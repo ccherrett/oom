@@ -201,9 +201,9 @@ void MidiTrack::updateSoloStates(bool noDec)
 	if (noDec && !_solo)
 		return;
 
-//	_tmpSoloChainTrack = this;
-//	_tmpSoloChainDoIns = false;
-//	_tmpSoloChainNoDec = noDec;
+        _tmpSoloChainTrack = this;
+        _tmpSoloChainDoIns = false;
+        _tmpSoloChainNoDec = noDec;
 	updateSoloState();
 
         if (outPort() >= 0)
