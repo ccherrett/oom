@@ -20,19 +20,24 @@ extern SndFile* getSndFile(const SndFile* sf, QWidget* parent);
 //   MixdownFileDialog
 //---------------------------------------------------------
 
-class MixdownFileDialog : public QDialog, public Ui::MixdownFileDialogBase {
+class MixdownFileDialog : public QDialog, public Ui::MixdownFileDialogBase
+{
     Q_OBJECT
-      SndFile* sf;
+    SndFile* sf;
 
-   private slots:
-      void fdialog();
-      virtual void accept();
+private slots:
+    void fdialog();
+    virtual void accept();
 
-   public:
-      MixdownFileDialog(const SndFile* f, QWidget* parent = 0,
-         Qt::WFlags fl = 0);
-      SndFile* sndFile() { return sf; }
-      };
+public:
+    MixdownFileDialog(const SndFile* f, QWidget* parent = 0,
+            Qt::WFlags fl = 0);
+
+    SndFile* sndFile()
+    {
+        return sf;
+    }
+};
 
 #endif
 

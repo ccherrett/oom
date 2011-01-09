@@ -18,37 +18,81 @@ class Xml;
 //   NKey
 //---------------------------------------------------------
 
-class NKey {
-      static int offsets[14];
-      int val;
-   public:
-      NKey() { val = 7; }
-      NKey(int k) { val = k; }
-      void draw(QPainter& p, const QPoint& pt) const;
-      int idx() const  { return val; }
-      int offset() const { return offsets[val]; }
-      void read(Xml&);
-      void write(int, Xml&) const;
-      void set(int n) { val = n; }
-      int width() const;
-      };
+class NKey
+{
+    static int offsets[14];
+    int val;
+public:
+
+    NKey()
+    {
+        val = 7;
+    }
+
+    NKey(int k)
+    {
+        val = k;
+    }
+    void draw(QPainter& p, const QPoint& pt) const;
+
+    int idx() const
+    {
+        return val;
+    }
+
+    int offset() const
+    {
+        return offsets[val];
+    }
+    void read(Xml&);
+    void write(int, Xml&) const;
+
+    void set(int n)
+    {
+        val = n;
+    }
+    int width() const;
+};
 
 //---------------------------------------------------------
 //   Scale
 //---------------------------------------------------------
 
-class Scale {
-      int val;                // 1 = 1 sharp,  -1 1 flat
-      bool minor;
-   public:
-      Scale() { val = 0; minor = false; }
-      Scale(int s, bool m = false) { val = s; minor = m; }
-      int idx() const             { return val; }
-      void read(Xml&);
-      void write(int, Xml&) const;
-      void set(int n)             { val = n; }
-      void setMajorMinor(bool f)  { minor = f; }      // true == minor
-      int width() const;
-      };
+class Scale
+{
+    int val; // 1 = 1 sharp,  -1 1 flat
+    bool minor;
+public:
+
+    Scale()
+    {
+        val = 0;
+        minor = false;
+    }
+
+    Scale(int s, bool m = false)
+    {
+        val = s;
+        minor = m;
+    }
+
+    int idx() const
+    {
+        return val;
+    }
+    void read(Xml&);
+    void write(int, Xml&) const;
+
+    void set(int n)
+    {
+        val = n;
+    }
+
+    void setMajorMinor(bool f)
+    {
+        minor = f;
+    } // true == minor
+    int width() const;
+};
 #endif
 

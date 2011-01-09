@@ -14,71 +14,71 @@
 //---------------------------------------------------------
 
 SpinBox::SpinBox(QWidget* parent)
-   : QSpinBox(parent)
+: QSpinBox(parent)
 {
-  _clearFocus = true;
+	_clearFocus = true;
 }
 
 SpinBox::SpinBox(int minValue, int maxValue, int step, QWidget* parent)
-   : QSpinBox(parent)
+: QSpinBox(parent)
 {
-  setRange(minValue, maxValue);
-  setSingleStep(step);
-  _clearFocus = true;
+	setRange(minValue, maxValue);
+	setSingleStep(step);
+	_clearFocus = true;
 }
 
 bool SpinBox::eventFilter(QObject* o, QEvent* ev)
 {
-    // if (o != (QObject*)editor()) ddskrjo can't find editor()
-    //    return QSpinBox::eventFilter(o,ev);
-    
-    bool retval = FALSE; 
-    if(ev->type() == QEvent::KeyPress) 
-    {
-        QKeyEvent* k = (QKeyEvent*)ev;
-        if(k->key() == Qt::Key_Up || k->key() == Qt::Key_Down) 
-        {
-          // stepUp/stepDown will be called. Set this now.
-          _clearFocus = false;
-        }  
-        else if (k->key() == Qt::Key_Enter || k->key() == Qt::Key_Return) 
-        {
-          // With this line, two enter presses after an edit will clear focus.
-          // Without, just one enter press clears the focus.
-          //if(!editor()->isModified())
-          {  
-            clearFocus();
-            return TRUE;
-          }
-        }
-   }
-   else
-   if(ev->type() == QEvent::MouseButtonDblClick) 
-   {
-     emit doubleClicked();
-     return TRUE;
-   }
-   
-   retval = QSpinBox::eventFilter(o, ev);
-     
-   return retval;
+	// if (o != (QObject*)editor()) ddskrjo can't find editor()
+	//    return QSpinBox::eventFilter(o,ev);
+
+	bool retval = FALSE;
+	if (ev->type() == QEvent::KeyPress)
+	{
+		QKeyEvent* k = (QKeyEvent*) ev;
+		if (k->key() == Qt::Key_Up || k->key() == Qt::Key_Down)
+		{
+			// stepUp/stepDown will be called. Set this now.
+			_clearFocus = false;
+		}
+		else if (k->key() == Qt::Key_Enter || k->key() == Qt::Key_Return)
+		{
+			// With this line, two enter presses after an edit will clear focus.
+			// Without, just one enter press clears the focus.
+			//if(!editor()->isModified())
+			{
+				clearFocus();
+				return TRUE;
+			}
+		}
+	}
+	else
+		if (ev->type() == QEvent::MouseButtonDblClick)
+	{
+		emit doubleClicked();
+		return TRUE;
+	}
+
+	retval = QSpinBox::eventFilter(o, ev);
+
+	return retval;
 }
 
 void SpinBox::stepUp()
 {
-  QSpinBox::stepUp();
-  if(_clearFocus)
-    clearFocus();
-  else  
-    _clearFocus = true;
+	QSpinBox::stepUp();
+	if (_clearFocus)
+		clearFocus();
+	else
+		_clearFocus = true;
 }
 
 void SpinBox::stepDown()
 {
-  QSpinBox::stepDown();
-  if(_clearFocus)
-    clearFocus();
-  else  
-    _clearFocus = true;
+	QSpinBox::stepDown();
+	if (_clearFocus)
+		clearFocus();
+	else
+		_clearFocus = true;
 }
 

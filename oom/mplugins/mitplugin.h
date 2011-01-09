@@ -19,13 +19,23 @@ class Xml;
 //    midi input transform plugin
 //---------------------------------------------------------
 
-class MITPlugin {
-   public:
-      virtual ~MITPlugin(){}
-      virtual void process(MEvent& event) = 0;
-      virtual void readStatus(Xml&) {}
-      virtual void writeStatus(int, Xml&) const {}
-      };
+class MITPlugin
+{
+public:
+
+    virtual ~MITPlugin()
+    {
+    }
+    virtual void process(MEvent& event) = 0;
+
+    virtual void readStatus(Xml&)
+    {
+    }
+
+    virtual void writeStatus(int, Xml&) const
+    {
+    }
+};
 
 typedef std::list<MITPlugin*> MITPluginList;
 typedef MITPluginList::iterator iMITPlugin;

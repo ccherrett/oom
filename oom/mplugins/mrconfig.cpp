@@ -18,54 +18,54 @@
 //---------------------------------------------------------
 
 MRConfig::MRConfig(QWidget* parent, Qt::WFlags fl)
-   : QWidget(parent, fl)
-      {
-      setupUi(this);
-      b1->setChecked(rcEnable);
-      sb1->setValue(rcStopNote);
-      sb2->setValue(rcRecordNote);
-      sb3->setValue(rcGotoLeftMarkNote);
-      sb4->setValue(rcPlayNote);
+: QWidget(parent, fl)
+{
+	setupUi(this);
+	b1->setChecked(rcEnable);
+	sb1->setValue(rcStopNote);
+	sb2->setValue(rcRecordNote);
+	sb3->setValue(rcGotoLeftMarkNote);
+	sb4->setValue(rcPlayNote);
 
-      connect(b1,  SIGNAL(toggled(bool)), SLOT(setRcEnable(bool)));
-      connect(sb1, SIGNAL(valueChanged(int)), SLOT(setRcStopNote(int)));
-      connect(sb2, SIGNAL(valueChanged(int)), SLOT(setRcRecordNote(int)));
-      connect(sb3, SIGNAL(valueChanged(int)), SLOT(setRcGotoLeftMarkNote(int)));
-      connect(sb4, SIGNAL(valueChanged(int)), SLOT(setRcPlayNote(int)));
-      }
+	connect(b1, SIGNAL(toggled(bool)), SLOT(setRcEnable(bool)));
+	connect(sb1, SIGNAL(valueChanged(int)), SLOT(setRcStopNote(int)));
+	connect(sb2, SIGNAL(valueChanged(int)), SLOT(setRcRecordNote(int)));
+	connect(sb3, SIGNAL(valueChanged(int)), SLOT(setRcGotoLeftMarkNote(int)));
+	connect(sb4, SIGNAL(valueChanged(int)), SLOT(setRcPlayNote(int)));
+}
 
 //---------------------------------------------------------
 //   closeEvent
 //---------------------------------------------------------
 
 void MRConfig::closeEvent(QCloseEvent* ev)
-      {
-      emit hideWindow();
-      QWidget::closeEvent(ev);
-      }
+{
+	emit hideWindow();
+	QWidget::closeEvent(ev);
+}
 
 void MRConfig::setRcEnable(bool f)
-      {
-      rcEnable = f;
-      }
+{
+	rcEnable = f;
+}
 
 void MRConfig::setRcStopNote(int val)
-      {
-      rcStopNote = val;
-      }
+{
+	rcStopNote = val;
+}
 
 void MRConfig::setRcRecordNote(int val)
-      {
-      rcRecordNote = val;
-      }
+{
+	rcRecordNote = val;
+}
 
 void MRConfig::setRcGotoLeftMarkNote(int val)
-      {
-      rcGotoLeftMarkNote = val;
-      }
+{
+	rcGotoLeftMarkNote = val;
+}
 
 void MRConfig::setRcPlayNote(int val)
-      {
-      rcPlayNote = val;
-      }
+{
+	rcPlayNote = val;
+}
 

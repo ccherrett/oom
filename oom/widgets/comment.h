@@ -18,36 +18,38 @@ class QWidget;
 //   Comment
 //---------------------------------------------------------
 
-class Comment : public QWidget, public Ui::CommentBase {
-      Q_OBJECT
+class Comment : public QWidget, public Ui::CommentBase
+{
+    Q_OBJECT
 
-   private:
-      virtual void setText(const QString& s) = 0;
+private:
+    virtual void setText(const QString& s) = 0;
 
-   private slots:
-      void textChanged();
+private slots:
+    void textChanged();
 
-   public:
-      Comment(QWidget* parent);
-      };
+public:
+    Comment(QWidget* parent);
+};
 
 //---------------------------------------------------------
 //   TrackComment
 //---------------------------------------------------------
 
-class TrackComment : public Comment {
-      Track* track;
-      Q_OBJECT
+class TrackComment : public Comment
+{
+    Track* track;
+    Q_OBJECT
 
-   private:
-      virtual void setText(const QString& s);
+private:
+    virtual void setText(const QString& s);
 
-   private slots:
-      void songChanged(int);
+private slots:
+    void songChanged(int);
 
-   public:
-      TrackComment(Track*, QWidget*);
-      };
+public:
+    TrackComment(Track*, QWidget*);
+};
 
 #endif
 

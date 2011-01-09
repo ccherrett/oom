@@ -21,17 +21,17 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   VolEntry
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   VolEntry
+	//---------------------------------------------------------
 
-VolEntry::VolEntry(QWidget* parent)
-   : FloatEntry(parent)
-      {
-      setRange(-60.0f, 10.0f);
-      setSpecialText(tr("off"));
-      setPrecision(0);
-      setLog(true);
-      }
+	VolEntry::VolEntry(QWidget* parent)
+	: FloatEntry(parent)
+	{
+		setRange(-60.0f, 10.0f);
+		setSpecialText(tr("off"));
+		setPrecision(0);
+		setLog(true);
+	}
 }
 

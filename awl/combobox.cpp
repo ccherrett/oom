@@ -22,15 +22,15 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   ComboBox
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   ComboBox
+	//---------------------------------------------------------
 
-ComboBox::ComboBox(QWidget* parent)
-   : QComboBox(parent)
-      {
-      _id = 0;
-      connect(this, SIGNAL(activated(int)), SLOT(activatedIntern(int)));
-      }
+	ComboBox::ComboBox(QWidget* parent)
+	: QComboBox(parent)
+	{
+		_id = 0;
+		connect(this, SIGNAL(activated(int)), SLOT(activatedIntern(int)));
+	}
 }
 

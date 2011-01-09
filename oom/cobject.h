@@ -21,42 +21,60 @@ class Xml;
 //---------------------------------------------------------
 
 class TopWin : public QMainWindow
-      {
-      Q_OBJECT
+{
+    Q_OBJECT
 
-   public:
-      virtual void readStatus(Xml&);
-      virtual void writeStatus(int, Xml&) const;
-      TopWin(QWidget* parent=0, const char* name=0,
-         Qt::WindowFlags f = Qt::Window);
-      };
+public:
+    virtual void readStatus(Xml&);
+    virtual void writeStatus(int, Xml&) const;
+    TopWin(QWidget* parent = 0, const char* name = 0,
+            Qt::WindowFlags f = Qt::Window);
+};
 
 //---------------------------------------------------------
 //   Toplevel
 //---------------------------------------------------------
 
-class Toplevel {
-   public:
-      enum ToplevelType { PIANO_ROLL, LISTE, DRUM, MASTER, WAVE, 
-         LMASTER, CLIPLIST, MARKER
-#ifdef PATCHBAY
-         , M_PATCHBAY
-#endif /* PATCHBAY */
-         };
-      Toplevel(ToplevelType t, unsigned long obj, TopWin* cobj) {
-            _type = t;
-            _object = obj;
-            _cobject = cobj;
-            }
-      ToplevelType type() const { return _type; }
-      unsigned long object()        const { return _object; }
-      TopWin* cobject()   const { return _cobject; }
+class Toplevel
+{
+public:
 
-   private:
-      ToplevelType _type;
-      unsigned long _object;
-      TopWin* _cobject;
-      };
+    enum ToplevelType
+    {
+        PIANO_ROLL, LISTE, DRUM, MASTER, WAVE,
+        LMASTER, CLIPLIST, MARKER
+#ifdef PATCHBAY
+        , M_PATCHBAY
+#endif /* PATCHBAY */
+    };
+
+    Toplevel(ToplevelType t, unsigned long obj, TopWin* cobj)
+    {
+        _type = t;
+        _object = obj;
+        _cobject = cobj;
+    }
+
+    ToplevelType type() const
+    {
+        return _type;
+    }
+
+    unsigned long object() const
+    {
+        return _object;
+    }
+
+    TopWin* cobject() const
+    {
+        return _cobject;
+    }
+
+private:
+    ToplevelType _type;
+    unsigned long _object;
+    TopWin* _cobject;
+};
 
 typedef std::list <Toplevel> ToplevelList;
 typedef ToplevelList::iterator iToplevel;

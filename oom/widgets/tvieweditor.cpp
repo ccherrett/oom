@@ -34,7 +34,7 @@
 
 TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(parent)
 {
-	setupUi(this); 
+	setupUi(this);
 	_allTracks = song->tracks();
 	_viewList = vl;
 	//MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP,AUDIO_AUX
@@ -42,32 +42,33 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 	//Populate trackTypes and pass it to cmbTypes 
 	cmbType->addItems(_trackTypes);
 	QStringList stracks;
-	for(ciTrack t = _allTracks->begin(); t != _allTracks->end(); ++t)
+	for (ciTrack t = _allTracks->begin(); t != _allTracks->end(); ++t)
 	{
 		_tracks.push_back((*t));
-		switch((*t)->type()) {/*{{{*/
+		switch ((*t)->type())
+		{/*{{{*/
 			case Track::MIDI:
 			case Track::DRUM:
-				_midis.push_back((MidiTrack*)(*t));
+				_midis.push_back((MidiTrack*) (*t));
 				break;
 			case Track::WAVE:
-				_waves.push_back((WaveTrack*)(*t));
+				_waves.push_back((WaveTrack*) (*t));
 				break;
 			case Track::AUDIO_OUTPUT:
-				_outputs.push_back((AudioOutput*)(*t));
+				_outputs.push_back((AudioOutput*) (*t));
 				stracks << (*t)->name();
 				break;
 			case Track::AUDIO_GROUP:
-				_groups.push_back((AudioGroup*)(*t));
+				_groups.push_back((AudioGroup*) (*t));
 				break;
 			case Track::AUDIO_AUX:
-				_auxs.push_back((AudioAux*)(*t));
+				_auxs.push_back((AudioAux*) (*t));
 				break;
 			case Track::AUDIO_INPUT:
-				_inputs.push_back((AudioInput*)(*t));
+				_inputs.push_back((AudioInput*) (*t));
 				break;
 			case Track::AUDIO_SOFTSYNTH:
-				SynthI* s = (SynthI*)(*t);
+				SynthI* s = (SynthI*) (*t);
 				_synthIs.push_back(s);
 				break;
 		}/*}}}*/
@@ -80,7 +81,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 	btnRemove->setText(tr("Remove Track"));
 	btnRemove->setFocusPolicy(btnAdd->focusPolicy());
 	connect(btnRemove, SIGNAL(clicked(bool)), SLOT(btnRemoveTrack(bool)));
-	
+
 	connect(cmbViews, SIGNAL(currentIndexChanged(QString&)), SLOT(cmbViewSelected(QString&)));
 	connect(cmbType, SIGNAL(currentIndexChanged(int)), SLOT(cmbTypeSelected(int)));
 }
@@ -89,6 +90,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 //----------------------------------------------
 // Slots
 //----------------------------------------------
+
 void TrackViewEditor::cmbViewSelected(QString& sl)
 {
 	//Perform actions to populate list below based on selected view
@@ -100,43 +102,44 @@ void TrackViewEditor::cmbTypeSelected(int type)
 	//We need to repopulate and filter the allTrackList
 	//"Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Soft_Synth"
 	QStringList stracks;
-	switch(type) {/*{{{*/
+	switch (type)
+	{/*{{{*/
 		case 0:
-			for(ciTrack t = _outputs.begin(); t != _outputs.end(); ++t)
+			for (ciTrack t = _outputs.begin(); t != _outputs.end(); ++t)
 			{
 				//This should be checked against track in other views
 				stracks << (*t)->name();
 			}
 		case 1:
-			for(ciTrack t = _inputs.begin(); t != _inputs.end(); ++t)
+			for (ciTrack t = _inputs.begin(); t != _inputs.end(); ++t)
 			{
 				//This should be checked against track in other views
 				stracks << (*t)->name();
 			}
 			break;
 		case 2:
-			for(ciTrack t = _auxs.begin(); t != _auxs.end(); ++t)
+			for (ciTrack t = _auxs.begin(); t != _auxs.end(); ++t)
 			{
 				//This should be checked against track in other views
 				stracks << (*t)->name();
 			}
 			break;
 		case 3:
-			for(ciTrack t = _groups.begin(); t != _groups.end(); ++t)
+			for (ciTrack t = _groups.begin(); t != _groups.end(); ++t)
 			{
 				//This should be checked against track in other views
 				stracks << (*t)->name();
 			}
 			break;
 		case 4:
-			for(ciTrack t = _midis.begin(); t != _midis.end(); ++t)
+			for (ciTrack t = _midis.begin(); t != _midis.end(); ++t)
 			{
 				//This should be checked against track in other views
 				stracks << (*t)->name();
 			}
 			break;
 		case 5:
-			for(ciTrack t = _synthIs.begin(); t != _synthIs.end(); ++t)
+			for (ciTrack t = _synthIs.begin(); t != _synthIs.end(); ++t)
 			{
 				//This should be checked against track in other views
 				stracks << (*t)->name();
@@ -151,12 +154,12 @@ void TrackViewEditor::btnAddTrack(bool state)
 	//Perform actions to add action to right list and remove from left
 	printf("Add button clicked\n");
 	QItemSelectionModel* model = listAllTracks->selectionModel();
-	if(model->hasSelection())
+	if (model->hasSelection())
 	{
 		QModelIndexList sel = model->selectedRows(0);
 		QList<QModelIndex>::const_iterator id;
 		for (id = sel.constBegin(); id != sel.constEnd(); ++id)
-		//for(QModelIndex* id = sel.begin(); id != sel.end(); ++id)
+			//for(QModelIndex* id = sel.begin(); id != sel.end(); ++id)
 		{
 			//We have to index we will get the row.
 			int row = (*id).row();
@@ -164,9 +167,9 @@ void TrackViewEditor::btnAddTrack(bool state)
 			QVariant v = m->data((*id));
 			QString val = v.toString();
 			Track* trk = song->findTrack(val);
-			if(trk)
+			if (trk)
 				printf("Adding Track from row: %d\n", row);
-				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
+			//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
 		}
 	}
 }

@@ -25,84 +25,84 @@
 //    "val" - slider value in range 0-1024
 //---------------------------------------------------------
 
-void ScrollScale::setScale ( int val )
+void ScrollScale::setScale(int val)
 {
 	int off = offset();
-	if ( invers )
+	if (invers)
 		val = 1024 - val;
 	double min, max;
-	if ( scaleMin < 0 )
-		min = 1.0/ ( -scaleMin );
+	if (scaleMin < 0)
+		min = 1.0 / (-scaleMin);
 	else
-		min = double ( scaleMin );
+		min = double ( scaleMin);
 
-	if ( scaleMax < 0 )
-		max = 1.0/ ( -scaleMax );
+	if (scaleMax < 0)
+		max = 1.0 / (-scaleMax);
 	else
-		max = double ( scaleMax );
+		max = double ( scaleMax);
 
-	double diff = max-min;
-	double fkt  = double ( val ) /1024.0;
-	double v = ( pow ( logbase, fkt )-1 ) / ( logbase-1 );
+	double diff = max - min;
+	double fkt = double ( val) / 1024.0;
+	double v = (pow(logbase, fkt) - 1) / (logbase - 1);
 	double scale;
-	if ( invers )
+	if (invers)
 		scale = max - v * diff;
 	else
 		scale = min + v * diff;
 
-	if ( scale < 1.0 )
-		scaleVal = - ( int ( 1.0 / scale ) );
+	if (scale < 1.0)
+		scaleVal = -(int ( 1.0 / scale));
 	else
-		scaleVal = int ( scale );
-	if ( scaleVal == -1 )   // nur so
+		scaleVal = int ( scale);
+	if (scaleVal == -1) // nur so
 		scaleVal = 1;
 
 #if 0
-	if ( scaleMax > scaleMin )
+	if (scaleMax > scaleMin)
 	{
-		if ( scale < scaleMin )
+		if (scale < scaleMin)
 			scale = scaleMin;
-		else if ( scale > scaleMax )
+		else if (scale > scaleMax)
 			scale = scaleMax;
 	}
 	else
 	{
-		if ( scale < scaleMax )
+		if (scale < scaleMax)
 			scale = scaleMax;
-		else if ( scale > scaleMin )
+		else if (scale > scaleMin)
 			scale = scaleMin;
 	}
 #endif
 
-	emit scaleChanged ( scaleVal );
-	if ( !noScale )
-		setRange ( minVal, maxVal );
+	emit scaleChanged(scaleVal);
+	if (!noScale)
+		setRange(minVal, maxVal);
 
-  int i = ( scroll->orientation() == Qt::Horizontal ) ? width() : height();
-  int pos, pmax;
-  if ( scaleVal < 1 )
-  {
-    pos = ( off-scaleVal/2 ) / ( -scaleVal );
-    pmax = ( maxVal-scaleVal-1 ) / ( -scaleVal ) - i;
-  }
-  else
-  {
-    pos = off * scaleVal;
-    pmax = maxVal * scaleVal - i;
-  }
-  if(pos > pmax)
-    pos = pmax;
-  setPos(pos);
+	int i = (scroll->orientation() == Qt::Horizontal) ? width() : height();
+	int pos, pmax;
+	if (scaleVal < 1)
+	{
+		pos = (off - scaleVal / 2) / (-scaleVal);
+		pmax = (maxVal - scaleVal - 1) / (-scaleVal) - i;
+	}
+	else
+	{
+		pos = off * scaleVal;
+		pmax = maxVal * scaleVal - i;
+	}
+	if (pos > pmax)
+		pos = pmax;
+	setPos(pos);
 }
 
 //---------------------------------------------------------
 //   setMag
 //---------------------------------------------------------
 
-void ScrollScale::setMag ( int cs )
+void ScrollScale::setMag(int cs)
 {
-	scale->setValue ( cs );
-	setScale ( cs );
+	scale->setValue(cs);
+	setScale(cs);
 }
 
 //---------------------------------------------------------
@@ -110,20 +110,20 @@ void ScrollScale::setMag ( int cs )
 //    min,max  ticks
 //---------------------------------------------------------
 
-void ScrollScale::setRange ( int min, int max )
+void ScrollScale::setRange(int min, int max)
 {
-//      if ((min != minVal) && (max != maxVal))
-//            return;
+	//      if ((min != minVal) && (max != maxVal))
+	//            return;
 	minVal = min;
 	maxVal = max;
-	int i = ( scroll->orientation() == Qt::Horizontal ) ? width() : height();
+	int i = (scroll->orientation() == Qt::Horizontal) ? width() : height();
 
-	if ( !noScale )
+	if (!noScale)
 	{
-		if ( scaleVal < 1 )
+		if (scaleVal < 1)
 		{
-			min = minVal / ( -scaleVal );
-			max = ( maxVal-scaleVal-1 ) / ( -scaleVal ) - i;
+			min = minVal / (-scaleVal);
+			max = (maxVal - scaleVal - 1) / (-scaleVal) - i;
 		}
 		else
 		{
@@ -133,22 +133,22 @@ void ScrollScale::setRange ( int min, int max )
 	}
 	else
 		max -= i;
-	if ( max < 0 )
+	if (max < 0)
 		max = 0;
-	if ( min < 0 )
+	if (min < 0)
 		min = 0;
-	if ( min > max )
+	if (min > max)
 		max = min;
-  
-  scroll->setRange ( min, max );
+
+	scroll->setRange(min, max);
 
 	// qt doesn't check this...
-	if ( scroll->value() < min )
-		scroll->setValue ( min );
-	if ( scroll->value() > max )
-		scroll->setValue ( max );
-        scroll->setSingleStep(20);
-        scroll->setPageStep(i);
+	if (scroll->value() < min)
+		scroll->setValue(min);
+	if (scroll->value() > max)
+		scroll->setValue(max);
+	scroll->setSingleStep(20);
+	scroll->setPageStep(i);
 }
 
 //---------------------------------------------------------
@@ -156,10 +156,10 @@ void ScrollScale::setRange ( int min, int max )
 //    pos in pixel
 //---------------------------------------------------------
 
-void ScrollScale::setPos ( unsigned pos )
+void ScrollScale::setPos(unsigned pos)
 {
 
-	scroll->setValue ( pos );
+	scroll->setValue(pos);
 }
 
 //---------------------------------------------------------
@@ -167,151 +167,151 @@ void ScrollScale::setPos ( unsigned pos )
 //    pos in pixel
 //---------------------------------------------------------
 
-void ScrollScale::setPosNoLimit ( unsigned pos )
+void ScrollScale::setPosNoLimit(unsigned pos)
 {
-  //printf ( "ScrollScale::setPosNoLimit pos:%d scaleVal:%d offset ticks:%d\n", pos, scaleVal, pos2offset ( pos ) );
+	//printf ( "ScrollScale::setPosNoLimit pos:%d scaleVal:%d offset ticks:%d\n", pos, scaleVal, pos2offset ( pos ) );
 
-  if((int)pos > scroll->maximum())
-    scroll->setMaximum(pos);
-  scroll->setValue(pos);
+	if ((int) pos > scroll->maximum())
+		scroll->setMaximum(pos);
+	scroll->setValue(pos);
 }
 
 //---------------------------------------------------------
 //   resizeEvent
 //---------------------------------------------------------
 
-void ScrollScale::resizeEvent ( QResizeEvent* )
+void ScrollScale::resizeEvent(QResizeEvent*)
 {
-	setScale ( scale->value() );
+	setScale(scale->value());
 }
 
 //---------------------------------------------------------
 //   ScrollScale
 //---------------------------------------------------------
 
-ScrollScale::ScrollScale ( int s1, int s2, int cs, int max_, Qt::Orientation o,
-                           QWidget* parent, int min_, bool inv, double bas )
-		: QWidget ( parent )
+ScrollScale::ScrollScale(int s1, int s2, int cs, int max_, Qt::Orientation o,
+		QWidget* parent, int min_, bool inv, double bas)
+: QWidget(parent)
 {
-	noScale     = false;
-	_page        = 0;
-	_pages       = 1;
+	noScale = false;
+	_page = 0;
+	_pages = 1;
 	pageButtons = false;
 	showMagFlag = true;
-	scaleMin    = s1;
-	scaleMax    = s2;
-	minVal      = min_;
-	maxVal      = max_;
-	up          = 0;
-	down        = 0;
-	logbase     = bas;
-	invers      = inv;
+	scaleMin = s1;
+	scaleMax = s2;
+	minVal = min_;
+	maxVal = max_;
+	up = 0;
+	down = 0;
+	logbase = bas;
+	invers = inv;
 
 	double min, max;
-	if ( scaleMin < 0 )
-		min = 1.0/ ( -scaleMin );
+	if (scaleMin < 0)
+		min = 1.0 / (-scaleMin);
 	else
-		min = double ( scaleMin );
+		min = double ( scaleMin);
 
-	if ( scaleMax < 0 )
-		max = 1.0/ ( -scaleMax );
+	if (scaleMax < 0)
+		max = 1.0 / (-scaleMax);
 	else
-		max = double ( scaleMax );
+		max = double ( scaleMax);
 
-	double cmag = ( cs < 0 ) ? ( 1.0/ ( -cs ) ) : double ( cs );
-	double diff = max-min;
+	double cmag = (cs < 0) ? (1.0 / (-cs)) : double ( cs);
+	double diff = max - min;
 
 	//
 	// search initial value for slider
 	//
-	int cur   = 512;
+	int cur = 512;
 	int delta = 256;
-	for ( int i = 0; i < 8; ++i )
+	for (int i = 0; i < 8; ++i)
 	{
-		int tryVal   = invers ? 1025 - cur : cur;
-		double fkt   = double ( tryVal ) /1024.0;
-		double v     = ( pow ( logbase, fkt )-1 ) / ( logbase-1 );
-		double scale = invers ? ( max - v * diff ) : ( min + v * diff );
-		if ( scale == cmag ) // not very likely
+		int tryVal = invers ? 1025 - cur : cur;
+		double fkt = double ( tryVal) / 1024.0;
+		double v = (pow(logbase, fkt) - 1) / (logbase - 1);
+		double scale = invers ? (max - v * diff) : (min + v * diff);
+		if (scale == cmag) // not very likely
 			break;
- //printf("iteration %d invers:%d soll %f(cur:%d) - ist %f\n", i, invers, scale, cur, cmag);
+		//printf("iteration %d invers:%d soll %f(cur:%d) - ist %f\n", i, invers, scale, cur, cmag);
 		int dd = invers ? -delta : delta;
-		cur += ( scale < cmag ) ? dd : -dd;
-		delta/=2;
+		cur += (scale < cmag) ? dd : -dd;
+		delta /= 2;
 	}
 
-	scale  = new QSlider (o);
-        // Added by Tim. For some reason focus was on. 
-        // It messes up tabbing, and really should have a shortcut instead.
-        scale->setFocusPolicy(Qt::NoFocus);  
-        scale->setMinimum(0);
-        scale->setMaximum(1024);
+	scale = new QSlider(o);
+	// Added by Tim. For some reason focus was on.
+	// It messes up tabbing, and really should have a shortcut instead.
+	scale->setFocusPolicy(Qt::NoFocus);
+	scale->setMinimum(0);
+	scale->setMaximum(1024);
 	scale->setPageStep(1);
-	scale->setValue(cur);	
+	scale->setValue(cur);
 
-	scroll = new QScrollBar ( o );
-        //scroll->setFocusPolicy(Qt::NoFocus);  // Tim.
-	setScale ( cur );
+	scroll = new QScrollBar(o);
+	//scroll->setFocusPolicy(Qt::NoFocus);  // Tim.
+	setScale(cur);
 
-	if ( o == Qt::Horizontal )
+	if (o == Qt::Horizontal)
 	{
-                box = new QBoxLayout ( QBoxLayout::LeftToRight);
-		scale->setMaximumWidth ( 70 );
-		scroll->setMinimumWidth ( 50 );
+		box = new QBoxLayout(QBoxLayout::LeftToRight);
+		scale->setMaximumWidth(70);
+		scroll->setMinimumWidth(50);
 	}
 	else
 	{
-                box = new QBoxLayout ( QBoxLayout::TopToBottom);
-		scroll->setMinimumHeight ( 50 );
-		scale->setMaximumHeight ( 70 );
+		box = new QBoxLayout(QBoxLayout::TopToBottom);
+		scroll->setMinimumHeight(50);
+		scale->setMaximumHeight(70);
 	}
-	box->addWidget ( scroll, 10 );
-	box->addWidget ( scale, 5 );
+	box->addWidget(scroll, 10);
+	box->addWidget(scale, 5);
 	setLayout(box);
-	connect ( scale, SIGNAL ( valueChanged ( int ) ), SLOT ( setScale ( int ) ) );
+	connect(scale, SIGNAL(valueChanged(int)), SLOT(setScale(int)));
 	///connect ( scale, SIGNAL ( valueChanged ( int ) ), SIGNAL ( lscaleChanged ( int ) ) );  // ??
-	connect ( scroll, SIGNAL ( valueChanged ( int ) ), SIGNAL ( scrollChanged ( int ) ) );
+	connect(scroll, SIGNAL(valueChanged(int)), SIGNAL(scrollChanged(int)));
 }
 
 //---------------------------------------------------------
 //   setPageButtons
 //---------------------------------------------------------
 
-void ScrollScale::setPageButtons ( bool flag )
+void ScrollScale::setPageButtons(bool flag)
 {
-	if ( flag == pageButtons )
+	if (flag == pageButtons)
 		return;
 
-	if ( flag )
+	if (flag)
 	{
-		if ( up == 0 )
+		if (up == 0)
 		{
 			up = new QToolButton;
-			up->setIcon ( QIcon(*upIcon) );
+			up->setIcon(QIcon(*upIcon));
 			down = new QToolButton;
-			down->setIcon ( QIcon(*downIcon) );
+			down->setIcon(QIcon(*downIcon));
 			pageNo = new QLabel;
 			QString s;
-			s.setNum ( _page+1 );
-			pageNo->setText ( s );
-                        down->setToolTip(tr ( "next page" ) );
-                        up->setToolTip(tr ( "previous page" ) );
-                        pageNo->setToolTip(tr ( "current page number" ) );
-			box->insertWidget ( 1, up );
-			box->insertWidget ( 2, down );
-			box->insertSpacing ( 3, 5 );
-			box->insertWidget ( 4, pageNo );
-			box->insertSpacing ( 5, 5 );
-			connect ( up, SIGNAL ( clicked() ), SLOT ( pageUp() ) );
-			connect ( down, SIGNAL ( clicked() ), SLOT ( pageDown() ) );
+			s.setNum(_page + 1);
+			pageNo->setText(s);
+			down->setToolTip(tr("next page"));
+			up->setToolTip(tr("previous page"));
+			pageNo->setToolTip(tr("current page number"));
+			box->insertWidget(1, up);
+			box->insertWidget(2, down);
+			box->insertSpacing(3, 5);
+			box->insertWidget(4, pageNo);
+			box->insertSpacing(5, 5);
+			connect(up, SIGNAL(clicked()), SLOT(pageUp()));
+			connect(down, SIGNAL(clicked()), SLOT(pageDown()));
 		}
 		up->show();
 		down->show();
 		pageNo->show();
-		if ( _page == ( _pages-1 ) )
-			down->setEnabled ( false );
-		if ( _page == 0 )
-			up->setEnabled ( false );
+		if (_page == (_pages - 1))
+			down->setEnabled(false);
+		if (_page == 0)
+			up->setEnabled(false);
 	}
 	else
 	{
@@ -325,10 +325,10 @@ void ScrollScale::setPageButtons ( bool flag )
 //   showMag
 //---------------------------------------------------------
 
-void ScrollScale::showMag ( bool flag )
+void ScrollScale::showMag(bool flag)
 {
 	showMagFlag = flag;
-	if ( flag )
+	if (flag)
 		scale->show();
 	else
 		scale->hide();
@@ -338,18 +338,20 @@ void ScrollScale::showMag ( bool flag )
 //---------------------------------------------------------
 //   offset
 //---------------------------------------------------------
+
 int ScrollScale::offset()
 {
-	return pos2offset ( scroll->value() );
+	return pos2offset(scroll->value());
 }
 
 //---------------------------------------------------------
 //   pos2offset
 //---------------------------------------------------------
-int ScrollScale::pos2offset ( int pos )
+
+int ScrollScale::pos2offset(int pos)
 {
-	if ( scaleVal < 1 )
-		return pos * ( -scaleVal ) + scaleVal/2;
+	if (scaleVal < 1)
+		return pos * (-scaleVal) + scaleVal / 2;
 	else
 		return pos / scaleVal;
 }
@@ -359,47 +361,47 @@ int ScrollScale::pos2offset ( int pos )
 //    val in tick
 //---------------------------------------------------------
 
-void ScrollScale::setOffset ( int val )
+void ScrollScale::setOffset(int val)
 {
-	int i = ( scroll->orientation() == Qt::Horizontal ) ? width() : height();
+	int i = (scroll->orientation() == Qt::Horizontal) ? width() : height();
 	int pos, max;
 
-	if ( scaleVal < 1 )
+	if (scaleVal < 1)
 	{
-		pos = ( val-scaleVal/2 ) / ( -scaleVal );
-		max = ( maxVal-scaleVal-1 ) / ( -scaleVal ) - i;
+		pos = (val - scaleVal / 2) / (-scaleVal);
+		max = (maxVal - scaleVal - 1) / (-scaleVal) - i;
 	}
 	else
 	{
 		pos = val * scaleVal;
 		max = maxVal * scaleVal - i;
 	}
-	if ( pos > max )
+	if (pos > max)
 	{
 		int min;
-		if ( scaleVal < 1 )
+		if (scaleVal < 1)
 		{
-			maxVal  = ( pos + width() ) * ( -scaleVal );
-			min = ( minVal-scaleVal/2 ) / ( -scaleVal );
-			max     = ( maxVal-scaleVal/2 ) / ( -scaleVal ) - i;
+			maxVal = (pos + width()) * (-scaleVal);
+			min = (minVal - scaleVal / 2) / (-scaleVal);
+			max = (maxVal - scaleVal / 2) / (-scaleVal) - i;
 		}
 		else
 		{
-			maxVal  = ( pos + width() + scaleVal/2 ) /scaleVal;
+			maxVal = (pos + width() + scaleVal / 2) / scaleVal;
 			min = minVal * scaleVal;
-			max     = maxVal * scaleVal - i;
+			max = maxVal * scaleVal - i;
 		}
 
-		if ( max < 0 )
+		if (max < 0)
 			max = 0;
-		if ( min < 0 )
+		if (min < 0)
 			min = 0;
-		if ( min > max )
+		if (min > max)
 			max = min;
-		scroll->setRange ( min, max );
+		scroll->setRange(min, max);
 	}
 
-	setPos ( pos );
+	setPos(pos);
 }
 
 //---------------------------------------------------------
@@ -409,17 +411,17 @@ void ScrollScale::setOffset ( int val )
 
 void ScrollScale::pageUp()
 {
-	if ( _page )
+	if (_page)
 	{
 		--_page;
-		emit newPage ( _page );
+		emit newPage(_page);
 		QString s;
-		s.setNum ( _page+1 );
-		pageNo->setText ( s );
-		if ( _page == 0 )
-			up->setEnabled ( false );
-		if ( _page == ( _pages-2 ) )
-			down->setEnabled ( true );
+		s.setNum(_page + 1);
+		pageNo->setText(s);
+		if (_page == 0)
+			up->setEnabled(false);
+		if (_page == (_pages - 2))
+			down->setEnabled(true);
 	}
 }
 
@@ -430,17 +432,17 @@ void ScrollScale::pageUp()
 
 void ScrollScale::pageDown()
 {
-	if ( _page + 1 < _pages )
+	if (_page + 1 < _pages)
 	{
 		++_page;
-		emit newPage ( _page );
+		emit newPage(_page);
 		QString s;
-		s.setNum ( _page+1 );
-		pageNo->setText ( s );
-		if ( _page == ( _pages-1 ) )
-			down->setEnabled ( false );
-		if ( _page == 1 )
-			up->setEnabled ( true );
+		s.setNum(_page + 1);
+		pageNo->setText(s);
+		if (_page == (_pages - 1))
+			down->setEnabled(false);
+		if (_page == 1)
+			up->setEnabled(true);
 	}
 }
 
@@ -448,19 +450,19 @@ void ScrollScale::pageDown()
 //   setPages
 //---------------------------------------------------------
 
-void ScrollScale::setPages ( int n )
+void ScrollScale::setPages(int n)
 {
 	_pages = n;
-	if ( _page >= _pages )
+	if (_page >= _pages)
 	{
-		_page = _pages-1;
-		emit newPage ( _page );
+		_page = _pages - 1;
+		emit newPage(_page);
 		QString s;
-		s.setNum ( _page+1 );
-		pageNo->setText ( s );
+		s.setNum(_page + 1);
+		pageNo->setText(s);
 	}
-	up->setEnabled ( _page );
-	down->setEnabled ( _page < ( _pages-1 ) );
+	up->setEnabled(_page);
+	down->setEnabled(_page < (_pages - 1));
 }
 
 int ScrollScale::pos() const
@@ -480,17 +482,18 @@ int ScrollScale::mag() const
  */
 int ScrollScale::getQuickZoomLevel(int mag)
 {
-      if (mag == 0)
-            return 0;
+	if (mag == 0)
+		return 0;
 
-      for (int i=0; i<24; i++) {
-            int val1 = ScrollScale::convertQuickZoomLevelToMag(i);
-            int val2 = ScrollScale::convertQuickZoomLevelToMag(i + 1);
-            if (mag > val1 && mag <= val2)
-                  return i + 1;
-            }
+	for (int i = 0; i < 24; i++)
+	{
+		int val1 = ScrollScale::convertQuickZoomLevelToMag(i);
+		int val2 = ScrollScale::convertQuickZoomLevelToMag(i + 1);
+		if (mag > val1 && mag <= val2)
+			return i + 1;
+	}
 
-     return -1; 
+	return -1;
 
 }
 
@@ -500,10 +503,10 @@ int ScrollScale::getQuickZoomLevel(int mag)
  */
 int ScrollScale::convertQuickZoomLevelToMag(int zoomlevel)
 {
-      int vals[] = { 0, 1, 15, 30, 46, 62, 80, 99, 119, 140, 163, 
-            187, 214, 242, 274, 308, 346, 388, 436, 491, 555, 631, 
-            726, 849, 1024 };
+	int vals[] = {0, 1, 15, 30, 46, 62, 80, 99, 119, 140, 163,
+		187, 214, 242, 274, 308, 346, 388, 436, 491, 555, 631,
+		726, 849, 1024};
 
-      return vals[zoomlevel];
+	return vals[zoomlevel];
 }
 

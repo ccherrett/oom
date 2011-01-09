@@ -17,43 +17,56 @@ class QCloseEvent;
 #include "ui_shortcutconfigbase.h"
 
 #define SHRT_CATEGORY_COL 0
+
 enum
-      {
-      SHRT_DESCR_COL = 0,
-      SHRT_SHRTCUT_COL
-      };
+{
+    SHRT_DESCR_COL = 0,
+    SHRT_SHRTCUT_COL
+};
 
-class SCListViewItem : public QTreeWidgetItem {
-      private:
-      int index;
+class SCListViewItem : public QTreeWidgetItem
+{
+private:
+    int index;
 
-      public:
-      SCListViewItem(QTreeWidget* parent, int i)
-            : QTreeWidgetItem(parent), index(i) { }
-      int getIndex() { return index; }
+public:
+
+    SCListViewItem(QTreeWidget* parent, int i)
+    : QTreeWidgetItem(parent), index(i)
+    {
+    }
+
+    int getIndex()
+    {
+        return index;
+    }
 
 };
 
+class ShortcutConfig : public QDialog, public Ui::ShortcutConfigBase
+{
+    Q_OBJECT
+private:
+    int current_category;
+    void updateSCListView(int category);
 
-class ShortcutConfig : public QDialog, public Ui::ShortcutConfigBase {
-      Q_OBJECT
-      private:
-      int current_category;
-      void updateSCListView(int category);
-      void updateSCListView() { updateSCListView(current_category); }
-      void closeEvent(QCloseEvent *e);
+    void updateSCListView()
+    {
+        updateSCListView(current_category);
+    }
+    void closeEvent(QCloseEvent *e);
 
-      private slots:
-      void categorySelChanged(QTreeWidgetItem*, int);
-      void shortcutSelChanged(QTreeWidgetItem*, int);
-      void assignShortcut();
-      void clearShortcut();
-      void assignAll();
+private slots:
+    void categorySelChanged(QTreeWidgetItem*, int);
+    void shortcutSelChanged(QTreeWidgetItem*, int);
+    void assignShortcut();
+    void clearShortcut();
+    void assignAll();
 
 
-      public:
-      ShortcutConfig(QWidget* parent);
-      bool _config_changed;
+public:
+    ShortcutConfig(QWidget* parent);
+    bool _config_changed;
 
 };
 

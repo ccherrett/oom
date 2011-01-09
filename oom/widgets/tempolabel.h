@@ -15,47 +15,49 @@
 //   TempoLabel
 //---------------------------------------------------------
 
-class TempoLabel : public QLabel {
-      double _value;
+class TempoLabel : public QLabel
+{
+    double _value;
 
-      Q_OBJECT
+    Q_OBJECT
 
-   protected:
-      QSize sizeHint() const;
+protected:
+    QSize sizeHint() const;
 
-   public slots:
-      void setValue(int);
-      void setValue(double);
+public slots:
+    void setValue(int);
+    void setValue(double);
 
-   public:
-      TempoLabel(QWidget*, const char* name = 0);
-      };
+public:
+    TempoLabel(QWidget*, const char* name = 0);
+};
 
 //---------------------------------------------------------
 //   TempoEdit
 //---------------------------------------------------------
 
-class TempoEdit : public QDoubleSpinBox {
-      Q_OBJECT
+class TempoEdit : public QDoubleSpinBox
+{
+    Q_OBJECT
 
-      double curVal;
-      
-   protected:
-      QSize sizeHint() const;
+    double curVal;
 
-   private slots:
-      void newValue(double);
+protected:
+    QSize sizeHint() const;
 
-   public slots:
-      void setValue(double);
+private slots:
+    void newValue(double);
 
-   signals:
-      void tempoChanged(double);
+public slots:
+    void setValue(double);
 
-   public:
-      TempoEdit(QWidget*);
-      //int tempo() const;
-      };
+signals:
+    void tempoChanged(double);
+
+public:
+    TempoEdit(QWidget*);
+    //int tempo() const;
+};
 
 #endif
 

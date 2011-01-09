@@ -19,24 +19,25 @@
 //   SpinBox
 //---------------------------------------------------------
 
-class SpinBox : public QSpinBox {
-      Q_OBJECT
+class SpinBox : public QSpinBox
+{
+    Q_OBJECT
 
-      bool _clearFocus; 
+    bool _clearFocus;
 
-   protected:
-      bool eventFilter(QObject* obj, QEvent* ev);
-      
-   public slots:
-      virtual void stepUp();
-      virtual void stepDown();
-   
-   signals:
-      void doubleClicked();
+protected:
+    bool eventFilter(QObject* obj, QEvent* ev);
 
-   public:
-      SpinBox(QWidget* parent=0);
-      SpinBox(int minValue, int maxValue, int step = 1, QWidget* parent=0);
+public slots:
+    virtual void stepUp();
+    virtual void stepDown();
+
+signals:
+    void doubleClicked();
+
+public:
+    SpinBox(QWidget* parent = 0);
+    SpinBox(int minValue, int maxValue, int step = 1, QWidget* parent = 0);
 };
 
 #endif

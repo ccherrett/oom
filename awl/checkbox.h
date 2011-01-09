@@ -23,33 +23,49 @@
 
 #include <QCheckBox>
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   CheckBox
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   CheckBox
+    //---------------------------------------------------------
 
-class CheckBox : public QCheckBox {
-      Q_OBJECT
-      Q_PROPERTY(int id READ id WRITE setId)
+    class CheckBox : public QCheckBox
+    {
+        Q_OBJECT
+        Q_PROPERTY(int id READ id WRITE setId)
 
-      int _id;
+        int _id;
 
-   private slots:
-      void hasToggled(bool val) {
+    private slots:
+
+        void hasToggled(bool val)
+        {
             emit valueChanged(double(val), _id);
-            }
-   signals:
-      void valueChanged(double, int);
+        }
+    signals:
+        void valueChanged(double, int);
 
-   public slots:
-      void setValue(double val) { setDown(val > 0.5f); }
+    public slots:
 
-   public:
-      CheckBox(QWidget* parent);
-      int id() const       { return _id; }
-      void setId(int i)    { _id = i; }
-      };
+        void setValue(double val)
+        {
+            setDown(val > 0.5f);
+        }
+
+    public:
+        CheckBox(QWidget* parent);
+
+        int id() const
+        {
+            return _id;
+        }
+
+        void setId(int i)
+        {
+            _id = i;
+        }
+    };
 
 }
 

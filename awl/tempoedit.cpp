@@ -27,67 +27,69 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   TempoEdit
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   TempoEdit
+	//---------------------------------------------------------
 
-TempoEdit::TempoEdit(QWidget* parent)
-   : QDoubleSpinBox(parent)
-      {
-      curVal = -1.0;
-      setSingleStep(1.0);
-      setRange(30.0, 600.0);
-      connect(this, SIGNAL(valueChanged(double)), SLOT(newValue(double)));
-      }
+	TempoEdit::TempoEdit(QWidget* parent)
+	: QDoubleSpinBox(parent)
+	{
+		curVal = -1.0;
+		setSingleStep(1.0);
+		setRange(30.0, 600.0);
+		connect(this, SIGNAL(valueChanged(double)), SLOT(newValue(double)));
+	}
 
-//---------------------------------------------------------
-//   sizeHint
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   sizeHint
+	//---------------------------------------------------------
 
-QSize TempoEdit::sizeHint() const
-      {
-      QFontMetrics fm(font());
-      int fw = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
-      int h  = fm.height() + fw * 2;
-      int w  = 2 + fm.width(QString("000.00")) +  fw * 4 + 30;
-      return QSize(w, h).expandedTo(QApplication::globalStrut());
-      }
+	QSize TempoEdit::sizeHint() const
+	{
+		QFontMetrics fm(font());
+		int fw = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+		int h = fm.height() + fw * 2;
+		int w = 2 + fm.width(QString("000.00")) + fw * 4 + 30;
+		return QSize(w, h).expandedTo(QApplication::globalStrut());
+	}
 
-//---------------------------------------------------------
-//   newValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   newValue
+	//---------------------------------------------------------
 
-void TempoEdit::newValue(double val)
-      {
-	if (val != curVal) {
-      	curVal = val;
-            emit tempoChanged(tempo());
-            }
-      }
+	void TempoEdit::newValue(double val)
+	{
+		if (val != curVal)
+		{
+			curVal = val;
+			emit tempoChanged(tempo());
+		}
+	}
 
-//---------------------------------------------------------
-//   setTempo
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setTempo
+	//---------------------------------------------------------
 
-void TempoEdit::setTempo(int val)
-      {
-      double d = 60000000.0/double(val);
-      if (d != curVal) {
-      	curVal = d;
-        	blockSignals(true);
-      	setValue(d);
-        	blockSignals(false);
-         	}
-      }
+	void TempoEdit::setTempo(int val)
+	{
+		double d = 60000000.0 / double(val);
+		if (d != curVal)
+		{
+			curVal = d;
+			blockSignals(true);
+			setValue(d);
+			blockSignals(false);
+		}
+	}
 
-//---------------------------------------------------------
-//   tempo
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   tempo
+	//---------------------------------------------------------
 
-int TempoEdit::tempo() const
-      {
-	return lrint(60000000.0/value());
-      }
+	int TempoEdit::tempo() const
+	{
+		return lrint(60000000.0 / value());
+	}
 
 }
 

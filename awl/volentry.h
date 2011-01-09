@@ -23,18 +23,20 @@
 
 #include "floatentry.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   VolEntry
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   VolEntry
+    //---------------------------------------------------------
 
-class VolEntry : public FloatEntry {
-      Q_OBJECT
+    class VolEntry : public FloatEntry
+    {
+        Q_OBJECT
 
-   public:
-      VolEntry(QWidget* parent);
-      };
+    public:
+        VolEntry(QWidget* parent);
+    };
 
 }
 

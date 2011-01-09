@@ -23,24 +23,34 @@
 
 #include "floatentry.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   MidiVolEntry
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   MidiVolEntry
+    //---------------------------------------------------------
 
-class MidiVolEntry : public FloatEntry {
-      Q_OBJECT
-      Q_PROPERTY(int max READ max WRITE setMax)
+    class MidiVolEntry : public FloatEntry
+    {
+        Q_OBJECT
+        Q_PROPERTY(int max READ max WRITE setMax)
 
-  	int _max;
+        int _max;
 
-   public:
-      virtual void setValue(double);
-   	void setMax(int val) { _max = val; }
-      int max() const      { return _max; }
-      MidiVolEntry(QWidget* parent);
-      };
+    public:
+        virtual void setValue(double);
+
+        void setMax(int val)
+        {
+            _max = val;
+        }
+
+        int max() const
+        {
+            return _max;
+        }
+        MidiVolEntry(QWidget* parent);
+    };
 }
 
 #endif

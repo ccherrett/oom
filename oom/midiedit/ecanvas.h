@@ -24,71 +24,112 @@ class QDropEvent;
 
 struct PartToChange
 {
-  Part* npart;
-  int   xdiff;
-}; 
+    Part* npart;
+    int xdiff;
+};
 typedef std::map<Part*, PartToChange> PartsToChangeMap;
 typedef std::map<Part*, PartToChange>::iterator iPartToChange;
-  
+
 //---------------------------------------------------------
 //   EventCanvas
 //---------------------------------------------------------
 
-class EventCanvas : public Canvas {
-      Q_OBJECT
-      virtual void leaveEvent(QEvent*e);
-      virtual void enterEvent(QEvent*e);
-      // Removed by T356.
-      //virtual QPoint raster(const QPoint&) const;
-      
-      virtual void startUndo(DragType);
-      
-      virtual void endUndo(DragType, int flags = 0);
-      virtual void mouseMove(const QPoint&);
+class EventCanvas : public Canvas
+{
+    Q_OBJECT
+    virtual void leaveEvent(QEvent*e);
+    virtual void enterEvent(QEvent*e);
+    // Removed by T356.
+    //virtual QPoint raster(const QPoint&) const;
 
-   protected:
-      bool _playEvents;
-      MidiEditor* editor;
-      unsigned start_tick, end_tick;
-      int curVelo;
-      bool _steprec;
-      bool _midiin;
+    virtual void startUndo(DragType);
 
-      void updateSelection();
-      virtual void addItem(Part*, Event&) = 0;
-      // Added by T356.
-      virtual QPoint raster(const QPoint&) const;
+    virtual void endUndo(DragType, int flags = 0);
+    virtual void mouseMove(const QPoint&);
 
-   public slots:
-      void redrawGrid()       { redraw(); }
-      void setSteprec(bool f) { _steprec = f; }
-      void setMidiin(bool f)  { _midiin = f; }
+protected:
+    bool _playEvents;
+    MidiEditor* editor;
+    unsigned start_tick, end_tick;
+    int curVelo;
+    bool _steprec;
+    bool _midiin;
 
-   signals:
-      void pitchChanged(int);       // current cursor position
-      void timeChanged(unsigned);
-      void selectionChanged(int, Event&, Part*);
-      void enterCanvas();
+    void updateSelection();
+    virtual void addItem(Part*, Event&) = 0;
+    // Added by T356.
+    virtual QPoint raster(const QPoint&) const;
 
-   public:
-      EventCanvas(MidiEditor*, QWidget*, int, int, const char* name = 0);
-      MidiTrack* track() const;
-      unsigned start() const       { return start_tick; }
-      unsigned end() const         { return end_tick; }
-      bool midiin() const     { return _midiin; }
-      bool steprec() const    { return _steprec; }
-      QString getCaption() const;
-      void songChanged(int);
-      void range(int* s, int* e) const { *s = start_tick; *e = end_tick; }
-      void playEvents(bool flag) { _playEvents = flag; }
-      void selectAtTick(unsigned int tick);
-      //QDrag* getTextDrag(QWidget* parent);
-      QMimeData* getTextDrag();
-      void pasteAt(const QString& pt, int pos);
-      void viewDropEvent(QDropEvent* event);
-      virtual void modifySelected(NoteInfo::ValType, int) {}
-      virtual void keyPress(QKeyEvent*);
-      };
+public slots:
+
+    void redrawGrid()
+    {
+        redraw();
+    }
+
+    void setSteprec(bool f)
+    {
+        _steprec = f;
+    }
+
+    void setMidiin(bool f)
+    {
+        _midiin = f;
+    }
+
+signals:
+    void pitchChanged(int); // current cursor position
+    void timeChanged(unsigned);
+    void selectionChanged(int, Event&, Part*);
+    void enterCanvas();
+
+public:
+    EventCanvas(MidiEditor*, QWidget*, int, int, const char* name = 0);
+    MidiTrack* track() const;
+
+    unsigned start() const
+    {
+        return start_tick;
+    }
+
+    unsigned end() const
+    {
+        return end_tick;
+    }
+
+    bool midiin() const
+    {
+        return _midiin;
+    }
+
+    bool steprec() const
+    {
+        return _steprec;
+    }
+    QString getCaption() const;
+    void songChanged(int);
+
+    void range(int* s, int* e) const
+    {
+        *s = start_tick;
+        *e = end_tick;
+    }
+
+    void playEvents(bool flag)
+    {
+        _playEvents = flag;
+    }
+    void selectAtTick(unsigned int tick);
+    //QDrag* getTextDrag(QWidget* parent);
+    QMimeData* getTextDrag();
+    void pasteAt(const QString& pt, int pos);
+    void viewDropEvent(QDropEvent* event);
+
+    virtual void modifySelected(NoteInfo::ValType, int)
+    {
+    }
+    virtual void keyPress(QKeyEvent*);
+};
 
 #endif
 

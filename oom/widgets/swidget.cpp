@@ -14,7 +14,7 @@
 //---------------------------------------------------------
 
 void SWidget::resizeEvent(QResizeEvent* ev)
-      {
-      emit heightChanged(ev->size().height());
-      }
+{
+	emit heightChanged(ev->size().height());
+}
 

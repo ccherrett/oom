@@ -15,18 +15,21 @@
 
 class QCloseEvent;
 
-struct KeyOn {
-      unsigned char pitch;
-      unsigned char channel;
-      unsigned char port;
-      char transpose;
-      KeyOn(int a, int b, int c, int d) {
-            pitch = a;
-            transpose = d;
-            channel = b;
-            port = c;
-            }
-      };
+struct KeyOn
+{
+    unsigned char pitch;
+    unsigned char channel;
+    unsigned char port;
+    char transpose;
+
+    KeyOn(int a, int b, int c, int d)
+    {
+        pitch = a;
+        transpose = d;
+        channel = b;
+        port = c;
+    }
+};
 
 typedef std::list<KeyOn > KeyOnList;
 typedef KeyOnList::iterator iKeyOn;
@@ -37,32 +40,33 @@ class Xml;
 //   MITPluginTranspose
 //---------------------------------------------------------
 
-class MITPluginTranspose : public QWidget, public Ui::MITTransposeBase, public MITPlugin {
-      Q_OBJECT
+class MITPluginTranspose : public QWidget, public Ui::MITTransposeBase, public MITPlugin
+{
+    Q_OBJECT
 
-      KeyOnList keyOnList;
-      int transpose;    // current pitch offset
-      int trigger;
-      bool on;
-      bool transposeChangedFlag;
+    KeyOnList keyOnList;
+    int transpose; // current pitch offset
+    int trigger;
+    bool on;
+    bool transposeChangedFlag;
 
-      void transposeChanged();
-      virtual void closeEvent(QCloseEvent*);
+    void transposeChanged();
+    virtual void closeEvent(QCloseEvent*);
 
-   signals:
-      void hideWindow();
+signals:
+    void hideWindow();
 
-   private slots:
-      void onToggled(bool);
-      void triggerKeyChanged(int);
-      void noteReceived();
+private slots:
+    void onToggled(bool);
+    void triggerKeyChanged(int);
+    void noteReceived();
 
-   public:
-      MITPluginTranspose(QWidget* parent = 0, Qt::WFlags fl = 0);
-      virtual void process(MEvent&);
-      virtual void readStatus(Xml&);
-      virtual void writeStatus(int, Xml&) const;
-      };
+public:
+    MITPluginTranspose(QWidget* parent = 0, Qt::WFlags fl = 0);
+    virtual void process(MEvent&);
+    virtual void readStatus(Xml&);
+    virtual void writeStatus(int, Xml&) const;
+};
 
 extern MITPluginTranspose* mitPluginTranspose;
 

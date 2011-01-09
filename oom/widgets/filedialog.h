@@ -18,39 +18,47 @@ class QStringList;
 
 class FileDialogButtonsWidget : public QWidget, public Ui::FileDialogButtons
 {
-     Q_OBJECT
 
-       public:
-  FileDialogButtonsWidget(QWidget *parent = 0)
+    Q_OBJECT
+
+public:
+    FileDialogButtonsWidget(QWidget *parent = 0)
     : QWidget(parent)
-  { setupUi(this); }
+    {
+        setupUi(this);
+    }
 };
 
 //---------------------------------------------------------
 //   MFileDialog
 //---------------------------------------------------------
 
-class MFileDialog : public QFileDialog {
-      Q_OBJECT
+class MFileDialog : public QFileDialog
+{
+    Q_OBJECT
 
-      static QString  lastUserDir, lastGlobalDir;
-      bool showButtons;
-      QString baseDir;
+    static QString lastUserDir, lastGlobalDir;
+    bool showButtons;
+    QString baseDir;
 
-   private slots:
-      void directoryChanged(const QString& directory);
-   public slots:
-      void globalToggled(bool);
-      void userToggled(bool);
-      void projectToggled(bool);
+private slots:
+    void directoryChanged(const QString& directory);
+public slots:
+    void globalToggled(bool);
+    void userToggled(bool);
+    void projectToggled(bool);
 
-   public:
-      enum ViewType { GLOBAL_VIEW, PROJECT_VIEW, USER_VIEW }; //!< The three different viewtypes
-      static ViewType lastViewUsed;
-      FileDialogButtonsWidget buttons;
-      MFileDialog(const QString& dir, const QString& filter = QString::null,
-         QWidget* parent = 0, bool writeFlag = false);
-      };
+public:
+
+    enum ViewType
+    {
+        GLOBAL_VIEW, PROJECT_VIEW, USER_VIEW
+    }; //!< The three different viewtypes
+    static ViewType lastViewUsed;
+    FileDialogButtonsWidget buttons;
+    MFileDialog(const QString& dir, const QString& filter = QString::null,
+            QWidget* parent = 0, bool writeFlag = false);
+};
 
 /* ORCAN - Disable previeww for now. It is not available in qt4. We will
            need to implement it ourselves.
@@ -72,20 +80,20 @@ class ContentsPreview : public QWidget, public Q3FilePreview {
             }
       ~ContentsPreview();
       };
-*/
+ */
 
 //QString getSaveFileName(const QString& startWidth, const char** filter,
 QString getSaveFileName(const QString& startWidth, const QStringList& filters,
-         QWidget* parent, const QString& name);
+        QWidget* parent, const QString& name);
 //QString getOpenFileName(const QString& startWidth, const char** filter,
 QString getOpenFileName(const QString& startWidth, const QStringList& filters,
-                        QWidget* parent, const QString& name, bool* openAll, MFileDialog::ViewType viewType = MFileDialog::PROJECT_VIEW);
+        QWidget* parent, const QString& name, bool* openAll, MFileDialog::ViewType viewType = MFileDialog::PROJECT_VIEW);
 //QString getImageFileName(const QString& startWith, const char** filters, 
-QString getImageFileName(const QString& startWith, const QStringList& filters, 
-         QWidget* parent, const QString& name);
+QString getImageFileName(const QString& startWith, const QStringList& filters,
+        QWidget* parent, const QString& name);
 
 FILE* fileOpen(QWidget*, QString, const QString&,
-   const char*, bool&, bool = false, bool = false);
+        const char*, bool&, bool = false, bool = false);
 
 
 //---------------------------------------------------------
@@ -93,18 +101,19 @@ FILE* fileOpen(QWidget*, QString, const QString&,
 //    "OOMidi" File
 //---------------------------------------------------------
 
-class MFile {
-      bool isPopen;
-      FILE* f;
-      QString path;
-      QString ext;
+class MFile
+{
+    bool isPopen;
+    FILE* f;
+    QString path;
+    QString ext;
 
-   public:
-      MFile(const QString& path, const QString& ext);
-      ~MFile();
-      //FILE* open(const char* mode, const char** pattern,
-      FILE* open(const char* mode, const QStringList& pattern,
-         QWidget* parent, bool noError,
-         bool warnIfOverwrite, const QString& caption);
-      };
+public:
+    MFile(const QString& path, const QString& ext);
+    ~MFile();
+    //FILE* open(const char* mode, const char** pattern,
+    FILE* open(const char* mode, const QStringList& pattern,
+            QWidget* parent, bool noError,
+            bool warnIfOverwrite, const QString& caption);
+};
 

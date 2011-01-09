@@ -15,70 +15,75 @@ class QLabel;
 class QLineEdit;
 class QTimer;
 
-class NentryFilter : public QObject {
-      Q_OBJECT
+class NentryFilter : public QObject
+{
+    Q_OBJECT
 
-   protected:
-      bool eventFilter(QObject* object, QEvent* event);
-   public:
-      NentryFilter(QObject* parent);
-      };
+protected:
+    bool eventFilter(QObject* object, QEvent* event);
+public:
+    NentryFilter(QObject* parent);
+};
 
 //---------------------------------------------------------
 //   Nentry
 //    numerical entry widget with optional label
 //---------------------------------------------------------
 
-class Nentry : public QFrame {
-      Q_OBJECT
+class Nentry : public QFrame
+{
+    Q_OBJECT
 
-      int button;
-      int starty;
-      bool drawFrame;
-      QTimer* timer;
-      int evx;
-      int timecount;
-      QHBoxLayout* layout;
-      QObject* filter;
-      QLabel* label;
-      int lPos;   // label Position 0 - left, 1 - right
-      QWidget* focusW;
+    int button;
+    int starty;
+    bool drawFrame;
+    QTimer* timer;
+    int evx;
+    int timecount;
+    QHBoxLayout* layout;
+    QObject* filter;
+    QLabel* label;
+    int lPos; // label Position 0 - left, 1 - right
+    QWidget* focusW;
 
-   protected:
-      QLineEdit* edit;
-      int val;
-      virtual void incValue(int x) = 0;
-      virtual void decValue(int x) = 0;
-      virtual bool setString(int, bool editable = false) = 0;
-      virtual bool setSValue(const QString&) = 0;
+protected:
+    QLineEdit* edit;
+    int val;
+    virtual void incValue(int x) = 0;
+    virtual void decValue(int x) = 0;
+    virtual bool setString(int, bool editable = false) = 0;
+    virtual bool setSValue(const QString&) = 0;
 
-   private slots:
-      void repeat();
+private slots:
+    void repeat();
 
-   protected slots:
-      void endEdit();
+protected slots:
+    void endEdit();
 
-   public slots:
-      virtual void setValue(int);
+public slots:
+    virtual void setValue(int);
 
-   public:
-      Nentry(QWidget* parent, const QString& txt = QString(""),
-         int lPos = 0, bool dark=false);
+public:
+    Nentry(QWidget* parent, const QString& txt = QString(""),
+            int lPos = 0, bool dark = false);
 
-      int value() const { return val; }
-      void setFrame(bool);
-      //void setAlignment(int flag)    { edit->setAlignment(flag); }
-      void setText(const QString& s);
-      void setSize(int n);
-      void setDark();
+    int value() const
+    {
+        return val;
+    }
+    void setFrame(bool);
+    //void setAlignment(int flag)    { edit->setAlignment(flag); }
+    void setText(const QString& s);
+    void setSize(int n);
+    void setDark();
 
-      void mousePress(QMouseEvent*);
-      void mouseMove(QMouseEvent*);
-      void mouseDoubleClick(QMouseEvent*);
-      void mouseRelease(QMouseEvent*);
-      void wheel(QWheelEvent*);
-      bool keyPress(QKeyEvent*);
-      void setFocusPolicy(Qt::FocusPolicy);
-      bool contextMenu(QContextMenuEvent*);
-      };
+    void mousePress(QMouseEvent*);
+    void mouseMove(QMouseEvent*);
+    void mouseDoubleClick(QMouseEvent*);
+    void mouseRelease(QMouseEvent*);
+    void wheel(QWheelEvent*);
+    bool keyPress(QKeyEvent*);
+    void setFocusPolicy(Qt::FocusPolicy);
+    bool contextMenu(QContextMenuEvent*);
+};
 #endif

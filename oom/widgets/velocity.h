@@ -16,24 +16,37 @@ class QButtonGroup;
 //   Velocity
 //---------------------------------------------------------
 
-class Velocity : public QDialog, public Ui::VelocityBase {
-      int _range;
-      int _rateVal;
-      int _offsetVal;
+class Velocity : public QDialog, public Ui::VelocityBase
+{
+    int _range;
+    int _rateVal;
+    int _offsetVal;
 
-      Q_OBJECT
-      QButtonGroup* rangeGroup;
+    Q_OBJECT
+    QButtonGroup* rangeGroup;
 
-   protected slots:
-      void accept();
+protected slots:
+    void accept();
 
-   public:
-      Velocity(QDialog* parent = 0);
-      void setRange(int id);
-      int range() const     { return _range; }
-      int rateVal() const   { return _rateVal; }
-      int offsetVal() const { return _offsetVal; }
-      };
+public:
+    Velocity(QDialog* parent = 0);
+    void setRange(int id);
+
+    int range() const
+    {
+        return _range;
+    }
+
+    int rateVal() const
+    {
+        return _rateVal;
+    }
+
+    int offsetVal() const
+    {
+        return _offsetVal;
+    }
+};
 
 #endif
 

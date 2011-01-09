@@ -30,8 +30,12 @@ class QDialog;
 
 class DidYouKnowWidget : public QDialog, public Ui::DidYouKnow
 {
-      Q_OBJECT
 
-   public:
-      DidYouKnowWidget(QDialog *parent = 0) : QDialog(parent) { setupUi(this); }
+    Q_OBJECT
+
+public:
+    DidYouKnowWidget(QDialog *parent = 0) : QDialog(parent)
+    {
+        setupUi(this);
+    }
 };

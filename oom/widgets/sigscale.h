@@ -17,30 +17,31 @@ class MidiEditor;
 //    Time Signature Scale
 //---------------------------------------------------------
 
-class SigScale : public View {
-      Q_OBJECT
-      int* raster;
-      unsigned pos[3];
-      int button;
+class SigScale : public View
+{
+    Q_OBJECT
+    int* raster;
+    unsigned pos[3];
+    int button;
 
-   signals:
-      void posChanged(unsigned, unsigned);
+signals:
+    void posChanged(unsigned, unsigned);
 
-   protected:
-      virtual void pdraw(QPainter&, const QRect&);
-      virtual void viewMousePressEvent(QMouseEvent* event);
-      virtual void viewMouseMoveEvent(QMouseEvent* event);
-      virtual void viewMouseReleaseEvent(QMouseEvent* event);
-      virtual void leaveEvent(QEvent*e);
+protected:
+    virtual void pdraw(QPainter&, const QRect&);
+    virtual void viewMousePressEvent(QMouseEvent* event);
+    virtual void viewMouseMoveEvent(QMouseEvent* event);
+    virtual void viewMouseReleaseEvent(QMouseEvent* event);
+    virtual void leaveEvent(QEvent*e);
 
-   signals:
-      void timeChanged(unsigned);
+signals:
+    void timeChanged(unsigned);
 
-   public slots:
-      void setPos(int, unsigned, bool);
+public slots:
+    void setPos(int, unsigned, bool);
 
-   public:
-      SigScale(int* raster, QWidget* parent, int xscale);
-      };
+public:
+    SigScale(int* raster, QWidget* parent, int xscale);
+};
 #endif
 

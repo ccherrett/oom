@@ -39,18 +39,18 @@
 
 double qwtGetMin(double *array, int size)
 {
-    double rv;
-    int i;
+	double rv;
+	int i;
 
-    if (size > 0)
-    {
-	rv = array[0];
-	for (i=1; i< size; i++)
-	   rv = qwtMin(rv, array[i]);
-	return rv;
-    }
-    else
-       return 0.0;
+	if (size > 0)
+	{
+		rv = array[0];
+		for (i = 1; i < size; i++)
+			rv = qwtMin(rv, array[i]);
+		return rv;
+	}
+	else
+		return 0.0;
 
 }
 
@@ -67,20 +67,21 @@ double qwtGetMin(double *array, int size)
 //.p	double *array, int size
 //
 //------------------------------------------------------------
+
 double qwtGetMax(double *array, int size)
 {
-    double rv;
-    int i;
+	double rv;
+	int i;
 
-    if (size > 0)
-    {
-	rv = array[0];
-	for (i=1; i< size; i++)
-	   rv = qwtMax(rv, array[i]);
-	return rv;
-    }
-    else
-       return 0.0;
+	if (size > 0)
+	{
+		rv = array[0];
+		for (i = 1; i < size; i++)
+			rv = qwtMax(rv, array[i]);
+		return rv;
+	}
+	else
+		return 0.0;
 
 }
 
@@ -98,27 +99,28 @@ double qwtGetMax(double *array, int size)
 //.p	double x
 //
 //------------------------------------------------------------
-double qwtCeil125( double x)
+
+double qwtCeil125(double x)
 {
-    double lx, rv;
-    double p10, fr;
-    double sign = ( x > 0) ? 1.0 : -1.0;
+	double lx, rv;
+	double p10, fr;
+	double sign = (x > 0) ? 1.0 : -1.0;
 
-    if (x == 0.0) return 0.0;
+	if (x == 0.0) return 0.0;
 
-    lx = log10(fabs(x));
-    p10 = floor(lx);
-    fr = pow(10.0,lx - p10);
-    if (fr <=1.0)
-       fr = 1.0;
-    else if (fr <= 2.0)
-       fr = 2.0;
-    else if (fr <= 5.0)
-       fr = 5.0;
-    else
-       fr = 10.0;
-    rv = fr * pow(10.0,p10);
-    return sign * rv;
+	lx = log10(fabs(x));
+	p10 = floor(lx);
+	fr = pow(10.0, lx - p10);
+	if (fr <= 1.0)
+		fr = 1.0;
+	else if (fr <= 2.0)
+		fr = 2.0;
+	else if (fr <= 5.0)
+		fr = 5.0;
+	else
+		fr = 10.0;
+	rv = fr * pow(10.0, p10);
+	return sign * rv;
 }
 
 
@@ -135,27 +137,28 @@ double qwtCeil125( double x)
 //.p	double x
 //
 //------------------------------------------------------------
-double qwtFloor125( double x)
+
+double qwtFloor125(double x)
 {
-    double lx, rv;
-    double p10, fr;
-    double sign = ( x > 0) ? 1.0 : -1.0;
+	double lx, rv;
+	double p10, fr;
+	double sign = (x > 0) ? 1.0 : -1.0;
 
-    if (x == 0.0) return 0.0;
+	if (x == 0.0) return 0.0;
 
-    lx = log10(fabs(x));
-    p10 = floor(lx);
-    fr = pow(10.0,lx - p10);
-    if (fr >= 10.0)
-       fr = 10.0;
-    else if (fr >= 5.0)
-       fr = 5.0;
-    else if (fr >= 2.0)
-       fr = 2.0;
-    else
-       fr = 1.0;
-    rv = fr * pow(10.0,p10);
-    return sign * rv;
+	lx = log10(fabs(x));
+	p10 = floor(lx);
+	fr = pow(10.0, lx - p10);
+	if (fr >= 10.0)
+		fr = 10.0;
+	else if (fr >= 5.0)
+		fr = 5.0;
+	else if (fr >= 2.0)
+		fr = 2.0;
+	else
+		fr = 1.0;
+	rv = fr * pow(10.0, p10);
+	return sign * rv;
 }
 
 
@@ -177,22 +180,23 @@ double qwtFloor125( double x)
 //      -1 --  sequence is strictly monotonically decreasing
 //
 //------------------------------------------------------------
+
 int qwtChkMono(double *array, int size)
 {
-    int rv, i;
+	int rv, i;
 
-    if (size < 2) return 0;
+	if (size < 2) return 0;
 
-    rv = qwtSign(array[1] - array[0]);
-    for (i=1;i<size-1;i++)
-    {
-	if ( qwtSign(array[i+1] - array[i]) != rv )
+	rv = qwtSign(array[1] - array[0]);
+	for (i = 1; i < size - 1; i++)
 	{
-	    rv = 0;
-	    break;
+		if (qwtSign(array[i + 1] - array[i]) != rv)
+		{
+			rv = 0;
+			break;
+		}
 	}
-    }
-    return rv;
+	return rv;
 
 }
 
@@ -208,21 +212,22 @@ int qwtChkMono(double *array, int size)
 //.p	double *array, int size
 //
 //------------------------------------------------------------
+
 void qwtTwistArray(double *array, int size)
 {
-    int itmp;
-    int i, s2;
-    double dtmp;
+	int itmp;
+	int i, s2;
+	double dtmp;
 
-    s2 = size / 2;
+	s2 = size / 2;
 
-    for (i=0; i < s2; i++)
-    {
-	itmp = size - 1 - i;
-	dtmp = array[i];
-	array[i] = array[itmp];
-	array[itmp] = dtmp;
-    }
+	for (i = 0; i < s2; i++)
+	{
+		itmp = size - 1 - i;
+		dtmp = array[i];
+		array[i] = array[itmp];
+		array[itmp] = dtmp;
+	}
 
 }
 
@@ -242,21 +247,22 @@ void qwtTwistArray(double *array, int size)
 //	double xmax	-- value associated with index (size-1)
 //
 //------------------------------------------------------------
+
 void qwtLinSpace(double *array, int size, double xmin, double xmax)
 {
-    int i, imax;
-    imax = size -1;
-    double step;
+	int i, imax;
+	imax = size - 1;
+	double step;
 
-    if (size > 0)
-    {
-	array[0] = xmin;
-	array[imax] = xmax;
-	step = (xmax - xmin) / double(imax);
+	if (size > 0)
+	{
+		array[0] = xmin;
+		array[imax] = xmax;
+		step = (xmax - xmin) / double(imax);
 
-	for (i=1;i<imax;i++)
-	   array[i] = xmin + double(i) * step;
-    }
+		for (i = 1; i < imax; i++)
+			array[i] = xmin + double(i) * step;
+	}
 
 }
 
@@ -275,26 +281,27 @@ void qwtLinSpace(double *array, int size, double xmin, double xmax)
 //	double xmin	-- value associated with index 0
 //	double xmax	-- value associated with index (size-1)
 //------------------------------------------------------------
+
 void qwtLogSpace(double *array, int size, double xmin, double xmax)
 {
-    int i, imax;
+	int i, imax;
 
-    double lxmin,lxmax;
-    double lstep;
+	double lxmin, lxmax;
+	double lstep;
 
-    imax = size -1;
+	imax = size - 1;
 
-    if ((xmin <= 0.0) || (xmax <= 0.0) || (size <= 0))
-       return;
+	if ((xmin <= 0.0) || (xmax <= 0.0) || (size <= 0))
+		return;
 
-    array[0] = xmin;
-    array[imax] = xmax;
-    lxmin = log(xmin);
-    lxmax = log(xmax);
+	array[0] = xmin;
+	array[imax] = xmax;
+	lxmin = log(xmin);
+	lxmax = log(xmax);
 
-    lstep = (lxmax - lxmin) / double(imax);
+	lstep = (lxmax - lxmin) / double(imax);
 
-    for (i=1; i<imax;i++)
-       array[i] = exp(lxmin + double(i) * lstep);
+	for (i = 1; i < imax; i++)
+		array[i] = exp(lxmin + double(i) * lstep);
 
 }

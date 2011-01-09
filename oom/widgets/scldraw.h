@@ -22,59 +22,71 @@ class QRect;
 
 class AutoScale;
 
-class ScaleDraw : public DiMap {
-   public:
-      enum OrientationX { Bottom, Top, Left, Right, Round };
+class ScaleDraw : public DiMap
+{
+public:
 
-   private:
-      ScaleDiv d_scldiv;
-      static const int minLen;
-      OrientationX d_orient;
-	
-      int d_xorg;
-      int d_yorg;
-      int d_len;
-	
-      int d_hpad;
-      int d_vpad;
-	
-      int d_medLen;
-      int d_majLen;
-      int d_minLen;
+    enum OrientationX
+    {
+        Bottom, Top, Left, Right, Round
+    };
 
-      int d_minAngle;
-      int d_maxAngle;
+private:
+    ScaleDiv d_scldiv;
+    static const int minLen;
+    OrientationX d_orient;
 
-      double d_xCenter;
-      double d_yCenter;
-      double d_radius;
+    int d_xorg;
+    int d_yorg;
+    int d_len;
 
-      char d_fmt;
-      int d_prec;
-	
-      void drawTick(QPainter *p, double val, int len) const;
-      void drawBackbone(QPainter *p) const;
-      void drawLabel(QPainter *p, double val) const;
-	
-   public:
+    int d_hpad;
+    int d_vpad;
 
-      ScaleDraw();
+    int d_medLen;
+    int d_majLen;
+    int d_minLen;
 
-      void setScale(const ScaleDiv &s);
-      void setScale(double vmin, double vmax, int maxMajIntv, int maxMinIntv,
-	   double step = 0.0, int logarithmic = 0);
-      void setGeometry(int xorigin, int yorigin, int length, OrientationX o);
-      void setAngleRange(double angle1, double angle2);
-      void setLabelFormat(char f, int prec);
+    int d_minAngle;
+    int d_maxAngle;
 
-      const ScaleDiv& scaleDiv() const { return d_scldiv; }
-      OrientationX orientation() const { return d_orient; }
-      QRect maxBoundingRect(QPainter *p) const;
-      int maxWidth(QPainter *p, bool worst = TRUE) const;
-      int maxHeight(QPainter *p) const;
-      int maxLabelWidth(QPainter *p, int worst = TRUE) const;
-      void draw(QPainter *p) const;
-      };
+    double d_xCenter;
+    double d_yCenter;
+    double d_radius;
+
+    char d_fmt;
+    int d_prec;
+
+    void drawTick(QPainter *p, double val, int len) const;
+    void drawBackbone(QPainter *p) const;
+    void drawLabel(QPainter *p, double val) const;
+
+public:
+
+    ScaleDraw();
+
+    void setScale(const ScaleDiv &s);
+    void setScale(double vmin, double vmax, int maxMajIntv, int maxMinIntv,
+            double step = 0.0, int logarithmic = 0);
+    void setGeometry(int xorigin, int yorigin, int length, OrientationX o);
+    void setAngleRange(double angle1, double angle2);
+    void setLabelFormat(char f, int prec);
+
+    const ScaleDiv& scaleDiv() const
+    {
+        return d_scldiv;
+    }
+
+    OrientationX orientation() const
+    {
+        return d_orient;
+    }
+    QRect maxBoundingRect(QPainter *p) const;
+    int maxWidth(QPainter *p, bool worst = TRUE) const;
+    int maxHeight(QPainter *p) const;
+    int maxLabelWidth(QPainter *p, int worst = TRUE) const;
+    void draw(QPainter *p) const;
+};
 
 #endif
 

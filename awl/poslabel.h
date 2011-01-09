@@ -23,32 +23,42 @@
 
 #include "al/pos.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   PosLabel
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   PosLabel
+    //---------------------------------------------------------
 
-class PosLabel : public QLabel {
-      bool _smpte;
-      AL::Pos pos;
-      Q_OBJECT
+    class PosLabel : public QLabel
+    {
+        bool _smpte;
+        AL::Pos pos;
+        Q_OBJECT
 
-      void updateValue();
+        void updateValue();
 
-   protected:
-      QSize sizeHint() const;
+    protected:
+        QSize sizeHint() const;
 
-   public slots:
-      void setValue(const AL::Pos&, bool);
+    public slots:
+        void setValue(const AL::Pos&, bool);
 
-   public:
-      PosLabel(QWidget* parent = 0);
-      AL::Pos value() const { return pos; }
+    public:
+        PosLabel(QWidget* parent = 0);
 
-      void setSmpte(bool);
-      bool smpte() const { return _smpte; }
-      };
+        AL::Pos value() const
+        {
+            return pos;
+        }
+
+        void setSmpte(bool);
+
+        bool smpte() const
+        {
+            return _smpte;
+        }
+    };
 
 }
 

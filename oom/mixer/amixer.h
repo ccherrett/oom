@@ -43,90 +43,95 @@ typedef std::list<Strip*> StripList;
 //   ScrollArea
 //---------------------------------------------------------
 
-class ScrollArea : public QScrollArea 
+class ScrollArea : public QScrollArea
 {
-  Q_OBJECT
-  
-  signals:
+    Q_OBJECT
+
+signals:
     void layoutRequest();
-  
-  protected:
+
+protected:
     virtual bool viewportEvent(QEvent* event);
-    
-  public:
-    ScrollArea(QWidget* parent = 0) : QScrollArea(parent) { } 
+
+public:
+
+    ScrollArea(QWidget* parent = 0) : QScrollArea(parent)
+    {
+    }
 };
 
 //---------------------------------------------------------
 //   AudioMixerApp
 //---------------------------------------------------------
 
-class AudioMixerApp : public QMainWindow {
-      //QString name;
-      MixerConfig* cfg;
-      StripList stripList;
-      QScrollArea* view;
-      QWidget* central;
-      QHBoxLayout* lbox;
-      //Strip* master;
-      QHBoxLayout* layout;
-      QMenu* menuView;
-      RouteDialog* routingDialog;
-      QAction* routingId;
-      int oldAuxsSize;
+class AudioMixerApp : public QMainWindow
+{
+    //QString name;
+    MixerConfig* cfg;
+    StripList stripList;
+    QScrollArea* view;
+    QWidget* central;
+    QHBoxLayout* lbox;
+    //Strip* master;
+    QHBoxLayout* layout;
+    QMenu* menuView;
+    RouteDialog* routingDialog;
+    QAction* routingId;
+    int oldAuxsSize;
 
-      QAction* showMidiTracksId;
-      QAction* showDrumTracksId;
-      QAction* showInputTracksId;
-      QAction* showOutputTracksId;
-      QAction* showWaveTracksId;
-      QAction* showGroupTracksId;
-      QAction* showAuxTracksId;
-      QAction* showSyntiTracksId;
+    QAction* showMidiTracksId;
+    QAction* showDrumTracksId;
+    QAction* showInputTracksId;
+    QAction* showOutputTracksId;
+    QAction* showWaveTracksId;
+    QAction* showGroupTracksId;
+    QAction* showAuxTracksId;
+    QAction* showSyntiTracksId;
 
-      Q_OBJECT
+    Q_OBJECT
 
-      virtual void closeEvent(QCloseEvent*);
-      void addStrip(Track*, int);
-      void showRouteDialog(bool);
+    virtual void closeEvent(QCloseEvent*);
+    void addStrip(Track*, int);
+    void showRouteDialog(bool);
 
-      enum UpdateAction {
-            NO_UPDATE, UPDATE_ALL, UPDATE_MIDI, STRIP_INSERTED, STRIP_REMOVED
-            };
-      void updateMixer(UpdateAction);
-      
-   signals:
-      void closed();
-      //void layoutRequest();
+    enum UpdateAction
+    {
+        NO_UPDATE, UPDATE_ALL, UPDATE_MIDI, STRIP_INSERTED, STRIP_REMOVED
+    };
+    void updateMixer(UpdateAction);
 
-   private slots:
-      void songChanged(int);
-      //void configChanged()    { songChanged(-1); }
-      void configChanged();
-      void setSizing();
-      void toggleRouteDialog();
-      void routingDialogClosed();
-      //void showTracksChanged(QAction*);
-      void showMidiTracksChanged(bool);
-      void showDrumTracksChanged(bool);
-      void showWaveTracksChanged(bool);
-      void showInputTracksChanged(bool);
-      void showOutputTracksChanged(bool);
-      void showGroupTracksChanged(bool);
-      void showAuxTracksChanged(bool);
-      void showSyntiTracksChanged(bool);
+signals:
+    void closed();
+    //void layoutRequest();
 
-   //protected:
-   //   virtual bool event(QEvent* event);
-   
-   public:
-      //AudioMixerApp(QWidget* parent);
-      AudioMixerApp(QWidget* parent, MixerConfig* c);
-      //void write(Xml&, const char* name);
-      //void write(int level, Xml& xml, const char* name);
-      void write(int level, Xml& xml);
-      void clear();
-      };
+private slots:
+    void songChanged(int);
+    //void configChanged()    { songChanged(-1); }
+    void configChanged();
+    void setSizing();
+    void toggleRouteDialog();
+    void routingDialogClosed();
+    //void showTracksChanged(QAction*);
+    void showMidiTracksChanged(bool);
+    void showDrumTracksChanged(bool);
+    void showWaveTracksChanged(bool);
+    void showInputTracksChanged(bool);
+    void showOutputTracksChanged(bool);
+    void showGroupTracksChanged(bool);
+    void showAuxTracksChanged(bool);
+    void showSyntiTracksChanged(bool);
+
+    //protected:
+    //   virtual bool event(QEvent* event);
+
+public:
+    //AudioMixerApp(QWidget* parent);
+    AudioMixerApp(QWidget* parent, MixerConfig* c);
+    //void write(Xml&, const char* name);
+    //void write(int level, Xml& xml, const char* name);
+    void write(int level, Xml& xml);
+    void clear();
+};
 
 #endif
 

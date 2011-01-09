@@ -21,14 +21,15 @@
 #ifndef __AL_H__
 #define __AL_H__
 
-namespace AL {
+namespace AL
+{
 
-      extern bool debugMsg;
-      //extern int sampleRate;
-      //extern int mtcType;
-      //extern int division;
+    extern bool debugMsg;
+    //extern int sampleRate;
+    //extern int mtcType;
+    //extern int division;
 
-      }
+}
 
 #endif
 

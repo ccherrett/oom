@@ -25,44 +25,48 @@ class ScrollScale;
 //   Master
 //---------------------------------------------------------
 
-class Master : public View {
-      enum DragMode { DRAG_OFF, DRAG_NEW, DRAG_MOVE_START, DRAG_MOVE,
-            DRAG_DELETE, DRAG_COPY_START, DRAG_COPY,
-            DRAG_RESIZE, DRAG_LASSO_START, DRAG_LASSO
-            };
-      ScrollScale* vscroll;
-      unsigned pos[3];
-      QPoint start;
-      Tool tool;
-      DragMode drag;
-      MidiEditor* editor;
+class Master : public View
+{
 
-      Q_OBJECT
-      virtual void pdraw(QPainter&, const QRect&);
-      virtual void viewMouseMoveEvent(QMouseEvent* event);
-      virtual void leaveEvent(QEvent*e);
-      virtual void viewMousePressEvent(QMouseEvent* event);
-      virtual void viewMouseReleaseEvent(QMouseEvent*);
+    enum DragMode
+    {
+        DRAG_OFF, DRAG_NEW, DRAG_MOVE_START, DRAG_MOVE,
+        DRAG_DELETE, DRAG_COPY_START, DRAG_COPY,
+        DRAG_RESIZE, DRAG_LASSO_START, DRAG_LASSO
+    };
+    ScrollScale* vscroll;
+    unsigned pos[3];
+    QPoint start;
+    Tool tool;
+    DragMode drag;
+    MidiEditor* editor;
 
-      void draw(QPainter&, const QRect&);
-      void newVal(int x1, int x2, int y);
-      bool deleteVal1(unsigned int x1, unsigned int x2);
-      void deleteVal(int x1, int x2);
+    Q_OBJECT
+    virtual void pdraw(QPainter&, const QRect&);
+    virtual void viewMouseMoveEvent(QMouseEvent* event);
+    virtual void leaveEvent(QEvent*e);
+    virtual void viewMousePressEvent(QMouseEvent* event);
+    virtual void viewMouseReleaseEvent(QMouseEvent*);
 
-   signals:
-      void followEvent(int);
-      void xposChanged(int);
-      void yposChanged(int);
-      void timeChanged(unsigned);
-      void tempoChanged(int);
+    void draw(QPainter&, const QRect&);
+    void newVal(int x1, int x2, int y);
+    bool deleteVal1(unsigned int x1, unsigned int x2);
+    void deleteVal(int x1, int x2);
 
-   public slots:
-      void setPos(int, unsigned, bool adjustScrollbar);
-      void setTool(int t);
+signals:
+    void followEvent(int);
+    void xposChanged(int);
+    void yposChanged(int);
+    void timeChanged(unsigned);
+    void tempoChanged(int);
 
-   public:
-      Master(MidiEditor*, QWidget* parent, int xmag, int ymag);
-      };
+public slots:
+    void setPos(int, unsigned, bool adjustScrollbar);
+    void setTool(int t);
+
+public:
+    Master(MidiEditor*, QWidget* parent, int xmag, int ymag);
+};
 
 #endif
 

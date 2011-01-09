@@ -18,26 +18,27 @@ class QDialog;
 //   RouteDialog
 //---------------------------------------------------------
 
-class RouteDialog : public QDialog, public Ui::RouteDialogBase {
-      Q_OBJECT
+class RouteDialog : public QDialog, public Ui::RouteDialogBase
+{
+    Q_OBJECT
 
-      virtual void closeEvent(QCloseEvent*);
-      void routingChanged();
+    virtual void closeEvent(QCloseEvent*);
+    void routingChanged();
 
-   private slots:
-      void routeSelectionChanged();
-      void removeRoute();
-      void addRoute();
-      void srcSelectionChanged();
-      void dstSelectionChanged();
-      void songChanged(int);
+private slots:
+    void routeSelectionChanged();
+    void removeRoute();
+    void addRoute();
+    void srcSelectionChanged();
+    void dstSelectionChanged();
+    void songChanged(int);
 
-   signals:
-      void closed();
+signals:
+    void closed();
 
-   public:
-      RouteDialog(QWidget* parent=0);
-      };
+public:
+    RouteDialog(QWidget* parent = 0);
+};
 
 
 #endif

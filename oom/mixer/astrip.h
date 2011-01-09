@@ -31,75 +31,76 @@ class EffectRack;
 //   AudioStrip
 //---------------------------------------------------------
 
-class AudioStrip : public Strip {
-      Q_OBJECT
+class AudioStrip : public Strip
+{
+    Q_OBJECT
 
-      int channel;
-      Slider* slider;
-      DoubleLabel* sl;
-      EffectRack* rack;
+    int channel;
+    Slider* slider;
+    DoubleLabel* sl;
+    EffectRack* rack;
 
-      Knob* pan;
-      DoubleLabel* panl;
+    Knob* pan;
+    DoubleLabel* panl;
 
-      std::vector<Knob*> auxKnob;
-      std::vector<DoubleLabel*> auxLabel;
+    std::vector<Knob*> auxKnob;
+    std::vector<DoubleLabel*> auxLabel;
 
-      QToolButton* stereo;
-      QToolButton* pre;
-      TransparentToolButton* off;
+    QToolButton* stereo;
+    QToolButton* pre;
+    TransparentToolButton* off;
 
-      double volume;
-      double panVal;
+    double volume;
+    double panVal;
 
-	  QString slDefaultStyle; 
+    QString slDefaultStyle;
 
-      //QToolButton* iR;
-      //QToolButton* oR;
-      
-      Knob* addKnob(int, int, DoubleLabel**);
-      
-      void updateOffState();
-      void updateVolume();
-      void updatePan();
-      void updateChannels();
-      //void updateRouteMenus();
+    //QToolButton* iR;
+    //QToolButton* oR;
 
-   private slots:
-      void stereoToggled(bool);
-      void preToggled(bool);
-      void offToggled(bool);
-      void iRoutePressed();
-      void oRoutePressed();
-      void routingPopupMenuActivated(QAction*);
-      void auxChanged(double, int);
-      void volumeChanged(double);
-      void volumePressed();
-      void volumeReleased();
-      void panChanged(double);
-      void panPressed();
-      void panReleased();
-      void volLabelChanged(double);
-      void panLabelChanged(double);
-      void auxLabelChanged(double, unsigned int);
-      void volumeRightClicked(const QPoint &);
-      void panRightClicked(const QPoint &);
-	  void playbackClipped();
-	  void resetPeaks();
+    Knob* addKnob(int, int, DoubleLabel**);
 
-   protected slots:
-      virtual void heartBeat();
+    void updateOffState();
+    void updateVolume();
+    void updatePan();
+    void updateChannels();
+    //void updateRouteMenus();
 
-   public slots:
-      virtual void configChanged();
-      virtual void songChanged(int);
+private slots:
+    void stereoToggled(bool);
+    void preToggled(bool);
+    void offToggled(bool);
+    void iRoutePressed();
+    void oRoutePressed();
+    void routingPopupMenuActivated(QAction*);
+    void auxChanged(double, int);
+    void volumeChanged(double);
+    void volumePressed();
+    void volumeReleased();
+    void panChanged(double);
+    void panPressed();
+    void panReleased();
+    void volLabelChanged(double);
+    void panLabelChanged(double);
+    void auxLabelChanged(double, unsigned int);
+    void volumeRightClicked(const QPoint &);
+    void panRightClicked(const QPoint &);
+    void playbackClipped();
+    void resetPeaks();
 
-   public:
-      AudioStrip(QWidget* parent, AudioTrack*);
-      ~AudioStrip();
-      ///virtual QSize minimumSizeHint () const;
-      //virtual QSize sizeHint () const;
-      };
+protected slots:
+    virtual void heartBeat();
+
+public slots:
+    virtual void configChanged();
+    virtual void songChanged(int);
+
+public:
+    AudioStrip(QWidget* parent, AudioTrack*);
+    ~AudioStrip();
+    ///virtual QSize minimumSizeHint () const;
+    //virtual QSize sizeHint () const;
+};
 
 #endif
 

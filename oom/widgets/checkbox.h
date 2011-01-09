@@ -15,30 +15,39 @@
 //   CheckBox
 //---------------------------------------------------------
 
-class CheckBox : public QCheckBox {
-      Q_OBJECT
-      Q_PROPERTY( int id READ id WRITE setId )
+class CheckBox : public QCheckBox
+{
+    Q_OBJECT
+    Q_PROPERTY(int id READ id WRITE setId)
 
-      int _id;
+    int _id;
 
-   protected:
-      void mousePressEvent(QMouseEvent *e);
-      void mouseReleaseEvent(QMouseEvent *e);
-   
-   private slots:
-      void hasToggled(bool val);
+protected:
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
 
-   signals:
-      void toggleChanged(bool, int);
-      void checkboxPressed(int);
-      void checkboxReleased(int);
-      void checkboxRightClicked(const QPoint &, int);
+private slots:
+    void hasToggled(bool val);
 
-   public:
-      CheckBox(QWidget* parent, int i, const char* name = 0);
-      int id() const       { return _id; }
-      void setId(int i)    { _id = i; }
-      };
+signals:
+    void toggleChanged(bool, int);
+    void checkboxPressed(int);
+    void checkboxReleased(int);
+    void checkboxRightClicked(const QPoint &, int);
+
+public:
+    CheckBox(QWidget* parent, int i, const char* name = 0);
+
+    int id() const
+    {
+        return _id;
+    }
+
+    void setId(int i)
+    {
+        _id = i;
+    }
+};
 
 #endif
 

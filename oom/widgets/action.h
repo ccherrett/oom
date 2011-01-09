@@ -14,19 +14,30 @@
 //   Action
 //---------------------------------------------------------
 
-class Action : public QAction {
-      Q_OBJECT
-      int _id;
+class Action : public QAction
+{
+    Q_OBJECT
+    int _id;
 
-   public:
-      Action(QObject* parent, int i, const char* name = 0, bool toggle = false)
-         : QAction(name, parent) {
-            _id = i;
-            setCheckable(toggle);
-            }
-      void setId(int i) { _id = i; }
-      int id() const    { return _id; }
-      };
+public:
+
+    Action(QObject* parent, int i, const char* name = 0, bool toggle = false)
+    : QAction(name, parent)
+    {
+        _id = i;
+        setCheckable(toggle);
+    }
+
+    void setId(int i)
+    {
+        _id = i;
+    }
+
+    int id() const
+    {
+        return _id;
+    }
+};
 
 
 #endif

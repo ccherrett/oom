@@ -27,67 +27,68 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   PitchEdit
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   PitchEdit
+	//---------------------------------------------------------
 
-PitchEdit::PitchEdit(QWidget* parent)
-  : QSpinBox(parent)
-      {
-      setRange(0, 127);
-      deltaMode = false;
-      }
+	PitchEdit::PitchEdit(QWidget* parent)
+	: QSpinBox(parent)
+	{
+		setRange(0, 127);
+		deltaMode = false;
+	}
 
-//---------------------------------------------------------
-//   keyPressEvent
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   keyPressEvent
+	//---------------------------------------------------------
 
-void PitchEdit::keyPressEvent(QKeyEvent* ev)
-      {
-      if (ev->key() == Qt::Key_Return)
-            emit returnPressed();
-      else if (ev->key() == Qt::Key_Escape)
-            emit escapePressed();
-      }
+	void PitchEdit::keyPressEvent(QKeyEvent* ev)
+	{
+		if (ev->key() == Qt::Key_Return)
+			emit returnPressed();
+		else if (ev->key() == Qt::Key_Escape)
+			emit escapePressed();
+	}
 
-//---------------------------------------------------------
-//   mapValueToText
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   mapValueToText
+	//---------------------------------------------------------
 
-QString PitchEdit::mapValueToText(int v)
-      {
-      if (deltaMode) {
-            QString s;
-            s.setNum(v);
-            return s;
-            }
-      else
-            return pitch2string(v);
-      }
+	QString PitchEdit::mapValueToText(int v)
+	{
+		if (deltaMode)
+		{
+			QString s;
+			s.setNum(v);
+			return s;
+		}
+		else
+			return pitch2string(v);
+	}
 
-//---------------------------------------------------------
-//   mapTextToValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   mapTextToValue
+	//---------------------------------------------------------
 
-int PitchEdit::mapTextToValue(bool* ok)
-      {
-printf("AwlPitchEdit: mapTextToValue: not impl.\n");
-      if (ok)
-            *ok = false;
-      return 0;
-      }
+	int PitchEdit::mapTextToValue(bool* ok)
+	{
+		printf("AwlPitchEdit: mapTextToValue: not impl.\n");
+		if (ok)
+			*ok = false;
+		return 0;
+	}
 
-//---------------------------------------------------------
-//   setDeltaMode
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setDeltaMode
+	//---------------------------------------------------------
 
-void PitchEdit::setDeltaMode(bool val)
-      {
-      deltaMode = val;
-      if (deltaMode)
-            setRange(-127, 127);
-      else
-            setRange(0, 127);
-      }
+	void PitchEdit::setDeltaMode(bool val)
+	{
+		deltaMode = val;
+		if (deltaMode)
+			setRange(-127, 127);
+		else
+			setRange(0, 127);
+	}
 }
 

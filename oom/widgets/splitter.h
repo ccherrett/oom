@@ -17,13 +17,13 @@ class Xml;
 //---------------------------------------------------------
 
 class Splitter : public QSplitter {
-      Q_OBJECT
+    Q_OBJECT
 
-   public:
-      Splitter(Qt::Orientation o, QWidget* parent, const char* name);
-      void writeStatus(int level, Xml&);
-      void readStatus(Xml&);
-      };
+public:
+    Splitter(Qt::Orientation o, QWidget* parent, const char* name);
+    void writeStatus(int level, Xml&);
+    void readStatus(Xml&);
+};
 
 #endif
 

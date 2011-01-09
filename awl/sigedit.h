@@ -26,45 +26,50 @@
 
 #include <QAbstractSpinBox>
 
-namespace AL {
-      class TimeSignature;
-      };
+namespace AL
+{
+    class TimeSignature;
+};
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   SigEdit
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   SigEdit
+    //---------------------------------------------------------
 
-class SigEdit : public QAbstractSpinBox
-      {
-      Q_OBJECT
+    class SigEdit : public QAbstractSpinBox
+    {
+        Q_OBJECT
 
-      AL::TimeSignature _sig;
-      bool initialized;
+        AL::TimeSignature _sig;
+        bool initialized;
 
-      virtual void paintEvent(QPaintEvent* event);
-      virtual void stepBy(int steps);
-      virtual StepEnabled stepEnabled() const;
-      virtual void fixup(QString& input) const;
-      virtual QValidator::State validate(QString&, int&) const;
-      void updateValue();
-      int curSegment() const;
-      virtual bool event(QEvent*);
+        virtual void paintEvent(QPaintEvent* event);
+        virtual void stepBy(int steps);
+        virtual StepEnabled stepEnabled() const;
+        virtual void fixup(QString& input) const;
+        virtual QValidator::State validate(QString&, int&) const;
+        void updateValue();
+        int curSegment() const;
+        virtual bool event(QEvent*);
 
-   signals:
-      void valueChanged(const AL::TimeSignature&);
+    signals:
+        void valueChanged(const AL::TimeSignature&);
 
-   public slots:
-      void setValue(const AL::TimeSignature&);
-      void setValue(const QString& s);
+    public slots:
+        void setValue(const AL::TimeSignature&);
+        void setValue(const QString& s);
 
-   public:
-      SigEdit(QWidget* parent = 0);
-      ~SigEdit();
+    public:
+        SigEdit(QWidget* parent = 0);
+        ~SigEdit();
 
-      AL::TimeSignature sig() const { return _sig; }
-      };
+        AL::TimeSignature sig() const
+        {
+            return _sig;
+        }
+    };
 }
 
 #endif

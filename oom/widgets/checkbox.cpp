@@ -14,17 +14,17 @@
 //---------------------------------------------------------
 
 CheckBox::CheckBox(QWidget* parent, int i, const char* name)
-   : QCheckBox(parent)
-      {
-      setObjectName(name);
-      _id = i;
-      connect(this, SIGNAL(toggled(bool)), SLOT(hasToggled(bool)));
-      }
+: QCheckBox(parent)
+{
+	setObjectName(name);
+	_id = i;
+	connect(this, SIGNAL(toggled(bool)), SLOT(hasToggled(bool)));
+}
 
 void CheckBox::hasToggled(bool val)
-      {
-      emit toggleChanged(val, _id);
-      }
+{
+	emit toggleChanged(val, _id);
+}
 
 //------------------------------------------------------------
 //  mousePressEvent
@@ -32,16 +32,16 @@ void CheckBox::hasToggled(bool val)
 
 void CheckBox::mousePressEvent(QMouseEvent *e)
 {
-  if(e->button() == Qt::RightButton)
-    emit checkboxRightClicked(e->globalPos(), _id);
-  else
-  {
-    if(isChecked())
-      setChecked(false);
-    else
-      setChecked(true);
-    emit checkboxPressed(_id);
-  }
+	if (e->button() == Qt::RightButton)
+		emit checkboxRightClicked(e->globalPos(), _id);
+	else
+	{
+		if (isChecked())
+			setChecked(false);
+		else
+			setChecked(true);
+		emit checkboxPressed(_id);
+	}
 }
 
 //------------------------------------------------------------
@@ -50,10 +50,10 @@ void CheckBox::mousePressEvent(QMouseEvent *e)
 
 void CheckBox::mouseReleaseEvent(QMouseEvent *e)
 {
-  if(e->button() == Qt::RightButton)
-    return;
-    
-  emit checkboxReleased(_id);
+	if (e->button() == Qt::RightButton)
+		return;
+
+	emit checkboxReleased(_id);
 }
 
 

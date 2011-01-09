@@ -47,12 +47,12 @@
 //------------------------------------------------------------
 
 ScaleIf::ScaleIf()
-      {
-      d_userScale = FALSE;
-      d_maxMajor = 5;
-      d_maxMinor = 3;
-      d_scale.setScale(0.0,100.0,d_maxMajor, d_maxMinor);
-      }
+{
+	d_userScale = FALSE;
+	d_maxMajor = 5;
+	d_maxMinor = 3;
+	d_scale.setScale(0.0, 100.0, d_maxMajor, d_maxMinor);
+}
 
 //------------------------------------------------------------
 //	ScaleIf::setScale (1)
@@ -79,9 +79,9 @@ ScaleIf::ScaleIf()
 //------------------------------------------------------------
 
 void ScaleIf::setScale(double vmin, double vmax, int logarithmic)
-      {
-      setScale(vmin,vmax,0.0,logarithmic);
-      }
+{
+	setScale(vmin, vmax, 0.0, logarithmic);
+}
 
 //------------------------------------------------------------
 //	ScaleIf::setScale (2)
@@ -106,14 +106,14 @@ void ScaleIf::setScale(double vmin, double vmax, int logarithmic)
 //------------------------------------------------------------
 
 void ScaleIf::setScale(double vmin, double vmax, double step, int logarithmic)
-      {
-      ScaleDiv oldscl(d_scale.scaleDiv());
+{
+	ScaleDiv oldscl(d_scale.scaleDiv());
 
-      d_scale.setScale(vmin, vmax, d_maxMajor, d_maxMinor, step, logarithmic);
-      d_userScale = TRUE;
-      if (oldscl != d_scale.scaleDiv())
-            scaleChange();
-      }
+	d_scale.setScale(vmin, vmax, d_maxMajor, d_maxMinor, step, logarithmic);
+	d_userScale = TRUE;
+	if (oldscl != d_scale.scaleDiv())
+		scaleChange();
+}
 
 //------------------------------------------------------------
 //	Scale::setScale
@@ -127,10 +127,10 @@ void ScaleIf::setScale(double vmin, double vmax, double step, int logarithmic)
 //------------------------------------------------------------
 
 void ScaleIf::setScale(const ScaleDiv &s)
-      {
-      d_scale.setScale(s);
-      scaleChange();
-      }
+{
+	d_scale.setScale(s);
+	scaleChange();
+}
 
 //------------------------------------------------------------
 //	ScaleIf::autoScale
@@ -144,12 +144,13 @@ void ScaleIf::setScale(const ScaleDiv &s)
 //------------------------------------------------------------
 
 void ScaleIf::autoScale()
-      {
-      if (!d_userScale) {
-            d_userScale = FALSE;
-            scaleChange();
-            }
-      }
+{
+	if (!d_userScale)
+	{
+		d_userScale = FALSE;
+		scaleChange();
+	}
+}
 
 //------------------------------------------------------------
 //	ScaleIf::setScaleMaxMajor
@@ -168,14 +169,15 @@ void ScaleIf::autoScale()
 //------------------------------------------------------------
 
 void ScaleIf::setScaleMaxMajor(int ticks)
-      {
-      if (ticks != d_maxMajor) {
-            d_maxMajor = ticks;
-            d_scale.setScale(d_scale.scaleDiv().lBound(), d_scale.scaleDiv().hBound(),
-               d_maxMajor, d_maxMinor, 0.0,d_scale.scaleDiv().logScale());
-            scaleChange();
-            }
-      }
+{
+	if (ticks != d_maxMajor)
+	{
+		d_maxMajor = ticks;
+		d_scale.setScale(d_scale.scaleDiv().lBound(), d_scale.scaleDiv().hBound(),
+				d_maxMajor, d_maxMinor, 0.0, d_scale.scaleDiv().logScale());
+		scaleChange();
+	}
+}
 
 //------------------------------------------------------------
 //  ScaleIf::setScaleMaxMinor
@@ -194,12 +196,13 @@ void ScaleIf::setScaleMaxMajor(int ticks)
 //------------------------------------------------------------
 
 void ScaleIf::setScaleMaxMinor(int ticks)
-      {
-      if ( ticks != d_maxMinor) {
-            d_maxMinor = ticks;
-            d_scale.setScale(d_scale.scaleDiv().lBound(), d_scale.scaleDiv().hBound(),
-               d_maxMajor, d_maxMinor, 0.0, d_scale.scaleDiv().logScale());
-            scaleChange();
-            }
-      }
+{
+	if (ticks != d_maxMinor)
+	{
+		d_maxMinor = ticks;
+		d_scale.setScale(d_scale.scaleDiv().lBound(), d_scale.scaleDiv().hBound(),
+				d_maxMajor, d_maxMinor, 0.0, d_scale.scaleDiv().logScale());
+		scaleChange();
+	}
+}
 

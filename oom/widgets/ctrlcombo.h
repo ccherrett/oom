@@ -11,11 +11,12 @@
 
 #include <QComboBox>
 
-class CtrlComboBox : public QComboBox {
-      Q_OBJECT
-   public:
-      CtrlComboBox(QWidget* parent);
-      };
+class CtrlComboBox : public QComboBox
+{
+    Q_OBJECT
+public:
+    CtrlComboBox(QWidget* parent);
+};
 
 
 #endif

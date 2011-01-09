@@ -16,14 +16,19 @@ class QPaintEvent;
 //   VScale
 //---------------------------------------------------------
 
-class VScale : public QWidget {
-      Q_OBJECT
+class VScale : public QWidget
+{
+    Q_OBJECT
 
-      virtual void paintEvent(QPaintEvent*);
+    virtual void paintEvent(QPaintEvent*);
 
-   public:
-      VScale(QWidget* parent=0) : QWidget(parent) {setFixedWidth(18);}
-      };
+public:
+
+    VScale(QWidget* parent = 0) : QWidget(parent)
+    {
+        setFixedWidth(18);
+    }
+};
 
 #endif
 

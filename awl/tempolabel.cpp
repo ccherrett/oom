@@ -24,51 +24,51 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   TempoLabel
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   TempoLabel
+	//---------------------------------------------------------
 
-TempoLabel::TempoLabel(QWidget* parent)
-   : QLabel(parent)
-      {
-      setFrameStyle(WinPanel | Sunken);
-      setLineWidth(2);
-      setMidLineWidth(3);
-      _value = 1.0;
-      setValue(0.0);
-      setIndent(3);
-      setMinimumSize(sizeHint());
-      }
+	TempoLabel::TempoLabel(QWidget* parent)
+	: QLabel(parent)
+	{
+		setFrameStyle(WinPanel | Sunken);
+		setLineWidth(2);
+		setMidLineWidth(3);
+		_value = 1.0;
+		setValue(0.0);
+		setIndent(3);
+		setMinimumSize(sizeHint());
+	}
 
-//---------------------------------------------------------
-//   setVal
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setVal
+	//---------------------------------------------------------
 
-void TempoLabel::setValue(int val)
-      {
-      setValue(double(val/1000.0));
-      }
+	void TempoLabel::setValue(int val)
+	{
+		setValue(double(val / 1000.0));
+	}
 
-void TempoLabel::setValue(double val)
-      {
-      if (val == _value)
-            return;
-      _value = val;
-      QString s = QString("%1").arg(val, 3, 'f', 2);
-      setText(s);
-      }
+	void TempoLabel::setValue(double val)
+	{
+		if (val == _value)
+			return;
+		_value = val;
+		QString s = QString("%1").arg(val, 3, 'f', 2);
+		setText(s);
+	}
 
-//---------------------------------------------------------
-//   sizeHint
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   sizeHint
+	//---------------------------------------------------------
 
-QSize TempoLabel::sizeHint() const
-      {
-      QFontMetrics fm(font());
-      int fw = 4;
-      int h  = fm.height() + fw * 2;
-      int w  = 6 + fm.width(QString("000.00")) +  fw * 2;  // 6=indent
-      return QSize(w, h).expandedTo(QApplication::globalStrut());
-      }
+	QSize TempoLabel::sizeHint() const
+	{
+		QFontMetrics fm(font());
+		int fw = 4;
+		int h = fm.height() + fw * 2;
+		int w = 6 + fm.width(QString("000.00")) + fw * 2; // 6=indent
+		return QSize(w, h).expandedTo(QApplication::globalStrut());
+	}
 }
 

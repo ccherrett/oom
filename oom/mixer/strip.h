@@ -32,48 +32,53 @@ static const int STRIP_WIDTH = 65;
 //   Strip
 //---------------------------------------------------------
 
-class Strip : public QFrame {
-      Q_OBJECT
-   
-   protected:
-      Track* track;
-      QLabel* label;
-      //QVBoxLayout* layout;
-      QGridLayout* grid;
-      QVBoxLayout* rackgrid;
-      int _curGridRow;
-      Meter* meter[MAX_CHANNELS];
-      bool useSoloIconSet2;
-      
-      QToolButton* record;
-      QToolButton* solo;
-      QToolButton* mute;
-      QToolButton* iR; // Input routing button
-      QToolButton* oR; // Output routing button
-      QGridLayout* sliderGrid;
-      ComboBox* autoType;
-      void setLabelText();
+class Strip : public QFrame
+{
+    Q_OBJECT
 
-   private slots:
-      void recordToggled(bool);
-      void soloToggled(bool);
-      void muteToggled(bool);
+protected:
+    Track* track;
+    QLabel* label;
+    //QVBoxLayout* layout;
+    QGridLayout* grid;
+    QVBoxLayout* rackgrid;
+    int _curGridRow;
+    Meter* meter[MAX_CHANNELS];
+    bool useSoloIconSet2;
 
-   protected slots:
-      virtual void heartBeat();
-      void setAutomationType(int t,int);
+    QToolButton* record;
+    QToolButton* solo;
+    QToolButton* mute;
+    QToolButton* iR; // Input routing button
+    QToolButton* oR; // Output routing button
+    QGridLayout* sliderGrid;
+    ComboBox* autoType;
+    void setLabelText();
 
-   public slots:
-      void resetPeaks();
-      virtual void songChanged(int) = 0;
+private slots:
+    void recordToggled(bool);
+    void soloToggled(bool);
+    void muteToggled(bool);
 
-   public:
-      Strip(QWidget* parent, Track* t);
-      ~Strip();
-      void setRecordFlag(bool flag);
-      Track* getTrack() const { return track; }
-      void setLabelFont();
-      };
+protected slots:
+    virtual void heartBeat();
+    void setAutomationType(int t, int);
+
+public slots:
+    void resetPeaks();
+    virtual void songChanged(int) = 0;
+
+public:
+    Strip(QWidget* parent, Track* t);
+    ~Strip();
+    void setRecordFlag(bool flag);
+
+    Track* getTrack() const
+    {
+        return track;
+    }
+    void setLabelFont();
+};
 
 #endif
 

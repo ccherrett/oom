@@ -82,7 +82,7 @@ extern const char* part_file_save_pattern[];  //!< File name pattern for saving 
 //extern const char* plug_file_pattern[];  //!< File name pattern for plugin files
 extern const char* preset_file_pattern[];  //!< File name pattern for plugin files
 extern const char* preset_file_save_pattern[];  //!< File name pattern for saving plugin files
-*/
+ */
 
 extern const QStringList midi_file_pattern;
 extern const QStringList midi_file_save_pattern;
@@ -101,9 +101,9 @@ extern const QStringList audio_file_pattern;
 ///extern Qt::ButtonState globalKeyState;
 extern Qt::KeyboardModifiers globalKeyState;
 
-extern int midiInputPorts;          //!< receive from all devices
-extern int midiInputChannel;        //!< receive all channel
-extern int midiRecordType;          //!< receive all events
+extern int midiInputPorts; //!< receive from all devices
+extern int midiInputChannel; //!< receive all channel
+extern int midiRecordType; //!< receive all events
 
 #define MIDI_FILTER_NOTEON    1
 #define MIDI_FILTER_POLYP     2
@@ -113,7 +113,7 @@ extern int midiRecordType;          //!< receive all events
 #define MIDI_FILTER_PITCH     32
 #define MIDI_FILTER_SYSEX     64
 
-extern int midiThruType;            // transmit all events
+extern int midiThruType; // transmit all events
 extern int midiFilterCtrl1;
 extern int midiFilterCtrl2;
 extern int midiFilterCtrl3;

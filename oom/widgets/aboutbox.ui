@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>160</height>
+    <width>354</width>
+    <height>185</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,7 +72,7 @@ Published under the GNU Public License</string>
    <item>
     <widget class="QPushButton" name="doneHere">
      <property name="text">
-      <string>&amp;Keep On Rocking!</string>
+      <string>Close</string>
      </property>
      <property name="shortcut">
       <string>Alt+K</string>

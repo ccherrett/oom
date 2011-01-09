@@ -18,7 +18,7 @@
 //  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //=============================================================================
 
- 
+
 #ifndef __STRINGPARAM_H__
 #define __STRINGPARAM_H__
 
@@ -29,18 +29,18 @@ class QString;
 class Xml;
 
 //typedef std::pair<std::string, std::string >                 StringParamMapItem;
-typedef std::map<std::string, std::string >::iterator           iStringParamMap;
-typedef std::map<std::string, std::string >::const_iterator     ciStringParamMap;
+typedef std::map<std::string, std::string >::iterator iStringParamMap;
+typedef std::map<std::string, std::string >::const_iterator ciStringParamMap;
 
-class StringParamMap : public std::map<std::string, std::string > 
+class StringParamMap : public std::map<std::string, std::string >
 {
-  public:
+public:
     void set(const char* /*key*/, const char* /*value*/);
     void remove(const char* /*key*/);
-    
+
     iStringParamMap findKey(const char* /*key*/);
     //int index(char* /*key*/);
-    
+
     void read(Xml& /*xml*/, const QString& /*name*/);
     void write(int /*level*/, Xml& /*xml*/, const char* /*name*/) const;
 };

@@ -6,9 +6,9 @@
 //---------------------------------------------------------
 
 int main(int /*argc*/, char* /*argv*/[])
-      {
-      printf("Hello OOMidi\n");
-      new KnobPlugin;
-      return 0;
-      }
+{
+	printf("Hello OOMidi\n");
+	new KnobPlugin;
+	return 0;
+}
 

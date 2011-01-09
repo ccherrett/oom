@@ -23,53 +23,114 @@ class Part;
 //---------------------------------------------------------
 
 class CItem {
-   private:
-      Event _event;
-      Part* _part;
+private:
+    Event _event;
+    Part* _part;
 
-   protected:
-      bool _isMoving;
-      QPoint moving;
-      QRect  _bbox;
-      QPoint _pos;
+protected:
+    bool _isMoving;
+    QPoint moving;
+    QRect _bbox;
+    QPoint _pos;
 
-   public:
-      CItem(const QPoint& p, const QRect& r);
-      CItem();
-      // Changed by Tim. p3.3.20
-      //CItem(Event e, Part* p);
-      CItem(const Event& e, Part* p);
+public:
+    CItem(const QPoint& p, const QRect& r);
+    CItem();
+    // Changed by Tim. p3.3.20
+    //CItem(Event e, Part* p);
+    CItem(const Event& e, Part* p);
 
-      bool isMoving() const        { return _isMoving;  }
-      void setMoving(bool f)       { _isMoving = f;     }
-      bool isSelected() const;
-      void setSelected(bool f);
+    bool isMoving() const {
+        return _isMoving;
+    }
 
-      int width() const            { return _bbox.width(); }
-      void setWidth(int l)         { _bbox.setWidth(l); }
-      void setHeight(int l)        { _bbox.setHeight(l); }
-      void setMp(const QPoint&p)   { moving = p;    }
-      const QPoint mp() const      { return moving; }
-      int x() const                { return _pos.x(); }
-      int y() const                { return _pos.y(); }
-      void setY(int y)             { _bbox.setY(y); }
-      QPoint pos() const           { return _pos; }
-      void setPos(const QPoint& p) { _pos = p;    }
-      int height() const           { return _bbox.height(); }
-      const QRect& bbox() const    { return _bbox; }
-      void setBBox(const QRect& r) { _bbox = r; }
-      void move(const QPoint& tl)  {
-            _bbox.moveTopLeft(tl);
-            _pos = tl;
-            }
-      bool contains(const QPoint& p) const  { return _bbox.contains(p); }
-      bool intersects(const QRect& r) const { return r.intersects(_bbox); }
+    void setMoving(bool f) {
+        _isMoving = f;
+    }
+    bool isSelected() const;
+    void setSelected(bool f);
 
-      Event event() const         { return _event;  }
-      void setEvent(Event& e)     { _event = e;     }
-      Part* part() const          { return _part; }
-      void setPart(Part* p)       { _part = p; }
-      };
+    int width() const {
+        return _bbox.width();
+    }
+
+    void setWidth(int l) {
+        _bbox.setWidth(l);
+    }
+
+    void setHeight(int l) {
+        _bbox.setHeight(l);
+    }
+
+    void setMp(const QPoint&p) {
+        moving = p;
+    }
+
+    const QPoint mp() const {
+        return moving;
+    }
+
+    int x() const {
+        return _pos.x();
+    }
+
+    int y() const {
+        return _pos.y();
+    }
+
+    void setY(int y) {
+        _bbox.setY(y);
+    }
+
+    QPoint pos() const {
+        return _pos;
+    }
+
+    void setPos(const QPoint& p) {
+        _pos = p;
+    }
+
+    int height() const {
+        return _bbox.height();
+    }
+
+    const QRect& bbox() const {
+        return _bbox;
+    }
+
+    void setBBox(const QRect& r) {
+        _bbox = r;
+    }
+
+    void move(const QPoint& tl) {
+        _bbox.moveTopLeft(tl);
+        _pos = tl;
+    }
+
+    bool contains(const QPoint& p) const {
+        return _bbox.contains(p);
+    }
+
+    bool intersects(const QRect& r) const {
+        return r.intersects(_bbox);
+    }
+
+    Event event() const {
+        return _event;
+    }
+
+    void setEvent(Event& e) {
+        _event = e;
+    }
+
+    Part* part() const {
+        return _part;
+    }
+
+    void setPart(Part* p) {
+        _part = p;
+    }
+};
 
 typedef std::multimap<int, CItem*, std::less<int> >::iterator iCItem;
 //typedef std::multimap<int, CItem*, std::less<int> >::const_iterator ciCItem;
@@ -80,11 +141,11 @@ typedef std::multimap<int, CItem*, std::less<int> >::const_reverse_iterator rciC
 //    Canvas Item List
 //---------------------------------------------------------
 
-class CItemList: public std::multimap<int, CItem*, std::less<int> > {
-   public:
-      void add(CItem*);
-      CItem* find(const QPoint& pos) const;
-      };
+class CItemList : public std::multimap<int, CItem*, std::less<int> > {
+public:
+    void add(CItem*);
+    CItem* find(const QPoint& pos) const;
+};
 
 #endif
 

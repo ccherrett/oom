@@ -41,68 +41,71 @@ const double DoubleRange::MinEps = 1.0e-10;
 //---------------------------------------------------------
 
 DoubleRange::DoubleRange()
-      {
-      d_minValue = 0;
-      d_maxValue = 100.0;
-      d_prevValue = 0.0;
-      d_exactPrevValue = 0.0;
-      d_exactValue = 0.0;
-      d_value = 0.0;
-      d_step  = 0.1;
-      d_periodic = FALSE;
-      }
+{
+	d_minValue = 0;
+	d_maxValue = 100.0;
+	d_prevValue = 0.0;
+	d_exactPrevValue = 0.0;
+	d_exactValue = 0.0;
+	d_value = 0.0;
+	d_step = 0.1;
+	d_periodic = FALSE;
+}
 
 //---------------------------------------------------------
 //   setNewValue
 //---------------------------------------------------------
 
 void DoubleRange::setNewValue(double x, bool align)
-      {
-      d_prevValue = d_value;
+{
+	d_prevValue = d_value;
 
-      double vmin = qwtMin(d_minValue, d_maxValue);
-      double vmax = qwtMax(d_minValue, d_maxValue);
+	double vmin = qwtMin(d_minValue, d_maxValue);
+	double vmax = qwtMax(d_minValue, d_maxValue);
 
-      // Range check
+	// Range check
 
-      if (x < vmin) {
-            if ((d_periodic) && (vmin != vmax))
-                  d_value = x + ceil((vmin - x) / (vmax - vmin))
-                     * (vmax - vmin);
-            else
-                  d_value = vmin;
-            }
-      else if (x > vmax) {
-            if ((d_periodic) && (vmin != vmax))
-                  d_value = x - ceil( ( x - vmax) / (vmax - vmin ))
-                     * (vmax - vmin);
-            else
-                  d_value = vmax;
-            }
-      else
-            d_value = x;
+	if (x < vmin)
+	{
+		if ((d_periodic) && (vmin != vmax))
+			d_value = x + ceil((vmin - x) / (vmax - vmin))
+			* (vmax - vmin);
+		else
+			d_value = vmin;
+	}
+	else if (x > vmax)
+	{
+		if ((d_periodic) && (vmin != vmax))
+			d_value = x - ceil((x - vmax) / (vmax - vmin))
+			* (vmax - vmin);
+		else
+			d_value = vmax;
+	}
+	else
+		d_value = x;
 
-      d_exactPrevValue = d_exactValue;
-      d_exactValue = d_value;
+	d_exactPrevValue = d_exactValue;
+	d_exactValue = d_value;
 
-      // align to grid
-      if (align) {
-            if (d_step != 0.0)
-                  d_value = d_minValue + rint((d_value - d_minValue) / d_step ) * d_step;
-            else
-                  d_value = d_minValue;
-	
-            // correct rounding error at the border
-            if (fabs(d_value - d_maxValue) < MinEps * qwtAbs(d_step))
-                  d_value = d_maxValue;
+	// align to grid
+	if (align)
+	{
+		if (d_step != 0.0)
+			d_value = d_minValue + rint((d_value - d_minValue) / d_step) * d_step;
+		else
+			d_value = d_minValue;
 
-            // correct rounding error if value = 0
-            if (fabs(d_value) < MinEps * qwtAbs(d_step))
-                  d_value = 0.0;
-            }
-      if (d_prevValue != d_value)
-            valueChange();
-      }
+		// correct rounding error at the border
+		if (fabs(d_value - d_maxValue) < MinEps * qwtAbs(d_step))
+			d_value = d_maxValue;
+
+		// correct rounding error if value = 0
+		if (fabs(d_value) < MinEps * qwtAbs(d_step))
+			d_value = 0.0;
+	}
+	if (d_prevValue != d_value)
+		valueChange();
+}
 
 //---------------------------------------------------------
 //   fitValue
@@ -114,9 +117,9 @@ void DoubleRange::setNewValue(double x, bool align)
 //---------------------------------------------------------
 
 void DoubleRange::fitValue(double x)
-      {
-      setNewValue(x, true);
-      }
+{
+	setNewValue(x, true);
+}
 
 //---------------------------------------------------------
 //   setValue
@@ -131,9 +134,9 @@ void DoubleRange::fitValue(double x)
 //---------------------------------------------------------
 
 void DoubleRange::setValue(double x)
-      {
-      setNewValue(x, false);
-      }
+{
+	setNewValue(x, false);
+}
 
 //---------------------------------------------------------
 //   setRange
@@ -149,36 +152,37 @@ void DoubleRange::setValue(double x)
 //---------------------------------------------------------
 
 void DoubleRange::setRange(double vmin, double vmax, double vstep, int pageSize)
-      {
-      bool rchg = ((d_maxValue != vmax) || (d_minValue != vmin));
+{
+	bool rchg = ((d_maxValue != vmax) || (d_minValue != vmin));
 
-      if (rchg) {
-            d_minValue = vmin;
-            d_maxValue = vmax;
-            }
+	if (rchg)
+	{
+		d_minValue = vmin;
+		d_maxValue = vmax;
+	}
 
-      //
-      // look if the step width has an acceptable
-      // value or otherwise change it.
-      //
-      setStep(vstep);
+	//
+	// look if the step width has an acceptable
+	// value or otherwise change it.
+	//
+	setStep(vstep);
 
-      //
-      // limit page size
-      //
-      d_pageSize = qwtLim(pageSize,0, int(qwtAbs((d_maxValue - d_minValue) / d_step)));
+	//
+	// limit page size
+	//
+	d_pageSize = qwtLim(pageSize, 0, int(qwtAbs((d_maxValue - d_minValue) / d_step)));
 
-      //
-      // If the value lies out of the range, it
-      // will be changed. Note that it will not be adjusted to
-      // the new step width.
-      setNewValue(d_value, false);
+	//
+	// If the value lies out of the range, it
+	// will be changed. Note that it will not be adjusted to
+	// the new step width.
+	setNewValue(d_value, false);
 
-      // call notifier after the step width has been
-      // adjusted.
-      if (rchg)
-            rangeChange();
-      }
+	// call notifier after the step width has been
+	// adjusted.
+	if (rchg)
+		rangeChange();
+}
 
 //---------------------------------------------------------
 //   setStep
@@ -188,28 +192,30 @@ void DoubleRange::setRange(double vmin, double vmax, double vstep, int pageSize)
 //---------------------------------------------------------
 
 void DoubleRange::setStep(double vstep)
-      {
-    double newStep,intv;
+{
+	double newStep, intv;
 
-    intv = d_maxValue - d_minValue;
+	intv = d_maxValue - d_minValue;
 
-      if (vstep == 0.0)
-            newStep = intv * DefaultRelStep;
-      else {
-         if (((intv > 0) && (vstep < 0)) || ((intv < 0) && (vstep > 0)))
-                  newStep = -vstep;
-            else
-                  newStep = vstep;
-	
-            if ( fabs(newStep) < fabs(MinRelStep * intv) )
-                  newStep = MinRelStep * intv;
-            }
+	if (vstep == 0.0)
+		newStep = intv * DefaultRelStep;
+	else
+	{
+		if (((intv > 0) && (vstep < 0)) || ((intv < 0) && (vstep > 0)))
+			newStep = -vstep;
+		else
+			newStep = vstep;
 
-      if (newStep != d_step) {
-            d_step = newStep;
-            stepChange();
-            }
-      }
+		if (fabs(newStep) < fabs(MinRelStep * intv))
+			newStep = MinRelStep * intv;
+	}
+
+	if (newStep != d_step)
+	{
+		d_step = newStep;
+		stepChange();
+	}
+}
 
 //---------------------------------------------------------
 //   setPeriodic
@@ -226,9 +232,9 @@ void DoubleRange::setStep(double vstep)
 //---------------------------------------------------------
 
 void DoubleRange::setPeriodic(bool tf)
-      {
-      d_periodic = tf;
-      }
+{
+	d_periodic = tf;
+}
 
 //------------------------------------------------------------
 //  incValue
@@ -239,9 +245,9 @@ void DoubleRange::setPeriodic(bool tf)
 //------------------------------------------------------------
 
 void DoubleRange::incValue(int nSteps)
-      {
-      setNewValue(d_value + double(nSteps) * d_step, true);
-      }
+{
+	setNewValue(d_value + double(nSteps) * d_step, true);
+}
 
 //---------------------------------------------------------
 //   incPages
@@ -249,17 +255,17 @@ void DoubleRange::incValue(int nSteps)
 //---------------------------------------------------------
 
 void DoubleRange::incPages(int nPages)
-      {
-      setNewValue(d_value + double(nPages) * double(d_pageSize)
-         * d_step, true);
-      }
+{
+	setNewValue(d_value + double(nPages) * double(d_pageSize)
+			* d_step, true);
+}
 
 //---------------------------------------------------------
 //   step
 //---------------------------------------------------------
 
 double DoubleRange::step() const
-      {
-      return qwtAbs(d_step);
-      }
+{
+	return qwtAbs(d_step);
+}
 

@@ -14,15 +14,20 @@
 //   TransparentToolButton
 //---------------------------------------------------------
 
-class TransparentToolButton : public QToolButton {
-      Q_OBJECT
+class TransparentToolButton : public QToolButton
+{
+    Q_OBJECT
 
-      virtual void drawButton(QPainter*);
+    virtual void drawButton(QPainter*);
 
-   public:
-      TransparentToolButton(QWidget* parent, const char* name = 0)
-         : QToolButton(parent) {setObjectName(name);}
-      };
+public:
+
+    TransparentToolButton(QWidget* parent, const char* name = 0)
+    : QToolButton(parent)
+    {
+        setObjectName(name);
+    }
+};
 
 #endif
 

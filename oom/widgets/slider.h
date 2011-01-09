@@ -24,73 +24,81 @@
 //---------------------------------------------------------
 
 class Slider : public SliderBase, public ScaleIf
-      {
-  Q_OBJECT
+{
 
- public:
-  enum ScalePos { None, Left, Right, Top, Bottom };
-  enum { BgTrough = 0x1, BgSlot = 0x2 };
+    Q_OBJECT
 
-   private:
-      Q_PROPERTY( double lineStep READ lineStep WRITE setLineStep )
-      Q_PROPERTY( double pageStep READ pageStep WRITE setPageStep )
-      Q_PROPERTY( Qt::Orientation orientation READ orientation WRITE setOrientation )
+public:
+    enum ScalePos
+    {
+        None, Left, Right, Top, Bottom
+    };
 
-  QRect d_sliderRect;
+    enum
+    {
+        BgTrough = 0x1, BgSlot = 0x2
+    };
 
-  int d_thumbLength;
-  int d_thumbHalf;
-  int d_thumbWidth;
-  int d_borderWidth;
-  int d_bwTrough;
-  int d_scaleDist;
-  int d_xMargin;
-  int d_yMargin;
-  
-  int d_resized;
-  bool d_autoResize;
-  double d_scaleStep;
+private:
+    Q_PROPERTY(double lineStep READ lineStep WRITE setLineStep)
+    Q_PROPERTY(double pageStep READ pageStep WRITE setPageStep)
+    Q_PROPERTY(Qt::Orientation orientation READ orientation WRITE setOrientation)
 
-  Qt::Orientation d_orient;
-  ScalePos d_scalePos;
-  int d_bgStyle;
-  int markerPos;
+    QRect d_sliderRect;
 
-  void drawHsBgSlot(QPainter *, const QRect&, const QRect&,const QBrush&);
-  void drawVsBgSlot(QPainter *, const QRect&, const QRect&,const QBrush&);
+    int d_thumbLength;
+    int d_thumbHalf;
+    int d_thumbWidth;
+    int d_borderWidth;
+    int d_bwTrough;
+    int d_scaleDist;
+    int d_xMargin;
+    int d_yMargin;
 
-  protected:
-  virtual void drawSlider (QPainter *p, const QRect &r);
-  double getValue(const QPoint &p);
-  void getScrollMode( QPoint &p, const Qt::MouseButton &button, int &scrollMode, int &direction);
-  void resizeEvent(QResizeEvent *e);
-  void paintEvent (QPaintEvent *e);
-  void valueChange();
-  void rangeChange();
-  void scaleChange();
-  void fontChange(const QFont &oldFont);
+    int d_resized;
+    bool d_autoResize;
+    double d_scaleStep;
 
-  public:
-  Slider(QWidget *parent, const char *name = 0,
-      Qt::Orientation orient = Qt::Vertical,
-      ScalePos scalePos = None,
-      int bgStyle = BgTrough);
-  
-  ~Slider();
-  void setThumbLength(int l);
-  void setThumbWidth(int w);
+    Qt::Orientation d_orient;
+    ScalePos d_scalePos;
+    int d_bgStyle;
+    int markerPos;
 
-  void setOrientation(Qt::Orientation o);
-  Qt::Orientation orientation() const;
+    void drawHsBgSlot(QPainter *, const QRect&, const QRect&, const QBrush&);
+    void drawVsBgSlot(QPainter *, const QRect&, const QRect&, const QBrush&);
 
-  double lineStep() const;
-  double pageStep() const;
+protected:
+    virtual void drawSlider(QPainter *p, const QRect &r);
+    double getValue(const QPoint &p);
+    void getScrollMode(QPoint &p, const Qt::MouseButton &button, int &scrollMode, int &direction);
+    void resizeEvent(QResizeEvent *e);
+    void paintEvent(QPaintEvent *e);
+    void valueChange();
+    void rangeChange();
+    void scaleChange();
+    void fontChange(const QFont &oldFont);
 
-  void setLineStep(double);
-  void setPageStep(double);
+public:
+    Slider(QWidget *parent, const char *name = 0,
+            Qt::Orientation orient = Qt::Vertical,
+            ScalePos scalePos = None,
+            int bgStyle = BgTrough);
 
-  void setBorderWidth(int bw);
-      void setMargins(int x, int y);
-  QSize sizeHint(); // const;
-      };
+    ~Slider();
+    void setThumbLength(int l);
+    void setThumbWidth(int w);
+
+    void setOrientation(Qt::Orientation o);
+    Qt::Orientation orientation() const;
+
+    double lineStep() const;
+    double pageStep() const;
+
+    void setLineStep(double);
+    void setPageStep(double);
+
+    void setBorderWidth(int bw);
+    void setMargins(int x, int y);
+    QSize sizeHint(); // const;
+};
 #endif

@@ -25,30 +25,32 @@
 
 class QKeyEvent;
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   PitchEdit
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   PitchEdit
+    //---------------------------------------------------------
 
-class PitchEdit : public QSpinBox {
-      Q_OBJECT
+    class PitchEdit : public QSpinBox
+    {
+        Q_OBJECT
 
-      bool deltaMode;
+        bool deltaMode;
 
-   protected:
-      virtual QString mapValueToText(int v);
-      virtual int mapTextToValue(bool* ok);
-      virtual void keyPressEvent(QKeyEvent*);
+    protected:
+        virtual QString mapValueToText(int v);
+        virtual int mapTextToValue(bool* ok);
+        virtual void keyPressEvent(QKeyEvent*);
 
-   signals:
-      void returnPressed();
-      void escapePressed();
+    signals:
+        void returnPressed();
+        void escapePressed();
 
-   public:
-      PitchEdit(QWidget* parent);
-      void setDeltaMode(bool);
-      };
+    public:
+        PitchEdit(QWidget* parent);
+        void setDeltaMode(bool);
+    };
 }
 
 #endif

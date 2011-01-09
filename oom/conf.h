@@ -19,17 +19,18 @@ class QLineEdit;
 //    config properties of exported midi files
 //---------------------------------------------------------
 
-class MidiFileConfig : public QDialog, public Ui::ConfigMidiFileBase {
-      Q_OBJECT
+class MidiFileConfig : public QDialog, public Ui::ConfigMidiFileBase
+{
+    Q_OBJECT
 
-   private slots:
-      void okClicked();
-      void cancelClicked();
+private slots:
+    void okClicked();
+    void cancelClicked();
 
-   public:
-      MidiFileConfig(QWidget* parent=0);
-      void updateValues();
-      };
+public:
+    MidiFileConfig(QWidget* parent = 0);
+    void updateValues();
+};
 
 class Xml;
 extern bool readConfiguration();

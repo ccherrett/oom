@@ -23,18 +23,20 @@
 
 #include "floatentry.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   PanEntry
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   PanEntry
+    //---------------------------------------------------------
 
-class PanEntry : public FloatEntry {
-      Q_OBJECT
+    class PanEntry : public FloatEntry
+    {
+        Q_OBJECT
 
-   public:
-      PanEntry(QWidget*);
-      };
+    public:
+        PanEntry(QWidget*);
+    };
 }
 
 #endif

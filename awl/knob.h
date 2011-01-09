@@ -24,60 +24,86 @@
 #include "aslider.h"
 // #include <QtDesigner/QDesignerExportWidget>
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//    Knob
-//
-//!   Base class of all dialer type input widgets.
-//
-//!   xxxxxxxxx
-//!
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //    Knob
+    //
+    //!   Base class of all dialer type input widgets.
+    //
+    //!   xxxxxxxxx
+    //!
+    //---------------------------------------------------------
 
-class Q_DECL_EXPORT Knob : public AbstractSlider {
-      Q_OBJECT
-      Q_PROPERTY(int scaleSize READ scaleSize WRITE setScaleSize)
-      Q_PROPERTY(int markSize READ markSize WRITE setMarkSize)
-      Q_PROPERTY(int border READ border WRITE setBorder)
-      Q_PROPERTY(QString text READ text WRITE setText)
+    class Q_DECL_EXPORT Knob : public AbstractSlider
+    {
+        Q_OBJECT
+        Q_PROPERTY(int scaleSize READ scaleSize WRITE setScaleSize)
+        Q_PROPERTY(int markSize READ markSize WRITE setMarkSize)
+        Q_PROPERTY(int border READ border WRITE setBorder)
+        Q_PROPERTY(QString text READ text WRITE setText)
 
-      int _scaleSize;         //! scale size in degrees
-      int _markSize;
-      int _border;
-      QPainterPath* points;
+        int _scaleSize; //! scale size in degrees
+        int _markSize;
+        int _border;
+        QPainterPath* points;
 
-      virtual void paintEvent(QPaintEvent*);
-      virtual void mousePressEvent(QMouseEvent*);
-      virtual void mouseReleaseEvent(QMouseEvent*);
-      virtual void mouseMoveEvent(QMouseEvent*);
+        virtual void paintEvent(QPaintEvent*);
+        virtual void mousePressEvent(QMouseEvent*);
+        virtual void mouseReleaseEvent(QMouseEvent*);
+        virtual void mouseMoveEvent(QMouseEvent*);
 
-   protected:
-      int startY;
-      QString _text;
+    protected:
+        int startY;
+        QString _text;
 
-   signals:
-      void sliderPressed(int);
-      void sliderReleased(int);
+    signals:
+        void sliderPressed(int);
+        void sliderReleased(int);
 
-   public:
-      Knob(QWidget* parent = 0);
-      ~Knob();
-      virtual QSize sizeHint() const { return QSize(50, 50); }
-      virtual int heightForWidth(int w) { return w; }
+    public:
+        Knob(QWidget* parent = 0);
+        ~Knob();
 
-      //! return text decoration
-      QString text() const           { return _text; }
-      void setText(const QString& s);
+        virtual QSize sizeHint() const
+        {
+            return QSize(50, 50);
+        }
 
-      //! return scale size in degrees
-      int scaleSize() const          { return _scaleSize; }
-      void setScaleSize(int val);
-      int markSize() const           { return _markSize; }
-      void setMarkSize(int val);
-      int border() const             { return _border; }
-      void setBorder(int val);
-      };
+        virtual int heightForWidth(int w)
+        {
+            return w;
+        }
+
+        //! return text decoration
+
+        QString text() const
+        {
+            return _text;
+        }
+        void setText(const QString& s);
+
+        //! return scale size in degrees
+
+        int scaleSize() const
+        {
+            return _scaleSize;
+        }
+        void setScaleSize(int val);
+
+        int markSize() const
+        {
+            return _markSize;
+        }
+        void setMarkSize(int val);
+
+        int border() const
+        {
+            return _border;
+        }
+        void setBorder(int val);
+    };
 
 }
 

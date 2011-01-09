@@ -23,33 +23,35 @@
 
 #include <QDoubleSpinBox>
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   TempoEdit
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   TempoEdit
+    //---------------------------------------------------------
 
-class TempoEdit : public QDoubleSpinBox {
-      Q_OBJECT
+    class TempoEdit : public QDoubleSpinBox
+    {
+        Q_OBJECT
 
-      double curVal;
+        double curVal;
 
-   protected:
-      QSize sizeHint() const;
+    protected:
+        QSize sizeHint() const;
 
-   private slots:
-      void newValue(double);
+    private slots:
+        void newValue(double);
 
-   public slots:
-      void setTempo(int);
+    public slots:
+        void setTempo(int);
 
-   signals:
-   	void tempoChanged(int);
+    signals:
+        void tempoChanged(int);
 
-   public:
-      TempoEdit(QWidget*);
-      int tempo() const;
-      };
+    public:
+        TempoEdit(QWidget*);
+        int tempo() const;
+    };
 
 }
 

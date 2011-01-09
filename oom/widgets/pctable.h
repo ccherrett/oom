@@ -17,32 +17,32 @@
 
 class ProgramChangeTable : public QTableView
 {
-	Q_OBJECT
+    Q_OBJECT
     virtual void dragEnterEvent(QDragEnterEvent*);
     virtual void dragMoveEvent(QDragMoveEvent*);
-	virtual void paintEvent(QPaintEvent*);
-	QRect dropSite;
+    virtual void paintEvent(QPaintEvent*);
+    QRect dropSite;
 
-	signals:
-		void rowOrderChanged();
+signals:
+    void rowOrderChanged();
 
-	public:
-		ProgramChangeTable(QWidget *parent = 0);
-		void dropEvent(QDropEvent *evt);
-		void mousePressEvent(QMouseEvent* evt);
+public:
+    ProgramChangeTable(QWidget *parent = 0);
+    void dropEvent(QDropEvent *evt);
+    void mousePressEvent(QMouseEvent* evt);
 
-	public slots:
-		QList<int> getSelectedRows();
+public slots:
+    QList<int> getSelectedRows();
 };
 
 class HTMLDelegate : public QStyledItemDelegate
 {
-	Q_OBJECT
- 
-	protected:
-		void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-		QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    Q_OBJECT
+
+protected:
+    void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const;
+    QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const;
 };
- 
- 
+
+
 #endif

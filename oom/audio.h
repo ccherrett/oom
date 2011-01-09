@@ -37,74 +37,76 @@ class MidiTrack;
 //    the midi thread
 //---------------------------------------------------------
 
-enum {
-      SEQM_ADD_TRACK, SEQM_REMOVE_TRACK, SEQM_CHANGE_TRACK, SEQM_MOVE_TRACK,
-      SEQM_ADD_PART, SEQM_REMOVE_PART, SEQM_CHANGE_PART,
-      SEQM_ADD_EVENT, SEQM_REMOVE_EVENT, SEQM_CHANGE_EVENT,
-      SEQM_ADD_TEMPO, SEQM_SET_TEMPO, SEQM_REMOVE_TEMPO, SEQM_ADD_SIG, SEQM_REMOVE_SIG,
-      SEQM_SET_GLOBAL_TEMPO,
-      SEQM_UNDO, SEQM_REDO,
-      SEQM_RESET_DEVICES, SEQM_INIT_DEVICES, SEQM_PANIC,
-      SEQM_MIDI_LOCAL_OFF,
-      SEQM_SET_MIDI_DEVICE,
-      SEQM_PLAY_MIDI_EVENT,
-      SEQM_SET_HW_CTRL_STATE,
-      SEQM_SET_HW_CTRL_STATES,
-      SEQM_SET_TRACK_OUT_PORT,
-      SEQM_SET_TRACK_OUT_CHAN,
-      SEQM_REMAP_PORT_DRUM_CTL_EVS,
-      SEQM_CHANGE_ALL_PORT_DRUM_CTL_EVS,
-      SEQM_SCAN_ALSA_MIDI_PORTS,
-      SEQM_SET_AUX,
-      SEQM_UPDATE_SOLO_STATES,
-      MIDI_SHOW_INSTR_GUI,
-      AUDIO_RECORD,
-      AUDIO_ROUTEADD, AUDIO_ROUTEREMOVE, AUDIO_REMOVEROUTES,
-      AUDIO_VOL, AUDIO_PAN,
-      AUDIO_ADDPLUGIN,
-      AUDIO_SET_SEG_SIZE,
-      AUDIO_SET_PREFADER, AUDIO_SET_CHANNELS,
-      AUDIO_SET_PLUGIN_CTRL_VAL,
-      AUDIO_SWAP_CONTROLLER_IDX,
-      AUDIO_CLEAR_CONTROLLER_EVENTS,
-      AUDIO_SEEK_PREV_AC_EVENT,
-      AUDIO_SEEK_NEXT_AC_EVENT,
-      AUDIO_ERASE_AC_EVENT,
-      AUDIO_ERASE_RANGE_AC_EVENTS,
-      AUDIO_ADD_AC_EVENT,
-      AUDIO_SET_SOLO, AUDIO_SET_SEND_METRONOME, 
-      MS_PROCESS, MS_STOP, MS_SET_RTC, MS_UPDATE_POLL_FD,
-      SEQM_IDLE, SEQM_SEEK,
-      };
+enum
+{
+    SEQM_ADD_TRACK, SEQM_REMOVE_TRACK, SEQM_CHANGE_TRACK, SEQM_MOVE_TRACK,
+    SEQM_ADD_PART, SEQM_REMOVE_PART, SEQM_CHANGE_PART,
+    SEQM_ADD_EVENT, SEQM_REMOVE_EVENT, SEQM_CHANGE_EVENT,
+    SEQM_ADD_TEMPO, SEQM_SET_TEMPO, SEQM_REMOVE_TEMPO, SEQM_ADD_SIG, SEQM_REMOVE_SIG,
+    SEQM_SET_GLOBAL_TEMPO,
+    SEQM_UNDO, SEQM_REDO,
+    SEQM_RESET_DEVICES, SEQM_INIT_DEVICES, SEQM_PANIC,
+    SEQM_MIDI_LOCAL_OFF,
+    SEQM_SET_MIDI_DEVICE,
+    SEQM_PLAY_MIDI_EVENT,
+    SEQM_SET_HW_CTRL_STATE,
+    SEQM_SET_HW_CTRL_STATES,
+    SEQM_SET_TRACK_OUT_PORT,
+    SEQM_SET_TRACK_OUT_CHAN,
+    SEQM_REMAP_PORT_DRUM_CTL_EVS,
+    SEQM_CHANGE_ALL_PORT_DRUM_CTL_EVS,
+    SEQM_SCAN_ALSA_MIDI_PORTS,
+    SEQM_SET_AUX,
+    SEQM_UPDATE_SOLO_STATES,
+    MIDI_SHOW_INSTR_GUI,
+    AUDIO_RECORD,
+    AUDIO_ROUTEADD, AUDIO_ROUTEREMOVE, AUDIO_REMOVEROUTES,
+    AUDIO_VOL, AUDIO_PAN,
+    AUDIO_ADDPLUGIN,
+    AUDIO_SET_SEG_SIZE,
+    AUDIO_SET_PREFADER, AUDIO_SET_CHANNELS,
+    AUDIO_SET_PLUGIN_CTRL_VAL,
+    AUDIO_SWAP_CONTROLLER_IDX,
+    AUDIO_CLEAR_CONTROLLER_EVENTS,
+    AUDIO_SEEK_PREV_AC_EVENT,
+    AUDIO_SEEK_NEXT_AC_EVENT,
+    AUDIO_ERASE_AC_EVENT,
+    AUDIO_ERASE_RANGE_AC_EVENTS,
+    AUDIO_ADD_AC_EVENT,
+    AUDIO_SET_SOLO, AUDIO_SET_SEND_METRONOME,
+    MS_PROCESS, MS_STOP, MS_SET_RTC, MS_UPDATE_POLL_FD,
+    SEQM_IDLE, SEQM_SEEK,
+};
 
-extern const char* seqMsgList[];  // for debug
+extern const char* seqMsgList[]; // for debug
 
 //---------------------------------------------------------
 //   Msg
 //---------------------------------------------------------
 
-struct AudioMsg : public ThreadMsg {   // this should be an union
-      int serialNo;
-      SndFile* downmix;
-      AudioTrack* snode;
-      AudioTrack* dnode;
-      Route sroute, droute;
-      AudioDevice* device;
-      int ival;
-      int iival;
-      double dval;
-      PluginI* plugin;
-      SynthI* synth;
-      Part* spart;
-      Part* dpart;
-      Track* track;
+struct AudioMsg : public ThreadMsg
+{ // this should be an union
+    int serialNo;
+    SndFile* downmix;
+    AudioTrack* snode;
+    AudioTrack* dnode;
+    Route sroute, droute;
+    AudioDevice* device;
+    int ival;
+    int iival;
+    double dval;
+    PluginI* plugin;
+    SynthI* synth;
+    Part* spart;
+    Part* dpart;
+    Track* track;
 
-      const void *p1, *p2, *p3;
-      Event ev1, ev2;
-      char port, channel, ctrl;
-      int a, b, c;
-      Pos pos;
-      };
+    const void *p1, *p2, *p3;
+    Event ev1, ev2;
+    char port, channel, ctrl;
+    int a, b, c;
+    Pos pos;
+};
 
 class AudioOutput;
 
@@ -112,190 +114,262 @@ class AudioOutput;
 //   Audio
 //---------------------------------------------------------
 
-class Audio {
-   public:
-      enum State {STOP, START_PLAY, PLAY, LOOP1, LOOP2, SYNC, PRECOUNT};
+class Audio
+{
+public:
 
-   private:
-      bool _running;          // audio is active
-      bool recording;         // recording is active
-      bool idle;              // do nothing in idle mode
-      bool _freewheel;
-      bool _bounce;
-      //bool loopPassed;
-      unsigned _loopFrame;     // Startframe of loop if in LOOP mode. Not quite the same as left marker !
-      int _loopCount;         // Number of times we have looped so far
+    enum State
+    {
+        STOP, START_PLAY, PLAY, LOOP1, LOOP2, SYNC, PRECOUNT
+    };
 
-      Pos _pos;               // current play position
+private:
+    bool _running; // audio is active
+    bool recording; // recording is active
+    bool idle; // do nothing in idle mode
+    bool _freewheel;
+    bool _bounce;
+    //bool loopPassed;
+    unsigned _loopFrame; // Startframe of loop if in LOOP mode. Not quite the same as left marker !
+    int _loopCount; // Number of times we have looped so far
 
-      unsigned curTickPos;   // pos at start of frame during play/record
-      unsigned nextTickPos;  // pos at start of next frame during play/record
+    Pos _pos; // current play position
 
-      //metronome values
-      unsigned midiClick;
-      int clickno;      // precount values
-      int clicksMeasure;
-      int ticksBeat;
+    unsigned curTickPos; // pos at start of frame during play/record
+    unsigned nextTickPos; // pos at start of next frame during play/record
 
-      double syncTime;  // wall clock at last sync point
-      unsigned syncFrame;    // corresponding frame no. to syncTime
-      int frameOffset;  // offset to free running hw frame counter
+    //metronome values
+    unsigned midiClick;
+    int clickno; // precount values
+    int clicksMeasure;
+    int ticksBeat;
 
-      State state;
+    double syncTime; // wall clock at last sync point
+    unsigned syncFrame; // corresponding frame no. to syncTime
+    int frameOffset; // offset to free running hw frame counter
 
-      AudioMsg* msg;
-      int fromThreadFdw, fromThreadFdr;  // message pipe
+    State state;
 
-      int sigFd;              // pipe fd for messages to gui
+    AudioMsg* msg;
+    int fromThreadFdw, fromThreadFdr; // message pipe
 
-      // record values:
-      Pos startRecordPos;
-      Pos endRecordPos;
+    int sigFd; // pipe fd for messages to gui
 
-      //
-      AudioOutput* _audioMaster;
-      AudioOutput* _audioMonitor;
+    // record values:
+    Pos startRecordPos;
+    Pos endRecordPos;
 
-      void sendLocalOff();
-      bool filterEvent(const MidiPlayEvent* event, int type, bool thru);
+    //
+    AudioOutput* _audioMaster;
+    AudioOutput* _audioMonitor;
 
-      void startRolling();
-      void stopRolling();
+    void sendLocalOff();
+    bool filterEvent(const MidiPlayEvent* event, int type, bool thru);
 
-      void panic();
-      void processMsg(AudioMsg* msg);
-      void process1(unsigned samplePos, unsigned offset, unsigned samples);
+    void startRolling();
+    void stopRolling();
 
-      void collectEvents(MidiTrack*, unsigned int startTick, unsigned int endTick);
+    void panic();
+    void processMsg(AudioMsg* msg);
+    void process1(unsigned samplePos, unsigned offset, unsigned samples);
 
-   public:
-      Audio();
-      virtual ~Audio() {}
+    void collectEvents(MidiTrack*, unsigned int startTick, unsigned int endTick);
 
-      void process(unsigned frames);
-      bool sync(int state, unsigned frame);
-      void shutdown();
-      void writeTick();
+public:
+    Audio();
 
-      // transport:
-      bool start();
-      void stop(bool);
-      void seek(const Pos& pos);
+    virtual ~Audio()
+    {
+    }
 
-      bool isPlaying() const    { return state == PLAY || state == LOOP1 || state == LOOP2; }
-      bool isRecording() const  { return state == PLAY && recording; }
-      void setRunning(bool val) { _running = val; }
-      bool isRunning() const    { return _running; }
+    void process(unsigned frames);
+    bool sync(int state, unsigned frame);
+    void shutdown();
+    void writeTick();
 
-      //-----------------------------------------
-      //   message interface
-      //-----------------------------------------
+    // transport:
+    bool start();
+    void stop(bool);
+    void seek(const Pos& pos);
 
-      void msgSeek(const Pos&);
-      void msgPlay(bool val);
+    bool isPlaying() const
+    {
+        return state == PLAY || state == LOOP1 || state == LOOP2;
+    }
 
-      void msgRemoveTrack(Track*, bool u = true);
-      void msgRemoveTracks();
-      void msgChangeTrack(Track* oldTrack, Track* newTrack, bool u = true);
-      void msgMoveTrack(int idx1, int dx2, bool u = true);
-      void msgAddPart(Part*, bool u = true);
-      void msgRemovePart(Part*, bool u = true);
-      //void msgChangePart(Part* oldPart, Part* newPart, bool u = true);
-      void msgChangePart(Part* oldPart, Part* newPart, bool u = true, bool doCtrls = true, bool doClones = false);
-      //void msgAddEvent(Event&, Part*, bool u = true);
-      void msgAddEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
-      //void msgDeleteEvent(Event&, Part*, bool u = true);
-      void msgDeleteEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
-      //void msgChangeEvent(Event&, Event&, Part*, bool u = true);
-      void msgChangeEvent(Event&, Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
-      void msgScanAlsaMidiPorts();
-      void msgAddTempo(int tick, int tempo, bool doUndoFlag = true);
-      void msgSetTempo(int tick, int tempo, bool doUndoFlag = true);
-      void msgUpdateSoloStates();
-      void msgSetAux(AudioTrack*, int, double);
-      void msgSetGlobalTempo(int val);
-      void msgDeleteTempo(int tick, int tempo, bool doUndoFlag = true);
-      void msgAddSig(int tick, int z, int n, bool doUndoFlag = true);
-      void msgRemoveSig(int tick, int z, int n, bool doUndoFlag = true);
-      void msgShowInstrumentGui(MidiInstrument*, bool);
-      void msgPanic();
-      void sendMsg(AudioMsg*);
-      bool sendMessage(AudioMsg* m, bool doUndo);
-      void msgRemoveRoute(Route, Route);
-      void msgRemoveRoute1(Route, Route);
-      void msgRemoveRoutes(Route, Route);  // p3.3.55
-      void msgRemoveRoutes1(Route, Route);  // p3.3.55
-      void msgAddRoute(Route, Route);
-      void msgAddRoute1(Route, Route);
-      void msgAddPlugin(AudioTrack*, int idx, PluginI* plugin);
-      void msgSetMute(AudioTrack*, bool val);
-      void msgSetVolume(AudioTrack*, double val);
-      void msgSetPan(AudioTrack*, double val);
-      void msgAddSynthI(SynthI* synth);
-      void msgRemoveSynthI(SynthI* synth);
-      void msgSetSegSize(int, int);
-      void msgSetPrefader(AudioTrack*, int);
-      void msgSetChannels(AudioTrack*, int);
-      void msgSetOff(AudioTrack*, bool);
-      void msgSetRecord(AudioTrack*, bool);
-      void msgUndo();
-      void msgRedo();
-      void msgLocalOff();
-      void msgInitMidiDevices();
-      void msgResetMidiDevices();
-      void msgIdle(bool);
-      void msgBounce();
-      //void msgSetPluginCtrlVal(PluginI* /*plugin*/, int /*param*/, double /*val*/);
-      void msgSetPluginCtrlVal(AudioTrack*, int /*param*/, double /*val*/);
-      void msgSwapControllerIDX(AudioTrack*, int, int);
-      void msgClearControllerEvents(AudioTrack*, int);
-      void msgSeekPrevACEvent(AudioTrack*, int);
-      void msgSeekNextACEvent(AudioTrack*, int);
-      void msgEraseACEvent(AudioTrack*, int, int);
-      void msgEraseRangeACEvents(AudioTrack*, int, int, int);
-      void msgAddACEvent(AudioTrack*, int, int, double);
-      void msgSetSolo(Track*, bool);
-      void msgSetHwCtrlState(MidiPort*, int, int, int);
-      void msgSetHwCtrlStates(MidiPort*, int, int, int, int);
-      void msgSetTrackOutChannel(MidiTrack*, int);
-      void msgSetTrackOutPort(MidiTrack*, int);
-      void msgRemapPortDrumCtlEvents(int, int, int, int);
-      void msgChangeAllPortDrumCtrlEvents(bool, bool);
-      void msgSetSendMetronome(AudioTrack*, bool);
+    bool isRecording() const
+    {
+        return state == PLAY && recording;
+    }
 
-      void msgPlayMidiEvent(const MidiPlayEvent* event);
-      void rescanAlsaPorts();
+    void setRunning(bool val)
+    {
+        _running = val;
+    }
 
-      void midiPortsChanged();
+    bool isRunning() const
+    {
+        return _running;
+    }
 
-      const Pos& pos() const { return _pos; }
-      const Pos& getStartRecordPos() const { return startRecordPos; }
-      const Pos& getEndRecordPos() const { return endRecordPos; }
-      int loopCount() { return _loopCount; }         // Number of times we have looped so far
-      unsigned loopFrame() { return _loopFrame; }          
+    //-----------------------------------------
+    //   message interface
+    //-----------------------------------------
 
-      int tickPos() const         { return curTickPos; }
-      int timestamp() const;
-      void processMidi();
-      unsigned curFrame() const;
-      void recordStop();
-      bool freewheel() const       { return _freewheel; }
-      void setFreewheel(bool val);
-      int getFrameOffset() const   { return frameOffset; }
-      void initDevices();
+    void msgSeek(const Pos&);
+    void msgPlay(bool val);
 
-      AudioOutput* audioMaster() const { return _audioMaster; }
-      AudioOutput* audioMonitor() const { return _audioMonitor; }
-      void setMaster(AudioOutput* track) { _audioMaster = track; }
-      void setMonitor(AudioOutput* track) { _audioMonitor = track; }
-      void sendMsgToGui(char c);
-      bool bounce() const { return _bounce; }
-      };
+    void msgRemoveTrack(Track*, bool u = true);
+    void msgRemoveTracks();
+    void msgChangeTrack(Track* oldTrack, Track* newTrack, bool u = true);
+    void msgMoveTrack(int idx1, int dx2, bool u = true);
+    void msgAddPart(Part*, bool u = true);
+    void msgRemovePart(Part*, bool u = true);
+    //void msgChangePart(Part* oldPart, Part* newPart, bool u = true);
+    void msgChangePart(Part* oldPart, Part* newPart, bool u = true, bool doCtrls = true, bool doClones = false);
+    //void msgAddEvent(Event&, Part*, bool u = true);
+    void msgAddEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
+    //void msgDeleteEvent(Event&, Part*, bool u = true);
+    void msgDeleteEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
+    //void msgChangeEvent(Event&, Event&, Part*, bool u = true);
+    void msgChangeEvent(Event&, Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
+    void msgScanAlsaMidiPorts();
+    void msgAddTempo(int tick, int tempo, bool doUndoFlag = true);
+    void msgSetTempo(int tick, int tempo, bool doUndoFlag = true);
+    void msgUpdateSoloStates();
+    void msgSetAux(AudioTrack*, int, double);
+    void msgSetGlobalTempo(int val);
+    void msgDeleteTempo(int tick, int tempo, bool doUndoFlag = true);
+    void msgAddSig(int tick, int z, int n, bool doUndoFlag = true);
+    void msgRemoveSig(int tick, int z, int n, bool doUndoFlag = true);
+    void msgShowInstrumentGui(MidiInstrument*, bool);
+    void msgPanic();
+    void sendMsg(AudioMsg*);
+    bool sendMessage(AudioMsg* m, bool doUndo);
+    void msgRemoveRoute(Route, Route);
+    void msgRemoveRoute1(Route, Route);
+    void msgRemoveRoutes(Route, Route); // p3.3.55
+    void msgRemoveRoutes1(Route, Route); // p3.3.55
+    void msgAddRoute(Route, Route);
+    void msgAddRoute1(Route, Route);
+    void msgAddPlugin(AudioTrack*, int idx, PluginI* plugin);
+    void msgSetMute(AudioTrack*, bool val);
+    void msgSetVolume(AudioTrack*, double val);
+    void msgSetPan(AudioTrack*, double val);
+    void msgAddSynthI(SynthI* synth);
+    void msgRemoveSynthI(SynthI* synth);
+    void msgSetSegSize(int, int);
+    void msgSetPrefader(AudioTrack*, int);
+    void msgSetChannels(AudioTrack*, int);
+    void msgSetOff(AudioTrack*, bool);
+    void msgSetRecord(AudioTrack*, bool);
+    void msgUndo();
+    void msgRedo();
+    void msgLocalOff();
+    void msgInitMidiDevices();
+    void msgResetMidiDevices();
+    void msgIdle(bool);
+    void msgBounce();
+    //void msgSetPluginCtrlVal(PluginI* /*plugin*/, int /*param*/, double /*val*/);
+    void msgSetPluginCtrlVal(AudioTrack*, int /*param*/, double /*val*/);
+    void msgSwapControllerIDX(AudioTrack*, int, int);
+    void msgClearControllerEvents(AudioTrack*, int);
+    void msgSeekPrevACEvent(AudioTrack*, int);
+    void msgSeekNextACEvent(AudioTrack*, int);
+    void msgEraseACEvent(AudioTrack*, int, int);
+    void msgEraseRangeACEvents(AudioTrack*, int, int, int);
+    void msgAddACEvent(AudioTrack*, int, int, double);
+    void msgSetSolo(Track*, bool);
+    void msgSetHwCtrlState(MidiPort*, int, int, int);
+    void msgSetHwCtrlStates(MidiPort*, int, int, int, int);
+    void msgSetTrackOutChannel(MidiTrack*, int);
+    void msgSetTrackOutPort(MidiTrack*, int);
+    void msgRemapPortDrumCtlEvents(int, int, int, int);
+    void msgChangeAllPortDrumCtrlEvents(bool, bool);
+    void msgSetSendMetronome(AudioTrack*, bool);
+
+    void msgPlayMidiEvent(const MidiPlayEvent* event);
+    void rescanAlsaPorts();
+
+    void midiPortsChanged();
+
+    const Pos& pos() const
+    {
+        return _pos;
+    }
+
+    const Pos& getStartRecordPos() const
+    {
+        return startRecordPos;
+    }
+
+    const Pos& getEndRecordPos() const
+    {
+        return endRecordPos;
+    }
+
+    int loopCount()
+    {
+        return _loopCount;
+    } // Number of times we have looped so far
+
+    unsigned loopFrame()
+    {
+        return _loopFrame;
+    }
+
+    int tickPos() const
+    {
+        return curTickPos;
+    }
+    int timestamp() const;
+    void processMidi();
+    unsigned curFrame() const;
+    void recordStop();
+
+    bool freewheel() const
+    {
+        return _freewheel;
+    }
+    void setFreewheel(bool val);
+
+    int getFrameOffset() const
+    {
+        return frameOffset;
+    }
+    void initDevices();
+
+    AudioOutput* audioMaster() const
+    {
+        return _audioMaster;
+    }
+
+    AudioOutput* audioMonitor() const
+    {
+        return _audioMonitor;
+    }
+
+    void setMaster(AudioOutput* track)
+    {
+        _audioMaster = track;
+    }
+
+    void setMonitor(AudioOutput* track)
+    {
+        _audioMonitor = track;
+    }
+    void sendMsgToGui(char c);
+
+    bool bounce() const
+    {
+        return _bounce;
+    }
+};
 
 extern int processAudio(unsigned long, void*);
 extern void processAudio1(void*, void*);
 
 extern Audio* audio;
-extern AudioDevice* audioDevice;   // current audio device in use
+extern AudioDevice* audioDevice; // current audio device in use
 #endif
 

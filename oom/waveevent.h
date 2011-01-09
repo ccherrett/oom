@@ -21,44 +21,71 @@ class WavePart;
 //   WaveEvent
 //---------------------------------------------------------
 
-class WaveEventBase : public EventBase {
-      QString _name;
-      SndFileR f;
-      int _spos;        // start sample position in WaveFile
-      bool deleted;
+class WaveEventBase : public EventBase
+{
+    QString _name;
+    SndFileR f;
+    int _spos; // start sample position in WaveFile
+    bool deleted;
 
-      // p3.3.31
-      //virtual EventBase* clone() { return new WaveEventBase(*this); }
-      virtual EventBase* clone();
+    // p3.3.31
+    //virtual EventBase* clone() { return new WaveEventBase(*this); }
+    virtual EventBase* clone();
 
-   public:
-      WaveEventBase(EventType t);
-      virtual ~WaveEventBase() {}
+public:
+    WaveEventBase(EventType t);
 
-      virtual void read(Xml&);
-      //virtual void write(int, Xml&, const Pos& offset) const;
-      virtual void write(int, Xml&, const Pos& offset, bool forcePath = false) const;
-      virtual EventBase* mid(unsigned, unsigned);
-      
-      virtual void dump(int n = 0) const;
+    virtual ~WaveEventBase()
+    {
+    }
 
-      virtual const QString name() const       { return _name;  }
-      virtual void setName(const QString& s)   { _name = s;     }
-      virtual int spos() const                 { return _spos;  }
-      virtual void setSpos(int s)              { _spos = s;     }
-      virtual SndFileR sndFile() const         { return f;      }
-      virtual void setSndFile(SndFileR& sf)    { f = sf;        }
-      
-      // Changed by Tim. p3.3.17
-      //virtual void read(unsigned offset, float** bpp, int channels, int nn, bool overwrite = true);
-      //virtual void readAudio(unsigned /*offset*/, float** /*bpp*/, int /*channels*/, int /*nn*/, bool /*doSeek*/, bool /*overwrite*/);
-      //virtual off_t readAudio(SRC_STATE* /*src_state*/, off_t /*sfCurFrame*/, unsigned /*offset*/, 
-      //                       float** /*bpp*/, int /*channels*/, int /*nn*/, bool /*doSeek*/, bool /*overwrite*/);
-      //virtual off_t readAudio(AudioConverter* /*audConv*/, off_t /*sfCurFrame*/, unsigned /*offset*/, 
-      //                       float** /*bpp*/, int /*channels*/, int /*nn*/, bool /*doSeek*/, bool /*overwrite*/);
-      virtual void readAudio(WavePart* /*part*/, unsigned /*offset*/, 
-                             float** /*bpp*/, int /*channels*/, int /*nn*/, bool /*doSeek*/, bool /*overwrite*/);
-      };
-      
+    virtual void read(Xml&);
+    //virtual void write(int, Xml&, const Pos& offset) const;
+    virtual void write(int, Xml&, const Pos& offset, bool forcePath = false) const;
+    virtual EventBase* mid(unsigned, unsigned);
+
+    virtual void dump(int n = 0) const;
+
+    virtual const QString name() const
+    {
+        return _name;
+    }
+
+    virtual void setName(const QString& s)
+    {
+        _name = s;
+    }
+
+    virtual int spos() const
+    {
+        return _spos;
+    }
+
+    virtual void setSpos(int s)
+    {
+        _spos = s;
+    }
+
+    virtual SndFileR sndFile() const
+    {
+        return f;
+    }
+
+    virtual void setSndFile(SndFileR& sf)
+    {
+        f = sf;
+    }
+
+    // Changed by Tim. p3.3.17
+    //virtual void read(unsigned offset, float** bpp, int channels, int nn, bool overwrite = true);
+    //virtual void readAudio(unsigned /*offset*/, float** /*bpp*/, int /*channels*/, int /*nn*/, bool /*doSeek*/, bool /*overwrite*/);
+    //virtual off_t readAudio(SRC_STATE* /*src_state*/, off_t /*sfCurFrame*/, unsigned /*offset*/,
+    //                       float** /*bpp*/, int /*channels*/, int /*nn*/, bool /*doSeek*/, bool /*overwrite*/);
+    //virtual off_t readAudio(AudioConverter* /*audConv*/, off_t /*sfCurFrame*/, unsigned /*offset*/,
+    //                       float** /*bpp*/, int /*channels*/, int /*nn*/, bool /*doSeek*/, bool /*overwrite*/);
+    virtual void readAudio(WavePart* /*part*/, unsigned /*offset*/,
+            float** /*bpp*/, int /*channels*/, int /*nn*/, bool /*doSeek*/, bool /*overwrite*/);
+};
+
 #endif
 

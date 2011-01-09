@@ -30,54 +30,58 @@ class QAction;
 //   WaveEdit
 //---------------------------------------------------------
 
-class WaveEdit : public MidiEditor {
-      WaveView* view;
-      QSlider* ymag;
-      QToolBar* tools;
-      QToolBar* tb1;
-      QToolButton* solo;
-      PosLabel* pos1;
-      PosLabel* pos2;
-      QAction* selectAllAction;
-      QAction* selectNoneAction;
-      
-      static int _widthInit, _heightInit;
+class WaveEdit : public MidiEditor
+{
+    WaveView* view;
+    QSlider* ymag;
+    QToolBar* tools;
+    QToolBar* tb1;
+    QToolButton* solo;
+    PosLabel* pos1;
+    PosLabel* pos2;
+    QAction* selectAllAction;
+    QAction* selectNoneAction;
 
-      Q_OBJECT
-      virtual void closeEvent(QCloseEvent*);
-      virtual void resizeEvent(QResizeEvent* ev);
-      virtual void keyPressEvent(QKeyEvent*);
+    static int _widthInit, _heightInit;
 
-      QMenu* menuFunctions, *select, *menuGain;
+    Q_OBJECT
+    virtual void closeEvent(QCloseEvent*);
+    virtual void resizeEvent(QResizeEvent* ev);
+    virtual void keyPressEvent(QKeyEvent*);
 
-   private slots:
-      void cmd(int);
-      void setTime(unsigned t);
-      void songChanged1(int);
-      void soloChanged(bool flag);
-      void moveVerticalSlider(int val);
+    QMenu* menuFunctions, *select, *menuGain;
 
-   public slots:
-      void configChanged();
-   
-      virtual void updateHScrollRange();
+private slots:
+    void cmd(int);
+    void setTime(unsigned t);
+    void songChanged1(int);
+    void soloChanged(bool flag);
+    void moveVerticalSlider(int val);
 
-   signals:
-      void deleted(unsigned long);
+public slots:
+    void configChanged();
 
-   public:
-      WaveEdit(PartList*);
-      ~WaveEdit();
-      virtual void readStatus(Xml&);
-      virtual void writeStatus(int, Xml&) const;
-      static void readConfiguration(Xml&);
-      static void writeConfiguration(int, Xml&);
+    virtual void updateHScrollRange();
 
-      enum { CMD_MUTE=0, CMD_NORMALIZE, CMD_FADE_IN, CMD_FADE_OUT, CMD_REVERSE,
-             CMD_GAIN_FREE, CMD_GAIN_200, CMD_GAIN_150, CMD_GAIN_75, CMD_GAIN_50, CMD_GAIN_25,
-             CMD_EDIT_EXTERNAL,
-             CMD_SELECT_ALL, CMD_SELECT_NONE };
-      };
+signals:
+    void deleted(unsigned long);
+
+public:
+    WaveEdit(PartList*);
+    ~WaveEdit();
+    virtual void readStatus(Xml&);
+    virtual void writeStatus(int, Xml&) const;
+    static void readConfiguration(Xml&);
+    static void writeConfiguration(int, Xml&);
+
+    enum
+    {
+        CMD_MUTE = 0, CMD_NORMALIZE, CMD_FADE_IN, CMD_FADE_OUT, CMD_REVERSE,
+        CMD_GAIN_FREE, CMD_GAIN_200, CMD_GAIN_150, CMD_GAIN_75, CMD_GAIN_50, CMD_GAIN_25,
+        CMD_EDIT_EXTERNAL,
+        CMD_SELECT_ALL, CMD_SELECT_NONE
+    };
+};
 
 #endif
 

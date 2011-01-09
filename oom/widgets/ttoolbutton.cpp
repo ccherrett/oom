@@ -17,13 +17,13 @@
 //---------------------------------------------------------
 
 void TransparentToolButton::drawButton(QPainter* p)
-      {
-      int w = width();
-      int h = height();
-      QIcon::Mode mode = isEnabled() ? QIcon::Normal : QIcon::Disabled;
-      QIcon::State state = isChecked() ? QIcon::On : QIcon::Off;
-      const QPixmap pm(icon().pixmap(style()->pixelMetric(QStyle::PM_SmallIconSize), mode, state));
-      p->drawPixmap(QPoint((w - pm.width())/2, (h - pm.height())/2), pm);
-      }
+{
+	int w = width();
+	int h = height();
+	QIcon::Mode mode = isEnabled() ? QIcon::Normal : QIcon::Disabled;
+	QIcon::State state = isChecked() ? QIcon::On : QIcon::Off;
+	const QPixmap pm(icon().pixmap(style()->pixelMetric(QStyle::PM_SmallIconSize), mode, state));
+	p->drawPixmap(QPoint((w - pm.width()) / 2, (h - pm.height()) / 2), pm);
+}
 
 

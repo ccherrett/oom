@@ -24,7 +24,7 @@
 #include <lo/lo.h>
 
 #include "config.h"
- 
+
 #ifdef DSSI_SUPPORT
 class DssiSynthIF;
 #endif
@@ -46,9 +46,9 @@ class OscIF;
 
 struct OscControlValue
 {
-  //int idx;
-  float value;
-  // maybe timestamp, too ?
+    //int idx;
+    float value;
+    // maybe timestamp, too ?
 };
 
 //---------------------------------------------------------
@@ -58,20 +58,36 @@ struct OscControlValue
 
 class OscControlFifo
 {
-      OscControlValue fifo[OSC_FIFO_SIZE];
-      volatile int size;
-      int wIndex;
-      int rIndex;
+    OscControlValue fifo[OSC_FIFO_SIZE];
+    volatile int size;
+    int wIndex;
+    int rIndex;
 
-   public:
-      OscControlFifo()  { clear(); }
-      bool put(const OscControlValue& event);   // returns true on fifo overflow
-      OscControlValue get();
-      const OscControlValue& peek(int n = 0);
-      void remove();
-      bool isEmpty() const { return size == 0; }
-      void clear()         { size = 0, wIndex = 0, rIndex = 0; }
-      int getSize() const  { return size; }
+public:
+
+    OscControlFifo()
+    {
+        clear();
+    }
+    bool put(const OscControlValue& event); // returns true on fifo overflow
+    OscControlValue get();
+    const OscControlValue& peek(int n = 0);
+    void remove();
+
+    bool isEmpty() const
+    {
+        return size == 0;
+    }
+
+    void clear()
+    {
+        size = 0, wIndex = 0, rIndex = 0;
+    }
+
+    int getSize() const
+    {
+        return size;
+    }
 };
 
 //---------------------------------------------------------
@@ -122,92 +138,118 @@ class OscIF
       bool oscGuiVisible() const;
       OscControlFifo* oscFifo(unsigned long) const;
 };
-*/ 
- 
+ */
+
 class OscIF
 {
-   protected:
-      QProcess* _oscGuiQProc;
-      void* _uiOscTarget;
-      char* _uiOscPath;
-      char* _uiOscSampleRatePath;
-      char* _uiOscConfigurePath;
-      char* _uiOscProgramPath;
-      char* _uiOscControlPath;
-      char* _uiOscShowPath;
-      bool _oscGuiVisible;
-   
-      OscControlFifo* _oscControlFifos;
-      
-      virtual bool oscInitGui(const QString& /*typ*/, const QString& /*baseName*/, const QString& /*name*/, 
-                       const QString& /*label*/, const QString& /*filePath*/, const QString& /*dirPath*/);
-                       
-   public:
-      OscIF();
-      virtual ~OscIF();
-      
-      OscControlFifo* oscFifo(unsigned long) const;
-      
-      virtual int oscUpdate(lo_arg**);    
-      virtual int oscProgram(lo_arg**)   { return 0; }   
-      virtual int oscControl(lo_arg**)   { return 0; }    
-      virtual int oscExiting(lo_arg**);   
-      virtual int oscMidi(lo_arg**)      { return 0; }      
-      virtual int oscConfigure(lo_arg**) { return 0; } 
-   
-      virtual void oscSendProgram(unsigned long /*prog*/, unsigned long /*bank*/);    
-      virtual void oscSendControl(unsigned long /*dssiPort*/, float /*val*/);    
-      virtual void oscSendConfigure(const char */*key*/, const char */*val*/); 
-      
-      virtual bool oscInitGui() { return false; }
-      virtual void oscShowGui(bool);
-      virtual bool oscGuiVisible() const;
+protected:
+    QProcess* _oscGuiQProc;
+    void* _uiOscTarget;
+    char* _uiOscPath;
+    char* _uiOscSampleRatePath;
+    char* _uiOscConfigurePath;
+    char* _uiOscProgramPath;
+    char* _uiOscControlPath;
+    char* _uiOscShowPath;
+    bool _oscGuiVisible;
+
+    OscControlFifo* _oscControlFifos;
+
+    virtual bool oscInitGui(const QString& /*typ*/, const QString& /*baseName*/, const QString& /*name*/,
+            const QString& /*label*/, const QString& /*filePath*/, const QString& /*dirPath*/);
+
+public:
+    OscIF();
+    virtual ~OscIF();
+
+    OscControlFifo* oscFifo(unsigned long) const;
+
+    virtual int oscUpdate(lo_arg**);
+
+    virtual int oscProgram(lo_arg**)
+    {
+        return 0;
+    }
+
+    virtual int oscControl(lo_arg**)
+    {
+        return 0;
+    }
+    virtual int oscExiting(lo_arg**);
+
+    virtual int oscMidi(lo_arg**)
+    {
+        return 0;
+    }
+
+    virtual int oscConfigure(lo_arg**)
+    {
+        return 0;
+    }
+
+    virtual void oscSendProgram(unsigned long /*prog*/, unsigned long /*bank*/);
+    virtual void oscSendControl(unsigned long /*dssiPort*/, float /*val*/);
+    virtual void oscSendConfigure(const char */*key*/, const char */*val*/);
+
+    virtual bool oscInitGui()
+    {
+        return false;
+    }
+    virtual void oscShowGui(bool);
+    virtual bool oscGuiVisible() const;
 };
- 
+
 class OscEffectIF : public OscIF
 {
-   protected:
-      PluginI* _oscPluginI;
-   
-   public:
-      OscEffectIF() {}
-      //~OscEffectIF();
+protected:
+    PluginI* _oscPluginI;
 
-      void oscSetPluginI(PluginI*);
-      
-      virtual int oscUpdate(lo_arg**);
-      //virtual int oscProgram(lo_arg**);
-      virtual int oscControl(lo_arg**);
-      //virtual int oscExiting(lo_arg**);
-      //virtual int oscMidi(lo_arg**);
-      virtual int oscConfigure(lo_arg**);
-      
-      virtual bool oscInitGui();
+public:
+
+    OscEffectIF()
+    {
+    }
+    //~OscEffectIF();
+
+    void oscSetPluginI(PluginI*);
+
+    virtual int oscUpdate(lo_arg**);
+    //virtual int oscProgram(lo_arg**);
+    virtual int oscControl(lo_arg**);
+    //virtual int oscExiting(lo_arg**);
+    //virtual int oscMidi(lo_arg**);
+    virtual int oscConfigure(lo_arg**);
+
+    virtual bool oscInitGui();
 };
- 
+
 #ifdef DSSI_SUPPORT
+
 class OscDssiIF : public OscIF
 {
-   protected:
-      DssiSynthIF* _oscSynthIF;
-      
-   public:
-      OscDssiIF() {}
-      //~OscDssiIF();
-      
-      void oscSetSynthIF(DssiSynthIF*);
-      
-      virtual int oscUpdate(lo_arg**);
-      virtual int oscProgram(lo_arg**);
-      virtual int oscControl(lo_arg**);
-      //virtual int oscExiting(lo_arg**);
-      virtual int oscMidi(lo_arg**);
-      virtual int oscConfigure(lo_arg**);
-      
-      virtual bool oscInitGui();
+protected:
+    DssiSynthIF* _oscSynthIF;
+
+public:
+
+    OscDssiIF()
+    {
+    }
+    //~OscDssiIF();
+
+    void oscSetSynthIF(DssiSynthIF*);
+
+    virtual int oscUpdate(lo_arg**);
+    virtual int oscProgram(lo_arg**);
+    virtual int oscControl(lo_arg**);
+    //virtual int oscExiting(lo_arg**);
+    virtual int oscMidi(lo_arg**);
+    virtual int oscConfigure(lo_arg**);
+
+    virtual bool oscInitGui();
 };
 #endif // DSSI_SUPPORT
- 
+
 extern void initOSC();
 
 #endif

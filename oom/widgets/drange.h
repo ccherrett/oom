@@ -19,51 +19,93 @@
 //---------------------------------------------------------
 
 class DoubleRange
-      {
-      static const double MinRelStep;
-      static const double DefaultRelStep;
-      static const double MinEps;
+{
+    static const double MinRelStep;
+    static const double DefaultRelStep;
+    static const double MinEps;
 
-      double d_minValue;
-      double d_maxValue;
-      double d_step;
-      int d_pageSize;
-      double d_value;
-      double d_exactValue;
-      double d_exactPrevValue;
-      double d_prevValue;
-      bool d_periodic;
+    double d_minValue;
+    double d_maxValue;
+    double d_step;
+    int d_pageSize;
+    double d_value;
+    double d_exactValue;
+    double d_exactPrevValue;
+    double d_prevValue;
+    bool d_periodic;
 
-      void setNewValue(double x, bool align = false);
+    void setNewValue(double x, bool align = false);
 
-   protected:
-      double exactValue() const { return d_exactValue; }
-      double exactPrevValue() const { return d_exactPrevValue; }
-      double prevValue() const { return d_prevValue; }
-      virtual void valueChange() {}
-      virtual void stepChange()  {}
-      virtual void rangeChange() {}
+protected:
 
-   public:
-      DoubleRange();
-      virtual ~DoubleRange(){};
+    double exactValue() const
+    {
+        return d_exactValue;
+    }
 
-      double value() const    { return d_value; }
-      virtual void setValue(double);
+    double exactPrevValue() const
+    {
+        return d_exactPrevValue;
+    }
 
-      virtual void fitValue(double);
-      virtual void incValue(int);
-      virtual void incPages(int);
-      void setPeriodic(bool tf);
-      void setRange(double vmin, double vmax, double vstep = 0.0,
-         int pagesize = 1);
-      void setStep(double);
+    double prevValue() const
+    {
+        return d_prevValue;
+    }
 
-      double maxValue() const { return d_maxValue; }
-      double minValue() const { return d_minValue; }
-      bool periodic()  const  { return d_periodic; }
-      int pageSize() const    { return d_pageSize; }
-      double step() const;
-      };
+    virtual void valueChange()
+    {
+    }
+
+    virtual void stepChange()
+    {
+    }
+
+    virtual void rangeChange()
+    {
+    }
+
+public:
+    DoubleRange();
+
+    virtual ~DoubleRange()
+    {
+    };
+
+    double value() const
+    {
+        return d_value;
+    }
+    virtual void setValue(double);
+
+    virtual void fitValue(double);
+    virtual void incValue(int);
+    virtual void incPages(int);
+    void setPeriodic(bool tf);
+    void setRange(double vmin, double vmax, double vstep = 0.0,
+            int pagesize = 1);
+    void setStep(double);
+
+    double maxValue() const
+    {
+        return d_maxValue;
+    }
+
+    double minValue() const
+    {
+        return d_minValue;
+    }
+
+    bool periodic() const
+    {
+        return d_periodic;
+    }
+
+    int pageSize() const
+    {
+        return d_pageSize;
+    }
+    double step() const;
+};
 
 #endif

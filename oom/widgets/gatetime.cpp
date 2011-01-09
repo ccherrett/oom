@@ -17,35 +17,35 @@
 //---------------------------------------------------------
 
 GateTime::GateTime(QWidget* parent)
-   : QDialog(parent)
-      {
-      setupUi(this);
-      rangeGroup = new QButtonGroup(rangeBox);
-      rangeGroup->addButton(allButton, 0);
-      rangeGroup->addButton(selButton, 1);
-      rangeGroup->addButton(loopButton, 2);
-      rangeGroup->addButton(sloopButton, 3);
-      rangeGroup->setExclusive(true);
-      }
+: QDialog(parent)
+{
+	setupUi(this);
+	rangeGroup = new QButtonGroup(rangeBox);
+	rangeGroup->addButton(allButton, 0);
+	rangeGroup->addButton(selButton, 1);
+	rangeGroup->addButton(loopButton, 2);
+	rangeGroup->addButton(sloopButton, 3);
+	rangeGroup->setExclusive(true);
+}
 
 //---------------------------------------------------------
 //   accept
 //---------------------------------------------------------
 
 void GateTime::accept()
-      {
-      _range     = rangeGroup->checkedId();
-      _rateVal   = rate->value();
-      _offsetVal = offset->value();
-      QDialog::accept();
-      }
+{
+	_range = rangeGroup->checkedId();
+	_rateVal = rate->value();
+	_offsetVal = offset->value();
+	QDialog::accept();
+}
 
 //---------------------------------------------------------
 //   setRange
 //---------------------------------------------------------
 
 void GateTime::setRange(int id)
-      {
+{
 	rangeGroup->button(id)->setChecked(true);
-      }
+}
 

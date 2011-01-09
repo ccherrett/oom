@@ -16,39 +16,40 @@
 //   MidiControllerEditDialog
 //---------------------------------------------------------
 
-class MidiControllerEditDialog : public MidiControllerEditDialogBase {
-      Q_OBJECT
+class MidiControllerEditDialog : public MidiControllerEditDialogBase
+{
+    Q_OBJECT
 
-      int _lastPort;
-      bool _modified;
-      
-      void addControllerToView(MidiController* mctrl);
-      void mergeReplace(bool replace);
-      void updatePredefinedList();
-      void updateMidiPortsList();
-      void updateViewController();
-      void setModified(bool);
+    int _lastPort;
+    bool _modified;
 
-   private slots:
-      void ctrlAdd();
-      void ctrlDelete();
-      virtual void accept();
-      virtual void reject();
-      void apply();
-      void nameChanged(const QString&);
-      void typeChanged(const QString&);
-      void valueHChanged(int);
-      void valueLChanged(int);
-      void controllerChanged(Q3ListViewItem*);
-      void controllerChanged();
-      void minChanged(int);
-      void maxChanged(int);
-      void portChanged(int);
-      void songChanged(int);
+    void addControllerToView(MidiController* mctrl);
+    void mergeReplace(bool replace);
+    void updatePredefinedList();
+    void updateMidiPortsList();
+    void updateViewController();
+    void setModified(bool);
 
-   public:
-      MidiControllerEditDialog(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WFlags fl = 0);
-      };
+private slots:
+    void ctrlAdd();
+    void ctrlDelete();
+    virtual void accept();
+    virtual void reject();
+    void apply();
+    void nameChanged(const QString&);
+    void typeChanged(const QString&);
+    void valueHChanged(int);
+    void valueLChanged(int);
+    void controllerChanged(Q3ListViewItem*);
+    void controllerChanged();
+    void minChanged(int);
+    void maxChanged(int);
+    void portChanged(int);
+    void songChanged(int);
+
+public:
+    MidiControllerEditDialog(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WFlags fl = 0);
+};
 
 extern MidiControllerEditDialog* midiControllerEditDialog;
 extern void configMidiController();

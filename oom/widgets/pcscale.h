@@ -18,41 +18,50 @@
 //    program change scale for midi track
 //---------------------------------------------------------
 
-class PCScale : public View {
-      Q_OBJECT
-	  PianoRoll* currentEditor;
-      int* raster;
-      unsigned pos[4];
-      int button;
-      bool barLocator;
-      bool waveMode;
-	  Audio* audio;
+class PCScale : public View
+{
+    Q_OBJECT
+    PianoRoll* currentEditor;
+    int* raster;
+    unsigned pos[4];
+    int button;
+    bool barLocator;
+    bool waveMode;
+    Audio* audio;
 
 
-   private slots:
-      void songChanged(int);
+private slots:
+    void songChanged(int);
 
-   protected:
-      virtual void pdraw(QPainter&, const QRect&);
-      virtual void viewMousePressEvent(QMouseEvent* event);
-      virtual void viewMouseMoveEvent(QMouseEvent* event);
-      virtual void viewMouseReleaseEvent(QMouseEvent* event);
-      virtual void leaveEvent(QEvent*e);
+protected:
+    virtual void pdraw(QPainter&, const QRect&);
+    virtual void viewMousePressEvent(QMouseEvent* event);
+    virtual void viewMouseMoveEvent(QMouseEvent* event);
+    virtual void viewMouseReleaseEvent(QMouseEvent* event);
+    virtual void leaveEvent(QEvent*e);
 
-   signals:
-	  void selectInstrument();
-	  void addProgramChange();
+signals:
+    void selectInstrument();
+    void addProgramChange();
 
-   public slots:
-      void setPos(int, unsigned, bool);
-	  void updateProgram();
-	  void setAudio(Audio*);
+public slots:
+    void setPos(int, unsigned, bool);
+    void updateProgram();
+    void setAudio(Audio*);
 
-   public:
-      PCScale(int* raster, QWidget* parent, PianoRoll* editor, int xscale, bool f = false);
-      void setBarLocator(bool f) { barLocator = f; }
-	  void setEditor(PianoRoll*);
-	  PianoRoll* getEditor() { return currentEditor; }
-      };
+public:
+    PCScale(int* raster, QWidget* parent, PianoRoll* editor, int xscale, bool f = false);
+
+    void setBarLocator(bool f)
+    {
+        barLocator = f;
+    }
+    void setEditor(PianoRoll*);
+
+    PianoRoll* getEditor()
+    {
+        return currentEditor;
+    }
+};
 #endif
 

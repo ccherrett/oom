@@ -7,9 +7,8 @@
 
 #include "mlabel.h"
 
-
 void MLabel::mousePressEvent(QMouseEvent*)
-      {
-      emit mousePressed();
-      }
+{
+	emit mousePressed();
+}
 

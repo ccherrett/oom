@@ -20,28 +20,42 @@ class QMouseEvent;
 //    show/edit time signature
 //---------------------------------------------------------
 
-class SigLabel : public QLabel {
-      Q_OBJECT
-      virtual void mousePressEvent(QMouseEvent*);
-      virtual void wheelEvent(QWheelEvent*);
-      void incValue(bool zaehler, bool inc, int&, int&);
+class SigLabel : public QLabel
+{
+    Q_OBJECT
+    virtual void mousePressEvent(QMouseEvent*);
+    virtual void wheelEvent(QWheelEvent*);
+    void incValue(bool zaehler, bool inc, int&, int&);
 
-   protected:
-      int z, n;
-      
-   signals:
-      void valueChanged(const AL::TimeSignature&);
+protected:
+    int z, n;
 
-   public slots:
-      virtual void setValue(int, int);
-      virtual void setValue(const AL::TimeSignature& sig) { setValue(sig.z, sig.n); }
+signals:
+    void valueChanged(const AL::TimeSignature&);
 
-   public:
-      SigLabel(int z, int n, QWidget*);
-      SigLabel(const AL::TimeSignature&, QWidget*);
-      void value(int& a, int& b) const { a = z; b = n; }
-      AL::TimeSignature value() const { return AL::TimeSignature(z, n); }
-      void setFrame(bool);
-      };
+public slots:
+    virtual void setValue(int, int);
+
+    virtual void setValue(const AL::TimeSignature& sig)
+    {
+        setValue(sig.z, sig.n);
+    }
+
+public:
+    SigLabel(int z, int n, QWidget*);
+    SigLabel(const AL::TimeSignature&, QWidget*);
+
+    void value(int& a, int& b) const
+    {
+        a = z;
+        b = n;
+    }
+
+    AL::TimeSignature value() const
+    {
+        return AL::TimeSignature(z, n);
+    }
+    void setFrame(bool);
+};
 #endif
 

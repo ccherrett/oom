@@ -17,19 +17,23 @@
 class QKeyEvent;
 
 class ShortcutCaptureDialog : public QDialog, public Ui::ShortcutCaptureDialogBase
-      {
-      Q_OBJECT
-      private:
-      int  shortcutindex;
-      void keyPressEvent(QKeyEvent* e);
-      int  key;
+{
+    Q_OBJECT
+private:
+    int shortcutindex;
+    void keyPressEvent(QKeyEvent* e);
+    int key;
 
-      private slots:
-      void apply();
-      void cancel() { reject(); };
+private slots:
+    void apply();
 
-      public:
-      ShortcutCaptureDialog(QWidget* parent, int index=0);
-      ~ShortcutCaptureDialog();
-      };
+    void cancel()
+    {
+        reject();
+    };
+
+public:
+    ShortcutCaptureDialog(QWidget* parent, int index = 0);
+    ~ShortcutCaptureDialog();
+};
 

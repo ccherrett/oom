@@ -14,30 +14,47 @@
 //   PosLabel
 //---------------------------------------------------------
 
-class PosLabel : public QLabel {
-      bool _smpte;
-      unsigned _tickValue;
-      unsigned _sampleValue;
-      Q_OBJECT
+class PosLabel : public QLabel
+{
+    bool _smpte;
+    unsigned _tickValue;
+    unsigned _sampleValue;
+    Q_OBJECT
 
-      void updateValue();
+    void updateValue();
 
-   protected:
-      QSize sizeHint() const;
+protected:
+    QSize sizeHint() const;
 
-   public slots:
-      void setTickValue(unsigned);
-      void setSampleValue(unsigned);
-      void setValue(unsigned);
+public slots:
+    void setTickValue(unsigned);
+    void setSampleValue(unsigned);
+    void setValue(unsigned);
 
-   public:
-      PosLabel(QWidget* parent, const char* name = 0);
-      unsigned value()       const { return _smpte ? _sampleValue : _tickValue; }
-      unsigned tickValue()   const { return _tickValue; }
-      unsigned sampleValue() const { return _sampleValue; }
-      void setSmpte(bool);
-      bool smpte() const { return _smpte; }
-      };
+public:
+    PosLabel(QWidget* parent, const char* name = 0);
+
+    unsigned value() const
+    {
+        return _smpte ? _sampleValue : _tickValue;
+    }
+
+    unsigned tickValue() const
+    {
+        return _tickValue;
+    }
+
+    unsigned sampleValue() const
+    {
+        return _sampleValue;
+    }
+    void setSmpte(bool);
+
+    bool smpte() const
+    {
+        return _smpte;
+    }
+};
 
 
 #endif

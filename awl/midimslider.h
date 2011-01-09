@@ -23,33 +23,42 @@
 
 #include "slider.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   MidiMeterSlider
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   MidiMeterSlider
+    //---------------------------------------------------------
 
-class MidiMeterSlider : public Slider
-      {
-      Q_PROPERTY(int meterWidth READ meterWidth WRITE setMeterWidth)
-      Q_OBJECT
+    class MidiMeterSlider : public Slider
+    {
+        Q_PROPERTY(int meterWidth READ meterWidth WRITE setMeterWidth)
+        Q_OBJECT
 
-      double meterval;
-      int _meterWidth;
+        double meterval;
+        int _meterWidth;
 
-      virtual void paintEvent(QPaintEvent*);
+        virtual void paintEvent(QPaintEvent*);
 
-   protected:
-      virtual void mouseDoubleClickEvent(QMouseEvent*);
+    protected:
+        virtual void mouseDoubleClickEvent(QMouseEvent*);
 
-   public slots:
-      void setMeterVal(double value);
+    public slots:
+        void setMeterVal(double value);
 
-   public:
-      MidiMeterSlider(QWidget* parent = 0);
-      int meterWidth() const    { return _meterWidth; }
-      void setMeterWidth(int v) { _meterWidth = v; }
-      };
+    public:
+        MidiMeterSlider(QWidget* parent = 0);
+
+        int meterWidth() const
+        {
+            return _meterWidth;
+        }
+
+        void setMeterWidth(int v)
+        {
+            _meterWidth = v;
+        }
+    };
 }
 
 #endif

@@ -26,59 +26,67 @@
 
 #include <QAbstractSpinBox>
 
-namespace Awl {
+namespace Awl
+{
 
-      ///using AL::Pos;
+    ///using AL::Pos;
 
-//---------------------------------------------------------
-//   PosEdit
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   PosEdit
+    //---------------------------------------------------------
 
-class PosEdit : public QAbstractSpinBox
-      {
-      Q_OBJECT
-      Q_PROPERTY(bool smpte READ smpte WRITE setSmpte)
+    class PosEdit : public QAbstractSpinBox
+    {
+        Q_OBJECT
+        Q_PROPERTY(bool smpte READ smpte WRITE setSmpte)
 
-      bool _smpte;
-      Pos _pos;
-      bool initialized;
+        bool _smpte;
+        Pos _pos;
+        bool initialized;
 
-      QIntValidator* validator;
-      
-      virtual void paintEvent(QPaintEvent* event);
-      virtual void stepBy(int steps);
-      virtual StepEnabled stepEnabled() const;
-      virtual void fixup(QString& input) const;
-      virtual QValidator::State validate(QString&, int&) const;
-      void updateValue();
-      int curSegment() const;
-      virtual bool event(QEvent*);
-      void finishEdit();
+        QIntValidator* validator;
 
-   signals:
-      void valueChanged(const Pos&);
-      
-      // Choose these three carefully, watch out for focusing recursion. 
-      void returnPressed();
-      void lostFocus();      
-      // This is emitted when focus lost or return pressed (same as QAbstractSpinBox). 
-      void editingFinished();
+        virtual void paintEvent(QPaintEvent* event);
+        virtual void stepBy(int steps);
+        virtual StepEnabled stepEnabled() const;
+        virtual void fixup(QString& input) const;
+        virtual QValidator::State validate(QString&, int&) const;
+        void updateValue();
+        int curSegment() const;
+        virtual bool event(QEvent*);
+        void finishEdit();
 
-   public slots:
-      void setValue(const Pos& time);
-      void setValue(int t);
-      void setValue(const QString& s);
+    signals:
+        void valueChanged(const Pos&);
 
-   public:
-      PosEdit(QWidget* parent = 0);
-      ~PosEdit();
-      QSize sizeHint() const;
+        // Choose these three carefully, watch out for focusing recursion.
+        void returnPressed();
+        void lostFocus();
+        // This is emitted when focus lost or return pressed (same as QAbstractSpinBox).
+        void editingFinished();
 
-      Pos pos() const { return _pos; }
-      void setSmpte(bool);
-      bool smpte() const { return _smpte; }
-      // void* operator new(size_t);          // What was this for? Tim.
-      };
+    public slots:
+        void setValue(const Pos& time);
+        void setValue(int t);
+        void setValue(const QString& s);
+
+    public:
+        PosEdit(QWidget* parent = 0);
+        ~PosEdit();
+        QSize sizeHint() const;
+
+        Pos pos() const
+        {
+            return _pos;
+        }
+        void setSmpte(bool);
+
+        bool smpte() const
+        {
+            return _smpte;
+        }
+        // void* operator new(size_t);          // What was this for? Tim.
+    };
 }
 
 #endif

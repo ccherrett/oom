@@ -36,81 +36,91 @@ class Xml;
 //   tRhyGroup
 //---------------------------------------------------------
 
-struct tRhyGroup {
-      int contrib;
-      int listen;
+struct tRhyGroup
+{
+    int contrib;
+    int listen;
 
-      tRhyGroup() {
-            listen = 0;
-            contrib = 0;
-            }
-//      void write(int, Xml&);
-//      void read(Xml&);
-      };
+    tRhyGroup()
+    {
+        listen = 0;
+        contrib = 0;
+    }
+    //      void write(int, Xml&);
+    //      void read(Xml&);
+};
 
 //---------------------------------------------------------
 //   tRhyGroups
 //---------------------------------------------------------
 
-struct tRhyGroups {
-      tRhyGroup g[MAX_GROUPS];
-      tRhyGroup& operator [] (int i) { return g[i]; }
+struct tRhyGroups
+{
+    tRhyGroup g[MAX_GROUPS];
 
-//      void write(int, Xml&);
-//      void read(Xml&);
-      };
+    tRhyGroup & operator [] (int i)
+    {
+        return g[i];
+    }
+
+    //      void write(int, Xml&);
+    //      void read(Xml&);
+};
 
 //---------------------------------------------------------
 //   tRhythm
 //---------------------------------------------------------
 
 class tRhythm
-      {
-      friend class tRhythmWin;
+{
+    friend class tRhythmWin;
 
-      char* label;
+    char* label;
 
-//      tRndArray rhythm;
-//      tRndArray length;
-//      tRndArray veloc;
+    //      tRndArray rhythm;
+    //      tRndArray length;
+    //      tRndArray veloc;
 
-      int steps_per_count;
-      int count_per_bar;
-      int n_bars;
-      int keys[MAX_KEYS];
-      int n_keys;
-      int mode;
-      int parm;
+    int steps_per_count;
+    int count_per_bar;
+    int n_bars;
+    int keys[MAX_KEYS];
+    int n_keys;
+    int mode;
+    int parm;
 
-      int randomize;
-      tRhyGroups groups;
-//      tRndArray history;
+    int randomize;
+    tRhyGroups groups;
+    //      tRndArray history;
 
-      // set by GenInit()
-      long start_clock;
-      long next_clock;
+    // set by GenInit()
+    long start_clock;
+    long next_clock;
 
-//      void GenGroup(tRndArray& out, int grp, tBarInfo &bi, tRhythm *rhy[], int n_rhy);
-      int Clock2i(long clock, tBarInfo &bi) const;
-      int ClocksPerStep(tBarInfo &bi) const;
+    //      void GenGroup(tRndArray& out, int grp, tBarInfo &bi, tRhythm *rhy[], int n_rhy);
+    int Clock2i(long clock, tBarInfo &bi) const;
+    int ClocksPerStep(tBarInfo &bi) const;
 
-   public:
-      tRhythm(int key);
-      tRhythm(const tRhythm &o);
-      tRhythm & operator= (const tRhythm &o);
-      virtual ~tRhythm();
+public:
+    tRhythm(int key);
+    tRhythm(const tRhythm &o);
+    tRhythm & operator=(const tRhythm &o);
+    virtual ~tRhythm();
 
-      char const * GetLabel() { return label; }
-      void SetLabel(char const *);
+    char const * GetLabel()
+    {
+        return label;
+    }
+    void SetLabel(char const *);
 
-      void Generate(tTrack *track, long fr_clock, long to_clock, long ticks_per_bar);
-      void Generate(tTrack *track, tBarInfo &bi, tRhythm *rhy[], int n_rhy);
-      void GenInit(long start_clock);
-      void GenerateEvent(tTrack *track, long clock, short vel, short len);
+    void Generate(tTrack *track, long fr_clock, long to_clock, long ticks_per_bar);
+    void Generate(tTrack *track, tBarInfo &bi, tRhythm *rhy[], int n_rhy);
+    void GenInit(long start_clock);
+    void GenerateEvent(tTrack *track, long clock, short vel, short len);
 
-      void write(int, Xml&);
-      void read(Xml&);
-      };
+    void write(int, Xml&);
+    void read(Xml&);
+};
 #endif
 
 //---------------------------------------------------------
@@ -118,34 +128,37 @@ class tRhythm
 //---------------------------------------------------------
 
 class RhythmGen : public QMainWindow, public Ui::RhythmBase
-      {
-      Q_OBJECT
+{
+    Q_OBJECT
 #if 0
-    wxPanel    *inst_panel;
-    wxText     *label;
-    wxSlider   *steps_per_count;
-    wxSlider   *count_per_bar;
-    wxSlider   *n_bars;
-    wxListBox  *instrument_list;
+    wxPanel *inst_panel;
+    wxText *label;
+    wxSlider *steps_per_count;
+    wxSlider *count_per_bar;
+    wxSlider *n_bars;
+    wxListBox *instrument_list;
     wxCheckBox *rand_checkbox;
 
-    wxPanel    *group_panel;
-    wxListBox  *group_list;
-    wxSlider   *group_contrib;
-    wxSlider   *group_listen;
-    int        act_group;
+    wxPanel *group_panel;
+    wxListBox *group_list;
+    wxSlider *group_contrib;
+    wxSlider *group_listen;
+    int act_group;
 
-    tArrayEdit    *length_edit;
-    tArrayEdit    *veloc_edit;
+    tArrayEdit *length_edit;
+    tArrayEdit *veloc_edit;
     tRhyArrayEdit *rhythm_edit;
 
-    enum       { MAX_INSTRUMENTS = 20 };
-    tRhythm    *instruments[MAX_INSTRUMENTS];
-    int        n_instruments;
-    int        act_instrument;	// -1 if none
+    enum
+    {
+        MAX_INSTRUMENTS = 20
+    };
+    tRhythm *instruments[MAX_INSTRUMENTS];
+    int n_instruments;
+    int act_instrument; // -1 if none
 
     // this one is edited and copied from/to instruments[i]
-    tRhythm    edit;
+    tRhythm edit;
 
     // ignore Updates while creating the window (motif)
     Bool in_create;
@@ -159,14 +172,14 @@ class RhythmGen : public QMainWindow, public Ui::RhythmBase
     static void Generate(wxButton &but, wxCommandEvent& event);
     static void Help();
 
-    void Instrument2Win(int i = -1);	// instrument[act_instrument] -> win
-    void Win2Instrument(int i = -1);	// win -> instrument[act_instrument]
+    void Instrument2Win(int i = -1); // instrument[act_instrument] -> win
+    void Win2Instrument(int i = -1); // win -> instrument[act_instrument]
     void AddInstrumentDlg();
     void AddInstrument(tRhythm *r);
     void DelInstrument();
 
     tEventWin *event_win;
-    tSong     *song;
+    tSong *song;
 
     void RndEnable();
 
@@ -179,20 +192,20 @@ class RhythmGen : public QMainWindow, public Ui::RhythmBase
     void DownInstrument();
     void InitInstrumentList();
 #endif
-      virtual void closeEvent(QCloseEvent*);
+    virtual void closeEvent(QCloseEvent*);
 
-   signals:
-      void hideWindow();
+signals:
+    void hideWindow();
 
-   public:
-//      virtual void OnMenuCommand(int id);
-//      virtual void OnSize(int w, int h);
-      RhythmGen(QWidget* parent = 0, Qt::WFlags fo = Qt::Window);
-      virtual ~RhythmGen();
-//      void OnPaint();
-//      void GenRhythm();
-//      bool OnClose();
-      };
+public:
+    //      virtual void OnMenuCommand(int id);
+    //      virtual void OnSize(int w, int h);
+    RhythmGen(QWidget* parent = 0, Qt::WFlags fo = Qt::Window);
+    virtual ~RhythmGen();
+    //      void OnPaint();
+    //      void GenRhythm();
+    //      bool OnClose();
+};
 
 #endif
 

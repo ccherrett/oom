@@ -22,41 +22,41 @@ class QPixmap;
 //---------------------------------------------------------
 
 class Piano : public View
-      {
-      int curPitch;
-      QPixmap* octave;
-      QPixmap* c_keys[10];
-      QPixmap* mk1;
-      QPixmap* mk2;
-      QPixmap* mk3;
-      QPixmap* mk4;
-      int keyDown;
-      bool shift;
-      int button;
+{
+    int curPitch;
+    QPixmap* octave;
+    QPixmap* c_keys[10];
+    QPixmap* mk1;
+    QPixmap* mk2;
+    QPixmap* mk3;
+    QPixmap* mk4;
+    int keyDown;
+    bool shift;
+    int button;
 
-      Q_OBJECT
-      int y2pitch(int) const;
-      int pitch2y(int) const;
-      void viewMouseMoveEvent(QMouseEvent* event);
-      virtual void leaveEvent(QEvent*e);
+    Q_OBJECT
+    int y2pitch(int) const;
+    int pitch2y(int) const;
+    void viewMouseMoveEvent(QMouseEvent* event);
+    virtual void leaveEvent(QEvent*e);
 
-      virtual void viewMousePressEvent(QMouseEvent* event);
-      virtual void viewMouseReleaseEvent(QMouseEvent*);
+    virtual void viewMousePressEvent(QMouseEvent* event);
+    virtual void viewMouseReleaseEvent(QMouseEvent*);
 
-   protected:
-      virtual void draw(QPainter&, const QRect&);
+protected:
+    virtual void draw(QPainter&, const QRect&);
 
-   signals:
-      void pitchChanged(int);
-      void keyPressed(int, int, bool);
-      void keyReleased(int, bool);
+signals:
+    void pitchChanged(int);
+    void keyPressed(int, int, bool);
+    void keyReleased(int, bool);
 
-   public slots:
-      void setPitch(int);
+public slots:
+    void setPitch(int);
 
-   public:
-      Piano(QWidget*, int);
-      };
+public:
+    Piano(QWidget*, int);
+};
 
 #endif
 

@@ -29,39 +29,44 @@ class Pos;
 
 class ClipListEditorBaseWidget : public QWidget, public Ui::ClipListEditorBase
 {
-      Q_OBJECT
 
-   public:
-      ClipListEditorBaseWidget(QWidget *parent = 0) : QWidget(parent) { setupUi(this); }
+    Q_OBJECT
+
+public:
+    ClipListEditorBaseWidget(QWidget *parent = 0) : QWidget(parent)
+    {
+        setupUi(this);
+    }
 };
 
 //---------------------------------------------------------
 //   ClipListEdit
 //---------------------------------------------------------
 
-class ClipListEdit : public TopWin {
-      Q_OBJECT
-      ClipListEditorBaseWidget* editor;
+class ClipListEdit : public TopWin
+{
+    Q_OBJECT
+    ClipListEditorBaseWidget* editor;
 
-      virtual void closeEvent(QCloseEvent*);
-      void updateList();
+    virtual void closeEvent(QCloseEvent*);
+    void updateList();
 
-   private slots:
-      void songChanged(int);
-      void startChanged(const Pos&);
-      void lenChanged(const Pos&);
-      void clipSelectionChanged();
-      void clicked(QTreeWidgetItem*, int);
+private slots:
+    void songChanged(int);
+    void startChanged(const Pos&);
+    void lenChanged(const Pos&);
+    void clipSelectionChanged();
+    void clicked(QTreeWidgetItem*, int);
 
-   signals:
-      void deleted(unsigned long);
+signals:
+    void deleted(unsigned long);
 
-   public:
-      ClipListEdit(QWidget* parent);
-      ~ClipListEdit();
-      virtual void readStatus(Xml&);
-      virtual void writeStatus(int, Xml&) const;
-      };
+public:
+    ClipListEdit(QWidget* parent);
+    ~ClipListEdit();
+    virtual void readStatus(Xml&);
+    virtual void writeStatus(int, Xml&) const;
+};
 
 #endif
 

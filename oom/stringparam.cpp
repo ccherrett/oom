@@ -21,15 +21,15 @@
 
 #include "stringparam.h" 
 #include "xml.h" 
- 
+
 //---------------------------------------------------------
 //   findKey
 //---------------------------------------------------------
 
 iStringParamMap StringParamMap::findKey(const char* key)
 {
-  iStringParamMap icm = find(std::string(key));
-  return icm;
+	iStringParamMap icm = find(std::string(key));
+	return icm;
 }
 
 //---------------------------------------------------------
@@ -38,11 +38,11 @@ iStringParamMap StringParamMap::findKey(const char* key)
 
 void StringParamMap::set(const char* key, const char* value)
 {
-  iStringParamMap icm = find(std::string(key));
-  if(icm == end())
-    insert(std::pair<std::string, std::string>(key, value));
-  else
-    icm->second = std::string(value);  
+	iStringParamMap icm = find(std::string(key));
+	if (icm == end())
+		insert(std::pair<std::string, std::string > (key, value));
+	else
+		icm->second = std::string(value);
 }
 
 //---------------------------------------------------------
@@ -51,7 +51,7 @@ void StringParamMap::set(const char* key, const char* value)
 
 void StringParamMap::remove(const char* key)
 {
-  erase(std::string(key));
+	erase(std::string(key));
 }
 
 //---------------------------------------------------------
@@ -60,41 +60,41 @@ void StringParamMap::remove(const char* key)
 
 void StringParamMap::read(Xml& xml, const QString& name)
 {
-  QString n;
-  QString value;
-  
-  for (;;) 
-  {
-    Xml::Token token = xml.parse();
-    const QString tag = xml.s1();
-    switch (token) 
-    {
-      case Xml::Error:
-      case Xml::End:
-            return;
-      case Xml::TagStart:
-            xml.unknown(name.toAscii().constData());
-            break;
-      case Xml::Attribut:
-            if(tag == "name") 
-              n = xml.s2();
-            else
-            if(tag == "val") 
-              value = xml.s2();      
-            else
-              xml.unknown(name.toAscii().constData());
-            break;
-      case Xml::TagEnd:
-            if(tag == name) 
-            {
-              // Add or modify the item.
-              set(n.toLatin1(), value.toLatin1());
-              return;
-            }
-      default:
-            break;
-    }
-  }
+	QString n;
+	QString value;
+
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::TagStart:
+				xml.unknown(name.toAscii().constData());
+				break;
+			case Xml::Attribut:
+				if (tag == "name")
+					n = xml.s2();
+				else
+					if (tag == "val")
+					value = xml.s2();
+				else
+					xml.unknown(name.toAscii().constData());
+				break;
+			case Xml::TagEnd:
+				if (tag == name)
+				{
+					// Add or modify the item.
+					set(n.toLatin1(), value.toLatin1());
+					return;
+				}
+			default:
+				break;
+		}
+	}
 }
 
 //---------------------------------------------------------
@@ -103,10 +103,10 @@ void StringParamMap::read(Xml& xml, const QString& name)
 
 void StringParamMap::write(int level, Xml& xml, const char* name) const
 {
-  if(empty())
-    return;
-    
-  for(ciStringParamMap r = begin(); r != end(); ++r) 
-    xml.tag(level, "%s name=\"%s\" val=\"%s\"/", name, r->first.c_str(), r->second.c_str());
+	if (empty())
+		return;
+
+	for (ciStringParamMap r = begin(); r != end(); ++r)
+		xml.tag(level, "%s name=\"%s\" val=\"%s\"/", name, r->first.c_str(), r->second.c_str());
 }
 

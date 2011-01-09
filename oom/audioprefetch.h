@@ -15,31 +15,36 @@
 //   AudioPrefetch
 //---------------------------------------------------------
 
-class AudioPrefetch : public Thread {
-      unsigned writePos;
-      unsigned seekPos; // remember last seek to optimize seeks
+class AudioPrefetch : public Thread
+{
+    unsigned writePos;
+    unsigned seekPos; // remember last seek to optimize seeks
 
-      virtual void processMsg1(const void*);
-      //void prefetch();
-      void prefetch(bool doSeek);
-      void seek(unsigned pos);
+    virtual void processMsg1(const void*);
+    //void prefetch();
+    void prefetch(bool doSeek);
+    void seek(unsigned pos);
 
-      volatile int seekCount;
-      
-   public:
-      //AudioPrefetch(int prio, const char* name);
-      AudioPrefetch(const char* name);
-      
-      ~AudioPrefetch();
-      //virtual void start();
-      virtual void start(int);
+    volatile int seekCount;
 
-      void msgTick();
-      void msgSeek(unsigned samplePos, bool force=false);
-      
-      //volatile bool seekDone;
-      bool seekDone() const { return seekCount == 0; }
-      };
+public:
+    //AudioPrefetch(int prio, const char* name);
+    AudioPrefetch(const char* name);
+
+    ~AudioPrefetch();
+    //virtual void start();
+    virtual void start(int);
+
+    void msgTick();
+    void msgSeek(unsigned samplePos, bool force = false);
+
+    //volatile bool seekDone;
+
+    bool seekDone() const
+    {
+        return seekCount == 0;
+    }
+};
 
 extern AudioPrefetch* audioPrefetch;
 

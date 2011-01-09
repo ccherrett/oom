@@ -19,21 +19,22 @@ class QTableWidget;
 //   ComboQuant
 //---------------------------------------------------------
 
-class ComboQuant : public QComboBox {
-      Q_OBJECT
+class ComboQuant : public QComboBox
+{
+    Q_OBJECT
 
-      QTableWidget* qlist;
-       
-   private slots:
-      void activated(int);
+    QTableWidget* qlist;
 
-   signals:
-      void valueChanged(int);
+private slots:
+    void activated(int);
 
-   public:
-      ComboQuant(QWidget* parent = 0);
-      void setValue(int val);
-      };
+signals:
+    void valueChanged(int);
+
+public:
+    ComboQuant(QWidget* parent = 0);
+    void setValue(int val);
+};
 
 #endif
 

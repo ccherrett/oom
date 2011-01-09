@@ -37,91 +37,105 @@
 #include <QtDesigner/QDesignerCustomWidgetInterface>
 
 QWidget* KnobPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::Knob(parent);
-      }
+{
+	return new Awl::Knob(parent);
+}
+
 QWidget* VolKnobPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::VolKnob(parent);
-      }
+{
+	return new Awl::VolKnob(parent);
+}
+
 QWidget* SliderPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::Slider(parent);
-      }
+{
+	return new Awl::Slider(parent);
+}
+
 QWidget* VolSliderPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::VolSlider(parent);
-      }
+{
+	return new Awl::VolSlider(parent);
+}
+
 QWidget* MeterSliderPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::MeterSlider(parent);
-      }
+{
+	return new Awl::MeterSlider(parent);
+}
+
 QWidget* PosEditPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::PosEdit(parent);
-      }
+{
+	return new Awl::PosEdit(parent);
+}
+
 QWidget* PosLabelPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::PosLabel(parent);
-      }
+{
+	return new Awl::PosLabel(parent);
+}
+
 QWidget* TempoEditPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::TempoEdit(parent);
-      }
+{
+	return new Awl::TempoEdit(parent);
+}
+
 QWidget* TempoLabelPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::TempoLabel(parent);
-      }
+{
+	return new Awl::TempoLabel(parent);
+}
+
 QWidget* CheckBoxPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::CheckBox(parent);
-      }
+{
+	return new Awl::CheckBox(parent);
+}
+
 QWidget* ComboBoxPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::ComboBox(parent);
-      }
+{
+	return new Awl::ComboBox(parent);
+}
+
 QWidget* FloatEntryPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::FloatEntry(parent);
-      }
+{
+	return new Awl::FloatEntry(parent);
+}
+
 QWidget* PanKnobPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::PanKnob(parent);
-      }
+{
+	return new Awl::PanKnob(parent);
+}
+
 QWidget* MidiPanKnobPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::MidiPanKnob(parent);
-      }
+{
+	return new Awl::MidiPanKnob(parent);
+}
+
 QWidget* DrawbarPlugin::createWidget(QWidget* parent)
-	{
-      return new Awl::Drawbar(parent);
-      }
+{
+	return new Awl::Drawbar(parent);
+}
 
 //---------------------------------------------------------
 //   customWidgets
 //---------------------------------------------------------
 
 QList<QDesignerCustomWidgetInterface*> AwlPlugins::customWidgets() const
-	{
+{
 	QList<QDesignerCustomWidgetInterface*> plugins;
-            plugins
-               << new VolKnobPlugin
-               << new PanKnobPlugin
-               << new MidiPanKnobPlugin
-               << new KnobPlugin
-      	   << new SliderPlugin
-      	   << new VolSliderPlugin
-      	   << new MeterSliderPlugin
-      	   << new PosEditPlugin
-      	   << new PosLabelPlugin
-      	   << new TempoEditPlugin
-      	   << new TempoLabelPlugin
-      	   << new CheckBoxPlugin
-      	   << new ComboBoxPlugin
-      	   << new FloatEntryPlugin
-      	   << new DrawbarPlugin;
-      return plugins;
-	}
+	plugins
+			<< new VolKnobPlugin
+			<< new PanKnobPlugin
+			<< new MidiPanKnobPlugin
+			<< new KnobPlugin
+			<< new SliderPlugin
+			<< new VolSliderPlugin
+			<< new MeterSliderPlugin
+			<< new PosEditPlugin
+			<< new PosLabelPlugin
+			<< new TempoEditPlugin
+			<< new TempoLabelPlugin
+			<< new CheckBoxPlugin
+			<< new ComboBoxPlugin
+			<< new FloatEntryPlugin
+			<< new DrawbarPlugin;
+	return plugins;
+}
 
 Q_EXPORT_PLUGIN(AwlPlugins)
 

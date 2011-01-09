@@ -14,18 +14,19 @@ class QStandardItemModel;
 
 class Xml;
 
-class Header : public QHeaderView {
-      Q_OBJECT
+class Header : public QHeaderView
+{
+    Q_OBJECT
 
-      QStandardItemModel *itemModel;
+    QStandardItemModel *itemModel;
 
-   public:
-      Header(QWidget* parent=0, const char* name=0);
-      void writeStatus(int level, Xml&) const;
-      void readStatus(Xml&);
-      void setColumnLabel( const QString & s, int col, int width = -1 );
-      void setToolTip(int col, const QString &text);
-      void setWhatsThis(int col, const QString &text);
+public:
+    Header(QWidget* parent = 0, const char* name = 0);
+    void writeStatus(int level, Xml&) const;
+    void readStatus(Xml&);
+    void setColumnLabel(const QString & s, int col, int width = -1);
+    void setToolTip(int col, const QString &text);
+    void setWhatsThis(int col, const QString &text);
 };
 
 #endif

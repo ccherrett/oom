@@ -17,20 +17,21 @@ class QDialog;
 //   MetronomeConfig
 //---------------------------------------------------------
 
-class MetronomeConfig : public QDialog, public Ui::MetronomeConfigBase {
-      Q_OBJECT
+class MetronomeConfig : public QDialog, public Ui::MetronomeConfigBase
+{
+    Q_OBJECT
 
-   private slots:
-      virtual void accept();
-      void apply();
-      virtual void reject();
-      virtual void audioBeepRoutesClicked();
-      void midiClickChanged(bool);
-      void precountEnableChanged(bool);
-      void precountFromMastertrackChanged(bool);
-      void beepVolumeChanged(int);
+private slots:
+    virtual void accept();
+    void apply();
+    virtual void reject();
+    virtual void audioBeepRoutesClicked();
+    void midiClickChanged(bool);
+    void precountEnableChanged(bool);
+    void precountFromMastertrackChanged(bool);
+    void beepVolumeChanged(int);
 
-   public:
-      MetronomeConfig(QDialog* parent=0);
-      };
+public:
+    MetronomeConfig(QDialog* parent = 0);
+};
 #endif

@@ -12,9 +12,10 @@
 #include "noteinfo.h"
 #include "cobject.h"
 
-namespace Awl {
-      class SigEdit;
-      };
+namespace Awl
+{
+    class SigEdit;
+};
 using Awl::SigEdit;
 
 class QCloseEvent;
@@ -36,51 +37,52 @@ class TempoLabel;
 //   MasterEdit
 //---------------------------------------------------------
 
-class MasterEdit : public MidiEditor {
-      Master* canvas;
-      ScrollScale* hscroll;
-      ScrollScale* vscroll;
-      MTScale* time1;
-      MTScale* time2;
-      SigScale* sign;
-      HitScale* thits;
-      HitScale* zhits;
-      TScale* tscale;
+class MasterEdit : public MidiEditor
+{
+    Master* canvas;
+    ScrollScale* hscroll;
+    ScrollScale* vscroll;
+    MTScale* time1;
+    MTScale* time2;
+    SigScale* sign;
+    HitScale* thits;
+    HitScale* zhits;
+    TScale* tscale;
 
-      TempoEdit* curTempo;
-      SigEdit* curSig;
-      LabelCombo* rasterLabel;
-      QToolBar* tools;
-      PosLabel* cursorPos;
-      TempoLabel* tempo;
-      QToolButton* enableButton;
-      
-      static int _rasterInit;
+    TempoEdit* curTempo;
+    SigEdit* curSig;
+    LabelCombo* rasterLabel;
+    QToolBar* tools;
+    PosLabel* cursorPos;
+    TempoLabel* tempo;
+    QToolButton* enableButton;
 
-      Q_OBJECT
-      virtual void closeEvent(QCloseEvent*);
+    static int _rasterInit;
 
-   private slots:
-      void _setRaster(int);
-      void posChanged(int,unsigned,bool);
-      void setTime(unsigned);
-      void setTempo(int);
+    Q_OBJECT
+    virtual void closeEvent(QCloseEvent*);
 
-   public slots:
-      void songChanged(int);
-//      void tempoChanged(double);
+private slots:
+    void _setRaster(int);
+    void posChanged(int, unsigned, bool);
+    void setTime(unsigned);
+    void setTempo(int);
 
-   signals:
-      void deleted(unsigned long);
+public slots:
+    void songChanged(int);
+    //      void tempoChanged(double);
 
-   public:
-      MasterEdit();
-      ~MasterEdit();
-      virtual void readStatus(Xml&);
-      virtual void writeStatus(int, Xml&) const;
-      static void readConfiguration(Xml&);
-      static void writeConfiguration(int, Xml&);
-      };
+signals:
+    void deleted(unsigned long);
+
+public:
+    MasterEdit();
+    ~MasterEdit();
+    virtual void readStatus(Xml&);
+    virtual void writeStatus(int, Xml&) const;
+    static void readConfiguration(Xml&);
+    static void writeConfiguration(int, Xml&);
+};
 
 #endif
 

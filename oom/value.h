@@ -17,45 +17,59 @@ class Xml;
 //   IValue
 //---------------------------------------------------------
 
-class IValue : public QObject {
-      int val;
+class IValue : public QObject
+{
+    int val;
 
-      Q_OBJECT
+    Q_OBJECT
 
-   signals:
-      void valueChanged(int);
+signals:
+    void valueChanged(int);
 
-   public slots:
-      void setValue(int v);
+public slots:
+    void setValue(int v);
 
-   public:
-      IValue(QObject* parent=0, const char* name=0);
-      int value() const    { return val; }
-      void save(int level, Xml& xml);
-      };
+public:
+    IValue(QObject* parent = 0, const char* name = 0);
+
+    int value() const
+    {
+        return val;
+    }
+    void save(int level, Xml& xml);
+};
 
 //---------------------------------------------------------
 //   BValue
 //---------------------------------------------------------
 
-class BValue : public QObject {
-      bool val;
+class BValue : public QObject
+{
+    bool val;
 
-      Q_OBJECT
+    Q_OBJECT
 
-   signals:
-      void valueChanged(bool);
-      void valueChanged(int);
+signals:
+    void valueChanged(bool);
+    void valueChanged(int);
 
-   public slots:
-      void setValue(bool v);
-      void setValue(int v) { setValue(bool(v)); }
+public slots:
+    void setValue(bool v);
 
-   public:
-      BValue(QObject* parent=0, const char* name=0);
-      bool value() const    { return val; }
-      void save(int level, Xml& xml);
-      };
+    void setValue(int v)
+    {
+        setValue(bool(v));
+    }
+
+public:
+    BValue(QObject* parent = 0, const char* name = 0);
+
+    bool value() const
+    {
+        return val;
+    }
+    void save(int level, Xml& xml);
+};
 
 #endif
 

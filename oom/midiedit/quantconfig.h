@@ -15,17 +15,18 @@
 //   QuantConfig
 //---------------------------------------------------------
 
-class QuantConfig : public QDialog {
-      Q_OBJECT
+class QuantConfig : public QDialog
+{
+    Q_OBJECT
 
-   signals:
-      void setQuantStrength(int);
-      void setQuantLimit(int);
-      void setQuantLen(bool);
+signals:
+    void setQuantStrength(int);
+    void setQuantLimit(int);
+    void setQuantLen(bool);
 
-   public:
-      QuantConfig(int, int, bool);
-      };
+public:
+    QuantConfig(int, int, bool);
+};
 
 
 #endif

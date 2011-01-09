@@ -18,24 +18,25 @@ class QWidget;
 //   MRConfig
 //---------------------------------------------------------
 
-class MRConfig : public QWidget, public Ui::MRConfigBase {
-      Q_OBJECT
+class MRConfig : public QWidget, public Ui::MRConfigBase
+{
+    Q_OBJECT
 
-      virtual void closeEvent(QCloseEvent*);
+    virtual void closeEvent(QCloseEvent*);
 
-   signals:
-      void hideWindow();
+signals:
+    void hideWindow();
 
-   private slots:
-      void setRcEnable(bool);
-      void setRcStopNote(int);
-      void setRcRecordNote(int);
-      void setRcGotoLeftMarkNote(int);
-      void setRcPlayNote(int);
+private slots:
+    void setRcEnable(bool);
+    void setRcStopNote(int);
+    void setRcRecordNote(int);
+    void setRcGotoLeftMarkNote(int);
+    void setRcPlayNote(int);
 
-   public:
-      MRConfig(QWidget* parent=0, Qt::WFlags fl = 0);
-      };
+public:
+    MRConfig(QWidget* parent = 0, Qt::WFlags fl = 0);
+};
 
 #endif
 

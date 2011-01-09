@@ -24,78 +24,120 @@
 //---------------------------------------------------------
 
 class SliderBase : public QWidget, public DoubleRange
-      {
-  Q_OBJECT
-      Q_PROPERTY( int id READ id WRITE setId )
-      Q_PROPERTY( double minValue READ minValue WRITE setMinValue )
-      Q_PROPERTY( double maxValue READ maxValue WRITE setMaxValue )
-      Q_PROPERTY( double value READ value WRITE setValue )
+{
+    Q_OBJECT
+    Q_PROPERTY(int id READ id WRITE setId)
+    Q_PROPERTY(double minValue READ minValue WRITE setMinValue)
+    Q_PROPERTY(double maxValue READ maxValue WRITE setMaxValue)
+    Q_PROPERTY(double value READ value WRITE setValue)
 
-      int _id;
-  int d_tmrID;
-  int d_updTime;
-  int d_timerTick;
-  QTime d_time;
-  double d_speed;
-  double d_mass;
-  bool _cursorHoming;
-  bool _ignoreMouseMove;
+    int _id;
+    int d_tmrID;
+    int d_updTime;
+    int d_timerTick;
+    QTime d_time;
+    double d_speed;
+    double d_mass;
+    bool _cursorHoming;
+    bool _ignoreMouseMove;
 
-  void buttonReleased();
+    void buttonReleased();
 
- protected:
-  int d_scrollMode;
-  double d_mouseOffset;
-  int d_direction;
-  int d_tracking;
-  
-  virtual void setMass(double val);
-  void setPosition(const QPoint &p);
-  virtual void valueChange();
-  virtual double mass() const { return d_mass; }
+protected:
+    int d_scrollMode;
+    double d_mouseOffset;
+    int d_direction;
+    int d_tracking;
 
-      void wheelEvent(QWheelEvent *e);
-  void timerEvent(QTimerEvent *e);
-  void mousePressEvent(QMouseEvent *e);
-  void mouseReleaseEvent(QMouseEvent *e);
-  void mouseMoveEvent(QMouseEvent *e);
-  virtual double getValue(const QPoint & p) = 0;
-  virtual void getScrollMode( QPoint &p, const Qt::MouseButton &button, 
-           int &scrollMode, int &direction) = 0;
+    virtual void setMass(double val);
+    void setPosition(const QPoint &p);
+    virtual void valueChange();
 
- public slots:
-  void setValue(double val);
-  void fitValue(double val);
-  void incValue(int steps);
-  
- signals:
-  void valueChanged(double value, int id);
-  void sliderPressed(int id);
-  void sliderReleased(int id);
-  void sliderMoved(double value, int id);
-  void sliderRightClicked(const QPoint &p, int id);
+    virtual double mass() const
+    {
+        return d_mass;
+    }
 
- public:
-  enum { ScrNone, ScrMouse, ScrTimer, ScrDirect, ScrPage };
-  
-  SliderBase( QWidget *parent = 0, const char *name = 0 );
-  ~SliderBase();
+    void wheelEvent(QWheelEvent *e);
+    void timerEvent(QTimerEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
+    virtual double getValue(const QPoint & p) = 0;
+    virtual void getScrollMode(QPoint &p, const Qt::MouseButton &button,
+            int &scrollMode, int &direction) = 0;
 
-  bool cursorHoming() const { return _cursorHoming; }
-  void setCursorHoming(bool b) { _cursorHoming = b; }
-  void setUpdateTime(int t);
-  //  void incValue(double nSteps);
-  void stopMoving();
-  void setTracking(bool enable);
+public slots:
+    void setValue(double val);
+    void fitValue(double val);
+    void incValue(int steps);
 
-      double value() const       { return DoubleRange::value(); }
-      void stepPages(int pages);
-      double minValue() const    { return  DoubleRange::minValue(); }
-      double maxValue() const    { return  DoubleRange::maxValue(); }
-      void setMinValue(double v) { DoubleRange::setRange(v, maxValue(), 0.0, 1); }
-      void setMaxValue(double v) { DoubleRange::setRange(minValue(), v, 0.0, 1); }
-      int id() const             { return _id; }
-      void setId(int i)          { _id = i; }
-      };
+signals:
+    void valueChanged(double value, int id);
+    void sliderPressed(int id);
+    void sliderReleased(int id);
+    void sliderMoved(double value, int id);
+    void sliderRightClicked(const QPoint &p, int id);
+
+public:
+
+    enum
+    {
+        ScrNone, ScrMouse, ScrTimer, ScrDirect, ScrPage
+    };
+
+    SliderBase(QWidget *parent = 0, const char *name = 0);
+    ~SliderBase();
+
+    bool cursorHoming() const
+    {
+        return _cursorHoming;
+    }
+
+    void setCursorHoming(bool b)
+    {
+        _cursorHoming = b;
+    }
+    void setUpdateTime(int t);
+    //  void incValue(double nSteps);
+    void stopMoving();
+    void setTracking(bool enable);
+
+    double value() const
+    {
+        return DoubleRange::value();
+    }
+    void stepPages(int pages);
+
+    double minValue() const
+    {
+        return DoubleRange::minValue();
+    }
+
+    double maxValue() const
+    {
+        return DoubleRange::maxValue();
+    }
+
+    void setMinValue(double v)
+    {
+        DoubleRange::setRange(v, maxValue(), 0.0, 1);
+    }
+
+    void setMaxValue(double v)
+    {
+        DoubleRange::setRange(minValue(), v, 0.0, 1);
+    }
+
+    int id() const
+    {
+        return _id;
+    }
+
+    void setId(int i)
+    {
+        _id = i;
+    }
+};
 
 #endif

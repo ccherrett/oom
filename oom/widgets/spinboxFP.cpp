@@ -19,36 +19,36 @@
 //---------------------------------------------------------
 
 SpinBoxFP::SpinBoxFP(QWidget* parent)
-   //: QSpinBox(parent)
-   : QDoubleSpinBox(parent)
-      {
-        //validator = new QDoubleValidator(this);
-        //lineEdit()->setValidator(validator = new QDoubleValidator(this));
-        //validator->setNotation(QDoubleValidator::StandardNotation);
-        
-        //_decimals = 0;
-        setDecimals(0);
-        
-        connect(this, SIGNAL(valueChanged(double)), SLOT(valueChange(double)));
-      }
+//: QSpinBox(parent)
+: QDoubleSpinBox(parent)
+{
+	//validator = new QDoubleValidator(this);
+	//lineEdit()->setValidator(validator = new QDoubleValidator(this));
+	//validator->setNotation(QDoubleValidator::StandardNotation);
+
+	//_decimals = 0;
+	setDecimals(0);
+
+	connect(this, SIGNAL(valueChanged(double)), SLOT(valueChange(double)));
+}
 
 SpinBoxFP::SpinBoxFP(int minValue, int maxValue, int step, QWidget* parent)
 //SpinBoxFP::SpinBoxFP(double minValue, double maxValue, double step, QWidget* parent)
-   //: QSpinBox(parent)
-   : QDoubleSpinBox(parent)
-      {
-        //validator = new QDoubleValidator(this);
-        //lineEdit()->setValidator(validator = new QDoubleValidator(this));
-        //validator->setNotation(QDoubleValidator::StandardNotation);
-        
-        //_decimals = 0;
-        QDoubleSpinBox::setDecimals(0);
-        
-        setRange(minValue, maxValue);
-        setSingleStep(step);
-        
-        connect(this, SIGNAL(valueChanged(double)), SLOT(valueChange(double)));
-      }
+//: QSpinBox(parent)
+: QDoubleSpinBox(parent)
+{
+	//validator = new QDoubleValidator(this);
+	//lineEdit()->setValidator(validator = new QDoubleValidator(this));
+	//validator->setNotation(QDoubleValidator::StandardNotation);
+
+	//_decimals = 0;
+	QDoubleSpinBox::setDecimals(0);
+
+	setRange(minValue, maxValue);
+	setSingleStep(step);
+
+	connect(this, SIGNAL(valueChanged(double)), SLOT(valueChange(double)));
+}
 
 //---------------------------------------------------------
 //   valueChange
@@ -56,8 +56,8 @@ SpinBoxFP::SpinBoxFP(int minValue, int maxValue, int step, QWidget* parent)
 
 void SpinBoxFP::valueChange(double)
 {
-        double div = exp10(decimals());
-        emit valueChanged(int(value() * div));
+	double div = exp10(decimals());
+	emit valueChanged(int(value() * div));
 }
 
 //---------------------------------------------------------
@@ -65,37 +65,37 @@ void SpinBoxFP::valueChange(double)
 //---------------------------------------------------------
 
 void SpinBoxFP::setValue(int val)
-      {
-        double div = exp10(decimals());
-        QDoubleSpinBox::setValue(double(val) /  div );
-      }
+{
+	double div = exp10(decimals());
+	QDoubleSpinBox::setValue(double(val) / div);
+}
 
 //---------------------------------------------------------
 //   intValue
 //---------------------------------------------------------
 
 int SpinBoxFP::intValue()
-      {
-        double div = exp10(decimals());
-        return int(value() * div);
-      }
+{
+	double div = exp10(decimals());
+	return int(value() * div);
+}
 
 //---------------------------------------------------------
 //   setDecimals
 //---------------------------------------------------------
 
 void SpinBoxFP::setDecimals(int val)
-      {
-      //_decimals = val;
-      
-      //updateDisplay();
-      //interpretText();  // TODO: Check - is this what we need? Will send out signals?
-      //setValue(value());    // Try this. "setValue() will emit valueChanged() if the new value is different from the old one."
-      
-      QDoubleSpinBox::setDecimals(val);
-      double step = 1.0 / exp10(val);
-      setSingleStep(step);
-      }
+{
+	//_decimals = val;
+
+	//updateDisplay();
+	//interpretText();  // TODO: Check - is this what we need? Will send out signals?
+	//setValue(value());    // Try this. "setValue() will emit valueChanged() if the new value is different from the old one."
+
+	QDoubleSpinBox::setDecimals(val);
+	double step = 1.0 / exp10(val);
+	setSingleStep(step);
+}
 
 /*
 //---------------------------------------------------------
@@ -116,57 +116,57 @@ QValidator::State SpinBoxFP::validate(QString& input, int& pos) const
 //---------------------------------------------------------
 
 QString SpinBoxFP::textFromValue(int value) const
-      {
-      if (_decimals) {
-            QString s;
-            int div = int(exp10(_decimals));
+	  {
+	  if (_decimals) {
+			QString s;
+			int div = int(exp10(_decimals));
 //            printf("val %d, prec %d, div %d\n", value, _precision, div);
             
-            s.sprintf("%d.%0*d", value/div, _decimals, value%div);
-            //s.sprintf("%0*f", value, _decimals);
+			s.sprintf("%d.%0*d", value/div, _decimals, value%div);
+			//s.sprintf("%0*f", value, _decimals);
             
-            return s;
-            }
-      return QSpinBox::textFromValue(value);
-      }
+			return s;
+			}
+	  return QSpinBox::textFromValue(value);
+	  }
 
 //---------------------------------------------------------
 //   mapTextToValue
 //---------------------------------------------------------
 
 int SpinBoxFP::valueFromText(const QString& text) const
-      {
-      //QString qs = cleanText();
-      if (_decimals) {
-            //const char* s = qs.toLatin1();
-            //const char* s = cleanText().toAscii().data();
+	  {
+	  //QString qs = cleanText();
+	  if (_decimals) {
+			//const char* s = qs.toLatin1();
+			//const char* s = cleanText().toAscii().data();
             
-            //int a, b;
-            bool ok;
-            double f = text.toDouble(&ok);
+			//int a, b;
+			bool ok;
+			double f = text.toDouble(&ok);
             
-            //int n = sscanf(s, "%d.%d", &a, &b);
-            //int n = sscanf(s, "%f", &f);
+			//int n = sscanf(s, "%d.%d", &a, &b);
+			//int n = sscanf(s, "%f", &f);
             
-            //if (n != 2) {
-            //if (n != 1) {
-            if (!ok) {
+			//if (n != 2) {
+			//if (n != 1) {
+			if (!ok) {
             
-                  // *ok = false;
-                  //return 0;
-                  // TODO: Check - Hmm, no OK parameter. Why return 0? Let's try: 
-                  // Keep returning the current value until something valid comes in...
-                  return value();
-                  }
+				  // *ok = false;
+				  //return 0;
+				  // TODO: Check - Hmm, no OK parameter. Why return 0? Let's try:
+				  // Keep returning the current value until something valid comes in...
+				  return value();
+				  }
             
-            //int div = int(exp10(_decimals));
-            double div = int(exp10(_decimals));
+			//int div = int(exp10(_decimals));
+			double div = int(exp10(_decimals));
             
-            //return a * div + b;
-            return (f * div);
+			//return a * div + b;
+			return (f * div);
             
-            }
-      return QSpinBox::valueFromText(text);
-      }
+			}
+	  return QSpinBox::valueFromText(text);
+	  }
 
-*/
+ */

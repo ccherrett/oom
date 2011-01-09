@@ -23,9 +23,10 @@
 
 class QString;
 
-namespace Awl {
-      extern QString pitch2string(int);
-      }
+namespace Awl
+{
+    extern QString pitch2string(int);
+}
 
 #endif
 

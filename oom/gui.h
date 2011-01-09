@@ -45,7 +45,7 @@ static const int STRIP_WIDTH  = 60;
 static const int LABEL_HEIGHT = 20;
 static const int BUTTON_HEIGHT = STRIP_WIDTH / 3;
 static const int ENTRY_HEIGHT = 17;
-*/
+ */
 
 static const int ICON_WIDTH = 18;
 static const QSize ICON_SIZE(ICON_WIDTH, ICON_WIDTH);

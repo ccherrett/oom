@@ -26,58 +26,60 @@ class TransparentToolButton;
 //   MidiStrip
 //---------------------------------------------------------
 
-class MidiStrip : public Strip {
-      Q_OBJECT
+class MidiStrip : public Strip
+{
+    Q_OBJECT
 
-      Slider* slider;
-      DoubleLabel* sl;
-      TransparentToolButton* off;
-      //QToolButton* route;
-      //QToolButton* iR;
-      //QToolButton* oR;
+    Slider* slider;
+    DoubleLabel* sl;
+    TransparentToolButton* off;
+    //QToolButton* route;
+    //QToolButton* iR;
+    //QToolButton* oR;
 
-      struct KNOB {
-            Knob* knob;
-            DoubleLabel* dl;
-            QLabel* lb;
-            } controller[4];    // pan variation reverb chorus
+    struct KNOB
+    {
+        Knob* knob;
+        DoubleLabel* dl;
+        QLabel* lb;
+    } controller[4]; // pan variation reverb chorus
 
-      int volume;
-      int variSend;
-      int reverbSend;
-      int chorusSend;
-      int pan;
-      bool inHeartBeat;
+    int volume;
+    int variSend;
+    int reverbSend;
+    int chorusSend;
+    int pan;
+    bool inHeartBeat;
 
-      void addKnob(int idx, const QString&, const QString&, const char*, bool);
-      void ctrlChanged(int num, int val);
-      void updateControls();
-      void updateOffState();
-   
-   private slots:
-      //void routeClicked();
-      void offToggled(bool);
-      void iRoutePressed();
-      void oRoutePressed();
-      void routingPopupMenuActivated(QAction*);
-      void setVolume(double);
-      void setPan(double);
-      void setChorusSend(double);
-      void setVariSend(double);
-      void setReverbSend(double);
-      void labelDoubleClicked(int);
-      void volLabelChanged(double);
-      void controlRightClicked(const QPoint&, int);
+    void addKnob(int idx, const QString&, const QString&, const char*, bool);
+    void ctrlChanged(int num, int val);
+    void updateControls();
+    void updateOffState();
 
-   protected slots:
-      virtual void heartBeat();
+private slots:
+    //void routeClicked();
+    void offToggled(bool);
+    void iRoutePressed();
+    void oRoutePressed();
+    void routingPopupMenuActivated(QAction*);
+    void setVolume(double);
+    void setPan(double);
+    void setChorusSend(double);
+    void setVariSend(double);
+    void setReverbSend(double);
+    void labelDoubleClicked(int);
+    void volLabelChanged(double);
+    void controlRightClicked(const QPoint&, int);
 
-   public slots:
-      virtual void songChanged(int);
+protected slots:
+    virtual void heartBeat();
 
-   public:
-      MidiStrip(QWidget* parent, MidiTrack*);
-      };
+public slots:
+    virtual void songChanged(int);
+
+public:
+    MidiStrip(QWidget* parent, MidiTrack*);
+};
 
 
 #endif

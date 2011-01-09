@@ -28,48 +28,50 @@ class QDomNode;
 class QRect;
 class QWidget;
 
-namespace AL {
+namespace AL
+{
 
-//---------------------------------------------------------
-//   Xml
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   Xml
+    //---------------------------------------------------------
 
-class Xml : public QTextStream {
-      int level;
+    class Xml : public QTextStream
+    {
+        int level;
 
-   public:
-      Xml();
-      Xml(QIODevice*);
+    public:
+        Xml();
+        Xml(QIODevice*);
 
-      void header();
-      void putLevel();
+        void header();
+        void putLevel();
 
-      void put(const QString&);
+        void put(const QString&);
 
-      void stag(const QString&);
-      void etag(const char*);
+        void stag(const QString&);
+        void etag(const char*);
 
-      void tagE(const QString&);
+        void tagE(const QString&);
 
-      void tag(const char* name, int);
-      void tag(const char* name, unsigned);
-      void tag(const char* name, const double& val);
-      void tag(const char* name, float val);
-      void tag(const char* name, const QString& s);
-      void tag(const char* name, const QColor& color);
-      void tag(const char* name, const QWidget* g);
-      void tag(const char* name, const QRect& r);
+        void tag(const char* name, int);
+        void tag(const char* name, unsigned);
+        void tag(const char* name, const double& val);
+        void tag(const char* name, float val);
+        void tag(const char* name, const QString& s);
+        void tag(const char* name, const QColor& color);
+        void tag(const char* name, const QWidget* g);
+        void tag(const char* name, const QRect& r);
 
-      void dump(int n, const unsigned char*);
-      void writeProperties(const QObject*);
+        void dump(int n, const unsigned char*);
+        void writeProperties(const QObject*);
 
-      static QString xmlString(const QString&);
-      };
+        static QString xmlString(const QString&);
+    };
 
-extern QRect readGeometry(QDomNode);
-extern void readProperties(QObject* o, QDomNode node);
-extern void domError(QDomNode node);
-extern void domNotImplemented(QDomNode node);
+    extern QRect readGeometry(QDomNode);
+    extern void readProperties(QObject* o, QDomNode node);
+    extern void domError(QDomNode node);
+    extern void domNotImplemented(QDomNode node);
 }
 
 #endif

@@ -19,9 +19,9 @@ class QDialog;
 
 class EditGain : public QDialog, public Ui::EditGainBase
 {
-      Q_OBJECT
+    Q_OBJECT
 public:
-    EditGain(QWidget* parent = 0, int initGainValue=100);
+    EditGain(QWidget* parent = 0, int initGainValue = 100);
 
     ~EditGain();
     int getGain();

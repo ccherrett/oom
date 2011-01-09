@@ -26,83 +26,107 @@ extern std::list<QString> temporaryWavFiles; //!< Used for storing all tmp-files
 //   UndoOp
 //---------------------------------------------------------
 
-struct UndoOp {
-      enum UndoType {
-            AddTrack, DeleteTrack, ModifyTrack,
-            AddPart,  DeletePart,  ModifyPart,
-            AddEvent, DeleteEvent, ModifyEvent,
-            AddTempo, DeleteTempo,
-            AddSig,   DeleteSig,
-            SwapTrack,
-            ModifyClip,
-            ModifyMarker,
-			AddTrackView, DeleteTrackView, ModifyTrackView
-            };
-      UndoType type;
+struct UndoOp
+{
 
-      union {
-            struct {
-                  int a;
-                  int b;
-                  int c;
-                  };
-            struct {
-                  Track* oTrack;
-                  Track* nTrack;
-                  int trackno;
-                  };
-            struct {
-                  Part* oPart;
-                  Part* nPart;
-                  };
-            struct {
-                  Part* part;
-                  };
-            struct {
-                  SigEvent* nSignature;
-                  SigEvent* oSignature;
-                  };
-            struct {
-                  int channel;
-                  int ctrl;
-                  int oVal;
-                  int nVal;
-                  };
-            struct {
-                  int startframe; //!< Start frame of changed data
-                  int endframe;   //!< End frame of changed data
-                  const char* filename; //!< The file that is changed
-                  const char* tmpwavfile; //!< The file with the changed data
-                  };
-            struct {
-                  Marker* realMarker;
-                  Marker* copyMarker;
-                };
-            struct {
-                  int d;
-                  int e;
-                  int f;
-                  };
-            };
-      Event oEvent;
-      Event nEvent;
-      bool doCtrls;
-      bool doClones;
-      const char* typeName();
-      void dump();
-      };
+    enum UndoType
+    {
+        AddTrack, DeleteTrack, ModifyTrack,
+        AddPart, DeletePart, ModifyPart,
+        AddEvent, DeleteEvent, ModifyEvent,
+        AddTempo, DeleteTempo,
+        AddSig, DeleteSig,
+        SwapTrack,
+        ModifyClip,
+        ModifyMarker,
+        AddTrackView, DeleteTrackView, ModifyTrackView
+    };
+    UndoType type;
 
-class Undo : public std::list<UndoOp> {
-      void undoOp(UndoOp::UndoType, int data);
-      };
+    union
+    {
+
+        struct
+        {
+            int a;
+            int b;
+            int c;
+        };
+
+        struct
+        {
+            Track* oTrack;
+            Track* nTrack;
+            int trackno;
+        };
+
+        struct
+        {
+            Part* oPart;
+            Part* nPart;
+        };
+
+        struct
+        {
+            Part* part;
+        };
+
+        struct
+        {
+            SigEvent* nSignature;
+            SigEvent* oSignature;
+        };
+
+        struct
+        {
+            int channel;
+            int ctrl;
+            int oVal;
+            int nVal;
+        };
+
+        struct
+        {
+            int startframe; //!< Start frame of changed data
+            int endframe; //!< End frame of changed data
+            const char* filename; //!< The file that is changed
+            const char* tmpwavfile; //!< The file with the changed data
+        };
+
+        struct
+        {
+            Marker* realMarker;
+            Marker* copyMarker;
+        };
+
+        struct
+        {
+            int d;
+            int e;
+            int f;
+        };
+    };
+    Event oEvent;
+    Event nEvent;
+    bool doCtrls;
+    bool doClones;
+    const char* typeName();
+    void dump();
+};
+
+class Undo : public std::list<UndoOp>
+{
+    void undoOp(UndoOp::UndoType, int data);
+};
 
 typedef Undo::iterator iUndoOp;
 typedef Undo::reverse_iterator riUndoOp;
 
-class UndoList : public std::list<Undo> {
-   public:
-      void clearDelete();
-      };
+class UndoList : public std::list<Undo>
+{
+public:
+    void clearDelete();
+};
 
 typedef UndoList::iterator iUndo;
 

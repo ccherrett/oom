@@ -20,8 +20,8 @@
 //   AlsaTimer
 //---------------------------------------------------------
 
-class AlsaTimer : public Timer{
-    
+class AlsaTimer : public Timer
+{
     snd_timer_t *handle;
     snd_timer_id_t *id;
     snd_timer_info_t *info;
@@ -32,21 +32,24 @@ class AlsaTimer : public Timer{
     unsigned int ticks;
     bool findBest;
 
-    public:
-       AlsaTimer();
-       virtual ~AlsaTimer();
-       
-       virtual signed int initTimer();
-       virtual unsigned int setTimerResolution(unsigned int resolution);
-       virtual unsigned int getTimerResolution();
-       virtual unsigned int setTimerFreq(unsigned int freq);
-       virtual unsigned int getTimerFreq();
+public:
+    AlsaTimer();
+    virtual ~AlsaTimer();
 
-       virtual bool startTimer();
-       virtual bool stopTimer();
-       virtual unsigned int getTimerTicks(bool printTicks=false);
-       
-       void setFindBestTimer(bool b) { findBest = b; }
+    virtual signed int initTimer();
+    virtual unsigned int setTimerResolution(unsigned int resolution);
+    virtual unsigned int getTimerResolution();
+    virtual unsigned int setTimerFreq(unsigned int freq);
+    virtual unsigned int getTimerFreq();
+
+    virtual bool startTimer();
+    virtual bool stopTimer();
+    virtual unsigned int getTimerTicks(bool printTicks = false);
+
+    void setFindBestTimer(bool b)
+    {
+        findBest = b;
+    }
 };
 
 #endif //__ALSATIMER_H__

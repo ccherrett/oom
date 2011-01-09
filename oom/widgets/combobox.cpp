@@ -14,67 +14,69 @@
 //---------------------------------------------------------
 
 ComboBox::ComboBox(QWidget* parent, const char* name)
-   : QLabel(parent)
-      {
-      setObjectName(name);
-      _currentItem = 0;
-      _id = -1;
-      list = new QMenu(0);
-      connect(list, SIGNAL(triggered(QAction*)), SLOT(activatedIntern(QAction*)));
-      setFrameStyle(QFrame::Panel | QFrame::Raised);
-      setLineWidth(2);
-      }
+: QLabel(parent)
+{
+	setObjectName(name);
+	_currentItem = 0;
+	_id = -1;
+	list = new QMenu(0);
+	connect(list, SIGNAL(triggered(QAction*)), SLOT(activatedIntern(QAction*)));
+	setFrameStyle(QFrame::Panel | QFrame::Raised);
+	setLineWidth(2);
+}
 
 ComboBox::~ComboBox()
-      {
-      delete list;
-      }
+{
+	delete list;
+}
 
 //---------------------------------------------------------
 //   mousePressEvent
 //---------------------------------------------------------
 
 void ComboBox::mousePressEvent(QMouseEvent*)
-      {
-      list->exec(QCursor::pos());
-      }
+{
+	list->exec(QCursor::pos());
+}
 
 //---------------------------------------------------------
 //   activated
 //---------------------------------------------------------
 
 void ComboBox::activatedIntern(QAction* act)
-      {
-      _currentItem = act->data().toInt();
-      emit activated(_currentItem, _id);
-      setText(act->text());
-      }
+{
+	_currentItem = act->data().toInt();
+	emit activated(_currentItem, _id);
+	setText(act->text());
+}
 
 //---------------------------------------------------------
 //   setCurrentItem
 //---------------------------------------------------------
 
 void ComboBox::setCurrentItem(int i)
-      {
-      _currentItem = i;
-      // ORCAN - CHECK
-      QList<QAction *> actions = list->actions();
-      for (QList<QAction *>::iterator it = actions.begin(); it != actions.end(); ++it) {
-            QAction* act = *it;
-            if (act->data().toInt() == i) {
-                  setText(act->text());
-                  break;
-                  }
-            }
-      }
+{
+	_currentItem = i;
+	// ORCAN - CHECK
+	QList<QAction *> actions = list->actions();
+	for (QList<QAction *>::iterator it = actions.begin(); it != actions.end(); ++it)
+	{
+		QAction* act = *it;
+		if (act->data().toInt() == i)
+		{
+			setText(act->text());
+			break;
+		}
+	}
+}
 
 //---------------------------------------------------------
 //   insertItem
 //---------------------------------------------------------
 
 void ComboBox::insertItem(const QString& s, int id)
-      {
+{
 	QAction *act = list->addAction(s);
 	act->setData(id);
-      }
+}
 

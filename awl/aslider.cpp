@@ -26,219 +26,237 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   AbstractSlider
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   AbstractSlider
+	//---------------------------------------------------------
 
-AbstractSlider::AbstractSlider(QWidget* parent)
-   : QWidget(parent), _scaleColor(Qt::black), _scaleValueColor(Qt::blue)
-      {
-      _id         = 0;
-      _value      = 0.5;
-      _minValue   = 0.0;
-      _maxValue   = 1.0;
-      _lineStep   = 0.1;
-      _pageStep   = 0.2;
-      _center     = false;
-      _invert     = false;
-      _scaleWidth = 4;
-      _log        = false;
-      _integer    = false;
-      }
+	AbstractSlider::AbstractSlider(QWidget* parent)
+	: QWidget(parent), _scaleColor(Qt::black), _scaleValueColor(Qt::blue)
+	{
+		_id = 0;
+		_value = 0.5;
+		_minValue = 0.0;
+		_maxValue = 1.0;
+		_lineStep = 0.1;
+		_pageStep = 0.2;
+		_center = false;
+		_invert = false;
+		_scaleWidth = 4;
+		_log = false;
+		_integer = false;
+	}
 
-//---------------------------------------------------------
-//   setEnabled
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setEnabled
+	//---------------------------------------------------------
 
-void AbstractSlider::setEnabled(bool val)
-      {
-      QWidget::setEnabled(val);
-      update();
-      }
+	void AbstractSlider::setEnabled(bool val)
+	{
+		QWidget::setEnabled(val);
+		update();
+	}
 
-//---------------------------------------------------------
-//   setCenter
-//!   If the center flag is set, a notch is drawn to
-//!   show the center position.
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setCenter
+	//!   If the center flag is set, a notch is drawn to
+	//!   show the center position.
+	//---------------------------------------------------------
 
-void AbstractSlider::setCenter(bool val)
-      {
-      if (val != _center) {
-            _center = val;
-            update();
-            }
-      }
+	void AbstractSlider::setCenter(bool val)
+	{
+		if (val != _center)
+		{
+			_center = val;
+			update();
+		}
+	}
 
-//!--------------------------------------------------------
-//   setScaleWidth
-//---------------------------------------------------------
+	//!--------------------------------------------------------
+	//   setScaleWidth
+	//---------------------------------------------------------
 
-void AbstractSlider::setScaleWidth(int val)
-      {
-      if (val != _scaleWidth) {
-            _scaleWidth = val;
-            update();
-            }
-      }
+	void AbstractSlider::setScaleWidth(int val)
+	{
+		if (val != _scaleWidth)
+		{
+			_scaleWidth = val;
+			update();
+		}
+	}
 
-//---------------------------------------------------------
-//   setScaleColor
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setScaleColor
+	//---------------------------------------------------------
 
-void AbstractSlider::setScaleColor(const QColor& c)
-      {
-      if (c != _scaleColor) {
-            _scaleColor = c;
-            update();
-            }
-      }
+	void AbstractSlider::setScaleColor(const QColor& c)
+	{
+		if (c != _scaleColor)
+		{
+			_scaleColor = c;
+			update();
+		}
+	}
 
-//---------------------------------------------------------
-//   setScaleValueColor
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setScaleValueColor
+	//---------------------------------------------------------
 
-void AbstractSlider::setScaleValueColor(const QColor& c)
-      {
-      if (c != _scaleValueColor) {
-            _scaleValueColor = c;
-            update();
-            }
-      }
+	void AbstractSlider::setScaleValueColor(const QColor& c)
+	{
+		if (c != _scaleValueColor)
+		{
+			_scaleValueColor = c;
+			update();
+		}
+	}
 
-//---------------------------------------------------------
-//   wheelEvent
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   wheelEvent
+	//---------------------------------------------------------
 
-void AbstractSlider::wheelEvent(QWheelEvent* ev)
-      {
-      double div = 120.0;
-      if (ev->modifiers() & Qt::ShiftModifier)
-            _value += (ev->delta() * pageStep()) / div;
-      else
-            _value += (ev->delta() * lineStep()) / div;
-      if (_value < _minValue)
-            _value = _minValue;
-      else if (_value > _maxValue)
-            _value = _maxValue;
-      valueChange();
-      update();
-      }
+	void AbstractSlider::wheelEvent(QWheelEvent* ev)
+	{
+		double div = 120.0;
+		if (ev->modifiers() & Qt::ShiftModifier)
+			_value += (ev->delta() * pageStep()) / div;
+		else
+			_value += (ev->delta() * lineStep()) / div;
+		if (_value < _minValue)
+			_value = _minValue;
+		else if (_value > _maxValue)
+			_value = _maxValue;
+		valueChange();
+		update();
+	}
 
-//---------------------------------------------------------
-//   keyPressEvent
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   keyPressEvent
+	//---------------------------------------------------------
 
-void AbstractSlider::keyPressEvent(QKeyEvent* ev)
-      {
-      double oval = _value;
+	void AbstractSlider::keyPressEvent(QKeyEvent* ev)
+	{
+		double oval = _value;
 
-      switch (ev->key()) {
-            case Qt::Key_Home:    _value = _minValue; break;
-            case Qt::Key_End:     _value = _maxValue; break;
-            case Qt::Key_Up:
-            case Qt::Key_Left:    _value += lineStep(); break;
-            case Qt::Key_Down:
-            case Qt::Key_Right:    _value -= lineStep(); break;
-            case Qt::Key_PageDown: _value -= pageStep(); break;
-            case Qt::Key_PageUp:   _value += pageStep(); break;
-            default:
-                  break;
-            }
-      if (_value < _minValue)
-            _value = _minValue;
-      else if (_value > _maxValue)
-            _value = _maxValue;
+		switch (ev->key())
+		{
+			case Qt::Key_Home: _value = _minValue;
+				break;
+			case Qt::Key_End: _value = _maxValue;
+				break;
+			case Qt::Key_Up:
+			case Qt::Key_Left: _value += lineStep();
+				break;
+			case Qt::Key_Down:
+			case Qt::Key_Right: _value -= lineStep();
+				break;
+			case Qt::Key_PageDown: _value -= pageStep();
+				break;
+			case Qt::Key_PageUp: _value += pageStep();
+				break;
+			default:
+				break;
+		}
+		if (_value < _minValue)
+			_value = _minValue;
+		else if (_value > _maxValue)
+			_value = _maxValue;
 
-      if (oval != _value) {
-            if (_integer && (rint(oval) == rint(_value)))
-                  return;
-            valueChange();
-            update();
-            }
-      }
+		if (oval != _value)
+		{
+			if (_integer && (rint(oval) == rint(_value)))
+				return;
+			valueChange();
+			update();
+		}
+	}
 
-//---------------------------------------------------------
-//   setValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setValue
+	//---------------------------------------------------------
 
-void AbstractSlider::setValue(double val)
-      {
-      if (_log) {
-            if (val == 0.0f)
-                  _value = _minValue;
-            else {
-                  _value = fast_log10(val) * 20.0f;
-       		if (_value < _minValue)
-            		_value = _minValue;
-                 	}
-            }
-      else if (_integer)
-            _value = rint(val);
-      else
-            _value = val;
-      update();
-      }
+	void AbstractSlider::setValue(double val)
+	{
+		if (_log)
+		{
+			if (val == 0.0f)
+				_value = _minValue;
+			else
+			{
+				_value = fast_log10(val) * 20.0f;
+				if (_value < _minValue)
+					_value = _minValue;
+			}
+		}
+		else if (_integer)
+			_value = rint(val);
+		else
+			_value = val;
+		update();
+	}
 
-//---------------------------------------------------------
-//   valueChange
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   valueChange
+	//---------------------------------------------------------
 
-void AbstractSlider::valueChange()
-      {
-      emit valueChanged(value(), _id);
-      }
+	void AbstractSlider::valueChange()
+	{
+		emit valueChanged(value(), _id);
+	}
 
-//---------------------------------------------------------
-//   value
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   value
+	//---------------------------------------------------------
 
-double AbstractSlider::value() const
-      {
-      if (_log)
-            return pow(10.0, _value*0.05f);
-      if (_integer)
-            return rint(_value);
-      return _value;
-      }
+	double AbstractSlider::value() const
+	{
+		if (_log)
+			return pow(10.0, _value * 0.05f);
+		if (_integer)
+			return rint(_value);
+		return _value;
+	}
 
-//---------------------------------------------------------
-//   minLogValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   minLogValue
+	//---------------------------------------------------------
 
-//double AbstractSlider::minValue() const {
-//  return _log ? pow(10.0, _minValue*0.05f) : _minValue;
-//}
+	//double AbstractSlider::minValue() const {
+	//  return _log ? pow(10.0, _minValue*0.05f) : _minValue;
+	//}
 
-//---------------------------------------------------------
-//   setMinLogValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setMinLogValue
+	//---------------------------------------------------------
 
-void AbstractSlider::setMinLogValue(double val) {
-  if (_log) {
-    if (val == 0.0f) _minValue = -100;
-    else _minValue = fast_log10(val) * 20.0f;
-  }
-  else _minValue = val;
-}
+	void AbstractSlider::setMinLogValue(double val)
+	{
+		if (_log)
+		{
+			if (val == 0.0f) _minValue = -100;
+			else _minValue = fast_log10(val) * 20.0f;
+		}
+		else _minValue = val;
+	}
 
-//---------------------------------------------------------
-//   maxLogValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   maxLogValue
+	//---------------------------------------------------------
 
-//double AbstractSlider::maxValue() const {
-//  return _log ? pow(10.0, _maxValue*0.05f) : _maxValue;
-//}
+	//double AbstractSlider::maxValue() const {
+	//  return _log ? pow(10.0, _maxValue*0.05f) : _maxValue;
+	//}
 
-//---------------------------------------------------------
-//   setMaxLogValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setMaxLogValue
+	//---------------------------------------------------------
 
-void AbstractSlider::setMaxLogValue(double val) {
-  if (_log) {
-    _maxValue = fast_log10(val) * 20.0f;
-  }
-  else _maxValue = val;
-}
+	void AbstractSlider::setMaxLogValue(double val)
+	{
+		if (_log)
+		{
+			_maxValue = fast_log10(val) * 20.0f;
+		}
+		else _maxValue = val;
+	}
 
 }

@@ -23,30 +23,36 @@
 
 #include "slider.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   Drawbar
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   Drawbar
+    //---------------------------------------------------------
 
-class Drawbar : public Slider {
-      Q_OBJECT
+    class Drawbar : public Slider
+    {
+        Q_OBJECT
 
-      Q_PROPERTY(QColor sliderColor READ sliderColor WRITE setSliderColor)
+        Q_PROPERTY(QColor sliderColor READ sliderColor WRITE setSliderColor)
 
-      virtual void paintEvent(QPaintEvent*);
+        virtual void paintEvent(QPaintEvent*);
 
-   protected:
-      QColor _sliderColor;
+    protected:
+        QColor _sliderColor;
 
-   public:
-      Drawbar(QWidget* parent = 0);
-      ~Drawbar();
+    public:
+        Drawbar(QWidget* parent = 0);
+        ~Drawbar();
 
-      //! return current slider color
-      QColor sliderColor() const      { return _sliderColor; }
-      void setSliderColor(const QColor&);
-      };
+        //! return current slider color
+
+        QColor sliderColor() const
+        {
+            return _sliderColor;
+        }
+        void setSliderColor(const QColor&);
+    };
 
 }
 

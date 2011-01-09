@@ -16,22 +16,29 @@
 //    on mousePressEvent
 //---------------------------------------------------------
 
-class MLabel : public QLabel {
+class MLabel : public QLabel
+{
+    Q_OBJECT
 
-      Q_OBJECT
+protected:
+    virtual void mousePressEvent(QMouseEvent*);
 
-   protected:
-      virtual void mousePressEvent(QMouseEvent*);
+signals:
+    void mousePressed();
 
-   signals:
-      void mousePressed();
+public:
 
-   public:
-      MLabel(const QString& txt, QWidget* parent, const char* name = 0)
-         : QLabel(txt, parent) {setObjectName(name);};
+    MLabel(const QString& txt, QWidget* parent, const char* name = 0)
+    : QLabel(txt, parent)
+    {
+        setObjectName(name);
+    };
 
-      MLabel(QWidget* parent, const char* name = 0)
-         : QLabel(parent) {setObjectName(name);};
-      };
+    MLabel(QWidget* parent, const char* name = 0)
+    : QLabel(parent)
+    {
+        setObjectName(name);
+    };
+};
 #endif
 

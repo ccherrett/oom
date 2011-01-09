@@ -17,28 +17,29 @@
 //   GlobalSettingsConfig
 //---------------------------------------------------------
 
-class GlobalSettingsConfig : public QDialog, public Ui::GlobalSettingsDialogBase {
-      Q_OBJECT
+class GlobalSettingsConfig : public QDialog, public Ui::GlobalSettingsDialogBase
+{
+    Q_OBJECT
 
-   private slots:
-      void updateSettings();
-      void apply();
-      void ok();
-      void cancel();
-      void mixerCurrent();
-      void mixer2Current();
-      void bigtimeCurrent();
-      void arrangerCurrent();
-      void transportCurrent();
-      void selectInstrumentsPath();
-      void defaultInstrumentsPath();
+private slots:
+    void updateSettings();
+    void apply();
+    void ok();
+    void cancel();
+    void mixerCurrent();
+    void mixer2Current();
+    void bigtimeCurrent();
+    void arrangerCurrent();
+    void transportCurrent();
+    void selectInstrumentsPath();
+    void defaultInstrumentsPath();
 
-    protected:
-      void showEvent(QShowEvent*);
-      QButtonGroup *startSongGroup;
-      
-   public:
-      GlobalSettingsConfig(QWidget* parent=0);
-      };
+protected:
+    void showEvent(QShowEvent*);
+    QButtonGroup *startSongGroup;
+
+public:
+    GlobalSettingsConfig(QWidget* parent = 0);
+};
 
 #endif

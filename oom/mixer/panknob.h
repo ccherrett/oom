@@ -17,16 +17,17 @@ class AudioTrack;
 //   PanKnob
 //---------------------------------------------------------
 
-class PanKnob : public Knob {
-      Q_OBJECT
-      AudioTrack* src;
+class PanKnob : public Knob
+{
+    Q_OBJECT
+    AudioTrack* src;
 
-   private slots:
-      void valueChanged(double);
+private slots:
+    void valueChanged(double);
 
-   public:
-      PanKnob(QWidget* parent, AudioTrack*);
-      };
+public:
+    PanKnob(QWidget* parent, AudioTrack*);
+};
 
 #endif
 

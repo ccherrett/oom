@@ -25,63 +25,65 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   VolSlider
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   VolSlider
+	//---------------------------------------------------------
 
-VolSlider::VolSlider(QWidget* parent)
-   : Slider(parent)
-      {
-      setLog(true);
-      setRange(-60.0f, 10.0f);
-      setScaleWidth(7);
-      setLineStep(.8f);
-      setPageStep(3.0f);
-      }
+	VolSlider::VolSlider(QWidget* parent)
+	: Slider(parent)
+	{
+		setLog(true);
+		setRange(-60.0f, 10.0f);
+		setScaleWidth(7);
+		setLineStep(.8f);
+		setPageStep(3.0f);
+	}
 
-//---------------------------------------------------------
-//   mouseDoubleClickEvent
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   mouseDoubleClickEvent
+	//---------------------------------------------------------
 
-void VolSlider::mouseDoubleClickEvent(QMouseEvent* ev)
-      {
-      if (ev->button() == Qt::RightButton)
-      	_value = 0.0;
-      else
-      	_value = _minValue;
-      valueChange();
-      update();
-      }
+	void VolSlider::mouseDoubleClickEvent(QMouseEvent* ev)
+	{
+		if (ev->button() == Qt::RightButton)
+			_value = 0.0;
+		else
+			_value = _minValue;
+		valueChange();
+		update();
+	}
 
 
-//---------------------------------------------------------
-//   setValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setValue
+	//---------------------------------------------------------
 
-void VolSlider::setValue(double val)
-      {
-      if (_log) {
-            if (val == 0.0f)
-                  _value = _minValue;
-            else {
-                  _value = fast_log10(val) * 20.0f;
-       		if (_value < _minValue)
-            		_value = _minValue;
-                 	}
-            }
-      else
-            _value = val;
-      update();
-      }
+	void VolSlider::setValue(double val)
+	{
+		if (_log)
+		{
+			if (val == 0.0f)
+				_value = _minValue;
+			else
+			{
+				_value = fast_log10(val) * 20.0f;
+				if (_value < _minValue)
+					_value = _minValue;
+			}
+		}
+		else
+			_value = val;
+		update();
+	}
 
-//---------------------------------------------------------
-//   value
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   value
+	//---------------------------------------------------------
 
-double VolSlider::value() const
-      {
-      return _log ? (_value <= _minValue) ? 0.0f : pow(10.0, _value*0.05f)
-                  : _value;
-      }
+	double VolSlider::value() const
+	{
+		return _log ? (_value <= _minValue) ? 0.0f : pow(10.0, _value * 0.05f)
+				: _value;
+	}
 
 }

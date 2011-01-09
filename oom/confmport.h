@@ -25,27 +25,28 @@ class Xml;
 //    Midi Port Config
 //---------------------------------------------------------
 
-class MPConfig : public QDialog, Ui::SynthConfigBase {
-      QMenu* instrPopup;
-      //QMenu* popup;
-      int _showAliases; // -1: None. 0: First aliases. 1: Second aliases etc.
-      void setWhatsThis(QTableWidgetItem *item, int col);
-      void setToolTip(QTableWidgetItem *item, int col);
-      void addItem(int row, int col, QTableWidgetItem *item, QTableWidget *table);
+class MPConfig : public QDialog, Ui::SynthConfigBase
+{
+    QMenu* instrPopup;
+    //QMenu* popup;
+    int _showAliases; // -1: None. 0: First aliases. 1: Second aliases etc.
+    void setWhatsThis(QTableWidgetItem *item, int col);
+    void setToolTip(QTableWidgetItem *item, int col);
+    void addItem(int row, int col, QTableWidgetItem *item, QTableWidget *table);
 
-      Q_OBJECT
+    Q_OBJECT
 
-   private slots:
-      void rbClicked(QTableWidgetItem*);
-      void mdevViewItemRenamed(QTableWidgetItem*);
-      void songChanged(int);
-      void selectionChanged();
-      void addInstanceClicked();
-      void removeInstanceClicked();
+private slots:
+    void rbClicked(QTableWidgetItem*);
+    void mdevViewItemRenamed(QTableWidgetItem*);
+    void songChanged(int);
+    void selectionChanged();
+    void addInstanceClicked();
+    void removeInstanceClicked();
 
-   public:
-      MPConfig(QWidget* parent=0);
-      ~MPConfig();
-      };
+public:
+    MPConfig(QWidget* parent = 0);
+    ~MPConfig();
+};
 
 #endif

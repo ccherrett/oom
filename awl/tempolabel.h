@@ -23,27 +23,29 @@
 
 #include <QLabel>
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   TempoLabel
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   TempoLabel
+    //---------------------------------------------------------
 
-class TempoLabel : public QLabel {
-      double _value;
+    class TempoLabel : public QLabel
+    {
+        double _value;
 
-      Q_OBJECT
+        Q_OBJECT
 
-   protected:
-      QSize sizeHint() const;
+    protected:
+        QSize sizeHint() const;
 
-   public slots:
-      void setValue(int);
-      void setValue(double);
+    public slots:
+        void setValue(int);
+        void setValue(double);
 
-   public:
-      TempoLabel(QWidget*);
-      };
+    public:
+        TempoLabel(QWidget*);
+    };
 }
 
 #endif

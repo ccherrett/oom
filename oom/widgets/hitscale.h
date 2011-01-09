@@ -17,30 +17,31 @@ class MidiEditor;
 //    scale for midi track
 //---------------------------------------------------------
 
-class HitScale : public View {
-      Q_OBJECT
-      int* raster;
-      unsigned pos[3];
-      int button;
+class HitScale : public View
+{
+    Q_OBJECT
+    int* raster;
+    unsigned pos[3];
+    int button;
 
-   signals:
-//      void posChanged(int, int);
+signals:
+    //      void posChanged(int, int);
 
-   protected:
-      virtual void pdraw(QPainter&, const QRect&);
-      virtual void viewMousePressEvent(QMouseEvent* event);
-      virtual void viewMouseMoveEvent(QMouseEvent* event);
-      virtual void viewMouseReleaseEvent(QMouseEvent* event);
-      virtual void leaveEvent(QEvent*e);
+protected:
+    virtual void pdraw(QPainter&, const QRect&);
+    virtual void viewMousePressEvent(QMouseEvent* event);
+    virtual void viewMouseMoveEvent(QMouseEvent* event);
+    virtual void viewMouseReleaseEvent(QMouseEvent* event);
+    virtual void leaveEvent(QEvent*e);
 
-   signals:
-      void timeChanged(int);
+signals:
+    void timeChanged(int);
 
-   public slots:
-      void setPos(int, unsigned, bool);
+public slots:
+    void setPos(int, unsigned, bool);
 
-   public:
-      HitScale(int* raster, QWidget* parent, int xscale);
-      };
+public:
+    HitScale(int* raster, QWidget* parent, int xscale);
+};
 #endif
 

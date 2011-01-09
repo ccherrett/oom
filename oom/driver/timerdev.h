@@ -20,22 +20,28 @@
 //   AlsaTimer
 //---------------------------------------------------------
 
-class Timer {
-    
-     public:
-       Timer() {};
-       virtual ~Timer() {};
-       
-       virtual signed int initTimer() = 0;
-       virtual unsigned int setTimerResolution(unsigned int resolution) = 0;
-       virtual unsigned int getTimerResolution() = 0;
-       virtual unsigned int setTimerFreq(unsigned int freq) = 0;
-       virtual unsigned int getTimerFreq() = 0;
-       
-       virtual bool startTimer() = 0;
-       virtual bool stopTimer() = 0;
-       virtual unsigned int getTimerTicks(bool printTicks = false) = 0;
-        
+class Timer
+{
+public:
+
+    Timer()
+    {
+    };
+
+    virtual ~Timer()
+    {
+    };
+
+    virtual signed int initTimer() = 0;
+    virtual unsigned int setTimerResolution(unsigned int resolution) = 0;
+    virtual unsigned int getTimerResolution() = 0;
+    virtual unsigned int setTimerFreq(unsigned int freq) = 0;
+    virtual unsigned int getTimerFreq() = 0;
+
+    virtual bool startTimer() = 0;
+    virtual bool stopTimer() = 0;
+    virtual unsigned int getTimerTicks(bool printTicks = false) = 0;
+
 };
 
 #endif //__ALSATIMER_H__

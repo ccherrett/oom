@@ -67,26 +67,26 @@ static const double step_eps = 1.0e-3;
 static const double border_eps = 1.0e-10;
 
 static bool limRange(double &val, double v1, double v2, double eps_rel = 0.0,
-   double eps_abs = 0.0)
-      {
+		double eps_abs = 0.0)
+{
 
-    bool rv = TRUE;
-    double vmin = qwtMin(v1, v2);
-    double vmax = qwtMax(v1, v2);
-    double delta_min = qwtMax(qwtAbs(eps_rel * vmin), qwtAbs(eps_abs));
-    double delta_max = qwtMax(qwtAbs(eps_rel * vmax), qwtAbs(eps_abs));
+	bool rv = TRUE;
+	double vmin = qwtMin(v1, v2);
+	double vmax = qwtMax(v1, v2);
+	double delta_min = qwtMax(qwtAbs(eps_rel * vmin), qwtAbs(eps_abs));
+	double delta_max = qwtMax(qwtAbs(eps_rel * vmax), qwtAbs(eps_abs));
 
-    if (val < vmin)
-    {
-	if (val < vmin - delta_min) rv = FALSE;
-	val = vmin;
-    }
-    else if (val > vmax)
-    {
-	if (val > vmax + delta_max) rv = FALSE;
-	val = vmax;
-    }
-    return rv;
+	if (val < vmin)
+	{
+		if (val < vmin - delta_min) rv = FALSE;
+		val = vmin;
+	}
+	else if (val > vmax)
+	{
+		if (val > vmax + delta_max) rv = FALSE;
+		val = vmax;
+	}
+	return rv;
 
 }
 
@@ -99,12 +99,12 @@ static bool limRange(double &val, double v1, double v2, double eps_rel = 0.0,
 //------------------------------------------------------------
 
 ScaleDiv::ScaleDiv()
-      {
-      d_lBound = 0.0;
-      d_hBound = 0.0;
-      d_majStep = 0.0;
-      d_log = FALSE;
-      }
+{
+	d_lBound = 0.0;
+	d_hBound = 0.0;
+	d_majStep = 0.0;
+	d_log = FALSE;
+}
 
 //------------------------------------------------------------
 //.F	ScaleDiv::~ScaleDiv
@@ -115,8 +115,8 @@ ScaleDiv::ScaleDiv()
 //------------------------------------------------------------
 
 ScaleDiv::~ScaleDiv()
-      {
-      }
+{
+}
 
 //------------------------------------------------------------
 //.F	ScaleDiv::ScaleDiv
@@ -130,9 +130,9 @@ ScaleDiv::~ScaleDiv()
 //------------------------------------------------------------
 
 ScaleDiv::ScaleDiv(const ScaleDiv &s)
-      {
-      copy(s);
-      }
+{
+	copy(s);
+}
 
 //------------------------------------------------------------
 //.F	ScaleDiv::operator=
@@ -146,10 +146,10 @@ ScaleDiv::ScaleDiv(const ScaleDiv &s)
 //------------------------------------------------------------
 
 ScaleDiv& ScaleDiv::operator=(const ScaleDiv &s)
-      {
-      copy(s);
-      return *this;
-      }
+{
+	copy(s);
+	return *this;
+}
 
 //------------------------------------------------------------
 //.F	ScaleDiv::copy
@@ -163,14 +163,14 @@ ScaleDiv& ScaleDiv::operator=(const ScaleDiv &s)
 //------------------------------------------------------------
 
 void ScaleDiv::copy(const ScaleDiv &s)
-      {
-      d_lBound = s.d_lBound;
-      d_hBound = s.d_hBound;
-      d_log = s.d_log;
-      d_majStep = s.d_majStep;
-      d_minMarks = s.d_minMarks;
-      d_majMarks = s.d_majMarks;
-      }
+{
+	d_lBound = s.d_lBound;
+	d_hBound = s.d_hBound;
+	d_log = s.d_log;
+	d_majStep = s.d_majStep;
+	d_minMarks = s.d_minMarks;
+	d_majMarks = s.d_majMarks;
+}
 
 //------------------------------------------------------------
 //.F	ScaleDiv::rebuild
@@ -215,29 +215,29 @@ void ScaleDiv::copy(const ScaleDiv &s)
 //------------------------------------------------------------
 
 bool ScaleDiv::rebuild(double x1, double x2, int maxMajSteps, int maxMinSteps,
-   bool log, double step, bool ascend)
+		bool log, double step, bool ascend)
 {
 
-  int rv;
+	int rv;
 
-  d_lBound = qwtMin(x1, x2);
-  d_hBound = qwtMax(x1, x2);
-  d_log = log;
+	d_lBound = qwtMin(x1, x2);
+	d_hBound = qwtMax(x1, x2);
+	d_log = log;
 
-  if (d_log)
-      rv = buildLogDiv(maxMajSteps,maxMinSteps,step);
-  else
-      rv = buildLinDiv(maxMajSteps, maxMinSteps, step);
+	if (d_log)
+		rv = buildLogDiv(maxMajSteps, maxMinSteps, step);
+	else
+		rv = buildLinDiv(maxMajSteps, maxMinSteps, step);
 
-  if ((!ascend) && (x2 < x1))
-  {
-      d_lBound = x1;
-      d_hBound = x2;
-      qwtTwistArray(d_majMarks.data(), d_majMarks.size());
-      qwtTwistArray(d_minMarks.data(), d_minMarks.size());
-  }
+	if ((!ascend) && (x2 < x1))
+	{
+		d_lBound = x1;
+		d_hBound = x2;
+		qwtTwistArray(d_majMarks.data(), d_majMarks.size());
+		qwtTwistArray(d_minMarks.data(), d_minMarks.size());
+	}
 
-  return rv;
+	return rv;
 
 }
 
@@ -270,101 +270,101 @@ bool ScaleDiv::rebuild(double x1, double x2, int maxMajSteps, int maxMinSteps,
 //------------------------------------------------------------
 
 bool ScaleDiv::buildLinDiv(int maxMajSteps, int maxMinSteps, double step)
-      {
+{
 
-    int nMaj, nMin, minSize, i0,i,k;
-    double val, mval;
-    double firstTick, lastTick;
-    double minStep;
-    QVector<double> buffer;
-    bool rv = TRUE;
+	int nMaj, nMin, minSize, i0, i, k;
+	double val, mval;
+	double firstTick, lastTick;
+	double minStep;
+	QVector<double> buffer;
+	bool rv = TRUE;
 
-    // parameter range check
-    maxMajSteps = qwtMax(1, maxMajSteps);
-    maxMinSteps = qwtMax(0, maxMinSteps);
-    step = qwtAbs(step);
+	// parameter range check
+	maxMajSteps = qwtMax(1, maxMajSteps);
+	maxMinSteps = qwtMax(0, maxMinSteps);
+	step = qwtAbs(step);
 
-    // reset vectors
-    d_minMarks.resize(0);
-    d_majMarks.resize(0);
+	// reset vectors
+	d_minMarks.resize(0);
+	d_majMarks.resize(0);
 
-    if (d_lBound == d_hBound) return TRUE;
+	if (d_lBound == d_hBound) return TRUE;
 
-    //
-    // Set up major divisions
-    //
-    if (step == 0.0)
-       d_majStep = qwtCeil125(qwtAbs(d_hBound - d_lBound) * 0.999999
-			      / double(maxMajSteps));
-    else
-       d_majStep = step;
+	//
+	// Set up major divisions
+	//
+	if (step == 0.0)
+		d_majStep = qwtCeil125(qwtAbs(d_hBound - d_lBound) * 0.999999
+			/ double(maxMajSteps));
+	else
+		d_majStep = step;
 
-    if (d_majStep == 0.0) return TRUE;
+	if (d_majStep == 0.0) return TRUE;
 
-    firstTick = ceil( (d_lBound - step_eps * d_majStep) / d_majStep) * d_majStep;
-    lastTick = floor( (d_hBound + step_eps * d_majStep) / d_majStep) * d_majStep;
+	firstTick = ceil((d_lBound - step_eps * d_majStep) / d_majStep) * d_majStep;
+	lastTick = floor((d_hBound + step_eps * d_majStep) / d_majStep) * d_majStep;
 
-    nMaj = qwtMin(10000, int(rint((lastTick - firstTick) / d_majStep)) + 1);
-    
-    d_majMarks.resize(nMaj);
-    qwtLinSpace(d_majMarks.data(), d_majMarks.size(), firstTick, lastTick);
+	nMaj = qwtMin(10000, int(rint((lastTick - firstTick) / d_majStep)) + 1);
 
-    //
-    // Set up minor divisions
-    //
-    if (maxMinSteps < 1) // no minor divs
-       return TRUE;
+	d_majMarks.resize(nMaj);
+	qwtLinSpace(d_majMarks.data(), d_majMarks.size(), firstTick, lastTick);
 
-    minStep = qwtCeil125( d_majStep  /  double(maxMinSteps) );
+	//
+	// Set up minor divisions
+	//
+	if (maxMinSteps < 1) // no minor divs
+		return TRUE;
 
-    if (minStep == 0.0) return TRUE;
+	minStep = qwtCeil125(d_majStep / double(maxMinSteps));
 
-    nMin = qwtAbs(int(rint(d_majStep / minStep))) - 1; // # minor steps per interval
+	if (minStep == 0.0) return TRUE;
 
-    // Do the minor steps fit into the interval?
-    if ( qwtAbs(double(nMin +  1) * minStep - d_majStep) >  step_eps * d_majStep)
-    {
-	nMin = 1;
-	minStep = d_majStep * 0.5;
-    }
+	nMin = qwtAbs(int(rint(d_majStep / minStep))) - 1; // # minor steps per interval
 
-    // Are there minor ticks below the first major tick?
-    if (d_majMarks[0] > d_lBound )
-       i0 = -1;	
-    else
-       i0 = 0;
-
-    // resize buffer to the maximum possible number of minor ticks
-    buffer.resize(nMin * (nMaj + 1));
-
-    // calculate minor ticks
-    if (rv)
-    {
-	minSize = 0;
-	for (i = i0; i < (int)d_majMarks.size(); i++)
+	// Do the minor steps fit into the interval?
+	if (qwtAbs(double(nMin + 1) * minStep - d_majStep) > step_eps * d_majStep)
 	{
-	    if (i >= 0)
-	       val = d_majMarks[i];
-	    else
-	       val = d_majMarks[0] - d_majStep;
-
-	    for (k=0; k< nMin; k++)
-	    {
-		mval = (val += minStep);
-		if (limRange(mval, d_lBound, d_hBound, border_eps))
-		{
-		    buffer[minSize] = mval;
-		    minSize++;
-		}
-	    }
+		nMin = 1;
+		minStep = d_majStep * 0.5;
 	}
-        //d_minMarks.duplicate(buffer.data(), minSize);
-        d_minMarks.resize(minSize);
-        qCopy(buffer.data(), buffer.data() + minSize, d_minMarks.begin());
-    }
 
-    return rv;
-      }
+	// Are there minor ticks below the first major tick?
+	if (d_majMarks[0] > d_lBound)
+		i0 = -1;
+	else
+		i0 = 0;
+
+	// resize buffer to the maximum possible number of minor ticks
+	buffer.resize(nMin * (nMaj + 1));
+
+	// calculate minor ticks
+	if (rv)
+	{
+		minSize = 0;
+		for (i = i0; i < (int) d_majMarks.size(); i++)
+		{
+			if (i >= 0)
+				val = d_majMarks[i];
+			else
+				val = d_majMarks[0] - d_majStep;
+
+			for (k = 0; k < nMin; k++)
+			{
+				mval = (val += minStep);
+				if (limRange(mval, d_lBound, d_hBound, border_eps))
+				{
+					buffer[minSize] = mval;
+					minSize++;
+				}
+			}
+		}
+		//d_minMarks.duplicate(buffer.data(), minSize);
+		d_minMarks.resize(minSize);
+		qCopy(buffer.data(), buffer.data() + minSize, d_minMarks.begin());
+	}
+
+	return rv;
+}
 
 //------------------------------------------------------------
 //.F	ScaleDiv::buildLogDiv
@@ -385,196 +385,196 @@ bool ScaleDiv::buildLinDiv(int maxMajSteps, int maxMinSteps, double step)
 //------------------------------------------------------------
 
 bool ScaleDiv::buildLogDiv(int maxMajSteps, int maxMinSteps, double majStep)
-      {
-    double firstTick, lastTick;
-    double lFirst, lLast;
-    double val, sval, minStep, minFactor;
-    int nMaj, nMin, minSize, i, k, k0, kstep, kmax, i0;
-    int rv = TRUE;
-    double width;
+{
+	double firstTick, lastTick;
+	double lFirst, lLast;
+	double val, sval, minStep, minFactor;
+	int nMaj, nMin, minSize, i, k, k0, kstep, kmax, i0;
+	int rv = TRUE;
+	double width;
 
-    QVector<double> buffer;
+	QVector<double> buffer;
 
 
-    // Parameter range check
-    maxMajSteps = qwtMax(1, qwtAbs(maxMajSteps));
-    maxMinSteps = qwtMax(0, qwtAbs(maxMinSteps));
-    majStep = qwtAbs(majStep);
+	// Parameter range check
+	maxMajSteps = qwtMax(1, qwtAbs(maxMajSteps));
+	maxMinSteps = qwtMax(0, qwtAbs(maxMinSteps));
+	majStep = qwtAbs(majStep);
 
-    // boundary check
-    limRange(d_hBound, LOG_MIN, LOG_MAX);
-    limRange(d_lBound, LOG_MIN, LOG_MAX);
+	// boundary check
+	limRange(d_hBound, LOG_MIN, LOG_MAX);
+	limRange(d_lBound, LOG_MIN, LOG_MAX);
 
-    // reset vectors
-    d_minMarks.resize(0);
-    d_majMarks.resize(0);
+	// reset vectors
+	d_minMarks.resize(0);
+	d_majMarks.resize(0);
 
-    if (d_lBound == d_hBound) return TRUE;
+	if (d_lBound == d_hBound) return TRUE;
 
-    // scale width in decades
-    width = log10(d_hBound) - log10(d_lBound);
+	// scale width in decades
+	width = log10(d_hBound) - log10(d_lBound);
 
-    // scale width is less than one decade -> build linear scale
-    if (width < 1.0)
-    {
-	rv = buildLinDiv(maxMajSteps, maxMinSteps, 0.0);
-	// convert step width to decades
-	if (d_majStep > 0)
-	   d_majStep = log10(d_majStep);
+	// scale width is less than one decade -> build linear scale
+	if (width < 1.0)
+	{
+		rv = buildLinDiv(maxMajSteps, maxMinSteps, 0.0);
+		// convert step width to decades
+		if (d_majStep > 0)
+			d_majStep = log10(d_majStep);
+
+		return rv;
+	}
+
+	//
+	//  Set up major scale divisions
+	//
+	if (majStep == 0.0)
+		d_majStep = qwtCeil125(width * 0.999999 / double(maxMajSteps));
+	else
+		d_majStep = majStep;
+
+	// major step must be >= 1 decade
+	d_majStep = qwtMax(d_majStep, 1.0);
+
+
+	lFirst = ceil((log10(d_lBound) - step_eps * d_majStep) / d_majStep) * d_majStep;
+	lLast = floor((log10(d_hBound) + step_eps * d_majStep) / d_majStep) * d_majStep;
+
+	firstTick = pow(10.0, lFirst);
+	lastTick = pow(10.0, lLast);
+
+	nMaj = qwtMin(10000, int(rint(qwtAbs(lLast - lFirst) / d_majStep)) + 1);
+
+	d_majMarks.resize(nMaj);
+	qwtLogSpace(d_majMarks.data(), d_majMarks.size(), firstTick, lastTick);
+
+
+	//
+	// Set up minor scale divisions
+	//
+
+	if ((d_majMarks.size() < 1) || (maxMinSteps < 1)) return TRUE; // no minor marks
+
+	if (d_majStep < 1.1) // major step width is one decade
+	{
+		if (maxMinSteps >= 8)
+		{
+			k0 = 2;
+			kmax = 9;
+			kstep = 1;
+			minSize = (d_majMarks.size() + 1) * 8;
+		}
+		else if (maxMinSteps >= 4)
+		{
+			k0 = 2;
+			kmax = 8;
+			kstep = 2;
+			minSize = (d_majMarks.size() + 1) * 4;
+		}
+		else if (maxMinSteps >= 2)
+		{
+			k0 = 2;
+			kmax = 5;
+			kstep = 3;
+			minSize = (d_majMarks.size() + 1) * 2;
+		}
+		else
+		{
+			k0 = 5;
+			kmax = 5;
+			kstep = 1;
+			minSize = (d_majMarks.size() + 1);
+		}
+
+		// resize buffer to the max. possible number of minor marks
+		buffer.resize(minSize);
+
+		// Are there minor ticks below the first major tick?
+		if (d_lBound < firstTick)
+			i0 = -1;
+		else
+			i0 = 0;
+
+		minSize = 0;
+		for (i = i0; i < (int) d_majMarks.size(); i++)
+		{
+			if (i >= 0)
+				val = d_majMarks[i];
+			else
+				val = d_majMarks[0] / pow(10.0, d_majStep);
+
+			for (k = k0; k <= kmax; k += kstep)
+			{
+				sval = val * double(k);
+				if (limRange(sval, d_lBound, d_hBound, border_eps))
+				{
+					buffer[minSize] = sval;
+					minSize++;
+				}
+			}
+		}
+
+		// copy values into the minMarks array
+		//d_minMarks.duplicate(buffer.data(), minSize);
+		d_minMarks.resize(minSize);
+		qCopy(buffer.data(), buffer.data() + minSize, d_minMarks.begin());
+
+
+	}
+	else // major step > one decade
+	{
+
+		// substep width in decades, at least one decade
+		minStep = qwtCeil125((d_majStep - step_eps * (d_majStep / double(maxMinSteps)))
+				/ double(maxMinSteps));
+		minStep = qwtMax(1.0, minStep);
+
+		// # subticks per interval
+		nMin = int(rint(d_majStep / minStep)) - 1;
+
+		// Do the minor steps fit into the interval?
+		if (qwtAbs(double(nMin + 1) * minStep - d_majStep) > step_eps * d_majStep)
+			nMin = 0;
+
+		if (nMin < 1) return TRUE; // no subticks
+
+		// resize buffer to max. possible number of subticks
+		buffer.resize((d_majMarks.size() + 1) * nMin);
+
+		// substep factor = 10^substeps
+		minFactor = qwtMax(pow(10, minStep), 10.0);
+
+		// Are there minor ticks below the first major tick?
+		if (d_lBound < firstTick)
+			i0 = -1;
+		else
+			i0 = 0;
+
+		minSize = 0;
+		for (i = i0; i < (int) d_majMarks.size(); i++)
+		{
+			if (i >= 0)
+				val = d_majMarks[i];
+			else
+				val = firstTick / pow(10.0, d_majStep);
+
+			for (k = 0; k < nMin; k++)
+			{
+				sval = (val *= minFactor);
+				if (limRange(sval, d_lBound, d_hBound, border_eps))
+				{
+					buffer[minSize] = sval;
+					minSize++;
+				}
+			}
+		}
+		//d_minMarks.duplicate(buffer.data(), minSize);
+		d_minMarks.resize(minSize);
+		qCopy(buffer.data(), buffer.data() + minSize, d_minMarks.begin());
+
+	}
 
 	return rv;
-    }
-
-    //
-    //  Set up major scale divisions
-    //
-    if (majStep == 0.0)
-       d_majStep = qwtCeil125( width * 0.999999 / double(maxMajSteps));
-    else
-       d_majStep = majStep;
-
-    // major step must be >= 1 decade
-    d_majStep = qwtMax(d_majStep, 1.0);
-
-
-    lFirst = ceil((log10(d_lBound) - step_eps * d_majStep) / d_majStep) * d_majStep;
-    lLast = floor((log10(d_hBound) + step_eps * d_majStep) / d_majStep) * d_majStep;
-
-    firstTick = pow(10.0, lFirst);
-    lastTick = pow(10.0, lLast);
-
-    nMaj = qwtMin(10000, int(rint(qwtAbs(lLast - lFirst) / d_majStep)) + 1);
-
-    d_majMarks.resize(nMaj);
-    qwtLogSpace(d_majMarks.data(), d_majMarks.size(), firstTick, lastTick);
-
-
-    //
-    // Set up minor scale divisions
-    //
-
-    if ((d_majMarks.size() < 1) || (maxMinSteps < 1)) return TRUE; // no minor marks
-
-    if (d_majStep < 1.1)			// major step width is one decade
-    {
-	if (maxMinSteps >= 8)
-	{
-	    k0 = 2;
-	    kmax = 9;
-	    kstep = 1;
-	    minSize = (d_majMarks.size() + 1) * 8;
-	}
-	else if (maxMinSteps >= 4)
-	{
-	    k0 = 2;
-	    kmax = 8;
-	    kstep = 2;
-	    minSize = (d_majMarks.size() + 1) * 4;
-	}
-	else if (maxMinSteps >= 2)
-	{
-	    k0 = 2;
-	    kmax = 5;
-	    kstep = 3;
-	    minSize = (d_majMarks.size() + 1) * 2;
-	}
-	else
-	{
-	    k0 = 5;
-	    kmax = 5;
-	    kstep = 1;
-	    minSize = (d_majMarks.size() + 1);
-	}
-	
-	// resize buffer to the max. possible number of minor marks
-	buffer.resize(minSize);
-
-	// Are there minor ticks below the first major tick?
-	if ( d_lBound < firstTick )
-	    i0 = -1;
-	else
-	   i0 = 0;
-	
-	minSize = 0;
-	for (i = i0; i< (int)d_majMarks.size(); i++)
-	{
-	    if (i >= 0)
-	       val = d_majMarks[i];
-	    else
-	       val = d_majMarks[0] / pow(10.0, d_majStep);
-	
-	    for (k=k0; k<= kmax; k+=kstep)
-	    {
-		sval = val * double(k);
-		if (limRange(sval, d_lBound, d_hBound, border_eps))
-		{
-		    buffer[minSize] = sval;
-		    minSize++;
-		}
-	    }
-	}
-
-	// copy values into the minMarks array
-	//d_minMarks.duplicate(buffer.data(), minSize);
-        d_minMarks.resize(minSize);
-        qCopy(buffer.data(), buffer.data() + minSize, d_minMarks.begin());
-
-
-    }
-    else				// major step > one decade
-    {
-	
-	// substep width in decades, at least one decade
-	minStep = qwtCeil125( (d_majStep - step_eps * (d_majStep / double(maxMinSteps)))
-			 /  double(maxMinSteps) );
-	minStep = qwtMax(1.0, minStep);
-
-	// # subticks per interval
-	nMin = int(rint(d_majStep / minStep)) - 1;
-
-	// Do the minor steps fit into the interval?
-	if ( qwtAbs( double(nMin + 1) * minStep - d_majStep)  >  step_eps * d_majStep)
-	    nMin = 0;
-
-	if (nMin < 1) return TRUE;		// no subticks
-
-	// resize buffer to max. possible number of subticks
-	buffer.resize((d_majMarks.size() + 1) * nMin );
-	
-	// substep factor = 10^substeps
-	minFactor = qwtMax(pow(10,minStep), 10.0);
-
-	// Are there minor ticks below the first major tick?
-	if ( d_lBound < firstTick )
-	    i0 = -1;
-	else
-	   i0 = 0;
-	
-	minSize = 0;
-	for (i = i0; i< (int)d_majMarks.size(); i++)
-	{
-	    if (i >= 0)
-	       val = d_majMarks[i];
-	    else
-	       val = firstTick / pow(10.0, d_majStep);
-	
-	    for (k=0; k< nMin; k++)
-	    {
-		sval = (val *= minFactor);
-		if (limRange(sval, d_lBound, d_hBound, border_eps))
-		{
-		    buffer[minSize] = sval;
-		    minSize++;
-		}
-	    }
-	}
-	//d_minMarks.duplicate(buffer.data(), minSize);
-        d_minMarks.resize(minSize);
-        qCopy(buffer.data(), buffer.data() + minSize, d_minMarks.begin());
-
-    }
-
-    return rv;
 }
 
 //------------------------------------------------------------
@@ -592,19 +592,19 @@ bool ScaleDiv::buildLogDiv(int maxMajSteps, int maxMinSteps, double majStep)
 //------------------------------------------------------------
 
 int ScaleDiv::operator==(const ScaleDiv &s) const
-      {
-      if (d_lBound != s.d_lBound)
-            return 0;
-      if (d_hBound != s.d_hBound)
-            return 0;
-      if (d_log != s.d_log)
-            return 0;
-      if (d_majStep != s.d_majStep)
-            return 0;
-      if (d_majMarks != s.d_majMarks)
-            return 0;
-      return (d_minMarks == s.d_minMarks);
-      }
+{
+	if (d_lBound != s.d_lBound)
+		return 0;
+	if (d_hBound != s.d_hBound)
+		return 0;
+	if (d_log != s.d_log)
+		return 0;
+	if (d_majStep != s.d_majStep)
+		return 0;
+	if (d_majMarks != s.d_majMarks)
+		return 0;
+	return (d_minMarks == s.d_minMarks);
+}
 
 //------------------------------------------------------------
 //.F	ScaleDiv::operator!=
@@ -621,9 +621,9 @@ int ScaleDiv::operator==(const ScaleDiv &s) const
 //------------------------------------------------------------
 
 int ScaleDiv::operator!=(const ScaleDiv &s) const
-      {
-      return (!(*this == s));
-      }
+{
+	return (!(*this == s));
+}
 
 //------------------------------------------------------------
 //.F	ScaleDiv::reset
@@ -634,17 +634,17 @@ int ScaleDiv::operator!=(const ScaleDiv &s) const
 //------------------------------------------------------------
 
 void ScaleDiv::reset()
-      {
-      // reset vectors
-      d_minMarks.resize(0);
-      d_majMarks.resize(0);
+{
+	// reset vectors
+	d_minMarks.resize(0);
+	d_majMarks.resize(0);
 
 
-      d_lBound = 0.0;
-      d_hBound = 0.0;
-      d_majStep = 0.0;
-      d_log = FALSE;
-      }
+	d_lBound = 0.0;
+	d_hBound = 0.0;
+	d_majStep = 0.0;
+	d_log = FALSE;
+}
 
 
 

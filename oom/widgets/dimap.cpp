@@ -42,13 +42,13 @@ const double DiMap::LogMax = 1.0e150;
 //------------------------------------------------------------
 
 DiMap::DiMap()
-      {
-      d_x1 = 0.0;
-      d_x2 = 1.0;
-      d_y1 = 0;
-      d_y2 = 1;
-      d_cnv = 1.0;
-      }
+{
+	d_x1 = 0.0;
+	d_x2 = 1.0;
+	d_y1 = 0;
+	d_y2 = 1;
+	d_cnv = 1.0;
+}
 
 //------------------------------------------------------------
 //.F	DiMap::DiMap (2)
@@ -68,11 +68,11 @@ DiMap::DiMap()
 //------------------------------------------------------------
 
 DiMap::DiMap(int i1, int i2, double d1, double d2, bool logarithmic)
-      {
-      d_log = logarithmic;
-      setIntRange(i1,i2);
-      setDblRange(d1, d2);
-      }
+{
+	d_log = logarithmic;
+	setIntRange(i1, i2);
+	setDblRange(d1, d2);
+}
 
 //------------------------------------------------------------
 //.F	DiMap::~DiMap
@@ -83,8 +83,8 @@ DiMap::DiMap(int i1, int i2, double d1, double d2, bool logarithmic)
 //------------------------------------------------------------
 
 DiMap::~DiMap()
-      {
-      }
+{
+}
 
 //------------------------------------------------------------
 //.F	DiMap::contains (1)
@@ -99,9 +99,9 @@ DiMap::~DiMap()
 //------------------------------------------------------------
 
 bool DiMap::contains(double x) const
-      {
-      return ( (x >= qwtMin(d_x1, d_x1)) && (x <= qwtMax(d_x1, d_x2)));
-      }
+{
+	return ( (x >= qwtMin(d_x1, d_x1)) && (x <= qwtMax(d_x1, d_x2)));
+}
 
 //------------------------------------------------------------
 //.F	DiMap::contains (2)
@@ -116,9 +116,9 @@ bool DiMap::contains(double x) const
 //------------------------------------------------------------
 
 bool DiMap::contains(int x) const
-      {
-      return ( (x >= qwtMin(d_y1, d_y1)) && (x <= qwtMax(d_y1, d_y2)));
-      }
+{
+	return ( (x >= qwtMin(d_y1, d_y1)) && (x <= qwtMax(d_y1, d_y2)));
+}
 
 //------------------------------------------------------------
 //.F	DiMap::setDblRange
@@ -135,29 +135,31 @@ bool DiMap::contains(int x) const
 //------------------------------------------------------------
 
 void DiMap::setDblRange(double d1, double d2, bool lg)
-      {
-      if (lg) {
-            d_log = true;
-            if (d1 < LogMin)
-                  d1 = LogMin;
-            else if (d1 > LogMax)
-                  d1 = LogMax;
-      	
-            if (d2 < LogMin)
-                  d2 = LogMin;
-            else if (d2 > LogMax)
-                  d2 = LogMax;
-      	
-            d_x1 = log(d1);
-            d_x2 = log(d2);
-            }
-      else {
-            d_log = FALSE;
-            d_x1 = d1;
-            d_x2 = d2;
-            }
-      newFactor();
-      }
+{
+	if (lg)
+	{
+		d_log = true;
+		if (d1 < LogMin)
+			d1 = LogMin;
+		else if (d1 > LogMax)
+			d1 = LogMax;
+
+		if (d2 < LogMin)
+			d2 = LogMin;
+		else if (d2 > LogMax)
+			d2 = LogMax;
+
+		d_x1 = log(d1);
+		d_x2 = log(d2);
+	}
+	else
+	{
+		d_log = FALSE;
+		d_x1 = d1;
+		d_x2 = d2;
+	}
+	newFactor();
+}
 
 //------------------------------------------------------------
 //.F	DiMap::setIntRange
@@ -172,11 +174,11 @@ void DiMap::setDblRange(double d1, double d2, bool lg)
 //------------------------------------------------------------
 
 void DiMap::setIntRange(int i1, int i2)
-      {
-      d_y1 = i1;
-      d_y2 = i2;
-      newFactor();
-      }
+{
+	d_y1 = i1;
+	d_y2 = i2;
+	newFactor();
+}
 
 //------------------------------------------------------------
 //.F	DiMap::transform
@@ -200,12 +202,12 @@ void DiMap::setIntRange(int i1, int i2)
 //------------------------------------------------------------
 
 int DiMap::transform(double x) const
-      {
-      if (d_log)
-            return (d_y1 + int(rint( (log(x) - d_x1) * d_cnv )));
-      else
-            return (d_y1 + int(rint( (x - d_x1) * d_cnv )));
-      }
+{
+	if (d_log)
+		return (d_y1 + int(rint((log(x) - d_x1) * d_cnv)));
+	else
+		return (d_y1 + int(rint((x - d_x1) * d_cnv)));
+}
 
 //------------------------------------------------------------
 //.F	DiMap::invTransform
@@ -224,16 +226,17 @@ int DiMap::transform(double x) const
 //------------------------------------------------------------
 
 double DiMap::invTransform(int y) const
-      {
-      if (d_cnv == 0.0)
-            return 0.0;
-      else {
-            if (d_log)
-                  return exp(d_x1 + double(y - d_y1) / d_cnv );
-            else
-                  return ( d_x1 + double(y - d_y1) / d_cnv );	
-            }
-      }
+{
+	if (d_cnv == 0.0)
+		return 0.0;
+	else
+	{
+		if (d_log)
+			return exp(d_x1 + double(y - d_y1) / d_cnv);
+		else
+			return ( d_x1 + double(y - d_y1) / d_cnv);
+	}
+}
 
 //------------------------------------------------------------
 //.F	DiMap::limTransform
@@ -255,13 +258,13 @@ double DiMap::invTransform(int y) const
 //------------------------------------------------------------
 
 int DiMap::limTransform(double x) const
-      {
-      if ( x > qwtMax(d_x1, d_x2) )
-            x = qwtMax(d_x1, d_x2);
-      else if ( x < qwtMin(d_x1, d_x2))
-            x = qwtMin(d_x1, d_x2);
-      return transform(x);
-      }
+{
+	if (x > qwtMax(d_x1, d_x2))
+		x = qwtMax(d_x1, d_x2);
+	else if (x < qwtMin(d_x1, d_x2))
+		x = qwtMin(d_x1, d_x2);
+	return transform(x);
+}
 
 //------------------------------------------------------------
 //.F	DiMap::xTransform
@@ -284,15 +287,15 @@ int DiMap::limTransform(double x) const
 //------------------------------------------------------------
 
 double DiMap::xTransform(double x) const
-      {
-      double rv;
+{
+	double rv;
 
-      if (d_log)
-            rv = double(d_y1) + (log(x) - d_x1) * d_cnv;
-      else
-            rv = double(d_y1) + (x - d_x1) * d_cnv;
-      return rv;
-      }
+	if (d_log)
+		rv = double(d_y1) + (log(x) - d_x1) * d_cnv;
+	else
+		rv = double(d_y1) + (x - d_x1) * d_cnv;
+	return rv;
+}
 
 //------------------------------------------------------------
 //.F	DiMap::newFactor
@@ -300,9 +303,9 @@ double DiMap::xTransform(double x) const
 //------------------------------------------------------------
 
 void DiMap::newFactor()
-      {
-      if (d_x2 != d_x1)
-            d_cnv = double(d_y2 - d_y1) / (d_x2 - d_x1);
-      else
-            d_cnv = 0.0;
-      }
+{
+	if (d_x2 != d_x1)
+		d_cnv = double(d_y2 - d_y1) / (d_x2 - d_x1);
+	else
+		d_cnv = 0.0;
+}

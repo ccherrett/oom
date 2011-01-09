@@ -26,41 +26,42 @@ class MidiTrack;
 //   CtrlPanel
 //---------------------------------------------------------
 
-class CtrlPanel: public QWidget {
-      ///QMenu* pop;
-      QPushButton* selCtrl;
-      MidiEditor* editor;
-      
-      MidiTrack* _track;
-      MidiController* _ctrl;
-      int _dnum;
-      bool inHeartBeat;
-      Knob* _knob;
-      DoubleLabel* _dl;
-      int _val;
-      
-      Q_OBJECT
+class CtrlPanel : public QWidget
+{
+    ///QMenu* pop;
+    QPushButton* selCtrl;
+    MidiEditor* editor;
 
-   signals:
-      void destroyPanel();
-      void controllerChanged(int);
+    MidiTrack* _track;
+    MidiController* _ctrl;
+    int _dnum;
+    bool inHeartBeat;
+    Knob* _knob;
+    DoubleLabel* _dl;
+    int _val;
 
-   private slots:
-      void ctrlChanged(double val);
-      void labelDoubleClicked();
-      void ctrlRightClicked(const QPoint& p, int id);
-      //void ctrlReleased(int id);
-      
-   protected slots:
-      virtual void heartBeat();
-      
-   public slots:
-      void setHeight(int);
-      void ctrlPopup();
+    Q_OBJECT
 
-   public:
-      CtrlPanel(QWidget*, MidiEditor*, const char* name = 0);
-      void setHWController(MidiTrack* t, MidiController* ctrl);
-      bool ctrlSetTypeByName(QString);
-      };
+signals:
+    void destroyPanel();
+    void controllerChanged(int);
+
+private slots:
+    void ctrlChanged(double val);
+    void labelDoubleClicked();
+    void ctrlRightClicked(const QPoint& p, int id);
+    //void ctrlReleased(int id);
+
+protected slots:
+    virtual void heartBeat();
+
+public slots:
+    void setHeight(int);
+    void ctrlPopup();
+
+public:
+    CtrlPanel(QWidget*, MidiEditor*, const char* name = 0);
+    void setHWController(MidiTrack* t, MidiController* ctrl);
+    bool ctrlSetTypeByName(QString);
+};
 #endif

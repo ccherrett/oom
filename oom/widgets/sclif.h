@@ -21,30 +21,44 @@
 //---------------------------------------------------------
 
 class ScaleIf
-      {
-	bool d_userScale;
+{
+    bool d_userScale;
 
-  protected:
-	ScaleDraw d_scale;
-	int d_maxMajor;
-	int d_maxMinor;
-	bool hasUserScale() {return d_userScale;}
-	virtual void scaleChange() = 0;
+protected:
+    ScaleDraw d_scale;
+    int d_maxMajor;
+    int d_maxMinor;
 
-  public:
-	ScaleIf();
-      virtual ~ScaleIf() {};
-	
-	void setScale (double vmin, double vmax, int logarithmic = 0);
-	void setScale (double vmin, double vmax, double step, int logarithmic = 0);
-	void setScale(const ScaleDiv &s);
-	void setScaleMaxMajor( int ticks);
-	void setScaleMaxMinor( int ticks);
-	void autoScale();
+    bool hasUserScale()
+    {
+        return d_userScale;
+    }
+    virtual void scaleChange() = 0;
 
-	int scaleMaxMinor() const {return d_maxMinor;}
-	int scaleMaxMajor() const {return d_maxMinor;}
-      };
+public:
+    ScaleIf();
+
+    virtual ~ScaleIf()
+    {
+    };
+
+    void setScale(double vmin, double vmax, int logarithmic = 0);
+    void setScale(double vmin, double vmax, double step, int logarithmic = 0);
+    void setScale(const ScaleDiv &s);
+    void setScaleMaxMajor(int ticks);
+    void setScaleMaxMinor(int ticks);
+    void autoScale();
+
+    int scaleMaxMinor() const
+    {
+        return d_maxMinor;
+    }
+
+    int scaleMaxMajor() const
+    {
+        return d_maxMinor;
+    }
+};
 
 #endif
 

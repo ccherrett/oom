@@ -15,19 +15,20 @@
 //   AuxKnob
 //---------------------------------------------------------
 
-class AuxKnob : public Knob {
-      Q_OBJECT
-      int idx;
+class AuxKnob : public Knob
+{
+    Q_OBJECT
+    int idx;
 
-   private slots:
-      void valueChanged(double v);
+private slots:
+    void valueChanged(double v);
 
-   signals:
-      void auxChanged(int, double);
+signals:
+    void auxChanged(int, double);
 
-   public:
-      AuxKnob(QWidget* parent, int idx);
-      };
+public:
+    AuxKnob(QWidget* parent, int idx);
+};
 
 #endif
 

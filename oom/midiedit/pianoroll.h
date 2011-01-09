@@ -51,154 +51,171 @@ class QScrollArea;
 //   PianoRoll
 //---------------------------------------------------------
 
-class PianoRoll : public MidiEditor {
-      Event selEvent;
-      MidiPart* selPart;
-      int selTick;
+class PianoRoll : public MidiEditor
+{
+    Event selEvent;
+    MidiPart* selPart;
+    int selTick;
 
-      //enum { CMD_EVENT_COLOR, CMD_CONFIG_QUANT, CMD_LAST };
-      //int menu_ids[CMD_LAST];
-      //Q3PopupMenu *menuEdit, *menuFunctions, *menuSelect, *menuConfig, *menuPlugins;
+    //enum { CMD_EVENT_COLOR, CMD_CONFIG_QUANT, CMD_LAST };
+    //int menu_ids[CMD_LAST];
+    //Q3PopupMenu *menuEdit, *menuFunctions, *menuSelect, *menuConfig, *menuPlugins;
 
-      
-      QMenu *menuEdit, *menuFunctions, *menuSelect, *menuConfig, *eventColor, *menuPlugins;
-      MidiTrackInfo *midiTrackInfo;
-      Track* selected;
-	  PCScale* pcbar;
-      
-      QAction* editCutAction; 
-      QAction* editCopyAction; 
-      QAction* editPasteAction; 
-      QAction* editDelEventsAction;
-      
-      QAction* selectAllAction; 
-      QAction* selectNoneAction;
-      QAction* selectInvertAction;
-      QAction* selectInsideLoopAction;
-      QAction* selectOutsideLoopAction;
-      QAction* selectPrevPartAction;
-      QAction* selectNextPartAction;
-      
-      QAction* evColorBlueAction;
-      QAction* evColorPitchAction;
-      QAction* evColorVelAction;
-      
-      QAction* funcOverQuantAction;
-      QAction* funcNoteOnQuantAction;
-      QAction* funcNoteOnOffQuantAction;
-      QAction* funcIterQuantAction;
-      QAction* funcConfigQuantAction;
-      QAction* funcGateTimeAction;
-      QAction* funcModVelAction;
-      QAction* funcCrescendoAction;
-      QAction* funcTransposeAction;
-      QAction* funcThinOutAction;
-      QAction* funcEraseEventAction;
-      QAction* funcNoteShiftAction;
-      QAction* funcMoveClockAction;
-      QAction* funcCopyMeasureAction;
-      QAction* funcEraseMeasureAction;
-      QAction* funcDelMeasureAction;
-      QAction* funcCreateMeasureAction;
-      QAction* funcSetFixedLenAction;
-      QAction* funcDelOverlapsAction;
-      
-      
-      int tickOffset;
-      int lenOffset;
-      int pitchOffset;
-      int veloOnOffset;
-      int veloOffOffset;
-      bool deltaMode;
 
-      NoteInfo* info;
-      QToolButton* srec;
-      QToolButton* midiin;
+    QMenu *menuEdit, *menuFunctions, *menuSelect, *menuConfig, *eventColor, *menuPlugins;
+    MidiTrackInfo *midiTrackInfo;
+    Track* selected;
+    PCScale* pcbar;
 
-      Toolbar1* toolbar;
-      Splitter* splitter;
-      Splitter* hsplitter;
-      Splitter* ctrlLane;
+    QAction* editCutAction;
+    QAction* editCopyAction;
+    QAction* editPasteAction;
+    QAction* editDelEventsAction;
 
-      QToolButton* speaker;
-      QToolBar* tools;
-      EditToolBar* tools2;
+    QAction* selectAllAction;
+    QAction* selectNoneAction;
+    QAction* selectInvertAction;
+    QAction* selectInsideLoopAction;
+    QAction* selectOutsideLoopAction;
+    QAction* selectPrevPartAction;
+    QAction* selectNextPartAction;
 
-      int colorMode;
+    QAction* evColorBlueAction;
+    QAction* evColorPitchAction;
+    QAction* evColorVelAction;
 
-      static int _quantInit, _rasterInit;
-      static int _widthInit, _heightInit;
+    QAction* funcOverQuantAction;
+    QAction* funcNoteOnQuantAction;
+    QAction* funcNoteOnOffQuantAction;
+    QAction* funcIterQuantAction;
+    QAction* funcConfigQuantAction;
+    QAction* funcGateTimeAction;
+    QAction* funcModVelAction;
+    QAction* funcCrescendoAction;
+    QAction* funcTransposeAction;
+    QAction* funcThinOutAction;
+    QAction* funcEraseEventAction;
+    QAction* funcNoteShiftAction;
+    QAction* funcMoveClockAction;
+    QAction* funcCopyMeasureAction;
+    QAction* funcEraseMeasureAction;
+    QAction* funcDelMeasureAction;
+    QAction* funcCreateMeasureAction;
+    QAction* funcSetFixedLenAction;
+    QAction* funcDelOverlapsAction;
 
-      static int _quantStrengthInit;
-      static int _quantLimitInit;
-      static bool _quantLenInit;
-      static int _toInit;
-      static int colorModeInit;
 
-      int _quantStrength;
-      int _quantLimit;
-      int _to;
-      bool _quantLen;
-      QuantConfig* quantConfig;
-      bool _playEvents;
+    int tickOffset;
+    int lenOffset;
+    int pitchOffset;
+    int veloOnOffset;
+    int veloOffOffset;
+    bool deltaMode;
 
-      //QScrollBar* infoScroll;
-      QScrollArea* infoScroll;
+    NoteInfo* info;
+    QToolButton* srec;
+    QToolButton* midiin;
 
-      Q_OBJECT
-      void initShortcuts();
-      void setEventColorMode(int);
-      QWidget* genToolbar(QWidget* parent);
-      virtual void closeEvent(QCloseEvent*);
-      virtual void keyPressEvent(QKeyEvent*);
-      virtual void resizeEvent(QResizeEvent*);
-      virtual void showEvent(QShowEvent *);
+    Toolbar1* toolbar;
+    Splitter* splitter;
+    Splitter* hsplitter;
+    Splitter* ctrlLane;
 
-   private slots:
-      void setSelection(int, Event&, Part*);
-      void noteinfoChanged(NoteInfo::ValType, int);
-      //CtrlEdit* addCtrl();
-      void soloChanged(bool flag);
-      //void trackInfoScroll(int);
-      void setRaster(int);
-      void setQuant(int);
-      void configQuant();
-      void setQuantStrength(int val) { _quantStrength = val; }
-      void setQuantLimit(int val)    { _quantLimit = val; }
-      void setQuantLen(bool val)     { _quantLen = val; }
-      void cmd(int);
-      void setSteprec(bool);
-      void setTo(int val)            { _to = val; }
-      void eventColorModeChanged(int);
-      void clipboardChanged(); // enable/disable "Paste"
-      void selectionChanged(); // enable/disable "Copy" & "Paste"
-      void setSpeaker(bool);
-      void setTime(unsigned);
-      void follow(int pos);
-      void songChanged1(int);
-      void configChanged();
-      void newCanvasWidth(int);
-      void toggleTrackInfo();
-      void updateTrackInfo();
+    QToolButton* speaker;
+    QToolBar* tools;
+    EditToolBar* tools2;
 
-   signals:
-      void deleted(unsigned long);
-   
-   public slots:
-      virtual void updateHScrollRange();
-      void execDeliveredScript(int id);
-      void execUserScript(int id);
-      CtrlEdit* addCtrl();
-      void removeCtrl(CtrlEdit* ctrl);
-      
-   public:
-      PianoRoll(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);
-      ~PianoRoll();
-      virtual void readStatus(Xml&);
-      virtual void writeStatus(int, Xml&) const;
-      static void readConfiguration(Xml&);
-      static void writeConfiguration(int, Xml&);
-      };
+    int colorMode;
+
+    static int _quantInit, _rasterInit;
+    static int _widthInit, _heightInit;
+
+    static int _quantStrengthInit;
+    static int _quantLimitInit;
+    static bool _quantLenInit;
+    static int _toInit;
+    static int colorModeInit;
+
+    int _quantStrength;
+    int _quantLimit;
+    int _to;
+    bool _quantLen;
+    QuantConfig* quantConfig;
+    bool _playEvents;
+
+    //QScrollBar* infoScroll;
+    QScrollArea* infoScroll;
+
+    Q_OBJECT
+    void initShortcuts();
+    void setEventColorMode(int);
+    QWidget* genToolbar(QWidget* parent);
+    virtual void closeEvent(QCloseEvent*);
+    virtual void keyPressEvent(QKeyEvent*);
+    virtual void resizeEvent(QResizeEvent*);
+    virtual void showEvent(QShowEvent *);
+
+private slots:
+    void setSelection(int, Event&, Part*);
+    void noteinfoChanged(NoteInfo::ValType, int);
+    //CtrlEdit* addCtrl();
+    void soloChanged(bool flag);
+    //void trackInfoScroll(int);
+    void setRaster(int);
+    void setQuant(int);
+    void configQuant();
+
+    void setQuantStrength(int val)
+    {
+        _quantStrength = val;
+    }
+
+    void setQuantLimit(int val)
+    {
+        _quantLimit = val;
+    }
+
+    void setQuantLen(bool val)
+    {
+        _quantLen = val;
+    }
+    void cmd(int);
+    void setSteprec(bool);
+
+    void setTo(int val)
+    {
+        _to = val;
+    }
+    void eventColorModeChanged(int);
+    void clipboardChanged(); // enable/disable "Paste"
+    void selectionChanged(); // enable/disable "Copy" & "Paste"
+    void setSpeaker(bool);
+    void setTime(unsigned);
+    void follow(int pos);
+    void songChanged1(int);
+    void configChanged();
+    void newCanvasWidth(int);
+    void toggleTrackInfo();
+    void updateTrackInfo();
+
+signals:
+    void deleted(unsigned long);
+
+public slots:
+    virtual void updateHScrollRange();
+    void execDeliveredScript(int id);
+    void execUserScript(int id);
+    CtrlEdit* addCtrl();
+    void removeCtrl(CtrlEdit* ctrl);
+
+public:
+    PianoRoll(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);
+    ~PianoRoll();
+    virtual void readStatus(Xml&);
+    virtual void writeStatus(int, Xml&) const;
+    static void readConfiguration(Xml&);
+    static void writeConfiguration(int, Xml&);
+};
 
 #endif
 

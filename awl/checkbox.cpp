@@ -22,15 +22,15 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   CheckBox
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   CheckBox
+	//---------------------------------------------------------
 
-CheckBox::CheckBox(QWidget* parent)
-   : QCheckBox(parent)
-      {
-      _id = 0;
-      connect(this, SIGNAL(toggled(bool)), SLOT(hasToggled(bool)));
-      }
+	CheckBox::CheckBox(QWidget* parent)
+	: QCheckBox(parent)
+	{
+		_id = 0;
+		connect(this, SIGNAL(toggled(bool)), SLOT(hasToggled(bool)));
+	}
 }
 

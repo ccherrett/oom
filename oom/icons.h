@@ -127,7 +127,7 @@ extern QIcon* editpasteIcon;
 extern QIcon* editpasteCloneIcon;
 extern QIcon* editpaste2TrackIcon;
 extern QIcon* editpasteClone2TrackIcon;
-*/
+ */
 
 extern QPixmap* exitIcon;
 extern QPixmap* exit1Icon;
@@ -139,9 +139,9 @@ extern QPixmap* soloIcon;
 
 extern QPixmap* muteIconOn;
 extern QPixmap* muteIconOff;
-extern QPixmap* soloIconOn; 
+extern QPixmap* soloIconOn;
 extern QPixmap* soloIconOff;
-extern QPixmap* soloblksqIconOn; 
+extern QPixmap* soloblksqIconOn;
 extern QPixmap* soloblksqIconOff;
 extern QIcon* soloIconSet1;
 extern QIcon* soloIconSet2;

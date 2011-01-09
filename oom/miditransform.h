@@ -19,85 +19,89 @@ class Event;
 class MidiPart;
 class Xml;
 
-enum ValOp {
-      All=0, Ignore=0, Equal=1, Unequal=2, Higher=3, Lower=4,
-      Inside=5, Outside=6
-      };
+enum ValOp
+{
+    All = 0, Ignore = 0, Equal = 1, Unequal = 2, Higher = 3, Lower = 4,
+    Inside = 5, Outside = 6
+};
 
-enum TransformFunction {
-      Select, Quantize, Delete, Transform, Insert, Copy, Extract
-      };
+enum TransformFunction
+{
+    Select, Quantize, Delete, Transform, Insert, Copy, Extract
+};
 
-enum TransformOperator {
-      Keep, Plus, Minus, Multiply, Divide, Fix, Value, Invert,
-      ScaleMap, Flip, Dynamic, Random
-      };
+enum TransformOperator
+{
+    Keep, Plus, Minus, Multiply, Divide, Fix, Value, Invert,
+    ScaleMap, Flip, Dynamic, Random
+};
 
 //---------------------------------------------------------
 //   MidiTransformDialog
 //---------------------------------------------------------
 
-class MidiTransformerDialog : public QDialog, public Ui::MidiTransformDialogBase {
-      Q_OBJECT
-      MidiTransformPrivate* data;
+class MidiTransformerDialog : public QDialog, public Ui::MidiTransformDialogBase
+{
+    Q_OBJECT
+    MidiTransformPrivate* data;
 
-      virtual void accept();
-//      virtual void reject();
-      void setValOp(QWidget* a, QWidget* b, ValOp op);
-      void processEvent(Event&, MidiPart*, MidiPart*);
-      bool isSelected(Event&, MidiPart*);
-      void transformEvent(Event&, MidiPart*, MidiPart*);
-      bool typesMatch(Event& e, unsigned selType);
-      
-      void updatePresetList();
+    virtual void accept();
+    //      virtual void reject();
+    void setValOp(QWidget* a, QWidget* b, ValOp op);
+    void processEvent(Event&, MidiPart*, MidiPart*);
+    bool isSelected(Event&, MidiPart*);
+    void transformEvent(Event&, MidiPart*, MidiPart*);
+    bool typesMatch(Event& e, unsigned selType);
 
-   private slots:
-      void apply();
-      void presetNew();
-      void presetDelete();
+    void updatePresetList();
 
-      void selEventOpSel(int);
-      void selTypeSel(int);
-      void selVal1OpSel(int);
-      void selVal2OpSel(int);
-      void selLenOpSel(int);
-      void selRangeOpSel(int);
-      void procEventOpSel(int);
-      void procEventTypeSel(int);
-      void procVal1OpSel(int);
-      void procVal2OpSel(int);
-      void procLenOpSel(int);
-      void procPosOpSel(int);
-      void funcOpSel(int);
-      void presetChanged(QListWidgetItem*);
-      void nameChanged(const QString&);
-      void commentChanged();
-      void selVal1aChanged(int);
-      void selVal1bChanged(int);
-      void selVal2aChanged(int);
-      void selVal2bChanged(int);
-      void selLenAChanged(int);
-      void selLenBChanged(int);
-      void selBarAChanged(int);
-      void selBarBChanged(int);
-      void procVal1aChanged(int);
-      void procVal1bChanged(int);
-      void procVal2aChanged(int);
-      void procVal2bChanged(int);
-      void procLenAChanged(int);
-      void procPosAChanged(int);
-      void funcQuantValSel(int);
-      void processAllChanged(bool);
-      void selectedTracksChanged(bool);
-      void insideLoopChanged(bool);
+private slots:
+    void apply();
+    void presetNew();
+    void presetDelete();
 
-   public slots:
-      void songChanged(int);
+    void selEventOpSel(int);
+    void selTypeSel(int);
+    void selVal1OpSel(int);
+    void selVal2OpSel(int);
+    void selLenOpSel(int);
+    void selRangeOpSel(int);
+    void procEventOpSel(int);
+    void procEventTypeSel(int);
+    void procVal1OpSel(int);
+    void procVal2OpSel(int);
+    void procLenOpSel(int);
+    void procPosOpSel(int);
+    void funcOpSel(int);
+    void presetChanged(QListWidgetItem*);
+    void nameChanged(const QString&);
+    void commentChanged();
+    void selVal1aChanged(int);
+    void selVal1bChanged(int);
+    void selVal2aChanged(int);
+    void selVal2bChanged(int);
+    void selLenAChanged(int);
+    void selLenBChanged(int);
+    void selBarAChanged(int);
+    void selBarBChanged(int);
+    void procVal1aChanged(int);
+    void procVal1bChanged(int);
+    void procVal2aChanged(int);
+    void procVal2bChanged(int);
+    void procLenAChanged(int);
+    void procPosAChanged(int);
+    void funcQuantValSel(int);
+    void processAllChanged(bool);
+    void selectedTracksChanged(bool);
+    void insideLoopChanged(bool);
 
-   public:
-      MidiTransformerDialog(QDialog* parent = 0, Qt::WFlags fl = 0);
-      ~MidiTransformerDialog();
-      };
+public slots:
+    void songChanged(int);
+
+public:
+    MidiTransformerDialog(QDialog* parent = 0, Qt::WFlags fl = 0);
+    ~MidiTransformerDialog();
+};
 
 extern void writeMidiTransforms(int level, Xml& xml);
 extern void readMidiTransform(Xml&);

@@ -39,7 +39,7 @@ extern ACG rnd;
 
 class tRandomGenerator
 {
-  public:
+public:
     double asDouble();
 };
 extern tRandomGenerator rnd;
@@ -55,43 +55,79 @@ extern tRandomGenerator rnd;
 
 class tRndArray
 {
-  friend class tArrayEdit;
-  protected:
+    friend class tArrayEdit;
+protected:
     tIntArray array;
-    int n;	// number of elements in array
+    int n; // number of elements in array
     int nul, min, max;
 
-  public:
-    int Null()				{ return nul; }
-    void SetNull(int n)			{ nul = n; }
+public:
+
+    int Null()
+    {
+        return nul;
+    }
+
+    void SetNull(int n)
+    {
+        nul = n;
+    }
     tRndArray(int n, int min, int max);
-    tRndArray & operator = (const tRndArray &);
+    tRndArray & operator =(const tRndArray &);
     tRndArray(tRndArray const &);
 
     virtual ~tRndArray();
-    int &operator[] (int i) 		{ return array[i]; }
-    int  operator[] (int i) const 	{ return array[i]; }
+
+    int &operator[] (int i)
+    {
+        return array[i];
+    }
+
+    int operator[] (int i) const
+    {
+        return array[i];
+    }
 #ifdef FOR_MSW
     double operator[](double f);
-    float operator[](float f) {
+
+    float operator[](float f)
+    {
 #else
     double operator[](double f) const;
-    float operator[](float f) const {
+
+    float operator[](float f) const
+    {
 #endif
-      return (float)operator[]((double)f);
+        return (float) operator[]((double) f);
     }
-    int Size() const 			{ return n; }
-    int Min() const			{ return min; }
-    int Max() const			{ return max; }
+
+    int Size() const
+    {
+        return n;
+    }
+
+    int Min() const
+    {
+        return min;
+    }
+
+    int Max() const
+    {
+        return max;
+    }
     void SetMinMax(int min, int max);
-    void Resize(int nn) 		{ n = nn; }
 
-    friend ostream & operator << (ostream &, tRndArray const &);
-    friend istream & operator >> (istream &, tRndArray &);
+    void Resize(int nn)
+    {
+        n = nn;
+    }
 
-    int Random();	// returns index 0..n-1 (arrayvalues -> empiric distribution)
-    int Random(double rndval);	// returns index 0..n-1 (arrayvalues -> empiric distribution)
-    int Random(int i);  // return 0/1
+    friend ostream & operator <<(ostream &, tRndArray const &);
+    friend istream & operator >>(istream &, tRndArray &);
+
+    int Random(); // returns index 0..n-1 (arrayvalues -> empiric distribution)
+    int Random(double rndval); // returns index 0..n-1 (arrayvalues -> empiric distribution)
+    int Random(int i); // return 0/1
     int Interval(int seed);
 
     void SetUnion(tRndArray &o, int fuzz);
@@ -111,77 +147,85 @@ class tRndArray
 #define ARED_BLOCKS     32
 #define ARED_LINES      64
 
-
-class tArrayEditDrawBars {
-  public:
+class tArrayEditDrawBars
+{
+public:
     virtual void DrawBars() = 0;
 };
-
 
 class tArrayEdit : public wxCanvas
 {
 protected:
-  // paint position
-  long x, y, w, h, ynul;
-  void DrawBar(int i, int Qt::black);
+    // paint position
+    long x, y, w, h, ynul;
+    void DrawBar(int i, int Qt::black);
 
-  int dragging;		// Dragging-Event valid
-  int index;		// ctrl down: drag this one
+    int dragging; // Dragging-Event valid
+    int index; // ctrl down: drag this one
 
-  tRndArray &array;
-  int &n, &min, &max, &nul;	// shorthand for array.n, array.min, ...
-  char *label;
-  tArrayEditDrawBars *draw_bars;
+    tRndArray &array;
+    int &n, &min, &max, &nul; // shorthand for array.n, array.min, ...
+    char *label;
+    tArrayEditDrawBars *draw_bars;
 
-  // array size is mapped to this range for x-tick marks
-  int xmin, xmax;
+    // array size is mapped to this range for x-tick marks
+    int xmin, xmax;
 
-  virtual void DrawXTicks();
-  virtual void DrawYTicks();
-  virtual void DrawLabel();
-  virtual void DrawNull();
-  int  Index(wxMouseEvent &e);
+    virtual void DrawXTicks();
+    virtual void DrawYTicks();
+    virtual void DrawLabel();
+    virtual void DrawNull();
+    int Index(wxMouseEvent &e);
 
-  int  enabled;
-  int  style_bits;
+    int enabled;
+    int style_bits;
 
-  virtual const char *GetXText(int xval);  // Text for x-tickmarks
-  virtual const char *GetYText(int yval);  // Text for y-tickmarks
+    virtual const char *GetXText(int xval); // Text for x-tickmarks
+    virtual const char *GetYText(int yval); // Text for y-tickmarks
 
 
 public:
-  tArrayEdit(wxFrame *parent, tRndArray &array, long xx, long yy, long ww, long hh, int style_bits = (ARED_GAP | ARED_XTICKS));
-  virtual ~tArrayEdit();
+    tArrayEdit(wxFrame *parent, tRndArray &array, long xx, long yy, long ww, long hh, int style_bits = (ARED_GAP | ARED_XTICKS));
+    virtual ~tArrayEdit();
 
-  virtual void OnPaint();
-  virtual void OnSize(int ww, int hh);
-  virtual void OnEvent(wxMouseEvent &e);
-  virtual int Dragging(wxMouseEvent &);
-  virtual int ButtonDown(wxMouseEvent &);
-  virtual int ButtonUp(wxMouseEvent &);
+    virtual void OnPaint();
+    virtual void OnSize(int ww, int hh);
+    virtual void OnEvent(wxMouseEvent &e);
+    virtual int Dragging(wxMouseEvent &);
+    virtual int ButtonDown(wxMouseEvent &);
+    virtual int ButtonUp(wxMouseEvent &);
 
-  virtual void SetLabel(char const *llabel);
-  void Enable(int enable = 1);
-  void SetStyle(int style) { style_bits = style; }
-  // min and max value in array (both values inclusive)
-  void SetYMinMax(int min, int max);
-  // for display x-axis only, does not resize the array (both values inclusive)
-  void SetXMinMax(int xmin, int xmax);
-  void DrawBarLine (long xx);
-  void SetDrawBars(tArrayEditDrawBars *x) { draw_bars = x; }
-  void Init() {}
+    virtual void SetLabel(char const *llabel);
+    void Enable(int enable = 1);
+
+    void SetStyle(int style)
+    {
+        style_bits = style;
+    }
+    // min and max value in array (both values inclusive)
+    void SetYMinMax(int min, int max);
+    // for display x-axis only, does not resize the array (both values inclusive)
+    void SetXMinMax(int xmin, int xmax);
+    void DrawBarLine(long xx);
+
+    void SetDrawBars(tArrayEditDrawBars *x)
+    {
+        draw_bars = x;
+    }
+
+    void Init()
+    {
+    }
 };
-
-
 
 class tRhyArrayEdit : public tArrayEdit
 {
     int steps_per_count;
     int count_per_bar;
     int n_bars;
-  protected:
+protected:
     virtual void DrawXTicks();
-  public:
+public:
     tRhyArrayEdit(wxFrame *parent, tRndArray &array, long xx, long yy, long ww, long hh, int style_bits = (ARED_GAP | ARED_XTICKS | ARED_RHYTHM));
     void SetMeter(int steps_per_count, int count_per_bar, int n_bars);
 };

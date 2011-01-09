@@ -21,22 +21,27 @@ class Xml;
 //   Signature Event
 //---------------------------------------------------------
 
-struct SigEvent {
-      int z, n;            // takt signatur
-      unsigned tick;       // ab dieser Position gilt signatur
-      int bar;             // precomputed
+struct SigEvent
+{
+    int z, n; // takt signatur
+    unsigned tick; // ab dieser Position gilt signatur
+    int bar; // precomputed
 
-      int read(Xml&);
-      void write(int, Xml&, int) const;
+    int read(Xml&);
+    void write(int, Xml&, int) const;
 
-      SigEvent() { }
-      SigEvent(int Z, int N, unsigned tk) {
-            z = Z;
-            n = N;
-            tick = tk;
-            bar = 0;
-            }
-      };
+    SigEvent()
+    {
+    }
+
+    SigEvent(int Z, int N, unsigned tk)
+    {
+        z = Z;
+        n = N;
+        tick = tk;
+        bar = 0;
+    }
+};
 
 //---------------------------------------------------------
 //   SigList
@@ -48,32 +53,33 @@ typedef SIGLIST::const_iterator ciSigEvent;
 typedef SIGLIST::reverse_iterator riSigEvent;
 typedef SIGLIST::const_reverse_iterator criSigEvent;
 
-class SigList : public SIGLIST {
-      int ticks_beat(int N) const;
-      void normalize();
-      int ticksMeasure(int z, int n) const;
+class SigList : public SIGLIST
+{
+    int ticks_beat(int N) const;
+    void normalize();
+    int ticksMeasure(int z, int n) const;
 
-   public:
-      SigList();
-      void clear();
-      void add(unsigned tick, int z, int n);
-      void del(unsigned tick);
+public:
+    SigList();
+    void clear();
+    void add(unsigned tick, int z, int n);
+    void del(unsigned tick);
 
-      void read(Xml&);
-      void write(int, Xml&) const;
-      void dump() const;
+    void read(Xml&);
+    void write(int, Xml&) const;
+    void dump() const;
 
-      void timesig(unsigned tick, int& z, int& n) const;
-      void tickValues(unsigned t, int* bar, int* beat, unsigned* tick) const;
-      unsigned bar2tick(int bar, int beat, unsigned tick) const;
+    void timesig(unsigned tick, int& z, int& n) const;
+    void tickValues(unsigned t, int* bar, int* beat, unsigned* tick) const;
+    unsigned bar2tick(int bar, int beat, unsigned tick) const;
 
-      int ticksMeasure(unsigned tick) const;
-      int ticksBeat(unsigned tick) const;
-      unsigned raster(unsigned tick, int raster) const;
-      unsigned raster1(unsigned tick, int raster) const;
-      unsigned raster2(unsigned tick, int raster) const;
-      int rasterStep(unsigned tick, int raster) const;
-      };
+    int ticksMeasure(unsigned tick) const;
+    int ticksBeat(unsigned tick) const;
+    unsigned raster(unsigned tick, int raster) const;
+    unsigned raster1(unsigned tick, int raster) const;
+    unsigned raster2(unsigned tick, int raster) const;
+    int rasterStep(unsigned tick, int raster) const;
+};
 
 extern SigList sigmap;
 #endif

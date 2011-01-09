@@ -14,12 +14,13 @@
 //   MenuTitleItem
 //---------------------------------------------------------
 
-class MenuTitleItem : public QWidgetAction { 
-      QString s;
+class MenuTitleItem : public QWidgetAction
+{
+    QString s;
 
-   public:
-      MenuTitleItem(const QString&, QWidget* /*parent*/);
-      QWidget* createWidget(QWidget* /*parent*/);
-      };
+public:
+    MenuTitleItem(const QString&, QWidget* /*parent*/);
+    QWidget* createWidget(QWidget* /*parent*/);
+};
 
 #endif

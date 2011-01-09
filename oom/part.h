@@ -28,15 +28,16 @@ class Part;
 
 // typedef std::multimap<unsigned, Event*, std::less<unsigned> >::iterator iEvent;
 
-struct ClonePart {
-      //const EventList* el;
-      const Part* cp;
-      int id;
-      uuid_t uuid;
-      //ClonePart(const EventList* e, int i) : el(e), id(i) {}
-      //ClonePart(const Part* p, int i) : cp(p), id(i) {}
-      ClonePart(const Part*, int i = -1);
-      };
+struct ClonePart
+{
+    //const EventList* el;
+    const Part* cp;
+    int id;
+    uuid_t uuid;
+    //ClonePart(const EventList* e, int i) : el(e), id(i) {}
+    //ClonePart(const Part* p, int i) : cp(p), id(i) {}
+    ClonePart(const Part*, int i = -1);
+};
 
 typedef std::list<ClonePart> CloneList;
 typedef CloneList::iterator iClone;
@@ -45,98 +46,193 @@ typedef CloneList::iterator iClone;
 //   Part
 //---------------------------------------------------------
 
-class Part : public PosLen {
-      static int snGen;
-      int _sn;
+class Part : public PosLen
+{
+    static int snGen;
+    int _sn;
 
-      QString _name;
-      bool _selected;
-      bool _mute;
-      int _colorIndex;
-                   
-   protected:
-      Track* _track;
-      EventList* _events;
-      Part* _prevClone;
-      Part* _nextClone;
+    QString _name;
+    bool _selected;
+    bool _mute;
+    int _colorIndex;
 
-   public:
-      Part(Track*);
-      Part(Track*, EventList*);
-      virtual ~Part();
-      int sn()                         { return _sn; }
-      void setSn(int n)                { _sn = n; }
-      int newSn()                      { return snGen++; }
+protected:
+    Track* _track;
+    EventList* _events;
+    Part* _prevClone;
+    Part* _nextClone;
 
-      virtual Part* clone() const = 0;
+public:
+    Part(Track*);
+    Part(Track*, EventList*);
+    virtual ~Part();
 
-      const QString& name() const      { return _name; }
-      void setName(const QString& s)   { _name = s; }
-      bool selected() const            { return _selected; }
-      void setSelected(bool f)         { _selected = f; }
-      bool mute() const                { return _mute; }
-      void setMute(bool b)             { _mute = b; }
-      Track* track() const             { return _track; }
-      void setTrack(Track*t)           { _track = t; }
-      EventList* events() const        { return _events; }
-      const EventList* cevents() const { return _events; }
-      int colorIndex() const           { return _colorIndex; }
-      void setColorIndex(int idx)      { _colorIndex = idx; }
-      
-      Part* prevClone()                { return _prevClone; }
-      Part* nextClone()                { return _nextClone; }
-      void setPrevClone(Part* p)       { _prevClone = p; }
-      void setNextClone(Part* p)       { _nextClone = p; }
-      
-      iEvent addEvent(Event& p);
+    int sn()
+    {
+        return _sn;
+    }
 
-      //virtual void read(Xml&, int newPartOffset=0, bool toTrack = true);
-      //virtual void write(int, Xml&) const;
-      //virtual void write(int, Xml&, bool isCopy = false) const;
-      virtual void write(int, Xml&, bool isCopy = false, bool forceWavePaths = false) const;
-      
-//      virtual Event* newEvent() const = 0;
-      virtual void dump(int n = 0) const;
-      };
+    void setSn(int n)
+    {
+        _sn = n;
+    }
+
+    int newSn()
+    {
+        return snGen++;
+    }
+
+    virtual Part* clone() const = 0;
+
+    const QString& name() const
+    {
+        return _name;
+    }
+
+    void setName(const QString& s)
+    {
+        _name = s;
+    }
+
+    bool selected() const
+    {
+        return _selected;
+    }
+
+    void setSelected(bool f)
+    {
+        _selected = f;
+    }
+
+    bool mute() const
+    {
+        return _mute;
+    }
+
+    void setMute(bool b)
+    {
+        _mute = b;
+    }
+
+    Track* track() const
+    {
+        return _track;
+    }
+
+    void setTrack(Track*t)
+    {
+        _track = t;
+    }
+
+    EventList* events() const
+    {
+        return _events;
+    }
+
+    const EventList* cevents() const
+    {
+        return _events;
+    }
+
+    int colorIndex() const
+    {
+        return _colorIndex;
+    }
+
+    void setColorIndex(int idx)
+    {
+        _colorIndex = idx;
+    }
+
+    Part* prevClone()
+    {
+        return _prevClone;
+    }
+
+    Part* nextClone()
+    {
+        return _nextClone;
+    }
+
+    void setPrevClone(Part* p)
+    {
+        _prevClone = p;
+    }
+
+    void setNextClone(Part* p)
+    {
+        _nextClone = p;
+    }
+
+    iEvent addEvent(Event& p);
+
+    //virtual void read(Xml&, int newPartOffset=0, bool toTrack = true);
+    //virtual void write(int, Xml&) const;
+    //virtual void write(int, Xml&, bool isCopy = false) const;
+    virtual void write(int, Xml&, bool isCopy = false, bool forceWavePaths = false) const;
+
+    //      virtual Event* newEvent() const = 0;
+    virtual void dump(int n = 0) const;
+};
 
 //---------------------------------------------------------
 //   MidiPart
 //---------------------------------------------------------
 
-class MidiPart : public Part {
+class MidiPart : public Part
+{
+public:
 
-   public:
-      MidiPart(MidiTrack* t) : Part((Track*)t) {}
-      MidiPart(MidiTrack* t, EventList* ev) : Part((Track*)t, ev) {}
-      MidiPart(const MidiPart& p);
-      virtual ~MidiPart() {}
-      virtual MidiPart* clone() const;
-      MidiTrack* track() const   { return (MidiTrack*)Part::track(); }
+    MidiPart(MidiTrack* t) : Part((Track*) t)
+    {
+    }
 
-//      virtual Event* newEvent() const;
-      virtual void dump(int n = 0) const;
-      };
+    MidiPart(MidiTrack* t, EventList* ev) : Part((Track*) t, ev)
+    {
+    }
+    MidiPart(const MidiPart& p);
+
+    virtual ~MidiPart()
+    {
+    }
+    virtual MidiPart* clone() const;
+
+    MidiTrack* track() const
+    {
+        return (MidiTrack*) Part::track();
+    }
+
+    //      virtual Event* newEvent() const;
+    virtual void dump(int n = 0) const;
+};
 
 //---------------------------------------------------------
 //   WavePart
 //---------------------------------------------------------
 
-class WavePart : public Part {
+class WavePart : public Part
+{
+    // p3.3.31
+    AudioConvertMap _converters;
 
-      // p3.3.31
-      AudioConvertMap _converters;
-      
-   public:
-      WavePart(WaveTrack* t);
-      WavePart(WaveTrack* t, EventList* ev);
-      WavePart(const WavePart& p);
-      virtual ~WavePart() {}
-      virtual WavePart* clone() const;
-      WaveTrack* track() const   { return (WaveTrack*)Part::track(); }
+public:
+    WavePart(WaveTrack* t);
+    WavePart(WaveTrack* t, EventList* ev);
+    WavePart(const WavePart& p);
 
-//      virtual Event* newEvent() const;
-      virtual void dump(int n = 0) const;
-      };
+    virtual ~WavePart()
+    {
+    }
+    virtual WavePart* clone() const;
+
+    WaveTrack* track() const
+    {
+        return (WaveTrack*) Part::track();
+    }
+
+    //      virtual Event* newEvent() const;
+    virtual void dump(int n = 0) const;
+};
 
 //---------------------------------------------------------
 //   PartList
@@ -145,14 +241,15 @@ class WavePart : public Part {
 typedef std::multimap<int, Part*, std::less<unsigned> >::iterator iPart;
 typedef std::multimap<int, Part*, std::less<unsigned> >::const_iterator ciPart;
 
-class PartList : public std::multimap<int, Part*, std::less<unsigned> > {
-   public:
-      iPart findPart(unsigned tick);
-      iPart add(Part*);
-      void remove(Part* part);
-      int index(Part*);
-      Part* find(int idx);
-      };
+class PartList : public std::multimap<int, Part*, std::less<unsigned> >
+{
+public:
+    iPart findPart(unsigned tick);
+    iPart add(Part*);
+    void remove(Part* part);
+    int index(Part*);
+    Part* find(int idx);
+};
 
 extern void chainClone(Part* p);
 extern void chainClone(Part* p1, Part* p2);

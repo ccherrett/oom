@@ -43,131 +43,158 @@ class SpinBox;
 //   WidgetStack
 //---------------------------------------------------------
 
-class WidgetStack : public QWidget {
-      Q_OBJECT
-      std::vector<QWidget*> stack;
-      int top;
+class WidgetStack : public QWidget
+{
+    Q_OBJECT
+    std::vector<QWidget*> stack;
+    int top;
 
-   public:
-      WidgetStack(QWidget* parent, const char* name = 0);
-      void raiseWidget(int idx);
-      void addWidget(QWidget* w, unsigned int idx);
-      QWidget* getWidget(unsigned int idx);
-      QWidget* visibleWidget() const;
-      int curIdx() const { return top; }
-      virtual QSize minimumSizeHint() const;
-      //QSize minimumSize() const;
-      //int minimumHeight() const;
-      };
+public:
+    WidgetStack(QWidget* parent, const char* name = 0);
+    void raiseWidget(int idx);
+    void addWidget(QWidget* w, unsigned int idx);
+    QWidget* getWidget(unsigned int idx);
+    QWidget* visibleWidget() const;
+
+    int curIdx() const
+    {
+        return top;
+    }
+    virtual QSize minimumSizeHint() const;
+    //QSize minimumSize() const;
+    //int minimumHeight() const;
+};
 
 //---------------------------------------------------------
 //   Arranger
 //---------------------------------------------------------
 
-class Arranger : public QWidget {
-      Q_OBJECT
+class Arranger : public QWidget
+{
+    Q_OBJECT
 
-      int _quant, _raster;
-      PartCanvas* canvas;
-      ScrollScale* hscroll;
-      QScrollBar* vscroll;
-      TList* list;
-      Header* header;
-      MTScale* time;
-      SpinBox* lenEntry;
-      bool showTrackinfoFlag;
-      WidgetStack* trackInfo;
-      //QStackedWidget* trackInfo;
-      QScrollBar* infoScroll;
-      //MidiTrackInfoBase* midiTrackInfo;
-      MidiTrackInfo* midiTrackInfo;
-      AudioStrip* waveTrackInfo;
-      QWidget* noTrackInfo;
-      TLLayout* tgrid;
+    int _quant, _raster;
+    PartCanvas* canvas;
+    ScrollScale* hscroll;
+    QScrollBar* vscroll;
+    TList* list;
+    Header* header;
+    MTScale* time;
+    SpinBox* lenEntry;
+    bool showTrackinfoFlag;
+    WidgetStack* trackInfo;
+    //QStackedWidget* trackInfo;
+    QScrollBar* infoScroll;
+    //MidiTrackInfoBase* midiTrackInfo;
+    MidiTrackInfo* midiTrackInfo;
+    AudioStrip* waveTrackInfo;
+    QWidget* noTrackInfo;
+    TLLayout* tgrid;
 
-      Track* selected;
+    Track* selected;
 
-      LabelCombo* typeBox;
-      QToolButton* ib;
-      int trackInfoType;
-      Splitter* split;
-      ///QMenu* pop;
-      int songType;
-      PosLabel* cursorPos;
-      SpinBox* globalTempoSpinBox;
-      SpinBox* globalPitchSpinBox;
-      
-      unsigned cursVal;
-      void genTrackInfo(QWidget* parent);
-      void genMidiTrackInfo();
-      void genWaveTrackInfo();
-      void switchInfo(int);
-      void setHeaderToolTips();
-      void setHeaderWhatsThis();
+    LabelCombo* typeBox;
+    QToolButton* ib;
+    int trackInfoType;
+    Splitter* split;
+    ///QMenu* pop;
+    int songType;
+    PosLabel* cursorPos;
+    SpinBox* globalTempoSpinBox;
+    SpinBox* globalPitchSpinBox;
 
-   private slots:
-      void _setRaster(int);
-      void songlenChanged(int);
-      void showTrackInfo(bool);
-      void trackSelectionChanged();
-      void trackInfoScroll(int);
-      void songChanged(int);
-      void modeChange(int);
-      void setTime(unsigned);
-      void headerMoved();
-      void globalPitchChanged(int);
-      void globalTempoChanged(int);
-      void setTempo50();
-      void setTempo100();
-      void setTempo200();
-      //void seek();
-      void verticalScrollSetYpos(unsigned);
-	  void showTrackViews();
-      
-   signals:
-      void redirectWheelEvent(QWheelEvent*);
-      void editPart(Track*);
-      void selectionChanged();
-      void dropSongFile(const QString&);
-      void dropMidiFile(const QString&);
-      void startEditor(PartList*, int);
-      void toolChanged(int);
-      //void addMarker(int);
-      void setUsedTool(int);
+    unsigned cursVal;
+    void genTrackInfo(QWidget* parent);
+    void genMidiTrackInfo();
+    void genWaveTrackInfo();
+    void switchInfo(int);
+    void setHeaderToolTips();
+    void setHeaderWhatsThis();
+
+private slots:
+    void _setRaster(int);
+    void songlenChanged(int);
+    void showTrackInfo(bool);
+    void trackSelectionChanged();
+    void trackInfoScroll(int);
+    void songChanged(int);
+    void modeChange(int);
+    void setTime(unsigned);
+    void headerMoved();
+    void globalPitchChanged(int);
+    void globalTempoChanged(int);
+    void setTempo50();
+    void setTempo100();
+    void setTempo200();
+    //void seek();
+    void verticalScrollSetYpos(unsigned);
+    void showTrackViews();
+
+signals:
+    void redirectWheelEvent(QWheelEvent*);
+    void editPart(Track*);
+    void selectionChanged();
+    void dropSongFile(const QString&);
+    void dropMidiFile(const QString&);
+    void startEditor(PartList*, int);
+    void toolChanged(int);
+    //void addMarker(int);
+    void setUsedTool(int);
 
 
-   protected:
-      virtual void wheelEvent(QWheelEvent* e);
+protected:
+    virtual void wheelEvent(QWheelEvent* e);
 
-   public slots:
-      void dclickPart(Track*);
-      void setTool(int);
-      void updateTrackInfo(int flags);
-      void configChanged();
-      void controllerChanged(Track *t);
+public slots:
+    void dclickPart(Track*);
+    void setTool(int);
+    void updateTrackInfo(int flags);
+    void configChanged();
+    void controllerChanged(Track *t);
 
-   public:
-      enum { CMD_CUT_PART, CMD_COPY_PART, CMD_PASTE_PART, CMD_PASTE_CLONE_PART, CMD_PASTE_PART_TO_TRACK, CMD_PASTE_CLONE_PART_TO_TRACK,
-             CMD_INSERT_PART, CMD_INSERT_EMPTYMEAS };
+public:
 
-      Arranger(QMainWindow* parent, const char* name = 0);
+    enum
+    {
+        CMD_CUT_PART, CMD_COPY_PART, CMD_PASTE_PART, CMD_PASTE_CLONE_PART, CMD_PASTE_PART_TO_TRACK, CMD_PASTE_CLONE_PART_TO_TRACK,
+        CMD_INSERT_PART, CMD_INSERT_EMPTYMEAS
+    };
 
-      PartCanvas* getCanvas() { return canvas; }
-      void setMode(int);
-      void reset();
-      
-      void writeStatus(int level, Xml&);
-      void readStatus(Xml&);
+    Arranger(QMainWindow* parent, const char* name = 0);
 
-      Track* curTrack() const { return selected; }
-      void cmd(int);
-      bool isSingleSelection() { return canvas->isSingleSelection(); }
-      int selectionSize() { return canvas->selectionSize(); }
-      void setGlobalTempo(int);
-      void clear();
-      
-      unsigned cursorValue() { return cursVal; }
-      };
+    PartCanvas* getCanvas()
+    {
+        return canvas;
+    }
+    void setMode(int);
+    void reset();
+
+    void writeStatus(int level, Xml&);
+    void readStatus(Xml&);
+
+    Track* curTrack() const
+    {
+        return selected;
+    }
+    void cmd(int);
+
+    bool isSingleSelection()
+    {
+        return canvas->isSingleSelection();
+    }
+
+    int selectionSize()
+    {
+        return canvas->selectionSize();
+    }
+    void setGlobalTempo(int);
+    void clear();
+
+    unsigned cursorValue()
+    {
+        return cursVal;
+    }
+};
 
 #endif
 

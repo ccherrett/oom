@@ -13,67 +13,98 @@
 //---------------------------------------------------------
 
 class Knob : public SliderBase, public ScaleIf
-      {
-  Q_OBJECT
+{
 
-   public:
-      enum Symbol { Line, Dot };
+    Q_OBJECT
 
-   private:
-      bool hasScale;
+public:
+    enum Symbol
+    {
+        Line, Dot
+    };
 
-      int d_borderWidth;
-      int d_borderDist;
-      int d_scaleDist;
-      int d_maxScaleTicks;
-      int d_newVal;
-      int d_knobWidth;
-      int d_dotWidth;
+private:
+    bool hasScale;
 
-      Symbol d_symbol;
-      double d_angle;
-      double d_oldAngle;
-      double d_totalAngle;
-      double d_nTurns;
+    int d_borderWidth;
+    int d_borderDist;
+    int d_scaleDist;
+    int d_maxScaleTicks;
+    int d_newVal;
+    int d_knobWidth;
+    int d_dotWidth;
 
-      QRect  kRect;
-      bool _faceColSel;
-      QColor d_faceColor;
-      QColor d_curFaceColor;
-      QColor d_altFaceColor;
-      QColor d_markerColor;
-      QString  knobImage;
+    Symbol d_symbol;
+    double d_angle;
+    double d_oldAngle;
+    double d_totalAngle;
+    double d_nTurns;
 
-      void recalcAngle();
-      void valueChange();
-      void rangeChange();
-      void drawKnob(QPainter *p, const QRect &r);
-      void drawMarker(QPainter *p, double arc, const QColor &c);
+    QRect kRect;
+    bool _faceColSel;
+    QColor d_faceColor;
+    QColor d_curFaceColor;
+    QColor d_altFaceColor;
+    QColor d_markerColor;
+    QString knobImage;
 
-      void paintEvent(QPaintEvent *);
-      void resizeEvent(QResizeEvent *e);
-      double getValue(const QPoint &p);
-      void getScrollMode( QPoint &p, const Qt::MouseButton &button, int &scrollMode, int &direction );
-      void scaleChange()             { repaint(); }
-      void fontChange(const QFont &) { repaint(); }
+    void recalcAngle();
+    void valueChange();
+    void rangeChange();
+    void drawKnob(QPainter *p, const QRect &r);
+    void drawMarker(QPainter *p, double arc, const QColor &c);
 
-   public:
-      Knob(QWidget* parent = 0, const char *name = 0);
-      ~Knob() {}
+    void paintEvent(QPaintEvent *);
+    void resizeEvent(QResizeEvent *e);
+    double getValue(const QPoint &p);
+    void getScrollMode(QPoint &p, const Qt::MouseButton &button, int &scrollMode, int &direction);
 
-      void setKnobWidth(int w);
-      void setTotalAngle (double angle);
-      void setBorderWidth(int bw);
-      void selectFaceColor(bool alt);
-      bool selectedFaceColor() { return _faceColSel; }
-      QColor faceColor() { return d_faceColor; }
-      void setFaceColor(const QColor c);
-      QColor altFaceColor() { return d_altFaceColor; }
-      void setAltFaceColor(const QColor c);
-      QColor markerColor() { return d_markerColor; }
-      void setMarkerColor(const QColor c);
-      void setKnobImage(const QString img);
-      };
+    void scaleChange()
+    {
+        repaint();
+    }
+
+    void fontChange(const QFont &)
+    {
+        repaint();
+    }
+
+public:
+    Knob(QWidget* parent = 0, const char *name = 0);
+
+    ~Knob()
+    {
+    }
+
+    void setKnobWidth(int w);
+    void setTotalAngle(double angle);
+    void setBorderWidth(int bw);
+    void selectFaceColor(bool alt);
+
+    bool selectedFaceColor()
+    {
+        return _faceColSel;
+    }
+
+    QColor faceColor()
+    {
+        return d_faceColor;
+    }
+    void setFaceColor(const QColor c);
+
+    QColor altFaceColor()
+    {
+        return d_altFaceColor;
+    }
+    void setAltFaceColor(const QColor c);
+
+    QColor markerColor()
+    {
+        return d_markerColor;
+    }
+    void setMarkerColor(const QColor c);
+    void setKnobImage(const QString img);
+};
 
 
 #endif

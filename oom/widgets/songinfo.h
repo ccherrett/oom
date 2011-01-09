@@ -30,8 +30,12 @@ class QDialog;
 
 class SongInfoWidget : public QDialog, public Ui::SongInfo
 {
-      Q_OBJECT
 
-   public:
-      SongInfoWidget(QDialog *parent = 0) : QDialog(parent) { setupUi(this); }
+    Q_OBJECT
+
+public:
+    SongInfoWidget(QDialog *parent = 0) : QDialog(parent)
+    {
+        setupUi(this);
+    }
 };

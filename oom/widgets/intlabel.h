@@ -17,30 +17,35 @@ class QString;
 //   IntLabel
 //---------------------------------------------------------
 
-class IntLabel : public Nentry {
-      Q_OBJECT
+class IntLabel : public Nentry
+{
+    Q_OBJECT
 
-      int min, max, off;
-      QString suffix;
-      QString specialValue;
+    int min, max, off;
+    QString suffix;
+    QString specialValue;
 
-      void init();
+    void init();
 
-      virtual bool setSValue(const QString&);
-      virtual bool setString(int val, bool editable = false);
-      virtual void incValue(int);
-      virtual void decValue(int);
+    virtual bool setSValue(const QString&);
+    virtual bool setString(int val, bool editable = false);
+    virtual void incValue(int);
+    virtual void decValue(int);
 
-   signals:
-      void valueChanged(int);
+signals:
+    void valueChanged(int);
 
-   public:
-      IntLabel(int, int, int, QWidget*, int _off = MAXINT,
-         const QString& = QString(""), int lpos = 0);
-      void setOff(int v);
-      void setSuffix(const QString& s) { suffix = s; }
-      void setSpecialValueText(const QString& s);
-      void setRange(int, int);
-      };
+public:
+    IntLabel(int, int, int, QWidget*, int _off = MAXINT,
+            const QString& = QString(""), int lpos = 0);
+    void setOff(int v);
+
+    void setSuffix(const QString& s)
+    {
+        suffix = s;
+    }
+    void setSpecialValueText(const QString& s);
+    void setRange(int, int);
+};
 
 #endif

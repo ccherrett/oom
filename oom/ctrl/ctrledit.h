@@ -23,33 +23,42 @@ class Xml;
 //   CtrlEdit
 //---------------------------------------------------------
 
-class CtrlEdit : public QWidget {
-      CtrlCanvas* canvas;
-      CtrlPanel* panel;
+class CtrlEdit : public QWidget
+{
+    CtrlCanvas* canvas;
+    CtrlPanel* panel;
 
-      Q_OBJECT
+    Q_OBJECT
 
-   private slots:
-      void destroy();
+private slots:
+    void destroy();
 
-   public slots:
-      void setTool(int tool);
-      void setXPos(int val)           { canvas->setXPos(val); }
-      void setXMag(int val)           { canvas->setXMag(val); }
-      void setCanvasWidth(int w);
-   signals:
-      void timeChanged(unsigned);
-      void destroyedCtrl(CtrlEdit*);
-      void enterCanvas();
-      void yposChanged(int);
+public slots:
+    void setTool(int tool);
 
-   public:
-      CtrlEdit(QWidget*, MidiEditor* e, int xmag,
-         bool expand = false, const char* name = 0);
-      void readStatus(Xml&);
-      void writeStatus(int, Xml&);
-	  bool setType(QString);
-      };
+    void setXPos(int val)
+    {
+        canvas->setXPos(val);
+    }
+
+    void setXMag(int val)
+    {
+        canvas->setXMag(val);
+    }
+    void setCanvasWidth(int w);
+signals:
+    void timeChanged(unsigned);
+    void destroyedCtrl(CtrlEdit*);
+    void enterCanvas();
+    void yposChanged(int);
+
+public:
+    CtrlEdit(QWidget*, MidiEditor* e, int xmag,
+            bool expand = false, const char* name = 0);
+    void readStatus(Xml&);
+    void writeStatus(int, Xml&);
+    bool setType(QString);
+};
 
 #endif
 

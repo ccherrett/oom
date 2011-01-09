@@ -17,21 +17,22 @@ class Xml;
 //   DrumMap
 //---------------------------------------------------------
 
-struct DrumMap {
-      QString name;
-      unsigned char vol;            // playback volume, percent.
-      int quant;
-      int len;                      // len of event in ticks
-      int channel;                  // midi channel
-      int port;                     // midi port
-      char lv1, lv2, lv3, lv4;      // velocities
-      char enote, anote;            // input note - output note
-      bool mute;
-//      bool selected;
+struct DrumMap
+{
+    QString name;
+    unsigned char vol; // playback volume, percent.
+    int quant;
+    int len; // len of event in ticks
+    int channel; // midi channel
+    int port; // midi port
+    char lv1, lv2, lv3, lv4; // velocities
+    char enote, anote; // input note - output note
+    bool mute;
+    //      bool selected;
 
-      //bool const operator==(const DrumMap& map) const;
-      bool operator==(const DrumMap& map) const;
-      };
+    //bool const operator==(const DrumMap& map) const;
+    bool operator==(const DrumMap & map) const;
+};
 
 #define DRUM_MAPSIZE  128
 

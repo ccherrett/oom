@@ -20,11 +20,12 @@ class WavePart;
 class MidiEditor;
 class SndFileR;
 
-struct WaveEventSelection {
-      SndFileR file;
-      unsigned startframe;
-      unsigned endframe;
-      };
+struct WaveEventSelection
+{
+    SndFileR file;
+    unsigned startframe;
+    unsigned endframe;
+};
 
 typedef std::list<WaveEventSelection> WaveSelectionList;
 typedef std::list<WaveEventSelection>::iterator iWaveSelection;
@@ -33,67 +34,79 @@ typedef std::list<WaveEventSelection>::iterator iWaveSelection;
 //   WaveView
 //---------------------------------------------------------
 
-class WaveView : public View {
-      MidiEditor* editor;
-      unsigned pos[3];
-      int yScale;
-      int button;
-      int startSample;
-      int endSample;
+class WaveView : public View
+{
+    MidiEditor* editor;
+    unsigned pos[3];
+    int yScale;
+    int button;
+    int startSample;
+    int endSample;
 
-      WavePart* curPart;
-      int curPartId;
+    WavePart* curPart;
+    int curPartId;
 
-      enum { NORMAL, DRAG } mode;
-      enum { MUTE = 0, NORMALIZE, FADE_IN, FADE_OUT, REVERSE, GAIN, EDIT_EXTERNAL }; //!< Modify operations
+    enum
+    {
+        NORMAL, DRAG
+    } mode;
 
-      unsigned selectionStart, selectionStop, dragstartx;
+    enum
+    {
+        MUTE = 0, NORMALIZE, FADE_IN, FADE_OUT, REVERSE, GAIN, EDIT_EXTERNAL
+    }; //!< Modify operations
 
-      Q_OBJECT
-      virtual void pdraw(QPainter&, const QRect&);
-      virtual void draw(QPainter&, const QRect&);
-      virtual void viewMousePressEvent(QMouseEvent*);
-      virtual void viewMouseMoveEvent(QMouseEvent*);
-      virtual void viewMouseReleaseEvent(QMouseEvent*);
-      virtual void wheelEvent(QWheelEvent*);
+    unsigned selectionStart, selectionStop, dragstartx;
 
-      bool getUniqueTmpfileName(QString& newFilename); //!< Generates unique filename for temporary SndFile
-      WaveSelectionList getSelection(unsigned startpos, unsigned stoppos);
+    Q_OBJECT
+    virtual void pdraw(QPainter&, const QRect&);
+    virtual void draw(QPainter&, const QRect&);
+    virtual void viewMousePressEvent(QMouseEvent*);
+    virtual void viewMouseMoveEvent(QMouseEvent*);
+    virtual void viewMouseReleaseEvent(QMouseEvent*);
+    virtual void wheelEvent(QWheelEvent*);
 
-      int lastGainvalue; //!< Stores the last used gainvalue when specifiying gain value in the editgain dialog
-      void modifySelection(int operation, unsigned startpos, unsigned stoppos, double paramA); //!< Modifies selection
+    bool getUniqueTmpfileName(QString& newFilename); //!< Generates unique filename for temporary SndFile
+    WaveSelectionList getSelection(unsigned startpos, unsigned stoppos);
 
-      void muteSelection(unsigned channels, float** data, unsigned length); //!< Mutes selection
-      void normalizeSelection(unsigned channels, float** data, unsigned length); //!< Normalizes selection
-      void fadeInSelection(unsigned channels, float** data, unsigned length); //!< Linear fade in of selection
-      void fadeOutSelection(unsigned channels, float** data, unsigned length); //!< Linear fade out of selection
-      void reverseSelection(unsigned channels, float** data, unsigned length); //!< Reverse selection
-      void applyGain(unsigned channels, float** data, unsigned length, double gain); //!< Apply gain to selection
+    int lastGainvalue; //!< Stores the last used gainvalue when specifiying gain value in the editgain dialog
+    void modifySelection(int operation, unsigned startpos, unsigned stoppos, double paramA); //!< Modifies selection
 
-      void editExternal(unsigned file_format, unsigned file_samplerate, unsigned channels, float** data, unsigned length);
+    void muteSelection(unsigned channels, float** data, unsigned length); //!< Mutes selection
+    void normalizeSelection(unsigned channels, float** data, unsigned length); //!< Normalizes selection
+    void fadeInSelection(unsigned channels, float** data, unsigned length); //!< Linear fade in of selection
+    void fadeOutSelection(unsigned channels, float** data, unsigned length); //!< Linear fade out of selection
+    void reverseSelection(unsigned channels, float** data, unsigned length); //!< Reverse selection
+    void applyGain(unsigned channels, float** data, unsigned length, double gain); //!< Apply gain to selection
 
-      //void applyLadspa(unsigned channels, float** data, unsigned length); //!< Apply LADSPA plugin on selection
+    void editExternal(unsigned file_format, unsigned file_samplerate, unsigned channels, float** data, unsigned length);
+
+    //void applyLadspa(unsigned channels, float** data, unsigned length); //!< Apply LADSPA plugin on selection
 
 
-   private slots:
-      void setPos(int idx, unsigned val, bool adjustScrollbar);
+private slots:
+    void setPos(int idx, unsigned val, bool adjustScrollbar);
 
-   public slots:
-      void setYScale(int);
-      void songChanged(int type);
+public slots:
+    void setYScale(int);
+    void songChanged(int type);
 
-   signals:
-      void followEvent(int);
-      void timeChanged(unsigned);
-      void mouseWheelMoved(int);
+signals:
+    void followEvent(int);
+    void timeChanged(unsigned);
+    void mouseWheelMoved(int);
 
-   public:
-      WaveView(MidiEditor*, QWidget* parent, int xscale, int yscale);
-      QString getCaption() const;
-      void range(int*, int*);
-      void cmd(int n);
-      WavePart* part() { return curPart; }
-      };
+public:
+    WaveView(MidiEditor*, QWidget* parent, int xscale, int yscale);
+    QString getCaption() const;
+    void range(int*, int*);
+    void cmd(int n);
+
+    WavePart* part()
+    {
+        return curPart;
+    }
+};
 
 #endif
 

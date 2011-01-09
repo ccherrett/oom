@@ -23,13 +23,13 @@ class QAction;
 
 class PopupMenu : public QMenu
 {
-  Q_OBJECT
-  
-  protected:
+    Q_OBJECT
+
+protected:
     void mouseReleaseEvent(QMouseEvent *);
-  
-  public:
-    PopupMenu(QWidget* parent=0);
+
+public:
+    PopupMenu(QWidget* parent = 0);
     ~PopupMenu();
     void clear();
     QAction* findActionFromData(QVariant);
@@ -52,7 +52,7 @@ class PopupView : public QColumnView
     void clear();
     QStandardItemModel* model() { return _model; }
 };
-*/
+ */
 
 
 #endif

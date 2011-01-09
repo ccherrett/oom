@@ -15,39 +15,44 @@ class QResizeEvent;
 class QMouseEvent;
 class QPainter;
 
-class Meter : public QFrame {
-   public:
-      enum MeterType {DBMeter, LinMeter};
-   private:  
-      MeterType mtype;
-      bool overflow;
-      double val;
-      double maxVal;
-      double minScale, maxScale;
-      int yellowScale, redScale;
-	  QColor green;
-	  QColor red;
-	  QColor yellow;
-	  QColor bgColor;
+class Meter : public QFrame
+{
+public:
 
-      void drawVU(QPainter& p, int, int, int);
+    enum MeterType
+    {
+        DBMeter, LinMeter
+    };
+private:
+    MeterType mtype;
+    bool overflow;
+    double val;
+    double maxVal;
+    double minScale, maxScale;
+    int yellowScale, redScale;
+    QColor green;
+    QColor red;
+    QColor yellow;
+    QColor bgColor;
 
-      Q_OBJECT
-      void paintEvent(QPaintEvent*);
-      virtual void resizeEvent(QResizeEvent*);
-      virtual void mousePressEvent(QMouseEvent*);
+    void drawVU(QPainter& p, int, int, int);
 
-   public slots:
-      void resetPeaks();
-      void setVal(double, double, bool);
+    Q_OBJECT
+    void paintEvent(QPaintEvent*);
+    virtual void resizeEvent(QResizeEvent*);
+    virtual void mousePressEvent(QMouseEvent*);
 
-   signals:
-      void mousePress();
-	  void meterClipped();
+public slots:
+    void resetPeaks();
+    void setVal(double, double, bool);
 
-   public:
-      Meter(QWidget* parent, MeterType type = DBMeter);
-      void setRange(double min, double max);
-      };
+signals:
+    void mousePress();
+    void meterClipped();
+
+public:
+    Meter(QWidget* parent, MeterType type = DBMeter);
+    void setRange(double min, double max);
+};
 #endif
 

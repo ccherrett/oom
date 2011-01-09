@@ -16,34 +16,39 @@
 //    scale for midi track
 //---------------------------------------------------------
 
-class MTScale : public View {
-      Q_OBJECT
-      int* raster;
-      unsigned pos[4];
-      int button;
-      bool barLocator;
-      bool waveMode;
+class MTScale : public View
+{
+    Q_OBJECT
+    int* raster;
+    unsigned pos[4];
+    int button;
+    bool barLocator;
+    bool waveMode;
 
-   private slots:
-      void songChanged(int);
+private slots:
+    void songChanged(int);
 
-   protected:
-      virtual void pdraw(QPainter&, const QRect&);
-      virtual void viewMousePressEvent(QMouseEvent* event);
-      virtual void viewMouseMoveEvent(QMouseEvent* event);
-      virtual void viewMouseReleaseEvent(QMouseEvent* event);
-      virtual void leaveEvent(QEvent*e);
+protected:
+    virtual void pdraw(QPainter&, const QRect&);
+    virtual void viewMousePressEvent(QMouseEvent* event);
+    virtual void viewMouseMoveEvent(QMouseEvent* event);
+    virtual void viewMouseReleaseEvent(QMouseEvent* event);
+    virtual void leaveEvent(QEvent*e);
 
-   signals:
-      void timeChanged(unsigned);
-      //void addMarker(int);
+signals:
+    void timeChanged(unsigned);
+    //void addMarker(int);
 
-   public slots:
-      void setPos(int, unsigned, bool);
+public slots:
+    void setPos(int, unsigned, bool);
 
-   public:
-      MTScale(int* raster, QWidget* parent, int xscale, bool f = false);
-      void setBarLocator(bool f) { barLocator = f; }
-      };
+public:
+    MTScale(int* raster, QWidget* parent, int xscale, bool f = false);
+
+    void setBarLocator(bool f)
+    {
+        barLocator = f;
+    }
+};
 #endif
 

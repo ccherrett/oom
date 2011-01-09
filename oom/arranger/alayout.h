@@ -22,39 +22,68 @@ class WidgetStack;
 //---------------------------------------------------------
 
 class TLLayout : public QLayout
-      {
-      Q_OBJECT
+{
+    Q_OBJECT
 
-      bool _inSetGeometry;
-      QList<QLayoutItem*> ilist;
-      QLayoutItem* li[6];
-      QScrollBar* sb;
-      WidgetStack* stack;
+    bool _inSetGeometry;
+    QList<QLayoutItem*> ilist;
+    QLayoutItem* li[6];
+    QScrollBar* sb;
+    WidgetStack* stack;
 
-    public:
-      //TLLayout(QWidget *parent) : QLayout(parent, 0, -1) {}
-      TLLayout(QWidget *parent) : QLayout(parent) { _inSetGeometry = false; setContentsMargins(0, 0, 0, 0); setSpacing(-1); }
-      ~TLLayout() { clear(); }
+public:
+    //TLLayout(QWidget *parent) : QLayout(parent, 0, -1) {}
 
-      void addItem(QLayoutItem *item) { ilist.append(item); }
-      virtual Qt::Orientations expandingDirections() const { return 0; }
-      virtual bool hasHeightForWidth() const { return false; }
-      virtual int count() const { return ilist.size(); }
-      void clear();
+    TLLayout(QWidget *parent) : QLayout(parent)
+    {
+        _inSetGeometry = false;
+        setContentsMargins(0, 0, 0, 0);
+        setSpacing(-1);
+    }
 
-      void wadd(int idx, QWidget* w);
-      virtual QSize sizeHint() const;
-      virtual QSize minimumSize() const;
-      virtual QSize maximumSize() const;
-      //QSize sizeHint() const;
-      //QSize minimumSize() const;
-      //QSize maximumSize() const;
-      ///QLayoutIterator iterator();
-      virtual void setGeometry(const QRect &rect);
+    ~TLLayout()
+    {
+        clear();
+    }
 
-      //virtual QLayoutItem* itemAt(int) const { return 0;} // ddskrjo, is pure virtual, overridden
-      virtual QLayoutItem* itemAt(int i) const { return ilist.value(i);} 
-      virtual QLayoutItem* takeAt(int); // { return 0;} // ddskrjo, is pure virtual, overridden
-      ///virtual int count() const { return ilist.count(); } // ddskrjo, is pure virtual, overridden
-      };
+    void addItem(QLayoutItem *item)
+    {
+        ilist.append(item);
+    }
+
+    virtual Qt::Orientations expandingDirections() const
+    {
+        return 0;
+    }
+
+    virtual bool hasHeightForWidth() const
+    {
+        return false;
+    }
+
+    virtual int count() const
+    {
+        return ilist.size();
+    }
+    void clear();
+
+    void wadd(int idx, QWidget* w);
+    virtual QSize sizeHint() const;
+    virtual QSize minimumSize() const;
+    virtual QSize maximumSize() const;
+    //QSize sizeHint() const;
+    //QSize minimumSize() const;
+    //QSize maximumSize() const;
+    ///QLayoutIterator iterator();
+    virtual void setGeometry(const QRect &rect);
+
+    //virtual QLayoutItem* itemAt(int) const { return 0;} // ddskrjo, is pure virtual, overridden
+
+    virtual QLayoutItem* itemAt(int i) const
+    {
+        return ilist.value(i);
+    }
+    virtual QLayoutItem* takeAt(int); // { return 0;} // ddskrjo, is pure virtual, overridden
+    ///virtual int count() const { return ilist.count(); } // ddskrjo, is pure virtual, overridden
+};
 #endif

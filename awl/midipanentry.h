@@ -23,26 +23,34 @@
 
 #include "floatentry.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   MidiPanEntry
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   MidiPanEntry
+    //---------------------------------------------------------
 
-class MidiPanEntry : public FloatEntry {
-      Q_OBJECT
+    class MidiPanEntry : public FloatEntry
+    {
+        Q_OBJECT
 
-   protected:
-      virtual void valueChange();
+    protected:
+        virtual void valueChange();
 
-   public slots:
-      virtual void setValue(double v) {
+    public slots:
+
+        virtual void setValue(double v)
+        {
             FloatEntry::setValue(v - 64.0f);
-            }
-   public:
-      MidiPanEntry(QWidget* parent);
-      virtual double value() const  { return _value + 64.0f; }
-      };
+        }
+    public:
+        MidiPanEntry(QWidget* parent);
+
+        virtual double value() const
+        {
+            return _value + 64.0f;
+        }
+    };
 }
 
 #endif

@@ -17,39 +17,58 @@
 #include <QtGlobal>
 
 class DiMap
-      {
-      double d_x1, d_x2;  // double interval boundaries
-      int d_y1,d_y2;      // integer interval boundaries
-      double d_cnv;       // conversion factor
-      bool d_log;		// logarithmic scale?
-	
-      void newFactor();	
+{
+    double d_x1, d_x2; // double interval boundaries
+    int d_y1, d_y2; // integer interval boundaries
+    double d_cnv; // conversion factor
+    bool d_log; // logarithmic scale?
 
-  public:
-      static const double LogMin;
-      static const double LogMax;
+    void newFactor();
 
-      DiMap();
-      DiMap(int, int, double, double, bool lg = FALSE);
-      ~DiMap();
-	
+public:
+    static const double LogMin;
+    static const double LogMax;
 
-      bool contains(double x) const;
-      bool contains(int x) const;
+    DiMap();
+    DiMap(int, int, double, double, bool lg = FALSE);
+    ~DiMap();
 
-      void setIntRange(int i1, int i2);
-      void setDblRange(double d1, double d2, bool lg = FALSE);
 
-      int transform(double x) const;
-      double invTransform(int i) const;
-      int limTransform(double x) const;
-      double xTransform(double x) const;
-	
-      double d1() const        { return d_x1;}
-      double d2() const        { return d_x2;}
-      int i1() const           { return d_y1;}
-      int i2() const           { return d_y2;}
-      bool logarithmic() const { return d_log;}
-      };
+    bool contains(double x) const;
+    bool contains(int x) const;
+
+    void setIntRange(int i1, int i2);
+    void setDblRange(double d1, double d2, bool lg = FALSE);
+
+    int transform(double x) const;
+    double invTransform(int i) const;
+    int limTransform(double x) const;
+    double xTransform(double x) const;
+
+    double d1() const
+    {
+        return d_x1;
+    }
+
+    double d2() const
+    {
+        return d_x2;
+    }
+
+    int i1() const
+    {
+        return d_y1;
+    }
+
+    int i2() const
+    {
+        return d_y2;
+    }
+
+    bool logarithmic() const
+    {
+        return d_log;
+    }
+};
 
 #endif

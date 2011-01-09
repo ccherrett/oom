@@ -23,23 +23,25 @@
 
 #include "knob.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   PanKnob
-//!   Pan Knob entry widget
-//
-//!   This widget implements a centered floating point
-//!   knob used to adjust the pan position in an audio
-//!   mixer.
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   PanKnob
+    //!   Pan Knob entry widget
+    //
+    //!   This widget implements a centered floating point
+    //!   knob used to adjust the pan position in an audio
+    //!   mixer.
+    //---------------------------------------------------------
 
-class PanKnob : public Knob {
-      Q_OBJECT
+    class PanKnob : public Knob
+    {
+        Q_OBJECT
 
-   public:
-      PanKnob(QWidget* parent = 0);
-      };
+    public:
+        PanKnob(QWidget* parent = 0);
+    };
 }
 
 #endif

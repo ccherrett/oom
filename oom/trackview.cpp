@@ -24,7 +24,8 @@ TrackView::~TrackView()
 void TrackView::setDefaultName()/*{{{*/
 {
 	QString base;
-	switch(_type) {
+	switch (_type)
+	{
 		case Track::MIDI:
 		case Track::DRUM:
 		case Track::WAVE:
@@ -47,12 +48,14 @@ void TrackView::setDefaultName()/*{{{*/
 			break;
 	};
 	base += " ";
-	for (int i = 1; true; ++i) {
+	for (int i = 1; true; ++i)
+	{
 		QString n;
 		n.setNum(i);
 		QString s = base + n;
 		TrackView* tv = song->findTrackView(s);
-		if (tv == 0) {
+		if (tv == 0)
+		{
 			setViewName(s);
 			break;
 		}
@@ -66,7 +69,7 @@ void TrackView::setDefaultName()/*{{{*/
 void TrackView::addTrack(Track* t)/*{{{*/
 {
 	Track::TrackType type = (Track::TrackType) t->type();
-	if(type == _type)
+	if (type == _type)
 	{
 		_tracks.push_back(t);
 	}
@@ -84,17 +87,20 @@ void TrackView::removeTrack(Track* t)
 
 void TrackView::read(Xml& xml)/*{{{*/
 {
-	for (;;) {
+	for (;;)
+	{
 		Xml::Token token = xml.parse();
 		const QString& tag = xml.s1();
-		switch (token) {
+		switch (token)
+		{
 			case Xml::Error:
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if (tag == "vtrack") {
+				if (tag == "vtrack")
+				{
 					Track* t = song->findTrack(xml.parse1());
-					if(t != 0)
+					if (t != 0)
 					{
 						addTrack(t);
 					}
@@ -107,13 +113,13 @@ void TrackView::read(Xml& xml)/*{{{*/
 					_comment = xml.parse1();
 				else if (tag == "selected")
 					_selected = xml.parseInt();
-				else if(tag == "type")
+				else if (tag == "type")
 					_type = (Track::TrackType)xml.parseInt();
 				break;
 			case Xml::TagEnd:
 				break;
 			default:
-            break;
+				break;
 		}
 	}
 }/*}}}*/

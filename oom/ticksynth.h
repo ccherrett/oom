@@ -11,9 +11,14 @@
 #include "synth.h"
 extern void initMetronome();
 extern void exitMetronome();
+
 class MetronomeSynthI : public SynthI
 {
-   virtual bool hasAuxSend() const  { return false; }
+
+    virtual bool hasAuxSend() const
+    {
+        return false;
+    }
 
 };
 extern MetronomeSynthI* metronome;

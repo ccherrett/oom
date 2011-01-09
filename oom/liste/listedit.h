@@ -31,49 +31,53 @@ class Xml;
 //   ListEdit
 //---------------------------------------------------------
 
-class ListEdit : public MidiEditor {
-      QTreeWidget* liste;
-      QMenu* menuEdit;
-      QActionGroup* insertItems;
-      QToolBar* listTools;
-      MidiTrack* curTrack;
-      MidiPart* curPart;
-      int selectedTick;
-      int curPartId;
+class ListEdit : public MidiEditor
+{
+    QTreeWidget* liste;
+    QMenu* menuEdit;
+    QActionGroup* insertItems;
+    QToolBar* listTools;
+    MidiTrack* curTrack;
+    MidiPart* curPart;
+    int selectedTick;
+    int curPartId;
 
-      enum { CMD_DELETE };
+    enum
+    {
+        CMD_DELETE
+    };
 
-      Q_OBJECT
-      virtual void closeEvent(QCloseEvent*);
-      virtual void keyPressEvent(QKeyEvent*);
-      void initShortcuts();
-      QAction *insertNote, *insertSysEx, *insertCtrl, *insertMeta, *insertCAfter, *insertPAfter;
+    Q_OBJECT
+    virtual void closeEvent(QCloseEvent*);
+    virtual void keyPressEvent(QKeyEvent*);
+    void initShortcuts();
+    QAction *insertNote, *insertSysEx, *insertCtrl, *insertMeta, *insertCAfter, *insertPAfter;
 
-   private slots:
-      void editInsertNote();
-      void editInsertSysEx();
-      void editInsertCtrl();
-      void editInsertMeta();
-      void editInsertCAfter();
-      void editInsertPAfter();
-      void editEvent(Event&, MidiPart*);
-      void selectionChanged();
-      void doubleClicked(QTreeWidgetItem*);
-      void cmd(int cmd);
-      void configChanged();
+private slots:
+    void editInsertNote();
+    void editInsertSysEx();
+    void editInsertCtrl();
+    void editInsertMeta();
+    void editInsertCAfter();
+    void editInsertPAfter();
+    void editEvent(Event&, MidiPart*);
+    void selectionChanged();
+    void doubleClicked(QTreeWidgetItem*);
+    void cmd(int cmd);
+    void configChanged();
 
-   public slots:
-      void songChanged(int);
+public slots:
+    void songChanged(int);
 
-   signals:
-      void deleted(unsigned long);
+signals:
+    void deleted(unsigned long);
 
-   public:
-      ListEdit(PartList*);
-      ~ListEdit();
-      virtual void readStatus(Xml&);
-      virtual void writeStatus(int, Xml&) const;
-      };
+public:
+    ListEdit(PartList*);
+    ~ListEdit();
+    virtual void readStatus(Xml&);
+    virtual void writeStatus(int, Xml&) const;
+};
 
 #endif
 

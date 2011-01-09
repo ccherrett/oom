@@ -32,29 +32,29 @@ class SndFileR;
 
 class AudioConverter
 {
-   protected:   
-      int _refCount;
-      off_t _sfCurFrame;
-      
-   public:   
-      AudioConverter();
-      ~AudioConverter();
-      
-      AudioConverter* reference();
-      static AudioConverter* release(AudioConverter* cv);
-      
-      //off_t readAudio(SndFileR& /*sf*/, off_t /*sfCurFrame*/, unsigned /*offset*/, float** /*buffer*/, 
-      //                int /*channels*/, int /*frames*/, bool /*doSeek*/, bool /*overwrite*/);
-      off_t readAudio(SndFileR& /*sf*/, unsigned /*offset*/, float** /*buffer*/, 
-                      int /*channels*/, int /*frames*/, bool /*doSeek*/, bool /*overwrite*/);
-      
-      virtual bool isValid() = 0;
-      virtual void reset() = 0;
-      virtual void setChannels(int ch) = 0;
-      //virtual off_t process(SndFileR& /*sf*/, off_t /*sfCurFrame*/, float** /*buffer*/, 
-      //                      int /*channels*/, int /*frames*/, bool /*overwrite*/) = 0; // Interleaved buffer if stereo.
-      virtual off_t process(SndFileR& /*sf*/, float** /*buffer*/, 
-                            int /*channels*/, int /*frames*/, bool /*overwrite*/) = 0; // Interleaved buffer if stereo.
+protected:
+    int _refCount;
+    off_t _sfCurFrame;
+
+public:
+    AudioConverter();
+    ~AudioConverter();
+
+    AudioConverter* reference();
+    static AudioConverter* release(AudioConverter* cv);
+
+    //off_t readAudio(SndFileR& /*sf*/, off_t /*sfCurFrame*/, unsigned /*offset*/, float** /*buffer*/,
+    //                int /*channels*/, int /*frames*/, bool /*doSeek*/, bool /*overwrite*/);
+    off_t readAudio(SndFileR& /*sf*/, unsigned /*offset*/, float** /*buffer*/,
+            int /*channels*/, int /*frames*/, bool /*doSeek*/, bool /*overwrite*/);
+
+    virtual bool isValid() = 0;
+    virtual void reset() = 0;
+    virtual void setChannels(int ch) = 0;
+    //virtual off_t process(SndFileR& /*sf*/, off_t /*sfCurFrame*/, float** /*buffer*/,
+    //                      int /*channels*/, int /*frames*/, bool /*overwrite*/) = 0; // Interleaved buffer if stereo.
+    virtual off_t process(SndFileR& /*sf*/, float** /*buffer*/,
+            int /*channels*/, int /*frames*/, bool /*overwrite*/) = 0; // Interleaved buffer if stereo.
 };
 
 //---------------------------------------------------------
@@ -63,21 +63,24 @@ class AudioConverter
 
 class SRCAudioConverter : public AudioConverter
 {
-      int _type;
-      int _channels;
-      SRC_STATE* _src_state;
-   
-   public:   
-      SRCAudioConverter(int channels, int type);
-      ~SRCAudioConverter();
-      
-      virtual bool isValid() { return _src_state != 0; }
-      virtual void reset();
-      virtual void setChannels(int ch);
-      //virtual off_t process(SndFileR& /*sf*/, off_t /*sfCurFrame*/, float** /*buffer*/, 
-      //                      int /*channels*/, int /*frames*/, bool /*overwrite*/); // Interleaved buffer if stereo.
-      virtual off_t process(SndFileR& /*sf*/, float** /*buffer*/, 
-                            int /*channels*/, int /*frames*/, bool /*overwrite*/); // Interleaved buffer if stereo.
+    int _type;
+    int _channels;
+    SRC_STATE* _src_state;
+
+public:
+    SRCAudioConverter(int channels, int type);
+    ~SRCAudioConverter();
+
+    virtual bool isValid()
+    {
+        return _src_state != 0;
+    }
+    virtual void reset();
+    virtual void setChannels(int ch);
+    //virtual off_t process(SndFileR& /*sf*/, off_t /*sfCurFrame*/, float** /*buffer*/,
+    //                      int /*channels*/, int /*frames*/, bool /*overwrite*/); // Interleaved buffer if stereo.
+    virtual off_t process(SndFileR& /*sf*/, float** /*buffer*/,
+            int /*channels*/, int /*frames*/, bool /*overwrite*/); // Interleaved buffer if stereo.
 };
 
 #ifdef RUBBERBAND_SUPPORT
@@ -88,21 +91,24 @@ class SRCAudioConverter : public AudioConverter
 
 class RubberBandAudioConverter : public AudioConverter
 {
-      int _options;
-      int _channels;
-      RubberBandStretcher* _rbs;
-   
-   public:   
-      RubberBandAudioConverter(int channels, int options);
-      ~RubberBandAudioConverter();
-      
-      virtual bool isValid() { return _rbs != 0; }
-      virtual void reset();
-      virtual void setChannels(int ch);
-      //virtual off_t process(SndFileR& /*sf*/, off_t /*sfCurFrame*/, float** /*buffer*/, 
-      //                      int /*channels*/, int /*frames*/, bool /*overwrite*/); // Interleaved buffer if stereo.
-      virtual off_t process(SndFileR& /*sf*/, float** /*buffer*/, 
-                            int /*channels*/, int /*frames*/, bool /*overwrite*/); // Interleaved buffer if stereo.
+    int _options;
+    int _channels;
+    RubberBandStretcher* _rbs;
+
+public:
+    RubberBandAudioConverter(int channels, int options);
+    ~RubberBandAudioConverter();
+
+    virtual bool isValid()
+    {
+        return _rbs != 0;
+    }
+    virtual void reset();
+    virtual void setChannels(int ch);
+    //virtual off_t process(SndFileR& /*sf*/, off_t /*sfCurFrame*/, float** /*buffer*/,
+    //                      int /*channels*/, int /*frames*/, bool /*overwrite*/); // Interleaved buffer if stereo.
+    virtual off_t process(SndFileR& /*sf*/, float** /*buffer*/,
+            int /*channels*/, int /*frames*/, bool /*overwrite*/); // Interleaved buffer if stereo.
 };
 
 #endif // RUBBERBAND_SUPPORT
@@ -115,14 +121,15 @@ typedef std::map<EventBase*, AudioConverter*, std::less<EventBase*> >::iterator 
 typedef std::map<EventBase*, AudioConverter*, std::less<EventBase*> >::const_iterator ciAudioConvertMap;
 
 //typedef std::map<EventBase*, AudioConverter*, std::less<EventBase*> > AudioConvertMap;
-class AudioConvertMap : public std::map<EventBase*, AudioConverter*, std::less<EventBase*> > 
+
+class AudioConvertMap : public std::map<EventBase*, AudioConverter*, std::less<EventBase*> >
 {
-   public:
-      void remapEvents(const EventList*);  
-      iAudioConvertMap addEvent(EventBase*);
-      void removeEvent(EventBase*);
-      //AudioConverter* getConverter(const EventBase*);
-      iAudioConvertMap getConverter(EventBase*);
+public:
+    void remapEvents(const EventList*);
+    iAudioConvertMap addEvent(EventBase*);
+    void removeEvent(EventBase*);
+    //AudioConverter* getConverter(const EventBase*);
+    iAudioConvertMap getConverter(EventBase*);
 };
 
 #endif

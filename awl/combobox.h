@@ -23,34 +23,50 @@
 
 #include <QComboBox>
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   ComboBox
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   ComboBox
+    //---------------------------------------------------------
 
-class ComboBox : public QComboBox {
-      Q_OBJECT
-      Q_PROPERTY(int id READ id WRITE setId)
+    class ComboBox : public QComboBox
+    {
+        Q_OBJECT
+        Q_PROPERTY(int id READ id WRITE setId)
 
-      int _id;
+        int _id;
 
-   private slots:
-      void activatedIntern(int val) {
+    private slots:
+
+        void activatedIntern(int val)
+        {
             emit valueChanged(double(val), _id);
-            }
+        }
 
-   signals:
-      void valueChanged(double, int);
+    signals:
+        void valueChanged(double, int);
 
-   public slots:
-      void setValue(double val) { setCurrentIndex(int(val)); }
+    public slots:
 
-   public:
-      ComboBox(QWidget* parent);
-      int id() const       { return _id; }
-      void setId(int i)    { _id = i; }
-      };
+        void setValue(double val)
+        {
+            setCurrentIndex(int(val));
+        }
+
+    public:
+        ComboBox(QWidget* parent);
+
+        int id() const
+        {
+            return _id;
+        }
+
+        void setId(int i)
+        {
+            _id = i;
+        }
+    };
 
 }
 

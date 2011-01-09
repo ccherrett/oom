@@ -14,19 +14,19 @@
 //---------------------------------------------------------
 
 PanKnob::PanKnob(QWidget* parent, AudioTrack* s)
-   : Knob(parent, "pan")
-      {
-      src = s;
-      connect(this, SIGNAL(valueChanged(double,int)), SLOT(valueChanged(double)));
-      }
+: Knob(parent, "pan")
+{
+	src = s;
+	connect(this, SIGNAL(valueChanged(double, int)), SLOT(valueChanged(double)));
+}
 
 //---------------------------------------------------------
 //   panChanged
 //---------------------------------------------------------
 
 void PanKnob::valueChanged(double val)
-      {
-      audio->msgSetPan(src, val);
-      }
+{
+	audio->msgSetPan(src, val);
+}
 
 

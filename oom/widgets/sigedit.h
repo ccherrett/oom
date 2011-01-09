@@ -18,71 +18,83 @@ class QTimerEvent;
 class SigEditor;
 class SpinBox;
 
-struct Sig {
-      int z;
-      int n;
-   public:
-      Sig(int _z, int _n) : z(_z), n(_n) {}
-      bool isValid() const;
-      };
+struct Sig
+{
+    int z;
+    int n;
+public:
+
+    Sig(int _z, int _n) : z(_z), n(_n)
+    {
+    }
+    bool isValid() const;
+};
 
 //---------------------------------------------------------
 //   SigEdit
 //---------------------------------------------------------
 
 class SigEdit : public QWidget
-      {
-      Q_OBJECT
-      void init();
+{
+    Q_OBJECT
+    void init();
 
-      QString sectionText(int sec);
-      Section sec[2];
+    QString sectionText(int sec);
+    Section sec[2];
 
-      bool adv;
-      bool overwrite;
-      int timerId;
-      bool typing;
-      bool changed;
-      SigEditor *ed;
-      SpinBox* controls;
+    bool adv;
+    bool overwrite;
+    int timerId;
+    bool typing;
+    bool changed;
+    SigEditor *ed;
+    SpinBox* controls;
 
-   private slots:
-      void stepUp();
-      void stepDown();
+private slots:
+    void stepUp();
+    void stepDown();
 
-   signals:
-      void valueChanged(int, int);
-      void returnPressed();
+signals:
+    void valueChanged(int, int);
+    void returnPressed();
 
-   protected:
-      bool event(QEvent *e );
-      void timerEvent(QTimerEvent* e);
-      void resizeEvent(QResizeEvent*);
-      QString sectionFormattedText(int sec);
-      void addNumber(int sec, int num);
-      void removeLastNumber(int sec);
-      bool setFocusSection(int s);
+protected:
+    bool event(QEvent *e);
+    void timerEvent(QTimerEvent* e);
+    void resizeEvent(QResizeEvent*);
+    QString sectionFormattedText(int sec);
+    void addNumber(int sec, int num);
+    void removeLastNumber(int sec);
+    bool setFocusSection(int s);
 
-      virtual bool outOfRange(int, int) const;
-      virtual void setSec(int, int);
-      friend class SigEditor;
+    virtual bool outOfRange(int, int) const;
+    virtual void setSec(int, int);
+    friend class SigEditor;
 
-   protected slots:
-      void updateButtons();
+protected slots:
+    void updateButtons();
 
-   public slots:
-      virtual void setValue(const Sig& sig);
-      void setValue(const QString& s);
+public slots:
+    virtual void setValue(const Sig& sig);
+    void setValue(const QString& s);
 
-   public:
-      SigEdit(QWidget*,  const char* = 0);
-      ~SigEdit();
+public:
+    SigEdit(QWidget*, const char* = 0);
+    ~SigEdit();
 
-      QSize sizeHint() const;
-      Sig sig() const;
-      virtual void setAutoAdvance(bool advance) { adv = advance; }
-      bool autoAdvance() const                  { return adv; }
-      void enterPressed();
-      };
+    QSize sizeHint() const;
+    Sig sig() const;
+
+    virtual void setAutoAdvance(bool advance)
+    {
+        adv = advance;
+    }
+
+    bool autoAdvance() const
+    {
+        return adv;
+    }
+    void enterPressed();
+};
 
 #endif

@@ -23,23 +23,25 @@
 
 #include "knob.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   VolKnob
-//!   Volume Knob entry widget
-//
-//!   This widget implements knob with a logarithmic
-//!   floating point scale used to adjust the volume
-//!   in an audio mixer.
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   VolKnob
+    //!   Volume Knob entry widget
+    //
+    //!   This widget implements knob with a logarithmic
+    //!   floating point scale used to adjust the volume
+    //!   in an audio mixer.
+    //---------------------------------------------------------
 
-class VolKnob : public Knob {
-      Q_OBJECT
+    class VolKnob : public Knob
+    {
+        Q_OBJECT
 
-   public:
-      VolKnob(QWidget* parent = 0);
-      };
+    public:
+        VolKnob(QWidget* parent = 0);
+    };
 }
 
 #endif

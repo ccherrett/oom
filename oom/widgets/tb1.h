@@ -22,40 +22,41 @@ class LabelCombo;
 //   Toolbar1
 //---------------------------------------------------------
 
-class Toolbar1 : public QToolBar {       
-      QToolButton* solo;
-      PosLabel* pos;
-      PitchLabel* pitch;
-      LabelCombo* quant;
-      QTableWidget* qlist;
-      LabelCombo* raster;
-      QTableWidget* rlist;
-      bool showPitch;
-      Q_OBJECT
+class Toolbar1 : public QToolBar
+{
+    QToolButton* solo;
+    PosLabel* pos;
+    PitchLabel* pitch;
+    LabelCombo* quant;
+    QTableWidget* qlist;
+    LabelCombo* raster;
+    QTableWidget* rlist;
+    bool showPitch;
+    Q_OBJECT
 
-   private slots:
-      void _rasterChanged(int);
-      void _quantChanged(int);
+private slots:
+    void _rasterChanged(int);
+    void _quantChanged(int);
 
-   public slots:
-      void setTime(unsigned);
-      void setPitch(int);
-      void setInt(int);
-      void setRaster(int);
-      void setQuant(int);
+public slots:
+    void setTime(unsigned);
+    void setPitch(int);
+    void setInt(int);
+    void setRaster(int);
+    void setQuant(int);
 
-   signals:
-      void rasterChanged(int);
-      void quantChanged(int);
-      void soloChanged(bool);
-      void toChanged(int);
+signals:
+    void rasterChanged(int);
+    void quantChanged(int);
+    void soloChanged(bool);
+    void toChanged(int);
 
-   public:
-      //Toolbar1(QMainWindow* parent = 0, int r=96,
-      Toolbar1(QWidget* parent, int r=96,     
-         int q=96, bool showPitch=true);
-      void setSolo(bool val);
-      void setPitchMode(bool flag);
-      };
+public:
+    //Toolbar1(QMainWindow* parent = 0, int r=96,
+    Toolbar1(QWidget* parent, int r = 96,
+            int q = 96, bool showPitch = true);
+    void setSolo(bool val);
+    void setPitchMode(bool flag);
+};
 
 #endif

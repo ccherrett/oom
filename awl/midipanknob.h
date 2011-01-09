@@ -23,32 +23,42 @@
 
 #include "knob.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   MidiPanKnob
-//!   MidiPan Knob entry widget
-//
-//!   This widget implements a centered floating point
-//!   knob used to adjust the pan position in an audio
-//!   mixer.
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   MidiPanKnob
+    //!   MidiPan Knob entry widget
+    //
+    //!   This widget implements a centered floating point
+    //!   knob used to adjust the pan position in an audio
+    //!   mixer.
+    //---------------------------------------------------------
 
-class MidiPanKnob : public Knob {
-      Q_OBJECT
+    class MidiPanKnob : public Knob
+    {
 
-      virtual void valueChange() {
+        Q_OBJECT
+
+        virtual void valueChange()
+        {
             emit valueChanged(_value + 64.0f, _id);
-            }
+        }
 
-   public slots:
-      virtual void setValue(double v) {
+    public slots:
+
+        virtual void setValue(double v)
+        {
             AbstractSlider::setValue(v - 64.0f);
-            }
-   public:
-      MidiPanKnob(QWidget* parent = 0);
-      virtual double value() const { return _value + 64.0f; }
-      };
+        }
+    public:
+        MidiPanKnob(QWidget* parent = 0);
+
+        virtual double value() const
+        {
+            return _value + 64.0f;
+        }
+    };
 }
 
 #endif

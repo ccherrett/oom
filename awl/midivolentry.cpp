@@ -23,28 +23,28 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   MidiVolEntry
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   MidiVolEntry
+	//---------------------------------------------------------
 
-MidiVolEntry::MidiVolEntry(QWidget* parent)
-   : FloatEntry(parent)
-      {
-  	_max = 127;
-      setRange(-98.0f, 0.0f);
-      setSpecialText(tr("off"));
-      setSuffix(tr("db"));
-      setFrame(true);
-      setPrecision(0);
-      }
+	MidiVolEntry::MidiVolEntry(QWidget* parent)
+	: FloatEntry(parent)
+	{
+		_max = 127;
+		setRange(-98.0f, 0.0f);
+		setSpecialText(tr("off"));
+		setSuffix(tr("db"));
+		setFrame(true);
+		setPrecision(0);
+	}
 
-//---------------------------------------------------------
-//   setValue
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   setValue
+	//---------------------------------------------------------
 
-void MidiVolEntry::setValue(double v)
-      {
-      FloatEntry::setValue(-fast_log10(double(_max*_max)/(v*v))*20.0f);
-      }
+	void MidiVolEntry::setValue(double v)
+	{
+		FloatEntry::setValue(-fast_log10(double(_max * _max) / (v * v))*20.0f);
+	}
 }
 

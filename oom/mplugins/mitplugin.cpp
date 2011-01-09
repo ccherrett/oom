@@ -27,89 +27,104 @@ MITPluginList mitPlugins;
 //---------------------------------------------------------
 
 void OOMidi::startMidiInputPlugin(int id)
-      {
-      bool flag = false;
-      QWidget* w = 0;
-      QAction* act;
-      if (id == 0) {
-            if (!mitPluginTranspose) {
-                  mitPluginTranspose = new MITPluginTranspose();
-                  mitPlugins.push_back(mitPluginTranspose);
-                  connect(mitPluginTranspose, SIGNAL(hideWindow()),
-                     SLOT(hideMitPluginTranspose()));
-                  }
-            w = mitPluginTranspose;
-            act = midiTrpAction;
-            }
-      else if (id == 1) {
-            if (!midiInputTransform) {
-                  midiInputTransform = new MidiInputTransformDialog();
-                  connect(midiInputTransform, SIGNAL(hideWindow()),
-                     SLOT(hideMidiInputTransform()));
-                  }
-            w = midiInputTransform;
-            act = midiInputTrfAction;
-            }
-      else if (id == 2) {
-            if (!midiFilterConfig) {
-                  midiFilterConfig = new MidiFilterConfig();
-                  connect(midiFilterConfig, SIGNAL(hideWindow()),
-                     SLOT(hideMidiFilterConfig()));
-                  }
-            w = midiFilterConfig;
-            act = midiInputFilterAction;
-            }
-      else if (id == 3) {
-            if (!midiRemoteConfig) {
-                  midiRemoteConfig = new MRConfig();
-                  connect(midiRemoteConfig, SIGNAL(hideWindow()),
-                     SLOT(hideMidiRemoteConfig()));
-                  }
-            w = midiRemoteConfig;
-            act = midiRemoteAction;
-            }
+{
+	bool flag = false;
+	QWidget* w = 0;
+	QAction* act;
+	if (id == 0)
+	{
+		if (!mitPluginTranspose)
+		{
+			mitPluginTranspose = new MITPluginTranspose();
+			mitPlugins.push_back(mitPluginTranspose);
+			connect(mitPluginTranspose, SIGNAL(hideWindow()),
+					SLOT(hideMitPluginTranspose()));
+		}
+		w = mitPluginTranspose;
+		act = midiTrpAction;
+	}
+	else if (id == 1)
+	{
+		if (!midiInputTransform)
+		{
+			midiInputTransform = new MidiInputTransformDialog();
+			connect(midiInputTransform, SIGNAL(hideWindow()),
+					SLOT(hideMidiInputTransform()));
+		}
+		w = midiInputTransform;
+		act = midiInputTrfAction;
+	}
+	else if (id == 2)
+	{
+		if (!midiFilterConfig)
+		{
+			midiFilterConfig = new MidiFilterConfig();
+			connect(midiFilterConfig, SIGNAL(hideWindow()),
+					SLOT(hideMidiFilterConfig()));
+		}
+		w = midiFilterConfig;
+		act = midiInputFilterAction;
+	}
+	else if (id == 3)
+	{
+		if (!midiRemoteConfig)
+		{
+			midiRemoteConfig = new MRConfig();
+			connect(midiRemoteConfig, SIGNAL(hideWindow()),
+					SLOT(hideMidiRemoteConfig()));
+		}
+		w = midiRemoteConfig;
+		act = midiRemoteAction;
+	}
 #ifdef BUILD_EXPERIMENTAL
-      else if (id == 4) {
-            if (!midiRhythmGenerator) {
-                  midiRhythmGenerator = new RhythmGen();
-                  connect(midiRhythmGenerator, SIGNAL(hideWindow()),
-                     SLOT(hideMidiRhythmGenerator()));
-                  }
-            w = midiRhythmGenerator;
-            act = midiRhythmAction;
-            }
+	else if (id == 4)
+	{
+		if (!midiRhythmGenerator)
+		{
+			midiRhythmGenerator = new RhythmGen();
+			connect(midiRhythmGenerator, SIGNAL(hideWindow()),
+					SLOT(hideMidiRhythmGenerator()));
+		}
+		w = midiRhythmGenerator;
+		act = midiRhythmAction;
+	}
 #endif
-      if (w) {
-            flag = !w->isVisible();
-            if (flag)
-                  w->show();
-            else
-                  w->hide();
-            }
-      act->setChecked(flag);
-      }
+	if (w)
+	{
+		flag = !w->isVisible();
+		if (flag)
+			w->show();
+		else
+			w->hide();
+	}
+	act->setChecked(flag);
+}
 
 void OOMidi::hideMitPluginTranspose()
-      {
-      midiTrpAction->setChecked(false);
-      }
+{
+	midiTrpAction->setChecked(false);
+}
+
 void OOMidi::hideMidiInputTransform()
-      {
-      midiInputTrfAction->setChecked(false);
-      }
+{
+	midiInputTrfAction->setChecked(false);
+}
+
 void OOMidi::hideMidiFilterConfig()
-      {
-      midiInputFilterAction->setChecked(false);
-      }
+{
+	midiInputFilterAction->setChecked(false);
+}
+
 void OOMidi::hideMidiRemoteConfig()
-      {
-      midiRemoteAction->setChecked(false);
-      }
+{
+	midiRemoteAction->setChecked(false);
+}
 #ifdef BUILD_EXPERIMENTAL
+
 void OOMidi::hideMidiRhythmGenerator()
-      {
-      midiRhythmAction->setChecked(false);
-      }
+{
+	midiRhythmAction->setChecked(false);
+}
 #endif
 
 //---------------------------------------------------------
@@ -117,40 +132,41 @@ void OOMidi::hideMidiRhythmGenerator()
 //---------------------------------------------------------
 
 void processMidiInputTransformPlugins(MEvent& event)
-      {
-      for (iMITPlugin i = mitPlugins.begin(); i != mitPlugins.end(); ++i)
-            (*i)->process(event);
-      }
+{
+	for (iMITPlugin i = mitPlugins.begin(); i != mitPlugins.end(); ++i)
+		(*i)->process(event);
+}
 
 //---------------------------------------------------------
 //   startMidiTransformer
 //---------------------------------------------------------
 
 void OOMidi::startMidiTransformer()
-      {
-      if (midiTransformerDialog == 0)
-            midiTransformerDialog = new MidiTransformerDialog;
-      midiTransformerDialog->show();
-      }
+{
+	if (midiTransformerDialog == 0)
+		midiTransformerDialog = new MidiTransformerDialog;
+	midiTransformerDialog->show();
+}
 
 //---------------------------------------------------------
 //   writeStatusMidiInputTransformPlugins
 //---------------------------------------------------------
 
 void writeStatusMidiInputTransformPlugins(int level, Xml& xml)
-      {
-      for (iMITPlugin i = mitPlugins.begin(); i != mitPlugins.end(); ++i) {
-            xml.tag(level++, "mplugin name=\"%d\"");
-            (*i)->writeStatus(level, xml);
-            xml.etag(level, "mplugin");
-            }
-      }
+{
+	for (iMITPlugin i = mitPlugins.begin(); i != mitPlugins.end(); ++i)
+	{
+		xml.tag(level++, "mplugin name=\"%d\"");
+		(*i)->writeStatus(level, xml);
+		xml.etag(level, "mplugin");
+	}
+}
 
 //---------------------------------------------------------
 //   readStatusMidiInputTransformPlugin
 //---------------------------------------------------------
 
 void readStatusMidiInputTransformPlugin(Xml&)
-      {
-      }
+{
+}
 

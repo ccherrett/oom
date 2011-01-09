@@ -20,80 +20,104 @@ class QString;
 //    changes.
 //---------------------------------------------------------
 
-class Pos {
-   public:
-      enum TType { TICKS, FRAMES };
+class Pos
+{
+public:
 
-   private:
-      TType _type;
-      mutable int sn;
-      mutable unsigned _tick;
-      mutable unsigned _frame;
+    enum TType
+    {
+        TICKS, FRAMES
+    };
 
-   public:
-      Pos();
-      Pos(const Pos&);
-      Pos(int,int,int);
-      Pos(int,int,int,int);
-      Pos(unsigned, bool ticks=true);
-      Pos(const QString&);
-      void dump(int n = 0) const;
-      void mbt(int*, int*, int*) const;
-      void msf(int*, int*, int*, int*) const;
+private:
+    TType _type;
+    mutable int sn;
+    mutable unsigned _tick;
+    mutable unsigned _frame;
 
-      void invalidSn()  { sn = -1; }
+public:
+    Pos();
+    Pos(const Pos&);
+    Pos(int, int, int);
+    Pos(int, int, int, int);
+    Pos(unsigned, bool ticks = true);
+    Pos(const QString&);
+    void dump(int n = 0) const;
+    void mbt(int*, int*, int*) const;
+    void msf(int*, int*, int*, int*) const;
 
-      TType  type() const     { return _type; }
-      void   setType(TType t);
+    void invalidSn()
+    {
+        sn = -1;
+    }
 
-      Pos& operator+=(Pos a);
-      Pos& operator+=(int a);
+    TType type() const
+    {
+        return _type;
+    }
+    void setType(TType t);
 
-      bool operator>=(const Pos& s) const;
-      bool operator>(const Pos& s) const;
-      bool operator<(const Pos& s) const;
-      bool operator<=(const Pos& s) const;
-      bool operator==(const Pos& s) const;
+    Pos & operator+=(Pos a);
+    Pos & operator+=(int a);
 
-      friend Pos operator+(Pos a, Pos b);
-      friend Pos operator+(Pos a, int b);
+    bool operator>=(const Pos& s) const;
+    bool operator>(const Pos& s) const;
+    bool operator<(const Pos& s) const;
+    bool operator<=(const Pos& s) const;
+    bool operator==(const Pos& s) const;
 
-      unsigned tick() const;
-      unsigned frame() const;
-      void setTick(unsigned);
-      void setFrame(unsigned);
+    friend Pos operator+(Pos a, Pos b);
+    friend Pos operator+(Pos a, int b);
 
-      void write(int level, Xml&, const char*) const;
-      void read(Xml& xml, const char*);
-      bool isValid() const { return true; }
-      static bool isValid(int m, int b, int t);
-      static bool isValid(int, int, int, int);
-      };
+    unsigned tick() const;
+    unsigned frame() const;
+    void setTick(unsigned);
+    void setFrame(unsigned);
+
+    void write(int level, Xml&, const char*) const;
+    void read(Xml& xml, const char*);
+
+    bool isValid() const
+    {
+        return true;
+    }
+    static bool isValid(int m, int b, int t);
+    static bool isValid(int, int, int, int);
+};
 
 //---------------------------------------------------------
 //   PosLen
 //---------------------------------------------------------
 
-class PosLen : public Pos {
-      mutable unsigned _lenTick;
-      mutable unsigned _lenFrame;
-      mutable int sn;
+class PosLen : public Pos
+{
+    mutable unsigned _lenTick;
+    mutable unsigned _lenFrame;
+    mutable int sn;
 
-   public:
-      PosLen();
-      PosLen(const PosLen&);
-      void dump(int n = 0) const;
+public:
+    PosLen();
+    PosLen(const PosLen&);
+    void dump(int n = 0) const;
 
-      void write(int level, Xml&, const char*) const;
-      void read(Xml& xml, const char*);
-      void setLenTick(unsigned);
-      void setLenFrame(unsigned);
-      unsigned lenTick() const;
-      unsigned lenFrame() const;
-      Pos end() const;
-      unsigned endTick() const    { return end().tick(); }
-      unsigned endFrame() const   { return end().frame(); }
-      void setPos(const Pos&);
-      };
+    void write(int level, Xml&, const char*) const;
+    void read(Xml& xml, const char*);
+    void setLenTick(unsigned);
+    void setLenFrame(unsigned);
+    unsigned lenTick() const;
+    unsigned lenFrame() const;
+    Pos end() const;
+
+    unsigned endTick() const
+    {
+        return end().tick();
+    }
+
+    unsigned endFrame() const
+    {
+        return end().frame();
+    }
+    void setPos(const Pos&);
+};
 
 #endif

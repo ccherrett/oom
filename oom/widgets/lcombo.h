@@ -19,25 +19,47 @@ class QString;
 //   LabelCombo
 //---------------------------------------------------------
 
-class LabelCombo : public QWidget {
-      QComboBox* box;
-      Q_OBJECT
+class LabelCombo : public QWidget
+{
+    QComboBox* box;
+    Q_OBJECT
 
-   signals:
-      void activated(int);
+signals:
+    void activated(int);
 
-   public slots:
-      void clearFocus() { box->clearFocus(); }
-      void setCurrentIndex(int i);
+public slots:
 
-   public:
-      LabelCombo(const QString& label, QWidget* parent,
-         const char* name=0);
-      void addItem(const QString& txt, const QVariant & userData = QVariant()) { box->addItem(txt, userData); }
-      void insertItem(int index, const QString& txt, const QVariant & userData = QVariant()) { box->insertItem(index, txt, userData); }
-      //void setListBox(Q3ListBox* lb) { box->setListBox(lb); } // ddskrjo
-      void setView(QAbstractItemView* v) { box->setModel(v->model()); box->setView(v); } // p4.0.3
-      void setFocusPolicy ( Qt::FocusPolicy fp ) { box->setFocusPolicy(fp); }
-      };
+    void clearFocus()
+    {
+        box->clearFocus();
+    }
+    void setCurrentIndex(int i);
+
+public:
+    LabelCombo(const QString& label, QWidget* parent,
+            const char* name = 0);
+
+    void addItem(const QString& txt, const QVariant & userData = QVariant())
+    {
+        box->addItem(txt, userData);
+    }
+
+    void insertItem(int index, const QString& txt, const QVariant & userData = QVariant())
+    {
+        box->insertItem(index, txt, userData);
+    }
+    //void setListBox(Q3ListBox* lb) { box->setListBox(lb); } // ddskrjo
+
+    void setView(QAbstractItemView* v)
+    {
+        box->setModel(v->model());
+        box->setView(v);
+    } // p4.0.3
+
+    void setFocusPolicy(Qt::FocusPolicy fp)
+    {
+        box->setFocusPolicy(fp);
+    }
+};
 
 #endif

@@ -12,42 +12,43 @@ class OOMidi;
 //   BigTime
 //---------------------------------------------------------
 
-class BigTime : public QWidget {
-      bool tickmode;
-      OOMidi* seq;
-      Q_OBJECT
+class BigTime : public QWidget
+{
+    bool tickmode;
+    OOMidi* seq;
+    Q_OBJECT
 
-      bool setString(unsigned);
+    bool setString(unsigned);
 
-      QWidget *dwin;
-      QCheckBox *fmtButton;
-      QLabel *absTickLabel;
-      QLabel *absFrameLabel;
-      QLabel *barLabel, *beatLabel, *tickLabel,
-             //*hourLabel, *minLabel, *secLabel, *frameLabel,
-             *minLabel, *secLabel, *frameLabel, *subFrameLabel, 
-             *sep1, *sep2, *sep3, *sep4, *sep5;
-      
-      //int oldbar, oldbeat, oldhour, oldmin, oldsec, oldframe;
-      int oldbar, oldbeat, oldmin, oldsec, oldframe, oldsubframe;
-      unsigned oldtick;
-      unsigned oldAbsTick, oldAbsFrame;
-      void setFgColor(QColor c);
-      void setBgColor(QColor c);
+    QWidget *dwin;
+    QCheckBox *fmtButton;
+    QLabel *absTickLabel;
+    QLabel *absFrameLabel;
+    QLabel *barLabel, *beatLabel, *tickLabel,
+    //*hourLabel, *minLabel, *secLabel, *frameLabel,
+    *minLabel, *secLabel, *frameLabel, *subFrameLabel,
+    *sep1, *sep2, *sep3, *sep4, *sep5;
 
-   protected:
-      virtual void resizeEvent(QResizeEvent*);
-      virtual void closeEvent(QCloseEvent*);
+    //int oldbar, oldbeat, oldhour, oldmin, oldsec, oldframe;
+    int oldbar, oldbeat, oldmin, oldsec, oldframe, oldsubframe;
+    unsigned oldtick;
+    unsigned oldAbsTick, oldAbsFrame;
+    void setFgColor(QColor c);
+    void setBgColor(QColor c);
 
-   public slots:
-      void setPos(int, unsigned, bool);
-      void configChanged();
-      void fmtButtonToggled(bool);
-   signals:
-      void closed();
+protected:
+    virtual void resizeEvent(QResizeEvent*);
+    virtual void closeEvent(QCloseEvent*);
 
-   public:
-      BigTime(QWidget* parent);
-      };
+public slots:
+    void setPos(int, unsigned, bool);
+    void configChanged();
+    void fmtButtonToggled(bool);
+signals:
+    void closed();
+
+public:
+    BigTime(QWidget* parent);
+};
 
 #endif

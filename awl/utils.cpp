@@ -23,28 +23,28 @@
 #include "utils.h"
 
 static const char* vall[] = {
-      "c","c#","d","d#","e","f","f#","g","g#","a","a#","h"
-      };
+	"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "h"
+};
 static const char* valu[] = {
-      "C","C#","D","D#","E","F","F#","G","G#","A","A#","H"
-      };
+	"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H"
+};
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   pitch2string
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   pitch2string
+	//---------------------------------------------------------
 
-QString pitch2string(int v)
-      {
-      if (v < 0 || v > 127)
-            return QString("----");
-      int octave = (v / 12) - 2;
-      QString o;
-      o.sprintf("%d", octave);
-      int i = v % 12;
-      QString s(octave < 0 ? valu[i] : vall[i]);
-      return s + o;
-      }
+	QString pitch2string(int v)
+	{
+		if (v < 0 || v > 127)
+			return QString("----");
+		int octave = (v / 12) - 2;
+		QString o;
+		o.sprintf("%d", octave);
+		int i = v % 12;
+		QString s(octave < 0 ? valu[i] : vall[i]);
+		return s + o;
+	}
 }
 

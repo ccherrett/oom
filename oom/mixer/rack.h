@@ -23,41 +23,49 @@ class Xml;
 //   EffectRack
 //---------------------------------------------------------
 
-class EffectRack : public QListWidget {
-      AudioTrack* track;
-      Q_OBJECT
+class EffectRack : public QListWidget
+{
+    AudioTrack* track;
+    Q_OBJECT
 
-      virtual QSize minimumSizeHint() const;
-      virtual QSize sizeHint() const;
-      
-      void startDrag(int idx);
-      void initPlugin(Xml xml, int idx);
-      QPoint dragPos;
-      void savePreset(int idx);
-      void choosePlugin(QListWidgetItem* item, bool replace = false);
+    virtual QSize minimumSizeHint() const;
+    virtual QSize sizeHint() const;
 
-   private slots:
-      void menuRequested(QListWidgetItem*);
-      void doubleClicked(QListWidgetItem*);
-      void songChanged(int);
-      void updateContents();
+    void startDrag(int idx);
+    void initPlugin(Xml xml, int idx);
+    QPoint dragPos;
+    void savePreset(int idx);
+    void choosePlugin(QListWidgetItem* item, bool replace = false);
 
-   protected:
-      void dropEvent(QDropEvent *event);
-      void dragEnterEvent(QDragEnterEvent *event);
-      void mousePressEvent(QMouseEvent *event);
-      void mouseMoveEvent(QMouseEvent *event);
+private slots:
+    void menuRequested(QListWidgetItem*);
+    void doubleClicked(QListWidgetItem*);
+    void songChanged(int);
+    void updateContents();
 
-      QStringList mimeTypes() const;
-      Qt::DropActions supportedDropActions () const;
-   
-   public:
-      EffectRack(QWidget*, AudioTrack* t);
-      ~EffectRack();
-      
-      AudioTrack* getTrack() { return track; } 
-      QPoint getDragPos() { return dragPos; }
-      };
+protected:
+    void dropEvent(QDropEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+
+    QStringList mimeTypes() const;
+    Qt::DropActions supportedDropActions() const;
+
+public:
+    EffectRack(QWidget*, AudioTrack* t);
+    ~EffectRack();
+
+    AudioTrack* getTrack()
+    {
+        return track;
+    }
+
+    QPoint getDragPos()
+    {
+        return dragPos;
+    }
+};
 
 #endif
 

@@ -14,19 +14,20 @@
 //   PitchEdit
 //---------------------------------------------------------
 
-class PitchEdit : public QSpinBox {
-      Q_OBJECT
+class PitchEdit : public QSpinBox
+{
+    Q_OBJECT
 
-      bool deltaMode;
+    bool deltaMode;
 
-   protected:
-      virtual QString mapValueToText(int v);
-      virtual int mapTextToValue(bool* ok);
+protected:
+    virtual QString mapValueToText(int v);
+    virtual int mapTextToValue(bool* ok);
 
-   public:
-      PitchEdit(QWidget* parent=0);
-      void setDeltaMode(bool);
-      };
+public:
+    PitchEdit(QWidget* parent = 0);
+    void setDeltaMode(bool);
+};
 
 extern QString pitch2string(int v);
 

@@ -13,12 +13,12 @@
 //---------------------------------------------------------
 
 void syncChanged(bool flag)
-      {
-      startAction->setEnabled(!flag);
-      forwardAction->setEnabled(!flag);
-      rewindAction->setEnabled(!flag);
-      stopAction->setEnabled(!flag);
-      playAction->setEnabled(!flag);
-      }
+{
+	startAction->setEnabled(!flag);
+	forwardAction->setEnabled(!flag);
+	rewindAction->setEnabled(!flag);
+	stopAction->setEnabled(!flag);
+	playAction->setEnabled(!flag);
+}
 
 

@@ -20,66 +20,79 @@
 //   Pool
 //---------------------------------------------------------
 
-class Pool {
-      struct Verweis {
-            Verweis* next;
-            };
-      struct Chunk {
-            enum { size = 4 * 1024 };
-            Chunk* next;
-            char mem[size];
-            };
-      enum { dimension = 21 };
-      Chunk* chunks[dimension];
-      Verweis* head[dimension];
-      Pool(Pool&);
-      void operator=(Pool&);
-      void grow(int idx);
+class Pool
+{
 
-   public:
-      Pool();
-      ~Pool();
-      void* alloc(size_t n);
-      void free(void* b, size_t n);
-      };
+    struct Verweis
+    {
+        Verweis* next;
+    };
+
+    struct Chunk
+    {
+
+        enum
+        {
+            size = 4 * 1024
+        };
+        Chunk* next;
+        char mem[size];
+    };
+
+    enum
+    {
+        dimension = 21
+    };
+    Chunk* chunks[dimension];
+    Verweis* head[dimension];
+    Pool(Pool&);
+    void operator=(Pool&);
+    void grow(int idx);
+
+public:
+    Pool();
+    ~Pool();
+    void* alloc(size_t n);
+    void free(void* b, size_t n);
+};
 
 //---------------------------------------------------------
 //   alloc
 //---------------------------------------------------------
 
 inline void* Pool::alloc(size_t n)
-      {
-      if (n == 0)
-            return 0;
-      int idx = ((n + sizeof(unsigned long) - 1) / sizeof(unsigned long)) - 1;
-      if (idx >= dimension) {
-            printf("panic: alloc %zd %d %d\n", n, idx, dimension);
-            exit(-1);
-            }
-      if (head[idx] == 0)
-            grow(idx);
-      Verweis* p = head[idx];
-      head[idx] = p->next;
-      return p;
-      }
+{
+    if (n == 0)
+        return 0;
+    int idx = ((n + sizeof (unsigned long) - 1) / sizeof (unsigned long)) - 1;
+    if (idx >= dimension) {
+        printf("panic: alloc %zd %d %d\n", n, idx, dimension);
+        exit(-1);
+    }
+    if (head[idx] == 0)
+        grow(idx);
+    Verweis* p = head[idx];
+    head[idx] = p->next;
+    return p;
+}
 
 //---------------------------------------------------------
 //   free
 //---------------------------------------------------------
 
 inline void Pool::free(void* b, size_t n)
-      {
-      if (b == 0 || n == 0)
-            return;
-      int idx = ((n + sizeof(unsigned long) - 1) / sizeof(unsigned long)) - 1;
-      if (idx >= dimension) {
-            printf("panic: free %zd %d %d\n", n, idx, dimension);
-            exit(-1);
-            }
-      Verweis* p = static_cast<Verweis*>(b);
-      p->next = head[idx];
-      head[idx] = p;
-      }
+{
+    if (b == 0 || n == 0)
+        return;
+    int idx = ((n + sizeof (unsigned long) - 1) / sizeof (unsigned long)) - 1;
+    if (idx >= dimension) {
+        printf("panic: free %zd %d %d\n", n, idx, dimension);
+        exit(-1);
+    }
+    Verweis* p = static_cast<Verweis*> (b);
+    p->next = head[idx];
+    head[idx] = p;
+}
 
 extern Pool audioRTmemoryPool;
 extern Pool midiRTmemoryPool;
@@ -89,92 +102,164 @@ extern Pool midiRTmemoryPool;
 //---------------------------------------------------------
 
 template <class T> class audioRTalloc
-      {
-   public:
-      typedef T         value_type;
-      typedef size_t    size_type;
-      typedef ptrdiff_t difference_type;
+{
+public:
+    typedef T value_type;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
 
-      typedef T*        pointer;
-      typedef const T*  const_pointer;
+    typedef T* pointer;
+    typedef const T* const_pointer;
 
-      typedef T&        reference;
-      typedef const T&  const_reference;
+    typedef T& reference;
+    typedef const T& const_reference;
 
-      pointer address(reference x) const { return &x; }
-      const_pointer address(const_reference x) const { return &x; }
+    pointer address(reference x) const
+    {
+        return &x;
+    }
 
-      audioRTalloc();
-      template <class U> audioRTalloc(const audioRTalloc<U>&) {}
-      ~audioRTalloc() {}
+    const_pointer address(const_reference x) const
+    {
+        return &x;
+    }
 
-      pointer allocate(size_type n, void * = 0) {
-            return static_cast<T*>(audioRTmemoryPool.alloc(n * sizeof(T)));
-            }
-      void deallocate(pointer p, size_type n) {
-            audioRTmemoryPool.free(p, n * sizeof(T));
-            }
+    audioRTalloc();
 
-      audioRTalloc<T>&  operator=(const audioRTalloc&) { return *this; }
-      void construct(pointer p, const T& val) {
-            new ((T*) p) T(val);
-            }
-      void destroy(pointer p) {
-            p->~T();
-            }
-      size_type max_size() const { return size_t(-1); }
+    template <class U> audioRTalloc(const audioRTalloc<U>&)
+    {
+    }
 
-      template <class U> struct rebind { typedef audioRTalloc<U> other; };
-      template <class U> audioRTalloc& operator=(const audioRTalloc<U>&) { return *this; }
-      };
+    ~audioRTalloc()
+    {
+    }
 
-template <class T> audioRTalloc<T>::audioRTalloc() {}
+    pointer allocate(size_type n, void * = 0)
+    {
+        return static_cast<T*> (audioRTmemoryPool.alloc(n * sizeof (T)));
+    }
+
+    void deallocate(pointer p, size_type n)
+    {
+        audioRTmemoryPool.free(p, n * sizeof (T));
+    }
+
+    audioRTalloc<T> & operator=(const audioRTalloc&)
+    {
+        return *this;
+    }
+
+    void construct(pointer p, const T& val)
+    {
+        new ((T*) p) T(val);
+    }
+
+    void destroy(pointer p)
+    {
+        p->~T();
+    }
+
+    size_type max_size() const
+    {
+        return size_t(-1);
+    }
+
+    template <class U> struct rebind
+    {
+        typedef audioRTalloc<U> other;
+    };
+
+    template <class U> audioRTalloc & operator=(const audioRTalloc<U>&)
+    {
+        return *this;
+    }
+};
+
+template <class T> audioRTalloc<T>::audioRTalloc()
+{
+}
 
 //---------------------------------------------------------
 //   midiRTalloc
 //---------------------------------------------------------
 
 template <class T> class midiRTalloc
-      {
-   public:
-      typedef T         value_type;
-      typedef size_t    size_type;
-      typedef ptrdiff_t difference_type;
+{
+public:
+    typedef T value_type;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
 
-      typedef T*        pointer;
-      typedef const T*  const_pointer;
+    typedef T* pointer;
+    typedef const T* const_pointer;
 
-      typedef T&        reference;
-      typedef const T&  const_reference;
+    typedef T& reference;
+    typedef const T& const_reference;
 
-      pointer address(reference x) const { return &x; }
-      const_pointer address(const_reference x) const { return &x; }
+    pointer address(reference x) const
+    {
+        return &x;
+    }
 
-      midiRTalloc();
-      template <class U> midiRTalloc(const midiRTalloc<U>&) {}
-      ~midiRTalloc() {}
+    const_pointer address(const_reference x) const
+    {
+        return &x;
+    }
 
-      pointer allocate(size_type n, void * = 0) {
-            return static_cast<T*>(midiRTmemoryPool.alloc(n * sizeof(T)));
-            }
-      void deallocate(pointer p, size_type n) {
-            midiRTmemoryPool.free(p, n * sizeof(T));
-            }
+    midiRTalloc();
 
-      midiRTalloc<T>&  operator=(const midiRTalloc&) { return *this; }
-      void construct(pointer p, const T& val) {
-            new ((T*) p) T(val);
-            }
-      void destroy(pointer p) {
-            p->~T();
-            }
-      size_type max_size() const { return size_t(-1); }
+    template <class U> midiRTalloc(const midiRTalloc<U>&)
+    {
+    }
 
-      template <class U> struct rebind { typedef midiRTalloc<U> other; };
-      template <class U> midiRTalloc& operator=(const midiRTalloc<U>&) { return *this; }
-      };
+    ~midiRTalloc()
+    {
+    }
 
-template <class T> midiRTalloc<T>::midiRTalloc() {}
+    pointer allocate(size_type n, void * = 0)
+    {
+        return static_cast<T*> (midiRTmemoryPool.alloc(n * sizeof (T)));
+    }
+
+    void deallocate(pointer p, size_type n)
+    {
+        midiRTmemoryPool.free(p, n * sizeof (T));
+    }
+
+    midiRTalloc<T> & operator=(const midiRTalloc&)
+    {
+        return *this;
+    }
+
+    void construct(pointer p, const T& val)
+    {
+        new ((T*) p) T(val);
+    }
+
+    void destroy(pointer p)
+    {
+        p->~T();
+    }
+
+    size_type max_size() const
+    {
+        return size_t(-1);
+    }
+
+    template <class U> struct rebind
+    {
+        typedef midiRTalloc<U> other;
+    };
+
+    template <class U> midiRTalloc & operator=(const midiRTalloc<U>&)
+    {
+        return *this;
+    }
+};
+
+template <class T> midiRTalloc<T>::midiRTalloc()
+{
+}
 
 #endif
 

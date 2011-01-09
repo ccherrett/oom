@@ -23,25 +23,25 @@
 
 namespace Awl {
 
-//---------------------------------------------------------
-//   MidiPanEntry
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   MidiPanEntry
+	//---------------------------------------------------------
 
-MidiPanEntry::MidiPanEntry(QWidget* parent)
-   : FloatEntry(parent)
-      {
-      setRange(-64.0f, 63.0f);
-      setFrame(true);
-      setPrecision(0);
-      }
+	MidiPanEntry::MidiPanEntry(QWidget* parent)
+	: FloatEntry(parent)
+	{
+		setRange(-64.0f, 63.0f);
+		setFrame(true);
+		setPrecision(0);
+	}
 
-//---------------------------------------------------------
-//   valueChange
-//---------------------------------------------------------
+	//---------------------------------------------------------
+	//   valueChange
+	//---------------------------------------------------------
 
-void MidiPanEntry::valueChange()
-      {
-      emit valueChanged(_value + 64.0f, _id);
-      }
+	void MidiPanEntry::valueChange()
+	{
+		emit valueChanged(_value + 64.0f, _id);
+	}
 }
 

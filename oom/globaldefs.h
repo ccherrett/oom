@@ -14,17 +14,21 @@
 //    MT_GS  - Roland GS
 //    MT_XG  - Yamaha XG
 
-enum MType { MT_UNKNOWN=0, MT_GM, MT_GS, MT_XG };
+enum MType
+{
+    MT_UNKNOWN = 0, MT_GM, MT_GS, MT_XG
+};
 
-enum AutomationType {
-      AUTO_OFF, AUTO_READ, AUTO_TOUCH, AUTO_WRITE
-      };
+enum AutomationType
+{
+    AUTO_OFF, AUTO_READ, AUTO_TOUCH, AUTO_WRITE
+};
 
-const int MAX_CHANNELS = 2;   // max audio channels
-const int MAX_PLUGINS  = 4;   // plugins in mixer rack
+const int MAX_CHANNELS = 2; // max audio channels
+const int MAX_PLUGINS = 4; // plugins in mixer rack
 
 //const int MIDI_PORTS   = 32;  // max Number of Midi Ports
-const int MIDI_PORTS   = 200;  // max Number of Midi Ports
+const int MIDI_PORTS = 200; // max Number of Midi Ports
 
 #ifndef MIDI_CHANNELS
 #define MIDI_CHANNELS 16       // Channels per Port

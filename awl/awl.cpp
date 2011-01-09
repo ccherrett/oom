@@ -21,7 +21,7 @@
 #include "awl.h"
 
 namespace Awl {
-//      int sampleRate = 44100;
-//      int mtcType = 0;
-      };
+	//      int sampleRate = 44100;
+	//      int mtcType = 0;
+};
 

@@ -23,12 +23,12 @@ template <class T>
 inline int qwtSign(const T& x)
 {
     if (x > T(0))
-       return 1;
+        return 1;
     else if (x < T(0))
-       return (-1);
+        return (-1);
     else
-       return 0;
-}			
+        return 0;
+}
 
 inline int qwtInt(double x)
 {
@@ -36,23 +36,22 @@ inline int qwtInt(double x)
 }
 
 template <class T>
-inline T qwtAbs (const T& x)
+inline T qwtAbs(const T& x)
 {
-    return( x > T(0) ? x : -x );
+    return ( x > T(0) ? x : -x);
 }
 
 template <class T>
-inline const T& qwtMax (const T& x, const T& y)
+inline const T& qwtMax(const T& x, const T& y)
 {
-    return ( x > y ? x : y );
+    return ( x > y ? x : y);
 }
 
 template <class T>
-inline const T& qwtMin ( const T& x, const T& y)
+inline const T& qwtMin(const T& x, const T& y)
 {
-    return ( x < y ? x : y );
+    return ( x < y ? x : y);
 }
-
 
 template <class T>
 T qwtLim(const T& x, const T& x1, const T& x2)
@@ -63,12 +62,12 @@ T qwtLim(const T& x, const T& x1, const T& x2)
     xmin = qwtMin(x1, x2);
     xmax = qwtMax(x1, x2);
 
-    if ( x < xmin )
-       rv = xmin;
-    else if ( x > xmax )
-       rv = xmax;
+    if (x < xmin)
+        rv = xmin;
+    else if (x > xmax)
+        rv = xmax;
     else
-       rv = x;
+        rv = x;
 
     return rv;
 }

@@ -23,33 +23,35 @@
 
 #include "slider.h"
 
-namespace Awl {
+namespace Awl
+{
 
-//---------------------------------------------------------
-//   VolSlider
-//!   Volume Slider entry widget
-//
-//!   This widget implements a slider with a logarithmic
-//!   floating point scale used to adjust the volume
-//!   in an audio mixer.
-//!   Internal value represents gain as a logarythmic
-//!   dB value.
-//---------------------------------------------------------
+    //---------------------------------------------------------
+    //   VolSlider
+    //!   Volume Slider entry widget
+    //
+    //!   This widget implements a slider with a logarithmic
+    //!   floating point scale used to adjust the volume
+    //!   in an audio mixer.
+    //!   Internal value represents gain as a logarythmic
+    //!   dB value.
+    //---------------------------------------------------------
 
-class VolSlider : public Slider {
-      Q_OBJECT
+    class VolSlider : public Slider
+    {
+        Q_OBJECT
 
-   protected:
-      virtual void mouseDoubleClickEvent(QMouseEvent*);
+    protected:
+        virtual void mouseDoubleClickEvent(QMouseEvent*);
 
-   public slots:
-      virtual void setValue(double v);
+    public slots:
+        virtual void setValue(double v);
 
-   public:
-      VolSlider(QWidget* parent = 0);
+    public:
+        VolSlider(QWidget* parent = 0);
 
-      virtual double value() const;
-      };
+        virtual double value() const;
+    };
 
 }
 

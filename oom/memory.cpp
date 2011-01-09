@@ -16,54 +16,57 @@ Pool midiRTmemoryPool;
 //---------------------------------------------------------
 
 Pool::Pool()
-      {
-      for (int idx = 0; idx < dimension; ++idx) {
-            head[idx]   = 0;
-            chunks[idx] = 0;
-            grow(idx);  // preallocate
-            }
-      }
+{
+	for (int idx = 0; idx < dimension; ++idx)
+	{
+		head[idx] = 0;
+		chunks[idx] = 0;
+		grow(idx); // preallocate
+	}
+}
 
 //---------------------------------------------------------
 //   ~Pool
 //---------------------------------------------------------
 
 Pool::~Pool()
-      {
-      for (int i = 0; i < dimension; ++i) {
-            Chunk* n = chunks[i];
-            while (n) {
-                  Chunk* p = n;
-                  n = n->next;
-                  delete p;
-                  }
-            }
-      }
+{
+	for (int i = 0; i < dimension; ++i)
+	{
+		Chunk* n = chunks[i];
+		while (n)
+		{
+			Chunk* p = n;
+			n = n->next;
+			delete p;
+		}
+	}
+}
 
 //---------------------------------------------------------
 //   grow
 //---------------------------------------------------------
 
 void Pool::grow(int idx)
-      {
-//      printf("grow memory idx %d\n", idx);
+{
+	//      printf("grow memory idx %d\n", idx);
 
-      int esize = (idx+1) * sizeof(unsigned long);
+	int esize = (idx + 1) * sizeof (unsigned long);
 
-      Chunk* n    = new Chunk;
-      n->next     = chunks[idx];
-      chunks[idx] = n;
+	Chunk* n = new Chunk;
+	n->next = chunks[idx];
+	chunks[idx] = n;
 
-      const int nelem = Chunk::size / esize;
-      char* start     = n->mem;
-      char* last      = &start[(nelem-1) * esize];
+	const int nelem = Chunk::size / esize;
+	char* start = n->mem;
+	char* last = &start[(nelem - 1) * esize];
 
-      for (char* p = start; p < last; p += esize)
-            reinterpret_cast<Verweis*>(p)->next =
-               reinterpret_cast<Verweis*>(p + esize);
-      reinterpret_cast<Verweis*>(last)->next = 0;
-      head[idx] = reinterpret_cast<Verweis*>(start);
-      }
+	for (char* p = start; p < last; p += esize)
+		reinterpret_cast<Verweis*> (p)->next =
+			reinterpret_cast<Verweis*> (p + esize);
+	reinterpret_cast<Verweis*> (last)->next = 0;
+	head[idx] = reinterpret_cast<Verweis*> (start);
+}
 
 
 #ifdef TEST
@@ -71,11 +74,15 @@ void Pool::grow(int idx)
 //    TEST
 //=========================================================
 
-struct mops {
-      char a, c;
-      int b;
-      mops(int x) : b(x) {}
-      };
+struct mops
+{
+	char a, c;
+	int b;
+
+	mops(int x) : b(x)
+	{
+	}
+};
 
 typedef std::list<struct mops, RTalloc<struct mops> > List;
 // typedef std::vector<struct mops> List;
@@ -89,12 +96,12 @@ typedef List::iterator iList;
 //---------------------------------------------------------
 
 int main()
-      {
-      List l;
+{
+	List l;
 
-      for (int i = 0; i < 10000000; ++i)
-            l.push_back(mops(i));
-      return 0;
-      }
+	for (int i = 0; i < 10000000; ++i)
+		l.push_back(mops(i));
+	return 0;
+}
 #endif
 

@@ -84,29 +84,30 @@ static const double WorstCase = -8.8888888888888888888888e-88;
 //	length is 100, and the orientation is ScaleDraw::Bottom.
 //
 //------------------------------------------------------------
+
 ScaleDraw::ScaleDraw()
 {
-/*    d_hpad   = 6;
-    d_vpad   = 3;
-    d_majLen = 8;
-    d_medLen = 6;
-    d_minLen = 4;
-  */
+	/*    d_hpad   = 6;
+		d_vpad   = 3;
+		d_majLen = 8;
+		d_medLen = 6;
+		d_minLen = 4;
+	 */
 
-    d_hpad   = 3;
-    d_vpad   = 1;
-    d_majLen = 4;
-    d_medLen = 3;
-    d_minLen = 2;
+	d_hpad = 3;
+	d_vpad = 1;
+	d_majLen = 4;
+	d_medLen = 3;
+	d_minLen = 2;
 
-    d_minAngle = -135 * 16;
-    d_maxAngle = 135 * 16;
-    d_fmt = 'g';
-    d_prec = 4;
+	d_minAngle = -135 * 16;
+	d_maxAngle = 135 * 16;
+	d_fmt = 'g';
+	d_prec = 4;
 
-    // initialize scale and geometry
-    setGeometry(0,0,100,Bottom);
-    setScale(0,100,0,0,10);
+	// initialize scale and geometry
+	setGeometry(0, 0, 100, Bottom);
+	setScale(0, 100, 0, 0, 10);
 }
 
 
@@ -129,11 +130,12 @@ ScaleDraw::ScaleDraw()
 //	dependent on the maximal number of scale ticks.
 //	
 //------------------------------------------------------------
+
 void ScaleDraw::setScale(double x1, double x2, int maxMajIntv,
-			    int maxMinIntv, double step, int logscale)
+		int maxMinIntv, double step, int logscale)
 {
-    d_scldiv.rebuild( x1, x2, maxMajIntv, maxMinIntv, logscale, step, FALSE );
-    setDblRange( d_scldiv.lBound(), d_scldiv.hBound(), d_scldiv.logScale());
+	d_scldiv.rebuild(x1, x2, maxMajIntv, maxMinIntv, logscale, step, FALSE);
+	setDblRange(d_scldiv.lBound(), d_scldiv.hBound(), d_scldiv.logScale());
 }
 
 
@@ -152,8 +154,8 @@ void ScaleDraw::setScale(double x1, double x2, int maxMajIntv,
 
 void ScaleDraw::setScale(const ScaleDiv &s)
 {
-    d_scldiv = s;
-    setDblRange(d_scldiv.lBound(),d_scldiv.hBound(),d_scldiv.logScale());
+	d_scldiv = s;
+	setDblRange(d_scldiv.lBound(), d_scldiv.hBound(), d_scldiv.logScale());
 }
 
 
@@ -166,64 +168,64 @@ void ScaleDraw::setScale(const ScaleDiv &s)
 //------------------------------------------------------------
 
 void ScaleDraw::draw(QPainter *p) const
-      {
-      double val,hval,majTick;
+{
+	double val, hval, majTick;
 
-      int i,k,kmax;
+	int i, k, kmax;
 
-    for (i=0; i< d_scldiv.majCnt(); i++)
-    {
-	val = d_scldiv.majMark(i);
-	drawTick(p, val, d_majLen);
-	drawLabel(p, val);
-    }
-
-    if (d_scldiv.logScale())
-    {
-	for (i=0; i< d_scldiv.minCnt(); i++)
+	for (i = 0; i < d_scldiv.majCnt(); i++)
 	{
-	    drawTick(p,d_scldiv.minMark(i),d_minLen);
+		val = d_scldiv.majMark(i);
+		drawTick(p, val, d_majLen);
+		drawLabel(p, val);
 	}
-    }
-    else
-    {
-	k = 0;
-	kmax = d_scldiv.majCnt() - 1;
-	if (kmax > 0)
+
+	if (d_scldiv.logScale())
 	{
-	   majTick = d_scldiv.majMark(0);
-	   hval = majTick - 0.5 * d_scldiv.majStep();
-
-	   for (i=0; i< d_scldiv.minCnt(); i++)
-	   {
-	       val = d_scldiv.minMark(i);
-	       if  (val > majTick)
-	       {
-		   if (k < kmax)
-		   {
-		       k++;
-		       majTick = d_scldiv.majMark(k);
-		   }
-		   else
-		   {
-		       majTick += d_scldiv.majMark(kmax) + d_scldiv.majStep();
-		   }
-		   hval = majTick - 0.5 * d_scldiv.majStep();
-		
-	       }
-	       if (qwtAbs(val-hval) < step_eps * d_scldiv.majStep())
-		  drawTick(p, val, d_medLen);
-	       else
-		  drawTick(p, val, d_minLen);
-	   }
+		for (i = 0; i < d_scldiv.minCnt(); i++)
+		{
+			drawTick(p, d_scldiv.minMark(i), d_minLen);
+		}
 	}
-    }
+	else
+	{
+		k = 0;
+		kmax = d_scldiv.majCnt() - 1;
+		if (kmax > 0)
+		{
+			majTick = d_scldiv.majMark(0);
+			hval = majTick - 0.5 * d_scldiv.majStep();
 
-    //
-    // draw backbone
-    //
-    //if (d_baseEnabled)
-       drawBackbone(p);
+			for (i = 0; i < d_scldiv.minCnt(); i++)
+			{
+				val = d_scldiv.minMark(i);
+				if (val > majTick)
+				{
+					if (k < kmax)
+					{
+						k++;
+						majTick = d_scldiv.majMark(k);
+					}
+					else
+					{
+						majTick += d_scldiv.majMark(kmax) + d_scldiv.majStep();
+					}
+					hval = majTick - 0.5 * d_scldiv.majStep();
+
+				}
+				if (qwtAbs(val - hval) < step_eps * d_scldiv.majStep())
+					drawTick(p, val, d_medLen);
+				else
+					drawTick(p, val, d_minLen);
+			}
+		}
+	}
+
+	//
+	// draw backbone
+	//
+	//if (d_baseEnabled)
+	drawBackbone(p);
 
 }
 
@@ -237,49 +239,49 @@ void ScaleDraw::draw(QPainter *p) const
 //------------------------------------------------------------
 
 void ScaleDraw::drawTick(QPainter *p, double val, int len) const
-      {
-      int tval = transform(val);
-      double arc;
-  int x1, x2, y1, y2;
+{
+	int tval = transform(val);
+	double arc;
+	int x1, x2, y1, y2;
 
-  switch(d_orient)
-  {
-  case Right:
+	switch (d_orient)
+	{
+		case Right:
 
-      p->drawLine(d_xorg, tval, d_xorg + len, tval);
-      break;
+			p->drawLine(d_xorg, tval, d_xorg + len, tval);
+			break;
 
-  case Bottom:
+		case Bottom:
 
-      p->drawLine(tval, d_yorg, tval, d_yorg + len);
-      break;
+			p->drawLine(tval, d_yorg, tval, d_yorg + len);
+			break;
 
-  case Left:
+		case Left:
 
-      p->drawLine(d_xorg, tval, d_xorg - len, tval);
-      break;
+			p->drawLine(d_xorg, tval, d_xorg - len, tval);
+			break;
 
-  case Round:
+		case Round:
 
-      if ((tval <= d_minAngle + 359 * 16) || (tval >= d_minAngle - 359 * 16))
-      {
-	  arc = double(tval) / 16.0 * M_PI / 180.0;
-	  x1 = qwtInt(d_xCenter + sin(arc) * d_radius);
-	  x2 = qwtInt(d_xCenter + sin(arc) * (d_radius + double(len)));
-	  y1 = qwtInt(d_yCenter - cos(arc) * d_radius);
-	  y2 = qwtInt(d_yCenter - cos(arc) * (d_radius + double(len)));
-	  p->drawLine(x1, y1, x2, y2);
-      }
-      break;
+			if ((tval <= d_minAngle + 359 * 16) || (tval >= d_minAngle - 359 * 16))
+			{
+				arc = double(tval) / 16.0 * M_PI / 180.0;
+				x1 = qwtInt(d_xCenter + sin(arc) * d_radius);
+				x2 = qwtInt(d_xCenter + sin(arc) * (d_radius + double(len)));
+				y1 = qwtInt(d_yCenter - cos(arc) * d_radius);
+				y2 = qwtInt(d_yCenter - cos(arc) * (d_radius + double(len)));
+				p->drawLine(x1, y1, x2, y2);
+			}
+			break;
 
-  case Top:
-  default:
+		case Top:
+		default:
 
-      p->drawLine(tval, d_yorg, tval, d_yorg - len);
-      break;
+			p->drawLine(tval, d_yorg, tval, d_yorg - len);
+			break;
 
 
-  }
+	}
 
 }
 
@@ -295,99 +297,100 @@ void ScaleDraw::drawTick(QPainter *p, double val, int len) const
 //.p  QPainter *p,  double val
 //
 //------------------------------------------------------------
+
 void ScaleDraw::drawLabel(QPainter *p, double val) const
 {
 
-    static QString label;
-    static double pi_4 = M_PI * 0.25;
-    static double pi_75 = M_PI * 0.75;
+	static QString label;
+	static double pi_4 = M_PI * 0.25;
+	static double pi_75 = M_PI * 0.75;
 
-    double arc;
-    int xpos, ypos;
-    int tval;
+	double arc;
+	int xpos, ypos;
+	int tval;
 
-    QFontMetrics fm = p->fontMetrics();
+	QFontMetrics fm = p->fontMetrics();
 
-    tval = transform(val);
+	tval = transform(val);
 
-    // correct rounding errors if val = 0
-    if ((!d_scldiv.logScale()) && (qwtAbs(val) < qwtAbs(step_eps * d_scldiv.majStep())))
-       val = 0.0;
+	// correct rounding errors if val = 0
+	if ((!d_scldiv.logScale()) && (qwtAbs(val) < qwtAbs(step_eps * d_scldiv.majStep())))
+		val = 0.0;
 
-    label.setNum(val, d_fmt, d_prec);
+	label.setNum(val, d_fmt, d_prec);
 
-    switch(d_orient)
-    {
-    case Right:
-	p->drawText(d_xorg + d_majLen + d_hpad,
-		    tval + (fm.ascent()-1) / 2,
-		    label);
-	break;
-    case Left:
-	p->drawText(d_xorg - d_majLen - d_hpad - fm.width(label),
-		    tval + (fm.ascent() -1) / 2,
-		    label);
-	break;
-    case Bottom:
-	p->drawText(tval - (fm.width(label)-1) / 2, d_yorg + d_majLen + d_vpad + fm.ascent(), label);
-	break;
-    case Round:
-
-	if ((tval > d_minAngle + 359 * 16) || (tval < d_minAngle - 359 * 16))
-	   break;
-	
-	arc = double(tval) / 16.0 * M_PI / 180.0;
-	
-	// Map arc into the interval -pi <= arc <= pi
-	if ((arc < -M_PI) || (arc > M_PI))
-	   arc -= floor((arc + M_PI) / M_PI * 0.5) * 2.0 * M_PI;
-	
-	xpos = 1 + qwtInt(d_xCenter + (d_radius + double(d_majLen + d_vpad)) * sin(arc));
-	ypos = qwtInt(d_yCenter - (d_radius + double(d_majLen + d_vpad)) * cos(arc));
-	
-	if (arc < -pi_75)
+	switch (d_orient)
 	{
-	    p->drawText(xpos - qwtInt(double(fm.width(label))
-				      * (1.0 + (arc + pi_75) * M_2_PI) ),
-			ypos + fm.ascent() - 1,
-			label);
+		case Right:
+			p->drawText(d_xorg + d_majLen + d_hpad,
+					tval + (fm.ascent() - 1) / 2,
+					label);
+			break;
+		case Left:
+			p->drawText(d_xorg - d_majLen - d_hpad - fm.width(label),
+					tval + (fm.ascent() - 1) / 2,
+					label);
+			break;
+		case Bottom:
+			p->drawText(tval - (fm.width(label) - 1) / 2, d_yorg + d_majLen + d_vpad + fm.ascent(), label);
+			break;
+		case Round:
+
+			if ((tval > d_minAngle + 359 * 16) || (tval < d_minAngle - 359 * 16))
+				break;
+
+			arc = double(tval) / 16.0 * M_PI / 180.0;
+
+			// Map arc into the interval -pi <= arc <= pi
+			if ((arc < -M_PI) || (arc > M_PI))
+				arc -= floor((arc + M_PI) / M_PI * 0.5) * 2.0 * M_PI;
+
+			xpos = 1 + qwtInt(d_xCenter + (d_radius + double(d_majLen + d_vpad)) * sin(arc));
+			ypos = qwtInt(d_yCenter - (d_radius + double(d_majLen + d_vpad)) * cos(arc));
+
+			if (arc < -pi_75)
+			{
+				p->drawText(xpos - qwtInt(double(fm.width(label))
+						* (1.0 + (arc + pi_75) * M_2_PI)),
+						ypos + fm.ascent() - 1,
+						label);
+			}
+			else if (arc < -M_PI_4)
+			{
+				p->drawText(xpos - fm.width(label),
+
+
+						ypos - qwtInt(double(fm.ascent() - 1)
+						* (arc + M_PI_4) * M_2_PI),
+						label);
+			}
+			else if (arc < pi_4)
+			{
+				p->drawText(xpos + qwtInt(double(fm.width(label))
+						* (arc - M_PI_4) * M_2_PI),
+						ypos,
+						label);
+			}
+			else if (arc < pi_75)
+			{
+				p->drawText(xpos,
+						ypos + qwtInt(double(fm.ascent() - 1)
+						* (arc - M_PI_4) * M_2_PI),
+						label);
+			}
+			else
+			{
+				p->drawText(xpos - qwtInt(double(fm.width(label))
+						* (arc - pi_75) * M_2_PI),
+						ypos + fm.ascent() - 1,
+						label);
+			}
+			break;
+		case Top:
+		default:
+			p->drawText(tval - (fm.width(label) - 1) / 2, d_yorg - d_majLen - d_vpad, label);
+			break;
 	}
-	else if (arc < -M_PI_4)
-	{
-	    p->drawText(xpos - fm.width(label),
-			
-			
-			ypos - qwtInt(double(fm.ascent() - 1)
-				      * (arc + M_PI_4) * M_2_PI),
-			label);
-	}
-	else if (arc < pi_4)
-	{
-	    p->drawText(xpos + qwtInt(double(fm.width(label))
-				      * ( arc - M_PI_4 ) * M_2_PI ),
-			ypos,
-			label);
-	}
-	else if (arc < pi_75)
-	{
-	    p->drawText(xpos,
-			ypos + qwtInt(double(fm.ascent() - 1)
-				      * (arc - M_PI_4) * M_2_PI),
-			label);
-	}
-	else
-	{
-	    p->drawText(xpos - qwtInt(double(fm.width(label))
-				      * ( arc - pi_75) * M_2_PI ),
-			ypos + fm.ascent() - 1,
-			label);
-	}
-	break;
-    case Top:
-    default:
-	p->drawText(tval - (fm.width(label)-1) / 2, d_yorg - d_majLen - d_vpad, label);
-	break;
-    }
 
 
 
@@ -403,42 +406,43 @@ void ScaleDraw::drawLabel(QPainter *p, double val) const
 //.p  QPainter *p
 //
 //------------------------------------------------------------
+
 void ScaleDraw::drawBackbone(QPainter *p) const
 {
-    int bw2;
-    int a1, a2;
-    bw2 = p->pen().width() / 2;
+	int bw2;
+	int a1, a2;
+	bw2 = p->pen().width() / 2;
 
 
-    switch(d_orient)
-    {
-    case Left:
-	p->drawLine(d_xorg - bw2, d_yorg, d_xorg - bw2, d_yorg + d_len - 1);
-	break;
-    case Right:
-	p->drawLine(d_xorg + bw2, d_yorg, d_xorg + bw2, d_yorg + d_len - 1);
-	break;
-    case Round:
-	
-	a1 = qwtMin(i1(), i2()) - 90 * 16;
-	a2 = qwtMax(i1(), i2()) - 90 * 16;
-	
-	p->drawArc(d_xorg, d_yorg, d_len,
-		   d_len,
-		   -a2, a2 - a1 + 1);		// counterclockwise
-	
-	break;
-	
-    case Top:
-	p->drawLine(d_xorg, d_yorg - bw2, d_xorg + d_len - 1, d_yorg-bw2);
-	break;
-    case Bottom:
-	p->drawLine(d_xorg, d_yorg+bw2, d_xorg + d_len - 1, d_yorg+bw2);
-	break;
-    default:
-	p->drawLine(d_xorg, d_yorg, d_xorg + d_len - 1, d_yorg);
-	break;
-    }
+	switch (d_orient)
+	{
+		case Left:
+			p->drawLine(d_xorg - bw2, d_yorg, d_xorg - bw2, d_yorg + d_len - 1);
+			break;
+		case Right:
+			p->drawLine(d_xorg + bw2, d_yorg, d_xorg + bw2, d_yorg + d_len - 1);
+			break;
+		case Round:
+
+			a1 = qwtMin(i1(), i2()) - 90 * 16;
+			a2 = qwtMax(i1(), i2()) - 90 * 16;
+
+			p->drawArc(d_xorg, d_yorg, d_len,
+					d_len,
+					-a2, a2 - a1 + 1); // counterclockwise
+
+			break;
+
+		case Top:
+			p->drawLine(d_xorg, d_yorg - bw2, d_xorg + d_len - 1, d_yorg - bw2);
+			break;
+		case Bottom:
+			p->drawLine(d_xorg, d_yorg + bw2, d_xorg + d_len - 1, d_yorg + bw2);
+			break;
+		default:
+			p->drawLine(d_xorg, d_yorg, d_xorg + d_len - 1, d_yorg);
+			break;
+	}
 
 }
 
@@ -488,37 +492,38 @@ void ScaleDraw::drawBackbone(QPainter *p) const
 //		circle.
 //
 //------------------------------------------------------------
+
 void ScaleDraw::setGeometry(int xorigin, int yorigin, int length, OrientationX o)
 {
 
-    d_xorg = xorigin;
-    d_yorg = yorigin;
-    d_radius = double(length) * 0.5;
-    d_xCenter = double(xorigin) + double(length) * 0.5;
-    d_yCenter = double(yorigin) + double(length) * 0.5;
+	d_xorg = xorigin;
+	d_yorg = yorigin;
+	d_radius = double(length) * 0.5;
+	d_xCenter = double(xorigin) + double(length) * 0.5;
+	d_yCenter = double(yorigin) + double(length) * 0.5;
 
-    if (length > minLen)
-       d_len = length;
-    else
-       d_len = minLen;
+	if (length > minLen)
+		d_len = length;
+	else
+		d_len = minLen;
 
-    d_orient = o;
+	d_orient = o;
 
-    switch(d_orient)
-    {
-    case Left:
-    case Right:
-	setIntRange(d_yorg + d_len - 1, d_yorg);
-	break;
-    case Round:
-	setIntRange(d_minAngle, d_maxAngle);
-	break;
-    case Top:
-    case Bottom:
-    default:
-	setIntRange(d_xorg, d_xorg + d_len - 1);
-	break;
-    }
+	switch (d_orient)
+	{
+		case Left:
+		case Right:
+			setIntRange(d_yorg + d_len - 1, d_yorg);
+			break;
+		case Round:
+			setIntRange(d_minAngle, d_maxAngle);
+			break;
+		case Top:
+		case Bottom:
+		default:
+			setIntRange(d_xorg, d_xorg + d_len - 1);
+			break;
+	}
 }
 
 
@@ -538,33 +543,34 @@ void ScaleDraw::setGeometry(int xorigin, int yorigin, int length, OrientationX o
 //			CPU intensive.
 //
 //------------------------------------------------------------
+
 int ScaleDraw::maxWidth(QPainter *p, bool worst) const
 {
-    int rv = 0;
-    int bw = p->pen().width();
+	int rv = 0;
+	int bw = p->pen().width();
 
-    QString s;
+	QString s;
 
-    QFontMetrics fm = p->fontMetrics();
+	QFontMetrics fm = p->fontMetrics();
 
-    rv = maxLabelWidth(p,worst);
+	rv = maxLabelWidth(p, worst);
 
-    switch (d_orient)
-    {
-    case Left:
-    case Right:
-	rv += (bw + d_hpad + d_majLen);
-	break;
-    case Round:
-	rv += (bw + d_vpad + d_majLen);
-	break;
-    case Top:
-    case Bottom:
-    default:
-	rv += d_len;
-    }
+	switch (d_orient)
+	{
+		case Left:
+		case Right:
+			rv += (bw + d_hpad + d_majLen);
+			break;
+		case Round:
+			rv += (bw + d_vpad + d_majLen);
+			break;
+		case Top:
+		case Bottom:
+		default:
+			rv += d_len;
+	}
 
-    return rv;
+	return rv;
 
 }
 
@@ -581,29 +587,30 @@ int ScaleDraw::maxWidth(QPainter *p, bool worst) const
 //.p	QPainter *p
 //
 //------------------------------------------------------------
+
 int ScaleDraw::maxHeight(QPainter *p) const
 {
 
-    int rv = 0;
-    int bw = p->pen().width();
+	int rv = 0;
+	int bw = p->pen().width();
 
-    p->save();
-    QFontMetrics fm = p->fontMetrics();
+	p->save();
+	QFontMetrics fm = p->fontMetrics();
 
-    switch (d_orient)
-    {
-    case Top:
-    case Bottom:
-    case Round:
-	rv = bw + d_vpad + d_majLen + fm.height();
-	break;
-    case Left:
-    case Right:
-    default:
-	rv = d_len + ((fm.height() + 1) / 2);
-    }
+	switch (d_orient)
+	{
+		case Top:
+		case Bottom:
+		case Round:
+			rv = bw + d_vpad + d_majLen + fm.height();
+			break;
+		case Left:
+		case Right:
+		default:
+			rv = d_len + ((fm.height() + 1) / 2);
+	}
 
-    return rv;
+	return rv;
 
 }
 
@@ -621,102 +628,103 @@ int ScaleDraw::maxHeight(QPainter *p) const
 //	with strange angle ranges.
 //
 //------------------------------------------------------------
+
 QRect ScaleDraw::maxBoundingRect(QPainter *p) const
 {
-    int i, wl,h,wmax;
-    int a, ar, amin, amax;
-    double arc;
+	int i, wl, h, wmax;
+	int a, ar, amin, amax;
+	double arc;
 
-    QRect r;
+	QRect r;
 
-    QFontMetrics fm = p->fontMetrics();
+	QFontMetrics fm = p->fontMetrics();
 
-    wl = maxLabelWidth(p, TRUE);
-    h = fm.height();
+	wl = maxLabelWidth(p, TRUE);
+	h = fm.height();
 
-    switch(d_orient)
-    {
-    case Left:
-	
-	r = QRect( d_xorg - d_hpad - d_majLen - wl,
-		  d_yorg - fm.ascent(),
-		  d_majLen + d_hpad + wl,
-		  d_len + fm.height());
-	break;
-	
-    case Right:
-	
-	r = QRect( d_xorg,
-		  d_yorg - fm.ascent(),
-		  d_majLen + d_hpad + wl,
-		  d_len + fm.height());
-	break;
-	
-    case Top:
-	
-	r = QRect ( d_xorg - wl / 2,
-		   d_yorg - d_majLen - fm.ascent(),
-		   d_len + wl,
-		   d_majLen + d_vpad + fm.ascent());
-	break;
-	
-    case Bottom:
-	
-	r = QRect ( d_xorg - wl / 2,
-		   d_yorg,
-		   d_len + wl,
-		   d_majLen + d_vpad + fm.height());
-	break;
-	
-    case Round:
-
-	amin = 2880;
-	amax = 0;
-	ar = 0;
-
-	for (i=0; i< d_scldiv.majCnt(); i++)
+	switch (d_orient)
 	{
-	    a = transform(d_scldiv.majMark(i));
-	
-	    while (a > 2880) a -= 5760;
-	    while (a < - 2880) a += 5760;
+		case Left:
 
-	    ar = qwtAbs(a);
+			r = QRect(d_xorg - d_hpad - d_majLen - wl,
+					d_yorg - fm.ascent(),
+					d_majLen + d_hpad + wl,
+					d_len + fm.height());
+			break;
 
-	    if (ar < amin) amin = ar;
-	    if (ar > amax) amax = ar;
+		case Right:
 
+			r = QRect(d_xorg,
+					d_yorg - fm.ascent(),
+					d_majLen + d_hpad + wl,
+					d_len + fm.height());
+			break;
+
+		case Top:
+
+			r = QRect(d_xorg - wl / 2,
+					d_yorg - d_majLen - fm.ascent(),
+					d_len + wl,
+					d_majLen + d_vpad + fm.ascent());
+			break;
+
+		case Bottom:
+
+			r = QRect(d_xorg - wl / 2,
+					d_yorg,
+					d_len + wl,
+					d_majLen + d_vpad + fm.height());
+			break;
+
+		case Round:
+
+			amin = 2880;
+			amax = 0;
+			ar = 0;
+
+			for (i = 0; i < d_scldiv.majCnt(); i++)
+			{
+				a = transform(d_scldiv.majMark(i));
+
+				while (a > 2880) a -= 5760;
+				while (a < -2880) a += 5760;
+
+				ar = qwtAbs(a);
+
+				if (ar < amin) amin = ar;
+				if (ar > amax) amax = ar;
+
+			}
+
+			for (i = 0; i < d_scldiv.minCnt(); i++)
+			{
+				a = transform(d_scldiv.majMark(i));
+
+				while (a > 2880) a -= 5760;
+				while (a < -2880) a += 5760;
+
+				ar = qwtAbs(a);
+
+				if (ar < amin) amin = ar;
+				if (ar > amax) amax = ar;
+			}
+
+			arc = double(amin) / 16.0 * M_PI / 180.0;
+			r.setTop(qwtInt(d_yCenter - (d_radius + double(d_majLen + d_vpad)) * cos(arc))
+					+ fm.ascent());
+
+			arc = double(amax) / 16.0 * M_PI / 180.0;
+			r.setBottom(qwtInt(d_yCenter - (d_radius + double(d_majLen + d_vpad)) * cos(arc))
+					+ fm.height());
+
+			wmax = d_len + d_majLen + d_hpad + wl;
+
+			r.setLeft(d_xorg - d_majLen - d_hpad - wl);
+			r.setWidth(d_len + 2 * (d_majLen + d_hpad + wl));
+			break;
 	}
 
-	for (i=0; i< d_scldiv.minCnt(); i++)
-	{
-	    a = transform(d_scldiv.majMark(i));
-	
-	    while (a > 2880) a -= 5760;
-	    while (a < - 2880) a += 5760;
-
-	    ar = qwtAbs(a);
-
-	    if (ar < amin) amin = ar;
-	    if (ar > amax) amax = ar;
-	}
-
-	arc = double(amin) / 16.0 * M_PI / 180.0;
-	r.setTop(qwtInt(d_yCenter - (d_radius + double(d_majLen + d_vpad)) * cos(arc))
-		 + fm.ascent() );
-
-	arc = double(amax) / 16.0 * M_PI / 180.0;
-	r.setBottom(qwtInt(d_yCenter - (d_radius + double(d_majLen + d_vpad)) * cos(arc))
-		    + fm.height() );
-
-	wmax = d_len + d_majLen + d_hpad + wl;
-
-	r.setLeft(d_xorg - d_majLen - d_hpad - wl);
-	r.setWidth(d_len + 2*(d_majLen + d_hpad + wl));
-	break;
-    }
-
-    return r;
+	return r;
 
 }
 
@@ -748,24 +756,25 @@ QRect ScaleDraw::maxBoundingRect(QPainter *p) const
 //	-- If you need a counterclockwise scale, use @QwtScaleDiv::setRange (1)@
 //		or @QwtScaleDiv::setRange (2)@.
 //------------------------------------------------------------
+
 void ScaleDraw::setAngleRange(double angle1, double angle2)
 {
-    int amin, amax;
+	int amin, amax;
 
-    angle1 = qwtLim(angle1, -360.0, 360.0);
-    angle2 = qwtLim(angle2, -360.0, 360.0);
-    amin = int(rint(qwtMin(angle1, angle2) * 16.0));
-    amax = int(rint(qwtMax(angle1, angle2) * 16.0));
+	angle1 = qwtLim(angle1, -360.0, 360.0);
+	angle2 = qwtLim(angle2, -360.0, 360.0);
+	amin = int(rint(qwtMin(angle1, angle2) * 16.0));
+	amax = int(rint(qwtMax(angle1, angle2) * 16.0));
 
-    if (amin == amax)
-    {
-	amin -= 1;
-	amax += 1;
-    }
+	if (amin == amax)
+	{
+		amin -= 1;
+		amax += 1;
+	}
 
-    d_minAngle = amin;
-    d_maxAngle = amax;
-    setIntRange(d_minAngle, d_maxAngle);
+	d_minAngle = amin;
+	d_maxAngle = amax;
+	setIntRange(d_minAngle, d_maxAngle);
 
 }
 
@@ -790,10 +799,11 @@ void ScaleDraw::setAngleRange(double angle1, double angle2)
 //	QString::setNum in the Qt manual
 //
 //------------------------------------------------------------
+
 void ScaleDraw::setLabelFormat(char f, int prec)
 {
-    d_fmt = f;
-    d_prec = prec;
+	d_fmt = f;
+	d_prec = prec;
 }
 
 //------------------------------------------------------------
@@ -810,36 +820,37 @@ void ScaleDraw::setLabelFormat(char f, int prec)
 //			the actual width of the largest label.
 //
 //------------------------------------------------------------
+
 int ScaleDraw::maxLabelWidth(QPainter *p, int worst) const
 {
 
-    int i,rv = 0;
-    double val;
-    QString s;
+	int i, rv = 0;
+	double val;
+	QString s;
 
 
-    QFontMetrics fm = p->fontMetrics();
+	QFontMetrics fm = p->fontMetrics();
 
-    if (worst)			// worst case
-    {
-	s.setNum(WorstCase, d_fmt, d_prec);
-	rv = fm.width(s);
-    }
-    else				// actual width
-    {
-	for (i=0;i<d_scldiv.majCnt(); i++)
+	if (worst) // worst case
 	{
-      val = d_scldiv.majMark(i);
-	    // correct rounding errors if val = 0
-	    if ((!d_scldiv.logScale()) && (qwtAbs(val) < step_eps * qwtAbs(d_scldiv.majStep())))
-	       val = 0.0;
-	    s.setNum(val, d_fmt, d_prec);
-	    rv = qwtMax(rv,fm.width(s));
+		s.setNum(WorstCase, d_fmt, d_prec);
+		rv = fm.width(s);
 	}
-    }
+	else // actual width
+	{
+		for (i = 0; i < d_scldiv.majCnt(); i++)
+		{
+			val = d_scldiv.majMark(i);
+			// correct rounding errors if val = 0
+			if ((!d_scldiv.logScale()) && (qwtAbs(val) < step_eps * qwtAbs(d_scldiv.majStep())))
+				val = 0.0;
+			s.setNum(val, d_fmt, d_prec);
+			rv = qwtMax(rv, fm.width(s));
+		}
+	}
 
 
-    return rv;
+	return rv;
 
 }
 

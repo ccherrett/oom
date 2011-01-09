@@ -14,25 +14,34 @@
 //   PitchLabel
 //---------------------------------------------------------
 
-class PitchLabel : public QLabel {
-      bool _pitchMode;
-      int _value;
-      Q_OBJECT
+class PitchLabel : public QLabel
+{
+    bool _pitchMode;
+    int _value;
+    Q_OBJECT
 
-   protected:
-      QSize sizeHint() const;
+protected:
+    QSize sizeHint() const;
 
-   public slots:
-      void setValue(int);
-      void setInt(int);
-      void setPitch(int);
+public slots:
+    void setValue(int);
+    void setInt(int);
+    void setPitch(int);
 
-   public:
-      PitchLabel(QWidget* parent, const char* name = 0);
-      int value() const { return _value; }
-      void setPitchMode(bool val);
-      bool pitchMode() const { return _pitchMode; }
-      };
+public:
+    PitchLabel(QWidget* parent, const char* name = 0);
+
+    int value() const
+    {
+        return _value;
+    }
+    void setPitchMode(bool val);
+
+    bool pitchMode() const
+    {
+        return _pitchMode;
+    }
+};
 
 
 #endif

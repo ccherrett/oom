@@ -88,341 +88,476 @@ class AudioDevice;
 //---------------------------------------------------------
 
 class Song : public QObject {
-      Q_OBJECT
 
-   public:
-      enum POS        { CPOS = 0, LPOS, RPOS };
-      enum FollowMode { NO, JUMP, CONTINUOUS };
-      enum            { REC_OVERDUP, REC_REPLACE };
-      enum            { CYCLE_NORMAL, CYCLE_MIX, CYCLE_REPLACE };
-      enum { MARKER_CUR, MARKER_ADD, MARKER_REMOVE, MARKER_NAME,
-         MARKER_TICK, MARKER_LOCK };
+    Q_OBJECT
 
-   private:
-      // fifo for note-on events
-      //    - this events are read by the heart beat interrupt
-      //    - used for single step recording in midi editors
+public:
+    enum POS {
+        CPOS = 0, LPOS, RPOS
+    };
 
-      int recNoteFifo[REC_NOTE_FIFO_SIZE];
-      volatile int noteFifoSize;
-      int noteFifoWindex;
-      int noteFifoRindex;
+    enum FollowMode {
+        NO, JUMP, CONTINUOUS
+    };
 
-      int updateFlags;
+    enum {
+        REC_OVERDUP, REC_REPLACE
+    };
 
-      TrackList _tracks;      // tracklist as seen by arranger
-	  TrackViewList _tviews;  // trackviewlist as seen by arranger
-      MidiTrackList  _midis;
-      WaveTrackList _waves;
-      InputList _inputs;      // audio input ports
-      OutputList _outputs;    // audio output ports
-      GroupList _groups;      // mixer groups
-      AuxList _auxs;          // aux sends
-      SynthIList _synthIs;
+    enum {
+        CYCLE_NORMAL, CYCLE_MIX, CYCLE_REPLACE
+    };
 
-      UndoList* undoList;
-      UndoList* redoList;
-      Pos pos[3];
-      Pos _vcpos;               // virtual CPOS (locate in progress)
-      MarkerList* _markerList;
+    enum {
+        MARKER_CUR, MARKER_ADD, MARKER_REMOVE, MARKER_NAME,
+        MARKER_TICK, MARKER_LOCK
+    };
 
-      bool _masterFlag;
-      bool loopFlag;
-      bool punchinFlag;
-      bool punchoutFlag;
-      bool recordFlag;
-      bool soloFlag;
-      enum MType _mtype;
-      int _recMode;
-      int _cycleMode;
-      bool _click;
-      bool _quantize;
-      int _arrangerRaster;        // Used for audio rec new part snapping. Set by Arranger snap combo box.
-      unsigned _len;         // song len in ticks
-      FollowMode _follow;
-      int _globalPitchShift;
-      void readMarker(Xml&);
+private:
+    // fifo for note-on events
+    //    - this events are read by the heart beat interrupt
+    //    - used for single step recording in midi editors
 
-      QString songInfoStr;  // contains user supplied song information, stored in song file.
-      QStringList deliveredScriptNames;
-      QStringList userScriptNames;
+    int recNoteFifo[REC_NOTE_FIFO_SIZE];
+    volatile int noteFifoSize;
+    int noteFifoWindex;
+    int noteFifoRindex;
 
-   public:
-      Song(const char* name = 0);
-      ~Song();
+    int updateFlags;
 
-      void putEvent(int pv);
-      void endMsgCmd();
-      void processMsg(AudioMsg* msg);
+    TrackList _tracks; // tracklist as seen by arranger
+    TrackViewList _tviews; // trackviewlist as seen by arranger
+    MidiTrackList _midis;
+    WaveTrackList _waves;
+    InputList _inputs; // audio input ports
+    OutputList _outputs; // audio output ports
+    GroupList _groups; // mixer groups
+    AuxList _auxs; // aux sends
+    SynthIList _synthIs;
 
-      void setMType(MType t);
-      MType mtype() const              { return _mtype; }
+    UndoList* undoList;
+    UndoList* redoList;
+    Pos pos[3];
+    Pos _vcpos; // virtual CPOS (locate in progress)
+    MarkerList* _markerList;
 
-      void setFollow(FollowMode m)     { _follow = m; }
-      FollowMode follow() const        { return _follow; }
+    bool _masterFlag;
+    bool loopFlag;
+    bool punchinFlag;
+    bool punchoutFlag;
+    bool recordFlag;
+    bool soloFlag;
+    enum MType _mtype;
+    int _recMode;
+    int _cycleMode;
+    bool _click;
+    bool _quantize;
+    int _arrangerRaster; // Used for audio rec new part snapping. Set by Arranger snap combo box.
+    unsigned _len; // song len in ticks
+    FollowMode _follow;
+    int _globalPitchShift;
+    void readMarker(Xml&);
 
-      bool dirty;
-      WaveTrack* bounceTrack;
-      AudioOutput* bounceOutput;
-      void updatePos();
+    QString songInfoStr; // contains user supplied song information, stored in song file.
+    QStringList deliveredScriptNames;
+    QStringList userScriptNames;
 
-      void read(Xml&);
-      void write(int, Xml&) const;
-      void writeFont(int level, Xml& xml, const char* name,
-         const QFont& font) const;
-      QFont readFont(Xml& xml, const char* name);
-      QString getSongInfo() { return songInfoStr; }
-      void setSongInfo(QString info) { songInfoStr = info; }
+public:
+    Song(const char* name = 0);
+    ~Song();
 
-      void clear(bool signal);
-      void update(int flags = -1);
-      void cleanupForQuit();
+    void putEvent(int pv);
+    void endMsgCmd();
+    void processMsg(AudioMsg* msg);
 
-      int globalPitchShift() const      { return _globalPitchShift; }
-      void setGlobalPitchShift(int val) { _globalPitchShift = val; }
+    void setMType(MType t);
 
-      //-----------------------------------------
-      //   Marker
-      //-----------------------------------------
+    MType mtype() const {
+        return _mtype;
+    }
 
-      MarkerList* marker() const { return _markerList; }
-      Marker* addMarker(const QString& s, int t, bool lck);
-      Marker* getMarkerAt(int t);
-      void removeMarker(Marker*);
-      Marker* setMarkerName(Marker*, const QString&);
-      Marker* setMarkerTick(Marker*, int);
-      Marker* setMarkerLock(Marker*, bool);
-      void setMarkerCurrent(Marker* m, bool f);
+    void setFollow(FollowMode m) {
+        _follow = m;
+    }
 
-      //-----------------------------------------
-      //   transport
-      //-----------------------------------------
+    FollowMode follow() const {
+        return _follow;
+    }
 
-      void setPos(int, const Pos&, bool sig = true, bool isSeek = true,
-         bool adjustScrollbar = false);
-      const Pos& cPos() const       { return pos[0]; }
-      const Pos& lPos() const       { return pos[1]; }
-      const Pos& rPos() const       { return pos[2]; }
-      unsigned cpos() const         { return pos[0].tick(); }
-      unsigned vcpos() const        { return _vcpos.tick(); }
-      const Pos& vcPos() const      { return _vcpos; }
-      unsigned lpos() const         { return pos[1].tick(); }
-      unsigned rpos() const         { return pos[2].tick(); }
+    bool dirty;
+    WaveTrack* bounceTrack;
+    AudioOutput* bounceOutput;
+    void updatePos();
 
-      bool loop() const             { return loopFlag; }
-      bool record() const           { return recordFlag; }
-      bool punchin() const          { return punchinFlag; }
-      bool punchout() const         { return punchoutFlag; }
-      bool masterFlag() const       { return _masterFlag; }
-      void setRecMode(int val)      { _recMode = val; }
-      int  recMode() const          { return _recMode; }
-      void setCycleMode(int val)    { _cycleMode = val; }
-      int cycleMode() const         { return _cycleMode; }
-      bool click() const            { return _click; }
-      bool quantize() const         { return _quantize; }
-      void setStopPlay(bool);
-      void stopRolling();
-      void abortRolling();
+    void read(Xml&);
+    void write(int, Xml&) const;
+    void writeFont(int level, Xml& xml, const char* name,
+            const QFont& font) const;
+    QFont readFont(Xml& xml, const char* name);
 
-      //-----------------------------------------
-      //    access tempomap/sigmap  (Mastertrack)
-      //-----------------------------------------
+    QString getSongInfo() {
+        return songInfoStr;
+    }
 
-      unsigned len() const { return _len; }
-      void setLen(unsigned l);     // set songlen in ticks
-      int roundUpBar(int tick) const;
-      int roundUpBeat(int tick) const;
-      int roundDownBar(int tick) const;
-      void initLen();
-      void tempoChanged();
+    void setSongInfo(QString info) {
+        songInfoStr = info;
+    }
 
-      //-----------------------------------------
-      //   event manipulations
-      //-----------------------------------------
+    void clear(bool signal);
+    void update(int flags = -1);
+    void cleanupForQuit();
 
-      //void cmdAddRecordedWave(WaveTrack* track, const Pos&, const Pos&);
-      void cmdAddRecordedWave(WaveTrack* track, Pos, Pos);
-      void cmdAddRecordedEvents(MidiTrack*, EventList*, unsigned);
-      bool addEvent(Event&, Part*);
-      void changeEvent(Event&, Event&, Part*);
-      void deleteEvent(Event&, Part*);
-      void cmdChangeWave(QString original, QString tmpfile, unsigned sx, unsigned ex);
-      void remapPortDrumCtrlEvents(int mapidx, int newnote, int newchan, int newport);
-      void changeAllPortDrumCtrlEvents(bool add, bool drumonly = false);
+    int globalPitchShift() const {
+        return _globalPitchShift;
+    }
 
-      //-----------------------------------------
-      //   part manipulations
-      //-----------------------------------------
+    void setGlobalPitchShift(int val) {
+        _globalPitchShift = val;
+    }
 
-      void cmdResizePart(Track* t, Part* p, unsigned int size);
-      void cmdSplitPart(Track* t, Part* p, int tick);
-      void cmdGluePart(Track* t, Part* p);
+    //-----------------------------------------
+    //   Marker
+    //-----------------------------------------
 
-      void addPart(Part* part);
-      void removePart(Part* part);
-      void changePart(Part*, Part*);
-      PartList* getSelectedMidiParts() const;
-      PartList* getSelectedWaveParts() const;
-      bool msgRemoveParts();
+    MarkerList* marker() const {
+        return _markerList;
+    }
+    Marker* addMarker(const QString& s, int t, bool lck);
+    Marker* getMarkerAt(int t);
+    void removeMarker(Marker*);
+    Marker* setMarkerName(Marker*, const QString&);
+    Marker* setMarkerTick(Marker*, int);
+    Marker* setMarkerLock(Marker*, bool);
+    void setMarkerCurrent(Marker* m, bool f);
 
-      //void cmdChangePart(Part* oldPart, Part* newPart);
-      void cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClones);
-      void cmdRemovePart(Part* part);
-      void cmdAddPart(Part* part);
-      int arrangerRaster() { return _arrangerRaster; }        // Used by Song::cmdAddRecordedWave to snap new wave parts
-      void setArrangerRaster(int r) { _arrangerRaster = r; }  // Used by Arranger snap combo box
+    //-----------------------------------------
+    //   transport
+    //-----------------------------------------
 
-      //-----------------------------------------
-      //   track manipulations
-      //-----------------------------------------
+    void setPos(int, const Pos&, bool sig = true, bool isSeek = true,
+            bool adjustScrollbar = false);
 
-      TrackList* tracks()         { return &_tracks;  }
-      MidiTrackList* midis()      { return &_midis;   }
-      WaveTrackList* waves()      { return &_waves;   }
-      InputList* inputs()         { return &_inputs;  }
-      OutputList* outputs()       { return &_outputs; }
-      GroupList* groups()         { return &_groups;  }
-      AuxList* auxs()             { return &_auxs;    }
-      SynthIList* syntis()        { return &_synthIs; }
+    const Pos& cPos() const {
+        return pos[0];
+    }
 
-      void cmdRemoveTrack(Track* track);
-      void removeTrack0(Track* track);
-      void removeTrack1(Track* track);
-      void removeTrack2(Track* track);
-      void removeTrack3(Track* track);
-      void removeMarkedTracks();
-      void changeTrack(Track* oldTrack, Track* newTrack);
-      MidiTrack* findTrack(const Part* part) const;
-      Track* findTrack(const QString& name) const;
-      void swapTracks(int i1, int i2);
-      void setChannelMute(int channel, bool flag);
-      void setRecordFlag(Track*, bool);
-      void insertTrack0(Track*, int idx);
-      void insertTrack1(Track*, int idx);
-      void insertTrack2(Track*, int idx);
-      void insertTrack3(Track*, int idx);
-      void deselectTracks();
-      void readRoute(Xml& xml);
-      void recordEvent(MidiTrack*, Event&);
-      void msgInsertTrack(Track* track, int idx, bool u = true);
-      void clearRecAutomation(bool clearList);
-      void processAutomationEvents();
-      int execAutomationCtlPopup(AudioTrack*, const QPoint&, int);
-      int execMidiAutomationCtlPopup(MidiTrack*, MidiPart*, const QPoint&, int);
-      void connectJackRoutes(AudioTrack* track, bool disconnect);
-      void updateSoloStates();
-      //void chooseMidiRoutes(QButton* /*parent*/, MidiTrack* /*track*/, bool /*dst*/);
+    const Pos& lPos() const {
+        return pos[1];
+    }
 
-	  // TrackView
-	  TrackViewList* trackviews() { return &_tviews;  }
-      TrackView* findTrackView(const QString& name) const;
-      void insertTrackView(TrackView*, int idx);
-	  void removeTrackView(TrackView*);
-	  void cmdRemoveTrackView(TrackView*);
-      void msgInsertTrackView(TrackView*, int idx, bool u = true);
-      
-      //-----------------------------------------
-      //   undo, redo
-      //-----------------------------------------
+    const Pos& rPos() const {
+        return pos[2];
+    }
 
-      void startUndo();
-      void endUndo(int);
-      //void undoOp(UndoOp::UndoType, Track* oTrack, Track* nTrack);
-      void undoOp(UndoOp::UndoType, int n, Track* oTrack, Track* nTrack);
-      void undoOp(UndoOp::UndoType, int, Track*);
-      void undoOp(UndoOp::UndoType, int, int, int = 0);
-      void undoOp(UndoOp::UndoType, Part*);
-      //void undoOp(UndoOp::UndoType, Event& nevent, Part*);
-      void undoOp(UndoOp::UndoType, Event& nevent, Part*, bool doCtrls, bool doClones);
-      //void undoOp(UndoOp::UndoType, Event& oevent, Event& nevent, Part*);
-      void undoOp(UndoOp::UndoType, Event& oevent, Event& nevent, Part*, bool doCtrls, bool doClones);
-      void undoOp(UndoOp::UndoType, SigEvent* oevent, SigEvent* nevent);
-      void undoOp(UndoOp::UndoType, int channel, int ctrl, int oval, int nval);
-      //void undoOp(UndoOp::UndoType, Part* oPart, Part* nPart);
-      void undoOp(UndoOp::UndoType, Part* oPart, Part* nPart, bool doCtrls, bool doClones);
-      void undoOp(UndoOp::UndoType type, const char* changedFile, const char* changeData, int startframe, int endframe);
-      void undoOp(UndoOp::UndoType type, Marker* copyMarker, Marker* realMarker);
-      bool doUndo1();
-      void doUndo2();
-      void doUndo3();
-      bool doRedo1();
-      void doRedo2();
-      void doRedo3();
+    unsigned cpos() const {
+        return pos[0].tick();
+    }
 
-      void addUndo(UndoOp& i);
+    unsigned vcpos() const {
+        return _vcpos.tick();
+    }
 
-      //-----------------------------------------
-      //   Configuration
-      //-----------------------------------------
+    const Pos& vcPos() const {
+        return _vcpos;
+    }
 
-      //SynthI* createSynthI(const QString& sclass);
-      SynthI* createSynthI(const QString& sclass, const QString& label = QString());
-      
-      void rescanAlsaPorts();
+    unsigned lpos() const {
+        return pos[1].tick();
+    }
 
-      //-----------------------------------------
-      //   Debug
-      //-----------------------------------------
+    unsigned rpos() const {
+        return pos[2].tick();
+    }
 
-      void dumpMaster();
-      void addUpdateFlags(int f)  { updateFlags |= f; }
+    bool loop() const {
+        return loopFlag;
+    }
 
-      //-----------------------------------------
-      //   Python bridge related
-      //-----------------------------------------
+    bool record() const {
+        return recordFlag;
+    }
+
+    bool punchin() const {
+        return punchinFlag;
+    }
+
+    bool punchout() const {
+        return punchoutFlag;
+    }
+
+    bool masterFlag() const {
+        return _masterFlag;
+    }
+
+    void setRecMode(int val) {
+        _recMode = val;
+    }
+
+    int recMode() const {
+        return _recMode;
+    }
+
+    void setCycleMode(int val) {
+        _cycleMode = val;
+    }
+
+    int cycleMode() const {
+        return _cycleMode;
+    }
+
+    bool click() const {
+        return _click;
+    }
+
+    bool quantize() const {
+        return _quantize;
+    }
+    void setStopPlay(bool);
+    void stopRolling();
+    void abortRolling();
+
+    //-----------------------------------------
+    //    access tempomap/sigmap  (Mastertrack)
+    //-----------------------------------------
+
+    unsigned len() const {
+        return _len;
+    }
+    void setLen(unsigned l); // set songlen in ticks
+    int roundUpBar(int tick) const;
+    int roundUpBeat(int tick) const;
+    int roundDownBar(int tick) const;
+    void initLen();
+    void tempoChanged();
+
+    //-----------------------------------------
+    //   event manipulations
+    //-----------------------------------------
+
+    //void cmdAddRecordedWave(WaveTrack* track, const Pos&, const Pos&);
+    void cmdAddRecordedWave(WaveTrack* track, Pos, Pos);
+    void cmdAddRecordedEvents(MidiTrack*, EventList*, unsigned);
+    bool addEvent(Event&, Part*);
+    void changeEvent(Event&, Event&, Part*);
+    void deleteEvent(Event&, Part*);
+    void cmdChangeWave(QString original, QString tmpfile, unsigned sx, unsigned ex);
+    void remapPortDrumCtrlEvents(int mapidx, int newnote, int newchan, int newport);
+    void changeAllPortDrumCtrlEvents(bool add, bool drumonly = false);
+
+    //-----------------------------------------
+    //   part manipulations
+    //-----------------------------------------
+
+    void cmdResizePart(Track* t, Part* p, unsigned int size);
+    void cmdSplitPart(Track* t, Part* p, int tick);
+    void cmdGluePart(Track* t, Part* p);
+
+    void addPart(Part* part);
+    void removePart(Part* part);
+    void changePart(Part*, Part*);
+    PartList* getSelectedMidiParts() const;
+    PartList* getSelectedWaveParts() const;
+    bool msgRemoveParts();
+
+    //void cmdChangePart(Part* oldPart, Part* newPart);
+    void cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClones);
+    void cmdRemovePart(Part* part);
+    void cmdAddPart(Part* part);
+
+    int arrangerRaster() {
+        return _arrangerRaster;
+    } // Used by Song::cmdAddRecordedWave to snap new wave parts
+
+    void setArrangerRaster(int r) {
+        _arrangerRaster = r;
+    } // Used by Arranger snap combo box
+
+    //-----------------------------------------
+    //   track manipulations
+    //-----------------------------------------
+
+    TrackList* tracks() {
+        return &_tracks;
+    }
+
+    MidiTrackList* midis() {
+        return &_midis;
+    }
+
+    WaveTrackList* waves() {
+        return &_waves;
+    }
+
+    InputList* inputs() {
+        return &_inputs;
+    }
+
+    OutputList* outputs() {
+        return &_outputs;
+    }
+
+    GroupList* groups() {
+        return &_groups;
+    }
+
+    AuxList* auxs() {
+        return &_auxs;
+    }
+
+    SynthIList* syntis() {
+        return &_synthIs;
+    }
+
+    void cmdRemoveTrack(Track* track);
+    void removeTrack0(Track* track);
+    void removeTrack1(Track* track);
+    void removeTrack2(Track* track);
+    void removeTrack3(Track* track);
+    void removeMarkedTracks();
+    void changeTrack(Track* oldTrack, Track* newTrack);
+    MidiTrack* findTrack(const Part* part) const;
+    Track* findTrack(const QString& name) const;
+    void swapTracks(int i1, int i2);
+    void setChannelMute(int channel, bool flag);
+    void setRecordFlag(Track*, bool);
+    void insertTrack0(Track*, int idx);
+    void insertTrack1(Track*, int idx);
+    void insertTrack2(Track*, int idx);
+    void insertTrack3(Track*, int idx);
+    void deselectTracks();
+    void readRoute(Xml& xml);
+    void recordEvent(MidiTrack*, Event&);
+    void msgInsertTrack(Track* track, int idx, bool u = true);
+    void clearRecAutomation(bool clearList);
+    void processAutomationEvents();
+    int execAutomationCtlPopup(AudioTrack*, const QPoint&, int);
+    int execMidiAutomationCtlPopup(MidiTrack*, MidiPart*, const QPoint&, int);
+    void connectJackRoutes(AudioTrack* track, bool disconnect);
+    void updateSoloStates();
+    //void chooseMidiRoutes(QButton* /*parent*/, MidiTrack* /*track*/, bool /*dst*/);
+
+    // TrackView
+
+    TrackViewList* trackviews() {
+        return &_tviews;
+    }
+    TrackView* findTrackView(const QString& name) const;
+    void insertTrackView(TrackView*, int idx);
+    void removeTrackView(TrackView*);
+    void cmdRemoveTrackView(TrackView*);
+    void msgInsertTrackView(TrackView*, int idx, bool u = true);
+
+    //-----------------------------------------
+    //   undo, redo
+    //-----------------------------------------
+
+    void startUndo();
+    void endUndo(int);
+    //void undoOp(UndoOp::UndoType, Track* oTrack, Track* nTrack);
+    void undoOp(UndoOp::UndoType, int n, Track* oTrack, Track* nTrack);
+    void undoOp(UndoOp::UndoType, int, Track*);
+    void undoOp(UndoOp::UndoType, int, int, int = 0);
+    void undoOp(UndoOp::UndoType, Part*);
+    //void undoOp(UndoOp::UndoType, Event& nevent, Part*);
+    void undoOp(UndoOp::UndoType, Event& nevent, Part*, bool doCtrls, bool doClones);
+    //void undoOp(UndoOp::UndoType, Event& oevent, Event& nevent, Part*);
+    void undoOp(UndoOp::UndoType, Event& oevent, Event& nevent, Part*, bool doCtrls, bool doClones);
+    void undoOp(UndoOp::UndoType, SigEvent* oevent, SigEvent* nevent);
+    void undoOp(UndoOp::UndoType, int channel, int ctrl, int oval, int nval);
+    //void undoOp(UndoOp::UndoType, Part* oPart, Part* nPart);
+    void undoOp(UndoOp::UndoType, Part* oPart, Part* nPart, bool doCtrls, bool doClones);
+    void undoOp(UndoOp::UndoType type, const char* changedFile, const char* changeData, int startframe, int endframe);
+    void undoOp(UndoOp::UndoType type, Marker* copyMarker, Marker* realMarker);
+    bool doUndo1();
+    void doUndo2();
+    void doUndo3();
+    bool doRedo1();
+    void doRedo2();
+    void doRedo3();
+
+    void addUndo(UndoOp& i);
+
+    //-----------------------------------------
+    //   Configuration
+    //-----------------------------------------
+
+    //SynthI* createSynthI(const QString& sclass);
+    SynthI* createSynthI(const QString& sclass, const QString& label = QString());
+
+    void rescanAlsaPorts();
+
+    //-----------------------------------------
+    //   Debug
+    //-----------------------------------------
+
+    void dumpMaster();
+
+    void addUpdateFlags(int f) {
+        updateFlags |= f;
+    }
+
+    //-----------------------------------------
+    //   Python bridge related
+    //-----------------------------------------
 #ifdef ENABLE_PYTHON
-      virtual bool event (QEvent* e );
+    virtual bool event(QEvent* e);
 #endif
-      void executeScript(const char* scriptfile, PartList* parts, int quant, bool onlyIfSelected);
+    void executeScript(const char* scriptfile, PartList* parts, int quant, bool onlyIfSelected);
 
-   public slots:
-      void beat();
+public slots:
+    void beat();
 
-      void undo();
-      void redo();
+    void undo();
+    void redo();
 
-      void setTempo(int t);
-      void setSig(int a, int b);
-      void setSig(const AL::TimeSignature&);
-      void setTempo(double tempo)  { setTempo(int(60000000.0/tempo)); }
+    void setTempo(int t);
+    void setSig(int a, int b);
+    void setSig(const AL::TimeSignature&);
 
-      void setMasterFlag(bool flag);
-      bool getLoop() { return loopFlag; }
-      void setLoop(bool f);
-      void setRecord(bool f, bool autoRecEnable = true);
-      void clearTrackRec();
-      void setPlay(bool f);
-      void setStop(bool);
-      void forward();
-      void rewindStart();
-      void rewind();
-      void setPunchin(bool f);
-      void setPunchout(bool f);
-      void setClick(bool val);
-      void setQuantize(bool val);
-      void panic();
-      void seqSignal(int fd);
-      Track* addTrack(int);
-      Track* addNewTrack(QAction* action);
-	  TrackView* addNewTrackView(int);
-      QString getScriptPath(int id, bool delivered);
-      void populateScriptMenu(QMenu* menuPlugins, QObject* receiver);
-      TrackView* addTrackView(int);
+    void setTempo(double tempo) {
+        setTempo(int(60000000.0 / tempo));
+    }
 
-   signals:
-      void songChanged(int);
-      void posChanged(int, unsigned, bool);
-      void loopChanged(bool);
-      void recordChanged(bool);
-      void playChanged(bool);
-      void punchinChanged(bool);
-      void punchoutChanged(bool);
-      void clickChanged(bool);
-      void quantizeChanged(bool);
-      void markerChanged(int);
-      void midiPortsChanged();
-      void midiNote(int pitch, int velo);
-      };
+    void setMasterFlag(bool flag);
+
+    bool getLoop() {
+        return loopFlag;
+    }
+    void setLoop(bool f);
+    void setRecord(bool f, bool autoRecEnable = true);
+    void clearTrackRec();
+    void setPlay(bool f);
+    void setStop(bool);
+    void forward();
+    void rewindStart();
+    void rewind();
+    void setPunchin(bool f);
+    void setPunchout(bool f);
+    void setClick(bool val);
+    void setQuantize(bool val);
+    void panic();
+    void seqSignal(int fd);
+    Track* addTrack(int);
+    Track* addNewTrack(QAction* action);
+    TrackView* addNewTrackView(int);
+    QString getScriptPath(int id, bool delivered);
+    void populateScriptMenu(QMenu* menuPlugins, QObject* receiver);
+    TrackView* addTrackView(int);
+
+signals:
+    void songChanged(int);
+    void posChanged(int, unsigned, bool);
+    void loopChanged(bool);
+    void recordChanged(bool);
+    void playChanged(bool);
+    void punchinChanged(bool);
+    void punchoutChanged(bool);
+    void clickChanged(bool);
+    void quantizeChanged(bool);
+    void markerChanged(int);
+    void midiPortsChanged();
+    void midiNote(int pitch, int velo);
+};
 
 extern Song* song;
 

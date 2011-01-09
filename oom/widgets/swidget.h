@@ -13,19 +13,23 @@
 //---------------------------------------------------------
 //   SWidget
 //    a simple widget which emits a heighChanged signal
-//    on received ResizeEvent´s
+//    on received ResizeEventï¿½s
 //---------------------------------------------------------
 
-class SWidget : public QWidget {
-      virtual void resizeEvent(QResizeEvent*);
-      Q_OBJECT
+class SWidget : public QWidget
+{
+    virtual void resizeEvent(QResizeEvent*);
+    Q_OBJECT
 
-   signals:
-      void heightChanged(int);
+signals:
+    void heightChanged(int);
 
-   public:
-      SWidget(QWidget* parent) : QWidget(parent) {}
-      };
+public:
+
+    SWidget(QWidget* parent) : QWidget(parent)
+    {
+    }
+};
 
 #endif
 

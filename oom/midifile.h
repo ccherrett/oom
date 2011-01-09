@@ -22,13 +22,16 @@ class MidiPlayEvent;
 //   MidiFileTrack
 //---------------------------------------------------------
 
-struct MidiFileTrack {
-      MPEventList events;
-      bool isDrumTrack;
-      MidiFileTrack() {
-            isDrumTrack = false;
-            }
-      };
+struct MidiFileTrack
+{
+    MPEventList events;
+    bool isDrumTrack;
+
+    MidiFileTrack()
+    {
+        isDrumTrack = false;
+    }
+};
 
 typedef std::list<MidiFileTrack*> MidiFileTrackList;
 typedef MidiFileTrackList::iterator iMidiFileTrack;
@@ -38,54 +41,85 @@ typedef MidiFileTrackList::const_iterator ciMidiFileTrack;
 //   MidiFile
 //---------------------------------------------------------
 
-class MidiFile {
-      int _error;
-      int format;       // smf file format
-      int ntracks;      // number of midi tracks
-      int _division;
-      MType _mtype;
-      MidiFileTrackList* _tracks;
+class MidiFile
+{
+    int _error;
+    int format; // smf file format
+    int ntracks; // number of midi tracks
+    int _division;
+    MType _mtype;
+    MidiFileTrackList* _tracks;
 
-      int status, click;
-      int sstatus;
-      int lastport, lastchannel;
-      FILE* fp;
-      int curPos;
+    int status, click;
+    int sstatus;
+    int lastport, lastchannel;
+    FILE* fp;
+    int curPos;
 
-      bool read(void*, size_t);
-      bool write(const void*, size_t);
-      void put(unsigned char c) { write(&c, 1); }
-      bool skip(size_t);
-      int readShort();
-      bool writeShort(int);
-      int readLong();
-      bool writeLong(int);
-      int getvl();
-      void putvl(unsigned);
+    bool read(void*, size_t);
+    bool write(const void*, size_t);
 
-      bool readTrack(MidiFileTrack*);
-      bool writeTrack(const MidiFileTrack*);
+    void put(unsigned char c)
+    {
+        write(&c, 1);
+    }
+    bool skip(size_t);
+    int readShort();
+    bool writeShort(int);
+    int readLong();
+    bool writeLong(int);
+    int getvl();
+    void putvl(unsigned);
 
-      int readEvent(MidiPlayEvent*, MidiFileTrack*);
-      void writeEvent(const MidiPlayEvent*);
+    bool readTrack(MidiFileTrack*);
+    bool writeTrack(const MidiFileTrack*);
 
-   public:
-      MidiFile(FILE* f);
-      ~MidiFile();
-      bool read();
-      bool write();
-      QString error();
-      MidiFileTrackList* trackList()  { return _tracks; }
-      int tracks() const              { return ntracks; }
-      void setTrackList(MidiFileTrackList* tr, int n) {
-            _tracks = tr;
-            ntracks = n;
-            }
-      void setDivision(int d)         { _division = d; }
-      int division() const            { return _division; }
-      void setMType(MType t)          { _mtype = t; }
-      MType mtype() const             { return _mtype; }
-      };
+    int readEvent(MidiPlayEvent*, MidiFileTrack*);
+    void writeEvent(const MidiPlayEvent*);
+
+public:
+    MidiFile(FILE* f);
+    ~MidiFile();
+    bool read();
+    bool write();
+    QString error();
+
+    MidiFileTrackList* trackList()
+    {
+        return _tracks;
+    }
+
+    int tracks() const
+    {
+        return ntracks;
+    }
+
+    void setTrackList(MidiFileTrackList* tr, int n)
+    {
+        _tracks = tr;
+        ntracks = n;
+    }
+
+    void setDivision(int d)
+    {
+        _division = d;
+    }
+
+    int division() const
+    {
+        return _division;
+    }
+
+    void setMType(MType t)
+    {
+        _mtype = t;
+    }
+
+    MType mtype() const
+    {
+        return _mtype;
+    }
+};
 
 #define XCHG_SHORT(x) ((((x)&0xFF)<<8) | (((x)>>8)&0xFF))
 #ifdef __i486__
