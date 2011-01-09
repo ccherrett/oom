@@ -201,17 +201,17 @@ void MidiTrack::updateSoloStates(bool noDec)
 	if (noDec && !_solo)
 		return;
 
-	_tmpSoloChainTrack = this;
-	_tmpSoloChainDoIns = false;
-	_tmpSoloChainNoDec = noDec;
+//	_tmpSoloChainTrack = this;
+//	_tmpSoloChainDoIns = false;
+//	_tmpSoloChainNoDec = noDec;
 	updateSoloState();
 
-//	if (outPort() >= 0)
-//	{
-//		MidiDevice *md = midiPorts[outPort()].device();
-//		if (md && md->isSynti())
-//			((SynthI*) md)->updateInternalSoloStates();
-//	}
+        if (outPort() >= 0)
+        {
+                MidiDevice *md = midiPorts[outPort()].device();
+                if (md && md->isSynti())
+                        ((SynthI*) md)->updateInternalSoloStates();
+        }
 }
 
 //---------------------------------------------------------
