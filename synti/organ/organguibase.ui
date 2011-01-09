@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>MusE: Organ</string>
+   <string>OOMidi: Organ</string>
   </property>
   <layout class="QGridLayout">
    <property name="margin">

@@ -19,14 +19,14 @@
 #include "libsynti/mess.h"
 #include "common.h"
 //#include "libsynti/mpevent.h"
-#include "muse/mpevent.h"   
+#include "oom/mpevent.h"   
 #include "simpledrumsgui.h"
 #include "ssplugin.h"
 
 #define SS_NO_SAMPLE       0
 #define SS_NO_PLUGIN       0
 
-#define SS_PROCESS_BUFFER_SIZE 4096 //TODO: Add initialization method for nr of frames in each process from MusE - if nr of frames > than this, this will fail
+#define SS_PROCESS_BUFFER_SIZE 4096 //TODO: Add initialization method for nr of frames in each process from OOMidi - if nr of frames > than this, this will fail
 #define SS_SENDFX_BUFFER_SIZE  SS_PROCESS_BUFFER_SIZE
 
 enum SS_ChannelState

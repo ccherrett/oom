@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2008 by Werner Schweer and others
@@ -22,7 +22,7 @@ include(FindPkgConfig)
 include(cmake/Summary.cmake)
 include(cmake/TargetDoc.cmake)
 
-project(muse)
+project(oom)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4.1)
 if (COMMAND cmake_policy)
       cmake_policy(SET CMP0003 NEW)
@@ -60,43 +60,43 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
-# The MusE version number.
-SET(MusE_VERSION_MAJOR 2)
-SET(MusE_VERSION_MINOR 0)
-SET(MusE_VERSION_PATCH 0)
-SET(MusE_VERSION       "2.0alpha")
-SET(MusE_VERSION_FULL  "2.0alpha")
-SET(MusE_INSTALL_NAME  "muse-2.0alpha")
-SET(MusE_EXEC_NAME     "muse2")
+# The OOMidi version number.
+SET(OOMidi_VERSION_MAJOR 2)
+SET(OOMidi_VERSION_MINOR 0)
+SET(OOMidi_VERSION_PATCH 0)
+SET(OOMidi_VERSION       "2.0alpha")
+SET(OOMidi_VERSION_FULL  "2.0alpha")
+SET(OOMidi_INSTALL_NAME  "oom-2.0alpha")
+SET(OOMidi_EXEC_NAME     "oom2")
 
 ## The library where we will install the shared components:
-SET(MusE_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${MusE_INSTALL_NAME}/modules)
-SET(CMAKE_INSTALL_RPATH ${MusE_MODULES_DIR})
+SET(OOMidi_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/modules)
+SET(CMAKE_INSTALL_RPATH ${OOMidi_MODULES_DIR})
 
 ## Synthesizers directory
-SET(MusE_SYNTHI_DIR ${CMAKE_INSTALL_LIBDIR}/${MusE_INSTALL_NAME}/synthi)
+SET(OOMidi_SYNTHI_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/synthi)
 
 ## Plugins directory
-SET(MusE_PLUGINS_DIR ${CMAKE_INSTALL_LIBDIR}/${MusE_INSTALL_NAME}/plugins)
+SET(OOMidi_PLUGINS_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/plugins)
 
 ## Top documentation dir
-IF(NOT DEFINED MusE_DOC_DIR)
-      SET(MusE_DOC_DIR ${SHARE_INSTALL_PREFIX}/doc/${MusE_INSTALL_NAME}/)
-ENDIF(NOT DEFINED MusE_DOC_DIR)
+IF(NOT DEFINED OOMidi_DOC_DIR)
+      SET(OOMidi_DOC_DIR ${SHARE_INSTALL_PREFIX}/doc/${OOMidi_INSTALL_NAME}/)
+ENDIF(NOT DEFINED OOMidi_DOC_DIR)
 
 ## Data directory
-SET(MusE_SHARE_DIR ${SHARE_INSTALL_PREFIX}/${MusE_INSTALL_NAME})
+SET(OOMidi_SHARE_DIR ${SHARE_INSTALL_PREFIX}/${OOMidi_INSTALL_NAME})
 
 ## Lib directory
-SET(MusE_LIB_DIR ${CMAKE_INSTALL_LIBDIR}/${MusE_INSTALL_NAME})
+SET(OOMidi_LIB_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME})
 
 FIND_PROGRAM(SVNVER svnversion)
 if (${SVNVER} STREQUAL "SVNVER-NOTFOUND")
-      SET (MusE_SVNVER 0)
+      SET (OOMidi_SVNVER 0)
 else (${SVNVER} STREQUAL "SVNVER-NOTFOUND")
       EXEC_PROGRAM( svnversion
             ARGS ${PROJECT_SOURCE_DIR}
-            OUTPUT_VARIABLE MusE_SVNVER )
+            OUTPUT_VARIABLE OOMidi_SVNVER )
 endif (${SVNVER} STREQUAL "SVNVER-NOTFOUND")
 
 # Do we need this? - Orcan:
@@ -307,13 +307,13 @@ add_custom_command(
 include_directories(
    .
    ${PROJECT_SOURCE_DIR}
-   ${PROJECT_SOURCE_DIR}/muse
-   ${PROJECT_SOURCE_DIR}/muse/widgets
+   ${PROJECT_SOURCE_DIR}/oom
+   ${PROJECT_SOURCE_DIR}/oom/widgets
    ${PROJECT_BINARY_DIR}
-   ${PROJECT_BINARY_DIR}/muse
-   ${PROJECT_BINARY_DIR}/muse/widgets
-   ${PROJECT_BINARY_DIR}/muse/instruments
-   ${PROJECT_BINARY_DIR}/muse/ctrl
+   ${PROJECT_BINARY_DIR}/oom
+   ${PROJECT_BINARY_DIR}/oom/widgets
+   ${PROJECT_BINARY_DIR}/oom/instruments
+   ${PROJECT_BINARY_DIR}/oom/ctrl
    )
 
 # include (pch.txt)
@@ -328,15 +328,15 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
       INCLUDE(InstallRequiredSystemLibraries)
   ENDIF(EXISTS "${CMAKE_ROOT}/Modules/InstallRequiredSystemLibraries.cmake")
 
-  SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MusE is a virtual audio studio environment")
+  SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OOMidi is a virtual audio studio environment")
   SET(CPACK_PACKAGE_VENDOR "Werner Schweer and others")
   SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
   SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
-  SET(CPACK_PACKAGE_VERSION_MAJOR "${MusE_VERSION_MAJOR}")
-  SET(CPACK_PACKAGE_VERSION_MINOR "${MusE_VERSION_MINOR}")
-  SET(CPACK_PACKAGE_VERSION_PATCH "${MusE_VERSION_PATCH}")
+  SET(CPACK_PACKAGE_VERSION_MAJOR "${OOMidi_VERSION_MAJOR}")
+  SET(CPACK_PACKAGE_VERSION_MINOR "${OOMidi_VERSION_MINOR}")
+  SET(CPACK_PACKAGE_VERSION_PATCH "${OOMidi_VERSION_PATCH}")
   SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
-  SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${MusE_INSTALL_NAME}")
+  SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${OOMidi_INSTALL_NAME}")
 
   # Don't pack the binary tree and the subversion directories
   SET(CPACK_SOURCE_IGNORE_FILES "/\\\\.svn/;${CMAKE_BINARY_DIR}/*")
@@ -344,8 +344,8 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   SET(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 
   SET(CPACK_PACKAGE_FILE_NAME "${CPACK_SOURCE_PACKAGE_FILE_NAME}-${CPACK_SYSTEM_NAME}")
-  SET(CPACK_STRIP_FILES "bin/muse;bin/grepmidi")
-  SET(CPACK_PACKAGE_EXECUTABLES "muse" "MusE" "grepmidi" "grepmidi")
+  SET(CPACK_STRIP_FILES "bin/oom;bin/grepmidi")
+  SET(CPACK_PACKAGE_EXECUTABLES "oom" "OOMidi" "grepmidi" "grepmidi")
   INCLUDE(CPack)
 ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 
@@ -353,12 +353,12 @@ set(CMAKE_CXX_FLAGS         "-Wall -Wextra -Winvalid-pch -fno-exceptions ${CMAKE
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -fomit-frame-pointer -ffast-math -fstrength-reduce ${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -DQT_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}")
 
-# subdirs(al awl grepmidi plugins midiplugins muse share synti)
-# subdirs(al lib grepmidi plugins xpm muse share demos doc synti utils)
-#subdirs(al lib grepmidi plugins muse share demos synti )
+# subdirs(al awl grepmidi plugins midiplugins oom share synti)
+# subdirs(al lib grepmidi plugins xpm oom share demos doc synti utils)
+#subdirs(al lib grepmidi plugins oom share demos synti )
 # NOTE: share/ directory needs to be at the end so that the translations
 #       are scanned before coming to share/locale
-subdirs(al awl grepmidi man plugins muse synti packaging utils demos share)
+subdirs(al awl grepmidi man plugins oom synti packaging utils demos share)
 
 ## Install doc files
 file (GLOB doc_files
@@ -376,7 +376,7 @@ file (GLOB doc_files
       README.translate
       SECURITY
       )
-INSTALL( FILES ${doc_files} DESTINATION ${MusE_DOC_DIR})
+INSTALL( FILES ${doc_files} DESTINATION ${OOMidi_DOC_DIR})
 
 ## Uninstall support
 configure_file(

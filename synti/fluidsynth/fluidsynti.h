@@ -1,5 +1,5 @@
 /*
- * MusE FLUID Synth softsynth plugin
+ * OOMidi FLUID Synth softsynth plugin
  *
  * Copyright (C) 2004 Mathias Lundgren (lunar_shuttle@users.sourcforge.net)
  *
@@ -16,10 +16,10 @@
 
 #include "fluidsynthgui.h"
 #include "libsynti/mess.h"
-#include "muse/debug.h"
+#include "oom/debug.h"
 //#include "libsynti/mpevent.h"
-#include "muse/mpevent.h"   
-#include "muse/midictrl.h"
+#include "oom/mpevent.h"   
+#include "oom/midictrl.h"
 
 #define FS_DEBUG_DATA 0 //Turn on/off debug print of midi data sent to fluidsynth
 

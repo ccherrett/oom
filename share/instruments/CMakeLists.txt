@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -21,6 +21,6 @@
 file (GLOB instruments_files *.idf)
 
 install( FILES ${instruments_files}
-      DESTINATION ${MusE_SHARE_DIR}/instruments
+      DESTINATION ${OOMidi_SHARE_DIR}/instruments
       )
 

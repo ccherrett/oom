@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: organ.h,v 1.5.2.3 2009/11/19 04:20:33 terminator356 Exp $
 //
 //  Parts of this file taken from:
@@ -13,7 +13,7 @@
 #ifndef __ORGAN_H__
 #define __ORGAN_H__
 
-#include "muse/midictrl.h"
+#include "oom/midictrl.h"
 #include "libsynti/mess.h"
 
 #define RESOLUTION   (16384*2)

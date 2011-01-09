@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="ZynAddSubFX-1.4">
     <Controller name="Program" type="Program" />
     <Controller name="Pitch" type="Pitch" />
@@ -19,4 +19,4 @@
     <Controller name="ResetAllController" l="121" />
     <Controller name="AllNotesOff" l="123" />
   </MidiInstrument>
-</muse>
+</oom>

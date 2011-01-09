@@ -36,8 +36,8 @@
 #include <QPainter>
 #include <QSocketNotifier>
 
-#include "muse/midi.h"
-#include "muse/midictrl.h"
+#include "oom/midi.h"
+#include "oom/midictrl.h"
 #include "config.h"
 
 #include "deicsonzegui.h"
@@ -440,7 +440,7 @@ DeicsOnzeGui::DeicsOnzeGui(DeicsOnze* deicsOnze)
   setEnabledPreset(false);
   
   // Tim.
-  QString sharePath(museGlobalShare);                            
+  QString sharePath(oomGlobalShare);                            
   updateInitSetPath
     (sharePath + QString("/presets/deicsonze/SutulaBank.dei"));    // Tim.
     

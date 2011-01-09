@@ -33,10 +33,10 @@ More than one \fIfile\fR can be given on the commandline.  Option \fB-f\fR
 tells \fBgrepmidi\fR to prepend each line of output with the filename that
 is currently checked.
 .PP
-\fBgrepmidi\fR is distributed along with \fBMusE\fR, a full-fledged MIDI
+\fBgrepmidi\fR is distributed along with \fBOOMidi\fR, a full-fledged MIDI
 Music Editor.
 .SH "SEE ALSO"
-.BR ${MusE_EXEC_NAME} (1).
+.BR ${OOMidi_EXEC_NAME} (1).
 .SH AUTHORS
 .B grepmidi
 was written by Werner Schweer <ws@seh.de>.

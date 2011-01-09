@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -49,5 +49,5 @@ target_link_libraries(simpledrums
       ${QT_LIBRARIES}
       )
 
-install_targets ( /${CMAKE_INSTALL_LIBDIR}/${MusE_INSTALL_NAME}/synthi/ simpledrums )
+install_targets ( /${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/synthi/ simpledrums )
 

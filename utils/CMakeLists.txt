@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -19,10 +19,10 @@
 #=============================================================================
 
 file(GLOB utils_files
-      muse-find-unused-wavs
-      muse-song-convert.py
+      oom-find-unused-wavs
+      oom-song-convert.py
       )
 
 install (PROGRAMS ${utils_files}
-      DESTINATION ${MusE_SHARE_DIR}/utils/
+      DESTINATION ${OOMidi_SHARE_DIR}/utils/
       )

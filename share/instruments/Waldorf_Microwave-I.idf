@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="Waldorf Microwave I">
     <PatchGroup name="Internal Bank A">
       <Patch name="A 01" hbank="0" lbank="0" prog="0" />
@@ -139,4 +139,4 @@
     </PatchGroup>
     <Controller name="Program" type="Program" />
   </MidiInstrument>
-</muse>
+</oom>

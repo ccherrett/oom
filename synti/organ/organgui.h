@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: organgui.h,v 1.6.2.1 2005/12/29 23:33:50 spamatica Exp $
 //
 //  (C) Copyright 2001-2004 Werner Schweer (ws@seh.de)
@@ -13,7 +13,7 @@
 #include "organ.h"
 #include "libsynti/gui.h"
 //#include "libsynti/mpevent.h"
-#include "muse/mpevent.h"   
+#include "oom/mpevent.h"   
 
 class QWidget;
 class QSignalMapper;

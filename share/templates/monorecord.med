@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="2.0">
+<oom version="2.0">
   <configuration>
           <midiInputDevice>0</midiInputDevice>
       <midiInputChannel>0</midiInputChannel>
@@ -429,4 +429,4 @@
         </topwin>
       </audiomixer>
     </toplevels>
-  </muse>
+  </oom>

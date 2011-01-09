@@ -1,17 +1,17 @@
 ====================================================================
-      MusE  ---  Linux Music Editor
+      OOMidi  ---  Open Octave Midi and Audio Editor
 ====================================================================
 
-Welcome to MusE, the open source MIDI/Audio sequencer.
+Welcome to OOMidi, the open source MIDI/Audio sequencer.
 
-MusE is distributed under the GNU General Public License (GPL).
+OOMidi is distributed under the GNU General Public License (GPL).
 Please check out the file COPYING in this directory for more
 details.
 
 ,-----------------------------------------------------------------.
 | NOTICE                                                          |
 |-----------------------------------------------------------------|
-| Some parts of MusE code are EXPERIMENTAL, and may well result   |
+| Some parts of OOMidi code are EXPERIMENTAL, and may well result |
 | in a CRASH, and who knows what other ill effects.               |
 | RUN THIS SOFTWARE AT YOUR OWN RISK.                             |
 `-----------------------------------------------------------------'
@@ -26,7 +26,7 @@ details.
 
       - QT: Qt >= 4.2.0 
         ftp://ftp.trolltech.com/qt/source
-        MusE does _not_ compile with older versions
+        OOMidi does _not_ compile with older versions
 
       - gcc >= 4.x.x
 
@@ -57,14 +57,14 @@ details.
       Compiling:
   =============================
 
-      - Download source from http://lmuse.sourceforge.net/
+      - Download source from https://github.com/ccherrett/oom
 
       - Command line to unpack source:
-            tar xvofz muse-x.y.z.tar.gz 
+            tar xvofz oom-x.y.z.tar.gz 
          where x.y.z is the version number.
         Or just use a graphical de-compressor to unpack it somewhere.  
 
-      - To compile MusE, run the following commands from the 
+      - To compile OOMidi, run the following commands from the 
          top level directory where the source code was unpacked
          (the directory where THIS README FILE is): 
         
@@ -74,7 +74,7 @@ details.
               cd build                                         
           
           # Create make system in the build directory.
-          # Optional <Prefix> is the location to install MusE, default /usr/local.
+          # Optional <Prefix> is the location to install OOMidi, default /usr/local.
           # Build type can be blank (to reset a previous cached type to 'empty'), 
           #  debug, release, RelWithDebInfo and MinSizeRel.
           # If no CMAKE_BUILD_TYPE is given at all, cmake uses either the previous 
@@ -82,17 +82,17 @@ details.
           # ('Release' type is recommended, otherwise it builds a plain unoptimized program.)
               cmake -DCMAKE_BUILD_TYPE=release [-DCMAKE_INSTALL_PREFIX=<prefix>] ../
           
-          # Compile muse
+          # Compile oom
               make                                             
             
-      - Install MusE:
+      - Install OOMidi:
               Run "make install"  (as root user)
 
   =============================
-      running MusE
+      running OOMidi
   =============================
 
-      MusE is a realtime program which requires special rights to
+      OOMidi is a realtime program which requires special rights to
       work poperly.
       Recommended setup:
 
@@ -105,12 +105,12 @@ details.
             chmod 660 /dev/rtc
             chgrp audio /dev/rtc
 
-      - make sure MusE can set the rtc clock:
+      - make sure OOMidi can set the rtc clock:
             echo 8192 > /proc/sys/dev/rtc/max-user-freq
             inspect with:
             cat /proc/sys/dev/rtc/max-user-freq
 
-      - for MusE to gain RT priviledges load the "realtime-lsm"
+      - for OOMidi to gain RT priviledges load the "realtime-lsm"
         modul; the modul should be configured to give all "audio"
         group members realtime priviledges
 
@@ -121,9 +121,10 @@ details.
       - start qjackctl
             - start JACK with qjackctl
 
-      - start MusE
+      - start OOMidi
+	       /usr/local/bin/oom2
 
-      (JACK and all its clients (qjackctl & MusE) must run with the
+      (JACK and all its clients (qjackctl & OOMidi) must run with the
       same user id)
 
 
@@ -134,7 +135,7 @@ details.
       - many
 
 ====================================================================
-Let us know whether MusE works for you !!!
-Have a look at the webpage http://www.muse-sequencer.org for details.
+Let us know whether OOMidi works for you !!!
+Have a look at the webpage http://www.openoctave.org for details.
 
 

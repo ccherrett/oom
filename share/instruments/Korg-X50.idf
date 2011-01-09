@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="Korg X50">
     <PatchGroup name="Combinations Bank A">
       <Patch name="StereophonicKeys" hbank="0" lbank="0" prog="0" />
@@ -616,7 +616,7 @@
       <Patch name="2 Step Bass" hbank="63" lbank="1" prog="91" />
       <Patch name="Koto" hbank="63" lbank="1" prog="92" />
       <Patch name="Astral Dreams" hbank="63" lbank="1" prog="93" />
-      <Patch name="Musette" hbank="63" lbank="1" prog="94" />
+      <Patch name="OOMiditte" hbank="63" lbank="1" prog="94" />
       <Patch name="Dark Night" hbank="63" lbank="1" prog="95" />
       <Patch name="Metalic Rez" hbank="63" lbank="1" prog="96" />
       <Patch name="Dyno Tine EP" hbank="63" lbank="1" prog="97" />
@@ -1088,4 +1088,4 @@
     <Controller name="All_Sound_Off" l="120" />
     <Controller name="Reset_All_Controllers" l="121" />
   </MidiInstrument>
-</muse>
+</oom>

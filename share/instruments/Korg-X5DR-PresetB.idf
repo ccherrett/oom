@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="Korg X5DR Preset B">
     <PatchGroup name="Bank C Combinations">
       <Patch name="Star*Burst" hbank="127" lbank="0" prog="0" />
@@ -227,7 +227,7 @@
       <Patch name="BX-3 Organ" hbank="61" lbank="0" prog="18" />
       <Patch name="ChurchPipe" hbank="61" lbank="0" prog="19" />
       <Patch name="Positive" hbank="61" lbank="0" prog="20" />
-      <Patch name="Musette" hbank="61" lbank="0" prog="21" />
+      <Patch name="OOMiditte" hbank="61" lbank="0" prog="21" />
       <Patch name="Harmonica" hbank="61" lbank="0" prog="22" />
       <Patch name="Tango" hbank="61" lbank="0" prog="23" />
       <Patch name="ClassicGtr" hbank="61" lbank="0" prog="24" />
@@ -365,4 +365,4 @@
     <Controller name="ResetAllCntrls" l="121" />
     <Controller name="Program" type="Program" />
   </MidiInstrument>
-</muse>
+</oom>

@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: fluidgui.cpp,v 1.6.2.1 2009/08/12 20:47:01 spamatica Exp $
 //
 //    This is a simple GUI implemented with QT for
@@ -17,8 +17,8 @@
 #include <QMessageBox>
 
 #include "fluidgui.h"
-#include "muse/midi.h"
-#include "muse/icons.h"
+#include "oom/midi.h"
+#include "oom/icons.h"
 
 //---------------------------------------------------------
 //   FLUIDGui

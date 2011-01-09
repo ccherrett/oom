@@ -1,16 +1,16 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: fluid.h,v 1.7.2.4 2009/11/19 04:20:33 terminator356 Exp $
 //
 //  This file is derived from fluid Synth and modified
-//    for MusE.
+//    for OOMidi.
 //  Parts of fluid are derived from Smurf Sound Font Editor.
 //  Parts of Smurf Sound Font Editor are derived from
 //    awesfx utilities
 //  Smurf:  Copyright (C) 1999-2000 Josh Green
 //  fluid:   Copyright (C) 2001 Peter Hanappe
-//  MusE:   Copyright (C) 2001 Werner Schweer
+//  OOMidi:   Copyright (C) 2001 Werner Schweer
 //  awesfx: Copyright (C) 1996-1999 Takashi Iwai
 //=========================================================
 

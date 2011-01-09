@@ -8,7 +8,7 @@ RELEASE NOTES:
 - Resampling of samples when loading (libsamplerate)
 - Synth state is saved to/restored from project file
 - Channel settings: balance, volume, effect tap for each sendeffect
-- Effect settings: all LADSPA parameters controllable and saved to MusE project, effect master volume, effect on/off
+- Effect settings: all LADSPA parameters controllable and saved to OOMidi project, effect master volume, effect on/off
 - Support for mono + stereo samples
 - Support for stereo + mono LADSPA effects
 - Bugfixes, GUI-improvements etc...

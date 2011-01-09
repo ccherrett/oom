@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -32,6 +32,6 @@ subdirs(
       locale
       )
 
-# We don't have a splash image for MusE2 yet. When we do, the
+# We don't have a splash image for OOMidi2 yet. When we do, the
 # following line can be uncommented:
-#install (FILES splash.png DESTINATION ${MusE_SHARE_DIR} )
+#install (FILES splash.png DESTINATION ${OOMidi_SHARE_DIR} )

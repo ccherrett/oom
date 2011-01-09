@@ -7,7 +7,7 @@
   +"The Left Pane"  "window_ref.html"
    "Track Info"    "window_ref.html"
  "The Main Window" "window_ref.html"
-"Invoking MusE"  "invocation.html"
+"Invoking OOMidi"  "invocation.html"
 "Installation"   "installation.html"
 "Introduction"   "introduction.html"
 "Index"          "index.html"

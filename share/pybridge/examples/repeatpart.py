@@ -1,7 +1,7 @@
 """
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  (C) Copyright 2009 Mathias Gyllengahm (lunar_shuttle@users.sf.net)
 //=========================================================
 """
@@ -12,37 +12,37 @@ import time
 
 SLEEPIVAL=0.3
 
-def advanceToNextSection(muse, newlpos, newrpos):
+def advanceToNextSection(oom, newlpos, newrpos):
       print "Advancing..."
-      currpos = muse.getRPos()
-      curlpos = muse.getLPos()
-      curpos = muse.getCPos()
-      muse.setLoop(False)
+      currpos = oom.getRPos()
+      curlpos = oom.getLPos()
+      curpos = oom.getCPos()
+      oom.setLoop(False)
 
       while curpos < currpos:
             time.sleep(SLEEPIVAL)
-            curpos = muse.getCPos()
+            curpos = oom.getCPos()
       print "Leaving current section..."
-      muse.setRPos(newrpos)
-      curpos = muse.getCPos()
+      oom.setRPos(newrpos)
+      curpos = oom.getCPos()
 
       while curpos < newlpos:
             time.sleep(SLEEPIVAL)
-            curpos = muse.getCPos()
+            curpos = oom.getCPos()
       print "Entered new section"
-      muse.setLPos(newlpos)
-      muse.setLoop(True)
+      oom.setLPos(newlpos)
+      oom.setLoop(True)
       return
 
-muse=Pyro.core.getProxyForURI('PYRONAME://:Default.muse')
-muse.stopPlay()
-parts = muse.getParts("Track 1")
-muse.setLPos(parts[0]['tick'])
-muse.setRPos(parts[0]['tick'] + parts[0]['len'])
-muse.setCPos(0)
+oom=Pyro.core.getProxyForURI('PYRONAME://:Default.oom')
+oom.stopPlay()
+parts = oom.getParts("Track 1")
+oom.setLPos(parts[0]['tick'])
+oom.setRPos(parts[0]['tick'] + parts[0]['len'])
+oom.setCPos(0)
 time.sleep(0.2) # Hmmm, don't like it but it seems necessary to pause a short while before starting play
-muse.setLoop(True)
-muse.startPlay()
+oom.setLoop(True)
+oom.startPlay()
 
 for i in range(1, len(parts)):
       part = parts[i]
@@ -50,12 +50,12 @@ for i in range(1, len(parts)):
       len = part['len']
       print "Press enter to advance to next section/part!"
       sys.stdin.read(1)
-      advanceToNextSection(muse, tick, tick + len)
+      advanceToNextSection(oom, tick, tick + len)
 
 print "This is the final section. Disabling loop and leaving..."
-muse.setLoop(False)
+oom.setLoop(False)
 
 #print "Press enter to leave final section"
 #sys.stdin.read(1)
-#muse.setLoop(False)
+#oom.setLoop(False)
 

@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: organgui.cpp,v 1.16.2.3 2009/11/16 04:30:46 terminator356 Exp $
 //
 //    This is a simple GUI implemented with QT for
@@ -20,8 +20,8 @@
 #include <QSpinBox>
 
 #include "organgui.h"
-#include "muse/midi.h"
-#include "muse/midictrl.h"
+#include "oom/midi.h"
+#include "oom/midictrl.h"
 
 //#define ORGANGUI_DEBUG
 

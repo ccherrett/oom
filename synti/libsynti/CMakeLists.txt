@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -30,7 +30,7 @@ file (GLOB synti_source_files
       mono.cpp
       poly.cpp
       # midievent.cpp
-      # Removed. Causing conflicts with /muse/mpevent
+      # Removed. Causing conflicts with /oom/mpevent
       ## mpevent.cpp
       )
 
@@ -59,12 +59,12 @@ set (FILES_TO_TRANSLATE
 #
 set_target_properties( synti
       PROPERTIES COMPILE_FLAGS "-fPIC -include ${PROJECT_BINARY_DIR}/all-pic.h"
-      OUTPUT_NAME muse_synti
+      OUTPUT_NAME oom_synti
       )
 
 ##
 ## Install location
 ##
 install(TARGETS synti 
-      DESTINATION ${MusE_MODULES_DIR}
+      DESTINATION ${OOMidi_MODULES_DIR}
       )

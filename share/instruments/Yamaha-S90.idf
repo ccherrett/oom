@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="Yamaha-S90">
     <PatchGroup name="PRE1">
       <Patch name="3LayerS700" hbank="63" lbank="0" prog="0" />
@@ -663,4 +663,4 @@
     </PatchGroup>
     <Controller name="Program" type="Program" />
   </MidiInstrument>
-</muse>
+</oom>

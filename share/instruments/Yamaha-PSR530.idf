@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="Yamaha PSR 530">
     <PatchGroup name="Piano(1-18)">
       <Patch name="1: Grand Piano" hbank="0" lbank="112" prog="0" />
@@ -57,7 +57,7 @@
       <Patch name="50: ChapelOrgan" hbank="0" lbank="113" prog="19" />
       <Patch name="51: Reed Organ" hbank="0" lbank="112" prog="20" />
       <Patch name="52: Trad. Accrd" hbank="0" lbank="113" prog="21" />
-      <Patch name="53: Musette" hbank="0" lbank="112" prog="21" />
+      <Patch name="53: OOMiditte" hbank="0" lbank="112" prog="21" />
       <Patch name="54: Tango Accrd" hbank="0" lbank="112" prog="23" />
       <Patch name="55: Bandoneon" hbank="0" lbank="113" prog="23" />
       <Patch name="56: Soft Accrd" hbank="0" lbank="114" prog="21" />
@@ -754,4 +754,4 @@
     </PatchGroup>
     <Controller name="Program" type="Program" />
   </MidiInstrument>
-</muse>
+</oom>

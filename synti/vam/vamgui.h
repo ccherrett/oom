@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  vamgui.h
 //
 //  (C) Copyright 2002 Jotsif Lindman Hï¿½nlund (jotsif@linux.nu)

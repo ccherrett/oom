@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -88,8 +88,8 @@ target_link_libraries(simpledrums
 ## Install location
 ##
 install( TARGETS simpledrums 
-      DESTINATION ${MusE_SYNTHI_DIR}
+      DESTINATION ${OOMidi_SYNTHI_DIR}
       )
 install( FILES COPYING README ReleaseNotes.txt
-      DESTINATION ${MusE_DOC_DIR}/simpledrums
+      DESTINATION ${OOMidi_DOC_DIR}/simpledrums
       )

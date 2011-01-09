@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: dspSSE.cpp,v 1.1.2.3 2009/12/20 00:04:25 spamatica Exp $
 //
 //  (C) Copyright 2007-2009 Werner Schweer (ws@seh.de)

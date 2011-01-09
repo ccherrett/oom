@@ -1,6 +1,6 @@
 import Pyro.core
 
-muse=Pyro.core.getProxyForURI('PYRONAME://:Default.muse')
+oom=Pyro.core.getProxyForURI('PYRONAME://:Default.oom')
 
-print "Tempo: " + str(muse.getTempo(0))
+print "Tempo: " + str(oom.getTempo(0))
 

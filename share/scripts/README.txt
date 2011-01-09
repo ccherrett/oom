@@ -1,12 +1,12 @@
-MusE midi event scripting format 0.5
+OOMidi midi event scripting format 0.5
 
 Some information for the budding script writer, here is some info 
 about the format currently used.
      
 Scripts can be put in two different dirs.
-<install_path>/share/muse/scripts
+<install_path>/share/oom/scripts
 for scripts bundled
-or $HOME/.muse/scripts
+or $HOME/.oom/scripts
 for user created scripts
 
 There are two main requirements on scripts.
@@ -26,7 +26,7 @@ CONTROLLER <tick> <a> <b> <c>
 PARTLEN, BEATLEN and QUANTLEN are there for informational purposes, to 
 make some transformations possible. e.g. quantization, beat delay.
 
-NOTE and CONTROLLER are the ones that are read back into MusE when the filter
+NOTE and CONTROLLER are the ones that are read back into OOMidi when the filter
 stops executing. These may be manipulated, removed or multiplied as seen
 fit by the filter.
 -- Note that it is a good idea to just pass on the lines your script is not

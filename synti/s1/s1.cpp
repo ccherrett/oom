@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: s1.cpp,v 1.9.2.5 2009/11/19 04:20:33 terminator356 Exp $
 //
 //    S1  - simple mono demo synthesizer
@@ -216,7 +216,7 @@ static Mess* instantiate(int sr, QWidget*, QString* projectPathPtr, const char*)
 extern "C" {
       static MESS descriptor = {
             "S1",
-            "S1 MusE Demo Software Synthesizer",
+            "S1 OOMidi Demo Software Synthesizer",
             "0.2",      // version string
             MESS_MAJOR_VERSION, MESS_MINOR_VERSION,
             instantiate

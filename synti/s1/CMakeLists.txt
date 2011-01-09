@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -63,6 +63,6 @@ target_link_libraries(s1
 ## Install location
 ##
 install( TARGETS s1
-      DESTINATION ${MusE_SYNTHI_DIR}
+      DESTINATION ${OOMidi_SYNTHI_DIR}
       )
 

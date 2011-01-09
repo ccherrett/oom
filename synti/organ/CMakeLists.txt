@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -47,7 +47,7 @@ file (GLOB organ_source_files
 ## Define target
 ##
 add_library ( organ SHARED
-      ${PROJECT_SOURCE_DIR}/muse/xml.cpp
+      ${PROJECT_SOURCE_DIR}/oom/xml.cpp
       ${organ_source_files}
       ${organ_mocs}
       ${organ_uis}
@@ -85,6 +85,6 @@ target_link_libraries(organ
 ## Install location
 ##
 install( TARGETS organ
-      DESTINATION ${MusE_SYNTHI_DIR}
+      DESTINATION ${OOMidi_SYNTHI_DIR}
       )
 

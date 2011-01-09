@@ -10,10 +10,10 @@
 //
 //
 
-#include "muse/midictrl.h"
-#include "muse/midi.h"
+#include "oom/midictrl.h"
+#include "oom/midi.h"
 //#include "libsynti/mpevent.h"
-#include "muse/mpevent.h"   
+#include "oom/mpevent.h"   
 #include "simpledrums.h"
 #include <qstring.h>
 #include <samplerate.h>
@@ -636,7 +636,7 @@ const MidiPatch* SimpleSynth::getPatchInfo(int index, const MidiPatch* patch) co
     \brief Called from host to collect info about which controllers the synth supports
     \param index current controller number
     \param name pointer where name is stored
-    \param controller int pointer where muse controller number is stored
+    \param controller int pointer where oom controller number is stored
     \param min int pointer where controller min value is stored
     \param max int pointer where controller max value is stored
     \return 0 when done, otherwise return next desired controller index
@@ -1286,7 +1286,7 @@ static void* loadSampleThread(void* p)
       // Allocate and read the thingie
       //
 
-      // If current samplerate is the same as MusE's:
+      // If current samplerate is the same as OOMidi's:
       if (SS_samplerate == sfi.samplerate) {
             smp->data = new float[sfi.channels * sfi.frames];
             sf_count_t n = sf_readf_float(sf, smp->data, sfi.frames);

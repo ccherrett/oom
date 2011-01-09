@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //    $Id: mess.h,v 1.3.2.3 2009/11/19 04:20:33 terminator356 Exp $
 //  (C) Copyright 2001-2004 Werner Schweer (ws@seh.de)
 //=========================================================
@@ -35,7 +35,7 @@ struct MidiPatch {
 
 //---------------------------------------------------------
 //  Mess
-//    MusE experimental software synth
+//    OOMidi experimental software synth
 //    Instance virtual interface class
 //---------------------------------------------------------
 

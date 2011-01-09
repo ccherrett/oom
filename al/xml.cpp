@@ -194,10 +194,10 @@ void Xml::writeProperties(const QObject* o)
       const QMetaObject* meta = o->metaObject();
 
   	//
-      // start from dummy "muse" property, assuming this is the
-      // first muse propertie in widget hierarchy
+      // start from dummy "oom" property, assuming this is the
+      // first oom propertie in widget hierarchy
       //
-  	int from = meta->indexOfProperty("muse") + 1;
+  	int from = meta->indexOfProperty("oom") + 1;
      	int n    = meta->propertyCount();
       for (int i = from; i < n; ++i) {
             QMetaProperty p  = meta->property(i);
@@ -229,7 +229,7 @@ void Xml::writeProperties(const QObject* o)
                         break;
 
                   default:
-                        printf("MusE:%s type %d not implemented\n",
+                        printf("OOMidi:%s type %d not implemented\n",
                            meta->className(), v.type());
                         break;
                	}
@@ -248,7 +248,7 @@ void readProperties(QObject* o, QDomNode node)
       QString tag(e.tagName());
       int idx = meta->indexOfProperty(tag.toLatin1().constData());
       if (idx == -1) {
-            printf("MusE:%s: unknown tag %s\n",
+            printf("OOMidi:%s: unknown tag %s\n",
                meta->className(), tag.toLatin1().constData());
             return;
             }
@@ -276,7 +276,7 @@ void readProperties(QObject* o, QDomNode node)
              	}
                   break;
             default:
-                  printf("MusE:%s type %d not implemented\n",
+                  printf("OOMidi:%s type %d not implemented\n",
                      meta->className(), p.type());
                   return;
             }

@@ -39,7 +39,7 @@ class AwlPlugin : public QDesignerCustomWidgetInterface {
     	virtual QString codeTemplate() const { return QString();     }
     	QString whatsThis() const    { return QString();     }
     	QString toolTip() const      { return QString();     }
-    	QString group() const        { return "MusE Awl Widgets"; }
+    	QString group() const        { return "OOMidi Awl Widgets"; }
 	void initialize(QDesignerFormEditorInterface *) {
 		if (m_initialized)
 			return;

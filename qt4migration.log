@@ -1,4 +1,4 @@
-This is a quick shot at converting the MusE 1.0 sources to Qt4 using the
+This is a quick shot at converting the OOMidi 1.0 sources to Qt4 using the
 Qt3Support compatibility classes. This far it looks quite promising the code
 compiles and is runnable. When used it is quickly found that things are not
 ok though. Hopefully we can fix most without too much effort

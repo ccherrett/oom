@@ -35,13 +35,13 @@
 #include <QDomDocument>
 #include <QTemporaryFile>
 
-#include "muse/midi.h"
+#include "oom/midi.h"
 #include "libsynti/mess.h"
 #include "deicsonze.h"
 
 #include "plugin.h"
 
-#include "muse/midictrl.h"
+#include "oom/midictrl.h"
 //#include "deicsonze.h"
 #include "config.h"
 
@@ -121,7 +121,7 @@ DeicsOnze::DeicsOnze() : Mess(2) {
   _saveConfig = true;
   _isInitSet = true; //false if an initial bank must be download
   
-  QString sharePath(museGlobalShare);
+  QString sharePath(oomGlobalShare);
   _initSetPath = sharePath + QString("/presets/deicsonze/SutulaBank.dei");
   
   
@@ -129,13 +129,13 @@ DeicsOnze::DeicsOnze() : Mess(2) {
   //INSTPREFIX + "/share/" + PACKAGEVERSION + "/presets/deicsonze/ARCH_ALIN";
   _isBackgroundPix = true; //false if an initial bank must be download
   
-  //"/usr/local/share/muse-1.0pre1/wallpapers/abstractdeicsonze1.jpg";
+  //"/usr/local/share/oom-1.0pre1/wallpapers/abstractdeicsonze1.jpg";
   _backgroundPixPath = sharePath + QString("/wallpapers/paper2.jpg");    // Tim.
   
   
   //initialization GUI
   _gui = new DeicsOnzeGui(this);
-  _gui->hide();   // to avoid flicker during MusE startup
+  _gui->hide();   // to avoid flicker during OOMidi startup
   _gui->setWindowTitle(QString("DeicsOnze"));
 
   //FX
@@ -1296,7 +1296,7 @@ void DeicsOnze::loadSutulaPresets()
     //QString presetPath(INSTPREFIX);
     //presetPath += "/share/" PACKAGEVERSION "/presets/deicsonze/ARCH_ALIN";
 
-    QString presetPath("/home/a-lin/sources/svnMusEDev/lmuse/muse/synti/deicsonze/ARCH_ALIN");
+    QString presetPath("/home/a-lin/sources/OOMidiDev/oom/synti/deicsonze/ARCH_ALIN");
 
     file = fopen (presetPath.toLatin1().constData(), "rt");
     if (file == NULL) {
@@ -3721,7 +3721,7 @@ const MidiPatch* DeicsOnze::getPatchInfo(int /*ch*/, const MidiPatch* p) const {
   the synth supports
   \param index current controller number
   \param name pointer where name is stored
-  \param controller int pointer where muse controller number is stored
+  \param controller int pointer where oom controller number is stored
   \param min int pointer where controller min value is stored
   \param max int pointer where controller max value is stored
   \return 0 when done, otherwise return next desired controller index

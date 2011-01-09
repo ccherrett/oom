@@ -1,13 +1,13 @@
 ================================================
-    MusE loadable Midi Instrument Definitions
-    (as of 10.09.2003) MusE 0.7.0
+    OOMidi loadable Midi Instrument Definitions
+    (as of 10.09.2003) OOMidi 0.7.0
 ================================================
 
   - File Extension  ".idf"
   - searched in Subdirectory  "instruments"
-    (/usr/share/muse/instruments on my system)
+    (/usr/share/oom/instruments on my system)
 
-  All found instrument definitions are presented by MusE
+  All found instrument definitions are presented by OOMidi
   in Config->MidiPorts in Pulldown in column "Instrument".
 
 -------------------------------------------------
@@ -15,10 +15,10 @@
 -------------------------------------------------
 
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="GM">
     <Init>
-      ...MusE event list which initializes instrument
+      ...OOMidi event list which initializes instrument
       </Init>
     <PatchGroup name="Piano">
        <Patch name="Grand Piano" prog="0"/>
@@ -38,7 +38,7 @@
       </Controller>
     ...
     </MidiInstrument>
-  </muse>
+  </oom>
 
 -------------------------------------------------
       Notes
@@ -79,7 +79,7 @@
 
       <Patch name="Grand Piano" mode=7" hbank="0" lbank="0" prog="0"/>
 
- (4)  example for MusE event (Sysex "XG-On"):
+ (4)  example for OOMidi event (Sysex "XG-On"):
 
       <event tick="0" type="5" datalen="7">
         43 10 4c 00 00 7e 00

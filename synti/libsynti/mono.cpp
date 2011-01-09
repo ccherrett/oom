@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //    software synthesizer helper library
 //    $Id: mono.cpp,v 1.2 2004/04/15 13:46:18 wschweer Exp $
 //

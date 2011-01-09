@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="Roland XP-30">
     <PatchGroup name="GM">
       <Patch name="Acoustic Grand Piano" hbank="81" lbank="3" prog="0" />
@@ -839,7 +839,7 @@
       <Patch name="Cosmic Flute" hbank="84" lbank="0" prog="57" />
       <Patch name="Acc. De Paris" hbank="84" lbank="0" prog="58" />
       <Patch name="Paris 50;s" hbank="84" lbank="0" prog="59" />
-      <Patch name="Musette Ens" hbank="84" lbank="0" prog="60" />
+      <Patch name="OOMiditte Ens" hbank="84" lbank="0" prog="60" />
       <Patch name="Montmartre" hbank="84" lbank="0" prog="61" />
       <Patch name="Sad Akordion" hbank="84" lbank="0" prog="62" />
       <Patch name="Fr. Accordion" hbank="84" lbank="0" prog="63" />
@@ -1588,4 +1588,4 @@
     </PatchGroup>
     <Controller name="Program" type="Program" />
   </MidiInstrument>
-</muse>
+</oom>

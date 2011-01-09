@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="GM" nullparam="32639">
     <PatchGroup name="Piano">
       <Patch name="Grand Piano" prog="0" />
@@ -190,4 +190,4 @@
     <Controller name="Pitch" type="Pitch" />
     <Controller name="Program" type="Program" />
   </MidiInstrument>
-</muse>
+</oom>

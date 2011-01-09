@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //
 //  vamgui.c
 //	This is a simple GUI implemented with QT for
@@ -43,11 +43,11 @@
 #include <QSlider>
 #include <QSocketNotifier>
 
-#include "muse/globals.h"
-#include "muse/xml.h"
-#include "muse/midi.h"
-#include "muse/midictrl.h"
-#include "muse/icons.h"
+#include "oom/globals.h"
+#include "oom/xml.h"
+#include "oom/midi.h"
+#include "oom/midictrl.h"
+#include "oom/icons.h"
 
 const char *vam_ctrl_names[] = {
   "DCO1_PITCHMOD", "DCO1_WAVEFORM", "DCO1_FM", "DCO1_PWM",
@@ -76,9 +76,9 @@ std::list<Preset> presets;
 typedef std::list<Preset>::iterator iPreset;
 
 // Removed by T356
-//QString museProject;
-//QString museGlobalShare;
-//QString museUser;
+//QString oomProject;
+//QString oomGlobalShare;
+//QString oomUser;
 //QString instanceName;
 
 // char* presetFileTypes[] = {
@@ -500,7 +500,7 @@ void VAMGui::sysexReceived(const unsigned char* data, int len)
 {
 	if (len >= 4) {
 		//---------------------------------------------
-		//  MusE Soft Synth
+		//  OOMidi Soft Synth
 		//---------------------------------------------
 
 		if (data[0] == 0x7c) {
@@ -566,7 +566,7 @@ void VAMGui::loadPresetsPressed()
                                                       this,
                                                       "Load Soundfont dialog",
                                                       "Choose soundfont");*/
-        QString fn = QFileDialog::getOpenFileName(this, tr("MusE: Load VAM Presets"), 
+        QString fn = QFileDialog::getOpenFileName(this, tr("OOMidi: Load VAM Presets"), 
                                                   s, "Presets (*.vam)");
 
 	if (fn.isEmpty())
@@ -588,7 +588,7 @@ void VAMGui::loadPresetsPressed()
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if (mode == 0 && tag == "muse")
+				if (mode == 0 && (tag == "oom" || tag == "muse"))
 					mode = 1;
 //				else if (mode == 1 && tag == "instrument")
 //					mode = 2;
@@ -611,7 +611,7 @@ void VAMGui::loadPresetsPressed()
 				}
                     		break;
 			case Xml::TagEnd:
-				if (tag == "muse")
+				if (tag == "oom" || tag == "muse")
 				goto ende;
 			default:
 				break;
@@ -653,13 +653,13 @@ void VAMGui::doSavePresets(const QString& fn, bool showWarning)
 		return;
 	Xml xml(f);
 	xml.header();
-	xml.tag(0, "muse version=\"1.0\"");
+	xml.tag(0, "oom version=\"1.0\"");
 	xml.tag(0, "instrument iname=\"vam-1.0\" /");
 
 	for (iPreset i = presets.begin(); i != presets.end(); ++i)
 		i->writeConfiguration(xml, 1);
 
-	xml.tag(1, "/muse");
+	xml.tag(1, "/oom");
 
 	if (popenFlag)
 		pclose(f);
@@ -676,7 +676,7 @@ void VAMGui::savePresetsPressed()
 {
 #if 1 // TODO
 	QString s(configPath);
-	QString fn = QFileDialog::getSaveFileName(this, tr("MusE: Save VAM Presets"), 
+	QString fn = QFileDialog::getSaveFileName(this, tr("OOMidi: Save VAM Presets"), 
                                                   s, "Presets (*.vam)");
 	if (fn.isEmpty())
 		return;
@@ -694,7 +694,7 @@ void VAMGui::savePresetsToFilePressed()
 	if (!presetFileName ) {
  
       QString s(configPath);
-      QString fn = QFileDialog::getSaveFileName(this, tr("MusE: Save VAM Presets"), 
+      QString fn = QFileDialog::getSaveFileName(this, tr("OOMidi: Save VAM Presets"), 
                                                 s, "Presets (*.vam)");
       presetFileName = new QString(fn);
       }

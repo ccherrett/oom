@@ -1,7 +1,7 @@
-MusE 0.7:
+OOMidi 0.7:
       New features:
 
-      - MusE now depends on JACK; midi event timing is coupled
+      - OOMidi now depends on JACK; midi event timing is coupled
         to JACK timing i.e
       - simpler integration of internal software synthesizer;
         midi events are now delivered directly to synthesizer without

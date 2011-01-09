@@ -1,35 +1,35 @@
-MusE Security Information
+OOMidi Security Information
 =========================
 
-In order to operate reliably at low latencies, MusE needs root privileges.
+In order to operate reliably at low latencies, OOMidi needs root privileges.
 For a stand-alone computer in a home environment, this is not a problem.
 However, on networked machines with multi-user access, there are some security
 issues to be aware of.
 
 
-Why does MusE require root privileges ?
+Why does OOMidi require root privileges ?
 ---------------------------------------
 
 1.
-MusE must set the real time clock (/dev/rtc/) to a higher rate in order to get 
+OOMidi must set the real time clock (/dev/rtc/) to a higher rate in order to get 
 a more precise timing source than the standard setting would allow.
 For this task, it is *not* sufficient to alter the permissions or group of
 /dev/rtc. You need root access.
 
 2.
-The MusE audio threads must acquire real-time scheduling to perform with low
+The OOMidi audio threads must acquire real-time scheduling to perform with low
 latency and free of dropouts. Since this could be misused for a local
 denial-of-service attack (you can hog 100% cpu with a real-time task, thus
 effectively making the system unusable), only root is allowed to do that.
 
 
-Do I need to be root to run MusE ?
+Do I need to be root to run OOMidi ?
 ----------------------------------
 
 No. You should not do normal work as root. Use the root login exclusively for
-administrative tasks. You can run MusE as a normal user, provided you have set
+administrative tasks. You can run OOMidi as a normal user, provided you have set
 the *suid bit*.
-This is done automatically when you build and install MusE.
+This is done automatically when you build and install OOMidi.
 
 
 How does this "suid bit" thing work ?
@@ -94,7 +94,7 @@ If you are interested in details of such attacks, I recommend AlephOne's paper
 Magazine (http://www.phrack.com/show.php?p=49&a=14).
 
 
-Does MusE have buffer-overflow vulnerabilities ?
+Does OOMidi have buffer-overflow vulnerabilities ?
 ------------------------------------------------
 
 It may. But even if it had not, it is good practice to assume it does.
@@ -103,36 +103,36 @@ programs with extra care unless they are proven to be secure.
 
 This is a gruesome and boring task, and we all want Werner to concentrate on
 cool new features rather than digging through the code to fix loopholes that
-aren't even a problem for 99% of the MusE users.
-MusE does not need to be as secure as server daemons. It is intended for home
+aren't even a problem for 99% of the OOMidi users.
+OOMidi does not need to be as secure as server daemons. It is intended for home
 use in a trusted environment.
-If you run MusE on your company's primary DNS server, it's your fault.
+If you run OOMidi on your company's primary DNS server, it's your fault.
 
 But even home machines can become targets for intruders the moment they connect
-to the internet. Since almost all of the machines than run MusE are occasionally
+to the internet. Since almost all of the machines than run OOMidi are occasionally
 used to surf the web, it  might be worth taking a few precautions.
 
 
 What can I do to minimize the risk of a suid program ?
 ------------------------------------------------------
 
-By default, Werner drops the root privileges in MusE's GUI thread - only the
+By default, Werner drops the root privileges in OOMidi's GUI thread - only the
 audio threads keep it. This rules out many possible exploits, since GUI code is
 usually the hardest to make secure.
 
 
 As a further very simple yet effective security precaution, you can create a
 group of trusted users, and give only this group access to critical suid
-programs. For example, you might create a group called musers, of which you and
-your best friend are members. Then you can set the muse binary as follows:
+programs. For example, you might create a group called oomrs, of which you and
+your best friend are members. Then you can set the oom binary as follows:
 
-	#chown root:musers muse
-	#chmod 4750 muse
-	#ls -l muse
-	-rwsr-x---    1 root     musers     20930049 Aug 28 19:34 muse
+	#chown root:oomrs oom
+	#chmod 4750 oom
+	#ls -l oom
+	-rwsr-x---    1 root     oomrs     20930049 Aug 28 19:34 oom
 
-Now only members of the group musers can use MusE, Joe Random Hacker can not.
-(However, if your account is hacked, MusE can then be exploited to gain root,
+Now only members of the group oomrs can use OOMidi, Joe Random Hacker can not.
+(However, if your account is hacked, OOMidi can then be exploited to gain root,
 but hey...)
 
 Additionally, you can use "givertcap" as described in the next section.
@@ -143,14 +143,14 @@ What is givertcap and how do I use it ?
 
 "givertcap" (give real-time capabilites) is a small wrapper written by Tommi
 Ilmonen.
-When enabled, it is executed by MusE and gives to it just the capabilities
+When enabled, it is executed by OOMidi and gives to it just the capabilities
 needed to set the timer and get real-time scheduling, but not the full set of 
 root privileges. This greatly reduces the amount of damage that can be done.
 
 However, it is not used by default, since it requires a kernel modification.
 
 To enable givertcap, simply call ./configure --enable-rtcap before compiling.
-(The givertcap code is part of the MusE distribution.)
+(The givertcap code is part of the OOMidi distribution.)
 
 With current kernels, you need to apply a little patch to the kernel headers:
 Go to /usr/src/linux/include/linux (or wherever you have your kernel sources)
@@ -169,7 +169,7 @@ to
 
 You must then recompile your kernel.
 
-In this setup, givertcap must be set suid root, but MusE can be run with normal
+In this setup, givertcap must be set suid root, but OOMidi can be run with normal
 privileges.
 Now all possible suid exploits described above apply to givertcap, but since it
 is such a tiny program, it can be checked for exploits far more easily and can
@@ -178,12 +178,12 @@ be considered reasonably secure.
 Unfortunately, givertcap can be used to grant real-time privileges to *any*
 program, so it's an easy way to have the machine clogged up by a malicious user
 who might run bogus tasks at 100% system usage.
-Therefore, you *must* create an extra group for it (called "musers" in this
+Therefore, you *must* create an extra group for it (called "oomrs" in this
 example):
-	# chown root:musers givertcap
+	# chown root:oomrs givertcap
 	# chmod 4750 givertcap
-Do not forget to remove the suid bit on muse afterwards by doing
-	# chmod 755 muse
+Do not forget to remove the suid bit on oom afterwards by doing
+	# chmod 755 oom
 .
 
 For more information about givertcap and kernel capabilites, see
@@ -227,7 +227,7 @@ Buffer Overflow attacks:
 Phrack magazine, issue 49
 http://www.phrack.com/show.php?p=49&a=14
 
-In the MusE source, app.cpp contains the invocation of givertcap and the
+In the OOMidi source, app.cpp contains the invocation of givertcap and the
 dropping of the suid privileges: grep for "getCapabilities" and "setuid" to see
 how it's done.
 

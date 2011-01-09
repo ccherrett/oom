@@ -22,8 +22,8 @@
 #include "al/al.h"
 #include "al/sig.h"
 #include "al/tempo.h"
-#include "../muse/gconfig.h"
-#include "../muse/icons.h"
+#include "../oom/gconfig.h"
+#include "../oom/icons.h"
 
 #include "metronom.xpm"
 #include "clock.xpm"

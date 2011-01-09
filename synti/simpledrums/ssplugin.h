@@ -15,8 +15,8 @@
 
 #include <QFileInfo>
 //#include <ladspa.h>
-#include "muse/ladspa.h"
-#include "muse/fastlog.h"
+#include "oom/ladspa.h"
+#include "oom/fastlog.h"
 #include <math.h>
 
 //---------------------------------------------------------

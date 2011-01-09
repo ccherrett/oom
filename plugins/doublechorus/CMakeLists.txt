@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -50,5 +50,5 @@ set_target_properties (doublechorus
 ## Install location
 ##
 install( TARGETS doublechorus
-      DESTINATION ${MusE_PLUGINS_DIR}
+      DESTINATION ${OOMidi_PLUGINS_DIR}
       )

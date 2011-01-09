@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -27,6 +27,6 @@ set (FILES_TO_TRANSLATE
       )
 
 install( FILES ${plugins_ui_files}
-      DESTINATION ${MusE_SHARE_DIR}/plugins
+      DESTINATION ${OOMidi_SHARE_DIR}/plugins
       )
 

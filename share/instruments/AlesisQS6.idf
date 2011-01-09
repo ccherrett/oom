@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="AlesisQS6">
     <PatchGroup name="General Midi">
       <Patch name="Acoustic Grand Piano" hbank="4" lbank="32" prog="0" />
@@ -652,4 +652,4 @@
     </PatchGroup>
     <Controller name="Program" type="Program" />
   </MidiInstrument>
-</muse>
+</oom>

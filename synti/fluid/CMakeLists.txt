@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -91,5 +91,5 @@ target_link_libraries(fluid
 ## Install location
 ##
 install( TARGETS fluid 
-      DESTINATION ${MusE_SYNTHI_DIR}
+      DESTINATION ${OOMidi_SYNTHI_DIR}
       )

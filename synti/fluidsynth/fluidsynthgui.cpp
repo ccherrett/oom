@@ -1,5 +1,5 @@
 /*
- * MusE FLUID Synth softsynth plugin
+ * OOMidi FLUID Synth softsynth plugin
  *
  * Copyright (C) 2004 Mathias Lundgren (lunar_shuttle@users.sourcforge.net)
  *
@@ -18,12 +18,12 @@
 #include <QTableWidgetItem>
 #include <QTreeWidgetItem>
 
-#include "muse/midi.h"
+#include "oom/midi.h"
 #include "icons.h"
 
 
  /*
-#include "muse/debug.h"
+#include "oom/debug.h"
 #include <iomanip>
 #include <qtooltip.h>
 #include <qapplication.h>
@@ -219,7 +219,7 @@ void FluidSynthGui::processEvent(const MidiPlayEvent& ev)
                   case FS_ERROR: {
                         char* msg = (char*) (data+1);
                         
-                        printf("Muse: fluidsynth error: %s\n", msg);
+                        printf("OOMidi: fluidsynth error: %s\n", msg);
                         
                         break;
                         }
@@ -804,24 +804,24 @@ void FluidSynthGui::dbgMsg(const char* msg)
 //   main
 //---------------------------------------------------------
 
-/*QString museProject;
-QString museGlobalShare;
-QString museUser;*/
+/*QString oomProject;
+QString oomGlobalShare;
+QString oomUser;*/
 
 
 int main(int argc, char* argv[])
 {
 /*
-  museUser = getenv("MUSEHOME");
-  if (museUser == 0)
-    museUser = getenv("HOME");
-  museGlobalShare = getenv("MUSE");
-  if (museGlobalShare == 0) {
-    museGlobalShare = "/usr/muse";
-    if (access(museGlobalShare.toLatin1(), R_OK) != 0) {
-      museGlobalShare = "/usr/local/muse";
-      if (access(museGlobalShare.toLatin1(), R_OK) != 0)
-        museGlobalShare = museUser;
+  oomUser = getenv("MUSEHOME");
+  if (oomUser == 0)
+    oomUser = getenv("HOME");
+  oomGlobalShare = getenv("MUSE");
+  if (oomGlobalShare == 0) {
+    oomGlobalShare = "/usr/oom";
+    if (access(oomGlobalShare.toLatin1(), R_OK) != 0) {
+      oomGlobalShare = "/usr/local/oom";
+      if (access(oomGlobalShare.toLatin1(), R_OK) != 0)
+        oomGlobalShare = oomUser;
     }
   }*/
 	char * instanceName = argv[1];

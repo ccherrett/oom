@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="Korg-NS5R">
     <PatchGroup name="Piano">
       <Patch name="Grand Piano" mode="7" hbank="0" lbank="0" prog="0" />
@@ -562,4 +562,4 @@
     </PatchGroup>
     <Controller name="Program" type="Program" />
   </MidiInstrument>
-</muse>
+</oom>

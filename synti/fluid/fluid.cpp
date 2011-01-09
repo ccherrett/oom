@@ -1,16 +1,16 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: fluid.cpp,v 1.18.2.8 2009/12/06 10:05:00 terminator356 Exp $
 //
 //  This file is derived from fluid Synth and modified
-//    for MusE.
+//    for OOMidi.
 //  Parts of fluid are derived from Smurf Sound Font Editor.
 //  Parts of Smurf Sound Font Editor are derived from
 //    awesfx utilities
 //  Smurf:  Copyright (C) 1999-2000 Josh Green
 //  fluid:  Copyright (C) 2001 Peter Hanappe
-//  MusE:   Copyright (C) 2001 Werner Schweer
+//  OOMidi:   Copyright (C) 2001 Werner Schweer
 //  awesfx: Copyright (C) 1996-1999 Takashi Iwai
 //=========================================================
 
@@ -26,9 +26,9 @@
 #include <sys/time.h>
 #include <sched.h>
 
-#include "muse/midictrl.h"
+#include "oom/midictrl.h"
 
-#include "muse/midi.h"
+#include "oom/midi.h"
 #include "fluid.h"
 #include "fluidgui.h"
 
@@ -202,7 +202,7 @@ bool ISynth::sysex(int len, const unsigned char* data)
                   }
 
             //---------------------------------------------
-            //  MusE Soft Synth
+            //  OOMidi Soft Synth
             //---------------------------------------------
 
             else if (data[0] == 0x7c) {

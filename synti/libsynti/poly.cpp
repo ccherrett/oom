@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //    software synthesizer helper library
 //    $Id: poly.cpp,v 1.3 2004/06/01 14:25:50 wschweer Exp $
 //
@@ -8,7 +8,7 @@
 //=========================================================
 
 #include "poly.h"
-#include "muse/midictrl.h"
+#include "oom/midictrl.h"
 
 //---------------------------------------------------------
 //   playNote

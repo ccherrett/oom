@@ -3,9 +3,9 @@
       synthesizer up and running
 =============================================================
 
-1. Compile and install MusE
+1. Compile and install OOMidi
 
-3. Run MusE from an xterm with Option "-D";
+3. Run OOMidi from an xterm with Option "-D";
    look at the debug output in the xterm; you should see something
    like:
 
@@ -27,7 +27,7 @@
 5. Configure Midi Port
 
    To use the synthesizer instance you must
-   connect it to a MusE midi port:
+   connect it to a OOMidi midi port:
 
       - click into the "Device Name" column of an empty midi port
         (Device Name == "none")

@@ -23,7 +23,7 @@
 
 #include <map>
 
-#include "../muse/xml.h"
+#include "../oom/xml.h"
 class Xml;
 
 namespace AL {

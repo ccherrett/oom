@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //  $Id: organ.cpp,v 1.15.2.8 2009/12/06 10:05:00 terminator356 Exp $
 //
 //  Parts of this file taken from:
@@ -13,9 +13,9 @@
 #include <cmath>
 #include <stdio.h>
 
-#include "muse/midi.h"
+#include "oom/midi.h"
 //#include "libsynti/mpevent.h"
-#include "muse/mpevent.h"   
+#include "oom/mpevent.h"   
 
 #include "organ.h"
 #include "organgui.h"
@@ -436,7 +436,7 @@ void Organ::setController(int ctrl, int data)
       int sr = sampleRate();
       
       // Changed By T356.
-      // Because of muse's auto-bias controllers, some of these negative-range 
+      // Because of oom's auto-bias controllers, some of these negative-range 
       //  controls need to apply the auto-bias correction.
       
       switch (ctrl) {

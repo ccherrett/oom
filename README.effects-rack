@@ -7,13 +7,13 @@ All audio track types (Input, Output, Group, Wave, Synth, and Aux) have
  an effects rack into which audio plugins can be inserted in a chain. 
 Currently each rack can accomodate up to four plugins.
 
-MusE currently supports LADSPA plugins and DSSI effects plugins.
+OOMidi currently supports LADSPA plugins and DSSI effects plugins.
 
 One must carefully consider how many audio inputs and outputs a plugin has, 
  and how may channels the particular audio track has (1 mono or 2 stereo), 
- and how MusE uses the plugins in the rack.
+ and how OOMidi uses the plugins in the rack.
  
-MusE will try to internally create as many independent copies (instances) of 
+OOMidi will try to internally create as many independent copies (instances) of 
  a plugin as necessary, to satisfy the number of channels in the audio track.
 Basically it divides the number of track channels by the number of 
  plugin audio inputs or outputs to determine how many copies to make.
@@ -22,7 +22,7 @@ First it examines the number of plugin audio outputs, and if there are none,
  it will simply use just one plugin copy.
 
 For mono tracks with plugins having more than one audio input or output, 
- MusE uses the first input or output and ignores the rest. 
+ OOMidi uses the first input or output and ignores the rest. 
 
 For stereo tracks:
     
@@ -48,7 +48,7 @@ These same rules apply to inter-plugin audio when more than one plugin
  is in the rack chain. Extra audio outputs of one plugin may be ignored
  by the next plugin if not used. 
  
-Currently plugins with no audio outputs are not really useful in MusE,
+Currently plugins with no audio outputs are not really useful in OOMidi,
  chiefly because plugin control outputs are not used or displayed.
 Nor are specialized plugins with many inputs and/or outputs.
 

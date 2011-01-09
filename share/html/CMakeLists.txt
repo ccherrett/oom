@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -26,5 +26,5 @@ file (GLOB html_files
       )
 
 install( FILES ${html_files}
-      DESTINATION ${MusE_DOC_DIR}/html
+      DESTINATION ${OOMidi_DOC_DIR}/html
       )

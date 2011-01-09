@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -22,20 +22,20 @@
 # produce the .desktop file
 #
 configure_file (
-      muse.desktop.in
-      ${PROJECT_BINARY_DIR}/packaging/muse.desktop
+      oom.desktop.in
+      ${PROJECT_BINARY_DIR}/packaging/oom.desktop
       )
 
 #
 # install the desktop and mime files
 #
-install( FILES muse_icon.png
+install( FILES oom_icon.png
       DESTINATION ${SHARE_INSTALL_PREFIX}/icons/hicolor/64x64/apps/
       )
-install( FILES ${PROJECT_BINARY_DIR}/packaging/muse.desktop
+install( FILES ${PROJECT_BINARY_DIR}/packaging/oom.desktop
       DESTINATION ${SHARE_INSTALL_PREFIX}/applications/
       )
-install( FILES muse.xml
+install( FILES oom.xml
       DESTINATION ${SHARE_INSTALL_PREFIX}/mime/packages/
       )
 

@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -109,7 +109,7 @@ set (FILES_TO_TRANSLATE
 ##
 set_target_properties( awl
       PROPERTIES COMPILE_FLAGS "-fPIC -include ${PROJECT_BINARY_DIR}/all.h"
-      OUTPUT_NAME muse_awl
+      OUTPUT_NAME oom_awl
       )
 
 ##
@@ -124,6 +124,6 @@ target_link_libraries ( awl
 ## Install location
 ##
 install(TARGETS awl
-      DESTINATION ${MusE_MODULES_DIR}
+      DESTINATION ${OOMidi_MODULES_DIR}
       )
 

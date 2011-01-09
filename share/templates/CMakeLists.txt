@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -21,6 +21,6 @@
 file (GLOB templates_files *.med)
 
 install( FILES ${templates_files}
-      DESTINATION ${MusE_SHARE_DIR}/templates
+      DESTINATION ${OOMidi_SHARE_DIR}/templates
       )
 

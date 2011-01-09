@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -49,7 +49,7 @@ add_library(al SHARED
 ## Compilation flags and target name
 ##
 set_target_properties( al
-      PROPERTIES OUTPUT_NAME muse_al
+      PROPERTIES OUTPUT_NAME oom_al
       )
 set_source_files_properties(
       al.cpp
@@ -75,5 +75,5 @@ target_link_libraries ( al
 ## Install location
 ##
 install(TARGETS al 
-      DESTINATION ${MusE_MODULES_DIR}
+      DESTINATION ${OOMidi_MODULES_DIR}
       )

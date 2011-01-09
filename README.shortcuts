@@ -1,13 +1,13 @@
 From: Frank Neumann
-Subject: [MusE] Keyboard shortcut list
+Subject: [OOMidi] Keyboard shortcut list
 
 Hi all,
-while reading some MusE source code during the last weeks, I made a list
+while reading some OOMidi source code during the last weeks, I made a list
 of all keyboard shortcuts I found in there. I thought other might find
 this useful, so I am posting this here. There are some "?" spots in
 there where I am not perfectly sure if something is correct or really
 works the way it should, so comments or corrections are welcome. A few
-keys are also result of my first ever cvs commit to Muse :-).
+keys are also result of my first ever cvs commit to OOMidi :-).
 
 Frank
 
@@ -31,7 +31,7 @@ Frank
 
 <cut here>
 
-Shortcut keys in Muse, as of 0.6.0pre5:
+Shortcut keys in OOMidi, as of 0.6.0pre5:
 
 Arranger:
 =========

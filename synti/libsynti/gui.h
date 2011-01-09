@@ -1,6 +1,6 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //    software synthesizer helper library
 //    $Id: gui.h,v 1.4 2004/06/19 09:50:37 wschweer Exp $
 //

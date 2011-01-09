@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -32,7 +32,7 @@ add_custom_target (translations ALL DEPENDS ${QM_FILES})
 # are scanned first
 if (UPDATE_TRANSLATIONS)
       add_dependencies(translations
-            muse
+            oom
             arranger
             cliplist
             ctrl
@@ -60,5 +60,5 @@ if (UPDATE_TRANSLATIONS)
 endif (UPDATE_TRANSLATIONS)
 
 install(FILES ${QM_FILES}
-      DESTINATION ${MusE_SHARE_DIR}/locale
+      DESTINATION ${OOMidi_SHARE_DIR}/locale
       )

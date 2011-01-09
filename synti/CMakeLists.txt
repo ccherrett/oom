@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -22,8 +22,8 @@ include_directories(
    .
    ${CMAKE_CURRENT_BINARY}
    ${PROJECT_SOURCE_DIR}
-   ${PROJECT_SOURCE_DIR}/muse
-   ${PROJECT_SOURCE_DIR}/muse/widgets
+   ${PROJECT_SOURCE_DIR}/oom
+   ${PROJECT_SOURCE_DIR}/oom/widgets
    ${PROJECT_SOURCE_DIR}/synti
    )
 

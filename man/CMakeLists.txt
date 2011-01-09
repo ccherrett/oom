@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -22,8 +22,8 @@
 # produce the manpages
 #
 configure_file (
-      muse.1.in
-      ${PROJECT_BINARY_DIR}/man/${MusE_EXEC_NAME}.1
+      oom.1.in
+      ${PROJECT_BINARY_DIR}/man/${OOMidi_EXEC_NAME}.1
       )
 configure_file (
       grepmidi.1.in
@@ -31,7 +31,7 @@ configure_file (
       )
 
 install( FILES 
-      ${PROJECT_BINARY_DIR}/man/${MusE_EXEC_NAME}.1
+      ${PROJECT_BINARY_DIR}/man/${OOMidi_EXEC_NAME}.1
       ${PROJECT_BINARY_DIR}/man/grepmidi.1
       DESTINATION ${SHARE_INSTALL_PREFIX}/man/man1/
       )

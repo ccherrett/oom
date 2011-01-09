@@ -2,7 +2,7 @@
 #---------------------------------------------------------------------------
 # General configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = MusE
+PROJECT_NAME           = OOMidi
 PROJECT_NUMBER         = @VERSION@
 OUTPUT_DIRECTORY       = doc
 OUTPUT_LANGUAGE        = English

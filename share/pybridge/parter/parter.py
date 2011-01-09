@@ -3,9 +3,9 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import QFileDialog, QListView, QStringListModel, QButtonGroup, QPushButton
 
 class ParterMainwidget(QtGui.QWidget):
-      def __init__(self, parent=None, muse=None, partsdir=None):
+      def __init__(self, parent=None, oom=None, partsdir=None):
             QtGui.QWidget.__init__(self, parent)
-            self.muse = muse
+            self.oom = oom
             self.partsdir = partsdir
             self.lcurdir = QtGui.QLabel(partsdir)
             moveupbutton = QPushButton("Parent dir")
@@ -51,11 +51,11 @@ class ParterMainwidget(QtGui.QWidget):
             self.putPart(fname)
 
       def putPart(self, fname):
-            trackid = self.muse.getSelectedTrack()
+            trackid = self.oom.getSelectedTrack()
             if trackid == None:
                   return
-            cpos = self.muse.getCPos()
-            self.muse.importPart(trackid, fname, cpos)
+            cpos = self.oom.getCPos()
+            self.oom.importPart(trackid, fname, cpos)
 
       def getSelectedItem(self):
             selectionmodel = self.tree.selectionModel()
@@ -68,10 +68,10 @@ class ParterMainwidget(QtGui.QWidget):
             selected = self.getSelectedItem()
             if selected == None:
                   return
-            trackid = self.muse.getSelectedTrack()
+            trackid = self.oom.getSelectedTrack()
             if trackid == None:
                   return
-            parts = self.muse.getParts(trackid)
+            parts = self.oom.getParts(trackid)
             if parts == None:
                   return
 
@@ -80,7 +80,7 @@ class ParterMainwidget(QtGui.QWidget):
                   part = parts[len(parts) - 1]
                   pos = part['tick'] + part['len']
             print "Appending " + selected
-            self.muse.importPart(trackid, selected, pos)
+            self.oom.importPart(trackid, selected, pos)
 
                   
 
@@ -88,11 +88,11 @@ class ParterMainwidget(QtGui.QWidget):
             selected = self.getSelectedItem()
             if selected == None:
                   return
-            trackid = self.muse.getSelectedTrack()
+            trackid = self.oom.getSelectedTrack()
             if trackid == None:
                   return
-            cpos = self.muse.getCPos()
-            self.muse.importPart(trackid, selected, cpos)
+            cpos = self.oom.getCPos()
+            self.oom.importPart(trackid, selected, cpos)
 
       def testfunc2(self, index):
             print str(index.row()) + " " + str(index.column())

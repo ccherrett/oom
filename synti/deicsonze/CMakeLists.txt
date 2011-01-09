@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -98,11 +98,11 @@ target_link_libraries(deicsonze
 ## Install location
 ##
 install( TARGETS deicsonze
-      DESTINATION ${MusE_SYNTHI_DIR}
+      DESTINATION ${OOMidi_SYNTHI_DIR}
       )
 install( FILES SutulaBank.dei
-      DESTINATION ${MusE_SHARE_DIR}/presets/deicsonze
+      DESTINATION ${OOMidi_SHARE_DIR}/presets/deicsonze
       )
 install( FILES README TODO
-      DESTINATION ${MusE_DOC_DIR}/deicsonze
+      DESTINATION ${OOMidi_DOC_DIR}/deicsonze
       )

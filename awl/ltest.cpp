@@ -7,7 +7,7 @@
 
 int main(int /*argc*/, char* /*argv*/[])
       {
-      printf("Hello MusE\n");
+      printf("Hello OOMidi\n");
       new KnobPlugin;
       return 0;
       }

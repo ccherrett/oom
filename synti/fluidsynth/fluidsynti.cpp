@@ -1,5 +1,5 @@
 /*
- * MusE FLUID Synth softsynth plugin
+ * OOMidi FLUID Synth softsynth plugin
  *
  * Copyright (C) 2004 Mathias Lundgren (lunar_shuttle@users.sourcforge.net)
  *
@@ -13,7 +13,7 @@
 #include <QFileInfo>
 
 #include "fluidsynti.h"
-#include "muse/midi.h"
+#include "oom/midi.h"
 
 FluidCtrl FluidSynth::fluidCtrl[] = {
       //{ "Expression", CTRL_EXPRESSION, 0, 127 },
@@ -877,7 +877,7 @@ void FluidSynth::setController(int channel, int id, int val, bool fromGui)
             // Controllers that depend on channels
             //
             case CTRL_PITCH:
-                  // MusE's range is from -8192 to +8191, fluidsynth seems to be [0, 16384]
+                  // OOMidi's range is from -8192 to +8191, fluidsynth seems to be [0, 16384]
                   val +=8192;
                   err = fluid_synth_pitch_bend (fluidsynth, channel, val);
                   break;
@@ -888,7 +888,7 @@ void FluidSynth::setController(int channel, int id, int val, bool fromGui)
                   break;
                   
             case CTRL_PROGRAM: {
-                  //Check if MusE is trying to set a preset on an unspecified font. If so, ignore.
+                  //Check if OOMidi is trying to set a preset on an unspecified font. If so, ignore.
                   if (FS_DEBUG)
                         printf("Program select : channel %d val %d\n",channel, val);
                   byte font_intid = channels[channel].font_intid;

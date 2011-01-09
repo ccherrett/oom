@@ -32,7 +32,7 @@
 ///#include "plugingui.h"
 #include "ctrl.h"
 #include "fastlog.h"
-#include "muse/midi.h"
+#include "oom/midi.h"
 #include "awl/floatentry.h"
 #include "awl/slider.h"
 #include "awl/checkbox.h"

@@ -1,13 +1,13 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //    $Id: mess.cpp,v 1.2 2004/04/15 13:46:18 wschweer Exp $
 //  (C) Copyright 2004 Werner Schweer (ws@seh.de)
 //=========================================================
 
 #include "mess.h"
-#include "muse/midi.h"
-#include "muse/midictrl.h"
+#include "oom/midi.h"
+#include "oom/midictrl.h"
 
 static const int FIFO_SIZE = 32;
 

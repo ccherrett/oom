@@ -1,4 +1,4 @@
-VAM: Virtual Analog for MusE
+VAM: Virtual Analog for OOMidi
 
     by Josef Lindman Hörnlund
 
@@ -10,24 +10,24 @@ VAM: Virtual Analog for MusE
 
 * What's VAM??
 
-    VAM is a soft synth for MusE (http://muse.seh.de) emulating
+    VAM is a soft synth for OOMidi (http://oom.seh.de) emulating
     an old monophonic two oscillator analog synthesizer. It has
     a simple interface and a quite fast synthesis engine.
 
 * Installation
-    MusE version >= 0.5.0 required (I think)
-    ( and everything that MusE requires, like Qt3 )
+    OOMidi version >= 0.5.0 required (I think)
+    ( and everything that OOMidi requires, like Qt3 )
 
     Unpack VAM in $MUSESOURCEDIR/synthi and run from vam/ make;
     make install. VAM won't compile automaticly if you run make 
     from $MUSESOURCEDIR.
-    $MUSESOURCEDIR is the directory you have the MusE source.
+    $MUSESOURCEDIR is the directory you have the OOMidi source.
     For optimizing add -march=(your arch) to the compiler arguments
     in Makefile.
 
 * Using VAM:
 
-    To have fun with VAM MusE really should be started with -R.
+    To have fun with VAM OOMidi really should be started with -R.
     Otherwise VAM will produce mostly noise, like clicks.
     If you're familiar with analog or virtual analog synthesizers
     using VAM souldn't be a problem.

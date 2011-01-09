@@ -1,5 +1,5 @@
 //=========================================================
-//  DoubleChorus for MusE
+//  DoubleChorus for OOMidi
 //  
 //  (C) Copyright 2006 Nil Geisweiller
 //=========================================================

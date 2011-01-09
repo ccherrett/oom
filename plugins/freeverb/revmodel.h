@@ -10,7 +10,7 @@
 #include "comb.h"
 #include "allpass.h"
 #include "tuning.h"
-#include "../../muse/ladspa.h"
+#include "../../oom/ladspa.h"
 
 //---------------------------------------------------------
 //   Revmodel

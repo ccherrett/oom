@@ -1,7 +1,7 @@
 README.txt
 ----------
 
-Graphical frontend and built-in softsynth (MusE Experimental Soft Synth) for MusE, based on Fluidsynth
+Graphical frontend and built-in softsynth (OOMidi Experimental Soft Synth) for OOMidi, based on Fluidsynth
 (http://www.fluidsynth.org).
 
 Features:

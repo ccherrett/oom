@@ -25,8 +25,8 @@
 
 #include "simpledrumsgui.h"
 //#include "libsynti/mpevent.h"
-#include "muse/mpevent.h"   
-#include "muse/midi.h"
+#include "oom/mpevent.h"   
+#include "oom/midi.h"
 #include "ssplugingui.h"
 
 #define SS_VOLUME_MIN_VALUE                     0

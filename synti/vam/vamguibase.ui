@@ -20,7 +20,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Virtual Analogue for MusE</string>
+   <string>Virtual Analogue for OOMidi</string>
   </property>
   <layout class="QGridLayout">
    <property name="margin">
@@ -1532,7 +1532,7 @@
     <widget class="QLabel" name="TextLabel1_5">
      <property name="text">
       <string>VAM 1.0beta3
-Virtual Analog for MusE
+Virtual Analog for OOMidi
 Released under GPL.
 Copyright(C) 2002
 Jotsif Lindman Hörnlund 

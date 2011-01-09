@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -27,6 +27,6 @@ file(GLOB script_files
       )
 
 install (PROGRAMS ${script_files}
-      DESTINATION ${MusE_SHARE_DIR}/scripts
+      DESTINATION ${OOMidi_SHARE_DIR}/scripts
       )
 

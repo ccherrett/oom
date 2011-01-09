@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <drummap>
     <entry>
       <name></name>
@@ -1794,4 +1794,4 @@
       <anote>34</anote>
       </entry>
     </drummap>
-  </muse>
+  </oom>

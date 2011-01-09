@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<muse version="1.0">
+<oom version="1.0">
   <MidiInstrument name="Yamaha PSR-275">
     <PatchGroup name="Piano (panel)">
       <Patch name="Grand Piano" hbank="0" lbank="112" prog="0" />
@@ -57,7 +57,7 @@
       <Patch name="Reed Organ" hbank="0" lbank="112" prog="20" />
     </PatchGroup>
     <PatchGroup name="Accordion (panel)">
-      <Patch name="Musette Accordion" hbank="0" lbank="112" prog="21" />
+      <Patch name="OOMiditte Accordion" hbank="0" lbank="112" prog="21" />
       <Patch name="Traditional Accordion" hbank="0" lbank="113" prog="21" />
       <Patch name="Harmonica" hbank="0" lbank="112" prog="22" />
       <Patch name="Bandoneon" hbank="0" lbank="113" prog="23" />
@@ -564,4 +564,4 @@
     <Controller name="ResetAllController" l="121" />
     <Controller name="AllNotesOff" l="123" />
   </MidiInstrument>
-</muse>
+</oom>

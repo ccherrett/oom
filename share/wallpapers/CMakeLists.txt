@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -21,6 +21,6 @@
 file (GLOB wallpapers_files *.gif *.jpg *.png)
 
 install( FILES ${wallpapers_files}
-      DESTINATION ${MusE_SHARE_DIR}/wallpapers
+      DESTINATION ${OOMidi_SHARE_DIR}/wallpapers
       )
 

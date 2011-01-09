@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-# Example client for MusE Pyro bridge (Python Remote Object)
+# Example client for OOMidi Pyro bridge (Python Remote Object)
 #
 import Pyro.core
 import time
 
-muse=Pyro.core.getProxyForURI('PYRONAME://:Default.muse')
-print "Current position is: " + str(muse.getCPos())
+oom=Pyro.core.getProxyForURI('PYRONAME://:Default.oom')
+print "Current position is: " + str(oom.getCPos())
 
 midiDevice=file("/dev/snd/midiC1D0")
 nextIsCommand=False
@@ -16,31 +16,31 @@ while True:
     print "   %d"%ord(v)
     if ord(v) == 0:
 	print "set hh"
-        muse.setMute("hh", False)
-        muse.setMute("RIDE", True)
+        oom.setMute("hh", False)
+        oom.setMute("RIDE", True)
     if ord(v) == 1:
-        muse.setMute("hh", True)
-        muse.setMute("RIDE", False)
+        oom.setMute("hh", True)
+        oom.setMute("RIDE", False)
 	print "set ride"
     if ord(v) == 2:
-        muse.setMute("ACCENT1", False)
+        oom.setMute("ACCENT1", False)
     if ord(v) == 3:
-        muse.setMute("ACCENT2", False)
+        oom.setMute("ACCENT2", False)
     if ord(v) == 127:
 	print "mute all accents"
-        muse.setMute("ACCENT1", True)
-        muse.setMute("ACCENT2", True)
+        oom.setMute("ACCENT1", True)
+        oom.setMute("ACCENT2", True)
     nextIsCommand=False
   if ord(v) == 192:
      nextIsCommand=True
 
 '''
-muse.startPlay()
+oom.startPlay()
 time.sleep(1) # Sleep one second
-muse.stopPlay()
-print "New position is: " + str(muse.getCPos())
-muse.rewindStart()
-print "Pos after rewind is: " + str(muse.getCPos())
-print "Lpos, Rpos: " + str(muse.getLPos()) + ":" + str(muse.getRPos())
+oom.stopPlay()
+print "New position is: " + str(oom.getCPos())
+oom.rewindStart()
+print "Pos after rewind is: " + str(oom.getCPos())
+print "Lpos, Rpos: " + str(oom.getLPos()) + ":" + str(oom.getRPos())
 
 '''

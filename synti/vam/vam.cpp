@@ -1,10 +1,10 @@
 //=========================================================
-//  MusE
-//  Linux Music Editor
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
 //
 //  Parts of this file taken from:
 //      The analogue oscillator from Steve Harris plugin collection.
-//      Werner Schweer's organ softsynth for MusE.
+//      Werner Schweer's organ softsynth for OOMidi.
 //	The music-dsp source archive.
 //
 //  (C) Copyright 2002 Jotsif Lindman Hï¿½nlund (jotsif@linux.nu)
@@ -32,8 +32,8 @@
 #include <list>
 
 #include "libsynti/mess.h"
-#include "muse/midi.h"
-#include "muse/midictrl.h"
+#include "oom/midi.h"
+#include "oom/midictrl.h"
 
 #include "vam.h"
 #include "vamgui.h"

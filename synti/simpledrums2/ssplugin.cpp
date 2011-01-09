@@ -93,7 +93,7 @@ static void loadPluginDir(const QString& s)
 void SS_initPlugins()
       {
       SS_TRACE_IN
-      //loadPluginDir(museGlobalLib + QString("/plugins"));
+      //loadPluginDir(oomGlobalLib + QString("/plugins"));
 
       const char* ladspaPath = getenv("LADSPA_PATH");
       if (ladspaPath == 0)

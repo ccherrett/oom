@@ -95,10 +95,10 @@ void initDsp()
 #if 0    // Disabled for now.
 #if defined(__i386__) || defined(__x86_64__)
       if(debugMsg)
-        printf("Muse: __i386__ or __x86_64__ defined. Using optimized float buffer copying (asm movsl).\n");
+        printf("OOMidi: __i386__ or __x86_64__ defined. Using optimized float buffer copying (asm movsl).\n");
 #else
       if(debugMsg)
-        printf("Muse: __i386__ or __x86_64__ not defined. Using non-optimized memcpy for float buffer copying.\n");
+        printf("OOMidi: __i386__ or __x86_64__ not defined. Using non-optimized memcpy for float buffer copying.\n");
 #endif
 #endif
 
@@ -136,7 +136,7 @@ void initDsp()
       // fall through to not hardware optimized routines
 #endif
       if(debugMsg)
-        printf("Muse: using unoptimized non-SSE dsp routines\n");
+        printf("OOMidi: using unoptimized non-SSE dsp routines\n");
       dsp = new Dsp();
       }
 

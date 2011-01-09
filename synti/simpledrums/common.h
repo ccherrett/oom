@@ -12,7 +12,7 @@
 #ifndef __MUSE_TESTO_COMMON_H__
 #define __MUSE_TESTO_COMMON_H__
 
-#include "muse/midictrl.h"
+#include "oom/midictrl.h"
 
 #define SS_VERSIONSTRING "1.0"
 

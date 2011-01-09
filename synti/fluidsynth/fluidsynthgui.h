@@ -1,5 +1,5 @@
 /*
- * MusE FLUID Synth softsynth plugin
+ * OOMidi FLUID Synth softsynth plugin
  *
  * Copyright (C) 2004 Mathias Lundgren (lunar_shuttle@users.sourcforge.net)
  *
@@ -30,7 +30,7 @@ struct FluidChannel;
 #include <alsa/asoundlib.h>
 #include <qlistview.h>
 #include <qheader.h>
-#include "muse/debug.h"
+#include "oom/debug.h"
 */
 
 #define FS_MAX_NR_OF_CHANNELS          16

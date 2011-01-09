@@ -1,6 +1,6 @@
 #=============================================================================
-#  MusE
-#  Linux Music Editor
+#  OOMidi
+#  OpenOctave Midi and Audio Editor
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
@@ -48,9 +48,9 @@ set_target_properties (freeverb
 ## Install location
 ##
 install( TARGETS freeverb
-      DESTINATION ${MusE_PLUGINS_DIR}
+      DESTINATION ${OOMidi_PLUGINS_DIR}
       )
 install( FILES readme.txt
-      DESTINATION ${MusE_DOC_DIR}/freeverb
+      DESTINATION ${OOMidi_DOC_DIR}/freeverb
       )
 
