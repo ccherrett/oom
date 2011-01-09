@@ -206,12 +206,12 @@ void MidiTrack::updateSoloStates(bool noDec)
 	_tmpSoloChainNoDec = noDec;
 	updateSoloState();
 
-	if (outPort() >= 0)
-	{
-		MidiDevice *md = midiPorts[outPort()].device();
-		if (md && md->isSynti())
-			((SynthI*) md)->updateInternalSoloStates();
-	}
+//	if (outPort() >= 0)
+//	{
+//		MidiDevice *md = midiPorts[outPort()].device();
+//		if (md && md->isSynti())
+//			((SynthI*) md)->updateInternalSoloStates();
+//	}
 }
 
 //---------------------------------------------------------
@@ -228,34 +228,34 @@ void AudioTrack::updateSoloStates(bool noDec)
 	updateSoloState();
 
 	_tmpSoloChainDoIns = true;
-//	if (type() == AUDIO_SOFTSYNTH)
-//	{
-//		const MidiTrackList* ml = song->midis();
-//		for (ciMidiTrack im = ml->begin(); im != ml->end(); ++im)
-//		{
-//			MidiTrack* mt = *im;
-//			if (mt->outPort() >= 0 && mt->outPort() == ((SynthI*)this)->midiPort())
-//				mt->updateInternalSoloStates();
-//		}
-//	}
+        if (type() == AUDIO_SOFTSYNTH)
+        {
+                const MidiTrackList* ml = song->midis();
+                for (ciMidiTrack im = ml->begin(); im != ml->end(); ++im)
+                {
+                        MidiTrack* mt = *im;
+                        if (mt->outPort() >= 0 && mt->outPort() == ((SynthI*)this)->midiPort())
+                                mt->updateInternalSoloStates();
+                }
+        }
 
-//	{
-//		const RouteList* rl = inRoutes();
-//		for (ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
-//		{
-//			if (ir->type == Route::TRACK_ROUTE)
-//				ir->track->updateInternalSoloStates();
-//		}
-//	}
-//	_tmpSoloChainDoIns = false;
-//	{
-//		const RouteList* rl = outRoutes();
-//		for (ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
-//		{
-//			if (ir->type == Route::TRACK_ROUTE)
-//				ir->track->updateInternalSoloStates();
-//		}
-//	}
+        {
+                const RouteList* rl = inRoutes();
+                for (ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
+                {
+                        if (ir->type == Route::TRACK_ROUTE)
+                                ir->track->updateInternalSoloStates();
+                }
+        }
+        _tmpSoloChainDoIns = false;
+        {
+                const RouteList* rl = outRoutes();
+                for (ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
+                {
+                        if (ir->type == Route::TRACK_ROUTE)
+                                ir->track->updateInternalSoloStates();
+                }
+        }
 }
 
 //---------------------------------------------------------
