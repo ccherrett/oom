@@ -1,0 +1,5 @@
+CPPFLAGS = -I/usr/qt/include -I..
+
+mops: mops.o oomwidgetsplug.o
+	g++ -o mops mops.o oomwidgetsplug.o -L . -l oomwidgetsplugin -L /usr/qt/lib -l qt-mt
+
