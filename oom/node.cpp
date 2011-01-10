@@ -74,6 +74,11 @@ void MidiTrack::setSolo(bool val)
 
 void AudioTrack::setSolo(bool val)
 {
+        AudioInput* inputTrack = dynamic_cast<AudioInput*>(this);
+        if (inputTrack) {
+                return;
+        }
+
 	if (_solo != val)
 	{
 		_solo = val;
