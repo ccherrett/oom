@@ -323,7 +323,6 @@ void EventCanvas::keyPress(QKeyEvent* event)
 		// Select items by key (PianoRoll & DrumEditor)
 	else if (key == shortcuts[SHRT_SEL_RIGHT].key || key == shortcuts[SHRT_SEL_RIGHT_ADD].key)
 	{
-                printf("this is what i'm looking for \n");
 		iCItem i, iRightmost;
 		CItem* rightmost = NULL;
 
@@ -355,7 +354,10 @@ void EventCanvas::keyPress(QKeyEvent* event)
 				iRightmost->second->setSelected(true);
 				updateSelection();
 			}
-		}
+                } else // there was no item selected at all? Then select nearest to tick if there is any
+                {
+                        selectAtTick(song->cpos());
+                }
 	}
 		//Select items by key: (PianoRoll & DrumEditor)
 	else if (key == shortcuts[SHRT_SEL_LEFT].key || key == shortcuts[SHRT_SEL_LEFT_ADD].key)
@@ -370,8 +372,11 @@ void EventCanvas::keyPress(QKeyEvent* event)
 
                 if (list.size() > 0)
 		{
-                        for (i = list.end(), i--; i != list.begin(); i--)
+                        i = list.end();
+                        while (i != list.begin())
 			{
+                                --i;
+
 				if (i->second->isSelected())
 				{
 					iLeftmost = i;
@@ -381,17 +386,24 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			if (leftmost)
 			{
                                 if (iLeftmost != list.begin())
-				{
-					//Add item
-					if (key != shortcuts[SHRT_SEL_LEFT_ADD].key)
-						deselectAll();
+                                {
+                                        //Add item
+                                        if (key != shortcuts[SHRT_SEL_LEFT_ADD].key)
+                                                deselectAll();
 
-					iLeftmost--;
-					iLeftmost->second->setSelected(true);
-					updateSelection();
-				}
-			}
-		}
+                                        iLeftmost--;
+                                        iLeftmost->second->setSelected(true);
+                                        updateSelection();
+                                } else {
+                                        printf("first item in list, selecting it now, here and now!! So why doesn't it get selected????\n");
+                                        leftmost->setSelected(true);
+                                        updateSelection();
+                                }
+                        } else // there was no item selected at all? Then select nearest to tick if there is any
+                        {
+                                selectAtTick(song->cpos());
+                        }
+                }
 	}
 	else if (key == shortcuts[SHRT_INC_PITCH].key)
 	{
