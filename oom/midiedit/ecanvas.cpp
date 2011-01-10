@@ -326,8 +326,14 @@ void EventCanvas::keyPress(QKeyEvent* event)
                 printf("this is what i'm looking for \n");
 		iCItem i, iRightmost;
 		CItem* rightmost = NULL;
-		//Get the rightmost selected note (if any)
-                for (i = _items.begin(); i != _items.end(); ++i)
+
+                // get a list of items that belong to the current part
+                // since multiple parts have populated the _items list
+                // we need to filter on the actual current Part!
+                CItemList list = getItemlistForCurrentPart();
+
+                //Get the rightmost selected note (if any)
+                for (i = list.begin(); i != list.end(); ++i)
 		{
 			if (i->second->isSelected())
 			{
@@ -340,7 +346,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			iCItem temp = iRightmost;
 			temp++;
 			//If so, deselect current note and select the one to the right
-                        if (temp != _items.end())
+                        if (temp != list.end())
 			{
 				if (key != shortcuts[SHRT_SEL_RIGHT_ADD].key)
 					deselectAll();
@@ -355,10 +361,16 @@ void EventCanvas::keyPress(QKeyEvent* event)
 	else if (key == shortcuts[SHRT_SEL_LEFT].key || key == shortcuts[SHRT_SEL_LEFT_ADD].key)
 	{
 		iCItem i, iLeftmost;
-		CItem* leftmost = NULL;
-                if (_items.size() > 0)
+                CItem* leftmost = NULL;
+
+                // get a list of items that belong to the current part
+                // since multiple parts have populated the _items list
+                // we need to filter on the actual current Part!
+                CItemList list = getItemlistForCurrentPart();
+
+                if (list.size() > 0)
 		{
-                        for (i = _items.end(), i--; i != _items.begin(); i--)
+                        for (i = list.end(), i--; i != list.begin(); i--)
 			{
 				if (i->second->isSelected())
 				{
@@ -368,7 +380,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			}
 			if (leftmost)
 			{
-                                if (iLeftmost != _items.begin())
+                                if (iLeftmost != list.begin())
 				{
 					//Add item
 					if (key != shortcuts[SHRT_SEL_LEFT_ADD].key)
