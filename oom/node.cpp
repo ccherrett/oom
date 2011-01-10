@@ -76,6 +76,23 @@ void AudioTrack::setSolo(bool val)
 {
         AudioInput* inputTrack = dynamic_cast<AudioInput*>(this);
         if (inputTrack) {
+                printf("don't setsolo on an audioinput\n");
+                return;
+        }
+        AudioOutput* outputTrack = dynamic_cast<AudioOutput*>(this);
+        if (outputTrack) {
+                printf("don't setsolo on an audiooutput\n");
+                return;
+        }
+        AudioGroup* group = dynamic_cast<AudioGroup*>(this);
+        if (group) {
+                printf("don't setsolo on an audiogroup\n");
+                return;
+        }
+        AudioAux* audioAux = dynamic_cast<AudioAux*>(this);
+        if (audioAux)
+        {
+                printf("don't setsolo on an audioaux\n");
                 return;
         }
 
