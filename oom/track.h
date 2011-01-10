@@ -732,6 +732,12 @@ public:
     {
         return true;
     }
+
+    virtual bool isMute() const
+    {
+            return false;
+    }
+
 };
 
 //---------------------------------------------------------
@@ -793,6 +799,12 @@ public:
     {
         return _monitorBuffer;
     }
+
+    virtual bool isMute() const
+    {
+            return false;
+    }
+
 };
 
 //---------------------------------------------------------
@@ -824,6 +836,12 @@ public:
     {
         return true;
     }
+
+    virtual bool isMute() const
+    {
+            return false;
+    }
+
 };
 
 //---------------------------------------------------------
@@ -857,6 +875,12 @@ public:
     {
         return buffer;
     }
+
+    virtual bool isMute() const
+    {
+            return false;
+    }
+
 };
 
 //---------------------------------------------------------
