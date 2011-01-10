@@ -1770,7 +1770,7 @@ void PartCanvas::drawWavePart(QPainter& p,
 	int x2 = 1;
 	int x1 = rr.x() > pr.x() ? rr.x() : pr.x();
 	x2 += rr.right() < pr.right() ? rr.right() : pr.right();
-	printf("x1 = %d, x2 = %d\n", x1, x2);
+	//printf("x1 = %d, x2 = %d\n", x1, x2);
 	if (x1 < 0)
 		x1 = 0;
 	if (x2 > width())
@@ -1780,7 +1780,6 @@ void PartCanvas::drawWavePart(QPainter& p,
 	//	hh = hh +1;
 	int h = hh / 2;
 	int y = pr.y() + h;
-	int myheight = hh;
 
 	EventList* el = wp->events();
 	for (iEvent e = el->begin(); e != el->end(); ++e)
@@ -1866,7 +1865,6 @@ void PartCanvas::drawWavePart(QPainter& p,
 				p.drawLine(i, y - peak - cc, i, y + peak);
 				p.setPen(QColor(0,10,15));
 				p.drawLine(i, y - rms - cc, i, y + rms);
-				myheight += pr.height();
 			}
 		}
 		else
@@ -1876,8 +1874,8 @@ void PartCanvas::drawWavePart(QPainter& p,
 			//
 			int hm = hh / (channels * 2);
 			int cc = hh % (channels * 2) ? 0 : 1;
-			printf("channels = %d, pr = %d, h = %d, hh = %d, hm = %d\n", channels, pr.height(), h, hh, hm);
-			printf("canvas height: %d\n", height());
+			//printf("channels = %d, pr = %d, h = %d, hh = %d, hm = %d\n", channels, pr.height(), h, hh, hm);
+			//printf("canvas height: %d\n", height());
 			for (; i < ex; i++)
 			{
 				y = pr.y() + hm;
@@ -1907,7 +1905,7 @@ void PartCanvas::drawWavePart(QPainter& p,
 						p.setPen(myPen);
 						//p.setPen(QColor(Qt::darkGray));
 						p.drawLine(i, y - peak - cc, i, y + peak);
-						p.drawLine(0, pr.height(), 3000, pr.height());
+						//p.drawLine(0, pr.height(), 3000, pr.height());
 					}
 					else
 					{
@@ -1930,7 +1928,6 @@ void PartCanvas::drawWavePart(QPainter& p,
 
 					y += 2 * hm;
 				}
-				myheight += pr.height();
 			}
 		}
 	}
