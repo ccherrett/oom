@@ -23,7 +23,6 @@ class QPushButton;
 class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase 
 {
 	Q_OBJECT
-	TrackList* _allTracks;
 	TrackViewList* _viewList;
 	TrackList* _selected;
 	TrackList _tracks;      // tracklist as seen by arranger

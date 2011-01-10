@@ -23,6 +23,8 @@ ShortcutConfig::ShortcutConfig(QWidget* parent)
 	setupUi(this);
 	connect(cgListView, SIGNAL(itemActivated(QTreeWidgetItem*, int)),
 			this, SLOT(categorySelChanged(QTreeWidgetItem*, int)));
+	connect(cgListView, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+			this, SLOT(categorySelChanged(QTreeWidgetItem*, int)));
 	connect(scListView, SIGNAL(itemActivated(QTreeWidgetItem*, int)),
 			this, SLOT(shortcutSelChanged(QTreeWidgetItem*, int)));
 

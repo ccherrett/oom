@@ -3353,6 +3353,29 @@ TrackView* Song::findTrackView(const QString& name) const
 
 
 //---------------------------------------------------------
+//   findTrackView
+//    find track view by name
+//---------------------------------------------------------
+
+TrackView* Song::findTrackView(Track* t)
+{
+	for (ciTrackView i = _tviews.begin(); i != _tviews.end(); ++i)
+	{
+		TrackList* list = (*i)->tracks();
+		for(ciTrack ci = list->begin(); ci != list->end(); ++ci)
+		{
+			if((*ci)->name() == t->name())
+			{
+				TrackView* tv = dynamic_cast<TrackView*> (*i);
+				if(tv)
+					return tv;
+			}
+		}
+	}
+	return 0;
+}
+
+//---------------------------------------------------------
 //   insertTrack0
 //---------------------------------------------------------
 

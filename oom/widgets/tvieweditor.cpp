@@ -35,44 +35,23 @@
 TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(parent)
 {
 	setupUi(this);
-	_allTracks = song->tracks();
-	_viewList = vl;
 	//MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP,AUDIO_AUX
-	_trackTypes = (QStringList() << "Audio_Out" << "Audio_In" << "Audio_Aux" << "Audio_Group" << "Midi" << "Soft_Synth"); //new QStringList();
+	_trackTypes = (QStringList() << "Audio_Out" << "Audio_In" << "Audio_Aux" << "Audio_Group" << "Midi" << "Soft_Synth" << "Wave"); //new QStringList();
 	//Populate trackTypes and pass it to cmbTypes 
 	cmbType->addItems(_trackTypes);
 	QStringList stracks;
-	for (ciTrack t = _allTracks->begin(); t != _allTracks->end(); ++t)
+	//Output is the first in the list and will be displayed by default.
+	for (ciTrack t = song->outputs()->begin(); t != song->outputs()->end(); ++t)
 	{
-		_tracks.push_back((*t));
-		switch ((*t)->type())
-		{/*{{{*/
-			case Track::MIDI:
-			case Track::DRUM:
-				_midis.push_back((MidiTrack*) (*t));
-				break;
-			case Track::WAVE:
-				_waves.push_back((WaveTrack*) (*t));
-				break;
-			case Track::AUDIO_OUTPUT:
-				_outputs.push_back((AudioOutput*) (*t));
-				stracks << (*t)->name();
-				break;
-			case Track::AUDIO_GROUP:
-				_groups.push_back((AudioGroup*) (*t));
-				break;
-			case Track::AUDIO_AUX:
-				_auxs.push_back((AudioAux*) (*t));
-				break;
-			case Track::AUDIO_INPUT:
-				_inputs.push_back((AudioInput*) (*t));
-				break;
-			case Track::AUDIO_SOFTSYNTH:
-				SynthI* s = (SynthI*) (*t);
-				_synthIs.push_back(s);
-				break;
-		}/*}}}*/
+		stracks << (*t)->name();
 	}
+	QStringList tv;
+	tv.append(tr("Select Track View"));
+	for(ciTrackView ci = song->trackviews()->begin(); ci != song->trackviews()->end(); ++ci)
+	{
+		tv.append((*ci)->viewName());
+	}
+	cmbViews->addItems(tv);
 	listAllTracks->setModel(new QStringListModel(stracks));
 	btnAdd = actionBox->button(QDialogButtonBox::Yes);
 	btnAdd->setText(tr("Add Track"));
@@ -94,6 +73,46 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 void TrackViewEditor::cmbViewSelected(QString& sl)
 {
 	//Perform actions to populate list below based on selected view
+	TrackView* v = song->findTrackView(sl);
+	if(v)
+	{
+		TrackList* l = v->tracks();
+		if(l)
+		{
+			QStringList sl;
+			for(ciTrack ci = l->begin(); ci != l->end(); ++ci)
+			{
+				sl.append((*ci)->name());
+			}
+			listSelectedTracks->setModel(new QStringListModel(sl));
+//"Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Soft_Synth"
+			switch(v->type())
+			{
+				case Track::MIDI:
+				case Track::DRUM:
+					cmbType->setCurrentIndex(4);
+				break;
+				case Track::WAVE:
+					cmbType->setCurrentIndex(6);
+				break;
+				case Track::AUDIO_OUTPUT:
+					cmbType->setCurrentIndex(0);
+				break;
+				case Track::AUDIO_INPUT:
+					cmbType->setCurrentIndex(1);
+				break;
+				case Track::AUDIO_GROUP:
+					cmbType->setCurrentIndex(3);
+				break;
+				case Track::AUDIO_AUX:
+					cmbType->setCurrentIndex(2);
+				break;
+				case Track::AUDIO_SOFTSYNTH:
+					cmbType->setCurrentIndex(5);
+				break;
+			}
+		}
+	}
 }
 
 void TrackViewEditor::cmbTypeSelected(int type)
@@ -105,44 +124,58 @@ void TrackViewEditor::cmbTypeSelected(int type)
 	switch (type)
 	{/*{{{*/
 		case 0:
-			for (ciTrack t = _outputs.begin(); t != _outputs.end(); ++t)
+			for (ciTrack t = song->outputs()->begin(); t != song->outputs()->end(); ++t)
 			{
 				//This should be checked against track in other views
-				stracks << (*t)->name();
+				if(song->findTrackView((*t)) == 0)
+					stracks << (*t)->name();
 			}
 		case 1:
-			for (ciTrack t = _inputs.begin(); t != _inputs.end(); ++t)
+			for (ciTrack t = song->inputs()->begin(); t != song->inputs()->end(); ++t)
 			{
 				//This should be checked against track in other views
-				stracks << (*t)->name();
+				if(song->findTrackView((*t)) == 0)
+					stracks << (*t)->name();
 			}
 			break;
 		case 2:
-			for (ciTrack t = _auxs.begin(); t != _auxs.end(); ++t)
+			for (ciTrack t = song->auxs()->begin(); t != song->auxs()->end(); ++t)
 			{
 				//This should be checked against track in other views
-				stracks << (*t)->name();
+				if(song->findTrackView((*t)) == 0)
+					stracks << (*t)->name();
 			}
 			break;
 		case 3:
-			for (ciTrack t = _groups.begin(); t != _groups.end(); ++t)
+			for (ciTrack t = song->groups()->begin(); t != song->groups()->end(); ++t)
 			{
 				//This should be checked against track in other views
-				stracks << (*t)->name();
+				if(song->findTrackView((*t)) == 0)
+					stracks << (*t)->name();
 			}
 			break;
 		case 4:
-			for (ciTrack t = _midis.begin(); t != _midis.end(); ++t)
+			for (ciTrack t = song->midis()->begin(); t != song->midis()->end(); ++t)
 			{
 				//This should be checked against track in other views
-				stracks << (*t)->name();
+				if(song->findTrackView((*t)) == 0)
+					stracks << (*t)->name();
 			}
 			break;
 		case 5:
-			for (ciTrack t = _synthIs.begin(); t != _synthIs.end(); ++t)
+			for (ciTrack t = song->syntis()->begin(); t != song->syntis()->end(); ++t)
 			{
 				//This should be checked against track in other views
-				stracks << (*t)->name();
+				if(song->findTrackView((*t)) == 0)
+					stracks << (*t)->name();
+			}
+			break;
+		case 6:
+			for (ciTrack t = song->waves()->begin(); t != song->waves()->end(); ++t)
+			{
+				//This should be checked against track in other views
+				if(song->findTrackView((*t)) == 0)
+					stracks << (*t)->name();
 			}
 			break;
 	}/*}}}*/

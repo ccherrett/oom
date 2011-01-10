@@ -442,6 +442,7 @@ public:
         return &_tviews;
     }
     TrackView* findTrackView(const QString& name) const;
+    TrackView* findTrackView(Track*);
     void insertTrackView(TrackView*, int idx);
     void removeTrackView(TrackView*);
     void cmdRemoveTrackView(TrackView*);

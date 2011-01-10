@@ -130,11 +130,10 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	cursorPos->setObjectName("arrangerCursor");
 	toolbar->addWidget(cursorPos);
 
-	/*QToolButton* testView  = new QToolButton();
+	QToolButton* testView  = new QToolButton();
 	testView->setText(QString("TG"));
 	toolbar->addWidget(testView);
 	connect(testView, SIGNAL(clicked()), SLOT(showTrackViews()));
-	 */
 
 	const char* rastval[] = {
 		QT_TRANSLATE_NOOP("@default", "Off"), QT_TRANSLATE_NOOP("@default", "Bar"), "1/2", "1/4", "1/8", "1/16"

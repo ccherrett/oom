@@ -54,6 +54,8 @@ void MidiTrackInfo::setTrack(Track* t)
 	trackNameLabel->setPalette(pal);
 
 	updateTrackInfo(-1);
+	populateMatrix();
+	rebuildMatrix();
 }
 
 //---------------------------------------------------------

@@ -1023,7 +1023,7 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 		int quantLimit, bool quantLen, int range)
 {
 	cmdRange = range;
-	printf("PianoCanvas cmd called with command: %d\n\n", cmd);
+	//printf("PianoCanvas cmd called with command: %d\n\n", cmd);
 	switch (cmd)
 	{
 		case CMD_CUT:
