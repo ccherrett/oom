@@ -1760,6 +1760,10 @@ void PartCanvas::drawWavePart(QPainter& p,
 {
 	//printf("PartCanvas::drawWavePart bb.x:%d bb.y:%d bb.w:%d bb.h:%d  pr.x:%d pr.y:%d pr.w:%d pr.h:%d\n",
 	//  bb.x(), bb.y(), bb.width(), bb.height(), _pr.x(), _pr.y(), _pr.width(), _pr.height());
+	QColor green = QColor(49, 175, 197);
+	QColor yellow = QColor(127,12,128);
+	QColor red = QColor(197, 49, 87);
+	QColor rms_color = QColor(0,19,23);
 
 	QRect rr = p.worldMatrix().mapRect(bb);
 	QRect pr = p.worldMatrix().mapRect(_pr);
@@ -1849,9 +1853,6 @@ void PartCanvas::drawWavePart(QPainter& p,
 				peak = (peak * (hh - 2)) >> 9;
 				rms = (rms * (hh - 2)) >> 9;
 				
-				QColor green = QColor(49, 175, 197);
-				QColor yellow = QColor(127,12,128);
-				QColor red = QColor(197, 49, 87);
 				QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
 				vuGrad.setColorAt(1, red);
 				vuGrad.setColorAt(0.6, green);
@@ -1868,7 +1869,7 @@ void PartCanvas::drawWavePart(QPainter& p,
 				p.setPen(myPen);
 				
 				p.drawLine(i, y - peak - cc, i, y + peak);
-				p.setPen(QColor(0,10,15));
+				p.setPen(rms_color);
 				p.drawLine(i, y - rms - cc, i, y + rms);
 			}
 		}
@@ -1893,9 +1894,6 @@ void PartCanvas::drawWavePart(QPainter& p,
 				{
 					int peak = (sa[k].peak * (hm - 1)) >> 8;
 					int rms = (sa[k].rms * (hm - 1)) >> 8;
-					QColor green = QColor(49, 175, 197);
-					QColor yellow = QColor(127,12,128);
-					QColor red = QColor(197, 49, 87);
 					if(k == 0)
 					{
 						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
@@ -1938,8 +1936,19 @@ void PartCanvas::drawWavePart(QPainter& p,
 						p.drawLine(i, y - peak - cc, i, y + peak);
 						
 					}
-					p.setPen(QColor(Qt::black));
+					p.setPen(rms_color);//QColor(0,19,23));
 					p.drawLine(i, y - rms - cc, i, y + rms);
+					
+					if(k == 0)
+					{
+						p.setPen(QColor(102,177,205));//QColor(0,19,23));
+						p.drawLine(0, y, width(), y);
+					}
+					else
+					{
+						p.setPen(QColor(213,93,93));//QColor(0,19,23));
+						p.drawLine(0, y, width(), y);
+					}
 
 					y += 2 * hm;
 				}

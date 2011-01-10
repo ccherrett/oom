@@ -157,7 +157,7 @@ void WaveView::pdraw(QPainter& p, const QRect& rr)
 					if (rms > h)
 						rms = h;
 					QColor peak_color = QColor(Qt::darkGray);
-					QColor rms_color = QColor(0,10,15);
+					QColor rms_color = QColor(0,19,23);
 				
 					// Changed by T356. Reduces (but not eliminates) drawing artifacts.
 					//if (pos > selectionStartPos && pos < selectionStopPos) {
