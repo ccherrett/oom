@@ -16,6 +16,7 @@
 CItem::CItem()
 {
 	_isMoving = false;
+        _part = 0;
 }
 
 CItem::CItem(const QPoint&p, const QRect& r)
@@ -23,6 +24,7 @@ CItem::CItem(const QPoint&p, const QRect& r)
 	_pos = p;
 	_bbox = r;
 	_isMoving = false;
+        _part = 0;
 }
 
 // Changed by Tim. p3.3.20

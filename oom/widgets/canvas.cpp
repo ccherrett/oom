@@ -1361,12 +1361,19 @@ CItemList Canvas::getItemlistForCurrentPart()
                 return list;
         }
 
-        for (i = _items.end(), i--; i != _items.begin(); i--)
+        if (_items.size() == 0) {
+                return list;
+        }
+
+        i = _items.begin();
+        while (i != _items.end())
         {
                 if (i->second->part() == _curPart)
                 {
                         list.add(i->second);
                 }
+
+                ++i;
         }
 
         return list;
