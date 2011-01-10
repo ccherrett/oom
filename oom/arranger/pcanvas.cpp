@@ -1817,7 +1817,7 @@ void PartCanvas::drawWavePart(QPainter& p,
 		int ex = mapx(tempomap.frame2tick(wp->frame() + event.frame() + event.lenFrame()));
 		if (ex > x2)
 			ex = x2;
-		if (h < 20)
+		if (h < 41)
 		{
 			//
 			//    combine multi channels into one waveform

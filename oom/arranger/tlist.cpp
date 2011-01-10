@@ -50,7 +50,7 @@
 
 extern QMenu* populateAddSynth(QWidget* parent);
 
-static const int MIN_TRACKHEIGHT = 20;
+static const int MIN_TRACKHEIGHT = 40;
 static const int WHEEL_DELTA = 120;
 
 //---------------------------------------------------------
