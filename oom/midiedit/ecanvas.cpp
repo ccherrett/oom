@@ -45,8 +45,8 @@ EventCanvas::EventCanvas(MidiEditor* pr, QWidget* parent, int sx,
 	setFocusPolicy(Qt::StrongFocus);
 	setMouseTracking(true);
 
-	curPart = (MidiPart*) (editor->parts()->begin()->second);
-	curPartId = curPart->sn();
+        _curPart = (MidiPart*) (editor->parts()->begin()->second);
+        _curPartId = _curPart->sn();
 }
 
 //---------------------------------------------------------
@@ -58,11 +58,11 @@ QString EventCanvas::getCaption() const
 	int bar1, bar2, xx;
 	unsigned x;
 	///sigmap.tickValues(curPart->tick(), &bar1, &xx, &x);
-	AL::sigmap.tickValues(curPart->tick(), &bar1, &xx, &x);
+        AL::sigmap.tickValues(_curPart->tick(), &bar1, &xx, &x);
 	///sigmap.tickValues(curPart->tick() + curPart->lenTick(), &bar2, &xx, &x);
-	AL::sigmap.tickValues(curPart->tick() + curPart->lenTick(), &bar2, &xx, &x);
+        AL::sigmap.tickValues(_curPart->tick() + _curPart->lenTick(), &bar2, &xx, &x);
 
-	return QString("OOMidi: Part <") + curPart->name()
+        return QString("OOMidi: Part <") + _curPart->name()
 			+ QString("> %1-%2").arg(bar1 + 1).arg(bar2 + 1);
 }
 
@@ -151,15 +151,15 @@ void EventCanvas::songChanged(int flags)
 
 	if (flags & ~SC_SELECTION)
 	{
-		items.clear();
+                _items.clear();
 		start_tick = MAXINT;
 		end_tick = 0;
-		curPart = 0;
+                _curPart = 0;
 		for (iPart p = editor->parts()->begin(); p != editor->parts()->end(); ++p)
 		{
 			MidiPart* part = (MidiPart*) (p->second);
-			if (part->sn() == curPartId)
-				curPart = part;
+                        if (part->sn() == _curPartId)
+                                _curPart = part;
 			unsigned stick = part->tick();
 			unsigned len = part->lenTick();
 			unsigned etick = stick + len;
@@ -179,7 +179,7 @@ void EventCanvas::songChanged(int flags)
 
 				if (e.isNote())
 				{
-					addItem(part, e);
+                                        addItem(part, e);
 				}
 			}
 		}
@@ -191,7 +191,7 @@ void EventCanvas::songChanged(int flags)
 	CItem* nevent = 0;
 
 	int n = 0; // count selections
-	for (iCItem k = items.begin(); k != items.end(); ++k)
+        for (iCItem k = _items.begin(); k != _items.end(); ++k)
 	{
 		Event ev = k->second->event();
 		bool selected = ev.selected();
@@ -215,16 +215,16 @@ void EventCanvas::songChanged(int flags)
 		x = nevent->x();
 		event = nevent->event();
 		part = (MidiPart*) nevent->part();
-		if (curPart != part)
+                if (_curPart != part)
 		{
-			curPart = part;
-			curPartId = curPart->sn();
+                        _curPart = part;
+                        _curPartId = _curPart->sn();
 			curPartChanged();
 		}
 	}
 	emit selectionChanged(x, event, part);
-	if (curPart == 0)
-		curPart = (MidiPart*) (editor->parts()->begin()->second);
+        if (_curPart == 0)
+                _curPart = (MidiPart*) (editor->parts()->begin()->second);
 	redraw();
 }
 
@@ -234,13 +234,15 @@ void EventCanvas::songChanged(int flags)
 
 void EventCanvas::selectAtTick(unsigned int tick)
 {
-	//Select note nearest tick, if none selected and there are any
-	if (!items.empty() && selectionSize() == 0)
+        CItemList list = getItemlistForCurrentPart();
+
+        //Select note nearest tick, if none selected and there are any
+        if (!list.empty() && selectionSize() == 0)
 	{
-		iCItem i = items.begin();
+                iCItem i = list.begin();
 		CItem* nearest = i->second;
 
-		while (i != items.end())
+                while (i != list.end())
 		{
 			CItem* cur = i->second;
 			unsigned int curtk = abs(cur->x() + cur->part()->tick() - tick);
@@ -254,7 +256,7 @@ void EventCanvas::selectAtTick(unsigned int tick)
 			i++;
 		}
 
-		if (!nearest->isSelected())
+                if (!nearest->isSelected())
 		{
 			selectItem(nearest, true);
 			songChanged(SC_SELECTION);
@@ -268,7 +270,7 @@ void EventCanvas::selectAtTick(unsigned int tick)
 
 MidiTrack* EventCanvas::track() const
 {
-	return ((MidiPart*) curPart)->track();
+        return ((MidiPart*) _curPart)->track();
 }
 
 
@@ -299,7 +301,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 		int tick_min = INT_MAX;
 		bool found = false;
 
-		for (iCItem i = items.begin(); i != items.end(); i++)
+                for (iCItem i = _items.begin(); i != _items.end(); i++)
 		{
 			if (!i->second->isSelected())
 				continue;
@@ -325,8 +327,14 @@ void EventCanvas::keyPress(QKeyEvent* event)
 	{
 		iCItem i, iRightmost;
 		CItem* rightmost = NULL;
-		//Get the rightmost selected note (if any)
-		for (i = items.begin(); i != items.end(); ++i)
+
+                // get a list of items that belong to the current part
+                // since multiple parts have populated the _items list
+                // we need to filter on the actual current Part!
+                CItemList list = getItemlistForCurrentPart();
+
+                //Get the rightmost selected note (if any)
+                for (i = list.begin(); i != list.end(); ++i)
 		{
 			if (i->second->isSelected())
 			{
@@ -339,7 +347,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			iCItem temp = iRightmost;
 			temp++;
 			//If so, deselect current note and select the one to the right
-			if (temp != items.end())
+                        if (temp != list.end())
 			{
 				if (key != shortcuts[SHRT_SEL_RIGHT_ADD].key)
 					deselectAll();
@@ -348,17 +356,29 @@ void EventCanvas::keyPress(QKeyEvent* event)
 				iRightmost->second->setSelected(true);
 				updateSelection();
 			}
-		}
+                } else // there was no item selected at all? Then select nearest to tick if there is any
+                {
+                        selectAtTick(song->cpos());
+                }
 	}
 		//Select items by key: (PianoRoll & DrumEditor)
 	else if (key == shortcuts[SHRT_SEL_LEFT].key || key == shortcuts[SHRT_SEL_LEFT_ADD].key)
 	{
 		iCItem i, iLeftmost;
-		CItem* leftmost = NULL;
-		if (items.size() > 0)
+                CItem* leftmost = NULL;
+
+                // get a list of items that belong to the current part
+                // since multiple parts have populated the _items list
+                // we need to filter on the actual current Part!
+                CItemList list = getItemlistForCurrentPart();
+
+                if (list.size() > 0)
 		{
-			for (i = items.end(), i--; i != items.begin(); i--)
+                        i = list.end();
+                        while (i != list.begin())
 			{
+                                --i;
+
 				if (i->second->isSelected())
 				{
 					iLeftmost = i;
@@ -367,18 +387,25 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			}
 			if (leftmost)
 			{
-				if (iLeftmost != items.begin())
-				{
-					//Add item
-					if (key != shortcuts[SHRT_SEL_LEFT_ADD].key)
-						deselectAll();
+                                if (iLeftmost != list.begin())
+                                {
+                                        //Add item
+                                        if (key != shortcuts[SHRT_SEL_LEFT_ADD].key)
+                                                deselectAll();
 
-					iLeftmost--;
-					iLeftmost->second->setSelected(true);
-					updateSelection();
-				}
-			}
-		}
+                                        iLeftmost--;
+                                        iLeftmost->second->setSelected(true);
+                                        updateSelection();
+                                } else {
+                                        printf("first item in list, selecting it now, here and now!! So why doesn't it get selected????\n");
+                                        leftmost->setSelected(true);
+                                        updateSelection();
+                                }
+                        } else // there was no item selected at all? Then select nearest to tick if there is any
+                        {
+                                selectAtTick(song->cpos());
+                        }
+                }
 	}
 	else if (key == shortcuts[SHRT_INC_PITCH].key)
 	{
@@ -428,7 +455,7 @@ QMimeData* EventCanvas::getTextDrag()
 
 	EventList el;
 	unsigned startTick = MAXINT;
-	for (iCItem i = items.begin(); i != items.end(); ++i)
+        for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		if (!i->second->isSelected())
 			continue;
@@ -519,7 +546,7 @@ void EventCanvas::pasteAt(const QString& pt, int pos)
 					for (iEvent i = el->begin(); i != el->end(); ++i)
 					{
 						Event e = i->second;
-						int tick = e.tick() + pos - curPart->tick();
+                                                int tick = e.tick() + pos - _curPart->tick();
 						if (tick < 0)
 						{
 							printf("ERROR: trying to add event before current part!\n");
@@ -529,18 +556,18 @@ void EventCanvas::pasteAt(const QString& pt, int pos)
 						}
 
 						e.setTick(tick);
-						int diff = e.endTick() - curPart->lenTick();
+                                                int diff = e.endTick() - _curPart->lenTick();
 						if (diff > 0)
 						{// too short part? extend it
-							Part* newPart = curPart->clone();
+                                                        Part* newPart = _curPart->clone();
 							newPart->setLenTick(newPart->lenTick() + diff);
 							// Indicate no undo, and do port controller values but not clone parts.
-							audio->msgChangePart(curPart, newPart, false, true, false);
+                                                        audio->msgChangePart(_curPart, newPart, false, true, false);
 							modified = modified | SC_PART_MODIFIED;
-							curPart = newPart; // reassign
+                                                        _curPart = newPart; // reassign
 						}
 						// Indicate no undo, and do not do port controller values and clone parts.
-						audio->msgAddEvent(e, curPart, false, false, false);
+                                                audio->msgAddEvent(e, _curPart, false, false, false);
 					}
 					song->endUndo(modified);
 					delete el;
