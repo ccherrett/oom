@@ -464,7 +464,7 @@ void Canvas::startMoving(const QPoint& pos, DragType)
 //          2     move only vertical
 //---------------------------------------------------------
 
-void Canvas::moveItems(const QPoint& pos, int dir = 0, bool rasterize)
+void Canvas::moveItems(const QPoint& pos, int dir, bool rasterize)
 {
 	int dp;
 	if (rasterize)
