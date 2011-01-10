@@ -141,7 +141,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 
 	tracks = song->tracks();
 	setMouseTracking(true);
-	drag = DRAG_OFF;
+        _drag = DRAG_OFF;
 	curColorIndex = 0;
 	partsChanged();
 }
@@ -225,14 +225,14 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 		return;
 	}
 	QPoint cpos = event->pos();
-	curItem = items.find(cpos);
+        _curItem = _items.find(cpos);
 	bool shift = event->modifiers() & Qt::ShiftModifier;
-	if (curItem)
+        if (_curItem)
 	{
 		if (event->button() == Qt::LeftButton && shift)
 		{
-			editPart = (NPart*) curItem;
-			QRect r = map(curItem->bbox());
+                        editPart = (NPart*) _curItem;
+                        QRect r = map(_curItem->bbox());
 			if (lineEditor == 0)
 			{
 				lineEditor = new QLineEdit(this);
@@ -247,8 +247,8 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 		else if (event->button() == Qt::LeftButton)
 		{
 			deselectAll();
-			selectItem(curItem, true);
-			emit dclickPart(((NPart*) (curItem))->track());
+                        selectItem(_curItem, true);
+                        emit dclickPart(((NPart*) (_curItem))->track());
 		}
 	}
 		//
@@ -268,7 +268,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 				break;
 			yy += h;
 		}
-		if (pos[2] - pos[1] > 0 && it != tl->end())
+                if (_pos[2] - _pos[1] > 0 && it != tl->end())
 		{
 			Track* track = *it;
 			switch (track->type())
@@ -277,11 +277,11 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 				case Track::DRUM:
 				{
 					MidiPart* part = new MidiPart((MidiTrack*) track);
-					part->setTick(pos[1]);
-					part->setLenTick(pos[2] - pos[1]);
+                                        part->setTick(_pos[1]);
+                                        part->setLenTick(_pos[2] - _pos[1]);
 					part->setName(track->name());
 					NPart* np = new NPart(part);
-					items.add(np);
+                                        _items.add(np);
 					deselectAll();
 					part->setSelected(true);
 					audio->msgAddPart(part);
@@ -438,9 +438,9 @@ void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 
 		if (moveItem(ci, newpos, dtype))
 			ci->move(newpos);
-		if (moving.size() == 1)
+                if (_moving.size() == 1)
 		{
-			itemReleased(curItem, newpos);
+                        itemReleased(_curItem, newpos);
 		}
 		if (dtype == MOVE_COPY || dtype == MOVE_CLONE)
 			selectItem(ci, false);
@@ -584,7 +584,7 @@ QPoint PartCanvas::raster(const QPoint& p) const
 
 void PartCanvas::partsChanged()
 {
-	items.clear();
+        _items.clear();
 	int idx = 0;
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{
@@ -592,7 +592,7 @@ void PartCanvas::partsChanged()
 		for (iPart i = pl->begin(); i != pl->end(); ++i)
 		{
 			NPart* np = new NPart(i->second);
-			items.add(np);
+                        _items.add(np);
 			if (i->second->selected())
 			{
 				selectItem(np, true);
@@ -609,7 +609,7 @@ void PartCanvas::partsChanged()
 
 void PartCanvas::updateSelection()
 {
-	for (iCItem i = items.begin(); i != items.end(); ++i)
+        for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		NPart* part = (NPart*) (i->second);
 		part->part()->setSelected(i->second->isSelected());
@@ -859,7 +859,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 		case 0: // rename
 		{
 			editPart = npart;
-			QRect r = map(curItem->bbox());
+                        QRect r = map(_curItem->bbox());
 			if (lineEditor == 0)
 			{
 				lineEditor = new QLineEdit(this);
@@ -1009,7 +1009,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 			curColorIndex = n - 20;
 			bool selfound = false;
 			//Loop through all parts and set color on selected:
-			for (iCItem i = items.begin(); i != items.end(); i++)
+                        for (iCItem i = _items.begin(); i != _items.end(); i++)
 			{
 				if (i->second->isSelected())
 				{
@@ -1043,7 +1043,7 @@ void PartCanvas::mousePress(QMouseEvent* event)
 		return;
 	}
 	QPoint pt = event->pos();
-	CItem* item = items.find(pt);
+        CItem* item = _items.find(pt);
 	if (item == 0)
 		return;
 	switch (_tool)
@@ -1150,7 +1150,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_POS_DEC].key)
 	{
-		int spos = pos[0];
+                int spos = _pos[0];
 		if (spos > 0)
 		{
 			spos -= 1; // Nudge by -1, then snap down with raster1.
@@ -1164,14 +1164,14 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_POS_INC].key)
 	{
-		int spos = AL::sigmap.raster2(pos[0] + 1, *_raster); // Nudge by +1, then snap up with raster2.
+                int spos = AL::sigmap.raster2(_pos[0] + 1, *_raster); // Nudge by +1, then snap up with raster2.
 		Pos p(spos, true);
 		song->setPos(0, p, true, true, true);
 		return;
 	}
 	else if (key == shortcuts[SHRT_POS_DEC_NOSNAP].key)
 	{
-		int spos = pos[0] - AL::sigmap.rasterStep(pos[0], *_raster);
+                int spos = _pos[0] - AL::sigmap.rasterStep(_pos[0], *_raster);
 		if (spos < 0)
 			spos = 0;
 		Pos p(spos, true);
@@ -1180,7 +1180,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_POS_INC_NOSNAP].key)
 	{
-		Pos p(pos[0] + AL::sigmap.rasterStep(pos[0], *_raster), true);
+                Pos p(_pos[0] + AL::sigmap.rasterStep(_pos[0], *_raster), true);
 		song->setPos(0, p, true, true, true);
 		return;
 	}
@@ -1228,24 +1228,24 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	//
 	// Shortcuts that require selected parts from here
 	//
-	if (!curItem)
+        if (!_curItem)
 	{
-		if (items.size() == 0)
+                if (_items.size() == 0)
 		{
 			event->ignore(); // give global accelerators a chance
 			return;
 		}
-		for (iCItem i = items.begin(); i != items.end(); ++i)
+                for (iCItem i = _items.begin(); i != _items.end(); ++i)
 		{
 			NPart* part = (NPart*) (i->second);
 			if (part->isSelected())
 			{
-				curItem = part;
+                                _curItem = part;
 				break;
 			}
 		}
-		if (!curItem)
-			curItem = (NPart*) items.begin()->second; // just grab the first part
+                if (!_curItem)
+                        _curItem = (NPart*) _items.begin()->second; // just grab the first part
 	}
 
 	CItem* newItem = 0;
@@ -1255,7 +1255,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	if (key == shortcuts[SHRT_LOCATORS_TO_SELECTION].key)
 	{
 		CItem *leftmost = 0, *rightmost = 0;
-		for (iCItem i = items.begin(); i != items.end(); i++)
+                for (iCItem i = _items.begin(); i != _items.end(); i++)
 		{
 			if (i->second->isSelected())
 			{
@@ -1290,11 +1290,11 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		if (key == shortcuts[SHRT_SEL_RIGHT_ADD].key)
 			add = true;
 
-		Part* part = curItem->part();
+                Part* part = _curItem->part();
 		Track* track = part->track();
 		unsigned int tick = part->tick();
 		bool afterthis = false;
-		for (iCItem i = items.begin(); i != items.end(); ++i)
+                for (iCItem i = _items.begin(); i != _items.end(); ++i)
 		{
 			NPart* npart = (NPart*) (i->second);
 			Part* ipart = npart->part();
@@ -1320,11 +1320,11 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		if (key == shortcuts[SHRT_SEL_LEFT_ADD].key)
 			add = true;
 
-		Part* part = curItem->part();
+                Part* part = _curItem->part();
 		Track* track = part->track();
 		unsigned int tick = part->tick();
 
-		for (iCItem i = items.begin(); i != items.end(); ++i)
+                for (iCItem i = _items.begin(); i != _items.end(); ++i)
 		{
 			NPart* npart = (NPart*) (i->second);
 			Part* ipart = npart->part();
@@ -1346,7 +1346,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 			add = true;
 		//To get an idea of which track is above us:
 		int stepsize = rmapxDev(1);
-		Track* track = curItem->part()->track(); //top->part()->track();
+                Track* track = _curItem->part()->track(); //top->part()->track();
 		track = y2Track(track->y() - 1);
 
 		//If we're at topmost, leave
@@ -1355,7 +1355,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 			printf("no track above!\n");
 			return;
 		}
-		int middle = curItem->x() + curItem->part()->lenTick() / 2;
+                int middle = _curItem->x() + _curItem->part()->lenTick() / 2;
 		CItem *aboveL = 0, *aboveR = 0;
 		//Upper limit: song end, lower limit: song start
 		int ulimit = song->len();
@@ -1373,9 +1373,9 @@ void PartCanvas::keyPress(QKeyEvent* event)
 				xleft = middle - xoffset;
 				xright = middle + xoffset;
 				if (xleft >= 0)
-					aboveL = items.find(QPoint(xleft, y));
+                                        aboveL = _items.find(QPoint(xleft, y));
 				if (xright <= ulimit)
-					aboveR = items.find(QPoint(xright, y));
+                                        aboveR = _items.find(QPoint(xright, y));
 			}
 
 			if ((aboveL || aboveR) != 0)
@@ -1401,9 +1401,9 @@ void PartCanvas::keyPress(QKeyEvent* event)
 
 		//To get an idea of which track is below us:
 		int stepsize = rmapxDev(1);
-		Track* track = curItem->part()->track(); //bottom->part()->track();
+                Track* track = _curItem->part()->track(); //bottom->part()->track();
 		track = y2Track(track->y() + track->height() + 1);
-		int middle = curItem->x() + curItem->part()->lenTick() / 2;
+                int middle = _curItem->x() + _curItem->part()->lenTick() / 2;
 		//If we're at bottommost, leave
 		if (!track)
 			return;
@@ -1424,9 +1424,9 @@ void PartCanvas::keyPress(QKeyEvent* event)
 				xleft = middle - xoffset;
 				xright = middle + xoffset;
 				if (xleft >= 0)
-					belowL = items.find(QPoint(xleft, y));
+                                        belowL = _items.find(QPoint(xleft, y));
 				if (xright <= ulimit)
-					belowR = items.find(QPoint(xright, y));
+                                        belowR = _items.find(QPoint(xright, y));
 			}
 
 			if ((belowL || belowR) != 0)
@@ -1445,7 +1445,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		}
 		emit trackChanged(track);
 	}
-	else if (key == shortcuts[SHRT_EDIT_PART].key && curItem)
+        else if (key == shortcuts[SHRT_EDIT_PART].key && _curItem)
 	{ //This should be the other way around - singleSelection first.
 		if (!singleSelection)
 		{
@@ -1453,7 +1453,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 			return;
 		}
 		PartList* pl = new PartList;
-		NPart* npart = (NPart*) (curItem);
+                NPart* npart = (NPart*) (_curItem);
 		Track* track = npart->part()->track();
 		pl->add(npart->part());
 		int type = 0;
@@ -1493,23 +1493,23 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	{
 		//If this is a single selection, toggle previous item
 		if (singleSelection && !add)
-			selectItem(curItem, false);
+                        selectItem(_curItem, false);
 		else if (!add)
 			deselectAll();
 
-		curItem = newItem;
+                _curItem = newItem;
 		selectItem(newItem, true);
 
 		//Check if we've hit the upper or lower boundaries of the window. If so, set a new position
 		if (newItem->x() < mapxDev(0))
 		{
-			int curpos = pos[0];
+                        int curpos = _pos[0];
 			setPos(0, newItem->x(), true);
 			setPos(0, curpos, false); //Dummy to put the current position back once we've scrolled
 		}
 		else if (newItem->x() > mapxDev(width()))
 		{
-			int curpos = pos[0];
+                        int curpos = _pos[0];
 			setPos(0, newItem->x(), true);
 			setPos(0, curpos, false); //Dummy to put the current position back once we've scrolled
 		}
@@ -1964,7 +1964,7 @@ void PartCanvas::drawWavePart(QPainter& p,
 void PartCanvas::cmd(int cmd)
 {
 	PartList pl;
-	for (iCItem i = items.begin(); i != items.end(); ++i)
+        for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		if (!i->second->isSelected())
 			continue;
@@ -1981,7 +1981,7 @@ void PartCanvas::cmd(int cmd)
 			do
 			{
 				loop = false;
-				for (iCItem i = items.begin(); i != items.end(); ++i)
+                                for (iCItem i = _items.begin(); i != _items.end(); ++i)
 				{
 					if (!i->second->isSelected())
 						continue;
@@ -2735,7 +2735,7 @@ void PartCanvas::paste(bool clone, bool toTrack, bool doInsert)
 void PartCanvas::movePartsTotheRight(unsigned int startTicks, int length)
 {
 	// all parts that start after the pasted parts will be moved the entire length of the pasted parts
-	for (iCItem i = items.begin(); i != items.end(); ++i)
+        for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		if (!i->second->isSelected())
 		{

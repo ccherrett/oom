@@ -25,17 +25,17 @@ class QMenu;
 class Canvas : public View
 {
     Q_OBJECT
-    int canvasTools;
-    QTimer *scrollTimer;
+    int _canvasTools;
+    QTimer *_scrollTimer;
 
-    bool doScroll;
-    int scrollSpeed;
+    bool _doScroll;
+    int _scrollSpeed;
 
-    QPoint ev_pos;
-    bool canScrollLeft;
-    bool canScrollRight;
-    bool canScrollUp;
-    bool canScrollDown;
+    QPoint _evPos;
+    bool _canScrollLeft;
+    bool _canScrollRight;
+    bool _canScrollUp;
+    bool _canScrollDown;
 protected:
 
     enum DragMode
@@ -66,24 +66,24 @@ protected:
         VSCROLL_NONE, VSCROLL_UP, VSCROLL_DOWN
     };
 
-    CItemList items;
-    CItemList moving;
-    CItem* curItem;
-    Part* curPart;
-    int curPartId;
+    CItemList _items;
+    CItemList _moving;
+    CItem* _curItem;
+    Part* _curPart;
+    int _curPartId;
 
-    DragMode drag;
-    QRect lasso;
-    QPoint start;
+    DragMode _drag;
+    QRect _lasso;
+    QPoint _start;
     Tool _tool;
-    unsigned pos[3];
+    unsigned _pos[3];
 
-    HScrollDir hscrollDir;
-    VScrollDir vscrollDir;
-    int button;
-    Qt::KeyboardModifiers keyState;
-    QMenu* itemPopupMenu;
-    QMenu* canvasPopupMenu;
+    HScrollDir _hscrollDir;
+    VScrollDir _vscrollDir;
+    int _button;
+    Qt::KeyboardModifiers _keyState;
+    QMenu* _itemPopupMenu;
+    QMenu* _canvasPopupMenu;
 
     void setCursor();
     virtual void viewKeyPressEvent(QKeyEvent* event);
@@ -214,13 +214,13 @@ public:
 
     Part* part() const
     {
-        return curPart;
+        return _curPart;
     }
     void setCurrentPart(Part*);
 
     void setCanvasTools(int n)
     {
-        canvasTools = n;
+        _canvasTools = n;
     }
 };
 #endif
