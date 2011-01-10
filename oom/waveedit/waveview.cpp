@@ -183,9 +183,11 @@ void WaveView::pdraw(QPainter& p, const QRect& rr)
 					{
 						QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, h*2));
 						vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.75, yellow);
+						//vuGrad.setColorAt(0.90, yellow);
+						vuGrad.setColorAt(0.6, green);
 						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.25, yellow);
+						vuGrad.setColorAt(0.4, green);
+						//vuGrad.setColorAt(0.10, yellow);
 						vuGrad.setColorAt(0, red);
 						QPen myPen = QPen();
 						myPen.setBrush(QBrush(vuGrad));
@@ -197,9 +199,9 @@ void WaveView::pdraw(QPainter& p, const QRect& rr)
 						//QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, hh*2));
 						QLinearGradient vuGrad(QPointF(0, h*2), QPointF(0, hh));
 						vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.75, yellow);
+						vuGrad.setColorAt(0.6, green);
 						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.25, yellow);
+						vuGrad.setColorAt(0.4, green);
 						vuGrad.setColorAt(0, red);
 						QPen myPen = QPen();
 						myPen.setBrush(QBrush(vuGrad));

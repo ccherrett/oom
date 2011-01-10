@@ -1854,10 +1854,15 @@ void PartCanvas::drawWavePart(QPainter& p,
 				QColor red = QColor(197, 49, 87);
 				QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
 				vuGrad.setColorAt(1, red);
-				vuGrad.setColorAt(0.75, yellow);
+				vuGrad.setColorAt(0.6, green);
 				vuGrad.setColorAt(0.5, green);
-				vuGrad.setColorAt(0.25, yellow);
+				vuGrad.setColorAt(0.4, green);
 				vuGrad.setColorAt(0, red);
+				/*vuGrad.setColorAt(1, red);
+				vuGrad.setColorAt(0.90, yellow);
+				vuGrad.setColorAt(0.5, green);
+				vuGrad.setColorAt(0.10, yellow);
+				vuGrad.setColorAt(0, red);*/
 				QPen myPen = QPen();
 				myPen.setBrush(QBrush(vuGrad));
 				p.setPen(myPen);
@@ -1896,10 +1901,15 @@ void PartCanvas::drawWavePart(QPainter& p,
 						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
 						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
 						vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.75, yellow);
+						vuGrad.setColorAt(0.6, green);
 						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.25, yellow);
+						vuGrad.setColorAt(0.4, green);
 						vuGrad.setColorAt(0, red);
+						/*vuGrad.setColorAt(1, red);
+						vuGrad.setColorAt(0.90, yellow);
+						vuGrad.setColorAt(0.5, green);
+						vuGrad.setColorAt(0.10, yellow);
+						vuGrad.setColorAt(0, red);*/
 						QPen myPen = QPen();
 						myPen.setBrush(QBrush(vuGrad));
 						p.setPen(myPen);
@@ -1912,10 +1922,15 @@ void PartCanvas::drawWavePart(QPainter& p,
 						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
 						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
 						vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.75, yellow);
+						vuGrad.setColorAt(0.6, green);
 						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.25, yellow);
+						vuGrad.setColorAt(0.4, green);
 						vuGrad.setColorAt(0, red);
+						/*vuGrad.setColorAt(1, red);
+						vuGrad.setColorAt(0.90, yellow);
+						vuGrad.setColorAt(0.5, green);
+						vuGrad.setColorAt(0.10, yellow);
+						vuGrad.setColorAt(0, red);*/
 						QPen myPen = QPen();
 						myPen.setBrush(QBrush(vuGrad));
 						p.setPen(myPen);
