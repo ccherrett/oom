@@ -334,13 +334,16 @@ void EventCanvas::keyPress(QKeyEvent* event)
                 CItemList list = getItemlistForCurrentPart();
 
                 //Get the rightmost selected note (if any)
-                for (i = list.begin(); i != list.end(); ++i)
+                i = list.begin();
+                while (i != list.end())
 		{
 			if (i->second->isSelected())
 			{
 				iRightmost = i;
 				rightmost = i->second;
 			}
+
+                        ++i;
 		}
 		if (rightmost)
 		{
