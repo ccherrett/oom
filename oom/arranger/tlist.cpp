@@ -50,7 +50,7 @@
 
 extern QMenu* populateAddSynth(QWidget* parent);
 
-static const int MIN_TRACKHEIGHT = 20;
+static const int MIN_TRACKHEIGHT = 40;
 static const int WHEEL_DELTA = 120;
 
 //---------------------------------------------------------
@@ -1365,6 +1365,8 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 					startY = curY;
 					if (h < MIN_TRACKHEIGHT)
 						h = MIN_TRACKHEIGHT;
+					//if((h / 2) != 0)
+					//	h = h +1;
 					t->setHeight(h);
 					song->update(SC_TRACK_MODIFIED);
 				}

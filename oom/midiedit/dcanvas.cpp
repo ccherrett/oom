@@ -63,7 +63,7 @@ void DrumCanvas::addItem(Part* part, Event& event)
 	}
 
 	DEvent* ev = new DEvent(event, part);
-	items.add(ev);
+	_items.add(ev);
 
 	int diff = event.endTick() - part->lenTick();
 	if (diff > 0)
@@ -215,11 +215,11 @@ void DrumCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 
 	}
 
-	iPartToChange icp = parts2change.find(curPart);
+	iPartToChange icp = parts2change.find(_curPart);
 	if (icp != parts2change.end())
 	{
-		curPart = icp->second.npart;
-		curPartId = curPart->sn();
+		_curPart = icp->second.npart;
+		_curPartId = _curPart->sn();
 	}
 
 	std::vector< CItem* > doneList;
@@ -265,9 +265,9 @@ void DrumCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 			}
 		}
 
-		if (moving.size() == 1)
+		if (_moving.size() == 1)
 		{
-			itemReleased(curItem, newpos);
+			itemReleased(_curItem, newpos);
 		}
 		if (dtype == MOVE_COPY || dtype == MOVE_CLONE)
 			selectItem(ci, false);
@@ -382,13 +382,13 @@ CItem* DrumCanvas::newItem(const QPoint& p, int state)
 	else if (state == (Qt::ControlModifier | Qt::ShiftModifier))
 		velo = drumMap[instr].lv1;
 	int tick = editor->rasterVal(p.x());
-	tick -= curPart->tick();
+	tick -= _curPart->tick();
 	Event e(Note);
 	e.setTick(tick);
 	e.setPitch(instr);
 	e.setVelo(velo);
 	e.setLenTick(drumMap[instr].len);
-	return new DEvent(e, curPart);
+	return new DEvent(e, _curPart);
 }
 
 //---------------------------------------------------------
@@ -503,7 +503,7 @@ void DrumCanvas::drawItem(QPainter&p, const CItem*item, const QRect& rect)
 
 	p.setPen(Qt::black);
 
-	if (e->part() != curPart)
+	if (e->part() != _curPart)
 	{
 		if (item->isMoving())
 			p.setBrush(Qt::gray);
@@ -630,7 +630,7 @@ void DrumCanvas::cmd(int cmd)
 		case CMD_CUT:
 			copy();
 			song->startUndo();
-			for (iCItem i = items.begin(); i != items.end(); ++i)
+			for (iCItem i = _items.begin(); i != _items.end(); ++i)
 			{
 				if (!i->second->isSelected())
 					continue;
@@ -649,7 +649,7 @@ void DrumCanvas::cmd(int cmd)
 			paste();
 			break;
 		case CMD_SELECT_ALL: // select all
-			for (iCItem k = items.begin(); k != items.end(); ++k)
+			for (iCItem k = _items.begin(); k != _items.end(); ++k)
 			{
 				if (!k->second->isSelected())
 					selectItem(k->second, true);
@@ -659,13 +659,13 @@ void DrumCanvas::cmd(int cmd)
 			deselectAll();
 			break;
 		case CMD_SELECT_INVERT: // invert selection
-			for (iCItem k = items.begin(); k != items.end(); ++k)
+			for (iCItem k = _items.begin(); k != _items.end(); ++k)
 			{
 				selectItem(k->second, !k->second->isSelected());
 			}
 			break;
 		case CMD_SELECT_ILOOP: // select inside loop
-			for (iCItem k = items.begin(); k != items.end(); ++k)
+			for (iCItem k = _items.begin(); k != _items.end(); ++k)
 			{
 				DEvent* nevent = (DEvent*) (k->second);
 				Part* part = nevent->part();
@@ -678,7 +678,7 @@ void DrumCanvas::cmd(int cmd)
 			}
 			break;
 		case CMD_SELECT_OLOOP: // select outside loop
-			for (iCItem k = items.begin(); k != items.end(); ++k)
+			for (iCItem k = _items.begin(); k != _items.end(); ++k)
 			{
 				DEvent* nevent = (DEvent*) (k->second);
 				Part* part = nevent->part();
@@ -730,7 +730,7 @@ void DrumCanvas::cmd(int cmd)
 			if (selectionSize())
 			{
 				song->startUndo();
-				for (iCItem i = items.begin(); i != items.end(); ++i)
+				for (iCItem i = _items.begin(); i != _items.end(); ++i)
 				{
 					if (!i->second->isSelected())
 						continue;
@@ -752,7 +752,7 @@ void DrumCanvas::cmd(int cmd)
 			if (!selectionSize())
 				break;
 			song->startUndo();
-			for (iCItem k = items.begin(); k != items.end(); ++k)
+			for (iCItem k = _items.begin(); k != _items.end(); ++k)
 			{
 				if (k->second->isSelected())
 				{
@@ -769,11 +769,11 @@ void DrumCanvas::cmd(int cmd)
 			break;
 		case CMD_LEFT:
 		{
-			int spos = pos[0];
+			int spos = _pos[0];
 			if (spos > 0)
 			{
 				spos -= 1; // Nudge by -1, then snap down with raster1.
-				spos = AL::sigmap.raster1(spos, editor->rasterStep(pos[0]));
+				spos = AL::sigmap.raster1(spos, editor->rasterStep(_pos[0]));
 			}
 			if (spos < 0)
 				spos = 0;
@@ -783,14 +783,14 @@ void DrumCanvas::cmd(int cmd)
 			break;
 		case CMD_RIGHT:
 		{
-			int spos = AL::sigmap.raster2(pos[0] + 1, editor->rasterStep(pos[0])); // Nudge by +1, then snap up with raster2.
+			int spos = AL::sigmap.raster2(_pos[0] + 1, editor->rasterStep(_pos[0])); // Nudge by +1, then snap up with raster2.
 			Pos p(spos, true);
 			song->setPos(0, p, true, true, true);
 		}
 			break;
 		case CMD_LEFT_NOSNAP:
 		{
-			int spos = pos[0] - editor->rasterStep(pos[0]);
+			int spos = _pos[0] - editor->rasterStep(_pos[0]);
 			if (spos < 0)
 				spos = 0;
 			Pos p(spos, true);
@@ -799,7 +799,7 @@ void DrumCanvas::cmd(int cmd)
 			break;
 		case CMD_RIGHT_NOSNAP:
 		{
-			Pos p(pos[0] + editor->rasterStep(pos[0]), true);
+			Pos p(_pos[0] + editor->rasterStep(_pos[0]), true);
 			//if (p > part->tick())
 			//      p = part->tick();
 			song->setPos(0, p, true, true, true); //CDW
@@ -816,7 +816,7 @@ void DrumCanvas::cmd(int cmd)
 			int offset = w.offsetVal();
 
 			song->startUndo();
-			for (iCItem k = items.begin(); k != items.end(); ++k)
+			for (iCItem k = _items.begin(); k != _items.end(); ++k)
 			{
 				DEvent* devent = (DEvent*) (k->second);
 				Event event = devent->event();
@@ -1295,7 +1295,7 @@ void DrumCanvas::modifySelected(NoteInfo::ValType type, int delta)
 {
 	audio->msgIdle(true);
 	song->startUndo();
-	for (iCItem i = items.begin(); i != items.end(); ++i)
+	for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		if (!(i->second->isSelected()))
 			continue;

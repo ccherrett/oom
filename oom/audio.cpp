@@ -345,7 +345,7 @@ void Audio::process(unsigned frames)
 		}
 	}
 
-	OutputList* ol = song->outputs();
+        OutputList* ol = song->outputs();
 	if (idle)
 	{
 		// deliver no audio

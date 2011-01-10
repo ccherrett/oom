@@ -68,6 +68,7 @@ class PartCanvas : public Canvas
     QLineEdit* lineEditor;
     NPart* editPart;
     int curColorIndex;
+    int trackOffset;
     bool editMode;
 
     std::vector<TrackAutomationView*> automationViews;

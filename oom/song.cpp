@@ -256,6 +256,7 @@ Track* Song::addTrack(int t)
 			abort();
 	}
 	track->setDefaultName();
+	track->setHeight(40);
 	insertTrack1(track, -1);
 	msgInsertTrack(track, -1, true);
 	insertTrack3(track, -1);
