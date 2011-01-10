@@ -559,7 +559,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	const Pos cpos = song->cPos();
 	canvas->setPos(0, cpos.tick(), true);
-	canvas->selectAtTick(cpos.tick());
+//	canvas->selectAtTick(cpos.tick());
 	//canvas->selectFirst();
 	//
 	if (canvas->track())
