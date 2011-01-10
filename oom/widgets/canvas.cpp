@@ -1351,6 +1351,27 @@ int Canvas::getCurrentDrag()
         return _drag;
 }
 
+CItemList Canvas::getItemlistForCurrentPart()
+{
+        CItemList list;
+        iCItem i;
+
+        if (!_curPart)
+        {
+                return list;
+        }
+
+        for (i = _items.end(), i--; i != _items.begin(); i--)
+        {
+                if (i->second->part() == _curPart)
+                {
+                        list.add(i->second);
+                }
+        }
+
+        return list;
+}
+
 //---------------------------------------------------------
 //   deleteItem
 //---------------------------------------------------------

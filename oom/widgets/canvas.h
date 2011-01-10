@@ -190,6 +190,9 @@ protected:
     {
     }
 
+    CItemList getItemlistForCurrentPart();
+
+
 public slots:
     void setTool(int t);
     void setPos(int, unsigned, bool adjustScrollbar);
