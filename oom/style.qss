@@ -1,6 +1,10 @@
 /*
  *    this is the OOMidi application style sheet
  */
+ QWidget#WaveView
+ {
+ 	background-color: black;
+ }
  QCanvas#ctrlCanvas
  {
  }

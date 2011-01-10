@@ -47,7 +47,7 @@ WaveView::WaveView(MidiEditor* pr, QWidget* parent, int xscale, int yscale)
 	setFocusPolicy(Qt::StrongFocus); // Tim.
 
 	setMouseTracking(true);
-	setBg(QColor(192, 208, 255));
+	setBg(QColor(0, 0, 0));
 
 	if (editor->parts()->empty())
 	{
@@ -148,6 +148,7 @@ void WaveView::pdraw(QPainter& p, const QRect& rr)
 
 				for (int k = 0; k < channels; ++k)
 				{
+				
 					int kk = k % f.channels();
 					int peak = (sa[kk].peak * (h - 1)) / yScale;
 					int rms = (sa[kk].rms * (h - 1)) / yScale;
@@ -156,21 +157,56 @@ void WaveView::pdraw(QPainter& p, const QRect& rr)
 					if (rms > h)
 						rms = h;
 					QColor peak_color = QColor(Qt::darkGray);
-					QColor rms_color = QColor(Qt::black);
-
+					QColor rms_color = QColor(0,10,15);
+				
 					// Changed by T356. Reduces (but not eliminates) drawing artifacts.
 					//if (pos > selectionStartPos && pos < selectionStopPos) {
 					if (pos > selectionStartPos && pos <= selectionStopPos)
 					{
 
 						peak_color = QColor(Qt::lightGray);
-						rms_color = QColor(Qt::white);
+						rms_color = QColor(214,214,214);
 						// Draw inverted
-						p.setPen(QColor(Qt::black));
+						p.setPen(QColor(0,10,15));
 						p.drawLine(i, y - h + cc, i, y + h - cc);
 					}
-					p.setPen(peak_color);
-					p.drawLine(i, y - peak - cc, i, y + peak);
+					else
+					{
+						p.setPen(QColor(203,211,212));
+						p.drawLine(i, y - h + cc, i, y + h - cc);
+					}
+					//p.drawLine(i, y - peak - cc, i, y + peak);
+					QColor green = QColor(49, 175, 197);
+					QColor yellow = QColor(127,12,128);
+					QColor red = QColor(197, 49, 87);
+					if(k == 0)
+					{
+						QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, h*2));
+						vuGrad.setColorAt(1, red);
+						vuGrad.setColorAt(0.75, yellow);
+						vuGrad.setColorAt(0.5, green);
+						vuGrad.setColorAt(0.25, yellow);
+						vuGrad.setColorAt(0, red);
+						QPen myPen = QPen();
+						myPen.setBrush(QBrush(vuGrad));
+						p.setPen(myPen);
+						p.drawLine(i, y - peak - cc, i, y + peak);
+					}
+					else
+					{
+						//QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, hh*2));
+						QLinearGradient vuGrad(QPointF(0, h*2), QPointF(0, hh));
+						vuGrad.setColorAt(1, red);
+						vuGrad.setColorAt(0.75, yellow);
+						vuGrad.setColorAt(0.5, green);
+						vuGrad.setColorAt(0.25, yellow);
+						vuGrad.setColorAt(0, red);
+						QPen myPen = QPen();
+						myPen.setBrush(QBrush(vuGrad));
+						p.setPen(myPen);
+						p.drawLine(i, y - peak - cc, i, y + peak);
+					}
+					
 					p.setPen(rms_color);
 					p.drawLine(i, y - rms - cc, i, y + rms);
 					y += 2 * h;
@@ -198,12 +234,12 @@ void WaveView::draw(QPainter& p, const QRect& r)
 	//
 	//    draw marker & centerline
 	//
-	p.setPen(Qt::red);
+	p.setPen(QColor(0,186,255));
 	if (pos[0] >= x && pos[0] < x2)
 	{
 		p.drawLine(pos[0], y, pos[0], y2);
 	}
-	p.setPen(Qt::blue);
+	p.setPen(QColor(139,255,69));
 	if (pos[1] >= x && pos[1] < x2)
 	{
 		p.drawLine(pos[1], y, pos[1], y2);
@@ -223,8 +259,18 @@ void WaveView::draw(QPainter& p, const QRect& r)
 	{
 		int h2 = hn * i;
 		int center = hh + h2;
-		p.setPen(QColor(i & i ? Qt::red : Qt::blue));
-		p.drawLine(x, center, x2, center);
+		if(i == 0)
+		{
+			//blue middle marker
+			p.setPen(QColor(102,177,205));
+			p.drawLine(x, center-1, x2, center-1);
+		}
+		else
+		{
+			//red middle marker
+			p.setPen(QColor(213,93,93));
+			p.drawLine(x, center-3, x2, center-3);
+		}
 		p.setPen(QColor(Qt::black));
 		p.drawLine(x, h2, x2, h2);
 	}

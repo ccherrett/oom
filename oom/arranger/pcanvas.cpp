@@ -137,6 +137,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	// Defaults:
 	lineEditor = 0;
 	editMode = false;
+	trackOffset = 0;
 
 	tracks = song->tracks();
 	setMouseTracking(true);
@@ -1616,6 +1617,7 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	MidiPart* mp = 0;
 	WavePart* wp = 0;
 	Track::TrackType type = part->track()->type();
+	trackOffset += part->track()->height();
 	if (type == Track::WAVE)
 	{
 		wp = (WavePart*) part;
@@ -1768,14 +1770,17 @@ void PartCanvas::drawWavePart(QPainter& p,
 	int x2 = 1;
 	int x1 = rr.x() > pr.x() ? rr.x() : pr.x();
 	x2 += rr.right() < pr.right() ? rr.right() : pr.right();
-
+	printf("x1 = %d, x2 = %d\n", x1, x2);
 	if (x1 < 0)
 		x1 = 0;
 	if (x2 > width())
 		x2 = width();
 	int hh = pr.height();
+	//if((hh / 2) != 0)
+	//	hh = hh +1;
 	int h = hh / 2;
 	int y = pr.y() + h;
+	int myheight = hh;
 
 	EventList* el = wp->events();
 	for (iEvent e = el->begin(); e != el->end(); ++e)
@@ -1822,6 +1827,12 @@ void PartCanvas::drawWavePart(QPainter& p,
 
 			for (; i < ex; i++)
 			{
+				int hm = hh / 2;
+				//if(channels == 1)
+				//{
+					//printf("one channel found: %d\n", channels);
+				//	hm = h;
+				//}	
 				SampleV sa[channels];
 				xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
 				f.read(sa, xScale, pos);
@@ -1838,10 +1849,24 @@ void PartCanvas::drawWavePart(QPainter& p,
 				rms /= channels;
 				peak = (peak * (hh - 2)) >> 9;
 				rms = (rms * (hh - 2)) >> 9;
-				p.setPen(QColor(Qt::darkGray));
+				
+				QColor green = QColor(49, 175, 197);
+				QColor yellow = QColor(127,12,128);
+				QColor red = QColor(197, 49, 87);
+				QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+				vuGrad.setColorAt(1, red);
+				vuGrad.setColorAt(0.75, yellow);
+				vuGrad.setColorAt(0.5, green);
+				vuGrad.setColorAt(0.25, yellow);
+				vuGrad.setColorAt(0, red);
+				QPen myPen = QPen();
+				myPen.setBrush(QBrush(vuGrad));
+				p.setPen(myPen);
+				
 				p.drawLine(i, y - peak - cc, i, y + peak);
-				p.setPen(QColor(Qt::black));
+				p.setPen(QColor(0,10,15));
 				p.drawLine(i, y - rms - cc, i, y + rms);
+				myheight += pr.height();
 			}
 		}
 		else
@@ -1851,6 +1876,8 @@ void PartCanvas::drawWavePart(QPainter& p,
 			//
 			int hm = hh / (channels * 2);
 			int cc = hh % (channels * 2) ? 0 : 1;
+			printf("channels = %d, pr = %d, h = %d, hh = %d, hm = %d\n", channels, pr.height(), h, hh, hm);
+			printf("canvas height: %d\n", height());
 			for (; i < ex; i++)
 			{
 				y = pr.y() + hm;
@@ -1863,13 +1890,47 @@ void PartCanvas::drawWavePart(QPainter& p,
 				{
 					int peak = (sa[k].peak * (hm - 1)) >> 8;
 					int rms = (sa[k].rms * (hm - 1)) >> 8;
-					p.setPen(QColor(Qt::darkGray));
-					p.drawLine(i, y - peak - cc, i, y + peak);
+					QColor green = QColor(49, 175, 197);
+					QColor yellow = QColor(127,12,128);
+					QColor red = QColor(197, 49, 87);
+					if(k == 0)
+					{
+						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
+						vuGrad.setColorAt(1, red);
+						vuGrad.setColorAt(0.75, yellow);
+						vuGrad.setColorAt(0.5, green);
+						vuGrad.setColorAt(0.25, yellow);
+						vuGrad.setColorAt(0, red);
+						QPen myPen = QPen();
+						myPen.setBrush(QBrush(vuGrad));
+						p.setPen(myPen);
+						//p.setPen(QColor(Qt::darkGray));
+						p.drawLine(i, y - peak - cc, i, y + peak);
+						p.drawLine(0, pr.height(), 3000, pr.height());
+					}
+					else
+					{
+						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
+						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+						vuGrad.setColorAt(1, red);
+						vuGrad.setColorAt(0.75, yellow);
+						vuGrad.setColorAt(0.5, green);
+						vuGrad.setColorAt(0.25, yellow);
+						vuGrad.setColorAt(0, red);
+						QPen myPen = QPen();
+						myPen.setBrush(QBrush(vuGrad));
+						p.setPen(myPen);
+						//p.setPen(QColor(Qt::darkGray));
+						p.drawLine(i, y - peak - cc, i, y + peak);
+						
+					}
 					p.setPen(QColor(Qt::black));
 					p.drawLine(i, y - rms - cc, i, y + rms);
 
 					y += 2 * hm;
 				}
+				myheight += pr.height();
 			}
 		}
 	}

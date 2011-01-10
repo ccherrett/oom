@@ -1365,6 +1365,8 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 					startY = curY;
 					if (h < MIN_TRACKHEIGHT)
 						h = MIN_TRACKHEIGHT;
+					//if((h / 2) != 0)
+					//	h = h +1;
 					t->setHeight(h);
 					song->update(SC_TRACK_MODIFIED);
 				}
