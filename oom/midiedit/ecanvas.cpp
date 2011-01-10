@@ -234,13 +234,15 @@ void EventCanvas::songChanged(int flags)
 
 void EventCanvas::selectAtTick(unsigned int tick)
 {
-	//Select note nearest tick, if none selected and there are any
-        if (!_items.empty() && selectionSize() == 0)
+        CItemList list = getItemlistForCurrentPart();
+
+        //Select note nearest tick, if none selected and there are any
+        if (!list.empty() && selectionSize() == 0)
 	{
-                iCItem i = _items.begin();
+                iCItem i = list.begin();
 		CItem* nearest = i->second;
 
-                while (i != _items.end())
+                while (i != list.end())
 		{
 			CItem* cur = i->second;
 			unsigned int curtk = abs(cur->x() + cur->part()->tick() - tick);
@@ -254,7 +256,7 @@ void EventCanvas::selectAtTick(unsigned int tick)
 			i++;
 		}
 
-		if (!nearest->isSelected())
+                if (!nearest->isSelected())
 		{
 			selectItem(nearest, true);
 			songChanged(SC_SELECTION);
