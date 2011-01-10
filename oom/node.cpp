@@ -74,6 +74,22 @@ void MidiTrack::setSolo(bool val)
 
 void AudioTrack::setSolo(bool val)
 {
+	if (_solo != val)
+	{
+		_solo = val;
+		updateSoloStates(false);
+	}
+
+	if (isMute())
+		resetMeter();
+}
+
+//---------------------------------------------------------
+//   setInternalSolo
+//---------------------------------------------------------
+
+void Track::setInternalSolo(unsigned int val)
+{
         AudioInput* inputTrack = dynamic_cast<AudioInput*>(this);
         if (inputTrack) {
                 printf("don't setsolo on an audioinput\n");
@@ -96,23 +112,7 @@ void AudioTrack::setSolo(bool val)
                 return;
         }
 
-	if (_solo != val)
-	{
-		_solo = val;
-		updateSoloStates(false);
-	}
-
-	if (isMute())
-		resetMeter();
-}
-
-//---------------------------------------------------------
-//   setInternalSolo
-//---------------------------------------------------------
-
-void Track::setInternalSolo(unsigned int val)
-{
-	_internalSolo = val;
+        _internalSolo = val;
 }
 
 //---------------------------------------------------------
