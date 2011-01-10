@@ -802,7 +802,7 @@ public:
 
     virtual bool isMute() const
     {
-            return false;
+            return _mute;
     }
 
 };
@@ -839,7 +839,7 @@ public:
 
     virtual bool isMute() const
     {
-            return false;
+            return _mute;
     }
 
 };
@@ -878,7 +878,7 @@ public:
 
     virtual bool isMute() const
     {
-            return false;
+            return _mute;
     }
 
 };
