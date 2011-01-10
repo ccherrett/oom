@@ -48,7 +48,7 @@ bool MidiTrack::isMute() const
 	return _mute;
 }
 
-bool AudioTrack::isMute()
+bool AudioTrack::isMute() const
 {
 //        AudioInput* inputTrack = dynamic_cast<AudioInput*>(this);
 //        if (inputTrack) {
