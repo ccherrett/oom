@@ -167,6 +167,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="btnEdit">
+       <property name="text">
+        <string>Edit</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
