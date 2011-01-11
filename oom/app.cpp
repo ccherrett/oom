@@ -59,6 +59,8 @@
 #include "vst.h"
 #endif
 
+#include "traverso_shared/TConfig.h"
+
 //extern void cacheJackRouteNames();
 
 static pthread_t watchdogThread;
@@ -771,6 +773,10 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 
 OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 {
+
+        // Very first thing we should do is loading global configuration values
+        tconfig().check_and_load_configuration();
+
 	// By T356. For LADSPA plugins in plugin.cpp
 	// QWidgetFactory::addWidgetFactory( new PluginWidgetFactory ); ddskrjo
 
@@ -1589,6 +1595,9 @@ OOMidi::~OOMidi()
 	//printf("OOMidi::~OOMidi\n");
 	//if(transport)
 	//  delete transport;
+
+        // Save the new global settings to the configuration file
+        tconfig().save();
 }
 
 //---------------------------------------------------------
