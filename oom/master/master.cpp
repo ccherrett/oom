@@ -185,19 +185,22 @@ void Master::pdraw(QPainter& p, const QRect& rect)
 	int xp = mapx(pos[0]);
 	if (xp >= x && xp < x + w)
 	{
-		p.setPen(Qt::red);
+		p.setPen(QColor(0, 186, 255));
+		//p.setPen(Qt::red);
 		p.drawLine(xp, y, xp, y + h);
 	}
 	xp = mapx(pos[1]);
 	if (xp >= x && xp < x + w)
 	{
-		p.setPen(Qt::blue);
+		p.setPen(QColor(139, 225, 69));
+		//p.setPen(Qt::blue);
 		p.drawLine(xp, y, xp, y + h);
 	}
 	xp = mapx(pos[2]);
 	if (xp >= x && xp < x + w)
 	{
-		p.setPen(Qt::blue);
+		p.setPen(QColor(139, 225, 69));
+		//p.setPen(Qt::blue);
 		p.drawLine(xp, y, xp, y + h);
 	}
 }

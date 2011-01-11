@@ -140,11 +140,13 @@ void SigScale::pdraw(QPainter& p, const QRect& r)
 	//    draw location marker
 	//---------------------------------------------------
 
-	p.setPen(Qt::red);
+	//p.setPen(Qt::red);
+	p.setPen(QColor(0, 186, 255));
 	int xp = mapx(pos[0]);
 	if (xp >= x && xp < x + w)
 		p.drawLine(xp, 0, xp, h);
-	p.setPen(Qt::blue);
+	//p.setPen(Qt::blue);
+	p.setPen(QColor(139, 225, 69));
 	xp = mapx(pos[1]);
 	if (xp >= x && xp < x + w)
 		p.drawLine(xp, 0, xp, h);
