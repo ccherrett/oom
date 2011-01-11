@@ -55,7 +55,6 @@ void TConfig::reset_settings( )
 
 	settings.clear();
 
-        settings.setValue("Project/directory", QDir::homePath());
         settings.setValue("ProgramVersion", 2);
 	settings.setValue("ConfigFileVersion", CONFIG_FILE_VERSION);
 	
