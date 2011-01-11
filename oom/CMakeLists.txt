@@ -64,6 +64,7 @@ QT4_WRAP_CPP ( oom_moc_headers
       transport.h 
       transpose.h 
       value.h 
+      traverso_shared/TConfig.h
       )
 
 ##
@@ -134,6 +135,7 @@ file (GLOB core_source_files
       waveevent.cpp 
       wavetrack.cpp 
       xml.cpp
+      traverso_shared/TConfig.cpp
       )
 file (GLOB main_source_files
       main.cpp
