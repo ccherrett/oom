@@ -34,6 +34,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	GroupList _groups;      // mixer groups
 	AuxList _auxs;          // aux sends
 	SynthIList _synthIs;
+	bool _editing;
 
 	QStringList _trackTypes;
 	QPushButton* btnAdd;

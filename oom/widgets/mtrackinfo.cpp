@@ -2024,3 +2024,8 @@ void MidiTrackInfo::updateSize()
 {
 	tableView->resizeRowsToContents();
 }
+
+void MidiTrackInfo::showEvent(QShowEvent* /*evt*/)
+{
+	tableView->resizeRowsToContents();
+}

@@ -30,6 +30,7 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
     QList<int>* _matrix;
     ProgramChangeTableModel* _tableModel;
     bool editing;
+    virtual void showEvent(QShowEvent *);
 
 private slots:
     void iOutputChannelChanged(int);
