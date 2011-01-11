@@ -51,6 +51,8 @@
 
 #include "mtrackinfo.h"
 
+#include "traverso_shared/TConfig.h"
+
 int PianoRoll::_quantInit = 96;
 int PianoRoll::_rasterInit = 96;
 int PianoRoll::_widthInit = 600;
@@ -75,7 +77,11 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 : MidiEditor(_quantInit, _rasterInit, pl, parent, name)
 {
 	deltaMode = false;
-	resize(_widthInit, _heightInit);
+        // Set size stored in global config, or use defaults.
+        int w = tconfig().get_property("PianoRollEdit", "widgetwidth", 800).toInt();
+        int h = tconfig().get_property("PianoRollEdit", "widgetheigth", 650).toInt();
+        resize(w, h);
+
 	selPart = 0;
 	quantConfig = 0;
 	_playEvents = false;
@@ -678,6 +684,9 @@ void PianoRoll::setTime(unsigned tick)
 PianoRoll::~PianoRoll()
 {
 	// undoRedo->removeFrom(tools);  // p4.0.6 Removed
+        // store widget size to global config
+        tconfig().set_property("PianoRollEdit", "widgetwidth", width());
+        tconfig().set_property("PianoRollEdit", "widgetheigth", height());
 }
 
 //---------------------------------------------------------
