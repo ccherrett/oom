@@ -129,11 +129,11 @@
         </controller>
       </AudioOutput>
     <Route channel="0">
-      <source name="Out 1"/>
+      <source name="Master"/>
       <dest type="1" name="system:playback_1"/>
       </Route>
     <Route channel="1">
-      <source name="Out 1"/>
+      <source name="Master"/>
       <dest type="1" name="system:playback_2"/>
       </Route>
     <tempolist fix="500000">
