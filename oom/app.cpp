@@ -3216,6 +3216,11 @@ void OOMidi::startPianoroll(PartList* pl, bool showDefaultCtrls)
 
 	PianoRoll* pianoroll = new PianoRoll(pl, this, 0, arranger->cursorValue());
 	pianoroll->show();
+
+        // Be able to open the List Editor from the Piano Roll
+        // with the application global shortcut to open the L.E.
+        pianoroll->addAction(startListEditAction);
+
 	if (showDefaultCtrls) // p4.0.12
 	{
 		CtrlEdit* mainVol = pianoroll->addCtrl();
