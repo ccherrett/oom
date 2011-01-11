@@ -11,6 +11,7 @@
 
 #include "ui_trackvieweditorbase.h"
 #include <QList>
+#include <QStringList>
 #include <QObject>
 #include "trackview.h"
 #include "track.h"
@@ -37,12 +38,19 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	QStringList _trackTypes;
 	QPushButton* btnAdd;
 	QPushButton* btnRemove;
+	QPushButton* btnOk;
+	QPushButton* btnCancel;
+	QPushButton* btnApply;
 
 	private slots:
-		void cmbViewSelected(QString&);
+		void cmbViewSelected(int);
 		void cmbTypeSelected(int);
 		void btnAddTrack(bool);
 		void btnRemoveTrack(bool);
+		void btnNewClicked(bool);
+		void btnOkClicked(bool);
+		void btnApplyClicked(bool);
+		void btnCancelClicked(bool);
 
 	public:
 		TrackViewEditor(QWidget*, TrackViewList* = 0);
@@ -61,6 +69,9 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 		GroupList* groups()         { return &_groups;  }
 		AuxList* auxs()             { return &_auxs;    }
 		SynthIList* syntis()        { return &_synthIs; }
+
+	private:
+		QStringList buildViewList();
 };
 
 #endif

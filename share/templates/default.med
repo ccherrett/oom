@@ -106,7 +106,7 @@
     <len>0</len>
     <follow>1</follow>
     <AudioOutput>
-      <name>Out 1</name>
+      <name>Master</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>

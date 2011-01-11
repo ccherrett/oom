@@ -244,7 +244,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 
 	QWidget* tracklist = new QWidget(split);
 
-	split->setStretchFactor(split->indexOf(tracklist), 0);
+	split->setStretchFactor(split->indexOf(tracklist), 1);
 	//tracklist->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding, 0, 100));
 	QSizePolicy tpolicy = QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 	tpolicy.setHorizontalStretch(0);
@@ -999,12 +999,12 @@ void Arranger::genTrackInfo(QWidget* parent)
 	const QPixmap *logo = new QPixmap(*oomLeftSideLogo);
 	noInfoPix->fill(noTrackInfo->palette().color(QPalette::Window));
 	QPainter p(noInfoPix);
-	p.drawPixmap(10, 0, *logo, 0, 0, logo->width(), logo->height());
+	p.drawPixmap(0, 0, *logo, 0, 0, logo->width(), logo->height());
 
 	QPalette palette;
 	palette.setBrush(noTrackInfo->backgroundRole(), QBrush(*noInfoPix));
 	noTrackInfo->setPalette(palette);
-	noTrackInfo->setGeometry(0, 0, 65, 200);
+	noTrackInfo->setGeometry(0, 0, 119, 200);
 	noTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
 
 	midiTrackInfo = new MidiTrackInfo(trackInfo);

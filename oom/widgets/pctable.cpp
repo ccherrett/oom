@@ -90,6 +90,7 @@ void ProgramChangeTable::dragMoveEvent(QDragMoveEvent* evt)
 	m->emit_layoutChanged();
 }
 
+/*
 void ProgramChangeTable::paintEvent(QPaintEvent* event)
 {
 	QTableView::paintEvent(event);
@@ -108,6 +109,7 @@ void ProgramChangeTable::paintEvent(QPaintEvent* event)
 	painter.drawLine(0, b, width() - 40, b);
 	event->accept();
 }
+*/
 
 QList<int> ProgramChangeTable::getSelectedRows()
 {

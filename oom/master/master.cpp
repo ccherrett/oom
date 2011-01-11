@@ -162,7 +162,19 @@ void Master::pdraw(QPainter& p, const QRect& rect)
 			tempo = 0;
 		if (tempo < wh)
 		{
-			p.fillRect(stick, tempo, etick - stick, wh, Qt::blue);
+			QColor green = QColor(119, 169, 181, 127);
+			QColor yellow = QColor(41, 130, 140);
+			QColor red = QColor(0, 37, 46, 127);
+			QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, height()));
+			vuGrad.setColorAt(1, green);
+			//vuGrad.setColorAt(0.45, yellow);
+			//vuGrad.setColorAt(0.3, yellow);
+			vuGrad.setColorAt(0, red);
+			QPen myPen = QPen();
+			//myPen.setCapStyle(Qt::RoundCap);
+			//myPen.setStyle(Qt::DashLine);
+			myPen.setBrush(QBrush(vuGrad));
+			p.fillRect(stick, tempo, etick - stick, wh, QBrush(vuGrad));
 		}
 	}
 

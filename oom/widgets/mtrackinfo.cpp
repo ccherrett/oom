@@ -1160,7 +1160,8 @@ void MidiTrackInfo::instrPopup()
 			rowData.append(patch);
 
 			_tableModel->insertRow(0, rowData);
-			//	tableView->resizeRowToContents(0);
+			tableView->setRowHeight(0, 50);
+			tableView->resizeRowsToContents();
 			//	tableView->selectRow(0);
 			//	_matrix->append(0);
 			updateTrackInfo(-1);
@@ -1831,6 +1832,7 @@ void MidiTrackInfo::populateMatrix()
 				rowData.append(patch);
 				_tableModel->blockSignals(true);
 				_tableModel->insertRow(_tableModel->rowCount(), rowData);
+				tableView->setRowHeight(_tableModel->rowCount(), 50);
 				_tableModel->blockSignals(false);
 				_tableModel->emit_layoutChanged();
 			}
@@ -1838,6 +1840,7 @@ void MidiTrackInfo::populateMatrix()
 		}
 	}
 	//rebuildMatrix();
+	tableView->resizeRowsToContents();
 	updateTableHeader();
 }
 
@@ -1899,6 +1902,7 @@ void MidiTrackInfo::movePatchDown(bool)
 		QStandardItem* txt = item.at(2);
 		txt->setEditable(false);
 		_tableModel->insertRow(row, item);
+		tableView->setRowHeight(row, 50);
 		tableView->resizeRowsToContents();
 		tableView->setColumnWidth(1, 20);
 		tableView->setColumnWidth(0, 1);
@@ -1919,6 +1923,7 @@ void MidiTrackInfo::movePatchUp(bool)
 		QStandardItem* txt = item.at(2);
 		txt->setEditable(false);
 		_tableModel->insertRow(row, item);
+		tableView->setRowHeight(row, 50);
 		tableView->resizeRowsToContents();
 		tableView->setColumnWidth(1, 20);
 		tableView->setColumnWidth(0, 1);

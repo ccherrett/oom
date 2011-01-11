@@ -45,34 +45,91 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 	{
 		stracks << (*t)->name();
 	}
+	cmbViews->addItems(buildViewList());
+	listAllTracks->setModel(new QStringListModel(stracks));
+	
+	btnOk = buttonBox->button(QDialogButtonBox::Ok);
+	btnCancel = buttonBox->button(QDialogButtonBox::Cancel);
+	btnApply = buttonBox->button(QDialogButtonBox::Apply);
+	btnApply->setEnabled(false);
+	btnEdit->setEnabled(false);
+
+	btnAdd = actionBox->button(QDialogButtonBox::Yes);
+	btnAdd->setText(tr("Add Track"));
+
+	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddTrack(bool)));
+	
+	btnRemove = actionBox->button(QDialogButtonBox::No);
+	btnRemove->setText(tr("Remove Track"));
+	btnRemove->setFocusPolicy(btnAdd->focusPolicy());
+	
+	txtName->setReadOnly(true);
+	connect(btnRemove, SIGNAL(clicked(bool)), SLOT(btnRemoveTrack(bool)));
+	connect(btnNew, SIGNAL(clicked(bool)), SLOT(btnNewClicked(bool)));
+
+	connect(cmbViews, SIGNAL(currentIndexChanged(int)), SLOT(cmbViewSelected(int)));
+	connect(cmbType, SIGNAL(currentIndexChanged(int)), SLOT(cmbTypeSelected(int)));
+	connect(btnOk, SIGNAL(clicked(bool)), SLOT(btnOkClicked(bool)));
+	connect(btnApply, SIGNAL(clicked(bool)), SLOT(btnApplyClicked(bool)));
+	connect(btnCancel, SIGNAL(clicked(bool)), SLOT(btnCancelClicked(bool)));
+}
+
+
+QStringList TrackViewEditor::buildViewList()
+{
 	QStringList tv;
 	tv.append(tr("Select Track View"));
 	for(ciTrackView ci = song->trackviews()->begin(); ci != song->trackviews()->end(); ++ci)
 	{
 		tv.append((*ci)->viewName());
 	}
-	cmbViews->addItems(tv);
-	listAllTracks->setModel(new QStringListModel(stracks));
-	btnAdd = actionBox->button(QDialogButtonBox::Yes);
-	btnAdd->setText(tr("Add Track"));
-	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddTrack(bool)));
-	btnRemove = actionBox->button(QDialogButtonBox::No);
-	btnRemove->setText(tr("Remove Track"));
-	btnRemove->setFocusPolicy(btnAdd->focusPolicy());
-	connect(btnRemove, SIGNAL(clicked(bool)), SLOT(btnRemoveTrack(bool)));
-
-	connect(cmbViews, SIGNAL(currentIndexChanged(QString&)), SLOT(cmbViewSelected(QString&)));
-	connect(cmbType, SIGNAL(currentIndexChanged(int)), SLOT(cmbTypeSelected(int)));
+	return tv;
 }
-
 
 //----------------------------------------------
 // Slots
 //----------------------------------------------
 
-void TrackViewEditor::cmbViewSelected(QString& sl)
+void TrackViewEditor::btnNewClicked(bool)
 {
+	_selected = 0;
+	//Reset cmbViews
+	cmbViews->blockSignals(true);
+	cmbViews->setCurrentIndex(0);
+	cmbViews->blockSignals(true);
+	//Reset listSelectedTracks
+	QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
+	if(model)
+	{
+		model->removeRows(0, model->rowCount());
+	}
+	//Clear txtName, set value to Untitled
+	txtName->setText(tr("Untitled"));
+	txtName->setFocus(Qt::OtherFocusReason);
+	txtName->setReadOnly(false);
+	btnApply->setEnabled(true);
+}
+
+void TrackViewEditor::cmbViewSelected(int ind)
+{
+	if(ind == 0)
+	{
+		//Clear listSelectedTracks
+		QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
+		if(model)
+		{
+			model->removeRows(0, model->rowCount());
+		}
+		//Clear txtName
+		txtName->setText("");
+		//Disable btnEdit
+		btnEdit->setEnabled(false);
+		return;
+	}
+	btnEdit->setEnabled(false);
 	//Perform actions to populate list below based on selected view
+	QString sl = cmbViews->itemText(ind);
+	btnApply->setEnabled(false);
 	TrackView* v = song->findTrackView(sl);
 	if(v)
 	{
@@ -182,11 +239,31 @@ void TrackViewEditor::cmbTypeSelected(int type)
 	listAllTracks->setModel(new QStringListModel(stracks));
 }
 
-void TrackViewEditor::btnAddTrack(bool state)
+void TrackViewEditor::btnApplyClicked(bool/* state*/)
+{
+	printf("TrackViewEditor::btnApplyClicked()\n");
+}
+
+void TrackViewEditor::btnOkClicked(bool/* state*/)
+{
+	printf("TrackViewEditor::btnOkClicked()\n");
+}
+
+void TrackViewEditor::btnCancelClicked(bool/* state*/)
+{
+	printf("TrackViewEditor::btnCancelClicked()\n");
+}
+
+void TrackViewEditor::btnAddTrack(bool/* state*/)
 {
 	//Perform actions to add action to right list and remove from left
 	printf("Add button clicked\n");
+	if(_selected)
+		btnApply->setEnabled(true);
 	QItemSelectionModel* model = listAllTracks->selectionModel();
+	QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
+	QStringListModel* lat = (QStringListModel*)listAllTracks->model(); 
+	QList<int> del;
 	if (model->hasSelection())
 	{
 		QModelIndexList sel = model->selectedRows(0);
@@ -201,13 +278,30 @@ void TrackViewEditor::btnAddTrack(bool state)
 			QString val = v.toString();
 			Track* trk = song->findTrack(val);
 			if (trk)
+			{
+				QStringList slist  = lst->stringList();
+				slist.append(val);
+				lst->setStringList(slist);
 				printf("Adding Track from row: %d\n", row);
+				del.append(row);
+			}
 			//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
+		}
+		//Delete the list in reverse order so the listview maintains the propper state
+		if(!del.isEmpty())
+		{
+			QListIterator<int> it(del); 
+			it.toBack();
+			while(it.hasPrevious())
+			{
+				lat->removeRow(it.previous());
+			}
+
 		}
 	}
 }
 
-void TrackViewEditor::btnRemoveTrack(bool state)
+void TrackViewEditor::btnRemoveTrack(bool/* state*/)
 {
 	//Perform action to remove track from the selectedTracks list
 	printf("Remove button clicked\n");

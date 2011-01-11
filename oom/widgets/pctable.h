@@ -20,7 +20,7 @@ class ProgramChangeTable : public QTableView
     Q_OBJECT
     virtual void dragEnterEvent(QDragEnterEvent*);
     virtual void dragMoveEvent(QDragMoveEvent*);
-    virtual void paintEvent(QPaintEvent*);
+    //virtual void paintEvent(QPaintEvent*);
     QRect dropSite;
 
 signals:
