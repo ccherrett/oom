@@ -30,6 +30,8 @@
 #include "midiport.h"
 #include "midictrl.h"
 
+#include "traverso_shared/TConfig.h"
+
 //---------------------------------------------------------
 //   EventListItem
 //---------------------------------------------------------
@@ -576,6 +578,11 @@ ListEdit::ListEdit(PartList* pl)
 	}
 
 	initShortcuts();
+
+        // Set size stored in global config, or use defaults.
+        int w = tconfig().get_property("ListEdit", "widgetwidth", 700).toInt();
+        int h = tconfig().get_property("ListEdit", "widgetheigth", 650).toInt();
+        resize(w, h);
 }
 
 //---------------------------------------------------------
@@ -585,6 +592,8 @@ ListEdit::ListEdit(PartList* pl)
 ListEdit::~ListEdit()
 {
 	// undoRedo->removeFrom(listTools);  // p4.0.6 Removed
+        tconfig().set_property("ListEdit", "widgetwidth", width());
+        tconfig().set_property("ListEdit", "widgetheigth", height());
 }
 
 //---------------------------------------------------------
