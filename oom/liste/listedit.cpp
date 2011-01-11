@@ -579,8 +579,7 @@ ListEdit::ListEdit(PartList* pl)
 
 	initShortcuts();
 
-        // Set default size
-        // TODO: get from config() !!
+        // Set size stored in global config, or use defaults.
         int w = tconfig().get_property("ListEdit", "widgetwidth", 700).toInt();
         int h = tconfig().get_property("ListEdit", "widgetheigth", 650).toInt();
         resize(w, h);
