@@ -33,7 +33,7 @@ Master::Master(MidiEditor* e, QWidget* parent, int xmag, int ymag)
 : View(parent, xmag, ymag)
 {
 	editor = e;
-	setBg(Qt::white);
+	setBg(QColor(195,198,196));
 	vscroll = 0;
 	pos[0] = 0;
 	pos[1] = 0;
