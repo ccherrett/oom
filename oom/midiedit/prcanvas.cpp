@@ -1075,13 +1075,20 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 		case CMD_ITERATIVE_QUANTIZE: // Iterative Quantize
 			quantize(quantStrength, quantLimit, quantLen);
 			break;
-		case CMD_SELECT_ALL: // select all
-                        for (iCItem k = _items.begin(); k != _items.end(); ++k)
-			{
-				if (!k->second->isSelected())
-					selectItem(k->second, true);
-			}
-			break;
+                case CMD_SELECT_ALL: // select all
+                        {
+                                // get a list of items that belong to the current part
+                                // since (if) multiple parts have populated the _items list
+                                // we need to filter on the actual current Part!
+                                CItemList list = getItemlistForCurrentPart();
+
+                                for (iCItem k = list.begin(); k != list.end(); ++k)
+                                {
+                                        if (!k->second->isSelected())
+                                                selectItem(k->second, true);
+                                }
+                        }
+                        break;
 		case CMD_SELECT_NONE: // select none
 			deselectAll();
 			break;
