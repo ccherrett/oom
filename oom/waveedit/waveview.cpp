@@ -172,8 +172,8 @@ void WaveView::pdraw(QPainter& p, const QRect& rr)
 					}
 					else
 					{
-						p.setPen(QColor(203,211,212));
-						p.drawLine(i, y - h + cc, i, y + h - cc);
+						//p.setPen(QColor(203,211,212));
+						//p.drawLine(i, y - h + cc, i, y + h - cc);
 					}
 					//p.drawLine(i, y - peak - cc, i, y + peak);
 					QColor green = QColor(49, 175, 197);
