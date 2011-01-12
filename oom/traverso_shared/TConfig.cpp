@@ -40,7 +40,7 @@ TConfig::~ TConfig( )
 
 void TConfig::load_configuration()
 {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Open Octave Midi", "oom2");
+        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "OpenOctaveMidi", "oom2");
 	
 	QStringList keys = settings.allKeys();
 	
@@ -51,7 +51,7 @@ void TConfig::load_configuration()
 
 void TConfig::reset_settings( )
 {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Open Octave Midi", "oom2");
+        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "OpenOctaveMidi", "oom2");
 
 	settings.clear();
 
@@ -78,7 +78,7 @@ void TConfig::check_and_load_configuration( )
 
 void TConfig::save( )
 {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Open Octave Midi", "oom2");
+        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "OpenOctaveMidi", "oom2");
 
 	QHash<QString, QVariant>::const_iterator i = m_configs.constBegin();
 	
