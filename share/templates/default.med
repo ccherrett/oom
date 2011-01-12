@@ -20,6 +20,52 @@
     <markerVisible>0</markerVisible>
     <geometryMain x="0" y="0" w="640" h="480"></geometryMain>
     <geometryTransport x="0" y="0" w="598" h="88"></geometryTransport>
+    <trackBg r="30" g="30" b="30"></trackBg>
+    <partCanvasBg r="90" g="90" b="90"></partCanvasBg>
+    <selectTrackBg r="18" g="25" b="28"></selectTrackBg>
+    <selectTrackFg r="71" g="202" b="225"></selectTrackFg>
+    <midiTrackBg r="118" g="104" b="125"></midiTrackBg>
+    <drumTrackBg r="118" g="104" b="125"></drumTrackBg>
+    <waveTrackBg r="58" g="79" b="84"></waveTrackBg>
+    <outputTrackBg r="133" g="36" b="36"></outputTrackBg>
+    <inputTrackBg r="99" g="137" b="97"></inputTrackBg>
+    <groupTrackBg r="123" g="131" b="133"></groupTrackBg>
+    <auxTrackBg r="83" g="87" b="137"></auxTrackBg>
+    <synthTrackBg r="125" g="73" b="32"></synthTrackBg>
+    <partColor0 r="18" g="25" b="28"></partColor0>
+    <partColor1 r="255" g="0" b="0"></partColor1>
+    <partColor2 r="0" g="255" b="0"></partColor2>
+    <partColor3 r="0" g="0" b="255"></partColor3>
+    <partColor4 r="255" g="255" b="0"></partColor4>
+    <partColor5 r="0" g="255" b="255"></partColor5>
+    <partColor6 r="255" g="0" b="255"></partColor6>
+    <partColor7 r="159" g="199" b="239"></partColor7>
+    <partColor8 r="0" g="255" b="127"></partColor8>
+    <partColor9 r="127" g="0" b="0"></partColor9>
+    <partColor10 r="0" g="127" b="0"></partColor10>
+    <partColor11 r="0" g="0" b="127"></partColor11>
+    <partColor12 r="127" g="127" b="63"></partColor12>
+    <partColor13 r="0" g="127" b="127"></partColor13>
+    <partColor14 r="127" g="0" b="127"></partColor14>
+    <partColor15 r="0" g="127" b="255"></partColor15>
+    <partColor16 r="0" g="63" b="63"></partColor16>
+    <partColorName0>Midi</partColorName0>
+    <partColorName1>Wave</partColorName1>
+    <partColorName2>Output</partColorName2>
+    <partColorName3>Group</partColorName3>
+    <partColorName4>Input</partColorName4>
+    <partColorName5>Aux</partColorName5>
+    <partColorName6>Synth</partColorName6>
+    <partColorName7>Brass</partColorName7>
+    <partColorName8>Percussion</partColorName8>
+    <partColorName9>Drums</partColorName9>
+    <partColorName10>Guitar</partColorName10>
+    <partColorName11>Bass</partColorName11>
+    <partColorName12>Flute</partColorName12>
+    <partColorName13>Strings</partColorName13>
+    <partColorName14>Keyboard</partColorName14>
+    <partColorName15>Piano</partColorName15>
+    <partColorName16>Saxophone</partColorName16>
     <mixer1Visible>0</mixer1Visible>
     <mixer2Visible>0</mixer2Visible>
     <arranger>
