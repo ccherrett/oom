@@ -1287,8 +1287,8 @@ void CtrlCanvas::setTool(int t)
 
 void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part, bool velo, bool fg)
 {
-	int x = rect.x() - 1; // compensate for 3 pixel line width
-	int w = rect.width() + 2;
+        int x = 0;//rect.x() - 1; // compensate for 3 pixel line width
+        int w = rect.width() + 2;
 	int wh = height();
 
 	if (velo)
