@@ -191,6 +191,9 @@ protected:
     }
 
     CItemList getItemlistForCurrentPart();
+    CItemList getSelectedItemsForCurrentPart();
+
+    bool allItemsAreSelected();
 
 
 public slots:

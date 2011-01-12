@@ -1379,6 +1379,38 @@ CItemList Canvas::getItemlistForCurrentPart()
         return list;
 }
 
+CItemList Canvas::getSelectedItemsForCurrentPart()
+{
+        CItemList list = getItemlistForCurrentPart();
+        CItemList selected;
+
+        iCItem i = list.begin();
+        while (i != list.end())
+        {
+                if (i->second->isSelected())
+                {
+                        selected.add(i->second);
+                }
+
+                ++i;
+        }
+
+        return selected;
+}
+
+bool Canvas::allItemsAreSelected()
+{
+        CItemList list = getItemlistForCurrentPart();
+        CItemList selected = getSelectedItemsForCurrentPart();
+
+        if (list.size() == selected.size())
+        {
+                return true;
+        }
+
+        return false;
+}
+
 //---------------------------------------------------------
 //   deleteItem
 //---------------------------------------------------------

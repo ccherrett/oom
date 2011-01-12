@@ -325,6 +325,13 @@ void EventCanvas::keyPress(QKeyEvent* event)
 		// Select items by key (PianoRoll & DrumEditor)
 	else if (key == shortcuts[SHRT_SEL_RIGHT].key || key == shortcuts[SHRT_SEL_RIGHT_ADD].key)
 	{
+                if (key == shortcuts[SHRT_SEL_RIGHT].key && allItemsAreSelected())
+                {
+                        deselectAll();
+                        selectAtTick(song->cpos());
+                        return;
+                }
+
 		iCItem i, iRightmost;
 		CItem* rightmost = NULL;
 
@@ -367,6 +374,13 @@ void EventCanvas::keyPress(QKeyEvent* event)
 		//Select items by key: (PianoRoll & DrumEditor)
 	else if (key == shortcuts[SHRT_SEL_LEFT].key || key == shortcuts[SHRT_SEL_LEFT_ADD].key)
 	{
+                if (key == shortcuts[SHRT_SEL_LEFT].key && allItemsAreSelected())
+                {
+                        deselectAll();
+                        selectAtTick(song->cpos());
+                        return;
+                }
+
 		iCItem i, iLeftmost;
                 CItem* leftmost = NULL;
 
@@ -400,7 +414,6 @@ void EventCanvas::keyPress(QKeyEvent* event)
                                         iLeftmost->second->setSelected(true);
                                         updateSelection();
                                 } else {
-                                        printf("first item in list, selecting it now, here and now!! So why doesn't it get selected????\n");
                                         leftmost->setSelected(true);
                                         updateSelection();
                                 }
