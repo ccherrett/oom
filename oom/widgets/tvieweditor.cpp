@@ -35,7 +35,8 @@
 TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(parent)
 {
 	setupUi(this);
-	//MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP,AUDIO_AUX
+	_selected = 0;
+//MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP,AUDIO_AUX
 	_trackTypes = (QStringList() << "Audio_Out" << "Audio_In" << "Audio_Aux" << "Audio_Group" << "Midi" << "Soft_Synth" << "Wave"); //new QStringList();
 	_editing = false;
 	//Populate trackTypes and pass it to cmbTypes 
@@ -137,6 +138,7 @@ void TrackViewEditor::cmbViewSelected(int ind)
 	_editing = true;
 	if(v)
 	{
+		_selected = v;
 		TrackList* l = v->tracks();
 		if(l)
 		{
@@ -351,7 +353,7 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)
 	}/*}}}*/
 }
 
-void TrackViewEditor::setSelectedTracks(TrackList* t)
+void TrackViewEditor::setSelected(TrackView* t)
 {
 	_selected = t;
 	//Call methods to update the display

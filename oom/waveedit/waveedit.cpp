@@ -245,7 +245,7 @@ WaveEdit::WaveEdit(PartList* pl)
 
 void WaveEdit::configChanged()
 {
-	view->setBg(config.waveEditBackgroundColor);
+	//view->setBg(config.waveEditBackgroundColor);
 	selectAllAction->setShortcut(shortcuts[SHRT_SELECT_ALL].key);
 	selectNoneAction->setShortcut(shortcuts[SHRT_SELECT_NONE].key);
 }

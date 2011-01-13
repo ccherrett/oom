@@ -15,6 +15,8 @@ class Track;
 class QTableView;
 class QStandardItem;
 class QModelIndex;
+class QItemSelection;
+class QItemSelectionModel;
 
 //---------------------------------------------------------
 //   MidiTrackInfo
@@ -25,11 +27,13 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
     Track* selected;
     bool _midiDetect;
     int program, pan, volume;
-    int _progRowNum;
+    int _progRowNum, _selectedIndex;
     ProgramChangeTable* tableView;
     QList<int>* _matrix;
     ProgramChangeTableModel* _tableModel;
+	QItemSelectionModel* _selModel;
     bool editing;
+	bool _useMatrix;
     virtual void showEvent(QShowEvent *);
 
 private slots:
@@ -58,11 +62,13 @@ private slots:
     //void routingPopupViewActivated(const QModelIndex&);
     void toggleAdvanced(int);
     void matrixItemChanged(QStandardItem*);
+	void matrixSelectionChanged(QItemSelection, QItemSelection);
     void deleteSelectedPatches(bool);
     void movePatchUp(bool);
     void movePatchDown(bool);
     void patchSequenceInserted(QModelIndex, int, int);
     void patchSequenceRemoved(QModelIndex, int, int);
+	void clonePatchSequence();
 
 protected slots:
     virtual void heartBeat();

@@ -70,7 +70,7 @@ GlobalConfigValues config = {
 	QColor(0, 0, 255), // transportHandleColor;
 	QColor(255, 0, 0), // bigTimeForegroundColor;
 	QColor(0, 0, 0), // bigTimeBackgroundColor;
-	QColor(200, 200, 200), // waveEditBackgroundColor;
+	QColor(23, 23, 23), // waveEditBackgroundColor;
 	{
 		QFont(QString("arial"), 10, QFont::Normal),
 		QFont(QString("arial"), 8, QFont::Normal),

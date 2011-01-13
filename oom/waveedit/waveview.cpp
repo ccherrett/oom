@@ -47,7 +47,7 @@ WaveView::WaveView(MidiEditor* pr, QWidget* parent, int xscale, int yscale)
 	setFocusPolicy(Qt::StrongFocus); // Tim.
 
 	setMouseTracking(true);
-	setBg(QColor(0, 0, 0));
+	setBg(QColor(30, 33, 34));
 
 	if (editor->parts()->empty())
 	{
@@ -169,11 +169,6 @@ void WaveView::pdraw(QPainter& p, const QRect& rr)
 						// Draw inverted
 						p.setPen(QColor(0,10,15));
 						p.drawLine(i, y - h + cc, i, y + h - cc);
-					}
-					else
-					{
-						//p.setPen(QColor(203,211,212));
-						//p.drawLine(i, y - h + cc, i, y + h - cc);
 					}
 					//p.drawLine(i, y - peak - cc, i, y + peak);
 					QColor green = QColor(49, 175, 197);

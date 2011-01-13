@@ -75,6 +75,7 @@
 		<file>images/icons/up.png</file>
 		<file>images/icons/down.png</file>
 		<file>images/icons/garbage.png</file>
+		<file>images/icons/duplicate.png</file>
 	</qresource>
 </RCC>
 

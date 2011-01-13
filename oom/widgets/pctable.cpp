@@ -39,6 +39,7 @@ void ProgramChangeTable::dropEvent(QDropEvent *evt)
 			QList<QStandardItem*> dragItems = m->takeRow(srow);
 			m->insertRow(index.row(), dragItems);
 			emit rowOrderChanged();
+			resizeRowsToContents();
 		}
 	}
 	else
@@ -52,7 +53,7 @@ void ProgramChangeTable::mousePressEvent(QMouseEvent *evt)
 	QModelIndex modidx = indexAt(evt->pos());
 	QRect arect = visualRect(modidx);
 	arect.setWidth(20);
-	if (evt->button() == Qt::LeftButton && !arect.contains(evt->pos()) /*&& ((QInputEvent*)evt)->modifiers() & Qt::ShiftModifier*/)
+	if (evt->button() == Qt::LeftButton && !arect.contains(evt->pos()) && ((QInputEvent*)evt)->modifiers() & Qt::ShiftModifier)
 	{
 		//printf("Mouse Press Event fired\n");
 		QTableView::mousePressEvent(evt);

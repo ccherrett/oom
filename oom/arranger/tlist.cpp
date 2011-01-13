@@ -219,6 +219,20 @@ void TList::paint(const QRect& r)
 			}
 			p.setPen(palette().color(QPalette::Active, QPalette::Text));
 		}
+		/*QColor green = QColor(49, 175, 197);
+		QColor yellow = QColor(127,12,128);
+		QColor red = QColor(197, 49, 87);
+		QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, h*2));
+		vuGrad.setColorAt(1, red);
+		//vuGrad.setColorAt(0.90, yellow);
+		vuGrad.setColorAt(0.6, green);
+		vuGrad.setColorAt(0.5, green);
+		vuGrad.setColorAt(0.4, green);
+		//vuGrad.setColorAt(0.10, yellow);
+		vuGrad.setColorAt(0, red);
+		QPen myPen = QPen();
+		myPen.setBrush(QBrush(vuGrad));
+		p.setPen(myPen);*/
 		p.fillRect(x1, yy, w, trackHeight, bg);
 
 		int x = 0;
@@ -385,7 +399,7 @@ void TList::paint(const QRect& r)
 	{
 		int section = header->logicalIndex(index);
 		xpos += header->sectionSize(section);
-		p.drawLine(xpos, 0, xpos, height());
+		//p.drawLine(xpos, 0, xpos, height());
 	}
 }
 

@@ -108,6 +108,7 @@ extern QPixmap* panicIcon;
 extern QPixmap* upPCIcon;
 extern QPixmap* downPCIcon;
 extern QPixmap* garbagePCIcon;
+extern QPixmap* duplicatePCIcon;
 
 extern QIcon* pianoIconSet;
 extern QIcon* scoreIconSet;

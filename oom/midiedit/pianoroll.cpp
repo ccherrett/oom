@@ -643,11 +643,14 @@ void PianoRoll::updateHScrollRange()
 
 void PianoRoll::updateTrackInfo()
 {
-	selected = curCanvasPart()->track();
-	if (selected->isMidiTrack())
+	if(selected != curCanvasPart()->track())
 	{
-		midiTrackInfo->setTrack(selected);
-		///midiTrackInfo->updateTrackInfo(-1);
+		selected = curCanvasPart()->track();
+		if (selected->isMidiTrack())
+		{
+			midiTrackInfo->setTrack(selected);
+			///midiTrackInfo->updateTrackInfo(-1);
+		}
 	}
 }
 

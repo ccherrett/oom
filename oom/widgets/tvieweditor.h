@@ -25,7 +25,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 {
 	Q_OBJECT
 	TrackViewList* _viewList;
-	TrackList* _selected;
+	TrackView* _selected;
 	TrackList _tracks;      // tracklist as seen by arranger
 	MidiTrackList  _midis;
 	WaveTrackList _waves;
@@ -55,8 +55,8 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 
 	public:
 		TrackViewEditor(QWidget*, TrackViewList* = 0);
-		void setSelectedTracks(TrackList*);
-		TrackList* selectedTracks( ) { return _selected; }
+		void setSelected(TrackView*);
+		TrackView* selectedView( ) { return _selected; }
 		void setTypes(QStringList);
 		void setViews(TrackViewList*);
 		QStringList trackTypes(){return _trackTypes;}

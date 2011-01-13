@@ -363,6 +363,7 @@ QPixmap* editmuteIcon;
 QPixmap* editmuteSIcon;
 QPixmap* panicIcon;
 
+QPixmap* duplicatePCIcon;
 QPixmap* garbagePCIcon;
 QPixmap* upPCIcon;
 QPixmap* downPCIcon;
@@ -547,6 +548,7 @@ void initIcons()
       upPCIcon 	  = new MPIXMAP(":/images/icons/up.png", NULL);//ProgramChange Flag
       downPCIcon   = new MPIXMAP(":/images/icons/down.png", NULL);//ProgramChange Flag
       garbagePCIcon = new MPIXMAP(":/images/icons/garbage.png", NULL);//ProgramChange Flag
+      duplicatePCIcon = new MPIXMAP(":/images/icons/duplicate.png", NULL);//ProgramChange Flag
       lockIcon    = new MPIXMAP(lock_xpm, NULL);
       tocIcon     = new MPIXMAP(toc_xpm, NULL);
       exitIconS   = new MPIXMAP(exitS_xpm, "application-exit");

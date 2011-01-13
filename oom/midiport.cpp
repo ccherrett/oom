@@ -1054,7 +1054,8 @@ void MidiPort::insertPatchSequence(int p, PatchSequence* ps)
 	if (p < _patchSequences.size() && ps)
 		_patchSequences.insert(p, ps);
 	else if (ps)
-		addPatchSequence(ps);
+		appendPatchSequence(ps);
+		//addPatchSequence(ps);
 }
 
 //---------------------------------------------------------
