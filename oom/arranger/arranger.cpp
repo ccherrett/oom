@@ -334,11 +334,21 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	//   | ib  |                        | 3
 	//   +-----+------------------------+
 
+	//QStandardItemModel itemModel = new QStandardItemModel;
+	QHeaderView *spacerBox = new QHeaderView(Qt::Horizontal);
+	spacerBox->setFixedHeight(30);
+	//spacerBox->setModel(itemModel);
+	//QStandardItem *sitem = new QStandardItem(text);
+	//itemModel->setHorizontalHeaderItem(0, sitem);
+	spacerBox->setStretchLastSection(true);
+	header->hide();
+	//spacerBox->addItem(new QSpacerItem(0, header->sizeHint().height()));
 	connect(infoScroll, SIGNAL(valueChanged(int)), SLOT(trackInfoScroll(int)));
 	tgrid = new TLLayout(tracklist); // layout manager for this
 	tgrid->wadd(0, trackInfo);
 	tgrid->wadd(1, infoScroll);
-	tgrid->wadd(2, header);
+	tgrid->wadd(2, spacerBox);
+	//tgrid->wadd(2, header);
 	tgrid->wadd(3, list);
 	tgrid->wadd(4, hLine(tracklist));
 	tgrid->wadd(5, ib);
