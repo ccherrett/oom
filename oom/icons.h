@@ -109,6 +109,12 @@ extern QPixmap* upPCIcon;
 extern QPixmap* downPCIcon;
 extern QPixmap* garbagePCIcon;
 extern QPixmap* duplicatePCIcon;
+extern QPixmap* arranger_record_on_Icon;
+extern QPixmap* arranger_record_off_Icon;
+extern QPixmap* arranger_mute_on_Icon;
+extern QPixmap* arranger_mute_off_Icon;
+extern QPixmap* arranger_solo_on_Icon;
+extern QPixmap* arranger_solo_off_Icon;
 
 extern QIcon* pianoIconSet;
 extern QIcon* scoreIconSet;

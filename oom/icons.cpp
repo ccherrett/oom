@@ -363,6 +363,12 @@ QPixmap* editmuteIcon;
 QPixmap* editmuteSIcon;
 QPixmap* panicIcon;
 
+QPixmap* arranger_record_on_Icon;
+QPixmap* arranger_record_off_Icon;
+QPixmap* arranger_mute_on_Icon;
+QPixmap* arranger_mute_off_Icon;
+QPixmap* arranger_solo_on_Icon;
+QPixmap* arranger_solo_off_Icon;
 QPixmap* duplicatePCIcon;
 QPixmap* garbagePCIcon;
 QPixmap* upPCIcon;
@@ -548,6 +554,13 @@ void initIcons()
       upPCIcon 	  = new MPIXMAP(":/images/icons/up.png", NULL);//ProgramChange Flag
       downPCIcon   = new MPIXMAP(":/images/icons/down.png", NULL);//ProgramChange Flag
       garbagePCIcon = new MPIXMAP(":/images/icons/garbage.png", NULL);//ProgramChange Flag
+      duplicatePCIcon = new MPIXMAP(":/images/icons/duplicate.png", NULL);//ProgramChange Flag
+      arranger_record_on_Icon = new MPIXMAP(":/images/icons/arranger_record_on.png", NULL);//ProgramChange Flag
+      arranger_record_off_Icon = new MPIXMAP(":/images/icons/arranger_record_off.png", NULL);//ProgramChange Flag
+      arranger_mute_on_Icon = new MPIXMAP(":/images/icons/arranger_mute_on.png", NULL);//ProgramChange Flag
+      arranger_mute_off_Icon = new MPIXMAP(":/images/icons/arranger_mute_off.png", NULL);//ProgramChange Flag
+      arranger_solo_on_Icon = new MPIXMAP(":/images/icons/arranger_solo_on.png", NULL);//ProgramChange Flag
+      arranger_solo_off_Icon = new MPIXMAP(":/images/icons/arranger_solo_off.png", NULL);//ProgramChange Flag
       duplicatePCIcon = new MPIXMAP(":/images/icons/duplicate.png", NULL);//ProgramChange Flag
       lockIcon    = new MPIXMAP(lock_xpm, NULL);
       tocIcon     = new MPIXMAP(toc_xpm, NULL);

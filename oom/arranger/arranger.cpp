@@ -289,7 +289,8 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	header->setColumnLabel(tr("R"), COL_RECORD, fm1.width('R') + fw);
 	header->setColumnLabel(tr("M"), COL_MUTE, fm1.width('M') + fw);
 	header->setColumnLabel(tr("S"), COL_SOLO, fm1.width('S') + fw);
-	header->setColumnLabel(tr("C"), COL_CLASS, fm1.width('C') + fw);
+	//header->setColumnLabel(tr("C"), COL_CLASS, fm1.width('C') + fw);
+	header->setColumnLabel(tr("C"), COL_CLASS, 0);
 	header->setColumnLabel(tr("Track"), COL_NAME, 100);
 	header->setColumnLabel(tr("Port"), COL_OPORT, 60);
 	header->setColumnLabel(tr("Ch"), COL_OCHANNEL, 30);

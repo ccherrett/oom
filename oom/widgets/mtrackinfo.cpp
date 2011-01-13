@@ -150,6 +150,8 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track) : QFrame(parent)
 	btnUp->setIconSize(upPCIcon->size());
 	btnDown->setIconSize(downPCIcon->size());
 	btnDelete->setIconSize(garbagePCIcon->size());
+	btnCopy->setIcon(*duplicatePCIcon);
+	btnCopy->setIconSize(duplicatePCIcon->size());
 
 	connect(tableView, SIGNAL(rowOrderChanged()), SLOT(rebuildMatrix()));
 	connect(_selModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(matrixSelectionChanged(QItemSelection, QItemSelection)));
@@ -160,6 +162,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track) : QFrame(parent)
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(deleteSelectedPatches(bool)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(movePatchUp(bool)));
 	connect(btnDown, SIGNAL(clicked(bool)), SLOT(movePatchDown(bool)));
+	connect(btnCopy, SIGNAL(clicked(bool)), SLOT(clonePatchSequence()));
 
 	//setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding));
 
@@ -2119,8 +2122,6 @@ void MidiTrackInfo::clonePatchSequence()
 	if (!rows.isEmpty())
 	{
 		int start = rows.at(0);
-		if ((start + 1) >= _tableModel->rowCount())
-			return;
 		int row = (start + 1);
 		QStandardItem* iid = _tableModel->item(start, 0);
 		QStandardItem* ichk = _tableModel->item(start, 1);

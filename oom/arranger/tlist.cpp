@@ -219,21 +219,19 @@ void TList::paint(const QRect& r)
 			}
 			p.setPen(palette().color(QPalette::Active, QPalette::Text));
 		}
-		/*QColor green = QColor(49, 175, 197);
-		QColor yellow = QColor(127,12,128);
-		QColor red = QColor(197, 49, 87);
-		QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, h*2));
-		vuGrad.setColorAt(1, red);
-		//vuGrad.setColorAt(0.90, yellow);
-		vuGrad.setColorAt(0.6, green);
-		vuGrad.setColorAt(0.5, green);
-		vuGrad.setColorAt(0.4, green);
-		//vuGrad.setColorAt(0.10, yellow);
-		vuGrad.setColorAt(0, red);
-		QPen myPen = QPen();
-		myPen.setBrush(QBrush(vuGrad));
-		p.setPen(myPen);*/
+		/*QColor white = QColor(202, 86, 86);
+		QColor trackcolor = bg;
+		QLinearGradient vuGrad(QPointF(10, 10), QPointF(0, 0));
+		vuGrad.setColorAt(1, white);
+		vuGrad.setColorAt(0.9, trackcolor);
+		vuGrad.setColorAt(0.5, trackcolor);
+		vuGrad.setColorAt(0.1, trackcolor);
+		vuGrad.setColorAt(0, white);
+		p.fillRect(x1, yy, w, trackHeight, QBrush(vuGrad));
+		*/
 		p.fillRect(x1, yy, w, trackHeight, bg);
+		
+		//p.setPen(Qt::black);
 
 		int x = 0;
 		for (int index = 0; index < header->count(); ++index)
@@ -249,7 +247,7 @@ void TList::paint(const QRect& r)
 					if (track->canRecord())
 					{
 						drawCenteredPixmap(p,
-								track->recordFlag() ? record_on_Icon : record_off_Icon, r);
+								track->recordFlag() ? arranger_record_on_Icon : arranger_record_off_Icon, r);
 					}
 					break;
 				case COL_CLASS:
@@ -283,24 +281,34 @@ void TList::paint(const QRect& r)
 							pm = synthIcon;
 							break;
 					}
-					drawCenteredPixmap(p, pm, r);
+					//drawCenteredPixmap(p, pm, r);
 				}
 					break;
 				case COL_MUTE:
 					if (track->off())
 						drawCenteredPixmap(p, offIcon, r);
 					else if (track->mute())
-						drawCenteredPixmap(p, editmuteSIcon, r);
+					{
+						drawCenteredPixmap(p,arranger_mute_on_Icon, r);
+					}
+					else
+					{
+						drawCenteredPixmap(p,arranger_mute_off_Icon, r);
+						
+					}
+					//	drawCenteredPixmap(p, editmuteSIcon, r);
 					break;
 				case COL_SOLO:
 					if (track->solo() && track->internalSolo())
 						drawCenteredPixmap(p, blacksqcheckIcon, r);
-					else
-						if (track->internalSolo())
+					else if (track->internalSolo())
 						drawCenteredPixmap(p, blacksquareIcon, r);
+					else if (track->solo())
+						drawCenteredPixmap(p, arranger_solo_on_Icon, r);
 					else
-						if (track->solo())
-						drawCenteredPixmap(p, bluedotIcon, r);
+					{
+						drawCenteredPixmap(p,arranger_solo_off_Icon, r);
+					}
 					break;
 				case COL_TIMELOCK:
 					if (track->isMidiTrack()
@@ -375,7 +383,7 @@ void TList::paint(const QRect& r)
 			}
 			x += header->sectionSize(section);
 		}
-		p.setPen(Qt::gray);
+		p.setPen(QColor(164,164,164));
 		p.drawLine(x1, yy, x2, yy);
 	}
 	p.drawLine(x1, yy, x2, yy);
@@ -383,7 +391,7 @@ void TList::paint(const QRect& r)
 	if (mode == DRAG)
 	{
 		int yy = curY - dragYoff;
-		p.setPen(Qt::green);
+		p.setPen(QColor(0,164,194));
 		p.drawLine(x1, yy, x2, yy);
 		p.drawLine(x1, yy + dragHeight, x2, yy + dragHeight);
 	}

@@ -76,6 +76,12 @@
 		<file>images/icons/down.png</file>
 		<file>images/icons/garbage.png</file>
 		<file>images/icons/duplicate.png</file>
+		<file>images/icons/arranger_record_on.png</file>
+		<file>images/icons/arranger_record_off.png</file>
+		<file>images/icons/arranger_mute_on.png</file>
+		<file>images/icons/arranger_mute_off.png</file>
+		<file>images/icons/arranger_solo_on.png</file>
+		<file>images/icons/arranger_solo_off.png</file>
 	</qresource>
 </RCC>
 
