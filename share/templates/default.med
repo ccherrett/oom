@@ -24,7 +24,7 @@
     <partCanvasBg r="90" g="90" b="90"></partCanvasBg>
     <selectTrackBg r="18" g="25" b="28"></selectTrackBg>
     <selectTrackFg r="71" g="202" b="225"></selectTrackFg>
-    <midiTrackBg r="118" g="104" b="125"></midiTrackBg>
+    <midiTrackBg r="77" g="65" b="83"></midiTrackBg>
     <drumTrackBg r="118" g="104" b="125"></drumTrackBg>
     <waveTrackBg r="58" g="79" b="84"></waveTrackBg>
     <outputTrackBg r="133" g="36" b="36"></outputTrackBg>

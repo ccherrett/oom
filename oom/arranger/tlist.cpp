@@ -217,7 +217,8 @@ void TList::paint(const QRect& r)
 					bg = config.synthTrackBg;
 					break;
 			}
-			p.setPen(palette().color(QPalette::Active, QPalette::Text));
+			//p.setPen(palette().color(QPalette::Active, QPalette::Text));
+			p.setPen(QColor(213,213,213));
 		}
 		/*QColor white = QColor(202, 86, 86);
 		QColor trackcolor = bg;
