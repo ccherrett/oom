@@ -3230,7 +3230,7 @@ void OOMidi::startPianoroll(PartList* pl, bool showDefaultCtrls)
         // with the application global shortcut to open the L.E.
         pianoroll->addAction(startListEditAction);
         // same for save shortcut
-        pianoroll->addAction(fileSaveAction->a);
+        pianoroll->addAction(fileSaveAction);
 
 	if (showDefaultCtrls) // p4.0.12
 	{
