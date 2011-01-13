@@ -295,7 +295,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	srec = new QToolButton();
 	srec->setToolTip(tr("Step Record"));
 	srec->setIcon(*steprecIcon);
-	srec->setCheckable(true);
+        srec->setCheckable(true);
 	//srec->setObjectName("StepRecord");
 	tools->addWidget(srec);
 

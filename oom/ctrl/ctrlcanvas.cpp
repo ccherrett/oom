@@ -1287,8 +1287,9 @@ void CtrlCanvas::setTool(int t)
 
 void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part, bool velo, bool fg)
 {
-	int x = rect.x() - 1; // compensate for 3 pixel line width
-	int w = rect.width() + 2;
+        // Remon: Do we really have to do that ???? Seems unnesecary to me.
+        int x = 0;//rect.x() - 1; // compensate for 3 pixel line width
+        int w = rect.width() + 2;
 	int wh = height();
 
 	if (velo)
