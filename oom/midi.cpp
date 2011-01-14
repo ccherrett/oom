@@ -1725,7 +1725,7 @@ void Audio::preloadControllers()/*{{{*/
 					{
 						printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
 							tick, channel, port, ev.dataA(), ev.dataB());
-						playEvents->add(MidiPlayEvent(tick+10000, port, channel, ev));
+						playEvents->add(MidiPlayEvent(tick+300, port, channel, ev));
 					}
 						break;
 					default:
