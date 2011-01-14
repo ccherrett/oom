@@ -1682,7 +1682,7 @@ void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAl
 
 	if (song->getSongInfo().length() > 0)
 		startSongInfo(false);
-	audio->preloadControllers();
+	//audio->preloadControllers();
 	QApplication::restoreOverrideCursor();
 }
 
