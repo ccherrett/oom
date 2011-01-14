@@ -1688,21 +1688,6 @@ void Audio::processMidi()
 void Audio::preloadControllers()/*{{{*/
 {
 	midiBusy = true;
-	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)/*{{{*/
-	{
-		MidiDevice* md = *id;
-
-		MPEventList* playEvents = md->playEvents();
-		//
-		// erase already played events:
-		//
-		iMPEvent nextPlayEvent = md->nextPlayEvent();
-		playEvents->erase(playEvents->begin(), nextPlayEvent);
-
-		// Take snapshots of the current sizes of the recording fifos,
-		//  because they may change while here in process, asynchronously.
-		md->beforeProcess();
-	}/*}}}*/
 
 	MidiTrackList* tracks = song->midis();
 	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
@@ -1716,15 +1701,12 @@ void Audio::preloadControllers()/*{{{*/
 	
 		MidiDevice* md = midiPorts[port].device();
 		MPEventList* playEvents = md->playEvents();
-		MPEventList* stuckNotes = md->stuckNotes();
+		playEvents->erase(playEvents->begin(), playEvents->end());
 	
 		PartList* pl = track->parts();
 		for (iPart p = pl->begin(); p != pl->end(); ++p)
 		{
 			MidiPart* part = (MidiPart*) (p->second);
-			// dont play muted parts
-		//	if (part->mute())
-		//		continue;
 			EventList* events = part->events();
 			unsigned partTick = part->tick();
 			unsigned partLen = part->lenTick();
@@ -1732,15 +1714,10 @@ void Audio::preloadControllers()/*{{{*/
 	
 			unsigned offset = delay + partTick;
 	
-			iEvent ie;
-	
-			for (ie = events->begin(); ie != events->end(); ++ie)
+			for (iEvent ie = events->begin(); ie != events->end(); ++ie)
 			{
 				Event ev = ie->second;
 				port = defaultPort; //Reset each loop
-				//
-				//  dont play any meta events
-				//
 				unsigned tick = ev.tick() + offset;
 				unsigned frame = tempomap.tick2frame(tick) + frameOffset;
 				switch (ev.dataA())
@@ -1748,45 +1725,14 @@ void Audio::preloadControllers()/*{{{*/
 					case CTRL_PROGRAM:
 					{
 						//printf("Audio::preloadControllers() Found Controller event to send.\n");
-						//int len   = ev.lenTick();
-						//int pitch = ev.pitch();
-						/*
-						if (track->type() == Track::DRUM)
-						{
-							int ctl = ev.dataA();
-							// Is it a drum controller event, according to the track port's instrument?
-							MidiController *mc = midiPorts[defaultPort].drumController(ctl);
-							if (mc)
-							{
-								int instr = ctl & 0x7f;
-								ctl &= ~0xff;
-								int pitch = drumMap[instr].anote & 0x7f;
-								port = drumMap[instr].port; //This changes to non-default port
-								channel = drumMap[instr].channel;
-								MidiDevice* mdAlt = midiPorts[port].device();
-								if (mdAlt)
-								{
-									// p3.3.25
-									// If syncing to external midi sync, we cannot use the tempo map.
-									// Therefore we cannot get sub-tick resolution. Just use ticks instead of frames.
-									if (extSyncFlag.value())
-										mdAlt->playEvents()->add(MidiPlayEvent(tick, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB()));
-									else
-										//playEvents->add(MidiPlayEvent(frame, port, channel, ev));
-										mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB()));
-								}
-								break;
-							}
-						}*/
-						// p3.3.25
 						if (extSyncFlag.value())
 						{
-							printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d\n", tick, channel, port);
+							//printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d\n", tick, channel, port);
 							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 						}
 						else
 						{
-							printf("Audio::preloadControllers() Loading event @ frame: %d - on channel: %d\n", frame, channel);
+							//printf("Audio::preloadControllers() Loading event @ frame: %d - on channel: %d\n", frame, channel);
 							playEvents->add(MidiPlayEvent(frame, port, channel, ev));
 						}
 					}
@@ -1796,15 +1742,7 @@ void Audio::preloadControllers()/*{{{*/
 				}
 			}
 		}
+		md->setNextPlayEvent(playEvents->begin());
 	}
-	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)/*{{{*/
-	{
-		MidiDevice* md = *id;
-		MPEventList* playEvents = md->playEvents();
-		if (md)
-			md->setNextPlayEvent(playEvents->begin());
-		sleep(1);
-
-	}/*}}}*/
 	midiBusy = false;
 }/*}}}*/
