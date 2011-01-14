@@ -1687,6 +1687,23 @@ void Audio::processMidi()
 
 void Audio::preloadControllers()/*{{{*/
 {
+	midiBusy = true;
+	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)/*{{{*/
+	{
+		MidiDevice* md = *id;
+
+		MPEventList* playEvents = md->playEvents();
+		//
+		// erase already played events:
+		//
+		iMPEvent nextPlayEvent = md->nextPlayEvent();
+		playEvents->erase(playEvents->begin(), nextPlayEvent);
+
+		// Take snapshots of the current sizes of the recording fifos,
+		//  because they may change while here in process, asynchronously.
+		md->beforeProcess();
+	}/*}}}*/
+
 	MidiTrackList* tracks = song->midis();
 	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
 	{
@@ -1791,4 +1808,14 @@ void Audio::preloadControllers()/*{{{*/
 			}
 		}
 	}
+	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)/*{{{*/
+	{
+		MidiDevice* md = *id;
+
+		MPEventList* playEvents = md->playEvents();
+		if (md)
+			md->setNextPlayEvent(playEvents->begin());
+
+	}/*}}}*/
+	midiBusy = false;
 }/*}}}*/
