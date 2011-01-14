@@ -1417,7 +1417,7 @@ void* JackAudioDevice::registerOutPort(const char* name, bool midi)
 	if (!checkJackClient(_client)) return NULL;
 	const char* type = midi ? JACK_DEFAULT_MIDI_TYPE : JACK_DEFAULT_AUDIO_TYPE;
 	//void* p = jack_port_register(_client, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-	void* p = jack_port_register(_client, name, type, JackPortIsOutput);
+	void* p = jack_port_register(_client, name, type, JackPortIsOutput, 0);
 	// printf("JACK: registerOutPort: <%s> %p\n", name, p);
 	return p;
 }
