@@ -1268,10 +1268,10 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 						if (xp >= x && xp <= (x + 50))
 						{
 							//printf("Found Program Change to delete at: %d\n", x);
-							//song->startUndo();
+							song->startUndo();
 							audio->msgDeleteEvent(evt->second, p->second, false, false, false);
 							pcbar->redraw();
-							//song->endUndo(SC_EVENT_MODIFIED);
+							song->endUndo(SC_EVENT_MODIFIED);
 						}
 					}
 				}

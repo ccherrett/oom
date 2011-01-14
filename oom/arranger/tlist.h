@@ -57,6 +57,7 @@ class TList : public QWidget
     QScrollBar* _scroll;
     QLineEdit* editor;
     Track* editTrack;
+	Track* editAutomation;
 
     int startY;
     int curY;

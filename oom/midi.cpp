@@ -1684,3 +1684,104 @@ void Audio::processMidi()
 	midiBusy = false;
 }
 
+
+void Audio::preloadControllers()/*{{{*/
+{
+	MidiTrackList* tracks = song->midis();
+	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
+	{
+		MidiTrack* track = *it;
+		//activePorts[track->outPort()] = true;
+
+		int port = track->outPort();
+		int channel = track->outChannel();
+		int defaultPort = port;
+	
+		MidiDevice* md = midiPorts[port].device();
+		MPEventList* playEvents = md->playEvents();
+		MPEventList* stuckNotes = md->stuckNotes();
+	
+		PartList* pl = track->parts();
+		for (iPart p = pl->begin(); p != pl->end(); ++p)
+		{
+			MidiPart* part = (MidiPart*) (p->second);
+			// dont play muted parts
+		//	if (part->mute())
+		//		continue;
+			EventList* events = part->events();
+			unsigned partTick = part->tick();
+			unsigned partLen = part->lenTick();
+			int delay = track->delay;
+	
+			unsigned offset = delay + partTick;
+	
+			iEvent ie = events->lower_bound(partTick);
+			iEvent iend = events->lower_bound(partLen);
+	
+			for (; ie != iend; ++ie)
+			{
+				Event ev = ie->second;
+				port = defaultPort; //Reset each loop
+				//
+				//  dont play any meta events
+				//
+				if (ev.type() == Meta)
+					continue;
+				if (track->type() == Track::DRUM)
+				{
+					int instr = ev.pitch();
+					// ignore muted drums
+					//if (ev.isNote() && drumMap[instr].mute)
+					//	continue;
+				}
+				unsigned tick = ev.tick() + offset;
+				unsigned frame = tempomap.tick2frame(tick) + frameOffset;
+				switch (ev.type())
+				{
+					case Controller:
+					{
+						//int len   = ev.lenTick();
+						//int pitch = ev.pitch();
+						if (track->type() == Track::DRUM)
+						{
+							int ctl = ev.dataA();
+							// Is it a drum controller event, according to the track port's instrument?
+							MidiController *mc = midiPorts[defaultPort].drumController(ctl);
+							if (mc)
+							{
+								int instr = ctl & 0x7f;
+								ctl &= ~0xff;
+								int pitch = drumMap[instr].anote & 0x7f;
+								port = drumMap[instr].port; //This changes to non-default port
+								channel = drumMap[instr].channel;
+								MidiDevice* mdAlt = midiPorts[port].device();
+								if (mdAlt)
+								{
+									// p3.3.25
+									// If syncing to external midi sync, we cannot use the tempo map.
+									// Therefore we cannot get sub-tick resolution. Just use ticks instead of frames.
+									if (extSyncFlag.value())
+										mdAlt->playEvents()->add(MidiPlayEvent(tick, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB()));
+									else
+										//playEvents->add(MidiPlayEvent(frame, port, channel, ev));
+										mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB()));
+								}
+								break;
+							}
+						}
+						// p3.3.25
+						if (extSyncFlag.value())
+							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
+						else
+							playEvents->add(MidiPlayEvent(frame, port, channel, ev));
+					}
+						break;
+	
+	
+					default:
+						break;
+				}
+			}
+		}
+	}
+}/*}}}*/

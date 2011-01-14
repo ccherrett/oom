@@ -326,6 +326,7 @@ public:
     void processMidi();
     unsigned curFrame() const;
     void recordStop();
+	void preloadControllers();
 
     bool freewheel() const
     {

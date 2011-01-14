@@ -20,17 +20,12 @@
 
 void CtrlList::initColor(int i)
 {
-	if (i == 0)
-		_displayColor = Qt::red;
-	else if (i == 1)
-		_displayColor = Qt::yellow;
+	QColor collist[] = { Qt::red, Qt::yellow, Qt::blue , Qt::green, Qt::white, Qt::black };
+	if (i < 5)
+		_displayColor = collist[i%6];
 	else
-		_displayColor = Qt::black;
-
-	if (i < 2)
-		_visible = true;
-	else
-		_visible = false;
+		_displayColor = Qt::gray;
+	_visible = false;
 
 }
 
@@ -46,6 +41,7 @@ CtrlList::CtrlList(int id)
 	_default = 0.0;
 	_curVal = 0.0;
 	_mode = INTERPOLATE;
+	_dontShow = false;
 	initColor(id);
 }
 //---------------------------------------------------------
@@ -74,7 +70,8 @@ CtrlList::CtrlList()
 	_default = 0.0;
 	_curVal = 0.0;
 	_mode = INTERPOLATE;
-	initColor(0);
+	 _dontShow = false;
+	initColor(-1);
 }
 
 //---------------------------------------------------------
