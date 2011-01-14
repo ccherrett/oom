@@ -1715,10 +1715,9 @@ void Audio::preloadControllers()/*{{{*/
 	
 			unsigned offset = delay + partTick;
 	
-			iEvent ie = events->lower_bound(partTick);
-			iEvent iend = events->lower_bound(partLen);
+			iEvent ie;
 	
-			for (; ie != iend; ++ie)
+			for (ie = events->begin(); ie != events->end(); ++ie)
 			{
 				Event ev = ie->second;
 				port = defaultPort; //Reset each loop
@@ -1740,6 +1739,7 @@ void Audio::preloadControllers()/*{{{*/
 				{
 					case Controller:
 					{
+						printf("Audio::preloadControllers() Found Controller event to send.\n");
 						//int len   = ev.lenTick();
 						//int pitch = ev.pitch();
 						if (track->type() == Track::DRUM)
