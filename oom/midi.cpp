@@ -1752,9 +1752,9 @@ void Audio::preloadControllers()/*{{{*/
 				}
 				unsigned tick = ev.tick() + offset;
 				unsigned frame = tempomap.tick2frame(tick) + frameOffset;
-				switch (ev.type())
+				switch (ev.dataA())
 				{
-					case Controller:
+					case CTRL_PROGRAM:
 					{
 						printf("Audio::preloadControllers() Found Controller event to send.\n");
 						//int len   = ev.lenTick();
