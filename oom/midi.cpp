@@ -1742,6 +1742,7 @@ void Audio::preloadControllers()/*{{{*/
 						printf("Audio::preloadControllers() Found Controller event to send.\n");
 						//int len   = ev.lenTick();
 						//int pitch = ev.pitch();
+						/*
 						if (track->type() == Track::DRUM)
 						{
 							int ctl = ev.dataA();
@@ -1768,12 +1769,18 @@ void Audio::preloadControllers()/*{{{*/
 								}
 								break;
 							}
-						}
+						}*/
 						// p3.3.25
 						if (extSyncFlag.value())
+						{
+							printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d\n", tick, channel);
 							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
+						}
 						else
+						{
+							printf("Audio::preloadControllers() Loading event @ frame: %d - on channel: %d\n", frame, channel);
 							playEvents->add(MidiPlayEvent(frame, port, channel, ev));
+						}
 					}
 						break;
 	
