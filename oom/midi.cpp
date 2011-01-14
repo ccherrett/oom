@@ -1717,24 +1717,15 @@ void Audio::preloadControllers()/*{{{*/
 			for (iEvent ie = events->begin(); ie != events->end(); ++ie)
 			{
 				Event ev = ie->second;
-				port = defaultPort; //Reset each loop
+				port = defaultPort; 
 				unsigned tick = ev.tick() + offset;
 				unsigned frame = tempomap.tick2frame(tick) + frameOffset;
 				switch (ev.dataA())
 				{
 					case CTRL_PROGRAM:
 					{
-						//printf("Audio::preloadControllers() Found Controller event to send.\n");
-						//if (extSyncFlag.value())
-						//{
-							//printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d\n", tick, channel, port);
-							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
-						/*}
-						else
-						{
-							//printf("Audio::preloadControllers() Loading event @ frame: %d - on channel: %d\n", frame, channel);
-							playEvents->add(MidiPlayEvent(frame, port, channel, ev));
-						}*/
+						//printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d\n", tick, channel, port);
+						playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 					}
 						break;
 					default:

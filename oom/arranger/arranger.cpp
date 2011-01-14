@@ -495,15 +495,15 @@ void Arranger::headerMoved()
 
 void Arranger::setTime(unsigned tick)
 {
-//	if (tick == MAXINT)
-//		cursorPos->setEnabled(false);
-//	else
-//	{
+	if (tick == MAXINT)
+		return;
+	else
+	{
 		cursVal = tick;
 		cursorPos->setEnabled(true);
 		cursorPos->setValue(tick);
 		time->setPos(3, tick, false);
-//	}
+	}
 }
 
 //---------------------------------------------------------
