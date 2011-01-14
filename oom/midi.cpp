@@ -1329,8 +1329,7 @@ void Audio::processMidi()
 								}
 							}
 								// Added by T356.
-							else
-								if (event.type() == ME_CONTROLLER)
+							else if (event.type() == ME_CONTROLLER)
 							{
 								if (track->type() == Track::DRUM)
 								{
@@ -1724,7 +1723,8 @@ void Audio::preloadControllers()/*{{{*/
 				{
 					case CTRL_PROGRAM:
 					{
-						//printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d\n", tick, channel, port);
+						printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
+							tick, channel, port, ev.dataA(), ev.dataB());
 						playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 					}
 						break;
