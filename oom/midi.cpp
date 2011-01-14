@@ -1800,10 +1800,10 @@ void Audio::preloadControllers()/*{{{*/
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)/*{{{*/
 	{
 		MidiDevice* md = *id;
-		sleep(100);
 		MPEventList* playEvents = md->playEvents();
 		if (md)
 			md->setNextPlayEvent(playEvents->begin());
+		sleep(1);
 
 	}/*}}}*/
 	midiBusy = false;
