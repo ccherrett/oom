@@ -1788,16 +1788,16 @@ void Audio::preloadControllers()/*{{{*/
 							}
 						}*/
 						// p3.3.25
-						//if (extSyncFlag.value())
-						//{
+						if (extSyncFlag.value())
+						{
 							printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d\n", tick, channel, port);
 							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
-						/*}
+						}
 						else
 						{
 							printf("Audio::preloadControllers() Loading event @ frame: %d - on channel: %d\n", frame, channel);
 							playEvents->add(MidiPlayEvent(frame, port, channel, ev));
-						}*/
+						}
 					}
 						break;
 	
