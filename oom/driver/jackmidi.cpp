@@ -1239,7 +1239,7 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 			printf("MidiJackDevice::queueEvent note on/off polyafter controller or pitch\n");
 #endif  
 
-			unsigned char* p = jack_midi_event_reserve(pb, ft, 30);
+			unsigned char* p = jack_midi_event_reserve(pb, ft, 3);
 			if (p == 0)
 			{
 				fprintf(stderr, "MidiJackDevice::queueEvent #1: buffer overflow, event lost\n");
@@ -1258,7 +1258,7 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 			printf("MidiJackDevice::queueEvent program or aftertouch\n");
 #endif  
 
-			unsigned char* p = jack_midi_event_reserve(pb, ft, 20);
+			unsigned char* p = jack_midi_event_reserve(pb, ft, 2);
 			if (p == 0)
 			{
 				fprintf(stderr, "MidiJackDevice::queueEvent #2: buffer overflow, event lost\n");
@@ -1276,7 +1276,7 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 
 			const unsigned char* data = e.data();
 			int len = e.len();
-			unsigned char* p = jack_midi_event_reserve(pb, ft, len + 20);
+			unsigned char* p = jack_midi_event_reserve(pb, ft, len + 2);
 			if (p == 0)
 			{
 				fprintf(stderr, "MidiJackDevice::queueEvent #3: buffer overflow, event lost\n");
