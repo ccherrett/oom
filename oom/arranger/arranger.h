@@ -129,6 +129,7 @@ private slots:
     //void seek();
     void verticalScrollSetYpos(unsigned);
     void showTrackViews();
+	void preloadControllers();
 
 signals:
     void redirectWheelEvent(QWheelEvent*);

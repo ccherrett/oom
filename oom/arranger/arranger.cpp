@@ -135,6 +135,10 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	toolbar->addWidget(testView);
 	connect(testView, SIGNAL(clicked()), SLOT(showTrackViews()));
 
+	QToolButton* preloadCtrl  = new QToolButton();
+	preloadCtrl->setText(QString("PC"));
+	toolbar->addWidget(preloadCtrl);
+	connect(preloadCtrl, SIGNAL(clicked()), SLOT(preloadControllers()));
 	const char* rastval[] = {
 		QT_TRANSLATE_NOOP("@default", "Off"), QT_TRANSLATE_NOOP("@default", "Bar"), "1/2", "1/4", "1/8", "1/16"
 	};
@@ -1118,6 +1122,11 @@ void Arranger::switchInfo(int n)
 	trackInfo->raiseWidget(n);
 	tgrid->activate();
 	tgrid->update(); // oom-2 Qt4
+}
+
+void Arranger::preloadControllers()
+{
+	audio->preloadControllers();
 }
 
 /*
