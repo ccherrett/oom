@@ -1741,22 +1741,13 @@ void Audio::preloadControllers()/*{{{*/
 				//
 				//  dont play any meta events
 				//
-				if (ev.type() == Meta)
-					continue;
-				if (track->type() == Track::DRUM)
-				{
-					int instr = ev.pitch();
-					// ignore muted drums
-					//if (ev.isNote() && drumMap[instr].mute)
-					//	continue;
-				}
 				unsigned tick = ev.tick() + offset;
 				unsigned frame = tempomap.tick2frame(tick) + frameOffset;
 				switch (ev.dataA())
 				{
 					case CTRL_PROGRAM:
 					{
-						printf("Audio::preloadControllers() Found Controller event to send.\n");
+						//printf("Audio::preloadControllers() Found Controller event to send.\n");
 						//int len   = ev.lenTick();
 						//int pitch = ev.pitch();
 						/*
@@ -1800,8 +1791,6 @@ void Audio::preloadControllers()/*{{{*/
 						}
 					}
 						break;
-	
-	
 					default:
 						break;
 				}
@@ -1811,7 +1800,7 @@ void Audio::preloadControllers()/*{{{*/
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)/*{{{*/
 	{
 		MidiDevice* md = *id;
-
+		sleep(100);
 		MPEventList* playEvents = md->playEvents();
 		if (md)
 			md->setNextPlayEvent(playEvents->begin());
