@@ -1126,7 +1126,7 @@ void Arranger::switchInfo(int n)
 
 void Arranger::preloadControllers()
 {
-	audio->msgPreloadCtrl();//preloadControllers();
+	audio->preloadControllers();
 }
 
 /*
