@@ -1688,7 +1688,7 @@ void Audio::preloadControllers()/*{{{*/
 {
 	midiBusy = true;
 
-	EventList pcevents;
+	//EventList pcevents;
 	int evcount = 0;
 	MidiTrackList* tracks = song->midis();
 	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
@@ -1727,11 +1727,12 @@ void Audio::preloadControllers()/*{{{*/
 					{
 						printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
 							tick, channel, port, ev.dataA(), ev.dataB());
-						Event tev = Event(Controller);
-						tev.setA(ev.dataA());
-						tev.setB(ev.dataB());
-						tev.setTick(evcount + 50);
-						pcevents.add(tev);
+						//Event tev = Event(Controller);
+						//tev.setA(ev.dataA());
+						//tev.setB(ev.dataB());
+						//tev.setTick(evcount + 50);
+						//pcevents.add(tev);
+						playEvents->add(MidiPlayEvent(evcount + 50, port, channel, ev));
 						evcount = evcount + 50;
 					}
 						break;
@@ -1740,11 +1741,11 @@ void Audio::preloadControllers()/*{{{*/
 				}
 			}
 		}
-		for (iEvent ie = pcevents.begin(); ie != pcevents.end(); ++ie)
-		{
-			Event ev = ie->second;
-			playEvents->add(MidiPlayEvent(ev.tick(), port, channel, ev));
-		}
+	//	for (iEvent ie = pcevents.begin(); ie != pcevents.end(); ++ie)
+	//	{
+	//		Event ev = ie->second;
+	//		playEvents->add(MidiPlayEvent(ev.tick(), port, channel, ev));
+	//	}
 		md->setNextPlayEvent(playEvents->begin());
 		evcount = 0;
 	}
