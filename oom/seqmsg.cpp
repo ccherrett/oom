@@ -1286,3 +1286,9 @@ void Audio::msgIdle(bool on)
 	sendMessage(&msg, false);
 }
 
+void Audio::msgPreloadCtrl()
+{
+	AudioMsg msg;
+	msg.id = SEQM_PRELOAD_PROGRAM;
+	sendMsg(&msg);
+}

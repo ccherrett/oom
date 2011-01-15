@@ -55,6 +55,8 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 	AudioMsg* msg = (AudioMsg*) m;
 	switch (msg->id)
 	{
+		case SEQM_PRELOAD_PROGRAM:
+			audio->preloadControllers();
 		case MS_PROCESS:
 			audio->processMidi();
 			break;
@@ -785,6 +787,11 @@ void MidiSeq::msgSetMidiDevice(MidiPort* port, MidiDevice* device)
 	msg.id = SEQM_IDLE;
 	msg.a = false;
 	Thread::sendMsg(&msg);
+}
+
+void MidiSeq::msgPreloadCtrl()
+{
+	msgMsg(SEQM_PRELOAD_PROGRAM);
 }
 
 void MidiSeq::msgProcess()

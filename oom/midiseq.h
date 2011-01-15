@@ -88,6 +88,7 @@ public:
 
     void msgMsg(int id);
     void msgProcess();
+	void msgPreloadCtrl();
     void msgSeek();
     void msgStop();
     void msgSetRtc();

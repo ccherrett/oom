@@ -81,7 +81,7 @@ const char* seqMsgList[] = {
 	"AUDIO_ADD_AC_EVENT",
 	"AUDIO_SET_SOLO", "AUDIO_SET_SEND_METRONOME",
 	"MS_PROCESS", "MS_STOP", "MS_SET_RTC", "MS_UPDATE_POLL_FD",
-	"SEQM_IDLE", "SEQM_SEEK"
+	"SEQM_IDLE", "SEQM_SEEK", "SEQM_PRELOAD_PROGRAM"
 };
 
 const char* audioStates[] = {
@@ -792,6 +792,7 @@ void Audio::processMsg(AudioMsg* msg)
 		case SEQM_SET_TRACK_OUT_PORT:
 		case SEQM_REMAP_PORT_DRUM_CTL_EVS:
 		case SEQM_CHANGE_ALL_PORT_DRUM_CTL_EVS:
+		case SEQM_PRELOAD_PROGRAM:
 			midiSeq->sendMsg(msg);
 			break;
 

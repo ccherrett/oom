@@ -75,7 +75,7 @@ enum
     AUDIO_ADD_AC_EVENT,
     AUDIO_SET_SOLO, AUDIO_SET_SEND_METRONOME,
     MS_PROCESS, MS_STOP, MS_SET_RTC, MS_UPDATE_POLL_FD,
-    SEQM_IDLE, SEQM_SEEK,
+    SEQM_IDLE, SEQM_SEEK, SEQM_PRELOAD_PROGRAM
 };
 
 extern const char* seqMsgList[]; // for debug
@@ -289,6 +289,7 @@ public:
     void msgSetSendMetronome(AudioTrack*, bool);
 
     void msgPlayMidiEvent(const MidiPlayEvent* event);
+	void msgPreloadCtrl();
     void rescanAlsaPorts();
 
     void midiPortsChanged();
