@@ -1688,6 +1688,8 @@ void Audio::preloadControllers()/*{{{*/
 {
 	midiBusy = true;
 
+	EventList pcevents;
+	int evcount = 0;
 	MidiTrackList* tracks = song->midis();
 	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
 	{
@@ -1700,6 +1702,7 @@ void Audio::preloadControllers()/*{{{*/
 	
 		MidiDevice* md = midiPorts[port].device();
 		MPEventList* playEvents = md->playEvents();
+		playEvents->erase(playEvents->begin(), playEvents->end());
 	
 		PartList* pl = track->parts();
 		for (iPart p = pl->begin(); p != pl->end(); ++p)
@@ -1709,7 +1712,6 @@ void Audio::preloadControllers()/*{{{*/
 			unsigned partTick = part->tick();
 			unsigned partLen = part->lenTick();
 			int delay = track->delay;
-			playEvents->erase(playEvents->begin(), playEvents->end());
 	
 			unsigned offset = delay + partTick;
 	
@@ -1725,16 +1727,26 @@ void Audio::preloadControllers()/*{{{*/
 					{
 						printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
 							tick, channel, port, ev.dataA(), ev.dataB());
-						playEvents->add(MidiPlayEvent(tick+300, port, channel, ev));
+						Event tev = Event(Controller);
+						tev.setA(ev.dataA());
+						tev.setB(ev.dataB());
+						tev.setTick(evcount + 50);
+						pcevents.add(tev);
+						evcount = evcount + 50;
 					}
 						break;
 					default:
 						break;
 				}
 			}
-			md->setNextPlayEvent(playEvents->begin());
-			sleep(1);
 		}
+		for (iEvent ie = pcevents.begin(); ie != pcevents.end(); ++ie)
+		{
+			Event ev = ie->second;
+			playEvents->add(MidiPlayEvent(ev.tick(), port, channel, ev));
+		}
+		md->setNextPlayEvent(playEvents->begin());
+		evcount = 0;
 	}
 	midiBusy = false;
 }/*}}}*/
