@@ -1689,7 +1689,7 @@ void Audio::preloadControllers()/*{{{*/
 	midiBusy = true;
 
 	//EventList pcevents;
-	int evcount = 0;
+	int evcount = 50;
 	MidiTrackList* tracks = song->midis();
 	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
 	{
@@ -1732,8 +1732,8 @@ void Audio::preloadControllers()/*{{{*/
 						//tev.setB(ev.dataB());
 						//tev.setTick(evcount + 50);
 						//pcevents.add(tev);
-						playEvents->add(MidiPlayEvent(evcount + 50, port, channel, ev));
-						evcount = evcount + 50;
+						playEvents->add(MidiPlayEvent(tick+evcount, port, channel, ev));
+						evcount = evcount + 150;
 					}
 						break;
 					default:
