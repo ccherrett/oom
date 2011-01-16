@@ -1031,11 +1031,11 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 
 				default:
 					// p3.3.25
-					if (extSyncFlag.value())
-						playEvents->add(MidiPlayEvent(tick, port, channel, ev));
-					else
+					//if (extSyncFlag.value())
+						//playEvents->add(MidiPlayEvent(tick, port, channel, ev));
+					//else
 
-						playEvents->add(MidiPlayEvent(frame, port, channel, ev));
+					//	playEvents->add(MidiPlayEvent(frame, port, channel, ev));
 
 					break;
 			}
