@@ -1734,6 +1734,7 @@ void Audio::preloadControllers()/*{{{*/
 						//pcevents.add(tev);
 						playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 						evcount = evcount + 150;
+						sleep(1);
 					}
 						break;
 					default:
