@@ -1345,6 +1345,7 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HBANK, hb));
 		if (lb != 0xff)
 			queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LBANK, lb));
+		sleep(1);
 		queueEvent(MidiPlayEvent(t + 2, port, chn, ME_PROGRAM, pr, 0));
 		//      }
 	}
