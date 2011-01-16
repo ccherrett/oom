@@ -377,7 +377,7 @@ void MidiPort::sendGmInitValues()
 		// By T356. Initialize from instrument controller if it has an initial value, otherwise use the specified value.
 		// Tested: Ultimately, a track's controller stored values take priority by sending any 'zero time' value
 		//  AFTER these GM/GS/XG init routines are called via initDevices().
-		tryCtrlInitVal(i, CTRL_PROGRAM, 0);
+		//tryCtrlInitVal(i, CTRL_PROGRAM, 0);
 		tryCtrlInitVal(i, CTRL_PITCH, 0);
 		tryCtrlInitVal(i, CTRL_VOLUME, 100);
 		tryCtrlInitVal(i, CTRL_PANPOT, 64);
