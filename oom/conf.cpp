@@ -141,8 +141,7 @@ static void readController(Xml& xml, int midiPort, int channel)
 		{
 			case Xml::TagStart:
 				if (tag == "val")
-					break;
-					//val = xml.parseInt();
+					val = xml.parseInt();
 				else
 					xml.unknown("controller");
 				break;

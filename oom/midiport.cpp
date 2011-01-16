@@ -189,8 +189,8 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 							///{
 							///#endif
 							// Note the addition of bias!
-							_device->putEvent(MidiPlayEvent(0, portno(), chan,
-									ME_CONTROLLER, ctl, mc->initVal() + mc->bias()));
+							/////_device->putEvent(MidiPlayEvent(0, portno(), chan,
+							/////		ME_CONTROLLER, ctl, mc->initVal() + mc->bias()));
 							///#ifdef DSSI_SUPPORT
 							///}
 							///#endif
