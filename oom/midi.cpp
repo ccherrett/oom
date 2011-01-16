@@ -1060,6 +1060,7 @@ void Audio::processMidi()
 	//
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
 	{
+		printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 		MidiDevice* md = *id;
 
 		MPEventList* playEvents = md->playEvents();
@@ -1661,7 +1662,8 @@ void Audio::processMidi()
 		//if(!mjd)
 		//  continue;
 		//mjd->processMidi();
-		///////////////// Crazy Code! ----> /////////////////////(*id)->processMidi();
+		///////////////// Crazy Code! ----> /////////////////////
+		(*id)->processMidi();
 
 		/*
 		int port = md->midiPort();
