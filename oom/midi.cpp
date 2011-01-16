@@ -1706,7 +1706,6 @@ void Audio::preloadControllers()/*{{{*/
 		PartList* pl = track->parts();
 		for (iPart p = pl->begin(); p != pl->end(); ++p)
 		{
-			playEvents->erase(playEvents->begin(), playEvents->end());
 			MidiPart* part = (MidiPart*) (p->second);
 			EventList* events = part->events();
 			unsigned partTick = part->tick();
@@ -1717,6 +1716,7 @@ void Audio::preloadControllers()/*{{{*/
 	
 			for (iEvent ie = events->begin(); ie != events->end(); ++ie)
 			{
+			playEvents->erase(playEvents->begin(), playEvents->end());
 				Event ev = ie->second;
 				port = defaultPort; 
 				unsigned tick = ev.tick() + offset;
@@ -1739,8 +1739,8 @@ void Audio::preloadControllers()/*{{{*/
 					default:
 						break;
 				}
-			}
 			md->setNextPlayEvent(playEvents->begin());
+			}
 			//sleep(1);
 		}
 	//	for (iEvent ie = pcevents.begin(); ie != pcevents.end(); ++ie)
