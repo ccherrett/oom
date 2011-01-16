@@ -1732,7 +1732,7 @@ void Audio::preloadControllers()/*{{{*/
 						//tev.setB(ev.dataB());
 						//tev.setTick(evcount + 50);
 						//pcevents.add(tev);
-						playEvents->add(MidiPlayEvent(tick+100, port, channel, ev));
+						playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 						evcount = evcount + 150;
 						//sleep(1);
 					}
