@@ -654,7 +654,8 @@ bool initJackAudio()
 static int bufsize_callback(jack_nframes_t n, void*)
 {
 	printf("JACK: buffersize changed %d\n", n);
-	return 0;
+	//Christopher testing hard coded jack values
+	return 2048;
 }
 
 //---------------------------------------------------------
