@@ -156,7 +156,7 @@ static void readController(Xml& xml, int midiPort, int channel)
 					//port->addManagedController(channel, id);
 					val = port->limitValToInstrCtlRange(id, val);
 					// The value here will actually be sent to the device LATER, in MidiPort::setMidiDevice()
-					port->setHwCtrlState(channel, id, val);
+					//port->setHwCtrlState(channel, id, val);
 					return;
 				}
 			default:
