@@ -1523,9 +1523,9 @@ void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAl
 		}
 		seqStop();
 	}
-	microSleep(100000);
+	microSleep(10000000);
 	loadProjectFile1(name, songTemplate, loadAll);
-	microSleep(1000000);
+	microSleep(10000000);
 	if (restartSequencer)
 		seqStart();
 
