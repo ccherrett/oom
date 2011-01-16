@@ -224,8 +224,8 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 					///if(!_device->isSynti() || (dynamic_cast<DssiSynthIF*>(((SynthI*)_device)->sif()) == 0))
 					///{
 					///#endif
-					_device->putEvent(MidiPlayEvent(0, portno(), channel,
-							ME_CONTROLLER, cntrl, val));
+					///////_device->putEvent(MidiPlayEvent(0, portno(), channel,
+					///////		ME_CONTROLLER, cntrl, val));
 					///#ifdef DSSI_SUPPORT
 					///}
 					///#endif
