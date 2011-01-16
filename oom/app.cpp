@@ -198,53 +198,6 @@ static void* watchdog(void*)
 
 bool OOMidi::seqStart()
 {
-	// Changed by Tim. p3.3.17
-
-	/*
-	if (audio->isRunning()) {
-		  printf("seqStart(): already running\n");
-		  return true;
-		  }
-      
-	if (realTimeScheduling) {
-		  //
-		  //  create watchdog thread with max priority
-		  //
-		  doSetuid();
-		  struct sched_param rt_param;
-		  memset(&rt_param, 0, sizeof(rt_param));
-		  rt_param.sched_priority = realTimePriority +1;//sched_get_priority_max(SCHED_FIFO);
-
-		  pthread_attr_t* attributes = (pthread_attr_t*) malloc(sizeof(pthread_attr_t));
-		  pthread_attr_init(attributes);
-
-	//             if (pthread_attr_setschedpolicy(attributes, SCHED_FIFO)) {
-	//                   printf("OOMidi: cannot set FIFO scheduling class for RT thread\n");
-	//                   }
-	//             if (pthread_attr_setschedparam (attributes, &rt_param)) {
-	//                   // printf("Cannot set scheduling priority for RT thread (%s)\n", strerror(errno));
-	//                   }
-	//             if (pthread_attr_setscope (attributes, PTHREAD_SCOPE_SYSTEM)) {
-	//                   printf("OOMidi: Cannot set scheduling scope for RT thread\n");
-	//                   }
-		  if (pthread_create(&watchdogThread, attributes, ::watchdog, 0))
-				perror("OOMidi: creating watchdog thread failed:");
-		  pthread_attr_destroy(attributes);
-		  undoSetuid();
-		  }
-	audioPrefetch->start();
-	audioPrefetch->msgSeek(0, true); // force
-	midiSeqRunning = !midiSeq->start();
-      
-	if (!audio->start()) {
-		QMessageBox::critical( oom, tr(QString("Failed to start audio!")),
-			tr(QString("Was not able to start audio, check if jack is running.\n")));
-		return false;
-		}
-
-	return true;
-	 */
-
 	if (audio->isRunning())
 	{
 		printf("seqStart(): already running\n");
@@ -282,66 +235,6 @@ bool OOMidi::seqStart()
 	if (debugMsg)
 		printf("OOMidi::seqStart: getting audio driver realTimePriority:%d\n", realTimePriority);
 
-	// Disabled by Tim. p3.3.22
-	/*
-	if(realTimeScheduling)
-	{
-		  //
-		  //  create watchdog thread with max priority
-		  //
-		  doSetuid();
-		  struct sched_param rt_param;
-		  memset(&rt_param, 0, sizeof(rt_param));
-		  rt_param.sched_priority = realTimePriority + 1;//sched_get_priority_max(SCHED_FIFO);
-
-		  pthread_attr_t* attributes = (pthread_attr_t*) malloc(sizeof(pthread_attr_t));
-		  pthread_attr_init(attributes);
-
-	//             if (pthread_attr_setschedpolicy(attributes, SCHED_FIFO)) {
-	//                   printf("OOMidi: cannot set FIFO scheduling class for RT thread\n");
-	//                   }
-	//             if (pthread_attr_setschedparam (attributes, &rt_param)) {
-	//                   // printf("Cannot set scheduling priority for RT thread (%s)\n", strerror(errno));
-	//                   }
-	//             if (pthread_attr_setscope (attributes, PTHREAD_SCOPE_SYSTEM)) {
-	//                   printf("OOMidi: Cannot set scheduling scope for RT thread\n");
-	//                   }
-		  if (pthread_create(&watchdogThread, attributes, ::watchdog, 0))
-				perror("OOMidi: creating watchdog thread failed");
-		  pthread_attr_destroy(attributes);
-		  undoSetuid();
-	}
-	 */
-
-	//int policy;
-	//if ((policy = sched_getscheduler (0)) < 0) {
-	//      printf("Cannot get current client scheduler: %s\n", strerror(errno));
-	//      }
-	//if (policy != SCHED_FIFO)
-	//      printf("midi thread %d _NOT_ running SCHED_FIFO\n", getpid());
-
-
-	//audioState = AUDIO_RUNNING;
-	// Changed by Tim. p3.3.22
-	/*
-	//if(realTimePriority)
-	if(realTimeScheduling)
-	{
-	  int pr = realTimePriority;
-	  if(pr > 5)
-		pr -= 5;
-	  else
-		pr = 0;
-	  audioPrefetch->start(pr);
-	  //audioWriteback->start(realTimePriority - 5);
-	}
-	else
-	{
-	  audioPrefetch->start(0);
-	  //audioWriteback->start(0);
-	}
-	 */
-
 	int pfprio = 0;
 	int midiprio = 0;
 
@@ -353,50 +246,6 @@ bool OOMidi::seqStart()
 	{
 		//if(realTimePriority < 5)
 		//  printf("OOMidi: WARNING: Recommend setting audio realtime priority to a higher value!\n");
-		/*
-		if(realTimePriority == 0)
-		{
-		  pfprio = 1;
-		  midiprio = 2;
-		}
-		else
-		if(realTimePriority == 1)
-		{
-		  pfprio = 2;
-		  midiprio = 3;
-		}
-		else
-		if(realTimePriority == 2)
-		{
-		  pfprio = 1;
-		  midiprio = 3;
-		}
-		else
-		if(realTimePriority == 3)
-		{
-		  pfprio = 1;
-		  //midiprio = 2;
-		  // p3.3.37
-		  midiprio = 4;
-		}
-		else
-		if(realTimePriority == 4)
-		{
-		  pfprio = 1;
-		  //midiprio = 3;
-		  // p3.3.37
-		  midiprio = 5;
-		}
-		else
-		if(realTimePriority == 5)
-		{
-		  pfprio = 1;
-		  //midiprio = 3;
-		  // p3.3.37
-		  midiprio = 6;
-		}
-		else
-		 */
 		{
 			//pfprio = realTimePriority - 5;
 			// p3.3.40

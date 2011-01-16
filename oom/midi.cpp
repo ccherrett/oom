@@ -1331,14 +1331,18 @@ void Audio::processMidi()
 								// Added by T356.
 							else if (event.type() == ME_CONTROLLER)
 							{
+								//printf("11111111111111111111111111111111111111111111111111111\n");
 								if (track->type() == Track::DRUM)
 								{
+									//printf("2222222222222222222222222222222222222222222222222222222222\n");
 									ctl = event.dataA();
 									// Regardless of what port the event came from, is it a drum controller event
 									//  according to the track port's instrument?
 									mc = tport->drumController(ctl);
 									if (mc)
 									{
+
+										//printf("333333333333333333333333333333333333333333333333\n");
 										int pitch = ctl & 0x7f;
 										ctl &= ~0xff;
 										int dmindex = drumInmap[pitch] & 0x7f;
@@ -1376,15 +1380,19 @@ void Audio::processMidi()
 
 							if (!dev->isSynti())
 							{
+								//printf("444444444444444444444444444444444444444444444444444444\n");
 								//Check if we're outputting to another port than default:
 								if (devport == defaultPort)
 								{
+
+									//printf("5555555555555555555555555555555555555555555\n");
 									event.setPort(port);
 									if (md && track->recEcho())
 										playEvents->add(event);
 								}
 								else
 								{
+									//printf("66666666666666666666666666666666666666\n");
 									// Hmm, this appears to work, but... Will this induce trouble with md->setNextPlayEvent??
 									MidiDevice* mdAlt = midiPorts[devport].device();
 									if (mdAlt && track->recEcho())
@@ -1399,6 +1407,7 @@ void Audio::processMidi()
 							// If syncing externally the event time is already in units of ticks, set above.
 							if (!extsync)
 							{
+								//printf("7777777777777777777777777777777777777777777\n");
 								// p3.3.35
 								//time = tempomap.frame2tick(event.time());
 								//event.setTime(time);  // set tick time
@@ -1408,15 +1417,18 @@ void Audio::processMidi()
 							// Special handling of events stored in rec-lists. a bit hACKish. TODO: Clean up (after 0.7)! :-/ (ml)
 							if (recording)
 							{
+								//printf("888888888888888888888888888888888888888888888888\n");
 								// In these next steps, it is essential to set the recorded event's port
 								//  to the track port so buildMidiEventList will accept it. Even though
 								//  the port may have no device "<none>".
 								//
 								if (track->type() == Track::DRUM)
 								{
+									//printf("99999999999999999999999999999999999999999999999999\n");
 									// Is it a drum controller event?
 									if (mc)
 									{
+										//printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 										MidiPlayEvent drumRecEvent = event;
 										drumRecEvent.setA(ctl | drumRecPitch);
 										// In this case, preVelo is simply the controller value.
@@ -1427,6 +1439,7 @@ void Audio::processMidi()
 									}
 									else
 									{
+										//printf("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n");
 
 										MidiPlayEvent drumRecEvent = event;
 										drumRecEvent.setA(drumRecPitch);
@@ -1443,6 +1456,7 @@ void Audio::processMidi()
 								}
 								else
 								{
+									//printf("ccccccccccccccccccccccccccccccccccccccccccccc\n");
 									// Restore record-pitch to non-transposed value since we don't want the note transposed twice next
 									MidiPlayEvent recEvent = event;
 									if (prePitch)
@@ -1463,6 +1477,7 @@ void Audio::processMidi()
 		// Added by Tim. p3.3.8
 		if (md)
 		{
+			//printf("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n");
 
 			md->setNextPlayEvent(playEvents->begin());
 		}
@@ -1474,6 +1489,7 @@ void Audio::processMidi()
 	//
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
 	{
+		//printf("--------------------------aaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 		MidiDevice* md = *id;
 
 		///md->recordEvents()->clear();
@@ -1645,6 +1661,7 @@ void Audio::processMidi()
 		//if(!mjd)
 		//  continue;
 		//mjd->processMidi();
+		///////////////// Crazy Code! ----> /////////////////////
 		(*id)->processMidi();
 
 		/*
@@ -1702,7 +1719,6 @@ void Audio::preloadControllers()/*{{{*/
 	
 		MidiDevice* md = midiPorts[port].device();
 		MPEventList* playEvents = md->playEvents();
-		playEvents->erase(playEvents->begin(), playEvents->end());
 	
 		PartList* pl = track->parts();
 		for (iPart p = pl->begin(); p != pl->end(); ++p)
@@ -1714,6 +1730,7 @@ void Audio::preloadControllers()/*{{{*/
 			int delay = track->delay;
 	
 			unsigned offset = delay + partTick;
+			playEvents->erase(playEvents->begin(), playEvents->end());
 	
 			for (iEvent ie = events->begin(); ie != events->end(); ++ie)
 			{
@@ -1732,21 +1749,23 @@ void Audio::preloadControllers()/*{{{*/
 						//tev.setB(ev.dataB());
 						//tev.setTick(evcount + 50);
 						//pcevents.add(tev);
-						playEvents->add(MidiPlayEvent(0, port, channel, ev));
+						playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 						evcount = evcount + 150;
+						//sleep(1);
 					}
 						break;
 					default:
 						break;
 				}
 			}
+			md->setNextPlayEvent(playEvents->begin());
+			//sleep(1);
 		}
 	//	for (iEvent ie = pcevents.begin(); ie != pcevents.end(); ++ie)
 	//	{
 	//		Event ev = ie->second;
 	//		playEvents->add(MidiPlayEvent(ev.tick(), port, channel, ev));
 	//	}
-		md->setNextPlayEvent(playEvents->begin());
 		evcount = 0;
 	}
 	midiBusy = false;

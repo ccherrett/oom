@@ -189,8 +189,8 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 							///{
 							///#endif
 							// Note the addition of bias!
-							_device->putEvent(MidiPlayEvent(0, portno(), chan,
-									ME_CONTROLLER, ctl, mc->initVal() + mc->bias()));
+							/////_device->putEvent(MidiPlayEvent(0, portno(), chan,
+							/////		ME_CONTROLLER, ctl, mc->initVal() + mc->bias()));
 							///#ifdef DSSI_SUPPORT
 							///}
 							///#endif
@@ -224,8 +224,8 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 					///if(!_device->isSynti() || (dynamic_cast<DssiSynthIF*>(((SynthI*)_device)->sif()) == 0))
 					///{
 					///#endif
-					_device->putEvent(MidiPlayEvent(0, portno(), channel,
-							ME_CONTROLLER, cntrl, val));
+					///////_device->putEvent(MidiPlayEvent(0, portno(), channel,
+					///////		ME_CONTROLLER, cntrl, val));
 					///#ifdef DSSI_SUPPORT
 					///}
 					///#endif
@@ -377,12 +377,12 @@ void MidiPort::sendGmInitValues()
 		// By T356. Initialize from instrument controller if it has an initial value, otherwise use the specified value.
 		// Tested: Ultimately, a track's controller stored values take priority by sending any 'zero time' value
 		//  AFTER these GM/GS/XG init routines are called via initDevices().
-		tryCtrlInitVal(i, CTRL_PROGRAM, 0);
-		tryCtrlInitVal(i, CTRL_PITCH, 0);
-		tryCtrlInitVal(i, CTRL_VOLUME, 100);
-		tryCtrlInitVal(i, CTRL_PANPOT, 64);
-		tryCtrlInitVal(i, CTRL_REVERB_SEND, 40);
-		tryCtrlInitVal(i, CTRL_CHORUS_SEND, 0);
+		//tryCtrlInitVal(i, CTRL_PROGRAM, 0);
+		//tryCtrlInitVal(i, CTRL_PITCH, 0);
+		//tryCtrlInitVal(i, CTRL_VOLUME, 100);
+		//tryCtrlInitVal(i, CTRL_PANPOT, 64);
+		//tryCtrlInitVal(i, CTRL_REVERB_SEND, 40);
+		//tryCtrlInitVal(i, CTRL_CHORUS_SEND, 0);
 	}
 }
 
@@ -423,7 +423,8 @@ void MidiPort::sendXgInitValues()
 		//setHwCtrlState(i, CTRL_VARIATION_SEND, 0x0);
 
 		// By T356. Initialize from instrument controller if it has an initial value, otherwise use the specified value.
-		tryCtrlInitVal(i, CTRL_PROGRAM, 0);
+		//tryCtrlInitVal(i, CTRL_PROGRAM, 0);
+		/*
 		tryCtrlInitVal(i, CTRL_MODULATION, 0);
 		tryCtrlInitVal(i, CTRL_PORTAMENTO_TIME, 0);
 		tryCtrlInitVal(i, CTRL_VOLUME, 0x64);
@@ -440,6 +441,7 @@ void MidiPort::sendXgInitValues()
 		tryCtrlInitVal(i, CTRL_REVERB_SEND, 0x28);
 		tryCtrlInitVal(i, CTRL_CHORUS_SEND, 0x0);
 		tryCtrlInitVal(i, CTRL_VARIATION_SEND, 0x0);
+		*/
 	}
 }
 
