@@ -1060,7 +1060,6 @@ void Audio::processMidi()
 	//
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
 	{
-		printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 		MidiDevice* md = *id;
 
 		MPEventList* playEvents = md->playEvents();
@@ -1085,7 +1084,7 @@ void Audio::processMidi()
 		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(md);
 		//if(mjd)
 		//  mjd->collectMidiEvents();
-		md->collectMidiEvents();
+		//md->collectMidiEvents();
 
 		// Take snapshots of the current sizes of the recording fifos,
 		//  because they may change while here in process, asynchronously.
