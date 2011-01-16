@@ -199,7 +199,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 							//setHwCtrlState(chan, ctl, mc->initVal() + mc->bias());
 							// Set it again so that control labels show 'off'...
 							//setHwCtrlState(chan, ctl, CTRL_VAL_UNKNOWN);
-							//////setHwCtrlStates(chan, ctl, CTRL_VAL_UNKNOWN, mc->initVal() + mc->bias());
+							/////////////////setHwCtrlStates(chan, ctl, CTRL_VAL_UNKNOWN, mc->initVal() + mc->bias());
 						}
 					}
 				}
@@ -231,7 +231,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 					///#endif
 
 					// Set it once so the 'last HW value' is set, and control knobs are positioned at the value...
-					////////setHwCtrlState(channel, cntrl, val);
+					//////////////////setHwCtrlState(channel, cntrl, val);
 					// Set it again so that control labels show 'off'...
 					//setHwCtrlState(channel, cntrl, CTRL_VAL_UNKNOWN);
 					//setHwCtrlStates(channel, cntrl, CTRL_VAL_UNKNOWN, val);
@@ -440,8 +440,7 @@ void MidiPort::sendXgInitValues()
 		tryCtrlInitVal(i, CTRL_BRIGHTNESS, 0x40);
 		tryCtrlInitVal(i, CTRL_REVERB_SEND, 0x28);
 		tryCtrlInitVal(i, CTRL_CHORUS_SEND, 0x0);
-		tryCtrlInitVal(i, CTRL_VARIATION_SEND, 0x0);
-		*/
+		tryCtrlInitVal(i, CTRL_VARIATION_SEND, 0x0);*/
 	}
 }
 
@@ -733,8 +732,8 @@ bool MidiPort::sendEvent(const MidiPlayEvent& ev)
 		//      return false;
 		//      }
 		// printf("set HW Ctrl State ch:%d 0x%x 0x%x\n", ev.channel(), ev.dataA(), ev.dataB());
-		/////////////if (!setHwCtrlState(ev.channel(), da, db))
-		/////////////	return false;
+		if (!setHwCtrlState(ev.channel(), da, db))
+			return false;
 	}
 	else
 		if (ev.type() == ME_PITCHBEND)
@@ -744,14 +743,14 @@ bool MidiPort::sendEvent(const MidiPlayEvent& ev)
 		//if (hwCtrlState(ev.channel(), CTRL_PITCH) == ev.dataA())
 		//  return false;
 
-		///////////////if (!setHwCtrlState(ev.channel(), CTRL_PITCH, da))
-		///////////////	return false;
+		if (!setHwCtrlState(ev.channel(), CTRL_PITCH, da))
+			return false;
 	}
 	else
 		if (ev.type() == ME_PROGRAM)
 	{
-		////////////////if (!setHwCtrlState(ev.channel(), CTRL_PROGRAM, ev.dataA()))
-			//////////////////return false;
+		if (!setHwCtrlState(ev.channel(), CTRL_PROGRAM, ev.dataA()))
+			return false;
 	}
 
 
