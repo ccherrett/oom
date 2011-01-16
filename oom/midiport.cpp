@@ -331,14 +331,14 @@ void MidiPort::tryCtrlInitVal(int chan, int ctl, int val)
 				if (_device)
 				{
 					//MidiPlayEvent ev(song->cpos(), portno(), chan, ME_CONTROLLER, ctl, initval + mc->bias());
-					MidiPlayEvent ev(0, portno(), chan, ME_CONTROLLER, ctl, initval + mc->bias());
-					_device->putEvent(ev);
+					//////MidiPlayEvent ev(0, portno(), chan, ME_CONTROLLER, ctl, initval + mc->bias());
+					//////_device->putEvent(ev);
 				}
 				// Set it once so the 'last HW value' is set, and control knobs are positioned at the value...
 				//setHwCtrlState(chan, ctl, initval + mc->bias());
 				// Set it again so that control labels show 'off'...
 				//setHwCtrlState(chan, ctl, CTRL_VAL_UNKNOWN);
-				setHwCtrlStates(chan, ctl, CTRL_VAL_UNKNOWN, initval + mc->bias());
+				///////setHwCtrlStates(chan, ctl, CTRL_VAL_UNKNOWN, initval + mc->bias());
 
 				return;
 			}
@@ -348,14 +348,14 @@ void MidiPort::tryCtrlInitVal(int chan, int ctl, int val)
 	if (_device)
 	{
 		//MidiPlayEvent ev(song->cpos(), portno(), chan, ME_CONTROLLER, ctl, val);
-		MidiPlayEvent ev(0, portno(), chan, ME_CONTROLLER, ctl, val);
-		_device->putEvent(ev);
+		///////MidiPlayEvent ev(0, portno(), chan, ME_CONTROLLER, ctl, val);
+		///////_device->putEvent(ev);
 	}
 	// Set it once so the 'last HW value' is set, and control knobs are positioned at the value...
 	//setHwCtrlState(chan, ctl, val);
 	// Set it again so that control labels show 'off'...
 	//setHwCtrlState(chan, ctl, CTRL_VAL_UNKNOWN);
-	setHwCtrlStates(chan, ctl, CTRL_VAL_UNKNOWN, val);
+	///////setHwCtrlStates(chan, ctl, CTRL_VAL_UNKNOWN, val);
 }
 
 //---------------------------------------------------------
