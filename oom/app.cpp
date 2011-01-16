@@ -269,10 +269,9 @@ bool OOMidi::seqStart()
 	//  printf("OOMidi: WARNING: Midi realtime priority %d is the same as audio prefetch realtime priority %d. Try a different setting.\n",
 	//         midiprio, pfprio);
 
-	//Andrew (98-45-7620)
-	//audioPrefetch->start(pfprio);
+	audioPrefetch->start(pfprio);
 
-	//audioPrefetch->msgSeek(0, true); // force
+	audioPrefetch->msgSeek(0, true); // force
 
 	//midiSeqRunning = !midiSeq->start(realTimeScheduling ? realTimePriority : 0);
 	// Changed by Tim. p3.3.22

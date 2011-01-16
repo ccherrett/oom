@@ -1207,7 +1207,7 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 	if (!_out_client_jackport) // p3.3.55
 		return false;
 	//void* pb = jack_port_get_buffer(_client_jackport, segmentSize);
-	void* pb = jack_port_get_buffer(_out_client_jackport, segmentSize); // p3.3.55
+	void* pb = jack_port_get_buffer(_out_client_jackport, 2048);//segmentSize); // p3.3.55
 
 	//unsigned frameCounter = ->frameTime();
 	int frameOffset = audio->getFrameOffset();
