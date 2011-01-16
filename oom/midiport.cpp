@@ -174,6 +174,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 						if (mc->initVal() != CTRL_VAL_UNKNOWN)
 						{
 							int ctl = mc->num();
+							printf("Setting Values 111111111111111111");
 
 							///#ifdef DSSI_SUPPORT
 							// Exclude dssi synths from this, as some of them have hundreds of controls.
