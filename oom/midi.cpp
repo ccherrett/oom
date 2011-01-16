@@ -1084,7 +1084,7 @@ void Audio::processMidi()
 		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(md);
 		//if(mjd)
 		//  mjd->collectMidiEvents();
-		//md->collectMidiEvents();
+		md->collectMidiEvents();
 
 		// Take snapshots of the current sizes of the recording fifos,
 		//  because they may change while here in process, asynchronously.
@@ -1331,7 +1331,7 @@ void Audio::processMidi()
 								// Added by T356.
 							else if (event.type() == ME_CONTROLLER)
 							{
-								//printf("11111111111111111111111111111111111111111111111111111\n");
+								printf("11111111111111111111111111111111111111111111111111111\n");
 								if (track->type() == Track::DRUM)
 								{
 									//printf("2222222222222222222222222222222222222222222222222222222222\n");
