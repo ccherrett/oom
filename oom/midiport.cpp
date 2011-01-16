@@ -174,7 +174,6 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 						if (mc->initVal() != CTRL_VAL_UNKNOWN)
 						{
 							int ctl = mc->num();
-							printf("Setting Values 111111111111111111");
 
 							///#ifdef DSSI_SUPPORT
 							// Exclude dssi synths from this, as some of them have hundreds of controls.
@@ -190,6 +189,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 							///{
 							///#endif
 							// Note the addition of bias!
+							printf("Setting Values portNo:%d chan:%d ctl:$d intival:%d\n",protno(),chan,ctl,mc->initVal());
 							_device->putEvent(MidiPlayEvent(0, portno(), chan,
 									ME_CONTROLLER, ctl, mc->initVal() + mc->bias()));
 							///#ifdef DSSI_SUPPORT
