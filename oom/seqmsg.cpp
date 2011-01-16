@@ -947,6 +947,7 @@ void Audio::msgChangePart(Part* oldPart, Part* newPart, bool doUndoFlag, bool do
 
 void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls, bool doClones)
 {
+	printf("Entering Audio::msgAddEvent\n");
 	AudioMsg msg;
 	msg.id = SEQM_ADD_EVENT;
 	msg.ev1 = event;
