@@ -1203,8 +1203,8 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 					for (iMidiCtrlValList i = s; i != e; ++i)
 					{
 						xml.tag(level++, "controller id=\"%d\"", i->second->num());
-						if (i->second->hwVal() != CTRL_VAL_UNKNOWN)
-							xml.intTag(level, "val", i->second->hwVal());
+						//if (i->second->hwVal() != CTRL_VAL_UNKNOWN)
+						//	xml.intTag(level, "val", i->second->hwVal());
 						xml.etag(level--, "controller");
 					}
 				}
