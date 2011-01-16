@@ -1702,11 +1702,11 @@ void Audio::preloadControllers()/*{{{*/
 	
 		MidiDevice* md = midiPorts[port].device();
 		MPEventList* playEvents = md->playEvents();
-		playEvents->erase(playEvents->begin(), playEvents->end());
 	
 		PartList* pl = track->parts();
 		for (iPart p = pl->begin(); p != pl->end(); ++p)
 		{
+			playEvents->erase(playEvents->begin(), playEvents->end());
 			MidiPart* part = (MidiPart*) (p->second);
 			EventList* events = part->events();
 			unsigned partTick = part->tick();
@@ -1740,13 +1740,13 @@ void Audio::preloadControllers()/*{{{*/
 						break;
 				}
 			}
+			md->setNextPlayEvent(playEvents->begin());
 		}
 	//	for (iEvent ie = pcevents.begin(); ie != pcevents.end(); ++ie)
 	//	{
 	//		Event ev = ie->second;
 	//		playEvents->add(MidiPlayEvent(ev.tick(), port, channel, ev));
 	//	}
-		md->setNextPlayEvent(playEvents->begin());
 		evcount = 0;
 	}
 	midiBusy = false;
