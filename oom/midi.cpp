@@ -1477,7 +1477,7 @@ void Audio::processMidi()
 		// Added by Tim. p3.3.8
 		if (md)
 		{
-			printf("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n");
+			//printf("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n");
 
 			md->setNextPlayEvent(playEvents->begin());
 		}
@@ -1489,7 +1489,7 @@ void Audio::processMidi()
 	//
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
 	{
-		printf("--------------------------aaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+		//printf("--------------------------aaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 		MidiDevice* md = *id;
 
 		///md->recordEvents()->clear();
@@ -1661,7 +1661,7 @@ void Audio::processMidi()
 		//if(!mjd)
 		//  continue;
 		//mjd->processMidi();
-		(*id)->processMidi();
+		//(*id)->processMidi();
 
 		/*
 		int port = md->midiPort();
