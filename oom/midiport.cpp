@@ -311,9 +311,9 @@ const QString& MidiPort::portname() const
 
 void MidiPort::tryCtrlInitVal(int chan, int ctl, int val)
 {
+	printf("MidiPort::tryCtrlInitVal chan:%d ctl:%d val:%d\n",chan,ctl,val);
 	if (_instrument)
 	{
-		printf("Found instrument chan:%d ctl:%d val:%d\n",chan,ctl,val);
 		MidiControllerList* cl = _instrument->controller();
 		//for(ciMidiController imc = cl->begin(); imc != cl->end(); ++imc)
 		ciMidiController imc = cl->find(ctl);
