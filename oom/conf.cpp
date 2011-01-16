@@ -152,11 +152,11 @@ static void readController(Xml& xml, int midiPort, int channel)
 			case Xml::TagEnd:
 				if (tag == "controller")
 				{
-					MidiPort* port = &midiPorts[midiPort];
+					////MidiPort* port = &midiPorts[midiPort];
 					//port->addManagedController(channel, id);
-					val = port->limitValToInstrCtlRange(id, val);
+					////val = port->limitValToInstrCtlRange(id, val);
 					// The value here will actually be sent to the device LATER, in MidiPort::setMidiDevice()
-					//port->setHwCtrlState(channel, id, val);
+					////port->setHwCtrlState(channel, id, val);
 					return;
 				}
 			default:
