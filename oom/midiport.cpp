@@ -424,6 +424,7 @@ void MidiPort::sendXgInitValues()
 
 		// By T356. Initialize from instrument controller if it has an initial value, otherwise use the specified value.
 		//tryCtrlInitVal(i, CTRL_PROGRAM, 0);
+		/*
 		tryCtrlInitVal(i, CTRL_MODULATION, 0);
 		tryCtrlInitVal(i, CTRL_PORTAMENTO_TIME, 0);
 		tryCtrlInitVal(i, CTRL_VOLUME, 0x64);
@@ -440,6 +441,7 @@ void MidiPort::sendXgInitValues()
 		tryCtrlInitVal(i, CTRL_REVERB_SEND, 0x28);
 		tryCtrlInitVal(i, CTRL_CHORUS_SEND, 0x0);
 		tryCtrlInitVal(i, CTRL_VARIATION_SEND, 0x0);
+		*/
 	}
 }
 
