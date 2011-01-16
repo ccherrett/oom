@@ -12,6 +12,7 @@
 #include <QSignalMapper>
 #include <QTimer>
 #include <QWhatsThis>
+#include <QDomDocument>
 
 #include "app.h"
 #include "master/lmaster.h"
@@ -1657,6 +1658,7 @@ void OOMidi::loadProjectFile(const QString& name)
 	loadProjectFile(name, false, false);
 }
 
+
 void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAll)
 {
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1675,6 +1677,7 @@ void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAl
 		seqStop();
 	}
 	microSleep(100000);
+
 	loadProjectFile1(name, songTemplate, loadAll);
 	microSleep(100000);
 	if (restartSequencer)
@@ -1756,6 +1759,39 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		}
 		else
 		{
+                        // Load the .med file into a QDomDocument.
+                        // the xml parser of QDomDocument then will be able to tell us
+                        // if the .med file didn't get corrupted in some way, cause the
+                        // internal xml parser of oom can't do that.
+                        QDomDocument doc("OOMProject");
+                        QFile file(fi.filePath());
+
+                        if (!file.open(QIODevice::ReadOnly)) {
+                                printf("Could not open file %s readonly\n", file.fileName().toLatin1().data());
+                        }
+
+                        QString errorMsg;
+                        if (!doc.setContent(&file, &errorMsg)) {
+                                printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
+
+                                if (QMessageBox::critical(this,
+                                                      QString("OOMidi Load Project"),
+                                                      tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n\n"
+                                                         "Suggestion: \n\nmove the %1 file to another location, and rename the %1.backup to %1"
+                                                         " and reload the project\n")
+                                                      .arg(file.fileName())
+                                                      .arg(errorMsg),
+                                                      "OK")) {
+                                        setUntitledProject();
+                                        // is it save to return; here ?
+                                        return;
+                                }
+
+                        }
+
+                        // OK, seems the xml file contained valid xml, start loading the real thing here
+                        // using the internal xml parser for now.
+
 			Xml xml(f);
 			read(xml, !loadAll);
 			bool fileError = ferror(f);
