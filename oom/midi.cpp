@@ -1741,7 +1741,7 @@ void Audio::preloadControllers()/*{{{*/
 				}
 			}
 			md->setNextPlayEvent(playEvents->begin());
-			sleep(1);
+			//sleep(1);
 		}
 	//	for (iEvent ie = pcevents.begin(); ie != pcevents.end(); ++ie)
 	//	{

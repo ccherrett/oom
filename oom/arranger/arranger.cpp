@@ -1127,6 +1127,8 @@ void Arranger::switchInfo(int n)
 void Arranger::preloadControllers()
 {
 	audio->preloadControllers();
+	sleep(1);
+	audio->preloadControllers();
 }
 
 /*
