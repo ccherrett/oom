@@ -558,8 +558,8 @@ void MidiPort::sendStart()
 {
 	if (_device)
 	{
-		MidiPlayEvent event(0, 0, 0, ME_START, 0, 0);
-		_device->putEvent(event);
+		//MidiPlayEvent event(0, 0, 0, ME_START, 0, 0);
+		//_device->putEvent(event);
 	}
 }
 
