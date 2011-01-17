@@ -454,7 +454,7 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	grid->addWidget(autoType, _curGridRow++, 0, 1, 2);
 	grid->addItem(new QSpacerItem(0, 5), _curGridRow++, 0);
 	QLabel* toprack = new QLabel();
-	toprack->setPixmap(QPixmap(":/images/bottom_rack.png"));
+	toprack->setPixmap(QPixmap(":/images/bottom_rack_midi.png"));
 	grid->addWidget(toprack, _curGridRow++, 0, 1, 2);
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 	inHeartBeat = false;

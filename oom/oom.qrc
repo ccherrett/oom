@@ -71,6 +71,8 @@
 		<file>images/icons/blank_record.png</file>
 		<file>images/top_rack.png</file>
 		<file>images/bottom_rack.png</file>
+		<file>images/top_rack_midi.png</file>
+		<file>images/bottom_rack_midi.png</file>
 		<file>images/flagSP.png</file>
 		<file>images/icons/up.png</file>
 		<file>images/icons/down.png</file>

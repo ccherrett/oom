@@ -208,6 +208,7 @@ Strip::Strip(QWidget* parent, Track* t)
 	// NOTE: This was required, otherwise the strip labels have no colour in the mixer only - track info OK !
 	// Not sure why...
 	label = new QLabel(this);
+	QPixmap topRack(":/images/top_rack.png");
 	switch (track->type())
 	{
 		case Track::AUDIO_OUTPUT:
@@ -232,6 +233,7 @@ Strip::Strip(QWidget* parent, Track* t)
 		case Track::DRUM:
 		{
 			label->setObjectName("MidiTrackLabel");
+			topRack = QPixmap(":/images/top_rack_midi.png");
 		}
 			break;
 	}
@@ -274,7 +276,7 @@ Strip::Strip(QWidget* parent, Track* t)
 
 	//Add you top image here
 	QLabel* toprack = new QLabel();
-	toprack->setPixmap(QPixmap(":/images/top_rack.png"));
+	toprack->setPixmap(topRack);//QPixmap(":/images/top_rack.png"));
 	grid->addWidget(toprack, _curGridRow++, 0, 1, 2);
 	//layout->addWidget(label);
 	grid->addWidget(label, _curGridRow++, 0, 1, 2);
