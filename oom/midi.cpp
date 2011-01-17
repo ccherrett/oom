@@ -1712,6 +1712,7 @@ void Audio::preloadControllers()/*{{{*/
 	
 		MidiDevice* md = midiPorts[port].device();
 		MPEventList* playEvents = md->playEvents();
+		playEvents->erase(playEvents->begin(), playEvents->end());
 	
 		PartList* pl = track->parts();
 		for (iPart p = pl->begin(); p != pl->end(); ++p)
@@ -1723,7 +1724,6 @@ void Audio::preloadControllers()/*{{{*/
 			int delay = track->delay;
 	
 			unsigned offset = delay + partTick;
-			playEvents->erase(playEvents->begin(), playEvents->end());
 	
 			for (iEvent ie = events->begin(); ie != events->end(); ++ie)
 			{
@@ -1762,8 +1762,8 @@ void Audio::preloadControllers()/*{{{*/
 						break;
 				}
 			}
-			md->setNextPlayEvent(playEvents->begin());
 		}
+		md->setNextPlayEvent(playEvents->begin());
 	}
 	midiBusy = false;
 }/*}}}*/
