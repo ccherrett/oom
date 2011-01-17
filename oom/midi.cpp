@@ -1751,7 +1751,14 @@ void Audio::preloadControllers()/*{{{*/
 						pl->port = port;
 						pl->channel = channel;
 						pl->dataB = ev.dataB();
-						if(pcevents.isEmpty() || !pcevents.contains(pl))
+						bool addEvent = true;
+						for(int i = 0; i < pcevents.size(); ++i)
+						{
+							ProcessList* ipl = pcevents.at(i);
+							if(ipl->port == pl->port && ipl->channel == pl->channel && ipl->dataB == pl->dataB)
+								addEvent = false;
+						}
+						if(addEvent)
 						{
 							printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
 								tick, channel, port, ev.dataA(), ev.dataB());
