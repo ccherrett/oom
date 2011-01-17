@@ -1746,7 +1746,7 @@ void Audio::preloadControllers()/*{{{*/
 						//tev.setA(ev.dataA());
 						//tev.setB(ev.dataB());
 						//tev.setTick(evcount + 50);
-						if(pcevents.isEmpty() || pcevents.indexOf(ev) == -1)
+						if(pcevents.empty() || pcevents.find(ev) == pcevents.end())
 						{
 							printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
 								tick, channel, port, ev.dataA(), ev.dataB());
