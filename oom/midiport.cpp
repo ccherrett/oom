@@ -160,7 +160,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 					//printf("Entering: MidiPort::setMidiDevice\n");
 					ciMidiCtrlValList i;
 					// Look for an initial value for this midi controller, on this midi channel, in the song...
-					/*for (i = _controller->begin(); i != _controller->end(); ++i)
+					for (i = _controller->begin(); i != _controller->end(); ++i)
 					{
 						int channel = i->first >> 24;
 						int cntrl = i->first & 0xffffff;
@@ -168,7 +168,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 						if (channel == chan && cntrl == mc->num() && val != CTRL_VAL_UNKNOWN)
 							break;
 					}
-					*/
+					
 					// If no initial value was found for this midi controller, on this midi channel, in the song...
 					if (i == _controller->end())
 					{
