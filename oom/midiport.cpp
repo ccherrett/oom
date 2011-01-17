@@ -239,12 +239,11 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 					//setHwCtrlStates(channel, cntrl, CTRL_VAL_UNKNOWN, val);
 				}
 			}
-		}
+		}*/
 	}
 
 	else
 		clearDevice();
-	*/
 }
 
 //---------------------------------------------------------
