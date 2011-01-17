@@ -1742,14 +1742,14 @@ void Audio::preloadControllers()/*{{{*/
 				{
 					case CTRL_PROGRAM:
 					{
-						printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
-							tick, channel, port, ev.dataA(), ev.dataB());
 						//Event tev = Event(Controller);
 						//tev.setA(ev.dataA());
 						//tev.setB(ev.dataB());
 						//tev.setTick(evcount + 50);
-						if(pcevent.isEmpty() || pcevents.indexOf(ev) == -1)
+						if(pcevents.isEmpty() || pcevents.indexOf(ev) == -1)
 						{
+							printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
+								tick, channel, port, ev.dataA(), ev.dataB());
 							pcevents.add(ev);
 							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 						}
