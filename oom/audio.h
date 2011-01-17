@@ -108,6 +108,15 @@ struct AudioMsg : public ThreadMsg
     Pos pos;
 };
 
+//---------------------------------------------------------
+//  Struct for controll preload processing
+//---------------------------------------------------------
+struct ProcessList {
+	int port;
+	int channel;
+	int dataB;
+};
+
 class AudioOutput;
 
 //---------------------------------------------------------

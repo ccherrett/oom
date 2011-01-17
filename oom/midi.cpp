@@ -1705,7 +1705,8 @@ void Audio::preloadControllers()/*{{{*/
 {
 	midiBusy = true;
 
-	EventList pcevents;
+	//EventList pcevents;
+	QList<ProcessList*> pcevents;
 	int evcount = 50;
 	MidiTrackList* tracks = song->midis();
 	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
@@ -1746,11 +1747,15 @@ void Audio::preloadControllers()/*{{{*/
 						//tev.setA(ev.dataA());
 						//tev.setB(ev.dataB());
 						//tev.setTick(evcount + 50);
-						if(pcevents.empty() || pcevents.find(ev) == pcevents.end())
+						ProcessList *pl = new ProcessList;
+						pl->port = port;
+						pl->channel = channel;
+						pl->dataB = ev.dataB();
+						if(pcevents.isEmpty() || !pcevents.contains(pl))
 						{
 							printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
 								tick, channel, port, ev.dataA(), ev.dataB());
-							pcevents.add(ev);
+							pcevents.append(pl);
 							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 						}
 						evcount = evcount + 150;
