@@ -147,7 +147,6 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 		//
 		//if(_instrument)
 		// p3.3.39 NOT for syntis! Use midiState an/or initParams for that.
-		/*
 		if (_instrument && !_device->isSynti())
 		{
 			MidiControllerList* cl = _instrument->controller();
@@ -190,7 +189,6 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 							///{
 							///#endif
 							// Note the addition of bias!
-							printf("Setting Values portNo:%d chan:%d ctl:%d intival:%d\n",portno(),chan,ctl,mc->initVal()+mc->bias());
 							_device->putEvent(MidiPlayEvent(0, portno(), chan,
 									ME_CONTROLLER, ctl, mc->initVal() + mc->bias()));
 							///#ifdef DSSI_SUPPORT
@@ -206,8 +204,8 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 					}
 				}
 			}
-		}*/
-		/*
+		}
+
 		// init HW controller state
 		// p3.3.39 NOT for syntis! Use midiState an/or initParams for that.
 		if (!_device->isSynti())
@@ -239,7 +237,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 					//setHwCtrlStates(channel, cntrl, CTRL_VAL_UNKNOWN, val);
 				}
 			}
-		}*/
+		}
 	}
 
 	else
@@ -313,7 +311,6 @@ const QString& MidiPort::portname() const
 
 void MidiPort::tryCtrlInitVal(int chan, int ctl, int val)
 {
-	printf("MidiPort::tryCtrlInitVal chan:%d ctl:%d val:%d\n",chan,ctl,val);
 	if (_instrument)
 	{
 		MidiControllerList* cl = _instrument->controller();
@@ -380,13 +377,12 @@ void MidiPort::sendGmInitValues()
 		// By T356. Initialize from instrument controller if it has an initial value, otherwise use the specified value.
 		// Tested: Ultimately, a track's controller stored values take priority by sending any 'zero time' value
 		//  AFTER these GM/GS/XG init routines are called via initDevices().
-		/*tryCtrlInitVal(i, CTRL_PROGRAM, 0);
+		tryCtrlInitVal(i, CTRL_PROGRAM, 0);
 		tryCtrlInitVal(i, CTRL_PITCH, 0);
 		tryCtrlInitVal(i, CTRL_VOLUME, 100);
 		tryCtrlInitVal(i, CTRL_PANPOT, 64);
 		tryCtrlInitVal(i, CTRL_REVERB_SEND, 40);
 		tryCtrlInitVal(i, CTRL_CHORUS_SEND, 0);
-		*/
 	}
 }
 
@@ -427,7 +423,7 @@ void MidiPort::sendXgInitValues()
 		//setHwCtrlState(i, CTRL_VARIATION_SEND, 0x0);
 
 		// By T356. Initialize from instrument controller if it has an initial value, otherwise use the specified value.
-		/*tryCtrlInitVal(i, CTRL_PROGRAM, 0);
+		tryCtrlInitVal(i, CTRL_PROGRAM, 0);
 		tryCtrlInitVal(i, CTRL_MODULATION, 0);
 		tryCtrlInitVal(i, CTRL_PORTAMENTO_TIME, 0);
 		tryCtrlInitVal(i, CTRL_VOLUME, 0x64);
@@ -444,7 +440,6 @@ void MidiPort::sendXgInitValues()
 		tryCtrlInitVal(i, CTRL_REVERB_SEND, 0x28);
 		tryCtrlInitVal(i, CTRL_CHORUS_SEND, 0x0);
 		tryCtrlInitVal(i, CTRL_VARIATION_SEND, 0x0);
-		*/
 	}
 }
 
@@ -701,9 +696,41 @@ bool MidiPort::sendEvent(const MidiPlayEvent& ev)
 		// Added by T356.
 		int da = ev.dataA();
 		int db = ev.dataB();
+		/*
+		// Is it a drum controller?
+		MidiController* mc = drumController(da);
+		if(mc)
+		{
+		  DrumMap* dm = &drumMap[da & 0x7f];
+		  int port = dm->port;
+		  MidiPort* mp = &midiPorts[port];
+		  // Is it NOT for this MidiPort?
+		  if(mp && (mp != this))
+		  {
+			// Redirect the event to the mapped port and channel...
+			da = (da & ~0xff) | (dm->anote & 0x7f);
+			db = mp->limitValToInstrCtlRange(da, db);
+			MidiPlayEvent nev(ev.time(), port, dm->channel, ME_CONTROLLER, da, db);
+			if(!mp->setHwCtrlState(ev.channel(), da, db))
+			  return false;
+			if(!mp->device())
+			  return true;
+			return mp->device()->putEvent(nev);
+		  }
+		}
+		 */
 		db = limitValToInstrCtlRange(da, db);
 
 
+		// Removed by T356.
+		//
+		//  optimize controller settings
+		//
+		//if (hwCtrlState(ev.channel(), ev.dataA()) == ev.dataB()) {
+		// printf("optimize ctrl %d %x val %d\n", ev.dataA(), ev.dataA(), ev.dataB());
+		//      return false;
+		//      }
+		// printf("set HW Ctrl State ch:%d 0x%x 0x%x\n", ev.channel(), ev.dataA(), ev.dataB());
 		if (!setHwCtrlState(ev.channel(), da, db))
 			return false;
 	}
@@ -711,14 +738,18 @@ bool MidiPort::sendEvent(const MidiPlayEvent& ev)
 		if (ev.type() == ME_PITCHBEND)
 	{
 		int da = limitValToInstrCtlRange(CTRL_PITCH, ev.dataA());
+		// Removed by T356.
+		//if (hwCtrlState(ev.channel(), CTRL_PITCH) == ev.dataA())
+		//  return false;
 
 		if (!setHwCtrlState(ev.channel(), CTRL_PITCH, da))
 			return false;
 	}
-	else if (ev.type() == ME_PROGRAM)
+	else
+		if (ev.type() == ME_PROGRAM)
 	{
-		//if (!setHwCtrlState(ev.channel(), CTRL_PROGRAM, ev.dataA()))
-		//	return false;
+		if (!setHwCtrlState(ev.channel(), CTRL_PROGRAM, ev.dataA()))
+			return false;
 	}
 
 
