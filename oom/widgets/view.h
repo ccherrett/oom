@@ -93,7 +93,6 @@ protected:
     QRect mapDev(const QRect&) const;
     QPoint mapDev(const QPoint&) const;
 
-    int mapx(int x) const;
     int mapy(int y) const;
     int mapyDev(int y) const;
     int mapxDev(int x) const;
@@ -162,6 +161,8 @@ public:
     }
     int rmapxDev(int x) const;
     int rmapx(int x) const;
+    int mapx(int x) const;
+
 };
 
 #endif

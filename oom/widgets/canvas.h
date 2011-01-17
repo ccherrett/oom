@@ -190,9 +190,6 @@ protected:
     {
     }
 
-    CItemList getItemlistForCurrentPart();
-    CItemList getSelectedItemsForCurrentPart();
-
     bool allItemsAreSelected();
 
 
@@ -212,6 +209,8 @@ public:
     Canvas(QWidget* parent, int sx, int sy, const char* name = 0);
     bool isSingleSelection();
     int selectionSize();
+    CItemList getItemlistForCurrentPart();
+    CItemList getSelectedItemsForCurrentPart();
 
     Tool tool() const
     {
