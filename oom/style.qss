@@ -1,6 +1,22 @@
 /*
  *    this is the OOMidi application style sheet
  */
+
+QTableView#trackHeaders 
+{
+	background-color: #595966;
+	border: none;
+	padding: 0px;
+}
+
+QHeaderView#trackHeaders 
+{
+	text-align: left;
+	border: none;
+	background-color: #595966;
+	padding: 50px;
+}
+
  QWidget#WaveView
  {
  	background-color: black;
