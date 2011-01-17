@@ -1756,7 +1756,10 @@ void Audio::preloadControllers()/*{{{*/
 						{
 							ProcessList* ipl = pcevents.at(i);
 							if(ipl->port == pl->port && ipl->channel == pl->channel && ipl->dataB == pl->dataB)
+							{
 								addEvent = false;
+								break;
+							}
 						}
 						if(addEvent)
 						{
