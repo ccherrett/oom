@@ -1126,9 +1126,9 @@ void Arranger::switchInfo(int n)
 
 void Arranger::preloadControllers()
 {
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	audio->preloadControllers();
-	//sleep(1);
-	//audio->preloadControllers();
+	QApplication::restoreOverrideCursor();
 }
 
 /*

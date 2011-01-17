@@ -1655,13 +1655,6 @@ void Audio::processMidi()
 	//
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
 	{
-		//MidiDevice* md = *id;
-		// Is it a Jack midi device?
-		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(md);
-		//if(!mjd)
-		//  continue;
-		//mjd->processMidi();
-		///////////////// Crazy Code! ----> /////////////////////
 		(*id)->processMidi();
 
 		/*
@@ -1705,7 +1698,6 @@ void Audio::preloadControllers()/*{{{*/
 {
 	midiBusy = true;
 
-	//EventList pcevents;
 	QList<ProcessList*> pcevents;
 	int evcount = 50;
 	MidiTrackList* tracks = song->midis();
@@ -1743,10 +1735,6 @@ void Audio::preloadControllers()/*{{{*/
 				{
 					case CTRL_PROGRAM:
 					{
-						//Event tev = Event(Controller);
-						//tev.setA(ev.dataA());
-						//tev.setB(ev.dataB());
-						//tev.setTick(evcount + 50);
 						ProcessList *pl = new ProcessList;
 						pl->port = port;
 						pl->channel = channel;
@@ -1768,8 +1756,6 @@ void Audio::preloadControllers()/*{{{*/
 							pcevents.append(pl);
 							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
 						}
-						evcount = evcount + 150;
-						//sleep(1);
 					}
 						break;
 					default:
@@ -1777,14 +1763,7 @@ void Audio::preloadControllers()/*{{{*/
 				}
 			}
 			md->setNextPlayEvent(playEvents->begin());
-			//sleep(1);
 		}
-	//	for (iEvent ie = pcevents.begin(); ie != pcevents.end(); ++ie)
-	//	{
-	//		Event ev = ie->second;
-	//		playEvents->add(MidiPlayEvent(ev.tick(), port, channel, ev));
-	//	}
-		evcount = 0;
 	}
 	midiBusy = false;
 }/*}}}*/
