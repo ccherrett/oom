@@ -91,8 +91,8 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	_dnum = -1;
 
 	_knob = new Knob;
-	_knob->setFixedWidth(25);
-	_knob->setFixedHeight(25);
+	//_knob->setFixedWidth(25);
+	//_knob->setFixedHeight(25);
 	_knob->setToolTip(tr("manual adjust"));
 	_knob->setRange(0.0, 127.0, 1.0);
 	_knob->setValue(0.0);
