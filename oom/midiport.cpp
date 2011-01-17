@@ -147,6 +147,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 		//
 		//if(_instrument)
 		// p3.3.39 NOT for syntis! Use midiState an/or initParams for that.
+		/*
 		if (_instrument && !_device->isSynti())
 		{
 			MidiControllerList* cl = _instrument->controller();
@@ -205,8 +206,8 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 					}
 				}
 			}
-		}
-
+		}*/
+		/*
 		// init HW controller state
 		// p3.3.39 NOT for syntis! Use midiState an/or initParams for that.
 		if (!_device->isSynti())
@@ -243,6 +244,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 
 	else
 		clearDevice();
+	*/
 }
 
 //---------------------------------------------------------
