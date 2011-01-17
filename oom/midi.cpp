@@ -1749,13 +1749,13 @@ void Audio::preloadControllers()/*{{{*/
 								break;
 							}
 						}
-						if(addEvent)
-						{
+						//if(addEvent)
+						//{
 							printf("Audio::preloadControllers() Loading event @ tick: %d - on channel: %d - on port: %d - dataA: %d - dataB: %d\n",
 								tick, channel, port, ev.dataA(), ev.dataB());
 							pcevents.append(pl);
 							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
-						}
+						//}
 					}
 						break;
 					default:
