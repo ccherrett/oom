@@ -189,7 +189,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 							///{
 							///#endif
 							// Note the addition of bias!
-							printf("Setting Values portNo:%d chan:%d ctl:$d intival:%d\n",portno(),chan,ctl,mc->initVal());
+							printf("Setting Values portNo:%d chan:%d ctl:%d intival:%d\n",portno(),chan,ctl,mc->initVal());
 							_device->putEvent(MidiPlayEvent(0, portno(), chan,
 									ME_CONTROLLER, ctl, mc->initVal() + mc->bias()));
 							///#ifdef DSSI_SUPPORT
