@@ -205,6 +205,41 @@ void MidiEditor::songChanged(int type)
 				time->update();
 
 		}
+
+                if (type & SC_SELECTION)
+                {
+                        CItemList list = canvas->getSelectedItemsForCurrentPart();
+
+                        //Get the rightmost selected note (if any)
+                        iCItem i, iRightmost;
+                        CItem* rightmost = NULL;
+
+                        i = list.begin();
+                        while (i != list.end())
+                        {
+                                if (i->second->isSelected())
+                                {
+                                        iRightmost = i;
+                                        rightmost = i->second;
+                                }
+
+                                ++i;
+                        }
+
+                        if (rightmost)
+                        {
+                                int pos = rightmost->pos().x();
+                                pos = canvas->mapx(pos) + hscroll->offset();
+                                int s = hscroll->offset();
+                                int e = s + canvas->width();
+
+                                if (pos > e)
+                                        hscroll->setOffset(rightmost->pos().x());
+                                if (pos < s)
+                                        hscroll->setOffset(rightmost->pos().x());
+                        }
+                }
+
 	}
 }
 
