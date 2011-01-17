@@ -157,6 +157,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 				mc = imc->second;
 				for (int chan = 0; chan < MIDI_CHANNELS; ++chan)
 				{
+					printf("Entering: MidiPort::setMidiDevice");
 					ciMidiCtrlValList i;
 					// Look for an initial value for this midi controller, on this midi channel, in the song...
 					for (i = _controller->begin(); i != _controller->end(); ++i)
@@ -311,6 +312,7 @@ const QString& MidiPort::portname() const
 
 void MidiPort::tryCtrlInitVal(int chan, int ctl, int val)
 {
+	printf("Entering: MidiPort::tryCtrlInitVal");
 	if (_instrument)
 	{
 		MidiControllerList* cl = _instrument->controller();
