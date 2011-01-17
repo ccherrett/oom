@@ -1698,13 +1698,13 @@ void Audio::preloadControllers()/*{{{*/
 {
 	midiBusy = true;
 
-	QList<ProcessList*> pcevents;
 	int evcount = 50;
 	MidiTrackList* tracks = song->midis();
 	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
 	{
 		MidiTrack* track = *it;
 		//activePorts[track->outPort()] = true;
+		QList<ProcessList*> pcevents;
 
 		int port = track->outPort();
 		int channel = track->outChannel();
