@@ -1748,7 +1748,7 @@ void Audio::preloadControllers()/*{{{*/
 						//tev.setA(ev.dataA());
 						//tev.setB(ev.dataB());
 						//tev.setTick(evcount + 50);
-						if(pcevents.indexOf(ev) == -1)
+						if(pcevent.isEmpty() || pcevents.indexOf(ev) == -1)
 						{
 							pcevents.add(ev);
 							playEvents->add(MidiPlayEvent(tick, port, channel, ev));
