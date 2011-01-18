@@ -373,6 +373,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	int mtiw = 280; //midiTrackInfo->width(); // Save this.
 	midiTrackInfo->setMinimumWidth(100);
 	//midiTrackInfo->setMaximumWidth(300);
+        // Catch left/right arrow key events for this widget so we
+        // can easily move the focus back from this widget to the canvas.
+        midiTrackInfo->installEventFilter(this);
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
 
 	//midiTrackInfo->setSizePolicy(QSizePolicy(/*QSizePolicy::Ignored*/QSizePolicy::Preferred, QSizePolicy::Expanding));
@@ -1091,16 +1094,43 @@ static int rasterTable[] = {
 	9, 18, 36, 72, 144, 288, 576, 1152, 2304 // dot
 };
 
+
+bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
+{
+        // Force left/right arrow key events to move the focus
+        // back on the canvas if it doesn't have the focus.
+        // Currently the object that we're filtering is the
+        // midiTrackInfo.
+        if (event->type() == QEvent::KeyPress) {
+                QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+                if (keyEvent->key() == Qt::Key_Right || keyEvent->key() == Qt::Key_Left)
+                {
+                        canvas->setFocus(Qt::MouseFocusReason);
+                        return true;
+                }
+        }
+
+        // standard event processing
+        return QObject::eventFilter(obj, event);
+}
+
 //---------------------------------------------------------
 //   viewKeyPressEvent
 //---------------------------------------------------------
 
 void PianoRoll::keyPressEvent(QKeyEvent* event)
 {
-	if (info->hasFocus())
+
+        // Force left/right arrow key events to move the focus
+        // back on the canvas if it doesn't have the focus.
+        if (!canvas->hasFocus())
 	{
-		event->ignore();
-		return;
+                if (event->key() == Qt::Key_Right || event->key() == Qt::Key_Left)
+                {
+                        canvas->setFocus(Qt::MouseFocusReason);
+                        event->accept();
+                        return;
+                }
 	}
 
 	int index;
