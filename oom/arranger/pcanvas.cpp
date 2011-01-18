@@ -225,14 +225,14 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 		return;
 	}
 	QPoint cpos = event->pos();
-        _curItem = _items.find(cpos);
+    _curItem = _items.find(cpos);
 	bool shift = event->modifiers() & Qt::ShiftModifier;
-        if (_curItem)
+    if (_curItem)
 	{
 		if (event->button() == Qt::LeftButton && shift)
 		{
-                        editPart = (NPart*) _curItem;
-                        QRect r = map(_curItem->bbox());
+            editPart = (NPart*) _curItem;
+            QRect r = map(_curItem->bbox());
 			if (lineEditor == 0)
 			{
 				lineEditor = new QLineEdit(this);
@@ -247,8 +247,8 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 		else if (event->button() == Qt::LeftButton)
 		{
 			deselectAll();
-                        selectItem(_curItem, true);
-                        emit dclickPart(((NPart*) (_curItem))->track());
+            selectItem(_curItem, true);
+            emit dclickPart(((NPart*) (_curItem))->track());
 		}
 	}
 		//
@@ -268,7 +268,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 				break;
 			yy += h;
 		}
-                if (_pos[2] - _pos[1] > 0 && it != tl->end())
+        if (_pos[2] - _pos[1] > 0 && it != tl->end())
 		{
 			Track* track = *it;
 			switch (track->type())

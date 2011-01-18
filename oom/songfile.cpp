@@ -1505,11 +1505,6 @@ void Song::write(int level, Xml& xml) const
 	CloneList copyCloneList = cloneList;
 	cloneList.clear();
 
-	// write track views
-	for (ciTrackView i = _tviews.begin(); i != _tviews.end(); ++i)
-	{
-		(*i)->write(level, xml);
-	}
 	// write tracks
 	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
 		(*i)->write(level, xml);
@@ -1525,6 +1520,11 @@ void Song::write(int level, Xml& xml) const
 		//track->writeRouting(level, xml);
 
 		(*i)->writeRouting(level, xml);
+	}
+	// write track views
+	for (ciTrackView i = _tviews.begin(); i != _tviews.end(); ++i)
+	{
+		(*i)->write(level, xml);
 	}
 
 	// Write midi device routing.
@@ -1565,14 +1565,14 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 {
 	std::string tag = "trackview";
 
-	xml.put(level, "<%s name=\"%s\" selected=\"%d\" type=\"%d\"", tag.c_str(), _name.toStdString().c_str(), _selected, _type);
+	xml.put(level++, "<%s name=\"%s\" selected=\"%d\" type=\"%d\"", tag.c_str(), _name.toStdString().c_str(), _selected, _type);
 
 	//for(iTrack* t = _tracks.begin(); t != _tracks.end(); ++t)
 	for (ciTrack t = _tracks.begin(); t != _tracks.end(); ++t)
 	{
-		xml.strTag(level++, "vtrack", (*t)->name());
+		xml.strTag(level, "vtrack", (*t)->name());
 	}
-	xml.put(level++, "</%s>", tag.c_str());
+	xml.put(level--, "</%s>", tag.c_str());
 }/*}}}*/
 
 //---------------------------------------------------------
