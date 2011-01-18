@@ -984,8 +984,13 @@ void Audio::startRolling()
 {
 	// Changed by Tim. p3.3.8
 	//startRecordPos = _pos;
+	if (debugMsg)
+		printf("startRolling - loopCount=%d, _pos=%d\n", _loopCount, _pos.tick());
+
 	if (_loopCount == 0)
+	{
 		startRecordPos = _pos;
+	}
 
 	if (song->record())
 	{
@@ -1398,6 +1403,8 @@ void Audio::stopRolling()
 
 void Audio::recordStop()
 {
+	if (debugMsg)
+		printf("recordStop - startRecordPos=%d\n", startRecordPos.tick());
 	audio->msgIdle(true); // gain access to all data structures
 
 	song->startUndo();

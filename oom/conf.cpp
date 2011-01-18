@@ -1005,6 +1005,8 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 					config.projectBaseFolder = xml.parse1();
 				else if (tag == "projectStoreInFolder")
 					config.projectStoreInFolder = xml.parseInt();
+				else if (tag == "useProjectSaveDialog")
+					config.useProjectSaveDialog = xml.parseInt();
 				else
 					xml.unknown("configuration");
 				break;
@@ -1283,6 +1285,7 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.strTag(level, "startSong", config.startSong);
 	xml.strTag(level, "projectBaseFolder", config.projectBaseFolder);
 	xml.intTag(level, "projectStoreInFolder", config.projectStoreInFolder);
+	xml.intTag(level, "useProjectSaveDialog", config.useProjectSaveDialog);
 	xml.intTag(level, "midiInputDevice", midiInputPorts);
 	xml.intTag(level, "midiInputChannel", midiInputChannel);
 	xml.intTag(level, "midiRecordType", midiRecordType);

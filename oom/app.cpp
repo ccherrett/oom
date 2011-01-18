@@ -292,7 +292,8 @@ bool OOMidi::seqStart()
 		if (midiSeqRunning)
 			break;
 		usleep(1000);
-		printf("looping waiting for sequencer thread to start\n");
+		if(debugMsg)
+			printf("looping waiting for sequencer thread to start\n");
 	}
 	if (!midiSeqRunning)
 	{
@@ -3001,14 +3002,23 @@ bool OOMidi::saveAs()
 	QString name;
 	if (oomProject == oomProjectInitPath)
 	{
-		ProjectCreateImpl pci(oom);
-		if (pci.exec() == QDialog::Rejected)
+		printf("config.useProjectSaveDialog=%d\n", config.useProjectSaveDialog);
+		if (config.useProjectSaveDialog)
 		{
-			return false;
+			ProjectCreateImpl pci(oom);
+			if (pci.exec() == QDialog::Rejected)
+			{
+				return false;
+			}
+			song->setSongInfo(pci.getSongInfo());
+			name = pci.getProjectPath();
 		}
-
-		name = pci.getProjectPath();
-		song->setSongInfo(pci.getSongInfo());
+		else
+		{
+			name = getSaveFileName(QString(""), med_file_save_pattern, this, tr("OOMidi: Save As"));
+			if (name.isEmpty())
+				return false;
+		}
 		oomProject = QFileInfo(name).absolutePath();
 		QDir dirmanipulator;
 		if (!dirmanipulator.mkpath(oomProject))

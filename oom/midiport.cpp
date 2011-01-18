@@ -690,7 +690,7 @@ int MidiPort::limitValToInstrCtlRange(int ctl, int val)
 //    return true, if event cannot be delivered
 //---------------------------------------------------------
 
-bool MidiPort::sendEvent(const MidiPlayEvent& ev)
+bool MidiPort::sendEvent(const MidiPlayEvent& ev, bool forceSend)
 {
 	if (ev.type() == ME_CONTROLLER)
 	{
@@ -736,29 +736,42 @@ bool MidiPort::sendEvent(const MidiPlayEvent& ev)
 		//      }
 		// printf("set HW Ctrl State ch:%d 0x%x 0x%x\n", ev.channel(), ev.dataA(), ev.dataB());
 		if (!setHwCtrlState(ev.channel(), da, db))
-			return false;
+		{
+			if (debugMsg)
+				printf("setHwCtrlState failed\n");
+			if (!forceSend)
+				return false;
+		}
 	}
-	else
-		if (ev.type() == ME_PITCHBEND)
+	else if (ev.type() == ME_PITCHBEND)
 	{
 		int da = limitValToInstrCtlRange(CTRL_PITCH, ev.dataA());
 		// Removed by T356.
 		//if (hwCtrlState(ev.channel(), CTRL_PITCH) == ev.dataA())
 		//  return false;
 
-		if (!setHwCtrlState(ev.channel(), CTRL_PITCH, da))
-			return false;
+		if (!setHwCtrlState(ev.channel(), CTRL_PITCH, da)) 
+		{
+			if(!forceSend)
+				return false;
+		}
 	}
-	else
-		if (ev.type() == ME_PROGRAM)
+	else if (ev.type() == ME_PROGRAM)
 	{
 		if (!setHwCtrlState(ev.channel(), CTRL_PROGRAM, ev.dataA()))
-			return false;
+		{
+			if(!forceSend)
+				return false;
+		}
 	}
 
 
 	if (!_device)
+	{
+		if (debugMsg)
+			printf("no device for this midi port\n");
 		return true;
+	}
 	return _device->putEvent(ev);
 }
 
