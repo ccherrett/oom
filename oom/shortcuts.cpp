@@ -181,9 +181,9 @@ void initShortCuts()
 	//Pianoroll:
 	//-----------------------------------------------------------
 
-	defShrt(SHRT_OVER_QUANTIZE, 0, "Quantize: Over Quantize", PROLL_SHRT, "midi_over_quant");
-	defShrt(SHRT_ON_QUANTIZE, 0, "Quantize: Note On Quantize", PROLL_SHRT, "midi_quant_noteon");
-	defShrt(SHRT_ONOFF_QUANTIZE, 0, "Quantize: Note On/Off Quantize", PROLL_SHRT, "midi_quant_noteoff");
+	defShrt(SHRT_OVER_QUANTIZE, Qt::SHIFT + Qt::Key_E, "Quantize: Over Quantize", PROLL_SHRT, "midi_over_quant");
+	defShrt(SHRT_ON_QUANTIZE, Qt::SHIFT + Qt::Key_R, "Quantize: Note On Quantize", PROLL_SHRT, "midi_quant_noteon");
+	defShrt(SHRT_ONOFF_QUANTIZE, Qt::SHIFT + Qt::Key_T, "Quantize: Note On/Off Quantize", PROLL_SHRT, "midi_quant_noteoff");
 	defShrt(SHRT_ITERATIVE_QUANTIZE, 0, "Quantize: Iterative Quantize", PROLL_SHRT, "midi_quant_iterative");
 	defShrt(SHRT_CONFIG_QUANT, Qt::CTRL + Qt::ALT + Qt::Key_Q, "Quantize: Configure quant", PROLL_SHRT, "config_quant");
 	defShrt(SHRT_MODIFY_GATE_TIME, 0, "Quantize: Modify Gate Time", PROLL_SHRT, "midi_mod_gate_time");
