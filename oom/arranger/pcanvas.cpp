@@ -139,6 +139,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	editMode = false;
 	trackOffset = 0;
 
+	//This changes to song->visibletracks()
 	tracks = song->tracks();
 	setMouseTracking(true);
         _drag = DRAG_OFF;
@@ -152,6 +153,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 
 int PartCanvas::y2pitch(int y) const
 {
+	//This changes to song->visibletracks()
 	TrackList* tl = song->tracks();
 	int yy = 0;
 	int idx = 0;
@@ -172,6 +174,7 @@ int PartCanvas::y2pitch(int y) const
 
 int PartCanvas::pitch2y(int p) const
 {
+	//This changes to song->visibletracks()
 	TrackList* tl = song->tracks();
 	int yy = 0;
 	int idx = 0;
@@ -257,6 +260,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 
 	else
 	{
+	//This changes to song->visibletracks()
 		TrackList* tl = song->tracks();
 		iTrack it;
 		int yy = 0;
@@ -1094,6 +1098,7 @@ void PartCanvas::mouseMove(const QPoint& pos)
 
 Track* PartCanvas::y2Track(int y) const
 {
+	//This changes to song->visibletracks()
 	TrackList* l = song->tracks();
 	int ty = 0;
 	for (iTrack it = l->begin(); it != l->end(); ++it)
@@ -2634,6 +2639,7 @@ void PartCanvas::paste(bool clone, bool toTrack, bool doInsert)
 	// If we want to paste to a selected track...
 	if (toTrack)
 	{
+	//This changes to song->visibletracks()
 		TrackList* tl = song->tracks();
 		for (iTrack i = tl->begin(); i != tl->end(); ++i)
 		{
@@ -3045,6 +3051,7 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	// horizontal lines
 	//--------------------------------
 
+	//This changes to song->visibletracks()
 	TrackList* tl = song->tracks();
 	int yy = 0;
 	int th;

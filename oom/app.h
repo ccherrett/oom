@@ -26,6 +26,7 @@ class QSignalMapper;
 class QString;
 class QToolBar;
 class QToolButton;
+class QActionGroup;
 
 class Part;
 class PartList;
@@ -146,6 +147,9 @@ class OOMidi : public QMainWindow
     // Help Menu Actions
     QAction *helpManualAction, *helpHomepageAction, *helpReportAction, *helpAboutAction;
 
+	//TrackView menu actions
+	QAction *addTrackviewAction;
+
     QString appName;
 
     QFileInfo project;
@@ -160,7 +164,8 @@ class OOMidi : public QMainWindow
     QMenu *menuEdit, *menuStructure;
     QMenu* menu_audio, *menuAutomation;
     QMenu* menu_functions, *menuScriptPlugins;
-    QMenu* select, *master, *midiEdit, *addTrack;
+    QMenu* select, *master, *midiEdit, *addTrack, *trackView;
+	QActionGroup* trackViewGroup;
 
     // Special 'stay-open' menu for routes.
     PopupMenu* routingPopupMenu;
@@ -372,6 +377,9 @@ public:
     PopupMenu* prepareRoutingPopupMenu(Track* /*track*/, bool /*dst*/);
     void routingPopupMenuActivated(Track* /*track*/, int /*id*/);
     void updateRouteMenus(Track* /*track*/, QObject* /*master*/);
+
+	//TrackView code
+	void updateTrackviewMenus();
     // Testing...
     //PopupView* getRoutingPopupView();
     //PopupView* prepareRoutingPopupView(Track* /*track*/, bool /*dst*/);

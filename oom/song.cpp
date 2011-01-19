@@ -3379,6 +3379,38 @@ TrackView* Song::findTrackView(Track* t)
 }
 
 //---------------------------------------------------------
+// updateTrackViews
+//---------------------------------------------------------
+void Song::updateTrackViews(QAction* act)
+{
+	TrackView* tv = findTrackView(act->text());
+	if(tv)
+	{
+		tv->setSelected(act->isChecked());
+	}
+}
+
+//---------------------------------------------------------
+// updateTrackViews
+//---------------------------------------------------------
+void Song::updateTrackViews1()
+{
+	_viewtracks.clear();
+	for(iTrackView it = _tviews.begin(); it != _tviews.end(); ++it)
+	{
+		if((*it)->selected())
+		{
+			TrackList* tl = (*it)->tracks();
+			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
+			{
+				_viewtracks.push_back((*t));
+			}
+		}
+	}
+	emit songChanged(SC_TRACK_REMOVED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
+}
+
+//---------------------------------------------------------
 //   insertTrack0
 //---------------------------------------------------------
 

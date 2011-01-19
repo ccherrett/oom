@@ -112,7 +112,7 @@ void TrackView::read(Xml& xml)/*{{{*/
 				else if (tag == "comment")
 					_comment = xml.parse1();
 				else if (tag == "selected")
-					_selected = xml.parseInt();
+					_selected = (bool)xml.parseInt();
 				else if (tag == "type")
 					_type = (Track::TrackType)xml.parseInt();
 				break;

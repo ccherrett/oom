@@ -1385,6 +1385,14 @@ void Song::read(Xml& xml)
 				{//Read in our trackviews
 					TrackView* tv = new TrackView();
 					tv->read(xml);
+					if(tv->selected())
+					{
+						TrackList* tvl = tv->tracks();
+						for(ciTrack it = tvl->begin(); it != tvl->end(); ++it)
+						{
+							_viewtracks.push_back((*it));
+						}
+					}
 				}
 				else
 					xml.unknown("Song");
@@ -1400,6 +1408,7 @@ void Song::read(Xml& xml)
 				break;
 		}
 	}
+	//Call oom->updateTrackView() to update the track view menu
 	dirty = false;
 
 	// Since cloneList is also used for copy/paste operations,

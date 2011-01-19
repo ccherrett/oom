@@ -129,6 +129,7 @@ private:
     TrackViewList _tviews; // trackviewlist as seen by arranger
     MidiTrackList _midis;
     WaveTrackList _waves;
+	TrackList _viewtracks;
     InputList _inputs; // audio input ports
     OutputList _outputs; // audio output ports
     GroupList _groups; // mixer groups
@@ -380,6 +381,10 @@ public:
         return &_tracks;
     }
 
+	TrackList* visibletracks() {
+		return &_viewtracks;
+	}
+
     MidiTrackList* midis() {
         return &_midis;
     }
@@ -544,6 +549,8 @@ public slots:
     QString getScriptPath(int id, bool delivered);
     void populateScriptMenu(QMenu* menuPlugins, QObject* receiver);
     TrackView* addTrackView(int);
+	void updateTrackViews(QAction*);
+	void updateTrackViews1();
 
 signals:
     void songChanged(int);

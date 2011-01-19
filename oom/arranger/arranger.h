@@ -128,7 +128,6 @@ private slots:
     void setTempo200();
     //void seek();
     void verticalScrollSetYpos(unsigned);
-    void showTrackViews();
 	void preloadControllers();
 
 signals:
@@ -152,6 +151,7 @@ public slots:
     void updateTrackInfo(int flags);
     void configChanged();
     void controllerChanged(Track *t);
+    void showTrackViews();
 
 public:
 

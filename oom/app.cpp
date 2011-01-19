@@ -858,6 +858,13 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	editSongInfoAction = new QAction(QIcon(*edit_listIcon), tr("Song Info"), this);
 
+	//-------- TrackView Actions
+	trackView = new QMenu(tr("Trackview"), this);
+	addTrackviewAction = new QAction(tr("New TrackView"), this);
+	trackView->addAction(addTrackviewAction);
+	trackViewGroup = new QActionGroup(this);
+	trackViewGroup->setExclusive(false);
+
 	//-------- View Actions
 	viewTransportAction = new QAction(QIcon(*view_transport_windowIcon), tr("Transport Panel"), this);
 	viewTransportAction->setCheckable(true);
@@ -1238,6 +1245,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuView->addAction(viewMixerBAction);
 	menuView->addAction(viewCliplistAction);
 	menuView->addAction(viewMarkerAction);
+	menuView->addSeparator();
+	menuView->addMenu(trackView);
 
 
 	//-------------------------------------------------------------
@@ -1351,6 +1360,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(this, SIGNAL(configChanged()), arranger, SLOT(configChanged()));
 
 	connect(arranger, SIGNAL(setUsedTool(int)), SLOT(setUsedTool(int)));
+	//Connect add track view here.
+	connect(addTrackviewAction, SIGNAL(activated()), arranger, SLOT(showTrackViews()));
+	connect(trackViewGroup, SIGNAL(triggered(QAction*)), song, SLOT(updateTrackViews(QAction*)));
 
 	//---------------------------------------------------
 	//  read list of "Recent Projects"
@@ -5018,4 +5030,31 @@ void OOMidi::execDeliveredScript(int id)
 void OOMidi::execUserScript(int id)
 {
 	song->executeScript(song->getScriptPath(id, false).toLatin1().constData(), song->getSelectedMidiParts(), 0, false); // TODO: get quant from arranger
+}
+
+//--------------------------------------------------------
+// updateTrackviewMenus
+//--------------------------------------------------------
+
+void OOMidi::updateTrackviewMenus()
+{
+	if(!song->trackviews()->empty())
+	{
+		//clean out the menu;
+		QList<QAction*> tvactions = trackViewGroup->actions();
+		while(tvactions.size() > 2)
+		{
+			QAction* a = tvactions.takeLast();
+			//trackView->removeAction(a);
+			delete a;
+		}
+		for(iTrackView itv = song->trackviews()->begin(); itv != song->trackviews()->end(); ++itv)
+		{
+			QAction *action = new QAction((*itv)->viewName(), this);
+			action->setCheckable(true);
+			action->setChecked((*itv)->selected());
+			trackViewGroup->addAction(action);
+		}
+		trackView->addActions(trackViewGroup->actions());
+	}
 }

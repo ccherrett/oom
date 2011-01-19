@@ -166,7 +166,12 @@ void TList::paint(const QRect& r)
 	//    Tracks
 	//---------------------------------------------------
 
-	TrackList* l = song->tracks();
+	//This changes to song->visibletracks()
+	TrackList* l;
+	if(song->visibletracks()->empty())
+		l = song->tracks();
+	else
+		l = song->visibletracks();
 	int idx = 0;
 	int yy = -ypos;
 	for (iTrack i = l->begin(); i != l->end(); ++idx, yy += (*i)->height(), ++i)
@@ -465,6 +470,7 @@ void TList::returnPressed()
 void TList::adjustScrollbar()
 {
 	int h = 0;
+	//This changes to song->visibletracks()
 	TrackList* l = song->tracks();
 	for (iTrack it = l->begin(); it != l->end(); ++it)
 		h += (*it)->height();
@@ -478,6 +484,7 @@ void TList::adjustScrollbar()
 
 Track* TList::y2Track(int y) const
 {
+	//This changes to song->visibletracks()
 	TrackList* l = song->tracks();
 	int ty = 0;
 	for (iTrack it = l->begin(); it != l->end(); ++it)
@@ -768,6 +775,7 @@ void TList::keyPressEvent(QKeyEvent* e)
 
 void TList::moveSelection(int n)
 {
+	//This changes to song->visibletracks()
 	TrackList* tracks = song->tracks();
 
 	// check for single selection
@@ -830,6 +838,7 @@ TrackList TList::getRecEnabledTracks()
 {
 	//printf("getRecEnabledTracks\n");
 	TrackList recEnabled;
+	//This changes to song->visibletracks()
 	TrackList* tracks = song->tracks();
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{
@@ -981,6 +990,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 		return;
 	}
 
+	//This changes to song->visibletracks()
 	TrackList* tracks = song->tracks();
 	dragYoff = y - (t->y() - ypos);
 	startY = y;
@@ -1329,6 +1339,7 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 	{
 		int y = ev->y();
 		int ty = -ypos;
+	//This changes to song->visibletracks()
 		TrackList* tracks = song->tracks();
 		iTrack it;
 		for (it = tracks->begin(); it != tracks->end(); ++it)
@@ -1380,6 +1391,7 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 			{
 				mode = DRAG;
 				dragHeight = t->height();
+	//This changes to song->visibletracks()
 				sTrack = song->tracks()->index(t);
 				setCursor(QCursor(Qt::SizeVerCursor));
 				redraw();
@@ -1393,8 +1405,10 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 			break;
 		case RESIZE:
 		{
+	//This changes to song->visibletracks()
 			if (sTrack >= 0 && (unsigned) sTrack < song->tracks()->size())
 			{
+	//This changes to song->visibletracks()
 				Track* t = song->tracks()->index(sTrack);
 				if (t)
 				{
@@ -1424,6 +1438,7 @@ void TList::mouseReleaseEvent(QMouseEvent* ev)
 		Track* t = y2Track(ev->y() + ypos);
 		if (t)
 		{
+	//This changes to song->visibletracks()
 			int dTrack = song->tracks()->index(t);
 			audio->msgMoveTrack(sTrack, dTrack);
 		}
