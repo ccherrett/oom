@@ -27,15 +27,15 @@ void defShrt(int shrt, int key, const char* descr, int type, const char* xml)
 void initShortCuts()
 {
 	//Global:
-	defShrt(SHRT_PLAY_SONG, Qt::Key_Enter, "Transport: Start playback from current location", GLOBAL_SHRT, "play");
+        defShrt(SHRT_PLAY_SONG, Qt::CTRL + Qt::Key_Enter, "Transport: Start playback from current location", GLOBAL_SHRT, "play");
 	defShrt(SHRT_TOGGLE_METRO, Qt::Key_C, "Transport: Toggle metronome", GLOBAL_SHRT, "toggle_metro");
-	defShrt(SHRT_STOP, Qt::Key_Insert, "Transport: Stop Playback", GLOBAL_SHRT, "stop");
-	defShrt(SHRT_GOTO_START, Qt::Key_W, "Transport: Goto Start", GLOBAL_SHRT, "goto_start");
+        defShrt(SHRT_STOP, 0, "Transport: Stop Playback", GLOBAL_SHRT, "stop");
+        defShrt(SHRT_GOTO_START, Qt::Key_Home, "Transport: Goto Start", GLOBAL_SHRT, "goto_start");
 	defShrt(SHRT_PLAY_TOGGLE, Qt::Key_Space, "Transport: Play, Stop, Rewind", GLOBAL_SHRT, "play_toggle");
 	defShrt(SHRT_GOTO_LEFT, Qt::Key_End, "Transport: Goto left marker", GLOBAL_SHRT, "goto_left");
 	defShrt(SHRT_GOTO_RIGHT, Qt::Key_PageDown, "Transport: Goto right marker", GLOBAL_SHRT, "goto_right");
 	defShrt(SHRT_TOGGLE_LOOP, Qt::Key_Slash, "Transport: Toggle Loop section", GLOBAL_SHRT, "toggle_loop");
-	defShrt(SHRT_START_REC, Qt::Key_Asterisk, "Transport: Toggle Record", GLOBAL_SHRT, "toggle_rec");
+        defShrt(SHRT_START_REC, Qt::Key_R, "Transport: Toggle Record", GLOBAL_SHRT, "toggle_rec");
 	defShrt(SHRT_REC_CLEAR, Qt::Key_Backspace, "Transport: Clear all rec enabled tracks", GLOBAL_SHRT, "rec_clear");
 
 	defShrt(SHRT_COPY, Qt::CTRL + Qt::Key_C, "Edit: Copy", INVIS_SHRT, "copy");
@@ -208,7 +208,7 @@ void initShortCuts()
 	// global
 	defShrt(SHRT_TOOL_POINTER, Qt::Key_A, "Tool: Pointer", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "pointer_tool");
 	defShrt(SHRT_TOOL_PENCIL, Qt::Key_D, "Tool: Pencil", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "pencil_tool");
-	defShrt(SHRT_TOOL_RUBBER, Qt::Key_R, "Tool: Eraser", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "eraser_tool");
+        defShrt(SHRT_TOOL_RUBBER, Qt::Key_B, "Tool: Eraser", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "eraser_tool");
 	// piano roll & drum editor
 	defShrt(SHRT_TOOL_LINEDRAW, 0, "Tool: Line Draw", PROLL_SHRT + DEDIT_SHRT, "line_draw_tool");
 	// arranger
@@ -218,8 +218,8 @@ void initShortCuts()
 
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
-	defShrt(SHRT_POS_INC, Qt::Key_Plus, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
-	defShrt(SHRT_POS_DEC, Qt::Key_Minus, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
+        defShrt(SHRT_POS_INC, Qt::SHIFT + Qt::RightArrow, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
+        defShrt(SHRT_POS_DEC, Qt::SHIFT + Qt::LeftArrow, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
 
 	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::Key_Plus, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
 	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::Key_Minus, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");
@@ -266,7 +266,7 @@ void initShortCuts()
 	defShrt(SHRT_TOGGLE_TRIOL, Qt::Key_T, "Quantize: Toggle triol quantization", PROLL_SHRT, "midi_quant_triol");
 	defShrt(SHRT_TOGGLE_PUNCT, Qt::Key_Period, "Quantize: Toggle punctuation quantization", PROLL_SHRT, "midi_quant_punct");
 	defShrt(SHRT_TOGGLE_PUNCT2, Qt::Key_Comma, "Quantize: Toggle punctuation quantization (2)", PROLL_SHRT, "midi_quant_punct2");
-	defShrt(SHRT_INSERT_AT_LOCATION, Qt::SHIFT + Qt::Key_Right, "Edit: Insert at location", PROLL_SHRT, "midi_insert_at_loc");
+        defShrt(SHRT_INSERT_AT_LOCATION, Qt::Key_Insert, "Edit: Insert at location", PROLL_SHRT, "midi_insert_at_loc");
 
 	defShrt(SHRT_INCREASE_LEN, Qt::CTRL + Qt::SHIFT + Qt::Key_Right, "Edit: Increase length", PROLL_SHRT, "increase_len");
 	defShrt(SHRT_DECREASE_LEN, Qt::CTRL + Qt::SHIFT + Qt::Key_Left, "Edit: Decrease length", PROLL_SHRT, "decrease_len");
