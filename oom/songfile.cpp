@@ -1383,6 +1383,7 @@ void Song::read(Xml& xml)
 					readDrumMap(xml, false);
 				else if (tag == "trackview")
 				{//Read in our trackviews
+					printf("Song::read() found track view\n");
 					TrackView* tv = new TrackView();
 					tv->read(xml);
 					if(tv->selected())
@@ -1393,6 +1394,7 @@ void Song::read(Xml& xml)
 							_viewtracks.push_back((*it));
 						}
 					}
+					insertTrackView(tv, -1);
 				}
 				else
 					xml.unknown("Song");
@@ -1402,13 +1404,14 @@ void Song::read(Xml& xml)
 			case Xml::TagEnd:
 				if (tag == "song")
 				{
+					//Call oom->updateTrackView() to update the track view menu
+					updateTrackViews1();
 					return;
 				}
 			default:
 				break;
 		}
 	}
-	//Call oom->updateTrackView() to update the track view menu
 	dirty = false;
 
 	// Since cloneList is also used for copy/paste operations,
@@ -1574,7 +1577,13 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 {
 	std::string tag = "trackview";
 
-	xml.put(level++, "<%s name=\"%s\" selected=\"%d\" type=\"%d\"", tag.c_str(), _name.toStdString().c_str(), _selected, _type);
+	xml.put(level, "<%s>", tag.c_str());//, _name.toStdString().c_str(), _selected, _type);
+	level++;
+	xml.strTag(level, "name", _name);
+	xml.intTag(level, "selected", _selected);
+	xml.intTag(level, "type", _type);
+	if(!_comment.isEmpty())
+		xml.strTag(level, "comment", _comment);
 
 	//for(iTrack* t = _tracks.begin(); t != _tracks.end(); ++t)
 	for (ciTrack t = _tracks.begin(); t != _tracks.end(); ++t)

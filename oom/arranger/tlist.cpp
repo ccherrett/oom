@@ -236,6 +236,7 @@ void TList::paint(const QRect& r)
 		p.fillRect(x1, yy, w, trackHeight, QBrush(vuGrad));
 		*/
 		p.fillRect(x1, yy, w, trackHeight, bg);
+		track->setY(y);
 		
 		//p.setPen(Qt::black);
 
@@ -471,7 +472,11 @@ void TList::adjustScrollbar()
 {
 	int h = 0;
 	//This changes to song->visibletracks()
-	TrackList* l = song->tracks();
+	TrackList* l;
+	if(song->visibletracks()->empty())
+		l = song->tracks();
+	else
+		l = song->visibletracks();
 	for (iTrack it = l->begin(); it != l->end(); ++it)
 		h += (*it)->height();
 	_scroll->setMaximum(h + 30);
@@ -485,7 +490,11 @@ void TList::adjustScrollbar()
 Track* TList::y2Track(int y) const
 {
 	//This changes to song->visibletracks()
-	TrackList* l = song->tracks();
+	TrackList* l;
+	if(song->visibletracks()->empty())
+		l = song->tracks();
+	else
+		l = song->visibletracks();
 	int ty = 0;
 	for (iTrack it = l->begin(); it != l->end(); ++it)
 	{
@@ -776,7 +785,11 @@ void TList::keyPressEvent(QKeyEvent* e)
 void TList::moveSelection(int n)
 {
 	//This changes to song->visibletracks()
-	TrackList* tracks = song->tracks();
+	TrackList* tracks;
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
 
 	// check for single selection
 	int nselect = 0;
@@ -839,7 +852,11 @@ TrackList TList::getRecEnabledTracks()
 	//printf("getRecEnabledTracks\n");
 	TrackList recEnabled;
 	//This changes to song->visibletracks()
-	TrackList* tracks = song->tracks();
+	TrackList* tracks;
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{
 		if ((*t)->recordFlag())
@@ -991,7 +1008,11 @@ void TList::mousePressEvent(QMouseEvent* ev)
 	}
 
 	//This changes to song->visibletracks()
-	TrackList* tracks = song->tracks();
+	TrackList* tracks;
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
 	dragYoff = y - (t->y() - ypos);
 	startY = y;
 
@@ -1340,7 +1361,11 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 		int y = ev->y();
 		int ty = -ypos;
 	//This changes to song->visibletracks()
-		TrackList* tracks = song->tracks();
+		TrackList* tracks;
+		if(song->visibletracks()->empty())
+			tracks = song->tracks();
+		else
+			tracks = song->visibletracks();
 		iTrack it;
 		for (it = tracks->begin(); it != tracks->end(); ++it)
 		{
@@ -1391,8 +1416,11 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 			{
 				mode = DRAG;
 				dragHeight = t->height();
-	//This changes to song->visibletracks()
-				sTrack = song->tracks()->index(t);
+				//This changes to song->visibletracks()
+				if(song->visibletracks()->empty())
+					sTrack = song->tracks()->index(t);
+				else
+					sTrack = song->visibletracks()->index(t);
 				setCursor(QCursor(Qt::SizeVerCursor));
 				redraw();
 			}
@@ -1405,21 +1433,41 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 			break;
 		case RESIZE:
 		{
-	//This changes to song->visibletracks()
-			if (sTrack >= 0 && (unsigned) sTrack < song->tracks()->size())
+			if(song->visibletracks()->empty())
 			{
-	//This changes to song->visibletracks()
-				Track* t = song->tracks()->index(sTrack);
-				if (t)
+				if (sTrack >= 0 && (unsigned) sTrack < song->tracks()->size())
 				{
-					int h = t->height() + delta;
-					startY = curY;
-					if (h < MIN_TRACKHEIGHT)
-						h = MIN_TRACKHEIGHT;
-					//if((h / 2) != 0)
-					//	h = h +1;
-					t->setHeight(h);
-					song->update(SC_TRACK_MODIFIED);
+					Track* t = song->tracks()->index(sTrack);
+					if (t)
+					{
+						int h = t->height() + delta;
+						startY = curY;
+						if (h < MIN_TRACKHEIGHT)
+							h = MIN_TRACKHEIGHT;
+						//if((h / 2) != 0)
+						//	h = h +1;
+						t->setHeight(h);
+						song->update(SC_TRACK_MODIFIED);
+					}
+				}
+			}
+			else
+			{
+				if (sTrack >= 0 && (unsigned) sTrack < song->visibletracks()->size())
+				{
+					//This changes to song->visibletracks()
+					Track* t = song->visibletracks()->index(sTrack);
+					if (t)
+					{
+						int h = t->height() + delta;
+						startY = curY;
+						if (h < MIN_TRACKHEIGHT)
+							h = MIN_TRACKHEIGHT;
+						//if((h / 2) != 0)
+						//	h = h +1;
+						t->setHeight(h);
+						song->update(SC_TRACK_MODIFIED);
+					}
 				}
 			}
 		}
@@ -1439,8 +1487,16 @@ void TList::mouseReleaseEvent(QMouseEvent* ev)
 		if (t)
 		{
 	//This changes to song->visibletracks()
-			int dTrack = song->tracks()->index(t);
-			audio->msgMoveTrack(sTrack, dTrack);
+			if(song->visibletracks()->empty())
+			{
+				int dTrack = song->tracks()->index(t);
+				audio->msgMoveTrack(sTrack, dTrack);
+			}
+			else
+			{
+				int dTrack = song->visibletracks()->index(t);
+				audio->msgMoveTrack(sTrack, dTrack);
+			}
 		}
 	}
 	if (mode != NORMAL)

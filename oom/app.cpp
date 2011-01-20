@@ -860,6 +860,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	//-------- TrackView Actions
 	trackView = new QMenu(tr("Trackview"), this);
+	trackView->setTearOffEnabled(true);
 	addTrackviewAction = new QAction(tr("New TrackView"), this);
 	trackView->addAction(addTrackviewAction);
 	trackViewGroup = new QActionGroup(this);
@@ -5038,11 +5039,12 @@ void OOMidi::execUserScript(int id)
 
 void OOMidi::updateTrackviewMenus()
 {
+	printf("OOMidi::updateTrackviewMenus() \n");
 	if(!song->trackviews()->empty())
 	{
 		//clean out the menu;
 		QList<QAction*> tvactions = trackViewGroup->actions();
-		while(tvactions.size() > 2)
+		while(!tvactions.isEmpty())
 		{
 			QAction* a = tvactions.takeLast();
 			//trackView->removeAction(a);
@@ -5050,6 +5052,7 @@ void OOMidi::updateTrackviewMenus()
 		}
 		for(iTrackView itv = song->trackviews()->begin(); itv != song->trackviews()->end(); ++itv)
 		{
+			printf("Found trackview %s\n", (*itv)->viewName().toStdString().c_str());
 			QAction *action = new QAction((*itv)->viewName(), this);
 			action->setCheckable(true);
 			action->setChecked((*itv)->selected());

@@ -208,12 +208,12 @@ Track* Song::addNewTrack(QAction* action)
 }
 
 
-//---------------------------------------------------------/*{{{*/
+//---------------------------------------------------------
 //    addTrack
 //    called from GUI context
 //---------------------------------------------------------
 
-Track* Song::addTrack(int t)
+Track* Song::addTrack(int t)/*{{{*/
 {
 	Track::TrackType type = (Track::TrackType) t;
 	Track* track = 0;
@@ -3294,12 +3294,12 @@ TrackView* Song::addNewTrackView(int idx)
 	return tv;
 }
 
-//---------------------------------------------------------/*{{{*/
+//---------------------------------------------------------
 //    addTrackView
 //    called from GUI context
 //---------------------------------------------------------
 
-TrackView* Song::addTrackView(int t)
+TrackView* Song::addTrackView(int t)/*{{{*/
 {
 	Track::TrackType type = (Track::TrackType) t;
 	TrackView* tv = new TrackView();
@@ -3334,6 +3334,7 @@ TrackView* Song::addTrackView(int t)
 			abort();
 	}
 	tv->setDefaultName();
+	_tviews.push_back(tv);
 	//msgInsertTrackView(tv, -1, true);
 
 	return tv;
@@ -3387,6 +3388,7 @@ void Song::updateTrackViews(QAction* act)
 	if(tv)
 	{
 		tv->setSelected(act->isChecked());
+		updateTrackViews1();
 	}
 }
 
@@ -3395,6 +3397,7 @@ void Song::updateTrackViews(QAction* act)
 //---------------------------------------------------------
 void Song::updateTrackViews1()
 {
+	printf("Song::updateTrackViews1()\n");
 	_viewtracks.clear();
 	for(iTrackView it = _tviews.begin(); it != _tviews.end(); ++it)
 	{
@@ -3407,6 +3410,7 @@ void Song::updateTrackViews1()
 			}
 		}
 	}
+	oom->updateTrackviewMenus();
 	emit songChanged(SC_TRACK_REMOVED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
 

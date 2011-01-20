@@ -39,6 +39,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 //MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP,AUDIO_AUX
 	_trackTypes = (QStringList() << "Audio_Out" << "Audio_In" << "Audio_Aux" << "Audio_Group" << "Midi" << "Soft_Synth" << "Wave"); //new QStringList();
 	_editing = false;
+	_addmode = false;
 	//Populate trackTypes and pass it to cmbTypes 
 	cmbType->addItems(_trackTypes);
 	QStringList stracks;
@@ -94,27 +95,61 @@ QStringList TrackViewEditor::buildViewList()
 // Slots
 //----------------------------------------------
 
-void TrackViewEditor::btnNewClicked(bool)
+void TrackViewEditor::btnNewClicked(bool)/*{{{*/
 {
-	_selected = 0;
-	//Reset cmbViews
-	cmbViews->blockSignals(true);
-	cmbViews->setCurrentIndex(0);
-	cmbViews->blockSignals(true);
-	//Reset listSelectedTracks
-	QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
-	if(model)
+	int t = 0;
+        //MIDI = 0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP, AUDIO_AUX, AUDIO_SOFTSYNTH
+	int type = cmbType->currentIndex();
+	switch (type)/*{{{*/
 	{
-		model->removeRows(0, model->rowCount());
+		case 0:
+			t = (int)Track::AUDIO_OUTPUT;
+			break;
+		case 1:
+			t = (int)Track::AUDIO_INPUT;
+			break;
+		case 2:
+			t = (int)Track::AUDIO_AUX;
+			break;
+		case 3:
+			t = (int)Track::AUDIO_GROUP;
+			break;
+		case 4:
+			t = Track::MIDI;
+			break;
+		case 5:
+			t = Track::AUDIO_SOFTSYNTH;
+			break;
+		case 6:
+			t = Track::WAVE;
+			break;
+	}/*}}}*/
+	_selected = song->addNewTrackView(t);
+	if(_selected)
+	{
+		_addmode = true;
+		_editing = true;
+		//Reset cmbViews
+		cmbViews->blockSignals(true);
+		cmbViews->setCurrentIndex(0);
+		//cmbViews->addItem(_selected->viewName());
+		//cmbViews->setCurrentIndex(cmbViews->find(_selected->viewName()));
+		cmbViews->blockSignals(true);
+		//Reset listSelectedTracks
+		QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
+		if(model)
+		{
+			model->removeRows(0, model->rowCount());
+		}
+		//Clear txtName, set value to Untitled
+		txtName->setText(_selected->viewName());
+		txtName->setFocus(Qt::OtherFocusReason);
+		txtName->setReadOnly(false);
+		btnApply->setEnabled(true);
 	}
-	//Clear txtName, set value to Untitled
-	txtName->setText(tr("Untitled"));
-	txtName->setFocus(Qt::OtherFocusReason);
-	txtName->setReadOnly(false);
-	btnApply->setEnabled(true);
-}
+}/*}}}*/
 
-void TrackViewEditor::cmbViewSelected(int ind)
+void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 {
 	if(ind == 0)
 	{
@@ -177,9 +212,9 @@ void TrackViewEditor::cmbViewSelected(int ind)
 		}
 	}
 	_editing = false;
-}
+}/*}}}*/
 
-void TrackViewEditor::cmbTypeSelected(int type)
+void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 {
 	//Perform actions to populate list below based on selected type
 	//We need to repopulate and filter the allTrackList
@@ -246,112 +281,155 @@ void TrackViewEditor::cmbTypeSelected(int type)
 			break;
 	}/*}}}*/
 	listAllTracks->setModel(new QStringListModel(stracks));
-}
+}/*}}}*/
 
 void TrackViewEditor::btnApplyClicked(bool/* state*/)
 {
 	printf("TrackViewEditor::btnApplyClicked()\n");
+	if(_editing && _selected)
+	{
+		TrackList *tl = _selected->tracks();
+		for(iTrack it = tl->begin(); it != tl->end(); ++it)
+			tl->erase(it);
+		//Process all the tracks in the listSelectedTracks and add them to the TrackList
+		QStringListModel* model = (QStringListModel*)listSelectedTracks->model(); 
+		if(model)
+		{
+			QStringList list = model->stringList();
+			for(int i = 0; i < list.size(); ++i)
+			{
+				Track *t = song->findTrack(list.at(i));
+				if(t)
+				{
+					tl->push_back(t);
+				}
+			}
+		}
+		song->dirty = true;
+		song->updateTrackViews1();
+		cmbViews->blockSignals(true);
+		if(_addmode)
+			cmbViews->addItem(_selected->viewName());
+		cmbViews->blockSignals(false);
+		cmbViews->setCurrentIndex(0);
+	}
 }
 
-void TrackViewEditor::btnOkClicked(bool/* state*/)
+void TrackViewEditor::btnOkClicked(bool state)
 {
 	printf("TrackViewEditor::btnOkClicked()\n");
+	//Apply is the same as ok without the close so just call the other method
+	btnApplyClicked(state);
+	//Do other close cleanup;
 }
 
 void TrackViewEditor::btnCancelClicked(bool/* state*/)
 {
 	printf("TrackViewEditor::btnCancelClicked()\n");
+	if(_addmode)
+	{//remove the trackview that was added to the song
+		TrackView* v = song->trackviews()->back();
+		song->trackviews()->erase(v);
+		delete v;
+	}
+	_addmode = false;
+	_selected = 0;
+	song->update();
 }
 
-void TrackViewEditor::btnAddTrack(bool/* state*/)
+void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 {
 	//Perform actions to add action to right list and remove from left
 	printf("Add button clicked\n");
-	if(_selected)/*{{{*/
-		btnApply->setEnabled(true);
-	QItemSelectionModel* model = listAllTracks->selectionModel();
-	QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
-	QAbstractItemModel* lat = listAllTracks->model(); 
-	//QList<int> del;
-	if (model->hasSelection())
+	if(_selected)
 	{
-		QModelIndexList sel = model->selectedRows(0);
-		QList<QModelIndex>::const_iterator id;
-		for (id = sel.constBegin(); id != sel.constEnd(); ++id)
+		btnApply->setEnabled(true);
+		QItemSelectionModel* model = listAllTracks->selectionModel();
+		QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
+		QAbstractItemModel* lat = listAllTracks->model(); 
+		//QList<int> del;
+		if (model->hasSelection())
 		{
-			//We have to index we will get the row.
-			//int row = (*id).row();
-			QVariant v = lat->data((*id));
-			QString val = v.toString();
-			Track* trk = song->findTrack(val);
-			if (trk && lst)
+			QModelIndexList sel = model->selectedRows(0);
+			QList<QModelIndex>::const_iterator id;
+			for (id = sel.constBegin(); id != sel.constEnd(); ++id)
 			{
-			//	printf("Adding Track from row: %d\n", row);
-				QStringList slist  = lst->stringList();
-				if(slist.indexOf(val) == -1)
+				//We have to index we will get the row.
+				//int row = (*id).row();
+				QVariant v = lat->data((*id));
+				QString val = v.toString();
+				Track* trk = song->findTrack(val);
+				if (trk && lst)
 				{
-					slist.append(val);
-					lst->setStringList(slist);
+				//	printf("Adding Track from row: %d\n", row);
+					QStringList slist  = lst->stringList();
+					if(slist.indexOf(val) == -1)
+					{
+						slist.append(val);
+						lst->setStringList(slist);
+					}
+					//del.append(row);
 				}
-				//del.append(row);
+				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
 			}
-			//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
-		}
-		//Delete the list in reverse order so the listview maintains the propper state
-		/*if(!del.isEmpty())
-		{
-			QListIterator<int> it(del); 
-			it.toBack();
-			while(it.hasPrevious())
+			//Delete the list in reverse order so the listview maintains the propper state
+			/*if(!del.isEmpty())
 			{
-				lat->removeRow(it.previous());
-			}
+				QListIterator<int> it(del); 
+				it.toBack();
+				while(it.hasPrevious())
+				{
+					lat->removeRow(it.previous());
+				}
+	
+			}*/
+		}
+	}
+}/*}}}*/
 
-		}*/
-	}/*}}}*/
-}
-
-void TrackViewEditor::btnRemoveTrack(bool/* state*/)
+void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 {
 	//Perform action to remove track from the selectedTracks list
 	printf("Remove button clicked\n");
-	if(_selected)/*{{{*/
-		btnApply->setEnabled(true);
-	QItemSelectionModel* model = listSelectedTracks->selectionModel();
-	QAbstractItemModel* lat = listSelectedTracks->model(); 
-	QList<int> del;
-	if (model->hasSelection())
+	if(_selected)
 	{
-		QModelIndexList sel = model->selectedRows(0);
-		QList<QModelIndex>::const_iterator id;
-		for (id = sel.constBegin(); id != sel.constEnd(); ++id)
-			//for(QModelIndex* id = sel.begin(); id != sel.end(); ++id)
+		btnApply->setEnabled(true);
+		QItemSelectionModel* model = listSelectedTracks->selectionModel();
+		QAbstractItemModel* lat = listSelectedTracks->model(); 
+		QList<int> del;
+		if (model->hasSelection())
 		{
-			//We have to index we will get the row.
-			int row = (*id).row();
-			///*QStringListModel* m = */QAbstractItemModel* m = listAllTracks->model();
-			QVariant v = lat->data((*id));
-			QString val = v.toString();
-			Track* trk = song->findTrack(val);
-			if (trk)
+			QModelIndexList sel = model->selectedRows(0);
+			QList<QModelIndex>::const_iterator id;
+			for (id = sel.constBegin(); id != sel.constEnd(); ++id)
+				//for(QModelIndex* id = sel.begin(); id != sel.end(); ++id)
 			{
-				del.append(row);
+				//We have to index we will get the row.
+				int row = (*id).row();
+				///*QStringListModel* m = */QAbstractItemModel* m = listAllTracks->model();
+				QVariant v = lat->data((*id));
+				QString val = v.toString();
+				Track* trk = song->findTrack(val);
+				if (trk)
+				{
+					del.append(row);
+				}
+				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
 			}
-			//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
-		}
-		//Delete the list in reverse order so the listview maintains the propper state
-		if(!del.isEmpty())
-		{
-			QListIterator<int> it(del); 
-			it.toBack();
-			while(it.hasPrevious())
+			//Delete the list in reverse order so the listview maintains the propper state
+			if(!del.isEmpty())
 			{
-				lat->removeRow(it.previous());
-			}
+				QListIterator<int> it(del); 
+				it.toBack();
+				while(it.hasPrevious())
+				{
+					lat->removeRow(it.previous());
+				}
 
+			}
 		}
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
 void TrackViewEditor::setSelected(TrackView* t)
 {

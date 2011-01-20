@@ -15,6 +15,7 @@
 
 TrackView::TrackView()
 {
+	_selected = false;
 }
 
 TrackView::~TrackView()
@@ -97,27 +98,36 @@ void TrackView::read(Xml& xml)/*{{{*/
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if (tag == "vtrack")
+				if(tag == "name")
+				{
+					_name = xml.parse1();
+				}
+				else if(tag == "comment")
+				{
+					_comment = xml.parse1();
+				}
+				else if(tag == "selected")
+				{
+					_selected = (bool)xml.parseInt();
+				}
+				else if(tag == "type")
+				{
+					_type = (Track::TrackType)xml.parseInt();
+				}
+				else if (tag == "vtrack")
 				{
 					Track* t = song->findTrack(xml.parse1());
-					if (t != 0)
+					if (t)
 					{
 						addTrack(t);
 					}
 				}
 				break;
 			case Xml::Attribut:
-				if (tag == "name")
-					_name = xml.parse1();
-				else if (tag == "comment")
-					_comment = xml.parse1();
-				else if (tag == "selected")
-					_selected = (bool)xml.parseInt();
-				else if (tag == "type")
-					_type = (Track::TrackType)xml.parseInt();
 				break;
 			case Xml::TagEnd:
-				break;
+				if(tag == "trackview")
+					return;
 			default:
 				break;
 		}

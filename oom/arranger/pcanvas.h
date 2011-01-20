@@ -158,5 +158,6 @@ public slots:
     {
         keyPress(e);
     }
+	void trackViewChanged();
 };
 #endif

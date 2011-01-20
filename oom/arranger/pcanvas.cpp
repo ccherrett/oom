@@ -140,7 +140,11 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	trackOffset = 0;
 
 	//This changes to song->visibletracks()
-	tracks = song->tracks();
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
+	//tracks = song->tracks();
 	setMouseTracking(true);
         _drag = DRAG_OFF;
 	curColorIndex = 0;
@@ -154,7 +158,11 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 int PartCanvas::y2pitch(int y) const
 {
 	//This changes to song->visibletracks()
-	TrackList* tl = song->tracks();
+	TrackList* tl;
+	if(song->visibletracks()->empty())
+		tl = song->tracks();
+	else
+		tl = song->visibletracks();
 	int yy = 0;
 	int idx = 0;
 	for (iTrack it = tl->begin(); it != tl->end(); ++it, ++idx)
@@ -175,7 +183,11 @@ int PartCanvas::y2pitch(int y) const
 int PartCanvas::pitch2y(int p) const
 {
 	//This changes to song->visibletracks()
-	TrackList* tl = song->tracks();
+	TrackList* tl;
+	if(song->visibletracks()->empty())
+		tl = song->tracks();
+	else
+		tl = song->visibletracks();
 	int yy = 0;
 	int idx = 0;
 	for (iTrack it = tl->begin(); it != tl->end(); ++it, ++idx)
@@ -261,7 +273,11 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 	else
 	{
 	//This changes to song->visibletracks()
-		TrackList* tl = song->tracks();
+		TrackList* tl;
+		if(song->visibletracks()->empty())
+			tl = song->tracks();
+		else
+			tl = song->visibletracks();
 		iTrack it;
 		int yy = 0;
 		int y = event->y();
@@ -281,11 +297,11 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 				case Track::DRUM:
 				{
 					MidiPart* part = new MidiPart((MidiTrack*) track);
-                                        part->setTick(_pos[1]);
-                                        part->setLenTick(_pos[2] - _pos[1]);
+                    part->setTick(_pos[1]);
+                    part->setLenTick(_pos[2] - _pos[1]);
 					part->setName(track->name());
 					NPart* np = new NPart(part);
-                                        _items.add(np);
+                    _items.add(np);
 					deselectAll();
 					part->setSelected(true);
 					audio->msgAddPart(part);
@@ -465,6 +481,10 @@ void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 
 bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 {
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
 	NPart* npart = (NPart*) item;
 	Part* spart = npart->part();
 	Track* track = npart->track();
@@ -588,7 +608,11 @@ QPoint PartCanvas::raster(const QPoint& p) const
 
 void PartCanvas::partsChanged()
 {
-        _items.clear();
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
+    _items.clear();
 	int idx = 0;
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{
@@ -596,7 +620,7 @@ void PartCanvas::partsChanged()
 		for (iPart i = pl->begin(); i != pl->end(); ++i)
 		{
 			NPart* np = new NPart(i->second);
-                        _items.add(np);
+            _items.add(np);
 			if (i->second->selected())
 			{
 				selectItem(np, true);
@@ -613,7 +637,7 @@ void PartCanvas::partsChanged()
 
 void PartCanvas::updateSelection()
 {
-        for (iCItem i = _items.begin(); i != _items.end(); ++i)
+    for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		NPart* part = (NPart*) (i->second);
 		part->part()->setSelected(i->second->isSelected());
@@ -651,6 +675,10 @@ void PartCanvas::resizeItem(CItem* i, bool noSnap)
 
 CItem* PartCanvas::newItem(const QPoint& pos, int)
 {
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
 	int x = pos.x();
 	if (x < 0)
 		x = 0;
@@ -863,7 +891,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 		case 0: // rename
 		{
 			editPart = npart;
-                        QRect r = map(_curItem->bbox());
+            QRect r = map(_curItem->bbox());
 			if (lineEditor == 0)
 			{
 				lineEditor = new QLineEdit(this);
@@ -1013,7 +1041,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 			curColorIndex = n - 20;
 			bool selfound = false;
 			//Loop through all parts and set color on selected:
-                        for (iCItem i = _items.begin(); i != _items.end(); i++)
+            for (iCItem i = _items.begin(); i != _items.end(); i++)
 			{
 				if (i->second->isSelected())
 				{
@@ -1047,7 +1075,7 @@ void PartCanvas::mousePress(QMouseEvent* event)
 		return;
 	}
 	QPoint pt = event->pos();
-        CItem* item = _items.find(pt);
+    CItem* item = _items.find(pt);
 	if (item == 0)
 		return;
 	switch (_tool)
@@ -1099,7 +1127,11 @@ void PartCanvas::mouseMove(const QPoint& pos)
 Track* PartCanvas::y2Track(int y) const
 {
 	//This changes to song->visibletracks()
-	TrackList* l = song->tracks();
+	TrackList* l;
+	if(song->visibletracks()->empty())
+		l = song->tracks();
+	else
+		l = song->visibletracks();
 	int ty = 0;
 	for (iTrack it = l->begin(); it != l->end(); ++it)
 	{
@@ -1233,24 +1265,24 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	//
 	// Shortcuts that require selected parts from here
 	//
-        if (!_curItem)
+    if (!_curItem)
 	{
-                if (_items.size() == 0)
+        if (_items.size() == 0)
 		{
 			event->ignore(); // give global accelerators a chance
 			return;
 		}
-                for (iCItem i = _items.begin(); i != _items.end(); ++i)
+        for (iCItem i = _items.begin(); i != _items.end(); ++i)
 		{
 			NPart* part = (NPart*) (i->second);
 			if (part->isSelected())
 			{
-                                _curItem = part;
+                _curItem = part;
 				break;
 			}
 		}
-                if (!_curItem)
-                        _curItem = (NPart*) _items.begin()->second; // just grab the first part
+        if (!_curItem)
+            _curItem = (NPart*) _items.begin()->second; // just grab the first part
 	}
 
 	CItem* newItem = 0;
@@ -1295,11 +1327,11 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		if (key == shortcuts[SHRT_SEL_RIGHT_ADD].key)
 			add = true;
 
-                Part* part = _curItem->part();
+        Part* part = _curItem->part();
 		Track* track = part->track();
 		unsigned int tick = part->tick();
 		bool afterthis = false;
-                for (iCItem i = _items.begin(); i != _items.end(); ++i)
+        for (iCItem i = _items.begin(); i != _items.end(); ++i)
 		{
 			NPart* npart = (NPart*) (i->second);
 			Part* ipart = npart->part();
@@ -1329,7 +1361,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		Track* track = part->track();
 		unsigned int tick = part->tick();
 
-                for (iCItem i = _items.begin(); i != _items.end(); ++i)
+        for (iCItem i = _items.begin(); i != _items.end(); ++i)
 		{
 			NPart* npart = (NPart*) (i->second);
 			Part* ipart = npart->part();
@@ -1360,7 +1392,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 			printf("no track above!\n");
 			return;
 		}
-                int middle = _curItem->x() + _curItem->part()->lenTick() / 2;
+        int middle = _curItem->x() + _curItem->part()->lenTick() / 2;
 		CItem *aboveL = 0, *aboveR = 0;
 		//Upper limit: song end, lower limit: song start
 		int ulimit = song->len();
@@ -1378,9 +1410,9 @@ void PartCanvas::keyPress(QKeyEvent* event)
 				xleft = middle - xoffset;
 				xright = middle + xoffset;
 				if (xleft >= 0)
-                                        aboveL = _items.find(QPoint(xleft, y));
+                   aboveL = _items.find(QPoint(xleft, y));
 				if (xright <= ulimit)
-                                        aboveR = _items.find(QPoint(xright, y));
+                   aboveR = _items.find(QPoint(xright, y));
 			}
 
 			if ((aboveL || aboveR) != 0)
@@ -1406,9 +1438,9 @@ void PartCanvas::keyPress(QKeyEvent* event)
 
 		//To get an idea of which track is below us:
 		int stepsize = rmapxDev(1);
-                Track* track = _curItem->part()->track(); //bottom->part()->track();
+        Track* track = _curItem->part()->track(); //bottom->part()->track();
 		track = y2Track(track->y() + track->height() + 1);
-                int middle = _curItem->x() + _curItem->part()->lenTick() / 2;
+        int middle = _curItem->x() + _curItem->part()->lenTick() / 2;
 		//If we're at bottommost, leave
 		if (!track)
 			return;
@@ -2640,7 +2672,11 @@ void PartCanvas::paste(bool clone, bool toTrack, bool doInsert)
 	if (toTrack)
 	{
 	//This changes to song->visibletracks()
-		TrackList* tl = song->tracks();
+		TrackList* tl;
+		if(song->visibletracks()->empty())
+			tl = song->tracks();
+		else
+			tl = song->visibletracks();
 		for (iTrack i = tl->begin(); i != tl->end(); ++i)
 		{
 			if ((*i)->selected())
@@ -2876,6 +2912,10 @@ void PartCanvas::dragLeaveEvent(QDragLeaveEvent*)
 
 void PartCanvas::viewDropEvent(QDropEvent* event)
 {
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
 	//printf("void PartCanvas::viewDropEvent(QDropEvent* event)\n");
 	if (event->source() == this)
 	{
@@ -3052,7 +3092,11 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	//--------------------------------
 
 	//This changes to song->visibletracks()
-	TrackList* tl = song->tracks();
+	TrackList* tl;
+	if(song->visibletracks()->empty())
+		tl = song->tracks();
+	else
+		tl = song->visibletracks();
 	int yy = 0;
 	int th;
 	for (iTrack it = tl->begin(); it != tl->end(); ++it)
@@ -3211,5 +3255,25 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 void PartCanvas::controllerChanged(Track* /* t */)
 {
+	redraw();
+}
+
+void PartCanvas::trackViewChanged()
+{
+	printf("PartCanvas::trackViewChanged()\n");
+    for (iCItem i = _items.begin(); i != _items.end(); ++i)
+	{
+		NPart* part = (NPart*) (i->second);
+		QRect r = part->bbox();
+		part->part()->setSelected(i->second->isSelected());
+		Track* track = part->part()->track();
+		int y = track->y();
+		int th = track->height();
+
+		part->setPos(QPoint(part->part()->tick(), y));
+
+		part->setBBox(QRect(part->part()->tick(), y + 1, part->part()->lenTick(), th));
+	}
+	emit selectionChanged();
 	redraw();
 }

@@ -595,6 +595,7 @@ void Arranger::songChanged(int type)
 
 		if (type & SC_TRACK_REMOVED)
 		{
+			canvas->trackViewChanged();
 			AudioStrip* w = (AudioStrip*) (trackInfo->getWidget(2));
 			//AudioStrip* w = (AudioStrip*)(trackInfo->widget(2));
 			if (w)
@@ -602,7 +603,11 @@ void Arranger::songChanged(int type)
 				Track* t = w->getTrack();
 				if (t)
 				{
-					TrackList* tl = song->tracks();
+					TrackList* tl;
+					if(song->visibletracks()->empty())
+						tl = song->tracks();
+					else
+						tl = song->visibletracks();
 					iTrack it = tl->find(t);
 					if (it == tl->end())
 					{
@@ -625,7 +630,11 @@ void Arranger::songChanged(int type)
 
 void Arranger::trackSelectionChanged()
 {
-	TrackList* tracks = song->tracks();
+	TrackList* tracks;
+	if(song->visibletracks()->empty())
+		tracks = song->tracks();
+	else
+		tracks = song->visibletracks();
 	Track* track = 0;
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{

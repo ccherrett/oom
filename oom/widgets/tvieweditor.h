@@ -26,15 +26,8 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	Q_OBJECT
 	TrackViewList* _viewList;
 	TrackView* _selected;
-	TrackList _tracks;      // tracklist as seen by arranger
-	MidiTrackList  _midis;
-	WaveTrackList _waves;
-	InputList _inputs;      // audio input ports
-	OutputList _outputs;    // audio output ports
-	GroupList _groups;      // mixer groups
-	AuxList _auxs;          // aux sends
-	SynthIList _synthIs;
 	bool _editing;
+	bool _addmode;
 
 	QStringList _trackTypes;
 	QPushButton* btnAdd;
@@ -62,14 +55,6 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 		QStringList trackTypes(){return _trackTypes;}
 		TrackViewList* views(){return _viewList;}
 
-		TrackList* tracks()         { return &_tracks;  }
-		MidiTrackList* midis()      { return &_midis;   }
-		WaveTrackList* waves()      { return &_waves;   }
-		InputList* inputs()         { return &_inputs;  }
-		OutputList* outputs()       { return &_outputs; }
-		GroupList* groups()         { return &_groups;  }
-		AuxList* auxs()             { return &_auxs;    }
-		SynthIList* syntis()        { return &_synthIs; }
 
 	private:
 		QStringList buildViewList();
