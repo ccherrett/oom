@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>754</width>
-    <height>550</height>
+    <width>644</width>
+    <height>426</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,45 +33,6 @@
    <property name="spacing">
     <number>12</number>
    </property>
-   <item>
-    <layout class="QHBoxLayout" name="typeLayout">
-     <item>
-      <widget class="QLabel" name="lblType">
-       <property name="minimumSize">
-        <size>
-         <width>60</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>60</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Type:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmbType">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>1</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>80</width>
-         <height>32</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
    <item>
     <layout class="QHBoxLayout" name="groupLayout">
      <item>
@@ -119,6 +80,13 @@
        </property>
        <property name="text">
         <string>New</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDelete">
+       <property name="text">
+        <string>Delete</string>
        </property>
       </widget>
      </item>
@@ -177,25 +145,74 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="listLayout">
+    <layout class="QHBoxLayout" name="listLayout" stretch="1,0,1">
      <item>
-      <widget class="QListView" name="listAllTracks">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>1</horstretch>
-         <verstretch>1</verstretch>
-        </sizepolicy>
+      <layout class="QVBoxLayout" name="tracksLayout" stretch="0,0">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinAndMaxSize</enum>
        </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAsNeeded</enum>
+       <property name="rightMargin">
+        <number>0</number>
        </property>
-       <property name="alternatingRowColors">
-        <bool>true</bool>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::ExtendedSelection</enum>
-       </property>
-      </widget>
+       <item>
+        <layout class="QHBoxLayout" name="typeLayout">
+         <item>
+          <widget class="QLabel" name="lblType">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Type:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cmbType">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>32</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QListView" name="listAllTracks">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>1</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAsNeeded</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="QDialogButtonBox" name="actionBox">
