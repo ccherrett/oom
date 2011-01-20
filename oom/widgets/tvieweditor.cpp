@@ -194,8 +194,8 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 	//Perform actions to populate list below based on selected type
 	//We need to repopulate and filter the allTrackList
 	//"Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Soft_Synth"
-	if(!_editing)
-		cmbViews->setCurrentIndex(0);
+	//if(!_editing)
+	//	cmbViews->setCurrentIndex(0);
 	QStringList stracks;
 	switch (type)
 	{/*{{{*/

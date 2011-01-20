@@ -3359,6 +3359,7 @@ void Song::updateTrackViews(QAction* act)
 	{
 		printf("Song::updateTrackViews(QAction* act) \n");
 		tv->setSelected(act->isChecked());
+		song->dirty = true;
 		updateTrackViews1();
 	}
 }
@@ -3380,11 +3381,11 @@ void Song::updateTrackViews1()
 			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
 			{
 				//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
-			//	for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
-			//	{
-			//		if ((*i)->name() == (*t)->name())
-			//			continue;
-			//	}
+				for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
+				{
+					if ((*i)->name() == (*t)->name())
+						continue;
+				}
 				_viewtracks.push_back((*t));
 			}
 		}
