@@ -168,6 +168,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 	btnEdit->setEnabled(true);
 	//Perform actions to populate list below based on selected view
 	QString sl = cmbViews->itemText(ind);
+	txtName->setText(sl);
 	btnApply->setEnabled(false);
 	TrackView* v = song->findTrackView(sl);
 	_editing = true;
@@ -183,32 +184,6 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 				sl.append((*ci)->name());
 			}
 			listSelectedTracks->setModel(new QStringListModel(sl));
-//"Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Soft_Synth"
-			switch(v->type())
-			{
-				case Track::MIDI:
-				case Track::DRUM:
-					cmbType->setCurrentIndex(4);
-				break;
-				case Track::WAVE:
-					cmbType->setCurrentIndex(6);
-				break;
-				case Track::AUDIO_OUTPUT:
-					cmbType->setCurrentIndex(0);
-				break;
-				case Track::AUDIO_INPUT:
-					cmbType->setCurrentIndex(1);
-				break;
-				case Track::AUDIO_GROUP:
-					cmbType->setCurrentIndex(3);
-				break;
-				case Track::AUDIO_AUX:
-					cmbType->setCurrentIndex(2);
-				break;
-				case Track::AUDIO_SOFTSYNTH:
-					cmbType->setCurrentIndex(5);
-				break;
-			}
 		}
 	}
 	_editing = false;
@@ -288,7 +263,9 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)
 	printf("TrackViewEditor::btnApplyClicked()\n");
 	if(_editing && _selected)
 	{
+		_selected->setViewName(txtName->text());
 		TrackList *tl = _selected->tracks();
+
 		for(iTrack it = tl->begin(); it != tl->end(); ++it)
 			tl->erase(it);
 		//Process all the tracks in the listSelectedTracks and add them to the TrackList
@@ -312,6 +289,9 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)
 			cmbViews->addItem(_selected->viewName());
 		cmbViews->blockSignals(false);
 		cmbViews->setCurrentIndex(0);
+		btnApply->setEnabled(false);
+		_editing = false;
+		_addmode = false;
 	}
 }
 
@@ -319,7 +299,8 @@ void TrackViewEditor::btnOkClicked(bool state)
 {
 	printf("TrackViewEditor::btnOkClicked()\n");
 	//Apply is the same as ok without the close so just call the other method
-	btnApplyClicked(state);
+	if(_editing)
+		btnApplyClicked(state);
 	//Do other close cleanup;
 }
 

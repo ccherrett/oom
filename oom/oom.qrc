@@ -84,6 +84,10 @@
 		<file>images/icons/arranger_mute_off.png</file>
 		<file>images/icons/arranger_solo_on.png</file>
 		<file>images/icons/arranger_solo_off.png</file>
+		<file>images/icons/transport-loop.png</file>
+		<file>images/icons/transport-punchin.png</file>
+		<file>images/icons/transport-punchout.png</file>
+		<file>images/icons/line-tool.png</file>
 	</qresource>
 </RCC>
 

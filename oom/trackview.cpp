@@ -24,30 +24,7 @@ TrackView::~TrackView()
 
 void TrackView::setDefaultName()/*{{{*/
 {
-	QString base;
-	switch (_type)
-	{
-		case Track::MIDI:
-		case Track::DRUM:
-		case Track::WAVE:
-			base = QString("Track View");
-			break;
-		case Track::AUDIO_OUTPUT:
-			base = QString("Out View");
-			break;
-		case Track::AUDIO_GROUP:
-			base = QString("Group View");
-			break;
-		case Track::AUDIO_AUX:
-			base = QString("Aux View");
-			break;
-		case Track::AUDIO_INPUT:
-			base = QString("Input View");
-			break;
-		case Track::AUDIO_SOFTSYNTH:
-			base = QString("Synth View");
-			break;
-	};
+	QString base = QString("Track View");
 	base += " ";
 	for (int i = 1; true; ++i)
 	{
@@ -69,11 +46,7 @@ void TrackView::setDefaultName()/*{{{*/
 
 void TrackView::addTrack(Track* t)/*{{{*/
 {
-	Track::TrackType type = (Track::TrackType) t->type();
-	if (type == _type)
-	{
-		_tracks.push_back(t);
-	}
+	_tracks.push_back(t);
 }/*}}}*/
 
 void TrackView::removeTrack(Track* t)
@@ -110,15 +83,12 @@ void TrackView::read(Xml& xml)/*{{{*/
 				{
 					_selected = (bool)xml.parseInt();
 				}
-				else if(tag == "type")
-				{
-					_type = (Track::TrackType)xml.parseInt();
-				}
 				else if (tag == "vtrack")
 				{
 					Track* t = song->findTrack(xml.parse1());
 					if (t)
 					{
+						printf("TrackView::read() Adding track\n");
 						addTrack(t);
 					}
 				}

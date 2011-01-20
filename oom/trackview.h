@@ -30,7 +30,6 @@ class TrackView
 {
 	private:
 		QString _comment;
-		Track::TrackType _type;
 		TrackList _tracks;
 
 
@@ -51,16 +50,12 @@ class TrackView
 		QString comment() const         { return _comment; }
 		void setComment(const QString& s) { _comment = s; }
 		
-		Track::TrackType type() const         { return _type; }
-		void setType(const Track::TrackType& t) { _type = t; }
-		
 		bool selected() const           { return _selected; }
 		void setSelected(bool f)        { _selected = f; }
 		
 		const QString& viewName() const     { return _name; }
 		void setViewName(const QString& s)  { _name = s; }
 		void setDefaultName();
-		QString cname() const           { int t = type(); return QString(_cname[t]); }
 		void addTrack(Track*);
 		void removeTrack(Track*);
 		TrackList* tracks() { return &_tracks; } 

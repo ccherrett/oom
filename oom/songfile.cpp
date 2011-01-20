@@ -1581,7 +1581,6 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 	level++;
 	xml.strTag(level, "name", _name);
 	xml.intTag(level, "selected", _selected);
-	xml.intTag(level, "type", _type);
 	if(!_comment.isEmpty())
 		xml.strTag(level, "comment", _comment);
 

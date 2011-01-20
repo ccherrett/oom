@@ -486,12 +486,12 @@ void initIcons()
       pointerIcon  = new MPIXMAP(":/images/icons/select.png", NULL);
       pencilIcon   = new MPIXMAP(":/images/icons/pencil.png", NULL);
       deleteIcon   = new MPIXMAP(":/images/icons/eraser.png", "draw-eraser");
-      punchinIcon  = new MPIXMAP(punchin_xpm, NULL);
-      punchoutIcon = new MPIXMAP(punchout_xpm, NULL);
-      punchin1Icon = new MPIXMAP(punchin1_xpm, NULL);
-      punchout1Icon = new MPIXMAP(punchout1_xpm, NULL);
-      loopIcon     = new MPIXMAP(loop_xpm, NULL);
-      loop1Icon    = new MPIXMAP(loop1_xpm, NULL);
+      punchinIcon  = new MPIXMAP(":/images/icons/transport-punchin.png", NULL);
+      punchoutIcon = new MPIXMAP(":/images/icons/transport-punchout.png", NULL);
+      punchin1Icon = new MPIXMAP(":/images/icons/transport-punchin.png", NULL);
+      punchout1Icon = new MPIXMAP(":/images/icons/transport-punchout.png", NULL);
+      loopIcon     = new MPIXMAP(":/images/icons/transport-loop.png", NULL);
+      loop1Icon    = new MPIXMAP(":/images/icons/transport-loop.png", NULL);
       playIcon     = new MPIXMAP(":/images/icons/transport-play.png", "media-playback-start");
 
       record1_Icon  = new MPIXMAP(":/images/icons/mixer-record.png", NULL);
@@ -518,7 +518,7 @@ void initIcons()
       steprecIcon  = new MPIXMAP(":/images/icons/step_by_step.png", NULL);
       glueIcon     = new MPIXMAP(glue_xpm, NULL);
       //drawIcon     = new MPIXMAP(draw_xpm, NULL);
-      drawIcon     = new MPIXMAP(draw_xpm, NULL);
+      drawIcon     = new MPIXMAP(":/images/icons/line-tool.png", NULL);
       quantIcon    = new MPIXMAP(quant_xpm, NULL);
       saveIcon     = new MPIXMAP(filesave_xpm, "document-save");
       saveasIcon     = new MPIXMAP(filesaveas_xpm, "document-save-as");

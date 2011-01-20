@@ -3303,36 +3303,6 @@ TrackView* Song::addTrackView(int t)/*{{{*/
 {
 	Track::TrackType type = (Track::TrackType) t;
 	TrackView* tv = new TrackView();
-	switch (type)
-	{
-		case Track::MIDI:
-			tv->setType(Track::MIDI);
-			break;
-		case Track::DRUM:
-			tv->setType(Track::MIDI);
-			break;
-		case Track::WAVE:
-			tv->setType(Track::WAVE);
-			break;
-		case Track::AUDIO_OUTPUT:
-			tv->setType(Track::AUDIO_OUTPUT);
-			break;
-		case Track::AUDIO_GROUP:
-			tv->setType(Track::AUDIO_GROUP);
-			break;
-		case Track::AUDIO_AUX:
-			tv->setType(Track::AUDIO_AUX);
-			break;
-		case Track::AUDIO_INPUT:
-			tv->setType(Track::AUDIO_INPUT);
-			break;
-		case Track::AUDIO_SOFTSYNTH:
-			printf("not implemented: Song::addTrackView(SOFTSYNTH)\n");
-			break;
-		default:
-			printf("Song::addTrackView() illegal type %d\n", type);
-			abort();
-	}
 	tv->setDefaultName();
 	_tviews.push_back(tv);
 	//msgInsertTrackView(tv, -1, true);
@@ -3387,6 +3357,7 @@ void Song::updateTrackViews(QAction* act)
 	TrackView* tv = findTrackView(act->text());
 	if(tv)
 	{
+		printf("Song::updateTrackViews(QAction* act) \n");
 		tv->setSelected(act->isChecked());
 		updateTrackViews1();
 	}
@@ -3403,9 +3374,17 @@ void Song::updateTrackViews1()
 	{
 		if((*it)->selected())
 		{
+			printf("Song::updateTrackViews1() Found selected trackview\n");
 			TrackList* tl = (*it)->tracks();
+			printf("Song::updateTrackViews1() size = %d\n", tl->size());
 			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
 			{
+				//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
+			//	for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
+			//	{
+			//		if ((*i)->name() == (*t)->name())
+			//			continue;
+			//	}
 				_viewtracks.push_back((*t));
 			}
 		}
