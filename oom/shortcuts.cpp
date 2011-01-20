@@ -70,12 +70,12 @@ void initShortCuts()
 	defShrt(SHRT_OPEN_GRAPHIC_MASTER, Qt::CTRL + Qt::Key_M, "Open graphical mastertrack editor", ARRANG_SHRT, "open_graph_master");
 	defShrt(SHRT_OPEN_LIST_MASTER, Qt::CTRL + Qt::SHIFT + Qt::Key_M, "Open list mastertrack editor", ARRANG_SHRT, "open_list_master");
 	defShrt(SHRT_OPEN_MIDI_TRANSFORM, Qt::CTRL + Qt::Key_T, "Open midi transformer", ARRANG_SHRT, "open_midi_transform");
-	defShrt(SHRT_ADD_MIDI_TRACK, Qt::CTRL + Qt::Key_J, "Add midi track", ARRANG_SHRT, "add_midi_track");
-	defShrt(SHRT_ADD_DRUM_TRACK, 0, "Add drum track", ARRANG_SHRT, "add_drum_track");
-	defShrt(SHRT_ADD_WAVE_TRACK, 0, "Add wave track", ARRANG_SHRT, "add_wave_track");
-	defShrt(SHRT_ADD_AUDIO_OUTPUT, 0, "Add audio output", ARRANG_SHRT, "add_audio_output");
-	defShrt(SHRT_ADD_AUDIO_GROUP, 0, "Add audio group", ARRANG_SHRT, "add_audio_group");
-	defShrt(SHRT_ADD_AUDIO_INPUT, 0, "Add audio input", ARRANG_SHRT, "add_audio_input");
+	defShrt(SHRT_ADD_MIDI_TRACK, Qt::SHIFT + Qt::Key_M, "Add midi track", ARRANG_SHRT, "add_midi_track");
+	defShrt(SHRT_ADD_DRUM_TRACK, Qt::SHIFT + Qt::Key_D, "Add drum track", ARRANG_SHRT, "add_drum_track");
+	defShrt(SHRT_ADD_WAVE_TRACK, Qt::SHIFT + Qt::Key_W, "Add wave track", ARRANG_SHRT, "add_wave_track");
+	defShrt(SHRT_ADD_AUDIO_OUTPUT, Qt::SHIFT + Qt::Key_O, "Add audio output", ARRANG_SHRT, "add_audio_output");
+	defShrt(SHRT_ADD_AUDIO_GROUP, Qt::SHIFT + Qt::Key_G, "Add audio group", ARRANG_SHRT, "add_audio_group");
+	defShrt(SHRT_ADD_AUDIO_INPUT, Qt::SHIFT + Qt::Key_I, "Add audio input", ARRANG_SHRT, "add_audio_input");
 	defShrt(SHRT_ADD_AUDIO_AUX, 0, "Add audio aux", ARRANG_SHRT, "add_audio_aux");
 	defShrt(SHRT_GLOBAL_CUT, 0, "Structure: Global cut", ARRANG_SHRT, "global_cut");
 	defShrt(SHRT_GLOBAL_INSERT, 0, "Structure: Global insert", ARRANG_SHRT, "global_insert");
@@ -152,8 +152,8 @@ void initShortCuts()
 	defShrt(SHRT_SELECT_ALL, Qt::CTRL + Qt::Key_A, "Edit: Select all", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_all");
 	defShrt(SHRT_SELECT_NONE, Qt::CTRL + Qt::SHIFT + Qt::Key_A, "Edit: Select none", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_none");
 	defShrt(SHRT_SELECT_INVERT, Qt::CTRL + Qt::Key_I, "Edit: Invert Selection", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_inv");
-	defShrt(SHRT_SELECT_ILOOP, 0, "Edit: Select events/parts inside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_ins_loc");
-	defShrt(SHRT_SELECT_OLOOP, 0, "Edit: Select events/parts outside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_out_loc");
+	defShrt(SHRT_SELECT_ILOOP, Qt::ALT + Qt::Key_Y, "Edit: Select events/parts inside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_ins_loc");
+	defShrt(SHRT_SELECT_OLOOP, Qt::ALT + Qt::Key_U, "Edit: Select events/parts outside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_out_loc");
 	defShrt(SHRT_SELECT_PREV_PART, Qt::ALT + Qt::Key_Left, "Edit: Select previous part", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_prv_prt");
 	defShrt(SHRT_SELECT_NEXT_PART, Qt::ALT + Qt::Key_Right, "Edit: Select next part", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_nxt_prt");
 	defShrt(SHRT_SEL_LEFT, Qt::Key_Left, "Edit: Select nearest part/event to the left", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_left");
@@ -167,9 +167,9 @@ void initShortCuts()
 	defShrt(SHRT_DEC_POS, Qt::CTRL + Qt::Key_Left, "Edit: Decrease event position", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pos");
 	defShrt(SHRT_ZOOM_IN, Qt::CTRL + Qt::Key_PageUp, "View: Zoom in", PROLL_SHRT + DEDIT_SHRT, "zoom_in");
 	defShrt(SHRT_ZOOM_OUT, Qt::CTRL + Qt::Key_PageDown, "View: Zoom out", PROLL_SHRT + DEDIT_SHRT, "zoom_out");
-	defShrt(SHRT_GOTO_CPOS, Qt::Key_C, "View: Goto Current Position", PROLL_SHRT + DEDIT_SHRT, "goto_cpos");
+	defShrt(SHRT_GOTO_CPOS, Qt::CTRL + Qt::Key_J, "View: Goto Current Position", PROLL_SHRT + DEDIT_SHRT, "goto_cpos");
 	defShrt(SHRT_SCROLL_LEFT, Qt::Key_H, "View: Scroll left", PROLL_SHRT + DEDIT_SHRT, "scroll_left");
-	defShrt(SHRT_SCROLL_RIGHT, Qt::Key_L, "View: Scroll left", PROLL_SHRT + DEDIT_SHRT, "scroll_right");
+	defShrt(SHRT_SCROLL_RIGHT, Qt::Key_L, "View: Scroll right", PROLL_SHRT + DEDIT_SHRT, "scroll_right");
 
 	//-----------------------------------------------------------
 	//Drum:
@@ -181,9 +181,9 @@ void initShortCuts()
 	//Pianoroll:
 	//-----------------------------------------------------------
 
-	defShrt(SHRT_OVER_QUANTIZE, 0, "Quantize: Over Quantize", PROLL_SHRT, "midi_over_quant");
-	defShrt(SHRT_ON_QUANTIZE, 0, "Quantize: Note On Quantize", PROLL_SHRT, "midi_quant_noteon");
-	defShrt(SHRT_ONOFF_QUANTIZE, 0, "Quantize: Note On/Off Quantize", PROLL_SHRT, "midi_quant_noteoff");
+	defShrt(SHRT_OVER_QUANTIZE, Qt::SHIFT + Qt::Key_E, "Quantize: Over Quantize", PROLL_SHRT, "midi_over_quant");
+	defShrt(SHRT_ON_QUANTIZE, Qt::SHIFT + Qt::Key_R, "Quantize: Note On Quantize", PROLL_SHRT, "midi_quant_noteon");
+	defShrt(SHRT_ONOFF_QUANTIZE, Qt::SHIFT + Qt::Key_T, "Quantize: Note On/Off Quantize", PROLL_SHRT, "midi_quant_noteoff");
 	defShrt(SHRT_ITERATIVE_QUANTIZE, 0, "Quantize: Iterative Quantize", PROLL_SHRT, "midi_quant_iterative");
 	defShrt(SHRT_CONFIG_QUANT, Qt::CTRL + Qt::ALT + Qt::Key_Q, "Quantize: Configure quant", PROLL_SHRT, "config_quant");
 	defShrt(SHRT_MODIFY_GATE_TIME, 0, "Quantize: Modify Gate Time", PROLL_SHRT, "midi_mod_gate_time");
@@ -218,8 +218,8 @@ void initShortCuts()
 
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
-        defShrt(SHRT_POS_INC, Qt::SHIFT + Qt::RightArrow, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
-        defShrt(SHRT_POS_DEC, Qt::SHIFT + Qt::LeftArrow, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
+        defShrt(SHRT_POS_INC, Qt::SHIFT + Qt::Key_Period, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
+        defShrt(SHRT_POS_DEC, Qt::SHIFT + Qt::Key_Comma, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
 
 	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::Key_Plus, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
 	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::Key_Minus, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");
