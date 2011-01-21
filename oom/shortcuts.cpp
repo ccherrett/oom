@@ -276,7 +276,7 @@ void initShortCuts()
 	//-----------------------------------------------------------
 
 	defShrt(SHRT_LE_INS_NOTES, Qt::CTRL + Qt::Key_N, "Insert Note", LEDIT_SHRT, "le_ins_note");
-	defShrt(SHRT_LE_INS_SYSEX, Qt::CTRL + Qt::Key_S, "Insert SysEx", LEDIT_SHRT, "le_ins_sysex");
+	defShrt(SHRT_LE_INS_SYSEX, Qt::ALT + Qt::Key_S, "Insert SysEx", LEDIT_SHRT, "le_ins_sysex");
 	defShrt(SHRT_LE_INS_CTRL, Qt::CTRL + Qt::Key_T, "Insert Ctrl", LEDIT_SHRT, "le_ins_ctrl");
 	defShrt(SHRT_LE_INS_META, 0, "Insert Meta", LEDIT_SHRT, "le_ins_meta");
 	defShrt(SHRT_LE_INS_CHAN_AFTERTOUCH, Qt::CTRL + Qt::Key_A, "Insert Channel Aftertouch", LEDIT_SHRT, "le_ins_afttouch");
