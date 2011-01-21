@@ -1,4 +1,4 @@
-May 6, 2010 v0.0.2 by Tim.
+Edited by Alex Stone 21.01.2011
 
 Understanding the Effects Rack
 ------------------------------
@@ -54,9 +54,10 @@ Nor are specialized plugins with many inputs and/or outputs.
 
 Nor are so-called 'realtime' control plugins which use audio inputs 
  and outputs for control signals. 
-<<< 
- Loud noise alert! Beware of using such plugins in an audio effects rack. 
->>>
+
+
+NOTE: Loud noise alert! Beware of using such plugins in an audio effects rack. 
+You are advised not to use RT plugins in OOM2, as you may damage your hardware.
 
 
 Example: Consider a stereo Audio Input track with these effect rack 
@@ -74,12 +75,14 @@ The stereo Audio Input track will therefore ignore its second
  split stereo signal into the Stereo Echo, finally producing 
  stereo output available at the Audio Input track's output routes.      
   
-  
-One improvement would be not creating unused redundant plugin copies
- between plugins in stereo tracks.
-For example, for a plugin having one audio input and one audio output,
- feeding a plugin having one audio input and two audio outputs,  
- the extra copy of the first plugin is redundant and not required,
- but currently it is created anyway.
+
+NOTE: OOM2 does not use, or open, LV2 plugins. If you wish to 
+use LV2 plugins, please open them outside OOM2 in a suitable host.  
+We have tested LV2 plugins with a standalone host called lv2rack, which
+will work with most LV2 plugins currently built.
+Calf LV2 plugins run in their own host, and under our testing have
+proved to be stable and competent for professional use.
+
+
   
   

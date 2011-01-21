@@ -18,6 +18,10 @@ Check:
       under Tools/OOMidi. If you cannot find any OOMidi widgets, designer
       did not find the file "oomwidgetsplugin.so".
 
+NOTE: OOM2 is now a qt4 application (recently), so these instructions may be void.
+If you manage to build ladspa guis with QT4 following the above instructions, 
+and they open successfully in OOM2, please let us know.
+
 ======================
    Environment
 ======================

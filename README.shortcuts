@@ -1,159 +1,208 @@
-From: Frank Neumann
-Subject: [OOMidi] Keyboard shortcut list
+Updated by Alex Stone 21.01.2011
 
-Hi all,
-while reading some OOMidi source code during the last weeks, I made a list
-of all keyboard shortcuts I found in there. I thought other might find
-this useful, so I am posting this here. There are some "?" spots in
-there where I am not perfectly sure if something is correct or really
-works the way it should, so comments or corrections are welcome. A few
-keys are also result of my first ever cvs commit to OOMidi :-).
+(Shortcuts without a default are marked as **)
 
-Frank
+Default Shortcut keys in OOMidi, as of version 1:
 
-2004-04-xx:
-      Also changed Ctrl+Shift+A to Select None.
+Transport:
+=========
+Transport: Start playback from current location: Ctrl-ENTER
+Transport: Play/Stop/Rewind: SPACE
+Transport: Stop Playback: **
+Transport: Go to start: HOME
+Transport: Go to left marker: END
+Transport: Go to right marker: Ctrl-END
+Transport: Increase current position: Shift->   (Moves the playback cursor to the right)
+Transport: Decrease current position: Shift-<   (Moves the playback cursor to the left)
+Transport: Toggle loop selection: /
+Transport: Toggle Metronome: C
+Transport: Toggle Record: R
+Transport: Clear all record enabled tracks: Backspace
+Transport: Increase current position, no snap: Ctrl - +
+Transport: Decrease current position, no snap: Ctrl - -
 
-2004-01-08:
-      Changed Ctrl+A to Select All in Arranger for the sake of uniformity. (ML)
 
-2003-10-26:
-      Added Alt+L shortcut in drumeditor to set fixed length on drumnotes
-      according to drummap (Mathias Lundgren)
- 2003-10-19:
-      In Arranger, Part Canvas:
-      added Alt+P shortcut in to move locators to part boundaries
-      Crsr Up / Crsr Down to move to nearest part on track above/below
-      in current window.
 
-04.01.2003:
-      - (ws) added new Delete keys in pianoroll and drumedit
-
-<cut here>
-
-Shortcut keys in OOMidi, as of 0.6.0pre5:
 
 Arranger:
 =========
-Undo: Ctrl-Z
-Redo: Ctrl-Y
-New: Ctrl-N
-Open: Ctrl-O
-Save: Ctrl-S
-Open PianoRoll Editor: Ctrl-E
-Open Score Editor: Ctrl-R
-
-Open Recent: Ctrl-S (? collides with "Save"?)
-Config Printer: Ctrl-P
-Quit: Ctrl-Q
-
-Cut: Ctrl-X
-Copy: Ctrl-C
-Paste: Ctrl-V
-Delete Track: Delete
-Add Track: Ctrl-J
-Select all: Ctrl-A
-Deselect All Parts: Ctrl-B
-Open Drums Editor: Ctrl-D
-Open List Editor: Ctrl-L
+File: New Project: Ctrl-N
+File: Open from disk: Ctrl-O
+File: Save Project: Ctrl-S
+File: Save as: **
+File: Open recent file: Ctrl-1
+File: Load Template: **
+File: Import Midi file: **
+File: Export Midi file: **
+File: Import Midi part: **
+File: Import Audio file: **
+File: Quit OOMidi: Ctrl-Q
+Edit: Select parts on track: Ctrl-Alt-P
+Open Pianoroll: Ctrl-E
+Open Drumeditor: Ctrl-D
+Open Listeditor: Ctrl-L
+Open Waveeditor: Ctrl-W
 Open Graphical Mastertrack Editor: Ctrl-M
-Open List Mastertrack Editor: Shift-Ctrl-M
-Open MIDI Transform Editor: Ctrl-T
-Open Transport Panel: F11
-Open Bigtime Window: F12
-Open Help Browser: F1
-Start "What's This" Mode: Shift-F1
-Toggle Metronome Click: C
+Open List Mastertrack Editor: Ctrl-Shift-M
+Open Midi Transformer: Ctrl-T
+Structure: Global Cut: **
+Structure: Global Insert: **
+Structure: Global Split: **
+Structure: Copy Range: **
+Structure: Cut Events: **
+View: Toggle Transport Window: F11
+View: Toggle Bigtime Window: F12
+View: Toggle Mixer 1 Window: F10
+View: Toggle Mixer 2 Window: Ctrl-F10
+View: Open Marker Window: F9
+Settings: Follow song by page: **
+Settings: Follow song off: **
+Settings: Follow Song continuous: **
+Settings: Global Configuration: **
+Settings: Configure Shortcuts: **
+Settings: Configure Metronome: **
+Settings: Midi Sync configuration: **
+Settings: Midifile Import/Export configuration: **
+Settings: Appearance settings: **
+Settings: Midiport/Softsynth: **
+Settings: Audio subsystem configuration: **
+Midi: Edit midi instruments: **
+Midi: Open Midi input transform: **
+Midi: Open midi input filter: **
+Midi: Midi input transpose: **
+Midi: Midi remote control: **
+Midi: Reset midi: **
+Midi: Init midi: **
+Midi: Local off: **
+Audio: Bounce audio to track: **
+Audio: Bounce audio to file: **
+Audio: Restart audio: **
+Automation: Mixer automation: **
+Automation: Take mixer snapshot: **
+Automation: Clear mixer automation: **
+Add midi track: Shift-M
+Add drum track: Shift-D
+Add wave track: Shift-W
+Add audio output: Shift-O
+Add audio input: Shift-I
+Add audio aux: **
+Help: Open manual: F1
+Help: Toggle Whatsthismode: Shift-F1
+Edit: Edit selected part: ENTER
+Edit: Select nearest part on track above: UP
+Edit: Select nearest part on track below: DOWN
+Edit: Add nearest part on track above: Shift-UP
+Edit: Add nearest part on track below: Shift-DOWN
+Edit: Insert parts, moving time: Ctrl-Shift-I
+Edit: Insert empty measure: Ctrl-Shift-M
+Edit: Paste clone: Ctrl-Shift-V
+Edit: Paste to track: Ctrl-B
+Edit: Paste clone to track: Ctrl-Shift-B
+Edit: Select track below: Ctrl-DOWN
+Edit: Select track above: Ctrl-UP
+Edit: Select all: Ctrl-A
+Edit: Select none: Ctrl-Shift-A
+Edit: Invert selection: Ctrl-I
+Edit: Select events/parts inside locators: Alt-Y
+Edit: Select events/parts outside locators: Alt-U
+Edit: Select previous part: **
+Edit: Select next part: **
+Edit: Select nearest part/event to the left: LEFT
+Edit: Select nearest part/event to the right: RIGHT
+Edit: Add nearest part/event to the left to selection: Shift-LEFT
+Edit: Add nearest part/event to the right to selection: Shift-RIGHT
+Midi: Transpose: **
+Tool: Pointer: A
+Tool: Pencil: D
+Tool: Eraser: B
+Tool: Scissor: S
+Tool: Glue: G
+Tool: Mute: Meta-M (windows key)
+Go to next marker: F6
+Go to previous marker: F5
 
-Stop Playback / Rewind: Space
-Stop Playback: Insert
-Start Playback: Enter
-Go to left Marker: End (Keypad)
-Go to right marker: CursorDown (Keypad)
-Toggle Loop Mode: / (Keypad)
-Start Recording: * (Keypad)
-
-
-Arranger, Part Canvas:
-======================
-Cut: Ctrl-X
-Copy: Ctrl-C
-Select previous/next part in this track: Crsr-Left / Crsr-Right
-Remove Part: Delete
-
-
-Arranger, Track List Canvas:
-============================
-Move to previous track: Crsr-Up
-Move to next track: Crsr-Down
-
-
-Pianoedit:
+Pianoroll:
 ==========
-Cut: Ctrl-X
-Copy: Ctrl-C
-Paste: Ctrl-V
-Select All: Ctrl-A (just added in CVS)
-Deselect All: Ctrl-Shift-A (just added in CVS)
-Invertion Selection: Ctrl-I (just added in CVS)
-Delete selected Events: Delete
+Edit: Select all: Ctrl-A
+Edit: Select none: Ctrl-Shift-A
+Edit: Invert selection: Ctrl-I
+Edit: Select events/parts inside locators: Alt-Y
+Edit: Select events/parts outside locators: Alt-U
+Edit: Select previous part: **
+Edit: Select next part: **
+Edit: Select nearest part/event to the left: LEFT
+Edit: Select nearest part/event to the right: RIGHT
+Edit: Add nearest part/event to the left to selection: Shift-LEFT
+Edit: Add nearest part/event to the right to selection: Shift-RIGHT
+Edit: Increase pitch: Ctrl-UP
+Edit: Decrease pitch: Ctrl-DOWN
+Edit: Increase event position: Ctrl-RIGHT
+Edit: Decrease event position: Ctrl-LEFT
+Edit: Set locators to position: Alt-P
+Edit: Insert at location: INS
+Edit: Increase note length: Ctrl-Shift-RIGHT
+Edit: Decrease note length: Ctrl-Shift-LEFT
+Midi: Transpose: **
+View: Zoom in: Ctrl-PageUp
+View: Zoom out: Ctrl-PageDown
+View: Go to current position: Ctrl-J
+View: Scroll left: H
+View: Scroll right: L
+Edit: Set fixed lengths on midi events: Alt-L
+Quantize: Over quantize: Shift-E
+Quantize: Note on quantize: Shift-R
+Quantize: Note on/off quantize: Shift-T
+Quantize: Iterative quantize: **
+Quantize: Configure quantize: Ctrl-Alt-Q
+Quantize: Modify gate time: **
+Quantize: Modify velocity: **
+Edit: Crescendo: **
+Edit: Delete overlaps: **
+Edit: Thin out: **
+Edit: erase event: **
+Edit: Note shift: **
+Edit: Move clock: **
+Edit: Copy measure: **
+Edit: Erase measure: **
+Edit: Delete measure: **
+Edit: Create measure: **
+Quantize: Set quantize to 1/1 note: 1
+Quantize: Set quantize to 1/2 note: 2
+Quantize: Set quantize to 1/4 note: 3
+Quantize: Set quantize to 1/8 note: 4
+Quantize: Set quantize to 1/16 note: 5
+Quantize: Set quantize to 1/32 note: 6
+Quantize: Set quantize to 1/64 note: 7
+Quantize: Toggle triol quantization: T
+Quantize: Toggle dotted quantization: .
+Quantize: Toggle double dotted quantization: ,
+Edit: Event change colour: E (Soon to be removed)
+Edit: Insert program change: \
+Edit: Delete program change: Ctrl-\
+Edit: Select instrument: I
+Tool: Pointer: A
+Tool: Pencil: D
+Tool: Eraser: B
+Tool: Line draw: **
 
-Insert Notes at locator position: Shift-Crsr-Right
-Move Locator right: Crsr-Right
-Move Locator left: Crsr-Left
-Delete under Locator: Delete (KP?), "collects" notes left of locator
-Set Grid Snap/Quantizer to 1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64:
-1/2/3/4/5/6/7
-Toggle "triolic" flag of Grid Snap/Quantizer: T
-Toggle "punctuated" flag of Grid Snap/Quantizer: .
-Set Grid Snap/Quantizer to "first value in list"(?): ,
-Open "Event Color" dialog: e (just fixed in CVS)
-
-
-Drumedit:
-=========
-Cut: Ctrl-X
-Copy: Ctrl-C
-Paste:Ctrl-V
-Load Drummap: Ctrl-O
-Save Drummap: Ctrl-S
-Set fixed length: Alt-L (Sets length on selected events to the length specified in the drummap)
-
-Delete selected Events: Delete
-
-Listedit:
-=========
-Insert Note: Ctrl-N
-Insert SysEx: Ctrl-S
-Insert Ctrl: Ctrl-T
-Insert Pitch: Ctrl-E
-Insert Channel Aftertouch: Ctrl-A
-Insert Key Aftertouch: Ctrl-P
-Delete Events: Delete
-
-
-Score Edit:
+Listeditor
 ===========
-When entering Lyrics:
-Move to next Note's Lyrics: Crsr-Left (problems when at beginning/end of
-notes)
-Move to previous Note' Lyrics: Crsr-Right
-Cancel (?) entering notes: Escape
-Remove last character from lyrics: Backspace or Delete
-End entering Lyrics: Enter
 
+Insert note: Ctrl-N
+Insert sysex: Alt-S
+Insert control: Ctrl-T
+Insert meta: **
+Insert channel aftertouch: Ctrl-A
+Insert key aftertouch: Ctrl-P
 
-Help Browser:
+List Mastertrack
 =============
-New Window: Alt-N
-Open File: Alt-O
-Print: Alt-P
-Close: Alt-Q
-Exit: Alt-X
+
+Insert Tempo: Alt-T
+Insert Signature: Alt-R
+Change event position: Alt-Shift-E
+Edit event value: Alt-E
 
 
-Transport:
-==========
-Toggle metronome Click: C
-Toggle Loop Mode: / (Keypad)
+
 

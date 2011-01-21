@@ -276,7 +276,7 @@ void initShortCuts()
 	//-----------------------------------------------------------
 
 	defShrt(SHRT_LE_INS_NOTES, Qt::CTRL + Qt::Key_N, "Insert Note", LEDIT_SHRT, "le_ins_note");
-	defShrt(SHRT_LE_INS_SYSEX, Qt::CTRL + Qt::Key_S, "Insert SysEx", LEDIT_SHRT, "le_ins_sysex");
+	defShrt(SHRT_LE_INS_SYSEX, Qt::ALT + Qt::Key_S, "Insert SysEx", LEDIT_SHRT, "le_ins_sysex");
 	defShrt(SHRT_LE_INS_CTRL, Qt::CTRL + Qt::Key_T, "Insert Ctrl", LEDIT_SHRT, "le_ins_ctrl");
 	defShrt(SHRT_LE_INS_META, 0, "Insert Meta", LEDIT_SHRT, "le_ins_meta");
 	defShrt(SHRT_LE_INS_CHAN_AFTERTOUCH, Qt::CTRL + Qt::Key_A, "Insert Channel Aftertouch", LEDIT_SHRT, "le_ins_afttouch");
@@ -285,10 +285,10 @@ void initShortCuts()
 	//-----------------------------------------------------------
 	// List masteredit:
 	//-----------------------------------------------------------
-	defShrt(SHRT_LM_INS_TEMPO, Qt::CTRL + Qt::Key_T, "Insert Tempo", LMEDIT_SHRT, "lm_ins_tempo");
-	defShrt(SHRT_LM_INS_SIG, Qt::CTRL + Qt::Key_R, "Insert Signature", LMEDIT_SHRT, "lm_ins_sig");
-	defShrt(SHRT_LM_EDIT_BEAT, Qt::CTRL + Qt::SHIFT + Qt::Key_E, "Change Event Position", LMEDIT_SHRT, "lm_edit_beat");
-	defShrt(SHRT_LM_EDIT_VALUE, Qt::CTRL + Qt::Key_E, "Edit Event Value", LMEDIT_SHRT, "lm_edit_val");
+	defShrt(SHRT_LM_INS_TEMPO, Qt::ALT + Qt::Key_T, "Insert Tempo", LMEDIT_SHRT, "lm_ins_tempo");
+	defShrt(SHRT_LM_INS_SIG, Qt::ALT + Qt::Key_R, "Insert Signature", LMEDIT_SHRT, "lm_ins_sig");
+	defShrt(SHRT_LM_EDIT_BEAT, Qt::ALT + Qt::SHIFT + Qt::Key_E, "Change Event Position", LMEDIT_SHRT, "lm_edit_beat");
+	defShrt(SHRT_LM_EDIT_VALUE, Qt::ALT + Qt::Key_E, "Edit Event Value", LMEDIT_SHRT, "lm_edit_val");
 
 	defShrt(SHRT_NEXT_MARKER, Qt::Key_F6, "Goto Next Marker", ARRANG_SHRT, "me_sel_next");
 	defShrt(SHRT_PREV_MARKER, Qt::Key_F5, "Goto Prev Marker", ARRANG_SHRT, "me_sel_prev");
