@@ -458,7 +458,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
                 if (leftmost)
                 {
                         Pos p1(leftmost->event().tick(), true);
-                        song->setPos(0, p1, true, false, false);
+                        song->setPos(0, p1, true, true, false);
                 }
         }
 
