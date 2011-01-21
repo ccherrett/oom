@@ -204,7 +204,7 @@ void initShortCuts()
 	defShrt(SHRT_ADD_PROGRAM, Qt::Key_Backslash, "Edit: Insert Program Change", PROLL_SHRT, "add_program_change");
 	defShrt(SHRT_DEL_PROGRAM, Qt::CTRL + Qt::Key_Backslash, "Edit: Delete Program Change", PROLL_SHRT, "delete_program_change");
 	defShrt(SHRT_SEL_INSTRUMENT, Qt::Key_I, "Edit: Select Instrument", PROLL_SHRT, "midi_instrument");
-
+	defShrt(SHRT_TOGGLE_STEPRECORD, Qt::CTRL + Qt::Key_F8, "Edit: Toggle Step Input", PROLL_SHRT, "toggle_step_input");
 
 	// Shortcuts for tools
 	// global
@@ -220,8 +220,8 @@ void initShortCuts()
 
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
-        defShrt(SHRT_POS_INC, Qt::SHIFT + Qt::Key_Period, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
-        defShrt(SHRT_POS_DEC, Qt::SHIFT + Qt::Key_Comma, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
+        defShrt(SHRT_POS_INC, Qt::SHIFT + Qt::Key_Greater, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
+        defShrt(SHRT_POS_DEC, Qt::SHIFT + Qt::Key_Less, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
 
 	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::Key_Plus, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
 	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::Key_Minus, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");

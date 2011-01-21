@@ -1355,6 +1355,10 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		else
 			return;
 	}
+        else if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
+        {
+                srec->toggle();
+        }
 	else
 	{ //Default:
 		event->ignore();
