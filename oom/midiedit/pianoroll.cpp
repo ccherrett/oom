@@ -1355,6 +1355,16 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		else
 			return;
 	}
+        else if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
+        {
+                if (canvas->steprec()) {
+                        canvas->setSteprec(false);
+                }
+                else
+                {
+                        canvas->setSteprec(true);
+                }
+        }
 	else
 	{ //Default:
 		event->ignore();
