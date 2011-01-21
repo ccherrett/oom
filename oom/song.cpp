@@ -3380,18 +3380,23 @@ void Song::updateTrackViews1()
 			printf("Song::updateTrackViews1() size = %d\n", tl->size());
 			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
 			{
+				bool found = false;
 				//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
 				for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
 				{
 					if ((*i)->name() == (*t)->name())
-						continue;
+					{
+						found = true;
+						break;
+					}
 				}
-				_viewtracks.push_back((*t));
+				if(!found)
+					_viewtracks.push_back((*t));
 			}
 		}
 	}
 	oom->updateTrackviewMenus();
-	emit songChanged(SC_TRACK_REMOVED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
+	emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
 
 //---------------------------------------------------------

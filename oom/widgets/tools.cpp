@@ -89,6 +89,10 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 		++n;
 	}
 	action->setVisible(true);
+	QWidget* spacer = new QWidget();
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	// toolBar is a pointer to an existing toolbar
+	addWidget(spacer);
 	//action->addTo(this);
 	// Note: Does not take ownership.
 	addActions(action->actions());

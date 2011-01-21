@@ -27,6 +27,7 @@ class QString;
 class QToolBar;
 class QToolButton;
 class QActionGroup;
+class QDockWidget;
 
 class Part;
 class PartList;
@@ -63,6 +64,7 @@ class Appearance;
 class WaveTrack;
 class AudioOutput;
 class EditInstrument;
+class QDocWidget;
 
 #define MENU_ADD_SYNTH_ID_BASE 0x1000
 
@@ -196,6 +198,8 @@ class OOMidi : public QMainWindow
     MarkerView* markerView;
     MidiTransformerDialog* midiTransformerDialog;
     QMenu* openRecent;
+
+	QDockWidget* _resourceDock;
 
     bool readMidi(FILE*);
     void read(Xml& xml, bool skipConfig);
@@ -380,6 +384,9 @@ public:
 
 	//TrackView code
 	void updateTrackviewMenus();
+
+	QDockWidget* resourceDock() { return _resourceDock; }
+	void addTransportToolbar();
     // Testing...
     //PopupView* getRoutingPopupView();
     //PopupView* prepareRoutingPopupView(Track* /*track*/, bool /*dst*/);

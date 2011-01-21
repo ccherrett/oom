@@ -43,6 +43,7 @@ class TrackView
 	public:
 		TrackView();
 		~TrackView();
+		QString getValidName(QString);
 		TrackView& operator=(const TrackView& g);
 		
 		static const char* _cname[];

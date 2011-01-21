@@ -18,6 +18,7 @@ class QAction;
 class QCheckBox;
 class QMainWindow;
 class QMenu;
+class QScrollArea;
 class QScrollBar;
 class QToolButton;
 class QWheelEvent;
@@ -82,11 +83,12 @@ class Arranger : public QWidget
     MTScale* time;
     SpinBox* lenEntry;
     bool showTrackinfoFlag;
-    WidgetStack* trackInfo;
+    //WidgetStack* trackInfo;
     //QStackedWidget* trackInfo;
-    QScrollBar* infoScroll;
+   // QScrollBar* infoScroll;
     //MidiTrackInfoBase* midiTrackInfo;
     MidiTrackInfo* midiTrackInfo;
+	QScrollArea *infoScroll;
     AudioStrip* waveTrackInfo;
     QWidget* noTrackInfo;
     TLLayout* tgrid;
@@ -102,6 +104,8 @@ class Arranger : public QWidget
     PosLabel* cursorPos;
     SpinBox* globalTempoSpinBox;
     SpinBox* globalPitchSpinBox;
+	QTabWidget* _rtabs;
+	AudioStrip* _lastStrip;
 
     unsigned cursVal;
     void genTrackInfo(QWidget* parent);
@@ -129,6 +133,7 @@ private slots:
     //void seek();
     void verticalScrollSetYpos(unsigned);
 	void preloadControllers();
+	void splitterMoved(int, int);
 
 signals:
     void redirectWheelEvent(QWheelEvent*);
@@ -162,6 +167,7 @@ public:
     };
 
     Arranger(QMainWindow* parent, const char* name = 0);
+	~Arranger();
 
     PartCanvas* getCanvas()
     {

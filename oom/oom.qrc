@@ -88,6 +88,8 @@
 		<file>images/icons/transport-punchin.png</file>
 		<file>images/icons/transport-punchout.png</file>
 		<file>images/icons/line-tool.png</file>
+		<file>images/icons/join_tracks.png</file>
+		<file>images/icons/speaker.png</file>
 	</qresource>
 </RCC>
 

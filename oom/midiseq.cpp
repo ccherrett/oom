@@ -57,6 +57,7 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 	{
 		case SEQM_PRELOAD_PROGRAM:
 			audio->preloadControllers();
+			break;
 		case MS_PROCESS:
 			audio->processMidi();
 			break;

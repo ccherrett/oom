@@ -134,7 +134,7 @@ void TrackViewEditor::btnNewClicked(bool)/*{{{*/
 		cmbViews->setCurrentIndex(0);
 		//cmbViews->addItem(_selected->viewName());
 		//cmbViews->setCurrentIndex(cmbViews->find(_selected->viewName()));
-		cmbViews->blockSignals(true);
+		cmbViews->blockSignals(false);
 		//Reset listSelectedTracks
 		QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
 		if(model)
@@ -169,6 +169,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 	//Perform actions to populate list below based on selected view
 	QString sl = cmbViews->itemText(ind);
 	txtName->setText(sl);
+	txtName->setReadOnly(false);
 	btnApply->setEnabled(false);
 	TrackView* v = song->findTrackView(sl);
 	_editing = true;
@@ -263,7 +264,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)
 	printf("TrackViewEditor::btnApplyClicked()\n");
 	if(_editing && _selected)
 	{
-		_selected->setViewName(txtName->text());
+		_selected->setViewName(_selected->getValidName(txtName->text()));
 		TrackList *tl = _selected->tracks();
 
 		for(iTrack it = tl->begin(); it != tl->end(); ++it)
@@ -290,6 +291,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)
 		cmbViews->blockSignals(false);
 		cmbViews->setCurrentIndex(0);
 		btnApply->setEnabled(false);
+		txtName->setReadOnly(true);
 		_editing = false;
 		_addmode = false;
 	}

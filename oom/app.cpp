@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QWhatsThis>
 #include <QDomDocument>
+#include <QDockWidget>
 
 #include "app.h"
 #include "master/lmaster.h"
@@ -665,6 +666,11 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	midiPluginSignalMapper = new QSignalMapper(this);
 	followSignalMapper = new QSignalMapper(this);
 
+	_resourceDock = new QDockWidget(tr("Resource Manager"), this);
+	_resourceDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	_resourceDock->setObjectName("tbResourceCenter");
+	addDockWidget(Qt::LeftDockWidgetArea, _resourceDock);
+
 	song = new Song("song");
 	song->blockSignals(true);
 	heartBeatTimer = new QTimer(this);
@@ -735,7 +741,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	QAction *tseparator = new QAction(this);
 	tseparator->setSeparator(true);
-	transportAction->addAction(tseparator);
+	//transportAction->addAction(tseparator);
 
 	startAction = new QAction(QIcon(*startIcon),
 			tr("Start"), transportAction);
@@ -1099,23 +1105,24 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	tools->addAction(fileNewAction);
 	tools->addAction(fileOpenAction);
 	tools->addAction(fileSaveAction);
+	tools->setObjectName("tbFileButtons");
+	tools->hide();
 
 	//
 	//    Whats This
 	//
 	tools->addAction(QWhatsThis::createAction(this));
 
-	tools->addSeparator();
+	//tools->addSeparator();
 	tools->addActions(undoRedo->actions());
 
 	tools1 = new EditToolBar(this, arrangerTools);
 	addToolBar(tools1);
+	tools1->setObjectName("tbEditTools");
 
-	QToolBar* transportToolbar = addToolBar(tr("Transport"));
-	transportToolbar->addActions(transportAction->actions());
 
-	QToolBar* panicToolbar = addToolBar(tr("Panic"));
-	panicToolbar->addAction(panicAction);
+	//QToolBar* panicToolbar = addToolBar(tr("Panic"));
+	//panicToolbar->addAction(panicAction);
 
 	if (realTimePriority < sched_get_priority_min(SCHED_FIFO))
 		realTimePriority = sched_get_priority_min(SCHED_FIFO);
@@ -1450,6 +1457,17 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	song->blockSignals(false);
 	loadProjectFile(name, useTemplate, true);
 	changeConfig(false);
+	QSize defaultScreenSize = tconfig().get_property("Interface", "size", QSize(0, 0)).toSize();
+	if(defaultScreenSize.height())
+	{
+		resize(defaultScreenSize);
+		move(tconfig().get_property("Interface", "pos", QPoint(200, 200)).toPoint());
+		restoreState(tconfig().get_property("Interface", "windowstate", "").toByteArray());
+	}
+	else
+	{ //maximize the window
+		showMaximized();
+	}
 
 	song->update();
 }
@@ -1459,9 +1477,31 @@ OOMidi::~OOMidi()
 	//printf("OOMidi::~OOMidi\n");
 	//if(transport)
 	//  delete transport;
+	tconfig().set_property("Interface", "size", size());
+	tconfig().set_property("Interface", "fullScreen", isFullScreen());
+	tconfig().set_property("Interface", "pos", pos());
+	tconfig().set_property("Interface", "windowstate", saveState());
+    // Save the new global settings to the configuration file
+    tconfig().save();
+}
 
-        // Save the new global settings to the configuration file
-        tconfig().save();
+/**
+ * Called from within the Arranger Constructor
+ */
+void OOMidi::addTransportToolbar()
+{
+	QToolBar* transportToolbar = new QToolBar(tr("Transport"));
+	addToolBar(Qt::BottomToolBarArea, transportToolbar);
+	QWidget* spacer = new QWidget();
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	// toolBar is a pointer to an existing toolbar
+	transportToolbar->addWidget(spacer);
+	transportToolbar->addActions(transportAction->actions());
+	transportToolbar->addAction(panicAction);
+	transportToolbar->setObjectName("tbTransport");
+	transportToolbar->setAllowedAreas(Qt::BottomToolBarArea);
+	transportToolbar->setFloatable(false);
+	transportToolbar->setMovable(false);
 }
 
 //---------------------------------------------------------

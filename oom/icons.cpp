@@ -513,10 +513,10 @@ void initIcons()
       markIcon[0]  = new MPIXMAP(cmark_xpm, NULL);
       markIcon[1]  = new MPIXMAP(lmark_xpm, NULL);
       markIcon[2]  = new MPIXMAP(rmark_xpm, NULL);
-      cutIcon      = new MPIXMAP(cut_xpm, "edit-cut");
+      cutIcon      = new MPIXMAP(":/images/icons/split.png", "edit-cut");
       //steprecIcon  = new MPIXMAP(steprec_xpm, NULL);
       steprecIcon  = new MPIXMAP(":/images/icons/step_by_step.png", NULL);
-      glueIcon     = new MPIXMAP(glue_xpm, NULL);
+      glueIcon     = new MPIXMAP(":/images/icons/join_tracks.png", NULL);
       //drawIcon     = new MPIXMAP(draw_xpm, NULL);
       drawIcon     = new MPIXMAP(":/images/icons/line-tool.png", NULL);
       quantIcon    = new MPIXMAP(quant_xpm, NULL);
@@ -571,11 +571,11 @@ void initIcons()
       undoIconS    = new MPIXMAP(undoS_xpm, "edit-undo");
       redoIconS    = new MPIXMAP(redoS_xpm, "edit-redo");
 
-      speakerIcon    = new MPIXMAP(speaker_xpm, NULL);
+      speakerIcon    = new MPIXMAP(":/images/icons/speaker.png", NULL);
       buttondownIcon = new MPIXMAP(buttondown_xpm, "arrow-down");
       configureIcon  = new MPIXMAP(configure_xpm, NULL);
 
-      editmuteIcon  = new MPIXMAP(editmute_xpm, NULL);
+      editmuteIcon  = new MPIXMAP(":/images/icons/mute-all.png", NULL);
       editmuteSIcon = new MPIXMAP(editmuteS_xpm, NULL);
       panicIcon  = new MPIXMAP(":/images/icons/transport-panic.png", NULL);
 

@@ -25,20 +25,25 @@ TrackView::~TrackView()
 void TrackView::setDefaultName()/*{{{*/
 {
 	QString base = QString("Track View");
-	base += " ";
-	for (int i = 1; true; ++i)
-	{
-		QString n;
-		n.setNum(i);
-		QString s = base + n;
-		TrackView* tv = song->findTrackView(s);
-		if (tv == 0)
-		{
-			setViewName(s);
-			break;
-		}
-	}
+	setViewName(getValidName(base));
 }/*}}}*/
+
+
+QString TrackView::getValidName(QString text)
+{
+	QString spc(" ");
+	QString rv;
+	TrackView* tv = song->findTrackView(s);
+	int c = 1;
+	while(tv)
+	{
+		QString n = QString::number(c);
+		rv = text + spc + c;
+		tv = song->findTrackView(rv);
+		++c;
+	}
+	return rv;
+}
 
 //---------------------------------------------------------
 //    addTrack

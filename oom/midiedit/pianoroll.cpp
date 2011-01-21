@@ -80,6 +80,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
         // Set size stored in global config, or use defaults.
         int w = tconfig().get_property("PianoRollEdit", "widgetwidth", 800).toInt();
         int h = tconfig().get_property("PianoRollEdit", "widgetheigth", 650).toInt();
+		//FIXME: This needs to be checked to make sure its not larger than the current desktop size
         resize(w, h);
 
 	selPart = 0;
@@ -288,8 +289,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	//---------ToolBar----------------------------------
 	tools = addToolBar(tr("Pianoroll tools"));
-	tools->addActions(undoRedo->actions());
-	tools->addSeparator();
+	tools->setObjectName("tbPRtools");
+	//tools->addActions(undoRedo->actions());
+	//tools->addSeparator();
 	tools->setIconSize(QSize(22, 22));
 
 	srec = new QToolButton();

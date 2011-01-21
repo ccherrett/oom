@@ -21,6 +21,7 @@ class Splitter : public QSplitter {
 
 public:
     Splitter(Qt::Orientation o, QWidget* parent, const char* name);
+	~Splitter();
     void writeStatus(int level, Xml&);
     void readStatus(Xml&);
 };
