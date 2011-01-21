@@ -1116,10 +1116,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//tools->addSeparator();
 	tools->addActions(undoRedo->actions());
 
-	tools1 = new EditToolBar(this, arrangerTools);
-	addToolBar(tools1);
-	tools1->setObjectName("tbEditTools");
-
 
 	//QToolBar* panicToolbar = addToolBar(tr("Panic"));
 	//panicToolbar->addAction(panicAction);
@@ -1359,12 +1355,10 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	arranger = new Arranger(this, "arranger");
 	setCentralWidget(arranger);
 
-	connect(tools1, SIGNAL(toolChanged(int)), arranger, SLOT(setTool(int)));
 	connect(arranger, SIGNAL(editPart(Track*)), SLOT(startEditor(Track*)));
 	connect(arranger, SIGNAL(dropSongFile(const QString&)), SLOT(loadProjectFile(const QString&)));
 	connect(arranger, SIGNAL(dropMidiFile(const QString&)), SLOT(importMidi(const QString&)));
 	connect(arranger, SIGNAL(startEditor(PartList*, int)), SLOT(startEditor(PartList*, int)));
-	connect(arranger, SIGNAL(toolChanged(int)), tools1, SLOT(set(int)));
 	connect(this, SIGNAL(configChanged()), arranger, SLOT(configChanged()));
 
 	connect(arranger, SIGNAL(setUsedTool(int)), SLOT(setUsedTool(int)));
@@ -1490,18 +1484,31 @@ OOMidi::~OOMidi()
  */
 void OOMidi::addTransportToolbar()
 {
-	QToolBar* transportToolbar = new QToolBar(tr("Transport"));
-	addToolBar(Qt::BottomToolBarArea, transportToolbar);
+	tools1 = new EditToolBar(this, arrangerTools);
+	addToolBar(Qt::BottomToolBarArea, tools1);
+	tools1->setObjectName("tbEditTools");
+	tools1->setAllowedAreas(Qt::BottomToolBarArea);
+	tools1->setFloatable(false);
+	tools1->setMovable(false);
+	connect(tools1, SIGNAL(toolChanged(int)), arranger, SLOT(setTool(int)));
+	connect(arranger, SIGNAL(toolChanged(int)), tools1, SLOT(set(int)));
+
+	//QToolBar* transportToolbar = new QToolBar(tr("Transport"));
+	//addToolBar(Qt::BottomToolBarArea, transportToolbar);
 	QWidget* spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer->setMaximumWidth(35);
+	tools1->addWidget(spacer);
+	tools1->addActions(transportAction->actions());
+	tools1->addAction(panicAction);
 	// toolBar is a pointer to an existing toolbar
-	transportToolbar->addWidget(spacer);
-	transportToolbar->addActions(transportAction->actions());
-	transportToolbar->addAction(panicAction);
-	transportToolbar->setObjectName("tbTransport");
-	transportToolbar->setAllowedAreas(Qt::BottomToolBarArea);
-	transportToolbar->setFloatable(false);
-	transportToolbar->setMovable(false);
+	//transportToolbar->addWidget(spacer);
+	//transportToolbar->addActions(transportAction->actions());
+	//transportToolbar->addAction(panicAction);
+	//transportToolbar->setObjectName("tbTransport");
+	//transportToolbar->setAllowedAreas(Qt::BottomToolBarArea);
+	//transportToolbar->setFloatable(false);
+	//transportToolbar->setMovable(false);
 }
 
 //---------------------------------------------------------
@@ -1759,8 +1766,8 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		}
 
 		//showMarker(config.markerVisible);  // Moved below. Tim.
-		resize(config.geometryMain.size());
-		move(config.geometryMain.topLeft());
+		//resize(config.geometryMain.size());
+		//move(config.geometryMain.topLeft());
 
 		if (config.transportVisible)
 			transport->show();

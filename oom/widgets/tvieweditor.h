@@ -45,6 +45,10 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 		void btnOkClicked(bool);
 		void btnApplyClicked(bool);
 		void btnCancelClicked(bool);
+		void btnCopyClicked(bool);
+		void btnDeleteClicked(bool);
+		void txtNameEdited(QString);
+		void reset();
 
 	public:
 		TrackViewEditor(QWidget*, TrackViewList* = 0);

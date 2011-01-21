@@ -32,13 +32,13 @@ void TrackView::setDefaultName()/*{{{*/
 QString TrackView::getValidName(QString text)
 {
 	QString spc(" ");
-	QString rv;
-	TrackView* tv = song->findTrackView(s);
+	QString rv = text;
+	TrackView* tv = song->findTrackView(text);
 	int c = 1;
 	while(tv)
 	{
 		QString n = QString::number(c);
-		rv = text + spc + c;
+		rv = text + spc + n;
 		tv = song->findTrackView(rv);
 		++c;
 	}

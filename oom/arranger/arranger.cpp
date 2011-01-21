@@ -136,7 +136,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	_rtabs = new QTabWidget(oom->resourceDock());
 	_rtabs->setTabPosition(QTabWidget::West);
 	_rtabs->setTabShape(QTabWidget::Triangular);
-	_rtabs->setMinimumSize(QSize(250, 150));
+	_rtabs->setMinimumSize(QSize(200, 150));
 	oom->resourceDock()->setWidget(_rtabs);
 
 	QLabel* label = new QLabel(tr("Cursor"));
@@ -477,7 +477,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(canvas, SIGNAL(dropMidiFile(const QString&)), SIGNAL(dropMidiFile(const QString&)));
 
 	connect(canvas, SIGNAL(toolChanged(int)), SIGNAL(toolChanged(int)));
-	connect(split, SIGNAL(splitterMoved(int, int)), SIGNAL(splitterMoved(int, int)));
+	connect(split, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 	//      connect(song, SIGNAL(posChanged(int, unsigned, bool)), SLOT(seek()));
 
 	// Removed p3.3.43
@@ -677,6 +677,7 @@ void Arranger::splitterMoved(int pos, int)
 	{
 		QList<int> def;
 		def.append(list->maximumSize().width());
+		def.append(50);
 		split->setSizes(def);
 	}
 }

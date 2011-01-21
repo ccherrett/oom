@@ -1655,6 +1655,8 @@ void TList::readStatus(Xml& xml, const char* name)
 			case Xml::TagStart:
 				if (tag == header->objectName())
 					header->readStatus(xml);
+				else if(tag == "header")
+					xml.skip(tag);
 				else
 					xml.unknown("Tlist");
 				break;

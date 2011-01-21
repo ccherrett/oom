@@ -37,14 +37,14 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 	setupUi(this);
 	_selected = 0;
 //MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP,AUDIO_AUX
-	_trackTypes = (QStringList() << "Audio_Out" << "Audio_In" << "Audio_Aux" << "Audio_Group" << "Midi" << "Soft_Synth" << "Wave"); //new QStringList();
+	_trackTypes = (QStringList() << "All Types" << "Audio_Out" << "Audio_In" << "Audio_Aux" << "Audio_Group" << "Midi" << "Soft_Synth" << "Wave"); //new QStringList();
 	_editing = false;
 	_addmode = false;
 	//Populate trackTypes and pass it to cmbTypes 
 	cmbType->addItems(_trackTypes);
 	QStringList stracks;
 	//Output is the first in the list and will be displayed by default.
-	for (ciTrack t = song->outputs()->begin(); t != song->outputs()->end(); ++t)
+	for (ciTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 	{
 		stracks << (*t)->name();
 	}
@@ -57,7 +57,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 	btnCancel = buttonBox->button(QDialogButtonBox::Cancel);
 	btnApply = buttonBox->button(QDialogButtonBox::Apply);
 	btnApply->setEnabled(false);
-	btnEdit->setEnabled(false);
+	btnCopy->setEnabled(false);
 
 	btnAdd = actionBox->button(QDialogButtonBox::Yes);
 	btnAdd->setText(tr("Add Track"));
@@ -77,6 +77,9 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 	connect(btnOk, SIGNAL(clicked(bool)), SLOT(btnOkClicked(bool)));
 	connect(btnApply, SIGNAL(clicked(bool)), SLOT(btnApplyClicked(bool)));
 	connect(btnCancel, SIGNAL(clicked(bool)), SLOT(btnCancelClicked(bool)));
+	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
+	connect(btnCopy, SIGNAL(clicked(bool)), SLOT(btnCopyClicked(bool)));
+	connect(txtName, SIGNAL(textEdited(QString)), SLOT(txtNameEdited(QString)));
 }
 
 
@@ -95,52 +98,24 @@ QStringList TrackViewEditor::buildViewList()
 // Slots
 //----------------------------------------------
 
+void TrackViewEditor::txtNameEdited(QString)
+{
+	if(_selected)
+	{
+		_editing = true;
+		btnApply->setEnabled(true);
+	}
+}
+
 void TrackViewEditor::btnNewClicked(bool)/*{{{*/
 {
-	int t = 0;
-        //MIDI = 0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP, AUDIO_AUX, AUDIO_SOFTSYNTH
-	int type = cmbType->currentIndex();
-	switch (type)/*{{{*/
-	{
-		case 0:
-			t = (int)Track::AUDIO_OUTPUT;
-			break;
-		case 1:
-			t = (int)Track::AUDIO_INPUT;
-			break;
-		case 2:
-			t = (int)Track::AUDIO_AUX;
-			break;
-		case 3:
-			t = (int)Track::AUDIO_GROUP;
-			break;
-		case 4:
-			t = Track::MIDI;
-			break;
-		case 5:
-			t = Track::AUDIO_SOFTSYNTH;
-			break;
-		case 6:
-			t = Track::WAVE;
-			break;
-	}/*}}}*/
-	_selected = song->addNewTrackView(t);
+	reset();
+	_selected = song->addNewTrackView();
 	if(_selected)
 	{
 		_addmode = true;
 		_editing = true;
-		//Reset cmbViews
-		cmbViews->blockSignals(true);
-		cmbViews->setCurrentIndex(0);
-		//cmbViews->addItem(_selected->viewName());
-		//cmbViews->setCurrentIndex(cmbViews->find(_selected->viewName()));
-		cmbViews->blockSignals(false);
-		//Reset listSelectedTracks
-		QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
-		if(model)
-		{
-			model->removeRows(0, model->rowCount());
-		}
+		btnDelete->setEnabled(false);
 		//Clear txtName, set value to Untitled
 		txtName->setText(_selected->viewName());
 		txtName->setFocus(Qt::OtherFocusReason);
@@ -161,11 +136,13 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 		}
 		//Clear txtName
 		txtName->setText("");
-		//Disable btnEdit
-		btnEdit->setEnabled(false);
+		//Disable btnCopy
+		btnCopy->setEnabled(false);
+		btnDelete->setEnabled(false);
 		return;
 	}
-	btnEdit->setEnabled(true);
+	btnCopy->setEnabled(true);
+	btnDelete->setEnabled(true);
 	//Perform actions to populate list below based on selected view
 	QString sl = cmbViews->itemText(ind);
 	txtName->setText(sl);
@@ -201,14 +178,15 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 	switch (type)
 	{/*{{{*/
 		case 0:
-			for (ciTrack t = song->outputs()->begin(); t != song->outputs()->end(); ++t)
+			for (ciTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
 					stracks << (*t)->name();
 			}
+			break;
 		case 1:
-			for (ciTrack t = song->inputs()->begin(); t != song->inputs()->end(); ++t)
+			for (ciTrack t = song->outputs()->begin(); t != song->outputs()->end(); ++t)
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
@@ -216,7 +194,7 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			}
 			break;
 		case 2:
-			for (ciTrack t = song->auxs()->begin(); t != song->auxs()->end(); ++t)
+			for (ciTrack t = song->inputs()->begin(); t != song->inputs()->end(); ++t)
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
@@ -224,7 +202,7 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			}
 			break;
 		case 3:
-			for (ciTrack t = song->groups()->begin(); t != song->groups()->end(); ++t)
+			for (ciTrack t = song->auxs()->begin(); t != song->auxs()->end(); ++t)
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
@@ -232,7 +210,7 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			}
 			break;
 		case 4:
-			for (ciTrack t = song->midis()->begin(); t != song->midis()->end(); ++t)
+			for (ciTrack t = song->groups()->begin(); t != song->groups()->end(); ++t)
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
@@ -240,7 +218,7 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			}
 			break;
 		case 5:
-			for (ciTrack t = song->syntis()->begin(); t != song->syntis()->end(); ++t)
+			for (ciTrack t = song->midis()->begin(); t != song->midis()->end(); ++t)
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
@@ -248,6 +226,14 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			}
 			break;
 		case 6:
+			for (ciTrack t = song->syntis()->begin(); t != song->syntis()->end(); ++t)
+			{
+				//This should be checked against track in other views
+				//if(song->findTrackView((*t)) == 0)
+					stracks << (*t)->name();
+			}
+			break;
+		case 7:
 			for (ciTrack t = song->waves()->begin(); t != song->waves()->end(); ++t)
 			{
 				//This should be checked against track in other views
@@ -259,16 +245,22 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 	listAllTracks->setModel(new QStringListModel(stracks));
 }/*}}}*/
 
-void TrackViewEditor::btnApplyClicked(bool/* state*/)
+void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 {
 	printf("TrackViewEditor::btnApplyClicked()\n");
 	if(_editing && _selected)
 	{
 		_selected->setViewName(_selected->getValidName(txtName->text()));
+		printf("after setviewname\n");
 		TrackList *tl = _selected->tracks();
-
-		for(iTrack it = tl->begin(); it != tl->end(); ++it)
-			tl->erase(it);
+		if(tl)
+		{
+			tl->clear();
+		}
+		else
+		{
+			tl = new TrackList();
+		}
 		//Process all the tracks in the listSelectedTracks and add them to the TrackList
 		QStringListModel* model = (QStringListModel*)listSelectedTracks->model(); 
 		if(model)
@@ -285,17 +277,9 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)
 		}
 		song->dirty = true;
 		song->updateTrackViews1();
-		cmbViews->blockSignals(true);
-		if(_addmode)
-			cmbViews->addItem(_selected->viewName());
-		cmbViews->blockSignals(false);
-		cmbViews->setCurrentIndex(0);
-		btnApply->setEnabled(false);
-		txtName->setReadOnly(true);
-		_editing = false;
-		_addmode = false;
+		reset();
 	}
-}
+}/*}}}*/
 
 void TrackViewEditor::btnOkClicked(bool state)
 {
@@ -306,7 +290,33 @@ void TrackViewEditor::btnOkClicked(bool state)
 	//Do other close cleanup;
 }
 
-void TrackViewEditor::btnCancelClicked(bool/* state*/)
+void TrackViewEditor::reset()
+{
+	//Reset cmbViews
+	cmbViews->blockSignals(true);
+	QAbstractItemModel *mod = cmbViews->model();
+	if(mod)
+		mod->removeRows(0, mod->rowCount());
+	cmbViews->addItems(buildViewList());
+	cmbViews->blockSignals(false);
+	cmbViews->setCurrentIndex(0);
+	btnApply->setEnabled(false);
+	btnDelete->setEnabled(false);
+	btnCopy->setEnabled(false);
+	txtName->setReadOnly(true);
+	_editing = false;
+	_addmode = false;
+	_selected = 0;
+	//Reset listSelectedTracks
+	QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
+	if(model)
+	{
+		model->removeRows(0, model->rowCount());
+	}
+	txtName->setText("");
+}
+
+void TrackViewEditor::btnCancelClicked(bool/* state*/)/*{{{*/
 {
 	printf("TrackViewEditor::btnCancelClicked()\n");
 	if(_addmode)
@@ -317,8 +327,44 @@ void TrackViewEditor::btnCancelClicked(bool/* state*/)
 	}
 	_addmode = false;
 	_selected = 0;
-	song->update();
-}
+	song->update(SC_VIEW_CHANGED);
+}/*}}}*/
+
+void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
+{
+	if(_selected)
+	{
+		TrackView* tv = song->addNewTrackView();
+		if(tv)
+		{
+			TrackList* tl = _selected->tracks();
+			for(ciTrack ci = tl->begin(); ci != tl->end(); ++ci)
+			{
+				tv->addTrack((*ci));
+			}
+			tv->setViewName(tv->getValidName(_selected->viewName()));
+			cmbViews->addItem(tv->viewName());
+			cmbViews->setCurrentIndex(cmbViews->findText(tv->viewName()));
+			_selected = tv;
+			btnApply->setEnabled(true);
+			_addmode = true;
+			_editing = true;
+		}
+	}
+}/*}}}*/
+
+void TrackViewEditor::btnDeleteClicked(bool)/*{{{*/
+{
+	if(_selected && song->findTrackView(_selected->viewName()))
+	{
+		QString n = _selected->viewName();
+		song->trackviews()->erase(_selected);
+		song->dirty = true;
+		song->updateTrackViews1();
+		reset();
+	}
+}/*}}}*/
+
 
 void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 {

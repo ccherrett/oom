@@ -3288,9 +3288,9 @@ void Song::removeTrackView(TrackView* tv)
 //    add a new trackview for the arranger
 //---------------------------------------------------------
 
-TrackView* Song::addNewTrackView(int idx)
+TrackView* Song::addNewTrackView()
 {
-	TrackView* tv = addTrackView((Track::TrackType)idx);
+	TrackView* tv = addTrackView();
 	return tv;
 }
 
@@ -3299,9 +3299,8 @@ TrackView* Song::addNewTrackView(int idx)
 //    called from GUI context
 //---------------------------------------------------------
 
-TrackView* Song::addTrackView(int t)/*{{{*/
+TrackView* Song::addTrackView()/*{{{*/
 {
-	Track::TrackType type = (Track::TrackType) t;
 	TrackView* tv = new TrackView();
 	tv->setDefaultName();
 	_tviews.push_back(tv);

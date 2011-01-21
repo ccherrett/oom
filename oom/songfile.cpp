@@ -1383,7 +1383,7 @@ void Song::read(Xml& xml)
 					readDrumMap(xml, false);
 				else if (tag == "trackview")
 				{//Read in our trackviews
-					printf("Song::read() found track view\n");
+					//printf("Song::read() found track view\n");
 					TrackView* tv = new TrackView();
 					tv->read(xml);
 					if(tv->selected())

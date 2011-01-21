@@ -546,10 +546,10 @@ public slots:
     void seqSignal(int fd);
     Track* addTrack(int);
     Track* addNewTrack(QAction* action);
-    TrackView* addNewTrackView(int);
+    TrackView* addNewTrackView();
     QString getScriptPath(int id, bool delivered);
     void populateScriptMenu(QMenu* menuPlugins, QObject* receiver);
-    TrackView* addTrackView(int);
+    TrackView* addTrackView();
 	void updateTrackViews(QAction*);
 	void updateTrackViews1();
 
