@@ -204,7 +204,7 @@ void initShortCuts()
 	defShrt(SHRT_ADD_PROGRAM, Qt::Key_Backslash, "Edit: Insert Program Change", PROLL_SHRT, "add_program_change");
 	defShrt(SHRT_DEL_PROGRAM, Qt::CTRL + Qt::Key_Backslash, "Edit: Delete Program Change", PROLL_SHRT, "delete_program_change");
 	defShrt(SHRT_SEL_INSTRUMENT, Qt::Key_I, "Edit: Select Instrument", PROLL_SHRT, "midi_instrument");
-
+	defShrt(SHRT_TOGGLE_STEPRECORD, Qt::CTRL + Qt::Key_F8, "Edit: Toggle Step Input", PROLL_SHRT, "toggle_step_input");
 
 	// Shortcuts for tools
 	// global

@@ -276,6 +276,7 @@ enum
     SHRT_TOGGLE_TRIOL, //t
     SHRT_TOGGLE_PUNCT, //.-keypad
     SHRT_TOGGLE_PUNCT2, // ,
+    SHRT_TOGGLE_STEPRECORD,
 
     SHRT_EVENT_COLOR, //e
 
