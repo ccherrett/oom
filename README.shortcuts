@@ -1,37 +1,6 @@
-From: Frank Neumann
-Subject: [OOMidi] Keyboard shortcut list
+Updated by Alex Stone 21.01.2011
 
-Hi all,
-while reading some OOMidi source code during the last weeks, I made a list
-of all keyboard shortcuts I found in there. I thought other might find
-this useful, so I am posting this here. There are some "?" spots in
-there where I am not perfectly sure if something is correct or really
-works the way it should, so comments or corrections are welcome. A few
-keys are also result of my first ever cvs commit to OOMidi :-).
-
-Frank
-
-2004-04-xx:
-      Also changed Ctrl+Shift+A to Select None.
-
-2004-01-08:
-      Changed Ctrl+A to Select All in Arranger for the sake of uniformity. (ML)
-
-2003-10-26:
-      Added Alt+L shortcut in drumeditor to set fixed length on drumnotes
-      according to drummap (Mathias Lundgren)
- 2003-10-19:
-      In Arranger, Part Canvas:
-      added Alt+P shortcut in to move locators to part boundaries
-      Crsr Up / Crsr Down to move to nearest part on track above/below
-      in current window.
-
-04.01.2003:
-      - (ws) added new Delete keys in pianoroll and drumedit
-
-<cut here>
-
-Shortcut keys in OOMidi, as of 0.6.0pre5:
+Shortcut keys in OOMidi, as of version 1:
 
 Arranger:
 =========
@@ -41,9 +10,12 @@ New: Ctrl-N
 Open: Ctrl-O
 Save: Ctrl-S
 Open PianoRoll Editor: Ctrl-E
-Open Score Editor: Ctrl-R
+Open Drums Editor: Ctrl-D
+Open List Editor: Ctrl-L
+Open Graphical Mastertrack Editor: Ctrl-M
+Open List Mastertrack Editor: Shift-Ctrl-M
+Open MIDI Transform Editor: Ctrl-T
 
-Open Recent: Ctrl-S (? collides with "Save"?)
 Config Printer: Ctrl-P
 Quit: Ctrl-Q
 
@@ -51,14 +23,16 @@ Cut: Ctrl-X
 Copy: Ctrl-C
 Paste: Ctrl-V
 Delete Track: Delete
-Add Track: Ctrl-J
+Add Midi Track: Shift-M
+Add Audio Track: Shift-W
+Add Drum Track: Shift-D
+Add Audio Output: Shift-O
+Add Audio Input: Shift-I
+Add Audio Group: Shift-G
+
 Select all: Ctrl-A
 Deselect All Parts: Ctrl-B
-Open Drums Editor: Ctrl-D
-Open List Editor: Ctrl-L
-Open Graphical Mastertrack Editor: Ctrl-M
-Open List Mastertrack Editor: Shift-Ctrl-M
-Open MIDI Transform Editor: Ctrl-T
+
 Open Transport Panel: F11
 Open Bigtime Window: F12
 Open Help Browser: F1
@@ -66,26 +40,26 @@ Start "What's This" Mode: Shift-F1
 Toggle Metronome Click: C
 
 Stop Playback / Rewind: Space
-Stop Playback: Insert
-Start Playback: Enter
-Go to left Marker: End (Keypad)
-Go to right marker: CursorDown (Keypad)
-Toggle Loop Mode: / (Keypad)
-Start Recording: * (Keypad)
+Stop Playback: Ctrl-Space
+Start Playback: Space
+Go to left Marker: End 
+Go to right marker: Ctrl-End 
+Toggle Loop Mode: / 
+Start Recording: R
 
 
 Arranger, Part Canvas:
 ======================
 Cut: Ctrl-X
 Copy: Ctrl-C
-Select previous/next part in this track: Crsr-Left / Crsr-Right
+Select previous/next part in this track: Alt-Left / Alt-Right
 Remove Part: Delete
 
 
 Arranger, Track List Canvas:
 ============================
-Move to previous track: Crsr-Up
-Move to next track: Crsr-Down
+Move to previous track: Ctrl-Up
+Move to next track: Ctrl-Down
 
 
 Pianoedit:
@@ -93,21 +67,21 @@ Pianoedit:
 Cut: Ctrl-X
 Copy: Ctrl-C
 Paste: Ctrl-V
-Select All: Ctrl-A (just added in CVS)
-Deselect All: Ctrl-Shift-A (just added in CVS)
-Invertion Selection: Ctrl-I (just added in CVS)
+Select All: Ctrl-A 
+Deselect All: Ctrl-Shift-A 
+Invertion Selection: Ctrl-I 
 Delete selected Events: Delete
 
-Insert Notes at locator position: Shift-Crsr-Right
-Move Locator right: Crsr-Right
-Move Locator left: Crsr-Left
+Insert Notes at locator position: Ins
+Move Locator right: Shift-period
+Move Locator left: Shift-comma
 Delete under Locator: Delete (KP?), "collects" notes left of locator
 Set Grid Snap/Quantizer to 1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64:
 1/2/3/4/5/6/7
 Toggle "triolic" flag of Grid Snap/Quantizer: T
 Toggle "punctuated" flag of Grid Snap/Quantizer: .
 Set Grid Snap/Quantizer to "first value in list"(?): ,
-Open "Event Color" dialog: e (just fixed in CVS)
+Open "Event Color" dialog: e 
 
 
 Drumedit:
@@ -124,23 +98,12 @@ Delete selected Events: Delete
 Listedit:
 =========
 Insert Note: Ctrl-N
-Insert SysEx: Ctrl-S
-Insert Ctrl: Ctrl-T
+Insert SysEx: Alt-S
+Insert Ctrl: Alt-T
 Insert Pitch: Ctrl-E
 Insert Channel Aftertouch: Ctrl-A
 Insert Key Aftertouch: Ctrl-P
 Delete Events: Delete
-
-
-Score Edit:
-===========
-When entering Lyrics:
-Move to next Note's Lyrics: Crsr-Left (problems when at beginning/end of
-notes)
-Move to previous Note' Lyrics: Crsr-Right
-Cancel (?) entering notes: Escape
-Remove last character from lyrics: Backspace or Delete
-End entering Lyrics: Enter
 
 
 Help Browser:
