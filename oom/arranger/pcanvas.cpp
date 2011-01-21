@@ -1755,6 +1755,15 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.save();
 		p.setFont(config.fonts[1]);
 		p.setWorldMatrixEnabled(false);
+		if(part->selected())
+		{
+			p.setPen(QColor(66,202,230));
+			p.setFont(QFont("fixed-width", 8, QFont::Bold));
+		}
+		else
+		{
+			p.setFont(QFont("fixed-width", 8, QFont::Normal));
+		}
 		p.drawText(rr, Qt::AlignVCenter | Qt::AlignLeft, part->name());
 		p.restore();
 	}

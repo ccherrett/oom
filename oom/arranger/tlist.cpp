@@ -239,6 +239,17 @@ void TList::paint(const QRect& r)
 		track->setY(y);
 		
 		//p.setPen(Qt::black);
+		//QFont::Light	25	25 Weight
+		//QFont::Normal	50	50
+		//QFont::DemiBold	63	63
+		//QFont::Bold	75	75
+		//QFont::Black	87	87
+		if(track->selected())
+			p.setFont(QFont("fixed-width", 10, QFont::Bold));
+		else
+			p.setFont(QFont("fixed-width", 10, QFont::Normal));
+
+		//p.setStyle("font-family: 'fixed-width';")
 
 		int x = 0;
 		for (int index = 0; index < header->count(); ++index)
