@@ -24,6 +24,38 @@ Transport: Decrease current position, no snap: Ctrl - -
 
 
 
+Arranger:
+=========
+File: New Project: Ctrl-N
+File: Open from disk: Ctrl-O
+File: Save Project: Ctrl-S
+File: Save as: **
+File: Open recent file: Ctrl-1
+File: Load Template: **
+File: Import Midi file: **
+File: Export Midi file: **
+File: Import Midi part: **
+File: Import Audio file: **
+File: Quit OOMidi: Ctrl-Q
+Edit: Select parts on track: Ctrl-Alt-P
+Open Pianoroll: Ctrl-E
+Open Drumeditor: Ctrl-D
+Open Listeditor: Ctrl-L
+Open Waveeditor: Ctrl-W
+Open Graphical Mastertrack Editor: Ctrl-M
+Open List Mastertrack Editor: Ctrl-Shift-M
+Open Midi Transformer: Ctrl-T
+Structure: Global Cut: **
+Structure: Global Insert: **
+Structure: Global Split: **
+Structure: Copy Range: **
+Structure: Cut Events: **
+View: Toggle Transport Window: F11
+
+
+
+
+
 
 
 
