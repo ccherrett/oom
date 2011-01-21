@@ -185,6 +185,23 @@ Tool: Pencil: D
 Tool: Eraser: B
 Tool: Line draw: **
 
+Listeditor
+===========
+
+Insert note: Ctrl-N
+Insert sysex: Alt-S
+Insert control: Ctrl-T
+Insert meta: **
+Insert channel aftertouch: Ctrl-A
+Insert key aftertouch: Ctrl-P
+
+List Mastertrack
+=============
+
+Insert Tempo: Alt-T
+Insert Signature: Alt-R
+Change event position: Alt-Shift-E
+Edit event value: Alt-E
 
 
 
