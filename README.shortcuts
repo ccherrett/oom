@@ -105,8 +105,22 @@ Edit: Select none: Ctrl-Shift-A
 Edit: Invert selection: Ctrl-I
 Edit: Select events/parts inside locators: Alt-Y
 Edit: Select events/parts outside locators: Alt-U
-Edit: Select previous part: Alt-LEFT
-Edit: Select next part: Alt-RIGHT
+Edit: Select previous part: **
+Edit: Select next part: **
+Edit: Select nearest part/event to the left: LEFT
+Edit: Select nearest part/event to the right: RIGHT
+Edit: Add nearest part/event to the left to selection: Shift-LEFT
+Edit: Add nearest part/event to the right to selection: Shift-RIGHT
+Midi: Transpose: **
+Tool: Pointer: A
+Tool: Pencil: D
+Tool: Eraser: B
+Tool: Scissor: S
+Tool: Glue: G
+Tool: Mute: Meta-M (windows key)
+Go to next marker: F6
+Go to previous marker: F5
+
 
 
 
