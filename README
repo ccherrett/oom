@@ -105,6 +105,8 @@ details.
             chmod 660 /dev/rtc
             chgrp audio /dev/rtc
 
+NOTE: Alsa now uses the HPET timer, and adds a symlink for RTC based applications.
+
       - make sure OOMidi can set the rtc clock:
             echo 8192 > /proc/sys/dev/rtc/max-user-freq
             inspect with:
@@ -113,6 +115,8 @@ details.
       - for OOMidi to gain RT priviledges load the "realtime-lsm"
         modul; the modul should be configured to give all "audio"
         group members realtime priviledges
+
+NOTE: the realtime-lsm module is depreciated in later kernel versions.
 
       - some distros do not load the alsa sequencer module by default.
         if necessary, load the alsa sequencer module with:
@@ -126,6 +130,10 @@ details.
 
       (JACK and all its clients (qjackctl & OOMidi) must run with the
       same user id)
+
+
+For Gentoo users: When building your kernel, Gentoo recommends you build alsa directly into the kernel.
+In our testing, this has proved more stable than building alsa as modules. 
 
 
   =============================
