@@ -363,6 +363,10 @@ QWidget#MixerCenter { background-color: #595966 }
 	background-color: #595966; 
 }*/
 QMainWindow { background-color: #595966 }
+QMainWindow::separator {
+	background-color: #6b6973;
+	width: 5px;
+}
 /*QWidget { background-color: #595966 }*/
 
 QTabWidget#tabControlCenter::pane { /* The tab widget frame */
