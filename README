@@ -48,6 +48,11 @@ details.
         (Both recommended - DSSI alone will have no DSSI GUIs. OSC alone does nothing, for now.)
 
       - LASH Audio Session Handler
+
+PLEASE NOTE: We do not use Lash at openoctave, and have not tested it with OOM2.
+Your mileage may vary, and we hope you are successful if you wish to use Lash,
+but we are working towards using jack-session as our session protocol.
+Jack-session is not implemented yet, but is on our long list of intended features. 
       
       - ConTeXt (for building documentation, by default the build
                script tries to build documentation, can be
