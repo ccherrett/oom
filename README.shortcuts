@@ -173,6 +173,18 @@ Quantize: Set quantize to 1/8 note: 4
 Quantize: Set quantize to 1/16 note: 5
 Quantize: Set quantize to 1/32 note: 6
 Quantize: Set quantize to 1/64 note: 7
+Quantize: Toggle triol quantization: T
+Quantize: Toggle dotted quantization: .
+Quantize: Toggle double dotted quantization: ,
+Edit: Event change colour: E (Soon to be removed)
+Edit: Insert program change: \
+Edit: Delete program change: Ctrl-\
+Edit: Select instrument: I
+Tool: Pointer: A
+Tool: Pencil: D
+Tool: Eraser: B
+Tool: Line draw: **
+
 
 
 
