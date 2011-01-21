@@ -450,14 +450,17 @@ QDockWidget {
 }
 
 QDockWidget::title {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #727180, stop:0.1 #727180, stop:0.3 #4a4d5a, stop:1 #4a4d5a);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #727180, stop:0.1 #727180, stop:0.5 #4a4d5a, stop:1 #4a4d5a);
     text-align: center;
     /*background: lightgray;*/
     padding-left: 35px;
     padding-top: 6px;
     padding-bottom: 6px;
 	color: #d6dfd6;
-	border: 1px solid #2b2b2f;
+	border-top: 1px solid #2b2b2f;
+	border-left: 1px solid #2b2b2f;
+	border-right: 1px solid #2b2b2f;
+	border-bottom: none;
 }
 
 QDockWidget::close-button, QDockWidget::float-button {
@@ -523,7 +526,14 @@ QToolBar::handle, QToolBar::addToolBarBreak
 }
 
 
-QMenuBar { background-color: #595966; color: #e2e5e5; border: 0px; font-size: 12pt; font-family: 'Arial';}
+QMenuBar { 
+	background-color: #595966; 
+	color: #e2e5e5; 
+	border: 0px; 
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+}
 QMenuBar::item {
      spacing: 6px; /* spacing between menu bar items */
      padding: 1px 4px;
@@ -532,11 +542,13 @@ QMenuBar::item {
  }
 
  QMenuBar::item:selected { /* when selected using mouse or keyboard */
-     background: #a8a8a8;
+     background: #101819;
+	 color: #42cae6;
  }
 
  QMenuBar::item:pressed {
-     background: #888888;
+     background: #101819;
+	 color: #42cae6;
  }
 
 
