@@ -51,7 +51,62 @@ Structure: Global Split: **
 Structure: Copy Range: **
 Structure: Cut Events: **
 View: Toggle Transport Window: F11
-
+View: Toggle Bigtime Window: F12
+View: Toggle Mixer 1 Window: F10
+View: Toggle Mixer 2 Window: Ctrl-F10
+View: Open Marker Window: F9
+Settings: Follow song by page: **
+Settings: Follow song off: **
+Settings: Follow Song continuous: **
+Settings: Global Configuration: **
+Settings: Configure Shortcuts: **
+Settings: Configure Metronome: **
+Settings: Midi Sync configuration: **
+Settings: Midifile Import/Export configuration: **
+Settings: Appearance settings: **
+Settings: Midiport/Softsynth: **
+Settings: Audio subsystem configuration: **
+Midi: Edit midi instruments: **
+Midi: Open Midi input transform: **
+Midi: Open midi input filter: **
+Midi: Midi input transpose: **
+Midi: Midi remote control: **
+Midi: Reset midi: **
+Midi: Init midi: **
+Midi: Local off: **
+Audio: Bounce audio to track: **
+Audio: Bounce audio to file: **
+Audio: Restart audio: **
+Automation: Mixer automation: **
+Automation: Take mixer snapshot: **
+Automation: Clear mixer automation: **
+Add midi track: Shift-M
+Add drum track: Shift-D
+Add wave track: Shift-W
+Add audio output: Shift-O
+Add audio input: Shift-I
+Add audio aux: **
+Help: Open manual: F1
+Help: Toggle Whatsthismode: Shift-F1
+Edit: Edit selected part: ENTER
+Edit: Select nearest part on track above: UP
+Edit: Select nearest part on track below: DOWN
+Edit: Add nearest part on track above: Shift-UP
+Edit: Add nearest part on track below: Shift-DOWN
+Edit: Insert parts, moving time: Ctrl-Shift-I
+Edit: Insert empty measure: Ctrl-Shift-M
+Edit: Paste clone: Ctrl-Shift-V
+Edit: Paste to track: Ctrl-B
+Edit: Paste clone to track: Ctrl-Shift-B
+Edit: Select track below: Ctrl-DOWN
+Edit: Select track above: Ctrl-UP
+Edit: Select all: Ctrl-A
+Edit: Select none: Ctrl-Shift-A
+Edit: Invert selection: Ctrl-I
+Edit: Select events/parts inside locators: Alt-Y
+Edit: Select events/parts outside locators: Alt-U
+Edit: Select previous part: Alt-LEFT
+Edit: Select next part: Alt-RIGHT
 
 
 
