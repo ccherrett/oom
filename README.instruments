@@ -88,7 +88,7 @@
  (5)  <Init> ... </Init> part can be omitted
 
 
- (6)  Controller have the following porperties:
+ (6)  Controller have the following properties:
 
       name: arbitrary unique (short) string describing the controller
       n:    controller number, defines also the controller type:

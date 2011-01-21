@@ -81,6 +81,9 @@ These are the software synthesizers currently available:
             - simple gui lets you load a different sound font
         Fluid loads a default sound font determined by the
         environment variable "DEFAULT_SOUNDFONT".
+         
+       - Deicsonze, a single midi channel synth, with loadable presets if required.
 
-
-
+NOTE: The organ synth in OOM2 is currently broken, and use will result in a segfault. 
+We are considering whether to fix this, or remove it. Please do not use. 
+Deicsonze has been updated and added to the list
