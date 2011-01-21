@@ -24,7 +24,7 @@ details.
       - CMake >= 2.4 
         http:/www.cmake.org/HTML/Download.html
 
-      - QT: Qt >= 4.2.0 
+      - QT: Qt >= 4.6.0 
         ftp://ftp.trolltech.com/qt/source
         OOMidi does _not_ compile with older versions
 
@@ -36,7 +36,7 @@ details.
       - libsamplerate
 
       - JACK >= 0.118.0
-          http://jackit.sourceforge.net/download/
+          http://jackaudio.org/download
 
       Optional:
 
