@@ -35,7 +35,7 @@ details.
 
       - libsamplerate
 
-      - JACK >= 0.103
+      - JACK >= 0.118.0
           http://jackit.sourceforge.net/download/
 
       Optional:
