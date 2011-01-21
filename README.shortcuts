@@ -160,10 +160,19 @@ Edit: Crescendo: **
 Edit: Delete overlaps: **
 Edit: Thin out: **
 Edit: erase event: **
-
-
-
-
+Edit: Note shift: **
+Edit: Move clock: **
+Edit: Copy measure: **
+Edit: Erase measure: **
+Edit: Delete measure: **
+Edit: Create measure: **
+Quantize: Set quantize to 1/1 note: 1
+Quantize: Set quantize to 1/2 note: 2
+Quantize: Set quantize to 1/4 note: 3
+Quantize: Set quantize to 1/8 note: 4
+Quantize: Set quantize to 1/16 note: 5
+Quantize: Set quantize to 1/32 note: 6
+Quantize: Set quantize to 1/64 note: 7
 
 
 
