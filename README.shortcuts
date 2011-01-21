@@ -1,6 +1,6 @@
 Updated by Alex Stone 21.01.2011
 
-(Shortcuts without a default are marked as *)
+(Shortcuts without a default are marked as **)
 
 Default Shortcut keys in OOMidi, as of version 1:
 
@@ -8,8 +8,18 @@ Transport:
 =========
 Transport: Start playback from current location: Ctrl-ENTER
 Transport: Play/Stop/Rewind: SPACE
-Transport: Stop Playback: *
+Transport: Stop Playback: **
 Transport: Go to start: HOME
+Transport: Go to left marker: END
+Transport: Go to right marker: Ctrl-END
+Transport: Increase current position: Shift->   (Moves the playback cursor to the right)
+Transport: Decrease current position: Shift-<   (Moves the playback cursor to the left)
+Transport: Toggle loop selection: /
+Transport: Toggle Metronome: C
+Transport: Toggle Record: R
+Transport: Clear all record enabled tracks: Backspace
+Transport: Increase current position, no snap: Ctrl - +
+Transport: Decrease current position, no snap: Ctrl - -
 
 
 
