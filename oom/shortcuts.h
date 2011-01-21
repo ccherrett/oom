@@ -64,6 +64,7 @@ enum
     SHRT_TOGGLE_METRO, // C
     SHRT_START_REC, // *(keypad)
     SHRT_REC_CLEAR, // *(keypad)
+    SHRT_GOTO_SEL_NOTE,
 
     //Main + Drumeditor
     SHRT_NEW, //Ctrl+N

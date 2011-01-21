@@ -452,6 +452,15 @@ void EventCanvas::keyPress(QKeyEvent* event)
 		// TODO: Check boundaries
 		modifySelected(NoteInfo::VAL_LEN, 0 - editor->raster());
 	}
+        else if (key == shortcuts[SHRT_GOTO_SEL_NOTE].key)
+        {
+                CItem* leftmost = getLeftMostSelected();
+                if (leftmost)
+                {
+                        Pos p1(leftmost->event().tick(), true);
+                        song->setPos(0, p1, true, false, false);
+                }
+        }
 
 	else
 		event->ignore();
@@ -632,3 +641,56 @@ void EventCanvas::viewDropEvent(QDropEvent* event)
 	}
 }
 
+CItem* EventCanvas::getRightMostSelected()
+{
+        iCItem i, iRightmost;
+        CItem* rightmost = NULL;
+
+        // get a list of items that belong to the current part
+        // since multiple parts have populated the _items list
+        // we need to filter on the actual current Part!
+        CItemList list = getItemlistForCurrentPart();
+
+        //Get the rightmost selected note (if any)
+        i = list.begin();
+        while (i != list.end())
+        {
+                if (i->second->isSelected())
+                {
+                        iRightmost = i;
+                        rightmost = i->second;
+                }
+
+                ++i;
+        }
+
+        return rightmost;
+}
+
+CItem* EventCanvas::getLeftMostSelected()
+{
+        iCItem i, iLeftmost;
+        CItem* leftmost = NULL;
+
+        // get a list of items that belong to the current part
+        // since multiple parts have populated the _items list
+        // we need to filter on the actual current Part!
+        CItemList list = getItemlistForCurrentPart();
+
+        if (list.size() > 0)
+        {
+                i = list.end();
+                while (i != list.begin())
+                {
+                        --i;
+
+                        if (i->second->isSelected())
+                        {
+                                iLeftmost = i;
+                                leftmost = i->second;
+                        }
+                }
+        }
+
+        return leftmost;
+}

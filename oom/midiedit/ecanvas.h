@@ -56,6 +56,8 @@ protected:
     bool _midiin;
 
     void updateSelection();
+    CItem* getRightMostSelected();
+    CItem* getLeftMostSelected();
     virtual void addItem(Part*, Event&) = 0;
     // Added by T356.
     virtual QPoint raster(const QPoint&) const;
