@@ -221,8 +221,13 @@ void CtrlCanvas::setPos(int idx, unsigned val, bool adjustScrollbar)
 		w += npos - opos;
 		x = opos;
 	}
-	pos[idx] = val;
-	redraw(QRect(x, 0, w, height()));
+        pos[idx] = val;
+
+        // FIXME: redrawing this rectangle wipes out the controller lane
+        // items when cursor passes over them.
+        // Redrawing the whole view fixes that for now, but it could be a cpu hog ?
+//	redraw(QRect(x, 0, w, height()));
+        update();
 }
 
 //---------------------------------------------------------
@@ -1615,7 +1620,7 @@ void CtrlCanvas::drawOverlay(QPainter& p)
 	{
 		p.setFont(config.fonts[3]);
 		p.setPen(Qt::black);
-		p.drawText(width() / 2 - 100, height() / 2 - 10, "Use shift + pencil or line tool to draw new events");
+                p.drawText(width() / 2 - 100, height() / 2 - 10, "Use shift + pencil or line tool to draw new events");
 		//p.drawText(2 , y * 2, "Use shift + pencil or line tool to draw new events");
 	}
 }
