@@ -666,9 +666,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	midiPluginSignalMapper = new QSignalMapper(this);
 	followSignalMapper = new QSignalMapper(this);
 
-	_resourceDock = new QDockWidget(tr("Resource Manager"), this);
+	_resourceDock = new QDockWidget(tr("Resource Center"), this);
 	_resourceDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	_resourceDock->setObjectName("tbResourceCenter");
+	_resourceDock->setObjectName("dockResourceCenter");
 	addDockWidget(Qt::LeftDockWidgetArea, _resourceDock);
 
 	song = new Song("song");
@@ -1354,6 +1354,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	arranger = new Arranger(this, "arranger");
 	setCentralWidget(arranger);
+	addTransportToolbar();
 
 	connect(arranger, SIGNAL(editPart(Track*)), SLOT(startEditor(Track*)));
 	connect(arranger, SIGNAL(dropSongFile(const QString&)), SLOT(loadProjectFile(const QString&)));
@@ -1480,7 +1481,7 @@ OOMidi::~OOMidi()
 }
 
 /**
- * Called from within the Arranger Constructor
+ * Called from within the after Arranger Constructor
  */
 void OOMidi::addTransportToolbar()
 {

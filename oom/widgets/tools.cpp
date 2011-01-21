@@ -93,15 +93,12 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 	action->setVisible(true);
 	QWidget* spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//spacer->setMaximumSize(QSize(1000,32));
-	//spacer->setMinimumSize(QSize(100,32));
-	// toolBar is a pointer to an existing toolbar
 	addWidget(spacer);
 	//action->addTo(this);
 	// Note: Does not take ownership.
 	addActions(action->actions());
 
-	connect(action, SIGNAL(selected(QAction*)), SLOT(toolChanged(QAction*)));
+	connect(action, SIGNAL(selected(QAction*)), this, SLOT(toolChanged(QAction*)));
 }
 
 //---------------------------------------------------------

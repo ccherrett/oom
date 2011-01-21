@@ -131,9 +131,9 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	toolbar2->setMovable(false);
 	toolbar2->setFloatable(false);
 
-	oom->addTransportToolbar();
 
 	_rtabs = new QTabWidget(oom->resourceDock());
+	_rtabs->setObjectName("tabControlCenter");
 	_rtabs->setTabPosition(QTabWidget::West);
 	_rtabs->setTabShape(QTabWidget::Triangular);
 	_rtabs->setMinimumSize(QSize(200, 150));
@@ -1095,8 +1095,8 @@ void Arranger::genTrackInfo(QWidget* parent)
 	midiTrackInfo = new MidiTrackInfo(this);
 	infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
-	_rtabs->addTab(infoScroll, tr("Track Info."));
-	_rtabs->addTab(noTrackInfo, tr("Strip"));
+	_rtabs->addTab(infoScroll, tr(" Track Info "));
+	_rtabs->addTab(noTrackInfo, tr(" Mixer "));
 	//midiTrackInfo->setFocusPolicy(Qt::TabFocus);    // p4.0.9
 	//midiTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
 	//trackInfo->addWidget(noTrackInfo, 0);
