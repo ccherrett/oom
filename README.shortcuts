@@ -1,9 +1,24 @@
 Updated by Alex Stone 21.01.2011
 
-Shortcut keys in OOMidi, as of version 1:
+(Shortcuts without a default are marked as *)
 
-Arranger:
+Default Shortcut keys in OOMidi, as of version 1:
+
+Transport:
 =========
+Transport: Start playback from current location: Ctrl-ENTER
+Transport: Play/Stop/Rewind: SPACE
+Transport: Stop Playback: *
+Transport: Go to start: HOME
+
+
+
+
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxx
 Undo: Ctrl-Z
 Redo: Ctrl-Y
 New: Ctrl-N
