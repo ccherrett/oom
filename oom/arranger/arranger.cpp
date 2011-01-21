@@ -329,11 +329,11 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	header->setColumnLabel(tr("S"), COL_SOLO, fm1.width('S') + fw);
 	//header->setColumnLabel(tr("C"), COL_CLASS, fm1.width('C') + fw);
 	header->setColumnLabel(tr("C"), COL_CLASS, 0);
-	header->setColumnLabel(tr("Track"), COL_NAME, 200);
-	header->setColumnLabel(tr("Port"), COL_OPORT, 60);
+	header->setColumnLabel(tr("Track"), COL_NAME, 175);
+	header->setColumnLabel(tr("Port"), COL_OPORT, 100);
 	header->setColumnLabel(tr("Ch"), COL_OCHANNEL, 30);
 	header->setColumnLabel(tr("T"), COL_TIMELOCK, fm1.width('T') + fw);
-	header->setColumnLabel(tr("Automation"), COL_AUTOMATION, 75);
+	header->setColumnLabel(tr("Automation"), COL_AUTOMATION, 100);
 	header->setResizeMode(COL_RECORD, QHeaderView::Fixed);
 	header->setResizeMode(COL_MUTE, QHeaderView::Fixed);
 	header->setResizeMode(COL_SOLO, QHeaderView::Fixed);
@@ -388,7 +388,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	tg->addItem(new QSpacerItem(0, 22));
 	tg->addWidget(list);
 	list->setMinimumSize(QSize(100, 50));
-	list->setMaximumSize(QSize(440, 10000));
+	list->setMaximumSize(QSize(540, 10000));
 
 
 	//---------------------------------------------------
