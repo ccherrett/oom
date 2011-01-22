@@ -797,10 +797,10 @@ void TList::moveSelection(int n)
 {
 	//This changes to song->visibletracks()
 	TrackList* tracks;
-	if(song->visibletracks()->empty())
+        if(song->visibletracks()->empty())
 		tracks = song->tracks();
-	else
-		tracks = song->visibletracks();
+        else
+                tracks = song->visibletracks();
 
 	// check for single selection
 	int nselect = 0;
@@ -815,7 +815,6 @@ void TList::moveSelection(int n)
 		iTrack s = t;
 		if ((*t)->selected())
 		{
-			selTrack = *t;
 			if (n > 0)
 			{
 				while (n--)
@@ -839,6 +838,7 @@ void TList::moveSelection(int n)
 			}
 			(*s)->setSelected(false);
 			(*t)->setSelected(true);
+                        selTrack = *t;
 
 			// rec enable track if expected
 			TrackList recd = getRecEnabledTracks();
@@ -854,8 +854,8 @@ void TList::moveSelection(int n)
 			break;
 		}
 	}
-	///emit selectionChanged();
-	emit selectionChanged(selTrack);
+        ///emit selectionChanged();
+        emit selectionChanged(selTrack);
 }
 
 TrackList TList::getRecEnabledTracks()
