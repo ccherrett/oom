@@ -74,6 +74,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track) : QFrame(parent)
 	_selectedIndex = 0;
 	editing = false;
 	_useMatrix = false;
+	_autoExapand = true;
 	_matrix = new QList<int>;
 	_tableModel = new ProgramChangeTableModel(this);
 	tableView = new ProgramChangeTable(this);
@@ -2169,5 +2170,7 @@ void MidiTrackInfo::updateSize()
 void MidiTrackInfo::showEvent(QShowEvent* /*evt*/)
 {
 	tableView->resizeRowsToContents();
-	chkAdvanced->setChecked(false);
+	if(_autoExapand)
+		chkAdvanced->setChecked(false);
+	_autoExapand = false;
 }
