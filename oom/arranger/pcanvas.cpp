@@ -34,6 +34,7 @@
 #include "app.h"
 #include "filedialog.h"
 #include "marker/marker.h"
+#include "arranger.h"
 
 // Moved into global config by Tim.
 /* 
@@ -1263,12 +1264,12 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
         else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
         {
-                if (!_curItem)
-                    _curItem = (NPart*) _items.begin()->second; // just grab the first part
-
-                Track* t = _curItem->part()->track();
-                audio->msgSetSolo(t, !t->solo());
-                song->update(SC_SOLO);
+                Track* t =oom->arranger->curTrack();
+                if (t)
+                {
+                        audio->msgSetSolo(t, !t->solo());
+                        song->update(SC_SOLO);
+                }
                 return;
         }
         else if (key == shortcuts[SHRT_TRACK_TOGGLE_MUTE].key)
