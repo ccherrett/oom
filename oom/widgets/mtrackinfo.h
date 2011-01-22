@@ -34,6 +34,7 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
 	QItemSelectionModel* _selModel;
     bool editing;
 	bool _useMatrix;
+	bool _autoExapand;
     virtual void showEvent(QShowEvent *);
 
 private slots:

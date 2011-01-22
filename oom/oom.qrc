@@ -90,6 +90,10 @@
 		<file>images/icons/line-tool.png</file>
 		<file>images/icons/join_tracks.png</file>
 		<file>images/icons/speaker.png</file>
+		<file>images/icons/mixeraudioS.png</file>
+		<file>images/icons/deselectall.png</file>
+		<file>images/icons/select_invert_selection.png</file>
+		<file>images/icons/initSong.png</file>
 	</qresource>
 </RCC>
 

@@ -862,7 +862,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	midiTransposeAction = new QAction(QIcon(*midi_transposeIcon), tr("Transpose"), this);
 	midiTransformerAction = new QAction(QIcon(*midi_transformIcon), tr("Midi &Transform"), this);
 
-	editSongInfoAction = new QAction(QIcon(*edit_listIcon), tr("Song Info"), this);
+	editSongInfoAction = new QAction(QIcon(*songInfoIcon), tr("Song Info"), this);
 
 	//-------- TrackView Actions
 	trackView = new QMenu(tr("Trackview"), this);
