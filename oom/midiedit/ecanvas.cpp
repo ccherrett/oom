@@ -470,15 +470,6 @@ void EventCanvas::keyPress(QKeyEvent* event)
                         song->update(SC_SOLO);
                 }
         }
-        else if (key == shortcuts[SHRT_TRACK_TOGGLE_MUTE].key)
-        {
-                if (_curPart) {
-                        Track* t = _curPart->track();
-                        t->setMute(!t->mute());
-                        song->update(SC_MUTE);
-                }
-                return;
-        }
         else
 		event->ignore();
 }
