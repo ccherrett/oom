@@ -1274,6 +1274,13 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_TOGGLE_MUTE].key)
         {
+                Track* t =oom->arranger->curTrack();
+                if (t)
+                {
+                        t->setMute(!t->mute());
+                        song->update(SC_MUTE);
+                }
+                return;
         }
 
 
