@@ -216,7 +216,7 @@ void initShortCuts()
 	// piano roll & drum editor
 	defShrt(SHRT_TOOL_LINEDRAW, 0, "Tool: Line Draw", PROLL_SHRT + DEDIT_SHRT, "line_draw_tool");
 	// arranger
-	defShrt(SHRT_TOOL_SCISSORS, Qt::Key_S, "Tool: Scissor", ARRANG_SHRT, "scissor_tool");
+	defShrt(SHRT_TOOL_SCISSORS, Qt::Key_J, "Tool: Scissor", ARRANG_SHRT, "scissor_tool");
 	defShrt(SHRT_TOOL_GLUE, Qt::Key_G, "Tool: Glue", ARRANG_SHRT, "glue_tool");
 	defShrt(SHRT_TOOL_MUTE, 0, "Tool: Mute", ARRANG_SHRT, "mute_tool");
 
