@@ -181,7 +181,7 @@
 #include "xpm/listS.xpm"
 #include "xpm/inputpluginS.xpm"
 #include "xpm/cliplistS.xpm"
-#include "xpm/mixeraudioS.xpm"
+//#include "xpm/mixeraudioS.xpm"
 #include "xpm/initS.xpm"
 
 #include "xpm/addtrack_addmiditrack.xpm"
@@ -206,9 +206,9 @@
 #include "xpm/select.xpm"
 #include "xpm/select_all.xpm"
 #include "xpm/select_all_parts_on_track.xpm"
-#include "xpm/select_deselect_all.xpm"
+//#include "xpm/select_deselect_all.xpm"
 #include "xpm/select_inside_loop.xpm"
-#include "xpm/select_invert_selection.xpm"
+//#include "xpm/select_invert_selection.xpm"
 #include "xpm/select_outside_loop.xpm"
 
 #include "xpm/mono.xpm"
@@ -260,6 +260,7 @@ QPixmap* inputpluginSIcon;
 QPixmap* cliplistSIcon;
 QPixmap* mixerAudioSIcon;
 QPixmap* initSIcon;
+QPixmap* songInfoIcon;
 
 QPixmap* exitIcon;
 QPixmap* exit1Icon;
@@ -648,8 +649,9 @@ void initIcons()
       listSIcon            = new MPIXMAP(listS_xpm, NULL);
       inputpluginSIcon     = new MPIXMAP(inputpluginS_xpm, NULL);
       cliplistSIcon        = new MPIXMAP(cliplistS_xpm, NULL);
-      mixerAudioSIcon      = new MPIXMAP(mixerAudioS_xpm, NULL);
+      mixerAudioSIcon      = new MPIXMAP(":/images/icons/mixeraudioS.png", NULL);
       initSIcon            = new MPIXMAP(initS_xpm, NULL);
+      songInfoIcon         = new MPIXMAP(":/images/icons/initSong.png", NULL);
 
       addtrack_addmiditrackIcon     = new MPIXMAP(addtrack_addmiditrack_xpm, NULL);
       addtrack_audiogroupIcon       = new MPIXMAP(addtrack_audiogroup_xpm, NULL);
@@ -673,9 +675,9 @@ void initIcons()
       selectIcon                    = new MPIXMAP(select_xpm, NULL);
       select_allIcon                = new MPIXMAP(select_all_xpm, NULL);
       select_all_parts_on_trackIcon = new MPIXMAP(select_all_parts_on_track_xpm, NULL);
-      select_deselect_allIcon       = new MPIXMAP(select_deselect_all, NULL);
+      select_deselect_allIcon       = new MPIXMAP(":/images/icons/deselectall.png", NULL);
       select_inside_loopIcon        = new MPIXMAP(select_inside_loop_xpm, NULL);
-      select_invert_selectionIcon   = new MPIXMAP(select_invert_selection, NULL);
+      select_invert_selectionIcon   = new MPIXMAP(":/images/icons/select_invert_selection.png", NULL);
       select_outside_loopIcon       = new MPIXMAP(select_outside_loop_xpm, NULL);
       pianoIconSet                  = new MICON(edit_pianoroll_xpm, NULL); // ddskrjo
 

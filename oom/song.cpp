@@ -3737,6 +3737,20 @@ void Song::removeTrack2(Track* track)
 			break;
 	}
 	_tracks.erase(track);
+	TrackView* tv = findTrackView(track);
+	bool updateview = false;
+	while(tv)
+	{
+		updateview = true;
+		TrackList* tvl = tv->tracks();
+		if(tvl)
+		{
+			tvl->erase(track);
+		}
+		tv = findTrackView(track);
+	}
+	if(updateview)
+		updateTrackViews1();
 
 
 	/*

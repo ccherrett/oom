@@ -98,11 +98,12 @@ QStringList TrackViewEditor::buildViewList()
 // Slots
 //----------------------------------------------
 
-void TrackViewEditor::txtNameEdited(QString)
+void TrackViewEditor::txtNameEdited(QString text)
 {
 	if(_selected)
 	{
 		_editing = true;
+		txtName->setText(_selected->getValidName(text));
 		btnApply->setEnabled(true);
 	}
 }
@@ -250,7 +251,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 	printf("TrackViewEditor::btnApplyClicked()\n");
 	if(_editing && _selected)
 	{
-		_selected->setViewName(_selected->getValidName(txtName->text()));
+		_selected->setViewName(txtName->text());
 		printf("after setviewname\n");
 		TrackList *tl = _selected->tracks();
 		if(tl)
@@ -271,7 +272,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 				Track *t = song->findTrack(list.at(i));
 				if(t)
 				{
-					tl->push_back(t);
+					_selected->addTrack(t);//tl->push_back(t);
 				}
 			}
 		}
@@ -290,7 +291,7 @@ void TrackViewEditor::btnOkClicked(bool state)
 	//Do other close cleanup;
 }
 
-void TrackViewEditor::reset()
+void TrackViewEditor::reset()/*{{{*/
 {
 	//Reset cmbViews
 	cmbViews->blockSignals(true);
@@ -314,7 +315,7 @@ void TrackViewEditor::reset()
 		model->removeRows(0, model->rowCount());
 	}
 	txtName->setText("");
-}
+}/*}}}*/
 
 void TrackViewEditor::btnCancelClicked(bool/* state*/)/*{{{*/
 {
@@ -373,6 +374,7 @@ void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 	if(_selected)
 	{
 		btnApply->setEnabled(true);
+		_editing = true;
 		QItemSelectionModel* model = listAllTracks->selectionModel();
 		QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
 		QAbstractItemModel* lat = listAllTracks->model(); 
@@ -423,6 +425,7 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 	if(_selected)
 	{
 		btnApply->setEnabled(true);
+		_editing = true;
 		QItemSelectionModel* model = listSelectedTracks->selectionModel();
 		QAbstractItemModel* lat = listSelectedTracks->model(); 
 		QList<int> del;
