@@ -1002,7 +1002,7 @@ void Canvas::viewMouseMoveEvent(QMouseEvent* event)
                                 connect(_scrollTimer, SIGNAL(timeout()), SLOT(scrollTimerDone()));
 				//scrollTimer->start( 0, TRUE ); // single-shot timer
                                 _scrollTimer->setSingleShot(true); // single-shot timer
-//                                _scrollTimer->start(0);
+                                _scrollTimer->start(0);
 			}
 		}
 		else
