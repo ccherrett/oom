@@ -457,7 +457,8 @@ void EventCanvas::keyPress(QKeyEvent* event)
                 CItem* leftmost = getLeftMostSelected();
                 if (leftmost)
                 {
-                        Pos p1(leftmost->event().tick(), true);
+                        unsigned newtick = leftmost->event().tick() + leftmost->part()->tick();
+                        Pos p1(newtick, true);
                         song->setPos(0, p1, true, true, false);
                 }
         }
