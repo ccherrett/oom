@@ -301,8 +301,8 @@ enum
     SHRT_TOOL_MUTE,
 
     // global state
-    SHRT_TRACK_TOGGLE_SOLO
-    SHRT_TRACK_TOGGLE_MUTE
+    SHRT_TRACK_TOGGLE_SOLO,
+    SHRT_TRACK_TOGGLE_MUTE,
 
     //Listeditor:
     SHRT_LE_INS_NOTES, //Ctrl+N
