@@ -1358,6 +1358,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
         else if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
         {
                 srec->toggle();
+                return;
         }
         else if (key == shortcuts[SHRT_NOTE_VELOCITY_UP].key)
         {
@@ -1388,6 +1389,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
                         }
                 }
                 song->endUndo(SC_EVENT_MODIFIED);
+                return;
 
         }
         else if (key == shortcuts[SHRT_NOTE_VELOCITY_DOWN].key)
@@ -1419,6 +1421,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
                         }
                 }
                 song->endUndo(SC_EVENT_MODIFIED);
+                return;
         }
         else
 	{ //Default:
