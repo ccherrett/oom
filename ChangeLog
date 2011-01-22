@@ -1,3 +1,14 @@
+22.01.2011
+Major redesign work. 
+Fixed some behavioural quirks in the PR
+Drawing issues in the PR controller lanes now seem 
+to be fixed. There'll be a likely increase in CPU use. Needs testing, 
+and monitoring.
+New icon set for main items now in place. (woohoo)
+Updated and added more shortcuts. Playback cursor in the PR will now 
+jump to the active note. (Ctrl +Space) 
+Step input now has a toggle shortcut (Ctrl + F8)
+
 21.01.2011
 
 There's major work going on in the design and included features in OOM2, 
