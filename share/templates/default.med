@@ -25,7 +25,7 @@
     <selectTrackBg r="18" g="25" b="28"></selectTrackBg>
     <selectTrackFg r="71" g="202" b="225"></selectTrackFg>
     <midiTrackBg r="77" g="65" b="83"></midiTrackBg>
-    <drumTrackBg r="118" g="104" b="125"></drumTrackBg>
+    <drumTrackBg r="77" g="65" b="83"></drumTrackBg>
     <waveTrackBg r="40" g="62" b="68"></waveTrackBg>
     <outputTrackBg r="133" g="36" b="36"></outputTrackBg>
     <inputTrackBg r="99" g="137" b="97"></inputTrackBg>
