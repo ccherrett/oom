@@ -1359,7 +1359,68 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
         {
                 srec->toggle();
         }
-	else
+        else if (key == shortcuts[SHRT_NOTE_VELOCITY_UP].key)
+        {
+                CItemList list = canvas->getSelectedItemsForCurrentPart();
+
+                song->startUndo();
+                for (iCItem k = list.begin(); k != list.end(); ++k)
+                {
+                        NEvent* nevent = (NEvent*) (k->second);
+                        Event event = nevent->event();
+                        if (event.type() != Note)
+                                continue;
+
+                        int velo = event.velo();
+                        velo += 1;
+
+                        if (velo <= 0)
+                                velo = 1;
+                        if (velo > 127)
+                                velo = 127;
+                        if (event.velo() != velo)
+                        {
+                                Event newEvent = event.clone();
+                                newEvent.setVelo(velo);
+                                // Indicate no undo, and do not do port controller values and clone parts.
+                                //audio->msgChangeEvent(event, newEvent, nevent->part(), false);
+                                audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
+                        }
+                }
+                song->endUndo(SC_EVENT_MODIFIED);
+
+        }
+        else if (key == shortcuts[SHRT_NOTE_VELOCITY_DOWN].key)
+        {
+                CItemList list = canvas->getSelectedItemsForCurrentPart();
+
+                song->startUndo();
+                for (iCItem k = list.begin(); k != list.end(); ++k)
+                {
+                        NEvent* nevent = (NEvent*) (k->second);
+                        Event event = nevent->event();
+                        if (event.type() != Note)
+                                continue;
+
+                        int velo = event.velo();
+                        velo -= 1;
+
+                        if (velo <= 0)
+                                velo = 1;
+                        if (velo > 127)
+                                velo = 127;
+                        if (event.velo() != velo)
+                        {
+                                Event newEvent = event.clone();
+                                newEvent.setVelo(velo);
+                                // Indicate no undo, and do not do port controller values and clone parts.
+                                //audio->msgChangeEvent(event, newEvent, nevent->part(), false);
+                                audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
+                        }
+                }
+                song->endUndo(SC_EVENT_MODIFIED);
+        }
+        else
 	{ //Default:
 		event->ignore();
 		return;
