@@ -465,15 +465,12 @@ void EventCanvas::keyPress(QKeyEvent* event)
         else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
         {
                 if (_curPart) {
-                        audio->msgSetSolo(track(), !track()->solo());
+                        Track* t = _curPart->track();
+                        audio->msgSetSolo(t, !t->solo());
                         song->update(SC_SOLO);
                 }
         }
-        else if (key == shortcuts[SHRT_TRACK_TOGGLE_MUTE].key)
-        {
-        }
-
-	else
+        else
 		event->ignore();
 }
 

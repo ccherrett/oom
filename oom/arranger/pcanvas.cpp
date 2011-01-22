@@ -1261,6 +1261,20 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		emit selectTrackBelow();
 		return;
 	}
+        else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
+        {
+                if (!_curItem)
+                    _curItem = (NPart*) _items.begin()->second; // just grab the first part
+
+                Track* t = _curItem->part()->track();
+                audio->msgSetSolo(t, !t->solo());
+                song->update(SC_SOLO);
+                return;
+        }
+        else if (key == shortcuts[SHRT_TRACK_TOGGLE_MUTE].key)
+        {
+        }
+
 
 	//
 	// Shortcuts that require selected parts from here
