@@ -23,6 +23,7 @@ class QScrollBar;
 class QToolButton;
 class QWheelEvent;
 class QKeyEvent;
+class QComboBox;
 //class QStackedWidget;
 
 class Header;
@@ -116,7 +117,6 @@ class Arranger : public QWidget
     void setHeaderWhatsThis();
 
 private slots:
-    void _setRaster(int);
     void songlenChanged(int);
     void showTrackInfo(bool);
     void trackSelectionChanged();
@@ -157,6 +157,7 @@ public slots:
     void configChanged();
     void controllerChanged(Track *t);
     void showTrackViews();
+    void _setRaster(int);
 
 public:
 
@@ -201,6 +202,9 @@ public:
     {
         return cursVal;
     }
+
+
+    QComboBox* raster;
 };
 
 #endif

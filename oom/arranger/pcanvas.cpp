@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QUrl>
+#include <QComboBox>
 
 #include "widgets/tools.h"
 #include "pcanvas.h"
@@ -1282,7 +1283,36 @@ void PartCanvas::keyPress(QKeyEvent* event)
                 }
                 return;
         }
-
+        else if (key == shortcuts[SHRT_SET_QUANT_0].key)
+        {
+                oom->arranger->_setRaster(0);
+                oom->arranger->raster->setCurrentIndex(0);
+        }
+        else if (key == shortcuts[SHRT_SET_QUANT_1].key)
+        {
+                oom->arranger->_setRaster(1);
+                oom->arranger->raster->setCurrentIndex(1);
+        }
+        else if (key == shortcuts[SHRT_SET_QUANT_2].key)
+        {
+                oom->arranger->_setRaster(2);
+                oom->arranger->raster->setCurrentIndex(2);
+        }
+        else if (key == shortcuts[SHRT_SET_QUANT_3].key)
+        {
+                oom->arranger->_setRaster(3);
+                oom->arranger->raster->setCurrentIndex(3);
+        }
+        else if (key == shortcuts[SHRT_SET_QUANT_4].key)
+        {
+                oom->arranger->_setRaster(4);
+                oom->arranger->raster->setCurrentIndex(4);
+        }
+        else if (key == shortcuts[SHRT_SET_QUANT_5].key)
+        {
+                oom->arranger->_setRaster(5);
+                oom->arranger->raster->setCurrentIndex(5);
+        }
 
 	//
 	// Shortcuts that require selected parts from here

@@ -266,6 +266,7 @@ enum
     SHRT_ERASE_MEASURE,
     SHRT_DELETE_MEASURE,
     SHRT_CREATE_MEASURE,
+    SHRT_SET_QUANT_0, //1 - pianoroll
     SHRT_SET_QUANT_1, //1 - pianoroll
     SHRT_SET_QUANT_2, //2 - pianoroll
     SHRT_SET_QUANT_3, //3 - pianoroll

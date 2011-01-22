@@ -166,7 +166,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	label->setIndent(3);
 	toolbar->addWidget(label);*/
 
-	QComboBox* raster = new QComboBox();
+        raster = new QComboBox();
 	for (int i = 0; i < 6; i++)
 		raster->insertItem(i, tr(rastval[i]));
 	raster->setCurrentIndex(1);

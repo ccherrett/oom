@@ -260,8 +260,9 @@ void initShortCuts()
 	 */
 
 
-	defShrt(SHRT_SET_QUANT_1, Qt::Key_1, "Quantize: Set quantize to 1/1 note", PROLL_SHRT, "midi_quant_1");
-	defShrt(SHRT_SET_QUANT_2, Qt::Key_2, "Quantize: Set quantize to 1/2 note", PROLL_SHRT, "midi_quant_2");
+        defShrt(SHRT_SET_QUANT_0, Qt::Key_0, "Quantize: Set quantize to off", PROLL_SHRT, "midi_quant_off");
+        defShrt(SHRT_SET_QUANT_1, Qt::Key_1, "Quantize: Set quantize to 1/1 note", PROLL_SHRT, "midi_quant_1");
+        defShrt(SHRT_SET_QUANT_2, Qt::Key_2, "Quantize: Set quantize to 1/2 note", PROLL_SHRT, "midi_quant_2");
 	defShrt(SHRT_SET_QUANT_3, Qt::Key_3, "Quantize: Set quantize to 1/4 note", PROLL_SHRT, "midi_quant_3");
 	defShrt(SHRT_SET_QUANT_4, Qt::Key_4, "Quantize: Set quantize to 1/8 note", PROLL_SHRT, "midi_quant_4");
 	defShrt(SHRT_SET_QUANT_5, Qt::Key_5, "Quantize: Set quantize to 1/16 note", PROLL_SHRT, "midi_quant_5");
