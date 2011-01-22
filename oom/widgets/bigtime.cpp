@@ -48,17 +48,31 @@ BigTime::BigTime(QWidget* parent)
 	sep3 = new QLabel(QString(":"), dwin);
 	sep4 = new QLabel(QString(":"), dwin);
 	sep5 = new QLabel(QString(":"), dwin);
+	sep1->setObjectName("bigwinmiddle");
+	sep2->setObjectName("bigwinmiddle");
+	sep3->setObjectName("bigwinmiddle");
+	sep4->setObjectName("bigwinmiddle");
+	sep5->setObjectName("bigwinmiddle");
 	absTickLabel = new QLabel(dwin);
 	absFrameLabel = new QLabel(dwin);
+	absFrameLabel->setObjectName("bigwinmiddle");
 	barLabel->setToolTip(tr("bar"));
+	barLabel->setObjectName("bigwinleft");
 	beatLabel->setToolTip(tr("beat"));
+	beatLabel->setObjectName("bigwinmiddle");
 	tickLabel->setToolTip(tr("tick"));
+	tickLabel->setObjectName("bigwinright");
 	//hourLabel->setToolTip(tr("hour"));
 	minLabel->setToolTip(tr("minute"));
+	minLabel->setObjectName("bigwinleft");
 	secLabel->setToolTip(tr("second"));
+	secLabel->setObjectName("bigwinmiddle");
 	frameLabel->setToolTip(tr("frame"));
+	frameLabel->setObjectName("bigwinmiddle");
 	subFrameLabel->setToolTip(tr("subframe"));
+	subFrameLabel->setObjectName("bigwinright");
 	absTickLabel->setToolTip(tr("tick"));
+	absTickLabel->setObjectName("bigwinright");
 	absFrameLabel->setToolTip(tr("frame"));
 	fmtButtonToggled(true);
 	connect(fmtButton, SIGNAL(toggled(bool)), SLOT(fmtButtonToggled(bool)));
@@ -67,7 +81,7 @@ BigTime::BigTime(QWidget* parent)
 	oldAbsTick = oldAbsFrame = -1;
 	setString(MAXINT);
 
-	dwin->setStyleSheet("font-size:10px; font-family:'Courier'; "); // Tim p4.0.8
+	dwin->setStyleSheet("font-size:10px; font-family:'fixed-width'; "); // Tim p4.0.8
 
 	configChanged();
 
@@ -330,6 +344,7 @@ void BigTime::resizeEvent(QResizeEvent *ev)
 	int tw = fm.width(QString("000:00:00:00"));
 
 	fs = ((ev->size().width() - hspace * 2) * fs) / tw;
+	fs -= 15;
 
 	// set min/max
 	if (fs < 10)
@@ -344,7 +359,7 @@ void BigTime::resizeEvent(QResizeEvent *ev)
 	//f.setPixelSize(fs);
 
 	//dwin->setFont(f);
-	QString fstr = QString("font-size:%1px; font-family:'Courier'; ").arg(fs); // Tim p4.0.8
+	QString fstr = QString("font-size:%1px; font-family:'fixed-width'; ").arg(fs); // Tim p4.0.8
 	dwin->setStyleSheet(fstr);
 	setBgColor(config.bigTimeBackgroundColor);
 	setFgColor(config.bigTimeForegroundColor);
@@ -405,6 +420,7 @@ void BigTime::resizeEvent(QResizeEvent *ev)
 
 void BigTime::setFgColor(QColor c)
 {
+	return;
 	QPalette newpalette(palette());
 	newpalette.setColor(QPalette::Foreground, c);
 	setPalette(newpalette);
@@ -433,6 +449,7 @@ void BigTime::setFgColor(QColor c)
 
 void BigTime::setBgColor(QColor c)
 {
+	return;
 	QPalette newpalette(palette());
 	newpalette.setColor(QPalette::Window, c);
 	setPalette(newpalette);

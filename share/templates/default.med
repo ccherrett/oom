@@ -33,6 +33,9 @@
     <auxTrackBg r="83" g="87" b="137"></auxTrackBg>
     <synthTrackBg r="125" g="73" b="32"></synthTrackBg>
     <waveEditBackgroundColor r="23" g="23" b="23"></waveEditBackgroundColor>
+    <transportHandleColor r="16" g="24" b="25"></transportHandleColor>
+    <bigtimeForegroundcolor r="66" g="202" b="230"></bigtimeForegroundcolor>
+    <bigtimeBackgroundcolor r="16" g="24" b="25"></bigtimeBackgroundcolor>
     <partColor0 r="43" g="49" b="51"></partColor0>
     <partColor1 r="55" g="61" b="55"></partColor1>
     <partColor2 r="61" g="55" b="55"></partColor2>

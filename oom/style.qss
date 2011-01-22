@@ -2,6 +2,10 @@
  *    this is the OOMidi application style sheet
  */
 
+QWidget#transport 
+{
+	background-color: #595966;
+}
 QTableView#trackHeaders 
 {
 	background-color: #595966;
@@ -526,7 +530,35 @@ QToolBar::handle, QToolBar::addToolBarBreak
 }
 
 
-QMenuBar { 
+QMenu{ 
+	background-color: #595966; 
+	color: #e2e5e5; 
+	border: 0px; 
+	font-family: "fixed-width";
+	font-weight: normal;
+	font-size: 11px;
+}
+QMenu::item {
+     spacing: 6px; /* spacing between menu bar items */
+	 padding: 1px 40px 1px 25px;
+     background: transparent;
+     border-radius: 3px;
+ }
+
+QMenu::item:selected { /* when selected using mouse or keyboard */
+     background: #101819;
+	 color: #42cae6;
+	 font-weight: bold;
+	 font-size: 10px;
+ }
+QMenu::item:pressed {
+     background: #101819;
+	 color: #42cae6;
+	 font-weight: bold;
+	 font-size: 10px;
+}
+
+QMenuBar{ 
 	background-color: #595966; 
 	color: #e2e5e5; 
 	border: 0px; 
@@ -770,7 +802,29 @@ QLabel#pitchLabel {
 	 background-color: #010f14;
 	 color: #03c0e2;
 	 /*color: #76ac01;*/
- }
+}
+
+/* Bigtime stying */
+QWidget#bigtime-dwin {
+	 background-color: #010f14;
+	 color: #03c0e2;
+}
+
+QLabel#bigwinmiddle {
+	 background-color: #010f14;
+	 color: #03c0e2;
+}
+
+QLabel#bigwinleft {
+	 background-color: #010f14;
+	 color: #03c0e2;
+}
+
+QLabel#bigwinright {
+	 background-color: #010f14;
+	 color: #03c0e2;
+}
+
 
 QAbstractSpinBox {
 	 border-radius: 8px;

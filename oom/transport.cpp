@@ -57,7 +57,9 @@ static QToolButton* newButton(const QPixmap* pm, const QString& tt,
 {
 	QToolButton* button = new QToolButton(parent);
 	button->setFixedHeight(25);
-	//button->setIcon(QIcon(*pm));
+	QIcon icon(*pm);
+	button->setIcon(icon);
+	button->setIconSize(pm->size());
 	button->setCheckable(toggle);
 	button->setToolTip(tt);
 	button->setFocusPolicy(Qt::NoFocus);
@@ -401,7 +403,7 @@ Transport::Transport(QWidget* parent, const char* name)
 	buttons[4] = newButton(playIcon, tr("play"), true);
 	buttons[4]->setWhatsThis(tr(playTransportText));
 
-	buttons[5] = newButton(record_on_Icon, tr("record"), true);
+	buttons[5] = newButton(recordIcon, tr("record"), true);
 	buttons[5]->setWhatsThis(tr(recordTransportText));
 
 	for (int i = 0; i < 6; ++i)
