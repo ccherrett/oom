@@ -139,6 +139,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	_rtabs->setTabShape(QTabWidget::Triangular);
 	_rtabs->setMinimumSize(QSize(200, 150));
 	oom->resourceDock()->setWidget(_rtabs);
+	connect(oom->resourceDock(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(resourceDockAreaChanged(Qt::DockWidgetArea)));
 
 	QLabel* label = new QLabel(tr("Cursor"));
 	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -746,6 +747,22 @@ void Arranger::showTrackViews()
 	TrackViewEditor* ted = new TrackViewEditor(this);
 	ted->show();
 }
+
+void Arranger::resourceDockAreaChanged(Qt::DockWidgetArea area)
+{
+	switch(area)
+	{
+		case Qt::LeftDockWidgetArea:
+			_rtabs->setTabPosition(QTabWidget::West);
+		break;
+		case Qt::RightDockWidgetArea:
+			_rtabs->setTabPosition(QTabWidget::East);
+		break;
+		default:
+		break;
+	}
+}
+
 //---------------------------------------------------------
 //   writeStatus
 //---------------------------------------------------------
