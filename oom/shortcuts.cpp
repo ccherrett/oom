@@ -220,7 +220,9 @@ void initShortCuts()
 	defShrt(SHRT_TOOL_GLUE, Qt::Key_G, "Tool: Glue", ARRANG_SHRT, "glue_tool");
 	defShrt(SHRT_TOOL_MUTE, 0, "Tool: Mute", ARRANG_SHRT, "mute_tool");
         defShrt(SHRT_TRACK_TOGGLE_SOLO, Qt::Key_S, "State: Solo", GLOBAL_SHRT, "toggle_solo"); 
-        defShrt(SHRT_TRACK_TOGGLE_MUTE, Qt::Key_M, "State: Mute", GLOBAL_SHRT, "toggle_mute"); 
+        defShrt(SHRT_TRACK_TOGGLE_MUTE, Qt::Key_M, "State: Mute", GLOBAL_SHRT, "toggle_mute");
+        defShrt(SHRT_MIDI_PANIC, Qt::Key_P, "Tool: "midi panic button", GLOBAL_SHRT, "midi_panic");
+ 
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
         defShrt(SHRT_POS_INC, Qt::SHIFT + Qt::Key_Greater, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
