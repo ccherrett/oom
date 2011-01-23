@@ -152,6 +152,8 @@ public:
     void partsChanged();
     void cmd(int);
     void controllerChanged(Track *t);
+    int track2Y(Track*) const;
+
 public slots:
 
     void redirKeypress(QKeyEvent* e)

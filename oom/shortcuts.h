@@ -292,6 +292,7 @@ enum
     SHRT_TOOL_POINTER, //
     SHRT_TOOL_PENCIL,
     SHRT_TOOL_RUBBER,
+    SHRT_MIDI_PANIC,
 
     // pianoroll and drum editor
     SHRT_TOOL_LINEDRAW,

@@ -707,6 +707,14 @@ void Arranger::trackSelectionChanged()
 		return;
 	selected = track;
 	updateTrackInfo(-1);
+
+        int vScrollValue = vscroll->value();
+        int trackYPos = canvas->track2Y(selected);
+        if (trackYPos > (vScrollValue + canvas->height()) ||
+            trackYPos < vScrollValue)
+        {
+                vscroll->setValue(trackYPos - (canvas->height() / 2));
+        }
 }
 
 //---------------------------------------------------------
