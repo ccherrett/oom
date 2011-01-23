@@ -294,20 +294,20 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//tools->addSeparator();
 	tools->setIconSize(QSize(22, 22));
 
-	srec = new QToolButton();
+        srec = new QToolButton();
 	srec->setToolTip(tr("Step Record"));
 	srec->setIcon(*steprecIcon);
         srec->setCheckable(true);
 	//srec->setObjectName("StepRecord");
 	tools->addWidget(srec);
 
-	midiin = new QToolButton();
+        midiin = new QToolButton();
 	midiin->setToolTip(tr("Midi Input"));
 	midiin->setIcon(*midiinIcon);
 	midiin->setCheckable(true);
 	//tools->addWidget(midiin);
 
-	speaker = new QToolButton();
+        speaker = new QToolButton();
 	speaker->setToolTip(tr("Play Events"));
 	speaker->setIcon(*speakerIcon);
 	speaker->setCheckable(true);
@@ -317,13 +317,13 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tools2->setIconSize(QSize(22, 22));
 	addToolBar(tools2);
 
-	QToolBar* panicToolbar = new QToolBar(tr("panic"));
+        QToolBar* panicToolbar = new QToolBar(tr("panic"));
 	panicToolbar->addAction(panicAction);
 	panicToolbar->setAllowedAreas(Qt::BottomToolBarArea);
 
 	//-------------------------------------------------------------
 	//    Transport Bar
-	QToolBar* transport = new QToolBar(tr("transport"));
+        QToolBar* transport = new QToolBar(tr("transport"));
 	addToolBar(Qt::BottomToolBarArea, transport);
 	transport->addActions(transportAction->actions());
 	transport->setAllowedAreas(Qt::BottomToolBarArea);
@@ -343,19 +343,19 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//    split
 	//---------------------------------------------------
 
-	splitter = new Splitter(Qt::Vertical, mainw, "splitter");
+        splitter = new Splitter(Qt::Vertical, mainw, "splitter");
 	splitter->setHandleWidth(2);
 
-	hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
+        hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
 	hsplitter->setChildrenCollapsible(true);
 	hsplitter->setHandleWidth(2);
 
-	QPushButton* ctrl = new QPushButton(tr("ctrl"), mainw);
+        QPushButton* ctrl = new QPushButton(tr("ctrl"), mainw);
 	//QPushButton* ctrl = new QPushButton(tr("C"), mainw);  // Tim.
 	ctrl->setObjectName("Ctrl");
 	ctrl->setFont(config.fonts[3]);
 	ctrl->setToolTip(tr("Add Controller View"));
-	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
+        hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
 	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());
 	//ctrl->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());  // Tim.
 
@@ -368,20 +368,23 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	trackInfoButton->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());
 	 */
 
-	QSizeGrip* corner = new QSizeGrip(mainw);
+        QSizeGrip* corner = new QSizeGrip(mainw);
 
-	midiTrackInfo = new MidiTrackInfo(mainw);
+        midiTrackInfo = new MidiTrackInfo(this);
 	midiTrackInfo->setObjectName("prTrackInfo");
 	int mtiw = 280; //midiTrackInfo->width(); // Save this.
 	midiTrackInfo->setMinimumWidth(100);
 	//midiTrackInfo->setMaximumWidth(300);
         // Catch left/right arrow key events for this widget so we
         // can easily move the focus back from this widget to the canvas.
+        installEventFilter(this);
         midiTrackInfo->installEventFilter(this);
+        midiTrackInfo->getView()->installEventFilter(this);
+
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
 
 	//midiTrackInfo->setSizePolicy(QSizePolicy(/*QSizePolicy::Ignored*/QSizePolicy::Preferred, QSizePolicy::Expanding));
-	infoScroll = new QScrollArea;
+        infoScroll = new QScrollArea;
 	infoScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	infoScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	//infoScroll->setMaximumWidth(300);
@@ -1113,6 +1116,13 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
                 {
                         canvas->setFocus(Qt::MouseFocusReason);
                         return true;
+                }
+                if (keyEvent->key() == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key ||
+                    keyEvent->key() == shortcuts[SHRT_TOGGLE_STEPRECORD].key ||
+                    keyEvent->key() == shortcuts[SHRT_MIDI_PANIC].key
+                    )
+                {
+                        qApp->sendEvent(canvas, event);
                 }
         }
 
