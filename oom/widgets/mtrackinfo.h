@@ -95,6 +95,10 @@ public:
     Track* track() const {
         return selected;
     }
+    QTableView* getView() const
+    {
+            return tableView;
+    }
     void setLabelText();
     void setLabelFont();
     void updateTrackInfo(int);
