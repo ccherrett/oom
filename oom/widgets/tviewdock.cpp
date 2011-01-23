@@ -74,15 +74,15 @@ void TrackViewDock::populateTable(int /*flag*/)
 	_autoTableModel->clear();
 	for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++ait)
 	{
-		QList<QStandardItem*> rowData;
+		QList<QStandardItem*> rowData2;
 		QStandardItem *chk = new QStandardItem(true);
 		chk->setCheckable(true);
 		chk->setCheckState((*ait)->selected() ? Qt::Checked : Qt::Unchecked);
 		QStandardItem *tname = new QStandardItem((*ait)->viewName());
-		rowData.append(chk);
-		rowData.append(tname);
+		rowData2.append(chk);
+		rowData2.append(tname);
 		_autoTableModel->blockSignals(true);
-		_autoTableModel->insertRow(_autoTableModel->rowCount(), rowData);
+		_autoTableModel->insertRow(_autoTableModel->rowCount(), rowData2);
 		_autoTableModel->blockSignals(false);
 		autoTable->setRowHeight(_autoTableModel->rowCount(), 25);
 	}
@@ -93,12 +93,40 @@ void TrackViewDock::populateTable(int /*flag*/)
 
 void TrackViewDock::trackviewChanged(QStandardItem *item)
 {
-	updateTrackView(-1, item);
+	if(item)
+	{
+		int row = item->row();
+		QStandardItem *tname = _tableModel->item(row, 1);
+		QStandardItem *chk = _tableModel->item(row, 0);
+		if(tname)
+		{
+			TrackView* tv = song->findTrackView(tname->text());
+			if(tv)
+			{
+				tv->setSelected((chk->checkState() == Qt::Checked) ? true : false);
+				song->updateTrackViews1();
+			}
+		}
+	}
 }
 
 void TrackViewDock::autoTrackviewChanged(QStandardItem *item)
 {
-	updateTrackView(1, item);
+	if(item)
+	{
+		int row = item->row();
+		QStandardItem *tname = _autoTableModel->item(row, 1);
+		QStandardItem *chk = _autoTableModel->item(row, 0);
+		if(tname)
+		{
+			TrackView* tv = song->findAutoTrackView(tname->text());
+			if(tv)
+			{
+				tv->setSelected((chk->checkState() == Qt::Checked) ? true : false);
+				song->updateTrackViews1();
+			}
+		}
+	}
 }
 
 void TrackViewDock::updateTrackView(int table, QStandardItem *item)/*{{{*/
