@@ -31,7 +31,7 @@ set (SubDirs
       deicsonze
       # deicsonze2
       libsynti
-      organ
+      # organ
       # simpledrums
       simpledrums2
       vam
