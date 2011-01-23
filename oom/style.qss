@@ -501,8 +501,8 @@ QTabWidget#tabControlCenter QTabBar::tab:only-one {
 
 QDockWidget {
     border: 1px solid lightgray;
-    /*titlebar-close-icon: url(close.png);
-    titlebar-normal-icon: url(float.png);*/
+    titlebar-close-icon: url(:/images/right_arrow.png);
+    titlebar-normal-icon: url(:/images/left_arrow.png);
 	color: #d6dfd6;
 	font-family: "fixed-width";
 	font-weight: bold;
@@ -552,6 +552,7 @@ QDockWidget::float-button {
     position: absolute;
     top: 0px; left: 16px; bottom: 0px;
     width: 14px;
+	height: 20px;
 }
 
 QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea { background-color: #595966 }
