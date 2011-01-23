@@ -8,6 +8,7 @@
 #include "song.h"
 #include "tviewdock.h"
 #include "trackview.h"
+#include "tvieweditor.h"
 
 #include "icons.h"
 #include <QStandardItemModel>
@@ -23,14 +24,18 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	setupUi(this);
 	_tableModel = new QStandardItemModel(tableView);
 	tableView->setModel(_tableModel);
+	tableView->setObjectName("tblTrackView");
 	btnUp->setIcon(*upPCIcon);
 	btnDown->setIcon(*downPCIcon);
 	btnDelete->setIcon(*garbagePCIcon);
 	btnUp->setIconSize(upPCIcon->size());
 	btnDown->setIconSize(downPCIcon->size());
+	btnTV->setIcon(*addTVIcon);
+	btnTV->setIconSize(addTVIcon->size());
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(btnUpClicked(bool)));
 	connect(btnDown, SIGNAL(clicked(bool)), SLOT(btnDownClicked(bool)));
+	connect(btnTV, SIGNAL(clicked(bool)), SLOT(btnTVClicked(bool)));
 	connect(_tableModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(trackviewInserted(QModelIndex, int, int)));
 	connect(_tableModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(trackviewRemoved(QModelIndex, int, int)));
 	connect(_tableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(trackviewChanged(QStandardItem*)));
@@ -61,7 +66,7 @@ void TrackViewDock::populateTable(int /*flag*/)
 		_tableModel->blockSignals(true);
 		_tableModel->insertRow(_tableModel->rowCount(), rowData);
 		_tableModel->blockSignals(false);
-		tableView->setRowHeight(_tableModel->rowCount(), 50);
+		tableView->setRowHeight(_tableModel->rowCount(), 25);
 	}
 	updateTableHeader();
 	tableView->resizeRowsToContents();
@@ -93,9 +98,15 @@ void TrackViewDock::trackviewRemoved(QModelIndex, int, int)
 {
 }
 
-void TrackViewDock::btnUpClicked(bool)
+void TrackViewDock::btnTVClicked(bool)
 {
-	QList<int> rows;// = tableView->getSelectedRows();/*{{{*/
+	TrackViewEditor* tve = new TrackViewEditor(this);
+	tve->show();
+}
+
+void TrackViewDock::btnUpClicked(bool)/*{{{*/
+{
+	QList<int> rows = getSelectedRows();
 	if (!rows.isEmpty())
 	{
 		int id = rows.at(0);
@@ -104,17 +115,22 @@ void TrackViewDock::btnUpClicked(bool)
 		int row = (id - 1);
 		QList<QStandardItem*> item = _tableModel->takeRow(id);
 		QStandardItem* txt = item.at(1);
-		txt->setEditable(false);
-		//_selectedIndex = row;
-		_tableModel->insertRow(row, item);
-		tableView->setRowHeight(row, 50);
-		tableView->resizeRowsToContents();
-		tableView->setColumnWidth(0, 20);
+		if(txt)
+		{
+			QString tname = txt->text();
+			TrackView* tv = song->findTrackView(tname);
+			if(tv)
+			{
+				TrackViewList* tvl = song->trackviews();
+				tvl->erase(tv);
+				song->insertTrackView(tv, row);
+			}
+		}
 		//_selModel->blockSignals(true);
 		tableView->selectRow(row);
 		//_selModel->blockSignals(false);
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
 void TrackViewDock::btnDownClicked(bool)/*{{{*/
 {
@@ -126,14 +142,18 @@ void TrackViewDock::btnDownClicked(bool)/*{{{*/
 			return;
 		int row = (id + 1);
 		QList<QStandardItem*> item = _tableModel->takeRow(id);
-		QStandardItem* txt = item.at(2);
-		txt->setEditable(false);
-		//_selectedIndex = row;
-		_tableModel->insertRow(row, item);
-		tableView->setRowHeight(row, 50);
-		tableView->resizeRowsToContents();
-		tableView->setColumnWidth(1, 20);
-		tableView->setColumnWidth(0, 1);
+		QStandardItem* txt = item.at(1);
+		if(txt)
+		{
+			QString tname = txt->text();
+			TrackView* tv = song->findTrackView(tname);
+			if(tv)
+			{
+				TrackViewList* tvl = song->trackviews();
+				tvl->erase(tv);
+				song->insertTrackView(tv, row);
+			}
+		}
 		//_selModel->blockSignals(true);
 		tableView->selectRow(row);
 		//_selModel->blockSignals(false);
@@ -145,7 +165,6 @@ void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 	QList<int> rows = getSelectedRows();
 	if (!rows.isEmpty())
 	{
-		printf("Found rows to delete\n");
 		QList<TrackView*> dlist;
 		int id = 0;
 		TrackViewList* tviews = song->trackviews();
@@ -158,7 +177,6 @@ void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 				TrackView* tv = song->findTrackView(item->text());
 				if(tv)
 				{
-					printf("Found tv to delete\n");
 					dlist.append(tv);
 				}
 			}
@@ -167,11 +185,9 @@ void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 		{
 			for (int d = 0; d < dlist.size(); ++d)
 			{
-				printf("Deleting item\n");
 				song->removeTrackView(dlist.at(d));
 			}
 		}
-		//updateTableHeader();
 	}
 }/*}}}*/
 
@@ -181,13 +197,10 @@ QList<int> TrackViewDock::getSelectedRows()/*{{{*/
 	QItemSelectionModel* smodel = tableView->selectionModel();
 	if (smodel->hasSelection())
 	{
-		printf("TrackViewDock::getSelectedRows() found selected rows\n");
 		QModelIndexList indexes = smodel->selectedRows();
-		printf("TrackViewDock::getSelectedRows()\n");
 		QList<QModelIndex>::const_iterator id;
 		for (id = indexes.constBegin(); id != indexes.constEnd(); ++id)
 		{
-			printf("Appending selected row\n");
 			int row = (*id).row();
 			rv.append(row);
 		}

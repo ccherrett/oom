@@ -20,6 +20,7 @@ class TrackViewDock : public QFrame, public Ui::TViewDockBase {
 		void btnUpClicked(bool);
 		void btnDownClicked(bool);
 		void btnDeleteClicked(bool);
+		void btnTVClicked(bool);
 		void trackviewInserted(QModelIndex, int, int);
 		void trackviewRemoved(QModelIndex, int, int);
 		void trackviewChanged(QStandardItem*);

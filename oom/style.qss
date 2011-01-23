@@ -114,24 +114,35 @@ QHeaderView::section
 	font-size: 11px;
 }
 
-TrackViewDock QTableView::item
+QTableView#tblTrackView
 {
-	padding-top: 8px;
-	padding-bottom: 8px;
+	background-color: #d8dbe8;
+	border: 1px solid #29292a;
+	border-radius: 0px;
+	padding: 0px;
+	color: black;
+	font-size: 12px;
+	alternate-background-color: #bec0cf;
 }
 
-TrackViewDock QTableView::item:selected
+QTableView#tblTrackView::item
+{
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+QTableView#tblTrackView::item:selected
 {
 	background-color: #3d3e44;
 	border: none;
 }
 
-TrackViewDock QTableView::item:selected:active
+QTableView#tblTrackView::item:selected:active
 {
 	border: none;
 }
 
-TrackViewDock QTableView::item:selected:!active
+QTableView#tblTrackView::item:selected:!active
 {
 	border: none;
 }
