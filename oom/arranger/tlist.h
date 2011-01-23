@@ -27,15 +27,15 @@ class Header;
 
 enum TrackColumn
 {
-    COL_RECORD = 0,
+    COL_CLASS = 0,
+    COL_AUTOMATION,
+    COL_OPORT,
+    COL_RECORD,
     COL_MUTE,
     COL_SOLO,
-    COL_CLASS,
-    COL_NAME,
-    COL_OPORT,
     COL_OCHANNEL,
     COL_TIMELOCK,
-    COL_AUTOMATION,
+    COL_NAME,
     COL_NONE = -1
 };
 

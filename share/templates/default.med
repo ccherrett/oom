@@ -28,7 +28,7 @@
     <drumTrackBg r="77" g="65" b="83"></drumTrackBg>
     <waveTrackBg r="40" g="62" b="68"></waveTrackBg>
     <outputTrackBg r="133" g="36" b="36"></outputTrackBg>
-    <inputTrackBg r="99" g="137" b="97"></inputTrackBg>
+    <inputTrackBg r="75" g="112" b="75"></inputTrackBg>
     <groupTrackBg r="58" g="64" b="65"></groupTrackBg>
     <auxTrackBg r="83" g="87" b="137"></auxTrackBg>
     <synthTrackBg r="125" g="73" b="32"></synthTrackBg>

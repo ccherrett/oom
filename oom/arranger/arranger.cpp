@@ -329,11 +329,11 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	header->setColumnLabel(tr("S"), COL_SOLO, fm1.width('S') + fw);
 	//header->setColumnLabel(tr("C"), COL_CLASS, fm1.width('C') + fw);
 	header->setColumnLabel(tr("C"), COL_CLASS, 0);
-	header->setColumnLabel(tr("Track"), COL_NAME, 175);
-	header->setColumnLabel(tr("Port"), COL_OPORT, 100);
-	header->setColumnLabel(tr("Ch"), COL_OCHANNEL, 30);
-	header->setColumnLabel(tr("T"), COL_TIMELOCK, fm1.width('T') + fw);
-	header->setColumnLabel(tr("Automation"), COL_AUTOMATION, 100);
+	header->setColumnLabel(tr("Track"), COL_NAME, 375);
+	header->setColumnLabel(tr("Port"), COL_OPORT, 30);
+	header->setColumnLabel(tr(""), COL_OCHANNEL, 0);
+	header->setColumnLabel(tr("T"), COL_TIMELOCK, 0/*fm1.width('T') + fw*/);
+	header->setColumnLabel(tr("Automation"), COL_AUTOMATION, 30);
 	header->setResizeMode(COL_RECORD, QHeaderView::Fixed);
 	header->setResizeMode(COL_MUTE, QHeaderView::Fixed);
 	header->setResizeMode(COL_SOLO, QHeaderView::Fixed);
@@ -342,7 +342,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	header->setResizeMode(COL_OPORT, QHeaderView::Interactive);
 	header->setResizeMode(COL_OCHANNEL, QHeaderView::Fixed);
 	header->setResizeMode(COL_TIMELOCK, QHeaderView::Fixed);
-	header->setResizeMode(COL_AUTOMATION, QHeaderView::Interactive);
+	header->setResizeMode(COL_AUTOMATION, QHeaderView::Fixed);
 
 	setHeaderToolTips();
 	setHeaderWhatsThis();

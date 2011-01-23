@@ -141,17 +141,18 @@ void TList::redraw(const QRect& r)
 //   paint
 //---------------------------------------------------------
 
-void TList::paint(const QRect& r)
+void TList::paint(const QRect& r)/*{{{*/
 {
 	if (!isVisible())
 		return;
 	QRect rect(r);
 	QPainter p(this);
 
-	if (bgPixmap.isNull())
+	//No more track wallpapers
+	//if (bgPixmap.isNull())
 		p.fillRect(rect, config.trackBg);
-	else
-		p.drawTiledPixmap(rect, bgPixmap, QPoint(rect.x(), ypos + rect.y()));
+	//else
+	//	p.drawTiledPixmap(rect, bgPixmap, QPoint(rect.x(), ypos + rect.y()));
 	p.setClipRegion(rect);
 
 	//printf("TList::paint hasClipping:%d\n", p.hasClipping());   // Tested true.
@@ -225,16 +226,6 @@ void TList::paint(const QRect& r)
 			//p.setPen(palette().color(QPalette::Active, QPalette::Text));
 			p.setPen(QColor(213,213,213));
 		}
-		/*QColor white = QColor(202, 86, 86);
-		QColor trackcolor = bg;
-		QLinearGradient vuGrad(QPointF(10, 10), QPointF(0, 0));
-		vuGrad.setColorAt(1, white);
-		vuGrad.setColorAt(0.9, trackcolor);
-		vuGrad.setColorAt(0.5, trackcolor);
-		vuGrad.setColorAt(0.1, trackcolor);
-		vuGrad.setColorAt(0, white);
-		p.fillRect(x1, yy, w, trackHeight, QBrush(vuGrad));
-		*/
 		p.fillRect(x1, yy, w, trackHeight, bg);
 		track->setY(y);
 		
@@ -264,8 +255,7 @@ void TList::paint(const QRect& r)
 				case COL_RECORD:
 					if (track->canRecord())
 					{
-						drawCenteredPixmap(p,
-								track->recordFlag() ? arranger_record_on_Icon : arranger_record_off_Icon, r);
+						drawCenteredPixmap(p, track->recordFlag() ? arranger_record_on_Icon : arranger_record_off_Icon, r);
 					}
 					break;
 				case COL_CLASS:
@@ -329,14 +319,13 @@ void TList::paint(const QRect& r)
 					}
 					break;
 				case COL_TIMELOCK:
-					if (track->isMidiTrack()
-							&& track->locked())
+					if (track->isMidiTrack() && track->locked())
 					{
-						drawCenteredPixmap(p, lockIcon, r);
+						;//drawCenteredPixmap(p, lockIcon, r);
 					}
 					break;
 				case COL_NAME:
-					p.drawText(r, Qt::AlignVCenter | Qt::AlignLeft, track->name());
+					p.drawText(r, Qt::AlignLeft | Qt::AlignVCenter, track->name());
 					break;
 				case COL_OCHANNEL:
 				{
@@ -352,12 +341,12 @@ void TList::paint(const QRect& r)
 						n = ((WaveTrack*) track)->channels();
 					}
 					s.setNum(n);
-					p.drawText(r, Qt::AlignVCenter | Qt::AlignHCenter, s);
+					//p.drawText(r, Qt::AlignVCenter | Qt::AlignHCenter, s);
 				}
 					break;
 				case COL_OPORT:
 				{
-					QString s;
+					/*QString s;
 					if (track->isMidiTrack())
 					{
 						int outport = ((MidiTrack*) track)->outPort();
@@ -380,13 +369,18 @@ void TList::paint(const QRect& r)
 					}
 
 					p.drawText(r, Qt::AlignVCenter | Qt::AlignLeft, s);
+					*/
+					if(track->isMidiTrack() || track->type() == Track::AUDIO_SOFTSYNTH)
+						drawCenteredPixmap(p, portIcon, r);
+					else
+						drawCenteredPixmap(p, portDisabledIcon, r);
 				}
 					break;
 				case COL_AUTOMATION:
 				{
-					QString s = "-";
+					//QString s = "-";
 
-					if (!track->isMidiTrack())
+					/*if (!track->isMidiTrack())
 					{
 						CtrlListList* cll = ((AudioTrack*)track)->controller();
 						int countAll=0, countVisible=0;
@@ -401,10 +395,13 @@ void TList::paint(const QRect& r)
 						int count = ((AudioTrack*) track)->controller()->size();
 						//s.sprintf("%d viewed", count);
 						s.sprintf(" %d(%d) visible",countVisible, countAll);
-					}
+					}*/
 
-
-					p.drawText(r, Qt::AlignVCenter | Qt::AlignLeft, s);
+					if (!track->isMidiTrack())
+						drawCenteredPixmap(p, automationIcon, r);
+					else
+						drawCenteredPixmap(p, automationDisabledIcon, r);
+					//p.drawText(r, Qt::AlignVCenter | Qt::AlignLeft, s);
 				}
 					break;
 				default:
@@ -438,7 +435,7 @@ void TList::paint(const QRect& r)
 		xpos += header->sectionSize(section);
 		//p.drawLine(xpos, 0, xpos, height());
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   returnPressed
@@ -562,7 +559,7 @@ void TList::mouseDoubleClickEvent(QMouseEvent* ev)
 //   portsPopupMenu
 //---------------------------------------------------------
 
-void TList::portsPopupMenu(Track* t, int x, int y)
+void TList::portsPopupMenu(Track* t, int x, int y)/*{{{*/
 {
 	switch (t->type())
 	{
@@ -658,7 +655,7 @@ void TList::portsPopupMenu(Track* t, int x, int y)
 		case Track::AUDIO_AUX: //TODO
 			break;
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   oportPropertyPopupMenu

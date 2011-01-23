@@ -465,6 +465,10 @@ QPixmap* view_transport_windowIcon;
 
 QPixmap* monoIcon;
 QPixmap* stereoIcon;
+QPixmap* automationIcon;
+QPixmap* portIcon;
+QPixmap* automationDisabledIcon;
+QPixmap* portDisabledIcon;
 QPixmap* oomIcon;
 QPixmap* aboutOOMidiImage;
 QPixmap* oomLeftSideLogo;
@@ -714,6 +718,10 @@ void initIcons()
 
       monoIcon                                      = new MPIXMAP(":/images/icons/mixer-mono.png", NULL);
       stereoIcon                                    = new MPIXMAP(":/images/icons/mixer-stereo.png", NULL);
+      automationIcon                                = new MPIXMAP(":/images/icons/automation.png", NULL);
+      portIcon                                		= new MPIXMAP(":/images/icons/ports.png", NULL);
+      automationDisabledIcon                        = new MPIXMAP(":/images/icons/automation_disabled.png", NULL);
+      portDisabledIcon                              = new MPIXMAP(":/images/icons/ports_disabled.png", NULL);
 
       oomIcon                                      = new MPIXMAP(oom_icon_xpm, NULL);
       aboutOOMidiImage                             = new MPIXMAP(":/images/oom-about.png", NULL);

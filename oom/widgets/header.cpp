@@ -77,7 +77,7 @@ Header::Header(QWidget* parent, const char* name)
 	itemModel = new QStandardItemModel;
 	setModel(itemModel);
 	//setResizeMode(QHeaderView::ResizeToContents);
-	setDefaultSectionSize(30);
+	setDefaultSectionSize(0);
 }
 
 //---------------------------------------------------------

@@ -96,6 +96,10 @@
 		<file>images/icons/initSong.png</file>
 		<file>images/oom-about.png</file>
 		<file>images/oom_leftside_logo.png</file>
+		<file>images/icons/automation.png</file>
+		<file>images/icons/ports.png</file>
+		<file>images/icons/automation_disabled.png</file>
+		<file>images/icons/ports_disabled.png</file>
 	</qresource>
 </RCC>
 

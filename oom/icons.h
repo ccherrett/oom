@@ -242,6 +242,10 @@ extern QPixmap* view_transport_windowIcon;
 
 extern QPixmap* monoIcon;
 extern QPixmap* stereoIcon;
+extern QPixmap* automationIcon;
+extern QPixmap* portIcon;
+extern QPixmap* automationDisabledIcon;
+extern QPixmap* portDisabledIcon;
 
 extern QPixmap* oomIcon;
 extern QPixmap* aboutOOMidiImage;
