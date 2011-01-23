@@ -40,6 +40,7 @@ class TLLayout;
 class WidgetStack;
 class AudioStrip;
 class SpinBox;
+class TrackViewDock;
 
 //---------------------------------------------------------
 //   WidgetStack
@@ -107,6 +108,7 @@ class Arranger : public QWidget
     SpinBox* globalPitchSpinBox;
 	QTabWidget* _rtabs;
 	AudioStrip* _lastStrip;
+	TrackViewDock* _tvdock;
 
     unsigned cursVal;
     void genTrackInfo(QWidget* parent);

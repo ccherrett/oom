@@ -57,6 +57,7 @@
 #include "spinbox.h"
 #include "tvieweditor.h"
 #include "traverso_shared/TConfig.h"
+#include "tviewdock.h"
 
 //---------------------------------------------------------
 //   Arranger::setHeaderToolTips
@@ -1093,10 +1094,12 @@ void Arranger::genTrackInfo(QWidget* parent)
 	noTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
 
 	midiTrackInfo = new MidiTrackInfo(this);
+	_tvdock = new TrackViewDock(this);
 	infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
-	_rtabs->addTab(infoScroll, tr(" Track Info "));
+	_rtabs->addTab(_tvdock, tr(" Track Views "));
 	_rtabs->addTab(noTrackInfo, tr(" Mixer "));
+	_rtabs->addTab(infoScroll, tr(" Track Info "));
 	//midiTrackInfo->setFocusPolicy(Qt::TabFocus);    // p4.0.9
 	//midiTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
 	//trackInfo->addWidget(noTrackInfo, 0);

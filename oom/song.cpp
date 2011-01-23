@@ -3281,6 +3281,8 @@ void Song::cmdRemoveTrackView(TrackView* tv)
 void Song::removeTrackView(TrackView* tv)
 {
 	_tviews.erase(tv);
+	update(SC_TRACKVIEW_REMOVED);
+	updateTrackViews1();
 }
 
 //---------------------------------------------------------
