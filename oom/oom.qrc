@@ -94,6 +94,8 @@
 		<file>images/icons/deselectall.png</file>
 		<file>images/icons/select_invert_selection.png</file>
 		<file>images/icons/initSong.png</file>
+		<file>images/oom-about.png</file>
+		<file>images/oom_leftside_logo.png</file>
 	</qresource>
 </RCC>
 

@@ -214,8 +214,8 @@
 #include "xpm/mono.xpm"
 #include "xpm/stereo.xpm"
 #include "xpm/oom_icon.xpm"
-#include "xpm/about_oom.xpm"
-#include "xpm/oom_leftside_logo.xpm"
+//#include "xpm/about_oom.xpm"
+//#include "xpm/oom_leftside_logo.xpm"
 
 #include "xpm/global.xpm"
 #include "xpm/project.xpm"
@@ -716,8 +716,8 @@ void initIcons()
       stereoIcon                                    = new MPIXMAP(":/images/icons/mixer-stereo.png", NULL);
 
       oomIcon                                      = new MPIXMAP(oom_icon_xpm, NULL);
-      aboutOOMidiImage                                = new MPIXMAP(about_oom_xpm, NULL);
-      oomLeftSideLogo                              = new MPIXMAP(oom_leftside_logo_xpm, NULL);
+      aboutOOMidiImage                             = new MPIXMAP(":/images/oom-about.png", NULL);
+      oomLeftSideLogo                              = new MPIXMAP(":/images/oom_leftside_logo.png", NULL);
       globalIcon                                    = new MICON(global_xpm, "folder");
       userIcon                                      = new MICON(user_xpm, "user-home");
       projectIcon                                   = new MICON(project_xpm, "folder-sound");
