@@ -1145,6 +1145,38 @@ Track* PartCanvas::y2Track(int y) const
 	return 0;
 }
 
+
+// Return the track Y position, if track was not found, return -1
+int PartCanvas::track2Y(Track * track) const
+{
+        TrackList* l;
+        int trackYPos = -1;
+
+        //This changes to song->visibletracks()
+        if(song->visibletracks()->empty())
+        {
+                l = song->tracks();
+        }
+        else
+        {
+                l = song->visibletracks();
+        }
+
+        for (iTrack it = l->begin(); it != l->end(); ++it)
+        {
+                if ((*it) == track)
+                {
+                        return trackYPos;
+                }
+
+                int h = (*it)->height();
+                trackYPos += h;
+        }
+
+        return trackYPos;
+}
+
+
 //---------------------------------------------------------
 //   keyPress
 //---------------------------------------------------------
