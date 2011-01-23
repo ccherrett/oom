@@ -58,11 +58,9 @@
    <item>
     <widget class="QLabel" name="textLabel1">
      <property name="text">
-      <string>(C) Copyright 1999-2010 Werner Schweer and others.
-See http://www.openoctave.org for new versions and
-more information.
+      <string>(C) Copyright 2011 openoctave.org
 
-Published under the GNU Public License</string>
+Published under the GNU Public License v2</string>
      </property>
      <property name="wordWrap">
       <bool>false</bool>
