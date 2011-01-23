@@ -330,10 +330,10 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	//header->setColumnLabel(tr("C"), COL_CLASS, fm1.width('C') + fw);
 	header->setColumnLabel(tr("C"), COL_CLASS, 0);
 	header->setColumnLabel(tr("Track"), COL_NAME, 375);
-	header->setColumnLabel(tr("Port"), COL_OPORT, 30);
+	header->setColumnLabel(tr("Port"), COL_OPORT, 22);
 	header->setColumnLabel(tr(""), COL_OCHANNEL, 0);
 	header->setColumnLabel(tr("T"), COL_TIMELOCK, 0/*fm1.width('T') + fw*/);
-	header->setColumnLabel(tr("Automation"), COL_AUTOMATION, 30);
+	header->setColumnLabel(tr("Automation"), COL_AUTOMATION, 22);
 	header->setResizeMode(COL_RECORD, QHeaderView::Fixed);
 	header->setResizeMode(COL_MUTE, QHeaderView::Fixed);
 	header->setResizeMode(COL_SOLO, QHeaderView::Fixed);

@@ -166,6 +166,7 @@ HEADERS = \
 ./oom/widgets/transposebase.h \
 ./oom/widgets/dentry.h \
 ./oom/widgets/trackvieweditorbase.h \
+./oom/widgets/tviewdockbase.h \
 ./oom/event.h \
 ./oom/sync.h \
 ./oom/confmport.h \
