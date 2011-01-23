@@ -1123,6 +1123,7 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
                     )
                 {
                         qApp->sendEvent(canvas, event);
+                        return;
                 }
         }
 
