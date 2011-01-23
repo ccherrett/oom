@@ -3447,7 +3447,7 @@ void Song::updateTrackViews1()
 	}
 	for(iTrackView ait = _autotviews.begin(); ait != _autotviews.end(); ++ait)
 	{
-		if(workview && (*ait)->viewName() == "Working View")
+		if(customview && (*ait)->viewName() == "Working View")
 			continue;
 		if((*ait)->selected())/*{{{*/
 		{
