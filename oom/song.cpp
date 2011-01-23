@@ -85,6 +85,28 @@ Song::Song(const char* name)
 	redoList = new UndoList;
 	_markerList = new MarkerList;
 	_globalPitchShift = 0;
+	//Create the AutoView
+	TrackView* wv = new TrackView();
+	wv->setViewName("Working View");
+	wv->setSelected(false);
+	_autotviews.push_back(wv);
+	TrackView* iv = new TrackView();
+	iv->setViewName("Inputs  View");
+	iv->setSelected(false);
+	_autotviews.push_back(iv);
+	TrackView* ov = new TrackView();
+	ov->setViewName("Outputs View");
+	ov->setSelected(false);
+	_autotviews.push_back(ov);
+	TrackView* gv = new TrackView();
+	gv->setViewName("Buss View");
+	gv->setSelected(false);
+	_autotviews.push_back(gv);
+	TrackView* av = new TrackView();
+	av->setViewName("Aux View");
+	av->setSelected(false);
+	_autotviews.push_back(av);
+
 	clear(false);
 }
 
@@ -3327,6 +3349,21 @@ TrackView* Song::findTrackView(const QString& name) const
 	return 0;
 }
 
+//---------------------------------------------------------
+//   findAutoTrackView
+//    find track view by name
+//---------------------------------------------------------
+
+TrackView* Song::findAutoTrackView(const QString& name) const
+{
+	for (ciTrackView i = _autotviews.begin(); i != _autotviews.end(); ++i)
+	{
+		if ((*i)->viewName() == name)
+			return *i;
+	}
+	return 0;
+}
+
 
 //---------------------------------------------------------
 //   findTrackView
@@ -3373,16 +3410,24 @@ void Song::updateTrackViews1()
 {
 	printf("Song::updateTrackViews1()\n");
 	_viewtracks.clear();
+	bool customview = false;
+	bool workview = false;
+	TrackView* wv = findAutoTrackView("Working View");
+	if(wv && wv->selected())
+	{
+		workview = true;
+	}
 	for(iTrackView it = _tviews.begin(); it != _tviews.end(); ++it)
 	{
 		if((*it)->selected())
 		{
-			printf("Song::updateTrackViews1() Found selected trackview\n");
 			TrackList* tl = (*it)->tracks();
-			printf("Song::updateTrackViews1() size = %d\n", tl->size());
 			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
 			{
 				bool found = false;
+				if(workview && (*t)->parts()->empty()) {
+					continue;
+				}
 				//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
 				for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
 				{
@@ -3393,9 +3438,77 @@ void Song::updateTrackViews1()
 					}
 				}
 				if(!found)
+				{
 					_viewtracks.push_back((*t));
+					customview = true;
+				}
 			}
 		}
+	}
+	for(iTrackView ait = _autotviews.begin(); ait != _autotviews.end(); ++ait)
+	{
+		if(workview && (*ait)->viewName() == "Working View")
+			continue;
+		if((*ait)->selected())/*{{{*/
+		{
+			TrackList* tl = tracks();
+			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
+			{
+				bool found = false;
+				for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
+				{
+					if ((*i)->name() == (*t)->name())
+					{
+						found = true;
+						break;
+					}
+				}
+				if(!found)
+				{
+					switch((*t)->type())/*{{{*/
+					{
+						case Track::MIDI:
+						case Track::DRUM:
+						case Track::AUDIO_SOFTSYNTH:
+						case Track::WAVE:
+							if((*ait)->viewName() == "Working View")
+							{
+								if((*t)->parts()->empty())
+									break;
+								_viewtracks.push_back((*t));
+							}
+							break;
+						case Track::AUDIO_OUTPUT:
+							if((*ait)->viewName() == "Outputs View")
+							{
+								_viewtracks.push_back((*t));
+							}
+							break;
+						case Track::AUDIO_GROUP:
+							if((*ait)->viewName() == "Buss View")
+							{
+								_viewtracks.push_back((*t));
+							}
+							break;
+						case Track::AUDIO_AUX:
+							if((*ait)->viewName() == "Aux View")
+							{
+								_viewtracks.push_back((*t));
+							}
+							break;
+						case Track::AUDIO_INPUT:
+							if((*ait)->viewName() == "Inputs  View")
+							{
+								_viewtracks.push_back((*t));
+							}
+							break;
+						default:
+							fprintf(stderr, "unknown track type %d\n", (*t)->type());
+							return;
+					}/*}}}*/
+				}
+			}
+		}/*}}}*/
 	}
 	oom->updateTrackviewMenus();
 	emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?

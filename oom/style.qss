@@ -113,7 +113,7 @@ QHeaderView::section
 	font-weight: bold;
 	font-size: 11px;
 }
-
+/*{{{*/
 QTableView#tblTrackView
 {
 	background-color: #d8dbe8;
@@ -146,7 +146,42 @@ QTableView#tblTrackView::item:selected:!active
 {
 	border: none;
 }
+/*}}}*/
 
+/*{{{*/
+QTableView#autoTable
+{
+	background-color: #d8dbe8;
+	border: 1px solid #29292a;
+	border-radius: 0px;
+	padding: 0px;
+	color: black;
+	font-size: 12px;
+	alternate-background-color: #bec0cf;
+}
+
+QTableView#autoTable::item
+{
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+QTableView#autoTable::item:selected
+{
+	background-color: #3d3e44;
+	border: none;
+}
+
+QTableView#autoTable::item:selected:active
+{
+	border: none;
+}
+
+QTableView#autoTable::item:selected:!active
+{
+	border: none;
+}
+/*}}}*/
 
 /* Mixer Audio In Style*/
 QFrame#MixerAudioInStrip { 
@@ -972,6 +1007,7 @@ QScrollBar:left-arrow:vertical, QScrollBar::right-arrow:vertical {
      background: none;
  }
 
+Awl--PosEdit       { font-size: 5pt; color: green; }
 
 */
 

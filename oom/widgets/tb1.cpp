@@ -16,6 +16,7 @@
 #include "config.h"
 #include "lcombo.h"
 #include "tb1.h"
+#include "icons.h"
 #include "globals.h"
 #include "poslabel.h"
 #include "pitchlabel.h"
@@ -61,7 +62,9 @@ Toolbar1::Toolbar1(QWidget* parent, int r, int q, bool sp)
 	//setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 
 	solo = new QToolButton();
-	solo->setText(tr("Solo"));
+	solo->setIcon(*soloIconSet2);
+	solo->setIconSize(soloIconOn->size());
+	//solo->setText(tr("Solo"));
 	solo->setCheckable(true);
 	addWidget(solo);
 
