@@ -708,6 +708,8 @@ void Arranger::trackSelectionChanged()
 	selected = track;
 	updateTrackInfo(-1);
 
+        // Check if the selected track is inside the view, if not
+        // scroll the track to the center of the view
         int vScrollValue = vscroll->value();
         int trackYPos = canvas->track2Y(selected);
         if (trackYPos > (vScrollValue + canvas->height()) ||
