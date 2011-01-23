@@ -60,6 +60,19 @@ void TrackView::removeTrack(Track* t)
 	//This needs to fire something so the gui gets updated
 }
 
+void TrackView::setSelected(bool f)
+{
+	_selected = f;
+	if(!f && !tracks()->empty())
+	{
+		for(iTrack it = tracks()->begin(); it != tracks()->end(); ++it)
+		{
+			(*it)->setRecordFlag1(false);
+			(*it)->setRecordFlag2(false);
+			(*it)->setSelected(false);
+		}
+	}
+}
 //---------------------------------------------------------
 //   TrackView::read
 //---------------------------------------------------------

@@ -21,6 +21,7 @@ ProgramChangeTable::ProgramChangeTable(QWidget *parent) : QTableView(parent)
 	setSelectionBehavior(QAbstractItemView::SelectRows);
 	setAlternatingRowColors(true);
 	setWordWrap(false);
+	setShowGrid(false);
 }
 
 void ProgramChangeTable::dropEvent(QDropEvent *evt)

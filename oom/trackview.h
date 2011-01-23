@@ -52,7 +52,7 @@ class TrackView
 		void setComment(const QString& s) { _comment = s; }
 		
 		bool selected() const           { return _selected; }
-		void setSelected(bool f)        { _selected = f; }
+		void setSelected(bool f);
 		
 		const QString& viewName() const     { return _name; }
 		void setViewName(const QString& s)  { _name = s; }

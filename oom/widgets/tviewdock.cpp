@@ -278,7 +278,7 @@ void TrackViewDock::updateTableHeader()/*{{{*/
 	QStandardItem* hstat = new QStandardItem(true);
 	hstat->setCheckable(true);
 	hstat->setCheckState(Qt::Unchecked);
-	QStandardItem* hpatch = new QStandardItem(tr("Custom Track Views"));
+	QStandardItem* hpatch = new QStandardItem(tr("Custom Views"));
 	_tableModel->setHorizontalHeaderItem(0, hstat);
 	_tableModel->setHorizontalHeaderItem(1, hpatch);
 	tableView->setColumnWidth(0, 20);
@@ -288,7 +288,7 @@ void TrackViewDock::updateTableHeader()/*{{{*/
 	QStandardItem* ahstat = new QStandardItem(true);
 	ahstat->setCheckable(true);
 	ahstat->setCheckState(Qt::Unchecked);
-	QStandardItem* ahpatch = new QStandardItem(tr("Track Views"));
+	QStandardItem* ahpatch = new QStandardItem(tr("Views"));
 	_autoTableModel->setHorizontalHeaderItem(0, ahstat);
 	_autoTableModel->setHorizontalHeaderItem(1, ahpatch);
 	autoTable->setColumnWidth(0, 20);
