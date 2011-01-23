@@ -47,6 +47,8 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 		void btnCancelClicked(bool);
 		void btnCopyClicked(bool);
 		void btnDeleteClicked(bool);
+		void btnDownClicked(bool);
+		void btnUpClicked(bool);
 		void txtNameEdited(QString);
 		void reset();
 

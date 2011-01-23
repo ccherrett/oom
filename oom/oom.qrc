@@ -103,6 +103,8 @@
 		<file>images/left_arrow.png</file>
 		<file>images/right_arrow.png</file>
 		<file>images/icons/add_tv.png</file>
+		<file>images/icons/x.png</file>
+		<file>images/icons/detach.png</file>
 	</qresource>
 </RCC>
 
