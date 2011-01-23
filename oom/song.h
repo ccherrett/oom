@@ -128,6 +128,7 @@ private:
 
     TrackList _tracks; // tracklist as seen by arranger
     TrackViewList _tviews; // trackviewlist as seen by arranger
+	TrackViewList _autotviews;
     MidiTrackList _midis;
     WaveTrackList _waves;
 	TrackList _viewtracks;
@@ -446,6 +447,9 @@ public:
 
     TrackViewList* trackviews() {
         return &_tviews;
+    }
+    TrackViewList* autoviews() {
+        return &_autotviews;
     }
     TrackView* findTrackView(const QString& name) const;
     TrackView* findTrackView(Track*);

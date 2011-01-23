@@ -61,6 +61,10 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 
 	btnAdd = actionBox->button(QDialogButtonBox::Yes);
 	btnAdd->setText(tr("Add Track"));
+	btnUp->setIcon(*upPCIcon);
+	btnDown->setIcon(*downPCIcon);
+	btnUp->setIconSize(upPCIcon->size());
+	btnDown->setIconSize(downPCIcon->size());
 
 	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddTrack(bool)));
 	
@@ -80,6 +84,8 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
 	connect(btnCopy, SIGNAL(clicked(bool)), SLOT(btnCopyClicked(bool)));
 	connect(txtName, SIGNAL(textEdited(QString)), SLOT(txtNameEdited(QString)));
+	connect(btnUp, SIGNAL(clicked(bool)), SLOT(btnUpClicked(bool)));
+	connect(btnDown, SIGNAL(clicked(bool)), SLOT(btnDownClicked(bool)));
 }
 
 
@@ -462,6 +468,74 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 		}
 	}
 }/*}}}*/
+
+void TrackViewEditor::btnUpClicked(bool)/*{{{*/
+{
+	//Perform action to remove track from the selectedTracks list
+	printf("Remove up clicked\n");
+	if(_selected)
+	{
+		btnApply->setEnabled(true);
+		_editing = true;
+		QItemSelectionModel* model = listSelectedTracks->selectionModel();
+		QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
+		QList<int> del;
+		if (model->hasSelection())
+		{
+			QStringList list = lst->stringList();
+			QModelIndexList sel = model->selectedRows(0);
+			QList<QModelIndex>::const_iterator iid;
+			for (iid = sel.constBegin(); iid != sel.constEnd(); ++iid)
+			{
+				//We have to index we will get the row.
+				int id = (*iid).row();
+				if ((id - 1) < 0)
+					return;
+				int row = (id - 1);
+				QString track = list.takeAt(id);
+				list.insert(row, track);
+				lst->setStringList(list);
+				//model->setCurrentIndex(index);
+				break; //Only process the first selection FIXME: We need a function to handle this and keep track of where you are in a multitrack move
+			}
+		}
+	}
+}/*}}}*/
+
+void TrackViewEditor::btnDownClicked(bool)/*{{{*/
+{
+	//Perform action to remove track from the selectedTracks list
+	printf("Remove up clicked\n");
+	if(_selected)
+	{
+		btnApply->setEnabled(true);
+		_editing = true;
+		QItemSelectionModel* model = listSelectedTracks->selectionModel();
+		QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
+		QList<int> del;
+		if (model->hasSelection())
+		{
+			QStringList list = lst->stringList();
+			QModelIndexList sel = model->selectedRows(0);
+			QList<QModelIndex>::const_iterator iid;
+			for (iid = sel.constBegin(); iid != sel.constEnd(); ++iid)
+			{
+				//We have to index we will get the row.
+				int id = (*iid).row();
+				if ((id + 1) < 0)
+					return;
+				int row = (id + 1);
+				QString track = list.takeAt(id);
+				list.insert(row, track);
+				lst->setStringList(list);
+				//listSelectedTracks->
+				//model->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
+				break; //Only process the first selection FIXME: We need a function to handle this and keep track of where you are in a multitrack move
+			}
+		}
+	}
+}/*}}}*/
+
 
 void TrackViewEditor::setSelected(TrackView* t)
 {

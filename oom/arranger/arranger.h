@@ -136,6 +136,7 @@ private slots:
     void verticalScrollSetYpos(unsigned);
 	void preloadControllers();
 	void splitterMoved(int, int);
+	void resourceDockAreaChanged(Qt::DockWidgetArea);
 
 signals:
     void redirectWheelEvent(QWheelEvent*);

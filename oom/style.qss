@@ -498,12 +498,11 @@ QTabWidget#tabControlCenter QTabBar::tab:last:selected {
 QTabWidget#tabControlCenter QTabBar::tab:only-one {
     margin: 0; /* if there is only one tab, we don't want overlapping margins */
 }
-
 QDockWidget {
-    border: 1px solid lightgray;
-    /*titlebar-close-icon: url(close.png);
-    titlebar-normal-icon: url(float.png);*/
-	color: #d6dfd6;
+    /*border: 1px solid lightgray;*/
+    titlebar-close-icon: url(:/images/icons/x.png);
+    titlebar-normal-icon: url(:/images/icons/detach.png);
+    color: #d6dfd6;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 11px;
@@ -525,17 +524,16 @@ QDockWidget::title {
 }
 
 QDockWidget::close-button, QDockWidget::float-button {
-    background: darkgray;
+    background: #101819;
     padding: 2px;
-    icon-size: 14px; /* maximum icon size */
+    icon-size: 15px; /* maximum icon size */
 }
 
 QDockWidget::close-button:hover, QDockWidget::float-button:hover {
-    background: gray;
 }
 
 QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
-    padding: 1px -1px -1px 1px;
+    /*padding: 1px -1px -1px 1px;*/
 }
 
 QDockWidget::close-button {

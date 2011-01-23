@@ -21,6 +21,49 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QTableView" name="autoTable">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>150</height>
+      </size>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="textElideMode">
+      <enum>Qt::ElideNone</enum>
+     </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
+     <property name="cornerButtonEnabled">
+      <bool>false</bool>
+     </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>25</number>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>25</number>
+     </attribute>
+    </widget>
+   </item>
+   <item>
     <widget class="QTableView" name="tableView">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
@@ -53,16 +96,16 @@
       <bool>false</bool>
      </attribute>
      <attribute name="verticalHeaderDefaultSectionSize">
-      <number>25</number>
+      <number>50</number>
      </attribute>
      <attribute name="verticalHeaderMinimumSectionSize">
-      <number>25</number>
+      <number>50</number>
      </attribute>
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
      </attribute>
      <attribute name="verticalHeaderDefaultSectionSize">
-      <number>25</number>
+      <number>50</number>
      </attribute>
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
@@ -74,7 +117,7 @@
       <number>20</number>
      </attribute>
      <attribute name="verticalHeaderMinimumSectionSize">
-      <number>25</number>
+      <number>50</number>
      </attribute>
     </widget>
    </item>
