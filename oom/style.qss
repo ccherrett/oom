@@ -89,6 +89,63 @@ MidiTrackInfo QTableView::item:selected:!active
 	border: none;
 }
 
+QHeaderView
+{
+	background-color: #d8dbe8;
+	border: 1px solid #29292a;
+	border-radius: 0px;
+	padding: 0px;
+	color: black;
+	font-size: 12px;
+	alternate-background-color: #bec0cf;
+}
+
+QHeaderView::section
+{
+	text-align: left;
+	border: 0px solid black;
+	border-radius: 0px;
+	padding: 5px;
+	/*background-color: #936b9c;*/
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #727180, stop:0.1 #727180, stop:0.3 #4a4d5a, stop:1 #4a4d5a);
+	color: #d6dfd6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+}
+
+QTableView#tblTrackView
+{
+	background-color: #d8dbe8;
+	border: 1px solid #29292a;
+	border-radius: 0px;
+	padding: 0px;
+	color: black;
+	font-size: 12px;
+	alternate-background-color: #bec0cf;
+}
+
+QTableView#tblTrackView::item
+{
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+QTableView#tblTrackView::item:selected
+{
+	background-color: #3d3e44;
+	border: none;
+}
+
+QTableView#tblTrackView::item:selected:active
+{
+	border: none;
+}
+
+QTableView#tblTrackView::item:selected:!active
+{
+	border: none;
+}
 
 
 /* Mixer Audio In Style*/
@@ -586,15 +643,15 @@ QMenuBar::item {
 
  QScrollBar:horizontal {
      border: 1px solid #393941;
-     background: #858599;
+     background: #101819;
      height: 15px;
      margin: 0px 15px 0 15px;
  }
  QScrollBar::handle:horizontal {
      /*border: 1px solid #393941;*/
-     border: 1px solid #5c5c5c;
+     border: 1px solid #aac0c2;
      /*background: #545463;*/
-     background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
+     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #71707f, stop:1 #4a4d5a);
      min-width: 15px;
  }
  QScrollBar::add-line:horizontal {
@@ -612,11 +669,11 @@ QMenuBar::item {
      subcontrol-position: left;
      subcontrol-origin: margin;
  }
-QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
-     border: 1px solid #393941;
-     width: 3px;
-     height: 3px;
-     background: #dedede;
+QScrollBar:left-arrow:horizontal {
+     image: url(:/images/left_arrow.png);
+ }
+QScrollBar::right-arrow:horizontal {
+     image: url(:/images/right_arrow.png);
  }
 
  QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
@@ -624,15 +681,15 @@ QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
  }
  QScrollBar:vertical {
      border: 1px solid #393941;
-     background: #858599;
+     background: #101819;/*#858599;*/
      width: 15px;
      margin: 15px 0 15px 0px;
  }
  QScrollBar::handle:vertical {
      /*border: 1px solid #393941;*/
-     border: 1px solid #5c5c5c;
+     border: 1px solid #aac0c2;
      /*background: #545463;*/
-     background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
+     background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #71707f, stop:1 #4a4d5a);
      min-height: 15px;
  }
  QScrollBar::add-line:vertical {
@@ -650,11 +707,11 @@ QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
      subcontrol-position: top;
      subcontrol-origin: margin;
  }
-QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical {
-     border: 1px solid #393941;
-     width: 3px;
-     height: 3px;
-     background: #dedede;
+QScrollBar:up-arrow:vertical {
+     image: url(:/images/up_arrow.png);
+ }
+QScrollBar::down-arrow:vertical {
+     image: url(:/images/down_arrow.png);
  }
 
  QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
@@ -676,20 +733,6 @@ QSlider::handle:horizontal
     margin: -2px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
     border-radius: 3px;
 }
-/*
-Slider
-{
-
-	background-color: red;
-	border: 1px solid green;
-	border-radius: 3px;
-
-}
-Slider::groove:vertical
-{
-	background-color: blue;
-}
-*/
 QSlider::groove:vertical  
 {
     border: 1px solid #393941;
@@ -752,7 +795,7 @@ QSlider::handle:vertical
  }
 
  QComboBox::down-arrow {
-     image: url(:/images/down_arrow_disabled.png) 1;
+     image: url(:/images/down_arrow.png) 1;
  }
 
  QComboBox::down-arrow:on { /* shift the arrow when popup is open */

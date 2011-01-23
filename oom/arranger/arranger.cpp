@@ -57,6 +57,7 @@
 #include "spinbox.h"
 #include "tvieweditor.h"
 #include "traverso_shared/TConfig.h"
+#include "tviewdock.h"
 
 //---------------------------------------------------------
 //   Arranger::setHeaderToolTips
@@ -707,6 +708,8 @@ void Arranger::trackSelectionChanged()
 	selected = track;
 	updateTrackInfo(-1);
 
+        // Check if the selected track is inside the view, if not
+        // scroll the track to the center of the view
         int vScrollValue = vscroll->value();
         int trackYPos = canvas->track2Y(selected);
         if (trackYPos > (vScrollValue + canvas->height()) ||
@@ -1101,10 +1104,12 @@ void Arranger::genTrackInfo(QWidget* parent)
 	noTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
 
 	midiTrackInfo = new MidiTrackInfo(this);
+	_tvdock = new TrackViewDock(this);
 	infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
-	_rtabs->addTab(infoScroll, tr(" Track Info "));
+	_rtabs->addTab(_tvdock, tr(" Track Views "));
 	_rtabs->addTab(noTrackInfo, tr(" Mixer "));
+	_rtabs->addTab(infoScroll, tr(" Track Info "));
 	//midiTrackInfo->setFocusPolicy(Qt::TabFocus);    // p4.0.9
 	//midiTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
 	//trackInfo->addWidget(noTrackInfo, 0);

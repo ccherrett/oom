@@ -695,6 +695,9 @@ PianoRoll::~PianoRoll()
         // store widget size to global config
         tconfig().set_property("PianoRollEdit", "widgetwidth", width());
         tconfig().set_property("PianoRollEdit", "widgetheigth", height());
+        tconfig().set_property("PianoRoll", "hscale", hscroll->mag());
+        tconfig().set_property("PianoRoll", "yscale", vscroll->mag());
+        tconfig().set_property("PianoRoll", "ypos", vscroll->pos());
 }
 
 //---------------------------------------------------------
@@ -1012,6 +1015,7 @@ void PianoRoll::writeStatus(int level, Xml& xml) const
 
 void PianoRoll::readStatus(Xml& xml)
 {
+        printf("readstatus\n");
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -1062,14 +1066,14 @@ void PianoRoll::readStatus(Xml& xml)
 					canvas->playEvents(_playEvents);
 					speaker->setChecked(_playEvents);
 				}
-				else if (tag == "xmag")
-					hscroll->setMag(xml.parseInt());
-				else if (tag == "xpos")
-					hscroll->setPos(xml.parseInt());
-				else if (tag == "ymag")
-					vscroll->setMag(xml.parseInt());
-				else if (tag == "ypos")
-					vscroll->setPos(xml.parseInt());
+                                else if (tag == "xmag")
+                                        hscroll->setMag(xml.parseInt());
+                                else if (tag == "xpos")
+                                        hscroll->setPos(xml.parseInt());
+                                else if (tag == "ymag")
+                                        vscroll->setMag(xml.parseInt());
+                                else if (tag == "ypos")
+                                        vscroll->setPos(xml.parseInt());
 				else
 					xml.unknown("PianoRoll");
 				break;
@@ -1549,6 +1553,13 @@ void PianoRoll::showEvent(QShowEvent *)
 	// now that the cursor is in the view, move the view
 	// half the canvas width so the cursor is centered.
 	hscroll->setPos(hscroll->pos() - (canvas->width() / 2));
+
+        int hScale = tconfig().get_property("PianoRoll", "hscale", 346).toInt();
+        int vScale = tconfig().get_property("PianoRoll", "yscale", 286).toInt();
+        int yPos = tconfig().get_property("PianoRoll", "ypos", 0).toInt();
+        hscroll->setMag(hScale);
+        vscroll->setMag(vScale);
+        vscroll->setPos(yPos);
 }
 
 /*

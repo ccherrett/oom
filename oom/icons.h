@@ -246,6 +246,7 @@ extern QPixmap* automationIcon;
 extern QPixmap* portIcon;
 extern QPixmap* automationDisabledIcon;
 extern QPixmap* portDisabledIcon;
+extern QPixmap* addTVIcon;
 
 extern QPixmap* oomIcon;
 extern QPixmap* aboutOOMidiImage;

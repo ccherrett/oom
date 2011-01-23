@@ -469,6 +469,7 @@ QPixmap* automationIcon;
 QPixmap* portIcon;
 QPixmap* automationDisabledIcon;
 QPixmap* portDisabledIcon;
+QPixmap* addTVIcon;
 QPixmap* oomIcon;
 QPixmap* aboutOOMidiImage;
 QPixmap* oomLeftSideLogo;
@@ -722,6 +723,7 @@ void initIcons()
       portIcon                                		= new MPIXMAP(":/images/icons/ports.png", NULL);
       automationDisabledIcon                        = new MPIXMAP(":/images/icons/automation_disabled.png", NULL);
       portDisabledIcon                              = new MPIXMAP(":/images/icons/ports_disabled.png", NULL);
+      addTVIcon                              		= new MPIXMAP(":/images/icons/add_tv.png", NULL);
 
       oomIcon                                      = new MPIXMAP(oom_icon_xpm, NULL);
       aboutOOMidiImage                             = new MPIXMAP(":/images/oom-about.png", NULL);

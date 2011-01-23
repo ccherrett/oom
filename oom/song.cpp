@@ -3259,6 +3259,7 @@ void Song::insertTrackView(TrackView* tv, int idx)
 {
 	iTrackView i = _tviews.index2iterator(idx);
 	_tviews.insert(i, tv);
+	updateTrackViews1();
 }
 
 //---------------------------------------------------------
@@ -3281,6 +3282,8 @@ void Song::cmdRemoveTrackView(TrackView* tv)
 void Song::removeTrackView(TrackView* tv)
 {
 	_tviews.erase(tv);
+	update(SC_TRACKVIEW_REMOVED);
+	updateTrackViews1();
 }
 
 //---------------------------------------------------------
