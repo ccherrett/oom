@@ -16,6 +16,8 @@ class QModelIndex;
 class TrackViewDock : public QFrame, public Ui::TViewDockBase {
     Q_OBJECT
 	QStandardItemModel* _tableModel;
+	QStandardItemModel* _autoTableModel;
+
 	private slots:
 		void btnUpClicked(bool);
 		void btnDownClicked(bool);
@@ -24,6 +26,8 @@ class TrackViewDock : public QFrame, public Ui::TViewDockBase {
 		void trackviewInserted(QModelIndex, int, int);
 		void trackviewRemoved(QModelIndex, int, int);
 		void trackviewChanged(QStandardItem*);
+		void autoTrackviewChanged(QStandardItem*);
+		void updateTrackView(int, QStandardItem*);
 	
 	public slots:
 		void populateTable(int);

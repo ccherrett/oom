@@ -451,6 +451,7 @@ public:
     TrackViewList* autoviews() {
         return &_autotviews;
     }
+    TrackView* findAutoTrackView(const QString& name) const;
     TrackView* findTrackView(const QString& name) const;
     TrackView* findTrackView(Track*);
     void insertTrackView(TrackView*, int idx);

@@ -23,8 +23,10 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 {
 	setupUi(this);
 	_tableModel = new QStandardItemModel(tableView);
+	_autoTableModel = new QStandardItemModel(autoTable);
 	tableView->setModel(_tableModel);
 	tableView->setObjectName("tblTrackView");
+	autoTable->setModel(_autoTableModel);
 	btnUp->setIcon(*upPCIcon);
 	btnDown->setIcon(*downPCIcon);
 	btnDelete->setIcon(*garbagePCIcon);
@@ -39,6 +41,7 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	connect(_tableModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(trackviewInserted(QModelIndex, int, int)));
 	connect(_tableModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(trackviewRemoved(QModelIndex, int, int)));
 	connect(_tableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(trackviewChanged(QStandardItem*)));
+	connect(_autoTableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(autoTrackviewChanged(QStandardItem*)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
 	populateTable(SC_VIEW_CHANGED);
 	//updateTableHeader();
@@ -68,8 +71,24 @@ void TrackViewDock::populateTable(int /*flag*/)
 		_tableModel->blockSignals(false);
 		tableView->setRowHeight(_tableModel->rowCount(), 25);
 	}
+	_autoTableModel->clear();
+	for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++ait)
+	{
+		QList<QStandardItem*> rowData2;
+		QStandardItem *chk = new QStandardItem(true);
+		chk->setCheckable(true);
+		chk->setCheckState((*ait)->selected() ? Qt::Checked : Qt::Unchecked);
+		QStandardItem *tname = new QStandardItem((*ait)->viewName());
+		rowData2.append(chk);
+		rowData2.append(tname);
+		_autoTableModel->blockSignals(true);
+		_autoTableModel->insertRow(_autoTableModel->rowCount(), rowData2);
+		_autoTableModel->blockSignals(false);
+		autoTable->setRowHeight(_autoTableModel->rowCount(), 25);
+	}
 	updateTableHeader();
 	tableView->resizeRowsToContents();
+	autoTable->resizeRowsToContents();
 }
 
 void TrackViewDock::trackviewChanged(QStandardItem *item)
@@ -78,9 +97,55 @@ void TrackViewDock::trackviewChanged(QStandardItem *item)
 	{
 		int row = item->row();
 		QStandardItem *tname = _tableModel->item(row, 1);
+		QStandardItem *chk = _tableModel->item(row, 0);
 		if(tname)
 		{
 			TrackView* tv = song->findTrackView(tname->text());
+			if(tv)
+			{
+				tv->setSelected((chk->checkState() == Qt::Checked) ? true : false);
+				song->updateTrackViews1();
+			}
+		}
+	}
+}
+
+void TrackViewDock::autoTrackviewChanged(QStandardItem *item)
+{
+	if(item)
+	{
+		int row = item->row();
+		QStandardItem *tname = _autoTableModel->item(row, 1);
+		QStandardItem *chk = _autoTableModel->item(row, 0);
+		if(tname)
+		{
+			TrackView* tv = song->findAutoTrackView(tname->text());
+			if(tv)
+			{
+				tv->setSelected((chk->checkState() == Qt::Checked) ? true : false);
+				song->updateTrackViews1();
+			}
+		}
+	}
+}
+
+void TrackViewDock::updateTrackView(int table, QStandardItem *item)/*{{{*/
+{
+	if(item)
+	{
+		int row = item->row();
+		QStandardItem *tname;
+		if(table)
+			tname = _autoTableModel->item(row, 1);
+		else
+			tname = _tableModel->item(row, 1);
+		if(tname)
+		{
+			TrackView* tv;
+			if(table)
+				tv = song->findAutoTrackView(tname->text());
+			else
+				tv = song->findTrackView(tname->text());
 			if(tv)
 			{
 				tv->setSelected((item->checkState() == Qt::Checked) ? true : false);
@@ -88,7 +153,7 @@ void TrackViewDock::trackviewChanged(QStandardItem *item)
 			}
 		}
 	}
-}
+}/*}}}*/
 
 void TrackViewDock::trackviewInserted(QModelIndex, int, int)
 {
@@ -213,10 +278,20 @@ void TrackViewDock::updateTableHeader()/*{{{*/
 	QStandardItem* hstat = new QStandardItem(true);
 	hstat->setCheckable(true);
 	hstat->setCheckState(Qt::Unchecked);
-	QStandardItem* hpatch = new QStandardItem(tr("TrackView"));
+	QStandardItem* hpatch = new QStandardItem(tr("Custom Track Views"));
 	_tableModel->setHorizontalHeaderItem(0, hstat);
 	_tableModel->setHorizontalHeaderItem(1, hpatch);
 	tableView->setColumnWidth(0, 20);
 	tableView->horizontalHeader()->setStretchLastSection(true);
 	tableView->verticalHeader()->hide();
+
+	QStandardItem* ahstat = new QStandardItem(true);
+	ahstat->setCheckable(true);
+	ahstat->setCheckState(Qt::Unchecked);
+	QStandardItem* ahpatch = new QStandardItem(tr("Track Views"));
+	_autoTableModel->setHorizontalHeaderItem(0, ahstat);
+	_autoTableModel->setHorizontalHeaderItem(1, ahpatch);
+	autoTable->setColumnWidth(0, 20);
+	autoTable->horizontalHeader()->setStretchLastSection(true);
+	autoTable->verticalHeader()->hide();
 }/*}}}*/
