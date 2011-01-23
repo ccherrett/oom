@@ -470,6 +470,11 @@ void EventCanvas::keyPress(QKeyEvent* event)
                         song->update(SC_SOLO);
                 }
         }
+        else if (key == shortcuts[SHRT_MIDI_PANIC].key)
+        {
+                song->panic();
+        }
+
         else
 		event->ignore();
 }
