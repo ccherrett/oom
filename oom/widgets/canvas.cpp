@@ -337,11 +337,15 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 	//    draw lasso
 	//---------------------------------------------------
 
-        if (_drag == DRAG_LASSO)
+    if (_drag == DRAG_LASSO)
 	{
-		p.setPen(QColor(181, 109, 16));
-		p.setBrush(Qt::NoBrush);
-                p.drawRect(_lasso);
+		QColor outlineColor = QColor(55,80,45);
+		QColor fillColor = QColor(148, 177, 106,127);
+		QPen mypen3 = QPen(outlineColor, 2, Qt::SolidLine);
+		p.setPen(mypen3);
+		//p.setPen(QColor(181, 109, 16));
+		p.setBrush(QBrush(fillColor));
+        p.drawRect(_lasso);
 	}
 
 	//---------------------------------------------------
@@ -366,19 +370,19 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 
 	//p.setPen(Qt::blue);
 	p.setPen(QColor(139, 225, 69));
-        if (_pos[1] >= unsigned(x) && _pos[1] < unsigned(x2))
+    if (_pos[1] >= unsigned(x) && _pos[1] < unsigned(x2))
 	{
-                p.drawLine(_pos[1], y, _pos[1], y2);
+    	p.drawLine(_pos[1], y, _pos[1], y2);
 	}
-        if (_pos[2] >= unsigned(x) && _pos[2] < unsigned(x2))
-                p.drawLine(_pos[2], y, _pos[2], y2);
+    if (_pos[2] >= unsigned(x) && _pos[2] < unsigned(x2))
+    	p.drawLine(_pos[2], y, _pos[2], y2);
 
 	//QPen playbackPen(QColor(8,193,156), 1);
 	//p.setPen(playbackPen);
 	//p.setPen(Qt::green);
 	p.setPen(QColor(0, 186, 255));
 
-        if (_pos[0] >= unsigned(x) && _pos[0] < unsigned(x2))
+    if (_pos[0] >= unsigned(x) && _pos[0] < unsigned(x2))
 	{
                 p.drawLine(_pos[0], y, _pos[0], y2);
 	}
