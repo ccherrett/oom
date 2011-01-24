@@ -1023,6 +1023,10 @@ void Arranger::clear()
         }
         m_strips.clear();
         _lastStrip = 0;
+        if (canvas)
+        {
+                canvas->setCurrentPart(0);
+        }
 }
 
 void Arranger::wheelEvent(QWheelEvent* ev)

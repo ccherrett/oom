@@ -34,7 +34,10 @@ View::View(QWidget* w, int xm, int ym, const char* name)
 	setAttribute(Qt::WA_StaticContents);
 	// This is absolutely required for speed! Otherwise painfully slow because we get
 	//  full rect paint events even on small scrolls! See help on QPainter::scroll().
-	setAttribute(Qt::WA_OpaquePaintEvent);
+
+        // This causes smearing of the Controller Lane names, so simply clear the whole thing,
+        // don't set this attribute, it's not that important anymore.
+//	setAttribute(Qt::WA_OpaquePaintEvent);
 
 	setObjectName(QString(name));
 	xmag = xm;
@@ -311,7 +314,7 @@ void View::paint(const QRect& r)
 
 	p.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing, false);
 
-	if (bgPixmap.isNull())
+        if (bgPixmap.isNull())
 		p.fillRect(rr, brush);
 	else
 		p.drawTiledPixmap(rr, bgPixmap, QPoint(xpos + rmapx(xorg)
@@ -322,7 +325,7 @@ void View::paint(const QRect& r)
 	//printf("View::paint r.x:%d w:%d\n", rr.x(), rr.width());
 	pdraw(p, rr); // draw into pixmap
 
-	p.resetMatrix(); // Q3 support says use resetMatrix instead, but resetMatrix advises resetTransform instead...
+        p.resetMatrix(); // Q3 support says use resetMatrix instead, but resetMatrix advises resetTransform instead...
 	//p.resetTransform();
 
 	drawOverlay(p);

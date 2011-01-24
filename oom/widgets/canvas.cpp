@@ -1606,6 +1606,9 @@ void Canvas::setCurrentPart(Part* part)
         _curItem = NULL;
 	deselectAll();
         _curPart = part;
-        _curPartId = _curPart->sn();
+        if (_curPart)
+        {
+                _curPartId = _curPart->sn();
+        }
 	curPartChanged();
 }
