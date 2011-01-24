@@ -1168,7 +1168,8 @@ void Arranger::switchInfo(int n)
 				break;
 		}//}}}
 		connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
-		connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
+		if(!selected->isMidiTrack())
+			connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
 		mlayout->addWidget(w);
 		//QSizePolicy policy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 		//policy.setHorizontalStretch(0);

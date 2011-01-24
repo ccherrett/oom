@@ -1298,33 +1298,37 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		{
 			Part* mprt = p->second;
 			EventList* eventList = mprt->events(); //m->second.events();
-			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+			if(eventList && !eventList->empty())
 			{
-				//Get event type.
-				Event pcevt = evt->second;
-				//printf("Found events %d \n", pcevt.type());
-				if (!pcevt.isNote())
+				for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
 				{
-					//printf("Found none Note events of type: %d with dataA: %d\n", pcevt.type(), pcevt.dataA());
-					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+					//Get event type.
+					Event pcevt = evt->second;
+					printf("Found events %d \n", pcevt.type());
+					if (!pcevt.isNote())
 					{
-						//printf("Found Program Change event type\n");
-						//printf("Pos x: %d\n", x);
-						int xp = pcevt.tick() + mprt->tick();
-						//printf("Event x: %d\n", xp);
-						if (xp >= x && xp <= (x + 50))
+						//printf("Found none Note events of type: %d with dataA: %d\n", pcevt.type(), pcevt.dataA());
+						if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
 						{
-							//printf("Found Program Change to delete at: %d\n", x);
-							song->startUndo();
-							audio->msgDeleteEvent(evt->second, p->second, false, false, false);
-							pcbar->redraw();
-							song->endUndo(SC_EVENT_MODIFIED);
+							//printf("Found Program Change event type\n");
+							//printf("Pos x: %d\n", x);
+							int xp = pcevt.tick() + mprt->tick();
+							//printf("Event x: %d\n", xp);
+							if (xp >= x && xp <= (x + 50))
+							{
+								//printf("Found Program Change to delete at: %d\n", x);
+								//song->startUndo();
+								song->deleteEvent(pcevt, mprt); //hack
+								//audio->msgDeleteEvent(evt->second, p->second, false, true, true);
+								//song->endUndo(SC_EVENT_MODIFIED);
+							}
 						}
 					}
 				}
 			}
 		}/*}}}*/
 		//pcbar->deleteProgram();
+		pcbar->update();
 		return;
 	}
 	else if (key == shortcuts[SHRT_SET_QUANT_1].key)
