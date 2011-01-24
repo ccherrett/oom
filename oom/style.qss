@@ -873,6 +873,7 @@ QLabel#arrangerCursor {
 	 background-color: #010f14;
 	 color: #03c0e2;
 	 /*color: #76ac01;*/
+	 border-radius: 8px;
  }
 
 QLabel#pitchLabel {

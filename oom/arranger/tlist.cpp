@@ -188,6 +188,7 @@ void TList::paint(const QRect& r)/*{{{*/
 		// clear one row
 		//
 		QColor bg;
+		QColor nameTextColor;
 		if (track->selected())
 		{
 			bg = config.selectTrackBg;
@@ -224,7 +225,7 @@ void TList::paint(const QRect& r)/*{{{*/
 					break;
 			}
 			//p.setPen(palette().color(QPalette::Active, QPalette::Text));
-			p.setPen(QColor(213,213,213));
+			p.setPen(QColor(213,213,213,175));
 		}
 		p.fillRect(x1, yy, w, trackHeight, bg);
 		track->setY(y);
@@ -238,7 +239,7 @@ void TList::paint(const QRect& r)/*{{{*/
 		if(track->selected())
 			p.setFont(QFont("fixed-width", 10, QFont::Bold));
 		else
-			p.setFont(QFont("fixed-width", 10, QFont::Normal));
+			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 
 		//p.setStyle("font-family: 'fixed-width';")
 
