@@ -1852,11 +1852,12 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.setWorldMatrixEnabled(false);
 		if(part->selected())
 		{
-			p.setPen(QColor(66,202,230));
+			p.setPen(QColor(66,202,230,127));
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		else
 		{
+			p.setPen(QColor(255,255,255,127));
 			p.setFont(QFont("fixed-width", 8, QFont::Normal));
 		}
 		p.drawText(rr, Qt::AlignTop | Qt::AlignLeft, part->name());
