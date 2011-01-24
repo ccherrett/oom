@@ -496,6 +496,8 @@ QTabWidget#tabControlCenter QTabBar::tab {
     padding-right: 2px;
 	color: #e6e7e6;
 	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
 }
 
 /*QTabWidget#tabControlCenter QTabBar::tab:selected, QTabWidget#tabControlCenter QTabBar::tab:hover {*/
@@ -637,6 +639,8 @@ QMenu::item {
 	 padding: 1px 40px 1px 25px;
      background: transparent;
      border-radius: 3px;
+	 font-weight: bold;
+	 font-size: 10px;
  }
 
 QMenu::item:selected { /* when selected using mouse or keyboard */
