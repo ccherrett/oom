@@ -114,6 +114,7 @@ class Arranger : public QWidget
 	TrackViewDock* _tvdock;
 	QWidget *central;
 	QVBoxLayout *mlayout;
+        QList<Strip* > m_strips;
 
     unsigned cursVal;
     void genTrackInfo(QWidget* parent);
