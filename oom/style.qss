@@ -2,6 +2,10 @@
  *    this is the OOMidi application style sheet
  */
 
+QWidget#dockMixerCenter 
+{
+	background-color: #595966;
+}
 QWidget#transport 
 {
 	background-color: #595966;
@@ -859,6 +863,7 @@ QLabel#Cursor {
 	 background-color: #010f14;
 	 color: #03c0e2;
 	 /*color: #76ac01;*/
+	 border-radius: 8px;
  }
 
 QLabel#arrangerCursor {
@@ -878,6 +883,7 @@ QLabel#pitchLabel {
 	 background-color: #010f14;
 	 color: #03c0e2;
 	 /*color: #76ac01;*/
+	 border-radius: 8px;
 }
 
 /* Bigtime stying */

@@ -24,7 +24,8 @@ class QToolButton;
 class QWheelEvent;
 class QKeyEvent;
 class QComboBox;
-//class QStackedWidget;
+class QStackedWidget;
+class QVBoxLayout;
 
 class Header;
 class TList;
@@ -39,6 +40,7 @@ class MidiTrackInfo;
 class TLLayout;
 class WidgetStack;
 class AudioStrip;
+class Strip;
 class SpinBox;
 class TrackViewDock;
 
@@ -91,6 +93,7 @@ class Arranger : public QWidget
     //MidiTrackInfoBase* midiTrackInfo;
     MidiTrackInfo* midiTrackInfo;
 	QScrollArea *infoScroll;
+	QScrollArea *mixerScroll;
     AudioStrip* waveTrackInfo;
     QWidget* noTrackInfo;
     TLLayout* tgrid;
@@ -107,8 +110,10 @@ class Arranger : public QWidget
     SpinBox* globalTempoSpinBox;
     SpinBox* globalPitchSpinBox;
 	QTabWidget* _rtabs;
-	AudioStrip* _lastStrip;
+	Strip* _lastStrip;
 	TrackViewDock* _tvdock;
+	QWidget *central;
+	QVBoxLayout *mlayout;
 
     unsigned cursVal;
     void genTrackInfo(QWidget* parent);

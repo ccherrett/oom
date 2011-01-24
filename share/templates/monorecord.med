@@ -341,7 +341,7 @@
       <solo>0</solo>
       <off>0</off>
       <channels>1</channels>
-      <height>20</height>
+      <height>40</height>
       <locked>0</locked>
       <mute>0</mute>
       <solo>0</solo>
@@ -361,7 +361,7 @@
       <solo>0</solo>
       <off>0</off>
       <channels>1</channels>
-      <height>20</height>
+      <height>40</height>
       <locked>1</locked>
       <selected>1</selected>
       <mute>0</mute>
@@ -382,7 +382,7 @@
       <solo>0</solo>
       <off>0</off>
       <channels>1</channels>
-      <height>20</height>
+      <height>40</height>
       <locked>1</locked>
       <mute>0</mute>
       <solo>0</solo>

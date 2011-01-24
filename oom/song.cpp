@@ -3510,7 +3510,6 @@ void Song::updateTrackViews1()
 			}
 		}/*}}}*/
 	}
-	oom->updateTrackviewMenus();
 	emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
 

@@ -623,7 +623,7 @@
       <solo>0</solo>
       <off>0</off>
       <channels>2</channels>
-      <height>20</height>
+      <height>40</height>
       <locked>0</locked>
       <selected>1</selected>
       <mute>0</mute>
@@ -642,7 +642,7 @@
       <solo>0</solo>
       <off>1</off>
       <channels>2</channels>
-      <height>20</height>
+      <height>40</height>
       <locked>124</locked>
       <mute>0</mute>
       <solo>0</solo>
@@ -669,7 +669,7 @@
       <solo>0</solo>
       <off>0</off>
       <channels>1</channels>
-      <height>20</height>
+      <height>40</height>
       <locked>0</locked>
       <mute>0</mute>
       <solo>0</solo>
@@ -703,7 +703,7 @@
       <solo>0</solo>
       <off>1</off>
       <channels>1</channels>
-      <height>20</height>
+      <height>40</height>
       <locked>11</locked>
       <mute>0</mute>
       <solo>0</solo>
@@ -724,7 +724,7 @@
       <solo>0</solo>
       <off>1</off>
       <channels>1</channels>
-      <height>20</height>
+      <height>40</height>
       <locked>0</locked>
       <mute>0</mute>
       <solo>0</solo>

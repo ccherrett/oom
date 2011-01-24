@@ -166,7 +166,7 @@ void Track::init()
 	_panEn2Ctrl = true;
 
 	_selected = false;
-	_height = 20;
+	_height = 40;
 	_locked = false;
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 	{

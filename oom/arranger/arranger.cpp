@@ -25,7 +25,9 @@
 #include <QPainter>
 #include <QDockWidget>
 #include <QTabWidget>
-//#include <QStackedWidget>
+#include <QStackedWidget>
+#include <QVBoxLayout>
+#include <QLayoutItem>
 
 #include "arranger.h"
 #include "song.h"
@@ -54,6 +56,8 @@
 #include "mpevent.h"
 #include "gconfig.h"
 #include "mixer/astrip.h"
+#include "mixer/mstrip.h"
+#include "mixer/strip.h"
 #include "spinbox.h"
 #include "tvieweditor.h"
 #include "traverso_shared/TConfig.h"
@@ -141,32 +145,20 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	oom->resourceDock()->setWidget(_rtabs);
 	connect(oom->resourceDock(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(resourceDockAreaChanged(Qt::DockWidgetArea)));
 
-	QLabel* label = new QLabel(tr("Cursor"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	//toolbar->addWidget(label);
+
 	cursorPos = new PosLabel(0);
 	cursorPos->setEnabled(false);
 	cursorPos->setFixedHeight(22);
 	cursorPos->setObjectName("arrangerCursor");
 	toolbar2->addWidget(cursorPos);
 
-	QToolButton* testView  = new QToolButton();
-	testView->setText(QString("TG"));
-	toolbar->addWidget(testView);
-	connect(testView, SIGNAL(clicked()), SLOT(showTrackViews()));
-
 	QToolButton* preloadCtrl  = new QToolButton();
 	preloadCtrl->setText(QString("PC"));
-	toolbar->addWidget(preloadCtrl);
+	toolbar2->addWidget(preloadCtrl);
 	connect(preloadCtrl, SIGNAL(clicked()), SLOT(preloadControllers()));
 	const char* rastval[] = {
 		QT_TRANSLATE_NOOP("@default", "Off"), QT_TRANSLATE_NOOP("@default", "Bar"), "1/2", "1/4", "1/8", "1/16"
 	};
-	/*label = new QLabel(tr("Snap"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	toolbar->addWidget(label);*/
 
         raster = new QComboBox();
 	for (int i = 0; i < 6; i++)
@@ -180,7 +172,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	raster->setFocusPolicy(Qt::TabFocus);
 
 	// Song len
-	label = new QLabel(tr("Len"));
+	QLabel* label = new QLabel(tr("Len"));
 	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	label->setIndent(3);
 	toolbar->addWidget(label);
@@ -253,9 +245,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	box->setContentsMargins(0, 0, 0, 0);
 	box->setSpacing(0);
 	box->addWidget(hLine(this), Qt::AlignTop);
-	//QFrame* hline = hLine(this);
-	//hline->setLineWidth(0);
-	//box->addWidget(hline, Qt::AlignTop);
 
 	//---------------------------------------------------
 	//  Tracklist
@@ -286,10 +275,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	QWidget* editor = new QWidget(split);
 	split->setStretchFactor(split->indexOf(editor), 1);
 	//editor->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding,
-	// Changed by T356. Was causing "large int implicitly truncated" warning. These are UCHAR values...
-	//1000, 100));
-	//232, 100)); // 232 is what it was being truncated to, but what is the right value?...
-	//255, 100));
 	QSizePolicy epolicy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	epolicy.setHorizontalStretch(255);
 	epolicy.setVerticalStretch(100);
@@ -305,19 +290,13 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	//infoScroll->setMaximumWidth(300);
 	infoScroll->setMinimumWidth(100);
 	//infoScroll->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
+	mixerScroll = new QScrollArea;
+	mixerScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	mixerScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//mixerScroll->setMaximumWidth(300);
+	mixerScroll->setMinimumWidth(100);
+	//mixerScroll->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
 	
-	//infoScroll = new QScrollBar(Qt::Vertical, tracklist);
-	//infoScroll->setObjectName("infoScrollBar");
-	//genTrackInfo(tracklist); // Moved below
-
-	// Track-Info Button
-	//ib = new QToolButton(tracklist);
-	//ib->setText(tr("TrackInfo"));
-	//ib->setCheckable(true);
-	//ib->setChecked(showTrackinfoFlag);
-	//ib->setFocusPolicy(Qt::NoFocus);
-	//connect(ib, SIGNAL(toggled(bool)), SLOT(showTrackInfo(bool)));
-
 	header = new Header(tracklist, "header");
 	header->setObjectName("trackHeaders");
 
@@ -361,32 +340,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(header, SIGNAL(sectionMoved(int, int, int)), list, SLOT(redraw()));
 	connect(header, SIGNAL(sectionMoved(int, int, int)), this, SLOT(headerMoved()));
 
-	//  tracklist:
-	//
-	//         0         1         2
-	//   +-----------+--------+---------+
-	//   | Trackinfo | scroll | Header  | 0
-	//   |           | bar    +---------+
-	//   |           |        | TList   | 1
-	//   +-----------+--------+---------+
-	//   |             hline            | 2
-	//   +-----+------------------------+
-	//   | ib  |                        | 3
-	//   +-----+------------------------+
-
-	//connect(infoScroll, SIGNAL(valueChanged(int)), SLOT(trackInfoScroll(int)));
-	/*tgrid = new TLLayout(tracklist); // layout manager for this
-	tgrid->wadd(0, trackInfo);
-	tgrid->wadd(1, infoScroll);
-	tgrid->wadd(2, header);
-	tgrid->wadd(3, list);
-	tgrid->wadd(4, hLine(tracklist));
-	tgrid->wadd(5, ib);*/
-	//tgrid = new TLLayout(tracklist); // layout manager for this
-	//tgrid->wadd(0, header);
-	//tgrid->wadd(1, list);
-	//tgrid->wadd(3, hLine(tracklist));
-	//tg->addWidget(header);
 	tg->addItem(new QSpacerItem(0, 22));
 	tg->addWidget(list);
 	list->setMinimumSize(QSize(100, 50));
@@ -400,14 +353,12 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	int offset = AL::sigmap.ticksMeasure(0);
 	hscroll = new ScrollScale(-1000, -10, xscale, song->len(), Qt::Horizontal, editor, -offset);
 	hscroll->setFocusPolicy(Qt::NoFocus);
-	//ib->setFixedHeight(hscroll->sizeHint().height());
 
 	// Changed p3.3.43 Too small steps for me...
 	//vscroll = new QScrollBar(1, 20*20, 1, 5, 0, Vertical, editor);
 	//vscroll = new QScrollBar(1, 20*20, 5, 25, 0, Qt::Vertical, editor);
 	vscroll = new QScrollBar(editor);
-	///vscroll->setMinimum(1);
-	vscroll->setMinimum(0); // Tim.
+	vscroll->setMinimum(0);
 	vscroll->setMaximum(20 * 20);
 	vscroll->setSingleStep(5);
 	vscroll->setPageStep(25);
@@ -415,12 +366,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	vscroll->setOrientation(Qt::Vertical);
 
 	list->setScroll(vscroll);
-
-	//QList<int> def;
-	//def.append(tconfig().get_property(split->objectName(), "listwidth", maximumSize().width()).toInt());
-	//split->setSizes(def);
-	//vallist.append(tgrid->maximumSize().width());
-	//split->setSizes(vallist);
 
 	QGridLayout* egrid = new QGridLayout(editor);
 	egrid->setColumnStretch(0, 50);
@@ -640,7 +585,7 @@ void Arranger::songChanged(int type)
 		if (type & (SC_TRACK_REMOVED | SC_VIEW_CHANGED))
 		{
 			canvas->trackViewChanged();
-			AudioStrip* w = (AudioStrip*) _lastStrip;//(trackInfo->getWidget(2));
+			/*AudioStrip* w = (AudioStrip*) _lastStrip;//(trackInfo->getWidget(2));
 			//AudioStrip* w = (AudioStrip*)(trackInfo->widget(2));
 			if (w)
 			{
@@ -661,7 +606,7 @@ void Arranger::songChanged(int type)
 						selected = 0;
 					}
 				}
-			}
+			}*/
 		}
 		if(type & SC_VIEW_CHANGED)
 		{//Scroll to top
@@ -968,7 +913,7 @@ void Arranger::verticalScrollSetYpos(unsigned ypos)
 //   trackInfoScroll
 //---------------------------------------------------------
 
-void Arranger::trackInfoScroll(int y)
+void Arranger::trackInfoScroll(int)
 {
 	//if (trackInfo->visibleWidget())
 	//	trackInfo->visibleWidget()->move(0, -y);
@@ -1088,7 +1033,7 @@ void Arranger::controllerChanged(Track *t)
 //   showTrackInfo
 //---------------------------------------------------------
 
-void Arranger::showTrackInfo(bool flag)
+void Arranger::showTrackInfo(bool)
 {
 	//showTrackinfoFlag = flag;
 	//trackInfo->setVisible(flag);
@@ -1100,7 +1045,7 @@ void Arranger::showTrackInfo(bool flag)
 //   genTrackInfo
 //---------------------------------------------------------
 
-void Arranger::genTrackInfo(QWidget* parent)
+void Arranger::genTrackInfo(QWidget*)
 {
 	//trackInfo = new WidgetStack(parent, "trackInfoStack");
 	//trackInfo->setFocusPolicy(Qt::TabFocus);  // p4.0.9
@@ -1125,15 +1070,19 @@ void Arranger::genTrackInfo(QWidget* parent)
 	infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
 	_rtabs->addTab(_tvdock, tr(" Track Views "));
-	_rtabs->addTab(noTrackInfo, tr(" Mixer "));
-	_rtabs->addTab(infoScroll, tr(" Track Info "));
-	//midiTrackInfo->setFocusPolicy(Qt::TabFocus);    // p4.0.9
+	_rtabs->addTab(mixerScroll, tr(" Mixer "));
+	_rtabs->addTab(infoScroll, tr(" Patch Sequencer "));
 	//midiTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
-	//trackInfo->addWidget(noTrackInfo, 0);
-	//trackInfo->addWidget(midiTrackInfo, 1);
-	//trackInfo->addWidget(0, 2);
-
-	///      genMidiTrackInfo();
+	central = new QWidget(mixerScroll);
+	central->setObjectName("dockMixerCenter");
+	mlayout = new QVBoxLayout();
+	central->setLayout(mlayout);
+	mlayout->setSpacing(0);
+	mlayout->setContentsMargins(0, 0, 0, 0);
+	mlayout->setSpacing(0);
+	mlayout->setAlignment(Qt::AlignHCenter);
+	mixerScroll->setWidget(central);
+	mixerScroll->setWidgetResizable(true);
 }
 
 //---------------------------------------------------------
@@ -1149,12 +1098,12 @@ void Arranger::updateTrackInfo(int flags)
 	}
 	if (selected == 0)
 	{
-		switchInfo(0);
 		return;
+		//switchInfo(0);
 	}
 	if (selected->isMidiTrack())
 	{
-		switchInfo(1);
+		switchInfo(2);
 		// If a new part was selected, and only if it's different.
 		if ((flags & SC_SELECTION) && midiTrackInfo->track() != selected)
 			// Set a new track and do a complete update.
@@ -1175,60 +1124,59 @@ void Arranger::updateTrackInfo(int flags)
 
 void Arranger::switchInfo(int n)
 {
-	if (n == 2)
+	if(selected && n == 2)
 	{
-		/*
-		AudioStrip* w = (AudioStrip*) _lastStrip;
-		if (w == 0 || selected != w->getTrack())\
-		{
-			if (w)
-				delete w;
-			w = new AudioStrip(noTrackInfo, (AudioTrack*) selected);
-			_lastStrip = w;
-			switch (selected->type())
-			{//{{{
-				case Track::AUDIO_OUTPUT:
-					w->setObjectName("MixerAudioOutStrip");
-					break;
-				case Track::AUDIO_GROUP:
-					w->setObjectName("MixerAudioGroupStrip");
-					break;
-				case Track::AUDIO_AUX:
-					w->setObjectName("MixerAuxStrip");
-					break;
-				case Track::WAVE:
-					w->setObjectName("MixerWaveStrip");
-					break;
-				case Track::AUDIO_INPUT:
-					w->setObjectName("MixerAudioInStrip");
-					break;
-				case Track::AUDIO_SOFTSYNTH:
-					w->setObjectName("MixerSynthStrip");
-					break;
-				case Track::MIDI:
-				case Track::DRUM:
-				{
-					w->setObjectName("MidiTrackStrip");
-				}
-					break;
-			}//}}}
-			//w->setFocusPolicy(Qt::TabFocus);  // p4.0.9
-			connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
-			connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
-			w->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-			//trackInfo->addWidget(w, 2);
-			w->show();
-			//setTabOrder(midiTrackInfo, w); // p4.0.9
-			//tgrid->activate();
-			//tgrid->update(); // oom-2 Qt4
-		}
-		*/
+		Strip* w = 0;
+
+		QLayoutItem* item = mlayout->takeAt(0);
+		if(item)
+			delete item;
+		if(_lastStrip)
+			delete _lastStrip;
+		switch (selected->type())
+		{//{{{
+			case Track::AUDIO_OUTPUT:
+				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+				w->setObjectName("MixerAudioOutStrip");
+				break;
+			case Track::AUDIO_GROUP:
+				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+				w->setObjectName("MixerAudioGroupStrip");
+				break;
+			case Track::AUDIO_AUX:
+				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+				w->setObjectName("MixerAuxStrip");
+				break;
+			case Track::WAVE:
+				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+				w->setObjectName("MixerWaveStrip");
+				break;
+			case Track::AUDIO_INPUT:
+				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+				w->setObjectName("MixerAudioInStrip");
+				break;
+			case Track::AUDIO_SOFTSYNTH:
+				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+				w->setObjectName("MixerSynthStrip");
+				break;
+			case Track::MIDI:
+			case Track::DRUM:
+			{
+				w = new MidiStrip(mixerScroll, (MidiTrack*) selected);
+				w->setObjectName("MidiTrackStrip");
+			}
+				break;
+		}//}}}
+		connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
+		connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
+		mlayout->addWidget(w);
+		//QSizePolicy policy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+		//policy.setHorizontalStretch(0);
+		//policy.setVerticalStretch(100);
+		//w->setSizePolicy(policy);//QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+		w->show();
+		_lastStrip = w;
 	}
-	//if (trackInfo->curIdx() == n)
-	//	return;
-	//trackInfo->raiseWidget(n);
-	//tgrid->activate();
-	//tgrid->update(); // oom-2 Qt4
 }
 
 void Arranger::preloadControllers()

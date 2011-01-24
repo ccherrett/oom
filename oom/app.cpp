@@ -864,13 +864,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	editSongInfoAction = new QAction(QIcon(*songInfoIcon), tr("Song Info"), this);
 
-	//-------- TrackView Actions
-	trackView = new QMenu(tr("Trackview"), this);
-	trackView->setTearOffEnabled(true);
-	addTrackviewAction = new QAction(tr("New TrackView"), this);
-	trackView->addAction(addTrackviewAction);
-	trackViewGroup = new QActionGroup(this);
-	trackViewGroup->setExclusive(false);
 
 	//-------- View Actions
 	viewTransportAction = new QAction(QIcon(*view_transport_windowIcon), tr("Transport Panel"), this);
@@ -938,7 +931,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	settingsMetronomeAction = new QAction(QIcon(*settings_metronomeIcon), tr("Metronome"), this);
 	settingsMidiSyncAction = new QAction(QIcon(*settings_midisyncIcon), tr("Midi Sync"), this);
 	settingsMidiIOAction = new QAction(QIcon(*settings_midifileexportIcon), tr("Midi File Import/Export"), this);
-	settingsAppearanceAction = new QAction(QIcon(*settings_appearance_settingsIcon), tr("Appearance Settings"), this);
+	//settingsAppearanceAction = new QAction(QIcon(*settings_appearance_settingsIcon), tr("Appearance Settings"), this);
 	settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports / Soft Synth"), this);
 
 	//-------- Help Actions
@@ -1069,7 +1062,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(settingsMetronomeAction, SIGNAL(activated()), SLOT(configMetronome()));
 	connect(settingsMidiSyncAction, SIGNAL(activated()), SLOT(configMidiSync()));
 	connect(settingsMidiIOAction, SIGNAL(activated()), SLOT(configMidiFile()));
-	connect(settingsAppearanceAction, SIGNAL(activated()), SLOT(configAppearance()));
+	//connect(settingsAppearanceAction, SIGNAL(activated()), SLOT(configAppearance()));
 	connect(settingsMidiPortAction, SIGNAL(activated()), SLOT(configMidiPorts()));
 
 	connect(dontFollowAction, SIGNAL(triggered()), followSignalMapper, SLOT(map()));
@@ -1249,8 +1242,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuView->addAction(viewMixerBAction);
 	menuView->addAction(viewCliplistAction);
 	menuView->addAction(viewMarkerAction);
-	menuView->addSeparator();
-	menuView->addMenu(trackView);
 
 
 	//-------------------------------------------------------------
@@ -1328,8 +1319,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuSettings->addAction(settingsMidiSyncAction);
 	menuSettings->addAction(settingsMidiIOAction);
 	menuSettings->addSeparator();
-	menuSettings->addAction(settingsAppearanceAction);
-	menuSettings->addSeparator();
+	//menuSettings->addAction(settingsAppearanceAction);
+	//menuSettings->addSeparator();
 	menuSettings->addAction(settingsMidiPortAction);
 
 	//---------------------------------------------------
@@ -1363,9 +1354,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(this, SIGNAL(configChanged()), arranger, SLOT(configChanged()));
 
 	connect(arranger, SIGNAL(setUsedTool(int)), SLOT(setUsedTool(int)));
-	//Connect add track view here.
-	connect(addTrackviewAction, SIGNAL(activated()), arranger, SLOT(showTrackViews()));
-	connect(trackViewGroup, SIGNAL(triggered(QAction*)), song, SLOT(updateTrackViews(QAction*)));
 
 	//---------------------------------------------------
 	//  read list of "Recent Projects"
@@ -4833,7 +4821,7 @@ void OOMidi::updateConfiguration()
 	settingsMetronomeAction->setShortcut(shortcuts[SHRT_CONFIG_METRONOME].key);
 	settingsMidiSyncAction->setShortcut(shortcuts[SHRT_CONFIG_MIDISYNC].key);
 	// settingsMidiIOAction does not have acceleration
-	settingsAppearanceAction->setShortcut(shortcuts[SHRT_APPEARANCE_SETTINGS].key);
+	//settingsAppearanceAction->setShortcut(shortcuts[SHRT_APPEARANCE_SETTINGS].key);
 	settingsMidiPortAction->setShortcut(shortcuts[SHRT_CONFIG_MIDI_PORTS].key);
 
 
@@ -5081,31 +5069,3 @@ void OOMidi::execUserScript(int id)
 	song->executeScript(song->getScriptPath(id, false).toLatin1().constData(), song->getSelectedMidiParts(), 0, false); // TODO: get quant from arranger
 }
 
-//--------------------------------------------------------
-// updateTrackviewMenus
-//--------------------------------------------------------
-
-void OOMidi::updateTrackviewMenus()
-{
-	printf("OOMidi::updateTrackviewMenus() \n");
-	if(!song->trackviews()->empty())
-	{
-		//clean out the menu;
-		QList<QAction*> tvactions = trackViewGroup->actions();
-		while(!tvactions.isEmpty())
-		{
-			QAction* a = tvactions.takeLast();
-			//trackView->removeAction(a);
-			delete a;
-		}
-		for(iTrackView itv = song->trackviews()->begin(); itv != song->trackviews()->end(); ++itv)
-		{
-			printf("Found trackview %s\n", (*itv)->viewName().toStdString().c_str());
-			QAction *action = new QAction((*itv)->viewName(), this);
-			action->setCheckable(true);
-			action->setChecked((*itv)->selected());
-			trackViewGroup->addAction(action);
-		}
-		trackView->addActions(trackViewGroup->actions());
-	}
-}

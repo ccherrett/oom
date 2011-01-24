@@ -284,7 +284,7 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 
 void Meter::resizeEvent(QResizeEvent* /*ev*/)
 {
-
+	update();
 }
 
 //---------------------------------------------------------
