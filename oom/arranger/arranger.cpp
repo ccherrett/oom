@@ -1017,6 +1017,12 @@ void Arranger::clear()
 {
 	selected = 0;
 	midiTrackInfo->setTrack(0);
+        foreach(Strip* strip, m_strips)
+        {
+                delete strip;
+        }
+        m_strips.clear();
+        _lastStrip = 0;
 }
 
 void Arranger::wheelEvent(QWheelEvent* ev)
@@ -1102,19 +1108,19 @@ void Arranger::updateTrackInfo(int flags)
 		//switchInfo(0);
 	}
 	if (selected->isMidiTrack())
-	{
-		switchInfo(2);
-		// If a new part was selected, and only if it's different.
+        {
+                switchInfo(2);
+                // If a new part was selected, and only if it's different.
 		if ((flags & SC_SELECTION) && midiTrackInfo->track() != selected)
 			// Set a new track and do a complete update.
 			midiTrackInfo->setTrack(selected);
 		else
 			// Otherwise just regular update with specific flags.
 			midiTrackInfo->updateTrackInfo(flags);
-	}
+        }
 	else
 	{
-		switchInfo(2);
+                switchInfo(2);
 	}
 }
 
@@ -1124,60 +1130,70 @@ void Arranger::updateTrackInfo(int flags)
 
 void Arranger::switchInfo(int n)
 {
-	if(selected && n == 2)
-	{
-		Strip* w = 0;
+        if(selected && n == 2)
+        {
+                Strip* w = 0;
 
-		QLayoutItem* item = mlayout->takeAt(0);
-		if(item)
-			delete item;
-		if(_lastStrip)
-			delete _lastStrip;
-		switch (selected->type())
-		{//{{{
-			case Track::AUDIO_OUTPUT:
-				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-				w->setObjectName("MixerAudioOutStrip");
-				break;
-			case Track::AUDIO_GROUP:
-				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-				w->setObjectName("MixerAudioGroupStrip");
-				break;
-			case Track::AUDIO_AUX:
-				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-				w->setObjectName("MixerAuxStrip");
-				break;
-			case Track::WAVE:
-				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-				w->setObjectName("MixerWaveStrip");
-				break;
-			case Track::AUDIO_INPUT:
-				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-				w->setObjectName("MixerAudioInStrip");
-				break;
-			case Track::AUDIO_SOFTSYNTH:
-				w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-				w->setObjectName("MixerSynthStrip");
-				break;
-			case Track::MIDI:
-			case Track::DRUM:
-			{
-				w = new MidiStrip(mixerScroll, (MidiTrack*) selected);
-				w->setObjectName("MidiTrackStrip");
-			}
-				break;
-		}//}}}
-		connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
-		if(!selected->isMidiTrack())
-			connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
-		mlayout->addWidget(w);
-		//QSizePolicy policy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-		//policy.setHorizontalStretch(0);
-		//policy.setVerticalStretch(100);
-		//w->setSizePolicy(policy);//QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-		w->show();
-		_lastStrip = w;
-	}
+                QLayoutItem* item = mlayout->takeAt(0);
+                if(item) {
+                        Strip* strip = (Strip*)item->widget();
+                        m_strips.removeAll(strip);
+                        delete item;
+                }
+                if(_lastStrip)
+                {
+                        m_strips.removeAll(_lastStrip);
+                        delete _lastStrip;
+                }
+                switch (selected->type())
+                {//{{{
+                        case Track::AUDIO_OUTPUT:
+                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+                                w->setObjectName("MixerAudioOutStrip");
+                                break;
+                        case Track::AUDIO_GROUP:
+                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+                                w->setObjectName("MixerAudioGroupStrip");
+                                break;
+                        case Track::AUDIO_AUX:
+                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+                                w->setObjectName("MixerAuxStrip");
+                                break;
+                        case Track::WAVE:
+                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+                                w->setObjectName("MixerWaveStrip");
+                                break;
+                        case Track::AUDIO_INPUT:
+                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+                                w->setObjectName("MixerAudioInStrip");
+                                break;
+                        case Track::AUDIO_SOFTSYNTH:
+                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+                                w->setObjectName("MixerSynthStrip");
+                                break;
+                        case Track::MIDI:
+                        case Track::DRUM:
+                        {
+                                w = new MidiStrip(mixerScroll, (MidiTrack*) selected);
+                                w->setObjectName("MidiTrackStrip");
+                        }
+                                break;
+                }//}}}
+                if (w)
+                {
+                        connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
+                        if(!selected->isMidiTrack())
+                                connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
+                        mlayout->addWidget(w);
+                        m_strips.append(w);
+                        //QSizePolicy policy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+                        //policy.setHorizontalStretch(0);
+                        //policy.setVerticalStretch(100);
+                        //w->setSizePolicy(policy);//QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+                        w->show();
+                        _lastStrip = w;
+                }
+        }
 }
 
 void Arranger::preloadControllers()
