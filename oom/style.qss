@@ -601,7 +601,7 @@ QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Spinner, DoubleRange, 
 }*/
 QToolBar { 
 background-color: #595966; 
-color: #e2e5e5; 
+color: #d0d4d0; 
 border: 0px solid #393941;
 }
 QToolBar::item {
@@ -628,7 +628,7 @@ QToolBar::handle, QToolBar::addToolBarBreak
 
 QMenu{ 
 	background-color: #595966; 
-	color: #e2e5e5; 
+	color: #d0d4d0; 
 	border: 0px; 
 	font-family: "fixed-width";
 	font-weight: normal;
