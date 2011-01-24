@@ -1069,9 +1069,9 @@ void Arranger::genTrackInfo(QWidget*)
 	_tvdock = new TrackViewDock(this);
 	infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
-	_rtabs->addTab(_tvdock, tr(" Track Views "));
-	_rtabs->addTab(mixerScroll, tr(" Mixer "));
-	_rtabs->addTab(infoScroll, tr("  Patch Sequencer  "));
+	_rtabs->addTab(_tvdock, tr("   Track Views   "));
+	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
+	_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
 	//midiTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
 	central = new QWidget(mixerScroll);
 	central->setObjectName("dockMixerCenter");
