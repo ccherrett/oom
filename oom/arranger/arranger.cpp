@@ -1022,8 +1022,6 @@ void Arranger::clear()
                 delete strip;
         }
         m_strips.clear();
-        delete mlayout;
-        mlayout = new QVBoxLayout();
         _lastStrip = 0;
 }
 
