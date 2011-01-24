@@ -1860,7 +1860,7 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 			p.setPen(QColor(255,255,255,127));
 			p.setFont(QFont("fixed-width", 8, QFont::Normal));
 		}
-		p.drawText(rr, Qt::AlignTop | Qt::AlignLeft, part->name());
+		p.drawText(rr, Qt::AlignBottom | Qt::AlignLeft, part->name());
 		p.restore();
 	}
 }
