@@ -494,7 +494,7 @@ QTabWidget#tabControlCenter QTabBar::tab {
     padding-bottom: 8px;
     padding-left: 2px;
     padding-right: 2px;
-	color: #e6e7e6;
+	color: #d6dfd6; 
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 11px;
@@ -506,7 +506,7 @@ QTabWidget#tabControlCenter QTabBar::tab:selected {
                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);*/
     background-color: #101819;
-	color: #42cae6;
+	color: #47cae1; 
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 11px;
@@ -658,7 +658,7 @@ QMenu::item:pressed {
 
 QMenuBar{ 
 	background-color: #595966; 
-	color: #e2e5e5; 
+	color: #d0d4d0; 
 	border: 0px; 
 	font-family: "fixed-width";
 	font-weight: bold;
