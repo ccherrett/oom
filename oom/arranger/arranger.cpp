@@ -1133,7 +1133,6 @@ void Arranger::switchInfo(int n)
         if(selected && n == 2)
         {
                 Strip* w = 0;
-                printf("selected->type() %d\n", selected->type());
 
                 QLayoutItem* item = mlayout->takeAt(0);
                 if(item) {
