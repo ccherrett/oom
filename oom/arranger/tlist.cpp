@@ -239,7 +239,7 @@ void TList::paint(const QRect& r)/*{{{*/
 		if(track->selected())
 			p.setFont(QFont("fixed-width", 10, QFont::Bold));
 		else
-			p.setFont(QFont("fixed-width", 9, QFont::Bold));
+			p.setFont(QFont("fixed-width", 10, QFont::Bold));
 
 		//p.setStyle("font-family: 'fixed-width';")
 
