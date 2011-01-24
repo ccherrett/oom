@@ -85,6 +85,7 @@ Song::Song(const char* name)
 	redoList = new UndoList;
 	_markerList = new MarkerList;
 	_globalPitchShift = 0;
+	viewselected = false;
 	//Create the AutoView
 	TrackView* wv = new TrackView();
 	wv->setViewName("Working View");
@@ -3410,12 +3411,14 @@ void Song::updateTrackViews1()
 {
 	printf("Song::updateTrackViews1()\n");
 	_viewtracks.clear();
+	viewselected = false;
 	bool customview = false;
 	bool workview = false;
 	TrackView* wv = findAutoTrackView("Working View");
 	if(wv && wv->selected())
 	{
 		workview = true;
+		viewselected = true;
 	}
 	for(iTrackView it = _tviews.begin(); it != _tviews.end(); ++it)
 	{
@@ -3441,6 +3444,7 @@ void Song::updateTrackViews1()
 				{
 					_viewtracks.push_back((*t));
 					customview = true;
+					viewselected = true;
 				}
 			}
 		}
@@ -3465,6 +3469,7 @@ void Song::updateTrackViews1()
 				}
 				if(!found)
 				{
+					viewselected = true;
 					switch((*t)->type())/*{{{*/
 					{
 						case Track::MIDI:

@@ -169,7 +169,7 @@ void TList::paint(const QRect& r)/*{{{*/
 
 	//This changes to song->visibletracks()
 	TrackList* l;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		l = song->tracks();
 	else
 		l = song->visibletracks();
@@ -481,7 +481,7 @@ void TList::adjustScrollbar()
 	int h = 0;
 	//This changes to song->visibletracks()
 	TrackList* l;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		l = song->tracks();
 	else
 		l = song->visibletracks();
@@ -499,7 +499,7 @@ Track* TList::y2Track(int y) const
 {
 	//This changes to song->visibletracks()
 	TrackList* l;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		l = song->tracks();
 	else
 		l = song->visibletracks();
@@ -794,10 +794,10 @@ void TList::moveSelection(int n)
 {
 	//This changes to song->visibletracks()
 	TrackList* tracks;
-        if(song->visibletracks()->empty())
+    if(!song->viewselected)
 		tracks = song->tracks();
-        else
-                tracks = song->visibletracks();
+    else
+        tracks = song->visibletracks();
 
 	// check for single selection
 	int nselect = 0;
@@ -861,7 +861,7 @@ TrackList TList::getRecEnabledTracks()
 	TrackList recEnabled;
 	//This changes to song->visibletracks()
 	TrackList* tracks;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tracks = song->tracks();
 	else
 		tracks = song->visibletracks();
@@ -1017,7 +1017,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 
 	//This changes to song->visibletracks()
 	TrackList* tracks;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tracks = song->tracks();
 	else
 		tracks = song->visibletracks();
@@ -1370,7 +1370,7 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 		int ty = -ypos;
 	//This changes to song->visibletracks()
 		TrackList* tracks;
-		if(song->visibletracks()->empty())
+		if(!song->viewselected)
 			tracks = song->tracks();
 		else
 			tracks = song->visibletracks();
@@ -1425,7 +1425,7 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 				mode = DRAG;
 				dragHeight = t->height();
 				//This changes to song->visibletracks()
-				if(song->visibletracks()->empty())
+				if(!song->viewselected)
 					sTrack = song->tracks()->index(t);
 				else
 					sTrack = song->visibletracks()->index(t);
@@ -1441,7 +1441,7 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 			break;
 		case RESIZE:
 		{
-			if(song->visibletracks()->empty())
+			if(!song->viewselected)
 			{
 				if (sTrack >= 0 && (unsigned) sTrack < song->tracks()->size())
 				{
@@ -1495,7 +1495,7 @@ void TList::mouseReleaseEvent(QMouseEvent* ev)
 		if (t)
 		{
 	//This changes to song->visibletracks()
-			if(song->visibletracks()->empty())
+			if(!song->viewselected)
 			{
 				int dTrack = song->tracks()->index(t);
 				audio->msgMoveTrack(sTrack, dTrack);

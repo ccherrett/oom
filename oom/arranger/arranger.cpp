@@ -593,7 +593,7 @@ void Arranger::songChanged(int type)
 				if (t)
 				{
 					TrackList* tl;
-					if(song->visibletracks()->empty())
+					if(!song->viewselected)
 						tl = song->tracks();
 					else
 						tl = song->visibletracks();
@@ -636,7 +636,7 @@ void Arranger::splitterMoved(int pos, int)
 void Arranger::trackSelectionChanged()
 {
 	TrackList* tracks;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tracks = song->tracks();
 	else
 		tracks = song->visibletracks();

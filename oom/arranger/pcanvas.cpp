@@ -142,7 +142,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	trackOffset = 0;
 
 	//This changes to song->visibletracks()
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tracks = song->tracks();
 	else
 		tracks = song->visibletracks();
@@ -161,7 +161,7 @@ int PartCanvas::y2pitch(int y) const
 {
 	//This changes to song->visibletracks()
 	TrackList* tl;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tl = song->tracks();
 	else
 		tl = song->visibletracks();
@@ -186,7 +186,7 @@ int PartCanvas::pitch2y(int p) const
 {
 	//This changes to song->visibletracks()
 	TrackList* tl;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tl = song->tracks();
 	else
 		tl = song->visibletracks();
@@ -276,7 +276,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 	{
 	//This changes to song->visibletracks()
 		TrackList* tl;
-		if(song->visibletracks()->empty())
+		if(!song->viewselected)
 			tl = song->tracks();
 		else
 			tl = song->visibletracks();
@@ -483,7 +483,7 @@ void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 
 bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 {
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tracks = song->tracks();
 	else
 		tracks = song->visibletracks();
@@ -610,7 +610,7 @@ QPoint PartCanvas::raster(const QPoint& p) const
 
 void PartCanvas::partsChanged()
 {
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tracks = song->tracks();
 	else
 		tracks = song->visibletracks();
@@ -677,7 +677,7 @@ void PartCanvas::resizeItem(CItem* i, bool noSnap)
 
 CItem* PartCanvas::newItem(const QPoint& pos, int)
 {
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tracks = song->tracks();
 	else
 		tracks = song->visibletracks();
@@ -1130,7 +1130,7 @@ Track* PartCanvas::y2Track(int y) const
 {
 	//This changes to song->visibletracks()
 	TrackList* l;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		l = song->tracks();
 	else
 		l = song->visibletracks();
@@ -1153,7 +1153,7 @@ int PartCanvas::track2Y(Track * track) const
         int trackYPos = -1;
 
         //This changes to song->visibletracks()
-        if(song->visibletracks()->empty())
+        if(!song->viewselected)
         {
                 l = song->tracks();
         }
@@ -2777,7 +2777,7 @@ void PartCanvas::paste(bool clone, bool toTrack, bool doInsert)
 	{
 	//This changes to song->visibletracks()
 		TrackList* tl;
-		if(song->visibletracks()->empty())
+		if(!song->viewselected)
 			tl = song->tracks();
 		else
 			tl = song->visibletracks();
@@ -3016,7 +3016,7 @@ void PartCanvas::dragLeaveEvent(QDragLeaveEvent*)
 
 void PartCanvas::viewDropEvent(QDropEvent* event)
 {
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tracks = song->tracks();
 	else
 		tracks = song->visibletracks();
@@ -3197,7 +3197,7 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 
 	//This changes to song->visibletracks()
 	TrackList* tl;
-	if(song->visibletracks()->empty())
+	if(!song->viewselected)
 		tl = song->tracks();
 	else
 		tl = song->visibletracks();

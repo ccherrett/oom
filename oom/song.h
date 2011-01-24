@@ -188,6 +188,7 @@ public:
     }
 
     bool dirty;
+	bool viewselected;
     WaveTrack* bounceTrack;
     AudioOutput* bounceOutput;
     void updatePos();
