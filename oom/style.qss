@@ -553,11 +553,9 @@ QTabWidget#tabControlCenter QTabBar::tab:only-one {
 }
 QTabWidget#tabControlCenter QTabBar::tab::disabled {
     color: #8f9198;; /* if there is only one tab, we don't want overlapping margins */
-	background-color: #7e7e88;
 	border-color: #47474d;							
-	etch-disabled-text: 1;
+	background-color: #595966;
 }
-* { etch-disabled-text: 1px }
 QDockWidget {
     /*border: 1px solid lightgray;*/
     titlebar-close-icon: url(:/images/icons/x.png);
