@@ -908,6 +908,39 @@ QSlider::handle:vertical
     border-radius: 3px;
 }
 
+ QRadioButton::indicator {
+     width: 13px;
+     height: 13px;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
+	 color: #d0d4d0;
+ }
+
+ QRadioButton::indicator::unchecked {
+     image: url(:/images/radiobutton_unchecked.png);
+ }
+
+ QRadioButton::indicator:unchecked:hover {
+     image: url(:/images/radiobutton_unchecked_hover.png);
+ }
+
+ QRadioButton::indicator:unchecked:pressed {
+     image: url(:/images/radiobutton_unchecked_pressed.png);
+ }
+
+ QRadioButton::indicator::checked {
+     image: url(:/images/radiobutton_checked.png);
+ }
+
+ QRadioButton::indicator:checked:hover {
+     image: url(:/images/radiobutton_checked_hover.png);
+ }
+
+ QRadioButton::indicator:checked:pressed {
+     image: url(:/images/radiobutton_checked_pressed.png);
+ }
+
 QCheckBox {
      spacing: 5px;
 	 font-family: "fixed-width";

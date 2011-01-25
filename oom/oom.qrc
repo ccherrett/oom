@@ -10,6 +10,12 @@
 		<file>images/checkbox_unchecked.png</file>
 		<file>images/checkbox_unchecked_hover.png</file>
 		<file>images/checkbox_unchecked_pressed.png</file>
+		<file>images/radiobutton_checked.png</file>
+		<file>images/radiobutton_checked_hover.png</file>
+		<file>images/radiobutton_checked_pressed.png</file>
+		<file>images/radiobutton_unchecked.png</file>
+		<file>images/radiobutton_unchecked_hover.png</file>
+		<file>images/radiobutton_unchecked_pressed.png</file>
 		<file>images/up_arrow.png</file>
     	<file>images/up_arrow_disabled.png</file>
      	<file>images/down_arrow.png</file>
