@@ -485,7 +485,7 @@
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>start with template: default.med</string>
+                  <string>start with template: default.oom</string>
                  </property>
                  <property name="checked">
                   <bool>false</bool>

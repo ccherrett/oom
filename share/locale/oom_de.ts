@@ -4246,8 +4246,8 @@ Configuration</source>
         <translation>Jetzige Werte übernehmen</translation>
     </message>
     <message>
-        <source>start with template: default.med</source>
-        <translation>Mit Lied: default.med starten</translation>
+        <source>start with template: default.oom</source>
+        <translation>Mit Lied: default.oom starten</translation>
     </message>
     <message>
         <source>show splash screen</source>

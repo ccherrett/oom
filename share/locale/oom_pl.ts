@@ -4262,8 +4262,8 @@ RTC (Rzeczywista Rozdzielczość Zegara)
         <translation>Ustaw aktualną wartość</translation>
     </message>
     <message>
-        <source>start with template: default.med</source>
-        <translation>Załaduj utwór szablon: default.med</translation>
+        <source>start with template: default.oom</source>
+        <translation>Załaduj utwór szablon: default.oom</translation>
     </message>
     <message>
         <source>show splash screen</source>

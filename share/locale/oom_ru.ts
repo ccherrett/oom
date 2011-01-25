@@ -4459,8 +4459,8 @@ Configuration</source>
         <translation>установить текущее значение</translation>
     </message>
     <message>
-        <source>start with template: default.med</source>
-        <translation>начать с шаблона: default.med</translation>
+        <source>start with template: default.oom</source>
+        <translation>начать с шаблона: default.oom</translation>
     </message>
     <message>
         <source>show splash screen</source>

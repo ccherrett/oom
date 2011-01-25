@@ -941,7 +941,7 @@ void readMidiInputTransform(Xml& xml)
 					// printf("midi Input transform <%s> apply %d\n",
 					//   trans.name.toLatin1().constData(), apply);
 
-					// By T356. A previous bug caused some .med files to grow very large
+					// By T356. A previous bug caused some .oom files to grow very large
 					//  with duplicate transforms. Here we can eliminate those duplicates.
 					for (iMidiInputTransformation i = mtlist.begin(); i != mtlist.end(); ++i)
 					{

@@ -1082,7 +1082,7 @@ void MidiPort::insertPatchSequence(int p, PatchSequence* ps)
 void MidiPort::writeRouting(int level, Xml& xml) const
 {
 	// If this device is not actually in use by the song, do not write any routes.
-	// This prevents bogus routes from being saved and propagated in the med file.
+	// This prevents bogus routes from being saved and propagated in the oom file.
 	if (!device())
 		return;
 

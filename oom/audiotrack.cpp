@@ -985,7 +985,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		// Since (until now) oom wrote a 'zero' for plugin controller current value
 		//  in the XML file, we can't use that value, now that plugin automation is added.
 		// We must take the value from the plugin control value.
-		// Otherwise we break all existing .med files with plugins, because the gui
+		// Otherwise we break all existing .oom files with plugins, because the gui
 		//  controls would all be set to zero.
 		// But we will allow for the (unintended, useless) possibility of a controller
 		//  with no matching plugin control.
@@ -1089,7 +1089,7 @@ void AudioTrack::mapRackPluginsToControllers()
 	// No matter of the outcome of the above - rack position is not too critical -
 	//  making sure that each control has a controller is important. Otherwise they
 	//  are stuck at zero can't be adjusted.
-	// OOMidi med files created before the automation patches (before 0.9pre1) may have broken
+	// OOMidi oom files created before the automation patches (before 0.9pre1) may have broken
 	//  controller sections, so this will allow more tolerance of them.
 	for (int idx = 0; idx < PipelineDepth; idx++)
 	{
@@ -1117,7 +1117,7 @@ void AudioTrack::mapRackPluginsToControllers()
 				l = icl->second;
 
 			// Force all of these now, even though they may have already been set. With a pre-
-			//  0.9pre1 med file with broken controller sections they may not be set correct.
+			//  0.9pre1 oom file with broken controller sections they may not be set correct.
 			float min, max;
 			p->range(i, &min, &max);
 			CtrlValueType t = p->valueType();

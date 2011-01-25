@@ -1035,7 +1035,7 @@ Route name2route(const QString& rn, bool /*dst*/, int rtype)
 	int channel = -1;
 	//int channel = 0;
 	QString s(rn);
-	// Support old route style in med files. Obsolete.
+	// Support old route style in oom files. Obsolete.
 	if (rn[0].isNumber() && rn[1] == ':')
 	{
 		channel = rn[0].toAscii() - int('1');
@@ -1397,7 +1397,7 @@ void Route::read(Xml& xml)
 							{
 								// p3.3.45
 								// We found a device, but if it is not in use by the song (port is -1), ignore it.
-								// This prevents loading and propagation of bogus routes in the med file.
+								// This prevents loading and propagation of bogus routes in the oom file.
 								if (md->midiPort() == -1)
 									break;
 
@@ -1442,7 +1442,7 @@ void Song::readRoute(Xml& xml)
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				// p3.3.38 2010/02/03 Support old routes in med files. Now obsolete!
+				// p3.3.38 2010/02/03 Support old routes in oom files. Now obsolete!
 				if (tag == "srcNode")
 					src = xml.parse1();
 				else if (tag == "dstNode")
@@ -1486,7 +1486,7 @@ void Song::readRoute(Xml& xml)
 			case Xml::TagEnd:
 				if (xml.s1() == "Route")
 				{
-					// Support old routes in med files. Now obsolete!
+					// Support old routes in oom files. Now obsolete!
 					if (!src.isEmpty() && !dst.isEmpty())
 					{
 						Route s = name2route(src, false);

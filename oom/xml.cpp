@@ -208,7 +208,7 @@ again:
 	nextc();
 	if (c == EOF)
 	{
-		printf("unexpected EOF reading *.med file at level %d, line %d, <%s><%s><%s>\n",
+		printf("unexpected EOF reading *.oom file at level %d, line %d, <%s><%s><%s>\n",
 				level, _line, _tag.toLatin1().constData(), _s1.toLatin1().constData(), _s2.toLatin1().constData());
 		return level == 0 ? End : Error;
 	}

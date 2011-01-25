@@ -57,7 +57,7 @@ iEvent EventList::add(Event& event)
 	// Also, when the tempo map is changed, every wave event would have to be
 	//  re-added to the event list so that the proper sorting order (by ticks)
 	//  could be achieved.
-	// Note that in a med file, the tempo list is loaded AFTER all the tracks.
+	// Note that in a oom file, the tempo list is loaded AFTER all the tracks.
 	// There was a bug that all the wave events' tick values were not correct,
 	// since they were computed BEFORE the tempo map was loaded.
 	if (event.type() == Wave)

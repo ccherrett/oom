@@ -18,9 +18,9 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #=============================================================================
 
-file (GLOB med_files *.med)
+file (GLOB oom_files *.oom)
 
-install( FILES ${med_files}
+install( FILES ${oom_files}
       DESTINATION ${OOMidi_SHARE_DIR}/demos
       )
 

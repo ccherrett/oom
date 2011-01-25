@@ -96,7 +96,7 @@ void MidiEventBase::write(int level, Xml& xml, const Pos& offset, bool /*forcePa
 			break;
 	}
 
-	// Changed by T356. BUG: *.med does not save meta event types - ID: 2879426
+	// Changed by T356. BUG: *.oom does not save meta event types - ID: 2879426
 	if (a)
 		xml.nput(" a=\"%d\"", a);
 	if (b)

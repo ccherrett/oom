@@ -439,7 +439,7 @@ void readMidiTransform(Xml& xml)
 			case Xml::TagEnd:
 				if (xml.s1() == "midiTransform")
 				{
-					// By T356. A previous bug caused some .med files to grow very large
+					// By T356. A previous bug caused some .oom files to grow very large
 					//  with duplicate transforms. Here we can eliminate those duplicates.
 					for (iMidiTransformation i = mtlist.begin(); i != mtlist.end(); ++i)
 					{

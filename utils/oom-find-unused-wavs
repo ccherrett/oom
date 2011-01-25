@@ -8,9 +8,9 @@ dirlist = os.listdir(".")
 
 wavs=[]
 
-print "oom-find-unused-wavs - check wav file usage in all *.med files in current dir."
+print "oom-find-unused-wavs - check wav file usage in all *.oom files in current dir."
 print ""
-print "This utility scans all med files in the current dir, maps their"
+print "This utility scans all oom files in the current dir, maps their"
 print "wave file usage to what is currently available in current dir."
 print "The output is printed."
 print "Files no longer used are moved to the subdir 'unused'"
@@ -33,7 +33,7 @@ else:
         print f
 
 for line in dirlist:
-        if (line.endswith( ".med") ):
+        if (line.endswith( ".oom") ):
                 #print "HO!", line
                 med = file(line)
                 for line in med:

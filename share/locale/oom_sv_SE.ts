@@ -4495,8 +4495,8 @@ Configuration</source>
         <translation type="unfinished">sätt nuvarande värden</translation>
     </message>
     <message>
-        <source>start with template: default.med</source>
-        <translation type="unfinished">börja med mall: default.med</translation>
+        <source>start with template: default.oom</source>
+        <translation type="unfinished">börja oom mall: default.oom</translation>
     </message>
     <message>
         <source>show splash screen</source>

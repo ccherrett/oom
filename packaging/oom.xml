@@ -2,8 +2,8 @@
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
         <mime-type type="application/x-oom">
                 <comment>OOMidi file</comment>
-                <glob pattern="*.med"/>
-                <glob pattern="*.med.bz2"/>
-                <glob pattern="*.med.gz"/>
+                <glob pattern="*.oom"/>
+                <glob pattern="*.oom.bz2"/>
+                <glob pattern="*.oom.gz"/>
         </mime-type>
 </mime-info>

@@ -1429,7 +1429,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	else if (config.startMode == 1)
 	{
 		printf("starting with default template\n");
-		name = oomGlobalShare + QString("/templates/default.med");
+		name = oomGlobalShare + QString("/templates/default.oom");
 		useTemplate = true;
 	}
 	else if (config.startMode == 2)
@@ -1544,7 +1544,7 @@ void OOMidi::localOff()
 
 //---------------------------------------------------------
 //   loadProjectFile
-//    load *.med, *.mid, *.kar
+//    load *.oom, *.mid, *.kar
 //
 //    template - if true, load file but do not change
 //                project name
@@ -1590,7 +1590,7 @@ void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAl
 
 //---------------------------------------------------------
 //   loadProjectFile
-//    load *.med, *.mid, *.kar
+//    load *.oom, *.mid, *.kar
 //
 //    template - if true, load file but do not change
 //                project name
@@ -1637,14 +1637,13 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	if ((mex == "gz") || (mex == "bz2"))
 		mex = ex.section('.', -2, -2);
 
-	//if (ex.isEmpty() || ex == "med.") {
-	if (ex.isEmpty() || mex == "med")
+	if (ex.isEmpty() || mex == "oom")
 	{
 		//
-		//  read *.med file
+		//  read *.oom file
 		//
 		bool popenFlag;
-		FILE* f = fileOpen(this, fi.filePath(), QString(".med"), "r", popenFlag, true);
+		FILE* f = fileOpen(this, fi.filePath(), QString(".oom"), "r", popenFlag, true);
 		if (f == 0)
 		{
 			if (errno != ENOENT)
@@ -1658,9 +1657,9 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		}
 		else
 		{
-            // Load the .med file into a QDomDocument.
+            // Load the .oom file into a QDomDocument.
             // the xml parser of QDomDocument then will be able to tell us
-            // if the .med file didn't get corrupted in some way, cause the
+            // if the .oom file didn't get corrupted in some way, cause the
             // internal xml parser of oom can't do that.
             QDomDocument doc("OOMProject");
             QFile file(fi.filePath());
@@ -1939,15 +1938,19 @@ bool OOMidi::save(const QString& name, bool overwriteWarn)
 	{
 		backupCommand.sprintf("cp \"%s\" \"%s.backup\"", name.toLatin1().constData(), name.toLatin1().constData());
 	}
-	else if (QFile::exists(name + QString(".med")))
+	else if (QFile::exists(name + QString(".oom")))
 	{
-		backupCommand.sprintf("cp \"%s.med\" \"%s.med.backup\"", name.toLatin1().constData(), name.toLatin1().constData());
+		backupCommand.sprintf("cp \"%s.oom\" \"%s.oom.backup\"", name.toLatin1().constData(), name.toLatin1().constData());
 	}
 	if (!backupCommand.isEmpty())
-		system(backupCommand.toLatin1().constData());
+	{
+		int tmp = system(backupCommand.toLatin1().constData());
+		if(debugMsg)
+			printf("Creating project backup: %d", tmp);
+	}
 
 	bool popenFlag;
-	FILE* f = fileOpen(this, name, QString(".med"), "w", popenFlag, false, overwriteWarn);
+	FILE* f = fileOpen(this, name, QString(".oom"), "w", popenFlag, false, overwriteWarn);
 	if (f == 0)
 		return false;
 	Xml xml(f);
@@ -2033,9 +2036,11 @@ void OOMidi::closeEvent(QCloseEvent* event)
 	FILE* f = fopen(prjPath.toLatin1().constData(), "w");
 	if (f)
 	{
+		QList<QString*> uniq;
 		for (int i = 0; i < PROJECT_LIST_LEN; ++i)
 		{
-			fprintf(f, "%s\n", projectList[i] ? projectList[i]->toLatin1().constData() : "");
+			if(projectList[i] && (uniq.isEmpty() || !uniq.contains(projectList[i])))
+				fprintf(f, "%s\n", projectList[i]->toLatin1().constData());
 		}
 		fclose(f);
 	}
@@ -4547,7 +4552,7 @@ OOMidi::lash_idle_cb()
 			case LASH_Save_File:
 			{
 				/* save file */
-				QString ss = QString(lash_event_get_string(event)) + QString("/lash-project-oom.med");
+				QString ss = QString(lash_event_get_string(event)) + QString("/lash-project-oom.oom");
 				int ok = save(ss.toAscii(), false);
 				if (ok)
 				{
@@ -4563,7 +4568,7 @@ OOMidi::lash_idle_cb()
 			case LASH_Restore_File:
 			{
 				/* load file */
-				QString sr = QString(lash_event_get_string(event)) + QString("/lash-project-oom.med");
+				QString sr = QString(lash_event_get_string(event)) + QString("/lash-project-oom.oom");
 				loadProjectFile(sr.toAscii(), false, true);
 				lash_send_event(lash_client, event);
 			}

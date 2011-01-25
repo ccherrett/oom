@@ -37,37 +37,10 @@ class Splitter;
 class LabelCombo;
 class PosLabel;
 class MidiTrackInfo;
-class WidgetStack;
 class AudioStrip;
 class Strip;
 class SpinBox;
 class TrackViewDock;
-
-//---------------------------------------------------------
-//   WidgetStack
-//---------------------------------------------------------
-
-class WidgetStack : public QWidget
-{
-    Q_OBJECT
-    std::vector<QWidget*> stack;
-    int top;
-
-public:
-    WidgetStack(QWidget* parent, const char* name = 0);
-    void raiseWidget(int idx);
-    void addWidget(QWidget* w, unsigned int idx);
-    QWidget* getWidget(unsigned int idx);
-    QWidget* visibleWidget() const;
-
-    int curIdx() const
-    {
-        return top;
-    }
-    virtual QSize minimumSizeHint() const;
-    //QSize minimumSize() const;
-    //int minimumHeight() const;
-};
 
 //---------------------------------------------------------
 //   Arranger
@@ -86,10 +59,6 @@ class Arranger : public QWidget
     MTScale* time;
     SpinBox* lenEntry;
     bool showTrackinfoFlag;
-    //WidgetStack* trackInfo;
-    //QStackedWidget* trackInfo;
-   // QScrollBar* infoScroll;
-    //MidiTrackInfoBase* midiTrackInfo;
     MidiTrackInfo* midiTrackInfo;
 	QScrollArea *infoScroll;
 	QScrollArea *mixerScroll;
@@ -101,7 +70,6 @@ class Arranger : public QWidget
     QToolButton* ib;
     int trackInfoType;
     Splitter* split;
-    ///QMenu* pop;
     int songType;
     PosLabel* cursorPos;
     SpinBox* globalTempoSpinBox;

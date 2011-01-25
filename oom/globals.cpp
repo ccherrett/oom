@@ -154,47 +154,20 @@ const QStringList midi_file_save_pattern =
       QString("Karaoke (*.kar);;") +
       QString("All Files (*)")).split(";;");
 
-/*
-const char* med_file_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "med Files (*.med *.med.gz *.med.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "Uncompressed med Files (*.med)"),
-      QT_TRANSLATE_NOOP("@default", "gzip compressed med Files (*.med.gz)"),
-      QT_TRANSLATE_NOOP("@default", "bzip2 compressed med Files (*.med.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-const char* med_file_save_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "Uncompressed med Files (*.med)"),
-      QT_TRANSLATE_NOOP("@default", "gzip compressed med Files (*.med.gz)"),
-      QT_TRANSLATE_NOOP("@default", "bzip2 compressed med Files (*.med.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-*/      
 const QStringList med_file_pattern =  
       QT_TRANSLATE_NOOP("@default", 
-      QString("med Files (*.med *.med.gz *.med.bz2);;") +
-      QString("Uncompressed med Files (*.med);;") +
-      QString("gzip compressed med Files (*.med.gz);;") +
-      QString("bzip2 compressed med Files (*.med.bz2);;") +
+      QString("oom Files (*.oom *.oom.gz *.oom.bz2);;") +
+      QString("Uncompressed oom Files (*.oom);;") +
+      QString("gzip compressed oom Files (*.oom.gz);;") +
+      QString("bzip2 compressed oom Files (*.oom.bz2);;") +
       QString("All Files (*)")).split(";;");
 const QStringList med_file_save_pattern =  
       QT_TRANSLATE_NOOP("@default", 
-      QString("Uncompressed med Files (*.med);;") +
-      QString("gzip compressed med Files (*.med.gz);;") +
-      QString("bzip2 compressed med Files (*.med.bz2);;") +
+      QString("Uncompressed oom Files (*.oom);;") +
+      QString("gzip compressed oom Files (*.oom.gz);;") +
+      QString("bzip2 compressed oom Files (*.oom.bz2);;") +
       QString("All Files (*)")).split(";;");
 
-/*
-const char* image_file_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "(*.jpg *.gif *.png)"),
-      QT_TRANSLATE_NOOP("@default", "(*.jpg)"),
-      QT_TRANSLATE_NOOP("@default", "(*.gif)"),
-      QT_TRANSLATE_NOOP("@default", "(*.png)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-*/      
 const QStringList image_file_pattern =  
       QT_TRANSLATE_NOOP("@default", 
       QString("(*.jpg *.gif *.png);;") +
@@ -203,30 +176,6 @@ const QStringList image_file_pattern =
       QString("(*.png);;") +
       QString("All Files (*)")).split(";;");
 
-// Not used.
-/*
-const char* ctrl_file_pattern[] = {
-      "ctrl Files (*.ctrl *.ctrl.gz *.ctrl.bz2)",
-      "All Files (*)",
-      0
-      };
-*/
-
-/*
-const char* part_file_pattern[] = {
-      //QT_TRANSLATE_NOOP("@default", "part Files (*.mpt)"),
-      QT_TRANSLATE_NOOP("@default", "part Files (*.mpt *.mpt.gz *.mpt.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-const char* part_file_save_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "part Files (*.mpt)"),
-      QT_TRANSLATE_NOOP("@default", "gzip compressed part Files (*.mpt.gz)"),
-      QT_TRANSLATE_NOOP("@default", "bzip2 compressed part Files (*.mpt.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-*/
 const QStringList part_file_pattern =  
       QT_TRANSLATE_NOOP("@default", 
       QString("part Files (*.mpt *.mpt.gz *.mpt.bz2);;") +
@@ -239,28 +188,6 @@ const QStringList part_file_save_pattern =
       QString("bzip2 compressed part Files (*.mpt.bz2);;") +
       QString("All Files (*)")).split(";;");
 
-/*
-const char* plug_file_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "part Files (*.pre)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-*/
-/*
-const char* preset_file_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "Presets (*.pre *.pre.gz *.pre.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-
-const char* preset_file_save_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "Presets (*.pre)"),
-      QT_TRANSLATE_NOOP("@default", "gzip compressed presets (*.pre.gz)"),
-      QT_TRANSLATE_NOOP("@default", "bzip2 compressed presets (*.pre.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-*/
 const QStringList preset_file_pattern =  
       QT_TRANSLATE_NOOP("@default", 
       QString("Presets (*.pre *.pre.gz *.pre.bz2);;") +

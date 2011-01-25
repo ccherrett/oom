@@ -951,7 +951,7 @@ iPart PartList::add(Part* part)
 	// Also, when the tempo map is changed, every wavepart would have to be
 	//  re-added to the part list so that the proper sorting order (by ticks)
 	//  could be achieved.
-	// Note that in a med file, the tempo list is loaded AFTER all the tracks.
+	// Note that in a oom file, the tempo list is loaded AFTER all the tracks.
 	// There was a bug that all the wave parts' tick values were not correct,
 	// since they were computed BEFORE the tempo map was loaded.
 	if (part->type() == Pos::FRAMES)

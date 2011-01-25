@@ -4471,7 +4471,7 @@ Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>start with template: default.med</source>
+        <source>start with template: default.oom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

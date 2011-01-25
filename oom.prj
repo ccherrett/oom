@@ -149,7 +149,7 @@
   (share/html/right_pane.jpg (oom/n/44_right_pane 1.1 644) :no-keywords)
 
   (demos/Makefile.am (oom/n/45_Makefile.a 1.1 644))
-  (demos/rasen.med (oom/n/46_rasen.med 1.1 644))
+  (demos/rasen.oom (oom/n/46_rasen.oom 1.1 644))
 
   (oom/Makefile.am (oom/n/47_Makefile.a 1.1 644))
 

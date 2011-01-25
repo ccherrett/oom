@@ -3103,7 +3103,7 @@ void PartCanvas::viewDropEvent(QDropEvent* event)
 				}
 			}
 		}
-		else if (text.endsWith(".med", Qt::CaseInsensitive))
+		else if (text.endsWith(".oom", Qt::CaseInsensitive))
 		{
 			emit dropSongFile(text);
 		}

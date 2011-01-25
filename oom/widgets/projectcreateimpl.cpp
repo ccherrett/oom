@@ -46,13 +46,13 @@ void ProjectCreateImpl::updateDirectoryPath()
 	if (createFolderCheckbox->isChecked())
 	{
 		if (!projectNameEdit->text().isEmpty())
-			name = projectNameEdit->text() + "/" + projectNameEdit->text() + ".med";
+			name = projectNameEdit->text() + "/" + projectNameEdit->text() + ".oom";
 		storageDirEdit->setText(directoryPath + name );
 	}
 	else
 	{
 		if (!projectNameEdit->text().isEmpty())
-			name = projectNameEdit->text() + ".med";
+			name = projectNameEdit->text() + ".oom";
 		storageDirEdit->setText(directoryPath + "/" + name);
 	}
 }

@@ -1018,7 +1018,7 @@ void OOMidi::readToplevels(Xml& xml)
 				{
 					// p3.3.34
 					// Do not open if there are no parts.
-					// Had bogus '-1' part index for list edit in med file,
+					// Had bogus '-1' part index for list edit in oom file,
 					//  causing list edit to segfault on song load.
 					// Somehow that -1 was put there on write, because the
 					//  current part didn't exist anymore, so no index number
