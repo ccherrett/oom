@@ -262,6 +262,10 @@ int main(int argc, char* argv[])
 	initMidiController();
 	QApplication::setColorSpec(QApplication::ManyColor);
 	OOMidiApplication app(argc, argv);
+	app.setStyleSheet("QMessageBox{background-color: #595966;} QPushButton{border-radius: 3px; padding: 5px; background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #626272, stop:0.1 #5b5b6b, stop: 1.0 #4d4d5b); border: 1px solid #393941; font-family: fixed-width;	font-weight: bold; font-size: 11px; color: #d0d4d0; } QPushButton:pressed, QPushButton::checked, QPushButton::hover { color: #e2e5e5; border-radius: 3px; padding: 3px; border: 1px solid #181819; background-color: #393941; }");
+	QPalette p = QApplication::palette();
+	p.setColor(QPalette::Disabled, QPalette::Light, QColor(89,89,102));
+	QApplication::setPalette(p);
 
 	initShortCuts();
 	readConfiguration();

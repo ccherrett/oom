@@ -566,6 +566,7 @@ QDockWidget {
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 11px;
+	background-color: #595966;
 	
 }
 
