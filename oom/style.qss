@@ -908,6 +908,26 @@ QSlider::handle:vertical
     border-radius: 3px;
 }
 
+ QGroupBox {
+     border: 2px solid #313133;
+     border-radius: 5px;
+     margin-top: 1ex; /* leave space at the top for the title */
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 13px;
+	 color: #d0d4d0;
+ }
+
+ QGroupBox::title {
+     subcontrol-origin: margin;
+     subcontrol-position: top left; /* position at the top center */
+     padding: 0 3px;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 13px;
+	 color: #d0d4d0;
+ }
+
 QRadioButton {
      spacing: 5px;
 	 font-family: "fixed-width";
