@@ -928,7 +928,7 @@ PyObject* addOutput(PyObject*, PyObject*)
 
 PyObject* addGroup(PyObject*, PyObject*)
 {
-	QPybridgeEvent* pyevent = new QPybridgeEvent(QPybridgeEvent::SONG_ADD_TRACK, Track::AUDIO_GROUP);
+	QPybridgeEvent* pyevent = new QPybridgeEvent(QPybridgeEvent::SONG_ADD_TRACK, Track::AUDIO_BUSS);
 	QApplication::postEvent(song, pyevent);
 	return Py_None;
 }

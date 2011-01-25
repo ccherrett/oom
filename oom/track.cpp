@@ -24,7 +24,7 @@ bool Track::_tmpSoloChainDoIns = false;
 bool Track::_tmpSoloChainNoDec = false;
 
 const char* Track::_cname[] = {
-	"Midi", "Drum", "Wave", "AudioOut", "AudioIn", "AudioGroup",
+	"Midi", "Drum", "Wave", "AudioOut", "AudioIn", "AudioBuss",
 	"AudioAux", "AudioSynth"
 };
 
@@ -302,8 +302,8 @@ void Track::setDefaultName()
 		case AUDIO_OUTPUT:
 			base = QString("Out");
 			break;
-		case AUDIO_GROUP:
-			base = QString("Group");
+		case AUDIO_BUSS:
+			base = QString("Buss");
 			break;
 		case AUDIO_AUX:
 			base = QString("Aux");

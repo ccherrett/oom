@@ -58,7 +58,7 @@ blocks = [
 
 # To store array of audio groups
 # input, group1,2,3,4 + master
-AudioGroupTags = [
+AudioBussTags = [
 "<channels>","<connect>","<volume>","<pan>",
 "<mute>","<solo>","<prefader>","<off>"]
 adata=[]
@@ -388,7 +388,7 @@ class OOMidiConvert:
 					# we're in business, add ALL stored info:
 					# 1. AudioOutput
 					# 2. AudioInput
-					# 3. AudioGroup
+					# 3. AudioBuss
 					# 4. SynthI
 					# 5. Routes
 					#
@@ -472,7 +472,7 @@ class OOMidiConvert:
 					# 3.                   
 					for line in adata:     
 						if line[0] == "audiogroup":
-							outFile.write("      <AudioGroup>\n")
+							outFile.write("      <AudioBuss>\n")
 							outFile.write("        <name>%s</name>\n"%line[1])
 							outFile.write("        <record>0</record>\n")
 							outFile.write("        <mute>%s</mute>\n"%line[7])
@@ -503,7 +503,7 @@ class OOMidiConvert:
 											print "%s line[14] %s"%(line[1],line[14])
 											for pl in line[14]:
 												outFile.write(pl)
-							outFile.write("      </AudioGroup>\n")
+							outFile.write("      </AudioBuss>\n")
 
 					# 4.                   
 					for line in adata:     

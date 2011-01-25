@@ -224,7 +224,7 @@ haz click en una parte para silenciar/des-silenciar</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add Audio Group</source>
+        <source>Add Audio Buss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

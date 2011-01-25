@@ -219,7 +219,7 @@ click on part to mute/unmute</source>
         <translation>Audioausgang erzeugen</translation>
     </message>
     <message>
-        <source>Add Audio Group</source>
+        <source>Add Audio Buss</source>
         <translation>Audiogruppe erzeugen</translation>
     </message>
     <message>

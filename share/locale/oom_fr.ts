@@ -263,7 +263,7 @@ You can also select the Save command from the File menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add Audio Group</source>
+        <source>Add Audio Buss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

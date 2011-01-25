@@ -190,7 +190,7 @@
       <controller id="1" cur="0">
         </controller>
       </wavetrack>
-    <AudioGroup>
+    <AudioBuss>
       <name>Group 1</name>
       <record>0</record>
       <mute>0</mute>
@@ -210,8 +210,8 @@
         </controller>
       <controller id="1" cur="0">
         </controller>
-      </AudioGroup>
-    <AudioGroup>
+      </AudioBuss>
+    <AudioBuss>
       <name>Group 2</name>
       <record>0</record>
       <mute>0</mute>
@@ -231,7 +231,7 @@
         </controller>
       <controller id="1" cur="0">
         </controller>
-      </AudioGroup>
+      </AudioBuss>
     <AudioAux>
       <name>Aux 1</name>
       <record>0</record>

@@ -1155,9 +1155,9 @@ void Arranger::switchInfo(int n)
                                 w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
                                 w->setObjectName("MixerAudioOutStrip");
                                 break;
-                        case Track::AUDIO_GROUP:
+                        case Track::AUDIO_BUSS:
                                 w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-                                w->setObjectName("MixerAudioGroupStrip");
+                                w->setObjectName("MixerAudioBussStrip");
                                 break;
                         case Track::AUDIO_AUX:
                                 w = new AudioStrip(mixerScroll, (AudioTrack*) selected);

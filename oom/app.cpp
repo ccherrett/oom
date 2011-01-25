@@ -592,8 +592,8 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 	aoutput->setData(Track::AUDIO_OUTPUT);
 	grp->addAction(aoutput);
 	QAction* agroup = addTrack->addAction(QIcon(*addtrack_audiogroupIcon),
-			QT_TRANSLATE_NOOP("@default", "Add Audio Group"));
-	agroup->setData(Track::AUDIO_GROUP);
+			QT_TRANSLATE_NOOP("@default", "Add Audio Buss"));
+	agroup->setData(Track::AUDIO_BUSS);
 	grp->addAction(agroup);
 	QAction* ainput = addTrack->addAction(QIcon(*addtrack_audioinputIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Audio Input"));
@@ -1839,7 +1839,7 @@ void OOMidi::setConfigDefaults()
 		configBigTimeVisible = false;
 
 		for (int channel = 0; channel < 2; ++channel)
-			song->addTrack(Track::AUDIO_GROUP);
+			song->addTrack(Track::AUDIO_BUSS);
 		AudioTrack* out = (AudioTrack*) song->addTrack(Track::AUDIO_OUTPUT);
 		AudioTrack* in = (AudioTrack*) song->addTrack(Track::AUDIO_INPUT);
 
@@ -4760,7 +4760,7 @@ void OOMidi::updateConfiguration()
 	trackDrumAction->setShortcut(shortcuts[SHRT_ADD_DRUM_TRACK].key);
 	trackWaveAction->setShortcut(shortcuts[SHRT_ADD_WAVE_TRACK].key);
 	trackAOutputAction->setShortcut(shortcuts[SHRT_ADD_AUDIO_OUTPUT].key);
-	trackAGroupAction->setShortcut(shortcuts[SHRT_ADD_AUDIO_GROUP].key);
+	trackAGroupAction->setShortcut(shortcuts[SHRT_ADD_AUDIO_BUSS].key);
 	trackAInputAction->setShortcut(shortcuts[SHRT_ADD_AUDIO_INPUT].key);
 	trackAAuxAction->setShortcut(shortcuts[SHRT_ADD_AUDIO_AUX].key);
 

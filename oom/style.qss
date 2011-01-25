@@ -271,18 +271,18 @@ QFrame#MidiTrackStrip QLabel#MidiTrackLabel  {
 	padding: 3px;
 }
 
-/* Mixer AudioGroup Track Style*/
-QFrame#MixerAudioGroupStrip { 
+/* Mixer AudioBuss Track Style*/
+QFrame#MixerAudioBussStrip { 
 	border: 1px solid #29292a;
 	/*background-color: #4a5152;*/
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6c797b, stop:0.5 #3a4041);
 	border-radius: 7px;
 }
-QFrame#MixerAudioGroupStrip QLabel { 
+QFrame#MixerAudioBussStrip QLabel { 
 	background-color: none;
 	color: #d7d7d7;
 }
-QFrame#MixerAudioGroupStrip QLabel#MixerAudioGroupLabel
+QFrame#MixerAudioBussStrip QLabel#MixerAudioBussLabel
 {
     border: 1px solid #393941;
 	border-radius: 3px;

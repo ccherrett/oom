@@ -222,7 +222,7 @@ klicka på en part för att Tysta/Avtysta</translation>
         <translation type="unfinished">Lägg till Ljudutgång</translation>
     </message>
     <message>
-        <source>Add Audio Group</source>
+        <source>Add Audio Buss</source>
         <translation type="unfinished">Lägg till Ljudgrupp</translation>
     </message>
     <message>

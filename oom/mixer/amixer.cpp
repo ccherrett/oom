@@ -304,8 +304,8 @@ void AudioMixerApp::addStrip(Track* t, int idx)
 			case Track::AUDIO_OUTPUT:
 				strip->setObjectName("MixerAudioOutStrip");
 				break;
-			case Track::AUDIO_GROUP:
-				strip->setObjectName("MixerAudioGroupStrip");
+			case Track::AUDIO_BUSS:
+				strip->setObjectName("MixerAudioBussStrip");
 				break;
 			case Track::AUDIO_AUX:
 				strip->setObjectName("MixerAuxStrip");
@@ -512,7 +512,7 @@ void AudioMixerApp::updateMixer(UpdateAction action)
 	if (cfg->showGroupTracks)
 	{
 		GroupList* gtl = song->groups();
-		for (iAudioGroup i = gtl->begin(); i != gtl->end(); ++i)
+		for (iAudioBuss i = gtl->begin(); i != gtl->end(); ++i)
 			addStrip(*i, idx++);
 	}
 

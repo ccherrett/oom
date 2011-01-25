@@ -76,7 +76,7 @@ void initShortCuts()
 	defShrt(SHRT_ADD_DRUM_TRACK, Qt::SHIFT + Qt::Key_D, "Add drum track", ARRANG_SHRT, "add_drum_track");
 	defShrt(SHRT_ADD_WAVE_TRACK, Qt::SHIFT + Qt::Key_W, "Add wave track", ARRANG_SHRT, "add_wave_track");
 	defShrt(SHRT_ADD_AUDIO_OUTPUT, Qt::SHIFT + Qt::Key_O, "Add audio output", ARRANG_SHRT, "add_audio_output");
-	defShrt(SHRT_ADD_AUDIO_GROUP, Qt::SHIFT + Qt::Key_G, "Add audio group", ARRANG_SHRT, "add_audio_group");
+	defShrt(SHRT_ADD_AUDIO_BUSS, Qt::SHIFT + Qt::Key_G, "Add audio group", ARRANG_SHRT, "add_audio_group");
 	defShrt(SHRT_ADD_AUDIO_INPUT, Qt::SHIFT + Qt::Key_I, "Add audio input", ARRANG_SHRT, "add_audio_input");
 	defShrt(SHRT_ADD_AUDIO_AUX, 0, "Add audio aux", ARRANG_SHRT, "add_audio_aux");
 	defShrt(SHRT_GLOBAL_CUT, 0, "Structure: Global cut", ARRANG_SHRT, "global_cut");

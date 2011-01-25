@@ -151,7 +151,7 @@ enum
     SHRT_ADD_DRUM_TRACK, //Default: undefined
     SHRT_ADD_WAVE_TRACK, //Default: undefined
     SHRT_ADD_AUDIO_OUTPUT, //Default: undefined
-    SHRT_ADD_AUDIO_GROUP, //Default: undefined
+    SHRT_ADD_AUDIO_BUSS, //Default: undefined
     SHRT_ADD_AUDIO_INPUT, //Default: undefined
     SHRT_ADD_AUDIO_AUX, //Default: undefined
     SHRT_RESET_MIDI, //Ctrl+Alt+Z

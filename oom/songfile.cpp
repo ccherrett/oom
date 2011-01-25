@@ -1329,9 +1329,9 @@ void Song::read(Xml& xml)
 					insertTrack0(track, -1);
 					track->showPendingPluginNativeGuis();
 				}
-				else if (tag == "AudioGroup")
+				else if (tag == "AudioBuss" || tag == "AudioGroup")
 				{
-					AudioGroup* track = new AudioGroup();
+					AudioBuss* track = new AudioBuss();
 					track->read(xml);
 					insertTrack0(track, -1);
 					track->showPendingPluginNativeGuis();

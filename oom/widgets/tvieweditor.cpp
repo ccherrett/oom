@@ -36,7 +36,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(p
 {
 	setupUi(this);
 	_selected = 0;
-//MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP,AUDIO_AUX
+//MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_BUSS,AUDIO_AUX
 	_trackTypes = (QStringList() << "All Types" << "Audio_Out" << "Audio_In" << "Audio_Aux" << "Audio_Group" << "Midi" << "Soft_Synth" << "Wave"); //new QStringList();
 	_editing = false;
 	_addmode = false;

@@ -214,7 +214,7 @@ void TList::paint(const QRect& r)/*{{{*/
 				case Track::AUDIO_INPUT:
 					bg = config.inputTrackBg;
 					break;
-				case Track::AUDIO_GROUP:
+				case Track::AUDIO_BUSS:
 					bg = config.groupTrackBg;
 					break;
 				case Track::AUDIO_AUX:
@@ -279,7 +279,7 @@ void TList::paint(const QRect& r)/*{{{*/
 						case Track::AUDIO_INPUT:
 							pm = addtrack_audioinputIcon;
 							break;
-						case Track::AUDIO_GROUP:
+						case Track::AUDIO_BUSS:
 							pm = addtrack_audiogroupIcon;
 							break;
 						case Track::AUDIO_AUX:
@@ -652,7 +652,7 @@ void TList::portsPopupMenu(Track* t, int x, int y)/*{{{*/
 		case Track::WAVE:
 		case Track::AUDIO_OUTPUT:
 		case Track::AUDIO_INPUT:
-		case Track::AUDIO_GROUP:
+		case Track::AUDIO_BUSS:
 		case Track::AUDIO_AUX: //TODO
 			break;
 	}
@@ -935,8 +935,8 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					tr("Add Output"));
 			aoutput->setData(Track::AUDIO_OUTPUT);
 			QAction* agroup = p->addAction(*addtrack_audiogroupIcon,
-					tr("Add Group"));
-			agroup->setData(Track::AUDIO_GROUP);
+					tr("Add Buss"));
+			agroup->setData(Track::AUDIO_BUSS);
 			QAction* ainput = p->addAction(*addtrack_audioinputIcon,
 					tr("Add Input"));
 			ainput->setData(Track::AUDIO_INPUT);

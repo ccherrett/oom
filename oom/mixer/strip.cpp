@@ -100,7 +100,7 @@ void Strip::setLabelText()
 	//       case Track::AUDIO_OUTPUT:
 	//             c = Qt::green;
 	//             break;
-	//       case Track::AUDIO_GROUP:
+	//       case Track::AUDIO_BUSS:
 	//             c = Qt::yellow;
 	//             break;
 	//       case Track::AUDIO_AUX:
@@ -214,8 +214,8 @@ Strip::Strip(QWidget* parent, Track* t)
 		case Track::AUDIO_OUTPUT:
 			label->setObjectName("MixerAudioOutLabel");
 			break;
-		case Track::AUDIO_GROUP:
-			label->setObjectName("MixerAudioGroupLabel");
+		case Track::AUDIO_BUSS:
+			label->setObjectName("MixerAudioBussLabel");
 			break;
 		case Track::AUDIO_AUX:
 			label->setObjectName("MixerAuxLabel");

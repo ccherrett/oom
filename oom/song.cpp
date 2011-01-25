@@ -259,8 +259,8 @@ Track* Song::addTrack(int t)/*{{{*/
 		case Track::AUDIO_OUTPUT:
 			track = new AudioOutput();
 			break;
-		case Track::AUDIO_GROUP:
-			track = new AudioGroup();
+		case Track::AUDIO_BUSS:
+			track = new AudioBuss();
 			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
 			break;
 		case Track::AUDIO_AUX:
@@ -345,7 +345,7 @@ Track* Song::addTrack(int t)/*{{{*/
 				//      break;
 
 			case Track::WAVE:
-				//case Track::AUDIO_GROUP:  // Removed by Tim.
+				//case Track::AUDIO_BUSS:  // Removed by Tim.
 			case Track::AUDIO_AUX:
 				//case Track::AUDIO_INPUT:  // Removed by Tim.
 				// p3.3.38
@@ -3489,7 +3489,7 @@ void Song::updateTrackViews1()
 								_viewtracks.push_back((*t));
 							}
 							break;
-						case Track::AUDIO_GROUP:
+						case Track::AUDIO_BUSS:
 							if((*ait)->viewName() == "Buss View")
 							{
 								_viewtracks.push_back((*t));
@@ -3589,8 +3589,8 @@ void Song::insertTrack2(Track* track, int idx)
 			if (audio->audioMonitor() == 0)
 				audio->setMonitor((AudioOutput*) track);
 			break;
-		case Track::AUDIO_GROUP:
-			_groups.push_back((AudioGroup*) track);
+		case Track::AUDIO_BUSS:
+			_groups.push_back((AudioBuss*) track);
 			break;
 		case Track::AUDIO_AUX:
 			_auxs.push_back((AudioAux*) track);
@@ -3783,7 +3783,7 @@ void Song::removeTrack1(Track* track)
 		case Track::WAVE:
 		case Track::AUDIO_OUTPUT:
 		case Track::AUDIO_INPUT:
-		case Track::AUDIO_GROUP:
+		case Track::AUDIO_BUSS:
 		case Track::AUDIO_AUX:
 		case Track::AUDIO_SOFTSYNTH:
 			((AudioTrack*) track)->deleteAllEfxGuis();
@@ -3842,7 +3842,7 @@ void Song::removeTrack2(Track* track)
 		case Track::AUDIO_INPUT:
 			_inputs.erase(track);
 			break;
-		case Track::AUDIO_GROUP:
+		case Track::AUDIO_BUSS:
 			_groups.erase(track);
 			break;
 		case Track::AUDIO_AUX:

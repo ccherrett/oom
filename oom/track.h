@@ -38,7 +38,7 @@ public:
 
     enum TrackType
     {
-        MIDI = 0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_GROUP,
+        MIDI = 0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_BUSS,
         AUDIO_AUX, AUDIO_SOFTSYNTH
     };
 private:
@@ -491,7 +491,7 @@ public:
 //---------------------------------------------------------
 //   AudioTrack
 //    this track can hold audio automation data and can
-//    hold tracktypes AUDIO, AUDIO_MASTER, AUDIO_GROUP,
+//    hold tracktypes AUDIO, AUDIO_MASTER, AUDIO_BUSS,
 //    AUDIO_INPUT, AUDIO_SOFTSYNTH, AUDIO_AUX
 //---------------------------------------------------------
 
@@ -808,26 +808,26 @@ public:
 };
 
 //---------------------------------------------------------
-//   AudioGroup
+//   AudioBuss
 //---------------------------------------------------------
 
-class AudioGroup : public AudioTrack
+class AudioBuss : public AudioTrack
 {
 public:
 
-    AudioGroup() : AudioTrack(AUDIO_GROUP)
+    AudioBuss() : AudioTrack(AUDIO_BUSS)
     {
     }
-    //AudioGroup* clone() const { return new AudioGroup(*this); }
+    //AudioBuss* clone() const { return new AudioBuss(*this); }
 
-    AudioGroup* clone(bool /*cloneParts*/) const
+    AudioBuss* clone(bool /*cloneParts*/) const
     {
-        return new AudioGroup(*this);
+        return new AudioBuss(*this);
     }
 
-    virtual AudioGroup* newTrack() const
+    virtual AudioBuss* newTrack() const
     {
-        return new AudioGroup();
+        return new AudioBuss();
     }
     virtual void read(Xml&);
     virtual void write(int, Xml&) const;
@@ -1158,9 +1158,9 @@ typedef tracklist<AudioOutput*>::iterator iAudioOutput;
 typedef tracklist<AudioOutput*>::const_iterator ciAudioOutput;
 typedef tracklist<AudioOutput*> OutputList;
 
-typedef tracklist<AudioGroup*>::iterator iAudioGroup;
-typedef tracklist<AudioGroup*>::const_iterator ciAudioGroup;
-typedef tracklist<AudioGroup*> GroupList;
+typedef tracklist<AudioBuss*>::iterator iAudioBuss;
+typedef tracklist<AudioBuss*>::const_iterator ciAudioBuss;
+typedef tracklist<AudioBuss*> GroupList;
 
 typedef tracklist<AudioAux*>::iterator iAudioAux;
 typedef tracklist<AudioAux*>::const_iterator ciAudioAux;

@@ -220,7 +220,7 @@ click on part to mute/unmute</source>
         <translation>Добавить аудиовыход</translation>
     </message>
     <message>
-        <source>Add Audio Group</source>
+        <source>Add Audio Buss</source>
         <translation>Добавить аудиогруппу</translation>
     </message>
     <message>

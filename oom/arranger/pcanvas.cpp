@@ -312,7 +312,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 				case Track::WAVE:
 				case Track::AUDIO_OUTPUT:
 				case Track::AUDIO_INPUT:
-				case Track::AUDIO_GROUP:
+				case Track::AUDIO_BUSS:
 				case Track::AUDIO_AUX:
 				case Track::AUDIO_SOFTSYNTH:
 					break;
@@ -709,7 +709,7 @@ CItem* PartCanvas::newItem(const QPoint& pos, int)
 			break;
 		case Track::AUDIO_OUTPUT:
 		case Track::AUDIO_INPUT:
-		case Track::AUDIO_GROUP:
+		case Track::AUDIO_BUSS:
 		case Track::AUDIO_AUX:
 		case Track::AUDIO_SOFTSYNTH:
 			return 0;
@@ -865,7 +865,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 			break;
 		case Track::AUDIO_OUTPUT:
 		case Track::AUDIO_INPUT:
-		case Track::AUDIO_GROUP:
+		case Track::AUDIO_BUSS:
 		case Track::AUDIO_AUX:
 		case Track::AUDIO_SOFTSYNTH:
 			break;
@@ -1606,7 +1606,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 			case Track::MIDI:
 			case Track::AUDIO_OUTPUT:
 			case Track::AUDIO_INPUT:
-			case Track::AUDIO_GROUP:
+			case Track::AUDIO_BUSS:
 			case Track::AUDIO_AUX:
 			case Track::AUDIO_SOFTSYNTH: //TODO
 				break;

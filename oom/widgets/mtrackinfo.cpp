@@ -503,7 +503,7 @@ void MidiTrackInfo::heartBeat()
 		case Track::WAVE:
 		case Track::AUDIO_OUTPUT:
 		case Track::AUDIO_INPUT:
-		case Track::AUDIO_GROUP:
+		case Track::AUDIO_BUSS:
 		case Track::AUDIO_AUX:
 		case Track::AUDIO_SOFTSYNTH:
 			break;

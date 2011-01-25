@@ -216,7 +216,7 @@ Kliknij na pojedynczy klocek aby go wyłączyć z odtwarzania.</translation>
         <translation>Dodaj Wyjście Audio</translation>
     </message>
     <message>
-        <source>Add Audio Group</source>
+        <source>Add Audio Buss</source>
         <translation>Dodaj Grupę(Szynę) Audio</translation>
     </message>
     <message>

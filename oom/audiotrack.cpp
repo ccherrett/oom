@@ -1426,18 +1426,18 @@ void AudioOutput::read(Xml& xml)
 //   write
 //---------------------------------------------------------
 
-void AudioGroup::write(int level, Xml& xml) const
+void AudioBuss::write(int level, Xml& xml) const
 {
-	xml.tag(level++, "AudioGroup");
+	xml.tag(level++, "AudioBuss");
 	AudioTrack::writeProperties(level, xml);
-	xml.etag(level, "AudioGroup");
+	xml.etag(level, "AudioBuss");
 }
 
 //---------------------------------------------------------
 //   read
 //---------------------------------------------------------
 
-void AudioGroup::read(Xml& xml)
+void AudioBuss::read(Xml& xml)
 {
 	for (;;)
 	{
@@ -1450,12 +1450,12 @@ void AudioGroup::read(Xml& xml)
 				return;
 			case Xml::TagStart:
 				if (AudioTrack::readProperties(xml, tag))
-					xml.unknown("AudioGroup");
+					xml.unknown("AudioBuss");
 				break;
 			case Xml::Attribut:
 				break;
 			case Xml::TagEnd:
-				if (tag == "AudioGroup")
+				if (tag == "AudioBuss")
 				{
 					mapRackPluginsToControllers();
 					return;
