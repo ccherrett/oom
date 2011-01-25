@@ -1115,6 +1115,7 @@ void Arranger::updateTrackInfo(int flags)
 
 void Arranger::switchInfo(int n)/*{{{*/
 {
+	bool chview = false;
 	if(selected && n == 2)
 	{
 		Strip* w = 0;
@@ -1122,6 +1123,8 @@ void Arranger::switchInfo(int n)/*{{{*/
 		QLayoutItem* item = mlayout->takeAt(0);
 		if(item) {
 			Strip* strip = (Strip*)item->widget();
+			if(strip && (strip->getTrack()->isMidiTrack() && !selected->isMidiTrack() && _rtabs->currentIndex() == 2))
+				chview = true;
 			m_strips.removeAll(strip);
 			delete item;
 		}
@@ -1132,16 +1135,17 @@ void Arranger::switchInfo(int n)/*{{{*/
 		}
 		if(selected->isMidiTrack())
 		{
-		 	_rtabs->setTabEnabled(1, false);
+		 	_rtabs->setTabEnabled(1, true);
 		 	_rtabs->setTabEnabled(2, true);
-		 	_rtabs->setCurrentIndex(2);
+		 	//_rtabs->setCurrentIndex(2);
 		 	w = new MidiStrip(mixerScroll, (MidiTrack*) selected);
 		}
 		else
 		{
 		 	_rtabs->setTabEnabled(2, false);
 		 	_rtabs->setTabEnabled(1, true);
-		 	_rtabs->setCurrentIndex(1);
+		 	if(chview)
+				_rtabs->setCurrentIndex(1);
 		 	w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
 		}
 		switch (selected->type())//{{{

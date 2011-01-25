@@ -1153,22 +1153,14 @@ void TList::mousePressEvent(QMouseEvent* ev)
 		case COL_NONE:
 			break;
 		case COL_CLASS:
-			if (t->isMidiTrack())
-				classesPopupMenu(t, x, t->y() - ypos);
+			//if (t->isMidiTrack())
+			//	classesPopupMenu(t, x, t->y() - ypos);
 			break;
 		case COL_OPORT:
-			// Changed by Tim. p3.3.9
-			// Reverted.
-			if (button == Qt::LeftButton)
-				portsPopupMenu(t, x, t->y() - ypos);
-			else if (button == Qt::RightButton)
-				oportPropertyPopupMenu(t, x, t->y() - ypos);
-			//if(((button == QMouseEvent::LeftButton) && (t->type() == Track::AUDIO_SOFTSYNTH)) || (button == QMouseEvent::RightButton))
-			//  oportPropertyPopupMenu(t, x, t->y() - ypos);
-			//else
-			//if(button == QMouseEvent::LeftButton)
-			//  portsPopupMenu(t, x, t->y() - ypos);
-
+			//if (button == Qt::LeftButton)
+			//	portsPopupMenu(t, x, t->y() - ypos);
+			//else if (button == Qt::RightButton)
+			//	oportPropertyPopupMenu(t, x, t->y() - ypos);
 			break;
 		case COL_MUTE:
 			// p3.3.29
@@ -1218,6 +1210,55 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				//p->clear();
 				p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 				p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
+				if (t->type() == Track::AUDIO_SOFTSYNTH)/*{{{*/
+				{
+					SynthI* synth = (SynthI*) t;
+			
+					QAction* sga = p->addAction(tr("Show Gui"));
+					sga->setData(2);
+					sga->setCheckable(true);
+					//printf("synth hasgui %d, gui visible %d\n",synth->hasGui(), synth->guiVisible());
+					sga->setEnabled(synth->hasGui());
+					sga->setChecked(synth->guiVisible());
+			
+					// If it has a gui but we don't have OSC, disable the action.
+#ifndef OSC_SUPPORT
+#ifdef DSSI_SUPPORT
+					if (dynamic_cast<DssiSynthIF*> (synth->sif()))
+					{
+						sga->setChecked(false);
+						sga->setEnabled(false);
+					}
+#endif
+#endif
+				}/*}}}*/
+				else if(t->isMidiTrack())
+				{
+					int oPort = ((MidiTrack*) t)->outPort();
+					MidiPort* port = &midiPorts[oPort];
+				
+					QAction* mact = p->addAction(tr("Show Gui"));
+					mact->setCheckable(true);
+					//printf("synth hasgui %d, gui visible %d\n",port->hasGui(), port->guiVisible());
+					mact->setEnabled(port->hasGui());
+					mact->setChecked(port->guiVisible());
+					mact->setData(3);
+				
+					// If it has a gui but we don't have OSC, disable the action.
+#ifndef OSC_SUPPORT
+#ifdef DSSI_SUPPORT
+					MidiDevice* dev = port->device();
+					if (dev && dev->isSynti() && (dynamic_cast<DssiSynthIF*> (((SynthI*) dev)->sif())))
+					{
+						mact->setChecked(false);
+						mact->setEnabled(false);
+					}
+#endif
+#endif
+					p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
+					p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
+				}
+			
 				QAction* act = p->exec(ev->globalPos(), 0);
 				if (act)
 				{
@@ -1227,7 +1268,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						case 0: // delete track
 							song->removeTrack0(t);
 							audio->msgUpdateSoloStates();
-							break;
+						break;
 
 						case 1: // show track comment
 						{
@@ -1235,25 +1276,151 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							tc->show();
 							//QToolTip::add( this, "FOOOOOOOOOOOOO" );
 						}
-							break;
-
+						break;
+						case 2:
+						{
+							SynthI* synth = (SynthI*) t;
+							bool show = !synth->guiVisible();
+							audio->msgShowInstrumentGui(synth, show);
+						}
+						break;
+						case 3:
+						{
+							int oPort = ((MidiTrack*) t)->outPort();
+							MidiPort* port = &midiPorts[oPort];
+							bool show = !port->guiVisible();
+							audio->msgShowInstrumentGui(port->instrument(), show);
+						}
+						break;
+						case 4:
+						{
+							if (t->type() == Track::DRUM)
+							{
+								//
+								//    Drum -> Midi
+								//
+								audio->msgIdle(true);
+								PartList* pl = t->parts();
+								MidiTrack* m = (MidiTrack*) t;
+								for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+								{
+									EventList* el = ip->second->events();
+									for (iEvent ie = el->begin(); ie != el->end(); ++ie)
+									{
+										Event ev = ie->second;
+										if (ev.type() == Note)
+										{
+											int pitch = ev.pitch();
+											// Changed by T356.
+											// Tested: Notes were being mixed up switching back and forth between midi and drum.
+											//pitch = drumMap[pitch].anote;
+											pitch = drumMap[pitch].enote;
+						
+											ev.setPitch(pitch);
+										}
+										else
+											if (ev.type() == Controller)
+										{
+											int ctl = ev.dataA();
+											// Is it a drum controller event, according to the track port's instrument?
+											MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
+											if (mc)
+												// Change the controller event's index into the drum map to an instrument note.
+												ev.setA((ctl & ~0xff) | drumMap[ctl & 0x7f].enote);
+										}
+						
+									}
+								}
+								t->setType(Track::MIDI);
+								audio->msgIdle(false);
+							}
+						}
+						break;
+						case 5:
+						{
+							if (t->type() == Track::MIDI)
+							{
+								//
+								//    Midi -> Drum
+								//
+								bool change = QMessageBox::question(this, tr("Update drummap?"),
+										tr("Do you want to use same port and channel for all instruments in the drummap?"),
+										tr("&Yes"), tr("&No"), QString::null, 0, 1);
+						
+								audio->msgIdle(true);
+								// Delete all port controller events.
+								//audio->msgChangeAllPortDrumCtrlEvents(false);
+								song->changeAllPortDrumCtrlEvents(false);
+						
+								if (!change)
+								{
+									MidiTrack* m = (MidiTrack*) t;
+									for (int i = 0; i < DRUM_MAPSIZE; i++)
+									{
+										drumMap[i].channel = m->outChannel();
+										drumMap[i].port = m->outPort();
+									}
+								}
+						
+								//audio->msgIdle(true);
+								PartList* pl = t->parts();
+								MidiTrack* m = (MidiTrack*) t;
+								for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+								{
+									EventList* el = ip->second->events();
+									for (iEvent ie = el->begin(); ie != el->end(); ++ie)
+									{
+										Event ev = ie->second;
+										if (ev.type() == Note)
+										{
+											int pitch = ev.pitch();
+											pitch = drumInmap[pitch];
+											ev.setPitch(pitch);
+										}
+										else
+										{
+											if (ev.type() == Controller)
+											{
+												int ctl = ev.dataA();
+												// Is it a drum controller event, according to the track port's instrument?
+												MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
+												if (mc)
+													// Change the controller event's instrument note to an index into the drum map.
+													ev.setA((ctl & ~0xff) | drumInmap[ctl & 0x7f]);
+											}
+						
+										}
+						
+									}
+								}
+								t->setType(Track::DRUM);
+						
+								// Add all port controller events.
+								//audio->msgChangeAllPortDrumCtrlEvents(true);
+								song->changeAllPortDrumCtrlEvents(true);
+						
+								audio->msgIdle(false);
+							}
+						}
 						default:
 							printf("action %d\n", n);
-							break;
+						break;
 					}
-
 				}
 				delete p;
+
+
 			}
 			break;
 
 		case COL_TIMELOCK:
-			t->setLocked(!t->locked());
+			//this has been zero sized if we need to re-enable its here
+			//t->setLocked(!t->locked());
 			break;
 
 		case COL_OCHANNEL:
 		{
-			int delta = 0;
+			/*int delta = 0;
 			if (button == Qt::RightButton)
 				delta = 1;
 			else if (button == Qt::MidButton)
@@ -1280,12 +1447,6 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					mt->setOutChanAndUpdate(channel);
 					audio->msgIdle(false);
 
-					/* --- I really don't like this, you can mess up the whole map "as easy as dell"
-					if (mt->type() == MidiTrack::DRUM) {//Change channel on all drum instruments
-						  for (int i=0; i<DRUM_MAPSIZE; i++)
-								drumMap[i].channel = channel;
-						  }*/
-
 					// may result in adding/removing mixer strip:
 					//song->update(-1);
 					//song->update(SC_CHANNELS);
@@ -1311,7 +1472,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						song->update(SC_CHANNELS);
 					}
 				}
-			}
+			}*/
 		}
 			break;
 	}
