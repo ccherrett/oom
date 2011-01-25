@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>522</width>
+    <width>543</width>
     <height>518</height>
    </rect>
   </property>
@@ -33,7 +33,7 @@
      </property>
      <widget class="QWidget" name="TabPage">
       <attribute name="title">
-       <string>Application</string>
+       <string>  Application  </string>
       </attribute>
       <layout class="QGridLayout">
        <item row="1" column="0">
@@ -547,7 +547,7 @@
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Audio</string>
+       <string>  Audio  </string>
       </attribute>
       <layout class="QGridLayout">
        <item row="0" column="0">
@@ -893,7 +893,7 @@ Shorter periods are desirable.</string>
      </widget>
      <widget class="QWidget" name="tab2">
       <attribute name="title">
-       <string>Midi</string>
+       <string>  Midi  </string>
       </attribute>
       <layout class="QVBoxLayout">
        <property name="spacing">
@@ -1110,7 +1110,7 @@ Shorter periods are desirable.</string>
      </widget>
      <widget class="QWidget" name="tab3">
       <attribute name="title">
-       <string>GUI</string>
+       <string>  GUI  </string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="spacing">

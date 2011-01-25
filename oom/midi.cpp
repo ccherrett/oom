@@ -1700,7 +1700,6 @@ void Audio::preloadControllers()/*{{{*/
 {
 	midiBusy = true;
 
-	int evcount = 50;
 	MidiTrackList* tracks = song->midis();
 	for (iMidiTrack it = tracks->begin(); it != tracks->end(); ++it)
 	{
@@ -1722,7 +1721,7 @@ void Audio::preloadControllers()/*{{{*/
 			MidiPart* part = (MidiPart*) (p->second);
 			EventList* events = part->events();
 			unsigned partTick = part->tick();
-			unsigned partLen = part->lenTick();
+			//unsigned partLen = part->lenTick();
 			int delay = track->delay;
 	
 			unsigned offset = delay + partTick;
@@ -1732,7 +1731,7 @@ void Audio::preloadControllers()/*{{{*/
 				Event ev = ie->second;
 				port = defaultPort; 
 				unsigned tick = ev.tick() + offset;
-				unsigned frame = tempomap.tick2frame(tick) + frameOffset;
+				//unsigned frame = tempomap.tick2frame(tick) + frameOffset;
 				switch (ev.dataA())
 				{
 					case CTRL_PROGRAM:

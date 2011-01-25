@@ -48,7 +48,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>9</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="PresetsTab">
       <attribute name="title">
@@ -271,6 +271,15 @@
        </property>
        <item row="1" column="1" rowspan="2">
         <widget class="QGroupBox" name="pitchEnvGroupBox">
+         <property name="font">
+          <font>
+           <family>Sans Serif</family>
+           <pointsize>9</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
+           <kerning>true</kerning>
+          </font>
+         </property>
          <property name="title">
           <string>Pitch Envelope</string>
          </property>
@@ -5892,6 +5901,9 @@ Wave form 8 = &lt;i&gt;if &lt;b&gt;t&lt;/b&gt;&amp;#060 pi then sin(2*&lt;b&gt;t
           </property>
           <item row="1" column="0">
            <widget class="QCheckBox" name="imageCheckBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Image in the background :</string>
             </property>
@@ -5902,6 +5914,9 @@ Wave form 8 = &lt;i&gt;if &lt;b&gt;t&lt;/b&gt;&amp;#060 pi then sin(2*&lt;b&gt;t
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="imagePathLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="maxLength">
              <number>128</number>
             </property>

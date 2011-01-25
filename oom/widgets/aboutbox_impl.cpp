@@ -8,5 +8,5 @@ AboutBoxImpl::AboutBoxImpl()
 	imageLabel->setPixmap(*aboutOOMidiImage);
 	QString version(VERSION);
 	QString svnrevision(SVNVERSION);
-	versionLabel->setText("Version: " + version + " (svn  revision: " + svnrevision + ")");
+	versionLabel->setText("Version: " + version);
 }
