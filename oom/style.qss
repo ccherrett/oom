@@ -354,13 +354,17 @@ Dentry
 }
 QPushButton 
 { 
-	color: #e2e5e5; border-radius: 3px; padding: 5px; 
+	border-radius: 3px; 
+	padding: 5px; 
     /*background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);*/
 	/*background-color: #393941;*/
       background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                   stop: 0 #626272, stop:0.1 #5b5b6b, stop: 1.0 #4d4d5b);
     border: 1px solid #393941;
 	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+	color: #d0d4d0;
 }
 QPushButton:pressed, QPushButton::checked, QPushButton::hover 
 { 
@@ -373,13 +377,17 @@ QPushButton:pressed, QPushButton::checked, QPushButton::hover
 }
 QToolButton 
 { 
-	color: #e2e5e5; border-radius: 3px; padding: 0px; 
+	border-radius: 3px; padding: 0px; 
     /*background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);*/
 	/*background-color:#6f6e77;*/
       background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                   stop: 0 #626272, stop:0.1 #5b5b6b, stop: 1.0 #4d4d5b);
 	/*border: 1px solid #181819; */
     border: 1px solid #393941;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+	color: #d0d4d0;
 }
 QToolButton:pressed, QToolButton::checked, QToolButton::hover 
 { 
@@ -409,7 +417,11 @@ QToolButton#btnExit::hover, QToolButton#btnIns::hover, QToolButton#btnOuts::hove
 
 QLabel 
 { 
-	color: #e2e5e5; border: 0px;
+	border: 0px;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+	color: #d0d4d0;
 }
 QLabel::disabled 
 { 
@@ -538,6 +550,11 @@ QTabWidget#tabControlCenter QTabBar::tab:last:selected {
 
 QTabWidget#tabControlCenter QTabBar::tab:only-one {
     margin: 0; /* if there is only one tab, we don't want overlapping margins */
+}
+QTabWidget#tabControlCenter QTabBar::tab::disabled {
+    color: #8f9198;; /* if there is only one tab, we don't want overlapping margins */
+	background-color: #d8dbe8;
+	border-color: #47474d;							
 }
 QDockWidget {
     /*border: 1px solid lightgray;*/
@@ -791,13 +808,73 @@ QSlider::handle:vertical
     border-radius: 3px;
 }
 
+QCheckBox {
+     spacing: 5px;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
+	 color: #d0d4d0;
+ }
 
+ QCheckBox::indicator {
+     width: 13px;
+     height: 13px;
+	 background-color: white;
+   	 border-radius: 3px;
+ }
+
+ QCheckBox::indicator:unchecked {
+     image: url(:/images/checkbox_unchecked.png);
+ }
+
+ QCheckBox::indicator:unchecked:hover {
+     image: url(:/images/checkbox_unchecked_hover.png);
+ }
+
+ QCheckBox::indicator:unchecked:pressed {
+     image: url(:/images/checkbox_unchecked_pressed.png);
+ }
+
+ QCheckBox::indicator:checked {
+     image: url(:/images/checkbox_checked.png);
+ }
+
+ QCheckBox::indicator:checked:hover {
+     image: url(:/images/checkbox_checked_hover.png);
+ }
+
+ QCheckBox::indicator:checked:pressed {
+     image: url(:/images/checkbox_checked_pressed.png);
+ }
+
+ QCheckBox::indicator:indeterminate:hover {
+     image: url(:/images/checkbox_indeterminate_hover.png);
+ }
+
+ QCheckBox::indicator:indeterminate:pressed {
+     image: url(:/images/checkbox_indeterminate_pressed.png);
+ }
+/*
+ QCheckBox {
+     border: 1px solid #393941;
+     border-radius: 3px;
+     padding: 3px 18px 3px 6px;
+     min-width: 6em;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
+	 color: #d0d4d0;
+ }
+*/
  QComboBox {
      border: 1px solid #393941;
      border-radius: 3px;
      padding: 3px 18px 3px 6px;
      min-width: 6em;
-	 color: #e2e5e5;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
+	 color: #d0d4d0;
  }
 
  QComboBox:editable {
