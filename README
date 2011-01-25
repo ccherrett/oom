@@ -145,6 +145,14 @@ In our testing, this has proved more stable than building alsa as modules.
       known bugs
   =============================
 
+The DSSI plugins are installed and stored on your system by you, the users. Some behave well, some not quite so well.
+These plugins are a challenge so far:
+
+Less trivialsynth
+Trivial synth.
+
+
+
       - many
 
 ====================================================================
