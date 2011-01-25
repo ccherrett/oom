@@ -908,13 +908,17 @@ QSlider::handle:vertical
     border-radius: 3px;
 }
 
- QRadioButton::indicator {
-     width: 13px;
-     height: 13px;
+QRadioButton {
+     spacing: 5px;
 	 font-family: "fixed-width";
 	 font-weight: bold;
 	 font-size: 11px;
 	 color: #d0d4d0;
+ }
+
+ QRadioButton::indicator {
+     width: 13px;
+     height: 13px;
  }
 
  QRadioButton::indicator::unchecked {
