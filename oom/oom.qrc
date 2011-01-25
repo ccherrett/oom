@@ -4,7 +4,13 @@
 		<file>style.qss</file>
 		<file>images/frame.png</file>
 		<file>images/frame_clipping.png</file>
-	    <file>images/up_arrow.png</file>
+		<file>images/checkbox_checked.png</file>
+		<file>images/checkbox_checked_hover.png</file>
+		<file>images/checkbox_checked_pressed.png</file>
+		<file>images/checkbox_unchecked.png</file>
+		<file>images/checkbox_unchecked_hover.png</file>
+		<file>images/checkbox_unchecked_pressed.png</file>
+		<file>images/up_arrow.png</file>
     	<file>images/up_arrow_disabled.png</file>
      	<file>images/down_arrow.png</file>
      	<file>images/down_arrow_disabled.png</file>
