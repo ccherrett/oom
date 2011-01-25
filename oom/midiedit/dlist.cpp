@@ -54,7 +54,7 @@ void DList::draw(QPainter& p, const QRect& rect)
 		DrumMap* dm = &drumMap[i];
 		//            if (dm->selected)
 		if (dm == currentlySelected)
-			p.fillRect(x, yy, w, TH, Qt::yellow);
+			p.fillRect(x, yy, w, TH, QColor(190,192,207));
 		//            else
 		//                  p.eraseRect(x, yy, w, TH);
 		QHeaderView *h = header;
@@ -675,7 +675,7 @@ void DList::songChanged(int flags)
 DList::DList(QHeaderView* h, QWidget* parent, int ymag)
 : View(parent, 1, ymag)
 {
-	setBg(Qt::white);
+	setBg(QColor(216,219,232));
 	if (!h)
 	{
 		h = new QHeaderView(Qt::Horizontal, parent);
