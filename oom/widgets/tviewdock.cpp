@@ -30,6 +30,7 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	btnUp->setIcon(*upPCIcon);
 	btnDown->setIcon(*downPCIcon);
 	btnDelete->setIcon(*garbagePCIcon);
+	btnDelete->setIconSize(garbagePCIcon->size());
 	btnUp->setIconSize(upPCIcon->size());
 	btnDown->setIconSize(downPCIcon->size());
 	btnTV->setIcon(*addTVIcon);

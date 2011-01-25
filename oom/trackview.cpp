@@ -106,7 +106,7 @@ void TrackView::read(Xml& xml)/*{{{*/
 					Track* t = song->findTrack(xml.parse1());
 					if (t)
 					{
-						printf("TrackView::read() Adding track\n");
+						//printf("TrackView::read() Adding track\n");
 						addTrack(t);
 					}
 				}
