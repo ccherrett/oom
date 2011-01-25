@@ -106,6 +106,7 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	_dl->setPrecision(0);
 	_dl->setToolTip(tr("double click on/off"));
 	_dl->setSpecialText(tr("off"));
+	_dl->setObjectName("ctrlLabelBox");
 	_dl->setFont(config.fonts[1]);
 	_dl->setBackgroundRole(QPalette::Mid);
 	_dl->setFrame(true);
