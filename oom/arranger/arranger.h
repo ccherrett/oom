@@ -37,7 +37,6 @@ class Splitter;
 class LabelCombo;
 class PosLabel;
 class MidiTrackInfo;
-class TLLayout;
 class WidgetStack;
 class AudioStrip;
 class Strip;
@@ -95,8 +94,6 @@ class Arranger : public QWidget
 	QScrollArea *infoScroll;
 	QScrollArea *mixerScroll;
     AudioStrip* waveTrackInfo;
-    QWidget* noTrackInfo;
-    TLLayout* tgrid;
 
     Track* selected;
 
@@ -114,7 +111,7 @@ class Arranger : public QWidget
 	TrackViewDock* _tvdock;
 	QWidget *central;
 	QVBoxLayout *mlayout;
-        QList<Strip* > m_strips;
+    QList<Strip* > m_strips;
 
     unsigned cursVal;
     void genTrackInfo(QWidget* parent);

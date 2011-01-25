@@ -48,7 +48,6 @@
 #include "icons.h"
 #include "header.h"
 #include "utils.h"
-#include "alayout.h"
 #include "audio.h"
 #include "event.h"
 #include "midiseq.h"
@@ -731,7 +730,7 @@ void Arranger::writeStatus(int level, Xml& xml)
 
 void Arranger::readStatus(Xml& xml)
 {
-	printf("Arranger::readStatus() entering\n");
+	//printf("Arranger::readStatus() entering\n");
 	for (;;)
 	{
 		Xml::Token token(xml.parse());
@@ -766,14 +765,14 @@ void Arranger::readStatus(Xml& xml)
 				if (tag == "arranger")
 				{
 					//ib->setChecked(showTrackinfoFlag);
-					printf("Arranger::readStatus() leaving end tag\n");
+					//printf("Arranger::readStatus() leaving end tag\n");
 					return;
 				}
 			default:
 				break;
 		}
 	}
-	printf("Arranger::readStatus() leaving\n");
+	//printf("Arranger::readStatus() leaving\n");
 }
 
 //---------------------------------------------------------
@@ -1057,24 +1056,6 @@ void Arranger::showTrackInfo(bool)
 
 void Arranger::genTrackInfo(QWidget*)
 {
-	//trackInfo = new WidgetStack(parent, "trackInfoStack");
-	//trackInfo->setFocusPolicy(Qt::TabFocus);  // p4.0.9
-	//trackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-
-	noTrackInfo = new QWidget();
-	noTrackInfo->setAutoFillBackground(true);
-	QPixmap *noInfoPix = new QPixmap(160, 1000); //oom_leftside_logo_xpm);
-	const QPixmap *logo = new QPixmap(*oomLeftSideLogo);
-	noInfoPix->fill(noTrackInfo->palette().color(QPalette::Window));
-	QPainter p(noInfoPix);
-	p.drawPixmap(0, 0, *logo, 0, 0, logo->width(), logo->height());
-
-	QPalette palette;
-	palette.setBrush(noTrackInfo->backgroundRole(), QBrush(*noInfoPix));
-	noTrackInfo->setPalette(palette);
-	noTrackInfo->setGeometry(0, 0, 119, 200);
-	noTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
-
 	midiTrackInfo = new MidiTrackInfo(this);
 	_tvdock = new TrackViewDock(this);
 	infoScroll->setWidget(midiTrackInfo);
@@ -1082,7 +1063,7 @@ void Arranger::genTrackInfo(QWidget*)
 	_rtabs->addTab(_tvdock, tr("   Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
 	_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
-	//midiTrackInfo->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
+
 	central = new QWidget(mixerScroll);
 	central->setObjectName("dockMixerCenter");
 	mlayout = new QVBoxLayout();
@@ -1132,73 +1113,84 @@ void Arranger::updateTrackInfo(int flags)
 //   switchInfo
 //---------------------------------------------------------
 
-void Arranger::switchInfo(int n)
+void Arranger::switchInfo(int n)/*{{{*/
 {
-        if(selected && n == 2)
-        {
-                Strip* w = 0;
-
-                QLayoutItem* item = mlayout->takeAt(0);
-                if(item) {
-                        Strip* strip = (Strip*)item->widget();
-                        m_strips.removeAll(strip);
-                        delete item;
-                }
-                if(_lastStrip)
-                {
-                        m_strips.removeAll(_lastStrip);
-                        delete _lastStrip;
-                }
-                switch (selected->type())
-                {//{{{
-                        case Track::AUDIO_OUTPUT:
-                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-                                w->setObjectName("MixerAudioOutStrip");
-                                break;
-                        case Track::AUDIO_BUSS:
-                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-                                w->setObjectName("MixerAudioBussStrip");
-                                break;
-                        case Track::AUDIO_AUX:
-                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-                                w->setObjectName("MixerAuxStrip");
-                                break;
-                        case Track::WAVE:
-                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-                                w->setObjectName("MixerWaveStrip");
-                                break;
-                        case Track::AUDIO_INPUT:
-                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-                                w->setObjectName("MixerAudioInStrip");
-                                break;
-                        case Track::AUDIO_SOFTSYNTH:
-                                w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
-                                w->setObjectName("MixerSynthStrip");
-                                break;
-                        case Track::MIDI:
-                        case Track::DRUM:
-                        {
-                                w = new MidiStrip(mixerScroll, (MidiTrack*) selected);
-                                w->setObjectName("MidiTrackStrip");
-                        }
-                                break;
-                }//}}}
-                if (w)
-                {
-                        connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
-                        if(!selected->isMidiTrack())
-                                connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
-                        mlayout->addWidget(w);
-                        m_strips.append(w);
-                        //QSizePolicy policy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-                        //policy.setHorizontalStretch(0);
-                        //policy.setVerticalStretch(100);
-                        //w->setSizePolicy(policy);//QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-                        w->show();
-                        _lastStrip = w;
-                }
-        }
-}
+	if(selected && n == 2)
+	{
+		Strip* w = 0;
+		
+		QLayoutItem* item = mlayout->takeAt(0);
+		if(item) {
+			Strip* strip = (Strip*)item->widget();
+			m_strips.removeAll(strip);
+			delete item;
+		}
+		if(_lastStrip)
+		{
+		        m_strips.removeAll(_lastStrip);
+		        delete _lastStrip;
+		}
+		if(selected->isMidiTrack())
+		{
+		 	_rtabs->setTabEnabled(1, false);
+		 	_rtabs->setTabEnabled(2, true);
+		 	_rtabs->setCurrentIndex(2);
+		 	w = new MidiStrip(mixerScroll, (MidiTrack*) selected);
+		}
+		else
+		{
+		 	_rtabs->setTabEnabled(2, false);
+		 	_rtabs->setTabEnabled(1, true);
+		 	_rtabs->setCurrentIndex(1);
+		 	w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+		}
+		switch (selected->type())//{{{
+		{
+		 	case Track::AUDIO_OUTPUT:
+		 	    w->setObjectName("MixerAudioOutStrip");
+		 	    break;
+		 	case Track::AUDIO_BUSS:
+		 	    w->setObjectName("MixerAudioBussStrip");
+		 	    break;
+		 	case Track::AUDIO_AUX:
+		 	    w->setObjectName("MixerAuxStrip");
+		 	    break;
+		 	case Track::WAVE:
+		 	    w->setObjectName("MixerWaveStrip");
+		 	    break;
+		 	case Track::AUDIO_INPUT:
+		 	    w->setObjectName("MixerAudioInStrip");
+		 	    break;
+		 	case Track::AUDIO_SOFTSYNTH:
+		 	    w->setObjectName("MixerSynthStrip");
+		 	    break;
+		 	case Track::MIDI:
+		 	case Track::DRUM:
+		 	{
+		 	    w->setObjectName("MidiTrackStrip");
+		 	}
+		 	break;
+		}//}}}
+		if (w)
+		{
+			connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
+			if(!selected->isMidiTrack())
+			        connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
+			mlayout->addWidget(w);
+			m_strips.append(w);
+			w->show();
+			_lastStrip = w;
+		}
+	}
+	else
+	{
+		printf("Arranger::switchInfo(int %d)\n", n);
+		 _rtabs->setTabEnabled(2, false);
+		 _rtabs->setTabEnabled(1, false);
+		 _rtabs->setTabEnabled(0, true);
+		 _rtabs->setCurrentIndex(0);
+	}
+}/*}}}*/
 
 void Arranger::preloadControllers()
 {

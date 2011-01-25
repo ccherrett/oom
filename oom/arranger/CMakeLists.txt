@@ -22,7 +22,6 @@
 # Expand Qt macros
 #
 QT4_WRAP_CPP (arranger_mocs
-      alayout.h
       arranger.h 
       pcanvas.h 
       tlist.h 
@@ -32,7 +31,6 @@ QT4_WRAP_CPP (arranger_mocs
 # List of source files to compile
 #
 file (GLOB arranger_source_files
-      alayout.cpp
       arranger.cpp
       pcanvas.cpp
       tlist.cpp

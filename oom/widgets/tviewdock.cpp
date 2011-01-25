@@ -54,7 +54,7 @@ TrackViewDock::~TrackViewDock()
 
 void TrackViewDock::populateTable(int /*flag*/)
 {
-	printf("TrackViewDock::populateTable(int flag) fired\n");
+	//printf("TrackViewDock::populateTable(int flag) fired\n");
 	TrackViewList* tviews = song->trackviews();
 	_tableModel->clear();
 	for(iTrackView it = tviews->begin(); it != tviews->end(); ++it)
@@ -231,8 +231,6 @@ void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 	if (!rows.isEmpty())
 	{
 		QList<TrackView*> dlist;
-		int id = 0;
-		TrackViewList* tviews = song->trackviews();
 		for (int i = 0; i < rows.size(); ++i)
 		{
 			int r = rows.at(i);

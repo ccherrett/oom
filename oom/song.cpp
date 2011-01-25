@@ -203,12 +203,14 @@ Track* Song::addNewTrack(QAction* action)
 					oom->changeConfig(true); // save configuration file
 					deselectTracks();
 					si->setSelected(true);
+					updateTrackViews1();
 					update();
 					return si;
 				}
 			}
 			deselectTracks();
 			si->setSelected(true);
+			updateTrackViews1();
 			update(SC_SELECTION);
 			return si;
 		}
@@ -225,6 +227,7 @@ Track* Song::addNewTrack(QAction* action)
 		Track* t = addTrack((Track::TrackType)n);
 		deselectTracks();
 		t->setSelected(true);
+		updateTrackViews1();
 		update(SC_SELECTION);
 		return t;
 	}
@@ -3397,7 +3400,7 @@ void Song::updateTrackViews(QAction* act)
 	TrackView* tv = findTrackView(act->text());
 	if(tv)
 	{
-		printf("Song::updateTrackViews(QAction* act) \n");
+		//printf("Song::updateTrackViews(QAction* act) \n");
 		tv->setSelected(act->isChecked());
 		song->dirty = true;
 		updateTrackViews1();
@@ -3409,7 +3412,7 @@ void Song::updateTrackViews(QAction* act)
 //---------------------------------------------------------
 void Song::updateTrackViews1()
 {
-	printf("Song::updateTrackViews1()\n");
+	//printf("Song::updateTrackViews1()\n");
 	_viewtracks.clear();
 	viewselected = false;
 	bool customview = false;
@@ -3428,6 +3431,7 @@ void Song::updateTrackViews1()
 			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
 			{
 				bool found = false;
+				(*t)->setSelected(false);
 				if(workview && (*t)->parts()->empty()) {
 					continue;
 				}
@@ -3459,6 +3463,7 @@ void Song::updateTrackViews1()
 			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
 			{
 				bool found = false;
+				(*t)->setSelected(false);
 				for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
 				{
 					if ((*i)->name() == (*t)->name())
@@ -3869,7 +3874,7 @@ void Song::removeTrack2(Track* track)
 		}
 		tv = findTrackView(track);
 	}
-	if(updateview)
+	if(updateview || viewselected)
 		updateTrackViews1();
 
 

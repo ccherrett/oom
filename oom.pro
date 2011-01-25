@@ -30,7 +30,6 @@ HEADERS = \
 ./oom/key.h \
 ./oom/thread.h \
 ./oom/sig.h \
-./oom/arranger/alayout.h \
 ./oom/arranger/arranger.h \
 ./oom/arranger/trackautomationview.h \
 ./oom/arranger/pcanvas.h \
@@ -312,9 +311,7 @@ SOURCES =  \
 ./oom/arranger/moc_pcanvas.cpp \
 ./oom/arranger/tlist.cpp \
 ./oom/arranger/pcanvas.cpp \
-./oom/arranger/moc_alayout.cpp \
 ./oom/arranger/trackinfo.cpp \
-./oom/arranger/alayout.cpp \
 ./oom/arranger/arranger.cpp \
 ./oom/arranger/moc_tlist.cpp \
 ./oom/arranger/trackautomationview.cpp \

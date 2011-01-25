@@ -57,7 +57,7 @@ void MidiTrackInfo::setTrack(Track* t)
 	trackNameLabel->setPalette(pal);
 
 	updateTrackInfo(-1);
-	printf("Calling populate matrix from setTrack()\n");
+	//printf("Calling populate matrix from setTrack()\n");
 	populateMatrix();
 	rebuildMatrix();
 }
@@ -493,7 +493,7 @@ void MidiTrackInfo::heartBeat()
 			QList<PatchSequence*> *list = mp->patchSequences();
 			if (_progRowNum != list->size())
 			{
-				printf("Calling populate matrix from heartBeat()\n");
+				//printf("Calling populate matrix from heartBeat()\n");
 				populateMatrix();
 				rebuildMatrix();
 			}
@@ -546,7 +546,7 @@ void MidiTrackInfo::songChanged(int type)
 		return;
 	if (type == SC_PATCH_UPDATED && !editing)
 	{
-		printf("Calling populate matrix from songChanged()\n");
+		//printf("Calling populate matrix from songChanged()\n");
 		populateMatrix();
 		rebuildMatrix();
 		return;
@@ -626,7 +626,7 @@ void MidiTrackInfo::iOutputPortChanged(int index)
 	//audio->msgSetTrackOutPort(track, index);
 	track->setOutPortAndUpdate(index);
 	//_tableModel->clear();
-	printf("Calling populate matrix from iOutputPortChanged()\n");
+	//printf("Calling populate matrix from iOutputPortChanged()\n");
 	populateMatrix();
 	rebuildMatrix();
 	audio->msgIdle(false);
@@ -1808,7 +1808,7 @@ void MidiTrackInfo::insertMatrixEvent()
 				row = rows.at(0);
 			else
 				return; //Nothing is selected and we are in selection mode
-			printf("MidiTrackInfo::insertMatrixEvent() not using matrix\n");
+			//printf("MidiTrackInfo::insertMatrixEvent() not using matrix\n");
 		}
 		else
 			row = _matrix->at(0);
@@ -1846,7 +1846,7 @@ void MidiTrackInfo::insertMatrixEvent()
 
 void MidiTrackInfo::populateMatrix()
 {
-	printf("MidiTrackInfo::populateMatrix() entering\n");
+	//printf("MidiTrackInfo::populateMatrix() entering\n");
 	if (!selected)
 		return;
 	//printf("MidiTrackInfo::populateMatrix() found track\n");
@@ -2091,7 +2091,7 @@ void MidiTrackInfo::patchSequenceRemoved(QModelIndex /*index*/, int start, int e
 	//printf("Leaving patchSequenceDeleted()\n");
 }
 
-void MidiTrackInfo::matrixSelectionChanged(QItemSelection sel, QItemSelection unsel)
+void MidiTrackInfo::matrixSelectionChanged(QItemSelection sel, QItemSelection)
 {
 	//if(sel == unsel)
 	//	return;

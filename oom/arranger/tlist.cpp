@@ -893,7 +893,7 @@ void TList::changeAutomation(QAction* act)
 
 	//CtrlListList* cll = ((AudioTrack*) editTrack)->controller();
 	CtrlListList* cll = ((AudioTrack*)editAutomation)->controller();
-	int index = 0;
+	//int index = 0;
 	for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 	{
 		//if (act->data() == index++)
@@ -1004,6 +1004,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 
 						///emit selectionChanged();
 						emit selectionChanged(t);
+						song->updateTrackViews1();
 						adjustScrollbar();
 					}
 				}

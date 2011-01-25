@@ -3365,7 +3365,7 @@ void PartCanvas::controllerChanged(Track* /* t */)
 
 void PartCanvas::trackViewChanged()
 {
-	printf("PartCanvas::trackViewChanged()\n");
+	//printf("PartCanvas::trackViewChanged()\n");
     for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		NPart* part = (NPart*) (i->second);
