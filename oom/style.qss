@@ -583,7 +583,7 @@ QDockWidget::title {
 }
 
 QDockWidget::close-button, QDockWidget::float-button {
-    background: #101819;
+    background: #47474d;
     padding: 2px;
     icon-size: 15px; /* maximum icon size */
 }
