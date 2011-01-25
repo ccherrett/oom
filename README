@@ -131,7 +131,7 @@ NOTE: the realtime-lsm module is depreciated in later kernel versions.
             - start JACK with qjackctl
 
       - start OOMidi
-	       /usr/local/bin/oom2
+	       /usr/local/bin/oomidi
 
       (JACK and all its clients (qjackctl & OOMidi) must run with the
       same user id)
