@@ -230,10 +230,16 @@ Strip::Strip(QWidget* parent, Track* t)
 			label->setObjectName("MixerSynthLabel");
 			break;
 		case Track::MIDI:
-		case Track::DRUM:
 		{
 			label->setObjectName("MidiTrackLabel");
 			topRack = QPixmap(":/images/top_rack_midi.png");
+			break;
+		}
+		case Track::DRUM:
+		{
+			label->setObjectName("MidiDrumTrackLabel");
+			topRack = QPixmap(":/images/top_rack_midi.png");
+			break;
 		}
 			break;
 	}
