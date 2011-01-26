@@ -32,7 +32,7 @@
 #include "trackview.h"
 #include "synth.h"
 
-TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList* vl) : QDialog(parent)
+TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(parent)
 {
 	setupUi(this);
 	_selected = 0;
