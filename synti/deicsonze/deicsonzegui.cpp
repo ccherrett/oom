@@ -163,8 +163,8 @@ DeicsOnzeGui::DeicsOnzeGui(DeicsOnze* deicsOnze)
 	  this, SLOT(setIsBackgroundPix(bool)));
   connect(imagePathLineEdit, SIGNAL(textChanged(const QString&)),
 	  this, SLOT(setBackgroundPixPath(const QString&)));
-  connect(imageBrowsePushButton, SIGNAL(pressed()),
-	  this, SLOT(setBrowseBackgroundPixPath()));
+  //connect(imageBrowsePushButton, SIGNAL(pressed()),
+//  this, SLOT(setBrowseBackgroundPixPath()));
 
   //Midi in channel
   //connect(MidiInChComboBox, SIGNAL(activated(int)),
@@ -4331,11 +4331,15 @@ void DeicsOnzeGui::updateInitSetPath(QString s) {
   initSetPathLineEdit->blockSignals(false);
 }
 void DeicsOnzeGui::updateBackgroundPixCheckBox(bool b) {
+  b = false;
   imageCheckBox->blockSignals(true);
   imageCheckBox->setChecked(b);
   imageCheckBox->blockSignals(false);
   imagePathLineEdit->setEnabled(b);
   imageBrowsePushButton-> setEnabled(b);
+  imageCheckBox->hide();
+  imagePathLineEdit->hide();
+  imageBrowsePushButton->hide();
 }
 void DeicsOnzeGui::updateBackgroundPixPath(QString s) {
   imagePathLineEdit->blockSignals(true);

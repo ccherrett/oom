@@ -127,7 +127,7 @@ DeicsOnze::DeicsOnze() : Mess(2) {
   
   //TODO
   //INSTPREFIX + "/share/" + PACKAGEVERSION + "/presets/deicsonze/ARCH_ALIN";
-  _isBackgroundPix = true; //false if an initial bank must be download
+  _isBackgroundPix = false; //false if an initial bank must be download
   
   //"/usr/local/share/oom-1.0pre1/wallpapers/abstractdeicsonze1.jpg";
   _backgroundPixPath = sharePath + QString("/wallpapers/paper2.jpg");    // Tim.
@@ -2146,7 +2146,7 @@ void DeicsOnze::readConfiguration(QDomNode qdn) {
     }
     //load background pix
     if(qdEl.tagName()==ISBACKGROUNDPIXSTR) {
-      _isBackgroundPix = (qdEl.text()==YESSTRDEI?true:false);
+      _isBackgroundPix = false;//= (qdEl.text()==YESSTRDEI?true:false);
       unsigned char *dataIsBackgroundPix = new unsigned char[2];
       dataIsBackgroundPix[0]=SYSEX_ISBACKGROUNDPIX;
       dataIsBackgroundPix[1]=(unsigned char)_isBackgroundPix;
