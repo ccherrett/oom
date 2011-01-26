@@ -584,7 +584,7 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 	drum->setData(Track::DRUM);
 	grp->addAction(drum);
 	QAction* wave = addTrack->addAction(QIcon(*addtrack_wavetrackIcon),
-			QT_TRANSLATE_NOOP("@default", "Add Wave Track"));
+			QT_TRANSLATE_NOOP("@default", "Add Audio Track"));
 	wave->setData(Track::WAVE);
 	grp->addAction(wave);
 	QAction* aoutput = addTrack->addAction(QIcon(*addtrack_audiooutputIcon),
@@ -818,7 +818,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	fileExportMidiAction = new QAction(tr("Export Midifile"), this);
 	fileImportPartAction = new QAction(tr("Import Part"), this);
 
-	fileImportWaveAction = new QAction(tr("Import Wave File"), this);
+	fileImportWaveAction = new QAction(tr("Import Audio File"), this);
 
 	quitAction = new QAction(tr("&Quit"), this);
 
@@ -849,7 +849,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	startPianoEditAction = new QAction(*pianoIconSet, tr("Pianoroll"), this);
 	startDrumEditAction = new QAction(QIcon(*edit_drummsIcon), tr("Drums"), this);
 	startListEditAction = new QAction(QIcon(*edit_listIcon), tr("List"), this);
-	startWaveEditAction = new QAction(QIcon(*edit_waveIcon), tr("Wave"), this);
+	startWaveEditAction = new QAction(QIcon(*edit_waveIcon), tr("Audio"), this);
 
 	master = new QMenu(tr("Mastertrack"), this);
 	master->setIcon(QIcon(*edit_mastertrackIcon));

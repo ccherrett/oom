@@ -929,7 +929,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					tr("Add Drum Track"));
 			drum->setData(Track::DRUM);
 			QAction* wave = p->addAction(*addtrack_wavetrackIcon,
-					tr("Add Wave Track"));
+					tr("Add Audio Track"));
 			wave->setData(Track::WAVE);
 			QAction* aoutput = p->addAction(*addtrack_audiooutputIcon,
 					tr("Add Output"));

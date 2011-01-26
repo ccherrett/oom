@@ -166,7 +166,7 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 
 	showMidiTracksId = new QAction(tr("Show Midi Tracks"), actionItems);
 	showDrumTracksId = new QAction(tr("Show Drum Tracks"), actionItems);
-	showWaveTracksId = new QAction(tr("Show Wave Tracks"), actionItems);
+	showWaveTracksId = new QAction(tr("Show Audio Tracks"), actionItems);
 
 	QAction *separator = new QAction(this);
 	separator->setSeparator(true);

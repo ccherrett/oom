@@ -135,7 +135,7 @@ WaveEdit::WaveEdit(PartList* pl)
 	connect(selectNoneAction, SIGNAL(triggered()), mapper, SLOT(map()));
 
 	//---------ToolBar----------------------------------
-	tools = addToolBar(tr("Wave edit tools"));
+	tools = addToolBar(tr("Audio edit tools"));
 	tools->addActions(undoRedo->actions());
 
 	connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));

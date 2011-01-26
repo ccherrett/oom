@@ -880,7 +880,7 @@ void OOMidi::importWave()
 	}
 	//QString fn = getOpenFileName(lastWavePath, audioFilePattern, this,
 	QString fn = getOpenFileName(lastWavePath, audio_file_pattern, this,
-			tr("Import Wave File"), 0);
+			tr("Import Audio File"), 0);
 	if (!fn.isEmpty())
 	{
 		lastWavePath = fn;
@@ -907,7 +907,7 @@ bool OOMidi::importWaveToTrack(QString& name, unsigned tick, Track* track)
 	int samples = f->samples();
 	if ((unsigned) sampleRate != f->samplerate())
 	{
-		if (QMessageBox::question(this, tr("Import Wavefile"),
+		if (QMessageBox::question(this, tr("Import Audio file"),
 				tr("This wave file has a samplerate of %1,\n"
 				"as opposed to current setting %2.\n"
 				"Do you still want to import it?").arg(f->samplerate()).arg(sampleRate),
