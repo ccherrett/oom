@@ -1093,6 +1093,17 @@ QHeaderView#header {
 	 /*color: #76ac01;*/
  }
 
+DoubleLabel#ctrlLabelBox {
+     /*padding-right: 15px;  make room for the arrows */
+     border-image: url(:/images/frame.png) 4;
+     border-width: 3;
+	 border-right: 0;
+	 background-color: #010f14;
+	 color: #03c0e2;
+	 /*color: #76ac01;*/
+	 border-radius: 8px;
+ }
+
 QLabel#Cursor {
      /*padding-right: 15px;  make room for the arrows */
      border-image: url(:/images/frame.png) 4;
