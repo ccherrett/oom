@@ -1048,7 +1048,7 @@ void Arranger::switchInfo(int n)/*{{{*/
 		 	_rtabs->setTabEnabled(1, true);
 		 	_rtabs->setTabEnabled(2, true);
 		 	//_rtabs->setCurrentIndex(2);
-		 	w = new MidiStrip(mixerScroll, (MidiTrack*) selected);
+		 	w = new MidiStrip(central, (MidiTrack*) selected);
 		}
 		else
 		{
@@ -1056,7 +1056,7 @@ void Arranger::switchInfo(int n)/*{{{*/
 		 	_rtabs->setTabEnabled(1, true);
 		 	if(chview)
 				_rtabs->setCurrentIndex(1);
-		 	w = new AudioStrip(mixerScroll, (AudioTrack*) selected);
+		 	w = new AudioStrip(central, (AudioTrack*) selected);
 		}
 		switch (selected->type())//{{{
 		{

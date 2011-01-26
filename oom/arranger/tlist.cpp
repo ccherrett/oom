@@ -1157,8 +1157,8 @@ void TList::mousePressEvent(QMouseEvent* ev)
 			//	classesPopupMenu(t, x, t->y() - ypos);
 			break;
 		case COL_OPORT:
-			//if (button == Qt::LeftButton)
-			//	portsPopupMenu(t, x, t->y() - ypos);
+			if (button == Qt::LeftButton)
+				portsPopupMenu(t, x, t->y() - ypos);
 			//else if (button == Qt::RightButton)
 			//	oportPropertyPopupMenu(t, x, t->y() - ypos);
 			break;
