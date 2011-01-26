@@ -62,7 +62,7 @@ Jack-session is not implemented yet, but is on our long list of intended feature
       Compiling:
   =============================
 
-      - Download source from https://github.com/ccherrett/oom
+      - Download source from git://github.com/ccherrett/oom.git
 
       - Command line to unpack source:
             tar xvofz oom-x.y.z.tar.gz 
