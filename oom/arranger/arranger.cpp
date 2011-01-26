@@ -1079,9 +1079,14 @@ void Arranger::switchInfo(int n)/*{{{*/
 		 	    w->setObjectName("MixerSynthStrip");
 		 	    break;
 		 	case Track::MIDI:
+			{
+		 	    w->setObjectName("MidiTrackStrip");
+		 		break;
+			}
 		 	case Track::DRUM:
 		 	{
-		 	    w->setObjectName("MidiTrackStrip");
+		 	    w->setObjectName("MidiDrumTrackStrip");
+		 		break;
 		 	}
 		 	break;
 		}//}}}
