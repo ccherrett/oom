@@ -301,7 +301,7 @@ void Track::setDefaultName()
 			base = QString("Drum");
 			break;
 		case WAVE:
-			base = QString("Wave");
+			base = QString("Audio");
 			break;
 		case AUDIO_OUTPUT:
 			base = QString("Out");
