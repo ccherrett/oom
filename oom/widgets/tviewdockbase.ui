@@ -152,6 +152,12 @@
          <height>24</height>
         </size>
        </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -169,6 +175,12 @@
         <size>
          <width>24</width>
          <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
         </size>
        </property>
        <property name="text">
@@ -190,6 +202,12 @@
          <height>24</height>
         </size>
        </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="toolTip">
         <string>Create and manager track views</string>
        </property>
@@ -205,7 +223,7 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>1</width>
          <height>20</height>
         </size>
        </property>
@@ -223,6 +241,12 @@
         <size>
          <width>24</width>
          <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
         </size>
        </property>
        <property name="text">
