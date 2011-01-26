@@ -320,9 +320,14 @@ void AudioMixerApp::addStrip(Track* t, int idx)
 				strip->setObjectName("MixerSynthStrip");
 				break;
 			case Track::MIDI:
-			case Track::DRUM:
 			{
 				strip->setObjectName("MidiTrackStrip");
+				break;
+			}
+			case Track::DRUM:
+			{
+				strip->setObjectName("MidiDrumTrackStrip");
+				break;
 			}
 				break;
 		}/*}}}*/
