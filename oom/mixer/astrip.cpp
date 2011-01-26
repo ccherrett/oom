@@ -1644,6 +1644,7 @@ void AudioStrip::iRoutePressed()
 		gRoutingPopupMenuMaster = 0;
 		return;
 	}
+	//TODO: Prepare the routeeditor dialog
 
 	QPoint ppt = QCursor::pos();
 
@@ -1917,6 +1918,7 @@ void AudioStrip::oRoutePressed()
 		gRoutingPopupMenuMaster = 0;
 		return;
 	}
+	//TODO: Prepare the routeeditor dialog
 
 	QPoint ppt = QCursor::pos();
 

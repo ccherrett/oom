@@ -295,9 +295,13 @@ void Track::setDefaultName()
 	switch (_type)
 	{
 		case MIDI:
+			base = QString("Midi");
+			break;
 		case DRUM:
+			base = QString("Drum");
+			break;
 		case WAVE:
-			base = QString("Track");
+			base = QString("Wave");
 			break;
 		case AUDIO_OUTPUT:
 			base = QString("Out");

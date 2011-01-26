@@ -1093,7 +1093,7 @@ QHeaderView#header {
 	 /*color: #76ac01;*/
  }
 
-DoubleLabel#ctrlLabelBox {
+QAbstractLabel#ctrlLabelBox {
      /*padding-right: 15px;  make room for the arrows */
      border-image: url(:/images/frame.png) 4;
      border-width: 3;

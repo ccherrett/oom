@@ -50,6 +50,7 @@ QT4_WRAP_CPP (widget_mocs
       pcscale.h  
 	  tvieweditor.h
 	  tviewdock.h
+	  routeeditor.h
 	  pctablemodel.h
 	  pctable.h
       mtrackinfo.h
@@ -115,6 +116,7 @@ file (GLOB widgets_ui_files
       velocitybase.ui
 	  trackvieweditorbase.ui
 	  tviewdockbase.ui
+	  routeeditorbase.ui
       )
 QT4_WRAP_UI (widget_ui_headers ${widgets_ui_files})
 
@@ -151,6 +153,7 @@ file (GLOB widgets_source_files
       mtrackinfo.cpp
 	  tvieweditor.cpp
 	  tviewdock.cpp
+	  routeeditor.cpp
       mtscale.cpp 
       pcscale.cpp 
 	  pctablemodel.cpp
