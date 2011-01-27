@@ -854,7 +854,7 @@ QToolBar::handle, QToolBar::addToolBarBreak
 QMenu{ 
 	background-color: #464649; 
 	color: #d0d4d0; 
-	border: 0px; 
+	border: 1px solid #222222; 
 	font-family: "fixed-width";
 	font-weight: normal;
 	font-size: 11px;
