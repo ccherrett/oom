@@ -519,7 +519,7 @@ background-color: #595966
 	background-color: red;
 	color:black;
 }*/
-MidiRack, EffectRack    { 
+MidiRack, EffectRack  { 
 	 border-radius: 6px;
      padding: 3px;
      /*border-image: url(:/images/frame.png) 4;*/
@@ -537,13 +537,57 @@ QListWidget::item::text
 	border-style: none;
 }
 */
-QListWidget#EffectRack::item:selected:active, QListWidget::item:selected {
+QListWidget#EffectRack::item:selected:active, QListWidget#EffectsRack::item:selected {
 	 border-radius: 3px;
      border: 1px solid #b883a1;
 	 background-color: #410122;
 	 color: #dcc3d1;
 	 text-decoration: none;
 	 font-family: "fixed";
+}
+QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selected, QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected {
+	 border-radius: 3px;
+     border: 0px solid #47cae1;
+	 background-color: #12191c;
+	 color: #47cae1;
+	 text-decoration: none;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
+}
+QListWidget#newSrcList, QListWidget#newDstList {
+	 border-radius: 6px;
+     border: 1px solid #211f23;
+	 background-color: #d8dbe8;
+	 text-decoration: none;
+     padding: 4px;
+	 color: #36373a; 
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
+}
+QGroupBox#groupBox1 ,QGroupBox#groupBox2, QGroupBox#groupBox3, QGroupBox#groupBox4
+{
+	padding: 10px;
+}
+QTreeWidget#routeList {
+	 border-radius: 6px;
+     border: 1px solid #211f23;
+	 background-color: #d8dbe8;
+	 text-decoration: none;
+	 color: #36373a; 
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
+}
+QTreeWidget#routeList::item:selected:active, QTreeWidget#routeList::item:selected {
+     border: 0px solid #47cae1;
+	 background-color: #12191c;
+	 color: #47cae1;
+	 text-decoration: none;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
 }
 
 /*QListWidgetItem { background-color: #595966 }*/

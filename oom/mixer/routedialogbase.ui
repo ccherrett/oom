@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>316</width>
-    <height>383</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -49,7 +49,7 @@
            </sizepolicy>
           </property>
           <property name="title">
-           <string>Source:</string>
+           <string>Inputs:</string>
           </property>
           <layout class="QVBoxLayout">
            <property name="spacing">
@@ -73,7 +73,7 @@
            </sizepolicy>
           </property>
           <property name="title">
-           <string>Destination:</string>
+           <string>Outputs:</string>
           </property>
           <layout class="QVBoxLayout">
            <property name="spacing">
@@ -127,22 +127,10 @@
          <property name="text">
           <string>Source</string>
          </property>
-         <property name="clickable">
-          <bool>true</bool>
-         </property>
-         <property name="resizable">
-          <bool>true</bool>
-         </property>
         </column>
         <column>
          <property name="text">
           <string>Destination</string>
-         </property>
-         <property name="clickable">
-          <bool>true</bool>
-         </property>
-         <property name="resizable">
-          <bool>true</bool>
          </property>
         </column>
        </widget>
