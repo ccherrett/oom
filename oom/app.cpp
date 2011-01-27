@@ -658,6 +658,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	watchdogThread = 0;
 	editInstrument = 0;
 	routingPopupMenu = 0;
+	routingDialog = 0;
 	//routingPopupView      = 0;
 
 	appName = QString("OOMidi");
@@ -874,6 +875,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	viewMixerAAction->setCheckable(true);
 	viewMixerBAction = new QAction(QIcon(*mixerSIcon), tr("Mixer B"), this);
 	viewMixerBAction->setCheckable(true);
+	viewRoutesAction = new QAction(QIcon(*mixerSIcon), tr("Audio Routes"), this);
+	viewRoutesAction->setCheckable(true);
 	viewCliplistAction = new QAction(QIcon(*cliplistSIcon), tr("Cliplist"), this);
 	viewCliplistAction->setCheckable(true);
 	viewMarkerAction = new QAction(QIcon(*view_markerIcon), tr("Marker View"), this);
@@ -1013,6 +1016,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(viewBigtimeAction, SIGNAL(toggled(bool)), SLOT(toggleBigTime(bool)));
 	connect(viewMixerAAction, SIGNAL(toggled(bool)), SLOT(toggleMixer1(bool)));
 	connect(viewMixerBAction, SIGNAL(toggled(bool)), SLOT(toggleMixer2(bool)));
+	connect(viewRoutesAction, SIGNAL(toggled(bool)), SLOT(toggleRoutes(bool)));
 	connect(viewCliplistAction, SIGNAL(toggled(bool)), SLOT(startClipList(bool)));
 	connect(viewMarkerAction, SIGNAL(toggled(bool)), SLOT(toggleMarker(bool)));
 
@@ -1240,6 +1244,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuView->addAction(viewBigtimeAction);
 	menuView->addAction(viewMixerAAction);
 	menuView->addAction(viewMixerBAction);
+	menuView->addAction(viewRoutesAction);
 	menuView->addAction(viewCliplistAction);
 	menuView->addAction(viewMarkerAction);
 
@@ -3585,6 +3590,10 @@ void OOMidi::kbAccel(int key)
 	{
 		toggleMixer2(!viewMixerBAction->isChecked());
 	}
+	else if(key == shortcuts[SHRT_OPEN_ROUTES].key)
+	{
+		toggleRoutes(true);
+	}
 	else if (key == shortcuts[SHRT_NEXT_MARKER].key)
 	{
 		if (markerView)
@@ -4794,6 +4803,7 @@ void OOMidi::updateConfiguration()
 	viewMixerBAction->setShortcut(shortcuts[SHRT_OPEN_MIXER2].key);
 	//viewCliplistAction has no acceleration
 	viewMarkerAction->setShortcut(shortcuts[SHRT_OPEN_MARKER].key);
+	viewRoutesAction->setShortcut(shortcuts[SHRT_OPEN_ROUTES].key);
 
 	strGlobalCutAction->setShortcut(shortcuts[SHRT_GLOBAL_CUT].key);
 	strGlobalInsertAction->setShortcut(shortcuts[SHRT_GLOBAL_INSERT].key);
@@ -4947,6 +4957,21 @@ void OOMidi::showMixer2(bool on)
 	if (mixer2)
 		mixer2->setVisible(on);
 	viewMixerBAction->setChecked(on);
+}
+
+void OOMidi::routingDialogClosed()
+{
+	routingDialog = 0;	
+}
+
+void OOMidi::toggleRoutes(bool)
+{
+	if(!routingDialog)
+	{
+		routingDialog = new RouteDialog(this);
+		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
+		routingDialog->setVisible(true);
+	}
 }
 
 //---------------------------------------------------------
