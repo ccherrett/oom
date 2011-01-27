@@ -1665,7 +1665,6 @@ void AudioStrip::iRoutePressed()
 
 	switch (track->type())
 	{
-		case Track::WAVE:
 		case Track::AUDIO_INPUT:
 		{
 			for (int i = 0; i < channel; ++i)
@@ -1729,9 +1728,9 @@ void AudioStrip::iRoutePressed()
 			gid = addAuxPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
 			gid = nonSyntiTrackAddSyntis(t, pup, gid, gRoutingMenuMap, false);
 			break;
-		//case Track::WAVE:
-			//gid = addInPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			//break;
+		case Track::WAVE:
+			gid = addInPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
+			break;
 		case Track::AUDIO_BUSS:
 			gid = addWavePorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
 			gid = addInPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
