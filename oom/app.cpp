@@ -3592,7 +3592,7 @@ void OOMidi::kbAccel(int key)
 	}
 	else if(key == shortcuts[SHRT_OPEN_ROUTES].key)
 	{
-		toggleRoutes(true);
+		toggleRoutes(!viewRoutesAction->isChecked());
 	}
 	else if (key == shortcuts[SHRT_NEXT_MARKER].key)
 	{
@@ -4961,17 +4961,21 @@ void OOMidi::showMixer2(bool on)
 
 void OOMidi::routingDialogClosed()
 {
-	routingDialog = 0;	
+	viewRoutesAction->setChecked(false);
+	//routingDialog = 0;	
 }
 
-void OOMidi::toggleRoutes(bool)
+void OOMidi::toggleRoutes(bool on)
 {
-	if(!routingDialog)
+	if(on && routingDialog == 0)
 	{
 		routingDialog = new RouteDialog(this);
 		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
 		routingDialog->setVisible(true);
 	}
+	if (routingDialog)
+		routingDialog->setVisible(on);
+	viewRoutesAction->setChecked(on);
 }
 
 //---------------------------------------------------------
