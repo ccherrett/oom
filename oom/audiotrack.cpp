@@ -129,6 +129,7 @@ AudioTrack::AudioTrack(const AudioTrack& t, bool cloneParts)
 	_auxSend = t._auxSend;
 	_efxPipe = new Pipeline(*(t._efxPipe));
 	_automationType = t._automationType;
+	//FIXME:Update this to create new input/output tracks and connect them to the same routes
 	_inRoutes = t._inRoutes;
 	_outRoutes = t._outRoutes;
 	// Changed by Tim. p3.3.15

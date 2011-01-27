@@ -155,6 +155,15 @@ void RouteDialog::addRoute()
 	audio->msgUpdateSoloStates();
 	song->update(SC_SOLO);
 	new QTreeWidgetItem(routeList, QStringList() << srcItem->text() << dstItem->text());
+	connectButton->setEnabled(false);
+}
+
+void RouteDialog::setSourceSelection(QString)
+{
+}
+
+void RouteDialog::setDestSelection(QString)
+{
 }
 
 //---------------------------------------------------------

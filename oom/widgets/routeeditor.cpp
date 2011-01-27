@@ -7,6 +7,7 @@
 #include "routeeditor.h"
 
 #include "track.h"
+#include "song.h"
 
 RouteEditor::RouteEditor(QWidget* parent) : QDialog(parent)
 {
