@@ -694,6 +694,8 @@ public:
 
 class AudioInput : public AudioTrack
 {
+	bool _slave;
+	Track* _master;
     void* jackPorts[MAX_CHANNELS];
     virtual bool getData(unsigned, int, unsigned, float**);
 
@@ -717,6 +719,22 @@ public:
     virtual void write(int, Xml&) const;
     virtual void setName(const QString& s);
 
+	void setSlave(bool s)
+	{
+		_slave = s;
+	}
+	bool isSlave()
+	{
+		return _slave;
+	}
+	void setMaster(Track* trk)
+	{
+		_master = trk;
+	}
+	Track* getMaster()
+	{
+		return _master;
+	}
     void* jackPort(int channel)
     {
         return jackPorts[channel];
@@ -746,6 +764,8 @@ public:
 
 class AudioOutput : public AudioTrack
 {
+	bool _slave;
+	Track* _master;
     void* jackPorts[MAX_CHANNELS];
     float* buffer[MAX_CHANNELS];
     float* buffer1[MAX_CHANNELS];
@@ -773,6 +793,22 @@ public:
     virtual void write(int, Xml&) const;
     virtual void setName(const QString& s);
 
+	void setSlave(bool s)
+	{
+		_slave = s;
+	}
+	bool isSlave()
+	{
+		return _slave;
+	}
+	void setMaster(Track* trk)
+	{
+		_master = trk;
+	}
+	Track* getMaster()
+	{
+		return _master;
+	}
     void* jackPort(int channel)
     {
         return jackPorts[channel];
@@ -813,6 +849,8 @@ public:
 
 class AudioBuss : public AudioTrack
 {
+	AudioInput* _input;
+	AudioOutput* _output;
 public:
 
     AudioBuss() : AudioTrack(AUDIO_BUSS)
@@ -841,6 +879,23 @@ public:
     {
             return _mute;
     }
+
+	void setOutputTrack(AudioOutput* out)
+	{
+		_output = out;
+	}
+	AudioOutput* output()
+	{
+		return _output;
+	}
+	void setInputTrack(AudioInput* in)
+	{
+		_input = in;
+	}
+	AudioInput* input()
+	{
+		return _input;
+	}
 
 };
 
@@ -890,6 +945,8 @@ public:
 class WaveTrack : public AudioTrack
 {
     Fifo _prefetchFifo; // prefetch Fifo
+	AudioInput* _input;
+	AudioOutput* _output;
 
 public:
     static bool firstWaveTrack;
@@ -945,6 +1002,23 @@ public:
     {
         return true;
     }
+
+	void setOutputTrack(AudioOutput* out)
+	{
+		_output = out;
+	}
+	AudioOutput* output()
+	{
+		return _output;
+	}
+	void setInputTrack(AudioInput* in)
+	{
+		_input = in;
+	}
+	AudioInput* input()
+	{
+		return _input;
+	}
 };
 
 //---------------------------------------------------------

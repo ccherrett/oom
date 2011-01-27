@@ -415,7 +415,7 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	oR->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	//oR->setText(tr("oR"));
 	oR->setIcon(*mixerOut);
-	oR->setIconSize(mixerIn->size());
+	oR->setIconSize(mixerOut->size());
 	oR->setCheckable(false);
 	oR->setObjectName("btnOuts");
 	// TODO: Works OK, but disabled for now, until we figure out what to do about multiple out routes and display values...
