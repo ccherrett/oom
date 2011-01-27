@@ -727,6 +727,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 
 	record = 0;
 	off = 0;
+	routingDialog = 0;
 
 	AudioTrack* t = (AudioTrack*) track;
 	channel = at->channels();
@@ -1645,7 +1646,15 @@ void AudioStrip::iRoutePressed()
 		return;
 	}
 	//TODO: Prepare the routeeditor dialog
-
+	iR->setDown(true);
+	if(!routingDialog)
+	{
+		routingDialog = new RouteDialog(this);
+		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
+		routingDialog->setDestSelection(track->name());
+		routingDialog->setVisible(true);
+	}
+/*
 	QPoint ppt = QCursor::pos();
 
 	PopupMenu* pup = oom->getRoutingPopupMenu();
@@ -1763,6 +1772,7 @@ void AudioStrip::iRoutePressed()
 	connect(pup, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
 	pup->popup(ppt);
 	iR->setDown(false);
+	*/
 }
 
 //---------------------------------------------------------
@@ -1907,6 +1917,13 @@ void AudioStrip::routingPopupMenuActivated(QAction* act)
 	}
 }
 
+void AudioStrip::routingDialogClosed()
+{
+	oR->setDown(false);
+	iR->setDown(false);
+	routingDialog = 0;
+}
+
 //---------------------------------------------------------
 //   oRoutePressed
 //---------------------------------------------------------
@@ -1918,9 +1935,17 @@ void AudioStrip::oRoutePressed()
 		gRoutingPopupMenuMaster = 0;
 		return;
 	}
+	oR->setDown(true);
 	//TODO: Prepare the routeeditor dialog
+	if(!routingDialog)
+	{
+		routingDialog = new RouteDialog(this);
+		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
+		routingDialog->setSourceSelection(track->name());
+		routingDialog->setVisible(true);
+	}
 
-	QPoint ppt = QCursor::pos();
+/*	QPoint ppt = QCursor::pos();
 
 	PopupMenu* pup = oom->getRoutingPopupMenu();
 	pup->disconnect();
@@ -2024,6 +2049,7 @@ void AudioStrip::oRoutePressed()
 	connect(pup, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
 	pup->popup(ppt);
 	oR->setDown(false);
+	*/
 }
 
 void AudioStrip::playbackClipped()

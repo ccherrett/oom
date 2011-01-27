@@ -26,6 +26,7 @@ class TransparentToolButton;
 class AudioTrack;
 class DoubleLabel;
 class EffectRack;
+class RouteDialog;
 
 //---------------------------------------------------------
 //   AudioStrip
@@ -54,6 +55,7 @@ class AudioStrip : public Strip
     double panVal;
 
     QString slDefaultStyle;
+    RouteDialog* routingDialog;
 
     //QToolButton* iR;
     //QToolButton* oR;
@@ -87,6 +89,7 @@ private slots:
     void panRightClicked(const QPoint &);
     void playbackClipped();
     void resetPeaks();
+	void routingDialogClosed();
 
 protected slots:
     virtual void heartBeat();

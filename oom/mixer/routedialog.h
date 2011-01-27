@@ -32,14 +32,14 @@ private slots:
     void srcSelectionChanged();
     void dstSelectionChanged();
     void songChanged(int);
-	void setSourceSelection(QString);
-	void setDestSelection(QString);
 
 signals:
     void closed();
 
 public:
     RouteDialog(QWidget* parent = 0);
+	void setSourceSelection(QString);
+	void setDestSelection(QString);
 };
 
 

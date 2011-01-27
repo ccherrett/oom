@@ -158,12 +158,30 @@ void RouteDialog::addRoute()
 	connectButton->setEnabled(false);
 }
 
-void RouteDialog::setSourceSelection(QString)
+void RouteDialog::setSourceSelection(QString src)
 {
+	newSrcList->setCurrentRow(-1);
+	QList<QListWidgetItem*> found = newSrcList->findItems(src, Qt::MatchExactly);
+	if(found.isEmpty())
+		return;
+	for(int i = 0; i < found.size(); ++i)
+	{
+		newSrcList->setCurrentItem(found.at(i), QItemSelectionModel::ClearAndSelect);
+	}
+	newDstList->setCurrentRow(-1);
 }
 
-void RouteDialog::setDestSelection(QString)
+void RouteDialog::setDestSelection(QString dest)
 {
+	newDstList->setCurrentRow(-1);
+	QList<QListWidgetItem*> found = newDstList->findItems(dest, Qt::MatchExactly);
+	if(found.isEmpty())
+		return;
+	for(int i = 0; i < found.size(); ++i)
+	{
+		newDstList->setCurrentItem(found.at(i), QItemSelectionModel::ClearAndSelect);
+	}
+	newSrcList->setCurrentRow(-1);
 }
 
 //---------------------------------------------------------
