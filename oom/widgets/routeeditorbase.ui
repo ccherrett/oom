@@ -77,7 +77,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTabWidget" name="tabWidget">
+        <widget class="QTabWidget" name="tabMain">
          <property name="currentIndex">
           <number>0</number>
          </property>

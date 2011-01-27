@@ -233,13 +233,12 @@ Strip::Strip(QWidget* parent, Track* t)
 		{
 			label->setObjectName("MidiTrackLabel");
 			topRack = QPixmap(":/images/top_rack_midi.png");
-			break;
 		}
+			break;
 		case Track::DRUM:
 		{
 			label->setObjectName("MidiDrumTrackLabel");
 			topRack = QPixmap(":/images/top_rack_midi.png");
-			break;
 		}
 			break;
 	}
