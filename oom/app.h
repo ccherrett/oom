@@ -64,6 +64,7 @@ class Appearance;
 class WaveTrack;
 class AudioOutput;
 class EditInstrument;
+class RouteDialog;
 class QDocWidget;
 
 #define MENU_ADD_SYNTH_ID_BASE 0x1000
@@ -123,7 +124,7 @@ class OOMidi : public QMainWindow
     QAction *editSongInfoAction;
 
     // View Menu actions
-    QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, *viewMixerBAction, *viewCliplistAction, *viewMarkerAction;
+    QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, *viewMixerBAction, *viewCliplistAction, *viewMarkerAction, *viewRoutesAction;
 
     // Structure Menu actions
     QAction *strGlobalCutAction, *strGlobalInsertAction, *strGlobalSplitAction, *strCopyRangeAction, *strCutEventsAction;
@@ -188,6 +189,7 @@ class OOMidi : public QMainWindow
     Appearance* appearance;
     AudioMixerApp* mixer1;
     AudioMixerApp* mixer2;
+    RouteDialog* routingDialog;
 
     ToplevelList toplevels;
     ClipListEdit* clipListEdit;
@@ -254,6 +256,7 @@ private slots:
     //void toggleMixer();
     void toggleMixer1(bool);
     void toggleMixer2(bool);
+	void toggleRoutes(bool);
 
     void configMidiSync();
     void configMidiFile();
@@ -322,6 +325,7 @@ private slots:
     void mixer1Closed();
     void mixer2Closed();
     void markerClosed();
+	void routingDialogClosed();
 
     void execDeliveredScript(int);
     void execUserScript(int);
