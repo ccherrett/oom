@@ -553,18 +553,20 @@ QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selec
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
-	 font-size: 11px;
+	 font-size: 12px;
 }
 QListWidget#newSrcList, QListWidget#newDstList {
 	 border-radius: 6px;
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
 	 text-decoration: none;
-     padding: 4px;
+     padding: 15px;
 	 color: #36373a; 
 	 font-family: "fixed-width";
 	 font-weight: bold;
-	 font-size: 11px;
+	 font-size: 14px;
+	 alternate-background-color: #bec0cf;
+	 show-decoration-selected: 0; 
 }
 QGroupBox#groupBox1 ,QGroupBox#groupBox2, QGroupBox#groupBox3, QGroupBox#groupBox4
 {
@@ -578,7 +580,10 @@ QTreeWidget#routeList {
 	 color: #36373a; 
 	 font-family: "fixed-width";
 	 font-weight: bold;
-	 font-size: 11px;
+	 font-size: 14px;
+     padding: 15px;
+	 alternate-background-color: #bec0cf;
+	 show-decoration-selected: 0; 
 }
 QTreeWidget#routeList::item:selected:active, QTreeWidget#routeList::item:selected {
      border: 0px solid #47cae1;
@@ -587,7 +592,44 @@ QTreeWidget#routeList::item:selected:active, QTreeWidget#routeList::item:selecte
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
-	 font-size: 11px;
+	 font-size: 12px;
+	 show-decoration-selected: 0; 
+}
+QToolButton#connectButton
+{
+	padding: 12px;
+	color: #000000;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #32462e, stop:0.1 #99b594, stop:0.6 #bcddb7, stop: 0.9 #bcddb7, stop: 1.0 #647961);
+}
+QToolButton#connectButton::hover
+{
+	padding: 12px;
+	color: #000000;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #3c6c35, stop:0.1 #24a801, stop:0.6 #a5fc97, stop: 0.9 #a5fc97, stop: 1.0 #3c6c35);
+}
+QToolButton#removeButton
+{
+	padding: 12px;
+	color: #000000;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #683c3c, stop:0.1 #7a3030, stop:0.6 #e0b4b4, stop: 0.9 #e0b4b4, stop: 1.0 #997b7b);
+}
+QToolButton#removeButton::hover
+{
+	padding: 12px;
+	color: #000000;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #6c3535, stop:0.1 #a80101, stop:0.6 #fc9797, stop: 0.9 #fc9797, stop: 1.0 #653c3c);
+}
+QToolButton#connectButton::disabled, QToolButton#removeButton::disabled
+{
+	padding: 12px;
+	background-color: #595966;
+	color: #8f9198;
+    /*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #d0d4d0, stop:0.3 #5b5b6b, stop: 1.0 #4d4d5b);*/
 }
 
 /*QListWidgetItem { background-color: #595966 }*/
