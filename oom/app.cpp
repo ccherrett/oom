@@ -4971,13 +4971,23 @@ void OOMidi::toggleRoutes(bool on)
 	{
 		routingDialog = new RouteDialog(this);
 		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
-		routingDialog->setVisible(true);
 	}
 	if (routingDialog)
 		routingDialog->setVisible(on);
 	viewRoutesAction->setChecked(on);
 }
 
+RouteDialog* OOMidi::getRoutingDialog(bool on)
+{
+	if(routingDialog == 0)
+	{
+		routingDialog = new RouteDialog(this);
+		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
+		routingDialog->setVisible(on);
+	}
+	viewRoutesAction->setChecked(on);
+	return routingDialog;
+}
 //---------------------------------------------------------
 //   toggleMixer
 //---------------------------------------------------------

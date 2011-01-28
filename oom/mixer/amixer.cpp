@@ -620,7 +620,7 @@ void AudioMixerApp::showRouteDialog(bool on)
 {
 	if (on && routingDialog == 0)
 	{
-		routingDialog = new RouteDialog(this);
+		routingDialog = oom->getRoutingDialog(true);//new RouteDialog(this);
 		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
 	}
 	if (routingDialog)

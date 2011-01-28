@@ -371,6 +371,7 @@ public:
     QWidget* mixer2Window();
     QWidget* transportWindow();
     QWidget* bigtimeWindow();
+	RouteDialog* getRoutingDialog(bool);
     bool importWaveToTrack(QString& name, unsigned tick = 0, Track* track = NULL);
     void importPartToTrack(QString& filename, unsigned tick, Track* track);
 

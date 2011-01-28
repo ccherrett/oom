@@ -1649,10 +1649,10 @@ void AudioStrip::iRoutePressed()
 	iR->setDown(true);
 	if(!routingDialog)
 	{
-		routingDialog = new RouteDialog(this);
+		routingDialog = oom->getRoutingDialog(true);
 		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
 		routingDialog->setDestSelection(track->name());
-		routingDialog->setVisible(true);
+		//routingDialog->setVisible(true);
 	}
 /*
 	QPoint ppt = QCursor::pos();
@@ -1919,8 +1919,8 @@ void AudioStrip::routingPopupMenuActivated(QAction* act)
 
 void AudioStrip::routingDialogClosed()
 {
-	oR->setDown(false);
-	iR->setDown(false);
+	//oR->setDown(false);
+	//iR->setDown(false);
 	routingDialog = 0;
 }
 
@@ -1939,10 +1939,9 @@ void AudioStrip::oRoutePressed()
 	//TODO: Prepare the routeeditor dialog
 	if(!routingDialog)
 	{
-		routingDialog = new RouteDialog(this);
+		routingDialog = oom->getRoutingDialog(true);
 		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
 		routingDialog->setSourceSelection(track->name());
-		routingDialog->setVisible(true);
 	}
 
 /*	QPoint ppt = QCursor::pos();
