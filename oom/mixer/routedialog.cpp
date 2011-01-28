@@ -137,7 +137,8 @@ void RouteDialog::removeRoute()
 		return;
 	audio->msgRemoveRoute(Route(item->text(0), false, -1), Route(item->text(1), true, -1));
 	audio->msgUpdateSoloStates();
-	song->update(SC_SOLO);
+	//song->update(SC_SOLO);
+	song->update(SC_ROUTE);
 	delete item;
 }
 
@@ -153,7 +154,8 @@ void RouteDialog::addRoute()
 		return;
 	audio->msgAddRoute(Route(srcItem->text(), false, -1), Route(dstItem->text(), true, -1));
 	audio->msgUpdateSoloStates();
-	song->update(SC_SOLO);
+	//song->update(SC_SOLO);
+	song->update(SC_ROUTE);
 	new QTreeWidgetItem(routeList, QStringList() << srcItem->text() << dstItem->text());
 	connectButton->setEnabled(false);
 }
