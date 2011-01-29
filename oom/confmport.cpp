@@ -791,14 +791,17 @@ MPConfig::MPConfig(QWidget* parent)
 	mdevView->resizeColumnsToContents();
 	//mdevView->horizontalHeader()->setMinimumSectionSize(60);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_REC, 16);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 16);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 100);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 200);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 200);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_REC, 20);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 20);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 40);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_INROUTES, 50);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 60);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 60);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NAME, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->setStretchLastSection(true);
+	mdevView->horizontalHeader()->setDefaultAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 
 	connect(mdevView, SIGNAL(itemPressed(QTableWidgetItem*)),
 			this, SLOT(rbClicked(QTableWidgetItem*)));
@@ -1004,7 +1007,7 @@ void MPConfig::songChanged(int flags)
 	}
 	synthList->resizeColumnToContents(1);
 	*/
-	mdevView->resizeColumnsToContents();
+	/*mdevView->resizeColumnsToContents();*/
 	/*mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_REC, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_PLAY, QHeaderView::Fixed);
