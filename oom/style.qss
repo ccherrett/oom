@@ -1,5 +1,5 @@
 /*
- *    this is the OOMidi application style sheet
+ *    OOMidi application style sheet
  */
 
 QWidget#dockMixerCenter 
@@ -22,7 +22,6 @@ QHeaderView#trackHeaders
 	text-align: left;
 	border: none;
 	background-color: #595966;
-	/*padding: 50px;*/
 }
 
  QWidget#WaveView
@@ -484,13 +483,6 @@ QToolButton#btnPre, QToolButton#btnPre::checked, QToolButton#btnPre::pressed, QT
 	background-color:none;
 	border: none;
 }
-/*QToolButton#btnMute::hover, QToolButton#btnSolo::hover, QToolButton#btnRecord::hover, QToolButton#btnPre::hover, 
-QToolButton#btnExit::hover, QToolButton#btnIns::hover, QToolButton#btnOuts::hover, QToolButton#btnStereo::hover 
-{ 
-	color: #e2e5e5; border-radius: 3px; padding: 0px; 
-	border: 1px solid #181819; 
-	background-color: #393941;
-}*/
 
 QLabel 
 { 
@@ -515,10 +507,6 @@ background-color: #595966
 }
 
 
-/*QListWidget#EffectRack    { 
-	background-color: red;
-	color:black;
-}*/
 MidiRack, EffectRack  { 
 	 border-radius: 6px;
      padding: 3px;
@@ -529,14 +517,6 @@ MidiRack, EffectRack  {
 	 background-color: #000c10;
 	 color: #b883a1;
 }
-/*
-QListWidget::item::focus{ border-style: none; }
-QListWidget::item:selected:active::text { border-style: none; }
-QListWidget::item::text
-{
-	border-style: none;
-}
-*/
 QListWidget#EffectRack::item:selected:active, QListWidget#EffectsRack::item:selected {
 	 border-radius: 3px;
      border: 1px solid #b883a1;
@@ -545,6 +525,7 @@ QListWidget#EffectRack::item:selected:active, QListWidget#EffectsRack::item:sele
 	 text-decoration: none;
 	 font-family: "fixed";
 }
+/*///////////START AUDIO PORT MANAGER///////////////{{{*/
 QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selected, QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected, QListWidget#tracksList::item:selected {
 	 border-radius: 3px;
      border: 0px solid #47cae1;
@@ -631,18 +612,101 @@ QToolButton#connectButton::disabled, QToolButton#removeButton::disabled, QToolBu
     /*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                   stop: 0 #d0d4d0, stop:0.3 #5b5b6b, stop: 1.0 #4d4d5b);*/
 }
-
-/*QListWidgetItem { background-color: #595966 }*/
+/*///////////END AUDIO PORT MANAGER///////////////}}}*/
+/*///////////START MIDI PORT MANAGER///////////////{{{*/
+QObject#mdeView::item:selected:active, QObject#mdeView::item:selected {
+	 border-radius: 3px;
+     border: 0px solid #47cae1;
+	 background-color: #12191c;
+	 color: #47cae1;
+	 text-decoration: none;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 12px;
+}
+QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList {
+	 border-radius: 6px;
+     border: 1px solid #211f23;
+	 background-color: #d8dbe8;
+	 text-decoration: none;
+     padding: 15px;
+	 color: #36373a; 
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 10px;
+	 alternate-background-color: #bec0cf;
+	 show-decoration-selected: 0; 
+}
+QGroupBox#groupBox1 ,QGroupBox#groupBox2, QGroupBox#groupBox3, QGroupBox#groupBox4, QGroupBox#groupBox
+{
+	padding: 10px;
+}
+QTreeWidget#routeList {
+	 border-radius: 6px;
+     border: 1px solid #211f23;
+	 background-color: #d8dbe8;
+	 text-decoration: none;
+	 color: #36373a; 
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 10px;
+     padding: 15px;
+	 alternate-background-color: #bec0cf;
+	 show-decoration-selected: 0; 
+}
+QTreeWidget#routeList::item:selected:active, QTreeWidget#routeList::item:selected {
+     border: 0px solid #47cae1;
+	 background-color: #12191c;
+	 color: #47cae1;
+	 text-decoration: none;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 12px;
+	 show-decoration-selected: 0; 
+}
+QToolButton#connectButton, QToolButton#btnConnectOut
+{
+	padding: 12px;
+	color: #000000;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #32462e, stop:0.1 #99b594, stop:0.6 #bcddb7, stop: 0.9 #bcddb7, stop: 1.0 #647961);
+}
+QToolButton#connectButton::hover, QToolButton#btnConnectOut::hover
+{
+	padding: 12px;
+	color: #000000;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #3c6c35, stop:0.1 #24a801, stop:0.6 #a5fc97, stop: 0.9 #a5fc97, stop: 1.0 #3c6c35);
+}
+QToolButton#removeButton
+{
+	padding: 12px;
+	color: #000000;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #683c3c, stop:0.1 #7a3030, stop:0.6 #e0b4b4, stop: 0.9 #e0b4b4, stop: 1.0 #997b7b);
+}
+QToolButton#removeButton::hover
+{
+	padding: 12px;
+	color: #000000;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #6c3535, stop:0.1 #a80101, stop:0.6 #fc9797, stop: 0.9 #fc9797, stop: 1.0 #653c3c);
+}
+QToolButton#connectButton::disabled, QToolButton#removeButton::disabled, QToolButton#btnConnectOut::disabled
+{
+	padding: 12px;
+	background-color: #595966;
+	color: #8f9198;
+    /*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #d0d4d0, stop:0.3 #5b5b6b, stop: 1.0 #4d4d5b);*/
+}
+/*///////////END MIDI PORT MANAGER///////////////}}}*/
 QWidget#MixerCenter { background-color: #595966 }
-/*QWidget#EffectRack { 
-	background-color: #595966; 
-}*/
 QMainWindow { background-color: #595966 }
 QMainWindow::separator {
 	background-color: #6b6973;
 	width: 5px;
 }
-/*QWidget { background-color: #595966 }*/
 
 /*{{{*/
 QTabWidget::pane { /* The tab widget frame */
@@ -699,9 +763,6 @@ QTabWidget#tabControlCenter::tab-bar {
 /* Style the tab using the tab sub-control. Note that
     it reads QTabBar _not_ QTabWidget */
 QTabWidget#tabControlCenter QTabBar::tab {
-    /*background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
-                                stop: 0 green, stop: 0.4 red,
-                                stop: 0.5 white, stop: 1.0 blue);*/
 	background-color: #47474d;							
     border: 1px solid #a5a6a5;
     border-right-color: #5a5963; /* same as the pane color */
@@ -719,7 +780,6 @@ QTabWidget#tabControlCenter QTabBar::tab {
 	font-size: 11px;
 }
 
-/*QTabWidget#tabControlCenter QTabBar::tab:selected, QTabWidget#tabControlCenter QTabBar::tab:hover {*/
 QTabWidget#tabControlCenter QTabBar::tab:selected {
     /*background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
@@ -819,11 +879,7 @@ QDockWidget::float-button {
 }
 
 QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea { background-color: #595966 }
-/*QMainWindow::toolBarBreak { color: green }*/
 
-/*QToolButton {
-	border: 0px;
-}*/
 QToolBar { 
 background-color: #595966; 
 color: #d0d4d0; 
@@ -1119,18 +1175,6 @@ QCheckBox {
  QCheckBox::indicator:indeterminate:pressed {
      image: url(:/images/checkbox_indeterminate_pressed.png);
  }
-/*
- QCheckBox {
-     border: 1px solid #393941;
-     border-radius: 3px;
-     padding: 3px 18px 3px 6px;
-     min-width: 6em;
-	 font-family: "fixed-width";
-	 font-weight: bold;
-	 font-size: 11px;
-	 color: #d0d4d0;
- }
-*/
  QComboBox {
      border: 1px solid #393941;
      border-radius: 3px;
@@ -1336,113 +1380,3 @@ QAbstractSpinBox {
     image: url(:/images/down_arrow_disabled.png);
  }
 
-/*
- QScrollBar:vertical {
-     border: 1px solid #393941;
-     background: #858599;
-     height: 15px;
-     margin: 0px 20px 0 20px;
- }
- QScrollBar::handle:vertical {
-     border: 1px solid #393941;
-     background: #545463;
-     min-width: 20px;
- }
- QScrollBar::add-line:vertical {
-     border: 1px solid #393941;
-     background: #585867;
-     width: 20px;
-     subcontrol-position: right;
-     subcontrol-origin: margin;
- }
-
- QScrollBar::sub-line:vertical {
-     border: 1px solid #393941;
-     background: #585867;
-     width: 20px;
-     subcontrol-position: left;
-     subcontrol-origin: margin;
- }
-QScrollBar:left-arrow:vertical, QScrollBar::right-arrow:vertical {
-     border: 1px solid #393941;
-     width: 3px;
-     height: 3px;
-     background: white;
- }
-
- QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-     background: none;
- }
-
-Awl--PosEdit       { font-size: 5pt; color: green; }
-
-*/
-
-
-/*progRecordButton { background-color: #595966 }*/
-/* TODO */
-/*
-QLabel#midiChannelLabel { font-size: 6pt }
-MidiRack, EffectRack    { font-size: 8pt }
-QLabel#trackLabel       { font-size: 6pt }
-SimpleButton            { font-size: 8pt }
-QToolButton#routeButton { font-size: 8pt }
-QToolButton#preButton   { font-size: 8pt }
-
-TimeCanvas {
-      qproperty-fontSize1: 6;
-      qproperty-fontSize2: 8;
-      qproperty-fontSize3: 8
-      }
-
-QLabel#knobLabel        { font-size: 8pt }
-Awl--MidiVolEntry       { font-size: 5pt }
-Awl--MidiPanEntry       { font-size: 5pt }
-Awl--VolEntry           { font-size: 5pt }
-Awl--PanEntry           { font-size: 5pt }
-
-QLabel#AudioOut         {
-      font-size: 7pt;
-      background-color: white;
-      }
-
-QLabel#Group         {
-      font-size: 7pt;
-      background-color: yellow;
-      }
-
-QLabel#Wave         {
-      font-size: 7pt;
-      background-color: rgb(0,255,0);
-      }
-
-QLabel#AudioIn         {
-      font-size: 7pt;
-      background-color: red;
-      }
-
-QLabel#Synth         {
-      font-size: 7pt;
-      background-color: blue;
-      }
-
-QLabel#Midi         {
-      font-size: 7pt;
-      background-color: gray;
-      }
-
-QLabel#MidiOut         {
-      font-size: 7pt;
-      background-color: gray;
-      }
-
-QLabel#MidiIn         {
-      font-size: 7pt;
-      background-color: gray;
-      }
-QLabel#M-Synth         {
-      font-size: 7pt;
-      background-color: gray;
-      }
-
-*/
