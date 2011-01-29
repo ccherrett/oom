@@ -45,6 +45,7 @@ signals:
 
 public:
     RouteDialog(QWidget* parent = 0);
+	~RouteDialog();
 	void setSourceSelection(QString);
 	void setDestSelection(QString);
 	void setSelected(AudioTrack* s);

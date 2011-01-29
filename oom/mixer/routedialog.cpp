@@ -17,6 +17,7 @@
 #include "song.h"
 #include "audio.h"
 #include "driver/jackaudio.h"
+#include "traverso_shared/TConfig.h"
 
 //---------------------------------------------------------
 //   RouteDialog
@@ -37,12 +38,18 @@ RouteDialog::RouteDialog(QWidget* parent)
 	connect(btnConnectOut, SIGNAL(clicked()), SLOT(addOutRoute()));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	routingChanged();
-	//QTreeWidgetItem* header = routeList->headerItem();
-	//if(header)
-	//{
-		routeList->header()->resizeSection(1, 30);
-		routeList->header()->resizeSection(3, 30);
-	//}
+	routeList->header()->resizeSection(1, 30);
+	routeList->header()->resizeSection(3, 30);
+	resize(tconfig().get_property("RouteDialog", "size", QSize(891, 691)).toSize());
+	move(tconfig().get_property("RouteDialog", "pos", QPoint(0, 0)).toPoint());
+}
+
+RouteDialog::~RouteDialog()
+{
+	tconfig().set_property("RouteDialog", "size", size());
+	tconfig().set_property("RouteDialog", "pos", pos());
+    // Save the new global settings to the configuration file
+    tconfig().save();
 }
 
 //---------------------------------------------------------
