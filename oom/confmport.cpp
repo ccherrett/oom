@@ -772,12 +772,12 @@ MPConfig::MPConfig(QWidget* parent)
 			<< tr("GUI")
 			<< tr("I")
 			<< tr("O")
-			<< tr("Instr")
-			<< tr("D-Name")
-			<< tr("Ins")
-			<< tr("Outs")
-			<< tr("I-Ch")
-			<< tr("O-Ch")
+			<< tr("Instrument")
+			<< tr("Device Name")
+			<< tr("In routes")
+			<< tr("Out routes")
+			<< tr("Def in ch")
+			<< tr("Def out ch")
 			<< tr("State");
 
 	mdevView->setColumnCount(columnnames.size());
@@ -851,7 +851,7 @@ void MPConfig::songChanged(int flags)
 		s.setNum(i + 1);
 		QTableWidgetItem* itemno = new QTableWidgetItem(s);
 		addItem(i, DEVCOL_NO, itemno, mdevView);
-		itemno->setTextAlignment(Qt::AlignLeft);
+		itemno->setTextAlignment(Qt::AlignHCenter);
 		itemno->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemstate = new QTableWidgetItem(port->state());
 		addItem(i, DEVCOL_STATE, itemstate, mdevView);
@@ -866,15 +866,15 @@ void MPConfig::songChanged(int flags)
 		itemname->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemgui = new QTableWidgetItem;
 		addItem(i, DEVCOL_GUI, itemgui, mdevView);
-		itemgui->setTextAlignment(Qt::AlignLeft);
+		itemgui->setTextAlignment(Qt::AlignHCenter);
 		itemgui->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemrec = new QTableWidgetItem;
 		addItem(i, DEVCOL_REC, itemrec, mdevView);
-		itemrec->setTextAlignment(Qt::AlignLeft);
+		itemrec->setTextAlignment(Qt::AlignHCenter);
 		itemrec->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemplay = new QTableWidgetItem;
 		addItem(i, DEVCOL_PLAY, itemplay, mdevView);
-		itemplay->setTextAlignment(Qt::AlignLeft);
+		itemplay->setTextAlignment(Qt::AlignHCenter);
 		itemplay->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemout = new QTableWidgetItem;
 		addItem(i, DEVCOL_OUTROUTES, itemout, mdevView);
@@ -998,8 +998,6 @@ void MPConfig::songChanged(int flags)
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_REC, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_PLAY, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_GUI, QHeaderView::Fixed);
-	//mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
-	//mdevView->horizontalHeader()->setResizeMode(DEVCOL_NAME, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->setStretchLastSection(true);
 	selectionChanged();
 }
@@ -1033,8 +1031,7 @@ void MPConfig::addInstanceClicked()
 			break;
 		}
 	}
-	*/
-	
+*/	
 }
 
 //---------------------------------------------------------
