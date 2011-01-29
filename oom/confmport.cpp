@@ -772,12 +772,12 @@ MPConfig::MPConfig(QWidget* parent)
 			<< tr("GUI")
 			<< tr("I")
 			<< tr("O")
-			<< tr("Instrument")
-			<< tr("Device Name")
-			<< tr("In routes")
-			<< tr("Out routes")
-			<< tr("Def in ch")
-			<< tr("Def out ch")
+			<< tr("Instr")
+			<< tr("D-Name")
+			<< tr("Ins")
+			<< tr("Outs")
+			<< tr("In Ch")
+			<< tr("Out Ch")
 			<< tr("State");
 
 	mdevView->setColumnCount(columnnames.size());
@@ -788,6 +788,20 @@ MPConfig::MPConfig(QWidget* parent)
 		setToolTip(mdevView->horizontalHeaderItem(i), i);
 	}
 	mdevView->setFocusPolicy(Qt::NoFocus);
+	mdevView->resizeColumnsToContents();
+	//mdevView->horizontalHeader()->setMinimumSectionSize(60);
+	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_REC, 20);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 20);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 40);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_INROUTES, 50);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 60);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 60);
+	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
+	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NAME, QHeaderView::ResizeToContents);
+	mdevView->horizontalHeader()->setStretchLastSection(true);
+	mdevView->horizontalHeader()->setDefaultAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 
 	connect(mdevView, SIGNAL(itemPressed(QTableWidgetItem*)),
 			this, SLOT(rbClicked(QTableWidgetItem*)));
@@ -993,12 +1007,12 @@ void MPConfig::songChanged(int flags)
 	}
 	synthList->resizeColumnToContents(1);
 	*/
-	mdevView->resizeColumnsToContents();
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
+	/*mdevView->resizeColumnsToContents();*/
+	/*mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_REC, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_PLAY, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_GUI, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->setStretchLastSection(true);
+	mdevView->horizontalHeader()->setStretchLastSection(true);*/
 	selectionChanged();
 }
 

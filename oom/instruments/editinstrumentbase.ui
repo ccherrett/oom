@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>802</width>
-    <height>505</height>
+    <width>1000</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>802</width>
-    <height>464</height>
+    <width>1000</width>
+    <height>600</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -56,8 +56,17 @@
         </item>
         <item>
          <widget class="QListWidget" name="instrumentList">
+          <property name="minimumSize">
+           <size>
+            <width>260</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="whatsThis">
            <string>List of defined instruments.</string>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -72,7 +81,7 @@
        </property>
        <widget class="QWidget" name="patchesTab">
         <attribute name="title">
-         <string>Pa&amp;tches</string>
+         <string>    Pa&amp;tches    </string>
         </attribute>
         <layout class="QVBoxLayout">
          <item>
@@ -92,6 +101,9 @@
             </property>
             <property name="whatsThis">
              <string>List of groups and patches.</string>
+            </property>
+            <property name="alternatingRowColors">
+             <bool>true</bool>
             </property>
             <property name="rootIsDecorated">
              <bool>true</bool>
@@ -446,7 +458,7 @@
        </widget>
        <widget class="QWidget" name="controllerTab">
         <attribute name="title">
-         <string>Contro&amp;ller</string>
+         <string>    Contro&amp;ller    </string>
         </attribute>
         <layout class="QVBoxLayout">
          <item>
@@ -482,6 +494,9 @@
 Note that in OOMidi pitch and program changes are
 handled like normal controllers.</string>
                </property>
+               <property name="alternatingRowColors">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -501,6 +516,9 @@ handled like normal controllers.</string>
                </property>
                <property name="frameShadow">
                 <enum>QFrame::Sunken</enum>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>true</bool>
                </property>
                <property name="allColumnsShowFocus">
                 <bool>true</bool>
@@ -1264,7 +1282,7 @@ Typically, set to 127/127, or an unused
        </widget>
        <widget class="QWidget" name="sysExTab">
         <attribute name="title">
-         <string>S&amp;ysEx</string>
+         <string>    S&amp;ysEx    </string>
         </attribute>
         <layout class="QVBoxLayout">
          <item>
@@ -1291,6 +1309,9 @@ Typically, set to 127/127, or an unused
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -1395,8 +1416,8 @@ Typically, set to 127/127, or an unused
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>802</width>
-     <height>21</height>
+     <width>1000</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="defaultUp">
@@ -1617,7 +1638,7 @@ Typically, set to 127/127, or an unused
    <sender>fileExitAction</sender>
    <signal>activated()</signal>
    <receiver>EditInstrumentBase</receiver>
-   <slot>fileExit()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

@@ -629,7 +629,7 @@ QObject#mdevView {
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
 	 text-decoration: none;
-     padding: 15px;
+     padding: 0px;
 	 color: #36373a; 
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -667,6 +667,70 @@ QTreeWidget#mdevView::item:selected:active, QTreeWidget#mdevView::item:selected 
 	 show-decoration-selected: 0; 
 }
 /*///////////END MIDI PORT MANAGER///////////////}}}*/
+/*///////////START SHORTCUT MANAGER///////////////}}}*/
+QObject#scListView::item:selected:active, QObject#scListView::item:selected,
+QObject#cgListView::item:selected:active, QObject#cgListView::item:selected {
+	 border-radius: 3px;
+     border: 0px solid #47cae1;
+	 background-color: #12191c;
+	 color: #47cae1;
+	 text-decoration: none;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 12px;
+}
+QObject#scListView,
+QObject#cgListView {
+	 border-radius: 6px;
+     border: 1px solid #211f23;
+	 background-color: #d8dbe8;
+	 text-decoration: none;
+     padding: 15px;
+	 color: #36373a; 
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 10px;
+	 alternate-background-color: #bec0cf;
+	 show-decoration-selected: 0; 
+}
+/*///////////END SHORTCUT MANAGER///////////////}}}*/
+/*///////////START CLIPLIST MANAGER///////////////}}}*/
+QObject#view::item:selected:active, QObject#view::item:selected,
+QObject#instrumentList::item:selected:active, QObject#instrumentList::item:selected,
+QObject#patchView::item:selected:active, QObject#patchView::item:selected,
+QObject#listController::item:selected:active, QObject#listController::item:selected,
+QObject#viewController::item:selected:active, QObject#viewController::item:selected,
+QObject#sysexList::item:selected:active, QObject#sysexList::item:selected,
+QObject#sysexData::item:selected:active, QObject#sysexDate::item:selected {
+	 border-radius: 3px;
+     border: 0px solid #47cae1;
+	 background-color: #12191c;
+	 color: #47cae1;
+	 text-decoration: none;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 12px;
+}
+QObject#view,
+QObject#instrumentList,
+QObject#listController,
+QObject#viewController,
+QObject#sysexList,
+QObject#sysexDate,
+QObject#patchView{
+	 border-radius: 6px;
+     border: 1px solid #211f23;
+	 background-color: #d8dbe8;
+	 text-decoration: none;
+     padding: 15px;
+	 color: #36373a; 
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 10px;
+	 alternate-background-color: #bec0cf;
+	 show-decoration-selected: 0; 
+}
+/*///////////END CLIPLIST MANAGER///////////////}}}*/
 QWidget#MixerCenter { background-color: #595966 }
 QMainWindow { background-color: #595966 }
 QMainWindow::separator {
