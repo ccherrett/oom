@@ -36,6 +36,12 @@ RouteDialog::RouteDialog(QWidget* parent)
 	connect(btnConnectOut, SIGNAL(clicked()), SLOT(addOutRoute()));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	routingChanged();
+	//QTreeWidgetItem* header = routeList->headerItem();
+	//if(header)
+	//{
+		routeList->header()->resizeSection(1, 30);
+		routeList->header()->resizeSection(3, 30);
+	//}
 }
 
 //---------------------------------------------------------
@@ -61,59 +67,18 @@ void RouteDialog::routingChanged()
 	{
 		if ((*i)->isMidiTrack())
 			continue;
-		// p3.3.38
-		//WaveTrack* track = (WaveTrack*)(*i);
 		AudioTrack* track = (AudioTrack*) (*i);
-		//tracksList->addItem(track->name());
-		/*if (track->type() == Track::AUDIO_INPUT)
-		{
-			for (int channel = 0; channel < track->channels(); ++channel)
-				newDstList->addItem(Route(track, channel).name());
-			const RouteList* rl = track->inRoutes();
-			for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-			{
-				//Route dst(track->name(), true, r->channel);
-				Route dst(track->name(), true, r->channel, Route::TRACK_ROUTE);
-				new QTreeWidgetItem(routeList, QStringList() << r->name() << dst.name());
-			}
-		}*/
-		//else if (track->type() != Track::AUDIO_AUX)
-		//	newDstList->addItem(Route(track, -1).name());
-		if (track->type() == Track::AUDIO_OUTPUT)
-		{
+		//if (track->type() == Track::AUDIO_OUTPUT)
+		//{
 			for (int channel = 0; channel < track->channels(); ++channel)
 			{
 				Route r(track, channel);
 				tracksList->addItem(r.name());
-				//newSrcList->addItem(r.name());
 			}
-		}
-		else
-			tracksList->addItem(Route(track, -1).name());
-			//newSrcList->addItem(Route(track, -1).name());
-/*
-		const RouteList* rl = track->outRoutes();
-		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-		{
-			QString src(track->name());
-			if (track->type() == Track::AUDIO_OUTPUT)
-			{
-				Route s(src, false, r->channel);
-				src = s.name();
-			}
-			new QTreeWidgetItem(routeList, QStringList() << src << r->name());
-		}
-*/
+		//}
+		//else
+		//	tracksList->addItem(Route(track, -1).name());
 	}
-/*	if (!checkAudioDevice()) return;
-	std::list<QString> sl = audioDevice->outputPorts();
-	for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i)
-		newSrcList->addItem(*i);
-	sl = audioDevice->inputPorts();
-	for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i)
-		newDstList->addItem(*i);
-	routeSelectionChanged(); // init remove button
-	srcSelectionChanged(); // init select button*/
 	if(_selected)
 		setSelected(_selected->name());
 }
@@ -149,7 +114,10 @@ void RouteDialog::removeRoute()
 	QTreeWidgetItem* item = routeList->currentItem();
 	if (item == 0)
 		return;
-	audio->msgRemoveRoute(Route(item->text(0), false, -1), Route(item->text(1), true, -1));
+	Route srcRoute(item->text(0), true, item->text(1).toInt());
+	Route dstRoute(item->text(2), true, item->text(3).toInt());
+	audio->msgRemoveRoute(srcRoute, dstRoute);
+	//audio->msgRemoveRoute(Route(item->text(0), false, -1), Route(item->text(1), true, -1));
 	audio->msgUpdateSoloStates();
 	//song->update(SC_SOLO);
 	song->update(SC_ROUTE);
@@ -471,19 +439,27 @@ void RouteDialog::trackSelectionChanged()
 			{
 				Route s(src, false, r->channel);
 				src = s.name();
+				new QTreeWidgetItem(routeList, QStringList() << src << QString::number(s.channel) << r->name() << QString::number(r->channel));
 			}
-			new QTreeWidgetItem(routeList, QStringList() << src << r->name());
+			else
+			{
+				new QTreeWidgetItem(routeList, QStringList() << src << QString::number(0) << r->name() << QString::number(0));
+			}
 		}
 		const RouteList* rli = atrack->inRoutes();
 		for (ciRoute ri = rli->begin(); ri != rli->end(); ++ri)
 		{
 			QString src(atrack->name());
-			if (atrack->type() == Track::AUDIO_OUTPUT)
+			if (atrack->type() == Track::AUDIO_INPUT)
 			{
 				Route s(src, false, ri->channel);
 				src = s.name();
+				new QTreeWidgetItem(routeList, QStringList() << ri->name() << QString::number(ri->channel) << src << QString::number(s.channel));
 			}
-			new QTreeWidgetItem(routeList, QStringList() << ri->name() << src);
+			else
+			{
+				new QTreeWidgetItem(routeList, QStringList() << ri->name() << QString::number(0) << src << QString::number(0));
+			}
 		}
 		routeSelectionChanged(); // init remove button
 		srcSelectionChanged(); // init select button

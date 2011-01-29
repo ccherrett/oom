@@ -246,11 +246,20 @@
           <property name="alternatingRowColors">
            <bool>true</bool>
           </property>
+          <property name="columnCount">
+           <number>4</number>
+          </property>
           <attribute name="headerDefaultSectionSize">
-           <number>350</number>
+           <number>250</number>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
           </attribute>
           <attribute name="headerDefaultSectionSize">
-           <number>350</number>
+           <number>250</number>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
           </attribute>
           <column>
            <property name="text">
@@ -259,7 +268,23 @@
           </column>
           <column>
            <property name="text">
+            <string>Ch</string>
+           </property>
+           <property name="toolTip">
+            <string>Source Channel</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
             <string>Destination</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Ch</string>
+           </property>
+           <property name="toolTip">
+            <string>Destination Channel</string>
            </property>
           </column>
          </widget>
@@ -303,6 +328,38 @@
     <hint type="destinationlabel">
      <x>572</x>
      <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tracksList</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>newDstList</receiver>
+   <slot>reset()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>128</x>
+     <y>352</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>727</x>
+     <y>177</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tracksList</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>newSrcList</receiver>
+   <slot>reset()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>128</x>
+     <y>352</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>417</x>
+     <y>177</y>
     </hint>
    </hints>
   </connection>
