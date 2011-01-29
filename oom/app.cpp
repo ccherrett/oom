@@ -875,7 +875,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	viewMixerAAction->setCheckable(true);
 	viewMixerBAction = new QAction(QIcon(*mixerSIcon), tr("Mixer B"), this);
 	viewMixerBAction->setCheckable(true);
-	viewRoutesAction = new QAction(QIcon(*mixerSIcon), tr("Audio Routes"), this);
+	viewRoutesAction = new QAction(QIcon(*mixerSIcon), tr("Audio Routing Manager"), this);
 	viewRoutesAction->setCheckable(true);
 	viewCliplistAction = new QAction(QIcon(*cliplistSIcon), tr("Cliplist"), this);
 	viewCliplistAction->setCheckable(true);
