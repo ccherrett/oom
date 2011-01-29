@@ -1065,6 +1065,15 @@ void TList::mousePressEvent(QMouseEvent* ev)
 	}
 	mode = START_DRAG;
 
+        TrackList selectedTracksList = song->getSelectedTracks();
+        bool multipleSelectedTracks = false;
+        if (selectedTracksList.size() > 1)
+        {
+                printf("multiple selected tracks is true\n");
+                multipleSelectedTracks = true;
+        }
+
+
 	switch (col)
 	{
 		case COL_AUTOMATION:
@@ -1210,9 +1219,12 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				QMenu* p = new QMenu;
 				//p->clear();
 				p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
-				p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
+                                if (!multipleSelectedTracks)
+                                {
+                                        p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
+                                }
 
-                                QMenu* trackHeightsMenu = p->addMenu("Track Heights");
+                                QMenu* trackHeightsMenu = p->addMenu("Track Height");
                                 trackHeightsMenu->addAction("Default")->setData(6);
                                 trackHeightsMenu->addAction("2")->setData(7);
                                 trackHeightsMenu->addAction("3")->setData(8);
@@ -1222,7 +1234,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
                                 trackHeightsMenu->addAction("Full Screen")->setData(12);
 
 
-				if (t->type() == Track::AUDIO_SOFTSYNTH)/*{{{*/
+                                if (t->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
 				{
 					SynthI* synth = (SynthI*) t;
 			
@@ -1244,7 +1256,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 #endif
 #endif
 				}/*}}}*/
-				else if(t->isMidiTrack())
+                                else if(t->isMidiTrack() && !multipleSelectedTracks)
 				{
 					int oPort = ((MidiTrack*) t)->outPort();
 					MidiPort* port = &midiPorts[oPort];
@@ -1278,8 +1290,21 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					switch (n)
 					{
 						case 0: // delete track
-							song->removeTrack0(t);
-							audio->msgUpdateSoloStates();
+                                                if (multipleSelectedTracks)
+                                                {
+                                                        for (iTrack t = selectedTracksList.begin(); t != selectedTracksList.end(); ++t)
+                                                        {
+                                                                Track* tr = *t;
+                                                                song->removeTrack0(tr);
+                                                        }
+                                                        audio->msgUpdateSoloStates();
+                                                }
+                                                else
+                                                {
+                                                        song->removeTrack0(t);
+                                                        audio->msgUpdateSoloStates();
+                                                }
+
 						break;
 
 						case 1: // show track comment
@@ -1416,38 +1441,80 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						}
                                                 case 6:
                                                 {
-                                                        t->setHeight(40);
-                                                        song->update(SC_TRACK_MODIFIED);
+                                                        if (multipleSelectedTracks)
+                                                        {
+                                                                song->setTrackHeights(selectedTracksList, 40);
+                                                        }
+                                                        else
+                                                        {
+                                                                t->setHeight(40);
+                                                                song->update(SC_TRACK_MODIFIED);
+                                                        }
                                                         break;
                                                 }
                                                 case 7:
                                                 {
-                                                        t->setHeight(80);
-                                                        song->update(SC_TRACK_MODIFIED);
+                                                        if (multipleSelectedTracks)
+                                                        {
+                                                                song->setTrackHeights(selectedTracksList, 60);
+                                                        }
+                                                        else
+                                                        {
+                                                                t->setHeight(60);
+                                                                song->update(SC_TRACK_MODIFIED);
+                                                        }
                                                         break;
                                                 }
                                                 case 8:
                                                 {
-                                                        t->setHeight(120);
-                                                        song->update(SC_TRACK_MODIFIED);
+                                                        if (multipleSelectedTracks)
+                                                        {
+                                                                song->setTrackHeights(selectedTracksList, 100);
+                                                        }
+                                                        else
+                                                        {
+                                                                t->setHeight(100);
+                                                                song->update(SC_TRACK_MODIFIED);
+                                                        }
                                                         break;
                                                 }
                                                 case 9:
                                                 {
-                                                        t->setHeight(160);
-                                                        song->update(SC_TRACK_MODIFIED);
+                                                        if (multipleSelectedTracks)
+                                                        {
+                                                                song->setTrackHeights(selectedTracksList, 180);
+                                                        }
+                                                        else
+                                                        {
+                                                                t->setHeight(180);
+                                                                song->update(SC_TRACK_MODIFIED);
+                                                        }
                                                         break;
                                                 }
                                                 case 10:
                                                 {
-                                                        t->setHeight(200);
-                                                        song->update(SC_TRACK_MODIFIED);
+                                                        if (multipleSelectedTracks)
+                                                        {
+                                                                song->setTrackHeights(selectedTracksList, 320);
+                                                        }
+                                                        else
+                                                        {
+                                                                t->setHeight(320);
+                                                                song->update(SC_TRACK_MODIFIED);
+                                                        }
                                                         break;
                                                 }
                                                 case 11:
                                                 {
-                                                        t->setHeight(240);
-                                                        song->update(SC_TRACK_MODIFIED);
+                                                        if (multipleSelectedTracks)
+                                                        {
+                                                                song->setTrackHeights(selectedTracksList, 640);
+                                                        }
+                                                        else
+                                                        {
+                                                                t->setHeight(640);
+                                                                song->update(SC_TRACK_MODIFIED);
+                                                        }
                                                         break;
                                                 }
                                                 case 12:

@@ -384,9 +384,12 @@ public:
         return &_tracks;
     }
 
-	TrackList* visibletracks() {
-		return &_viewtracks;
-	}
+        TrackList* visibletracks() {
+                return &_viewtracks;
+        }
+
+        TrackList getSelectedTracks();
+        void setTrackHeights(TrackList& list, int height);
 
     MidiTrackList* midis() {
         return &_midis;

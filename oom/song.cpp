@@ -4229,3 +4229,29 @@ QString Song::getScriptPath(int id, bool isdelivered)
 }
 
 
+TrackList Song::getSelectedTracks()
+{
+        TrackList list;
+        for (iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
+        {
+                Track* tr = *t;
+                if (tr->selected())
+                {
+                        list.push_back(tr);
+                }
+       }
+
+        return list;
+}
+
+void Song::setTrackHeights(TrackList &list, int height)
+{
+        for (iTrack t = list.begin(); t != list.end(); ++t)
+        {
+                Track* tr = *t;
+                tr->setHeight(height);
+
+        }
+
+        song->update(SC_TRACK_MODIFIED);
+}
