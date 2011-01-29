@@ -348,7 +348,7 @@ void RouteDialog::trackSelectionChanged()
 							newSrcList->addItem(r.name());
 						}
 					}
-					insertOutputs();
+					insertInputs();
 					//newDstList->addItem(Route(track, -1).name());
 				break;
 				case Track::AUDIO_AUX:
@@ -387,7 +387,7 @@ void RouteDialog::trackSelectionChanged()
 							break;
 						}
 					}
-					insertInputs();
+					insertOutputs();
 					//newSrcList->addItem(Route(track, -1).name());
 				break;
 				case Track::WAVE:
@@ -496,7 +496,7 @@ void RouteDialog::insertOutputs()
 	{
 		std::list<QString> sl = audioDevice->outputPorts();
 		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			newDstList->addItem(*i);
+			newSrcList->addItem(*i);
 		}
 	}
 }
@@ -507,7 +507,7 @@ void RouteDialog::insertInputs()
 	{
 		std::list<QString> sl = audioDevice->inputPorts();
 		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			newSrcList->addItem(*i);
+			newDstList->addItem(*i);
 		}
 	}
 }
