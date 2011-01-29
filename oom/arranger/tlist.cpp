@@ -802,12 +802,30 @@ void TList::moveSelection(int n)
         tracks = song->visibletracks();
 
 	// check for single selection
-	int nselect = 0;
-	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
-		if ((*t)->selected())
-			++nselect;
+        TrackList selectedTracks = song->getSelectedTracks();
+        int nselect = selectedTracks.size();
+
 	if (nselect != 1)
-		return;
+        {
+                song->deselectTracks();
+                if (n == 1)
+                {
+                        Track* bottomMostSelected = *(--selectedTracks.end());
+                        bottomMostSelected->setSelected(true);
+                        emit selectionChanged(bottomMostSelected);
+                }
+                else if (n == -1)
+                {
+                        Track* topMostSelected = *(selectedTracks.begin());
+                        topMostSelected->setSelected(true);
+                        emit selectionChanged(topMostSelected);
+                }
+                else
+                {
+                        return;
+                }
+        }
+
 	Track* selTrack = 0;
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{
@@ -1069,7 +1087,6 @@ void TList::mousePressEvent(QMouseEvent* ev)
         bool multipleSelectedTracks = false;
         if (selectedTracksList.size() > 1)
         {
-                printf("multiple selected tracks is true\n");
                 multipleSelectedTracks = true;
         }
 
