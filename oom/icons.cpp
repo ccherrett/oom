@@ -508,9 +508,9 @@ void initIcons()
       startIcon    = new MPIXMAP(":/images/icons/transport-rewind-end.png", "media-skip-backward");
       fforwardIcon = new MPIXMAP(":/images/icons/transport-ffwd.png", "media-seek-forward");
       frewindIcon  = new MPIXMAP(":/images/icons/transport-rewind.png", "media-seek-backward");
-      dotIcon      = new MPIXMAP(dot_xpm, "dialog-ok-apply");
-      dothIcon     = new MPIXMAP(doth_xpm, "draw-circle");
-      dot1Icon     = new MPIXMAP(dot1_xpm, NULL);
+      dotIcon      = new MPIXMAP(":/images/icons/arranger_solo_on.png", "dialog-ok-apply");
+      dothIcon     = new MPIXMAP(":/images/icons/arranger_solo_off.png", "draw-circle");
+      dot1Icon     = new MPIXMAP(":/images/icons/arranger_solo_on.png", NULL);
       noteIcon     = new MPIXMAP(note_xpm, NULL);
       note1Icon    = new MPIXMAP(note1_xpm, NULL);
       stickIcon    = new MPIXMAP(stick_xpm, NULL);
