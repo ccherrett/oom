@@ -935,7 +935,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	settingsMidiSyncAction = new QAction(QIcon(*settings_midisyncIcon), tr("Midi Sync"), this);
 	settingsMidiIOAction = new QAction(QIcon(*settings_midifileexportIcon), tr("Midi File Import/Export"), this);
 	//settingsAppearanceAction = new QAction(QIcon(*settings_appearance_settingsIcon), tr("Appearance Settings"), this);
-	settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports / Soft Synth"), this);
+	settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports Manager"), this);
 
 	//-------- Help Actions
 	//helpManualAction = new QAction(tr("&Manual"), this);

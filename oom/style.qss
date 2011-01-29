@@ -614,7 +614,7 @@ QToolButton#connectButton::disabled, QToolButton#removeButton::disabled, QToolBu
 }
 /*///////////END AUDIO PORT MANAGER///////////////}}}*/
 /*///////////START MIDI PORT MANAGER///////////////{{{*/
-QObject#mdeView::item:selected:active, QObject#mdeView::item:selected {
+QObject#mdevView::item:selected:active, QObject#mdevView::item:selected {
 	 border-radius: 3px;
      border: 0px solid #47cae1;
 	 background-color: #12191c;
@@ -624,7 +624,7 @@ QObject#mdeView::item:selected:active, QObject#mdeView::item:selected {
 	 font-weight: bold;
 	 font-size: 12px;
 }
-QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList {
+QObject#mdevView {
 	 border-radius: 6px;
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
@@ -637,11 +637,13 @@ QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList {
 	 alternate-background-color: #bec0cf;
 	 show-decoration-selected: 0; 
 }
-QGroupBox#groupBox1 ,QGroupBox#groupBox2, QGroupBox#groupBox3, QGroupBox#groupBox4, QGroupBox#groupBox
+QGroupBox#groupBox1 ,QGroupBox#groupBox2, QGroupBox#groupBox3, 
+QGroupBox#groupBox4, QGroupBox#groupBox, QGroupBox#groupBox5,
+QGroupBox#groupBox10
 {
 	padding: 10px;
 }
-QTreeWidget#routeList {
+QTreeWidget#mdevView {
 	 border-radius: 6px;
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
@@ -654,7 +656,7 @@ QTreeWidget#routeList {
 	 alternate-background-color: #bec0cf;
 	 show-decoration-selected: 0; 
 }
-QTreeWidget#routeList::item:selected:active, QTreeWidget#routeList::item:selected {
+QTreeWidget#mdevView::item:selected:active, QTreeWidget#mdevView::item:selected {
      border: 0px solid #47cae1;
 	 background-color: #12191c;
 	 color: #47cae1;
@@ -663,42 +665,6 @@ QTreeWidget#routeList::item:selected:active, QTreeWidget#routeList::item:selecte
 	 font-weight: bold;
 	 font-size: 12px;
 	 show-decoration-selected: 0; 
-}
-QToolButton#connectButton, QToolButton#btnConnectOut
-{
-	padding: 12px;
-	color: #000000;
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #32462e, stop:0.1 #99b594, stop:0.6 #bcddb7, stop: 0.9 #bcddb7, stop: 1.0 #647961);
-}
-QToolButton#connectButton::hover, QToolButton#btnConnectOut::hover
-{
-	padding: 12px;
-	color: #000000;
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #3c6c35, stop:0.1 #24a801, stop:0.6 #a5fc97, stop: 0.9 #a5fc97, stop: 1.0 #3c6c35);
-}
-QToolButton#removeButton
-{
-	padding: 12px;
-	color: #000000;
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #683c3c, stop:0.1 #7a3030, stop:0.6 #e0b4b4, stop: 0.9 #e0b4b4, stop: 1.0 #997b7b);
-}
-QToolButton#removeButton::hover
-{
-	padding: 12px;
-	color: #000000;
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #6c3535, stop:0.1 #a80101, stop:0.6 #fc9797, stop: 0.9 #fc9797, stop: 1.0 #653c3c);
-}
-QToolButton#connectButton::disabled, QToolButton#removeButton::disabled, QToolButton#btnConnectOut::disabled
-{
-	padding: 12px;
-	background-color: #595966;
-	color: #8f9198;
-    /*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #d0d4d0, stop:0.3 #5b5b6b, stop: 1.0 #4d4d5b);*/
 }
 /*///////////END MIDI PORT MANAGER///////////////}}}*/
 QWidget#MixerCenter { background-color: #595966 }

@@ -772,12 +772,12 @@ MPConfig::MPConfig(QWidget* parent)
 			<< tr("GUI")
 			<< tr("I")
 			<< tr("O")
-			<< tr("Instrument")
-			<< tr("Device Name")
+			<< tr("Instr")
+			<< tr("D-Name")
 			<< tr("Ins")
 			<< tr("Outs")
-			<< tr("In Ch")
-			<< tr("Out Ch")
+			<< tr("I-Ch")
+			<< tr("O-Ch")
 			<< tr("State");
 
 	mdevView->setColumnCount(columnnames.size());
@@ -998,6 +998,8 @@ void MPConfig::songChanged(int flags)
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_REC, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_PLAY, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_GUI, QHeaderView::Fixed);
+	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
+	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NAME, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->setStretchLastSection(true);
 	selectionChanged();
 }

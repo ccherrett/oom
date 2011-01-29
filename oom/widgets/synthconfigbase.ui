@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>OOMidi: Midi Ports / Soft Synth Manager</string>
+   <string>OOMidi: Midi Ports Manager</string>
   </property>
   <layout class="QGridLayout">
    <item row="0" column="0" colspan="2">
@@ -22,11 +22,50 @@
      <layout class="QVBoxLayout">
       <item>
        <widget class="QTableWidget" name="mdevView">
+        <property name="minimumSize">
+         <size>
+          <width>800</width>
+          <height>600</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>200</number>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>25</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
         <attribute name="verticalHeaderDefaultSectionSize">
          <number>18</number>
         </attribute>
         <attribute name="verticalHeaderDefaultSectionSize">
          <number>18</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>25</number>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>200</number>
         </attribute>
        </widget>
       </item>
