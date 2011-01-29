@@ -496,7 +496,7 @@ void RouteDialog::insertOutputs()
 	{
 		std::list<QString> sl = audioDevice->outputPorts();
 		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			newSrcList->addItem(*i);
+			newDstList->addItem(*i);
 		}
 	}
 }
@@ -507,7 +507,7 @@ void RouteDialog::insertInputs()
 	{
 		std::list<QString> sl = audioDevice->inputPorts();
 		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			newDstList->addItem(*i);
+			newSrcList->addItem(*i);
 		}
 	}
 }
