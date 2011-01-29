@@ -225,12 +225,13 @@ void initShortCuts()
         defShrt(SHRT_MIDI_PANIC, Qt::Key_P, "Tool: midi panic button", GLOBAL_SHRT, "midi_panic");
 
         defShrt(SHRT_TRACK_HEIGHT_DEFAULT, Qt::ALT + Qt::Key_1, "Track: Default Height", GLOBAL_SHRT, "track_height_default");
-        defShrt(SHRT_TRACK_HEIGHT_FULL_SCREEN, Qt::ALT + Qt::Key_0, "Track: Full screen height", GLOBAL_SHRT, "track_height_default");
-        defShrt(SHRT_TRACK_HEIGHT_2, Qt::ALT + Qt::Key_2, "Track: height 2", GLOBAL_SHRT, "track_height_default");
-        defShrt(SHRT_TRACK_HEIGHT_3, Qt::ALT + Qt::Key_3, "Track: height 3", GLOBAL_SHRT, "track_height_default");
-        defShrt(SHRT_TRACK_HEIGHT_4, Qt::ALT + Qt::Key_4, "Track: height 4", GLOBAL_SHRT, "track_height_default");
-        defShrt(SHRT_TRACK_HEIGHT_5, Qt::ALT + Qt::Key_5, "Track: height 5", GLOBAL_SHRT, "track_height_default");
-        defShrt(SHRT_TRACK_HEIGHT_6, Qt::ALT + Qt::Key_6, "Track: height 6", GLOBAL_SHRT, "track_height_default");
+        defShrt(SHRT_TRACK_HEIGHT_FULL_SCREEN, Qt::ALT + Qt::Key_0, "Track: Full screen height", GLOBAL_SHRT, "track_height_full_screen");
+        defShrt(SHRT_TRACK_HEIGHT_SELECTION_FITS_IN_VIEW, Qt::ALT + Qt::Key_7, "Track: Full screen height", GLOBAL_SHRT, "track_height_fit_selection_in_view");
+        defShrt(SHRT_TRACK_HEIGHT_2, Qt::ALT + Qt::Key_2, "Track: height 2", GLOBAL_SHRT, "track_height_2");
+        defShrt(SHRT_TRACK_HEIGHT_3, Qt::ALT + Qt::Key_3, "Track: height 3", GLOBAL_SHRT, "track_height_3");
+        defShrt(SHRT_TRACK_HEIGHT_4, Qt::ALT + Qt::Key_4, "Track: height 4", GLOBAL_SHRT, "track_height_4");
+        defShrt(SHRT_TRACK_HEIGHT_5, Qt::ALT + Qt::Key_5, "Track: height 5", GLOBAL_SHRT, "track_height_5");
+        defShrt(SHRT_TRACK_HEIGHT_6, Qt::ALT + Qt::Key_6, "Track: height 6", GLOBAL_SHRT, "track_height_6");
 
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.

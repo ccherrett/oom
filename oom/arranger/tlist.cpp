@@ -1249,6 +1249,10 @@ void TList::mousePressEvent(QMouseEvent* ev)
                                 trackHeightsMenu->addAction("5")->setData(10);
                                 trackHeightsMenu->addAction("6")->setData(11);
                                 trackHeightsMenu->addAction("Full Screen")->setData(12);
+                                if (selectedTracksList.size() > 1)
+                                {
+                                        trackHeightsMenu->addAction("Fit Selection in View")->setData(13);
+                                }
 
 
                                 if (t->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
@@ -1534,16 +1538,36 @@ void TList::mousePressEvent(QMouseEvent* ev)
                                                 }
                                                 case 12:
                                                 {
+                                                        int canvasHeight = oom->arranger->getCanvas()->height();
+
                                                         if (multipleSelectedTracks)
                                                         {
-                                                                song->setTrackHeights(selectedTracksList, parentWidget()->height());
+                                                                song->setTrackHeights(selectedTracksList, canvasHeight);
                                                                 Track* firstSelectedTrack = *selectedTracksList.begin();
                                                                 oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
 
                                                         }
                                                         else
                                                         {
-                                                                t->setHeight(parentWidget()->height());
+                                                                t->setHeight(canvasHeight);
+                                                                song->update(SC_TRACK_MODIFIED);
+                                                                oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+                                                        }
+                                                        break;
+                                                }
+                                                case 13:
+                                                {
+                                                        int canvasHeight = oom->arranger->getCanvas()->height();
+                                                        if (multipleSelectedTracks)
+                                                        {
+                                                                song->setTrackHeights(selectedTracksList, canvasHeight / selectedTracksList.size());
+                                                                Track* firstSelectedTrack = *selectedTracksList.begin();
+                                                                oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+
+                                                        }
+                                                        else
+                                                        {
+                                                                t->setHeight(canvasHeight);
                                                                 song->update(SC_TRACK_MODIFIED);
                                                                 oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
                                                         }

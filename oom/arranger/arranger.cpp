@@ -260,7 +260,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	QWidget* tracklist = new QWidget();
 	QWidget* wtlist = new QWidget(split);
 	QVBoxLayout *tg = new QVBoxLayout(wtlist);
-	tg->setSpacing(0);
+        tg->setSpacing(0);
 
 	split->setStretchFactor(split->indexOf(wtlist), 0);
 	//split->setStretchFactor(split->indexOf(tracklist), 1);
@@ -339,7 +339,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(header, SIGNAL(sectionMoved(int, int, int)), list, SLOT(redraw()));
 	connect(header, SIGNAL(sectionMoved(int, int, int)), this, SLOT(headerMoved()));
 
-	tg->addItem(new QSpacerItem(0, 22));
+        tg->addItem(new QSpacerItem(0, 24));
 	tg->addWidget(list);
 	list->setMinimumSize(QSize(100, 50));
 	list->setMaximumSize(QSize(540, 10000));

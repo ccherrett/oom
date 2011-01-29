@@ -1386,6 +1386,23 @@ void PartCanvas::keyPress(QKeyEvent* event)
                 song->update(SC_TRACK_MODIFIED);
                 return;
         }
+        else if (key == shortcuts[SHRT_TRACK_HEIGHT_SELECTION_FITS_IN_VIEW].key)
+        {
+                TrackList tl = song->getSelectedTracks();
+                for (iTrack t = tl.begin(); t != tl.end(); ++t)
+                {
+                        Track* tr = *t;
+                        tr->setHeight(height() / tl.size());
+                }
+                if (tl.size())
+                {
+                        Track* tr = *tl.begin();
+                        oom->arranger->verticalScrollSetYpos(track2Y(tr));
+                }
+                song->update(SC_TRACK_MODIFIED);
+                return;
+        }
+
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_2].key)
         {
                 TrackList* tl = song->tracks();
