@@ -26,6 +26,7 @@ RouteDialog::RouteDialog(QWidget* parent)
 : QDialog(parent)
 {
 	setupUi(this);
+	_selected = 0;
 	connect(routeList, SIGNAL(itemSelectionChanged()), SLOT(routeSelectionChanged()));
 	connect(newSrcList, SIGNAL(itemSelectionChanged()), SLOT(srcSelectionChanged()));
 	connect(newDstList, SIGNAL(itemSelectionChanged()), SLOT(dstSelectionChanged()));
@@ -113,6 +114,8 @@ void RouteDialog::routingChanged()
 		newDstList->addItem(*i);
 	routeSelectionChanged(); // init remove button
 	srcSelectionChanged(); // init select button*/
+	if(_selected)
+		setSelected(_selected->name());
 }
 
 //---------------------------------------------------------
@@ -320,41 +323,145 @@ void RouteDialog::trackSelectionChanged()
 	if(atrack)
 	{
 		_selected = atrack;
-		TrackList* tl = song->tracks();
-		for(iTrack t = tl->begin(); t != tl->end(); ++t)
-		{
-			if((*t)->isMidiTrack())
-				continue;
-			AudioTrack* track = (AudioTrack*) (*t);
-			if(track->name() == atrack->name())
-				continue; //You cant connect a track to itself
+		//TrackList* tl = song->tracks();
+		//for(iTrack t = tl->begin(); t != tl->end(); ++t)
+		//{
+		//	if((*t)->isMidiTrack())
+		//		continue;
+		//	AudioTrack* track = (AudioTrack*) (*t);
+		//	if(track->name() == atrack->name())
+		//		continue; //You cant connect a track to itself
 			//int channels = track->channels();
-			switch (track->type())
+			switch (atrack->type())
 			{
 				case Track::AUDIO_OUTPUT:/*{{{*/
-					for (int channel = 0; channel < track->channels(); ++channel)
+					for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 					{
-						Route r(track, channel);
-						newSrcList->addItem(r.name());
+						if((*t)->isMidiTrack())
+							continue;
+						AudioTrack* track = (AudioTrack*) (*t);
+						if(track->name() == atrack->name() || track->type() == Track::AUDIO_OUTPUT)
+							continue; //You cant connect a track to itself
+						for (int channel = 0; channel < track->channels(); ++channel)
+						{
+							Route r(track, channel);
+							newSrcList->addItem(r.name());
+						}
 					}
-					newDstList->addItem(Route(track, -1).name());
+					insertOutputs();
+					//newDstList->addItem(Route(track, -1).name());
 				break;
 				case Track::AUDIO_AUX:
-					newDstList->addItem(Route(track, -1).name());
+					newSrcList->clear();
+					for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
+					{
+						if((*t)->isMidiTrack())
+							continue;
+						AudioTrack* track = (AudioTrack*) (*t);
+						if(track->name() == atrack->name())
+							continue; //You cant connect a track to itself
+						if(track->type() ==  Track::AUDIO_BUSS || track->type() == Track::AUDIO_OUTPUT)
+							newDstList->addItem(Route(track, -1).name());
+						//newDstList->addItem(Route(track, -1).name());
+					}
 				break;
 				case Track::AUDIO_INPUT:
-					for (int channel = 0; channel < track->channels(); ++channel)
+					for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 					{
-						newDstList->addItem(Route(track, channel).name());
+						if((*t)->isMidiTrack())
+							continue;
+						AudioTrack* track = (AudioTrack*) (*t);
+						if(track->name() == atrack->name())
+							continue; //You cant connect a track to itself
+						switch(track->type())
+						{
+							case Track::AUDIO_OUTPUT:
+							case Track::AUDIO_BUSS:
+							case Track::WAVE:
+								for (int channel = 0; channel < track->channels(); ++channel)
+								{
+									newDstList->addItem(Route(track, channel).name());
+								}
+							break;
+							default:
+							break;
+						}
 					}
-					newSrcList->addItem(Route(track, -1).name());
+					insertInputs();
+					//newSrcList->addItem(Route(track, -1).name());
+				break;
+				case Track::WAVE:
+					for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
+					{
+						if((*t)->isMidiTrack())
+							continue;
+						AudioTrack* track = (AudioTrack*) (*t);
+						if(track->name() == atrack->name())
+							continue; //You cant connect a track to itself
+						if(track->type() == Track::AUDIO_INPUT)
+						{
+							for (int channel = 0; channel < track->channels(); ++channel)
+							{
+								newSrcList->addItem(Route(track, channel).name());
+							}
+						}
+						else if(track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_BUSS)
+						{
+							for (int channel = 0; channel < track->channels(); ++channel)
+							{
+								newDstList->addItem(Route(track, channel).name());
+							}
+						}
+					}
+				break;
+				case Track::AUDIO_BUSS:
+					for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
+					{
+						if((*t)->isMidiTrack())
+							continue;
+						AudioTrack* track = (AudioTrack*) (*t);
+						if(track->name() == atrack->name())
+							continue; //You cant connect a track to itself
+						if(track->type() == Track::AUDIO_INPUT || track->type() == Track::WAVE || track->type() == Track::AUDIO_SOFTSYNTH)
+						{
+							for (int channel = 0; channel < track->channels(); ++channel)
+							{
+								newSrcList->addItem(Route(track, channel).name());
+							}
+						}
+						else if(track->type() == Track::AUDIO_OUTPUT)
+						{
+							for (int channel = 0; channel < track->channels(); ++channel)
+							{
+								newDstList->addItem(Route(track, channel).name());
+							}
+						}
+					}
+				break;
+				case Track::AUDIO_SOFTSYNTH:
+					newSrcList->clear();
+					for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
+					{
+						if((*t)->isMidiTrack())
+							continue;
+						AudioTrack* track = (AudioTrack*) (*t);
+						if(track->name() == atrack->name())
+							continue; //You cant connect a track to itself
+						if(track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_BUSS)
+						{
+							for (int channel = 0; channel < track->channels(); ++channel)
+							{
+								newDstList->addItem(Route(track, channel).name());
+							}
+						}
+					}
 				break;
 				default:
-					newDstList->addItem(Route(track, -1).name());
-					newSrcList->addItem(Route(track, -1).name());
+					//newDstList->addItem(Route(track, -1).name());
+					//newSrcList->addItem(Route(track, -1).name());
 				break;/*}}}*/
 			}
-		}
+		//}
 
 		const RouteList* rl = atrack->outRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
@@ -367,24 +474,64 @@ void RouteDialog::trackSelectionChanged()
 			}
 			new QTreeWidgetItem(routeList, QStringList() << src << r->name());
 		}
-		if (checkAudioDevice()) 
+		const RouteList* rli = atrack->inRoutes();
+		for (ciRoute ri = rli->begin(); ri != rli->end(); ++ri)
 		{
-			std::list<QString> sl = audioDevice->outputPorts();
-			for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-				newSrcList->addItem(*i);
-			}
-			if(atrack->type() != Track::AUDIO_AUX)
+			QString src(atrack->name());
+			if (atrack->type() == Track::AUDIO_OUTPUT)
 			{
-				sl = audioDevice->inputPorts();
-				for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-					newDstList->addItem(*i);
-				}
+				Route s(src, false, ri->channel);
+				src = s.name();
 			}
+			new QTreeWidgetItem(routeList, QStringList() << ri->name() << src);
 		}
 		routeSelectionChanged(); // init remove button
 		srcSelectionChanged(); // init select button
 	}
 }
+
+void RouteDialog::insertOutputs()
+{
+	if (checkAudioDevice()) 
+	{
+		std::list<QString> sl = audioDevice->outputPorts();
+		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
+			newSrcList->addItem(*i);
+		}
+	}
+}
+
+void RouteDialog::insertInputs()
+{
+	if (checkAudioDevice()) 
+	{
+		std::list<QString> sl = audioDevice->inputPorts();
+		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
+			newDstList->addItem(*i);
+		}
+	}
+}
+
+void RouteDialog::setSelected(QString t)
+{
+	QList<QListWidgetItem*> found = tracksList->findItems(t, Qt::MatchExactly);
+	if(found.isEmpty())
+		return;
+	tracksList->setCurrentItem(found.at(0));
+}
+
+void RouteDialog::setSelected(AudioTrack* t)
+{
+	//_selected = s;
+	if(t)
+	{
+		QList<QListWidgetItem*> found = tracksList->findItems(t->name(), Qt::MatchExactly);
+		if(found.isEmpty())
+			return;
+		tracksList->setCurrentItem(found.at(0));
+	}
+}
+
 
 //---------------------------------------------------------
 //   srcSelectionChanged

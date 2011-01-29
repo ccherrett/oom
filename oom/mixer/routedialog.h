@@ -26,6 +26,8 @@ class RouteDialog : public QDialog, public Ui::RouteDialogBase
 
     virtual void closeEvent(QCloseEvent*);
     void routingChanged();
+	void insertInputs();
+	void insertOutputs();
 
 private slots:
     void routeSelectionChanged();
@@ -44,10 +46,8 @@ public:
     RouteDialog(QWidget* parent = 0);
 	void setSourceSelection(QString);
 	void setDestSelection(QString);
-	void setSelected(AudioTrack* s)
-	{
-		_selected = s;
-	}
+	void setSelected(AudioTrack* s);
+	void setSelected(QString);
 	AudioTrack* selected()
 	{
 		return _selected;
