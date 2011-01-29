@@ -772,12 +772,12 @@ MPConfig::MPConfig(QWidget* parent)
 			<< tr("GUI")
 			<< tr("I")
 			<< tr("O")
-			<< tr("Instrument")
-			<< tr("Device Name")
-			<< tr("In routes")
-			<< tr("Out routes")
-			<< tr("Def in ch")
-			<< tr("Def out ch")
+			<< tr("Instr")
+			<< tr("D-Name")
+			<< tr("Ins")
+			<< tr("Outs")
+			<< tr("In Ch")
+			<< tr("Out Ch")
 			<< tr("State");
 
 	mdevView->setColumnCount(columnnames.size());
