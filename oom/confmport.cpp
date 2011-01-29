@@ -789,10 +789,10 @@ MPConfig::MPConfig(QWidget* parent)
 	}
 	mdevView->setFocusPolicy(Qt::NoFocus);
 	mdevView->resizeColumnsToContents();
-	mdevView->horizontalHeader()->setMinimumSectionSize(60);
+	//mdevView->horizontalHeader()->setMinimumSectionSize(60);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_REC, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_PLAY, QHeaderView::Fixed);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_REC, 16);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 16);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_GUI, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NAME, QHeaderView::ResizeToContents);
