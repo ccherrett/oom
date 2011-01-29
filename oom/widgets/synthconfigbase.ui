@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>OOMidi: Synth Configuration</string>
+   <string>OOMidi: Midi Ports / Soft Synth Manager</string>
   </property>
   <layout class="QGridLayout">
    <item row="1" column="1">
