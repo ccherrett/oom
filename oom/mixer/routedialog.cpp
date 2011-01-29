@@ -69,7 +69,7 @@ void RouteDialog::routingChanged()
 		if ((*i)->isMidiTrack())
 			continue;
 		AudioTrack* track = (AudioTrack*) (*i);
-		if (track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_OUTPUT)
+		if (track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_INPUT)
 		{
 			for (int channel = 0; channel < track->channels(); ++channel)
 			{
