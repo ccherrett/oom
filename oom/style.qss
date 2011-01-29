@@ -545,7 +545,7 @@ QListWidget#EffectRack::item:selected:active, QListWidget#EffectsRack::item:sele
 	 text-decoration: none;
 	 font-family: "fixed";
 }
-QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selected, QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected {
+QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selected, QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected, QListWidget#tracksList::item:selected {
 	 border-radius: 3px;
      border: 0px solid #47cae1;
 	 background-color: #12191c;
@@ -555,7 +555,7 @@ QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selec
 	 font-weight: bold;
 	 font-size: 12px;
 }
-QListWidget#newSrcList, QListWidget#newDstList {
+QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList {
 	 border-radius: 6px;
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
@@ -568,7 +568,7 @@ QListWidget#newSrcList, QListWidget#newDstList {
 	 alternate-background-color: #bec0cf;
 	 show-decoration-selected: 0; 
 }
-QGroupBox#groupBox1 ,QGroupBox#groupBox2, QGroupBox#groupBox3, QGroupBox#groupBox4
+QGroupBox#groupBox1 ,QGroupBox#groupBox2, QGroupBox#groupBox3, QGroupBox#groupBox4, QGroupBox#groupBox
 {
 	padding: 10px;
 }
@@ -595,14 +595,14 @@ QTreeWidget#routeList::item:selected:active, QTreeWidget#routeList::item:selecte
 	 font-size: 12px;
 	 show-decoration-selected: 0; 
 }
-QToolButton#connectButton
+QToolButton#connectButton, QToolButton#btnConnectOut
 {
 	padding: 12px;
 	color: #000000;
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                   stop: 0 #32462e, stop:0.1 #99b594, stop:0.6 #bcddb7, stop: 0.9 #bcddb7, stop: 1.0 #647961);
 }
-QToolButton#connectButton::hover
+QToolButton#connectButton::hover, QToolButton#btnConnectOut::hover
 {
 	padding: 12px;
 	color: #000000;
@@ -623,7 +623,7 @@ QToolButton#removeButton::hover
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                   stop: 0 #6c3535, stop:0.1 #a80101, stop:0.6 #fc9797, stop: 0.9 #fc9797, stop: 1.0 #653c3c);
 }
-QToolButton#connectButton::disabled, QToolButton#removeButton::disabled
+QToolButton#connectButton::disabled, QToolButton#removeButton::disabled, QToolButton#btnConnectOut::disabled
 {
 	padding: 12px;
 	background-color: #595966;

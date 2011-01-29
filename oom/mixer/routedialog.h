@@ -13,6 +13,7 @@
 
 class QCloseEvent;
 class QDialog;
+class AudioTrack;
 
 //---------------------------------------------------------
 //   RouteDialog
@@ -21,6 +22,7 @@ class QDialog;
 class RouteDialog : public QDialog, public Ui::RouteDialogBase
 {
     Q_OBJECT
+	AudioTrack* _selected;
 
     virtual void closeEvent(QCloseEvent*);
     void routingChanged();
@@ -29,8 +31,10 @@ private slots:
     void routeSelectionChanged();
     void removeRoute();
     void addRoute();
+    void addOutRoute();
     void srcSelectionChanged();
     void dstSelectionChanged();
+	void trackSelectionChanged();
     void songChanged(int);
 
 signals:
@@ -40,6 +44,14 @@ public:
     RouteDialog(QWidget* parent = 0);
 	void setSourceSelection(QString);
 	void setDestSelection(QString);
+	void setSelected(AudioTrack* s)
+	{
+		_selected = s;
+	}
+	AudioTrack* selected()
+	{
+		return _selected;
+	}
 };
 
 
