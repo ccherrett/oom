@@ -320,11 +320,11 @@ void RouteDialog::trackSelectionChanged()
 						AudioTrack* track = (AudioTrack*) (*t);
 						if(track->name() == atrack->name() || track->type() == Track::AUDIO_OUTPUT)
 							continue; //You cant connect a track to itself
-						for (int channel = 0; channel < track->channels(); ++channel)
-						{
-							Route r(track, channel);
+						//for (int channel = 0; channel < track->channels(); ++channel)
+						//{
+							Route r(track, -1);
 							newSrcList->addItem(r.name());
-						}
+						//}
 					}
 					insertInputs();
 					//newDstList->addItem(Route(track, -1).name());
@@ -356,10 +356,10 @@ void RouteDialog::trackSelectionChanged()
 							case Track::AUDIO_OUTPUT:
 							case Track::AUDIO_BUSS:
 							case Track::WAVE:
-								for (int channel = 0; channel < track->channels(); ++channel)
-								{
-									newDstList->addItem(Route(track, channel).name());
-								}
+								//for (int channel = 0; channel < track->channels(); ++channel)
+								//{
+									newDstList->addItem(Route(track, -1).name());
+								//}
 							break;
 							default:
 							break;
@@ -378,17 +378,17 @@ void RouteDialog::trackSelectionChanged()
 							continue; //You cant connect a track to itself
 						if(track->type() == Track::AUDIO_INPUT)
 						{
-							for (int channel = 0; channel < track->channels(); ++channel)
-							{
-								newSrcList->addItem(Route(track, channel).name());
-							}
+							//for (int channel = 0; channel < track->channels(); ++channel)
+							//{
+								newSrcList->addItem(Route(track, -1).name());
+							//}
 						}
 						else if(track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_BUSS)
 						{
-							for (int channel = 0; channel < track->channels(); ++channel)
-							{
-								newDstList->addItem(Route(track, channel).name());
-							}
+							//for (int channel = 0; channel < track->channels(); ++channel)
+							//{
+								newDstList->addItem(Route(track, -1).name());
+							//}
 						}
 					}
 				break;
@@ -402,17 +402,17 @@ void RouteDialog::trackSelectionChanged()
 							continue; //You cant connect a track to itself
 						if(track->type() == Track::AUDIO_INPUT || track->type() == Track::WAVE || track->type() == Track::AUDIO_SOFTSYNTH)
 						{
-							for (int channel = 0; channel < track->channels(); ++channel)
-							{
-								newSrcList->addItem(Route(track, channel).name());
-							}
+							//for (int channel = 0; channel < track->channels(); ++channel)
+							//{
+								newSrcList->addItem(Route(track, -1).name());
+							//}
 						}
 						else if(track->type() == Track::AUDIO_OUTPUT)
 						{
-							for (int channel = 0; channel < track->channels(); ++channel)
-							{
-								newDstList->addItem(Route(track, channel).name());
-							}
+							//for (int channel = 0; channel < track->channels(); ++channel)
+							//{
+								newDstList->addItem(Route(track, -1).name());
+							//}
 						}
 					}
 				break;
@@ -427,16 +427,14 @@ void RouteDialog::trackSelectionChanged()
 							continue; //You cant connect a track to itself
 						if(track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_BUSS)
 						{
-							for (int channel = 0; channel < track->channels(); ++channel)
-							{
-								newDstList->addItem(Route(track, channel).name());
-							}
+							//for (int channel = 0; channel < track->channels(); ++channel)
+							//{
+								newDstList->addItem(Route(track, -1).name());
+							//}
 						}
 					}
 				break;
 				default:
-					//newDstList->addItem(Route(track, -1).name());
-					//newSrcList->addItem(Route(track, -1).name());
 				break;/*}}}*/
 			}
 		//}
@@ -551,6 +549,12 @@ void RouteDialog::srcSelectionChanged()
 			for(int i = 0; i < found.size(); ++i)
 			{
 				QTreeWidgetItem* r = found.at(i);
+				Track* t = song->findTrack(r->text(1));
+				if(t)
+				{
+					en = false;
+					break;
+				}
 				if(r->text(1).toInt() == chan)
 				{
 					en = false;
@@ -596,7 +600,13 @@ void RouteDialog::dstSelectionChanged()
 			for(int i = 0; i < found.size(); ++i)
 			{
 				QTreeWidgetItem* r = found.at(i);
-				if(r->text(1).toInt() == chan)
+				Track* t = song->findTrack(r->text(3));
+				if(t)
+				{
+					en = false;
+					break;
+				}
+				if(r->text(3).toInt() == chan)
 				{
 					en = false;
 					break;
