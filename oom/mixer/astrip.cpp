@@ -790,7 +790,13 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 
 	grid->addItem(new QSpacerItem(0, 4), _curGridRow++, 0);
 	grid->addWidget(stereo, _curGridRow, 0);
-	grid->addWidget(pre, _curGridRow++, 1);
+
+        // FIXME
+        // It seems the prefader send doens't send to anywhere or to the
+        // same output as the track is routing too.
+        // It also overloads 'some output' when toggling the mono/stereo button
+        // when Pre send is turned on during playback.
+//	grid->addWidget(pre, _curGridRow++, 1);
 
 	//---------------------------------------------------
 	//    aux send
