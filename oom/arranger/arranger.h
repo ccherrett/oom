@@ -104,7 +104,6 @@ private slots:
     void setTempo100();
     void setTempo200();
     //void seek();
-    void verticalScrollSetYpos(unsigned);
 	void preloadControllers();
 	void splitterMoved(int, int);
 	void resourceDockAreaChanged(Qt::DockWidgetArea);
@@ -132,6 +131,7 @@ public slots:
     void controllerChanged(Track *t);
     void showTrackViews();
     void _setRaster(int);
+    void verticalScrollSetYpos(unsigned);
 
 public:
 

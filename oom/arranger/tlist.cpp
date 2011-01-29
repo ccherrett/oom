@@ -38,6 +38,7 @@
 #include "audio.h"
 #include "instruments/minstrument.h"
 #include "app.h"
+#include "arranger.h"
 #include "gconfig.h"
 #include "event.h"
 #include "midiedit/drummap.h"
@@ -1210,6 +1211,17 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				//p->clear();
 				p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 				p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
+
+                                QMenu* trackHeightsMenu = p->addMenu("Track Heights");
+                                trackHeightsMenu->addAction("Default")->setData(6);
+                                trackHeightsMenu->addAction("2")->setData(7);
+                                trackHeightsMenu->addAction("3")->setData(8);
+                                trackHeightsMenu->addAction("4")->setData(9);
+                                trackHeightsMenu->addAction("5")->setData(10);
+                                trackHeightsMenu->addAction("6")->setData(11);
+                                trackHeightsMenu->addAction("Full Screen")->setData(12);
+
+
 				if (t->type() == Track::AUDIO_SOFTSYNTH)/*{{{*/
 				{
 					SynthI* synth = (SynthI*) t;
@@ -1402,11 +1414,56 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								audio->msgIdle(false);
 							}
 						}
+                                                case 6:
+                                                {
+                                                        t->setHeight(40);
+                                                        song->update(SC_TRACK_MODIFIED);
+                                                        break;
+                                                }
+                                                case 7:
+                                                {
+                                                        t->setHeight(80);
+                                                        song->update(SC_TRACK_MODIFIED);
+                                                        break;
+                                                }
+                                                case 8:
+                                                {
+                                                        t->setHeight(120);
+                                                        song->update(SC_TRACK_MODIFIED);
+                                                        break;
+                                                }
+                                                case 9:
+                                                {
+                                                        t->setHeight(160);
+                                                        song->update(SC_TRACK_MODIFIED);
+                                                        break;
+                                                }
+                                                case 10:
+                                                {
+                                                        t->setHeight(200);
+                                                        song->update(SC_TRACK_MODIFIED);
+                                                        break;
+                                                }
+                                                case 11:
+                                                {
+                                                        t->setHeight(240);
+                                                        song->update(SC_TRACK_MODIFIED);
+                                                        break;
+                                                }
+                                                case 12:
+                                                {
+                                                        t->setHeight(parentWidget()->height());
+                                                        song->update(SC_TRACK_MODIFIED);
+                                                        oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+                                                        break;
+                                                }
+
 						default:
 							printf("action %d\n", n);
 						break;
 					}
 				}
+                                delete trackHeightsMenu;
 				delete p;
 
 
@@ -1616,7 +1673,7 @@ void TList::mouseMoveEvent(QMouseEvent* ev)
 						if (h < MIN_TRACKHEIGHT)
 							h = MIN_TRACKHEIGHT;
 						//if((h / 2) != 0)
-						//	h = h +1;
+                                                //	h = h +1;
 						t->setHeight(h);
 						song->update(SC_TRACK_MODIFIED);
 					}
