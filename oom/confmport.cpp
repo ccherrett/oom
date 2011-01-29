@@ -1016,7 +1016,8 @@ void MPConfig::addInstanceClicked()
 	SynthI *si = song->createSynthI(item->text(0), item->text(2));
 	if (!si)
 		return;
-
+*/
+	/*
 	// add instance last in midi device list
 	for (int i = 0; i < MIDI_PORTS; ++i)
 	{
@@ -1031,6 +1032,7 @@ void MPConfig::addInstanceClicked()
 		}
 	}
 	*/
+	
 }
 
 //---------------------------------------------------------
