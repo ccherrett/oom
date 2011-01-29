@@ -236,7 +236,6 @@ signals:
 private slots:
     //void runPythonScript();
     void loadProject();
-    bool save();
     void configGlobalSettings();
     void quitDoc();
     void about();
@@ -331,6 +330,7 @@ private slots:
     void execUserScript(int);
 
 public slots:
+    bool save();
     bool saveAs();
     void bounceToFile(AudioOutput* ao = 0);
     void closeEvent(QCloseEvent*e);
