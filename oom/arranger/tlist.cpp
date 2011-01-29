@@ -1292,12 +1292,10 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						case 0: // delete track
                                                 if (multipleSelectedTracks)
                                                 {
-                                                        for (iTrack t = selectedTracksList.begin(); t != selectedTracksList.end(); ++t)
-                                                        {
-                                                                Track* tr = *t;
-                                                                song->removeTrack0(tr);
-                                                        }
-                                                        audio->msgUpdateSoloStates();
+                                                        song->startUndo();
+                                                        audio->msgRemoveTracks();
+                                                        song->endUndo(SC_TRACK_REMOVED);
+                                                        song->updateSoloStates();
                                                 }
                                                 else
                                                 {
