@@ -665,9 +665,7 @@ void removeRoute(Route src, Route dst)
 				}
 			}
 		}
-		else
-			//if (dst.type == Route::JACK_MIDI_ROUTE)
-			if (dst.type == Route::MIDI_DEVICE_ROUTE)
+		else if (dst.type == Route::MIDI_DEVICE_ROUTE)
 		{
 			RouteList* routes = dst.device->inRoutes();
 			iRoute i;
@@ -720,9 +718,7 @@ void removeRoute(Route src, Route dst)
 				}
 			}
 		}
-		else
-			//if (src.type == Route::JACK_MIDI_ROUTE)
-			if (src.type == Route::MIDI_DEVICE_ROUTE)
+		else if (src.type == Route::MIDI_DEVICE_ROUTE)
 		{
 			RouteList* routes = src.device->outRoutes();
 			iRoute i;
@@ -848,83 +844,35 @@ void removeRoute(Route src, Route dst)
 			return;
 		}
 
-		// Removed p3.3.49
-		/*
-		//if((src.type == Route::JACK_MIDI_ROUTE) || (src.type == Route::ALSA_MIDI_ROUTE))
-		if(src.type == Route::MIDI_DEVICE_ROUTE)
+		if (src.isValid())
 		{
-		  if(src.isValid())
-		  {
-			RouteList* outRoutes = src.device->outRoutes();
+			RouteList* outRoutes = src.track->outRoutes();
 			for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
 			{
-				  if (*i == dst) {
-						outRoutes->erase(i);
-						break;
-						}
+				if ((*i).name() == dst.name())
+				{
+					outRoutes->erase(i);
+					break;
+				}
 			}
-		  }
-		  else
-			printf("removeRoute: source is midi but invalid\n");
-              
-		  if(dst.isValid())
-		  {
+		}
+		else
+			printf("removeRoute: source is track but invalid\n");
+
+		if (dst.isValid())
+		{
 			RouteList* inRoutes = dst.track->inRoutes();
 			for (iRoute i = inRoutes->begin(); i != inRoutes->end(); ++i)
 			{
-				  if (*i == src) {
-						inRoutes->erase(i);
-						break;
-						}
+				if ((*i).name() == src.name())
+				{
+					inRoutes->erase(i);
+					break;
+				}
 			}
-		  }
-		  else
-			printf("removeRoute: source is midi but destination invalid\n");
 		}
 		else
-		 */
-
-		{
-			if (src.isValid())
-			{
-				RouteList* outRoutes = src.track->outRoutes();
-				for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
-				{
-					if (*i == dst)
-					{
-						outRoutes->erase(i);
-						break;
-					}
-				}
-			}
-			else
-				printf("removeRoute: source is track but invalid\n");
-
-			if (dst.isValid())
-			{
-				RouteList* inRoutes;
-
-				//if ((dst.type == Route::JACK_MIDI_ROUTE) || (dst.type == Route::ALSA_MIDI_ROUTE))
-				// Removed p3.3.49
-				/*
-				if (dst.type == Route::MIDI_DEVICE_ROUTE)
-				  inRoutes = dst.device->inRoutes();
-				else
-				 */
-
-				inRoutes = dst.track->inRoutes();
-				for (iRoute i = inRoutes->begin(); i != inRoutes->end(); ++i)
-				{
-					if (*i == src)
-					{
-						inRoutes->erase(i);
-						break;
-					}
-				}
-			}
-			else
-				printf("removeRoute: source is track but destination invalid\n");
-		}
+			printf("removeRoute: source is track but destination invalid\n");
 	}
 }
 
