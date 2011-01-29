@@ -624,7 +624,10 @@ void AudioMixerApp::showRouteDialog(bool on)
 		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
 	}
 	if (routingDialog)
-		routingDialog->setVisible(on);
+        {
+//		routingDialog->setVisible(on);
+                routingDialog->show();
+        }
 	//menuView->setItemChecked(routingId, on);
 	routingId->setChecked(on);
 }
