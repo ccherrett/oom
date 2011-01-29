@@ -564,7 +564,7 @@ QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList {
 	 color: #36373a; 
 	 font-family: "fixed-width";
 	 font-weight: bold;
-	 font-size: 9px;
+	 font-size: 8px;
 	 alternate-background-color: #bec0cf;
 	 show-decoration-selected: 0; 
 }
@@ -580,7 +580,7 @@ QTreeWidget#routeList {
 	 color: #36373a; 
 	 font-family: "fixed-width";
 	 font-weight: bold;
-	 font-size: 9px;
+	 font-size: 8px;
      padding: 15px;
 	 alternate-background-color: #bec0cf;
 	 show-decoration-selected: 0; 
