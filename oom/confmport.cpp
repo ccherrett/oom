@@ -793,7 +793,9 @@ MPConfig::MPConfig(QWidget* parent)
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_REC, 16);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 16);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_GUI, QHeaderView::Fixed);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 100);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 200);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 200);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NAME, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->setStretchLastSection(true);
@@ -1003,11 +1005,11 @@ void MPConfig::songChanged(int flags)
 	synthList->resizeColumnToContents(1);
 	*/
 	mdevView->resizeColumnsToContents();
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
+	/*mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_REC, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_PLAY, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_GUI, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->setStretchLastSection(true);
+	mdevView->horizontalHeader()->setStretchLastSection(true);*/
 	selectionChanged();
 }
 
