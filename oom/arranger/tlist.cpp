@@ -1224,9 +1224,13 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					}
 				}
 				else
+                                {
 					t->setSelected(!t->selected());
+                                }
 				if (editTrack && editTrack != t)
+                                {
 					returnPressed();
+                                }
 				///emit selectionChanged();
 				emit selectionChanged(t->selected() ? t : 0);
 			}

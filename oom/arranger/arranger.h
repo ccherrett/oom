@@ -148,6 +148,12 @@ public:
     {
         return canvas;
     }
+
+    TList* getTrackList() const
+    {
+            return list;
+    }
+
     void setMode(int);
     void reset();
 

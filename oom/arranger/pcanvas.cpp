@@ -36,6 +36,7 @@
 #include "filedialog.h"
 #include "marker/marker.h"
 #include "arranger.h"
+#include "tlist.h"
 
 // Moved into global config by Tim.
 /* 
@@ -1295,6 +1296,60 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		emit selectTrackBelow();
 		return;
 	}
+        else if (key == shortcuts[SHRT_SEL_TRACK_ABOVE_ADD].key)
+        {
+                TrackList* tl = song->tracks();
+                TrackList selectedTracks = song->getSelectedTracks();
+                if (!selectedTracks.size())
+                {
+                        return;
+                }
+
+                iTrack t = tl->end();
+                while (t != tl->begin())
+                {
+                        --t;
+
+                        if ((*t) == *(selectedTracks.begin()))
+                        {
+                                if (*t != *(tl->begin()))
+                                {
+                                        Track* previous = *(--t);
+                                        previous->setSelected(true);
+                                        oom->arranger->getTrackList()->update();
+                                        return;
+                                }
+
+                        }
+                }
+
+                return;
+        }
+        else if (key == shortcuts[SHRT_SEL_TRACK_BELOW_ADD].key)
+        {
+                TrackList* tl = song->tracks();
+                TrackList selectedTracks = song->getSelectedTracks();
+                if (!selectedTracks.size())
+                {
+                        return;
+                }
+
+                for (iTrack t = tl->begin(); t != tl->end(); ++t)
+                {
+                        if (*t == *(--selectedTracks.end()))
+                        {
+                                if (*t != *(--tl->end()))
+                                {
+                                        Track* next = *(++t);
+                                        next->setSelected(true);
+                                        oom->arranger->getTrackList()->update();
+                                        return;
+                                }
+
+                        }
+                }
+                return;
+        }
         else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
         {
                 Track* t =oom->arranger->curTrack();
