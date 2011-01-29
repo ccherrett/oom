@@ -153,7 +153,7 @@ void RouteDialog::removeRoute()
 	audio->msgUpdateSoloStates();
 	//song->update(SC_SOLO);
 	song->update(SC_ROUTE);
-	delete item;
+	//delete item;
 }
 
 //---------------------------------------------------------
