@@ -40,7 +40,7 @@ RouteDialog::RouteDialog(QWidget* parent)
 	routingChanged();
 	routeList->header()->resizeSection(1, 30);
 	routeList->header()->resizeSection(3, 30);
-	resize(tconfig().get_property("RouteDialog", "size", QSize(891, 891)).toSize());
+	resize(tconfig().get_property("RouteDialog", "size", QSize(891, 691)).toSize());
 	move(tconfig().get_property("RouteDialog", "pos", QPoint(0, 0)).toPoint());
 }
 
