@@ -795,13 +795,13 @@ MPConfig::MPConfig(QWidget* parent)
 			this, SLOT(mdevViewItemRenamed(QTableWidgetItem*)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 
-	connect(synthList, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
-	connect(instanceList, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
+	//connect(synthList, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
+	//connect(instanceList, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
 
-	connect(addInstance, SIGNAL(clicked()), SLOT(addInstanceClicked()));
-	connect(synthList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(addInstanceClicked()));
-	connect(removeInstance, SIGNAL(clicked()), SLOT(removeInstanceClicked()));
-	connect(instanceList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(removeInstanceClicked()));
+	//connect(addInstance, SIGNAL(clicked()), SLOT(addInstanceClicked()));
+	//connect(synthList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(addInstanceClicked()));
+	//connect(removeInstance, SIGNAL(clicked()), SLOT(removeInstanceClicked()));
+	//connect(instanceList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(removeInstanceClicked()));
 	songChanged(0);
 }
 
@@ -815,8 +815,8 @@ MPConfig::~MPConfig()
 
 void MPConfig::selectionChanged()
 {
-	addInstance->setEnabled(synthList->currentItem());
-	removeInstance->setEnabled(instanceList->currentItem());
+	//addInstance->setEnabled(synthList->currentItem());
+	//removeInstance->setEnabled(instanceList->currentItem());
 }
 
 //---------------------------------------------------------
@@ -958,7 +958,8 @@ void MPConfig::songChanged(int flags)
 		mdevView->setCurrentItem(sitem);
 
 	QString s;
-	synthList->clear();
+	//synthList->clear();
+	/*
 	for (std::vector<Synth*>::iterator i = synthis.begin();
 			i != synthis.end(); ++i)
 	{
@@ -977,7 +978,7 @@ void MPConfig::songChanged(int flags)
 		item->setText(3, QString((*i)->version()));
 		item->setText(4, QString((*i)->description()));
 	}
-	instanceList->clear();
+	//instanceList->clear();
 	SynthIList* sl = song->syntis();
 	for (iSynthI si = sl->begin(); si != sl->end(); ++si)
 	{
@@ -991,6 +992,7 @@ void MPConfig::songChanged(int flags)
 		iitem->setTextAlignment(1, Qt::AlignHCenter);
 	}
 	synthList->resizeColumnToContents(1);
+	*/
 	mdevView->resizeColumnsToContents();
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_REC, QHeaderView::Fixed);
@@ -1006,6 +1008,7 @@ void MPConfig::songChanged(int flags)
 
 void MPConfig::addInstanceClicked()
 {
+	/*
 	QTreeWidgetItem* item = synthList->currentItem();
 	if (item == 0)
 		return;
@@ -1027,6 +1030,7 @@ void MPConfig::addInstanceClicked()
 			break;
 		}
 	}
+	*/
 }
 
 //---------------------------------------------------------
@@ -1035,6 +1039,7 @@ void MPConfig::addInstanceClicked()
 
 void MPConfig::removeInstanceClicked()
 {
+/*
 	QTreeWidgetItem* item = instanceList->currentItem();
 	if (item == 0)
 		return;
@@ -1051,6 +1056,7 @@ void MPConfig::removeInstanceClicked()
 		return;
 	}
 	audio->msgRemoveTrack(*ii);
+	*/
 }
 
 //---------------------------------------------------------
