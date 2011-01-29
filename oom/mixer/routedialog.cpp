@@ -69,16 +69,16 @@ void RouteDialog::routingChanged()
 		if ((*i)->isMidiTrack())
 			continue;
 		AudioTrack* track = (AudioTrack*) (*i);
-		//if (track->type() == Track::AUDIO_OUTPUT)
-		//{
+		if (track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_OUTPUT)
+		{
 			for (int channel = 0; channel < track->channels(); ++channel)
 			{
 				Route r(track, channel);
 				tracksList->addItem(r.name());
 			}
-		//}
-		//else
-		//	tracksList->addItem(Route(track, -1).name());
+		}
+		else
+			tracksList->addItem(Route(track, -1).name());
 	}
 	if(selectedIndex < tracksList->count())
 		tracksList->setCurrentRow(selectedIndex, QItemSelectionModel::ClearAndSelect);
@@ -256,7 +256,6 @@ void RouteDialog::addOutRoute()/*{{{*/
 	connectButton->setEnabled(false);
 	*/
 }/*}}}*/
-
 
 void RouteDialog::setSourceSelection(QString src)
 {
