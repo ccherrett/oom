@@ -77,11 +77,11 @@
         <bool>true</bool>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="patchesTab">
         <attribute name="title">
-         <string>Pa&amp;tches</string>
+         <string>    Pa&amp;tches    </string>
         </attribute>
         <layout class="QVBoxLayout">
          <item>
@@ -458,7 +458,7 @@
        </widget>
        <widget class="QWidget" name="controllerTab">
         <attribute name="title">
-         <string>Contro&amp;ller</string>
+         <string>    Contro&amp;ller    </string>
         </attribute>
         <layout class="QVBoxLayout">
          <item>
@@ -1282,7 +1282,7 @@ Typically, set to 127/127, or an unused
        </widget>
        <widget class="QWidget" name="sysExTab">
         <attribute name="title">
-         <string>S&amp;ysEx</string>
+         <string>    S&amp;ysEx    </string>
         </attribute>
         <layout class="QVBoxLayout">
          <item>
