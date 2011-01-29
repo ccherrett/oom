@@ -1517,9 +1517,19 @@ void TList::mousePressEvent(QMouseEvent* ev)
                                                 }
                                                 case 12:
                                                 {
-                                                        t->setHeight(parentWidget()->height());
-                                                        song->update(SC_TRACK_MODIFIED);
-                                                        oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+                                                        if (multipleSelectedTracks)
+                                                        {
+                                                                song->setTrackHeights(selectedTracksList, parentWidget()->height());
+                                                                Track* firstSelectedTrack = *selectedTracksList.begin();
+                                                                oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+
+                                                        }
+                                                        else
+                                                        {
+                                                                t->setHeight(parentWidget()->height());
+                                                                song->update(SC_TRACK_MODIFIED);
+                                                                oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+                                                        }
                                                         break;
                                                 }
 

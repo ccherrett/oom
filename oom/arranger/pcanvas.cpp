@@ -1372,66 +1372,88 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_FULL_SCREEN].key)
         {
-                TrackList* tl = song->tracks();
-                for (iTrack t = tl->begin(); t != tl->end(); ++t)
+                TrackList tl = song->getSelectedTracks();
+                for (iTrack t = tl.begin(); t != tl.end(); ++t)
                 {
                         Track* tr = *t;
-                        if (tr->selected())
-                        {
-                                tr->setHeight(height());
-                        }
+                        tr->setHeight(height());
+                }
+                if (tl.size())
+                {
+                        Track* tr = *tl.begin();
+                        oom->arranger->verticalScrollSetYpos(track2Y(tr));
                 }
                 song->update(SC_TRACK_MODIFIED);
                 return;
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_2].key)
         {
-                Track* t = oom->arranger->curTrack();
-                if (t)
+                TrackList* tl = song->tracks();
+                for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
-                        t->setHeight(80);
-                        song->update(SC_TRACK_MODIFIED);
+                        Track* tr = *t;
+                        if (tr->selected())
+                        {
+                                tr->setHeight(60);
+                        }
                 }
+                song->update(SC_TRACK_MODIFIED);
                 return;
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_3].key)
         {
-                Track* t = oom->arranger->curTrack();
-                if (t)
+                TrackList* tl = song->tracks();
+                for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
-                        t->setHeight(120);
-                        song->update(SC_TRACK_MODIFIED);
+                        Track* tr = *t;
+                        if (tr->selected())
+                        {
+                                tr->setHeight(100);
+                        }
                 }
+                song->update(SC_TRACK_MODIFIED);
                 return;
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_4].key)
         {
-                Track* t = oom->arranger->curTrack();
-                if (t)
+                TrackList* tl = song->tracks();
+                for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
-                        t->setHeight(160);
-                        song->update(SC_TRACK_MODIFIED);
+                        Track* tr = *t;
+                        if (tr->selected())
+                        {
+                                tr->setHeight(180);
+                        }
                 }
+                song->update(SC_TRACK_MODIFIED);
                 return;
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_5].key)
         {
-                Track* t = oom->arranger->curTrack();
-                if (t)
+                TrackList* tl = song->tracks();
+                for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
-                        t->setHeight(200);
-                        song->update(SC_TRACK_MODIFIED);
+                        Track* tr = *t;
+                        if (tr->selected())
+                        {
+                                tr->setHeight(320);
+                        }
                 }
+                song->update(SC_TRACK_MODIFIED);
                 return;
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_6].key)
         {
-                Track* t = oom->arranger->curTrack();
-                if (t)
+                TrackList* tl = song->tracks();
+                for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
-                        t->setHeight(240);
-                        song->update(SC_TRACK_MODIFIED);
+                        Track* tr = *t;
+                        if (tr->selected())
+                        {
+                                tr->setHeight(640);
+                        }
                 }
+                song->update(SC_TRACK_MODIFIED);
                 return;
         }
 
