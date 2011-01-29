@@ -1356,6 +1356,77 @@ void PartCanvas::keyPress(QKeyEvent* event)
                 oom->arranger->raster->setCurrentIndex(5);
                 return;
         }
+        else if (key == shortcuts[SHRT_TRACK_HEIGHT_DEFAULT].key)
+        {
+                Track* t = oom->arranger->curTrack();
+                if (t)
+                {
+                        t->setHeight(40);
+                        song->update(SC_TRACK_MODIFIED);
+                }
+                return;
+        }
+        else if (key == shortcuts[SHRT_TRACK_HEIGHT_FULL_SCREEN].key)
+        {
+                Track* t = oom->arranger->curTrack();
+                if (t)
+                {
+                        t->setHeight(height());
+                        song->update(SC_TRACK_MODIFIED);
+                        oom->arranger->verticalScrollSetYpos(track2Y(t));
+                }
+                return;
+        }
+        else if (key == shortcuts[SHRT_TRACK_HEIGHT_2].key)
+        {
+                Track* t = oom->arranger->curTrack();
+                if (t)
+                {
+                        t->setHeight(80);
+                        song->update(SC_TRACK_MODIFIED);
+                }
+                return;
+        }
+        else if (key == shortcuts[SHRT_TRACK_HEIGHT_3].key)
+        {
+                Track* t = oom->arranger->curTrack();
+                if (t)
+                {
+                        t->setHeight(120);
+                        song->update(SC_TRACK_MODIFIED);
+                }
+                return;
+        }
+        else if (key == shortcuts[SHRT_TRACK_HEIGHT_4].key)
+        {
+                Track* t = oom->arranger->curTrack();
+                if (t)
+                {
+                        t->setHeight(160);
+                        song->update(SC_TRACK_MODIFIED);
+                }
+                return;
+        }
+        else if (key == shortcuts[SHRT_TRACK_HEIGHT_5].key)
+        {
+                Track* t = oom->arranger->curTrack();
+                if (t)
+                {
+                        t->setHeight(200);
+                        song->update(SC_TRACK_MODIFIED);
+                }
+                return;
+        }
+        else if (key == shortcuts[SHRT_TRACK_HEIGHT_6].key)
+        {
+                Track* t = oom->arranger->curTrack();
+                if (t)
+                {
+                        t->setHeight(240);
+                        song->update(SC_TRACK_MODIFIED);
+                }
+                return;
+        }
 
 	//
 	// Shortcuts that require selected parts from here
