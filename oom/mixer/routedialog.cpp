@@ -27,6 +27,7 @@ RouteDialog::RouteDialog(QWidget* parent)
 {
 	setupUi(this);
 	_selected = 0;
+	selectedIndex = -1;
 	connect(routeList, SIGNAL(itemSelectionChanged()), SLOT(routeSelectionChanged()));
 	connect(newSrcList, SIGNAL(itemSelectionChanged()), SLOT(srcSelectionChanged()));
 	connect(newDstList, SIGNAL(itemSelectionChanged()), SLOT(dstSelectionChanged()));
@@ -79,8 +80,10 @@ void RouteDialog::routingChanged()
 		//else
 		//	tracksList->addItem(Route(track, -1).name());
 	}
-	if(_selected)
-		setSelected(_selected->name());
+	if(selectedIndex < tracksList->count())
+		tracksList->setCurrentRow(selectedIndex, QItemSelectionModel::ClearAndSelect);
+	//if(_selected)
+	//	setSelected(_selected->name());
 }
 
 //---------------------------------------------------------
@@ -89,7 +92,7 @@ void RouteDialog::routingChanged()
 
 void RouteDialog::songChanged(int v)
 {
-	if (v & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_ROUTE))
+	if (v & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_ROUTE | SC_CHANNELS))
 	{
 		routingChanged();
 	}
@@ -291,6 +294,7 @@ void RouteDialog::trackSelectionChanged()
 	if(atrack)
 	{
 		_selected = atrack;
+		selectedIndex = tracksList->row(titem);
 		//TrackList* tl = song->tracks();
 		//for(iTrack t = tl->begin(); t != tl->end(); ++t)
 		//{
@@ -516,11 +520,39 @@ void RouteDialog::setSelected(AudioTrack* t)
 void RouteDialog::srcSelectionChanged()
 {
 	QListWidgetItem* srcItem = newSrcList->currentItem();
-	//QListWidgetItem* dstItem = newDstList->currentItem();
+	QListWidgetItem* tItem = tracksList->currentItem();
 	if(srcItem)
 	{
+		int chan = 0;
+		if(!tItem)
+			return;
+		int row = tracksList->row(tItem);
+		QList<QListWidgetItem*> tfound = tracksList->findItems(tItem->text(), Qt::MatchExactly);
+		if(tfound.isEmpty())
+			return;
+		for(int i = 0; i < tfound.size(); ++i)
+		{
+			QListWidgetItem* item = tfound.at(i);
+			chan = i;
+			int r = tracksList->row(item);
+			if(r == row)
+				break;
+		}
 		QList<QTreeWidgetItem*> found = routeList->findItems(srcItem->text(), Qt::MatchExactly, 0);
-		connectButton->setEnabled(found.isEmpty());//(srcItem != 0) && (dstItem != 0) && checkRoute(srcItem->text(), dstItem->text()));
+		bool en = true;
+		if(!found.isEmpty())
+		{
+			for(int i = 0; i < found.size(); ++i)
+			{
+				QTreeWidgetItem* r = found.at(i);
+				if(r->text(1).toInt() == chan)
+				{
+					en = false;
+					break;
+				}
+			}
+		}
+		connectButton->setEnabled(en);//(srcItem != 0) && (dstItem != 0) && checkRoute(srcItem->text(), dstItem->text()));
 	}
 	else
 		connectButton->setEnabled(false);
@@ -533,11 +565,39 @@ void RouteDialog::srcSelectionChanged()
 void RouteDialog::dstSelectionChanged()
 {
 	QListWidgetItem* dstItem = newDstList->currentItem();
-	//QListWidgetItem* srcItem = newSrcList->currentItem();
+	QListWidgetItem* tItem = tracksList->currentItem();
 	if(dstItem)
 	{
-		QList<QTreeWidgetItem*> found = routeList->findItems(dstItem->text(), Qt::MatchExactly, 1);
-		btnConnectOut->setEnabled(found.isEmpty());
+		int chan = 0;
+		if(!tItem)
+			return;
+		int row = tracksList->row(tItem);
+		QList<QListWidgetItem*> tfound = tracksList->findItems(tItem->text(), Qt::MatchExactly);
+		if(tfound.isEmpty())
+			return;
+		for(int i = 0; i < tfound.size(); ++i)
+		{
+			QListWidgetItem* item = tfound.at(i);
+			chan = i;
+			int r = tracksList->row(item);
+			if(r == row)
+				break;
+		}
+		QList<QTreeWidgetItem*> found = routeList->findItems(dstItem->text(), Qt::MatchExactly, 3);
+		bool en = true;
+		if(!found.isEmpty())
+		{
+			for(int i = 0; i < found.size(); ++i)
+			{
+				QTreeWidgetItem* r = found.at(i);
+				if(r->text(1).toInt() == chan)
+				{
+					en = false;
+					break;
+				}
+			}
+		}
+		btnConnectOut->setEnabled(en);
 	}
 	else
 		btnConnectOut->setEnabled(false);
