@@ -774,10 +774,10 @@ MPConfig::MPConfig(QWidget* parent)
 			<< tr("O")
 			<< tr("Instrument")
 			<< tr("Device Name")
-			<< tr("In routes")
-			<< tr("Out routes")
-			<< tr("Def in ch")
-			<< tr("Def out ch")
+			<< tr("Ins")
+			<< tr("Outs")
+			<< tr("In Ch")
+			<< tr("Out Ch")
 			<< tr("State");
 
 	mdevView->setColumnCount(columnnames.size());
@@ -851,7 +851,7 @@ void MPConfig::songChanged(int flags)
 		s.setNum(i + 1);
 		QTableWidgetItem* itemno = new QTableWidgetItem(s);
 		addItem(i, DEVCOL_NO, itemno, mdevView);
-		itemno->setTextAlignment(Qt::AlignHCenter);
+		itemno->setTextAlignment(Qt::AlignLeft);
 		itemno->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemstate = new QTableWidgetItem(port->state());
 		addItem(i, DEVCOL_STATE, itemstate, mdevView);
@@ -866,15 +866,15 @@ void MPConfig::songChanged(int flags)
 		itemname->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemgui = new QTableWidgetItem;
 		addItem(i, DEVCOL_GUI, itemgui, mdevView);
-		itemgui->setTextAlignment(Qt::AlignHCenter);
+		itemgui->setTextAlignment(Qt::AlignLeft);
 		itemgui->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemrec = new QTableWidgetItem;
 		addItem(i, DEVCOL_REC, itemrec, mdevView);
-		itemrec->setTextAlignment(Qt::AlignHCenter);
+		itemrec->setTextAlignment(Qt::AlignLeft);
 		itemrec->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemplay = new QTableWidgetItem;
 		addItem(i, DEVCOL_PLAY, itemplay, mdevView);
-		itemplay->setTextAlignment(Qt::AlignHCenter);
+		itemplay->setTextAlignment(Qt::AlignLeft);
 		itemplay->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemout = new QTableWidgetItem;
 		addItem(i, DEVCOL_OUTROUTES, itemout, mdevView);
