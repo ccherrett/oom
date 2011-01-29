@@ -48,6 +48,8 @@ RouteDialog::~RouteDialog()
 {
 	tconfig().set_property("RouteDialog", "size", size());
 	tconfig().set_property("RouteDialog", "pos", pos());
+    // Save the new global settings to the configuration file
+    tconfig().save();
 }
 
 //---------------------------------------------------------
