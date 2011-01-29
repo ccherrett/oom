@@ -1638,7 +1638,7 @@ Typically, set to 127/127, or an unused
    <sender>fileExitAction</sender>
    <signal>activated()</signal>
    <receiver>EditInstrumentBase</receiver>
-   <slot>fileExit()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
