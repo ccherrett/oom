@@ -25,7 +25,6 @@ class RouteDialog : public QDialog, public Ui::RouteDialogBase
 	AudioTrack* _selected;
 	int selectedIndex;
 
-    virtual void closeEvent(QCloseEvent*);
     void routingChanged();
 	void insertInputs();
 	void insertOutputs();
@@ -54,6 +53,10 @@ public:
 	{
 		return _selected;
 	}
+
+protected:
+    virtual void closeEvent(QCloseEvent*);
+    void reject();
 };
 
 

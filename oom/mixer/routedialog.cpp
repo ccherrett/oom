@@ -625,6 +625,11 @@ void RouteDialog::dstSelectionChanged()
 
 void RouteDialog::closeEvent(QCloseEvent* e)
 {
-	emit closed();
+        emit closed();
 	e->accept();
+}
+
+void RouteDialog::reject()
+{
+        emit closed();
 }
