@@ -795,15 +795,29 @@ void TList::keyPressEvent(QKeyEvent* e)
 void TList::moveSelection(int n)
 {
 	//This changes to song->visibletracks()
-	TrackList* tracks;
-    if(!song->viewselected)
-		tracks = song->tracks();
-    else
-        tracks = song->visibletracks();
+        TrackList* tracks;
+        if(!song->viewselected)
+                tracks = song->tracks();
+        else
+                tracks = song->visibletracks();
 
 	// check for single selection
         TrackList selectedTracks = song->getSelectedTracks();
         int nselect = selectedTracks.size();
+
+        // if there isn't a selection, select the first in the list
+        // if there is any, else return, not tracks at all
+        if (nselect == 0)
+        {
+                if (song->tracks()->size())
+                {
+                        Track* track = (*(song->tracks()->begin()));
+                        track->setSelected(true);
+                        emit selectionChanged(track);
+                        redraw();
+                }
+                return;
+        }
 
 	if (nselect != 1)
         {
