@@ -377,8 +377,10 @@ _redisplay:
 				// Routes can't be re-read until the message sent from msgAddRoute1()
 				//  has had time to be sent and actually affected the routes.
 				///goto _redisplay;   // Go back
-				item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(tr("my out"));
 			}
+
+			QString sss(act->text());
+			item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(sss);
 			delete pup;
 			//iR->setDown(false);     // pup->exec() catches mouse release event
 		}
