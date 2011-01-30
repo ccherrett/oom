@@ -648,15 +648,14 @@ void RouteDialog::showEvent(QShowEvent *)
 void RouteDialog::updateRoutingHeaderWidths()
 {
         int routeListWidth = routeList->header()->width();
-        printf("routeListWidth %d\n", routeListWidth);
-        routeListWidth -= 90;
-        int routeSectionWidth = routeListWidth / 3;
+        routeListWidth -= 60;
+        float routeSectionWidth = float(routeListWidth) / 7;
 
-        routeList->header()->resizeSection(0, routeSectionWidth);
-        routeList->header()->resizeSection(1, 50);
-        routeList->header()->resizeSection(2, routeSectionWidth);
-        routeList->header()->resizeSection(3, routeSectionWidth);
-        routeList->header()->resizeSection(4, 40);
+        routeList->header()->resizeSection(0, routeSectionWidth * 3);
+        routeList->header()->resizeSection(1, 30);
+        routeList->header()->resizeSection(2, routeSectionWidth * 2);
+        routeList->header()->resizeSection(3, routeSectionWidth * 2);
+        routeList->header()->resizeSection(4, 30);
 
 }
 
