@@ -327,6 +327,7 @@ _redisplay:
 				}
 
 				QString s(act->text());
+				item->setText(act->text());
 
 				//if(dev->rwFlags() & 1) // Writable
 				if (col == DEVCOL_OUTROUTES) // Writable  p3.3.55
@@ -371,7 +372,6 @@ _redisplay:
 				audio->msgUpdateSoloStates();
 				song->update(SC_ROUTE);
 
-				item->setText(act->text());
 				// p3.3.46
 				//delete pup;
 				// FIXME:
