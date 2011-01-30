@@ -205,12 +205,12 @@ void MPConfig::rbClicked(QTableWidgetItem* item)
 				if (dev->openFlags() & 1)
 				{
 					//item->setPixmap(DEVCOL_OUTROUTES, *buttondownIcon);
-					//item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(tr("out"));
+					item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(tr("out"));
 				}
 				else
 				{
 					//item->setPixmap(DEVCOL_OUTROUTES, *buttondownIcon);
-					//item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText("");
+					item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText("");
 				}
 			}
 
@@ -327,7 +327,6 @@ _redisplay:
 				}
 
 				QString s(act->text());
-				item->setText(act->text());
 
 				//if(dev->rwFlags() & 1) // Writable
 				if (col == DEVCOL_OUTROUTES) // Writable  p3.3.55
@@ -956,8 +955,17 @@ void MPConfig::songChanged(int flags)
 				//if(dev->openFlags() & 1)
 			{
 				itemout->setIcon(QIcon(*buttondownIcon));
+				if (port->device())
+                {
+                	itemout->setText(port->device()->name());
+                }
+                else 
+                {
+                	itemout->setText(tr("out"));                                                
+                }
+
 				//if (dev->openFlags() & 1)
-					//itemout->setText(tr("out"));
+				//	itemout->setText(tr("out"));
 			}
 			if (dev->rwFlags() & 2)
 				//if(dev->openFlags() & 2)
