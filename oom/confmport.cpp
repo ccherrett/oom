@@ -957,7 +957,12 @@ void MPConfig::songChanged(int flags)
 				itemout->setIcon(QIcon(*buttondownIcon));
 				if (port->device())
                 {
-                	itemout->setText(port->device()->name());
+					RouteList* list = port->device()->outRoutes();
+                    if (list->size())
+                    {
+						iRoute r = list->begin();
+						itemout->setText(r->name());
+					}
                 }
                 else 
                 {
