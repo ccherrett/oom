@@ -344,13 +344,16 @@ void BigTime::resizeEvent(QResizeEvent *ev)
 	int tw = fm.width(QString("000:00:00:00"));
 
 	fs = ((ev->size().width() - hspace * 2) * fs) / tw;
-	fs -= 15;
+	//fs -= 20;
 
 	// set min/max
 	if (fs < 10)
 		fs = 10;
-	else if (fs > 256)
-		fs = 256;
+	else if (fs > 200)
+		fs = 200;
+	else
+		fs -= 20;
+		
 
 	//if(debugMsg)
 	//  printf("resize BigTime: Font name:%s CurSize:%d NewSize:%d, NewWidth:%d\n",
@@ -359,7 +362,7 @@ void BigTime::resizeEvent(QResizeEvent *ev)
 	//f.setPixelSize(fs);
 
 	//dwin->setFont(f);
-	QString fstr = QString("font-size:%1px; font-family:'fixed-width'; ").arg(fs); // Tim p4.0.8
+	QString fstr = QString("font-size:%1px; font-family:'Arial'; ").arg(fs); // Tim p4.0.8
 	dwin->setStyleSheet(fstr);
 	setBgColor(config.bigTimeBackgroundColor);
 	setFgColor(config.bigTimeForegroundColor);

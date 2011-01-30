@@ -2,6 +2,10 @@
  *    OOMidi application style sheet
  */
 
+QWidget#MRConfigBase, QWidget#MITTransposeBase 
+{
+	background-color: #595966;
+}
 QWidget#dockMixerCenter 
 {
 	background-color: #595966;
@@ -526,7 +530,10 @@ QListWidget#EffectRack::item:selected:active, QListWidget#EffectsRack::item:sele
 	 font-family: "fixed";
 }
 /*///////////START AUDIO PORT MANAGER///////////////{{{*/
-QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selected, QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected, QListWidget#tracksList::item:selected {
+QListWidget#presetList::item:selected:active, QListWidget#presetList::item:selected, 
+QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selected, 
+QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected, 
+QListWidget#tracksList::item:selected {
 	 border-radius: 3px;
      border: 0px solid #47cae1;
 	 background-color: #12191c;
@@ -536,7 +543,7 @@ QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selec
 	 font-weight: bold;
 	 font-size: 12px;
 }
-QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList {
+QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList, QListWidget#presetList, QTextEdit {
 	 border-radius: 6px;
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
