@@ -38,9 +38,12 @@ RouteDialog::RouteDialog(QWidget* parent)
 	connect(btnConnectOut, SIGNAL(clicked()), SLOT(addOutRoute()));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	routingChanged();
-	routeList->header()->resizeSection(1, 30);
-	routeList->header()->resizeSection(3, 30);
-	resize(tconfig().get_property("RouteDialog", "size", QSize(891, 691)).toSize());
+        routeList->header()->resizeSection(0, 150);
+        routeList->header()->resizeSection(1, 40);
+        routeList->header()->resizeSection(2, 150);
+        routeList->header()->resizeSection(3, 150);
+        routeList->header()->resizeSection(4, 30);
+        resize(tconfig().get_property("RouteDialog", "size", QSize(891, 691)).toSize());
 	move(tconfig().get_property("RouteDialog", "pos", QPoint(0, 0)).toPoint());
 }
 
@@ -442,33 +445,29 @@ void RouteDialog::trackSelectionChanged()
 		const RouteList* rl = atrack->outRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			QString src(atrack->name());
+                        QString src("");
 			if (atrack->type() == Track::AUDIO_OUTPUT)
 			{
-				Route s(src, false, r->channel);
-				src = s.name();
-				new QTreeWidgetItem(routeList, QStringList() << src << QString::number(s.channel) << r->name() << QString::number(r->channel));
+                                new QTreeWidgetItem(routeList, QStringList() << src << QString("") << atrack->name() << r->name() << QString::number(r->channel));
 			}
 			else
 			{
-				new QTreeWidgetItem(routeList, QStringList() << src << QString::number(0) << r->name() << QString::number(0));
+                                new QTreeWidgetItem(routeList, QStringList() << src << QString("") << atrack->name() << r->name() << QString::number(0));
 			}
-		}
-		const RouteList* rli = atrack->inRoutes();
-		for (ciRoute ri = rli->begin(); ri != rli->end(); ++ri)
-		{
-			QString src(atrack->name());
-			if (atrack->type() == Track::AUDIO_INPUT)
-			{
-				Route s(src, false, ri->channel);
-				src = s.name();
-				new QTreeWidgetItem(routeList, QStringList() << ri->name() << QString::number(ri->channel) << src << QString::number(s.channel));
-			}
-			else
-			{
-				new QTreeWidgetItem(routeList, QStringList() << ri->name() << QString::number(0) << src << QString::number(0));
-			}
-		}
+                }
+                const RouteList* rli = atrack->inRoutes();
+                for (ciRoute ri = rli->begin(); ri != rli->end(); ++ri)
+                {
+                        QString src("");
+                        if (atrack->type() == Track::AUDIO_INPUT)
+                        {
+                                new QTreeWidgetItem(routeList, QStringList() << ri->name() << QString::number(ri->channel) << atrack->name() << src << QString(""));
+                        }
+                        else
+                        {
+                                new QTreeWidgetItem(routeList, QStringList() << ri->name() << QString::number(0) << atrack->name() << src << QString(""));
+                        }
+                }
 		routeSelectionChanged(); // init remove button
 		srcSelectionChanged(); // init select button
 	}
