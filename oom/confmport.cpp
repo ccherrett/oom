@@ -796,7 +796,8 @@ MPConfig::MPConfig(QWidget* parent)
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 40);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_INROUTES, 50);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
+	//mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
+	mdevView->horizontalHeader()->setResizeMode(DEVCOL_OUTROUTES, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 60);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 60);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
