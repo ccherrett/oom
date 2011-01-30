@@ -371,8 +371,7 @@ _redisplay:
 				audio->msgUpdateSoloStates();
 				song->update(SC_ROUTE);
 
-				QString sss(act->text());
-				item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(sss);
+				item->setText(act->text());
 				// p3.3.46
 				//delete pup;
 				// FIXME:
