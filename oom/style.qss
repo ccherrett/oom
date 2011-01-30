@@ -918,7 +918,7 @@ QDockWidget::float-button {
     width: 14px;
 }
 
-QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea { background-color: #595966 }
+QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea { background-color: #595966; color: #d0d4d0; }
 
 QToolBar { 
 background-color: #595966; 
