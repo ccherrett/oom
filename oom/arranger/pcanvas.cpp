@@ -1594,7 +1594,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		if (key == shortcuts[SHRT_SEL_RIGHT_ADD].key)
 			add = true;
 
-        Part* part = _curItem->part();
+                Part* part = _curItem->part();
 		Track* track = part->track();
 		unsigned int tick = part->tick();
 		bool afterthis = false;
@@ -1677,9 +1677,9 @@ void PartCanvas::keyPress(QKeyEvent* event)
 				xleft = middle - xoffset;
 				xright = middle + xoffset;
 				if (xleft >= 0)
-                   aboveL = _items.find(QPoint(xleft, y));
+                                        aboveL = _items.find(QPoint(xleft, y));
 				if (xright <= ulimit)
-                   aboveR = _items.find(QPoint(xright, y));
+                                        aboveR = _items.find(QPoint(xright, y));
 			}
 
 			if ((aboveL || aboveR) != 0)
@@ -1705,9 +1705,9 @@ void PartCanvas::keyPress(QKeyEvent* event)
 
 		//To get an idea of which track is below us:
 		int stepsize = rmapxDev(1);
-        Track* track = _curItem->part()->track(); //bottom->part()->track();
+                Track* track = _curItem->part()->track(); //bottom->part()->track();
 		track = y2Track(track->y() + track->height() + 1);
-        int middle = _curItem->x() + _curItem->part()->lenTick() / 2;
+                int middle = _curItem->x() + _curItem->part()->lenTick() / 2;
 		//If we're at bottommost, leave
 		if (!track)
 			return;
@@ -1785,7 +1785,19 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		}
 		emit startEditor(pl, type);
 	}
-	else
+        else if (key == shortcuts[SHRT_INC_POS].key)
+        {
+                Part* part = _curItem->part();
+                _curItem->setWidth(_curItem->width() + 200);
+                redraw();
+                resizeItem(_curItem, false);
+        }
+        else if (key == shortcuts[SHRT_DEC_POS].key)
+        {
+                Part* part = _curItem->part();
+                part->setLenTick(part->lenTick() - 200);
+        }
+        else
 	{
 		event->ignore(); // give global accelerators a chance
 		return;
