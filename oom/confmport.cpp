@@ -371,6 +371,8 @@ _redisplay:
 				audio->msgUpdateSoloStates();
 				song->update(SC_ROUTE);
 
+				QString sss(act->text());
+				item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(sss);
 				// p3.3.46
 				//delete pup;
 				// FIXME:
@@ -379,8 +381,6 @@ _redisplay:
 				///goto _redisplay;   // Go back
 			}
 
-			QString sss(act->text());
-			item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(sss);
 			delete pup;
 			//iR->setDown(false);     // pup->exec() catches mouse release event
 		}
