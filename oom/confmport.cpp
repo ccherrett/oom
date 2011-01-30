@@ -210,7 +210,7 @@ void MPConfig::rbClicked(QTableWidgetItem* item)
 				else
 				{
 					//item->setPixmap(DEVCOL_OUTROUTES, *buttondownIcon);
-					item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText("");
+					//item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText("");
 				}
 			}
 
