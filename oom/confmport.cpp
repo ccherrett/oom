@@ -205,7 +205,7 @@ void MPConfig::rbClicked(QTableWidgetItem* item)
 				if (dev->openFlags() & 1)
 				{
 					//item->setPixmap(DEVCOL_OUTROUTES, *buttondownIcon);
-					item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(tr("out"));
+					//item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(tr("out"));
 				}
 				else
 				{
@@ -956,8 +956,8 @@ void MPConfig::songChanged(int flags)
 				//if(dev->openFlags() & 1)
 			{
 				itemout->setIcon(QIcon(*buttondownIcon));
-				if (dev->openFlags() & 1)
-					itemout->setText(tr("out"));
+				//if (dev->openFlags() & 1)
+					//itemout->setText(tr("out"));
 			}
 			if (dev->rwFlags() & 2)
 				//if(dev->openFlags() & 2)
