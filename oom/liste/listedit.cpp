@@ -511,6 +511,7 @@ ListEdit::ListEdit(PartList* pl)
 	//
 
 	liste = new QTreeWidget(mainw);
+	liste->setObjectName("EventListTree");
 	QFontMetrics fm(liste->font());
 	int n = fm.width('9');
 	int b = 24;

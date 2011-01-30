@@ -701,7 +701,9 @@ QObject#patchView::item:selected:active, QObject#patchView::item:selected,
 QObject#listController::item:selected:active, QObject#listController::item:selected,
 QObject#viewController::item:selected:active, QObject#viewController::item:selected,
 QObject#sysexList::item:selected:active, QObject#sysexList::item:selected,
-QObject#sysexData::item:selected:active, QObject#sysexDate::item:selected {
+QObject#sysexData::item:selected:active, QObject#sysexDate::item:selected,
+QTreeWidget::item:selected:active, QTreeWidget::item:selected
+{
 	 border-radius: 3px;
      border: 0px solid #47cae1;
 	 background-color: #12191c;
@@ -717,6 +719,7 @@ QObject#listController,
 QObject#viewController,
 QObject#sysexList,
 QObject#sysexDate,
+QTreeWidget,
 QObject#patchView{
 	 border-radius: 6px;
      border: 1px solid #211f23;
