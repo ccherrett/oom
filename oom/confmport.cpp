@@ -378,6 +378,9 @@ _redisplay:
 				//  has had time to be sent and actually affected the routes.
 				///goto _redisplay;   // Go back
 			}
+
+			QString sss(act->text());
+			item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(sss);
 			delete pup;
 			//iR->setDown(false);     // pup->exec() catches mouse release event
 		}
