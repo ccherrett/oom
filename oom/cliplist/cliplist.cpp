@@ -2,6 +2,9 @@
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
 //  $Id: cliplist.cpp,v 1.6.2.3 2008/08/18 00:15:24 terminator356 Exp $
+
+//  (C) Copyright 2011 Remon Sijrier
+//      january 31: Actually populate the list with file information
 //
 //  (C) Copyright 2000 Werner Schweer (ws@seh.de)
 //=========================================================
@@ -31,8 +34,6 @@ class ClipItem : public QTreeWidgetItem
 {
 	SndFileR _wf;
 
-	virtual QString text(int) const;
-
 public:
 	ClipItem(QTreeWidget*, const SndFileR&);
 
@@ -40,6 +41,8 @@ public:
 	{
 		return &_wf;
 	}
+
+        virtual QString text(int) const;
 };
 
 ClipItem::ClipItem(QTreeWidget* parent, const SndFileR& w)
@@ -48,39 +51,23 @@ ClipItem::ClipItem(QTreeWidget* parent, const SndFileR& w)
 }
 
 //---------------------------------------------------------
-//   samples2smpte
+//   frames to hours minutes seconds
 //---------------------------------------------------------
 
-#if 0
-
-static QString samples2smpte(int samples)
+static QString frames_to_hms(const uint frames, uint rate)
 {
-	double time = double(samples) / double(sampleRate);
-	int min = int(time) / 60;
-	int sec = int(time) % 60;
-	double rest = time - (min * 60 + sec);
-	switch (mtcType)
-	{
-		case 0: // 24 frames sec
-			rest *= 24;
-			break;
-		case 1: // 25
-			rest *= 25;
-			break;
-		case 2: // 30 drop frame
-			rest *= 30;
-			break;
-		case 3: // 30 non drop frame
-			rest *= 30;
-			break;
-	}
-	int frame = int(rest);
-	int subframe = int((rest - frame)*100);
-	QString s;
-	s.sprintf("%03d:%02d:%02d:%02d", min, sec, frame, subframe);
-	return s;
+        qint64 remainder;
+        int hours, mins, secs;
+
+
+        hours = (int) (frames / (3600 * rate));
+        remainder = qint64(frames - (hours * (3600 * rate)));
+        mins = (int) (remainder / (60 * rate));
+        remainder -= mins * (60 * rate);
+        secs = (int) (remainder / rate);
+        return QString().sprintf("%02d:%02d:%02d", hours, mins, secs);
 }
-#endif
+
 
 //---------------------------------------------------------
 //   text
@@ -95,7 +82,9 @@ QString ClipItem::text(int col) const
 			s = _wf.name();
 			break;
 		case COL_POS:
+                        break;
 		case COL_LEN:
+                        s = frames_to_hms(_wf.samples(), _wf.samplerate());
 			break;
 		case COL_REFS:
 			s.setNum(_wf.getRefCount());
@@ -117,15 +106,7 @@ ClipListEdit::ClipListEdit(QWidget* parent)
 	editor = new ClipListEditorBaseWidget;
 	setCentralWidget(editor);
 
-	//editor->view->setColumnAlignment(COL_REFS, Qt::AlignRight);
-
-	QFontMetrics fm(editor->view->font());
-	int fw = style()->pixelMetric(QStyle::PM_DefaultFrameWidth, 0, this); // ddskrjo 0
-	int w = 2 + fm.width('9') * 9 + fm.width(':') * 3 + fw * 4;
-	//editor->view->setColumnAlignment(COL_POS, Qt::AlignRight);
-	editor->view->setColumnWidth(COL_POS, w);
-	//editor->view->setColumnAlignment(COL_LEN, Qt::AlignRight);
-	editor->view->setColumnWidth(COL_LEN, w);
+        editor->view->header()->resizeSection(0, 250);
 
 	connect(editor->view, SIGNAL(itemSelectionChanged()), SLOT(clipSelectionChanged()));
 	connect(editor->view, SIGNAL(itemClicked(QTreeWidgetItem*, int)), SLOT(clicked(QTreeWidgetItem*, int)));
@@ -151,8 +132,13 @@ void ClipListEdit::updateList()
 	editor->view->clear();
 	for (iSndFile f = SndFile::sndFiles.begin(); f != SndFile::sndFiles.end(); ++f)
 	{
-		new ClipItem(editor->view, *f);
-	}
+                ClipItem* item = new ClipItem(editor->view, *f);
+                item->setText(0, item->text(0));
+                item->setText(1, item->text(1));
+                item->setText(2, item->text(2));
+                item->setText(3, item->text(3));
+                item->setText(4, item->text(4));
+        }
 	clipSelectionChanged();
 }
 
