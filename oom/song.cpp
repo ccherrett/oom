@@ -1356,6 +1356,7 @@ void Song::setStopPlay(bool f)
 void Song::swapTracks(int i1, int i2)
 {
 	//undoOp(UndoOp::SwapTrack, i1, i2);
+	printf("Song::swapTracks(int %d, int %d)\n", i1, i2);
 	if(viewselected)
 	{
 		Track* track = _viewtracks[i1];

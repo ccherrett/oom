@@ -1330,18 +1330,18 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					switch (n)
 					{
 						case 0: // delete track
-                                                if (multipleSelectedTracks)
-                                                {
-                                                        song->startUndo();
-                                                        audio->msgRemoveTracks();
-                                                        song->endUndo(SC_TRACK_REMOVED);
-                                                        song->updateSoloStates();
-                                                }
-                                                else
-                                                {
-                                                        song->removeTrack0(t);
-                                                        audio->msgUpdateSoloStates();
-                                                }
+                            if (multipleSelectedTracks)
+                            {
+                                    song->startUndo();
+                                    audio->msgRemoveTracks();
+                                    song->endUndo(SC_TRACK_REMOVED);
+                                    song->updateSoloStates();
+                            }
+                            else
+                            {
+                                    song->removeTrack0(t);
+                                    audio->msgUpdateSoloStates();
+                            }
 
 						break;
 
@@ -1846,18 +1846,22 @@ void TList::mouseReleaseEvent(QMouseEvent* ev)
 {
 	if (mode == DRAG)
 	{
+		printf("TList::mouseReleaseEvent()\n");
 		Track* t = y2Track(ev->y() + ypos);
 		if (t)
 		{
-	//This changes to song->visibletracks()
+			//printf("TList::mouseReleaseEvent() track found: %s\n", t->name().toStdString().c_str());
+			//This changes to song->visibletracks()
 			if(!song->viewselected)
 			{
 				int dTrack = song->artracks()->index(t);
+				 //printf("TList::mouseReleaseEvent: StandardView mode sTrack: %d  dTrack: %d\n", sTrack, dTrack);
 				audio->msgMoveTrack(sTrack, dTrack);
 			}
 			else
 			{
 				int dTrack = song->visibletracks()->index(t);
+				 //printf("TList::mouseReleaseEvent: TrackView mode sTrack: %d  dTrack: %d\n", sTrack, dTrack);
 				audio->msgMoveTrack(sTrack, dTrack);
 			}
 		}
