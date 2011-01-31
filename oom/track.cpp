@@ -131,7 +131,7 @@ int Track::y() const
 {
 	TrackList* tl = song->tracks();
 	if(!song->viewselected)
-		tl = song->tracks();
+		tl = song->artracks();
 	else
 		tl = song->visibletracks();
 	int yy = 0;
