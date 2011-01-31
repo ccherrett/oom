@@ -17,6 +17,8 @@ class QTableWidget;
 class QComboBox;
 
 class Track;
+class LabelCombo;
+
 class QTableView;
 class QStandardItem;
 class QModelIndex;
@@ -31,9 +33,9 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
     Q_OBJECT
 
 	//ToolBar1 merge
-    QComboBox* quantLabel;
+    LabelCombo* quantLabel;
     QTableWidget* qlist;
-    QComboBox* rasterLabel;
+    LabelCombo* rasterLabel;
     QTableWidget* rlist;
 	//end merge
 	

@@ -191,10 +191,8 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	//  Raster, Quant.
 	//---------------------------------------------------
 
-	rasterLabel = new QComboBox();
-	rasterLabel->setEditable(false);
-	quantLabel = new QComboBox();
-	quantLabel->setEditable(false);
+        rasterLabel = new LabelCombo(tr("Snap"), 0);
+        quantLabel = new LabelCombo(tr("Quantize"), 0);
 
 	rlist = new QTableWidget(10, 3);
 	qlist = new QTableWidget(8, 3);
@@ -212,9 +210,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	rlist->setMinimumWidth(96);
 	qlist->setMinimumWidth(96);
 
-	rasterLabel->setModel(rlist->model());
 	rasterLabel->setView(rlist);
-	quantLabel->setModel(qlist->model());
 	quantLabel->setView(qlist);
 
 	for (int j = 0; j < 3; j++)
@@ -227,12 +223,10 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	setRaster(rast);
 	setQuant(quant);
 
-	rasterLabel->setFixedHeight(22);
-	quantLabel->setFixedHeight(22);
+        rasterLabel->setFixedHeight(28);
+        quantLabel->setFixedHeight(28);
 
-	controlsBox->addWidget(new QLabel(tr("Snap")));
 	controlsBox->addWidget(rasterLabel);
-	controlsBox->addWidget(new QLabel(tr("Quantize")));
 	controlsBox->addWidget(quantLabel);
 
 	//---------------------------------------------------
@@ -2304,7 +2298,7 @@ void MidiTrackInfo::_quantChanged(int /*i*/)
 //   setRaster
 //---------------------------------------------------------
 
-/*void MidiTrackInfo::setRaster(int val)
+void MidiTrackInfo::setRaster(int val)
 {
 	for (unsigned i = 0; i < sizeof (rasterTable) / sizeof (*rasterTable); i++)
 	{
@@ -2334,57 +2328,5 @@ void MidiTrackInfo::setQuant(int val)
 	}
 	printf("setQuant(%d) not defined\n", val);
 	quantLabel->setCurrentIndex(0);
-}*/
-/*}}}*/
+}
 
-//---------------------------------------------------------
-//   setQuant
-//---------------------------------------------------------
-
-void MidiTrackInfo::setQuant(int val)/*{{{*/
-{
-	for (unsigned i = 0; i < sizeof (quantTable) / sizeof (*quantTable); i++)
-	{
-		if (val == quantTable[i])
-		{
-			int rc = quantLabel->model()->rowCount();
-			if (rc == 0)
-				return;
-			int r = val % rc;
-			int c = val / rc;
-			if (c >= quantLabel->model()->columnCount())
-				return;
-			if (quantLabel->modelColumn() != c)
-				quantLabel->setModelColumn(c);
-			if (quantLabel->currentIndex() != r)
-				quantLabel->setCurrentIndex(r);
-			return;
-		}
-	}
-}/*}}}*/
-
-//---------------------------------------------------------
-//   setRaster
-//---------------------------------------------------------
-
-void MidiTrackInfo::setRaster(int val)/*{{{*/
-{
-	for (unsigned i = 0; i < sizeof (rasterTable) / sizeof (*rasterTable); i++)
-	{
-		if (val == rasterTable[i])
-		{
-			int rc = rasterLabel->model()->rowCount();
-			if (rc == 0)
-				return;
-			int r = val % rc;
-			int c = val / rc;
-			if (c >= rasterLabel->model()->columnCount())
-				return;
-			if (rasterLabel->modelColumn() != c)
-				rasterLabel->setModelColumn(c);
-			if (rasterLabel->currentIndex() != r)
-				rasterLabel->setCurrentIndex(r);
-			return;
-		}
-	}
-}/*}}}*/
