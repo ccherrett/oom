@@ -31,6 +31,7 @@ class TrackViewDock : public QFrame, public Ui::TViewDockBase {
 	
 	public slots:
 		void populateTable(int);
+		void selectStaticView(int);
 	
 	public:
 		TrackViewDock(QWidget* parent = 0);

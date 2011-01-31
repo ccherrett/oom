@@ -1037,6 +1037,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 
 						///emit selectionChanged();
 						emit selectionChanged(t);
+						emit trackInserted(n);
 						song->updateTrackViews1();
 						adjustScrollbar();
 					}

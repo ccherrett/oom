@@ -1355,10 +1355,19 @@ void Song::setStopPlay(bool f)
 
 void Song::swapTracks(int i1, int i2)
 {
-	undoOp(UndoOp::SwapTrack, i1, i2);
-	Track* track = _tracks[i1];
-	_tracks[i1] = _tracks[i2];
-	_tracks[i2] = track;
+	//undoOp(UndoOp::SwapTrack, i1, i2);
+	if(viewselected)
+	{
+		Track* track = _viewtracks[i1];
+		_viewtracks[i1] = _viewtracks[i2];
+		_viewtracks[i2] = track;
+	}
+	else
+	{
+		Track* track = _artracks[i1];
+		_artracks[i1] = _artracks[i2];
+		_artracks[i2] = track;
+	}
 }
 
 //---------------------------------------------------------

@@ -100,6 +100,7 @@ signals:
     void selectionChanged(Track*);
     void keyPressExt(QKeyEvent*);
     void redirectWheelEvent(QWheelEvent*);
+	void trackInserted(int);
 
 public slots:
     void tracklistChanged();

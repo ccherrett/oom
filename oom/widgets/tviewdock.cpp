@@ -294,3 +294,30 @@ void TrackViewDock::updateTableHeader()/*{{{*/
 	autoTable->horizontalHeader()->setStretchLastSection(true);
 	autoTable->verticalHeader()->hide();
 }/*}}}*/
+
+void TrackViewDock::selectStaticView(int n)
+{
+	Track::TrackType type = (Track::TrackType)n;
+	QStandardItem *item = 0;
+	switch(type)
+	{
+		case Track::AUDIO_INPUT:
+			item = _autoTableModel->item(1, 0);
+		    break;
+		case Track::AUDIO_OUTPUT: 
+			item = _autoTableModel->item(2, 0);
+		    break;
+		case Track::AUDIO_BUSS:
+			item = _autoTableModel->item(3, 0);
+		    break;
+		case Track::AUDIO_AUX:
+			item = _autoTableModel->item(4, 0);
+		    break;
+		default:
+		break;
+	}
+	if(item && item->checkState() == Qt::Unchecked)
+	{
+		item->setCheckState(Qt::Checked);
+	}
+}

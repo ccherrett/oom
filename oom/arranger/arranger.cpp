@@ -334,7 +334,8 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	// Do this now that the list is available.
 	genTrackInfo(tracklist);
 
-	///connect(list, SIGNAL(selectionChanged()), SLOT(trackSelectionChanged()));
+	if(_tvdock)
+		connect(list, SIGNAL(trackInserted(int)), _tvdock, SLOT(selectStaticView(int)));
 	connect(list, SIGNAL(selectionChanged(Track*)), SLOT(trackSelectionChanged()));
 	connect(list, SIGNAL(selectionChanged(Track*)), midiTrackInfo, SLOT(setTrack(Track*)));
 	connect(header, SIGNAL(sectionResized(int, int, int)), list, SLOT(redraw()));
