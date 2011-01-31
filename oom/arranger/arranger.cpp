@@ -611,8 +611,8 @@ void Arranger::songChanged(int type)
 		}
 		if(type & SC_VIEW_CHANGED)
 		{//Scroll to top
-			canvas->setYPos(0);
-			vscroll->setValue(0);
+			//canvas->setYPos(0);
+			//vscroll->setValue(0);
 		}
 	}
 
@@ -638,7 +638,7 @@ void Arranger::trackSelectionChanged()
 {
 	TrackList* tracks;
 	if(!song->viewselected)
-		tracks = song->tracks();
+		tracks = song->artracks();
 	else
 		tracks = song->visibletracks();
 	Track* track = 0;

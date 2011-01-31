@@ -126,7 +126,8 @@ private:
 
     int updateFlags;
 
-    TrackList _tracks; // tracklist as seen by arranger
+    TrackList _tracks; // tracklist as seen by globally
+    TrackList _artracks; // tracklist as seen by arranger
     TrackViewList _tviews; // trackviewlist as seen by arranger
 	TrackViewList _autotviews;
     MidiTrackList _midis;
@@ -384,12 +385,16 @@ public:
         return &_tracks;
     }
 
-        TrackList* visibletracks() {
-                return &_viewtracks;
-        }
+    TrackList* artracks() {
+        return &_artracks;
+    }
 
-        TrackList getSelectedTracks();
-        void setTrackHeights(TrackList& list, int height);
+    TrackList* visibletracks() {
+            return &_viewtracks;
+    }
+
+    TrackList getSelectedTracks();
+    void setTrackHeights(TrackList& list, int height);
 
     MidiTrackList* midis() {
         return &_midis;

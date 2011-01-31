@@ -339,7 +339,7 @@ Track* Song::addTrack(int t)/*{{{*/
 	OutputList* ol = song->outputs();
 	if (!ol->empty())
 	{
-		AudioOutput* ao = ol->front();
+		AudioOutput* ao = ol->front(); //FIXME: THIS IS WHERE IT GETS THE FIRST OUTPUT BUSS AND CONNECTS TO IT BELOW
 		switch (type)
 		{
 				//case Track::MIDI:
@@ -3573,11 +3573,14 @@ void Song::insertTrack2(Track* track, int idx)
 	//printf("Song::insertTrack2 track:%lx\n", track);
 
 	int n;
+	iTrack ia;
 	switch (track->type())
 	{
 		case Track::MIDI:
 		case Track::DRUM:
 			_midis.push_back((MidiTrack*) track);
+			ia = _artracks.index2iterator(idx);
+			_artracks.insert(ia, track);
 			// Added by T356.
 			//((MidiTrack*)track)->addPortCtrlEvents();
 			addPortCtrlEvents(((MidiTrack*) track));
@@ -3585,6 +3588,8 @@ void Song::insertTrack2(Track* track, int idx)
 			break;
 		case Track::WAVE:
 			_waves.push_back((WaveTrack*) track);
+			ia = _artracks.index2iterator(idx);
+			_artracks.insert(ia, track);
 			break;
 		case Track::AUDIO_OUTPUT:
 			_outputs.push_back((AudioOutput*) track);
@@ -3609,6 +3614,8 @@ void Song::insertTrack2(Track* track, int idx)
 			midiDevices.add(s);
 			midiInstruments.push_back(s);
 			_synthIs.push_back(s);
+			ia = _artracks.index2iterator(idx);
+			_artracks.insert(ia, track);
 		}
 			break;
 		default:
