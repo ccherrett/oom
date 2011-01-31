@@ -918,7 +918,6 @@ QDockWidget::float-button {
     width: 14px;
 }
 
-<<<<<<< HEAD:oom/style.qss
 /*//////////////////////// MIDI INPUT PLUGINS ////////////////////////////{{{*/
 QWidget#mitPluginTranspose, QDialog#midiInputTransform, QDialog#midiFilterConfig, QWidget#midiRemoteConfig, QDialog#midiRhythmGenerator 
 {
