@@ -3850,12 +3850,14 @@ void Song::removeTrack2(Track* track)
 			unchainTrackParts(track, true);
 
 			_midis.erase(track);
+			_artracks.erase(track);
 			break;
 		case Track::WAVE:
 			// Added by T356.
 			unchainTrackParts(track, true);
 
 			_waves.erase(track);
+			_artracks.erase(track);
 			break;
 		case Track::AUDIO_OUTPUT:
 			_outputs.erase(track);
