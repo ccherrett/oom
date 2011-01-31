@@ -42,6 +42,7 @@ QT4_WRAP_CPP (widget_mocs
       intlabel.h  
       knob.h  
       lcombo.h  
+      gcombo.h  
       metronome.h  
       midisyncimpl.h  
       mixdowndialog.h  
@@ -145,6 +146,7 @@ file (GLOB widgets_source_files
       intlabel.cpp 
       knob.cpp 
       lcombo.cpp 
+      gcombo.cpp 
       metronome.cpp 
       midisyncimpl.cpp 
       mixdowndialog.cpp 

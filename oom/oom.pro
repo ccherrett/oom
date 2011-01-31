@@ -99,6 +99,7 @@ HEADERS = \
       ./widgets/dimap.h       \
       ./widgets/fontsel.h           \
       ./widgets/lcombo.h            \
+      ./widgets/gcombo.h           \
       ./widgets/pitchedit.h         \
       ./widgets/tb1.h         \
       ./widgets/gatetime.h          \
@@ -277,6 +278,7 @@ SOURCES =  \
       ./widgets/sigscale.cpp        \
       ./widgets/vscale.cpp          \
       ./widgets/lcombo.cpp          \
+      ./widgets/gcombo.cpp          \
       ./widgets/noteinfo.cpp        \
       ./widgets/mtscale.cpp         \
       ./widgets/scrollscale.cpp           \
