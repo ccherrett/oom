@@ -351,21 +351,6 @@ _redisplay:
 							break;
 					}
 					
-					if(routeSelected)
-					{
-						iRoute selr = rl->begin();
-						for (; selr != rl->end(); ++selr)
-						{
-							//clean up the routing list as something was selected that was not the current so delete the old route
-							//QString sn(*selr.name());
-							if((*selr).name() == currentRoute)
-							{
-								audio->msgRemoveRoute(srcRoute, (*selr));
-								break;
-							}
-						}
-					}
-
 					if (iir != rl->end())
 					{
 						// disconnect
@@ -376,6 +361,20 @@ _redisplay:
 						// connect
 						audio->msgAddRoute(srcRoute, dstRoute);
 					}
+					if(routeSelected)
+					{
+						iRoute selr = rl->begin();
+						for (; selr != rl->end(); ++selr)
+						{
+							//clean up the routing list as something was selected that was not the current so delete the old route
+							if((*selr).name() == currentRoute)
+							{
+								audio->msgRemoveRoute(srcRoute, (*selr));
+								break;
+							}
+						}
+					}
+
 				}
 				else
 				{
