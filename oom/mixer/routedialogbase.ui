@@ -235,14 +235,8 @@
            <bool>true</bool>
           </property>
           <property name="columnCount">
-           <number>4</number>
+           <number>5</number>
           </property>
-          <attribute name="headerDefaultSectionSize">
-           <number>250</number>
-          </attribute>
-          <attribute name="headerStretchLastSection">
-           <bool>true</bool>
-          </attribute>
           <attribute name="headerDefaultSectionSize">
            <number>250</number>
           </attribute>
@@ -251,7 +245,7 @@
           </attribute>
           <column>
            <property name="text">
-            <string>Source</string>
+            <string>Inputs</string>
            </property>
           </column>
           <column>
@@ -264,7 +258,12 @@
           </column>
           <column>
            <property name="text">
-            <string>Destination</string>
+            <string>Track</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Outputs</string>
            </property>
           </column>
           <column>

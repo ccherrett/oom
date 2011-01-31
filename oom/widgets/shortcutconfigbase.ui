@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>850</width>
     <height>600</height>
    </rect>
   </property>
@@ -76,14 +76,17 @@
         <property name="alternatingRowColors">
          <bool>true</bool>
         </property>
+        <attribute name="headerDefaultSectionSize">
+         <number>150</number>
+        </attribute>
         <column>
          <property name="text">
-          <string>Description</string>
+          <string>Shortcut</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Shortcut</string>
+          <string>Description</string>
          </property>
         </column>
        </widget>

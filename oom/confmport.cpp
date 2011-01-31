@@ -378,6 +378,7 @@ _redisplay:
 				//  has had time to be sent and actually affected the routes.
 				///goto _redisplay;   // Go back
 			}
+
 			delete pup;
 			//iR->setDown(false);     // pup->exec() catches mouse release event
 		}
@@ -795,7 +796,8 @@ MPConfig::MPConfig(QWidget* parent)
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 40);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_INROUTES, 50);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
+	//mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
+	mdevView->horizontalHeader()->setResizeMode(DEVCOL_OUTROUTES, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 60);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 60);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
@@ -954,8 +956,22 @@ void MPConfig::songChanged(int flags)
 				//if(dev->openFlags() & 1)
 			{
 				itemout->setIcon(QIcon(*buttondownIcon));
-				if (dev->openFlags() & 1)
-					itemout->setText(tr("out"));
+				if (port->device() && !port->device()->outRoutes()->empty())
+                {
+					RouteList* list = port->device()->outRoutes();
+                    if (!list->empty())
+                    {
+						iRoute r = list->begin();
+						itemout->setText(r->name());
+					}
+                }
+                else 
+                {
+                	itemout->setText(tr("out"));                                                
+                }
+
+				//if (dev->openFlags() & 1)
+				//	itemout->setText(tr("out"));
 			}
 			if (dev->rwFlags() & 2)
 				//if(dev->openFlags() & 2)

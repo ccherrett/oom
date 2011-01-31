@@ -177,6 +177,8 @@ enum
     //Arranger tracks
     SHRT_SEL_TRACK_BELOW,
     SHRT_SEL_TRACK_ABOVE,
+    SHRT_SEL_TRACK_ABOVE_ADD,
+    SHRT_SEL_TRACK_BELOW_ADD,
 
     //To be in arranger, pianoroll & drumeditor. p4.0.10 now globally handled, too.
     SHRT_SELECT_ALL, //Ctrl+A

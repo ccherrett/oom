@@ -2,6 +2,10 @@
  *    OOMidi application style sheet
  */
 
+QWidget#MRConfigBase, QWidget#MITTransposeBase 
+{
+	background-color: #595966;
+}
 QWidget#dockMixerCenter 
 {
 	background-color: #595966;
@@ -526,7 +530,10 @@ QListWidget#EffectRack::item:selected:active, QListWidget#EffectsRack::item:sele
 	 font-family: "fixed";
 }
 /*///////////START AUDIO PORT MANAGER///////////////{{{*/
-QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selected, QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected, QListWidget#tracksList::item:selected {
+QListWidget#presetList::item:selected:active, QListWidget#presetList::item:selected, 
+QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selected, 
+QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected, 
+QListWidget#tracksList::item:selected {
 	 border-radius: 3px;
      border: 0px solid #47cae1;
 	 background-color: #12191c;
@@ -536,7 +543,7 @@ QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selec
 	 font-weight: bold;
 	 font-size: 12px;
 }
-QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList {
+QListWidget#newSrcList, QListWidget#newDstList, QListWidget#tracksList, QListWidget#presetList, QTextEdit {
 	 border-radius: 6px;
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
@@ -701,7 +708,9 @@ QObject#patchView::item:selected:active, QObject#patchView::item:selected,
 QObject#listController::item:selected:active, QObject#listController::item:selected,
 QObject#viewController::item:selected:active, QObject#viewController::item:selected,
 QObject#sysexList::item:selected:active, QObject#sysexList::item:selected,
-QObject#sysexData::item:selected:active, QObject#sysexDate::item:selected {
+QObject#sysexData::item:selected:active, QObject#sysexDate::item:selected,
+QTreeWidget::item:selected:active, QTreeWidget::item:selected
+{
 	 border-radius: 3px;
      border: 0px solid #47cae1;
 	 background-color: #12191c;
@@ -717,6 +726,7 @@ QObject#listController,
 QObject#viewController,
 QObject#sysexList,
 QObject#sysexDate,
+QTreeWidget,
 QObject#patchView{
 	 border-radius: 6px;
      border: 1px solid #211f23;
@@ -908,6 +918,7 @@ QDockWidget::float-button {
     width: 14px;
 }
 
+<<<<<<< HEAD:oom/style.qss
 /*//////////////////////// MIDI INPUT PLUGINS ////////////////////////////{{{*/
 QWidget#mitPluginTranspose, QDialog#midiInputTransform, QDialog#midiFilterConfig, QWidget#midiRemoteConfig, QDialog#midiRhythmGenerator 
 {
@@ -956,7 +967,7 @@ QTextEdit#commentEntry
 }
 /*////////////////////////////////////////////////////////////////////////}}}*/
 
-QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea { background-color: #595966 }
+QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea { background-color: #595966; color: #d0d4d0; }
 
 QTextEdit, QTextEdit#songInfoText
 {

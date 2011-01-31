@@ -20,8 +20,8 @@ class QCloseEvent;
 
 enum
 {
-    SHRT_DESCR_COL = 0,
-    SHRT_SHRTCUT_COL
+    SHRT_SHRTCUT_COL = 0,
+    SHRT_DESCR_COL
 };
 
 class SCListViewItem : public QTreeWidgetItem

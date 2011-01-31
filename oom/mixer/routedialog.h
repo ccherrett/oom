@@ -28,6 +28,7 @@ class RouteDialog : public QDialog, public Ui::RouteDialogBase
     void routingChanged();
 	void insertInputs();
 	void insertOutputs();
+        void updateRoutingHeaderWidths();
 
 private slots:
     void routeSelectionChanged();
@@ -56,6 +57,8 @@ public:
 
 protected:
     virtual void closeEvent(QCloseEvent*);
+    virtual void resizeEvent(QResizeEvent *);
+    virtual void showEvent(QShowEvent *);
     void reject();
 };
 
