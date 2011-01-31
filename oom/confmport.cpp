@@ -247,6 +247,9 @@ void MPConfig::rbClicked(QTableWidgetItem* item)
 			int gid = 0;
 			std::list<QString> sl;
 			pup = new QMenu(this);
+			//A temporary Route to us for matching later
+			QString currentRoute("");
+			bool routeSelected = false;
 
 _redisplay:
 			pup->clear();
@@ -292,7 +295,9 @@ _redisplay:
 				{
 					if (*ir == rt)
 					{
+						currentRoute = (*ir).name();
 						act->setChecked(true);
+						routeSelected = true;
 						break;
 					}
 				}
@@ -333,6 +338,11 @@ _redisplay:
 				{
 					Route srcRoute(dev, -1);
 					Route dstRoute(s, true, -1, Route::JACK_ROUTE);
+					if(routeSelected && currentRoute == s)
+					{
+						//it will alread be handled by an unchecked operation
+						routeSelected = false;
+					}
 
 					iRoute iir = rl->begin();
 					for (; iir != rl->end(); ++iir)
@@ -340,16 +350,33 @@ _redisplay:
 						if (*iir == dstRoute)
 							break;
 					}
+					
 					if (iir != rl->end())
+					{
 						// disconnect
 						audio->msgRemoveRoute(srcRoute, dstRoute);
+					}
 					else
+					{
 						// connect
 						audio->msgAddRoute(srcRoute, dstRoute);
+					}
+					if(routeSelected)
+					{
+						iRoute selr = rl->begin();
+						for (; selr != rl->end(); ++selr)
+						{
+							//clean up the routing list as something was selected that was not the current so delete the old route
+							if((*selr).name() == currentRoute)
+							{
+								audio->msgRemoveRoute(srcRoute, (*selr));
+								break;
+							}
+						}
+					}
+
 				}
 				else
-					//if(dev->rwFlags() & 2) // Readable
-					//if(col == DEVCOL_INROUTES) // Readable    p3.3.55
 				{
 					Route srcRoute(s, false, -1, Route::JACK_ROUTE);
 					Route dstRoute(dev, -1);
@@ -379,8 +406,6 @@ _redisplay:
 				///goto _redisplay;   // Go back
 			}
 
-			QString sss(act->text());
-			item->tableWidget()->item(item->row(), DEVCOL_OUTROUTES)->setText(sss);
 			delete pup;
 			//iR->setDown(false);     // pup->exec() catches mouse release event
 		}
@@ -798,7 +823,8 @@ MPConfig::MPConfig(QWidget* parent)
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 40);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_INROUTES, 50);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
+	//mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
+	mdevView->horizontalHeader()->setResizeMode(DEVCOL_OUTROUTES, QHeaderView::ResizeToContents);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 60);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 60);
 	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
@@ -806,10 +832,8 @@ MPConfig::MPConfig(QWidget* parent)
 	mdevView->horizontalHeader()->setStretchLastSection(true);
 	mdevView->horizontalHeader()->setDefaultAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 
-	connect(mdevView, SIGNAL(itemPressed(QTableWidgetItem*)),
-			this, SLOT(rbClicked(QTableWidgetItem*)));
-	connect(mdevView, SIGNAL(itemChanged(QTableWidgetItem*)),
-			this, SLOT(mdevViewItemRenamed(QTableWidgetItem*)));
+	connect(mdevView, SIGNAL(itemPressed(QTableWidgetItem*)), this, SLOT(rbClicked(QTableWidgetItem*)));
+	connect(mdevView, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(mdevViewItemRenamed(QTableWidgetItem*)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 
 	//connect(synthList, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
@@ -957,8 +981,22 @@ void MPConfig::songChanged(int flags)
 				//if(dev->openFlags() & 1)
 			{
 				itemout->setIcon(QIcon(*buttondownIcon));
-				if (dev->openFlags() & 1)
-					itemout->setText(tr("out"));
+				if (port->device() && !port->device()->outRoutes()->empty())
+                {
+					RouteList* list = port->device()->outRoutes();
+                    if (!list->empty())
+                    {
+						iRoute r = list->begin();
+						itemout->setText(r->name());
+					}
+                }
+                else 
+                {
+                	itemout->setText(tr("out"));                                                
+                }
+
+				//if (dev->openFlags() & 1)
+				//	itemout->setText(tr("out"));
 			}
 			if (dev->rwFlags() & 2)
 				//if(dev->openFlags() & 2)

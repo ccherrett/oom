@@ -1098,20 +1098,20 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//    Toolbar
 	//--------------------------------------------------
 
-	tools = addToolBar(tr("File Buttons"));
-	tools->addAction(fileNewAction);
-	tools->addAction(fileOpenAction);
-	tools->addAction(fileSaveAction);
-	tools->setObjectName("tbFileButtons");
-	tools->hide();
+	//tools = addToolBar(tr("File Buttons"));
+	//tools->addAction(fileNewAction);
+	//tools->addAction(fileOpenAction);
+	//tools->addAction(fileSaveAction);
+	//tools->setObjectName("tbFileButtons");
+	//tools->hide();
 
 	//
 	//    Whats This
 	//
-	tools->addAction(QWhatsThis::createAction(this));
+	//tools->addAction(QWhatsThis::createAction(this));
 
 	//tools->addSeparator();
-	tools->addActions(undoRedo->actions());
+	//tools->addActions(undoRedo->actions());
 
 
 	//QToolBar* panicToolbar = addToolBar(tr("Panic"));

@@ -33,12 +33,14 @@
 #include "pcscale.h"
 #include "prcanvas.h"
 #include "pianoroll.h"
+#include "poslabel.h"
+#include "pitchlabel.h"
 #include "scrollscale.h"
 #include "piano.h"
 #include "../ctrl/ctrledit.h"
 #include "splitter.h"
 #include "ttoolbar.h"
-#include "tb1.h"
+//#include "tb1.h"
 #include "utils.h"
 #include "globals.h"
 #include "gconfig.h"
@@ -288,103 +290,134 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(mapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
 
 	//---------ToolBar----------------------------------
-	tools = addToolBar(tr("Pianoroll tools"));
-	tools->setObjectName("tbPRtools");
+	//tools = addToolBar(tr("Pianoroll tools"));
+	//tools->setObjectName("tbPRtools");
 	//tools->addActions(undoRedo->actions());
 	//tools->addSeparator();
-	tools->setIconSize(QSize(22, 22));
+	//tools->setIconSize(QSize(22, 22));
 
-        srec = new QToolButton();
+    srec = new QToolButton();
 	srec->setToolTip(tr("Step Record"));
 	srec->setIcon(*steprecIcon);
-        srec->setCheckable(true);
+    srec->setCheckable(true);
 	//srec->setObjectName("StepRecord");
-	tools->addWidget(srec);
+	//tools->addWidget(srec);
 
-        midiin = new QToolButton();
+    midiin = new QToolButton();
 	midiin->setToolTip(tr("Midi Input"));
 	midiin->setIcon(*midiinIcon);
 	midiin->setCheckable(true);
 	//tools->addWidget(midiin);
 
-        speaker = new QToolButton();
+    speaker = new QToolButton();
 	speaker->setToolTip(tr("Play Events"));
 	speaker->setIcon(*speakerIcon);
 	speaker->setCheckable(true);
-	tools->addWidget(speaker);
+	//tools->addWidget(speaker);
+
+	solo = new QToolButton();
+	solo->setIcon(*soloIconSet2);
+	solo->setIconSize(soloIconOn->size());
+	solo->setCheckable(true);
+
+	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
+	posLabel = new PosLabel(0, "pos");
+	posLabel->setFixedHeight(22);
+	posLabel->setObjectName("Cursor");
+	cursorBar->addWidget(posLabel);
+
+	pitchLabel = new PitchLabel(0);
+	pitchLabel->setFixedHeight(22);
+	pitchLabel->setObjectName("pitchLabel");
+	cursorBar->addWidget(pitchLabel);
+	addToolBar(Qt::BottomToolBarArea, cursorBar);
+	cursorBar->setFloatable(false);
+	cursorBar->setMovable(false);
+	cursorBar->setAllowedAreas(Qt::BottomToolBarArea);
 
 	tools2 = new EditToolBar(this, pianorollTools);
 	tools2->setIconSize(QSize(22, 22));
-	addToolBar(tools2);
+	addToolBar(Qt::BottomToolBarArea, tools2);
+	tools2->setFloatable(false);
+	tools2->setMovable(false);
+	tools2->setAllowedAreas(Qt::BottomToolBarArea);
+	QWidget* spacer = new QWidget();
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer->setMaximumWidth(35);
+	tools2->addWidget(spacer);
 
-        QToolBar* panicToolbar = new QToolBar(tr("panic"));
-	panicToolbar->addAction(panicAction);
-	panicToolbar->setAllowedAreas(Qt::BottomToolBarArea);
 
 	//-------------------------------------------------------------
 	//    Transport Bar
-        QToolBar* transport = new QToolBar(tr("transport"));
-	addToolBar(Qt::BottomToolBarArea, transport);
-	transport->addActions(transportAction->actions());
-	transport->setAllowedAreas(Qt::BottomToolBarArea);
-	transport->setIconSize(QSize(22, 22));
-	addToolBar(Qt::BottomToolBarArea, panicToolbar);
+    //QToolBar* transport = new QToolBar(tr("Transport"));
+	//addToolBar(Qt::BottomToolBarArea, transport);
+	tools2->addWidget(srec);
+	tools2->addWidget(speaker);
+	QWidget* spacer1 = new QWidget();
+	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer1->setMaximumWidth(10);
+	tools2->addWidget(spacer1);
+	tools2->addActions(transportAction->actions());
+	tools2->addWidget(solo);
+	QWidget* spacer2 = new QWidget();
+	spacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer2->setMaximumWidth(10);
+	tools2->addWidget(spacer2);
+	tools2->addAction(panicAction);
+
+	//transport->setAllowedAreas(Qt::BottomToolBarArea);
+	//transport->setFloatable(false);
+	//transport->setMovable(false);
+	//transport->setIconSize(QSize(22, 22));
 
 	//addToolBarBreak();
-	toolbar = new Toolbar1(this, _rasterInit, _quantInit);
-	addToolBar(toolbar);
+	//toolbar = new Toolbar1(this, _rasterInit, _quantInit);
+	//addToolBar(toolbar);
 
 	//addToolBarBreak();
 	info = new NoteInfo(this);
-	addToolBar(Qt::BottomToolBarArea, info);
-	info->setAllowedAreas(Qt::BottomToolBarArea);
+	addToolBar(Qt::TopToolBarArea, info);
+	info->setAllowedAreas(Qt::TopToolBarArea);
+	info->setFloatable(false);
+	info->setMovable(false);
+	info->hide();
 
 	//---------------------------------------------------
 	//    split
 	//---------------------------------------------------
 
-        splitter = new Splitter(Qt::Vertical, mainw, "splitter");
+    splitter = new Splitter(Qt::Vertical, mainw, "splitter");
 	splitter->setHandleWidth(2);
 
-        hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
+    hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
 	hsplitter->setChildrenCollapsible(true);
 	hsplitter->setHandleWidth(2);
 
-        QPushButton* ctrl = new QPushButton(tr("ctrl"), mainw);
-	//QPushButton* ctrl = new QPushButton(tr("C"), mainw);  // Tim.
+    QPushButton* ctrl = new QPushButton(tr("ctrl"), mainw);
 	ctrl->setObjectName("Ctrl");
 	ctrl->setFont(config.fonts[3]);
 	ctrl->setToolTip(tr("Add Controller View"));
-        hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
+    hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
 	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());
 	//ctrl->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());  // Tim.
 
-	// Tim.
-	/*
-	QPushButton* trackInfoButton = new QPushButton(tr("T"), mainw);
-	trackInfoButton->setObjectName("TrackInfo");
-	trackInfoButton->setFont(config.fonts[3]);
-	trackInfoButton->setToolTip(tr("Show track info"));
-	trackInfoButton->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());
-	 */
+    QSizeGrip* corner = new QSizeGrip(mainw);
 
-        QSizeGrip* corner = new QSizeGrip(mainw);
-
-        midiTrackInfo = new MidiTrackInfo(this);
+    midiTrackInfo = new MidiTrackInfo(this, 0, _rasterInit, _quantInit);
 	midiTrackInfo->setObjectName("prTrackInfo");
 	int mtiw = 280; //midiTrackInfo->width(); // Save this.
 	midiTrackInfo->setMinimumWidth(100);
 	//midiTrackInfo->setMaximumWidth(300);
-        // Catch left/right arrow key events for this widget so we
-        // can easily move the focus back from this widget to the canvas.
-        installEventFilter(this);
-        midiTrackInfo->installEventFilter(this);
-        midiTrackInfo->getView()->installEventFilter(this);
+    // Catch left/right arrow key events for this widget so we
+    // can easily move the focus back from this widget to the canvas.
+    installEventFilter(this);
+    midiTrackInfo->installEventFilter(this);
+    midiTrackInfo->getView()->installEventFilter(this);
 
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
 
 	//midiTrackInfo->setSizePolicy(QSizePolicy(/*QSizePolicy::Ignored*/QSizePolicy::Preferred, QSizePolicy::Expanding));
-        infoScroll = new QScrollArea;
+    infoScroll = new QScrollArea;
 	infoScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	infoScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	//infoScroll->setMaximumWidth(300);
@@ -404,29 +437,6 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	mainGrid->setRowStretch(0, 100);
 	mainGrid->setColumnStretch(1, 100);
 	mainGrid->addWidget(hsplitter, 0, 1, 1, 3);
-
-	// Original.
-	/*
-	mainGrid->setColumnStretch(1, 100);
-	mainGrid->addWidget(splitter, 0, 0, 1, 3);
-	mainGrid->addWidget(ctrl,    1, 0);
-	mainGrid->addWidget(hscroll, 1, 1);
-	mainGrid->addWidget(corner,  1, 2, Qt::AlignBottom|Qt::AlignRight);
-	 */
-
-
-	// Tim.
-	/*
-	mainGrid->setColumnStretch(2, 100);
-	mainGrid->addWidget(splitter,           0, 0, 1, 4);
-	mainGrid->addWidget(trackInfoButton,    1, 0);
-	mainGrid->addWidget(ctrl,               1, 1);
-	mainGrid->addWidget(hscroll,            1, 2);
-	mainGrid->addWidget(corner,             1, 3, Qt::AlignBottom|Qt::AlignRight);
-	 */
-
-	//mainGrid->addRowSpacing(1, hscroll->sizeHint().height());
-	//mainGrid->addItem(new QSpacerItem(0, hscroll->sizeHint().height()), 1, 0); // Orig + Tim.
 
 	QWidget* split1 = new QWidget(splitter);
 	split1->setObjectName("split1");
@@ -546,16 +556,16 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	updateHScrollRange();
 	// connect to toolbar
-	connect(canvas, SIGNAL(pitchChanged(int)), toolbar, SLOT(setPitch(int)));
+	connect(canvas, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
 	connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-	connect(piano, SIGNAL(pitchChanged(int)), toolbar, SLOT(setPitch(int)));
+	connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
 	connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
 	connect(pcbar, SIGNAL(addProgramChange()), midiTrackInfo, SLOT(insertMatrixEvent()));
-	connect(toolbar, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
-	connect(toolbar, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
-	connect(toolbar, SIGNAL(toChanged(int)), SLOT(setTo(int)));
-	connect(toolbar, SIGNAL(soloChanged(bool)), SLOT(soloChanged(bool)));
+	connect(midiTrackInfo, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
+	connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
+	connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
+	connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
 
 	setFocusPolicy(Qt::StrongFocus);
 	setEventColorMode(colorMode);
@@ -579,7 +589,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	if (canvas->track())
 	{
 		updateTrackInfo();
-		toolbar->setSolo(canvas->track()->solo());
+		solo->blockSignals(true);
+		solo->setChecked(canvas->track()->solo());
+		solo->blockSignals(false);
 	}
 
 	unsigned pos;
@@ -609,7 +621,9 @@ void PianoRoll::songChanged1(int bits)
 
 	if (bits & SC_SOLO)
 	{
-		toolbar->setSolo(canvas->track()->solo());
+		solo->blockSignals(true);
+		solo->setChecked(canvas->track()->solo());
+		solo->blockSignals(false);
 		return;
 	}
 	songChanged(bits);
@@ -683,7 +697,8 @@ void PianoRoll::follow(int pos)
 
 void PianoRoll::setTime(unsigned tick)
 {
-	toolbar->setTime(tick);
+	if (tick != MAXINT)
+		posLabel->setValue(tick);
 	time->setPos(3, tick, false);
 	pcbar->setPos(3, tick, false);
 }
@@ -844,7 +859,7 @@ CtrlEdit* PianoRoll::addCtrl()
 	connect(hscroll, SIGNAL(scaleChanged(int)), ctrlEdit, SLOT(setXMag(int)));
 	connect(ctrlEdit, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	connect(ctrlEdit, SIGNAL(destroyedCtrl(CtrlEdit*)), SLOT(removeCtrl(CtrlEdit*)));
-	connect(ctrlEdit, SIGNAL(yposChanged(int)), toolbar, SLOT(setInt(int)));
+	connect(ctrlEdit, SIGNAL(yposChanged(int)), pitchLabel, SLOT(setInt(int)));
 
 	ctrlEdit->setTool(tools2->curTool());
 	ctrlEdit->setXPos(hscroll->pos());
@@ -1085,8 +1100,8 @@ void PianoRoll::readStatus(Xml& xml)
 				{
 					_quantInit = _quant;
 					_rasterInit = _raster;
-					toolbar->setRaster(_raster);
-					toolbar->setQuant(_quant);
+					midiTrackInfo->setRaster(_raster);
+					midiTrackInfo->setQuant(_quant);
 					canvas->redrawGrid();
 					return;
 				}
@@ -1449,8 +1464,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	setQuant(val);
 	setRaster(val);
-	toolbar->setQuant(_quant);
-	toolbar->setRaster(_raster);
+	midiTrackInfo->setQuant(_quant);
+	midiTrackInfo->setRaster(_raster);
 }
 
 //---------------------------------------------------------

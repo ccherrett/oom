@@ -144,7 +144,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 
 	//This changes to song->visibletracks()
 	if(!song->viewselected)
-		tracks = song->tracks();
+		tracks = song->artracks();
 	else
 		tracks = song->visibletracks();
 	//tracks = song->tracks();
@@ -163,7 +163,7 @@ int PartCanvas::y2pitch(int y) const
 	//This changes to song->visibletracks()
 	TrackList* tl;
 	if(!song->viewselected)
-		tl = song->tracks();
+		tl = song->artracks();
 	else
 		tl = song->visibletracks();
 	int yy = 0;
@@ -188,7 +188,7 @@ int PartCanvas::pitch2y(int p) const
 	//This changes to song->visibletracks()
 	TrackList* tl;
 	if(!song->viewselected)
-		tl = song->tracks();
+		tl = song->artracks();
 	else
 		tl = song->visibletracks();
 	int yy = 0;
@@ -278,7 +278,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 	//This changes to song->visibletracks()
 		TrackList* tl;
 		if(!song->viewselected)
-			tl = song->tracks();
+			tl = song->artracks();
 		else
 			tl = song->visibletracks();
 		iTrack it;
@@ -485,7 +485,7 @@ void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 {
 	if(!song->viewselected)
-		tracks = song->tracks();
+		tracks = song->artracks();
 	else
 		tracks = song->visibletracks();
 	NPart* npart = (NPart*) item;
@@ -612,7 +612,7 @@ QPoint PartCanvas::raster(const QPoint& p) const
 void PartCanvas::partsChanged()
 {
 	if(!song->viewselected)
-		tracks = song->tracks();
+		tracks = song->artracks();
 	else
 		tracks = song->visibletracks();
     _items.clear();
@@ -679,7 +679,7 @@ void PartCanvas::resizeItem(CItem* i, bool noSnap)
 CItem* PartCanvas::newItem(const QPoint& pos, int)
 {
 	if(!song->viewselected)
-		tracks = song->tracks();
+		tracks = song->artracks();
 	else
 		tracks = song->visibletracks();
 	int x = pos.x();
@@ -1132,7 +1132,7 @@ Track* PartCanvas::y2Track(int y) const
 	//This changes to song->visibletracks()
 	TrackList* l;
 	if(!song->viewselected)
-		l = song->tracks();
+		l = song->artracks();
 	else
 		l = song->visibletracks();
 	int ty = 0;
@@ -1156,7 +1156,7 @@ int PartCanvas::track2Y(Track * track) const
         //This changes to song->visibletracks()
         if(!song->viewselected)
         {
-                l = song->tracks();
+                l = song->artracks();
         }
         else
         {
@@ -1298,7 +1298,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
         else if (key == shortcuts[SHRT_SEL_TRACK_ABOVE_ADD].key)
         {
-                TrackList* tl = song->tracks();
+                TrackList* tl = song->artracks();
                 TrackList selectedTracks = song->getSelectedTracks();
                 if (!selectedTracks.size())
                 {
@@ -1327,7 +1327,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_SEL_TRACK_BELOW_ADD].key)
         {
-                TrackList* tl = song->tracks();
+                TrackList* tl = song->artracks();
                 TrackList selectedTracks = song->getSelectedTracks();
                 if (!selectedTracks.size())
                 {
@@ -1413,7 +1413,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_DEFAULT].key)
         {
-                TrackList* tl = song->tracks();
+                TrackList* tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -1460,7 +1460,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_2].key)
         {
-                TrackList* tl = song->tracks();
+                TrackList* tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -1474,7 +1474,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_3].key)
         {
-                TrackList* tl = song->tracks();
+                TrackList* tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -1488,7 +1488,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_4].key)
         {
-                TrackList* tl = song->tracks();
+                TrackList* tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -1502,7 +1502,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_5].key)
         {
-                TrackList* tl = song->tracks();
+                TrackList* tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -1516,7 +1516,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_6].key)
         {
-                TrackList* tl = song->tracks();
+                TrackList* tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -2963,7 +2963,7 @@ void PartCanvas::paste(bool clone, bool toTrack, bool doInsert)
 	//This changes to song->visibletracks()
 		TrackList* tl;
 		if(!song->viewselected)
-			tl = song->tracks();
+			tl = song->artracks();
 		else
 			tl = song->visibletracks();
 		for (iTrack i = tl->begin(); i != tl->end(); ++i)
@@ -3202,7 +3202,7 @@ void PartCanvas::dragLeaveEvent(QDragLeaveEvent*)
 void PartCanvas::viewDropEvent(QDropEvent* event)
 {
 	if(!song->viewselected)
-		tracks = song->tracks();
+		tracks = song->artracks();
 	else
 		tracks = song->visibletracks();
 	//printf("void PartCanvas::viewDropEvent(QDropEvent* event)\n");
@@ -3383,7 +3383,7 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	//This changes to song->visibletracks()
 	TrackList* tl;
 	if(!song->viewselected)
-		tl = song->tracks();
+		tl = song->artracks();
 	else
 		tl = song->visibletracks();
 	int yy = 0;

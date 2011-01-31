@@ -10,6 +10,11 @@
 #include "ui_mtrackinfobase.h"
 #include "pctablemodel.h"
 #include "pctable.h"
+#include <QToolBar>     
+
+class QToolButton;
+class QTableWidget;
+class QComboBox;
 
 class Track;
 class QTableView;
@@ -24,6 +29,14 @@ class QItemSelectionModel;
 
 class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
     Q_OBJECT
+
+	//ToolBar1 merge
+    QComboBox* quantLabel;
+    QTableWidget* qlist;
+    QComboBox* rasterLabel;
+    QTableWidget* rlist;
+	//end merge
+	
     Track* selected;
     bool _midiDetect;
     int program, pan, volume;
@@ -70,6 +83,10 @@ private slots:
     void patchSequenceInserted(QModelIndex, int, int);
     void patchSequenceRemoved(QModelIndex, int, int);
 	void clonePatchSequence();
+    //tb1
+	void _rasterChanged(int);
+    void _quantChanged(int);
+	//end
 
 protected slots:
     virtual void heartBeat();
@@ -85,12 +102,22 @@ public slots:
     void populateMatrix();
     void updateTableHeader();
     void rebuildMatrix();
+	//tb1
+    void setRaster(int);
+    void setQuant(int);
+	//end
 
 signals:
     void outputPortChanged(int);
+	//tb1
+    void rasterChanged(int);
+    void quantChanged(int);
+    void soloChanged(bool);
+    void toChanged(int);
+	//end
 
 public:
-    MidiTrackInfo(QWidget*, Track* = 0);
+    MidiTrackInfo(QWidget*, Track* = 0, int rast = 96, int quant = 96);
 
     Track* track() const {
         return selected;
@@ -102,6 +129,7 @@ public:
     void setLabelText();
     void setLabelFont();
     void updateTrackInfo(int);
+    void setSolo(bool val);
 };
 
 

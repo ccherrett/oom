@@ -846,7 +846,10 @@ void Audio::msgMoveTrack(int idx1, int idx2, bool doUndoFlag)
 {
 	if (idx1 < 0 || idx2 < 0) // sanity check
 		return;
-	int n = song->tracks()->size();
+	int n = song->artracks()->size();
+	if(!song->viewselected)
+		n = song->visibletracks()->size();
+		
 	if (idx1 >= n || idx2 >= n) // sanity check
 		return;
 	AudioMsg msg;
