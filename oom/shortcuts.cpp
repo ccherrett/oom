@@ -241,8 +241,8 @@ void initShortCuts()
         defShrt(SHRT_POS_INC, Qt::SHIFT + Qt::Key_Greater, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
         defShrt(SHRT_POS_DEC, Qt::SHIFT + Qt::Key_Less, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
 
-	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + QT::CTRL + Qt::Key_Greater, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
-	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + QT::CTRL + Qt::Key_Less, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");
+	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Greater, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
+	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Less, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");
 
 	/*
 	defShrt(SHRT_POS_INC_BAR,      Qt::CTRL + Qt::ALT + Qt::Key_Plus, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase_bar");
