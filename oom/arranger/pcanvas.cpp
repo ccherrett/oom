@@ -856,8 +856,9 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 			break;
 		case Track::WAVE:
 		{
-			QAction *act_wedit = partPopup->addAction(QIcon(*edit_waveIcon), tr("wave edit"));
-			act_wedit->setData(14);
+// the wave editor is destructive, don't us it anymore!
+//			QAction *act_wedit = partPopup->addAction(QIcon(*edit_waveIcon), tr("wave edit"));
+//			act_wedit->setData(14);
 			QAction *act_wexport = partPopup->addAction(tr("export"));
 			act_wexport->setData(16);
 			QAction *act_wfinfo = partPopup->addAction(tr("file info"));
