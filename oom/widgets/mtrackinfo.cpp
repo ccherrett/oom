@@ -38,7 +38,7 @@
 #include "popupmenu.h"
 #include "pctable.h"
 
-#include "lcombo.h"
+#include "gcombo.h"
 
 static int rasterTable[] = {
 	//------                8    4     2
@@ -191,8 +191,8 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	//  Raster, Quant.
 	//---------------------------------------------------
 
-        rasterLabel = new LabelCombo(tr("Snap"), 0);
-        quantLabel = new LabelCombo(tr("Quantize"), 0);
+    rasterLabel = new GridCombo(this);
+    quantLabel = new GridCombo(this);
 
 	rlist = new QTableWidget(10, 3);
 	qlist = new QTableWidget(8, 3);
@@ -223,30 +223,23 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	setRaster(rast);
 	setQuant(quant);
 
-        rasterLabel->setFixedHeight(28);
-        quantLabel->setFixedHeight(28);
+    rasterLabel->setFixedHeight(22);
+    quantLabel->setFixedHeight(22);
 
+	controlsBox->addWidget(new QLabel(tr("Snap")));
 	controlsBox->addWidget(rasterLabel);
+	controlsBox->addWidget(new QLabel(tr("Quantize")));
 	controlsBox->addWidget(quantLabel);
 
 	//---------------------------------------------------
 	//  To Menu
 	//---------------------------------------------------
-
-	//QWidget *toWidget = new QWidget(this);
-	//QHBoxLayout *toLayout = new QHBoxLayout(toWidget);
-	//toWidget->setLayout(toLayout);
-	//toLayout->addSpacing(5);
-	//toLayout->addWidget(new QLabel(tr("To")));
-	//toLayout->addSpacing(5);
 	QComboBox* toList = new QComboBox;
 	toList->setFixedHeight(22);
 	toList->insertItem(0, tr("All Events"));
 	toList->insertItem(CMD_RANGE_LOOP, tr("Looped Ev."));
 	toList->insertItem(CMD_RANGE_SELECTED, tr("Selected Ev."));
 	toList->insertItem(CMD_RANGE_LOOP | CMD_RANGE_SELECTED, tr("Looped+Sel."));
-	//toLayout->addWidget(toList);
-	//toLayout->addSpacing(5);
 	controlsBox->addWidget(new QLabel(tr("To")));
 	controlsBox->addWidget(toList);
 

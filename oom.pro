@@ -74,6 +74,7 @@ HEADERS = \
 ./oom/widgets/sclif.h \
 ./oom/widgets/citem.h \
 ./oom/widgets/lcombo.h \
+./oom/widgets/gcombo.h \
 ./oom/widgets/aboutbox_impl.h \
 ./oom/widgets/appearancebase.h \
 ./oom/widgets/mixdowndialogbase.h \
@@ -428,6 +429,7 @@ SOURCES =  \
 ./oom/widgets/gatetime.cpp \
 ./oom/widgets/checkbox.cpp \
 ./oom/widgets/moc_lcombo.cpp \
+./oom/widgets/moc_gcombo.cpp \
 ./oom/widgets/moc_filedialog.cpp \
 ./oom/widgets/moc_hitscale.cpp \
 ./oom/widgets/moc_checkbox.non-libtool.cpp \
@@ -499,6 +501,7 @@ SOURCES =  \
 ./oom/widgets/dimap.non-libtool.cpp \
 ./oom/widgets/moc_view.cpp \
 ./oom/widgets/lcombo.cpp \
+./oom/widgets/gcombo.cpp \
 ./oom/widgets/scrollscale.cpp \
 ./oom/widgets/mlabel.cpp \
 ./oom/widgets/moc_vscale.cpp \
