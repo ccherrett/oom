@@ -153,7 +153,7 @@ class OOMidi : public QMainWindow
     QString appName;
 
     QFileInfo project;
-    QToolBar *tools;
+    //QToolBar *tools;
     EditToolBar *tools1;
 
     Transport* transport;

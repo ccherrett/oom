@@ -23,6 +23,7 @@
 class MidiPart;
 class TimeLabel;
 class PitchLabel;
+class PosLabel;
 class QLabel;
 class PianoCanvas;
 class MTScale;
@@ -34,7 +35,7 @@ class QPushButton;
 class CtrlEdit;
 class Splitter;
 class PartList;
-class Toolbar1;
+//class Toolbar1;
 class Xml;
 class QuantConfig;
 class ScrollScale;
@@ -115,8 +116,11 @@ class PianoRoll : public MidiEditor
     NoteInfo* info;
     QToolButton* srec;
     QToolButton* midiin;
+    QToolButton* solo;
+    PosLabel* posLabel;
+    PitchLabel* pitchLabel;
 
-    Toolbar1* toolbar;
+    //Toolbar1* toolbar;
     Splitter* splitter;
     Splitter* hsplitter;
     Splitter* ctrlLane;
@@ -212,6 +216,7 @@ public slots:
 public:
     PianoRoll(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);
     ~PianoRoll();
+    //void setSolo(bool val);
     virtual void readStatus(Xml&);
     virtual void writeStatus(int, Xml&) const;
     static void readConfiguration(Xml&);

@@ -11,9 +11,14 @@
 #include <QItemSelectionModel>
 #include <QItemSelection>
 #include <QModelIndexList>
+#include <QHeaderView>
+#include <QTableWidget>    
+#include <QToolButton>
 
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
+#include <values.h>
 
 #include "mtrackinfo.h"
 #include "song.h"
@@ -32,6 +37,33 @@
 #include "route.h"
 #include "popupmenu.h"
 #include "pctable.h"
+
+#include "lcombo.h"
+
+static int rasterTable[] = {
+	//------                8    4     2
+	1, 4, 8, 16, 32, 64, 128, 256, 512, 1024,
+	1, 6, 12, 24, 48, 96, 192, 384, 768, 1536,
+	1, 9, 18, 36, 72, 144, 288, 576, 1152, 2304
+};
+
+static const char* rasterStrings[] ={
+	QT_TRANSLATE_NOOP("@default", "Off"), "2pp", "5pp", "64T", "32T", "16T", "8T", "4T", "2T", "1T",
+	QT_TRANSLATE_NOOP("@default", "Off"), "3pp", "6pp", "64", "32", "16", "8", "4", "2", "1",
+	QT_TRANSLATE_NOOP("@default", "Off"), "4pp", "7pp", "64.", "32.", "16.", "8.", "4.", "2.", "1."
+};
+
+static int quantTable[] = {
+	1, 16, 32, 64, 128, 256, 512, 1024,
+	1, 24, 48, 96, 192, 384, 768, 1536,
+	1, 36, 72, 144, 288, 576, 1152, 2304
+};
+
+static const char* quantStrings[] = {
+	QT_TRANSLATE_NOOP("@default", "Off"), "64T", "32T", "16T", "8T", "4T", "2T", "1T",
+	QT_TRANSLATE_NOOP("@default", "Off"), "64", "32", "16", "8", "4", "2", "1",
+	QT_TRANSLATE_NOOP("@default", "Off"), "64.", "32.", "16.", "8.", "4.", "2.", "1."
+};
 
 //---------------------------------------------------------
 //   setTrack
@@ -66,7 +98,7 @@ void MidiTrackInfo::setTrack(Track* t)
 //   midiTrackInfo
 //---------------------------------------------------------
 
-MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track) : QFrame(parent)//QWidget(parent)
+MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int quant) : QFrame(parent)//QWidget(parent)
 {
 	setupUi(this);
 	_midiDetect = false;
@@ -153,6 +185,81 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track) : QFrame(parent)
 	btnDelete->setIconSize(garbagePCIcon->size());
 	btnCopy->setIcon(*duplicatePCIcon);
 	btnCopy->setIconSize(duplicatePCIcon->size());
+
+	//start tb1 merge
+	//---------------------------------------------------
+	//  Raster, Quant.
+	//---------------------------------------------------
+
+	rasterLabel = new QComboBox();
+	rasterLabel->setEditable(false);
+	quantLabel = new QComboBox();
+	quantLabel->setEditable(false);
+
+	rlist = new QTableWidget(10, 3);
+	qlist = new QTableWidget(8, 3);
+	rlist->verticalHeader()->setDefaultSectionSize(22);
+	rlist->horizontalHeader()->setDefaultSectionSize(32);
+	rlist->setSelectionMode(QAbstractItemView::SingleSelection);
+	rlist->verticalHeader()->hide();
+	rlist->horizontalHeader()->hide();
+	qlist->verticalHeader()->setDefaultSectionSize(22);
+	qlist->horizontalHeader()->setDefaultSectionSize(32);
+	qlist->setSelectionMode(QAbstractItemView::SingleSelection);
+	qlist->verticalHeader()->hide();
+	qlist->horizontalHeader()->hide();
+
+	rlist->setMinimumWidth(96);
+	qlist->setMinimumWidth(96);
+
+	rasterLabel->setModel(rlist->model());
+	rasterLabel->setView(rlist);
+	quantLabel->setModel(qlist->model());
+	quantLabel->setView(qlist);
+
+	for (int j = 0; j < 3; j++)
+		for (int i = 0; i < 10; i++)
+			rlist->setItem(i, j, new QTableWidgetItem(tr(rasterStrings[i + j * 10])));
+	for (int j = 0; j < 3; j++)
+		for (int i = 0; i < 8; i++)
+			qlist->setItem(i, j, new QTableWidgetItem(tr(quantStrings[i + j * 8])));
+
+	setRaster(rast);
+	setQuant(quant);
+
+	rasterLabel->setFixedHeight(22);
+	quantLabel->setFixedHeight(22);
+
+	controlsBox->addWidget(new QLabel(tr("Snap")));
+	controlsBox->addWidget(rasterLabel);
+	controlsBox->addWidget(new QLabel(tr("Quantize")));
+	controlsBox->addWidget(quantLabel);
+
+	//---------------------------------------------------
+	//  To Menu
+	//---------------------------------------------------
+
+	//QWidget *toWidget = new QWidget(this);
+	//QHBoxLayout *toLayout = new QHBoxLayout(toWidget);
+	//toWidget->setLayout(toLayout);
+	//toLayout->addSpacing(5);
+	//toLayout->addWidget(new QLabel(tr("To")));
+	//toLayout->addSpacing(5);
+	QComboBox* toList = new QComboBox;
+	toList->setFixedHeight(22);
+	toList->insertItem(0, tr("All Events"));
+	toList->insertItem(CMD_RANGE_LOOP, tr("Looped Ev."));
+	toList->insertItem(CMD_RANGE_SELECTED, tr("Selected Ev."));
+	toList->insertItem(CMD_RANGE_LOOP | CMD_RANGE_SELECTED, tr("Looped+Sel."));
+	//toLayout->addWidget(toList);
+	//toLayout->addSpacing(5);
+	controlsBox->addWidget(new QLabel(tr("To")));
+	controlsBox->addWidget(toList);
+
+	connect(rasterLabel, SIGNAL(activated(int)), SLOT(_rasterChanged(int)));
+	connect(quantLabel, SIGNAL(activated(int)), SLOT(_quantChanged(int)));
+	connect(toList, SIGNAL(activated(int)), SIGNAL(toChanged(int)));
+	//end tb1
 
 	connect(tableView, SIGNAL(rowOrderChanged()), SLOT(rebuildMatrix()));
 	connect(_selModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(matrixSelectionChanged(QItemSelection, QItemSelection)));
@@ -2174,3 +2281,110 @@ void MidiTrackInfo::showEvent(QShowEvent* /*evt*/)
 		chkAdvanced->setChecked(false);
 	_autoExapand = false;
 }
+
+//---------------------------------------------------------/*{{{*/
+//   rasterChanged
+//---------------------------------------------------------
+
+void MidiTrackInfo::_rasterChanged(int /*i*/)
+{
+	emit rasterChanged(rasterTable[rlist->currentRow() + rlist->currentColumn() * 10]);
+}
+
+//---------------------------------------------------------
+//   quantChanged
+//---------------------------------------------------------
+
+void MidiTrackInfo::_quantChanged(int /*i*/)
+{
+	emit quantChanged(quantTable[qlist->currentRow() + qlist->currentColumn() * 8]);
+}
+
+//---------------------------------------------------------
+//   setRaster
+//---------------------------------------------------------
+
+/*void MidiTrackInfo::setRaster(int val)
+{
+	for (unsigned i = 0; i < sizeof (rasterTable) / sizeof (*rasterTable); i++)
+	{
+		if (val == rasterTable[i])
+		{
+			rasterLabel->setCurrentIndex(i);
+			return;
+		}
+	}
+	printf("setRaster(%d) not defined\n", val);
+	rasterLabel->setCurrentIndex(0);
+}
+
+//---------------------------------------------------------
+//   setQuant
+//---------------------------------------------------------
+
+void MidiTrackInfo::setQuant(int val)
+{
+	for (unsigned i = 0; i < sizeof (quantTable) / sizeof (*quantTable); i++)
+	{
+		if (val == quantTable[i])
+		{
+			quantLabel->setCurrentIndex(i);
+			return;
+		}
+	}
+	printf("setQuant(%d) not defined\n", val);
+	quantLabel->setCurrentIndex(0);
+}*/
+/*}}}*/
+
+//---------------------------------------------------------
+//   setQuant
+//---------------------------------------------------------
+
+void MidiTrackInfo::setQuant(int val)/*{{{*/
+{
+	for (unsigned i = 0; i < sizeof (quantTable) / sizeof (*quantTable); i++)
+	{
+		if (val == quantTable[i])
+		{
+			int rc = quantLabel->model()->rowCount();
+			if (rc == 0)
+				return;
+			int r = val % rc;
+			int c = val / rc;
+			if (c >= quantLabel->model()->columnCount())
+				return;
+			if (quantLabel->modelColumn() != c)
+				quantLabel->setModelColumn(c);
+			if (quantLabel->currentIndex() != r)
+				quantLabel->setCurrentIndex(r);
+			return;
+		}
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   setRaster
+//---------------------------------------------------------
+
+void MidiTrackInfo::setRaster(int val)/*{{{*/
+{
+	for (unsigned i = 0; i < sizeof (rasterTable) / sizeof (*rasterTable); i++)
+	{
+		if (val == rasterTable[i])
+		{
+			int rc = rasterLabel->model()->rowCount();
+			if (rc == 0)
+				return;
+			int r = val % rc;
+			int c = val / rc;
+			if (c >= rasterLabel->model()->columnCount())
+				return;
+			if (rasterLabel->modelColumn() != c)
+				rasterLabel->setModelColumn(c);
+			if (rasterLabel->currentIndex() != r)
+				rasterLabel->setCurrentIndex(r);
+			return;
+		}
+	}
+}/*}}}*/

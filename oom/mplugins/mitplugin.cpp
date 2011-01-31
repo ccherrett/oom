@@ -36,6 +36,8 @@ void OOMidi::startMidiInputPlugin(int id)
 		if (!mitPluginTranspose)
 		{
 			mitPluginTranspose = new MITPluginTranspose();
+			mitPluginTranspose->setObjectName("mitPluginTranspose");
+			mitPluginTranspose->setStyleSheet("QDialog{background-color: #595966;}");
 			mitPlugins.push_back(mitPluginTranspose);
 			connect(mitPluginTranspose, SIGNAL(hideWindow()),
 					SLOT(hideMitPluginTranspose()));
@@ -48,6 +50,7 @@ void OOMidi::startMidiInputPlugin(int id)
 		if (!midiInputTransform)
 		{
 			midiInputTransform = new MidiInputTransformDialog();
+			midiInputTransform->setObjectName("midiInputTransform");
 			connect(midiInputTransform, SIGNAL(hideWindow()),
 					SLOT(hideMidiInputTransform()));
 		}
@@ -59,6 +62,7 @@ void OOMidi::startMidiInputPlugin(int id)
 		if (!midiFilterConfig)
 		{
 			midiFilterConfig = new MidiFilterConfig();
+			midiFilterConfig->setObjectName("midiFilterConfig");
 			connect(midiFilterConfig, SIGNAL(hideWindow()),
 					SLOT(hideMidiFilterConfig()));
 		}
@@ -70,6 +74,7 @@ void OOMidi::startMidiInputPlugin(int id)
 		if (!midiRemoteConfig)
 		{
 			midiRemoteConfig = new MRConfig();
+			midiRemoteConfig->setObjectName("midiRemoteConfig");
 			connect(midiRemoteConfig, SIGNAL(hideWindow()),
 					SLOT(hideMidiRemoteConfig()));
 		}
@@ -82,6 +87,7 @@ void OOMidi::startMidiInputPlugin(int id)
 		if (!midiRhythmGenerator)
 		{
 			midiRhythmGenerator = new RhythmGen();
+			midiRhythmGenerator->setObjectName("midiRhythmGenerator");
 			connect(midiRhythmGenerator, SIGNAL(hideWindow()),
 					SLOT(hideMidiRhythmGenerator()));
 		}

@@ -129,6 +129,8 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	parent->addToolBarBreak();
 	QToolBar* toolbar = parent->addToolBar(tr("Arranger"));
 	toolbar->setObjectName("tbArranger");
+	toolbar->setMovable(false);
+	toolbar->setFloatable(false);
 	QToolBar* toolbar2 = new QToolBar(tr("Snap"));
 	parent->addToolBar(Qt::BottomToolBarArea, toolbar2);
 	toolbar2->setObjectName("tbSnap");
@@ -159,7 +161,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 		QT_TRANSLATE_NOOP("@default", "Off"), QT_TRANSLATE_NOOP("@default", "Bar"), "1/2", "1/4", "1/8", "1/16"
 	};
 
-        raster = new QComboBox();
+    raster = new QComboBox();
 	for (int i = 0; i < 6; i++)
 		raster->insertItem(i, tr(rastval[i]));
 	raster->setCurrentIndex(1);

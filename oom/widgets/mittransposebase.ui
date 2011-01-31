@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>OOMidi: Midi Input Plugin: Transpose</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <layout class="QHBoxLayout">
    <property name="spacing">
     <number>6</number>
