@@ -1846,7 +1846,7 @@ void TList::mouseReleaseEvent(QMouseEvent* ev)
 {
 	if (mode == DRAG)
 	{
-		printf("TList::mouseReleaseEvent()\n");
+		//printf("TList::mouseReleaseEvent()\n");
 		Track* t = y2Track(ev->y() + ypos);
 		if (t)
 		{

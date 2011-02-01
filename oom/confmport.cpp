@@ -424,7 +424,8 @@ _redisplay:
 			//printf("MPConfig::rbClicked DEVCOL_NAME\n");
 
 			// Did we click in the text area?
-			if ((mousepos.x() - ppt.x()) > buttondownIcon->width())
+			// NOTE: this needs the +15 pixels to make up for padding in the stylesheet.
+			if ((mousepos.x() - (ppt.x() + 15)) > buttondownIcon->width())
 			{
 				//printf("MPConfig::rbClicked starting item rename... enabled?:%d\n", item->renameEnabled(DEVCOL_NAME));
 				// Start the renaming of the cell...

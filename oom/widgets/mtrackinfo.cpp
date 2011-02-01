@@ -39,6 +39,7 @@
 #include "pctable.h"
 
 #include "gcombo.h"
+#include "traverso_shared/TConfig.h"
 
 static int rasterTable[] = {
 	//------                8    4     2
@@ -304,6 +305,13 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
 
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
+	bool adv = tconfig().get_property("MidiTrackInfo", "advanced", false).toBool();
+	chkAdvanced->setChecked(adv);
+}
+
+MidiTrackInfo::~MidiTrackInfo()
+{
+	tconfig().set_property("MidiTrackInfo", "advanced", chkAdvanced->isChecked());
 }
 
 //---------------------------------------------------------
@@ -2264,9 +2272,9 @@ void MidiTrackInfo::updateSize()
 void MidiTrackInfo::showEvent(QShowEvent* /*evt*/)
 {
 	tableView->resizeRowsToContents();
-	if(_autoExapand)
+	/*if(_autoExapand)
 		chkAdvanced->setChecked(false);
-	_autoExapand = false;
+	_autoExapand = false;*/
 }
 
 //---------------------------------------------------------/*{{{*/
@@ -2321,5 +2329,5 @@ void MidiTrackInfo::setQuant(int val)
 	}
 	printf("setQuant(%d) not defined\n", val);
 	quantLabel->setCurrentIndex(0);
-}
+}/*}}}*/
 

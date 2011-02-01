@@ -361,9 +361,18 @@ void Song::doUndo2()
 			case UndoOp::SwapTrack:
 			{
 				updateFlags |= SC_TRACK_MODIFIED;
-				Track* track = _tracks[i->a];
-				_tracks[i->a] = _tracks[i->b];
-				_tracks[i->b] = track;
+				if(song->viewselected)
+				{
+					Track* track = _tracks[i->a];
+					_tracks[i->a] = _tracks[i->b];
+					_tracks[i->b] = track;
+				}
+				else
+				{
+					Track* track = _artracks[i->a];
+					_artracks[i->a] = _artracks[i->b];
+					_artracks[i->b] = track;
+				}
 				updateFlags |= SC_TRACK_MODIFIED;
 			}
 				break;

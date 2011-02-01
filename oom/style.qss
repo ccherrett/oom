@@ -636,7 +636,7 @@ QObject#mdevView {
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
 	 text-decoration: none;
-     padding: 0px;
+     padding: 15px;
 	 color: #36373a; 
 	 font-family: "fixed-width";
 	 font-weight: bold;

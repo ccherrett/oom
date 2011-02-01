@@ -120,6 +120,7 @@ signals:
 
 public:
     MidiTrackInfo(QWidget*, Track* = 0, int rast = 96, int quant = 96);
+	~MidiTrackInfo();
 
     Track* track() const {
         return selected;

@@ -1517,8 +1517,21 @@ void Song::write(int level, Xml& xml) const
 	CloneList copyCloneList = cloneList;
 	cloneList.clear();
 
-	// write tracks
-	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
+	// write arranger visible tracks first so we maintain sort order
+	for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
+		(*i)->write(level, xml);
+
+	// write the buss type tracks
+	for (ciTrack i = _inputs.begin(); i != _inputs.end(); ++i)
+		(*i)->write(level, xml);
+
+	for (ciTrack i = _outputs.begin(); i != _outputs.end(); ++i)
+		(*i)->write(level, xml);
+
+	for (ciTrack i = _groups.begin(); i != _groups.end(); ++i)
+		(*i)->write(level, xml);
+
+	for (ciTrack i = _auxs.begin(); i != _auxs.end(); ++i)
 		(*i)->write(level, xml);
 
 	// write routing
