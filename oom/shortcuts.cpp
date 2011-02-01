@@ -68,7 +68,7 @@ void initShortCuts()
 	defShrt(SHRT_OPEN_PIANO, Qt::CTRL + Qt::Key_E, "Open pianoroll", ARRANG_SHRT, "open_pianoroll");
 	defShrt(SHRT_OPEN_DRUMS, Qt::CTRL + Qt::Key_D, "Open drumeditor", ARRANG_SHRT, "open_drumedit");
 	defShrt(SHRT_OPEN_LIST, Qt::CTRL + Qt::Key_L, "Open listeditor", ARRANG_SHRT, "open_listedit");
-	defShrt(SHRT_OPEN_WAVE, Qt::CTRL + Qt::Key_W, "Open waveeditor", ARRANG_SHRT, "open_waveedit");
+	defShrt(SHRT_OPEN_WAVE, 0, "Open waveeditor", ARRANG_SHRT, "open_waveedit");
 	defShrt(SHRT_OPEN_GRAPHIC_MASTER, Qt::CTRL + Qt::Key_M, "Open graphical mastertrack editor", ARRANG_SHRT, "open_graph_master");
 	defShrt(SHRT_OPEN_LIST_MASTER, Qt::CTRL + Qt::SHIFT + Qt::Key_M, "Open list mastertrack editor", ARRANG_SHRT, "open_list_master");
 	defShrt(SHRT_OPEN_MIDI_TRANSFORM, Qt::CTRL + Qt::Key_T, "Open midi transformer", ARRANG_SHRT, "open_midi_transform");
