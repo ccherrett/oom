@@ -406,7 +406,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     midiTrackInfo = new MidiTrackInfo(this, 0, _rasterInit, _quantInit);
 	midiTrackInfo->setObjectName("prTrackInfo");
 	int mtiw = 280; //midiTrackInfo->width(); // Save this.
-	midiTrackInfo->setMinimumWidth(100);
+	//midiTrackInfo->setMinimumWidth(100);
+	midiTrackInfo->setMinimumSize(QSize(190,100));
 	//midiTrackInfo->setMaximumWidth(300);
     // Catch left/right arrow key events for this widget so we
     // can easily move the focus back from this widget to the canvas.
@@ -415,6 +416,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     midiTrackInfo->getView()->installEventFilter(this);
 
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
+	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
 	//midiTrackInfo->setSizePolicy(QSizePolicy(/*QSizePolicy::Ignored*/QSizePolicy::Preferred, QSizePolicy::Expanding));
     infoScroll = new QScrollArea;
@@ -1704,4 +1706,15 @@ void PianoRoll::toggleTrackInfo()
 	bool vis = midiTrackInfo->isVisible();
 	infoScroll->setVisible(!vis);
 	infoScroll->setEnabled(!vis);
+}
+
+void PianoRoll::splitterMoved(int pos, int)
+{
+	if(pos < midiTrackInfo->minimumSize().width())
+	{
+		QList<int> def;
+		def.append(midiTrackInfo->minimumSize().width());
+		def.append(50);
+		hsplitter->setSizes(def);
+	}
 }

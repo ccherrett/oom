@@ -202,6 +202,7 @@ private slots:
     void newCanvasWidth(int);
     void toggleTrackInfo();
     void updateTrackInfo();
+	void splitterMoved(int, int);
 
 signals:
     void deleted(unsigned long);
