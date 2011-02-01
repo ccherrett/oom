@@ -263,6 +263,11 @@ int main(int argc, char* argv[])
 	QDir cPath = QDir(configPath);
 	if (!cPath.exists())
 		cPath.mkpath(".");
+	
+	//Create the directory to store the internal routing map
+	QDir rPath = QDir(routePath);
+	if(!rPath.exists())
+		rPath.mkpath(".");
 
 #ifdef HAVE_LASH
 	lash_args_t * lash_args = 0;

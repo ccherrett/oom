@@ -385,6 +385,8 @@ public:
 
 	QDockWidget* resourceDock() { return _resourceDock; }
 	void addTransportToolbar();
+	bool saveRouteMapping(QString, QString note = "Untitled");
+	bool loadRouteMapping(QString);
     // Testing...
     //PopupView* getRoutingPopupView();
     //PopupView* prepareRoutingPopupView(Track* /*track*/, bool /*dst*/);

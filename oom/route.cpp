@@ -1441,9 +1441,7 @@ void Song::readRoute(Xml& xml)
 						Route d = name2route(dst, true);
 						addRoute(s, d);
 					}
-					else
-						// Support new routes.
-						if (sroute.isValid() && droute.isValid())
+					else if (sroute.isValid() && droute.isValid())// Support new routes.
 					{
 						// p3.3.49 Support pre- 1.1-RC2 midi-device-to-track routes. Obsolete. Replaced with midi port routes.
 						if (sroute.type == Route::MIDI_DEVICE_ROUTE && droute.type == Route::TRACK_ROUTE)

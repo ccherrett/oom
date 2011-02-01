@@ -77,8 +77,9 @@ QString oomGlobalShare;
 QString oomUser;
 QString oomProject;
 QString oomProjectInitPath("./");
-QString configName = QString(getenv("HOME")) + QString("/.config/OOMidi/OOMidi.cfg");
-QString configPath = QFileInfo(configName).absoluteDir().absolutePath();
+QString configPath = QString(getenv("HOME")) + QString("/.config/OOMidi");
+QString configName = configPath + QString("/OOMidi.cfg");
+QString routePath = configPath + QString("/routes");
 QString oomInstruments;
 QString oomUserInstruments;
 

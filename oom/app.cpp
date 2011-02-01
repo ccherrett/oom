@@ -1975,8 +1975,54 @@ bool OOMidi::save(const QString& name, bool overwriteWarn)
 	{
 		popenFlag ? pclose(f) : fclose(f);
 		song->dirty = false;
+		saveRouteMapping(routePath + "/testing.orm", "This is a test");
 		return true;
 	}
+}
+
+bool OOMidi::saveRouteMapping(QString name, QString notes)
+{
+	bool popenFlag;
+	FILE* f = fileOpen(this, name, QString(".orm"), "w", popenFlag, false, false);
+	if (f == 0)
+		return false;
+	Xml xml(f);
+	xml.header();
+
+	int level = 0;
+	xml.tag(level++, "oom version=\"2.0\"");
+	xml.strTag(level, "notes", notes);
+	//Write out the routing map to the xml here
+	for (ciTrack i = song->tracks()->begin(); i != song->tracks()->end(); ++i)
+	{
+		(*i)->writeRouting(level, xml);
+	}
+	// Write midi device routing.
+	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+	{
+		(*i)->writeRouting(level, xml);
+	}
+	xml.tag(level, "/oom");
+	if (ferror(f))
+	{
+		QString s = "Write File\n" + name + "\nfailed: " + QString(strerror(errno));
+		QMessageBox::critical(this, tr("OOMidi: Write File failed"), s);
+		popenFlag ? pclose(f) : fclose(f);
+		unlink(name.toLatin1().constData());
+		return false;
+	}
+	else
+	{
+		popenFlag ? pclose(f) : fclose(f);
+		song->dirty = false;
+		return true;
+	}
+	return true;
+}
+
+bool OOMidi::loadRouteMapping(QString)
+{
+	return true;
 }
 
 //---------------------------------------------------------

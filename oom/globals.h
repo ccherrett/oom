@@ -49,6 +49,7 @@ extern QString oomProject;
 extern QString oomProjectInitPath;
 extern QString configName;
 extern QString configPath;
+extern QString routePath;
 extern QString oomInstruments;
 extern QString oomUserInstruments;
 
