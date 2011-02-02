@@ -238,11 +238,11 @@ void initShortCuts()
 
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
-        defShrt(SHRT_POS_INC, Qt::SHIFT + Qt::Key_Greater, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
-        defShrt(SHRT_POS_DEC, Qt::SHIFT + Qt::Key_Less, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
+	defShrt(SHRT_POS_INC, Qt::META + Qt::Key_Period, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
+	defShrt(SHRT_POS_DEC, Qt::META + Qt::Key_Comma, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
 
-	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Greater, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
-	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Less, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");
+	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Period, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
+	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Comma, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");
 
 	
         defShrt(SHRT_SET_QUANT_0, Qt::Key_0, "Quantize: Set quantize to off", PROLL_SHRT, "midi_quant_off");
