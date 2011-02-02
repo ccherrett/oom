@@ -148,7 +148,7 @@ void initShortCuts()
 
         defShrt(SHRT_SEL_TRACK_ABOVE_ADD, Qt::CTRL + Qt::SHIFT + Qt::Key_Up, "Add Track above to selection", ARRANG_SHRT, "sel_track_above_add");
         defShrt(SHRT_SEL_TRACK_BELOW_ADD, Qt::CTRL + Qt::SHIFT + Qt::Key_Down, "Add Track below to selection", ARRANG_SHRT, "sel_track_below_add");
-
+        defShrt(SHRT_TOGGLE_RACK, Qt::Key_N, "Toggle effectsrack in mixer", MIXER_SHRT, "toggle effectsrack");
         //-----------------------------------------------------------
 
 	defShrt(SHRT_TRANSPOSE, 0, "Midi: Transpose", ARRANG_SHRT + PROLL_SHRT, "midi_transpose");
