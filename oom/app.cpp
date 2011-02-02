@@ -1979,7 +1979,7 @@ bool OOMidi::save(const QString& name, bool overwriteWarn)
 	{
 		popenFlag ? pclose(f) : fclose(f);
 		song->dirty = false;
-		saveRouteMapping(routePath + "/testing.orm", "This is a test");
+		//saveRouteMapping(routePath + "/testing.orm", "This is a test");
 		return true;
 	}
 }
