@@ -1247,6 +1247,7 @@ void Song::readMarker(Xml& xml)
 void Song::read(Xml& xml)
 {
 	cloneList.clear();
+	associatedRoute = "";
 	for (;;)
 	{
 		Xml::Token token;
@@ -1262,6 +1263,8 @@ void Song::read(Xml& xml)
 					setMasterFlag(xml.parseInt());
 				else if (tag == "info")
 					songInfoStr = xml.parse1();
+				else if (tag == "associatedRoute")
+					associatedRoute = xml.parse1();
 				else if (tag == "loop")
 					setLoop(xml.parseInt());
 				else if (tag == "punchin")
@@ -1492,6 +1495,7 @@ void Song::write(int level, Xml& xml) const
 {
 	xml.tag(level++, "song");
 	xml.strTag(level, "info", songInfoStr);
+	xml.strTag(level, "associatedRoute", associatedRoute);
 	xml.intTag(level, "automation", automation);
 	xml.intTag(level, "cpos", song->cpos());
 	xml.intTag(level, "rpos", song->rpos());

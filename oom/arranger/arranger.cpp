@@ -980,7 +980,7 @@ void Arranger::genTrackInfo(QWidget*)
 	_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
 	_rtabs->addTab(_rmdock, tr("  Route Connector  "));
 
-	central = new QWidget(mixerScroll);
+	central = new QWidget(this);
 	central->setObjectName("dockMixerCenter");
 	mlayout = new QVBoxLayout();
 	central->setLayout(mlayout);

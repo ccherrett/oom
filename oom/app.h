@@ -388,6 +388,7 @@ public:
 	bool saveRouteMapping(QString, QString note = "Untitled");
 	bool loadRouteMapping(QString);
 	bool updateRouteMapping(QString, QString);
+	void connectDefaultSongPorts();
 	QString noteForRouteMapping(QString);
     // Testing...
     //PopupView* getRoutingPopupView();

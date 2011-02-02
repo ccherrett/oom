@@ -190,6 +190,7 @@ public:
 
     bool dirty;
 	bool viewselected;
+	QString associatedRoute;
     WaveTrack* bounceTrack;
     AudioOutput* bounceOutput;
     void updatePos();

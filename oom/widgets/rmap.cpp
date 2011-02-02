@@ -43,11 +43,15 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	btnLoad->setIconSize(midi_reset_instrIcon->size());
 	btnCopy->setIcon(*duplicatePCIcon);
 	btnCopy->setIconSize(duplicatePCIcon->size());
+	btnLink->setIcon(*midi_inputpluginsIcon);
+	btnLink->setIconSize(midi_inputpluginsIcon->size());
+
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
 	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddClicked(bool)));
 	connect(btnEdit, SIGNAL(clicked(bool)), SLOT(btnEditClicked(bool)));
 	connect(btnLoad, SIGNAL(clicked(bool)), SLOT(btnLoadClicked(bool)));
 	connect(btnCopy, SIGNAL(clicked(bool)), SLOT(btnCopyClicked(bool)));
+	connect(btnLink, SIGNAL(clicked(bool)), SLOT(btnLinkClicked(bool)));
 	connect(_listModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(renameRouteMap(QStandardItem*)));
 	//connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
 	populateTable(-1);
@@ -161,6 +165,21 @@ void RouteMapDock::btnLoadClicked(bool)/*{{{*/
 		}
 	}
 	populateTable(-1);
+}/*}}}*/
+
+void RouteMapDock::btnLinkClicked(bool)/*{{{*/
+{
+	QList<int> rows = getSelectedRows();
+	if (!rows.isEmpty())
+	{
+		int id = rows.at(0);
+		QStandardItem* path = _listModel->item(id, 0);
+		if(path)
+		{
+			song->associatedRoute = path->text();
+			song->dirty = true;
+		}
+	}
 }/*}}}*/
 
 void RouteMapDock::saveRouteMap(QString _name, QString note)/*{{{*/

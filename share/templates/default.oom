@@ -168,6 +168,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+	  <associatedRoute></associatedRoute>
       <controller id="0" cur="1">
         0 1,         
         </controller>

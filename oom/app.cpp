@@ -2238,6 +2238,14 @@ bool OOMidi::loadRouteMapping(QString name)
 	return true;
 }
 
+void OOMidi::connectDefaultSongPorts()
+{
+	if(!song->associatedRoute.isEmpty())
+	{
+		loadRouteMapping(song->associatedRoute);
+	}
+}
+
 //---------------------------------------------------------
 //   quitDoc
 //---------------------------------------------------------

@@ -96,6 +96,17 @@ static void ladish_l1_save(int sig)
 	}
 }
 
+//Reconnect default project port state on SIGHUP
+bool oom_reconnect_ports_requested = false;
+
+static void oom_reconnect_default_ports(int sig)
+{
+	if(sig == SIGHUP)
+	{
+		oom_reconnect_ports_requested = true;
+	}
+}
+
 //---------------------------------------------------------
 //   OOMidiApplication
 //---------------------------------------------------------
@@ -170,6 +181,12 @@ public:
 			g_ladish_l1_save_requested = false;
 			printf("ladish L1 save request\n");
 			oom->save();
+		}
+		if(oom_reconnect_ports_requested)
+		{
+			oom_reconnect_ports_requested = false;
+			printf("OOMidi reconnect ports called from SIGHUP\n");
+			oom->connectDefaultSongPorts();
 		}
 	}
 
@@ -554,6 +571,9 @@ int main(int argc, char* argv[])
 
 	// ladish L1
 	signal(SIGUSR1, ladish_l1_save);
+	
+	// OOMidi ports reconnect
+	signal(SIGHUP, oom_reconnect_default_ports);
 
 	int rv = app.exec();
 	if (debugMsg)
