@@ -31,7 +31,7 @@ class RouteMapDock : public QFrame, public Ui::RouteMapBase
 		void btnLoadClicked(bool);
 		void saveRouteMap(QString, QString);
 		void updateRouteMap(QString, QString);
-		void renameRouteMap(QString, QString);
+		void renameRouteMap(QStandardItem*);
 	
 	private:
 		QList<int> getSelectedRows();

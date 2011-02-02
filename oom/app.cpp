@@ -1995,8 +1995,7 @@ bool OOMidi::saveRouteMapping(QString name, QString notes)
 
 	int level = 0;
 	xml.tag(level++, "orm version=\"2.0\"");
-	xml.nput(level++,"<notes text\"%s\"/>", notes.toLatin1().constData());
-	//xml.strTag(level, "notes", notes);
+	xml.put(level++,"<notes text=\"%s\" />", notes.toLatin1().constData());
 	//Write out the routing map to the xml here
 	for (ciTrack i = song->tracks()->begin(); i != song->tracks()->end(); ++i)
 	{
@@ -2131,9 +2130,6 @@ bool OOMidi::loadRouteMapping(QString name)
 
 	if (ex.isEmpty() || mex == "orm")
 	{
-		//
-		//  read *.orm file
-		//
 		bool popenFlag;
 		FILE* f = fileOpen(this, fi.filePath(), QString(".orm"), "r", popenFlag, true);
 		if (f == 0)
@@ -2146,10 +2142,6 @@ bool OOMidi::loadRouteMapping(QString name)
 		}
 		else
 		{
-            // Load the .orm file into a QDomDocument.
-            // the xml parser of QDomDocument then will be able to tell us
-            // if the .orm file didn't get corrupted in some way, cause the
-            // internal xml parser of oom can't do that.
             QDomDocument doc("OOMRouteMap");
             QFile file(fi.filePath());
 
