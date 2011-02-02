@@ -2119,6 +2119,8 @@ QString OOMidi::noteForRouteMapping(QString name)/*{{{*/
 
 bool OOMidi::loadRouteMapping(QString name)
 {
+	//Make sure we stop the song
+	song->setStop(true);
 	QFileInfo fi(name);/*{{{*/
 	if (!fi.isReadable())
 	{
@@ -2228,8 +2230,9 @@ bool OOMidi::loadRouteMapping(QString name)
 			}
 		}
 	}/*}}}*/
-	song->update(SC_ROUTE);
 	song->dirty = true;
+	//Restart all the audio connections
+	oom->seqRestart();
 	return true;
 }
 
