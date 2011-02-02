@@ -22,7 +22,7 @@
 #define DEDIT_SHRT       2  // Drumedit shortcut
 #define LEDIT_SHRT       4  // Listedit shortcut
 #define SCORE_SHRT       8  // Score shortcut
-#define ARRANG_SHRT     16  // Arrenger shortcut
+#define ARRANG_SHRT     16  // Arranger shortcut
 #define TRANSP_SHRT     32  // Transport shortcut
 #define WAVE_SHRT       64  // Waveedit shortcut
 #define GLOBAL_SHRT    128  // Global shortcuts
@@ -30,6 +30,7 @@
 #define MEDIT_SHRT     512  // Master editor
 #define ALL_SHRT      1023  // All shortcuts
 #define INVIS_SHRT    1024  // Shortcuts not shown in the config-dialog. Hard-coded. To avoid conflicts
+#define MIXER_SHRT    1025  // Shortcuts directly related to mixer.
 
 #define SHRT_NUM_OF_CATEGORIES   7 //Number of shortcut categories
 
@@ -101,7 +102,8 @@ enum
     SHRT_OPEN_GRAPHIC_MASTER, //Ctrl+M
     SHRT_OPEN_LIST_MASTER, //Ctrl+Shift+M
     SHRT_OPEN_MIDI_TRANSFORM, //Ctrl+T
-
+    SHRT_TOGGLE_RACK, //Default: N
+     
     SHRT_GLOBAL_CUT, //Default: undefined
     SHRT_GLOBAL_INSERT, //Default: undefined
     SHRT_GLOBAL_SPLIT, //Default: undefined
