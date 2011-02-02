@@ -61,6 +61,7 @@
 #include "tvieweditor.h"
 #include "traverso_shared/TConfig.h"
 #include "tviewdock.h"
+#include "rmap.h"
 
 //---------------------------------------------------------
 //   Arranger::setHeaderToolTips
@@ -973,9 +974,11 @@ void Arranger::genTrackInfo(QWidget*)
 	_tvdock = new TrackViewDock(this);
 	infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
+	_rmdock = new RouteMapDock(this);
 	_rtabs->addTab(_tvdock, tr("   Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
 	_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
+	_rtabs->addTab(_rmdock, tr("  Route Connector  "));
 
 	central = new QWidget(mixerScroll);
 	central->setObjectName("dockMixerCenter");

@@ -109,7 +109,7 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	_dl->setObjectName("ctrlLabelBox");
 	_dl->setFont(config.fonts[1]);
 	_dl->setBackgroundRole(QPalette::Mid);
-	_dl->setFrame(true);
+	_dl->setFrame(false);
 	_dl->setFixedWidth(36);
 	_dl->setFixedHeight(15);
 	_dl->setEnabled(false);

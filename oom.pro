@@ -167,6 +167,8 @@ HEADERS = \
 ./oom/widgets/dentry.h \
 ./oom/widgets/trackvieweditorbase.h \
 ./oom/widgets/tviewdockbase.h \
+./oom/widgets/routemapbase.h \
+./oom/widgets/rmapdialogbase.h \
 ./oom/event.h \
 ./oom/sync.h \
 ./oom/confmport.h \

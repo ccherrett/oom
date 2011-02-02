@@ -41,6 +41,7 @@ class AudioStrip;
 class Strip;
 class SpinBox;
 class TrackViewDock;
+class RouteMapDock;
 
 //---------------------------------------------------------
 //   Arranger
@@ -77,6 +78,7 @@ class Arranger : public QWidget
 	QTabWidget* _rtabs;
 	Strip* _lastStrip;
 	TrackViewDock* _tvdock;
+	RouteMapDock* _rmdock;
 	QWidget *central;
 	QVBoxLayout *mlayout;
     QList<Strip* > m_strips;

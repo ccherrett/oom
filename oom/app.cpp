@@ -13,6 +13,10 @@
 #include <QTimer>
 #include <QWhatsThis>
 #include <QDomDocument>
+#include <QDomElement>
+#include <QDomNodeList>
+#include <QDomNode>
+#include <QTextStream>
 #include <QDockWidget>
 
 #include "app.h"
@@ -1990,8 +1994,9 @@ bool OOMidi::saveRouteMapping(QString name, QString notes)
 	xml.header();
 
 	int level = 0;
-	xml.tag(level++, "oom version=\"2.0\"");
-	xml.strTag(level, "notes", notes);
+	xml.tag(level++, "orm version=\"2.0\"");
+	xml.nput(level++,"<notes text\"%s\"/>", notes.toLatin1().constData());
+	//xml.strTag(level, "notes", notes);
 	//Write out the routing map to the xml here
 	for (ciTrack i = song->tracks()->begin(); i != song->tracks()->end(); ++i)
 	{
@@ -2002,7 +2007,7 @@ bool OOMidi::saveRouteMapping(QString name, QString notes)
 	{
 		(*i)->writeRouting(level, xml);
 	}
-	xml.tag(level, "/oom");
+	xml.tag(level, "/orm");
 	if (ferror(f))
 	{
 		QString s = "Write File\n" + name + "\nfailed: " + QString(strerror(errno));
@@ -2020,8 +2025,217 @@ bool OOMidi::saveRouteMapping(QString name, QString notes)
 	return true;
 }
 
-bool OOMidi::loadRouteMapping(QString)
+bool OOMidi::updateRouteMapping(QString name, QString note)/*{{{*/
 {
+	QFileInfo fi(name);
+	QDomDocument doc("OOMRouteMap");/*{{{*/
+	QFile file(fi.filePath());
+	
+	if (!file.open(QIODevice::ReadOnly)) {
+	    printf("Could not open file %s read/write\n", file.fileName().toLatin1().data());
+		return false;
+	}
+	
+	QString errorMsg;
+	if (!doc.setContent(&file, &errorMsg)) {
+	    printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
+	
+	    if (QMessageBox::critical(this,
+	                          QString("OOMidi Load Routing Map"),
+	                          tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
+	                          .arg(file.fileName())
+	                          .arg(errorMsg),
+	                          "OK")) 
+		{
+	    	return false;
+	    }
+	}/*}}}*/
+	file.close();
+
+	if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+	    printf("Could not open file %s read/write\n", file.fileName().toLatin1().data());
+		return false;
+	}
+	QDomElement root = doc.documentElement();
+	QDomNode n = root.firstChild();
+	while(!n.isNull())
+	{
+		QDomElement e = n.toElement();
+		if( !e.isNull() && e.tagName() == "notes")
+		{
+			e.setAttribute("text", note);
+			//QDomText t = n.toText();
+			//t.setData(note);
+			QTextStream ts( &file );
+			ts << doc.toString();
+			break;
+		}
+		n = n.nextSibling();
+	}
+	file.close();
+	return true;
+}/*}}}*/
+
+QString OOMidi::noteForRouteMapping(QString name)/*{{{*/
+{
+	QString rv;
+	QFileInfo fi(name);
+	QDomDocument doc("OOMRouteMap");/*{{{*/
+	QFile file(fi.filePath());
+	
+	if (!file.open(QIODevice::ReadOnly)) {
+	    printf("Could not open file %s readonly\n", file.fileName().toLatin1().data());
+		return rv;
+	}
+	
+	QString errorMsg;
+	if (!doc.setContent(&file, &errorMsg)) {
+	    printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
+	
+	    if (QMessageBox::critical(this,
+	                          QString("OOMidi Load Routing Map"),
+	                          tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
+	                          .arg(file.fileName())
+	                          .arg(errorMsg),
+	                          "OK")) 
+		{
+	    	return rv;
+	    }
+	}/*}}}*/
+	QDomElement root = doc.documentElement();
+	QDomNode n = root.firstChild();
+	while(!n.isNull())
+	{
+		QDomElement e = n.toElement();
+		if( !e.isNull() && e.tagName() == "notes")
+		{
+			rv = e.attribute("text", "");//text();
+			break;
+		}
+		n = n.nextSibling();
+	}
+	file.close();
+	return rv;
+}/*}}}*/
+
+bool OOMidi::loadRouteMapping(QString name)
+{
+	QFileInfo fi(name);/*{{{*/
+	if (!fi.isReadable())
+	{
+		QMessageBox::critical(this, QString("OOMidi"), tr("Cannot read routing map"));
+		return false;
+	}
+	QString ex = fi.completeSuffix().toLower();
+	QString mex = ex.section('.', -1, -1);
+
+	if (ex.isEmpty() || mex == "orm")
+	{
+		//
+		//  read *.orm file
+		//
+		bool popenFlag;
+		FILE* f = fileOpen(this, fi.filePath(), QString(".orm"), "r", popenFlag, true);
+		if (f == 0)
+		{
+			if (errno != ENOENT)
+			{
+				QMessageBox::critical(this, QString("OOMidi"), tr("File open error: Could not open Route Map"));
+				return false;
+			}
+		}
+		else
+		{
+            // Load the .orm file into a QDomDocument.
+            // the xml parser of QDomDocument then will be able to tell us
+            // if the .orm file didn't get corrupted in some way, cause the
+            // internal xml parser of oom can't do that.
+            QDomDocument doc("OOMRouteMap");
+            QFile file(fi.filePath());
+
+            if (!file.open(QIODevice::ReadOnly)) {
+                printf("Could not open file %s readonly\n", file.fileName().toLatin1().data());
+				return false;
+            }
+
+            QString errorMsg;
+            if (!doc.setContent(&file, &errorMsg)) {
+                printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
+
+                if (QMessageBox::critical(this,
+                                      QString("OOMidi Load Routing Map"),
+                                      tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
+                                      .arg(file.fileName())
+                                      .arg(errorMsg),
+                                      "OK")) 
+				{
+                	return false;
+                }
+            }
+
+			Xml xml(f);
+
+			//Flush the routing list for all tracks
+			for (ciTrack i = song->tracks()->begin(); i != song->tracks()->end(); ++i)
+			{
+				(*i)->inRoutes()->clear();
+				(*i)->outRoutes()->clear();
+			}
+			//Flush the routing list for all midi devices
+			for (iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
+			{
+				(*imd)->inRoutes()->clear();
+				(*imd)->outRoutes()->clear();
+			}
+		
+			bool lld = true;
+			while (lld)/*{{{*/
+			{
+				Xml::Token token = xml.parse();
+				const QString& tag = xml.s1();
+				switch (token)
+				{
+					case Xml::Error:
+					case Xml::End:
+						lld = false;
+						break;
+					case Xml::TagStart:
+						if (tag == "orm")
+						{
+							//xml.skip(tag);
+							break;
+						}
+						else if (tag == "notes")
+						{
+							break;
+						}
+						else if (tag == "Route")
+						{
+							song->readRoute(xml);
+							audio->msgUpdateSoloStates();
+						}
+						else
+							xml.unknown("orm");
+						break;
+					case Xml::Attribut:
+						break;
+					case Xml::TagEnd:
+						if (tag == "orm")
+							lld = false;
+							break;
+					default:
+						break;
+				}
+			}/*}}}*/
+			bool fileError = ferror(f);
+			popenFlag ? pclose(f) : fclose(f);
+			if (fileError)
+			{
+				QMessageBox::critical(this, QString("OOMidi"), tr("File read error"));
+				return false;
+			}
+		}
+	}/*}}}*/
 	return true;
 }
 

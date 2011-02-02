@@ -387,6 +387,8 @@ public:
 	void addTransportToolbar();
 	bool saveRouteMapping(QString, QString note = "Untitled");
 	bool loadRouteMapping(QString);
+	bool updateRouteMapping(QString, QString);
+	QString noteForRouteMapping(QString);
     // Testing...
     //PopupView* getRoutingPopupView();
     //PopupView* prepareRoutingPopupView(Track* /*track*/, bool /*dst*/);
