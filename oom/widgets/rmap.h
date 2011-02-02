@@ -35,6 +35,7 @@ class RouteMapDock : public QFrame, public Ui::RouteMapBase
 		void saveRouteMap(QString, QString);
 		void updateRouteMap(QString, QString);
 		void renameRouteMap(QStandardItem*);
+		void songChanged(int);
 	
 	private:
 		QList<int> getSelectedRows();
