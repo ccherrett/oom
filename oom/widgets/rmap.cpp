@@ -56,7 +56,7 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	connect(btnLink, SIGNAL(clicked(bool)), SLOT(btnLinkClicked(bool)));
 	connect(btnClear, SIGNAL(clicked(bool)), SLOT(btnClearClicked(bool)));
 	connect(_listModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(renameRouteMap(QStandardItem*)));
-	//connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
+	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	populateTable(-1);
 }
 
@@ -181,6 +181,7 @@ void RouteMapDock::btnLinkClicked(bool)/*{{{*/
 		{
 			song->associatedRoute = path->text();
 			song->dirty = true;
+			songChanged(-1);
 		}
 	}
 }/*}}}*/
@@ -189,7 +190,22 @@ void RouteMapDock::btnClearClicked(bool)/*{{{*/
 {
 	song->associatedRoute = "";
 	song->dirty = true;
+	songChanged(-1);
 }/*}}}*/
+
+void RouteMapDock::songChanged(int)
+{
+	//Update the label with the current link
+	if(song->associatedRoute.isEmpty())
+	{
+		lblLinked->setText("[ Unlinked ]");
+	}
+	else
+	{
+		QFileInfo f(song->associatedRoute);
+		lblLinked->setText(f.baseName());
+	}
+}
 
 void RouteMapDock::saveRouteMap(QString _name, QString note)/*{{{*/
 {
