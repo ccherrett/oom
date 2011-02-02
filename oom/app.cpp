@@ -2244,6 +2244,10 @@ void OOMidi::connectDefaultSongPorts()
 	{
 		loadRouteMapping(song->associatedRoute);
 	}
+	else
+	{
+		printf("Current Song has no default route\n");
+	}
 }
 
 //---------------------------------------------------------
