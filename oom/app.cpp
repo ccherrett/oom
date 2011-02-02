@@ -2228,6 +2228,8 @@ bool OOMidi::loadRouteMapping(QString name)
 			}
 		}
 	}/*}}}*/
+	song->update(SC_ROUTE);
+	song->dirty = true;
 	return true;
 }
 
