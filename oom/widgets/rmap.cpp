@@ -52,6 +52,7 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	connect(btnLoad, SIGNAL(clicked(bool)), SLOT(btnLoadClicked(bool)));
 	connect(btnCopy, SIGNAL(clicked(bool)), SLOT(btnCopyClicked(bool)));
 	connect(btnLink, SIGNAL(clicked(bool)), SLOT(btnLinkClicked(bool)));
+	connect(btnClear, SIGNAL(clicked(bool)), SLOT(btnClearClicked(bool)));
 	connect(_listModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(renameRouteMap(QStandardItem*)));
 	//connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
 	populateTable(-1);
@@ -180,6 +181,12 @@ void RouteMapDock::btnLinkClicked(bool)/*{{{*/
 			song->dirty = true;
 		}
 	}
+}/*}}}*/
+
+void RouteMapDock::btnClearClicked(bool)/*{{{*/
+{
+	song->associatedRoute = "";
+	song->dirty = true;
 }/*}}}*/
 
 void RouteMapDock::saveRouteMap(QString _name, QString note)/*{{{*/
