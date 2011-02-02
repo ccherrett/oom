@@ -291,7 +291,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 	if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
 		key += Qt::CTRL;
         ///if (event->state() & Qt::MetaButton)
-         if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+        if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
                 key += Qt::META;
 	//
 	//  Shortcut for DrumEditor & PianoRoll
