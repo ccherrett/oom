@@ -18,6 +18,7 @@
 #include <QDomNode>
 #include <QTextStream>
 #include <QDockWidget>
+#include <QProgressDialog>
 
 #include "app.h"
 #include "master/lmaster.h"
@@ -2233,6 +2234,7 @@ bool OOMidi::loadRouteMapping(QString name)
 	song->dirty = true;
 	//Restart all the audio connections
 	oom->seqRestart();
+	song->update(SC_CONFIG);	
 	return true;
 }
 
