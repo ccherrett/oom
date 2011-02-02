@@ -49,9 +49,9 @@ void initShortCuts()
 
 	//-----------------------------------------------------------
 	// Arranger:
-	defShrt(SHRT_NEW, Qt::CTRL + Qt::Key_N, "File: New project", ARRANG_SHRT + DEDIT_SHRT, "new_project");
-	defShrt(SHRT_OPEN, Qt::CTRL + Qt::Key_O, "File: Open from disk", ARRANG_SHRT + DEDIT_SHRT, "open_project");
-	defShrt(SHRT_SAVE, Qt::CTRL + Qt::Key_S, "File: Save project", ARRANG_SHRT + DEDIT_SHRT, "save_project");
+	defShrt(SHRT_NEW, Qt::CTRL + Qt::Key_N, "File: New project", ARRANG_SHRT, "new_project");
+	defShrt(SHRT_OPEN, Qt::CTRL + Qt::Key_O, "File: Open from disk", ARRANG_SHRT, "open_project");
+	defShrt(SHRT_SAVE, Qt::CTRL + Qt::Key_S, "File: Save project", ARRANG_SHRT, "save_project");
 	//-----------------------------------------------------------
 
 	defShrt(SHRT_OPEN_RECENT, Qt::CTRL + Qt::Key_1, "File: Open recent file", ARRANG_SHRT, "open_recent");
