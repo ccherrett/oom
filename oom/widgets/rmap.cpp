@@ -46,7 +46,7 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	btnLink->setIcon(*midi_inputpluginsIcon);
 	btnLink->setIconSize(midi_inputpluginsIcon->size());
 	btnClear->setIcon(*editcutIconSet);
-	btnClear->setIconSize(editcutIconSet->size());
+	btnClear->setIconSize(midi_inputpluginsIcon->size());
 
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
 	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddClicked(bool)));
