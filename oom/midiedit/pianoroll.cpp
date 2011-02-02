@@ -1181,7 +1181,9 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	//if (event->state() & Qt::ControlButton)
 	if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
 		key += Qt::CTRL;
-
+        ///if (event->state() & Qt::MetaButton)
+         if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+                key += Qt::META;
 	if (key == Qt::Key_Escape)
 	{
 		close();
