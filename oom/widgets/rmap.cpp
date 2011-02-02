@@ -41,10 +41,13 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	btnEdit->setIconSize(midi_edit_instrumentIcon->size());
 	btnLoad->setIcon(*midi_reset_instrIcon);
 	btnLoad->setIconSize(midi_reset_instrIcon->size());
+	btnCopy->setIcon(*duplicatePCIcon);
+	btnCopy->setIconSize(duplicatePCIcon->size());
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
 	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddClicked(bool)));
 	connect(btnEdit, SIGNAL(clicked(bool)), SLOT(btnEditClicked(bool)));
 	connect(btnLoad, SIGNAL(clicked(bool)), SLOT(btnLoadClicked(bool)));
+	connect(btnCopy, SIGNAL(clicked(bool)), SLOT(btnCopyClicked(bool)));
 	connect(_listModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(renameRouteMap(QStandardItem*)));
 	//connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
 	populateTable(-1);
@@ -112,12 +115,35 @@ void RouteMapDock::btnEditClicked(bool)/*{{{*/
 	populateTable(-1);
 }/*}}}*/
 
-void RouteMapDock::saveRouteMap(QString _name, QString note)/*{{{*/
+void RouteMapDock::btnCopyClicked(bool)/*{{{*/
 {
-	if(_name.isEmpty())
-		return;
-	oom->saveRouteMapping(routePath + "/" + _name + ".orm", note);
-	populateTable(-1);
+	QList<int> rows = getSelectedRows();
+	if (!rows.isEmpty())
+	{
+		int id = rows.at(0);
+		QStandardItem* item = _listModel->item(id, 1);
+		if(item)
+		{
+			QString tname = item->text();
+			QString origname = routePath + "/" + tname + ".orm";
+			QString part = " - Copy";
+			QFileInfo f(origname);
+			if(f.exists() && f.isFile() && f.isWritable())
+			{
+				QFile file(f.filePath());
+				part += " ";
+				for(int i = 1; true; ++i)
+				{
+					QString n;
+					n.setNum(i);
+					QString s = part + n;
+					if(file.copy(routePath + "/" + tname + s + ".orm"))
+						break;
+				}
+				populateTable(-1);
+			}
+		}
+	}
 }/*}}}*/
 
 void RouteMapDock::btnLoadClicked(bool)/*{{{*/
@@ -134,6 +160,14 @@ void RouteMapDock::btnLoadClicked(bool)/*{{{*/
 			oom->loadRouteMapping(tname);
 		}
 	}
+	populateTable(-1);
+}/*}}}*/
+
+void RouteMapDock::saveRouteMap(QString _name, QString note)/*{{{*/
+{
+	if(_name.isEmpty())
+		return;
+	oom->saveRouteMapping(routePath + "/" + _name + ".orm", note);
 	populateTable(-1);
 }/*}}}*/
 

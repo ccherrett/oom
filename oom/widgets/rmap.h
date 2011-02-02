@@ -29,6 +29,7 @@ class RouteMapDock : public QFrame, public Ui::RouteMapBase
 		void btnAddClicked(bool);
 		void btnEditClicked(bool);
 		void btnLoadClicked(bool);
+		void btnCopyClicked(bool);
 		void saveRouteMap(QString, QString);
 		void updateRouteMap(QString, QString);
 		void renameRouteMap(QStandardItem*);
