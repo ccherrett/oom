@@ -2072,3 +2072,14 @@ void AudioStrip::resetPeaks()
 	sl->setStyleSheet(slDefaultStyle);
 }
 
+void AudioStrip::toggleShowEffectsRack()
+{
+	if (rack->isVisible())
+	{
+		rack->hide();
+	}
+	else
+	{
+		rack->show();
+	}
+}

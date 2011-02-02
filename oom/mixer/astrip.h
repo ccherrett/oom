@@ -103,6 +103,8 @@ public:
     ~AudioStrip();
     ///virtual QSize minimumSizeHint () const;
     //virtual QSize sizeHint () const;
+
+    void toggleShowEffectsRack();
 };
 
 #endif

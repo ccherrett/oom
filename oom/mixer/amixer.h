@@ -90,7 +90,10 @@ class AudioMixerApp : public QMainWindow
 
     Q_OBJECT
 
+protected:
+    void keyPressEvent(QKeyEvent *);
     virtual void closeEvent(QCloseEvent*);
+
     void addStrip(Track*, int);
     void showRouteDialog(bool);
 

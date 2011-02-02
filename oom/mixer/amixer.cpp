@@ -23,6 +23,7 @@
 #include "icons.h"
 #include "amixer.h"
 #include "song.h"
+#include "shortcuts.h"
 
 #include "astrip.h"
 #include "mstrip.h"
@@ -601,6 +602,48 @@ void AudioMixerApp::closeEvent(QCloseEvent* e)
 {
 	emit closed();
 	e->accept();
+}
+
+void AudioMixerApp::keyPressEvent(QKeyEvent *event)
+{
+	int key = event->key();
+
+	//if (event->state() & Qt::ShiftButton)
+	if (((QInputEvent*) event)->modifiers() & Qt::ShiftModifier)
+		key += Qt::SHIFT;
+	//if (event->state() & Qt::AltButton)
+	if (((QInputEvent*) event)->modifiers() & Qt::AltModifier)
+		key += Qt::ALT;
+	//if (event->state() & Qt::ControlButton)
+	if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
+		key += Qt::CTRL;
+	///if (event->state() & Qt::MetaButton)
+	 if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+		key += Qt::META;
+
+	 if (key == Qt::Key_Escape)
+	{
+		close();
+		return;
+	}
+
+	 else if (key == shortcuts[SHRT_TOGGLE_RACK].key)
+	 {
+		 StripList::iterator si = stripList.begin();
+		 for (; si != stripList.end(); ++si)
+		 {
+			 AudioStrip* audioStrip = qobject_cast<AudioStrip*>(*si);
+			 if (audioStrip)
+			 {
+				 audioStrip->toggleShowEffectsRack();
+			 }
+
+		 }
+
+		 return;
+	 }
+
+
 }
 
 //---------------------------------------------------------
