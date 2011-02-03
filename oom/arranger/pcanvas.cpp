@@ -1207,6 +1207,9 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		key += Qt::ALT;
 	if (event->modifiers() & Qt::ControlModifier)
 		key += Qt::CTRL;
+	if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+		key += Qt::META;
+
 
 	if (key == shortcuts[SHRT_DELETE].key)
 	{
