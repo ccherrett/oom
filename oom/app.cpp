@@ -19,6 +19,7 @@
 #include <QTextStream>
 #include <QDockWidget>
 #include <QProgressDialog>
+#include <QSizeGrip>
 
 #include "app.h"
 #include "master/lmaster.h"
@@ -1500,6 +1501,12 @@ void OOMidi::addTransportToolbar()
 	tools1->addWidget(spacer);
 	tools1->addActions(transportAction->actions());
 	tools1->addAction(panicAction);
+    QSizeGrip* corner = new QSizeGrip(tools1);
+	QWidget* spacer3 = new QWidget();
+	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer3->setMaximumWidth(5);
+	tools1->addWidget(spacer3);
+	tools1->addWidget(corner);
 	// toolBar is a pointer to an existing toolbar
 	//transportToolbar->addWidget(spacer);
 	//transportToolbar->addActions(transportAction->actions());
