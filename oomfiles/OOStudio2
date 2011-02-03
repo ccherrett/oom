@@ -1,0 +1,149 @@
+#!/bin/bash
+#Licensed under the GPL
+#Authors: Alex Stone and Christopher Cherrett
+#OOStudio-v2 2009/08/25
+#Modified 2011/02/03
+
+usage() {
+	echo -e "OOStudio Script for starting your Open Octave Studio\n"
+	echo -e "\t./OOStudio (optional -d to start up in debug mode)"
+}
+
+if [[ "$1" = "-h" ]]; then
+	usage
+	exit 0
+fi
+
+debug_output="false"
+
+function killprocesses()
+{
+	echo "killing processes ......"
+	
+	if [[ "$debug_output" == "false" ]]; then
+		killall jconv >/dev/null 2>&1
+		sleep 2
+		killall linuxsampler >/dev/null 2>&1
+		sleep 2
+		killall jackd >/dev/null 2>&1
+		sleep 2
+	else
+		killall jconv
+		sleep 2
+		killall linuxsampler
+		sleep 2
+		killall jackd
+		sleep 2
+	fi
+}
+
+while getopts ":d" opts
+do
+	case $opts in
+		d)
+		debug_output="true";
+		;;
+	esac
+done
+
+trap ctrl_c INT
+
+
+function ctrl_c()
+{
+	killprocesses
+	exit
+}
+function start_jack()
+{
+	echo "starting jackd..."
+	if [[ $debug_output -eq "false" ]]; then
+		/usr/bin/jackd -R -P89 -p2048 -t2000 -dalsa -dhw:0 -r44100 -p256 -n3 -P -D -Phw:0,0 -s -i12 >/dev/null 2>&1 &
+	else
+		/usr/bin/jackd -R -P89 -p2048 -t2000 -dalsa -dhw:0 -r44100 -p256 -n3 -P -D -Phw:0,0 -s -i12 &
+	fi
+	sleep 2
+}
+function start_linuxsampler()
+{
+	echo "starting linuxsampler..."
+	if [[ "$debug_output" == "false" ]]; then
+		/usr/local/bin/linuxsampler >/dev/null 2>&1 &
+	else
+		/usr/local/bin/linuxsampler &
+	fi
+	sleep 5
+	echo "sending lscp commands to linuxsampler..."
+	if [[ "$debug_output" == "false" ]]; then
+		cat /home/chris/Drive2/Studio_Setup_Files/mono_full_orchestra_ssd_perf/LS_Studio_Final.lscp | nc localhost 8888 >/dev/null 2>&1 &
+	else
+		cat /home/chris/Drive2/Studio_Setup_Files/mono_full_orchestra_ssd_perf/LS_Studio_Final.lscp | nc localhost 8888 &
+	fi
+	sleep 30
+}
+function start_oomidi()
+{	
+	oomidi_running=`ps ax | grep "[o]midi"`
+	if [[ -z $oomidi_running ]]; then
+		echo "starting oomidi..."
+		if [[ "$debug_output" == "false" ]]; then
+			oomidi >/dev/null 2>&1 &
+		else
+			oomidi &
+		fi
+		sleep 8
+	fi
+}
+function start_jconv()
+{
+	echo "starting jconv..."
+	if [[ "$debug_output" == "false" ]]; then
+		/usr/bin/jconv /home/chris/Drive2/Studio_Setup_Files/JCONV/ambconster.conf >/dev/null 2>&1 &
+	else
+		/usr/bin/jconv /home/chris/Drive2/Studio_Setup_Files/JCONV/ambconster.conf &
+	fi
+	sleep 2
+}
+
+function startup()
+{
+	killprocesses
+	return
+}
+
+startup
+
+echo "Starting Open Octave Studio ......"
+
+start_jack
+start_linuxsampler
+start_jconv
+start_oomidi
+
+echo "To stop the Open Octave Studio press CTRL + C"
+
+for (( ; ; ))
+do
+	sleep 10
+	jack_running=`ps ax | grep "[j]ackd"`
+	ls_running=`ps ax | grep "[l]inuxsampler"`
+	jc_running=`ps ax | grep "[j]conv"`
+
+	if [[ -z $jack_running ]]; then
+		killprocesses
+		start_jack
+		start_linuxsampler	
+		start_jconv
+		killall -HUP oomidi
+	elif [[ -z $ls_running ]]; then
+		start_linuxsampler	
+		start_jconv
+		killall -HUP oomidi
+	elif [[ -z $jc_running ]]; then
+		start_jconv
+		killall -HUP oomidi
+	fi
+
+done
+
+
