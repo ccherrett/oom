@@ -1,0 +1,95 @@
+##This patch was submitted by Nedko of the ladish project
+diff --git a/oom/app.h b/oom/app.h
+index 32ae2d1..6375f8c 100644
+--- a/oom/app.h
++++ b/oom/app.h
+@@ -236,7 +236,6 @@ signals:
+ private slots:
+     //void runPythonScript();
+     void loadProject();
+-    bool save();
+     void configGlobalSettings();
+     void quitDoc();
+     void about();
+@@ -331,6 +330,7 @@ private slots:
+     void execUserScript(int);
+ 
+ public slots:
++    bool save();
+     bool saveAs();
+     void bounceToFile(AudioOutput* ao = 0);
+     void closeEvent(QCloseEvent*e);
+diff --git a/oom/main.cpp b/oom/main.cpp
+index 5656c61..ce83772 100644
+--- a/oom/main.cpp
++++ b/oom/main.cpp
+@@ -15,6 +15,7 @@
+ #include <QTimer>
+ #include <QTranslator>
+ 
++#include <signal.h>
+ #include <sys/mman.h>
+ #include <alsa/asoundlib.h>
+ 
+@@ -85,6 +86,16 @@ static void printVersion(const char* prog)
+ 	fprintf(stderr, "%s: OpenOctave Midi and Audio Editor; Version %s, (svn revision %s)\n", prog, VERSION, SVNVERSION);
+ }
+ 
++bool g_ladish_l1_save_requested = false;
++
++static void ladish_l1_save(int sig)
++{
++	if (sig == SIGUSR1)
++	{
++		g_ladish_l1_save_requested = true;
++	}
++}
++
+ //---------------------------------------------------------
+ //   OOMidiApplication
+ //---------------------------------------------------------
+@@ -104,10 +115,7 @@ public:
+ 	void setOOMidi(OOMidi* m)
+ 	{
+ 		oom = m;
+-#ifdef HAVE_LASH
+-		if (useLASH)
+-			startTimer(300);
+-#endif
++		startTimer(300);
+ 	}
+ 
+ 	bool notify(QObject* receiver, QEvent* event)
+@@ -151,14 +159,19 @@ public:
+ 		return flag;
+ 	}
+ 
+-#ifdef HAVE_LASH
+-
+ 	virtual void timerEvent(QTimerEvent * /* e */)
+ 	{
++#ifdef HAVE_LASH
+ 		if (useLASH)
+ 			oom->lash_idle_cb();
+-	}
+ #endif /* HAVE_LASH */
++		if (g_ladish_l1_save_requested)
++		{
++			g_ladish_l1_save_requested = false;
++			printf("ladish L1 save request\n");
++			oom->save();
++		}
++	}
+ 
+ };
+ 
+@@ -534,6 +547,9 @@ int main(int argc, char* argv[])
+ #endif /* HAVE_LASH */
+ 	//QTimer::singleShot(100, oom, SLOT(showDidYouKnowDialog()));
+ 
++	// ladish L1
++	signal(SIGUSR1, ladish_l1_save);
++
+ 	int rv = app.exec();
+ 	if (debugMsg)
+ 		printf("app.exec() returned:%d\nDeleting main OOMidi object\n", rv);
