@@ -51,6 +51,7 @@ class ListEdit : public MidiEditor
     virtual void closeEvent(QCloseEvent*);
     virtual void keyPressEvent(QKeyEvent*);
     void initShortcuts();
+    unsigned getSelectedTick();
     QAction *insertNote, *insertSysEx, *insertCtrl, *insertMeta, *insertCAfter, *insertPAfter;
 
 private slots:

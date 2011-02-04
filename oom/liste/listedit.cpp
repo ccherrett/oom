@@ -597,6 +597,22 @@ ListEdit::~ListEdit()
         tconfig().set_property("ListEdit", "widgetheigth", height());
 }
 
+
+unsigned ListEdit::getSelectedTick()
+{
+	Q_ASSERT(curPart);
+
+	EventListItem* ev = 0;
+
+	QList<QTreeWidgetItem*> items = liste->selectedItems();
+	if (items.size()) {
+		ev = (EventListItem*) items.first();
+
+	}
+
+	return ev ? ev->event.tick() : curPart->tick();
+}
+
 //---------------------------------------------------------
 //   editInsertNote
 //---------------------------------------------------------
@@ -607,7 +623,8 @@ void ListEdit::editInsertNote()
 	if (!curPart)
 		return;
 
-	Event event = EditNoteDialog::getEvent(curPart->tick(), Event(), this);
+
+	Event event = EditNoteDialog::getEvent(getSelectedTick(), Event(), this);
 	if (!event.empty())
 	{
 		//No events before beginning of part + take Part offset into consideration
@@ -633,7 +650,7 @@ void ListEdit::editInsertSysEx()
 	if (!curPart)
 		return;
 
-	Event event = EditSysexDialog::getEvent(curPart->tick(), Event(), this);
+	Event event = EditSysexDialog::getEvent(getSelectedTick(), Event(), this);
 	if (!event.empty())
 	{
 		//No events before beginning of part + take Part offset into consideration
@@ -659,7 +676,7 @@ void ListEdit::editInsertCtrl()
 	if (!curPart)
 		return;
 
-	Event event = EditCtrlDialog::getEvent(curPart->tick(), Event(), curPart, this);
+	Event event = EditCtrlDialog::getEvent(getSelectedTick(), Event(), curPart, this);
 	if (!event.empty())
 	{
 		//No events before beginning of part + take Part offset into consideration
@@ -685,7 +702,7 @@ void ListEdit::editInsertMeta()
 	if (!curPart)
 		return;
 
-	Event event = EditMetaDialog::getEvent(curPart->tick(), Event(), this);
+	Event event = EditMetaDialog::getEvent(getSelectedTick(), Event(), this);
 	if (!event.empty())
 	{
 		//No events before beginning of part + take Part offset into consideration
@@ -711,7 +728,7 @@ void ListEdit::editInsertCAfter()
 	if (!curPart)
 		return;
 
-	Event event = EditCAfterDialog::getEvent(curPart->tick(), Event(), this);
+	Event event = EditCAfterDialog::getEvent(getSelectedTick(), Event(), this);
 	if (!event.empty())
 	{
 		//No events before beginning of part + take Part offset into consideration
@@ -738,7 +755,7 @@ void ListEdit::editInsertPAfter()
 		return;
 
 	Event ev;
-	Event event = EditPAfterDialog::getEvent(curPart->tick(), ev, this);
+	Event event = EditPAfterDialog::getEvent(getSelectedTick(), ev, this);
 	if (!event.empty())
 	{
 		//No events before beginning of part + take Part offset into consideration
