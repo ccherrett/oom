@@ -1398,7 +1398,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
                                 continue;
 
                         int velo = event.velo();
-                        velo += 1;
+			velo += 5;
 
                         if (velo <= 0)
                                 velo = 1;
@@ -1430,7 +1430,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
                                 continue;
 
                         int velo = event.velo();
-                        velo -= 1;
+			velo -= 5;
 
                         if (velo <= 0)
                                 velo = 1;
