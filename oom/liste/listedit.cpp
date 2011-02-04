@@ -610,7 +610,7 @@ unsigned ListEdit::getSelectedTick()
 
 	}
 
-	return ev ? ev->event.tick() : curPart->tick();
+	return ev ? (ev->event.tick() + curPart->tick()) : curPart->tick();
 }
 
 //---------------------------------------------------------
