@@ -179,6 +179,13 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 	showAuxTracksId = new QAction(tr("Show Auxs"), actionItems);
 	showSyntiTracksId = new QAction(tr("Show Synthesizers"), actionItems);
 
+	separator = new QAction(this);
+	separator->setSeparator(true);
+	actionItems->addAction(separator);
+
+	toggleShowEffectsRackAction = new QAction(tr("Show/hide Effects Rack"), actionItems);
+	toggleShowEffectsRackAction->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
+
 	showMidiTracksId->setCheckable(true);
 	showDrumTracksId->setCheckable(true);
 	showWaveTracksId->setCheckable(true);
@@ -198,6 +205,7 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 	connect(showGroupTracksId, SIGNAL(triggered(bool)), SLOT(showGroupTracksChanged(bool)));
 	connect(showAuxTracksId, SIGNAL(triggered(bool)), SLOT(showAuxTracksChanged(bool)));
 	connect(showSyntiTracksId, SIGNAL(triggered(bool)), SLOT(showSyntiTracksChanged(bool)));
+	connect(toggleShowEffectsRackAction, SIGNAL(triggered()), SLOT(toggleShowEffectsRack()));
 
 	menuView->addActions(actionItems->actions());
 
@@ -604,46 +612,18 @@ void AudioMixerApp::closeEvent(QCloseEvent* e)
 	e->accept();
 }
 
-void AudioMixerApp::keyPressEvent(QKeyEvent *event)
+void AudioMixerApp::toggleShowEffectsRack()
 {
-	int key = event->key();
-
-	//if (event->state() & Qt::ShiftButton)
-	if (((QInputEvent*) event)->modifiers() & Qt::ShiftModifier)
-		key += Qt::SHIFT;
-	//if (event->state() & Qt::AltButton)
-	if (((QInputEvent*) event)->modifiers() & Qt::AltModifier)
-		key += Qt::ALT;
-	//if (event->state() & Qt::ControlButton)
-	if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
-		key += Qt::CTRL;
-	///if (event->state() & Qt::MetaButton)
-	 if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
-		key += Qt::META;
-
-	 if (key == Qt::Key_Escape)
+	StripList::iterator si = stripList.begin();
+	for (; si != stripList.end(); ++si)
 	{
-		close();
-		return;
+		AudioStrip* audioStrip = qobject_cast<AudioStrip*>(*si);
+		if (audioStrip)
+		{
+			audioStrip->toggleShowEffectsRack();
+		}
+
 	}
-
-	 else if (key == shortcuts[SHRT_TOGGLE_RACK].key)
-	 {
-		 StripList::iterator si = stripList.begin();
-		 for (; si != stripList.end(); ++si)
-		 {
-			 AudioStrip* audioStrip = qobject_cast<AudioStrip*>(*si);
-			 if (audioStrip)
-			 {
-				 audioStrip->toggleShowEffectsRack();
-			 }
-
-		 }
-
-		 return;
-	 }
-
-
 }
 
 //---------------------------------------------------------

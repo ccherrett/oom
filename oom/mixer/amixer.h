@@ -87,11 +87,11 @@ class AudioMixerApp : public QMainWindow
     QAction* showGroupTracksId;
     QAction* showAuxTracksId;
     QAction* showSyntiTracksId;
+    QAction* toggleShowEffectsRackAction;
 
     Q_OBJECT
 
 protected:
-    void keyPressEvent(QKeyEvent *);
     virtual void closeEvent(QCloseEvent*);
 
     void addStrip(Track*, int);
@@ -123,6 +123,7 @@ private slots:
     void showGroupTracksChanged(bool);
     void showAuxTracksChanged(bool);
     void showSyntiTracksChanged(bool);
+    void toggleShowEffectsRack();
 
     //protected:
     //   virtual bool event(QEvent* event);
