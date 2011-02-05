@@ -200,6 +200,7 @@ void ListEdit::songChanged(int type)
 		{
 			bool update = false;
 			QTreeWidgetItem* ci = 0;
+			liste->blockSignals(true);
 			for (int row = 0; row < liste->topLevelItemCount(); ++row)
 			{
 				QTreeWidgetItem* i = liste->topLevelItem(row);
@@ -217,6 +218,7 @@ void ListEdit::songChanged(int type)
 					liste->setCurrentItem(ci);
 				//liste->update();
 			}
+			liste->blockSignals(false);
 		}
 		else
 		{
@@ -493,6 +495,13 @@ ListEdit::ListEdit(PartList* pl)
 	menuEdit->addSeparator();
 
 	menuEdit->addActions(insertItems->actions());
+
+	menuEdit->addSeparator();
+
+	_editEventValueAction = menuEdit->addAction(tr("Edit Value"));
+	editSignalMapper->setMapping(_editEventValueAction, CMD_EDIT_VALUE);
+
+	connect(_editEventValueAction, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
 
 	connect(editSignalMapper, SIGNAL(mapped(int)), SLOT(cmd(int)));
 
@@ -905,6 +914,7 @@ void ListEdit::cmd(int cmd)
 	switch (cmd)
 	{
 		case CMD_DELETE:
+		{
 			bool found = false;
 			for (int row = 0; row < liste->topLevelItemCount(); ++row)
 			{
@@ -961,6 +971,14 @@ void ListEdit::cmd(int cmd)
 			//printf("selected tick = %d\n", selectedTick);
 			//emit selectionChanged();
 			break;
+		}
+		case CMD_EDIT_VALUE:
+			QList<QTreeWidgetItem*> items = liste->selectedItems();
+			if (items.size()) {
+				doubleClicked(items.first());
+
+			}
+			break;
 	}
 }
 
@@ -985,6 +1003,7 @@ void ListEdit::initShortcuts()
 	insertMeta->setShortcut(shortcuts[SHRT_LE_INS_META].key);
 	insertCAfter->setShortcut(shortcuts[SHRT_LE_INS_CHAN_AFTERTOUCH].key);
 	insertPAfter->setShortcut(shortcuts[SHRT_LE_INS_POLY_AFTERTOUCH].key);
+	_editEventValueAction->setShortcut(shortcuts[SHRT_GLOBAL_EDIT_EVENT_VALUE].key);
 }
 
 //---------------------------------------------------------

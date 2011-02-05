@@ -81,20 +81,20 @@ LMaster::LMaster()
 	tempoAction = menuEdit->addAction(tr("Insert Tempo"));
 	signAction = menuEdit->addAction(tr("Insert Signature"));
 	posAction = menuEdit->addAction(tr("Edit Positon"));
-	valAction = menuEdit->addAction(tr("Edit Value"));
+	_editEventValueAction = menuEdit->addAction(tr("Edit Value"));
 	delAction = menuEdit->addAction(tr("Delete Event"));
 	delAction->setShortcut(Qt::Key_Delete);
 
 	connect(tempoAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
 	connect(signAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
 	connect(posAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
-	connect(valAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
+	connect(_editEventValueAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
 	connect(delAction, SIGNAL(triggered()), signalMapper, SLOT(map()));
 
 	signalMapper->setMapping(tempoAction, CMD_INSERT_TEMPO);
 	signalMapper->setMapping(signAction, CMD_INSERT_SIG);
 	signalMapper->setMapping(posAction, CMD_EDIT_BEAT);
-	signalMapper->setMapping(valAction, CMD_EDIT_VALUE);
+	signalMapper->setMapping(_editEventValueAction, CMD_EDIT_VALUE);
 	signalMapper->setMapping(delAction, CMD_DELETE);
 
 	connect(signalMapper, SIGNAL(mapped(int)), SLOT(cmd(int)));
@@ -787,5 +787,5 @@ void LMaster::initShortcuts()
 	tempoAction->setShortcut(shortcuts[SHRT_LM_INS_TEMPO].key);
 	signAction->setShortcut(shortcuts[SHRT_LM_INS_SIG].key);
 	posAction->setShortcut(shortcuts[SHRT_LM_EDIT_BEAT].key);
-	valAction->setShortcut(shortcuts[SHRT_LM_EDIT_VALUE].key);
+	_editEventValueAction->setShortcut(shortcuts[SHRT_GLOBAL_EDIT_EVENT_VALUE].key);
 }

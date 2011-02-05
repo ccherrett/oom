@@ -165,7 +165,7 @@ class LMaster : public MidiEditor
     int editorColumn;
     bool editingNewItem;
 
-    QAction *tempoAction, *signAction, *posAction, *valAction, *delAction;
+    QAction *tempoAction, *signAction, *posAction, *_editEventValueAction, *delAction;
 
 private slots:
     void select(QTreeWidgetItem*, QTreeWidgetItem*);

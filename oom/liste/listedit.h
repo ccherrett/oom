@@ -36,6 +36,7 @@ class ListEdit : public MidiEditor
     QTreeWidget* liste;
     QMenu* menuEdit;
     QActionGroup* insertItems;
+    QAction *_editEventValueAction;
     QToolBar* listTools;
     MidiTrack* curTrack;
     MidiPart* curPart;
@@ -44,7 +45,7 @@ class ListEdit : public MidiEditor
 
     enum
     {
-        CMD_DELETE
+	CMD_DELETE, CMD_EDIT_VALUE
     };
 
     Q_OBJECT
