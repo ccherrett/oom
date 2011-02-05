@@ -58,6 +58,12 @@ namespace Awl {
 		if (event->type() == QEvent::KeyPress)
 		{
 			QKeyEvent* ke = static_cast<QKeyEvent*> (event);
+			if (ke->key() == Qt::Key_Return)
+			{
+				emit returnPressed();
+				return true;
+			}
+
 			int segment = curSegment();
 			if (ke->key() == Qt::Key_Backtab)
 			{

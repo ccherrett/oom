@@ -189,6 +189,11 @@ public:
     virtual void readStatus(Xml&);
     virtual void writeStatus(int, Xml&) const;
     LMasterLViewItem* getLastOfType(LMASTER_LVTYPE t);
+
+
+protected:
+    virtual void keyPressEvent(QKeyEvent*);
+
 };
 
 

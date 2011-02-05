@@ -789,3 +789,17 @@ void LMaster::initShortcuts()
 	posAction->setShortcut(shortcuts[SHRT_LM_EDIT_BEAT].key);
 	_editEventValueAction->setShortcut(shortcuts[SHRT_GLOBAL_EDIT_EVENT_VALUE].key);
 }
+
+//---------------------------------------------------------
+//   viewKeyPressEvent
+//---------------------------------------------------------
+
+void LMaster::keyPressEvent(QKeyEvent* event)
+{
+	int key = event->key();
+	if (key == Qt::Key_Escape)
+	{
+		close();
+		return;
+	}
+}
