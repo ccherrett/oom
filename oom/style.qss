@@ -709,6 +709,7 @@ QObject#listController::item:selected:active, QObject#listController::item:selec
 QObject#viewController::item:selected:active, QObject#viewController::item:selected,
 QObject#sysexList::item:selected:active, QObject#sysexList::item:selected,
 QObject#sysexData::item:selected:active, QObject#sysexDate::item:selected,
+QObject#ctrlList::item:selected:active, QObject#ctrlList::item:selected,
 QTreeWidget::item:selected:active, QTreeWidget::item:selected
 {
 	 border-radius: 3px;
@@ -726,6 +727,7 @@ QObject#listController,
 QObject#viewController,
 QObject#sysexList,
 QObject#sysexDate,
+QObject#ctrlList,
 QTreeWidget,
 QObject#patchView{
 	 border-radius: 6px;
