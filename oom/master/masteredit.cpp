@@ -423,3 +423,16 @@ void MasterEdit::setTempo(int val)
 	}
 }
 
+//---------------------------------------------------------
+//   viewKeyPressEvent
+//---------------------------------------------------------
+
+void MasterEdit::keyPressEvent(QKeyEvent* event)
+{
+	int key = event->key();
+	if (key == Qt::Key_Escape)
+	{
+		close();
+		return;
+	}
+}
