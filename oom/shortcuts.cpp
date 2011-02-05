@@ -280,10 +280,6 @@ void initShortCuts()
 	defShrt(SHRT_LM_INS_TEMPO, Qt::ALT + Qt::Key_T, "Insert Tempo", LMEDIT_SHRT, "lm_ins_tempo");
 	defShrt(SHRT_LM_INS_SIG, Qt::ALT + Qt::Key_R, "Insert Signature", LMEDIT_SHRT, "lm_ins_sig");
 	defShrt(SHRT_LM_EDIT_BEAT, Qt::ALT + Qt::SHIFT + Qt::Key_E, "Change Event Position", LMEDIT_SHRT, "lm_edit_beat");
-<<<<<<< HEAD
-=======
-	defShrt(SHRT_LM_EDIT_VALUE, Qt::SHIFT + Qt::Key_E, "Edit Event Value", LMEDIT_SHRT, "lm_edit_val");
->>>>>>> f6be75895c7a4b307c1b1e5226a8e0467b0bbcda
 
 	defShrt(SHRT_NEXT_MARKER, Qt::Key_F6, "Goto Next Marker", ARRANG_SHRT, "me_sel_next");
 	defShrt(SHRT_PREV_MARKER, Qt::Key_F5, "Goto Prev Marker", ARRANG_SHRT, "me_sel_prev");
