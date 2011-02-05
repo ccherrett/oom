@@ -137,7 +137,7 @@ void initShortCuts()
 	defShrt(SHRT_SEL_BELOW_ADD, Qt::SHIFT + Qt::Key_Down, "Edit: Add nearest part on track below", ARRANG_SHRT, "sel_part_below_add");
 
 	defShrt(SHRT_INSERT, Qt::CTRL + Qt::SHIFT + Qt::Key_I, "Edit: Insert parts, moving time", ARRANG_SHRT, "insert_parts");
-	defShrt(SHRT_INSERTMEAS, Qt::CTRL + Qt::SHIFT + Qt::Key_M, "Edit: Insert empty measure", ARRANG_SHRT, "insert_measure");
+	defShrt(SHRT_INSERTMEAS, Qt::CTRL + Qt::SHIFT + Qt::Key_E, "Edit: Insert empty measure", ARRANG_SHRT, "insert_measure");
 
 	defShrt(SHRT_PASTE_CLONE, Qt::CTRL + Qt::SHIFT + Qt::Key_V, "Edit: Paste clone", ARRANG_SHRT, "paste_clone");
 	defShrt(SHRT_PASTE_TO_TRACK, Qt::CTRL + Qt::Key_B, "Edit: Paste to track", ARRANG_SHRT, "paste_to_track");
@@ -187,7 +187,7 @@ void initShortCuts()
 	//Pianoroll:
 	//-----------------------------------------------------------
 
-	defShrt(SHRT_OVER_QUANTIZE, Qt::SHIFT + Qt::Key_E, "Quantize: Over Quantize", PROLL_SHRT, "midi_over_quant");
+	defShrt(SHRT_OVER_QUANTIZE, 0, "Quantize: Over Quantize", PROLL_SHRT, "midi_over_quant");
 	defShrt(SHRT_ON_QUANTIZE, Qt::SHIFT + Qt::Key_R, "Quantize: Note On Quantize", PROLL_SHRT, "midi_quant_noteon");
 	defShrt(SHRT_ONOFF_QUANTIZE, Qt::SHIFT + Qt::Key_T, "Quantize: Note On/Off Quantize", PROLL_SHRT, "midi_quant_noteoff");
 	defShrt(SHRT_ITERATIVE_QUANTIZE, 0, "Quantize: Iterative Quantize", PROLL_SHRT, "midi_quant_iterative");
@@ -279,7 +279,7 @@ void initShortCuts()
 	defShrt(SHRT_LM_INS_TEMPO, Qt::ALT + Qt::Key_T, "Insert Tempo", LMEDIT_SHRT, "lm_ins_tempo");
 	defShrt(SHRT_LM_INS_SIG, Qt::ALT + Qt::Key_R, "Insert Signature", LMEDIT_SHRT, "lm_ins_sig");
 	defShrt(SHRT_LM_EDIT_BEAT, Qt::ALT + Qt::SHIFT + Qt::Key_E, "Change Event Position", LMEDIT_SHRT, "lm_edit_beat");
-	defShrt(SHRT_LM_EDIT_VALUE, Qt::ALT + Qt::Key_E, "Edit Event Value", LMEDIT_SHRT, "lm_edit_val");
+	defShrt(SHRT_LM_EDIT_VALUE, Qt::SHIFT + Qt::Key_E, "Edit Event Value", LMEDIT_SHRT, "lm_edit_val");
 
 	defShrt(SHRT_NEXT_MARKER, Qt::Key_F6, "Goto Next Marker", ARRANG_SHRT, "me_sel_next");
 	defShrt(SHRT_PREV_MARKER, Qt::Key_F5, "Goto Prev Marker", ARRANG_SHRT, "me_sel_prev");
