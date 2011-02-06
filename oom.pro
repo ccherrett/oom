@@ -226,6 +226,8 @@ HEADERS = \
 ./oom/midieditor.h \
 ./oom/midiport.h \
 ./oom/device.h \
+./oom/cthread.h \
+./oom/cserver.h \
 ./plugins/freeverb/denormals.h \
 ./plugins/freeverb/comb.h \
 ./plugins/freeverb/tuning.h \
@@ -602,6 +604,8 @@ SOURCES =  \
 ./oom/ctrl.cpp \
 ./oom/shortcuts.cpp \
 ./oom/sync.cpp \
+./oom/cthread.cpp \
+./oom/cserver.cpp \
 ./plugins/freeverb/freeverb.cpp \
 ./plugins/freeverb/revmodel.cpp \
 ./plugins/doublechorus/simplechorusmodel.cpp \
@@ -698,7 +702,7 @@ FORMS3 = \
 ./synti/simpledrums/sspluginchooserbase.ui \
 ./synti/fluidsynth/fluidsynthguibase.ui
 #The following line was inserted by qt3to4
-QT += xml  qt3support 
+QT += xml  qt3support network
 #The following line was inserted by qt3to4
 CONFIG += uic3
 

@@ -547,6 +547,8 @@ int main(int argc, char* argv[])
 
 	oom->show();
 	oom->seqStart();
+	//Finally launch the server on port 8415
+	oom->startServer();
 
 #ifdef HAVE_LASH
 	{

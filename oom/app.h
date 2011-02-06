@@ -12,6 +12,7 @@
 #include "config.h"
 #include "cobject.h"
 #include "tools.h"
+#include "cserver.h"
 
 #include <QFileInfo>
 
@@ -68,6 +69,7 @@ class RouteDialog;
 class QDocWidget;
 
 #define MENU_ADD_SYNTH_ID_BASE 0x1000
+#define OOCMD_PORT 8415
 
 //---------------------------------------------------------
 //   OOMidi
@@ -229,6 +231,7 @@ class OOMidi : public QMainWindow
     QSignalMapper *editSignalMapper;
     QSignalMapper *midiPluginSignalMapper;
     QSignalMapper *followSignalMapper;
+	OOMCommandServer server;
 
 signals:
     void configChanged();
@@ -352,6 +355,8 @@ public slots:
 
     void routingPopupMenuAboutToHide();
     void configMidiPorts();
+	bool startServer();
+	void stopServer();
 
 public:
     OOMidi(int argc, char** argv);

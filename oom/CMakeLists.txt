@@ -65,6 +65,8 @@ QT4_WRAP_CPP ( oom_moc_headers
       transpose.h 
       value.h 
       traverso_shared/TConfig.h
+	  cthread.h
+	  cserver.h
       )
 
 ##
@@ -136,6 +138,8 @@ file (GLOB core_source_files
       wavetrack.cpp 
       xml.cpp
       traverso_shared/TConfig.cpp
+	  cthread.cpp
+	  cserver.cpp
       )
 file (GLOB main_source_files
       main.cpp
@@ -236,6 +240,7 @@ target_link_libraries(core
       widgets 
       
       ${QT_LIBRARIES}
+	  ${QT_QTNETWORK_LIBRARY}
       ${SNDFILE_LIBRARIES}
       ${SAMPLERATE_LIBRARIES}
       ${UUID_LIBRARIES}
@@ -259,6 +264,7 @@ target_link_libraries(oom
 
 target_link_libraries(icons
       ${QT_LIBRARIES}
+	  ${QT_QTNETWORK_LIBRARY}
       )	
 
 ##

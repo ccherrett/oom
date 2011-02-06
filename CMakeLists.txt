@@ -145,6 +145,9 @@ endif (NOT QT4_FOUND)
 # Needed for plugins factory:
 SET(QT_USE_QTUITOOLS TRUE)
 
+# Needed for the server to work
+SET (QT_USE_QTNETWORK TRUE)
+
 include(${QT_USE_FILE})
 
 

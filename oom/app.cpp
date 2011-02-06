@@ -352,6 +352,28 @@ bool OOMidi::seqRestart()
 	return true;
 }
 
+bool OOMidi::startServer()
+{
+	if(!server.listen(QHostAddress::Any, OOCMD_PORT))
+	{
+		printf("OOMidi CMS Error: %s\n",server.errorString().toLatin1().constData());
+		return false;
+	}
+	else
+	{
+		printf("OOMidi Command Server Listening on port: %d\n", OOCMD_PORT);
+		return true;
+	}
+}
+
+void OOMidi::stopServer()
+{
+	if(server.isListening())
+	{
+		server.close();
+	}
+}
+
 //---------------------------------------------------------
 //   addProject
 //---------------------------------------------------------

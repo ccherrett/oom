@@ -163,6 +163,8 @@ HEADERS = \
       ./memory.h        \
       ./helper.h        \
       ./trackview.h        \
+      ./cthread.h        \
+      ./cserver.h        \
       ./plugin.h
 
 SOURCES =  \
@@ -325,6 +327,8 @@ SOURCES =  \
       ./importmidi.cpp        \
       ./thread.cpp            \
       ./help.cpp        \
+	  ./cthread.cpp		\
+	  ./cserver.cpp		\
       ./tempo.cpp
 
 FORMS = \
