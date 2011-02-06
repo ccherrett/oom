@@ -152,7 +152,7 @@ do
 		start_jconv
 		echo "reload_routes"|nc localhost 8415
 		echo "pipeline_started"|nc localhost 8415
-	elif [[ -z $jc_running ]]; then
+	elif [[ -z $oomidi_running ]]; then
 		start_oomidi
 	fi
 
