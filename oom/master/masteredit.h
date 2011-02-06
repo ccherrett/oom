@@ -82,6 +82,9 @@ public:
     virtual void writeStatus(int, Xml&) const;
     static void readConfiguration(Xml&);
     static void writeConfiguration(int, Xml&);
+
+protected:
+    virtual void keyPressEvent(QKeyEvent*);
 };
 
 #endif

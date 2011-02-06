@@ -331,7 +331,7 @@ enum
     SHRT_LM_INS_TEMPO, // Ctrl+T
     SHRT_LM_INS_SIG, // Ctrl+R
     SHRT_LM_EDIT_BEAT, // Ctrl+Shift+E
-    SHRT_LM_EDIT_VALUE, // Ctrl+E
+    SHRT_GLOBAL_EDIT_EVENT_VALUE, // Ctrl+E
 
     // Marker view
     SHRT_NEXT_MARKER,

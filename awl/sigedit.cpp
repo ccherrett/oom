@@ -58,6 +58,12 @@ namespace Awl {
 		if (event->type() == QEvent::KeyPress)
 		{
 			QKeyEvent* ke = static_cast<QKeyEvent*> (event);
+			if (ke->key() == Qt::Key_Return)
+			{
+				emit returnPressed();
+				return true;
+			}
+
 			int segment = curSegment();
 			if (ke->key() == Qt::Key_Backtab)
 			{
@@ -187,11 +193,11 @@ namespace Awl {
 		int pos = le->cursorPosition();
 		int segment = -1;
 
-		if (pos >= 0 && pos <= 4)
+		if (pos >= 0 && pos <= 2)
 			segment = 0;
-		else if (pos >= 5 && pos <= 7)
+		else if (pos >= 3 && pos <= 6)
 			segment = 1;
-		else if (pos >= 8)
+		else if (pos >= 7)
 			segment = 2;
 		else
 			printf("curSegment = -1, pos %d\n", pos);

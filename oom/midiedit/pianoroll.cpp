@@ -393,38 +393,38 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//    split
 	//---------------------------------------------------
 
-    splitter = new Splitter(Qt::Vertical, mainw, "splitter");
+	splitter = new Splitter(Qt::Vertical, mainw, "splitter");
 	splitter->setHandleWidth(2);
 
-    hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
+	hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
 	hsplitter->setChildrenCollapsible(true);
 	hsplitter->setHandleWidth(2);
 
-    QPushButton* ctrl = new QPushButton(tr("ctrl"), mainw);
+	QPushButton* ctrl = new QPushButton(tr("ctrl"), mainw);
 	ctrl->setObjectName("Ctrl");
 	ctrl->setFont(config.fonts[3]);
 	ctrl->setToolTip(tr("Add Controller View"));
-    hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
+	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
 	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());
 	//ctrl->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());  // Tim.
 
-    midiTrackInfo = new MidiTrackInfo(this, 0, _rasterInit, _quantInit);
+	midiTrackInfo = new MidiTrackInfo(this, 0, _rasterInit, _quantInit);
 	midiTrackInfo->setObjectName("prTrackInfo");
 	int mtiw = 280; //midiTrackInfo->width(); // Save this.
 	//midiTrackInfo->setMinimumWidth(100);
 	midiTrackInfo->setMinimumSize(QSize(190,100));
 	//midiTrackInfo->setMaximumWidth(300);
-    // Catch left/right arrow key events for this widget so we
-    // can easily move the focus back from this widget to the canvas.
-    installEventFilter(this);
-    midiTrackInfo->installEventFilter(this);
-    midiTrackInfo->getView()->installEventFilter(this);
+	// Catch left/right arrow key events for this widget so we
+	// can easily move the focus back from this widget to the canvas.
+	installEventFilter(this);
+	midiTrackInfo->installEventFilter(this);
+	midiTrackInfo->getView()->installEventFilter(this);
 
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
 	//midiTrackInfo->setSizePolicy(QSizePolicy(/*QSizePolicy::Ignored*/QSizePolicy::Preferred, QSizePolicy::Expanding));
-    infoScroll = new QScrollArea;
+	infoScroll = new QScrollArea;
 	infoScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	infoScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	//infoScroll->setMaximumWidth(300);
@@ -1116,7 +1116,8 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
         // midiTrackInfo.
         if (event->type() == QEvent::KeyPress) {
                 QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-                if (keyEvent->key() == Qt::Key_Right || keyEvent->key() == Qt::Key_Left)
+		int key = keyEvent->key();
+		if (key == Qt::Key_Enter || key == Qt::Key_Return)
                 {
                         canvas->setFocus(Qt::MouseFocusReason);
                         return true;
