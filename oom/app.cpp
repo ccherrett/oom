@@ -374,6 +374,33 @@ void OOMidi::stopServer()
 	}
 }
 
+void OOMidi::pipelineStateChanged(int state)
+{
+	switch(state)
+	{
+		case 0:
+			if(!pipelineBox)
+			{
+				pipelineBox = new QMessageBox(this);
+				pipelineBox->setModal(true);
+			}
+			pipelineBox->setWindowTitle(tr("Pipeline Error"));
+			pipelineBox->setText(tr("There has been a Pipeline error"));
+			pipelineBox->setInformativeText(tr("One or more of the programs in your Pipeline has crashed\nPlease wait while we restore the Pipeline to a working state."));
+			pipelineBox->show();
+		break;
+		case 1:
+			if(pipelineBox)
+			{
+				pipelineBox->close();
+				pipelineBox = 0;
+			}
+		break;
+		default:
+			printf("Unknown state: %d\n", state);
+		break;
+	}
+}
 //---------------------------------------------------------
 //   addProject
 //---------------------------------------------------------
@@ -680,6 +707,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	midiTransformerDialog = 0;
 	shortcutConfig = 0;
 	appearance = 0;
+	pipelineBox = 0;
 	//audioMixer            = 0;
 	mixer1 = 0;
 	mixer2 = 0;

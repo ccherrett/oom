@@ -29,6 +29,7 @@ class QToolBar;
 class QToolButton;
 class QActionGroup;
 class QDockWidget;
+class QMessageBox;
 
 class Part;
 class PartList;
@@ -200,6 +201,7 @@ class OOMidi : public QMainWindow
     QMenu* openRecent;
 
 	QDockWidget* _resourceDock;
+	QMessageBox *pipelineBox;
 
     bool readMidi(FILE*);
     void read(Xml& xml, bool skipConfig);
@@ -357,6 +359,7 @@ public slots:
     void configMidiPorts();
 	bool startServer();
 	void stopServer();
+	void pipelineStateChanged(int);
 
 public:
     OOMidi(int argc, char** argv);

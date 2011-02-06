@@ -16,6 +16,7 @@ class OOMCommandServer : public QTcpServer
 	public slots:
 		void saveAsTriggered();
 		void saveTriggered();
+		void pipelineStateChanged(int);
 };
 
 #endif

@@ -32,7 +32,7 @@ OOMClientThread::OOMClientThread(int sock, QObject* parent)
 	cmdStrList.insert("show_auxes", SHOW_AUXES);
 	cmdStrList.insert("stop", STOP);
 	cmdStrList.insert("play", PLAY);
-	cmdStrList.insert("pipeline_stoped", PIPELINE_STOPED);
+	cmdStrList.insert("pipeline_stopped", PIPELINE_STOPED);
 	cmdStrList.insert("reload_routes", RELOAD_ROUTES);
 	cmdStrList.insert("song_save", SAVE_SONG);
 	cmdStrList.insert("song_saveas", SAVE_SONG_AS);
@@ -133,9 +133,11 @@ void OOMClientThread::run()
 			break;
 			case PIPELINE_STOPED: //update a flag in oom that the pipeline is currently broken
 				rv.append("Pipeline Stopped Called\n");
+				emit pipelineStateChanged(0);
 			break;
 			case PIPELINE_STARTED: //update a flag in oom that the pipeline is currently repaired and running:
 				rv.append("Pipeline Started Called\n");
+				emit pipelineStateChanged(1);
 			break;
 			case RELOAD_ROUTES:
 				rv.append("Reload Routes Called\n");

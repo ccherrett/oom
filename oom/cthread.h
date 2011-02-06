@@ -24,6 +24,7 @@ class OOMClientThread : public QThread
 	     void error(QTcpSocket::SocketError socketError);
 		 void saveSong();
 		 void saveSongAs();
+		 void pipelineStateChanged(int);
 
 	private:
 		int socket;

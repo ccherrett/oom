@@ -4,6 +4,7 @@
 #include "globals.h"
 #include "config.h"
 #include "gconfig.h"
+#include "song.h"
 #include <stdlib.h>
 
 OOMCommandServer::OOMCommandServer(QObject* parent) : QTcpServer(parent)
@@ -18,6 +19,7 @@ void OOMCommandServer::incomingConnection(int socket)
 	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 	connect(thread, SIGNAL(saveSong()), SLOT(saveTriggered()));
 	connect(thread, SIGNAL(saveSongAs()), SLOT(saveAsTriggered()));
+	connect(thread, SIGNAL(pipelineStateChanged(int)), song, SLOT(pipelineStateChanged(int)));
 	thread->start();
 }
 
@@ -29,4 +31,18 @@ void OOMCommandServer::saveTriggered()
 void OOMCommandServer::saveAsTriggered()
 {
 	oom->saveAs();
+}
+
+void OOMCommandServer::pipelineStateChanged(int state)
+{
+	switch(state)
+	{
+		case 0:
+		break;
+		case 1:
+		break;
+		default:
+			printf("Unknown state: %d\n", state);
+		break;
+	}
 }

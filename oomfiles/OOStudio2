@@ -130,18 +130,30 @@ do
 	jc_running=`ps ax | grep "[j]conv"`
 
 	if [[ -z $jack_running ]]; then
+		echo "stop"|nc localhost 8415
+		echo "pipeline_stopped"|nc localhost 8415
 		killprocesses
 		start_jack
 		start_linuxsampler	
 		start_jconv
-		killall -HUP oomidi
+		echo "reload_routes"|nc localhost 8415
+		sleep 2
+		echo "pipeline_started"|nc localhost 8415
 	elif [[ -z $ls_running ]]; then
+		echo "stop"|nc localhost 8415
+		echo "pipeline_stopped"|nc localhost 8415
 		start_linuxsampler	
 		start_jconv
-		killall -HUP oomidi
+		echo "reload_routes"|nc localhost 8415
+		sleep 2
+		echo "pipeline_started"|nc localhost 8415
 	elif [[ -z $jc_running ]]; then
+		echo "stop"|nc localhost 8415
+		echo "pipeline_stopped"|nc localhost 8415
 		start_jconv
-		killall -HUP oomidi
+		echo "reload_routes"|nc localhost 8415
+		sleep 2
+		echo "pipeline_started"|nc localhost 8415
 	fi
 
 done
