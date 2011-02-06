@@ -19,7 +19,7 @@ void OOMCommandServer::incomingConnection(int socket)
 	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 	connect(thread, SIGNAL(saveSong()), SLOT(saveTriggered()));
 	connect(thread, SIGNAL(saveSongAs()), SLOT(saveAsTriggered()));
-	connect(thread, SIGNAL(pipelineStateChanged(int)), song, SLOT(pipelineStateChanged(int)));
+	connect(thread, SIGNAL(pipelineStateChanged(int)), oom, SLOT(pipelineStateChanged(int)));
 	thread->start();
 }
 
