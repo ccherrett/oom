@@ -25,6 +25,7 @@ class OOMClientThread : public QThread
 		 void saveSong();
 		 void saveSongAs();
 		 void pipelineStateChanged(int);
+		 void reloadRoutes();
 
 	private:
 		int socket;

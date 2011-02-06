@@ -360,6 +360,7 @@ public slots:
 	bool startServer();
 	void stopServer();
 	void pipelineStateChanged(int);
+	void connectDefaultSongPorts();
 
 public:
     OOMidi(int argc, char** argv);
@@ -396,7 +397,6 @@ public:
 	bool saveRouteMapping(QString, QString note = "Untitled");
 	bool loadRouteMapping(QString);
 	bool updateRouteMapping(QString, QString);
-	void connectDefaultSongPorts();
 	QString noteForRouteMapping(QString);
     // Testing...
     //PopupView* getRoutingPopupView();
