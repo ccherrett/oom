@@ -395,6 +395,7 @@ void OOMidi::pipelineStateChanged(int state)
 				pipelineBox->close();
 				pipelineBox = 0;
 			}
+			song->closeJackBox();
 		break;
 		default:
 			printf("Unknown state: %d\n", state);
@@ -2179,6 +2180,13 @@ bool OOMidi::loadRouteMapping(QString name)
 {
 	//Make sure we stop the song
 	song->setStop(true);
+	//Start the sequencer before we start loading routes into the engine
+	if(!audio->isRunning())
+	{
+		printf("Sequencer is not running, Restarting\n");
+		seqRestart();
+	}
+
 	QFileInfo fi(name);/*{{{*/
 	if (!fi.isReadable())
 	{
@@ -2290,7 +2298,7 @@ bool OOMidi::loadRouteMapping(QString name)
 	}/*}}}*/
 	song->dirty = true;
 	//Restart all the audio connections
-	oom->seqRestart();
+	seqRestart();
 	song->update(SC_CONFIG);	
 	return true;
 }

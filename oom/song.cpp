@@ -85,6 +85,7 @@ Song::Song(const char* name)
 	redoList = new UndoList;
 	_markerList = new MarkerList;
 	_globalPitchShift = 0;
+	jackErrorBox = 0;
 	viewselected = false;
 	//Create the AutoView
 	TrackView* wv = new TrackView();
@@ -2417,7 +2418,8 @@ void Song::seqSignal(int fd)
 
 			{
 				// give the user a sensible explanation
-				int btn = QMessageBox::critical(oom, tr("Jack shutdown!"),
+				jackErrorBox = new QMessageBox(QMessageBox::Critical, tr("Jack shutdown!"),
+				//int btn = QMessageBox::critical(oom, tr("Jack shutdown!"),
 						tr("Jack has detected a performance problem which has lead to\n"
 						"OOMidi being disconnected.\n"
 						"This could happen due to a number of reasons:\n"
@@ -2432,12 +2434,13 @@ void Song::seqSignal(int fd)
 						" homepage which is available through the help menu)\n"
 						"\n"
 						"To proceed check the status of Jack and try to restart it and then .\n"
-						"click on the Restart button."), "restart", "cancel");
-				if (btn == 0)
+						"click \"Audio > Restart Audio\" menu."), QMessageBox::Close, oom);
+				jackErrorBox->exec();
+				/*if (btn == 0)
 				{
 					printf("restarting!\n");
 					oom->seqRestart();
-				}
+				}*/
 			}
 
 				break;
@@ -2482,6 +2485,15 @@ void Song::seqSignal(int fd)
 				printf("unknown Seq Signal <%c>\n", buffer[i]);
 				break;
 		}
+	}
+}
+
+void Song::closeJackBox()
+{
+	if(jackErrorBox)
+	{
+		jackErrorBox->close();
+		jackErrorBox = 0;
 	}
 }
 

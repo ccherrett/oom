@@ -24,6 +24,7 @@
 class QAction;
 class QFont;
 class QMenu;
+class QMessageBox;
 
 class SynthI;
 struct MidiMsg;
@@ -165,6 +166,7 @@ private:
     QString songInfoStr; // contains user supplied song information, stored in song file.
     QStringList deliveredScriptNames;
     QStringList userScriptNames;
+	QMessageBox *jackErrorBox;
 
 public:
     Song(const char* name = 0);
@@ -567,6 +569,7 @@ public slots:
     TrackView* addTrackView();
 	void updateTrackViews(QAction*);
 	void updateTrackViews1();
+	void closeJackBox();
 
 signals:
     void songChanged(int);
