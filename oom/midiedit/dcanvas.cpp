@@ -598,6 +598,13 @@ void DrumCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	drawTickRaster(p, x, y, w, h, editor->raster());
 }
 
+//   drawTopItem
+//---------------------------------------------------------
+void DrumCanvas::drawTopItem(QPainter &, const QRect &)
+{
+
+}
+
 //---------------------------------------------------------
 //   y2pitch
 //---------------------------------------------------------

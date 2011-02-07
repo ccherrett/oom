@@ -50,10 +50,20 @@ public:
     }
 };
 
+enum ControllerVals { doNothing, movingController, addNewController };
+struct AutomationObject {
+	CtrlVal *currentCtrl;
+	CtrlList *currentCtrlList;
+	Track *currentTrack;
+	bool moveController;
+	ControllerVals controllerState;
+};
+
 class QLineEdit;
 class MidiEditor;
 class QMenu;
 class Xml;
+class CtrlVal;
 
 //---------------------------------------------------------
 //   PartCanvas
@@ -71,11 +81,12 @@ class PartCanvas : public Canvas
     int trackOffset;
     bool editMode;
 
-    std::vector<TrackAutomationView*> automationViews;
+    AutomationObject automation;
+
     Q_OBJECT
     virtual void keyPress(QKeyEvent*);
     virtual void mousePress(QMouseEvent*);
-    virtual void mouseMove(const QPoint&);
+    virtual void mouseMove(QMouseEvent* event);
     virtual void mouseRelease(const QPoint&);
     virtual void viewMouseDoubleClickEvent(QMouseEvent*);
     virtual void leaveEvent(QEvent*e);
@@ -118,6 +129,12 @@ class PartCanvas : public Canvas
     Track* y2Track(int) const;
     void drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* track);
     void drawAutomation(QPainter& p, const QRect& r, AudioTrack* track);
+    void drawTopItem(QPainter& p, const QRect& rect);
+
+    void checkAutomation(Track * t, const QPoint& pointer, bool addNewCtrl);
+    void processAutomationMovements(QMouseEvent *event);
+    double dbToVal(double inDb);
+    double valToDb(double inV);
 
 
 protected:
