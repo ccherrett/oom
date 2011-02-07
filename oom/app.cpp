@@ -1760,7 +1760,9 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
             // using the internal xml parser for now.
 
 			Xml xml(f);
+			printf("OOMidi::loadProjectFile1 Before OOMidi::read()\n");
 			read(xml, !loadAll);
+			printf("OOMidi::loadProjectFile1 After OOMidi::read()\n");
 			bool fileError = ferror(f);
 			popenFlag ? pclose(f) : fclose(f);
 			if (fileError)

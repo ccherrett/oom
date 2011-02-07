@@ -29,47 +29,47 @@ GlobalConfigValues config = {
 		QColor(0xff, 0xff, 0xff)
 	},
 	{
-		QColor(255, 232, 140), // part colors
-		QColor(0xff, 0x00, 0x00),
-		QColor(0x00, 0xff, 0x00),
-		QColor(0x00, 0x00, 0xff),
-		QColor(0xff, 0xff, 0x00),
-		QColor(0x00, 0xff, 0xff),
-		QColor(0xff, 0x00, 0xff),
-		QColor(0x9f, 0xc7, 0xef),
-		QColor(0x00, 0xff, 0x7f),
-		QColor(0x7f, 0x00, 0x00),
-		QColor(0x00, 0x7f, 0x00),
-		QColor(0x00, 0x00, 0x7f),
-		QColor(0x7f, 0x7f, 0x3f),
-		QColor(0x00, 0x7f, 0x7f),
-		QColor(0x7f, 0x00, 0x7f),
-		QColor(0x00, 0x7f, 0xff),
-		QColor(0x00, 0x3f, 0x3f)
+		QColor(43, 49, 51), // part colors partColor0
+		QColor(55, 61, 55), // partColor1
+		QColor(61, 55, 55), // partColor2
+		QColor(61, 55, 61), // partColor3
+		QColor(61, 61, 55), // partColor4
+		QColor(25, 53, 59), // partColor5
+		QColor(34, 59, 25), // partColor6
+		QColor(58, 59, 25), // partColor7
+		QColor(25, 59, 51), // partColor8
+		QColor(47, 25, 59), // partColor9
+		QColor(59, 25, 25), // partColor10
+		QColor(17, 74, 88), // partColor11
+		QColor(88, 17, 17), // partColor12
+		QColor(17, 88, 19), // partColor13
+		QColor(88, 17, 87), // partColor14
+		QColor(88, 84, 17), // partColor15
+		QColor(2, 128, 121) // partColor16
 	},
 	{
 		QString("Default"), // Default part color names
-		QString("Refrain"),
-		QString("Bridge"),
-		QString("Intro"),
-		QString("Coda"),
-		QString("Chorus"),
-		QString("Solo"),
-		QString("Brass"),
-		QString("Percussion"),
-		QString("Drums"),
-		QString("Guitar"),
-		QString("Bass"),
-		QString("Flute"),
-		QString("Strings"),
-		QString("Keyboard"),
-		QString("Piano"),
-		QString("Saxophone")
+		QString("Color 2"),
+		QString("Color 3"),
+		QString("Color 4"),
+		QString("Color 5"),
+		QString("Color 6"),
+		QString("Color 7"),
+		QString("Color 8"),
+		QString("Color 9"),
+		QString("Color 10"),
+		QString("Color 11"),
+		QString("Color 12"),
+		QString("Color 13"),
+		QString("Color 14"),
+		QString("Color 15"),
+		QString("Color 16"),
+		QString("Color 17")
 	}
 ,
-	QColor(0, 0, 255), // transportHandleColor;
-	QColor(255, 0, 0), // bigTimeForegroundColor;
-	QColor(0, 0, 0), // bigTimeBackgroundColor;
+	QColor(16, 24, 25), // transportHandleColor;
+	QColor(66, 202, 230), // bigTimeForegroundColor;
+	QColor(16, 24, 25), // bigTimeBackgroundColor;
 	QColor(23, 23, 23), // waveEditBackgroundColor;
 	{
 		QFont(QString("arial"), 10, QFont::Normal),
@@ -82,9 +82,9 @@ GlobalConfigValues config = {
 		//  at the price of only few more pixels than Normal mode.
 	}
 ,
-	QColor(84, 97, 114), // trackBg;
-	QColor(0x80, 0xff, 0x80), // selected track Bg;
-	QColor(0x00, 0x00, 0x00), // selected track Fg;
+	QColor(30, 30, 30), // trackBg;
+	QColor(18, 25, 28), // selected track Bg;
+	QColor(71, 202, 225), // selected track Fg;
 
 	QColor(0, 160, 255), // midiTrackLabelBg;   // Med blue
 	QColor(0, 160, 255), // drumTrackLabelBg;   // Med blue
@@ -95,16 +95,16 @@ GlobalConfigValues config = {
 	QColor(120, 255, 255), // auxTrackLabelBg;    // Light blue
 	QColor(255, 130, 0), // synthTrackLabelBg;  // Med orange
 
-	QColor(220, 220, 220), // midiTrackBg;
-	QColor(220, 220, 220), // drumTrackBg;
-	QColor(220, 220, 220), // waveTrackBg;
-	QColor(189, 220, 193), // outputTrackBg;
-	QColor(189, 220, 193), // inputTrackBg;
-	QColor(220, 220, 220), // groupTrackBg;
-	QColor(220, 220, 220), // auxTrackBg;
-	QColor(220, 220, 220), // synthTrackBg;
+	QColor(55, 45, 61), // midiTrackBg;
+	QColor(77, 65, 83), // drumTrackBg;
+	QColor(40, 62, 68), // waveTrackBg;
+	QColor(133, 36, 36), // outputTrackBg;
+	QColor(75, 112, 75), // inputTrackBg;
+	QColor(58, 64, 65), // groupTrackBg;
+	QColor(83, 87, 137), // auxTrackBg;
+	QColor(125, 73, 32), // synthTrackBg;
 
-	QColor(98, 124, 168), // part canvas bg
+	QColor(90, 90, 90), // part canvas bg
 	QColor(255, 170, 0), // ctrlGraphFg;    Medium orange
 	QColor(0, 0, 0), // mixerBg;
 

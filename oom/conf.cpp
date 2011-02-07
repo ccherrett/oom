@@ -665,125 +665,182 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				else if (tag == "palette16")
 					config.palette[16] = readColor(xml);
 				else if (tag == "partColor0")
-					config.partColors[0] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[0] = readColor(xml);
 				else if (tag == "partColor1")
-					config.partColors[1] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[1] = readColor(xml);
 				else if (tag == "partColor2")
-					config.partColors[2] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[2] = readColor(xml);
 				else if (tag == "partColor3")
-					config.partColors[3] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[3] = readColor(xml);
 				else if (tag == "partColor4")
-					config.partColors[4] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[4] = readColor(xml);
 				else if (tag == "partColor5")
-					config.partColors[5] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[5] = readColor(xml);
 				else if (tag == "partColor6")
-					config.partColors[6] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[6] = readColor(xml);
 				else if (tag == "partColor7")
-					config.partColors[7] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[7] = readColor(xml);
 				else if (tag == "partColor8")
-					config.partColors[8] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[8] = readColor(xml);
 				else if (tag == "partColor9")
-					config.partColors[9] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[9] = readColor(xml);
 				else if (tag == "partColor10")
-					config.partColors[10] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[10] = readColor(xml);
 				else if (tag == "partColor11")
-					config.partColors[11] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[11] = readColor(xml);
 				else if (tag == "partColor12")
-					config.partColors[12] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[12] = readColor(xml);
 				else if (tag == "partColor13")
-					config.partColors[13] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[13] = readColor(xml);
 				else if (tag == "partColor14")
-					config.partColors[14] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[14] = readColor(xml);
 				else if (tag == "partColor15")
-					config.partColors[15] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[15] = readColor(xml);
 				else if (tag == "partColor16")
-					config.partColors[16] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[16] = readColor(xml);
 				else if (tag == "partColor17")
-					config.partColors[17] = readColor(xml);
+					xml.skip(tag);
+					//config.partColors[17] = readColor(xml);
 
 				else if (tag == "partColorName0")
-					config.partColorNames[0] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[0] = xml.parse1();
 				else if (tag == "partColorName1")
-					config.partColorNames[1] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[1] = xml.parse1();
 				else if (tag == "partColorName2")
-					config.partColorNames[2] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[2] = xml.parse1();
 				else if (tag == "partColorName3")
-					config.partColorNames[3] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[3] = xml.parse1();
 				else if (tag == "partColorName4")
-					config.partColorNames[4] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[4] = xml.parse1();
 				else if (tag == "partColorName5")
-					config.partColorNames[5] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[5] = xml.parse1();
 				else if (tag == "partColorName6")
-					config.partColorNames[6] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[6] = xml.parse1();
 				else if (tag == "partColorName7")
-					config.partColorNames[7] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[7] = xml.parse1();
 				else if (tag == "partColorName8")
-					config.partColorNames[8] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[8] = xml.parse1();
 				else if (tag == "partColorName9")
-					config.partColorNames[9] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[9] = xml.parse1();
 				else if (tag == "partColorName10")
-					config.partColorNames[10] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[10] = xml.parse1();
 				else if (tag == "partColorName11")
-					config.partColorNames[11] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[11] = xml.parse1();
 				else if (tag == "partColorName12")
-					config.partColorNames[12] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[12] = xml.parse1();
 				else if (tag == "partColorName13")
-					config.partColorNames[13] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[13] = xml.parse1();
 				else if (tag == "partColorName14")
-					config.partColorNames[14] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[14] = xml.parse1();
 				else if (tag == "partColorName15")
-					config.partColorNames[15] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[15] = xml.parse1();
 				else if (tag == "partColorName16")
-					config.partColorNames[16] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[16] = xml.parse1();
 				else if (tag == "partColorName17")
-					config.partColorNames[17] = xml.parse1();
+					xml.skip(tag);
+					//config.partColorNames[17] = xml.parse1();
 
 				else if (tag == "partCanvasBg")
-					config.partCanvasBg = readColor(xml);
+					xml.skip(tag);
+					//config.partCanvasBg = readColor(xml);
 				else if (tag == "trackBg")
-					config.trackBg = readColor(xml);
+					xml.skip(tag);
+					//config.trackBg = readColor(xml);
 				else if (tag == "selectTrackBg")
-					config.selectTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.selectTrackBg = readColor(xml);
 				else if (tag == "selectTrackFg")
-					config.selectTrackFg = readColor(xml);
+					xml.skip(tag);
+					//config.selectTrackFg = readColor(xml);
 
 				else if (tag == "mixerBg")
-					config.mixerBg = readColor(xml);
+					xml.skip(tag);
+					//config.mixerBg = readColor(xml);
 				else if (tag == "midiTrackLabelBg")
-					config.midiTrackLabelBg = readColor(xml);
+					xml.skip(tag);
+					//config.midiTrackLabelBg = readColor(xml);
 				else if (tag == "drumTrackLabelBg")
-					config.drumTrackLabelBg = readColor(xml);
+					xml.skip(tag);
+					//config.drumTrackLabelBg = readColor(xml);
 				else if (tag == "waveTrackLabelBg")
-					config.waveTrackLabelBg = readColor(xml);
+					xml.skip(tag);
+					//config.waveTrackLabelBg = readColor(xml);
 				else if (tag == "outputTrackLabelBg")
-					config.outputTrackLabelBg = readColor(xml);
+					xml.skip(tag);
+					//config.outputTrackLabelBg = readColor(xml);
 				else if (tag == "inputTrackLabelBg")
-					config.inputTrackLabelBg = readColor(xml);
+					xml.skip(tag);
+					//config.inputTrackLabelBg = readColor(xml);
 				else if (tag == "groupTrackLabelBg")
-					config.groupTrackLabelBg = readColor(xml);
+					xml.skip(tag);
+					//config.groupTrackLabelBg = readColor(xml);
 				else if (tag == "auxTrackLabelBg")
-					config.auxTrackLabelBg = readColor(xml);
+					xml.skip(tag);
+					//config.auxTrackLabelBg = readColor(xml);
 				else if (tag == "synthTrackLabelBg")
-					config.synthTrackLabelBg = readColor(xml);
+					xml.skip(tag);
+					//config.synthTrackLabelBg = readColor(xml);
 
 				else if (tag == "midiTrackBg")
-					config.midiTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.midiTrackBg = readColor(xml);
 				else if (tag == "ctrlGraphFg")
 					config.ctrlGraphFg = readColor(xml);
 				else if (tag == "drumTrackBg")
-					config.drumTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.drumTrackBg = readColor(xml);
 				else if (tag == "waveTrackBg")
-					config.waveTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.waveTrackBg = readColor(xml);
 				else if (tag == "outputTrackBg")
-					config.outputTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.outputTrackBg = readColor(xml);
 				else if (tag == "inputTrackBg")
-					config.inputTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.inputTrackBg = readColor(xml);
 				else if (tag == "groupTrackBg")
-					config.groupTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.groupTrackBg = readColor(xml);
 				else if (tag == "auxTrackBg")
-					config.auxTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.auxTrackBg = readColor(xml);
 				else if (tag == "synthTrackBg")
-					config.synthTrackBg = readColor(xml);
+					xml.skip(tag);
+					//config.synthTrackBg = readColor(xml);
 
 				else if (tag == "extendedMidi")
 					config.extendedMidi = xml.parseInt();
