@@ -37,6 +37,8 @@ OOMClientThread::OOMClientThread(int sock, QObject* parent)
 	cmdStrList.insert("song_save", SAVE_SONG);
 	cmdStrList.insert("song_saveas", SAVE_SONG_AS);
 	cmdStrList.insert("pipeline_started", PIPELINE_STARTED);
+	cmdStrList.insert("current_song", CURRENT_SONG);
+	cmdStrList.insert("current_song_file", CURRENT_SONG_FILE);
 }
 
 void OOMClientThread::run()
@@ -150,6 +152,14 @@ void OOMClientThread::run()
 			case SAVE_SONG_AS:
 				rv.append("Song SaveAs called\n");
 				emit saveSongAs();
+			break;
+			case CURRENT_SONG:
+				rv.append(oomProject);
+				rv.append("\n");
+			break;
+			case CURRENT_SONG_FILE:
+				rv.append(oomProjectFile);
+				rv.append("\n");
 			break;
 			default:
 				rv.append("OOMidi Error - Unknown Command: ");

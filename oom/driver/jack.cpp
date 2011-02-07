@@ -541,15 +541,6 @@ const char* JackAudioDevice::clientName()
 
 bool initJackAudio()
 {
-	/*
-	// p3.3.35
-	for(int i = 0; i < JACK_MIDI_CHANNELS; i++)
-	{
-	  midi_port_in[i] = 0;
-	  midi_port_out[i] = 0;
-	}
-	 */
-
 	if (JACK_DEBUG)
 		printf("initJackAudio()\n");
 	if (debugMsg)
@@ -561,18 +552,6 @@ bool initJackAudio()
 		jack_set_error_function(noJackError);
 	doSetuid();
 
-	//jack_client_t* client = 0;
-	//int i = 0;
-	//char jackIdString[8];
-	//for (i = 0; i < 5; ++i) {
-	//      sprintf(jackIdString, "OOMidi-%d", i+1);
-	//client = jack_client_new(jackIdString);
-	//      client = jack_client_open(jackIdString, JackNoStartServer, 0);
-	//      if (client)
-	//            break;
-	//      }
-	//if (i == 5)
-	//      return true;
 	jack_status_t status;
 	jack_client_t* client = jack_client_open("OOMidi", JackNoStartServer, &status);
 	if (!client)
@@ -608,39 +587,6 @@ bool initJackAudio()
 		//jack_set_timebase_callback(client, 0, (JackTimebaseCallback) timebase_callback, 0);
 	}
 	undoSetuid();
-
-	/*
-	// setup midi input/output
-	//memset(jack_midi_out_data, 0, JACK_MIDI_CHANNELS * sizeof(oom_jack_midi_buffer));
-	//memset(jack_midi_in_data, 0, JACK_MIDI_CHANNELS * sizeof(oom_jack_midi_buffer));
-	if(client){
-	  for(i = 0; i < JACK_MIDI_CHANNELS; i++)
-	  {
-		char buf[80];
-		snprintf(buf, 80, "oom-jack-midi-in-%d", i+1);
-		midi_port_in[i] = jack_port_register(client, buf,
-											JACK_DEFAULT_MIDI_TYPE,
-											JackPortIsInput, 0);
-		if(midi_port_in[i] == NULL){
-		  fprintf(stderr, "failed to register jack-midi-in\n");
-		  exit(-1);
-		}
-		snprintf(buf, 80, "oom-jack-midi-out-%d", i+1);
-		midi_port_out[i] = jack_port_register(client, buf,
-											  JACK_DEFAULT_MIDI_TYPE,
-											  JackPortIsOutput, 0);
-		if(midi_port_out == NULL)
-		{
-		  fprintf(stderr, "failed to register jack-midi-out\n");
-		  exit(-1);
-		}
-	  }
-	}
-	else
-	{
-	  fprintf(stderr, "WARNING NO oom-jack midi connection\n");
-	}
-	 */
 
 	if (client)
 	{
@@ -746,116 +692,6 @@ void JackAudioDevice::connectJackMidiPorts()
 			}
 		}
 	}
-
-
-	/*
-	const char* type = JACK_DEFAULT_MIDI_TYPE;
-	const char** ports = jack_get_ports(_client, 0, type, 0);
-	for (const char** p = ports; p && *p; ++p)
-	{
-	  jack_port_t* port = jack_port_by_name(_client, *p);
-	  if(!port)
-		continue;
-	  // Ignore our own client ports.
-	  if(jack_port_is_mine(_client, port))
-	  {
-		if(debugMsg)
-		  printf(" ignoring own port: %s\n", *p);
-		continue;
-	  }
-	  int nsz = jack_port_name_size();
-	  char buffer[nsz];
-	  strncpy(buffer, *p, nsz);
-	  // Ignore the OOMidi Jack port.
-	  //if(strncmp(buffer, "OOMidi", 4) == 0)
-	  //  continue;
-    
-	  if(debugMsg)
-		printf(" found port: %s  ", buffer);
-    
-	  // If there are aliases for this port, use the first one - much better for identifying.
-	  //char a1[nsz];
-	  char a2[nsz];
-	  char* aliases[2];
-	  //aliases[0] = a1;
-	  aliases[0] = buffer;
-	  aliases[1] = a2;
-	  // To disable aliases, just rem this line.
-	  jack_port_get_aliases(port, aliases);
-	  //int na = jack_port_get_aliases(port, aliases);
-	  //char* namep = (na >= 1) ? aliases[0] : buffer;
-	  char* namep = aliases[0];
-  
-	  if(debugMsg)
-		printf("alias: %s\n", aliases[0]);
-    
-	  //int flags = 0;
-	  int pf = jack_port_flags(port);
-	  // If Jack port can send data to us...
-	  //if(pf & JackPortIsOutput)
-		// Mark as input capable.
-	  //  flags |= 2;
-	  // If Jack port can receive data from us...
-	  //if(pf & JackPortIsInput)
-		// Mark as output capable.
-	  //  flags |= 1;
-    
-	  //JackPort jp(0, QString(buffer), flags);
-	  //portList.append(jp);
-    
-	  QString name(namep);
-    
-	  if(JACK_DEBUG)
-		printf("JackAudioDevice::graphChanged %s\n", name.toLatin1());
-      
-	  for(iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
-	  {
-		// Is it a Jack midi device?
-		MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(*imd);
-		if(!mjd)
-		  continue;
-        
-		//if(dev->name() != name)
-		//  continue;
-      
-		// Is this port the one created for the Jack midi device?
-		if(!mjd->clientJackPort() || (mjd->clientJackPort() != port))
-		  continue;
-      
-		jack_port_t* devport = jack_port_by_name(_client, mjd->name().toLatin1());
-		if(!devport)
-		  continue;
-      
-		int ofl = mjd->openFlags();
-    
-		if(JACK_DEBUG)
-		  printf("JackAudioDevice::graphChanged found MidiJackDevice:%s\n", mjd->name().toLatin1());
-      
-		// Note docs say it can't be both input and output. src, dest
-		// If Jack port can receive data from us and we actually want to...
-		if((pf & JackPortIsOutput) && (ofl & 1))
-		{
-		  if(JACK_DEBUG)
-			printf("JackAudioDevice::graphChanged connecting OOMidi output\n");
-		  audioDevice->connect(port, devport);
-		}
-		else
-		// If Jack port can send data to us and we actually want it...
-		if((pf & JackPortIsInput) && (ofl & 2))
-		{
-		  if(JACK_DEBUG)
-			printf("JackAudioDevice::graphChanged connecting OOMidi input\n");
-		  audioDevice->connect(devport, port);
-		}
-      
-		break;
-	  }
-	}
-  
-	if(ports)
-	  free(ports);
-    
-	 */
 }
 //---------------------------------------------------------
 //   client_registration_callback
@@ -954,6 +790,7 @@ void JackAudioDevice::graphChanged()
 						}
 						++pn;
 					}
+					//FIXME: This is the code that removes the route from the input track if jack dies
 					if (!found)
 					{
 						audio->msgRemoveRoute1(

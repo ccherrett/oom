@@ -694,8 +694,10 @@ Knob* AudioStrip::addKnob(int type, int id, DoubleLabel** dlabel)
 	else
 	{
 		knob->setId(id);
+		pl->setId(id);
 
 		connect(pl, SIGNAL(valueChanged(double, int)), knob, SLOT(setValue(double)));
+		connect(pl, SIGNAL(valueChanged(double, int)), SLOT(auxChanged(double, int)));
 		// Not used yet. Switch if/when necessary.
 		//connect(pl, SIGNAL(valueChanged(double, int)), SLOT(auxLabelChanged(double, int)));
 

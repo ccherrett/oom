@@ -398,10 +398,13 @@ public:
 	bool loadRouteMapping(QString);
 	bool updateRouteMapping(QString, QString);
 	QString noteForRouteMapping(QString);
-    // Testing...
-    //PopupView* getRoutingPopupView();
-    //PopupView* prepareRoutingPopupView(Track* /*track*/, bool /*dst*/);
-    //void routingPopupViewActivated(Track* /*track*/, int /*id*/);
+	QString* currentProject()
+	{
+		if(project.completeBaseName().endsWith("oom"))
+			return new QString(project.filePath());
+		else
+			return new QString();
+	}
 
 #ifdef HAVE_LASH
     void lash_idle_cb();

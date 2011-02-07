@@ -1688,12 +1688,14 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		}
 		project.setFile("untitled");
 		oomProject = oomProjectInitPath;
+		oomProjectFile = project.filePath();
 	}
 	else
 	{
 		printf("Setting project path to %s\n", fi.absolutePath().toLatin1().constData());
 		oomProject = fi.absolutePath();
 		project.setFile(name);
+		oomProjectFile = project.filePath();
 	}
 	// Changed by T356. 01/19/2010. We want the complete extension here.
 	//QString ex = fi.extension(false).toLower();
@@ -1885,6 +1887,7 @@ void OOMidi::setUntitledProject()
 	QString name("untitled");
 	oomProject = "./"; //QFileInfo(name).absolutePath();
 	project.setFile(name);
+	oomProjectFile = project.filePath();
 	setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
 }
 
@@ -1957,6 +1960,7 @@ void OOMidi::loadProject()
 	if (!fn.isEmpty())
 	{
 		oomProject = QFileInfo(fn).absolutePath();
+		oomProjectFile = QFileInfo(fn).filePath();
 		loadProjectFile(fn, false, loadAll);
 	}
 }
@@ -3415,6 +3419,7 @@ bool OOMidi::saveAs()
 				return false;
 		}
 		oomProject = QFileInfo(name).absolutePath();
+		oomProjectFile = QFileInfo(name).filePath();
 		QDir dirmanipulator;
 		if (!dirmanipulator.mkpath(oomProject))
 		{
@@ -3435,6 +3440,7 @@ bool OOMidi::saveAs()
 		if (ok)
 		{
 			project.setFile(name);
+			oomProjectFile = project.filePath();
 			setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
 			addProject(name);
 		}
@@ -4905,6 +4911,7 @@ OOMidi::lash_idle_cb()
 					setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
 					addProject(ss.toAscii());
 					oomProject = QFileInfo(ss.toAscii()).absolutePath();
+					oomProjectFile = QFileInfo(ss.toAscii()).filePath();
 				}
 				lash_send_event(lash_client, event);
 			}

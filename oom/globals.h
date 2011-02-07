@@ -46,6 +46,7 @@ extern QString oomGlobalLib;
 extern QString oomGlobalShare;
 extern QString oomUser;
 extern QString oomProject;
+extern QString oomProjectFile;
 extern QString oomProjectInitPath;
 extern QString configName;
 extern QString configPath;
