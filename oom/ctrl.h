@@ -197,25 +197,15 @@ public:
         _displayColor = c;
     }
 
-    QColor color()
-    {
-        return _displayColor;
-    }
+    QColor color() const { return _displayColor; }
 
     void setVisible(bool v)
     {
         _visible = v;
     }
 
-    bool isVisible()
-    {
-        return _visible;
-    }
-
-    bool dontShow()
-    {
-        return _dontShow;
-    }
+    bool isVisible() const { return _visible; }
+    bool dontShow() const { return _dontShow; }
 };
 
 //---------------------------------------------------------

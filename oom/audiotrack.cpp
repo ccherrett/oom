@@ -79,7 +79,7 @@ AudioTrack::AudioTrack(TrackType t)
 	_automationType = AUTO_OFF;
 	//setChannels(1);
 	setChannels(2);
-	addController(new CtrlList(AC_VOLUME, "Volume", 0.0, 1.0));
+	addController(new CtrlList(AC_VOLUME,"Volume",0.0,3.16 /* roughly 10 db */));
 	addController(new CtrlList(AC_PAN, "Pan", -1.0, 1.0));
 	addController(new CtrlList(AC_MUTE, "Mute", 0.0, 1.0, true /*dont show in arranger */));
 
@@ -880,8 +880,10 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 	for (ciCtrlList icl = _controller.begin(); icl != _controller.end(); ++icl)
 	{
 		const CtrlList* cl = icl->second;
-		QString s("controller id=\"%1\" cur=\"%2\"");
-		xml.tag(level++, s.arg(cl->id()).arg(cl->curVal()).toAscii().constData());
+
+		QString s= QString("controller id=\"%1\" cur=\"%2\"").arg(cl->id()).arg(cl->curVal()).toAscii().constData();
+		s += QString(" color=\"%1\" visible=\"%2\"").arg(cl->color().name()).arg(cl->isVisible());
+		xml.tag(level++, s.toAscii().constData());
 		int i = 0;
 		for (ciCtrl ic = cl->begin(); ic != cl->end(); ++ic)
 		{
@@ -1012,6 +1014,8 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 
 			if (!ctlfound)
 				d->setCurVal(l->curVal());
+			d->setColor(l->color());
+			d->setVisible(l->isVisible());
 
 			d->setDefault(l->getDefault());
 			delete l;

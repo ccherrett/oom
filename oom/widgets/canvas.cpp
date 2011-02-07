@@ -205,6 +205,9 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 		{
 			drawItem(p, i->second, rect);
 		}
+
+		drawTopItem(p,rect);
+
 	}
 	else
 	{
@@ -291,6 +294,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 		{
 			drawItem(p, i->second, rect);
 		}
+		drawTopItem(p, QRect(x,y,w,h));
 		p.save();
 		setPainter(p);
 	}
@@ -1139,7 +1143,7 @@ void Canvas::viewMouseMoveEvent(QMouseEvent* event)
                 break;
 	}
 
-        mouseMove(_evPos);
+	mouseMove(event);
 }
 
 //---------------------------------------------------------
@@ -1242,6 +1246,7 @@ void Canvas::viewMouseReleaseEvent(QMouseEvent* event)
 	if (redrawFlag)
 		redraw();
 	setCursor();
+	mouseRelease(pos);
 }
 
 //---------------------------------------------------------
@@ -1526,7 +1531,10 @@ void Canvas::setCursor()
                 case MuteTool:
                         QWidget::setCursor(QCursor(*editmuteIcon, 4, 15));
                         break;
-                default:
+		case AutomationTool:
+			QWidget::setCursor(QCursor(Qt::PointingHandCursor));
+			break;
+		default:
                         QWidget::setCursor(QCursor(Qt::ArrowCursor));
                         break;
                 }
