@@ -280,9 +280,9 @@ function start_linuxsampler()
 	echo "sending lscp commands to linuxsampler..."
 	#if [[ $debug_output -eq "false" ]]; then
 	if [[ "$debug_output" == "false" ]]; then
-		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT >/dev/null 2>&1
+		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT >/dev/null 2>&1 &
 	else
-		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT
+		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT &
 	fi
 	#sleep 30
 }
@@ -343,11 +343,11 @@ start_oomidi
 
 echo "To stop the Open Octave Studio press CTRL + C"
 
+oomidi_file=`echo "current_song_file"|nc localhost 8415`
+
 for (( ; ; ))
 do
 	sleep 2
-	oom_song=""
-	oom_song=`echo "current_song_file"|nc localhost 8415`
 	jack_running=`ps ax | grep "[j]ackd"`
 	ls_running=`ps ax | grep "[l]inuxsampler"`
 	jc_running=`ps ax | grep "[j]conv"`
@@ -376,7 +376,15 @@ do
 		echo "reload_routes"|nc localhost 8415
 		echo "pipeline_started"|nc localhost 8415
 	elif [[ -z $oomidi_running ]]; then
-		oomidi $oom_song
+		killprocesses
+		start_jack
+		start_linuxsampler	
+		start_jconv
+		start_oomidi
+	fi
+	tmp_oom_song=`echo "current_song_file"|nc localhost 8415`
+	if [[ -f "$tmp_oom_song" ]]; then
+		oomidi_file=$tmp_oom_song
 	fi
 
 done
