@@ -28,6 +28,10 @@ JACK_CMD="/usr/bin/jackd"
 #Any arguments your would like jack to run with 
 JACK_ARGS="-R -P89 -p2048 -t2000 -dalsa -dhw:0 -r44100 -p256 -n3 -P -D -Phw:0,0 -s -i12"
 
+# Read in the config file if found.
+if [[ -f ${HOME}/.oom/studio.conf ]]; then
+	. ${HOME}/.oom/studio.conf
+fi
 
 ###################################################################################################################
 ##  There is no need for user modification below this line.
