@@ -2157,7 +2157,10 @@ void Song::clear(bool signal)
 
 	bounceTrack = 0;
 
+	_tviews.clear();
 	_tracks.clear();
+	_artracks.clear();
+	_viewtracks.clear();
 	_midis.clearDelete();
 	_waves.clearDelete();
 	_inputs.clearDelete(); // audio input ports
@@ -2272,6 +2275,8 @@ void Song::cleanupForQuit()
 		printf("OOMidi: Song::cleanupForQuit...\n");
 
 	_tracks.clear();
+	_artracks.clear();
+	_viewtracks.clear();
 
 	if (debugMsg)
 		printf("deleting _midis\n");
