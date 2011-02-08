@@ -14,7 +14,7 @@ OOMCommandServer::OOMCommandServer(QObject* parent) : QTcpServer(parent)
 void OOMCommandServer::incomingConnection(int socket)
 {
 	//Start the thread to process the connection
-	printf("Recieved incoming connection\n");
+	//printf("Recieved incoming connection\n");
 	OOMClientThread *thread = new OOMClientThread(socket,  this);
 	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 	connect(thread, SIGNAL(saveSong()), SLOT(saveTriggered()));

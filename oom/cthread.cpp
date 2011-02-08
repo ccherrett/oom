@@ -72,7 +72,7 @@ void OOMClientThread::run()
 	//Proccess the command list and return any values or error.
 	if(clean && cmdStrList.contains(cd))
 	{
-		printf("Found in list\n");
+		//printf("Found in list\n");
 		ServerCommand cmd = (ServerCommand)cmdStrList.value(cd);
 		switch(cmd)
 		{
@@ -175,7 +175,7 @@ void OOMClientThread::run()
 		rv.append("\n");
 	}
 
-	printf("Inside client thread\n");
+	//printf("Inside client thread\n");
 	QByteArray block;
 	QByteArray msg = rv.toUtf8();
 	//QByteArray data = "MESSAGE " + QByteArray::number(msg.size()) + ' ' + msg;
