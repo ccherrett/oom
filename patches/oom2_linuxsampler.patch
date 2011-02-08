@@ -1,0 +1,197 @@
+Index: src/engines/EngineChannel.cpp
+===================================================================
+RCS file: /var/cvs/linuxsampler/linuxsampler/src/engines/EngineChannel.cpp,v
+retrieving revision 1.17
+diff -u -r1.17 EngineChannel.cpp
+--- src/engines/EngineChannel.cpp	14 Sep 2010 17:09:08 -0000	1.17
++++ src/engines/EngineChannel.cpp	8 Feb 2011 04:45:22 -0000
+@@ -300,22 +300,29 @@
+         }
+     }
+ 
+-    void EngineChannel::ExecuteProgramChange(uint8_t Program) {
+-        dmsg(1,("Received MIDI program change (prog=%d)\n",Program));
++    void EngineChannel::ExecuteProgramChange(uint32_t Program) {
++        
++		uint8_t hb = (Program >> 16) & 0xff;
++		uint8_t lb = (Program >> 8) & 0xff;
++		uint8_t pc = Program & 0x7f;
++
++		dmsg(1,("Received MIDI program change (msb=%d) (lsb=%d) (prog=%d)\n",hb ,lb, pc));		
++        //dmsg(1,("Received MIDI program change (prog=%d)\n",Program));
++		//dmsg(1,("Received MIDI program change (msb=%d) (lsb=%d) (prog=%d)\n",GetMidiBankMsb(),GetMidiBankLsb(),Program));		
+         std::vector<int> maps = MidiInstrumentMapper::Maps();
+         if (maps.empty()) return;
+ 
+-        SetMidiProgram(Program);
+-        if (UsesNoMidiInstrumentMap()) return;
++        //SetMidiProgram(Program);
++		if (UsesNoMidiInstrumentMap()) return;
+         if (MidiInstrumentMapper::GetMapCount() == 0) return;
+         // retrieve the MIDI instrument map this engine channel is assigned to
+         int iMapID = (UsesDefaultMidiInstrumentMap())
+             ? MidiInstrumentMapper::GetDefaultMap() /*default*/ : GetMidiInstrumentMap();
+         // is there an entry for this MIDI bank&prog pair in that map?
+         midi_prog_index_t midiIndex;
+-        midiIndex.midi_bank_msb = GetMidiBankMsb();
+-        midiIndex.midi_bank_lsb = GetMidiBankLsb();
+-        midiIndex.midi_prog     = GetMidiProgram();
++        midiIndex.midi_bank_msb = hb;//GetMidiBankMsb();
++        midiIndex.midi_bank_lsb = lb;//GetMidiBankLsb();
++        midiIndex.midi_prog     = pc;//GetMidiProgram();
+         optional<MidiInstrumentMapper::entry_t> mapping =
+             MidiInstrumentMapper::GetEntry(iMapID, midiIndex);
+         if (mapping) { // if mapping exists ...
+Index: src/engines/EngineChannel.h
+===================================================================
+RCS file: /var/cvs/linuxsampler/linuxsampler/src/engines/EngineChannel.h,v
+retrieving revision 1.26
+diff -u -r1.26 EngineChannel.h
+--- src/engines/EngineChannel.h	14 Sep 2010 17:09:08 -0000	1.26
++++ src/engines/EngineChannel.h	8 Feb 2011 04:45:22 -0000
+@@ -346,7 +346,7 @@
+              *
+              * This method is not real-time safe.
+              */
+-            void ExecuteProgramChange(uint8_t Program);
++            void ExecuteProgramChange(uint32_t Program);
+ 
+         protected:
+             EngineChannel();
+Index: src/engines/InstrumentManagerThread.cpp
+===================================================================
+RCS file: /var/cvs/linuxsampler/linuxsampler/src/engines/InstrumentManagerThread.cpp,v
+retrieving revision 1.10
+diff -u -r1.10 InstrumentManagerThread.cpp
+--- src/engines/InstrumentManagerThread.cpp	3 May 2009 12:15:39 -0000	1.10
++++ src/engines/InstrumentManagerThread.cpp	8 Feb 2011 04:45:22 -0000
+@@ -54,11 +54,21 @@
+         
+         
+         // already tell the engine which instrument to load
+-        pEngineChannel->PrepareLoadInstrument(Filename.c_str(), uiInstrumentIndex);
++		// Changed by Remon
++		// Don't tell the EngineChannel the filename/instrument index
++		// we're setting that at the time cmd is being processed by
++		// the InstrumentManagerThread
++		//                                                             
++        //pEngineChannel->PrepareLoadInstrument(Filename.c_str(), uiInstrumentIndex);
+ 
+         command_t cmd;
+         cmd.type           = command_t::DIRECT_LOAD;
+         cmd.pEngineChannel = pEngineChannel;
++		// Added by Remon
++		cmd.InstrumentIdx = uiInstrumentIndex;
++		cmd.InstrumentFile = Filename;
++		// Till here
++
+ 
+         mutex.Lock();
+         queue.push_back(cmd);
+@@ -116,6 +126,9 @@
+                     switch (cmd.type) {
+                         case command_t::DIRECT_LOAD:
+                             EngineChannelFactory::SetDeleteEnabled(cmd.pEngineChannel, false);
++							//Added by Remon
++							cmd.pEngineChannel->PrepareLoadInstrument(cmd.InstrumentFile.c_str(), cmd.InstrumentIdx);
++							// Till here
+                             cmd.pEngineChannel->LoadInstrument();
+                             EngineChannelFactory::SetDeleteEnabled(cmd.pEngineChannel, true);
+                             break;
+Index: src/engines/InstrumentManagerThread.h
+===================================================================
+RCS file: /var/cvs/linuxsampler/linuxsampler/src/engines/InstrumentManagerThread.h,v
+retrieving revision 1.4
+diff -u -r1.4 InstrumentManagerThread.h
+--- src/engines/InstrumentManagerThread.h	29 Aug 2008 15:42:06 -0000	1.4
++++ src/engines/InstrumentManagerThread.h	8 Feb 2011 04:45:22 -0000
+@@ -58,6 +58,10 @@
+                 InstrumentManager*                 pManager;     ///< only for INSTR_MODE commands
+                 InstrumentManager::instrument_id_t instrumentId; ///< only for INSTR_MODE commands
+                 InstrumentManager::mode_t          mode;         ///< only for INSTR_MODE commands
++				// Added by Remon
++				String                             InstrumentFile;
++				int                                InstrumentIdx;
++				// Till here.
+             };
+ 
+             // Instance variables.
+Index: src/engines/common/DiskThreadBase.h
+===================================================================
+RCS file: /var/cvs/linuxsampler/linuxsampler/src/engines/common/DiskThreadBase.h,v
+retrieving revision 1.2
+diff -u -r1.2 DiskThreadBase.h
+--- src/engines/common/DiskThreadBase.h	5 Oct 2010 10:35:12 -0000	1.2
++++ src/engines/common/DiskThreadBase.h	8 Feb 2011 04:45:22 -0000
+@@ -67,7 +67,7 @@
+                 bool              bNotify;
+             };
+             struct program_change_command_t {
+-                uint8_t Program;
++                uint32_t Program;
+                 EngineChannel* pEngineChannel;
+             };
+             // Attributes
+@@ -382,7 +382,7 @@
+              * Tell the disk thread to do a program change on the specified
+              * EngineChannel.
+              */
+-            int OrderProgramChange(uint8_t Program, EngineChannel* pEngineChannel) {
++            int OrderProgramChange(uint32_t Program, EngineChannel* pEngineChannel) {
+                 program_change_command_t cmd;
+                 cmd.Program = Program;
+                 cmd.pEngineChannel = pEngineChannel;
+Index: src/engines/gig/EngineChannel.cpp
+===================================================================
+RCS file: /var/cvs/linuxsampler/linuxsampler/src/engines/gig/EngineChannel.cpp,v
+retrieving revision 1.52
+diff -u -r1.52 EngineChannel.cpp
+--- src/engines/gig/EngineChannel.cpp	22 Sep 2010 18:59:15 -0000	1.52
++++ src/engines/gig/EngineChannel.cpp	8 Feb 2011 04:45:22 -0000
+@@ -62,7 +62,9 @@
+         if(engine == NULL) return;
+ 
+         if(engine->GetDiskThread()) {
+-            engine->GetDiskThread()->OrderProgramChange(Program, this);
++			uint32_t merged = (GetMidiBankMsb() << 16) | (GetMidiBankLsb() << 8) | Program;
++			engine->GetDiskThread()->OrderProgramChange(merged, this);
++            //engine->GetDiskThread()->OrderProgramChange(Program, this);
+         } else {
+             // TODO: 
+         }
+Index: src/engines/sf2/EngineChannel.cpp
+===================================================================
+RCS file: /var/cvs/linuxsampler/linuxsampler/src/engines/sf2/EngineChannel.cpp,v
+retrieving revision 1.5
+diff -u -r1.5 EngineChannel.cpp
+--- src/engines/sf2/EngineChannel.cpp	22 Sep 2010 18:59:15 -0000	1.5
++++ src/engines/sf2/EngineChannel.cpp	8 Feb 2011 04:45:22 -0000
+@@ -64,7 +64,9 @@
+         if(engine == NULL) return;
+ 
+         if(engine->GetDiskThread()) {
+-            engine->GetDiskThread()->OrderProgramChange(Program, this);
++			uint32_t merged = (GetMidiBankMsb() << 16) | (GetMidiBankLsb() << 8) | Program;
++			engine->GetDiskThread()->OrderProgramChange(merged, this);
++            //engine->GetDiskThread()->OrderProgramChange(Program, this);
+         } else {
+             // TODO: 
+         }
+Index: src/engines/sfz/EngineChannel.cpp
+===================================================================
+RCS file: /var/cvs/linuxsampler/linuxsampler/src/engines/sfz/EngineChannel.cpp,v
+retrieving revision 1.5
+diff -u -r1.5 EngineChannel.cpp
+--- src/engines/sfz/EngineChannel.cpp	22 Sep 2010 18:59:16 -0000	1.5
++++ src/engines/sfz/EngineChannel.cpp	8 Feb 2011 04:45:22 -0000
+@@ -66,7 +66,9 @@
+         if(engine == NULL) return;
+ 
+         if(engine->GetDiskThread()) {
+-            engine->GetDiskThread()->OrderProgramChange(Program, this);
++			uint32_t merged = (GetMidiBankMsb() << 16) | (GetMidiBankLsb() << 8) | Program;
++			engine->GetDiskThread()->OrderProgramChange(merged, this);
++            //engine->GetDiskThread()->OrderProgramChange(Program, this);
+         } else {
+             // TODO: 
+         }
