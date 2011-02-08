@@ -41,6 +41,7 @@ break_out="false";
 debug_output="false"
 path_passed="false"
 oomidi_file=""
+noprocess=""
 
 #TODO 
 #1. create a parmeter for passing a folder name that will contain the template files that you would like to load. Put it in ~/.oostudio.
@@ -72,7 +73,7 @@ function killprocesses()
     
 		killall oomidi >/dev/null 2>&1
 		sleep 2
-		killall jconv >/dev/null 2>&1
+		killall `basename ${CONV_CMD}` >/dev/null 2>&1
 		sleep 2
 		killall linuxsampler >/dev/null 2>&1
 		sleep 2
@@ -82,7 +83,7 @@ function killprocesses()
     
 		killall oomidi
 		sleep 2
-		killall jconv
+		killall `basename ${CONV_CMD}`
 		sleep 2
 		killall linuxsampler
 		sleep 2
@@ -227,7 +228,7 @@ function getSessions
 		echo "OOStudio will start without a session"
 		echo "###########################################################################"
 	fi #end of the search path argument validation
-
+	noprocess=""
 }
 
 
@@ -250,6 +251,8 @@ trap ctrl_c INT
 
 function ctrl_c()
 {
+	#Stop processing in the for loop below
+	noprocess="true"
 	killall jconv
 	if [[ ! -n $FILES ]]; then
 		killprocesses
@@ -288,7 +291,7 @@ function start_linuxsampler()
 	else
 		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT &
 	fi
-	#sleep 30
+	sleep 30
 }
 function start_oomidi()
 {	
@@ -352,43 +355,45 @@ oomidi_file=`echo "current_song_file"|nc localhost 8415`
 for (( ; ; ))
 do
 	sleep 2
-	jack_running=`ps ax | grep "[j]ackd"`
-	ls_running=`ps ax | grep "[l]inuxsampler"`
-	jc_running=`ps ax | grep "[j]conv"`
-	oomidi_running=`ps ax | grep "[o]omidi"`
+	if [[ -z $noprocess ]]; then 
+		jack_running=`ps ax | grep "[j]ackd"`
+		ls_running=`ps ax | grep "[l]inuxsampler"`
+		jc_running=`ps ax | grep "[j]conv"`
+		oomidi_running=`ps ax | grep "[o]omidi"`
 
-	if [[ -z $jack_running ]]; then
-		echo "stop"|nc localhost 8415
-		echo "pipeline_stopped"|nc localhost 8415
-		killprocesses
-		start_jack
-		start_linuxsampler	
-		start_jconv
-		echo "reload_routes"|nc localhost 8415
-		echo "pipeline_started"|nc localhost 8415
-	elif [[ -z $ls_running ]]; then
-		echo "stop"|nc localhost 8415
-		echo "pipeline_stopped"|nc localhost 8415
-		start_linuxsampler	
-		start_jconv
-		echo "reload_routes"|nc localhost 8415
-		echo "pipeline_started"|nc localhost 8415
-	elif [[ -z $jc_running ]]; then
-		echo "stop"|nc localhost 8415
-		echo "pipeline_stopped"|nc localhost 8415
-		start_jconv
-		echo "reload_routes"|nc localhost 8415
-		echo "pipeline_started"|nc localhost 8415
-	elif [[ -z $oomidi_running ]]; then
-		killprocesses
-		start_jack
-		start_linuxsampler	
-		start_jconv
-		start_oomidi
-	fi
-	tmp_oom_song=`echo "current_song_file"|nc localhost 8415`
-	if [[ -f "$tmp_oom_song" ]]; then
-		oomidi_file=$tmp_oom_song
+		if [[ -z $jack_running ]]; then
+			echo "stop"|nc localhost 8415
+			echo "pipeline_stopped"|nc localhost 8415
+			killprocesses
+			start_jack
+			start_linuxsampler	
+			start_jconv
+			echo "reload_routes"|nc localhost 8415
+			echo "pipeline_started"|nc localhost 8415
+		elif [[ -z $ls_running ]]; then
+			echo "stop"|nc localhost 8415
+			echo "pipeline_stopped"|nc localhost 8415
+			start_linuxsampler	
+			start_jconv
+			echo "reload_routes"|nc localhost 8415
+			echo "pipeline_started"|nc localhost 8415
+		elif [[ -z $jc_running ]]; then
+			echo "stop"|nc localhost 8415
+			echo "pipeline_stopped"|nc localhost 8415
+			start_jconv
+			echo "reload_routes"|nc localhost 8415
+			echo "pipeline_started"|nc localhost 8415
+		elif [[ -z $oomidi_running ]]; then
+			killprocesses
+			start_jack
+			start_linuxsampler	
+			start_jconv
+			start_oomidi
+		fi
+		tmp_oom_song=`echo "current_song_file"|nc localhost 8415`
+		if [[ -f "$tmp_oom_song" ]]; then
+			oomidi_file=$tmp_oom_song
+		fi
 	fi
 
 done
