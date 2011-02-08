@@ -70,7 +70,7 @@ public slots:
 
 public:
     Strip(QWidget* parent, Track* t);
-    ~Strip();
+    virtual ~Strip();
     void setRecordFlag(bool flag);
 
     Track* getTrack() const
