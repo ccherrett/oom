@@ -1010,7 +1010,8 @@ void Arranger::updateTrackInfo(int flags)
 	}
 	if (selected->isMidiTrack())
         {
-                switchInfo(2);
+		if ((flags & SC_SELECTION) || (flags & SC_TRACK_REMOVED))
+			switchInfo(2);
                 // If a new part was selected, and only if it's different.
 		if ((flags & SC_SELECTION) && midiTrackInfo->track() != selected)
 			// Set a new track and do a complete update.
@@ -1021,7 +1022,8 @@ void Arranger::updateTrackInfo(int flags)
         }
 	else
 	{
-                switchInfo(2);
+		if ((flags & SC_SELECTION) || (flags & SC_TRACK_REMOVED))
+			switchInfo(2);
 	}
 }
 
@@ -1047,7 +1049,8 @@ void Arranger::switchInfo(int n)/*{{{*/
 		if(_lastStrip)
 		{
 		        m_strips.removeAll(_lastStrip);
-		        delete _lastStrip;
+			delete _lastStrip;
+			_lastStrip = 0;
 		}
 		if(selected->isMidiTrack())
 		{
@@ -1100,7 +1103,7 @@ void Arranger::switchInfo(int n)/*{{{*/
 		{
 			connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
 			if(!selected->isMidiTrack())
-			        connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
+				connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
 			mlayout->addWidget(w);
 			m_strips.append(w);
 			w->show();

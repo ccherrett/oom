@@ -460,6 +460,12 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	inHeartBeat = false;
 }
 
+
+MidiStrip::~MidiStrip()
+{
+}
+
+
 //---------------------------------------------------------
 //   updateOffState
 //---------------------------------------------------------

@@ -79,6 +79,7 @@ public slots:
 
 public:
     MidiStrip(QWidget* parent, MidiTrack*);
+    ~MidiStrip();
 };
 
 
