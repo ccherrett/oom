@@ -287,11 +287,11 @@ function start_linuxsampler()
 	echo "sending lscp commands to linuxsampler..."
 	#if [[ $debug_output -eq "false" ]]; then
 	if [[ "$debug_output" == "false" ]]; then
-		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT >/dev/null 2>&1 &
+		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT >/dev/null 2>&1 
 	else
-		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT &
+		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT >/dev/null 2>&1
 	fi
-	sleep 30
+	#sleep 30
 }
 function start_oomidi()
 {	
