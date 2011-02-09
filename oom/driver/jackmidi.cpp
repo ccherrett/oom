@@ -267,14 +267,17 @@ QString MidiJackDevice::open()
 	{
 		if (!_out_client_jackport)
 		{
-			if (audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+			if(audioDevice)
 			{
-				s = name() + QString(JACK_MIDI_OUT_PORT_SUFFIX);
-				_out_client_jackport = (jack_port_t*) audioDevice->registerOutPort(s.toLatin1().constData(), true);
-				if (!_out_client_jackport)
+				if (audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
 				{
-					fprintf(stderr, "OOMidi: MidiJackDevice::open failed creating output port name %s\n", s.toLatin1().constData());
-					_openFlags &= ~1; // Remove the flag, but continue on...
+					s = name() + QString(JACK_MIDI_OUT_PORT_SUFFIX);
+					_out_client_jackport = (jack_port_t*) audioDevice->registerOutPort(s.toLatin1().constData(), true);
+					if (!_out_client_jackport)
+					{
+						fprintf(stderr, "OOMidi: MidiJackDevice::open failed creating output port name %s\n", s.toLatin1().constData());
+						_openFlags &= ~1; // Remove the flag, but continue on...
+					}
 				}
 			}
 		}
