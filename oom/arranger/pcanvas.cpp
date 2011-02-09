@@ -3429,13 +3429,6 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 			drawAudioTrack(p, r, (AudioTrack*) track);
 			p.setPen(baseColor);
 		}
-		if (!track->isMidiTrack())
-		{ // draw automation
-			QRect r = rect & QRect(x, yy, w, track->height());
-			drawAutomation(p, r, (AudioTrack*) track);
-			p.setPen(baseColor);
-
-		}
 		yy += track->height();
 	}
 }
@@ -3498,13 +3491,12 @@ void PartCanvas::drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* /* t */
 
 void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 {
-	QRect rr = p.worldMatrix().mapRect(r);
+	QRect rr = p.matrix().mapRect(r);
 
 	p.save();
 	p.resetTransform();
 
-	int height=rr.bottom()-rr.top()-4; // limit height
-
+	int height = t->height() - 4; // limit height
 
 	CtrlListList* cll = t->controller();
 
