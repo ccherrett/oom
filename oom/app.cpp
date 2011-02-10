@@ -2071,6 +2071,10 @@ bool OOMidi::saveRouteMapping(QString name, QString notes)
 	{
 		(*i)->writeRouting(level, xml);
 	}
+	for (int i = 0; i < MIDI_PORTS; ++i)
+	{
+		midiPorts[i].writeRouting(level, xml);
+	}
 	xml.tag(level, "/orm");
 	if (ferror(f))
 	{
@@ -2644,34 +2648,47 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 		if (!(md->rwFlags() & (gIsOutRoutingPopupMenu ? 1 : 2)))
 			return;
 
-		int chmask = 0;
-		iRoute iir = rl->begin();
-		for (; iir != rl->end(); ++iir)
+		//printf("Routing menu clicked with gid: %d\n", n);
+		if(n >= 50000 && !gIsOutRoutingPopupMenu)
 		{
-			//if(*iir == (dst ? bRoute : aRoute))
-			//if(*iir == aRoute)
-			if (iir->type == Route::MIDI_PORT_ROUTE && iir->midiPort == mdidx) // p3.3.50 Is there already a route to this port?
+			for(iMidiTrack it = song->midis()->begin(); it != song->midis()->end(); ++it)
 			{
-				chmask = iir->channel; // p3.3.50 Grab the channel mask.
-				break;
+				Route tRoute(*it, chbit);
+				audio->msgAddRoute(aRoute, tRoute);
+				//printf("Adding route for track %s\n", (*it)->name().toLatin1().constData());
 			}
-		}
-		//if (iir != rl->end())
-		if ((chmask & chbit) == chbit) // p3.3.50 Is the channel's bit(s) set?
-		{
-			// disconnect
-			if (gIsOutRoutingPopupMenu)
-				audio->msgRemoveRoute(bRoute, aRoute);
-			else
-				audio->msgRemoveRoute(aRoute, bRoute);
 		}
 		else
 		{
-			// connect
-			if (gIsOutRoutingPopupMenu)
-				audio->msgAddRoute(bRoute, aRoute);
+			int chmask = 0;
+			iRoute iir = rl->begin();
+			for (; iir != rl->end(); ++iir)
+			{
+				//if(*iir == (dst ? bRoute : aRoute))
+				//if(*iir == aRoute)
+				if (iir->type == Route::MIDI_PORT_ROUTE && iir->midiPort == mdidx) // p3.3.50 Is there already a route to this port?
+				{
+					chmask = iir->channel; // p3.3.50 Grab the channel mask.
+					break;
+				}
+			}
+			//if (iir != rl->end())
+			if ((chmask & chbit) == chbit) // p3.3.50 Is the channel's bit(s) set?
+			{
+				// disconnect
+				if (gIsOutRoutingPopupMenu)
+					audio->msgRemoveRoute(bRoute, aRoute);
+				else
+					audio->msgRemoveRoute(aRoute, bRoute);
+			}
 			else
-				audio->msgAddRoute(aRoute, bRoute);
+			{
+				// connect
+				if (gIsOutRoutingPopupMenu)
+					audio->msgAddRoute(bRoute, aRoute);
+				else
+					audio->msgAddRoute(aRoute, bRoute);
+			}
 		}
 
 		audio->msgUpdateSoloStates();
@@ -3041,6 +3058,18 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 				if (chanmask & chbit) // p3.3.50 Is the channel already set? Show item check mark.
 					act->setChecked(true);
 			}
+
+			if(!dst)
+			{
+				//Add global menu toggle
+				int ch1bit = 1 << 0;
+				Route myRoute(i, ch1bit); // p3.3.50 In accordance with new channel mask, use the bit position.
+				gid = 50000 + i;
+				act = subp->addAction(QString("Set Global Channel 1"));
+				act->setData(gid);
+				gRoutingMenuMap.insert(pRouteMenuMap(gid, myRoute));
+			}
+
 			//subp->insertItem(QString("Toggle all"), 1000+i);
 			// p3.3.50 One route with all channel bits set.
 			gid = MIDI_PORTS * MIDI_CHANNELS + i; // Make sure each 'toggle' item gets a unique id.
