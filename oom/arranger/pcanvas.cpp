@@ -3443,7 +3443,13 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 	QColor baseColor(config.partCanvasBg.light(104));
 	p.setPen(baseColor);
 
-	TrackList* tl = song->tracks();
+	//This changes to song->visibletracks()
+	TrackList* tl;
+	if(!song->viewselected)
+		tl = song->artracks();
+	else
+		tl = song->visibletracks();
+
 	int yy = 0;
 	int th;
 	for (iTrack it = tl->begin(); it != tl->end(); ++it) {
@@ -3512,6 +3518,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 		if (!cl->isVisible())
 			continue; // skip this iteration if this controller isn't in the visible list
 		p.setPen(QPen(cl->color(), 1, Qt::SolidLine));
+		p.setRenderHint(QPainter::Antialiasing, true);
 
 		// First check that there ARE automation, ic == cl->end means no automation
 		if (ic != cl->end())
@@ -3574,7 +3581,17 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 					goto quitDrawing;
 
 				// draw a square around the point
-				p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-1, (rr.bottom()-2)-prevVal*height-1, 3, 3);
+				// If the point is selected, paint it with a different color to make the selected one more visible to the user
+				if (automation.currentCtrl && automation.currentCtrl->frame == cv.frame && automation.currentCtrl->val == cv.val)
+				{
+					p.setPen(QColor(Qt::yellow));
+					p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-3, (rr.bottom()-2)-prevVal*height-3, 6, 6);
+					p.setPen(QPen(cl->color(), 1, Qt::SolidLine));
+				}
+				else
+				{
+					p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-2, (rr.bottom()-2)-prevVal*height-2, 4, 4);
+				}
 
 			}
 			//printf("outer draw %f\n", cvFirst.val );
@@ -3602,7 +3619,7 @@ quitDrawing:
 
 void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)
 {
-	int circumference = 5;
+	int circumference = 10;
 	if (t->isMidiTrack())
 		return;
 	//printf("checkAutomation p.x()=%d p.y()=%d\n", mapx(pointer.x()), mapx(pointer.y()));
@@ -3642,7 +3659,13 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 					y = ( cv.val - min)/(max-min);
 				}
 
-				TrackList* tl = song->tracks();
+				//This changes to song->visibletracks()
+				TrackList* tl;
+				if(!song->viewselected)
+					tl = song->artracks();
+				else
+					tl = song->visibletracks();
+
 				int yy = 0;
 				for (iTrack it = tl->begin(); it != tl->end(); ++it) {
 					Track* track = *it;
@@ -3680,9 +3703,11 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 					QWidget::setCursor(Qt::CrossCursor);
 					if (addNewCtrl) {
 						automation.currentCtrl = 0;
+						redraw();
 						automation.controllerState = addNewController;
 					}else {
 						automation.currentCtrl=&cv;
+						redraw();
 						automation.controllerState = movingController;
 					}
 					automation.currentCtrlList = cl;
@@ -3712,7 +3737,11 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 	}
 	// if there are no hits we default to clearing all the data
 	automation.controllerState = doNothing;
-	automation.currentCtrl = 0;
+	if (automation.currentCtrl)
+	{
+		automation.currentCtrl = 0;
+		redraw();
+	}
 	automation.currentCtrlList = 0;
 	automation.currentTrack = 0;
 	setCursor();
