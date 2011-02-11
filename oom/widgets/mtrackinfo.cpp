@@ -1949,10 +1949,10 @@ void MidiTrackInfo::insertMatrixEvent()
 void MidiTrackInfo::populateMatrix()
 {
 	//printf("MidiTrackInfo::populateMatrix() entering\n");
+	_tableModel->clear();
 	if (!selected)
 		return;
 	//printf("MidiTrackInfo::populateMatrix() found track\n");
-	_tableModel->clear();
 	MidiTrack* track = (MidiTrack*) selected;
 	int port = track->outPort();
 	MidiPort* mp = &midiPorts[port];

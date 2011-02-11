@@ -155,6 +155,7 @@
     <quantize>0</quantize>
     <len>0</len>
     <follow>1</follow>
+	<associatedRoute></associatedRoute>
     <AudioOutput>
       <name>Master</name>
       <record>0</record>
@@ -168,7 +169,6 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-	  <associatedRoute></associatedRoute>
       <controller id="0" cur="1">
         0 1,         
         </controller>

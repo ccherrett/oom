@@ -2175,6 +2175,13 @@ void Song::clear(bool signal)
 		midiPorts[i].inRoutes()->clear();
 		midiPorts[i].outRoutes()->clear();
 
+		//Clear out the patch sequences between song load
+		//This causes a crash right now only when the PR is open while changing songs
+		//Its because all the components of PR like trackinfo are not reacting properly
+		//I think the solution is to close the PR before changing songs, what's the point
+		//of having it there between completely different songs.
+		//midiPorts[i].patchSequences()->clear();
+
 		// p3.3.50 Reset this.
 		midiPorts[i].setFoundInSongFile(false);
 
@@ -2327,8 +2334,13 @@ void Song::cleanupForQuit()
 		printf("deleting midiport controllers\n");
 	// Clear all midi port controllers and values.
 	for (int i = 0; i < MIDI_PORTS; ++i)
+	{
+		//Clear out the patch sequences 
+		midiPorts[i].patchSequences()->clear();
+
 		// Remove the controllers and the values.
 		midiPorts[i].controller()->clearDelete(true);
+	}
 
 	// Can't do this here. Jack isn't running. Fixed. Test OK so far.
 #if 1

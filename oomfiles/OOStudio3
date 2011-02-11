@@ -1,0 +1,402 @@
+#!/bin/bash
+#Licensed under the GPL
+#Authors: Andrew Williams, Alex Stone and Christopher Cherrett
+#OOStudio-v2 2009/08/25
+#revision: OOStudio-v3 2011/02/07
+
+###
+# Configure your studio here
+###
+#Your projects directory, This is where you group your projects
+FILES="/home/chris/Drive2/oom2-projects/"  
+#The .oom file to use as your default template 
+OOMIDI_TEMPLATE="/home/chris/Drive2/oom2-projects/templates/full_template1/full_template1.oom" 
+#The lscp file to load into linuxsampler
+DEFAULT_LSCP="/home/chris/Drive2/Studio_Setup_Files/mono_full_orchestra_ssd_perf/LS_Studio_Final.lscp"
+# The hostname or IP address of the machine running linuxsampler
+LS_HOST="localhost" 
+# The port on which linuxsampler is listening for requests
+LS_PORT="8888" 
+#Convolver reverb engine (Default: /usr/bin/jconv)
+CONV_CMD="/usr/bin/jconv" 
+#Place any arguments you need for your conv engine
+CONV_ARGS="" 
+#The config file for your convolver
+CONV_CONF="/home/chris/Drive2/Studio_Setup_Files/JCONV/ambconster.conf" 
+#The path to the jackd binary
+JACK_CMD="/usr/bin/jackd" 
+#Any arguments your would like jack to run with 
+JACK_ARGS="-R -P89 -p2048 -t2000 -dalsa -dhw:0 -r44100 -p256 -n3 -P -D -Phw:0,0 -s -i12"
+
+# Read in the config file if found.
+if [[ -f ${HOME}/.oom/studio.conf ]]; then
+	. ${HOME}/.oom/studio.conf
+fi
+
+###################################################################################################################
+##  There is no need for user modification below this line.
+###################################################################################################################
+
+break_out="false";
+debug_output="false"
+path_passed="false"
+oomidi_file=""
+noprocess=""
+
+#TODO 
+#1. create a parmeter for passing a folder name that will contain the template files that you would like to load. Put it in ~/.oostudio.
+#we will need a .lscp, .oom, jconv file in the template folder created by the user
+#
+#2. allow for the killing and loading based on greping the ids based on the users machine. 
+
+#if [[ $# -lt 2 ]]; then
+#	usage
+#	exit 1
+#elif [[ "$1" = "-h" ]]; then
+if [[ "$1" = "-h" ]]; then
+	usage
+	exit 0
+fi
+
+usage() {
+	echo -e "OOStudio Script for starting your Open Octave Studio\n"
+	echo -e "\t./OOStudio (optional -d to start up in debug mode)"
+	echo -e "\t./OOStudio (optional -s to start up in session search mode to load previous sessions)"
+}
+
+function killprocesses()
+{
+	echo "killing processes ......"
+	
+	#if [[ $debug_output -eq "false" ]]; then
+	if [[ "$debug_output" == "false" ]]; then
+    
+		killall oomidi >/dev/null 2>&1
+		sleep 2
+		killall `basename ${CONV_CMD}` >/dev/null 2>&1
+		sleep 2
+		killall linuxsampler >/dev/null 2>&1
+		sleep 2
+		killall jackd >/dev/null 2>&1
+		sleep 2
+	else
+    
+		killall oomidi
+		sleep 2
+		killall `basename ${CONV_CMD}`
+		sleep 2
+		killall linuxsampler
+		sleep 2
+		killall jackd
+		sleep 2
+	fi
+}
+
+function getSessions
+{
+	#check to see if the search directory passed in exists
+	if [ -d $FILES ]; then
+		#change directory into the directory that was passed into as a parameter
+		cd $FILES
+		
+		###########################################################################
+		### list the session projects in the search directory
+		###########################################################################
+		arr[0]="Exit"
+		arr[1]="Create New Session"
+		array_counter=2
+		
+		#for i in `ls -d */`
+		for i in */
+		do
+			if [ -d "$i" ]; then
+				# fill array
+				arr[$array_counter]="$i"
+				array_counter+=1
+			fi
+		done
+
+		###########################################################################
+		### echo out the list of session projects with associated numbers to 
+		### select from
+		###########################################################################
+		array_counter=0
+		for index in "${arr[@]}"
+		do
+    		echo $array_counter: $index
+			((array_counter++))
+		done
+
+		###########################################################################
+		### Prompt the user to select what sesion project they want to load
+		###########################################################################
+		echo "Please select the session you would like to load and press [ENTER]:"
+		read session
+		
+
+		selected_session=""
+		if [[ "$session" == "0" ]]; then
+			killprocesses
+			exit
+		fi
+		#if ((session == 1)); then
+		if [[ "$session" == "1" ]]; then
+			echo "creating new session!"
+			killprocesses
+			#break
+			break_out="true";
+		fi
+
+		if [[ $session = *[^0-9]* ]]; then
+			echo -e "\n\n"
+			echo "###########################################################################"
+			echo "ERROR:"
+			echo "You must enter a numerical value within the range of the items in the menu"
+			echo "Try again ....."
+			echo "###########################################################################"
+			echo -e "\n\n"
+			getSessions
+		else
+			if [[ "$break_out" == "false" ]]; then
+			if ((session > array_counter)); then
+				echo -e "\n\n"
+				echo "###########################################################################"
+				echo "ERROR:"
+				echo "You must enter a numerical value within the range of the items in the menu"
+				echo "Try again ....."
+				echo "###########################################################################"
+				echo -e "\n\n"
+				getSessions
+			else
+				killprocesses
+				#echo "a number was detected"
+				###########################################################################
+				### Load the session directory the user specified
+				###########################################################################
+				array_counter=0
+				for index in "${arr[@]}"
+				do
+					if [ "$array_counter" = "$session" ]; then
+    					#echo $array_counter: $index
+						selected_session="$index"
+					fi
+					((array_counter++))
+				done
+
+				###########################################################################i
+				### change directories into the directory selected and load the directory 
+				### into a variable for later use
+				###########################################################################
+
+				##check to see if an integer was selected in array_counters range
+				cd "$selected_session"
+				project_folder=$PWD
+
+
+				###########################################################################
+				###  search the directory for files to load into oomidi
+				###########################################################################
+				for file in `ls $project_folder`; do
+					#echo $file
+					if [[ $file == *.oom ]]; then
+						oomidi_file="$project_folder/$file"
+						echo "found file for oomidi: $oomidi_file"
+					fi
+				done
+				if [[ ! -n $oomidi_file ]]; then
+					oomidi_file=""
+					echo -e "\n\n"
+					echo "###########################################################################"
+					echo "ERROR:"
+					echo "Did not find .oom files to launch an Open Octave Project session"
+					echo "Try again ....."
+					echo "###########################################################################"
+					echo -e "\n\n"
+					getSessions
+				fi
+			fi #end of checking if the users input was numerically within the range of the menu items
+		else
+			break_out="false";
+		fi #end of checking for create new session break_out
+		fi #end of the user input number validation
+	else
+		echo "search directory not found"
+		echo -e "\n\n"
+		echo "###########################################################################"
+		echo "ERROR:"
+		echo "The search directory specified as an argument could not be found."
+		echo "OOStudio will start without a session"
+		echo "###########################################################################"
+	fi #end of the search path argument validation
+	noprocess=""
+}
+
+
+while getopts ":ds:" opts
+do
+	case $opts in
+		d)
+		debug_output="true";
+		;;
+		s) 
+		FILES="$OPTARG";
+		path_passed="true";
+		getSessions
+		;;
+	esac
+done
+
+trap ctrl_c INT
+
+
+function ctrl_c()
+{
+	#Stop processing in the for loop below
+	noprocess="true"
+	killall jconv
+	if [[ ! -n $FILES ]]; then
+		killprocesses
+		exit
+	else
+		getSessions
+		start_jack
+		start_linuxsampler
+		start_jconv
+		start_oomidi
+	fi
+}
+function start_jack()
+{
+	echo "starting jackd..."
+	if [[ $debug_output -eq "false" ]]; then
+		$JACK_CMD $JACK_ARGS >/dev/null 2>&1 &
+	else
+		$JACK_CMD $JACK_ARGS &
+	fi
+	sleep 2
+}
+function start_linuxsampler()
+{
+	echo "starting linuxsampler..."
+	if [[ "$debug_output" == "false" ]]; then
+		linuxsampler >/dev/null 2>&1 &
+	else
+		linuxsampler &
+	fi
+	sleep 5
+	echo "sending lscp commands to linuxsampler..."
+	#if [[ $debug_output -eq "false" ]]; then
+	if [[ "$debug_output" == "false" ]]; then
+		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT >/dev/null 2>&1 &
+	else
+		cat $DEFAULT_LSCP | nc $LS_HOST $LS_PORT &
+	fi
+	sleep 30
+}
+function start_oomidi()
+{	
+	echo "starting oomidi..."
+	if [[ -n $oomidi_file ]]; then
+		#if [[ $debug_output -eq "false" ]]; then
+		if [[ "$debug_output" == "false" ]]; then
+			oomidi $oomidi_file >/dev/null 2>&1 &
+		else
+			oomidi $oomidi_file &
+		fi
+	else
+		#if [[ $debug_output -eq "false" ]]; then
+		if [[ "$debug_output" == "false" ]]; then
+			oomidi $OOMIDI_TEMPLATE >/dev/null 2>&1 &
+		else
+			oomidi $OOMIDI_TEMPLATE &
+		fi
+	fi
+	sleep 8
+}
+function start_jconv()
+{
+	#if [[ $debug_output -eq "false" ]]; then
+	if [[ "$debug_output" == "false" ]]; then
+		$CONV_CMD $CONV_ARGS $CONV_CONF >/dev/null 2>&1 &
+	else
+		$CONV_CMD $CONV_ARGS $CONV_CONF &
+	fi
+	sleep 2
+}
+
+function startup()
+{
+	if [[ ! -n $FILES ]]; then
+		echo "running initial cleanup"
+		killprocesses
+	else
+		if [[ "$path_passed" == "false" ]]; then
+			getSessions
+		fi
+	fi
+}
+
+#jack_disconnect_all "hello"
+startup
+
+echo "Starting Open Octave Studio ......"
+
+start_jack
+start_linuxsampler
+start_jconv
+start_oomidi
+
+
+
+echo "To stop the Open Octave Studio press CTRL + C"
+
+oomidi_file=`echo "current_song_file"|nc localhost 8415`
+
+for (( ; ; ))
+do
+	sleep 2
+	if [[ -z $noprocess ]]; then 
+		jack_running=`ps ax | grep "[j]ackd"`
+		ls_running=`ps ax | grep "[l]inuxsampler"`
+		jc_running=`ps ax | grep "[j]conv"`
+		oomidi_running=`ps ax | grep "[o]omidi"`
+
+		if [[ -z $jack_running ]]; then
+			echo "stop"|nc localhost 8415
+			echo "pipeline_stopped"|nc localhost 8415
+			killprocesses
+			start_jack
+			start_linuxsampler	
+			start_jconv
+			echo "reload_routes"|nc localhost 8415
+			echo "pipeline_started"|nc localhost 8415
+		elif [[ -z $ls_running ]]; then
+			echo "stop"|nc localhost 8415
+			echo "pipeline_stopped"|nc localhost 8415
+			start_linuxsampler	
+			start_jconv
+			echo "reload_routes"|nc localhost 8415
+			echo "pipeline_started"|nc localhost 8415
+		elif [[ -z $jc_running ]]; then
+			echo "stop"|nc localhost 8415
+			echo "pipeline_stopped"|nc localhost 8415
+			start_jconv
+			echo "reload_routes"|nc localhost 8415
+			echo "pipeline_started"|nc localhost 8415
+		elif [[ -z $oomidi_running ]]; then
+			killprocesses
+			start_jack
+			start_linuxsampler	
+			start_jconv
+			start_oomidi
+		fi
+		tmp_oom_song=`echo "current_song_file"|nc localhost 8415`
+		if [[ -f "$tmp_oom_song" ]]; then
+			oomidi_file=$tmp_oom_song
+		fi
+	fi
+
+done
+
+
+
