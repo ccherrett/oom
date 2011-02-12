@@ -3810,7 +3810,24 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		if (nextFrame!=-1 && currFrame > nextFrame) currFrame=nextFrame-1;
 		automation.currentCtrl->frame = currFrame;
 
-		int mouseY = automation.currentTrack->height() - (mapy(event->pos().y()) - automation.currentTrack->y())-2;
+		//This changes to song->visibletracks()
+		TrackList* tl;
+		if(!song->viewselected)
+			tl = song->artracks();
+		else
+			tl = song->visibletracks();
+
+		int yy = 0;
+		for (iTrack it = tl->begin(); it != tl->end(); ++it) {
+			Track* track = *it;
+			if (track == automation.currentTrack)
+			{
+				break;
+			}
+			yy += track->height();
+		}
+
+		int mouseY = automation.currentTrack->height() - (mapy(event->pos().y()) - mapy(yy)) - 2;
 		double yfraction = ((double)mouseY)/automation.currentTrack->height();
 
 		if (automation.currentCtrlList->id() == AC_VOLUME ) { // use db scale for volume
