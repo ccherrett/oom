@@ -2374,7 +2374,6 @@ void PartCanvas::cmd(int cmd)
 			{
 				if (automation.currentCtrl)
 				{
-					printf("removing a node\n");
 					automation.currentCtrlList->del(automation.currentCtrl->frame);
 					redraw();
 

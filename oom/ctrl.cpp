@@ -165,7 +165,8 @@ void CtrlList::add(int frame, double val)
 
 void CtrlList::del(int frame)
 {
-	iCtrl e = find(frame);
+	const int f = frame;
+	iCtrl e = find(f);
 	if (e == end())
 	{
 		printf("CtrlList::del(%d): not found\n", frame);
