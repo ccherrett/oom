@@ -4087,15 +4087,25 @@ void OOMidi::cmd(int cmd)
 			arranger->cmd(Arranger::CMD_INSERT_EMPTYMEAS);
 			break;
 		case CMD_DELETE:
-			song->startUndo();
-			if (song->msgRemoveParts())
+			if (arranger->getCanvas()->tool() == AutomationTool)
 			{
-				song->endUndo(SC_PART_REMOVED);
-				break;
+				arranger->getCanvas()->cmd(Arranger::CMD_REMOVE_SELECTED_AUTOMATION_NODES);
 			}
 			else
-				audio->msgRemoveTracks();
-			song->endUndo(SC_TRACK_REMOVED);
+			{
+				song->startUndo();
+				if (song->msgRemoveParts())
+				{
+					song->endUndo(SC_PART_REMOVED);
+					break;
+				}
+				else
+				{
+					audio->msgRemoveTracks();
+				}
+				song->endUndo(SC_TRACK_REMOVED);
+
+			}
 			break;
 		case CMD_DELETE_TRACK:
 			song->startUndo();

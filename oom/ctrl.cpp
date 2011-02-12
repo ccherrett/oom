@@ -163,16 +163,15 @@ void CtrlList::add(int frame, double val)
 //   del
 //---------------------------------------------------------
 
-void CtrlList::del(int /* frame*/)
+void CtrlList::del(int frame)
 {
-	/*
 	iCtrl e = find(frame);
-	if (e == end()) {
-		  printf("CtrlList::del(%d): not found\n", frame);
-		  return;
-		  }
+	if (e == end())
+	{
+		printf("CtrlList::del(%d): not found\n", frame);
+		return;
+	}
 	erase(e);
-	 */
 }
 
 //---------------------------------------------------------

@@ -2360,12 +2360,28 @@ void PartCanvas::cmd(int cmd)
 			paste(false, false, true);
 			break;
 		case CMD_INSERT_EMPTYMEAS:
+		{
 			song->startUndo();
 			int startPos = song->vcpos();
 			int oneMeas = AL::sigmap.ticksMeasure(startPos);
 			movePartsTotheRight(startPos, oneMeas);
 			song->endUndo(SC_PART_INSERTED);
 			break;
+		}
+		case Arranger::CMD_REMOVE_SELECTED_AUTOMATION_NODES:
+		{
+			if (_tool == AutomationTool)
+			{
+				if (automation.currentCtrl)
+				{
+					printf("removing a node\n");
+					automation.currentCtrlList->del(automation.currentCtrl->frame);
+					redraw();
+
+				}
+			}
+			break;
+		}
 	}
 }
 
@@ -3497,7 +3513,7 @@ void PartCanvas::drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* /* t */
 
 void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 {
-	QRect rr = p.matrix().mapRect(r);
+	QRect rr = p.worldMatrix().mapRect(r);
 
 	p.save();
 	p.resetTransform();
@@ -3531,7 +3547,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 			// prepare prevVal
 			if (cl->id() == AC_VOLUME)
 			{ // use db scale for volume
-				printf("volume cvval=%f\n", cvFirst.val);
+//				printf("volume cvval=%f\n", cvFirst.val);
 				prevVal = dbToVal(cvFirst.val); // represent volume between 0 and 1
 				if (prevVal < 0) prevVal = 0.0;
 			}
