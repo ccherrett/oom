@@ -3697,11 +3697,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 
 				bool foundIt=false;
 				if (addNewCtrl) {
-					// check if we are reasonably close to a line
-					//printf("xpixel=%d oldX=%d\n", xpixel, oldX);
-					if ( xpixel == oldX && abs(currX-xpixel) < circumference)
-						foundIt=true;
-
+					foundIt=true;
 				}
 
 				//printf("point at x=%d xdiff=%d y=%d ydiff=%d\n", mapx(tempomap.frame2tick(cv.frame)), x1, mapx(ypixel), y1);
