@@ -2374,7 +2374,7 @@ void PartCanvas::cmd(int cmd)
 			{
 				if (automation.currentCtrl)
 				{
-					automation.currentCtrlList->del(automation.currentCtrl->frame);
+					automation.currentCtrlList->del(automation.currentCtrl->getFrame());
 					redraw();
 
 				}
@@ -3540,7 +3540,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 		{
 			CtrlVal cvFirst = ic->second;
 			ic++;
-			int prevPosFrame=cvFirst.frame;
+			int prevPosFrame=cvFirst.getFrame();
 			prevVal = cvFirst.val;
 
 			// prepare prevVal
@@ -3583,21 +3583,21 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 					leftX=rr.x();
 				}
 
-				int currentPixel = mapx(tempomap.frame2tick(cv.frame));
+				int currentPixel = mapx(tempomap.frame2tick(cv.getFrame()));
 				p.drawLine(leftX,
 					   (rr.bottom()-2)-prevVal*height,
 					   currentPixel,
 					   (rr.bottom()-2)-nextVal*height);
 				firstRun = false;
 				//printf("draw line: %d %f %d %f\n",tempomap.frame2tick(lastPos),rr.bottom()-lastVal*height,tempomap.frame2tick(cv.frame),rr.bottom()-curVal*height);
-				prevPosFrame=cv.frame;
+				prevPosFrame=cv.getFrame();
 				prevVal = nextVal;
 				if (currentPixel > rr.x()+ rr.width())
 					goto quitDrawing;
 
 				// draw a square around the point
 				// If the point is selected, paint it with a different color to make the selected one more visible to the user
-				if (automation.currentCtrl && automation.currentCtrl->frame == cv.frame && automation.currentCtrl->val == cv.val)
+				if (automation.currentCtrl && automation.currentCtrl->getFrame() == cv.getFrame() && automation.currentCtrl->val == cv.val)
 				{
 					p.setPen(QColor(Qt::yellow));
 					p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-3, (rr.bottom()-2)-prevVal*height-3, 6, 6);
@@ -3690,7 +3690,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 				}
 
 				ypixel = mapy(yy-2-y*t->height());
-				xpixel = mapx(tempomap.frame2tick(cv.frame));
+				xpixel = mapx(tempomap.frame2tick(cv.getFrame()));
 
 				if (oldX==-1) oldX = xpixel;
 				if (oldY==-1) oldY = ypixel;
@@ -3799,7 +3799,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			iCtrl ic=automation.currentCtrlList->begin();
 			for (; ic !=automation.currentCtrlList->end(); ic++) {
 				CtrlVal &cv = ic->second;
-				if (cv.frame == frame) {
+				if (cv.getFrame() == frame) {
 					automation.currentCtrl = &cv;
 					automation.controllerState = movingController;
 					break;
@@ -3814,16 +3814,17 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			CtrlVal &cv = ic->second;
 			if (&cv == automation.currentCtrl)
 				break;
-			prevFrame = cv.frame;
+			prevFrame = cv.getFrame();
 		}
 		if ( ++ic != automation.currentCtrlList->end()) {
 			CtrlVal &cv = ic->second;
-			nextFrame = cv.frame;
+			nextFrame = cv.getFrame();
 		}
 		int currFrame = tempomap.tick2frame(event->pos().x());
 		if (currFrame < prevFrame) currFrame=prevFrame+1;
 		if (nextFrame!=-1 && currFrame > nextFrame) currFrame=nextFrame-1;
-		automation.currentCtrl->frame = currFrame;
+
+		automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrl, currFrame);
 
 		//This changes to song->visibletracks()
 		TrackList* tl;

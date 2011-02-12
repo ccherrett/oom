@@ -47,7 +47,11 @@ enum CtrlRecValueType
 
 struct CtrlVal
 {
+private:
     int frame;
+
+    friend class CtrlList;
+public:
     double val;
 
     CtrlVal(int f, double v)
@@ -55,6 +59,8 @@ struct CtrlVal
         frame = f;
         val = v;
     }
+
+    int getFrame() const {return frame;}
 };
 
 //---------------------------------------------------------
@@ -123,6 +129,8 @@ public:
     CtrlList();
     CtrlList(int id);
     CtrlList(int id, QString name, double min, double max, bool dontShow = false);
+
+    void setCtrlFrameValue(CtrlVal* ctrl, int frame);
 
     Mode mode() const
     {

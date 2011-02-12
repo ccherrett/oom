@@ -343,7 +343,7 @@ void AudioTrack::swapControllerIDX(int idx1, int idx2)
 			for (iCtrl ic = cl->begin(); ic != cl->end(); ++ic)
 			{
 				cv = ic->second;
-				newcl->insert(std::pair<const int, CtrlVal > (cv.frame, cv));
+				newcl->insert(std::pair<const int, CtrlVal > (cv.getFrame(), cv));
 			}
 			tmpcll.insert(std::pair<const int, CtrlList*>(newcl->id(), newcl));
 		}
@@ -490,7 +490,7 @@ void AudioTrack::processAutomationEvents()
 				//if (icr->id == id && icr->type == ARVT_START)
 				if (icr->id == id)
 				{
-					int start = icr->frame;
+					int start = icr->getFrame();
 
 					if (icr == _recEvents.end())
 					{
@@ -507,7 +507,7 @@ void AudioTrack::processAutomationEvents()
 					{
 						if (icr == _recEvents.end())
 						{
-							int end = icrlast->frame;
+							int end = icrlast->getFrame();
 							iCtrl s = cl->lower_bound(start);
 							iCtrl e = cl->lower_bound(end);
 							cl->erase(s, e);
@@ -516,7 +516,7 @@ void AudioTrack::processAutomationEvents()
 
 						if (icr->id == id && icr->type == ARVT_STOP)
 						{
-							int end = icr->frame;
+							int end = icr->getFrame();
 							// Erase everything up to, not including, this stop event's frame.
 							// Because an event was already stored directly when slider released.
 							if (end > start)
@@ -544,7 +544,7 @@ void AudioTrack::processAutomationEvents()
 		for (iCtrlRec icr = _recEvents.begin(); icr != _recEvents.end(); ++icr)
 		{
 			if (icr->id == id && (icr->type == ARVT_VAL || icr->type == ARVT_START))
-				cl->add(icr->frame, icr->val);
+				cl->add(icr->getFrame(), icr->val);
 		}
 	}
 
@@ -608,7 +608,7 @@ void AudioTrack::seekPrevACEvent(int id)
 	iCtrl s = cl->lower_bound(song->cPos().frame());
 	if (s != cl->begin())
 		--s;
-	song->setPos(Song::CPOS, Pos(s->second.frame, false), true, false, true);
+	song->setPos(Song::CPOS, Pos(s->second.getFrame(), false), true, false, true);
 	return;
 }
 
@@ -632,7 +632,7 @@ void AudioTrack::seekNextACEvent(int id)
 		--s;
 	}
 
-	song->setPos(Song::CPOS, Pos(s->second.frame, false), true, false, true);
+	song->setPos(Song::CPOS, Pos(s->second.getFrame(), false), true, false, true);
 	return;
 }
 
@@ -888,7 +888,7 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 		for (ciCtrl ic = cl->begin(); ic != cl->end(); ++ic)
 		{
 			QString s("%1 %2, ");
-			xml.nput(level, s.arg(ic->second.frame).arg(ic->second.val).toAscii().constData());
+			xml.nput(level, s.arg(ic->second.getFrame()).arg(ic->second.val).toAscii().constData());
 			++i;
 			if (i >= 4)
 			{

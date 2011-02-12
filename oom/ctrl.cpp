@@ -106,7 +106,7 @@ double CtrlList::value(int frame)
 	}
 	else
 	{
-		int frame2 = i->second.frame;
+		int frame2 = i->second.getFrame();
 		double val2 = i->second.val;
 		int frame1;
 		double val1;
@@ -118,7 +118,7 @@ double CtrlList::value(int frame)
 		else
 		{
 			--i;
-			frame1 = i->second.frame;
+			frame1 = i->second.getFrame();
 			val1 = i->second.val;
 		}
 		frame -= frame1;
@@ -151,7 +151,6 @@ void CtrlList::setCurVal(double val)
 
 void CtrlList::add(int frame, double val)
 {
-	// printf("add %d %f\n", frame, val);
 	iCtrl e = find(frame);
 	if (e != end())
 		e->second.val = val;
@@ -165,14 +164,25 @@ void CtrlList::add(int frame, double val)
 
 void CtrlList::del(int frame)
 {
-	const int f = frame;
-	iCtrl e = find(f);
+	iCtrl e = find(frame);
 	if (e == end())
 	{
 		printf("CtrlList::del(%d): not found\n", frame);
 		return;
 	}
 	erase(e);
+}
+
+// sets a new frame value for a CtrlVal reference
+// since the frame value is the 'key' in our 'map'
+// we have to 'update' the key value in the map too
+// which is to my knowledge only possible by removing
+// the original entry, and inserting the modified one.
+void CtrlList::setCtrlFrameValue(CtrlVal* ctrl, int frame)
+{
+	del(ctrl->getFrame());
+	add(frame, ctrl->val);
+	ctrl->frame = frame;
 }
 
 //---------------------------------------------------------

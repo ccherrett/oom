@@ -2622,7 +2622,7 @@ int Song::execAutomationCtlPopup(AudioTrack* track, const QPoint& menupos, int a
 				iCtrl s = cl->lower_bound(frame);
 				iCtrl e = cl->upper_bound(frame);
 
-				isEvent = (s != cl->end() && s->second.frame == frame);
+				isEvent = (s != cl->end() && s->second.getFrame() == frame);
 
 				canSeekPrev = s != cl->begin();
 				canSeekNext = e != cl->end();
@@ -2630,7 +2630,7 @@ int Song::execAutomationCtlPopup(AudioTrack* track, const QPoint& menupos, int a
 				s = cl->lower_bound(pos[1].frame());
 
 				canEraseRange = s != cl->end()
-						&& (int) pos[2].frame() > s->second.frame;
+						&& (int) pos[2].frame() > s->second.getFrame();
 			}
 		}
 	}
