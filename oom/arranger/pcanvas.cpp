@@ -3634,7 +3634,7 @@ quitDrawing:
 
 void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)
 {
-	int circumference = 10;
+	int circumference = 12;
 	if (t->isMidiTrack())
 		return;
 	//printf("checkAutomation p.x()=%d p.y()=%d\n", mapx(pointer.x()), mapx(pointer.y()));
@@ -3711,7 +3711,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 				}
 
 				if (foundIt) {
-					QWidget::setCursor(Qt::CrossCursor);
+//					QWidget::setCursor(Qt::CrossCursor);
 					if (addNewCtrl) {
 						automation.currentCtrl = 0;
 						redraw();
@@ -3737,7 +3737,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 			}
 
 			if (foundIt) {
-				QWidget::setCursor(Qt::CrossCursor);
+//				QWidget::setCursor(Qt::CrossCursor);
 				automation.controllerState = addNewController;
 				automation.currentCtrlList = cl;
 				automation.currentTrack = t;
@@ -3755,7 +3755,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 	}
 	automation.currentCtrlList = 0;
 	automation.currentTrack = 0;
-	setCursor();
+//	setCursor();
 }
 
 
