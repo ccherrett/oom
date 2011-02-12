@@ -3817,8 +3817,8 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			nextFrame = cv.getFrame();
 		}
 		int currFrame = tempomap.tick2frame(event->pos().x());
-		if (currFrame < prevFrame) currFrame=prevFrame+1;
-		if (nextFrame!=-1 && currFrame > nextFrame) currFrame=nextFrame-1;
+		if (currFrame <= prevFrame) currFrame=prevFrame+1;
+		if (nextFrame!=-1 && currFrame >= nextFrame) currFrame=nextFrame-1;
 
 		automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrl, currFrame);
 
