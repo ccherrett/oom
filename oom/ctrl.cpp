@@ -160,7 +160,6 @@ void CtrlList::add(int frame, double val)
 	iCtrl e = find(frame);
 	if (e != end())
 	{
-		printf("blah %d, %f\n", frame, val);
 		e->second.val = val;
 	}
 	else
