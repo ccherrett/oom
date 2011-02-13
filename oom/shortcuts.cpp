@@ -161,8 +161,8 @@ void initShortCuts()
 	defShrt(SHRT_SELECT_INVERT, Qt::CTRL + Qt::Key_I, "Edit: Invert Selection", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_inv");
 	defShrt(SHRT_SELECT_ILOOP, Qt::ALT + Qt::Key_Y, "Edit: Select events/parts inside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_ins_loc");
 	defShrt(SHRT_SELECT_OLOOP, Qt::ALT + Qt::Key_U, "Edit: Select events/parts outside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_out_loc");
-	defShrt(SHRT_SELECT_PREV_PART, 0, "Edit: Select previous part", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_prv_prt");
-	defShrt(SHRT_SELECT_NEXT_PART, 0, "Edit: Select next part", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_nxt_prt");
+	defShrt(SHRT_SELECT_PREV_PART, Qt::ALT + Qt::Key_Left, "Edit: Select previous part", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_prv_prt");
+	defShrt(SHRT_SELECT_NEXT_PART, Qt::ALT + Qt::Key_Right, "Edit: Select next part", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_nxt_prt");
 	defShrt(SHRT_SEL_LEFT, Qt::Key_Left, "Edit: Select nearest part/event to the left", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_left");
 	defShrt(SHRT_SEL_LEFT_ADD, Qt::Key_Left + Qt::SHIFT, "Edit: Add nearest part/event to the left to selection", PROLL_SHRT + DEDIT_SHRT, "sel_left_add");
 	defShrt(SHRT_SEL_RIGHT, Qt::Key_Right, "Edit: Select nearest part/event to the left", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_right");
@@ -170,8 +170,8 @@ void initShortCuts()
 	defShrt(SHRT_LOCATORS_TO_SELECTION, Qt::ALT + Qt::Key_P, "Edit: Set locators to selection", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "loc_to_sel");
 	defShrt(SHRT_INC_PITCH, Qt::CTRL + Qt::Key_Up, "Edit: Increase pitch", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pitch");
 	defShrt(SHRT_DEC_PITCH, Qt::CTRL + Qt::Key_Down, "Edit: Decrease pitch", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pitch");
-	defShrt(SHRT_INC_POS, Qt::CTRL + Qt::Key_Right, "Edit: Increase event position", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pos");
-	defShrt(SHRT_DEC_POS, Qt::CTRL + Qt::Key_Left, "Edit: Decrease event position", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pos");
+	defShrt(SHRT_INC_POS, 0, "Edit: Increase event position", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pos");
+	defShrt(SHRT_DEC_POS, 0, "Edit: Decrease event position", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pos");
 	defShrt(SHRT_ZOOM_IN, Qt::CTRL + Qt::Key_PageUp, "View: Zoom in", PROLL_SHRT + DEDIT_SHRT, "zoom_in");
 	defShrt(SHRT_ZOOM_OUT, Qt::CTRL + Qt::Key_PageDown, "View: Zoom out", PROLL_SHRT + DEDIT_SHRT, "zoom_out");
 	defShrt(SHRT_GOTO_CPOS, Qt::CTRL + Qt::Key_J, "View: Goto Current Position", PROLL_SHRT + DEDIT_SHRT, "goto_cpos");
@@ -239,8 +239,8 @@ void initShortCuts()
 
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
-	defShrt(SHRT_POS_INC, Qt::META + Qt::Key_Period, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
-	defShrt(SHRT_POS_DEC, Qt::META + Qt::Key_Comma, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
+	defShrt(SHRT_POS_INC, Qt::CTRL + Qt::Key_Right, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
+	defShrt(SHRT_POS_DEC, Qt::CTRL + Qt::Key_Left, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
 
 	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Period, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
 	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Comma, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");
