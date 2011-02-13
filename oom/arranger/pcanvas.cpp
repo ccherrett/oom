@@ -3662,6 +3662,9 @@ quitDrawing:
 			vol = 0.0001f;
 		}
 		vol = 20.0f * log10 (vol);// pow(10.0, automation.currentCtrl->val / 20.0);
+		if(vol < -60.0f)
+			vol = -60.0f;
+
 		QString dbString = QString::number (vol, 'f', 2) + " dB";
 		// Set the color for the dB text
 		p.setPen(QColor(Qt::white));
