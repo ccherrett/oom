@@ -3667,7 +3667,7 @@ quitDrawing:
 
 		QString dbString = QString::number (vol, 'f', 2) + " dB";
 		// Set the color for the dB text
-		p.setPen(QColor(Qt::white));
+		p.setPen(QColor(255,255,255,190));
 		p.drawText(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) + 15, (rr.bottom()-2)-lazySelectedNodePrevVal*height, dbString);
 	}
 
