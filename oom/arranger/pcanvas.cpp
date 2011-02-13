@@ -3532,7 +3532,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 		iCtrl ic = cl->begin();
 		if (!cl->isVisible())
 			continue; // skip this iteration if this controller isn't in the visible list
-		p.setPen(QPen(cl->color(), 1, Qt::SolidLine));
+		p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
 		p.setRenderHint(QPainter::Antialiasing, true);
 
 		// First check that there ARE automation, ic == cl->end means no automation
@@ -3600,8 +3600,8 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 				if (automation.currentCtrl && automation.currentCtrl->getFrame() == cv.getFrame() && automation.currentCtrl->val == cv.val)
 				{
 					p.setPen(QColor(Qt::yellow));
-					p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-3, (rr.bottom()-2)-prevVal*height-3, 6, 6);
-					p.setPen(QPen(cl->color(), 1, Qt::SolidLine));
+					p.drawRect(mapx(tempomap.frame2tick(prevPosFrame)) - 4, (rr.bottom()-2)-prevVal*height - 4, 8, 8);
+					p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
 				}
 				else
 				{
