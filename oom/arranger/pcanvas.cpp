@@ -1106,7 +1106,14 @@ void PartCanvas::mousePress(QMouseEvent* event)
 		}
 		case AutomationTool:
 			if (automation.controllerState != doNothing)
+			{
 				automation.moveController=true;
+				if (automation.currentCtrl)
+				{
+					QWidget::setCursor(Qt::BlankCursor);
+				}
+			}
+
 			break;
 		}
 }
@@ -3521,6 +3528,12 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 	CtrlListList* cll = t->controller();
 
+	// set those when there is a node 'lazy selected', then the
+	// dB indicator will be painted on top of the curve, not below it
+	int lazySelectedNodeFrame = -1;
+	double lazySelectedNodePrevVal;
+	double lazySelectedNodeVal;
+
 	bool firstRun = true;
 	for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 	{
@@ -3597,16 +3610,19 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 				// draw a square around the point
 				// If the point is selected, paint it with a different color to make the selected one more visible to the user
-				p.setRenderHint(QPainter::Antialiasing, true);
 				if (automation.currentCtrl && automation.currentCtrl->getFrame() == cv.getFrame() && automation.currentCtrl->val == cv.val)
 				{
+					lazySelectedNodePrevVal = prevVal;
+					lazySelectedNodeFrame = prevPosFrame;
+					lazySelectedNodeVal = cv.val;
+
 					QPen pen2(QColor(131,254,255), 3);
 					p.setPen(pen2);
 					QBrush brush(QColor(1,41,59));
 					p.setBrush(brush);
-					//p.drawEllipse(10, 10, 80, 80);
-					p.drawEllipse(mapx(tempomap.frame2tick(prevPosFrame)) - 5, (rr.bottom()-2)-prevVal*height - 5, 8, 8);
-					//p.drawRect(mapx(tempomap.frame2tick(prevPosFrame)) - 4, (rr.bottom()-2)-prevVal*height - 4, 8, 8);
+
+					p.drawEllipse(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) - 5, (rr.bottom()-2)-lazySelectedNodePrevVal*height - 5, 8, 8);
+
 					p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
 				}
 				else
@@ -3623,7 +3639,27 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 			//printf("draw last line: %d %f %d %f\n",tempomap.frame2tick(prevPosFrame),(rr.bottom()-2)-prevVal*height,tempomap.frame2tick(prevPosFrame)+rr.width(),(rr.bottom()-2)-prevVal*height);
 		}
 	}
+
+
 quitDrawing:
+
+	// now if there was a lazy selected node, draw it's dB value no
+	// so it's painted on top of the curve, not below the curve
+	if (lazySelectedNodeFrame >= 0)
+	{
+		// calculate the dB value for the dB string.
+		double vol = lazySelectedNodeVal;
+		if (vol < 0.0001f)
+		{
+			vol = 0.0001f;
+		}
+		vol = 20.0f * log10 (vol);// pow(10.0, automation.currentCtrl->val / 20.0);
+		QString dbString = QString::number (vol, 'f', 2) + " dB";
+		// Set the color for the dB text
+		p.setPen(QColor(Qt::white));
+		p.drawText(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) + 15, (rr.bottom()-2)-lazySelectedNodePrevVal*height, dbString);
+	}
+
 	p.restore();
 }
 
@@ -3717,7 +3753,6 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 				}
 
 				if (foundIt) {
-//					QWidget::setCursor(Qt::CrossCursor);
 					if (addNewCtrl) {
 						automation.currentCtrl = 0;
 						redraw();
@@ -3743,7 +3778,6 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 			}
 
 			if (foundIt) {
-//				QWidget::setCursor(Qt::CrossCursor);
 				automation.controllerState = addNewController;
 				automation.currentCtrlList = cl;
 				automation.currentTrack = t;
@@ -3761,7 +3795,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 	}
 	automation.currentCtrlList = 0;
 	automation.currentTrack = 0;
-//	setCursor();
+	setCursor();
 }
 
 
@@ -3797,6 +3831,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			//printf("adding a new ctrler!\n");
 			int frame = tempomap.tick2frame(event->pos().x());
 			automation.currentCtrlList->add( frame, 1.0 /*dummy value */);
+			QWidget::setCursor(Qt::BlankCursor);
 
 			iCtrl ic=automation.currentCtrlList->begin();
 			for (; ic !=automation.currentCtrlList->end(); ic++) {
