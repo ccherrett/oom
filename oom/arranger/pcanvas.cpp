@@ -3536,6 +3536,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 	p.resetTransform();
 
 	int height = t->height() - 4; // limit height
+	bool paintdBLines = false;
 
 	CtrlListList* cll = t->controller();
 
@@ -3550,8 +3551,14 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 	{
 		//iCtrlList *icl = icll->second;
 		CtrlList *cl = icll->second;
+
 		if (cl->dontShow())
+		{
 			continue;
+		}
+
+		paintdBLines = true;
+
 		double prevVal;
 		iCtrl ic = cl->begin();
 		if (!cl->isVisible())
@@ -3653,6 +3660,25 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 quitDrawing:
 
+	if (paintdBLines)
+	{
+		double zerodBHeight = rr.bottom() - dbToVal(1.0) * height;
+		double minusTwelvedBHeight = rr.bottom() - dbToVal(0.25) * height;
+
+		// line color
+		p.setPen(QColor(100, 100, 100, 100));
+		p.drawLine(0, zerodBHeight, rr.width(), zerodBHeight);
+		p.drawLine(0, minusTwelvedBHeight, rr.width(), minusTwelvedBHeight);
+
+		// text color
+		p.setPen(QColor(Qt::black));
+		// if you want to move the text to the right, then adjust the
+		// rr.left - value.
+		p.drawText(rr.left() - 40, zerodBHeight - 4, "  0 dB");
+		p.drawText(rr.left() - 40, minusTwelvedBHeight - 4, "-12 dB");
+
+	}
+
 	// now if there was a lazy selected node, draw it's dB value no
 	// so it's painted on top of the curve, not below the curve
 	if (lazySelectedNodeFrame >= 0)
@@ -3663,7 +3689,7 @@ quitDrawing:
 		{
 			vol = 0.0001f;
 		}
-		vol = 20.0f * log10 (vol);// pow(10.0, automation.currentCtrl->val / 20.0);
+		vol = 20.0f * log10 (vol);
 		if(vol < -60.0f)
 			vol = -60.0f;
 
