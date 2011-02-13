@@ -685,6 +685,10 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
         // Very first thing we should do is loading global configuration values
         tconfig().check_and_load_configuration();
 
+	loadTheme(config.style);
+	QApplication::setFont(config.fonts[0]);
+	loadStyleSheetFile(config.styleSheetFile);
+
 	// By T356. For LADSPA plugins in plugin.cpp
 	// QWidgetFactory::addWidgetFactory( new PluginWidgetFactory ); ddskrjo
 
@@ -4419,11 +4423,6 @@ void OOMidi::changeConfig(bool writeFlag)
 {
 	if (writeFlag)
 		writeGlobalConfiguration();
-
-	//loadStyleSheetFile(config.styleSheetFile);
-	loadTheme(config.style);
-	QApplication::setFont(config.fonts[0]);
-	loadStyleSheetFile(config.styleSheetFile);
 
 	emit configChanged();
 	updateConfiguration();
