@@ -22,11 +22,17 @@ void CtrlList::initColor(int i)
 {
 	QColor collist[] = { Qt::red, Qt::yellow, Qt::blue , Qt::green, Qt::white, Qt::black };
 	if (i < 5)
+	{
 		_displayColor = collist[i%6];
+	}
 	else
+	{
 		_displayColor = Qt::gray;
-	_visible = false;
+	}
 
+	_displayColor.setAlpha(100);
+
+	_visible = false;
 }
 
 
@@ -208,7 +214,12 @@ void CtrlList::read(Xml& xml)
 					//_id = xml.s2().toInt();
 					_id = loc.toInt(xml.s2(), &ok);
 					if (!ok)
+					{
 						printf("CtrlList::read failed reading _id string: %s\n", xml.s2().toLatin1().constData());
+					}
+					else {
+						initColor(_id);
+					}
 				}
 				else if (tag == "cur")
 				{
