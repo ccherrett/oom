@@ -3671,11 +3671,11 @@ quitDrawing:
 		p.drawLine(0, minusTwelvedBHeight, rr.width(), minusTwelvedBHeight);
 
 		// text color
-		p.setPen(QColor(Qt::black));
+		//p.setPen(QColor(Qt::black));
 		// if you want to move the text to the right, then adjust the
 		// rr.left - value.
-		p.drawText(rr.left() - 40, zerodBHeight - 4, "  0 dB");
-		p.drawText(rr.left() - 40, minusTwelvedBHeight - 4, "-12 dB");
+		//p.drawText(rr.left() - 40, zerodBHeight - 4, "  0 dB");
+		//p.drawText(rr.left() - 40, minusTwelvedBHeight - 4, "-12 dB");
 
 	}
 
