@@ -3634,7 +3634,7 @@ quitDrawing:
 
 void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)
 {
-	int circumference = 12;
+	int circumference = 15;
 	if (t->isMidiTrack())
 		return;
 	//printf("checkAutomation p.x()=%d p.y()=%d\n", mapx(pointer.x()), mapx(pointer.y()));
