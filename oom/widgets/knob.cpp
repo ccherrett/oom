@@ -59,7 +59,8 @@ Knob::Knob(QWidget* parent, const char* name)
 	d_faceColor = palette().color(QPalette::Window);
 	d_curFaceColor = d_faceColor;
 	d_altFaceColor = d_faceColor;
-	d_markerColor = palette().color(QPalette::WindowText);
+	d_markerColor = QColor(255,255,255,157);
+	d_markerColorDisabled = QColor(255,255,255,50);
 	d_dotWidth = 8;
 
 	setMinimumSize(30, 30);
@@ -149,7 +150,7 @@ void Knob::drawKnob(QPainter* p, const QRect& r)
 	//
 	//drawMarker(p, d_angle, isEnabled() ? d_markerColor : Qt::gray);
 	drawMarker(p, d_angle, pal.currentColorGroup() == QPalette::Disabled ?
-			pal.color(QPalette::Disabled, QPalette::WindowText) : d_markerColor);
+			d_markerColorDisabled : d_markerColor);
 }
 
 //------------------------------------------------------------
@@ -395,7 +396,7 @@ void Knob::drawMarker(QPainter *p, double arc, const QColor &c)
 		case Line:
 
 			pn.setColor(c);
-			pn.setWidth(2);
+			pn.setWidth(3);
 			p->setPen(pn);
 
 			rb = qwtMax(double((radius - 4) / 3.0), 0.0);

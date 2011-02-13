@@ -46,6 +46,7 @@ private:
     QColor d_curFaceColor;
     QColor d_altFaceColor;
     QColor d_markerColor;
+    QColor d_markerColorDisabled;
     QString knobImage;
 
     void recalcAngle();
