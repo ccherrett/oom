@@ -1293,6 +1293,11 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		emit setUsedTool(PencilTool);
 		return;
 	}
+	else if (key == shortcuts[SHRT_TOOL_LINEDRAW].key)
+	{
+		emit setUsedTool(AutomationTool);
+		return;
+	}
 	else if (key == shortcuts[SHRT_TOOL_RUBBER].key)
 	{
 		emit setUsedTool(RubberTool);
