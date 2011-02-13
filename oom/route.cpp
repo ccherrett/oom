@@ -1322,10 +1322,12 @@ void Route::read(Xml& xml)
 						if (i == tl->end())
 							printf("Route::read(): track <%s> not found\n", s.toLatin1().constData());
 					}
-					else
-						if (rtype == JACK_ROUTE)
+					else if (rtype == JACK_ROUTE)
 					{
-						void* jport = audioDevice->findPort(s.toLatin1().constData());
+						void* jport = 0;
+						if (audioDevice) //Fix from Robert at muse
+							jport = audioDevice->findPort(s.toLatin1().constData());
+
 						if (jport == 0)
 							printf("Route::read(): jack port <%s> not found\n", s.toLatin1().constData());
 						else
@@ -1334,8 +1336,7 @@ void Route::read(Xml& xml)
 							type = rtype;
 						}
 					}
-					else
-						if (rtype == MIDI_DEVICE_ROUTE)
+					else if (rtype == MIDI_DEVICE_ROUTE)
 					{
 						iMidiDevice imd = midiDevices.begin();
 						for (; imd != midiDevices.end(); ++imd)
