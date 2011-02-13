@@ -3558,6 +3558,8 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 		{
 			continue;
 		}
+		
+		paintdBLines = true;
 
 		double prevVal;
 		iCtrl ic = cl->begin();
