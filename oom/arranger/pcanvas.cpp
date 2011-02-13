@@ -3600,9 +3600,9 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 				p.setRenderHint(QPainter::Antialiasing, true);
 				if (automation.currentCtrl && automation.currentCtrl->getFrame() == cv.getFrame() && automation.currentCtrl->val == cv.val)
 				{
-					QPen pen2(QColor(0,255,240), 3);
+					QPen pen2(QColor(131,254,255), 3);
 					p.setPen(pen2);
-					QBrush brush(QColor(0,85,80));
+					QBrush brush(QColor(1,41,59));
 					p.setBrush(brush);
 					//p.drawEllipse(10, 10, 80, 80);
 					p.drawEllipse(mapx(tempomap.frame2tick(prevPosFrame)) - 5, (rr.bottom()-2)-prevVal*height - 5, 8, 8);
