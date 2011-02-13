@@ -3537,6 +3537,8 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 	int height = t->height() - 4; // limit height
 	bool paintdBLines = false;
+	bool paintdBText = false;
+	bool paintTextAsPan = false;
 
 	CtrlListList* cll = t->controller();
 
@@ -3556,8 +3558,6 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 		{
 			continue;
 		}
-
-		paintdBLines = true;
 
 		double prevVal;
 		iCtrl ic = cl->begin();
@@ -3579,9 +3579,15 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 //				printf("volume cvval=%f\n", cvFirst.val);
 				prevVal = dbToVal(cvFirst.val); // represent volume between 0 and 1
 				if (prevVal < 0) prevVal = 0.0;
+				paintdBText = true;
 			}
 			else
 			{
+				if(cl->id() == AC_PAN)
+				{
+					paintdBText = true;
+					paintTextAsPan = true;
+				}
 				// we need to set curVal between 0 and 1
 				double min, max;
 				cl->range(&min, &max);
@@ -3681,19 +3687,26 @@ quitDrawing:
 
 	// now if there was a lazy selected node, draw it's dB value no
 	// so it's painted on top of the curve, not below the curve
-	if (lazySelectedNodeFrame >= 0)
+	if (lazySelectedNodeFrame >= 0 && paintdBText)
 	{
 		// calculate the dB value for the dB string.
 		double vol = lazySelectedNodeVal;
-		if (vol < 0.0001f)
+		QString dbString;
+		if(!paintTextAsPan)
 		{
-			vol = 0.0001f;
+			if (vol < 0.0001f)
+			{
+				vol = 0.0001f;
+			}
+			vol = 20.0f * log10 (vol);
+			if(vol < -60.0f)
+				vol = -60.0f;
+			 dbString = QString::number (vol, 'f', 2) + " dB";
 		}
-		vol = 20.0f * log10 (vol);
-		if(vol < -60.0f)
-			vol = -60.0f;
-
-		QString dbString = QString::number (vol, 'f', 2) + " dB";
+		else
+		{
+			dbString = QString::number(vol, 'f', 2);
+		}
 		// Set the color for the dB text
 		p.setPen(QColor(255,255,255,190));
 		p.drawText(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) + 15, (rr.bottom()-2)-lazySelectedNodePrevVal*height, dbString);
