@@ -2386,8 +2386,12 @@ void PartCanvas::cmd(int cmd)
 			{
 				if (automation.currentCtrl)
 				{
-					automation.currentCtrlList->del(automation.currentCtrl->getFrame());
-					redraw();
+					CtrlVal& firstCtrlVal = automation.currentCtrlList->begin()->second;
+					if (automation.currentCtrl->getFrame() != firstCtrlVal.getFrame())
+					{
+						automation.currentCtrlList->del(automation.currentCtrl->getFrame());
+						redraw();
+					}
 
 				}
 			}
@@ -3557,7 +3561,6 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 		if (ic != cl->end())
 		{
 			CtrlVal cvFirst = ic->second;
-			ic++;
 			int prevPosFrame=cvFirst.getFrame();
 			prevVal = cvFirst.val;
 
@@ -3866,7 +3869,11 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		if (currFrame <= prevFrame) currFrame=prevFrame+1;
 		if (nextFrame!=-1 && currFrame >= nextFrame) currFrame=nextFrame-1;
 
-		automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrl, currFrame);
+		CtrlVal& firstCtrlVal = automation.currentCtrlList->begin()->second;
+		if (automation.currentCtrl->getFrame() != firstCtrlVal.getFrame())
+		{
+			automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrl, currFrame);
+		}
 
 		//This changes to song->visibletracks()
 		TrackList* tl;

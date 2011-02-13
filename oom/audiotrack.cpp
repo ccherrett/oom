@@ -343,7 +343,7 @@ void AudioTrack::swapControllerIDX(int idx1, int idx2)
 			for (iCtrl ic = cl->begin(); ic != cl->end(); ++ic)
 			{
 				cv = ic->second;
-				newcl->insert(std::pair<const int, CtrlVal > (cv.getFrame(), cv));
+				newcl->add(cv.getFrame(), cv.val);
 			}
 			tmpcll.insert(std::pair<const int, CtrlList*>(newcl->id(), newcl));
 		}
@@ -1010,7 +1010,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		{
 			CtrlList* d = icl->second;
 			for (iCtrl i = l->begin(); i != l->end(); ++i)
-				d->insert(std::pair<const int, CtrlVal > (i->first, i->second));
+				d->add(i->second.getFrame(), i->second.val);
 
 			if (!ctlfound)
 				d->setCurVal(l->curVal());
