@@ -3597,10 +3597,16 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 				// draw a square around the point
 				// If the point is selected, paint it with a different color to make the selected one more visible to the user
+				p.setRenderHint(QPainter::Antialiasing, true);
 				if (automation.currentCtrl && automation.currentCtrl->getFrame() == cv.getFrame() && automation.currentCtrl->val == cv.val)
 				{
-					p.setPen(QColor(Qt::yellow));
-					p.drawRect(mapx(tempomap.frame2tick(prevPosFrame)) - 4, (rr.bottom()-2)-prevVal*height - 4, 8, 8);
+					QPen pen2(QColor(0,255,240), 3);
+					p.setPen(pen2);
+					QBrush brush(QColor(0,85,80));
+					p.setBrush(brush);
+					//p.drawEllipse(10, 10, 80, 80);
+					p.drawEllipse(mapx(tempomap.frame2tick(prevPosFrame)) - 5, (rr.bottom()-2)-prevVal*height - 5, 8, 8);
+					//p.drawRect(mapx(tempomap.frame2tick(prevPosFrame)) - 4, (rr.bottom()-2)-prevVal*height - 4, 8, 8);
 					p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
 				}
 				else

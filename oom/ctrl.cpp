@@ -20,7 +20,7 @@
 
 void CtrlList::initColor(int i)
 {
-	QColor collist[] = { Qt::red, Qt::yellow, Qt::blue , Qt::green, Qt::white, Qt::black };
+	QColor collist[] = { QColor(211,0,219), Qt::yellow, Qt::blue , Qt::green, Qt::white, Qt::black };
 	if (i < 5)
 	{
 		_displayColor = collist[i%6];
@@ -30,7 +30,7 @@ void CtrlList::initColor(int i)
 		_displayColor = Qt::gray;
 	}
 
-	_displayColor.setAlpha(100);
+	_displayColor.setAlpha(255);
 
 	_visible = false;
 }
