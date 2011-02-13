@@ -3528,7 +3528,9 @@ void PartCanvas::drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* /* t */
 
 void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 {
-	QRect rr = p.worldMatrix().mapRect(r);
+	QRect tempRect = r;
+	tempRect.setBottom(track2Y(t) + t->height());
+	QRect rr = p.worldMatrix().mapRect(tempRect);
 
 	p.save();
 	p.resetTransform();
@@ -3727,20 +3729,8 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 					y = ( cv.val - min)/(max-min);
 				}
 
-				//This changes to song->visibletracks()
-				TrackList* tl;
-				if(!song->viewselected)
-					tl = song->artracks();
-				else
-					tl = song->visibletracks();
 
-				int yy = 0;
-				for (iTrack it = tl->begin(); it != tl->end(); ++it) {
-					Track* track = *it;
-					yy += track->height();
-					if (track == t)
-						break;
-				}
+				int yy = track2Y(t) + t->height();
 
 				ypixel = mapy(yy-2-y*t->height());
 				xpixel = mapx(tempomap.frame2tick(cv.getFrame()));
@@ -3878,22 +3868,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrl, currFrame);
 		}
 
-		//This changes to song->visibletracks()
-		TrackList* tl;
-		if(!song->viewselected)
-			tl = song->artracks();
-		else
-			tl = song->visibletracks();
-
-		int yy = 0;
-		for (iTrack it = tl->begin(); it != tl->end(); ++it) {
-			Track* track = *it;
-			if (track == automation.currentTrack)
-			{
-				break;
-			}
-			yy += track->height();
-		}
+		int yy = track2Y(automation.currentTrack);
 
 		int mouseY = automation.currentTrack->height() - (mapy(event->pos().y()) - mapy(yy)) - 2;
 		double yfraction = ((double)mouseY)/automation.currentTrack->height();
