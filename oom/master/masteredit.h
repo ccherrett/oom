@@ -32,6 +32,7 @@ class TempoEdit;
 class LabelCombo;
 class PosLabel;
 class TempoLabel;
+class EditToolBar;
 
 //---------------------------------------------------------
 //   MasterEdit
@@ -56,6 +57,7 @@ class MasterEdit : public MidiEditor
     PosLabel* cursorPos;
     TempoLabel* tempo;
     QToolButton* enableButton;
+    EditToolBar* tools2;
 
     static int _rasterInit;
 

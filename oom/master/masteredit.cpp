@@ -20,6 +20,7 @@
 #include "xml.h"
 #include "lcombo.h"
 #include "doublelabel.h"
+#include "shortcuts.h"
 ///#include "sigedit.h"
 #include "globals.h"
 
@@ -96,7 +97,7 @@ MasterEdit::MasterEdit()
 	tools = addToolBar(tr("Master tools"));
 	tools->addActions(undoRedo->actions());
 
-	EditToolBar* tools2 = new EditToolBar(this, PointerTool | PencilTool | RubberTool);
+	tools2 = new EditToolBar(this, PointerTool | PencilTool | RubberTool);
 	addToolBar(tools2);
 
 	QToolBar* enableMaster = addToolBar(tr("Enable master"));
@@ -435,4 +436,20 @@ void MasterEdit::keyPressEvent(QKeyEvent* event)
 		close();
 		return;
 	}
+	else if (key == shortcuts[SHRT_TOOL_POINTER].key)
+	{
+		tools2->set(PointerTool);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TOOL_RUBBER].key)
+	{
+		tools2->set(RubberTool);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TOOL_PENCIL].key)
+	{
+		tools2->set(PencilTool);
+		return;
+	}
+
 }
