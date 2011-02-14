@@ -123,6 +123,7 @@ private:
     QColor _displayColor;
     bool _visible;
     bool _dontShow; // when this is true the control exists but is not compatible with viewing in the arranger
+	bool _selected;
     void initColor(int i);
 
 public:
@@ -212,8 +213,14 @@ public:
         _visible = v;
     }
 
+	void setSelected(bool v)
+	{
+		_selected = v;
+	}
+
     bool isVisible() const { return _visible; }
     bool dontShow() const { return _dontShow; }
+    bool selected() const { return _selected; }
 };
 
 //---------------------------------------------------------

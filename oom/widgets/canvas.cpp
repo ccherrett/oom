@@ -388,7 +388,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 
     if (_pos[0] >= unsigned(x) && _pos[0] < unsigned(x2))
 	{
-                p.drawLine(_pos[0], y, _pos[0], y2);
+    	p.drawLine(_pos[0], y, _pos[0], y2);
 	}
 
 }

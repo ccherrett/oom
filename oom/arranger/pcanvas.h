@@ -80,6 +80,7 @@ class PartCanvas : public Canvas
     int curColorIndex;
     int trackOffset;
     bool editMode;
+    bool unselectNodes;
 
     AutomationObject automation;
 
@@ -130,6 +131,7 @@ class PartCanvas : public Canvas
     void drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* track);
     void drawAutomation(QPainter& p, const QRect& r, AudioTrack* track);
     void drawTopItem(QPainter& p, const QRect& rect);
+	void drawTooltipText(QPainter& p, const QRect& rr, int height, double lazySelNodeVal, double lazySelNodePrevVal, int lazySelNodeFrame, bool paintAsDb);
 
     void checkAutomation(Track * t, const QPoint& pointer, bool addNewCtrl);
     void processAutomationMovements(QMouseEvent *event);

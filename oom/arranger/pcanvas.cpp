@@ -140,6 +140,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	// Defaults:
 	lineEditor = 0;
 	editMode = false;
+	unselectNodes = false;
 	trackOffset = 0;
 
 	//This changes to song->visibletracks()
@@ -1105,17 +1106,55 @@ void PartCanvas::mousePress(QMouseEvent* event)
 			break;
 		}
 		case AutomationTool:
+		{
 			if (automation.controllerState != doNothing)
 			{
 				automation.moveController=true;
 				if (automation.currentCtrl)
 				{
 					QWidget::setCursor(Qt::BlankCursor);
-				}
+					printf("TTTTTTTTTTTTTTTTTTTTTTTTTTTTT\n");
+					//printf("Current After foundIt Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
+					if(automation.currentCtrlList)
+						automation.currentCtrlList->setSelected(true);
+					//else
+					//	automation.currentCtrlList->setSelected(true);
+					Track * t = y2Track(event->pos().y());
+					if (t) {
+						bool addNewPoints=false;
+						CtrlListList* cll = ((AudioTrack*) t)->controller();
+						for(CtrlListList::iterator icll =cll->begin();icll!=cll->end();++icll)
+						{
+							//iCtrlList *icl = icll->second;
+							CtrlList *cl = icll->second;
+							if(cl != automation.currentCtrlList)
+							{
+								cl->setSelected(false);
+							}
+							else
+							{
+								printf("unselectNodes: %d\n", unselectNodes);
+								if(unselectNodes)
+								{
+									printf("unselecting nodes\n");
+									automation.currentCtrlList->setSelected(false);
+									//cl->setSelected(false);
+									unselectNodes = false;
+								}
+							}
+						}
+					}	
+				}	
+			}
+			else
+			{
+				printf("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS\n");
+				//printf("Current After Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
 			}
 
 			break;
 		}
+	}
 }
 
 //---------------------------------------------------------
@@ -1220,6 +1259,19 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		{
 			lineEditor->hide();
 			editMode = false;
+			return;
+		}
+	}
+	else
+	{
+		if (key == Qt::Key_Escape)
+		{
+			unselectNodes = true;
+			/*if(automation.currentCtrlList)// && automation.currentCtrlList->selected())
+			{
+				printf("ESC fired Current Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
+				automation.currentCtrlList->setSelected(false);
+			}*/	
 			return;
 		}
 	}
@@ -3537,10 +3589,12 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 	int height = t->height() - 4; // limit height
 	bool paintdBLines = false;
+	bool paintLines = false;
 	bool paintdBText = false;
-	bool paintTextAsPan = false;
+	bool paintTextAsDb = false;
 
 	CtrlListList* cll = t->controller();
+	//printf("list size: %d\n", cll->size());
 
 	// set those when there is a node 'lazy selected', then the
 	// dB indicator will be painted on top of the curve, not below it
@@ -3559,12 +3613,13 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 			continue;
 		}
 		
-		paintdBLines = true;
-
 		double prevVal;
 		iCtrl ic = cl->begin();
+		//printf("Controller - Name: %s ID: %d Visible: %d\n", cl->name().toLatin1().constData(), cl->id(), cl->isVisible());
 		if (!cl->isVisible())
 			continue; // skip this iteration if this controller isn't in the visible list
+
+		//printf("4444444444444444444444444444444444444444444444444444\n");
 		p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
 		p.setRenderHint(QPainter::Antialiasing, true);
 
@@ -3582,13 +3637,17 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 				prevVal = dbToVal(cvFirst.val); // represent volume between 0 and 1
 				if (prevVal < 0) prevVal = 0.0;
 				paintdBText = true;
+				paintTextAsDb = true;
+				paintLines = true;
+				paintdBLines = true;
 			}
 			else
 			{
 				if(cl->id() == AC_PAN)
 				{
 					paintdBText = true;
-					paintTextAsPan = true;
+					paintTextAsDb = false;
+					paintLines = true;
 				}
 				// we need to set curVal between 0 and 1
 				double min, max;
@@ -3622,6 +3681,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 				}
 
 				int currentPixel = mapx(tempomap.frame2tick(cv.getFrame()));
+				p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
 				p.drawLine(leftX,
 					   (rr.bottom()-2)-prevVal*height,
 					   currentPixel,
@@ -3630,91 +3690,117 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 				//printf("draw line: %d %f %d %f\n",tempomap.frame2tick(lastPos),rr.bottom()-lastVal*height,tempomap.frame2tick(cv.frame),rr.bottom()-curVal*height);
 				prevPosFrame=cv.getFrame();
 				prevVal = nextVal;
-				if (currentPixel > rr.x()+ rr.width())
-					goto quitDrawing;
-
-				// draw a square around the point
-				// If the point is selected, paint it with a different color to make the selected one more visible to the user
-				if (automation.currentCtrl && automation.currentCtrl->getFrame() == cv.getFrame() && automation.currentCtrl->val == cv.val)
+				if (currentPixel < rr.x()+ rr.width())
 				{
-					lazySelectedNodePrevVal = prevVal;
-					lazySelectedNodeFrame = prevPosFrame;
-					lazySelectedNodeVal = cv.val;
+					//printf("pppppppppuuuuuuuuuuuuuuuuuuuuuuuuuuuuuukkkkkkkkkkkkkkkkkkkeeeeeeeeeeeeeeeee\n");
+					//goto quitDrawing;
 
-					QPen pen2(QColor(131,254,255), 3);
-					p.setPen(pen2);
-					QBrush brush(QColor(1,41,59));
-					p.setBrush(brush);
+					// draw a square around the point
+					// If the point is selected, paint it with a different color to make the selected one more visible to the user
+					if (automation.currentCtrl && automation.currentCtrl->getFrame() == cv.getFrame() && automation.currentCtrl->val == cv.val)
+					{
+						lazySelectedNodePrevVal = prevVal;
+						lazySelectedNodeFrame = prevPosFrame;
+						lazySelectedNodeVal = cv.val;
 
-					p.drawEllipse(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) - 5, (rr.bottom()-2)-lazySelectedNodePrevVal*height - 5, 8, 8);
+						QPen pen2(QColor(131,254,255), 3);
+						p.setPen(pen2);
+						QBrush brush(QColor(1,41,59));
+						p.setBrush(brush);
 
-					p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
-				}
-				else
+						p.drawEllipse(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) - 5, (rr.bottom()-2)-lazySelectedNodePrevVal*height - 5, 8, 8);
+
+						if (lazySelectedNodeFrame >= 0 && paintdBText)/*{{{*/
+						{
+								drawTooltipText(p, rr, height, lazySelectedNodeVal, lazySelectedNodePrevVal, lazySelectedNodeFrame, paintTextAsDb);
+						}/*}}}*/
+						p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
+					}
+					else
+					{
+						p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
+						p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-2, (rr.bottom()-2)-prevVal*height-2, 4, 4);
+					}
+				}	
+
+				//paint the lines
+				/*if (paintdBLines)
 				{
-					p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-2, (rr.bottom()-2)-prevVal*height-2, 4, 4);
-				}
-
+					printf("222222222222222222222222222222222222\n");
+					drawPositionLines(p, rr, height, paintTextAsDb);
+				}*/
+				//paint the text
 			}
+			p.setPen(QPen(cl->color(), 2, Qt::SolidLine));
 			//printf("outer draw %f\n", cvFirst.val );
 			p.drawLine(mapx(tempomap.frame2tick(prevPosFrame)),
 				   (rr.bottom()-2)-prevVal*height,
 				   rr.x()+rr.width(),
 				   (rr.bottom()-2)-prevVal*height);
 			//printf("draw last line: %d %f %d %f\n",tempomap.frame2tick(prevPosFrame),(rr.bottom()-2)-prevVal*height,tempomap.frame2tick(prevPosFrame)+rr.width(),(rr.bottom()-2)-prevVal*height);
-		}
-	}
+		}//END if(ci = end())
+	} //END first for loop
 
 
-quitDrawing:
+//quitDrawing:
 
-	if (paintdBLines)
+	if (paintLines)
 	{
+		
 		double zerodBHeight = rr.bottom() - dbToVal(1.0) * height;
 		double minusTwelvedBHeight = rr.bottom() - dbToVal(0.25) * height;
+		double panZero = height/2;
 
 		// line color
-		p.setPen(QColor(100, 100, 100, 100));
-		p.drawLine(0, zerodBHeight, rr.width(), zerodBHeight);
-		p.drawLine(0, minusTwelvedBHeight, rr.width(), minusTwelvedBHeight);
+		p.setPen(QColor(255, 255, 255, 100));
+		//p.setPen(QColor(255, 0, 0, 255));
+		if(paintdBLines)
+		{
+			p.drawLine(0, zerodBHeight, width(), zerodBHeight);
+			p.drawLine(0, minusTwelvedBHeight, width(), minusTwelvedBHeight);
+			if(height >= 180)
+			{
+				//p.drawText(rr.left() + 5, zerodBHeight - 4, "  0 dB");
+				p.drawText(5, zerodBHeight - 4, "  0 dB");
+				p.drawText(5, minusTwelvedBHeight - 4, "-12 dB");
+			}	
+		}
+		if(!paintTextAsDb)
+			p.drawLine(0, panZero, width(), panZero);
 
 		// text color
 		//p.setPen(QColor(Qt::black));
 		// if you want to move the text to the right, then adjust the
 		// rr.left - value.
-		//p.drawText(rr.left() - 40, zerodBHeight - 4, "  0 dB");
-		//p.drawText(rr.left() - 40, minusTwelvedBHeight - 4, "-12 dB");
 
-	}
-
-	// now if there was a lazy selected node, draw it's dB value no
-	// so it's painted on top of the curve, not below the curve
-	if (lazySelectedNodeFrame >= 0 && paintdBText)
-	{
-		// calculate the dB value for the dB string.
-		double vol = lazySelectedNodeVal;
-		QString dbString;
-		if(!paintTextAsPan)
-		{
-			if (vol < 0.0001f)
-			{
-				vol = 0.0001f;
-			}
-			vol = 20.0f * log10 (vol);
-			if(vol < -60.0f)
-				vol = -60.0f;
-			 dbString = QString::number (vol, 'f', 2) + " dB";
-		}
-		else
-		{
-			dbString = QString::number(vol, 'f', 2);
-		}
-		// Set the color for the dB text
-		p.setPen(QColor(255,255,255,190));
-		p.drawText(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) + 15, (rr.bottom()-2)-lazySelectedNodePrevVal*height, dbString);
 	}
 
 	p.restore();
+}
+
+void PartCanvas::drawTooltipText(QPainter& p, const QRect& rr, int height, double lazySelNodeVal, double lazySelNodePrevVal, int lazySelNodeFrame, bool paintTextAsDb )
+{
+	// calculate the dB value for the dB string.
+	double vol = lazySelNodeVal;
+	QString dbString;
+	if(paintTextAsDb)
+	{
+		if (vol < 0.0001f)
+		{
+			vol = 0.0001f;
+		}
+		vol = 20.0f * log10 (vol);
+		if(vol < -60.0f)
+			vol = -60.0f;
+		 dbString = QString::number (vol, 'f', 2) + " dB";
+	}
+	else
+	{
+		dbString = QString::number(vol, 'f', 2);
+	}
+	// Set the color for the dB text
+	p.setPen(QColor(255,255,255,190));
+	p.drawText(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 15, (rr.bottom()-2)-lazySelNodePrevVal*height, dbString);
 }
 
 //---------------------------------------------------------
@@ -3795,6 +3881,8 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 				}
 
 				if (foundIt) {
+					automation.currentCtrlList = cl;
+					automation.currentTrack = t;
 					if (addNewCtrl) {
 						automation.currentCtrl = 0;
 						redraw();
@@ -3804,10 +3892,9 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 						redraw();
 						automation.controllerState = movingController;
 					}
-					automation.currentCtrlList = cl;
-					automation.currentTrack = t;
-					return;
+						return;
 				}
+				
 			}
 		} // if
 
@@ -3872,7 +3959,11 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		{
 			//printf("adding a new ctrler!\n");
 			int frame = tempomap.tick2frame(event->pos().x());
-			automation.currentCtrlList->add( frame, 1.0 /*dummy value */);
+			//Add the controll node here
+			//FIXME: this is not selecting the correct controller
+			//mapy(pointer.y());
+			printf("Current Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
+			automation.currentCtrlList->add( frame, mapy(event->pos().y()) /*dummy value */);
 			QWidget::setCursor(Qt::BlankCursor);
 
 			iCtrl ic=automation.currentCtrlList->begin();

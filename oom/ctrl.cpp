@@ -32,7 +32,7 @@ void CtrlList::initColor(int i)
 
 	_displayColor.setAlpha(255);
 
-	_visible = false;
+	//_visible = false;
 }
 
 
@@ -218,6 +218,7 @@ void CtrlList::read(Xml& xml)
 					if (!ok)
 					{
 						printf("CtrlList::read failed reading _id string: %s\n", xml.s2().toLatin1().constData());
+						initColor(0); //Set the default color if we have an error
 					}
 					else {
 						initColor(_id);
@@ -229,6 +230,14 @@ void CtrlList::read(Xml& xml)
 					_curVal = loc.toDouble(xml.s2(), &ok);
 					if (!ok)
 						printf("CtrlList::read failed reading _curVal string: %s\n", xml.s2().toLatin1().constData());
+				}
+				else if(tag == "visible")
+				{
+					_visible = (bool)xml.s2().toInt();
+				}
+				else if(tag == "color")
+				{
+					;//xml.skip(tag);
 				}
 				else
 					printf("unknown tag %s\n", tag.toLatin1().constData());
