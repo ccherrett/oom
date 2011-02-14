@@ -43,6 +43,7 @@
 #include "marker/marker.h"
 #include "arranger.h"
 #include "tlist.h"
+#include "utils.h"
 
 // Moved into global config by Tim.
 /* 
@@ -120,6 +121,8 @@ public:
 		m_nodes.clear();
 	}
 
+	int size() const {return m_nodes.size();}
+
 	double getMaxValue() const
 	{
 		double maxValue = MINDOUBLE;
@@ -148,7 +151,7 @@ public:
 		return minValue;
 	}
 
-	int getMaxFrame() const
+	int getEndFrame() const
 	{
 		int maxFrame = INT_MIN;
 		foreach(const CtrlVal* ctrlVal, m_nodes)
@@ -162,7 +165,7 @@ public:
 		return maxFrame;
 	}
 
-	int getMinFrame() const
+	int getStartFrame() const
 	{
 		int minFrame = INT_MAX;
 		foreach(const CtrlVal* ctrlVal, m_nodes)
@@ -181,8 +184,113 @@ public:
 		return m_nodes.contains(node);
 	}
 
+	void move(int frameDiff, double valDiff, double min, double max, CtrlList* list, CtrlVal* lazySelectedCtrlVal, bool dBCalculation)
+	{
+		if (lazySelectedCtrlVal)
+		{
+			addNodeToSelection(lazySelectedCtrlVal);
+		}
 
+		double maxNodeValue = getMaxValue();
+		double minNodeValue = getMinValue();
+
+		// should use the dbToVal() I guess, doesn't work as expected atm.
+		if ((maxNodeValue + valDiff) > max)
+		{
+			valDiff = max - maxNodeValue;
+		}
+
+		if ((minNodeValue + valDiff) < min)
+		{
+			valDiff = min - minNodeValue;
+		}
+
+		if (dBCalculation)
+		{
+			foreach(CtrlVal* ctrlVal, m_nodes)
+			{
+				double newCtrlVal = dbToVal(ctrlVal->val) + valDiff;
+				double cvval = valToDb(newCtrlVal);
+				if (cvval< min) cvval=min;
+				if (cvval>max) cvval=max;
+				ctrlVal->val = cvval;
+			}
+		}
+		else
+		{
+			double range = max - min;
+
+			foreach(CtrlVal* ctrlVal, m_nodes)
+			{
+				double cvval = ctrlVal->val + (valDiff * range);
+
+				if (cvval< min) cvval=min;
+				if (cvval>max) cvval=max;
+				ctrlVal->val = cvval;
+			}
+
+		}
+
+		int endFrame = getEndFrame();
+		int startFrame = getStartFrame();
+		int prevFrame = 0;
+		int nextFrame = INT_MAX;
+
+		// get previous and next frame position to give x bounds for this event.
+		iCtrl ic= list->begin();
+		for (; ic != list->end(); ic++)
+		{
+			CtrlVal &cv = ic->second;
+			if (cv.getFrame() == startFrame)
+			{
+				break;
+			}
+			prevFrame = cv.getFrame();
+		}
+
+		ic= list->begin();
+		for (; ic != list->end(); ic++)
+		{
+			CtrlVal &cv = ic->second;
+			nextFrame = cv.getFrame();
+			if (cv.getFrame() > endFrame)
+			{
+				break;
+			}
+		}
+
+		if (nextFrame == endFrame)
+		{
+			nextFrame = INT_MAX;
+		}
+
+		if ((endFrame + frameDiff) >= nextFrame)
+		{
+			frameDiff = 0;
+		}
+
+		if ((startFrame + frameDiff) <= prevFrame)
+		{
+			frameDiff = 0;
+		}
+
+		if (frameDiff != 0)
+		{
+			foreach(CtrlVal* ctrlVal, m_nodes)
+			{
+				int newFrame = ctrlVal->getFrame() + frameDiff;
+				list->setCtrlFrameValue(ctrlVal, newFrame);
+			}
+		}
+
+		if (lazySelectedCtrlVal)
+		{
+			removeNodeFromSelection(lazySelectedCtrlVal);
+		}
+
+	}
 };
+
 
 QIcon colorRect(const QColor& color, int width, int height)
 {
@@ -1246,8 +1354,6 @@ void PartCanvas::mousePress(QMouseEvent* event)
 				{
 					_curveNodeSelection->addNodeToSelection(cv);
 				}
-				_curveNodeSelection->getMaxFrame();
-				_curveNodeSelection->getMinFrame();
 			}
 			else
 			{
@@ -4106,88 +4212,40 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		}
 	}
 
+
 	if (!automation.currentCtrlVal)
 	{
 		return;
 	}
 
-	// get previous and next frame position to give x bounds for this event.
-	iCtrl ic=automation.currentCtrlList->begin();
-	for (; ic !=automation.currentCtrlList->end(); ic++)
+	int xDiff = (event->pos() - automation.mousePressPos).x();
+	int frameDiff = tempomap.tick2frame(abs(xDiff));
+	if (xDiff < 0)
 	{
-		CtrlVal &cv = ic->second;
-		if (automation.currentCtrlVal && cv == *automation.currentCtrlVal)
-		{
-			break;
-		}
-		prevFrame = cv.getFrame();
-	}
-
-	if ( ++ic != automation.currentCtrlList->end()) {
-		CtrlVal &cv = ic->second;
-		nextFrame = cv.getFrame();
-	}
-
-	if (currFrame <= prevFrame)
-	{
-		currFrame=prevFrame+1;
-	}
-
-	if (nextFrame!=-1 && currFrame >= nextFrame)
-	{
-		currFrame=nextFrame-1;
-	}
-
-	CtrlVal& firstCtrlVal = automation.currentCtrlList->begin()->second;
-	// only set a new frame value if the curve node != first curve node
-	if ( ! (*automation.currentCtrlVal == firstCtrlVal) )
-	{
-		automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrlVal, currFrame);
+		frameDiff *= -1;
 	}
 
 	double mouseYDiff = (automation.mousePressPos - event->pos()).y();
-	double yfraction = (mouseYDiff)/automation.currentTrack->height();
+	double valDiff = (mouseYDiff)/automation.currentTrack->height();
 
-	if (automation.currentCtrlList->id() == AC_VOLUME )  // use db scale for volume
+	double min, max;
+	automation.currentCtrlList->range(&min,&max);
+
+
+	if (automation.currentCtrlList->id() == AC_VOLUME )
 	{
-		double newCtrlVal = dbToVal(automation.currentCtrlVal->val) + yfraction;
-		double cvval = valToDb(newCtrlVal);
-		double min, max;
-		automation.currentCtrlList->range(&min,&max);
-		if (cvval< min) cvval=min;
-		if (cvval>max) cvval=max;
-		automation.currentCtrlVal->val=cvval;
+		_curveNodeSelection->move(frameDiff, valDiff, min, max, automation.currentCtrlList, automation.currentCtrlVal, true);
 	}
 	else
 	{
-		// we need to set curVal between 0 and 1
-		double min, max;
-		automation.currentCtrlList->range(&min,&max);
-		double range = max - min;
-		double cvval = automation.currentCtrlVal->val + (yfraction * range);
-
-		if (cvval< min) cvval=min;
-		if (cvval>max) cvval=max;
-		automation.currentCtrlVal->val = cvval;
-		//printf("calc cvval=%f yfraction=%f ", cvval, yfraction);
+		_curveNodeSelection->move(frameDiff, valDiff, min, max, automation.currentCtrlList, automation.currentCtrlVal, false);
 	}
-
 
 	automation.mousePressPos = event->pos();
 
 	//printf("mouseY=%d\n", mouseY);
 	controllerChanged(automation.currentTrack);
 }
-
-double PartCanvas::dbToVal(double inDb)
-{
-    return (20.0*log10(inDb)+60) / 70.0;
-}
-double PartCanvas::valToDb(double inV)
-{
-    return exp10((inV*70.0-60)/20.0);
-}
-
 
 void PartCanvas::trackViewChanged()
 {
