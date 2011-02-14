@@ -1,6 +1,12 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
+
+//  (C) Copyright 2011 Remon Sijrier
+//	14-feb:	Automation Curves:
+//		Fixed multiple drawing issues, highlight lazy selected node,
+//		implemented CurveNodeSelection to move a selection of nodes.
+//
 //    $Id: pcanvas.cpp,v 1.48.2.26 2009/11/22 11:08:33 spamatica Exp $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
@@ -93,6 +99,91 @@ class ColorListItem { //: public QCustomMenuItem { ddskrjo
 //   paints a rectangular icon with a given color
 //---------------------------------------------------------
 
+class CurveNodeSelection
+{
+private:
+	QList<CtrlVal*> m_nodes;
+
+public:
+	void addNodeToSelection(CtrlVal* node)
+	{
+		m_nodes.append(node);
+	}
+
+	void removeNodeFromSelection(CtrlVal* node)
+	{
+		m_nodes.removeAll(node);
+	}
+
+	void clearSelection()
+	{
+		m_nodes.clear();
+	}
+
+	double getMaxValue() const
+	{
+		double maxValue = MINDOUBLE;
+
+		foreach(const CtrlVal* ctrlVal, m_nodes)
+		{
+			if (ctrlVal->val > maxValue)
+			{
+				maxValue = ctrlVal->val;
+			}
+		}
+		return maxValue;
+	}
+
+	double getMinValue() const
+	{
+		double minValue = MAXDOUBLE;
+
+		foreach(const CtrlVal* ctrlVal, m_nodes)
+		{
+			if (ctrlVal->val < minValue)
+			{
+				minValue = ctrlVal->val;
+			}
+		}
+		return minValue;
+	}
+
+	int getMaxFrame() const
+	{
+		int maxFrame = INT_MIN;
+		foreach(const CtrlVal* ctrlVal, m_nodes)
+		{
+			if (ctrlVal->getFrame() > maxFrame)
+			{
+				maxFrame = ctrlVal->getFrame();
+			}
+		}
+
+		return maxFrame;
+	}
+
+	int getMinFrame() const
+	{
+		int minFrame = INT_MAX;
+		foreach(const CtrlVal* ctrlVal, m_nodes)
+		{
+			if (ctrlVal->getFrame() < minFrame)
+			{
+				minFrame = ctrlVal->getFrame();
+			}
+		}
+
+		return minFrame;
+	}
+
+	bool isSelected (CtrlVal* node)
+	{
+		return m_nodes.contains(node);
+	}
+
+
+};
+
 QIcon colorRect(const QColor& color, int width, int height)
 {
 	QPainter painter;
@@ -152,9 +243,10 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	setMouseTracking(true);
         _drag = DRAG_OFF;
 	curColorIndex = 0;
-	automation.currentCtrl = 0;
+	automation.currentCtrlVal = 0;
 	automation.controllerState = doNothing;
 	automation.moveController = false;
+	_curveNodeSelection = new CurveNodeSelection;
 	partsChanged();
 }
 
@@ -1078,14 +1170,19 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 
 void PartCanvas::mousePress(QMouseEvent* event)
 {
-	if (event->modifiers() & Qt::ShiftModifier)
+	if (event->modifiers() & Qt::ShiftModifier && _tool != AutomationTool)
 	{
 		return;
 	}
+
 	QPoint pt = event->pos();
 	CItem* item = _items.find(pt);
+
 	if (item == 0 && _tool!=AutomationTool)
+	{
 		return;
+	}
+
 	switch (_tool)
 	{
 		default:
@@ -1110,7 +1207,7 @@ void PartCanvas::mousePress(QMouseEvent* event)
 			if (automation.controllerState != doNothing)
 			{
 				automation.moveController=true;
-				if (automation.currentCtrl)
+				if (automation.currentCtrlVal)
 				{
 					QWidget::setCursor(Qt::BlankCursor);
 					//printf("Current After foundIt Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
@@ -1120,7 +1217,6 @@ void PartCanvas::mousePress(QMouseEvent* event)
 					}
 					Track * t = y2Track(event->pos().y());
 					if (t) {
-						bool addNewPoints=false;
 						CtrlListList* cll = ((AudioTrack*) t)->controller();
 						for(CtrlListList::iterator icll =cll->begin();icll!=cll->end();++icll)
 						{
@@ -1133,6 +1229,31 @@ void PartCanvas::mousePress(QMouseEvent* event)
 						}
 					}	
 				}	
+			}
+
+			if (automation.currentCtrlVal && event->modifiers() & Qt::ShiftModifier)
+			{
+				CtrlVal* cv = automation.currentCtrlVal;
+				if (_curveNodeSelection->isSelected(cv))
+				{
+					_curveNodeSelection->removeNodeFromSelection(cv);
+					automation.currentCtrlVal = 0;
+					redraw();
+				}
+				else
+				{
+					_curveNodeSelection->addNodeToSelection(cv);
+				}
+				_curveNodeSelection->getMaxFrame();
+				_curveNodeSelection->getMinFrame();
+			}
+			else
+			{
+				if (! (event->modifiers() & Qt::ShiftModifier))
+				{
+					_curveNodeSelection->clearSelection();
+					redraw();
+				}
 			}
 
 			break;
@@ -1149,7 +1270,7 @@ void PartCanvas::mouseRelease(const QPoint&)
 	// clear all the automation parameters
 	automation.moveController=false;
 	automation.controllerState = doNothing;
-	automation.currentCtrl=0;
+	automation.currentCtrlVal=0;
 	automation.currentTrack=0;
 	automation.currentCtrlList=0;
 }
@@ -2406,12 +2527,12 @@ void PartCanvas::cmd(int cmd)
 		{
 			if (_tool == AutomationTool)
 			{
-				if (automation.currentCtrl)
+				if (automation.currentCtrlVal)
 				{
 					CtrlVal& firstCtrlVal = automation.currentCtrlList->begin()->second;
-					if (automation.currentCtrl->getFrame() != firstCtrlVal.getFrame())
+					if (automation.currentCtrlVal->getFrame() != firstCtrlVal.getFrame())
 					{
-						automation.currentCtrlList->del(automation.currentCtrl->getFrame());
+						automation.currentCtrlList->del(automation.currentCtrlVal->getFrame());
 						redraw();
 					}
 
@@ -3635,7 +3756,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 			for (; ic != cl->end(); ++ic)
 			{
-				CtrlVal cv = ic->second;
+				CtrlVal &cv = ic->second;
 				double nextVal = cv.val; // was curVal
 				if (cl->id() == AC_VOLUME)
 				{ // use db scale for volume
@@ -3671,7 +3792,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 					// draw a square around the point
 					// If the point is selected, paint it with a different color to make the selected one more visible to the user
-					if (automation.currentCtrl && automation.currentCtrl->getFrame() == cv.getFrame() && automation.currentCtrl->val == cv.val)
+					if ((automation.currentCtrlVal && *automation.currentCtrlVal == cv) || _curveNodeSelection->isSelected(&cv))
 					{
 						lazySelectedNodePrevVal = prevVal;
 						lazySelectedNodeFrame = prevPosFrame;
@@ -3684,9 +3805,12 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 						p.drawEllipse(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) - 5, (rr.bottom()-2)-lazySelectedNodePrevVal*height - 5, 8, 8);
 
-						if (lazySelectedNodeFrame >= 0 && paintdBText)/*{{{*/
+						if ((lazySelectedNodeFrame >= 0) && paintdBText)/*{{{*/
 						{
+							if (automation.currentCtrlVal && *automation.currentCtrlVal == cv)
+							{
 								drawTooltipText(p, rr, height, lazySelectedNodeVal, lazySelectedNodePrevVal, lazySelectedNodeFrame, paintTextAsDb);
+							}
 						}/*}}}*/
 					}
 					else
@@ -3851,11 +3975,11 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 					automation.currentCtrlList = cl;
 					automation.currentTrack = t;
 					if (addNewCtrl) {
-						automation.currentCtrl = 0;
+						automation.currentCtrlVal = 0;
 						redraw();
 						automation.controllerState = addNewController;
 					}else {
-						automation.currentCtrl=&cv;
+						automation.currentCtrlVal=&cv;
 						redraw();
 						automation.controllerState = movingController;
 					}
@@ -3879,16 +4003,16 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 				automation.controllerState = addNewController;
 				automation.currentCtrlList = cl;
 				automation.currentTrack = t;
-				automation.currentCtrl = 0;
+				automation.currentCtrlVal = 0;
 				return;
 			}
 		}
 	}
 	// if there are no hits we default to clearing all the data
 	automation.controllerState = doNothing;
-	if (automation.currentCtrl)
+	if (automation.currentCtrlVal)
 	{
-		automation.currentCtrl = 0;
+		automation.currentCtrlVal = 0;
 		redraw();
 	}
 	automation.currentCtrlList = 0;
@@ -3930,17 +4054,17 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 
 	int prevFrame = 0;
 	int nextFrame = -1;
+	int currFrame = tempomap.tick2frame(event->pos().x());
 
 	if (automation.controllerState == addNewController)
 	{
 		//printf("adding a new ctrler!\n");
-		int frame = tempomap.tick2frame(event->pos().x());
 		//Add the controll node here
 		//FIXME: this is not selecting the correct controller
 		//printf("Current Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
 		if(automation.currentCtrlList->selected())
 		{
-			automation.currentCtrlList->add( frame, mapy(event->pos().y()) /*dummy value */);
+			automation.currentCtrlList->add( currFrame, mapy(event->pos().y()) /*dummy value */);
 		}
 		else
 		{ //go find the right item from the current track
@@ -3958,7 +4082,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 				}
 				if(automation.currentCtrlList->selected())
 				{
-					automation.currentCtrlList->add( frame, mapy(event->pos().y()));
+					automation.currentCtrlList->add( currFrame, mapy(event->pos().y()));
 				}
 			}
 		}
@@ -3968,12 +4092,17 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		iCtrl ic=automation.currentCtrlList->begin();
 		for (; ic !=automation.currentCtrlList->end(); ic++) {
 			CtrlVal &cv = ic->second;
-			if (cv.getFrame() == frame) {
-				automation.currentCtrl = &cv;
+			if (cv.getFrame() == currFrame) {
+				automation.currentCtrlVal = &cv;
 				automation.controllerState = movingController;
 				break;
 			}
 		}
+	}
+
+	if (!automation.currentCtrlVal)
+	{
+		return;
 	}
 
 	// get previous and next frame position to give x bounds for this event.
@@ -3981,7 +4110,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 	for (; ic !=automation.currentCtrlList->end(); ic++)
 	{
 		CtrlVal &cv = ic->second;
-		if (&cv == automation.currentCtrl)
+		if (automation.currentCtrlVal && cv == *automation.currentCtrlVal)
 		{
 			break;
 		}
@@ -3993,14 +4122,21 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		nextFrame = cv.getFrame();
 	}
 
-	int currFrame = tempomap.tick2frame(event->pos().x());
-	if (currFrame <= prevFrame) currFrame=prevFrame+1;
-	if (nextFrame!=-1 && currFrame >= nextFrame) currFrame=nextFrame-1;
+	if (currFrame <= prevFrame)
+	{
+		currFrame=prevFrame+1;
+	}
+
+	if (nextFrame!=-1 && currFrame >= nextFrame)
+	{
+		currFrame=nextFrame-1;
+	}
 
 	CtrlVal& firstCtrlVal = automation.currentCtrlList->begin()->second;
-	if (automation.currentCtrl->getFrame() != firstCtrlVal.getFrame())
+	// only set a new frame value if the curve node != first curve node
+	if ( ! (*automation.currentCtrlVal == firstCtrlVal) )
 	{
-		automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrl, currFrame);
+		automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrlVal, currFrame);
 	}
 
 	int yy = track2Y(automation.currentTrack);
@@ -4016,7 +4152,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		automation.currentCtrlList->range(&min,&max);
 		if (cvval< min) cvval=min;
 		if (cvval>max) cvval=max;
-		automation.currentCtrl->val=cvval;
+		automation.currentCtrlVal->val=cvval;
 	}
 	else
 	{
@@ -4027,7 +4163,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 
 		if (cvval< min) cvval=min;
 		if (cvval>max) cvval=max;
-		automation.currentCtrl->val = cvval;
+		automation.currentCtrlVal->val = cvval;
 		//printf("calc cvval=%f yfraction=%f ", cvval, yfraction);
 	}
 

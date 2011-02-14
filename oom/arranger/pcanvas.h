@@ -52,7 +52,7 @@ public:
 
 enum ControllerVals { doNothing, movingController, addNewController };
 struct AutomationObject {
-	CtrlVal *currentCtrl;
+	CtrlVal *currentCtrlVal;
 	CtrlList *currentCtrlList;
 	Track *currentTrack;
 	bool moveController;
@@ -64,6 +64,7 @@ class MidiEditor;
 class QMenu;
 class Xml;
 class CtrlVal;
+class CurveNodeSelection;
 
 //---------------------------------------------------------
 //   PartCanvas
@@ -83,6 +84,7 @@ class PartCanvas : public Canvas
     bool unselectNodes;
 
     AutomationObject automation;
+    CurveNodeSelection* _curveNodeSelection;
 
     Q_OBJECT
     virtual void keyPress(QKeyEvent*);
