@@ -1113,12 +1113,9 @@ void PartCanvas::mousePress(QMouseEvent* event)
 				if (automation.currentCtrl)
 				{
 					QWidget::setCursor(Qt::BlankCursor);
-					printf("TTTTTTTTTTTTTTTTTTTTTTTTTTTTT\n");
 					//printf("Current After foundIt Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
 					if(automation.currentCtrlList)
 						automation.currentCtrlList->setSelected(true);
-					//else
-					//	automation.currentCtrlList->setSelected(true);
 					Track * t = y2Track(event->pos().y());
 					if (t) {
 						bool addNewPoints=false;
@@ -1131,25 +1128,9 @@ void PartCanvas::mousePress(QMouseEvent* event)
 							{
 								cl->setSelected(false);
 							}
-							else
-							{
-								printf("unselectNodes: %d\n", unselectNodes);
-								if(unselectNodes)
-								{
-									printf("unselecting nodes\n");
-									automation.currentCtrlList->setSelected(false);
-									//cl->setSelected(false);
-									unselectNodes = false;
-								}
-							}
 						}
 					}	
 				}	
-			}
-			else
-			{
-				printf("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS\n");
-				//printf("Current After Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
 			}
 
 			break;
@@ -1259,19 +1240,6 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		{
 			lineEditor->hide();
 			editMode = false;
-			return;
-		}
-	}
-	else
-	{
-		if (key == Qt::Key_Escape)
-		{
-			unselectNodes = true;
-			/*if(automation.currentCtrlList)// && automation.currentCtrlList->selected())
-			{
-				printf("ESC fired Current Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
-				automation.currentCtrlList->setSelected(false);
-			}*/	
 			return;
 		}
 	}
@@ -3942,9 +3910,9 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		if (!automation.moveController) { // currently nothing going lets's check for some action.
 			Track * t = y2Track(event->pos().y());
 			if (t) {
-				bool addNewPoints=false;
+				bool addNewPoints = false;
 				if (event->modifiers() & Qt::ControlModifier)
-					addNewPoints=true;
+					addNewPoints = true;
 				checkAutomation(t, event->pos(), addNewPoints);
 			}
 			return;
@@ -3961,9 +3929,28 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			int frame = tempomap.tick2frame(event->pos().x());
 			//Add the controll node here
 			//FIXME: this is not selecting the correct controller
-			//mapy(pointer.y());
-			printf("Current Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
-			automation.currentCtrlList->add( frame, mapy(event->pos().y()) /*dummy value */);
+			//printf("Current Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
+			if(automation.currentCtrlList->selected())
+				automation.currentCtrlList->add( frame, mapy(event->pos().y()) /*dummy value */);
+			else
+			{ //go find the right item from the current track
+				Track * t = y2Track(event->pos().y());/*{{{*/
+				if (t) {
+					bool addNewPoints=false;
+					CtrlListList* cll = ((AudioTrack*) t)->controller();
+					for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+					{
+						CtrlList *cl = icll->second;
+						if(cl->selected() && cl != automation.currentCtrlList)
+						{
+							automation.currentCtrlList = cl;
+							break;
+						}
+					}
+					if(automation.currentCtrlList->selected())
+						automation.currentCtrlList->add( frame, mapy(event->pos().y()));
+				}	/*}}}*/
+			}
 			QWidget::setCursor(Qt::BlankCursor);
 
 			iCtrl ic=automation.currentCtrlList->begin();
