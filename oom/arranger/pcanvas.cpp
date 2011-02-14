@@ -1204,6 +1204,8 @@ void PartCanvas::mousePress(QMouseEvent* event)
 		}
 		case AutomationTool:
 		{
+			automation.mousePressPos = event->pos();
+
 			if (automation.controllerState != doNothing)
 			{
 				automation.moveController=true;
@@ -4030,16 +4032,20 @@ void PartCanvas::controllerChanged(Track* /* t */)
 void PartCanvas::processAutomationMovements(QMouseEvent *event)
 {
 
-	if (_tool != AutomationTool) {
+	if (_tool != AutomationTool)
+	{
 		return;
 	}
 
-	if (!automation.moveController) { // currently nothing going lets's check for some action.
+	if (!automation.moveController)  // currently nothing going lets's check for some action.
+	{
 		Track * t = y2Track(event->pos().y());
 		if (t) {
 			bool addNewPoints = false;
 			if (event->modifiers() & Qt::ControlModifier)
+			{
 				addNewPoints = true;
+			}
 			checkAutomation(t, event->pos(), addNewPoints);
 		}
 		return;
@@ -4139,15 +4145,13 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		automation.currentCtrlList->setCtrlFrameValue(automation.currentCtrlVal, currFrame);
 	}
 
-	int yy = track2Y(automation.currentTrack);
-
-	int mouseY = automation.currentTrack->height() - (mapy(event->pos().y()) - mapy(yy)) - 2;
-	double yfraction = ((double)mouseY)/automation.currentTrack->height();
+	double mouseYDiff = (automation.mousePressPos - event->pos()).y();
+	double yfraction = (mouseYDiff)/automation.currentTrack->height();
 
 	if (automation.currentCtrlList->id() == AC_VOLUME )  // use db scale for volume
 	{
-		double cvval = valToDb(yfraction);
-		//printf("calc yfraction = %f v=%f ",yfraction,cvval);
+		double newCtrlVal = dbToVal(automation.currentCtrlVal->val) + yfraction;
+		double cvval = valToDb(newCtrlVal);
 		double min, max;
 		automation.currentCtrlList->range(&min,&max);
 		if (cvval< min) cvval=min;
@@ -4159,13 +4163,17 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		// we need to set curVal between 0 and 1
 		double min, max;
 		automation.currentCtrlList->range(&min,&max);
-		double cvval = yfraction * (max-min) + min;
+		double range = max - min;
+		double cvval = automation.currentCtrlVal->val + (yfraction * range);
 
 		if (cvval< min) cvval=min;
 		if (cvval>max) cvval=max;
 		automation.currentCtrlVal->val = cvval;
 		//printf("calc cvval=%f yfraction=%f ", cvval, yfraction);
 	}
+
+
+	automation.mousePressPos = event->pos();
 
 	//printf("mouseY=%d\n", mouseY);
 	controllerChanged(automation.currentTrack);

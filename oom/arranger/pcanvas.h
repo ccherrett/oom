@@ -57,6 +57,7 @@ struct AutomationObject {
 	Track *currentTrack;
 	bool moveController;
 	ControllerVals controllerState;
+	QPoint mousePressPos;
 };
 
 class QLineEdit;
