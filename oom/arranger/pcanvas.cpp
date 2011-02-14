@@ -4176,7 +4176,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		//printf("Current Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
 		if(automation.currentCtrlList->selected())
 		{
-			automation.currentCtrlList->add( currFrame, mapy(event->pos().y()) /*dummy value */);
+			automation.currentCtrlList->add( currFrame, 0.5 /*dummy value */);
 		}
 		else
 		{ //go find the right item from the current track
@@ -4194,7 +4194,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 				}
 				if(automation.currentCtrlList->selected())
 				{
-					automation.currentCtrlList->add( currFrame, mapy(event->pos().y()));
+					automation.currentCtrlList->add( currFrame, 0.5);
 				}
 			}
 		}
@@ -4212,11 +4212,6 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 		}
 	}
 
-
-	if (!automation.currentCtrlVal)
-	{
-		return;
-	}
 
 	int xDiff = (event->pos() - automation.mousePressPos).x();
 	int frameDiff = tempomap.tick2frame(abs(xDiff));
