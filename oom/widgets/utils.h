@@ -25,5 +25,8 @@ extern QFrame* vLine(QWidget* parent);
 extern void dump(const unsigned char* p, int n);
 extern double curTime();
 
+extern double dbToVal(double inDb);
+extern double valToDb(double inV);
+
 #endif
 

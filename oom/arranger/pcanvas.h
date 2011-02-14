@@ -137,10 +137,7 @@ class PartCanvas : public Canvas
 	void drawTooltipText(QPainter& p, const QRect& rr, int height, double lazySelNodeVal, double lazySelNodePrevVal, int lazySelNodeFrame, bool paintAsDb);
 
     void checkAutomation(Track * t, const QPoint& pointer, bool addNewCtrl);
-    void processAutomationMovements(QMouseEvent *event);
-    double dbToVal(double inDb);
-    double valToDb(double inV);
-
+    void processAutomationMovements(QMouseEvent *event);    
 
 protected:
     virtual void drawCanvas(QPainter&, const QRect&);

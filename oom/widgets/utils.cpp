@@ -383,3 +383,14 @@ bool autoAdjustFontSize(QFrame* w, const QString& s, bool ignoreWidth, bool igno
 
 	return true;
 }
+
+
+double dbToVal(double inDb)
+{
+    return (20.0*log10(inDb)+60) / 70.0;
+}
+
+double valToDb(double inV)
+{
+    return exp10((inV*70.0-60)/20.0);
+}
