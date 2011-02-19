@@ -306,6 +306,7 @@ public:
 			removeNodeFromSelection(lazySelectedCtrlVal);
 		}
 
+		song->dirty = true;
 	}
 };
 
