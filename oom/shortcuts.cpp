@@ -131,7 +131,7 @@ void initShortCuts()
 	defShrt(SHRT_OPEN_HELP, Qt::Key_F1, "Help: Open Manual", ARRANG_SHRT, "open_help");
 	defShrt(SHRT_START_WHATSTHIS, Qt::SHIFT + Qt::Key_F1, "Help: Toggle whatsthis mode", ARRANG_SHRT, "toggle_whatsthis");
 
-	defShrt(SHRT_EDIT_PART, Qt::Key_Return, "Edit: Edit selected part", ARRANG_SHRT, "edit_selected_part");
+	defShrt(SHRT_EDIT_PART, 0, "Edit: Edit selected part", ARRANG_SHRT, "edit_selected_part");
 	defShrt(SHRT_SEL_ABOVE, Qt::Key_Up, "Edit: Select nearest part on track above", ARRANG_SHRT, "sel_part_above");
 	defShrt(SHRT_SEL_ABOVE_ADD, Qt::SHIFT + Qt::Key_Up, "Edit: Add nearest part on track above", ARRANG_SHRT, "sel_part_above_add");
 	defShrt(SHRT_SEL_BELOW, Qt::Key_Down, "Edit: Select nearest part on track below", ARRANG_SHRT, "sel_part_below");
