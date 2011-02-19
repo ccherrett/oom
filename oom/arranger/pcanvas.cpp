@@ -1327,8 +1327,15 @@ void PartCanvas::mousePress(QMouseEvent* event)
 		{
 			automation.mousePressPos = event->pos();
 
+			if (event->modifiers() & Qt::ShiftModifier && event->button() & Qt::LeftButton && !automation.currentCtrlVal)
+			{
+				automation.moveController = true;
+				return;
+			}
+
 			if (automation.controllerState != doNothing)
 			{
+
 				automation.moveController=true;
 				if (automation.currentCtrlVal)
 				{
@@ -1392,8 +1399,6 @@ void PartCanvas::mouseRelease(const QPoint&)
 	automation.moveController=false;
 	automation.controllerState = doNothing;
 	automation.currentCtrlVal=0;
-	automation.currentTrack=0;
-	automation.currentCtrlList=0;
 }
 
 //---------------------------------------------------------
@@ -4153,8 +4158,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 		automation.currentCtrlVal = 0;
 		redraw();
 	}
-	automation.currentCtrlList = 0;
-	automation.currentTrack = 0;
+
 	setCursor();
 }
 
@@ -4194,8 +4198,6 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 
 	// automation.moveController is set, lets rock.
 
-	int prevFrame = 0;
-	int nextFrame = -1;
 	int currFrame = tempomap.tick2frame(event->pos().x());
 
 	if (automation.controllerState == addNewController)
