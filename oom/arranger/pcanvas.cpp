@@ -121,6 +121,11 @@ public:
 		m_nodes.clear();
 	}
 
+	QList<CtrlVal*> getNodes() const
+	{
+		return m_nodes;
+	}
+
 	int size() const {return m_nodes.size();}
 
 	double getMaxValue() const
@@ -1511,9 +1516,15 @@ void PartCanvas::keyPress(QKeyEvent* event)
 			return;
 		}
 
+		if (_tool == AutomationTool)
+		{
+			return;
+		}
+
 		song->startUndo();
 		song->msgRemoveParts();
 		song->endUndo(SC_PART_REMOVED);
+
 		return;
 	}
 	else if (key == shortcuts[SHRT_POS_DEC].key)
@@ -2088,7 +2099,6 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
         else if (key == shortcuts[SHRT_INC_POS].key)
         {
-                Part* part = _curItem->part();
                 _curItem->setWidth(_curItem->width() + 200);
                 redraw();
                 resizeItem(_curItem, false);
@@ -2098,7 +2108,32 @@ void PartCanvas::keyPress(QKeyEvent* event)
                 Part* part = _curItem->part();
                 part->setLenTick(part->lenTick() - 200);
         }
-        else
+	else if (key == shortcuts[SHRT_SELECT_ALL].key)
+	{
+		if (_tool == AutomationTool)
+		{
+			if (automation.currentCtrlList)
+			{
+				if (_curveNodeSelection->size())
+				{
+					_curveNodeSelection->clearSelection();
+
+				}
+				else
+				{
+					iCtrl ic=automation.currentCtrlList->begin();
+					for (; ic !=automation.currentCtrlList->end(); ic++)
+					{
+						CtrlVal &cv = ic->second;
+						_curveNodeSelection->addNodeToSelection(&cv);
+					}
+				}
+				redraw();
+			}
+		}
+		return;
+	}
+	else
 	{
 		event->ignore(); // give global accelerators a chance
 		return;
@@ -2653,6 +2688,21 @@ void PartCanvas::cmd(int cmd)
 		{
 			if (_tool == AutomationTool)
 			{
+				if (automation.currentCtrlList && _curveNodeSelection->size())
+				{
+					QList<CtrlVal*> selectedNodes = _curveNodeSelection->getNodes();
+					foreach(CtrlVal* val, selectedNodes)
+					{
+						if (val->getFrame() != 0)
+						{
+							automation.currentCtrlList->del(val->getFrame());
+						}
+					}
+					_curveNodeSelection->clearSelection();
+					redraw();
+					return;
+				}
+
 				if (automation.currentCtrlVal)
 				{
 					CtrlVal& firstCtrlVal = automation.currentCtrlList->begin()->second;
