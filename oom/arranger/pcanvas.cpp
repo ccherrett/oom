@@ -3898,9 +3898,26 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 					//printf("pppppppppuuuuuuuuuuuuuuuuuuuuuuuuuuuuuukkkkkkkkkkkkkkkkkkkeeeeeeeeeeeeeeeee\n");
 					//goto quitDrawing;
 
+					bool ctrListNodesMoving = false;
+					if (automation.currentCtrlList == cl && automation.moveController) {
+						ctrListNodesMoving = true;
+					}
+
+					bool paintNodeHighlighted = false;
+					if (ctrListNodesMoving) {
+						if ((automation.currentCtrlVal && *automation.currentCtrlVal == cv) || _curveNodeSelection->isSelected(&cv))
+						{
+							paintNodeHighlighted = true;
+						}
+					}
+					else if ((automation.currentCtrlVal && *automation.currentCtrlVal == cv) || _curveNodeSelection->isSelected(&cv))
+					{
+						paintNodeHighlighted = true;
+					}
+
 					// draw a square around the point
 					// If the point is selected, paint it with a different color to make the selected one more visible to the user
-					if ((automation.currentCtrlVal && *automation.currentCtrlVal == cv) || _curveNodeSelection->isSelected(&cv))
+					if (paintNodeHighlighted)
 					{
 						lazySelectedNodePrevVal = prevVal;
 						lazySelectedNodeFrame = prevPosFrame;
