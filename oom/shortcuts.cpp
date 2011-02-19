@@ -170,8 +170,8 @@ void initShortCuts()
 	defShrt(SHRT_LOCATORS_TO_SELECTION, Qt::ALT + Qt::Key_P, "Edit: Set locators to selection", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "loc_to_sel");
 	defShrt(SHRT_INC_PITCH, Qt::CTRL + Qt::Key_Up, "Edit: Increase pitch", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pitch");
 	defShrt(SHRT_DEC_PITCH, Qt::CTRL + Qt::Key_Down, "Edit: Decrease pitch", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pitch");
-	defShrt(SHRT_INC_POS, 0, "Edit: Increase event position", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pos");
-	defShrt(SHRT_DEC_POS, 0, "Edit: Decrease event position", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pos");
+	defShrt(SHRT_INC_POS, Qt::CTRL + QT::Key_period, "Edit: Increase event position", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pos");
+	defShrt(SHRT_DEC_POS, Qt::CTRL + QT::Key_comma, "Edit: Decrease event position", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pos");
 	defShrt(SHRT_ZOOM_IN, Qt::CTRL + Qt::Key_PageUp, "View: Zoom in", PROLL_SHRT + DEDIT_SHRT, "zoom_in");
 	defShrt(SHRT_ZOOM_OUT, Qt::CTRL + Qt::Key_PageDown, "View: Zoom out", PROLL_SHRT + DEDIT_SHRT, "zoom_out");
 	defShrt(SHRT_GOTO_CPOS, Qt::CTRL + Qt::Key_J, "View: Goto Current Position", PROLL_SHRT + DEDIT_SHRT, "goto_cpos");
@@ -271,7 +271,7 @@ void initShortCuts()
 	defShrt(SHRT_LE_INS_SYSEX, Qt::ALT + Qt::Key_S, "Insert SysEx", LEDIT_SHRT, "le_ins_sysex");
 	defShrt(SHRT_LE_INS_CTRL, Qt::CTRL + Qt::Key_T, "Insert Ctrl", LEDIT_SHRT, "le_ins_ctrl");
 	defShrt(SHRT_LE_INS_META, 0, "Insert Meta", LEDIT_SHRT, "le_ins_meta");
-	defShrt(SHRT_LE_INS_CHAN_AFTERTOUCH, Qt::CTRL + Qt::Key_A, "Insert Channel Aftertouch", LEDIT_SHRT, "le_ins_afttouch");
+	defShrt(SHRT_LE_INS_CHAN_AFTERTOUCH, Qt::SHIFT + Qt::Key_A, "Insert Channel Aftertouch", LEDIT_SHRT, "le_ins_afttouch");
 	defShrt(SHRT_LE_INS_POLY_AFTERTOUCH, Qt::CTRL + Qt::Key_P, "Insert Key Aftertouch", LEDIT_SHRT, "le_ins_poly");
 
 	//-----------------------------------------------------------

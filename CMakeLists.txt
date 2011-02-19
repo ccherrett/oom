@@ -102,7 +102,7 @@ endif (${SVNVER} STREQUAL "SVNVER-NOTFOUND")
 # Do we need this? - Orcan:
 # include ( ${PROJECT_SOURCE_DIR}/cmake/WrapMacros.cmake)
 
-option ( ENABLE_LASH        "enable LASH Audio Session Handler"                              ON)
+option ( ENABLE_LASH        "enable LASH Audio Session Handler"                              OFF)
 option ( ENABLE_OSC         "enable Open Sound Control (DSSI also recommended)"              ON)   
 option ( ENABLE_DSSI        "enable Disposable Soft Synth Interface (OSC also recommended)"  ON)
 option ( ENABLE_VST         "enable VST/win support"                                         OFF)
