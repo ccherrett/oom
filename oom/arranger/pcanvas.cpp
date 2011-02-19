@@ -170,7 +170,7 @@ public:
 		int minFrame = INT_MAX;
 		foreach(const CtrlVal* ctrlVal, m_nodes)
 		{
-			if (ctrlVal->getFrame() < minFrame)
+			if (ctrlVal->getFrame() != 0 && ctrlVal->getFrame() < minFrame)
 			{
 				minFrame = ctrlVal->getFrame();
 			}
@@ -288,8 +288,11 @@ public:
 		{
 			foreach(CtrlVal* ctrlVal, m_nodes)
 			{
-				int newFrame = ctrlVal->getFrame() + frameDiff;
-				list->setCtrlFrameValue(ctrlVal, newFrame);
+				if (ctrlVal->getFrame() != 0)
+				{
+					int newFrame = ctrlVal->getFrame() + frameDiff;
+					list->setCtrlFrameValue(ctrlVal, newFrame);
+				}
 			}
 		}
 
