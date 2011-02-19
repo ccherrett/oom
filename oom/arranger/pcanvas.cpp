@@ -4249,16 +4249,14 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 	// automation.moveController is set, lets rock.
 
 	int currFrame = tempomap.tick2frame(event->pos().x());
+	double min, max;
 
 	if (automation.controllerState == addNewController)
 	{
-		//printf("adding a new ctrler!\n");
-		//Add the controll node here
-		//FIXME: this is not selecting the correct controller
-		//printf("Current Controller: %s\n", automation.currentCtrlList->name().toLatin1().constData());
+		bool addNode = false;
 		if(automation.currentCtrlList->selected())
 		{
-			automation.currentCtrlList->add( currFrame, 0.5 /*dummy value */);
+			addNode = true;
 		}
 		else
 		{ //go find the right item from the current track
@@ -4276,9 +4274,31 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 				}
 				if(automation.currentCtrlList->selected())
 				{
-					automation.currentCtrlList->add( currFrame, 0.5);
+					addNode = true;
 				}
 			}
+		}
+
+		if (addNode)
+		{
+			automation.currentCtrlList->range(&min,&max);
+			double range = max - min;
+			double newValue;
+			int mappedY = mapy(event->pos().y());
+			int trackY = track2Y(automation.currentTrack);
+			double relativeY = double(mappedY - trackY) / automation.currentTrack->height();
+
+			if (automation.currentCtrlList->id() == AC_VOLUME )
+			{
+				newValue = dbToVal(max) - relativeY;
+				newValue = valToDb(newValue);
+			}
+			else
+			{
+				newValue = max - (relativeY * range);
+			}
+
+			automation.currentCtrlList->add( currFrame, newValue);
 		}
 
 		QWidget::setCursor(Qt::BlankCursor);
@@ -4305,9 +4325,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 	double mouseYDiff = (automation.mousePressPos - event->pos()).y();
 	double valDiff = (mouseYDiff)/automation.currentTrack->height();
 
-	double min, max;
 	automation.currentCtrlList->range(&min,&max);
-
 
 	if (automation.currentCtrlList->id() == AC_VOLUME )
 	{
