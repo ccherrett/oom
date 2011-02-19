@@ -191,13 +191,29 @@ public:
 			addNodeToSelection(lazySelectedCtrlVal);
 		}
 
-		double maxNodeValue = getMaxValue();
-		double minNodeValue = getMinValue();
+		double range = max - min;
+
+		double maxNodeValue, minNodeValue;
+
+		if (dBCalculation)
+		{
+			maxNodeValue = dbToVal(getMaxValue()) * range;
+			minNodeValue = dbToVal(getMinValue()) * range;
+		}
+		else
+		{
+			maxNodeValue = getMaxValue();
+			minNodeValue = getMinValue();
+		}
+
+//		printf("maxNodeValue %f, minNodeValue %f\n", maxNodeValue, minNodeValue);
 
 		// should use the dbToVal() I guess, doesn't work as expected atm.
+//		printf("valDiff %f\, max %f\n", valDiff, max);
 		if ((maxNodeValue + valDiff) > max)
 		{
 			valDiff = max - maxNodeValue;
+//			printf("valDiff adjusted %f\n", valDiff);
 		}
 
 		if ((minNodeValue + valDiff) < min)
@@ -218,8 +234,6 @@ public:
 		}
 		else
 		{
-			double range = max - min;
-
 			foreach(CtrlVal* ctrlVal, m_nodes)
 			{
 				double cvval = ctrlVal->val + (valDiff * range);
