@@ -206,19 +206,15 @@ public:
 			minNodeValue = getMinValue();
 		}
 
-//		printf("maxNodeValue %f, minNodeValue %f\n", maxNodeValue, minNodeValue);
-
 		// should use the dbToVal() I guess, doesn't work as expected atm.
-//		printf("valDiff %f\, max %f\n", valDiff, max);
 		if ((maxNodeValue + valDiff) > max)
 		{
-			valDiff = max - maxNodeValue;
-//			printf("valDiff adjusted %f\n", valDiff);
+			valDiff = 0;
 		}
 
 		if ((minNodeValue + valDiff) < min)
 		{
-			valDiff = min - minNodeValue;
+			valDiff = 0;
 		}
 
 		if (dBCalculation)
@@ -227,8 +223,8 @@ public:
 			{
 				double newCtrlVal = dbToVal(ctrlVal->val) + valDiff;
 				double cvval = valToDb(newCtrlVal);
-				if (cvval< min) cvval=min;
-				if (cvval>max) cvval=max;
+				if (cvval < valToDb(min)) cvval = min;
+				if (cvval > max) cvval = max;
 				ctrlVal->val = cvval;
 			}
 		}
