@@ -4036,10 +4036,11 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 		
 		double zerodBHeight = rr.bottom() - dbToVal(1.0) * height;
 		double minusTwelvedBHeight = rr.bottom() - dbToVal(0.25) * height;
-		double panZero = height/2;
+		double panZero = rr.bottom() - height/2;
 
 		// line color
-		p.setPen(QColor(255, 255, 255, 100));
+		p.setRenderHint(QPainter::Antialiasing, false);
+		p.setPen(QColor(255, 255, 255, 30));
 		//p.setPen(QColor(255, 0, 0, 255));
 		if(paintdBLines)
 		{
