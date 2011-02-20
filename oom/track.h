@@ -134,6 +134,15 @@ public:
     void setSelected(bool f)
     {
         _selected = f;
+		//If we are deselected then also deselect our parts
+		if(!f)
+		{
+			for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+			{
+				Part* p = ip->second;
+				p->setSelected(f);
+			}
+		}
     }
 
     bool locked() const
