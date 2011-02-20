@@ -189,11 +189,12 @@ void CtrlList::del(int frame)
 // we have to 'update' the key value in the map too
 // which is to my knowledge only possible by removing
 // the original entry, and inserting the modified one.
-void CtrlList::setCtrlFrameValue(CtrlVal* ctrl, int frame)
+CtrlVal& CtrlList::setCtrlFrameValue(CtrlVal* ctrl, int frame)
 {
 	del(ctrl->getFrame());
 	add(frame, ctrl->val);
-	ctrl->frame = frame;
+	iCtrl e = find(frame);
+	return e->second;
 }
 
 //---------------------------------------------------------

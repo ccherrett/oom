@@ -296,7 +296,8 @@ public:
 				if (ctrlVal->getFrame() != 0)
 				{
 					int newFrame = ctrlVal->getFrame() + frameDiff;
-					list->setCtrlFrameValue(ctrlVal, newFrame);
+					removeNodeFromSelection(ctrlVal);
+					addNodeToSelection(&list->setCtrlFrameValue(ctrlVal, newFrame));
 				}
 			}
 		}

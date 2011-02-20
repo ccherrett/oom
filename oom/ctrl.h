@@ -136,7 +136,7 @@ public:
     CtrlList(int id);
     CtrlList(int id, QString name, double min, double max, bool dontShow = false);
 
-    void setCtrlFrameValue(CtrlVal* ctrl, int frame);
+    CtrlVal& setCtrlFrameValue(CtrlVal* ctrl, int frame);
 
     Mode mode() const
     {
