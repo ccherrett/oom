@@ -4286,9 +4286,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			automation.currentCtrlList->range(&min,&max);
 			double range = max - min;
 			double newValue;
-			int mappedY = mapy(event->pos().y());
-			int trackY = track2Y(automation.currentTrack);
-			double relativeY = double(mappedY - trackY) / automation.currentTrack->height();
+			double relativeY = double(event->pos().y() - track2Y(automation.currentTrack)) / automation.currentTrack->height();
 
 			if (automation.currentCtrlList->id() == AC_VOLUME )
 			{
