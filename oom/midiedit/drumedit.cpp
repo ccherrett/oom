@@ -401,7 +401,7 @@ DrumEdit::DrumEdit(PartList* pl, QWidget* parent, const char* name, unsigned ini
 	connect(vscroll, SIGNAL(scaleChanged(int)), dlist, SLOT(setYMag(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scaleChanged(int)), canvas, SLOT(setXMag(int)));
-	connect(srec, SIGNAL(toggled(bool)), canvas, SLOT(setSteprec(bool)));
+	connect(srec, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
 	connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
 
 	connect(vscroll, SIGNAL(scrollChanged(int)), dlist, SLOT(setYPos(int)));
@@ -467,6 +467,13 @@ void DrumEdit::songChanged1(int bits)
 	}
 	songChanged(bits);
 
+}
+
+void DrumEdit::setSteprec(bool flag)
+{
+	canvas->setSteprec(flag);
+	//if (flag == false)
+	//      midiin->setChecked(flag);
 }
 
 //---------------------------------------------------------
