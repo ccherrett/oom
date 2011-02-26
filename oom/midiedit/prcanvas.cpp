@@ -177,13 +177,12 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 		{ 0xff, 0xbf, 0x7a}
 	};
 
-	QPen mainPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-	p.setPen(mainPen);
+	QPen mainPen(Qt::black);
 
 	QColor colMoving;
 	colMoving.setRgb(220, 220, 120, 127);
 
-	QPen movingPen(Qt::darkGray, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+	QPen movingPen(Qt::darkGray);
 
 	QColor colSelected;
 	colSelected.setRgb(243, 206, 105, 127);
@@ -214,7 +213,6 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 		{
 			p.setPen(movingPen);
 			p.setBrush(colMoving);
-			//p.setBrush(Qt::gray);
 		}
 		else if (item->isSelected())
 		{
@@ -224,7 +222,6 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 		else
 		{
 			QColor color;
-			//color.setRgb(80, 102, 143);
 			color.setRgb(13, 124, 151, 127);
 			switch (colorMode)
 			{
@@ -239,38 +236,6 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 				case 2: // velocity
 				{
 					int velo = event.velo();
-					/*
-					if (velo < 64)
-						  color.setRgb(velo*4, 0, 0xff);
-					else
-						  color.setRgb(0xff, 0, (127-velo) * 4);
-					 */
-					/*
-					if(velo <= 11)
-					  color.setRgb(75,145,47);
-					else if(velo <= 22)
-					  color.setRgb(56,145,79);
-					else if(velo <= 33)
-					  color.setRgb(64,139,84);
-					else if(velo <= 44)
-					  color.setRgb(60,137,99);
-					else if(velo <= 55)
-					  color.setRgb(55,134,113);
-					else if(velo <= 66)
-					  color.setRgb(51,132,127);
-					else if(velo <= 77)
-					  color.setRgb(48,130,141);
-					else if(velo <= 88)
-					  color.setRgb(57,121,144);
-					else if(velo <= 99)
-					  color.setRgb(72,108,143);
-					else if(velo <= 110)
-					  color.setRgb(86,96,142);
-					else if(velo <= 121)
-					  color.setRgb(101,84,141);
-					else
-					  color.setRgb(116,72,140);
-					 */
 
 					if (velo <= 11)
 						color.setRgb(147, 186, 195, 127);
@@ -301,8 +266,10 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 					break;
 			}
 			p.setBrush(color);
+			p.setPen(mainPen);
 		}
 	}
+
 	p.drawRect(r);
 }
 
