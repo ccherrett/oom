@@ -103,6 +103,7 @@ class DrumEdit : public MidiEditor {
       void newCanvasWidth(int);
       void configChanged();
       void songChanged1(int);
+	  void setSteprec(bool);
 
    public slots:
       void setSelection(int, Event&, Part*);

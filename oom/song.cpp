@@ -4279,17 +4279,31 @@ QString Song::getScriptPath(int id, bool isdelivered)
 
 TrackList Song::getSelectedTracks()
 {
-        TrackList list;
-        for (iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
-        {
-                Track* tr = *t;
-                if (tr->selected())
-                {
-                        list.push_back(tr);
-                }
-       }
-
-        return list;
+	TrackList list;
+	if(viewselected)
+	{
+		for (iTrack t = _artracks.begin(); t != _artracks.end(); ++t)
+		{
+			Track* tr = *t;
+			if (tr->selected())
+			{
+				list.push_back(tr);
+			}
+		}
+	}
+	else
+	{
+		for (iTrack t = _viewtracks.begin(); t != _viewtracks.end(); ++t)
+		{
+			Track* tr = *t;
+			if (tr->selected())
+			{
+				list.push_back(tr);
+			}
+		}
+	}
+	
+	return list;
 }
 
 void Song::setTrackHeights(TrackList &list, int height)

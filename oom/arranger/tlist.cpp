@@ -868,6 +868,7 @@ void TList::moveSelection(int n)
 				}
 			}
 			(*s)->setSelected(false);
+			(*s)->deselectParts(); //TODO: Fix for part deselection on ctrl+up 
 			(*t)->setSelected(true);
                         selTrack = *t;
 

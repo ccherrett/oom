@@ -1774,7 +1774,11 @@ void PartCanvas::keyPress(QKeyEvent* event)
 
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_2].key)
         {
-                TrackList* tl = song->artracks();
+            TrackList* tl;
+			if(song->viewselected)
+				tl = song->visibletracks();
+			else
+				tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -1788,21 +1792,29 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_3].key)
         {
-                TrackList* tl = song->artracks();
-                for (iTrack t = tl->begin(); t != tl->end(); ++t)
-                {
-                        Track* tr = *t;
-                        if (tr->selected())
-                        {
-                                tr->setHeight(100);
-                        }
-                }
-                song->update(SC_TRACK_MODIFIED);
-                return;
+            TrackList* tl;
+			if(song->viewselected)
+				tl = song->visibletracks();
+			else
+				tl = song->artracks();
+            for (iTrack t = tl->begin(); t != tl->end(); ++t)
+            {
+                    Track* tr = *t;
+                    if (tr->selected())
+                    {
+                            tr->setHeight(100);
+                    }
+            }
+            song->update(SC_TRACK_MODIFIED);
+            return;
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_4].key)
         {
-                TrackList* tl = song->artracks();
+            TrackList* tl;
+			if(song->viewselected)
+				tl = song->visibletracks();
+			else
+				tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -1816,7 +1828,11 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_5].key)
         {
-                TrackList* tl = song->artracks();
+            TrackList* tl;
+			if(song->viewselected)
+				tl = song->visibletracks();
+			else
+				tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
@@ -1830,7 +1846,11 @@ void PartCanvas::keyPress(QKeyEvent* event)
         }
         else if (key == shortcuts[SHRT_TRACK_HEIGHT_6].key)
         {
-                TrackList* tl = song->artracks();
+            TrackList* tl;
+			if(song->viewselected)
+				tl = song->visibletracks();
+			else
+				tl = song->artracks();
                 for (iTrack t = tl->begin(); t != tl->end(); ++t)
                 {
                         Track* tr = *t;
