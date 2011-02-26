@@ -36,6 +36,7 @@ class Canvas : public View
     bool _canScrollRight;
     bool _canScrollUp;
     bool _canScrollDown;
+
 protected:
 
     enum DragMode
@@ -124,6 +125,7 @@ protected:
 
     virtual void endUndo(DragType, int flags) = 0;
     int getCurrentDrag();
+    void updateCItemsZValues();
 
     /*!
        \brief Virtual member

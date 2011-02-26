@@ -186,6 +186,8 @@ void EventCanvas::songChanged(int flags)
 		}
 	}
 
+	updateCItemsZValues();
+
 	Event event;
 	MidiPart* part = 0;
 	int x = 0;

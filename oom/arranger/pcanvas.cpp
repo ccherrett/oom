@@ -839,7 +839,7 @@ void PartCanvas::partsChanged()
 		tracks = song->artracks();
 	else
 		tracks = song->visibletracks();
-    _items.clear();
+	_items.clear();
 	int idx = 0;
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{
@@ -847,7 +847,7 @@ void PartCanvas::partsChanged()
 		for (iPart i = pl->begin(); i != pl->end(); ++i)
 		{
 			NPart* np = new NPart(i->second);
-            _items.add(np);
+			_items.add(np);
 			if (i->second->selected())
 			{
 				selectItem(np, true);

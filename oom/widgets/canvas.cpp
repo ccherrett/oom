@@ -1634,7 +1634,10 @@ void Canvas::setCurrentPart(Part* part)
                 _curPartId = _curPart->sn();
         }
 	curPartChanged();
+}
 
+void Canvas::updateCItemsZValues()
+{
 	for (iCItem k = _items.begin(); k != _items.end(); ++k)
 	{
 		CItem* cItem = k->second;
@@ -1647,5 +1650,4 @@ void Canvas::setCurrentPart(Part* part)
 			cItem->setZValue(0);
 		}
 	}
-
 }
