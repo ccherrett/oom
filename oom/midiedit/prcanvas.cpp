@@ -148,11 +148,14 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 {
 	QRect r = item->bbox();
 	if (!virt())
+	{
 		r.moveCenter(map(item->pos()));
+	}
 	r = r.intersected(rect);
 	if (!r.isValid())
+	{
 		return;
-	p.setPen(Qt::black);
+	}
 
 	struct Triple
 	{
@@ -1145,7 +1148,14 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 					break;
 				}
 			if (newpt != pt)
+			{
 				editor->setCurCanvasPart(newpt);
+				// ecanvas songchanged will insert the
+				// canvasitems in the correct order, so the
+				// active part notes will be painted last
+				EventCanvas::songChanged(SC_PART_INSERTED);
+				redraw();
+			}
 		}
 			break;
 		case CMD_SELECT_NEXT_PART: // select next part
@@ -1163,7 +1173,14 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 					break;
 				}
 			if (newpt != pt)
+			{
 				editor->setCurCanvasPart(newpt);
+				// ecanvas songchanged will insert the
+				// canvasitems in the correct order, so the
+				// active part notes will be painted last
+				EventCanvas::songChanged(SC_PART_INSERTED);
+				redraw();
+			}
 		}
 			break;
 		case CMD_MODIFY_GATE_TIME:

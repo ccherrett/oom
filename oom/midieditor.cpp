@@ -284,6 +284,8 @@ WavePart* MidiEditor::curWavePart()
 void MidiEditor::setCurCanvasPart(Part* part)
 {
 	if (canvas)
+	{
 		canvas->setCurrentPart(part);
+	}
 }
 

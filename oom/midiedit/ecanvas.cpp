@@ -151,13 +151,27 @@ void EventCanvas::songChanged(int flags)
 
 	if (flags & ~SC_SELECTION)
 	{
-                _items.clear();
+		QList<Part*> partList;
+		for (iPart p = editor->parts()->begin(); p != editor->parts()->end(); ++p)
+		{
+			partList.append(p->second);
+		}
+
+		// put the current part notes to the list after
+		// all the others so they are painted on top of the non-current parts
+		if (partList.removeAll(_curPart))
+		{
+			partList.append(_curPart);
+		}
+
+		_items.clear();
 		start_tick = MAXINT;
 		end_tick = 0;
                 _curPart = 0;
-		for (iPart p = editor->parts()->begin(); p != editor->parts()->end(); ++p)
+
+		foreach(Part* p, partList)
 		{
-			MidiPart* part = (MidiPart*) (p->second);
+			MidiPart* part = (MidiPart*) (p);
                         if (part->sn() == _curPartId)
                                 _curPart = part;
 			unsigned stick = part->tick();
