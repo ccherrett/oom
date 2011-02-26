@@ -51,10 +51,10 @@ void ScrollScale::setScale(int val)
 		scale = min + v * diff;
 
 	if (scale < 1.0)
-		scaleVal = -(int ( 1.0 / scale));
+		scaleVal = -( 1.0 / scale);
 	else
-		scaleVal = int ( scale);
-	if (scaleVal == -1) // nur so
+		scaleVal = scale;
+	if (scaleVal == -1.0f) // nur so
 		scaleVal = 1;
 
 #if 0
@@ -82,13 +82,13 @@ void ScrollScale::setScale(int val)
 	int pos, pmax;
 	if (scaleVal < 1)
 	{
-		pos = (off - scaleVal / 2) / (-scaleVal);
-		pmax = (maxVal - scaleVal - 1) / (-scaleVal) - i;
+		pos = int(off - scaleVal / 2) / (-scaleVal);
+		pmax = int((maxVal - scaleVal - 1) / (-scaleVal)) - i;
 	}
 	else
 	{
-		pos = off * scaleVal;
-		pmax = maxVal * scaleVal - i;
+		pos = int(off * scaleVal);
+		pmax = int(maxVal * scaleVal) - i;
 	}
 	if (pos > pmax)
 		pos = pmax;

@@ -25,7 +25,7 @@ class ScrollScale : public QWidget
     QSlider* scale;
     QScrollBar* scroll;
     int minVal, maxVal;
-    int scaleVal, scaleMin, scaleMax;
+    float scaleVal, scaleMin, scaleMax;
     bool showMagFlag;
     QBoxLayout* box;
     bool noScale;
@@ -53,7 +53,7 @@ public slots:
     void setScale(int);
 
 signals:
-    void scaleChanged(int);
+    void scaleChanged(float);
     void lscaleChanged(int);
     void scrollChanged(int);
     void newPage(int);
@@ -67,7 +67,7 @@ public:
         return scale->value();
     }
 
-    void setXmag(int val)
+    void setXmag(float val)
     {
         scale->setValue(val);
     }
@@ -98,7 +98,7 @@ public:
     int pos() const;
     int mag() const;
 
-    int getScaleValue() const
+    float getScaleValue() const
     {
         return scaleVal;
     }

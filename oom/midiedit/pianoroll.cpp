@@ -506,16 +506,16 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
 	connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
 	connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
-	connect(vscroll, SIGNAL(scaleChanged(int)), canvas, SLOT(setYMag(int)));
-	connect(vscroll, SIGNAL(scaleChanged(int)), piano, SLOT(setYMag(int)));
+	connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
+	connect(vscroll, SIGNAL(scaleChanged(float)), piano, SLOT(setYMag(float)));
 
 	connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), pcbar, SLOT(setXPos(int)));
 
-	connect(hscroll, SIGNAL(scaleChanged(int)), canvas, SLOT(setXMag(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), time, SLOT(setXMag(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), pcbar, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
 
 	connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
 	connect(canvas, SIGNAL(pitchChanged(int)), piano, SLOT(setPitch(int)));
@@ -532,7 +532,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(speaker, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
 	connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
 
-	connect(hscroll, SIGNAL(scaleChanged(int)), SLOT(updateHScrollRange()));
+	connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
 	piano->setYPos(KH * 30);
 	canvas->setYPos(KH * 30);
 	vscroll->setPos(KH * 30);
@@ -845,7 +845,7 @@ CtrlEdit* PianoRoll::addCtrl()
 	CtrlEdit* ctrlEdit = new CtrlEdit(ctrlLane/*splitter*/, this, xscale, false, "pianoCtrlEdit"); // ccharrett
 	connect(tools2, SIGNAL(toolChanged(int)), ctrlEdit, SLOT(setTool(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), ctrlEdit, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), ctrlEdit, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), ctrlEdit, SLOT(setXMag(float)));
 	connect(ctrlEdit, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	connect(ctrlEdit, SIGNAL(destroyedCtrl(CtrlEdit*)), SLOT(removeCtrl(CtrlEdit*)));
 	connect(ctrlEdit, SIGNAL(yposChanged(int)), pitchLabel, SLOT(setInt(int)));

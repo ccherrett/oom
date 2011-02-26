@@ -200,10 +200,10 @@ MasterEdit::MasterEdit()
 
 	connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 	connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
-	connect(vscroll, SIGNAL(scaleChanged(int)), canvas, SLOT(setYMag(int)));
+	connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
 
 	connect(vscroll, SIGNAL(scrollChanged(int)), tscale, SLOT(setYPos(int)));
-	connect(vscroll, SIGNAL(scaleChanged(int)), tscale, SLOT(setYMag(int)));
+	connect(vscroll, SIGNAL(scaleChanged(float)), tscale, SLOT(setYMag(float)));
 
 	connect(hscroll, SIGNAL(scrollChanged(int)), time1, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), sign, SLOT(setXPos(int)));
@@ -212,12 +212,12 @@ MasterEdit::MasterEdit()
 	//      connect(hscroll, SIGNAL(scrollChanged(int)), zhits,  SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), time2, SLOT(setXPos(int)));
 
-	connect(hscroll, SIGNAL(scaleChanged(int)), time1, SLOT(setXMag(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), sign, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), time1, SLOT(setXMag(float)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), sign, SLOT(setXMag(float)));
 	//      connect(hscroll, SIGNAL(scaleChanged(int)), thits,  SLOT(setXMag(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), canvas, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
 	//      connect(hscroll, SIGNAL(scaleChanged(int)), zhits,  SLOT(setXMag(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), time2, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), time2, SLOT(setXMag(float)));
 
 	connect(time1, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	//      connect(sign,   SIGNAL(timeChanged(unsigned)), pos, SLOT(setValue(unsigned)));

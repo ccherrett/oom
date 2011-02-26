@@ -36,7 +36,8 @@ protected:
     int xorg;
     int yorg;
     int xpos, ypos;
-    int xmag, ymag;
+    float xmag;
+    float ymag;
 
     virtual void keyPressEvent(QKeyEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
@@ -105,8 +106,8 @@ protected:
 public slots:
     void setXPos(int);
     void setYPos(int);
-    void setXMag(int xs);
-    void setYMag(int ys);
+    void setXMag(float xs);
+    void setYMag(float ys);
     void redraw();
 
 public:
@@ -139,15 +140,6 @@ public:
         return mapyDev(ypos) - yorg;
     }
 
-    int getXScale() const
-    {
-        return xmag;
-    }
-
-    int getYScale() const
-    {
-        return ymag;
-    }
     void setOrigin(int x, int y);
 
     void setVirt(bool flag)

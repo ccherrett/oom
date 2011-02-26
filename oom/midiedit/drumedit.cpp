@@ -397,16 +397,16 @@ DrumEdit::DrumEdit(PartList* pl, QWidget* parent, const char* name, unsigned ini
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
 	connect(song, SIGNAL(songChanged(int)), dlist, SLOT(songChanged(int)));
 	connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
-	connect(vscroll, SIGNAL(scaleChanged(int)), canvas, SLOT(setYMag(int)));
-	connect(vscroll, SIGNAL(scaleChanged(int)), dlist, SLOT(setYMag(int)));
+	connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
+	connect(vscroll, SIGNAL(scaleChanged(float)), dlist, SLOT(setYMag(float)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), canvas, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
 	connect(srec, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
 	connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
 
 	connect(vscroll, SIGNAL(scrollChanged(int)), dlist, SLOT(setYPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), time, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
 
 	connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 
@@ -930,7 +930,7 @@ CtrlEdit* DrumEdit::addCtrl()
 {
 	CtrlEdit* ctrlEdit = new CtrlEdit(split1, this, xscale, true, "drumCtrlEdit");
 	connect(hscroll, SIGNAL(scrollChanged(int)), ctrlEdit, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), ctrlEdit, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), ctrlEdit, SLOT(setXMag(float)));
 	connect(ctrlEdit, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	connect(ctrlEdit, SIGNAL(destroyedCtrl(CtrlEdit*)), SLOT(removeCtrl(CtrlEdit*)));
 	connect(ctrlEdit, SIGNAL(yposChanged(int)), toolbar, SLOT(setInt(int)));

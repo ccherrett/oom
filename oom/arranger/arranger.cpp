@@ -405,10 +405,10 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 
 	connect(vscroll, SIGNAL(valueChanged(int)), canvas, SLOT(setYPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), canvas, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
 	connect(vscroll, SIGNAL(valueChanged(int)), list, SLOT(setYPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int))); //
-	connect(hscroll, SIGNAL(scaleChanged(int)), time, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
 	connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	connect(canvas, SIGNAL(verticalScroll(unsigned)), SLOT(verticalScrollSetYpos(unsigned)));
 	connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));

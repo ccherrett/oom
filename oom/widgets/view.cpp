@@ -70,7 +70,7 @@ void View::setOrigin(int x, int y)
 //   setXMag
 //---------------------------------------------------------
 
-void View::setXMag(int xs)
+void View::setXMag(float xs)
 {
 	xmag = xs;
 	redraw();
@@ -80,7 +80,7 @@ void View::setXMag(int xs)
 //   seqYMag
 //---------------------------------------------------------
 
-void View::setYMag(int ys)
+void View::setYMag(float ys)
 {
 	ymag = ys;
 	redraw();
@@ -486,7 +486,7 @@ void View::setPainter(QPainter& p)
 
 	p.translate(double(-(xpos + rmapx(xorg))), double(-(ypos + rmapy(yorg))));
 	double xMag = (xmag < 0) ? 1.0 / (-xmag) : double(xmag);
-	double yMag = (ymag < 0) ? 1.0 / (-ymag) : double(ymag);
+	double yMag = (ymag < 0) ? 1.0 / (-ymag) : ymag;
 	p.scale(xMag, yMag);
 }
 

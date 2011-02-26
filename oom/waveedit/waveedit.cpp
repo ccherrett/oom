@@ -217,12 +217,12 @@ WaveEdit::WaveEdit(PartList* pl)
 	view->setFocus(); // Tim.
 
 	connect(hscroll, SIGNAL(scrollChanged(int)), view, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), view, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), view, SLOT(setXMag(float)));
 	setWindowTitle(view->getCaption());
 	connect(view, SIGNAL(followEvent(int)), hscroll, SLOT(setOffset(int)));
 
 	connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scaleChanged(int)), time, SLOT(setXMag(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
 	//      connect(time,    SIGNAL(timeChanged(unsigned)),  SLOT(setTime(unsigned)));
 	connect(view, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 

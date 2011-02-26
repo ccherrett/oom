@@ -41,7 +41,7 @@ public slots:
         canvas->setXPos(val);
     }
 
-    void setXMag(int val)
+    void setXMag(float val)
     {
         canvas->setXMag(val);
     }
