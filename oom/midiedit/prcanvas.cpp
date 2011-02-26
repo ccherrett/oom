@@ -469,6 +469,7 @@ void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dty
 	{
                 _curPart = icp->second.npart;
                 _curPartId = _curPart->sn();
+		updateCItemsZValues();
 	}
 
 	std::vector< CItem* > doneList;

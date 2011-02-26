@@ -186,8 +186,6 @@ void EventCanvas::songChanged(int flags)
 		}
 	}
 
-	updateCItemsZValues();
-
 	Event event;
 	MidiPart* part = 0;
 	int x = 0;
@@ -228,6 +226,9 @@ void EventCanvas::songChanged(int flags)
 	emit selectionChanged(x, event, part);
         if (_curPart == 0)
                 _curPart = (MidiPart*) (editor->parts()->begin()->second);
+
+	updateCItemsZValues();
+
 	redraw();
 }
 
