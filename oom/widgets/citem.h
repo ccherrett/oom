@@ -26,6 +26,7 @@ class CItem {
 private:
     Event _event;
     Part* _part;
+    int _zValue;
 
 protected:
     bool _isMoving;
@@ -53,6 +54,10 @@ public:
     int width() const {
         return _bbox.width();
     }
+
+    int zValue() const {return _zValue;}
+
+    void setZValue(int value) {_zValue = value;}
 
     void setWidth(int l) {
         _bbox.setWidth(l);

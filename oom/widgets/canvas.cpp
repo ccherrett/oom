@@ -145,6 +145,11 @@ void Canvas::setPos(int idx, unsigned val, bool adjustScrollbar)
 //   draw
 //---------------------------------------------------------
 
+static bool smallerZValue(const CItem* first, const CItem* second)
+{
+	return first->zValue() < second->zValue();
+}
+
 void Canvas::draw(QPainter& p, const QRect& rect)
 {
 	//      printf("draw canvas %x virt %d\n", this, virt());
@@ -167,10 +172,20 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 
 		// Draw items from other parts behind all others.
 		// Only for items with events (not arranger parts).
-                for (iCItem i = _items.begin(); i != to; ++i)
+		QList<CItem*> sortedByZValue;
+
+		// Draw items from other parts behind all others.
+		// Only for items with events (not arranger parts).
+		for (iCItem i = _items.begin(); i != to; ++i)
 		{
-			CItem* ci = i->second;
-                        if (!ci->event().empty() && ci->part() != _curPart)
+			sortedByZValue.append(i->second);
+		}
+
+		qSort(sortedByZValue.begin(), sortedByZValue.end(), smallerZValue);
+
+		foreach(CItem* ci, sortedByZValue)
+		{
+			if (!ci->event().empty() && ci->part() != _curPart)
 			{
 				drawItem(p, ci, rect);
 			}
@@ -1619,4 +1634,18 @@ void Canvas::setCurrentPart(Part* part)
                 _curPartId = _curPart->sn();
         }
 	curPartChanged();
+
+	for (iCItem k = _items.begin(); k != _items.end(); ++k)
+	{
+		CItem* cItem = k->second;
+		if(cItem->part() == _curPart)
+		{
+			cItem->setZValue(1);
+		}
+		else
+		{
+			cItem->setZValue(0);
+		}
+	}
+
 }

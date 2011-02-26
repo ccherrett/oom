@@ -25,6 +25,7 @@ CItem::CItem(const QPoint&p, const QRect& r)
 	_bbox = r;
 	_isMoving = false;
         _part = 0;
+	_zValue = 0;
 }
 
 // Changed by Tim. p3.3.20
@@ -35,6 +36,7 @@ CItem::CItem(const Event& e, Part* p)
 	_event = e;
 	_part = p;
 	_isMoving = false;
+	_zValue = 0;
 }
 
 //---------------------------------------------------------
