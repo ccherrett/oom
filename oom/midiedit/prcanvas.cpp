@@ -178,14 +178,15 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 	};
 
 	QPen mainPen(Qt::black);
+	int alpha = 150;
 
 	QColor colMoving;
-	colMoving.setRgb(220, 220, 120, 127);
+	colMoving.setRgb(220, 220, 120, alpha);
 
 	QPen movingPen(Qt::darkGray);
 
 	QColor colSelected;
-	colSelected.setRgb(243, 206, 105, 127);
+	colSelected.setRgb(243, 206, 105, alpha);
 
 	NEvent* nevent = (NEvent*) item;
 	Event event = nevent->event();
@@ -204,7 +205,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 		else
 		{
 			p.setPen(movingPen);
-			p.setBrush(QColor(192, 192, 192, 127));
+			p.setBrush(QColor(192, 192, 192, alpha));
 		}
 	}
 	else
@@ -222,7 +223,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 		else
 		{
 			QColor color;
-			color.setRgb(13, 124, 151, 127);
+			color.setRgb(13, 124, 151, alpha);
 			switch (colorMode)
 			{
 				case 0:
@@ -230,7 +231,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 				case 1: // pitch
 				{
 					Triple* c = &myColors/*Qt::color1*/[event.pitch() % 12];
-					color.setRgb(c->r, c->g, c->b, 127);
+					color.setRgb(c->r, c->g, c->b, alpha);
 				}
 					break;
 				case 2: // velocity
@@ -238,29 +239,29 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item,
 					int velo = event.velo();
 
 					if (velo <= 11)
-						color.setRgb(147, 186, 195, 127);
+						color.setRgb(147, 186, 195, alpha);
 					else if (velo <= 22)
-						color.setRgb(119, 169, 181, 127);
+						color.setRgb(119, 169, 181, alpha);
 					else if (velo <= 33)
-						color.setRgb(85, 157, 175, 127);
+						color.setRgb(85, 157, 175, alpha);
 					else if (velo <= 44)
-						color.setRgb(58, 152, 176, 127);
+						color.setRgb(58, 152, 176, alpha);
 					else if (velo <= 55)
-						color.setRgb(33, 137, 163, 127);
+						color.setRgb(33, 137, 163, alpha);
 					else if (velo <= 66)
-						color.setRgb(30, 136, 162, 127);
+						color.setRgb(30, 136, 162, alpha);
 					else if (velo <= 77)
-						color.setRgb(13, 124, 151, 127);
+						color.setRgb(13, 124, 151, alpha);
 					else if (velo <= 88)
-						color.setRgb(0, 110, 138, 127);
+						color.setRgb(0, 110, 138, alpha);
 					else if (velo <= 99)
-						color.setRgb(0, 99, 124, 127);
+						color.setRgb(0, 99, 124, alpha);
 					else if (velo <= 110)
-						color.setRgb(0, 77, 96, 127);
+						color.setRgb(0, 77, 96, alpha);
 					else if (velo <= 121)
-						color.setRgb(0, 69, 86, 127);
+						color.setRgb(0, 69, 86, alpha);
 					else
-						color.setRgb(0, 58, 72, 127);
+						color.setRgb(0, 58, 72, alpha);
 
 				}
 					break;
