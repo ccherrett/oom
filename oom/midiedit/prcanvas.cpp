@@ -1150,11 +1150,6 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 			if (newpt != pt)
 			{
 				editor->setCurCanvasPart(newpt);
-				// ecanvas songchanged will insert the
-				// canvasitems in the correct order, so the
-				// active part notes will be painted last
-				EventCanvas::songChanged(SC_PART_INSERTED);
-				redraw();
 			}
 		}
 			break;
@@ -1175,11 +1170,6 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 			if (newpt != pt)
 			{
 				editor->setCurCanvasPart(newpt);
-				// ecanvas songchanged will insert the
-				// canvasitems in the correct order, so the
-				// active part notes will be painted last
-				EventCanvas::songChanged(SC_PART_INSERTED);
-				redraw();
 			}
 		}
 			break;
