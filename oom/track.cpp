@@ -129,11 +129,7 @@ void removePortCtrlEvents(MidiTrack* t)
 
 int Track::y() const
 {
-	TrackList* tl = song->tracks();
-	if(!song->viewselected)
-		tl = song->artracks();
-	else
-		tl = song->visibletracks();
+	TrackList* tl = song->visibletracks();
 	int yy = 0;
 	for (ciTrack it = tl->begin(); it != tl->end(); ++it)
 	{

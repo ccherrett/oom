@@ -638,11 +638,7 @@ void Arranger::splitterMoved(int pos, int)
 
 void Arranger::trackSelectionChanged()
 {
-	TrackList* tracks;
-	if(!song->viewselected)
-		tracks = song->artracks();
-	else
-		tracks = song->visibletracks();
+	TrackList* tracks = song->visibletracks();
 	Track* track = 0;
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{

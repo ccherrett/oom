@@ -1358,17 +1358,15 @@ void Song::swapTracks(int i1, int i2)
 {
 	undoOp(UndoOp::SwapTrack, i1, i2);
 	//printf("Song::swapTracks(int %d, int %d)\n", i1, i2);
-	if(viewselected)
+	Track* track = _viewtracks[i1];
+	_viewtracks[i1] = _viewtracks[i2];
+	_viewtracks[i2] = track;
+
+	if(!viewselected)
 	{
-		Track* track = _viewtracks[i1];
-		_viewtracks[i1] = _viewtracks[i2];
-		_viewtracks[i2] = track;
-	}
-	else
-	{
-		Track* track = _artracks[i1];
+		Track *t = _artracks[i1];
 		_artracks[i1] = _artracks[i2];
-		_artracks[i2] = track;
+		_artracks[i2] = t;
 	}
 }
 
@@ -1514,6 +1512,8 @@ void Song::update(int flags)
 		return;
 	}
 	++level;
+	if(flags & (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
+		updateTrackViews1();
 	emit songChanged(flags);
 	--level;
 }
@@ -1913,6 +1913,8 @@ void Song::endMsgCmd()
 		redoList->clear(); // TODO: delete elements in list
 		undoAction->setEnabled(true);
 		redoAction->setEnabled(false);
+		if(updateFlags & (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
+			updateTrackViews1();
 		emit songChanged(updateFlags);
 	}
 }
@@ -1954,6 +1956,8 @@ void Song::redo()
 	if (updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED))
 		audio->msgUpdateSoloStates();
 
+	if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
+		updateTrackViews1();
 	emit songChanged(updateFlags);
 }
 
@@ -3558,6 +3562,17 @@ void Song::updateTrackViews1()
 				}
 			}
 		}/*}}}*/
+	}
+	if(!viewselected)
+	{
+		//Make the viewtracks the artracks
+		for(ciTrack it = _artracks.begin(); it != _artracks.end(); ++it)
+		{
+			//if((*it)->isMidiTrack() || (*it)->type() == Track::WAVE || (*it)->type() == Track::AUDIO_SOFTSYNTH)
+			//{
+				_viewtracks.push_back((*it));
+			//}
+		}
 	}
 	emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
