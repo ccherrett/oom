@@ -99,10 +99,7 @@ public:
         return _selected;
     }
 
-    void setSelected(bool f)
-    {
-        _selected = f;
-    }
+	void setSelected(bool f);
 
     bool mute() const
     {

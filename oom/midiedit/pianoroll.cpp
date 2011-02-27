@@ -1309,6 +1309,20 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		hscroll->setPos(pos);
 		return;
 	}
+	else if (key == shortcuts[SHRT_SCROLL_UP].key)
+	{
+		int pos = vscroll->pos() - (config.division/2);
+		if (pos < 0)
+			pos = 0;
+		vscroll->setPos(pos);
+		return;
+	}
+	else if (key == shortcuts[SHRT_SCROLL_DOWN].key)
+	{
+		int pos = vscroll->pos() + (config.division/2);
+		vscroll->setPos(pos);
+		return;
+	}
 	else if (key == shortcuts[SHRT_SEL_INSTRUMENT].key)
 	{
 		midiTrackInfo->instrPopup();

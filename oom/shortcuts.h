@@ -253,6 +253,8 @@ enum
     SHRT_GOTO_CPOS, // c
     SHRT_SCROLL_LEFT, // h
     SHRT_SCROLL_RIGHT, // l
+	SHRT_SCROLL_UP, // Shift+PgUp
+	SHRT_SCROLL_DOWN, // Shift+PgDown
     SHRT_FIXED_LEN, //Alt+L, currently only drumeditor
     SHRT_QUANTIZE, //q
     SHRT_OVER_QUANTIZE, //Default: undefined
@@ -305,7 +307,7 @@ enum
     SHRT_TOOL_LINEDRAW,
 
     // arranger
-    SHRT_TOOL_SCISSORS,
+	SHRT_TOOL_SCISSORS, // j
     SHRT_TOOL_GLUE,
     SHRT_TOOL_MUTE,
 

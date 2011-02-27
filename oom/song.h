@@ -192,6 +192,7 @@ public:
 
     bool dirty;
 	bool viewselected;
+	bool hasSelectedParts;
 	QString associatedRoute;
     WaveTrack* bounceTrack;
     AudioOutput* bounceOutput;

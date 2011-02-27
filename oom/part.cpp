@@ -10,7 +10,6 @@
 #include <assert.h>
 #include <cmath>
 
-#include "song.h"
 #include "part.h"
 #include "track.h"
 #include "globals.h"
@@ -19,6 +18,7 @@
 #include "wave.h"
 #include "midiport.h"
 #include "drummap.h"
+#include "song.h"
 //#include "midiedit/drummap.h"    // p4.0.2
 
 int Part::snGen;
@@ -1421,6 +1421,13 @@ void Part::dump(int n) const
 	for (int i = 0; i < n; ++i)
 		putchar(' ');
 	PosLen::dump();
+}
+
+void Part::setSelected(bool f)
+{
+	_selected = f;
+	if(f)
+		song->hasSelectedParts = f;
 }
 
 void WavePart::dump(int n) const

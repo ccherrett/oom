@@ -87,6 +87,7 @@ Song::Song(const char* name)
 	_globalPitchShift = 0;
 	jackErrorBox = 0;
 	viewselected = false;
+	hasSelectedParts = false;
 	//Create the AutoView
 	TrackView* wv = new TrackView();
 	wv->setViewName("Working View");
@@ -418,7 +419,8 @@ void Song::deselectAllParts()
 {
 	for(iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
 		(*t)->deselectParts();
-	update(SC_SELECTION);
+	hasSelectedParts = false;
+	//update(SC_SELECTION);
 }
 
 //---------------------------------------------------------

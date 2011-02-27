@@ -1508,14 +1508,14 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_POS_INC].key)
 	{
-                int spos = AL::sigmap.raster2(_pos[0] + 1, *_raster); // Nudge by +1, then snap up with raster2.
+		int spos = AL::sigmap.raster2(_pos[0] + 1, *_raster); // Nudge by +1, then snap up with raster2.
 		Pos p(spos, true);
 		song->setPos(0, p, true, true, true);
 		return;
 	}
 	else if (key == shortcuts[SHRT_POS_DEC_NOSNAP].key)
 	{
-                int spos = _pos[0] - AL::sigmap.rasterStep(_pos[0], *_raster);
+		int spos = _pos[0] - AL::sigmap.rasterStep(_pos[0], *_raster);
 		if (spos < 0)
 			spos = 0;
 		Pos p(spos, true);
@@ -1573,238 +1573,238 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		emit selectTrackBelow();
 		return;
 	}
-        else if (key == shortcuts[SHRT_SEL_TRACK_ABOVE_ADD].key)
-        {
-				TrackList* tl = song->visibletracks();
-                TrackList selectedTracks = song->getSelectedTracks();
-                if (!selectedTracks.size())
-                {
-                        return;
-                }
+	else if (key == shortcuts[SHRT_SEL_TRACK_ABOVE_ADD].key)
+	{
+		TrackList* tl = song->visibletracks();
+		TrackList selectedTracks = song->getSelectedTracks();
+		if (!selectedTracks.size())
+		{
+			return;
+		}
 
-                iTrack t = tl->end();
-                while (t != tl->begin())
-                {
-                        --t;
+		iTrack t = tl->end();
+		while (t != tl->begin())
+		{
+			--t;
 
-                        if ((*t) == *(selectedTracks.begin()))
-                        {
-                                if (*t != *(tl->begin()))
-                                {
-                                        Track* previous = *(--t);
-                                        previous->setSelected(true);
-                                        oom->arranger->getTrackList()->update();
-                                        return;
-                                }
+			if ((*t) == *(selectedTracks.begin()))
+			{
+				if (*t != *(tl->begin()))
+				{
+					Track* previous = *(--t);
+					previous->setSelected(true);
+					oom->arranger->getTrackList()->update();
+					return;
+				}
 
-                        }
-                }
+			}
+		}
 
-                return;
-        }
-        else if (key == shortcuts[SHRT_SEL_TRACK_BELOW_ADD].key)
-        {
-				TrackList* tl = song->visibletracks();
-                TrackList selectedTracks = song->getSelectedTracks();
-                if (!selectedTracks.size())
-                {
-                        return;
-                }
+		return;
+	}
+	else if (key == shortcuts[SHRT_SEL_TRACK_BELOW_ADD].key)
+	{
+		TrackList* tl = song->visibletracks();
+		TrackList selectedTracks = song->getSelectedTracks();
+		if (!selectedTracks.size())
+		{
+			return;
+		}
 
-                for (iTrack t = tl->begin(); t != tl->end(); ++t)
-                {
-                        if (*t == *(--selectedTracks.end()))
-                        {
-                                if (*t != *(--tl->end()))
-                                {
-                                        Track* next = *(++t);
-                                        next->setSelected(true);
-                                        oom->arranger->getTrackList()->update();
-                                        return;
-                                }
+		for (iTrack t = tl->begin(); t != tl->end(); ++t)
+		{
+			if (*t == *(--selectedTracks.end()))
+			{
+				if (*t != *(--tl->end()))
+				{
+					Track* next = *(++t);
+					next->setSelected(true);
+					oom->arranger->getTrackList()->update();
+					return;
+				}
 
-                        }
-                }
-                return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
-        {
-                Track* t =oom->arranger->curTrack();
-                if (t)
-                {
-                        audio->msgSetSolo(t, !t->solo());
-                        song->update(SC_SOLO);
-                }
-                return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_TOGGLE_MUTE].key)
-        {
-                Track* t =oom->arranger->curTrack();
-                if (t)
-                {
-                        t->setMute(!t->mute());
-                        song->update(SC_MUTE);
-                }
-                return;
-        }
-        else if (key == shortcuts[SHRT_MIDI_PANIC].key)
-        {
-                song->panic();
-                return;
-        }
-        else if (key == shortcuts[SHRT_SET_QUANT_0].key)
-        {
-                oom->arranger->_setRaster(0);
-                oom->arranger->raster->setCurrentIndex(0);
-                return;
-        }
-        else if (key == shortcuts[SHRT_SET_QUANT_1].key)
-        {
-                oom->arranger->_setRaster(1);
-                oom->arranger->raster->setCurrentIndex(1);
-                return;
-        }
-        else if (key == shortcuts[SHRT_SET_QUANT_2].key)
-        {
-                oom->arranger->_setRaster(2);
-                oom->arranger->raster->setCurrentIndex(2);
-                return;
-        }
-        else if (key == shortcuts[SHRT_SET_QUANT_3].key)
-        {
-                oom->arranger->_setRaster(3);
-                oom->arranger->raster->setCurrentIndex(3);
-                return;
-        }
-        else if (key == shortcuts[SHRT_SET_QUANT_4].key)
-        {
-                oom->arranger->_setRaster(4);
-                oom->arranger->raster->setCurrentIndex(4);
-                return;
-        }
-        else if (key == shortcuts[SHRT_SET_QUANT_5].key)
-        {
-                oom->arranger->_setRaster(5);
-                oom->arranger->raster->setCurrentIndex(5);
-                return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_HEIGHT_DEFAULT].key)
-        {
-				TrackList* tl = song->visibletracks();
-                for (iTrack t = tl->begin(); t != tl->end(); ++t)
-                {
-                        Track* tr = *t;
-                        if (tr->selected())
-                        {
-                                tr->setHeight(40);
-                        }
-                }
-                song->update(SC_TRACK_MODIFIED);
-                return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_HEIGHT_FULL_SCREEN].key)
-        {
-                TrackList tl = song->getSelectedTracks();
-                for (iTrack t = tl.begin(); t != tl.end(); ++t)
-                {
-                        Track* tr = *t;
-                        tr->setHeight(height());
-                }
-                if (tl.size())
-                {
-                        Track* tr = *tl.begin();
-                        oom->arranger->verticalScrollSetYpos(track2Y(tr));
-                }
-                song->update(SC_TRACK_MODIFIED);
-                return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_HEIGHT_SELECTION_FITS_IN_VIEW].key)
-        {
-                TrackList tl = song->getSelectedTracks();
-                for (iTrack t = tl.begin(); t != tl.end(); ++t)
-                {
-                        Track* tr = *t;
-                        tr->setHeight(height() / tl.size());
-                }
-                if (tl.size())
-                {
-                        Track* tr = *tl.begin();
-                        oom->arranger->verticalScrollSetYpos(track2Y(tr));
-                }
-                song->update(SC_TRACK_MODIFIED);
-                return;
-        }
+			}
+		}
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
+	{
+		Track* t =oom->arranger->curTrack();
+		if (t)
+		{
+			audio->msgSetSolo(t, !t->solo());
+			song->update(SC_SOLO);
+		}
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_TOGGLE_MUTE].key)
+	{
+		Track* t =oom->arranger->curTrack();
+		if (t)
+		{
+			t->setMute(!t->mute());
+			song->update(SC_MUTE);
+		}
+		return;
+	}
+	else if (key == shortcuts[SHRT_MIDI_PANIC].key)
+	{
+		song->panic();
+		return;
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_0].key)
+	{
+		oom->arranger->_setRaster(0);
+		oom->arranger->raster->setCurrentIndex(0);
+		return;
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_1].key)
+	{
+		oom->arranger->_setRaster(1);
+		oom->arranger->raster->setCurrentIndex(1);
+		return;
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_2].key)
+	{
+		oom->arranger->_setRaster(2);
+		oom->arranger->raster->setCurrentIndex(2);
+		return;
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_3].key)
+	{
+		oom->arranger->_setRaster(3);
+		oom->arranger->raster->setCurrentIndex(3);
+		return;
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_4].key)
+	{
+		oom->arranger->_setRaster(4);
+		oom->arranger->raster->setCurrentIndex(4);
+		return;
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_5].key)
+	{
+		oom->arranger->_setRaster(5);
+		oom->arranger->raster->setCurrentIndex(5);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_HEIGHT_DEFAULT].key)
+	{
+		TrackList* tl = song->visibletracks();
+		for (iTrack t = tl->begin(); t != tl->end(); ++t)
+		{
+			Track* tr = *t;
+			if (tr->selected())
+			{
+				tr->setHeight(40);
+			}
+		}
+		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_HEIGHT_FULL_SCREEN].key)
+	{
+		TrackList tl = song->getSelectedTracks();
+		for (iTrack t = tl.begin(); t != tl.end(); ++t)
+		{
+			Track* tr = *t;
+			tr->setHeight(height());
+		}
+		if (tl.size())
+		{
+			Track* tr = *tl.begin();
+			oom->arranger->verticalScrollSetYpos(track2Y(tr));
+		}
+		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_HEIGHT_SELECTION_FITS_IN_VIEW].key)
+	{
+		TrackList tl = song->getSelectedTracks();
+		for (iTrack t = tl.begin(); t != tl.end(); ++t)
+		{
+			Track* tr = *t;
+			tr->setHeight(height() / tl.size());
+		}
+		if (tl.size())
+		{
+			Track* tr = *tl.begin();
+			oom->arranger->verticalScrollSetYpos(track2Y(tr));
+		}
+		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
 
-        else if (key == shortcuts[SHRT_TRACK_HEIGHT_2].key)
-        {
-			TrackList* tl = song->visibletracks();
-                for (iTrack t = tl->begin(); t != tl->end(); ++t)
-                {
-                        Track* tr = *t;
-                        if (tr->selected())
-                        {
-                                tr->setHeight(60);
-                        }
-                }
-                song->update(SC_TRACK_MODIFIED);
-                return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_HEIGHT_3].key)
-        {
-			TrackList* tl = song->visibletracks();
-            for (iTrack t = tl->begin(); t != tl->end(); ++t)
-            {
-                    Track* tr = *t;
-                    if (tr->selected())
-                    {
-                            tr->setHeight(100);
-                    }
-            }
-            song->update(SC_TRACK_MODIFIED);
-            return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_HEIGHT_4].key)
-        {
-			TrackList* tl = song->visibletracks();
-                for (iTrack t = tl->begin(); t != tl->end(); ++t)
-                {
-                        Track* tr = *t;
-                        if (tr->selected())
-                        {
-                                tr->setHeight(180);
-                        }
-                }
-                song->update(SC_TRACK_MODIFIED);
-                return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_HEIGHT_5].key)
-        {
-			TrackList* tl = song->visibletracks();
-                for (iTrack t = tl->begin(); t != tl->end(); ++t)
-                {
-                        Track* tr = *t;
-                        if (tr->selected())
-                        {
-                                tr->setHeight(320);
-                        }
-                }
-                song->update(SC_TRACK_MODIFIED);
-                return;
-        }
-        else if (key == shortcuts[SHRT_TRACK_HEIGHT_6].key)
-        {
-			TrackList* tl = song->visibletracks();
-                for (iTrack t = tl->begin(); t != tl->end(); ++t)
-                {
-                        Track* tr = *t;
-                        if (tr->selected())
-                        {
-                                tr->setHeight(640);
-                        }
-                }
-                song->update(SC_TRACK_MODIFIED);
-                return;
-        }
+	else if (key == shortcuts[SHRT_TRACK_HEIGHT_2].key)
+	{
+		TrackList* tl = song->visibletracks();
+		for (iTrack t = tl->begin(); t != tl->end(); ++t)
+		{
+			Track* tr = *t;
+			if (tr->selected())
+			{
+				tr->setHeight(60);
+			}
+		}
+		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_HEIGHT_3].key)
+	{
+		TrackList* tl = song->visibletracks();
+		for (iTrack t = tl->begin(); t != tl->end(); ++t)
+		{
+			Track* tr = *t;
+			if (tr->selected())
+			{
+				tr->setHeight(100);
+			}
+		}
+		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_HEIGHT_4].key)
+	{
+		TrackList* tl = song->visibletracks();
+		for (iTrack t = tl->begin(); t != tl->end(); ++t)
+		{
+			Track* tr = *t;
+			if (tr->selected())
+			{
+				tr->setHeight(180);
+			}
+		}
+		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_HEIGHT_5].key)
+	{
+		TrackList* tl = song->visibletracks();
+		for (iTrack t = tl->begin(); t != tl->end(); ++t)
+		{
+			Track* tr = *t;
+			if (tr->selected())
+			{
+				tr->setHeight(320);
+			}
+		}
+		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
+	else if (key == shortcuts[SHRT_TRACK_HEIGHT_6].key)
+	{
+		TrackList* tl = song->visibletracks();
+		for (iTrack t = tl->begin(); t != tl->end(); ++t)
+		{
+			Track* tr = *t;
+			if (tr->selected())
+			{
+				tr->setHeight(640);
+			}
+		}
+		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
 
 	//
 	// Shortcuts that require selected parts from here
@@ -1836,7 +1836,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	if (key == shortcuts[SHRT_LOCATORS_TO_SELECTION].key)
 	{
 		CItem *leftmost = 0, *rightmost = 0;
-                for (iCItem i = _items.begin(); i != _items.end(); i++)
+		for (iCItem i = _items.begin(); i != _items.end(); i++)
 		{
 			if (i->second->isSelected())
 			{
@@ -1845,14 +1845,14 @@ void PartCanvas::keyPress(QKeyEvent* event)
 					leftmost = i->second;
 				else
 					if (leftmost->x() > i->second->x())
-					leftmost = i->second;
+						leftmost = i->second;
 
 				// Check rightmost:
 				if (!rightmost)
 					rightmost = i->second;
 				else
 					if (rightmost->x() < i->second->x())
-					rightmost = i->second;
+						rightmost = i->second;
 			}
 		}
 

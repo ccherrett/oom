@@ -797,7 +797,8 @@ void TList::moveSelection(int n)
 		{
 			Track* track = (*(song->visibletracks()->begin()));
 			track->setSelected(true);
-			song->deselectAllParts();
+			if(song->hasSelectedParts)
+				song->deselectAllParts();
 			emit selectionChanged(track);
 			redraw();
 		}
@@ -811,14 +812,16 @@ void TList::moveSelection(int n)
 		{
 			Track* bottomMostSelected = *(--selectedTracks.end());
 			bottomMostSelected->setSelected(true);
-			song->deselectAllParts();
+			if(song->hasSelectedParts)
+				song->deselectAllParts();
 			emit selectionChanged(bottomMostSelected);
 		}
 		else if (n == -1)
 		{
 			Track* topMostSelected = *(selectedTracks.begin());
 			topMostSelected->setSelected(true);
-			song->deselectAllParts();
+			if(song->hasSelectedParts)
+				song->deselectAllParts();
 			emit selectionChanged(topMostSelected);
 		}
 		else
@@ -872,7 +875,8 @@ void TList::moveSelection(int n)
 			break;
 		}
 	}
-	song->deselectAllParts();
+	if(song->hasSelectedParts)
+		song->deselectAllParts();
 	///emit selectionChanged();
 	emit selectionChanged(selTrack);
 }
@@ -1208,7 +1212,8 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				if (!shift)
 				{
 					song->deselectTracks();
-					song->deselectAllParts();
+					if(song->hasSelectedParts)
+						song->deselectAllParts();
 					t->setSelected(true);
 
 					// rec enable track if expected
@@ -1460,120 +1465,120 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 						}
                                                 case 6:
-                                                {
-                                                        if (multipleSelectedTracks)
-                                                        {
-                                                                song->setTrackHeights(selectedTracksList, 40);
-                                                        }
-                                                        else
-                                                        {
-                                                                t->setHeight(40);
-                                                                song->update(SC_TRACK_MODIFIED);
-                                                        }
-                                                        break;
-                                                }
+						{
+							if (multipleSelectedTracks)
+							{
+								song->setTrackHeights(selectedTracksList, 40);
+							}
+							else
+							{
+								t->setHeight(40);
+								song->update(SC_TRACK_MODIFIED);
+							}
+							break;
+						}
                                                 case 7:
-                                                {
-                                                        if (multipleSelectedTracks)
-                                                        {
-                                                                song->setTrackHeights(selectedTracksList, 60);
-                                                        }
-                                                        else
-                                                        {
-                                                                t->setHeight(60);
-                                                                song->update(SC_TRACK_MODIFIED);
-                                                        }
-                                                        break;
-                                                }
+						{
+							if (multipleSelectedTracks)
+							{
+								song->setTrackHeights(selectedTracksList, 60);
+							}
+							else
+							{
+								t->setHeight(60);
+								song->update(SC_TRACK_MODIFIED);
+							}
+							break;
+						}
                                                 case 8:
-                                                {
-                                                        if (multipleSelectedTracks)
-                                                        {
-                                                                song->setTrackHeights(selectedTracksList, 100);
-                                                        }
-                                                        else
-                                                        {
-                                                                t->setHeight(100);
-                                                                song->update(SC_TRACK_MODIFIED);
-                                                        }
-                                                        break;
-                                                }
+						{
+							if (multipleSelectedTracks)
+							{
+								song->setTrackHeights(selectedTracksList, 100);
+							}
+							else
+							{
+								t->setHeight(100);
+								song->update(SC_TRACK_MODIFIED);
+							}
+							break;
+						}
                                                 case 9:
-                                                {
-                                                        if (multipleSelectedTracks)
-                                                        {
-                                                                song->setTrackHeights(selectedTracksList, 180);
-                                                        }
-                                                        else
-                                                        {
-                                                                t->setHeight(180);
-                                                                song->update(SC_TRACK_MODIFIED);
-                                                        }
-                                                        break;
-                                                }
+						{
+							if (multipleSelectedTracks)
+							{
+								song->setTrackHeights(selectedTracksList, 180);
+							}
+							else
+							{
+								t->setHeight(180);
+								song->update(SC_TRACK_MODIFIED);
+							}
+							break;
+						}
                                                 case 10:
-                                                {
-                                                        if (multipleSelectedTracks)
-                                                        {
-                                                                song->setTrackHeights(selectedTracksList, 320);
-                                                        }
-                                                        else
-                                                        {
-                                                                t->setHeight(320);
-                                                                song->update(SC_TRACK_MODIFIED);
-                                                        }
-                                                        break;
-                                                }
+						{
+							if (multipleSelectedTracks)
+							{
+								song->setTrackHeights(selectedTracksList, 320);
+							}
+							else
+							{
+								t->setHeight(320);
+								song->update(SC_TRACK_MODIFIED);
+							}
+							break;
+						}
                                                 case 11:
-                                                {
-                                                        if (multipleSelectedTracks)
-                                                        {
-                                                                song->setTrackHeights(selectedTracksList, 640);
-                                                        }
-                                                        else
-                                                        {
-                                                                t->setHeight(640);
-                                                                song->update(SC_TRACK_MODIFIED);
-                                                        }
-                                                        break;
-                                                }
+						{
+							if (multipleSelectedTracks)
+							{
+								song->setTrackHeights(selectedTracksList, 640);
+							}
+							else
+							{
+								t->setHeight(640);
+								song->update(SC_TRACK_MODIFIED);
+							}
+							break;
+						}
                                                 case 12:
-                                                {
-                                                        int canvasHeight = oom->arranger->getCanvas()->height();
+						{
+							int canvasHeight = oom->arranger->getCanvas()->height();
 
-                                                        if (multipleSelectedTracks)
-                                                        {
-                                                                song->setTrackHeights(selectedTracksList, canvasHeight);
-                                                                Track* firstSelectedTrack = *selectedTracksList.begin();
-                                                                oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+							if (multipleSelectedTracks)
+							{
+								song->setTrackHeights(selectedTracksList, canvasHeight);
+								Track* firstSelectedTrack = *selectedTracksList.begin();
+								oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
 
-                                                        }
-                                                        else
-                                                        {
-                                                                t->setHeight(canvasHeight);
-                                                                song->update(SC_TRACK_MODIFIED);
-                                                                oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
-                                                        }
-                                                        break;
-                                                }
+							}
+							else
+							{
+								t->setHeight(canvasHeight);
+								song->update(SC_TRACK_MODIFIED);
+								oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+							}
+							break;
+						}
                                                 case 13:
-                                                {
-                                                        int canvasHeight = oom->arranger->getCanvas()->height();
-                                                        if (multipleSelectedTracks)
-                                                        {
-                                                                song->setTrackHeights(selectedTracksList, canvasHeight / selectedTracksList.size());
-                                                                Track* firstSelectedTrack = *selectedTracksList.begin();
-                                                                oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+						{
+							int canvasHeight = oom->arranger->getCanvas()->height();
+							if (multipleSelectedTracks)
+							{
+								song->setTrackHeights(selectedTracksList, canvasHeight / selectedTracksList.size());
+								Track* firstSelectedTrack = *selectedTracksList.begin();
+								oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
 
-                                                        }
-                                                        else
-                                                        {
-                                                                t->setHeight(canvasHeight);
-                                                                song->update(SC_TRACK_MODIFIED);
-                                                                oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
-                                                        }
-                                                        break;
-                                                }
+							}
+							else
+							{
+								t->setHeight(canvasHeight);
+								song->update(SC_TRACK_MODIFIED);
+								oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+							}
+							break;
+						}
 
 						default:
 							printf("action %d\n", n);
