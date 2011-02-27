@@ -773,7 +773,7 @@ QTabBar::tab {
 	color: #d6dfd6; 
 	font-family: "fixed-width";
 	font-weight: bold;
-	font-size: 11px;
+	font-size: 10px;
 }
 
 QTabBar::tab:selected, QTabBar::tab:hover {
@@ -781,7 +781,7 @@ QTabBar::tab:selected, QTabBar::tab:hover {
 	color: #47cae1; 
 	font-family: "fixed-width";
 	font-weight: bold;
-	font-size: 11px;
+	font-size: 10px;
 }
 
 QTabBar::tab:selected {
