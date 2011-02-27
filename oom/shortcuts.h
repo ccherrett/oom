@@ -246,8 +246,10 @@ enum
     SHRT_TRANSPOSE, //Default: undefined
 
     //Shortcuts to be in pianoroll & drumeditor
-    SHRT_ZOOM_IN, // PgUp
-    SHRT_ZOOM_OUT, // PgDown
+	SHRT_ZOOM_IN, // Ctrl+PgUp
+	SHRT_ZOOM_OUT, // Ctrl+PgDown
+	SHRT_VZOOM_IN, // Ctrl+Shift+PgUp
+	SHRT_VZOOM_OUT, // Ctrl+Shift+PgDown
     SHRT_GOTO_CPOS, // c
     SHRT_SCROLL_LEFT, // h
     SHRT_SCROLL_RIGHT, // l

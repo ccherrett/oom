@@ -1264,6 +1264,30 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		//printf("mag = %d zoomlvl = %d newmag = %d\n", mag, zoomlvl, newmag);
 		return;
 	}
+	else if (key == shortcuts[SHRT_VZOOM_IN].key)
+	{
+		int mag = vscroll->mag();
+		int zoomlvl = ScrollScale::getQuickZoomLevel(mag);
+		if (zoomlvl < 23)
+			zoomlvl++;
+
+		int newmag = ScrollScale::convertQuickZoomLevelToMag(zoomlvl);
+		vscroll->setMag(newmag);
+		//printf("mag = %d zoomlvl = %d newmag = %d\n", mag, zoomlvl, newmag);
+		return;
+	}
+	else if (key == shortcuts[SHRT_VZOOM_OUT].key)
+	{
+		int mag = vscroll->mag();
+		int zoomlvl = ScrollScale::getQuickZoomLevel(mag);
+		if (zoomlvl > 1)
+			zoomlvl--;
+
+		int newmag = ScrollScale::convertQuickZoomLevelToMag(zoomlvl);
+		vscroll->setMag(newmag);
+		//printf("mag = %d zoomlvl = %d newmag = %d\n", mag, zoomlvl, newmag);
+		return;
+	}
 	else if (key == shortcuts[SHRT_GOTO_CPOS].key)
 	{
 		PartList* p = this->parts();
