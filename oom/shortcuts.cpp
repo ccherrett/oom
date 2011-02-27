@@ -174,6 +174,8 @@ void initShortCuts()
 	defShrt(SHRT_DEC_POS, Qt::CTRL + Qt::Key_Comma, "Edit: Decrease event position", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pos");
 	defShrt(SHRT_ZOOM_IN, Qt::CTRL + Qt::Key_PageUp, "View: Zoom in", PROLL_SHRT + DEDIT_SHRT, "zoom_in");
 	defShrt(SHRT_ZOOM_OUT, Qt::CTRL + Qt::Key_PageDown, "View: Zoom out", PROLL_SHRT + DEDIT_SHRT, "zoom_out");
+	defShrt(SHRT_VZOOM_IN, Qt::CTRL + Qt::SHIFT + Qt::Key_PageUp, "View: Vertical Zoom in", PROLL_SHRT + DEDIT_SHRT, "vzoom_in");
+	defShrt(SHRT_VZOOM_OUT, Qt::CTRL + Qt::SHIFT + Qt::Key_PageDown, "View: Vertical Zoom out", PROLL_SHRT + DEDIT_SHRT, "vzoom_out");
 	defShrt(SHRT_GOTO_CPOS, Qt::CTRL + Qt::Key_J, "View: Goto Current Position", PROLL_SHRT + DEDIT_SHRT, "goto_cpos");
 	defShrt(SHRT_SCROLL_LEFT, Qt::Key_H, "View: Scroll left", PROLL_SHRT + DEDIT_SHRT, "scroll_left");
 	defShrt(SHRT_SCROLL_RIGHT, Qt::Key_L, "View: Scroll right", PROLL_SHRT + DEDIT_SHRT, "scroll_right");
