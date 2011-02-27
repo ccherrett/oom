@@ -845,14 +845,11 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 
 	// if the recorded event is outside of the parts lenght
 	// make the part longer so the new event will be recorded properly
-	if (_steprec && _curPart)
+	if (_steprec && _curPart && (_pos[0] > end_tick))
 	{
 		unsigned tick = _pos[0] - _curPart->tick(); //CDW
-		if(tick > end_tick)
-		{
-			int endTick = song->roundUpBar(tick);
-			_curPart->setLenTick(endTick);
-		}
+		int endTick = song->roundUpBar(tick);
+		_curPart->setLenTick(endTick);
 	}
 
         if (_steprec && _pos[0] >= start_tick && _pos[0] < end_tick)
