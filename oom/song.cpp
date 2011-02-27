@@ -1327,7 +1327,10 @@ void Song::setPlay(bool f)
 	if (!f)
 		playAction->setChecked(true);
 	else
+	{
 		audio->msgPlay(true);
+		emit playbackStateChanged(true);
+	}
 }
 
 void Song::setStop(bool f)
@@ -1342,7 +1345,10 @@ void Song::setStop(bool f)
 	if (!f)
 		stopAction->setChecked(true);
 	else
+	{
 		audio->msgPlay(false);
+		emit playbackStateChanged(false);
+	}
 }
 
 void Song::setStopPlay(bool f)

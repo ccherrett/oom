@@ -38,7 +38,7 @@ RouteDialog::RouteDialog(QWidget* parent)
 	connect(btnConnectOut, SIGNAL(clicked()), SLOT(addOutRoute()));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	routingChanged();
-        resize(tconfig().get_property("RouteDialog", "size", QSize(891, 691)).toSize());
+	resize(tconfig().get_property("RouteDialog", "size", QSize(891, 691)).toSize());
 	move(tconfig().get_property("RouteDialog", "pos", QPoint(0, 0)).toPoint());
 }
 

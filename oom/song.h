@@ -578,7 +578,8 @@ signals:
     void posChanged(int, unsigned, bool);
     void loopChanged(bool);
     void recordChanged(bool);
-    void playChanged(bool);
+	void playChanged(bool);
+	void playbackStateChanged(bool);
     void punchinChanged(bool);
     void punchoutChanged(bool);
     void clickChanged(bool);

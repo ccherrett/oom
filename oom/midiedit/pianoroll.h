@@ -117,6 +117,9 @@ class PianoRoll : public MidiEditor
     QToolButton* srec;
     QToolButton* midiin;
     QToolButton* solo;
+	QToolButton* repPlay;
+	unsigned replayPos;
+	bool _replay;
     PosLabel* posLabel;
     PitchLabel* pitchLabel;
 
@@ -186,6 +189,7 @@ private slots:
     }
     void cmd(int);
     void setSteprec(bool);
+	void setReplay(bool);
 
     void setTo(int val)
     {
@@ -213,11 +217,17 @@ public slots:
     void execUserScript(int id);
     CtrlEdit* addCtrl();
     void removeCtrl(CtrlEdit* ctrl);
+	void playStateChanged(bool);
 
 public:
     PianoRoll(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);
     ~PianoRoll();
     //void setSolo(bool val);
+	bool replay()
+	{
+		return _replay;
+	}
+
     virtual void readStatus(Xml&);
     virtual void writeStatus(int, Xml&) const;
     static void readConfiguration(Xml&);

@@ -88,6 +88,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	selPart = 0;
 	quantConfig = 0;
 	_playEvents = false;
+	_replay = false;
+	replayPos = song->cpos();
 	_quantStrength = _quantStrengthInit;
 	_quantLimit = _quantLimitInit;
 	_quantLen = _quantLenInit;
@@ -320,6 +322,10 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	solo->setIconSize(soloIconOn->size());
 	solo->setCheckable(true);
 
+	repPlay = new QToolButton();
+	repPlay->setText("PR");
+	repPlay->setCheckable(true);
+
 	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
 	posLabel = new PosLabel(0, "pos");
 	posLabel->setFixedHeight(22);
@@ -357,6 +363,15 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer1->setMaximumWidth(10);
 	tools2->addWidget(spacer1);
+	QWidget* spacer5 = new QWidget();
+	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer5->setMaximumWidth(10);
+	tools2->addWidget(spacer5);
+	tools2->addWidget(repPlay);
+	QWidget* spacer4 = new QWidget();
+	spacer4->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer4->setMaximumWidth(10);
+	tools2->addWidget(spacer4);
 	tools2->addActions(transportAction->actions());
 	tools2->addWidget(solo);
 	QWidget* spacer2 = new QWidget();
@@ -540,6 +555,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	info->setEnabled(false);
 
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
+	connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
 
 	setWindowTitle(canvas->getCaption());
 
@@ -555,6 +571,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
 	connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
 	connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
+	connect(repPlay, SIGNAL(toggled(bool)), SLOT(setReplay(bool)));
 
 	setFocusPolicy(Qt::StrongFocus);
 	setEventColorMode(colorMode);
@@ -630,6 +647,27 @@ void PianoRoll::configChanged()
 {
 	initShortcuts();
 	//trackInfo->updateTrackInfo();
+}
+
+void PianoRoll::setReplay(bool t)
+{
+	_replay = t;
+	if(t)
+	{
+		replayPos = song->cpos();
+	}
+}
+
+void PianoRoll::playStateChanged(bool state)
+{
+	if(_replay)
+	{
+		if(!state)
+		{
+			Pos p(replayPos, true);
+			song->setPos(0, p, true, true, true);
+		}
+	}
 }
 
 //---------------------------------------------------------
@@ -1321,6 +1359,11 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	{
 		int pos = vscroll->pos() + (config.division/2);
 		vscroll->setPos(pos);
+		return;
+	}
+	else if(key == shortcuts[SHRT_PLAY_REPEAT].key)
+	{
+		repPlay->toggle();
 		return;
 	}
 	else if (key == shortcuts[SHRT_SEL_INSTRUMENT].key)

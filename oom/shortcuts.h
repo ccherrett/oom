@@ -66,6 +66,7 @@ enum
     SHRT_START_REC, // *(keypad)
     SHRT_REC_CLEAR, // *(keypad)
     SHRT_GOTO_SEL_NOTE,
+	SHRT_PLAY_REPEAT, //u
 
     //Main + Drumeditor
     SHRT_NEW, //Ctrl+N
