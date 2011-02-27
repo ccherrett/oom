@@ -72,7 +72,8 @@ void PianoCanvas::addItem(Part* part, Event& event)
 		//newPart->setLenTick(newPart->lenTick()+diff);
 		//audio->msgChangePart(part, newPart,false);
 		//part = newPart;
-		part->setLenTick(part->lenTick() + diff);
+		int endTick = song->roundUpBar(part->lenTick() + diff);
+		part->setLenTick(endTick);
 	}
 }
 
