@@ -325,7 +325,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 		int xp = m->second.tick();
 		if (xp >= x && xp < x + w)
 		{
-			p.setPen(Qt::green);
+			p.setPen(QColor(243,191,124));
 			p.drawLine(xp, y, xp, y2);
 		}
 	}
