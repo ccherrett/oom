@@ -309,7 +309,8 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 
 			if (xp >= 0)
 			{
-				p.setPen(QColor(243, 191, 124));
+				//p.setPen(QColor(243, 191, 124));
+				p.setPen(colTimeLine);
 				p.drawLine(xp, y, xp, height());
 			}
 		}
