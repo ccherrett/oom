@@ -1525,12 +1525,16 @@ void Song::write(int level, Xml& xml) const
 	//for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
 	//	(*i)->write(level, xml);
 
+	QList<QString> added;
 	for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
+	{
 		(*i)->write(level, xml);
+		added.append((*i)->name());
+	}
 
 	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
 	{
-		if(_viewtracks.find((*i)) != _viewtracks.end())
+		if(!added.contains((*i)->name()))
 			(*i)->write(level, xml);
 	}
 

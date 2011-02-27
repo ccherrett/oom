@@ -414,6 +414,13 @@ void Song::deselectTracks()
 		(*t)->setSelected(false);
 }
 
+void Song::deselectAllParts()
+{
+	for(iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
+		(*t)->deselectParts();
+	update(SC_SELECTION);
+}
+
 //---------------------------------------------------------
 //   changeTrack
 //    oldTrack - copy of the original track befor modification
@@ -1368,6 +1375,12 @@ void Song::swapTracks(int i1, int i2)
 		_artracks[i1] = _artracks[i2];
 		_artracks[i2] = t;
 	}
+	else
+	{
+		Track *t = _tracks[i1];
+		_tracks[i1] = _tracks[i2];
+		_tracks[i2] = t;
+	}
 }
 
 //---------------------------------------------------------
@@ -1913,8 +1926,11 @@ void Song::endMsgCmd()
 		redoList->clear(); // TODO: delete elements in list
 		undoAction->setEnabled(true);
 		redoAction->setEnabled(false);
-		if(updateFlags & (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
+		if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
+		{
+			//printf("Song::endMsgCmd() calling updateTrackViews1()\n");
 			updateTrackViews1();
+		}
 		emit songChanged(updateFlags);
 	}
 }
@@ -1935,6 +1951,9 @@ void Song::undo()
 
 	if (updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED))
 		audio->msgUpdateSoloStates();
+
+	if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
+		updateTrackViews1();
 
 	emit songChanged(updateFlags);
 }
@@ -4295,26 +4314,13 @@ QString Song::getScriptPath(int id, bool isdelivered)
 TrackList Song::getSelectedTracks()
 {
 	TrackList list;
-	if(viewselected)
+
+	for (iTrack t = _viewtracks.begin(); t != _viewtracks.end(); ++t)
 	{
-		for (iTrack t = _artracks.begin(); t != _artracks.end(); ++t)
+		Track* tr = *t;
+		if (tr->selected())
 		{
-			Track* tr = *t;
-			if (tr->selected())
-			{
-				list.push_back(tr);
-			}
-		}
-	}
-	else
-	{
-		for (iTrack t = _viewtracks.begin(); t != _viewtracks.end(); ++t)
-		{
-			Track* tr = *t;
-			if (tr->selected())
-			{
-				list.push_back(tr);
-			}
+			list.push_back(tr);
 		}
 	}
 	

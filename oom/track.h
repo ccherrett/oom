@@ -136,14 +136,7 @@ public:
         _selected = f;
     }
 
-	void deselectParts()
-	{
-		for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
-		{
-			Part* p = ip->second;
-			p->setSelected(false);
-		}
-	}
+	void deselectParts();
 
     bool locked() const
     {

@@ -444,6 +444,7 @@ public:
     void insertTrack2(Track*, int idx);
     void insertTrack3(Track*, int idx);
     void deselectTracks();
+	void deselectAllParts();
     void readRoute(Xml& xml);
     void recordEvent(MidiTrack*, Event&);
     void msgInsertTrack(Track* track, int idx, bool u = true);

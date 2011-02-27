@@ -783,46 +783,49 @@ void TList::keyPressEvent(QKeyEvent* e)
 void TList::moveSelection(int n)
 {
 	//This changes to song->visibletracks()
-		TrackList* tracks = song->visibletracks();
+	TrackList* tracks = song->visibletracks();
 
 	// check for single selection
-        TrackList selectedTracks = song->getSelectedTracks();
-        int nselect = selectedTracks.size();
+	TrackList selectedTracks = song->getSelectedTracks();
+	int nselect = selectedTracks.size();
 
-        // if there isn't a selection, select the first in the list
-        // if there is any, else return, not tracks at all
-        if (nselect == 0)
-        {
-				if (song->visibletracks()->size())
-                {
-						Track* track = (*(song->visibletracks()->begin()));
-                        track->setSelected(true);
-                        emit selectionChanged(track);
-                        redraw();
-                }
-                return;
-        }
+	// if there isn't a selection, select the first in the list
+	// if there is any, else return, not tracks at all
+	if (nselect == 0)
+	{
+		if (song->visibletracks()->size())
+		{
+			Track* track = (*(song->visibletracks()->begin()));
+			track->setSelected(true);
+			song->deselectAllParts();
+			emit selectionChanged(track);
+			redraw();
+		}
+		return;
+	}
 
 	if (nselect != 1)
-        {
-                song->deselectTracks();
-                if (n == 1)
-                {
-                        Track* bottomMostSelected = *(--selectedTracks.end());
-                        bottomMostSelected->setSelected(true);
-                        emit selectionChanged(bottomMostSelected);
-                }
-                else if (n == -1)
-                {
-                        Track* topMostSelected = *(selectedTracks.begin());
-                        topMostSelected->setSelected(true);
-                        emit selectionChanged(topMostSelected);
-                }
-                else
-                {
-                        return;
-                }
-        }
+	{
+		song->deselectTracks();
+		if (n == 1)
+		{
+			Track* bottomMostSelected = *(--selectedTracks.end());
+			bottomMostSelected->setSelected(true);
+			song->deselectAllParts();
+			emit selectionChanged(bottomMostSelected);
+		}
+		else if (n == -1)
+		{
+			Track* topMostSelected = *(selectedTracks.begin());
+			topMostSelected->setSelected(true);
+			song->deselectAllParts();
+			emit selectionChanged(topMostSelected);
+		}
+		else
+		{
+			return;
+		}
+	}
 
 	Track* selTrack = 0;
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
@@ -852,9 +855,8 @@ void TList::moveSelection(int n)
 				}
 			}
 			(*s)->setSelected(false);
-			(*s)->deselectParts(); //TODO: Fix for part deselection on ctrl+up 
 			(*t)->setSelected(true);
-                        selTrack = *t;
+			selTrack = *t;
 
 			// rec enable track if expected
 			TrackList recd = getRecEnabledTracks();
@@ -870,8 +872,9 @@ void TList::moveSelection(int n)
 			break;
 		}
 	}
-        ///emit selectionChanged();
-        emit selectionChanged(selTrack);
+	song->deselectAllParts();
+	///emit selectionChanged();
+	emit selectionChanged(selTrack);
 }
 
 TrackList TList::getRecEnabledTracks()
@@ -1205,6 +1208,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				if (!shift)
 				{
 					song->deselectTracks();
+					song->deselectAllParts();
 					t->setSelected(true);
 
 					// rec enable track if expected
@@ -1216,13 +1220,14 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					}
 				}
 				else
-                                {
+				{
+					song->deselectAllParts();
 					t->setSelected(!t->selected());
-                                }
+				}
 				if (editTrack && editTrack != t)
-                                {
+				{
 					returnPressed();
-                                }
+				}
 				///emit selectionChanged();
 				emit selectionChanged(t->selected() ? t : 0);
 			}
@@ -1232,29 +1237,29 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				QMenu* p = new QMenu;
 				//p->clear();
 				p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
-                                if (!multipleSelectedTracks)
-                                {
-                                        p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
-                                }
+				if (!multipleSelectedTracks)
+				{
+					p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
+				}
 
-                                QMenu* trackHeightsMenu = p->addMenu("Track Height");
-                                trackHeightsMenu->addAction("Default")->setData(6);
-                                trackHeightsMenu->addAction("2")->setData(7);
-                                trackHeightsMenu->addAction("3")->setData(8);
-                                trackHeightsMenu->addAction("4")->setData(9);
-                                trackHeightsMenu->addAction("5")->setData(10);
-                                trackHeightsMenu->addAction("6")->setData(11);
-                                trackHeightsMenu->addAction("Full Screen")->setData(12);
-                                if (selectedTracksList.size() > 1)
-                                {
-                                        trackHeightsMenu->addAction("Fit Selection in View")->setData(13);
-                                }
+				QMenu* trackHeightsMenu = p->addMenu("Track Height");
+				trackHeightsMenu->addAction("Default")->setData(6);
+				trackHeightsMenu->addAction("2")->setData(7);
+				trackHeightsMenu->addAction("3")->setData(8);
+				trackHeightsMenu->addAction("4")->setData(9);
+				trackHeightsMenu->addAction("5")->setData(10);
+				trackHeightsMenu->addAction("6")->setData(11);
+				trackHeightsMenu->addAction("Full Screen")->setData(12);
+				if (selectedTracksList.size() > 1)
+				{
+					trackHeightsMenu->addAction("Fit Selection in View")->setData(13);
+				}
 
 
-                                if (t->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
+				if (t->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
 				{
 					SynthI* synth = (SynthI*) t;
-			
+
 					QAction* sga = p->addAction(tr("Show Gui"));
 					sga->setData(2);
 					sga->setCheckable(true);

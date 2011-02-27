@@ -330,6 +330,16 @@ void Track::setDefaultName()
 	}
 }
 
+void Track::deselectParts()
+{
+	for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+	{
+		Part* p = ip->second;
+		p->setSelected(false);
+	}
+	song->update(SC_SELECTION);
+}
+
 //---------------------------------------------------------
 //   clearRecAutomation
 //---------------------------------------------------------
