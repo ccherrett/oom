@@ -2303,7 +2303,7 @@ void MidiTrackInfo::patchDoubleClicked(QModelIndex index)
 		QStandardItem* p = nItem->parent();
 		QStandardItem *idItem;
 		QString pg = "";
-		if(p != _patchModel->invisibleRootItem())
+		if(p && p != _patchModel->invisibleRootItem() && p->columnCount() == 2)
 		{
 			//We are in group mode
 			idItem = p->child(row, 1);

@@ -1043,6 +1043,7 @@ void MidiInstrument::populatePatchModel(QStandardItemModel* model, int chan, MTy
 	{
 		// no groups
 		const PatchList& pl = pg.front()->patches;
+		QStandardItem* root = model->invisibleRootItem();
 		for (ciPatch ipl = pl.begin(); ipl != pl.end(); ++ipl)
 		{
 			const Patch* mp = *ipl;
@@ -1055,7 +1056,7 @@ void MidiInstrument::populatePatchModel(QStandardItemModel* model, int chan, MTy
 				QStandardItem* nItem = new QStandardItem(mp->name);
 				row.append(nItem);
 				row.append(idItem);
-				model->appendRow(row);
+				root->appendRow(row);
 			}
 		}
 	}

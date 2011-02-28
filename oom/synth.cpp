@@ -886,6 +886,7 @@ void MessSynthIF::populatePatchModel(QStandardItemModel* model, int ch, MType, b
 {
 	model->clear();
 	const MidiPatch* mp = _mess->getPatchInfo(ch, 0);
+	QStandardItem* root = model->invisibleRootItem();
 	while (mp)
 	{
 		int id = ((mp->hbank & 0xff) << 16) + ((mp->lbank & 0xff) << 8) + mp->prog;
@@ -896,7 +897,7 @@ void MessSynthIF::populatePatchModel(QStandardItemModel* model, int ch, MType, b
 		QStandardItem* nItem = new QStandardItem(QString(mp->name));
 		row.append(nItem);
 		row.append(idItem);
-		model->appendRow(row);
+		root->appendRow(row);
 		//QAction *act = menu->addAction(QString(mp->name));
 		//act->setData(id);
 		mp = _mess->getPatchInfo(ch, mp);

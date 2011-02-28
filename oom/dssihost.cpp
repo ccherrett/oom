@@ -2934,8 +2934,7 @@ void DssiSynthIF::populatePatchModel(QStandardItemModel* model, int /*chan*/, MT
 	model->clear();
 	queryPrograms();
 
-	menu->clear();
-
+	QStandardItem* root = model->invisibleRootItem();
 	for (std::vector<DSSI_Program_Descriptor>::const_iterator i = programs.begin(); i != programs.end(); ++i)
 	{
 		int bank = i->Bank;
@@ -2948,7 +2947,7 @@ void DssiSynthIF::populatePatchModel(QStandardItemModel* model, int /*chan*/, MT
 		QStandardItem* nItem = new QStandardItem(QString(i->Name));
 		row.append(nItem);
 		row.append(idItem);
-		model->appendRow(row);
+		root->appendRow(row);
 	}
 }
 
