@@ -72,6 +72,9 @@
            <height>150</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::WheelFocus</enum>
+         </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
@@ -90,6 +93,12 @@
          <property name="textElideMode">
           <enum>Qt::ElideNone</enum>
          </property>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>false</bool>
+         </property>
          <property name="animated">
           <bool>true</bool>
          </property>
@@ -107,7 +116,7 @@
          <x>0</x>
          <y>0</y>
          <width>185</width>
-         <height>549</height>
+         <height>519</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -125,28 +134,6 @@
           <property name="topMargin">
            <number>0</number>
           </property>
-          <item>
-           <widget class="QPushButton" name="iPatch">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>50</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Select instrument patch</string>
-            </property>
-            <property name="text">
-             <string>Select Patch</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <layout class="QVBoxLayout" name="tableBox">
             <property name="topMargin">
@@ -1214,7 +1201,6 @@
          </layout>
         </item>
        </layout>
-       <zorder>widget</zorder>
        <zorder></zorder>
       </widget>
      </widget>

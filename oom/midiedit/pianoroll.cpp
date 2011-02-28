@@ -339,6 +339,14 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	pitchLabel->setFixedHeight(22);
 	pitchLabel->setObjectName("pitchLabel");
 	cursorBar->addWidget(pitchLabel);
+
+	patchLabel = new QLabel();
+	patchLabel->setObjectName("patchLabel");
+	patchLabel->setMaximumSize(QSize(180, 22));
+	//patchLabel->setFixedWidth(180);
+	patchLabel->setFixedHeight(22);
+	cursorBar->addWidget(patchLabel);
+
 	addToolBar(Qt::BottomToolBarArea, cursorBar);
 	cursorBar->setFloatable(false);
 	cursorBar->setMovable(false);
@@ -565,11 +573,12 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
 	connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-	connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
+	//connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
 	connect(pcbar, SIGNAL(addProgramChange()), midiTrackInfo, SLOT(insertMatrixEvent()));
 	connect(midiTrackInfo, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
 	connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
 	connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
+	connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
 	connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
 	connect(repPlay, SIGNAL(toggled(bool)), SLOT(setReplay(bool)));
 
@@ -1148,30 +1157,35 @@ static int rasterTable[] = {
 
 bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 {
-        // Force left/right arrow key events to move the focus
-        // back on the canvas if it doesn't have the focus.
-        // Currently the object that we're filtering is the
-        // midiTrackInfo.
-        if (event->type() == QEvent::KeyPress) {
-                QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+	// Force left/right arrow key events to move the focus
+	// back on the canvas if it doesn't have the focus.
+	// Currently the object that we're filtering is the
+	// midiTrackInfo.
+	if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 		int key = keyEvent->key();
 		if (key == Qt::Key_Enter || key == Qt::Key_Return)
-                {
-                        canvas->setFocus(Qt::MouseFocusReason);
-                        return true;
-                }
-                if (keyEvent->key() == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key ||
-                    keyEvent->key() == shortcuts[SHRT_TOGGLE_STEPRECORD].key ||
-                    keyEvent->key() == shortcuts[SHRT_MIDI_PANIC].key
-                    )
-                {
-                        qApp->sendEvent(canvas, event);
-                        return true;
-                }
+        {
+                canvas->setFocus(Qt::MouseFocusReason);
+                return true;
         }
+        if (keyEvent->key() == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key ||
+            keyEvent->key() == shortcuts[SHRT_TOGGLE_STEPRECORD].key ||
+            keyEvent->key() == shortcuts[SHRT_MIDI_PANIC].key
+            )
+        {
+                qApp->sendEvent(canvas, event);
+                return true;
+        }
+		if(keyEvent->key() == shortcuts[SHRT_SEL_INSTRUMENT].key)
+		{
+			midiTrackInfo->addSelectedPatch();
+			return true;
+		}
+	}
 
-        // standard event processing
-        return QObject::eventFilter(obj, event);
+	// standard event processing
+	return QObject::eventFilter(obj, event);
 }
 
 //---------------------------------------------------------
@@ -1368,7 +1382,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_SEL_INSTRUMENT].key)
 	{
-		midiTrackInfo->instrPopup();
+		midiTrackInfo->addSelectedPatch();
 		return;
 	}
 	else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
