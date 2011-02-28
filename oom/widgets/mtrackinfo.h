@@ -21,6 +21,7 @@ class GridCombo;
 
 class QTableView;
 class QStandardItem;
+class QStandardItemModel;
 class QModelIndex;
 class QItemSelection;
 class QItemSelectionModel;
@@ -47,6 +48,8 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
     QList<int>* _matrix;
     ProgramChangeTableModel* _tableModel;
 	QItemSelectionModel* _selModel;
+	QItemSelectionModel* _patchSelModel;
+	QStandardItemModel* _patchModel;
     bool editing;
 	bool _useMatrix;
 	bool _autoExapand;
@@ -85,6 +88,7 @@ private slots:
     void patchSequenceInserted(QModelIndex, int, int);
     void patchSequenceRemoved(QModelIndex, int, int);
 	void clonePatchSequence();
+	void patchDoubleClicked(QModelIndex);
     //tb1
 	void _rasterChanged(int);
     void _quantChanged(int);
@@ -102,6 +106,7 @@ public slots:
     void insertMatrixEvent();
     void updateSize();
     void populateMatrix();
+	void populatePatches();
     void updateTableHeader();
     void rebuildMatrix();
 	//tb1

@@ -89,6 +89,7 @@ void MidiTrackInfo::setTrack(Track* t)
 		pal.setColor(trackNameLabel->backgroundRole(), config.midiTrackLabelBg);
 	trackNameLabel->setPalette(pal);
 
+	populatePatches();
 	updateTrackInfo(-1);
 	//printf("Calling populate matrix from setTrack()\n");
 	populateMatrix();
@@ -114,6 +115,9 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	tableView->setMinimumHeight(150);
 	tableBox->addWidget(tableView);
 	_selModel = new QItemSelectionModel(_tableModel);//tableView->selectionModel();
+	_patchModel = new QStandardItemModel(0, 2, this);
+	_patchSelModel = new QItemSelectionModel(_patchModel);
+
 	selected = sel_track;
 
 	// Since program covers 3 controls at once, it is in 'midi controller' units rather than 'gui control' units.
@@ -135,11 +139,6 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 
 	// OOMidi-2: AlignCenter and WordBreak are set in the ui(3) file, but not supported by QLabel. Turn them on here.
 	trackNameLabel->setAlignment(Qt::AlignCenter);
-	//Qt::TextWordWrap is not available for alignment in Qt4 - Orcan
-	// OOMidi-2 Tested: TextWrapAnywhere actually works, but in fact it takes precedence
-	//  over word wrap, so I found it is not really desirable. Maybe with a user setting...
-	//trackNameLabel->setAlignment(Qt::AlignCenter | Qt::TextWordWrap | Qt::TextWrapAnywhere);
-	//trackNameLabel->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Minimum));
 
 	if (selected)
 	{
@@ -174,6 +173,9 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	tableView->setSelectionModel(_selModel);
 	tableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
 	updateTableHeader();
+
+	patchList->setModel(_patchModel);
+	patchList->setSelectionModel(_patchSelModel);
 
 	//HTMLDelegate *delegate = new HTMLDelegate;
 	//tableView->setItemDelegateForColumn(1, delegate);
@@ -254,6 +256,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(_tableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(matrixItemChanged(QStandardItem*)));
 	connect(_tableModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(patchSequenceInserted(QModelIndex, int, int)));
 	connect(_tableModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(patchSequenceRemoved(QModelIndex, int, int)));
+	connect(patchList, SIGNAL( doubleClicked(const QModelIndex&) ), this, SLOT(patchDoubleClicked(const QModelIndex&) ) );
 	connect(chkAdvanced, SIGNAL(stateChanged(int)), SLOT(toggleAdvanced(int)));
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(deleteSelectedPatches(bool)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(movePatchUp(bool)));
@@ -729,6 +732,7 @@ void MidiTrackInfo::iOutputPortChanged(int index)
 	track->setOutPortAndUpdate(index);
 	//_tableModel->clear();
 	//printf("Calling populate matrix from iOutputPortChanged()\n");
+	populatePatches();
 	populateMatrix();
 	rebuildMatrix();
 	audio->msgIdle(false);
@@ -2115,6 +2119,15 @@ void MidiTrackInfo::updateTableHeader()
 	tableView->setColumnWidth(1, 20);
 	tableView->setColumnHidden(0, true);
 	tableView->horizontalHeader()->setStretchLastSection(true);
+
+	//update the patchList headers as well
+	QStandardItem* pid = new QStandardItem("");
+	QStandardItem* patch = new QStandardItem(tr("Select Patch"));
+	patch->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+	_patchModel->setHorizontalHeaderItem(0, patch);
+	_patchModel->setHorizontalHeaderItem(1, pid);
+	//patchList->setColumnWidth(0, 1);
+	patchList->setColumnHidden(1, true);
 }
 
 void MidiTrackInfo::patchSequenceInserted(QModelIndex /*index*/, int start, int end)
@@ -2260,6 +2273,84 @@ void MidiTrackInfo::clonePatchSequence()
 			//_selModel->blockSignals(true);
 			tableView->selectRow(row);
 			//_selModel->blockSignals(false);
+		}
+	}
+}
+
+void MidiTrackInfo::populatePatches()
+{
+	if(!selected)
+	{
+		_patchModel->clear();
+		return;
+	}
+	MidiTrack* track = (MidiTrack*)selected;
+	int channel = track->outChannel();
+	int port = track->outPort();
+	MidiInstrument* instr = midiPorts[port].instrument();
+	instr->populatePatchModel(_patchModel, channel, song->mtype(), track->type() == Track::DRUM);
+}
+
+void MidiTrackInfo::patchDoubleClicked(QModelIndex index)
+{
+	if(!selected)
+		return;
+	QStandardItem* nItem = _patchModel->itemFromIndex(index);//item(row, 0);
+
+	if(!nItem->hasChildren())
+	{
+		int row = nItem->row();
+		QStandardItem* p = nItem->parent();
+		QStandardItem *idItem;
+		QString pg = "";
+		if(p != _patchModel->invisibleRootItem())
+		{
+			//We are in group mode
+			idItem = p->child(row, 1);
+			pg = p->text();
+		}
+		else
+		{
+			idItem = _patchModel->item(row, 1);
+		}
+		int id = idItem->text().toInt();
+		QString name = nItem->text();
+		//printf("Found patch Name: %s - ID: %d\n",name.toUtf8().constData(), id);
+
+		if (!name.isEmpty() && id)
+		{
+			MidiTrack* track = (MidiTrack*) selected;
+			int channel = track->outChannel();
+			int port = track->outPort();
+
+			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+			audio->msgPlayMidiEvent(&ev);
+
+			if (!pg.isEmpty())
+				pg = pg + ": \n  ";
+			QString label = "  " + pg + name;
+
+			QList<QStandardItem*> rowData;
+			QStandardItem* chk = new QStandardItem(true);
+			chk->setCheckable(true);
+			chk->setCheckState(Qt::Unchecked);
+			chk->setToolTip(tr("Add to patch sequence"));
+
+			QStandardItem* patch = new QStandardItem(label);
+			patch->setToolTip(label);
+			patch->setEditable(false);
+			rowData.append(new QStandardItem(idItem->text()));
+			rowData.append(chk);
+			rowData.append(patch);
+
+			int trow = _tableModel->rowCount();
+			_selectedIndex = trow;
+			_useMatrix = false;
+			_tableModel->insertRow(trow, rowData);
+			tableView->setRowHeight(trow, 50);
+			tableView->resizeRowsToContents();
+			updateTrackInfo(-1);
+			updateTableHeader();
 		}
 	}
 }

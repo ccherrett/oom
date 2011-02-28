@@ -23,6 +23,7 @@
 #include <QFileInfo>
 
 class QMenu;
+class QStandardItemModel;
 
 //class MidiEvent;
 class MidiPlayEvent;
@@ -197,6 +198,7 @@ public:
     virtual const char* getPatchName(int, int, int, bool) const = 0;
     virtual const char* getPatchName(int, int, MType, bool) = 0;
     virtual void populatePatchPopup(QMenu*, int, MType, bool) = 0;
+	virtual void populatePatchModel(QStandardItemModel*, int, MType, bool) = 0;
     virtual void write(int level, Xml& xml) const = 0;
     virtual float getParameter(unsigned long idx) const = 0;
     virtual void setParameter(unsigned long idx, float value) = 0;
@@ -312,6 +314,11 @@ public:
     {
         _sif->populatePatchPopup(m, i, t, d);
     }
+
+	virtual void populatePatchModel(QStandardItemModel* m, int i, MType t, bool d)
+	{
+		_sif->populatePatchModel(m, i, t, d);
+	}
 
     // void setParameter(const char* name, const char* value) const;   // Not required
     //StringParamMap& stringParameters() { return _stringParamMap; }   // Not required
@@ -430,6 +437,7 @@ public:
     }
     virtual const char* getPatchName(int, int, MType, bool);
     virtual void populatePatchPopup(QMenu*, int, MType, bool);
+	virtual void populatePatchModel(QStandardItemModel*, int, MType, bool);
     virtual void write(int level, Xml& xml) const;
 
     virtual float getParameter(unsigned long) const

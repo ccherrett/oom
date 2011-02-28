@@ -10,6 +10,7 @@
 #include "default_click.h"
 
 #include <QMenu>
+#include <QStandardItemModel>
 
 // Added by Tim. p3.3.18
 //#define METRONOME_DEBUG
@@ -157,6 +158,11 @@ public:
 	virtual void populatePatchPopup(QMenu*, int, MType, bool)
 	{
 	};
+
+	virtual void populatePatchModel(QStandardItemModel* m, int, MType, bool)
+	{
+		m->clear();
+	}
 
 	virtual void write(int, Xml&) const
 	{

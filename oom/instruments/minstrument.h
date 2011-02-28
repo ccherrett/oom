@@ -15,6 +15,7 @@
 
 class MidiPort;
 class QMenu;
+class QStandardItemModel;
 class MidiPlayEvent;
 class Xml;
 class EventList;
@@ -196,6 +197,7 @@ public:
     virtual void reset(int, MType);
     virtual QString getPatchName(int, int, MType, bool);
     virtual void populatePatchPopup(QMenu*, int, MType, bool);
+	virtual void populatePatchModel(QStandardItemModel*, int, MType, bool);
     void read(Xml&);
     void write(int level, Xml&);
 

@@ -11,6 +11,7 @@
 #include "synth.h"
 
 class QMenu;
+#include <QStandardItemModel>
 
 struct _FSTHandle;
 struct _FST;
@@ -72,6 +73,10 @@ class VstSynthIF : public SynthIF
       virtual const char* getPatchName(int, int, int, bool) const { return ""; }
       virtual const char* getPatchName(int, int, MType, bool) { return ""; }
       virtual void populatePatchPopup(QMenu*, int, MType, bool) {};
+	  virtual void populatePatchModel(QStandardItemModel* m, int, MType, bool)
+	  {
+		  m->clear();
+	  }
       virtual void write(int level, Xml& xml) const;
       virtual float getParameter(unsigned long idx) const;
       virtual void setParameter(unsigned long idx, float value);

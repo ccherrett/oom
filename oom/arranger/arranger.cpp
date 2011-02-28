@@ -968,12 +968,13 @@ void Arranger::genTrackInfo(QWidget*)
 {
 	midiTrackInfo = new MidiTrackInfo(this);
 	_tvdock = new TrackViewDock(this);
-	infoScroll->setWidget(midiTrackInfo);
+	//infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
 	_rmdock = new RouteMapDock(this);
 	_rtabs->addTab(_tvdock, tr("   Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
-	_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
+	_rtabs->addTab(midiTrackInfo, tr("   Patch Sequencer   "));
+	//_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
 	_rtabs->addTab(_rmdock, tr("  Route Connector  "));
 
 	central = new QWidget(this);

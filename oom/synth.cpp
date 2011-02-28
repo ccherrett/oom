@@ -18,6 +18,8 @@
 
 #include <QDir>
 #include <QMenu>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 #include "app.h"
 #include "synth.h"
@@ -872,6 +874,31 @@ void MessSynthIF::populatePatchPopup(QMenu* menu, int ch, MType, bool)
 		 */
 		QAction *act = menu->addAction(QString(mp->name));
 		act->setData(id);
+		mp = _mess->getPatchInfo(ch, mp);
+	}
+}
+
+//---------------------------------------------------------
+//   populatePatchModel
+//---------------------------------------------------------
+
+void MessSynthIF::populatePatchModel(QStandardItemModel* model, int ch, MType, bool)
+{
+	model->clear();
+	const MidiPatch* mp = _mess->getPatchInfo(ch, 0);
+	while (mp)
+	{
+		int id = ((mp->hbank & 0xff) << 16) + ((mp->lbank & 0xff) << 8) + mp->prog;
+
+		QList<QStandardItem*> row;
+		QString strId = QString::number(id);
+		QStandardItem* idItem = new QStandardItem(strId);
+		QStandardItem* nItem = new QStandardItem(QString(mp->name));
+		row.append(nItem);
+		row.append(idItem);
+		model->appendRow(row);
+		//QAction *act = menu->addAction(QString(mp->name));
+		//act->setData(id);
 		mp = _mess->getPatchInfo(ch, mp);
 	}
 }

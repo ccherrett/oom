@@ -14,6 +14,8 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QList>
+#include <QStandardItemModel>
+#include <QStandardItem>
 
 #include "minstrument.h"
 #include "midiport.h"
@@ -976,6 +978,84 @@ void MidiInstrument::populatePatchPopup(QMenu* menu, int chan, MType songType, b
 				//_data->append(strId);
 				//act->setData(id);
 				act->setData(_data);
+			}
+		}
+	}
+}
+
+//---------------------------------------------------------
+//   populatePatchModel
+//---------------------------------------------------------
+
+void MidiInstrument::populatePatchModel(QStandardItemModel* model, int chan, MType songType, bool drum)
+{
+	model->clear();
+	int mask = 0;
+	bool drumchan = chan == 9;
+	switch (songType)
+	{
+		case MT_XG: mask = 4;
+			break;
+		case MT_GS: mask = 2;
+			break;
+		case MT_GM:
+			if (drumchan)
+				return;
+			mask = 1;
+			break;
+		case MT_UNKNOWN: mask = 7;
+			break;
+	}
+	if (pg.size() > 1)
+	{
+		for (ciPatchGroup i = pg.begin(); i != pg.end(); ++i)
+		{
+			PatchGroup* pgp = *i;
+			QList<QStandardItem*> folder;
+			QStandardItem* noop = new QStandardItem("");
+			QStandardItem *dir = new QStandardItem(pgp->name);
+			QFont f = dir->font();
+			f.setBold(true);
+			dir->setFont(f);
+			const PatchList& pl = pgp->patches;
+			for (ciPatch ipl = pl.begin(); ipl != pl.end(); ++ipl)
+			{
+				const Patch* mp = *ipl;
+				if ((mp->typ & mask) && ((drum && songType != MT_GM) || (mp->drum == drumchan)))
+				{
+					int id = ((mp->hbank & 0xff) << 16) + ((mp->lbank & 0xff) << 8) + (mp->prog & 0xff);
+					QList<QStandardItem*> row;
+					QString strId = QString::number(id);
+					QStandardItem* idItem = new QStandardItem(strId);
+					QStandardItem* nItem = new QStandardItem(mp->name);
+					row.append(nItem);
+					row.append(idItem);
+					dir->appendRow(row);
+				}
+
+			}
+			folder.append(dir);
+			folder.append(noop);
+			model->appendRow(folder);
+		}
+	}
+	else if (pg.size() == 1)
+	{
+		// no groups
+		const PatchList& pl = pg.front()->patches;
+		for (ciPatch ipl = pl.begin(); ipl != pl.end(); ++ipl)
+		{
+			const Patch* mp = *ipl;
+			if (mp->typ & mask)
+			{
+				int id = ((mp->hbank & 0xff) << 16) + ((mp->lbank & 0xff) << 8) + (mp->prog & 0xff);
+				QList<QStandardItem*> row;
+				QString strId = QString::number(id);
+				QStandardItem* idItem = new QStandardItem(strId);
+				QStandardItem* nItem = new QStandardItem(mp->name);
+				row.append(nItem);
+				row.append(idItem);
+				model->appendRow(row);
 			}
 		}
 	}

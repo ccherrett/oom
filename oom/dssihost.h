@@ -52,6 +52,7 @@ class DssiPluginIF;
 
 //class LadspaPort;
 class Port;
+class QStandardItemModel;
 
 //---------------------------------------------------------
 //   DssiSynth
@@ -223,6 +224,7 @@ public:
 
     //virtual void populatePatchPopup(QMenu*, int);
     virtual void populatePatchPopup(QMenu*, int, MType, bool);
+	virtual void populatePatchModel(QStandardItemModel*, int, MType, bool);
 
     //virtual void write(Xml& xml) const;
     virtual void write(int level, Xml& xml) const;

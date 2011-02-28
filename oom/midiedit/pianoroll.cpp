@@ -439,16 +439,17 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
 	//midiTrackInfo->setSizePolicy(QSizePolicy(/*QSizePolicy::Ignored*/QSizePolicy::Preferred, QSizePolicy::Expanding));
-	infoScroll = new QScrollArea;
+	/*infoScroll = new QScrollArea;
 	infoScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	infoScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	//infoScroll->setMaximumWidth(300);
 	infoScroll->setMinimumWidth(100);
 	//infoScroll->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
 	infoScroll->setWidget(midiTrackInfo);
-	infoScroll->setWidgetResizable(true);
+	infoScroll->setWidgetResizable(true);*/
 
-	hsplitter->addWidget(infoScroll);
+	//hsplitter->addWidget(infoScroll);
+	hsplitter->addWidget(midiTrackInfo);
 	hsplitter->addWidget(splitter);
 
 	mainGrid->setRowStretch(0, 100);

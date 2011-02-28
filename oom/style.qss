@@ -96,6 +96,60 @@ MidiTrackInfo QTableView::item:selected:!active
 	border: none;
 }
 
+/* Patch tree styles */
+MidiTrackInfo QWidget#patchSeqContents
+{
+	background-color: #595966;
+	color: #d0d4d0;
+}
+
+MidiTrackInfo QTreeView
+{
+	background-color: #d8dbe8;
+	border: 1px solid #29292a;
+	border-radius: 0px;
+	padding: 0px;
+	color: black;
+	font-size: 12px;
+	alternate-background-color: #bec0cf;
+}
+
+MidiTrackInfo QTreeView QHeaderView::section
+{
+	text-align: left;
+	border: 0px solid black;
+	border-radius: 0px;
+	padding: 5px;
+	/*background-color: #936b9c;*/
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #727180, stop:0.1 #727180, stop:0.3 #4a4d5a, stop:1 #4a4d5a);
+	color: #d6dfd6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+}
+
+MidiTrackInfo QTreeView::item
+{
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+MidiTrackInfo QTreeView::item:selected
+{
+	background-color: #3d3e44;
+	border: none;
+}
+
+MidiTrackInfo QTreeView::item:selected:active
+{
+	border: none;
+}
+
+MidiTrackInfo QTreeView::item:selected:!active
+{
+	border: none;
+}
+
 QHeaderView
 {
 	background-color: #d8dbe8;
@@ -968,7 +1022,7 @@ QTextEdit#commentEntry
 }
 /*////////////////////////////////////////////////////////////////////////}}}*/
 
-QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea { background-color: #595966; color: #d0d4d0; }
+QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Splitter, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea { background-color: #595966; color: #d0d4d0; }
 
 QTextEdit, QTextEdit#songInfoText
 {

@@ -38,6 +38,8 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QMenu>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 #include "dssihost.h"
 #include "synth.h"
@@ -2920,6 +2922,33 @@ void DssiSynthIF::populatePatchPopup(QMenu* menu, int /*ch*/, MType /*type*/, bo
 
 		QAction *act = menu->addAction(QString(i->Name));
 		act->setData(id);
+	}
+}
+
+//---------------------------------------------------------
+//   populatePatchModel
+//---------------------------------------------------------
+
+void DssiSynthIF::populatePatchModel(QStandardItemModel* model, int /*chan*/, MType /*songType*/, bool /*drum*/)
+{
+	model->clear();
+	queryPrograms();
+
+	menu->clear();
+
+	for (std::vector<DSSI_Program_Descriptor>::const_iterator i = programs.begin(); i != programs.end(); ++i)
+	{
+		int bank = i->Bank;
+		int prog = i->Program;
+		int id = (bank << 16) + prog;
+
+		QList<QStandardItem*> row;
+		QString strId = QString::number(id);
+		QStandardItem* idItem = new QStandardItem(strId);
+		QStandardItem* nItem = new QStandardItem(QString(i->Name));
+		row.append(nItem);
+		row.append(idItem);
+		model->appendRow(row);
 	}
 }
 

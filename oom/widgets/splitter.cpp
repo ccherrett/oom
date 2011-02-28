@@ -23,6 +23,9 @@ Splitter::Splitter(Qt::Orientation o, QWidget* parent, const char* name)
 	setOpaqueResize(true);
 }
 
+Splitter::Splitter(QWidget *parent) : QSplitter(parent)
+{}
+
 Splitter::~Splitter()
 {
 	QList<int> vl = sizes();
