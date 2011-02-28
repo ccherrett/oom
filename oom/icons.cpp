@@ -277,6 +277,7 @@ QPixmap* punchout1Icon;
 QPixmap* loopIcon;
 QPixmap* loop1Icon;
 QPixmap* playIcon;
+QPixmap* auditionIcon;
 
 QPixmap* record1_Icon;
 QPixmap* record_on_Icon;
@@ -499,6 +500,7 @@ void initIcons()
       loopIcon     = new MPIXMAP(":/images/icons/transport-loop.png", NULL);
       loop1Icon    = new MPIXMAP(":/images/icons/transport-loop.png", NULL);
       playIcon     = new MPIXMAP(":/images/icons/transport-play.png", NULL);
+      auditionIcon     = new MPIXMAP(":/images/icons/audition.png", NULL);
 
       record1_Icon  = new MPIXMAP(":/images/icons/mixer-record.png", NULL);
       record_on_Icon = new MPIXMAP(":/images/icons/mixer-record_on.png", NULL);

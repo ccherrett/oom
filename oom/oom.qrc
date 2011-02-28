@@ -117,6 +117,7 @@
 		<file>images/icons/add_tv.png</file>
 		<file>images/icons/x.png</file>
 		<file>images/icons/detach.png</file>
+		<file>images/icons/audition.png</file>
 	</qresource>
 </RCC>
 
