@@ -1119,7 +1119,14 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 				}
 			if (newpt != pt)
 			{
+				// turn of record flag for the currents part track
+				if (_curPart)
+				{
+					song->setRecordFlag(track(), false);
+				}
 				editor->setCurCanvasPart(newpt);
+				// and turn it on for the new parts track
+				song->setRecordFlag(track(), true);
 			}
 		}
 			break;
@@ -1139,7 +1146,14 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 				}
 			if (newpt != pt)
 			{
+				// turn of record flag for the currents part track
+				if (_curPart)
+				{
+					song->setRecordFlag(track(), false);
+				}
 				editor->setCurCanvasPart(newpt);
+				// and turn it on for the new parts track
+				song->setRecordFlag(track(), true);
 			}
 		}
 			break;
