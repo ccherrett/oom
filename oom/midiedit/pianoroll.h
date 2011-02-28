@@ -122,6 +122,7 @@ class PianoRoll : public MidiEditor
 	bool _replay;
     PosLabel* posLabel;
     PitchLabel* pitchLabel;
+	QLabel *patchLabel;
 
     //Toolbar1* toolbar;
     Splitter* splitter;

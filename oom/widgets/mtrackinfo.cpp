@@ -117,6 +117,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	_selModel = new QItemSelectionModel(_tableModel);//tableView->selectionModel();
 	_patchModel = new QStandardItemModel(0, 2, this);
 	_patchSelModel = new QItemSelectionModel(_patchModel);
+	patchList->installEventFilter(parent);
 
 	selected = sel_track;
 
@@ -265,13 +266,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 
 	//setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding));
 
-	connect(iPatch, SIGNAL(released()), SLOT(instrPopup()));
-
-	///pop = new QMenu(iPatch);
-	//pop->setCheckable(false); // not needed in Qt4
-
-	// Removed by Tim. p3.3.9
-	//connect(iName, SIGNAL(returnPressed()), SLOT(iNameChanged()));
+	//connect(iPatch, SIGNAL(released()), SLOT(instrPopup()));
 
 	connect(iOutputChannel, SIGNAL(valueChanged(int)), SLOT(iOutputChannelChanged(int)));
 	///connect(iInputChannel, SIGNAL(textChanged(const QString&)), SLOT(iInputChannelChanged(const QString&)));
@@ -447,13 +442,13 @@ void MidiTrackInfo::heartBeat()
 				{
 					//const char* n = "<unknown>";
 					const QString n(tr("Select Patch"));
-					//if(strcmp(iPatch->text().toLatin1().constData(), n) != 0)
-					if (iPatch->text() != n)
+					emit updateCurrentPatch(n);
+					/*if (iPatch->text() != n)
 					{
 						//printf("Arranger::midiTrackInfoHeartBeat setting patch <unknown>\n");
 
 						iPatch->setText(n);
-					}
+					}*/
 				}
 				else
 				{
@@ -461,17 +456,18 @@ void MidiTrackInfo::heartBeat()
 					QString name = instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
 					if (name.isEmpty())
 					{
-						const QString n("???");
-						if (iPatch->text() != n)
-							iPatch->setText(n);
+						name = "???";
+						//if (iPatch->text() != n)
+						//	iPatch->setText(n);
 					}
-					else
+					/*else
 						if (iPatch->text() != name)
 					{
 						//printf("Arranger::midiTrackInfoHeartBeat setting patch name\n");
 
 						iPatch->setText(name);
-					}
+					}*/
+					emit updateCurrentPatch(name);
 				}
 			}
 			else
@@ -488,8 +484,9 @@ void MidiTrackInfo::heartBeat()
 				//{
 				MidiInstrument* instr = mp->instrument();
 				QString name = instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM);
-				if (iPatch->text() != name)
-					iPatch->setText(name);
+				//if (iPatch->text() != name)
+				//	iPatch->setText(name);
+				emit updateCurrentPatch(name);
 
 				int hb = ((program >> 16) & 0xff) + 1;
 				if (hb == 0x100)
@@ -907,8 +904,8 @@ void MidiTrackInfo::iProgHBankChanged()
 	audio->msgPlayMidiEvent(&ev);
 
 	MidiInstrument* instr = mp->instrument();
-	iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
-	//      updateTrackInfo();
+	emit updateCurrentPatch(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
+	//iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
 }
 
 //---------------------------------------------------------
@@ -985,8 +982,8 @@ void MidiTrackInfo::iProgLBankChanged()
 	audio->msgPlayMidiEvent(&ev);
 
 	MidiInstrument* instr = mp->instrument();
-	iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
-	//      updateTrackInfo();
+	emit updateCurrentPatch(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
+	//iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
 }
 
 //---------------------------------------------------------
@@ -1063,7 +1060,8 @@ void MidiTrackInfo::iProgramChanged()
 		audio->msgPlayMidiEvent(&ev);
 
 		MidiInstrument* instr = mp->instrument();
-		iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
+		emit updateCurrentPatch(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
+		//iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
 	}
 
 	//      updateTrackInfo();
@@ -1199,6 +1197,8 @@ void MidiTrackInfo::iPanChanged(int val)
 
 void MidiTrackInfo::instrPopup()
 {
+	return;
+	/*
 	if (!selected)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
@@ -1240,11 +1240,7 @@ void MidiTrackInfo::instrPopup()
 			if (!pg.isEmpty())
 				pg = pg + ": \n  ";
 			QString label = "  " + pg + act->text();
-			/*for (int i = 0; i < _tableModel->rowCount(); ++i)
-			{
-				QStandardItem* item = _tableModel->item(i, 1);
-				item->setCheckState(Qt::Unchecked);
-			}*/
+			
 			QList<QStandardItem*> rowData;
 			QStandardItem* chk = new QStandardItem(true);
 			chk->setCheckable(true);
@@ -1274,6 +1270,7 @@ void MidiTrackInfo::instrPopup()
 	}
 
 	delete pup;
+	*/
 }
 
 //---------------------------------------------------------
@@ -1576,11 +1573,13 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 		nprogram = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
 		if (nprogram == CTRL_VAL_UNKNOWN)
 			//iPatch->setText(QString("<unknown>"));
-			iPatch->setText(tr("Select Patch"));
+			//iPatch->setText(tr("Select Patch"));
+			emit updateCurrentPatch(tr("Select Patch"));
 		else
 		{
 			MidiInstrument* instr = mp->instrument();
-			iPatch->setText(instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM));
+			emit updateCurrentPatch(instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM));
+			//iPatch->setText(instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM));
 		}
 	}
 	else
@@ -1596,7 +1595,8 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 		//else
 		//{
 		MidiInstrument* instr = mp->instrument();
-		iPatch->setText(instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM));
+		emit updateCurrentPatch(instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM));
+		//iPatch->setText(instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM));
 
 		int hb = ((program >> 16) & 0xff) + 1;
 		if (hb == 0x100)
@@ -2352,6 +2352,16 @@ void MidiTrackInfo::patchDoubleClicked(QModelIndex index)
 			updateTrackInfo(-1);
 			updateTableHeader();
 		}
+	}
+}
+
+void MidiTrackInfo::addSelectedPatch()
+{
+	if(!selected)
+		return;
+	if(_patchSelModel->hasSelection())
+	{
+		patchDoubleClicked(_patchSelModel->currentIndex());
 	}
 }
 

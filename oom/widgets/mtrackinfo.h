@@ -109,6 +109,7 @@ public slots:
 	void populatePatches();
     void updateTableHeader();
     void rebuildMatrix();
+	void addSelectedPatch();
 	//tb1
     void setRaster(int);
     void setQuant(int);
@@ -116,6 +117,7 @@ public slots:
 
 signals:
     void outputPortChanged(int);
+	void updateCurrentPatch(QString);
 	//tb1
     void rasterChanged(int);
     void quantChanged(int);

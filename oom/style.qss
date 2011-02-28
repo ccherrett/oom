@@ -49,6 +49,18 @@ TrackViewEditor QListView, TrackViewEditor QTextField, QTableView
 }
 
 /*MidiTrackInfo styles*/
+
+QLabel#patchLabel
+{
+	 border-radius: 8px;
+     border-image: url(:/images/frame.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #010f14;
+	 color: #03c0e2;
+	 padding: 0px 16px;
+}
+
 MidiTrackInfo QTableView 
 {
 	background-color: #d8dbe8;
@@ -486,6 +498,7 @@ Dentry
 	 background-color: #010f14;
 	 color: #03c0e2;
 }
+
 QPushButton 
 { 
 	border-radius: 3px; 
