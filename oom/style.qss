@@ -125,8 +125,8 @@ MidiTrackInfo QTreeView
 	border: 1px solid #29292a;
 	border-radius: 0px;
 	padding: 0px;
-	color: black;
-	font-size: 9px;
+	color: #303033;
+	font-size: 11x;
 	alternate-background-color: #bec0cf;
 }
 
@@ -141,13 +141,13 @@ MidiTrackInfo QTreeView QHeaderView::section
 	color: #d6dfd6;
 	font-family: "fixed-width";
 	font-weight: bold;
-	font-size: 9px;
+	font-size: 11px;
 }
 
 MidiTrackInfo QTreeView::item
 {
-	padding-top: 4px;
-	padding-bottom: 4px;
+	padding-top: 3px;
+	padding-bottom: 3px;
 }
 
 MidiTrackInfo QTreeView::item:selected
