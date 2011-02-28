@@ -39,6 +39,10 @@ QHeaderView#trackHeaders
  {
  	background-color: #696977;
  }
+ QScrollArea
+ {
+ 	background-color: #696977;
+ }
 /*Trackview editor styles*/
 TrackViewEditor QListView, TrackViewEditor QTextField, QTableView
 {
