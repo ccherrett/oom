@@ -834,9 +834,22 @@ void PianoCanvas::pianoCmd(int cmd)
 
 void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 {
-	int port = track()->outPort();
-	int channel = track()->outChannel();
-	pitch += track()->transposition;
+
+	MidiTrack* midiTrack = 0;
+	if (_curPart)
+	{
+		midiTrack = dynamic_cast<MidiTrack*>(_curPart->track());
+		if (!midiTrack)
+		{
+			midiTrack = track();
+		}
+	}
+
+	Q_ASSERT(midiTrack);
+
+	int port = midiTrack->outPort();
+	int channel = midiTrack->outChannel();
+	pitch += midiTrack->transposition;
 
 	// play note:
 	//MidiPlayEvent e(0, port, channel, 0x90, pitch, 127);
