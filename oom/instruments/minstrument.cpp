@@ -1028,6 +1028,7 @@ void MidiInstrument::populatePatchModel(QStandardItemModel* model, int chan, MTy
 					QString strId = QString::number(id);
 					QStandardItem* idItem = new QStandardItem(strId);
 					QStandardItem* nItem = new QStandardItem(mp->name);
+					nItem->setToolTip(QString(pgp->name+":\n    "+mp->name));
 					row.append(nItem);
 					row.append(idItem);
 					dir->appendRow(row);
@@ -1054,6 +1055,7 @@ void MidiInstrument::populatePatchModel(QStandardItemModel* model, int chan, MTy
 				QString strId = QString::number(id);
 				QStandardItem* idItem = new QStandardItem(strId);
 				QStandardItem* nItem = new QStandardItem(mp->name);
+				nItem->setToolTip(QString(mp->name));
 				row.append(nItem);
 				row.append(idItem);
 				root->appendRow(row);
