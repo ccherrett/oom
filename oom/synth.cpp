@@ -895,6 +895,7 @@ void MessSynthIF::populatePatchModel(QStandardItemModel* model, int ch, MType, b
 		QString strId = QString::number(id);
 		QStandardItem* idItem = new QStandardItem(strId);
 		QStandardItem* nItem = new QStandardItem(QString(mp->name));
+		nItem->setToolTip(QString(mp->name));
 		row.append(nItem);
 		row.append(idItem);
 		root->appendRow(row);

@@ -2945,6 +2945,7 @@ void DssiSynthIF::populatePatchModel(QStandardItemModel* model, int /*chan*/, MT
 		QString strId = QString::number(id);
 		QStandardItem* idItem = new QStandardItem(strId);
 		QStandardItem* nItem = new QStandardItem(QString(i->Name));
+		nItem->setToolTip(QString(i->Name));
 		row.append(nItem);
 		row.append(idItem);
 		root->appendRow(row);

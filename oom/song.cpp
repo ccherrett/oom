@@ -3948,6 +3948,7 @@ void Song::removeTrack2(Track* track)
 			SynthI* s = (SynthI*) track;
 			s->deactivate2();
 			_synthIs.erase(track);
+			_artracks.erase(track);
 		}
 			break;
 	}
@@ -3964,8 +3965,8 @@ void Song::removeTrack2(Track* track)
 		}
 		tv = findTrackView(track);
 	}
-	if(updateview || viewselected)
-		updateTrackViews1();
+	//if(updateview || viewselected)
+	updateTrackViews1();
 
 
 	/*
