@@ -23,6 +23,7 @@ extern QPixmap* punchout1Icon;
 extern QPixmap* loopIcon;
 extern QPixmap* loop1Icon;
 extern QPixmap* playIcon;
+extern QPixmap* auditionIcon;
 extern QPixmap* recordIcon;
 extern QPixmap* stopIcon;
 extern QPixmap* startIcon;

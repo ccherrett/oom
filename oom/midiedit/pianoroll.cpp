@@ -320,10 +320,13 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	solo = new QToolButton();
 	solo->setIcon(*soloIconSet2);
 	solo->setIconSize(soloIconOn->size());
+	solo->setToolTip(tr("Solo"));
 	solo->setCheckable(true);
 
 	repPlay = new QToolButton();
-	repPlay->setText("PR");
+	repPlay->setIcon(*auditionIcon);
+	repPlay->setIconSize(soloIconOn->size());
+	repPlay->setToolTip(tr("Toggle Audition Mode"));
 	repPlay->setCheckable(true);
 
 	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
@@ -368,10 +371,6 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer5->setMaximumWidth(10);
 	tools2->addWidget(spacer5);
 	tools2->addWidget(repPlay);
-	QWidget* spacer4 = new QWidget();
-	spacer4->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer4->setMaximumWidth(10);
-	tools2->addWidget(spacer4);
 	tools2->addActions(transportAction->actions());
 	tools2->addWidget(solo);
 	QWidget* spacer2 = new QWidget();
