@@ -58,7 +58,7 @@ QLabel#patchLabel
 	 border-color: #484848;
 	 background-color: #010f14;
 	 color: #03c0e2;
-	 padding: 0px 16px;
+	 padding: 0px 8px;
 }
 
 MidiTrackInfo QTableView 
