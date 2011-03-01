@@ -1486,17 +1486,25 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		e.setPitch(pitch);
 		e.setVelo(velo);
 		e.setLenTick(len);
+		// Indicate do undo, and do not do port controller values and clone parts.
+		//audio->msgAddEvent(e, curPart);
+
 
 		int diff = e.endTick() - _curPart->lenTick();
 		if (diff > 0)
 		{// too short part? extend it
-			int endTick = song->roundUpBar(_curPart->lenTick() + diff);
-			_curPart->setLenTick(endTick);
-			printf("resizing part length during step input recording\n");
+			//printf("extend Part!\n");
+			Part* newPart = _curPart->clone();
+			newPart->setLenTick(newPart->lenTick() + diff);
+			// Indicate no undo, and do port controller values but not clone parts.
+			//audio->msgChangePart(part, newPart,false);
+			audio->msgChangePart(_curPart, newPart, false, true, false);
+			_curPart = newPart; // reassign
 		}
 
-		// Indicate do undo, and do not do port controller values and clone parts.
+
 		audio->msgAddEvent(e, _curPart, true, false, false);
+
 
 		tick += editor->rasterStep(tick);
 		if (tick != song->cpos())
