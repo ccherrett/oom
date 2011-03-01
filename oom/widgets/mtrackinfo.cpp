@@ -2317,7 +2317,7 @@ void MidiTrackInfo::patchDoubleClicked(QModelIndex index)
 		QString name = nItem->text();
 		//printf("Found patch Name: %s - ID: %d\n",name.toUtf8().constData(), id);
 
-		if (!name.isEmpty() && id)
+		if (!name.isEmpty() && id >= 0)
 		{
 			MidiTrack* track = (MidiTrack*) selected;
 			int channel = track->outChannel();
