@@ -999,7 +999,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports Manager"), this);
 
 	//-------- Help Actions
-	//helpManualAction = new QAction(tr("&Manual"), this);
+	helpManualAction = new QAction(tr("&Manual"), this);
 	helpHomepageAction = new QAction(tr("&OOMidi Homepage"), this);
 	helpReportAction = new QAction(tr("&Report Bug..."), this);
 	helpAboutAction = new QAction(tr("&About OOMidi"), this);
@@ -1141,9 +1141,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(followSignalMapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
 
 	//-------- Help connections
-	//connect(helpManualAction, SIGNAL(activated()), SLOT(startHelpBrowser()));
+	connect(helpManualAction, SIGNAL(activated()), SLOT(startHelpBrowser()));
 	connect(helpHomepageAction, SIGNAL(activated()), SLOT(startHomepageBrowser()));
-	connect(helpReportAction, SIGNAL(activated()), SLOT(startBugBrowser()));
+	//connect(helpReportAction, SIGNAL(activated()), SLOT(startBugBrowser()));
 	connect(helpAboutAction, SIGNAL(activated()), SLOT(about()));
 
 	//--------------------------------------------------
@@ -1394,11 +1394,11 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//---------------------------------------------------
 
 	menu_help = menuBar()->addMenu(tr("&Help"));
-	//menu_help->addAction(helpManualAction);
+	menu_help->addAction(helpManualAction);
 	menu_help->addAction(helpHomepageAction);
 	menu_help->addSeparator();
-	menu_help->addAction(helpReportAction);
-	menu_help->addSeparator();
+	//menu_help->addAction(helpReportAction);
+	//menu_help->addSeparator();
 	menu_help->addAction(helpAboutAction);
 
 	//menu_help->insertItem(tr("About&Qt"), this, SLOT(aboutQt()));
@@ -5227,7 +5227,7 @@ void OOMidi::updateConfiguration()
 	followPageAction->setShortcut(shortcuts[SHRT_FOLLOW_JUMP].key);
 	followCtsAction->setShortcut(shortcuts[SHRT_FOLLOW_CONTINUOUS].key);
 
-	//helpManualAction->setShortcut(shortcuts[SHRT_OPEN_HELP].key);
+	helpManualAction->setShortcut(shortcuts[SHRT_OPEN_HELP].key);
 
 	// Orcan: Old stuff, needs to be converted. These aren't used anywhere so I commented them out
 	//menuSettings->setAccel(shortcuts[SHRT_CONFIG_AUDIO_PORTS].key, menu_ids[CMD_CONFIG_AUDIO_PORTS]);

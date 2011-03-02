@@ -24,71 +24,61 @@
 //---------------------------------------------------------
 
 void OOMidi::startHelpBrowser()
-      {
-      QString lang(getenv("LANG"));
-      QString oomHelp = DOCDIR + QString("/html/index_") + lang + QString(".html");
-      if (access(oomHelp.toLatin1(), R_OK) != 0) {
-            oomHelp = DOCDIR + QString("/html/index.html");
-            if (access(oomHelp.toLatin1(), R_OK) != 0) {
-                  QString info(tr("no help found at: "));
-                  info += oomHelp;
-                  QMessageBox::critical(this, tr("OOMidi: Open Help"), info);
-                  return;
-                  }
-            }
+{
+      QString oomHelp = QString("https://github.com/ccherrett/oom/wiki/Quick-Start-Manual");
       launchBrowser(oomHelp);
-      }
+}
 
 //---------------------------------------------------------
 //   startHelpBrowser
 //---------------------------------------------------------
 
 void OOMidi::startHomepageBrowser()
-      {
-      QString oomHome = QString("https://github.com/ccherrett/oom/wiki/Quick-Start-Manual");
+{
+      QString oomHome = QString("http://www.openoctave.org");
 
       launchBrowser(oomHome);
-      }
+}
 
 //---------------------------------------------------------
 //   startBugBrowser
 //---------------------------------------------------------
 
 void OOMidi::startBugBrowser()
-      {
+{
       //QString oomBugPage("http://www.openoctave.org/wiki/index.php/Report_a_bug");
       QString oomBugPage("http://www.openoctave.org/index.php/Report_a_bug");
       launchBrowser(oomBugPage);
-      }
+}
 
 //---------------------------------------------------------
 //   about
 //---------------------------------------------------------
 
 void OOMidi::about()
-      {
+{
       AboutBoxImpl ab;
       ab.show();
       ab.exec();
-      }
+}
 
 //---------------------------------------------------------
 //   aboutQt
 //---------------------------------------------------------
 
 void OOMidi::aboutQt()
-      {
+{
       QMessageBox::aboutQt(this, QString("OOMidi"));
-      }
+}
 
 void OOMidi::launchBrowser(QString &whereTo)
-      {
+{
       if (! QDesktopServices::openUrl(QUrl(whereTo)))
-            {
+      {
             QMessageBox::information(this, tr("Unable to launch help"), 
                                      tr("For some reason OOMidi has to launch the default\n"
                                         "browser on your machine."),
                                      QMessageBox::Ok, QMessageBox::Ok);
             printf("Unable to launch help\n");
-            }
       }
+}
