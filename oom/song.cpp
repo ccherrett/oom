@@ -423,6 +423,22 @@ void Song::deselectAllParts()
 	update(SC_SELECTION);
 }
 
+void Song::disarmAllTracks()
+{
+	if(viewselected)
+	{
+		for(iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
+		{
+			if(_viewtracks.index((*t)) == -1)
+			{
+				(*t)->setRecordFlag1(false);
+				(*t)->setRecordFlag2(false);
+				(*t)->setSelected(false);
+			}
+		}
+	}
+}
+
 //---------------------------------------------------------
 //   changeTrack
 //    oldTrack - copy of the original track befor modification
@@ -3601,6 +3617,7 @@ void Song::updateTrackViews1()
 			//}
 		}
 	}
+	disarmAllTracks();
 	emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
 
