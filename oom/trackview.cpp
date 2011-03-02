@@ -63,7 +63,7 @@ void TrackView::removeTrack(Track* t)
 void TrackView::setSelected(bool f)
 {
 	_selected = f;
-	if(!f && !tracks()->empty())
+	if(!f)
 	{
 		for(iTrack it = tracks()->begin(); it != tracks()->end(); ++it)
 		{

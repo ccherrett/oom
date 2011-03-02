@@ -176,6 +176,7 @@ enum
     SHRT_PASTE_CLONE, //CTRL+SHIFT+Key_V
     SHRT_PASTE_TO_TRACK, //CTRL+Key_B
     SHRT_PASTE_CLONE_TO_TRACK, //CTRL+SHIFT+Key_B
+	SHRT_INSERT_PART, //Ctrl+Insert
 
     //Arranger tracks
     SHRT_SEL_TRACK_BELOW,
