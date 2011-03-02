@@ -817,19 +817,17 @@ MPConfig::MPConfig(QWidget* parent)
 		setToolTip(mdevView->horizontalHeaderItem(i), i);
 	}
 	mdevView->setFocusPolicy(Qt::NoFocus);
-	mdevView->resizeColumnsToContents();
 	//mdevView->horizontalHeader()->setMinimumSectionSize(60);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_NO, 50);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_REC, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 40);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_INROUTES, 50);
-	//mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 50);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_OUTROUTES, QHeaderView::ResizeToContents);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 60);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 60);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_INSTR, QHeaderView::ResizeToContents);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_NAME, QHeaderView::ResizeToContents);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_INROUTES, 40);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 40);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 70);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 70);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_INSTR, 140);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_NAME, 140);
 	mdevView->horizontalHeader()->setStretchLastSection(true);
 	mdevView->horizontalHeader()->setDefaultAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 
@@ -844,6 +842,53 @@ MPConfig::MPConfig(QWidget* parent)
 	//connect(synthList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(addInstanceClicked()));
 	//connect(removeInstance, SIGNAL(clicked()), SLOT(removeInstanceClicked()));
 	//connect(instanceList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(removeInstanceClicked()));
+
+
+	for (int i = MIDI_PORTS - 1; i >= 0; --i)
+	{
+		mdevView->blockSignals(true); // otherwise itemChanged() is triggered and bad things happen.
+		QString s;
+		s.setNum(i + 1);
+		QTableWidgetItem* itemno = new QTableWidgetItem(s);
+		addItem(i, DEVCOL_NO, itemno, mdevView);
+		itemno->setTextAlignment(Qt::AlignHCenter);
+		itemno->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemstate = new QTableWidgetItem();
+		addItem(i, DEVCOL_STATE, itemstate, mdevView);
+		itemstate->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* iteminstr = new QTableWidgetItem();
+		addItem(i, DEVCOL_INSTR, iteminstr, mdevView);
+		iteminstr->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemname = new QTableWidgetItem;
+		addItem(i, DEVCOL_NAME, itemname, mdevView);
+		itemname->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemgui = new QTableWidgetItem;
+		addItem(i, DEVCOL_GUI, itemgui, mdevView);
+		itemgui->setTextAlignment(Qt::AlignHCenter);
+		itemgui->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemrec = new QTableWidgetItem;
+		addItem(i, DEVCOL_REC, itemrec, mdevView);
+		itemrec->setTextAlignment(Qt::AlignHCenter);
+		itemrec->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemplay = new QTableWidgetItem;
+		addItem(i, DEVCOL_PLAY, itemplay, mdevView);
+		itemplay->setTextAlignment(Qt::AlignHCenter);
+		itemplay->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemout = new QTableWidgetItem;
+		addItem(i, DEVCOL_OUTROUTES, itemout, mdevView);
+		itemout->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemin = new QTableWidgetItem;
+		addItem(i, DEVCOL_INROUTES, itemin, mdevView);
+		itemin->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemdefin = new QTableWidgetItem();
+		addItem(i, DEVCOL_DEF_IN_CHANS, itemdefin, mdevView);
+		itemdefin->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+		QTableWidgetItem* itemdefout = new QTableWidgetItem();
+		addItem(i, DEVCOL_DEF_OUT_CHANS, itemdefout, mdevView);
+		itemdefout->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+		mdevView->blockSignals(false);
+	}
+
 	songChanged(0);
 }
 
@@ -883,7 +928,6 @@ void MPConfig::songChanged(int flags)
 	}
 
 	sitem = 0;
-	mdevView->clearContents();
 	for (int i = MIDI_PORTS - 1; i >= 0; --i)
 	{
 		mdevView->blockSignals(true); // otherwise itemChanged() is triggered and bad things happen.
@@ -891,51 +935,30 @@ void MPConfig::songChanged(int flags)
 		MidiDevice* dev = port->device();
 		QString s;
 		s.setNum(i + 1);
-		QTableWidgetItem* itemno = new QTableWidgetItem(s);
-		addItem(i, DEVCOL_NO, itemno, mdevView);
-		itemno->setTextAlignment(Qt::AlignHCenter);
-		itemno->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* itemstate = new QTableWidgetItem(port->state());
-		addItem(i, DEVCOL_STATE, itemstate, mdevView);
-		itemstate->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* iteminstr = new QTableWidgetItem(port->instrument() ?
-				port->instrument()->iname() :
-				tr("<unknown>"));
-		addItem(i, DEVCOL_INSTR, iteminstr, mdevView);
-		iteminstr->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* itemname = new QTableWidgetItem;
-		addItem(i, DEVCOL_NAME, itemname, mdevView);
-		itemname->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* itemgui = new QTableWidgetItem;
-		addItem(i, DEVCOL_GUI, itemgui, mdevView);
-		itemgui->setTextAlignment(Qt::AlignHCenter);
-		itemgui->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* itemrec = new QTableWidgetItem;
-		addItem(i, DEVCOL_REC, itemrec, mdevView);
-		itemrec->setTextAlignment(Qt::AlignHCenter);
-		itemrec->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* itemplay = new QTableWidgetItem;
-		addItem(i, DEVCOL_PLAY, itemplay, mdevView);
-		itemplay->setTextAlignment(Qt::AlignHCenter);
-		itemplay->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* itemout = new QTableWidgetItem;
-		addItem(i, DEVCOL_OUTROUTES, itemout, mdevView);
-		itemout->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* itemin = new QTableWidgetItem;
-		addItem(i, DEVCOL_INROUTES, itemin, mdevView);
-		itemin->setFlags(Qt::ItemIsEnabled);
-		QTableWidgetItem* itemdefin = new QTableWidgetItem(bitmap2String(port->defaultInChannels()));
-		addItem(i, DEVCOL_DEF_IN_CHANS, itemdefin, mdevView);
-		itemdefin->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
-		QTableWidgetItem* itemdefout = new QTableWidgetItem(bitmap2String(port->defaultOutChannels()));
-		addItem(i, DEVCOL_DEF_OUT_CHANS, itemdefout, mdevView);
-		itemdefout->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+		QTableWidgetItem* itemno = mdevView->item(i, DEVCOL_NO);
+		QTableWidgetItem* itemstate = mdevView->item(i, DEVCOL_STATE);
+		itemstate->setText(port->state());
+		QTableWidgetItem* iteminstr = mdevView->item(i, DEVCOL_INSTR);
+		QString instrumentName = port->instrument() ? port->instrument()->iname() : tr("<unknown>");
+		iteminstr->setText(instrumentName);
+		iteminstr->setToolTip(instrumentName);
+		QTableWidgetItem* itemname = mdevView->item(i, DEVCOL_NAME);
+		QTableWidgetItem* itemgui = mdevView->item(i, DEVCOL_GUI);
+		QTableWidgetItem* itemrec = mdevView->item(i, DEVCOL_REC);
+		QTableWidgetItem* itemplay = mdevView->item(i, DEVCOL_PLAY);
+		QTableWidgetItem* itemout = mdevView->item(i, DEVCOL_OUTROUTES);
+		QTableWidgetItem* itemin = mdevView->item(i, DEVCOL_INROUTES);
+		QTableWidgetItem* itemdefin = mdevView->item(i, DEVCOL_DEF_IN_CHANS);
+		itemdefin->setText(bitmap2String(port->defaultInChannels()));
+		QTableWidgetItem* itemdefout = mdevView->item(i, DEVCOL_DEF_OUT_CHANS);
+		itemdefout->setText(bitmap2String(port->defaultOutChannels()));
 		mdevView->blockSignals(false);
 
 
 		if (dev)
 		{
 			itemname->setText(dev->name());
+			itemname->setToolTip(dev->name());
 
 			// Is it a Jack midi device? Allow renaming.
 			//if(dynamic_cast<MidiJackDevice*>(dev))
@@ -954,6 +977,7 @@ void MPConfig::songChanged(int flags)
 		else
 		{
 			itemname->setText(tr("<none>"));
+			itemname->setToolTip("");
 			itemgui->setIcon(QIcon(*dothIcon));
 			itemrec->setIcon(QIcon(QPixmap()));
 			itemplay->setIcon(QIcon(QPixmap()));
@@ -983,18 +1007,18 @@ void MPConfig::songChanged(int flags)
 			{
 				itemout->setIcon(QIcon(*buttondownIcon));
 				if (port->device() && !port->device()->outRoutes()->empty())
-                {
+				{
 					RouteList* list = port->device()->outRoutes();
-                    if (!list->empty())
-                    {
+					if (!list->empty())
+					{
 						iRoute r = list->begin();
 						itemout->setText(r->name());
 					}
-                }
-                else 
-                {
-                	itemout->setText(tr("out"));                                                
-                }
+				}
+				else
+				{
+					itemout->setText(tr("out"));
+				}
 
 				//if (dev->openFlags() & 1)
 				//	itemout->setText(tr("out"));
@@ -1010,52 +1034,11 @@ void MPConfig::songChanged(int flags)
 
 		if (i == no) sitem = itemno;
 	}
+
 	if (sitem)
+	{
 		mdevView->setCurrentItem(sitem);
-
-	QString s;
-	//synthList->clear();
-	/*
-	for (std::vector<Synth*>::iterator i = synthis.begin();
-			i != synthis.end(); ++i)
-	{
-		//s = (*i)->baseName();
-		//s = (*i)->name();
-
-		QTreeWidgetItem* item = new QTreeWidgetItem(synthList);
-		//item->setText(0, s);
-		item->setText(0, QString((*i)->baseName()));
-		s.setNum((*i)->instances());
-		item->setText(1, s);
-		item->setTextAlignment(1, Qt::AlignHCenter);
-		//item->setText(2, QString((*i)->baseName()));
-		item->setText(2, QString((*i)->name()));
-
-		item->setText(3, QString((*i)->version()));
-		item->setText(4, QString((*i)->description()));
 	}
-	//instanceList->clear();
-	SynthIList* sl = song->syntis();
-	for (iSynthI si = sl->begin(); si != sl->end(); ++si)
-	{
-		QTreeWidgetItem* iitem = new QTreeWidgetItem(instanceList);
-		iitem->setText(0, (*si)->name());
-		if ((*si)->midiPort() == -1)
-			s = tr("<none>");
-		else
-			s.setNum((*si)->midiPort() + 1);
-		iitem->setText(1, s);
-		iitem->setTextAlignment(1, Qt::AlignHCenter);
-	}
-	synthList->resizeColumnToContents(1);
-	*/
-	/*mdevView->resizeColumnsToContents();*/
-	/*mdevView->horizontalHeader()->setResizeMode(DEVCOL_NO, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_REC, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_PLAY, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->setResizeMode(DEVCOL_GUI, QHeaderView::Fixed);
-	mdevView->horizontalHeader()->setStretchLastSection(true);*/
-	selectionChanged();
 }
 
 //---------------------------------------------------------
