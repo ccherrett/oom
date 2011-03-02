@@ -123,6 +123,7 @@ class PartCanvas : public Canvas
 
     void glueItem(CItem* item);
     void splitItem(CItem* item, const QPoint&);
+	CItem* addPartAtCursor(Track*);
 
     void copy(PartList*);
     void paste(bool clone = false, bool toTrack = true, bool doInsert = false);
