@@ -45,7 +45,7 @@ void OOMidi::startHelpBrowser()
 
 void OOMidi::startHomepageBrowser()
       {
-      QString oomHome = QString("http://www.openoctave.org");
+      QString oomHome = QString("https://github.com/ccherrett/oom/wiki/Quick-Start-Manual");
 
       launchBrowser(oomHome);
       }
