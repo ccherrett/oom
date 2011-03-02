@@ -420,7 +420,7 @@ void Song::deselectAllParts()
 	for(iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
 		(*t)->deselectParts();
 	hasSelectedParts = false;
-	//update(SC_SELECTION);
+	update(SC_SELECTION);
 }
 
 //---------------------------------------------------------

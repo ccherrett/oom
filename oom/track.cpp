@@ -337,7 +337,6 @@ void Track::deselectParts()
 		Part* p = ip->second;
 		p->setSelected(false);
 	}
-	song->update(SC_SELECTION);
 }
 
 //---------------------------------------------------------
