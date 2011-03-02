@@ -1425,8 +1425,8 @@ void PianoCanvas::quantize(int strength, int limit, bool quantLen)
 void PianoCanvas::midiNote(int pitch, int velo)
 {
         if (_midiin && _steprec && _curPart
-                        && !audio->isPlaying() && velo && _pos[0] >= start_tick
-                        && _pos[0] < end_tick
+			&& !audio->isPlaying() && velo
+			&& _pos[0] >= start_tick
 			&& !(globalKeyState & Qt::AltModifier))
 	{
 		unsigned int len = editor->quant(); //prevent compiler warning: comparison singed/unsigned

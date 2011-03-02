@@ -874,6 +874,40 @@ void PartCanvas::resizeItem(CItem* i, bool noSnap)
 	song->cmdResizePart(t, p, newwidth);
 }
 
+CItem* PartCanvas::addPartAtCursor(Track* track)
+{
+	if (!track)
+		return 0;
+
+	unsigned pos = song->cpos();
+	Part* pa = 0;
+	NPart* np = 0;
+	switch (track->type())
+	{
+		case Track::MIDI:
+		case Track::DRUM:
+			pa = new MidiPart((MidiTrack*) track);
+			pa->setTick(pos);
+			pa->setLenTick(0);
+			break;
+		case Track::WAVE:
+			pa = new WavePart((WaveTrack*) track);
+			pa->setTick(pos);
+			pa->setLenTick(0);
+			break;
+		case Track::AUDIO_OUTPUT:
+		case Track::AUDIO_INPUT:
+		case Track::AUDIO_BUSS:
+		case Track::AUDIO_AUX:
+		case Track::AUDIO_SOFTSYNTH:
+			return 0;
+	}
+	pa->setName(track->name());
+	pa->setColorIndex(curColorIndex);
+	np = new NPart(pa);
+	return np;
+}
+
 //---------------------------------------------------------
 //   newItem
 //    first create local Item
@@ -1803,6 +1837,24 @@ void PartCanvas::keyPress(QKeyEvent* event)
 			}
 		}
 		song->update(SC_TRACK_MODIFIED);
+		return;
+	}
+	else if(key == shortcuts[SHRT_INSERT_PART].key)
+	{
+		TrackList sel = song->getSelectedTracks();
+		if(sel.size() == 1)
+		{
+			Track* trk = sel.front();
+			if(trk)
+			{
+				//printf("Found one track selected: %s\n", trk->name().toUtf8().constData());
+				CItem* ci = addPartAtCursor(trk);
+				if(ci)
+				{
+					newItem(ci, false);
+				}
+			}
+		}
 		return;
 	}
 
