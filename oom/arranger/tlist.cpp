@@ -507,7 +507,7 @@ Track* TList::y2Track(int y) const
 //---------------------------------------------------------
 //   viewMouseDoubleClickEvent
 //---------------------------------------------------------
-
+/*
 void TList::mouseDoubleClickEvent(QMouseEvent* ev)
 {
 	int x = ev->x();
@@ -519,29 +519,36 @@ void TList::mouseDoubleClickEvent(QMouseEvent* ev)
 
 	if (t)
 	{
-		int colx = header->sectionPosition(section);
-		int colw = header->sectionSize(section);
-		int coly = t->y() - ypos;
-		int colh = t->height();
-
 		if (section == COL_NAME)
 		{
-			editTrack = t;
-			if (editor == 0)
-			{
-				editor = new QLineEdit(this);
-				/*connect(editor, SIGNAL(returnPressed()),
-				   SLOT(returnPressed()));*/
-				editor->setFrame(true);
-			}
-			editor->setText(editTrack->name());
-			editor->end(false);
-			editor->setGeometry(colx, coly, colw, colh);
-			editMode = true;
-			editor->show();
+			renameTrack(t);
 		}
 		else
 			mousePressEvent(ev);
+	}
+}
+*/
+
+void TList::renameTrack(Track* t)
+{
+	if (t)
+	{
+		int colx = header->sectionPosition(COL_NAME);
+		int colw = header->sectionSize(COL_NAME);
+		int coly = t->y() - ypos;
+		int colh = t->height();
+
+		editTrack = t;
+		if (editor == 0)
+		{
+			editor = new QLineEdit(this);
+			editor->setFrame(true);
+		}
+		editor->setText(editTrack->name());
+		editor->end(false);
+		editor->setGeometry(colx, coly, colw, colh);
+		editMode = true;
+		editor->show();
 	}
 }
 
@@ -1037,7 +1044,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 			delete p;
 		}
 		return;
-	}
+	}//END no Track
 
 	//This changes to song->visibletracks()
 	TrackList* tracks = song->visibletracks();
@@ -1241,11 +1248,12 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				mode = NORMAL;
 				QMenu* p = new QMenu;
 				//p->clear();
-				p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 				if (!multipleSelectedTracks)
 				{
+					p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
 					p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
 				}
+				p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 
 				QMenu* trackHeightsMenu = p->addMenu("Track Height");
 				trackHeightsMenu->addAction("Default")->setData(6);
@@ -1283,7 +1291,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 #endif
 #endif
 				}/*}}}*/
-                                else if(t->isMidiTrack() && !multipleSelectedTracks)
+                else if(t->isMidiTrack() && !multipleSelectedTracks)
 				{
 					int oPort = ((MidiTrack*) t)->outPort();
 					MidiPort* port = &midiPorts[oPort];
@@ -1464,7 +1472,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								audio->msgIdle(false);
 							}
 						}
-                                                case 6:
+                        case 6:
 						{
 							if (multipleSelectedTracks)
 							{
@@ -1477,7 +1485,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 							break;
 						}
-                                                case 7:
+                        case 7:
 						{
 							if (multipleSelectedTracks)
 							{
@@ -1490,7 +1498,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 							break;
 						}
-                                                case 8:
+                        case 8:
 						{
 							if (multipleSelectedTracks)
 							{
@@ -1503,7 +1511,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 							break;
 						}
-                                                case 9:
+                        case 9:
 						{
 							if (multipleSelectedTracks)
 							{
@@ -1516,7 +1524,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 							break;
 						}
-                                                case 10:
+                        case 10:
 						{
 							if (multipleSelectedTracks)
 							{
@@ -1529,7 +1537,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 							break;
 						}
-                                                case 11:
+                        case 11:
 						{
 							if (multipleSelectedTracks)
 							{
@@ -1542,7 +1550,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 							break;
 						}
-                                                case 12:
+                        case 12:
 						{
 							int canvasHeight = oom->arranger->getCanvas()->height();
 
@@ -1561,7 +1569,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 							break;
 						}
-                                                case 13:
+                        case 13:
 						{
 							int canvasHeight = oom->arranger->getCanvas()->height();
 							if (multipleSelectedTracks)
@@ -1579,7 +1587,14 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 							break;
 						}
-
+						case 15:
+						{
+							if(!multipleSelectedTracks)
+							{
+								renameTrack(t);
+							}
+							break;
+						}
 						default:
 							printf("action %d\n", n);
 						break;

@@ -1857,6 +1857,20 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		}
 		return;
 	}
+	else if(key == shortcuts[SHRT_RENAME_TRACK].key)
+	{
+		TrackList sel = song->getSelectedTracks();
+		if(sel.size() == 1)
+		{
+			Track* trk = sel.front();
+			if(trk)
+			{
+				//printf("Found one track selected: %s\n", trk->name().toUtf8().constData());
+				emit renameTrack(trk);
+			}
+		}
+		return;
+	}
 
 	//
 	// Shortcuts that require selected parts from here

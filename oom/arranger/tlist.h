@@ -72,7 +72,7 @@ class TList : public QWidget
 
     virtual void paintEvent(QPaintEvent*);
     virtual void mousePressEvent(QMouseEvent* event);
-    virtual void mouseDoubleClickEvent(QMouseEvent*);
+    //virtual void mouseDoubleClickEvent(QMouseEvent*);
     virtual void mouseMoveEvent(QMouseEvent*);
     virtual void mouseReleaseEvent(QMouseEvent*);
     virtual void keyPressEvent(QKeyEvent* e);
@@ -109,6 +109,7 @@ public slots:
     void selectTrack(Track*);
     void selectTrackAbove();
     void selectTrackBelow();
+	void renameTrack(Track*);
 
 public:
     TList(Header*, QWidget* parent, const char* name);

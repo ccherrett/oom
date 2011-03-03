@@ -387,6 +387,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 
 	connect(canvas, SIGNAL(setUsedTool(int)), this, SIGNAL(setUsedTool(int)));
 	connect(canvas, SIGNAL(trackChanged(Track*)), list, SLOT(selectTrack(Track*)));
+	connect(canvas, SIGNAL(renameTrack(Track*)), list, SLOT(renameTrack(Track*)));
 	connect(list, SIGNAL(keyPressExt(QKeyEvent*)), canvas, SLOT(redirKeypress(QKeyEvent*)));
 	connect(canvas, SIGNAL(selectTrackAbove()), list, SLOT(selectTrackAbove()));
 	connect(canvas, SIGNAL(selectTrackBelow()), list, SLOT(selectTrackBelow()));

@@ -148,6 +148,8 @@ void initShortCuts()
 	defShrt(SHRT_SEL_TRACK_BELOW, Qt::CTRL + Qt::Key_Down, "Select track below", ARRANG_SHRT, "sel_track_below");
 
 	defShrt(SHRT_INSERT_PART, Qt::CTRL + Qt::Key_Insert, "Insert new part at cursor", ARRANG_SHRT, "insert_part_at_cursor");
+	
+	defShrt(SHRT_RENAME_TRACK, Qt::CTRL + Qt::Key_R, "Rename selected track", ARRANG_SHRT, "rename_track");
 
         defShrt(SHRT_SEL_TRACK_ABOVE_ADD, Qt::CTRL + Qt::SHIFT + Qt::Key_Up, "Add Track above to selection", ARRANG_SHRT, "sel_track_above_add");
         defShrt(SHRT_SEL_TRACK_BELOW_ADD, Qt::CTRL + Qt::SHIFT + Qt::Key_Down, "Add Track below to selection", ARRANG_SHRT, "sel_track_below_add");
