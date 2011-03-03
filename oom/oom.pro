@@ -155,6 +155,7 @@ HEADERS = \
       ./widgets/scldraw.h           \
       ./widgets/citem.h       \
       ./widgets/songinfo.h       \
+      ./widgets/menulist.h       \
       ./mididev.h       \
       ./midictrl.h            \
       ./midiseq.h       \

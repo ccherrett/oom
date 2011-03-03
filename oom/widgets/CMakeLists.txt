@@ -85,6 +85,7 @@ QT4_WRAP_CPP (widget_mocs
       velocity.h  
       view.h  
       vscale.h  
+	  menulist.h
       )
 
 ##
@@ -195,6 +196,7 @@ file (GLOB widgets_source_files
       velocity.cpp 
       view.cpp    
       vscale.cpp
+	  menulist.cpp
       )
 
 ##

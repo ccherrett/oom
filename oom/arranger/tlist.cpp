@@ -20,6 +20,8 @@
 #include <QResizeEvent>
 #include <QScrollBar>
 #include <QWheelEvent>
+#include <QListWidget>
+#include <QWidgetAction>
 
 #include "popupmenu.h"
 #include "globals.h"
@@ -44,6 +46,7 @@
 #include "midiedit/drummap.h"
 #include "synth.h"
 #include "config.h"
+#include "menulist.h"
 
 #ifdef DSSI_SUPPORT
 #include "dssihost.h"
@@ -568,6 +571,7 @@ void TList::portsPopupMenu(Track* t, int x, int y)/*{{{*/
 			MidiTrack* track = (MidiTrack*) t;
 
 			//QPopupMenu* p = midiPortsPopup(0);
+			QMenu* p = new QMenu(this);
 			MidiDevice* md = 0;
 			int port = -1;
 			if (t->type() == Track::AUDIO_SOFTSYNTH)
@@ -579,8 +583,27 @@ void TList::portsPopupMenu(Track* t, int x, int y)/*{{{*/
 			}
 			else
 				port = track->outPort();
+			/*	
+		 	QListWidget* menuList = new QListWidget(this);
+			menuList->setSelectionMode(QAbstractItemView::SingleSelection);
+			menuList->setAlternatingRowColors(true);
+			menuList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+			menuList->setFixedHeight(300);
+			for (int i = 0; i < MIDI_PORTS; ++i)
+			{
+				QString name;
+				name.sprintf("%d:%s", i + 1, midiPorts[i].portname().toLatin1().constData());
+				menuList->insertItem(i, name);
+				if (i == port)
+					menuList->setCurrentRow(i);
+			}
+			*/
+			//QWidgetAction* item = new QWidgetAction(p);
+			//item->setDefaultWidget(menuList);
+			MenuList *item = new MenuList(p, track);
+			p->addAction(item);
 
-			QMenu* p = midiPortsPopup(0, port);
+			//QMenu* p = midiPortsPopup(0, port);
 			QAction* act = p->exec(mapToGlobal(QPoint(x, y)), 0);
 			if (act)
 			{
