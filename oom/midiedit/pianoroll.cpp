@@ -344,10 +344,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	patchLabel = new QLabel();
 	patchLabel->setObjectName("patchLabel");
 	patchLabel->setMaximumSize(QSize(180, 22));
-	//patchLabel->setFixedWidth(180);
+	patchLabel->setFixedWidth(180);
 	patchLabel->setFixedHeight(22);
-	QWidgetAction *wa = new QWidgetAction(menuBar());
-	wa->setDefaultWidget(patchLabel);
 	menuBar()->setCornerWidget(patchLabel, Qt::TopRightCorner);
 	patchLabel->show();
 	//cursorBar->addWidget(patchLabel);
