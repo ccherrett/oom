@@ -549,6 +549,7 @@ void TList::renameTrack(Track* t)
 		editor->setGeometry(colx, coly, colw, colh);
 		editMode = true;
 		editor->show();
+		editor->setFocus(Qt::MouseFocusReason);
 	}
 }
 
