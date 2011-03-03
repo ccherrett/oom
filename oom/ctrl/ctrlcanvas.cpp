@@ -1616,7 +1616,7 @@ void CtrlCanvas::drawOverlay(QPainter& p)
 {
 	QString s(_controller->name());
 	p.setFont(config.fonts[3]);
-	p.setPen(Qt::black);
+	p.setPen(QColor(0,0,0,127));
 	QFontMetrics fm(config.fonts[3]);
 	int y = fm.lineSpacing() + 2;
 	p.drawText(2, y, s);
