@@ -1062,7 +1062,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(startPianoEditAction, SIGNAL(activated()), SLOT(startPianoroll()));
 	connect(startDrumEditAction, SIGNAL(activated()), SLOT(startDrumEditor()));
 	connect(startListEditAction, SIGNAL(activated()), SLOT(startListEditor()));
-	connect(startWaveEditAction, SIGNAL(activated()), SLOT(startWaveEditor()));
+	//connect(startWaveEditAction, SIGNAL(activated()), SLOT(startWaveEditor()));
 
 	connect(masterGraphicAction, SIGNAL(activated()), SLOT(startMasterEditor()));
 	connect(masterListAction, SIGNAL(activated()), SLOT(startLMasterEditor()));
@@ -1265,7 +1265,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuEdit->addAction(startPianoEditAction);
 	menuEdit->addAction(startDrumEditAction);
 	menuEdit->addAction(startListEditAction);
-	menuEdit->addAction(startWaveEditAction);
+	//menuEdit->addAction(startWaveEditAction);
 
 	menuEdit->addMenu(master);
 	master->addAction(masterGraphicAction);
@@ -3500,7 +3500,8 @@ void OOMidi::startEditor(PartList* pl, int type)
 			break;
 		case 3: startDrumEditor(pl, true);
 			break;
-		case 4: startWaveEditor(pl);
+		//case 4: startWaveEditor(pl);
+		default:
 			break;
 	}
 }
@@ -3517,8 +3518,8 @@ void OOMidi::startEditor(Track* t)
 			break;
 		case Track::DRUM: startDrumEditor();
 			break;
-		case Track::WAVE: startWaveEditor();
-			break;
+		//case Track::WAVE: startWaveEditor();
+		//	break;
 		default:
 			break;
 	}
@@ -5171,7 +5172,7 @@ void OOMidi::updateConfiguration()
 	startPianoEditAction->setShortcut(shortcuts[SHRT_OPEN_PIANO].key);
 	startDrumEditAction->setShortcut(shortcuts[SHRT_OPEN_DRUMS].key);
 	startListEditAction->setShortcut(shortcuts[SHRT_OPEN_LIST].key);
-	startWaveEditAction->setShortcut(shortcuts[SHRT_OPEN_WAVE].key);
+	//startWaveEditAction->setShortcut(shortcuts[SHRT_OPEN_WAVE].key);
 
 	masterGraphicAction->setShortcut(shortcuts[SHRT_OPEN_GRAPHIC_MASTER].key);
 	masterListAction->setShortcut(shortcuts[SHRT_OPEN_LIST_MASTER].key);
