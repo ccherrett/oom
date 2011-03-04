@@ -958,6 +958,38 @@ void TList::changeAutomation(QAction* act)
 	song->update(SC_TRACK_MODIFIED);
 }
 
+void TList::updateSelection(Track* t, bool shift)
+{
+	if(t)
+	{
+		if (!shift)
+		{
+			song->deselectTracks();
+			if(song->hasSelectedParts)
+				song->deselectAllParts();
+			t->setSelected(true);
+		
+			// rec enable track if expected
+			TrackList recd = getRecEnabledTracks();
+			if (recd.size() == 1 && config.moveArmedCheckBox)
+			{ // one rec enabled track, move rec enabled with selection
+				song->setRecordFlag((Track*) recd.front(), false);
+				song->setRecordFlag(t, true);
+			}
+		}
+		else
+		{
+			song->deselectAllParts();
+			t->setSelected(!t->selected());
+		}
+		if (editTrack && editTrack != t)
+		{
+			returnPressed();
+		}
+		emit selectionChanged(t->selected() ? t : 0);
+	}
+}
+
 void TList::mousePressEvent(QMouseEvent* ev)
 {
 	int x = ev->x();
@@ -1158,6 +1190,10 @@ void TList::mousePressEvent(QMouseEvent* ev)
 	
 					delete p;
 				}
+				else
+				{
+					updateSelection(t, shift);
+				}
 				break;
 			}
 	
@@ -1183,7 +1219,13 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						song->setRecordFlag(t, val);
 					}
 					else if(valid)
+					{
 						song->setRecordFlag(t, val);
+					}
+					else
+					{
+						updateSelection(t, shift);
+					}
 				}
 				else if (button == Qt::RightButton)
 				{
@@ -1210,6 +1252,10 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							song->setRecordFlag(mt, val);
 						}
 					}
+					else
+					{
+						updateSelection(t, shift);
+					}
 				}
 			}
 				break;
@@ -1221,7 +1267,13 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				break;
 			case COL_OPORT:
 				if (button == Qt::LeftButton && valid)
+				{
 					portsPopupMenu(t, x, t->y() - ypos);
+				}
+				else
+				{
+					updateSelection(t, shift);
+				}
 				//else if (button == Qt::RightButton)
 				//	oportPropertyPopupMenu(t, x, t->y() - ypos);
 				break;
@@ -1239,6 +1291,10 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					}
 					song->update(SC_MUTE);
 				}
+				else 
+				{
+					updateSelection(t, shift);
+				}
 				break;
 			case COL_SOLO:
 				if(valid)
@@ -1246,12 +1302,17 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					audio->msgSetSolo(t, !t->solo());
 					song->update(SC_SOLO);
 				}
+				else
+				{
+					updateSelection(t, shift);
+				}
 				break;
 	
 			case COL_NAME:
 				if (button == Qt::LeftButton)
 				{
-					if (!shift)
+					updateSelection(t, shift);
+					/*if (!shift)
 					{
 						song->deselectTracks();
 						if(song->hasSelectedParts)
@@ -1276,7 +1337,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						returnPressed();
 					}
 					///emit selectionChanged();
-					emit selectionChanged(t->selected() ? t : 0);
+					emit selectionChanged(t->selected() ? t : 0);*/
 				}
 				else if (button == Qt::RightButton)
 				{

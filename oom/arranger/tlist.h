@@ -94,6 +94,7 @@ private slots:
     void returnPressed();
     void songChanged(int flags);
     void changeAutomation(QAction*);
+	void updateSelection(Track*, bool);
 
 signals:
     ///void selectionChanged();
