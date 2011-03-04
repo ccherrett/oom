@@ -45,7 +45,16 @@ class LSClient
 	int client_test_isplit ( int *piSplit );
 	int client_test_status ( lscp_status_t s );
 	int client_test_size_t ( int i );
-
+	int client_test_midi_instruments ( lscp_midi_instrument_t *pInstrs );
+	int client_test_param_info ( lscp_param_info_t *pParamInfo );
+	int client_test_driver_info ( lscp_driver_info_t *pDriverInfo );
+	int client_test_device_info ( lscp_device_info_t *pDeviceInfo );
+	int client_test_engine_info ( lscp_engine_info_t *pEngineInfo );
+	int client_test_channel_info ( lscp_channel_info_t *pChannelInfo );
+	int client_test_fxsend_info ( lscp_fxsend_info_t *pFxSendInfo );
+	int client_test_buffer_fill ( lscp_buffer_fill_t *pBufferFill );
+	int client_test_load_mode ( lscp_load_mode_t load_mode );
+	int client_test_midi_instrument_info ( lscp_midi_instrument_info_t *pInstrInfo );
 
 #define CLIENT_TEST(p, t, x) { clock_t c; void *v; g_test_count++; \
 	printf("\n" #x ":\n"); client_test_start(&c); v = (void *) (x); \
