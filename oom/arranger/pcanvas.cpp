@@ -3784,19 +3784,11 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 			break;
 		Track* track = *it;
 		th = track->height();
-		///if (/*config.canvasShowGrid ||*/ !track->isMidiTrack()) {
-		if (config.canvasShowGrid && (track->isMidiTrack() || track->type() == Track::WAVE)) // Tim.
+		if (config.canvasShowGrid)
 		{
 			//printf("PartCanvas::drawCanvas track name:%s, y:%d h:%d\n", track->name().toLatin1().constData(), yy, th);
 			p.setPen(baseColor.dark(130));
-			///p.drawLine(x, yy, x + w, yy);
-			p.drawLine(x, yy + th, x + w, yy + th); // Tim.
-			p.setPen(baseColor);
-		}
-		if (!track->isMidiTrack() && (track->type() != Track::WAVE))
-		{
-			QRect r = rect & QRect(x, yy, w, track->height());
-			drawAudioTrack(p, r, (AudioTrack*) track);
+			p.drawLine(x, yy + th, x + w, yy + th); 
 			p.setPen(baseColor);
 		}
 		yy += track->height();
