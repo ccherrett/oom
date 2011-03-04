@@ -12,7 +12,7 @@ LSClient::~LSClient()
 {
 }
 
-lscp_status_t client_callback ( lscp_client_t *_client, lscp_event_t event, const char *pchData, int cchData, void *pvData )
+lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t event, const char *pchData, int cchData, void* /*pvData*/ )
 {
 	lscp_status_t ret = LSCP_FAILED;
 
@@ -312,14 +312,14 @@ int LSClient::client_test_midi_instrument_info ( lscp_midi_instrument_info_t *pI
 
 void LSClient::testClient()
 {
-	const char **ppszAudioDrivers, **ppszMidiDrivers, **ppszEngines;
-	const char *pszAudioDriver, *pszMidiDriver, *pszEngine = 0;
-	int iAudioDriver, iMidiDriver, iEngine;
-	int iAudio, iAudioDevice, iMidi, iMidiDevice;
-	int iNewAudioDevice, iNewMidiDevice;
-	int *piAudioDevices, *piMidiDevices;
-	lscp_midi_instrument_t midi_instr;
-	int i, j, k;
+	const char **ppszAudioDrivers = NULL, **ppszMidiDrivers, **ppszEngines;
+	//const char *pszAudioDriver, *pszMidiDriver, *pszEngine = 0;
+	//int iAudioDriver, iMidiDriver, iEngine;
+	//int iAudio, iAudioDevice, iMidi, iMidiDevice;
+	//int iNewAudioDevice, iNewMidiDevice;
+	//int *piAudioDevices, *piMidiDevices;
+	//lscp_midi_instrument_t midi_instr;
+	//int i, j, k;
 
 	CLIENT_TEST(_client, server_info, lscp_get_server_info(_client));
 	CLIENT_TEST(_client, size_t, lscp_get_available_audio_drivers(_client));
@@ -341,7 +341,7 @@ void LSClient::testClient()
 	printf("\n\n");
 	printf("  LSClient Total: %d tests, %d failed.\n\n", g_test_count, g_test_fails);
 }
-//#else
+#else
 void foobar()
 {
 }
