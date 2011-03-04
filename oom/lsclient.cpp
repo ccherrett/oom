@@ -35,6 +35,7 @@ bool LSClient::initClient()
 	{
 		return false;
 	}
+	//lscp_client_subscribe(_client, LSCP_EVENT_MISCELLANEOUS);
 	return true;
 }
 

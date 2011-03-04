@@ -1070,6 +1070,13 @@ void TList::mousePressEvent(QMouseEvent* ev)
 		return;
 	}//END no Track
 
+	//x y
+	int ctpos = (t->y()+(t->height()/2))+1;
+	QRect vRange(this->x(), ctpos-8, 100, 16);
+	bool valid = vRange.contains(ev->pos());
+	//printf("validRange: x: %d, y: %d, height: %d, width: %d, right: %d, left: %d, top: %d, bottom: %d\n", vRange.x(), vRange.y(), vRange.height(), vRange.width(), vRange.right(), vRange.left(), vRange.top(), vRange.bottom());
+	//printf("Click Point: x: %d, y: %d, Global: x: %d, y: %d, valid: %d\n", x, y, ev->globalX(), ev->globalY(), (int)valid);
+
 	//This changes to song->visibletracks()
 	TrackList* tracks = song->visibletracks();
 	dragYoff = y - (t->y() - ypos);
@@ -1120,580 +1127,584 @@ void TList::mousePressEvent(QMouseEvent* ev)
                 multipleSelectedTracks = true;
         }
 
-
-	switch (col)
-	{
-		case COL_AUTOMATION:
+		switch (col)
 		{
-			if (!t->isMidiTrack())
+			case COL_AUTOMATION:
 			{
-				editAutomation = t;
-				PopupMenu* p = new PopupMenu();
-				p->disconnect();
-				p->clear();
-				p->setTitle(tr("Viewable automation"));
-				CtrlListList* cll = ((AudioTrack*) t)->controller();
-				QAction* act = 0;
-				for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+				if (!t->isMidiTrack() && valid)
 				{
-					CtrlList *cl = icll->second;
-					printf("id = %d", cl->id());
-					if (cl->dontShow())
-						continue;
-					act = p->addAction(cl->name());
-					act->setCheckable(true);
-					act->setChecked(cl->isVisible());
-					act->setData(cl->id());
+					editAutomation = t;
+					PopupMenu* p = new PopupMenu();
+					p->disconnect();
+					p->clear();
+					p->setTitle(tr("Viewable automation"));
+					CtrlListList* cll = ((AudioTrack*) t)->controller();
+					QAction* act = 0;
+					for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+					{
+						CtrlList *cl = icll->second;
+						printf("id = %d", cl->id());
+						if (cl->dontShow())
+							continue;
+						act = p->addAction(cl->name());
+						act->setCheckable(true);
+						act->setChecked(cl->isVisible());
+						act->setData(cl->id());
+					}
+					connect(p, SIGNAL(triggered(QAction*)), SLOT(changeAutomation(QAction*)));
+					//connect(p, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
+					//p->popup(QCursor::pos());
+					p->exec(QCursor::pos());
+	
+					delete p;
 				}
-				connect(p, SIGNAL(triggered(QAction*)), SLOT(changeAutomation(QAction*)));
-				//connect(p, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
-				//p->popup(QCursor::pos());
-				p->exec(QCursor::pos());
-
-				delete p;
+				break;
 			}
-			break;
-		}
-
-		case COL_RECORD:
-		{
-			bool val = !(t->recordFlag());
-			if (button == Qt::LeftButton)
+	
+			case COL_RECORD:
 			{
-				if (!t->isMidiTrack())
+				bool val = !(t->recordFlag());
+				if (button == Qt::LeftButton)
 				{
-					if (t->type() == Track::AUDIO_OUTPUT)
+					if (!t->isMidiTrack() && valid)
 					{
-						if (val && t->recordFlag() == false)
+						if (t->type() == Track::AUDIO_OUTPUT)
 						{
-							oom->bounceToFile((AudioOutput*) t);
-						}
-						audio->msgSetRecord((AudioOutput*) t, val);
-						if (!((AudioOutput*) t)->recFile())
-							val = false;
-						else
-							return;
-					}
-					song->setRecordFlag(t, val);
-				}
-				else
-					song->setRecordFlag(t, val);
-			}
-			else if (button == Qt::RightButton)
-			{
-				// enable or disable ALL tracks of this type
-				if (!t->isMidiTrack())
-				{
-					if (t->type() == Track::AUDIO_OUTPUT)
-					{
-						return;
-					}
-					WaveTrackList* wtl = song->waves();
-
-					foreach(WaveTrack *wt, *wtl)
-					{
-						song->setRecordFlag(wt, val);
-					}
-				}
-				else
-				{
-					MidiTrackList* mtl = song->midis();
-
-					foreach(MidiTrack *mt, *mtl)
-					{
-						song->setRecordFlag(mt, val);
-					}
-				}
-			}
-		}
-			break;
-		case COL_NONE:
-			break;
-		case COL_CLASS:
-			//if (t->isMidiTrack())
-			//	classesPopupMenu(t, x, t->y() - ypos);
-			break;
-		case COL_OPORT:
-			if (button == Qt::LeftButton)
-				portsPopupMenu(t, x, t->y() - ypos);
-			//else if (button == Qt::RightButton)
-			//	oportPropertyPopupMenu(t, x, t->y() - ypos);
-			break;
-		case COL_MUTE:
-			// p3.3.29
-			if ((button == Qt::RightButton) || (((QInputEvent*) ev)->modifiers() & Qt::ControlModifier))
-				t->setOff(!t->off());
-			else
-			{
-				if (t->off())
-					t->setOff(false);
-				else
-					t->setMute(!t->mute());
-			}
-			song->update(SC_MUTE);
-			break;
-		case COL_SOLO:
-			audio->msgSetSolo(t, !t->solo());
-			song->update(SC_SOLO);
-			break;
-
-		case COL_NAME:
-			if (button == Qt::LeftButton)
-			{
-				if (!shift)
-				{
-					song->deselectTracks();
-					if(song->hasSelectedParts)
-						song->deselectAllParts();
-					t->setSelected(true);
-
-					// rec enable track if expected
-					TrackList recd = getRecEnabledTracks();
-					if (recd.size() == 1 && config.moveArmedCheckBox)
-					{ // one rec enabled track, move rec enabled with selection
-						song->setRecordFlag((Track*) recd.front(), false);
-						song->setRecordFlag(t, true);
-					}
-				}
-				else
-				{
-					song->deselectAllParts();
-					t->setSelected(!t->selected());
-				}
-				if (editTrack && editTrack != t)
-				{
-					returnPressed();
-				}
-				///emit selectionChanged();
-				emit selectionChanged(t->selected() ? t : 0);
-			}
-			else if (button == Qt::RightButton)
-			{
-				mode = NORMAL;
-				QMenu* p = new QMenu;
-				//p->clear();
-				if (!multipleSelectedTracks)
-				{
-					p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
-					p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
-				}
-				p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
-
-				QMenu* trackHeightsMenu = p->addMenu("Track Height");
-				trackHeightsMenu->addAction("Default")->setData(6);
-				trackHeightsMenu->addAction("2")->setData(7);
-				trackHeightsMenu->addAction("3")->setData(8);
-				trackHeightsMenu->addAction("4")->setData(9);
-				trackHeightsMenu->addAction("5")->setData(10);
-				trackHeightsMenu->addAction("6")->setData(11);
-				trackHeightsMenu->addAction("Full Screen")->setData(12);
-				if (selectedTracksList.size() > 1)
-				{
-					trackHeightsMenu->addAction("Fit Selection in View")->setData(13);
-				}
-
-
-				if (t->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
-				{
-					SynthI* synth = (SynthI*) t;
-
-					QAction* sga = p->addAction(tr("Show Gui"));
-					sga->setData(2);
-					sga->setCheckable(true);
-					//printf("synth hasgui %d, gui visible %d\n",synth->hasGui(), synth->guiVisible());
-					sga->setEnabled(synth->hasGui());
-					sga->setChecked(synth->guiVisible());
-			
-					// If it has a gui but we don't have OSC, disable the action.
-#ifndef OSC_SUPPORT
-#ifdef DSSI_SUPPORT
-					if (dynamic_cast<DssiSynthIF*> (synth->sif()))
-					{
-						sga->setChecked(false);
-						sga->setEnabled(false);
-					}
-#endif
-#endif
-				}/*}}}*/
-                else if(t->isMidiTrack() && !multipleSelectedTracks)
-				{
-					int oPort = ((MidiTrack*) t)->outPort();
-					MidiPort* port = &midiPorts[oPort];
-				
-					QAction* mact = p->addAction(tr("Show Gui"));
-					mact->setCheckable(true);
-					//printf("synth hasgui %d, gui visible %d\n",port->hasGui(), port->guiVisible());
-					mact->setEnabled(port->hasGui());
-					mact->setChecked(port->guiVisible());
-					mact->setData(3);
-				
-					// If it has a gui but we don't have OSC, disable the action.
-#ifndef OSC_SUPPORT
-#ifdef DSSI_SUPPORT
-					MidiDevice* dev = port->device();
-					if (dev && dev->isSynti() && (dynamic_cast<DssiSynthIF*> (((SynthI*) dev)->sif())))
-					{
-						mact->setChecked(false);
-						mact->setEnabled(false);
-					}
-#endif
-#endif
-					p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
-					p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
-				}
-			
-				QAction* act = p->exec(ev->globalPos(), 0);
-				if (act)
-				{
-					int n = act->data().toInt();
-					switch (n)
-					{
-						case 0: // delete track
-                            if (multipleSelectedTracks)
-                            {
-                                    song->startUndo();
-                                    audio->msgRemoveTracks();
-                                    song->endUndo(SC_TRACK_REMOVED);
-                                    song->updateSoloStates();
-                            }
-                            else
-                            {
-                                    song->removeTrack0(t);
-                                    audio->msgUpdateSoloStates();
-                            }
-
-						break;
-
-						case 1: // show track comment
-						{
-							TrackComment* tc = new TrackComment(t, 0);
-							tc->show();
-							//QToolTip::add( this, "FOOOOOOOOOOOOO" );
-						}
-						break;
-						case 2:
-						{
-							SynthI* synth = (SynthI*) t;
-							bool show = !synth->guiVisible();
-							audio->msgShowInstrumentGui(synth, show);
-						}
-						break;
-						case 3:
-						{
-							int oPort = ((MidiTrack*) t)->outPort();
-							MidiPort* port = &midiPorts[oPort];
-							bool show = !port->guiVisible();
-							audio->msgShowInstrumentGui(port->instrument(), show);
-						}
-						break;
-						case 4:
-						{
-							if (t->type() == Track::DRUM)
+							if (val && t->recordFlag() == false)
 							{
-								//
-								//    Drum -> Midi
-								//
-								audio->msgIdle(true);
-								PartList* pl = t->parts();
-								MidiTrack* m = (MidiTrack*) t;
-								for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
-								{
-									EventList* el = ip->second->events();
-									for (iEvent ie = el->begin(); ie != el->end(); ++ie)
-									{
-										Event ev = ie->second;
-										if (ev.type() == Note)
-										{
-											int pitch = ev.pitch();
-											// Changed by T356.
-											// Tested: Notes were being mixed up switching back and forth between midi and drum.
-											//pitch = drumMap[pitch].anote;
-											pitch = drumMap[pitch].enote;
-						
-											ev.setPitch(pitch);
-										}
-										else
-											if (ev.type() == Controller)
-										{
-											int ctl = ev.dataA();
-											// Is it a drum controller event, according to the track port's instrument?
-											MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
-											if (mc)
-												// Change the controller event's index into the drum map to an instrument note.
-												ev.setA((ctl & ~0xff) | drumMap[ctl & 0x7f].enote);
-										}
-						
-									}
-								}
-								t->setType(Track::MIDI);
-								audio->msgIdle(false);
+								oom->bounceToFile((AudioOutput*) t);
 							}
+							audio->msgSetRecord((AudioOutput*) t, val);
+							if (!((AudioOutput*) t)->recFile())
+								val = false;
+							else
+								return;
 						}
-						break;
-						case 5:
+						song->setRecordFlag(t, val);
+					}
+					else if(valid)
+						song->setRecordFlag(t, val);
+				}
+				else if (button == Qt::RightButton)
+				{
+					// enable or disable ALL tracks of this type
+					if (!t->isMidiTrack() && valid)
+					{
+						if (t->type() == Track::AUDIO_OUTPUT)
 						{
-							if (t->type() == Track::MIDI)
+							return;
+						}
+						WaveTrackList* wtl = song->waves();
+	
+						foreach(WaveTrack *wt, *wtl)
+						{
+							song->setRecordFlag(wt, val);
+						}
+					}
+					else if(valid)
+					{
+						MidiTrackList* mtl = song->midis();
+	
+						foreach(MidiTrack *mt, *mtl)
+						{
+							song->setRecordFlag(mt, val);
+						}
+					}
+				}
+			}
+				break;
+			case COL_NONE:
+				break;
+			case COL_CLASS:
+				//if (t->isMidiTrack())
+				//	classesPopupMenu(t, x, t->y() - ypos);
+				break;
+			case COL_OPORT:
+				if (button == Qt::LeftButton && valid)
+					portsPopupMenu(t, x, t->y() - ypos);
+				//else if (button == Qt::RightButton)
+				//	oportPropertyPopupMenu(t, x, t->y() - ypos);
+				break;
+			case COL_MUTE:
+				if(valid)
+				{
+					if ((button == Qt::RightButton) || (((QInputEvent*) ev)->modifiers() & Qt::ControlModifier))
+						t->setOff(!t->off());
+					else
+					{
+						if (t->off())
+							t->setOff(false);
+						else
+							t->setMute(!t->mute());
+					}
+					song->update(SC_MUTE);
+				}
+				break;
+			case COL_SOLO:
+				if(valid)
+				{
+					audio->msgSetSolo(t, !t->solo());
+					song->update(SC_SOLO);
+				}
+				break;
+	
+			case COL_NAME:
+				if (button == Qt::LeftButton)
+				{
+					if (!shift)
+					{
+						song->deselectTracks();
+						if(song->hasSelectedParts)
+							song->deselectAllParts();
+						t->setSelected(true);
+	
+						// rec enable track if expected
+						TrackList recd = getRecEnabledTracks();
+						if (recd.size() == 1 && config.moveArmedCheckBox)
+						{ // one rec enabled track, move rec enabled with selection
+							song->setRecordFlag((Track*) recd.front(), false);
+							song->setRecordFlag(t, true);
+						}
+					}
+					else
+					{
+						song->deselectAllParts();
+						t->setSelected(!t->selected());
+					}
+					if (editTrack && editTrack != t)
+					{
+						returnPressed();
+					}
+					///emit selectionChanged();
+					emit selectionChanged(t->selected() ? t : 0);
+				}
+				else if (button == Qt::RightButton)
+				{
+					mode = NORMAL;
+					QMenu* p = new QMenu;
+					//p->clear();
+					if (!multipleSelectedTracks)
+					{
+						p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
+						p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
+					}
+					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
+	
+					QMenu* trackHeightsMenu = p->addMenu("Track Height");
+					trackHeightsMenu->addAction("Default")->setData(6);
+					trackHeightsMenu->addAction("2")->setData(7);
+					trackHeightsMenu->addAction("3")->setData(8);
+					trackHeightsMenu->addAction("4")->setData(9);
+					trackHeightsMenu->addAction("5")->setData(10);
+					trackHeightsMenu->addAction("6")->setData(11);
+					trackHeightsMenu->addAction("Full Screen")->setData(12);
+					if (selectedTracksList.size() > 1)
+					{
+						trackHeightsMenu->addAction("Fit Selection in View")->setData(13);
+					}
+	
+	
+					if (t->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
+					{
+						SynthI* synth = (SynthI*) t;
+	
+						QAction* sga = p->addAction(tr("Show Gui"));
+						sga->setData(2);
+						sga->setCheckable(true);
+						//printf("synth hasgui %d, gui visible %d\n",synth->hasGui(), synth->guiVisible());
+						sga->setEnabled(synth->hasGui());
+						sga->setChecked(synth->guiVisible());
+				
+						// If it has a gui but we don't have OSC, disable the action.
+	#ifndef OSC_SUPPORT
+	#ifdef DSSI_SUPPORT
+						if (dynamic_cast<DssiSynthIF*> (synth->sif()))
+						{
+							sga->setChecked(false);
+							sga->setEnabled(false);
+						}
+	#endif
+	#endif
+					}/*}}}*/
+	                else if(t->isMidiTrack() && !multipleSelectedTracks)
+					{
+						int oPort = ((MidiTrack*) t)->outPort();
+						MidiPort* port = &midiPorts[oPort];
+					
+						QAction* mact = p->addAction(tr("Show Gui"));
+						mact->setCheckable(true);
+						//printf("synth hasgui %d, gui visible %d\n",port->hasGui(), port->guiVisible());
+						mact->setEnabled(port->hasGui());
+						mact->setChecked(port->guiVisible());
+						mact->setData(3);
+					
+						// If it has a gui but we don't have OSC, disable the action.
+#ifndef OSC_SUPPORT
+#ifdef DSSI_SUPPORT
+						MidiDevice* dev = port->device();
+						if (dev && dev->isSynti() && (dynamic_cast<DssiSynthIF*> (((SynthI*) dev)->sif())))
+						{
+							mact->setChecked(false);
+							mact->setEnabled(false);
+						}
+#endif
+#endif
+						p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
+						p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
+					}
+				
+					QAction* act = p->exec(ev->globalPos(), 0);
+					if (act)
+					{
+						int n = act->data().toInt();
+						switch (n)
+						{
+							case 0: // delete track
+	                            if (multipleSelectedTracks)
+	                            {
+	                                    song->startUndo();
+	                                    audio->msgRemoveTracks();
+	                                    song->endUndo(SC_TRACK_REMOVED);
+	                                    song->updateSoloStates();
+	                            }
+	                            else
+	                            {
+	                                    song->removeTrack0(t);
+	                                    audio->msgUpdateSoloStates();
+	                            }
+	
+							break;
+	
+							case 1: // show track comment
 							{
-								//
-								//    Midi -> Drum
-								//
-								bool change = QMessageBox::question(this, tr("Update drummap?"),
-										tr("Do you want to use same port and channel for all instruments in the drummap?"),
-										tr("&Yes"), tr("&No"), QString::null, 0, 1);
-						
-								audio->msgIdle(true);
-								// Delete all port controller events.
-								//audio->msgChangeAllPortDrumCtrlEvents(false);
-								song->changeAllPortDrumCtrlEvents(false);
-						
-								if (!change)
+								TrackComment* tc = new TrackComment(t, 0);
+								tc->show();
+								//QToolTip::add( this, "FOOOOOOOOOOOOO" );
+							}
+							break;
+							case 2:
+							{
+								SynthI* synth = (SynthI*) t;
+								bool show = !synth->guiVisible();
+								audio->msgShowInstrumentGui(synth, show);
+							}
+							break;
+							case 3:
+							{
+								int oPort = ((MidiTrack*) t)->outPort();
+								MidiPort* port = &midiPorts[oPort];
+								bool show = !port->guiVisible();
+								audio->msgShowInstrumentGui(port->instrument(), show);
+							}
+							break;
+							case 4:
+							{
+								if (t->type() == Track::DRUM)
 								{
+									//
+									//    Drum -> Midi
+									//
+									audio->msgIdle(true);
+									PartList* pl = t->parts();
 									MidiTrack* m = (MidiTrack*) t;
-									for (int i = 0; i < DRUM_MAPSIZE; i++)
+									for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
 									{
-										drumMap[i].channel = m->outChannel();
-										drumMap[i].port = m->outPort();
-									}
-								}
-						
-								//audio->msgIdle(true);
-								PartList* pl = t->parts();
-								MidiTrack* m = (MidiTrack*) t;
-								for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
-								{
-									EventList* el = ip->second->events();
-									for (iEvent ie = el->begin(); ie != el->end(); ++ie)
-									{
-										Event ev = ie->second;
-										if (ev.type() == Note)
+										EventList* el = ip->second->events();
+										for (iEvent ie = el->begin(); ie != el->end(); ++ie)
 										{
-											int pitch = ev.pitch();
-											pitch = drumInmap[pitch];
-											ev.setPitch(pitch);
-										}
-										else
-										{
-											if (ev.type() == Controller)
+											Event ev = ie->second;
+											if (ev.type() == Note)
+											{
+												int pitch = ev.pitch();
+												// Changed by T356.
+												// Tested: Notes were being mixed up switching back and forth between midi and drum.
+												//pitch = drumMap[pitch].anote;
+												pitch = drumMap[pitch].enote;
+							
+												ev.setPitch(pitch);
+											}
+											else
+												if (ev.type() == Controller)
 											{
 												int ctl = ev.dataA();
 												// Is it a drum controller event, according to the track port's instrument?
 												MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
 												if (mc)
-													// Change the controller event's instrument note to an index into the drum map.
-													ev.setA((ctl & ~0xff) | drumInmap[ctl & 0x7f]);
+													// Change the controller event's index into the drum map to an instrument note.
+													ev.setA((ctl & ~0xff) | drumMap[ctl & 0x7f].enote);
 											}
-						
+							
 										}
-						
 									}
+									t->setType(Track::MIDI);
+									audio->msgIdle(false);
 								}
-								t->setType(Track::DRUM);
-						
-								// Add all port controller events.
-								//audio->msgChangeAllPortDrumCtrlEvents(true);
-								song->changeAllPortDrumCtrlEvents(true);
-						
-								audio->msgIdle(false);
-							}
-						}
-                        case 6:
-						{
-							if (multipleSelectedTracks)
-							{
-								song->setTrackHeights(selectedTracksList, 40);
-							}
-							else
-							{
-								t->setHeight(40);
-								song->update(SC_TRACK_MODIFIED);
 							}
 							break;
-						}
-                        case 7:
-						{
-							if (multipleSelectedTracks)
+							case 5:
 							{
-								song->setTrackHeights(selectedTracksList, 60);
+								if (t->type() == Track::MIDI)
+								{
+									//
+									//    Midi -> Drum
+									//
+									bool change = QMessageBox::question(this, tr("Update drummap?"),
+											tr("Do you want to use same port and channel for all instruments in the drummap?"),
+											tr("&Yes"), tr("&No"), QString::null, 0, 1);
+							
+									audio->msgIdle(true);
+									// Delete all port controller events.
+									//audio->msgChangeAllPortDrumCtrlEvents(false);
+									song->changeAllPortDrumCtrlEvents(false);
+							
+									if (!change)
+									{
+										MidiTrack* m = (MidiTrack*) t;
+										for (int i = 0; i < DRUM_MAPSIZE; i++)
+										{
+											drumMap[i].channel = m->outChannel();
+											drumMap[i].port = m->outPort();
+										}
+									}
+							
+									//audio->msgIdle(true);
+									PartList* pl = t->parts();
+									MidiTrack* m = (MidiTrack*) t;
+									for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+									{
+										EventList* el = ip->second->events();
+										for (iEvent ie = el->begin(); ie != el->end(); ++ie)
+										{
+											Event ev = ie->second;
+											if (ev.type() == Note)
+											{
+												int pitch = ev.pitch();
+												pitch = drumInmap[pitch];
+												ev.setPitch(pitch);
+											}
+											else
+											{
+												if (ev.type() == Controller)
+												{
+													int ctl = ev.dataA();
+													// Is it a drum controller event, according to the track port's instrument?
+													MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
+													if (mc)
+														// Change the controller event's instrument note to an index into the drum map.
+														ev.setA((ctl & ~0xff) | drumInmap[ctl & 0x7f]);
+												}
+							
+											}
+							
+										}
+									}
+									t->setType(Track::DRUM);
+							
+									// Add all port controller events.
+									//audio->msgChangeAllPortDrumCtrlEvents(true);
+									song->changeAllPortDrumCtrlEvents(true);
+							
+									audio->msgIdle(false);
+								}
 							}
-							else
+	                        case 6:
 							{
-								t->setHeight(60);
-								song->update(SC_TRACK_MODIFIED);
+								if (multipleSelectedTracks)
+								{
+									song->setTrackHeights(selectedTracksList, 40);
+								}
+								else
+								{
+									t->setHeight(40);
+									song->update(SC_TRACK_MODIFIED);
+								}
+								break;
 							}
+	                        case 7:
+							{
+								if (multipleSelectedTracks)
+								{
+									song->setTrackHeights(selectedTracksList, 60);
+								}
+								else
+								{
+									t->setHeight(60);
+									song->update(SC_TRACK_MODIFIED);
+								}
+								break;
+							}
+	                        case 8:
+							{
+								if (multipleSelectedTracks)
+								{
+									song->setTrackHeights(selectedTracksList, 100);
+								}
+								else
+								{
+									t->setHeight(100);
+									song->update(SC_TRACK_MODIFIED);
+								}
+								break;
+							}
+	                        case 9:
+							{
+								if (multipleSelectedTracks)
+								{
+									song->setTrackHeights(selectedTracksList, 180);
+								}
+								else
+								{
+									t->setHeight(180);
+									song->update(SC_TRACK_MODIFIED);
+								}
+								break;
+							}
+	                        case 10:
+							{
+								if (multipleSelectedTracks)
+								{
+									song->setTrackHeights(selectedTracksList, 320);
+								}
+								else
+								{
+									t->setHeight(320);
+									song->update(SC_TRACK_MODIFIED);
+								}
+								break;
+							}
+	                        case 11:
+							{
+								if (multipleSelectedTracks)
+								{
+									song->setTrackHeights(selectedTracksList, 640);
+								}
+								else
+								{
+									t->setHeight(640);
+									song->update(SC_TRACK_MODIFIED);
+								}
+								break;
+							}
+	                        case 12:
+							{
+								int canvasHeight = oom->arranger->getCanvas()->height();
+	
+								if (multipleSelectedTracks)
+								{
+									song->setTrackHeights(selectedTracksList, canvasHeight);
+									Track* firstSelectedTrack = *selectedTracksList.begin();
+									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+	
+								}
+								else
+								{
+									t->setHeight(canvasHeight);
+									song->update(SC_TRACK_MODIFIED);
+									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+								}
+								break;
+							}
+	                        case 13:
+							{
+								int canvasHeight = oom->arranger->getCanvas()->height();
+								if (multipleSelectedTracks)
+								{
+									song->setTrackHeights(selectedTracksList, canvasHeight / selectedTracksList.size());
+									Track* firstSelectedTrack = *selectedTracksList.begin();
+									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+	
+								}
+								else
+								{
+									t->setHeight(canvasHeight);
+									song->update(SC_TRACK_MODIFIED);
+									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+								}
+								break;
+							}
+							case 15:
+							{
+								if(!multipleSelectedTracks)
+								{
+									renameTrack(t);
+								}
+								break;
+							}
+							default:
+								printf("action %d\n", n);
 							break;
 						}
-                        case 8:
-						{
-							if (multipleSelectedTracks)
-							{
-								song->setTrackHeights(selectedTracksList, 100);
-							}
-							else
-							{
-								t->setHeight(100);
-								song->update(SC_TRACK_MODIFIED);
-							}
-							break;
-						}
-                        case 9:
-						{
-							if (multipleSelectedTracks)
-							{
-								song->setTrackHeights(selectedTracksList, 180);
-							}
-							else
-							{
-								t->setHeight(180);
-								song->update(SC_TRACK_MODIFIED);
-							}
-							break;
-						}
-                        case 10:
-						{
-							if (multipleSelectedTracks)
-							{
-								song->setTrackHeights(selectedTracksList, 320);
-							}
-							else
-							{
-								t->setHeight(320);
-								song->update(SC_TRACK_MODIFIED);
-							}
-							break;
-						}
-                        case 11:
-						{
-							if (multipleSelectedTracks)
-							{
-								song->setTrackHeights(selectedTracksList, 640);
-							}
-							else
-							{
-								t->setHeight(640);
-								song->update(SC_TRACK_MODIFIED);
-							}
-							break;
-						}
-                        case 12:
-						{
-							int canvasHeight = oom->arranger->getCanvas()->height();
-
-							if (multipleSelectedTracks)
-							{
-								song->setTrackHeights(selectedTracksList, canvasHeight);
-								Track* firstSelectedTrack = *selectedTracksList.begin();
-								oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
-
-							}
-							else
-							{
-								t->setHeight(canvasHeight);
-								song->update(SC_TRACK_MODIFIED);
-								oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
-							}
-							break;
-						}
-                        case 13:
-						{
-							int canvasHeight = oom->arranger->getCanvas()->height();
-							if (multipleSelectedTracks)
-							{
-								song->setTrackHeights(selectedTracksList, canvasHeight / selectedTracksList.size());
-								Track* firstSelectedTrack = *selectedTracksList.begin();
-								oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
-
-							}
-							else
-							{
-								t->setHeight(canvasHeight);
-								song->update(SC_TRACK_MODIFIED);
-								oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
-							}
-							break;
-						}
-						case 15:
-						{
-							if(!multipleSelectedTracks)
-							{
-								renameTrack(t);
-							}
-							break;
-						}
-						default:
-							printf("action %d\n", n);
-						break;
 					}
+	                                delete trackHeightsMenu;
+					delete p;
+	
+	
 				}
-                                delete trackHeightsMenu;
-				delete p;
-
-
-			}
-			break;
-
-		case COL_TIMELOCK:
-			//this has been zero sized if we need to re-enable its here
-			//t->setLocked(!t->locked());
-			break;
-
-		case COL_OCHANNEL:
-		{
-			/*int delta = 0;
-			if (button == Qt::RightButton)
-				delta = 1;
-			else if (button == Qt::MidButton)
-				delta = -1;
-			if (t->isMidiTrack())
+				break;
+	
+			case COL_TIMELOCK:
+				//this has been zero sized if we need to re-enable its here
+				//t->setLocked(!t->locked());
+				break;
+	
+			case COL_OCHANNEL:
 			{
-				MidiTrack* mt = dynamic_cast<MidiTrack*> (t);
-				if (mt == 0)
-					break;
-
-				int channel = mt->outChannel();
-				channel += delta;
-				if (channel >= MIDI_CHANNELS)
-					channel = MIDI_CHANNELS - 1;
-				if (channel < 0)
-					channel = 0;
-				//if (channel != ((MidiTrack*)t)->outChannel())
-				if (channel != mt->outChannel())
+				/*int delta = 0;
+				if (button == Qt::RightButton)
+					delta = 1;
+				else if (button == Qt::MidButton)
+					delta = -1;
+				if (t->isMidiTrack())
 				{
-					// Changed by T356.
-					//mt->setOutChannel(channel);
-					audio->msgIdle(true);
-					//audio->msgSetTrackOutChannel(mt, channel);
-					mt->setOutChanAndUpdate(channel);
-					audio->msgIdle(false);
-
-					// may result in adding/removing mixer strip:
-					//song->update(-1);
-					//song->update(SC_CHANNELS);
-					song->update(SC_MIDI_TRACK_PROP);
-				}
-			}
-			else
-			{
-				if (t->type() != Track::AUDIO_SOFTSYNTH)
-				{
-					AudioTrack* at = dynamic_cast<AudioTrack*> (t);
-					if (at == 0)
+					MidiTrack* mt = dynamic_cast<MidiTrack*> (t);
+					if (mt == 0)
 						break;
-
-					int n = t->channels() + delta;
-					if (n > MAX_CHANNELS)
-						n = MAX_CHANNELS;
-					else if (n < 1)
-						n = 1;
-					if (n != t->channels())
+	
+					int channel = mt->outChannel();
+					channel += delta;
+					if (channel >= MIDI_CHANNELS)
+						channel = MIDI_CHANNELS - 1;
+					if (channel < 0)
+						channel = 0;
+					//if (channel != ((MidiTrack*)t)->outChannel())
+					if (channel != mt->outChannel())
 					{
-						audio->msgSetChannels(at, n);
-						song->update(SC_CHANNELS);
+						// Changed by T356.
+						//mt->setOutChannel(channel);
+						audio->msgIdle(true);
+						//audio->msgSetTrackOutChannel(mt, channel);
+						mt->setOutChanAndUpdate(channel);
+						audio->msgIdle(false);
+	
+						// may result in adding/removing mixer strip:
+						//song->update(-1);
+						//song->update(SC_CHANNELS);
+						song->update(SC_MIDI_TRACK_PROP);
 					}
 				}
-			}*/
+				else
+				{
+					if (t->type() != Track::AUDIO_SOFTSYNTH)
+					{
+						AudioTrack* at = dynamic_cast<AudioTrack*> (t);
+						if (at == 0)
+							break;
+	
+						int n = t->channels() + delta;
+						if (n > MAX_CHANNELS)
+							n = MAX_CHANNELS;
+						else if (n < 1)
+							n = 1;
+						if (n != t->channels())
+						{
+							audio->msgSetChannels(at, n);
+							song->update(SC_CHANNELS);
+						}
+					}
+				}*/
+			}
+				break;
 		}
-			break;
-	}
 	redraw();
 }
 

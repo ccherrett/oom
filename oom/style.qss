@@ -226,6 +226,42 @@ QTableView#tblTrackView::item:selected:!active, QTableView#routeList::item:selec
 /*}}}*/
 
 /*{{{*/
+/*Style for all non specific QListWidget*/
+QListWidget
+{
+	background-color: #d8dbe8;
+	border: 1px solid #29292a;
+	border-radius: 0px;
+	padding: 0px;
+	color: black;
+	font-size: 12px;
+	alternate-background-color: #bec0cf;
+}
+
+QListWidget::item
+{
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+QListWidget::item:selected
+{
+	background-color: #3d3e44;
+	border: none;
+}
+
+QListWidget::item:selected:active
+{
+	border: none;
+}
+
+QListWidget::item:selected:!active
+{
+	border: none;
+}
+/*}}}*/
+
+/*{{{*/
 QTableView#autoTable
 {
 	background-color: #d8dbe8;
