@@ -540,6 +540,8 @@ void TList::renameTrack(Track* t)
 		int colw = header->sectionSize(COL_NAME);
 		int coly = t->y() - ypos;
 		int colh = t->height();
+		
+		int ctpos = (colh/2);
 
 		editTrack = t;
 		if (editor == 0)
@@ -549,7 +551,10 @@ void TList::renameTrack(Track* t)
 		}
 		editor->setText(editTrack->name());
 		editor->end(false);
-		editor->setGeometry(colx, coly, colw, colh);
+		if(colh > 40)
+			editor->setGeometry(colx, ctpos-20, colw, 40);
+		else
+			editor->setGeometry(colx, coly, colw, colh);
 		editMode = true;
 		editor->show();
 		editor->setFocus(Qt::MouseFocusReason);
