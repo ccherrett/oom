@@ -22,6 +22,7 @@
 #cmakedefine OSC_SUPPORT
 #cmakedefine DSSI_SUPPORT
 #cmakedefine VST_SUPPORT
+#cmakedefine LSCP_SUPPORT
 #cmakedefine USE_SSE
 
 #define VERSION          "${OOMidi_VERSION_FULL}"
