@@ -36,8 +36,8 @@ QWidget* MenuList::createWidget(QWidget* parent)
 {
 	if(!_track)
 		return 0;
-	if(!_track->isMidiTrack() || _track->type() != Track::AUDIO_SOFTSYNTH)
-		return 0;
+	//if(!_track->isMidiTrack() || _track->type() != Track::AUDIO_SOFTSYNTH)
+	//	return 0;
 	MidiTrack* track = (MidiTrack*) _track;
 
 	MidiDevice* md = 0;
