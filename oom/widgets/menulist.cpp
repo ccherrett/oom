@@ -8,6 +8,8 @@
 #include <QWidgetAction>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QKeyEvent>
+#include <QCoreApplication>
 
 #include "track.h"
 #include "globals.h"
@@ -25,7 +27,7 @@
 #include "config.h"
 #include "menulist.h"
 
-MenuList::MenuList(QWidget* parent, Track *t) : QWidgetAction(parent)
+MenuList::MenuList(QMenu* parent, Track *t) : QWidgetAction(parent)
 {
 	_track = t;
 }
@@ -33,6 +35,8 @@ MenuList::MenuList(QWidget* parent, Track *t) : QWidgetAction(parent)
 QWidget* MenuList::createWidget(QWidget* parent)
 {
 	if(!_track)
+		return 0;
+	if(!_track->isMidiTrack() || _track->type() != Track::AUDIO_SOFTSYNTH)
 		return 0;
 	MidiTrack* track = (MidiTrack*) _track;
 
@@ -71,9 +75,12 @@ void MenuList::updateData(QListWidgetItem *item)
 	{
 		//printf("Triggering Menu Action\n");
 		setData(list->row(item));
-		//emit triggered();
-		activate(QAction::Trigger);
-		//QAction::trigger();
-		trigger();
+		
+		//FIXME: This is a seriously brutal HACK but its the only way it can get it done
+		QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+		QCoreApplication::postEvent(this->parent(), e);
+
+		QKeyEvent *e2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+		QCoreApplication::postEvent(this->parent(), e2);
 	}
 }

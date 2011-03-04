@@ -1409,7 +1409,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 				{
 					//Get event type.
 					Event pcevt = evt->second;
-					printf("Found events %d \n", pcevt.type());
+					//printf("Found events %d \n", pcevt.type());
 					if (!pcevt.isNote())
 					{
 						//printf("Found none Note events of type: %d with dataA: %d\n", pcevt.type(), pcevt.dataA());

@@ -441,12 +441,8 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	showTrackInfo(showTrackinfoFlag);
 
 	// Take care of some tabbies!
-	//setTabOrder(tempo200, trackInfo);
-	//setTabOrder(trackInfo, infoScroll);
 	setTabOrder(tempo200, list);
 	setTabOrder(list, canvas);
-	//setTabOrder(canvas, ib);
-	//setTabOrder(ib, hscroll);
 }
 
 Arranger::~Arranger()

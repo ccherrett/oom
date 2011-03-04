@@ -5,7 +5,10 @@
 //  (C) Copyright 2011 Andrew Williams and the OOMidi team
 //=========================================================
 
-#include <QObject>
+#ifndef _MENULIST_
+#define _MENULIST_
+
+#include <QMenu>
 #include <QWidgetAction>
 
 class QListWidget;
@@ -19,7 +22,7 @@ class MenuList : public QWidgetAction
 	Track* _track;
 
 	public:
-		MenuList(QWidget* parent = 0, Track* t = 0);
+		MenuList(QMenu* parent, Track* t);
 		virtual QWidget* createWidget(QWidget* parent = 0);
 
 	private slots:
@@ -28,3 +31,5 @@ class MenuList : public QWidgetAction
 	signals:
 		void triggered();
 };
+
+#endif
