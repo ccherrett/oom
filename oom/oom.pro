@@ -166,6 +166,7 @@ HEADERS = \
       ./trackview.h        \
       ./cthread.h        \
       ./cserver.h        \
+      ./lsclient.h        \
       ./plugin.h
 
 SOURCES =  \
@@ -330,6 +331,7 @@ SOURCES =  \
       ./help.cpp        \
 	  ./cthread.cpp		\
 	  ./cserver.cpp		\
+	  ./lsclient.cpp		\
       ./tempo.cpp
 
 FORMS = \

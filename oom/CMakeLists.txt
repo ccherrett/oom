@@ -140,6 +140,7 @@ file (GLOB core_source_files
       traverso_shared/TConfig.cpp
 	  cthread.cpp
 	  cserver.cpp
+	  lsclient.cpp
       )
 file (GLOB main_source_files
       main.cpp
@@ -256,6 +257,10 @@ endif(HAVE_LASH)
 if(OSC_SUPPORT)
       target_link_libraries(core ${LIBLO_LIBRARIES})
 endif(OSC_SUPPORT)
+
+if(LSCP_SUPPORT)
+      target_link_libraries(core ${LSCP_LIBRARIES})
+endif(LSCP_SUPPORT)
 
 target_link_libraries(oom
       midiedit

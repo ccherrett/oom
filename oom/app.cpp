@@ -67,6 +67,10 @@
 #include "vst.h"
 #endif
 
+#ifdef LSCP_SUPPORT
+#include "lsclient.h"
+#endif
+
 #include "traverso_shared/TConfig.h"
 
 //extern void cacheJackRouteNames();
@@ -1519,6 +1523,21 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	}
 
 	song->update();
+	
+#ifdef LSCP_SUPPORT
+	LSClient* lsc = new LSClient();
+	if(lsc->initClient())
+	{
+		printf("Initialized LSCP client connection\n");
+		lsc->testClient();
+	}
+	else
+	{
+		printf("Failed to Initialize LSCP client connection\n");
+	}
+#else
+	printf("NO LSCP Support!!!\n");
+#endif
 }
 
 OOMidi::~OOMidi()

@@ -110,6 +110,7 @@ option ( ENABLE_FLUID       "enable fluidsynth softsynth plugins"               
 option ( ENABLE_EXPERIMENTAL "enable building experimental features"                         OFF)
 option ( UPDATE_TRANSLATIONS "Update source translation share/locale/*.ts files 
          (WARNING: This will modify the .ts files in the source tree!!)"                     OFF)
+option ( ENABLE_LSCP         "enable lscp client"                                            ON)
 
 ##
 ## Just print a notice if this is OS X
@@ -242,6 +243,18 @@ else (ENABLE_VST)
       message("VST support disabled")
       set (VST_SUPPORT FALSE)
 endif (ENABLE_VST)
+
+if (ENABLE_LSCP)
+      PKG_CHECK_MODULES(LSCP lscp)
+      if (LSCP_FOUND)
+          message("LSCP support enabled")
+          include_directories(${LSCP_INCLUDE_DIRS})
+          set (LSCP_SUPPORT TRUE)
+      endif (LSCP_FOUND)
+else (ENABLE_LSCP)
+      message("LSCP support disabled")
+      set (LSCP_SUPPORT FALSE)
+endif (ENABLE_LSCP)
 
 ##
 ## TODO
@@ -394,6 +407,7 @@ summary_add("Lash support" HAVE_LASH)
 summary_add("OSC (Liblo) support" OSC_SUPPORT)
 summary_add("DSSI support" DSSI_SUPPORT)
 summary_add("VST support" VST_SUPPORT)
+summary_add("LSCP support" LSCP_SUPPORT)
 summary_add("Fluidsynth support" HAVE_FLUIDSYNTH)
 summary_add("Experimental features" ENABLE_EXPERIMENTAL)
 summary_show()
