@@ -1473,13 +1473,10 @@ int PianoCanvas::stepInputQwerty(QKeyEvent *event)
 
 	if (pitch == -1)
 	{
-		printf("key %s doesn't have a midi note attached to it\n", key);
 		return 0;
 	}
 
 	pitch += _octaveQwerty * 12;
-
-	printf("pitch is %d\n", pitch);
 
 	midiNote(pitch, 100);
 

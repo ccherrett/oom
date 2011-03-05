@@ -221,13 +221,13 @@ void initShortCuts()
         defShrt(SHRT_NOTE_VELOCITY_UP, Qt::Key_Up, "Edit: Increase velocity for selection", PROLL_SHRT, "increase_note_velocity");
         defShrt(SHRT_NOTE_VELOCITY_DOWN, Qt::Key_Down, "Edit: Decrease velocity for selection", PROLL_SHRT, "Decrease_note_velocity");
         defShrt(SHRT_TOGGLE_STEPQWERTY, Qt::CTRL + Qt::Key_F9, "Edit: Toggle Qwerty Step Input", PROLL_SHRT, "toggle_qwerty_step_input");
-        defShrt(SHRT_OCTAVE_QWERTY_0, Qt::SHIFT + Qt::Key_0, "Edit: Set Qwerty Range To C0", PROLL_SHRT, "Qwerty range C0");
-        defShrt(SHRT_OCTAVE_QWERTY_1, Qt::SHIFT + Qt::Key_1, "Edit: Set Qwerty Range To C1", PROLL_SHRT, "Qwerty range C1");
-        defShrt(SHRT_OCTAVE_QWERTY_2, Qt::SHIFT + Qt::Key_2, "Edit: Set Qwerty Range To C2", PROLL_SHRT, "Qwerty range C2");
-        defShrt(SHRT_OCTAVE_QWERTY_3, Qt::SHIFT + Qt::Key_3, "Edit: Set Qwerty Range To C3", PROLL_SHRT, "Qwerty range C3");
-        defShrt(SHRT_OCTAVE_QWERTY_4, Qt::SHIFT + Qt::Key_4, "Edit: Set Qwerty Range To C4", PROLL_SHRT, "Qwerty range C4");
-        defShrt(SHRT_OCTAVE_QWERTY_5, Qt::SHIFT + Qt::Key_5, "Edit: Set Qwerty Range To C5", PROLL_SHRT, "Qwerty range C5");
-        defShrt(SHRT_OCTAVE_QWERTY_6, Qt::SHIFT + Qt::Key_6, "Edit: Set Qwerty Range To C6", PROLL_SHRT, "Qwerty range C6");
+	defShrt(SHRT_OCTAVE_QWERTY_0, Qt::CTRL + Qt::Key_0, "Edit: Set Qwerty Range To C0", PROLL_SHRT, "Qwerty range C0");
+	defShrt(SHRT_OCTAVE_QWERTY_1, Qt::CTRL + Qt::Key_1, "Edit: Set Qwerty Range To C1", PROLL_SHRT, "Qwerty range C1");
+	defShrt(SHRT_OCTAVE_QWERTY_2, Qt::CTRL + Qt::Key_2, "Edit: Set Qwerty Range To C2", PROLL_SHRT, "Qwerty range C2");
+	defShrt(SHRT_OCTAVE_QWERTY_3, Qt::CTRL + Qt::Key_3, "Edit: Set Qwerty Range To C3", PROLL_SHRT, "Qwerty range C3");
+	defShrt(SHRT_OCTAVE_QWERTY_4, Qt::CTRL + Qt::Key_4, "Edit: Set Qwerty Range To C4", PROLL_SHRT, "Qwerty range C4");
+	defShrt(SHRT_OCTAVE_QWERTY_5, Qt::CTRL + Qt::Key_5, "Edit: Set Qwerty Range To C5", PROLL_SHRT, "Qwerty range C5");
+	defShrt(SHRT_OCTAVE_QWERTY_6, Qt::CTRL + Qt::Key_6, "Edit: Set Qwerty Range To C6", PROLL_SHRT, "Qwerty range C6");
 	
         // Shortcuts for tools
 	// global
