@@ -201,8 +201,7 @@ enum
     SHRT_DEC_PITCH,
     SHRT_INC_POS,
     SHRT_DEC_POS,
-
-    SHRT_POS_INC_NOSNAP,
+    SHRT_TOGGLE_STEPQWERTYSHRT_POS_INC_NOSNAP,
     SHRT_POS_DEC_NOSNAP,
 
     /*
@@ -290,6 +289,14 @@ enum
     SHRT_TOGGLE_PUNCT, //.-keypad
     SHRT_TOGGLE_PUNCT2, // ,
     SHRT_TOGGLE_STEPRECORD,
+    SHRT_TOGGLE_STEPQWERTY,
+    SHRT_OCTAVE_QWERTY_0,  //0 - Set qwerty step input range starts at C0
+    SHRT_OCTAVE_QWERTY_1,  //1 - Set qwerty step input range starts at C1
+    SHRT_OCTAVE_QWERTY_2,  //2 - Set qwerty step input range starts at C2
+    SHRT_OCTAVE_QWERTY_3,  //3 - Set qwerty step input range starts at C3
+    SHRT_OCTAVE_QWERTY_4,  //4 - Set qwerty step input range starts at C4
+    SHRT_OCTAVE_QWERTY_5,  //5 - Set qwerty step input range starts at C5
+    SHRT_OCTAVE_QWERTY_6,  //6 - Set qwerty step input range starts at C6
     SHRT_NOTE_VELOCITY_UP,
     SHRT_NOTE_VELOCITY_DOWN,
 
