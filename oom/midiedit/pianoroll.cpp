@@ -96,6 +96,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	_quantLen = _quantLenInit;
 	_to = _toInit;
 	colorMode = colorModeInit;
+	_stepQwerty = false;
 
 	QSignalMapper* mapper = new QSignalMapper(this);
 	QSignalMapper* colorMapper = new QSignalMapper(this);
@@ -1243,7 +1244,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 
 	 PianoCanvas* pc = (PianoCanvas*) canvas;
 
-	 if (true && pc->steprec())
+	 if (_stepQwerty && pc->steprec())
 	 {
 		 if (key == shortcuts[SHRT_OCTAVE_QWERTY_0].key) {
 			 pc->setOctaveQwerty(0);
@@ -1519,6 +1520,15 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
                 srec->toggle();
                 return;
         }
+	else if (key == shortcuts[SHRT_TOGGLE_STEPQWERTY].key)
+	{
+		_stepQwerty = !_stepQwerty;
+		if (_stepQwerty && !srec->isChecked()) {
+			srec->toggle();
+		}
+
+		return;
+	}
         else if (key == shortcuts[SHRT_NOTE_VELOCITY_UP].key)
         {
                 CItemList list = canvas->getSelectedItemsForCurrentPart();

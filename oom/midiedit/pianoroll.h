@@ -112,6 +112,7 @@ class PianoRoll : public MidiEditor
     int veloOnOffset;
     int veloOffOffset;
     bool deltaMode;
+    bool _stepQwerty;
 
     NoteInfo* info;
     QToolButton* srec;
