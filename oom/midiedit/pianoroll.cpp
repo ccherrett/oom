@@ -1224,16 +1224,6 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 
 	int val = 0;
 
-	PianoCanvas* pc = (PianoCanvas*) canvas;
-
-	if (true && pc->steprec())
-	{
-		if(pc->stepInputQwerty(event))
-		{
-			return;
-		}
-	}
-
 	int key = event->key();
 
 	//if (event->state() & Qt::ShiftButton)
@@ -1248,6 +1238,43 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
         ///if (event->state() & Qt::MetaButton)
          if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
                 key += Qt::META;
+
+
+
+	 PianoCanvas* pc = (PianoCanvas*) canvas;
+
+	 if (true && pc->steprec())
+	 {
+		 if (key == shortcuts[SHRT_OCTAVE_QWERTY_0].key) {
+			 pc->setOctaveQwerty(0);
+			 return;
+		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_1].key) {
+			 pc->setOctaveQwerty(1);
+			 return;
+		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_2].key) {
+			 pc->setOctaveQwerty(2);
+			 return;
+		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_3].key) {
+			 pc->setOctaveQwerty(3);
+			 return;
+		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_4].key) {
+			 pc->setOctaveQwerty(4);
+			 return;
+		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_5].key) {
+			 pc->setOctaveQwerty(5);
+			 return;
+		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_6].key) {
+			 pc->setOctaveQwerty(6);
+			 return;
+		 }
+
+		 if(pc->stepInputQwerty(event))
+		 {
+			 return;
+		 }
+	 }
+
+
 	if (key == Qt::Key_Escape)
 	{
 		close();

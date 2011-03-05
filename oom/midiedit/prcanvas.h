@@ -93,6 +93,7 @@ public slots:
     void pianoReleased(int pitch, bool);
 
     void createQWertyToMidiBindings();
+    void setOctaveQwerty(int octave);
 
 public:
 

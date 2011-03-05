@@ -1455,6 +1455,11 @@ void PianoCanvas::createQWertyToMidiBindings()
 	bindQwertyKeyToMidiValue("u", 35);
 }
 
+void PianoCanvas::setOctaveQwerty(int octave)
+{
+	_octaveQwerty = octave + 1;
+}
+
 void PianoCanvas::bindQwertyKeyToMidiValue(const char* key, int note)
 {
 	_qwertyToMidiMap.insert(key, note);
