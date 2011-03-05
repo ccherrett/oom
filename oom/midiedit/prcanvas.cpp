@@ -87,9 +87,12 @@ PianoCanvas::PianoCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy)
 	colorMode = 0;
 	cmdRange = 0; // all Events
 	playedPitch = -1;
+	_octaveQwerty = 3;
 
 	songChanged(SC_TRACK_INSERTED);
 	connect(song, SIGNAL(midiNote(int, int)), SLOT(midiNote(int, int)));
+
+	createQWertyToMidiBindings();
 }
 
 //---------------------------------------------------------
@@ -1417,6 +1420,67 @@ void PianoCanvas::quantize(int strength, int limit, bool quantLen)
 	}
 	song->endUndo(SC_EVENT_MODIFIED);
 }
+
+
+void PianoCanvas::createQWertyToMidiBindings()
+{
+	_qwertyToMidiMap.clear();
+
+	/* Lower keyboard row - "zxcvbnm". */
+	bindQwertyKeyToMidiValue("z", 12);	/* C-1 */
+	bindQwertyKeyToMidiValue("s", 13);
+	bindQwertyKeyToMidiValue("x", 14);
+	bindQwertyKeyToMidiValue("d", 15);
+	bindQwertyKeyToMidiValue("c", 16);
+	bindQwertyKeyToMidiValue("v", 17);
+	bindQwertyKeyToMidiValue("g", 18);
+	bindQwertyKeyToMidiValue("b", 19);
+	bindQwertyKeyToMidiValue("h", 20);
+	bindQwertyKeyToMidiValue("n", 21);
+	bindQwertyKeyToMidiValue("j", 22);
+	bindQwertyKeyToMidiValue("m", 23);
+
+	/* Upper keyboard row, first octave - "qwertyu". */
+	bindQwertyKeyToMidiValue("q", 24);
+	bindQwertyKeyToMidiValue("2", 25);
+	bindQwertyKeyToMidiValue("w", 26);
+	bindQwertyKeyToMidiValue("3", 27);
+	bindQwertyKeyToMidiValue("e", 28);
+	bindQwertyKeyToMidiValue("r", 29);
+	bindQwertyKeyToMidiValue("5", 30);
+	bindQwertyKeyToMidiValue("t", 31);
+	bindQwertyKeyToMidiValue("6", 32);
+	bindQwertyKeyToMidiValue("y", 33);
+	bindQwertyKeyToMidiValue("7", 34);
+	bindQwertyKeyToMidiValue("u", 35);
+}
+
+void PianoCanvas::bindQwertyKeyToMidiValue(const char* key, int note)
+{
+	_qwertyToMidiMap.insert(key, note);
+}
+
+
+int PianoCanvas::stepInputQwerty(QKeyEvent *event)
+{
+	const char* key = event->text().toAscii().data();
+	int pitch = _qwertyToMidiMap.value(event->text(), -1);
+
+	if (pitch == -1)
+	{
+		printf("key %s doesn't have a midi note attached to it\n", key);
+		return 0;
+	}
+
+	pitch += _octaveQwerty * 12;
+
+	printf("pitch is %d\n", pitch);
+
+	midiNote(pitch, 100);
+
+	return 1;
+}
+
 
 //---------------------------------------------------------
 //   midiNote

@@ -42,6 +42,10 @@ class PianoCanvas : public EventCanvas
     int cmdRange;
     int colorMode;
     int playedPitch;
+    int _octaveQwerty;
+
+    QMap<QString, int> _qwertyToMidiMap;
+    void bindQwertyKeyToMidiValue(const char* key, int note);
 
     Q_OBJECT
     virtual void viewMouseDoubleClickEvent(QMouseEvent*);
@@ -74,6 +78,7 @@ class PianoCanvas : public EventCanvas
     virtual void curPartChanged();
     virtual void resizeEvent(QResizeEvent*);
 
+
 private slots:
     void midiNote(int pitch, int velo);
 
@@ -86,6 +91,8 @@ public slots:
     void pianoCmd(int);
     void pianoPressed(int pitch, int velocity, bool shift);
     void pianoReleased(int pitch, bool);
+
+    void createQWertyToMidiBindings();
 
 public:
 
@@ -105,6 +112,7 @@ public:
 
     PianoCanvas(MidiEditor*, QWidget*, int, int);
     void cmd(int, int, int, bool, int);
+    int stepInputQwerty(QKeyEvent* event);
 
     void setColorMode(int mode)
     {

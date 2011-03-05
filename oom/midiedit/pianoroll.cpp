@@ -1165,21 +1165,20 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 	// Currently the object that we're filtering is the
 	// midiTrackInfo.
 	if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 		int key = keyEvent->key();
 		if (key == Qt::Key_Enter || key == Qt::Key_Return)
-        {
-                canvas->setFocus(Qt::MouseFocusReason);
-                return true;
-        }
-        if (keyEvent->key() == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key ||
-            keyEvent->key() == shortcuts[SHRT_TOGGLE_STEPRECORD].key ||
-            keyEvent->key() == shortcuts[SHRT_MIDI_PANIC].key
-            )
-        {
-                qApp->sendEvent(canvas, event);
-                return true;
-        }
+		{
+			canvas->setFocus(Qt::MouseFocusReason);
+			return true;
+		}
+		if (keyEvent->key() == shortcuts[SHRT_TOGGLE_STEPRECORD].key ||
+		    keyEvent->key() == shortcuts[SHRT_MIDI_PANIC].key
+		    )
+		{
+			qApp->sendEvent(canvas, event);
+			return true;
+		}
 		if(keyEvent->key() == shortcuts[SHRT_SEL_INSTRUMENT].key)
 		{
 			midiTrackInfo->addSelectedPatch();
@@ -1226,6 +1225,15 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	int val = 0;
 
 	PianoCanvas* pc = (PianoCanvas*) canvas;
+
+	if (true && pc->steprec())
+	{
+		if(pc->stepInputQwerty(event))
+		{
+			return;
+		}
+	}
+
 	int key = event->key();
 
 	//if (event->state() & Qt::ShiftButton)
@@ -1546,8 +1554,16 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
                 }
                 song->endUndo(SC_EVENT_MODIFIED);
                 return;
-        }
-        else
+        }	
+	else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
+	{
+		if (canvas->part()) {
+			Track* t = canvas->part()->track();
+			audio->msgSetSolo(t, !t->solo());
+			song->update(SC_SOLO);
+		}
+	}
+	else
 	{ //Default:
 		event->ignore();
 		return;
