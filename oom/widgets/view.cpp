@@ -82,6 +82,7 @@ void View::setXMag(float xs)
 
 void View::setYMag(float ys)
 {
+	//printf("Canvas Zoom Level: %f\n", ys);
 	ymag = ys;
 	redraw();
 }

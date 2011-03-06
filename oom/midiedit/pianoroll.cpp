@@ -480,7 +480,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	time = new MTScale(&_raster, split1, xscale);
 	Piano* piano = new Piano(split1, yscale);
 	canvas = new PianoCanvas(this, split1, xscale, yscale);
-	vscroll = new ScrollScale(-3, 7, yscale, KH * 75, Qt::Vertical, split1);
+	vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
 
 	int offset = -(config.division / 4);
 	canvas->setOrigin(offset, 0);

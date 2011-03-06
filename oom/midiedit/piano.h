@@ -25,7 +25,6 @@ class QPixmap;
 class Piano : public View
 {
     int curPitch;
-    QPixmap* octave;
     QPixmap* c_keys[10];
     QPixmap* mk1;
     QPixmap* mk2;
@@ -35,6 +34,10 @@ class Piano : public View
     QPixmap* mk2_l;
     QPixmap* mk3_l;
     QPixmap* mk4_l;
+    QPixmap* mk1_n;
+    QPixmap* mk2_n;
+    QPixmap* mk3_n;
+    QPixmap* mk4_n;
     int keyDown;
     bool shift;
     int button;
