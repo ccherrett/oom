@@ -1526,6 +1526,9 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		if (_stepQwerty && !srec->isChecked()) {
 			srec->toggle();
 		}
+		if (!_stepQwerty && srec->isChecked()) {
+			srec->toggle();
+		}
 
 		return;
 	}
