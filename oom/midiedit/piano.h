@@ -9,6 +9,7 @@
 #define __PIANO_H__
 
 #include "view.h"
+#include <QList>
 
 class QEvent;
 class QMouseEvent;
@@ -30,9 +31,14 @@ class Piano : public View
     QPixmap* mk2;
     QPixmap* mk3;
     QPixmap* mk4;
+    QPixmap* mk1_l;
+    QPixmap* mk2_l;
+    QPixmap* mk3_l;
+    QPixmap* mk4_l;
     int keyDown;
     bool shift;
     int button;
+	QList<int>* enabled;
 
     Q_OBJECT
     int y2pitch(int) const;
