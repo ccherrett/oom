@@ -38,10 +38,10 @@ bool LSClient::initClient()
 	{
 		return false;
 	}
-	lscp_client_subscribe(_client, LSCP_EVENT_MISCELLANEOUS);
+	//lscp_client_subscribe(_client, LSCP_EVENT_MISCELLANEOUS);
 	lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
-	lscp_client_subscribe(_client, LSCP_EVENT_MIDI_INSTRUMENT_MAP_INFO);
-	lscp_client_subscribe(_client, LSCP_EVENT_MIDI_INSTRUMENT_INFO);
+	//lscp_client_subscribe(_client, LSCP_EVENT_MIDI_INSTRUMENT_MAP_INFO);
+	//lscp_client_subscribe(_client, LSCP_EVENT_MIDI_INSTRUMENT_INFO);
 	return true;
 }
 

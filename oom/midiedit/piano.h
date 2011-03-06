@@ -38,10 +38,18 @@ class Piano : public View
     QPixmap* mk2_n;
     QPixmap* mk3_n;
     QPixmap* mk4_n;
+    QPixmap* mk5_n;
+    QPixmap* mk1_s;
+    QPixmap* mk2_s;
+    QPixmap* mk3_s;
+    QPixmap* mk4_s;
+    QPixmap* mk5_s;
+    QPixmap* mk6_s;
     int keyDown;
     bool shift;
     int button;
 	QList<int>* enabled;
+	QList<int>* keyswitch;
 
     Q_OBJECT
     int y2pitch(int) const;
