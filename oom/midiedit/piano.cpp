@@ -701,7 +701,7 @@ void Piano::draw(QPainter& p, const QRect& r)
           int drawY = octaveSize * drawKey + 81 - KH*2;
           if (drawY > r.y() && drawY < r.y() + r.height()) 
 		  {
-          		p.drawText(25, drawY + 9, "C" + QString::number(8 - drawKey));
+          		p.drawText(25, drawY + 8, "C" + QString::number(8 - drawKey));
           }
       }
       
