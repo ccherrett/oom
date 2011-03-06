@@ -692,7 +692,7 @@ void Piano::draw(QPainter& p, const QRect& r)
       }/*}}}*/
       p.drawPixmap(0, y, *pm);
       QFont font;
-      font.setPixelSize(11);
+      font.setPixelSize(10);
       p.setFont(font);
       // draw C notes
       for (int drawKey = 0; drawKey < 8;drawKey++) 
