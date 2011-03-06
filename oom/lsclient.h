@@ -1,6 +1,8 @@
 #ifndef _LS_CLIENT_
 #define _LS_CLIENT_
 
+#ifdef LSCP_SUPPORT
+
 #include <lscp/client.h>
 #include <lscp/device.h>
 #include <QList>
@@ -41,5 +43,6 @@ class LSClient
 //END example_client.c
 
 };
+#endif
 
 #endif
