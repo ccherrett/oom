@@ -691,9 +691,11 @@ void Piano::draw(QPainter& p, const QRect& r)
                   break;
       }/*}}}*/
       p.drawPixmap(0, y, *pm);
-      QFont font;
-      font.setPixelSize(10);
-      p.setFont(font);
+      //QFont font;
+      //font.setPixelSize(10);
+      //p.setFontFamily("fixed-font");
+      //p.setFont(font);
+      p.setFont(QFont("fixed-font", 7));
       // draw C notes
       for (int drawKey = 0; drawKey < 8;drawKey++) 
 	  {	
@@ -701,7 +703,7 @@ void Piano::draw(QPainter& p, const QRect& r)
           int drawY = octaveSize * drawKey + 81 - KH*2;
           if (drawY > r.y() && drawY < r.y() + r.height()) 
 		  {
-          		p.drawText(25, drawY + 8, "C" + QString::number(8 - drawKey));
+          		p.drawText(23, drawY + 8, "C" + QString::number(8 - drawKey));
           }
       }
       
