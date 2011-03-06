@@ -44,46 +44,6 @@ OOMClientThread::OOMClientThread(int sock, QObject* parent)
 
 void OOMClientThread::run()
 {
-#ifdef LSCP_SUPPORT
-	LSClient* lsc = new LSClient("192.168.1.53");
-	if(lsc->initClient())
-	{
-		printf("Initialized LSCP client connection\n");
-		lsc->testClient();
-		QString file("/home/chris/Drive3_SSD/VSL/PRO/Orchestral_Cube/Strings/01 Violin ensemble - 14/01 VI-14_SHORT-NOTES.gig");
-		QList<QList<int>*> *keybindings = lsc->getKeyBindings(file.toUtf8().constData(), 1);
-		if(!keybindings->isEmpty())
-		{
-			QList<int> *kb = keybindings->at(0);
-			printf("KEY_BINDINGS: \n\t [");
-			for(int i = 0; i < kb->size(); ++i)
-			{
-				printf("%d", kb->at(i));
-				if(i != (kb->size()-1))
-					printf(", ");
-			}
-			printf("]\n\n");
-			if(keybindings->size() == 2)
-			{
-				QList<int> *ksb = keybindings->at(1);
-				printf("KEYSWITCH_BINDINGS: \n\t [");
-				for(int c = 0; c < ksb->size(); ++c)
-				{
-					printf("%d", ksb->at(c));
-					if(c != (ksb->size()-1))
-						printf(", ");
-				}
-				printf("]\n\n");
-			}
-		}
-	}
-	else
-	{
-		printf("Failed to Initialize LSCP client connection\n");
-	}
-#else
-	printf("NO LSCP Support!!!\n");
-#endif
 	QString rv;
 	QTcpSocket tcpSocket;
 	if(!tcpSocket.setSocketDescriptor(socket))
