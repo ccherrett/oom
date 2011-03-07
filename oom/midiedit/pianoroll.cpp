@@ -1739,6 +1739,8 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
     MidiPort* mp = &midiPorts[midiTrack->outPort()];
 	RouteList *rl = mp->outRoutes();
 
+	printf("rl.size() %d\n", rl.size());
+
 	//for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
     for(ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
