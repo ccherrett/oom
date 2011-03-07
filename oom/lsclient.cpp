@@ -154,7 +154,11 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 								if(tmp2.size() > 1)
 								{
 									printf(" Processing input port\n");
-									info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
+									//info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
+									QString portname = tmp2.at(1).trimmed();
+									portname = portname.remove("'");
+									info.midi_portname = portname.toUtf8().constData();
+																																													
 									printf("info midi port - %s\n", info.midi_portname);
 									process = true;
 									break;
