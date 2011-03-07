@@ -115,45 +115,49 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 		{
 			//printf("Found instrument to process\n");
 			printf("Instrument - file: %s, nr:%d, Channel - file: %s, nr: %d\n", instrInfo->instrument_file, instrInfo->instrument_nr, chanInfo->instrument_file, chanInfo->instrument_nr);
-			if(instrInfo->instrument_file == chanInfo->instrument_file && instrInfo->instrument_nr == chanInfo->instrument_nr)
+			if(instrInfo->instrument_file == chanInfo->instrument_file)
 			{
-				printf("Found Correct instrument !!!!\n");
-				info.instrument_name = instrInfo->instrument_name;
-				info.instrument_filename = instrInfo->instrument_file;
-				info.lbank = mInstrs[iInstr].map;
-				info.hbank = mInstrs[iInstr].bank;
-				info.program = mInstrs[iInstr].prog;
-				info.midi_port = chanInfo->midi_port;
-				info.midi_device = chanInfo->midi_device;
-				info.midi_channel = chanInfo->midi_channel;
-				char iquery[1024];
-				sprintf(iquery, "GET MIDI_INPUT_PORT INFO %d %d",chanInfo->midi_port, chanInfo->midi_channel);
-				if (lscp_client_query(_client, iquery) == LSCP_OK)
+				if(instrInfo->instrument_nr == chanInfo->instrument_nr)
 				{
-					const char* ret = lscp_client_get_result(_client);
-					QString midiInputPort(ret);
-					QStringList sl = midiInputPort.split("\r\n", QString::SkipEmptyParts);
-					QStringListIterator iter(sl);
-					while(iter.hasNext())
+					printf("Found Correct instrument !!!!\n");
+					info.instrument_name = instrInfo->instrument_name;
+					info.instrument_filename = instrInfo->instrument_file;
+					info.lbank = mInstrs[iInstr].map;
+					info.hbank = mInstrs[iInstr].bank;
+					info.program = mInstrs[iInstr].prog;
+					info.midi_port = chanInfo->midi_port;
+					info.midi_device = chanInfo->midi_device;
+					info.midi_channel = chanInfo->midi_channel;
+					char iquery[1024];
+					sprintf(iquery, "GET MIDI_INPUT_PORT INFO %d %d",chanInfo->midi_port, chanInfo->midi_channel);
+					if (lscp_client_query(_client, iquery) == LSCP_OK)
 					{
-						printf(" Processing input port\n");
-						QString tmp = iter.next().trimmed();
-						if(tmp.startsWith("NAME", Qt::CaseSensitive))
+						const char* ret = lscp_client_get_result(_client);
+						QString midiInputPort(ret);
+						QStringList sl = midiInputPort.split("\r\n", QString::SkipEmptyParts);
+						QStringListIterator iter(sl);
+						while(iter.hasNext())
 						{
-							printf(" Found midi port - %s\n", tmp.toUtf8().constData());
-							QStringList tmp2 = tmp.split(":", QString::SkipEmptyParts);
-							if(tmp2.size() > 1)
+							printf(" Processing input port\n");
+							QString tmp = iter.next().trimmed();
+							if(tmp.startsWith("NAME", Qt::CaseSensitive))
 							{
-								printf(" Processing input port\n");
-								info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
-								process = true;
-								break;
+								printf(" Found midi port - %s\n", tmp.toUtf8().constData());
+								QStringList tmp2 = tmp.split(":", QString::SkipEmptyParts);
+								if(tmp2.size() > 1)
+								{
+									printf(" Processing input port\n");
+									info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
+									process = true;
+									break;
+								}
 							}
 						}
 					}
+					break;
 				}
-				break;
-			}
+			}	
+
 		}
 	}
 	if(process)
