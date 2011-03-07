@@ -1729,12 +1729,18 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	MidiTrack* midiTrack = static_cast<MidiTrack*>(t);
 	if (!midiTrack)
 	{
+		printf("not a midi port\n");
 		return;
+	}
+	else
+	{
+		printf("found midi track\n");
 	}
     MidiPort* mp = &midiPorts[midiTrack->outPort()];
 	RouteList *rl = mp->outRoutes();
 
-	for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
+	//for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
+    for(ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
 		printf("oom-port-name: %s, lscp-port-name: %s\n", (*ir).name().toAscii().data(), QString(info.midi_portname).toAscii().data());
 		if((*ir).name() == QString(info.midi_portname))
