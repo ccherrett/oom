@@ -1738,7 +1738,11 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 				printf("is current patch calling setMIDIKeyBindings\n");
 				piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
 			}	
-			//break;
+			break;
+		}
+		else
+		{
+			printf("no match\n");
 		}
 	}
 }
