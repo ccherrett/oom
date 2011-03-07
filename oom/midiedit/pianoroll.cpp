@@ -5,6 +5,11 @@
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
+
+// if app.h is included before the other headers
+// if fails to compile, why ?
+#include "app.h"
+
 #include <QLayout>
 #include <QSizeGrip>
 #include <QLabel>
