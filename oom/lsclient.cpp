@@ -49,6 +49,7 @@ void LSClient::run()
 	if(_client != NULL)
 	{
 		printf("Initialized LSCP client connection\n");
+		::lscp_client_set_timeout(_client, 1000);
 		::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 	}
 	else
@@ -105,6 +106,8 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 	QString keySwitchStr = "KEYSWITCH_BINDINGS:";
 	char query[1024];
 	bool process = false;
+	int nr = chanInfo->instrument_nr;
+	QString chanfname(chanInfo->instrument_file);
 	
 	//Lookup the instrument map
 	lscp_midi_instrument_t* mInstrs = ::lscp_list_midi_instruments(_client, chanInfo->midi_map);
@@ -115,11 +118,10 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 		{
 			//printf("Found instrument to process\n");
 			printf("Instrument - file: %s, nr:%d, Channel - file: %s, nr: %d\n", instrInfo->instrument_file, instrInfo->instrument_nr, chanInfo->instrument_file, chanInfo->instrument_nr);
-			if(instrInfo->instrument_nr == chanInfo->instrument_nr)
+			if(instrInfo->instrument_nr == nr)
 			{
 				printf("Found matching nr\n");
 				QString insfname(instrInfo->instrument_file);
-				QString chanfname(chanInfo->instrument_file);
 
 				//if(instrInfo->instrument_file == chanInfo->instrument_file)
 				if(chanfname == insfname)
@@ -134,7 +136,7 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 					info.midi_device = chanInfo->midi_device;
 					info.midi_channel = chanInfo->midi_channel;
 					char iquery[1024];
-					sprintf(iquery, "GET MIDI_INPUT_PORT INFO %d %d",chanInfo->midi_device, chanInfo->midi_port);
+					sprintf(iquery, "GET MIDI_INPUT_PORT INFO %d %d",info.midi_device, info.midi_port);
 					printf("Query for MIDI_INPPUT_PORT\n%s\n", iquery);
 					if (lscp_client_query(_client, iquery) == LSCP_OK)
 					{
@@ -174,7 +176,7 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 	if(process)
 	{
 		printf("Starting key binding processing\n");
-		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", chanInfo->instrument_file, chanInfo->instrument_nr);
+		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", info.instrument_filename, nr);
 		if (lscp_client_query(_client, query) == LSCP_OK)
 		{
 			const char* ret = lscp_client_get_result(_client);
