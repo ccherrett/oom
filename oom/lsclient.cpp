@@ -87,12 +87,15 @@ void LSClient::stopClient()
  */
 const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{{{*/
 {
+	printf("\nEntering LSClient::getKeyBindings()\n");
 	LSCPChannelInfo info;
 	if(chanInfo == NULL)
 	{
+		printf("Channel Info is NULL\n");
 		info.valid = false;
 		return info;
 	}
+	printf("Channel Info is NULL\n");
 	QList<int> keys;
 	QList<int> switched;
 	QString keyStr = "KEY_BINDINGS:";
@@ -107,8 +110,10 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 		lscp_midi_instrument_info_t *instrInfo = ::lscp_get_midi_instrument_info(_client, &mInstrs[iInstr]);
 		if(instrInfo)
 		{
+			printf("Found instrument to process\n");
 			if(instrInfo->instrument_file == chanInfo->instrument_file && instrInfo->instrument_nr == chanInfo->instrument_nr)
 			{
+				printf("Found Correct instrument !!!!\n");
 				info.instrument_name = instrInfo->instrument_name;
 				info.instrument_filename = instrInfo->instrument_file;
 				info.lbank = mInstrs[iInstr].map;
@@ -127,12 +132,15 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 					QStringListIterator iter(sl);
 					while(iter.hasNext())
 					{
+						printf(" Processing input port\n");
 						QString tmp = iter.next().trimmed();
 						if(tmp.startsWith("NAME", Qt::CaseSensitive))
 						{
+							printf(" Found midi port - %s\n", tmp.toUtf8().constData());
 							QStringList tmp2 = tmp.split(":", QString::SkipEmptyParts);
-							if(tmp2.size() == 2)
+							if(tmp2.size() > 1)
 							{
+								printf(" Processing input port\n");
 								info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
 								process = true;
 								break;
@@ -146,13 +154,13 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 	}
 	if(process)
 	{
+		printf("Starting key binding processing\n");
 		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", chanInfo->instrument_file, chanInfo->instrument_nr);
 		if (lscp_client_query(_client, query) == LSCP_OK)
 		{
 			const char* ret = lscp_client_get_result(_client);
 			QString values(ret);
-			if(debugMsg)
-				printf("Server Returned:\n %s\n", ret);
+			printf("Server Returned:\n %s\n", ret);
 			QStringList arrayVal = values.split("\r\n", QString::SkipEmptyParts);
 			QStringListIterator vIter(arrayVal);
 			while(vIter.hasNext())
@@ -191,6 +199,7 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 	}
 
 	info.valid = process;
+	printf("Leaving LSClient::getKeyBindings()\n");
 	return info;
 }/*}}}*/
 
