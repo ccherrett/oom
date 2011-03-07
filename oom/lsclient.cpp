@@ -161,6 +161,10 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 							}
 						}
 					}
+					else
+					{
+						printf("Bad LSCP command \n%d\n", lscp_client_get_errno(_client));
+					}
 					break;
 				}
 			}	
