@@ -48,8 +48,8 @@ class Piano : public View
     int keyDown;
     bool shift;
     int button;
-	QList<int>* enabled;
-	QList<int>* keyswitch;
+	QList<int> enabled;
+	QList<int> keyswitch;
 
     Q_OBJECT
     int y2pitch(int) const;
@@ -73,6 +73,7 @@ public slots:
 
 public:
     Piano(QWidget*, int);
+	void setMIDIKeyBindings(QList<int>, QList<int>);
 };
 
 #endif

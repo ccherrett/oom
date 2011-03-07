@@ -16,8 +16,8 @@
 
 typedef struct chaninfo/*{{{*/
 {
-	int lbank;
 	int hbank;
+	int lbank;
 	int program;
 	QList<int> key_bindings;
 	QList<int> keyswitch_bindings;

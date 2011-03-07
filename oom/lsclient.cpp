@@ -129,8 +129,8 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 					printf("Found Correct instrument !!!!\n");
 					info.instrument_name = instrInfo->instrument_name;
 					info.instrument_filename = instrInfo->instrument_file;
-					info.lbank = mInstrs[iInstr].map;
-					info.hbank = mInstrs[iInstr].bank;
+					info.hbank = mInstrs[iInstr].map;
+					info.lbank = mInstrs[iInstr].bank;
 					info.program = mInstrs[iInstr].prog;
 					info.midi_port = chanInfo->midi_port;
 					info.midi_device = chanInfo->midi_device;

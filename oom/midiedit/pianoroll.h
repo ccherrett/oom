@@ -19,6 +19,11 @@
 #include "midieditor.h"
 #include "tools.h"
 #include "event.h"
+#ifdef LSCP_SUPPORT
+#ifndef _LS_CLIENT_
+#include "lsclient.h"
+#endif
+#endif
 
 class MidiPart;
 class TimeLabel;
@@ -47,6 +52,7 @@ class QWidget;
 class QScrollBar;
 class MidiTrackInfo;
 class QScrollArea;
+class Piano;
 
 //---------------------------------------------------------
 //   PianoRoll
@@ -67,6 +73,7 @@ class PianoRoll : public MidiEditor
     MidiTrackInfo *midiTrackInfo;
     Track* selected;
     PCScale* pcbar;
+	Piano* piano;
 
     QAction* editCutAction;
     QAction* editCopyAction;
@@ -209,6 +216,9 @@ private slots:
     void toggleTrackInfo();
     void updateTrackInfo();
 	void splitterMoved(int, int);
+#ifdef LSCP_SUPPORT
+	void setKeyBindings(LSCPChannelInfo);
+#endif
 
 signals:
     void deleted(unsigned long);
@@ -229,6 +239,7 @@ public:
 	{
 		return _replay;
 	}
+	bool isCurrentPatch(int, int, int);
 
     virtual void readStatus(Xml&);
     virtual void writeStatus(int, Xml&) const;

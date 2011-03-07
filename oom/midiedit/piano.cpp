@@ -606,7 +606,7 @@ Piano::Piano(QWidget* parent, int ymag)
       mk5_s = new QPixmap(mk5_xpm_switch);
       mk6_s = new QPixmap(mk6_xpm_switch);
 
-	  enabled = new QList<int>();
+	  /*enabled = new QList<int>();
 	  QStringList sls;
 	  sls << "55" << "56" << "57" << "58" << "59" << "60" << "61" << "62" << "63" << "64" << "65" << "66" << "67" << "68" << "69" << "70" << "71" << "72" << "73" << "74" << "75" << "76" << "77" << "78" << "79" << "80" << "81" << "82" << "83" << "84" << "85" << "86" << "87" << "88" << "89" << "90" << "91" << "92" << "93" << "94" << "95" << "96" << "97" << "98" << "99";// << "100";      
 	  //sls << "55" << "56" << "57" << "58" << "64" << "65" << "66" << "67" << "72" << "73" << "74" << "77" << "79" << "81" << "82" << "83" << "84" << "85" << "90" << "91" << "92" << "93" << "97" << "98";      
@@ -623,7 +623,7 @@ Piano::Piano(QWidget* parent, int ymag)
 	  while(iterswitch.hasNext())
 	  {
 	  	keyswitch->append(iterswitch.next().toInt());
-	  }
+	  }*/
 	  keyDown = -1;
       button = Qt::NoButton;
       }
@@ -659,9 +659,9 @@ void Piano::draw(QPainter& p, const QRect& r)
      	       case 0:
      	       case 5:
      	             //pm2 = mk3_l;
-					if(keyswitch->contains(i))
+					if(keyswitch.contains(i))
       					p.drawPixmap(0, pitch2y(i), *mk3_s);
-					else if(!enabled->contains(i))
+					else if(enabled.isEmpty() || !enabled.contains(i))
       					p.drawPixmap(0, pitch2y(i), *mk3_l);
 					else
       					p.drawPixmap(0, pitch2y(i), *mk3_n);
@@ -675,11 +675,11 @@ void Piano::draw(QPainter& p, const QRect& r)
       				//	p.drawPixmap(0, pitch2y(i), *mk2_l);
 					//else
       				//	p.drawPixmap(0, pitch2y(i), *mk2_n);
-					if(keyswitch->contains(i))
+					if(keyswitch.contains(i))
 					{
 						if(preOn)
 						{
-							if(enabled->contains(i))
+							if(!enabled.isEmpty() && enabled.contains(i))
       							p.drawPixmap(0, pitch2y(i), *mk5_s);
 							else
       							p.drawPixmap(0, pitch2y(i), *mk6_s);
@@ -687,7 +687,7 @@ void Piano::draw(QPainter& p, const QRect& r)
 						else
       						p.drawPixmap(0, pitch2y(i), *mk2_s);
 					}
-					else if(!enabled->contains(i))
+					else if(enabled.isEmpty() || !enabled.contains(i))
 					{
       					p.drawPixmap(0, pitch2y(i), *mk2_l);
 					}
@@ -702,9 +702,9 @@ void Piano::draw(QPainter& p, const QRect& r)
      	       case 4:
      	       case 11:
      	             //pm2 = mk1_l;
-					if(keyswitch->contains(i))
+					if(keyswitch.contains(i))
       					p.drawPixmap(0, pitch2y(i), *mk1_s);
-					else if(!enabled->contains(i))
+					else if(enabled.isEmpty() || !enabled.contains(i))
 					{
       					p.drawPixmap(0, pitch2y(i), *mk1_l);
 					}
@@ -715,12 +715,12 @@ void Piano::draw(QPainter& p, const QRect& r)
 					preOn = false;
      	             break;
             default:
-					if(keyswitch->contains(i))
+					if(keyswitch.contains(i))
 					{
       					p.drawPixmap(0, pitch2y(i), *mk4_s);
 						preOn = false;
 					}
-					else if(!enabled->contains(i))
+					else if(enabled.isEmpty() || !enabled.contains(i))
 					{
       					p.drawPixmap(0, pitch2y(i), *mk4_l);
 						preOn = true;
@@ -775,6 +775,13 @@ void Piano::draw(QPainter& p, const QRect& r)
           }
       }
       
+}
+
+void Piano::setMIDIKeyBindings(QList<int> e, QList<int> s)
+{
+	enabled = e;//info->key_bindings;
+	keyswitch = s;//info->keyswitch_bindings;
+	redraw();
 }
 
 //---------------------------------------------------------

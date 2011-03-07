@@ -47,6 +47,7 @@
 #include "gconfig.h"
 #include "icons.h"
 #include "audio.h"
+#include "midiport.h"
 
 #include "cmd.h"
 #include "quantconfig.h"
@@ -478,7 +479,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	pcbar->setAudio(audio);
 	//pcbar->setEditor(this);
 	time = new MTScale(&_raster, split1, xscale);
-	Piano* piano = new Piano(split1, yscale);
+	/*Piano*/ piano = new Piano(split1, yscale);
 	canvas = new PianoCanvas(this, split1, xscale, yscale);
 	vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
 
@@ -1702,6 +1703,62 @@ void PianoRoll::setSpeaker(bool val)
 	_playEvents = val;
 	canvas->playEvents(_playEvents);
 }
+
+#ifdef LSCP_SUPPORT
+//---------------------------------------------------------
+//   setKeyBindings
+//---------------------------------------------------------
+
+void PianoRoll::setKeyBindings(LSCPChannelInfo info)
+{
+	if(!selected || audio->isPlaying())
+		return;
+	//check if the lscp information is pertaining to this track and port
+	Track *t = curCanvasPart()->track();
+	RouteList *rl = t->inRoutes();
+	for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
+	{
+		if((*ir).name() == QString(info.midi_portname))
+		{
+			if(isCurrentPatch(info.hbank, info.lbank, info.program))
+				piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
+			break;
+		}
+	}
+}
+#endif
+
+bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
+{
+	if(!selected)
+		return false;
+	MidiTrack *tr = (MidiTrack*)selected;
+	int outChannel = tr->outChannel();
+	int outPort = tr->outPort();
+	MidiPort* mp = &midiPorts[outPort];
+	int program = mp->hwCtrlState(outChannel, CTRL_PROGRAM);
+	if (program == CTRL_VAL_UNKNOWN)
+	{
+		program = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
+	}
+	
+	if (program == CTRL_VAL_UNKNOWN)
+	{
+		return false;
+	}
+	int hb = ((program >> 16) & 0xff) + 1;
+	if (hb == 0x100)
+		hb = 0;
+	int lb = ((program >> 8) & 0xff) + 1;
+	if (lb == 0x100)
+		lb = 0;
+	int pr = (program & 0xff) + 1;
+	if (pr == 0x100)
+		pr = 0;
+
+	return (hb == hbank && lb == lbank && pr == prog);
+
+}/*}}}*/
 
 //---------------------------------------------------------
 //   resizeEvent
