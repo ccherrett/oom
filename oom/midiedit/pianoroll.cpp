@@ -1725,6 +1725,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	Track *t = curCanvasPart()->track();
 	RouteList *rl = t->outRoutes();
 	printf("info.hbank = %d, info.lbank = %d, info.program = %d\n", info.hbank, info.lbank, info.program);
+	/*
 	for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
 		printf("oom-port-name: %s, lscp-port-name: %s\n", (*ir).name().toAscii().data(), QString(info.midi_portname).toAscii().data());
@@ -1734,11 +1735,13 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 			if(isCurrentPatch(info.hbank, info.lbank, info.program))
 			{
 				printf("is current patch calling setMIDIKeyBindings\n");
+				*/
 				piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
+				/*
 			}	
 			break;
 		}
-	}
+	}*/
 }
 #endif
 
