@@ -1737,7 +1737,13 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 		printf("found midi track\n");
 	}
     MidiPort* mp = &midiPorts[midiTrack->outPort()];
-	RouteList *rl = mp->outRoutes();
+	MidiDevice* dev = mp->device();
+	if (!dev)
+	{
+		return;
+	}
+    RouteList *rl = dev->outRoutes();
+
 
 	printf("rl.size() %d\n", rl->size());
 
