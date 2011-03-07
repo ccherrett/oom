@@ -1711,8 +1711,10 @@ void PianoRoll::setSpeaker(bool val)
 
 void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 {
+	printf("entering PianoRoll::setKeyBindings");
 	if(!selected || audio->isPlaying())
 		return;
+	printf("not playing and selected");	
 	//check if the lscp information is pertaining to this track and port
 	Track *t = curCanvasPart()->track();
 	RouteList *rl = t->inRoutes();
@@ -1720,8 +1722,12 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	{
 		if((*ir).name() == QString(info.midi_portname))
 		{
+			printf("port names match");
 			if(isCurrentPatch(info.hbank, info.lbank, info.program))
+			{
+				printf("is current patch calling setMIDIKeyBindings");
 				piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
+			}	
 			break;
 		}
 	}
