@@ -134,11 +134,12 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 					info.midi_device = chanInfo->midi_device;
 					info.midi_channel = chanInfo->midi_channel;
 					char iquery[1024];
-					sprintf(iquery, "GET MIDI_INPUT_PORT INFO %d %d",chanInfo->midi_port, chanInfo->midi_channel);
+					sprintf(iquery, "GET MIDI_INPUT_PORT INFO %d %d",chanInfo->midi_device, chanInfo->midi_port);
 					if (lscp_client_query(_client, iquery) == LSCP_OK)
 					{
+						printf("Query for MIDI_INPPUT_PORT\n%s\n", iquery);
 						const char* ret = lscp_client_get_result(_client);
-						printf("Return value of MIDI_INPPUT_PORT\n\n%s", ret);
+						printf("Return value of MIDI_INPPUT_PORT\n%s\n", ret);
 						QString midiInputPort(ret);
 						QStringList sl = midiInputPort.split("\r\n", QString::SkipEmptyParts);
 						QStringListIterator iter(sl);
