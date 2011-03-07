@@ -1727,7 +1727,8 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	printf("info.hbank = %d, info.lbank = %d, info.program = %d\n", info.hbank, info.lbank, info.program);
 	for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
-		printf("oom-port-name: %s, lscp-port-name: %s\n", (*ir).name(), QString(info.midi_portname));
+
+		printf("oom-port-name: %s, lscp-port-name: %s\n", (*ir).name(), QString(info.midi_portname).toAscii().data());
 		if((*ir).name() == QString(info.midi_portname))
 		{
 			printf("port names match\n");
