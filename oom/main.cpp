@@ -549,6 +549,9 @@ int main(int argc, char* argv[])
 	oom->seqStart();
 	//Finally launch the server on port 8415
 	oom->startServer();
+#ifdef LSCP_SUPPORT
+	oom->startLSCPClient();
+#endif
 
 #ifdef HAVE_LASH
 	{

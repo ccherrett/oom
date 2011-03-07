@@ -378,6 +378,23 @@ void OOMidi::stopServer()
 	}
 }
 
+#ifdef LSCP_SUPPORT
+void OOMidi::startLSCPClient()
+{
+	lsclient = new LSClient();
+	connect(lsclient, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), SIGNAL(channelInfoChanged(const LSCPChannelInfo&)));
+	lsclient->start();
+}
+
+void OOMidi::stopLSCPClient()
+{
+	if(lsclient)
+	{
+		lsclient->stopClient();
+	}
+}
+#endif
+
 void OOMidi::pipelineStateChanged(int state)
 {
 	switch(state)
@@ -1524,22 +1541,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	song->update();
 	
-#ifdef LSCP_SUPPORT
-	/*LSClient* lsc = new LSClient("192.168.1.53");
-	if(lsc->initClient())
-	{
-		printf("Initialized LSCP client connection\n");
-		lsc->testClient();
-		QString file("/home/chris/Drive3_SSD/VSL/PRO/Orchestral_Cube/Strings/01 Violin ensemble - 14/01 VI-14_SHORT-NOTES.gig");
-		QList<int> *keybindings = lsc->getKeyBindings(file.toUtf8().constData(), 1);
-	}
-	else
-	{
-		printf("Failed to Initialize LSCP client connection\n");
-	}*/
-#else
-	printf("NO LSCP Support!!!\n");
-#endif
 }
 
 OOMidi::~OOMidi()

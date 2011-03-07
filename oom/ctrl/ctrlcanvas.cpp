@@ -1275,7 +1275,7 @@ void CtrlCanvas::setTool(int t)
 	switch (tool)
 	{
 		case PencilTool:
-			setCursor(QCursor(*pencilIcon, 4, 15));
+			setCursor(QCursor(*pencilCursorIcon, 4, 15));
 			break;
 		case DrawTool:
 			drawLineMode = false;

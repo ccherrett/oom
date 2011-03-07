@@ -13,6 +13,7 @@
 #include "cobject.h"
 #include "tools.h"
 #include "cserver.h"
+#include "lsclient.h"
 
 #include <QFileInfo>
 
@@ -234,9 +235,15 @@ class OOMidi : public QMainWindow
     QSignalMapper *midiPluginSignalMapper;
     QSignalMapper *followSignalMapper;
 	OOMCommandServer server;
+#ifdef LSCP_SUPPORT
+	LSClient *lsclient;
+#endif
 
 signals:
     void configChanged();
+#ifdef LSCP_SUPPORT
+	void channelInfoChanged(const LSCPChannelInfo&);
+#endif
 
 private slots:
     //void runPythonScript();
@@ -359,6 +366,10 @@ public slots:
     void configMidiPorts();
 	bool startServer();
 	void stopServer();
+#ifdef LSCP_SUPPORT
+	void startLSCPClient();
+	void stopLSCPClient();
+#endif
 	void pipelineStateChanged(int);
 	void connectDefaultSongPorts();
 

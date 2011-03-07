@@ -1,96 +1,81 @@
 #include "config.h"
+#include "globals.h"
 #ifdef LSCP_SUPPORT
 #include "lsclient.h"
 #include <ctype.h>
 #include <QStringListIterator>
 #include <QStringList>
+#include <QCoreApplication>
 
-LSClient::LSClient(const char* host, int p)
+LSClient::LSClient(const char* host, int p, QObject* parent) : QThread(parent)
 {
 	_hostname = host;
 	_port = p;
+	_abort = false;
 }
 
 LSClient::~LSClient()
 {
+	mutex.lock();
+	_abort = true;
+	//condition.wakeOne();
+	mutex.unlock();
+	wait();
 }
 
-lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t event, const char *pchData, int cchData, void* /*pvData*/ )
+lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t event, const char *pchData, int cchData, void* pvData )
 {
 	lscp_status_t ret = LSCP_FAILED;
+	LSClient* lsc = (LSClient*)pvData;
 
-	char *pszData = (char *) malloc(cchData + 1);
-	if (pszData) {
-		memcpy(pszData, pchData, cchData);
-		pszData[cchData] = (char) 0;
-		printf("client_callback: event=%s (0x%04x) [%s]\n", lscp_event_to_text(event), (int) event, pszData);
-		free(pszData);
-		ret = LSCP_OK;
+	if(lsc == NULL)
+		return ret;
+
+	switch(event)
+	{
+		case LSCP_EVENT_CHANNEL_INFO:
+			QCoreApplication::postEvent(lsc, new LscpEvent(event, pchData, cchData));
+		break;
+		default:
+			return LSCP_OK;
+		break;
 	}
-
-	return ret;
+	return LSCP_OK;
 }
 
-bool LSClient::initClient()
+void LSClient::run()
 {
 	_client = ::lscp_client_create(_hostname, _port, client_callback, this);
-	if(_client == NULL)
+	if(_client != NULL)
 	{
-		return false;
+		printf("Initialized LSCP client connection\n");
+		::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 	}
-	//lscp_client_subscribe(_client, LSCP_EVENT_MISCELLANEOUS);
-	lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
-	//lscp_client_subscribe(_client, LSCP_EVENT_MIDI_INSTRUMENT_MAP_INFO);
-	//lscp_client_subscribe(_client, LSCP_EVENT_MIDI_INSTRUMENT_INFO);
-	return true;
+	else
+	{
+		printf("Failed to Initialize LSCP client connection\n");
+		//
+	}
+	forever 
+	{
+		if(_abort)
+		{
+			stopClient();
+			return;
+		}
+	}
 }
 
-int LSClient::client_test_status ( lscp_status_t s )
+void LSClient::stopClient()
 {
-	const char *pszStatus;
-
-	switch (s) {
-	case LSCP_OK:         pszStatus = "OK";       break;
-	case LSCP_FAILED:     pszStatus = "FAILED";   break;
-	case LSCP_ERROR:      pszStatus = "ERROR";    break;
-	case LSCP_WARNING:    pszStatus = "WARNING";  break;
-	case LSCP_TIMEOUT:    pszStatus = "TIMEOUT";  break;
-	case LSCP_QUIT:       pszStatus = "QUIT";     break;
-	default:              pszStatus = "NONE";     break;
+	if(_client != NULL)
+	{
+		//TODO: create a list of subscribed events so we can reference it here and unsubscribe 
+		//to any subscribed event.
+		::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
+		::lscp_client_destroy(_client);
+		_abort = true;
 	}
-	printf("%s\n", pszStatus);
-	return (s == LSCP_OK ? 0 : 1);
-}
-
-int LSClient::client_test_channel_info ( lscp_channel_info_t *pChannelInfo )
-{
-	if (pChannelInfo == NULL) {
-		printf("(nil)\n");
-		return 1;
-	}
-	printf("{\n");
-	printf("    channel_info.engine_name       = %s\n", pChannelInfo->engine_name);
-	printf("    channel_info.audio_device      = %d\n", pChannelInfo->audio_device);
-	printf("    channel_info.audio_channels    = %d\n", pChannelInfo->audio_channels);
-//	printf("    channel_info.audio_routing     = %d\n", pChannelInfo->audio_routing);
-	printf("    channel_info.instrument_file   = %s\n", pChannelInfo->instrument_file);
-	printf("    channel_info.instrument_nr     = %d\n", pChannelInfo->instrument_nr);
-	printf("    channel_info.instrument_name   = %s\n", pChannelInfo->instrument_name);
-	printf("    channel_info.instrument_status = %d\n", pChannelInfo->instrument_status);
-	printf("    channel_info.midi_device       = %d\n", pChannelInfo->midi_device);
-	printf("    channel_info.midi_port         = %d\n", pChannelInfo->midi_port);
-	printf("    channel_info.midi_channel      = %d\n", pChannelInfo->midi_channel);
-	printf("    channel_info.midi_map          = %d\n", pChannelInfo->midi_map);
-	printf("    channel_info.volume            = %g\n", pChannelInfo->volume);
-	printf("    channel_info.mute              = %d\n", pChannelInfo->mute);
-	printf("    channel_info.solo              = %d\n", pChannelInfo->solo);
-	printf("  }\n");
-	return 0;
-}
-
-
-void LSClient::testClient()
-{
 }
 
 /**
@@ -100,56 +85,139 @@ void LSClient::testClient()
  * The list will be zero length if there is an error or NULL is returned
  * by linuxsampler
  */
-QList<QList<int>*>* LSClient::getKeyBindings(QString fname, int instrId)/*{{{*/
+const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{{{*/
 {
-	QList<int> *keys = new QList<int>();
-	QList<int> *switched = new QList<int>();
-	QList<QList<int>*> *list = new QList<QList<int>*>();
+	LSCPChannelInfo info;
+	if(chanInfo == NULL)
+	{
+		info.valid = false;
+		return info;
+	}
+	QList<int> keys;
+	QList<int> switched;
 	QString keyStr = "KEY_BINDINGS:";
 	QString keySwitchStr = "KEYSWITCH_BINDINGS:";
 	char query[1024];
-	sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", fname.toUtf8().constData(), instrId);
-	if (lscp_client_query(_client, query) == LSCP_OK)
+	bool process = false;
+	
+	//Lookup the instrument map
+	lscp_midi_instrument_t* mInstrs = ::lscp_list_midi_instruments(_client, chanInfo->midi_map);
+	for (int iInstr = 0; mInstrs && mInstrs[iInstr].map >= 0; iInstr++)
 	{
-		const char* ret = lscp_client_get_result(_client);
-		QString values(ret);
-		printf("Server Returned:\n %s\n",ret);
-		QStringList arrayVal = values.split("\r\n", QString::SkipEmptyParts);
-		QStringListIterator vIter(arrayVal);
-		while(vIter.hasNext())
+		lscp_midi_instrument_info_t *instrInfo = ::lscp_get_midi_instrument_info(_client, &mInstrs[iInstr]);
+		if(instrInfo)
 		{
-			QString i = vIter.next().trimmed();
-			if(i.startsWith(keyStr, Qt::CaseSensitive))
+			if(instrInfo->instrument_file == chanInfo->instrument_file && instrInfo->instrument_nr == chanInfo->instrument_nr)
 			{
-				i = i.replace(keyStr, "").trimmed();
-				if(i.contains(","))
+				info.instrument_name = instrInfo->instrument_name;
+				info.instrument_filename = instrInfo->instrument_file;
+				info.lbank = mInstrs[iInstr].map;
+				info.hbank = mInstrs[iInstr].bank;
+				info.program = mInstrs[iInstr].prog;
+				info.midi_port = chanInfo->midi_port;
+				info.midi_device = chanInfo->midi_device;
+				info.midi_channel = chanInfo->midi_channel;
+				char iquery[1024];
+				sprintf(iquery, "GET MIDI_INPUT_PORT INFO %d %d",chanInfo->midi_port, chanInfo->midi_channel);
+				if (lscp_client_query(_client, iquery) == LSCP_OK)
 				{
-					QStringList sl = i.split(",", QString::SkipEmptyParts);
+					const char* ret = lscp_client_get_result(_client);
+					QString midiInputPort(ret);
+					QStringList sl = midiInputPort.split("\r\n", QString::SkipEmptyParts);
 					QStringListIterator iter(sl);
 					while(iter.hasNext())
 					{
-						keys->append(iter.next().toInt());
+						QString tmp = iter.next().trimmed();
+						if(tmp.startsWith("NAME", Qt::CaseSensitive))
+						{
+							QStringList tmp2 = tmp.split(":", QString::SkipEmptyParts);
+							if(tmp2.size() == 2)
+							{
+								info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
+								process = true;
+								break;
+							}
+						}
 					}
-					list->insert(0, keys);
 				}
+				break;
 			}
-			else if(i.startsWith(keySwitchStr, Qt::CaseSensitive))
+		}
+	}
+	if(process)
+	{
+		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", chanInfo->instrument_file, chanInfo->instrument_nr);
+		if (lscp_client_query(_client, query) == LSCP_OK)
+		{
+			const char* ret = lscp_client_get_result(_client);
+			QString values(ret);
+			if(debugMsg)
+				printf("Server Returned:\n %s\n", ret);
+			QStringList arrayVal = values.split("\r\n", QString::SkipEmptyParts);
+			QStringListIterator vIter(arrayVal);
+			while(vIter.hasNext())
 			{
-				i = i.replace(keySwitchStr, "").trimmed();
-				if(i.contains(","))
+				QString i = vIter.next().trimmed();
+				if(i.startsWith(keyStr, Qt::CaseSensitive))
 				{
-					QStringList sl = i.split(",", QString::SkipEmptyParts);
-					QStringListIterator iter(sl);
-					while(iter.hasNext())
+					i = i.replace(keyStr, "").trimmed();
+					if(i.contains(","))
 					{
-						switched->append(iter.next().toInt());
+						QStringList sl = i.split(",", QString::SkipEmptyParts);
+						QStringListIterator iter(sl);
+						while(iter.hasNext())
+						{
+							keys.append(iter.next().toInt());
+						}
+						info.key_bindings = keys;
 					}
-					list->insert(1, switched);
+				}
+				else if(i.startsWith(keySwitchStr, Qt::CaseSensitive))
+				{
+					i = i.replace(keySwitchStr, "").trimmed();
+					if(i.contains(","))
+					{
+						QStringList sl = i.split(",", QString::SkipEmptyParts);
+						QStringListIterator iter(sl);
+						while(iter.hasNext())
+						{
+							switched.append(iter.next().toInt());
+						}
+						info.keyswitch_bindings = switched;
+					}
 				}
 			}
 		}
 	}
 
-	return list;
+	info.valid = process;
+	return info;
 }/*}}}*/
+
+void LSClient::customEvent(QEvent* event)
+{
+
+	LscpEvent *lscpEvent = static_cast<LscpEvent *> (event);
+	if(lscpEvent)
+	{
+		switch(lscpEvent->event())
+		{
+			case LSCP_EVENT_CHANNEL_INFO:
+			{
+				int channel = lscpEvent->data().toInt();
+				lscp_channel_info_t* chanInfo = ::lscp_get_channel_info(_client, channel);
+				if(chanInfo != NULL)
+				{
+					LSCPChannelInfo info = getKeyBindings(chanInfo);
+					if(info.valid)
+						emit channelInfoChanged(info);
+				}
+				break;
+			}	
+			default:
+				return;
+			break;
+		}
+	}
+}
 #endif

@@ -39,10 +39,7 @@ Route::Route(void* t, int ch)
 	type = JACK_ROUTE;
 }
 
-//Route::Route(AudioTrack* t, int ch)
-
 Route::Route(Track* t, int ch, int chans)
-//Route::Route(Track* t, int ch)
 {
 	track = t;
 	midiPort = -1;
@@ -52,8 +49,6 @@ Route::Route(Track* t, int ch, int chans)
 	type = TRACK_ROUTE;
 }
 
-//Route::Route(MidiJackDevice* d)
-
 Route::Route(MidiDevice* d, int ch)
 {
 	device = d;
@@ -61,15 +56,6 @@ Route::Route(MidiDevice* d, int ch)
 	channel = ch;
 	channels = -1;
 	remoteChannel = -1;
-	/*
-	//if(dynamic_cast<MidiJackDevice*>(d))
-	if(d->deviceType() == MidiDevice::JACK_MIDI)
-	  type    = JACK_MIDI_ROUTE;
-	else
-	//if(dynamic_cast<MidiAlsaDevice*>(d))
-	if(d->deviceType() == MidiDevice::ALSA_MIDI)
-	  type    = ALSA_MIDI_ROUTE;
-	 */
 	type = MIDI_DEVICE_ROUTE;
 }
 
@@ -83,17 +69,12 @@ Route::Route(int port, int ch) // p3.3.49
 	type = MIDI_PORT_ROUTE;
 }
 
-//Route::Route(const QString& s, bool dst, int ch)
-
 Route::Route(const QString& s, bool dst, int ch, int rtype)
 {
-	//Route node(name2route(s, dst));
 	Route node(name2route(s, dst, rtype));
 	channel = node.channel;
 	if (channel == -1)
 		channel = ch;
-	//if(channels == -1)
-	//  channels = chans;
 	channels = node.channels;
 	remoteChannel = node.remoteChannel;
 	type = node.type;
@@ -102,31 +83,20 @@ Route::Route(const QString& s, bool dst, int ch, int rtype)
 		track = node.track;
 		midiPort = -1;
 	}
-	else
-		if (type == JACK_ROUTE)
+	else if (type == JACK_ROUTE)
 	{
 		jackPort = node.jackPort;
 		midiPort = -1;
 	}
-		/*
-		else
-		if (type == JACK_MIDI_ROUTE)
-			  device = node.device;
-		else
-		if (type == ALSA_MIDI_ROUTE)
-			  device = node.device;
-		 */
-	else
-		if (type == MIDI_DEVICE_ROUTE)
+	else if (type == MIDI_DEVICE_ROUTE)
 	{
 		device = node.device;
 		midiPort = -1;
 	}
-	else
-		if (type == MIDI_PORT_ROUTE) // p3.3.49
+	else if (type == MIDI_PORT_ROUTE)
 	{
 		track = 0;
-		midiPort = node.midiPort; //
+		midiPort = node.midiPort;
 	}
 }
 
@@ -159,44 +129,28 @@ void addRoute(Route src, Route dst)
 		return;
 	}
 
-	//      printf("addRoute %d.%d:<%s> %d.%d:<%s>\n",
-	//         src.type, src.channel, src.name().toLatin1().constData(),
-	//         dst.type, dst.channel, dst.name().toLatin1().constData());
 	if (src.type == Route::JACK_ROUTE)
 	{
-		//if (dst.type != TRACK_ROUTE)
-		//{
-		//      fprintf(stderr, "addRoute: bad route 1\n");
-		// exit(-1);
-		//      return;
-		//}
-
 		if (dst.type == Route::TRACK_ROUTE)
 		{
 			if (dst.track->type() != Track::AUDIO_INPUT)
 			{
 				fprintf(stderr, "addRoute: source is jack, dest:%s is track but not audio input\n", dst.track->name().toLatin1().constData());
-				//exit(-1);
 				return;
 			}
 			if (dst.channel < 0)
 			{
 				fprintf(stderr, "addRoute: source is jack, dest:%s is track but invalid channel:%d\n", dst.track->name().toLatin1().constData(), dst.channel);
-				//exit(-1);
 				return;
 			}
 
-			//src.channel = src.dstChannel = dst.channel;
 			src.channel = dst.channel;
-			//src.channels = dst.channels = 1;
 			RouteList* inRoutes = dst.track->inRoutes();
 			for (iRoute i = inRoutes->begin(); i != inRoutes->end(); ++i)
 			{
 				if (*i == src) // route already there
 				{
-					//#ifdef ROUTE_DEBUG
 					fprintf(stderr, "addRoute: src track route already exists.\n");
-					//#endif
 					return;
 				}
 			}
@@ -205,37 +159,18 @@ void addRoute(Route src, Route dst)
 #endif
 			inRoutes->push_back(src);
 		}
-		else
-			//if (dst.type == Route::JACK_MIDI_ROUTE)
-			if (dst.type == Route::MIDI_DEVICE_ROUTE)
-			//if (dst.type == Route::MIDI_PORT_ROUTE)      // p3.3.49
+		else if (dst.type == Route::MIDI_DEVICE_ROUTE)
 		{
-			//MidiDevice *md = midiPorts[dst.midiPort].device();
-			//if(dst.device->deviceType() == MidiDevice::JACK_MIDI)
-			//if(!md)
-			//{
-			//  fprintf(stderr, "addRoute: source is Jack, but no destination port device\n");
-			//  return;
-			//}
-
 			if (dst.device->deviceType() == MidiDevice::JACK_MIDI)
-				//if(md->deviceType() == MidiDevice::JACK_MIDI)
 			{
 				src.channel = dst.channel;
-				//src.channel = -1;
-				//src.channel = 0;
-				//src.channel = src.dstChannel = dst.channel;
-				//src.channels = dst.channels = 1;
-				//dst.channel = -1;
 
 				RouteList* routes = dst.device->inRoutes();
 				for (iRoute i = routes->begin(); i != routes->end(); ++i)
 				{
 					if (*i == src) // route already there
 					{
-						//#ifdef ROUTE_DEBUG
 						fprintf(stderr, "addRoute: src Jack midi route already exists.\n");
-						//#endif
 						return;
 					}
 				}
@@ -247,45 +182,32 @@ void addRoute(Route src, Route dst)
 			else
 			{
 				fprintf(stderr, "addRoute: source is Jack, but destination is not jack midi - type:%d\n", dst.device->deviceType());
-				// exit(-1);
 				return;
 			}
 		}
 		else
 		{
 			fprintf(stderr, "addRoute: source is Jack, but destination is not track or midi - type:%d \n", dst.type);
-			// exit(-1);
 			return;
 		}
 	}
 	else if (dst.type == Route::JACK_ROUTE)
 	{
-		//if (src.type != TRACK_ROUTE)
-		//{
-		//      fprintf(stderr, "addRoute: bad route 3\n");
-		// exit(-1);
-		//      return;
-		//}
-
 		if (src.type == Route::TRACK_ROUTE)
 		{
 			if (src.track->type() != Track::AUDIO_OUTPUT)
 			{
 				fprintf(stderr, "addRoute: destination is jack, source is track but not audio output\n");
-				// exit(-1);
 				return;
 			}
 			if (src.channel < 0)
 			{
 				fprintf(stderr, "addRoute: destination is jack, source:%s is track but invalid channel:%d\n", src.track->name().toLatin1().constData(), src.channel);
-				// exit(-1);
 				return;
 			}
 
 			RouteList* outRoutes = src.track->outRoutes();
-			//dst.channel = dst.dstChannel = src.channel;
 			dst.channel = src.channel;
-			//dst.channels = src.channels = 1;
 
 			for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
 			{
@@ -302,26 +224,18 @@ void addRoute(Route src, Route dst)
 #endif
 			outRoutes->push_back(dst);
 		}
-		else
-			//if (src.type == Route::JACK_MIDI_ROUTE)
-			if (src.type == Route::MIDI_DEVICE_ROUTE)
+		else if (src.type == Route::MIDI_DEVICE_ROUTE)
 		{
 			if (src.device->deviceType() == MidiDevice::JACK_MIDI)
 			{
 				dst.channel = src.channel;
-				//dst.channel = -1;
-				//src.channel = -1;
-				//dst.channel = dst.dstChannel = src.channel;
-				//dst.channels = src.channels = 1;
 
 				RouteList* routes = src.device->outRoutes();
 				for (iRoute i = routes->begin(); i != routes->end(); ++i)
 				{
 					if (*i == dst) // route already there
 					{
-						//#ifdef ROUTE_DEBUG
 						fprintf(stderr, "addRoute: dst Jack midi route already exists.\n");
-						//#endif
 						return;
 					}
 				}
@@ -333,14 +247,12 @@ void addRoute(Route src, Route dst)
 			else
 			{
 				fprintf(stderr, "addRoute: destination is Jack, but source is not jack midi - type:%d\n", src.device->deviceType());
-				// exit(-1);
 				return;
 			}
 		}
 		else
 		{
 			fprintf(stderr, "addRoute: destination is Jack, but source is not track or midi - type:%d \n", src.type);
-			// exit(-1);
 			return;
 		}
 	}
@@ -357,31 +269,17 @@ void addRoute(Route src, Route dst)
 			return;
 		}
 
-		//MidiDevice *md = midiPorts[src.midiPort].device();
-		//if(!md)
-		//{
-		//  fprintf(stderr, "addRoute: source is midi port, but no destination port device\n");
-		//  return;
-		//}
-
 		MidiPort *mp = &midiPorts[src.midiPort];
 
 		src.channel = dst.channel;
 		RouteList* outRoutes = mp->outRoutes();
-		//for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
 		iRoute ir = outRoutes->begin(); // p3.3.50
 		for (; ir != outRoutes->end(); ++ir)
 		{
-			//if (*i == dst)    // route already there
 			if (ir->type == Route::TRACK_ROUTE && ir->track == dst.track) // p3.3.50 Does a route to the track exist?
 			{
-				//#ifdef ROUTE_DEBUG
-				//fprintf(stderr, "addRoute: src midi port:%d dst track:%s route already exists.\n", src.midiPort, dst.track->name().toLatin1().constData());
-				//#endif
 				ir->channel |= dst.channel; // p3.3.50 Bitwise OR the desired channel bit with the existing bit mask.
 				break;
-
-				//return;
 			}
 		}
 #ifdef ROUTE_DEBUG
@@ -420,29 +318,14 @@ void addRoute(Route src, Route dst)
 			return;
 		}
 
-
-		//MidiDevice *md = midiPorts[dst.midiPort].device();
-		//if(!md)
-		//{
-		//  fprintf(stderr, "addRoute: dst is midi port, but no destination port device\n");
-		//  return;
-		//}
-
 		dst.channel = src.channel;
 		RouteList* outRoutes = src.track->outRoutes();
 
-		//for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
 		iRoute ir = outRoutes->begin(); // p3.3.50
 		for (; ir != outRoutes->end(); ++ir)
 		{
-			//if (*i == dst)    // route already there
 			if (ir->type == Route::MIDI_PORT_ROUTE && ir->midiPort == dst.midiPort) // p3.3.50 Does a route to the midi port exist?
 			{
-				//#ifdef ROUTE_DEBUG
-				//fprintf(stderr, "addRoute: dst midi port:%d src track:%s route already exists.\n", dst.midiPort, src.track->name().toLatin1().constData());
-				//#endif
-				//return;
-
 				ir->channel |= dst.channel; // p3.3.50 Bitwise OR the desired channel bit with the existing bit mask.
 				break;
 			}
@@ -471,7 +354,6 @@ void addRoute(Route src, Route dst)
 
 		if (ir == inRoutes->end()) // p3.3.50 Only if route not found, add the route, with the requested channel bits as mask to start with.
 			inRoutes->push_back(src);
-		//inRoutes->insert(inRoutes->begin(), src);
 	}
 	else
 	{
@@ -481,52 +363,7 @@ void addRoute(Route src, Route dst)
 			return;
 		}
 
-		// Removed p3.3.49
-		/*
-		//if ((src.type == Route::JACK_MIDI_ROUTE) || (src.type == Route::ALSA_MIDI_ROUTE))
-		if(src.type == Route::MIDI_DEVICE_ROUTE)
 		{
-			//src.channel = src.dstChannel = dst.dstChannel = dst.channel;
-			src.channel = dst.channel;
-			//src.channels = dst.channels = 1;
-			RouteList* outRoutes = src.device->outRoutes();
-			#ifdef ROUTE_DEBUG
-			fprintf(stderr, "addRoute: src name: %s looking for existing dest in out routes...\n", src.device->name().toLatin1().constData());
-			#endif
-			for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
-			{
-				  if (*i == dst)    // route already there
-				  {
-						//#ifdef ROUTE_DEBUG
-						fprintf(stderr, "addRoute: src Jack or ALSA midi route already exists.\n");
-						//#endif
-						return;
-				  }
-			}
-			#ifdef ROUTE_DEBUG
-			fprintf(stderr, "addRoute: src midi dst name: %s pushing destination and source routes\n", dst.track->name().toLatin1().constData());
-			#endif
-            
-			outRoutes->push_back(dst);
-			RouteList* inRoutes = dst.track->inRoutes();
-			inRoutes->push_back(src);
-		}
-		else
-		 */
-
-		{
-			///if(dst.type == Route::MIDI_DEVICE_ROUTE)  // Removed p3.3.49
-			//{
-			///  dst.channel = src.channel;
-			//src.channel = src.dstChannel = dst.dstChannel = dst.channel;
-			//src.channels = dst.channels = 1;
-			//}
-			//else
-			//{
-			//src.channel = src.dstChannel = dst.dstChannel = dst.channel;
-			//src.channels = dst.channels = 1;
-			//}
-
 			RouteList* outRoutes = src.track->outRoutes();
 
 			//
@@ -538,74 +375,28 @@ void addRoute(Route src, Route dst)
 					src.channel = 0;
 				if (src.channels == -1)
 					src.channels = src.track->channels();
-				//if(dst.type == Route::TRACK_ROUTE)      // p3.3.49 Removed
-				//{
-				//if(dst.channel == -1)
-				//  dst.channel = 0;
-				//if(dst.channels == -1)
-				// Yes, that's correct: dst channels = src track channels.
-				//  dst.channels = src.track->channels();
 				dst.channel = src.channel;
 				dst.channels = src.channels;
 				dst.remoteChannel = src.remoteChannel;
-				//}
 			}
-			//if(dst.type == Route::TRACK_ROUTE && dst.track->type() == Track::AUDIO_SOFTSYNTH)
-			//{
-			//  if(dst.channel == -1)
-			//    dst.channel = 0;
-			//  if(dst.channels == -1)
-			// Yes, that's correct: dst channels = src track channels.
-			//    dst.channels = src.track->channels();
-			//}
 
 			for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
 			{
 				if (*i == dst) // route already there
-					// TODO:
-					//if (i->type == dst.type && i->channel == dst.channel)
 				{
-					//if(i->type == Route::TRACK_ROUTE)
-					{
-						//if(i->track == dst.track)
-						{
-							//if(i->channels == dst.channels)
-							{
-								//#ifdef ROUTE_DEBUG
-								fprintf(stderr, "addRoute: src track route already exists.\n");
-								//#endif
-								return;
-							}
-							//else
-							//{
-
-							//}
-						}
-					}
+					//#ifdef ROUTE_DEBUG
+					fprintf(stderr, "addRoute: src track route already exists.\n");
+					//#endif
+					return;
 				}
 			}
 			outRoutes->push_back(dst);
 			RouteList* inRoutes;
 
-			// Removed p3.3.49
-			/*
-			//if ((dst.type == Route::JACK_MIDI_ROUTE) || (dst.type == Route::ALSA_MIDI_ROUTE))
-			if(dst.type == Route::MIDI_DEVICE_ROUTE)
-			{
-			  #ifdef ROUTE_DEBUG
-			  fprintf(stderr, "addRoute: src track dst midi name: %s pushing destination and source routes\n", dst.device->name().toLatin1().constData());
-			  #endif
-			  inRoutes = dst.device->inRoutes();
-			}
-			else
-			 */
-
 			{
 #ifdef ROUTE_DEBUG
-				//fprintf(stderr, "addRoute: src track ch:%d chs:%d  dst track ch:%d chs:%d name: %s pushing destination and source routes\n", src.channel, src.channels, dst.channel, dst.channels, dst.track->name().toLatin1().constData());
 				fprintf(stderr, "addRoute: src track ch:%d chs:%d remch:%d  dst track ch:%d chs:%d remch:%d name: %s pushing dest and source routes\n",
 						src.channel, src.channels, src.remoteChannel, dst.channel, dst.channels, dst.remoteChannel, dst.track->name().toLatin1().constData());
-				//fprintf(stderr, "addRoute: src track ch:%d  dst track ch:%d name: %s pushing destination and source routes\n", src.channel, dst.channel, dst.track->name().toLatin1().constData());
 #endif
 				inRoutes = dst.track->inRoutes();
 			}
@@ -628,18 +419,8 @@ void addRoute(Route src, Route dst)
 
 void removeRoute(Route src, Route dst)
 {
-	//printf("removeRoute %d.%d:<%s> %d.%d:<%s>\n",
-	//     src.type, src.channel, src.name().toLatin1().constData(),
-	//     dst.type, dst.channel, dst.name().toLatin1().constData());
-
 	if (src.type == Route::JACK_ROUTE)
 	{
-		//if (dst.type != TRACK_ROUTE)
-		//{
-		//      fprintf(stderr, "removeRoute: bad route 1\n");
-		// exit(-1);
-		//      return;
-		//}
 		if (!dst.isValid())
 		{
 			printf("removeRoute: source is jack, invalid destination\n");
@@ -681,18 +462,11 @@ void removeRoute(Route src, Route dst)
 		else
 		{
 			fprintf(stderr, "removeRoute: source is jack, destination unknown\n");
-			// exit(-1);
 			return;
 		}
 	}
 	else if (dst.type == Route::JACK_ROUTE)
 	{
-		//if (src.type != TRACK_ROUTE)
-		//{
-		//      fprintf(stderr, "removeRoute: bad route 3\n");
-		// exit(-1);
-		//      return;
-		//}
 		if (!src.isValid())
 		{
 			printf("removeRoute: destination is jack, invalid source\n");
@@ -704,7 +478,6 @@ void removeRoute(Route src, Route dst)
 			if (src.track->type() != Track::AUDIO_OUTPUT)
 			{
 				fprintf(stderr, "removeRoute: destination is jack, source is track but not audio output\n");
-				// exit(-1);
 				return;
 			}
 			RouteList* outRoutes = src.track->outRoutes();
@@ -772,7 +545,6 @@ void removeRoute(Route src, Route dst)
 			RouteList* inRoutes = dst.track->inRoutes();
 			for (iRoute i = inRoutes->begin(); i != inRoutes->end(); ++i)
 			{
-				//if (*i == src)
 				if (i->type == Route::MIDI_PORT_ROUTE && i->midiPort == src.midiPort) // p3.3.50 Is there a route to the midi port?
 				{
 					i->channel &= ~src.channel; // p3.3.50 Unset the desired channel bits.
@@ -800,7 +572,6 @@ void removeRoute(Route src, Route dst)
 			RouteList* outRoutes = src.track->outRoutes();
 			for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
 			{
-				//if (*i == dst)
 				if (i->type == Route::MIDI_PORT_ROUTE && i->midiPort == dst.midiPort) // p3.3.50 Is there a route to the midi port?
 				{
 					i->channel &= ~dst.channel; // p3.3.50 Unset the desired channel bits.
@@ -821,7 +592,6 @@ void removeRoute(Route src, Route dst)
 			RouteList* inRoutes = mp->inRoutes();
 			for (iRoute i = inRoutes->begin(); i != inRoutes->end(); ++i)
 			{
-				//if (*i == src)
 				if (i->type == Route::TRACK_ROUTE && i->track == src.track) // p3.3.50 Is there a route to the track?
 				{
 					i->channel &= ~src.channel; // p3.3.50 Unset the desired channel bits.
@@ -926,30 +696,10 @@ static QString track2name(const Track* n)
 
 QString Route::name() const
 {
-	// p3.3.38 Removed
-	/*
-	QString s;
-	if ((type == TRACK_ROUTE) && (channel != -1)) {
-	//      if (channel != -1) {
-		  QString c;
-		  c.setNum(channel+1);
-		  s = c + ":";
-		  }
-	 */
-
 	if (type == MIDI_DEVICE_ROUTE)
 	{
 		if (device)
 		{
-			// p3.3.55 Removed for unified jack in/out devices, the actual port names are now different from device name.
-			// Like this:   device: "MyJackDevice1" ->  inport: "MyJackDevice1_in"  outport: "MyJackDevice1_out"
-			/*
-			if(device->deviceType() == MidiDevice::JACK_MIDI)
-			  return audioDevice->portName(device->clientPort());
-			else
-			 */
-
-			//if(device->deviceType() == MidiDevice::ALSA_MIDI)
 			return device->name();
 		}
 		return QWidget::tr("None");
@@ -958,7 +708,6 @@ QString Route::name() const
 		if (type == JACK_ROUTE)
 	{
 		if (!checkAudioDevice()) return "";
-		//return s + audioDevice->portName(jackPort);
 		return audioDevice->portName(jackPort);
 	}
 	else
@@ -967,7 +716,6 @@ QString Route::name() const
 		return ROUTE_MIDIPORT_NAME_PREFIX + QString().setNum(midiPort);
 	}
 	else
-		//return s + track2name(track);
 		return track2name(track);
 }
 
@@ -992,8 +740,6 @@ Route name2route(const QString& rn, bool /*dst*/, int rtype)
 
 	if (rtype == -1)
 	{
-		//if(dst)
-		//{
 		if (checkAudioDevice())
 		{
 			void* p = audioDevice->findPort(s.toLatin1().constData());
@@ -1035,8 +781,6 @@ Route name2route(const QString& rn, bool /*dst*/, int rtype)
 	}
 	else
 	{
-		//if(dst)
-		//{
 		if (rtype == Route::TRACK_ROUTE)
 		{
 			TrackList* tl = song->tracks();
@@ -1053,43 +797,18 @@ Route name2route(const QString& rn, bool /*dst*/, int rtype)
 					AudioTrack* track = (AudioTrack*) * i;
 					if (track->name() == s)
 						return Route(track, channel);
-					//return Route(track, channel, 1);
-					//return Route(track, channel, track->channels());
 				}
 			}
-		}
-		else
-			//if((rtype == Route::JACK_MIDI_ROUTE) || (rtype == Route::ALSA_MIDI_ROUTE))
-			// TODO Distinguish the device types
-			if (rtype == Route::MIDI_DEVICE_ROUTE)
+		}// TODO Distinguish the device types
+		else if (rtype == Route::MIDI_DEVICE_ROUTE)
 		{
 			for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
 			{
 				if ((*i)->name() == s)
-					//if (jmd->name() == rn)
 					return Route(*i, channel);
-
-				/*
-				MidiJackDevice* jmd = dynamic_cast<MidiJackDevice*>(*i);
-				if(jmd)
-				{
-				  if(jmd->name() == s)
-				  //if (jmd->name() == rn)
-					  return Route(jmd);
-				}
-				MidiAlsaDevice* amd = dynamic_cast<MidiAlsaDevice*>(*i);
-				if(amd)
-				{
-				  // TODO
-				  if(amd->name() == s)
-				  //if (amd->name() == rn)
-					  return Route(amd);
-				}
-				 */
 			}
 		}
-		else
-			if (rtype == Route::JACK_ROUTE)
+		else if (rtype == Route::JACK_ROUTE)
 		{
 			if (checkAudioDevice())
 			{
@@ -1098,8 +817,7 @@ Route name2route(const QString& rn, bool /*dst*/, int rtype)
 					return Route(p, channel);
 			}
 		}
-		else
-			if (rtype == Route::MIDI_PORT_ROUTE) // p3.3.49
+		else if (rtype == Route::MIDI_PORT_ROUTE) // p3.3.49
 		{
 			if (s.left(ROUTE_MIDIPORT_NAME_PREFIX.length()) == ROUTE_MIDIPORT_NAME_PREFIX)
 			{
@@ -1113,7 +831,6 @@ Route name2route(const QString& rn, bool /*dst*/, int rtype)
 
 	printf("  name2route: <%s> not found\n", rn.toLatin1().constData());
 	return Route((Track*) 0, channel);
-	//return Route((Track*) 0, channel, 1);
 }
 
 //---------------------------------------------------------
@@ -1130,10 +847,6 @@ bool checkRoute(const QString& s, const QString& d)
 		return false;
 	if (src.type == Route::JACK_ROUTE)
 	{
-		//if (dst.type != TRACK_ROUTE) {
-		//      return false;
-		//      }
-
 		if (dst.type == Route::TRACK_ROUTE)
 		{
 			if (dst.track->type() != Track::AUDIO_INPUT)
@@ -1150,13 +863,9 @@ bool checkRoute(const QString& s, const QString& d)
 				}
 			}
 		}
-		else
-			//if (dst.type == Route::JACK_MIDI_ROUTE)
-			if (dst.type == Route::MIDI_DEVICE_ROUTE)
+		else if (dst.type == Route::MIDI_DEVICE_ROUTE)
 		{
-			//src.channel = dst.channel;
 			src.channel = -1;
-			//dst.channel = -1;
 			RouteList* routes = dst.device->inRoutes();
 			for (iRoute i = routes->begin(); i != routes->end(); ++i)
 			{
@@ -1171,10 +880,6 @@ bool checkRoute(const QString& s, const QString& d)
 	}
 	else if (dst.type == Route::JACK_ROUTE)
 	{
-		//if (src.type != TRACK_ROUTE) {
-		//      return false;
-		//      }
-
 		if (src.type == Route::TRACK_ROUTE)
 		{
 			if (src.track->type() != Track::AUDIO_OUTPUT)
@@ -1191,14 +896,10 @@ bool checkRoute(const QString& s, const QString& d)
 				}
 			}
 		}
-		else
-			//if (src.type == Route::JACK_MIDI_ROUTE)
-			if (src.type == Route::MIDI_DEVICE_ROUTE)
+		else if (src.type == Route::MIDI_DEVICE_ROUTE)
 		{
 			RouteList* routes = src.device->outRoutes();
-			//dst.channel = src.channel;
 			dst.channel = -1;
-			//src.channel = -1;
 			for (iRoute i = routes->begin(); i != routes->end(); ++i)
 			{
 				if (*i == dst)
@@ -1221,13 +922,8 @@ bool checkRoute(const QString& s, const QString& d)
 			}
 		}
 	}
-		//else if (dst.type == Route::MIDI_PORT_ROUTE) // p3.3.49
-		//{
-		//}
 	else
 	{
-		//RouteList* outRoutes = ((src.type == Route::JACK_MIDI_ROUTE) || (src.type == Route::ALSA_MIDI_ROUTE)) ?
-		//                       src.device->outRoutes() : src.track->outRoutes();
 		RouteList* outRoutes = (src.type == Route::MIDI_DEVICE_ROUTE) ? src.device->outRoutes() : src.track->outRoutes();
 
 		for (iRoute i = outRoutes->begin(); i != outRoutes->end(); ++i)
@@ -1261,9 +957,6 @@ void Route::read(Xml& xml)
 			case Xml::Error:
 			case Xml::End:
 				return;
-				//case Xml::TagStart:
-				//        xml.unknown("Route");
-				//      break;
 			case Xml::Attribut:
 #ifdef ROUTE_DEBUG
 				printf("Route::read(): attribute:%s\n", tag.toLatin1().constData());
@@ -1504,13 +1197,8 @@ void Song::readRoute(Xml& xml)
 
 void RouteList::removeRoute(const Route& r)
 {
-	//printf("RouteList::removeRoute:\n");
-	//r.dump();
-	//printf("Searching routes:\n");
-
 	for (iRoute i = begin(); i != end(); ++i)
 	{
-		//i->dump();
 		if (r == *i)
 		{
 			erase(i);
@@ -1530,9 +1218,6 @@ void Route::dump() const
 	{
 		if (track)
 			printf("Route dump: track <%s> channel %d channels %d\n", track->name().toLatin1().constData(), channel, channels);
-		//printf("Route dump: track <%s> channel %d\n", track->name().toLatin1().constData(), channel);
-		//else
-		//  printf("Route dump: invalid track, channel %d\n", channel);
 	}
 	else
 		if (type == JACK_ROUTE)
@@ -1554,8 +1239,6 @@ void Route::dump() const
 			if (device->deviceType() == MidiDevice::JACK_MIDI)
 			{
 				if (checkAudioDevice())
-					//printf("jack midi port device <%s> ", audioDevice->portName(device->clientPort()).toLatin1().constData());
-					// p3.3.55
 				{
 					printf("jack midi device <%s> ", device->name().toLatin1().constData());
 					if (device->inClientPort())
@@ -1590,8 +1273,6 @@ void Route::dump() const
 
 bool Route::operator==(const Route& a) const
 {
-	//if (type == MIDI_PORT_ROUTE) // p3.3.50
-	//{
 	// Use new channel mask. True if all the bits in a.channel are contained in this route's channel.
 	// Hmm, not commutative... Two such routes are equal if _____ what? ...   Code-specific for now.
 	//  return midiPort == a.midiPort && (channel & a.channel) == a.channel;
@@ -1599,49 +1280,23 @@ bool Route::operator==(const Route& a) const
 	//else
 
 	if ((type == a.type) && (channel == a.channel))
-		//if (type == a.type)
 	{
 		if (type == TRACK_ROUTE)
 		{
 			return track == a.track && channels == a.channels && remoteChannel == a.remoteChannel;
 		}
-		else
-			if (channel == a.channel)
+		else if (channel == a.channel)
 		{
 			if (type == JACK_ROUTE)
 			{
-				//if (!checkAudioDevice()) return false;
-				//return audioDevice->portName(jackPort) == audioDevice->portName(a.jackPort);
-				// p3.3.55 Simplified.
 				return jackPort == a.jackPort;
 			}
-			else
-				if (type == MIDI_PORT_ROUTE) // p3.3.49
+			else if (type == MIDI_PORT_ROUTE)
 			{
 				return midiPort == a.midiPort;
 			}
-			else
-				if (type == MIDI_DEVICE_ROUTE)
+			else if (type == MIDI_DEVICE_ROUTE)
 			{
-				// p3.3.55 Changed for unified jack in/out devices, the actual port names are now different from device name.
-				// Like this:   device: "MyJackDevice1" ->  inport: "MyJackDevice1_in"  outport: "MyJackDevice1_out"
-				/*
-				if(device && a.device && device->deviceType() == a.device->deviceType())
-				{
-				  if(device->deviceType() == MidiDevice::JACK_MIDI)
-				  {
-					if (!checkAudioDevice()) return false;
-					return audioDevice->portName(device->clientPort()) == audioDevice->portName(a.device->clientPort());
-				  }
-				  else
-				  if(device->deviceType() == MidiDevice::ALSA_MIDI)
-					// TODO: OK ??
-					return device->clientPort() == a.device->clientPort() && (channel == a.channel);
-				  else
-				  if(device->deviceType() == MidiDevice::SYNTH_MIDI)
-					return device->name() == a.device->name();
-				}
-				 */
 				return device == a.device;
 			}
 		}

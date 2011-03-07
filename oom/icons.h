@@ -15,6 +15,7 @@ class QIcon;
 extern QPixmap* track_commentIcon;
 extern QPixmap* pointerIcon;
 extern QPixmap* pencilIcon;
+extern QPixmap* pencilCursorIcon;
 extern QPixmap* deleteIcon;
 extern QPixmap* punchinIcon;
 extern QPixmap* punchoutIcon;

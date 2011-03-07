@@ -33,9 +33,7 @@ struct Route
 
     union
     {
-        //AudioTrack* track;
         Track* track;
-        //MidiJackDevice* device;
         MidiDevice* device;
         void* jackPort;
     };
