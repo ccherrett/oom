@@ -95,7 +95,10 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 		info.valid = false;
 		return info;
 	}
-	printf("Channel Info is NULL\n");
+	else
+	{
+		printf("Found Channel\n");
+	}	
 	QList<int> keys;
 	QList<int> switched;
 	QString keyStr = "KEY_BINDINGS:";
