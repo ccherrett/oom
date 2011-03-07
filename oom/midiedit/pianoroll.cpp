@@ -1764,6 +1764,10 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 					printf("is current patch calling setMIDIKeyBindings\n");
 					piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
 				}	
+				else
+				{
+					printf("hbank, lbank and program did not match");
+				}
 				break;
 			}
 			else
@@ -1777,6 +1781,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 
 bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 {
+	printf("entering PianoRoll::isCurrentPatch");
 	if(!selected)
 		return false;
 	MidiTrack *tr = (MidiTrack*)selected;
@@ -1802,6 +1807,7 @@ bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 	int pr = (program & 0xff) + 1;
 	if (pr == 0x100)
 		pr = 0;
+	printf("leaving PianoRoll::isCurrentPatch");
 
 	return (hb == hbank && lb == lbank && pr == prog);
 
