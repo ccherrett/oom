@@ -1,6 +1,7 @@
 #include "config.h"
 #include "globals.h"
 #ifdef LSCP_SUPPORT
+#include "audio.h"
 #include "lsclient.h"
 #include <ctype.h>
 #include <QStringListIterator>
@@ -234,13 +235,16 @@ void LSClient::customEvent(QEvent* event)
 		{
 			case LSCP_EVENT_CHANNEL_INFO:
 			{
-				int channel = lscpEvent->data().toInt();
-				lscp_channel_info_t* chanInfo = ::lscp_get_channel_info(_client, channel);
-				if(chanInfo != NULL)
+				if(!audio->isPlaying())
 				{
-					LSCPChannelInfo info = getKeyBindings(chanInfo);
-					if(info.valid)
-						emit channelInfoChanged(info);
+					int channel = lscpEvent->data().toInt();
+					lscp_channel_info_t* chanInfo = ::lscp_get_channel_info(_client, channel);
+					if(chanInfo != NULL)
+					{
+						LSCPChannelInfo info = getKeyBindings(chanInfo);
+						if(info.valid)
+							emit channelInfoChanged(info);
+					}
 				}
 				break;
 			}	

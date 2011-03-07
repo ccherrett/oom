@@ -586,6 +586,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
 	connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
 	connect(repPlay, SIGNAL(toggled(bool)), SLOT(setReplay(bool)));
+	connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
 
 	setFocusPolicy(Qt::StrongFocus);
 	setEventColorMode(colorMode);
