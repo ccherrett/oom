@@ -49,7 +49,7 @@ void LSClient::run()
 	if(_client != NULL)
 	{
 		printf("Initialized LSCP client connection\n");
-		::lscp_client_set_timeout(_client, 1000);
+		::lscp_client_set_timeout(_client, 10000);
 		::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 	}
 	else
@@ -177,7 +177,10 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 	{
 		printf("Starting key binding processing\n");
 		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", info.instrument_filename, nr);
+		bool good = false;
 		if (lscp_client_query(_client, query) == LSCP_OK)
+			good = true;
+		if (good || lscp_client_query(_client, query) == LSCP_OK)
 		{
 			const char* ret = lscp_client_get_result(_client);
 			QString values(ret);
