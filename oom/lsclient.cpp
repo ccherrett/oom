@@ -58,14 +58,8 @@ void LSClient::run()
 		printf("Failed to Initialize LSCP client connection\n");
 		//
 	}
-	forever 
-	{
-		if(_abort)
-		{
-			stopClient();
-			return;
-		}
-	}
+
+	exec();
 }
 
 void LSClient::stopClient()
@@ -76,7 +70,11 @@ void LSClient::stopClient()
 		//to any subscribed event.
 		::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 		::lscp_client_destroy(_client);
-		_abort = true;
+
+		if (!wait(1000))
+		{
+			terminate();
+		}
 	}
 }
 
