@@ -146,7 +146,6 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 						QStringListIterator iter(sl);
 						while(iter.hasNext())
 						{
-							printf(" Processing input port\n");
 							QString tmp = iter.next().trimmed();
 							if(tmp.startsWith("NAME", Qt::CaseSensitive))
 							{
@@ -156,6 +155,7 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 								{
 									printf(" Processing input port\n");
 									info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
+									printf("info midi port - %s\n", info.midi_portname.toUtf8().constData());
 									process = true;
 									break;
 								}
