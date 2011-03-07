@@ -118,8 +118,11 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 			if(instrInfo->instrument_nr == chanInfo->instrument_nr)
 			{
 				printf("Found matching nr\n");
-				
-				if(instrInfo->instrument_file == chanInfo->instrument_file)
+				QString insfname(instrInfo->instrument_file);
+				QString chanfname(chanInfo->instrument_file);
+
+				//if(instrInfo->instrument_file == chanInfo->instrument_file)
+				if(chanfname == insfname)
 				{
 					printf("Found Correct instrument !!!!\n");
 					info.instrument_name = instrInfo->instrument_name;
