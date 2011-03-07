@@ -13,8 +13,9 @@
 #include "cobject.h"
 #include "tools.h"
 #include "cserver.h"
+#ifdef LSCP_SUPPORT
 #include "lsclient.h"
-
+#endif
 #include <QFileInfo>
 
 class QCloseEvent;

@@ -1717,21 +1717,22 @@ void PianoRoll::setSpeaker(bool val)
 
 void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 {
-	printf("entering PianoRoll::setKeyBindings");
+	printf("entering PianoRoll::setKeyBindings\n");
 	if(!selected || audio->isPlaying())
 		return;
-	printf("not playing and selected");	
+	printf("not playing and selected\n");	
 	//check if the lscp information is pertaining to this track and port
 	Track *t = curCanvasPart()->track();
 	RouteList *rl = t->inRoutes();
+	printf("info.hbank = %d, info.lbank = %d, info.program = %d\n", info.hbank, info.lbank, info.program);
 	for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
 		if((*ir).name() == QString(info.midi_portname))
 		{
-			printf("port names match");
+			printf("port names match\n");
 			if(isCurrentPatch(info.hbank, info.lbank, info.program))
 			{
-				printf("is current patch calling setMIDIKeyBindings");
+				printf("is current patch calling setMIDIKeyBindings\n");
 				piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
 			}	
 			break;
