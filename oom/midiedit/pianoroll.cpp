@@ -1725,6 +1725,8 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	Track *t = curCanvasPart()->track();
 	RouteList *rl = t->outRoutes();
 	printf("info.hbank = %d, info.lbank = %d, info.program = %d\n", info.hbank, info.lbank, info.program);
+	printf("info midi portname %s\n", info.midi_portname);
+
 	/*
 	for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
