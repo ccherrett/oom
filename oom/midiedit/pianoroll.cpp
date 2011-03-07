@@ -1751,19 +1751,25 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
     for(ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
 		printf("oom-port-name: %s, lscp-port-name: %s\n", (*ir).name().toAscii().data(), QString(info.midi_portname).toAscii().data());
-		if((*ir).name() == QString(info.midi_portname))
+
+		QStringList tmp2 = (*ir).name().split(":", QString::SkipEmptyParts);
+		if(tmp2.size() > 1)
 		{
-			printf("port names match\n");
-			if(isCurrentPatch(info.hbank, info.lbank, info.program))
+			QString portname = tmp2.at(1).trimmed();
+			if(portname	== QString(info.midi_portname))
 			{
-				printf("is current patch calling setMIDIKeyBindings\n");
-				piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
-			}	
-			break;
-		}
-		else
-		{
-			printf("no match\n");
+				printf("port names match\n");
+				if(isCurrentPatch(info.hbank, info.lbank, info.program))
+				{
+					printf("is current patch calling setMIDIKeyBindings\n");
+					piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
+				}	
+				break;
+			}
+			else
+			{
+				printf("no match\n");
+			}
 		}
 	}
 }
