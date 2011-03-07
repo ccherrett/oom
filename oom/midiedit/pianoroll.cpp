@@ -1798,15 +1798,17 @@ bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 	{
 		return false;
 	}
-	int hb = ((program >> 16) & 0xff) + 1;
+	int hb = ((program >> 16) & 0xff);
 	if (hb == 0x100)
 		hb = 0;
-	int lb = ((program >> 8) & 0xff) + 1;
+	int lb = ((program >> 8) & 0xff);
 	if (lb == 0x100)
 		lb = 0;
-	int pr = (program & 0xff) + 1;
+	int pr = (program & 0xff);
 	if (pr == 0x100)
 		pr = 0;
+	
+
 	printf("leaving PianoRoll::isCurrentPatch\n");
 
 	return (hb == hbank && lb == lbank && pr == prog);
