@@ -1723,7 +1723,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	printf("not playing and selected\n");	
 	//check if the lscp information is pertaining to this track and port
 	Track *t = curCanvasPart()->track();
-	RouteList *rl = t->inRoutes();
+	RouteList *rl = t->outRoutes();
 	printf("info.hbank = %d, info.lbank = %d, info.program = %d\n", info.hbank, info.lbank, info.program);
 	for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
