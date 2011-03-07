@@ -115,9 +115,11 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 		{
 			//printf("Found instrument to process\n");
 			printf("Instrument - file: %s, nr:%d, Channel - file: %s, nr: %d\n", instrInfo->instrument_file, instrInfo->instrument_nr, chanInfo->instrument_file, chanInfo->instrument_nr);
-			if(instrInfo->instrument_file == chanInfo->instrument_file)
+			if(instrInfo->instrument_nr == chanInfo->instrument_nr)
 			{
-				if(instrInfo->instrument_nr == chanInfo->instrument_nr)
+				printf("Found matching nr\n");
+				
+				if(instrInfo->instrument_file == chanInfo->instrument_file)
 				{
 					printf("Found Correct instrument !!!!\n");
 					info.instrument_name = instrInfo->instrument_name;
