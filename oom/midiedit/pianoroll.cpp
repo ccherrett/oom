@@ -1766,7 +1766,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 				}	
 				else
 				{
-					printf("hbank, lbank and program did not match");
+					printf("hbank, lbank and program did not match\n");
 				}
 				break;
 			}
@@ -1781,7 +1781,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 
 bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 {
-	printf("entering PianoRoll::isCurrentPatch");
+	printf("entering PianoRoll::isCurrentPatch\n");
 	if(!selected)
 		return false;
 	MidiTrack *tr = (MidiTrack*)selected;
@@ -1807,7 +1807,7 @@ bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 	int pr = (program & 0xff) + 1;
 	if (pr == 0x100)
 		pr = 0;
-	printf("leaving PianoRoll::isCurrentPatch");
+	printf("leaving PianoRoll::isCurrentPatch\n");
 
 	return (hb == hbank && lb == lbank && pr == prog);
 
