@@ -64,7 +64,7 @@ class MidiTrack;
 class MidiInstrument;
 class MidiPort;
 class ShortcutConfig;
-class Appearance;
+//class Appearance;
 class WaveTrack;
 class AudioOutput;
 class EditInstrument;
@@ -149,7 +149,7 @@ class OOMidi : public QMainWindow
 
     // Settings Menu Actions
     QAction *settingsGlobalAction, *settingsShortcutsAction, *settingsMetronomeAction, *settingsMidiSyncAction;
-    QAction *settingsMidiIOAction, *settingsAppearanceAction, *settingsMidiPortAction;
+    QAction *settingsMidiIOAction, /*settingsAppearanceAction,*/ *settingsMidiPortAction;
     QAction *dontFollowAction, *followPageAction, *followCtsAction;
 
     // Help Menu Actions
@@ -191,7 +191,7 @@ class OOMidi : public QMainWindow
     MidiFilterConfig* midiFilterConfig;
     MidiInputTransformDialog* midiInputTransform;
     ShortcutConfig* shortcutConfig;
-    Appearance* appearance;
+    //Appearance* appearance;
     AudioMixerApp* mixer1;
     AudioMixerApp* mixer2;
     RouteDialog* routingDialog;
@@ -274,7 +274,7 @@ private slots:
     void configMidiFile();
     void configShortCuts();
     void configMetronome();
-    void configAppearance();
+    //void configAppearance();
     void startEditor(PartList*, int);
     void startMasterEditor();
     void startLMasterEditor();

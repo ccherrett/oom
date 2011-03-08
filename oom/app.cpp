@@ -25,7 +25,7 @@
 #include "master/lmaster.h"
 #include "al/dsp.h"
 #include "amixer.h"
-#include "appearance.h"
+//#include "appearance.h"
 #include "arranger.h"
 #include "audio.h"
 #include "audiodev.h"
@@ -740,7 +740,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	softSynthesizerConfig = 0;
 	midiTransformerDialog = 0;
 	shortcutConfig = 0;
-	appearance = 0;
+	//appearance = 0;
 	pipelineBox = 0;
 	//audioMixer            = 0;
 	mixer1 = 0;
@@ -4398,7 +4398,7 @@ void OOMidi::mixTrack()
 //---------------------------------------------------------
 //   configAppearance
 //---------------------------------------------------------
-
+/*
 void OOMidi::configAppearance()
 {
 	if (!appearance)
@@ -4412,7 +4412,7 @@ void OOMidi::configAppearance()
 	else
 		appearance->show();
 }
-
+*/
 //---------------------------------------------------------
 //   loadTheme
 //---------------------------------------------------------
