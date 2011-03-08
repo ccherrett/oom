@@ -381,8 +381,10 @@ void OOMidi::stopServer()
 #ifdef LSCP_SUPPORT
 void OOMidi::checkLSCPClient()
 {
+	printf("Check LSCP client state\n");
 	if(!lsclient || !lsclient->isRunning())
 	{
+		printf("LSCP Client has died restarting\n");
 		startLSCPClient();
 	}
 }
