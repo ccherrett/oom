@@ -177,7 +177,7 @@ QString MidiJackDevice::open()
 	{
 		if (!_in_client_jackport)
 		{
-			if (audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+			if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
 			{
 				s = name() + QString(JACK_MIDI_IN_PORT_SUFFIX);
 				_in_client_jackport = (jack_port_t*) audioDevice->registerInPort(s.toLatin1().constData(), true);
