@@ -17,6 +17,7 @@
 #include "noteinfo.h"
 #include "cobject.h"
 #include "midieditor.h"
+#include "mididev.h"
 #include "tools.h"
 #include "event.h"
 #ifdef LSCP_SUPPORT

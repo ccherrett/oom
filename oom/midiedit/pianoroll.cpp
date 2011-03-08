@@ -396,6 +396,13 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer2->setMaximumWidth(10);
 	tools2->addWidget(spacer2);
 	tools2->addAction(panicAction);
+/*#ifdef LSCP_SUPPORT
+	QToolButton *btnLSCP = new QToolButton();
+	btnLSCP->setText(tr("L"));
+	btnLSCP->setToolTip(tr("Click the refresh the LSCP Event subscription"));
+	tools2->addWidget(btnLSCP);
+	connect(btnLSCP, SIGNAL(clicked()), oom, SLOT(restartLSCPSubscribe()));
+#endif*/
     QSizeGrip* corner = new QSizeGrip(mainw);
 	QWidget* spacer3 = new QWidget();
 	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1717,24 +1724,63 @@ void PianoRoll::setSpeaker(bool val)
 
 void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 {
-	printf("entering PianoRoll::setKeyBindings");
+	printf("entering PianoRoll::setKeyBindings\n");
 	if(!selected || audio->isPlaying())
 		return;
-	printf("not playing and selected");	
+	printf("not playing and selected\n");	
 	//check if the lscp information is pertaining to this track and port
 	Track *t = curCanvasPart()->track();
-	RouteList *rl = t->inRoutes();
-	for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
+	//RouteList *rl = t->inRoutes();
+	printf("info.hbank = %d, info.lbank = %d, info.program = %d\n", info.hbank, info.lbank, info.program);
+	printf("info midi portname %s\n", info.midi_portname);
+	MidiTrack* midiTrack = static_cast<MidiTrack*>(t);
+	if (!midiTrack)
 	{
-		if((*ir).name() == QString(info.midi_portname))
+		printf("not a midi port\n");
+		return;
+	}
+	else
+	{
+		printf("found midi track\n");
+	}
+    MidiPort* mp = &midiPorts[midiTrack->outPort()];
+	MidiDevice* dev = mp->device();
+	if (!dev)
+	{
+		return;
+	}
+    RouteList *rl = dev->outRoutes();
+
+
+	printf("rl.size() %d\n", rl->size());
+
+	//for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
+    for(ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
+	{
+		printf("oom-port-name: %s, lscp-port-name: %s\n", (*ir).name().toAscii().data(), QString(info.midi_portname).toAscii().data());
+
+		QStringList tmp2 = (*ir).name().split(":", QString::SkipEmptyParts);
+		if(tmp2.size() > 1)
 		{
-			printf("port names match");
-			if(isCurrentPatch(info.hbank, info.lbank, info.program))
+			QString portname = tmp2.at(1).trimmed();
+			if(portname	== QString(info.midi_portname))
 			{
-				printf("is current patch calling setMIDIKeyBindings");
-				piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
-			}	
-			break;
+				printf("port names match\n");
+				if(isCurrentPatch(info.hbank, info.lbank, info.program))
+				{
+					printf("is current patch calling setMIDIKeyBindings\n");
+					piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
+				}	
+				else
+				{
+					printf("hbank, lbank and program did not match\n");
+				}
+				break;
+			}
+			else
+			{
+				printf("no match\n");
+			}
 		}
 	}
 }
@@ -1742,6 +1788,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 
 bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 {
+	printf("entering PianoRoll::isCurrentPatch\n");
 	if(!selected)
 		return false;
 	MidiTrack *tr = (MidiTrack*)selected;
@@ -1758,15 +1805,18 @@ bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 	{
 		return false;
 	}
-	int hb = ((program >> 16) & 0xff) + 1;
+	int hb = ((program >> 16) & 0xff);
 	if (hb == 0x100)
 		hb = 0;
-	int lb = ((program >> 8) & 0xff) + 1;
+	int lb = ((program >> 8) & 0xff);
 	if (lb == 0x100)
 		lb = 0;
-	int pr = (program & 0xff) + 1;
+	int pr = (program & 0xff);
 	if (pr == 0x100)
 		pr = 0;
+	
+
+	printf("leaving PianoRoll::isCurrentPatch\n");
 
 	return (hb == hbank && lb == lbank && pr == prog);
 

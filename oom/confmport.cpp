@@ -592,7 +592,7 @@ _redisplay:
 							int of = 3;
 							switch (n)
 							{
-								case 0: of = 3;
+								case 0: of = 0; //3; Set the open flags of the midiDevice this should be off by default
 									break;
 								case 1: of = 2;
 									break;
@@ -823,7 +823,7 @@ MPConfig::MPConfig(QWidget* parent)
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 40);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_INROUTES, 40);
-	mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 40);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_OUTROUTES, 140);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_IN_CHANS, 70);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_DEF_OUT_CHANS, 70);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_INSTR, 140);

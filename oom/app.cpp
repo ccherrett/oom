@@ -25,7 +25,7 @@
 #include "master/lmaster.h"
 #include "al/dsp.h"
 #include "amixer.h"
-#include "appearance.h"
+//#include "appearance.h"
 #include "arranger.h"
 #include "audio.h"
 #include "audiodev.h"
@@ -311,6 +311,9 @@ bool OOMidi::seqStart()
 		fprintf(stderr, "midiSeq is not running! Exiting...\n");
 		exit(33);
 	}
+#ifdef LSCP_SUPPORT
+	emit lscpStartListener();
+#endif
 	return true;
 }
 
@@ -322,6 +325,9 @@ void OOMidi::seqStop()
 {
 	// label sequencer as disabled before it actually happened to minimize race condition
 	midiSeqRunning = false;
+#ifdef LSCP_SUPPORT
+	emit lscpStopListener();
+#endif
 
 	song->setStop(true);
 	song->setStopPlay(false);
@@ -379,10 +385,19 @@ void OOMidi::stopServer()
 }
 
 #ifdef LSCP_SUPPORT
+void OOMidi::restartLSCPSubscribe()
+{
+	emit lscpStopListener();
+	emit lscpStartListener();
+}
+
+
 void OOMidi::startLSCPClient()
 {
 	lsclient = new LSClient();
 	connect(lsclient, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), SIGNAL(channelInfoChanged(const LSCPChannelInfo&)));
+	connect(oom, SIGNAL(lscpStartListener()), lsclient, SLOT(subscribe()));
+	connect(oom, SIGNAL(lscpStopListener()), lsclient, SLOT(unsubscribe()));
 	lsclient->start();
 }
 
@@ -732,7 +747,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	softSynthesizerConfig = 0;
 	midiTransformerDialog = 0;
 	shortcutConfig = 0;
-	appearance = 0;
+	//appearance = 0;
 	pipelineBox = 0;
 	//audioMixer            = 0;
 	mixer1 = 0;
@@ -759,6 +774,11 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	heartBeatTimer = new QTimer(this);
 	heartBeatTimer->setObjectName("timer");
 	connect(heartBeatTimer, SIGNAL(timeout()), song, SLOT(beat()));
+
+#ifdef LSCP_SUPPORT
+	lscpRestart = false;
+	//connect(heartBeatTimer, SIGNAL(timeout()), SLOT(checkLSCPClient()));
+#endif
 
 #ifdef ENABLE_PYTHON
 	//---------------------------------------------------
@@ -1701,7 +1721,9 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		mixer2->clear();
 	arranger->clear(); // clear track info
 	if (clearSong())
+	{
 		return;
+	}
 
 	QFileInfo fi(name);
 	if (songTemplate)
@@ -4386,7 +4408,7 @@ void OOMidi::mixTrack()
 //---------------------------------------------------------
 //   configAppearance
 //---------------------------------------------------------
-
+/*
 void OOMidi::configAppearance()
 {
 	if (!appearance)
@@ -4400,7 +4422,7 @@ void OOMidi::configAppearance()
 	else
 		appearance->show();
 }
-
+*/
 //---------------------------------------------------------
 //   loadTheme
 //---------------------------------------------------------

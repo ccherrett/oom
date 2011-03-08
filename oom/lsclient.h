@@ -31,7 +31,7 @@ typedef struct chaninfo/*{{{*/
 	bool valid;;
 } LSCPChannelInfo ;/*}}}*/
 
-
+class QTimer;
 class LSClient : public QThread
 {
 	Q_OBJECT
@@ -40,9 +40,12 @@ public:
 	LSClient(const char* host = "localhost", int port = 8888, QObject *parent = 0);
 	~LSClient();
 	void stopClient();
+	void startClient();
+	int getError();
 
 private:
 	const LSCPChannelInfo getKeyBindings(lscp_channel_info_t*);
+	bool compare(const LSCPChannelInfo, const LSCPChannelInfo);
 
 	lscp_client_t* _client;
 	const char* _hostname;
@@ -50,14 +53,18 @@ private:
 	bool _abort;
 	QMutex mutex;
 	QWaitCondition condition;
+	LSCPChannelInfo lastInfo;
 
-	protected:
-		void run();
-		void customEvent(QEvent*);
+protected:
+	void run();
+	void customEvent(QEvent*);
 
-	signals:
-		void channelInfoChanged(const LSCPChannelInfo);
-		//void channelInfoChanged(int);
+signals:
+	void channelInfoChanged(const LSCPChannelInfo);
+
+public slots:
+	void subscribe();
+	void unsubscribe();
 
 };	
 

@@ -145,7 +145,7 @@ static const char *mk1_xpmC8[] = {
       };
 //}}}	  
 //{{{
-static const char *mk1_xpm[] = {
+static const char *mk1_xpm[] = {/*{{{*/
       "40 13 2 1",
       ". c #2d95b7",//highlight
       "# c none",
@@ -162,7 +162,7 @@ static const char *mk1_xpm[] = {
       "########################...............#",
       "########################...............#",
       "####################################### ",
-      };
+      };/*}}}*/
 
 static const char *mk2_xpm[] = {/*{{{*/
       "40 13 2 1",
@@ -306,7 +306,7 @@ static const char *mk4_xpm_lowlight[] = {
       };
 //}}}	  
 //{{{
-static const char *mk1_xpm_normal[] = {
+static const char *mk1_xpm_normal[] = {/*{{{*/
       "40 13 2 1",
       ". c #dedede",
       "# c #292929",
@@ -323,7 +323,7 @@ static const char *mk1_xpm_normal[] = {
       "########################...............#",
       "########################...............#",
       "####################################### ",
-      };
+      };/*}}}*/
 
 static const char *mk2_xpm_normal[] = {
       "40 13 2 1",
@@ -365,7 +365,8 @@ static const char *mk3_xpm_normal[] = {
 
 static const char *mk4_xpm_normal[] = {
       "40 13 2 1",
-      ". c #dedede",
+      //". c #dedede",
+	  ". c none",
       "# c #292929",
       ".......................................#",
       ".......................................#",
@@ -400,6 +401,25 @@ static const char *mk5_xpm_normal[] = {
       "$$$$$$$$$$$$$$$$$$$$$$$$...............#",     // 7
       "$$$$$$$$$$$$$$$$$$$$$$$$############### ",
       };
+static const char *mk6_xpm_normal[] = {/*{{{*/
+      "40 13 3 1",
+      ". c #dedede",
+      "# c #292929",
+      "$ c #7b7b7b",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      "$$$$$$$$$$$$$$$$$$$$$$$................#",
+      "$$$$$$$$$$$$$$$$$$$$$$$$...............#",
+      "$$$$$$$$$$$$$$$$$$$$$$$$...............#",
+      "$$$$$$$$$$$$$$$$$$$$$$$$############### ",
+      };/*}}}*/
 //}}}	  
 //{{{
 static const char *mk1_xpm_switch[] = {
@@ -597,6 +617,7 @@ Piano::Piano(QWidget* parent, int ymag)
       mk3_n = new QPixmap(mk3_xpm_normal);
       mk4_n = new QPixmap(mk4_xpm_normal);
       mk5_n = new QPixmap(mk5_xpm_normal);
+      mk6_n = new QPixmap(mk6_xpm_normal);
 	  
 	  //setup all the keyswitch colors 	
       mk1_s = new QPixmap(mk1_xpm_switch);
@@ -670,11 +691,6 @@ void Piano::draw(QPainter& p, const QRect& r)
      	       case 2:
      	       case 7:
      	       case 9:
-     	             //pm2 = mk2_l;
-					//if(!enabled->contains(i))
-      				//	p.drawPixmap(0, pitch2y(i), *mk2_l);
-					//else
-      				//	p.drawPixmap(0, pitch2y(i), *mk2_n);
 					if(keyswitch.contains(i))
 					{
 						if(preOn)
@@ -710,7 +726,10 @@ void Piano::draw(QPainter& p, const QRect& r)
 					}
 					else
 					{
-      					p.drawPixmap(0, pitch2y(i), *mk1_n);
+						if(preOn)
+      						p.drawPixmap(0, pitch2y(i), *mk6_n);
+						else
+      						p.drawPixmap(0, pitch2y(i), *mk1_n);
 					}
 					preOn = false;
      	             break;
@@ -831,14 +850,14 @@ int Piano::y2pitch(int y) const
 //---------------------------------------------------------
 
 void Piano::leaveEvent(QEvent*)
-      {
+{
       if (keyDown != -1) {
             emit keyReleased(keyDown, shift);
             keyDown = -1;
-            }
+      }
       emit pitchChanged(-1);
       setPitch(-1);
-      }
+}
 
 //---------------------------------------------------------
 //   setPitch

@@ -583,6 +583,10 @@ int main(int argc, char* argv[])
 	int rv = app.exec();
 	if (debugMsg)
 		printf("app.exec() returned:%d\nDeleting main OOMidi object\n", rv);
+#ifdef LSCP_SUPPORT
+	oom->startLSCPClient();
+#endif
+	oom->stopServer();
 	delete oom;
 	if (debugMsg)
 		printf("Finished! Exiting main, return value:%d\n", rv);

@@ -13,8 +13,9 @@
 #include "cobject.h"
 #include "tools.h"
 #include "cserver.h"
+#ifdef LSCP_SUPPORT
 #include "lsclient.h"
-
+#endif
 #include <QFileInfo>
 
 class QCloseEvent;
@@ -63,7 +64,7 @@ class MidiTrack;
 class MidiInstrument;
 class MidiPort;
 class ShortcutConfig;
-class Appearance;
+//class Appearance;
 class WaveTrack;
 class AudioOutput;
 class EditInstrument;
@@ -148,7 +149,7 @@ class OOMidi : public QMainWindow
 
     // Settings Menu Actions
     QAction *settingsGlobalAction, *settingsShortcutsAction, *settingsMetronomeAction, *settingsMidiSyncAction;
-    QAction *settingsMidiIOAction, *settingsAppearanceAction, *settingsMidiPortAction;
+    QAction *settingsMidiIOAction, /*settingsAppearanceAction,*/ *settingsMidiPortAction;
     QAction *dontFollowAction, *followPageAction, *followCtsAction;
 
     // Help Menu Actions
@@ -190,7 +191,7 @@ class OOMidi : public QMainWindow
     MidiFilterConfig* midiFilterConfig;
     MidiInputTransformDialog* midiInputTransform;
     ShortcutConfig* shortcutConfig;
-    Appearance* appearance;
+    //Appearance* appearance;
     AudioMixerApp* mixer1;
     AudioMixerApp* mixer2;
     RouteDialog* routingDialog;
@@ -237,12 +238,15 @@ class OOMidi : public QMainWindow
 	OOMCommandServer server;
 #ifdef LSCP_SUPPORT
 	LSClient *lsclient;
+	bool lscpRestart;
 #endif
 
 signals:
     void configChanged();
 #ifdef LSCP_SUPPORT
 	void channelInfoChanged(const LSCPChannelInfo&);
+	void lscpStartListener();
+	void lscpStopListener();
 #endif
 
 private slots:
@@ -273,7 +277,7 @@ private slots:
     void configMidiFile();
     void configShortCuts();
     void configMetronome();
-    void configAppearance();
+    //void configAppearance();
     void startEditor(PartList*, int);
     void startMasterEditor();
     void startLMasterEditor();
@@ -369,6 +373,7 @@ public slots:
 #ifdef LSCP_SUPPORT
 	void startLSCPClient();
 	void stopLSCPClient();
+	void restartLSCPSubscribe();
 #endif
 	void pipelineStateChanged(int);
 	void connectDefaultSongPorts();

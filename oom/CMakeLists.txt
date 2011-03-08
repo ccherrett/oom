@@ -31,6 +31,7 @@ set (SubDirs
       driver
       instruments
       liste
+	  network
       marker
       master
       midiedit
@@ -53,7 +54,6 @@ subdirs (${SubDirs})
 ##
 QT4_WRAP_CPP ( oom_moc_headers
       app.h 
-      appearance.h
       cobject.h 
       conf.h 
       confmport.h 
@@ -85,7 +85,6 @@ QT4_ADD_RESOURCES (oom_qrc_files
 
 file (GLOB core_source_files
       app.cpp
-      appearance.cpp
       audio.cpp
       audioconvert.cpp
       audioprefetch.cpp
@@ -243,6 +242,7 @@ target_link_libraries(core
       icons
       instruments
       liste
+	  network
       marker
       master
       midiedit

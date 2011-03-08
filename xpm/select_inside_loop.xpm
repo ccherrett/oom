@@ -1,5 +1,5 @@
 /* XPM */
-static char * select_inside_loop_xpm[] = {
+static const char * select_inside_loop_xpm[] = {
 "16 16 80 1",
 " 	c None",
 ".	c #D8D8D8",

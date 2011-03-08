@@ -1,5 +1,6 @@
 #include "config.h"
 #include "globals.h"
+#include "gconfig.h"
 #ifdef LSCP_SUPPORT
 #include "audio.h"
 #include "lsclient.h"
@@ -7,6 +8,7 @@
 #include <QStringListIterator>
 #include <QStringList>
 #include <QCoreApplication>
+#include <QTimer>
 
 LSClient::LSClient(const char* host, int p, QObject* parent) : QThread(parent)
 {
@@ -35,6 +37,7 @@ lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t event, 
 	switch(event)
 	{
 		case LSCP_EVENT_CHANNEL_INFO:
+			//printf("Recieved CHANNEL_INFO event\n");
 			QCoreApplication::postEvent(lsc, new LscpEvent(event, pchData, cchData));
 		break;
 		default:
@@ -44,9 +47,41 @@ lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t event, 
 	return LSCP_OK;
 }
 
+void LSClient::subscribe()
+{
+	if(_client == NULL)
+	{
+		startClient();
+	}
+	else
+	{
+		unsubscribe();
+		startClient();
+	}
+}
+
+void LSClient::unsubscribe()
+{
+	if(_client != NULL)
+	{
+		::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
+		::lscp_client_destroy(_client);
+	}
+	_client = NULL;
+}
+
+int LSClient::getError()
+{
+	if(_client != NULL)
+	{
+		return -1;
+	}
+	return lscp_client_get_errno(_client);
+}
+
 void LSClient::run()
 {
-	_client = ::lscp_client_create(_hostname, _port, client_callback, this);
+	/*_client = ::lscp_client_create(_hostname, _port, client_callback, this);
 	if(_client != NULL)
 	{
 		printf("Initialized LSCP client connection\n");
@@ -57,9 +92,27 @@ void LSClient::run()
 	{
 		printf("Failed to Initialize LSCP client connection\n");
 		//
-	}
-
+	}*/
+	//heartBeatTimer->start(1000 / config.guiRefresh);
+	startClient();
 	exec();
+}
+
+void LSClient::startClient()
+{
+	_client = ::lscp_client_create(_hostname, _port, client_callback, this);
+	if(_client != NULL)
+	{
+		printf("Initialized LSCP client connection\n");
+		::lscp_client_set_timeout(_client, 1000);
+		lastInfo.valid = false;
+		::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
+	}
+	else
+	{
+		printf("Failed to Initialize LSCP client connection\n");
+		//
+	}
 }
 
 void LSClient::stopClient()
@@ -69,6 +122,7 @@ void LSClient::stopClient()
 		//TODO: create a list of subscribed events so we can reference it here and unsubscribe 
 		//to any subscribed event.
 		::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
+		lastInfo.valid = false;
 		::lscp_client_destroy(_client);
 
 		if (!wait(1000))
@@ -128,7 +182,7 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 					printf("Found Correct instrument !!!!\n");
 					info.instrument_name = instrInfo->instrument_name;
 					info.instrument_filename = instrInfo->instrument_file;
-					info.hbank = mInstrs[iInstr].map;
+					info.hbank = 0;
 					info.lbank = mInstrs[iInstr].bank;
 					info.program = mInstrs[iInstr].prog;
 					info.midi_port = chanInfo->midi_port;
@@ -146,7 +200,6 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 						QStringListIterator iter(sl);
 						while(iter.hasNext())
 						{
-							printf(" Processing input port\n");
 							QString tmp = iter.next().trimmed();
 							if(tmp.startsWith("NAME", Qt::CaseSensitive))
 							{
@@ -155,7 +208,12 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 								if(tmp2.size() > 1)
 								{
 									printf(" Processing input port\n");
-									info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
+									//info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
+									QString portname = tmp2.at(1).trimmed();
+									portname = portname.remove("'");
+									info.midi_portname = portname.toUtf8().constData();
+																																													
+									printf("info midi port - %s\n", info.midi_portname);
 									process = true;
 									break;
 								}
@@ -223,9 +281,37 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 	return info;
 }/*}}}*/
 
+bool LSClient::compare(LSCPChannelInfo info1, LSCPChannelInfo info2)
+{
+	if(!info1.valid)
+		return false;
+	if(QString(info1.instrument_filename) == QString(info2.instrument_filename))
+	{
+		if(QString(info1.instrument_name) == QString(info2.instrument_name))
+		{
+			if(QString(info1.midi_portname) == QString(info2.midi_portname))
+			{
+				if(info1.midi_channel == info2.midi_channel)
+				{
+					if(info1.hbank == info2.hbank)
+					{
+						if(info1.lbank == info2.lbank)
+						{
+							if(info1.program == info2.program)
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
 void LSClient::customEvent(QEvent* event)
 {
-
 	LscpEvent *lscpEvent = static_cast<LscpEvent *> (event);
 	if(lscpEvent)
 	{
@@ -241,7 +327,14 @@ void LSClient::customEvent(QEvent* event)
 					{
 						LSCPChannelInfo info = getKeyBindings(chanInfo);
 						if(info.valid)
-							emit channelInfoChanged(info);
+						{
+							if(!compare(lastInfo, info))
+							{
+								emit channelInfoChanged(info);
+								lastInfo = info;
+							}
+							lastInfo = info;
+						}
 					}
 				}
 				break;
