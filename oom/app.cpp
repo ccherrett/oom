@@ -311,6 +311,9 @@ bool OOMidi::seqStart()
 		fprintf(stderr, "midiSeq is not running! Exiting...\n");
 		exit(33);
 	}
+#ifdef LSCP_SUPPORT
+	emit lscpStartListener();
+#endif
 	return true;
 }
 
@@ -322,6 +325,9 @@ void OOMidi::seqStop()
 {
 	// label sequencer as disabled before it actually happened to minimize race condition
 	midiSeqRunning = false;
+#ifdef LSCP_SUPPORT
+	emit lscpStopListener();
+#endif
 
 	song->setStop(true);
 	song->setStopPlay(false);
@@ -1709,9 +1715,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 {
 	//if (audioMixer)
 	//      audioMixer->clear();
-#ifdef LSCP_SUPPORT
-	emit lscpStopListener();
-#endif
 	if (mixer1)
 		mixer1->clear();
 	if (mixer2)
@@ -1719,9 +1722,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	arranger->clear(); // clear track info
 	if (clearSong())
 	{
-#ifdef LSCP_SUPPORT
-	emit lscpStartListener();
-#endif
 		return;
 	}
 
@@ -1732,9 +1732,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		{
 			QMessageBox::critical(this, QString("OOMidi"),
 					tr("Cannot read template"));
-#ifdef LSCP_SUPPORT
-	emit lscpStartListener();
-#endif
 			return;
 		}
 		project.setFile("untitled");
@@ -1803,9 +1800,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
                                       "OK")) {
                         setUntitledProject();
                         // is it save to return; here ?
-#ifdef LSCP_SUPPORT
-	emit lscpStartListener();
-#endif
                         return;
                 }
             }
@@ -1930,9 +1924,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		// Marker view list was not updated, had non-existent items from marker list (cleared in ::clear()).
 		showMarker(config.markerVisible);
 	}
-#ifdef LSCP_SUPPORT
-	emit lscpStartListener();
-#endif
 
 }
 
