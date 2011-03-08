@@ -596,6 +596,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
 	connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
 	connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
+	connect(canvas, SIGNAL(partChanged(Part*)), midiTrackInfo, SLOT(editorPartChanged(Part*)));
 	connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
 	connect(repPlay, SIGNAL(toggled(bool)), SLOT(setReplay(bool)));
 	connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
@@ -1732,7 +1733,6 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	Track *t = curCanvasPart()->track();
 	//RouteList *rl = t->inRoutes();
 	printf("info.hbank = %d, info.lbank = %d, info.program = %d\n", info.hbank, info.lbank, info.program);
-	printf("info midi portname %s\n", info.midi_portname);
 	MidiTrack* midiTrack = static_cast<MidiTrack*>(t);
 	if (!midiTrack)
 	{
@@ -1743,6 +1743,9 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	{
 		printf("found midi track\n");
 	}
+	//const char* pname = info.midi_portname;
+
+	printf("info midi portname %s\n", info.midi_portname.toAscii().data());
     MidiPort* mp = &midiPorts[midiTrack->outPort()];
 	MidiDevice* dev = mp->device();
 	if (!dev)
@@ -1751,19 +1754,18 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	}
     RouteList *rl = dev->outRoutes();
 
-
-	printf("rl.size() %d\n", rl->size());
+	//printf("rl.size() %d\n", rl->size());
 
 	//for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
     for(ciRoute ir = rl->begin(); ir != rl->end(); ++ir)
 	{
-		printf("oom-port-name: %s, lscp-port-name: %s\n", (*ir).name().toAscii().data(), QString(info.midi_portname).toAscii().data());
+		printf("oom-port-name: %s, lscp-port-name: %s\n", (*ir).name().toAscii().data(), info.midi_portname.toAscii().data());
 
 		QStringList tmp2 = (*ir).name().split(":", QString::SkipEmptyParts);
 		if(tmp2.size() > 1)
 		{
 			QString portname = tmp2.at(1).trimmed();
-			if(portname	== QString(info.midi_portname))
+			if(portname	== info.midi_portname)
 			{
 				printf("port names match\n");
 				if(isCurrentPatch(info.hbank, info.lbank, info.program))

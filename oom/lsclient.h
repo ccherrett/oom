@@ -21,10 +21,10 @@ typedef struct chaninfo/*{{{*/
 	int program;
 	QList<int> key_bindings;
 	QList<int> keyswitch_bindings;
-	const char* instrument_filename;
+	QString instrument_filename;
 	//const char* midi_mapname;
-	const char* instrument_name;
-	const char* midi_portname;
+	QString instrument_name;
+	QString midi_portname;
 	int midi_port;
 	int midi_device;
 	int midi_channel;

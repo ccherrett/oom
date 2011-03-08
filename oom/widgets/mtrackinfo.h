@@ -17,6 +17,7 @@ class QTableWidget;
 class QComboBox;
 
 class Track;
+class Part;
 class GridCombo;
 
 class QTableView;
@@ -53,6 +54,7 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
     bool editing;
 	bool _useMatrix;
 	bool _autoExapand;
+	bool _resetProgram;
     virtual void showEvent(QShowEvent *);
 
 private slots:
@@ -89,6 +91,7 @@ private slots:
     void patchSequenceRemoved(QModelIndex, int, int);
 	void clonePatchSequence();
 	void patchDoubleClicked(QModelIndex);
+	void editorPartChanged(Part*);
     //tb1
 	void _rasterChanged(int);
     void _quantChanged(int);

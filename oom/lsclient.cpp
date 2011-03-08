@@ -180,8 +180,8 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 				if(chanfname == insfname)
 				{
 					printf("Found Correct instrument !!!!\n");
-					info.instrument_name = instrInfo->instrument_name;
-					info.instrument_filename = instrInfo->instrument_file;
+					info.instrument_name = QString(instrInfo->instrument_name);
+					info.instrument_filename = QString(instrInfo->instrument_file);
 					info.hbank = 0;
 					info.lbank = mInstrs[iInstr].bank;
 					info.program = mInstrs[iInstr].prog;
@@ -211,9 +211,9 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 									//info.midi_portname = tmp2.at(1).trimmed().toUtf8().constData();
 									QString portname = tmp2.at(1).trimmed();
 									portname = portname.remove("'");
-									info.midi_portname = portname.toUtf8().constData();
+									info.midi_portname = portname;//.toUtf8().constData();
 																																													
-									printf("info midi port - %s\n", info.midi_portname);
+									printf("info midi port - %s\n", info.midi_portname.toAscii().constData());
 									process = true;
 									break;
 								}
@@ -233,7 +233,7 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 	if(process)
 	{
 		printf("Starting key binding processing\n");
-		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", info.instrument_filename, nr);
+		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", info.instrument_filename.toAscii().constData(), nr);
 		if (lscp_client_query(_client, query) == LSCP_OK)
 		{
 			const char* ret = lscp_client_get_result(_client);
@@ -285,11 +285,11 @@ bool LSClient::compare(LSCPChannelInfo info1, LSCPChannelInfo info2)
 {
 	if(!info1.valid)
 		return false;
-	if(QString(info1.instrument_filename) == QString(info2.instrument_filename))
+	if(info1.instrument_filename == info2.instrument_filename)
 	{
-		if(QString(info1.instrument_name) == QString(info2.instrument_name))
+		if(info1.instrument_name == info2.instrument_name)
 		{
-			if(QString(info1.midi_portname) == QString(info2.midi_portname))
+			if(info1.midi_portname == info2.midi_portname)
 			{
 				if(info1.midi_channel == info2.midi_channel)
 				{

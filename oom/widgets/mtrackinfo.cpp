@@ -91,9 +91,41 @@ void MidiTrackInfo::setTrack(Track* t)
 
 	populatePatches();
 	updateTrackInfo(-1);
-	//printf("Calling populate matrix from setTrack()\n");
+	//printf("MidiTrackInfo::setTrack()\n");
 	populateMatrix();
 	rebuildMatrix();
+	if(_resetProgram)
+	{
+		MidiTrack* midiTrack = static_cast<MidiTrack*>(t);/*{{{*/
+		if(midiTrack)
+		{
+			int outChannel = midiTrack->outChannel();
+			int outPort = midiTrack->outPort();
+			MidiPort* mp = &midiPorts[outPort];
+			if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
+				audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
+			int hbank = iHBank->value();
+			int lbank = iLBank->value();
+			int prog = iProgram->value();
+
+			if (hbank > 0 && hbank < 129)
+				hbank -= 1;
+			else
+				hbank = 0xff;
+			if (lbank > 0 && lbank < 129)
+				lbank -= 1;
+			else
+				lbank = 0xff;
+			if (prog > 0 && prog < 129)
+				prog -= 1;
+			else
+				prog = 0xff;
+			program = (hbank << 16) + (lbank << 8) + prog;
+			MidiPlayEvent ev(0, outPort, outChannel, ME_CONTROLLER, CTRL_PROGRAM, program);
+			audio->msgPlayMidiEvent(&ev);
+		}/*}}}*/
+	}
+	_resetProgram = false;
 }
 
 //---------------------------------------------------------
@@ -109,6 +141,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	editing = false;
 	_useMatrix = false;
 	_autoExapand = true;
+	_resetProgram = false;
 	_matrix = new QList<int>;
 	_tableModel = new ProgramChangeTableModel(this);
 	tableView = new ProgramChangeTable(this);
@@ -1662,6 +1695,14 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 	//printf("Before populateMatrix()\n");
 	//populateMatrix();
 	//rebuildMatrix();
+}
+
+void MidiTrackInfo::editorPartChanged(Part* p)
+{
+	if(p)
+	{
+		_resetProgram = true;
+	}
 }
 
 //---------------------------------------------------------

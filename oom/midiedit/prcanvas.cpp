@@ -1468,7 +1468,7 @@ void PianoCanvas::bindQwertyKeyToMidiValue(const char* key, int note)
 
 int PianoCanvas::stepInputQwerty(QKeyEvent *event)
 {
-	const char* key = event->text().toAscii().data();
+	//const char* key = event->text().toAscii().data();
 	int pitch = _qwertyToMidiMap.value(event->text(), -1);
 
 	if (pitch == -1)
@@ -1901,6 +1901,7 @@ void PianoCanvas::itemMoved(const CItem* item, const QPoint& pos)
 void PianoCanvas::curPartChanged()
 {
 	editor->setWindowTitle(getCaption());
+	emit partChanged(editor->curCanvasPart());
 }
 
 //---------------------------------------------------------
