@@ -768,9 +768,9 @@ void JackAudioDevice::graphChanged()
 			bool erased;
 			// limit set to 20 iterations for disconnects, don't know how to make it go
 			// the "right" amount
-			//for (int i = 0; i < 20; i++)
-			//{
-			//	erased = false;
+			for (int i = 0; i < 20; i++)
+			{
+				erased = false;
 				for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 				{
 					if (irl->channel != channel)
@@ -779,29 +779,32 @@ void JackAudioDevice::graphChanged()
 					QByteArray ba = name.toLatin1();
 					const char* portName = ba.constData();
 					//printf("portname=%s\n", portName);
-					//bool found = false;
+					bool found = false;
 					const char** pn = ports;
 					while (pn && *pn)
 					{
 						if (strcmp(*pn, portName) == 0)
 						{
-							//found = true;
-							audio->msgRemoveRoute1(Route(portName, false, channel, Route::JACK_ROUTE), Route(it, channel));
+							found = true;
 							break;
 						}
 						++pn;
 					}
 					//FIXME: This is the code that removes the route from the input track if jack dies
-					/*if (!found)
+					if (!found)
 					{
-						audio->msgRemoveRoute1(Route(portName, false, channel, Route::JACK_ROUTE), Route(it, channel));
+						audio->msgRemoveRoute1(
+								//Route(portName, false, channel),
+								Route(portName, false, channel, Route::JACK_ROUTE),
+								Route(it, channel)
+								);
 						erased = true;
 						break;
-					}*/
+					}
 				}
-			//	if (!erased)
-			//		break;
-			//}
+				if (!erased)
+					break;
+			}
 
 			//---------------------------------------
 			// check for connects
@@ -862,12 +865,12 @@ void JackAudioDevice::graphChanged()
 			// check for disconnects
 			//---------------------------------------
 
-			//bool erased;
+			bool erased;
 			// limit set to 20 iterations for disconnects, don't know how to make it go
 			// the "right" amount
-			//for (int i = 0; i < 20; i++)
-			//{
-			//	erased = false;
+			for (int i = 0; i < 20; i++)
+			{
+				erased = false;
 				for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 				{
 					if (irl->channel != channel)
@@ -875,28 +878,31 @@ void JackAudioDevice::graphChanged()
 					QString name = irl->name();
 					QByteArray ba = name.toLatin1();
 					const char* portName = ba.constData();
-					//bool found = false;
+					bool found = false;
 					const char** pn = ports;
 					while (pn && *pn)
 					{
 						if (strcmp(*pn, portName) == 0)
 						{
-							//found = true;
-							audio->msgRemoveRoute1(Route(it, channel), Route(portName, false, channel, Route::JACK_ROUTE));
+							found = true;
 							break;
 						}
 						++pn;
 					}
-					/*if (!found)
+					if (!found)
 					{
-						audio->msgRemoveRoute1(Route(it, channel), Route(portName, false, channel, Route::JACK_ROUTE));
+						audio->msgRemoveRoute1(
+								Route(it, channel),
+								//Route(portName, false, channel)
+								Route(portName, false, channel, Route::JACK_ROUTE)
+								);
 						erased = true;
 						break;
-					}*/
+					}
 				}
-			//	if (!erased)
-			//		break;
-			//}
+				if (!erased)
+					break;
+			}
 
 			//---------------------------------------
 			// check for connects
@@ -947,6 +953,18 @@ void JackAudioDevice::graphChanged()
 		if (md->deviceType() != MidiDevice::JACK_MIDI)
 			continue;
 
+		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(*ii);
+		//if(!mjd)
+		//  continue;
+		//for (int channel = 0; channel < channels; ++channel)
+		//{
+
+		// p3.3.55 Removed
+		//jack_port_t* port = (jack_port_t*)md->clientPort();
+		//if (port == 0)
+		//      continue;
+		//const char** ports = jack_port_get_all_connections(_client, port);
+
 		//---------------------------------------
 		// outputs
 		//---------------------------------------
@@ -967,12 +985,12 @@ void JackAudioDevice::graphChanged()
 				// check for disconnects
 				//---------------------------------------
 
-				//bool erased;
+				bool erased;
 				// limit set to 20 iterations for disconnects, don't know how to make it go
 				// the "right" amount
-				//for (int i = 0; i < 20; i++)
-				//{
-				//	erased = false;
+				for (int i = 0; i < 20; i++)
+				{
+					erased = false;
 					for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 					{
 						//if (irl->channel != channel)
@@ -987,22 +1005,28 @@ void JackAudioDevice::graphChanged()
 						{
 							if (strcmp(*pn, portName) == 0)
 							{
-								//found = true;
-								audio->msgRemoveRoute1(Route(md, -1), Route(portName, false, -1, Route::JACK_ROUTE));
+								found = true;
 								break;
 							}
 							++pn;
 						}
-						/*if (!found)
+						if (!found)
 						{
-							audio->msgRemoveRoute1(Route(md, -1), Route(portName, false, -1, Route::JACK_ROUTE));
+							audio->msgRemoveRoute1(
+									//Route(it, channel),
+									//Route(mjd),
+									Route(md, -1),
+									//Route(portName, false, channel)
+									//Route(portName, false, -1)
+									Route(portName, false, -1, Route::JACK_ROUTE)
+									);
 							erased = true;
 							break;
-						}*/
+						}
 					}
-				//	if (!erased)
-				//		break;
-				//}
+					if (!erased)
+						break;
+				}
 
 				//---------------------------------------
 				// check for connects
@@ -1030,7 +1054,11 @@ void JackAudioDevice::graphChanged()
 						if (!found)
 						{
 							audio->msgAddRoute1(
+									//Route(it, channel),
+									//Route(mjd),
 									Route(md, -1),
+									//Route(*pn, false, channel)
+									//Route(*pn, false, -1)
 									Route(*pn, false, -1, Route::JACK_ROUTE)
 									);
 						}
@@ -1064,12 +1092,12 @@ void JackAudioDevice::graphChanged()
 				// check for disconnects
 				//---------------------------------------
 
-				//bool erased;
+				bool erased;
 				// limit set to 20 iterations for disconnects, don't know how to make it go
 				// the "right" amount
-				//for (int i = 0; i < 20; i++)
-				//{
-				//	erased = false;
+				for (int i = 0; i < 20; i++)
+				{
+					erased = false;
 					for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 					{
 						//if (irl->channel != channel)
@@ -1077,28 +1105,34 @@ void JackAudioDevice::graphChanged()
 						QString name = irl->name();
 						QByteArray ba = name.toLatin1();
 						const char* portName = ba.constData();
-						//bool found = false;
+						bool found = false;
 						const char** pn = ports;
 						while (pn && *pn)
 						{
 							if (strcmp(*pn, portName) == 0)
 							{
-								//found = true;
-								audio->msgRemoveRoute1(Route(portName, false, -1, Route::JACK_ROUTE), Route(md, -1));
+								found = true;
 								break;
 							}
 							++pn;
 						}
-						/*if (!found)
+						if (!found)
 						{
-							audio->msgRemoveRoute1(Route(portName, false, -1, Route::JACK_ROUTE), Route(md, -1));
+							audio->msgRemoveRoute1(
+									//Route(portName, false, channel),
+									//Route(portName, false, -1),
+									Route(portName, false, -1, Route::JACK_ROUTE),
+									//Route(it, channel)
+									//Route(mjd)
+									Route(md, -1)
+									);
 							erased = true;
 							break;
-						}*/
+						}
 					}
-				//	if (!erased)
-				//		break;
-				//}
+					if (!erased)
+						break;
+				}
 
 				//---------------------------------------
 				// check for connects
