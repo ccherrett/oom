@@ -1736,7 +1736,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 	MidiTrack* midiTrack = static_cast<MidiTrack*>(t);
 	if (!midiTrack)
 	{
-		printf("not a midi port\n");
+		printf("not a midi track\n"); // Remon: fixed typo :)
 		return;
 	}
 	else
