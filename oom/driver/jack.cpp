@@ -719,12 +719,12 @@ void JackAudioDevice::graphChanged()
 				// check for disconnects
 				//---------------------------------------
 
-				//bool erased;
+				bool erased;
 				// limit set to 20 iterations for disconnects, don't know how to make it go
 				// the "right" amount
-				//for (int i = 0; i < 20; i++)
-				//{
-				//	erased = false;
+				for (int i = 0; i < 20; i++)
+				{
+					erased = false;
 					for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 					{
 						//if (irl->channel != channel)
@@ -733,28 +733,29 @@ void JackAudioDevice::graphChanged()
 						//name += QString(JACK_MIDI_OUT_PORT_SUFFIX);    // p3.3.55
 						QByteArray ba = name.toLatin1();
 						const char* portName = ba.constData();
-						//bool found = false;
+						bool found = false;
 						const char** pn = ports;
 						while (pn && *pn)
 						{
 							if (strcmp(*pn, portName) == 0)
 							{
 								audio->msgRemoveRoute1(Route(md, -1), Route(portName, false, -1, Route::JACK_ROUTE));
-								//found = true;
+								erased = true;
+								found = true;
 								break;
 							}
 							++pn;
 						}
-						//if (!found)
-						//{
+						if (!found)
+						{
 						//	audio->msgRemoveRoute1(Route(md, -1), Route(portName, false, -1, Route::JACK_ROUTE));
 						//	erased = true;
-						//	break;
-						//}
+							break;
+						}
 					}
-				//	if (!erased)
-				//		break;
-				//}
+					if (!erased)
+						break;
+				}
 
 				//---------------------------------------
 				// check for connects

@@ -704,14 +704,12 @@ QString Route::name() const
 		}
 		return QWidget::tr("None");
 	}
-	else
-		if (type == JACK_ROUTE)
+	else if (type == JACK_ROUTE)
 	{
 		if (!checkAudioDevice()) return "";
 		return audioDevice->portName(jackPort);
 	}
-	else
-		if (type == MIDI_PORT_ROUTE) // p3.3.49
+	else if (type == MIDI_PORT_ROUTE) // p3.3.49
 	{
 		return ROUTE_MIDIPORT_NAME_PREFIX + QString().setNum(midiPort);
 	}
