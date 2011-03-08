@@ -540,7 +540,7 @@ void JackAudioDevice::graphChanged()
 		for (int channel = 0; channel < channels; ++channel)
 		{
 			jack_port_t* port = (jack_port_t*) (it->jackPort(channel));
-			if (port == 0)
+			if (!port)
 				continue;
 			const char** ports = jack_port_get_all_connections(_client, port);
 			RouteList* rl = it->inRoutes();
