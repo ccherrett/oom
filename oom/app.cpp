@@ -791,8 +791,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	redoAction->setWhatsThis(tr("redo last undo"));
 	undoAction->setEnabled(false);
 	redoAction->setEnabled(false);
-	connect(redoAction, SIGNAL(activated()), song, SLOT(redo()));
-	connect(undoAction, SIGNAL(activated()), song, SLOT(undo()));
+	connect(redoAction, SIGNAL(triggered()), song, SLOT(redo()));
+	connect(undoAction, SIGNAL(triggered()), song, SLOT(undo()));
 
 	//---------------------------------------------------
 	//    Transport
@@ -830,19 +830,19 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 			tr("Start"), transportAction);
 
 	startAction->setWhatsThis(tr(infoStartButton));
-	connect(startAction, SIGNAL(activated()), song, SLOT(rewindStart()));
+	connect(startAction, SIGNAL(triggered()), song, SLOT(rewindStart()));
 
 	rewindAction = new QAction(QIcon(*frewindIcon),
 			tr("Rewind"), transportAction);
 
 	rewindAction->setWhatsThis(tr(infoRewindButton));
-	connect(rewindAction, SIGNAL(activated()), song, SLOT(rewind()));
+	connect(rewindAction, SIGNAL(triggered()), song, SLOT(rewind()));
 
 	forwardAction = new QAction(QIcon(*fforwardIcon),
 			tr("Forward"), transportAction);
 
 	forwardAction->setWhatsThis(tr(infoForwardButton));
-	connect(forwardAction, SIGNAL(activated()), song, SLOT(forward()));
+	connect(forwardAction, SIGNAL(triggered()), song, SLOT(forward()));
 
 	stopAction = new QAction(QIcon(*stopIcon),
 			tr("Stop"), transportAction);
@@ -870,7 +870,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 			tr("Panic"), this);
 
 	panicAction->setWhatsThis(tr(infoPanicButton));
-	connect(panicAction, SIGNAL(activated()), song, SLOT(panic()));
+	connect(panicAction, SIGNAL(triggered()), song, SLOT(panic()));
 
 	initMidiInstruments();
 	initMidiPorts();
@@ -1029,20 +1029,20 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//---- Connections
 	//-------- File connections
 
-	connect(fileNewAction, SIGNAL(activated()), SLOT(loadTemplate()));
-	connect(fileOpenAction, SIGNAL(activated()), SLOT(loadProject()));
+	connect(fileNewAction, SIGNAL(triggered()), SLOT(loadTemplate()));
+	connect(fileOpenAction, SIGNAL(triggered()), SLOT(loadProject()));
 	connect(openRecent, SIGNAL(aboutToShow()), SLOT(openRecentMenu()));
 	connect(openRecent, SIGNAL(triggered(QAction*)), SLOT(selectProject(QAction*)));
 
-	connect(fileSaveAction, SIGNAL(activated()), SLOT(save()));
-	connect(fileSaveAsAction, SIGNAL(activated()), SLOT(saveAs()));
+	connect(fileSaveAction, SIGNAL(triggered()), SLOT(save()));
+	connect(fileSaveAsAction, SIGNAL(triggered()), SLOT(saveAs()));
 
-	connect(fileImportMidiAction, SIGNAL(activated()), SLOT(importMidi()));
-	connect(fileExportMidiAction, SIGNAL(activated()), SLOT(exportMidi()));
-	connect(fileImportPartAction, SIGNAL(activated()), SLOT(importPart()));
+	connect(fileImportMidiAction, SIGNAL(triggered()), SLOT(importMidi()));
+	connect(fileExportMidiAction, SIGNAL(triggered()), SLOT(exportMidi()));
+	connect(fileImportPartAction, SIGNAL(triggered()), SLOT(importPart()));
 
-	connect(fileImportWaveAction, SIGNAL(activated()), SLOT(importWave()));
-	connect(quitAction, SIGNAL(activated()), SLOT(quitDoc()));
+	connect(fileImportWaveAction, SIGNAL(triggered()), SLOT(importWave()));
+	connect(quitAction, SIGNAL(triggered()), SLOT(quitDoc()));
 
 	//-------- Edit connections
 	connect(editCutAction, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
@@ -1080,18 +1080,18 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	connect(editSignalMapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
 
-	connect(startPianoEditAction, SIGNAL(activated()), SLOT(startPianoroll()));
-	connect(startDrumEditAction, SIGNAL(activated()), SLOT(startDrumEditor()));
-	connect(startListEditAction, SIGNAL(activated()), SLOT(startListEditor()));
-	//connect(startWaveEditAction, SIGNAL(activated()), SLOT(startWaveEditor()));
+	connect(startPianoEditAction, SIGNAL(triggered()), SLOT(startPianoroll()));
+	connect(startDrumEditAction, SIGNAL(triggered()), SLOT(startDrumEditor()));
+	connect(startListEditAction, SIGNAL(triggered()), SLOT(startListEditor()));
+	//connect(startWaveEditAction, SIGNAL(triggered()), SLOT(startWaveEditor()));
 
-	connect(masterGraphicAction, SIGNAL(activated()), SLOT(startMasterEditor()));
-	connect(masterListAction, SIGNAL(activated()), SLOT(startLMasterEditor()));
+	connect(masterGraphicAction, SIGNAL(triggered()), SLOT(startMasterEditor()));
+	connect(masterListAction, SIGNAL(triggered()), SLOT(startLMasterEditor()));
 
-	connect(midiTransposeAction, SIGNAL(activated()), SLOT(transpose()));
-	connect(midiTransformerAction, SIGNAL(activated()), SLOT(startMidiTransformer()));
+	connect(midiTransposeAction, SIGNAL(triggered()), SLOT(transpose()));
+	connect(midiTransformerAction, SIGNAL(triggered()), SLOT(startMidiTransformer()));
 
-	connect(editSongInfoAction, SIGNAL(activated()), SLOT(startSongInfo()));
+	connect(editSongInfoAction, SIGNAL(triggered()), SLOT(startSongInfo()));
 
 	//-------- View connections
 	connect(viewTransportAction, SIGNAL(toggled(bool)), SLOT(toggleTransport(bool)));
@@ -1103,17 +1103,17 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(viewMarkerAction, SIGNAL(toggled(bool)), SLOT(toggleMarker(bool)));
 
 	//-------- Structure connections
-	connect(strGlobalCutAction, SIGNAL(activated()), SLOT(globalCut()));
-	connect(strGlobalInsertAction, SIGNAL(activated()), SLOT(globalInsert()));
-	connect(strGlobalSplitAction, SIGNAL(activated()), SLOT(globalSplit()));
-	connect(strCopyRangeAction, SIGNAL(activated()), SLOT(copyRange()));
-	connect(strCutEventsAction, SIGNAL(activated()), SLOT(cutEvents()));
+	connect(strGlobalCutAction, SIGNAL(triggered()), SLOT(globalCut()));
+	connect(strGlobalInsertAction, SIGNAL(triggered()), SLOT(globalInsert()));
+	connect(strGlobalSplitAction, SIGNAL(triggered()), SLOT(globalSplit()));
+	connect(strCopyRangeAction, SIGNAL(triggered()), SLOT(copyRange()));
+	connect(strCutEventsAction, SIGNAL(triggered()), SLOT(cutEvents()));
 
 	//-------- Midi connections
-	connect(midiEditInstAction, SIGNAL(activated()), SLOT(startEditInstrument()));
-	connect(midiResetInstAction, SIGNAL(activated()), SLOT(resetMidiDevices()));
-	connect(midiInitInstActions, SIGNAL(activated()), SLOT(initMidiDevices()));
-	connect(midiLocalOffAction, SIGNAL(activated()), SLOT(localOff()));
+	connect(midiEditInstAction, SIGNAL(triggered()), SLOT(startEditInstrument()));
+	connect(midiResetInstAction, SIGNAL(triggered()), SLOT(resetMidiDevices()));
+	connect(midiInitInstActions, SIGNAL(triggered()), SLOT(initMidiDevices()));
+	connect(midiLocalOffAction, SIGNAL(triggered()), SLOT(localOff()));
 
 	connect(midiTrpAction, SIGNAL(triggered()), midiPluginSignalMapper, SLOT(map()));
 	connect(midiInputTrfAction, SIGNAL(triggered()), midiPluginSignalMapper, SLOT(map()));
@@ -1133,23 +1133,23 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(midiPluginSignalMapper, SIGNAL(mapped(int)), this, SLOT(startMidiInputPlugin(int)));
 
 	//-------- Audio connections
-	connect(audioBounce2TrackAction, SIGNAL(activated()), SLOT(bounceToTrack()));
-	connect(audioBounce2FileAction, SIGNAL(activated()), SLOT(bounceToFile()));
-	connect(audioRestartAction, SIGNAL(activated()), SLOT(seqRestart()));
+	connect(audioBounce2TrackAction, SIGNAL(triggered()), SLOT(bounceToTrack()));
+	connect(audioBounce2FileAction, SIGNAL(triggered()), SLOT(bounceToFile()));
+	connect(audioRestartAction, SIGNAL(triggered()), SLOT(seqRestart()));
 
 	//-------- Automation connections
-	connect(autoMixerAction, SIGNAL(activated()), SLOT(switchMixerAutomation()));
-	connect(autoSnapshotAction, SIGNAL(activated()), SLOT(takeAutomationSnapshot()));
-	connect(autoClearAction, SIGNAL(activated()), SLOT(clearAutomation()));
+	connect(autoMixerAction, SIGNAL(triggered()), SLOT(switchMixerAutomation()));
+	connect(autoSnapshotAction, SIGNAL(triggered()), SLOT(takeAutomationSnapshot()));
+	connect(autoClearAction, SIGNAL(triggered()), SLOT(clearAutomation()));
 
 	//-------- Settings connections
-	connect(settingsGlobalAction, SIGNAL(activated()), SLOT(configGlobalSettings()));
-	connect(settingsShortcutsAction, SIGNAL(activated()), SLOT(configShortCuts()));
-	connect(settingsMetronomeAction, SIGNAL(activated()), SLOT(configMetronome()));
-	connect(settingsMidiSyncAction, SIGNAL(activated()), SLOT(configMidiSync()));
-	connect(settingsMidiIOAction, SIGNAL(activated()), SLOT(configMidiFile()));
-	//connect(settingsAppearanceAction, SIGNAL(activated()), SLOT(configAppearance()));
-	connect(settingsMidiPortAction, SIGNAL(activated()), SLOT(configMidiPorts()));
+	connect(settingsGlobalAction, SIGNAL(triggered()), SLOT(configGlobalSettings()));
+	connect(settingsShortcutsAction, SIGNAL(triggered()), SLOT(configShortCuts()));
+	connect(settingsMetronomeAction, SIGNAL(triggered()), SLOT(configMetronome()));
+	connect(settingsMidiSyncAction, SIGNAL(triggered()), SLOT(configMidiSync()));
+	connect(settingsMidiIOAction, SIGNAL(triggered()), SLOT(configMidiFile()));
+	//connect(settingsAppearanceAction, SIGNAL(triggered()), SLOT(configAppearance()));
+	connect(settingsMidiPortAction, SIGNAL(triggered()), SLOT(configMidiPorts()));
 
 	connect(dontFollowAction, SIGNAL(triggered()), followSignalMapper, SLOT(map()));
 	connect(followPageAction, SIGNAL(triggered()), followSignalMapper, SLOT(map()));
@@ -1162,10 +1162,10 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(followSignalMapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
 
 	//-------- Help connections
-	connect(helpManualAction, SIGNAL(activated()), SLOT(startHelpBrowser()));
-	connect(helpHomepageAction, SIGNAL(activated()), SLOT(startHomepageBrowser()));
-	//connect(helpReportAction, SIGNAL(activated()), SLOT(startBugBrowser()));
-	connect(helpAboutAction, SIGNAL(activated()), SLOT(about()));
+	connect(helpManualAction, SIGNAL(triggered()), SLOT(startHelpBrowser()));
+	connect(helpHomepageAction, SIGNAL(triggered()), SLOT(startHomepageBrowser()));
+	//connect(helpReportAction, SIGNAL(triggered()), SLOT(startBugBrowser()));
+	connect(helpAboutAction, SIGNAL(triggered()), SLOT(about()));
 
 	//--------------------------------------------------
 	//    Miscellaneous shortcuts
@@ -1173,7 +1173,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	QShortcut* sc = new QShortcut(shortcuts[SHRT_DELETE].key, this);
 	sc->setContext(Qt::WindowShortcut);
-	connect(sc, SIGNAL(activated()), editSignalMapper, SLOT(map()));
+	connect(sc, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
 	editSignalMapper->setMapping(sc, CMD_DELETE);
 
 	//--------------------------------------------------
@@ -1228,7 +1228,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//       testAction = new QAction(foo,"testPython");
 	//       testAction->addTo(foo);
 	//       menuBar()->insertItem(tr("&testpython"), foo);
-	//       connect(testAction, SIGNAL(activated()), this, SLOT(runPythonScript()));
+	//       connect(testAction, SIGNAL(triggered()), this, SLOT(runPythonScript()));
 
 
 	//-------------------------------------------------------------

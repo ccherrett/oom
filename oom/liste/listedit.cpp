@@ -458,12 +458,12 @@ ListEdit::ListEdit(PartList* pl)
 	insertCAfter = new QAction(QIcon(*cafterIcon), tr("insert Channel Aftertouch"), insertItems);
 	insertPAfter = new QAction(QIcon(*pafterIcon), tr("insert Poly Aftertouch"), insertItems);
 
-	connect(insertNote, SIGNAL(activated()), SLOT(editInsertNote()));
-	connect(insertSysEx, SIGNAL(activated()), SLOT(editInsertSysEx()));
-	connect(insertCtrl, SIGNAL(activated()), SLOT(editInsertCtrl()));
-	connect(insertMeta, SIGNAL(activated()), SLOT(editInsertMeta()));
-	connect(insertCAfter, SIGNAL(activated()), SLOT(editInsertCAfter()));
-	connect(insertPAfter, SIGNAL(activated()), SLOT(editInsertPAfter()));
+	connect(insertNote, SIGNAL(triggered()), SLOT(editInsertNote()));
+	connect(insertSysEx, SIGNAL(triggered()), SLOT(editInsertSysEx()));
+	connect(insertCtrl, SIGNAL(triggered()), SLOT(editInsertCtrl()));
+	connect(insertMeta, SIGNAL(triggered()), SLOT(editInsertMeta()));
+	connect(insertCAfter, SIGNAL(triggered()), SLOT(editInsertCAfter()));
+	connect(insertPAfter, SIGNAL(triggered()), SLOT(editInsertPAfter()));
 
 	//---------Pulldown Menu----------------------------
 
