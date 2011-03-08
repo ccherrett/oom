@@ -379,6 +379,14 @@ void OOMidi::stopServer()
 }
 
 #ifdef LSCP_SUPPORT
+void OOMidi::checkLSCPClient()
+{
+	if(!lsclient || !lsclient->isRunning())
+	{
+		startLSCPClient();
+	}
+}
+
 void OOMidi::startLSCPClient()
 {
 	lsclient = new LSClient();
@@ -759,6 +767,10 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	heartBeatTimer = new QTimer(this);
 	heartBeatTimer->setObjectName("timer");
 	connect(heartBeatTimer, SIGNAL(timeout()), song, SLOT(beat()));
+
+#ifdef LSCP_SUPPORT
+	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(checkLSCPClient()));
+#endif
 
 #ifdef ENABLE_PYTHON
 	//---------------------------------------------------

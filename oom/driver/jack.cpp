@@ -47,15 +47,6 @@ extern void undoSetuid();
 #include <fst.h>
 #endif
 
-//extern int jackmidi_pi[2];
-//extern int jackmidi_po[2];
-
-//jack_port_t *midi_port_in[JACK_MIDI_CHANNELS];
-//jack_port_t *midi_port_out[JACK_MIDI_CHANNELS];
-
-//oom_jack_midi_buffer jack_midi_out_data[JACK_MIDI_CHANNELS];
-//oom_jack_midi_buffer jack_midi_in_data[JACK_MIDI_CHANNELS];
-
 JackAudioDevice* jackAudio;
 
 //---------------------------------------------------------
@@ -93,35 +84,6 @@ bool checkAudioDevice()
 static void jack_thread_init(void*) // data
 {
 	doSetuid();
-	/*
-	if (jackAudio->isRealtime()) {
-		  struct sched_param rt_param;
-		  int rv;
-		  memset(&rt_param, 0, sizeof(sched_param));
-		  int type;
-		  rv = pthread_getschedparam(pthread_self(), &type, &rt_param);
-		  if (rv != 0)
-				perror("get scheduler parameter");
-		  if (type != SCHED_FIFO) {
-				fprintf(stderr, "JACK thread not running SCHED_FIFO, try to set...\n");
-
-				memset(&rt_param, 0, sizeof(sched_param));
-				rt_param.sched_priority = 1;
-				rv = pthread_setschedparam(pthread_self(), SCHED_FIFO, &rt_param);
-				if (rv != 0)
-					  perror("set realtime scheduler");
-				memset(&rt_param, 0, sizeof(sched_param));
-				rv = pthread_getschedparam(pthread_self(), &type, &rt_param);
-				if (rv != 0)
-					  perror("get scheduler parameter");
-				if (type != SCHED_FIFO)
-					  fprintf(stderr, "JACK still not running FIFO !?!\n"
-					  "======reliable RT operation not possible!!======\n");
-				else
-					  fprintf(stderr, "JACK thread succesfully set to SCHED_FIFO\n");
-				}
-		  }
-	 */
 #ifdef VST_SUPPORT
 	if (loadVST)
 		fst_adopt_thread();
@@ -129,150 +91,9 @@ static void jack_thread_init(void*) // data
 	undoSetuid();
 }
 
-/*
-//---------------------------------------------------------
-//   processAudio + Midi
-//    JACK callback
-//---------------------------------------------------------
-void
-print_triplet(unsigned char *data)
-{
-  int a,b,c;
-  a = b = c = 0;
-  memcpy(&a, data, 1);
-  memcpy(&b, data+1, 1);
-  memcpy(&c, data+2, 1);
-  fprintf(stderr, "%x,%x,%x", a, b, c);
-}
- */
-
-/*
-void handle_jack_midi_in_events(jack_nframes_t frames)
-{
-  char buf = 0;
-  int i,j;
-  jack_midi_event_t midi_event;
-  unsigned char t,n,v;
-
-  for(j = 0; j < JACK_MIDI_CHANNELS; j++){
-	void *midi_buffer_in = jack_port_get_buffer(midi_port_in[j], frames);
-	int event_count = jack_midi_get_event_count(midi_buffer_in);
-
-	for(i = 0; i < event_count; i++){
-	  jack_midi_event_get(&midi_event, midi_buffer_in, i);
-	  t = midi_event.buffer[0];
-	  n = midi_event.buffer[1];
-	  v = midi_event.buffer[2];
-	  if(((*(midi_event.buffer) & 0xf0)) == 0x90){
-		fprintf(stderr, "jack-midi-in-event: ON_ time=%d %u ", midi_event.time,
-				midi_event.size);
-		print_triplet(midi_event.buffer);
-		fprintf(stderr, "\n");
-	  }else if(((*(midi_event.buffer)) & 0xf0) == 0x80){
-		fprintf(stderr, "jack-midi-in-event: OFF time=%d %u ", midi_event.time,
-				midi_event.size);
-		print_triplet(midi_event.buffer);
-		fprintf(stderr, "\n");
-	  }else{
-		fprintf(stderr, "jack-midi-in-event: ??? time=%d %u ", midi_event.time,
-				midi_event.size);
-		print_triplet(midi_event.buffer);
-		fprintf(stderr, "\n");
-	  }
-	  jack_midi_in_data[j].buffer[0] = t;
-	  jack_midi_in_data[j].buffer[1] = n;
-	  jack_midi_in_data[j].buffer[2] = v;
-	  jack_midi_in_data[j].buffer[3] = 1;
-	  fprintf(stderr, "handle_jack_midi_in_events() w\n");
-	  write(jackmidi_pi[1], &buf, 1);
-	  fprintf(stderr, "handle_jack_midi_in_events() wd\n");
-	}
-  }
-}
-
-void handle_jack_midi_out_events(jack_nframes_t frames)
-{
-  unsigned char *data;
-  void *port_buf;
-  int i,j,n,x;
-
-  //for(i = 0; i < JACK_MIDI_CHANNELS; i++){
-  for(i = 0; i < JACK_MIDI_CHANNELS; ++i){
-	// jack-midi-clear any old events
-	while(jack_midi_out_data[i].buffer[jack_midi_out_data[i].take*4+3] == 2){
-	  port_buf = jack_port_get_buffer(midi_port_out[i], frames);
-	  jack_midi_clear_buffer(port_buf);
-	  jack_midi_out_data[i].buffer[jack_midi_out_data[i].take*4+3] = 0;
-	  // point the take to the next slot
-	  jack_midi_out_data[i].take++;
-	  if(jack_midi_out_data[i].take >= JACK_MIDI_BUFFER_SIZE){
-		jack_midi_out_data[i].take = 0;
-	  }
-	}
-	// check if any incoming midi-events from oom
-	if(jack_midi_out_data[i].give != jack_midi_out_data[i].take){
-
-	  if(jack_midi_out_data[i].give > jack_midi_out_data[i].take){
-		n = jack_midi_out_data[i].give - jack_midi_out_data[i].take;
-	  }else{
-		n = jack_midi_out_data[i].give +
-			(JACK_MIDI_BUFFER_SIZE - jack_midi_out_data[i].take);
-	  }
-	  port_buf = jack_port_get_buffer(midi_port_out[i], frames);
-	  jack_midi_clear_buffer(port_buf);
-	  // FIX: midi events has different sizes, compare note-on to
-	  //        program-change. We should first walk over the events
-	  //        counting the size.
-	  //data = jack_midi_event_reserve(port_buf, 0, n*3);
-	  //x = jack_midi_out_data[i].take;
-	  //for(j = 0; j < n; j++){
-	  //  data[j*3+0] = jack_midi_out_data[i].buffer[x*4+0];
-	  //  data[j*3+1] = jack_midi_out_data[i].buffer[x*4+1];
-	  //  data[j*3+2] = jack_midi_out_data[i].buffer[x*4+2];
-		// after having copied the buffer over to the jack-buffer,
-		// mark the ooms midi-out buffer as 'need-cleaning'
-	  //  jack_midi_out_data[i].buffer[x*4+3] = 2;
-	  //  x++;
-	  //  if(x >= JACK_MIDI_BUFFER_SIZE){
-	  //    x = 0;
-	  //  }
-	  //}
-      
-	  x = jack_midi_out_data[i].take;
-	  for(j = 0; j < n; ++j)
-	  {
-		data = jack_midi_event_reserve(port_buf, 0, 3);
-		if(data == 0)
-		{
-		  fprintf(stderr, "handle_jack_midi_out_events: buffer overflow, event lost\n");
-		  // Can do no more processing. Just return.
-		  return;
-		}
-		data[0] = jack_midi_out_data[i].buffer[x*4+0];
-		data[1] = jack_midi_out_data[i].buffer[x*4+1];
-		data[2] = jack_midi_out_data[i].buffer[x*4+2];
-		// after having copied the buffer over to the jack-buffer,
-		//  mark the ooms midi-out buffer as 'need-cleaning'
-		jack_midi_out_data[i].buffer[x*4+3] = 2;
-		x++;
-		if(x >= JACK_MIDI_BUFFER_SIZE){
-		  x = 0;
-		}
-	  }
-      
-	}
-  }
-}
- */
-
-//static int processAudio(jack_nframes_t frames, void*)
-
 int JackAudioDevice::processAudio(jack_nframes_t frames, void*)
 {
 	jackAudio->_frameCounter += frames;
-
-	///  handle_jack_midi_in_events(frames);
-	///  handle_jack_midi_out_events(frames);
 
 	//      if (JACK_DEBUG)
 	//            printf("processAudio - >>>>\n");
@@ -332,7 +153,6 @@ static int processSync(jack_transport_state_t state, jack_position_t* pos, void*
 
 	// p3.3.23
 	//printf("Jack processSync() before audio->sync frame:%d\n", frame);
-	//return audio->sync(audioState, frame);
 	int rv = audio->sync(audioState, frame);
 	//printf("Jack processSync() after audio->sync frame:%d\n", frame);
 	return rv;
@@ -351,10 +171,8 @@ static void timebase_callback(jack_transport_state_t /* state */,
 	//printf("Jack timebase_callback pos->frame:%u audio->tickPos:%d song->cpos:%d\n", pos->frame, audio->tickPos(), song->cpos());
 
 	// p3.3.27
-	//Pos p(pos->frame, false);
 	Pos p(extSyncFlag.value() ? audio->tickPos() : pos->frame, extSyncFlag.value() ? true : false);
 	// Can't use song pos - it is only updated every (slow) GUI heartbeat !
-	//Pos p(extSyncFlag.value() ? song->cpos() : pos->frame, extSyncFlag.value() ? true : false);
 
 	pos->valid = JackPositionBBT;
 	p.mbt(&pos->bar, &pos->beat, &pos->tick);
@@ -362,27 +180,10 @@ static void timebase_callback(jack_transport_state_t /* state */,
 	pos->beat++;
 	pos->bar_start_tick = Pos(pos->bar, 0, 0).tick();
 
-	//
-	//  dummy:
-	//
-
-	// p3.3.26
-	//pos->beats_per_bar = 4;
-	//pos->beat_type = 4;
-	//pos->ticks_per_beat = 384;
-	//
-	/* // From example client transport.c :
-	float time_beats_per_bar = 4.0;
-	float time_beat_type = 0.25;            // Huh? Inverted? From docs: "Time signature 'denominator'"
-	double time_ticks_per_beat = 1920.0;    // Huh? Ticks per beat should be 24 etc. not 384 or 1920 etc. Otherwise it would be called 'frames_per_beat'.
-	double time_beats_per_minute = 120.0;
-	 */
-	//
 	int z, n;
 	AL::sigmap.timesig(p.tick(), z, n);
 	pos->beats_per_bar = z;
 	pos->beat_type = n;
-	//pos->ticks_per_beat = config.division;
 	pos->ticks_per_beat = 24;
 
 	int tempo = tempomap.tempo(p.tick());
@@ -397,7 +198,6 @@ static void processShutdown(void*)
 {
 	if (JACK_DEBUG)
 		printf("processShutdown()\n");
-	//printf("processShutdown\n");
 	jackAudio->nullify_client();
 	audio->shutdown();
 
@@ -442,7 +242,6 @@ JackAudioDevice::JackAudioDevice(jack_client_t* cl, char* name)
 : AudioDevice()
 {
 	_frameCounter = 0;
-	//JackAudioDevice::jackStarted=false;
 	strcpy(jackRegisteredName, name);
 	_client = cl;
 	dummyState = Audio::STOP;
@@ -460,20 +259,8 @@ JackAudioDevice::~JackAudioDevice()
 	if (_client)
 	{
 
-		/*
-		// p3.3.35
-		for(int i = 0; i < JACK_MIDI_CHANNELS; i++)
-		{
-		  if(midi_port_in[i])
-			jack_port_unregister(_client, midi_port_in[i]);
-		  if(midi_port_out[i])
-			jack_port_unregister(_client, midi_port_out[i]);
-		}
-		 */
-
 		if (jack_client_close(_client))
 		{
-			//error->logError("jack_client_close() failed: %s\n", strerror(errno));
 			fprintf(stderr, "jack_client_close() failed: %s\n", strerror(errno));
 		}
 	}
@@ -508,31 +295,6 @@ int JackAudioDevice::realtimePriority() const
 	return param.sched_priority;
 }
 
-/*
-//---------------------------------------------------------
-//   getJackName()
-//---------------------------------------------------------
-
-char* JackAudioDevice::getJackName()
-	  {
-	  return jackRegisteredName;
-	  }
- */
-
-/*
-//---------------------------------------------------------
-//   clientName()
-//---------------------------------------------------------
-
-const char* JackAudioDevice::clientName()
-{
-  //if(_client)
-  //  return jack_get_client_name(_client);
-  //else
-  //  return "OOMidi";  
-  return jackRegisteredName;
-}
- */
 
 //---------------------------------------------------------
 //   initJackAudio
@@ -576,7 +338,6 @@ bool initJackAudio()
 	if (client)
 	{
 		jack_set_error_function(jackError);
-		//jackAudio = new JackAudioDevice(client, jackIdString);
 		jackAudio = new JackAudioDevice(client, jack_get_client_name(client));
 		if (debugMsg)
 			fprintf(stderr, "initJackAudio(): registering client...\n");
@@ -661,13 +422,10 @@ void JackAudioDevice::connectJackMidiPorts()
 
 	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
 	{
-		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(*i);
-		//if(!mjd)
 		MidiDevice* md = *i;
 		if (md->deviceType() != MidiDevice::JACK_MIDI)
 			continue;
 
-		//void* port = md->clientPort();
 		if (md->rwFlags() & 1)
 		{
 			void* port = md->outClientPort(); // p3.3.55
@@ -678,8 +436,6 @@ void JackAudioDevice::connectJackMidiPorts()
 					connect(port, r->jackPort);
 			}
 		}
-
-		// else  // p3.3.55 Removed
 
 		if (md->rwFlags() & 2)
 		{
@@ -711,8 +467,6 @@ static void port_connect_callback(jack_port_id_t a, jack_port_id_t b, int isConn
 {
 	if (debugMsg || JACK_DEBUG)
 	{
-		//jack_port_t* ap = jack_port_by_id(_client, a);
-		//jack_port_t* bp = jack_port_by_id(_client, b);
 		//printf("JACK: port connections changed: A:%d:%s B:%d:%s isConnect:%d\n", a, jack_port_name(ap), b, jack_port_name(bp), isConnect);
 		printf("JACK: port connections changed: A:%d B:%d isConnect:%d\n", a, b, isConnect);
 	}
@@ -765,12 +519,12 @@ void JackAudioDevice::graphChanged()
 			// check for disconnects
 			//---------------------------------------
 
-			bool erased;
+			//bool erased;
 			// limit set to 20 iterations for disconnects, don't know how to make it go
 			// the "right" amount
-			for (int i = 0; i < 20; i++)
-			{
-				erased = false;
+			//for (int i = 0; i < 20; i++)
+			//{
+			//	erased = false;
 				for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 				{
 					if (irl->channel != channel)
@@ -779,32 +533,29 @@ void JackAudioDevice::graphChanged()
 					QByteArray ba = name.toLatin1();
 					const char* portName = ba.constData();
 					//printf("portname=%s\n", portName);
-					bool found = false;
+					//bool found = false;
 					const char** pn = ports;
 					while (pn && *pn)
 					{
 						if (strcmp(*pn, portName) == 0)
 						{
-							found = true;
+							//found = true;
+							audio->msgRemoveRoute1(Route(portName, false, channel, Route::JACK_ROUTE), Route(it, channel));
 							break;
 						}
 						++pn;
 					}
 					//FIXME: This is the code that removes the route from the input track if jack dies
-					if (!found)
-					{
-						audio->msgRemoveRoute1(
-								//Route(portName, false, channel),
-								Route(portName, false, channel, Route::JACK_ROUTE),
-								Route(it, channel)
-								);
-						erased = true;
-						break;
-					}
+					//if (!found)
+					//{
+					//	audio->msgRemoveRoute1(Route(portName, false, channel, Route::JACK_ROUTE), Route(it, channel));
+					//	erased = true;
+					//	break;
+					//}
 				}
-				if (!erased)
-					break;
-			}
+			//	if (!erased)
+			//		break;
+			//}
 
 			//---------------------------------------
 			// check for connects
@@ -864,13 +615,12 @@ void JackAudioDevice::graphChanged()
 			//---------------------------------------
 			// check for disconnects
 			//---------------------------------------
-
-			bool erased;
+			//bool erased;
 			// limit set to 20 iterations for disconnects, don't know how to make it go
 			// the "right" amount
-			for (int i = 0; i < 20; i++)
-			{
-				erased = false;
+			//for (int i = 0; i < 20; i++)
+			//{
+			//	erased = false;
 				for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 				{
 					if (irl->channel != channel)
@@ -878,31 +628,27 @@ void JackAudioDevice::graphChanged()
 					QString name = irl->name();
 					QByteArray ba = name.toLatin1();
 					const char* portName = ba.constData();
-					bool found = false;
+					//bool found = false;
 					const char** pn = ports;
 					while (pn && *pn)
 					{
 						if (strcmp(*pn, portName) == 0)
 						{
-							found = true;
+							audio->msgRemoveRoute1(Route(it, channel), Route(portName, false, channel, Route::JACK_ROUTE));
+							//found = true;
 							break;
 						}
 						++pn;
 					}
-					if (!found)
-					{
-						audio->msgRemoveRoute1(
-								Route(it, channel),
-								//Route(portName, false, channel)
-								Route(portName, false, channel, Route::JACK_ROUTE)
-								);
-						erased = true;
-						break;
-					}
+					//if (!found)
+					//{
+					//	erased = true;
+					//	break;
+					//}
 				}
-				if (!erased)
-					break;
-			}
+			//	if (!erased)
+			//		break;
+			//}
 
 			//---------------------------------------
 			// check for connects
@@ -953,18 +699,6 @@ void JackAudioDevice::graphChanged()
 		if (md->deviceType() != MidiDevice::JACK_MIDI)
 			continue;
 
-		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(*ii);
-		//if(!mjd)
-		//  continue;
-		//for (int channel = 0; channel < channels; ++channel)
-		//{
-
-		// p3.3.55 Removed
-		//jack_port_t* port = (jack_port_t*)md->clientPort();
-		//if (port == 0)
-		//      continue;
-		//const char** ports = jack_port_get_all_connections(_client, port);
-
 		//---------------------------------------
 		// outputs
 		//---------------------------------------
@@ -985,12 +719,12 @@ void JackAudioDevice::graphChanged()
 				// check for disconnects
 				//---------------------------------------
 
-				bool erased;
+				//bool erased;
 				// limit set to 20 iterations for disconnects, don't know how to make it go
 				// the "right" amount
-				for (int i = 0; i < 20; i++)
-				{
-					erased = false;
+				//for (int i = 0; i < 20; i++)
+				//{
+				//	erased = false;
 					for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 					{
 						//if (irl->channel != channel)
@@ -999,34 +733,28 @@ void JackAudioDevice::graphChanged()
 						//name += QString(JACK_MIDI_OUT_PORT_SUFFIX);    // p3.3.55
 						QByteArray ba = name.toLatin1();
 						const char* portName = ba.constData();
-						bool found = false;
+						//bool found = false;
 						const char** pn = ports;
 						while (pn && *pn)
 						{
 							if (strcmp(*pn, portName) == 0)
 							{
-								found = true;
+								audio->msgRemoveRoute1(Route(md, -1), Route(portName, false, -1, Route::JACK_ROUTE));
+								//found = true;
 								break;
 							}
 							++pn;
 						}
-						if (!found)
-						{
-							audio->msgRemoveRoute1(
-									//Route(it, channel),
-									//Route(mjd),
-									Route(md, -1),
-									//Route(portName, false, channel)
-									//Route(portName, false, -1)
-									Route(portName, false, -1, Route::JACK_ROUTE)
-									);
-							erased = true;
-							break;
-						}
+						//if (!found)
+						//{
+						//	audio->msgRemoveRoute1(Route(md, -1), Route(portName, false, -1, Route::JACK_ROUTE));
+						//	erased = true;
+						//	break;
+						//}
 					}
-					if (!erased)
-						break;
-				}
+				//	if (!erased)
+				//		break;
+				//}
 
 				//---------------------------------------
 				// check for connects
@@ -1054,11 +782,7 @@ void JackAudioDevice::graphChanged()
 						if (!found)
 						{
 							audio->msgAddRoute1(
-									//Route(it, channel),
-									//Route(mjd),
 									Route(md, -1),
-									//Route(*pn, false, channel)
-									//Route(*pn, false, -1)
 									Route(*pn, false, -1, Route::JACK_ROUTE)
 									);
 						}
@@ -1092,12 +816,12 @@ void JackAudioDevice::graphChanged()
 				// check for disconnects
 				//---------------------------------------
 
-				bool erased;
+				/*bool erased;
 				// limit set to 20 iterations for disconnects, don't know how to make it go
 				// the "right" amount
 				for (int i = 0; i < 20; i++)
 				{
-					erased = false;
+					erased = false;*/
 					for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
 					{
 						//if (irl->channel != channel)
@@ -1105,34 +829,28 @@ void JackAudioDevice::graphChanged()
 						QString name = irl->name();
 						QByteArray ba = name.toLatin1();
 						const char* portName = ba.constData();
-						bool found = false;
+						//bool found = false;
 						const char** pn = ports;
 						while (pn && *pn)
 						{
 							if (strcmp(*pn, portName) == 0)
 							{
-								found = true;
+								//found = true;
+								audio->msgRemoveRoute1(Route(portName, false, -1, Route::JACK_ROUTE), Route(md, -1));
 								break;
 							}
 							++pn;
 						}
-						if (!found)
+				/*		if (!found)
 						{
-							audio->msgRemoveRoute1(
-									//Route(portName, false, channel),
-									//Route(portName, false, -1),
-									Route(portName, false, -1, Route::JACK_ROUTE),
-									//Route(it, channel)
-									//Route(mjd)
-									Route(md, -1)
-									);
+							audio->msgRemoveRoute1(Route(portName, false, -1, Route::JACK_ROUTE), Route(md, -1));
 							erased = true;
 							break;
-						}
-					}
+						}*/
+					}/*
 					if (!erased)
 						break;
-				}
+				}*/
 
 				//---------------------------------------
 				// check for connects

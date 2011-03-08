@@ -33,129 +33,18 @@
 
 extern unsigned int volatile lastExtMidiSyncTick;
 
-///int jackmidi_pi[2];
-///int jackmidi_po[2];
-
-//extern oom_jack_midi_buffer jack_midi_out_data[JACK_MIDI_CHANNELS];
-//extern oom_jack_midi_buffer jack_midi_in_data[JACK_MIDI_CHANNELS];
-///extern jack_port_t *midi_port_in[JACK_MIDI_CHANNELS];
-///extern jack_port_t *midi_port_out[JACK_MIDI_CHANNELS];
-
-///MidiJackDevice* gmdev = NULL;
-
-///int* jackSeq;
-//static snd_seq_addr_t oomPort;
-
-//int MidiJackDevice::_nextOutIdNum = 0;
-//int MidiJackDevice::_nextInIdNum = 0;
-
-//int JackMidiPortList::_nextOutIdNum = 0;
-//int JackMidiPortList::_nextInIdNum = 0;
-
-//JackMidiPortList jackMidiClientPorts;
-
-
-/*
-//---------------------------------------------------------
-//   JackMidiPortList
-//---------------------------------------------------------
-
-JackMidiPortList::JackMidiPortList()
-{
-
-}
-
-JackMidiPortList::~JackMidiPortList()
-{
-
-}
-
-iJackMidiPort JackMidiPortList::createClientPort(int flags) // 1 = writable, 2 = readable - do not mix
-{
-  if(flags & 1)
-  {
-	char buf[80];
-	snprintf(buf, 80, "oom-jack-midi-out-%d", _nextOutIdNum);
-	jack_port_t* _client_jackport = (jack_port_t*)audioDevice->registerOutPort(buf, true);
-	if(_client_jackport == NULL)
-	{
-	  fprintf(stderr, "JackMidiPortList::createClientPort failed to register jack-midi-out\n");
-	  //return QString("Could not register jack-midi-out client port");
-	  return end();
-	}
-	else
-	{
-	  JackMidiPort jmp(_client_jackport, QString(buf), flags);
-	  _nextOutIdNum++;
-	  return insert(begin(), std::pair<jack_port_t*, JackMidiPort>(_client_jackport, jmp));
-	}
-  }
-  else 
-  if(flags & 2)
-  {  
-	char buf[80];
-	snprintf(buf, 80, "oom-jack-midi-in-%d", _nextInIdNum);
-	jack_port_t* _client_jackport = (jack_port_t*)audioDevice->registerInPort(buf, true);
-	if(_client_jackport == NULL)
-	{
-	  fprintf(stderr, "JackMidiPortList::createClientPort failed to register jack-midi-in\n");
-	  return end();
-	}
-	else
-	{
-	  JackMidiPort jmp(_client_jackport, QString(buf), flags);
-	  _nextInIdNum++;
-	  return insert(begin(), std::pair<jack_port_t*, JackMidiPort>(_client_jackport, jmp));
-	}
-  }
-  return end();
-}
-
-// Return true if removed.
-bool JackMidiPortList::removeClientPort(jack_port_t* port) 
-{
-  iJackMidiPort ijp = find(port);
-  if(ijp == end())
-	return false;
-    
-  // Is output?
-  if(ijp->second._flags & 1)
-	_nextOutIdNum--;
-  // Is input?
-  if(ijp->second._flags & 2)
-	_nextInIdNum--;
-  
-  erase(ijp);
-  
-  audioDevice->unregisterPort(port);
-  
-  return true;
-}
- */
 
 //---------------------------------------------------------
 //   MidiJackDevice
 //   in_jack_port or out_jack_port can be null
 //---------------------------------------------------------
 
-//MidiJackDevice::MidiJackDevice(const int& a, const QString& n)
-//MidiJackDevice::MidiJackDevice(jack_port_t* jack_port, const QString& n)
-// p3.3.55
-//MidiJackDevice::MidiJackDevice(jack_port_t* in_jack_port, jack_port_t* out_jack_port, const QString& n)
-
 MidiJackDevice::MidiJackDevice(const QString& n)
 : MidiDevice(n)
 {
-	//_client_jackport = 0;
-
-	//_client_jackport = jack_port;
-	// p3.3.55
-	//_in_client_jackport  = in_jack_port;
-	//_out_client_jackport = out_jack_port;
 	_in_client_jackport = NULL;
 	_out_client_jackport = NULL;
 
-	//adr = a;
 	init();
 }
 
@@ -165,10 +54,6 @@ MidiJackDevice::~MidiJackDevice()
 	printf("MidiJackDevice::~MidiJackDevice()\n");
 #endif  
 
-	//if(_client_jackport)
-	//  audioDevice->unregisterPort(_client_jackport);
-	// p3.3.55
-
 	if (audioDevice)
 	{
 		if (_in_client_jackport)
@@ -176,33 +61,12 @@ MidiJackDevice::~MidiJackDevice()
 		if (_out_client_jackport)
 			audioDevice->unregisterPort(_out_client_jackport);
 	}
-
-	//close();
 }
-
-/*
-//---------------------------------------------------------
-//   select[RW]fd
-//---------------------------------------------------------
-
-int MidiJackDevice::selectRfd()
-{
-  return jackmidi_pi[0];
-}
-
-int MidiJackDevice::selectWfd()
-{
-  return jackmidi_po[0];
-}
- */
 
 //---------------------------------------------------------
 //   createJackMidiDevice
 //   If name parameter is blank, creates a new (locally) unique one.
 //---------------------------------------------------------
-
-//QString MidiJackDevice::createJackMidiDevice(int rwflags) // 1:Writable 2: Readable. Do not mix.
-//MidiDevice* MidiJackDevice::createJackMidiDevice(QString name, int rwflags) // 1:Writable 2: Readable. Do not mix.
 
 MidiDevice* MidiJackDevice::createJackMidiDevice(QString name, int rwflags) // p3.3.55 1:Writable 2: Readable 3: Writable + Readable
 {
@@ -240,9 +104,6 @@ void MidiJackDevice::setName(const QString& s)
 #endif  
 	_name = s;
 
-	//if(clientPort())  // p3.3.52 Added check.
-	//  audioDevice->setPortName(clientPort(), s.toLatin1().constData());
-	// p3.3.55
 	if (inClientPort())
 		audioDevice->setPortName(inClientPort(), (s + QString(JACK_MIDI_IN_PORT_SUFFIX)).toLatin1().constData());
 	if (outClientPort())
@@ -338,9 +199,6 @@ QString MidiJackDevice::open()
 		_in_client_jackport = NULL;
 	}
 
-	//if(client_jackport == NULL)  // p3.3.52 Removed. Allow the device to be created even if Jack isn't running.
-	//  return 0;
-
 	_writeEnable = bool(_openFlags & 1);
 	_readEnable = bool(_openFlags & 2);
 
@@ -357,63 +215,8 @@ void MidiJackDevice::close()
 	printf("MidiJackDevice::close %s\n", name().toLatin1().constData());
 #endif  
 
-	// p3.3.55 TODO: I don't really want to unregister the
-	//  Jack midi ports because then we lose the connections
-	//  to Jack every time we click the read/write lights
-	//  or change a port's device.
-
-	/*
-	if(_client_jackport)
-	{
-	  int pf = jack_port_flags(_client_jackport);
-
-	  if(pf & JackPortIsOutput)
-		_nextOutIdNum--;
-	  else
-	  if(pf & JackPortIsInput)
-		_nextInIdNum--;
-	  audioDevice->unregisterPort(_client_jackport);
-	  _client_jackport = 0;
-	  _writeEnable = false;
-	  _readEnable = false;
-	  return;
-	}
-	 */
-
 	_writeEnable = false;
 	_readEnable = false;
-
-	/*
-	//jack_port_t* jp = jack_port_by_name(_client, name().toLatin1().constData());
-	jack_port_t* jp = (jack_port_t*)audioDevice->findPort(name().toLatin1().constData());
-  
-	if(!jp)
-	{
-	  printf("MidiJackDevice::close: Jack midi port %s not found!\n", name().toLatin1().constData());
-	  _writeEnable = false;
-	  _readEnable = false;
-	  return;
-	}
-    
-	//int pf = jack_port_flags(jp);
-  
-	// If Jack port can receive data from us and we actually want to...
-	//if((pf & JackPortIsInput) && (_openFlags & 1))
-	if(jack_port_connected_to(midi_port_out[0], name().toLatin1().constData()))
-	{
-	  // src, dest
-  ///    audioDevice->disconnect(midi_port_out[0], jp);
-	  _writeEnable = false;
-	}
-	else // Note docs say it can't be both input and output.
-	// If Jack port can send data to us and we actually want it...
-	//if((pf & JackPortIsOutput) && (_openFlags & 2))
-	if(jack_port_connected_to(midi_port_in[0], name().toLatin1().constData()))
-	{
-  ///    audioDevice->disconnect(jp, midi_port_in[0]);
-	  _readEnable = false;
-	}
-	 */
 }
 
 //---------------------------------------------------------
@@ -431,28 +234,19 @@ void MidiJackDevice::writeRouting(int level, Xml& xml) const
 	QString s;
 	if (rwFlags() & 2) // Readable
 	{
-		//RouteList* rl = _inRoutes;
-		//for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		for (ciRoute r = _inRoutes.begin(); r != _inRoutes.end(); ++r)
 		{
 			if (!r->name().isEmpty())
 			{
 				xml.tag(level++, "Route");
 
-				//xml.strTag(level, "srcNode", r->name());
-				//xml.tag(level, "source type=\"%d\" name=\"%s\"/", r->type, r->name().toLatin1().constData());
 				s = QT_TRANSLATE_NOOP("@default", "source");
 				if (r->type != Route::TRACK_ROUTE)
 					s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
 
-				//s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(r->name());
 				s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 				xml.tag(level, s.toLatin1().constData());
 
-				//xml.strTag(level, "dstNode", name());
-				//xml.tag(level, "dest type=\"%d\" name=\"%s\"/", Route::JACK_MIDI_ROUTE, name().toLatin1().constData());
-				//xml.tag(level, "dest type=\"%d\" name=\"%s\"/", Route::MIDI_DEVICE_ROUTE, name().toLatin1().constData());
-				//xml.tag(level, "dest devtype=\"%d\" name=\"%s\"/", MidiDevice::JACK_MIDI, name().toLatin1().constData());
 				xml.tag(level, "dest devtype=\"%d\" name=\"%s\"/", MidiDevice::JACK_MIDI, Xml::xmlString(name()).toLatin1().constData());
 
 				xml.etag(level--, "Route");
@@ -468,39 +262,9 @@ void MidiJackDevice::writeRouting(int level, Xml& xml) const
 			if (r->channel != -1)
 				s += QString(QT_TRANSLATE_NOOP("@default", " channel=\"%1\"")).arg(r->channel);
 
-			//xml.tag(level++, "Route");
 			xml.tag(level++, s.toLatin1().constData());
 
-			/*
-			//xml.strTag(level, "srcNode", name());
-			if(r->channel != -1)
-			  //xml.tag(level, "source type=\"%d\" channel=\"%d\" name=\"%s\"/", Route::JACK_MIDI_ROUTE, r->channel, name().toLatin1().constData());
-			  //xml.tag(level, "source type=\"%d\" channel=\"%d\" name=\"%s\"/", Route::MIDI_DEVICE_ROUTE, r->channel, name().toLatin1().constData());
-			  xml.tag(level, "source devtype=\"%d\" channel=\"%d\" name=\"%s\"/", MidiDevice::JACK_MIDI, r->channel, name().toLatin1().constData());
-			else
-			  //xml.tag(level, "source type=\"%d\" name=\"%s\"/", Route::JACK_MIDI_ROUTE, name().toLatin1().constData());
-			  //xml.tag(level, "source type=\"%d\" name=\"%s\"/", Route::MIDI_DEVICE_ROUTE, name().toLatin1().constData());
-			 */
-			//xml.tag(level, "source devtype=\"%d\" name=\"%s\"/", MidiDevice::JACK_MIDI, name().toLatin1().constData());
 			xml.tag(level, "source devtype=\"%d\" name=\"%s\"/", MidiDevice::JACK_MIDI, Xml::xmlString(name()).toLatin1().constData());
-
-			/*
-			//xml.strTag(level, "dstNode", r->name());
-			if(r->channel != -1)
-			{
-			  if(r->type == Route::MIDI_DEVICE_ROUTE)
-				xml.tag(level, "dest devtype=\"%d\" channel=\"%d\" name=\"%s\"/", r->device->deviceType(), r->channel, r->name().toLatin1().constData());
-			  else
-				xml.tag(level, "dest type=\"%d\" channel=\"%d\" name=\"%s\"/", r->type, r->channel, r->name().toLatin1().constData());
-			}
-			else
-			{
-			  if(r->type == Route::MIDI_DEVICE_ROUTE)
-				xml.tag(level, "dest devtype=\"%d\" name=\"%s\"/", r->device->deviceType(), r->name().toLatin1().constData());
-			  else
-				xml.tag(level, "dest type=\"%d\" name=\"%s\"/", r->type, r->name().toLatin1().constData());
-			}
-			 */
 
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 			if (r->type == Route::MIDI_DEVICE_ROUTE)
@@ -509,7 +273,6 @@ void MidiJackDevice::writeRouting(int level, Xml& xml) const
 				if (r->type != Route::TRACK_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
 
-			//s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(r->name());
 			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 			xml.tag(level, s.toLatin1().constData());
 
@@ -517,33 +280,6 @@ void MidiJackDevice::writeRouting(int level, Xml& xml) const
 			xml.etag(level--, "Route");
 		}
 	}
-
-	/*
-	else
-	if(rwFlags() & 1)  // Writable
-	{
-	  //RouteList* rl = _outRoutes;
-	  //for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-	  for (ciRoute r = _outRoutes.begin(); r != _outRoutes.end(); ++r)
-	  {
-		if(!r->name().isEmpty())
-		{
-		  xml.tag(level++, "Route");
-            
-		  //xml.strTag(level, "srcNode", name());
-		  //if(r->channel != -1)
-		  //  xml.tag(level, "srcNode type=\"%d\" channel=\"%d\" name=\"%s\"", Route::JACK_MIDI_ROUTE, r->channel, name().toLatin1().constData());
-		  //else
-			xml.tag(level, "source type=\"%d\" name=\"%s\"/", Route::JACK_MIDI_ROUTE, name().toLatin1().constData());
-            
-		  //xml.strTag(level, "dstNode", r->name());
-		  xml.tag(level, "dest type=\"%d\" name=\"%s\"/", r->type, r->name().toLatin1().constData());
-            
-		  xml.etag(level--, "Route");
-		}
-	  }
-	}
-	 */
 }
 
 //---------------------------------------------------------
@@ -565,8 +301,6 @@ bool MidiJackDevice::putMidiEvent(const MidiPlayEvent& /*event*/)
 
 void MidiJackDevice::recordEvent(MidiRecordEvent& event)
 {
-	// Set the loop number which the event came in at.
-	//if(audio->isRecording())
 	if (audio->isPlaying())
 		event.setLoopNum(audio->loopCount());
 
@@ -592,26 +326,21 @@ void MidiJackDevice::recordEvent(MidiRecordEvent& event)
 			int n = event.len();
 			if (n >= 4)
 			{
-				if ((p[0] == 0x7f)
-						//&& ((p[1] == 0x7f) || (p[1] == rxDeviceId))) {
-						&& ((p[1] == 0x7f) || (idin == 0x7f) || (p[1] == idin)))
+				if ((p[0] == 0x7f) && ((p[1] == 0x7f) || (idin == 0x7f) || (p[1] == idin)))
 				{
 					if (p[2] == 0x06)
 					{
-						//mmcInput(p, n);
 						midiSeq->mmcInput(_port, p, n);
 						return;
 					}
 					if (p[2] == 0x01)
 					{
-						//mtcInputFull(p, n);
 						midiSeq->mtcInputFull(_port, p, n);
 						return;
 					}
 				}
 				else if (p[0] == 0x7e)
 				{
-					//nonRealtimeSystemSysex(p, n);
 					midiSeq->nonRealtimeSystemSysex(_port, p, n);
 					return;
 				}
@@ -684,12 +413,8 @@ void MidiJackDevice::eventReceived(jack_midi_event_t* ev)
 	//
 	//      const SeqTime* st = audio->seqTime();
 
-	//unsigned curFrame = st->startFrame() + segmentSize;
-	//      unsigned curFrame = st->lastFrameTime;
-	//int frameOffset = audio->getFrameOffset();
 	unsigned pos = audio->pos().frame();
 
-	//event.setTime(pos + ev->time);
 	event.setTime(extSyncFlag.value() ? lastExtMidiSyncTick : (pos + ev->time));
 
 	event.setChannel(*(ev->buffer) & 0xf);
@@ -741,9 +466,6 @@ void MidiJackDevice::eventReceived(jack_midi_event_t* ev)
 					if (_port != -1)
 						midiSeq->setSongPosition(_port, *(ev->buffer + 1) | (*(ev->buffer + 2) >> 2)); // LSB then MSB
 					return;
-					//case ME_SONGSEL:
-					//case ME_TUNE_REQ:
-					//case ME_SENSE:
 				case ME_CLOCK:
 				case ME_TICK:
 				case ME_START:
@@ -752,15 +474,11 @@ void MidiJackDevice::eventReceived(jack_midi_event_t* ev)
 					if (_port != -1)
 						midiSeq->realtimeSystemInput(_port, type);
 					return;
-					//case ME_SYSEX_END:
-					//break;
-					//      return;
 				default:
 					printf("MidiJackDevice::eventReceived unsupported system event 0x%02x\n", type);
 					return;
 			}
 		}
-			//return;
 			break;
 		default:
 			printf("MidiJackDevice::eventReceived unknown event 0x%02x\n", type);
@@ -791,11 +509,9 @@ void MidiJackDevice::collectMidiEvents()
 	if (!_readEnable)
 		return;
 
-	//if(!_client_jackport)
 	if (!_in_client_jackport) // p3.3.55
 		return;
 
-	//void* port_buf = jack_port_get_buffer(_client_jackport, segmentSize);
 	void* port_buf = jack_port_get_buffer(_in_client_jackport, segmentSize); // p3.3.55
 
 	jack_midi_event_t event;
@@ -840,10 +556,7 @@ bool MidiJackDevice::putEvent(const MidiPlayEvent& ev)
 //   This sends the actual midi events to jack for processing
 //---------------------------------------------------------
 
-//void JackAudioDevice::putEvent(Port port, const MidiEvent& e)
-
 bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
-//bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 {
 	// Perhaps we can find use for this value later, together with the Jack midi OOMidi port(s).
 	// No big deal if not. Not used for now.
@@ -860,13 +573,10 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 	//if(debugMsg)
 	//  printf("MidiJackDevice::queueEvent\n");
 
-	//if(!_client_jackport)
 	if (!_out_client_jackport) // p3.3.55
 		return false;
-	//void* pb = jack_port_get_buffer(_client_jackport, segmentSize);
 	void* pb = jack_port_get_buffer(_out_client_jackport, segmentSize); // p3.3.55
 
-	//unsigned frameCounter = ->frameTime();
 	int frameOffset = audio->getFrameOffset();
 	unsigned pos = audio->pos().frame();
 	int ft = e.time() - frameOffset - pos;
@@ -963,9 +673,6 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 
 void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 {
-	//int frameOffset = audio->getFrameOffset();
-	//unsigned pos = audio->pos().frame();
-
 	int chn = event.channel();
 	unsigned t = event.time();
 	int a = event.dataA();
@@ -980,7 +687,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 	// Tested OK so far with 128.
 	if (extSyncFlag.value())
 		t = audio->getFrameOffset() + audio->pos().frame();
-	//t = frameOffset + pos;
 
 #ifdef JACK_MIDI_DEBUG
 	printf("MidiJackDevice::processEvent time:%d type:%d ch:%d A:%d B:%d\n", event.time(), event.type(), event.channel(), event.dataA(), event.dataB());
@@ -989,7 +695,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 	if (event.type() == ME_PROGRAM)
 	{
 		// don't output program changes for GM drum channel
-		//if (!(song->mtype() == MT_GM && chn == 9)) {
 		int hb = (a >> 16) & 0xff;
 		int lb = (a >> 8) & 0xff;
 		int pr = a & 0x7f;
@@ -1005,7 +710,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LBANK, lb));
 		sleep(1);
 		queueEvent(MidiPlayEvent(t + 2, port, chn, ME_PROGRAM, pr, 0));
-		//      }
 	}
 	else
 		if (event.type() == ME_PITCHBEND)
@@ -1047,8 +751,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 		}
 		else if (a == CTRL_PROGRAM)
 		{
-			// don't output program changes for GM drum channel
-			//if (!(song->mtype() == MT_GM && chn == 9)) {
 			int hb = (b >> 16) & 0xff;
 			int lb = (b >> 8) & 0xff;
 			int pr = b & 0x7f;
@@ -1062,24 +764,10 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			if (lb != 0xff)
 				queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LBANK, lb));
 			queueEvent(MidiPlayEvent(t + 2, port, chn, ME_PROGRAM, pr, 0));
-			//      }
 		}
-			/*
-			else if (a == CTRL_MASTER_VOLUME)
-			{
-			  unsigned char sysex[] = {
-					0x7f, 0x7f, 0x04, 0x01, 0x00, 0x00
-					};
-			  sysex[1] = deviceId();
-			  sysex[4] = b & 0x7f;
-			  sysex[5] = (b >> 7) & 0x7f;
-			  queueEvent(MidiPlayEvent(t, port, ME_SYSEX, sysex, 6));
-			}
-			 */
 		else if (a < CTRL_14_OFFSET)
 		{ // 7 Bit Controller
 			queueEvent(event);
-			//queueEvent(oomport, MidiPlayEvent(t, port, chn, event));
 		}
 		else if (a < CTRL_RPN_OFFSET)
 		{ // 14 bit high resolution controller
@@ -1100,7 +788,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 
 			t += 3;
 			// Select null parameters so that subsequent data controller events do not upset the last *RPN controller.
-			//sendNullRPNParams(chn, false);
 			if (nvh != 0xff)
 			{
 				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, nvh & 0x7f));
@@ -1109,7 +796,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			if (nvl != 0xff)
 				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LRPN, nvl & 0x7f));
 		}
-			//else if (a < CTRL_RPN14_OFFSET)
 		else if (a < CTRL_INTERNAL_OFFSET)
 		{ // NRPN 7-Bit Controller
 			int ctrlH = (a >> 8) & 0x7f;
@@ -1119,7 +805,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, b));
 
 			t += 3;
-			//sendNullRPNParams(chn, true);
 			if (nvh != 0xff)
 			{
 				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, nvh & 0x7f));
@@ -1140,7 +825,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			queueEvent(MidiPlayEvent(t + 3, port, chn, ME_CONTROLLER, CTRL_LDATA, dataL));
 
 			t += 4;
-			//sendNullRPNParams(chn, false);
 			if (nvh != 0xff)
 			{
 				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, nvh & 0x7f));
@@ -1161,7 +845,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			queueEvent(MidiPlayEvent(t + 3, port, chn, ME_CONTROLLER, CTRL_LDATA, dataL));
 
 			t += 4;
-			//sendNullRPNParams(chn, true);
 			if (nvh != 0xff)
 			{
 				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, nvh & 0x7f));
@@ -1178,7 +861,6 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 	else
 	{
 		queueEvent(event);
-		//queueEvent(MidiPlayEvent(t, port, chn, event));
 	}
 }
 
@@ -1188,10 +870,8 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 
 void MidiJackDevice::processMidi()
 {
-	//if(!_client_jackport)
 	if (!_out_client_jackport) // p3.3.55
 		return;
-	//void* port_buf = jack_port_get_buffer(_client_jackport, segmentSize);
 	void* port_buf = jack_port_get_buffer(_out_client_jackport, segmentSize); // p3.3.55
 	jack_midi_clear_buffer(port_buf);
 
@@ -1203,16 +883,12 @@ void MidiJackDevice::processMidi()
 		if (evTime == 0)
 		{
 			// Nothing to do but stamp the event to be queued for frame 0+.
-			//e.setTime(frameOffset + pos);
 			e.setTime(audio->getFrameOffset() + audio->pos().frame());
 		}
 
 #ifdef JACK_MIDI_DEBUG
 		printf("MidiJackDevice::processMidi eventFifo time:%d type:%d ch:%d A:%d B:%d\n", e.time(), e.type(), e.channel(), e.dataA(), e.dataB());
 #endif  
-
-		//el->insert(eventFifo.get());
-		//el->insert(e);
 		processEvent(e);
 	}
 
@@ -1235,7 +911,6 @@ void MidiJackDevice::processMidi()
 				db = mp->limitValToInstrCtlRange(da, db);
 				if (!mp->setHwCtrlState(i->channel(), da, db))
 					continue;
-				//mp->setHwCtrlState(i->channel(), da, db);
 			}
 			else if (i->type() == ME_PITCHBEND)
 			{
@@ -1245,15 +920,11 @@ void MidiJackDevice::processMidi()
 				int da = mp->limitValToInstrCtlRange(CTRL_PITCH, i->dataA());
 				if (!mp->setHwCtrlState(i->channel(), CTRL_PITCH, da))
 					continue;
-				//mp->setHwCtrlState(i->channel(), CTRL_PITCH, da);
-
-				//(MidiPlayEvent(t, port, chn, ME_PITCHBEND, v & 0x7f, (v >> 7) & 0x7f));
 			}
 			else if (i->type() == ME_PROGRAM)
 			{
 				if (!mp->setHwCtrlState(i->channel(), CTRL_PROGRAM, i->dataA()))
 					continue;
-				//mp->setHwCtrlState(i->channel(), CTRL_PROGRAM, i->dataA());
 			}
 		}
 
@@ -1270,29 +941,6 @@ void MidiJackDevice::processMidi()
 
 bool initMidiJack()
 {
-	/*
-	int adr = 0;
-
-	memset(jack_midi_out_data, 0, JACK_MIDI_CHANNELS * sizeof(oom_jack_midi_buffer));
-	memset(jack_midi_in_data, 0, JACK_MIDI_CHANNELS * sizeof(oom_jack_midi_buffer));
-
-	MidiJackDevice* dev = new MidiJackDevice(adr, QString("jack-midi"));
-	dev->setrwFlags(3); // set read and write flags
-
-	if(pipe(jackmidi_pi) < 0){
-	  fprintf(stderr, "cant create midi-jack input pipe\n");
-	}
-	if(pipe(jackmidi_po) < 0){
-	  fprintf(stderr, "cant create midi-jack output pipe\n");
-	}
-  
-	midiDevices.add(dev);
-  
-	gmdev = dev; // proclaim the global jack-midi instance
-
-	//jackScanMidiPorts();
-	 */
-
 	return false;
 }
 

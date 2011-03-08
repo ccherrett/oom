@@ -341,6 +341,9 @@ private slots:
 
     void execDeliveredScript(int);
     void execUserScript(int);
+#ifdef LSCP_SUPPORT
+	void checkLSCPClient();
+#endif
 
 public slots:
     bool save();

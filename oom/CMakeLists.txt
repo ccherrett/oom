@@ -31,6 +31,7 @@ set (SubDirs
       driver
       instruments
       liste
+	  network
       marker
       master
       midiedit
@@ -243,6 +244,7 @@ target_link_libraries(core
       icons
       instruments
       liste
+	  network
       marker
       master
       midiedit

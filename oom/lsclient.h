@@ -57,7 +57,6 @@ private:
 
 	signals:
 		void channelInfoChanged(const LSCPChannelInfo);
-		//void channelInfoChanged(int);
 
 };	
 

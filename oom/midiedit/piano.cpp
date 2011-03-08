@@ -670,11 +670,6 @@ void Piano::draw(QPainter& p, const QRect& r)
      	       case 2:
      	       case 7:
      	       case 9:
-     	             //pm2 = mk2_l;
-					//if(!enabled->contains(i))
-      				//	p.drawPixmap(0, pitch2y(i), *mk2_l);
-					//else
-      				//	p.drawPixmap(0, pitch2y(i), *mk2_n);
 					if(keyswitch.contains(i))
 					{
 						if(preOn)
