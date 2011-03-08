@@ -365,7 +365,8 @@ static const char *mk3_xpm_normal[] = {
 
 static const char *mk4_xpm_normal[] = {
       "40 13 2 1",
-      ". c #dedede",
+      //". c #dedede",
+	  ". c none",
       "# c #292929",
       ".......................................#",
       ".......................................#",
@@ -849,14 +850,14 @@ int Piano::y2pitch(int y) const
 //---------------------------------------------------------
 
 void Piano::leaveEvent(QEvent*)
-      {
+{
       if (keyDown != -1) {
             emit keyReleased(keyDown, shift);
             keyDown = -1;
-            }
+      }
       emit pitchChanged(-1);
       setPitch(-1);
-      }
+}
 
 //---------------------------------------------------------
 //   setPitch
