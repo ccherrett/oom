@@ -161,10 +161,10 @@ MarkerView::MarkerView(QWidget* parent)
 	setWindowTitle(tr("OOMidi: Marker"));
 
 	QAction* markerAdd = new QAction(QIcon(*flagIcon), tr("add marker"), this);
-	connect(markerAdd, SIGNAL(activated()), SLOT(addMarker()));
+	connect(markerAdd, SIGNAL(triggered()), SLOT(addMarker()));
 
 	QAction* markerDelete = new QAction(QIcon(*deleteIcon), tr("delete marker"), this);
-	connect(markerDelete, SIGNAL(activated()), SLOT(deleteMarker()));
+	connect(markerDelete, SIGNAL(triggered()), SLOT(deleteMarker()));
 
 	//---------Pulldown Menu----------------------------
 	/* We probably don't need an empty menu - Orcan
