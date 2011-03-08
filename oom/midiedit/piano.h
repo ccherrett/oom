@@ -39,6 +39,7 @@ class Piano : public View
     QPixmap* mk3_n;
     QPixmap* mk4_n;
     QPixmap* mk5_n;
+    QPixmap* mk6_n;
     QPixmap* mk1_s;
     QPixmap* mk2_s;
     QPixmap* mk3_s;

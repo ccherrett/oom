@@ -396,6 +396,13 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer2->setMaximumWidth(10);
 	tools2->addWidget(spacer2);
 	tools2->addAction(panicAction);
+/*#ifdef LSCP_SUPPORT
+	QToolButton *btnLSCP = new QToolButton();
+	btnLSCP->setText(tr("L"));
+	btnLSCP->setToolTip(tr("Click the refresh the LSCP Event subscription"));
+	tools2->addWidget(btnLSCP);
+	connect(btnLSCP, SIGNAL(clicked()), oom, SLOT(restartLSCPSubscribe()));
+#endif*/
     QSizeGrip* corner = new QSizeGrip(mainw);
 	QWidget* spacer3 = new QWidget();
 	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

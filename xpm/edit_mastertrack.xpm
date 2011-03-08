@@ -1,5 +1,5 @@
 /* XPM */
-static char * edit_mastertrack_xpm[] = {
+static const char * edit_mastertrack_xpm[] = {
 "16 16 142 2",
 "  	c None",
 ". 	c #77A6EA",

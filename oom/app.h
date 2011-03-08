@@ -238,12 +238,15 @@ class OOMidi : public QMainWindow
 	OOMCommandServer server;
 #ifdef LSCP_SUPPORT
 	LSClient *lsclient;
+	bool lscpRestart;
 #endif
 
 signals:
     void configChanged();
 #ifdef LSCP_SUPPORT
 	void channelInfoChanged(const LSCPChannelInfo&);
+	void lscpStartListener();
+	void lscpStopListener();
 #endif
 
 private slots:
@@ -341,9 +344,6 @@ private slots:
 
     void execDeliveredScript(int);
     void execUserScript(int);
-#ifdef LSCP_SUPPORT
-	void checkLSCPClient();
-#endif
 
 public slots:
     bool save();
@@ -373,6 +373,7 @@ public slots:
 #ifdef LSCP_SUPPORT
 	void startLSCPClient();
 	void stopLSCPClient();
+	void restartLSCPSubscribe();
 #endif
 	void pipelineStateChanged(int);
 	void connectDefaultSongPorts();

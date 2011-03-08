@@ -1,5 +1,5 @@
 /* XPM */
-static char * edit_drumms_xpm[] = {
+static const char * edit_drumms_xpm[] = {
 "16 16 27 1",
 " 	c None",
 ".	c #818191",

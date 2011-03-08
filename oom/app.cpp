@@ -379,20 +379,19 @@ void OOMidi::stopServer()
 }
 
 #ifdef LSCP_SUPPORT
-void OOMidi::checkLSCPClient()
+void OOMidi::restartLSCPSubscribe()
 {
-	printf("Check LSCP client state\n");
-	if(!lsclient || !lsclient->isRunning())
-	{
-		printf("LSCP Client has died restarting\n");
-		startLSCPClient();
-	}
+	emit lscpStopListener();
+	emit lscpStartListener();
 }
+
 
 void OOMidi::startLSCPClient()
 {
 	lsclient = new LSClient();
 	connect(lsclient, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), SIGNAL(channelInfoChanged(const LSCPChannelInfo&)));
+	connect(oom, SIGNAL(lscpStartListener()), lsclient, SLOT(subscribe()));
+	connect(oom, SIGNAL(lscpStopListener()), lsclient, SLOT(unsubscribe()));
 	lsclient->start();
 }
 
@@ -771,7 +770,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(heartBeatTimer, SIGNAL(timeout()), song, SLOT(beat()));
 
 #ifdef LSCP_SUPPORT
-	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(checkLSCPClient()));
+	lscpRestart = false;
+	//connect(heartBeatTimer, SIGNAL(timeout()), SLOT(checkLSCPClient()));
 #endif
 
 #ifdef ENABLE_PYTHON
@@ -1709,13 +1709,21 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 {
 	//if (audioMixer)
 	//      audioMixer->clear();
+#ifdef LSCP_SUPPORT
+	emit lscpStopListener();
+#endif
 	if (mixer1)
 		mixer1->clear();
 	if (mixer2)
 		mixer2->clear();
 	arranger->clear(); // clear track info
 	if (clearSong())
+	{
+#ifdef LSCP_SUPPORT
+	emit lscpStartListener();
+#endif
 		return;
+	}
 
 	QFileInfo fi(name);
 	if (songTemplate)
@@ -1724,6 +1732,9 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		{
 			QMessageBox::critical(this, QString("OOMidi"),
 					tr("Cannot read template"));
+#ifdef LSCP_SUPPORT
+	emit lscpStartListener();
+#endif
 			return;
 		}
 		project.setFile("untitled");
@@ -1792,6 +1803,9 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
                                       "OK")) {
                         setUntitledProject();
                         // is it save to return; here ?
+#ifdef LSCP_SUPPORT
+	emit lscpStartListener();
+#endif
                         return;
                 }
             }
@@ -1916,6 +1930,9 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		// Marker view list was not updated, had non-existent items from marker list (cleared in ::clear()).
 		showMarker(config.markerVisible);
 	}
+#ifdef LSCP_SUPPORT
+	emit lscpStartListener();
+#endif
 
 }
 
