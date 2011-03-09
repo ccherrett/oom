@@ -148,7 +148,7 @@ static const char *mk1_xpmC8[] = {
 static const char *mk1_xpm[] = {/*{{{*/
       "40 13 2 1",
       //". c #2d95b7",//highlight
-      ". c #1c7f83",//highlight
+      ". c #2695a2",//highlight
       "# c none",
       ".......................................#",
       ".......................................#",
@@ -168,7 +168,7 @@ static const char *mk1_xpm[] = {/*{{{*/
 static const char *mk2_xpm[] = {/*{{{*/
       "40 13 2 1",
       //". c #2d95b7",
-      ". c #1c7f83",//highlight
+      ". c #2695a2",//highlight
       "# c none",
       "########################...............#",
       "########################...............#",
@@ -188,7 +188,7 @@ static const char *mk2_xpm[] = {/*{{{*/
 static const char *mk3_xpm[] = {
       "40 13 2 1",
       //". c #2d95b7",
-      ". c #1c7f83",//highlight
+      ". c #2695a2",//highlight
       "# c none",
       "########################...............#",
       "########################...............#",
@@ -208,7 +208,7 @@ static const char *mk3_xpm[] = {
 static const char *mk4_xpm[] = {
       "40 13 3 1",
       //"# c #2d95b7",
-      ". c #1c7f83",//highlight
+      ". c #2695a2",//highlight
       ". c none",
       "$ c #2d95b7",
       "........................................",
@@ -231,7 +231,7 @@ static const char *mk1_xpm_lowlight[] = {
       "40 13 3 1",
       //". c #7b7b7b",//highlight
       //". c #c1c1c1",
-      ". c #fffffc",
+      ". c #e0e0e0",
       "# c none",
       "$ c #333333",
       ".......................................$",
@@ -252,7 +252,7 @@ static const char *mk1_xpm_lowlight[] = {
 static const char *mk2_xpm_lowlight[] = {
       "40 13 3 1",
       //". c #7b7b7b",
-      ". c #fffffc",
+      ". c #e0e0e0",
       "# c none",
       "$ c #333333",
       "########################...............$",
@@ -272,7 +272,7 @@ static const char *mk2_xpm_lowlight[] = {
 
 static const char *mk3_xpm_lowlight[] = {
       "40 13 3 1",
-      ". c #fffffc",
+      ". c #e0e0e0",
       "# c none",
       "$ c #333333",
       "########################...............$",
@@ -293,7 +293,7 @@ static const char *mk3_xpm_lowlight[] = {
 static const char *mk4_xpm_lowlight[] = {
       "40 13 2 1",
       //"# c #2c2c2c",
-      "# c #777777",
+      "# c #5f5f5f",
       ". c none",
       "........................................",
       "........................................",
@@ -405,7 +405,7 @@ static const char *mk4_xpm_normal[] = {
       };
 static const char *mk5_xpm_normal[] = {
       "40 13 3 1",
-      "$ c #777777",
+      "$ c #5f5f5f",
       //". c #dedede",
       //". c #a0cfe1",
       ". c #a7c37e",
@@ -436,7 +436,7 @@ static const char *mk6_xpm_normal[] = {/*{{{*/
       //"# c #08455c",
       //"# c #06384b",
       "# c #14323e",
-      "$ c #777777",
+      "$ c #5f5f5f",
       ".......................................#",
       ".......................................#",
       ".......................................#",
