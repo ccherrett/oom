@@ -69,13 +69,6 @@ QT4_WRAP_CPP ( oom_moc_headers
 	  cserver.h
       )
 
-if(LSCP_SUPPORT)
-QT4_WRAP_CPP ( oom_moc_headers
-	lsclient.h
-	${oom_moc_headers}
-      )
-endif(LSCP_SUPPORT)
-
 ##
 ## Resource files
 ##
@@ -153,12 +146,6 @@ file (GLOB main_source_files
 file (GLOB icons_source_files
       icons.cpp
       )
-if(LSCP_SUPPORT)
-file (GLOB core_source_files
-	lsclient.cpp
-	${core_source_files}
-)
-endif(LSCP_SUPPORT)
 
 ##
 ## Define target
@@ -269,10 +256,6 @@ endif(HAVE_LASH)
 if(OSC_SUPPORT)
       target_link_libraries(core ${LIBLO_LIBRARIES})
 endif(OSC_SUPPORT)
-
-if(LSCP_SUPPORT)
-      target_link_libraries(core ${LSCP_LIBRARIES})
-endif(LSCP_SUPPORT)
 
 target_link_libraries(oom
       midiedit

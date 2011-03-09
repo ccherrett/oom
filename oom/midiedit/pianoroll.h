@@ -21,7 +21,7 @@
 #include "tools.h"
 #include "event.h"
 #ifdef LSCP_SUPPORT
-#include "lsclient.h"
+#include "network/lsclient.h"
 #endif
 
 class MidiPart;

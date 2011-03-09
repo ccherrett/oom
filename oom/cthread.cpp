@@ -15,7 +15,6 @@
 #include "app.h"
 #include "route.h"
 #include "track.h"
-#include "lsclient.h"
 
 
 OOMClientThread::OOMClientThread(int sock, QObject* parent) 

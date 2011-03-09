@@ -67,9 +67,9 @@
 #include "vst.h"
 #endif
 
-#ifdef LSCP_SUPPORT
-#include "lsclient.h"
-#endif
+//#ifdef LSCP_SUPPORT
+//#include "lsclient.h"
+//#endif
 
 #include "traverso_shared/TConfig.h"
 
