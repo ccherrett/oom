@@ -210,7 +210,7 @@ static const char *mk4_xpm[] = {
       //"# c #2d95b7",
       ". c #f3ce69",//highlight
       ". c none",
-      "$ c #2d95b7",
+      "$ c #933113",
       "........................................",
       "........................................",
       "........................................",
@@ -710,77 +710,97 @@ void Piano::draw(QPainter& p, const QRect& r)
 	 	 {
      	       case 0:
      	       case 5:
-     	             //pm2 = mk3_l;
-					if(keyswitch.contains(i))
-      					p.drawPixmap(0, pitch2y(i), *mk3_s);
-					else if(enabled.isEmpty() || !enabled.contains(i))
-      					p.drawPixmap(0, pitch2y(i), *mk3_l);
+			   		if(keyswitch.size() <= 0)
+      						p.drawPixmap(0, pitch2y(i), *mk3_n);
 					else
-      					p.drawPixmap(0, pitch2y(i), *mk3_n);
-					preOn = false;
-     	             break;
+					{
+     	            	 //pm2 = mk3_l;
+						if(keyswitch.contains(i))
+      						p.drawPixmap(0, pitch2y(i), *mk3_s);
+						else if(enabled.isEmpty() || !enabled.contains(i))
+      						p.drawPixmap(0, pitch2y(i), *mk3_l);
+						else
+      						p.drawPixmap(0, pitch2y(i), *mk3_n);
+						preOn = false;
+					}	
+     	            break;
      	       case 2:
      	       case 7:
      	       case 9:
-					if(keyswitch.contains(i))
-					{
-						if(preOn)
-						{
-							if(!enabled.isEmpty() && enabled.contains(i))
-      							p.drawPixmap(0, pitch2y(i), *mk5_s);
-							else
-      							p.drawPixmap(0, pitch2y(i), *mk6_s);
-						}
-						else
-      						p.drawPixmap(0, pitch2y(i), *mk2_s);
-					}
-					else if(enabled.isEmpty() || !enabled.contains(i))
-					{
-      					p.drawPixmap(0, pitch2y(i), *mk2_l);
-					}
+			   		if(keyswitch.size() <= 0)
+      						p.drawPixmap(0, pitch2y(i), *mk2_n);
 					else
 					{
-						if(preOn)
-      						p.drawPixmap(0, pitch2y(i), *mk5_n);
+						if(keyswitch.contains(i))
+						{
+							if(preOn)
+							{
+								if(!enabled.isEmpty() && enabled.contains(i))
+      								p.drawPixmap(0, pitch2y(i), *mk5_s);
+								else
+      								p.drawPixmap(0, pitch2y(i), *mk6_s);
+							}
+							else
+      							p.drawPixmap(0, pitch2y(i), *mk2_s);
+						}
+						else if(enabled.isEmpty() || !enabled.contains(i))
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk2_l);
+						}
 						else
-      						p.drawPixmap(0, pitch2y(i), *mk2_n);
-					}
-     	             break;
+						{
+							if(preOn)
+      							p.drawPixmap(0, pitch2y(i), *mk5_n);
+							else
+      							p.drawPixmap(0, pitch2y(i), *mk2_n);
+						}
+					}	
+     	            break;
      	       case 4:
      	       case 11:
      	             //pm2 = mk1_l;
-					if(keyswitch.contains(i))
-      					p.drawPixmap(0, pitch2y(i), *mk1_s);
-					else if(enabled.isEmpty() || !enabled.contains(i))
-					{
-      					p.drawPixmap(0, pitch2y(i), *mk1_l);
-					}
-					else
-					{
-						if(preOn)
-      						p.drawPixmap(0, pitch2y(i), *mk6_n);
-						else
+			   		if(keyswitch.size() <= 0)
       						p.drawPixmap(0, pitch2y(i), *mk1_n);
-					}
-					preOn = false;
-     	             break;
-            default:
-					if(keyswitch.contains(i))
-					{
-      					p.drawPixmap(0, pitch2y(i), *mk4_s);
-						preOn = false;
-					}
-					else if(enabled.isEmpty() || !enabled.contains(i))
-					{
-      					p.drawPixmap(0, pitch2y(i), *mk4_l);
-						preOn = true;
-					}
 					else
 					{
-      					p.drawPixmap(0, pitch2y(i), *mk4_n);
+						if(keyswitch.contains(i))
+      						p.drawPixmap(0, pitch2y(i), *mk1_s);
+						else if(enabled.isEmpty() || !enabled.contains(i))
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk1_l);
+						}
+						else
+						{
+							if(preOn)
+      							p.drawPixmap(0, pitch2y(i), *mk6_n);
+							else
+      							p.drawPixmap(0, pitch2y(i), *mk1_n);
+						}
 						preOn = false;
+					}	
+     	            break;
+            default:
+			   		if(keyswitch.size() <= 0)
+      						p.drawPixmap(0, pitch2y(i), *mk4_n);
+					else
+					{
+						if(keyswitch.contains(i))
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk4_s);
+							preOn = false;
+						}
+						else if(enabled.isEmpty() || !enabled.contains(i))
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk4_l);
+							preOn = true;
+						}
+						else
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk4_n);
+							preOn = false;
+						}
 					}
-                  break;
+                    break;
      	 }/*}}}*/
 	  }
 
