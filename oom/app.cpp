@@ -1193,7 +1193,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	QShortcut* sc = new QShortcut(shortcuts[SHRT_DELETE].key, this);
 	sc->setContext(Qt::WindowShortcut);
-	connect(sc, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
+	connect(sc, SIGNAL(activated()), editSignalMapper, SLOT(map()));
 	editSignalMapper->setMapping(sc, CMD_DELETE);
 
 	//--------------------------------------------------
