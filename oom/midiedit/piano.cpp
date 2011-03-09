@@ -710,7 +710,7 @@ void Piano::draw(QPainter& p, const QRect& r)
 	 	 {
      	       case 0:
      	       case 5:
-			   		if(keyswitch.size() <= 0)
+			   		if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk3_n);
 					else
 					{
@@ -727,7 +727,7 @@ void Piano::draw(QPainter& p, const QRect& r)
      	       case 2:
      	       case 7:
      	       case 9:
-			   		if(keyswitch.size() <= 0)
+			   		if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk2_n);
 					else
 					{
@@ -759,7 +759,7 @@ void Piano::draw(QPainter& p, const QRect& r)
      	       case 4:
      	       case 11:
      	             //pm2 = mk1_l;
-			   		if(keyswitch.size() <= 0)
+			   		if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk1_n);
 					else
 					{
@@ -780,7 +780,7 @@ void Piano::draw(QPainter& p, const QRect& r)
 					}	
      	            break;
             default:
-			   		if(keyswitch.size() <= 0)
+			   		if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk4_n);
 					else
 					{
