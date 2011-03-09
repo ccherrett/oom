@@ -148,7 +148,7 @@ static const char *mk1_xpmC8[] = {
 static const char *mk1_xpm[] = {/*{{{*/
       "40 13 2 1",
       //". c #2d95b7",//highlight
-      ". c #2695a2",//highlight
+      ". c #f3ce69",//highlight
       "# c none",
       ".......................................#",
       ".......................................#",
@@ -168,7 +168,7 @@ static const char *mk1_xpm[] = {/*{{{*/
 static const char *mk2_xpm[] = {/*{{{*/
       "40 13 2 1",
       //". c #2d95b7",
-      ". c #2695a2",//highlight
+      ". c #f3ce69",//highlight
       "# c none",
       "########################...............#",
       "########################...............#",
@@ -188,7 +188,7 @@ static const char *mk2_xpm[] = {/*{{{*/
 static const char *mk3_xpm[] = {
       "40 13 2 1",
       //". c #2d95b7",
-      ". c #2695a2",//highlight
+      ". c #f3ce69",//highlight
       "# c none",
       "########################...............#",
       "########################...............#",
@@ -208,9 +208,9 @@ static const char *mk3_xpm[] = {
 static const char *mk4_xpm[] = {
       "40 13 3 1",
       //"# c #2d95b7",
-      ". c #2695a2",//highlight
+      ". c #f3ce69",//highlight
       ". c none",
-      "$ c #2d95b7",
+      "$ c #933113",
       "........................................",
       "........................................",
       "........................................",
@@ -231,7 +231,7 @@ static const char *mk1_xpm_lowlight[] = {
       "40 13 3 1",
       //". c #7b7b7b",//highlight
       //". c #c1c1c1",
-      ". c #e0e0e0",
+      ". c #839396",
       "# c none",
       "$ c #333333",
       ".......................................$",
@@ -252,7 +252,7 @@ static const char *mk1_xpm_lowlight[] = {
 static const char *mk2_xpm_lowlight[] = {
       "40 13 3 1",
       //". c #7b7b7b",
-      ". c #e0e0e0",
+      ". c #839396",
       "# c none",
       "$ c #333333",
       "########################...............$",
@@ -272,7 +272,7 @@ static const char *mk2_xpm_lowlight[] = {
 
 static const char *mk3_xpm_lowlight[] = {
       "40 13 3 1",
-      ". c #e0e0e0",
+      ". c #839396",
       "# c none",
       "$ c #333333",
       "########################...............$",
@@ -293,7 +293,7 @@ static const char *mk3_xpm_lowlight[] = {
 static const char *mk4_xpm_lowlight[] = {
       "40 13 2 1",
       //"# c #2c2c2c",
-      "# c #333333",
+      "# c #576466",
       ". c none",
       "........................................",
       "........................................",
@@ -315,10 +315,10 @@ static const char *mk1_xpm_normal[] = {/*{{{*/
       "40 13 2 1",
       //". c #dedede",
       //". c #a0cfe1",
-      ". c #a7c37e",
+      ". c #e0e0e0",
       //"# c #292929",
       //"# c #06384b",
-      "# c #4b8000",
+      "# c #2e2e2e",
       ".......................................#",
       ".......................................#",
       ".......................................#",
@@ -338,10 +338,10 @@ static const char *mk2_xpm_normal[] = {
       "40 13 2 1",
       //". c #dedede",
       //". c #a0cfe1",
-      ". c #a7c37e",
+      ". c #e0e0e0",
       //"# c #292929",
       //"# c #06384b",
-      "# c #4b8000",
+      "# c #2e2e2e",
       "########################...............#",
       "########################...............#",
       "#######################................#", //------------------------
@@ -361,11 +361,11 @@ static const char *mk3_xpm_normal[] = {
       "40 13 2 1",
       //". c #dedede",
       //". c #a0cfe1",
-      ". c #a7c37e",
+      ". c #e0e0e0",
       //"# c #292929",
       //"# c #08455c",
       //"# c #06384b",
-      "# c #4b8000",
+      "# c #2e2e2e",
       "########################...............#",
       "########################...............#",
       "#######################................#",
@@ -388,7 +388,7 @@ static const char *mk4_xpm_normal[] = {
       //"# c #292929",
       //"# c #08455c",
       //"# c #06384b",
-      "# c #4b8000",
+      "# c #2e2e2e",
       ".......................................#",
       ".......................................#",
       ".......................................#",
@@ -405,14 +405,14 @@ static const char *mk4_xpm_normal[] = {
       };
 static const char *mk5_xpm_normal[] = {
       "40 13 3 1",
-      "$ c #333333",
+      "$ c #576466",
       //". c #dedede",
       //". c #a0cfe1",
-      ". c #a7c37e",
+      ". c #e0e0e0",
       //"# c #292929",
       //"# c #08455c",
       //"# c #06384b",
-      "# c #4b8000",
+      "# c #2e2e2e",
       "########################...............#",
       "########################...............#",
       "#######################................#", //------------------------
@@ -431,12 +431,12 @@ static const char *mk6_xpm_normal[] = {/*{{{*/
       "40 13 3 1",
       //". c #dedede",
       //". c #a0cfe1",
-      ". c #a7c37e",
+      ". c #e0e0e0",
       //"# c #292929",
       //"# c #08455c",
       //"# c #06384b",
       "# c #14323e",
-      "$ c #333333",
+      "$ c #576466",
       ".......................................#",
       ".......................................#",
       ".......................................#",
@@ -710,77 +710,97 @@ void Piano::draw(QPainter& p, const QRect& r)
 	 	 {
      	       case 0:
      	       case 5:
-     	             //pm2 = mk3_l;
-					if(keyswitch.contains(i))
-      					p.drawPixmap(0, pitch2y(i), *mk3_s);
-					else if(enabled.isEmpty() || !enabled.contains(i))
-      					p.drawPixmap(0, pitch2y(i), *mk3_l);
+			   		if(enabled.isEmpty())
+      						p.drawPixmap(0, pitch2y(i), *mk3_n);
 					else
-      					p.drawPixmap(0, pitch2y(i), *mk3_n);
-					preOn = false;
-     	             break;
+					{
+     	            	 //pm2 = mk3_l;
+						if(keyswitch.contains(i))
+      						p.drawPixmap(0, pitch2y(i), *mk3_s);
+						else if(enabled.isEmpty() || !enabled.contains(i))
+      						p.drawPixmap(0, pitch2y(i), *mk3_l);
+						else
+      						p.drawPixmap(0, pitch2y(i), *mk3_n);
+						preOn = false;
+					}	
+     	            break;
      	       case 2:
      	       case 7:
      	       case 9:
-					if(keyswitch.contains(i))
-					{
-						if(preOn)
-						{
-							if(!enabled.isEmpty() && enabled.contains(i))
-      							p.drawPixmap(0, pitch2y(i), *mk5_s);
-							else
-      							p.drawPixmap(0, pitch2y(i), *mk6_s);
-						}
-						else
-      						p.drawPixmap(0, pitch2y(i), *mk2_s);
-					}
-					else if(enabled.isEmpty() || !enabled.contains(i))
-					{
-      					p.drawPixmap(0, pitch2y(i), *mk2_l);
-					}
+			   		if(enabled.isEmpty())
+      						p.drawPixmap(0, pitch2y(i), *mk2_n);
 					else
 					{
-						if(preOn)
-      						p.drawPixmap(0, pitch2y(i), *mk5_n);
+						if(keyswitch.contains(i))
+						{
+							if(preOn)
+							{
+								if(!enabled.isEmpty() && enabled.contains(i))
+      								p.drawPixmap(0, pitch2y(i), *mk5_s);
+								else
+      								p.drawPixmap(0, pitch2y(i), *mk6_s);
+							}
+							else
+      							p.drawPixmap(0, pitch2y(i), *mk2_s);
+						}
+						else if(enabled.isEmpty() || !enabled.contains(i))
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk2_l);
+						}
 						else
-      						p.drawPixmap(0, pitch2y(i), *mk2_n);
-					}
-     	             break;
+						{
+							if(preOn)
+      							p.drawPixmap(0, pitch2y(i), *mk5_n);
+							else
+      							p.drawPixmap(0, pitch2y(i), *mk2_n);
+						}
+					}	
+     	            break;
      	       case 4:
      	       case 11:
      	             //pm2 = mk1_l;
-					if(keyswitch.contains(i))
-      					p.drawPixmap(0, pitch2y(i), *mk1_s);
-					else if(enabled.isEmpty() || !enabled.contains(i))
-					{
-      					p.drawPixmap(0, pitch2y(i), *mk1_l);
-					}
-					else
-					{
-						if(preOn)
-      						p.drawPixmap(0, pitch2y(i), *mk6_n);
-						else
+			   		if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk1_n);
-					}
-					preOn = false;
-     	             break;
-            default:
-					if(keyswitch.contains(i))
-					{
-      					p.drawPixmap(0, pitch2y(i), *mk4_s);
-						preOn = false;
-					}
-					else if(enabled.isEmpty() || !enabled.contains(i))
-					{
-      					p.drawPixmap(0, pitch2y(i), *mk4_l);
-						preOn = true;
-					}
 					else
 					{
-      					p.drawPixmap(0, pitch2y(i), *mk4_n);
+						if(keyswitch.contains(i))
+      						p.drawPixmap(0, pitch2y(i), *mk1_s);
+						else if(enabled.isEmpty() || !enabled.contains(i))
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk1_l);
+						}
+						else
+						{
+							if(preOn)
+      							p.drawPixmap(0, pitch2y(i), *mk6_n);
+							else
+      							p.drawPixmap(0, pitch2y(i), *mk1_n);
+						}
 						preOn = false;
+					}	
+     	            break;
+            default:
+			   		if(enabled.isEmpty())
+      						p.drawPixmap(0, pitch2y(i), *mk4_n);
+					else
+					{
+						if(keyswitch.contains(i))
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk4_s);
+							preOn = false;
+						}
+						else if(enabled.isEmpty() || !enabled.contains(i))
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk4_l);
+							preOn = true;
+						}
+						else
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk4_n);
+							preOn = false;
+						}
 					}
-                  break;
+                    break;
      	 }/*}}}*/
 	  }
 
