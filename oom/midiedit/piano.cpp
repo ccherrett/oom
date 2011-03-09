@@ -148,7 +148,7 @@ static const char *mk1_xpmC8[] = {
 static const char *mk1_xpm[] = {/*{{{*/
       "40 13 2 1",
       //". c #2d95b7",//highlight
-      ". c #2695a2",//highlight
+      ". c #96ff00",//highlight
       "# c none",
       ".......................................#",
       ".......................................#",
@@ -168,7 +168,7 @@ static const char *mk1_xpm[] = {/*{{{*/
 static const char *mk2_xpm[] = {/*{{{*/
       "40 13 2 1",
       //". c #2d95b7",
-      ". c #2695a2",//highlight
+      ". c #96ff00",//highlight
       "# c none",
       "########################...............#",
       "########################...............#",
@@ -188,7 +188,7 @@ static const char *mk2_xpm[] = {/*{{{*/
 static const char *mk3_xpm[] = {
       "40 13 2 1",
       //". c #2d95b7",
-      ". c #2695a2",//highlight
+      ". c #96ff00",//highlight
       "# c none",
       "########################...............#",
       "########################...............#",
@@ -208,7 +208,7 @@ static const char *mk3_xpm[] = {
 static const char *mk4_xpm[] = {
       "40 13 3 1",
       //"# c #2d95b7",
-      ". c #2695a2",//highlight
+      ". c #96ff00",//highlight
       ". c none",
       "$ c #2d95b7",
       "........................................",
