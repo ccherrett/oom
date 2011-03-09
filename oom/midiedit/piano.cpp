@@ -308,7 +308,8 @@ static const char *mk4_xpm_lowlight[] = {
 //{{{
 static const char *mk1_xpm_normal[] = {/*{{{*/
       "40 13 2 1",
-      ". c #dedede",
+      //". c #dedede",
+      ". c #a0cfe1",
       "# c #292929",
       ".......................................#",
       ".......................................#",
@@ -327,7 +328,8 @@ static const char *mk1_xpm_normal[] = {/*{{{*/
 
 static const char *mk2_xpm_normal[] = {
       "40 13 2 1",
-      ". c #dedede",
+      //". c #dedede",
+      ". c #a0cfe1",
       "# c #292929",
       "########################...............#",
       "########################...............#",
@@ -346,7 +348,8 @@ static const char *mk2_xpm_normal[] = {
 
 static const char *mk3_xpm_normal[] = {
       "40 13 2 1",
-      ". c #dedede",
+      //". c #dedede",
+      ". c #a0cfe1",
       "# c #292929",
       "########################...............#",
       "########################...............#",
