@@ -27,18 +27,19 @@ void defShrt(int shrt, int key, const char* descr, int type, const char* xml)
 void initShortCuts()
 {
 	//Global:
-        defShrt(SHRT_PLAY_SONG, Qt::CTRL + Qt::Key_Enter, "Transport: Start playback from current location", GLOBAL_SHRT, "play");
+    defShrt(SHRT_PLAY_SONG, Qt::CTRL + Qt::Key_Enter, "Transport: Start playback from current location", GLOBAL_SHRT, "play");
 	defShrt(SHRT_TOGGLE_METRO, Qt::Key_C, "Transport: Toggle metronome", GLOBAL_SHRT, "toggle_metro");
-        defShrt(SHRT_STOP, 0, "Transport: Stop Playback", GLOBAL_SHRT, "stop");
-        defShrt(SHRT_GOTO_START, Qt::Key_Home, "Transport: Goto Start", GLOBAL_SHRT, "goto_start");
+    defShrt(SHRT_STOP, 0, "Transport: Stop Playback", GLOBAL_SHRT, "stop");
+    defShrt(SHRT_GOTO_START, Qt::Key_Home, "Transport: Goto Start", GLOBAL_SHRT, "goto_start");
 	defShrt(SHRT_PLAY_TOGGLE, Qt::Key_Space, "Transport: Play, Stop, Rewind", GLOBAL_SHRT, "play_toggle");
 	defShrt(SHRT_GOTO_LEFT, Qt::Key_End, "Transport: Goto left marker", GLOBAL_SHRT, "goto_left");
 	defShrt(SHRT_GOTO_RIGHT, Qt::Key_PageDown, "Transport: Goto right marker", GLOBAL_SHRT, "goto_right");
 	defShrt(SHRT_TOGGLE_LOOP, Qt::Key_Slash, "Transport: Toggle Loop section", GLOBAL_SHRT, "toggle_loop");
-        defShrt(SHRT_START_REC, Qt::Key_R, "Transport: Toggle Record", GLOBAL_SHRT, "toggle_rec");
+    defShrt(SHRT_START_REC, Qt::Key_R, "Transport: Toggle Record", GLOBAL_SHRT, "toggle_rec");
 	defShrt(SHRT_REC_CLEAR, Qt::Key_Backspace, "Transport: Clear all rec enabled tracks", GLOBAL_SHRT, "rec_clear");
-        defShrt(SHRT_GOTO_SEL_NOTE, Qt::CTRL + Qt::Key_Space, "Transport: Move PB to active note", PROLL_SHRT, "goto_sel_note");
+    defShrt(SHRT_GOTO_SEL_NOTE, Qt::CTRL + Qt::Key_Space, "Transport: Move PB to active note", PROLL_SHRT, "goto_sel_note");
 	defShrt(SHRT_GLOBAL_EDIT_EVENT_VALUE, Qt::SHIFT + Qt::Key_E, "Edit Event Value", GLOBAL_SHRT, "global_edit_event_value");
+	defShrt(SHRT_PLAY_REPEAT, Qt::Key_U, "TransPort: toggle repeat", GLOBAL_SHRT, "play_repeat");
 
 
 	defShrt(SHRT_COPY, Qt::CTRL + Qt::Key_C, "Edit: Copy", INVIS_SHRT, "copy");
@@ -185,7 +186,6 @@ void initShortCuts()
 	defShrt(SHRT_SCROLL_RIGHT, Qt::Key_L, "View: Scroll right", PROLL_SHRT + DEDIT_SHRT, "scroll_right");
 	defShrt(SHRT_SCROLL_UP, Qt::SHIFT + Qt::Key_PageUp, "View: Scroll up", PROLL_SHRT + DEDIT_SHRT, "scroll_up");
 	defShrt(SHRT_SCROLL_DOWN, Qt::SHIFT + Qt::Key_PageDown, "View: Scroll down", PROLL_SHRT + DEDIT_SHRT, "scroll_down");
-	defShrt(SHRT_PLAY_REPEAT, Qt::Key_U, "TransPort: toggle repeat", PROLL_SHRT, "play_repeat");
 	//-----------------------------------------------------------
 	//Drum:
 	//-----------------------------------------------------------

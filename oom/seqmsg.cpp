@@ -80,27 +80,16 @@ bool Audio::sendMessage(AudioMsg* m, bool doUndo)
 void Audio::msgRemoveRoute(Route src, Route dst)
 {
 	msgRemoveRoute1(src, dst);
-	//if (!checkAudioDevice()) return;
 	if (src.type == Route::JACK_ROUTE)
 	{
 		if (!checkAudioDevice()) return;
 
-		//if(dst.type == Route::JACK_MIDI_ROUTE)
 		if (dst.type == Route::MIDI_DEVICE_ROUTE)
 		{
-			//MidiJackDevice* jmd = dynamic_cast<MidiJackDevice*>(dst.device);
-			//if(jmd)
 			if (dst.device)
 			{
 				if (dst.device->deviceType() == MidiDevice::JACK_MIDI)
-					//audioDevice->disconnect(src.jackPort, dst.device->clientPort());
 					audioDevice->disconnect(src.jackPort, dst.device->inClientPort()); // p3.3.55
-				//else
-				//{
-				// TODO...
-				//MidiAlsaDevice* amd = dynamic_cast<MidiAlsaDevice*>(dst.device);
-				//if(amd)
-				//}
 			}
 		}
 		else
@@ -110,22 +99,12 @@ void Audio::msgRemoveRoute(Route src, Route dst)
 	{
 		if (!checkAudioDevice()) return;
 
-		//if(src.type == Route::JACK_MIDI_ROUTE)
 		if (src.type == Route::MIDI_DEVICE_ROUTE)
 		{
-			//MidiJackDevice* jmd = dynamic_cast<MidiJackDevice*>(src.device);
-			//if(jmd)
 			if (src.device)
 			{
 				if (src.device->deviceType() == MidiDevice::JACK_MIDI)
-					//audioDevice->disconnect(src.device->clientPort(), dst.jackPort);
 					audioDevice->disconnect(src.device->outClientPort(), dst.jackPort); // p3.3.55
-				//else
-				//{
-				// TODO...
-				//MidiAlsaDevice* amd = dynamic_cast<MidiAlsaDevice*>(src.device);
-				//if(amd)
-				//}
 			}
 		}
 		else
@@ -155,62 +134,6 @@ void Audio::msgRemoveRoute1(Route src, Route dst)
 void Audio::msgRemoveRoutes(Route src, Route dst)
 {
 	msgRemoveRoutes1(src, dst);
-
-	// TODO
-	/*
-	//if (!checkAudioDevice()) return;
-	if (src.type == Route::JACK_ROUTE)
-	{
-		if (!checkAudioDevice()) return;
-          
-		//if(dst.type == Route::JACK_MIDI_ROUTE)
-		if(dst.type == Route::MIDI_DEVICE_ROUTE)
-		{
-		  //MidiJackDevice* jmd = dynamic_cast<MidiJackDevice*>(dst.device);
-		  //if(jmd)
-		  if(dst.device)
-		  {
-			if(dst.device->deviceType() == MidiDevice::JACK_MIDI)
-			  //audioDevice->disconnect(src.jackPort, dst.device->clientPort());
-			  audioDevice->disconnect(src.jackPort, dst.device->inClientPort());
-			//else
-			//{
-			  // TODO...
-			  //MidiAlsaDevice* amd = dynamic_cast<MidiAlsaDevice*>(dst.device);
-			  //if(amd)
-			//}
-		  }
-		}
-		else
-		  audioDevice->disconnect(src.jackPort, ((AudioInput*)dst.track)->jackPort(dst.channel));
-	}
-	else if (dst.type == Route::JACK_ROUTE)
-	{
-		if (!checkAudioDevice()) return;
-          
-		//if(src.type == Route::JACK_MIDI_ROUTE)
-		if(src.type == Route::MIDI_DEVICE_ROUTE)
-		{
-		  //MidiJackDevice* jmd = dynamic_cast<MidiJackDevice*>(src.device);
-		  //if(jmd)
-		  if(src.device)
-		  {
-			if(src.device->deviceType() == MidiDevice::JACK_MIDI)
-			  //audioDevice->disconnect(src.device->clientPort(), dst.jackPort);
-			  audioDevice->disconnect(src.device->outClientPort(), dst.jackPort);
-			//else
-			//{
-			  // TODO...
-			  //MidiAlsaDevice* amd = dynamic_cast<MidiAlsaDevice*>(src.device);
-			  //if(amd)
-			//}
-		  }
-		}
-		else
-		  audioDevice->disconnect(((AudioOutput*)src.track)->jackPort(src.channel), dst.jackPort);
-	}
-      
-	 */
 }
 
 //---------------------------------------------------------
@@ -239,22 +162,12 @@ void Audio::msgAddRoute(Route src, Route dst)
 		if (!checkAudioDevice()) return;
 		if (isRunning())
 		{
-			//if(dst.type == Route::JACK_MIDI_ROUTE)
 			if (dst.type == Route::MIDI_DEVICE_ROUTE)
 			{
-				//MidiJackDevice* jmd = dynamic_cast<MidiJackDevice*>(dst.device);
-				//if(jmd)
 				if (dst.device)
 				{
 					if (dst.device->deviceType() == MidiDevice::JACK_MIDI)
-						//audioDevice->connect(src.jackPort, dst.device->clientPort());
 						audioDevice->connect(src.jackPort, dst.device->inClientPort()); // p3.3.55
-					//else
-					//{
-					// TODO...
-					//MidiAlsaDevice* amd = dynamic_cast<MidiAlsaDevice*>(dst.device);
-					//if(amd)
-					//}
 				}
 			}
 			else
@@ -266,22 +179,12 @@ void Audio::msgAddRoute(Route src, Route dst)
 		if (!checkAudioDevice()) return;
 		if (audio->isRunning())
 		{
-			//if(src.type == Route::JACK_MIDI_ROUTE)
 			if (src.type == Route::MIDI_DEVICE_ROUTE)
 			{
-				//MidiJackDevice* jmd = dynamic_cast<MidiJackDevice*>(src.device);
-				//if(jmd)
 				if (src.device)
 				{
 					if (src.device->deviceType() == MidiDevice::JACK_MIDI)
-						//audioDevice->connect(src.device->clientPort(), dst.jackPort);
 						audioDevice->connect(src.device->outClientPort(), dst.jackPort); // p3.3.55
-					//else
-					//{
-					// TODO...
-					//MidiAlsaDevice* amd = dynamic_cast<MidiAlsaDevice*>(src.device);
-					//if(amd)
-					//}
 				}
 			}
 			else

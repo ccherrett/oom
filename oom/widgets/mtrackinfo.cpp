@@ -291,6 +291,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(_tableModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(patchSequenceInserted(QModelIndex, int, int)));
 	connect(_tableModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(patchSequenceRemoved(QModelIndex, int, int)));
 	connect(patchList, SIGNAL( doubleClicked(const QModelIndex&) ), this, SLOT(patchDoubleClicked(const QModelIndex&) ) );
+	connect(patchList, SIGNAL( clicked(const QModelIndex&) ), this, SLOT(patchClicked(const QModelIndex&) ) );
 	connect(chkAdvanced, SIGNAL(stateChanged(int)), SLOT(toggleAdvanced(int)));
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(deleteSelectedPatches(bool)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(movePatchUp(bool)));
@@ -2332,7 +2333,7 @@ void MidiTrackInfo::populatePatches()
 	instr->populatePatchModel(_patchModel, channel, song->mtype(), track->type() == Track::DRUM);
 }
 
-void MidiTrackInfo::patchDoubleClicked(QModelIndex index)
+void MidiTrackInfo::patchDoubleClicked(QModelIndex index)/*{{{*/
 {
 	if(!selected)
 		return;
@@ -2394,7 +2395,45 @@ void MidiTrackInfo::patchDoubleClicked(QModelIndex index)
 			updateTableHeader();
 		}
 	}
-}
+}/*}}}*/
+
+void MidiTrackInfo::patchClicked(QModelIndex index)/*{{{*/
+{
+	if(!selected)
+		return;
+	QStandardItem* nItem = _patchModel->itemFromIndex(index);//item(row, 0);
+
+	if(!nItem->hasChildren())
+	{
+		int row = nItem->row();
+		QStandardItem* p = nItem->parent();
+		QStandardItem *idItem;
+		QString pg = "";
+		if(p && p != _patchModel->invisibleRootItem() && p->columnCount() == 2)
+		{
+			//We are in group mode
+			idItem = p->child(row, 1);
+			pg = p->text();
+		}
+		else
+		{
+			idItem = _patchModel->item(row, 1);
+		}
+		int id = idItem->text().toInt();
+		QString name = nItem->text();
+		//printf("Found patch Name: %s - ID: %d\n",name.toUtf8().constData(), id);
+
+		if (!name.isEmpty() && id >= 0)
+		{
+			MidiTrack* track = (MidiTrack*) selected;
+			int channel = track->outChannel();
+			int port = track->outPort();
+
+			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+			audio->msgPlayMidiEvent(&ev);
+		}
+	}
+}/*}}}*/
 
 void MidiTrackInfo::addSelectedPatch()
 {

@@ -91,6 +91,7 @@ private slots:
     void patchSequenceRemoved(QModelIndex, int, int);
 	void clonePatchSequence();
 	void patchDoubleClicked(QModelIndex);
+	void patchClicked(QModelIndex);
 	void editorPartChanged(Part*);
     //tb1
 	void _rasterChanged(int);

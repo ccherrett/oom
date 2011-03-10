@@ -88,6 +88,8 @@ Song::Song(const char* name)
 	jackErrorBox = 0;
 	viewselected = false;
 	hasSelectedParts = false;
+	_replay = false;
+	_replayPos = 0;
 	//Create the AutoView
 	TrackView* wv = new TrackView();
 	wv->setViewName("Working View");
@@ -1127,6 +1129,21 @@ Track* Song::findTrack(const QString& name) const
 }
 
 //---------------------------------------------------------
+// setReplay
+// set transport audition flag
+//---------------------------------------------------------
+
+void Song::setReplay(bool t)
+{
+	_replay = t;
+	if(t)
+	{
+		_replayPos = song->cpos();
+		emit replayChanged(_replay, _replayPos);
+	}
+}
+
+//---------------------------------------------------------
 //   setLoop
 //    set transport loop flag
 //---------------------------------------------------------
@@ -1345,7 +1362,6 @@ void Song::setPlay(bool f)
 	else
 	{
 		audio->msgPlay(true);
-		emit playbackStateChanged(true);
 	}
 }
 
@@ -1363,7 +1379,12 @@ void Song::setStop(bool f)
 	else
 	{
 		audio->msgPlay(false);
-		emit playbackStateChanged(false);
+		if(_replay)
+		{
+			Pos p(_replayPos, true);
+			setPos(0, p, true, true, true);
+		}
+		//emit playbackStateChanged(false);
 	}
 }
 

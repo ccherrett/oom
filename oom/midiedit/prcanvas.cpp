@@ -1490,13 +1490,10 @@ int PianoCanvas::stepInputQwerty(QKeyEvent *event)
 
 void PianoCanvas::midiNote(int pitch, int velo)
 {
-        if (_midiin && _steprec && _curPart
-			&& !audio->isPlaying() && velo
-			&& _pos[0] >= start_tick
-			&& !(globalKeyState & Qt::AltModifier))
+    if (_midiin && _steprec && _curPart && !audio->isPlaying() && velo && _pos[0] >= start_tick && !(globalKeyState & Qt::AltModifier))
 	{
 		unsigned int len = editor->quant(); //prevent compiler warning: comparison singed/unsigned
-                unsigned tick = _pos[0]; //CDW
+        unsigned tick = _pos[0]; //CDW
 		unsigned starttick = tick;
 		if (globalKeyState & Qt::ShiftModifier)
 			tick -= editor->rasterStep(tick);
@@ -1504,7 +1501,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		//
 		// extend len of last note?
 		//
-                EventList* events = _curPart->events();
+        EventList* events = _curPart->events();
 		if (globalKeyState & Qt::ControlModifier)
 		{
 			for (iEvent i = events->begin(); i != events->end(); ++i)
@@ -1518,7 +1515,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 					e.setLenTick(ev.lenTick() + editor->rasterStep(starttick));
 					// Indicate do undo, and do not do port controller values and clone parts.
 					//audio->msgChangeEvent(ev, e, curPart);
-                                        audio->msgChangeEvent(ev, e, _curPart, true, false, false);
+                    audio->msgChangeEvent(ev, e, _curPart, true, false, false);
 					tick += editor->rasterStep(tick);
 					if (tick != song->cpos())
 					{
@@ -1541,7 +1538,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 			{
 				// Indicate do undo, and do not do port controller values and clone parts.
 				//audio->msgDeleteEvent(ev, curPart);
-                                audio->msgDeleteEvent(ev, _curPart, true, false, false);
+                audio->msgDeleteEvent(ev, _curPart, true, false, false);
 				if (globalKeyState & Qt::ShiftModifier)
 					tick += editor->rasterStep(tick);
 				return;
@@ -1555,6 +1552,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		// Indicate do undo, and do not do port controller values and clone parts.
 		//audio->msgAddEvent(e, curPart);
         audio->msgAddEvent(e, _curPart, true, false, false);
+		itemPressed(new CItem(e, _curPart));
 		tick += editor->rasterStep(tick);
 		//printf("Song length %d current tick %d\n", song->len(), tick);
 		unsigned int t = tick;
@@ -1912,7 +1910,7 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
 {
 	audio->msgIdle(true);
 	song->startUndo();
-        for (iCItem i = _items.begin(); i != _items.end(); ++i)
+    for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		if (!(i->second->isSelected()))
 			continue;

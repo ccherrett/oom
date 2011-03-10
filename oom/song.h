@@ -168,6 +168,10 @@ private:
     QStringList userScriptNames;
 	QMessageBox *jackErrorBox;
 
+	//Audition feature
+	bool _replay;
+	unsigned _replayPos;
+
 public:
     Song(const char* name = 0);
     ~Song();
@@ -547,6 +551,13 @@ public slots:
 
     void setMasterFlag(bool flag);
 
+	bool getReplay() {
+		return _replay;
+	}
+	void setReplay(bool f);
+	unsigned replayPos() {
+		return _replayPos;
+	}
     bool getLoop() {
         return loopFlag;
     }
@@ -575,6 +586,7 @@ public slots:
 	void closeJackBox();
 
 signals:
+	void replayChanged(bool, unsigned);
     void songChanged(int);
     void posChanged(int, unsigned, bool);
     void loopChanged(bool);
