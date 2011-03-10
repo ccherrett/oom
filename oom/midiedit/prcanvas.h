@@ -86,6 +86,7 @@ signals:
     void quantChanged(int);
     void rasterChanged(int);
     void newWidth(int);
+	void partChanged(Part*);
 
 public slots:
     void pianoCmd(int);
