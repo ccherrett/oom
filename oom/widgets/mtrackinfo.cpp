@@ -286,6 +286,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	//end tb1
 
 	connect(tableView, SIGNAL(rowOrderChanged()), SLOT(rebuildMatrix()));
+	connect(tableView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(patchSequenceClicked(const QModelIndex&)));
 	connect(_selModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(matrixSelectionChanged(QItemSelection, QItemSelection)));
 	connect(_tableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(matrixItemChanged(QStandardItem*)));
 	connect(_tableModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(patchSequenceInserted(QModelIndex, int, int)));
@@ -2431,6 +2432,31 @@ void MidiTrackInfo::patchClicked(QModelIndex index)/*{{{*/
 
 			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
 			audio->msgPlayMidiEvent(&ev);
+		}
+	}
+}/*}}}*/
+
+void MidiTrackInfo::patchSequenceClicked(QModelIndex index)/*{{{*/
+{
+	if(!selected)
+		return;
+	QStandardItem* nItem = _tableModel->itemFromIndex(index);//item(row, 0);
+
+	if(nItem)
+	{
+		QStandardItem* item = _tableModel->item(nItem->row(), 0);
+		if(item)
+		{
+			int id = item->text().toInt();
+			if (id >= 0)
+			{
+				MidiTrack* track = (MidiTrack*) selected;
+				int channel = track->outChannel();
+				int port = track->outPort();
+
+				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+				audio->msgPlayMidiEvent(&ev);
+			}
 		}
 	}
 }/*}}}*/

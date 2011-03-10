@@ -1526,7 +1526,7 @@ void Song::write(int level, Xml& xml) const
 	//	(*i)->write(level, xml);
 
 	QList<QString> added;
-	for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
+	for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
 	{
 		(*i)->write(level, xml);
 		added.append((*i)->name());

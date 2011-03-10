@@ -89,6 +89,7 @@ private slots:
     void movePatchDown(bool);
     void patchSequenceInserted(QModelIndex, int, int);
     void patchSequenceRemoved(QModelIndex, int, int);
+    void patchSequenceClicked(QModelIndex);
 	void clonePatchSequence();
 	void patchDoubleClicked(QModelIndex);
 	void patchClicked(QModelIndex);
