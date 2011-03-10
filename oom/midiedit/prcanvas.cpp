@@ -359,34 +359,6 @@ void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dty
 
 		if (npartoffset > 0)
 		{
-			// Create new part...
-			// if there are several events that are moved outside the part, it will be recreated for each
-			// so the part _in_ the event will not be valid, ask the authority.
-			//      Part* newPart = part->clone();
-			//Part* newPart = Canvas::part()->clone();
-
-			//      newPart->setLenTick(newPart->lenTick() + npartoffset);
-			//audio->msgChangePart(part, newPart,false);
-
-			//      modified = SC_PART_MODIFIED;
-
-			// BUG FIX: #1650953
-			// Added by T356.
-			// Fixes posted "select and drag past end of part - crashing" bug
-			//      for(iPart ip = editor->parts()->begin(); ip != editor->parts()->end(); ++ip)
-			//      {
-			//        if(ip->second == part)
-			//        {
-			//          editor->parts()->erase(ip);
-			//          break;
-			//        }
-			//      }
-
-			//      editor->parts()->add(newPart);
-			//      audio->msgChangePart(part, newPart,false);
-
-			//if(parts2change.find(part) == parts2change.end())
-			//  parts2change.insert(std::pair<Part*, Part*> (part, newPart));
 			iPartToChange ip2c = parts2change.find(part);
 			if (ip2c == parts2change.end())
 			{
@@ -395,13 +367,6 @@ void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dty
 			}
 			else
 				ip2c->second.xdiff = npartoffset;
-
-			//part = newPart; // reassign
-			//item->setPart(part);
-			//item->setEvent(newEvent);
-			//curPart = part;
-			//curPartId = curPart->sn();
-
 		}
 	}
 
@@ -659,6 +624,7 @@ void PianoCanvas::newItem(CItem* item, bool noSnap)
 	// Indicate no undo, and do not do port controller values and clone parts.
 	//audio->msgAddEvent(event, part,false);
 	audio->msgAddEvent(event, part, false, false, false);
+	emit pitchChanged(event.pitch());
 	song->endUndo(modified);
 }
 
@@ -1516,6 +1482,9 @@ void PianoCanvas::midiNote(int pitch, int velo)
 					// Indicate do undo, and do not do port controller values and clone parts.
 					//audio->msgChangeEvent(ev, e, curPart);
                     audio->msgChangeEvent(ev, e, _curPart, true, false, false);
+					itemPressed(new CItem(e, _curPart));
+					//TODO: emit a signal to flash keyboard here
+					emit pitchChanged(pitch);
 					tick += editor->rasterStep(tick);
 					if (tick != song->cpos())
 					{
@@ -1553,6 +1522,8 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		//audio->msgAddEvent(e, curPart);
         audio->msgAddEvent(e, _curPart, true, false, false);
 		itemPressed(new CItem(e, _curPart));
+		//TODO: emit a signal to flash keyboard here
+		emit pitchChanged(pitch);
 		tick += editor->rasterStep(tick);
 		//printf("Song length %d current tick %d\n", song->len(), tick);
 		unsigned int t = tick;

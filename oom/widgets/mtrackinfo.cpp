@@ -2440,7 +2440,7 @@ void MidiTrackInfo::patchSequenceClicked(QModelIndex index)/*{{{*/
 {
 	if(!selected)
 		return;
-	QStandardItem* nItem = _tableModel->itemFromIndex(index);//item(row, 0);
+	QStandardItem* nItem = _tableModel->itemFromIndex(index);
 
 	if(nItem)
 	{
