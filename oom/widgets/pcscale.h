@@ -52,7 +52,7 @@ protected:
 
 signals:
     void selectInstrument();
-    void addProgramChange();
+    void addProgramChange(Part*, unsigned);
 	void drawSelectedProgram(int, bool);
 
 public slots:

@@ -582,7 +582,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
     connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
     //connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
-    connect(pcbar, SIGNAL(addProgramChange()), midiTrackInfo, SLOT(insertMatrixEvent()));
+    connect(pcbar, SIGNAL(addProgramChange(Part*, unsigned)), midiTrackInfo, SLOT(insertMatrixEvent(Part*, unsigned)));
     connect(midiTrackInfo, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
     connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
     connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
@@ -1405,7 +1405,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
 	{
-		midiTrackInfo->insertMatrixEvent(); //progRecClicked();
+		unsigned utick = song->cpos() + rasterStep(song->cpos());
+		midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick); //progRecClicked();
 		return;
 	}
 	if(key == shortcuts[SHRT_COPY_PROGRAM].key)

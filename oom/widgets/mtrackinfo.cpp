@@ -1937,9 +1937,9 @@ void MidiTrackInfo::matrixItemChanged(QStandardItem* item)
 	//printf("Leaving matrixItemChanged()\n");
 }
 
-void MidiTrackInfo::insertMatrixEvent()
+void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 {
-	if (!selected)
+	if (!selected || !curPart)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
 	int channel = track->outChannel();
@@ -1963,6 +1963,14 @@ void MidiTrackInfo::insertMatrixEvent()
 			row = _matrix->at(0);
 		QStandardItem* item = _tableModel->item(row, 0);
 		int id = item->text().toInt();
+		if(curPart->lenTick() <= song->cpos())
+		{
+			curPart->setLenTick(tick);
+		}
+		if(song->len() <= tick)
+		{
+			song->setLen(tick);
+		}
 		MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
 		audio->msgPlayMidiEvent(&ev);
 		_selectedIndex = item->row();
@@ -1984,6 +1992,14 @@ void MidiTrackInfo::insertMatrixEvent()
 		{
 			QStandardItem* item = _tableModel->item(row, 0);
 			int id = item->text().toInt();
+			if(curPart->lenTick() <= song->cpos())
+			{
+				curPart->setLenTick(tick);
+			}
+			if(song->len() <= tick)
+			{
+				song->setLen(tick);
+			}
 			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
 			audio->msgPlayMidiEvent(&ev);
 			updateTrackInfo(-1);

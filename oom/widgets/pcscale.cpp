@@ -176,7 +176,8 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 		//Add program change here
 		song->setPos(i, p); // all other cases: relocating one of the locators
 		//emit selectInstrument();
-		emit addProgramChange();
+		unsigned utick = song->cpos() + currentEditor->rasterStep(song->cpos());
+		emit addProgramChange(currentEditor->curCanvasPart(), utick);
 	}
 	else if (i == 2 && (event->modifiers() & Qt::ShiftModifier))/*{{{*/
 	{ // If shift +RMB we remove a marker
@@ -400,6 +401,10 @@ void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 		{// too short part? extend it
 			int endTick = song->roundUpBar(pc.part->lenTick() + diff);
 			pc.part->setLenTick(endTick);
+			if(song->len() <= (unsigned int)endTick)
+			{
+				song->setLen((unsigned int)endTick);
+			}
 		}
 		audio->msgChangeEvent(pc.event, nevent, pc.part, true, false, false);
 		pc.event = nevent;

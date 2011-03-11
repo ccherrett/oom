@@ -1902,14 +1902,18 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
 			}
 				break;
 		}
+		int epitch = event.pitch();
 		song->changeEvent(event, newEvent, part);
 		emit pitchChanged(newEvent.pitch());
-		if(_playEvents)
+		//This is a vertical movement
+		if(_playEvents && newEvent.pitch() != epitch)
 		{
 			int port = track()->outPort();
 			int channel = track()->outChannel();
 
 			// release key:
+			MidiPlayEvent pe2(0, port, channel, 0x90, newEvent.pitch(), 0);
+			audio->msgPlayMidiEvent(&pe2);
 			MidiPlayEvent pe(0, port, channel, 0x90, newEvent.pitch(), newEvent.velo());
 			audio->msgPlayMidiEvent(&pe);
 		}

@@ -108,7 +108,7 @@ public slots:
     void instrPopup();
     void progRecClicked();
     void songChanged(int);
-    void insertMatrixEvent();
+    void insertMatrixEvent(Part*, unsigned);
     void updateSize();
     void populateMatrix();
 	void populatePatches();
