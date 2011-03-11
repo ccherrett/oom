@@ -1415,6 +1415,7 @@ int PianoCanvas::stepInputQwerty(QKeyEvent *event)
 
 void PianoCanvas::midiNote(int pitch, int velo)
 {
+	//printf("PianoCanvas::midiNote(pitch:%d, velo:%d) \n", pitch, velo);
     if (_midiin && _steprec && _curPart && !audio->isPlaying() && velo && _pos[0] >= start_tick && !(globalKeyState & Qt::AltModifier))
 	{
 		unsigned int len = editor->quant(); //prevent compiler warning: comparison singed/unsigned
@@ -1481,8 +1482,6 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		//audio->msgAddEvent(e, curPart);
         audio->msgAddEvent(e, _curPart, true, false, false);
 		itemPressed(new CItem(e, _curPart));
-		//TODO: emit a signal to flash keyboard here
-		emit pitchChanged(pitch);
 		tick += editor->rasterStep(tick);
 		//printf("Song length %d current tick %d\n", song->len(), tick);
 		unsigned int t = tick;
@@ -1498,6 +1497,8 @@ void PianoCanvas::midiNote(int pitch, int velo)
 			song->setPos(0, p, true, false, true);
 		}
 	}
+	//TODO: emit a signal to flash keyboard here
+	emit pitchChanged(pitch);
 }
 
 /*
