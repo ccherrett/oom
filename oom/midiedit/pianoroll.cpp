@@ -1407,6 +1407,26 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		midiTrackInfo->insertMatrixEvent(); //progRecClicked();
 		return;
 	}
+	if(key == shortcuts[SHRT_COPY_PROGRAM].key)
+	{
+		pcbar->copySelected();
+		return;
+	}
+	if(key == shortcuts[SHRT_SEL_PROGRAM].key)
+	{
+		pcbar->selectProgramChange();
+		return;
+	}
+	if(key == shortcuts[SHRT_LMOVE_PROGRAM].key)
+	{
+		pcbar->moveSelected(-1);
+		return;
+	}
+	if(key == shortcuts[SHRT_RMOVE_PROGRAM].key)
+	{
+		pcbar->moveSelected(1);
+		return;
+	}
 	else if (key == shortcuts[SHRT_DEL_PROGRAM].key)
 	{
 		//printf("Delete KeyStroke recieved\n");

@@ -216,11 +216,15 @@ void initShortCuts()
 	defShrt(SHRT_EVENT_COLOR, Qt::Key_E, "Edit: Change Event Color", PROLL_SHRT, "change_event_color");
 	defShrt(SHRT_ADD_PROGRAM, Qt::Key_Backslash, "Edit: Insert Program Change", PROLL_SHRT, "add_program_change");
 	defShrt(SHRT_DEL_PROGRAM, Qt::CTRL + Qt::Key_Backslash, "Edit: Delete Program Change", PROLL_SHRT, "delete_program_change");
+	defShrt(SHRT_COPY_PROGRAM, Qt::ALT + Qt::Key_Backslash, "Edit: Copy Selected Program Change", PROLL_SHRT, "copy_program_change");
+	defShrt(SHRT_SEL_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_S, "Edit: Select Program Change under cursor", PROLL_SHRT, "select_program_change");
+	defShrt(SHRT_LMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Left, "Edit: Move Selected Program Change Left", PROLL_SHRT, "lmove_program_change");
+	defShrt(SHRT_RMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Right, "Edit: Move Selected Program Change Right", PROLL_SHRT, "rmove_program_change");
 	defShrt(SHRT_SEL_INSTRUMENT, Qt::Key_I, "Edit: Select Instrument", PROLL_SHRT, "midi_instrument");
 	defShrt(SHRT_TOGGLE_STEPRECORD, Qt::CTRL + Qt::Key_F8, "Edit: Toggle Step Input", PROLL_SHRT, "toggle_step_input");
-        defShrt(SHRT_NOTE_VELOCITY_UP, Qt::Key_Up, "Edit: Increase velocity for selection", PROLL_SHRT, "increase_note_velocity");
-        defShrt(SHRT_NOTE_VELOCITY_DOWN, Qt::Key_Down, "Edit: Decrease velocity for selection", PROLL_SHRT, "Decrease_note_velocity");
-        defShrt(SHRT_TOGGLE_STEPQWERTY, Qt::CTRL + Qt::Key_F9, "Edit: Toggle Qwerty Step Input", PROLL_SHRT, "toggle_qwerty_step_input");
+	defShrt(SHRT_NOTE_VELOCITY_UP, Qt::Key_Up, "Edit: Increase velocity for selection", PROLL_SHRT, "increase_note_velocity");
+	defShrt(SHRT_NOTE_VELOCITY_DOWN, Qt::Key_Down, "Edit: Decrease velocity for selection", PROLL_SHRT, "Decrease_note_velocity");
+	defShrt(SHRT_TOGGLE_STEPQWERTY, Qt::CTRL + Qt::Key_F9, "Edit: Toggle Qwerty Step Input", PROLL_SHRT, "toggle_qwerty_step_input");
 	defShrt(SHRT_OCTAVE_QWERTY_0, Qt::CTRL + Qt::Key_0, "Edit: Set Qwerty Range To C0", PROLL_SHRT, "qwerty_range_C0");
 	defShrt(SHRT_OCTAVE_QWERTY_1, Qt::CTRL + Qt::Key_1, "Edit: Set Qwerty Range To C1", PROLL_SHRT, "qwerty_range_C1");
 	defShrt(SHRT_OCTAVE_QWERTY_2, Qt::CTRL + Qt::Key_2, "Edit: Set Qwerty Range To C2", PROLL_SHRT, "qwerty_range_C2");

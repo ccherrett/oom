@@ -57,6 +57,9 @@ signals:
 public slots:
     void setPos(int, unsigned, bool);
     void updateProgram();
+	void copySelected();
+	void moveSelected(int);
+	void selectProgramChange();
     //void setAudio(Audio*);
 
 public:

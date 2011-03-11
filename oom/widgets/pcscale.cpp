@@ -227,7 +227,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 				int id = act->data().toInt();
 				if(id == 1)
 				{
-					Event nevent = pc.event.clone();
+					Event nevent = pc.event.clone();/*{{{*/
 					nevent.setTick(x);
 					if((unsigned int)x < pc.part->tick())
 						return;
@@ -237,7 +237,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 						int endTick = song->roundUpBar(pc.part->lenTick() + diff);
 						pc.part->setLenTick(endTick);
 					}
-					pc.part->addEvent(nevent);
+					pc.part->addEvent(nevent);/*}}}*/
 				}
 			}
 		}
@@ -357,7 +357,7 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 //   viewMouseMoveEvent
 //---------------------------------------------------------
 
-void PCScale::viewMouseMoveEvent(QMouseEvent* event)
+void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 {
 	//printf("PCScale::viewMouseMoveEvent()\n");
 	if(pc.moving && pc.state == movingController && pc.track && pc.part)
@@ -367,12 +367,20 @@ void PCScale::viewMouseMoveEvent(QMouseEvent* event)
 		if (x < 0)
 			x = 0;
 		//int tick = pc.event.tick() + pc.part->tick();
+		if((unsigned int)x < pc.part->tick())
+			return;
 		Event nevent = pc.event.clone();
 		nevent.setTick(x);
+		int diff = nevent.tick() - pc.part->lenTick();
+		if (diff > 0)
+		{// too short part? extend it
+			int endTick = song->roundUpBar(pc.part->lenTick() + diff);
+			pc.part->setLenTick(endTick);
+		}
 		audio->msgChangeEvent(pc.event, nevent, pc.part, true, false, false);
 		pc.event = nevent;
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   leaveEvent
@@ -388,24 +396,130 @@ void PCScale::setEditor(PianoRoll* editor)
 	currentEditor = editor;
 }
 
+/**
+ * updateProgram
+ * Called to redraw the view after a program change was added
+ */
 void PCScale::updateProgram()
 {
 	redraw();
 }
 
-/*void PCScale::setAudio(Audio* a)
+/**
+ * selectProgramChange
+ * called the select the programchange at the current song position
+ */
+void PCScale::selectProgramChange()/*{{{*/
 {
-	if (!a)
-		return;
-	audio = a;
-}*/
+	Track* track = song->findTrack(currentEditor->curCanvasPart());
+	PartList* parts = track->parts();
+	bool stop = false;
+	int x = song->cpos();
+	for (iPart pt = parts->begin(); pt != parts->end() && !stop; ++pt)
+	{
+		Part* mprt = pt->second;
+		EventList* eventList = mprt->events();
+		for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+		{
+			//Get event type.
+			Event pcevt = evt->second;
+			if (!pcevt.isNote())
+			{
+				if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+				{
+					int xp = pcevt.tick() + mprt->tick();
+					if (xp >= x && xp <= (x + 50))
+					{
+						//Select the event and break
+						if(pc.moving)
+						{
+							pc.moving = false;
+							pc.state = doNothing;
+						}
+						else
+						{
+							pc.track = track;
+							pc.part = mprt;
+							pc.event = pcevt;
+							pc.moving = true;
+							pc.state = selectedController;
+							stop = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	update();
+}/*}}}*/
 
+/**
+ * moveSelected
+ * Move the selected program change left or right on the time scale
+ * @param dir int value where <=0 == left, >0 == right
+ */
+void PCScale::moveSelected(int dir)/*{{{*/
+{
+	if(pc.moving && pc.state == selectedController && pc.track && pc.part)
+	{
+		int x = pc.event.tick();
+		if(dir > 0)
+		{
+        	x += currentEditor->rasterStep(x) + pc.part->tick();
+		}
+		else
+		{
+        	x -= currentEditor->rasterStep(x) + pc.part->tick();
+		}
+		//printf("PCScale::moveSelected(%d) tick; %d\n", dir, x);
+
+		if (x < 0)
+			x = 0;
+		if((unsigned int)x < pc.part->tick())
+			return;
+		Event nevent = pc.event.clone();
+		nevent.setTick(x);
+		int diff = nevent.tick() - pc.part->lenTick();
+		if (diff > 0)
+		{// too short part? extend it
+			int endTick = song->roundUpBar(pc.part->lenTick() + diff);
+			pc.part->setLenTick(endTick);
+		}
+		audio->msgChangeEvent(pc.event, nevent, pc.part, true, false, false);
+		pc.event = nevent;
+	}
+	update();
+}/*}}}*/
+
+/**
+ * copySelected
+ * Used to copy the selected program change to the current song position
+ */
+void PCScale::copySelected()/*{{{*/
+{
+	if(pc.moving && pc.state == selectedController)
+	{
+		Event nevent = pc.event.clone();
+		nevent.setTick(song->cpos());
+		if(song->cpos() < pc.part->tick())
+			return;
+		int diff = nevent.tick() - pc.part->lenTick();
+		if (diff > 0)
+		{// too short part? extend it
+			int endTick = song->roundUpBar(pc.part->lenTick() + diff);
+			pc.part->setLenTick(endTick);
+		}
+		pc.part->addEvent(nevent);
+		update();
+	}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   draw
 //---------------------------------------------------------
 
-void PCScale::pdraw(QPainter& p, const QRect& r)
+void PCScale::pdraw(QPainter& p, const QRect& r)/*{{{*/
 {
 	if (waveMode)
 		return;
@@ -503,5 +617,5 @@ void PCScale::pdraw(QPainter& p, const QRect& r)
 			}//END if(!isNote)
 		}
 	}
-}
+}/*}}}*/
 
