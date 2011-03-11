@@ -1912,10 +1912,12 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
 			int channel = track()->outChannel();
 
 			// release key:
-			MidiPlayEvent pe2(0, port, channel, 0x90, newEvent.pitch(), 0);
+			MidiPlayEvent pe2(0, port, channel, 0x90, epitch, 0);
 			audio->msgPlayMidiEvent(&pe2);
 			MidiPlayEvent pe(0, port, channel, 0x90, newEvent.pitch(), newEvent.velo());
 			audio->msgPlayMidiEvent(&pe);
+			MidiPlayEvent pe3(0, port, channel, 0x90, newEvent.pitch(), 0);
+			audio->msgPlayMidiEvent(&pe3);
 		}
 		// Indicate do not do port controller values and clone parts.
 		//song->undoOp(UndoOp::ModifyEvent, newEvent, event, part);
