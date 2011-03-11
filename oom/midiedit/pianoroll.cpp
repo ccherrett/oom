@@ -479,7 +479,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//Defined and configure your program change bar here.
 	//This may well be a copy of MTScale extended for our needs
 	pcbar = new PCScale(&_raster, split1, this, xscale);
-	pcbar->setAudio(audio);
+	//pcbar->setAudio(audio);
 	//pcbar->setEditor(this);
 	time = new MTScale(&_raster, split1, xscale);
 	/*Piano*/ piano = new Piano(split1, yscale);
