@@ -61,6 +61,7 @@ public slots:
 	void copySelected();
 	void moveSelected(int);
 	void selectProgramChange();
+	void deleteProgramChange(Event);
     //void setAudio(Audio*);
 
 public:

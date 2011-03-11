@@ -202,6 +202,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 								//audio->msgDeleteEvent(evt->second, p->second, true, true, true);
 								//song->endUndo(SC_EVENT_MODIFIED);
 								song->deleteEvent(pcevt, mprt); //hack
+								deleteProgramChange(pcevt);
 							}
 						}
 					}
@@ -460,6 +461,20 @@ void PCScale::selectProgramChange()/*{{{*/
 	}
 	update();
 }/*}}}*/
+
+/**
+ * deleteProgramChange
+ * @param Event event object to compare against selected
+ */
+void PCScale::deleteProgramChange(Event evt)
+{
+	if(pc.moving && (pc.event == evt))
+	{
+		pc.moving = false;
+		pc.state = doNothing;
+		emit drawSelectedProgram(-1, false);
+	}
+}
 
 /**
  * moveSelected

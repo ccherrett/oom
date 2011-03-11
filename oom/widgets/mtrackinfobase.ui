@@ -999,7 +999,7 @@
                   </sizepolicy>
                  </property>
                  <property name="minimumSize">
-                 <size>
+                  <size>
                    <width>50</width>
                    <height>24</height>
                   </size>

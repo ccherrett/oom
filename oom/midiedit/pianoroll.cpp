@@ -1461,6 +1461,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 								song->deleteEvent(pcevt, mprt); //hack
 								//audio->msgDeleteEvent(evt->second, p->second, false, true, true);
 								//song->endUndo(SC_EVENT_MODIFIED);
+								pcbar->deleteProgramChange(pcevt);
 							}
 						}
 					}
