@@ -201,8 +201,8 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 								//song->startUndo();
 								//audio->msgDeleteEvent(evt->second, p->second, true, true, true);
 								//song->endUndo(SC_EVENT_MODIFIED);
-								song->deleteEvent(pcevt, mprt); //hack
 								deleteProgramChange(pcevt);
+								song->deleteEvent(pcevt, mprt); //hack
 							}
 						}
 					}
