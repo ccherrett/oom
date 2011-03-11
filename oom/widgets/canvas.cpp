@@ -58,6 +58,8 @@ Canvas::Canvas(QWidget* parent, int sx, int sy, const char* name)
 	_curPart = NULL;
 	_curPartId = -1;
 	_curItem = NULL;
+	_selectedProgramPos = -1;
+	_drawSelectedProgram = false;
 	connect(song, SIGNAL(posChanged(int, unsigned, bool)), this, SLOT(setPos(int, unsigned, bool)));
 }
 
@@ -330,6 +332,17 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 		}
 	}
 
+	if(_drawSelectedProgram && _selectedProgramPos >= 0)
+	{
+		//printf("Canvas::draw() drawing selected PC line\n");
+		if (_selectedProgramPos >= x && _selectedProgramPos < (x + w))
+		{
+			//p.setPen(QColor(243,206,105));
+			p.setPen(QColor(200,146,0));
+			p.drawLine(_selectedProgramPos, y, _selectedProgramPos, y2);
+		}
+	}
+
 	// //---------------------------------------------------
 	// //    draw location marker
 	// //---------------------------------------------------
@@ -406,6 +419,15 @@ void Canvas::draw(QPainter& p, const QRect& rect)
     	p.drawLine(_pos[0], y, _pos[0], y2);
 	}
 
+}
+
+void Canvas::drawSelectedProgram(int pos, bool set)
+{
+	_selectedProgramPos = pos;
+	_drawSelectedProgram = set;
+	redraw();
+	//printf("Canvas::drawSelectedProgram\n");
+	//update();
 }
 
 #define WHEEL_STEPSIZE 40

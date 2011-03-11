@@ -483,157 +483,158 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//pcbar->setEditor(this);
 	time = new MTScale(&_raster, split1, xscale);
 	/*Piano*/ piano = new Piano(split1, yscale);
-			  canvas = new PianoCanvas(this, split1, xscale, yscale);
-			  vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
+    canvas = new PianoCanvas(this, split1, xscale, yscale);
+    vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
 
-			  int offset = -(config.division / 4);
-			  canvas->setOrigin(offset, 0);
-			  canvas->setCanvasTools(pianorollTools);
-			  canvas->setFocus();
-			  connect(canvas, SIGNAL(toolChanged(int)), tools2, SLOT(set(int)));
-			  time->setOrigin(offset, 0);
-			  pcbar->setOrigin(offset, 0);
+    int offset = -(config.division / 4);
+    canvas->setOrigin(offset, 0);
+    canvas->setCanvasTools(pianorollTools);
+    canvas->setFocus();
+    connect(canvas, SIGNAL(toolChanged(int)), tools2, SLOT(set(int)));
+    time->setOrigin(offset, 0);
+    pcbar->setOrigin(offset, 0);
 
-			  gridS1->setRowStretch(2, 100);
-			  gridS1->setColumnStretch(1, 100);
+    gridS1->setRowStretch(2, 100);
+    gridS1->setColumnStretch(1, 100);
 
-			  gridS1->addWidget(pcbar, 0, 1, 1, 2);
-			  gridS1->addWidget(time, 1, 1, 1, 2);
-			  gridS1->addWidget(hLine(split1), 2, 0, 1, 3);
-			  gridS1->addWidget(piano, 3, 0);
-			  gridS1->addWidget(canvas, 3, 1);
-			  gridS1->addWidget(vscroll, 3, 2);
+    gridS1->addWidget(pcbar, 0, 1, 1, 2);
+    gridS1->addWidget(time, 1, 1, 1, 2);
+    gridS1->addWidget(hLine(split1), 2, 0, 1, 3);
+    gridS1->addWidget(piano, 3, 0);
+    gridS1->addWidget(canvas, 3, 1);
+    gridS1->addWidget(vscroll, 3, 2);
 
-			  ctrlLane = new Splitter(Qt::Vertical, splitter, "ctrllane");
-			  QWidget* split2 = new QWidget(splitter);
-			  split2->setMaximumHeight(hscroll->sizeHint().height());
-			  split2->setMinimumHeight(hscroll->sizeHint().height());
-			  QGridLayout* gridS2 = new QGridLayout(split2);
-			  gridS2->setContentsMargins(0, 0, 0, 0);
-			  gridS2->setSpacing(0);
-			  gridS2->setRowStretch(0, 100);
-			  gridS2->setColumnStretch(1, 100);
-			  gridS2->addWidget(ctrl, 0, 0);
-			  gridS2->addWidget(hscroll, 0, 1);
+    ctrlLane = new Splitter(Qt::Vertical, splitter, "ctrllane");
+    QWidget* split2 = new QWidget(splitter);
+    split2->setMaximumHeight(hscroll->sizeHint().height());
+    split2->setMinimumHeight(hscroll->sizeHint().height());
+    QGridLayout* gridS2 = new QGridLayout(split2);
+    gridS2->setContentsMargins(0, 0, 0, 0);
+    gridS2->setSpacing(0);
+    gridS2->setRowStretch(0, 100);
+    gridS2->setColumnStretch(1, 100);
+    gridS2->addWidget(ctrl, 0, 0);
+    gridS2->addWidget(hscroll, 0, 1);
 
-			  //gridS2->addWidget(corner, 0, 2, Qt::AlignBottom | Qt::AlignRight);
-			  //splitter->setCollapsible(0, true);
+    //gridS2->addWidget(corner, 0, 2, Qt::AlignBottom | Qt::AlignRight);
+    //splitter->setCollapsible(0, true);
 
-			  piano->setFixedWidth(pianoWidth);
+    piano->setFixedWidth(pianoWidth);
 
-			  // Tim.
-			  QList<int> mops;
-			  mops.append(mtiw); // 30 for possible scrollbar
-			  mops.append(width() - mtiw);
-			  hsplitter->setSizes(mops);
-			  hsplitter->setStretchFactor(0, 0);
-			  hsplitter->setStretchFactor(1, 15);
+    // Tim.
+    QList<int> mops;
+    mops.append(mtiw); // 30 for possible scrollbar
+    mops.append(width() - mtiw);
+    hsplitter->setSizes(mops);
+    hsplitter->setStretchFactor(0, 0);
+    hsplitter->setStretchFactor(1, 15);
 
-			  connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
+    connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 
-			  //connect(midiTrackInfo, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
-			  connect(ctrl, SIGNAL(clicked()), SLOT(addCtrl()));
-			  connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
-			  connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
-			  connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
-			  connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
-			  connect(vscroll, SIGNAL(scaleChanged(float)), piano, SLOT(setYMag(float)));
+    //connect(midiTrackInfo, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
+	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
+    connect(ctrl, SIGNAL(clicked()), SLOT(addCtrl()));
+    connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
+    connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
+    connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
+    connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
+    connect(vscroll, SIGNAL(scaleChanged(float)), piano, SLOT(setYMag(float)));
 
-			  connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
-			  connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
-			  connect(hscroll, SIGNAL(scrollChanged(int)), pcbar, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), pcbar, SLOT(setXPos(int)));
 
-			  connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
-			  connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
-			  connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
 
-			  connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
-			  connect(canvas, SIGNAL(pitchChanged(int)), piano, SLOT(setPitch(int)));
-			  connect(canvas, SIGNAL(verticalScroll(unsigned)), vscroll, SLOT(setPos(unsigned)));
-			  connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));
-			  connect(canvas, SIGNAL(horizontalScrollNoLimit(unsigned)), hscroll, SLOT(setPosNoLimit(unsigned)));
-			  connect(canvas, SIGNAL(selectionChanged(int, Event&, Part*)), this,
-					  SLOT(setSelection(int, Event&, Part*)));
+    connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
+    connect(canvas, SIGNAL(pitchChanged(int)), piano, SLOT(setPitch(int)));
+    connect(canvas, SIGNAL(verticalScroll(unsigned)), vscroll, SLOT(setPos(unsigned)));
+    connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));
+    connect(canvas, SIGNAL(horizontalScrollNoLimit(unsigned)), hscroll, SLOT(setPosNoLimit(unsigned)));
+    connect(canvas, SIGNAL(selectionChanged(int, Event&, Part*)), this,
+  		  SLOT(setSelection(int, Event&, Part*)));
 
-			  connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
-			  connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
-			  connect(srec, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
-			  //connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
-			  connect(speaker, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
-			  connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
+    connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
+    connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
+    connect(srec, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
+    //connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
+    connect(speaker, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
+    connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
 
-			  connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
-			  piano->setYPos(KH * 30);
-			  canvas->setYPos(KH * 30);
-			  vscroll->setPos(KH * 30);
-			  //setSelection(0, 0, 0); //Really necessary? Causes segfault when only 1 item selected, replaced by the following:
-			  info->setEnabled(false);
+    connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
+    piano->setYPos(KH * 30);
+    canvas->setYPos(KH * 30);
+    vscroll->setPos(KH * 30);
+    //setSelection(0, 0, 0); //Really necessary? Causes segfault when only 1 item selected, replaced by the following:
+    info->setEnabled(false);
 
-			  connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
-			  //connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
+    connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
+    //connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
 
-			  setWindowTitle(canvas->getCaption());
+    setWindowTitle(canvas->getCaption());
 
-			  updateHScrollRange();
-			  // connect to toolbar
-			  connect(canvas, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
-			  connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-			  connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
-			  connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-			  //connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
-			  connect(pcbar, SIGNAL(addProgramChange()), midiTrackInfo, SLOT(insertMatrixEvent()));
-			  connect(midiTrackInfo, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
-			  connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
-			  connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
-			  connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
-			  connect(canvas, SIGNAL(partChanged(Part*)), midiTrackInfo, SLOT(editorPartChanged(Part*)));
-			  connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
-			  connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
+    updateHScrollRange();
+    // connect to toolbar
+    connect(canvas, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
+    connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+    connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
+    connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+    //connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
+    connect(pcbar, SIGNAL(addProgramChange()), midiTrackInfo, SLOT(insertMatrixEvent()));
+    connect(midiTrackInfo, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
+    connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
+    connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
+    connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
+    connect(canvas, SIGNAL(partChanged(Part*)), midiTrackInfo, SLOT(editorPartChanged(Part*)));
+    connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
+    connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
 
-			  setFocusPolicy(Qt::StrongFocus);
-			  setEventColorMode(colorMode);
-			  canvas->setMidiin(true);
-			  midiin->setChecked(true);
-			  canvas->playEvents(true);
-			  speaker->setChecked(true);
+    setFocusPolicy(Qt::StrongFocus);
+    setEventColorMode(colorMode);
+    canvas->setMidiin(true);
+    midiin->setChecked(true);
+    canvas->playEvents(true);
+    speaker->setChecked(true);
 
-			  QClipboard* cb = QApplication::clipboard();
-			  connect(cb, SIGNAL(dataChanged()), SLOT(clipboardChanged()));
+    QClipboard* cb = QApplication::clipboard();
+    connect(cb, SIGNAL(dataChanged()), SLOT(clipboardChanged()));
 
-			  clipboardChanged(); // enable/disable "Paste"
-			  selectionChanged(); // enable/disable "Copy" & "Paste"
-			  initShortcuts(); // initialize shortcuts
+    clipboardChanged(); // enable/disable "Paste"
+    selectionChanged(); // enable/disable "Copy" & "Paste"
+    initShortcuts(); // initialize shortcuts
 
-			  const Pos cpos = song->cPos();
-			  canvas->setPos(0, cpos.tick(), true);
-			  //	canvas->selectAtTick(cpos.tick());
-			  //canvas->selectFirst();
-			  //
-			  if (canvas->track())
-			  {
-				  updateTrackInfo();
-				  solo->blockSignals(true);
-				  solo->setChecked(canvas->track()->solo());
-				  solo->blockSignals(false);
-			  }
+    const Pos cpos = song->cPos();
+    canvas->setPos(0, cpos.tick(), true);
+    //	canvas->selectAtTick(cpos.tick());
+    //canvas->selectFirst();
+    //
+    if (canvas->track())
+    {
+  	  updateTrackInfo();
+  	  solo->blockSignals(true);
+  	  solo->setChecked(canvas->track()->solo());
+  	  solo->blockSignals(false);
+    }
 
-			  unsigned pos;
-			  if (initPos >= MAXINT)
-				  pos = song->cpos();
-			  else
-				  pos = initPos;
-			  if (pos > MAXINT)
-				  pos = MAXINT;
+    unsigned pos;
+    if (initPos >= MAXINT)
+  	  pos = song->cpos();
+    else
+  	  pos = initPos;
+    if (pos > MAXINT)
+  	  pos = MAXINT;
 
-			  // At this point in time the range of the canvas hasn't
-			  // been calculated right ?
-			  // Also, why wanting to restore some initPos, what is initPos?
-			  // To me, it seems to make a lot more sense to use the actual
-			  // current song cpos.
-			  // This is now done via the showEvent();
+    // At this point in time the range of the canvas hasn't
+    // been calculated right ?
+    // Also, why wanting to restore some initPos, what is initPos?
+    // To me, it seems to make a lot more sense to use the actual
+    // current song cpos.
+    // This is now done via the showEvent();
 
-			  //      hscroll->setOffset((int)pos); // changed that to:
-		  }
+    //      hscroll->setOffset((int)pos); // changed that to:
+}
 
 //---------------------------------------------------------
 //   songChanged1

@@ -267,6 +267,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 							{
 								pc.moving = false;
 								pc.state = doNothing;
+								emit drawSelectedProgram(-1, false);
 							}
 							else
 							{
@@ -275,6 +276,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 								pc.event = pcevt;
 								pc.moving = true;
 								pc.state = selectedController;
+								emit drawSelectedProgram(pcevt.tick(), true);
 								stop = true;
 								break;
 							}
@@ -315,6 +317,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 							pc.event = pcevt;
 							pc.moving = true;
 							pc.state = movingController;
+							emit drawSelectedProgram(pcevt.tick(), true);
 							stop = true;
 							break;
 						}
@@ -347,6 +350,7 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 		{
 			pc.state = doNothing;
 			pc.moving = false;
+			emit drawSelectedProgram(-1, false);
 		}
 	}
 	button = Qt::NoButton;
@@ -379,6 +383,7 @@ void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 		}
 		audio->msgChangeEvent(pc.event, nevent, pc.part, true, false, false);
 		pc.event = nevent;
+		emit drawSelectedProgram(pc.event.tick(), true);
 	}
 }/*}}}*/
 
@@ -435,6 +440,7 @@ void PCScale::selectProgramChange()/*{{{*/
 						{
 							pc.moving = false;
 							pc.state = doNothing;
+							emit drawSelectedProgram(-1, false);
 						}
 						else
 						{
@@ -443,6 +449,7 @@ void PCScale::selectProgramChange()/*{{{*/
 							pc.event = pcevt;
 							pc.moving = true;
 							pc.state = selectedController;
+							emit drawSelectedProgram(pcevt.tick(), true);
 							stop = true;
 							break;
 						}
@@ -488,6 +495,7 @@ void PCScale::moveSelected(int dir)/*{{{*/
 		}
 		audio->msgChangeEvent(pc.event, nevent, pc.part, true, false, false);
 		pc.event = nevent;
+		emit drawSelectedProgram(pc.event.tick(), true);
 	}
 	update();
 }/*}}}*/
