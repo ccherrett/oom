@@ -1458,10 +1458,21 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 							{
 								pcbar->deleteProgramChange(pcevt);
 								//printf("Found Program Change to delete at: %d\n", x);
-								//song->startUndo();
-								song->deleteEvent(pcevt, mprt); //hack
-								//audio->msgDeleteEvent(evt->second, p->second, false, true, true);
-								//song->endUndo(SC_EVENT_MODIFIED);
+								song->startUndo();
+								//song->deleteEvent(pcevt, mprt); //hack
+								audio->msgDeleteEvent(evt->second, p->second, true, true, false);
+								song->endUndo(SC_EVENT_MODIFIED);
+								//Reset the hardware controller for this track
+								/*MidiTrack *evtrack = static_cast<MidiTrack*>(p->second->track());
+								if(evtrack)
+								{
+									int outChannel = evtrack->outChannel();
+									int outPort = evtrack->outPort();
+									MidiPort* mp = &midiPorts[outPort];
+									if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
+										audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
+								}*/
+								break;
 							}
 						}
 					}

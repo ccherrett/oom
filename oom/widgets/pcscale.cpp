@@ -16,8 +16,10 @@
 #include "song.h"
 #include "icons.h"
 #include "gconfig.h"
+#include "globals.h"
 #include "prcanvas.h"
 #include "audio.h"
+#include "midiport.h"
 
 //---------------------------------------------------------
 //   PCScale
@@ -137,7 +139,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 {
 	button = event->button();
 	//viewMouseMoveEvent(event);
-	if (event->modifiers() & Qt::ShiftModifier)/*{{{*/
+	if (event->modifiers() & Qt::ShiftModifier)
 		setCursor(QCursor(Qt::PointingHandCursor));
 	else
 		setCursor(QCursor(Qt::ArrowCursor));
@@ -198,11 +200,22 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 						{
 							if (audio)
 							{
-								//song->startUndo();
-								//audio->msgDeleteEvent(evt->second, p->second, true, true, true);
-								//song->endUndo(SC_EVENT_MODIFIED);
 								deleteProgramChange(pcevt);
-								song->deleteEvent(pcevt, mprt); //hack
+								song->startUndo();
+								audio->msgDeleteEvent(evt->second, pt->second, true, true, false);
+								song->endUndo(SC_EVENT_MODIFIED);
+								//Reset the hardware controller for this track
+								/*MidiTrack *evtrack = static_cast<MidiTrack*>(pt->second->track());
+								if(evtrack)
+								{
+									int outChannel = evtrack->outChannel();
+									int outPort = evtrack->outPort();
+									MidiPort* mp = &midiPorts[outPort];
+									if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
+										audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
+								}*/
+								//song->deleteEvent(pcevt, mprt); //hack
+								break;
 							}
 						}
 					}
@@ -261,6 +274,12 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
 					{
 						int xp = pcevt.tick() + mprt->tick();
+        				int start = x;
+						start -= currentEditor->rasterStep(x) + mprt->tick();
+						int end = x;
+						//end += currentEditor->rasterStep(x) + mprt->tick();
+						QRect lazyZone(start, 0, (end - start), 12);
+						//x += currentEditor->rasterStep(x) + pc.part->tick();
 						if (xp >= x && xp <= (x + 50))
 						{
 							//Select the event and break
@@ -335,7 +354,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	else
 		song->setPos(i, p); // all other cases: relocating one of the locators
 	
-	update();/*}}}*/
+	update();
 }
 
 //---------------------------------------------------------

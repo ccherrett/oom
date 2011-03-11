@@ -1392,30 +1392,30 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 		xml.strTag(level, buffer, config.partColorNames[i]);
 	}
 
-	xml.colorTag(level, "partCanvasBg", config.partCanvasBg);
-	xml.colorTag(level, "trackBg", config.trackBg);
-	xml.colorTag(level, "selectTrackBg", config.selectTrackBg);
-	xml.colorTag(level, "selectTrackFg", config.selectTrackFg);
+	//xml.colorTag(level, "partCanvasBg", config.partCanvasBg);
+	//xml.colorTag(level, "trackBg", config.trackBg);
+	//xml.colorTag(level, "selectTrackBg", config.selectTrackBg);
+	//xml.colorTag(level, "selectTrackFg", config.selectTrackFg);
 
-	xml.colorTag(level, "mixerBg", config.mixerBg);
-	xml.colorTag(level, "midiTrackLabelBg", config.midiTrackLabelBg);
-	xml.colorTag(level, "drumTrackLabelBg", config.drumTrackLabelBg);
-	xml.colorTag(level, "waveTrackLabelBg", config.waveTrackLabelBg);
-	xml.colorTag(level, "outputTrackLabelBg", config.outputTrackLabelBg);
-	xml.colorTag(level, "inputTrackLabelBg", config.inputTrackLabelBg);
-	xml.colorTag(level, "groupTrackLabelBg", config.groupTrackLabelBg);
-	xml.colorTag(level, "auxTrackLabelBg", config.auxTrackLabelBg);
-	xml.colorTag(level, "synthTrackLabelBg", config.synthTrackLabelBg);
+	//xml.colorTag(level, "mixerBg", config.mixerBg);
+	//xml.colorTag(level, "midiTrackLabelBg", config.midiTrackLabelBg);
+	//xml.colorTag(level, "drumTrackLabelBg", config.drumTrackLabelBg);
+	//xml.colorTag(level, "waveTrackLabelBg", config.waveTrackLabelBg);
+	//xml.colorTag(level, "outputTrackLabelBg", config.outputTrackLabelBg);
+	//xml.colorTag(level, "inputTrackLabelBg", config.inputTrackLabelBg);
+	//xml.colorTag(level, "groupTrackLabelBg", config.groupTrackLabelBg);
+	//xml.colorTag(level, "auxTrackLabelBg", config.auxTrackLabelBg);
+	//xml.colorTag(level, "synthTrackLabelBg", config.synthTrackLabelBg);
 
-	xml.colorTag(level, "midiTrackBg", config.midiTrackBg);
-	xml.colorTag(level, "ctrlGraphFg", config.ctrlGraphFg);
-	xml.colorTag(level, "drumTrackBg", config.drumTrackBg);
-	xml.colorTag(level, "waveTrackBg", config.waveTrackBg);
-	xml.colorTag(level, "outputTrackBg", config.outputTrackBg);
-	xml.colorTag(level, "inputTrackBg", config.inputTrackBg);
-	xml.colorTag(level, "groupTrackBg", config.groupTrackBg);
-	xml.colorTag(level, "auxTrackBg", config.auxTrackBg);
-	xml.colorTag(level, "synthTrackBg", config.synthTrackBg);
+	//xml.colorTag(level, "midiTrackBg", config.midiTrackBg);
+	//xml.colorTag(level, "ctrlGraphFg", config.ctrlGraphFg);
+	//xml.colorTag(level, "drumTrackBg", config.drumTrackBg);
+	//xml.colorTag(level, "waveTrackBg", config.waveTrackBg);
+	//xml.colorTag(level, "outputTrackBg", config.outputTrackBg);
+	//xml.colorTag(level, "inputTrackBg", config.inputTrackBg);
+	//xml.colorTag(level, "groupTrackBg", config.groupTrackBg);
+	//xml.colorTag(level, "auxTrackBg", config.auxTrackBg);
+	//xml.colorTag(level, "synthTrackBg", config.synthTrackBg);
 
 	// Changed by Tim. p3.3.6
 
@@ -1492,10 +1492,10 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.strTag(level, "canvasBgPixmap", config.canvasBgPixmap);
 	xml.strTag(level, "canvasCustomBgList", config.canvasCustomBgList.join(";"));
 
-	xml.colorTag(level, "transportHandleColor", config.transportHandleColor);
-	xml.colorTag(level, "bigtimeForegroundcolor", config.bigTimeForegroundColor);
-	xml.colorTag(level, "bigtimeBackgroundcolor", config.bigTimeBackgroundColor);
-	xml.colorTag(level, "waveEditBackgroundColor", config.waveEditBackgroundColor);
+	//xml.colorTag(level, "transportHandleColor", config.transportHandleColor);
+	//xml.colorTag(level, "bigtimeForegroundcolor", config.bigTimeForegroundColor);
+	//xml.colorTag(level, "bigtimeBackgroundcolor", config.bigTimeBackgroundColor);
+	//xml.colorTag(level, "waveEditBackgroundColor", config.waveEditBackgroundColor);
 
 	writeSeqConfiguration(level, xml, false);
 
