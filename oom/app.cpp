@@ -312,7 +312,7 @@ bool OOMidi::seqStart()
 		exit(33);
 	}
 #ifdef LSCP_SUPPORT
-	emit lscpStartListener();
+	//emit lscpStartListener();
 #endif
 	return true;
 }
@@ -326,7 +326,7 @@ void OOMidi::seqStop()
 	// label sequencer as disabled before it actually happened to minimize race condition
 	midiSeqRunning = false;
 #ifdef LSCP_SUPPORT
-	emit lscpStopListener();
+	//emit lscpStopListener();
 #endif
 
 	song->setStop(true);
@@ -756,6 +756,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	editInstrument = 0;
 	routingPopupMenu = 0;
 	routingDialog = 0;
+	firstrun = true;
 	//routingPopupView      = 0;
 
 	appName = QString("OOMidi");
@@ -1455,6 +1456,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//    Central Widget
 	//---------------------------------------------------
 
+	printf("Creating arranger 11111111111111111111111111111111111111111\n");
 	arranger = new Arranger(this, "arranger");
 	setCentralWidget(arranger);
 	addTransportToolbar();
@@ -1914,7 +1916,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		// Marker view list was not updated, had non-existent items from marker list (cleared in ::clear()).
 		showMarker(config.markerVisible);
 	}
-
+	firstrun = false;
 }
 
 //---------------------------------------------------------
@@ -3588,15 +3590,15 @@ void OOMidi::startPianoroll()
 
 void OOMidi::startPianoroll(PartList* pl, bool showDefaultCtrls)
 {
-
+	printf("Creating PianoRoll 222222222222222222222222222222222222\n");
 	PianoRoll* pianoroll = new PianoRoll(pl, this, 0, arranger->cursorValue());
 	pianoroll->show();
 
-        // Be able to open the List Editor from the Piano Roll
-        // with the application global shortcut to open the L.E.
-        pianoroll->addAction(startListEditAction);
-        // same for save shortcut
-        pianoroll->addAction(fileSaveAction);
+    // Be able to open the List Editor from the Piano Roll
+    // with the application global shortcut to open the L.E.
+    pianoroll->addAction(startListEditAction);
+    // same for save shortcut
+    pianoroll->addAction(fileSaveAction);
 
 	if (showDefaultCtrls) // p4.0.12
 	{
@@ -3819,10 +3821,13 @@ void OOMidi::selectProject(QAction* act)
 
 void OOMidi::toplevelDeleted(unsigned long tl)
 {
+	printf("OOMidi::toplevelDeleted\n");
 	for (iToplevel i = toplevels.begin(); i != toplevels.end(); ++i)
 	{
+	printf("OOMidi::toplevelDeleted 222222222222\n");
 		if (i->object() == tl)
 		{
+	printf("OOMidi::toplevelDeleted 33333333333\n");
 			switch (i->type())
 			{
 				case Toplevel::MARKER:
@@ -3843,7 +3848,9 @@ void OOMidi::toplevelDeleted(unsigned long tl)
 				case Toplevel::LMASTER:
 					break;
 			}
+	printf("OOMidi::toplevelDeleted 44444444444444444\n");
 			toplevels.erase(i);
+	printf("OOMidi::toplevelDeleted 555555555555555\n");
 			return;
 		}
 	}

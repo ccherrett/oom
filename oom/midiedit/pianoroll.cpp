@@ -626,6 +626,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     if (pos > MAXINT)
   	  pos = MAXINT;
 
+	qDebug() << QThread::currentThread();
+
     // At this point in time the range of the canvas hasn't
     // been calculated right ?
     // Also, why wanting to restore some initPos, what is initPos?

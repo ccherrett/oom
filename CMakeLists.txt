@@ -364,7 +364,7 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   INCLUDE(CPack)
 ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 
-set(CMAKE_CXX_FLAGS         "-Wall -Wextra -Winvalid-pch -fno-exceptions ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS         "-Wall -Wextra -Winvalid-pch -fexceptions ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -fomit-frame-pointer -ffast-math -fstrength-reduce ${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -DQT_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}")
 

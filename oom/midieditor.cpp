@@ -144,7 +144,7 @@ void MidiEditor::writePartList(int level, Xml& xml) const
 	{
 		Part* part = p->second;
 		Track* track = part->track();
-		int trkIdx = song->tracks()->index(track);
+		int trkIdx = song->artracks()->index(track);
 		int partIdx = track->parts()->index(part);
 
 		if ((trkIdx == -1) || (partIdx == -1))

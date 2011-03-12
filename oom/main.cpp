@@ -133,27 +133,22 @@ public:
 	{
 		//if (event->type() == QEvent::KeyPress)
 		//  printf("notify key press before app::notify accepted:%d\n", event->isAccepted());  // REMOVE Tim
+		if(!receiver || !event)
+			return false;
 		bool flag = QApplication::notify(receiver, event);
 		if (event->type() == QEvent::KeyPress)
 		{
 			//printf("notify key press after app::notify accepted:%d\n", event->isAccepted());   // REMOVE Tim
 			QKeyEvent* ke = (QKeyEvent*) event;
-			///globalKeyState = ke->stateAfter();
 			globalKeyState = ke->modifiers();
 			bool accepted = ke->isAccepted();
 			if (!accepted)
 			{
 				int key = ke->key();
-				///if (ke->state() & Qt::ShiftModifier)
-				//if (globalKeyState & Qt::ShiftModifier)
 				if (((QInputEvent*) ke)->modifiers() & Qt::ShiftModifier)
 					key += Qt::SHIFT;
-				///if (ke->state() & Qt::AltModifier)
-				//if (globalKeyState & Qt::AltModifier)
 				if (((QInputEvent*) ke)->modifiers() & Qt::AltModifier)
 					key += Qt::ALT;
-				///if (ke->state() & Qt::ControlModifier)
-				//if (globalKeyState & Qt::ControlModifier)
 				if (((QInputEvent*) ke)->modifiers() & Qt::ControlModifier)
 					key += Qt::CTRL;
 				oom->kbAccel(key);
@@ -163,7 +158,6 @@ public:
 		if (event->type() == QEvent::KeyRelease)
 		{
 			QKeyEvent* ke = (QKeyEvent*) event;
-			///globalKeyState = ke->stateAfter();
 			globalKeyState = ke->modifiers();
 		}
 
@@ -584,7 +578,7 @@ int main(int argc, char* argv[])
 	if (debugMsg)
 		printf("app.exec() returned:%d\nDeleting main OOMidi object\n", rv);
 #ifdef LSCP_SUPPORT
-	oom->startLSCPClient();
+	oom->stopLSCPClient();
 #endif
 	oom->stopServer();
 	delete oom;

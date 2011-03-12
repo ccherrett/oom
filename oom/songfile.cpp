@@ -974,7 +974,7 @@ Part* OOMidi::readPart(Xml& xml)
 			{
 				int trackIdx, partIdx;
 				sscanf(tag.toLatin1().constData(), "%d:%d", &trackIdx, &partIdx);
-				Track* track = song->tracks()->index(trackIdx);
+				Track* track = song->artracks()->index(trackIdx);
 				if (track)
 					part = track->parts()->find(partIdx);
 			}
@@ -1013,7 +1013,10 @@ void OOMidi::readToplevels(Xml& xml)
 				{
 					Part* part = readPart(xml);
 					if (part)
+					{
+						printf("Found part in track lists\n");
 						pl->add(part);
+					}
 				}
 				else if (tag == "pianoroll")
 				{
@@ -1030,7 +1033,8 @@ void OOMidi::readToplevels(Xml& xml)
 					{
 
 						startPianoroll(pl);
-						//FIXME: This should call the PR the read its status but fails sometime
+						//FIXME: When started from here in a song loaded from the commandline
+						//closing the PR window segfaults OOM no doing it untill I trace this down
 						toplevels.back().cobject()->readStatus(xml);
 						pl = new PartList;
 					}

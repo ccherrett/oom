@@ -382,6 +382,9 @@ public:
     OOMidi(int argc, char** argv);
     ~OOMidi();
     Arranger* arranger;
+	//FIXME: Hack to make projects loaded from the commandline not start PR
+	//I need to track where and what is cause it to crash
+	bool firstrun;
     QRect configGeometryMain;
     bool importMidi(const QString name, bool merge);
     void kbAccel(int);
