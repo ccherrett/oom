@@ -27,18 +27,19 @@ void defShrt(int shrt, int key, const char* descr, int type, const char* xml)
 void initShortCuts()
 {
 	//Global:
-        defShrt(SHRT_PLAY_SONG, Qt::CTRL + Qt::Key_Enter, "Transport: Start playback from current location", GLOBAL_SHRT, "play");
+    defShrt(SHRT_PLAY_SONG, Qt::CTRL + Qt::Key_Enter, "Transport: Start playback from current location", GLOBAL_SHRT, "play");
 	defShrt(SHRT_TOGGLE_METRO, Qt::Key_C, "Transport: Toggle metronome", GLOBAL_SHRT, "toggle_metro");
-        defShrt(SHRT_STOP, 0, "Transport: Stop Playback", GLOBAL_SHRT, "stop");
-        defShrt(SHRT_GOTO_START, Qt::Key_Home, "Transport: Goto Start", GLOBAL_SHRT, "goto_start");
+    defShrt(SHRT_STOP, 0, "Transport: Stop Playback", GLOBAL_SHRT, "stop");
+    defShrt(SHRT_GOTO_START, Qt::Key_Home, "Transport: Goto Start", GLOBAL_SHRT, "goto_start");
 	defShrt(SHRT_PLAY_TOGGLE, Qt::Key_Space, "Transport: Play, Stop, Rewind", GLOBAL_SHRT, "play_toggle");
 	defShrt(SHRT_GOTO_LEFT, Qt::Key_End, "Transport: Goto left marker", GLOBAL_SHRT, "goto_left");
 	defShrt(SHRT_GOTO_RIGHT, Qt::Key_PageDown, "Transport: Goto right marker", GLOBAL_SHRT, "goto_right");
 	defShrt(SHRT_TOGGLE_LOOP, Qt::Key_Slash, "Transport: Toggle Loop section", GLOBAL_SHRT, "toggle_loop");
-        defShrt(SHRT_START_REC, Qt::Key_R, "Transport: Toggle Record", GLOBAL_SHRT, "toggle_rec");
+    defShrt(SHRT_START_REC, Qt::Key_R, "Transport: Toggle Record", GLOBAL_SHRT, "toggle_rec");
 	defShrt(SHRT_REC_CLEAR, Qt::Key_Backspace, "Transport: Clear all rec enabled tracks", GLOBAL_SHRT, "rec_clear");
-        defShrt(SHRT_GOTO_SEL_NOTE, Qt::CTRL + Qt::Key_Space, "Transport: Move PB to active note", PROLL_SHRT, "goto_sel_note");
+    defShrt(SHRT_GOTO_SEL_NOTE, Qt::CTRL + Qt::Key_Space, "Transport: Move PB to active note", PROLL_SHRT, "goto_sel_note");
 	defShrt(SHRT_GLOBAL_EDIT_EVENT_VALUE, Qt::SHIFT + Qt::Key_E, "Edit Event Value", GLOBAL_SHRT, "global_edit_event_value");
+	defShrt(SHRT_PLAY_REPEAT, Qt::Key_U, "TransPort: toggle repeat", GLOBAL_SHRT, "play_repeat");
 
 
 	defShrt(SHRT_COPY, Qt::CTRL + Qt::Key_C, "Edit: Copy", INVIS_SHRT, "copy");
@@ -185,7 +186,6 @@ void initShortCuts()
 	defShrt(SHRT_SCROLL_RIGHT, Qt::Key_L, "View: Scroll right", PROLL_SHRT + DEDIT_SHRT, "scroll_right");
 	defShrt(SHRT_SCROLL_UP, Qt::SHIFT + Qt::Key_PageUp, "View: Scroll up", PROLL_SHRT + DEDIT_SHRT, "scroll_up");
 	defShrt(SHRT_SCROLL_DOWN, Qt::SHIFT + Qt::Key_PageDown, "View: Scroll down", PROLL_SHRT + DEDIT_SHRT, "scroll_down");
-	defShrt(SHRT_PLAY_REPEAT, Qt::Key_U, "TransPort: toggle repeat", PROLL_SHRT, "play_repeat");
 	//-----------------------------------------------------------
 	//Drum:
 	//-----------------------------------------------------------
@@ -216,11 +216,15 @@ void initShortCuts()
 	defShrt(SHRT_EVENT_COLOR, Qt::Key_E, "Edit: Change Event Color", PROLL_SHRT, "change_event_color");
 	defShrt(SHRT_ADD_PROGRAM, Qt::Key_Backslash, "Edit: Insert Program Change", PROLL_SHRT, "add_program_change");
 	defShrt(SHRT_DEL_PROGRAM, Qt::CTRL + Qt::Key_Backslash, "Edit: Delete Program Change", PROLL_SHRT, "delete_program_change");
+	defShrt(SHRT_COPY_PROGRAM, Qt::ALT + Qt::Key_Backslash, "Edit: Copy Selected Program Change", PROLL_SHRT, "copy_program_change");
+	defShrt(SHRT_SEL_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_S, "Edit: Select Program Change under cursor", PROLL_SHRT, "select_program_change");
+	defShrt(SHRT_LMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Left, "Edit: Move Selected Program Change Left", PROLL_SHRT, "lmove_program_change");
+	defShrt(SHRT_RMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Right, "Edit: Move Selected Program Change Right", PROLL_SHRT, "rmove_program_change");
 	defShrt(SHRT_SEL_INSTRUMENT, Qt::Key_I, "Edit: Select Instrument", PROLL_SHRT, "midi_instrument");
 	defShrt(SHRT_TOGGLE_STEPRECORD, Qt::CTRL + Qt::Key_F8, "Edit: Toggle Step Input", PROLL_SHRT, "toggle_step_input");
-        defShrt(SHRT_NOTE_VELOCITY_UP, Qt::Key_Up, "Edit: Increase velocity for selection", PROLL_SHRT, "increase_note_velocity");
-        defShrt(SHRT_NOTE_VELOCITY_DOWN, Qt::Key_Down, "Edit: Decrease velocity for selection", PROLL_SHRT, "Decrease_note_velocity");
-        defShrt(SHRT_TOGGLE_STEPQWERTY, Qt::CTRL + Qt::Key_F9, "Edit: Toggle Qwerty Step Input", PROLL_SHRT, "toggle_qwerty_step_input");
+	defShrt(SHRT_NOTE_VELOCITY_UP, Qt::Key_Up, "Edit: Increase velocity for selection", PROLL_SHRT, "increase_note_velocity");
+	defShrt(SHRT_NOTE_VELOCITY_DOWN, Qt::Key_Down, "Edit: Decrease velocity for selection", PROLL_SHRT, "Decrease_note_velocity");
+	defShrt(SHRT_TOGGLE_STEPQWERTY, Qt::CTRL + Qt::Key_F9, "Edit: Toggle Qwerty Step Input", PROLL_SHRT, "toggle_qwerty_step_input");
 	defShrt(SHRT_OCTAVE_QWERTY_0, Qt::CTRL + Qt::Key_0, "Edit: Set Qwerty Range To C0", PROLL_SHRT, "qwerty_range_C0");
 	defShrt(SHRT_OCTAVE_QWERTY_1, Qt::CTRL + Qt::Key_1, "Edit: Set Qwerty Range To C1", PROLL_SHRT, "qwerty_range_C1");
 	defShrt(SHRT_OCTAVE_QWERTY_2, Qt::CTRL + Qt::Key_2, "Edit: Set Qwerty Range To C2", PROLL_SHRT, "qwerty_range_C2");

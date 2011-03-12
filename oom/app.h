@@ -14,7 +14,7 @@
 #include "tools.h"
 #include "cserver.h"
 #ifdef LSCP_SUPPORT
-#include "lsclient.h"
+#include "network/lsclient.h"
 #endif
 #include <QFileInfo>
 

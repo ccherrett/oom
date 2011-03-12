@@ -154,13 +154,13 @@ void EventCanvas::songChanged(int flags)
 		_items.clear();
 		start_tick = MAXINT;
 		end_tick = 0;
-                _curPart = 0;
+        _curPart = 0;
 
 		for (iPart p = editor->parts()->begin(); p != editor->parts()->end(); ++p)
 		{
 			MidiPart* part = (MidiPart*) (p->second);
-                        if (part->sn() == _curPartId)
-                                _curPart = part;
+            if (part->sn() == _curPartId)
+                _curPart = part;
 			unsigned stick = part->tick();
 			unsigned len = part->lenTick();
 			unsigned etick = stick + len;
@@ -187,7 +187,7 @@ void EventCanvas::songChanged(int flags)
 	CItem* nevent = 0;
 
 	int n = 0; // count selections
-        for (iCItem k = _items.begin(); k != _items.end(); ++k)
+    for (iCItem k = _items.begin(); k != _items.end(); ++k)
 	{
 		Event ev = k->second->event();
 		bool selected = ev.selected();
@@ -211,16 +211,16 @@ void EventCanvas::songChanged(int flags)
 		x = nevent->x();
 		event = nevent->event();
 		part = (MidiPart*) nevent->part();
-                if (_curPart != part)
+        if (_curPart != part)
 		{
-                        _curPart = part;
-                        _curPartId = _curPart->sn();
+            _curPart = part;
+            _curPartId = _curPart->sn();
 			curPartChanged();
 		}
 	}
 	emit selectionChanged(x, event, part);
-        if (_curPart == 0)
-                _curPart = (MidiPart*) (editor->parts()->begin()->second);
+    if (_curPart == 0)
+       _curPart = (MidiPart*) (editor->parts()->begin()->second);
 
 	updateCItemsZValues();
 

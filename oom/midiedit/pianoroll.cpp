@@ -83,20 +83,18 @@ static int pianorollTools = PointerTool | PencilTool | RubberTool | DrawTool;
 //---------------------------------------------------------
 
 PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned initPos)
-: MidiEditor(_quantInit, _rasterInit, pl, parent, name)
+	: MidiEditor(_quantInit, _rasterInit, pl, parent, name)
 {
 	deltaMode = false;
-        // Set size stored in global config, or use defaults.
-        int w = tconfig().get_property("PianoRollEdit", "widgetwidth", 800).toInt();
-        int h = tconfig().get_property("PianoRollEdit", "widgetheigth", 650).toInt();
-		//FIXME: This needs to be checked to make sure its not larger than the current desktop size
-        resize(w, h);
+	// Set size stored in global config, or use defaults.
+	int w = tconfig().get_property("PianoRollEdit", "widgetwidth", 800).toInt();
+	int h = tconfig().get_property("PianoRollEdit", "widgetheigth", 650).toInt();
+	//FIXME: This needs to be checked to make sure its not larger than the current desktop size
+	resize(w, h);
 
 	selPart = 0;
 	quantConfig = 0;
 	_playEvents = false;
-	_replay = false;
-	replayPos = song->cpos();
 	_quantStrength = _quantStrengthInit;
 	_quantLimit = _quantLimitInit;
 	_quantLen = _quantLenInit;
@@ -331,12 +329,6 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	solo->setToolTip(tr("Solo"));
 	solo->setCheckable(true);
 
-	repPlay = new QToolButton();
-	repPlay->setIcon(*auditionIcon);
-	repPlay->setIconSize(soloIconOn->size());
-	repPlay->setToolTip(tr("Toggle Audition Mode"));
-	repPlay->setCheckable(true);
-
 	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
 	posLabel = new PosLabel(0, "pos");
 	posLabel->setFixedHeight(22);
@@ -388,7 +380,6 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer5->setMaximumWidth(10);
 	tools2->addWidget(spacer5);
-	tools2->addWidget(repPlay);
 	tools2->addActions(transportAction->actions());
 	tools2->addWidget(solo);
 	QWidget* spacer2 = new QWidget();
@@ -396,7 +387,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer2->setMaximumWidth(10);
 	tools2->addWidget(spacer2);
 	tools2->addAction(panicAction);
-/*#ifdef LSCP_SUPPORT
+	/*#ifdef LSCP_SUPPORT
 	QToolButton *btnLSCP = new QToolButton();
 	btnLSCP->setText(tr("L"));
 	btnLSCP->setToolTip(tr("Click the refresh the LSCP Event subscription"));
@@ -488,162 +479,161 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//Defined and configure your program change bar here.
 	//This may well be a copy of MTScale extended for our needs
 	pcbar = new PCScale(&_raster, split1, this, xscale);
-	pcbar->setAudio(audio);
+	//pcbar->setAudio(audio);
 	//pcbar->setEditor(this);
 	time = new MTScale(&_raster, split1, xscale);
 	/*Piano*/ piano = new Piano(split1, yscale);
-	canvas = new PianoCanvas(this, split1, xscale, yscale);
-	vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
+    canvas = new PianoCanvas(this, split1, xscale, yscale);
+    vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
 
-	int offset = -(config.division / 4);
-	canvas->setOrigin(offset, 0);
-	canvas->setCanvasTools(pianorollTools);
-	canvas->setFocus();
-	connect(canvas, SIGNAL(toolChanged(int)), tools2, SLOT(set(int)));
-	time->setOrigin(offset, 0);
-	pcbar->setOrigin(offset, 0);
+    int offset = -(config.division / 4);
+    canvas->setOrigin(offset, 0);
+    canvas->setCanvasTools(pianorollTools);
+    canvas->setFocus();
+    connect(canvas, SIGNAL(toolChanged(int)), tools2, SLOT(set(int)));
+    time->setOrigin(offset, 0);
+    pcbar->setOrigin(offset, 0);
 
-	gridS1->setRowStretch(2, 100);
-	gridS1->setColumnStretch(1, 100);
+    gridS1->setRowStretch(2, 100);
+    gridS1->setColumnStretch(1, 100);
 
-	gridS1->addWidget(pcbar, 0, 1, 1, 2);
-	gridS1->addWidget(time, 1, 1, 1, 2);
-	gridS1->addWidget(hLine(split1), 2, 0, 1, 3);
-	gridS1->addWidget(piano, 3, 0);
-	gridS1->addWidget(canvas, 3, 1);
-	gridS1->addWidget(vscroll, 3, 2);
+    gridS1->addWidget(pcbar, 0, 1, 1, 2);
+    gridS1->addWidget(time, 1, 1, 1, 2);
+    gridS1->addWidget(hLine(split1), 2, 0, 1, 3);
+    gridS1->addWidget(piano, 3, 0);
+    gridS1->addWidget(canvas, 3, 1);
+    gridS1->addWidget(vscroll, 3, 2);
 
-	ctrlLane = new Splitter(Qt::Vertical, splitter, "ctrllane");
-	QWidget* split2 = new QWidget(splitter);
-	split2->setMaximumHeight(hscroll->sizeHint().height());
-	split2->setMinimumHeight(hscroll->sizeHint().height());
-	QGridLayout* gridS2 = new QGridLayout(split2);
-	gridS2->setContentsMargins(0, 0, 0, 0);
-	gridS2->setSpacing(0);
-	gridS2->setRowStretch(0, 100);
-	gridS2->setColumnStretch(1, 100);
-	gridS2->addWidget(ctrl, 0, 0);
-	gridS2->addWidget(hscroll, 0, 1);
+    ctrlLane = new Splitter(Qt::Vertical, splitter, "ctrllane");
+    QWidget* split2 = new QWidget(splitter);
+    split2->setMaximumHeight(hscroll->sizeHint().height());
+    split2->setMinimumHeight(hscroll->sizeHint().height());
+    QGridLayout* gridS2 = new QGridLayout(split2);
+    gridS2->setContentsMargins(0, 0, 0, 0);
+    gridS2->setSpacing(0);
+    gridS2->setRowStretch(0, 100);
+    gridS2->setColumnStretch(1, 100);
+    gridS2->addWidget(ctrl, 0, 0);
+    gridS2->addWidget(hscroll, 0, 1);
 
-	//gridS2->addWidget(corner, 0, 2, Qt::AlignBottom | Qt::AlignRight);
-	//splitter->setCollapsible(0, true);
+    //gridS2->addWidget(corner, 0, 2, Qt::AlignBottom | Qt::AlignRight);
+    //splitter->setCollapsible(0, true);
 
-	piano->setFixedWidth(pianoWidth);
+    piano->setFixedWidth(pianoWidth);
 
-	// Tim.
-	QList<int> mops;
-	mops.append(mtiw); // 30 for possible scrollbar
-	mops.append(width() - mtiw);
-	hsplitter->setSizes(mops);
-	hsplitter->setStretchFactor(0, 0);
-	hsplitter->setStretchFactor(1, 15);
+    // Tim.
+    QList<int> mops;
+    mops.append(mtiw); // 30 for possible scrollbar
+    mops.append(width() - mtiw);
+    hsplitter->setSizes(mops);
+    hsplitter->setStretchFactor(0, 0);
+    hsplitter->setStretchFactor(1, 15);
 
-	connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
+    connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 
-	//connect(midiTrackInfo, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
-	connect(ctrl, SIGNAL(clicked()), SLOT(addCtrl()));
-	//connect(trackInfoButton, SIGNAL(clicked()), SLOT(toggleTrackInfo()));  Tim.
-	connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
-	connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
-	connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
-	connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
-	connect(vscroll, SIGNAL(scaleChanged(float)), piano, SLOT(setYMag(float)));
+    //connect(midiTrackInfo, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
+	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
+    connect(ctrl, SIGNAL(clicked()), SLOT(addCtrl()));
+    connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
+    connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
+    connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
+    connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
+    connect(vscroll, SIGNAL(scaleChanged(float)), piano, SLOT(setYMag(float)));
 
-	connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scrollChanged(int)), pcbar, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), pcbar, SLOT(setXPos(int)));
 
-	connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
-	connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
-	connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
 
-	connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
-	connect(canvas, SIGNAL(pitchChanged(int)), piano, SLOT(setPitch(int)));
-	connect(canvas, SIGNAL(verticalScroll(unsigned)), vscroll, SLOT(setPos(unsigned)));
-	connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));
-	connect(canvas, SIGNAL(horizontalScrollNoLimit(unsigned)), hscroll, SLOT(setPosNoLimit(unsigned)));
-	connect(canvas, SIGNAL(selectionChanged(int, Event&, Part*)), this,
-			SLOT(setSelection(int, Event&, Part*)));
+    connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
+    connect(canvas, SIGNAL(pitchChanged(int)), piano, SLOT(setPitch(int)));
+    connect(canvas, SIGNAL(verticalScroll(unsigned)), vscroll, SLOT(setPos(unsigned)));
+    connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));
+    connect(canvas, SIGNAL(horizontalScrollNoLimit(unsigned)), hscroll, SLOT(setPosNoLimit(unsigned)));
+    connect(canvas, SIGNAL(selectionChanged(int, Event&, Part*)), this,
+  		  SLOT(setSelection(int, Event&, Part*)));
 
-	connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
-	connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
-	connect(srec, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
-	//connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
-	connect(speaker, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
-	connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
+    connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
+    connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
+    connect(srec, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
+    //connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
+    connect(speaker, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
+    connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
 
-	connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
-	piano->setYPos(KH * 30);
-	canvas->setYPos(KH * 30);
-	vscroll->setPos(KH * 30);
-	//setSelection(0, 0, 0); //Really necessary? Causes segfault when only 1 item selected, replaced by the following:
-	info->setEnabled(false);
+    connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
+    piano->setYPos(KH * 30);
+    canvas->setYPos(KH * 30);
+    vscroll->setPos(KH * 30);
+    //setSelection(0, 0, 0); //Really necessary? Causes segfault when only 1 item selected, replaced by the following:
+    info->setEnabled(false);
 
-	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
-	connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
+    connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
+    //connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
 
-	setWindowTitle(canvas->getCaption());
+    setWindowTitle(canvas->getCaption());
 
-	updateHScrollRange();
-	// connect to toolbar
-	connect(canvas, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
-	connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-	connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
-	connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-	//connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
-	connect(pcbar, SIGNAL(addProgramChange()), midiTrackInfo, SLOT(insertMatrixEvent()));
-	connect(midiTrackInfo, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
-	connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
-	connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
-	connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
-	connect(canvas, SIGNAL(partChanged(Part*)), midiTrackInfo, SLOT(editorPartChanged(Part*)));
-	connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
-	connect(repPlay, SIGNAL(toggled(bool)), SLOT(setReplay(bool)));
-	connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
+    updateHScrollRange();
+    // connect to toolbar
+    connect(canvas, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
+    connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+    connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
+    connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+    //connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
+    connect(pcbar, SIGNAL(addProgramChange(Part*, unsigned)), midiTrackInfo, SLOT(insertMatrixEvent(Part*, unsigned)));
+    connect(midiTrackInfo, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
+    connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
+    connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
+    connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
+    connect(canvas, SIGNAL(partChanged(Part*)), midiTrackInfo, SLOT(editorPartChanged(Part*)));
+    connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
+    connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
 
-	setFocusPolicy(Qt::StrongFocus);
-	setEventColorMode(colorMode);
-	canvas->setMidiin(true);
-	midiin->setChecked(true);
-	canvas->playEvents(true);
-	speaker->setChecked(true);
+    setFocusPolicy(Qt::StrongFocus);
+    setEventColorMode(colorMode);
+    canvas->setMidiin(true);
+    midiin->setChecked(true);
+    canvas->playEvents(true);
+    speaker->setChecked(true);
 
-	QClipboard* cb = QApplication::clipboard();
-	connect(cb, SIGNAL(dataChanged()), SLOT(clipboardChanged()));
+    QClipboard* cb = QApplication::clipboard();
+    connect(cb, SIGNAL(dataChanged()), SLOT(clipboardChanged()));
 
-	clipboardChanged(); // enable/disable "Paste"
-	selectionChanged(); // enable/disable "Copy" & "Paste"
-	initShortcuts(); // initialize shortcuts
+    clipboardChanged(); // enable/disable "Paste"
+    selectionChanged(); // enable/disable "Copy" & "Paste"
+    initShortcuts(); // initialize shortcuts
 
-	const Pos cpos = song->cPos();
-	canvas->setPos(0, cpos.tick(), true);
-//	canvas->selectAtTick(cpos.tick());
-	//canvas->selectFirst();
-	//
-	if (canvas->track())
-	{
-		updateTrackInfo();
-		solo->blockSignals(true);
-		solo->setChecked(canvas->track()->solo());
-		solo->blockSignals(false);
-	}
+    const Pos cpos = song->cPos();
+    canvas->setPos(0, cpos.tick(), true);
+    //	canvas->selectAtTick(cpos.tick());
+    //canvas->selectFirst();
+    //
+    if (canvas->track())
+    {
+  	  updateTrackInfo();
+  	  solo->blockSignals(true);
+  	  solo->setChecked(canvas->track()->solo());
+  	  solo->blockSignals(false);
+    }
 
-	unsigned pos;
-	if (initPos >= MAXINT)
-		pos = song->cpos();
-	else
-		pos = initPos;
-	if (pos > MAXINT)
-		pos = MAXINT;
+    unsigned pos;
+    if (initPos >= MAXINT)
+  	  pos = song->cpos();
+    else
+  	  pos = initPos;
+    if (pos > MAXINT)
+  	  pos = MAXINT;
 
-	// At this point in time the range of the canvas hasn't
-	// been calculated right ?
-	// Also, why wanting to restore some initPos, what is initPos?
-	// To me, it seems to make a lot more sense to use the actual
-	// current song cpos.
-	// This is now done via the showEvent();
+    // At this point in time the range of the canvas hasn't
+    // been calculated right ?
+    // Also, why wanting to restore some initPos, what is initPos?
+    // To me, it seems to make a lot more sense to use the actual
+    // current song cpos.
+    // This is now done via the showEvent();
 
-	//      hscroll->setOffset((int)pos); // changed that to:
+    //      hscroll->setOffset((int)pos); // changed that to:
 }
 
 //---------------------------------------------------------
@@ -675,27 +665,6 @@ void PianoRoll::configChanged()
 {
 	initShortcuts();
 	//trackInfo->updateTrackInfo();
-}
-
-void PianoRoll::setReplay(bool t)
-{
-	_replay = t;
-	if(t)
-	{
-		replayPos = song->cpos();
-	}
-}
-
-void PianoRoll::playStateChanged(bool state)
-{
-	if(_replay)
-	{
-		if(!state)
-		{
-			Pos p(replayPos, true);
-			song->setPos(0, p, true, true, true);
-		}
-	}
 }
 
 //---------------------------------------------------------
@@ -765,12 +734,12 @@ void PianoRoll::setTime(unsigned tick)
 PianoRoll::~PianoRoll()
 {
 	// undoRedo->removeFrom(tools);  // p4.0.6 Removed
-        // store widget size to global config
-        tconfig().set_property("PianoRollEdit", "widgetwidth", width());
-        tconfig().set_property("PianoRollEdit", "widgetheigth", height());
-        tconfig().set_property("PianoRoll", "hscale", hscroll->mag());
-        tconfig().set_property("PianoRoll", "yscale", vscroll->mag());
-        tconfig().set_property("PianoRoll", "ypos", vscroll->pos());
+	// store widget size to global config
+	tconfig().set_property("PianoRollEdit", "widgetwidth", width());
+	tconfig().set_property("PianoRollEdit", "widgetheigth", height());
+	tconfig().set_property("PianoRoll", "hscale", hscroll->mag());
+	tconfig().set_property("PianoRoll", "yscale", vscroll->mag());
+	tconfig().set_property("PianoRoll", "ypos", vscroll->pos());
 }
 
 //---------------------------------------------------------
@@ -817,10 +786,10 @@ void PianoRoll::setSelection(int tick, Event& e, Part* p)
 		info->setEnabled(true);
 		info->setDeltaMode(false);
 		info->setValues(tick,
-				selEvent.lenTick(),
-				selEvent.pitch(),
-				selEvent.velo(),
-				selEvent.veloOff());
+						selEvent.lenTick(),
+						selEvent.pitch(),
+						selEvent.velo(),
+						selEvent.veloOff());
 	}
 	else
 	{
@@ -847,21 +816,21 @@ void PianoRoll::noteinfoChanged(NoteInfo::ValType type, int val)
 		Event event = selEvent.clone();
 		switch (type)
 		{
-			case NoteInfo::VAL_TIME:
-				event.setTick(val - selPart->tick());
-				break;
-			case NoteInfo::VAL_LEN:
-				event.setLenTick(val);
-				break;
-			case NoteInfo::VAL_VELON:
-				event.setVelo(val);
-				break;
-			case NoteInfo::VAL_VELOFF:
-				event.setVeloOff(val);
-				break;
-			case NoteInfo::VAL_PITCH:
-				event.setPitch(val);
-				break;
+		case NoteInfo::VAL_TIME:
+			event.setTick(val - selPart->tick());
+			break;
+		case NoteInfo::VAL_LEN:
+			event.setLenTick(val);
+			break;
+		case NoteInfo::VAL_VELON:
+			event.setVelo(val);
+			break;
+		case NoteInfo::VAL_VELOFF:
+			event.setVeloOff(val);
+			break;
+		case NoteInfo::VAL_PITCH:
+			event.setPitch(val);
+			break;
 		}
 		// Indicate do undo, and do not do port controller values and clone parts.
 		//audio->msgChangeEvent(selEvent, event, selPart);
@@ -875,26 +844,26 @@ void PianoRoll::noteinfoChanged(NoteInfo::ValType type, int val)
 		int delta = 0;
 		switch (type)
 		{
-			case NoteInfo::VAL_TIME:
-				delta = val - tickOffset;
-				tickOffset = val;
-				break;
-			case NoteInfo::VAL_LEN:
-				delta = val - lenOffset;
-				lenOffset = val;
-				break;
-			case NoteInfo::VAL_VELON:
-				delta = val - veloOnOffset;
-				veloOnOffset = val;
-				break;
-			case NoteInfo::VAL_VELOFF:
-				delta = val - veloOffOffset;
-				veloOffOffset = val;
-				break;
-			case NoteInfo::VAL_PITCH:
-				delta = val - pitchOffset;
-				pitchOffset = val;
-				break;
+		case NoteInfo::VAL_TIME:
+			delta = val - tickOffset;
+			tickOffset = val;
+			break;
+		case NoteInfo::VAL_LEN:
+			delta = val - lenOffset;
+			lenOffset = val;
+			break;
+		case NoteInfo::VAL_VELON:
+			delta = val - veloOnOffset;
+			veloOnOffset = val;
+			break;
+		case NoteInfo::VAL_VELOFF:
+			delta = val - veloOffOffset;
+			veloOffOffset = val;
+			break;
+		case NoteInfo::VAL_PITCH:
+			delta = val - pitchOffset;
+			pitchOffset = val;
+			break;
 		}
 		if (delta)
 			canvas->modifySelected(type, delta);
@@ -932,7 +901,7 @@ CtrlEdit* PianoRoll::addCtrl()
 void PianoRoll::removeCtrl(CtrlEdit* ctrl)
 {
 	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();
-			i != ctrlEditList.end(); ++i)
+	i != ctrlEditList.end(); ++i)
 	{
 		if (*i == ctrl)
 		{
@@ -966,33 +935,33 @@ void PianoRoll::readConfiguration(Xml& xml)
 		const QString& tag = xml.s1();
 		switch (token)
 		{
-			case Xml::TagStart:
-				if (tag == "quant")
-					_quantInit = xml.parseInt();
-				else if (tag == "raster")
-					_rasterInit = xml.parseInt();
-				else if (tag == "quantStrength")
-					_quantStrengthInit = xml.parseInt();
-				else if (tag == "quantLimit")
-					_quantLimitInit = xml.parseInt();
-				else if (tag == "quantLen")
-					_quantLenInit = xml.parseInt();
-				else if (tag == "to")
-					_toInit = xml.parseInt();
-				else if (tag == "colormode")
-					colorModeInit = xml.parseInt();
-				else if (tag == "width")
-					_widthInit = xml.parseInt();
-				else if (tag == "height")
-					_heightInit = xml.parseInt();
-				else
-					xml.unknown("PianoRoll");
-				break;
-			case Xml::TagEnd:
-				if (tag == "pianoroll")
-					return;
-			default:
-				break;
+		case Xml::TagStart:
+			if (tag == "quant")
+				_quantInit = xml.parseInt();
+			else if (tag == "raster")
+				_rasterInit = xml.parseInt();
+			else if (tag == "quantStrength")
+				_quantStrengthInit = xml.parseInt();
+			else if (tag == "quantLimit")
+				_quantLimitInit = xml.parseInt();
+			else if (tag == "quantLen")
+				_quantLenInit = xml.parseInt();
+			else if (tag == "to")
+				_toInit = xml.parseInt();
+			else if (tag == "colormode")
+				colorModeInit = xml.parseInt();
+			else if (tag == "width")
+				_widthInit = xml.parseInt();
+			else if (tag == "height")
+				_heightInit = xml.parseInt();
+			else
+				xml.unknown("PianoRoll");
+			break;
+		case Xml::TagEnd:
+			if (tag == "pianoroll")
+				return;
+		default:
+			break;
 		}
 	}
 }
@@ -1063,7 +1032,7 @@ void PianoRoll::writeStatus(int level, Xml& xml) const
 	hsplitter->writeStatus(level, xml);
 
 	for (std::list<CtrlEdit*>::const_iterator i = ctrlEditList.begin();
-			i != ctrlEditList.end(); ++i)
+	i != ctrlEditList.end(); ++i)
 	{
 		(*i)->writeStatus(level, xml);
 	}
@@ -1088,7 +1057,7 @@ void PianoRoll::writeStatus(int level, Xml& xml) const
 
 void PianoRoll::readStatus(Xml& xml)
 {
-        printf("readstatus\n");
+	printf("readstatus\n");
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -1097,71 +1066,71 @@ void PianoRoll::readStatus(Xml& xml)
 		const QString& tag = xml.s1();
 		switch (token)
 		{
-			case Xml::TagStart:
-				if (tag == "steprec")
-				{
-					int val = xml.parseInt();
-					canvas->setSteprec(val);
-					srec->setChecked(val);
-				}
-				else if (tag == "midiin")
-				{
-					int val = xml.parseInt();
-					canvas->setMidiin(val);
-					midiin->setChecked(val);
-				}
-				else if (tag == "tool")
-				{
-					int tool = xml.parseInt();
-					canvas->setTool(tool);
-					tools2->set(tool);
-				}
-				else if (tag == "midieditor")
-					MidiEditor::readStatus(xml);
-				else if (tag == "ctrledit")
-				{
-					CtrlEdit* ctrl = addCtrl();
-					ctrl->readStatus(xml);
-				}
-				else if (tag == splitter->objectName())
-					splitter->readStatus(xml);
-				else if (tag == hsplitter->objectName())
-					hsplitter->readStatus(xml);
-				else if (tag == "quantStrength")
-					_quantStrength = xml.parseInt();
-				else if (tag == "quantLimit")
-					_quantLimit = xml.parseInt();
-				else if (tag == "quantLen")
-					_quantLen = xml.parseInt();
-				else if (tag == "playEvents")
-				{
-					_playEvents = xml.parseInt();
-					canvas->playEvents(_playEvents);
-					speaker->setChecked(_playEvents);
-				}
-                                else if (tag == "xmag")
-                                        hscroll->setMag(xml.parseInt());
-                                else if (tag == "xpos")
-                                        hscroll->setPos(xml.parseInt());
-                                else if (tag == "ymag")
-                                        vscroll->setMag(xml.parseInt());
-                                else if (tag == "ypos")
-                                        vscroll->setPos(xml.parseInt());
-				else
-					xml.unknown("PianoRoll");
-				break;
+		case Xml::TagStart:
+			if (tag == "steprec")
+			{
+				int val = xml.parseInt();
+				canvas->setSteprec(val);
+				srec->setChecked(val);
+			}
+			else if (tag == "midiin")
+			{
+				int val = xml.parseInt();
+				canvas->setMidiin(val);
+				midiin->setChecked(val);
+			}
+			else if (tag == "tool")
+			{
+				int tool = xml.parseInt();
+				canvas->setTool(tool);
+				tools2->set(tool);
+			}
+			else if (tag == "midieditor")
+				MidiEditor::readStatus(xml);
+			else if (tag == "ctrledit")
+			{
+				CtrlEdit* ctrl = addCtrl();
+				ctrl->readStatus(xml);
+			}
+			else if (tag == splitter->objectName())
+				splitter->readStatus(xml);
+			else if (tag == hsplitter->objectName())
+				hsplitter->readStatus(xml);
+			else if (tag == "quantStrength")
+				_quantStrength = xml.parseInt();
+			else if (tag == "quantLimit")
+				_quantLimit = xml.parseInt();
+			else if (tag == "quantLen")
+				_quantLen = xml.parseInt();
+			else if (tag == "playEvents")
+			{
+				_playEvents = xml.parseInt();
+				canvas->playEvents(_playEvents);
+				speaker->setChecked(_playEvents);
+			}
+			else if (tag == "xmag")
+				hscroll->setMag(xml.parseInt());
+			else if (tag == "xpos")
+				hscroll->setPos(xml.parseInt());
+			else if (tag == "ymag")
+				vscroll->setMag(xml.parseInt());
+			else if (tag == "ypos")
+				vscroll->setPos(xml.parseInt());
+			else
+				xml.unknown("PianoRoll");
+			break;
 			case Xml::TagEnd:
-				if (tag == "pianoroll")
-				{
-					_quantInit = _quant;
-					_rasterInit = _raster;
-					midiTrackInfo->setRaster(_raster);
-					midiTrackInfo->setQuant(_quant);
-					canvas->redrawGrid();
-					return;
-				}
+			if (tag == "pianoroll")
+			{
+				_quantInit = _quant;
+				_rasterInit = _raster;
+				midiTrackInfo->setRaster(_raster);
+				midiTrackInfo->setQuant(_quant);
+				canvas->redrawGrid();
+				return;
+			}
 			default:
-				break;
+			break;
 		}
 	}
 }
@@ -1213,16 +1182,16 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 void PianoRoll::keyPressEvent(QKeyEvent* event)
 {
 
-        // Force left/right arrow key events to move the focus
-        // back on the canvas if it doesn't have the focus.
-        if (!canvas->hasFocus())
+	// Force left/right arrow key events to move the focus
+	// back on the canvas if it doesn't have the focus.
+	if (!canvas->hasFocus())
 	{
-                if (event->key() == Qt::Key_Right || event->key() == Qt::Key_Left)
-                {
-                        canvas->setFocus(Qt::MouseFocusReason);
-                        event->accept();
-                        return;
-                }
+		if (event->key() == Qt::Key_Right || event->key() == Qt::Key_Left)
+		{
+			canvas->setFocus(Qt::MouseFocusReason);
+			event->accept();
+			return;
+		}
 	}
 
 	int index;
@@ -1251,44 +1220,44 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	//if (event->state() & Qt::ControlButton)
 	if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
 		key += Qt::CTRL;
-        ///if (event->state() & Qt::MetaButton)
-         if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
-                key += Qt::META;
+	///if (event->state() & Qt::MetaButton)
+	if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+		key += Qt::META;
 
 
 
-	 PianoCanvas* pc = (PianoCanvas*) canvas;
+	PianoCanvas* pc = (PianoCanvas*) canvas;
 
-	 if (_stepQwerty && pc->steprec())
-	 {
-		 if (key == shortcuts[SHRT_OCTAVE_QWERTY_0].key) {
-			 pc->setOctaveQwerty(0);
-			 return;
-		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_1].key) {
-			 pc->setOctaveQwerty(1);
-			 return;
-		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_2].key) {
-			 pc->setOctaveQwerty(2);
-			 return;
-		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_3].key) {
-			 pc->setOctaveQwerty(3);
-			 return;
-		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_4].key) {
-			 pc->setOctaveQwerty(4);
-			 return;
-		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_5].key) {
-			 pc->setOctaveQwerty(5);
-			 return;
-		 } else if (key == shortcuts[SHRT_OCTAVE_QWERTY_6].key) {
-			 pc->setOctaveQwerty(6);
-			 return;
-		 }
+	if (_stepQwerty && pc->steprec())
+	{
+		if (key == shortcuts[SHRT_OCTAVE_QWERTY_0].key) {
+			pc->setOctaveQwerty(0);
+			return;
+		} else if (key == shortcuts[SHRT_OCTAVE_QWERTY_1].key) {
+			pc->setOctaveQwerty(1);
+			return;
+		} else if (key == shortcuts[SHRT_OCTAVE_QWERTY_2].key) {
+			pc->setOctaveQwerty(2);
+			return;
+		} else if (key == shortcuts[SHRT_OCTAVE_QWERTY_3].key) {
+			pc->setOctaveQwerty(3);
+			return;
+		} else if (key == shortcuts[SHRT_OCTAVE_QWERTY_4].key) {
+			pc->setOctaveQwerty(4);
+			return;
+		} else if (key == shortcuts[SHRT_OCTAVE_QWERTY_5].key) {
+			pc->setOctaveQwerty(5);
+			return;
+		} else if (key == shortcuts[SHRT_OCTAVE_QWERTY_6].key) {
+			pc->setOctaveQwerty(6);
+			return;
+		}
 
-		 if(pc->stepInputQwerty(event))
-		 {
-			 return;
-		 }
-	 }
+		if(pc->stepInputQwerty(event))
+		{
+			return;
+		}
+	}
 
 
 	if (key == Qt::Key_Escape)
@@ -1429,11 +1398,6 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		vscroll->setPos(pos);
 		return;
 	}
-	else if(key == shortcuts[SHRT_PLAY_REPEAT].key)
-	{
-		repPlay->toggle();
-		return;
-	}
 	else if (key == shortcuts[SHRT_SEL_INSTRUMENT].key)
 	{
 		midiTrackInfo->addSelectedPatch();
@@ -1441,7 +1405,28 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
 	{
-		midiTrackInfo->insertMatrixEvent(); //progRecClicked();
+		unsigned utick = song->cpos() + rasterStep(song->cpos());
+		midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick); //progRecClicked();
+		return;
+	}
+	if(key == shortcuts[SHRT_COPY_PROGRAM].key)
+	{
+		pcbar->copySelected();
+		return;
+	}
+	if(key == shortcuts[SHRT_SEL_PROGRAM].key)
+	{
+		pcbar->selectProgramChange();
+		return;
+	}
+	if(key == shortcuts[SHRT_LMOVE_PROGRAM].key)
+	{
+		pcbar->moveSelected(-1);
+		return;
+	}
+	if(key == shortcuts[SHRT_RMOVE_PROGRAM].key)
+	{
+		pcbar->moveSelected(1);
 		return;
 	}
 	else if (key == shortcuts[SHRT_DEL_PROGRAM].key)
@@ -1472,11 +1457,23 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 							//printf("Event x: %d\n", xp);
 							if (xp >= x && xp <= (x + 50))
 							{
+								pcbar->deleteProgramChange(pcevt);
 								//printf("Found Program Change to delete at: %d\n", x);
-								//song->startUndo();
-								song->deleteEvent(pcevt, mprt); //hack
-								//audio->msgDeleteEvent(evt->second, p->second, false, true, true);
-								//song->endUndo(SC_EVENT_MODIFIED);
+								song->startUndo();
+								//song->deleteEvent(pcevt, mprt); //hack
+								audio->msgDeleteEvent(evt->second, p->second, true, true, false);
+								song->endUndo(SC_EVENT_MODIFIED);
+								//Reset the hardware controller for this track
+								/*MidiTrack *evtrack = static_cast<MidiTrack*>(p->second->track());
+								if(evtrack)
+								{
+									int outChannel = evtrack->outChannel();
+									int outPort = evtrack->outPort();
+									MidiPort* mp = &midiPorts[outPort];
+									if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
+										audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
+								}*/
+								break;
 							}
 						}
 					}
@@ -1530,11 +1527,11 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		else
 			return;
 	}
-        else if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
-        {
-                srec->toggle();
-                return;
-        }
+	else if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
+	{
+		srec->toggle();
+		return;
+	}
 	else if (key == shortcuts[SHRT_TOGGLE_STEPQWERTY].key)
 	{
 		_stepQwerty = !_stepQwerty;
@@ -1547,69 +1544,69 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 
 		return;
 	}
-        else if (key == shortcuts[SHRT_NOTE_VELOCITY_UP].key)
-        {
-                CItemList list = canvas->getSelectedItemsForCurrentPart();
+	else if (key == shortcuts[SHRT_NOTE_VELOCITY_UP].key)
+	{
+		CItemList list = canvas->getSelectedItemsForCurrentPart();
 
-                song->startUndo();
-                for (iCItem k = list.begin(); k != list.end(); ++k)
-                {
-                        NEvent* nevent = (NEvent*) (k->second);
-                        Event event = nevent->event();
-                        if (event.type() != Note)
-                                continue;
+		song->startUndo();
+		for (iCItem k = list.begin(); k != list.end(); ++k)
+		{
+			NEvent* nevent = (NEvent*) (k->second);
+			Event event = nevent->event();
+			if (event.type() != Note)
+				continue;
 
-                        int velo = event.velo();
+			int velo = event.velo();
 			velo += 5;
 
-                        if (velo <= 0)
-                                velo = 1;
-                        if (velo > 127)
-                                velo = 127;
-                        if (event.velo() != velo)
-                        {
-                                Event newEvent = event.clone();
-                                newEvent.setVelo(velo);
-                                // Indicate no undo, and do not do port controller values and clone parts.
-                                //audio->msgChangeEvent(event, newEvent, nevent->part(), false);
-                                audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
-                        }
-                }
-                song->endUndo(SC_EVENT_MODIFIED);
-                return;
+			if (velo <= 0)
+				velo = 1;
+			if (velo > 127)
+				velo = 127;
+			if (event.velo() != velo)
+			{
+				Event newEvent = event.clone();
+				newEvent.setVelo(velo);
+				// Indicate no undo, and do not do port controller values and clone parts.
+				//audio->msgChangeEvent(event, newEvent, nevent->part(), false);
+				audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
+			}
+		}
+		song->endUndo(SC_EVENT_MODIFIED);
+		return;
 
-        }
-        else if (key == shortcuts[SHRT_NOTE_VELOCITY_DOWN].key)
-        {
-                CItemList list = canvas->getSelectedItemsForCurrentPart();
+	}
+	else if (key == shortcuts[SHRT_NOTE_VELOCITY_DOWN].key)
+	{
+		CItemList list = canvas->getSelectedItemsForCurrentPart();
 
-                song->startUndo();
-                for (iCItem k = list.begin(); k != list.end(); ++k)
-                {
-                        NEvent* nevent = (NEvent*) (k->second);
-                        Event event = nevent->event();
-                        if (event.type() != Note)
-                                continue;
+		song->startUndo();
+		for (iCItem k = list.begin(); k != list.end(); ++k)
+		{
+			NEvent* nevent = (NEvent*) (k->second);
+			Event event = nevent->event();
+			if (event.type() != Note)
+				continue;
 
-                        int velo = event.velo();
+			int velo = event.velo();
 			velo -= 5;
 
-                        if (velo <= 0)
-                                velo = 1;
-                        if (velo > 127)
-                                velo = 127;
-                        if (event.velo() != velo)
-                        {
-                                Event newEvent = event.clone();
-                                newEvent.setVelo(velo);
-                                // Indicate no undo, and do not do port controller values and clone parts.
-                                //audio->msgChangeEvent(event, newEvent, nevent->part(), false);
-                                audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
-                        }
-                }
-                song->endUndo(SC_EVENT_MODIFIED);
-                return;
-        }	
+			if (velo <= 0)
+				velo = 1;
+			if (velo > 127)
+				velo = 127;
+			if (event.velo() != velo)
+			{
+				Event newEvent = event.clone();
+				newEvent.setVelo(velo);
+				// Indicate no undo, and do not do port controller values and clone parts.
+				//audio->msgChangeEvent(event, newEvent, nevent->part(), false);
+				audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
+			}
+		}
+		song->endUndo(SC_EVENT_MODIFIED);
+		return;
+	}
 	else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
 	{
 		if (canvas->part()) {
@@ -1723,7 +1720,7 @@ void PianoRoll::setSpeaker(bool val)
 //   setKeyBindings
 //---------------------------------------------------------
 
-void PianoRoll::setKeyBindings(LSCPChannelInfo info)
+void PianoRoll::setKeyBindings(LSCPChannelInfo info)/*{{{*/
 {
 	printf("entering PianoRoll::setKeyBindings\n");
 	if(!selected || audio->isPlaying())
@@ -1785,7 +1782,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)
 			}
 		}
 	}
-}
+}/*}}}*/
 #endif
 
 bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
@@ -1851,25 +1848,13 @@ void PianoRoll::showEvent(QShowEvent *)
 	// half the canvas width so the cursor is centered.
 	hscroll->setPos(hscroll->pos() - (canvas->width() / 2));
 
-        int hScale = tconfig().get_property("PianoRoll", "hscale", 346).toInt();
-        int vScale = tconfig().get_property("PianoRoll", "yscale", 286).toInt();
-        int yPos = tconfig().get_property("PianoRoll", "ypos", 0).toInt();
-        hscroll->setMag(hScale);
-        vscroll->setMag(vScale);
-        vscroll->setPos(yPos);
+	int hScale = tconfig().get_property("PianoRoll", "hscale", 346).toInt();
+	int vScale = tconfig().get_property("PianoRoll", "yscale", 286).toInt();
+	int yPos = tconfig().get_property("PianoRoll", "ypos", 0).toInt();
+	hscroll->setMag(hScale);
+	vscroll->setMag(vScale);
+	vscroll->setPos(yPos);
 }
-
-/*
-//---------------------------------------------------------
-//   trackInfoScroll
-//---------------------------------------------------------
-
-void PianoRoll::trackInfoScroll(int y)
-	  {
-	  if (trackInfo->visibleWidget())
-			trackInfo->visibleWidget()->move(0, -y);
-	  }
- */
 
 //---------------------------------------------------------
 //   initShortcuts
@@ -1950,27 +1935,16 @@ void PianoRoll::newCanvasWidth(int /*w*/)
 		  int nw = w + (vscroll->width() - 18); // 18 is the fixed width of the CtlEdit VScale widget.
 		  if(nw < 1)
 			nw = 1;
-        
+
 		  for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();
 			 i != ctrlEditList.end(); ++i) {
 				// Changed by Tim. p3.3.7
 				//(*i)->setCanvasWidth(w);
 				(*i)->setCanvasWidth(nw);
 				}
-            
+
 		  updateHScrollRange();
 	 */
-}
-
-//---------------------------------------------------------
-//   toggleTrackInfo
-//---------------------------------------------------------
-
-void PianoRoll::toggleTrackInfo()
-{
-	bool vis = midiTrackInfo->isVisible();
-	infoScroll->setVisible(!vis);
-	infoScroll->setEnabled(!vis);
 }
 
 void PianoRoll::splitterMoved(int pos, int)

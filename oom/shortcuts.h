@@ -303,6 +303,10 @@ enum
     SHRT_EVENT_COLOR, //e
 
     SHRT_ADD_PROGRAM, //Add program change backslash
+    SHRT_COPY_PROGRAM, //Add program change Alt+backslash
+    SHRT_SEL_PROGRAM, //Select program change Ctrl+Alt+S
+    SHRT_RMOVE_PROGRAM, //Move program change left Ctrl+Alt+right
+    SHRT_LMOVE_PROGRAM, //Move program change right Ctrl+Alt+left
     SHRT_DEL_PROGRAM, //Delete program change under cursor shit+backslash
     SHRT_SEL_INSTRUMENT,
 

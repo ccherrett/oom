@@ -62,12 +62,14 @@ void LSClient::subscribe()
 
 void LSClient::unsubscribe()
 {
+	mutex.lock();
 	if(_client != NULL)
 	{
 		::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 		::lscp_client_destroy(_client);
 	}
 	_client = NULL;
+	mutex.unlock();
 }
 
 int LSClient::getError()
@@ -100,6 +102,7 @@ void LSClient::run()
 
 void LSClient::startClient()
 {
+	mutex.lock();
 	_client = ::lscp_client_create(_hostname, _port, client_callback, this);
 	if(_client != NULL)
 	{
@@ -113,6 +116,7 @@ void LSClient::startClient()
 		printf("Failed to Initialize LSCP client connection\n");
 		//
 	}
+	mutex.unlock();
 }
 
 void LSClient::stopClient()

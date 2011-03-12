@@ -91,6 +91,7 @@ extern QPixmap* pafterIcon;
 extern QPixmap* flagIcon;
 extern QPixmap* flagIconS;
 extern QPixmap* flagIconSP;
+extern QPixmap* flagIconSPSel;
 extern QPixmap* lockIcon;
 extern QPixmap* tocIcon;
 extern QPixmap* exitIconS;

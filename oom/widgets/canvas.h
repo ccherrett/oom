@@ -86,6 +86,9 @@ protected:
     QMenu* _itemPopupMenu;
     QMenu* _canvasPopupMenu;
 
+	int _selectedProgramPos;
+	bool _drawSelectedProgram;
+
     void setCursor();
     virtual void viewKeyPressEvent(QKeyEvent* event);
     virtual void viewMousePressEvent(QMouseEvent* event);
@@ -197,11 +200,13 @@ protected:
     bool allItemsAreSelected();
 
 
+
 public slots:
     void setTool(int t);
     void setPos(int, unsigned, bool adjustScrollbar);
     void scrollTimerDone(void);
     void redirectedWheelEvent(QWheelEvent*);
+	void drawSelectedProgram(int, bool);
 
 signals:
     void followEvent(int);

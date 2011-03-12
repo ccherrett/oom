@@ -88,6 +88,8 @@ Song::Song(const char* name)
 	jackErrorBox = 0;
 	viewselected = false;
 	hasSelectedParts = false;
+	_replay = false;
+	_replayPos = 0;
 	//Create the AutoView
 	TrackView* wv = new TrackView();
 	wv->setViewName("Working View");
@@ -528,68 +530,11 @@ void Song::changeEvent(Event& oldEvent, Event& newEvent, Part* part)
 		// This can be normal for some (redundant) operations.
 		if (debugMsg)
 			printf("Song::changeEvent event not found in part:%s size:%zd\n", part->name().toLatin1().constData(), part->events()->size());
-		// abort();
-		// Removed by T356. Allow it to add the new event.
-		// (And remove the old one from the midi port controller!)
-		//return;
 	}
 	else
 		part->events()->erase(i);
 
 	part->events()->add(newEvent);
-
-	/*
-	if (oldEvent.type() == Controller) {
-		  MidiTrack* track = (MidiTrack*)part->track();
-		  int ch    = track->outChannel();
-		  int tick  = oldEvent.tick() + part->tick();
-		  int cntrl = oldEvent.dataA();
-		  MidiPort* mp = &midiPorts[track->outPort()];
-		  // Is it a drum controller event, according to the track port's instrument?
-		  if(track->type() == Track::DRUM)
-		  {
-			MidiController* mc = mp->drumController(cntrl);
-			if(mc)
-			{
-			  int note = cntrl & 0x7f;
-			  cntrl &= ~0xff;
-			  ch = drumMap[note].channel;
-			  mp = &midiPorts[drumMap[note].port];
-			  cntrl |= drumMap[note].anote;
-			}
-		  }
-            
-		  mp->deleteController(ch, tick, cntrl, part);
-	}
-	 */
-	//removePortCtrlEvents(oldEvent, part);
-
-	/*
-	if (newEvent.type() == Controller) {
-		  MidiTrack* track = (MidiTrack*)part->track();
-		  int ch    = track->outChannel();
-		  int tick  = newEvent.tick() + part->tick();
-		  int cntrl = newEvent.dataA();
-		  int val   = newEvent.dataB();
-		  MidiPort* mp = &midiPorts[track->outPort()];
-		  // Is it a drum controller event, according to the track port's instrument?
-		  if(track->type() == Track::DRUM)
-		  {
-			MidiController* mc = mp->drumController(cntrl);
-			if(mc)
-			{
-			  int note = cntrl & 0x7f;
-			  cntrl &= ~0xff;
-			  ch = drumMap[note].channel;
-			  mp = &midiPorts[drumMap[note].port];
-			  cntrl |= drumMap[note].anote;
-			}
-		  }
-            
-		  mp->setControllerVal(ch, tick, cntrl, val, part);
-		  }
-	 */
-	//addPortCtrlEvents(newEvent, part);
 }
 
 //---------------------------------------------------------
@@ -598,33 +543,6 @@ void Song::changeEvent(Event& oldEvent, Event& newEvent, Part* part)
 
 void Song::deleteEvent(Event& event, Part* part)
 {
-	/*
-	if (event.type() == Controller) {
-		  MidiTrack* track = (MidiTrack*)part->track();
-		  int ch    = track->outChannel();
-		  int tick  = event.tick() + part->tick();
-		  int cntrl = event.dataA();
-            
-		  MidiPort* mp = &midiPorts[track->outPort()];
-		  // Is it a drum controller event, according to the track port's instrument?
-		  if(track->type() == Track::DRUM)
-		  {
-			MidiController* mc = mp->drumController(cntrl);
-			if(mc)
-			{
-			  int note = cntrl & 0x7f;
-			  cntrl &= ~0xff;
-			  ch = drumMap[note].channel;
-			  mp = &midiPorts[drumMap[note].port];
-			  cntrl |= drumMap[note].anote;
-			}
-		  }
-            
-		  mp->deleteController(ch, tick, cntrl, part);
-		  }
-	 */
-	//removePortCtrlEvents(event, part);
-
 	iEvent ev = part->events()->find(event);
 	if (ev == part->events()->end())
 	{
@@ -1127,6 +1045,21 @@ Track* Song::findTrack(const QString& name) const
 }
 
 //---------------------------------------------------------
+// setReplay
+// set transport audition flag
+//---------------------------------------------------------
+
+void Song::setReplay(bool t)
+{
+	_replay = t;
+	if(t)
+	{
+		_replayPos = song->cpos();
+		emit replayChanged(_replay, _replayPos);
+	}
+}
+
+//---------------------------------------------------------
 //   setLoop
 //    set transport loop flag
 //---------------------------------------------------------
@@ -1345,7 +1278,6 @@ void Song::setPlay(bool f)
 	else
 	{
 		audio->msgPlay(true);
-		emit playbackStateChanged(true);
 	}
 }
 
@@ -1363,7 +1295,12 @@ void Song::setStop(bool f)
 	else
 	{
 		audio->msgPlay(false);
-		emit playbackStateChanged(false);
+		if(_replay)
+		{
+			Pos p(_replayPos, true);
+			setPos(0, p, true, true, true);
+		}
+		//emit playbackStateChanged(false);
 	}
 }
 

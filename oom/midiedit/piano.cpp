@@ -618,7 +618,7 @@ static const char *mk6_xpm_switch[] = {/*{{{*/
 
 Piano::Piano(QWidget* parent, int ymag)
    : View(parent, 1, ymag)
-      {
+{
       setMouseTracking(true);
       curPitch = -1;
       c_keys[0] = new QPixmap(mk1_xpmC8);
@@ -658,27 +658,9 @@ Piano::Piano(QWidget* parent, int ymag)
       mk5_s = new QPixmap(mk5_xpm_switch);
       mk6_s = new QPixmap(mk6_xpm_switch);
 
-	  /*enabled = new QList<int>();
-	  QStringList sls;
-	  sls << "55" << "56" << "57" << "58" << "59" << "60" << "61" << "62" << "63" << "64" << "65" << "66" << "67" << "68" << "69" << "70" << "71" << "72" << "73" << "74" << "75" << "76" << "77" << "78" << "79" << "80" << "81" << "82" << "83" << "84" << "85" << "86" << "87" << "88" << "89" << "90" << "91" << "92" << "93" << "94" << "95" << "96" << "97" << "98" << "99";// << "100";      
-	  //sls << "55" << "56" << "57" << "58" << "64" << "65" << "66" << "67" << "72" << "73" << "74" << "77" << "79" << "81" << "82" << "83" << "84" << "85" << "90" << "91" << "92" << "93" << "97" << "98";      
-      QStringListIterator iter(sls);
-	  while(iter.hasNext())
-	  {
-	  	enabled->append(iter.next().toInt());
-	  }
-	  
-	  keyswitch = new QList<int>();
-	  QStringList keyswitchlist;
-	  keyswitchlist << "105" << "106" << "107" << "108" << "110" << "111" << "112" << "113";      
-      QStringListIterator iterswitch(keyswitchlist);
-	  while(iterswitch.hasNext())
-	  {
-	  	keyswitch->append(iterswitch.next().toInt());
-	  }*/
 	  keyDown = -1;
       button = Qt::NoButton;
-      }
+}
 
 //---------------------------------------------------------
 //   draw

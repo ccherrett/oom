@@ -89,8 +89,10 @@ private slots:
     void movePatchDown(bool);
     void patchSequenceInserted(QModelIndex, int, int);
     void patchSequenceRemoved(QModelIndex, int, int);
+    void patchSequenceClicked(QModelIndex);
 	void clonePatchSequence();
 	void patchDoubleClicked(QModelIndex);
+	void patchClicked(QModelIndex);
 	void editorPartChanged(Part*);
     //tb1
 	void _rasterChanged(int);
@@ -106,7 +108,7 @@ public slots:
     void instrPopup();
     void progRecClicked();
     void songChanged(int);
-    void insertMatrixEvent();
+    void insertMatrixEvent(Part*, unsigned);
     void updateSize();
     void populateMatrix();
 	void populatePatches();

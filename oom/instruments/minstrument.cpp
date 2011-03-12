@@ -143,62 +143,6 @@ static void readEventList(Xml& xml, EventList* el, const char* name)
 
 static void loadIDF(QFileInfo* fi)
 {
-	/*
-		  QFile qf(fi->filePath());
-		  if (!qf.open(IO_ReadOnly)) {
-				printf("cannot open file %s\n", fi->fileName().toLatin1());
-				return;
-				}
-		  if (debugMsg)
-				printf("   load instrument definition <%s>\n", fi->filePath().local8Bit().data());
-		  QDomDocument doc;
-		  int line, column;
-		  QString err;
-		  if (!doc.setContent(&qf, false, &err, &line, &column)) {
-				QString col, ln, error;
-				col.setNum(column);
-				ln.setNum(line);
-				error = err + " at line: " + ln + " col: " + col;
-				printf("error reading file <%s>:\n   %s\n",
-				   fi->filePath().toLatin1(), error.toLatin1());
-				return;
-				}
-		  QDomNode node = doc.documentElement();
-		  while (!node.isNull()) {
-				QDomElement e = node.toElement();
-				if (e.isNull())
-					  continue;
-				if (e.tagName() == "oom") {
-					  QString version = e.attribute(QString("version"));
-					  for (QDomNode n = node.firstChild(); !n.isNull(); n = n.nextSibling()) {
-							QDomElement e = n.toElement();
-							if (e.tagName() == "MidiInstrument") {
-								  MidiInstrument* i = new MidiInstrument();
-								  i->read(n);
-								  i->setFilePath(fi->filePath());
-								  bool replaced = false;
-								  for (int idx = 0; idx < midiInstruments.size(); ++idx) {
-										if (midiInstruments[idx]->iname() == i->iname()) {
-											  midiInstruments.replace(idx, i);
-											  replaced = true;
-											  if (debugMsg)
-													printf("Midi Instrument Definition <%s> overwritten\n",
-													   i->iname().toLocal8Bit().data());
-											  break;
-											  }
-										}
-								  if (!replaced)
-										midiInstruments += i;
-								  }
-							}
-					  }
-				else
-					  printf("OOMidi:laodIDF: %s not supported\n", e.tagName().toLatin1());
-				node = node.nextSibling();
-				}
-		  qf.close();
-	 */
-
 	FILE* f = fopen(fi->filePath().toAscii().constData(), "r");
 	if (f == 0)
 		return;
@@ -253,8 +197,6 @@ static void loadIDF(QFileInfo* fi)
 		}
 	}
 	fclose(f);
-
-
 }
 
 //---------------------------------------------------------
@@ -462,24 +404,11 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 	_nullvalue = ins._nullvalue;
 
 	// Assignment
-	// *_controller = *(ins._controller);
 	for (ciMidiController i = ins._controller->begin(); i != ins._controller->end(); ++i)
 	{
 		MidiController* mc = i->second;
 		_controller->add(new MidiController(*mc));
 	}
-
-	//  pg.clear();
-	//  for(iPatchGroup ipg = pg.begin(); ipg != pg.end(); ++ipg)
-	//  {
-	//ipg->patches.clear();
-
-	//const PatchGroup& g = *ipg;
-	//for(ciPatch ip = ipg->begin(); ip != ipg->end(); ++ipg)
-	//{
-
-	//}
-	//  }
 
 	for (ciPatchGroup g = pg.begin(); g != pg.end(); ++g)
 	{
@@ -643,13 +572,6 @@ void Patch::read(Xml& xml)
 
 void Patch::write(int level, Xml& xml)
 {
-	//if (drumMap == 0)
-	//{
-	//QString s = QString("Patch name=\"%1\"").arg(Xml::xmlString(name));
-	//if (typ != -1)
-	//      s += QString(" mode=\"%d\"").arg(typ);
-	//s += QString(" hbank=\"%1\" lbank=\"%2\" prog=\"%3\"").arg(hbank).arg(lbank).arg(prog);
-	//xml.tagE(s);
 	xml.nput(level, "<Patch name=\"%s\"", Xml::xmlString(name).toLatin1().constData());
 	if (typ != -1)
 		xml.nput(" mode=\"%d\"", typ);
@@ -662,24 +584,9 @@ void Patch::write(int level, Xml& xml)
 
 	xml.nput(" prog=\"%d\"", prog);
 
-	//xml.nput(level, " hbank=\"%d\" lbank=\"%d\" prog=\"%d\"", hbank, lbank, prog);
 	if (drum)
-		//xml.nput(level, " drum=\"%d\"", int(drum));
 		xml.nput(" drum=\"%d\"", int(drum));
-	//xml.put(level, " />");
 	xml.put(" />");
-
-	//return;
-	//}
-
-	//QString s = QString("drummap name=\"%1\"").arg(Xml::xmlString(name));
-	//s += QString(" hbank=\"%1\" lbank=\"%2\" prog=\"%3\"").arg(hbank).arg(lbank).arg(prog);
-	//xml.stag(s);
-	//for (int i = 0; i < DRUM_MAPSIZE; ++i) {
-	//      DrumMapEntry* dm = drumMap->entry(i);
-	//      dm->write(xml);
-	//      }
-	//xml.etag("drummap");
 }
 
 //---------------------------------------------------------
@@ -799,11 +706,8 @@ void MidiInstrument::read(Xml& xml)
 void MidiInstrument::write(int level, Xml& xml)
 {
 	xml.header();
-	//xml.stag("oom version=\"2.1\"");
 	xml.tag(level, "oom version=\"1.0\"");
-	//xml.stag(QString("MidiInstrument name=\"%1\"").arg(Xml::xmlString(iname())));
 	level++;
-	//xml.tag(level, "MidiInstrument name=\"%s\"", Xml::xmlString(iname()).toLatin1().constData());
 	xml.nput(level, "<MidiInstrument name=\"%s\"", Xml::xmlString(iname()).toLatin1().constData());
 
 	if (_nullvalue != -1)
@@ -818,34 +722,22 @@ void MidiInstrument::write(int level, Xml& xml)
 	// What about Init, Reset, State, and InitScript ?
 	// -------------
 
-	//std::vector<PatchGroup>* pg = groups();
-	//for (std::vector<PatchGroup>::iterator g = pg->begin(); g != pg->end(); ++g) {
 	level++;
-	//for (std::vector<PatchGroup>::iterator g = pg.begin(); g != pg.end(); ++g) {
 	for (ciPatchGroup g = pg.begin(); g != pg.end(); ++g)
 	{
 		PatchGroup* pgp = *g;
 		const PatchList& pl = pgp->patches;
-		//xml.stag(QString("PatchGroup name=\"%1\"").arg(Xml::xmlString(g->name)));
-		//xml.tag(level, "PatchGroup name=\"%s\"", Xml::xmlString(g->name).toLatin1().constData());
 		xml.tag(level, "PatchGroup name=\"%s\"", Xml::xmlString(pgp->name).toLatin1().constData());
 		level++;
-		//for (iPatch p = g->patches.begin(); p != g->patches.end(); ++p)
 		for (ciPatch p = pl.begin(); p != pl.end(); ++p)
-			//(*p)->write(xml);
-			//p->write(level, xml);
 			(*p)->write(level, xml);
 		level--;
-		//xml.etag("PatchGroup");
 		xml.etag(level, "PatchGroup");
 	}
 	for (iMidiController ic = _controller->begin(); ic != _controller->end(); ++ic)
-		//(*ic)->write(xml);
 		ic->second->write(level, xml);
-	//xml.etag("MidiInstrument");
 	level--;
 	xml.etag(level, "MidiInstrument");
-	//xml.etag("oom");
 	level--;
 	xml.etag(level, "oom");
 }

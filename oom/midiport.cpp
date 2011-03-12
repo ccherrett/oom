@@ -544,7 +544,7 @@ bool MidiPort::sendEvent(const MidiPlayEvent& ev, bool forceSend)
 {
 	if (ev.type() == ME_CONTROLLER)
 	{
-
+		//TODO: This is where PC are added
 		//      printf("current sustain %d %d %d\n", hwCtrlState(ev.channel(),CTRL_SUSTAIN), CTRL_SUSTAIN, ev.dataA());
 
 		// Added by T356.

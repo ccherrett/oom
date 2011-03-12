@@ -997,6 +997,7 @@ Part* OOMidi::readPart(Xml& xml)
 
 void OOMidi::readToplevels(Xml& xml)
 {
+	printf("OOMidi::readToplevels\n");
 	PartList* pl = new PartList;
 	for (;;)
 	{
@@ -1016,6 +1017,7 @@ void OOMidi::readToplevels(Xml& xml)
 				}
 				else if (tag == "pianoroll")
 				{
+					printf("Calling readStatus for PR\n");
 					// p3.3.34
 					// Do not open if there are no parts.
 					// Had bogus '-1' part index for list edit in oom file,
@@ -1028,6 +1030,7 @@ void OOMidi::readToplevels(Xml& xml)
 					{
 
 						startPianoroll(pl);
+						//FIXME: This should call the PR the read its status but fails sometime
 						toplevels.back().cobject()->readStatus(xml);
 						pl = new PartList;
 					}
@@ -1526,7 +1529,7 @@ void Song::write(int level, Xml& xml) const
 	//	(*i)->write(level, xml);
 
 	QList<QString> added;
-	for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
+	for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
 	{
 		(*i)->write(level, xml);
 		added.append((*i)->name());

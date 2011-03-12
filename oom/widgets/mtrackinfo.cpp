@@ -286,11 +286,13 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	//end tb1
 
 	connect(tableView, SIGNAL(rowOrderChanged()), SLOT(rebuildMatrix()));
+	connect(tableView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(patchSequenceClicked(const QModelIndex&)));
 	connect(_selModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(matrixSelectionChanged(QItemSelection, QItemSelection)));
 	connect(_tableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(matrixItemChanged(QStandardItem*)));
 	connect(_tableModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(patchSequenceInserted(QModelIndex, int, int)));
 	connect(_tableModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(patchSequenceRemoved(QModelIndex, int, int)));
 	connect(patchList, SIGNAL( doubleClicked(const QModelIndex&) ), this, SLOT(patchDoubleClicked(const QModelIndex&) ) );
+	connect(patchList, SIGNAL( clicked(const QModelIndex&) ), this, SLOT(patchClicked(const QModelIndex&) ) );
 	connect(chkAdvanced, SIGNAL(stateChanged(int)), SLOT(toggleAdvanced(int)));
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(deleteSelectedPatches(bool)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(movePatchUp(bool)));
@@ -1935,9 +1937,9 @@ void MidiTrackInfo::matrixItemChanged(QStandardItem* item)
 	//printf("Leaving matrixItemChanged()\n");
 }
 
-void MidiTrackInfo::insertMatrixEvent()
+void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 {
-	if (!selected)
+	if (!selected || !curPart)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
 	int channel = track->outChannel();
@@ -1961,6 +1963,14 @@ void MidiTrackInfo::insertMatrixEvent()
 			row = _matrix->at(0);
 		QStandardItem* item = _tableModel->item(row, 0);
 		int id = item->text().toInt();
+		if(curPart->lenTick() <= song->cpos())
+		{
+			curPart->setLenTick(tick);
+		}
+		if(song->len() <= tick)
+		{
+			song->setLen(tick);
+		}
 		MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
 		audio->msgPlayMidiEvent(&ev);
 		_selectedIndex = item->row();
@@ -1982,6 +1992,14 @@ void MidiTrackInfo::insertMatrixEvent()
 		{
 			QStandardItem* item = _tableModel->item(row, 0);
 			int id = item->text().toInt();
+			if(curPart->lenTick() <= song->cpos())
+			{
+				curPart->setLenTick(tick);
+			}
+			if(song->len() <= tick)
+			{
+				song->setLen(tick);
+			}
 			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
 			audio->msgPlayMidiEvent(&ev);
 			updateTrackInfo(-1);
@@ -2332,7 +2350,7 @@ void MidiTrackInfo::populatePatches()
 	instr->populatePatchModel(_patchModel, channel, song->mtype(), track->type() == Track::DRUM);
 }
 
-void MidiTrackInfo::patchDoubleClicked(QModelIndex index)
+void MidiTrackInfo::patchDoubleClicked(QModelIndex index)/*{{{*/
 {
 	if(!selected)
 		return;
@@ -2394,7 +2412,70 @@ void MidiTrackInfo::patchDoubleClicked(QModelIndex index)
 			updateTableHeader();
 		}
 	}
-}
+}/*}}}*/
+
+void MidiTrackInfo::patchClicked(QModelIndex index)/*{{{*/
+{
+	if(!selected)
+		return;
+	QStandardItem* nItem = _patchModel->itemFromIndex(index);//item(row, 0);
+
+	if(!nItem->hasChildren())
+	{
+		int row = nItem->row();
+		QStandardItem* p = nItem->parent();
+		QStandardItem *idItem;
+		QString pg = "";
+		if(p && p != _patchModel->invisibleRootItem() && p->columnCount() == 2)
+		{
+			//We are in group mode
+			idItem = p->child(row, 1);
+			pg = p->text();
+		}
+		else
+		{
+			idItem = _patchModel->item(row, 1);
+		}
+		int id = idItem->text().toInt();
+		QString name = nItem->text();
+		//printf("Found patch Name: %s - ID: %d\n",name.toUtf8().constData(), id);
+
+		if (!name.isEmpty() && id >= 0)
+		{
+			MidiTrack* track = (MidiTrack*) selected;
+			int channel = track->outChannel();
+			int port = track->outPort();
+
+			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+			audio->msgPlayMidiEvent(&ev);
+		}
+	}
+}/*}}}*/
+
+void MidiTrackInfo::patchSequenceClicked(QModelIndex index)/*{{{*/
+{
+	if(!selected)
+		return;
+	QStandardItem* nItem = _tableModel->itemFromIndex(index);
+
+	if(nItem)
+	{
+		QStandardItem* item = _tableModel->item(nItem->row(), 0);
+		if(item)
+		{
+			int id = item->text().toInt();
+			if (id >= 0)
+			{
+				MidiTrack* track = (MidiTrack*) selected;
+				int channel = track->outChannel();
+				int port = track->outPort();
+
+				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+				audio->msgPlayMidiEvent(&ev);
+			}
+		}
+	}
+}/*}}}*/
 
 void MidiTrackInfo::addSelectedPatch()
 {

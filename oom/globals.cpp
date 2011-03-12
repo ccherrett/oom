@@ -243,6 +243,7 @@ QAction* stopAction;
 QAction* rewindAction;
 QAction* forwardAction;
 QAction* loopAction;
+QAction* replayAction;
 QAction* punchinAction;
 QAction* punchoutAction;
 QAction* recordAction;

@@ -333,6 +333,7 @@ QPixmap* pafterIcon;
 QPixmap* flagIcon;
 QPixmap* flagIconS;
 QPixmap* flagIconSP;
+QPixmap* flagIconSPSel;
 QPixmap* lockIcon;
 QPixmap* tocIcon;
 QPixmap* exitIconS;
@@ -561,6 +562,7 @@ void initIcons()
       flagIcon    = new MPIXMAP(flag_xpm, NULL);
       flagIconS   = new MPIXMAP(flagS_xpm, NULL);
       flagIconSP  = new MPIXMAP(":/images/flagSP.png", NULL);//ProgramChange Flag
+      flagIconSPSel  = new MPIXMAP(":/images/flagSP-select.png", NULL);//ProgramChange Flag
       upPCIcon 	  = new MPIXMAP(":/images/icons/up.png", NULL);//ProgramChange Flag
       downPCIcon   = new MPIXMAP(":/images/icons/down.png", NULL);//ProgramChange Flag
       garbagePCIcon = new MPIXMAP(":/images/icons/garbage.png", NULL);//ProgramChange Flag

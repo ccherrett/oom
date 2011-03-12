@@ -67,9 +67,9 @@
 #include "vst.h"
 #endif
 
-#ifdef LSCP_SUPPORT
-#include "lsclient.h"
-#endif
+//#ifdef LSCP_SUPPORT
+//#include "network/lsclient.h"
+//#endif
 
 #include "traverso_shared/TConfig.h"
 
@@ -820,6 +820,11 @@ OOMidi::OOMidi(int &argc, char** argv) : QMainWindow()
 
 	transportAction = new QActionGroup(this);
 	transportAction->setExclusive(false);
+
+	//repPlay->setIconSize(soloIconOn->size());
+	replayAction = new QAction(QIcon(*auditionIcon), tr("Toggle Audition Mode"), transportAction);
+	replayAction->setCheckable(true);
+	connect(replayAction, SIGNAL(toggled(bool)), song, SLOT(setReplay(bool)));
 
 	loopAction = new QAction(QIcon(*loop1Icon),
 			tr("Loop"), transportAction);
@@ -1745,11 +1750,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		project.setFile(name);
 		oomProjectFile = project.filePath();
 	}
-	// Changed by T356. 01/19/2010. We want the complete extension here.
-	//QString ex = fi.extension(false).toLower();
-	//if (ex.length() == 3)
-	//      ex += ".";
-	//ex = ex.left(4);
 	QString ex = fi.completeSuffix().toLower();
 	QString mex = ex.section('.', -1, -1);
 	if ((mex == "gz") || (mex == "bz2"))
@@ -1899,11 +1899,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		{
 			if (mixer1->geometry().size() != config.mixer1.geometry.size())
 			{
-				//printf("OOMidi::loadProjectFile1 resizing mixer1 x:%d y:%d w:%d h:%d\n", config.mixer1.geometry.x(),
-				//                                                                       config.mixer1.geometry.y(),
-				//                                                                       config.mixer1.geometry.width(),
-				//                                                                       config.mixer1.geometry.height()
-				//                                                                       );
 				mixer1->resize(config.mixer1.geometry.size());
 			}
 		}
@@ -1911,11 +1906,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		{
 			if (mixer2->geometry().size() != config.mixer2.geometry.size())
 			{
-				//printf("OOMidi::loadProjectFile1 resizing mixer2 x:%d y:%d w:%d h:%d\n", config.mixer2.geometry.x(),
-				//                                                                       config.mixer2.geometry.y(),
-				//                                                                       config.mixer2.geometry.width(),
-				//                                                                       config.mixer2.geometry.height()
-				//                                                                       );
 				mixer2->resize(config.mixer2.geometry.size());
 			}
 		}
@@ -3993,6 +3983,11 @@ void OOMidi::kbAccel(int key)
 			song->clearTrackRec();
 		}
 	}
+	else if(key == shortcuts[SHRT_PLAY_REPEAT].key)
+	{
+		replayAction->toggle();//song->setReplay(!song->getReplay());
+		return;
+	}
 	else if (key == shortcuts[SHRT_OPEN_TRANSPORT].key)
 	{
 		toggleTransport(!viewTransportAction->isChecked());
@@ -4001,9 +3996,6 @@ void OOMidi::kbAccel(int key)
 	{
 		toggleBigTime(!viewBigtimeAction->isChecked());
 	}
-		//else if (key == shortcuts[SHRT_OPEN_MIXER].key) {
-		//      toggleMixer();
-		//      }
 	else if (key == shortcuts[SHRT_OPEN_MIXER].key)
 	{
 		toggleMixer1(!viewMixerAAction->isChecked());

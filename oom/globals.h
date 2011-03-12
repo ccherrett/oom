@@ -136,6 +136,7 @@ extern QAction* stopAction;
 extern QAction* rewindAction;
 extern QAction* forwardAction;
 extern QAction* loopAction;
+extern QAction* replayAction;
 extern QAction* punchinAction;
 extern QAction* punchoutAction;
 extern QAction* recordAction;

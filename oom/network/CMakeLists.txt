@@ -25,6 +25,13 @@ QT4_WRAP_CPP ( network_mocs
       samplertest.h
       )
 
+if(LSCP_SUPPORT)
+QT4_WRAP_CPP ( network_mocs
+	lsclient.h
+	${network_mocs}
+      )
+endif(LSCP_SUPPORT)
+
 ##
 ## List of source files to compile
 ##
@@ -32,12 +39,18 @@ file (GLOB network_source_files
       samplertest.cpp
       )
 
+if(LSCP_SUPPORT)
+file (GLOB network_source_files
+	lsclient.cpp
+	${network_source_files}
+)
+endif(LSCP_SUPPORT)
+
 ##
 ## Define target
 ##
 add_library ( network SHARED
       ${network_source_files}
-      # ${network_ui_headers}
       ${network_mocs}
       )
 
@@ -63,9 +76,14 @@ set_target_properties( network
 ##
 target_link_libraries ( network
       ${QT_LIBRARIES}
+	  ${QT_QTNETWORK_LIBRARY}
       awl
       icons
       )
+
+if(LSCP_SUPPORT)
+      target_link_libraries(network ${LSCP_LIBRARIES})
+endif(LSCP_SUPPORT)
 
 ##
 ## Install location

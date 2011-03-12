@@ -11,8 +11,17 @@
 #include "view.h"
 #include "pianoroll.h"
 #include "midictrl.h"
-#include "audio.h"
+//#include "audio.h"
 
+enum ProgramChangeVals { doNothing, movingController, selectedController };
+struct ProgramChangeObject {
+	Event event;
+	Part *part;
+	Track* track;
+	bool moving;
+	QPoint mousePressPos;
+	ProgramChangeVals state;
+};
 //---------------------------------------------------------
 //   PCScale
 //    program change scale for midi track
@@ -27,7 +36,8 @@ class PCScale : public View
     int button;
     bool barLocator;
     bool waveMode;
-    Audio* audio;
+    //Audio* audio;
+	ProgramChangeObject pc;
 
 
 private slots:
@@ -42,12 +52,17 @@ protected:
 
 signals:
     void selectInstrument();
-    void addProgramChange();
+    void addProgramChange(Part*, unsigned);
+	void drawSelectedProgram(int, bool);
 
 public slots:
     void setPos(int, unsigned, bool);
     void updateProgram();
-    void setAudio(Audio*);
+	void copySelected();
+	void moveSelected(int);
+	void selectProgramChange();
+	void deleteProgramChange(Event);
+    //void setAudio(Audio*);
 
 public:
     PCScale(int* raster, QWidget* parent, PianoRoll* editor, int xscale, bool f = false);

@@ -1330,14 +1330,18 @@ void Pipeline::showGui(int idx, bool flag)
 //   showNativeGui
 //---------------------------------------------------------
 
+#ifdef OSC_SUPPORT
 void Pipeline::showNativeGui(int idx, bool flag)
 {
-#ifdef OSC_SUPPORT
 	PluginI* p = (*this)[idx];
 	if (p)
 		p->oscIF().oscShowGui(flag);
-#endif      
 }
+#else
+void Pipeline::showNativeGui(int, bool)
+{
+}
+#endif      
 
 //---------------------------------------------------------
 //   deleteGui
@@ -2160,13 +2164,16 @@ void PluginI::showNativeGui()
 	_showNativeGuiPending = false;
 }
 
+#ifdef OSC_SUPPORT
 void PluginI::showNativeGui(bool flag)
 {
-#ifdef OSC_SUPPORT
 	if (_plugin)
 	{
 		_oscif.oscShowGui(flag);
 	}
+#else
+void PluginI::showNativeGui(bool)
+{
 #endif
 	_showNativeGuiPending = false;
 }

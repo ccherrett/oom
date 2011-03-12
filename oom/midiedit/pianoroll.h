@@ -21,7 +21,7 @@
 #include "tools.h"
 #include "event.h"
 #ifdef LSCP_SUPPORT
-#include "lsclient.h"
+#include "network/lsclient.h"
 #endif
 
 class MidiPart;
@@ -39,7 +39,6 @@ class QPushButton;
 class CtrlEdit;
 class Splitter;
 class PartList;
-//class Toolbar1;
 class Xml;
 class QuantConfig;
 class ScrollScale;
@@ -124,14 +123,10 @@ class PianoRoll : public MidiEditor
     QToolButton* srec;
     QToolButton* midiin;
     QToolButton* solo;
-	QToolButton* repPlay;
-	unsigned replayPos;
-	bool _replay;
     PosLabel* posLabel;
     PitchLabel* pitchLabel;
 	QLabel *patchLabel;
 
-    //Toolbar1* toolbar;
     Splitter* splitter;
     Splitter* hsplitter;
     Splitter* ctrlLane;
@@ -158,7 +153,6 @@ class PianoRoll : public MidiEditor
     QuantConfig* quantConfig;
     bool _playEvents;
 
-    //QScrollBar* infoScroll;
     QScrollArea* infoScroll;
 
     Q_OBJECT
@@ -174,9 +168,7 @@ class PianoRoll : public MidiEditor
 private slots:
     void setSelection(int, Event&, Part*);
     void noteinfoChanged(NoteInfo::ValType, int);
-    //CtrlEdit* addCtrl();
     void soloChanged(bool flag);
-    //void trackInfoScroll(int);
     void setRaster(int);
     void setQuant(int);
     void configQuant();
@@ -197,7 +189,6 @@ private slots:
     }
     void cmd(int);
     void setSteprec(bool);
-	void setReplay(bool);
 
     void setTo(int val)
     {
@@ -212,7 +203,6 @@ private slots:
     void songChanged1(int);
     void configChanged();
     void newCanvasWidth(int);
-    void toggleTrackInfo();
     void updateTrackInfo();
 	void splitterMoved(int, int);
 #ifdef LSCP_SUPPORT
@@ -228,16 +218,11 @@ public slots:
     void execUserScript(int id);
     CtrlEdit* addCtrl();
     void removeCtrl(CtrlEdit* ctrl);
-	void playStateChanged(bool);
 
 public:
     PianoRoll(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);
     ~PianoRoll();
     //void setSolo(bool val);
-	bool replay()
-	{
-		return _replay;
-	}
 	bool isCurrentPatch(int, int, int);
 
     virtual void readStatus(Xml&);

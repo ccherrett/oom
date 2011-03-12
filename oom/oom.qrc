@@ -87,6 +87,9 @@
 		<file>images/top_rack_midi.png</file>
 		<file>images/bottom_rack_midi.png</file>
 		<file>images/flagSP.png</file>
+		<file>images/flagSP-select.png</file>
+		<file>images/flagClear.png</file>
+		<file>images/flagClear-select.png</file>
 		<file>images/icons/up.png</file>
 		<file>images/icons/down.png</file>
 		<file>images/icons/garbage.png</file>
