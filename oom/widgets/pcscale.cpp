@@ -375,22 +375,11 @@ bool PCScale::selectProgramChange(int x)/*{{{*/
 		}
 	}
 
-	//Select the event and break
-	if(_pc.valid)
-	{
-		_pc.valid = false;
-		_pc.part = 0;
-		_pc.state = doNothing;
-		emit drawSelectedProgram(-1, false);
-	}
-	else
-	{
-		_pc.part = part;
-		_pc.event = nearest;
-		_pc.valid = true;
-		_pc.state = selectedController;
-		emit drawSelectedProgram(nearest.tick(), true);
-	}
+	_pc.part = part;
+	_pc.event = nearest;
+	_pc.valid = true;
+	_pc.state = selectedController;
+	emit drawSelectedProgram(nearest.tick(), true);
 
 	update();
 
