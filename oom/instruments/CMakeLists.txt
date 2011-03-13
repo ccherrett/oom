@@ -26,6 +26,14 @@ QT4_WRAP_CPP ( instruments_mocs
    # minstrument.h
    )
 
+if(LSCP_SUPPORT)
+QT4_WRAP_CPP ( instruments_mocs
+	importinstruments.h
+	${instruments_mocs}
+      )
+endif(LSCP_SUPPORT)
+
+
 ##
 ## UI files
 ##
@@ -33,7 +41,16 @@ file (GLOB instruments_ui_files
       # ccontrollerbase.ui # not built. It needs to be converted to Qt4 for revival.
       editinstrumentbase.ui
       )
+
+if(LSCP_SUPPORT)
+file (GLOB instruments_ui_files
+	importbase.ui
+	${instruments_ui_files}
+)
+endif(LSCP_SUPPORT)
+
 QT4_WRAP_UI ( instruments_uis ${instruments_ui_files} )
+
 
 ##
 ## List of source files to compile
@@ -45,6 +62,13 @@ file (GLOB instruments_source_files
    minstrument.h
    )
 
+if(LSCP_SUPPORT)
+file (GLOB instruments_source_files
+	importinstruments.cpp
+	importinstruments.h
+	${instruments_source_files}
+)
+endif(LSCP_SUPPORT)
 ##
 ## Define target
 ##
@@ -79,6 +103,10 @@ target_link_libraries ( instruments
       ${QT_LIBRARIES}
       icons
       )
+
+if(LSCP_SUPPORT)
+      target_link_libraries(instruments ${LSCP_LIBRARIES})
+endif(LSCP_SUPPORT)
 
 ##
 ## Install location

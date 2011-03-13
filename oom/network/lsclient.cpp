@@ -3,12 +3,15 @@
 #include "gconfig.h"
 #ifdef LSCP_SUPPORT
 #include "audio.h"
+#include "instruments/minstrument.h"
+#include "midictrl.h"
 #include "lsclient.h"
 #include <ctype.h>
 #include <QStringListIterator>
 #include <QStringList>
 #include <QCoreApplication>
 #include <QTimer>
+#include <QFileInfo>
 
 LSClient::LSClient(const char* host, int p, QObject* parent) : QThread(parent)
 {
@@ -55,8 +58,9 @@ void LSClient::subscribe()
 	}
 	else
 	{
-		unsubscribe();
-		startClient();
+		::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
+		//unsubscribe();
+		//startClient();
 	}
 }
 
@@ -66,9 +70,9 @@ void LSClient::unsubscribe()
 	if(_client != NULL)
 	{
 		::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
-		::lscp_client_destroy(_client);
+		//::lscp_client_destroy(_client);
 	}
-	_client = NULL;
+	//_client = NULL;
 	mutex.unlock();
 }
 
@@ -83,33 +87,22 @@ int LSClient::getError()
 
 void LSClient::run()
 {
-	/*_client = ::lscp_client_create(_hostname, _port, client_callback, this);
-	if(_client != NULL)
-	{
-		printf("Initialized LSCP client connection\n");
-		::lscp_client_set_timeout(_client, 1000);
-		::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
-	}
-	else
-	{
-		printf("Failed to Initialize LSCP client connection\n");
-		//
-	}*/
-	//heartBeatTimer->start(1000 / config.guiRefresh);
 	startClient();
 	exec();
 }
 
-void LSClient::startClient()
+void LSClient::startClient()/*{{{*/
 {
 	mutex.lock();
+	if(_client != NULL)
+		::lscp_client_destroy(_client);
 	_client = ::lscp_client_create(_hostname, _port, client_callback, this);
 	if(_client != NULL)
 	{
 		printf("Initialized LSCP client connection\n");
 		::lscp_client_set_timeout(_client, 1000);
 		lastInfo.valid = false;
-		::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
+		//::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 	}
 	else
 	{
@@ -117,24 +110,32 @@ void LSClient::startClient()
 		//
 	}
 	mutex.unlock();
-}
+}/*}}}*/
 
-void LSClient::stopClient()
+void LSClient::stopClient()/*{{{*/
 {
 	if(_client != NULL)
 	{
 		//TODO: create a list of subscribed events so we can reference it here and unsubscribe 
 		//to any subscribed event.
-		::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
+		//if(_client->cmd->iState == 0)
+		try
+		{
+		//::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 		lastInfo.valid = false;
 		::lscp_client_destroy(_client);
+		}
+		catch(std::exception e)
+		{
+			printf("Error while shutting down LSCP client\n");
+		}
 
 		//if (!wait(1000))
 		//{
 			terminate();
 		//}
 	}
-}
+}/*}}}*/
 
 /**
  * Returns a pair of list the first contain all the KEY_BINDINGS
@@ -234,7 +235,7 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 
 		}
 	}
-	if(process)
+	if(process)/*{{{*/
 	{
 		printf("Starting key binding processing\n");
 		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", info.instrument_filename.toAscii().constData(), nr);
@@ -278,14 +279,14 @@ const LSCPChannelInfo LSClient::getKeyBindings(lscp_channel_info_t* chanInfo)/*{
 				}
 			}
 		}
-	}
+	}/*}}}*/
 
 	info.valid = process;
 	printf("Leaving LSClient::getKeyBindings()\n");
 	return info;
 }/*}}}*/
 
-bool LSClient::compare(LSCPChannelInfo info1, LSCPChannelInfo info2)
+bool LSClient::compare(LSCPChannelInfo info1, LSCPChannelInfo info2)/*{{{*/
 {
 	if(!info1.valid)
 		return false;
@@ -312,9 +313,9 @@ bool LSClient::compare(LSCPChannelInfo info1, LSCPChannelInfo info2)
 		}
 	}
 	return false;
-}
+}/*}}}*/
 
-void LSClient::customEvent(QEvent* event)
+void LSClient::customEvent(QEvent* event)/*{{{*/
 {
 	LscpEvent *lscpEvent = static_cast<LscpEvent *> (event);
 	if(lscpEvent)
@@ -348,5 +349,204 @@ void LSClient::customEvent(QEvent* event)
 			break;
 		}
 	}
+}/*}}}*/
+
+/**
+ * getKeyMapping used to retrieve raw key bindings and switches for a sample
+ * @param fname QString The string filename of the gig file
+ * @param nr int The location in the file of the given instrument
+ */
+LSCPKeymap LSClient::getKeyMapping(QString fname, int nr)/*{{{*/
+{
+	//printf("Starting key binding processing\n");
+	QList<int> keys;
+	QList<int> switched;
+	QString keyStr = "KEY_BINDINGS:";
+	QString keySwitchStr = "KEYSWITCH_BINDINGS:";
+	char query[1024];
+	LSCPKeymap rv;
+	if(_client != NULL)
+	{
+		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", fname.toAscii().constData(), nr);
+		if (lscp_client_query(_client, query) == LSCP_OK)
+		{
+			const char* ret = lscp_client_get_result(_client);
+			QString values(ret);
+			printf("Server Returned:\n %s\n", ret);
+			QStringList arrayVal = values.split("\r\n", QString::SkipEmptyParts);
+			QStringListIterator vIter(arrayVal);
+			while(vIter.hasNext())
+			{
+				QString i = vIter.next().trimmed();
+				if(i.startsWith(keyStr, Qt::CaseSensitive))
+				{
+					i = i.replace(keyStr, "").trimmed();
+					if(i.contains(","))
+					{
+						QStringList sl = i.split(",", QString::SkipEmptyParts);
+						QStringListIterator iter(sl);
+						while(iter.hasNext())
+						{
+							keys.append(iter.next().toInt());
+						}
+						rv.key_bindings = keys;
+					}
+				}
+				else if(i.startsWith(keySwitchStr, Qt::CaseSensitive))
+				{
+					i = i.replace(keySwitchStr, "").trimmed();
+					if(i.contains(","))
+					{
+						QStringList sl = i.split(",", QString::SkipEmptyParts);
+						QStringListIterator iter(sl);
+						while(iter.hasNext())
+						{
+							switched.append(iter.next().toInt());
+						}
+						rv.keyswitch_bindings = switched;
+					}
+				}
+			}
+		}
+	}
+	return rv;
+}/*}}}*/
+
+/**
+ * Return a MidiInstrumentList of all the current instrument loaded into
+ * linuxsampler
+ */
+MidiInstrumentList* LSClient::getInstruments()
+{
+	if(_client != NULL)
+	{
+		int* maps = ::lscp_list_midi_instrument_maps(_client);
+		if(maps != NULL)
+		{
+			MidiInstrumentList* instruments = new MidiInstrumentList;
+			for(int m = 0; maps[m] >= 0; ++m)
+			{
+				QString mapName = getMapName(maps[m]);
+				if(!mapName.isEmpty())
+				{
+					QString insName(getValidInstrumentName(mapName));
+					MidiInstrument *midiInstr = new MidiInstrument(insName);
+					QString path = oomUserInstruments;
+					path += QString("/%1.idf").arg(insName);
+					midiInstr->setFilePath(path);
+					PatchGroupList *pgl = midiInstr->groups();
+					lscp_midi_instrument_t* instr = ::lscp_list_midi_instruments(_client, maps[m]);
+					for (int in = 0; instr && instr[in].map >= 0; ++in)
+					{
+						lscp_midi_instrument_t tmp;
+						tmp.map = instr[in].map;
+						tmp.bank = instr[in].bank;
+						tmp.prog = instr[in].prog;
+						lscp_midi_instrument_info_t* insInfo = ::lscp_get_midi_instrument_info(_client, &tmp);
+						if(insInfo != NULL)
+						{
+							QString ifname(insInfo->instrument_file);
+							QFileInfo finfo(ifname);
+							QString fname = finfo.baseName().simplified().replace(" ", "_");
+							PatchGroup *pg = 0;
+							for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
+							{
+								if((*pi)->name == fname)
+								{
+									pg = (PatchGroup*)*pi;
+								}
+							}
+							if(!pg)
+							{
+								pg = new PatchGroup();
+								pg->name = fname;
+								pgl->push_back(pg);
+							}
+							//Setup the patch
+							Patch* patch = new Patch;
+							patch->name = QString(insInfo->instrument_name);
+							patch->hbank = 0;
+							patch->lbank = instr[in].bank;
+							patch->prog = instr[in].prog;
+							patch->typ = -1;
+							patch->drum = false;
+							LSCPKeymap kmap = getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr);
+							patch->keys = kmap.key_bindings;
+							patch->keyswitches = kmap.keyswitch_bindings;
+							PatchList pl = pg->patches;
+							pl.push_back(patch);
+						}
+						instruments->push_back(midiInstr);
+					}
+				}
+			}
+			return instruments;
+		}
+	}
+	return 0;
 }
+
+/**
+ * Lookup a midi map name by ID
+ * @param int ID of the midi instrument map
+ */
+QString LSClient::getMapName(int mid)
+{
+	QString mapName;
+	if(_client == NULL)
+		return mapName;
+	const char* cname = ::lscp_get_midi_instrument_map_name(_client, mid);
+	if(cname != NULL)
+	{
+		mapName = QString(cname);
+	}
+	return mapName;
+}
+
+/**
+ * Get a single instrument from the sampler by name
+ * @param QString name
+ */
+MidiInstrument* LSClient::getInstrument(QString)
+{
+	return new MidiInstrument("place_holder");
+}
+
+QString LSClient::getValidInstrumentName(QString nameBase)/*{{{*/
+{
+	bool found = false;
+	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+	{
+		if (nameBase == (*i)->iname())
+		{
+			found = true;
+			break;
+		}
+	}
+	if(!found)
+	{//Use the name given
+		return nameBase;
+	}
+	else
+	{//Randomize the name
+		for (int i = 1;; ++i)
+		{
+			QString s = QString("%1-%1").arg(nameBase).arg(i);
+			found = false;
+			for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+			{
+				if (s == (*i)->iname())
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				return s;
+			}
+		}
+	}
+
+}/*}}}*/
 #endif

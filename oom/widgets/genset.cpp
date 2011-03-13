@@ -96,13 +96,12 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	startSongEntry->setText(config.startSong);
 	startSongGroup->button(config.startMode)->setChecked(true);
 
-	showTransport->setChecked(config.transportVisible);
-	showBigtime->setChecked(config.bigTimeVisible);
-	//showMixer->setChecked(config.mixerVisible);
-	showMixer->setChecked(config.mixer1Visible);
-	showMixer2->setChecked(config.mixer2Visible);
+	//showTransport->setChecked(config.transportVisible);
+	//showBigtime->setChecked(config.bigTimeVisible);
+	//showMixer->setChecked(config.mixer1Visible);
+	//showMixer2->setChecked(config.mixer2Visible);
 
-	arrangerX->setValue(config.geometryMain.x());
+	/*arrangerX->setValue(config.geometryMain.x());
 	arrangerY->setValue(config.geometryMain.y());
 	arrangerW->setValue(config.geometryMain.width());
 	arrangerH->setValue(config.geometryMain.height());
@@ -113,27 +112,26 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	bigtimeX->setValue(config.geometryBigTime.x());
 	bigtimeY->setValue(config.geometryBigTime.y());
 	bigtimeW->setValue(config.geometryBigTime.width());
-	bigtimeH->setValue(config.geometryBigTime.height());
+	bigtimeH->setValue(config.geometryBigTime.height());*/
 
 	//mixerX->setValue(config.geometryMixer.x());
 	//mixerY->setValue(config.geometryMixer.y());
 	//mixerW->setValue(config.geometryMixer.width());
 	//mixerH->setValue(config.geometryMixer.height());
-	mixerX->setValue(config.mixer1.geometry.x());
+	/*mixerX->setValue(config.mixer1.geometry.x());
 	mixerY->setValue(config.mixer1.geometry.y());
 	mixerW->setValue(config.mixer1.geometry.width());
 	mixerH->setValue(config.mixer1.geometry.height());
 	mixer2X->setValue(config.mixer2.geometry.x());
 	mixer2Y->setValue(config.mixer2.geometry.y());
 	mixer2W->setValue(config.mixer2.geometry.width());
-	mixer2H->setValue(config.mixer2.geometry.height());
+	mixer2H->setValue(config.mixer2.geometry.height());*/
 
-	//setMixerCurrent->setEnabled(oom->mixerWindow());
-	setMixerCurrent->setEnabled(oom->mixer1Window());
-	setMixer2Current->setEnabled(oom->mixer2Window());
+	//setMixerCurrent->setEnabled(oom->mixer1Window());
+	//setMixer2Current->setEnabled(oom->mixer2Window());
 
-	setBigtimeCurrent->setEnabled(oom->bigtimeWindow());
-	setTransportCurrent->setEnabled(oom->transportWindow());
+	//setBigtimeCurrent->setEnabled(oom->bigtimeWindow());
+	//setTransportCurrent->setEnabled(oom->transportWindow());
 
 	showSplash->setChecked(config.showSplashScreen);
 	showDidYouKnow->setChecked(config.showDidYouKnow);
@@ -147,11 +145,11 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	connect(applyButton, SIGNAL(clicked()), SLOT(apply()));
 	connect(okButton, SIGNAL(clicked()), SLOT(ok()));
 	connect(cancelButton, SIGNAL(clicked()), SLOT(cancel()));
-	connect(setMixerCurrent, SIGNAL(clicked()), SLOT(mixerCurrent()));
-	connect(setMixer2Current, SIGNAL(clicked()), SLOT(mixer2Current()));
-	connect(setBigtimeCurrent, SIGNAL(clicked()), SLOT(bigtimeCurrent()));
-	connect(setArrangerCurrent, SIGNAL(clicked()), SLOT(arrangerCurrent()));
-	connect(setTransportCurrent, SIGNAL(clicked()), SLOT(transportCurrent()));
+	//connect(setMixerCurrent, SIGNAL(clicked()), SLOT(mixerCurrent()));
+	//connect(setMixer2Current, SIGNAL(clicked()), SLOT(mixer2Current()));
+	//connect(setBigtimeCurrent, SIGNAL(clicked()), SLOT(bigtimeCurrent()));
+	//connect(setArrangerCurrent, SIGNAL(clicked()), SLOT(arrangerCurrent()));
+	//connect(setTransportCurrent, SIGNAL(clicked()), SLOT(transportCurrent()));
 }
 
 //---------------------------------------------------------
@@ -209,13 +207,12 @@ void GlobalSettingsConfig::updateSettings()
 	startSongEntry->setText(config.startSong);
 	startSongGroup->button(config.startMode)->setChecked(true);
 
-	showTransport->setChecked(config.transportVisible);
-	showBigtime->setChecked(config.bigTimeVisible);
-	//showMixer->setChecked(config.mixerVisible);
-	showMixer->setChecked(config.mixer1Visible);
-	showMixer2->setChecked(config.mixer2Visible);
+	//showTransport->setChecked(config.transportVisible);
+	//showBigtime->setChecked(config.bigTimeVisible);
+	//showMixer->setChecked(config.mixer1Visible);
+	//showMixer2->setChecked(config.mixer2Visible);
 
-	arrangerX->setValue(config.geometryMain.x());
+	/*arrangerX->setValue(config.geometryMain.x());
 	arrangerY->setValue(config.geometryMain.y());
 	arrangerW->setValue(config.geometryMain.width());
 	arrangerH->setValue(config.geometryMain.height());
@@ -226,27 +223,27 @@ void GlobalSettingsConfig::updateSettings()
 	bigtimeX->setValue(config.geometryBigTime.x());
 	bigtimeY->setValue(config.geometryBigTime.y());
 	bigtimeW->setValue(config.geometryBigTime.width());
-	bigtimeH->setValue(config.geometryBigTime.height());
+	bigtimeH->setValue(config.geometryBigTime.height());*/
 
 	//mixerX->setValue(config.geometryMixer.x());
 	//mixerY->setValue(config.geometryMixer.y());
 	//mixerW->setValue(config.geometryMixer.width());
 	//mixerH->setValue(config.geometryMixer.height());
-	mixerX->setValue(config.mixer1.geometry.x());
+	/*mixerX->setValue(config.mixer1.geometry.x());
 	mixerY->setValue(config.mixer1.geometry.y());
 	mixerW->setValue(config.mixer1.geometry.width());
 	mixerH->setValue(config.mixer1.geometry.height());
 	mixer2X->setValue(config.mixer2.geometry.x());
 	mixer2Y->setValue(config.mixer2.geometry.y());
 	mixer2W->setValue(config.mixer2.geometry.width());
-	mixer2H->setValue(config.mixer2.geometry.height());
+	mixer2H->setValue(config.mixer2.geometry.height());*/
 
 	//setMixerCurrent->setEnabled(oom->mixerWindow());
-	setMixerCurrent->setEnabled(oom->mixer1Window());
-	setMixer2Current->setEnabled(oom->mixer2Window());
+	//setMixerCurrent->setEnabled(oom->mixer1Window());
+	//setMixer2Current->setEnabled(oom->mixer2Window());
 
-	setBigtimeCurrent->setEnabled(oom->bigtimeWindow());
-	setTransportCurrent->setEnabled(oom->transportWindow());
+	//setBigtimeCurrent->setEnabled(oom->bigtimeWindow());
+	//setTransportCurrent->setEnabled(oom->transportWindow());
 
 	showSplash->setChecked(config.showSplashScreen);
 	showDidYouKnow->setChecked(config.showDidYouKnow);
@@ -293,39 +290,38 @@ void GlobalSettingsConfig::apply()
 	div = guiDivisionSelect->currentIndex();
 	config.guiDivision = divisions[div];
 
-	config.transportVisible = showTransport->isChecked();
-	config.bigTimeVisible = showBigtime->isChecked();
-	//config.mixerVisible     = showMixer->isChecked();
-	config.mixer1Visible = showMixer->isChecked();
-	config.mixer2Visible = showMixer2->isChecked();
+	//config.transportVisible = showTransport->isChecked();
+	//config.bigTimeVisible = showBigtime->isChecked();
+	//config.mixer1Visible = showMixer->isChecked();
+	//config.mixer2Visible = showMixer2->isChecked();
 
-	config.geometryMain.setX(arrangerX->value());
-	config.geometryMain.setY(arrangerY->value());
-	config.geometryMain.setWidth(arrangerW->value());
-	config.geometryMain.setHeight(arrangerH->value());
+	//config.geometryMain.setX(arrangerX->value());
+	//config.geometryMain.setY(arrangerY->value());
+	//config.geometryMain.setWidth(arrangerW->value());
+	//config.geometryMain.setHeight(arrangerH->value());
 
-	config.geometryTransport.setX(transportX->value());
-	config.geometryTransport.setY(transportY->value());
-	config.geometryTransport.setWidth(0);
-	config.geometryTransport.setHeight(0);
+	//config.geometryTransport.setX(transportX->value());
+	//config.geometryTransport.setY(transportY->value());
+	//config.geometryTransport.setWidth(0);
+	//config.geometryTransport.setHeight(0);
 
-	config.geometryBigTime.setX(bigtimeX->value());
-	config.geometryBigTime.setY(bigtimeY->value());
-	config.geometryBigTime.setWidth(bigtimeW->value());
-	config.geometryBigTime.setHeight(bigtimeH->value());
+	//config.geometryBigTime.setX(bigtimeX->value());
+	//config.geometryBigTime.setY(bigtimeY->value());
+	//config.geometryBigTime.setWidth(bigtimeW->value());
+	//config.geometryBigTime.setHeight(bigtimeH->value());
 
 	//config.geometryMixer.setX(mixerX->value());
 	//config.geometryMixer.setY(mixerY->value());
 	//config.geometryMixer.setWidth(mixerW->value());
 	//config.geometryMixer.setHeight(mixerH->value());
-	config.mixer1.geometry.setX(mixerX->value());
-	config.mixer1.geometry.setY(mixerY->value());
-	config.mixer1.geometry.setWidth(mixerW->value());
-	config.mixer1.geometry.setHeight(mixerH->value());
-	config.mixer2.geometry.setX(mixer2X->value());
-	config.mixer2.geometry.setY(mixer2Y->value());
-	config.mixer2.geometry.setWidth(mixer2W->value());
-	config.mixer2.geometry.setHeight(mixer2H->value());
+	//config.mixer1.geometry.setX(mixerX->value());
+	//config.mixer1.geometry.setY(mixerY->value());
+	//config.mixer1.geometry.setWidth(mixerW->value());
+	//config.mixer1.geometry.setHeight(mixerH->value());
+	//config.mixer2.geometry.setX(mixer2X->value());
+	//config.mixer2.geometry.setY(mixer2Y->value());
+	//config.mixer2.geometry.setWidth(mixer2W->value());
+	//config.mixer2.geometry.setHeight(mixer2H->value());
 
 	config.showSplashScreen = showSplash->isChecked();
 	config.showDidYouKnow = showDidYouKnow->isChecked();
@@ -333,13 +329,12 @@ void GlobalSettingsConfig::apply()
 	config.useOldStyleStopShortCut = oldStyleStopCheckBox->isChecked();
 	config.moveArmedCheckBox = moveArmedCheckBox->isChecked();
 	config.useProjectSaveDialog = projectSaveCheckBox->isChecked();
-	//oom->showMixer(config.mixerVisible);
-	oom->showMixer1(config.mixer1Visible);
-	oom->showMixer2(config.mixer2Visible);
+	//oom->showMixer1(config.mixer1Visible);
+	//oom->showMixer2(config.mixer2Visible);
 
-	oom->showBigtime(config.bigTimeVisible);
-	oom->showTransport(config.transportVisible);
-	QWidget* w = oom->transportWindow();
+	//oom->showBigtime(config.bigTimeVisible);
+	//oom->showTransport(config.transportVisible);
+	/*QWidget* w = oom->transportWindow();
 	if (w)
 	{
 		w->resize(config.geometryTransport.size());
@@ -367,9 +362,9 @@ void GlobalSettingsConfig::apply()
 	{
 		w->resize(config.geometryBigTime.size());
 		w->move(config.geometryBigTime.topLeft());
-	}
-	oom->resize(config.geometryMain.size());
-	oom->move(config.geometryMain.topLeft());
+	}*/
+	//oom->resize(config.geometryMain.size());
+	//oom->move(config.geometryMain.topLeft());
 
 	oomUserInstruments = config.userInstrumentsDir;
 
@@ -400,7 +395,7 @@ void GlobalSettingsConfig::cancel()
 //---------------------------------------------------------
 //   mixerCurrent
 //---------------------------------------------------------
-
+/*
 void GlobalSettingsConfig::mixerCurrent()
 {
 	QWidget* w = oom->mixer1Window();
@@ -471,7 +466,7 @@ void GlobalSettingsConfig::transportCurrent()
 	transportX->setValue(r.x());
 	transportY->setValue(r.y());
 }
-
+*/
 void GlobalSettingsConfig::selectInstrumentsPath()
 {
 	QString dir = QFileDialog::getExistingDirectory(this,

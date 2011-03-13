@@ -3,6 +3,7 @@
 
 #include <lscp/client.h>
 #include <lscp/device.h>
+#include <lscp/socket.h>
 #include <QList>
 #include <QThread>
 #include <QWaitCondition>
@@ -31,7 +32,17 @@ typedef struct chaninfo/*{{{*/
 	bool valid;;
 } LSCPChannelInfo ;/*}}}*/
 
+typedef struct lscp_keymap/*{{{*/
+{
+	QList<int> key_bindings;
+	QList<int> keyswitch_bindings;
+} LSCPKeymap ;/*}}}*/
+
 class QTimer;
+class MidiInstrument;
+class MidiInstrumentList;
+class Patch;
+class PatchGroup;
 class LSClient : public QThread
 {
 	Q_OBJECT
@@ -42,7 +53,11 @@ public:
 	void stopClient();
 	void startClient();
 	int getError();
-
+	MidiInstrumentList* getInstruments();
+	MidiInstrument* getInstrument(QString);
+	QString getValidInstrumentName(QString nameBase);
+	QString getMapName(int);
+	
 private:
 	const LSCPChannelInfo getKeyBindings(lscp_channel_info_t*);
 	bool compare(const LSCPChannelInfo, const LSCPChannelInfo);
@@ -54,6 +69,7 @@ private:
 	QMutex mutex;
 	QWaitCondition condition;
 	LSCPChannelInfo lastInfo;
+	LSCPKeymap getKeyMapping(QString, int);
 
 protected:
 	void run();
@@ -68,27 +84,23 @@ public slots:
 
 };	
 
+//The following class is borrowed from qSampler
 class LscpEvent : public QEvent
 {
 public:
 
-	// Constructor.
-	LscpEvent(lscp_event_t event, const char *pchData, int cchData)
-		: QEvent(LSCLIENT_LSCP_EVENT)
+	LscpEvent(lscp_event_t event, const char *pchData, int cchData)	: QEvent(LSCLIENT_LSCP_EVENT)
 	{
 		m_event = event;
 		m_data  = QString::fromUtf8(pchData, cchData);
 	}
 
-	// Accessors.
 	lscp_event_t event() { return m_event; }
 	QString&     data()  { return m_data;  }
 
 private:
 
-	// The proper event type.
 	lscp_event_t m_event;
-	// The event data as a string.
 	QString      m_data;
 };
 

@@ -26,11 +26,11 @@ private slots:
     void apply();
     void ok();
     void cancel();
-    void mixerCurrent();
-    void mixer2Current();
-    void bigtimeCurrent();
-    void arrangerCurrent();
-    void transportCurrent();
+    //void mixerCurrent();
+    //void mixer2Current();
+    //void bigtimeCurrent();
+    //void arrangerCurrent();
+    //void transportCurrent();
     void selectInstrumentsPath();
     void defaultInstrumentsPath();
 

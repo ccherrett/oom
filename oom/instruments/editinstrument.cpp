@@ -129,7 +129,7 @@ void EditInstrument::helpWhatsThis()
 //   fileNew
 //---------------------------------------------------------
 
-void EditInstrument::fileNew()
+void EditInstrument::fileNew()/*{{{*/
 {
 	// Allow these to update...
 	instrumentNameReturn();
@@ -195,7 +195,8 @@ void EditInstrument::fileNew()
 		}
 	}
 
-}
+}/*}}}*/
+
 
 //---------------------------------------------------------
 //   fileOpen

@@ -30,6 +30,7 @@ struct Patch
 {
     signed char typ; // 1 - GM  2 - GS  4 - XG
     signed char hbank, lbank, prog;
+	QList<int> keys, keyswitches;
     QString name;
     bool drum;
     void read(Xml&);

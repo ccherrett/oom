@@ -531,6 +531,8 @@ void Patch::read(Xml& xml)
 	lbank = -1;
 	prog = 0;
 	drum = false;
+	keys.clear();
+	keyswitches.clear();
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -556,6 +558,26 @@ void Patch::read(Xml& xml)
 					prog = xml.s2().toInt();
 				else if (tag == "drum")
 					drum = xml.s2().toInt();
+				else if(tag == "keys")
+				{
+					keys.clear();
+					QStringList klist = ((QString)xml.s2()).split(QString(" "), QString::SkipEmptyParts);
+					for (QStringList::Iterator it = klist.begin(); it != klist.end(); ++it)
+					{
+						int val = (*it).toInt();
+						keys.append(val);
+					}
+				}
+				else if(tag == "keyswitches")
+				{
+					keyswitches.clear();
+					QStringList klist = ((QString)xml.s2()).split(QString(" "), QString::SkipEmptyParts);
+					for (QStringList::Iterator it = klist.begin(); it != klist.end(); ++it)
+					{
+						int val = (*it).toInt();
+						keyswitches.append(val);
+					}
+				}
 				break;
 			case Xml::TagEnd:
 				if (tag == "Patch")
@@ -586,6 +608,28 @@ void Patch::write(int level, Xml& xml)
 
 	if (drum)
 		xml.nput(" drum=\"%d\"", int(drum));
+	if(!keys.isEmpty())
+	{
+		QString keyString;
+		for(int i = 0; i < keys.size(); ++i)
+		{
+			keyString.append(QString::number(keys.at(i)));
+			if(i < (keys.size() - 1))
+				keyString.append(" ");
+		}
+		xml.put(" keys=\"%s\"", keyString.toUtf8().constData());
+	}
+	if(!keyswitches.isEmpty())
+	{
+		QString keyString;
+		for(int i = 0; i < keyswitches.size(); ++i)
+		{
+			keyString.append(QString::number(keyswitches.at(i)));
+			if(i < (keyswitches.size() - 1))
+				keyString.append(" ");
+		}
+		xml.put(" keyswitches=\"%s\"", keyString.toUtf8().constData());
+	}
 	xml.put(" />");
 }
 

@@ -1841,6 +1841,9 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
 {
 	audio->msgIdle(true);
 	song->startUndo();
+	//i use this to make sure I only sound a note once if you are
+	//moving multiple notes at once
+	int count = 1;
     for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		if (!(i->second->isSelected()))
@@ -1906,7 +1909,7 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
 		song->changeEvent(event, newEvent, part);
 		emit pitchChanged(newEvent.pitch());
 		//This is a vertical movement
-		if(_playEvents && newEvent.pitch() != epitch)
+		if(_playEvents && newEvent.pitch() != epitch && count == 1)
 		{
 			int port = track()->outPort();
 			int channel = track()->outChannel();

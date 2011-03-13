@@ -433,6 +433,13 @@
                 </widget>
                </item>
                <item>
+                <widget class="QPushButton" name="btnImport">
+                 <property name="text">
+                  <string>Import Instruments</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <spacer name="spacer11">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1417,7 +1424,7 @@ Typically, set to 127/127, or an unused
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="defaultUp">
