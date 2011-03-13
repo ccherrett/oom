@@ -715,7 +715,7 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 
 //OOMidi::OOMidi(int argc, char** argv) : QMainWindow(0, "mainwindow")
 
-OOMidi::OOMidi(int &argc, char** argv) : QMainWindow()
+OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 {
 
         // Very first thing we should do is loading global configuration values

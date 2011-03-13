@@ -379,7 +379,7 @@ public slots:
 	void connectDefaultSongPorts();
 
 public:
-    OOMidi(int &argc, char** argv);
+    OOMidi(int argc, char** argv);
     ~OOMidi();
     Arranger* arranger;
 	//FIXME: Hack to make projects loaded from the commandline not start PR
