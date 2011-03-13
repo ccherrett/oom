@@ -443,6 +443,16 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	// Take care of some tabbies!
 	setTabOrder(tempo200, list);
 	setTabOrder(list, canvas);
+
+	QList<int> vl;
+	QString str = tconfig().get_property("arsplit", "sizes", "200 50").toString();
+	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
+	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+	{
+		int val = (*it).toInt();
+		vl.append(val);
+	}
+	split->setSizes(vl);
 }
 
 Arranger::~Arranger()
@@ -741,11 +751,14 @@ void Arranger::readStatus(Xml& xml)
 				if (tag == "info")
 					showTrackinfoFlag = xml.parseInt();
 				else if(tag == "split") //backwards compat
-					split->readStatus(xml);
+					xml.skip(tag);
+					//split->readStatus(xml);
 				else if (tag == split->objectName())
-					split->readStatus(xml);
+					xml.skip(tag);
+					//split->readStatus(xml);
 				else if (tag == "list")
-					list->readStatus(xml, "list");
+					xml.skip(tag);
+					//list->readStatus(xml, "list");
 				else if (tag == "xmag")
 					hscroll->setMag(xml.parseInt());
 				else if (tag == "xpos")

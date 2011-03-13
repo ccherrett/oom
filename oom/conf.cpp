@@ -574,7 +574,7 @@ static void readSeqConfiguration(Xml& xml)
 
 void readConfiguration(Xml& xml, bool readOnlySequencer)
 {
-	int mixers = 0;
+	//int mixers = 0;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -873,20 +873,23 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				else if (tag == "midiFilterCtrl4")
 					midiFilterCtrl4 = xml.parseInt();
 				else if (tag == "bigtimeVisible")
-					config.bigTimeVisible = xml.parseInt();
+					xml.skip(tag);
+					//config.bigTimeVisible = xml.parseInt();
 				else if (tag == "transportVisible")
-					config.transportVisible = xml.parseInt();
+					xml.skip(tag);
+					//config.transportVisible = xml.parseInt();
 				else if (tag == "markerVisible")
-					config.markerVisible = xml.parseInt();
-
+					xml.skip(tag);
+					//config.markerVisible = xml.parseInt();
 				else if (tag == "mixerVisible")
 					// config.mixerVisible = xml.parseInt();  // Obsolete
 					xml.skip(tag);
 				else if (tag == "mixer1Visible")
-					config.mixer1Visible = xml.parseInt();
+					xml.skip(tag);
+					//config.mixer1Visible = xml.parseInt();
 				else if (tag == "mixer2Visible")
-					config.mixer2Visible = xml.parseInt();
-
+					xml.skip(tag);
+					//config.mixer2Visible = xml.parseInt();
 				else if (tag == "showSplashScreen")
 					config.showSplashScreen = xml.parseInt();
 				else if (tag == "canvasShowPartType")
@@ -900,15 +903,20 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				else if (tag == "canvasCustomBgList")
 					config.canvasCustomBgList = xml.parse1().split(";", QString::SkipEmptyParts);
 				else if (tag == "geometryMain")
-					config.geometryMain = readGeometry(xml, tag);
+					xml.skip(tag);
+					//config.geometryMain = readGeometry(xml, tag);
 				else if (tag == "geometryTransport")
-					config.geometryTransport = readGeometry(xml, tag);
+					xml.skip(tag);
+					//config.geometryTransport = readGeometry(xml, tag);
 				else if (tag == "geometryBigTime")
-					config.geometryBigTime = readGeometry(xml, tag);
+					xml.skip(tag);
+					//config.geometryBigTime = readGeometry(xml, tag);
 				else if (tag == "geometryPianoroll")
-					config.geometryPianoroll = readGeometry(xml, tag);
+					xml.skip(tag);
+					//config.geometryPianoroll = readGeometry(xml, tag);
 				else if (tag == "geometryDrumedit")
-					config.geometryDrumedit = readGeometry(xml, tag);
+					xml.skip(tag);
+					//config.geometryDrumedit = readGeometry(xml, tag);
 
 				else if (tag == "geometryMixer")
 					// config.geometryMixer = readGeometry(xml, tag); // Obsolete
@@ -919,21 +927,26 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 					//      config.mixer2.read(xml);
 				else if (tag == "Mixer")
 				{
-					if (mixers == 0)
+					xml.skip(tag);
+					/*if (mixers == 0)
 						config.mixer1.read(xml);
 					else
 						config.mixer2.read(xml);
-					++mixers;
+					++mixers;*/
 				}
 
 				else if (tag == "bigtimeForegroundcolor")
-					config.bigTimeForegroundColor = readColor(xml);
+					xml.skip(tag);
+					//config.bigTimeForegroundColor = readColor(xml);
 				else if (tag == "bigtimeBackgroundcolor")
-					config.bigTimeBackgroundColor = readColor(xml);
+					xml.skip(tag);
+					//config.bigTimeBackgroundColor = readColor(xml);
 				else if (tag == "transportHandleColor")
-					config.transportHandleColor = readColor(xml);
+					xml.skip(tag);
+					//config.transportHandleColor = readColor(xml);
 				else if (tag == "waveEditBackgroundColor")
-					config.waveEditBackgroundColor = readColor(xml);
+					xml.skip(tag);
+					//config.waveEditBackgroundColor = readColor(xml);
 				else if (tag == "txDeviceId")
 					//txDeviceId = xml.parseInt();
 					xml.parseInt();
@@ -1001,19 +1014,25 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 					//      readConfigMidiSyncInfo(xml);
 				else if (tag == "arranger")
 				{
-					if (oom && oom->arranger)
+					xml.skip(tag);
+					/*if (oom && oom->arranger)
 						oom->arranger->readStatus(xml);
 					else
 						xml.skip(tag);
+					*/
 				}
 				else if (tag == "drumedit")
-					DrumEdit::readConfiguration(xml);
+					xml.skip(tag);
+					//DrumEdit::readConfiguration(xml);
 				else if (tag == "pianoroll")
-					PianoRoll::readConfiguration(xml);
+					xml.skip(tag);
+					//PianoRoll::readConfiguration(xml);
 				else if (tag == "masteredit")
-					MasterEdit::readConfiguration(xml);
+					xml.skip(tag);
+					//MasterEdit::readConfiguration(xml);
 				else if (tag == "waveedit")
-					WaveEdit::readConfiguration(xml);
+					xml.skip(tag);
+					//WaveEdit::readConfiguration(xml);
 				else if (tag == "shortcuts")
 					readShortCuts(xml);
 				else if (tag == "division")
@@ -1328,12 +1347,10 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 
 	xml.intTag(level, "guiRefresh", config.guiRefresh);
 	xml.strTag(level, "userInstrumentsDir", config.userInstrumentsDir);
-	// Removed by Orcan. 20101220
-	//xml.strTag(level, "helpBrowser", config.helpBrowser);
 	xml.intTag(level, "extendedMidi", config.extendedMidi);
 	xml.intTag(level, "midiExportDivision", config.midiDivision);
-	xml.intTag(level, "guiDivision", config.guiDivision);
-	xml.strTag(level, "copyright", config.copyright);
+	//xml.intTag(level, "guiDivision", config.guiDivision);
+	//xml.strTag(level, "copyright", config.copyright);
 	xml.intTag(level, "smfFormat", config.smfFormat);
 	xml.intTag(level, "exp2ByteTimeSigs", config.exp2ByteTimeSigs);
 	xml.intTag(level, "expOptimNoteOffs", config.expOptimNoteOffs);
@@ -1351,34 +1368,30 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.intTag(level, "midiFilterCtrl2", midiFilterCtrl2);
 	xml.intTag(level, "midiFilterCtrl3", midiFilterCtrl3);
 	xml.intTag(level, "midiFilterCtrl4", midiFilterCtrl4);
-	// Removed by Tim. p3.3.6
 
-	//xml.intTag(level, "txDeviceId", txDeviceId);
-	//xml.intTag(level, "rxDeviceId", rxDeviceId);
 	xml.strTag(level, "theme", config.style);
 	xml.strTag(level, "styleSheetFile", config.styleSheetFile);
 	xml.strTag(level, "externalWavEditor", config.externalWavEditor);
 	xml.intTag(level, "useOldStyleStopShortCut", config.useOldStyleStopShortCut);
 	xml.intTag(level, "moveArmedCheckBox", config.moveArmedCheckBox);
 
-	//for (int i = 0; i < 6; ++i) {
-	for (int i = 0; i < NUM_FONTS; ++i)
+	/*for (int i = 0; i < NUM_FONTS; ++i)
 	{
 		char buffer[32];
 		sprintf(buffer, "font%d", i);
 		xml.strTag(level, buffer, config.fonts[i].toString());
-	}
+	}*/
 
-	xml.intTag(level, "globalAlphaBlend", config.globalAlphaBlend);
+	//xml.intTag(level, "globalAlphaBlend", config.globalAlphaBlend);
 
-	for (int i = 0; i < 16; ++i)
+	/*for (int i = 0; i < 16; ++i)
 	{
 		char buffer[32];
 		sprintf(buffer, "palette%d", i);
 		xml.colorTag(level, buffer, config.palette[i]);
-	}
+	}*/
 
-	for (int i = 0; i < NUM_PARTCOLORS; ++i)
+	/*for (int i = 0; i < NUM_PARTCOLORS; ++i)
 	{
 		char buffer[32];
 		sprintf(buffer, "partColor%d", i);
@@ -1390,119 +1403,41 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 		char buffer[32];
 		sprintf(buffer, "partColorName%d", i);
 		xml.strTag(level, buffer, config.partColorNames[i]);
-	}
+	}*/
 
-	//xml.colorTag(level, "partCanvasBg", config.partCanvasBg);
-	//xml.colorTag(level, "trackBg", config.trackBg);
-	//xml.colorTag(level, "selectTrackBg", config.selectTrackBg);
-	//xml.colorTag(level, "selectTrackFg", config.selectTrackFg);
-
-	//xml.colorTag(level, "mixerBg", config.mixerBg);
-	//xml.colorTag(level, "midiTrackLabelBg", config.midiTrackLabelBg);
-	//xml.colorTag(level, "drumTrackLabelBg", config.drumTrackLabelBg);
-	//xml.colorTag(level, "waveTrackLabelBg", config.waveTrackLabelBg);
-	//xml.colorTag(level, "outputTrackLabelBg", config.outputTrackLabelBg);
-	//xml.colorTag(level, "inputTrackLabelBg", config.inputTrackLabelBg);
-	//xml.colorTag(level, "groupTrackLabelBg", config.groupTrackLabelBg);
-	//xml.colorTag(level, "auxTrackLabelBg", config.auxTrackLabelBg);
-	//xml.colorTag(level, "synthTrackLabelBg", config.synthTrackLabelBg);
-
-	//xml.colorTag(level, "midiTrackBg", config.midiTrackBg);
-	//xml.colorTag(level, "ctrlGraphFg", config.ctrlGraphFg);
-	//xml.colorTag(level, "drumTrackBg", config.drumTrackBg);
-	//xml.colorTag(level, "waveTrackBg", config.waveTrackBg);
-	//xml.colorTag(level, "outputTrackBg", config.outputTrackBg);
-	//xml.colorTag(level, "inputTrackBg", config.inputTrackBg);
-	//xml.colorTag(level, "groupTrackBg", config.groupTrackBg);
-	//xml.colorTag(level, "auxTrackBg", config.auxTrackBg);
-	//xml.colorTag(level, "synthTrackBg", config.synthTrackBg);
-
-	// Changed by Tim. p3.3.6
-
-	//xml.intTag(level, "txSyncPort", txSyncPort);
-	/*
-	// To keep old oom versions happy...
-	bool mcsync = mmc = mtc = false;
-	for(int sp = 0; sp < MIDI_PORTS; ++sp)
-	{
-	  MidiSyncTxPort* txPort = &midiSyncTxPorts[sp];
-	  if(txPort->doMCSync() || txPort->doMMC() || txPort->doMTC())
-	  {
-		if(txPort->doMCSync())
-		  mcsync = true;
-		if(txPort->doMMC())
-		  mmc = true;
-		if(txPort->doMTC())
-		  mtc = true;
-		xml.intTag(level, "txSyncPort", sp);
-		break;
-	  }
-	}
-	 */
-
-	// Added by Tim. p3.3.6
-
-	//xml.tag(level++, "midiSyncInfo");
-	//for(iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
-	//{
-	//  MidiDevice* md = *id;
-	//  (*id)->syncInfo().write(level, xml, md);
-	//}
-	//xml.etag(level, "midiSyncInfo");
-
-	//xml.intTag(level, "rxSyncPort", rxSyncPort);
 	xml.intTag(level, "mtctype", mtcType);
 	xml.nput(level, "<mtcoffset>%02d:%02d:%02d:%02d:%02d</mtcoffset>\n",
 			mtcOffset.h(), mtcOffset.m(), mtcOffset.s(),
 			mtcOffset.f(), mtcOffset.sf());
-	//xml.uintTag(level, "sendClockDelay", syncSendFirstClockDelay);
-	//xml.intTag(level, "useJackTransport", useJackTransport);
-	//xml.intTag(level, "jackTransportMaster", jackTransportMaster);
 	extSyncFlag.save(level, xml);
 
-	//      xml.intTag(level, "genMTCSync", genMTCSync);
-	//      xml.intTag(level, "genMCSync", genMCSync);
-	//      xml.intTag(level, "genMMC", genMMC);
-	//      xml.intTag(level, "acceptMTC", acceptMTC);
-	//      xml.intTag(level, "acceptMMC", acceptMMC);
-	//      xml.intTag(level, "acceptMC", acceptMC);
+	//xml.qrectTag(level, "geometryMain", config.geometryMain);
+	//xml.qrectTag(level, "geometryTransport", config.geometryTransport);
+	//xml.qrectTag(level, "geometryBigTime", config.geometryBigTime);
+	//xml.qrectTag(level, "geometryPianoroll", config.geometryPianoroll);
+	//xml.qrectTag(level, "geometryDrumedit", config.geometryDrumedit);
 
-	xml.qrectTag(level, "geometryMain", config.geometryMain);
-	xml.qrectTag(level, "geometryTransport", config.geometryTransport);
-	xml.qrectTag(level, "geometryBigTime", config.geometryBigTime);
-	xml.qrectTag(level, "geometryPianoroll", config.geometryPianoroll);
-	xml.qrectTag(level, "geometryDrumedit", config.geometryDrumedit);
-	//xml.qrectTag(level, "geometryMixer",     config.geometryMixer);  // Obsolete
+	//xml.intTag(level, "bigtimeVisible", config.bigTimeVisible);
+	//xml.intTag(level, "transportVisible", config.transportVisible);
 
-	xml.intTag(level, "bigtimeVisible", config.bigTimeVisible);
-	xml.intTag(level, "transportVisible", config.transportVisible);
+	//xml.intTag(level, "mixer1Visible", config.mixer1Visible);
+	//xml.intTag(level, "mixer2Visible", config.mixer2Visible);
+	//config.mixer1.write(level, xml);
+	//config.mixer2.write(level, xml);
 
-	//xml.intTag(level, "mixerVisible", config.mixerVisible);  // Obsolete
-	xml.intTag(level, "mixer1Visible", config.mixer1Visible);
-	xml.intTag(level, "mixer2Visible", config.mixer2Visible);
-	//config.mixer1.write(level, xml, "mixer1");
-	//config.mixer2.write(level, xml, "mixer2");
-	config.mixer1.write(level, xml);
-	config.mixer2.write(level, xml);
-
-	xml.intTag(level, "showSplashScreen", config.showSplashScreen);
-	xml.intTag(level, "canvasShowPartType", config.canvasShowPartType);
-	xml.intTag(level, "canvasShowPartEvent", config.canvasShowPartEvent);
-	xml.intTag(level, "canvasShowGrid", config.canvasShowGrid);
-	xml.strTag(level, "canvasBgPixmap", config.canvasBgPixmap);
-	xml.strTag(level, "canvasCustomBgList", config.canvasCustomBgList.join(";"));
-
-	//xml.colorTag(level, "transportHandleColor", config.transportHandleColor);
-	//xml.colorTag(level, "bigtimeForegroundcolor", config.bigTimeForegroundColor);
-	//xml.colorTag(level, "bigtimeBackgroundcolor", config.bigTimeBackgroundColor);
-	//xml.colorTag(level, "waveEditBackgroundColor", config.waveEditBackgroundColor);
+	//xml.intTag(level, "showSplashScreen", config.showSplashScreen);
+	//xml.intTag(level, "canvasShowPartType", config.canvasShowPartType);
+	//xml.intTag(level, "canvasShowPartEvent", config.canvasShowPartEvent);
+	//xml.intTag(level, "canvasShowGrid", config.canvasShowGrid);
+	//xml.strTag(level, "canvasBgPixmap", config.canvasBgPixmap);
+	//xml.strTag(level, "canvasCustomBgList", config.canvasCustomBgList.join(";"));
 
 	writeSeqConfiguration(level, xml, false);
 
-	DrumEdit::writeConfiguration(level, xml);
-	PianoRoll::writeConfiguration(level, xml);
-	MasterEdit::writeConfiguration(level, xml);
-	WaveEdit::writeConfiguration(level, xml);
+	//DrumEdit::writeConfiguration(level, xml);
+	//PianoRoll::writeConfiguration(level, xml);
+	//MasterEdit::writeConfiguration(level, xml);
+	//WaveEdit::writeConfiguration(level, xml);
 
 	writeShortCuts(level, xml);
 	xml.etag(level, "configuration");

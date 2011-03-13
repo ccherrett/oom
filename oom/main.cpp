@@ -133,6 +133,8 @@ public:
 	{
 		//if (event->type() == QEvent::KeyPress)
 		//  printf("notify key press before app::notify accepted:%d\n", event->isAccepted());  // REMOVE Tim
+		try
+		{
 		if(!receiver || !event)
 			return false;
 		bool flag = QApplication::notify(receiver, event);
@@ -162,6 +164,11 @@ public:
 		}
 
 		return flag;
+		}
+		catch(std::exception e)
+		{
+			return false;
+		}
 	}
 
 	virtual void timerEvent(QTimerEvent * /* e */)

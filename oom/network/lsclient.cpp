@@ -23,7 +23,7 @@ LSClient::~LSClient()
 	_abort = true;
 	//condition.wakeOne();
 	mutex.unlock();
-	wait();
+	//wait();
 }
 
 lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t event, const char *pchData, int cchData, void* pvData )
@@ -129,10 +129,10 @@ void LSClient::stopClient()
 		lastInfo.valid = false;
 		::lscp_client_destroy(_client);
 
-		if (!wait(1000))
-		{
+		//if (!wait(1000))
+		//{
 			terminate();
-		}
+		//}
 	}
 }
 

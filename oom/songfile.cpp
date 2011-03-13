@@ -1020,7 +1020,6 @@ void OOMidi::readToplevels(Xml& xml)
 				}
 				else if (tag == "pianoroll")
 				{
-					printf("Calling readStatus for PR\n");
 					// p3.3.34
 					// Do not open if there are no parts.
 					// Had bogus '-1' part index for list edit in oom file,
@@ -1035,7 +1034,7 @@ void OOMidi::readToplevels(Xml& xml)
 						startPianoroll(pl);
 						//FIXME: When started from here in a song loaded from the commandline
 						//closing the PR window segfaults OOM no doing it untill I trace this down
-						toplevels.back().cobject()->readStatus(xml);
+						//toplevels.back().cobject()->readStatus(xml);
 						pl = new PartList;
 					}
 				}
@@ -1044,7 +1043,7 @@ void OOMidi::readToplevels(Xml& xml)
 					if (!pl->empty())
 					{
 						startDrumEditor(pl);
-						toplevels.back().cobject()->readStatus(xml);
+						//toplevels.back().cobject()->readStatus(xml);
 						pl = new PartList;
 					}
 				}
@@ -1053,38 +1052,38 @@ void OOMidi::readToplevels(Xml& xml)
 					if (!pl->empty())
 					{
 						startListEditor(pl);
-						toplevels.back().cobject()->readStatus(xml);
+						//toplevels.back().cobject()->readStatus(xml);
 						pl = new PartList;
 					}
 				}
 				else if (tag == "master")
 				{
 					startMasterEditor();
-					toplevels.back().cobject()->readStatus(xml);
+					//toplevels.back().cobject()->readStatus(xml);
 				}
 				else if (tag == "lmaster")
 				{
 					startLMasterEditor();
-					toplevels.back().cobject()->readStatus(xml);
+					//toplevels.back().cobject()->readStatus(xml);
 				}
 				else if (tag == "marker")
 				{
 					showMarker(true);
-					toplevels.back().cobject()->readStatus(xml);
+					//toplevels.back().cobject()->readStatus(xml);
 				}
 				else if (tag == "waveedit")
 				{
 					if (!pl->empty())
 					{
 						startWaveEditor(pl);
-						toplevels.back().cobject()->readStatus(xml);
+						//toplevels.back().cobject()->readStatus(xml);
 						pl = new PartList;
 					}
 				}
 				else if (tag == "cliplist")
 				{
 					startClipList(true);
-					toplevels.back().cobject()->readStatus(xml);
+					//toplevels.back().cobject()->readStatus(xml);
 				}
 				else
 					xml.unknown("OOMidi");
@@ -1473,7 +1472,12 @@ void OOMidi::read(Xml& xml, bool skipConfig)
 				else if (tag == "mplugin")
 					readStatusMidiInputTransformPlugin(xml);
 				else if (tag == "toplevels")
-					readToplevels(xml);
+				{
+					//We no longer want to start top level windows with oom
+					//Start with only the arranger and that's all.
+					xml.skip(tag);
+					//readToplevels(xml);
+				}
 				else
 					xml.unknown("oom");
 				break;
@@ -1647,7 +1651,7 @@ void OOMidi::write(Xml& xml) const
 
 	song->write(level, xml);
 
-	if (!toplevels.empty())
+	/*if (!toplevels.empty())
 	{
 		xml.tag(level++, "toplevels");
 		for (ciToplevel i = toplevels.begin(); i != toplevels.end(); ++i)
@@ -1656,7 +1660,7 @@ void OOMidi::write(Xml& xml) const
 				i->cobject()->writeStatus(level, xml);
 		}
 		xml.tag(level--, "/toplevels");
-	}
+	}*/
 
 	xml.tag(level, "/oom");
 }

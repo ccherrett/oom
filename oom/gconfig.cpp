@@ -144,7 +144,7 @@ GlobalConfigValues config = {
 		true, true, true, true,
 		true, true, true, true
 	},
-	true, // TransportVisible;
+	false, // TransportVisible;
 	false, // BigTimeVisible;
 	false, // mixer1Visible;
 	false, // mixer2Visible;

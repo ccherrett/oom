@@ -21,10 +21,33 @@ Splitter::Splitter(Qt::Orientation o, QWidget* parent, const char* name)
 {
 	setObjectName(name);
 	setOpaqueResize(true);
+	QList<int> vl;
+
+	QString str = tconfig().get_property(objectName(), "sizes", "200 50").toString();
+	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
+	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+	{
+		int val = (*it).toInt();
+		vl.append(val);
+	}
+
+	setSizes(vl);
 }
 
 Splitter::Splitter(QWidget *parent) : QSplitter(parent)
-{}
+{
+	QList<int> vl;
+
+	QString str = tconfig().get_property(objectName(), "sizes", "200 50").toString();
+	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
+	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+	{
+		int val = (*it).toInt();
+		vl.append(val);
+	}
+
+	setSizes(vl);
+}
 
 Splitter::~Splitter()
 {
