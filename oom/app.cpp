@@ -4890,11 +4890,14 @@ void OOMidi::bounceToTrack()
 			return;
 		}
 	}
+	song->setPos(0,song->lPos(),0,true,true);
 	song->bounceOutput = out;
 	song->bounceTrack = track;
 	song->setRecord(true);
 	song->setRecordFlag(track, true);
+	track->prepareRecording();
 	audio->msgBounce();
+	song->setPlay(true);
 }
 
 //---------------------------------------------------------
@@ -4912,7 +4915,7 @@ void OOMidi::bounceToFile(AudioOutput* ao)
 		if (ol->empty())
 		{
 			QMessageBox::critical(this,
-					tr("OOMidi: Bounce to Track"),
+					tr("OOMidi: Bounce to File"),
 					tr("No audio output tracks found")
 					);
 			return;
@@ -4953,11 +4956,14 @@ void OOMidi::bounceToFile(AudioOutput* ao)
 	if (sf == 0)
 		return;
 
+	song->setPos(0,song->lPos(),0,true,true);
 	song->bounceOutput = ao;
 	ao->setRecFile(sf);
 	song->setRecord(true, false);
 	song->setRecordFlag(ao, true);
+	ao->prepareRecording();
 	audio->msgBounce();
+	song->setPlay(true);
 }
 
 #ifdef HAVE_LASH
