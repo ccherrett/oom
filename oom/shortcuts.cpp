@@ -218,8 +218,10 @@ void initShortCuts()
 	defShrt(SHRT_DEL_PROGRAM, Qt::CTRL + Qt::Key_Backslash, "Edit: Delete Program Change", PROLL_SHRT, "delete_program_change");
 	defShrt(SHRT_COPY_PROGRAM, Qt::ALT + Qt::Key_Backslash, "Edit: Copy Selected Program Change", PROLL_SHRT, "copy_program_change");
 	defShrt(SHRT_SEL_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_S, "Edit: Select Program Change under cursor", PROLL_SHRT, "select_program_change");
-	defShrt(SHRT_LMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Left, "Edit: Move Selected Program Change Left", PROLL_SHRT, "lmove_program_change");
-	defShrt(SHRT_RMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Right, "Edit: Move Selected Program Change Right", PROLL_SHRT, "rmove_program_change");
+	defShrt(SHRT_LMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Comma, "Edit: Move Selected Program Change Left", PROLL_SHRT, "lmove_program_change");
+	defShrt(SHRT_RMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Period, "Edit: Move Selected Program Change Right", PROLL_SHRT, "rmove_program_change");
+        defShrt(SHRT_LMOVE_SELECT, Qt::CTRL + Qt::ALT + Qt::Key_Left, "Edit: Move to next Program Change Left", PROLL_SHRT, "select_program_change_left");
+        defShrt(SHRT_RMOVE_SELECT, Qt::CTRL + Qt::ALT + Qt::Key_Right, "Edit: Move to next Program Change Right", PROLL_SHRT, "select_program_change_right");
 	defShrt(SHRT_SEL_INSTRUMENT, Qt::Key_I, "Edit: Select Instrument", PROLL_SHRT, "midi_instrument");
 	defShrt(SHRT_TOGGLE_STEPRECORD, Qt::CTRL + Qt::Key_F8, "Edit: Toggle Step Input", PROLL_SHRT, "toggle_step_input");
 	defShrt(SHRT_NOTE_VELOCITY_UP, Qt::Key_Up, "Edit: Increase velocity for selection", PROLL_SHRT, "increase_note_velocity");
