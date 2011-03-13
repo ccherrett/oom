@@ -3983,9 +3983,21 @@ void OOMidi::kbAccel(int key)
 			song->clearTrackRec();
 		}
 	}
+	else if(key == shortcuts[SHRT_TOGGLE_PLAY_REPEAT].key)
+	{
+		replayAction->toggle();
+		return;
+	}
 	else if(key == shortcuts[SHRT_PLAY_REPEAT].key)
 	{
-		replayAction->toggle();//song->setReplay(!song->getReplay());
+		if(!replayAction->isChecked())
+		{
+			replayAction->toggle();
+		}
+		else
+		{
+			song->updateReplayPos();
+		}
 		return;
 	}
 	else if (key == shortcuts[SHRT_OPEN_TRANSPORT].key)

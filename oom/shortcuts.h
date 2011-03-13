@@ -67,6 +67,7 @@ enum
     SHRT_REC_CLEAR, // *(keypad)
     SHRT_GOTO_SEL_NOTE,
 	SHRT_PLAY_REPEAT, //u
+	SHRT_TOGGLE_PLAY_REPEAT, //Ctrl+u toggle audition off
 
     //Main + Drumeditor
     SHRT_NEW, //Ctrl+N

@@ -39,7 +39,8 @@ void initShortCuts()
 	defShrt(SHRT_REC_CLEAR, Qt::Key_Backspace, "Transport: Clear all rec enabled tracks", GLOBAL_SHRT, "rec_clear");
     defShrt(SHRT_GOTO_SEL_NOTE, Qt::CTRL + Qt::Key_Space, "Transport: Move PB to active note", PROLL_SHRT, "goto_sel_note");
 	defShrt(SHRT_GLOBAL_EDIT_EVENT_VALUE, Qt::SHIFT + Qt::Key_E, "Edit Event Value", GLOBAL_SHRT, "global_edit_event_value");
-	defShrt(SHRT_PLAY_REPEAT, Qt::Key_U, "TransPort: toggle repeat", GLOBAL_SHRT, "play_repeat");
+	defShrt(SHRT_PLAY_REPEAT, Qt::Key_U, "TransPort: set repeat", GLOBAL_SHRT, "play_repeat");
+	defShrt(SHRT_TOGGLE_PLAY_REPEAT, Qt::CTRL + Qt::Key_U, "TransPort: toggle repeat", GLOBAL_SHRT, "toggle_play_repeat");
 
 
 	defShrt(SHRT_COPY, Qt::CTRL + Qt::Key_C, "Edit: Copy", INVIS_SHRT, "copy");
