@@ -558,7 +558,8 @@ public slots:
 	unsigned replayPos() {
 		return _replayPos;
 	}
-    bool getLoop() {
+	void updateReplayPos();
+	bool getLoop() {
         return loopFlag;
     }
     void setLoop(bool f);

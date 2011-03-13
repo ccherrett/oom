@@ -1059,6 +1059,12 @@ void Song::setReplay(bool t)
 	}
 }
 
+void Song::updateReplayPos()
+{
+	_replayPos = song->cpos();
+	emit replayChanged(_replay, _replayPos);
+}
+
 //---------------------------------------------------------
 //   setLoop
 //    set transport loop flag

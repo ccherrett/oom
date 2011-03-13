@@ -67,6 +67,7 @@ enum
     SHRT_REC_CLEAR, // *(keypad)
     SHRT_GOTO_SEL_NOTE,
 	SHRT_PLAY_REPEAT, //u
+	SHRT_TOGGLE_PLAY_REPEAT, //Ctrl+u toggle audition off
 
     //Main + Drumeditor
     SHRT_NEW, //Ctrl+N
@@ -305,9 +306,11 @@ enum
     SHRT_ADD_PROGRAM, //Add program change backslash
     SHRT_COPY_PROGRAM, //Add program change Alt+backslash
     SHRT_SEL_PROGRAM, //Select program change Ctrl+Alt+S
-    SHRT_RMOVE_PROGRAM, //Move program change left Ctrl+Alt+right
-    SHRT_LMOVE_PROGRAM, //Move program change right Ctrl+Alt+left
+    SHRT_RMOVE_PROGRAM, //Move program change left Ctrl+Alt+period
+    SHRT_LMOVE_PROGRAM, //Move program change right Ctrl+Alt+comma
     SHRT_DEL_PROGRAM, //Delete program change under cursor shit+backslash
+    SHRT_LMOVE_SELECT, //Move to next program change left  Ctrl+Alt+left
+    SHRT_RMOVE_SELECT, //Move to next program change right Ctrl+Alt+right
     SHRT_SEL_INSTRUMENT,
 
     // Shortcuts for tools

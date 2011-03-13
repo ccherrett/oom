@@ -554,7 +554,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));
     connect(canvas, SIGNAL(horizontalScrollNoLimit(unsigned)), hscroll, SLOT(setPosNoLimit(unsigned)));
     connect(canvas, SIGNAL(selectionChanged(int, Event&, Part*)), this,
-  		  SLOT(setSelection(int, Event&, Part*)));
+		  SLOT(setSelection(int, Event&, Part*)));
 
     connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
     connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
@@ -612,19 +612,19 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     //
     if (canvas->track())
     {
-  	  updateTrackInfo();
-  	  solo->blockSignals(true);
-  	  solo->setChecked(canvas->track()->solo());
-  	  solo->blockSignals(false);
+	  updateTrackInfo();
+	  solo->blockSignals(true);
+	  solo->setChecked(canvas->track()->solo());
+	  solo->blockSignals(false);
     }
 
     unsigned pos;
     if (initPos >= MAXINT)
-  	  pos = song->cpos();
+	  pos = song->cpos();
     else
-  	  pos = initPos;
+	  pos = initPos;
     if (pos > MAXINT)
-  	  pos = MAXINT;
+	  pos = MAXINT;
 
 	//qDebug() << QThread::currentThread();
 
@@ -1436,7 +1436,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	if(key == shortcuts[SHRT_SEL_PROGRAM].key)
 	{
-		pcbar->selectProgramChange();
+		pcbar->selectProgramChange(song->cpos());
 		return;
 	}
 	if(key == shortcuts[SHRT_LMOVE_PROGRAM].key)
@@ -1745,7 +1745,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)/*{{{*/
 	printf("entering PianoRoll::setKeyBindings\n");
 	if(!selected || audio->isPlaying())
 		return;
-	printf("not playing and selected\n");	
+	printf("not playing and selected\n");
 	//check if the lscp information is pertaining to this track and port
 	Track *t = curCanvasPart()->track();
 	//RouteList *rl = t->inRoutes();
@@ -1789,7 +1789,7 @@ void PianoRoll::setKeyBindings(LSCPChannelInfo info)/*{{{*/
 				{
 					printf("is current patch calling setMIDIKeyBindings\n");
 					piano->setMIDIKeyBindings(info.key_bindings, info.keyswitch_bindings);
-				}	
+				}
 				else
 				{
 					printf("hbank, lbank and program did not match\n");
@@ -1819,7 +1819,7 @@ bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 	{
 		program = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
 	}
-	
+
 	if (program == CTRL_VAL_UNKNOWN)
 	{
 		return false;
@@ -1833,7 +1833,7 @@ bool PianoRoll::isCurrentPatch(int hbank, int lbank, int prog)/*{{{*/
 	int pr = (program & 0xff);
 	if (pr == 0x100)
 		pr = 0;
-	
+
 
 	printf("leaving PianoRoll::isCurrentPatch\n");
 

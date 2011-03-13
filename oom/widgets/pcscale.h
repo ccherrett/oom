@@ -17,8 +17,7 @@ enum ProgramChangeVals { doNothing, movingController, selectedController };
 struct ProgramChangeObject {
 	Event event;
 	Part *part;
-	Track* track;
-	bool moving;
+	bool valid;
 	QPoint mousePressPos;
 	ProgramChangeVals state;
 };
@@ -37,7 +36,7 @@ class PCScale : public View
     bool barLocator;
     bool waveMode;
     //Audio* audio;
-	ProgramChangeObject pc;
+	ProgramChangeObject _pc;
 
 
 private slots:
@@ -60,7 +59,7 @@ public slots:
     void updateProgram();
 	void copySelected();
 	void moveSelected(int);
-	void selectProgramChange();
+	bool selectProgramChange(int x);
 	void deleteProgramChange(Event);
     //void setAudio(Audio*);
 
@@ -69,13 +68,13 @@ public:
 
     void setBarLocator(bool f)
     {
-        barLocator = f;
+	barLocator = f;
     }
     void setEditor(PianoRoll*);
 
     PianoRoll* getEditor()
     {
-        return currentEditor;
+	return currentEditor;
     }
 };
 #endif

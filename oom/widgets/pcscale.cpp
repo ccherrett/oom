@@ -56,8 +56,8 @@ PCScale::PCScale(int* r, QWidget* parent, PianoRoll* editor, int xs, bool _mode)
 
 	setFixedHeight(14);
 	setBg(QColor(110, 141, 152));
-	pc.state = doNothing;
-	pc.moving = false;
+	_pc.state = doNothing;
+	_pc.valid = false;
 }
 
 //---------------------------------------------------------
@@ -145,7 +145,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 		setCursor(QCursor(Qt::ArrowCursor));
 
 	int x = event->x();
-	x = AL::sigmap.raster(x, *raster);
+//	x = AL::sigmap.raster(x, *raster);
 	if (x < 0)
 		x = 0;
 	//printf("PCScale::viewMouseMoveEvent\n");
@@ -182,52 +182,21 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	else if (i == 2 && (event->modifiers() & Qt::ShiftModifier))/*{{{*/
 	{ // If shift +RMB we remove a marker
 		//Delete Program change here
-		Track* track = song->findTrack(currentEditor->curCanvasPart());
-		PartList* parts = track->parts();
-		for (iPart pt = parts->begin(); pt != parts->end(); ++pt)
+		if (selectProgramChange(x))
 		{
-			Part* mprt = pt->second;
-			EventList* eventList = mprt->events();
-			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
-			{
-				//Get event type.
-				Event pcevt = evt->second;
-				if (!pcevt.isNote())
-				{
-					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
-					{
-						int xp = pcevt.tick() + mprt->tick();
-						if (xp >= x && xp <= (x + 50))
-						{
-							if (audio)
-							{
-								deleteProgramChange(pcevt);
-								song->startUndo();
-								audio->msgDeleteEvent(evt->second, pt->second, true, true, false);
-								song->endUndo(SC_EVENT_MODIFIED);
-								//Reset the hardware controller for this track
-								/*MidiTrack *evtrack = static_cast<MidiTrack*>(pt->second->track());
-								if(evtrack)
-								{
-									int outChannel = evtrack->outChannel();
-									int outPort = evtrack->outPort();
-									MidiPort* mp = &midiPorts[outPort];
-									if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
-										audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
-								}*/
-								//song->deleteEvent(pcevt, mprt); //hack
-								break;
-							}
-						}
-					}
-				}
-			}
-			//redraw();
+			deleteProgramChange(_pc.event);
+			_pc.valid = false;
+
+			song->startUndo();
+			audio->msgDeleteEvent(_pc.event, _pc.part, true, true, false);
+			song->endUndo(SC_EVENT_MODIFIED);
+			update();
+			return;
 		}
 	}/*}}}*/
 	else if(i == 2)
 	{//popup a menu here to copy/paste PC
-		if(pc.moving && pc.state == selectedController)
+		if(_pc.valid && _pc.state == selectedController)
 		{
 			//update the song position before we start so we have a position for paste
 			song->setPos(0, p);
@@ -242,119 +211,43 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 				int id = act->data().toInt();
 				if(id == 1)
 				{
-					Event nevent = pc.event.clone();/*{{{*/
+					Event nevent = _pc.event.clone();/*{{{*/
 					nevent.setTick(x);
-					if((unsigned int)x < pc.part->tick())
+					if((unsigned int)x < _pc.part->tick())
 						return;
-					int diff = nevent.tick() - pc.part->lenTick();
+					int diff = nevent.tick() - _pc.part->lenTick();
 					if (diff > 0)
 					{// too short part? extend it
-						int endTick = song->roundUpBar(pc.part->lenTick() + diff);
-						pc.part->setLenTick(endTick);
+						int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
+						_pc.part->setLenTick(endTick);
 					}
-					pc.part->addEvent(nevent);/*}}}*/
+					_pc.part->addEvent(nevent);/*}}}*/
 				}
 			}
 		}
 	}
 	else if (i == 0 && (event->modifiers() & Qt::ControlModifier))/*{{{*/
 	{ // If LMB select the program change
-		Track* track = song->findTrack(currentEditor->curCanvasPart());
-		PartList* parts = track->parts();
-		bool stop = false;
-		for (iPart pt = parts->begin(); pt != parts->end() && !stop; ++pt)
+		if (selectProgramChange(x))
 		{
-			Part* mprt = pt->second;
-			EventList* eventList = mprt->events();
-			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
-			{
-				//Get event type.
-				Event pcevt = evt->second;
-				if (!pcevt.isNote())
-				{
-					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
-					{
-						int xp = pcevt.tick() + mprt->tick();
-        				int start = x;
-						start -= currentEditor->rasterStep(x) + mprt->tick();
-						int end = x;
-						//end += currentEditor->rasterStep(x) + mprt->tick();
-						QRect lazyZone(start, 0, (end - start), 12);
-						//x += currentEditor->rasterStep(x) + pc.part->tick();
-						if (xp >= x && xp <= (x + 50))
-						{
-							//Select the event and break
-							if(pc.moving)
-							{
-								pc.moving = false;
-								pc.state = doNothing;
-								emit drawSelectedProgram(-1, false);
-							}
-							else
-							{
-								pc.track = track;
-								pc.part = mprt;
-								pc.event = pcevt;
-								pc.moving = true;
-								pc.state = selectedController;
-								emit drawSelectedProgram(pcevt.tick(), true);
-								stop = true;
-								break;
-							}
-						}
-					}
-				}
-			}
+			return;
 		}
-		if(!stop)
-		{
-			//We did not find a program change so just set song position
-			song->setPos(i, p);
-		}
+		//We did not find a program change so just set song position
+		song->setPos(i, p);
 	}/*}}}*/
 	else if (i == 0)/*{{{*/
 	{ // If LMB select the program change
-		Track* track = song->findTrack(currentEditor->curCanvasPart());
-		PartList* parts = track->parts();
-		bool stop = false;
-		for (iPart pt = parts->begin(); pt != parts->end() && !stop; ++pt)
+		if (selectProgramChange(x))
 		{
-			Part* mprt = pt->second;
-			EventList* eventList = mprt->events();
-			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
-			{
-				//Get event type.
-				Event pcevt = evt->second;
-				if (!pcevt.isNote())
-				{
-					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
-					{
-						int xp = pcevt.tick() + mprt->tick();
-						if (xp >= x && xp <= (x + 50))
-						{
-							//Select the event and break
-							pc.track = track;
-							pc.part = mprt;
-							pc.event = pcevt;
-							pc.moving = true;
-							pc.state = movingController;
-							emit drawSelectedProgram(pcevt.tick(), true);
-							stop = true;
-							break;
-						}
-					}
-				}
-			}
+			_pc.state = movingController;
+			return;
 		}
-		if(!stop)
-		{
-			//We did not find a program change so just set song position
-			song->setPos(i, p);
-		}
+		//We did not find a program change so just set song position
+		song->setPos(i, p);
 	}/*}}}*/
 	else
 		song->setPos(i, p); // all other cases: relocating one of the locators
-	
+
 	update();
 }
 
@@ -367,10 +260,10 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 	//Deselect the PC only if was a end of move
 	if(button == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier))
 	{
-		if(pc.moving && pc.state == movingController)
+		if(_pc.valid && _pc.state == movingController)
 		{
-			pc.state = doNothing;
-			pc.moving = false;
+			_pc.state = doNothing;
+			_pc.valid = false;
 			emit drawSelectedProgram(-1, false);
 		}
 	}
@@ -385,30 +278,30 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 {
 	//printf("PCScale::viewMouseMoveEvent()\n");
-	if(pc.moving && pc.state == movingController && pc.track && pc.part)
+	if(_pc.valid && _pc.state == movingController && _pc.part && button == Qt::LeftButton)
 	{
 		int x = event->x();
 		x = AL::sigmap.raster(x, *raster);
 		if (x < 0)
 			x = 0;
 		//int tick = pc.event.tick() + pc.part->tick();
-		if((unsigned int)x < pc.part->tick())
+		if((unsigned int)x < _pc.part->tick())
 			return;
-		Event nevent = pc.event.clone();
+		Event nevent = _pc.event.clone();
 		nevent.setTick(x);
-		int diff = nevent.tick() - pc.part->lenTick();
+		int diff = nevent.tick() - _pc.part->lenTick();
 		if (diff > 0)
 		{// too short part? extend it
-			int endTick = song->roundUpBar(pc.part->lenTick() + diff);
-			pc.part->setLenTick(endTick);
+			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
+			_pc.part->setLenTick(endTick);
 			if(song->len() <= (unsigned int)endTick)
 			{
 				song->setLen((unsigned int)endTick);
 			}
 		}
-		audio->msgChangeEvent(pc.event, nevent, pc.part, true, false, false);
-		pc.event = nevent;
-		emit drawSelectedProgram(pc.event.tick(), true);
+		audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, false, false);
+		_pc.event = nevent;
+		emit drawSelectedProgram(_pc.event.tick(), true);
 	}
 }/*}}}*/
 
@@ -439,51 +332,59 @@ void PCScale::updateProgram()
  * selectProgramChange
  * called the select the programchange at the current song position
  */
-void PCScale::selectProgramChange()/*{{{*/
+bool PCScale::selectProgramChange(int x)/*{{{*/
 {
-	Track* track = song->findTrack(currentEditor->curCanvasPart());
-	PartList* parts = track->parts();
-	bool stop = false;
-	int x = song->cpos();
-	for (iPart pt = parts->begin(); pt != parts->end() && !stop; ++pt)
+	Part* part = currentEditor->curCanvasPart();
+	if (!part)
 	{
-		Part* mprt = pt->second;
-		EventList* eventList = mprt->events();
-		for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+		return false;
+	}
+
+	QList<Event> events;
+
+	EventList* eventList = part->events();
+	for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+	{
+		//Get event type.
+		Event pcevt = evt->second;
+		if (!pcevt.isNote() && pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
 		{
-			//Get event type.
-			Event pcevt = evt->second;
-			if (!pcevt.isNote())
+			int xp = pcevt.tick() + part->tick();
+			int diff = abs(xp - x);
+			if (diff < 300)
 			{
-				if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
-				{
-					int xp = pcevt.tick() + mprt->tick();
-					if (xp >= x && xp <= (x + 50))
-					{
-						//Select the event and break
-						if(pc.moving)
-						{
-							pc.moving = false;
-							pc.state = doNothing;
-							emit drawSelectedProgram(-1, false);
-						}
-						else
-						{
-							pc.track = track;
-							pc.part = mprt;
-							pc.event = pcevt;
-							pc.moving = true;
-							pc.state = selectedController;
-							emit drawSelectedProgram(pcevt.tick(), true);
-							stop = true;
-							break;
-						}
-					}
-				}
+				events.append(pcevt);
 			}
 		}
 	}
+
+	if (!events.size())
+	{
+		return false;
+	}
+
+	Event nearest;
+
+	int minDiff = INT_MAX;
+	foreach(Event event, events)
+	{
+		int diff = abs((event.tick() + part->tick()) - x);
+		if (diff < minDiff) {
+			minDiff = diff;
+			nearest = event;
+		}
+	}
+
+	_pc.part = part;
+	_pc.event = nearest;
+	_pc.valid = true;
+	_pc.state = selectedController;
+	emit drawSelectedProgram(nearest.tick(), true);
+
 	update();
+
+	return true;
+
 }/*}}}*/
 
 /**
@@ -492,10 +393,10 @@ void PCScale::selectProgramChange()/*{{{*/
  */
 void PCScale::deleteProgramChange(Event evt)
 {
-	if(pc.moving && (pc.event == evt))
+	if(_pc.valid && (_pc.event == evt))
 	{
-		pc.moving = false;
-		pc.state = doNothing;
+		_pc.valid = false;
+		_pc.state = doNothing;
 		emit drawSelectedProgram(-1, false);
 	}
 }
@@ -507,34 +408,34 @@ void PCScale::deleteProgramChange(Event evt)
  */
 void PCScale::moveSelected(int dir)/*{{{*/
 {
-	if(pc.moving && pc.state == selectedController && pc.track && pc.part)
+	if(_pc.valid && _pc.state == selectedController && _pc.part)
 	{
-		int x = pc.event.tick();
+		int x = _pc.event.tick();
 		if(dir > 0)
 		{
-        	x += currentEditor->rasterStep(x) + pc.part->tick();
+		x += currentEditor->rasterStep(x) + _pc.part->tick();
 		}
 		else
 		{
-        	x -= currentEditor->rasterStep(x) + pc.part->tick();
+		x -= currentEditor->rasterStep(x) + _pc.part->tick();
 		}
 		//printf("PCScale::moveSelected(%d) tick; %d\n", dir, x);
 
 		if (x < 0)
 			x = 0;
-		if((unsigned int)x < pc.part->tick())
+		if((unsigned int)x < _pc.part->tick())
 			return;
-		Event nevent = pc.event.clone();
+		Event nevent = _pc.event.clone();
 		nevent.setTick(x);
-		int diff = nevent.tick() - pc.part->lenTick();
+		int diff = nevent.tick() - _pc.part->lenTick();
 		if (diff > 0)
 		{// too short part? extend it
-			int endTick = song->roundUpBar(pc.part->lenTick() + diff);
-			pc.part->setLenTick(endTick);
+			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
+			_pc.part->setLenTick(endTick);
 		}
-		audio->msgChangeEvent(pc.event, nevent, pc.part, true, false, false);
-		pc.event = nevent;
-		emit drawSelectedProgram(pc.event.tick(), true);
+		audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, false, false);
+		_pc.event = nevent;
+		emit drawSelectedProgram(_pc.event.tick(), true);
 	}
 	update();
 }/*}}}*/
@@ -545,19 +446,19 @@ void PCScale::moveSelected(int dir)/*{{{*/
  */
 void PCScale::copySelected()/*{{{*/
 {
-	if(pc.moving && pc.state == selectedController)
+	if(_pc.valid && _pc.state == selectedController)
 	{
-		Event nevent = pc.event.clone();
+		Event nevent = _pc.event.clone();
 		nevent.setTick(song->cpos());
-		if(song->cpos() < pc.part->tick())
+		if(song->cpos() < _pc.part->tick())
 			return;
-		int diff = nevent.tick() - pc.part->lenTick();
+		int diff = nevent.tick() - _pc.part->lenTick();
 		if (diff > 0)
 		{// too short part? extend it
-			int endTick = song->roundUpBar(pc.part->lenTick() + diff);
-			pc.part->setLenTick(endTick);
+			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
+			_pc.part->setLenTick(endTick);
 		}
-		pc.part->addEvent(nevent);
+		_pc.part->addEvent(nevent);
 		update();
 	}
 }/*}}}*/
@@ -629,13 +530,13 @@ void PCScale::pdraw(QPainter& p, const QRect& r)/*{{{*/
 						//  and with high horizontal magnification, 'ghost' drawings appeared,
 						//  apparently the result of truncation later (xp = -65006 caused ghosting
 						//  at bar 245 with magnification at max.), even with correct clipping region
-						//  applied to painter in View::paint(). Tim.  Apr 5 2009 
-						// Quote: "Warning: Note that QPainter does not attempt to work around 
-						//  coordinate limitations in the underlying window system. Some platforms may 
+						//  applied to painter in View::paint(). Tim.  Apr 5 2009
+						// Quote: "Warning: Note that QPainter does not attempt to work around
+						//  coordinate limitations in the underlying window system. Some platforms may
 						//  behave incorrectly with coordinates as small as +/-4000."
 						if (xp >= -32)
 						{
-							if(pc.moving && pc.event == pcevt)
+							if(_pc.valid && _pc.event == pcevt)
 							{
 								p.drawPixmap(xp, 0, *flagIconSPSel);
 							}
@@ -658,7 +559,7 @@ void PCScale::pdraw(QPainter& p, const QRect& r)/*{{{*/
 						//{
 						//	p.setPen(Qt::red);
 						//	p.drawLine(xp, y, xp, height());
-						//}  
+						//}
 					}//END if(wr.isEmpty)
 				}//END if(CTRL_PROGRAM)
 			}//END if(!isNote)
