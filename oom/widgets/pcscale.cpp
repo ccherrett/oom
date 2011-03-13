@@ -182,47 +182,16 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	else if (i == 2 && (event->modifiers() & Qt::ShiftModifier))/*{{{*/
 	{ // If shift +RMB we remove a marker
 		//Delete Program change here
-		Track* track = song->findTrack(currentEditor->curCanvasPart());
-		PartList* parts = track->parts();
-		for (iPart pt = parts->begin(); pt != parts->end(); ++pt)
+		if (selectProgramChange(x))
 		{
-			Part* mprt = pt->second;
-			EventList* eventList = mprt->events();
-			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
-			{
-				//Get event type.
-				Event pcevt = evt->second;
-				if (!pcevt.isNote())
-				{
-					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
-					{
-						int xp = pcevt.tick() + mprt->tick();
-						if (xp >= x && xp <= (x + 50))
-						{
-							if (audio)
-							{
-								deleteProgramChange(pcevt);
-								song->startUndo();
-								audio->msgDeleteEvent(evt->second, pt->second, true, true, false);
-								song->endUndo(SC_EVENT_MODIFIED);
-								//Reset the hardware controller for this track
-								/*MidiTrack *evtrack = static_cast<MidiTrack*>(pt->second->track());
-								if(evtrack)
-								{
-									int outChannel = evtrack->outChannel();
-									int outPort = evtrack->outPort();
-									MidiPort* mp = &midiPorts[outPort];
-									if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
-										audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
-								}*/
-								//song->deleteEvent(pcevt, mprt); //hack
-								break;
-							}
-						}
-					}
-				}
-			}
-			//redraw();
+			deleteProgramChange(_pc.event);
+			_pc.valid = false;
+
+			song->startUndo();
+			audio->msgDeleteEvent(_pc.event, _pc.part, true, true, false);
+			song->endUndo(SC_EVENT_MODIFIED);
+			update();
+			return;
 		}
 	}/*}}}*/
 	else if(i == 2)
@@ -259,57 +228,12 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	}
 	else if (i == 0 && (event->modifiers() & Qt::ControlModifier))/*{{{*/
 	{ // If LMB select the program change
-		Track* track = song->findTrack(currentEditor->curCanvasPart());
-		PartList* parts = track->parts();
-		bool stop = false;
-		for (iPart pt = parts->begin(); pt != parts->end() && !stop; ++pt)
+		if (selectProgramChange(x))
 		{
-			Part* mprt = pt->second;
-			EventList* eventList = mprt->events();
-			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
-			{
-				//Get event type.
-				Event pcevt = evt->second;
-				if (!pcevt.isNote())
-				{
-					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
-					{
-						int xp = pcevt.tick() + mprt->tick();
-					int start = x;
-						start -= currentEditor->rasterStep(x) + mprt->tick();
-						int end = x;
-						//end += currentEditor->rasterStep(x) + mprt->tick();
-						QRect lazyZone(start, 0, (end - start), 12);
-						//x += currentEditor->rasterStep(x) + pc.part->tick();
-						if (xp >= x && xp <= (x + 50))
-						{
-							//Select the event and break
-							if(_pc.valid)
-							{
-								_pc.valid = false;
-								_pc.state = doNothing;
-								emit drawSelectedProgram(-1, false);
-							}
-							else
-							{
-								_pc.part = mprt;
-								_pc.event = pcevt;
-								_pc.valid = true;
-								_pc.state = selectedController;
-								emit drawSelectedProgram(pcevt.tick(), true);
-								stop = true;
-								break;
-							}
-						}
-					}
-				}
-			}
+			return;
 		}
-		if(!stop)
-		{
-			//We did not find a program change so just set song position
-			song->setPos(i, p);
-		}
+		//We did not find a program change so just set song position
+		song->setPos(i, p);
 	}/*}}}*/
 	else if (i == 0)/*{{{*/
 	{ // If LMB select the program change
@@ -354,7 +278,7 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 {
 	//printf("PCScale::viewMouseMoveEvent()\n");
-	if(_pc.valid && _pc.state == movingController && _pc.part)
+	if(_pc.valid && _pc.state == movingController && _pc.part && button == Qt::LeftButton)
 	{
 		int x = event->x();
 		x = AL::sigmap.raster(x, *raster);
