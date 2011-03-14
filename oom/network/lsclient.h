@@ -69,7 +69,7 @@ private:
 	QMutex mutex;
 	QWaitCondition condition;
 	LSCPChannelInfo lastInfo;
-	LSCPKeymap getKeyMapping(QString, int);
+	LSCPKeymap getKeyMapping(QString, int, QString);
 
 protected:
 	void run();
