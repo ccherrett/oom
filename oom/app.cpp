@@ -312,7 +312,7 @@ bool OOMidi::seqStart()
 		exit(33);
 	}
 #ifdef LSCP_SUPPORT
-	emit lscpStartListener();
+	//emit lscpStartListener();
 #endif
 	return true;
 }
@@ -326,7 +326,7 @@ void OOMidi::seqStop()
 	// label sequencer as disabled before it actually happened to minimize race condition
 	midiSeqRunning = false;
 #ifdef LSCP_SUPPORT
-	emit lscpStopListener();
+	//emit lscpStopListener();
 #endif
 
 	song->setStop(true);

@@ -551,7 +551,7 @@ int main(int argc, char* argv[])
 	//Finally launch the server on port 8415
 	oom->startServer();
 #ifdef LSCP_SUPPORT
-	oom->startLSCPClient();
+	//oom->startLSCPClient();
 #endif
 
 #ifdef HAVE_LASH
@@ -585,7 +585,7 @@ int main(int argc, char* argv[])
 	if (debugMsg)
 		printf("app.exec() returned:%d\nDeleting main OOMidi object\n", rv);
 #ifdef LSCP_SUPPORT
-	oom->stopLSCPClient();
+	//oom->stopLSCPClient();
 #endif
 	oom->stopServer();
 	delete oom;

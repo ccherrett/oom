@@ -49,6 +49,7 @@ struct PatchGroup
 {
     QString name;
     PatchList patches;
+	int id;
     void read(Xml&);
 };
 

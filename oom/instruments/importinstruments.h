@@ -13,6 +13,8 @@
 class QDialog;
 class QStandardItem;
 class QStandardItemModel;
+class LSClient;
+class QCloseEvent;
 class LSCPImport : public QDialog, public Ui::LSCPInstrumentBase
 {
 	Q_OBJECT
@@ -28,5 +30,8 @@ signals:
 	void instrumentsImported();
 private:
 	QStandardItemModel* _mapModel;
+	LSClient* _client;
+protected:
+	virtual void closeEvent(QCloseEvent*);
 };
 #endif

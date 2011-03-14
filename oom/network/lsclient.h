@@ -51,7 +51,7 @@ public:
 	LSClient(const char* host = "localhost", int port = 8888, QObject *parent = 0);
 	~LSClient();
 	void stopClient();
-	void startClient();
+	bool startClient();
 	int getError();
 	MidiInstrumentList* getInstruments();
 	MidiInstrument* getInstrument(QString);

@@ -104,7 +104,7 @@ void EditInstrument::populateInstruments()
 	instrumentList->blockSignals(true);
 	listController->clear();
 	instrumentList->clear();
-	// populate instrument list/*{{{*/
+	// populate instrument list
 	// Populate common controller list.
 	for (int i = 0; i < 128; ++i)
 	{
@@ -132,7 +132,7 @@ void EditInstrument::populateInstruments()
 	listController->blockSignals(false);
 	instrumentList->blockSignals(false);
 	if (instrumentList->item(0))
-		instrumentList->setCurrentItem(instrumentList->item(0));/*}}}*/
+		instrumentList->setCurrentItem(instrumentList->item(0));
 	changeInstrument();
 }
 

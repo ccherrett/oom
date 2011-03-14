@@ -18,14 +18,15 @@ LSClient::LSClient(const char* host, int p, QObject* parent) : QThread(parent)
 	_hostname = host;
 	_port = p;
 	_abort = false;
+	_client = NULL;
 }
 
 LSClient::~LSClient()
 {
-	mutex.lock();
+	//mutex.lock();
 	_abort = true;
 	//condition.wakeOne();
-	mutex.unlock();
+	//mutex.unlock();
 	//wait();
 }
 
@@ -91,9 +92,8 @@ void LSClient::run()
 	exec();
 }
 
-void LSClient::startClient()/*{{{*/
+bool LSClient::startClient()/*{{{*/
 {
-	mutex.lock();
 	if(_client != NULL)
 		::lscp_client_destroy(_client);
 	_client = ::lscp_client_create(_hostname, _port, client_callback, this);
@@ -102,14 +102,14 @@ void LSClient::startClient()/*{{{*/
 		printf("Initialized LSCP client connection\n");
 		::lscp_client_set_timeout(_client, 1000);
 		lastInfo.valid = false;
+		return true;
 		//::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 	}
 	else
 	{
 		printf("Failed to Initialize LSCP client connection\n");
-		//
+		return false;
 	}
-	mutex.unlock();
 }/*}}}*/
 
 void LSClient::stopClient()/*{{{*/
@@ -119,22 +119,12 @@ void LSClient::stopClient()/*{{{*/
 		//TODO: create a list of subscribed events so we can reference it here and unsubscribe 
 		//to any subscribed event.
 		//if(_client->cmd->iState == 0)
-		try
-		{
 		//::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 		lastInfo.valid = false;
 		::lscp_client_destroy(_client);
-		}
-		catch(std::exception e)
-		{
-			printf("Error while shutting down LSCP client\n");
-		}
 
-		//if (!wait(1000))
-		//{
-			terminate();
-		//}
 	}
+	_client = NULL;
 }/*}}}*/
 
 /**
@@ -367,6 +357,14 @@ LSCPKeymap LSClient::getKeyMapping(QString fname, int nr)/*{{{*/
 	LSCPKeymap rv;
 	if(_client != NULL)
 	{
+		//Try to load the instrument into RAM on channel 0 so we can get the keymaps for the instrument
+		//Linuxsampler will not give key info until the gig is loaded into ram, we will retry 5 times
+		int retry = 0;
+		while(lscp_load_instrument(_client, fname.toUtf8().constData(), nr, 0) != LSCP_OK && retry < 5)
+		{
+			printf("Failed to preload instrument:\n %s into ram...retrying\n", fname.toUtf8().constData());
+		}
+
 		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", fname.toAscii().constData(), nr);
 		if (lscp_client_query(_client, query) == LSCP_OK)
 		{
@@ -416,7 +414,7 @@ LSCPKeymap LSClient::getKeyMapping(QString fname, int nr)/*{{{*/
  * Return a MidiInstrumentList of all the current instrument loaded into
  * linuxsampler
  */
-MidiInstrumentList* LSClient::getInstruments()
+MidiInstrumentList* LSClient::getInstruments()/*{{{*/
 {
 	if(_client != NULL)
 	{
@@ -451,7 +449,7 @@ MidiInstrumentList* LSClient::getInstruments()
 							PatchGroup *pg = 0;
 							for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
 							{
-								if((*pi)->name == fname)
+								if((*pi)->id == instr[in].bank)
 								{
 									pg = (PatchGroup*)*pi;
 								}
@@ -460,11 +458,13 @@ MidiInstrumentList* LSClient::getInstruments()
 							{
 								pg = new PatchGroup();
 								pg->name = fname;
+								pg->id = instr[in].bank;
 								pgl->push_back(pg);
 							}
+							
 							//Setup the patch
 							Patch* patch = new Patch;
-							patch->name = QString(insInfo->instrument_name);
+							patch->name = QString(insInfo->name);
 							patch->hbank = 0;
 							patch->lbank = instr[in].bank;
 							patch->prog = instr[in].prog;
@@ -473,18 +473,17 @@ MidiInstrumentList* LSClient::getInstruments()
 							LSCPKeymap kmap = getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr);
 							patch->keys = kmap.key_bindings;
 							patch->keyswitches = kmap.keyswitch_bindings;
-							PatchList pl = pg->patches;
-							pl.push_back(patch);
+							pg->patches.push_back(patch);
 						}
-						instruments->push_back(midiInstr);
 					}
+					instruments->push_back(midiInstr);
 				}
 			}
 			return instruments;
 		}
 	}
 	return 0;
-}
+}/*}}}*/
 
 /**
  * Lookup a midi map name by ID
@@ -531,7 +530,7 @@ QString LSClient::getValidInstrumentName(QString nameBase)/*{{{*/
 	{//Randomize the name
 		for (int i = 1;; ++i)
 		{
-			QString s = QString("%1-%1").arg(nameBase).arg(i);
+			QString s = QString("%1-%2").arg(nameBase).arg(i);
 			found = false;
 			for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 			{

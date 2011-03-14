@@ -27,7 +27,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="txtHost"/>
+      <widget class="QLineEdit" name="txtHost">
+       <property name="text">
+        <string>localhost</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QSpinBox" name="txtPort">
@@ -64,7 +68,7 @@
    <item>
     <widget class="QTableView" name="mapTable">
      <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
+      <set>QAbstractItemView::SelectedClicked</set>
      </property>
      <property name="alternatingRowColors">
       <bool>true</bool>

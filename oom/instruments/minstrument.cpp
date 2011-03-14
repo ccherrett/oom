@@ -617,7 +617,7 @@ void Patch::write(int level, Xml& xml)
 			if(i < (keys.size() - 1))
 				keyString.append(" ");
 		}
-		xml.put(" keys=\"%s\"", keyString.toUtf8().constData());
+		xml.nput(" keys=\"%s\"", keyString.toUtf8().constData());
 	}
 	if(!keyswitches.isEmpty())
 	{
@@ -628,7 +628,7 @@ void Patch::write(int level, Xml& xml)
 			if(i < (keyswitches.size() - 1))
 				keyString.append(" ");
 		}
-		xml.put(" keyswitches=\"%s\"", keyString.toUtf8().constData());
+		xml.nput(" keyswitches=\"%s\"", keyString.toUtf8().constData());
 	}
 	xml.put(" />");
 }
