@@ -300,6 +300,7 @@ void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 			}
 		}
 		audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, false, false);
+		song->update(SC_MIDI_CONTROLLER);
 		_pc.event = nevent;
 		emit drawSelectedProgram(_pc.event.tick(), true);
 	}
