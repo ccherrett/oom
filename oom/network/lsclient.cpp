@@ -368,11 +368,12 @@ LSCPKeymap LSClient::getKeyMapping(QString fname, int nr, QString engine)/*{{{*/
 			int adev =  ::lscp_get_audio_devices(_client);
 			if(adev != -1 && lscp_set_channel_audio_device(_client, chan, 0) == LSCP_OK)
 			{
-				sleep(1);
+				//sleep(1);
 				//Load instruments into your created channel
 				while(lscp_load_instrument(_client, fname.toUtf8().constData(), nr, chan) != LSCP_OK && retry < 5)
 				{
 					printf("Failed to preload instrument:\n %s into ram...retrying\n", fname.toUtf8().constData());
+					sleep(1);
 					++retry;
 				}
 				
