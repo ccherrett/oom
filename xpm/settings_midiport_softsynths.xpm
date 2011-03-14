@@ -1,5 +1,5 @@
 /* XPM */
-static char * settings_midiport_softsynths_xpm[] = {
+static const char * settings_midiport_softsynths_xpm[] = {
 "16 16 7 1",
 " 	c None",
 ".	c #818191",

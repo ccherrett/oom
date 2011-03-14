@@ -1,5 +1,5 @@
 /* XPM */
-static char * fluidsynth_logo_124x45_xpm[] = {
+static const char * fluidsynth_logo_124x45_xpm[] = {
 "124 45 2076 2",
 "  	c #11002E",
 ". 	c #201037",

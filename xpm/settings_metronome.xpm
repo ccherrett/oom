@@ -1,5 +1,5 @@
 /* XPM */
-static char * settings_metronome_xpm[] = {
+static const char * settings_metronome_xpm[] = {
 "16 16 1 1",
 " 	c None",
 "                ",

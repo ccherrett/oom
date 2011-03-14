@@ -1,5 +1,5 @@
 /* XPM */
-static char * oom_leftside_logo_xpm[] = {
+static const char * oom_leftside_logo_xpm[] = {
 "119 798 6304 2",
 "  	c None",
 ". 	c #00373F",

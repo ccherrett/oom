@@ -721,7 +721,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
         // Very first thing we should do is loading global configuration values
         tconfig().check_and_load_configuration();
 
-	loadTheme(config.style);
+	//loadTheme(config.style);
+	loadTheme("plastique");
 	QApplication::setFont(config.fonts[0]);
 	loadStyleSheetFile(config.styleSheetFile);
 

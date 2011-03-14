@@ -1,5 +1,5 @@
 /* XPM */
-static char * mixeraudioS_xpm[] = {
+static const char * mixeraudioS_xpm[] = {
 "16 16 4 1",
 " 	c None",
 ".	c #FF00FF",

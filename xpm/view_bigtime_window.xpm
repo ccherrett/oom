@@ -1,5 +1,5 @@
 /* XPM */
-static char * view_bigtime_window_xpm[] = {
+static const char * view_bigtime_window_xpm[] = {
 "16 16 157 2",
 "  	c None",
 ". 	c #C6AB7E",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * addtrack_audioinput_xpm[] = {
+static const char * addtrack_audioinput_xpm[] = {
 "16 16 3 1",
 " 	c None",
 ".	c #A3ABA3",

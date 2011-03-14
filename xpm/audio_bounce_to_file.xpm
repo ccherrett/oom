@@ -1,5 +1,5 @@
 /* XPM */
-static char * audio_bounce_to_file_xpm[] = {
+static const char * audio_bounce_to_file_xpm[] = {
 "16 16 153 2",
 "  	c None",
 ". 	c #366BBC",

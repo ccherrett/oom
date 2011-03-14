@@ -1,5 +1,5 @@
 /* XPM */
-static char * editcopyS_xpm[] = {
+static const char * editcopyS_xpm[] = {
 "16 16 111 2",
 "  	c None",
 ". 	c #4779C7",

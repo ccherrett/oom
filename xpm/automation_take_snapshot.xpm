@@ -1,5 +1,5 @@
 /* XPM */
-static char * automation_take_snapshot_xpm[] = {
+static const char * automation_take_snapshot_xpm[] = {
 "16 16 155 2",
 "  	c None",
 ". 	c #989898",

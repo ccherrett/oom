@@ -1,5 +1,5 @@
 /* XPM */
-static char * edit_wave_xpm[] = {
+static const char * edit_wave_xpm[] = {
 "16 16 101 2",
 "  	c None",
 ". 	c #FFFCF8",

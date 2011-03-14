@@ -1,5 +1,5 @@
 /* XPM */
-static char * rmark_xpm[] = {
+static const char * rmark_xpm[] = {
 "18 18 35 1",
 " 	c None",
 ".	c #349400",

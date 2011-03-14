@@ -1,5 +1,5 @@
 /* XPM */
-static char * midi_inputplugins_remote_control_xpm[] = {
+static const char * midi_inputplugins_remote_control_xpm[] = {
 "16 16 1 1",
 " 	c None",
 "                ",

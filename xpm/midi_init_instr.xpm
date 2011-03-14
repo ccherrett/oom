@@ -1,5 +1,5 @@
 /* XPM */
-static char * midi_init_instr_xpm[] = {
+static const char * midi_init_instr_xpm[] = {
 "16 16 117 2",
 "  	c None",
 ". 	c #AEC6E3",
