@@ -1,5 +1,5 @@
 /* XPM */
-static char * select_all_parts_on_track_xpm[] = {
+static const char * select_all_parts_on_track_xpm[] = {
 "16 16 9 1",
 " 	c None",
 ".	c #818191",

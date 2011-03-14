@@ -1,5 +1,5 @@
 /* XPM */
-static char * audio_restartaudio_xpm[] = {
+static const char * audio_restartaudio_xpm[] = {
 "16 16 126 2",
 "  	c None",
 ". 	c #FBDE91",

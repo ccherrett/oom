@@ -1,5 +1,5 @@
 /* XPM */
-static char * track_comment_xpm[] = {
+static const char * track_comment_xpm[] = {
 "14 12 123 2",
 "  	c None",
 ". 	c #FEDFB6",

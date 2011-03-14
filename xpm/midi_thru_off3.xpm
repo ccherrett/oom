@@ -1,5 +1,5 @@
 /* XPM */
-static char * midi_thru_off3_xpm[] = {
+static const char * midi_thru_off3_xpm[] = {
 "18 18 123 2",
 "  	c None",
 ". 	c #818191",

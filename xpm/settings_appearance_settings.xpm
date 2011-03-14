@@ -1,5 +1,5 @@
 /* XPM */
-static char * settings_appearance_settings_xpm[] = {
+static const char * settings_appearance_settings_xpm[] = {
 "16 16 204 2",
 "  	c None",
 ". 	c #35D10C",

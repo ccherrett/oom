@@ -1,5 +1,5 @@
 /* XPM */
-static char * view_mixer_xpm[] = {
+static const char * view_mixer_xpm[] = {
 "16 16 53 1",
 " 	c None",
 ".	c #ED2763",

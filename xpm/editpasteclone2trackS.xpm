@@ -1,5 +1,5 @@
 /* XPM */
-static char * editpasteclone2trackS_xpm[] = {
+static const char * editpasteclone2trackS_xpm[] = {
 "16 16 157 2",
 "  	c None",
 ". 	c #986320",

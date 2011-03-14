@@ -1,5 +1,5 @@
 /* XPM */
-static char * view_transport_window_xpm[] = {
+static const char * view_transport_window_xpm[] = {
 "16 16 104 2",
 "  	c None",
 ". 	c #AEC6E3",

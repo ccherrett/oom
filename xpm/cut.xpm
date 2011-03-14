@@ -1,5 +1,5 @@
 /* XPM */
-static char * cut_xpm[] = {
+static const char * cut_xpm[] = {
 "18 18 74 1",
 " 	c None",
 ".	c #3E7BA7",

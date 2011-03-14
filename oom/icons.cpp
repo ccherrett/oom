@@ -43,12 +43,13 @@
 #include "xpm/view_marker.xpm"
 #include "xpm/view_mixer.xpm"
 #include "xpm/view_transport_window.xpm"
-
+/*
 #include "xpm/pointer.xpm"
 #include "xpm/pencil.xpm"
 #include "xpm/delete.xpm"
 #include "xpm/play.xpm"
-
+*/
+/*
 #include "xpm/record1.xpm"
 #include "xpm/record.xpm"
 #include "xpm/record_on.xpm"
@@ -66,6 +67,7 @@
 #include "xpm/dot.xpm"
 #include "xpm/doth.xpm"
 #include "xpm/dot1.xpm"
+*/
 #include "xpm/note.xpm"
 #include "xpm/note1.xpm"
 #include "xpm/stick.xpm"
@@ -74,10 +76,10 @@
 #include "xpm/cmark.xpm"
 #include "xpm/lmark.xpm"
 #include "xpm/rmark.xpm"
-#include "xpm/cut.xpm"
-#include "xpm/steprec.xpm"
-#include "xpm/glue.xpm"
-#include "xpm/draw.xpm"
+//#include "xpm/cut.xpm"
+//#include "xpm/steprec.xpm"
+//#include "xpm/glue.xpm"
+//#include "xpm/draw.xpm"
 #include "xpm/quant.xpm"
 #include "xpm/fileprint.xpm"
 #include "xpm/filesave.xpm"
@@ -95,14 +97,14 @@
 #include "xpm/forward.xpm"
 
 // #include "xpm/mute.xpm"
-#include "xpm/solobutton_on.xpm"
-#include "xpm/solobutton_off.xpm"
-#include "xpm/solobutton_on_blksq.xpm"
-#include "xpm/solobutton_off_blksq.xpm"
-#include "xpm/mutebutton_on.xpm"
-#include "xpm/mutebutton_off.xpm"
-#include "xpm/rec_echo_on.xpm"
-#include "xpm/rec_echo_off.xpm"
+//#include "xpm/solobutton_on.xpm"
+//#include "xpm/solobutton_off.xpm"
+//#include "xpm/solobutton_on_blksq.xpm"
+//#include "xpm/solobutton_off_blksq.xpm"
+//#include "xpm/mutebutton_on.xpm"
+//#include "xpm/mutebutton_off.xpm"
+//#include "xpm/rec_echo_on.xpm"
+//#include "xpm/rec_echo_off.xpm"
 
 #include "xpm/up.xpm"
 #include "xpm/down.xpm"
@@ -132,7 +134,7 @@
 #include "xpm/editcutS.xpm"
 #include "xpm/editcopyS.xpm"
 #include "xpm/editpasteS.xpm"
-#include "xpm/editmute.xpm"
+//#include "xpm/editmute.xpm"
 #include "xpm/editmuteS.xpm"
 #include "xpm/editpastecloneS.xpm"
 #include "xpm/editpaste2trackS.xpm"
@@ -146,17 +148,17 @@
 #include "xpm/editpaste2track.xpm"
 #include "xpm/editpasteclone2track.xpm"
 */
-#include "xpm/speaker.xpm"
+//#include "xpm/speaker.xpm"
 #include "xpm/buttondown.xpm"
 #include "xpm/configure.xpm"
-#include "xpm/panic.xpm"
+//#include "xpm/panic.xpm"
 
 
 // next two lines will vanish soon
 #include "xpm/solobutton.xpm"
 #include "xpm/newmutebutton.xpm"
-#include "xpm/exit.xpm"
-#include "xpm/exit1.xpm"
+//#include "xpm/exit.xpm"
+//#include "xpm/exit1.xpm"
 
 #include "xpm/redled.xpm"
 #include "xpm/darkredled.xpm"
@@ -211,8 +213,8 @@
 //#include "xpm/select_invert_selection.xpm"
 #include "xpm/select_outside_loop.xpm"
 
-#include "xpm/mono.xpm"
-#include "xpm/stereo.xpm"
+//#include "xpm/mono.xpm"
+//#include "xpm/stereo.xpm"
 #include "xpm/oom_icon.xpm"
 //#include "xpm/about_oom.xpm"
 //#include "xpm/oom_leftside_logo.xpm"

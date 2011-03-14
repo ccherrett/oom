@@ -1,5 +1,5 @@
 /* XPM */
-static char * automation_mixer_xpm[] = {
+static const char * automation_mixer_xpm[] = {
 "16 16 61 1",
 " 	c None",
 ".	c #F44548",

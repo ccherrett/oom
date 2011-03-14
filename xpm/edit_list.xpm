@@ -1,5 +1,5 @@
 /* XPM */
-static char * edit_list_xpm[] = {
+static const char * edit_list_xpm[] = {
 "16 16 25 1",
 " 	c None",
 ".	c #60606F",
