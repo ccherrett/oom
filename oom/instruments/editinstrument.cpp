@@ -50,38 +50,11 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	toolBar->addAction(QWhatsThis::createAction(this));
 	Help->addAction(QWhatsThis::createAction(this));
 
-	// populate instrument list
-	// Populate common controller list.
-	for (int i = 0; i < 128; ++i)
-	{
-		QListWidgetItem *lci = new QListWidgetItem(midiCtrlName(i));
-		listController->addItem(lci);
-	}
-	oldMidiInstrument = 0;
-	oldPatchItem = 0;
-	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
-	{
-		// Imperfect, crude way of ignoring internal instruments, soft synths etc. If it has a gui,
-		//  it must be an internal instrument. But this will still allow some vst instruments (without a gui)
-		//  to show up in the list.
-		// Hmm, try file path instead...
-		//if((*i)->hasGui())
-		if ((*i)->filePath().isEmpty())
-			continue;
 
-		QListWidgetItem* item = new QListWidgetItem((*i)->iname());
-		QVariant v = qVariantFromValue((void*) (*i));
-		item->setData(Qt::UserRole, v);
-		instrumentList->addItem(item);
-	}
-	instrumentList->setSelectionMode(QAbstractItemView::SingleSelection);
-	if (instrumentList->item(0))
-		instrumentList->setCurrentItem(instrumentList->item(0));
-
+	populateInstruments();
 	connect(instrumentList, SIGNAL(itemSelectionChanged()), SLOT(instrumentChanged()));
 	connect(patchView, SIGNAL(itemSelectionChanged()), SLOT(patchChanged()));
 
-	changeInstrument();
 
 	connect(viewController, SIGNAL(itemSelectionChanged()), SLOT(controllerChanged()));
 
@@ -114,8 +87,66 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	connect(nullParamSpinBoxL, SIGNAL(valueChanged(int)), SLOT(ctrlNullParamLChanged(int)));
 
 	connect(tabWidget3, SIGNAL(currentChanged(QWidget*)), SLOT(tabChanged(QWidget*)));
+	//disable this until we find LSCP_SUPPORT
+	btnImport->setEnabled(false);
+#ifdef LSCP_SUPPORT
+	import = 0;
+	printf("Found LSCP SUPPORT in EditInstrument 111111111111111111111111111111111111\n");
+	btnImport->setEnabled(true);
+	connect(btnImport, SIGNAL(clicked(bool)), SLOT(btnImportClicked(bool)));
+#endif
 }
 
+void EditInstrument::populateInstruments()
+{
+	//Make sure all the lists are clear since this can be called at anytime
+	listController->blockSignals(true);
+	instrumentList->blockSignals(true);
+	listController->clear();
+	instrumentList->clear();
+	// populate instrument list/*{{{*/
+	// Populate common controller list.
+	for (int i = 0; i < 128; ++i)
+	{
+		QListWidgetItem *lci = new QListWidgetItem(midiCtrlName(i));
+		listController->addItem(lci);
+	}
+	oldMidiInstrument = 0;
+	oldPatchItem = 0;
+	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+	{
+		// Imperfect, crude way of ignoring internal instruments, soft synths etc. If it has a gui,
+		//  it must be an internal instrument. But this will still allow some vst instruments (without a gui)
+		//  to show up in the list.
+		// Hmm, try file path instead...
+		//if((*i)->hasGui())
+		if ((*i)->filePath().isEmpty())
+			continue;
+
+		QListWidgetItem* item = new QListWidgetItem((*i)->iname());
+		QVariant v = qVariantFromValue((void*) (*i));
+		item->setData(Qt::UserRole, v);
+		instrumentList->addItem(item);
+	}
+	instrumentList->setSelectionMode(QAbstractItemView::SingleSelection);
+	listController->blockSignals(false);
+	instrumentList->blockSignals(false);
+	if (instrumentList->item(0))
+		instrumentList->setCurrentItem(instrumentList->item(0));/*}}}*/
+	changeInstrument();
+}
+
+#ifdef LSCP_SUPPORT
+void EditInstrument::btnImportClicked(bool)
+{
+	if(!import)
+	{
+		import = new LSCPImport(this);
+		connect(import, SIGNAL(instrumentsImported()), SLOT(populateInstruments()));
+	}
+	import->show();
+}
+#endif
 //---------------------------------------------------------
 //   helpWhatsThis
 //---------------------------------------------------------

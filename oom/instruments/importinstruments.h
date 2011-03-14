@@ -16,6 +16,7 @@ class QStandardItemModel;
 class LSCPImport : public QDialog, public Ui::LSCPInstrumentBase
 {
 	Q_OBJECT
+	void updateTableHeader();
 public:
 	LSCPImport(QWidget* parent);
 private slots:
@@ -23,6 +24,8 @@ private slots:
 	void btnRefreshClicked(bool);
 	void btnImportClicked(bool);
 	void btnCloseClicked(bool);
+signals:
+	void instrumentsImported();
 private:
 	QStandardItemModel* _mapModel;
 };

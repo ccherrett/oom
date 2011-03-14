@@ -12,6 +12,10 @@
 #include "ui_editinstrumentbase.h"
 #include "minstrument.h"
 #include "midictrl.h"
+#include "config.h"
+#ifdef LSCP_SUPPORT
+#include "importinstruments.h"
+#endif
 
 class QDialog;
 class QMenu;
@@ -45,6 +49,10 @@ class EditInstrument : public QMainWindow, public Ui::EditInstrumentBase
     void setDefaultPatchControls(int);
     QString getPatchName(int);
     void deleteInstrument(QListWidgetItem*);
+		
+#ifdef LSCP_SUPPORT
+	LSCPImport* import;
+#endif
     ///QMenu* patchpopup;
 
 private slots:
@@ -78,11 +86,15 @@ private slots:
     void ctrlMinChanged(int);
     void ctrlMaxChanged(int);
     void ctrlDefaultChanged(int);
+	void populateInstruments();
     //void sysexChanged();
     //void deleteSysexClicked();
     //void newSysexClicked();
     void ctrlNullParamHChanged(int);
     void ctrlNullParamLChanged(int);
+#ifdef LSCP_SUPPORT
+	void btnImportClicked(bool);
+#endif
 
 public:
     EditInstrument(QWidget* parent = 0, Qt::WFlags fl = Qt::Window);
