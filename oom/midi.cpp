@@ -1710,11 +1710,15 @@ void Audio::preloadControllers()/*{{{*/
 		int port = track->outPort();
 		int channel = track->outChannel();
 		int defaultPort = port;
-	
+
 		MidiDevice* md = midiPorts[port].device();
+		if (!md)
+		{
+			continue;
+		}
 		MPEventList* playEvents = md->playEvents();
 		playEvents->erase(playEvents->begin(), playEvents->end());
-	
+
 		PartList* pl = track->parts();
 		for (iPart p = pl->begin(); p != pl->end(); ++p)
 		{
@@ -1723,13 +1727,13 @@ void Audio::preloadControllers()/*{{{*/
 			unsigned partTick = part->tick();
 			//unsigned partLen = part->lenTick();
 			int delay = track->delay;
-	
+
 			unsigned offset = delay + partTick;
-	
+
 			for (iEvent ie = events->begin(); ie != events->end(); ++ie)
 			{
 				Event ev = ie->second;
-				port = defaultPort; 
+				port = defaultPort;
 				unsigned tick = ev.tick() + offset;
 				//unsigned frame = tempomap.tick2frame(tick) + frameOffset;
 				switch (ev.dataA())
