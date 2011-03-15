@@ -492,7 +492,7 @@ void PCScale::copySelected()/*{{{*/
 			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
 			_pc.part->setLenTick(endTick);
 		}
-		_pc.part->addEvent(nevent);
+		song->recordEvent((MidiTrack*)_pc.part->track(), nevent);
 		update();
 	}
 }/*}}}*/
