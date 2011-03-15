@@ -347,7 +347,7 @@ void LSClient::customEvent(QEvent* event)/*{{{*/
  * @param fname QString The string filename of the gig file
  * @param nr int The location in the file of the given instrument
  */
-LSCPKeymap LSClient::getKeyMapping(QString fname, int nr, QString engine)/*{{{*/
+LSCPKeymap LSClient::getKeyMapping(QString fname, int nr, int chan)/*{{{*/
 {
 	//printf("Starting key binding processing\n");
 	QList<int> keys;
@@ -361,83 +361,72 @@ LSCPKeymap LSClient::getKeyMapping(QString fname, int nr, QString engine)/*{{{*/
 		//Try to load the instrument into RAM on channel 0 so we can get the keymaps for the instrument
 		//Linuxsampler will not give key info until the gig is loaded into ram, we will retry 5 times
 		int retry = 0;
-		//Create a channel
-		int chan = ::lscp_add_channel(_client);
-		if(chan >= 0 && lscp_load_engine(_client, engine.toUtf8().constData(), chan) == LSCP_OK)
+		//Load instruments into your created channel
+		while(lscp_load_instrument(_client, fname.toUtf8().constData(), nr, chan) != LSCP_OK && retry < 5)
 		{
-			//Get audio channels
-			int adev =  ::lscp_get_audio_devices(_client);
-			if(adev != -1 && lscp_set_channel_audio_device(_client, chan, 0) == LSCP_OK)
-			{
-				//sleep(1);
-				//Load instruments into your created channel
-				while(lscp_load_instrument(_client, fname.toUtf8().constData(), nr, chan) != LSCP_OK && retry < 5)
-				{
-					printf("Failed to preload instrument:\n %s into ram...retrying\n", fname.toUtf8().constData());
-					sleep(1);
-					++retry;
-				}
-				
-				//We need to sleep a bit here to give LS time to load the gig
-				sleep(1);
+			printf("Failed to preload instrument:\n %s into ram...retrying\n", fname.toUtf8().constData());
+			sleep(1);
+			++retry;
+		}
+		
+		//We need to sleep a bit here to give LS time to load the gig
+		sleep(1);
+		int tries = 0;
 again:
-				sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", fname.toAscii().constData(), nr);
-				if (lscp_client_query(_client, query) == LSCP_OK)
+		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", fname.toAscii().constData(), nr);
+		if (lscp_client_query(_client, query) == LSCP_OK)
+		{
+			const char* ret = lscp_client_get_result(_client);
+			QString values(ret);
+			printf("Server Returned:\n %s\n", ret);
+			QStringList arrayVal = values.split("\r\n", QString::SkipEmptyParts);
+			QStringListIterator vIter(arrayVal);
+			bool found = false;
+			while(vIter.hasNext())
+			{
+				QString i = vIter.next().trimmed();
+				if(i.startsWith(keyStr, Qt::CaseSensitive))
 				{
-					const char* ret = lscp_client_get_result(_client);
-					QString values(ret);
-					printf("Server Returned:\n %s\n", ret);
-					QStringList arrayVal = values.split("\r\n", QString::SkipEmptyParts);
-					QStringListIterator vIter(arrayVal);
-					bool found = false;
-					while(vIter.hasNext())
+					found = true;
+					i = i.replace(keyStr, "").trimmed();
+					if(i.contains(","))
 					{
-						QString i = vIter.next().trimmed();
-						if(i.startsWith(keyStr, Qt::CaseSensitive))
+						QStringList sl = i.split(",", QString::SkipEmptyParts);
+						QStringListIterator iter(sl);
+						while(iter.hasNext())
 						{
-							found = true;
-							i = i.replace(keyStr, "").trimmed();
-							if(i.contains(","))
-							{
-								QStringList sl = i.split(",", QString::SkipEmptyParts);
-								QStringListIterator iter(sl);
-								while(iter.hasNext())
-								{
-									keys.append(iter.next().toInt());
-								}
-								rv.key_bindings = keys;
-							}
+							keys.append(iter.next().toInt());
 						}
-						else if(i.startsWith(keySwitchStr, Qt::CaseSensitive))
-						{
-							found = true;
-							i = i.replace(keyStr, "").trimmed();
-							i = i.replace(keySwitchStr, "").trimmed();
-							if(i.contains(","))
-							{
-								QStringList sl = i.split(",", QString::SkipEmptyParts);
-								QStringListIterator iter(sl);
-								while(iter.hasNext())
-								{
-									switched.append(iter.next().toInt());
-								}
-								rv.keyswitch_bindings = switched;
-							}
-						}
+						rv.key_bindings = keys;
 					}
-					if(!found)
-						goto again; //I cant believe i'm doing this, ick!!
-				}//END query check
-				else
+				}
+				else if(i.startsWith(keySwitchStr, Qt::CaseSensitive))
 				{
-					printf("Failed to lookup instrument file info\n");
+					found = true;
+					i = i.replace(keyStr, "").trimmed();
+					i = i.replace(keySwitchStr, "").trimmed();
+					if(i.contains(","))
+					{
+						QStringList sl = i.split(",", QString::SkipEmptyParts);
+						QStringListIterator iter(sl);
+						while(iter.hasNext())
+						{
+							switched.append(iter.next().toInt());
+						}
+						rv.keyswitch_bindings = switched;
+					}
 				}
 			}
-			//Flush the disk streams used by the channel created
-			::lscp_reset_channel(_client, chan);
-			//Finally remove the channel
-			::lscp_remove_channel(_client, chan);
-		}//END channel check
+			if(!found && tries < 3)
+			{
+				++tries;
+				goto again; //I cant believe i'm doing this, ick!!
+			}
+		}//END query check
+		else
+		{
+			printf("Failed to lookup instrument file info\n");
+		}
 	}//END client NULL check
 	return rv;
 }/*}}}*/
@@ -454,70 +443,88 @@ MidiInstrumentList* LSClient::getInstruments()/*{{{*/
 		if(maps != NULL)
 		{
 			MidiInstrumentList* instruments = new MidiInstrumentList;
-			for(int m = 0; maps[m] >= 0; ++m)
+			//Create a channel
+			int chan = ::lscp_add_channel(_client);
+			if(chan >= 0 && lscp_load_engine(_client, "GIG", chan) == LSCP_OK)
 			{
-				QString mapName = getMapName(maps[m]);
-				if(!mapName.isEmpty())
+				//Get audio channels
+				int adev =  ::lscp_get_audio_devices(_client);
+				if(adev != -1 && lscp_set_channel_audio_device(_client, chan, 0) == LSCP_OK)
 				{
-					QString insName(getValidInstrumentName(mapName));
-					MidiInstrument *midiInstr = new MidiInstrument(insName);
-					QString path = oomUserInstruments;
-					path += QString("/%1.idf").arg(insName);
-					midiInstr->setFilePath(path);
-					PatchGroupList *pgl = midiInstr->groups();
-					lscp_midi_instrument_t* instr = ::lscp_list_midi_instruments(_client, maps[m]);
-					for (int in = 0; instr && instr[in].map >= 0; ++in)
+					for(int m = 0; maps[m] >= 0; ++m)
 					{
-						lscp_midi_instrument_t tmp;
-						tmp.map = instr[in].map;
-						tmp.bank = instr[in].bank;
-						tmp.prog = instr[in].prog;
-						lscp_midi_instrument_info_t* insInfo = ::lscp_get_midi_instrument_info(_client, &tmp);
-						if(insInfo != NULL)
+						QString mapName = getMapName(maps[m]);
+						if(!mapName.isEmpty())
 						{
-							QString ifname(insInfo->instrument_file);
-							QFileInfo finfo(ifname);
-							QString fname = stripAscii(finfo.baseName());//.simplified();
-							//Strip it again to be sure
-							fname = stripAscii(fname);
-							PatchGroup *pg = 0;
-							for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
+							QString insName(getValidInstrumentName(mapName));
+							MidiInstrument *midiInstr = new MidiInstrument(insName);
+							QString path = oomUserInstruments;
+							path += QString("/%1.idf").arg(insName);
+							midiInstr->setFilePath(path);
+							PatchGroupList *pgl = midiInstr->groups();
+							lscp_midi_instrument_t* instr = ::lscp_list_midi_instruments(_client, maps[m]);
+							for (int in = 0; instr && instr[in].map >= 0; ++in)
 							{
-								if((*pi)->id == instr[in].bank)
+								lscp_midi_instrument_t tmp;
+								tmp.map = instr[in].map;
+								tmp.bank = instr[in].bank;
+								tmp.prog = instr[in].prog;
+								lscp_midi_instrument_info_t* insInfo = ::lscp_get_midi_instrument_info(_client, &tmp);
+								if(insInfo != NULL)
 								{
-									pg = (PatchGroup*)*pi;
+									QString ifname(insInfo->instrument_file);
+									QFileInfo finfo(ifname);
+									QString fname = stripAscii(finfo.baseName()).simplified();
+									//Strip it again to be sure
+									fname = stripAscii(fname);
+									PatchGroup *pg = 0;
+									for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
+									{
+										if((*pi)->id == instr[in].bank)
+										{
+											pg = (PatchGroup*)*pi;
+										}
+									}
+									if(!pg)
+									{
+										pg = new PatchGroup();
+										pg->name = fname;
+										pg->id = instr[in].bank;
+										pgl->push_back(pg);
+									}
+									
+									QString patchName(insInfo->instrument_name);
+									if(patchName.isEmpty())
+										patchName = QString(insInfo->name);
+									//Setup the patch
+									Patch* patch = new Patch;
+									patch->name = patchName;
+									patch->hbank = 0;
+									patch->lbank = instr[in].bank;
+									patch->prog = instr[in].prog;
+									patch->typ = -1;
+									patch->drum = false;
+									if(lscp_load_engine(_client, insInfo->engine_name, chan) == LSCP_OK)
+									{
+										LSCPKeymap kmap = getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr, chan);
+										patch->keys = kmap.key_bindings;
+										patch->keyswitches = kmap.keyswitch_bindings;
+									}
+									pg->patches.push_back(patch);
 								}
 							}
-							if(!pg)
-							{
-								pg = new PatchGroup();
-								pg->name = fname;
-								pg->id = instr[in].bank;
-								pgl->push_back(pg);
-							}
-							
-							QString patchName(insInfo->instrument_name);
-							if(patchName.isEmpty())
-								patchName = QString(insInfo->name);
-							//Setup the patch
-							Patch* patch = new Patch;
-							patch->name = patchName;
-							patch->hbank = 0;
-							patch->lbank = instr[in].bank;
-							patch->prog = instr[in].prog;
-							patch->typ = -1;
-							patch->drum = false;
-							LSCPKeymap kmap = getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr, QString(insInfo->engine_name));
-							patch->keys = kmap.key_bindings;
-							patch->keyswitches = kmap.keyswitch_bindings;
-							pg->patches.push_back(patch);
-						}
-					}
-					instruments->push_back(midiInstr);
-				}
-			}
+							instruments->push_back(midiInstr);
+							//Flush the disk streams used by the channel created
+							::lscp_reset_channel(_client, chan);
+							sleep(5);
+						}//END if(mapName.isEmpty)
+					}//END for
+				}//end load audio dev
+			}//end create channel
+			//Finally remove the channel
+			::lscp_remove_channel(_client, chan);
 			return instruments;
-		}
+		}//end maps
 	}
 	return 0;
 }/*}}}*/
