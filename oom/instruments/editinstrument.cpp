@@ -91,7 +91,6 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	btnImport->setEnabled(false);
 #ifdef LSCP_SUPPORT
 	import = 0;
-	printf("Found LSCP SUPPORT in EditInstrument 111111111111111111111111111111111111\n");
 	btnImport->setEnabled(true);
 	connect(btnImport, SIGNAL(clicked(bool)), SLOT(btnImportClicked(bool)));
 #endif

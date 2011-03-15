@@ -70,6 +70,7 @@ private:
 	QWaitCondition condition;
 	LSCPChannelInfo lastInfo;
 	LSCPKeymap getKeyMapping(QString, int, QString);
+	QString stripAscii(QString);
 
 protected:
 	void run();

@@ -12,6 +12,7 @@
 #include <QCoreApplication>
 #include <QTimer>
 #include <QFileInfo>
+#include <QRegExp>
 
 LSClient::LSClient(const char* host, int p, QObject* parent) : QThread(parent)
 {
@@ -476,7 +477,9 @@ MidiInstrumentList* LSClient::getInstruments()/*{{{*/
 						{
 							QString ifname(insInfo->instrument_file);
 							QFileInfo finfo(ifname);
-							QString fname = finfo.baseName().simplified().replace(" ", "_");
+							QString fname = stripAscii(finfo.baseName());//.simplified();
+							//Strip it again to be sure
+							fname = stripAscii(fname);
 							PatchGroup *pg = 0;
 							for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
 							{
@@ -582,4 +585,52 @@ QString LSClient::getValidInstrumentName(QString nameBase)/*{{{*/
 	}
 
 }/*}}}*/
+//The following routines is borrowed from the qSampler project
+
+static int _hexToNumber(char hex_digit) {
+    switch (hex_digit) {
+        case '0': return 0;
+        case '1': return 1;
+        case '2': return 2;
+        case '3': return 3;
+        case '4': return 4;
+        case '5': return 5;
+        case '6': return 6;
+        case '7': return 7;
+        case '8': return 8;
+        case '9': return 9;
+
+        case 'a': return 10;
+        case 'b': return 11;
+        case 'c': return 12;
+        case 'd': return 13;
+        case 'e': return 14;
+        case 'f': return 15;
+
+        case 'A': return 10;
+        case 'B': return 11;
+        case 'C': return 12;
+        case 'D': return 13;
+        case 'E': return 14;
+        case 'F': return 15;
+
+        default:  return 0;
+    }
+}
+
+static int _hexsToNumber(char hex_digit0, char hex_digit1) {
+    return _hexToNumber(hex_digit1)*16 + _hexToNumber(hex_digit0);
+}
+QString LSClient::stripAscii(QString str)
+{
+	QRegExp regexp(QRegExp::escape("\\x") + "[0-9a-fA-F][0-9a-fA-F]");
+	for (int i = str.indexOf(regexp); i >= 0; i = str.indexOf(regexp, i + 4))
+	{
+		const QString hexVal = str.mid(i+2, 2).toLower();
+		char asciiTxt = _hexsToNumber(hexVal.at(1).toLatin1(), hexVal.at(0).toLatin1());
+		str.replace(i, 4, asciiTxt);
+	}
+	return str;
+}
+//EnD qSampler
 #endif
