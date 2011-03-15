@@ -145,10 +145,11 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 		setCursor(QCursor(Qt::ArrowCursor));
 
 	int x = event->x();
-//	x = AL::sigmap.raster(x, *raster);
 	if (x < 0)
+	{
 		x = 0;
-	//printf("PCScale::viewMouseMoveEvent\n");
+	}
+
 	int i;
 	switch (button)
 	{
@@ -239,6 +240,12 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	{ // If LMB select the program change
 		if (selectProgramChange(x))
 		{
+			audio->msgDeleteEvent(_pc.event, _pc.part, true, true, false);
+			update();
+
+			Event nevent = _pc.event.clone();
+			_pc.event = nevent;
+
 			_pc.state = movingController;
 			return;
 		}
@@ -257,6 +264,32 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 
 void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 {
+
+	if(_pc.valid && _pc.state == movingController && _pc.part && button == Qt::LeftButton)
+	{
+		int x = event->x();
+		x = AL::sigmap.raster(x, *raster);
+		if (x < 0)
+		{
+			x = 0;
+		}
+
+		if((unsigned int)x >= _pc.part->tick())
+		{
+			int diff = _pc.event.tick() - _pc.part->lenTick();
+			if (diff > 0)
+			{// too short part? extend it
+				int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
+				_pc.part->setLenTick(endTick);
+				if(song->len() <= (unsigned int)endTick)
+				{
+					song->setLen((unsigned int)endTick);
+				}
+			}
+			audio->msgAddEvent(_pc.event, _pc.part, true, false, false);
+		}
+	}
+
 	//Deselect the PC only if was a end of move
 	if(button == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier))
 	{
@@ -267,6 +300,8 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 			emit drawSelectedProgram(-1, false);
 		}
 	}
+
+
 	button = Qt::NoButton;
 	update();
 }
@@ -287,9 +322,8 @@ void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 		//int tick = pc.event.tick() + pc.part->tick();
 		if((unsigned int)x < _pc.part->tick())
 			return;
-		Event nevent = _pc.event.clone();
-		nevent.setTick(x);
-		int diff = nevent.tick() - _pc.part->lenTick();
+		_pc.event.setTick(x);
+		int diff = _pc.event.tick() - _pc.part->lenTick();
 		if (diff > 0)
 		{// too short part? extend it
 			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
@@ -299,10 +333,8 @@ void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 				song->setLen((unsigned int)endTick);
 			}
 		}
-		audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, false, false);
-		song->update(SC_MIDI_CONTROLLER);
-		_pc.event = nevent;
 		emit drawSelectedProgram(_pc.event.tick(), true);
+		update();
 	}
 }/*}}}*/
 
@@ -471,7 +503,16 @@ void PCScale::copySelected()/*{{{*/
 void PCScale::pdraw(QPainter& p, const QRect& r)/*{{{*/
 {
 	if (waveMode)
+	{
 		return;
+	}
+
+	Part* curPart = currentEditor->curCanvasPart();
+	if (!curPart)
+	{
+		return;
+	}
+
 	int x = r.x();
 	int w = r.width();
 
@@ -488,82 +529,72 @@ void PCScale::pdraw(QPainter& p, const QRect& r)/*{{{*/
 	p.drawLine(r.x(), y + 1, r.x() + r.width(), y + 1);
 	QRect tr(r);
 	tr.setHeight(12);
-	Track* track = song->findTrack(currentEditor->curCanvasPart());
-	PartList* parts = track->parts();
-	for (iPart m = parts->begin(); m != parts->end(); ++m)
+
+
+	QList<Event> pcEvents;
+	EventList* eventList = curPart->events();
+	for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
 	{
-		Part* mprt = m->second;
-		EventList* eventList = mprt->events();
-		for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+		//Get event type.
+		Event pcevt = evt->second;
+		if (!pcevt.isNote() && pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
 		{
-			//Get event type.
-			Event pcevt = evt->second;
-			if (!pcevt.isNote())
+			pcEvents.append(pcevt);
+		}
+	}
+
+	if (_pc.valid)
+	{
+		printf("adding active pc\n");
+		pcEvents.append(_pc.event);
+	}
+
+	foreach(Event pcevt, pcEvents)
+	{
+		int xp = mapx(pcevt.tick() + curPart->tick());
+		if (xp > x + w)
+		{
+			//printf("Its dying from greater than bar size\n");
+			break;
+		}
+		int xe = r.x() + r.width();
+//		iEvent mm = evt;
+//		++mm;
+
+		QRect tr(xp, 0, xe - xp, 13);
+
+		QRect wr = r.intersect(tr);
+		if (!wr.isEmpty())
+		{
+			int x2;
+//			if (mm != eventList->end())
+//			{
+				x2 = mapx(pcevt.tick() + curPart->tick());
+//			}
+//			else
+//				x2 = xp + 200;
+
+			//printf("PCScale::pdraw marker %s xp:%d y:%d h:%d r.x:%d r.w:%d\n", "Test Debug", xp, height(), y, r.x(), r.width());
+
+			// Must be reasonable about very low negative x values! With long songs > 15min
+			//  and with high horizontal magnification, 'ghost' drawings appeared,
+			//  apparently the result of truncation later (xp = -65006 caused ghosting
+			//  at bar 245 with magnification at max.), even with correct clipping region
+			//  applied to painter in View::paint(). Tim.  Apr 5 2009
+			// Quote: "Warning: Note that QPainter does not attempt to work around
+			//  coordinate limitations in the underlying window system. Some platforms may
+			//  behave incorrectly with coordinates as small as +/-4000."
+			if (xp >= -32)
 			{
-				if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+				if(_pc.valid && _pc.event == pcevt)
 				{
-					int xp = mapx(pcevt.tick() + mprt->tick());
-					if (xp > x + w)
-					{
-						//printf("Its dying from greater than bar size\n");
-						break;
-					}
-					int xe = r.x() + r.width();
-					iEvent mm = evt;
-					++mm;
-
-					QRect tr(xp, 0, xe - xp, 13);
-
-					QRect wr = r.intersect(tr);
-					if (!wr.isEmpty())
-					{
-						int x2;
-						if (mm != eventList->end())
-						{
-							x2 = mapx(pcevt.tick() + mprt->tick());
-						}
-						else
-							x2 = xp + 200;
-
-						//printf("PCScale::pdraw marker %s xp:%d y:%d h:%d r.x:%d r.w:%d\n", "Test Debug", xp, height(), y, r.x(), r.width());
-
-						// Must be reasonable about very low negative x values! With long songs > 15min
-						//  and with high horizontal magnification, 'ghost' drawings appeared,
-						//  apparently the result of truncation later (xp = -65006 caused ghosting
-						//  at bar 245 with magnification at max.), even with correct clipping region
-						//  applied to painter in View::paint(). Tim.  Apr 5 2009
-						// Quote: "Warning: Note that QPainter does not attempt to work around
-						//  coordinate limitations in the underlying window system. Some platforms may
-						//  behave incorrectly with coordinates as small as +/-4000."
-						if (xp >= -32)
-						{
-							if(_pc.valid && _pc.event == pcevt)
-							{
-								p.drawPixmap(xp, 0, *flagIconSPSel);
-							}
-							else
-							{
-								p.drawPixmap(xp, 0, *flagIconSP);
-							}
-						}
-
-						//	if(xp >= -1023)
-						//	{
-						//		QRect r = QRect(xp+10, 0, x2-xp, 12);
-						//		p.setPen(Qt::black);
-						//		//Use the program change info as name
-						//		p.drawText(r, Qt::AlignLeft|Qt::AlignVCenter, "Test"/*pcevt.name()*/);
-						//	}
-
-						//Andrew Commenting this line to test the new flag
-						//if(xp >= 0)
-						//{
-						//	p.setPen(Qt::red);
-						//	p.drawLine(xp, y, xp, height());
-						//}
-					}//END if(wr.isEmpty)
-				}//END if(CTRL_PROGRAM)
-			}//END if(!isNote)
+					p.drawPixmap(xp, 0, *flagIconSPSel);
+				}
+				else
+				{
+					p.drawPixmap(xp, 0, *flagIconSP);
+				}
+			}
 		}
 	}
 }/*}}}*/
