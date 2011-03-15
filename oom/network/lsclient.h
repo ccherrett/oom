@@ -54,7 +54,7 @@ public:
 	void stopClient();
 	bool startClient();
 	int getError();
-	MidiInstrumentList* getInstruments(QList<int>);
+	MidiInstrumentList* getInstruments(QList<int>, int retries = 5, int timeout = 1);
 	QMap<int, QString> listInstruments();
 	MidiInstrument* getInstrument(QString);
 	QString getValidInstrumentName(QString nameBase);
@@ -70,9 +70,9 @@ private:
 	bool _abort;
 	QMutex mutex;
 	QWaitCondition condition;
-	LSCPChannelInfo lastInfo;
-	LSCPKeymap getKeyMapping(QString, int, int);
-	QString stripAscii(QString);
+	LSCPChannelInfo _lastInfo;
+	LSCPKeymap _getKeyMapping(QString, int, int, int, int);
+	QString _stripAscii(QString);
 
 protected:
 	void run();

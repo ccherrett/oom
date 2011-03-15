@@ -104,7 +104,7 @@ bool LSClient::startClient()/*{{{*/
 	{
 		printf("Initialized LSCP client connection\n");
 		::lscp_client_set_timeout(_client, 1000);
-		lastInfo.valid = false;
+		_lastInfo.valid = false;
 		return true;
 		//::lscp_client_subscribe(_client, LSCP_EVENT_CHANNEL_INFO);
 	}
@@ -123,7 +123,7 @@ void LSClient::stopClient()/*{{{*/
 		//to any subscribed event.
 		//if(_client->cmd->iState == 0)
 		//::lscp_client_unsubscribe(_client, LSCP_EVENT_CHANNEL_INFO);
-		lastInfo.valid = false;
+		_lastInfo.valid = false;
 		::lscp_client_destroy(_client);
 
 	}
@@ -326,12 +326,12 @@ void LSClient::customEvent(QEvent* event)/*{{{*/
 						LSCPChannelInfo info = getKeyBindings(chanInfo);
 						if(info.valid)
 						{
-							if(!compare(lastInfo, info))
+							if(!compare(_lastInfo, info))
 							{
 								emit channelInfoChanged(info);
-								lastInfo = info;
+								_lastInfo = info;
 							}
-							lastInfo = info;
+							_lastInfo = info;
 						}
 					}
 				}
@@ -349,7 +349,7 @@ void LSClient::customEvent(QEvent* event)/*{{{*/
  * @param fname QString The string filename of the gig file
  * @param nr int The location in the file of the given instrument
  */
-LSCPKeymap LSClient::getKeyMapping(QString fname, int nr, int chan)/*{{{*/
+LSCPKeymap LSClient::_getKeyMapping(QString fname, int nr, int chan, int retries, int timeout)/*{{{*/
 {
 	//printf("Starting key binding processing\n");
 	QList<int> keys;
@@ -362,18 +362,21 @@ LSCPKeymap LSClient::getKeyMapping(QString fname, int nr, int chan)/*{{{*/
 	{
 		//Try to load the instrument into RAM on channel 0 so we can get the keymaps for the instrument
 		//Linuxsampler will not give key info until the gig is loaded into ram, we will retry 5 times
-		int retry = 0;
+		int tries = 0;
+		if(retries <= 0)
+			retries = 5; //default to sane state
 		//Load instruments into your created channel
-		while(lscp_load_instrument(_client, fname.toUtf8().constData(), nr, chan) != LSCP_OK && retry < 5)
+		while(lscp_load_instrument(_client, fname.toUtf8().constData(), nr, chan) != LSCP_OK && tries < retries)
 		{
 			printf("Failed to preload instrument:\n %s into ram...retrying\n", fname.toUtf8().constData());
-			sleep(1);
-			++retry;
+			if(timeout)
+				sleep(timeout);
+			++tries;
 		}
 		
 		//We need to sleep a bit here to give LS time to load the gig
 		//sleep(1);
-		int tries = 0;
+		tries = 0;
 again:
 		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", fname.toAscii().constData(), nr);
 		if (lscp_client_query(_client, query) == LSCP_OK)
@@ -419,7 +422,7 @@ again:
 					}
 				}
 			}
-			if(!found && tries < 3)
+			if(!found && tries < retries)
 			{
 				++tries;
 				goto again; //I cant believe i'm doing this, ick!!
@@ -437,7 +440,7 @@ again:
  * Return a MidiInstrumentList of all the current instrument loaded into
  * linuxsampler
  */
-MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps)/*{{{*/
+MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps, int retry, int timeout)/*{{{*/
 {
 	if(_client != NULL)
 	{
@@ -481,9 +484,9 @@ MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps)/*{{{*/
 								}*/
 								QString ifname(insInfo->instrument_file);
 								QFileInfo finfo(ifname);
-								QString fname = stripAscii(finfo.baseName()).simplified();
+								QString fname = _stripAscii(finfo.baseName()).simplified();
 								//Strip it again to be sure
-								fname = stripAscii(fname);
+								//fname = stripAscii(fname);
 								PatchGroup *pg = 0;
 								for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
 								{
@@ -521,7 +524,7 @@ MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps)/*{{{*/
 								patch->drum = false;
 								if(lscp_load_engine(_client, insInfo->engine_name, chan) == LSCP_OK)
 								{
-									LSCPKeymap kmap = getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr, chan);
+									LSCPKeymap kmap = _getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr, chan, retry, timeout);
 									patch->keys = kmap.key_bindings;
 									patch->keyswitches = kmap.keyswitch_bindings;
 								}
@@ -548,7 +551,7 @@ MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps)/*{{{*/
 	return 0;
 }/*}}}*/
 
-QMap<int, QString> LSClient::listInstruments()
+QMap<int, QString> LSClient::listInstruments()/*{{{*/
 {
 	QMap<int, QString> rv;
 	if(_client != NULL)
@@ -563,13 +566,13 @@ QMap<int, QString> LSClient::listInstruments()
 		}
 	}
 	return rv;
-}
+}/*}}}*/
 
 /**
  * Lookup a midi map name by ID
  * @param int ID of the midi instrument map
  */
-QString LSClient::getMapName(int mid)
+QString LSClient::getMapName(int mid)/*{{{*/
 {
 	QString mapName("Untitled");
 	if(_client == NULL)
@@ -580,7 +583,7 @@ QString LSClient::getMapName(int mid)
 		mapName = QString(cname);
 	}
 	return mapName;
-}
+}/*}}}*/
 
 /**
  * Get a single instrument from the sampler by name
@@ -630,7 +633,7 @@ QString LSClient::getValidInstrumentName(QString nameBase)/*{{{*/
 }/*}}}*/
 //The following routines is borrowed from the qSampler project
 
-static int _hexToNumber(char hex_digit) {
+static int _hexToNumber(char hex_digit) {/*{{{*/
     switch (hex_digit) {
         case '0': return 0;
         case '1': return 1;
@@ -659,21 +662,25 @@ static int _hexToNumber(char hex_digit) {
 
         default:  return 0;
     }
-}
+}/*}}}*/
 
 static int _hexsToNumber(char hex_digit0, char hex_digit1) {
     return _hexToNumber(hex_digit1)*16 + _hexToNumber(hex_digit0);
 }
-QString LSClient::stripAscii(QString str)
+
+QString LSClient::_stripAscii(QString str)/*{{{*/
 {
 	QRegExp regexp(QRegExp::escape("\\x") + "[0-9a-fA-F][0-9a-fA-F]");
-	for (int i = str.indexOf(regexp); i >= 0; i = str.indexOf(regexp, i + 4))
+	for(int c = 0; c < 4; ++c)
 	{
-		const QString hexVal = str.mid(i+2, 2).toLower();
-		char asciiTxt = _hexsToNumber(hexVal.at(1).toLatin1(), hexVal.at(0).toLatin1());
-		str.replace(i, 4, asciiTxt);
+		for (int i = str.indexOf(regexp); i >= 0; i = str.indexOf(regexp, i + 4))
+		{
+			const QString hexVal = str.mid(i+2, 2).toLower();
+			char asciiTxt = _hexsToNumber(hexVal.at(1).toLatin1(), hexVal.at(0).toLatin1());
+			str.replace(i, 4, asciiTxt);
+		}
 	}
 	return str;
-}
+}/*}}}*/
 //EnD qSampler
 #endif

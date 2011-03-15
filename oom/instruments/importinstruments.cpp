@@ -86,7 +86,7 @@ void LSCPImport::btnImportClicked(bool)/*{{{*/
 		}
 		if(!maps.isEmpty())
 		{
-			MidiInstrumentList* instr = _client->getInstruments(maps);
+			MidiInstrumentList* instr = _client->getInstruments(maps, txtRetry->value(), txtTimeout->value());
 			if(instr)
 			{
 				_mapModel->clear();
