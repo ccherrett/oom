@@ -20,6 +20,7 @@
 #include "prcanvas.h"
 #include "audio.h"
 #include "midiport.h"
+#include "mtrackinfo.h"
 
 //---------------------------------------------------------
 //   PCScale
@@ -240,7 +241,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	{ // If LMB select the program change
 		if (selectProgramChange(x))
 		{
-			audio->msgDeleteEvent(_pc.event, _pc.part, true, true, false);
+			audio->msgDeleteEvent(_pc.event, _pc.part, false, true, false);
 			update();
 
 			Event nevent = _pc.event.clone();
@@ -286,7 +287,7 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 					song->setLen((unsigned int)endTick);
 				}
 			}
-			audio->msgAddEvent(_pc.event, _pc.part, true, false, false);
+			song->recordEvent((MidiTrack*)_pc.part->track(), _pc.event);
 		}
 	}
 
@@ -545,7 +546,6 @@ void PCScale::pdraw(QPainter& p, const QRect& r)/*{{{*/
 
 	if (_pc.valid)
 	{
-		printf("adding active pc\n");
 		pcEvents.append(_pc.event);
 	}
 
