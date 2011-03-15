@@ -53,6 +53,7 @@
 #include "icons.h"
 #include "audio.h"
 #include "midiport.h"
+#include "instruments/minstrument.h"
 
 #include "cmd.h"
 #include "quantconfig.h"
@@ -589,7 +590,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
     connect(canvas, SIGNAL(partChanged(Part*)), midiTrackInfo, SLOT(editorPartChanged(Part*)));
     connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
-    connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
+	connect(midiTrackInfo, SIGNAL(patchChanged(Patch*)), this ,SLOT(setKeyBindings(Patch*)));
+    //connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
 
     setFocusPolicy(Qt::StrongFocus);
     setEventColorMode(colorMode);
@@ -1736,6 +1738,16 @@ void PianoRoll::setSpeaker(bool val)
 }
 
 #ifdef LSCP_SUPPORT
+
+void PianoRoll::setKeyBindings(Patch* p)
+{
+	if(!audio->isPlaying())
+	{
+		printf("Debug: Updating patch - keys: %d, switches: %d\n", p->keys.size(), p->keyswitches.size());
+		piano->setMIDIKeyBindings(p->keys, p->keyswitches);
+	}
+}
+
 //---------------------------------------------------------
 //   setKeyBindings
 //---------------------------------------------------------

@@ -218,6 +218,7 @@ public slots:
     void execUserScript(int id);
     CtrlEdit* addCtrl();
     void removeCtrl(CtrlEdit* ctrl);
+	void setKeyBindings(Patch*);
 
 public:
     PianoRoll(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);

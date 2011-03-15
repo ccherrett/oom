@@ -560,7 +560,6 @@ void Patch::read(Xml& xml)
 					drum = xml.s2().toInt();
 				else if(tag == "keys")
 				{
-					keys.clear();
 					QStringList klist = ((QString)xml.s2()).split(QString(" "), QString::SkipEmptyParts);
 					for (QStringList::Iterator it = klist.begin(); it != klist.end(); ++it)
 					{
@@ -570,7 +569,6 @@ void Patch::read(Xml& xml)
 				}
 				else if(tag == "keyswitches")
 				{
-					keyswitches.clear();
 					QStringList klist = ((QString)xml.s2()).split(QString(" "), QString::SkipEmptyParts);
 					for (QStringList::Iterator it = klist.begin(); it != klist.end(); ++it)
 					{
@@ -790,7 +788,7 @@ void MidiInstrument::write(int level, Xml& xml)
 //   getPatchName
 //---------------------------------------------------------
 
-QString MidiInstrument::getPatchName(int channel, int prog, MType mode, bool drum)
+QString MidiInstrument::getPatchName(int channel, int prog, MType mode, bool drum)/*{{{*/
 {
 	int pr = prog & 0xff;
 	if (prog == CTRL_VAL_UNKNOWN || pr == 0xff)
@@ -840,7 +838,59 @@ QString MidiInstrument::getPatchName(int channel, int prog, MType mode, bool dru
 		}
 	}
 	return "<unknown>";
-}
+}/*}}}*/
+
+Patch* MidiInstrument::getPatch(int channel, int prog, MType mode, bool drum)/*{{{*/
+{
+	int pr = prog & 0xff;
+	if (prog == CTRL_VAL_UNKNOWN || pr == 0xff)
+		return 0;
+
+	int hbank = (prog >> 16) & 0xff;
+	int lbank = (prog >> 8) & 0xff;
+	int tmask = 1;
+	bool drumchan = channel == 9;
+	bool hb = false;
+	bool lb = false;
+	switch (mode)
+	{
+		case MT_GS:
+			tmask = 2;
+			hb = true;
+			break;
+		case MT_XG:
+			hb = true;
+			lb = true;
+			tmask = 4;
+			break;
+		case MT_GM:
+			if (drumchan)
+				return 0;
+			tmask = 1;
+			break;
+		default:
+			hb = true; // MSB bank matters
+			lb = true; // LSB bank matters
+			break;
+	}
+	for (ciPatchGroup i = pg.begin(); i != pg.end(); ++i)
+	{
+		const PatchList& pl = (*i)->patches;
+		for (ciPatch ipl = pl.begin(); ipl != pl.end(); ++ipl)
+		{
+			Patch* mp = *ipl;
+			if ((mp->typ & tmask)
+					&& (pr == mp->prog)
+					&& ((drum && mode != MT_GM) ||
+					(mp->drum == drumchan))
+
+					&& (hbank == mp->hbank || !hb || mp->hbank == -1)
+					&& (lbank == mp->lbank || !lb || mp->lbank == -1))
+				return mp;
+		}
+	}
+	return 0;
+}/*}}}*/
 
 //---------------------------------------------------------
 //   populatePatchPopup

@@ -502,6 +502,15 @@ void MidiTrackInfo::heartBeat()
 
 						iPatch->setText(name);
 					}*/
+					Patch *patch = instr->getPatch(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
+					if(patch)
+					{
+						emit patchChanged(patch);
+					}
+					else
+					{
+						emit patchChanged(new Patch);
+					}
 					emit updateCurrentPatch(name);
 				}
 			}
@@ -521,6 +530,15 @@ void MidiTrackInfo::heartBeat()
 				QString name = instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM);
 				//if (iPatch->text() != name)
 				//	iPatch->setText(name);
+				Patch *patch = instr->getPatch(outChannel, program, song->mtype(), track->type() == Track::DRUM);
+				if(patch)
+				{
+					emit patchChanged(patch);
+				}
+				else
+				{
+					emit patchChanged(new Patch);
+				}
 				emit updateCurrentPatch(name);
 
 				int hb = ((program >> 16) & 0xff) + 1;
@@ -940,6 +958,15 @@ void MidiTrackInfo::iProgHBankChanged()
 
 	MidiInstrument* instr = mp->instrument();
 	emit updateCurrentPatch(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
+	Patch *patch = instr->getPatch(channel, program, song->mtype(), track->type() == Track::DRUM);
+	if(patch)
+	{
+		emit patchChanged(patch);
+	}
+	else
+	{
+		emit patchChanged(new Patch);
+	}
 	//iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
 }
 
@@ -1019,6 +1046,15 @@ void MidiTrackInfo::iProgLBankChanged()
 	MidiInstrument* instr = mp->instrument();
 	emit updateCurrentPatch(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
 	//iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
+	Patch *patch = instr->getPatch(channel, program, song->mtype(), track->type() == Track::DRUM);
+	if(patch)
+	{
+		emit patchChanged(patch);
+	}
+	else
+	{
+		emit patchChanged(new Patch);
+	}
 }
 
 //---------------------------------------------------------
@@ -1096,6 +1132,15 @@ void MidiTrackInfo::iProgramChanged()
 
 		MidiInstrument* instr = mp->instrument();
 		emit updateCurrentPatch(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
+		Patch *patch = instr->getPatch(channel, program, song->mtype(), track->type() == Track::DRUM);
+		if(patch)
+		{
+			emit patchChanged(patch);
+		}
+		else
+		{
+			emit patchChanged(new Patch);
+		}
 		//iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
 	}
 
@@ -1607,14 +1652,26 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 		program = CTRL_VAL_UNKNOWN;
 		nprogram = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
 		if (nprogram == CTRL_VAL_UNKNOWN)
+		{
 			//iPatch->setText(QString("<unknown>"));
 			//iPatch->setText(tr("Select Patch"));
+			emit patchChanged(new Patch);
 			emit updateCurrentPatch(tr("Select Patch"));
+		}
 		else
 		{
 			MidiInstrument* instr = mp->instrument();
 			emit updateCurrentPatch(instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM));
 			//iPatch->setText(instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM));
+			Patch *patch = instr->getPatch(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
+			if(patch)
+			{
+				emit patchChanged(patch);
+			}
+			else
+			{
+				emit patchChanged(new Patch);
+			}
 		}
 	}
 	else
@@ -1632,6 +1689,15 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 		MidiInstrument* instr = mp->instrument();
 		emit updateCurrentPatch(instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM));
 		//iPatch->setText(instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM));
+		Patch *patch = instr->getPatch(outChannel, program, song->mtype(), track->type() == Track::DRUM);
+		if(patch)
+		{
+			emit patchChanged(patch);
+		}
+		else
+		{
+			emit patchChanged(new Patch);
+		}
 
 		int hb = ((program >> 16) & 0xff) + 1;
 		if (hb == 0x100)

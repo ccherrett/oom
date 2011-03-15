@@ -26,6 +26,7 @@ class QStandardItemModel;
 class QModelIndex;
 class QItemSelection;
 class QItemSelectionModel;
+class Patch;
 
 //---------------------------------------------------------
 //   MidiTrackInfo
@@ -123,6 +124,7 @@ public slots:
 signals:
     void outputPortChanged(int);
 	void updateCurrentPatch(QString);
+	void patchChanged(Patch*);
 	//tb1
     void rasterChanged(int);
     void quantChanged(int);

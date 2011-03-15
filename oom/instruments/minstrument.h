@@ -198,6 +198,7 @@ public:
 
     virtual void reset(int, MType);
     virtual QString getPatchName(int, int, MType, bool);
+    virtual Patch* getPatch(int, int, MType, bool);
     virtual void populatePatchPopup(QMenu*, int, MType, bool);
 	virtual void populatePatchModel(QStandardItemModel*, int, MType, bool);
     void read(Xml&);
