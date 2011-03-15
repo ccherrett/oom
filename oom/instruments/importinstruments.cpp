@@ -11,6 +11,7 @@
 #include "gconfig.h"
 #ifdef LSCP_SUPPORT
 #include "audio.h"
+#include "song.h"
 #include "instruments/minstrument.h"
 #include "midictrl.h"
 #include "network/lsclient.h"
@@ -174,8 +175,14 @@ void LSCPImport::btnSaveClicked(bool)
 				QString s = QString("Write File\n") + fpath->text() + QString("\nfailed: ") + QString(strerror(errno));
 				QMessageBox::critical(this, tr("OOMidi: Write File failed"), s);
 			}
+			else
+			{
+				midiInstruments.push_front(mi);
+			}
 		}
 	}
+	emit instrumentsImported();
+	song->update(SC_CONFIG | SC_MIDI_CONTROLLER);
 }
 
 void LSCPImport::updateTableHeader(bool list)/*{{{*/
