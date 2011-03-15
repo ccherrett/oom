@@ -10,6 +10,7 @@
 #include <QMutex>
 #include <QEvent>
 #include <QString>
+#include <QMap>
 
 #define LSCLIENT_LSCP_EVENT  QEvent::Type(QEvent::User + 1)
 
@@ -53,7 +54,8 @@ public:
 	void stopClient();
 	bool startClient();
 	int getError();
-	MidiInstrumentList* getInstruments();
+	MidiInstrumentList* getInstruments(QList<int>);
+	QMap<int, QString> listInstruments();
 	MidiInstrument* getInstrument(QString);
 	QString getValidInstrumentName(QString nameBase);
 	QString getMapName(int);

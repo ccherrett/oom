@@ -18,14 +18,15 @@ class QCloseEvent;
 class LSCPImport : public QDialog, public Ui::LSCPInstrumentBase
 {
 	Q_OBJECT
-	void updateTableHeader();
+	void updateTableHeader(bool list = false);
 public:
 	LSCPImport(QWidget* parent);
 private slots:
 	void btnConnectClicked(bool);
-	void btnRefreshClicked(bool);
+	void btnListClicked(bool);
 	void btnImportClicked(bool);
 	void btnCloseClicked(bool);
+	void btnSaveClicked(bool);
 signals:
 	void instrumentsImported();
 private:

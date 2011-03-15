@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Import Sampler Instrument</string>
+   <string>OOMidi: Import Sampler Instruments</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -57,9 +57,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnRefresh">
+      <widget class="QPushButton" name="btnList">
        <property name="text">
-        <string>Refresh List</string>
+        <string>List Instruments</string>
        </property>
       </widget>
      </item>
@@ -121,6 +121,16 @@
       <widget class="QPushButton" name="btnImport">
        <property name="text">
         <string>Import</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSave">
+       <property name="toolTip">
+        <string>Save selected instruments to file</string>
+       </property>
+       <property name="text">
+        <string>Save</string>
        </property>
       </widget>
      </item>

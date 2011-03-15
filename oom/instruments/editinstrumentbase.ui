@@ -381,6 +381,9 @@
              </item>
              <item>
               <layout class="QHBoxLayout">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetFixedSize</enum>
+               </property>
                <item>
                 <widget class="QToolButton" name="patchDelete">
                  <property name="sizePolicy">
@@ -443,7 +446,7 @@
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>25</height>
+                   <height>16777215</height>
                   </size>
                  </property>
                  <property name="focusPolicy">

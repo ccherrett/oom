@@ -13,6 +13,8 @@
 #include <QTimer>
 #include <QFileInfo>
 #include <QRegExp>
+#include <QVector>
+#include <QMap>
 
 LSClient::LSClient(const char* host, int p, QObject* parent) : QThread(parent)
 {
@@ -435,12 +437,12 @@ again:
  * Return a MidiInstrumentList of all the current instrument loaded into
  * linuxsampler
  */
-MidiInstrumentList* LSClient::getInstruments()/*{{{*/
+MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps)/*{{{*/
 {
 	if(_client != NULL)
 	{
-		int* maps = ::lscp_list_midi_instrument_maps(_client);
-		if(maps != NULL)
+		//int* maps = ::lscp_list_midi_instrument_maps(_client);
+		if(!pMaps.isEmpty())
 		{
 			MidiInstrumentList* instruments = new MidiInstrumentList;
 			//Create a channel
@@ -451,82 +453,90 @@ MidiInstrumentList* LSClient::getInstruments()/*{{{*/
 				int adev =  ::lscp_get_audio_devices(_client);
 				if(adev != -1 && lscp_set_channel_audio_device(_client, chan, 0) == LSCP_OK)
 				{
-					for(int m = 0; maps[m] >= 0; ++m)
+					//for(int m = 0; maps[m] >= 0; ++m)
+					for(int m = 0; m < pMaps.size(); ++m)
 					{
-						QString mapName = getMapName(maps[m]);
-						if(!mapName.isEmpty())
+						//QString mapName = getMapName(maps[m]);
+						QString mapName = getMapName(pMaps.at(m));
+						QString insName(getValidInstrumentName(mapName));
+						MidiInstrument *midiInstr = new MidiInstrument(insName);
+						QString path = oomUserInstruments;
+						path += QString("/%1.idf").arg(insName);
+						midiInstr->setFilePath(path);
+						PatchGroupList *pgl = midiInstr->groups();
+						//lscp_midi_instrument_t* instr = ::lscp_list_midi_instruments(_client, maps[m]);
+						lscp_midi_instrument_t* instr = ::lscp_list_midi_instruments(_client, pMaps.at(m));
+						for (int in = 0; instr && instr[in].map >= 0; ++in)
 						{
-							QString insName(getValidInstrumentName(mapName));
-							MidiInstrument *midiInstr = new MidiInstrument(insName);
-							QString path = oomUserInstruments;
-							path += QString("/%1.idf").arg(insName);
-							midiInstr->setFilePath(path);
-							PatchGroupList *pgl = midiInstr->groups();
-							lscp_midi_instrument_t* instr = ::lscp_list_midi_instruments(_client, maps[m]);
-							for (int in = 0; instr && instr[in].map >= 0; ++in)
+							lscp_midi_instrument_t tmp;
+							tmp.map = instr[in].map;
+							tmp.bank = instr[in].bank;
+							tmp.prog = instr[in].prog;
+							lscp_midi_instrument_info_t* insInfo = ::lscp_get_midi_instrument_info(_client, &tmp);
+							if(insInfo != NULL)
 							{
-								lscp_midi_instrument_t tmp;
-								tmp.map = instr[in].map;
-								tmp.bank = instr[in].bank;
-								tmp.prog = instr[in].prog;
-								lscp_midi_instrument_info_t* insInfo = ::lscp_get_midi_instrument_info(_client, &tmp);
-								if(insInfo != NULL)
+								/*if(lscp_map_midi_instrument(_client, &tmp, insInfo->engine_name, insInfo->instrument_file, insInfo->instrument_nr, insInfo->volume, LSCP_LOAD_ON_DEMAND, insInfo->name) != LSCP_OK)
 								{
-									if(lscp_map_midi_instrument(_client, &tmp, insInfo->engine_name, insInfo->instrument_file, insInfo->instrument_nr, insInfo->volume, LSCP_LOAD_ON_DEMAND, insInfo->name) != LSCP_OK)
+									printf("Failed to remap instrument, proceeding with ON_DEMAND_HOLD\n");
+								}*/
+								QString ifname(insInfo->instrument_file);
+								QFileInfo finfo(ifname);
+								QString fname = stripAscii(finfo.baseName()).simplified();
+								//Strip it again to be sure
+								fname = stripAscii(fname);
+								PatchGroup *pg = 0;
+								for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
+								{
+									if((*pi)->id == instr[in].bank)
 									{
-										printf("Failed to remap instrument, proceeding with ON_DEMAND_HOLD\n");
-									}
-									QString ifname(insInfo->instrument_file);
-									QFileInfo finfo(ifname);
-									QString fname = stripAscii(finfo.baseName()).simplified();
-									//Strip it again to be sure
-									fname = stripAscii(fname);
-									PatchGroup *pg = 0;
-									for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
-									{
-										if((*pi)->id == instr[in].bank)
-										{
-											pg = (PatchGroup*)*pi;
-										}
-									}
-									if(!pg)
-									{
-										pg = new PatchGroup();
-										pg->name = fname;
-										pg->id = instr[in].bank;
-										pgl->push_back(pg);
-									}
-									
-									QString patchName(insInfo->instrument_name);
-									if(patchName.isEmpty())
-										patchName = QString(insInfo->name);
-									//Setup the patch
-									Patch* patch = new Patch;
-									patch->name = patchName;
-									patch->hbank = 0;
-									patch->lbank = instr[in].bank;
-									patch->prog = instr[in].prog;
-									patch->typ = -1;
-									patch->drum = false;
-									if(lscp_load_engine(_client, insInfo->engine_name, chan) == LSCP_OK)
-									{
-										LSCPKeymap kmap = getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr, chan);
-										patch->keys = kmap.key_bindings;
-										patch->keyswitches = kmap.keyswitch_bindings;
-									}
-									pg->patches.push_back(patch);
-									//Remap the instrument now that we are done with it
-									if(lscp_map_midi_instrument(_client, &tmp, insInfo->engine_name, insInfo->instrument_file, insInfo->instrument_nr, insInfo->volume, insInfo->load_mode, insInfo->name) != LSCP_OK)
-									{
-										printf("Failed to restore instrument map, we recommend you restart linuxsampler after this operation\n");
+										pg = (PatchGroup*)*pi;
 									}
 								}
+								if(!pg)
+								{
+									pg = new PatchGroup();
+									pg->name = fname;
+									pg->id = instr[in].bank;
+									pgl->push_back(pg);
+								}
+								//If the map name is unknown then set it to the first instrument found in it
+								if(in == 0 && mapName.startsWith("Untitled"))
+								{
+									QString tmpName(getValidInstrumentName(fname.replace(" ","_")));
+									path = oomUserInstruments;
+									path += QString("/%1.idf").arg(tmpName);
+									midiInstr->setFilePath(path);
+									midiInstr->setIName(tmpName);
+								}
+								QString patchName(insInfo->instrument_name);
+								if(patchName.isEmpty())
+									patchName = QString(insInfo->name);
+								//Setup the patch
+								Patch* patch = new Patch;
+								patch->name = patchName;
+								patch->hbank = 0;
+								patch->lbank = instr[in].bank;
+								patch->prog = instr[in].prog;
+								patch->typ = -1;
+								patch->drum = false;
+								if(lscp_load_engine(_client, insInfo->engine_name, chan) == LSCP_OK)
+								{
+									LSCPKeymap kmap = getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr, chan);
+									patch->keys = kmap.key_bindings;
+									patch->keyswitches = kmap.keyswitch_bindings;
+								}
+								pg->patches.push_back(patch);
+								//Remap the instrument now that we are done with it
+								/*if(lscp_map_midi_instrument(_client, &tmp, insInfo->engine_name, insInfo->instrument_file, insInfo->instrument_nr, insInfo->volume, insInfo->load_mode, insInfo->name) != LSCP_OK)
+								{
+									printf("Failed to restore instrument map, we recommend you restart linuxsampler after this operation\n");
+								}*/
 							}
-							instruments->push_back(midiInstr);
-							//Flush the disk streams used by the channel created
-							::lscp_reset_channel(_client, chan);
-							sleep(5);
-						}//END if(mapName.isEmpty)
+						}
+						instruments->push_back(midiInstr);
+						//Flush the disk streams used by the channel created
+						::lscp_reset_channel(_client, chan);
+						//sleep(5);
 					}//END for
 				}//end load audio dev
 			}//end create channel
@@ -538,13 +548,30 @@ MidiInstrumentList* LSClient::getInstruments()/*{{{*/
 	return 0;
 }/*}}}*/
 
+QMap<int, QString> LSClient::listInstruments()
+{
+	QMap<int, QString> rv;
+	if(_client != NULL)
+	{
+		int* maps = ::lscp_list_midi_instrument_maps(_client);
+		if(maps != NULL)
+		{
+			for(int m = 0; maps[m] >= 0; ++m)
+			{
+				rv.insert(maps[m], getMapName(maps[m]));
+			}
+		}
+	}
+	return rv;
+}
+
 /**
  * Lookup a midi map name by ID
  * @param int ID of the midi instrument map
  */
 QString LSClient::getMapName(int mid)
 {
-	QString mapName;
+	QString mapName("Untitled");
 	if(_client == NULL)
 		return mapName;
 	const char* cname = ::lscp_get_midi_instrument_map_name(_client, mid);
