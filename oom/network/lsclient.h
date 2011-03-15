@@ -59,6 +59,8 @@ public:
 	MidiInstrument* getInstrument(QString);
 	QString getValidInstrumentName(QString nameBase);
 	QString getMapName(int);
+	bool resetSampler();
+	bool loadSamplerCommand(QString);
 	
 private:
 	const LSCPChannelInfo getKeyBindings(lscp_channel_info_t*);

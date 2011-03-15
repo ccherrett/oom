@@ -511,9 +511,9 @@ MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps, int retry, int ti
 									midiInstr->setFilePath(path);
 									midiInstr->setIName(tmpName);
 								}
-								QString patchName(insInfo->instrument_name);
+								QString patchName(_stripAscii(QString(insInfo->instrument_name)));
 								if(patchName.isEmpty())
-									patchName = QString(insInfo->name);
+									patchName = _stripAscii(QString(insInfo->name));
 								//Setup the patch
 								Patch* patch = new Patch;
 								patch->name = patchName;
@@ -584,6 +584,17 @@ QString LSClient::getMapName(int mid)/*{{{*/
 	}
 	return mapName;
 }/*}}}*/
+
+bool LSClient::resetSampler()
+{
+	bool rv = false;
+	return rv;
+}
+
+bool LSClient::loadSamplerCommand(QString)
+{
+	return true;
+}
 
 /**
  * Get a single instrument from the sampler by name
