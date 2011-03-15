@@ -370,7 +370,7 @@ LSCPKeymap LSClient::getKeyMapping(QString fname, int nr, int chan)/*{{{*/
 		}
 		
 		//We need to sleep a bit here to give LS time to load the gig
-		sleep(1);
+		//sleep(1);
 		int tries = 0;
 again:
 		sprintf(query, "GET FILE INSTRUMENT INFO '%s' %d\r\n", fname.toAscii().constData(), nr);
