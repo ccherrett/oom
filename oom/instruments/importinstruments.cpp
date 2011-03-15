@@ -156,7 +156,7 @@ void LSCPImport::btnSaveClicked(bool)
 		MidiInstrument* mi = (MidiInstrument*) ins->data(Qt::UserRole).value<void*>();
 		QFileInfo finfo(fpath->text());
 		QDir dpath = finfo.dir();
-		if(dpath.exists())
+		if(dpath.exists() && !finfo.exists())//Dont overwrite
 		{
 			mi->setFilePath(fpath->text());
 			FILE* f = fopen(fpath->text().toAscii().constData(), "w");
