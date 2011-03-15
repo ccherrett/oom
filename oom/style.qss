@@ -68,12 +68,16 @@ QLabel#patchLabel
 MidiTrackInfo QTableView 
 {
 	background-color: #d8dbe8;
-	border: 1px solid #29292a;
+	border: 2px solid #29292a;
 	border-radius: 0px;
 	padding: 0px;
 	color: black;
 	font-size: 12px;
 	alternate-background-color: #bec0cf;
+}
+MidiTrackInfo QTableView::focus
+{
+	border: 2px solid #f3ce69;
 }
 
 MidiTrackInfo QTableView QHeaderView::section 
@@ -122,12 +126,17 @@ MidiTrackInfo QWidget#patchSeqContents
 MidiTrackInfo QTreeView
 {
 	background-color: #d8dbe8;
-	border: 1px solid #29292a;
+	border: 2px solid #29292a;
 	border-radius: 0px;
 	padding: 0px;
 	color: #303033;
 	font-size: 11x;
 	alternate-background-color: #bec0cf;
+	/*selection-background-color:red;*//*this can be used to change the selection background color*/
+}
+MidiTrackInfo QTreeView::focus
+{
+	border: 2px solid #f3ce69;
 }
 
 MidiTrackInfo QTreeView QHeaderView::section
@@ -194,12 +203,16 @@ QHeaderView::section
 QTableView#tblTrackView, QTableView#routeList
 {
 	background-color: #d8dbe8;
-	border: 1px solid #29292a;
+	border: 2px solid #29292a;/*set for highlighting on focus*/
 	border-radius: 0px;
 	padding: 0px;
 	color: black;
 	font-size: 12px;
 	alternate-background-color: #bec0cf;
+}
+QTableView#tblTrackView::focus, QTableView#routeList::focus
+{
+	border: 2px solid #f3ce69;
 }
 
 QTableView#tblTrackView::item, QTableView#routeList::item
@@ -265,12 +278,16 @@ QListWidget::item:selected:!active
 QTableView#autoTable
 {
 	background-color: #d8dbe8;
-	border: 1px solid #29292a;
+	border: 2px solid #29292a;
 	border-radius: 0px;
 	padding: 0px;
 	color: black;
 	font-size: 12px;
 	alternate-background-color: #bec0cf;
+}
+QTableView#autoTable::focus
+{
+	border: 2px solid #f3ce69;
 }
 
 QTableView#autoTable::item
