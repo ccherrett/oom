@@ -463,6 +463,10 @@ MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps, int retry, int ti
 						QString mapName = getMapName(pMaps.at(m));
 						QString insName(getValidInstrumentName(mapName));
 						MidiInstrument *midiInstr = new MidiInstrument(insName);
+						MidiController *modCtrl = new MidiController("Modulation", CTRL_MODULATION, 0, 127, 0);
+						MidiController *expCtrl = new MidiController("Expression", CTRL_EXPRESSION, 0, 127, 0);
+						midiInstr->controller()->add(modCtrl);
+						midiInstr->controller()->add(expCtrl);
 						QString path = oomUserInstruments;
 						path += QString("/%1.idf").arg(insName);
 						midiInstr->setFilePath(path);
