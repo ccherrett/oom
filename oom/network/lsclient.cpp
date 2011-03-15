@@ -472,6 +472,10 @@ MidiInstrumentList* LSClient::getInstruments()/*{{{*/
 								lscp_midi_instrument_info_t* insInfo = ::lscp_get_midi_instrument_info(_client, &tmp);
 								if(insInfo != NULL)
 								{
+									if(lscp_map_midi_instrument(_client, &tmp, insInfo->engine_name, insInfo->instrument_file, insInfo->instrument_nr, insInfo->volume, LSCP_LOAD_ON_DEMAND, insInfo->name) != LSCP_OK)
+									{
+										printf("Failed to remap instrument, proceeding with ON_DEMAND_HOLD\n");
+									}
 									QString ifname(insInfo->instrument_file);
 									QFileInfo finfo(ifname);
 									QString fname = stripAscii(finfo.baseName()).simplified();
@@ -511,6 +515,11 @@ MidiInstrumentList* LSClient::getInstruments()/*{{{*/
 										patch->keyswitches = kmap.keyswitch_bindings;
 									}
 									pg->patches.push_back(patch);
+									//Remap the instrument now that we are done with it
+									if(lscp_map_midi_instrument(_client, &tmp, insInfo->engine_name, insInfo->instrument_file, insInfo->instrument_nr, insInfo->volume, insInfo->load_mode, insInfo->name) != LSCP_OK)
+									{
+										printf("Failed to restore instrument map, we recommend you restart linuxsampler after this operation\n");
+									}
 								}
 							}
 							instruments->push_back(midiInstr);
