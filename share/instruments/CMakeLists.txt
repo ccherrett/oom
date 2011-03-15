@@ -18,7 +18,12 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #=============================================================================
 
-file (GLOB instruments_files *.idf)
+#file (GLOB instruments_files *.idf)
+file (GLOB instruments_files 
+	gm.idf
+	gs.idf
+	xg.idf
+	)
 
 install( FILES ${instruments_files}
       DESTINATION ${OOMidi_SHARE_DIR}/instruments
