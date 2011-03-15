@@ -65,7 +65,7 @@ QLabel#patchLabel
 	 padding: 0px 8px;
 }
 
-MidiTrackInfo QTableView 
+MidiTrackInfo QTableView, QTableView#mapTable
 {
 	background-color: #d8dbe8;
 	border: 2px solid #29292a;
@@ -75,7 +75,7 @@ MidiTrackInfo QTableView
 	font-size: 12px;
 	alternate-background-color: #bec0cf;
 }
-MidiTrackInfo QTableView::focus
+MidiTrackInfo QTableView::focus, QTableView#mapTable::focus
 {
 	border: 2px solid #f3ce69;
 }
@@ -100,7 +100,7 @@ MidiTrackInfo QTableView::item
 	padding-bottom: 8px;
 }
 
-MidiTrackInfo QTableView::item:selected 
+MidiTrackInfo QTableView::item:selected, QTableView#mapTable::item:selected 
 {
 	background-color: #3d3e44;
 	border: none;
