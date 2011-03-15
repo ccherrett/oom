@@ -64,6 +64,7 @@ class PianoCanvas : public EventCanvas
     virtual void dragEnterEvent(QDragEnterEvent* event);
     virtual void dragMoveEvent(QDragMoveEvent*);
     virtual void dragLeaveEvent(QDragLeaveEvent*);
+    virtual void selectLasso(bool toggle);
     virtual void addItem(Part*, Event&);
 
     int y2pitch(int) const;
@@ -100,16 +101,16 @@ public:
 
     enum
     {
-        CMD_CUT, CMD_COPY, CMD_PASTE, CMD_DEL,
-        CMD_OVER_QUANTIZE, CMD_ON_QUANTIZE, CMD_ONOFF_QUANTIZE,
-        CMD_ITERATIVE_QUANTIZE,
-        CMD_SELECT_ALL, CMD_SELECT_NONE, CMD_SELECT_INVERT,
-        CMD_SELECT_ILOOP, CMD_SELECT_OLOOP, CMD_SELECT_PREV_PART, CMD_SELECT_NEXT_PART,
-        CMD_MODIFY_GATE_TIME, CMD_MODIFY_VELOCITY,
-        CMD_CRESCENDO, CMD_TRANSPOSE, CMD_THIN_OUT, CMD_ERASE_EVENT,
-        CMD_NOTE_SHIFT, CMD_MOVE_CLOCK, CMD_COPY_MEASURE,
-        CMD_ERASE_MEASURE, CMD_DELETE_MEASURE, CMD_CREATE_MEASURE,
-        CMD_FIXED_LEN, CMD_DELETE_OVERLAPS
+	CMD_CUT, CMD_COPY, CMD_PASTE, CMD_DEL,
+	CMD_OVER_QUANTIZE, CMD_ON_QUANTIZE, CMD_ONOFF_QUANTIZE,
+	CMD_ITERATIVE_QUANTIZE,
+	CMD_SELECT_ALL, CMD_SELECT_NONE, CMD_SELECT_INVERT,
+	CMD_SELECT_ILOOP, CMD_SELECT_OLOOP, CMD_SELECT_PREV_PART, CMD_SELECT_NEXT_PART,
+	CMD_MODIFY_GATE_TIME, CMD_MODIFY_VELOCITY,
+	CMD_CRESCENDO, CMD_TRANSPOSE, CMD_THIN_OUT, CMD_ERASE_EVENT,
+	CMD_NOTE_SHIFT, CMD_MOVE_CLOCK, CMD_COPY_MEASURE,
+	CMD_ERASE_MEASURE, CMD_DELETE_MEASURE, CMD_CREATE_MEASURE,
+	CMD_FIXED_LEN, CMD_DELETE_OVERLAPS
     };
 
     PianoCanvas(MidiEditor*, QWidget*, int, int);
@@ -118,8 +119,8 @@ public:
 
     void setColorMode(int mode)
     {
-        colorMode = mode;
-        redraw();
+	colorMode = mode;
+	redraw();
     }
     virtual void modifySelected(NoteInfo::ValType type, int delta);
 };
