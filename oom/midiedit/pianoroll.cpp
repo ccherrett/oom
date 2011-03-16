@@ -1741,12 +1741,12 @@ void PianoRoll::setSpeaker(bool val)
 
 void PianoRoll::setKeyBindings(Patch* p)
 {
-	if(!audio->isPlaying())
-	{
+	//if(!audio->isPlaying())
+	//{
 		if(debugMsg)
 			printf("Debug: Updating patch - keys: %d, switches: %d\n", p->keys.size(), p->keyswitches.size());
 		piano->setMIDIKeyBindings(p->keys, p->keyswitches);
-	}
+	//}
 }
 
 //---------------------------------------------------------
