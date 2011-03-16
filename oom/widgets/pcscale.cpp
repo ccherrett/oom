@@ -223,7 +223,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 						int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
 						_pc.part->setLenTick(endTick);
 					}
-					_pc.part->addEvent(nevent);/*}}}*/
+					song->recordEvent((MidiTrack*)_pc.part->track(), nevent);/*}}}*/
 				}
 			}
 		}
@@ -467,7 +467,7 @@ void PCScale::moveSelected(int dir)/*{{{*/
 			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
 			_pc.part->setLenTick(endTick);
 		}
-		audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, false, false);
+		audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, true, false);
 		_pc.event = nevent;
 		emit drawSelectedProgram(_pc.event.tick(), true);
 	}
@@ -492,7 +492,7 @@ void PCScale::copySelected()/*{{{*/
 			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
 			_pc.part->setLenTick(endTick);
 		}
-		_pc.part->addEvent(nevent);
+		song->recordEvent((MidiTrack*)_pc.part->track(), nevent);
 		update();
 	}
 }/*}}}*/
@@ -566,14 +566,6 @@ void PCScale::pdraw(QPainter& p, const QRect& r)/*{{{*/
 		QRect wr = r.intersect(tr);
 		if (!wr.isEmpty())
 		{
-			int x2;
-//			if (mm != eventList->end())
-//			{
-				x2 = mapx(pcevt.tick() + curPart->tick());
-//			}
-//			else
-//				x2 = xp + 200;
-
 			//printf("PCScale::pdraw marker %s xp:%d y:%d h:%d r.x:%d r.w:%d\n", "Test Debug", xp, height(), y, r.x(), r.width());
 
 			// Must be reasonable about very low negative x values! With long songs > 15min

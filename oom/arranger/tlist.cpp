@@ -229,7 +229,7 @@ void TList::paint(const QRect& r)/*{{{*/
 		}
 		p.fillRect(x1, yy, w, trackHeight, bg);
 		track->setY(y);
-		
+
 		//p.setPen(Qt::black);
 		//QFont::Light	25	25 Weight
 		//QFont::Normal	50	50
@@ -303,7 +303,7 @@ void TList::paint(const QRect& r)/*{{{*/
 					else
 					{
 						drawCenteredPixmap(p,arranger_mute_off_Icon, r);
-						
+
 					}
 					//	drawCenteredPixmap(p, editmuteSIcon, r);
 					break;
@@ -385,13 +385,13 @@ void TList::paint(const QRect& r)/*{{{*/
 					{
 						CtrlListList* cll = ((AudioTrack*)track)->controller();
 						int countAll=0, countVisible=0;
-						for(CtrlListList::iterator icll =cll->begin();icll!=cll->end();++icll) 
+						for(CtrlListList::iterator icll =cll->begin();icll!=cll->end();++icll)
 						{
 							CtrlList *cl = icll->second;
 							if (!cl->dontShow())
 								countAll++;
 							if (cl->isVisible())
-							 	countVisible++;
+								countVisible++;
 						}
 						int count = ((AudioTrack*) track)->controller()->size();
 						//s.sprintf("%d viewed", count);
@@ -540,7 +540,7 @@ void TList::renameTrack(Track* t)
 		int colw = header->sectionSize(COL_NAME);
 		int coly = t->y() - ypos;
 		int colh = t->height();
-		
+
 		int ctpos = (colh/2);
 
 		editTrack = t;
@@ -588,8 +588,8 @@ void TList::portsPopupMenu(Track* t, int x, int y)/*{{{*/
 			}
 			else
 				port = track->outPort();
-			/*	
-		 	QListWidget* menuList = new QListWidget(this);
+			/*
+			QListWidget* menuList = new QListWidget(this);
 			menuList->setSelectionMode(QAbstractItemView::SingleSelection);
 			menuList->setAlternatingRowColors(true);
 			menuList->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -973,7 +973,7 @@ void TList::updateSelection(Track* t, bool shift)
 			if(song->hasSelectedParts)
 				song->deselectAllParts();
 			t->setSelected(true);
-		
+
 			// rec enable track if expected
 			TrackList recd = getRecEnabledTracks();
 			if (recd.size() == 1 && config.moveArmedCheckBox)
@@ -1110,7 +1110,8 @@ void TList::mousePressEvent(QMouseEvent* ev)
 	//x y
 	int ctpos = (t->y()+(t->height()/2))+1;
 	QRect vRange(this->x(), ctpos-8, 100, 16);
-	bool valid = vRange.contains(ev->pos());
+	// FIXME does not work with vscroll!
+	bool valid = true;//vRange.contains(ev->pos());
 	//printf("validRange: x: %d, y: %d, height: %d, width: %d, right: %d, left: %d, top: %d, bottom: %d\n", vRange.x(), vRange.y(), vRange.height(), vRange.width(), vRange.right(), vRange.left(), vRange.top(), vRange.bottom());
 	//printf("Click Point: x: %d, y: %d, Global: x: %d, y: %d, valid: %d\n", x, y, ev->globalX(), ev->globalY(), (int)valid);
 
@@ -1157,12 +1158,12 @@ void TList::mousePressEvent(QMouseEvent* ev)
 	}
 	mode = START_DRAG;
 
-        TrackList selectedTracksList = song->getSelectedTracks();
-        bool multipleSelectedTracks = false;
-        if (selectedTracksList.size() > 1)
-        {
-                multipleSelectedTracks = true;
-        }
+	TrackList selectedTracksList = song->getSelectedTracks();
+	bool multipleSelectedTracks = false;
+	if (selectedTracksList.size() > 1)
+	{
+		multipleSelectedTracks = true;
+	}
 
 		switch (col)
 		{
@@ -1192,7 +1193,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					//connect(p, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
 					//p->popup(QCursor::pos());
 					p->exec(QCursor::pos());
-	
+
 					delete p;
 				}
 				else
@@ -1201,7 +1202,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				}
 				break;
 			}
-	
+
 			case COL_RECORD:
 			{
 				bool val = !(t->recordFlag());
@@ -1242,7 +1243,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							return;
 						}
 						WaveTrackList* wtl = song->waves();
-	
+
 						foreach(WaveTrack *wt, *wtl)
 						{
 							song->setRecordFlag(wt, val);
@@ -1251,7 +1252,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					else if(valid)
 					{
 						MidiTrackList* mtl = song->midis();
-	
+
 						foreach(MidiTrack *mt, *mtl)
 						{
 							song->setRecordFlag(mt, val);
@@ -1296,7 +1297,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					}
 					song->update(SC_MUTE);
 				}
-				else 
+				else
 				{
 					updateSelection(t, shift);
 				}
@@ -1312,7 +1313,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					updateSelection(t, shift);
 				}
 				break;
-	
+
 			case COL_NAME:
 				if (button == Qt::LeftButton)
 				{
@@ -1323,7 +1324,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						if(song->hasSelectedParts)
 							song->deselectAllParts();
 						t->setSelected(true);
-	
+
 						// rec enable track if expected
 						TrackList recd = getRecEnabledTracks();
 						if (recd.size() == 1 && config.moveArmedCheckBox)
@@ -1355,7 +1356,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
 					}
 					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
-	
+
 					QMenu* trackHeightsMenu = p->addMenu("Track Height");
 					trackHeightsMenu->addAction("Default")->setData(6);
 					trackHeightsMenu->addAction("2")->setData(7);
@@ -1368,19 +1369,19 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					{
 						trackHeightsMenu->addAction("Fit Selection in View")->setData(13);
 					}
-	
-	
+
+
 					if (t->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
 					{
 						SynthI* synth = (SynthI*) t;
-	
+
 						QAction* sga = p->addAction(tr("Show Gui"));
 						sga->setData(2);
 						sga->setCheckable(true);
 						//printf("synth hasgui %d, gui visible %d\n",synth->hasGui(), synth->guiVisible());
 						sga->setEnabled(synth->hasGui());
 						sga->setChecked(synth->guiVisible());
-				
+
 						// If it has a gui but we don't have OSC, disable the action.
 	#ifndef OSC_SUPPORT
 	#ifdef DSSI_SUPPORT
@@ -1392,18 +1393,18 @@ void TList::mousePressEvent(QMouseEvent* ev)
 	#endif
 	#endif
 					}/*}}}*/
-	                else if(t->isMidiTrack() && !multipleSelectedTracks)
+			else if(t->isMidiTrack() && !multipleSelectedTracks)
 					{
 						int oPort = ((MidiTrack*) t)->outPort();
 						MidiPort* port = &midiPorts[oPort];
-					
+
 						QAction* mact = p->addAction(tr("Show Gui"));
 						mact->setCheckable(true);
 						//printf("synth hasgui %d, gui visible %d\n",port->hasGui(), port->guiVisible());
 						mact->setEnabled(port->hasGui());
 						mact->setChecked(port->guiVisible());
 						mact->setData(3);
-					
+
 						// If it has a gui but we don't have OSC, disable the action.
 #ifndef OSC_SUPPORT
 #ifdef DSSI_SUPPORT
@@ -1418,7 +1419,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
 						p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
 					}
-				
+
 					QAction* act = p->exec(ev->globalPos(), 0);
 					if (act)
 					{
@@ -1426,21 +1427,21 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						switch (n)
 						{
 							case 0: // delete track
-	                            if (multipleSelectedTracks)
-	                            {
-	                                    song->startUndo();
-	                                    audio->msgRemoveTracks();
-	                                    song->endUndo(SC_TRACK_REMOVED);
-	                                    song->updateSoloStates();
-	                            }
-	                            else
-	                            {
-	                                    song->removeTrack0(t);
-	                                    audio->msgUpdateSoloStates();
-	                            }
-	
+				    if (multipleSelectedTracks)
+				    {
+					    song->startUndo();
+					    audio->msgRemoveTracks();
+					    song->endUndo(SC_TRACK_REMOVED);
+					    song->updateSoloStates();
+				    }
+				    else
+				    {
+					    song->removeTrack0(t);
+					    audio->msgUpdateSoloStates();
+				    }
+
 							break;
-	
+
 							case 1: // show track comment
 							{
 								TrackComment* tc = new TrackComment(t, 0);
@@ -1486,7 +1487,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 												// Tested: Notes were being mixed up switching back and forth between midi and drum.
 												//pitch = drumMap[pitch].anote;
 												pitch = drumMap[pitch].enote;
-							
+
 												ev.setPitch(pitch);
 											}
 											else
@@ -1499,7 +1500,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 													// Change the controller event's index into the drum map to an instrument note.
 													ev.setA((ctl & ~0xff) | drumMap[ctl & 0x7f].enote);
 											}
-							
+
 										}
 									}
 									t->setType(Track::MIDI);
@@ -1517,12 +1518,12 @@ void TList::mousePressEvent(QMouseEvent* ev)
 									bool change = QMessageBox::question(this, tr("Update drummap?"),
 											tr("Do you want to use same port and channel for all instruments in the drummap?"),
 											tr("&Yes"), tr("&No"), QString::null, 0, 1);
-							
+
 									audio->msgIdle(true);
 									// Delete all port controller events.
 									//audio->msgChangeAllPortDrumCtrlEvents(false);
 									song->changeAllPortDrumCtrlEvents(false);
-							
+
 									if (!change)
 									{
 										MidiTrack* m = (MidiTrack*) t;
@@ -1532,7 +1533,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 											drumMap[i].port = m->outPort();
 										}
 									}
-							
+
 									//audio->msgIdle(true);
 									PartList* pl = t->parts();
 									MidiTrack* m = (MidiTrack*) t;
@@ -1559,21 +1560,21 @@ void TList::mousePressEvent(QMouseEvent* ev)
 														// Change the controller event's instrument note to an index into the drum map.
 														ev.setA((ctl & ~0xff) | drumInmap[ctl & 0x7f]);
 												}
-							
+
 											}
-							
+
 										}
 									}
 									t->setType(Track::DRUM);
-							
+
 									// Add all port controller events.
 									//audio->msgChangeAllPortDrumCtrlEvents(true);
 									song->changeAllPortDrumCtrlEvents(true);
-							
+
 									audio->msgIdle(false);
 								}
 							}
-	                        case 6:
+				case 6:
 							{
 								if (multipleSelectedTracks)
 								{
@@ -1586,7 +1587,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								}
 								break;
 							}
-	                        case 7:
+				case 7:
 							{
 								if (multipleSelectedTracks)
 								{
@@ -1599,7 +1600,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								}
 								break;
 							}
-	                        case 8:
+				case 8:
 							{
 								if (multipleSelectedTracks)
 								{
@@ -1612,7 +1613,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								}
 								break;
 							}
-	                        case 9:
+				case 9:
 							{
 								if (multipleSelectedTracks)
 								{
@@ -1625,7 +1626,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								}
 								break;
 							}
-	                        case 10:
+				case 10:
 							{
 								if (multipleSelectedTracks)
 								{
@@ -1638,7 +1639,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								}
 								break;
 							}
-	                        case 11:
+				case 11:
 							{
 								if (multipleSelectedTracks)
 								{
@@ -1651,16 +1652,16 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								}
 								break;
 							}
-	                        case 12:
+				case 12:
 							{
 								int canvasHeight = oom->arranger->getCanvas()->height();
-	
+
 								if (multipleSelectedTracks)
 								{
 									song->setTrackHeights(selectedTracksList, canvasHeight);
 									Track* firstSelectedTrack = *selectedTracksList.begin();
 									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
-	
+
 								}
 								else
 								{
@@ -1670,7 +1671,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								}
 								break;
 							}
-	                        case 13:
+				case 13:
 							{
 								int canvasHeight = oom->arranger->getCanvas()->height();
 								if (multipleSelectedTracks)
@@ -1678,7 +1679,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 									song->setTrackHeights(selectedTracksList, canvasHeight / selectedTracksList.size());
 									Track* firstSelectedTrack = *selectedTracksList.begin();
 									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
-	
+
 								}
 								else
 								{
@@ -1701,18 +1702,18 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							break;
 						}
 					}
-	                                delete trackHeightsMenu;
+					delete trackHeightsMenu;
 					delete p;
-	
-	
+
+
 				}
 				break;
-	
+
 			case COL_TIMELOCK:
 				//this has been zero sized if we need to re-enable its here
 				//t->setLocked(!t->locked());
 				break;
-	
+
 			case COL_OCHANNEL:
 			{
 				/*int delta = 0;
@@ -1725,7 +1726,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					MidiTrack* mt = dynamic_cast<MidiTrack*> (t);
 					if (mt == 0)
 						break;
-	
+
 					int channel = mt->outChannel();
 					channel += delta;
 					if (channel >= MIDI_CHANNELS)
@@ -1741,7 +1742,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						//audio->msgSetTrackOutChannel(mt, channel);
 						mt->setOutChanAndUpdate(channel);
 						audio->msgIdle(false);
-	
+
 						// may result in adding/removing mixer strip:
 						//song->update(-1);
 						//song->update(SC_CHANNELS);
@@ -1755,7 +1756,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						AudioTrack* at = dynamic_cast<AudioTrack*> (t);
 						if (at == 0)
 							break;
-	
+
 						int n = t->channels() + delta;
 						if (n > MAX_CHANNELS)
 							n = MAX_CHANNELS;
