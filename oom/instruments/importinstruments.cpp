@@ -198,6 +198,7 @@ void LSCPImport::updateTableHeader(bool list)/*{{{*/
 	mapTable->horizontalHeader()->setStretchLastSection(true);
 	mapTable->verticalHeader()->hide();
 	btnSave->setEnabled(!list);
+	btnImport->setEnabled(list);
 }/*}}}*/
 
 void LSCPImport::btnCloseClicked(bool)

@@ -1079,6 +1079,8 @@ void EditInstrument::patchChanged()
 		checkBoxGM->setEnabled(false);
 		checkBoxGS->setEnabled(false);
 		checkBoxXG->setEnabled(false);
+		txtKeys->setEnabled(false);
+		txtKeySwitches->setEnabled(false);
 		return;
 	}
 
@@ -1094,6 +1096,8 @@ void EditInstrument::patchChanged()
 		checkBoxGM->setEnabled(true);
 		checkBoxGS->setEnabled(true);
 		checkBoxXG->setEnabled(true);
+		txtKeys->setEnabled(true);
+		txtKeySwitches->setEnabled(true);
 
 		int hb = ((p->hbank + 1) & 0xff);
 		int lb = ((p->lbank + 1) & 0xff);
@@ -1105,6 +1109,18 @@ void EditInstrument::patchChanged()
 		checkBoxGM->setChecked(p->typ & 1);
 		checkBoxGS->setChecked(p->typ & 2);
 		checkBoxXG->setChecked(p->typ & 4);
+		QStringList tmp;
+		foreach(int key, p->keys)
+		{
+			tmp.append(QString::number(key));
+		}
+		txtKeys->setText(tmp.join(", "));
+		QStringList stmp;
+		foreach(int skey, p->keyswitches)
+		{
+			stmp.append(QString::number(skey));
+		}
+		txtKeySwitches->setText(stmp.join(", "));
 	}
 	else
 		// The item is a patch group item.
@@ -1117,6 +1133,8 @@ void EditInstrument::patchChanged()
 		checkBoxGM->setEnabled(false);
 		checkBoxGS->setEnabled(false);
 		checkBoxXG->setEnabled(false);
+		txtKeys->setEnabled(false);
+		txtKeySwitches->setEnabled(false);
 	}
 }
 
@@ -2562,6 +2580,25 @@ void EditInstrument::updatePatch(MidiInstrument* instrument, Patch* p)
 		p->typ = value;
 		instrument->setDirty(true);
 	}
+	QList<int> keyslist;
+	QList<int> keyswitchlist;
+
+	QString keys = txtKeys->text();
+	QStringList klist = keys.split(QString(","), QString::SkipEmptyParts);
+	for (QStringList::Iterator it = klist.begin(); it != klist.end(); ++it)
+	{
+		int val = (*it).trimmed().toInt();
+		keyslist.append(val);
+	}
+	QString keyswitch = txtKeySwitches->text();
+	QStringList slist = keyswitch.split(QString(","), QString::SkipEmptyParts);
+	for (QStringList::Iterator it = slist.begin(); it != slist.end(); ++it)
+	{
+		int val = (*it).trimmed().toInt();
+		keyswitchlist.append(val);
+	}
+	p->keys = keyslist;
+	p->keyswitches = keyswitchlist;
 }
 
 //---------------------------------------------------------
