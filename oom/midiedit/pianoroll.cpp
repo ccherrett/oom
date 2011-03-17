@@ -572,6 +572,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     info->setEnabled(false);
 
     connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
+    connect(song, SIGNAL(punchinChanged(bool)), canvas, SLOT(update()));
+    connect(song, SIGNAL(punchoutChanged(bool)), canvas, SLOT(update()));
+    connect(song, SIGNAL(loopChanged(bool)), canvas, SLOT(update()));
     //connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
 
     setWindowTitle(canvas->getCaption());
@@ -1285,6 +1288,10 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	if (key == Qt::Key_Escape)
 	{
 		close();
+		return;
+	}
+	else if (key == shortcuts[SHRT_LE_INS_POLY_AFTERTOUCH].key)
+	{
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_POINTER].key)

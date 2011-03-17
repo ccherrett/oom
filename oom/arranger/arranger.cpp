@@ -421,6 +421,9 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(canvas, SIGNAL(startEditor(PartList*, int)), SIGNAL(startEditor(PartList*, int)));
 
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+    connect(song, SIGNAL(punchinChanged(bool)), canvas, SLOT(update()));
+    connect(song, SIGNAL(punchoutChanged(bool)), canvas, SLOT(update()));
+    connect(song, SIGNAL(loopChanged(bool)), canvas, SLOT(update()));
 	//connect(song,   SIGNAL(mTypeChanged(MType)), SLOT(setMode((int)MType)));    // p4.0.7 Tim.
 	connect(canvas, SIGNAL(followEvent(int)), hscroll, SLOT(setOffset(int)));
 	connect(canvas, SIGNAL(selectionChanged()), SIGNAL(selectionChanged()));
