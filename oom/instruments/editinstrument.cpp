@@ -1114,13 +1114,18 @@ void EditInstrument::patchChanged()
 		{
 			tmp.append(QString::number(key));
 		}
+		QString kb = tmp.join(", ");
 		txtKeys->setText(tmp.join(", "));
 		QStringList stmp;
 		foreach(int skey, p->keyswitches)
 		{
 			stmp.append(QString::number(skey));
 		}
-		txtKeySwitches->setText(stmp.join(", "));
+		QString ks = stmp.join(", ");
+		txtKeySwitches->setText(ks);
+		printf("Number of switches: %d\n", p->keys.size());
+		printf("Loading keys %s\n", kb.toUtf8().constData());
+		printf("Loading key switches %s\n", ks.toUtf8().constData());
 	}
 	else
 		// The item is a patch group item.
@@ -2152,6 +2157,8 @@ void EditInstrument::newPatchClicked()
 		prg = selpatch->prog;
 		patch->typ = selpatch->typ;
 		patch->drum = selpatch->drum;
+		patch->keys = selpatch->keys;
+		patch->keyswitches = selpatch->keyswitches;
 	}
 
 	bool found = false;
@@ -2234,6 +2241,8 @@ void EditInstrument::newPatchClicked()
 	checkBoxGM->setEnabled(true);
 	checkBoxGS->setEnabled(true);
 	checkBoxXG->setEnabled(true);
+	txtKeys->setEnabled(true);
+	txtKeySwitches->setEnabled(true);
 
 	oldPatchItem = 0;
 	patchChanged();
@@ -2305,6 +2314,8 @@ void EditInstrument::newGroupClicked()
 	checkBoxGM->setEnabled(false);
 	checkBoxGS->setEnabled(false);
 	checkBoxXG->setEnabled(false);
+	txtKeys->setEnabled(false);
+	txtKeySwitches->setEnabled(false);
 
 	workingInstrument.setDirty(true);
 }

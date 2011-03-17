@@ -265,6 +265,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 			_pc.event = nevent;
 
 			_pc.state = movingController;
+			_pc.valid = true;
 			return;
 		}
 		//We did not find a program change so just set song position
