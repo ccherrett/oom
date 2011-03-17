@@ -53,7 +53,6 @@ PCScale::PCScale(int* r, QWidget* parent, PianoRoll* editor, int xs, bool _mode)
 	setMouseTracking(true);
 	connect(song, SIGNAL(posChanged(int, unsigned, bool)), SLOT(setPos(int, unsigned, bool)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
-	//connect(song, SIGNAL(markerChanged(int)), SLOT(redraw()));
 
 	setFixedHeight(14);
 	setBg(QColor(110, 141, 152));
@@ -181,7 +180,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 		unsigned utick = song->cpos() + currentEditor->rasterStep(song->cpos());
 		emit addProgramChange(currentEditor->curCanvasPart(), utick);
 	}
-	else if (i == 2 && (event->modifiers() & Qt::ShiftModifier))/*{{{*/
+	/*else if (i == 2 && (event->modifiers() & Qt::ShiftModifier))
 	{ // If shift +RMB we remove a marker
 		//Delete Program change here
 		if (selectProgramChange(x))
@@ -195,7 +194,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 			update();
 			return;
 		}
-	}/*}}}*/
+	}*/
 	else if(i == 2)
 	{//popup a menu here to copy/paste PC
 		if(_pc.valid && _pc.state == selectedController)
@@ -203,27 +202,44 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 			//update the song position before we start so we have a position for paste
 			song->setPos(0, p);
 			QMenu* menu = new QMenu(this);
-			QAction *cp = menu->addAction(tr("Copy Selected Here."));
+			QAction *cp = menu->addAction(tr("Paste Program Change Here."));
 			cp->setData(1);
+			QAction *del = menu->addAction(tr("Delete Selected."));
+			del->setData(2);
 			//QAction *mv = menu->addAction(tr("Paste"));
 			//mv->setData(2);
 			QAction *act = menu->exec(event->globalPos(), 0);
 			if(act)
 			{
 				int id = act->data().toInt();
-				if(id == 1)
+				switch(id)
 				{
-					Event nevent = _pc.event.clone();/*{{{*/
-					nevent.setTick(x);
-					if((unsigned int)x < _pc.part->tick())
-						return;
-					int diff = nevent.tick() - _pc.part->lenTick();
-					if (diff > 0)
-					{// too short part? extend it
-						int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
-						_pc.part->setLenTick(endTick);
+					case 1:
+					{
+						Event nevent = _pc.event.clone();/*{{{*/
+						nevent.setTick(x);
+						if((unsigned int)x < _pc.part->tick())
+							return;
+						int diff = nevent.tick() - _pc.part->lenTick();
+						if (diff > 0)
+						{// too short part? extend it
+							int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
+							_pc.part->setLenTick(endTick);
+						}
+						song->recordEvent((MidiTrack*)_pc.part->track(), nevent);/*}}}*/
 					}
-					song->recordEvent((MidiTrack*)_pc.part->track(), nevent);/*}}}*/
+					break;
+					case 2:
+					{
+						deleteProgramChange(_pc.event);/*{{{*/
+						_pc.valid = false;
+
+						song->startUndo();
+						audio->msgDeleteEvent(_pc.event, _pc.part, true, true, false);
+						song->endUndo(SC_EVENT_MODIFIED);/*}}}*/
+						update();
+					}
+					break;
 				}
 			}
 		}
@@ -241,10 +257,11 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	{ // If LMB select the program change
 		if (selectProgramChange(x))
 		{
+			Event nevent = _pc.event.clone();
+
 			audio->msgDeleteEvent(_pc.event, _pc.part, false, true, false);
 			update();
 
-			Event nevent = _pc.event.clone();
 			_pc.event = nevent;
 
 			_pc.state = movingController;
