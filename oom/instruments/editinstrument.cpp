@@ -788,6 +788,8 @@ void EditInstrument::changeInstrument()
 				{
 					QTreeWidgetItem* sitem = new QTreeWidgetItem(item);
 					//printf("%s \n", qPrintable(patch->name));
+					//printf("Keys count: %d\n", (*p)->keys.size());
+					//printf("Keyswitch count: %d\n", (*p)->keyswitches.size());
 
 					sitem->setText(0, patch->name);
 					QVariant v = QVariant::fromValue((void*) patch);
@@ -1123,9 +1125,9 @@ void EditInstrument::patchChanged()
 		}
 		QString ks = stmp.join(", ");
 		txtKeySwitches->setText(ks);
-		printf("Number of switches: %d\n", p->keys.size());
-		printf("Loading keys %s\n", kb.toUtf8().constData());
-		printf("Loading key switches %s\n", ks.toUtf8().constData());
+		//printf("Number of switches: %d\n", p->keys.size());
+		//printf("Loading keys %s\n", kb.toUtf8().constData());
+		//printf("Loading key switches %s\n", ks.toUtf8().constData());
 	}
 	else
 		// The item is a patch group item.

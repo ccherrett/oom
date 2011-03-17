@@ -424,7 +424,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//    split
 	//---------------------------------------------------
 
-	splitter = new Splitter(Qt::Vertical, mainw, "splitter");
+	splitter = new Splitter(Qt::Vertical, this, "splitter");
 	splitter->setHandleWidth(2);
 
 	hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
@@ -765,6 +765,12 @@ PianoRoll::~PianoRoll()
 	tconfig().set_property("PianoRoll", "hscale", hscroll->mag());
 	tconfig().set_property("PianoRoll", "yscale", vscroll->mag());
 	tconfig().set_property("PianoRoll", "ypos", vscroll->pos());
+	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();
+	i != ctrlEditList.end(); ++i)
+	{
+		ctrlEditList.erase(i);
+		break;
+	}
 }
 
 //---------------------------------------------------------

@@ -442,6 +442,8 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 			np->prog = pp->prog;
 			np->name = pp->name;
 			np->drum = pp->drum;
+			np->keys = pp->keys;
+			np->keyswitches = pp->keyswitches;
 			npg->patches.push_back(np);
 		}
 	}

@@ -197,6 +197,7 @@ signals:
 public:
     CtrlCanvas(MidiEditor*, QWidget* parent, int,
             const char* name = 0, CtrlPanel* pnl = 0);
+	~CtrlCanvas(){}
 
     void setPanel(CtrlPanel* pnl)
     {

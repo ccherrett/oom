@@ -2170,7 +2170,7 @@ void Song::clear(bool signal)
 		//Its because all the components of PR like trackinfo are not reacting properly
 		//I think the solution is to close the PR before changing songs, what's the point
 		//of having it there between completely different songs.
-		//midiPorts[i].patchSequences()->clear();
+		midiPorts[i].patchSequences()->clear();
 
 		// p3.3.50 Reset this.
 		midiPorts[i].setFoundInSongFile(false);

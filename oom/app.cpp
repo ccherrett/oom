@@ -5082,7 +5082,7 @@ bool OOMidi::clearSong()
 	}
 	microSleep(100000);
 
-again:
+//again:
 	for (iToplevel i = toplevels.begin(); i != toplevels.end(); ++i)
 	{
 		Toplevel tl = *i;
@@ -5091,20 +5091,24 @@ again:
 		{
 			case Toplevel::CLIPLIST:
 			case Toplevel::MARKER:
-				break;
 			case Toplevel::PIANO_ROLL:
 			case Toplevel::LISTE:
 			case Toplevel::DRUM:
 			case Toplevel::MASTER:
 			case Toplevel::WAVE:
 			case Toplevel::LMASTER:
+			{
+				((QWidget*) (obj))->blockSignals(true);
 				((QWidget*) (obj))->close();
-				goto again;
+			}
+				//goto again;
 		}
 	}
+	printf("OOMidi::clearSong() TopLevel.size(%d) \n", (int)toplevels.size());
+	toplevels.clear();
 	microSleep(100000);
 	song->clear(false);
-	microSleep(100000);
+	microSleep(200000);
 	return false;
 }
 
