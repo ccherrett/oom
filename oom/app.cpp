@@ -20,6 +20,7 @@
 #include <QDockWidget>
 #include <QProgressDialog>
 #include <QSizeGrip>
+#include <QtGui>
 
 #include "app.h"
 #include "master/lmaster.h"
@@ -1555,10 +1556,19 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	loadProjectFile(name, useTemplate, true);
 	changeConfig(false);
 	QSize defaultScreenSize = tconfig().get_property("Interface", "size", QSize(0, 0)).toSize();
+	int dw = qApp->desktop()->width();
+	int dh = qApp->desktop()->height();
 	if(defaultScreenSize.height())
 	{
-		resize(defaultScreenSize);
-		move(tconfig().get_property("Interface", "pos", QPoint(200, 200)).toPoint());
+		if(defaultScreenSize.height() <= dh && defaultScreenSize.width() <= dw)
+		{
+			resize(defaultScreenSize);
+			move(tconfig().get_property("Interface", "pos", QPoint(200, 200)).toPoint());
+		}
+		else
+		{
+			showMaximized();
+		}
 		restoreState(tconfig().get_property("Interface", "windowstate", "").toByteArray());
 	}
 	else

@@ -31,6 +31,7 @@
 #include <QMimeData>
 #include <QScrollArea>
 #include <QWidgetAction>
+#include <QtGui>
 
 #include <stdio.h>
 
@@ -71,7 +72,7 @@ int PianoRoll::_quantStrengthInit = 80; // 1 - 100%
 int PianoRoll::_quantLimitInit = 50; // tick value
 bool PianoRoll::_quantLenInit = false;
 int PianoRoll::_toInit = 0;
-int PianoRoll::colorModeInit = 0;
+int PianoRoll::colorModeInit = 2;
 
 static const int xscale = -10;
 static const int yscale = 1;
@@ -90,8 +91,17 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	// Set size stored in global config, or use defaults.
 	int w = tconfig().get_property("PianoRollEdit", "widgetwidth", 800).toInt();
 	int h = tconfig().get_property("PianoRollEdit", "widgetheigth", 650).toInt();
-	//FIXME: This needs to be checked to make sure its not larger than the current desktop size
-	resize(w, h);
+	int dw = qApp->desktop()->width();
+	int dh = qApp->desktop()->height();
+	if(h <= dh && w <= dw)
+	{
+		//FIXME: This needs to be checked to make sure its not larger than the current desktop size
+		resize(w, h);
+	}
+	else
+	{
+		showMaximized();
+	}
 
 	selPart = 0;
 	quantConfig = 0;
@@ -100,7 +110,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	_quantLimit = _quantLimitInit;
 	_quantLen = _quantLenInit;
 	_to = _toInit;
-	colorMode = colorModeInit;
+	colorMode = tconfig().get_property("PianoRollEdit", "colormode", colorModeInit).toInt();
 	_stepQwerty = false;
 
 	QSignalMapper* mapper = new QSignalMapper(this);
@@ -762,9 +772,10 @@ PianoRoll::~PianoRoll()
 	// store widget size to global config
 	tconfig().set_property("PianoRollEdit", "widgetwidth", width());
 	tconfig().set_property("PianoRollEdit", "widgetheigth", height());
-	tconfig().set_property("PianoRoll", "hscale", hscroll->mag());
-	tconfig().set_property("PianoRoll", "yscale", vscroll->mag());
-	tconfig().set_property("PianoRoll", "ypos", vscroll->pos());
+	tconfig().set_property("PianoRollEdit", "hscale", hscroll->mag());
+	tconfig().set_property("PianoRollEdit", "yscale", vscroll->mag());
+	tconfig().set_property("PianoRollEdit", "ypos", vscroll->pos());
+	tconfig().set_property("PianoRollEdit", "colormode", colorMode);
 	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();
 	i != ctrlEditList.end(); ++i)
 	{
@@ -1894,9 +1905,9 @@ void PianoRoll::showEvent(QShowEvent *)
 	// half the canvas width so the cursor is centered.
 	hscroll->setPos(hscroll->pos() - (canvas->width() / 2));
 
-	int hScale = tconfig().get_property("PianoRoll", "hscale", 346).toInt();
-	int vScale = tconfig().get_property("PianoRoll", "yscale", 286).toInt();
-	int yPos = tconfig().get_property("PianoRoll", "ypos", 0).toInt();
+	int hScale = tconfig().get_property("PianoRollEdit", "hscale", 346).toInt();
+	int vScale = tconfig().get_property("PianoRollEdit", "yscale", 286).toInt();
+	int yPos = tconfig().get_property("PianoRollEdit", "ypos", 0).toInt();
 	hscroll->setMag(hScale);
 	vscroll->setMag(vScale);
 	vscroll->setPos(yPos);
