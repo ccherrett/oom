@@ -154,13 +154,13 @@ void EventCanvas::songChanged(int flags)
 		_items.clear();
 		start_tick = MAXINT;
 		end_tick = 0;
-        _curPart = 0;
+	_curPart = 0;
 
 		for (iPart p = editor->parts()->begin(); p != editor->parts()->end(); ++p)
 		{
 			MidiPart* part = (MidiPart*) (p->second);
-            if (part->sn() == _curPartId)
-                _curPart = part;
+	    if (part->sn() == _curPartId)
+		_curPart = part;
 			unsigned stick = part->tick();
 			unsigned len = part->lenTick();
 			unsigned etick = stick + len;
@@ -211,10 +211,10 @@ void EventCanvas::songChanged(int flags)
 		x = nevent->x();
 		event = nevent->event();
 		part = (MidiPart*) nevent->part();
-        if (_curPart != part)
+	if (_curPart != part)
 		{
-            _curPart = part;
-            _curPartId = _curPart->sn();
+	    _curPart = part;
+	    _curPartId = _curPart->sn();
 			curPartChanged();
 		}
 	}
@@ -370,6 +370,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 		} else // there was no item selected at all? Then select nearest to tick if there is any
 		{
 			selectAtTick(song->cpos());
+			updateSelection();
 		}
 	}
 	//Select items by key: (PianoRoll & DrumEditor)
@@ -421,6 +422,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			} else // there was no item selected at all? Then select nearest to tick if there is any
 			{
 				selectAtTick(song->cpos());
+				updateSelection();
 			}
 		}
 	}
