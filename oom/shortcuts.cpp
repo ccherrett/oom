@@ -311,6 +311,8 @@ void initShortCuts()
 	defShrt(SHRT_NEXT_MARKER, Qt::Key_F6, "Goto Next Marker", ARRANG_SHRT, "me_sel_next");
 	defShrt(SHRT_PREV_MARKER, Qt::Key_F5, "Goto Prev Marker", ARRANG_SHRT, "me_sel_prev");
 
+	defShrt(SHRT_TOGGLE_ENABLE, Qt::Key_E, "Tool: Toggle Enable", MEDIT_SHRT, "master_toggle_enable");
+
 }
 
 const shortcut_cg shortcut_category[SHRT_NUM_OF_CATEGORIES] = {

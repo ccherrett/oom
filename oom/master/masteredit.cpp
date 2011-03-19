@@ -506,5 +506,9 @@ void MasterEdit::keyPressEvent(QKeyEvent* event)
 	{
 		rasterLabel->setCurrentIndex(5);
 	}
+	else if (key == shortcuts[SHRT_TOGGLE_ENABLE].key)
+	{
+		enableButton->toggle();
+	}
 
 }
