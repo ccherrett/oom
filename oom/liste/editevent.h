@@ -105,6 +105,8 @@ class EditCtrlDialog : public QDialog, public Ui::EditCtrlBase
 
 private slots:
     void ctrlListClicked(QListWidgetItem*);
+    void ctrlListItemSelectionChanged();
+	void updateControls(QListWidgetItem*);
     void newController();
     void programChanged();
     void instrPopup();

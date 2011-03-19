@@ -691,7 +691,8 @@ EditCtrlDialog::EditCtrlDialog(int tick, const Event& event,
 	}
 	else
 		ctrlListClicked(ctrlList->selectedItems()[0]);
-	connect(ctrlList, SIGNAL(itemClicked(QListWidgetItem*)), SLOT(ctrlListClicked(QListWidgetItem*)));
+	//connect(ctrlList, SIGNAL(itemClicked(QListWidgetItem*)), SLOT(ctrlListClicked(QListWidgetItem*)));
+	connect(ctrlList, SIGNAL(itemSelectionChanged()), SLOT(ctrlListItemSelectionChanged()));
 	connect(buttonNewController, SIGNAL(clicked()), SLOT(newController()));
 	connect(hbank, SIGNAL(valueChanged(int)), SLOT(programChanged()));
 	connect(lbank, SIGNAL(valueChanged(int)), SLOT(programChanged()));
@@ -775,7 +776,22 @@ void EditCtrlDialog::newController()
 //   ctrlListClicked
 //---------------------------------------------------------
 
+void EditCtrlDialog::ctrlListItemSelectionChanged()
+{
+	QListWidgetItem* item = ctrlList->currentItem();
+	if(item == 0)
+		return;
+	updateControls(item);
+}
+
 void EditCtrlDialog::ctrlListClicked(QListWidgetItem* item)
+{
+	if(item == 0)
+		return;
+	updateControls(item);
+}
+
+void EditCtrlDialog::updateControls(QListWidgetItem* item)
 {
 	if (item == 0)
 		return;
