@@ -1332,8 +1332,8 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				p.setPen(mypen6);
 				p.setBrush(QBrush(fillColor));
 				p.drawRect(tick+1, y1-3, 5, wh);
-				QRect rect(tick-1, y1-3, 9, 6);
-				p.drawRoundedRect(rect,2,2);
+				QRect rect(tick-2, y1-3, 11, 6);
+				p.drawRoundedRect(rect,3,3);
 			}
 			else
 			{
