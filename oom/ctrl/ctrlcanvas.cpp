@@ -1260,14 +1260,22 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			else
 				p.setPen(QPen(QColor(172, 172, 172), 6));
 
-			int alpha = 150;
+			int alpha = 255;
 			QColor colSelected;
-			colSelected.setRgb(243, 206, 105, alpha);
+			colSelected.setRgb(57, 203, 0, alpha);
+			QColor outlineColor = QColor(0,0,0);
+			QColor fillColor = QColor(236, 215, 156,127);
 			if(e->selected())
 			{
-				p.setPen(QPen(colSelected, 6));
+				QPen mypen6 = QPen(outlineColor, 1, Qt::SolidLine);
+				p.setPen(mypen6);
+				p.setBrush(QBrush(fillColor));
+				p.drawRect(tick, y1, 6, 5);
 			}
-			p.drawLine(tick + 4, wh, tick + 4, y1);
+			else
+			{
+				p.drawLine(tick + 4, wh, tick + 4, y1);
+			}
 		}
 	}
 	else
