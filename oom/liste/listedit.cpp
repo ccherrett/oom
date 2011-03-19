@@ -951,7 +951,7 @@ void ListEdit::cmd(int cmd)
 					// Indicate no undo, and do port controller values and clone parts.
 					//audio->msgDeleteEvent(item->event, item->part, false);
 					//audio->msgDeleteEvent(item->event, item->part, false, true, true);
-					audio->msgDeleteEvent(item->event, item->part, true, true, false);
+					audio->msgDeleteEvent(item->event, item->part, false, false, false);
 				}
 			}
 
