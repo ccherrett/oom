@@ -1270,7 +1270,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				QPen mypen6 = QPen(outlineColor, 1, Qt::SolidLine);
 				p.setPen(mypen6);
 				p.setBrush(QBrush(fillColor));
-				p.drawRect(tick, y1, 6, -5);
+				p.drawRect(tick, y1-3, 6, 5);
 			}
 			else
 			{
