@@ -150,13 +150,13 @@ void initShortCuts()
 	defShrt(SHRT_SEL_TRACK_BELOW, Qt::CTRL + Qt::Key_Down, "Select track below", ARRANG_SHRT, "sel_track_below");
 
 	defShrt(SHRT_INSERT_PART, Qt::CTRL + Qt::Key_Insert, "Insert new part at cursor", ARRANG_SHRT, "insert_part_at_cursor");
-	
+
 	defShrt(SHRT_RENAME_TRACK, Qt::CTRL + Qt::Key_R, "Rename selected track", ARRANG_SHRT, "rename_track");
 
-        defShrt(SHRT_SEL_TRACK_ABOVE_ADD, Qt::CTRL + Qt::SHIFT + Qt::Key_Up, "Add Track above to selection", ARRANG_SHRT, "sel_track_above_add");
-        defShrt(SHRT_SEL_TRACK_BELOW_ADD, Qt::CTRL + Qt::SHIFT + Qt::Key_Down, "Add Track below to selection", ARRANG_SHRT, "sel_track_below_add");
-        defShrt(SHRT_TOGGLE_RACK, Qt::Key_N, "Toggle effectsrack in mixer", MIXER_SHRT, "toggle_effectsrack");
-        //-----------------------------------------------------------
+	defShrt(SHRT_SEL_TRACK_ABOVE_ADD, Qt::CTRL + Qt::SHIFT + Qt::Key_Up, "Add Track above to selection", ARRANG_SHRT, "sel_track_above_add");
+	defShrt(SHRT_SEL_TRACK_BELOW_ADD, Qt::CTRL + Qt::SHIFT + Qt::Key_Down, "Add Track below to selection", ARRANG_SHRT, "sel_track_below_add");
+	defShrt(SHRT_TOGGLE_RACK, Qt::Key_N, "Toggle effectsrack in mixer", MIXER_SHRT, "toggle_effectsrack");
+	//-----------------------------------------------------------
 
 	defShrt(SHRT_TRANSPOSE, 0, "Midi: Transpose", ARRANG_SHRT + PROLL_SHRT, "midi_transpose");
 
@@ -221,8 +221,8 @@ void initShortCuts()
 	defShrt(SHRT_SEL_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_S, "Edit: Select Program Change under cursor", PROLL_SHRT, "select_program_change");
 	defShrt(SHRT_LMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Comma, "Edit: Move Selected Program Change Left", PROLL_SHRT, "lmove_program_change");
 	defShrt(SHRT_RMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Period, "Edit: Move Selected Program Change Right", PROLL_SHRT, "rmove_program_change");
-        defShrt(SHRT_LMOVE_SELECT, Qt::CTRL + Qt::ALT + Qt::Key_Left, "Edit: Move to next Program Change Left", PROLL_SHRT, "select_program_change_left");
-        defShrt(SHRT_RMOVE_SELECT, Qt::CTRL + Qt::ALT + Qt::Key_Right, "Edit: Move to next Program Change Right", PROLL_SHRT, "select_program_change_right");
+	defShrt(SHRT_LMOVE_SELECT, Qt::CTRL + Qt::ALT + Qt::Key_Left, "Edit: Move to next Program Change Left", PROLL_SHRT, "select_program_change_left");
+	defShrt(SHRT_RMOVE_SELECT, Qt::CTRL + Qt::ALT + Qt::Key_Right, "Edit: Move to next Program Change Right", PROLL_SHRT, "select_program_change_right");
 	defShrt(SHRT_SEL_INSTRUMENT, Qt::Key_I, "Edit: Select Instrument", PROLL_SHRT, "midi_instrument");
 	defShrt(SHRT_TOGGLE_STEPRECORD, Qt::CTRL + Qt::Key_F8, "Edit: Toggle Step Input", PROLL_SHRT, "toggle_step_input");
 	defShrt(SHRT_NOTE_VELOCITY_UP, Qt::Key_Up, "Edit: Increase velocity for selection", PROLL_SHRT, "increase_note_velocity");
@@ -235,30 +235,33 @@ void initShortCuts()
 	defShrt(SHRT_OCTAVE_QWERTY_4, Qt::CTRL + Qt::Key_4, "Edit: Set Qwerty Range To C4", PROLL_SHRT, "qwerty_range_C4");
 	defShrt(SHRT_OCTAVE_QWERTY_5, Qt::CTRL + Qt::Key_5, "Edit: Set Qwerty Range To C5", PROLL_SHRT, "qwerty_range_C5");
 	defShrt(SHRT_OCTAVE_QWERTY_6, Qt::CTRL + Qt::Key_6, "Edit: Set Qwerty Range To C6", PROLL_SHRT, "qwerty_range_C6");
-	
-        // Shortcuts for tools
+
+	// Shortcuts for tools
 	// global
 	defShrt(SHRT_TOOL_POINTER, Qt::Key_A, "Tool: Pointer", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "pointer_tool");
 	defShrt(SHRT_TOOL_PENCIL, Qt::Key_D, "Tool: Pencil", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "pencil_tool");
-        defShrt(SHRT_TOOL_RUBBER, Qt::Key_B, "Tool: Eraser", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "eraser_tool");
+	defShrt(SHRT_TOOL_RUBBER, Qt::Key_B, "Tool: Eraser", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "eraser_tool");
 	// piano roll & drum editor
 	defShrt(SHRT_TOOL_LINEDRAW, Qt::Key_F, "Tool: Line Draw", PROLL_SHRT + DEDIT_SHRT, "line_draw_tool");
 	// arranger
 	defShrt(SHRT_TOOL_SCISSORS, Qt::Key_J, "Tool: Scissor", ARRANG_SHRT, "scissor_tool");
 	defShrt(SHRT_TOOL_GLUE, Qt::Key_G, "Tool: Glue", ARRANG_SHRT, "glue_tool");
 	defShrt(SHRT_TOOL_MUTE, 0, "Tool: Mute", ARRANG_SHRT, "mute_tool");
-        defShrt(SHRT_TRACK_TOGGLE_SOLO, Qt::Key_S, "State: Solo", GLOBAL_SHRT, "toggle_solo"); 
-        defShrt(SHRT_TRACK_TOGGLE_MUTE, Qt::Key_M, "State: Mute", GLOBAL_SHRT, "toggle_mute");
-        defShrt(SHRT_MIDI_PANIC, Qt::Key_P, "Tool: midi panic button", GLOBAL_SHRT, "midi_panic");
+	defShrt(SHRT_TRACK_TOGGLE_SOLO, Qt::Key_S, "State: Solo", GLOBAL_SHRT, "toggle_solo");
+	defShrt(SHRT_TRACK_TOGGLE_MUTE, Qt::Key_M, "State: Mute", GLOBAL_SHRT, "toggle_mute");
+	defShrt(SHRT_MIDI_PANIC, Qt::Key_P, "Tool: midi panic button", GLOBAL_SHRT, "midi_panic");
 
-        defShrt(SHRT_TRACK_HEIGHT_DEFAULT, Qt::ALT + Qt::Key_1, "Track: Default Height", GLOBAL_SHRT, "track_height_default");
-        defShrt(SHRT_TRACK_HEIGHT_FULL_SCREEN, Qt::ALT + Qt::Key_0, "Track: Full screen height", GLOBAL_SHRT, "track_height_full_screen");
-        defShrt(SHRT_TRACK_HEIGHT_SELECTION_FITS_IN_VIEW, Qt::ALT + Qt::Key_7, "Track: Full screen height", GLOBAL_SHRT, "track_height_fit_selection_in_view");
-        defShrt(SHRT_TRACK_HEIGHT_2, Qt::ALT + Qt::Key_2, "Track: height 2", GLOBAL_SHRT, "track_height_2");
-        defShrt(SHRT_TRACK_HEIGHT_3, Qt::ALT + Qt::Key_3, "Track: height 3", GLOBAL_SHRT, "track_height_3");
-        defShrt(SHRT_TRACK_HEIGHT_4, Qt::ALT + Qt::Key_4, "Track: height 4", GLOBAL_SHRT, "track_height_4");
-        defShrt(SHRT_TRACK_HEIGHT_5, Qt::ALT + Qt::Key_5, "Track: height 5", GLOBAL_SHRT, "track_height_5");
-        defShrt(SHRT_TRACK_HEIGHT_6, Qt::ALT + Qt::Key_6, "Track: height 6", GLOBAL_SHRT, "track_height_6");
+	defShrt(SHRT_NAVIGATE_TO_CANVAS, Qt::CTRL + Qt::Key_Enter, "Navigate: to canvas", GLOBAL_SHRT, "navigate_to_canvas");
+	defShrt(SHRT_NAVIGATE_TO_CANVAS, Qt::CTRL + Qt::Key_Return, "Navigate: to canvas", GLOBAL_SHRT, "navigate_to_canvas");
+
+	defShrt(SHRT_TRACK_HEIGHT_DEFAULT, Qt::ALT + Qt::Key_1, "Track: Default Height", GLOBAL_SHRT, "track_height_default");
+	defShrt(SHRT_TRACK_HEIGHT_FULL_SCREEN, Qt::ALT + Qt::Key_0, "Track: Full screen height", GLOBAL_SHRT, "track_height_full_screen");
+	defShrt(SHRT_TRACK_HEIGHT_SELECTION_FITS_IN_VIEW, Qt::ALT + Qt::Key_7, "Track: Full screen height", GLOBAL_SHRT, "track_height_fit_selection_in_view");
+	defShrt(SHRT_TRACK_HEIGHT_2, Qt::ALT + Qt::Key_2, "Track: height 2", GLOBAL_SHRT, "track_height_2");
+	defShrt(SHRT_TRACK_HEIGHT_3, Qt::ALT + Qt::Key_3, "Track: height 3", GLOBAL_SHRT, "track_height_3");
+	defShrt(SHRT_TRACK_HEIGHT_4, Qt::ALT + Qt::Key_4, "Track: height 4", GLOBAL_SHRT, "track_height_4");
+	defShrt(SHRT_TRACK_HEIGHT_5, Qt::ALT + Qt::Key_5, "Track: height 5", GLOBAL_SHRT, "track_height_5");
+	defShrt(SHRT_TRACK_HEIGHT_6, Qt::ALT + Qt::Key_6, "Track: height 6", GLOBAL_SHRT, "track_height_6");
 
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
@@ -268,10 +271,10 @@ void initShortCuts()
 	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Period, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
 	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Comma, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");
 
-	
-        defShrt(SHRT_SET_QUANT_0, Qt::Key_0, "Quantize: Set quantize to off", PROLL_SHRT, "midi_quant_off");
-        defShrt(SHRT_SET_QUANT_1, Qt::Key_1, "Quantize: Set quantize to 1/1 note", PROLL_SHRT, "midi_quant_1");
-        defShrt(SHRT_SET_QUANT_2, Qt::Key_2, "Quantize: Set quantize to 1/2 note", PROLL_SHRT, "midi_quant_2");
+
+	defShrt(SHRT_SET_QUANT_0, Qt::Key_0, "Quantize: Set quantize to off", PROLL_SHRT, "midi_quant_off");
+	defShrt(SHRT_SET_QUANT_1, Qt::Key_1, "Quantize: Set quantize to 1/1 note", PROLL_SHRT, "midi_quant_1");
+	defShrt(SHRT_SET_QUANT_2, Qt::Key_2, "Quantize: Set quantize to 1/2 note", PROLL_SHRT, "midi_quant_2");
 	defShrt(SHRT_SET_QUANT_3, Qt::Key_3, "Quantize: Set quantize to 1/4 note", PROLL_SHRT, "midi_quant_3");
 	defShrt(SHRT_SET_QUANT_4, Qt::Key_4, "Quantize: Set quantize to 1/8 note", PROLL_SHRT, "midi_quant_4");
 	defShrt(SHRT_SET_QUANT_5, Qt::Key_5, "Quantize: Set quantize to 1/16 note", PROLL_SHRT, "midi_quant_5");
@@ -281,7 +284,7 @@ void initShortCuts()
 	defShrt(SHRT_TOGGLE_TRIOL, Qt::Key_T, "Quantize: Toggle triol quantization", PROLL_SHRT, "midi_quant_triol");
 	defShrt(SHRT_TOGGLE_PUNCT, Qt::Key_Period, "Quantize: Toggle punctuation quantization", PROLL_SHRT, "midi_quant_punct");
 	defShrt(SHRT_TOGGLE_PUNCT2, Qt::Key_Comma, "Quantize: Toggle punctuation quantization (2)", PROLL_SHRT, "midi_quant_punct2");
-        defShrt(SHRT_INSERT_AT_LOCATION, Qt::Key_Insert, "Edit: Insert at location", PROLL_SHRT, "midi_insert_at_loc");
+	defShrt(SHRT_INSERT_AT_LOCATION, Qt::Key_Insert, "Edit: Insert at location", PROLL_SHRT, "midi_insert_at_loc");
 
 	defShrt(SHRT_INCREASE_LEN, Qt::CTRL + Qt::SHIFT + Qt::Key_Right, "Edit: Increase length", PROLL_SHRT, "increase_len");
 	defShrt(SHRT_DECREASE_LEN, Qt::CTRL + Qt::SHIFT + Qt::Key_Left, "Edit: Decrease length", PROLL_SHRT, "decrease_len");
