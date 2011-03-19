@@ -137,7 +137,7 @@ void microSleep(long msleep)
 }
 
 // Removed p3.3.17
-/* 
+/*
 //---------------------------------------------------------
 //   watchdog thread
 //---------------------------------------------------------
@@ -475,9 +475,9 @@ void addProject(const QString& name)
 //---------------------------------------------------------
 
 /*
-struct addSynth_cmp_str 
+struct addSynth_cmp_str
 {
-   bool operator()(std::string a, std::string b) 
+   bool operator()(std::string a, std::string b)
    {
 	  return (a < b);
    }
@@ -504,13 +504,13 @@ QMenu* populateAddSynth(QWidget* parent)
 	DssiSynth* synDSSI = 0;
 	QMenu* synpDSSI = 0;
 	asmap mapDSSI;
-#endif                  
+#endif
 
 #ifdef VST_SUPPORT
 	VstSynth* synVST = 0;
 	QMenu* synpVST = 0;
 	asmap mapVST;
-#endif                  
+#endif
 
 	// Not necessary, but what the heck.
 	QMenu* synpOther = 0;
@@ -535,7 +535,7 @@ QMenu* populateAddSynth(QWidget* parent)
 				mapDSSI.insert(std::pair<std::string, int> (std::string(synDSSI->description().toLower().toLatin1().constData()), ii));
 			}
 			else
-#endif                      
+#endif
 
 			{
 #ifdef VST_SUPPORT
@@ -545,7 +545,7 @@ QMenu* populateAddSynth(QWidget* parent)
 					mapVST.insert(std::pair<std::string, int> (std::string(synVST->description().toLower().toLatin1().constData()), ii));
 				}
 				else
-#endif                      
+#endif
 
 				{
 					mapOther.insert(std::pair<std::string, int> (std::string((*i)->description().toLower().toLatin1().constData()), ii));
@@ -719,8 +719,8 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 {
 
-        // Very first thing we should do is loading global configuration values
-        tconfig().check_and_load_configuration();
+	// Very first thing we should do is loading global configuration values
+	tconfig().check_and_load_configuration();
 
 	//loadTheme(config.style);
 	loadTheme("plastique");
@@ -1577,7 +1577,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	}
 
 	song->update();
-	
+
 }
 
 OOMidi::~OOMidi()
@@ -1787,37 +1787,37 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		}
 		else
 		{
-            // Load the .oom file into a QDomDocument.
-            // the xml parser of QDomDocument then will be able to tell us
-            // if the .oom file didn't get corrupted in some way, cause the
-            // internal xml parser of oom can't do that.
-            QDomDocument doc("OOMProject");
-            QFile file(fi.filePath());
+	    // Load the .oom file into a QDomDocument.
+	    // the xml parser of QDomDocument then will be able to tell us
+	    // if the .oom file didn't get corrupted in some way, cause the
+	    // internal xml parser of oom can't do that.
+	    QDomDocument doc("OOMProject");
+	    QFile file(fi.filePath());
 
-            if (!file.open(QIODevice::ReadOnly)) {
-                    printf("Could not open file %s readonly\n", file.fileName().toLatin1().data());
-            }
+	    if (!file.open(QIODevice::ReadOnly)) {
+		    printf("Could not open file %s readonly\n", file.fileName().toLatin1().data());
+	    }
 
-            QString errorMsg;
-            if (!doc.setContent(&file, &errorMsg)) {
-                printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
+	    QString errorMsg;
+	    if (!doc.setContent(&file, &errorMsg)) {
+		printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
 
-                if (QMessageBox::critical(this,
-                                      QString("OOMidi Load Project"),
-                                      tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n\n"
-                                         "Suggestion: \n\nmove the %1 file to another location, and rename the %1.backup to %1"
-                                         " and reload the project\n")
-                                      .arg(file.fileName())
-                                      .arg(errorMsg),
-                                      "OK")) {
-                        setUntitledProject();
-                        // is it save to return; here ?
-                        return;
-                }
-            }
+		if (QMessageBox::critical(this,
+				      QString("OOMidi Load Project"),
+				      tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n\n"
+					 "Suggestion: \n\nmove the %1 file to another location, and rename the %1.backup to %1"
+					 " and reload the project\n")
+				      .arg(file.fileName())
+				      .arg(errorMsg),
+				      "OK")) {
+			setUntitledProject();
+			// is it save to return; here ?
+			return;
+		}
+	    }
 
-            // OK, seems the xml file contained valid xml, start loading the real thing here
-            // using the internal xml parser for now.
+	    // OK, seems the xml file contained valid xml, start loading the real thing here
+	    // using the internal xml parser for now.
 
 			Xml xml(f);
 			printf("OOMidi::loadProjectFile1 Before OOMidi::read()\n");
@@ -2148,24 +2148,24 @@ bool OOMidi::updateRouteMapping(QString name, QString note)/*{{{*/
 	QFileInfo fi(name);
 	QDomDocument doc("OOMRouteMap");/*{{{*/
 	QFile file(fi.filePath());
-	
+
 	if (!file.open(QIODevice::ReadOnly)) {
 	    printf("Could not open file %s read/write\n", file.fileName().toLatin1().data());
 		return false;
 	}
-	
+
 	QString errorMsg;
 	if (!doc.setContent(&file, &errorMsg)) {
 	    printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
-	
+
 	    if (QMessageBox::critical(this,
-	                          QString("OOMidi Load Routing Map"),
-	                          tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
-	                          .arg(file.fileName())
-	                          .arg(errorMsg),
-	                          "OK")) 
+				  QString("OOMidi Load Routing Map"),
+				  tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
+				  .arg(file.fileName())
+				  .arg(errorMsg),
+				  "OK"))
 		{
-	    	return false;
+		return false;
 	    }
 	}/*}}}*/
 	file.close();
@@ -2200,24 +2200,24 @@ QString OOMidi::noteForRouteMapping(QString name)/*{{{*/
 	QFileInfo fi(name);
 	QDomDocument doc("OOMRouteMap");/*{{{*/
 	QFile file(fi.filePath());
-	
+
 	if (!file.open(QIODevice::ReadOnly)) {
 	    printf("Could not open file %s readonly\n", file.fileName().toLatin1().data());
 		return rv;
 	}
-	
+
 	QString errorMsg;
 	if (!doc.setContent(&file, &errorMsg)) {
 	    printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
-	
+
 	    if (QMessageBox::critical(this,
-	                          QString("OOMidi Load Routing Map"),
-	                          tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
-	                          .arg(file.fileName())
-	                          .arg(errorMsg),
-	                          "OK")) 
+				  QString("OOMidi Load Routing Map"),
+				  tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
+				  .arg(file.fileName())
+				  .arg(errorMsg),
+				  "OK"))
 		{
-	    	return rv;
+		return rv;
 	    }
 	}/*}}}*/
 	QDomElement root = doc.documentElement();
@@ -2270,28 +2270,28 @@ bool OOMidi::loadRouteMapping(QString name)
 		}
 		else
 		{
-            QDomDocument doc("OOMRouteMap");
-            QFile file(fi.filePath());
+	    QDomDocument doc("OOMRouteMap");
+	    QFile file(fi.filePath());
 
-            if (!file.open(QIODevice::ReadOnly)) {
-                printf("Could not open file %s readonly\n", file.fileName().toLatin1().data());
+	    if (!file.open(QIODevice::ReadOnly)) {
+		printf("Could not open file %s readonly\n", file.fileName().toLatin1().data());
 				return false;
-            }
+	    }
 
-            QString errorMsg;
-            if (!doc.setContent(&file, &errorMsg)) {
-                printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
+	    QString errorMsg;
+	    if (!doc.setContent(&file, &errorMsg)) {
+		printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
 
-                if (QMessageBox::critical(this,
-                                      QString("OOMidi Load Routing Map"),
-                                      tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
-                                      .arg(file.fileName())
-                                      .arg(errorMsg),
-                                      "OK")) 
+		if (QMessageBox::critical(this,
+				      QString("OOMidi Load Routing Map"),
+				      tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
+				      .arg(file.fileName())
+				      .arg(errorMsg),
+				      "OK"))
 				{
-                	return false;
-                }
-            }
+			return false;
+		}
+	    }
 
 			Xml xml(f);
 
@@ -2307,7 +2307,7 @@ bool OOMidi::loadRouteMapping(QString name)
 				(*imd)->inRoutes()->clear();
 				(*imd)->outRoutes()->clear();
 			}
-		
+
 			bool lld = true;
 			while (lld)/*{{{*/
 			{
@@ -2359,7 +2359,7 @@ bool OOMidi::loadRouteMapping(QString name)
 	song->dirty = true;
 	//Restart all the audio connections
 	seqRestart();
-	song->update(SC_CONFIG);	
+	song->update(SC_CONFIG);
 	return true;
 }
 
@@ -2496,7 +2496,7 @@ void OOMidi::closeEvent(QCloseEvent* event)
 		lash_event_t* lashev = lash_event_new_with_type(LASH_Quit);
 		lash_send_event(lash_client, lashev);
 	}
-#endif      
+#endif
 
 	if (debugMsg)
 		printf("OOMidi: Exiting Dsp\n");
@@ -2750,17 +2750,17 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 
 		/*
 		PopupMenu* pup = getRoutingPopupMenu();
-        
+
 		printf("OOMidi::routingPopupMenuActivated audio n:%d count:%d\n", n, pup->count());
-        
+
 		if(pup->count() == 0)
 		  return;
-          
+
 		AudioTrack* t = (AudioTrack*)track;
 		RouteList* rl = gIsOutRoutingPopupMenu ? t->outRoutes() : t->inRoutes();
-        
+
 		//QPoint ppt = QCursor::pos();
-        
+
 		if(n == -1)
 		{
 		  //printf("OOMidi::routingPopupMenuActivated audio n = -1 deleting popup...\n");
@@ -2781,28 +2781,28 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 			if(gIsOutRoutingPopupMenu)
 			{
 			  QString s(pup->text(n));
-              
+
 			  //printf("AudioStrip::routingPopupMenuActivated audio text:%s\n", s.toLatin1().constData());
-              
+
 			  if(track->type() == Track::AUDIO_OUTPUT)
 			  {
 				///delete orpup;
-                
+
 				int chan = n & 0xf;
-                
+
 				//Route srcRoute(t, -1);
 				//Route srcRoute(t, chan, chans);
 				//Route srcRoute(t, chan, 1);
 				Route srcRoute(t, chan);
-                
+
 				//Route dstRoute(s, true, -1);
 				Route dstRoute(s, true, -1, Route::JACK_ROUTE);
 				//Route dstRoute(s, true, 0, Route::JACK_ROUTE);
-    
+
 				//srcRoute.channel = dstRoute.channel = chan;
 				dstRoute.channel = chan;
 				//dstRoute.channels = 1;
-    
+
 				// check if route src->dst exists:
 				iRoute irl = rl->begin();
 				for (; irl != rl->end(); ++irl) {
@@ -2819,17 +2819,17 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 					  }
 				audio->msgUpdateSoloStates();
 				song->update(SC_ROUTE);
-                
+
 				// p3.3.47
 				//pup->popup(ppt, 0);
-                
+
 				//oR->setDown(false);
 				return;
-                
+
 				// p3.3.46
 				///goto _redisplay;
 			  }
-              
+
 			  iRouteMenuMap imm = gRoutingMenuMap.find(n);
 			  if(imm == gRoutingMenuMap.end())
 			  {
@@ -2837,24 +2837,24 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 				//oR->setDown(false);     // orpup->exec() catches mouse release event
 				return;
 			  }
-              
+
 			  //int chan = n >> 16;
 			  //int chans = (chan >> 15) + 1; // Bit 31 MSB: Mono or stereo.
 			  //chan &= 0xffff;
 			  //int chan = imm->second.channel;
 			  //int chans = imm->second.channels;
-              
+
 			  //Route srcRoute(t, -1);
 			  //srcRoute.remoteChannel = chan;
 			  //Route srcRoute(t, chan, chans);
 			  Route srcRoute(t, imm->second.channel, imm->second.channels);
 			  //Route srcRoute(t, imm->second.channel);
 			  srcRoute.remoteChannel = imm->second.remoteChannel;
-              
+
 			  //Route dstRoute(s, true, -1);
 			  //Route dstRoute(s, true, -1, Route::TRACK_ROUTE);
 			  Route &dstRoute = imm->second;
-  
+
 			  // check if route src->dst exists:
 			  iRoute irl = rl->begin();
 			  for (; irl != rl->end(); ++irl) {
@@ -2871,28 +2871,28 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 					}
 			  audio->msgUpdateSoloStates();
 			  song->update(SC_ROUTE);
-                
+
 			  // p3.3.46
 			  //oR->setDown(false);
 			  ///goto _redisplay;
-              
+
 			  // p3.3.47
 			  //pup->popup(ppt, 0);
 			}
 			else
 			{
 			  QString s(pup->text(n));
-              
+
 			  if(track->type() == Track::AUDIO_INPUT)
 			  {
 				///delete pup;
 				int chan = n & 0xf;
-                
+
 				Route srcRoute(s, false, -1, Route::JACK_ROUTE);
 				Route dstRoute(t, chan);
-                
+
 				srcRoute.channel = chan;
-                
+
 				iRoute irl = rl->begin();
 				for(; irl != rl->end(); ++irl)
 				{
@@ -2905,16 +2905,16 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 				else
 				  // connect
 				  audio->msgAddRoute(srcRoute, dstRoute);
-                
+
 				audio->msgUpdateSoloStates();
 				song->update(SC_ROUTE);
 				//iR->setDown(false);     // pup->exec() catches mouse release event
 				return;
-                
+
 				// p3.3.46
 				///goto _redisplay;
 			  }
-              
+
 			  iRouteMenuMap imm = gRoutingMenuMap.find(n);
 			  if(imm == gRoutingMenuMap.end())
 			  {
@@ -2922,23 +2922,23 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 				//iR->setDown(false);     // pup->exec() catches mouse release event
 				return;
 			  }
-              
+
 			  //int chan = n >> 16;
 			  //int chans = (chan >> 15) + 1; // Bit 31 MSB: Mono or stereo.
 			  //chan &= 0xffff;
 			  //int chan = imm->second.channel;
 			  //int chans = imm->second.channels;
-              
+
 			  //Route srcRoute(s, false, -1);
 			  //Route srcRoute(s, false, -1, Route::TRACK_ROUTE);
 			  Route &srcRoute = imm->second;
-              
+
 			  //Route dstRoute(t, -1);
 			  //Route dstRoute(t, chan, chans);
 			  Route dstRoute(t, imm->second.channel, imm->second.channels);
 			  //Route dstRoute(t, imm->second.channel);
 			  dstRoute.remoteChannel = imm->second.remoteChannel;
-  
+
 			  iRoute irl = rl->begin();
 			  for (; irl != rl->end(); ++irl) {
 					if (*irl == srcRoute)
@@ -2954,16 +2954,16 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 					}
 			  audio->msgUpdateSoloStates();
 			  song->update(SC_ROUTE);
-              
+
 			  // p3.3.46
 			  //iR->setDown(false);
 			  ///goto _redisplay;
-              
-              
-              
-              
+
+
+
+
 			}
-                
+
 		}
 		 */
 
@@ -3137,7 +3137,7 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 		pup->setCheckable(true);
 		//MidiTrack* t = (MidiTrack*)track;
 		RouteList* irl = track->inRoutes();
-  
+
 		MidiTrack* t = (MidiTrack*)track;
 		int gid = 0;
 		for (int i = 0; i < channel; ++i)
@@ -3146,7 +3146,7 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 			  snprintf(buffer, 128, "%s %d", tr("Channel").toLatin1().constData(), i+1);
 			  MenuTitleItem* titel = new MenuTitleItem(QString(buffer));
 			  pup->insertItem(titel);
-  
+
 			  if (!checkAudioDevice()) return;
 			  std::list<QString> ol = audioDevice->outputPorts();
 			  for (std::list<QString>::iterator ip = ol.begin(); ip != ol.end(); ++ip) {
@@ -3425,7 +3425,7 @@ PopupView* OOMidi::prepareRoutingPopupView(Track* track, bool dst)
 		pup->setCheckable(true);
 		//MidiTrack* t = (MidiTrack*)track;
 		RouteList* irl = track->inRoutes();
-  
+
 		MidiTrack* t = (MidiTrack*)track;
 		int gid = 0;
 		for (int i = 0; i < channel; ++i)
@@ -3434,7 +3434,7 @@ PopupView* OOMidi::prepareRoutingPopupView(Track* track, bool dst)
 			  snprintf(buffer, 128, "%s %d", tr("Channel").toLatin1().constData(), i+1);
 			  MenuTitleItem* titel = new MenuTitleItem(QString(buffer));
 			  pup->insertItem(titel);
-  
+
 			  if (!checkAudioDevice()) return;
 			  std::list<QString> ol = audioDevice->outputPorts();
 			  for (std::list<QString>::iterator ip = ol.begin(); ip != ol.end(); ++ip) {
@@ -3883,6 +3883,43 @@ void OOMidi::keyPressEvent(QKeyEvent* event)
 {
 	// Pass it on to arranger part canvas.
 	arranger->getCanvas()->redirKeypress(event);
+}
+
+bool OOMidi::eventFilter(QObject *obj, QEvent *event)
+{
+	QKeyEvent *keyEvent = 0;
+	int key = 0;
+
+	if (event->type() == QEvent::KeyPress) {
+		keyEvent = static_cast<QKeyEvent *>(event);
+		key = keyEvent->key();
+
+		//if (event->state() & Qt::ShiftButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::ShiftModifier)
+			key += Qt::SHIFT;
+		//if (event->state() & Qt::AltButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::AltModifier)
+			key += Qt::ALT;
+		//if (event->state() & Qt::ControlButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
+			key += Qt::CTRL;
+		///if (event->state() & Qt::MetaButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+			key += Qt::META;
+
+	}
+
+	QAbstractItemView* absItemView = qobject_cast<QAbstractItemView*>(obj);
+	if (absItemView && keyEvent)
+	{
+		if (key == shortcuts[SHRT_PLAY_TOGGLE].key)
+		{
+			kbAccel(key);
+			return true;
+		}
+	}
+
+	return QObject::eventFilter(obj, event);
 }
 
 //---------------------------------------------------------
@@ -5417,7 +5454,7 @@ void OOMidi::showMixer2(bool on)
 void OOMidi::routingDialogClosed()
 {
 	viewRoutesAction->setChecked(false);
-	//routingDialog = 0;	
+	//routingDialog = 0;
 }
 
 void OOMidi::toggleRoutes(bool on)

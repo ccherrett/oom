@@ -29,6 +29,7 @@
 RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 {
 	setupUi(this);
+	routeList->installEventFilter(oom);
 	_listModel = new QStandardItemModel(routeList);
 	routeList->setModel(_listModel);
 	//routeList->setObjectName("rmDockRouteList");

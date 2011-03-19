@@ -12,7 +12,7 @@
 #include <QItemSelection>
 #include <QModelIndexList>
 #include <QHeaderView>
-#include <QTableWidget>    
+#include <QTableWidget>
 #include <QToolButton>
 
 #include <math.h>
@@ -145,12 +145,13 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	_matrix = new QList<int>;
 	_tableModel = new ProgramChangeTableModel(this);
 	tableView = new ProgramChangeTable(this);
+	tableView->installEventFilter(oom);
 	tableView->setMinimumHeight(150);
 	tableBox->addWidget(tableView);
 	_selModel = new QItemSelectionModel(_tableModel);//tableView->selectionModel();
 	_patchModel = new QStandardItemModel(0, 2, this);
 	_patchSelModel = new QItemSelectionModel(_patchModel);
-	patchList->installEventFilter(parent);
+	patchList->installEventFilter(oom);
 
 	selected = sel_track;
 
@@ -1320,7 +1321,7 @@ void MidiTrackInfo::instrPopup()
 			if (!pg.isEmpty())
 				pg = pg + ": \n  ";
 			QString label = "  " + pg + act->text();
-			
+
 			QList<QStandardItem*> rowData;
 			QStandardItem* chk = new QStandardItem(true);
 			chk->setCheckable(true);
@@ -2374,18 +2375,18 @@ void MidiTrackInfo::clonePatchSequence()
 			QStandardItem* id = new QStandardItem();
 			id->setText(iid->text());
 			//id->setToolTip(iid->toolTip());
-			
+
 			QStandardItem* chk = new QStandardItem();
 			chk->setEditable(ichk->isEditable());
 			chk->setCheckable(ichk->isCheckable());
 			chk->setCheckState(ichk->checkState());
 
-			
+
 			QStandardItem* name = new QStandardItem();
 			name->setEditable(iname->isEditable());
 			name->setText(iname->text());
 			name->setToolTip(iname->toolTip());
-			
+
 			item.append(id);
 			item.append(chk);
 			item.append(name);

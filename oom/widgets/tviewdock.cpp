@@ -5,6 +5,8 @@
 //===========================================================
 //
 
+#include "app.h"
+#include "globals.h"
 #include "song.h"
 #include "tviewdock.h"
 #include "trackview.h"
@@ -22,6 +24,8 @@
 TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 {
 	setupUi(this);
+	tableView->installEventFilter(oom);
+	autoTable->installEventFilter(oom);
 	_tableModel = new QStandardItemModel(tableView);
 	_autoTableModel = new QStandardItemModel(autoTable);
 	tableView->setModel(_tableModel);
@@ -304,7 +308,7 @@ void TrackViewDock::selectStaticView(int n)
 		case Track::AUDIO_INPUT:
 			item = _autoTableModel->item(1, 0);
 		    break;
-		case Track::AUDIO_OUTPUT: 
+		case Track::AUDIO_OUTPUT:
 			item = _autoTableModel->item(2, 0);
 		    break;
 		case Track::AUDIO_BUSS:
