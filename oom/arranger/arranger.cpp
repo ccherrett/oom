@@ -28,6 +28,7 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QLayoutItem>
+#include <QDockWidget>
 
 #include "arranger.h"
 #include "song.h"
@@ -995,8 +996,11 @@ void Arranger::showTrackInfo(bool)
 void Arranger::genTrackInfo(QWidget*)
 {
 	midiTrackInfo = new MidiTrackInfo(this);
-	midiTrackInfo->installEventFilter(this);
-	midiTrackInfo->getView()->installEventFilter(this);
+	foreach(QObject* obj, oom->resourceDock()->children())
+	{
+		obj->installEventFilter(this);
+	}
+
 	_tvdock = new TrackViewDock(this);
 	//infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
