@@ -1227,7 +1227,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			int y1 = wh - (e->val() * wh / 128);
 			// fg means 'draw selected parts'.
 			QColor fillColor = QColor(255, 201, 144,255);
-			int bgalpha = 127;
+			int bgalpha = 40;
 			QColor bgfillColor = QColor(255, 201, 144, bgalpha);
 			if (fg)
 			{
@@ -1371,7 +1371,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				p.setBrush(QBrush(bgfillColor));
 				p.drawRect(tick+1, y1-3, 5, wh);
 				p.setBrush(QBrush(fillColor));
-				QRect rect(tick-1, y1-3, 9, 5);
+				QRect rect(tick+1, y1-3, 5, 5);
 				//p.drawRoundedRect(rect,3,3);
 				p.drawRect(rect);
 			}
