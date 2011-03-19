@@ -23,6 +23,7 @@
 #include "shortcuts.h"
 ///#include "sigedit.h"
 #include "globals.h"
+#include "traverso_shared/TConfig.h"
 
 #include <values.h>
 
@@ -32,6 +33,8 @@
 #include <QLabel>
 #include <QToolBar>
 #include <QToolButton>
+#include <QSize>
+#include <QPoint>
 
 int MasterEdit::_rasterInit = 0;
 
@@ -41,6 +44,12 @@ int MasterEdit::_rasterInit = 0;
 
 void MasterEdit::closeEvent(QCloseEvent* e)
 {
+	tconfig().set_property("MasterEdit", "size", size());
+	tconfig().set_property("MasterEdit", "hscale", hscroll->mag());
+	tconfig().set_property("MasterEdit", "yscale", vscroll->mag());
+	tconfig().set_property("MasterEdit", "ypos", vscroll->pos());
+	tconfig().set_property("MasterEdit", "pos", pos());
+    tconfig().save();
 	emit deleted((unsigned long) this);
 	e->accept();
 }
@@ -85,8 +94,8 @@ MasterEdit::MasterEdit()
 {
 	setWindowTitle(tr("OOMidi: Mastertrack"));
 	_raster = 0; // measure
-	setMinimumSize(400, 300);
-	resize(500, 350);
+	//setMinimumSize(400, 300);
+	//resize(500, 350);
 
 	//---------Pulldown Menu----------------------------
 	//      QPopupMenu* file = new QPopupMenu(this);
@@ -242,8 +251,28 @@ MasterEdit::MasterEdit()
 MasterEdit::~MasterEdit()
 {
 	//undoRedo->removeFrom(tools);  // p4.0.6 Removed
+	tconfig().set_property("MasterEdit", "size", size());
+	tconfig().set_property("MasterEdit", "hscale", hscroll->mag());
+	tconfig().set_property("MasterEdit", "yscale", vscroll->mag());
+	tconfig().set_property("MasterEdit", "ypos", vscroll->pos());
+	tconfig().set_property("MasterEdit", "pos", pos());
+    tconfig().save();
 }
 
+
+void MasterEdit::showEvent(QShowEvent*)
+{
+	int hScale = tconfig().get_property("MasterEdit", "hscale", -100).toInt();
+	int vScale = tconfig().get_property("MasterEdit", "yscale", -1000).toInt();
+	int yPos = tconfig().get_property("MasterEdit", "ypos", 0).toInt();
+	hscroll->setMag(hScale);
+	vscroll->setMag(vScale);
+	vscroll->setPos(yPos);
+	QSize s = tconfig().get_property("MasterEdit", "size", QSize(640, 480)).toSize();
+	resize(s);
+	QPoint p = tconfig().get_property("MasterEdit", "pos", QPoint(0,0)).toPoint();
+	move(p);
+}
 //---------------------------------------------------------
 //   readStatus
 //---------------------------------------------------------

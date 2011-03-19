@@ -33,6 +33,7 @@ class LabelCombo;
 class PosLabel;
 class TempoLabel;
 class EditToolBar;
+class QShowEvent;
 
 //---------------------------------------------------------
 //   MasterEdit
@@ -86,6 +87,7 @@ public:
     static void writeConfiguration(int, Xml&);
 
 protected:
+	void showEvent(QShowEvent*);
     virtual void keyPressEvent(QKeyEvent*);
 };
 

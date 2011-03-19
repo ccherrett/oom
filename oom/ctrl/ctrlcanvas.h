@@ -38,9 +38,10 @@ class CEvent
     int _val;
     MidiPart* _part;
     int ex;
+	bool _selected;
 
 public:
-    CEvent(Event e, MidiPart* part, int v);
+    CEvent(Event e, MidiPart* part, int v, bool sel = false);
 
     Event event() const
     {
@@ -77,6 +78,14 @@ public:
     {
         return ex;
     }
+	void setSelected(bool v)
+	{
+		_selected = v;
+	}
+	bool selected()
+	{
+		return _selected;
+	}
 };
 
 typedef std::list<CEvent*>::iterator iCEvent;

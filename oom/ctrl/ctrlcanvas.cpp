@@ -61,12 +61,13 @@ static int computeVal(MidiController* mc, int y, int height)
 //   CEvent
 //---------------------------------------------------------
 
-CEvent::CEvent(Event e, MidiPart* pt, int v)
+CEvent::CEvent(Event e, MidiPart* pt, int v, bool sel)
 {
 	_event = e;
 	_part = pt;
 	_val = v;
 	ex = !e.empty() ? e.tick() : 0;
+	_selected = sel;
 }
 
 //---------------------------------------------------------
@@ -468,99 +469,9 @@ void CtrlCanvas::updateItems()
 {
 	items.clearDelete();
 
-	/*
-	if(ctrl)
-	{
-	  for(ciMidiCtrlVal imcv = ctrl->begin(); imcv != ctrl->end(); ++imcv)
-	  {
-		MidiPart* part = (MidiPart*)imcv->part;
-		int val = imcv->val;
-          
-		bool edpart = false;
-		if(editor->parts()->index(part) != -1)
-		  edpart = true;
-          
-		MidiController* mc;
-		MidiCtrlValList* mcvl;
-		partControllers(part, _cnum, 0, 0, &mc, &mcvl);
-
-		Event e(Controller);
-          
-		if(_cnum == CTRL_VELOCITY && e.type() == Note)
-		{
-		  items.add(new CEvent(e, part, e.velo()));
-           
-		}
-          
-	  }
-	}
-	 */
-
-	/*
-	MidiTrackList* mtl = song->midis();
-	for(ciMidiTrack imt = mtl->begin(); imt != mtl->end(); ++imt)
-	{
-	  //MidiTrack* mt = *imt;
-	  PartList* pl = (*imt)->parts();
-	  for(ciPart p = pl->begin(); p != pl->end(); ++p)
-	  {
-		MidiPart* part = (MidiPart*)(p->second);
-          
-		bool edpart = false;
-		if(editor->parts()->index(part) != -1)
-		  edpart = true;
-          
-		EventList* el = part->events();
-		MidiController* mc;
-		MidiCtrlValList* mcvl;
-		partControllers(part, _cnum, 0, 0, &mc, &mcvl);
-
-		for(iEvent i = el->begin(); i != el->end(); ++i)
-		{
-		  Event e = i->second;
-		  if(_cnum == CTRL_VELOCITY && e.type() == Note)
-		  {
-			if(curDrumInstrument == -1)
-			{
-				  items.add(new CEvent(e, part, e.velo()));
-			}
-			else if (e.dataA() == curDrumInstrument) //same note
-				  items.add(new CEvent(e, part, e.velo()));
-		  }
-		  else if (e.type() == Controller && e.dataA() == _didx)
-		  {
-			if(mcvl && last.empty())
-			{
-				  Event le(Controller);
-				  //le.setType(Controller);
-				  le.setA(_didx);
-				  //le.setB(e.dataB());
-				  le.setB(CTRL_VAL_UNKNOWN);
-				  //lastce = new CEvent(Event(), part, mcvl->value(part->tick(), part));
-				  //lastce = new CEvent(le, part, mcvl->value(part->tick(), part));
-				  lastce = new CEvent(le, part, mcvl->value(part->tick()));
-				  items.add(lastce);
-			}
-			if (lastce)
-				  lastce->setEX(e.tick());
-			lastce = new CEvent(e, part, e.dataB());
-			items.add(lastce);
-			last = e;
-		  }
-		}
-	  }
-	}
-	 */
-
-
-
-
-
 	if (!editor->parts()->empty())
 	{
-		//Event last;
-		//CEvent* lastce  = 0;
-
+		MidiPart* cPart = static_cast<MidiPart*>(editor->curCanvasPart());
 		for (iPart p = editor->parts()->begin(); p != editor->parts()->end(); ++p)
 		{
 			Event last;
@@ -572,6 +483,7 @@ void CtrlCanvas::updateItems()
 			MidiCtrlValList* mcvl;
 			partControllers(part, _cnum, 0, 0, &mc, &mcvl);
 			unsigned len = part->lenTick();
+			bool isPart = (cPart && cPart == part);
 
 			for (iEvent i = el->begin(); i != el->end(); ++i)
 			{
@@ -579,6 +491,7 @@ void CtrlCanvas::updateItems()
 				// Added by T356. Do not add events which are past the end of the part.
 				if (e.tick() >= len)
 					break;
+				bool sel = (isPart && editor->isEventSelected(e));
 
 				if (_cnum == CTRL_VELOCITY && e.type() == Note)
 				{
@@ -587,10 +500,10 @@ void CtrlCanvas::updateItems()
 					{
 						// This is interesting - it would allow ALL drum note velocities to be shown.
 						// But currently the drum list ALWAYS has a selected item so this is not supposed to happen.
-						items.add(new CEvent(e, part, e.velo()));
+						items.add(new CEvent(e, part, e.velo(), sel));
 					}
 					else if (e.dataA() == curDrumInstrument) //same note
-						items.add(new CEvent(e, part, e.velo()));
+						items.add(new CEvent(e, part, e.velo(), sel));
 				}
 				else if (e.type() == Controller && e.dataA() == _didx)
 				{
@@ -1312,8 +1225,6 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			if (tick > x + w)
 				break;
 			int y1 = wh - (e->val() * wh / 128);
-			//p.setPen(QPen(Qt::black, 1));
-			//p.drawLine(tick+3, wh, tick+3, y1);
 			// fg means 'draw selected parts'.
 			if (fg)
 			{
@@ -1345,22 +1256,22 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 					color.setRgb(0, 58, 72, 127);
 
 				p.setPen(QPen(color, 6));
-
-				//p.setPen(QPen(config.ctrlGraphFg, 3));
-
 			}
 			else
 				p.setPen(QPen(QColor(172, 172, 172), 6));
 
+			int alpha = 150;
+			QColor colSelected;
+			colSelected.setRgb(243, 206, 105, alpha);
+			if(e->selected())
+			{
+				p.setPen(QPen(colSelected, 6));
+			}
 			p.drawLine(tick + 4, wh, tick + 4, y1);
-
-			//p.setPen(QPen(Qt::black, 1));
-			//p.drawLine(tick-3, wh, tick-3, y1);
 		}
 	}
 	else
 	{
-
 		MidiTrack* mt = part->track();
 		MidiPort* mp;
 
@@ -1438,32 +1349,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			}
 			if (tick > x + w)
 				break;
-			int velo2 = e->val();
-			/*if(velo2 <= 11)
-				color.setRgb(75,145,47);
-			else if(velo2 <= 22)
-				color.setRgb(64,139,83);
-			else if(velo2 <= 33)
-				color.setRgb(61,138,92);
-			else if(velo2 <= 44)
-				color.setRgb(57,135,107);
-			else if(velo2 <= 55)
-				color.setRgb(54,133,120);
-			else if(velo2 <= 66)
-				color.setRgb(50,131,133);
-			else if(velo2 <= 77)
-				color.setRgb(47,130,143);
-			else if(velo2 <= 88)
-				color.setRgb(57,121,144);
-			else if(velo2 <= 99)
-				color.setRgb(70,110,143);
-			else if(velo2 <= 110)
-				color.setRgb(82,100,142);
-			else if(velo2 <= 121)
-				color.setRgb(94,90,142);
-			else
-				color.setRgb(110,76,141);
-			 */
+			//int velo2 = e->val();
 
 			if (lval == CTRL_VAL_UNKNOWN)
 			{

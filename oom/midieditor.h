@@ -24,6 +24,7 @@ class MTScale;
 class WaveView;
 class Part;
 class WavePart;
+class Event;
 
 //---------------------------------------------------------
 //   MidiEditor
@@ -124,6 +125,7 @@ public:
         return _curDrumInstrument;
     }
     Part* curCanvasPart();
+	bool isEventSelected(Event e);
     WavePart* curWavePart();
     void setCurCanvasPart(Part*);
 };

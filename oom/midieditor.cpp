@@ -14,6 +14,7 @@
 #include "part.h"
 #include "track.h"
 #include "song.h"
+#include "event.h"
 
 #include <QRect>
 #include <QColor>
@@ -263,6 +264,16 @@ Part* MidiEditor::curCanvasPart()
 		return canvas->part();
 	else
 		return 0;
+}
+
+bool MidiEditor::isEventSelected(Event e)
+{
+	bool rv = false;
+	if(canvas)
+	{
+		rv = canvas->isEventSelected(e);
+	}
+	return rv;
 }
 
 //---------------------------------------------------------

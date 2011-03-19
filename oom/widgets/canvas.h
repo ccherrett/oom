@@ -197,6 +197,7 @@ protected:
     {
     }
 
+
     bool allItemsAreSelected();
 
 
@@ -236,6 +237,7 @@ public:
     {
         _canvasTools = n;
     }
+	virtual bool isEventSelected(Event e);
 };
 #endif
 

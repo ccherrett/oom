@@ -1987,3 +1987,23 @@ void PianoCanvas::resizeEvent(QResizeEvent* ev)
 	EventCanvas::resizeEvent(ev);
 }
 
+bool PianoCanvas::isEventSelected(Event e)
+{
+	bool rv = false;
+	CItemList list = getSelectedItemsForCurrentPart();/*{{{*/
+
+	for (iCItem k = list.begin(); k != list.end(); ++k)
+	{
+		NEvent* nevent = (NEvent*) (k->second);
+		Event event = nevent->event();
+		if (event.type() != Note)
+			continue;
+
+		if (event == e)
+		{
+			rv = true;
+			break;
+		}
+	}/*}}}*/
+	return rv;
+}

@@ -1673,3 +1673,7 @@ void Canvas::updateCItemsZValues()
 		}
 	}
 }
+bool Canvas::isEventSelected(Event)
+{
+	return false;
+}

@@ -123,6 +123,7 @@ public:
 	redraw();
     }
     virtual void modifySelected(NoteInfo::ValType type, int delta);
+	virtual bool isEventSelected(Event);
 };
 #endif
 

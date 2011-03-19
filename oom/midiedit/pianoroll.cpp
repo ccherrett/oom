@@ -354,7 +354,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	patchLabel = new QLabel();
 	patchLabel->setObjectName("patchLabel");
 	patchLabel->setMaximumSize(QSize(180, 22));
-	patchLabel->setFixedWidth(180);
+	patchLabel->setFixedWidth(280);
+	//patchLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 	patchLabel->setFixedHeight(22);
 	menuBar()->setCornerWidget(patchLabel, Qt::TopRightCorner);
 	patchLabel->show();
@@ -651,24 +652,6 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     // This is now done via the showEvent();
 
     //      hscroll->setOffset((int)pos); // changed that to:
-	QList<int> vl2;
-	QString str2 = tconfig().get_property("splitter", "sizes", "60 200").toString();
-	QStringList sl2 = str2.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it2 = sl2.begin(); it2 != sl2.end(); ++it2)
-	{
-		int val = (*it2).toInt();
-		vl2.append(val);
-	}
-	splitter->setSizes(vl2);
-	QList<int> vl;
-	QString str = tconfig().get_property("hsplitter", "sizes", "200 50").toString();
-	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
-	{
-		int val = (*it).toInt();
-		vl.append(val);
-	}
-	hsplitter->setSizes(vl);
 }
 
 //---------------------------------------------------------
@@ -776,6 +759,7 @@ PianoRoll::~PianoRoll()
 	tconfig().set_property("PianoRollEdit", "yscale", vscroll->mag());
 	tconfig().set_property("PianoRollEdit", "ypos", vscroll->pos());
 	tconfig().set_property("PianoRollEdit", "colormode", colorMode);
+    tconfig().save();
 	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();
 	i != ctrlEditList.end(); ++i)
 	{
@@ -1911,6 +1895,24 @@ void PianoRoll::showEvent(QShowEvent *)
 	hscroll->setMag(hScale);
 	vscroll->setMag(vScale);
 	vscroll->setPos(yPos);
+	QList<int> vl2;
+	QString str2 = tconfig().get_property("splitter", "sizes", "60 200").toString();
+	QStringList sl2 = str2.split(QString(" "), QString::SkipEmptyParts);
+	for (QStringList::Iterator it2 = sl2.begin(); it2 != sl2.end(); ++it2)
+	{
+		int val = (*it2).toInt();
+		vl2.append(val);
+	}
+	splitter->setSizes(vl2);
+	QList<int> vl;
+	QString str = tconfig().get_property("hsplitter", "sizes", "200 50").toString();
+	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
+	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+	{
+		int val = (*it).toInt();
+		vl.append(val);
+	}
+	hsplitter->setSizes(vl);
 }
 
 //---------------------------------------------------------

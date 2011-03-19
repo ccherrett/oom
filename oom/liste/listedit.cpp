@@ -215,7 +215,10 @@ void ListEdit::songChanged(int type)
 			if (update)
 			{
 				if (ci)
+				{
 					liste->setCurrentItem(ci);
+					liste->scrollToItem(ci, QAbstractItemView::EnsureVisible);
+				}
 				//liste->update();
 			}
 			liste->blockSignals(false);
@@ -565,6 +568,7 @@ ListEdit::ListEdit(PartList* pl)
 	mainGrid->addWidget(liste, 1, 0, 2, 1);
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	songChanged(-1);
+	songChanged(SC_SELECTION);
 
 	// p3.3.34
 	// Was crashing because of -1 stored, because there was an invalid
