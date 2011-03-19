@@ -1660,6 +1660,11 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 			song->update(SC_SOLO);
 		}
 	}
+	else if (key == shortcuts[SHRT_TOGGLE_SOUND].key)
+	{
+		speaker->toggle();
+		return;
+	}
 	else
 	{ //Default:
 		event->ignore();

@@ -250,6 +250,7 @@ void initShortCuts()
 	defShrt(SHRT_TRACK_TOGGLE_SOLO, Qt::Key_S, "State: Solo", GLOBAL_SHRT, "toggle_solo");
 	defShrt(SHRT_TRACK_TOGGLE_MUTE, Qt::Key_M, "State: Mute", GLOBAL_SHRT, "toggle_mute");
 	defShrt(SHRT_MIDI_PANIC, Qt::Key_P, "Tool: midi panic button", GLOBAL_SHRT, "midi_panic");
+	defShrt(SHRT_TOGGLE_SOUND, Qt::SHIFT + Qt::Key_S, "State: Sound on/off", PROLL_SHRT, "toggle_sound");
 
 	defShrt(SHRT_NAVIGATE_TO_CANVAS, Qt::CTRL + Qt::Key_Enter, "Navigate: to canvas", GLOBAL_SHRT, "navigate_to_canvas");
 	defShrt(SHRT_NAVIGATE_TO_CANVAS, Qt::CTRL + Qt::Key_Return, "Navigate: to canvas", GLOBAL_SHRT, "navigate_to_canvas");
@@ -309,6 +310,8 @@ void initShortCuts()
 
 	defShrt(SHRT_NEXT_MARKER, Qt::Key_F6, "Goto Next Marker", ARRANG_SHRT, "me_sel_next");
 	defShrt(SHRT_PREV_MARKER, Qt::Key_F5, "Goto Prev Marker", ARRANG_SHRT, "me_sel_prev");
+
+	defShrt(SHRT_TOGGLE_ENABLE, Qt::Key_E, "Tool: Toggle Enable", MEDIT_SHRT, "master_toggle_enable");
 
 }
 
