@@ -1205,9 +1205,27 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 			song->panic();
 			return true;
 		}
-		if(keyEvent->key() == shortcuts[SHRT_SEL_INSTRUMENT].key)
+		if(key == shortcuts[SHRT_SEL_INSTRUMENT].key)
 		{
 			midiTrackInfo->addSelectedPatch();
+			return true;
+		}
+		else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
+		{
+			unsigned utick = song->cpos() + rasterStep(song->cpos());
+			midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick); //progRecClicked();
+			return true;
+		}
+		else if (key == shortcuts[SHRT_POS_INC].key)
+		{
+			PianoCanvas* pc = (PianoCanvas*) canvas;
+			pc->pianoCmd(CMD_RIGHT);
+			return true;
+		}
+		else if (key == shortcuts[SHRT_POS_DEC].key)
+		{
+			PianoCanvas* pc = (PianoCanvas*) canvas;
+			pc->pianoCmd(CMD_LEFT);
 			return true;
 		}
 	}
