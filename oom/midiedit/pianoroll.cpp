@@ -95,7 +95,6 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	int dh = qApp->desktop()->height();
 	if(h <= dh && w <= dw)
 	{
-		//FIXME: This needs to be checked to make sure its not larger than the current desktop size
 		resize(w, h);
 	}
 	else

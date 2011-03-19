@@ -10,6 +10,7 @@
 
 #include <QSplitter>
 
+class QShowEvent;
 class Xml;
 
 //---------------------------------------------------------
@@ -25,6 +26,8 @@ public:
 	~Splitter();
     void writeStatus(int level, Xml&);
     void readStatus(Xml&);
+protected:
+	virtual void showEvent(QShowEvent*);
 };
 
 #endif

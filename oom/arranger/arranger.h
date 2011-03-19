@@ -109,6 +109,7 @@ private slots:
 	void preloadControllers();
 	void splitterMoved(int, int);
 	void resourceDockAreaChanged(Qt::DockWidgetArea);
+	void currentTabChanged(int);
 
 signals:
     void redirectWheelEvent(QWheelEvent*);

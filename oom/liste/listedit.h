@@ -16,6 +16,7 @@ class QAction;
 class QActionGroup;
 class QCloseEvent;
 class QKeyEvent;
+class QShowEvent;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -50,6 +51,7 @@ class ListEdit : public MidiEditor
 
     Q_OBJECT
     virtual void closeEvent(QCloseEvent*);
+    virtual void showEvent(QShowEvent*);
     virtual void keyPressEvent(QKeyEvent*);
     void initShortcuts();
     unsigned getSelectedTick();

@@ -21,6 +21,7 @@ class QLabel;
 class QMenu;
 class QToolButton;
 class QWidget;
+class QShowEvent;
 
 class Xml;
 class AudioTrack;
@@ -93,6 +94,7 @@ class AudioMixerApp : public QMainWindow
 
 protected:
     virtual void closeEvent(QCloseEvent*);
+	virtual void showEvent(QShowEvent*);
 
     void addStrip(Track*, int);
     void showRouteDialog(bool);
@@ -131,6 +133,7 @@ private slots:
 public:
     //AudioMixerApp(QWidget* parent);
     AudioMixerApp(QWidget* parent, MixerConfig* c);
+    ~AudioMixerApp();
     //void write(Xml&, const char* name);
     //void write(int level, Xml& xml, const char* name);
     void write(int level, Xml& xml);

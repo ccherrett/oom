@@ -15,6 +15,7 @@
 #include <QPaintEvent>
 #include <QHBoxLayout>
 #include <QCloseEvent>
+#include <QShowEvent>
 #include <QMenu>
 #include <QActionGroup>
 #include <QAction>
@@ -30,6 +31,7 @@
 
 #include "gconfig.h"
 #include "xml.h"
+#include "traverso_shared/TConfig.h"
 
 extern QActionGroup* populateAddTrack(QMenu* addTrack);
 
@@ -229,7 +231,6 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
-	song->update(); // calls update mixer
 }
 
 /*
@@ -246,6 +247,38 @@ bool AudioMixerApp::event(QEvent* event)
   return false;       
 }
  */
+
+AudioMixerApp::~AudioMixerApp()
+{
+	tconfig().set_property(objectName(), "geometry", geometry());
+	tconfig().set_property(objectName(), "showMidiTracks", cfg->showMidiTracks);
+	tconfig().set_property(objectName(), "showDrumTracks", cfg->showDrumTracks);
+	tconfig().set_property(objectName(), "showInputTracks", cfg->showInputTracks);
+	tconfig().set_property(objectName(), "showOutputTracks", cfg->showOutputTracks);
+	tconfig().set_property(objectName(), "showWaveTracks", cfg->showWaveTracks);
+	tconfig().set_property(objectName(), "showGroupTracks", cfg->showGroupTracks);
+	tconfig().set_property(objectName(), "showAuxTracks", cfg->showAuxTracks);
+	tconfig().set_property(objectName(), "showSyntiTracks", cfg->showSyntiTracks);
+    tconfig().save();
+}
+
+void AudioMixerApp::showEvent(QShowEvent*)
+{
+	MixerConfig* ncfg = new MixerConfig;
+	ncfg->name = cfg->name; //always preserve the name
+	ncfg->geometry = tconfig().get_property(objectName(), "geometry", cfg->geometry).toRect();
+	ncfg->showMidiTracks = tconfig().get_property(objectName(), "showMidiTracks", cfg->showMidiTracks).toBool();
+	ncfg->showDrumTracks = tconfig().get_property(objectName(), "showDrumTracks", cfg->showDrumTracks).toBool();
+	ncfg->showInputTracks = tconfig().get_property(objectName(), "showInputTracks", cfg->showInputTracks).toBool();
+	ncfg->showOutputTracks = tconfig().get_property(objectName(), "showOutputTracks", cfg->showOutputTracks).toBool();
+	ncfg->showWaveTracks = tconfig().get_property(objectName(), "showWaveTracks", cfg->showWaveTracks).toBool();
+	ncfg->showGroupTracks = tconfig().get_property(objectName(), "showGroupTracks", cfg->showGroupTracks).toBool();
+	ncfg->showAuxTracks = tconfig().get_property(objectName(), "showAuxTracks", cfg->showAuxTracks).toBool();
+	ncfg->showSyntiTracks = tconfig().get_property(objectName(), "showSyntiTracks", cfg->showSyntiTracks).toBool();
+	cfg = ncfg;
+	setGeometry(cfg->geometry);
+	song->update(); // calls update mixer
+}
 
 void AudioMixerApp::setSizing()
 {
@@ -608,6 +641,16 @@ void AudioMixerApp::songChanged(int flags)
 
 void AudioMixerApp::closeEvent(QCloseEvent* e)
 {
+	tconfig().set_property(objectName(), "geometry", geometry());
+	tconfig().set_property(objectName(), "showMidiTracks", cfg->showMidiTracks);
+	tconfig().set_property(objectName(), "showDrumTracks", cfg->showDrumTracks);
+	tconfig().set_property(objectName(), "showInputTracks", cfg->showInputTracks);
+	tconfig().set_property(objectName(), "showOutputTracks", cfg->showOutputTracks);
+	tconfig().set_property(objectName(), "showWaveTracks", cfg->showWaveTracks);
+	tconfig().set_property(objectName(), "showGroupTracks", cfg->showGroupTracks);
+	tconfig().set_property(objectName(), "showAuxTracks", cfg->showAuxTracks);
+	tconfig().set_property(objectName(), "showSyntiTracks", cfg->showSyntiTracks);
+    tconfig().save();
 	emit closed();
 	e->accept();
 }
@@ -667,30 +710,6 @@ void AudioMixerApp::routingDialogClosed()
 //---------------------------------------------------------
 //   showTracksChanged
 //---------------------------------------------------------
-
-/*
-void AudioMixerApp::showTracksChanged(QAction* id)
-	  {
-	  bool val = id->isOn();
-	  if (id == showMidiTracksId)
-			cfg->showMidiTracks = val;
-	  else if (id == showDrumTracksId)
-			cfg->showDrumTracks = val;
-	  else if (id == showInputTracksId)
-			cfg->showInputTracks = val;
-	  else if (id == showOutputTracksId)
-			cfg->showOutputTracks = val;
-	  else if (id == showWaveTracksId)
-			cfg->showWaveTracks = val;
-	  else if (id == showGroupTracksId)
-			cfg->showGroupTracks = val;
-	  else if (id == showAuxTracksId)
-			cfg->showAuxTracks = val;
-	  else if (id == showSyntiTracksId)
-			cfg->showSyntiTracks = val;
-	  updateMixer(UPDATE_ALL);
-	  }
- */
 
 void AudioMixerApp::showMidiTracksChanged(bool v)
 {

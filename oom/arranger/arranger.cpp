@@ -144,6 +144,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	_rtabs->setTabPosition(QTabWidget::West);
 	_rtabs->setTabShape(QTabWidget::Triangular);
 	_rtabs->setMinimumSize(QSize(200, 150));
+	connect(_rtabs, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
 	oom->resourceDock()->setWidget(_rtabs);
 	connect(oom->resourceDock(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(resourceDockAreaChanged(Qt::DockWidgetArea)));
 
@@ -482,6 +483,19 @@ Arranger::~Arranger()
 //      if(s != s1 || e != e1) 
 //        hscroll->setRange(s, e);
 //}
+
+void Arranger::currentTabChanged(int tab)
+{
+	if(tab == 2) //patch sequencer
+	{
+		if(midiTrackInfo)
+		{
+			//printf("PatchSequencer Tab clicked\n");
+			midiTrackInfo->update();
+			//midiTrackInfo->resize(midiTrackInfo->size());
+		}
+	}
+}
 
 //---------------------------------------------------------
 //   headerMoved

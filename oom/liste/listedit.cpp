@@ -9,6 +9,7 @@
 #include <QActionGroup>
 #include <QCloseEvent>
 #include <QKeyEvent>
+#include <QShowEvent>
 #include <QMenu>
 #include <QMenuBar>
 #include <QSignalMapper>
@@ -173,6 +174,11 @@ void ListEdit::closeEvent(QCloseEvent* e)
 {
 	emit deleted((unsigned long) this);
 	e->accept();
+}
+
+void ListEdit::showEvent(QShowEvent*)
+{
+	songChanged(SC_SELECTION);
 }
 
 //---------------------------------------------------------
@@ -568,7 +574,6 @@ ListEdit::ListEdit(PartList* pl)
 	mainGrid->addWidget(liste, 1, 0, 2, 1);
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	songChanged(-1);
-	songChanged(SC_SELECTION);
 
 	// p3.3.34
 	// Was crashing because of -1 stored, because there was an invalid

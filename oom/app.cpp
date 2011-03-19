@@ -5385,9 +5385,10 @@ void OOMidi::showMixer1(bool on)
 	if (on && mixer1 == 0)
 	{
 		mixer1 = new AudioMixerApp(this, &(config.mixer1));
+		mixer1->setObjectName("Mixer1");
 		connect(mixer1, SIGNAL(closed()), SLOT(mixer1Closed()));
-		mixer1->resize(config.mixer1.geometry.size());
-		mixer1->move(config.mixer1.geometry.topLeft());
+		//mixer1->resize(config.mixer1.geometry.size());
+		//mixer1->move(config.mixer1.geometry.topLeft());
 	}
 	if (mixer1)
 		mixer1->setVisible(on);
@@ -5403,9 +5404,10 @@ void OOMidi::showMixer2(bool on)
 	if (on && mixer2 == 0)
 	{
 		mixer2 = new AudioMixerApp(this, &(config.mixer2));
+		mixer2->setObjectName("Mixer2");
 		connect(mixer2, SIGNAL(closed()), SLOT(mixer2Closed()));
-		mixer2->resize(config.mixer2.geometry.size());
-		mixer2->move(config.mixer2.geometry.topLeft());
+		//mixer2->resize(config.mixer2.geometry.size());
+		//mixer2->move(config.mixer2.geometry.topLeft());
 	}
 	if (mixer2)
 		mixer2->setVisible(on);
