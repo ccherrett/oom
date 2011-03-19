@@ -32,7 +32,7 @@ LabelCombo::LabelCombo(const QString& txt, QWidget* parent,
 	layout->addWidget(box);
 	layout->addSpacing(5);
 	///layout->addStretch();
-	connect(box, SIGNAL(activated(int)), SIGNAL(activated(int)));
+	connect(box, SIGNAL(currentIndexChanged(int)), SIGNAL(activated(int)));
 }
 
 void LabelCombo::setCurrentIndex(int i)

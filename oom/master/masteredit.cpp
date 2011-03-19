@@ -205,7 +205,6 @@ MasterEdit::MasterEdit()
 	mainGrid->addWidget(vscroll, 0, 2, 10, 1);
 	//      mainGrid->addWidget(corner,  9, 2, AlignBottom | AlignRight);
 
-	canvas->setFocus(); // Tim.
 
 	connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 	connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
@@ -272,6 +271,7 @@ void MasterEdit::showEvent(QShowEvent*)
 	resize(s);
 	QPoint p = tconfig().get_property("MasterEdit", "pos", QPoint(0,0)).toPoint();
 	move(p);
+	canvas->setFocus();
 }
 //---------------------------------------------------------
 //   readStatus
@@ -392,6 +392,7 @@ void MasterEdit::writeConfiguration(int level, Xml& xml)
 
 void MasterEdit::_setRaster(int index)
 {
+	//printf("MasterEdit::_setRaster(%d)\n", index);
 	static int rasterTable[] = {
 		1, 0, 768, 384, 192, 96
 	};
@@ -479,6 +480,31 @@ void MasterEdit::keyPressEvent(QKeyEvent* event)
 	{
 		tools2->set(PencilTool);
 		return;
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_1].key)
+	{
+		//_setRaster(0)
+		rasterLabel->setCurrentIndex(0);
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_2].key)
+	{
+		rasterLabel->setCurrentIndex(1);
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_3].key)
+	{
+		rasterLabel->setCurrentIndex(2);
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_4].key)
+	{
+		rasterLabel->setCurrentIndex(3);
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_5].key)
+	{
+		rasterLabel->setCurrentIndex(4);
+	}
+	else if (key == shortcuts[SHRT_SET_QUANT_6].key)
+	{
+		rasterLabel->setCurrentIndex(5);
 	}
 
 }
