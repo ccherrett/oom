@@ -1177,16 +1177,32 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 	if (event->type() == QEvent::KeyPress) {
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 		int key = keyEvent->key();
+		//if (event->state() & Qt::ShiftButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::ShiftModifier)
+			key += Qt::SHIFT;
+		//if (event->state() & Qt::AltButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::AltModifier)
+			key += Qt::ALT;
+		//if (event->state() & Qt::ControlButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
+			key += Qt::CTRL;
+		///if (event->state() & Qt::MetaButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+			key += Qt::META;
+
 		if (key == Qt::Key_Enter || key == Qt::Key_Return)
 		{
 			canvas->setFocus(Qt::MouseFocusReason);
 			return true;
 		}
-		if (keyEvent->key() == shortcuts[SHRT_TOGGLE_STEPRECORD].key ||
-		    keyEvent->key() == shortcuts[SHRT_MIDI_PANIC].key
-		    )
+		if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
 		{
-			qApp->sendEvent(canvas, event);
+			srec->toggle();
+			return true;
+		}
+		if (key == shortcuts[SHRT_MIDI_PANIC].key)
+		{
+			song->panic();
 			return true;
 		}
 		if(keyEvent->key() == shortcuts[SHRT_SEL_INSTRUMENT].key)

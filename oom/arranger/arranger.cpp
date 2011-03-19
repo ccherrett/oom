@@ -264,7 +264,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	QWidget* tracklist = new QWidget();
 	QWidget* wtlist = new QWidget(split);
 	QVBoxLayout *tg = new QVBoxLayout(wtlist);
-        tg->setSpacing(0);
+	tg->setSpacing(0);
 
 	split->setStretchFactor(split->indexOf(wtlist), 0);
 	//split->setStretchFactor(split->indexOf(tracklist), 1);
@@ -299,7 +299,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	//mixerScroll->setMaximumWidth(300);
 	mixerScroll->setMinimumWidth(100);
 	//mixerScroll->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
-	
+
 	header = new Header(tracklist, "header");
 	header->setObjectName("trackHeaders");
 
@@ -344,7 +344,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(header, SIGNAL(sectionMoved(int, int, int)), list, SLOT(redraw()));
 	connect(header, SIGNAL(sectionMoved(int, int, int)), this, SLOT(headerMoved()));
 
-        tg->addItem(new QSpacerItem(0, 24));
+	tg->addItem(new QSpacerItem(0, 24));
 	tg->addWidget(list);
 	list->setMinimumSize(QSize(100, 50));
 	list->setMaximumSize(QSize(540, 10000));
@@ -473,14 +473,14 @@ Arranger::~Arranger()
 //{
 //      int s = 0, e = song->len();
 // Show one more measure.
-//      e += AL::sigmap.ticksMeasure(e);  
+//      e += AL::sigmap.ticksMeasure(e);
 // Show another quarter measure due to imprecise drawing at canvas end point.
 //      e += AL::sigmap.ticksMeasure(e) / 4;
-// Compensate for the fixed vscroll width. 
-//      e += canvas->rmapxDev(-vscroll->width()); 
+// Compensate for the fixed vscroll width.
+//      e += canvas->rmapxDev(-vscroll->width());
 //      int s1, e1;
 //      hscroll->range(&s1, &e1);
-//      if(s != s1 || e != e1) 
+//      if(s != s1 || e != e1)
 //        hscroll->setRange(s, e);
 //}
 
@@ -677,15 +677,15 @@ void Arranger::trackSelectionChanged()
 	selected = track;
 	updateTrackInfo(-1);
 
-        // Check if the selected track is inside the view, if not
-        // scroll the track to the center of the view
-        int vScrollValue = vscroll->value();
-        int trackYPos = canvas->track2Y(selected);
-        if (trackYPos > (vScrollValue + canvas->height()) ||
-            trackYPos < vScrollValue)
-        {
-                vscroll->setValue(trackYPos - (canvas->height() / 2));
-        }
+	// Check if the selected track is inside the view, if not
+	// scroll the track to the center of the view
+	int vScrollValue = vscroll->value();
+	int trackYPos = canvas->track2Y(selected);
+	if (trackYPos > (vScrollValue + canvas->height()) ||
+	    trackYPos < vScrollValue)
+	{
+		vscroll->setValue(trackYPos - (canvas->height() / 2));
+	}
 }
 
 //---------------------------------------------------------
@@ -953,16 +953,16 @@ void Arranger::clear()
 {
 	selected = 0;
 	midiTrackInfo->setTrack(0);
-        foreach(Strip* strip, m_strips)
-        {
-                delete strip;
-        }
-        m_strips.clear();
-        _lastStrip = 0;
-        if (canvas)
-        {
-                canvas->setCurrentPart(0);
-        }
+	foreach(Strip* strip, m_strips)
+	{
+		delete strip;
+	}
+	m_strips.clear();
+	_lastStrip = 0;
+	if (canvas)
+	{
+		canvas->setCurrentPart(0);
+	}
 }
 
 void Arranger::wheelEvent(QWheelEvent* ev)
@@ -994,6 +994,8 @@ void Arranger::showTrackInfo(bool)
 void Arranger::genTrackInfo(QWidget*)
 {
 	midiTrackInfo = new MidiTrackInfo(this);
+	midiTrackInfo->installEventFilter(this);
+	midiTrackInfo->getView()->installEventFilter(this);
 	_tvdock = new TrackViewDock(this);
 	//infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
@@ -1033,17 +1035,17 @@ void Arranger::updateTrackInfo(int flags)
 		//switchInfo(0);
 	}
 	if (selected->isMidiTrack())
-        {
+	{
 		if ((flags & SC_SELECTION) || (flags & SC_TRACK_REMOVED))
 			switchInfo(2);
-                // If a new part was selected, and only if it's different.
+		// If a new part was selected, and only if it's different.
 		if ((flags & SC_SELECTION) && midiTrackInfo->track() != selected)
 			// Set a new track and do a complete update.
 			midiTrackInfo->setTrack(selected);
 		else
 			// Otherwise just regular update with specific flags.
 			midiTrackInfo->updateTrackInfo(flags);
-        }
+	}
 	else
 	{
 		if ((flags & SC_SELECTION) || (flags & SC_TRACK_REMOVED))
@@ -1061,7 +1063,7 @@ void Arranger::switchInfo(int n)/*{{{*/
 	if(selected && n == 2)
 	{
 		Strip* w = 0;
-		
+
 		QLayoutItem* item = mlayout->takeAt(0);
 		if(item) {
 			Strip* strip = (Strip*)item->widget();
@@ -1072,56 +1074,56 @@ void Arranger::switchInfo(int n)/*{{{*/
 		}
 		if(_lastStrip)
 		{
-		        m_strips.removeAll(_lastStrip);
+			m_strips.removeAll(_lastStrip);
 			delete _lastStrip;
 			_lastStrip = 0;
 		}
 		if(selected->isMidiTrack())
 		{
-		 	_rtabs->setTabEnabled(1, true);
-		 	_rtabs->setTabEnabled(2, true);
-		 	//_rtabs->setCurrentIndex(2);
-		 	w = new MidiStrip(central, (MidiTrack*) selected);
+			_rtabs->setTabEnabled(1, true);
+			_rtabs->setTabEnabled(2, true);
+			//_rtabs->setCurrentIndex(2);
+			w = new MidiStrip(central, (MidiTrack*) selected);
 		}
 		else
 		{
-		 	_rtabs->setTabEnabled(2, false);
-		 	_rtabs->setTabEnabled(1, true);
-		 	if(chview)
+			_rtabs->setTabEnabled(2, false);
+			_rtabs->setTabEnabled(1, true);
+			if(chview)
 				_rtabs->setCurrentIndex(1);
-		 	w = new AudioStrip(central, (AudioTrack*) selected);
+			w = new AudioStrip(central, (AudioTrack*) selected);
 		}
 		switch (selected->type())//{{{
 		{
-		 	case Track::AUDIO_OUTPUT:
-		 	    w->setObjectName("MixerAudioOutStrip");
-		 	    break;
-		 	case Track::AUDIO_BUSS:
-		 	    w->setObjectName("MixerAudioBussStrip");
-		 	    break;
-		 	case Track::AUDIO_AUX:
-		 	    w->setObjectName("MixerAuxStrip");
-		 	    break;
-		 	case Track::WAVE:
-		 	    w->setObjectName("MixerWaveStrip");
-		 	    break;
-		 	case Track::AUDIO_INPUT:
-		 	    w->setObjectName("MixerAudioInStrip");
-		 	    break;
-		 	case Track::AUDIO_SOFTSYNTH:
-		 	    w->setObjectName("MixerSynthStrip");
-		 	    break;
-		 	case Track::MIDI:
+			case Track::AUDIO_OUTPUT:
+			    w->setObjectName("MixerAudioOutStrip");
+			    break;
+			case Track::AUDIO_BUSS:
+			    w->setObjectName("MixerAudioBussStrip");
+			    break;
+			case Track::AUDIO_AUX:
+			    w->setObjectName("MixerAuxStrip");
+			    break;
+			case Track::WAVE:
+			    w->setObjectName("MixerWaveStrip");
+			    break;
+			case Track::AUDIO_INPUT:
+			    w->setObjectName("MixerAudioInStrip");
+			    break;
+			case Track::AUDIO_SOFTSYNTH:
+			    w->setObjectName("MixerSynthStrip");
+			    break;
+			case Track::MIDI:
 			{
-		 	    w->setObjectName("MidiTrackStrip");
-		 		break;
+			    w->setObjectName("MidiTrackStrip");
+				break;
 			}
-		 	case Track::DRUM:
-		 	{
-		 	    w->setObjectName("MidiDrumTrackStrip");
-		 		break;
-		 	}
-		 	break;
+			case Track::DRUM:
+			{
+			    w->setObjectName("MidiDrumTrackStrip");
+				break;
+			}
+			break;
 		}//}}}
 		if (w)
 		{
@@ -1149,5 +1151,38 @@ void Arranger::preloadControllers()
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	audio->preloadControllers();
 	QApplication::restoreOverrideCursor();
+}
+
+bool Arranger::eventFilter(QObject *obj, QEvent *event)
+{
+	// Force left/right arrow key events to move the focus
+	// back on the canvas if it doesn't have the focus.
+	// Currently the object that we're filtering is the
+	// midiTrackInfo.
+	if (event->type() == QEvent::KeyPress) {
+		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+		int key = keyEvent->key();
+		//if (event->state() & Qt::ShiftButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::ShiftModifier)
+			key += Qt::SHIFT;
+		//if (event->state() & Qt::AltButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::AltModifier)
+			key += Qt::ALT;
+		//if (event->state() & Qt::ControlButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
+			key += Qt::CTRL;
+		///if (event->state() & Qt::MetaButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+			key += Qt::META;
+
+		if (key == Qt::Key_Enter || key == Qt::Key_Return)
+		{
+			canvas->setFocus(Qt::MouseFocusReason);
+			return true;
+		}
+	}
+
+	// standard event processing
+	return QObject::eventFilter(obj, event);
 }
 
