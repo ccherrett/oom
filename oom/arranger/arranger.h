@@ -90,6 +90,7 @@ class Arranger : public QWidget
     void switchInfo(int);
     void setHeaderToolTips();
     void setHeaderWhatsThis();
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
     void songlenChanged(int);
@@ -140,7 +141,7 @@ public:
 
     enum
     {
-        CMD_CUT_PART, CMD_COPY_PART, CMD_PASTE_PART, CMD_PASTE_CLONE_PART, CMD_PASTE_PART_TO_TRACK, CMD_PASTE_CLONE_PART_TO_TRACK,
+	CMD_CUT_PART, CMD_COPY_PART, CMD_PASTE_PART, CMD_PASTE_CLONE_PART, CMD_PASTE_PART_TO_TRACK, CMD_PASTE_CLONE_PART_TO_TRACK,
 	CMD_INSERT_PART, CMD_INSERT_EMPTYMEAS, CMD_REMOVE_SELECTED_AUTOMATION_NODES
     };
 
@@ -149,12 +150,12 @@ public:
 
     PartCanvas* getCanvas()
     {
-        return canvas;
+	return canvas;
     }
 
     TList* getTrackList() const
     {
-            return list;
+	    return list;
     }
 
     void setMode(int);
@@ -165,25 +166,25 @@ public:
 
     Track* curTrack() const
     {
-        return selected;
+	return selected;
     }
     void cmd(int);
 
     bool isSingleSelection()
     {
-        return canvas->isSingleSelection();
+	return canvas->isSingleSelection();
     }
 
     int selectionSize()
     {
-        return canvas->selectionSize();
+	return canvas->selectionSize();
     }
     void setGlobalTempo(int);
     void clear();
 
     unsigned cursorValue()
     {
-        return cursVal;
+	return cursVal;
     }
 
 
