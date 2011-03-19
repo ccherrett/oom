@@ -1968,6 +1968,7 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
 			MidiPlayEvent pe3(0, port, channel, 0x90, newEvent.pitch(), 0);
 			audio->msgPlayMidiEvent(&pe3);
 		}
+		++count;
 		// Indicate do not do port controller values and clone parts.
 		//song->undoOp(UndoOp::ModifyEvent, newEvent, event, part);
 		song->undoOp(UndoOp::ModifyEvent, newEvent, event, part, false, false);
