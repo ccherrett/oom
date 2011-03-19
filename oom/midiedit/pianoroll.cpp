@@ -1190,7 +1190,7 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 		if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
 			key += Qt::META;
 
-		if (key == Qt::Key_Enter || key == Qt::Key_Return)
+		if (key == shortcuts[SHRT_NAVIGATE_TO_CANVAS].key)
 		{
 			canvas->setFocus(Qt::MouseFocusReason);
 			return true;
