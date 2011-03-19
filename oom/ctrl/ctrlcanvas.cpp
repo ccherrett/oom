@@ -1226,7 +1226,9 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				break;
 			int y1 = wh - (e->val() * wh / 128);
 			// fg means 'draw selected parts'.
-			QColor fillColor = QColor(53, 171, 193,255);
+			QColor fillColor = QColor(255, 201, 144,255);
+			int bgalpha = 127;
+			QColor bgfillColor = QColor(255, 201, 144, bgalpha);
 			if (fg)
 			{
 				int velo2 = e->val();
@@ -1234,73 +1236,109 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				if (velo2 <= 11)
 				{
 					if(e->selected())
-						fillColor.setRgb(53, 171, 193, 255);	
+					{
+						fillColor.setRgb(255, 201, 144, 255);	
+						bgfillColor.setRgb(255, 201, 144, bgalpha);	
+					}
 					color.setRgb(147, 186, 195, 127);
 				}
 				else if (velo2 <= 22)
 				{
 					if(e->selected())
-						fillColor.setRgb(64, 161, 185, 255);	
+					{
+						fillColor.setRgb(255, 195, 131, 255);	
+						bgfillColor.setRgb(255, 195, 131, bgalpha);	
+					}
 					color.setRgb(119, 169, 181, 127);
 				}
 				else if (velo2 <= 33)
 				{
 					if(e->selected())
-						fillColor.setRgb(75, 152, 177, 255);	
+					{
+						fillColor.setRgb(255, 189, 118, 255);	
+						bgfillColor.setRgb(255, 189, 118, bgalpha);	
+					}
 					color.setRgb(85, 157, 175, 127);
 				}
 				else if (velo2 <= 44)
 				{
 					if(e->selected())
-						fillColor.setRgb(84, 144, 170, 255);	
+					{
+						fillColor.setRgb(255, 184, 107, 255);	
+						bgfillColor.setRgb(255, 184, 107, bgalpha);	
+					}
 					color.setRgb(58, 152, 176, 127);
 				}
 				else if (velo2 <= 55)
 				{
 					if(e->selected())
-						fillColor.setRgb(94, 136, 163, 255);	
+					{
+						fillColor.setRgb(255, 177, 94, 255);	
+						bgfillColor.setRgb(255, 177, 94, bgalpha);	
+					}
 					color.setRgb(33, 137, 163, 127);
 				}
 				else if (velo2 <= 66)
 				{
 					if(e->selected())
-						fillColor.setRgb(103, 128, 156, 255);	
+					{
+						fillColor.setRgb(255, 171, 81, 255);	
+						bgfillColor.setRgb(255, 171, 81, bgalpha);	
+					}
 					color.setRgb(30, 136, 162, 127);
 				}
 				else if (velo2 <= 77)
 				{
 					if(e->selected())
-						fillColor.setRgb(114, 118, 148, 255);	
+					{
+						fillColor.setRgb(255, 166, 70, 255);	
+						bgfillColor.setRgb(255, 166, 70, bgalpha);	
+					}
 					color.setRgb(13, 124, 151, 127);
 				}
 				else if (velo2 <= 88)
 				{
 					if(e->selected())
-						fillColor.setRgb(125, 110, 140, 255);	
+					{
+						fillColor.setRgb(255, 158, 53, 255);	
+						bgfillColor.setRgb(255, 158, 53, bgalpha);	
+					}
 					color.setRgb(0, 110, 138, 127);
 				}
 				else if (velo2 <= 99)
 				{
 					if(e->selected())
-						fillColor.setRgb(136, 100, 131, 255);	
+					{
+						fillColor.setRgb(255, 153, 44, 255);	
+						bgfillColor.setRgb(255, 153, 44, bgalpha);	
+					}
 					color.setRgb(0, 99, 124, 127);
 				}
 				else if (velo2 <= 110)
 				{
 					if(e->selected())
-						fillColor.setRgb(146, 92, 124, 255);	
+					{
+						fillColor.setRgb(255, 146, 28, 255);	
+						bgfillColor.setRgb(255, 146, 28, bgalpha);	
+					}
 					color.setRgb(0, 77, 96, 127);
 				}
 				else if (velo2 <= 121)
 				{
 					if(e->selected())
-						fillColor.setRgb(157, 82, 116, 255);	
+					{
+						fillColor.setRgb(255, 139, 14, 255);	
+						bgfillColor.setRgb(255, 139, 14, bgalpha);	
+					}
 					color.setRgb(0, 69, 86, 127);
 				}
 				else
 				{
 					if(e->selected())
-						fillColor.setRgb(169, 72, 107, 255);	
+					{
+						fillColor.setRgb(255, 132, 0, 255);	
+						bgfillColor.setRgb(255, 132, 0, bgalpha);	
+					}
 					color.setRgb(0, 58, 72, 127);
 				}
 				p.setPen(QPen(color, 6));
@@ -1308,18 +1346,18 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			else
 				p.setPen(QPen(QColor(172, 172, 172), 6));
 
-			int alpha = 255;
+			//int alpha = 255;
 			QColor outlineColor = QColor(0,0,0,255);
 			QColor bgoutlineColor = QColor(0,0,0,80);
-			QColor bgfillColor = QColor(224, 123, 23,80);
+			//QColor bgfillColor = QColor(224, 123, 23,80);
 
-			QColor color = QColor();
-			QColor green = QColor(53, 171, 193, 255);
-			QColor red = QColor(169, 72, 107, 255);
-			QLinearGradient vuGrad3(QPointF(0, 0), QPointF(0, height()));
-			vuGrad3.setColorAt(1, green);
-			vuGrad3.setColorAt(0, red);
-			QPen mypen7 = QPen();
+			//QColor color = QColor();
+			//QColor green = QColor(53, 171, 193, 255);
+			//QColor red = QColor(169, 72, 107, 255);
+			//QLinearGradient vuGrad3(QPointF(0, 0), QPointF(0, height()));
+			//vuGrad3.setColorAt(1, green);
+			//vuGrad3.setColorAt(0, red);
+			//QPen mypen7 = QPen();
 			
 			if(e->selected())
 			{
@@ -1330,10 +1368,12 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				//p.setPen(mypen);
 				//p.setBrush(QBrush(fillColor));
 				p.setPen(mypen6);
-				p.setBrush(QBrush(fillColor));
+				p.setBrush(QBrush(bgfillColor));
 				p.drawRect(tick+1, y1-3, 5, wh);
-				QRect rect(tick-2, y1-3, 11, 6);
-				p.drawRoundedRect(rect,3,3);
+				p.setBrush(QBrush(fillColor));
+				QRect rect(tick-1, y1-3, 9, 5);
+				//p.drawRoundedRect(rect,3,3);
+				p.drawRect(rect);
 			}
 			else
 			{
