@@ -1227,7 +1227,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			int y1 = wh - (e->val() * wh / 128);
 			// fg means 'draw selected parts'.
 			QColor fillColor = QColor(255, 201, 144,255);
-			int bgalpha = 40;
+			int bgalpha = 127;
 			QColor bgfillColor = QColor(255, 201, 144, bgalpha);
 			if (fg)
 			{
@@ -1348,7 +1348,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 
 			//int alpha = 255;
 			QColor outlineColor = QColor(0,0,0,255);
-			QColor bgoutlineColor = QColor(0,0,0,80);
+			QColor bgoutlineColor = QColor(0,0,0,bgalpha);
 			//QColor bgfillColor = QColor(224, 123, 23,80);
 
 			//QColor color = QColor();
@@ -1362,14 +1362,16 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			if(e->selected())
 			{
 				QPen mypen6 = QPen(outlineColor, 1, Qt::SolidLine);
+				QPen mypen7 = QPen(bgoutlineColor, 1, Qt::SolidLine);
 				//p.setBrush(QBrush(bgfillColor));
 				//mypen7.setBrush(QBrush(vuGrad3));
 				//p.setPen(mypen7);
 				//p.setPen(mypen);
 				//p.setBrush(QBrush(fillColor));
-				p.setPen(mypen6);
+				p.setPen(mypen7);
 				p.setBrush(QBrush(bgfillColor));
 				p.drawRect(tick+1, y1-3, 5, wh);
+				p.setPen(mypen6);
 				p.setBrush(QBrush(fillColor));
 				QRect rect(tick+1, y1-3, 5, 5);
 				//p.drawRoundedRect(rect,3,3);
