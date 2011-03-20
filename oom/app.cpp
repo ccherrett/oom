@@ -3917,6 +3917,16 @@ bool OOMidi::eventFilter(QObject *obj, QEvent *event)
 			kbAccel(key);
 			return true;
 		}
+		else if(key == shortcuts[SHRT_PLAY_REPEAT].key)
+		{
+			kbAccel(key);
+			return true;
+		}
+		else if (key == shortcuts[SHRT_START_REC].key)
+		{
+			kbAccel(key);
+			return true;
+		}
 	}
 
 	return QObject::eventFilter(obj, event);
