@@ -223,7 +223,7 @@ void initShortCuts()
 	defShrt(SHRT_RMOVE_PROGRAM, Qt::CTRL + Qt::ALT + Qt::Key_Period, "Edit: Move Selected Program Change Right", PROLL_SHRT, "rmove_program_change");
 	defShrt(SHRT_LMOVE_SELECT, 0, "Edit: Move to next Program Change Left", PROLL_SHRT, "select_program_change_left");
 	defShrt(SHRT_RMOVE_SELECT, 0, "Edit: Move to next Program Change Right", PROLL_SHRT, "select_program_change_right");
-	defShrt(SHRT_SEL_INSTRUMENT, Qt::Key_I, "Edit: Select Instrument", PROLL_SHRT, "midi_instrument");
+	defShrt(SHRT_SEL_INSTRUMENT, Qt::Key_Enter, "Edit: Select Instrument", PROLL_SHRT, "midi_instrument");
 	defShrt(SHRT_TOGGLE_STEPRECORD, Qt::CTRL + Qt::Key_F8, "Edit: Toggle Step Input", PROLL_SHRT, "toggle_step_input");
 	defShrt(SHRT_NOTE_VELOCITY_UP, Qt::Key_Up, "Edit: Increase velocity for selection", PROLL_SHRT, "increase_note_velocity");
 	defShrt(SHRT_NOTE_VELOCITY_DOWN, Qt::Key_Down, "Edit: Decrease velocity for selection", PROLL_SHRT, "Decrease_note_velocity");
