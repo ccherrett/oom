@@ -89,18 +89,21 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 {
 	deltaMode = false;
 	// Set size stored in global config, or use defaults.
-	int w = tconfig().get_property("PianoRollEdit", "widgetwidth", 800).toInt();
+	/*int w = tconfig().get_property("PianoRollEdit", "widgetwidth", 800).toInt();
 	int h = tconfig().get_property("PianoRollEdit", "widgetheigth", 650).toInt();
 	int dw = qApp->desktop()->width();
 	int dh = qApp->desktop()->height();
-	if(h <= dh && w <= dw)
+		resize(w, h);*/
+	/*if(h <= dh && w <= dw)
 	{
+		printf("Restoring window state\n");
 		resize(w, h);
 	}
 	else
 	{
+		printf("Desktop size too large for saved state\n");
 		showMaximized();
-	}
+	}*/
 
 	selPart = 0;
 	quantConfig = 0;
@@ -1931,37 +1934,53 @@ void PianoRoll::resizeEvent(QResizeEvent* ev)
 
 void PianoRoll::showEvent(QShowEvent *)
 {
-	// maybe add a bool flag to follow: centered ?
-	// couldn't find a function that does that directly.
-	follow(song->cpos());
-	// now that the cursor is in the view, move the view
-	// half the canvas width so the cursor is centered.
-	hscroll->setPos(hscroll->pos() - (canvas->width() / 2));
 
-	int hScale = tconfig().get_property("PianoRollEdit", "hscale", 346).toInt();
-	int vScale = tconfig().get_property("PianoRollEdit", "yscale", 286).toInt();
-	int yPos = tconfig().get_property("PianoRollEdit", "ypos", 0).toInt();
-	hscroll->setMag(hScale);
-	vscroll->setMag(vScale);
-	vscroll->setPos(yPos);
-	QList<int> vl2;
-	QString str2 = tconfig().get_property("splitter", "sizes", "60 200").toString();
-	QStringList sl2 = str2.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it2 = sl2.begin(); it2 != sl2.end(); ++it2)
+	int w = tconfig().get_property("PianoRollEdit", "widgetwidth", 800).toInt();
+	int h = tconfig().get_property("PianoRollEdit", "widgetheigth", 650).toInt();
+	int dw = qApp->desktop()->width();
+	int dh = qApp->desktop()->height();
+	if(h <= dh && w <= dw)
 	{
-		int val = (*it2).toInt();
-		vl2.append(val);
+		//printf("Restoring window state\n");
+		resize(w, h);
+		
+		// maybe add a bool flag to follow: centered ?
+		// couldn't find a function that does that directly.
+		follow(song->cpos());
+		// now that the cursor is in the view, move the view
+		// half the canvas width so the cursor is centered.
+
+		hscroll->setPos(hscroll->pos() - (canvas->width() / 2));
+		int hScale = tconfig().get_property("PianoRollEdit", "hscale", 346).toInt();
+		int vScale = tconfig().get_property("PianoRollEdit", "yscale", 286).toInt();
+		int yPos = tconfig().get_property("PianoRollEdit", "ypos", 0).toInt();
+		hscroll->setMag(hScale);
+		vscroll->setMag(vScale);
+		vscroll->setPos(yPos);
+		QList<int> vl2;
+		QString str2 = tconfig().get_property("splitter", "sizes", "60 200").toString();
+		QStringList sl2 = str2.split(QString(" "), QString::SkipEmptyParts);
+		for (QStringList::Iterator it2 = sl2.begin(); it2 != sl2.end(); ++it2)
+		{
+			int val = (*it2).toInt();
+			vl2.append(val);
+		}
+		splitter->setSizes(vl2);
+		QList<int> vl;
+		QString str = tconfig().get_property("hsplitter", "sizes", "200 50").toString();
+		QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
+		for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+		{
+			int val = (*it).toInt();
+			vl.append(val);
+		}
+		hsplitter->setSizes(vl);
 	}
-	splitter->setSizes(vl2);
-	QList<int> vl;
-	QString str = tconfig().get_property("hsplitter", "sizes", "200 50").toString();
-	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+	else
 	{
-		int val = (*it).toInt();
-		vl.append(val);
+		//printf("Desktop size too large for saved state\n");
+		showMaximized();
 	}
-	hsplitter->setSizes(vl);
 }
 
 //---------------------------------------------------------
