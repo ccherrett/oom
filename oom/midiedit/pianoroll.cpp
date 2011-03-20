@@ -1194,6 +1194,10 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 		{
 			if (canvas->hasFocus())
 			{
+				midiTrackInfo->getPatchListview()->setFocus();
+			}
+			else if (midiTrackInfo->getPatchListview()->hasFocus())
+			{
 				midiTrackInfo->getView()->setFocus();
 			}
 			else

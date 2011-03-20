@@ -10,7 +10,7 @@
 #include "ui_mtrackinfobase.h"
 #include "pctablemodel.h"
 #include "pctable.h"
-#include <QToolBar>     
+#include <QToolBar>
 
 class QToolButton;
 class QTableWidget;
@@ -41,7 +41,7 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
     GridCombo* rasterLabel;
     QTableWidget* rlist;
 	//end merge
-	
+
     Track* selected;
     bool _midiDetect;
     int program, pan, volume;
@@ -137,11 +137,15 @@ public:
 	~MidiTrackInfo();
 
     Track* track() const {
-        return selected;
+	return selected;
     }
     QTableView* getView() const
     {
-            return tableView;
+	    return tableView;
+    }
+    QTreeView* getPatchListview() const
+    {
+	    return patchList;
     }
     void setLabelText();
     void setLabelFont();
