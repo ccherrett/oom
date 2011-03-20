@@ -94,6 +94,7 @@ private slots:
 	void clonePatchSequence();
 	void patchDoubleClicked(QModelIndex);
 	void patchClicked(QModelIndex);
+	void patchSelectionChanged(QItemSelection, QItemSelection);
 	void editorPartChanged(Part*);
     //tb1
 	void _rasterChanged(int);
