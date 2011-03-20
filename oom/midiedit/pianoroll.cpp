@@ -1192,7 +1192,14 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 
 		if (key == shortcuts[SHRT_NAVIGATE_TO_CANVAS].key)
 		{
-			canvas->setFocus(Qt::MouseFocusReason);
+			if (canvas->hasFocus())
+			{
+				midiTrackInfo->getView()->setFocus();
+			}
+			else
+			{
+				canvas->setFocus(Qt::MouseFocusReason);
+			}
 			return true;
 		}
 		if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
