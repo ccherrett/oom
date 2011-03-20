@@ -155,6 +155,7 @@ signals:
     void selectTrackAbove();
     void selectTrackBelow();
 	void renameTrack(Track*);
+	void moveSelectedTracks(int);
 
     void startEditor(PartList*, int);
 

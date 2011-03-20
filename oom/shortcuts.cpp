@@ -264,6 +264,10 @@ void initShortCuts()
 	defShrt(SHRT_TRACK_HEIGHT_5, Qt::ALT + Qt::Key_5, "Track: height 5", GLOBAL_SHRT, "track_height_5");
 	defShrt(SHRT_TRACK_HEIGHT_6, Qt::ALT + Qt::Key_6, "Track: height 6", GLOBAL_SHRT, "track_height_6");
 
+	defShrt(SHRT_MOVE_TRACK_UP, Qt::CTRL + Qt::ALT + Qt::Key_Up, "Track: Move selected tracks up", GLOBAL_SHRT, "move_track_up");
+	defShrt(SHRT_MOVE_TRACK_DOWN, Qt::CTRL + Qt::ALT + Qt::Key_Down, "Track: Move selected tracks down", GLOBAL_SHRT, "move_track_down");
+
+
 	//Increase/decrease current position, is going to be in arranger & drumeditor as well
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
 	defShrt(SHRT_POS_INC, Qt::CTRL + Qt::Key_Right, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");

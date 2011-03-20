@@ -80,7 +80,6 @@ class TList : public QWidget
 
     void portsPopupMenu(Track*, int, int);
     void oportPropertyPopupMenu(Track*, int x, int y);
-    void moveSelection(int n);
     void adjustScrollbar();
     void paint(const QRect& r);
     virtual void resizeEvent(QResizeEvent*);
@@ -111,6 +110,8 @@ public slots:
     void selectTrackAbove();
     void selectTrackBelow();
 	void renameTrack(Track*);
+    void moveSelection(int n);
+    void moveSelectedTrack(int n);
 
 public:
     TList(Header*, QWidget* parent, const char* name);

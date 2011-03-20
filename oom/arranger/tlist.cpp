@@ -2140,3 +2140,48 @@ void TList::classesPopupMenu(Track* t, int x, int y)
 	}
 }
 
+void TList::moveSelectedTrack(int dir)/*{{{*/
+{
+	TrackList tl = song->getSelectedTracks();
+	if(tl.size() == 1)
+	{
+		Track* src = (Track*)tl.front();
+		if(src)
+		{
+			int i = song->visibletracks()->index(src);
+			ciTrack it = song->visibletracks()->index2iterator(i);
+			Track* t = 0;
+			if(dir == 1)
+			{
+				if(it != song->visibletracks()->begin())//already at top
+				{
+					ciTrack d = --it;
+					t = *(d);
+				}
+				if (t)
+				{
+					int dTrack = song->visibletracks()->index(t);
+					audio->msgMoveTrack(i, dTrack);
+					//The selection event should be harmless enough to call here to update 
+					redraw();
+					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(src));
+				}
+			}
+			else
+			{
+				if(it != song->visibletracks()->end())//already at bottom
+				{
+					ciTrack d = ++it;
+					t = *(d);
+				}
+				if (t)
+				{
+					int dTrack = song->visibletracks()->index(t);
+					audio->msgMoveTrack(i, dTrack);
+					//The selection event should be harmless enough to call here to update 
+					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+				}
+			}
+		}
+	}
+}/*}}}*/

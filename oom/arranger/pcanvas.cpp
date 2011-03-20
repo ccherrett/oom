@@ -1871,6 +1871,16 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		}
 		return;
 	}
+	else if(key == shortcuts[SHRT_MOVE_TRACK_UP].key)
+	{
+		emit moveSelectedTracks(1);
+		return;
+	}
+	else if(key == shortcuts[SHRT_MOVE_TRACK_DOWN].key)
+	{
+		emit moveSelectedTracks(-1);
+		return;
+	}
 
 	//
 	// Shortcuts that require selected parts from here
