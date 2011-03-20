@@ -463,21 +463,11 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	installEventFilter(this);
 	midiTrackInfo->installEventFilter(this);
 	midiTrackInfo->getView()->installEventFilter(this);
+	midiTrackInfo->getPatchListview()->installEventFilter(this);
 
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
-	//midiTrackInfo->setSizePolicy(QSizePolicy(/*QSizePolicy::Ignored*/QSizePolicy::Preferred, QSizePolicy::Expanding));
-	/*infoScroll = new QScrollArea;
-	infoScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	infoScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	//infoScroll->setMaximumWidth(300);
-	infoScroll->setMinimumWidth(100);
-	//infoScroll->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
-	infoScroll->setWidget(midiTrackInfo);
-	infoScroll->setWidgetResizable(true);*/
-
-	//hsplitter->addWidget(infoScroll);
 	hsplitter->addWidget(midiTrackInfo);
 	hsplitter->addWidget(splitter);
 

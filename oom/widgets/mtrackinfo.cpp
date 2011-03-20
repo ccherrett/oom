@@ -2423,7 +2423,11 @@ void MidiTrackInfo::patchDoubleClicked(QModelIndex index)/*{{{*/
 		return;
 	QStandardItem* nItem = _patchModel->itemFromIndex(index);//item(row, 0);
 
-	if(!nItem->hasChildren())
+	if(nItem->hasChildren()) //Its a folder perform expand collapse
+	{
+		patchList->setExpanded(index, !patchList->isExpanded(index));
+	}
+	else
 	{
 		int row = nItem->row();
 		QStandardItem* p = nItem->parent();
@@ -2550,6 +2554,7 @@ void MidiTrackInfo::addSelectedPatch()
 		return;
 	if(_patchSelModel->hasSelection())
 	{
+		//printf("MidiTrackInfo::addSelectedPatch()\n");
 		patchDoubleClicked(_patchSelModel->currentIndex());
 	}
 }
