@@ -195,6 +195,7 @@
 #include "xpm/addtrack_wavetrack.xpm"
 #include "xpm/edit_drumms.xpm"
 #include "xpm/edit_list.xpm"
+#include "xpm/remove_ctrl.xpm"
 #include "xpm/edit_wave.xpm"
 #include "xpm/edit_mastertrack.xpm"
 #include "xpm/edit_pianoroll.xpm"
@@ -419,6 +420,7 @@ QPixmap* addtrack_drumtrackIcon;
 QPixmap* addtrack_wavetrackIcon;
 QPixmap* edit_drummsIcon;
 QPixmap* edit_listIcon;
+QPixmap* remove_ctrlIcon;
 QPixmap* edit_waveIcon;
 QPixmap* edit_mastertrackIcon;
 QPixmap* edit_pianorollIcon;
@@ -675,6 +677,7 @@ void initIcons()
       addtrack_wavetrackIcon        = new MPIXMAP(addtrack_wavetrack_xpm, NULL);
       edit_drummsIcon               = new MPIXMAP(edit_drumms_xpm, NULL);
       edit_listIcon                 = new MPIXMAP(edit_list_xpm, NULL);
+      remove_ctrlIcon               = new MPIXMAP(remove_ctrl_xpm, NULL);
       edit_waveIcon                 = new MPIXMAP(edit_wave_xpm, NULL);
       edit_mastertrackIcon          = new MPIXMAP(edit_mastertrack_xpm, NULL);
       edit_pianorollIcon            = new MPIXMAP(edit_pianoroll_xpm, NULL);

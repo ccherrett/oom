@@ -65,7 +65,7 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	kbox->setContentsMargins(0, 0, 0, 0);
 	dbox->setContentsMargins(0, 0, 0, 0);
 
-	selCtrl = new QPushButton(tr("S"));
+	selCtrl = new QPushButton(tr(""));
 	//selCtrl->setFont(config.fonts[3]);
 	//selCtrl->setFixedHeight(20);
 	selCtrl->setFont(QFont("fixed-width", 8, QFont::Bold));
@@ -73,16 +73,18 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	selCtrl->setSizePolicy(
 			QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	selCtrl->setToolTip(tr("select controller"));
+	selCtrl->setIcon(*edit_listIcon);
 
 	///pop = new QMenu;
 
 	// destroy button
-	QPushButton* destroy = new QPushButton(tr("X"));
+	QPushButton* destroy = new QPushButton(tr(""));
 	destroy->setFont(QFont("fixed-width", 8, QFont::Bold));
 	destroy->setFixedHeight(20);
 	destroy->setSizePolicy(
 			QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	destroy->setToolTip(tr("remove panel"));
+	destroy->setIcon(*remove_ctrlIcon);
 	// Cursor Position
 	connect(selCtrl, SIGNAL(clicked()), SLOT(ctrlPopup()));
 	connect(destroy, SIGNAL(clicked()), SIGNAL(destroyPanel()));

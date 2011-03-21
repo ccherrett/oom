@@ -194,6 +194,7 @@ extern QPixmap* addtrack_drumtrackIcon;
 extern QPixmap* addtrack_wavetrackIcon;
 extern QPixmap* edit_drummsIcon;
 extern QPixmap* edit_listIcon;
+extern QPixmap* remove_ctrlIcon;
 extern QPixmap* edit_waveIcon;
 extern QPixmap* edit_mastertrackIcon;
 extern QPixmap* edit_pianorollIcon;

@@ -444,10 +444,11 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	hsplitter->setChildrenCollapsible(true);
 	hsplitter->setHandleWidth(2);
 
-	QPushButton* ctrl = new QPushButton(tr("ctrl"), mainw);
+	QPushButton* ctrl = new QPushButton(tr(""), mainw);
 	ctrl->setObjectName("Ctrl");
 	ctrl->setFont(config.fonts[3]);
 	ctrl->setToolTip(tr("Add Controller View"));
+	ctrl->setIcon(*mastertrackSIcon);
 	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
 	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());
 	//ctrl->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());  // Tim.
