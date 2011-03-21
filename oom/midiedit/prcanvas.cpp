@@ -1055,6 +1055,9 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 				editor->setCurCanvasPart(newpt);
 				// and turn it on for the new parts track
 				song->setRecordFlag(track(), true);
+				song->deselectTracks();
+				track()->setSelected(true);
+				song->update(SC_SELECTION);
 			}
 		}
 			break;
@@ -1082,6 +1085,9 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 				editor->setCurCanvasPart(newpt);
 				// and turn it on for the new parts track
 				song->setRecordFlag(track(), true);
+				song->deselectTracks();
+				track()->setSelected(true);
+				song->update(SC_SELECTION);
 			}
 		}
 			break;

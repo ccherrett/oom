@@ -621,10 +621,15 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     //
     if (canvas->track())
     {
-	  updateTrackInfo();
-	  solo->blockSignals(true);
-	  solo->setChecked(canvas->track()->solo());
-	  solo->blockSignals(false);
+		song->setRecordFlag(canvas->track(), true);
+		song->deselectTracks();
+		canvas->track()->setSelected(true);
+		song->update(SC_SELECTION);
+
+	 	updateTrackInfo();
+	 	solo->blockSignals(true);
+	 	solo->setChecked(canvas->track()->solo());
+	 	solo->blockSignals(false);
     }
 
     unsigned pos;
