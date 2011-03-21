@@ -447,7 +447,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	QPushButton* ctrl = new QPushButton(tr(""), mainw);
 	ctrl->setObjectName("Ctrl");
 	ctrl->setFont(config.fonts[3]);
-	ctrl->setToolTip(tr("Add Controller View"));
+	ctrl->setToolTip(tr("Add Controller Lane"));
 	ctrl->setIcon(*mastertrackSIcon);
 	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
 	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());

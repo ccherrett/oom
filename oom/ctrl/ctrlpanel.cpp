@@ -72,7 +72,7 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	selCtrl->setFixedHeight(20);
 	selCtrl->setSizePolicy(
 			QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-	selCtrl->setToolTip(tr("select controller"));
+	selCtrl->setToolTip(tr("select controller type"));
 	selCtrl->setIcon(*edit_listIcon);
 
 	///pop = new QMenu;
@@ -83,7 +83,7 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	destroy->setFixedHeight(20);
 	destroy->setSizePolicy(
 			QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-	destroy->setToolTip(tr("remove panel"));
+	destroy->setToolTip(tr("remove controller lane"));
 	destroy->setIcon(*remove_ctrlIcon);
 	// Cursor Position
 	connect(selCtrl, SIGNAL(clicked()), SLOT(ctrlPopup()));
