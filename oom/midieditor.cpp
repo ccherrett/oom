@@ -15,6 +15,7 @@
 #include "track.h"
 #include "song.h"
 #include "event.h"
+#include "prcanvas.h"
 
 #include <QRect>
 #include <QColor>
@@ -264,6 +265,26 @@ Part* MidiEditor::curCanvasPart()
 		return canvas->part();
 	else
 		return 0;
+}
+
+QList<Event> MidiEditor::getSelectedEvents()
+{
+	QList<Event> rv;
+	if(canvas)
+	{
+		CItemList list = canvas->getSelectedItemsForCurrentPart();/*{{{*/
+	
+		for (iCItem k = list.begin(); k != list.end(); ++k)
+		{
+			NEvent* nevent = (NEvent*) (k->second);
+			Event event = nevent->event();
+			if (event.type() != Note)
+				continue;
+			
+			rv.append(event);
+		}/*}}}*/
+	}
+	return rv;
 }
 
 bool MidiEditor::isEventSelected(Event e)

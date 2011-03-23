@@ -11,6 +11,7 @@
 #include <QPainter>
 #include <QCursor>
 #include <QMouseEvent>
+#include <QtGui>
 
 #include "globals.h"
 #include "ctrledit.h"
@@ -472,6 +473,7 @@ void CtrlCanvas::updateItems()
 	if (!editor->parts()->empty())
 	{
 		MidiPart* cPart = static_cast<MidiPart*>(editor->curCanvasPart());
+		QList<Event> selEvents = editor->getSelectedEvents();
 		for (iPart p = editor->parts()->begin(); p != editor->parts()->end(); ++p)
 		{
 			Event last;
@@ -491,7 +493,7 @@ void CtrlCanvas::updateItems()
 				// Added by T356. Do not add events which are past the end of the part.
 				if (e.tick() >= len)
 					break;
-				bool sel = (isPart && editor->isEventSelected(e));
+				bool sel = (isPart && (!selEvents.isEmpty() && selEvents.contains(e)));//false;//(isPart && editor->isEventSelected(e));
 
 				if (_cnum == CTRL_VELOCITY && e.type() == Note)
 				{
@@ -520,6 +522,7 @@ void CtrlCanvas::updateItems()
 					last = e;
 				}
 			}
+			//qApp->processEvents();
 		}
 	}
 
