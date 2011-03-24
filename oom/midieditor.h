@@ -11,6 +11,7 @@
 ///#include "sig.h"
 #include "al/sig.h"
 #include "cobject.h"
+#include <QList>
 
 class QGridLayout;
 class QWidget;
@@ -126,6 +127,7 @@ public:
     }
     Part* curCanvasPart();
 	bool isEventSelected(Event e);
+	QList<Event> getSelectedEvents();
     WavePart* curWavePart();
     void setCurCanvasPart(Part*);
 };
