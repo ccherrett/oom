@@ -11,6 +11,7 @@
 #include <QEvent>
 #include <QString>
 #include <QMap>
+#include <QQueue>
 
 #define LSCLIENT_LSCP_EVENT  QEvent::Type(QEvent::User + 1)
 
@@ -44,7 +45,50 @@ class MidiInstrument;
 class MidiInstrumentList;
 class Patch;
 class PatchGroup;
-class LSClient : public QThread
+class LSThread;
+class LSClient;
+
+class LSProcessor : public QObject
+{
+	Q_OBJECT
+public:
+	void queueClient(LSClient* client);
+	void freeClient(LSClient* client);
+
+private:
+	LSThread* m_lsthread;
+	QMutex m_mutex;
+	QWaitCondition m_wait;
+	bool m_taskRunning;
+	LSClient* m_runningClient;
+
+	QQueue<LSClient*> m_queue;
+	void dequeueClient();
+	LSProcessor();
+	LSProcessor(const LSProcessor&);
+	~LSProcessor();
+	friend LSProcessor& lsp();
+
+private slots:
+	void startClientTask();
+
+signals:
+	void newClientTask();
+};
+
+class LSThread : public QThread
+{
+public:
+	LSThread(LSProcessor* p);
+protected:
+	void run();
+private:
+	LSProcessor* m_lsp;
+};
+
+LSProcessor& lsp();
+
+class LSClient : public QObject
 {
 	Q_OBJECT
 
@@ -53,10 +97,15 @@ public:
 	~LSClient();
 	void stopClient();
 	bool startClient();
+	void startThread();
+	void setTimeout(int t){ _timeout = t; }
+	void setRetry(int r){ _retries = r; }
+	void mapInstrument(int);
 	int getError();
-	MidiInstrumentList* getInstruments(QList<int>, int retries = 5, int timeout = 1);
-	QMap<int, QString> listInstruments();
+	MidiInstrumentList* getInstruments(QList<int>);
+	MidiInstrument* getInstrument(int);
 	MidiInstrument* getInstrument(QString);
+	QMap<int, QString> listInstruments();
 	QString getValidInstrumentName(QString nameBase);
 	QString getMapName(int);
 	bool resetSampler();
@@ -70,18 +119,19 @@ private:
 	const char* _hostname;
 	int _port;
 	bool _abort;
-	QMutex mutex;
-	QWaitCondition condition;
+	int _retries;
+	int _timeout;
 	LSCPChannelInfo _lastInfo;
-	LSCPKeymap _getKeyMapping(QString, int, int, int, int);
+	LSCPKeymap _getKeyMapping(QString, int, int);
 	QString _stripAscii(QString);
+	bool _loadInstrumentFile(const char*, int, int);
 
 protected:
-	void run();
 	void customEvent(QEvent*);
 
 signals:
 	void channelInfoChanged(const LSCPChannelInfo);
+	void instrumentMapped(MidiInstrument*);
 
 public slots:
 	void subscribe();

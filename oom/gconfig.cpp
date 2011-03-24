@@ -169,6 +169,10 @@ GlobalConfigValues config = {
 	512, // Dummy audio buffer size
 	QString("./"), // projectBaseFolder
 	true,	 // projectStoreInFolder
-	false	// useProjectSaveDialog
+	false,	// useProjectSaveDialog
+	8888, //LSCP client port
+	QString("localhost"), //LSCP default hostname
+	5, //LSCP client retries
+	1  //LSCP client timeout
 };
 

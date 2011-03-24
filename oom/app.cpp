@@ -399,7 +399,7 @@ void OOMidi::startLSCPClient()
 	connect(lsclient, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), SIGNAL(channelInfoChanged(const LSCPChannelInfo&)));
 	connect(oom, SIGNAL(lscpStartListener()), lsclient, SLOT(subscribe()));
 	connect(oom, SIGNAL(lscpStopListener()), lsclient, SLOT(unsubscribe()));
-	lsclient->start();
+	//lsclient->start();
 }
 
 void OOMidi::stopLSCPClient()

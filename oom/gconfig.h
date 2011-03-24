@@ -144,6 +144,10 @@ struct GlobalConfigValues
     QString projectBaseFolder;
     bool projectStoreInFolder;
 	bool useProjectSaveDialog;
+	int lsClientPort;
+	QString lsClientHost;
+	int lsClientRetry;
+	int lsClientTimeout;
 };
 
 extern GlobalConfigValues config;

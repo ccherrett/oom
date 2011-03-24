@@ -56,13 +56,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnConnect">
-       <property name="text">
-        <string>Connect</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="btnList">
        <property name="text">
         <string>List Instruments</string>
@@ -210,6 +203,19 @@
       <number>0</number>
      </property>
      <item>
+      <widget class="QPushButton" name="btnSelectAll">
+       <property name="text">
+        <string>Select &amp;All</string>
+       </property>
+       <property name="shortcut">
+        <string>Alt+A</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -224,6 +230,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnImport">
+       <property name="toolTip">
+        <string>Import the selected instrument map(s) from LinuxSampler</string>
+       </property>
        <property name="text">
         <string>Import</string>
        </property>
