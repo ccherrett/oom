@@ -15,6 +15,7 @@ class QEvent;
 class QMouseEvent;
 class QPainter;
 class QPixmap;
+class QWheelEvent;
 
 #define KH  13
 
@@ -60,6 +61,7 @@ class Piano : public View
 
     virtual void viewMousePressEvent(QMouseEvent* event);
     virtual void viewMouseReleaseEvent(QMouseEvent*);
+    virtual void wheelEvent(QWheelEvent* e);
 
 protected:
     virtual void draw(QPainter&, const QRect&);
@@ -68,6 +70,7 @@ signals:
     void pitchChanged(int);
     void keyPressed(int, int, bool);
     void keyReleased(int, bool);
+    void redirectWheelEvent(QWheelEvent*);
 
 public slots:
     void setPitch(int);

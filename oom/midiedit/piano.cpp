@@ -973,3 +973,9 @@ void Piano::viewMouseReleaseEvent(QMouseEvent* event)
             }
       }
 
+void Piano::wheelEvent(QWheelEvent* ev)
+{
+	emit redirectWheelEvent(ev);
+	return;
+}
+

@@ -563,6 +563,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
     connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
     connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
+	connect(piano, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
     connect(srec, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
     //connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
     connect(speaker, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
