@@ -1221,6 +1221,11 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 			midiTrackInfo->addSelectedPatch();
 			return true;
 		}
+		if(key == shortcuts[SHRT_PREVIEW_INSTRUMENT].key)
+		{
+			midiTrackInfo->previewSelectedPatch();
+			return true;
+		}
 		else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
 		{
 			unsigned utick = song->cpos() + rasterStep(song->cpos());

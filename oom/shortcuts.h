@@ -314,6 +314,7 @@ enum
     SHRT_LMOVE_SELECT, //Move to next program change left  Ctrl+Alt+left
     SHRT_RMOVE_SELECT, //Move to next program change right Ctrl+Alt+right
     SHRT_SEL_INSTRUMENT,
+    SHRT_PREVIEW_INSTRUMENT,
 
     // Shortcuts for tools
     // global

@@ -117,6 +117,7 @@ public slots:
     void updateTableHeader();
     void rebuildMatrix();
 	void addSelectedPatch();
+	void previewSelectedPatch();
 	//tb1
     void setRaster(int);
     void setQuant(int);

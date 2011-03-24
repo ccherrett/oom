@@ -294,7 +294,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(_tableModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(patchSequenceRemoved(QModelIndex, int, int)));
 	connect(patchList, SIGNAL( doubleClicked(const QModelIndex&) ), this, SLOT(patchDoubleClicked(const QModelIndex&) ) );
 	connect(patchList, SIGNAL( clicked(const QModelIndex&) ), this, SLOT(patchClicked(const QModelIndex&) ) );
-	connect(_patchSelModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(patchSelectionChanged(QItemSelection, QItemSelection)));
+	//connect(_patchSelModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(patchSelectionChanged(QItemSelection, QItemSelection)));
 	connect(chkAdvanced, SIGNAL(stateChanged(int)), SLOT(toggleAdvanced(int)));
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(deleteSelectedPatches(bool)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(movePatchUp(bool)));
@@ -2554,6 +2554,17 @@ void MidiTrackInfo::patchSequenceClicked(QModelIndex index)/*{{{*/
 		}
 	}
 }/*}}}*/
+
+void MidiTrackInfo::previewSelectedPatch()
+{
+	if(!selected)
+		return;
+	if(_patchSelModel->hasSelection())
+	{
+		//printf("MidiTrackInfo::addSelectedPatch()\n");
+		patchClicked(_patchSelModel->currentIndex());
+	}
+}
 
 void MidiTrackInfo::addSelectedPatch()
 {

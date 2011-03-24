@@ -599,10 +599,13 @@ QString LSClient::getMapName(int mid)/*{{{*/
 	QString mapName("Untitled");
 	if(_client == NULL)
 		return mapName;
-	const char* cname = ::lscp_get_midi_instrument_map_name(_client, mid);
-	if(cname != NULL)
+	for(int i = 0; i < _retries && mapName == QString("Untitled"); ++i)
 	{
-		mapName = QString(cname);
+		const char* cname = ::lscp_get_midi_instrument_map_name(_client, mid);
+		if(cname != NULL)
+		{
+			mapName = QString(cname);
+		}
 	}
 	return mapName;
 }/*}}}*/
