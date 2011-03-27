@@ -585,7 +585,8 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 		ft = 0;
 	if (ft >= (int) segmentSize)
 	{
-		printf("MidiJackDevice::queueEvent: Event time:%d out of range. offset:%d ft:%d (seg=%d)\n", e.time(), frameOffset, ft, segmentSize);
+		if(debugMsg)
+			printf("MidiJackDevice::queueEvent: Event time:%d out of range. offset:%d ft:%d (seg=%d)\n", e.time(), frameOffset, ft, segmentSize);
 		if (ft > (int) segmentSize)
 			ft = segmentSize - 1;
 	}
