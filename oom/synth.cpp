@@ -946,8 +946,8 @@ bool SynthI::getData(unsigned pos, int ports, unsigned n, float** buffer)
 iMPEvent MessSynthIF::getData(MidiPort* mp, MPEventList* el, iMPEvent i, unsigned pos, int /*ports*/, unsigned n, float** buffer)
 {
 	//prevent compiler warning: comparison of signed/unsigned
-	int curPos = pos;
-	int endPos = pos + n;
+	unsigned int curPos = pos;
+	unsigned int endPos = pos + n;
 	int off = pos;
 	int frameOffset = audio->getFrameOffset();
 
@@ -960,7 +960,7 @@ iMPEvent MessSynthIF::getData(MidiPort* mp, MPEventList* el, iMPEvent i, unsigne
 			//      continue;
 			evTime = frameOffset; // will cause frame to be zero, problem?
 		}
-		int frame = evTime - frameOffset;
+		unsigned int frame = evTime - frameOffset;
 
 		//TODO           if (frame > 0) // robert: ugly fix, don't really know what is going on here
 		//                          // makes PPC work much better.

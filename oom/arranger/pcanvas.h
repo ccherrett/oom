@@ -160,8 +160,7 @@ signals:
 
     void startEditor(PartList*, int);
 
-private slots:
-    void returnPressed();
+//private slots:
 
 public:
 
@@ -176,9 +175,11 @@ public:
     void cmd(int);
     void controllerChanged(Track *t);
     int track2Y(Track*) const;
+	bool isEditing() { return editMode; }
 
 public slots:
 
+    void returnPressed();
     void redirKeypress(QKeyEvent* e)
     {
         keyPress(e);

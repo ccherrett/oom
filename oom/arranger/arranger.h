@@ -157,6 +157,8 @@ public:
     {
 	    return list;
     }
+	bool isEditing();
+	void endEditing();
 
     void setMode(int);
     void reset();

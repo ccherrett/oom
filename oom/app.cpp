@@ -3592,6 +3592,11 @@ PartList* OOMidi::getMidiPartsToEdit()
 
 void OOMidi::startPianoroll()
 {
+	if(arranger->isEditing())
+	{
+		arranger->endEditing();
+		return;
+	}
 	PartList* pl = getMidiPartsToEdit();
 	if (pl == 0)
 		return;

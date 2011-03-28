@@ -88,6 +88,7 @@ protected:
 
 	int _selectedProgramPos;
 	bool _drawSelectedProgram;
+	bool _drawPartLines;
 
     void setCursor();
     virtual void viewKeyPressEvent(QKeyEvent* event);
@@ -238,6 +239,7 @@ public:
         _canvasTools = n;
     }
 	virtual bool isEventSelected(Event e);
+	void setDrawPartLines(bool v) { _drawPartLines = v; }
 };
 #endif
 

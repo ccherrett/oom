@@ -444,29 +444,32 @@ void TList::paint(const QRect& r)/*{{{*/
 
 void TList::returnPressed()
 {
-	editor->hide();
-	if (editor->text() != editTrack->name())
+	if(editMode)
 	{
-		TrackList* tl = song->visibletracks();
-		for (iTrack i = tl->begin(); i != tl->end(); ++i)
+		editor->hide();
+		if (editor->text() != editTrack->name())
 		{
-			if ((*i)->name() == editor->text())
+			TrackList* tl = song->visibletracks();
+			for (iTrack i = tl->begin(); i != tl->end(); ++i)
 			{
-				QMessageBox::critical(this,
-						tr("OOMidi: bad trackname"),
-						tr("please choose a unique track name"),
-						QMessageBox::Ok,
-						Qt::NoButton,
-						Qt::NoButton);
-				editTrack = 0;
-				setFocus();
-				return;
+				if ((*i)->name() == editor->text())
+				{
+					QMessageBox::critical(this,
+							tr("OOMidi: bad trackname"),
+							tr("please choose a unique track name"),
+							QMessageBox::Ok,
+							Qt::NoButton,
+							Qt::NoButton);
+					editTrack = 0;
+					setFocus();
+					return;
+				}
 			}
+			//Track* track = editTrack->clone();
+			Track* track = editTrack->clone(false);
+			editTrack->setName(editor->text());
+			audio->msgChangeTrack(track, editTrack);
 		}
-		//Track* track = editTrack->clone();
-		Track* track = editTrack->clone(false);
-		editTrack->setName(editor->text());
-		audio->msgChangeTrack(track, editTrack);
 	}
 	editTrack = 0;
 	editMode = false;

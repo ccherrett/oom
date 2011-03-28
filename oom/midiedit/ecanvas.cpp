@@ -30,9 +30,8 @@
 //   EventCanvas
 //---------------------------------------------------------
 
-EventCanvas::EventCanvas(MidiEditor* pr, QWidget* parent, int sx,
-						 int sy, const char* name)
-							 : Canvas(parent, sx, sy, name)
+EventCanvas::EventCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy, const char* name)
+		: Canvas(parent, sx, sy, name)
 {
 	editor = pr;
 	_steprec = false;
@@ -47,6 +46,7 @@ EventCanvas::EventCanvas(MidiEditor* pr, QWidget* parent, int sx,
 
 	_curPart = (MidiPart*) (editor->parts()->begin()->second);
 	_curPartId = _curPart->sn();
+	setDrawPartLines(true);
 }
 
 //---------------------------------------------------------

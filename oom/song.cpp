@@ -429,9 +429,10 @@ void Song::disarmAllTracks()
 {
 	if(viewselected)
 	{
+		unsigned int noop = -1;
 		for(iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
 		{
-			if(_viewtracks.index((*t)) == -1)
+			if(_viewtracks.index((*t)) == noop)
 			{
 				(*t)->setRecordFlag1(false);
 				(*t)->setRecordFlag2(false);

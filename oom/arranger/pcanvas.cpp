@@ -430,17 +430,19 @@ void PartCanvas::leaveEvent(QEvent*)
 
 void PartCanvas::returnPressed()
 {
-	lineEditor->hide();
-	Part* oldPart = editPart->part();
-	Part* newPart = oldPart->clone();
-	//printf("PartCanvas::returnPressed before msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
+	if(editMode)
+	{
+		lineEditor->hide();
+		Part* oldPart = editPart->part();
+		Part* newPart = oldPart->clone();
+		//printf("PartCanvas::returnPressed before msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
 
-	newPart->setName(lineEditor->text());
-	// Indicate do undo, and do port controller values but not clone parts.
-	//audio->msgChangePart(oldPart, newPart);
-	audio->msgChangePart(oldPart, newPart, true, true, false);
-	//printf("PartCanvas::returnPressed after msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
-
+		newPart->setName(lineEditor->text());
+		// Indicate do undo, and do port controller values but not clone parts.
+		//audio->msgChangePart(oldPart, newPart);
+		audio->msgChangePart(oldPart, newPart, true, true, false);
+		//printf("PartCanvas::returnPressed after msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
+	}
 	editMode = false;
 }
 
