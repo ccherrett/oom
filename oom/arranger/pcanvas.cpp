@@ -3840,41 +3840,29 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 
 	p.save();
 	p.resetTransform();
-	int mypos = 0;
+	//Draw part as recorded
 	if (song->record() && audio->isPlaying())
 	{
 		for (iTrack it = tl->begin(); it != tl->end(); ++it)
 		{
 			Track* track = *it;
-			if (track->recordFlag())
+			if (track && track->recordFlag())
 			{
-				/*unsigned int startPos = audio->getStartRecordPos().tick();
-				if (song->punchin())
-					startPos=song->lpos();
-				if (song->punchout() && song->cpos() > song->rpos()) {
-					continue; 
-				}*/
-
-				/*if (song->cpos() > startPos)
-				{
-					int start = mapx(startPos);
-					int ww = mapx(song->cpos()) - mapx(startPos);
-		  	 */
-				p.fillRect(start,mypos, ww, track->height(), config.partColors[0]);
+				int mypos = track2Y(track)-ypos;
+				p.fillRect(start, mypos, ww, track->height(), config.partColors[0]);
 				p.setPen(Qt::black); //TODO: Fix colors
-				p.drawLine(start, mypos,start+ww, mypos);
-				p.drawLine(start, mypos+1,start+ww, mypos+1);
+				p.drawLine(start, mypos, start+ww, mypos);
+				p.drawLine(start, mypos+1, start+ww, mypos+1);
 				p.drawLine(start, mypos+track->height(), start+ww, mypos+track->height());
 				p.drawLine(start, mypos+track->height()-1, start+ww, mypos+track->height()-1);
-				//	}
 			}
-			mypos += track->height();
 		}
 	}
 	p.restore();
 	
-	mypos = 0;
-	if (song->record() && audio->isPlaying()) {
+	//Draw notes are recorded
+	if (song->record() && audio->isPlaying())
+	{
 		for (iTrack it = tl->begin(); it != tl->end(); ++it)
 		{
 			Track* track = *it;
@@ -3882,7 +3870,8 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 			if (track->isMidiTrack() && track->recordFlag())
 			{
 				MidiTrack *mt = (MidiTrack*)track;
-				QRect partRect(startPos,mypos, song->cpos()-startPos, track->height());
+				int mypos = track2Y(track);
+				QRect partRect(startPos, mypos, song->cpos()-startPos, track->height());
 				EventList newEventList;
 				MPEventList *el = mt->mpevents();
 				if (!el->size())
@@ -3916,7 +3905,6 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 				}
 				drawMidiPart(p, rect, &newEventList, mt, partRect, startPos, 0, (song->cpos() - startPos));
 			}
-			mypos += track->height();
 		}
     }
 }
