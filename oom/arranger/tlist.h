@@ -90,7 +90,6 @@ class TList : public QWidget
     void setHeaderToolTips();
 
 private slots:
-    void returnPressed();
     void songChanged(int flags);
     void changeAutomation(QAction*);
 	void updateSelection(Track*, bool);
@@ -103,6 +102,7 @@ signals:
 	void trackInserted(int);
 
 public slots:
+    void returnPressed();
     void tracklistChanged();
     void setYPos(int);
     void redraw();
@@ -125,6 +125,7 @@ public:
     {
         return editTrack;
     }
+	bool isEditing() { return editMode; }
     void writeStatus(int level, Xml&, const char* name) const;
     void readStatus(Xml&, const char* name);
 };

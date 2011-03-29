@@ -32,7 +32,7 @@
 //---------------------------------------------------------
 
 Canvas::Canvas(QWidget* parent, int sx, int sy, const char* name)
-	: View(parent, sx, sy, name)
+	: View(parent, sx, sy, name) ,_drawPartLines(false)
 {
 	_canvasTools = 0;
 	_itemPopupMenu = 0;
@@ -332,6 +332,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 		}
 	}
 
+	//Draw selected program change marker line
 	if(_drawSelectedProgram && _selectedProgramPos >= 0)
 	{
 		//printf("Canvas::draw() drawing selected PC line\n");
@@ -342,6 +343,8 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 			p.drawLine(_selectedProgramPos, y, _selectedProgramPos, y2);
 		}
 	}
+
+	
 
 	// //---------------------------------------------------
 	// //    draw location marker
@@ -409,6 +412,19 @@ void Canvas::draw(QPainter& p, const QRect& rect)
 	if ((song->loop() || song->punchout()) && _pos[2] >= unsigned(x) && _pos[2] < unsigned(x2))
 		p.drawLine(_pos[2], y, _pos[2], y2);
 
+	//Draw part end start lines
+	if(_curPart && _drawPartLines)
+	{
+		//p.setPen(QColor(200,146,0));
+		QColor pcolor(200,146,0);
+		p.setPen(pcolor);
+		p.drawLine(_curPart->tick(), y, _curPart->tick(), y2);
+		p.drawLine(_curPart->tick()+1, y, _curPart->tick()+1, y2);
+		p.drawLine(_curPart->tick()+2, y, _curPart->tick()+2, y2);
+		p.drawLine(_curPart->endTick(), y, _curPart->endTick(), y2);
+		p.drawLine(_curPart->endTick()+1, y, _curPart->endTick()+1, y2);
+		p.drawLine(_curPart->endTick()+2, y, _curPart->endTick()+2, y2);
+	}
 	//QPen playbackPen(QColor(8,193,156), 1);
 	//p.setPen(playbackPen);
 	//p.setPen(Qt::green);

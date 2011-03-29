@@ -1159,6 +1159,23 @@ void Arranger::preloadControllers()
 	QApplication::restoreOverrideCursor();
 }
 
+bool Arranger::isEditing()
+{
+	return (list->isEditing() || canvas->isEditing());
+}
+
+void Arranger::endEditing()
+{
+	if(list->isEditing())
+	{
+		list->returnPressed();
+	}
+	if(canvas->isEditing())
+	{
+		canvas->returnPressed();
+	}
+}
+
 bool Arranger::eventFilter(QObject *obj, QEvent *event)
 {
 	// Force left/right arrow key events to move the focus

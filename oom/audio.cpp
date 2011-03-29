@@ -1214,30 +1214,6 @@ void Audio::stopRolling()
 	// Don't send if external sync is on. The master, and our sync routing system will take care of that.
 	if (!extSyncFlag.value())
 	{
-
-		// Changed by Tim. p3.3.6
-		//MidiPort* syncPort = &midiPorts[txSyncPort];
-		//if (genMMC) {
-		//      unsigned char mmcPos[] = {
-		//            0x7f, 0x7f, 0x06, 0x44, 0x06, 0x01,
-		//            0, 0, 0, 0, 0
-		//            };
-		//      int frame = tempomap.tick2frame(curTickPos);
-		//      MTC mtc(double(frame) / double(sampleRate));
-		//      mmcPos[6] = mtc.h() | (mtcType << 5);
-		//      mmcPos[7] = mtc.m();
-		//      mmcPos[8] = mtc.s();
-		//      mmcPos[9] = mtc.f();
-		//      mmcPos[10] = mtc.sf();
-		//      syncPort->sendSysex(mmcStopMsg, sizeof(mmcStopMsg));
-		//      syncPort->sendSysex(mmcPos, sizeof(mmcPos));
-		//      }
-		//if (genMCSync) {         // Midi Clock
-		// send STOP and
-		// "set song position pointer"
-		//      syncPort->sendStop();
-		//      syncPort->sendSongpos(curTickPos * 4 / config.division);
-		//      }
 		for (int port = 0; port < MIDI_PORTS; ++port)
 		{
 			MidiPort* mp = &midiPorts[port];
@@ -1245,145 +1221,22 @@ void Audio::stopRolling()
 			if (!dev)
 				continue;
 
-			// Shall we check open flags?
-			//if(!(dev->rwFlags() & 0x1) || !(dev->openFlags() & 1))
-			//if(!(dev->openFlags() & 1))
-			//  continue;
-
 			MidiSyncInfo& si = mp->syncInfo();
 
-			//if(genMMC && si.MMCOut())
 			if (si.MMCOut())
 			{
-				//unsigned char mmcPos[] = {
-				//      0x7f, 0x7f, 0x06, 0x44, 0x06, 0x01,
-				//      0, 0, 0, 0, 0
-				//      };
-
-				// p3.3.31
-				/*
-				int frame = tempomap.tick2frame(curTickPos);
-				MTC mtc(double(frame) / double(sampleRate));
-				 */
-
-				//mmcPos[6] = mtc.h() | (mtcType << 5);
-				//mmcPos[7] = mtc.m();
-				//mmcPos[8] = mtc.s();
-				//mmcPos[9] = mtc.f();
-				//mmcPos[10] = mtc.sf();
-
-				//mp->sendSysex(mmcStopMsg, sizeof(mmcStopMsg));
 				mp->sendMMCStop();
-				//mp->sendSysex(mmcPos, sizeof(mmcPos));
-
-				// p3.3.31
-				// Added check of option send continue not start.
-				// Hmm, is this required? Seems to make other devices unhappy.
-				/*
-				if(!si.sendContNotStart())
-				  mp->sendMMCLocate(mtc.h() | (mtcType << 5),
-								  mtc.m(), mtc.s(), mtc.f(), mtc.sf());
-				 */
-
 			}
 
-			//if(genMCSync && si.MCOut()) // Midi Clock
-			//if(si.MCOut()) // Midi Clock
 			if (si.MRTOut()) //
 			{
 				// send STOP and
 				// "set song position pointer"
 				mp->sendStop();
-
-				// p3.3.31
-				// Added check of option send continue not start.
-				// Hmm, is this required? Seems to make other devices unhappy.
-				/*
-				if(!si.sendContNotStart())
-				  mp->sendSongpos(curTickPos * 4 / config.division);
-				 */
-
 			}
 		}
 	}
 
-	/*
-	for(iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
-	{
-	  MidiDevice* dev = (*imd);
-          
-	  // Shall we check open flags?
-	  //if(!(dev->rwFlags() & 0x1) || !(dev->openFlags() & 1))
-	  //if(!(dev->openFlags() & 1))
-	  //  continue;
-        
-	  int port = dev->midiPort();
-        
-	  // Without this -1 check, interesting sync things can be done by the user without ever
-	  //  assigning any devices to ports !
-	  //if(port < 0 || port > MIDI_PORTS)
-	  if(port < -1 || port > MIDI_PORTS)
-		continue;
-        
-	  MidiSyncInfo& si = dev->syncInfo();
-          
-	  MidiPort* mp = 0;
-	  if(port != -1)
-		mp = &midiPorts[port];
-        
-	  if(genMMC && si.MMCOut())
-	  {
-		unsigned char mmcPos[] = {
-			  0x7f, 0x7f, 0x06, 0x44, 0x06, 0x01,
-			  0, 0, 0, 0, 0
-			  };
-		int frame = tempomap.tick2frame(curTickPos);
-		MTC mtc(double(frame) / double(sampleRate));
-		mmcPos[6] = mtc.h() | (mtcType << 5);
-		mmcPos[7] = mtc.m();
-		mmcPos[8] = mtc.s();
-		mmcPos[9] = mtc.f();
-		mmcPos[10] = mtc.sf();
-          
-		if(mp)
-		// Go through the port...
-		{
-		  mp->sendSysex(mmcStopMsg, sizeof(mmcStopMsg));
-		  mp->sendSysex(mmcPos, sizeof(mmcPos));
-		}
-		else
-		// Send straight to the device... Copied from MidiPort.
-		{
-		  MidiPlayEvent event(0, 0, ME_SYSEX, mmcStopMsg, sizeof(mmcStopMsg));
-		  dev->putEvent(event);
-            
-		  event.setData(mmcPos, sizeof(mmcPos));
-		  dev->putEvent(event);
-		}
-	  }
-      
-	  if(genMCSync && si.MCOut()) // Midi Clock
-	  {
-		// send STOP and
-		// "set song position pointer"
-		if(mp)
-		// Go through the port...
-		{
-		  mp->sendStop();
-		  mp->sendSongpos(curTickPos * 4 / config.division);
-		}
-		else
-		// Send straight to the device... Copied from MidiPort.
-		{
-		  MidiPlayEvent event(0, 0, 0, ME_STOP, 0, 0);
-		  dev->putEvent(event);
-		  event.setType(ME_SONGPOS);
-		  event.setA(curTickPos * 4 / config.division);
-		  dev->putEvent(event);
-		}
-	  }
-	}
-	 */
 
 	WaveTrackList* tracks = song->waves();
 	for (iWaveTrack i = tracks->begin(); i != tracks->end(); ++i)

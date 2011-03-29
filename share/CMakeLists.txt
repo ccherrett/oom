@@ -22,13 +22,13 @@
 #       are scanned before coming to share/locale
 subdirs(
       drummaps
-      html
+	  #      html
       instruments
       plugins
       pybridge
       scripts
       templates
-      wallpapers
+#      wallpapers
       locale
       )
 

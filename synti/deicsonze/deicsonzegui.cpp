@@ -441,11 +441,9 @@ DeicsOnzeGui::DeicsOnzeGui(DeicsOnze* deicsOnze)
   
   // Tim.
   QString sharePath(oomGlobalShare);                            
-  updateInitSetPath
-    (sharePath + QString("/presets/deicsonze/SutulaBank.dei"));    // Tim.
+  updateInitSetPath(sharePath + QString("/presets/deicsonze/SutulaBank.dei"));    // Tim.
     
-  updateBackgroundPixPath
-    (sharePath + QString("/wallpapers/paper2.jpg"));    // Tim.
+  //updateBackgroundPixPath(sharePath + QString("/wallpapers/paper2.jpg"));
     
   updateBackgroundPixCheckBox(false);
   //applyBackgroundPix();
@@ -4347,6 +4345,7 @@ void DeicsOnzeGui::updateBackgroundPixPath(QString s) {
   imagePathLineEdit->blockSignals(false);
 }
 void DeicsOnzeGui::applyBackgroundPix() {
+  return;
   QPalette p = this->palette();
   QPixmap pixmap = QPixmap(imagePathLineEdit->text());
   p.setBrush((this)->backgroundRole(), QBrush(pixmap));
