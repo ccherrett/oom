@@ -49,6 +49,7 @@ CtrlList::CtrlList(int id)
 	_mode = INTERPOLATE;
 	_dontShow = false;
 	_selected = false;
+	_visible = false;
 	initColor(id);
 }
 //---------------------------------------------------------
@@ -66,6 +67,7 @@ CtrlList::CtrlList(int id, QString name, double min, double max, bool dontShow)
 	_max = max;
 	_dontShow = dontShow;
 	_selected = false;
+	_visible = false;
 	initColor(id);
 }
 //---------------------------------------------------------
@@ -80,6 +82,7 @@ CtrlList::CtrlList()
 	_mode = INTERPOLATE;
 	 _dontShow = false;
 	 _selected = false;
+	 _visible = false;
 	initColor(-1);
 }
 
