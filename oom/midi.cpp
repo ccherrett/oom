@@ -928,7 +928,7 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 						//
 						// transpose non drum notes
 						//
-						pitch += (track->transposition + song->globalPitchShift());
+						pitch += (track->getTransposition() + song->globalPitchShift());
 					}
 
 					if (pitch > 127)
@@ -1082,10 +1082,6 @@ void Audio::processMidi()
 			}
 		}
 
-		// Is it a Jack midi device?
-		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(md);
-		//if(mjd)
-		//  mjd->collectMidiEvents();
 		md->collectMidiEvents();
 
 		// Take snapshots of the current sizes of the recording fifos,
@@ -1106,13 +1102,6 @@ void Audio::processMidi()
 		int port = track->outPort();
 		MidiDevice* md = midiPorts[port].device();
 
-		// Changed by Tim. p3.3.8
-		//if(md == 0)
-		//  continue;
-		//MPEventList* playEvents = md->playEvents();
-		//if (playEvents == 0)
-		//    continue;
-		//if (!track->isMute())
 		MPEventList* playEvents = 0;
 		if (md)
 		{
@@ -1131,22 +1120,12 @@ void Audio::processMidi()
 		//
 		if (track->recordFlag())
 		{
-			//int portMask    = track->inPortMask();
-			// p3.3.38 Removed
-			//unsigned int portMask = track->inPortMask();
-			//int channelMask = track->inChannelMask();
-
 			MPEventList* rl = track->mpevents();
 			MidiPort* tport = &midiPorts[port];
 
-			// p3.3.38
-			//for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
-			//{
 			RouteList* irl = track->inRoutes();
 			for (ciRoute r = irl->begin(); r != irl->end(); ++r)
 			{
-				//if(!r->isValid() || (r->type != Route::ALSA_MIDI_ROUTE && r->type != Route::JACK_MIDI_ROUTE))
-				//if(!r->isValid() || (r->type != Route::MIDI_DEVICE_ROUTE))
 				if (!r->isValid() || (r->type != Route::MIDI_PORT_ROUTE)) // p3.3.49
 					continue;
 
@@ -1154,34 +1133,9 @@ void Audio::processMidi()
 				if (devport == -1)
 					continue;
 
-				//MidiDevice* dev = *id;
-				//MidiDevice* dev = r->device;
 				MidiDevice* dev = midiPorts[devport].device(); // p3.3.49
 				if (!dev)
 					continue;
-
-
-				// p3.3.50 Removed
-				//int channel = r->channel;
-				// NOTE: TODO: Special for input device sysex 'channel' marked as -1, ** IF we end up going with that method **.
-				// This would mean having a separate 'System' channel listed in the routing popups.
-				// The other alternative is to accept sysex from a device as long as ANY regular channel is routed from it,
-				//  this does not require a 'System' channel listed in the routing popups.
-				// But that requires more code below... Done.
-				//if(channel == -1)
-				//channel = MIDI_CHANNELS; // Special channel '17'
-				//  continue;
-
-				//int devport = dev->midiPort();
-
-				// record only from ports marked in portMask:
-				//if (devport == -1 || !(portMask & (1 << devport)))
-				//if (devport == -1)
-				//      continue;
-
-				//MREventList* el = dev->recordEvents();
-				//MidiFifo& rf = dev->recordEvents();
-
 
 				int channelMask = r->channel; // p3.3.50
 				if (channelMask == -1 || channelMask == 0)
@@ -1202,13 +1156,6 @@ void Audio::processMidi()
 						{
 							MidiPlayEvent event(rf.peek(i));
 
-							//unsigned time = event.time() + segmentSize*(segmentCount-1);
-							//unsigned time = event.time() + (extsync ? config.division/24 : segmentSize*(segmentCount-1));
-							//unsigned time = extsync ? curTickPos : (event.time() + segmentSize*(segmentCount-1));
-							//event.setTime(time);
-							//if(!extsync)
-							//  event.setTime(event.time() + segmentSize*(segmentCount-1));
-
 							event.setPort(port);
 
 							// dont't echo controller changes back to software
@@ -1219,8 +1166,6 @@ void Audio::processMidi()
 							// If syncing externally the event time is already in units of ticks, set above.
 							if (!extsync)
 							{
-								//time = tempomap.frame2tick(event.time());
-								//event.setTime(time);  // set tick time
 								event.setTime(tempomap.frame2tick(event.time())); // set tick time
 							}
 
@@ -1231,52 +1176,16 @@ void Audio::processMidi()
 						dev->setSysexFIFOProcessed(true);
 					}
 
-					// Set to the sysex fifo at first.
-					///MidiFifo& rf = dev->recordEvents(MIDI_CHANNELS);
-					// Get the frozen snapshot of the size.
-					///int count = dev->tmpRecordCount(MIDI_CHANNELS);
-
-					// Iterate once for sysex fifo (if needed), once for channel fifos.
-					///for(int sei = 0; sei < 2; ++sei)
 					{
-						// If on first pass, do sysex fifo.
-						/*
-						if(sei == 0)
-						{
-						  // Ignore any further channel routes on this device if already done here.
-						  if(dev->sysexFIFOProcessed())
-							continue;
-						  // Go ahead and set this now.
-						  dev->setSysexFIFOProcessed(true);
-						  // Allow it to fall through with the sysex fifo and count...
-						}
-						else
-						{
-						  // We're on the second pass, do channel fifos.
-						  rf = dev->recordEvents(channel);
-						  // Get the frozen snapshot of the size.
-						  count = dev->tmpRecordCount(channel);
-						}
-						 */
-
 						MidiFifo& rf = dev->recordEvents(channel);
 						int count = dev->tmpRecordCount(channel);
 
-						//for (iMREvent ie = el->begin(); ie != el->end(); ++ie)
 						for (int i = 0; i < count; ++i)
 						{
 							MidiPlayEvent event(rf.peek(i));
 
-							//int channel = ie->channel();
-							///int channel = event.channel();
-
 							int defaultPort = devport;
-							///if (!(channelMask & (1 << channel)))
-							///{
-							///      continue;
-							///}
 
-							//MidiPlayEvent event(*ie);
 							int drumRecPitch = 0; //prevent compiler warning: variable used without initialization
 							MidiController *mc = 0;
 							int ctl = 0;
@@ -1310,7 +1219,7 @@ void Audio::processMidi()
 								else
 								{ //Track transpose if non-drum
 									prePitch = event.dataA();
-									int pitch = prePitch + track->transposition;
+									int pitch = prePitch + track->getTransposition();
 									if (pitch > 127)
 										pitch = 127;
 									if (pitch < 0)
@@ -1358,24 +1267,6 @@ void Audio::processMidi()
 									}
 								}
 							}
-
-							// p3.3.25
-							// OOMidi uses a fixed clocks per quarternote of 24.
-							// At standard 384 ticks per quarternote for example,
-							// 384/24=16 for a division of 16 sub-frames (16 OOMidi 'ticks').
-							// That is what we'll use if syncing externally.
-							//unsigned time = event.time() + segmentSize*(segmentCount-1);
-							//unsigned time = event.time() + (extsync ? config.division/24 : segmentSize*(segmentCount-1));
-							// p3.3.34
-							// Oops, use the current tick.
-							//unsigned time = extsync ? curTickPos : (event.time() + segmentSize*(segmentCount-1));
-							//event.setTime(time);
-							// p3.3.35
-							// If ext sync, events are now time-stamped with last tick in MidiDevice::recordEvent().
-							// TODO: Tested, but record resolution not so good. Switch to wall clock based separate list in MidiDevice.
-							// p3.3.36
-							//if(!extsync)
-							//  event.setTime(event.time() + segmentSize*(segmentCount-1));
 
 							// dont't echo controller changes back to software
 							// synthesizer:
@@ -1461,14 +1352,14 @@ void Audio::processMidi()
 									//printf("ccccccccccccccccccccccccccccccccccccccccccccc\n");
 									// Restore record-pitch to non-transposed value since we don't want the note transposed twice next
 									MidiPlayEvent recEvent = event;
-									if (prePitch)
-										recEvent.setA(prePitch);
-									if (preVelo)
-										recEvent.setB(preVelo);
 									recEvent.setPort(port);
 									recEvent.setChannel(track->outChannel());
 
 									rl->add(recEvent);
+									if (prePitch)
+										recEvent.setA(prePitch);
+									if (preVelo)
+										recEvent.setB(preVelo);
 								}
 							}
 						}
@@ -1510,8 +1401,6 @@ void Audio::processMidi()
 				break;
 			MidiPlayEvent ev(*k);
 
-			// p3.3.25
-			//int frame = tempomap.tick2frame(k->time()) + frameOffset;
 			if (extsync)
 			{
 				ev.setTime(k->time());
@@ -1521,9 +1410,6 @@ void Audio::processMidi()
 				int frame = tempomap.tick2frame(k->time()) + frameOffset;
 				ev.setTime(frame);
 			}
-
-			// p3.3.25
-			//ev.setTime(frame);
 
 			playEvents->add(ev);
 		}
@@ -1554,7 +1440,6 @@ void Audio::processMidi()
 		{
 			if (isPlaying())
 			{
-				///sigmap.tickValues(midiClick, &bar, &beat, &tick);
 				AL::sigmap.tickValues(midiClick, &bar, &beat, &tick);
 				isMeasure = beat == 0;
 			}
@@ -1562,21 +1447,14 @@ void Audio::processMidi()
 			{
 				isMeasure = (clickno % clicksMeasure) == 0;
 			}
-			// p3.3.25
-			//int frame = tempomap.tick2frame(midiClick) + frameOffset;
 			int evtime = extsync ? midiClick : tempomap.tick2frame(midiClick) + frameOffset;
 
-			// p3.3.25
-			//MidiPlayEvent ev(frame, clickPort, clickChan, ME_NOTEON,
 			MidiPlayEvent ev(evtime, clickPort, clickChan, ME_NOTEON,
 					beatClickNote, beatClickVelo);
 
 			if (md)
 			{
-				// p3.3.25
-				//MidiPlayEvent ev(frame, clickPort, clickChan, ME_NOTEON,
-				MidiPlayEvent ev(evtime, clickPort, clickChan, ME_NOTEON,
-						beatClickNote, beatClickVelo);
+				MidiPlayEvent ev(evtime, clickPort, clickChan, ME_NOTEON, beatClickNote, beatClickVelo);
 
 				if (isMeasure)
 				{
@@ -1587,8 +1465,6 @@ void Audio::processMidi()
 			}
 			if (audioClickFlag)
 			{
-				// p3.3.25
-				//MidiPlayEvent ev1(frame, 0, 0, ME_NOTEON, 0, 0);
 				MidiPlayEvent ev1(evtime, 0, 0, ME_NOTEON, 0, 0);
 
 				ev1.setA(isMeasure ? 0 : 1);
@@ -1597,9 +1473,6 @@ void Audio::processMidi()
 			if (md)
 			{
 				ev.setB(0);
-				// p3.3.25
-				// Removed. Why was this here?
-				//frame = tempomap.tick2frame(midiClick+20) + frameOffset;
 				//
 				// Does it mean this should be changed too?
 				// No, stuck notes are in units of ticks, not frames like (normal, non-external) play events...
@@ -1610,7 +1483,6 @@ void Audio::processMidi()
 			}
 
 			if (isPlaying())
-				///midiClick = sigmap.bar2tick(bar, beat+1, 0);
 				midiClick = AL::sigmap.bar2tick(bar, beat + 1, 0);
 			else if (state == PRECOUNT)
 			{
@@ -1650,46 +1522,12 @@ void Audio::processMidi()
 
 
 	// p3.3.36
-	//int tickpos = audio->tickPos();
-	//bool extsync = extSyncFlag.value();
 	//
 	// Special for Jack midi devices: Play all Jack midi events up to curFrame.
 	//
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
 	{
 		(*id)->processMidi();
-
-		/*
-		int port = md->midiPort();
-		MidiPort* mp = port != -1 ? &midiPorts[port] : 0;
-		MPEventList* el = md->playEvents();
-		if (el->empty())
-			  continue;
-		iMPEvent i = md->nextPlayEvent();
-		for(; i != el->end(); ++i)
-		{
-		  // If syncing to external midi sync, we cannot use the tempo map.
-		  // Therefore we cannot get sub-tick resolution. Just use ticks instead of frames.
-		  //if(i->time() > curFrame)
-		  if(i->time() > (extsync ? tickpos : curFrame))
-		  {
-			//printf("  curT %d  frame %d\n", i->time(), curFrame);
-			break; // skip this event
-		  }
-
-		  if(mp)
-		  {
-			if(mp->sendEvent(*i))
-			  break;
-		  }
-		  else
-		  {
-			if(md->putEvent(*i))
-			  break;
-		  }
-		}
-		md->setNextPlayEvent(i);
-		 */
 	}
 
 	midiBusy = false;

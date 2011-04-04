@@ -1623,6 +1623,7 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 	level++;
 	xml.strTag(level, "name", _name);
 	xml.intTag(level, "selected", _selected);
+	xml.intTag(level, "record", _recState);
 	if(!_comment.isEmpty())
 		xml.strTag(level, "comment", _comment);
 
@@ -1631,8 +1632,65 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 	{
 		xml.strTag(level, "vtrack", (*t)->name());
 	}
+	QMap<QString, TrackSettings>::ConstIterator ts;
+	for(ts = _tSettings.begin(); ts != _tSettings.end(); ++ts)
+	{
+		if((*ts).valid)
+			(*ts).write(level, xml);
+	}
 	xml.put(level--, "</%s>", tag.c_str());
 }/*}}}*/
+
+void TrackSettings::write(int level, Xml& xml) const
+{
+	std::string tag = "tracksettings";
+	xml.put(level, "<%s>", tag.c_str());
+	xml.strTag(level, "name", name.toUtf8().constData());
+	xml.intTag(level, "program", program);
+	xml.intTag(level, "rec", rec);
+	xml.intTag(level, "transpose", transpose);
+	xml.put(level--, "</%s>", tag.c_str());
+}
+
+void TrackSettings::read(Xml& xml)
+{
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::TagStart:
+				if(tag == "name")
+				{
+					name = xml.parse1();
+				}
+				else if(tag == "rec")
+				{
+					rec = (bool)xml.parseInt();
+				}
+				else if(tag == "program")
+				{
+					program = (bool)xml.parseInt();
+				}
+				else if(tag == "transpose")
+				{
+					transpose = xml.parseInt();
+				}
+				break;
+			case Xml::Attribut:
+				break;
+			case Xml::TagEnd:
+				if(tag == "tracksettings")
+					return;
+			default:
+				break;
+		}
+	}
+}
 
 //---------------------------------------------------------
 //   write

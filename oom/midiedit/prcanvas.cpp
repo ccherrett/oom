@@ -1883,7 +1883,7 @@ void PianoCanvas::itemPressed(const CItem* item)
 	int channel = track()->outChannel();
 	NEvent* nevent = (NEvent*) item;
 	Event event = nevent->event();
-	playedPitch = event.pitch() + track()->transposition;
+	playedPitch = event.pitch();// + track()->transposition;
 	int velo = event.velo();
 
 	// play note:
@@ -1926,9 +1926,9 @@ void PianoCanvas::itemMoved(const CItem* item, const QPoint& pos)
 		MidiPlayEvent ev1(0, port, channel, 0x90, playedPitch, 0);
 		audio->msgPlayMidiEvent(&ev1);
 		// play note:
-		MidiPlayEvent e2(0, port, channel, 0x90, npitch + track()->transposition, event.velo());
+		MidiPlayEvent e2(0, port, channel, 0x90, npitch/* + track()->transposition*/, event.velo());
 		audio->msgPlayMidiEvent(&e2);
-		playedPitch = npitch + track()->transposition;
+		playedPitch = npitch;// + track()->transposition;
 	}
 }
 

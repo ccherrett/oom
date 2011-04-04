@@ -395,11 +395,14 @@ public:
     virtual void setAutomationType(AutomationType);
 
     // play parameter
+	bool transpose;
     int transposition;
     int velocity;
     int delay;
     int len;
     int compression;
+
+	int getTransposition();
 
     virtual bool setRecordFlag1(bool f)
     {

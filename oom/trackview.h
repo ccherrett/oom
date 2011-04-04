@@ -19,8 +19,19 @@
 #include "node.h"
 #include "globaldefs.h"
 #include "track.h"
+#include <QMap>
 
 class Xml;
+
+struct TrackSettings {
+	bool valid;
+	int program;
+	int transpose;
+	bool rec;
+	QString name;
+	virtual void write(int, Xml&) const;
+	virtual void read(Xml&);
+};
 
 //---------------------------------------------------------
 //   TrackView
@@ -31,6 +42,8 @@ class TrackView
 	private:
 		QString _comment;
 		TrackList _tracks;
+		QMap<QString, TrackSettings> _tSettings;
+		bool _recState;
 
 
 	protected:
@@ -60,6 +73,23 @@ class TrackView
 		void addTrack(Track*);
 		void removeTrack(Track*);
 		TrackList* tracks() { return &_tracks; } 
+		bool record() { return _recState; }
+		void setRecord(bool f) { _recState = f; }
+		QMap<QString, TrackSettings>* trackSettings() { return &_tSettings;}
+		void addTrackSetting(QString tname, TrackSettings settings) {
+			_tSettings[tname] = settings;
+		}
+		bool hasSettings(QString tname)
+		{
+			return _tSettings.contains(tname);
+		}
+		TrackSettings* getTrackSettings(QString tname)
+		{
+			if(hasSettings(tname))
+				return &_tSettings[tname];
+			else
+				return new TrackSettings;
+		}
 		virtual void write(int, Xml&) const;
 		void read(Xml&);
 		

@@ -403,6 +403,7 @@ MidiTrack::MidiTrack(const MidiTrack& mt, bool cloneParts)
 	_events = new EventList;
 	_mpevents = new MPEventList;
 	transposition = mt.transposition;
+	transpose = mt.transpose;
 	velocity = mt.velocity;
 	delay = mt.delay;
 	len = mt.len;
@@ -435,6 +436,16 @@ void MidiTrack::init()
 	len = 100; // percent
 	compression = 100; // percent
 	_recEcho = true;
+	transpose = false;
+}
+
+int MidiTrack::getTransposition()
+{
+	if(transpose)
+	{
+		return transposition;
+	}
+	return 0;
 }
 
 //---------------------------------------------------------
@@ -919,6 +930,7 @@ void MidiTrack::write(int level, Xml& xml) const
 	xml.intTag(level, "echo", _recEcho);
 
 	xml.intTag(level, "transposition", transposition);
+	xml.intTag(level, "transpose", transpose);
 	xml.intTag(level, "velocity", velocity);
 	xml.intTag(level, "delay", delay);
 	xml.intTag(level, "len", len);
@@ -952,6 +964,8 @@ void MidiTrack::read(Xml& xml)
 			case Xml::TagStart:
 				if (tag == "transposition")
 					transposition = xml.parseInt();
+				else if (tag == "transpose")
+					transpose = (bool)xml.parseInt();
 				else if (tag == "velocity")
 					velocity = xml.parseInt();
 				else if (tag == "delay")

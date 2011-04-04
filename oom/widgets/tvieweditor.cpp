@@ -86,6 +86,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	connect(txtName, SIGNAL(textEdited(QString)), SLOT(txtNameEdited(QString)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(btnUpClicked(bool)));
 	connect(btnDown, SIGNAL(clicked(bool)), SLOT(btnDownClicked(bool)));
+	connect(chkRecord, SIGNAL(toggled(bool)), SLOT(chkRecordChecked(bool)));
 }
 
 
@@ -110,6 +111,15 @@ void TrackViewEditor::txtNameEdited(QString text)
 	{
 		_editing = true;
 		txtName->setText(_selected->getValidName(text));
+		btnApply->setEnabled(true);
+	}
+}
+
+void TrackViewEditor::chkRecordChecked(bool)
+{
+	if(_selected)
+	{
+		_editing = true;
 		btnApply->setEnabled(true);
 	}
 }
@@ -146,6 +156,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 		//Disable btnCopy
 		btnCopy->setEnabled(false);
 		btnDelete->setEnabled(false);
+		chkRecord->setChecked(false);
 		return;
 	}
 	btnCopy->setEnabled(true);
@@ -170,6 +181,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 			}
 			listSelectedTracks->setModel(new QStringListModel(sl));
 		}
+		chkRecord->setChecked(v->record());
 	}
 	_editing = false;
 }/*}}}*/
@@ -282,6 +294,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 				}
 			}
 		}
+		_selected->setRecord(chkRecord->isChecked());
 		song->dirty = true;
 		song->updateTrackViews1();
 		reset();
@@ -320,6 +333,7 @@ void TrackViewEditor::reset()/*{{{*/
 	{
 		model->removeRows(0, model->rowCount());
 	}
+	chkRecord->setChecked(false);
 	txtName->setText("");
 }/*}}}*/
 
@@ -350,6 +364,7 @@ void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
 				tv->addTrack((*ci));
 			}
 			tv->setViewName(tv->getValidName(_selected->viewName()));
+			tv->setRecord(_selected->record());
 			cmbViews->addItem(tv->viewName());
 			cmbViews->setCurrentIndex(cmbViews->findText(tv->viewName()));
 			_selected = tv;

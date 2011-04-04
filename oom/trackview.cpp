@@ -16,6 +16,7 @@
 TrackView::TrackView()
 {
 	_selected = false;
+	_recState = false;
 }
 
 TrackView::~TrackView()
@@ -101,6 +102,10 @@ void TrackView::read(Xml& xml)/*{{{*/
 				{
 					_selected = (bool)xml.parseInt();
 				}
+				else if(tag == "record")
+				{
+					_recState = (bool)xml.parseInt();
+				}
 				else if (tag == "vtrack")
 				{
 					Track* t = song->findTrack(xml.parse1());
@@ -109,6 +114,13 @@ void TrackView::read(Xml& xml)/*{{{*/
 						//printf("TrackView::read() Adding track\n");
 						addTrack(t);
 					}
+				}
+				else if(tag == "tracksettings")
+				{
+					TrackSettings ts;
+					ts.valid = true;
+					ts.read(xml);
+					_tSettings[ts.name] = ts;
 				}
 				break;
 			case Xml::Attribut:

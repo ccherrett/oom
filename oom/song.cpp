@@ -3447,6 +3447,7 @@ void Song::updateTrackViews1()
 	viewselected = false;
 	bool customview = false;
 	bool workview = false;
+	disarmAllTracks();
 	TrackView* wv = findAutoTrackView("Working View");
 	if(wv && wv->selected())
 	{
@@ -3471,12 +3472,17 @@ void Song::updateTrackViews1()
 					if ((*i)->name() == (*t)->name())
 					{
 						found = true;
+						//Make sure to record arm the ones that were in other views as well
+						(*t)->setRecordFlag1((*it)->record());
+						(*t)->setRecordFlag2((*it)->record());
 						break;
 					}
 				}
 				if(!found)
 				{
 					_viewtracks.push_back((*t));
+					(*t)->setRecordFlag1((*it)->record());
+					(*t)->setRecordFlag2((*it)->record());
 					customview = true;
 					viewselected = true;
 				}
@@ -3561,7 +3567,6 @@ void Song::updateTrackViews1()
 			//}
 		}
 	}
-	disarmAllTracks();
 	emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
 

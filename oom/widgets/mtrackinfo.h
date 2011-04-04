@@ -96,6 +96,7 @@ private slots:
 	void patchClicked(QModelIndex);
 	void patchSelectionChanged(QItemSelection, QItemSelection);
 	void editorPartChanged(Part*);
+	void transposeStateChanged(bool);
     //tb1
 	void _rasterChanged(int);
     void _quantChanged(int);

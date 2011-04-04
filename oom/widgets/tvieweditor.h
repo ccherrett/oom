@@ -50,6 +50,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 		void btnDownClicked(bool);
 		void btnUpClicked(bool);
 		void txtNameEdited(QString);
+		void chkRecordChecked(bool);
 		void reset();
 
 	public:

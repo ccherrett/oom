@@ -316,6 +316,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(iLautst, SIGNAL(valueChanged(int)), SLOT(iLautstChanged(int)));
 	connect(iLautst, SIGNAL(doubleClicked()), SLOT(iLautstDoubleClicked()));
 	connect(iTransp, SIGNAL(valueChanged(int)), SLOT(iTranspChanged(int)));
+	connect(chkTranspose, SIGNAL(toggled(bool)), SLOT(transposeStateChanged(bool)));
 	connect(iAnschl, SIGNAL(valueChanged(int)), SLOT(iAnschlChanged(int)));
 	connect(iVerz, SIGNAL(valueChanged(int)), SLOT(iVerzChanged(int)));
 	connect(iLen, SIGNAL(valueChanged(int)), SLOT(iLenChanged(int)));
@@ -1191,6 +1192,15 @@ void MidiTrackInfo::iTranspChanged(int val)
 	song->update(SC_MIDI_TRACK_PROP);
 }
 
+void MidiTrackInfo::transposeStateChanged(bool state)
+{
+	if(!selected)
+		return;
+	MidiTrack* track = (MidiTrack*)selected;
+	track->transpose = state;
+	song->update(SC_MIDI_TRACK_PROP);
+}
+
 //---------------------------------------------------------
 //   iAnschlChanged
 //---------------------------------------------------------
@@ -1575,16 +1585,19 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 	if (flags & (SC_MIDI_TRACK_PROP))
 	{
 		iTransp->blockSignals(true);
+		chkTranspose->blockSignals(true);
 		iAnschl->blockSignals(true);
 		iVerz->blockSignals(true);
 		iLen->blockSignals(true);
 		iKompr->blockSignals(true);
 		iTransp->setValue(track->transposition);
+		chkTranspose->setChecked(track->transpose);
 		iAnschl->setValue(track->velocity);
 		iVerz->setValue(track->delay);
 		iLen->setValue(track->len);
 		iKompr->setValue(track->compression);
 		iTransp->blockSignals(false);
+		chkTranspose->blockSignals(false);
 		iAnschl->blockSignals(false);
 		iVerz->blockSignals(false);
 		iLen->blockSignals(false);
