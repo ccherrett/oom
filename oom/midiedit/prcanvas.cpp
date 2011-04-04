@@ -484,9 +484,9 @@ bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)
 		int port = track()->outPort();
 		int channel = track()->outChannel();
 		// release note:
-		MidiPlayEvent ev1(0, port, channel, 0x90, event.pitch()/* + track()->transposition*/, 0);
+		MidiPlayEvent ev1(0, port, channel, 0x90, event.pitch() + track()->getTransposition(), 0);
 		audio->msgPlayMidiEvent(&ev1);
-		MidiPlayEvent ev2(0, port, channel, 0x90, npitch/* + track()->transposition*/, event.velo());
+		MidiPlayEvent ev2(0, port, channel, 0x90, npitch + track()->getTransposition(), event.velo());
 		audio->msgPlayMidiEvent(&ev2);
 	}
 
@@ -764,7 +764,7 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 {
 	int port = track()->outPort();
 	int channel = track()->outChannel();
-	pitch += track()->transposition;
+	pitch += track()->getTransposition();
 
 	// play note:
 	//MidiPlayEvent e(0, port, channel, 0x90, pitch, 127);
@@ -804,7 +804,7 @@ void PianoCanvas::pianoReleased(int pitch, bool)
 {
 	int port = track()->outPort();
 	int channel = track()->outChannel();
-	pitch += track()->transposition;
+	pitch += track()->getTransposition();
 
 	// release key:
 	MidiPlayEvent e(0, port, channel, 0x90, pitch, 0);
@@ -1424,10 +1424,10 @@ void PianoCanvas::midiNote(int pitch, int velo)
 	//printf("PianoCanvas::midiNote(pitch:%d, velo:%d) \n", pitch, velo);
     if (_midiin && _steprec && _curPart && !audio->isPlaying() && velo && _pos[0] >= start_tick && !(globalKeyState & Qt::AltModifier))
 	{
-		MidiTrack* ctrack = (MidiTrack*)_curPart->track();
-		int tpitch = pitch;
-		if(ctrack)
-			tpitch = tpitch + ctrack->transposition;
+		//MidiTrack* ctrack = (MidiTrack*)_curPart->track();
+		//int tpitch = pitch;
+		//if(ctrack)
+		//	tpitch = tpitch + ctrack->transposition;
 		unsigned int len = editor->quant(); //prevent compiler warning: comparison singed/unsigned
 		unsigned tick = _pos[0]; //CDW
 		unsigned starttick = tick;
@@ -1445,7 +1445,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 				Event ev = i->second;
 				if (!ev.isNote())
 					continue;
-				if (ev.pitch() == tpitch && ((ev.tick() + ev.lenTick()) == /*(int)*/starttick))
+				if (ev.pitch() == pitch && ((ev.tick() + ev.lenTick()) == /*(int)*/starttick))
 				{
 					Event e = ev.clone();
 					e.setLenTick(ev.lenTick() + editor->rasterStep(starttick));
@@ -1473,7 +1473,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		for (iEvent i = range.first; i != range.second; ++i)
 		{
 			Event ev = i->second;
-			if (ev.isNote() && ev.pitch() == tpitch)
+			if (ev.isNote() && ev.pitch() == pitch)
 			{
 				// Indicate do undo, and do not do port controller values and clone parts.
 				//audio->msgDeleteEvent(ev, curPart);
@@ -1883,7 +1883,7 @@ void PianoCanvas::itemPressed(const CItem* item)
 	int channel = track()->outChannel();
 	NEvent* nevent = (NEvent*) item;
 	Event event = nevent->event();
-	playedPitch = event.pitch();// + track()->transposition;
+	playedPitch = event.pitch(); + track()->getTransposition();
 	int velo = event.velo();
 
 	// play note:
@@ -1926,9 +1926,9 @@ void PianoCanvas::itemMoved(const CItem* item, const QPoint& pos)
 		MidiPlayEvent ev1(0, port, channel, 0x90, playedPitch, 0);
 		audio->msgPlayMidiEvent(&ev1);
 		// play note:
-		MidiPlayEvent e2(0, port, channel, 0x90, npitch/* + track()->transposition*/, event.velo());
+		MidiPlayEvent e2(0, port, channel, 0x90, npitch + track()->getTransposition(), event.velo());
 		audio->msgPlayMidiEvent(&e2);
-		playedPitch = npitch;// + track()->transposition;
+		playedPitch = npitch + track()->getTransposition();
 	}
 }
 
