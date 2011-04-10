@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
-    <height>426</height>
+    <width>885</width>
+    <height>501</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,10 +29,7 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>12</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="bottomMargin">
@@ -128,6 +125,16 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QCheckBox" name="chkRecord">
+           <property name="toolTip">
+            <string>Toggle Record Arm on all tracks in view.</string>
+           </property>
+           <property name="text">
+            <string>Record</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -190,17 +197,20 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="listLayout" stretch="1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <layout class="QVBoxLayout" name="tracksLayout" stretch="0,0">
        <property name="sizeConstraint">
-        <enum>QLayout::SetMinAndMaxSize</enum>
+        <enum>QLayout::SetMinimumSize</enum>
        </property>
        <property name="rightMargin">
         <number>0</number>
        </property>
        <item>
         <layout class="QHBoxLayout" name="typeLayout">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
          <item>
           <widget class="QLabel" name="lblType">
            <property name="minimumSize">
@@ -230,7 +240,7 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>80</width>
+             <width>100</width>
              <height>32</height>
             </size>
            </property>
@@ -245,6 +255,12 @@
            <horstretch>1</horstretch>
            <verstretch>1</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>217</width>
+           <height>100</height>
+          </size>
          </property>
          <property name="horizontalScrollBarPolicy">
           <enum>Qt::ScrollBarAsNeeded</enum>
@@ -273,12 +289,15 @@
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <property name="leftMargin">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
          <property name="bottomMargin">
           <number>0</number>
          </property>
@@ -290,6 +309,13 @@
              <height>24</height>
             </size>
            </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDown">
            <property name="text">
             <string/>
            </property>
@@ -308,66 +334,47 @@
            </property>
           </spacer>
          </item>
-         <item>
-          <widget class="QPushButton" name="btnDown">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="chkRecord">
-           <property name="toolTip">
-            <string>Toggle Record Arm on all tracks in view.</string>
-           </property>
-           <property name="text">
-            <string>Record</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
-        <widget class="QTableView" name="listSelectedTracks">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>1</horstretch>
-           <verstretch>1</verstretch>
-          </sizepolicy>
+        <widget class="QSplitter" name="splitter">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAsNeeded</enum>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::ExtendedSelection</enum>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectColumns</enum>
-         </property>
-         <property name="cornerButtonEnabled">
-          <bool>false</bool>
-         </property>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
+         <widget class="QListView" name="listSelectedTracks">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+         </widget>
+         <widget class="QTableWidget" name="optionsTable">
+          <property name="baseSize">
+           <size>
+            <width>50</width>
+            <height>150</height>
+           </size>
+          </property>
+         </widget>
         </widget>
        </item>
       </layout>

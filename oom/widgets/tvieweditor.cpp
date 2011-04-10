@@ -110,7 +110,9 @@ void TrackViewEditor::txtNameEdited(QString text)
 	if(_selected)
 	{
 		_editing = true;
+		int cursorPos = txtName->cursorPosition();
 		txtName->setText(_selected->getValidName(text));
+		txtName->setCursorPosition(cursorPos);
 		btnApply->setEnabled(true);
 	}
 }
