@@ -39,22 +39,6 @@
 int MasterEdit::_rasterInit = 0;
 
 //---------------------------------------------------------
-//   closeEvent
-//---------------------------------------------------------
-
-void MasterEdit::closeEvent(QCloseEvent* e)
-{
-	tconfig().set_property("MasterEdit", "size", size());
-	tconfig().set_property("MasterEdit", "hscale", hscroll->mag());
-	tconfig().set_property("MasterEdit", "yscale", vscroll->mag());
-	tconfig().set_property("MasterEdit", "ypos", vscroll->pos());
-	tconfig().set_property("MasterEdit", "pos", pos());
-    tconfig().save();
-	emit deleted((unsigned long) this);
-	e->accept();
-}
-
-//---------------------------------------------------------
 //   songChanged
 //---------------------------------------------------------
 
@@ -249,13 +233,6 @@ MasterEdit::MasterEdit()
 
 MasterEdit::~MasterEdit()
 {
-	//undoRedo->removeFrom(tools);  // p4.0.6 Removed
-	tconfig().set_property("MasterEdit", "size", size());
-	tconfig().set_property("MasterEdit", "hscale", hscroll->mag());
-	tconfig().set_property("MasterEdit", "yscale", vscroll->mag());
-	tconfig().set_property("MasterEdit", "ypos", vscroll->pos());
-	tconfig().set_property("MasterEdit", "pos", pos());
-    tconfig().save();
 }
 
 
@@ -270,9 +247,46 @@ void MasterEdit::showEvent(QShowEvent*)
 	QSize s = tconfig().get_property("MasterEdit", "size", QSize(640, 480)).toSize();
 	resize(s);
 	QPoint p = tconfig().get_property("MasterEdit", "pos", QPoint(0,0)).toPoint();
+	int snap = tconfig().get_property("MasterEdit", "snap", 0).toInt();
+	int item = 0;
+	switch (snap)
+	{
+		case 1: item = 0;
+			break;
+		case 0: item = 1;
+			break;
+		case 768: item = 2;
+			break;
+		case 384: item = 3;
+			break;
+		case 192: item = 4;
+			break;
+		case 96: item = 5;
+			break;
+	}
+	_rasterInit = snap;
+	rasterLabel->setCurrentIndex(item);
 	move(p);
 	canvas->setFocus();
 }
+
+//---------------------------------------------------------
+//   closeEvent
+//---------------------------------------------------------
+
+void MasterEdit::closeEvent(QCloseEvent* e)
+{
+	tconfig().set_property("MasterEdit", "size", size());
+	tconfig().set_property("MasterEdit", "hscale", hscroll->mag());
+	tconfig().set_property("MasterEdit", "yscale", vscroll->mag());
+	tconfig().set_property("MasterEdit", "ypos", vscroll->pos());
+	tconfig().set_property("MasterEdit", "pos", pos());
+	tconfig().set_property("MasterEdit", "snap", _raster);
+    tconfig().save();
+	emit deleted((unsigned long) this);
+	e->accept();
+}
+
 //---------------------------------------------------------
 //   readStatus
 //---------------------------------------------------------
