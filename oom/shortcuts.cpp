@@ -72,9 +72,9 @@ void initShortCuts()
 	defShrt(SHRT_OPEN_DRUMS, Qt::CTRL + Qt::Key_D, "Open drumeditor", ARRANG_SHRT, "open_drumedit");
 	defShrt(SHRT_OPEN_LIST, Qt::CTRL + Qt::Key_L, "Open listeditor", ARRANG_SHRT, "open_listedit");
 	defShrt(SHRT_OPEN_WAVE, 0, "Open waveeditor", ARRANG_SHRT, "open_waveedit");
-	defShrt(SHRT_OPEN_GRAPHIC_MASTER, Qt::CTRL + Qt::Key_M, "Open graphical mastertrack editor", ARRANG_SHRT, "open_graph_master");
-	defShrt(SHRT_OPEN_LIST_MASTER, Qt::CTRL + Qt::SHIFT + Qt::Key_M, "Open list mastertrack editor", ARRANG_SHRT, "open_list_master");
-	defShrt(SHRT_OPEN_MIDI_TRANSFORM, Qt::CTRL + Qt::Key_T, "Open midi transformer", ARRANG_SHRT, "open_midi_transform");
+	defShrt(SHRT_OPEN_GRAPHIC_MASTER, Qt::CTRL + Qt::Key_T, "Open graphical mastertrack editor", ARRANG_SHRT, "open_graph_master");
+	defShrt(SHRT_OPEN_LIST_MASTER, Qt::CTRL + Qt::SHIFT + Qt::Key_T, "Open list mastertrack editor", ARRANG_SHRT, "open_list_master");
+	defShrt(SHRT_OPEN_MIDI_TRANSFORM, 0, "Open midi transformer", ARRANG_SHRT, "open_midi_transform");
 	defShrt(SHRT_ADD_MIDI_TRACK, Qt::SHIFT + Qt::Key_M, "Add midi track", ARRANG_SHRT, "add_midi_track");
 	defShrt(SHRT_ADD_DRUM_TRACK, Qt::SHIFT + Qt::Key_D, "Add drum track", ARRANG_SHRT, "add_drum_track");
 	defShrt(SHRT_ADD_WAVE_TRACK, Qt::SHIFT + Qt::Key_W, "Add wave track", ARRANG_SHRT, "add_wave_track");
@@ -101,7 +101,7 @@ void initShortCuts()
 
 	defShrt(SHRT_GLOBAL_CONFIG, 0, "Settings: Global configuration", ARRANG_SHRT, "configure_global");
 	defShrt(SHRT_CONFIG_SHORTCUTS, 0, "Settings: Configure shortcuts", ARRANG_SHRT, "configure_shortcuts");
-	defShrt(SHRT_CONFIG_METRONOME, 0, "Settings: Configure metronome", ARRANG_SHRT, "configure_metronome");
+	defShrt(SHRT_CONFIG_METRONOME, Qt::CTRL + Qt::Key_M, "Settings: Configure metronome", ARRANG_SHRT, "configure_metronome");
 	defShrt(SHRT_CONFIG_MIDISYNC, 0, "Settings: Midi sync configuration", ARRANG_SHRT, "configure_midi_sync");
 	defShrt(SHRT_MIDI_FILE_CONFIG, 0, "Settings: Midi file import/export configuration", ARRANG_SHRT, "configure_midi_file");
 	//defShrt(SHRT_APPEARANCE_SETTINGS, 0, "Settings: Appearance settings", ARRANG_SHRT, "configure_appearance_settings");

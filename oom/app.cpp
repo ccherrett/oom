@@ -962,7 +962,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	startListEditAction = new QAction(QIcon(*edit_listIcon), tr("List"), this);
 	startWaveEditAction = new QAction(QIcon(*edit_waveIcon), tr("Audio"), this);
 
-	master = new QMenu(tr("Mastertrack"), this);
+	master = new QMenu(tr("Tempo Editor"), this);
 	master->setIcon(QIcon(*edit_mastertrackIcon));
 	masterGraphicAction = new QAction(QIcon(*mastertrack_graphicIcon), tr("Graphic"), this);
 	masterListAction = new QAction(QIcon(*mastertrack_listIcon), tr("List"), this);
@@ -1316,9 +1316,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuEdit->addAction(startListEditAction);
 	//menuEdit->addAction(startWaveEditAction);
 
-	menuEdit->addMenu(master);
-	master->addAction(masterGraphicAction);
-	master->addAction(masterListAction);
 	menuEdit->addSeparator();
 
 
@@ -1350,11 +1347,15 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuView = menuBar()->addMenu(tr("View"));
 	//menuView->setCheckable(true);// not necessary with Qt4
 
+	menuView->addMenu(master);
+	master->addAction(masterGraphicAction);
+	master->addAction(settingsMetronomeAction);
+	master->addAction(masterListAction);
 	menuView->addAction(viewTransportAction);
-	menuView->addAction(viewBigtimeAction);
 	menuView->addAction(viewMixerAAction);
 	menuView->addAction(viewMixerBAction);
 	menuView->addAction(viewRoutesAction);
+	menuView->addAction(viewBigtimeAction);
 	menuView->addAction(viewCliplistAction);
 	menuView->addAction(viewMarkerAction);
 
@@ -1429,7 +1430,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	follow->addAction(dontFollowAction);
 	follow->addAction(followPageAction);
 	follow->addAction(followCtsAction);
-	menuSettings->addAction(settingsMetronomeAction);
+	//menuSettings->addAction(settingsMetronomeAction);
 	menuSettings->addSeparator();
 	menuSettings->addAction(settingsMidiSyncAction);
 	menuSettings->addAction(settingsMidiIOAction);
