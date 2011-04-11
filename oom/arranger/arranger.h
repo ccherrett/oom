@@ -138,6 +138,7 @@ public slots:
     void showTrackViews();
     void _setRaster(int);
     void verticalScrollSetYpos(unsigned);
+	void addCanvasPart(Track*);
 
 public:
 

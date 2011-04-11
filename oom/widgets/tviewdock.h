@@ -12,6 +12,7 @@
 class QStandardItemModel;
 class QStandardItem;
 class QModelIndex;
+class QPoint;
 
 class TrackViewDock : public QFrame, public Ui::TViewDockBase {
     Q_OBJECT
@@ -28,6 +29,7 @@ class TrackViewDock : public QFrame, public Ui::TViewDockBase {
 		void trackviewChanged(QStandardItem*);
 		void autoTrackviewChanged(QStandardItem*);
 		void updateTrackView(int, QStandardItem*);
+		void contextPopupMenu(QPoint);
 	
 	public slots:
 		void populateTable(int);

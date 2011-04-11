@@ -107,7 +107,6 @@ class PartCanvas : public Canvas
     virtual bool moveItem(CItem*, const QPoint&, DragType);
     virtual CItem* newItem(const QPoint&, int);
     virtual void resizeItem(CItem*, bool);
-    virtual void newItem(CItem*, bool);
     virtual bool deleteItem(CItem*);
     virtual void startUndo(DragType);
 
@@ -123,7 +122,6 @@ class PartCanvas : public Canvas
 
     void glueItem(CItem* item);
     void splitItem(CItem* item, const QPoint&);
-	CItem* addPartAtCursor(Track*);
 
     void copy(PartList*);
     void paste(bool clone = false, bool toTrack = true, bool doInsert = false);
@@ -176,6 +174,8 @@ public:
     void controllerChanged(Track *t);
     int track2Y(Track*) const;
 	bool isEditing() { return editMode; }
+	CItem* addPartAtCursor(Track*);
+    virtual void newItem(CItem*, bool);
 
 public slots:
 

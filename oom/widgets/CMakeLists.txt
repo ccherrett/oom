@@ -87,6 +87,7 @@ QT4_WRAP_CPP (widget_mocs
       view.h  
       vscale.h  
 	  menulist.h
+	  tviewmenu.h
 	  tablespinner.h
       )
 
@@ -201,6 +202,7 @@ file (GLOB widgets_source_files
       view.cpp    
       vscale.cpp
 	  menulist.cpp
+	  tviewmenu.cpp
 	  tablespinner.cpp
       )
 

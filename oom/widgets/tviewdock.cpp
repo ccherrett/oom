@@ -7,10 +7,14 @@
 
 #include "app.h"
 #include "globals.h"
+#include "gconfig.h"
 #include "song.h"
+#include "audio.h"
 #include "tviewdock.h"
+#include "tviewmenu.h"
 #include "trackview.h"
 #include "tvieweditor.h"
+#include "arranger.h"
 
 #include "icons.h"
 #include <QStandardItemModel>
@@ -20,6 +24,7 @@
 #include <QItemSelection>
 #include <QModelIndexList>
 #include <QList>
+#include <QtGui>
 
 TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 {
@@ -47,6 +52,7 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	connect(_tableModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(trackviewRemoved(QModelIndex, int, int)));
 	connect(_tableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(trackviewChanged(QStandardItem*)));
 	connect(_autoTableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(autoTrackviewChanged(QStandardItem*)));
+	connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(contextPopupMenu(QPoint)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
 	populateTable(SC_VIEW_CHANGED);
 	//updateTableHeader();
@@ -173,6 +179,41 @@ void TrackViewDock::btnTVClicked(bool)
 	TrackViewEditor* tve = new TrackViewEditor(this);
 	tve->show();
 }
+
+void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
+{
+	QModelIndex index = tableView->indexAt(pos);
+	if(!index.isValid())
+		return;
+	QStandardItem* item = _tableModel->itemFromIndex(index);
+	if(item)
+	{
+		//Make it works even if you rightclick on the checkbox
+		QStandardItem* tvcol = _tableModel->item(item->row(), 1);
+		if(tvcol)
+		{
+			TrackView *tv = song->findTrackView(tvcol->text());
+			if(tv)
+			{
+				QMenu* p = new QMenu(this);/*{{{*/
+				TrackViewMenu *item = new TrackViewMenu(p, tv);
+				p->addAction(item);
+
+				QAction* act = p->exec(mapToGlobal(pos));
+				if (act)
+				{
+					QString tname = act->data().toString();
+					Track* track = song->findTrack(tname);
+					if(track)
+					{
+						oom->arranger->addCanvasPart(track);
+					}
+				}
+				delete p;/*}}}*/
+			}
+		}
+	}
+}/*}}}*/
 
 void TrackViewDock::btnUpClicked(bool)/*{{{*/
 {
