@@ -42,7 +42,7 @@ void CommentDock::textChanged()
 		m_track->setComment(tcomment);
 		song->dirty = true;
 	}
-	song->update(SC_TRACK_MODIFIED);
+	//song->update(SC_TRACK_MODIFIED);
 }
 
 void CommentDock::songCommentChanged()

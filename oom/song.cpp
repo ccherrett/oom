@@ -111,6 +111,10 @@ Song::Song(const char* name)
 	av->setViewName("Aux View");
 	av->setSelected(false);
 	_autotviews.push_back(av);
+	TrackView* cv = new TrackView();
+	cv->setViewName("Comment View");
+	cv->setSelected(false);
+	_autotviews.push_back(cv);
 
 	clear(false);
 }
@@ -3447,11 +3451,18 @@ void Song::updateTrackViews1()
 	viewselected = false;
 	bool customview = false;
 	bool workview = false;
+	bool commentview = false;
 	disarmAllTracks();
 	TrackView* wv = findAutoTrackView("Working View");
+	TrackView* cv = findAutoTrackView("Comment View");
 	if(wv && wv->selected())
 	{
 		workview = true;
+		viewselected = true;
+	}
+	if(cv && cv->selected())
+	{
+		commentview = true;
 		viewselected = true;
 	}
 	for(iTrackView it = _tviews.begin(); it != _tviews.end(); ++it)
@@ -3523,10 +3534,22 @@ void Song::updateTrackViews1()
 									break;
 								_viewtracks.push_back((*t));
 							}
+							else if((*ait)->viewName() == "Comment View")
+							{
+								if((*t)->comment().isEmpty())
+									break;
+								_viewtracks.push_back((*t));
+							}
 							break;
 						case Track::AUDIO_OUTPUT:
 							if((*ait)->viewName() == "Outputs View")
 							{
+								_viewtracks.push_back((*t));
+							}
+							else if((*ait)->viewName() == "Comment View")
+							{
+								if((*t)->comment().isEmpty())
+									break;
 								_viewtracks.push_back((*t));
 							}
 							break;
@@ -3535,16 +3558,34 @@ void Song::updateTrackViews1()
 							{
 								_viewtracks.push_back((*t));
 							}
+							else if((*ait)->viewName() == "Comment View")
+							{
+								if((*t)->comment().isEmpty())
+									break;
+								_viewtracks.push_back((*t));
+							}
 							break;
 						case Track::AUDIO_AUX:
 							if((*ait)->viewName() == "Aux View")
 							{
 								_viewtracks.push_back((*t));
 							}
+							else if((*ait)->viewName() == "Comment View")
+							{
+								if((*t)->comment().isEmpty())
+									break;
+								_viewtracks.push_back((*t));
+							}
 							break;
 						case Track::AUDIO_INPUT:
 							if((*ait)->viewName() == "Inputs  View")
 							{
+								_viewtracks.push_back((*t));
+							}
+							else if((*ait)->viewName() == "Comment View")
+							{
+								if((*t)->comment().isEmpty())
+									break;
 								_viewtracks.push_back((*t));
 							}
 							break;
