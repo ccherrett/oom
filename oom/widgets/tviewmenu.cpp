@@ -35,16 +35,21 @@ QWidget* TrackViewMenu::createWidget(QWidget* parent)
 	if(!m_trackview)
 		return 0;
 
-	//QVBoxLayout* layout = new QVBoxLayout();
-	//QWidget* w = new QWidget(parent);
-	//w->setLayout(layout);
-	//QLabel* tvname = new QLabel(m_trackview->viewName(), w);
-	list = new QListWidget(parent);
+	QVBoxLayout* layout = new QVBoxLayout();
+	QWidget* w = new QWidget(parent);
+	w->setFixedHeight(350);
+	QLabel* tvname = new QLabel(m_trackview->viewName());
+	tvname->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+	tvname->setObjectName("TrackViewMenuLabel");
+	layout->addWidget(tvname);
+	list = new QListWidget();
 	list->setObjectName("TrackViewMenuList");
 	list->setSelectionMode(QAbstractItemView::SingleSelection);
 	list->setAlternatingRowColors(true);
 	list->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	list->setFixedHeight(300);
+	layout->addWidget(list);
+	w->setLayout(layout);
+	//list->setFixedHeight(300);
 	int r = 0;
 	for (iTrack it = m_trackview->tracks()->begin(); it != m_trackview->tracks()->end(); ++it)
 	{
@@ -57,12 +62,13 @@ QWidget* TrackViewMenu::createWidget(QWidget* parent)
 	if(!r)
 	{
 		list->insertItem(r, tr("<No Empty Tracks>"));
-		list->setFixedHeight(60);
+		//list->setFixedHeight(60);
+		w->setFixedHeight(90);
 	}
 	connect(list, SIGNAL(itemPressed(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
 	//connect(list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
 	//connect(list, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
-	return list;
+	return w;//list;
 }
 
 void TrackViewMenu::updateData(QListWidgetItem *item)

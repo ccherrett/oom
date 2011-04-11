@@ -19,6 +19,7 @@ class Xml;
 
 class Splitter : public QSplitter {
     Q_OBJECT
+	bool m_configured;
 
 public:
     Splitter(Qt::Orientation o, QWidget* parent, const char* name);
