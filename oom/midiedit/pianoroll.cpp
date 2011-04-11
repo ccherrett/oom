@@ -246,7 +246,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	funcModVelAction = menuFunctions->addAction(tr("Modify Velocity"));
 	mapper->setMapping(funcModVelAction, PianoCanvas::CMD_MODIFY_VELOCITY);
 	connect(funcModVelAction, SIGNAL(triggered()), mapper, SLOT(map()));
-
+/*
 	funcCrescendoAction = menuFunctions->addAction(tr("Crescendo"));
 	mapper->setMapping(funcCrescendoAction, PianoCanvas::CMD_CRESCENDO);
 	funcCrescendoAction->setEnabled(false);
@@ -296,7 +296,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	mapper->setMapping(funcCreateMeasureAction, PianoCanvas::CMD_CREATE_MEASURE);
 	funcCreateMeasureAction->setEnabled(false);
 	connect(funcCreateMeasureAction, SIGNAL(triggered()), mapper, SLOT(map()));
-
+*/
 	funcSetFixedLenAction = menuFunctions->addAction(tr("Set Fixed Length"));
 	mapper->setMapping(funcSetFixedLenAction, PianoCanvas::CMD_FIXED_LEN);
 	connect(funcSetFixedLenAction, SIGNAL(triggered()), mapper, SLOT(map()));
@@ -2018,6 +2018,7 @@ void PianoRoll::initShortcuts()
 
 	funcGateTimeAction->setShortcut(shortcuts[SHRT_MODIFY_GATE_TIME].key);
 	funcModVelAction->setShortcut(shortcuts[SHRT_MODIFY_VELOCITY].key);
+	/*
 	funcCrescendoAction->setShortcut(shortcuts[SHRT_CRESCENDO].key);
 	funcTransposeAction->setShortcut(shortcuts[SHRT_TRANSPOSE].key);
 	funcThinOutAction->setShortcut(shortcuts[SHRT_THIN_OUT].key);
@@ -2028,6 +2029,7 @@ void PianoRoll::initShortcuts()
 	funcEraseMeasureAction->setShortcut(shortcuts[SHRT_ERASE_MEASURE].key);
 	funcDelMeasureAction->setShortcut(shortcuts[SHRT_DELETE_MEASURE].key);
 	funcCreateMeasureAction->setShortcut(shortcuts[SHRT_CREATE_MEASURE].key);
+	*/
 	funcSetFixedLenAction->setShortcut(shortcuts[SHRT_FIXED_LEN].key);
 	funcDelOverlapsAction->setShortcut(shortcuts[SHRT_DELETE_OVERLAPS].key);
 

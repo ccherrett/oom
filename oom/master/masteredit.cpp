@@ -76,7 +76,7 @@ void MasterEdit::songChanged(int type)
 MasterEdit::MasterEdit()
 : MidiEditor(0, _rasterInit, 0)
 {
-	setWindowTitle(tr("OOMidi: Mastertrack"));
+	setWindowTitle(tr("OOMidi: Tempo Editor"));
 	_raster = 0; // measure
 	//setMinimumSize(400, 300);
 	//resize(500, 350);

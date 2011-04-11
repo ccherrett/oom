@@ -69,7 +69,7 @@ LMaster::LMaster()
 	sig_editor = 0;
 	editedItem = 0;
 	editingNewItem = false;
-	setWindowTitle(tr("OOMidi: Mastertrack"));
+	setWindowTitle(tr("OOMidi: Tempo Editor"));
 	setMinimumHeight(100);
 	setFixedWidth(400);
 
