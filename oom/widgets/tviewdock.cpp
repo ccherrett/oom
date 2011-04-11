@@ -199,7 +199,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 				TrackViewMenu *item = new TrackViewMenu(p, tv);
 				p->addAction(item);
 
-				QAction* act = p->exec(mapToGlobal(pos));
+				QAction* act = p->exec(QCursor::pos());
 				if (act)
 				{
 					QString tname = act->data().toString();

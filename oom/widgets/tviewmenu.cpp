@@ -55,7 +55,10 @@ QWidget* TrackViewMenu::createWidget(QWidget* parent)
 		}
 	}
 	if(!r)
-		return 0;
+	{
+		list->insertItem(r, tr("<No Empty Tracks>"));
+		list->setFixedHeight(60);
+	}
 	connect(list, SIGNAL(itemPressed(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
 	//connect(list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
 	//connect(list, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
