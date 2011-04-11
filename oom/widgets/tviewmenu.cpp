@@ -25,9 +25,10 @@
 #include "config.h"
 #include "tviewmenu.h"
 
-TrackViewMenu::TrackViewMenu(QMenu* parent, TrackView *t) : QWidgetAction(parent)
+TrackViewMenu::TrackViewMenu(QMenu* parent, TrackView *t, bool v) : QWidgetAction(parent)
 {
 	m_trackview = t;
+	m_viewall = v;
 }
 
 QWidget* TrackViewMenu::createWidget(QWidget* parent)
@@ -53,7 +54,7 @@ QWidget* TrackViewMenu::createWidget(QWidget* parent)
 	int r = 0;
 	for (iTrack it = m_trackview->tracks()->begin(); it != m_trackview->tracks()->end(); ++it)
 	{
-		if (((*it)->type() == Track::MIDI || (*it)->type() == Track::DRUM || (*it)->type() == Track::WAVE) && (*it)->parts()->empty())
+		if (((*it)->type() == Track::MIDI || (*it)->type() == Track::DRUM || (*it)->type() == Track::WAVE) && ((*it)->parts()->empty() || m_viewall))
 		{
 			list->insertItem(r, (*it)->name());
 			++r;

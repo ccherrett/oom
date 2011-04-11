@@ -196,7 +196,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 			if(tv)
 			{
 				QMenu* p = new QMenu(this);/*{{{*/
-				TrackViewMenu *item = new TrackViewMenu(p, tv);
+				TrackViewMenu *item = new TrackViewMenu(p, tv, (chkViewAll->checkState() == Qt::Checked));
 				p->addAction(item);
 
 				QAction* act = p->exec(QCursor::pos());

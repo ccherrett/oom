@@ -138,6 +138,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <property name="bottomMargin">
       <number>0</number>
      </property>
@@ -216,6 +219,27 @@
        </property>
        <property name="text">
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkViewAll">
+       <property name="toolTip">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Luxi Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;View &lt;span style=&quot; font-weight:600;&quot;&gt;all&lt;/span&gt; available tracks in TrackView context menu.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Leave unchecked to view only the tracks that contain &lt;span style=&quot; font-weight:600;&quot;&gt;no parts&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
        </property>
       </widget>
      </item>

@@ -20,9 +20,10 @@ class TrackViewMenu : public QWidgetAction
 	Q_OBJECT
 	QListWidget *list;
 	TrackView* m_trackview;
+	bool m_viewall;
 
 	public:
-		TrackViewMenu(QMenu* parent, TrackView* t);
+		TrackViewMenu(QMenu* parent, TrackView* t, bool viewall = false);
 		virtual QWidget* createWidget(QWidget* parent = 0);
 
 	private slots:
