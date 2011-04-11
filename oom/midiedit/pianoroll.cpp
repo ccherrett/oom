@@ -660,13 +660,13 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 void PianoRoll::songChanged1(int bits)
 {
 
-	if (bits & SC_SOLO)
-	{
+	//if (bits & SC_SOLO)
+	//{
 		solo->blockSignals(true);
 		solo->setChecked(canvas->track()->solo());
 		solo->blockSignals(false);
-		return;
-	}
+	//	return;
+	//}
 	songChanged(bits);
 	//trackInfo->songChanged(bits);
 	// We'll receive SC_SELECTION if a different part is selected.
