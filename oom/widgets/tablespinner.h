@@ -1,3 +1,11 @@
+//=========================================================
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
+//  $Id: $
+//
+//  (C) Copyright 2011 Andrew Williams and Christopher Cherrett
+//=========================================================
+
 #ifndef _OOM_TABLE_SPINNER_
 #define _OOM_TABLE_SPINNER_
 

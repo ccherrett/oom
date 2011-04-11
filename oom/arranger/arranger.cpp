@@ -62,6 +62,7 @@
 #include "tvieweditor.h"
 #include "traverso_shared/TConfig.h"
 #include "tviewdock.h"
+#include "commentdock.h"
 #include "rmap.h"
 #include "shortcuts.h"
 
@@ -1006,11 +1007,13 @@ void Arranger::genTrackInfo(QWidget*)
 	//infoScroll->setWidget(midiTrackInfo);
 	infoScroll->setWidgetResizable(true);
 	_rmdock = new RouteMapDock(this);
+	_commentdock = new CommentDock(this);
 	_rtabs->addTab(_tvdock, tr("   Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
 	_rtabs->addTab(midiTrackInfo, tr("   Patch Sequencer   "));
 	//_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
 	_rtabs->addTab(_rmdock, tr("  Route Connector  "));
+	_rtabs->addTab(_commentdock, tr("  Comments  "));
 
 	central = new QWidget(this);
 	central->setObjectName("dockMixerCenter");
@@ -1030,6 +1033,7 @@ void Arranger::genTrackInfo(QWidget*)
 
 void Arranger::updateTrackInfo(int flags)
 {
+	_commentdock->setTrack(selected);
 	if (!showTrackinfoFlag)
 	{
 		switchInfo(-1);
