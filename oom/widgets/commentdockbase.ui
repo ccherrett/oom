@@ -18,7 +18,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="Splitter" name="splitter">
+    <widget class="Splitter" name="commentDockSplitter">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>

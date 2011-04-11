@@ -28,6 +28,8 @@ public:
     void readStatus(Xml&);
 protected:
 	virtual void showEvent(QShowEvent*);
+private slots:
+	void saveStateInfo();
 };
 
 #endif

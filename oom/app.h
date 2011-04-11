@@ -126,7 +126,7 @@ class OOMidi : public QMainWindow
     QAction *masterGraphicAction, *masterListAction;
     QAction *midiTransposeAction;
     QAction *midiTransformerAction;
-    QAction *editSongInfoAction;
+    //QAction *editSongInfoAction;
 
     // View Menu actions
     QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, *viewMixerBAction, *viewCliplistAction, *viewMarkerAction, *viewRoutesAction;

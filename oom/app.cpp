@@ -973,7 +973,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	midiTransposeAction = new QAction(QIcon(*midi_transposeIcon), tr("Transpose"), this);
 	midiTransformerAction = new QAction(QIcon(*midi_transformIcon), tr("Midi &Transform"), this);
 
-	editSongInfoAction = new QAction(QIcon(*songInfoIcon), tr("Song Info"), this);
+	//editSongInfoAction = new QAction(QIcon(*songInfoIcon), tr("Song Info"), this);
 
 
 	//-------- View Actions
@@ -1119,7 +1119,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(midiTransposeAction, SIGNAL(triggered()), SLOT(transpose()));
 	connect(midiTransformerAction, SIGNAL(triggered()), SLOT(startMidiTransformer()));
 
-	connect(editSongInfoAction, SIGNAL(triggered()), SLOT(startSongInfo()));
+	//connect(editSongInfoAction, SIGNAL(triggered()), SLOT(startSongInfo()));
 
 	//-------- View connections
 	connect(viewTransportAction, SIGNAL(toggled(bool)), SLOT(toggleTransport(bool)));
@@ -1338,7 +1338,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	midiEdit->addAction(midiTransposeAction);
 	midiEdit->addAction(midiTransformerAction);
 
-	menuEdit->addAction(editSongInfoAction);
+	//menuEdit->addAction(editSongInfoAction);
 
 	//-------------------------------------------------------------
 	//    popup View

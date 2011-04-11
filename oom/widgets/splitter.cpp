@@ -22,6 +22,7 @@ Splitter::Splitter(Qt::Orientation o, QWidget* parent, const char* name)
 {
 	setObjectName(name);
 	setOpaqueResize(true);
+	connect(this, SIGNAL(splitterMoved(int, int)), this, SLOT(saveStateInfo()));
 }
 
 Splitter::Splitter(QWidget *parent) : QSplitter(parent)
@@ -29,6 +30,25 @@ Splitter::Splitter(QWidget *parent) : QSplitter(parent)
 }
 
 Splitter::~Splitter()
+{
+	/*
+	QList<int> vl = sizes();
+	QString val;
+	QList<int>::iterator ivl = vl.begin();
+	for (; ivl != vl.end(); ++ivl)
+	{
+		val.append(QString::number(*ivl));
+		val.append(" ");
+	}
+	//printf("Inside the Splitter Destructor: %s\n", val.toStdString().c_str());
+	tconfig().set_property(objectName(), "sizes", val);
+	//For whatever reason OOMidi destructor is called before this so call tconfig().save() again
+    tconfig().save();
+	*/
+	saveStateInfo();
+}
+
+void Splitter::saveStateInfo()
 {
 	QList<int> vl = sizes();
 	QString val;
