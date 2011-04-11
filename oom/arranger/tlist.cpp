@@ -1294,7 +1294,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					if (!multipleSelectedTracks)
 					{
 						p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
-						p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
+						//p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
 					}
 					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 
@@ -1383,13 +1383,13 @@ void TList::mousePressEvent(QMouseEvent* ev)
 
 							break;
 
-							case 1: // show track comment
+							/*case 1: // show track comment
 							{
 								TrackComment* tc = new TrackComment(t, 0);
 								tc->show();
 								//QToolTip::add( this, "FOOOOOOOOOOOOO" );
 							}
-							break;
+							break;*/
 							case 2:
 							{
 								SynthI* synth = (SynthI*) t;
