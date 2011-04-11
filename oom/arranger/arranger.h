@@ -42,6 +42,7 @@ class Strip;
 class SpinBox;
 class TrackViewDock;
 class RouteMapDock;
+class CommentDock;
 
 //---------------------------------------------------------
 //   Arranger
@@ -79,6 +80,7 @@ class Arranger : public QWidget
 	Strip* _lastStrip;
 	TrackViewDock* _tvdock;
 	RouteMapDock* _rmdock;
+	CommentDock* _commentdock;
 	QWidget *central;
 	QVBoxLayout *mlayout;
     QList<Strip* > m_strips;

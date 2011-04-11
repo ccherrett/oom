@@ -30,6 +30,7 @@ QT4_WRAP_CPP (widget_mocs
       comboQuant.h  
       combobox.h  
       comment.h  
+      commentdock.h  
       ctrlcombo.h  
       dentry.h  
       didyouknow.h
@@ -97,6 +98,7 @@ file (GLOB widgets_ui_files
       appearancebase.ui 
       cliplisteditorbase.ui  
       commentbase.ui  
+      commentdockbase.ui  
       configmidifilebase.ui
       didyouknow.ui  
       editnotedialogbase.ui  
@@ -137,6 +139,7 @@ file (GLOB widgets_source_files
       comboQuant.cpp 
       combobox.cpp  
       comment.cpp 
+      commentdock.cpp 
       ctrlcombo.cpp 
       dentry.cpp 
       dimap.cpp

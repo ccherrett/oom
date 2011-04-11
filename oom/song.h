@@ -213,6 +213,8 @@ public:
     }
 
     void setSongInfo(QString info) {
+		if(songInfoStr != info)
+			dirty = true;
         songInfoStr = info;
     }
 

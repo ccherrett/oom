@@ -2246,7 +2246,7 @@ void MidiTrackInfo::movePatchUp(bool)
 	}
 }
 
-void MidiTrackInfo::updateTableHeader()
+void MidiTrackInfo::updateTableHeader()/*{{{*/
 {
 	QStandardItem* hid = new QStandardItem(tr("I"));
 	QStandardItem* hstat = new QStandardItem(true);
@@ -2268,7 +2268,7 @@ void MidiTrackInfo::updateTableHeader()
 	_patchModel->setHorizontalHeaderItem(1, pid);
 	//patchList->setColumnWidth(0, 1);
 	patchList->setColumnHidden(1, true);
-}
+}/*}}}*/
 
 void MidiTrackInfo::patchSequenceInserted(QModelIndex /*index*/, int start, int end)
 {

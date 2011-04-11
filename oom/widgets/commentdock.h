@@ -5,10 +5,10 @@
 //  (C) Copyright 2001 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#ifndef __COMMENT_H__
-#define __COMMENT_H__
+#ifndef __COMMENTDOCK_H__
+#define __COMMENTDOCK_H__
 
-#include "ui_commentbase.h"
+#include "ui_commentdockbase.h"
 
 class Xml;
 class Track;
@@ -18,39 +18,27 @@ class QWidget;
 //   Comment
 //---------------------------------------------------------
 
-class Comment : public QWidget, public Ui::CommentBase
+class CommentDock : public QWidget, public Ui::CommentDockBase
 {
     Q_OBJECT
 
 private:
-    virtual void setText(const QString& s) = 0;
+    Track* m_track;
 
 private slots:
     void textChanged();
-
-public:
-    Comment(QWidget* parent);
-};
-
-//---------------------------------------------------------
-//   TrackComment
-//---------------------------------------------------------
-
-class TrackComment : public Comment
-{
-    Track* m_track;
-    Q_OBJECT
-
-private:
-    virtual void setText(const QString& s);
-
-private slots:
+	void songCommentChanged();
     void songChanged(int);
 
 public:
-    TrackComment(Track*, QWidget*);
-	void setTrack(Track* t) { m_track = t; }
+    CommentDock(QWidget* parent = 0, Track* t = 0);
+	void setTrack(Track* t) 
+	{ 
+		m_track = t; 
+		updateComments();
+	}
 	Track* track() { return m_track; }
+	void updateComments();
 };
 
 #endif

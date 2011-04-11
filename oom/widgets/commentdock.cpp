@@ -5,7 +5,7 @@
 //  (C) Copyright 2001 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#include "comment.h"
+#include "commentdock.h"
 #include "song.h"
 #include "track.h"
 
@@ -15,44 +15,74 @@
 //   Comment
 //---------------------------------------------------------
 
-Comment::Comment(QWidget* parent)
+CommentDock::CommentDock(QWidget* parent, Track* t)
 : QWidget(parent)
 {
 	setupUi(this);
+	m_track = t;
+	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+	connect(textentry, SIGNAL(textChanged()), this, SLOT(textChanged()));
+	connect(songComment, SIGNAL(textChanged()), this, SLOT(songCommentChanged()));
+	updateComments();
 }
 
 //---------------------------------------------------------
 //   textChanged
 //---------------------------------------------------------
 
-void Comment::textChanged()
+void CommentDock::textChanged()
 {
-	setText(textentry->toPlainText());
+	//printf("CommentDock::textChanged()\n");
+	if(!m_track)
+		return;
+	//setText(textentry->toPlainText());
+	QString tcomment = textentry->toPlainText();
+	if(tcomment != m_track->comment())
+	{
+		m_track->setComment(tcomment);
+		song->dirty = true;
+	}
+	song->update(SC_TRACK_MODIFIED);
+}
+
+void CommentDock::songCommentChanged()
+{
+	printf("CommentDock::songCommentChanged()\n");
+	song->setSongInfo(songComment->toPlainText());
 }
 
 //---------------------------------------------------------
 //   TrackComment
 //---------------------------------------------------------
 
-TrackComment::TrackComment(Track* t, QWidget* parent)
-: Comment(parent)
+void CommentDock::updateComments()
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	setWindowTitle(tr("OOMidi: Track Comment"));
-	m_track = t;
-	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
-	textentry->setText(m_track->comment());
-	textentry->moveCursor(QTextCursor::End);
-	connect(textentry, SIGNAL(textChanged()), SLOT(textChanged()));
-	label1->setText(tr("Track Comment:"));
-	label2->setText(m_track->name());
+	songComment->blockSignals(true);
+	songComment->setText(song->getSongInfo());
+	songComment->blockSignals(false);
+	if(m_track)
+	{
+		textentry->blockSignals(true);
+		textentry->setText(m_track->comment());
+		textentry->blockSignals(false);
+		textentry->moveCursor(QTextCursor::End);
+		label1->setText(tr("Track Comments:"));
+		label2->setText(m_track->name());
+	}
+	else
+	{
+		textentry->blockSignals(true);
+		textentry->setText("");
+		textentry->blockSignals(false);
+		label2->setText(tr("Select Track"));
+	}
 }
 
 //---------------------------------------------------------
 //   songChanged
 //---------------------------------------------------------
 
-void TrackComment::songChanged(int flags)
+void CommentDock::songChanged(int flags)
 {
 	if ((flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED)) == 0)
 		return;
@@ -70,6 +100,8 @@ void TrackComment::songChanged(int flags)
 		close();
 		return;
 	}
+	updateComments();
+	/*
 	label2->setText(m_track->name());
 	if (m_track->comment() != textentry->toPlainText())
 	{
@@ -80,15 +112,9 @@ void TrackComment::songChanged(int flags)
 		textentry->moveCursor(QTextCursor::End);
 		//connect(textentry, SIGNAL(textChanged()), this, SLOT(textChanged()));
 	}
-}
-
-//---------------------------------------------------------
-//   setText
-//---------------------------------------------------------
-
-void TrackComment::setText(const QString& s)
-{
-	m_track->setComment(s);
-	song->update(SC_TRACK_MODIFIED);
+	songInfoText->blockSignals(true);
+	songInfoText->setText(song->getSongInfo());
+	songInfoText->blockSignals(true);
+	*/
 }
 
