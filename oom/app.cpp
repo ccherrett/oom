@@ -1714,9 +1714,8 @@ void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAl
 	if (restartSequencer)
 		seqStart();
 
-	if (song->getSongInfo().length() > 0)
-		startSongInfo(false);
-	//audio->preloadControllers();
+	//if (song->getSongInfo().length() > 0)
+	//	startSongInfo(false);
 	QApplication::restoreOverrideCursor();
 }
 
