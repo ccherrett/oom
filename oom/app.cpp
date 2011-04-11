@@ -2404,7 +2404,7 @@ void OOMidi::closeEvent(QCloseEvent* event)
 		n = QMessageBox::warning(this, appName,
 				tr("The current Project contains unsaved data\n"
 				"Save Current Project?"),
-				tr("&Save"), tr("&Skip"), tr("&Cancel"), 0, 2);
+				tr("&Save"), tr("&Dont' Save"), tr("&Cancel"), 0, 2);
 		if (n == 0)
 		{
 			if (!save()) // dont quit if save failed
