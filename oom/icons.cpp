@@ -480,6 +480,12 @@ QPixmap* addTVIcon;
 QPixmap* oomIcon;
 QPixmap* aboutOOMidiImage;
 QPixmap* oomLeftSideLogo;
+QPixmap* reminder1_OnIcon;
+QPixmap* reminder1_OffIcon;
+QPixmap* reminder2_OnIcon;
+QPixmap* reminder2_OffIcon;
+QPixmap* reminder3_OnIcon;
+QPixmap* reminder3_OffIcon;
 
 QIcon* globalIcon;
 QIcon* projectIcon;
@@ -735,6 +741,12 @@ void initIcons()
       automationDisabledIcon                        = new MPIXMAP(":/images/icons/automation_disabled.png", NULL);
       portDisabledIcon                              = new MPIXMAP(":/images/icons/ports_disabled.png", NULL);
       addTVIcon                              		= new MPIXMAP(":/images/icons/add_tv.png", NULL);
+      reminder1_OnIcon                              = new MPIXMAP(":/images/icons/reminder1_on.png", NULL);
+      reminder1_OffIcon                        		= new MPIXMAP(":/images/icons/reminder_off.png", NULL);
+      reminder2_OnIcon                              = new MPIXMAP(":/images/icons/reminder2_on.png", NULL);
+      reminder2_OffIcon                        		= new MPIXMAP(":/images/icons/reminder_off.png", NULL);
+      reminder3_OnIcon                              = new MPIXMAP(":/images/icons/reminder3_on.png", NULL);
+      reminder3_OffIcon                        		= new MPIXMAP(":/images/icons/reminder_off.png", NULL);
 
       oomIcon                                      = new MPIXMAP(oom_icon_xpm, NULL);
       aboutOOMidiImage                             = new MPIXMAP(":/images/oom-about.png", NULL);

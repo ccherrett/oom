@@ -261,38 +261,28 @@ void TList::paint(const QRect& r)/*{{{*/
 					break;
 				case COL_CLASS:
 				{
-					const QPixmap* pm = 0;
-					switch (type)
-					{
-						case Track::MIDI:
-							pm = addtrack_addmiditrackIcon;
-							break;
-						case Track::DRUM:
-							pm = addtrack_drumtrackIcon;
-							break;
-						case Track::WAVE:
-							pm = addtrack_wavetrackIcon;
-							break;
-						case Track::AUDIO_OUTPUT:
-							pm = addtrack_audiooutputIcon;
-							break;
-						case Track::AUDIO_INPUT:
-							pm = addtrack_audioinputIcon;
-							break;
-						case Track::AUDIO_BUSS:
-							pm = addtrack_audiogroupIcon;
-							break;
-						case Track::AUDIO_AUX:
-							pm = addtrack_auxsendIcon;
-							break;
-						case Track::AUDIO_SOFTSYNTH:
-							//pm = waveIcon;
-							pm = synthIcon;
-							break;
-					}
-					//drawCenteredPixmap(p, pm, r);
-				}
+					if (track->getReminder1())
+						drawCenteredPixmap(p, reminder1_OnIcon, r);
+					else
+						drawCenteredPixmap(p, reminder1_OffIcon, r);
 					break;
+				}
+				case COL_OCHANNEL:
+				{
+					if (track->getReminder2())
+						drawCenteredPixmap(p, reminder2_OnIcon, r);
+					else
+						drawCenteredPixmap(p, reminder2_OffIcon, r);
+					break;
+				}
+				case COL_OPORT:
+				{
+					if (track->getReminder3())
+						drawCenteredPixmap(p, reminder3_OnIcon, r);
+					else
+						drawCenteredPixmap(p, reminder3_OffIcon, r);
+					break;
+				}
 				case COL_MUTE:
 					if (track->off())
 						drawCenteredPixmap(p, offIcon, r);
@@ -327,55 +317,6 @@ void TList::paint(const QRect& r)/*{{{*/
 					break;
 				case COL_NAME:
 					p.drawText(r, Qt::AlignLeft | Qt::AlignVCenter, track->name());
-					break;
-				case COL_OCHANNEL:
-				{
-					QString s;
-					int n;
-					if (track->isMidiTrack())
-					{
-						n = ((MidiTrack*) track)->outChannel() + 1;
-					}
-					else
-					{
-						// show number of ports
-						n = ((WaveTrack*) track)->channels();
-					}
-					s.setNum(n);
-					//p.drawText(r, Qt::AlignVCenter | Qt::AlignHCenter, s);
-				}
-					break;
-				case COL_OPORT:
-				{
-					/*QString s;
-					if (track->isMidiTrack())
-					{
-						int outport = ((MidiTrack*) track)->outPort();
-						s.sprintf("%d:%s", outport + 1, midiPorts[outport].portname().toLatin1().constData());
-					}
-						// Added by Tim. p3.3.9
-
-					else
-						if (track->type() == Track::AUDIO_SOFTSYNTH)
-					{
-						MidiDevice* md = dynamic_cast<MidiDevice*> (track);
-						if (md)
-						{
-							int outport = md->midiPort();
-							if ((outport >= 0) && (outport < MIDI_PORTS))
-								s.sprintf("%d:%s", outport + 1, midiPorts[outport].portname().toLatin1().constData());
-							else
-								s = tr("<none>");
-						}
-					}
-
-					p.drawText(r, Qt::AlignVCenter | Qt::AlignLeft, s);
-					*/
-					if(track->isMidiTrack() || track->type() == Track::AUDIO_SOFTSYNTH)
-						drawCenteredPixmap(p, portIcon, r);
-					else
-						drawCenteredPixmap(p, portDisabledIcon, r);
-				}
 					break;
 				case COL_AUTOMATION:
 				{
@@ -1271,20 +1212,17 @@ void TList::mousePressEvent(QMouseEvent* ev)
 			case COL_NONE:
 				break;
 			case COL_CLASS:
-				//if (t->isMidiTrack())
-				//	classesPopupMenu(t, x, t->y() - ypos);
+				t->setReminder1(!t->getReminder1());
+				break;
+			case COL_OCHANNEL:
+			{
+				t->setReminder2(!t->getReminder2());
+			}
 				break;
 			case COL_OPORT:
-				if (button == Qt::LeftButton && valid)
-				{
-					portsPopupMenu(t, x, t->y() - ypos);
-				}
-				else
-				{
-					updateSelection(t, shift);
-				}
-				//else if (button == Qt::RightButton)
-				//	oportPropertyPopupMenu(t, x, t->y() - ypos);
+			{
+				t->setReminder3(!t->getReminder3());
+			}
 				break;
 			case COL_MUTE:
 				if(valid)
@@ -1717,63 +1655,6 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				//t->setLocked(!t->locked());
 				break;
 
-			case COL_OCHANNEL:
-			{
-				/*int delta = 0;
-				if (button == Qt::RightButton)
-					delta = 1;
-				else if (button == Qt::MidButton)
-					delta = -1;
-				if (t->isMidiTrack())
-				{
-					MidiTrack* mt = dynamic_cast<MidiTrack*> (t);
-					if (mt == 0)
-						break;
-
-					int channel = mt->outChannel();
-					channel += delta;
-					if (channel >= MIDI_CHANNELS)
-						channel = MIDI_CHANNELS - 1;
-					if (channel < 0)
-						channel = 0;
-					//if (channel != ((MidiTrack*)t)->outChannel())
-					if (channel != mt->outChannel())
-					{
-						// Changed by T356.
-						//mt->setOutChannel(channel);
-						audio->msgIdle(true);
-						//audio->msgSetTrackOutChannel(mt, channel);
-						mt->setOutChanAndUpdate(channel);
-						audio->msgIdle(false);
-
-						// may result in adding/removing mixer strip:
-						//song->update(-1);
-						//song->update(SC_CHANNELS);
-						song->update(SC_MIDI_TRACK_PROP);
-					}
-				}
-				else
-				{
-					if (t->type() != Track::AUDIO_SOFTSYNTH)
-					{
-						AudioTrack* at = dynamic_cast<AudioTrack*> (t);
-						if (at == 0)
-							break;
-
-						int n = t->channels() + delta;
-						if (n > MAX_CHANNELS)
-							n = MAX_CHANNELS;
-						else if (n < 1)
-							n = 1;
-						if (n != t->channels())
-						{
-							audio->msgSetChannels(at, n);
-							song->update(SC_CHANNELS);
-						}
-					}
-				}*/
-			}
-				break;
 		}
 	redraw();
 }

@@ -155,6 +155,9 @@ void Track::init()
 	_internalSolo = 0;
 	_off = false;
 	_channels = 0; // 1 - mono, 2 - stereo
+	_reminder1 = false;
+	_reminder2 = false;
+	_reminder3 = false;
 
 	_volumeEnCtrl = true;
 	_volumeEn2Ctrl = true;
@@ -726,6 +729,9 @@ void Track::writeProperties(int level, Xml& xml) const
 	xml.intTag(level, "channels", _channels);
 	xml.intTag(level, "height", _height);
 	xml.intTag(level, "locked", _locked);
+	xml.intTag(level, "reminder1", _reminder1);
+	xml.intTag(level, "reminder2", _reminder2);
+	xml.intTag(level, "reminder3", _reminder3);
 	if (_selected)
 		xml.intTag(level, "selected", _selected);
 }
@@ -764,6 +770,12 @@ bool Track::readProperties(Xml& xml, const QString& tag)
 		_locked = xml.parseInt();
 	else if (tag == "selected")
 		_selected = xml.parseInt();
+	else if (tag == "reminder1")
+		_reminder1 = (bool)xml.parseInt();
+	else if (tag == "reminder2")
+		_reminder2 = (bool)xml.parseInt();
+	else if (tag == "reminder3")
+		_reminder3 = (bool)xml.parseInt();
 	else
 		return true;
 	return false;

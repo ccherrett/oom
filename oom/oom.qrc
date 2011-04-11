@@ -122,6 +122,10 @@
 		<file>images/icons/x.png</file>
 		<file>images/icons/detach.png</file>
 		<file>images/icons/audition.png</file>
+		<file>images/icons/reminder_off.png</file>
+		<file>images/icons/reminder1_on.png</file>
+		<file>images/icons/reminder2_on.png</file>
+		<file>images/icons/reminder3_on.png</file>
 	</qresource>
 </RCC>
 

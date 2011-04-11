@@ -48,6 +48,10 @@ private:
     PartList _parts;
 
     void init();
+	bool _reminder1;
+	bool _reminder2;
+	bool _reminder3;
+
 
 protected:
     static unsigned int _soloRefCnt;
@@ -98,6 +102,31 @@ public:
     virtual Track & operator=(const Track& t);
 
     static const char* _cname[];
+	
+	bool getReminder1()
+	{
+		return _reminder1;
+	}
+	void setReminder1(bool r)
+	{
+		_reminder1 = r;
+	}
+	bool getReminder2()
+	{
+		return _reminder2;
+	}
+	void setReminder2(bool r)
+	{
+		_reminder2 = r;
+	}
+	bool getReminder3()
+	{
+		return _reminder3;
+	}
+	void setReminder3(bool r)
+	{
+		_reminder3 = r;
+	}
 
     QString comment() const
     {
