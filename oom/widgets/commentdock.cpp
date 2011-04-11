@@ -20,7 +20,7 @@ CommentDock::CommentDock(QWidget* parent, Track* t)
 {
 	setupUi(this);
 	m_track = t;
-	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+	//connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	connect(textentry, SIGNAL(textChanged()), this, SLOT(textChanged()));
 	connect(songComment, SIGNAL(textChanged()), this, SLOT(songCommentChanged()));
 	updateComments();
@@ -47,7 +47,7 @@ void CommentDock::textChanged()
 
 void CommentDock::songCommentChanged()
 {
-	printf("CommentDock::songCommentChanged()\n");
+	//printf("CommentDock::songCommentChanged()\n");
 	song->setSongInfo(songComment->toPlainText());
 }
 
@@ -84,9 +84,9 @@ void CommentDock::updateComments()
 
 void CommentDock::songChanged(int flags)
 {
-	if ((flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED)) == 0)
+	if (flags & !(SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED))
 		return;
-
+	printf("CommentDock::songChanged() after flag check\n");
 	// check if track still exists:
 	TrackList* tl = song->tracks();
 	iTrack it;
@@ -97,7 +97,7 @@ void CommentDock::songChanged(int flags)
 	}
 	if (it == tl->end())
 	{
-		close();
+		//close();
 		return;
 	}
 	updateComments();
