@@ -195,7 +195,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 			TrackView *tv = song->findTrackView(tvcol->text());
 			if(tv)
 			{
-				QMenu* p = new QMenu(this);/*{{{*/
+				QMenu* p = new QMenu(this);
 				TrackViewMenu *item = new TrackViewMenu(p, tv, (chkViewAll->checkState() == Qt::Checked));
 				p->addAction(item);
 
@@ -209,7 +209,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 						oom->arranger->addCanvasPart(track);
 					}
 				}
-				delete p;/*}}}*/
+				delete p;
 			}
 		}
 	}

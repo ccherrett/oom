@@ -3654,6 +3654,7 @@ void OOMidi::startListEditor(PartList* pl)
 void OOMidi::startMasterEditor()
 {
 	MasterEdit* masterEditor = new MasterEdit();
+	masterEditor->installEventFilter(oom);
 	masterEditor->show();
 	toplevels.push_back(Toplevel(Toplevel::MASTER, (unsigned long) (masterEditor), masterEditor));
 	connect(masterEditor, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
@@ -3914,8 +3915,9 @@ bool OOMidi::eventFilter(QObject *obj, QEvent *event)
 
 	}
 
-	QAbstractItemView* absItemView = qobject_cast<QAbstractItemView*>(obj);
-	if (absItemView && keyEvent)
+	//QAbstractItemView* absItemView = qobject_cast<QAbstractItemView*>(obj);
+	//if (absItemView && keyEvent)
+	if (keyEvent)
 	{
 		if (key == shortcuts[SHRT_PLAY_TOGGLE].key)
 		{
