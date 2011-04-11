@@ -1060,7 +1060,7 @@ QWidget#mitPluginTranspose QLabel#transposeLabel
 }
 
 /* Midi transform */
-QListWidget#presetList {
+QListWidget#presetList, QListWidget#TrackViewMenuList {
 	 border-radius: 6px;
      border: 1px solid #211f23;
 	 background-color: #d8dbe8;
