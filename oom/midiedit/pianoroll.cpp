@@ -1693,6 +1693,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 			audio->msgSetSolo(t, !t->solo());
 			song->update(SC_SOLO);
 		}
+		return;
 	}
 	else if (key == shortcuts[SHRT_TOGGLE_SOUND].key)
 	{
