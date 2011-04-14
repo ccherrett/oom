@@ -17,6 +17,8 @@
 #include <QMimeData>
 #include <QByteArray>
 #include <QDrag>
+#include <QMenu>
+#include <QAction>
 
 #include "xml.h"
 #include "midieditor.h"
@@ -272,6 +274,235 @@ MidiTrack* EventCanvas::track() const
 	return ((MidiPart*) _curPart)->track();
 }
 
+//---------------------------------------------------------
+//   viewMousePressEvent
+//---------------------------------------------------------
+
+void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
+{
+	///keyState = event->state();
+	_keyState = ((QInputEvent*) event)->modifiers();
+	_button = event->button();
+
+	//printf("viewMousePressEvent buttons:%x mods:%x button:%x\n", (int)event->buttons(), (int)keyState, event->button());
+
+	// special events if right button is clicked while operations
+	// like moving or drawing lasso is performed.
+	///if (event->stateAfter() & Qt::RightButton) {
+	if (event->buttons() & Qt::RightButton & ~(event->button()))
+	{
+		//printf("viewMousePressEvent special buttons:%x mods:%x button:%x\n", (int)event->buttons(), (int)keyState, event->button());
+		switch (_drag)
+		{
+		case DRAG_LASSO:
+			_drag = DRAG_OFF;
+			redraw();
+			return;
+		case DRAG_MOVE:
+			_drag = DRAG_OFF;
+			endMoveItems(_start, MOVE_MOVE, 0);
+			return;
+		default:
+			break;
+		}
+	}
+
+	// ignore event if (another) button is already active:
+	///if (keyState & (Qt::LeftButton|Qt::RightButton|Qt::MidButton)) {
+	if (event->buttons() & (Qt::LeftButton | Qt::RightButton | Qt::MidButton) & ~(event->button()))
+	{
+		//printf("viewMousePressEvent ignoring buttons:%x mods:%x button:%x\n", (int)event->buttons(), (int)keyState, event->button());
+		return;
+	}
+	bool shift = _keyState & Qt::ShiftModifier;
+	bool alt = _keyState & Qt::AltModifier;
+	bool ctrl = _keyState & Qt::ControlModifier;
+	_start = event->pos();
+
+	//---------------------------------------------------
+	//    set curItem to item mouse is pointing
+	//    (if any)
+	//---------------------------------------------------
+
+	CItemList list = getItemlistForCurrentPart();
+	if (virt())
+		_curItem = list.find(_start);//_items.find(_start);
+	else
+	{
+		_curItem = 0; //selectAtTick(_start.x());
+		iCItem ius;
+		bool usfound = false;
+		for (iCItem i = list.begin(); i != list.end(); ++i)
+		{
+			QRect box = i->second->bbox();
+			int x = rmapxDev(box.x());
+			int y = rmapyDev(box.y());
+			int w = rmapxDev(box.width());
+			int h = rmapyDev(box.height());
+			QRect r(x, y, w, h);
+			///r.moveBy(i->second->pos().x(), i->second->pos().y());
+			r.translate(i->second->pos().x(), i->second->pos().y());
+			if (r.contains(_start))
+			{
+				if (i->second->isSelected())
+				{
+					_curItem = i->second;
+					break;
+				}
+				else if (!usfound)
+				{
+					ius = i;
+					usfound = true;
+				}
+			}
+		}
+		if (!_curItem && usfound)
+			_curItem = ius->second;
+		
+	}
+
+	if (_curItem && (event->button() == Qt::MidButton))
+	{
+		if (!_curItem->isSelected())
+		{
+			selectItem(_curItem, true);
+			updateSelection();
+			redraw();
+		}
+		startDrag(_curItem, shift);
+	}
+	else if (event->button() == Qt::RightButton)
+	{
+		if (_curItem)
+		{
+			if (shift)
+			{
+				_drag = DRAG_RESIZE;
+				setCursor();
+				int dx = _start.x() - _curItem->x();
+				_curItem->setWidth(dx);
+				_start.setX(_curItem->x());
+				deselectAll();
+				selectItem(_curItem, true);
+				updateSelection();
+				redraw();
+			}
+			else
+			{
+				_itemPopupMenu = genItemPopup(_curItem);
+				if (_itemPopupMenu)
+				{
+					QAction *act = _itemPopupMenu->exec(QCursor::pos());
+					if (act)
+						itemPopup(_curItem, act->data().toInt(), _start);
+					delete _itemPopupMenu;
+				}
+			}
+		}
+		else
+		{
+			_canvasPopupMenu = genCanvasPopup();
+			if (_canvasPopupMenu)
+			{
+				QAction *act = _canvasPopupMenu->exec(QCursor::pos(), 0);
+				if (act)
+					canvasPopup(act->data().toInt());
+				delete _canvasPopupMenu;
+			}
+		}
+	}
+	else if (event->button() == Qt::LeftButton)
+	{
+		switch (_tool)
+		{
+		case PointerTool:
+			if (_curItem)
+			{
+				/*if (_curItem->part() != _curPart)
+				{
+					_curPart = _curItem->part();
+					_curPartId = _curPart->sn();
+					curPartChanged();
+				}*/
+				itemPressed(_curItem);
+				// Changed by T356. Alt is default reserved for moving the whole window in KDE. Changed to Shift-Alt.
+				// Hmm, nope, shift-alt is also reserved sometimes. Must find a way to bypass,
+				//  why make user turn off setting? Left alone for now...
+				if (shift)
+					_drag = DRAG_COPY_START;
+				else if (alt)
+				{
+					_drag = DRAG_CLONE_START;
+				}
+				//
+				//if (shift)
+				//{
+				//  if (alt)
+				//    drag = DRAG_CLONE_START;
+				//  else
+				//    drag = DRAG_COPY_START;
+				//}
+				else if (ctrl)
+				{ //Select all on the same pitch (e.g. same y-value)
+					deselectAll();
+					//printf("Yes, ctrl and press\n");
+					for (iCItem i = _items.begin(); i != _items.end(); ++i)
+					{
+						if (i->second->y() == _curItem->y())
+							selectItem(i->second, true);
+					}
+					updateSelection();
+					redraw();
+				}
+				else
+					_drag = DRAG_MOVE_START;
+			}
+			else
+				_drag = DRAG_LASSO_START;
+			setCursor();
+			break;
+
+			case RubberTool:
+			deleteItem(_start);
+			_drag = DRAG_DELETE;
+			setCursor();
+			break;
+
+			case PencilTool:
+			if (_curItem)
+			{
+				_drag = DRAG_RESIZE;
+				setCursor();
+				int dx = _start.x() - _curItem->x();
+				_curItem->setWidth(dx);
+				_start.setX(_curItem->x());
+			}
+			else
+			{
+				_drag = DRAG_NEW;
+				setCursor();
+				_curItem = newItem(_start, event->modifiers());
+				if (_curItem)
+					_items.add(_curItem);
+				else
+				{
+					_drag = DRAG_OFF;
+					setCursor();
+				}
+			}
+			deselectAll();
+			if (_curItem)
+				selectItem(_curItem, true);
+			updateSelection();
+			redraw();
+			break;
+
+			default:
+			break;
+		}
+	}
+	mousePress(event);
+}/*}}}*/
 
 //---------------------------------------------------------
 //   keyPress
