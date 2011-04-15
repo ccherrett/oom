@@ -1367,7 +1367,7 @@ void PartCanvas::mousePress(QMouseEvent* event)
 					Track * t = y2Track(event->pos().y());
 					if (t) {
 						CtrlListList* cll = ((AudioTrack*) t)->controller();
-						for(CtrlListList::iterator icll =cll->begin();icll!=cll->end();++icll)
+						for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 						{
 							//iCtrlList *icl = icll->second;
 							CtrlList *cl = icll->second;
@@ -1378,6 +1378,12 @@ void PartCanvas::mousePress(QMouseEvent* event)
 						}
 					}	
 				}	
+			}
+			else
+			{
+				Track * t = y2Track(event->pos().y());
+				if(t)
+					selectAutomation(t, event->pos());
 			}
 
 			if (automation.currentCtrlVal && event->modifiers() & Qt::ShiftModifier)
@@ -4190,7 +4196,7 @@ void PartCanvas::drawTooltipText(QPainter& p, const QRect& rr, int height, doubl
 //    controller added.
 //---------------------------------------------------------
 
-void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)
+void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)/*{{{*/
 {
 	int circumference = 15;
 	if (t->isMidiTrack())
@@ -4220,7 +4226,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 
 		// First check that there ARE automation, ic == cl->end means no automation
 		if (ic != cl->end()) {
-			for (; ic !=cl->end(); ic++)
+			for (; ic !=cl->end(); ic++)/*{{{*/
 			{
 				CtrlVal &cv = ic->second;
 				double y;
@@ -4274,7 +4280,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 						return;
 				}
 				
-			}
+			}/*}}}*/
 		} // if
 
 		if (addNewCtrl)
@@ -4305,7 +4311,89 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 	}
 
 	setCursor();
-}
+}/*}}}*/
+void PartCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
+{
+	int circumference = 15;
+	if (t->isMidiTrack())
+	{
+		return;
+	}
+
+	//printf("selectAutomation p.x()=%d p.y()=%d\n", mapx(pointer.x()), mapx(pointer.y()));
+
+	int currY =  mapy(pointer.y());
+
+	CtrlListList* cll = ((AudioTrack*) t)->controller();
+	cll->deselectAll();
+	for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+	{
+		CtrlList *cl = icll->second;
+		if (cl->dontShow() || !cl->isVisible()) {
+			continue;
+		}
+		//cl->setSelected(false);
+		iCtrl ic=cl->begin();
+
+		int oldY=-1;
+		int ypixel;
+
+		// First check that there ARE automation, ic == cl->end means no automation
+		if (ic != cl->end()) {
+			for (; ic !=cl->end(); ic++)/*{{{*/
+			{
+				CtrlVal &cv = ic->second;
+				double y;
+				if (cl->id() == AC_VOLUME ) { // use db scale for volume
+					y = dbToVal(cv.val); // represent volume between 0 and 1
+					if (y < 0) y = 0;
+				}
+				else {
+					// we need to set curVal between 0 and 1
+					double min, max;
+					cl->range(&min,&max);
+					y = ( cv.val - min)/(max-min);
+				}
+
+				int yy = track2Y(t) + t->height();
+
+				ypixel = mapy(yy-2-y*t->height());
+
+				if (oldY==-1) oldY = ypixel;
+
+				//printf("point at x=%d xdiff=%d y=%d ydiff=%d\n", mapx(tempomap.frame2tick(cv.frame)), x1, mapx(ypixel), y1);
+				oldY = ypixel;
+			}/*}}}*/
+		} // if
+		// check if we are reasonably close to a line, we only need to check Y
+		// as the line is straight after the last controller
+		bool foundIt=false;
+		if ( ypixel == oldY && abs(currY-ypixel) < circumference) {
+			foundIt=true;
+		}
+
+		if (foundIt)
+		{
+			//printf("Selecting closest automation line\n");
+			automation.controllerState = doNothing;
+			automation.currentCtrlList = cl;
+			automation.currentCtrlList->setSelected(true);
+			automation.currentTrack = t;
+			automation.currentCtrlVal = 0;
+			redraw();
+			return;
+		}
+	}
+	// if there are no hits we default to clearing all the data
+	automation.controllerState = doNothing;
+	if (automation.currentCtrlVal)
+	{
+		automation.currentCtrlVal = 0;
+		redraw();
+	}
+
+	setCursor();
+}/*}}}*/
 
 
 void PartCanvas::controllerChanged(Track* /* t */)

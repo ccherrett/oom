@@ -366,3 +366,10 @@ void CtrlListList::add(CtrlList* vl)
 	insert(std::pair<const int, CtrlList*>(vl->id(), vl));
 }
 
+void CtrlListList::deselectAll()
+{
+	for(CtrlListList::iterator icll = begin(); icll != end(); ++icll)
+	{
+		icll->second->setSelected(false);
+	}
+}

@@ -252,6 +252,8 @@ public:
     {
         return std::map<int, CtrlList*, std::less<int> >::find(id);
     }
+
+	void deselectAll();
 };
 
 #endif
