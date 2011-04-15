@@ -884,25 +884,35 @@ TrackList TList::getRecEnabledTracks()
 
 void TList::changeAutomation(QAction* act)
 {
-	printf("changeAutomation!\n");
-	//if (editTrack->type() == Track::MIDI)
+	//printf("changeAutomation!\n");
 	if (editAutomation->type() == Track::MIDI)
 	{
 		printf("this is wrong, we can't edit automation for midi tracks from arranger yet!\n");
 		return;
 	}
 
-	//CtrlListList* cll = ((AudioTrack*) editTrack)->controller();
 	CtrlListList* cll = ((AudioTrack*)editAutomation)->controller();
-	//int index = 0;
 	for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 	{
-		//if (act->data() == index++)
-		//{ // got it, change state
 		CtrlList *cl = icll->second;
 		if (act->data() == cl->id())  // got it, change state
+		{
 			cl->setVisible(!cl->isVisible());
-		//}
+			if(cl->id() == AC_PAN)
+			{
+				AutomationType at = ((AudioTrack*) editAutomation)->automationType();
+				if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
+					((AudioTrack*) editAutomation)->enablePanController(false);
+			
+				double panVal = ((AudioTrack*) editAutomation)->pan();
+				audio->msgSetPan(((AudioTrack*) editAutomation), panVal);
+				((AudioTrack*) editAutomation)->startAutoRecord(AC_PAN, panVal);
+
+				if (((AudioTrack*) editAutomation)->automationType() != AUTO_WRITE)
+					((AudioTrack*) editAutomation)->enablePanController(true);
+				((AudioTrack*) editAutomation)->stopAutoRecord(AC_PAN, panVal);
+			}
+		}
 	}
 	song->update(SC_TRACK_MODIFIED);
 }
@@ -1125,7 +1135,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 					{
 						CtrlList *cl = icll->second;
-						printf("id = %d", cl->id());
+						//printf("id = %d", cl->id());
 						if (cl->dontShow())
 							continue;
 						act = p->addAction(cl->name());
