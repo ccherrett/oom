@@ -774,9 +774,9 @@ void MidiInstrument::read(Xml& xml)
 				}
 				else if(tag == "KeyMap")
 				{
-					KeyMap km;
-					km.read(xml);
-					m_keymaps.insert(km.key, km);
+					KeyMap *km = new KeyMap;
+					km->read(xml);
+					m_keymaps.insert(km->key, km);
 				}
 				else
 					xml.unknown("MidiInstrument");
@@ -835,10 +835,10 @@ void MidiInstrument::write(int level, Xml& xml)
 	}
 	for (iMidiController ic = _controller->begin(); ic != _controller->end(); ++ic)
 		ic->second->write(level, xml);
-	for(QHash<int, KeyMap>::const_iterator km = m_keymaps.begin(); km != m_keymaps.end(); ++km)
+	for(QHash<int, KeyMap*>::const_iterator km = m_keymaps.begin(); km != m_keymaps.end(); ++km)
 	{
-		KeyMap m = km.value();
-		m.write(level, xml);
+		KeyMap *m = km.value();
+		m->write(level, xml);
 	}
 	level--;
 	xml.etag(level, "MidiInstrument");

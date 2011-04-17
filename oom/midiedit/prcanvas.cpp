@@ -798,20 +798,6 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 		}
 	}
 
-	MidiInstrument* instr = midiPorts[port].instrument();
-	if(instr)
-	{
-		if(instr->hasMapping(pitch))
-		{
-			KeyMap km = instr->keymap(pitch);
-			int pr = km.program & 0xff;
-			if (km.program != CTRL_VAL_UNKNOWN && pr != 0xff)
-			{
-				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, km.program);
-				audio->msgPlayMidiEvent(&ev);
-			}
-		}
-	}
 }
 
 //---------------------------------------------------------
@@ -1578,6 +1564,42 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		}
     }*/ //}}}
 	}
+
+	//Handle any keyswitching at this stage
+	int port = track()->outPort();
+	int channel = track()->outChannel();
+	MidiInstrument* instr = midiPorts[port].instrument();/*{{{*/
+	if(instr)
+	{
+		if(instr->hasMapping(pitch))
+		{
+			KeyMap *km = instr->keymap(pitch);
+			int pr = km->program & 0xff;
+			printf("Recieved pianoPressed found mapping, program: %d, pr: %d, test: %d\n", km->program, pr, 0xff);
+			if (km->program != CTRL_VAL_UNKNOWN && pr != 0xff)
+			{
+				printf("Should be adding the program now\n");
+				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, km->program);
+				audio->msgPlayMidiEvent(&ev);
+
+				MidiPort* mport = &midiPorts[port];
+				int program = mport->hwCtrlState(channel, CTRL_PROGRAM);
+				//Check it again to make sure it was processed
+				if (program != CTRL_VAL_UNKNOWN && program != 0xffffff)
+				{
+
+					unsigned tick = song->cpos();
+					Event a(Controller);
+					a.setTick(tick);
+					a.setA(CTRL_PROGRAM);
+					a.setB(program);
+
+					song->recordEvent(track(), a);
+				}
+			}
+		}
+	}/*}}}*/
+	
 	//TODO: emit a signal to flash keyboard here
 	emit pitchChanged(pitch);
 }

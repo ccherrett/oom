@@ -93,7 +93,7 @@ class MidiInstrument
     PatchGroupList pg;
     MidiControllerList* _controller;
     QList<SysEx*> _sysex;
-	QHash<int, KeyMap> m_keymaps;
+	QHash<int, KeyMap*> m_keymaps;
     bool _dirty;
     int _nullvalue;
 
@@ -122,17 +122,16 @@ public:
         _name = txt;
     }
 
-	KeyMap newKeyMap(int key)
+	KeyMap* newKeyMap(int key)
 	{
 		if(m_keymaps.contains(key))
 		{
-			KeyMap km = keymap(key);
-			return km;
+			return keymap(key);
 		}
 		else
 		{
-			KeyMap km;
-			km.key = key;
+			KeyMap *km = new KeyMap;
+			km->key = key;
 			m_keymaps.insert(key, km);
 			return km;
 		}
@@ -145,7 +144,7 @@ public:
 		}
 		return m_keymaps.contains(key);
 	}
-	KeyMap keymap(int key)
+	KeyMap* keymap(int key)
 	{
 		if(hasMapping(key))
 			return m_keymaps.value(key);
@@ -155,7 +154,7 @@ public:
 		}
 	}
 	
-	QHash<int, KeyMap> *keymaps()
+	QHash<int, KeyMap*> *keymaps()
 	{
 		return &m_keymaps;
 	}

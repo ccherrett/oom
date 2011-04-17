@@ -955,8 +955,8 @@ void Piano::viewMouseMoveEvent(QMouseEvent* event)
 
 void Piano::viewMousePressEvent(QMouseEvent* event)
 {
-	if(m_menu)
-		return;
+	//if(m_menu)
+	//	return;
 	button = event->button();
 	shift  = event->modifiers() & Qt::ShiftModifier;
 	int c_pitch = y2pitch(event->y());
@@ -982,6 +982,8 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 		case Qt::RightButton:
 		{//this is where we launch the menu to add program and notes
 			printf("Right button click on key %d\n", c_pitch);
+    		button = Qt::NoButton;
+			//emit keyReleased(c_pitch, shift);
 			if(m_editor)
 			{
 				Part *curPart = m_editor->curCanvasPart();
@@ -992,17 +994,17 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 					{
 						MidiTrack *track = (MidiTrack*)trk;
 						int port = track->outPort();
-						int channel = track->outChannel();
+						//int channel = track->outChannel();
 						MidiInstrument* instr = midiPorts[port].instrument();
 						if(instr)
 						{
-							KeyMap km = instr->keymap(c_pitch);
+							KeyMap *km = instr->keymap(c_pitch);
 							QMenu* p = new QMenu(this);
-							KeyMapMenu *item = new KeyMapMenu(p, track, &km);
+							KeyMapMenu *item = new KeyMapMenu(p, track, km);
 							p->addAction(item);
 							m_menu = true;
 
-							QAction* act = p->exec(QCursor::pos());
+							p->exec(QCursor::pos());
 							delete p;
 							m_menu = false;
 						}
@@ -1020,24 +1022,12 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 
 void Piano::viewMouseReleaseEvent(QMouseEvent* event)
 {
-	if(m_menu)
-		return;
+	//if(m_menu)
+	//	return;
     shift = event->modifiers() & Qt::ShiftModifier;
-	switch(button)/*{{{*/
-	{
-		case Qt::LeftButton:
-		case Qt::MidButton:
-		{
-			if (keyDown != -1) {
-				emit keyReleased(keyDown, shift);
-				keyDown = -1;
-			}
-		}
-		break;
-		default:
-			break;
-	}/*}}}*/
-      button = Qt::NoButton;
+	emit keyReleased(keyDown, shift);
+	keyDown = -1;
+    button = Qt::NoButton;
 }
 
 void Piano::wheelEvent(QWheelEvent* ev)
