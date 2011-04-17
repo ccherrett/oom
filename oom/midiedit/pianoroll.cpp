@@ -487,7 +487,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//pcbar->setAudio(audio);
 	//pcbar->setEditor(this);
 	time = new MTScale(&_raster, split1, xscale);
-	/*Piano*/ piano = new Piano(split1, yscale);
+	/*Piano*/ piano = new Piano(split1, yscale, this);
     canvas = new PianoCanvas(this, split1, xscale, yscale);
     vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
 

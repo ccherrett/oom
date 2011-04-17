@@ -16,6 +16,7 @@ class QMouseEvent;
 class QPainter;
 class QPixmap;
 class QWheelEvent;
+class MidiEditor;
 
 #define KH  13
 
@@ -52,11 +53,22 @@ class Piano : public View
     int button;
 	QList<int> enabled;
 	QList<int> keyswitch;
+	bool m_menu;
+
+	MidiEditor *m_editor;
 
     Q_OBJECT
     int y2pitch(int) const;
     int pitch2y(int) const;
     void viewMouseMoveEvent(QMouseEvent* event);
+	void setEditor(MidiEditor *e)
+	{
+		m_editor = e;
+	}
+	MidiEditor* editor()
+	{
+		return m_editor;
+	}
     virtual void leaveEvent(QEvent*e);
 
     virtual void viewMousePressEvent(QMouseEvent* event);
@@ -76,7 +88,7 @@ public slots:
     void setPitch(int);
 
 public:
-    Piano(QWidget*, int);
+    Piano(QWidget*, int, MidiEditor*);
 	void setMIDIKeyBindings(QList<int>, QList<int>);
 };
 

@@ -28,6 +28,9 @@
 #include "xml.h"
 #include "prcanvas.h"
 #include "midiport.h"
+#include "minstrument.h"
+#include "midictrl.h"
+#include "midi.h"
 #include "event.h"
 #include "mpevent.h"
 #include "globals.h"
@@ -792,6 +795,21 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 		{
 			Pos p(tick, true);
 			song->setPos(0, p, true, false, true);
+		}
+	}
+
+	MidiInstrument* instr = midiPorts[port].instrument();
+	if(instr)
+	{
+		if(instr->hasMapping(pitch))
+		{
+			KeyMap km = instr->keymap(pitch);
+			int pr = km.program & 0xff;
+			if (km.program != CTRL_VAL_UNKNOWN && pr != 0xff)
+			{
+				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, km.program);
+				audio->msgPlayMidiEvent(&ev);
+			}
 		}
 	}
 }

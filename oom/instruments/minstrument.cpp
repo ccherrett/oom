@@ -526,7 +526,7 @@ void PatchGroup::read(Xml& xml)
 //   read
 //---------------------------------------------------------
 
-void Patch::read(Xml& xml)
+void Patch::read(Xml& xml)/*{{{*/
 {
 	typ = -1;
 	hbank = -1;
@@ -586,13 +586,13 @@ void Patch::read(Xml& xml)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   write
 //---------------------------------------------------------
 
-void Patch::write(int level, Xml& xml)
+void Patch::write(int level, Xml& xml)/*{{{*/
 {
 	xml.nput(level, "<Patch name=\"%s\"", Xml::xmlString(name).toLatin1().constData());
 	if (typ != -1)
@@ -631,8 +631,57 @@ void Patch::write(int level, Xml& xml)
 		xml.nput(" keyswitches=\"%s\"", keyString.toUtf8().constData());
 	}
 	xml.put(" />");
-}
+}/*}}}*/
 
+void KeyMap::read(Xml& xml)/*{{{*/
+{
+	program = -1;
+	pname = "";
+	comment = "";
+	key = -1;
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::TagStart:
+				xml.unknown("KeyMap");
+				break;
+			case Xml::Attribut:
+				if (tag == "comment")
+					comment = xml.s2();
+				else if (tag == "program")
+					program = xml.s2().toInt();
+				else if (tag == "key")
+					key = xml.s2().toInt();
+				else if (tag == "pname")
+					pname = xml.s2().toInt();
+				break;
+			case Xml::TagEnd:
+				if (tag == "KeyMap")
+					return;
+			default:
+				break;
+		}
+	}
+}/*}}}*/
+
+void KeyMap::write(int level, Xml& xml)/*{{{*/
+{
+	xml.nput(level, "<KeyMap key=\"%d\"", key);
+
+	xml.nput(" program=\"%d\"", program);
+
+	xml.nput(" comment=\"%s\"", Xml::xmlString(comment).toLatin1().constData());
+
+	xml.nput(" pname=\"%s\"", Xml::xmlString(pname).toLatin1().constData());
+
+	xml.put(" />");
+}/*}}}*/
 //---------------------------------------------------------
 //   readMidiState
 //---------------------------------------------------------
@@ -651,6 +700,7 @@ void MidiInstrument::read(Xml& xml)
 	bool ok;
 	int base = 10;
 	_nullvalue = -1;
+	m_keymaps.clear();
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -722,7 +772,12 @@ void MidiInstrument::read(Xml& xml)
 						memcpy(_initScript, istr, len);
 					}
 				}
-
+				else if(tag == "KeyMap")
+				{
+					KeyMap km;
+					km.read(xml);
+					m_keymaps.insert(km.key, km);
+				}
 				else
 					xml.unknown("MidiInstrument");
 				break;
@@ -780,6 +835,11 @@ void MidiInstrument::write(int level, Xml& xml)
 	}
 	for (iMidiController ic = _controller->begin(); ic != _controller->end(); ++ic)
 		ic->second->write(level, xml);
+	for(QHash<int, KeyMap>::const_iterator km = m_keymaps.begin(); km != m_keymaps.end(); ++km)
+	{
+		KeyMap m = km.value();
+		m.write(level, xml);
+	}
 	level--;
 	xml.etag(level, "MidiInstrument");
 	level--;

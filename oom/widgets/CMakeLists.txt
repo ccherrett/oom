@@ -89,6 +89,10 @@ QT4_WRAP_CPP (widget_mocs
 	  menulist.h
 	  tviewmenu.h
 	  tablespinner.h
+	  instrumenttree.h
+	  instrumentdelegate.h
+	  instrumentcombo.h
+	  keymapmenu.h
       )
 
 ##
@@ -204,6 +208,10 @@ file (GLOB widgets_source_files
 	  menulist.cpp
 	  tviewmenu.cpp
 	  tablespinner.cpp
+	  instrumenttree.cpp
+	  instrumentdelegate.cpp
+	  instrumentcombo.cpp
+	  keymapmenu.cpp
       )
 
 ##

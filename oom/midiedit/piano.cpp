@@ -7,9 +7,18 @@
 
 #include <QMouseEvent>
 #include <QPainter>
+#include <QMenu>
 
 #include <stdio.h>
 
+#include "midiport.h"
+#include "minstrument.h"
+#include "midictrl.h"
+#include "midi.h"
+#include "midieditor.h"
+#include "track.h"
+#include "part.h"
+#include "keymapmenu.h"
 #include "piano.h"
 
 //{{{
@@ -616,50 +625,53 @@ static const char *mk6_xpm_switch[] = {/*{{{*/
 //   Piano
 //---------------------------------------------------------
 
-Piano::Piano(QWidget* parent, int ymag)
+Piano::Piano(QWidget* parent, int ymag, MidiEditor *e)
    : View(parent, 1, ymag)
 {
-      setMouseTracking(true);
-      curPitch = -1;
-      c_keys[0] = new QPixmap(mk1_xpmC8);
-      c_keys[1] = new QPixmap(mk1_xpmC7);
-      c_keys[2] = new QPixmap(mk1_xpmC6);
-      c_keys[3] = new QPixmap(mk1_xpmC5);
-      c_keys[4] = new QPixmap(mk1_xpmC4);
-      c_keys[5] = new QPixmap(mk1_xpmC3);
-      c_keys[6] = new QPixmap(mk1_xpmC2);
-      c_keys[7] = new QPixmap(mk1_xpmC1);
-	  
-	  //setup all the highlight colors 	
-      mk1 = new QPixmap(mk1_xpm);
-      mk2 = new QPixmap(mk2_xpm);
-      mk3 = new QPixmap(mk3_xpm);
-      mk4 = new QPixmap(mk4_xpm);
-	  
-	  //setup all the highlight colors 	
-      mk1_l = new QPixmap(mk1_xpm_lowlight);
-      mk2_l = new QPixmap(mk2_xpm_lowlight);
-      mk3_l = new QPixmap(mk3_xpm_lowlight);
-      mk4_l = new QPixmap(mk4_xpm_lowlight);
-	  
-	  //setup all the highlight colors 	
-      mk1_n = new QPixmap(mk1_xpm_normal);
-      mk2_n = new QPixmap(mk2_xpm_normal);
-      mk3_n = new QPixmap(mk3_xpm_normal);
-      mk4_n = new QPixmap(mk4_xpm_normal);
-      mk5_n = new QPixmap(mk5_xpm_normal);
-      mk6_n = new QPixmap(mk6_xpm_normal);
-	  
-	  //setup all the keyswitch colors 	
-      mk1_s = new QPixmap(mk1_xpm_switch);
-      mk2_s = new QPixmap(mk2_xpm_switch);
-      mk3_s = new QPixmap(mk3_xpm_switch);
-      mk4_s = new QPixmap(mk4_xpm_switch);
-      mk5_s = new QPixmap(mk5_xpm_switch);
-      mk6_s = new QPixmap(mk6_xpm_switch);
+	m_editor = e;
+	m_menu = false;
 
-	  keyDown = -1;
-      button = Qt::NoButton;
+	setMouseTracking(true);
+	curPitch = -1;
+	c_keys[0] = new QPixmap(mk1_xpmC8);
+	c_keys[1] = new QPixmap(mk1_xpmC7);
+	c_keys[2] = new QPixmap(mk1_xpmC6);
+	c_keys[3] = new QPixmap(mk1_xpmC5);
+	c_keys[4] = new QPixmap(mk1_xpmC4);
+	c_keys[5] = new QPixmap(mk1_xpmC3);
+	c_keys[6] = new QPixmap(mk1_xpmC2);
+	c_keys[7] = new QPixmap(mk1_xpmC1);
+	
+	//setup all the highlight colors 	
+	mk1 = new QPixmap(mk1_xpm);
+	mk2 = new QPixmap(mk2_xpm);
+	mk3 = new QPixmap(mk3_xpm);
+	mk4 = new QPixmap(mk4_xpm);
+	
+	//setup all the highlight colors 	
+	mk1_l = new QPixmap(mk1_xpm_lowlight);
+	mk2_l = new QPixmap(mk2_xpm_lowlight);
+	mk3_l = new QPixmap(mk3_xpm_lowlight);
+	mk4_l = new QPixmap(mk4_xpm_lowlight);
+	
+	//setup all the highlight colors 	
+	mk1_n = new QPixmap(mk1_xpm_normal);
+	mk2_n = new QPixmap(mk2_xpm_normal);
+	mk3_n = new QPixmap(mk3_xpm_normal);
+	mk4_n = new QPixmap(mk4_xpm_normal);
+	mk5_n = new QPixmap(mk5_xpm_normal);
+	mk6_n = new QPixmap(mk6_xpm_normal);
+	
+	//setup all the keyswitch colors 	
+	mk1_s = new QPixmap(mk1_xpm_switch);
+	mk2_s = new QPixmap(mk2_xpm_switch);
+	mk3_s = new QPixmap(mk3_xpm_switch);
+	mk4_s = new QPixmap(mk4_xpm_switch);
+	mk5_s = new QPixmap(mk5_xpm_switch);
+	mk6_s = new QPixmap(mk6_xpm_switch);
+	
+	keyDown = -1;
+	button = Qt::NoButton;
 }
 
 //---------------------------------------------------------
@@ -942,36 +954,91 @@ void Piano::viewMouseMoveEvent(QMouseEvent* event)
 //---------------------------------------------------------
 
 void Piano::viewMousePressEvent(QMouseEvent* event)
-      {
-      button = event->button();
-      shift  = event->modifiers() & Qt::ShiftModifier;
-      if (keyDown != -1) {
-            emit keyReleased(keyDown, shift);
-            keyDown = -1;
-            }
-      keyDown = y2pitch(event->y());
-      if (keyDown < 0 || keyDown > 127) {
-            keyDown = -1;
-            }
-      else {
-            int velocity = event->x()*127/40;
-            emit keyPressed(keyDown, velocity>127 ? 127 : velocity, shift); //emit keyPressed(keyDown, shift);
-            }
-      }
+{
+	if(m_menu)
+		return;
+	button = event->button();
+	shift  = event->modifiers() & Qt::ShiftModifier;
+	int c_pitch = y2pitch(event->y());
+	switch(button)/*{{{*/
+	{
+		case Qt::LeftButton:
+		case Qt::MidButton:
+		{
+			if (keyDown != -1) {
+				emit keyReleased(keyDown, shift);
+				keyDown = -1;
+			}
+			keyDown = c_pitch; //y2pitch(event->y());
+			if (keyDown < 0 || keyDown > 127) {
+				keyDown = -1;
+			}
+			else {
+				int velocity = event->x()*127/40;
+				emit keyPressed(keyDown, velocity>127 ? 127 : velocity, shift); //emit keyPressed(keyDown, shift);
+			}
+			break;
+		}
+		case Qt::RightButton:
+		{//this is where we launch the menu to add program and notes
+			printf("Right button click on key %d\n", c_pitch);
+			if(m_editor)
+			{
+				Part *curPart = m_editor->curCanvasPart();
+				if(curPart)
+				{
+					Track* trk = curPart->track();
+					if(trk && trk->isMidiTrack())
+					{
+						MidiTrack *track = (MidiTrack*)trk;
+						int port = track->outPort();
+						int channel = track->outChannel();
+						MidiInstrument* instr = midiPorts[port].instrument();
+						if(instr)
+						{
+							KeyMap km = instr->keymap(c_pitch);
+							QMenu* p = new QMenu(this);
+							KeyMapMenu *item = new KeyMapMenu(p, track, &km);
+							p->addAction(item);
+							m_menu = true;
+
+							QAction* act = p->exec(QCursor::pos());
+							delete p;
+							m_menu = false;
+						}
+					}
+				}
+			}
+			break;
+		}
+	}/*}}}*/
+}
 
 //---------------------------------------------------------
 //   viewMouseReleaseEvent
 //---------------------------------------------------------
 
 void Piano::viewMouseReleaseEvent(QMouseEvent* event)
-      {
+{
+	if(m_menu)
+		return;
+    shift = event->modifiers() & Qt::ShiftModifier;
+	switch(button)/*{{{*/
+	{
+		case Qt::LeftButton:
+		case Qt::MidButton:
+		{
+			if (keyDown != -1) {
+				emit keyReleased(keyDown, shift);
+				keyDown = -1;
+			}
+		}
+		break;
+		default:
+			break;
+	}/*}}}*/
       button = Qt::NoButton;
-      shift = event->modifiers() & Qt::ShiftModifier;
-      if (keyDown != -1) {
-            emit keyReleased(keyDown, shift);
-            keyDown = -1;
-            }
-      }
+}
 
 void Piano::wheelEvent(QWheelEvent* ev)
 {

@@ -2161,6 +2161,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	{
 		if (_tool == AutomationTool)
 		{
+			printf("Should be select all here\n");
 			if (automation.currentCtrlList)
 			{
 				if (_curveNodeSelection->size())

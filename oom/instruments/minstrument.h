@@ -12,6 +12,7 @@
 #include "globaldefs.h"
 #include <list>
 #include <vector>
+#include <QHash>
 
 class MidiPort;
 class QMenu;
@@ -65,6 +66,24 @@ struct SysEx
     unsigned char* data;
 };
 
+struct KeyMap
+{
+	int program;
+	QString pname;
+	int key;
+	QString comment;
+	inline bool operator==(KeyMap km)
+	{
+		return km.key == key && km.program == program && km.comment == comment;
+	}
+	inline uint qHash(KeyMap km)
+	{
+		return km.program ^ km.key;
+	}
+	void read(Xml&);
+    void write(int level, Xml&);
+};
+
 //---------------------------------------------------------
 //   MidiInstrument
 //---------------------------------------------------------
@@ -74,6 +93,7 @@ class MidiInstrument
     PatchGroupList pg;
     MidiControllerList* _controller;
     QList<SysEx*> _sysex;
+	QHash<int, KeyMap> m_keymaps;
     bool _dirty;
     int _nullvalue;
 
@@ -101,6 +121,44 @@ public:
     {
         _name = txt;
     }
+
+	KeyMap newKeyMap(int key)
+	{
+		if(m_keymaps.contains(key))
+		{
+			KeyMap km = keymap(key);
+			return km;
+		}
+		else
+		{
+			KeyMap km;
+			km.key = key;
+			m_keymaps.insert(key, km);
+			return km;
+		}
+	}
+	bool hasMapping(int key)
+	{
+		if(m_keymaps.isEmpty())
+		{
+			return false;
+		}
+		return m_keymaps.contains(key);
+	}
+	KeyMap keymap(int key)
+	{
+		if(hasMapping(key))
+			return m_keymaps.value(key);
+		else
+		{
+			return newKeyMap(key);;
+		}
+	}
+	
+	QHash<int, KeyMap> *keymaps()
+	{
+		return &m_keymaps;
+	}
 
     //MidiInstrument& uniqueCopy(const MidiInstrument&);
     // Assign will 'delete' all existing patches and groups from the instrument.

@@ -123,7 +123,7 @@ MidiTrackInfo QWidget#patchSeqContents
 	color: #d0d4d0;
 }
 
-MidiTrackInfo QTreeView
+MidiTrackInfo QTreeView/*{{{*/
 {
 	background-color: #d8dbe8;
 	border: 2px solid #29292a;
@@ -137,7 +137,7 @@ MidiTrackInfo QTreeView
 MidiTrackInfo QTreeView::focus
 {
 	border: 2px solid #f3ce69;
-}
+}/*}}}*/
 
 MidiTrackInfo QTreeView QHeaderView::section
 {
@@ -1044,6 +1044,17 @@ QDockWidget::float-button {
     width: 14px;
 }
 
+InstrumentTree/*{{{*/
+{
+	background-color: #d8dbe8;
+	border: 2px solid #29292a;
+	border-radius: 0px;
+	padding: 0px;
+	color: #303033;
+	font-size: 11x;
+	alternate-background-color: #bec0cf;
+	/*selection-background-color:red;*//*this can be used to change the selection background color*/
+}/*}}}*/
 /*//////////////////////// MIDI INPUT PLUGINS ////////////////////////////{{{*/
 QWidget#mitPluginTranspose, QDialog#midiInputTransform, QDialog#midiFilterConfig, QWidget#midiRemoteConfig, QDialog#midiRhythmGenerator 
 {
