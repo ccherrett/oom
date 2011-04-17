@@ -1575,6 +1575,8 @@ void PianoCanvas::midiNote(int pitch, int velo)
 	{
 		Part* part = ip->second;
 		MidiTrack* track = (MidiTrack*)part->track();
+		if(!track || !track->recordFlag())
+			continue;
 		int port = track->outPort();
 		int channel = track->outChannel();
 		MidiInstrument* instr = midiPorts[port].instrument();/*{{{*/
