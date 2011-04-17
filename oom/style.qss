@@ -200,7 +200,7 @@ QHeaderView::section
 	font-size: 11px;
 }
 /*{{{*/
-QTableView#tblTrackView, QTableView#routeList
+QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#optionsTable
 {
 	background-color: #d8dbe8;
 	border: 2px solid #29292a;/*set for highlighting on focus*/
@@ -210,29 +210,29 @@ QTableView#tblTrackView, QTableView#routeList
 	font-size: 12px;
 	alternate-background-color: #bec0cf;
 }
-QTableView#tblTrackView::focus, QTableView#routeList::focus
+QTableView#tblTrackView::focus, QTableView#routeList::focus, TrackViewEditor QTableView#optionsTable
 {
 	border: 2px solid #f3ce69;
 }
 
-QTableView#tblTrackView::item, QTableView#routeList::item
+QTableView#tblTrackView::item, QTableView#routeList::item,TrackViewEditor  QTableView#optionsTable
 {
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
 
-QTableView#tblTrackView::item:selected, QTableView#routeList::item:selected
+QTableView#tblTrackView::item:selected, QTableView#routeList::item:selected, TrackViewEditor QTableView#optionsTable::item:selected
 {
 	background-color: #3d3e44;
 	border: none;
 }
 
-QTableView#tblTrackView::item:selected:active, QTableView#routeList::item:selected:active
+QTableView#tblTrackView::item:selected:active, QTableView#routeList::item:selected:active, TrackViewEditor QTableView#optionsTable::item:selected:active
 {
 	border: none;
 }
 
-QTableView#tblTrackView::item:selected:!active, QTableView#routeList::item:selected:!active
+QTableView#tblTrackView::item:selected:!active, QTableView#routeList::item:selected:!active, TrackViewEditor QTableView#optionsTable::item:selected:!active
 {
 	border: none;
 }

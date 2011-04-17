@@ -20,6 +20,8 @@ class TrackView;
 class Track;
 class QDialog;
 class QPushButton;
+class QStandardItemModel;
+class QStandardItem;
 
 class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase 
 {
@@ -28,6 +30,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	TrackView* _selected;
 	bool _editing;
 	bool _addmode;
+	//QStandardItemModel m_model;
 
 	QStringList _trackTypes;
 	QPushButton* btnAdd;

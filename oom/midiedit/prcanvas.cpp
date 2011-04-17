@@ -614,7 +614,7 @@ void PianoCanvas::resizeItem(CItem* item, bool noSnap) // experimental changes t
 		if (len <= 0)
 			len = editor->raster();
 	}
-	song->startUndo();
+	song->startUndo();/*{{{*/
 	int modified = SC_EVENT_MODIFIED;
 	//printf("event.tick()=%d len=%d part->lenTick()=%d\n",event.endTick(),len,part->lenTick());
 	int diff = event.tick() + len - part->lenTick();
@@ -634,7 +634,7 @@ void PianoCanvas::resizeItem(CItem* item, bool noSnap) // experimental changes t
 	// Indicate no undo, and do not do port controller values and clone parts.
 	//audio->msgChangeEvent(event, newEvent, nevent->part(),false);
 	audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
-	song->endUndo(modified);
+	song->endUndo(modified);/*}}}*/
 }
 
 //---------------------------------------------------------
@@ -659,7 +659,7 @@ bool PianoCanvas::deleteItem(CItem* item)
 //   pianoCmd
 //---------------------------------------------------------
 
-void PianoCanvas::pianoCmd(int cmd)
+void PianoCanvas::pianoCmd(int cmd)/*{{{*/
 {
 	switch (cmd)
 	{
@@ -757,7 +757,7 @@ void PianoCanvas::pianoCmd(int cmd)
 		}
 			break;
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   pianoPressed
@@ -811,8 +811,11 @@ void PianoCanvas::pianoReleased(int pitch, bool)
 	pitch += track()->getTransposition();
 
 	// release key:
-	MidiPlayEvent e(0, port, channel, 0x90, pitch, 0);
-	audio->msgPlayMidiEvent(&e);
+	//if()
+	//{
+		MidiPlayEvent e(0, port, channel, 0x90, pitch, 0);
+		audio->msgPlayMidiEvent(&e);
+	//}
 }
 
 //---------------------------------------------------------
@@ -1425,6 +1428,7 @@ int PianoCanvas::stepInputQwerty(QKeyEvent *event)
 
 void PianoCanvas::midiNote(int pitch, int velo)
 {
+	unsigned songtick = song->cpos();
 	//printf("PianoCanvas::midiNote(pitch:%d, velo:%d) \n", pitch, velo);
     if (_midiin && _steprec && _curPart && !audio->isPlaying() && velo && _pos[0] >= start_tick && !(globalKeyState & Qt::AltModifier))
 	{
@@ -1566,108 +1570,55 @@ void PianoCanvas::midiNote(int pitch, int velo)
 	}
 
 	//Handle any keyswitching at this stage
-	int port = track()->outPort();
-	int channel = track()->outChannel();
-	MidiInstrument* instr = midiPorts[port].instrument();/*{{{*/
-	if(instr)
+	PartList* pl = editor->parts();
+	for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
 	{
-		if(instr->hasMapping(pitch))
+		Part* part = ip->second;
+		MidiTrack* track = (MidiTrack*)part->track();
+		int port = track->outPort();
+		int channel = track->outChannel();
+		MidiInstrument* instr = midiPorts[port].instrument();/*{{{*/
+		if(instr)
 		{
-			KeyMap *km = instr->keymap(pitch);
-			int pr = km->program & 0xff;
-			//printf("Recieved pianoPressed found mapping, program: %d, pr: %d, test: %d\n", km->program, pr, 0xff);
-			if (km->program != CTRL_VAL_UNKNOWN && pr != 0xff)
+			if(instr->hasMapping(pitch))
 			{
-				//printf("Should be adding the program now\n");
-				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, km->program);
-				audio->msgPlayMidiEvent(&ev);
-
-				MidiPort* mport = &midiPorts[port];
-				int program = mport->hwCtrlState(channel, CTRL_PROGRAM);
-				//Check it again to make sure it was processed
-				if (program != CTRL_VAL_UNKNOWN && program != 0xff)
+				KeyMap *km = instr->keymap(pitch);
+				int pr = km->program & 0xff;
+				//printf("Recieved pianoPressed found mapping, program: %d, pr: %d, test: %d\n", km->program, pr, 0xff);
+				if (km->program != CTRL_VAL_UNKNOWN && pr != 0xff)
 				{
+					int diff = songtick - part->lenTick();
+					if (diff > 0)
+					{
+						int endTick = song->roundUpBar(part->lenTick() + diff);
+						part->setLenTick(endTick);
+					}
 
-					unsigned tick = song->cpos();
-					Event a(Controller);
-					a.setTick(tick);
-					a.setA(CTRL_PROGRAM);
-					a.setB(program);
+					
+					//printf("Should be adding the program now\n");
+					MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, km->program);
+					audio->msgPlayMidiEvent(&ev);
 
-					song->recordEvent(track(), a);
+					MidiPort* mport = &midiPorts[port];
+					int program = mport->hwCtrlState(channel, CTRL_PROGRAM);
+					//Check it again to make sure it was processed
+					if (program != CTRL_VAL_UNKNOWN && program != 0xff)
+					{
+						Event a(Controller);
+						a.setTick(songtick);
+						a.setA(CTRL_PROGRAM);
+						a.setB(program);
+
+						song->recordEvent(track, a);
+					}
 				}
 			}
-		}
-	}/*}}}*/
+		}/*}}}*/
+	}
 	
 	//TODO: emit a signal to flash keyboard here
 	emit pitchChanged(pitch);
 }
-
-/*
-//---------------------------------------------------------
-//   getTextDrag
-//---------------------------------------------------------
-
-Q3TextDrag* PianoCanvas::getTextDrag(QWidget* parent)
-	  {
-	  //---------------------------------------------------
-	  //   generate event list from selected events
-	  //---------------------------------------------------
-
-	  EventList el;
-	  unsigned startTick = MAXINT;
-	  for (iCItem i = items.begin(); i != items.end(); ++i) {
-			if (!i->second->isSelected())
-				  continue;
-			NEvent* ne = (NEvent*)(i->second);
-			Event e   = ne->event();
-			if (startTick == MAXINT)
-				  startTick = e.tick();
-			el.add(e);
-			}
-
-	  //---------------------------------------------------
-	  //    write events as XML into tmp file
-	  //---------------------------------------------------
-
-	  FILE* tmp = tmpfile();
-	  if (tmp == 0) {
-			fprintf(stderr, "PianoCanvas::copy() fopen failed: %s\n",
-			   strerror(errno));
-			return 0;
-			}
-	  Xml xml(tmp);
-
-	  int level = 0;
-	  xml.tag(level++, "eventlist");
-	  for (ciEvent e = el.begin(); e != el.end(); ++e)
-			e->second.write(level, xml, -startTick);
-	  xml.etag(--level, "eventlist");
-
-	  //---------------------------------------------------
-	  //    read tmp file into QTextDrag Object
-	  //---------------------------------------------------
-
-	  fflush(tmp);
-	  struct stat f_stat;
-	  if (fstat(fileno(tmp), &f_stat) == -1) {
-			fprintf(stderr, "PianoCanvas::copy() fstat failes:<%s>\n",
-			   strerror(errno));
-			fclose(tmp);
-			return 0;
-			}
-	  int n = f_stat.st_size;
-	  char* fbuf  = (char*)mmap(0, n+1, PROT_READ|PROT_WRITE,
-		 MAP_PRIVATE, fileno(tmp), 0);
-	  fbuf[n] = 0;
-	  Q3TextDrag* drag = new Q3TextDrag(QString(fbuf), parent);
-	  drag->setSubtype("eventlist");
-	  munmap(fbuf, n);
-	  fclose(tmp);
-	  return drag;
-	  }
- */
 
 //---------------------------------------------------------
 //   copy
@@ -1683,68 +1634,6 @@ void PianoCanvas::copy()
 		QApplication::clipboard()->setMimeData(drag, QClipboard::Clipboard);
 }
 
-/*
-//---------------------------------------------------------
-//   pasteAt
-//---------------------------------------------------------
-
-void PianoCanvas::pasteAt(const QString& pt, int pos)
-	  {
-	  QByteArray ba = pt.toLatin1();
-	  const char* p = ba.constData();
-	  Xml xml(p);
-	  for (;;) {
-			Xml::Token token = xml.parse();
-			const QString& tag = xml.s1();
-			switch (token) {
-				  case Xml::Error:
-				  case Xml::End:
-						return;
-				  case Xml::TagStart:
-						if (tag == "eventlist") {
-							  song->startUndo();
-							  EventList* el = new EventList();
-							  el->read(xml, "eventlist", true);
-							  int modified = SC_EVENT_INSERTED;
-							  for (iEvent i = el->begin(); i != el->end(); ++i) {
-									Event e = i->second;
-									int tick = e.tick() + pos - curPart->tick();
-									if (tick<0) {
-											printf("ERROR: trying to add event before current part!\n");
-											song->endUndo(SC_EVENT_INSERTED);
-											delete el;
-											return;
-											}
-
-									e.setTick(tick);
-									int diff = e.endTick()-curPart->lenTick();
-									if (diff > 0)  {// too short part? extend it
-											Part* newPart = curPart->clone();
-											newPart->setLenTick(newPart->lenTick()+diff);
-											// Indicate no undo, and do port controller values but not clone parts.
-											audio->msgChangePart(curPart, newPart, false, true, false);
-											modified=modified|SC_PART_MODIFIED;
-											curPart = newPart; // reassign
-											}
-									// Indicate no undo, and do not do port controller values and clone parts.
-									audio->msgAddEvent(e, curPart, false, false, false);
-									}
-							  song->endUndo(modified);
-							  delete el;
-							  return;
-							  }
-						else
-							  xml.unknown("pasteAt");
-						break;
-				  case Xml::Attribut:
-				  case Xml::TagEnd:
-				  default:
-						break;
-				  }
-			}
-	  }
- */
-
 //---------------------------------------------------------
 //   paste
 //    paste events
@@ -1752,20 +1641,8 @@ void PianoCanvas::pasteAt(const QString& pt, int pos)
 
 void PianoCanvas::paste()
 {
-	/*
-		  //Q3CString subtype("eventlist"); ddskrjo
-		  QString subtype("eventlist");
-		  QMimeSource* ms = QApplication::clipboard()->data(QClipboard::Clipboard);
-		  QString pt;
-		  if (!Q3TextDrag::decode(ms, pt, subtype)) {
-				printf("cannot paste: bad data type\n");
-				return;
-				}
-		  pasteAt(pt, song->cpos());
-	 */
 	QString stype("x-oom-eventlist");
 
-	//QString s = QApplication::clipboard()->text(stype, QClipboard::Selection);
 	QString s = QApplication::clipboard()->text(stype, QClipboard::Clipboard); // TODO CHECK Tim.
 
 	pasteAt(s, song->cpos());
@@ -1778,14 +1655,9 @@ void PianoCanvas::paste()
 void PianoCanvas::startDrag(CItem* /* item*/, bool copymode)
 {
 	QMimeData* md = getTextDrag();
-	//QDrag* drag = getTextDrag();
 
 	if (md)
 	{
-		//            QApplication::clipboard()->setData(drag, QClipboard::Clipboard);   // This line NOT enabled in oom-1
-		//QApplication::clipboard()->setMimeData(md);                // TODO CHECK Tim.
-		//QApplication::clipboard()->setMimeData(drag->mimeData());  //
-
 		// "Note that setMimeData() assigns ownership of the QMimeData object to the QDrag object.
 		//  The QDrag must be constructed on the heap with a parent QWidget to ensure that Qt can
 		//  clean up after the drag and drop operation has been completed. "
