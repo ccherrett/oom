@@ -16,6 +16,7 @@
 #include <QFont>
 #include <QRect>
 #include <QString>
+#include <QHash>
 
 class Xml;
 

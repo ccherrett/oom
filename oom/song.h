@@ -11,6 +11,7 @@
 
 #include <QObject>
 #include <QStringList>
+#include <QHash>
 
 #include "pos.h"
 #include "globaldefs.h"
@@ -171,6 +172,8 @@ private:
 	//Audition feature
 	bool _replay;
 	unsigned _replayPos;
+	//key to note mapping
+	QHash<int, QString> m_midiKeys;
 
 public:
     Song(const char* name = 0);
@@ -479,6 +482,16 @@ public:
     void removeTrackView(TrackView*);
     void cmdRemoveTrackView(TrackView*);
     void msgInsertTrackView(TrackView*, int idx, bool u = true);
+
+	//midikeys
+	QString key2note(int key)
+	{
+		if(m_midiKeys.contains(key))
+		{
+			return m_midiKeys.value(key);
+		}
+		return QString("");
+	}
 
     //-----------------------------------------
     //   undo, redo

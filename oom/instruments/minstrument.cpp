@@ -454,6 +454,7 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 
 	_name = ins._name;
 	_filePath = ins._filePath;
+	m_keymaps = ins.m_keymaps;
 
 	// Hmm, dirty, yes? But init sets it to false...
 	//_dirty = ins._dirty;

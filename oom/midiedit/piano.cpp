@@ -984,8 +984,10 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 			//printf("Right button click on key %d\n", c_pitch);
     		button = Qt::NoButton;
 			//emit keyReleased(c_pitch, shift);
-			if(c_pitch < 0 || c_pitch > 127)
-				return;
+			if(c_pitch < 0)
+				c_pitch = 0;
+			if( c_pitch > 127)
+				c_pitch = 127;
 			if(m_editor)
 			{
 				Part *curPart = m_editor->curCanvasPart();

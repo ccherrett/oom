@@ -41,7 +41,8 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	QVBoxLayout* layout = new QVBoxLayout();
 	QWidget* w = new QWidget(parent);
 	w->setFixedHeight(350);
-	QLabel* plabel = new QLabel();
+	QString title(tr("Default Patch - Note: "));
+	QLabel* plabel = new QLabel(title.append(song->key2note(m_keymap->key)));
 	plabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 	plabel->setObjectName("KeyMapMenuLabel");
 	layout->addWidget(plabel);
@@ -54,10 +55,12 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	hbox->addWidget(m_patch);
 	
 	QPushButton *btnClear = new QPushButton();
-	btnClear->setFixedHeight(20);
+	//btnClear->setFixedHeight(20);
 	btnClear->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 	btnClear->setToolTip(tr("Clear Patch"));
-	btnClear->setIcon(*edit_listIcon);
+	btnClear->setIcon(*garbagePCIcon);
+	btnClear->setIconSize(QSize(20, 20));
+	btnClear->setFixedSize(QSize(24, 24));
 	hbox->addWidget(btnClear);
 	
 	connect(btnClear, SIGNAL(clicked()), SLOT(clearPatch()));
