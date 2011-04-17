@@ -173,6 +173,8 @@ public:
         _filePath = s;
     }
 
+	bool fileSave();
+
     bool dirty() const
     {
         return _dirty;

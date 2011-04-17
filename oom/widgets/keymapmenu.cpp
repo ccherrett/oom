@@ -50,6 +50,7 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	m_patch = new QLineEdit();
 	m_patch->setReadOnly(true);
 	m_patch->setText(m_keymap->pname);
+	//printf("Patch name in menu: %s, program: %d\n", m_keymap->pname.toUtf8().constData(), m_keymap->program);
 	hbox->addWidget(m_patch);
 	
 	QPushButton *btnClear = new QPushButton();

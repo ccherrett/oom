@@ -981,7 +981,7 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 		}
 		case Qt::RightButton:
 		{//this is where we launch the menu to add program and notes
-			printf("Right button click on key %d\n", c_pitch);
+			//printf("Right button click on key %d\n", c_pitch);
     		button = Qt::NoButton;
 			//emit keyReleased(c_pitch, shift);
 			if(c_pitch < 0 || c_pitch > 127)
@@ -1001,13 +1001,26 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 						if(instr)
 						{
 							KeyMap *km = instr->keymap(c_pitch);
+							int prog = km->program;
+							QString comment = km->comment;
 							QMenu* p = new QMenu(this);
 							KeyMapMenu *item = new KeyMapMenu(p, track, km);
 							p->addAction(item);
 							m_menu = true;
-
+			
 							p->exec(QCursor::pos());
 							delete p;
+							if(prog != km->program || comment != km->comment)
+							{//Changes were made, try to save out the file
+								if(!instr->fileSave())
+								{
+								/*	printf("Sucessfully saved instrument file\n");
+								}
+								else
+								{*/
+									printf("Failed to save instrument file");
+								}
+							}
 							m_menu = false;
 						}
 					}

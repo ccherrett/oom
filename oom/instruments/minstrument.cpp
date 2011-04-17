@@ -7,6 +7,7 @@
 //=========================================================
 
 #include <stdio.h>
+#include <errno.h>
 
 #include <QAction>
 #include <QDir>
@@ -16,6 +17,8 @@
 #include <QList>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QMessageBox>
+#include <QObject>
 
 #include "minstrument.h"
 #include "midiport.h"
@@ -25,6 +28,7 @@
 #include "mpevent.h"
 #include "midictrl.h"
 #include "gconfig.h"
+#include "song.h"
 
 MidiInstrumentList midiInstruments;
 MidiInstrument* genericMidiInstrument;
@@ -659,7 +663,7 @@ void KeyMap::read(Xml& xml)/*{{{*/
 				else if (tag == "key")
 					key = xml.s2().toInt();
 				else if (tag == "pname")
-					pname = xml.s2().toInt();
+					pname = xml.s2();
 				break;
 			case Xml::TagEnd:
 				if (tag == "KeyMap")
@@ -1112,3 +1116,32 @@ void MidiInstrument::populatePatchModel(QStandardItemModel* model, int chan, MTy
 	}
 }
 
+bool MidiInstrument::fileSave()/*{{{*/
+{
+	if(_filePath.isEmpty())
+		return false;
+	// Do not allow a direct overwrite of a 'built-in' oom instrument.
+	QFileInfo qfi(_filePath);
+	if (qfi.absolutePath() == oomInstruments)
+	{
+		return false;
+	}
+	FILE* f = fopen(_filePath.toAscii().constData(), "w");
+	if (f == 0)
+	{
+		return false;
+	}
+
+	Xml xml(f);
+
+	write(0, xml);
+
+	// Now signal the rest of the app so stuff can change...
+	song->update(SC_CONFIG | SC_MIDI_CONTROLLER);
+
+	if (fclose(f) != 0)
+	{
+		return false;
+	}
+	return true;
+}/*}}}*/

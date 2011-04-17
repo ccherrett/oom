@@ -1575,17 +1575,17 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		{
 			KeyMap *km = instr->keymap(pitch);
 			int pr = km->program & 0xff;
-			printf("Recieved pianoPressed found mapping, program: %d, pr: %d, test: %d\n", km->program, pr, 0xff);
+			//printf("Recieved pianoPressed found mapping, program: %d, pr: %d, test: %d\n", km->program, pr, 0xff);
 			if (km->program != CTRL_VAL_UNKNOWN && pr != 0xff)
 			{
-				printf("Should be adding the program now\n");
+				//printf("Should be adding the program now\n");
 				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, km->program);
 				audio->msgPlayMidiEvent(&ev);
 
 				MidiPort* mport = &midiPorts[port];
 				int program = mport->hwCtrlState(channel, CTRL_PROGRAM);
 				//Check it again to make sure it was processed
-				if (program != CTRL_VAL_UNKNOWN && program != 0xffffff)
+				if (program != CTRL_VAL_UNKNOWN && program != 0xff)
 				{
 
 					unsigned tick = song->cpos();
