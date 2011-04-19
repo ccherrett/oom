@@ -1614,9 +1614,8 @@ void PianoCanvas::processKeySwitches(Part* part, int pitch, int songtick)
 		if(instr->hasMapping(pitch))
 		{
 			KeyMap *km = instr->keymap(pitch);
-			int pr = km->program & 0xff;
 			//printf("Recieved pianoPressed found mapping, program: %d, pr: %d, test: %d\n", km->program, pr, 0xff);
-			if (km->program != CTRL_VAL_UNKNOWN && pr != 0xff)
+			if (km->hasProgram)
 			{
 				int diff = songtick - part->lenTick();
 				if (diff > 0)
