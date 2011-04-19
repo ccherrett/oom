@@ -97,6 +97,7 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 void KeyMapMenu::clearPatch()
 {
 	m_keymap->program = -1;
+	m_keymap->hasProgram = false;
 	m_keymap->pname = tr("Select Patch");
 	m_patch->setText(m_keymap->pname);
 }
@@ -104,6 +105,7 @@ void KeyMapMenu::clearPatch()
 void KeyMapMenu::updatePatch(int prog, QString name)
 {
 	m_keymap->program = prog;
+	m_keymap->hasProgram = true;
 	m_keymap->pname = name;
 	m_patch->setText(name);
 }

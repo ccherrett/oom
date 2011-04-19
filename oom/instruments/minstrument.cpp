@@ -644,6 +644,7 @@ void KeyMap::read(Xml& xml)/*{{{*/
 	pname = "";
 	comment = "";
 	key = -1;
+	hasProgram = false;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -665,6 +666,8 @@ void KeyMap::read(Xml& xml)/*{{{*/
 					key = xml.s2().toInt();
 				else if (tag == "pname")
 					pname = xml.s2();
+				else if(tag == "hasProgram")
+					hasProgram = (bool)xml.s2().toInt();
 				break;
 			case Xml::TagEnd:
 				if (tag == "KeyMap")
@@ -680,6 +683,7 @@ void KeyMap::write(int level, Xml& xml)/*{{{*/
 	xml.nput(level, "<KeyMap key=\"%d\"", key);
 
 	xml.nput(" program=\"%d\"", program);
+	xml.nput(" hasProgram=\"%d\"", hasProgram);
 
 	xml.nput(" comment=\"%s\"", Xml::xmlString(comment).toLatin1().constData());
 

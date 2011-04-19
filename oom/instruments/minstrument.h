@@ -72,6 +72,7 @@ struct KeyMap
 	QString pname;
 	int key;
 	QString comment;
+	bool hasProgram;
 	inline bool operator==(KeyMap km)
 	{
 		return km.key == key && km.program == program && km.comment == comment;
@@ -132,6 +133,7 @@ public:
 		{
 			KeyMap *km = new KeyMap;
 			km->key = key;
+			km->hasProgram = false;
 			m_keymaps.insert(key, km);
 			return km;
 		}
