@@ -1430,6 +1430,24 @@ int PianoCanvas::stepInputQwerty(QKeyEvent *event)
 void PianoCanvas::midiNote(int pitch, int velo)
 {
 	unsigned songtick = song->cpos();
+	//Filter the noteoff events/*{{{*/
+	if(velo)
+	{
+		if(m_globalKey)
+		{
+			//Handle any keyswitching at this stage
+			PartList* pl = editor->parts();
+			for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+			{
+				Part* part = ip->second;
+				processKeySwitches(part, pitch, songtick);
+			}
+		}
+		else
+		{
+			processKeySwitches(_curPart, pitch, songtick);
+		}
+	}/*}}}*/
 	//printf("PianoCanvas::midiNote(pitch:%d, velo:%d) \n", pitch, velo);
     if (_midiin && _steprec && _curPart && !audio->isPlaying() && velo && _pos[0] >= start_tick && !(globalKeyState & Qt::AltModifier))
 	{
@@ -1570,23 +1588,6 @@ void PianoCanvas::midiNote(int pitch, int velo)
     }*/ //}}}
 	}
 
-	if(velo)
-	{
-	if(m_globalKey)
-	{
-		//Handle any keyswitching at this stage/*{{{*/
-		PartList* pl = editor->parts();
-		for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
-		{
-			Part* part = ip->second;
-			processKeySwitches(part, pitch, songtick);
-		}/*}}}*/
-	}
-	else
-	{
-		processKeySwitches(_curPart, pitch, songtick);
-	}
-	}
 	update();
 	
 	//TODO: emit a signal to flash keyboard here
