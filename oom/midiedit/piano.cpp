@@ -154,7 +154,7 @@ static const char *mk1_xpmC8[] = {
       };
 //}}}	  
 //{{{
-static const char *mk1_xpm[] = {/*{{{*/
+static const char *mk1_xpm[] = {
       "40 13 2 1",
       //". c #2d95b7",//highlight
       ". c #f3ce69",//highlight
@@ -172,9 +172,9 @@ static const char *mk1_xpm[] = {/*{{{*/
       "########################...............#",
       "########################...............#",
       "####################################### ",
-      };/*}}}*/
+      };
 
-static const char *mk2_xpm[] = {/*{{{*/
+static const char *mk2_xpm[] = {
       "40 13 2 1",
       //". c #2d95b7",
       ". c #f3ce69",//highlight
@@ -192,7 +192,7 @@ static const char *mk2_xpm[] = {/*{{{*/
       "########################...............#",
       "########################...............#",     // 7
       "####################################### ",
-      };/*}}}*/
+      };
 
 static const char *mk3_xpm[] = {
       "40 13 2 1",
@@ -584,6 +584,89 @@ static const char *mk6_xpm_switch[] = {/*{{{*/
       "$$$$$$$$$$$$$$$$$$$$$$$$ddddddddddddddd ",
       };/*}}}*/
 //}}}	  
+//{{{
+//Internal IDF based key switches
+static const char *mk1_xpm_lswitch[] = {
+      "40 13 2 1",
+      //". c #2d95b7",//highlight
+      ". c #f59100",//highlight
+      "# c none",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      "#######################................#",
+      "########################...............#",
+      "########################...............#",
+      "####################################### ",
+      };
+
+static const char *mk2_xpm_lswitch[] = {
+      "40 13 2 1",
+      //". c #2d95b7",
+      ". c #f59100",//highlight
+      "# c none",
+      "########################...............#",
+      "########################...............#",
+      "#######################................#", //------------------------
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",     // 6
+      ".......................................#",
+      ".......................................#",
+      ".......................................#", //--------------------------
+      "#######################................#",
+      "########################...............#",
+      "########################...............#",     // 7
+      "####################################### ",
+      };
+
+static const char *mk3_xpm_lswitch[] = {
+      "40 13 2 1",
+      //". c #2d95b7",
+      ". c #f59100",//highlight
+      "# c none",
+      "########################...............#",
+      "########################...............#",
+      "#######################................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      "########################################",
+      };
+
+static const char *mk4_xpm_lswitch[] = {
+      "40 13 3 1",
+      //"# c #2d95b7",
+      ". c #f59100",//highlight
+      ". c none",
+      "$ c #933113",
+      "........................................",
+      "........................................",
+      "........................................",
+      "$$$$$$$$$$$$$$$$$$$$$$$.................",
+      "#######################$................",
+      "#######################$................",
+      "#######################$................",
+      "#######################$................",
+      "#######################$................",
+      "$$$$$$$$$$$$$$$$$$$$$$$.................",
+      "........................................",
+      "........................................",
+      "........................................",
+      };
+//}}}	  
 /*
       0   1   2  3  4  5  6  7  8  9  10
       c-2 c-1 C0 C1 C2 C3 C4 C5 C6 C7 C8 - G8
@@ -654,7 +737,7 @@ Piano::Piano(QWidget* parent, int ymag, MidiEditor *e)
 	mk3_l = new QPixmap(mk3_xpm_lowlight);
 	mk4_l = new QPixmap(mk4_xpm_lowlight);
 	
-	//setup all the highlight colors 	
+	//setup all the black and white colors 	
 	mk1_n = new QPixmap(mk1_xpm_normal);
 	mk2_n = new QPixmap(mk2_xpm_normal);
 	mk3_n = new QPixmap(mk3_xpm_normal);
@@ -670,6 +753,11 @@ Piano::Piano(QWidget* parent, int ymag, MidiEditor *e)
 	mk5_s = new QPixmap(mk5_xpm_switch);
 	mk6_s = new QPixmap(mk6_xpm_switch);
 	
+	mk1_lswitch = new QPixmap(mk1_xpm_lswitch);
+	mk2_lswitch = new QPixmap(mk2_xpm_lswitch);
+	mk3_lswitch = new QPixmap(mk3_xpm_lswitch);
+	mk4_lswitch = new QPixmap(mk4_xpm_lswitch);
+
 	keyDown = -1;
 	button = Qt::NoButton;
 }
@@ -681,6 +769,7 @@ Piano::Piano(QWidget* parent, int ymag, MidiEditor *e)
 void Piano::draw(QPainter& p, const QRect& r)
 {
       QPoint offset(0, KH*2);
+	Part *curPart = m_editor->curCanvasPart();
       //p.drawTiledPixmap(r, *octave, r.topLeft()+offset);
 
       // draw C notes
@@ -700,11 +789,22 @@ void Piano::draw(QPainter& p, const QRect& r)
 	  bool preOn = false;
 	  for(int i = 0; i <= 127; ++i)
 	  {
+		MidiTrack* track = (MidiTrack*)curPart->track();
+		int port = track->outPort();
+		//int channel = track->outChannel();
+		MidiInstrument* instr = midiPorts[port].instrument();
+		KeyMap* km = instr->keymap(i);
+		int pr = km->program & 0xff;
+		bool lswitch = (km->program == CTRL_VAL_UNKNOWN || pr == 0xff);
      	 switch(i % 12) /*{{{*/
 	 	 {
      	       case 0:
      	       case 5:
-			   		if(enabled.isEmpty())
+					if (lswitch)
+					{
+      					p.drawPixmap(0, pitch2y(i), *mk3_lswitch);
+					}
+			   		else if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk3_n);
 					else
 					{
@@ -721,7 +821,11 @@ void Piano::draw(QPainter& p, const QRect& r)
      	       case 2:
      	       case 7:
      	       case 9:
-			   		if(enabled.isEmpty())
+					if (lswitch)
+					{
+      					p.drawPixmap(0, pitch2y(i), *mk2_lswitch);
+					}
+			   		else if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk2_n);
 					else
 					{
@@ -753,7 +857,11 @@ void Piano::draw(QPainter& p, const QRect& r)
      	       case 4:
      	       case 11:
      	             //pm2 = mk1_l;
-			   		if(enabled.isEmpty())
+					if (lswitch)
+					{
+      					p.drawPixmap(0, pitch2y(i), *mk1_lswitch);
+					}
+			   		else if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk1_n);
 					else
 					{
@@ -774,7 +882,11 @@ void Piano::draw(QPainter& p, const QRect& r)
 					}	
      	            break;
             default:
-			   		if(enabled.isEmpty())
+					if (lswitch)
+					{
+      					p.drawPixmap(0, pitch2y(i), *mk4_lswitch);
+					}
+			   		else if(enabled.isEmpty())
       						p.drawPixmap(0, pitch2y(i), *mk4_n);
 					else
 					{
