@@ -486,6 +486,8 @@ QPixmap* reminder2_OnIcon;
 QPixmap* reminder2_OffIcon;
 QPixmap* reminder3_OnIcon;
 QPixmap* reminder3_OffIcon;
+QPixmap* armAllIcon;
+QPixmap* globalKeysIcon;
 
 QIcon* globalIcon;
 QIcon* projectIcon;
@@ -596,6 +598,8 @@ void initIcons()
       speakerIcon    = new MPIXMAP(":/images/icons/speaker.png", NULL);
       buttondownIcon = new MPIXMAP(buttondown_xpm, NULL);//"arrow-down");
       configureIcon  = new MPIXMAP(configure_xpm, NULL);
+	  armAllIcon = new MPIXMAP(":/images/icons/globe-edit.png", NULL);
+      globalKeysIcon = new MPIXMAP(":/images/icons/globe.png", NULL);
 
       editmuteIcon  = new MPIXMAP(":/images/icons/mute-all.png", NULL);
       editmuteSIcon = new MPIXMAP(editmuteS_xpm, NULL);

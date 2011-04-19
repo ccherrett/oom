@@ -132,6 +132,8 @@ class PianoRoll : public MidiEditor
     Splitter* ctrlLane;
 
     QToolButton* speaker;
+    QToolButton* m_globalKey;
+    QToolButton* m_globalArm;
     QToolBar* tools;
     EditToolBar* tools2;
 

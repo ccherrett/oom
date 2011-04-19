@@ -342,6 +342,16 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	solo->setToolTip(tr("Solo"));
 	solo->setCheckable(true);
 
+    m_globalKey = new QToolButton();
+	m_globalKey->setToolTip(tr("Enable keyswitches across all parts"));
+	m_globalKey->setIcon(*globalKeysIcon);
+	m_globalKey->setCheckable(true);
+
+    m_globalArm = new QToolButton();
+	m_globalArm->setToolTip(tr("Globally record arm all parts"));
+	m_globalArm->setIcon(*armAllIcon);
+	//m_globalArm->setCheckable(true);
+
 	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
 	posLabel = new PosLabel(0, "pos");
 	posLabel->setFixedHeight(22);
@@ -386,6 +396,12 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//addToolBar(Qt::BottomToolBarArea, transport);
 	tools2->addWidget(srec);
 	tools2->addWidget(speaker);
+	QWidget* actionSpacer = new QWidget();
+	actionSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	actionSpacer->setMaximumWidth(5);
+	tools2->addWidget(actionSpacer);
+	tools2->addWidget(m_globalKey);
+	tools2->addWidget(m_globalArm);
 	QWidget* spacer1 = new QWidget();
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer1->setMaximumWidth(10);
@@ -568,6 +584,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     //connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
     connect(speaker, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
     connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
+	connect(m_globalArm, SIGNAL(clicked()), canvas, SLOT(recordArmAll()));
+	connect(m_globalKey, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
 
     connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
     piano->setYPos(KH * 30);

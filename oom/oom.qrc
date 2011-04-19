@@ -126,6 +126,8 @@
 		<file>images/icons/reminder1_on.png</file>
 		<file>images/icons/reminder2_on.png</file>
 		<file>images/icons/reminder3_on.png</file>
+		<file>images/icons/globe-edit.png</file>
+		<file>images/icons/globe.png</file>
 	</qresource>
 </RCC>
 

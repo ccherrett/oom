@@ -269,5 +269,8 @@ extern QIcon* userIcon;
 extern QPixmap* sineIcon;
 extern QPixmap* sawIcon;
 
+extern QPixmap* armAllIcon;
+extern QPixmap* globalKeysIcon;
+
 #endif
 

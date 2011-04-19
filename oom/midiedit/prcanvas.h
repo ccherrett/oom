@@ -43,6 +43,7 @@ class PianoCanvas : public EventCanvas
     int colorMode;
     int playedPitch;
     int _octaveQwerty;
+	bool m_globalKey;
 
     QMap<QString, int> _qwertyToMidiMap;
     void bindQwertyKeyToMidiValue(const char* key, int note);
@@ -69,6 +70,7 @@ class PianoCanvas : public EventCanvas
 
     int y2pitch(int) const;
     int pitch2y(int) const;
+	void processKeySwitches(Part*, int, int);
     virtual void drawCanvas(QPainter&, const QRect&);
     void quantize(int, int, bool);
     void copy();
@@ -96,6 +98,8 @@ public slots:
 
     void createQWertyToMidiBindings();
     void setOctaveQwerty(int octave);
+	void setGlobalKey(bool k) { m_globalKey = k; }
+	void recordArmAll();
 
 public:
 
