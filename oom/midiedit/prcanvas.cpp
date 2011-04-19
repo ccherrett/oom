@@ -1570,6 +1570,8 @@ void PianoCanvas::midiNote(int pitch, int velo)
     }*/ //}}}
 	}
 
+	if(velo)
+	{
 	if(m_globalKey)
 	{
 		//Handle any keyswitching at this stage/*{{{*/
@@ -1584,6 +1586,8 @@ void PianoCanvas::midiNote(int pitch, int velo)
 	{
 		processKeySwitches(_curPart, pitch, songtick);
 	}
+	}
+	update();
 	
 	//TODO: emit a signal to flash keyboard here
 	emit pitchChanged(pitch);
