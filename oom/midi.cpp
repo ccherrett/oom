@@ -1513,6 +1513,8 @@ void Audio::processMidi()
 			for (iMPEvent k = stuckNotes->begin(); k != stuckNotes->end(); ++k)
 			{
 				MidiPlayEvent ev(*k);
+				//THis is why we are getting those error messages on song stop because it is setting all the 
+				//event times to the same point in time 
 				ev.setTime(0); // play now
 				playEvents->add(ev);
 			}

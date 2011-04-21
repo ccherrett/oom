@@ -164,6 +164,7 @@ void initShortCuts()
 
 	defShrt(SHRT_SELECT_ALL, Qt::CTRL + Qt::Key_A, "Edit: Select all", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_all");
 	defShrt(SHRT_SELECT_NONE, Qt::CTRL + Qt::SHIFT + Qt::Key_A, "Edit: Select none", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_none");
+	defShrt(SHRT_SELECT_ALL_NODES, Qt::CTRL + Qt::ALT + Qt::Key_A, "Edit: Select all automation nodes", ARRANG_SHRT, "sel_all_nodes");
 	defShrt(SHRT_SELECT_INVERT, Qt::CTRL + Qt::Key_I, "Edit: Invert Selection", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_inv");
 	defShrt(SHRT_SELECT_ILOOP, Qt::ALT + Qt::Key_Y, "Edit: Select events/parts inside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_ins_loc");
 	defShrt(SHRT_SELECT_OLOOP, Qt::ALT + Qt::Key_U, "Edit: Select events/parts outside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_out_loc");

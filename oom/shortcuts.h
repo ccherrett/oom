@@ -188,7 +188,8 @@ enum
 
     //To be in arranger, pianoroll & drumeditor. p4.0.10 now globally handled, too.
     SHRT_SELECT_ALL, //Ctrl+A
-    SHRT_SELECT_NONE, //Ctrl+Shift+A
+    SHRT_SELECT_NONE, //
+    SHRT_SELECT_ALL_NODES, //Ctrl+Shift+A
     SHRT_SELECT_INVERT, //Ctrl+I
     SHRT_SELECT_ILOOP, //Default: Undefined
     SHRT_SELECT_OLOOP, //Default: Undefined

@@ -2110,7 +2110,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		}
 		emit trackChanged(track);
 	}
-        else if (key == shortcuts[SHRT_EDIT_PART].key && _curItem)
+    else if (key == shortcuts[SHRT_EDIT_PART].key && _curItem)
 	{ //This should be the other way around - singleSelection first.
 		if (!singleSelection)
 		{
@@ -2146,22 +2146,22 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		}
 		emit startEditor(pl, type);
 	}
-        else if (key == shortcuts[SHRT_INC_POS].key)
-        {
-                _curItem->setWidth(_curItem->width() + 200);
-                redraw();
-                resizeItem(_curItem, false);
-        }
-        else if (key == shortcuts[SHRT_DEC_POS].key)
-        {
-                Part* part = _curItem->part();
-                part->setLenTick(part->lenTick() - 200);
-        }
-	else if (key == shortcuts[SHRT_SELECT_ALL].key)
+    else if (key == shortcuts[SHRT_INC_POS].key)
+    {
+            _curItem->setWidth(_curItem->width() + 200);
+            redraw();
+            resizeItem(_curItem, false);
+    }
+    else if (key == shortcuts[SHRT_DEC_POS].key)
+    {
+            Part* part = _curItem->part();
+            part->setLenTick(part->lenTick() - 200);
+    }
+	else if (key == shortcuts[SHRT_SELECT_ALL_NODES].key)
 	{
+		//printf("Should be select all here\n");
 		if (_tool == AutomationTool)
 		{
-			printf("Should be select all here\n");
 			if (automation.currentCtrlList)
 			{
 				if (_curveNodeSelection->size())
