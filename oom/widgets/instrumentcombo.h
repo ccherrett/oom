@@ -16,12 +16,12 @@
 
 class MidiTrack;
 class QString;
-class InstrumentTree;
+class InstrumentMenu;
 
 class InstrumentCombo : public QComboBox
 {
 	Q_OBJECT
-	InstrumentTree *tree;
+	InstrumentMenu *tree;
 	int m_program;
 	QString m_name;
     bool eventFilter(QObject *obj, QEvent *event);
@@ -32,7 +32,7 @@ public:
 
 	int getProgram() { return m_program; }
 	void setProgram(int prog);
-	void setProgramName(QString pname) { m_name = pname; }
+	void setProgramName(QString pname);// { m_name = pname; }
 	QString getProgramName() { return m_name; }
 
 private:
@@ -40,10 +40,9 @@ private:
 	
 protected:
 	virtual void mousePressEvent(QMouseEvent*);
-private slots:
+public slots:
 	void updateValue(int, QString);
 signals:
-	void stopEditing();
 	void patchSelected(int, QString);
 };
 #endif

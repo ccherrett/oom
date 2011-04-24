@@ -8,6 +8,7 @@
 
 #include "instrumentcombo.h"
 #include "instrumenttree.h"
+#include "instrumentmenu.h"
 #include "track.h"
 #include "song.h"
 #include "midiport.h"
@@ -23,24 +24,28 @@ InstrumentCombo::InstrumentCombo(QWidget *parent, MidiTrack* track, int prog, QS
 	m_program = prog;
 	m_name = pname;
 
-	setEditable(true);
+	setEditable(false);
+	setMaxCount(1);
 	installEventFilter(this);
 }
 
 void InstrumentCombo::mousePressEvent(QMouseEvent* event)
 {
-	if(!lineEdit()->rect().contains(event->pos()))
-	{//We are clicking the arrow so display the list
+	//if(!lineEdit()->rect().contains(event->pos()))
+	//{//We are clicking the arrow so display the list
+		QMenu *p = new QMenu(this);
 		if(!tree)
 		{
-			tree = new InstrumentTree(this, m_track, true);
+	//printf("InstrumentCombo::mousePressEvent() trackName: %s\n",m_track->name().toUtf8().constData());
+			tree = new InstrumentMenu(p, m_track);
 			connect(tree, SIGNAL(patchSelected(int, QString)), this, SLOT(updateValue(int, QString)));
 			connect(tree, SIGNAL(patchSelected(int, QString)), this, SIGNAL(patchSelected(int, QString)));
-			connect(tree, SIGNAL(treeFocusLost()), this, SIGNAL(stopEditing()));
 		}
-		tree->move(lineEdit()->rect().bottomLeft());
-		tree->show();
-	}
+		p->addAction(tree);
+		p->exec(QCursor::pos());
+		//tree->move(QCursor::pos()/*lineEdit()->rect().bottomLeft()*/);
+		//tree->show();
+	//}
 }
 
 bool InstrumentCombo::eventFilter(QObject* obj, QEvent* event)
@@ -56,21 +61,16 @@ void InstrumentCombo::updateValue(int prog, QString name)
 {
 	m_program = prog;
 	m_name = name;
-	emit stopEditing();
+	clear();
+	addItem(m_name, m_program);
 }
 
 void InstrumentCombo::setProgram(int prog)
 {
 	m_program = prog;
-	if(m_track)
-	{
-		int port = m_track->outPort();
-		int channel = m_track->outChannel();
-		MidiInstrument* instr = midiPorts[port].instrument();
-		if(instr)
-		{
-			QString name = instr->getPatchName(channel, prog, song->mtype(), m_track->type() == Track::DRUM);
-			setProgramName(name);
-		}
-	}
+}
+
+void InstrumentCombo::setProgramName(QString pname)
+{
+	m_name = pname;
 }

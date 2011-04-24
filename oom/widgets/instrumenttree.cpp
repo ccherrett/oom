@@ -40,6 +40,7 @@ void InstrumentTree::updateModel()
 		_patchModel->clear();
 		return;
 	}
+	//printf("InstrumentTree::updateModel() trackName: %s\n",m_track->name().toUtf8().constData());
 	int channel = m_track->outChannel();
 	int port = m_track->outPort();
 	MidiInstrument* instr = midiPorts[port].instrument();

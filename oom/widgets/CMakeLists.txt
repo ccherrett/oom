@@ -92,6 +92,7 @@ QT4_WRAP_CPP (widget_mocs
 	  instrumenttree.h
 	  instrumentdelegate.h
 	  instrumentcombo.h
+	  instrumentmenu.h
 	  keymapmenu.h
       )
 
@@ -211,6 +212,7 @@ file (GLOB widgets_source_files
 	  instrumenttree.cpp
 	  instrumentdelegate.cpp
 	  instrumentcombo.cpp
+	  instrumentmenu.cpp
 	  keymapmenu.cpp
       )
 

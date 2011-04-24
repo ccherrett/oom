@@ -14,6 +14,8 @@
 #include <QItemSelectionModel>
 #include <QModelIndexList>
 #include <QModelIndex>
+#include <QStandardItemModel>
+#include <QMap>
 
 #include <math.h>
 #include <string.h>
@@ -31,6 +33,8 @@
 #include "track.h"
 #include "trackview.h"
 #include "synth.h"
+#include "instrumentdelegate.h"
+#include "tablespinner.h"
 
 TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(parent)
 {
@@ -40,6 +44,13 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	_trackTypes = (QStringList() << "All Types" << "Outputs" << "Inputs" << "Auxs" << "Busses" << "Midi Tracks" << "Soft Synth" << "Audio Tracks"); //new QStringList();
 	_editing = false;
 	_addmode = false;
+	InstrumentDelegate* pdelegate = new InstrumentDelegate(this);
+	TableSpinnerDelegate* tdelegate = new TableSpinnerDelegate(this);
+	m_model = new QStandardItemModel(0, 3, this);
+	optionsTable->setModel(m_model);
+	optionsTable->setItemDelegateForColumn(1, tdelegate);
+	optionsTable->setItemDelegateForColumn(2, pdelegate);
+	updateTableHeader();
 	//Populate trackTypes and pass it to cmbTypes 
 	cmbType->addItems(_trackTypes);
 	QStringList stracks;
@@ -135,7 +146,7 @@ void TrackViewEditor::btnNewClicked(bool)/*{{{*/
 		_addmode = true;
 		_editing = true;
 		btnDelete->setEnabled(false);
-		//Clear txtName, set value to Untitled
+		//Clear txtName, set value to Untitled 
 		txtName->setText(_selected->viewName());
 		txtName->setFocus(Qt::OtherFocusReason);
 		txtName->setReadOnly(false);
@@ -153,6 +164,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 		{
 			model->removeRows(0, model->rowCount());
 		}
+		m_model->clear();
 		//Clear txtName
 		txtName->setText("");
 		//Disable btnCopy
@@ -161,30 +173,75 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 		chkRecord->setChecked(false);
 		return;
 	}
+	m_model->clear();
 	btnCopy->setEnabled(true);
 	btnDelete->setEnabled(true);
 	//Perform actions to populate list below based on selected view
 	QString sl = cmbViews->itemText(ind);
 	txtName->setText(sl);
-	txtName->setReadOnly(false);
-	btnApply->setEnabled(false);
 	TrackView* v = song->findTrackView(sl);
 	_editing = true;
 	if(v)
 	{
 		_selected = v;
+		bool hasSettings = !v->trackSettings()->isEmpty();
 		TrackList* l = v->tracks();
 		if(l)
 		{
 			QStringList sl;
 			for(ciTrack ci = l->begin(); ci != l->end(); ++ci)
 			{
-				sl.append((*ci)->name());
+				QString trackname = (*ci)->name();
+				sl.append(trackname);
+				//Check if there are settings
+				if((*ci)->isMidiTrack())
+				{
+					if(hasSettings)
+					{
+						if(v->hasSettings(trackname))
+						{
+							TrackSettings *tset = v->getTrackSettings(trackname);
+							if(tset)
+							{
+								QStandardItem* tname = new QStandardItem(trackname);
+								tname->setEditable(false);
+								QStandardItem* transp = new QStandardItem(QString::number(tset->transpose));
+								transp->setEditable(true);
+								QStandardItem* patch = new QStandardItem(tset->pname);
+								patch->setData(tset->program, ProgramRole);
+								patch->setEditable(true);
+								QList<QStandardItem*> rowData;
+								rowData.append(tname);
+								rowData.append(transp);
+								rowData.append(patch);
+								m_model->appendRow(rowData);
+							}
+						}
+					}
+					else
+					{
+						QStandardItem* tname = new QStandardItem(trackname);
+						tname->setEditable(false);
+						QStandardItem* transp = new QStandardItem(QString::number(0));
+						transp->setEditable(true);
+						QStandardItem* patch = new QStandardItem(tr("Select Patch"));
+						patch->setData(0, ProgramRole);
+						patch->setEditable(true);
+						QList<QStandardItem*> rowData;
+						rowData.append(tname);
+						rowData.append(transp);
+						rowData.append(patch);
+						m_model->appendRow(rowData);
+					}
+				}
 			}
 			listSelectedTracks->setModel(new QStringListModel(sl));
 		}
 		chkRecord->setChecked(v->record());
 	}
+	txtName->setReadOnly(false);
+	btnApply->setEnabled(false);
+	updateTableHeader();
 	_editing = false;
 }/*}}}*/
 
@@ -305,7 +362,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 
 void TrackViewEditor::btnOkClicked(bool state)
 {
-	printf("TrackViewEditor::btnOkClicked()\n");
+	//printf("TrackViewEditor::btnOkClicked()\n");
 	//Apply is the same as ok without the close so just call the other method
 	if(_editing)
 		btnApplyClicked(state);
@@ -335,8 +392,10 @@ void TrackViewEditor::reset()/*{{{*/
 	{
 		model->removeRows(0, model->rowCount());
 	}
+	m_model->clear();
 	chkRecord->setChecked(false);
 	txtName->setText("");
+	updateTableHeader();
 }/*}}}*/
 
 void TrackViewEditor::btnCancelClicked(bool/* state*/)/*{{{*/
@@ -364,6 +423,13 @@ void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
 			for(ciTrack ci = tl->begin(); ci != tl->end(); ++ci)
 			{
 				tv->addTrack((*ci));
+			}
+
+			QMap<QString, TrackSettings>::ConstIterator ts;
+			for(ts = _selected->trackSettings()->begin(); ts != _selected->trackSettings()->end(); ++ts)
+			{
+				//if((*ts).valid)
+					tv->addTrackSetting((*ts).trackname, (*ts));
 			}
 			tv->setViewName(tv->getValidName(_selected->viewName()));
 			tv->setRecord(_selected->record());
@@ -421,24 +487,29 @@ void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 					{
 						slist.append(val);
 						lst->setStringList(slist);
+						//Add the trackinfo row for the track if it is a miditrack
+						if(trk->isMidiTrack())
+						{
+							QStandardItem* tname = new QStandardItem(trk->name());
+							tname->setEditable(false);
+							QStandardItem* transp = new QStandardItem(QString::number(0));
+							transp->setEditable(true);
+							QStandardItem* patch = new QStandardItem(tr("Select Patch"));
+							patch->setData(0, ProgramRole);
+							patch->setEditable(true);
+							QList<QStandardItem*> rowData;
+							rowData.append(tname);
+							rowData.append(transp);
+							rowData.append(patch);
+							m_model->appendRow(rowData);
+						}
 					}
-					//del.append(row);
 				}
 				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
 			}
-			//Delete the list in reverse order so the listview maintains the propper state
-			/*if(!del.isEmpty())
-			{
-				QListIterator<int> it(del); 
-				it.toBack();
-				while(it.hasPrevious())
-				{
-					lat->removeRow(it.previous());
-				}
-	
-			}*/
 		}
 	}
+	updateTableHeader();
 }/*}}}*/
 
 void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
@@ -469,6 +540,16 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 				{
 					del.append(row);
 				}
+				//Remove the trackinfo row for the track if it is a miditrack
+				if(trk->isMidiTrack())
+				{
+					QList<QStandardItem*> l = m_model->findItems(trk->name());
+					if(!l.isEmpty())
+					{
+						int row = l[0]->row();
+						m_model->takeRow(row);
+					}
+				}
 				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
 			}
 			//Delete the list in reverse order so the listview maintains the propper state
@@ -484,6 +565,7 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 			}
 		}
 	}
+	updateTableHeader();
 }/*}}}*/
 
 void TrackViewEditor::btnUpClicked(bool)/*{{{*/
@@ -512,7 +594,8 @@ void TrackViewEditor::btnUpClicked(bool)/*{{{*/
 				QString track = list.takeAt(id);
 				list.insert(row, track);
 				lst->setStringList(list);
-				//model->setCurrentIndex(index);
+				QModelIndex index = lst->index(row);
+				listSelectedTracks->setCurrentIndex(index);
 				break; //Only process the first selection FIXME: We need a function to handle this and keep track of where you are in a multitrack move
 			}
 		}
@@ -545,6 +628,8 @@ void TrackViewEditor::btnDownClicked(bool)/*{{{*/
 				QString track = list.takeAt(id);
 				list.insert(row, track);
 				lst->setStringList(list);
+				QModelIndex index = lst->index(row);
+				listSelectedTracks->setCurrentIndex(index);
 				//listSelectedTracks->
 				//model->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
 				break; //Only process the first selection FIXME: We need a function to handle this and keep track of where you are in a multitrack move
@@ -571,3 +656,17 @@ void TrackViewEditor::setViews(TrackViewList* l)
 	_viewList = l;
 	//Call methods to update the display
 }
+
+void TrackViewEditor::updateTableHeader()/*{{{*/
+{
+	QStandardItem* tname = new QStandardItem(tr("Track"));
+	QStandardItem* transp = new QStandardItem(tr("Transpose"));
+	QStandardItem* hpatch = new QStandardItem(tr("Patch"));
+	m_model->setHorizontalHeaderItem(0, tname);
+	m_model->setHorizontalHeaderItem(1, transp);
+	m_model->setHorizontalHeaderItem(2, hpatch);
+	optionsTable->setColumnWidth(0, 100);
+	optionsTable->setColumnWidth(1, 80);
+	optionsTable->setColumnWidth(2, 120);
+	optionsTable->horizontalHeader()->setStretchLastSection(true);
+}/*}}}*/

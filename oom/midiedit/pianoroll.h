@@ -51,6 +51,7 @@ class QScrollBar;
 class MidiTrackInfo;
 class QScrollArea;
 class Piano;
+class Patch;
 
 //---------------------------------------------------------
 //   PianoRoll

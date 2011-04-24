@@ -1818,7 +1818,6 @@ void PianoRoll::setSpeaker(bool val)
 	canvas->playEvents(_playEvents);
 }
 
-#ifdef LSCP_SUPPORT
 
 void PianoRoll::setKeyBindings(Patch* p)
 {
@@ -1834,6 +1833,7 @@ void PianoRoll::setKeyBindings(Patch* p)
 //   setKeyBindings
 //---------------------------------------------------------
 
+#ifdef LSCP_SUPPORT
 void PianoRoll::setKeyBindings(LSCPChannelInfo info)/*{{{*/
 {
 	printf("entering PianoRoll::setKeyBindings\n");

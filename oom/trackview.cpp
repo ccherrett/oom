@@ -120,7 +120,7 @@ void TrackView::read(Xml& xml)/*{{{*/
 					TrackSettings ts;
 					ts.valid = true;
 					ts.read(xml);
-					_tSettings[ts.name] = ts;
+					_tSettings[ts.trackname] = ts;
 				}
 				break;
 			case Xml::Attribut:

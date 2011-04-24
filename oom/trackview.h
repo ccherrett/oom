@@ -24,11 +24,19 @@
 class Xml;
 
 struct TrackSettings {
+	TrackSettings(int p = 0, int r = 0, int tp = 0, QString pn = "Select Patch", QString tn = "") {
+		program = p;
+		pname = pn;
+		transpose = tp;
+		rec = r;
+		trackname = tn;
+	}
 	bool valid;
 	int program;
+	QString pname;
 	int transpose;
 	bool rec;
-	QString name;
+	QString trackname;
 	virtual void write(int, Xml&) const;
 	virtual void read(Xml&);
 };
@@ -92,12 +100,6 @@ class TrackView
 		}
 		virtual void write(int, Xml&) const;
 		void read(Xml&);
-		
-		//virtual TrackView* newTrackView() const = 0;
-		
-		//void dump() const;
-		
-		//bool readProperty(Xml& xml, const QString& tag);
 };
 
 

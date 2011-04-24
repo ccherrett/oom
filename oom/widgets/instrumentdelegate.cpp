@@ -27,14 +27,17 @@ QWidget *InstrumentDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 		if(mod)
 		{
 			//MidiTrack* track = dynamic_cast<MidiTrack*>(mod->data(trackfield, InstrumentRole));
-			QString tname = mod->data(trackfield, InstrumentRole).toString();
+			QString tname = mod->data(trackfield, Qt::DisplayRole).toString();
 			Track* t = song->findTrack(tname);
 			if(t && t->isMidiTrack())
 			{
 				int prog = mod->data(index, ProgramRole).toInt();
 				QString pname = mod->data(index, Qt::DisplayRole).toString();
-				InstrumentCombo *editor = new InstrumentCombo(parent, (MidiTrack*)t, prog, pname);
-				return editor;
+				InstrumentCombo *m_editor = new InstrumentCombo(parent, (MidiTrack*)t, prog, pname);
+				m_editor->updateValue(prog, pname);
+				//m_editor->setProgram(prog);
+				//m_editor->setProgramName(pname);
+				return m_editor;
 			}
 		}
 	}
@@ -52,11 +55,15 @@ void InstrumentDelegate::setEditorData(QWidget *editor, const QModelIndex &index
 
 void InstrumentDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-	QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-	spinBox->interpretText();
-	int value = spinBox->value();
+	InstrumentCombo *combo = static_cast<InstrumentCombo*>(editor);
+	if(combo)
+	{
+		int value = combo->getProgram();
+		QString n = combo->getProgramName();
 
-	model->setData(index, value, Qt::EditRole);
+		model->setData(index, n, Qt::EditRole);
+		model->setData(index, value, ProgramRole);
+	}
 }
 
 void InstrumentDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const

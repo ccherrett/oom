@@ -1635,7 +1635,7 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 	QMap<QString, TrackSettings>::ConstIterator ts;
 	for(ts = _tSettings.begin(); ts != _tSettings.end(); ++ts)
 	{
-		if((*ts).valid)
+		//if((*ts).valid)
 			(*ts).write(level, xml);
 	}
 	xml.put(level--, "</%s>", tag.c_str());
@@ -1645,7 +1645,8 @@ void TrackSettings::write(int level, Xml& xml) const
 {
 	std::string tag = "tracksettings";
 	xml.put(level, "<%s>", tag.c_str());
-	xml.strTag(level, "name", name.toUtf8().constData());
+	xml.strTag(level, "pname", pname.toUtf8().constData());
+	xml.strTag(level, "trackname", trackname.toUtf8().constData());
 	xml.intTag(level, "program", program);
 	xml.intTag(level, "rec", rec);
 	xml.intTag(level, "transpose", transpose);
@@ -1664,9 +1665,13 @@ void TrackSettings::read(Xml& xml)
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if(tag == "name")
+				if(tag == "pname")
 				{
-					name = xml.parse1();
+					pname = xml.parse1();
+				}
+				else if(tag == "trackname")
+				{
+					trackname = xml.parse1();
 				}
 				else if(tag == "rec")
 				{

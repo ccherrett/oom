@@ -30,7 +30,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	TrackView* _selected;
 	bool _editing;
 	bool _addmode;
-	//QStandardItemModel m_model;
+	QStandardItemModel *m_model;
 
 	QStringList _trackTypes;
 	QPushButton* btnAdd;
@@ -55,6 +55,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 		void txtNameEdited(QString);
 		void chkRecordChecked(bool);
 		void reset();
+		void updateTableHeader();
 
 	public:
 		TrackViewEditor(QWidget*, TrackViewList* = 0);
