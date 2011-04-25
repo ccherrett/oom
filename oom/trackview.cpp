@@ -114,9 +114,9 @@ void TrackView::setSelected(bool f)
 					}
 				}
 			}
-			//(*it)->setRecordFlag1(false);
-			//(*it)->setRecordFlag2(false);
-			//(*it)->setSelected(false);
+		//	(*it)->setRecordFlag1(false);
+		//	(*it)->setRecordFlag2(false);
+		//	(*it)->setSelected(false);
 		}/*}}}*/
 	}
 }

@@ -77,7 +77,7 @@ void InstrumentMenu::updatePatch(int prog, QString name)
 
 void InstrumentMenu::doClose()
 {
-	printf("InstrumentMenu::doClose() classed\n");
+	//printf("InstrumentMenu::doClose() classed\n");
 	setData(m_program);
 	
 	//FIXME: This is a seriously brutal HACK but its the only way it can get it done
@@ -90,7 +90,7 @@ void InstrumentMenu::doClose()
 
 void InstrumentMenu::clearPatch()
 {
-	printf("InstrumentMenu::clearPatch() called\n");
+	//printf("InstrumentMenu::clearPatch() called\n");
 	m_program = 0;
 	m_name = QString(tr("Select Patch"));
 	emit patchSelected(m_program, m_name);
