@@ -114,9 +114,11 @@ void TrackView::setSelected(bool f)
 					}
 				}
 			}
-		//	(*it)->setRecordFlag1(false);
-		//	(*it)->setRecordFlag2(false);
-		//	(*it)->setSelected(false);
+			//Remove record arm so we dont have hidded tracks armed
+			//As requested by Wendy Cherrett
+			(*it)->setRecordFlag1(false);
+			(*it)->setRecordFlag2(false);
+			(*it)->setSelected(false);
 		}/*}}}*/
 	}
 }
