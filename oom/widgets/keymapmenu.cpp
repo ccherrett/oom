@@ -40,7 +40,7 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 
 	QVBoxLayout* layout = new QVBoxLayout();
 	QWidget* w = new QWidget(parent);
-	w->setFixedHeight(350);
+	w->setFixedHeight(500);
 	QString title(tr("Default Patch - Note: "));
 	QLabel* plabel = new QLabel(title.append(song->key2note(m_keymap->key)));
 	plabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
@@ -83,6 +83,7 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 
 	m_comment = new QTextEdit();
 	m_comment->setText(m_keymap->comment);
+	m_comment->setFixedHeight(150);
 	layout->addWidget(m_comment);
 	connect(m_comment, SIGNAL(textChanged()), SLOT(updateComment()));
 	
