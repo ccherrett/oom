@@ -1655,10 +1655,11 @@ void TrackSettings::write(int level, Xml& xml) const
 
 void TrackSettings::read(Xml& xml)
 {
-	program = 0;
+	program = -1;
 	rec = 0;
 	pname = QString("");
 	track = 0;
+	transpose = 0;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();

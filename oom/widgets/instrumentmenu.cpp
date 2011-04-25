@@ -91,7 +91,7 @@ void InstrumentMenu::doClose()
 void InstrumentMenu::clearPatch()
 {
 	//printf("InstrumentMenu::clearPatch() called\n");
-	m_program = 0;
+	m_program = -1;
 	m_name = QString(tr("Select Patch"));
 	emit patchSelected(m_program, m_name);
 	doClose();

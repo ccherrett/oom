@@ -353,11 +353,11 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 						QStandardItem* patch = m_model->item(row, 2);
 						QString pname = patch->text();
 						int prog = patch->data(ProgramRole).toInt();
-						printf("Track name: %s - Transpose: %d - Program: %d - Patch Name: %s\n", 
-							titem->text().toUtf8().constData(), transpose, prog, pname.toUtf8().constData());
-						if((transpose != 0) || prog)
+						//printf("Track name: %s - Transpose: %d - Program: %d - Patch Name: %s\n", 
+						//	titem->text().toUtf8().constData(), transpose, prog, pname.toUtf8().constData());
+						if((transpose != 0) || prog >= 0)
 						{
-							printf("Added TrackSettings for Track: %s\n", titem->text().toUtf8().constData());
+							//printf("Added TrackSettings for Track: %s\n", titem->text().toUtf8().constData());
 							TrackSettings *ts = new TrackSettings;
 							ts->pname = pname;
 							ts->program = prog;
