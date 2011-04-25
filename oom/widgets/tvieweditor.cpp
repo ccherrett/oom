@@ -200,7 +200,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 				QStandardItem* tname = new QStandardItem(trackname);
 				tname->setEditable(false);
 				QString tp("0");
-				QString pname("N/A");
+				QString pname((*ci)->isMidiTrack() ? tr("Select Patch") : "-");
 				int prog = 0;
 				//Check if there are settings
 				if(hasSettings)
@@ -321,11 +321,11 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 
 void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 {
-	printf("TrackViewEditor::btnApplyClicked()\n");
+	//printf("TrackViewEditor::btnApplyClicked()\n");
 	if(_editing && _selected)
 	{
 		_selected->setViewName(txtName->text());
-		printf("after setviewname\n");
+		//printf("after setviewname\n");
 		TrackList *tl = _selected->tracks();
 		if(tl)
 		{
@@ -411,7 +411,7 @@ void TrackViewEditor::reset()/*{{{*/
 
 void TrackViewEditor::btnCancelClicked(bool/* state*/)/*{{{*/
 {
-	printf("TrackViewEditor::btnCancelClicked()\n");
+	//printf("TrackViewEditor::btnCancelClicked()\n");
 	if(_addmode)
 	{//remove the trackview that was added to the song
 		TrackView* v = song->trackviews()->back();
@@ -470,15 +470,13 @@ void TrackViewEditor::btnDeleteClicked(bool)/*{{{*/
 void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 {
 	//Perform actions to add action to right list and remove from left
-	printf("Add button clicked\n");
+	//printf("Add button clicked\n");
 	if(_selected)
 	{
 		btnApply->setEnabled(true);
 		_editing = true;
 		QItemSelectionModel* model = listAllTracks->selectionModel();
-		//QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
 		QAbstractItemModel* lat = listAllTracks->model(); 
-		//QList<int> del;
 		if (model->hasSelection())
 		{
 			QModelIndexList sel = model->selectedRows(0);
@@ -501,7 +499,7 @@ void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 						transp->setEditable(false);
 						if(trk->isMidiTrack())
 							transp->setEditable(true);
-						QStandardItem* patch = new QStandardItem(trk->isMidiTrack() ? tr("Select Patch") : "N/A");
+						QStandardItem* patch = new QStandardItem(trk->isMidiTrack() ? tr("Select Patch") : "-");
 						patch->setData(0, ProgramRole);
 						patch->setEditable(false);
 						if(trk->isMidiTrack())
@@ -524,7 +522,7 @@ void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 {
 	//Perform action to remove track from the selectedTracks list
-	printf("Remove button clicked\n");
+	//printf("Remove button clicked\n");
 	if(_selected)
 	{
 		btnApply->setEnabled(true);
@@ -565,7 +563,7 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 void TrackViewEditor::btnUpClicked(bool)/*{{{*/
 {
 	//Perform action to remove track from the selectedTracks list
-	printf("Remove up clicked\n");
+	//printf("Remove up clicked\n");
 	if(_selected)
 	{
 		btnApply->setEnabled(true);
@@ -587,7 +585,7 @@ void TrackViewEditor::btnUpClicked(bool)/*{{{*/
 void TrackViewEditor::btnDownClicked(bool)/*{{{*/
 {
 	//Perform action to remove track from the selectedTracks list
-	printf("Remove up clicked\n");
+	//printf("Remove up clicked\n");
 	if(_selected)
 	{
 		btnApply->setEnabled(true);

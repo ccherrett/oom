@@ -47,8 +47,6 @@ QWidget *InstrumentDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 
 void InstrumentDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-	//int value = index.model()->data(index, Qt::EditRole).toInt();
-
 	InstrumentCombo *combo = static_cast<InstrumentCombo*>(editor);
 	const QAbstractItemModel* mod = index.model();
 	if(combo && mod)

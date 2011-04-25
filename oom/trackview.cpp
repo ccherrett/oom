@@ -8,6 +8,9 @@
 
 #include "event.h"
 #include "song.h"
+#include "audio.h"
+#include "midi.h"
+#include "midictrl.h"
 #include "xml.h"
 #include "globaldefs.h"
 #include "trackview.h"
@@ -64,14 +67,57 @@ void TrackView::removeTrack(Track* t)
 void TrackView::setSelected(bool f)
 {
 	_selected = f;
-	if(!f)
+	if(f)
 	{
-		for(iTrack it = tracks()->begin(); it != tracks()->end(); ++it)
+		for(iTrack it = tracks()->begin(); it != tracks()->end(); ++it)/*{{{*/
 		{
-			(*it)->setRecordFlag1(false);
-			(*it)->setRecordFlag2(false);
-			(*it)->setSelected(false);
-		}
+			if((*it)->isMidiTrack() && hasSettings((*it)->name()))
+			{
+				MidiTrack* track = (MidiTrack*) (*it);;
+				TrackSettings* tset = _tSettings[(*it)->name()];
+				if(tset)
+				{
+					if(tset->transpose != 0)
+					{
+						track->transposition = tset->transpose;
+						track->transpose = true;
+					}
+					if(tset->program)
+					{
+						int channel = track->outChannel();
+						int port = track->outPort();
+
+						MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, tset->program);
+						audio->msgPlayMidiEvent(&ev);
+					}
+				}
+			}
+			//(*it)->setRecordFlag1(false);
+			//(*it)->setRecordFlag2(false);
+			//(*it)->setSelected(false);
+		}/*}}}*/
+	}
+	else
+	{
+		for(iTrack it = tracks()->begin(); it != tracks()->end(); ++it)/*{{{*/
+		{
+			if((*it)->isMidiTrack() && hasSettings((*it)->name()))
+			{
+				MidiTrack* track = (MidiTrack*) (*it);;
+				TrackSettings* tset = _tSettings[(*it)->name()];
+				if(tset)
+				{
+					if(tset->transpose != 0)
+					{
+						track->transposition = 0;
+						track->transpose = false;
+					}
+				}
+			}
+			//(*it)->setRecordFlag1(false);
+			//(*it)->setRecordFlag2(false);
+			//(*it)->setSelected(false);
+		}/*}}}*/
 	}
 }
 //---------------------------------------------------------
