@@ -24,6 +24,7 @@ CommentDock::CommentDock(QWidget* parent, Track* t)
 	connect(textentry, SIGNAL(textChanged()), this, SLOT(textChanged()));
 	connect(songComment, SIGNAL(textChanged()), this, SLOT(songCommentChanged()));
 	updateComments();
+    commentDockSplitter->setChildrenCollapsible(false);
 }
 
 //---------------------------------------------------------

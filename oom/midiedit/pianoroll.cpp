@@ -538,7 +538,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     gridS2->addWidget(hscroll, 0, 1);
 
     //gridS2->addWidget(corner, 0, 2, Qt::AlignBottom | Qt::AlignRight);
-    //splitter->setCollapsible(0, true);
+    //splitter->setChildrenCollapsible(false);
+    splitter->setCollapsible(2, false);
 
     piano->setFixedWidth(pianoWidth);
 
