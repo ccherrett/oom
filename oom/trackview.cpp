@@ -82,7 +82,7 @@ void TrackView::setSelected(bool f)
 						track->transposition = tset->transpose;
 						track->transpose = true;
 					}
-					if(tset->program)
+					if(tset->program >= 0)
 					{
 						int channel = track->outChannel();
 						int port = track->outPort();
