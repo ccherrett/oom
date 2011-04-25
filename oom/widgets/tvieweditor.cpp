@@ -349,7 +349,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 					if(t->isMidiTrack())
 					{
 						QStandardItem* trans = m_model->item(row, 1);
-						int transpose = trans->text().toInt();
+						int transpose = trans->data(Qt::DisplayRole).toInt();
 						QStandardItem* patch = m_model->item(row, 2);
 						QString pname = patch->text();
 						int prog = patch->data(ProgramRole).toInt();
@@ -373,6 +373,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 		_selected->setRecord(chkRecord->isChecked());
 		song->dirty = true;
 		song->updateTrackViews1();
+		btnApply->setEnabled(false);
 		//reset();
 	}
 }/*}}}*/
