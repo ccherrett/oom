@@ -117,10 +117,11 @@ void TrackView::read(Xml& xml)/*{{{*/
 				}
 				else if(tag == "tracksettings")
 				{
-					TrackSettings ts;
-					ts.valid = true;
-					ts.read(xml);
-					_tSettings[ts.trackname] = ts;
+					TrackSettings *ts = new TrackSettings;
+					ts->valid = true;
+					ts->read(xml);
+					if(ts->track)
+						_tSettings[ts->track->name()] = ts;
 				}
 				break;
 			case Xml::Attribut:

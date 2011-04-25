@@ -24,19 +24,12 @@
 class Xml;
 
 struct TrackSettings {
-	TrackSettings(int p = 0, int r = 0, int tp = 0, QString pn = "Select Patch", QString tn = "") {
-		program = p;
-		pname = pn;
-		transpose = tp;
-		rec = r;
-		trackname = tn;
-	}
 	bool valid;
 	int program;
 	QString pname;
 	int transpose;
 	bool rec;
-	QString trackname;
+	Track* track;
 	virtual void write(int, Xml&) const;
 	virtual void read(Xml&);
 };
@@ -50,7 +43,7 @@ class TrackView
 	private:
 		QString _comment;
 		TrackList _tracks;
-		QMap<QString, TrackSettings> _tSettings;
+		QMap<QString, TrackSettings*> _tSettings;
 		bool _recState;
 
 
@@ -83,9 +76,16 @@ class TrackView
 		TrackList* tracks() { return &_tracks; } 
 		bool record() { return _recState; }
 		void setRecord(bool f) { _recState = f; }
-		QMap<QString, TrackSettings>* trackSettings() { return &_tSettings;}
-		void addTrackSetting(QString tname, TrackSettings settings) {
+		QMap<QString, TrackSettings*>* trackSettings() { return &_tSettings;}
+		void addTrackSetting(QString tname, TrackSettings* settings) {
 			_tSettings[tname] = settings;
+		}
+		void removeTrackSettings(QString name)
+		{
+			if(hasSettings(name))
+			{
+				_tSettings.erase(_tSettings.find(name));
+			}
 		}
 		bool hasSettings(QString tname)
 		{
@@ -94,7 +94,7 @@ class TrackView
 		TrackSettings* getTrackSettings(QString tname)
 		{
 			if(hasSettings(tname))
-				return &_tSettings[tname];
+				return _tSettings[tname];
 			else
 				return new TrackSettings;
 		}

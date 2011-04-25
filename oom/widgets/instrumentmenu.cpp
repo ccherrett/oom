@@ -45,6 +45,12 @@ QWidget* InstrumentMenu::createWidget(QWidget* parent)
 	plabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 	plabel->setObjectName("KeyMapMenuLabel");
 	layout->addWidget(plabel);
+	QPushButton *btnClear = new QPushButton(tr("Clear Patch"));
+	connect(btnClear, SIGNAL(clicked()), this, SLOT(clearPatch()));
+	layout->addWidget(btnClear);
+
+	QPushButton *btnClose = new QPushButton(tr("Dismiss"));
+	connect(btnClose, SIGNAL(clicked()), this, SLOT(doClose()));
 
 	m_tree = new InstrumentTree(w, m_track);
 	m_tree->setObjectName("InstrumentMenuList");
@@ -53,12 +59,10 @@ QWidget* InstrumentMenu::createWidget(QWidget* parent)
 	m_tree->setAlternatingRowColors(true);
 	m_tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	connect(m_tree, SIGNAL(patchSelected(int, QString)), this, SIGNAL(patchSelected(int, QString)));
-	connect(m_tree, SIGNAL(patchSelected(int, QString)), SLOT(updatePatch(int, QString)));
+	connect(m_tree, SIGNAL(patchSelected(int, QString)), this, SLOT(updatePatch(int, QString)));
 	layout->addWidget(m_tree);
 
-	QPushButton *btnClose = new QPushButton(tr("Dismiss"));
 	layout->addWidget(btnClose);
-	connect(btnClose, SIGNAL(clicked()), SLOT(doClose()));
 
 	w->setLayout(layout);
 	return w;
@@ -73,6 +77,7 @@ void InstrumentMenu::updatePatch(int prog, QString name)
 
 void InstrumentMenu::doClose()
 {
+	printf("InstrumentMenu::doClose() classed\n");
 	setData(m_program);
 	
 	//FIXME: This is a seriously brutal HACK but its the only way it can get it done
@@ -81,4 +86,13 @@ void InstrumentMenu::doClose()
 
 	QKeyEvent *e2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
 	QCoreApplication::postEvent(this->parent(), e2);
+}
+
+void InstrumentMenu::clearPatch()
+{
+	printf("InstrumentMenu::clearPatch() called\n");
+	m_program = 0;
+	m_name = QString(tr("Select Patch"));
+	emit patchSelected(m_program, m_name);
+	doClose();
 }

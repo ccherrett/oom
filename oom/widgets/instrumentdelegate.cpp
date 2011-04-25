@@ -47,10 +47,16 @@ QWidget *InstrumentDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 
 void InstrumentDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-	int value = index.model()->data(index, Qt::EditRole).toInt();
+	//int value = index.model()->data(index, Qt::EditRole).toInt();
 
 	InstrumentCombo *combo = static_cast<InstrumentCombo*>(editor);
-	combo->setProgram(value);
+	const QAbstractItemModel* mod = index.model();
+	if(combo && mod)
+	{
+		int prog = mod->data(index, ProgramRole).toInt();
+		QString pname = mod->data(index, Qt::DisplayRole).toString();
+		combo->updateValue(prog, pname);
+	}
 }
 
 void InstrumentDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
@@ -61,7 +67,7 @@ void InstrumentDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 		int value = combo->getProgram();
 		QString n = combo->getProgramName();
 
-		model->setData(index, n, Qt::EditRole);
+		model->setData(index, n, Qt::DisplayRole);
 		model->setData(index, value, ProgramRole);
 	}
 }

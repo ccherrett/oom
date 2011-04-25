@@ -41,6 +41,7 @@ public:
 
 private slots:
 	void doClose();
+	void clearPatch();
 public slots:
 	void updatePatch(int, QString);
 	

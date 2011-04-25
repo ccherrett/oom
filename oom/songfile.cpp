@@ -1632,11 +1632,11 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 	{
 		xml.strTag(level, "vtrack", (*t)->name());
 	}
-	QMap<QString, TrackSettings>::ConstIterator ts;
+	QMap<QString, TrackSettings*>::ConstIterator ts;
 	for(ts = _tSettings.begin(); ts != _tSettings.end(); ++ts)
 	{
 		//if((*ts).valid)
-			(*ts).write(level, xml);
+			(*ts)->write(level, xml);
 	}
 	xml.put(level--, "</%s>", tag.c_str());
 }/*}}}*/
@@ -1645,8 +1645,8 @@ void TrackSettings::write(int level, Xml& xml) const
 {
 	std::string tag = "tracksettings";
 	xml.put(level, "<%s>", tag.c_str());
+	xml.strTag(level, "trackname", track->name().toUtf8().constData());
 	xml.strTag(level, "pname", pname.toUtf8().constData());
-	xml.strTag(level, "trackname", trackname.toUtf8().constData());
 	xml.intTag(level, "program", program);
 	xml.intTag(level, "rec", rec);
 	xml.intTag(level, "transpose", transpose);
@@ -1655,6 +1655,10 @@ void TrackSettings::write(int level, Xml& xml) const
 
 void TrackSettings::read(Xml& xml)
 {
+	program = 0;
+	rec = 0;
+	pname = QString("");
+	track = 0;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -1671,7 +1675,9 @@ void TrackSettings::read(Xml& xml)
 				}
 				else if(tag == "trackname")
 				{
-					trackname = xml.parse1();
+					Track *t = song->findTrack(xml.parse1());
+					if(t)
+						track = t;
 				}
 				else if(tag == "rec")
 				{

@@ -47,6 +47,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	InstrumentDelegate* pdelegate = new InstrumentDelegate(this);
 	TableSpinnerDelegate* tdelegate = new TableSpinnerDelegate(this);
 	m_model = new QStandardItemModel(0, 3, this);
+	m_selmodel = new QItemSelectionModel(m_model);
 	optionsTable->setModel(m_model);
 	optionsTable->setItemDelegateForColumn(1, tdelegate);
 	optionsTable->setItemDelegateForColumn(2, pdelegate);
@@ -61,8 +62,8 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	}
 	cmbViews->addItems(buildViewList());
 	listAllTracks->setModel(new QStringListModel(stracks));
-	QStringList sel;
-	listSelectedTracks->setModel(new QStringListModel(sel));
+	//QStringList sel;
+	//listSelectedTracks->setModel(new QStringListModel(sel));
 	
 	btnOk = buttonBox->button(QDialogButtonBox::Ok);
 	btnCancel = buttonBox->button(QDialogButtonBox::Cancel);
@@ -98,6 +99,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(btnUpClicked(bool)));
 	connect(btnDown, SIGNAL(clicked(bool)), SLOT(btnDownClicked(bool)));
 	connect(chkRecord, SIGNAL(toggled(bool)), SLOT(chkRecordChecked(bool)));
+	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(settingsChanged(QStandardItem*)));
 }
 
 
@@ -137,6 +139,15 @@ void TrackViewEditor::chkRecordChecked(bool)
 	}
 }
 
+void TrackViewEditor::settingsChanged(QStandardItem*)
+{
+	if(_selected)
+	{
+		_editing = true;
+		btnApply->setEnabled(true);
+	}
+}
+
 void TrackViewEditor::btnNewClicked(bool)/*{{{*/
 {
 	reset();
@@ -158,12 +169,6 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 {
 	if(ind == 0)
 	{
-		//Clear listSelectedTracks
-		QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
-		if(model)
-		{
-			model->removeRows(0, model->rowCount());
-		}
 		m_model->clear();
 		//Clear txtName
 		txtName->setText("");
@@ -188,54 +193,45 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 		TrackList* l = v->tracks();
 		if(l)
 		{
-			QStringList sl;
+			//QStringList sl;
 			for(ciTrack ci = l->begin(); ci != l->end(); ++ci)
 			{
 				QString trackname = (*ci)->name();
-				sl.append(trackname);
+				QStandardItem* tname = new QStandardItem(trackname);
+				tname->setEditable(false);
+				QString tp("0");
+				QString pname("N/A");
+				int prog = 0;
 				//Check if there are settings
-				if((*ci)->isMidiTrack())
+				if(hasSettings)
 				{
-					if(hasSettings)
+					if(v->hasSettings(trackname))
 					{
-						if(v->hasSettings(trackname))
+						TrackSettings *tset = v->getTrackSettings(trackname);
+						if(tset)
 						{
-							TrackSettings *tset = v->getTrackSettings(trackname);
-							if(tset)
-							{
-								QStandardItem* tname = new QStandardItem(trackname);
-								tname->setEditable(false);
-								QStandardItem* transp = new QStandardItem(QString::number(tset->transpose));
-								transp->setEditable(true);
-								QStandardItem* patch = new QStandardItem(tset->pname);
-								patch->setData(tset->program, ProgramRole);
-								patch->setEditable(true);
-								QList<QStandardItem*> rowData;
-								rowData.append(tname);
-								rowData.append(transp);
-								rowData.append(patch);
-								m_model->appendRow(rowData);
-							}
+							tp = QString::number(tset->transpose);
+							pname = tset->pname;
+							prog = tset->program;
 						}
 					}
-					else
-					{
-						QStandardItem* tname = new QStandardItem(trackname);
-						tname->setEditable(false);
-						QStandardItem* transp = new QStandardItem(QString::number(0));
-						transp->setEditable(true);
-						QStandardItem* patch = new QStandardItem(tr("Select Patch"));
-						patch->setData(0, ProgramRole);
-						patch->setEditable(true);
-						QList<QStandardItem*> rowData;
-						rowData.append(tname);
-						rowData.append(transp);
-						rowData.append(patch);
-						m_model->appendRow(rowData);
-					}
 				}
+
+				QStandardItem* transp = new QStandardItem(tp);
+				transp->setEditable(false);
+				if((*ci)->isMidiTrack())
+					transp->setEditable(true);
+				QStandardItem* patch = new QStandardItem(pname);
+				patch->setData(prog, ProgramRole);
+				patch->setEditable(false);
+				if((*ci)->isMidiTrack())
+					patch->setEditable(true);
+				QList<QStandardItem*> rowData;
+				rowData.append(tname);
+				rowData.append(transp);
+				rowData.append(patch);
+				m_model->appendRow(rowData);
 			}
-			listSelectedTracks->setModel(new QStringListModel(sl));
 		}
 		chkRecord->setChecked(v->record());
 	}
@@ -339,24 +335,45 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 		{
 			tl = new TrackList();
 		}
+		_selected->trackSettings()->clear();
 		//Process all the tracks in the listSelectedTracks and add them to the TrackList
-		QStringListModel* model = (QStringListModel*)listSelectedTracks->model(); 
-		if(model)
+		for(int row = 0; row < m_model->rowCount(); ++row)
 		{
-			QStringList list = model->stringList();
-			for(int i = 0; i < list.size(); ++i)
+			QStandardItem* titem = m_model->item(row, 0);
+			if(titem)
 			{
-				Track *t = song->findTrack(list.at(i));
+				Track *t = song->findTrack(titem->text());
 				if(t)
 				{
-					_selected->addTrack(t);//tl->push_back(t);
+					_selected->addTrack(t);
+					if(t->isMidiTrack())
+					{
+						QStandardItem* trans = m_model->item(row, 1);
+						int transpose = trans->text().toInt();
+						QStandardItem* patch = m_model->item(row, 2);
+						QString pname = patch->text();
+						int prog = patch->data(ProgramRole).toInt();
+						if((transpose != 0) || prog)
+						{
+							TrackSettings *ts = new TrackSettings;
+							ts->pname = pname;
+							ts->program = prog;
+							ts->transpose = transpose;
+							ts->track = t;
+							_selected->addTrackSetting(ts->track->name(), ts);
+						}
+						/*else if(_selected->hasSettings(titem->text()))
+						{
+							_selected->removeTrackSettings(titem->text());
+						}*/
+					}
 				}
 			}
 		}
 		_selected->setRecord(chkRecord->isChecked());
 		song->dirty = true;
 		song->updateTrackViews1();
-		reset();
+		//reset();
 	}
 }/*}}}*/
 
@@ -376,6 +393,7 @@ void TrackViewEditor::reset()/*{{{*/
 	QAbstractItemModel *mod = cmbViews->model();
 	if(mod)
 		mod->removeRows(0, mod->rowCount());
+	m_model->clear();
 	cmbViews->addItems(buildViewList());
 	cmbViews->blockSignals(false);
 	cmbViews->setCurrentIndex(0);
@@ -386,13 +404,6 @@ void TrackViewEditor::reset()/*{{{*/
 	_editing = false;
 	_addmode = false;
 	_selected = 0;
-	//Reset listSelectedTracks
-	QStringListModel* model = (QStringListModel*)listSelectedTracks->model();
-	if(model)
-	{
-		model->removeRows(0, model->rowCount());
-	}
-	m_model->clear();
 	chkRecord->setChecked(false);
 	txtName->setText("");
 	updateTableHeader();
@@ -425,11 +436,11 @@ void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
 				tv->addTrack((*ci));
 			}
 
-			QMap<QString, TrackSettings>::ConstIterator ts;
+			QMap<QString, TrackSettings*>::ConstIterator ts;
 			for(ts = _selected->trackSettings()->begin(); ts != _selected->trackSettings()->end(); ++ts)
 			{
 				//if((*ts).valid)
-					tv->addTrackSetting((*ts).trackname, (*ts));
+					tv->addTrackSetting((*ts)->track->name(), (*ts));
 			}
 			tv->setViewName(tv->getValidName(_selected->viewName()));
 			tv->setRecord(_selected->record());
@@ -465,7 +476,7 @@ void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 		btnApply->setEnabled(true);
 		_editing = true;
 		QItemSelectionModel* model = listAllTracks->selectionModel();
-		QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
+		//QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
 		QAbstractItemModel* lat = listAllTracks->model(); 
 		//QList<int> del;
 		if (model->hasSelection())
@@ -475,34 +486,32 @@ void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 			for (id = sel.constBegin(); id != sel.constEnd(); ++id)
 			{
 				//We have to index we will get the row.
-				//int row = (*id).row();
 				QVariant v = lat->data((*id));
 				QString val = v.toString();
 				Track* trk = song->findTrack(val);
-				if (trk && lst)
+				if (trk)
 				{
 				//	printf("Adding Track from row: %d\n", row);
-					QStringList slist  = lst->stringList();
-					if(slist.indexOf(val) == -1)
+					QList<QStandardItem *> items = m_model->findItems(val);
+					if(items.isEmpty())
 					{
-						slist.append(val);
-						lst->setStringList(slist);
-						//Add the trackinfo row for the track if it is a miditrack
+						QStandardItem* tname = new QStandardItem(trk->name());
+						tname->setEditable(false);
+						QStandardItem* transp = new QStandardItem(QString::number(0));
+						transp->setEditable(false);
 						if(trk->isMidiTrack())
-						{
-							QStandardItem* tname = new QStandardItem(trk->name());
-							tname->setEditable(false);
-							QStandardItem* transp = new QStandardItem(QString::number(0));
 							transp->setEditable(true);
-							QStandardItem* patch = new QStandardItem(tr("Select Patch"));
-							patch->setData(0, ProgramRole);
+						QStandardItem* patch = new QStandardItem(trk->isMidiTrack() ? tr("Select Patch") : "N/A");
+						patch->setData(0, ProgramRole);
+						patch->setEditable(false);
+						if(trk->isMidiTrack())
 							patch->setEditable(true);
-							QList<QStandardItem*> rowData;
-							rowData.append(tname);
-							rowData.append(transp);
-							rowData.append(patch);
-							m_model->appendRow(rowData);
-						}
+						QList<QStandardItem*> rowData;
+						rowData.append(tname);
+						rowData.append(transp);
+						rowData.append(patch);
+						m_model->appendRow(rowData);
+						optionsTable->selectRow((m_model->rowCount()-1));
 					}
 				}
 				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
@@ -520,35 +529,20 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 	{
 		btnApply->setEnabled(true);
 		_editing = true;
-		QItemSelectionModel* model = listSelectedTracks->selectionModel();
-		QAbstractItemModel* lat = listSelectedTracks->model(); 
+		QList<int> selrows = getSelectedRows();
 		QList<int> del;
-		if (model->hasSelection())
+		if (!selrows.isEmpty())
 		{
-			QModelIndexList sel = model->selectedRows(0);
-			QList<QModelIndex>::const_iterator id;
-			for (id = sel.constBegin(); id != sel.constEnd(); ++id)
-				//for(QModelIndex* id = sel.begin(); id != sel.end(); ++id)
+			for(int i = 0; i < selrows.size(); ++i)
 			{
 				//We have to index we will get the row.
-				int row = (*id).row();
-				///*QStringListModel* m = */QAbstractItemModel* m = listAllTracks->model();
-				QVariant v = lat->data((*id));
-				QString val = v.toString();
+				int row = selrows[i];
+				QStandardItem* item = m_model->item(row);
+				QString val = item->text();
 				Track* trk = song->findTrack(val);
 				if (trk)
 				{
 					del.append(row);
-				}
-				//Remove the trackinfo row for the track if it is a miditrack
-				if(trk->isMidiTrack())
-				{
-					QList<QStandardItem*> l = m_model->findItems(trk->name());
-					if(!l.isEmpty())
-					{
-						int row = l[0]->row();
-						m_model->takeRow(row);
-					}
 				}
 				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
 			}
@@ -559,7 +553,7 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 				it.toBack();
 				while(it.hasPrevious())
 				{
-					lat->removeRow(it.previous());
+					m_model->takeRow(it.previous());
 				}
 
 			}
@@ -576,28 +570,16 @@ void TrackViewEditor::btnUpClicked(bool)/*{{{*/
 	{
 		btnApply->setEnabled(true);
 		_editing = true;
-		QItemSelectionModel* model = listSelectedTracks->selectionModel();
-		QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
-		QList<int> del;
-		if (model->hasSelection())
+		QList<int> rows = getSelectedRows();
+		if (!rows.isEmpty())
 		{
-			QStringList list = lst->stringList();
-			QModelIndexList sel = model->selectedRows(0);
-			QList<QModelIndex>::const_iterator iid;
-			for (iid = sel.constBegin(); iid != sel.constEnd(); ++iid)
-			{
-				//We have to index we will get the row.
-				int id = (*iid).row();
-				if ((id - 1) < 0)
-					return;
-				int row = (id - 1);
-				QString track = list.takeAt(id);
-				list.insert(row, track);
-				lst->setStringList(list);
-				QModelIndex index = lst->index(row);
-				listSelectedTracks->setCurrentIndex(index);
-				break; //Only process the first selection FIXME: We need a function to handle this and keep track of where you are in a multitrack move
-			}
+			int id = rows.at(0);
+			if ((id - 1) < 0)
+				return;
+			int row = (id - 1);
+			QList<QStandardItem*> item = m_model->takeRow(id);
+			m_model->insertRow(row, item);
+			optionsTable->selectRow(row);
 		}
 	}
 }/*}}}*/
@@ -610,30 +592,16 @@ void TrackViewEditor::btnDownClicked(bool)/*{{{*/
 	{
 		btnApply->setEnabled(true);
 		_editing = true;
-		QItemSelectionModel* model = listSelectedTracks->selectionModel();
-		QStringListModel* lst = (QStringListModel*)listSelectedTracks->model(); 
-		QList<int> del;
-		if (model->hasSelection())
+		QList<int> rows = getSelectedRows();
+		if (!rows.isEmpty())
 		{
-			QStringList list = lst->stringList();
-			QModelIndexList sel = model->selectedRows(0);
-			QList<QModelIndex>::const_iterator iid;
-			for (iid = sel.constBegin(); iid != sel.constEnd(); ++iid)
-			{
-				//We have to index we will get the row.
-				int id = (*iid).row();
-				if ((id + 1) < 0)
-					return;
-				int row = (id + 1);
-				QString track = list.takeAt(id);
-				list.insert(row, track);
-				lst->setStringList(list);
-				QModelIndex index = lst->index(row);
-				listSelectedTracks->setCurrentIndex(index);
-				//listSelectedTracks->
-				//model->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
-				break; //Only process the first selection FIXME: We need a function to handle this and keep track of where you are in a multitrack move
-			}
+			int id = rows.at(0);
+			if ((id + 1) >= m_model->rowCount())
+				return;
+			int row = (id + 1);
+			QList<QStandardItem*> item = m_model->takeRow(id);
+			m_model->insertRow(row, item);
+			optionsTable->selectRow(row);
 		}
 	}
 }/*}}}*/
@@ -657,6 +625,23 @@ void TrackViewEditor::setViews(TrackViewList* l)
 	//Call methods to update the display
 }
 
+QList<int> TrackViewEditor::getSelectedRows()/*{{{*/
+{
+	QList<int> rv;
+	QItemSelectionModel* smodel = optionsTable->selectionModel();
+	if (smodel->hasSelection())
+	{
+		QModelIndexList indexes = smodel->selectedRows();
+		QList<QModelIndex>::const_iterator id;
+		for (id = indexes.constBegin(); id != indexes.constEnd(); ++id)
+		{
+			int row = (*id).row();
+			rv.append(row);
+		}
+	}
+	return rv;
+}/*}}}*/
+
 void TrackViewEditor::updateTableHeader()/*{{{*/
 {
 	QStandardItem* tname = new QStandardItem(tr("Track"));
@@ -665,8 +650,8 @@ void TrackViewEditor::updateTableHeader()/*{{{*/
 	m_model->setHorizontalHeaderItem(0, tname);
 	m_model->setHorizontalHeaderItem(1, transp);
 	m_model->setHorizontalHeaderItem(2, hpatch);
-	optionsTable->setColumnWidth(0, 100);
+	optionsTable->setColumnWidth(0, 150);
 	optionsTable->setColumnWidth(1, 80);
-	optionsTable->setColumnWidth(2, 120);
+	//optionsTable->setColumnWidth(2, 120);
 	optionsTable->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/

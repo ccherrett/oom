@@ -22,6 +22,7 @@ class QDialog;
 class QPushButton;
 class QStandardItemModel;
 class QStandardItem;
+class QItemSelectionModel;
 
 class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase 
 {
@@ -31,6 +32,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	bool _editing;
 	bool _addmode;
 	QStandardItemModel *m_model;
+	QItemSelectionModel *m_selmodel;
 
 	QStringList _trackTypes;
 	QPushButton* btnAdd;
@@ -39,36 +41,38 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	QPushButton* btnCancel;
 	QPushButton* btnApply;
 
-	private slots:
-		void cmbViewSelected(int);
-		void cmbTypeSelected(int);
-		void btnAddTrack(bool);
-		void btnRemoveTrack(bool);
-		void btnNewClicked(bool);
-		void btnOkClicked(bool);
-		void btnApplyClicked(bool);
-		void btnCancelClicked(bool);
-		void btnCopyClicked(bool);
-		void btnDeleteClicked(bool);
-		void btnDownClicked(bool);
-		void btnUpClicked(bool);
-		void txtNameEdited(QString);
-		void chkRecordChecked(bool);
-		void reset();
-		void updateTableHeader();
+private slots:
+	void cmbViewSelected(int);
+	void cmbTypeSelected(int);
+	void btnAddTrack(bool);
+	void btnRemoveTrack(bool);
+	void btnNewClicked(bool);
+	void btnOkClicked(bool);
+	void btnApplyClicked(bool);
+	void btnCancelClicked(bool);
+	void btnCopyClicked(bool);
+	void btnDeleteClicked(bool);
+	void btnDownClicked(bool);
+	void btnUpClicked(bool);
+	void txtNameEdited(QString);
+	void chkRecordChecked(bool);
+	void reset();
+	void updateTableHeader();
+	void settingsChanged(QStandardItem*);
+    QList<int> getSelectedRows();
 
-	public:
-		TrackViewEditor(QWidget*, TrackViewList* = 0);
-		void setSelected(TrackView*);
-		TrackView* selectedView( ) { return _selected; }
-		void setTypes(QStringList);
-		void setViews(TrackViewList*);
-		QStringList trackTypes(){return _trackTypes;}
-		TrackViewList* views(){return _viewList;}
+public:
+	TrackViewEditor(QWidget*, TrackViewList* = 0);
+	void setSelected(TrackView*);
+	TrackView* selectedView( ) { return _selected; }
+	void setTypes(QStringList);
+	void setViews(TrackViewList*);
+	QStringList trackTypes(){return _trackTypes;}
+	TrackViewList* views(){return _viewList;}
 
 
-	private:
-		QStringList buildViewList();
+private:
+	QStringList buildViewList();
 };
 
 #endif
