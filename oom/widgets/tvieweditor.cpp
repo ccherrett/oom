@@ -354,7 +354,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 						QString pname = patch->text();
 						int prog = patch->data(ProgramRole).toInt();
 						printf("Track name: %s - Transpose: %d - Program: %d - Patch Name: %s\n", 
-							titem->text().toUtf8().constData(), transpose, prog, pname);
+							titem->text().toUtf8().constData(), transpose, prog, pname.toUtf8().constData());
 						if((transpose != 0) || prog)
 						{
 							printf("Added TrackSettings for Track: %s\n", titem->text().toUtf8().constData());
