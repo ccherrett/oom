@@ -89,7 +89,7 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	layout->addWidget(m_comment);
 	connect(m_comment, SIGNAL(textChanged()), SLOT(updateComment()));
 	
-	QLabel* pclabel = new QLabel(tr("Patch Comments"));
+	QLabel* pclabel = new QLabel(tr("Patch Key Comments"));
 	pclabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 	pclabel->setObjectName("KeyMapMenuLabel");
 	layout->addWidget(pclabel);
