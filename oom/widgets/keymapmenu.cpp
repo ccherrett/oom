@@ -107,7 +107,7 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	//printf("Patch name in menu: %s, program: %d\n", m_keymap->pname.toUtf8().constData(), m_keymap->program);
 	layout->addWidget(m_patchcomment);
 
-	QPushButton *btnClose = new QPushButton(tr("Dismiss"));
+	QPushButton *btnClose = new QPushButton(tr("Save Settings"));
 	layout->addWidget(btnClose);
 	connect(btnClose, SIGNAL(clicked()), SLOT(doClose()));
 

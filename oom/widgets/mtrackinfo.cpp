@@ -261,25 +261,31 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	setRaster(rast);
 	setQuant(quant);
 
-    rasterLabel->setFixedHeight(22);
-    quantLabel->setFixedHeight(22);
+    rasterLabel->setMinimumSize(QSize(80, 22));
+    quantLabel->setMinimumSize(QSize(80, 22));
 
-	controlsBox->addWidget(new QLabel(tr("Snap")));
-	controlsBox->addWidget(rasterLabel);
-	controlsBox->addWidget(new QLabel(tr("Quantize")));
-	controlsBox->addWidget(quantLabel);
+	QHBoxLayout *hbox1 = new QHBoxLayout();
+	hbox1->addWidget(new QLabel(tr("Snap")));
+	hbox1->addWidget(rasterLabel);
+	QHBoxLayout *hbox2 = new QHBoxLayout();
+	hbox2->addWidget(new QLabel(tr("Quant.")));
+	hbox2->addWidget(quantLabel);
+	controlsBox->addLayout(hbox1);
+	controlsBox->addLayout(hbox2);
 
 	//---------------------------------------------------
 	//  To Menu
 	//---------------------------------------------------
 	QComboBox* toList = new QComboBox;
-	toList->setFixedHeight(22);
 	toList->insertItem(0, tr("All Events"));
 	toList->insertItem(CMD_RANGE_LOOP, tr("Looped Ev."));
 	toList->insertItem(CMD_RANGE_SELECTED, tr("Selected Ev."));
 	toList->insertItem(CMD_RANGE_LOOP | CMD_RANGE_SELECTED, tr("Looped+Sel."));
-	controlsBox->addWidget(new QLabel(tr("To")));
-	controlsBox->addWidget(toList);
+    toList->setMinimumSize(QSize(80, 22));
+	QHBoxLayout *hbox3 = new QHBoxLayout();
+	hbox3->addWidget(new QLabel(tr("To")));
+	hbox3->addWidget(toList);
+	controlsBox->addLayout(hbox3);
 
 	connect(rasterLabel, SIGNAL(activated(int)), SLOT(_rasterChanged(int)));
 	connect(quantLabel, SIGNAL(activated(int)), SLOT(_quantChanged(int)));

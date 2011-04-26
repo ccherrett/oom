@@ -120,13 +120,15 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	m_prDock = new QDockWidget(tr("Resource Center"), this);
 	m_prDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	m_prDock->setObjectName("dockResourceCenter");
+	m_prDock->setMinimumWidth(190);
 	addDockWidget(Qt::LeftDockWidgetArea, m_prDock);
 
 	m_tabs = new QTabWidget(m_prDock);
 	m_tabs->setObjectName("tabControlCenter");
 	m_tabs->setTabPosition(QTabWidget::West);
 	m_tabs->setTabShape(QTabWidget::Triangular);
-	m_tabs->setMinimumSize(QSize(200, 150));
+	//m_tabs->setMinimumSize(QSize(200, 150));
+	m_tabs->setMinimumWidth(250);
 	//connect(m_rtabs, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
 	m_prDock->setWidget(m_tabs);
 	connect(m_prDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(dockAreaChanged(Qt::DockWidgetArea)));
@@ -1563,53 +1565,48 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	{
 		//printf("Delete KeyStroke recieved\n");
 		int x = song->cpos();
-		Track* track = song->findTrack(curCanvasPart()); /*{{{*/
-		PartList* parts = track->parts();
-		for (iPart p = parts->begin(); p != parts->end(); ++p)
+		Part* mprt = curCanvasPart();
+		EventList* eventList = mprt->events();
+		if(eventList && !eventList->empty())
 		{
-			Part* mprt = p->second;
-			EventList* eventList = mprt->events(); //m->second.events();
-			if(eventList && !eventList->empty())
+			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
 			{
-				for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+				//Get event type.
+				Event pcevt = evt->second;
+				//printf("Found events %d \n", pcevt.type());
+				if (!pcevt.isNote())
 				{
-					//Get event type.
-					Event pcevt = evt->second;
-					//printf("Found events %d \n", pcevt.type());
-					if (!pcevt.isNote())
+					//printf("Found none Note events of type: %d with dataA: %d\n", pcevt.type(), pcevt.dataA());
+					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
 					{
-						//printf("Found none Note events of type: %d with dataA: %d\n", pcevt.type(), pcevt.dataA());
-						if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+						//printf("Found Program Change event type\n");
+						//printf("Pos x: %d\n", x);
+						int xp = pcevt.tick() + mprt->tick();
+						//printf("Event x: %d\n", xp);
+						if (xp >= x && xp <= (x + 50))
 						{
-							//printf("Found Program Change event type\n");
-							//printf("Pos x: %d\n", x);
-							int xp = pcevt.tick() + mprt->tick();
-							//printf("Event x: %d\n", xp);
-							if (xp >= x && xp <= (x + 50))
+							pcbar->deleteProgramChange(pcevt);
+							//printf("Found Program Change to delete at: %d\n", x);
+							song->startUndo();
+							//song->deleteEvent(pcevt, mprt); //hack
+							audio->msgDeleteEvent(evt->second, mprt/*p->second*/, true, true, false);
+							song->endUndo(SC_EVENT_MODIFIED);
+							//Reset the hardware controller for this track
+							/*MidiTrack *evtrack = static_cast<MidiTrack*>(p->second->track());
+							if(evtrack)
 							{
-								pcbar->deleteProgramChange(pcevt);
-								//printf("Found Program Change to delete at: %d\n", x);
-								song->startUndo();
-								//song->deleteEvent(pcevt, mprt); //hack
-								audio->msgDeleteEvent(evt->second, p->second, true, true, false);
-								song->endUndo(SC_EVENT_MODIFIED);
-								//Reset the hardware controller for this track
-								/*MidiTrack *evtrack = static_cast<MidiTrack*>(p->second->track());
-								if(evtrack)
-								{
-									int outChannel = evtrack->outChannel();
-									int outPort = evtrack->outPort();
-									MidiPort* mp = &midiPorts[outPort];
-									if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
-										audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
-								}*/
-								break;
-							}
+								int outChannel = evtrack->outChannel();
+								int outPort = evtrack->outPort();
+								MidiPort* mp = &midiPorts[outPort];
+								if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
+									audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
+							}*/
+							break;
 						}
 					}
 				}
 			}
-		}/*}}}*/
+		}
 		//pcbar->deleteProgram();
 		pcbar->update();
 		return;

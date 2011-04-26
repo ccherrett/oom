@@ -116,7 +116,7 @@
          <x>0</x>
          <y>0</y>
          <width>188</width>
-         <height>514</height>
+         <height>522</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -276,11 +276,11 @@
           <item>
            <widget class="QGroupBox" name="groupBox">
             <property name="title">
-             <string>Snap/Quantize</string>
+             <string>Utilities</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <property name="spacing">
-              <number>0</number>
+              <number>-1</number>
              </property>
              <property name="margin">
               <number>0</number>
@@ -288,8 +288,120 @@
              <item>
               <layout class="QVBoxLayout" name="controlsBox">
                <property name="spacing">
+                <number>2</number>
+               </property>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <property name="topMargin">
                 <number>0</number>
                </property>
+               <item>
+                <widget class="QPushButton" name="pushButton">
+                 <property name="minimumSize">
+                  <size>
+                   <width>24</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>24</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Toggle on/off transpose globally for all parts in this PianoRoll instance</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="chkTranspose">
+                 <property name="toolTip">
+                  <string>Toggle transpose mode</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="SpinBox" name="iTransp" native="true">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>1</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Transpose position for the current track</string>
+                 </property>
+                 <property name="specialValueText" stdset="0">
+                  <string>off</string>
+                 </property>
+                 <property name="maximum" stdset="0">
+                  <number>127</number>
+                 </property>
+                 <property name="minimum" stdset="0">
+                  <number>-127</number>
+                 </property>
+                 <property name="value" stdset="0">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="iChanDetectLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>24</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Input detect</string>
+                 </property>
+                 <property name="whatsThis">
+                  <string>Input detect indicator. Detects all note on-off, controller, aftertouch, 
+                  program change, and pitchbend (but not sysex or realtime) events 
+                  on the selected channels, on the selected midi ports.</string>
+                 </property>
+                 <property name="text">
+                  <string>W</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
             </layout>
@@ -360,31 +472,6 @@
                <property name="topMargin">
                 <number>0</number>
                </property>
-               <item row="13" column="2">
-                <widget class="QLabel" name="TextLabel9">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>20</width>
-                   <height>24</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Transp.</string>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>false</bool>
-                 </property>
-                 <property name="indent">
-                  <number>2</number>
-                 </property>
-                </widget>
-               </item>
                <item row="15" column="1">
                 <widget class="SpinBox" name="iVerz" native="true">
                  <property name="sizePolicy">
@@ -1005,45 +1092,6 @@
                   <enum>QLayout::SetFixedSize</enum>
                  </property>
                  <item>
-                  <widget class="QLabel" name="iChanDetectLabel">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>24</width>
-                     <height>24</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>input detect</string>
-                   </property>
-                   <property name="whatsThis">
-                    <string>Input detect indicator. Detects all note on-off, controller, aftertouch, 
-                  program change, and pitchbend (but not sysex or realtime) events 
-                  on the selected channels, on the selected midi ports.</string>
-                   </property>
-                   <property name="text">
-                    <string>W</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                   <property name="wordWrap">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
                   <widget class="QToolButton" name="recEchoButton">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1064,7 +1112,7 @@
                     </size>
                    </property>
                    <property name="toolTip">
-                    <string>Midi thru</string>
+                    <string>MIDI Thru</string>
                    </property>
                    <property name="whatsThis">
                     <string>Pass input events through ('thru') to output.</string>
@@ -1157,44 +1205,6 @@
                  <property name="topMargin">
                   <number>0</number>
                  </property>
-                 <item>
-                  <widget class="SpinBox" name="iTransp" native="true">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                     <horstretch>1</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>20</width>
-                     <height>24</height>
-                    </size>
-                   </property>
-                   <property name="specialValueText" stdset="0">
-                    <string>off</string>
-                   </property>
-                   <property name="maximum" stdset="0">
-                    <number>127</number>
-                   </property>
-                   <property name="minimum" stdset="0">
-                    <number>-127</number>
-                   </property>
-                   <property name="value" stdset="0">
-                    <number>1</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="chkTranspose">
-                   <property name="toolTip">
-                    <string>Toggle transpose mode</string>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
                 </layout>
                </item>
               </layout>
