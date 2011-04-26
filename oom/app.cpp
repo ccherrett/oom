@@ -1296,6 +1296,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuEdit->addAction(editPaste2TrackAction);
 	menuEdit->addAction(editPasteC2TAction);
 	menuEdit->addAction(editInsertEMAction);
+	menuEdit->addAction(strGlobalSplitAction);
 	menuEdit->addSeparator();
 	menuEdit->addAction(editDeleteSelectedAction);
 
@@ -1364,13 +1365,13 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//    popup Structure
 	//-------------------------------------------------------------
 
-	menuStructure = menuBar()->addMenu(tr("&Structure"));
-	menuStructure->addAction(strGlobalCutAction);
-	menuStructure->addAction(strGlobalInsertAction);
-	menuStructure->addAction(strGlobalSplitAction);
-	menuStructure->addAction(strCopyRangeAction);
-	menuStructure->addSeparator();
-	menuStructure->addAction(strCutEventsAction);
+	//menuStructure = menuBar()->addMenu(tr("&Structure"));
+	//menuStructure->addAction(strGlobalCutAction);
+	//menuStructure->addAction(strGlobalInsertAction);
+	//menuStructure->addAction(strGlobalSplitAction);
+	//menuStructure->addAction(strCopyRangeAction);
+	//menuStructure->addSeparator();
+	//menuStructure->addAction(strCutEventsAction);
 
 	//-------------------------------------------------------------
 	//    popup Midi
@@ -1413,11 +1414,11 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//    popup Automation
 	//-------------------------------------------------------------
 
-	menuAutomation = menuBar()->addMenu(tr("Automation"));
-	menuAutomation->addAction(autoMixerAction);
-	menuAutomation->addSeparator();
-	menuAutomation->addAction(autoSnapshotAction);
-	menuAutomation->addAction(autoClearAction);
+	//menuAutomation = menuBar()->addMenu(tr("Automation"));
+	//menuAutomation->addAction(autoMixerAction);
+	//menuAutomation->addSeparator();
+	//menuAutomation->addAction(autoSnapshotAction);
+	//menuAutomation->addAction(autoClearAction);
 
 	//-------------------------------------------------------------
 	//    popup Settings
