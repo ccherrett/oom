@@ -176,7 +176,11 @@ void TrackView::read(Xml& xml)/*{{{*/
 				break;
 			case Xml::TagEnd:
 				if(tag == "trackview")
+				{
+					//This calls an update on the track states that are a part of this view
+					setSelected(_selected);
 					return;
+				}
 			default:
 				break;
 		}

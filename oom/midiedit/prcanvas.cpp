@@ -168,7 +168,7 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 				QString text(km->comment);
 				QFont font("fixed-font", 8);
 				font.setLetterSpacing(QFont::AbsoluteSpacing, 1);
-				font.setStretch(1024);
+				font.setStretch(512);
 				p.setFont(font);
 				int offset = 3;
      			 switch(key % 12) /*{{{*/
@@ -195,16 +195,21 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 							offset = 3;
      			             break;
      			 }/*}}}*/
-	  			if(!km->comment.isEmpty())
+	  			if(!km->comment.isEmpty() && km->hasProgram)
 				{
-					p.drawText(x+10, pitch2y(key)+offset, km->comment);
+					QString text(km->pname+" : "+km->comment);
+					p.drawText(x+10, pitch2y(key)+offset, text);
 					//printf(" Key has comments\n");
 				}
-				else
+				else if(!km->comment.isEmpty() && !km->hasProgram)
 				{
-					//QString text(QString::number(key));
-					//p.drawText(x+10, pitch2y(key)+offset, text);
-					//printf(" No comments\n");
+					QString text(" : "+km->comment);
+					p.drawText(x+10, pitch2y(key)+offset, text);
+				}
+				else if(km->comment.isEmpty() && km->hasProgram)
+				{
+					QString text(km->pname+" : ");
+					p.drawText(x+10, pitch2y(key)+offset, text);
 				}
 			}
 		}

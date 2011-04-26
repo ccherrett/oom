@@ -797,7 +797,7 @@ void Piano::draw(QPainter& p, const QRect& r)
 		//int channel = track->outChannel();
 		MidiInstrument* instr = midiPorts[port].instrument();
 		KeyMap* km = instr->keymap(i);
-		bool lswitch = km->hasProgram;
+		bool lswitch = (km->hasProgram && !keyswitch.contains(i));
      	 switch(i % 12) /*{{{*/
 	 	 {
      	       case 0:

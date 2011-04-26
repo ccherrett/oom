@@ -31,6 +31,8 @@
 #include <QMimeData>
 #include <QScrollArea>
 #include <QWidgetAction>
+#include <QDockWidget>
+#include <QTabWidget>
 #include <QtGui>
 
 #include <stdio.h>
@@ -114,6 +116,20 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	_to = _toInit;
 	colorMode = tconfig().get_property("PianoRollEdit", "colormode", colorModeInit).toInt();
 	_stepQwerty = false;
+
+	m_prDock = new QDockWidget(tr("Resource Center"), this);
+	m_prDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	m_prDock->setObjectName("dockResourceCenter");
+	addDockWidget(Qt::LeftDockWidgetArea, m_prDock);
+
+	m_tabs = new QTabWidget(m_prDock);
+	m_tabs->setObjectName("tabControlCenter");
+	m_tabs->setTabPosition(QTabWidget::West);
+	m_tabs->setTabShape(QTabWidget::Triangular);
+	m_tabs->setMinimumSize(QSize(200, 150));
+	//connect(m_rtabs, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
+	m_prDock->setWidget(m_tabs);
+	connect(m_prDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(dockAreaChanged(Qt::DockWidgetArea)));
 
 	QSignalMapper* mapper = new QSignalMapper(this);
 	QSignalMapper* colorMapper = new QSignalMapper(this);
@@ -485,7 +501,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
-	hsplitter->addWidget(midiTrackInfo);
+	m_tabs->addTab(midiTrackInfo, tr("   Patch Sequencer   "));
+	//hsplitter->addWidget(midiTrackInfo);
 	hsplitter->addWidget(splitter);
 
 	mainGrid->setRowStretch(0, 100);
@@ -691,6 +708,21 @@ void PianoRoll::songChanged1(int bits)
 	// We'll receive SC_SELECTION if a different part is selected.
 	if (bits & SC_SELECTION)
 		updateTrackInfo();
+}
+
+void PianoRoll::dockAreaChanged(Qt::DockWidgetArea area)
+{
+	switch(area)
+	{
+		case Qt::LeftDockWidgetArea:
+			m_tabs->setTabPosition(QTabWidget::West);
+		break;
+		case Qt::RightDockWidgetArea:
+			m_tabs->setTabPosition(QTabWidget::East);
+		break;
+		default:
+		break;
+	}
 }
 
 //---------------------------------------------------------

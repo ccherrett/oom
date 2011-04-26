@@ -55,6 +55,7 @@ private slots:
 	void btnDownClicked(bool);
 	void btnUpClicked(bool);
 	void txtNameEdited(QString);
+	void txtCommentChanged();
 	void chkRecordChecked(bool);
 	void reset();
 	void updateTableHeader();

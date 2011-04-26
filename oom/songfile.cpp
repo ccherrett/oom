@@ -1563,6 +1563,12 @@ void Song::write(int level, Xml& xml) const
 	for (ciTrack i = _auxs.begin(); i != _auxs.end(); ++i)
 		(*i)->write(level, xml);*/
 
+	// write track views
+	for (ciTrackView i = _tviews.begin(); i != _tviews.end(); ++i)
+	{
+		(*i)->write(level, xml);
+	}
+
 	// write routing
 	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
 	{
@@ -1574,11 +1580,6 @@ void Song::write(int level, Xml& xml) const
 		//track->writeRouting(level, xml);
 
 		(*i)->writeRouting(level, xml);
-	}
-	// write track views
-	for (ciTrackView i = _tviews.begin(); i != _tviews.end(); ++i)
-	{
-		(*i)->write(level, xml);
 	}
 
 	// Write midi device routing.
@@ -1625,7 +1626,7 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 	xml.intTag(level, "selected", _selected);
 	xml.intTag(level, "record", _recState);
 	if(!_comment.isEmpty())
-		xml.strTag(level, "comment", _comment);
+		xml.strTag(level, "comment", Xml::xmlString(_comment).toUtf8().constData());
 
 	//for(iTrack* t = _tracks.begin(); t != _tracks.end(); ++t)
 	for (ciTrack t = _tracks.begin(); t != _tracks.end(); ++t)

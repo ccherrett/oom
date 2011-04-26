@@ -29,16 +29,22 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinAndMaxSize</enum>
+     </property>
      <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>-1</number>
+       </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SetFixedSize</enum>
+        <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <property name="topMargin">
         <number>0</number>
@@ -46,6 +52,86 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetFixedSize</enum>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="btnCopy">
+           <property name="minimumSize">
+            <size>
+             <width>77</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>77</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Copy</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnNew">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>77</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>New</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDelete">
+           <property name="minimumSize">
+            <size>
+             <width>77</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>77</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Delete</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item>
         <layout class="QHBoxLayout" name="groupLayout">
          <property name="spacing">
@@ -80,8 +166,14 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>80</width>
+             <width>325</width>
              <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>325</width>
+             <height>16777215</height>
             </size>
            </property>
           </widget>
@@ -90,6 +182,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="nameLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="lblName">
            <property name="sizePolicy">
@@ -106,7 +201,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>63</width>
+             <width>60</width>
              <height>16777215</height>
             </size>
            </property>
@@ -123,82 +218,71 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>325</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
-             <width>16777215</width>
+             <width>325</width>
              <height>32</height>
             </size>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QCheckBox" name="chkRecord">
-           <property name="toolTip">
-            <string>Toggle Record Arm on all tracks in view.</string>
-           </property>
-           <property name="text">
-            <string>Record</string>
-           </property>
-          </widget>
-         </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkRecord">
+         <property name="toolTip">
+          <string>Toggle Record Arm on all tracks in view.</string>
+         </property>
+         <property name="text">
+          <string>Record</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="rightMargin">
-        <number>0</number>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Comments</string>
        </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="btnNew">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>77</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>New</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnCopy">
-         <property name="minimumSize">
-          <size>
-           <width>77</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Copy</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnDelete">
-         <property name="minimumSize">
-          <size>
-           <width>77</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Delete</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="margin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTextEdit" name="txtComment">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>150</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </item>
     </layout>
    </item>
@@ -214,6 +298,9 @@
        </property>
        <item>
         <layout class="QHBoxLayout" name="typeLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="sizeConstraint">
           <enum>QLayout::SetMinimumSize</enum>
          </property>
@@ -239,7 +326,7 @@
          <item>
           <widget class="QComboBox" name="cmbType">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -252,7 +339,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>150</width>
+             <width>240</width>
              <height>32</height>
             </size>
            </property>

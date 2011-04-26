@@ -100,6 +100,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	connect(btnDown, SIGNAL(clicked(bool)), SLOT(btnDownClicked(bool)));
 	connect(chkRecord, SIGNAL(toggled(bool)), SLOT(chkRecordChecked(bool)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(settingsChanged(QStandardItem*)));
+	connect(txtComment, SIGNAL(textChanged()), SLOT(txtCommentChanged()));
 }
 
 
@@ -140,6 +141,15 @@ void TrackViewEditor::chkRecordChecked(bool)
 }
 
 void TrackViewEditor::settingsChanged(QStandardItem*)
+{
+	if(_selected)
+	{
+		_editing = true;
+		btnApply->setEnabled(true);
+	}
+}
+
+void TrackViewEditor::txtCommentChanged()
 {
 	if(_selected)
 	{
@@ -189,6 +199,10 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 	if(v)
 	{
 		_selected = v;
+		txtComment->blockSignals(true);
+		txtComment->setText(v->comment());
+		txtComment->blockSignals(false);
+		txtComment->moveCursor(QTextCursor::End);
 		bool hasSettings = !v->trackSettings()->isEmpty();
 		TrackList* l = v->tracks();
 		if(l)
@@ -374,6 +388,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 			}
 		}
 		_selected->setRecord(chkRecord->isChecked());
+		_selected->setComment(txtComment->toPlainText());
 		song->dirty = true;
 		song->updateTrackViews1();
 		btnApply->setEnabled(false);
@@ -400,6 +415,9 @@ void TrackViewEditor::reset()/*{{{*/
 	m_model->clear();
 	cmbViews->addItems(buildViewList());
 	cmbViews->blockSignals(false);
+	txtComment->blockSignals(true);
+	txtComment->setText("");
+	txtComment->blockSignals(false);
 	cmbViews->setCurrentIndex(0);
 	btnApply->setEnabled(false);
 	btnDelete->setEnabled(false);
@@ -446,6 +464,7 @@ void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
 				//if((*ts).valid)
 					tv->addTrackSetting((*ts)->track->name(), (*ts));
 			}
+			tv->setComment(_selected->comment());
 			tv->setViewName(tv->getValidName(_selected->viewName()));
 			tv->setRecord(_selected->record());
 			cmbViews->addItem(tv->viewName());

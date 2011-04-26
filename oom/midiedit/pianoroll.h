@@ -52,6 +52,8 @@ class MidiTrackInfo;
 class QScrollArea;
 class Piano;
 class Patch;
+class QDockWidget;
+class QTabWidget;
 
 //---------------------------------------------------------
 //   PianoRoll
@@ -157,6 +159,8 @@ class PianoRoll : public MidiEditor
     bool _playEvents;
 
     QScrollArea* infoScroll;
+	QDockWidget* m_prDock;
+	QTabWidget* m_tabs;
 
     Q_OBJECT
     void initShortcuts();
@@ -208,6 +212,7 @@ private slots:
     void newCanvasWidth(int);
     void updateTrackInfo();
 	void splitterMoved(int, int);
+	void dockAreaChanged(Qt::DockWidgetArea);
 #ifdef LSCP_SUPPORT
 	void setKeyBindings(LSCPChannelInfo);
 #endif
