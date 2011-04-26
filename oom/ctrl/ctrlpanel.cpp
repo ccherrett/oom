@@ -712,6 +712,11 @@ bool CtrlPanel::ctrlSetTypeByName(QString s)/*{{{*/
 		rv = true;
 		emit controllerChanged(CTRL_VELOCITY);
 	}
+	else if(s == "Modulation")
+	{
+		rv = true;
+		emit controllerChanged(CTRL_MODULATION);
+	}
 	else
 	{
 		Part* part = editor->curCanvasPart();
