@@ -185,31 +185,23 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 					font.setWeight(QFont::Light);
 					p.setFont(font);
 					int offset = 2;
+					QString label(" ");
+					if(patch && patch->comments.contains(key))
+						label.append(patch->comments.value(key)).append(" : ");
 	  				if(!km->comment.isEmpty() && km->hasProgram)
 					{
-						QString text(" ");
-						if(patch && patch->comments.contains(key))
-							text.append(patch->comments.value(key)).append(" : ");
-						text.append(km->pname+" : "+km->comment);
-						p.drawText(x+10, pitch2y(key)+offset, text);
-						//printf(" Key has comments\n");
+						label.append(km->pname+" : "+km->comment);
 					}
 					else if(!km->comment.isEmpty() && !km->hasProgram)
 					{
-						QString text(" ");
-						if(patch && patch->comments.contains(key))
-							text.append(patch->comments.value(key)).append(" : ");
-						text.append(km->comment);
-						p.drawText(x+10, pitch2y(key)+offset, text);
+						label.append(km->comment);
 					}
 					else if(km->comment.isEmpty() && km->hasProgram)
 					{
-						QString text(" ");
-						if(patch && patch->comments.contains(key))
-							text.append(patch->comments.value(key)).append(" : ");
-						text.append(km->pname);
-						p.drawText(x+10, pitch2y(key)+offset, text);
+						label.append(km->pname);
+						//p.drawText(x+10, pitch2y(key)+offset, text);
 					}
+					p.drawText(x+10, pitch2y(key)+offset, label);
 				}
 			}
 		}
