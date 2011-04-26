@@ -27,10 +27,12 @@
 #include "config.h"
 #include "keymapmenu.h"
 
-KeyMapMenu::KeyMapMenu(QMenu* parent, MidiTrack *track, KeyMap* map) : QWidgetAction(parent)
+KeyMapMenu::KeyMapMenu(QMenu* parent, MidiTrack *track, KeyMap* map, Patch* p) : QWidgetAction(parent)
 {
 	m_keymap = map;
 	m_track = track;
+	m_patch = p;
+	m_datachanged = false;
 }
 
 QWidget* KeyMapMenu::createWidget(QWidget* parent)
@@ -48,11 +50,11 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	layout->addWidget(plabel);
 
 	QHBoxLayout *hbox = new QHBoxLayout();
-	m_patch = new QLineEdit();
-	m_patch->setReadOnly(true);
-	m_patch->setText(m_keymap->pname);
+	m_kpatch = new QLineEdit();
+	m_kpatch->setReadOnly(true);
+	m_kpatch->setText(m_keymap->pname);
 	//printf("Patch name in menu: %s, program: %d\n", m_keymap->pname.toUtf8().constData(), m_keymap->program);
-	hbox->addWidget(m_patch);
+	hbox->addWidget(m_kpatch);
 	
 	QPushButton *btnClear = new QPushButton();
 	//btnClear->setFixedHeight(20);
@@ -87,6 +89,23 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	layout->addWidget(m_comment);
 	connect(m_comment, SIGNAL(textChanged()), SLOT(updateComment()));
 	
+	QLabel* pclabel = new QLabel(tr("Patch Comments"));
+	pclabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+	pclabel->setObjectName("KeyMapMenuLabel");
+	layout->addWidget(pclabel);
+
+	m_patchcomment = new QLineEdit();
+	m_patchcomment->setReadOnly(false);
+	if(m_patch)
+	{
+		printf("Patch supplied, Name: %s\n", m_patch->name.toUtf8().constData());
+		m_patchcomment->setText(m_patch->comments.value(m_keymap->key));
+	}
+	connect(m_patchcomment, SIGNAL(textChanged(QString)), SLOT(updatePatchComment()));
+	connect(m_patchcomment, SIGNAL(returnPressed()), SLOT(updatePatchComment()));
+	//printf("Patch name in menu: %s, program: %d\n", m_keymap->pname.toUtf8().constData(), m_keymap->program);
+	layout->addWidget(m_patchcomment);
+
 	QPushButton *btnClose = new QPushButton(tr("Dismiss"));
 	layout->addWidget(btnClose);
 	connect(btnClose, SIGNAL(clicked()), SLOT(doClose()));
@@ -100,7 +119,7 @@ void KeyMapMenu::clearPatch()
 	m_keymap->program = -1;
 	m_keymap->hasProgram = false;
 	m_keymap->pname = tr("Select Patch");
-	m_patch->setText(m_keymap->pname);
+	m_kpatch->setText(m_keymap->pname);
 }
 
 void KeyMapMenu::updatePatch(int prog, QString name)
@@ -108,12 +127,13 @@ void KeyMapMenu::updatePatch(int prog, QString name)
 	m_keymap->program = prog;
 	m_keymap->hasProgram = true;
 	m_keymap->pname = name;
-	m_patch->setText(name);
+	m_kpatch->setText(name);
+	m_datachanged = true;
 }
 
 void KeyMapMenu::doClose()
 {
-	setData(m_keymap->program);
+	setData(m_datachanged);
 	
 	//FIXME: This is a seriously brutal HACK but its the only way it can get it done
 	QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
@@ -128,7 +148,17 @@ void KeyMapMenu::updateComment()
 	QString comment = m_comment->toPlainText();
 	if(comment != m_keymap->comment)
 	{
+		m_datachanged = true;
 		m_keymap->comment = comment;
 		//song->dirty = true;
+	}
+}
+
+void KeyMapMenu::updatePatchComment()
+{
+	if(m_patch)
+	{
+		m_datachanged = true;
+		m_patch->comments[m_keymap->key] = m_patchcomment->text();
 	}
 }

@@ -159,57 +159,57 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 			//printf("PianoCanvas::drawCanvas() track is MidiTrack\n");
 			MidiTrack* mtrack = (MidiTrack*)track;
 			int port = mtrack->outPort();
+			int channel = mtrack->outChannel();
 	  		MidiInstrument* instr = midiPorts[port].instrument();
-			for(int key = 0; key < 128; ++key)
+			if(instr)
 			{
-				//printf("Found key: %d ", key);
-	  			KeyMap* km = instr->keymap(key);
-				p.setPen(QColor("black"));
-				QString text(km->comment);
-				QFont font("fixed-font", 8);
-				font.setLetterSpacing(QFont::AbsoluteSpacing, 1);
-				font.setStretch(512);
-				p.setFont(font);
-				int offset = 3;
-     			 switch(key % 12) /*{{{*/
-	 			 {
-     			       case 0:
-     			       case 5://mk3;
-							font.setPointSize(8);
-							p.setFont(font);
-     			             break;
-     			       case 2:
-     			       case 7:
-     			       case 9://mk2;
-							font.setPointSize(8);
-							p.setFont(font);
-     			             break;
-     			       case 4:
-     			       case 11://mk1;
-							font.setPointSize(8);
-							p.setFont(font);
-     			             break;
-     			       default://mk4;
-							font.setPointSize(6);
-							p.setFont(font);
-							offset = 3;
-     			             break;
-     			 }/*}}}*/
-	  			if(!km->comment.isEmpty() && km->hasProgram)
+				MidiPort* mport = &midiPorts[port];
+				int program = mport->hwCtrlState(channel, CTRL_PROGRAM);
+				bool hasProgram = false;
+				Patch* patch = 0;
+				if (program != CTRL_VAL_UNKNOWN && program != 0xffffff)
 				{
-					QString text(km->pname+" : "+km->comment);
-					p.drawText(x+10, pitch2y(key)+offset, text);
-					//printf(" Key has comments\n");
+					hasProgram = true;
+					patch = instr->getPatch(channel, program, song->mtype(), mtrack->type() == Track::DRUM);
 				}
-				else if(!km->comment.isEmpty() && !km->hasProgram)
+
+				for(int key = 0; key < 128; ++key)
 				{
+					//printf("Found key: %d ", key);
+	  				KeyMap* km = instr->keymap(key);
+					p.setPen(QColor(0,26,30));
 					QString text(km->comment);
-					p.drawText(x+10, pitch2y(key)+offset, text);
-				}
-				else if(km->comment.isEmpty() && km->hasProgram)
-				{
-					QString text(km->pname);
-					p.drawText(x+10, pitch2y(key)+offset, text);
+					QFont font("fixed-font", 5);
+					font.setLetterSpacing(QFont::AbsoluteSpacing, 1);
+					font.setStretch(1024);
+					font.setWeight(QFont::Light);
+					p.setFont(font);
+					int offset = 2;
+	  				if(!km->comment.isEmpty() && km->hasProgram)
+					{
+						QString text(" ");
+						if(patch && patch->comments.contains(key))
+							text.append(patch->comments.value(key)).append(" : ");
+						text.append(km->pname+" : "+km->comment);
+						p.drawText(x+10, pitch2y(key)+offset, text);
+						//printf(" Key has comments\n");
+					}
+					else if(!km->comment.isEmpty() && !km->hasProgram)
+					{
+						QString text(" ");
+						if(patch && patch->comments.contains(key))
+							text.append(patch->comments.value(key)).append(" : ");
+						text.append(km->comment);
+						p.drawText(x+10, pitch2y(key)+offset, text);
+					}
+					else if(km->comment.isEmpty() && km->hasProgram)
+					{
+						QString text(" ");
+						if(patch && patch->comments.contains(key))
+							text.append(patch->comments.value(key)).append(" : ");
+						text.append(km->pname);
+						p.drawText(x+10, pitch2y(key)+offset, text);
+					}
 				}
 			}
 		}

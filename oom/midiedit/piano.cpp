@@ -15,6 +15,7 @@
 #include "minstrument.h"
 #include "midictrl.h"
 #include "midi.h"
+#include "song.h"
 #include "midieditor.h"
 #include "track.h"
 #include "part.h"
@@ -1112,31 +1113,44 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 					{
 						MidiTrack *track = (MidiTrack*)trk;
 						int port = track->outPort();
-						//int channel = track->outChannel();
+						int channel = track->outChannel();
 						MidiInstrument* instr = midiPorts[port].instrument();
 						if(instr)
 						{
+							MidiPort* mport = &midiPorts[port];
+							int program = mport->hwCtrlState(channel, CTRL_PROGRAM);
+							bool hasProgram = false;
+							Patch* patch = 0;
+							if (program != CTRL_VAL_UNKNOWN && program != 0xffffff)
+							{
+								hasProgram = true;
+								patch = instr->getPatch(channel, program, song->mtype(), track->type() == Track::DRUM);
+							}
 							KeyMap *km = instr->keymap(c_pitch);
-							int prog = km->program;
+							//int prog = km->program;
 							QString comment = km->comment;
 							QMenu* p = new QMenu(this);
-							KeyMapMenu *item = new KeyMapMenu(p, track, km);
+							KeyMapMenu *item = new KeyMapMenu(p, track, km, patch);
 							p->addAction(item);
 							m_menu = true;
 			
-							p->exec(QCursor::pos());
-							delete p;
-							if(prog != km->program || comment != km->comment)
-							{//Changes were made, try to save out the file
-								if(!instr->fileSave())
-								{
-								/*	printf("Sucessfully saved instrument file\n");
-								}
-								else
-								{*/
-									printf("Failed to save instrument file");
+							QAction* act = p->exec(QCursor::pos());
+							if(act)
+							{
+								int save = act->data().toInt();
+								if(save)
+								{//Changes were made, try to save out the file
+									if(!instr->fileSave())
+									{
+									/*	printf("Sucessfully saved instrument file\n");
+									}
+									else
+									{*/
+										printf("Failed to save instrument file");
+									}
 								}
 							}
+							delete p;
 							m_menu = false;
 						}
 					}

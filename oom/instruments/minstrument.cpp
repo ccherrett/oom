@@ -448,6 +448,7 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 			np->drum = pp->drum;
 			np->keys = pp->keys;
 			np->keyswitches = pp->keyswitches;
+			np->comments = pp->comments;
 			npg->patches.push_back(np);
 		}
 	}
@@ -583,6 +584,19 @@ void Patch::read(Xml& xml)/*{{{*/
 						keyswitches.append(val);
 					}
 				}
+				else if(tag == "comments")
+				{
+					QStringList clist = ((QString)xml.s2()).split(QString(" "), QString::SkipEmptyParts);
+					for (QStringList::Iterator it = clist.begin(); it != clist.end(); ++it)
+					{
+						QStringList hashlist = ((*it)).split(QString("@@:@@"), QString::SkipEmptyParts);
+						if(hashlist.size() == 2)
+						{
+							int k = hashlist.at(0).toInt();
+							comments[k] = hashlist.at(1);
+						}
+					}
+				}
 				break;
 			case Xml::TagEnd:
 				if (tag == "Patch")
@@ -634,6 +648,18 @@ void Patch::write(int level, Xml& xml)/*{{{*/
 				keyString.append(" ");
 		}
 		xml.nput(" keyswitches=\"%s\"", keyString.toUtf8().constData());
+	}
+	if(!comments.empty())
+	{
+		QString c;
+		QHashIterator<int, QString> it(comments);
+		while(it.hasNext())
+		{
+			it.next();
+			QString val = QString::number(it.key()).append("@@:@@").append(it.value());
+			c.append(val).append(" ");
+		}
+		xml.nput(" comments=\"%s\"", c.toUtf8().constData());
 	}
 	xml.put(" />");
 }/*}}}*/

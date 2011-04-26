@@ -34,6 +34,7 @@ struct Patch
 	QList<int> keys, keyswitches;
     QString name;
     bool drum;
+	QHash<int, QString> comments;
     void read(Xml&);
     void write(int level, Xml&);
 };
