@@ -590,7 +590,7 @@ static const char *mk6_xpm_switch[] = {/*{{{*/
 static const char *mk1_xpm_lswitch[] = {
       "40 13 3 1",
       //". c #2d95b7",//highlight
-      ". c #f59100",//highlight
+      ". c #b9d3af",//highlight
       "# c none",
       "$ c #292929",
       ".......................................$",
@@ -611,7 +611,7 @@ static const char *mk1_xpm_lswitch[] = {
 static const char *mk2_xpm_lswitch[] = {
       "40 13 3 1",
       //". c #2d95b7",
-      ". c #f59100",//highlight
+      ". c #b9d3af",//highlight
       "# c none",
       "$ c #292929",
       "########################...............$",
@@ -632,7 +632,7 @@ static const char *mk2_xpm_lswitch[] = {
 static const char *mk3_xpm_lswitch[] = {
       "40 13 3 1",
       //". c #2d95b7",
-      ". c #f59100",//highlight
+      ". c #b9d3af",//highlight
       "# c none",
       "$ c #292929",
       "########################...............$",
@@ -653,7 +653,7 @@ static const char *mk3_xpm_lswitch[] = {
 static const char *mk4_xpm_lswitch[] = {
       "40 13 3 1",
       //"# c #2d95b7",
-      ". c #f59100",//highlight
+      ". c #b9d3af",//highlight
       ". c none",
       "$ c #292929",
       "........................................",
