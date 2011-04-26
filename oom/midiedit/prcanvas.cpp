@@ -93,6 +93,7 @@ PianoCanvas::PianoCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy)
 	playedPitch = -1;
 	_octaveQwerty = 3;
 	m_globalKey = false;
+	m_showcomments = false;
 
 	songChanged(SC_TRACK_INSERTED);
 	connect(song, SIGNAL(midiNote(int, int)), SLOT(midiNote(int, int)));
@@ -141,6 +142,12 @@ int PianoCanvas::y2pitch(int y) const
 	return kt[y % 91] + oct;
 }
 
+void PianoCanvas::toggleComments(bool state)
+{
+	m_showcomments = state;
+	update();
+}
+
 void PianoCanvas::drawOverlay(QPainter&, const QRect&)
 {
 }
@@ -150,7 +157,7 @@ void PianoCanvas::drawOverlay(QPainter&, const QRect&)
 void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 {
 	int x = rect.x();
-	if(_curPart)/*{{{*/
+	if(_curPart && m_showcomments)/*{{{*/
 	{
 		int  cmag = (xmag*-1)*173;
 		if(cmag <= 0)

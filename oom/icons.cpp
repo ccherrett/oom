@@ -174,7 +174,7 @@
 #include "xpm/localoffS.xpm"
 #include "xpm/miditransformS.xpm"
 #include "xpm/midi_plugS.xpm"
-#include "xpm/miditransposeS.xpm"
+//#include "xpm/miditransposeS.xpm"
 #include "xpm/mixerS.xpm"
 #include "xpm/mustangS.xpm"
 #include "xpm/resetS.xpm"
@@ -251,6 +251,7 @@ QPixmap* localoffSIcon;
 QPixmap* miditransformSIcon;
 QPixmap* midi_plugSIcon;
 QPixmap* miditransposeSIcon;
+QPixmap* commentIcon;
 QPixmap* midiThruOnIcon;
 QPixmap* midiThruOffIcon;
 QPixmap* mixerSIcon;
@@ -662,7 +663,8 @@ void initIcons()
       localoffSIcon        = new MPIXMAP(localoffS_xpm, NULL);
       miditransformSIcon   = new MPIXMAP(miditransformS_xpm, NULL);
       midi_plugSIcon       = new MPIXMAP(midi_plugS_xpm, NULL);
-      miditransposeSIcon   = new MPIXMAP(miditransposeS_xpm, NULL);
+      miditransposeSIcon   = new MPIXMAP(":/images/icons/arrow_switch.png", NULL);
+      commentIcon          = new MPIXMAP(":/images/icons/comment.png", NULL);
       midiThruOnIcon       = new MPIXMAP(midi_thru_on3_xpm, NULL);      
       midiThruOffIcon      = new MPIXMAP(midi_thru_off3_xpm, NULL);      
       

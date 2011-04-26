@@ -128,6 +128,8 @@
 		<file>images/icons/reminder3_on.png</file>
 		<file>images/icons/globe-edit.png</file>
 		<file>images/icons/globe.png</file>
+		<file>images/icons/comment.png</file>
+		<file>images/icons/arrow_switch.png</file>
 	</qresource>
 </RCC>
 

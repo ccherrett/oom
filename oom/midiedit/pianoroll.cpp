@@ -607,6 +607,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(m_globalArm, SIGNAL(clicked()), canvas, SLOT(recordArmAll()));
 	connect(m_globalKey, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
 	connect(midiTrackInfo, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
+	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
 
     connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
     piano->setYPos(KH * 30);
@@ -706,6 +707,8 @@ void PianoRoll::songChanged1(int bits)
 		solo->blockSignals(false);
 	//	return;
 	//}
+	if(canvas)
+		midiTrackInfo->updateCommentState(canvas->showComments());
 	songChanged(bits);
 	//trackInfo->songChanged(bits);
 	// We'll receive SC_SELECTION if a different part is selected.

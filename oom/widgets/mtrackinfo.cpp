@@ -338,6 +338,9 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(recEchoButton, SIGNAL(toggled(bool)), SLOT(recEchoToggled(bool)));
 	connect(iRButton, SIGNAL(pressed()), SLOT(inRoutesPressed()));
 	connect(btnTranspose, SIGNAL(toggled(bool)), SIGNAL(globalTransposeClicked(bool)));
+	connect(btnComments, SIGNAL(toggled(bool)), SIGNAL(toggleComments(bool)));
+	btnComments->setIcon(QIcon(*commentIcon));
+	btnTranspose->setIcon(QIcon(*miditransposeSIcon));
 
 	// TODO: Works OK, but disabled for now, until we figure out what to do about multiple out routes and display values...
 	//oRButton->setEnabled(false);
@@ -798,6 +801,13 @@ void MidiTrackInfo::iOutputPortChanged(int index)
 	audio->msgIdle(false);
 
 	song->update(SC_MIDI_TRACK_PROP);
+}
+
+void MidiTrackInfo::updateCommentState(bool state)
+{
+	btnComments->blockSignals(true);
+	btnComments->setChecked(state);
+	btnComments->blockSignals(false);
 }
 
 //---------------------------------------------------------

@@ -402,6 +402,31 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QPushButton" name="btnComments">
+                 <property name="minimumSize">
+                  <size>
+                   <width>24</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>24</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Toggle on/off canvas comments</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
             </layout>

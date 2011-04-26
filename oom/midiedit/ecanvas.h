@@ -132,6 +132,7 @@ public:
     {
     }
     virtual void keyPress(QKeyEvent*);
+	virtual bool showComments() { return false; }
 };
 
 #endif

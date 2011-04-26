@@ -171,6 +171,7 @@ extern QPixmap* localoffSIcon;
 extern QPixmap* miditransformSIcon;
 extern QPixmap* midi_plugSIcon;
 extern QPixmap* miditransposeSIcon;
+extern QPixmap* commentIcon;
 extern QPixmap* midiThruOnIcon;
 extern QPixmap* midiThruOffIcon;
 extern QPixmap* mixerSIcon;

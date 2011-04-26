@@ -119,6 +119,7 @@ public slots:
     void rebuildMatrix();
 	void addSelectedPatch();
 	void previewSelectedPatch();
+	void updateCommentState(bool);
 	//tb1
     void setRaster(int);
     void setQuant(int);
@@ -129,6 +130,7 @@ signals:
 	void updateCurrentPatch(QString);
 	void patchChanged(Patch*);
 	void globalTransposeClicked(bool);
+	void toggleComments(bool);
 	//tb1
     void rasterChanged(int);
     void quantChanged(int);
