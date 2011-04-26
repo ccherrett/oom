@@ -298,7 +298,7 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QPushButton" name="pushButton">
+                <widget class="QPushButton" name="btnTranspose">
                  <property name="minimumSize">
                   <size>
                    <width>24</width>

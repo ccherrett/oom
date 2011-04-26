@@ -337,6 +337,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(panRecButton, SIGNAL(clicked()), SLOT(panRecClicked()));
 	connect(recEchoButton, SIGNAL(toggled(bool)), SLOT(recEchoToggled(bool)));
 	connect(iRButton, SIGNAL(pressed()), SLOT(inRoutesPressed()));
+	connect(btnTranspose, SIGNAL(toggled(bool)), SIGNAL(globalTransposeClicked(bool)));
 
 	// TODO: Works OK, but disabled for now, until we figure out what to do about multiple out routes and display values...
 	//oRButton->setEnabled(false);
@@ -1204,6 +1205,12 @@ void MidiTrackInfo::transposeStateChanged(bool state)
 		return;
 	MidiTrack* track = (MidiTrack*)selected;
 	track->transpose = state;
+	if(!state)
+	{
+		btnTranspose->blockSignals(true);
+		btnTranspose->setChecked(state);
+		btnTranspose->blockSignals(false);
+	}
 	song->update(SC_MIDI_TRACK_PROP);
 }
 
@@ -1598,6 +1605,12 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 		iKompr->blockSignals(true);
 		iTransp->setValue(track->transposition);
 		chkTranspose->setChecked(track->transpose);
+		if(!track->transpose)
+		{
+			btnTranspose->blockSignals(true);
+			btnTranspose->setChecked(false);
+			btnTranspose->blockSignals(false);
+		}
 		iAnschl->setValue(track->velocity);
 		iVerz->setValue(track->delay);
 		iLen->setValue(track->len);

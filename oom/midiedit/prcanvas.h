@@ -101,6 +101,7 @@ public slots:
     void setOctaveQwerty(int octave);
 	void setGlobalKey(bool k) { m_globalKey = k; }
 	void recordArmAll();
+	void globalTransposeClicked(bool);
 
 public:
 

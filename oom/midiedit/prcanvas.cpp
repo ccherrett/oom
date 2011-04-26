@@ -1681,6 +1681,20 @@ void PianoCanvas::recordArmAll()
 	song->update(SC_RECFLAG);
 }
 
+void PianoCanvas::globalTransposeClicked(bool state)/*{{{*/
+{
+	PartList* pl = editor->parts();
+	for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+	{
+		Part* part = ip->second;
+		Track* track = part->track();
+		MidiTrack* mtrack = (MidiTrack*)track;
+		mtrack->transpose = state;
+		//printf("global transpose track: %s - tp: %d \n", mtrack->name().toUtf8().constData(), state);
+	}
+	song->update(SC_MIDI_TRACK_PROP);
+}/*}}}*/
+
 void PianoCanvas::processKeySwitches(Part* part, int pitch, int songtick)
 {
 	MidiTrack* track = (MidiTrack*)part->track();
