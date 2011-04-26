@@ -1859,6 +1859,7 @@ void PianoRoll::setKeyBindings(Patch* p)
 		if(debugMsg)
 			printf("Debug: Updating patch - keys: %d, switches: %d\n", p->keys.size(), p->keyswitches.size());
 		piano->setMIDIKeyBindings(p->keys, p->keyswitches);
+		canvas->update();
 	//}
 }
 
