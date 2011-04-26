@@ -152,7 +152,12 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 	int x = rect.x();
 	if(_curPart)/*{{{*/
 	{
-		//printf("PianoCanvas::drawCanvas(): Found Current part\n");
+		int  cmag = (xmag*-1)*173;
+		if(cmag <= 0)
+			cmag = 1;
+		if(cmag > 4000)
+			cmag = 4000;
+		//printf("PianoCanvas::drawCanvas(): Current xMag: %f, cMag: %d\n", xmag, cmag);
 		Track* track = _curPart->track();
 		if(track && track->isMidiTrack())
 		{
@@ -181,7 +186,7 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 					QString text(km->comment);
 					QFont font("fixed-font", 5);
 					font.setLetterSpacing(QFont::AbsoluteSpacing, 1);
-					font.setStretch(1024);
+					font.setStretch(cmag);
 					font.setWeight(QFont::Light);
 					p.setFont(font);
 					int offset = 2;
