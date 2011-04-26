@@ -329,7 +329,7 @@ void View::paint(const QRect& r)
         p.resetMatrix(); // Q3 support says use resetMatrix instead, but resetMatrix advises resetTransform instead...
 	//p.resetTransform();
 
-	drawOverlay(p);
+	drawOverlay(p, rr);
 }
 
 //---------------------------------------------------------

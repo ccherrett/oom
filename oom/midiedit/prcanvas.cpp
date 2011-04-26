@@ -14,6 +14,7 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QMouseEvent>
+#include <QtGui>
 
 #include <values.h>
 #include <stdio.h>
@@ -140,11 +141,80 @@ int PianoCanvas::y2pitch(int y) const
 	return kt[y % 91] + oct;
 }
 
+void PianoCanvas::drawOverlay(QPainter&, const QRect&)
+{
+}
 //---------------------------------------------------------
 //   drawTopItem
 //---------------------------------------------------------
-void PianoCanvas::drawTopItem(QPainter&, const QRect&)
+void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 {
+	int x = rect.x();
+	int y = rect.y();
+	int w = rect.width();
+	int h = rect.height();
+
+	//---------------------------------------------------
+	//  horizontal lines
+	//---------------------------------------------------
+
+	int yy = ((y - 1) / KH) * KH + KH;
+	int key = 75 - (yy / KH);
+	//Draw out the comments for each key/*{{{*/
+	//printf("PianoCanvas::drawCanvas()\n");
+	if(_curPart)
+	{
+		printf("PianoCanvas::drawCanvas(): Found Current part\n");
+		Track* track = _curPart->track();
+		if(track && track->isMidiTrack())
+		{
+			printf("PianoCanvas::drawCanvas() track is MidiTrack\n");
+			MidiTrack* mtrack = (MidiTrack*)track;
+			int port = mtrack->outPort();
+	  		MidiInstrument* instr = midiPorts[port].instrument();
+			for (; yy < y + h; yy += KH)
+			{
+				printf("Found key: %d ", key);
+	  			KeyMap* km = instr->keymap(key);
+					printf(" Key has comments\n");
+					p.setPen(QColor("black"));
+					QString text(km->comment);
+					//p.drawText(x, yy, text);
+					switch (key % 7)//{{{
+					{
+						case 0:
+						case 3:
+							//p.drawLine(x, yy, x + w, yy);
+	  						if(!km->comment.isEmpty())
+							{
+								p.drawText(x+10, yy, km->comment);
+							}
+							else
+							{
+								QString text(QString::number(key));
+								p.drawText(x+10, yy, text);
+								printf(" No comments\n");
+							}
+							break;
+						default:
+							//p.fillRect(x, yy - 3, w, 6, QBrush(QColor(209, 213, 209)));
+	  						if(!km->comment.isEmpty())
+							{
+								p.drawText(x+10, yy - 3, km->comment);
+							}
+							else
+							{
+								QString text(QString::number(key));
+								p.drawText(x+10, yy - 3, text);
+								printf(" No comments\n");
+							}
+							//p.drawText(x, yy, km->comment);
+							break;
+					}//}}}
+				--key;
+			}
+		}
+	}/*}}}*/
 }
 
 //---------------------------------------------------------
@@ -152,7 +222,7 @@ void PianoCanvas::drawTopItem(QPainter&, const QRect&)
 //    draws a note
 //---------------------------------------------------------
 
-void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
+void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{{{*/
 {
 	QRect r = item->bbox();
 	if (!virt())
@@ -280,7 +350,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	}
 
 	p.drawRect(r);
-}
+}/*}}}*/
 
 
 //---------------------------------------------------------
@@ -288,7 +358,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 //    draws moving items
 //---------------------------------------------------------
 
-void PianoCanvas::drawMoving(QPainter& p, const CItem* item, const QRect& rect)
+void PianoCanvas::drawMoving(QPainter& p, const CItem* item, const QRect& rect)/*{{{*/
 {
 	//if(((NEvent*)item)->part() != curPart)
 	//  return;
@@ -301,7 +371,7 @@ void PianoCanvas::drawMoving(QPainter& p, const CItem* item, const QRect& rect)
 	p.setPen(Qt::black);
 	p.setBrush(Qt::NoBrush);
 	p.drawRect(mr);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   viewMouseDoubleClickEvent
@@ -320,7 +390,7 @@ void PianoCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 //   moveCanvasItems
 //---------------------------------------------------------
 
-void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtype, int* pflags)
+void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtype, int* pflags)/*{{{*/
 {
 	if (editor->parts()->empty())
 		return;
@@ -464,7 +534,7 @@ void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dty
 
 	if (pflags)
 		*pflags = modified;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   moveItem
@@ -474,7 +544,7 @@ void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dty
 // Changed by T356.
 //bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype, int* pflags)
 
-bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)
+bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)/*{{{*/
 {
 	NEvent* nevent = (NEvent*) item;
 	Event event = nevent->event();
@@ -525,7 +595,7 @@ bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)
 //	}
 
 	return true;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   newItem(p, state)
@@ -905,12 +975,14 @@ void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	int key = 75 - (yy / KH);
 	for (; yy < y + h; yy += KH)
 	{
+		//printf("Drawing lines\n");
 		switch (key % 7)
 		{
 			case 0:
 			case 3:
 				p.setPen(QColor(213, 220, 213));
 				p.drawLine(x, yy, x + w, yy);
+				p.drawText(x, yy,"test");
 				break;
 			default:
 				//p.setPen(lightGray);
@@ -927,6 +999,7 @@ void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	//---------------------------------------------------
 
 	drawTickRaster(p, x, y, w, h, editor->raster());
+
 }
 
 //---------------------------------------------------------

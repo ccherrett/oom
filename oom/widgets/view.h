@@ -50,7 +50,7 @@ protected:
     {
     }
 
-    virtual void drawOverlay(QPainter&)
+    virtual void drawOverlay(QPainter&, const QRect&)
     {
     }
 

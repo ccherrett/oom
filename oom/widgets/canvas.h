@@ -110,6 +110,14 @@ protected:
     virtual void drawCanvas(QPainter&, const QRect&) = 0;
     virtual void drawTopItem(QPainter& p, const QRect& rect) = 0;
 
+    virtual void drawOverlay(QPainter&, const QRect&)
+    {
+    }
+
+    virtual QRect overlayRect() const
+    {
+        return QRect(0, 0, 0, 0);
+    }
     virtual void drawItem(QPainter&, const CItem*, const QRect&) = 0;
     virtual void drawMoving(QPainter&, const CItem*, const QRect&) = 0;
     virtual void updateSelection() = 0;

@@ -138,7 +138,7 @@ class CtrlCanvas : public View
 
     virtual void draw(QPainter&, const QRect&);
     virtual void pdraw(QPainter&, const QRect&);
-    virtual void drawOverlay(QPainter& p);
+    virtual void drawOverlay(QPainter& p, const QRect&);
     virtual QRect overlayRect() const;
 
     void changeValRamp(int x1, int x2, int y1, int y2);

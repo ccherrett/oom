@@ -1614,7 +1614,7 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)
 //   drawOverlay
 //---------------------------------------------------------
 
-void CtrlCanvas::drawOverlay(QPainter& p)
+void CtrlCanvas::drawOverlay(QPainter& p, const QRect&)
 {
 	QString s(_controller->name());
 	p.setFont(config.fonts[3]);

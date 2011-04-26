@@ -52,6 +52,7 @@ class PianoCanvas : public EventCanvas
     virtual void viewMouseDoubleClickEvent(QMouseEvent*);
     virtual void drawItem(QPainter&, const CItem*, const QRect&);
     void drawTopItem(QPainter &p, const QRect &rect);
+    virtual void drawOverlay(QPainter& p, const QRect&);
     virtual void drawMoving(QPainter&, const CItem*, const QRect&);
     virtual void moveCanvasItems(CItemList&, int, int, DragType, int*);
     // Changed by T356.
