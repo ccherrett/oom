@@ -98,7 +98,7 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	m_patchcomment->setReadOnly(false);
 	if(m_patch)
 	{
-		printf("Patch supplied, Name: %s\n", m_patch->name.toUtf8().constData());
+		//printf("Patch supplied, Name: %s\n", m_patch->name.toUtf8().constData());
 		m_patchcomment->setText(m_patch->comments.value(m_keymap->key));
 	}
 	connect(m_patchcomment, SIGNAL(textChanged(QString)), SLOT(updatePatchComment()));
