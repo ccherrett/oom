@@ -140,7 +140,8 @@ void Canvas::setPos(int idx, unsigned val, bool adjustScrollbar)
 		x = opos;
 	}
 	_pos[idx] = val;
-	redraw(QRect(x - 1, 0, w + 2, height()));
+	//redraw(QRect(x - 1, 0, w + 2, height()));
+	update();
 }
 
 //---------------------------------------------------------
