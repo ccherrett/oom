@@ -203,12 +203,12 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 				}
 				else if(!km->comment.isEmpty() && !km->hasProgram)
 				{
-					QString text(" : "+km->comment);
+					QString text(km->comment);
 					p.drawText(x+10, pitch2y(key)+offset, text);
 				}
 				else if(km->comment.isEmpty() && km->hasProgram)
 				{
-					QString text(km->pname+" : ");
+					QString text(km->pname);
 					p.drawText(x+10, pitch2y(key)+offset, text);
 				}
 			}
