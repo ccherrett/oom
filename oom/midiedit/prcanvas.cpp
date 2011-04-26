@@ -170,7 +170,6 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 			{
 				MidiPort* mport = &midiPorts[port];
 				int program = mport->hwCtrlState(channel, CTRL_PROGRAM);
-				bool hasProgram = false;
 				Patch* patch = 0;
 				if (program != CTRL_VAL_UNKNOWN && program != 0xffffff)
 				{
@@ -190,29 +189,28 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 					p.setFont(font);
 					int offset = 2;
 					QString label(" ");
-					if(patch && patch->comments.contains(key))
-					{
-						label.append(patch->comments.value(key));
-						hasProgram = true;
-					}
+					bool hasComment = false;
 	  				if(!km->comment.isEmpty() && km->hasProgram)
 					{
-						if(hasProgram)
-							text.append(" : ");
 						label.append(km->pname+" : "+km->comment);
+						hasComment = true;
 					}
 					else if(!km->comment.isEmpty() && !km->hasProgram)
 					{
-						if(hasProgram)
-							text.append(" : ");
 						label.append(km->comment);
+						hasComment = true;
 					}
 					else if(km->comment.isEmpty() && km->hasProgram)
 					{
-						if(hasProgram)
-							text.append(" : ");
 						label.append(km->pname);
+						hasComment = true;
 						//p.drawText(x+10, pitch2y(key)+offset, text);
+					}
+					if(patch && patch->comments.contains(key))
+					{
+						if(hasComment)
+							label.append(" : ");
+						label.append(patch->comments.value(key));
 					}
 					p.drawText(x+10, pitch2y(key)+offset, label);
 				}
