@@ -150,18 +150,6 @@ void PianoCanvas::drawOverlay(QPainter&, const QRect&)
 void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 {
 	int x = rect.x();
-	int y = rect.y();
-	int w = rect.width();
-	int h = rect.height();
-
-	//---------------------------------------------------
-	//  horizontal lines
-	//---------------------------------------------------
-
-	int yy = ((y - 1) / KH) * KH + KH;
-	int key = 75 - (yy / KH);
-	//Draw out the comments for each key/*{{{*/
-	//printf("PianoCanvas::drawCanvas()\n");
 	if(_curPart)
 	{
 		printf("PianoCanvas::drawCanvas(): Found Current part\n");
@@ -172,49 +160,46 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 			MidiTrack* mtrack = (MidiTrack*)track;
 			int port = mtrack->outPort();
 	  		MidiInstrument* instr = midiPorts[port].instrument();
-			for (; yy < y + h; yy += KH)
+			for(int key = 0; key < 128; ++key)
 			{
 				printf("Found key: %d ", key);
 	  			KeyMap* km = instr->keymap(key);
+				p.setPen(QColor("black"));
+				QString text(km->comment);
+				QFont font("fixed-font", 8);
+				font.setLetterSpacing(QFont::AbsoluteSpacing, 1);
+				p.setFont(font);
+				//p.drawText(x, yy, text);
+				int offset = 4;
+     			 switch(key % 12) /*{{{*/
+	 			 {
+     			       case 0:
+     			       case 5://mk3;
+     			       case 2:
+     			       case 7:
+     			       case 9://mk2;
+     			       case 4:
+     			       case 11://mk1;
+     			       default://mk4;
+							font.setPointSize(7);
+							p.setFont(font);
+							offset = 2;
+     			             break;
+     			 }/*}}}*/
+	  			if(!km->comment.isEmpty())
+				{
+					p.drawText(x+10, pitch2y(key)+offset, km->comment);
 					printf(" Key has comments\n");
-					p.setPen(QColor("black"));
-					QString text(km->comment);
-					//p.drawText(x, yy, text);
-					switch (key % 7)//{{{
-					{
-						case 0:
-						case 3:
-							//p.drawLine(x, yy, x + w, yy);
-	  						if(!km->comment.isEmpty())
-							{
-								p.drawText(x+10, yy, km->comment);
-							}
-							else
-							{
-								QString text(QString::number(key));
-								p.drawText(x+10, yy, text);
-								printf(" No comments\n");
-							}
-							break;
-						default:
-							//p.fillRect(x, yy - 3, w, 6, QBrush(QColor(209, 213, 209)));
-	  						if(!km->comment.isEmpty())
-							{
-								p.drawText(x+10, yy - 3, km->comment);
-							}
-							else
-							{
-								QString text(QString::number(key));
-								p.drawText(x+10, yy - 3, text);
-								printf(" No comments\n");
-							}
-							//p.drawText(x, yy, km->comment);
-							break;
-					}//}}}
-				--key;
+				}
+				else
+				{
+					//QString text(QString::number(key));
+					//p.drawText(x+10, pitch2y(key)+offset, text);
+					printf(" No comments\n");
+				}
 			}
 		}
-	}/*}}}*/
+	}
 }
 
 //---------------------------------------------------------
@@ -982,7 +967,6 @@ void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)
 			case 3:
 				p.setPen(QColor(213, 220, 213));
 				p.drawLine(x, yy, x + w, yy);
-				p.drawText(x, yy,"test");
 				break;
 			default:
 				//p.setPen(lightGray);
