@@ -174,7 +174,6 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 				Patch* patch = 0;
 				if (program != CTRL_VAL_UNKNOWN && program != 0xffffff)
 				{
-					hasProgram = true;
 					patch = instr->getPatch(channel, program, song->mtype(), mtrack->type() == Track::DRUM);
 				}
 
@@ -192,17 +191,26 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 					int offset = 2;
 					QString label(" ");
 					if(patch && patch->comments.contains(key))
-						label.append(patch->comments.value(key)).append(" : ");
+					{
+						label.append(patch->comments.value(key));
+						hasProgram = true;
+					}
 	  				if(!km->comment.isEmpty() && km->hasProgram)
 					{
+						if(hasProgram)
+							text.append(" : ");
 						label.append(km->pname+" : "+km->comment);
 					}
 					else if(!km->comment.isEmpty() && !km->hasProgram)
 					{
+						if(hasProgram)
+							text.append(" : ");
 						label.append(km->comment);
 					}
 					else if(km->comment.isEmpty() && km->hasProgram)
 					{
+						if(hasProgram)
+							text.append(" : ");
 						label.append(km->pname);
 						//p.drawText(x+10, pitch2y(key)+offset, text);
 					}
