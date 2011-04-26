@@ -27,7 +27,7 @@ class KeyMapMenu : public QWidgetAction
 	private:
 	InstrumentTree *m_tree;
 	QLineEdit *m_kpatch;
-	QTextEdit *m_comment;
+	QLineEdit *m_comment;
 	QLineEdit *m_patchcomment;
 	KeyMap* m_keymap;
 	MidiTrack *m_track;

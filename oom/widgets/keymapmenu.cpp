@@ -83,11 +83,12 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	clabel->setObjectName("KeyMapMenuLabel");
 	layout->addWidget(clabel);
 
-	m_comment = new QTextEdit();
+	m_comment = new QLineEdit();
 	m_comment->setText(m_keymap->comment);
-	m_comment->setFixedHeight(150);
+	//m_comment->setFixedHeight(150);
 	layout->addWidget(m_comment);
-	connect(m_comment, SIGNAL(textChanged()), SLOT(updateComment()));
+	connect(m_comment, SIGNAL(textChanged(QString)), SLOT(updateComment()));
+	connect(m_comment, SIGNAL(returnPressed()), SLOT(updateComment()));
 	
 	QLabel* pclabel = new QLabel(tr("Patch Key Comments"));
 	pclabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
@@ -145,7 +146,7 @@ void KeyMapMenu::doClose()
 
 void KeyMapMenu::updateComment()
 {
-	QString comment = m_comment->toPlainText();
+	QString comment = m_comment->text();
 	if(comment != m_keymap->comment)
 	{
 		m_datachanged = true;
