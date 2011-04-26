@@ -1391,8 +1391,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 #endif
 
 	menu_functions->addSeparator();
-	menu_functions->addAction(midiResetInstAction);
-	menu_functions->addAction(midiInitInstActions);
+	//menu_functions->addAction(midiResetInstAction);
+	//menu_functions->addAction(midiInitInstActions);
 	menu_functions->addAction(midiLocalOffAction);
 	/*
 	 **      mpid4 = midiInputPlugins->insertItem(
