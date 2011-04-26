@@ -39,6 +39,7 @@ EventCanvas::EventCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy, const 
 	_steprec = false;
 	_midiin = false;
 	_playEvents = false;
+	m_showcomments = false;
 	curVelo = 70;
 
 	setBg(QColor(226, 229, 229));

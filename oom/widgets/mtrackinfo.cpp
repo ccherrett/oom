@@ -803,11 +803,13 @@ void MidiTrackInfo::iOutputPortChanged(int index)
 	song->update(SC_MIDI_TRACK_PROP);
 }
 
-void MidiTrackInfo::updateCommentState(bool state)
+void MidiTrackInfo::updateCommentState(bool state, bool block)
 {
-	btnComments->blockSignals(true);
+	if(block)
+		btnComments->blockSignals(true);
 	btnComments->setChecked(state);
-	btnComments->blockSignals(false);
+	if(block)
+		btnComments->blockSignals(false);
 }
 
 //---------------------------------------------------------

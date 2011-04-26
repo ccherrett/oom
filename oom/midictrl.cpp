@@ -72,6 +72,7 @@ static MidiController programCtrl("Program", CTRL_PROGRAM, 0, 0xffffff, 0);
 // Removed p3.3.37
 //static MidiController mastervolCtrl("MasterVolume", CTRL_MASTER_VOLUME, 0, 0x3fff, 0x3000);
 static MidiController volumeCtrl("MainVolume", CTRL_VOLUME, 0, 127, 100);
+static MidiController modCtrl("Modulation", CTRL_MODULATION, 0, 127, 0);
 static MidiController panCtrl("Pan", CTRL_PANPOT, -64, 63, 0);
 
 
@@ -140,6 +141,7 @@ void initMidiController()
 	//defaultMidiController.add(&mastervolCtrl);
 	defaultMidiController.add(&volumeCtrl);
 	defaultMidiController.add(&panCtrl);
+	defaultMidiController.add(&modCtrl);
 }
 
 //---------------------------------------------------------

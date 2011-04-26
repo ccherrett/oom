@@ -608,6 +608,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(m_globalKey, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
 	connect(midiTrackInfo, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
+	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
 
     connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
     piano->setYPos(KH * 30);
@@ -681,6 +682,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     if (pos > MAXINT)
 	  pos = MAXINT;
 
+	bool showcomment = tconfig().get_property("PianoRollEdit", "showcomments", false).toBool();
+	printf("Canvas show comments: %d\n", showcomment);
+	midiTrackInfo->updateCommentState(showcomment, false);
 	//qDebug() << QThread::currentThread();
 
     // At this point in time the range of the canvas hasn't
@@ -707,8 +711,6 @@ void PianoRoll::songChanged1(int bits)
 		solo->blockSignals(false);
 	//	return;
 	//}
-	if(canvas)
-		midiTrackInfo->updateCommentState(canvas->showComments());
 	songChanged(bits);
 	//trackInfo->songChanged(bits);
 	// We'll receive SC_SELECTION if a different part is selected.
@@ -772,6 +774,7 @@ void PianoRoll::updateTrackInfo()
 			///midiTrackInfo->updateTrackInfo(-1);
 		}
 	}
+	midiTrackInfo->updateCommentState(canvas->showComments(), false);
 }
 
 //---------------------------------------------------------
@@ -815,9 +818,10 @@ PianoRoll::~PianoRoll()
 	tconfig().set_property("PianoRollEdit", "yscale", vscroll->mag());
 	tconfig().set_property("PianoRollEdit", "ypos", vscroll->pos());
 	tconfig().set_property("PianoRollEdit", "colormode", colorMode);
+	tconfig().set_property("PianoRollEdit", "showcomments", canvas->showComments());
+	printf("Canvas show comments: %d\n", canvas->showComments());
     tconfig().save();
-	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();
-	i != ctrlEditList.end(); ++i)
+	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();i != ctrlEditList.end(); ++i)
 	{
 		ctrlEditList.erase(i);
 		break;
@@ -999,6 +1003,7 @@ void PianoRoll::removeCtrl(CtrlEdit* ctrl)
 
 void PianoRoll::closeEvent(QCloseEvent* e)
 {
+	printf("Canvas show comments: %d\n", canvas->showComments());
 	emit deleted((unsigned long) this);
 	e->accept();
 }

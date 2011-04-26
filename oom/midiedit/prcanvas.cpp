@@ -93,7 +93,6 @@ PianoCanvas::PianoCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy)
 	playedPitch = -1;
 	_octaveQwerty = 3;
 	m_globalKey = false;
-	m_showcomments = false;
 
 	songChanged(SC_TRACK_INSERTED);
 	connect(song, SIGNAL(midiNote(int, int)), SLOT(midiNote(int, int)));

@@ -699,7 +699,7 @@ void CtrlPanel::ctrlPopup()
 		}
 		if (i == cll->end())
 		{
-			printf("CtrlPanel: controller %s not found!", s.toLatin1().constData());
+			printf("CtrlPanel: controller %s not found!\n", s.toLatin1().constData());
 		}
 	}
 }
@@ -734,7 +734,7 @@ bool CtrlPanel::ctrlSetTypeByName(QString s)/*{{{*/
 		}
 		if (i == cll->end())
 		{
-			printf("CtrlPanel: controller %s not found!", s.toLatin1().constData());
+			printf("CtrlPanel: controller %s not found!\n", s.toLatin1().constData());
 		}
 	}
 	return rv;

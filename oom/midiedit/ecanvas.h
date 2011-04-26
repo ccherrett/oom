@@ -54,6 +54,7 @@ protected:
     int curVelo;
     bool _steprec;
     bool _midiin;
+	bool m_showcomments;
 
     void updateSelection();
     CItem* getRightMostSelected();
@@ -79,6 +80,7 @@ public slots:
     {
         _midiin = f;
     }
+	void toggleComments(bool){}
 
 signals:
     void pitchChanged(int); // current cursor position
@@ -132,7 +134,7 @@ public:
     {
     }
     virtual void keyPress(QKeyEvent*);
-	virtual bool showComments() { return false; }
+	virtual bool showComments() { return m_showcomments; }
 };
 
 #endif

@@ -219,6 +219,7 @@ private slots:
 
 signals:
     void deleted(unsigned long);
+	void showComments(bool);
 
 public slots:
     virtual void updateHScrollRange();

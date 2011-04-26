@@ -44,7 +44,6 @@ class PianoCanvas : public EventCanvas
     int playedPitch;
     int _octaveQwerty;
 	bool m_globalKey;
-	bool m_showcomments;
 
     QMap<QString, int> _qwertyToMidiMap;
     void bindQwertyKeyToMidiValue(const char* key, int note);
@@ -130,10 +129,6 @@ public:
 		colorMode = mode;
 		redraw();
     }
-	virtual bool showComments()
-	{
-		return m_showcomments;
-	}
     virtual void modifySelected(NoteInfo::ValType type, int delta);
 	virtual bool isEventSelected(Event);
 };

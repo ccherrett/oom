@@ -119,7 +119,7 @@ public slots:
     void rebuildMatrix();
 	void addSelectedPatch();
 	void previewSelectedPatch();
-	void updateCommentState(bool);
+	void updateCommentState(bool, bool = true);
 	//tb1
     void setRaster(int);
     void setQuant(int);
