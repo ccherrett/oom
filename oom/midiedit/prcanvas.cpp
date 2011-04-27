@@ -158,7 +158,7 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 	int x = rect.x();
 	if(_curPart && m_showcomments)/*{{{*/
 	{
-		int  cmag = (xmag*-1)*173;
+		int  cmag = (xmag*-1)*193;
 		if(cmag <= 0)
 			cmag = 1;
 		if(cmag > 4000)
@@ -188,10 +188,10 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 	  				KeyMap* km = instr->keymap(key);
 					p.setPen(QColor(0,26,30));
 					QString text(km->comment);
-					QFont font("fixed-font", 5);
-					font.setLetterSpacing(QFont::AbsoluteSpacing, 1);
-					font.setStretch(cmag);
+					QFont font("sans-serif", 5);
 					font.setWeight(QFont::Light);
+					//font.setLetterSpacing(QFont::AbsoluteSpacing, 1);
+					font.setStretch(cmag);
 					p.setFont(font);
 					int offset = 2;
 					QString label(" ");
