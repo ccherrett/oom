@@ -466,7 +466,6 @@ static const char *mk6_xpm_lswitch_normal[] = {/*{{{*/
       ". c #e0e0e0",
       "# c #14323e",
       "$ c #b9d3af",
-      "d c #292929",
       ".......................................#",
       ".......................................#",
       ".......................................#",
@@ -475,7 +474,7 @@ static const char *mk6_xpm_lswitch_normal[] = {/*{{{*/
       ".......................................#",
       ".......................................#",
       ".......................................#",
-      "ddddddddddddddddddddddd................#",
+      ".......................................#",
       "$$$$$$$$$$$$$$$$$$$$$$$................#",
       "$$$$$$$$$$$$$$$$$$$$$$$$...............#",
       "$$$$$$$$$$$$$$$$$$$$$$$$...............#",
@@ -842,8 +841,8 @@ void Piano::draw(QPainter& p, const QRect& r)
 						else
       						p.drawPixmap(0, pitch2y(i), *mk3_n);
 						preOn = false;
+						lastint = false;
 					}	
-					lastint = false;
      	            break;
      	       case 2:
      	       case 7:
@@ -853,7 +852,13 @@ void Piano::draw(QPainter& p, const QRect& r)
       					p.drawPixmap(0, pitch2y(i), *mk2_lswitch);
 					}
 			   		else if(enabled.isEmpty())
+					{
+						if(lastint)
+      						p.drawPixmap(0, pitch2y(i), *mk5_sn);
+						else
       						p.drawPixmap(0, pitch2y(i), *mk2_n);
+						lastint = false;
+					}
 					else
 					{
 						if(keyswitch.contains(i))
@@ -874,15 +879,16 @@ void Piano::draw(QPainter& p, const QRect& r)
 						}
 						else
 						{
+							//printf("preOn: %d, lastint: %d, key: %d\n", preOn, lastint, i);
 							if(preOn)
       							p.drawPixmap(0, pitch2y(i), *mk5_n);
 							else if(lastint)
       							p.drawPixmap(0, pitch2y(i), *mk5_sn);
 							else
       							p.drawPixmap(0, pitch2y(i), *mk2_n);
+							lastint = false;
 						}
 					}		
-					lastint = false;
      	            break;
      	       case 4:
      	       case 11:
@@ -890,9 +896,17 @@ void Piano::draw(QPainter& p, const QRect& r)
 					if (lswitch)
 					{
       					p.drawPixmap(0, pitch2y(i), *mk1_lswitch);
+						preOn = false;
 					}
 			   		else if(enabled.isEmpty())
+					{
+						if(lastint)
+						{
+      						p.drawPixmap(0, pitch2y(i), *mk6_sn);
+						}
+						else
       						p.drawPixmap(0, pitch2y(i), *mk1_n);
+					}
 					else
 					{
 						if(keyswitch.contains(i))
@@ -903,16 +917,23 @@ void Piano::draw(QPainter& p, const QRect& r)
 						}
 						else
 						{
+							//printf("preOn: %d, lastint: %d, key: %d\n", preOn, lastint, i);
 							if(preOn)
+							{
       							p.drawPixmap(0, pitch2y(i), *mk6_n);
+							}
 							else if(lastint)
+							{
       							p.drawPixmap(0, pitch2y(i), *mk6_sn);
+							}
 							else
+							{
       							p.drawPixmap(0, pitch2y(i), *mk1_n);
+							}
 						}
 						preOn = false;
+						lastint = false;
 					}	
-					lastint = false;
      	            break;
             default:
 					if (lswitch)
@@ -931,18 +952,20 @@ void Piano::draw(QPainter& p, const QRect& r)
 						{
       						p.drawPixmap(0, pitch2y(i), *mk4_s);
 							preOn = false;
+							lastint = false;
 						}
 						else if(enabled.isEmpty() || !enabled.contains(i))
 						{
       						p.drawPixmap(0, pitch2y(i), *mk4_l);
 							preOn = true;
+							lastint = false;
 						}
 						else
 						{
       						p.drawPixmap(0, pitch2y(i), *mk4_n);
 							preOn = false;
+							lastint = false;
 						}
-						lastint = false;
 					}
                     break;
      	 }/*}}}*/
