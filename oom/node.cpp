@@ -39,6 +39,8 @@
 
 bool MidiTrack::isMute() const
 {
+	if(this == (MidiTrack*)metronome)
+		return false;
 	if (_solo || (_internalSolo && !_mute))
 		return false;
 
@@ -50,6 +52,8 @@ bool MidiTrack::isMute() const
 
 bool AudioTrack::isMute() const
 {
+	if(this == metronome)
+		return false;
 	if (_solo || (_internalSolo && !_mute))
 		return false;
 
@@ -65,6 +69,8 @@ bool AudioTrack::isMute() const
 
 void MidiTrack::setSolo(bool val)
 {
+	if(this == (MidiTrack*)metronome)
+		return;
 	if (_solo != val)
 	{
 		_solo = val;
@@ -74,6 +80,9 @@ void MidiTrack::setSolo(bool val)
 
 void AudioTrack::setSolo(bool val)
 {
+	if(this == metronome)
+		return;
+	
 	if (_solo != val)
 	{
 		_solo = val;
@@ -90,6 +99,8 @@ void AudioTrack::setSolo(bool val)
 
 void Track::setInternalSolo(unsigned int val)
 {
+	if(this == metronome)
+		return;
         _internalSolo = val;
 }
 
@@ -110,6 +121,8 @@ void Track::clearSoloRefCounts()
 
 void Track::updateSoloState()
 {
+	if(this == metronome)
+		return;
 	if (_solo)
 		_soloRefCnt++;
 	else
@@ -123,6 +136,8 @@ void Track::updateSoloState()
 
 void Track::updateInternalSoloStates()
 {
+	if(this == metronome)
+		return;
 	if (_tmpSoloChainTrack->solo())
 	{
 		_internalSolo++;
@@ -144,7 +159,7 @@ void Track::updateInternalSoloStates()
 
 void MidiTrack::updateInternalSoloStates()
 {
-	if (this == _tmpSoloChainTrack)
+	if ((this == _tmpSoloChainTrack) || this == (MidiTrack*)metronome)
 		return;
 
 	Track::updateInternalSoloStates();
@@ -156,7 +171,7 @@ void MidiTrack::updateInternalSoloStates()
 
 void AudioTrack::updateInternalSoloStates()
 {
-	if (this == _tmpSoloChainTrack)
+	if ((this == _tmpSoloChainTrack) || this == metronome)
 		return;
 
 	Track::updateInternalSoloStates();
@@ -198,7 +213,8 @@ void AudioTrack::updateInternalSoloStates()
 
 void MidiTrack::updateSoloStates(bool noDec)
 {
-	if (noDec && !_solo)
+	//if (noDec && !_solo)
+	if ((noDec && !_solo) || this == (MidiTrack*)metronome)
 		return;
 
         _tmpSoloChainTrack = this;
@@ -220,7 +236,8 @@ void MidiTrack::updateSoloStates(bool noDec)
 
 void AudioTrack::updateSoloStates(bool noDec)
 {
-	if (noDec && !_solo)
+	//if (noDec && !_solo)
+	if ((noDec && !_solo) || this == metronome)
 		return;
 
 	_tmpSoloChainTrack = this;
