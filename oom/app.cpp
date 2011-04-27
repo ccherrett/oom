@@ -3622,11 +3622,12 @@ void OOMidi::startPianoroll(PartList* pl, bool showDefaultCtrls)
 			pianoroll->removeCtrl(mainVol);
 		pianoroll->addCtrl();
 		CtrlEdit* modctrl = pianoroll->addCtrl();
-		if (!modctrl->setType(QString("Modulation")))
+		modctrl->setType(QString("Modulation"));
+		/*if (!modctrl->setType(QString("Modulation")))
 		{
 			modctrl->hide();
 			pianoroll->removeCtrl(modctrl);
-		}
+		}*/
 	}
 	toplevels.push_back(Toplevel(Toplevel::PIANO_ROLL, (unsigned long) (pianoroll), pianoroll));
 	connect(pianoroll, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
