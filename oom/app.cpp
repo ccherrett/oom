@@ -672,10 +672,11 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 			QT_TRANSLATE_NOOP("@default", "Add Midi Track"));
 	midi->setData(Track::MIDI);
 	grp->addAction(midi);
-	QAction* drum = addTrack->addAction(QIcon(*addtrack_drumtrackIcon),
+	/*QAction* drum = addTrack->addAction(QIcon(*addtrack_drumtrackIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Drum Track"));
 	drum->setData(Track::DRUM);
 	grp->addAction(drum);
+	*/
 	QAction* wave = addTrack->addAction(QIcon(*addtrack_wavetrackIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Audio Track"));
 	wave->setData(Track::WAVE);
@@ -698,12 +699,12 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 	grp->addAction(aaux);
 
 	// Create a sub-menu and fill it with found synth types. Make addTrack the owner.
-	QMenu* synp = populateAddSynth(addTrack);
-	synp->setIcon(*synthIcon);
-	synp->setTitle(QT_TRANSLATE_NOOP("@default", "Add Synth"));
+	//QMenu* synp = populateAddSynth(addTrack);
+	//synp->setIcon(*synthIcon);
+	//synp->setTitle(QT_TRANSLATE_NOOP("@default", "Add Synth"));
 
 	// Add the sub-menu to the given menu.
-	addTrack->addMenu(synp);
+	//addTrack->addMenu(synp);
 
 	QObject::connect(addTrack, SIGNAL(triggered(QAction *)), song, SLOT(addNewTrack(QAction *)));
 
@@ -958,7 +959,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	editAllPartsAction = new QAction(QIcon(*select_all_parts_on_trackIcon), tr("All &Parts on Track"), this);
 
 	startPianoEditAction = new QAction(*pianoIconSet, tr("Pianoroll"), this);
-	startDrumEditAction = new QAction(QIcon(*edit_drummsIcon), tr("Drums"), this);
+	//startDrumEditAction = new QAction(QIcon(*edit_drummsIcon), tr("Drums"), this);
 	startListEditAction = new QAction(QIcon(*edit_listIcon), tr("List"), this);
 	startWaveEditAction = new QAction(QIcon(*edit_waveIcon), tr("Audio"), this);
 
@@ -1109,7 +1110,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(editSignalMapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
 
 	connect(startPianoEditAction, SIGNAL(triggered()), SLOT(startPianoroll()));
-	connect(startDrumEditAction, SIGNAL(triggered()), SLOT(startDrumEditor()));
+	//connect(startDrumEditAction, SIGNAL(triggered()), SLOT(startDrumEditor()));
 	connect(startListEditAction, SIGNAL(triggered()), SLOT(startListEditor()));
 	//connect(startWaveEditAction, SIGNAL(triggered()), SLOT(startWaveEditor()));
 
@@ -1313,14 +1314,14 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuEdit->addSeparator();
 
 	menuEdit->addAction(startPianoEditAction);
-	menuEdit->addAction(startDrumEditAction);
+	//menuEdit->addAction(startDrumEditAction);
 	menuEdit->addAction(startListEditAction);
 	//menuEdit->addAction(startWaveEditAction);
 
 	menuEdit->addSeparator();
 
 
-	menuEdit->addMenu(midiEdit);
+	//menuEdit->addMenu(midiEdit);
 #if 0  // TODO
 	midiEdit->insertItem(tr("Modify Gate Time"), this, SLOT(modifyGateTime()));
 	midiEdit->insertItem(tr("Modify Velocity"), this, SLOT(modifyVelocity()));
@@ -1336,8 +1337,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	midiEdit->insertItem(tr("Create Measure"), this, SLOT(createMeasure()));
 	midiEdit->insertItem(tr("Mix Track"), this, SLOT(mixTrack()));
 #endif
-	midiEdit->addAction(midiTransposeAction);
-	midiEdit->addAction(midiTransformerAction);
+	//midiEdit->addAction(midiTransposeAction);
+	//midiEdit->addAction(midiTransformerAction);
 
 	//menuEdit->addAction(editSongInfoAction);
 
@@ -1381,11 +1382,11 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	song->populateScriptMenu(menuScriptPlugins, this);
 	menu_functions->addMenu(menuScriptPlugins);
 	menu_functions->addAction(midiEditInstAction);
-	menu_functions->addMenu(midiInputPlugins);
-	midiInputPlugins->addAction(midiTrpAction);
-	midiInputPlugins->addAction(midiInputTrfAction);
-	midiInputPlugins->addAction(midiInputFilterAction);
-	midiInputPlugins->addAction(midiRemoteAction);
+	//menu_functions->addMenu(midiInputPlugins);
+	//midiInputPlugins->addAction(midiTrpAction);
+	//midiInputPlugins->addAction(midiInputTrfAction);
+	//midiInputPlugins->addAction(midiInputFilterAction);
+	//midiInputPlugins->addAction(midiRemoteAction);
 #ifdef BUILD_EXPERIMENTAL
 	midiInputPlugins->addAction(midiRhythmAction);
 #endif
@@ -1508,12 +1509,12 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	QActionGroup *grp = populateAddTrack(addTrack);
 
 	trackMidiAction = grp->actions()[0];
-	trackDrumAction = grp->actions()[1];
-	trackWaveAction = grp->actions()[2];
-	trackAOutputAction = grp->actions()[3];
-	trackAGroupAction = grp->actions()[4];
-	trackAInputAction = grp->actions()[5];
-	trackAAuxAction = grp->actions()[6];
+	//trackDrumAction = grp->actions()[1];
+	trackWaveAction = grp->actions()[1];
+	trackAOutputAction = grp->actions()[2];
+	trackAGroupAction = grp->actions()[3];
+	trackAInputAction = grp->actions()[4];
+	trackAAuxAction = grp->actions()[5];
 
 	transport = new Transport(this, "transport");
 	bigtime = 0;
@@ -5286,7 +5287,7 @@ void OOMidi::updateConfiguration()
 	//editDeleteSelectedAction has no acceleration
 
 	trackMidiAction->setShortcut(shortcuts[SHRT_ADD_MIDI_TRACK].key);
-	trackDrumAction->setShortcut(shortcuts[SHRT_ADD_DRUM_TRACK].key);
+	//trackDrumAction->setShortcut(shortcuts[SHRT_ADD_DRUM_TRACK].key);
 	trackWaveAction->setShortcut(shortcuts[SHRT_ADD_WAVE_TRACK].key);
 	trackAOutputAction->setShortcut(shortcuts[SHRT_ADD_AUDIO_OUTPUT].key);
 	trackAGroupAction->setShortcut(shortcuts[SHRT_ADD_AUDIO_BUSS].key);
@@ -5301,7 +5302,7 @@ void OOMidi::updateConfiguration()
 	editAllPartsAction->setShortcut(shortcuts[SHRT_SELECT_PRTSTRACK].key);
 
 	startPianoEditAction->setShortcut(shortcuts[SHRT_OPEN_PIANO].key);
-	startDrumEditAction->setShortcut(shortcuts[SHRT_OPEN_DRUMS].key);
+	//startDrumEditAction->setShortcut(shortcuts[SHRT_OPEN_DRUMS].key);
 	startListEditAction->setShortcut(shortcuts[SHRT_OPEN_LIST].key);
 	//startWaveEditAction->setShortcut(shortcuts[SHRT_OPEN_WAVE].key);
 

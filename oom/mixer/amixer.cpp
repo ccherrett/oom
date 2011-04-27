@@ -168,7 +168,7 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 	actionItems->setExclusive(false);
 
 	showMidiTracksId = new QAction(tr("Show Midi Tracks"), actionItems);
-	showDrumTracksId = new QAction(tr("Show Drum Tracks"), actionItems);
+	//showDrumTracksId = new QAction(tr("Show Drum Tracks"), actionItems);
 	showWaveTracksId = new QAction(tr("Show Audio Tracks"), actionItems);
 
 	QAction *separator = new QAction(this);
@@ -179,7 +179,7 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 	showOutputTracksId = new QAction(tr("Show Outputs"), actionItems);
 	showGroupTracksId = new QAction(tr("Show Groups"), actionItems);
 	showAuxTracksId = new QAction(tr("Show Auxs"), actionItems);
-	showSyntiTracksId = new QAction(tr("Show Synthesizers"), actionItems);
+	//showSyntiTracksId = new QAction(tr("Show Synthesizers"), actionItems);
 
 	separator = new QAction(this);
 	separator->setSeparator(true);
@@ -189,24 +189,24 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 	toggleShowEffectsRackAction->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
 
 	showMidiTracksId->setCheckable(true);
-	showDrumTracksId->setCheckable(true);
+	//showDrumTracksId->setCheckable(true);
 	showWaveTracksId->setCheckable(true);
 	showInputTracksId->setCheckable(true);
 	showOutputTracksId->setCheckable(true);
 	showGroupTracksId->setCheckable(true);
 	showAuxTracksId->setCheckable(true);
-	showSyntiTracksId->setCheckable(true);
+	//showSyntiTracksId->setCheckable(true);
 
 	//connect(menuView, SIGNAL(triggered(QAction*)), SLOT(showTracksChanged(QAction*)));
 	//connect(actionItems, SIGNAL(selected(QAction*)), this, SLOT(showTracksChanged(QAction*)));
 	connect(showMidiTracksId, SIGNAL(triggered(bool)), SLOT(showMidiTracksChanged(bool)));
-	connect(showDrumTracksId, SIGNAL(triggered(bool)), SLOT(showDrumTracksChanged(bool)));
+	//connect(showDrumTracksId, SIGNAL(triggered(bool)), SLOT(showDrumTracksChanged(bool)));
 	connect(showWaveTracksId, SIGNAL(triggered(bool)), SLOT(showWaveTracksChanged(bool)));
 	connect(showInputTracksId, SIGNAL(triggered(bool)), SLOT(showInputTracksChanged(bool)));
 	connect(showOutputTracksId, SIGNAL(triggered(bool)), SLOT(showOutputTracksChanged(bool)));
 	connect(showGroupTracksId, SIGNAL(triggered(bool)), SLOT(showGroupTracksChanged(bool)));
 	connect(showAuxTracksId, SIGNAL(triggered(bool)), SLOT(showAuxTracksChanged(bool)));
-	connect(showSyntiTracksId, SIGNAL(triggered(bool)), SLOT(showSyntiTracksChanged(bool)));
+	//connect(showSyntiTracksId, SIGNAL(triggered(bool)), SLOT(showSyntiTracksChanged(bool)));
 	connect(toggleShowEffectsRackAction, SIGNAL(triggered()), SLOT(toggleShowEffectsRack()));
 
 	menuView->addActions(actionItems->actions());
@@ -408,13 +408,13 @@ void AudioMixerApp::updateMixer(UpdateAction action)
 	setWindowTitle(cfg->name);
 
 	showMidiTracksId->setChecked(cfg->showMidiTracks);
-	showDrumTracksId->setChecked(cfg->showDrumTracks);
+	//showDrumTracksId->setChecked(cfg->showDrumTracks);
 	showInputTracksId->setChecked(cfg->showInputTracks);
 	showOutputTracksId->setChecked(cfg->showOutputTracks);
 	showWaveTracksId->setChecked(cfg->showWaveTracks);
 	showGroupTracksId->setChecked(cfg->showGroupTracks);
 	showAuxTracksId->setChecked(cfg->showAuxTracks);
-	showSyntiTracksId->setChecked(cfg->showSyntiTracks);
+	//showSyntiTracksId->setChecked(cfg->showSyntiTracks);
 
 	int auxsSize = song->auxs()->size();
 	if ((action == UPDATE_ALL) || (auxsSize != oldAuxsSize))

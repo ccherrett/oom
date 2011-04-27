@@ -968,9 +968,9 @@ void TList::mousePressEvent(QMouseEvent* ev)
 			QAction* midi = p->addAction(*addtrack_addmiditrackIcon,
 					tr("Add Midi Track"));
 			midi->setData(Track::MIDI);
-			QAction* drum = p->addAction(*addtrack_drumtrackIcon,
+			/*QAction* drum = p->addAction(*addtrack_drumtrackIcon,
 					tr("Add Drum Track"));
-			drum->setData(Track::DRUM);
+			drum->setData(Track::DRUM);*/
 			QAction* wave = p->addAction(*addtrack_wavetrackIcon,
 					tr("Add Audio Track"));
 			wave->setData(Track::WAVE);
@@ -988,12 +988,12 @@ void TList::mousePressEvent(QMouseEvent* ev)
 			aaux->setData(Track::AUDIO_AUX);
 
 			// Create a sub-menu and fill it with found synth types. Make p the owner.
-			QMenu* synp = populateAddSynth(p);
-			synp->setIcon(*synthIcon);
-			synp->setTitle(QT_TRANSLATE_NOOP("@default", "Add Synth"));
+			//QMenu* synp = populateAddSynth(p);
+			//synp->setIcon(*synthIcon);
+			//synp->setTitle(QT_TRANSLATE_NOOP("@default", "Add Synth"));
 
 			// Add the 'Add Synth' sub-menu to the menu.
-			p->addMenu(synp);
+			//p->addMenu(synp);
 
 			// Show the menu
 			QAction* act = p->exec(ev->globalPos(), 0);
@@ -1367,8 +1367,8 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						}
 #endif
 #endif
-						p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
-						p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
+						//p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
+						//p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
 					}
 
 					QAction* act = p->exec(ev->globalPos(), 0);
