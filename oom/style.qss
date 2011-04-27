@@ -72,7 +72,7 @@ MidiTrackInfo QTableView, QTableView#mapTable
 	border-radius: 0px;
 	padding: 0px;
 	color: black;
-	font-size: 12px;
+	font-size: 16px;
 	alternate-background-color: #bec0cf;
 }
 MidiTrackInfo QTableView::focus, QTableView#mapTable::focus
@@ -130,7 +130,7 @@ MidiTrackInfo QTreeView/*{{{*/
 	border-radius: 0px;
 	padding: 0px;
 	color: #303033;
-	font-size: 11x;
+	font-size: 16px;
 	alternate-background-color: #bec0cf;
 	/*selection-background-color:red;*//*this can be used to change the selection background color*/
 }
@@ -207,7 +207,7 @@ QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#option
 	border-radius: 0px;
 	padding: 0px;
 	color: black;
-	font-size: 12px;
+	font-size: 16px;
 	alternate-background-color: #bec0cf;
 }
 QTableView#tblTrackView::focus, QTableView#routeList::focus, TrackViewEditor QTableView#optionsTable
@@ -247,7 +247,7 @@ QListWidget
 	border-radius: 0px;
 	padding: 0px;
 	color: black;
-	font-size: 12px;
+	font-size: 16px;
 	alternate-background-color: #bec0cf;
 }
 
