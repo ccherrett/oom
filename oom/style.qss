@@ -282,7 +282,7 @@ QTableView#autoTable
 	border-radius: 0px;
 	padding: 0px;
 	color: black;
-	font-size: 12px;
+	font-size: 14px;
 	alternate-background-color: #bec0cf;
 }
 QTableView#autoTable::focus
