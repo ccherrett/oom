@@ -346,11 +346,7 @@ static const char *mk1_xpm_normal[] = {/*{{{*/
 
 static const char *mk2_xpm_normal[] = {
       "40 13 2 1",
-      //". c #dedede",
-      //". c #a0cfe1",
       ". c #e0e0e0",
-      //"# c #292929",
-      //"# c #06384b",
       "# c #2e2e2e",
       "########################...............#",
       "########################...............#",
@@ -369,12 +365,7 @@ static const char *mk2_xpm_normal[] = {
 
 static const char *mk3_xpm_normal[] = {
       "40 13 2 1",
-      //". c #dedede",
-      //". c #a0cfe1",
       ". c #e0e0e0",
-      //"# c #292929",
-      //"# c #08455c",
-      //"# c #06384b",
       "# c #2e2e2e",
       "########################...............#",
       "########################...............#",
@@ -413,15 +404,10 @@ static const char *mk4_xpm_normal[] = {
       ".......................................#",
       ".......................................#",
       };
-static const char *mk5_xpm_normal[] = {
+static const char *mk5_xpm_normal[] = {/*{{{*/
       "40 13 3 1",
       "$ c #576466",
-      //". c #dedede",
-      //". c #a0cfe1",
       ". c #e0e0e0",
-      //"# c #292929",
-      //"# c #08455c",
-      //"# c #06384b",
       "# c #2e2e2e",
       "########################...............#",
       "########################...............#",
@@ -436,15 +422,10 @@ static const char *mk5_xpm_normal[] = {
       "$$$$$$$$$$$$$$$$$$$$$$$$...............#",
       "$$$$$$$$$$$$$$$$$$$$$$$$...............#",     // 7
       "$$$$$$$$$$$$$$$$$$$$$$$$############### ",
-      };
+      };/*}}}*/
 static const char *mk6_xpm_normal[] = {/*{{{*/
       "40 13 3 1",
-      //". c #dedede",
-      //". c #a0cfe1",
       ". c #e0e0e0",
-      //"# c #292929",
-      //"# c #08455c",
-      //"# c #06384b",
       "# c #14323e",
       "$ c #576466",
       ".......................................#",
@@ -460,6 +441,46 @@ static const char *mk6_xpm_normal[] = {/*{{{*/
       "$$$$$$$$$$$$$$$$$$$$$$$$...............#",
       "$$$$$$$$$$$$$$$$$$$$$$$$...............#",
       "$$$$$$$$$$$$$$$$$$$$$$$$############### ",
+      };/*}}}*/
+static const char *mk5_xpm_lswitch_normal[] = {/*{{{*/
+      "40 13 3 1",
+      "$ c #b9d3af",
+      ". c #e0e0e0",
+      "# c #2e2e2e",
+      "d c #292929",
+      "########################...............#",
+      "########################...............#",
+      "#######################................#", //------------------------
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",     // 6
+      ".......................................#",
+      ".......................................#",
+      ".......................................#", //--------------------------
+      "ddddddddddddddddddddddd................#",
+      "$$$$$$$$$$$$$$$$$$$$$$$d...............#",
+      "$$$$$$$$$$$$$$$$$$$$$$$d...............#",     // 7
+      "$$$$$$$$$$$$$$$$$$$$$$$d############### ",
+      };/*}}}*/
+static const char *mk6_xpm_lswitch_normal[] = {/*{{{*/
+      "40 13 3 1",
+      ". c #e0e0e0",
+      "# c #14323e",
+      "$ c #b9d3af",
+      "d c #292929",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      ".......................................#",
+      "ddddddddddddddddddddddd................#",
+      "$$$$$$$$$$$$$$$$$$$$$$$d...............#",
+      "$$$$$$$$$$$$$$$$$$$$$$$d...............#",
+      "$$$$$$$$$$$$$$$$$$$$$$$d############### ",
       };/*}}}*/
 //}}}	  
 //{{{
@@ -653,7 +674,7 @@ static const char *mk3_xpm_lswitch[] = {
 static const char *mk4_xpm_lswitch[] = {
       "40 13 3 1",
       //"# c #2d95b7",
-      ". c #b9d3af",//highlight
+      "# c #b9d3af",
       ". c none",
       "$ c #292929",
       "........................................",
@@ -748,6 +769,8 @@ Piano::Piano(QWidget* parent, int ymag, MidiEditor *e)
 	mk4_n = new QPixmap(mk4_xpm_normal);
 	mk5_n = new QPixmap(mk5_xpm_normal);
 	mk6_n = new QPixmap(mk6_xpm_normal);
+	mk5_sn = new QPixmap(mk5_xpm_lswitch_normal);
+	mk6_sn = new QPixmap(mk6_xpm_lswitch_normal);
 	
 	//setup all the keyswitch colors 	
 	mk1_s = new QPixmap(mk1_xpm_switch);
@@ -791,6 +814,7 @@ void Piano::draw(QPainter& p, const QRect& r)
       }*/
 
 	  bool preOn = false;
+	  bool lastint = false;
 	  for(int i = 0; i <= 127; ++i)
 	  {
 		MidiTrack* track = (MidiTrack*)curPart->track();
@@ -820,6 +844,7 @@ void Piano::draw(QPainter& p, const QRect& r)
       						p.drawPixmap(0, pitch2y(i), *mk3_n);
 						preOn = false;
 					}	
+					lastint = false;
      	            break;
      	       case 2:
      	       case 7:
@@ -852,10 +877,13 @@ void Piano::draw(QPainter& p, const QRect& r)
 						{
 							if(preOn)
       							p.drawPixmap(0, pitch2y(i), *mk5_n);
+							else if(lastint)
+      							p.drawPixmap(0, pitch2y(i), *mk5_sn);
 							else
       							p.drawPixmap(0, pitch2y(i), *mk2_n);
 						}
-					}	
+					}		
+					lastint = false;
      	            break;
      	       case 4:
      	       case 11:
@@ -878,19 +906,26 @@ void Piano::draw(QPainter& p, const QRect& r)
 						{
 							if(preOn)
       							p.drawPixmap(0, pitch2y(i), *mk6_n);
+							else if(lastint)
+      							p.drawPixmap(0, pitch2y(i), *mk6_sn);
 							else
       							p.drawPixmap(0, pitch2y(i), *mk1_n);
 						}
 						preOn = false;
 					}	
+					lastint = false;
      	            break;
             default:
 					if (lswitch)
 					{
       					p.drawPixmap(0, pitch2y(i), *mk4_lswitch);
+						lastint = true;
 					}
 			   		else if(enabled.isEmpty())
-      						p.drawPixmap(0, pitch2y(i), *mk4_n);
+					{
+      					p.drawPixmap(0, pitch2y(i), *mk4_n);
+						lastint = false;
+					}
 					else
 					{
 						if(keyswitch.contains(i))
@@ -908,6 +943,7 @@ void Piano::draw(QPainter& p, const QRect& r)
       						p.drawPixmap(0, pitch2y(i), *mk4_n);
 							preOn = false;
 						}
+						lastint = false;
 					}
                     break;
      	 }/*}}}*/
