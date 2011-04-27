@@ -1192,12 +1192,12 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 							p->addAction(item);
 							m_menu = true;
 			
-							QAction* act = p->exec(QCursor::pos());
-							if(act)
-							{
-								int save = act->data().toInt();
-								if(save)
-								{//Changes were made, try to save out the file
+							p->exec(QCursor::pos());
+							//if(act)
+							//{
+							//	int save = act->data().toInt();
+							//	if(save)
+							//	{//Changes were made, try to save out the file
 									if(!instr->fileSave())
 									{
 									/*	printf("Sucessfully saved instrument file\n");
@@ -1206,8 +1206,8 @@ void Piano::viewMousePressEvent(QMouseEvent* event)
 									{*/
 										printf("Failed to save instrument file");
 									}
-								}
-							}
+							//	}
+							//}
 							delete p;
 							m_menu = false;
 						}
