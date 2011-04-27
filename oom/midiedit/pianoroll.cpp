@@ -683,7 +683,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	  pos = MAXINT;
 
 	bool showcomment = tconfig().get_property("PianoRollEdit", "showcomments", false).toBool();
-	printf("Canvas show comments: %d\n", showcomment);
+	//printf("Canvas show comments: %d\n", showcomment);
 	midiTrackInfo->updateCommentState(showcomment, false);
 	//qDebug() << QThread::currentThread();
 
@@ -819,7 +819,7 @@ PianoRoll::~PianoRoll()
 	tconfig().set_property("PianoRollEdit", "ypos", vscroll->pos());
 	tconfig().set_property("PianoRollEdit", "colormode", colorMode);
 	tconfig().set_property("PianoRollEdit", "showcomments", canvas->showComments());
-	printf("Canvas show comments: %d\n", canvas->showComments());
+	//printf("Canvas show comments: %d\n", canvas->showComments());
     tconfig().save();
 	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();i != ctrlEditList.end(); ++i)
 	{
@@ -1003,7 +1003,6 @@ void PianoRoll::removeCtrl(CtrlEdit* ctrl)
 
 void PianoRoll::closeEvent(QCloseEvent* e)
 {
-	printf("Canvas show comments: %d\n", canvas->showComments());
 	emit deleted((unsigned long) this);
 	e->accept();
 }
