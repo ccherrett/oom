@@ -142,6 +142,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	_useMatrix = false;
 	_autoExapand = true;
 	_resetProgram = false;
+	m_globalState = false;
 	_matrix = new QList<int>;
 	_tableModel = new ProgramChangeTableModel(this);
 	tableView = new ProgramChangeTable(this);
@@ -1827,7 +1828,14 @@ void MidiTrackInfo::progRecClicked()
 {
 	if (!selected)
 		return;
-	MidiTrack* track = (MidiTrack*) selected;
+	progRecClicked(selected);
+}
+
+void MidiTrackInfo::progRecClicked(Track* t)
+{
+	if (!t)
+		return;
+	MidiTrack* track = (MidiTrack*) t;
 	int portno = track->outPort();
 	int channel = track->outChannel();
 	MidiPort* port = &midiPorts[portno];
@@ -2051,9 +2059,9 @@ void MidiTrackInfo::matrixItemChanged(QStandardItem* item)
 
 void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 {
-	if (!selected || !curPart)
+	if (!curPart)
 		return;
-	MidiTrack* track = (MidiTrack*) selected;
+	MidiTrack* track = (MidiTrack*) curPart->track();
 	int channel = track->outChannel();
 	int port = track->outPort();
 	//printf("MidiTrackInfo::insertMatrixEvent() _matrix->size() = %d\n", _matrix->size());
@@ -2090,7 +2098,7 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 		//_selModel->blockSignals(true);
 		tableView->selectRow(item->row());
 		//_selModel->blockSignals(false);
-		progRecClicked();
+		progRecClicked(track);
 	}
 	else if (_matrix->size() > 1)
 	{
@@ -2115,7 +2123,7 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
 			audio->msgPlayMidiEvent(&ev);
 			updateTrackInfo(-1);
-			progRecClicked();
+			progRecClicked(track);
 		}
 		_matrix->push_back(row);
 	}

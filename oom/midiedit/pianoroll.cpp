@@ -606,6 +606,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
 	connect(m_globalArm, SIGNAL(clicked()), canvas, SLOT(recordArmAll()));
 	connect(m_globalKey, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
+	connect(m_globalKey, SIGNAL(toggled(bool)), midiTrackInfo, SLOT(setGlobalState(bool)));
 	connect(midiTrackInfo, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
@@ -1228,6 +1229,10 @@ static int rasterTable[] = {
 	9, 18, 36, 72, 144, 288, 576, 1152, 2304 // dot
 };
 
+bool PianoRoll::isGlobalEdit()
+{
+	return m_globalKey->isChecked();
+}
 
 bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 {
@@ -1290,7 +1295,18 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 		else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
 		{
 			unsigned utick = song->cpos() + rasterStep(song->cpos());
-			midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick); //progRecClicked();
+			if(m_globalKey->isChecked())
+			{
+				for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+				{
+					Part* part = ip->second;
+					midiTrackInfo->insertMatrixEvent(part, utick);
+				}
+			}
+			else
+			{
+				midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick);
+			}
 			return true;
 		}
 		else if (key == shortcuts[SHRT_POS_INC].key)
@@ -1546,7 +1562,19 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
 	{
 		unsigned utick = song->cpos() + rasterStep(song->cpos());
-		midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick); //progRecClicked();
+		if(m_globalKey->isChecked())
+		{
+			for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+			{
+				Part* part = ip->second;
+				midiTrackInfo->insertMatrixEvent(part, utick);
+			}
+		}
+		else
+		{
+			midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick);
+		}
+		//midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick); //progRecClicked();
 		return;
 	}
 	if(key == shortcuts[SHRT_COPY_PROGRAM].key)
@@ -1573,49 +1601,65 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	{
 		//printf("Delete KeyStroke recieved\n");
 		int x = song->cpos();
-		Part* mprt = curCanvasPart();
-		EventList* eventList = mprt->events();
-		if(eventList && !eventList->empty())
+		if(m_globalKey->isChecked())
 		{
-			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+			for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
 			{
-				//Get event type.
-				Event pcevt = evt->second;
-				//printf("Found events %d \n", pcevt.type());
-				if (!pcevt.isNote())
+				Part* mprt = ip->second;
+				EventList* eventList = mprt->events();
+				if(eventList && !eventList->empty())
 				{
-					//printf("Found none Note events of type: %d with dataA: %d\n", pcevt.type(), pcevt.dataA());
-					if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+					for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
 					{
-						//printf("Found Program Change event type\n");
-						//printf("Pos x: %d\n", x);
-						int xp = pcevt.tick() + mprt->tick();
-						//printf("Event x: %d\n", xp);
-						if (xp >= x && xp <= (x + 50))
+						//Get event type.
+						Event pcevt = evt->second;
+						if (!pcevt.isNote())
 						{
-							pcbar->deleteProgramChange(pcevt);
-							//printf("Found Program Change to delete at: %d\n", x);
-							song->startUndo();
-							//song->deleteEvent(pcevt, mprt); //hack
-							audio->msgDeleteEvent(evt->second, mprt/*p->second*/, true, true, false);
-							song->endUndo(SC_EVENT_MODIFIED);
-							//Reset the hardware controller for this track
-							/*MidiTrack *evtrack = static_cast<MidiTrack*>(p->second->track());
-							if(evtrack)
+							if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
 							{
-								int outChannel = evtrack->outChannel();
-								int outPort = evtrack->outPort();
-								MidiPort* mp = &midiPorts[outPort];
-								if (mp->hwCtrlState(outChannel, CTRL_PROGRAM) != CTRL_VAL_UNKNOWN)
-									audio->msgSetHwCtrlState(mp, outChannel, CTRL_PROGRAM, CTRL_VAL_UNKNOWN);
-							}*/
-							break;
+								int xp = pcevt.tick() + mprt->tick();
+								if (xp >= x && xp <= (x + 50))
+								{
+									pcbar->deleteProgramChange(pcevt);
+									song->startUndo();
+									audio->msgDeleteEvent(evt->second, mprt/*p->second*/, true, true, false);
+									song->endUndo(SC_EVENT_MODIFIED);
+									break;
+								}
+							}
 						}
 					}
 				}
 			}
 		}
-		//pcbar->deleteProgram();
+		else
+		{
+			Part* mprt = curCanvasPart();/*{{{*/
+			EventList* eventList = mprt->events();
+			if(eventList && !eventList->empty())
+			{
+				for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+				{
+					//Get event type.
+					Event pcevt = evt->second;
+					if (!pcevt.isNote())
+					{
+						if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+						{
+							int xp = pcevt.tick() + mprt->tick();
+							if (xp >= x && xp <= (x + 50))
+							{
+								pcbar->deleteProgramChange(pcevt);
+								song->startUndo();
+								audio->msgDeleteEvent(evt->second, mprt/*p->second*/, true, true, false);
+								song->endUndo(SC_EVENT_MODIFIED);
+								break;
+							}
+						}
+					}
+				}
+			}/*}}}*/
+		}
 		pcbar->update();
 		return;
 	}

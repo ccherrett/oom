@@ -178,7 +178,18 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 		song->setPos(i, p); // all other cases: relocating one of the locators
 		//emit selectInstrument();
 		unsigned utick = song->cpos() + currentEditor->rasterStep(song->cpos());
-		emit addProgramChange(currentEditor->curCanvasPart(), utick);
+		if(currentEditor->isGlobalEdit())
+		{
+			for (iPart ip = currentEditor->parts()->begin(); ip != currentEditor->parts()->end(); ++ip)
+			{
+				Part* part = ip->second;
+				emit addProgramChange(part, utick);
+			}
+		}
+		else
+		{
+			emit addProgramChange(currentEditor->curCanvasPart(), utick);
+		}
 	}
 	/*else if (i == 2 && (event->modifiers() & Qt::ShiftModifier))
 	{ // If shift +RMB we remove a marker

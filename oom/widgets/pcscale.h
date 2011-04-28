@@ -20,6 +20,10 @@ struct ProgramChangeObject {
 	bool valid;
 	QPoint mousePressPos;
 	ProgramChangeVals state;
+	inline bool operator==(ProgramChangeObject pco)
+	{
+		return pco.part == part && pco.event == event && pco.state == state;
+	}
 };
 //---------------------------------------------------------
 //   PCScale
@@ -37,6 +41,7 @@ class PCScale : public View
     bool waveMode;
     //Audio* audio;
 	ProgramChangeObject _pc;
+	QList<ProgramChangeObject> selectionList;
 
 
 private slots:

@@ -234,6 +234,7 @@ public:
     ~PianoRoll();
     //void setSolo(bool val);
 	bool isCurrentPatch(int, int, int);
+	bool isGlobalEdit();
 
     virtual void readStatus(Xml&);
     virtual void writeStatus(int, Xml&) const;

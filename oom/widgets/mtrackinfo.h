@@ -56,6 +56,7 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
 	bool _useMatrix;
 	bool _autoExapand;
 	bool _resetProgram;
+	bool m_globalState;
     virtual void showEvent(QShowEvent *);
 
 private slots:
@@ -110,6 +111,7 @@ public slots:
     void configChanged();
     void instrPopup();
     void progRecClicked();
+    void progRecClicked(Track*);
     void songChanged(int);
     void insertMatrixEvent(Part*, unsigned);
     void updateSize();
@@ -120,6 +122,7 @@ public slots:
 	void addSelectedPatch();
 	void previewSelectedPatch();
 	void updateCommentState(bool, bool = true);
+	void setGlobalState(bool state) { m_globalState = state; }
 	//tb1
     void setRaster(int);
     void setQuant(int);
