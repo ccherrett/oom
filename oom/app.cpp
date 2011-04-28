@@ -3608,6 +3608,7 @@ void OOMidi::startPianoroll()
 void OOMidi::startPianoroll(PartList* pl, bool showDefaultCtrls)
 {
 	PianoRoll* pianoroll = new PianoRoll(pl, this, 0, arranger->cursorValue());
+	pianoroll->setWindowRole("pianoroll");
 	pianoroll->show();
 
     // Be able to open the List Editor from the Piano Roll
@@ -3664,6 +3665,7 @@ void OOMidi::startMasterEditor()
 {
 	MasterEdit* masterEditor = new MasterEdit();
 	masterEditor->installEventFilter(oom);
+	masterEditor->setWindowRole("tempo_editor");
 	masterEditor->show();
 	toplevels.push_back(Toplevel(Toplevel::MASTER, (unsigned long) (masterEditor), masterEditor));
 	connect(masterEditor, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
@@ -3676,6 +3678,7 @@ void OOMidi::startMasterEditor()
 void OOMidi::startLMasterEditor()
 {
 	LMaster* lmaster = new LMaster();
+	lmaster->setWindowRole("tempo_editor_list");
 	lmaster->show();
 	toplevels.push_back(Toplevel(Toplevel::LMASTER, (unsigned long) (lmaster), lmaster));
 	connect(lmaster, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
@@ -3688,16 +3691,17 @@ void OOMidi::startLMasterEditor()
 
 void OOMidi::startDrumEditor()
 {
-	PartList* pl = getMidiPartsToEdit();
+	return;
+	/*PartList* pl = getMidiPartsToEdit();
 	if (pl == 0)
 		return;
-	startDrumEditor(pl, true);
+	startDrumEditor(pl, true);*/
 }
 
-void OOMidi::startDrumEditor(PartList* pl, bool showDefaultCtrls)
+void OOMidi::startDrumEditor(PartList*, bool)
 {
-
-	DrumEdit* drumEditor = new DrumEdit(pl, this, 0, arranger->cursorValue());
+	return;
+	/*DrumEdit* drumEditor = new DrumEdit(pl, this, 0, arranger->cursorValue());
 	drumEditor->show();
 	if (showDefaultCtrls) // p4.0.12
 	{
@@ -3708,7 +3712,7 @@ void OOMidi::startDrumEditor(PartList* pl, bool showDefaultCtrls)
 	}
 	toplevels.push_back(Toplevel(Toplevel::DRUM, (unsigned long) (drumEditor), drumEditor));
 	connect(drumEditor, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
-	connect(oom, SIGNAL(configChanged()), drumEditor, SLOT(configChanged()));
+	connect(oom, SIGNAL(configChanged()), drumEditor, SLOT(configChanged()));*/
 }
 
 //---------------------------------------------------------
@@ -3717,22 +3721,26 @@ void OOMidi::startDrumEditor(PartList* pl, bool showDefaultCtrls)
 
 void OOMidi::startWaveEditor()
 {
-	PartList* pl = song->getSelectedWaveParts();
+	return;
+	/*PartList* pl = song->getSelectedWaveParts();
 	if (pl->empty())
 	{
 		QMessageBox::critical(this, QString("OOMidi"), tr("Nothing to edit"));
 		return;
 	}
-	startWaveEditor(pl);
+	startWaveEditor(pl);*/
 }
 
-void OOMidi::startWaveEditor(PartList* pl)
+void OOMidi::startWaveEditor(PartList*)
 {
+	return;
+	/*
 	WaveEdit* waveEditor = new WaveEdit(pl);
 	waveEditor->show();
 	connect(oom, SIGNAL(configChanged()), waveEditor, SLOT(configChanged()));
 	toplevels.push_back(Toplevel(Toplevel::WAVE, (unsigned long) (waveEditor), waveEditor));
 	connect(waveEditor, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
+	*/
 }
 
 
@@ -5449,6 +5457,7 @@ void OOMidi::showMixer1(bool on)
 	{
 		mixer1 = new AudioMixerApp(this, &(config.mixer1));
 		mixer1->setObjectName("Mixer1");
+		mixer1->setWindowRole("Mixer1");
 		connect(mixer1, SIGNAL(closed()), SLOT(mixer1Closed()));
 		//mixer1->resize(config.mixer1.geometry.size());
 		//mixer1->move(config.mixer1.geometry.topLeft());
@@ -5468,6 +5477,7 @@ void OOMidi::showMixer2(bool on)
 	{
 		mixer2 = new AudioMixerApp(this, &(config.mixer2));
 		mixer2->setObjectName("Mixer2");
+		mixer2->setWindowRole("Mixer2");
 		connect(mixer2, SIGNAL(closed()), SLOT(mixer2Closed()));
 		//mixer2->resize(config.mixer2.geometry.size());
 		//mixer2->move(config.mixer2.geometry.topLeft());
