@@ -846,11 +846,11 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 {
 	int port = track()->outPort();
 	int channel = track()->outChannel();
-	pitch += track()->getTransposition();
+	int ipitch = pitch;
+	ipitch += track()->getTransposition();
 
 	// play note:
-	//MidiPlayEvent e(0, port, channel, 0x90, pitch, 127);
-	MidiPlayEvent e(0, port, channel, 0x90, pitch, velocity);
+	MidiPlayEvent e(0, port, channel, 0x90, ipitch, velocity);
 	audio->msgPlayMidiEvent(&e);
 
     if (_steprec && _pos[0] >= start_tick && _pos[0] < end_tick)
@@ -858,18 +858,47 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 		if (_curPart == 0)
 			return;
 		int len = editor->raster();
-		unsigned tick = _pos[0] - _curPart->tick(); //CDW
+		unsigned tick = _pos[0];// - _curPart->tick(); //CDW
 		if (shift)
 			tick -= editor->rasterStep(tick);
-		Event e(Note);
-		e.setTick(tick);
-		e.setPitch(pitch);
-		e.setVelo(127);
-		e.setLenTick(len);
-		// Indicate do undo, and do not do port controller values and clone parts.
-		//audio->msgAddEvent(e, curPart);
-		audio->msgAddEvent(e, _curPart, true, false, false);
+		if(m_globalKey)
+		{
+			PartList* pl = editor->parts();
+			for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+			{
+				Part* part = ip->second;
+				MidiTrack* ctrack = (MidiTrack*)part->track();
+				int tpitch = pitch;
+				tpitch += ctrack->getTransposition();
+				Event e(Note);
+				e.setTick(tick);
+				e.setPitch(tpitch);
+				e.setVelo(127);
+				e.setLenTick(len);
+				// Indicate do undo, and do not do port controller values and clone parts.
+				audio->msgAddEvent(e, part, true, false, false);
+			}
+		}
+		else
+		{
+			pitch += track()->getTransposition();
+
+			Event e(Note);
+			e.setTick(tick);
+			e.setPitch(pitch);
+			e.setVelo(127);
+			e.setLenTick(len);
+			// Indicate do undo, and do not do port controller values and clone parts.
+			audio->msgAddEvent(e, _curPart, true, false, false);
+		}
 		tick += editor->rasterStep(tick) + _curPart->tick();
+		unsigned int t = tick;
+		t += (editor->rasterStep(t)/2);
+		if(song->len() <= (tick + editor->rasterStep(tick)))
+		{
+			t += editor->rasterStep(t);
+			song->setLen(t);
+		}
 		if (tick != song->cpos())
 		{
 			Pos p(tick, true);
@@ -885,23 +914,39 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 
 void PianoCanvas::pianoReleased(int pitch, bool)
 {
-	int port = track()->outPort();
-	int channel = track()->outChannel();
-	pitch += track()->getTransposition();
+	if(m_globalKey)
+	{
+		PartList* pl = editor->parts();
+		for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+		{
+			Part* part = ip->second;
+			MidiTrack* ctrack = (MidiTrack*)part->track();
+			int tpitch = pitch;
+			tpitch += ctrack->getTransposition();
+			int port = ctrack->outPort();
+			int channel = ctrack->outChannel();
+
+			MidiPlayEvent e(0, port, channel, 0x90, tpitch, 0);
+			audio->msgPlayMidiEvent(&e);
+		}
+	}
+	else
+	{
+		int port = track()->outPort();
+		int channel = track()->outChannel();
+		pitch += track()->getTransposition();
 
 	// release key:
-	//if()
-	//{
 		MidiPlayEvent e(0, port, channel, 0x90, pitch, 0);
 		audio->msgPlayMidiEvent(&e);
-	//}
+	}
 }
 
 //---------------------------------------------------------
 //   drawTickRaster
 //---------------------------------------------------------
 
-void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster)
+void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster)/*{{{*/
 {
 
 	QColor colBeat;
@@ -962,13 +1007,13 @@ void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster)
 		}
 
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   draw
 //---------------------------------------------------------
 
-void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)
+void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)/*{{{*/
 {
 	int x = rect.x();
 	int y = rect.y();
@@ -1006,15 +1051,14 @@ void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	//---------------------------------------------------
 
 	drawTickRaster(p, x, y, w, h, editor->raster());
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   cmd
 //    pulldown menu commands
 //---------------------------------------------------------
 
-void PianoCanvas::cmd(int cmd, int quantStrength,
-		int quantLimit, bool quantLen, int range)
+void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen, int range)/*{{{*/
 {
 	cmdRange = range;
 	//printf("PianoCanvas cmd called with command: %d\n\n", cmd);
@@ -1386,13 +1430,13 @@ void PianoCanvas::cmd(int cmd, int quantStrength,
 	}
 	updateSelection();
 	redraw();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   quantize
 //---------------------------------------------------------
 
-void PianoCanvas::quantize(int strength, int limit, bool quantLen)
+void PianoCanvas::quantize(int strength, int limit, bool quantLen)/*{{{*/
 {
 	song->startUndo();
     for (iCItem k = _items.begin(); k != _items.end(); ++k)
@@ -1437,10 +1481,10 @@ void PianoCanvas::quantize(int strength, int limit, bool quantLen)
 		}
 	}
 	song->endUndo(SC_EVENT_MODIFIED);
-}
+}/*}}}*/
 
 
-void PianoCanvas::createQWertyToMidiBindings()
+void PianoCanvas::createQWertyToMidiBindings()/*{{{*/
 {
 	_qwertyToMidiMap.clear();
 
@@ -1471,7 +1515,7 @@ void PianoCanvas::createQWertyToMidiBindings()
 	bindQwertyKeyToMidiValue("y", 33);
 	bindQwertyKeyToMidiValue("7", 34);
 	bindQwertyKeyToMidiValue("u", 35);
-}
+}/*}}}*/
 
 void PianoCanvas::setOctaveQwerty(int octave)
 {
@@ -1534,8 +1578,27 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		//int tpitch = pitch;
 		//if(ctrack)
 		//	tpitch = tpitch + ctrack->transposition;
-		unsigned int len = editor->quant(); //prevent compiler warning: comparison singed/unsigned
+
 		unsigned tick = _pos[0]; //CDW
+		//Process all parts if in EPIC mode
+		if(m_globalKey)
+		{
+			PartList* pl = editor->parts();
+			for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+			{
+				Part* part = ip->second;
+				MidiTrack* ctrack = (MidiTrack*)part->track();
+				int tpitch = pitch;
+				if(ctrack)
+					tpitch = tpitch + ctrack->transposition;
+				stepInputNote(part, songtick, tpitch, velo);
+			}
+		}
+		else
+		{
+			stepInputNote(_curPart, songtick, pitch, velo);
+		}
+		/*unsigned int len = editor->quant(); //prevent compiler warning: comparison singed/unsigned//{{{
 		unsigned starttick = tick;
 		if (globalKeyState & Qt::ShiftModifier)
 			tick -= editor->rasterStep(tick);
@@ -1551,7 +1614,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 				Event ev = i->second;
 				if (!ev.isNote())
 					continue;
-				if (ev.pitch() == pitch && ((ev.tick() + ev.lenTick()) == /*(int)*/starttick))
+				if (ev.pitch() == pitch && ((ev.tick() + ev.lenTick()) == starttick))
 				{
 					Event e = ev.clone();
 					e.setLenTick(ev.lenTick() + editor->rasterStep(starttick));
@@ -1572,7 +1635,6 @@ void PianoCanvas::midiNote(int pitch, int velo)
 			}
 		}
 
-		//
 		// if we already entered the note, delete it
 		//
 		EventRange range = events->equal_range(tick);
@@ -1597,7 +1659,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 		// Indicate do undo, and do not do port controller values and clone parts.
 		//audio->msgAddEvent(e, curPart);
 		audio->msgAddEvent(e, _curPart, true, false, false);
-		itemPressed(new CItem(e, _curPart));
+		itemPressed(new CItem(e, _curPart));//}}}*/
 		tick += editor->rasterStep(tick);
 		//printf("Song length %d current tick %d\n", song->len(), tick);
 		unsigned int t = tick;
@@ -1613,64 +1675,77 @@ void PianoCanvas::midiNote(int pitch, int velo)
 			song->setPos(0, p, true, false, true);
 		}
 	}
-	else
-	{
-	/*if (song->record() && audio->isPlaying()) //{{{
-	{
-		unsigned int startPos = audio->getStartRecordPos().tick();
-		if(_curPart)
-		{
-			Track* track = _curPart->track();
-
-			if (track->isMidiTrack() && track->recordFlag())
-			{
-				MidiTrack *mt = (MidiTrack*)track;
-				EventList newEventList;
-				MPEventList *el = mt->mpevents();
-				if (!el->size())
-					return;
-
-				for (iMPEvent i = el->begin(); i != el->end(); ++i)
-				{
-					MidiPlayEvent pe = *i;
-
-					if (pe.isNote() && !pe.isNoteOff()) {
-						Event e(Note);
-						e.setPitch(pe.dataA());
-						e.setTick(pe.time()-startPos);
-						e.setLenTick(song->cpos()-pe.time());
-						e.setC(1);
-						newEventList.add(e);
-					}
-					else if (pe.isNoteOff())
-					{
-						for (iEvent i = newEventList.begin(); i != newEventList.end(); ++i)
-						{
-							Event &e = i->second;
-							if (e.pitch() == pe.dataA() && e.dataC() == 1)
-							{
-								e.setLenTick(pe.time() - e.tick()- startPos);
-								e.setC(0);
-								continue;
-							}
-						}
-					}
-				}
-				for (iEvent i = newEventList.begin(); i != newEventList.end(); ++i)
-				{
-					_curPart->addEvent(i->second);
-					//addItem(_curPart, i->second);
-				}
-				//update();
-			}
-		}
-    }*/ //}}}
-	}
 
 	update();
 	
 	//TODO: emit a signal to flash keyboard here
 	emit pitchChanged(pitch);
+}
+
+void PianoCanvas::stepInputNote(Part* part, unsigned tick, int pitch, int velo)
+{
+	unsigned int len = editor->quant(); //prevent compiler warning: comparison singed/unsigned/*{{{*/
+	//unsigned tick = _pos[0]; //CDW
+	unsigned starttick = tick;
+	if (globalKeyState & Qt::ShiftModifier)
+		tick -= editor->rasterStep(tick);
+
+	//
+	// extend len of last note?
+	//
+	EventList* events = part->events();
+	if (globalKeyState & Qt::ControlModifier)
+	{
+		for (iEvent i = events->begin(); i != events->end(); ++i)
+		{
+			Event ev = i->second;
+			if (!ev.isNote())
+				continue;
+			if (ev.pitch() == pitch && ((ev.tick() + ev.lenTick()) == /*(int)*/starttick))
+			{
+				Event e = ev.clone();
+				e.setLenTick(ev.lenTick() + editor->rasterStep(starttick));
+				// Indicate do undo, and do not do port controller values and clone parts.
+				//audio->msgChangeEvent(ev, e, curPart);
+			    audio->msgChangeEvent(ev, e, part, true, false, false);
+				//itemPressed(new CItem(e, part));
+				//TODO: emit a signal to flash keyboard here
+				emit pitchChanged(pitch);
+				/*tick += editor->rasterStep(tick);
+				if (tick != song->cpos())
+				{
+					Pos p(tick, true);
+					song->setPos(0, p, true, false, true);
+				}*/
+				return;
+			}
+		}
+	}/*}}}*/
+	///*{{{*/
+	// if we already entered the note, delete it
+	//
+	EventRange range = events->equal_range(tick);
+	for (iEvent i = range.first; i != range.second; ++i)
+	{
+		Event ev = i->second;
+		if (ev.isNote() && ev.pitch() == pitch)
+		{
+			// Indicate do undo, and do not do port controller values and clone parts.
+			//audio->msgDeleteEvent(ev, curPart);
+			audio->msgDeleteEvent(ev, part, true, false, false);
+			if (globalKeyState & Qt::ShiftModifier)
+				tick += editor->rasterStep(tick);
+			return;
+		}
+	}
+	Event e(Note);
+	e.setTick(tick - part->tick());
+	e.setPitch(pitch);
+	e.setVelo(velo);
+	e.setLenTick(len);
+	// Indicate do undo, and do not do port controller values and clone parts.
+	audio->msgAddEvent(e, part, true, false, false);
+	//itemPressed(new CItem(e, part));/*}}}*/
 }
 
 void PianoCanvas::recordArmAll()
