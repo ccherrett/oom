@@ -880,7 +880,7 @@ void Piano::draw(QPainter& p, const QRect& r)
 						else
 						{
 							//printf("preOn: %d, lastint: %d, key: %d\n", preOn, lastint, i);
-							if(preOn)
+							if(preOn && !lastint)
       							p.drawPixmap(0, pitch2y(i), *mk5_n);
 							else if(lastint)
       							p.drawPixmap(0, pitch2y(i), *mk5_sn);
@@ -918,7 +918,7 @@ void Piano::draw(QPainter& p, const QRect& r)
 						else
 						{
 							//printf("preOn: %d, lastint: %d, key: %d\n", preOn, lastint, i);
-							if(preOn)
+							if(preOn && !lastint)
 							{
       							p.drawPixmap(0, pitch2y(i), *mk6_n);
 							}
