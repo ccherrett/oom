@@ -159,7 +159,8 @@ void PCScale::deleteProgramChangeClicked(bool checked)
 void PCScale::changeProgramChangeClicked(int patch, QString)
 {
 	Event nevent = _pc.event.clone();
-	printf("Patch selected: %d - event.dataA(): %d - event.dataB(): %d\n", patch, nevent.dataA(), nevent.dataB());
+	if(debugMsg)
+		printf("Patch selected: %d - event.dataA(): %d - event.dataB(): %d\n", patch, nevent.dataA(), nevent.dataB());
 	nevent.setB(patch);
 	audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, true, false);
 	_pc.event = nevent;
