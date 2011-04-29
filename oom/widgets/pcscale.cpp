@@ -237,16 +237,43 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 							_pc.part->setLenTick(endTick);
 						}
 						song->recordEvent((MidiTrack*)_pc.part->track(), nevent);/*}}}*/
+						if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
+						{
+							foreach(ProgramChangeObject pco, selectionList)
+							{
+								Event nevent1 = pco.event.clone();
+								nevent1.setTick(x);
+								if((unsigned int)x < pco.part->tick())
+									return;
+								int diff1 = nevent1.tick() - pco.part->lenTick();
+								if (diff1 > 0)
+								{// too short part? extend it
+									int pendTick = song->roundUpBar(pco.part->lenTick() + diff1);
+									pco.part->setLenTick(pendTick);
+								}
+								song->recordEvent((MidiTrack*)pco.part->track(), nevent1);
+							}
+						}/*}}}*/
 					}
 					break;
 					case 2:
 					{
-						deleteProgramChange(_pc.event);/*{{{*/
+						deleteProgramChange(_pc.event);
 						_pc.valid = false;
 
 						song->startUndo();
 						audio->msgDeleteEvent(_pc.event, _pc.part, true, true, false);
-						song->endUndo(SC_EVENT_MODIFIED);/*}}}*/
+						song->endUndo(SC_EVENT_MODIFIED);
+						if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
+						{
+							foreach(ProgramChangeObject pco, selectionList)
+							{
+								song->startUndo();
+								audio->msgDeleteEvent(pco.event, pco.part, true, true, false);
+								song->endUndo(SC_EVENT_MODIFIED);
+							}
+						}/*}}}*/
+						selectionList.clear();
 						update();
 					}
 					break;
@@ -317,6 +344,24 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 			}
 			song->recordEvent((MidiTrack*)_pc.part->track(), _pc.event);
 		}
+		if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
+		{
+			foreach(ProgramChangeObject pco, selectionList)
+			{
+				if((unsigned int)x < pco.part->tick())
+					continue;
+				Event nevent1 = pco.event.clone();
+				nevent1.setTick(x);
+				int diff1 = nevent1.tick() - pco.part->lenTick();
+				if (diff1 > 0)
+				{// too short part? extend it
+					int pendTick = song->roundUpBar(pco.part->lenTick() + diff1);
+					pco.part->setLenTick(pendTick);
+				}
+				audio->msgChangeEvent(pco.event, nevent1, pco.part, true, true, false);
+				pco.event = nevent1;
+			}
+		}/*}}}*/
 	}
 
 	//Deselect the PC only if was a end of move
@@ -325,6 +370,7 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 		if(_pc.valid && _pc.state == movingController)
 		{
 			//Move all other events on the other parts to the new location of the event
+			selectionList.clear();
 			_pc.state = doNothing;
 			_pc.valid = false;
 			emit drawSelectedProgram(-1, false);
@@ -364,6 +410,24 @@ void PCScale::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 			}
 		}
 		emit drawSelectedProgram(_pc.event.tick(), true);
+		/*if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())
+		{
+			foreach(ProgramChangeObject pco, selectionList)
+			{
+				if((unsigned int)x < pco.part->tick())
+					continue;
+				Event nevent1 = pco.event.clone();
+				nevent1.setTick(x);
+				int diff1 = nevent1.tick() - pco.part->lenTick();
+				if (diff1 > 0)
+				{// too short part? extend it
+					int pendTick = song->roundUpBar(pco.part->lenTick() + diff1);
+					pco.part->setLenTick(pendTick);
+				}
+				audio->msgChangeEvent(pco.event, nevent1, pco.part, true, true, false);
+				pco.event = nevent1;
+			}
+		}*/
 		update();
 	}
 }/*}}}*/
@@ -397,52 +461,119 @@ void PCScale::updateProgram()
  */
 bool PCScale::selectProgramChange(int x)/*{{{*/
 {
-	Part* part = currentEditor->curCanvasPart();
-	if (!part)
+	if(currentEditor->isGlobalEdit())
 	{
-		return false;
-	}
-
-	QList<Event> events;
-
-	EventList* eventList = part->events();
-	for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
-	{
-		//Get event type.
-		Event pcevt = evt->second;
-		if (!pcevt.isNote() && pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+		Part* curpart = currentEditor->curCanvasPart();
+		if (!curpart)
 		{
-			int xp = pcevt.tick() + part->tick();
-			int diff = abs(xp - x);
-			if (diff < 300)
+			return false;
+		}
+		selectionList.clear();
+		for (iPart ip = currentEditor->parts()->begin(); ip != currentEditor->parts()->end(); ++ip)
+		{
+			Part* part = ip->second;
+		
+			QList<Event> events;
+		
+			EventList* eventList = part->events();
+			for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
 			{
-				events.append(pcevt);
+				//Get event type.
+				Event pcevt = evt->second;
+				if (!pcevt.isNote() && pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+				{
+					int xp = pcevt.tick() + part->tick();
+					int diff = abs(xp - x);
+					if (diff < 300)
+					{
+						events.append(pcevt);
+					}
+				}
+			}
+		
+			if (!events.size())
+			{
+				continue;
+				//return false;
+			}
+		
+			Event nearest;
+		
+			int minDiff = INT_MAX;
+			foreach(Event event, events)
+			{
+				int diff = abs((event.tick() + part->tick()) - x);
+				if (diff < minDiff) {
+					minDiff = diff;
+					nearest = event;
+				}
+			}
+			if(part == curpart)
+			{
+				_pc.part = part;
+				_pc.event = nearest;
+				_pc.valid = true;
+				_pc.state = selectedController;
+			}
+			else
+			{
+				ProgramChangeObject pco;
+				pco.part = part;
+				pco.event = nearest;
+				pco.valid = true;
+				selectionList.append(pco);
 			}
 		}
 	}
-
-	if (!events.size())
+	else
 	{
-		return false;
-	}
-
-	Event nearest;
-
-	int minDiff = INT_MAX;
-	foreach(Event event, events)
-	{
-		int diff = abs((event.tick() + part->tick()) - x);
-		if (diff < minDiff) {
-			minDiff = diff;
-			nearest = event;
+		Part* part = currentEditor->curCanvasPart();/*{{{*/
+		if (!part)
+		{
+			return false;
 		}
+	
+		QList<Event> events;
+	
+		EventList* eventList = part->events();
+		for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+		{
+			//Get event type.
+			Event pcevt = evt->second;
+			if (!pcevt.isNote() && pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+			{
+				int xp = pcevt.tick() + part->tick();
+				int diff = abs(xp - x);
+				if (diff < 300)
+				{
+					events.append(pcevt);
+				}
+			}
+		}
+	
+		if (!events.size())
+		{
+			return false;
+		}
+	
+		Event nearest;
+	
+		int minDiff = INT_MAX;
+		foreach(Event event, events)
+		{
+			int diff = abs((event.tick() + part->tick()) - x);
+			if (diff < minDiff) {
+				minDiff = diff;
+				nearest = event;
+			}
+		}
+	
+		_pc.part = part;
+		_pc.event = nearest;
+		_pc.valid = true;
+		_pc.state = selectedController;/*}}}*/
+		emit drawSelectedProgram(nearest.tick(), true);
 	}
-
-	_pc.part = part;
-	_pc.event = nearest;
-	_pc.valid = true;
-	_pc.state = selectedController;
-	emit drawSelectedProgram(nearest.tick(), true);
 
 	update();
 
@@ -473,7 +604,7 @@ void PCScale::moveSelected(int dir)/*{{{*/
 {
 	if(_pc.valid && _pc.state == selectedController && _pc.part)
 	{
-		int x = _pc.event.tick();
+		int x = _pc.event.tick();/*{{{*/
 		if(dir > 0)
 		{
 			x += currentEditor->rasterStep(x) + _pc.part->tick();
@@ -497,8 +628,40 @@ void PCScale::moveSelected(int dir)/*{{{*/
 			_pc.part->setLenTick(endTick);
 		}
 		audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, true, false);
-		_pc.event = nevent;
+		_pc.event = nevent;/*}}}*/
 		emit drawSelectedProgram(_pc.event.tick(), true);
+
+		if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())
+		{
+			foreach(ProgramChangeObject pco, selectionList)
+			{
+				int x1 = pco.event.tick();/*{{{*/
+				if(dir > 0)
+				{
+					x1 += currentEditor->rasterStep(x1) + pco.part->tick();
+				}
+				else
+				{
+					x1 -= currentEditor->rasterStep(x1) + pco.part->tick();
+				}
+				//printf("PCScale::moveSelected(%d) tick; %d\n", dir, x);
+
+				if (x1 < 0)
+					x1 = 0;
+				if((unsigned int)x1 < pco.part->tick())
+					return;
+				Event nevent1 = pco.event.clone();
+				nevent1.setTick(x1);
+				int diff1 = nevent1.tick() - pco.part->lenTick();
+				if (diff1 > 0)
+				{// too short part? extend it
+					int endTick = song->roundUpBar(pco.part->lenTick() + diff1);
+					pco.part->setLenTick(endTick);
+				}
+				audio->msgChangeEvent(pco.event, nevent1, pco.part, true, true, false);
+				pco.event = nevent1;/*}}}*/
+			}
+		}
 	}
 	update();
 }/*}}}*/
@@ -522,6 +685,22 @@ void PCScale::copySelected()/*{{{*/
 			_pc.part->setLenTick(endTick);
 		}
 		song->recordEvent((MidiTrack*)_pc.part->track(), nevent);
+
+		if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
+		{
+			foreach(ProgramChangeObject pco, selectionList)
+			{
+				Event nevent1 = pco.event.clone();
+				nevent1.setTick(song->cpos());
+				int diff1 = nevent1.tick() - pco.part->lenTick();
+				if (diff1 > 0)
+				{// too short part? extend it
+					int pendTick = song->roundUpBar(pco.part->lenTick() + diff1);
+					pco.part->setLenTick(pendTick);
+				}
+				song->recordEvent((MidiTrack*)pco.part->track(), nevent1);
+			}
+		}/*}}}*/
 		update();
 	}
 }/*}}}*/

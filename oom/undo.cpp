@@ -816,7 +816,8 @@ void Song::addUndo(UndoOp& i)
 {
 	if (!undoMode)
 	{
-		printf("internal error: undoOp without startUndo()\n");
+		if(debugMsg)
+			printf("internal error: undoOp without startUndo()\n");
 		return;
 	}
 	undoList->back().push_back(i);
