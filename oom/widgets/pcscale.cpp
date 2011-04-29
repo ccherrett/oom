@@ -164,6 +164,16 @@ void PCScale::changeProgramChangeClicked(int patch, QString)
 	nevent.setB(patch);
 	audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, true, false);
 	_pc.event = nevent;
+	if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
+	{
+		foreach(ProgramChangeObject pco, selectionList)
+		{
+			Event nevent1 = pco.event.clone();
+			nevent1.setB(patch);
+			audio->msgChangeEvent(pco.event, nevent1, pco.part, true, true, false);
+			pco.event = nevent1;
+		}
+	}/*}}}*/
 }
 
 //---------------------------------------------------------
