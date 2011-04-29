@@ -40,6 +40,7 @@ class PCScale : public View
     int button;
     bool barLocator;
     bool waveMode;
+	int m_clickpos;
     //Audio* audio;
 	ProgramChangeObject _pc;
 	QList<ProgramChangeObject> selectionList;
@@ -47,6 +48,8 @@ class PCScale : public View
 
 private slots:
     void songChanged(int);
+	void deleteProgramChangeClicked(bool);
+	void changeProgramChangeClicked(int, QString);
 
 protected:
     virtual void pdraw(QPainter&, const QRect&);
@@ -63,7 +66,7 @@ signals:
 public slots:
     void setPos(int, unsigned, bool);
     void updateProgram();
-	void copySelected();
+	void copySelected(bool);
 	void moveSelected(int);
 	bool selectProgramChange(int x);
 	void deleteProgramChange(Event);

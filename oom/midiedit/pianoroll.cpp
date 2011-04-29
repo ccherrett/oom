@@ -1579,7 +1579,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	if(key == shortcuts[SHRT_COPY_PROGRAM].key)
 	{
-		pcbar->copySelected();
+		pcbar->copySelected(true);
 		return;
 	}
 	if(key == shortcuts[SHRT_SEL_PROGRAM].key)

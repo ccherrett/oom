@@ -80,6 +80,7 @@ void InstrumentMenu::doClose()
 	//printf("InstrumentMenu::doClose() classed\n");
 	setData(m_program);
 	
+	trigger();
 	//FIXME: This is a seriously brutal HACK but its the only way it can get it done
 	QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
 	QCoreApplication::postEvent(this->parent(), e);

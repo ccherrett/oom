@@ -21,6 +21,7 @@
 #include "audio.h"
 #include "midiport.h"
 #include "mtrackinfo.h"
+#include "instrumentmenu.h"
 
 //---------------------------------------------------------
 //   PCScale
@@ -36,6 +37,7 @@ PCScale::PCScale(int* r, QWidget* parent, PianoRoll* editor, int xs, bool _mode)
 	setToolTip(tr("bar pcscale"));
 	barLocator = false;
 	raster = r;
+	m_clickpos = 0;
 	if (waveMode)
 	{
 		pos[0] = tempomap.tick2frame(song->cpos());
@@ -131,6 +133,38 @@ void PCScale::setPos(int idx, unsigned val, bool)
 	redraw(QRect(x, 0, w, height()));
 }
 
+void PCScale::deleteProgramChangeClicked(bool checked)
+{
+	if(!checked)
+		return
+	deleteProgramChange(_pc.event);/*{{{*/
+	_pc.valid = false;
+
+	song->startUndo();
+	audio->msgDeleteEvent(_pc.event, _pc.part, true, true, false);
+	song->endUndo(SC_EVENT_MODIFIED);
+	if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())
+	{
+		foreach(ProgramChangeObject pco, selectionList)
+		{
+			song->startUndo();
+			audio->msgDeleteEvent(pco.event, pco.part, true, true, false);
+			song->endUndo(SC_EVENT_MODIFIED);
+		}
+	}
+	selectionList.clear();
+	update();/*}}}*/
+}
+
+void PCScale::changeProgramChangeClicked(int patch, QString)
+{
+	Event nevent = _pc.event.clone();
+	printf("Patch selected: %d - event.dataA(): %d - event.dataB(): %d\n", patch, nevent.dataA(), nevent.dataB());
+	nevent.setB(patch);
+	audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, true, false);
+	_pc.event = nevent;
+}
+
 //---------------------------------------------------------
 //   viewMousePressEvent
 //---------------------------------------------------------
@@ -149,6 +183,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	{
 		x = 0;
 	}
+	m_clickpos = x;
 
 	int i;
 	switch (button)
@@ -213,72 +248,19 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 			song->setPos(0, p);
 			QMenu* menu = new QMenu(this);
 			QAction *cp = menu->addAction(tr("Paste Program Change Here."));
+			cp->setCheckable(true);
+			connect(cp, SIGNAL(triggered(bool)), this, SLOT(copySelected(bool)));
 			cp->setData(1);
 			QAction *del = menu->addAction(tr("Delete Selected."));
+			del->setCheckable(true);
+			connect(del, SIGNAL(triggered(bool)), this, SLOT(deleteProgramChangeClicked(bool)));
 			del->setData(2);
-			//QAction *mv = menu->addAction(tr("Paste"));
-			//mv->setData(2);
-			QAction *act = menu->exec(event->globalPos(), 0);
-			if(act)
-			{
-				int id = act->data().toInt();
-				switch(id)
-				{
-					case 1:
-					{
-						Event nevent = _pc.event.clone();/*{{{*/
-						nevent.setTick(x);
-						if((unsigned int)x < _pc.part->tick())
-							return;
-						int diff = nevent.tick() - _pc.part->lenTick();
-						if (diff > 0)
-						{// too short part? extend it
-							int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
-							_pc.part->setLenTick(endTick);
-						}
-						song->recordEvent((MidiTrack*)_pc.part->track(), nevent);/*}}}*/
-						if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
-						{
-							foreach(ProgramChangeObject pco, selectionList)
-							{
-								Event nevent1 = pco.event.clone();
-								nevent1.setTick(x);
-								if((unsigned int)x < pco.part->tick())
-									return;
-								int diff1 = nevent1.tick() - pco.part->lenTick();
-								if (diff1 > 0)
-								{// too short part? extend it
-									int pendTick = song->roundUpBar(pco.part->lenTick() + diff1);
-									pco.part->setLenTick(pendTick);
-								}
-								song->recordEvent((MidiTrack*)pco.part->track(), nevent1);
-							}
-						}/*}}}*/
-					}
-					break;
-					case 2:
-					{
-						deleteProgramChange(_pc.event);
-						_pc.valid = false;
-
-						song->startUndo();
-						audio->msgDeleteEvent(_pc.event, _pc.part, true, true, false);
-						song->endUndo(SC_EVENT_MODIFIED);
-						if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
-						{
-							foreach(ProgramChangeObject pco, selectionList)
-							{
-								song->startUndo();
-								audio->msgDeleteEvent(pco.event, pco.part, true, true, false);
-								song->endUndo(SC_EVENT_MODIFIED);
-							}
-						}/*}}}*/
-						selectionList.clear();
-						update();
-					}
-					break;
-				}
-			}
+			QMenu* menu2 = new QMenu(tr("Change Patch"), this);
+			InstrumentMenu *imenu = new InstrumentMenu(menu2, (MidiTrack*)_pc.part->track());
+			menu2->addAction(imenu);
+			connect(imenu, SIGNAL(patchSelected(int, QString)), this, SLOT(changeProgramChangeClicked(int, QString)));
+			menu->addMenu(menu2);
+			menu->exec(event->globalPos(), 0);
 		}
 	}
 	else if (i == 0 && (event->modifiers() & Qt::ControlModifier))/*{{{*/
@@ -617,19 +599,20 @@ void PCScale::moveSelected(int dir)/*{{{*/
 
 		if (x < 0)
 			x = 0;
-		if((unsigned int)x < _pc.part->tick())
-			return;
-		Event nevent = _pc.event.clone();
-		nevent.setTick(x);
-		int diff = nevent.tick() - _pc.part->lenTick();
-		if (diff > 0)
-		{// too short part? extend it
-			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
-			_pc.part->setLenTick(endTick);
+		if((unsigned int)x > _pc.part->tick())
+		{
+			Event nevent = _pc.event.clone();
+			nevent.setTick(x);
+			int diff = nevent.tick() - _pc.part->lenTick();
+			if (diff > 0)
+			{// too short part? extend it
+				int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
+				_pc.part->setLenTick(endTick);
+			}
+			audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, true, false);
+			_pc.event = nevent;/*}}}*/
+			emit drawSelectedProgram(_pc.event.tick(), true);
 		}
-		audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, true, false);
-		_pc.event = nevent;/*}}}*/
-		emit drawSelectedProgram(_pc.event.tick(), true);
 
 		if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())
 		{
@@ -649,7 +632,7 @@ void PCScale::moveSelected(int dir)/*{{{*/
 				if (x1 < 0)
 					x1 = 0;
 				if((unsigned int)x1 < pco.part->tick())
-					return;
+					continue;
 				Event nevent1 = pco.event.clone();
 				nevent1.setTick(x1);
 				int diff1 = nevent1.tick() - pco.part->lenTick();
@@ -670,14 +653,15 @@ void PCScale::moveSelected(int dir)/*{{{*/
  * copySelected
  * Used to copy the selected program change to the current song position
  */
-void PCScale::copySelected()/*{{{*/
+void PCScale::copySelected(bool checked)/*{{{*/
 {
-	if(_pc.valid && _pc.state == selectedController)
+	if(!checked)
+		return;
+	int x = m_clickpos;
+	Event nevent = _pc.event.clone();
+	nevent.setTick(x);
+	if((unsigned int)x > _pc.part->tick())
 	{
-		Event nevent = _pc.event.clone();
-		nevent.setTick(song->cpos());
-		if(song->cpos() < _pc.part->tick())
-			return;
 		int diff = nevent.tick() - _pc.part->lenTick();
 		if (diff > 0)
 		{// too short part? extend it
@@ -685,24 +669,25 @@ void PCScale::copySelected()/*{{{*/
 			_pc.part->setLenTick(endTick);
 		}
 		song->recordEvent((MidiTrack*)_pc.part->track(), nevent);
-
-		if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
-		{
-			foreach(ProgramChangeObject pco, selectionList)
-			{
-				Event nevent1 = pco.event.clone();
-				nevent1.setTick(song->cpos());
-				int diff1 = nevent1.tick() - pco.part->lenTick();
-				if (diff1 > 0)
-				{// too short part? extend it
-					int pendTick = song->roundUpBar(pco.part->lenTick() + diff1);
-					pco.part->setLenTick(pendTick);
-				}
-				song->recordEvent((MidiTrack*)pco.part->track(), nevent1);
-			}
-		}/*}}}*/
-		update();
 	}
+	if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())
+	{
+		foreach(ProgramChangeObject pco, selectionList)
+		{
+			Event nevent1 = pco.event.clone();
+			nevent1.setTick(x);
+			if((unsigned int)x < pco.part->tick())
+				continue;
+			int diff1 = nevent1.tick() - pco.part->lenTick();
+			if (diff1 > 0)
+			{// too short part? extend it
+				int pendTick = song->roundUpBar(pco.part->lenTick() + diff1);
+				pco.part->setLenTick(pendTick);
+			}
+			song->recordEvent((MidiTrack*)pco.part->track(), nevent1);
+		}
+	}
+	update();
 }/*}}}*/
 
 //---------------------------------------------------------
