@@ -174,6 +174,9 @@ void PCScale::changeProgramChangeClicked(int patch, QString)
 			pco.event = nevent1;
 		}
 	}/*}}}*/
+	_pc.valid = true;
+	_pc.state = doNothing;
+	selectionList.clear();
 }
 
 //---------------------------------------------------------
@@ -698,6 +701,9 @@ void PCScale::copySelected(bool checked)/*{{{*/
 			song->recordEvent((MidiTrack*)pco.part->track(), nevent1);
 		}
 	}
+	_pc.valid = true;
+	_pc.state = doNothing;
+	selectionList.clear();
 	update();
 }/*}}}*/
 
