@@ -131,7 +131,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	//---------------------------------------------------
 
 	parent->addToolBarBreak();
-	QToolBar* toolbar = parent->addToolBar(tr("Arranger"));
+	QToolBar* toolbar = parent->addToolBar(tr("The Composer Settings"));
 	toolbar->setObjectName("tbArranger");
 	toolbar->setMovable(false);
 	toolbar->setFloatable(false);
@@ -1020,7 +1020,7 @@ void Arranger::genTrackInfo(QWidget*)
 	_commentdock = new CommentDock(this);
 	_rtabs->addTab(_tvdock, tr("   Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
-	_rtabs->addTab(midiTrackInfo, tr("   Patch Sequencer   "));
+	_rtabs->addTab(midiTrackInfo, tr("   The Conductor   "));
 	//_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
 	_rtabs->addTab(_rmdock, tr("  Route Connector  "));
 	_rtabs->addTab(_commentdock, tr("  Comments  "));
