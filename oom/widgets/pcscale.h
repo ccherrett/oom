@@ -19,6 +19,7 @@ struct ProgramChangeObject {
 	Part *part;
 	bool valid;
 	QPoint mousePressPos;
+	unsigned starttick;
 	ProgramChangeVals state;
 	inline bool operator==(ProgramChangeObject pco)
 	{

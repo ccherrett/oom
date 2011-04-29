@@ -176,7 +176,6 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	{ // If shift +LMB we add a marker
 		//Add program change here
 		song->setPos(i, p); // all other cases: relocating one of the locators
-		//emit selectInstrument();
 		unsigned utick = song->cpos() + currentEditor->rasterStep(song->cpos());
 		if(currentEditor->isGlobalEdit())
 		{
@@ -325,6 +324,7 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 	{
 		if(_pc.valid && _pc.state == movingController)
 		{
+			//Move all other events on the other parts to the new location of the event
 			_pc.state = doNothing;
 			_pc.valid = false;
 			emit drawSelectedProgram(-1, false);
@@ -476,11 +476,11 @@ void PCScale::moveSelected(int dir)/*{{{*/
 		int x = _pc.event.tick();
 		if(dir > 0)
 		{
-		x += currentEditor->rasterStep(x) + _pc.part->tick();
+			x += currentEditor->rasterStep(x) + _pc.part->tick();
 		}
 		else
 		{
-		x -= currentEditor->rasterStep(x) + _pc.part->tick();
+			x -= currentEditor->rasterStep(x) + _pc.part->tick();
 		}
 		//printf("PCScale::moveSelected(%d) tick; %d\n", dir, x);
 
