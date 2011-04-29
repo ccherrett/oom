@@ -117,7 +117,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	colorMode = tconfig().get_property("PianoRollEdit", "colormode", colorModeInit).toInt();
 	_stepQwerty = false;
 
-	m_prDock = new QDockWidget(tr("Resource Center"), this);
+	m_prDock = new QDockWidget(tr("The Orchestra Pit"), this);
 	m_prDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	m_prDock->setObjectName("dockResourceCenter");
 	m_prDock->setMinimumWidth(190);
@@ -503,7 +503,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
-	m_tabs->addTab(midiTrackInfo, tr("   Patch Sequencer   "));
+	m_tabs->addTab(midiTrackInfo, tr("   The Conductor   "));
 	//hsplitter->addWidget(midiTrackInfo);
 	hsplitter->addWidget(splitter);
 
@@ -624,7 +624,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(song, SIGNAL(loopChanged(bool)), canvas, SLOT(update()));
     //connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
 
-    setWindowTitle(canvas->getCaption());
+    setWindowTitle(canvas->getCaption() + " - The Performer");
 
     updateHScrollRange();
     // connect to toolbar

@@ -68,10 +68,10 @@ void initShortCuts()
 	defShrt(SHRT_QUIT, Qt::CTRL + Qt::Key_Q, "File: Quit OOMidi", ARRANG_SHRT, "quit");
 	//      defShrt(SHRT_DESEL_PARTS,           Qt::CTRL + Qt::Key_B, "Deselect all parts", ARRANG_SHRT, "deselect_parts");
 	defShrt(SHRT_SELECT_PRTSTRACK, Qt::CTRL + Qt::ALT + Qt::Key_P, "Edit: Select parts on track", ARRANG_SHRT, "select_parts_on_track");
-	defShrt(SHRT_OPEN_PIANO, Qt::Key_Return, "Open pianoroll", ARRANG_SHRT, "open_pianoroll");
+	defShrt(SHRT_OPEN_PIANO, Qt::Key_Return, "Open The Performer", ARRANG_SHRT, "open_pianoroll");
 	//defShrt(SHRT_OPEN_DRUMS, Qt::CTRL + Qt::Key_D, "Open drumeditor", ARRANG_SHRT, "open_drumedit");
 	defShrt(SHRT_OPEN_LIST, Qt::CTRL + Qt::Key_L, "Open listeditor", ARRANG_SHRT, "open_listedit");
-	defShrt(SHRT_OPEN_WAVE, 0, "Open waveeditor", ARRANG_SHRT, "open_waveedit");
+	//defShrt(SHRT_OPEN_WAVE, 0, "Open waveeditor", ARRANG_SHRT, "open_waveedit");
 	defShrt(SHRT_OPEN_GRAPHIC_MASTER, Qt::CTRL + Qt::Key_T, "Open graphical mastertrack editor", ARRANG_SHRT, "open_graph_master");
 	defShrt(SHRT_OPEN_LIST_MASTER, Qt::CTRL + Qt::SHIFT + Qt::Key_T, "Open list mastertrack editor", ARRANG_SHRT, "open_list_master");
 	defShrt(SHRT_OPEN_MIDI_TRANSFORM, 0, "Open midi transformer", ARRANG_SHRT, "open_midi_transform");

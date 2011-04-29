@@ -762,13 +762,13 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	firstrun = true;
 	//routingPopupView      = 0;
 
-	appName = QString("OOMidi");
+	appName = QString("The Composer - OOMidi");
 	setWindowTitle(appName);
 	editSignalMapper = new QSignalMapper(this);
 	midiPluginSignalMapper = new QSignalMapper(this);
 	followSignalMapper = new QSignalMapper(this);
 
-	_resourceDock = new QDockWidget(tr("Resource Center"), this);
+	_resourceDock = new QDockWidget(tr("The Orchestra Pit"), this);
 	_resourceDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	_resourceDock->setObjectName("dockResourceCenter");
 	addDockWidget(Qt::LeftDockWidgetArea, _resourceDock);
