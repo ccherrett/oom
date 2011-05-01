@@ -157,6 +157,7 @@ bool filterEvent(const MEvent& event, int type, bool thru)
 				return true;
 			break;
 		default:
+			printf("Unhandled MIDI event type: %d - type: %d\n",event.type(), type);
 			break;
 	}
 	return false;

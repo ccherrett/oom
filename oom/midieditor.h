@@ -130,6 +130,7 @@ public:
 	QList<Event> getSelectedEvents();
     WavePart* curWavePart();
     void setCurCanvasPart(Part*);
+	virtual bool isGlobalEdit(){ return false; }
 };
 
 #endif

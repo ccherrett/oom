@@ -60,15 +60,14 @@ const int CTRL_LOCAL_OFF = 0x7a; // 122
 // internal controller types:
 const int CTRL_INTERNAL_OFFSET = 0x40000;
 
-// p3.3.37
-//const int CTRL_PITCH    = 0x40000;
-//const int CTRL_PROGRAM  = 0x40001;
-//const int CTRL_VELOCITY = 0x40002;
-//const int CTRL_MASTER_VOLUME = 0x40003;
 const int CTRL_PITCH = CTRL_INTERNAL_OFFSET;
 const int CTRL_PROGRAM = CTRL_INTERNAL_OFFSET + 1;
 const int CTRL_VELOCITY = CTRL_INTERNAL_OFFSET + 2;
-//const int CTRL_MASTER_VOLUME = CTRL_INTERNAL_OFFSET + 3;
+
+//These are only used for the controll surfaces
+const int CTRL_RECORD = CTRL_INTERNAL_OFFSET + 3;
+const int CTRL_MUTE = CTRL_INTERNAL_OFFSET + 4;
+const int CTRL_SOLO = CTRL_INTERNAL_OFFSET + 5;
 
 const int CTRL_VAL_UNKNOWN = 0x10000000; // used as unknown hwVal
 
@@ -199,15 +198,10 @@ struct MidiCtrlVal
 //    list for easy retrieval
 //---------------------------------------------------------
 
-// Changed by T356.
-//typedef std::map<int, int, std::less<int> >::iterator iMidiCtrlVal;
-//typedef std::map<int, int, std::less<int> >::const_iterator ciMidiCtrlVal;
 typedef std::multimap<int, MidiCtrlVal, std::less<int> >::iterator iMidiCtrlVal;
 typedef std::multimap<int, MidiCtrlVal, std::less<int> >::const_iterator ciMidiCtrlVal;
 
 typedef std::pair <iMidiCtrlVal, iMidiCtrlVal> MidiCtrlValRange;
-// Changed by T356.
-//class MidiCtrlValList : public std::map<int, int, std::less<int> > {
 
 class MidiCtrlValList : public std::multimap<int, MidiCtrlVal, std::less<int> >
 {
@@ -235,11 +229,7 @@ public:
 
     iMidiCtrlVal iValue(int tick);
     int value(int tick) const;
-    //int value(int tick, Part** part = 0) const;
     int value(int tick, Part* part) const;
-    // Changed by T356.
-    //bool add(int tick, int value);
-    //void del(int tick);
     bool addMCtlVal(int tick, int value, Part* part);
     void delMCtlVal(int tick, Part* part);
 

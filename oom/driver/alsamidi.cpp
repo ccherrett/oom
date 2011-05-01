@@ -183,80 +183,18 @@ void MidiAlsaDevice::writeRouting(int level, Xml& xml) const
 		return;
 
 	QString s;
-	/*
-	//if(rwFlags() & 2)  // Readable
-	{
-	  //RouteList* rl = _inRoutes;
-	  //for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-	  for (ciRoute r = _inRoutes.begin(); r != _inRoutes.end(); ++r)
-	  {
-		// Since an ALSA midi device supports read + write, this is the only way we can tell if this route is using the device as input.
-		if(r->type == Route::TRACK_ROUTE)
-		  continue;
-            
-		if(!r->name().isEmpty())
-		{
-		  xml.tag(level++, "Route");
-            
-		  //xml.strTag(level, "srcNode", r->name());
-		  xml.tag(level, "source type=\"%d\" name=\"%s\"/", r->type, r->name().toLatin1().constData());
-            
-		  //xml.strTag(level, "dstNode", name());
-		  xml.tag(level, "dest type=\"%d\" name=\"%s\"/", Route::ALSA_MIDI_ROUTE, name().toLatin1().constData());
-            
-		  xml.etag(level--, "Route");
-		}
-	  }
-	}
-	 */
 
 	for (ciRoute r = _outRoutes.begin(); r != _outRoutes.end(); ++r)
 	{
-		//if(r->type != Route::TRACK_ROUTE)
-		//{
-		//  printf("MidiAlsaDevice::writeRouting Warning out route is not TRACK_ROUTE type\n");
-		//  continue;
-		//}
-
 		if (!r->name().isEmpty())
 		{
-			//xml.tag(level++, "Route");
-
 			s = QT_TRANSLATE_NOOP("@default", "Route");
 			if (r->channel != -1)
 				s += QString(QT_TRANSLATE_NOOP("@default", " channel=\"%1\"")).arg(r->channel);
 			xml.tag(level++, s.toLatin1().constData());
 
-			/*
-			//xml.strTag(level, "srcNode", name());
-			if(r->channel != -1)
-			  //xml.tag(level, "source type=\"%d\" channel=\"%d\" name=\"%s\"/", Route::ALSA_MIDI_ROUTE, r->channel, name().toLatin1().constData());
-			  //xml.tag(level, "source type=\"%d\" channel=\"%d\" name=\"%s\"/", Route::MIDI_DEVICE_ROUTE, r->channel, name().toLatin1().constData());
-			  xml.tag(level, "source devtype=\"%d\" channel=\"%d\" name=\"%s\"/", MidiDevice::ALSA_MIDI, r->channel, name().toLatin1().constData());
-			else
-			  //xml.tag(level, "source type=\"%d\" name=\"%s\"/", Route::ALSA_MIDI_ROUTE, name().toLatin1().constData());
-			  //xml.tag(level, "source type=\"%d\" name=\"%s\"/", Route::MIDI_DEVICE_ROUTE, name().toLatin1().constData());
-			 */
-			//xml.tag(level, "source devtype=\"%d\" name=\"%s\"/", MidiDevice::ALSA_MIDI, name().toLatin1().constData());
 			xml.tag(level, "source devtype=\"%d\" name=\"%s\"/", MidiDevice::ALSA_MIDI, Xml::xmlString(name()).toLatin1().constData());
 
-			/*
-			//xml.strTag(level, "dstNode", r->name());
-			if(r->channel != -1)
-			{
-			  if(r->type == Route::MIDI_DEVICE_ROUTE)
-				xml.tag(level, "dest devtype=\"%d\" channel=\"%d\" name=\"%s\"/", r->device->deviceType(), r->channel, r->name().toLatin1().constData());
-			  else
-				xml.tag(level, "dest type=\"%d\" channel=\"%d\" name=\"%s\"/", r->type, r->channel, r->name().toLatin1().constData());
-			}
-			else
-			{
-			  if(r->type == Route::MIDI_DEVICE_ROUTE)
-				xml.tag(level, "dest devtype=\"%d\" name=\"%s\"/", r->device->deviceType(), r->name().toLatin1().constData());
-			  else
-				xml.tag(level, "dest type=\"%d\" name=\"%s\"/", r->type, r->name().toLatin1().constData());
-			}
-			 */
 
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 			if (r->type == Route::MIDI_DEVICE_ROUTE)
@@ -264,7 +202,6 @@ void MidiAlsaDevice::writeRouting(int level, Xml& xml) const
 			else
 				if (r->type != Route::TRACK_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
-			//s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(r->name());
 			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 			xml.tag(level, s.toLatin1().constData());
 

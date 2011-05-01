@@ -70,6 +70,7 @@ class AudioOutput;
 class EditInstrument;
 class RouteDialog;
 class QDocWidget;
+class MidiAssignDialog;
 
 #define MENU_ADD_SYNTH_ID_BASE 0x1000
 #define OOCMD_PORT 8415
@@ -149,7 +150,7 @@ class OOMidi : public QMainWindow
 
     // Settings Menu Actions
     QAction *settingsGlobalAction, *settingsShortcutsAction, *settingsMetronomeAction, *settingsMidiSyncAction;
-    QAction *settingsMidiIOAction, /*settingsAppearanceAction,*/ *settingsMidiPortAction;
+    QAction *settingsMidiIOAction, /*settingsAppearanceAction,*/ *settingsMidiPortAction, *settingsMidiAssignAction;
     QAction *dontFollowAction, *followPageAction, *followCtsAction;
 
     // Help Menu Actions
@@ -179,6 +180,7 @@ class OOMidi : public QMainWindow
     QMenu* follow;
     QMenu* midiInputPlugins;
 
+	MidiAssignDialog* midiAssignDialog;
     QWidget* midiPortConfig;
     QWidget* softSynthesizerConfig;
     MidiSyncConfig* midiSyncConfig;
@@ -370,6 +372,7 @@ public slots:
 
     void routingPopupMenuAboutToHide();
     void configMidiPorts();
+    void configMidiAssign();
 	bool startServer();
 	void stopServer();
 #ifdef LSCP_SUPPORT

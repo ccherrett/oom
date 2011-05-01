@@ -94,6 +94,8 @@ QT4_WRAP_CPP (widget_mocs
 	  instrumentcombo.h
 	  instrumentmenu.h
 	  keymapmenu.h
+	  midiassign.h
+	  midiportdelegate.h
       )
 
 ##
@@ -130,6 +132,7 @@ file (GLOB widgets_ui_files
 	  tviewdockbase.ui
 	  rmapdialogbase.ui
 	  routemapbase.ui
+	  midiassignbase.ui
       )
 QT4_WRAP_UI (widget_ui_headers ${widgets_ui_files})
 
@@ -214,6 +217,8 @@ file (GLOB widgets_source_files
 	  instrumentcombo.cpp
 	  instrumentmenu.cpp
 	  keymapmenu.cpp
+	  midiassign.cpp
+	  midiportdelegate.cpp
       )
 
 ##

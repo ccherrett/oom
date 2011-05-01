@@ -59,6 +59,7 @@
 #include "waveedit.h"
 #include "widgets/projectcreateimpl.h"
 #include "ctrl/ctrledit.h"
+#include "midiassign.h"
 
 #ifdef DSSI_SUPPORT
 #include "dssihost.h"
@@ -739,6 +740,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	midiSyncConfig = 0;
 	midiRemoteConfig = 0;
 	midiPortConfig = 0;
+	midiAssignDialog = 0;
 	metronomeConfig = 0;
 	audioConfig = 0;
 	midiFileConfig = 0;
@@ -1047,6 +1049,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	settingsMidiIOAction = new QAction(QIcon(*settings_midifileexportIcon), tr("Midi File Import/Export"), this);
 	//settingsAppearanceAction = new QAction(QIcon(*settings_appearance_settingsIcon), tr("Appearance Settings"), this);
 	settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports Manager"), this);
+	settingsMidiAssignAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Assign"), this);
 
 	//-------- Help Actions
 	helpManualAction = new QAction(tr("&Manual"), this);
@@ -1179,6 +1182,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(settingsMidiIOAction, SIGNAL(triggered()), SLOT(configMidiFile()));
 	//connect(settingsAppearanceAction, SIGNAL(triggered()), SLOT(configAppearance()));
 	connect(settingsMidiPortAction, SIGNAL(triggered()), SLOT(configMidiPorts()));
+	connect(settingsMidiAssignAction, SIGNAL(triggered()), SLOT(configMidiAssign()));
 
 	connect(dontFollowAction, SIGNAL(triggered()), followSignalMapper, SLOT(map()));
 	connect(followPageAction, SIGNAL(triggered()), followSignalMapper, SLOT(map()));
@@ -1440,6 +1444,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//menuSettings->addAction(settingsAppearanceAction);
 	//menuSettings->addSeparator();
 	menuSettings->addAction(settingsMidiPortAction);
+	menuSettings->addAction(settingsMidiAssignAction);
 
 	//---------------------------------------------------
 	//    popup Help
@@ -5622,6 +5627,16 @@ void OOMidi::setUsedTool(int tool)
 	tools1->set(tool);
 }
 
+void OOMidi::configMidiAssign()
+{
+	if(!midiAssignDialog)
+	{
+		midiAssignDialog = new MidiAssignDialog(this);
+	}
+	midiAssignDialog->show();
+	midiAssignDialog->raise();
+	midiAssignDialog->activateWindow();
+}
 
 //---------------------------------------------------------
 //   execDeliveredScript

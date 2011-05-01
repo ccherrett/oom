@@ -600,7 +600,7 @@ void PCScale::moveSelected(int dir)/*{{{*/
 {
 	if(_pc.valid && _pc.state == selectedController && _pc.part)
 	{
-		int x = _pc.event.tick();/*{{{*/
+		int x = _pc.event.tick();
 		if(dir > 0)
 		{
 			x += currentEditor->rasterStep(x) + _pc.part->tick();
@@ -624,7 +624,7 @@ void PCScale::moveSelected(int dir)/*{{{*/
 				_pc.part->setLenTick(endTick);
 			}
 			audio->msgChangeEvent(_pc.event, nevent, _pc.part, true, true, false);
-			_pc.event = nevent;/*}}}*/
+			_pc.event = nevent;
 			emit drawSelectedProgram(_pc.event.tick(), true);
 		}
 

@@ -326,6 +326,8 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 	//---------------------------------------------------
 
 	CItemList list = getItemlistForCurrentPart();
+	if(editor->isGlobalEdit())
+		list = _items;
 	if (virt())
 		_curItem = list.find(_start);//_items.find(_start);
 	else
@@ -335,6 +337,13 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 		bool usfound = false;
 		for (iCItem i = list.begin(); i != list.end(); ++i)
 		{
+			MidiTrack* mtrack = (MidiTrack*)i->second->part()->track();
+			int sy = _start.y();
+			int p = y2pitch(sy);
+			if(editor->isGlobalEdit())
+				p += mtrack->getTransposition();
+			int p2 = pitch2y(p);
+			QPoint lpos(_start.x(), p2);
 			QRect box = i->second->bbox();
 			int x = rmapxDev(box.x());
 			int y = rmapyDev(box.y());
@@ -343,7 +352,8 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			QRect r(x, y, w, h);
 			///r.moveBy(i->second->pos().x(), i->second->pos().y());
 			r.translate(i->second->pos().x(), i->second->pos().y());
-			if (r.contains(_start))
+			//if (r.contains(_start))
+			if(r.contains(lpos))
 			{
 				if (i->second->isSelected())
 				{
@@ -426,23 +436,12 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 					curPartChanged();
 				}*/
 				itemPressed(_curItem);
-				// Changed by T356. Alt is default reserved for moving the whole window in KDE. Changed to Shift-Alt.
-				// Hmm, nope, shift-alt is also reserved sometimes. Must find a way to bypass,
-				//  why make user turn off setting? Left alone for now...
 				if (shift)
 					_drag = DRAG_COPY_START;
 				else if (alt)
 				{
 					_drag = DRAG_CLONE_START;
 				}
-				//
-				//if (shift)
-				//{
-				//  if (alt)
-				//    drag = DRAG_CLONE_START;
-				//  else
-				//    drag = DRAG_COPY_START;
-				//}
 				else if (ctrl)
 				{ //Select all on the same pitch (e.g. same y-value)
 					deselectAll();

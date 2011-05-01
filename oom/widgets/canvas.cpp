@@ -153,7 +153,7 @@ static bool smallerZValue(const CItem* first, const CItem* second)
 	return first->zValue() < second->zValue();
 }
 
-void Canvas::draw(QPainter& p, const QRect& rect)
+void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 {
 	//      printf("draw canvas %x virt %d\n", this, virt());
 
@@ -436,7 +436,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)
     	p.drawLine(_pos[0], y, _pos[0], y2);
 	}
 
-}
+}/*}}}*/
 
 void Canvas::drawSelectedProgram(int pos, bool set)
 {
@@ -577,7 +577,7 @@ void Canvas::viewKeyPressEvent(QKeyEvent* event)
 //   viewMousePressEvent
 //---------------------------------------------------------
 
-void Canvas::viewMousePressEvent(QMouseEvent* event)
+void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 {
 	///keyState = event->state();
 	_keyState = ((QInputEvent*) event)->modifiers();
@@ -799,9 +799,9 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)
 		}
 	}
 	mousePress(event);
-}
+}/*}}}*/
 
-void Canvas::scrollTimerDone()
+void Canvas::scrollTimerDone()/*{{{*/
 {
 	//printf("Canvas::scrollTimerDone drag:%d doScroll:%d\n", drag, doScroll);
 
@@ -998,14 +998,14 @@ void Canvas::scrollTimerDone()
 		delete _scrollTimer;
 		_scrollTimer = NULL;
 	}
-}
+}/*}}}*/
 
 
 //---------------------------------------------------------
 //   viewMouseMoveEvent
 //---------------------------------------------------------
 
-void Canvas::viewMouseMoveEvent(QMouseEvent* event)
+void Canvas::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 {
 
 	_evPos = event->pos();
@@ -1198,13 +1198,13 @@ void Canvas::viewMouseMoveEvent(QMouseEvent* event)
 	}
 
 	mouseMove(event);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   viewMouseReleaseEvent
 //---------------------------------------------------------
 
-void Canvas::viewMouseReleaseEvent(QMouseEvent* event)
+void Canvas::viewMouseReleaseEvent(QMouseEvent* event)/*{{{*/
 {
 	// printf("release %x %x\n", event->state(), event->button());
 
@@ -1301,13 +1301,13 @@ void Canvas::viewMouseReleaseEvent(QMouseEvent* event)
 		redraw();
 	setCursor();
 	mouseRelease(pos);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   selectLasso
 //---------------------------------------------------------
 
-void Canvas::selectLasso(bool toggle)
+void Canvas::selectLasso(bool toggle)/*{{{*/
 {
 	int n = 0;
 	if (virt())
@@ -1348,7 +1348,7 @@ void Canvas::selectLasso(bool toggle)
 		updateSelection();
 		redraw();
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   endMoveItems
@@ -1357,7 +1357,7 @@ void Canvas::selectLasso(bool toggle)
 //          2     move only vertical
 //---------------------------------------------------------
 
-void Canvas::endMoveItems(const QPoint& pos, DragType dragtype, int dir)
+void Canvas::endMoveItems(const QPoint& pos, DragType dragtype, int dir)/*{{{*/
 {
 	startUndo(dragtype);
 
@@ -1373,33 +1373,13 @@ void Canvas::endMoveItems(const QPoint& pos, DragType dragtype, int dir)
 
 	int modified = 0;
 
-	// Removed by T356.
-	/*
-	for (iCItem i = moving.begin(); i != moving.end(); ++i) {
-		  int x = i->second->pos().x();
-		  int y = i->second->pos().y();
-		  int nx = x + dx;
-		  int ny = pitch2y(y2pitch(y) + dp);
-		  QPoint newpos = raster(QPoint(nx, ny));
-		  selectItem(i->second, true);
-
-		  if (moveItem(i->second, newpos, dragtype, &modified))
-				i->second->move(newpos);
-		  if (moving.size() == 1) {
-				itemReleased(curItem, newpos);
-				}
-		  if (dragtype == MOVE_COPY || dragtype == MOVE_CLONE)
-				selectItem(i->second, false);
-		  }
-	 */
-
 	moveCanvasItems(_moving, dp, dx, dragtype, &modified);
 
 	endUndo(dragtype, modified);
 	_moving.clear();
 	updateSelection();
 	redraw();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   getCurrentDrag
@@ -1464,12 +1444,7 @@ bool Canvas::allItemsAreSelected()
 	CItemList list = getItemlistForCurrentPart();
 	CItemList selected = getSelectedItemsForCurrentPart();
 
-	if (list.size() == selected.size())
-	{
-		return true;
-	}
-
-	return false;
+	return (list.size() == selected.size());
 }
 
 //---------------------------------------------------------
