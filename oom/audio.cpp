@@ -655,6 +655,7 @@ void Audio::processMsg(AudioMsg* msg)
 	{
 		case AUDIO_RECORD:
 			msg->snode->setRecordFlag2(msg->ival);
+			//TODO: hook this and send midi cc to bcf2000
 			break;
 		case AUDIO_ROUTEADD:
 			addRoute(msg->sroute, msg->droute);
@@ -667,9 +668,11 @@ void Audio::processMsg(AudioMsg* msg)
 			break;
 		case AUDIO_VOL:
 			msg->snode->setVolume(msg->dval);
+			//TODO: hook this and send midi cc to bcf2000
 			break;
 		case AUDIO_PAN:
 			msg->snode->setPan(msg->dval);
+			//TODO: hook this and send midi cc to bcf2000
 			break;
 		case SEQM_SET_AUX:
 			msg->snode->setAuxSend(msg->ival, msg->dval);
@@ -711,6 +714,7 @@ void Audio::processMsg(AudioMsg* msg)
 			break;
 		case AUDIO_SET_SOLO:
 			msg->track->setSolo((bool)msg->ival);
+			//TODO: hook this and send midi cc to bcf2000
 			break;
 
 		case AUDIO_SET_SEND_METRONOME:

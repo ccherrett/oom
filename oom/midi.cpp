@@ -1364,7 +1364,7 @@ void Audio::processMidi()
 							}
 						}
 					}
-				}
+				}//END for loop
 			}
 		}
 		// Added by Tim. p3.3.8

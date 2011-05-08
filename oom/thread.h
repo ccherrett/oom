@@ -11,6 +11,7 @@
 
 #include <pthread.h>
 #include <list>
+#include <QObject>
 
 //---------------------------------------------------------
 //   Poll
@@ -51,8 +52,10 @@ struct ThreadMsg
 //   Thread
 //---------------------------------------------------------
 
-class Thread
+class Thread : public QObject
 {
+	Q_OBJECT
+
     const char* _name;
     volatile bool _running;
     //int realTimePriority;

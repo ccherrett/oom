@@ -243,7 +243,7 @@ MidiController::ControllerType midiControllerType(int num)
 //   updateBias
 //---------------------------------------------------------
 
-void MidiController::updateBias()
+void MidiController::updateBias()/*{{{*/
 {
 	// If the specified minimum value is negative, we will
 	//  translate to a positive-biased range.
@@ -314,7 +314,7 @@ void MidiController::updateBias()
 				_bias -= _maxVal + _bias - mx;
 		}
 	}
-}
+}/*}}}*/
 
 
 //---------------------------------------------------------

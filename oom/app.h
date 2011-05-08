@@ -71,6 +71,7 @@ class EditInstrument;
 class RouteDialog;
 class QDocWidget;
 class MidiAssignDialog;
+class MidiPlayEvent;
 
 #define MENU_ADD_SYNTH_ID_BASE 0x1000
 #define OOCMD_PORT 8415
@@ -348,6 +349,7 @@ private slots:
 
     void execDeliveredScript(int);
     void execUserScript(int);
+
 
 public slots:
     bool save();

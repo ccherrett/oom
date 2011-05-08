@@ -1596,8 +1596,9 @@ void AudioAux::setChannels(int n)
 //    gui part (executed in gui thread)
 //---------------------------------------------------------
 
-bool AudioTrack::setRecordFlag1(bool f)
+bool AudioTrack::setRecordFlag1(bool f, bool /*monitor*/)
 {
+	//TODO: add monitor code
 	if (f == _recordFlag)
 		return true;
 	if (f)

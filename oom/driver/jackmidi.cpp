@@ -26,6 +26,7 @@
 #include "audiodev.h"
 #include "../mplugins/midiitransform.h"
 #include "../mplugins/mitplugin.h"
+#include "midimonitor.h"
 #include "xml.h"
 
 // Turn on debug messages.
@@ -347,8 +348,20 @@ void MidiJackDevice::recordEvent(MidiRecordEvent& event)
 			}
 		}
 		else
+		{
 			// Trigger general activity indicator detector. Sysex has no channel, don't trigger.
 			midiPorts[_port].syncInfo().trigActDetect(event.channel());
+		}
+			
+		//TODO: Jack in here and call our midimonitor with the data, it can then decide what to do
+		printf("MidiJackDevice::recordEvent _port:%d, event.port():%d\n",_port, event.port());
+		if(midiMonitor->isManagedInputPort(_port))
+		{
+			//MidiRecordEvent ev(event);
+			event.setPort(_port);
+			midiMonitor->msgSendMidiInputEvent(event);
+			return; //If we manage this input port return
+		}
 	}
 
 	//

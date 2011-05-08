@@ -10,6 +10,7 @@
 #define __TRACK_H__
 
 #include <QString>
+#include <QHash>
 
 #include <vector>
 #include <algorithm>
@@ -27,7 +28,27 @@ class SndFile;
 class MPEventList;
 class SynthI;
 class PluginI;
+class MidiAssignData;
+class MidiPort;
 
+class Track;
+struct MidiAssignData {/*{{{*/
+	Track* track;
+	QHash<int, int> midimap;
+	int port;
+	int channel;
+	bool enabled;
+	void read(Xml&, Track*);
+	//void write(int, Xml&);
+	inline bool operator==(MidiAssignData mad)
+	{
+		return mad.port == port && mad.track == track;
+	}
+	inline uint qHash(MidiAssignData m)
+	{
+		return (m.channel ^ m.port)*qrand();
+	}
+};/*}}}*/
 //---------------------------------------------------------
 //   Track
 //---------------------------------------------------------
@@ -51,6 +72,7 @@ private:
 	bool _reminder1;
 	bool _reminder2;
 	bool _reminder3;
+	MidiAssignData m_midiassign;
 
 
 protected:
@@ -137,6 +159,8 @@ public:
     {
         _comment = s;
     }
+
+	MidiAssignData* midiAssign() { return &m_midiassign; }
 
     int y() const;
 
@@ -285,21 +309,21 @@ public:
     //virtual Track* clone() const    = 0;
     virtual Track* clone(bool CloneParts) const = 0;
 
-    virtual bool setRecordFlag1(bool f) = 0;
-    virtual void setRecordFlag2(bool f) = 0;
+    virtual bool setRecordFlag1(bool f, bool monitor = false) = 0;
+    virtual void setRecordFlag2(bool f, bool monitor = false) = 0;
 
     virtual Part* newPart(Part*p = 0, bool clone = false) = 0;
     void dump() const;
     virtual void splitPart(Part*, int, Part*&, Part*&);
 
-    virtual void setMute(bool val);
+    virtual void setMute(bool val, bool monitor = false);
     virtual void setOff(bool val);
     virtual void updateSoloStates(bool noDec) = 0;
     virtual void updateInternalSoloStates();
     void updateSoloState();
     void setInternalSolo(unsigned int val);
     static void clearSoloRefCounts();
-    virtual void setSolo(bool val) = 0;
+    virtual void setSolo(bool val, bool monitor = false) = 0;
     virtual bool isMute() const = 0;
 
     unsigned int internalSolo() const
@@ -433,15 +457,13 @@ public:
 
 	int getTransposition();
 
-    virtual bool setRecordFlag1(bool f)
-    {
+    virtual bool setRecordFlag1(bool f, bool monitor = false);
+    /*{
         _recordFlag = f;
         return true;
-    }
+    }*/
 
-    virtual void setRecordFlag2(bool)
-    {
-    }
+    virtual void setRecordFlag2(bool, bool monitor = false);
 
     EventList* events() const
     {
@@ -510,7 +532,7 @@ public:
     }
 
     virtual bool isMute() const;
-    virtual void setSolo(bool val);
+    virtual void setSolo(bool val, bool monitor = false);
     virtual void updateSoloStates(bool noDec);
     virtual void updateInternalSoloStates();
 
@@ -573,8 +595,8 @@ public:
     AudioTrack(const AudioTrack&, bool cloneParts);
     virtual ~AudioTrack();
 
-    virtual bool setRecordFlag1(bool f);
-    virtual void setRecordFlag2(bool f);
+    virtual bool setRecordFlag1(bool f, bool monitor = false);
+    virtual void setRecordFlag2(bool f, bool monitor = false);
     bool prepareRecording();
 
     bool processed()
@@ -627,7 +649,7 @@ public:
     }
 
     virtual bool isMute() const;
-    virtual void setSolo(bool val);
+    virtual void setSolo(bool val, bool monitor = false);
     virtual void updateSoloStates(bool noDec);
     virtual void updateInternalSoloStates();
 
@@ -637,7 +659,7 @@ public:
 
     void record();
 
-    virtual void setMute(bool val);
+    virtual void setMute(bool val, bool monitor = false);
     virtual void setOff(bool val);
 
     void setSendMetronome(bool val)

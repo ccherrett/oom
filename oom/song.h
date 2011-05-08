@@ -448,7 +448,7 @@ public:
     Track* findTrack(const QString& name) const;
     void swapTracks(int i1, int i2);
     void setChannelMute(int channel, bool flag);
-    void setRecordFlag(Track*, bool);
+    void setRecordFlag(Track*, bool, bool monitor = false);
     void insertTrack0(Track*, int idx);
     void insertTrack1(Track*, int idx);
     void insertTrack2(Track*, int idx);
@@ -591,6 +591,7 @@ public slots:
     void setQuantize(bool val);
     void panic();
     void seqSignal(int fd);
+	void playMonitorEvent(int fd);
     Track* addTrack(int);
     Track* addNewTrack(QAction* action);
     TrackView* addNewTrackView();

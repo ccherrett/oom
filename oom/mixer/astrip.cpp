@@ -49,6 +49,7 @@
 #include "ttoolbutton.h"
 #include "menutitleitem.h"
 #include "popupmenu.h"
+#include "widgets/utils.h"
 
 //---------------------------------------------------------
 //   MenuTitleItem
@@ -428,6 +429,7 @@ void AudioStrip::volumeChanged(double val)
 	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
 		track->enableVolumeController(false);
 
+	//printf("AudioStrip::volumeChanged(%g) \n", val);
 	double vol;
 	if (val <= config.minSlider)
 	{
@@ -439,6 +441,8 @@ void AudioStrip::volumeChanged(double val)
 	volume = vol;
 	audio->msgSetVolume((AudioTrack*) track, vol);
 	((AudioTrack*) track)->recordAutomation(AC_VOLUME, vol);
+	//double vv = (vol + 60)/0.5546875;
+	printf("AudioStrip::volumeChanged(%g) - val: %g - midiNum: %d whacky: %d\n", vol, dbToTrackVol(val), dbToMidi(val), dbToMidi(trackVolToDb(vol)));
 }
 
 //---------------------------------------------------------
@@ -523,6 +527,7 @@ void AudioStrip::panChanged(double val)
 	panVal = val;
 	audio->msgSetPan(((AudioTrack*) track), val);
 	((AudioTrack*) track)->recordAutomation(AC_PAN, val);
+	printf("AudioStrip::panChanged(%d) midiToTrackPan(%g)\n", trackPanToMidi(val), midiToTrackPan(trackPanToMidi(val)));
 }
 
 //---------------------------------------------------------

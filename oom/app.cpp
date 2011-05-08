@@ -60,6 +60,7 @@
 #include "widgets/projectcreateimpl.h"
 #include "ctrl/ctrledit.h"
 #include "midiassign.h"
+#include "midimonitor.h"
 
 #ifdef DSSI_SUPPORT
 #include "dssihost.h"
@@ -250,6 +251,7 @@ bool OOMidi::seqStart()
 
 	int pfprio = 0;
 	int midiprio = 0;
+	int monitorprio = 0;
 
 	// NOTE: realTimeScheduling can be true (gotten using jack_is_realtime()),
 	//  while the determined realTimePriority can be 0.
@@ -257,19 +259,11 @@ bool OOMidi::seqStart()
 	//  in JackAudioDevice::realtimePriority() which is a bit flawed - it reports there's no RT...
 	if (realTimeScheduling)
 	{
-		//if(realTimePriority < 5)
-		//  printf("OOMidi: WARNING: Recommend setting audio realtime priority to a higher value!\n");
-		{
-			//pfprio = realTimePriority - 5;
-			// p3.3.40
-			pfprio = realTimePriority + 1;
+		monitorprio = realTimePriority + 1;
 
-			//midiprio = realTimePriority - 2;
-			// p3.3.37
-			//midiprio = realTimePriority + 1;
-			// p3.3.40
-			midiprio = realTimePriority + 2;
-		}
+		pfprio = realTimePriority + 1;
+
+		midiprio = realTimePriority + 2;
 	}
 
 	if (midiRTPrioOverride > 0)
@@ -279,23 +273,18 @@ bool OOMidi::seqStart()
 	//if(midiprio == realTimePriority)
 	//  printf("OOMidi: WARNING: Midi realtime priority %d is the same as audio realtime priority %d. Try a different setting.\n",
 	//         midiprio, realTimePriority);
-	//if(midiprio == pfprio)
-	//  printf("OOMidi: WARNING: Midi realtime priority %d is the same as audio prefetch realtime priority %d. Try a different setting.\n",
-	//         midiprio, pfprio);
+
+	midiMonitor->start(monitorprio);
 
 	audioPrefetch->start(pfprio);
 
 	audioPrefetch->msgSeek(0, true); // force
 
-	//midiSeqRunning = !midiSeq->start(realTimeScheduling ? realTimePriority : 0);
-	// Changed by Tim. p3.3.22
-	//midiSeq->start(realTimeScheduling ? realTimePriority : 0);
 	midiSeq->start(midiprio);
 
 	int counter = 0;
 	while (++counter)
 	{
-		//if (counter > 10) {
 		if (counter > 1000)
 		{
 			fprintf(stderr, "midi sequencer thread does not start!? Exiting...\n");
@@ -313,6 +302,9 @@ bool OOMidi::seqStart()
 		fprintf(stderr, "midiSeq is not running! Exiting...\n");
 		exit(33);
 	}
+
+	midiMonitor->populateList();
+
 #ifdef LSCP_SUPPORT
 	//emit lscpStartListener();
 #endif
@@ -333,6 +325,8 @@ void OOMidi::seqStop()
 
 	song->setStop(true);
 	song->setStopPlay(false);
+	//Stop the midiMonitor before the sequencer
+	midiMonitor->stop(true);
 	midiSeq->stop(true);
 	audio->stop(true);
 	audioPrefetch->stop(true);
@@ -1252,6 +1246,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	audio = new Audio();
 	//audioPrefetch = new AudioPrefetch(0, "Disc");
 	audioPrefetch = new AudioPrefetch("Prefetch");
+	//Define the MidiMonitor
+	midiMonitor = new MidiMonitor("MidiMonitor");
 
 	//---------------------------------------------------
 	//    Popups
@@ -2514,6 +2510,7 @@ void OOMidi::closeEvent(QCloseEvent* event)
 	exitOSC();
 
 	// p3.3.47
+	delete midiMonitor;
 	delete audioPrefetch;
 	delete audio;
 	delete midiSeq;

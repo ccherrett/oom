@@ -5,6 +5,7 @@
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
+#include <fastlog.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -394,3 +395,53 @@ double valToDb(double inV)
 {
     return exp10((inV*70.0-60)/20.0);
 }
+
+int dbToMidi(double val)
+{
+	int v = (int)(val + 60)/0.55;
+	//printf("dbToMidi v: %g \n", v, v);
+	if(v > 127)
+		v = 127;
+	if(v < 0)
+		v = 0;
+	return v; //(val + 60)*0.5546875;
+}
+
+double midiToDb(int val)
+{
+	return (double)(val / 1.8028169)-60;
+}
+
+
+double trackVolToDb(double vol)
+{
+	return fast_log10(vol) * 20.0;
+}
+
+double dbToTrackVol(double val)
+{
+	double rv = pow(10.0, val / 20.0);
+	return rv;
+}
+
+int trackPanToMidi(double val)
+{
+	double pan = (val+1)*64;
+	int p = (int)pan;
+	if(p > 127)
+		p = 127;
+	if(p < 0)
+		p = 0;
+	return p;
+}
+
+double midiToTrackPan(int val)
+{
+	double v = (double)(double(val)/64)-1;
+	if(v >= 0.98)
+		v = 1;
+	if(v < -1)
+		v = -1;
+	return v;
+}
+									

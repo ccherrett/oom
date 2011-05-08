@@ -12,6 +12,7 @@
 
 #include "ui_midiassignbase.h"
 #include <QStringList>
+#include <QList>
 
 class QDialog;
 class Track;
@@ -20,20 +21,6 @@ class QStandardItemModel;
 class MidiPort;
 class QString;
 
-struct MidiAssignData {
-	Track* track;
-	MidiPort* port;
-	int channel;
-	int volume;
-	int pan;
-	int reverb;
-	int chorus;
-	int var;
-	int rec;
-	int mute;
-	int solo;
-	bool enabled;
-};
 
 class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 {
@@ -42,6 +29,7 @@ class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 	QStandardItemModel *m_model;
 	QStringList m_midicontrols;
 	QStringList _trackTypes;
+	QList<int> m_allowed;
 
 public:
 	MidiAssignDialog(QWidget* parent = 0);
@@ -52,5 +40,6 @@ private slots:
 	void cmbTypeSelected(int);
 	void updateTableHeader();
 	void btnCloseClicked();
+	void itemChanged(QStandardItem*);
 };
 #endif

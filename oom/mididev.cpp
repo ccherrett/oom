@@ -24,6 +24,7 @@
 #include "midiseq.h"
 //#include "sync.h"
 #include "midiitransform.h"
+#include "midimonitor.h"
 
 #ifdef MIDI_DRIVER_MIDI_SERIAL
 extern void initMidiSerial();
@@ -312,6 +313,12 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 
 		//#endif
 
+	}
+
+	//TODO: Jack in here and call our midimonitor with the data, it can then decide what to do
+	if(typ == ME_CONTROLLER && midiMonitor->isManagedController(event.dataA()))
+	{
+		printf("Calling midimonitor from MidiDevice::recordEvent\n");
 	}
 
 	//

@@ -44,6 +44,7 @@
 #include "al/sig.h"
 #include <sys/wait.h>
 #include "trackview.h"
+#include "mpevent.h"
 
 extern void clearMidiTransforms();
 extern void clearMidiInputTransforms();
@@ -1874,8 +1875,13 @@ Marker* Song::setMarkerLock(Marker* m, bool f)
 //   setRecordFlag
 //---------------------------------------------------------
 
-void Song::setRecordFlag(Track* track, bool val)
+void Song::setRecordFlag(Track* track, bool val, bool monitor)
 {
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		//midimonitor->msgSendMidiOutputEvent(track, CTRL_RECORD, val ? 127 : 0);
+	}
 	if (track->type() == Track::WAVE)
 	{
 		WaveTrack* audioTrack = (WaveTrack*) track;
@@ -2397,6 +2403,35 @@ void Song::cleanupForQuit()
 
 	if (debugMsg)
 		printf("...finished cleaning up.\n");
+}
+
+void Song::playMonitorEvent(int fd)
+{
+	char buffer[16];
+
+	int n = ::read(fd, buffer, 16);
+	if (n < 0)
+	{
+		printf("Song: playMonitorEvent(): READ PIPE failed: %s\n",
+				strerror(errno));
+		return;
+	}
+	QByteArray ba(buffer);
+	QString str(ba);
+	QStringList raw = str.split("$$");
+	str = raw.at(0);
+	QStringList cmds = str.split(":", QString::SkipEmptyParts);
+	printf("playMonitorEvent to gui:<%s>\n", str.toUtf8().constData());
+	if(cmds.size() == 4)
+	{
+		MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
+		printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
+		//audio->msgPlayMidiEvent(&ev);
+		midiPorts[ev.port()].sendEvent(ev);
+	
+		update(SC_MIDI_CONTROLLER);
+		return;
+	}
 }
 
 //---------------------------------------------------------

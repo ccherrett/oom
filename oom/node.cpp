@@ -67,7 +67,7 @@ bool AudioTrack::isMute() const
 //   setSolo
 //---------------------------------------------------------
 
-void MidiTrack::setSolo(bool val)
+void MidiTrack::setSolo(bool val, bool monitor)
 {
 	if(this == (MidiTrack*)metronome)
 		return;
@@ -76,9 +76,14 @@ void MidiTrack::setSolo(bool val)
 		_solo = val;
 		updateSoloStates(false);
 	}
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, val ? 127 : 0);
+	}
 }
 
-void AudioTrack::setSolo(bool val)
+void AudioTrack::setSolo(bool val, bool monitor)
 {
 	if(this == metronome)
 		return;
@@ -89,6 +94,11 @@ void AudioTrack::setSolo(bool val)
 		updateSoloStates(false);
 	}
 
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, val ? 127 : 0);
+	}
 	if (isMute())
 		resetMeter();
 }
@@ -279,9 +289,14 @@ void AudioTrack::updateSoloStates(bool noDec)
 //   setMute
 //---------------------------------------------------------
 
-void Track::setMute(bool val)
+void Track::setMute(bool val, bool monitor)
 {
 	_mute = val;
+	if(!monitor)
+	{//call the monitor with the update if it was not called from the monitor
+		//Call the monitor here if it was not called from the monitor
+		//midimonitor->msgSendMidiOutputEvent(track, CTRL_MUTE, val ? 127 : 0);
+	}
 }
 
 //---------------------------------------------------------
@@ -1428,8 +1443,13 @@ void Track::resetAllMeter()
 //    real time part (executed in audio thread)
 //---------------------------------------------------------
 
-void AudioTrack::setRecordFlag2(bool f)
+void AudioTrack::setRecordFlag2(bool f, bool monitor)
 {
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, f ? 127 : 0);
+	}
 	if (f == _recordFlag)
 		return;
 	_recordFlag = f;
@@ -1441,11 +1461,16 @@ void AudioTrack::setRecordFlag2(bool f)
 //   setMute
 //---------------------------------------------------------
 
-void AudioTrack::setMute(bool f)
+void AudioTrack::setMute(bool f, bool monitor)
 {
 	_mute = f;
 	if (_mute)
 		resetAllMeter();
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, f ? 127 : 0);
+	}
 }
 
 //---------------------------------------------------------

@@ -6,8 +6,10 @@
 //  (C) Copyright 2000-2004 Werner Schweer (ws@seh.de)
 //=========================================================
 
+#include <QStringList>
 #include "track.h"
 #include "event.h"
+#include "midictrl.h"
 #include "mididev.h"
 #include "midiport.h"
 #include "song.h"
@@ -163,6 +165,9 @@ void Track::init()
 	_volumeEn2Ctrl = true;
 	_panEnCtrl = true;
 	_panEn2Ctrl = true;
+	m_midiassign.port = -1;
+	m_midiassign.channel = -1;
+	m_midiassign.enabled = false;
 
 	_selected = false;
 	_height = 40;
@@ -174,6 +179,19 @@ void Track::init()
 		_meter[i] = 0.0;
 		_peak[i] = 0.0;
 	}
+	m_midiassign.enabled = false;
+	m_midiassign.port = 0;
+	m_midiassign.channel = 0;
+	m_midiassign.track = this;
+	m_midiassign.midimap.clear();
+	m_midiassign.midimap[CTRL_VOLUME] = -1;
+	m_midiassign.midimap[CTRL_PANPOT] = -1;
+	m_midiassign.midimap[CTRL_REVERB_SEND] = -1;
+	m_midiassign.midimap[CTRL_CHORUS_SEND] = -1;
+	m_midiassign.midimap[CTRL_VARIATION_SEND] = -1;
+	m_midiassign.midimap[CTRL_RECORD] = -1;
+	m_midiassign.midimap[CTRL_MUTE] = -1;
+	m_midiassign.midimap[CTRL_SOLO] = -1;
 }
 
 Track::Track(Track::TrackType t)
@@ -207,6 +225,7 @@ Track::Track(const Track& t, bool cloneParts)
 	_name = t.name();
 	_type = t.type();
 	_locked = t.locked();
+	m_midiassign = t.m_midiassign;
 
 	if (cloneParts)
 	{
@@ -428,11 +447,7 @@ void MidiTrack::init()
 {
 	_outPort = 0;
 	_outChannel = 0;
-	// Changed by Tim. p3.3.8
-	//_inPortMask    = 0xffff;
-	///_inPortMask    = 0xffffffff;
 
-	///_inChannelMask = 0xffff;      // "ALL"
 	transposition = 0;
 	velocity = 0;
 	delay = 0;
@@ -460,10 +475,8 @@ void MidiTrack::setOutChanAndUpdate(int i)
 	if (_outChannel == i)
 		return;
 
-	//removePortCtrlEvents();
 	removePortCtrlEvents(this);
 	_outChannel = i;
-	//addPortCtrlEvents();
 	addPortCtrlEvents(this);
 }
 
@@ -476,10 +489,8 @@ void MidiTrack::setOutPortAndUpdate(int i)
 	if (_outPort == i)
 		return;
 
-	//removePortCtrlEvents();
 	removePortCtrlEvents(this);
 	_outPort = i;
-	//addPortCtrlEvents();
 	addPortCtrlEvents(this);
 }
 
@@ -491,10 +502,6 @@ void MidiTrack::setOutPortAndUpdate(int i)
 
 void MidiTrack::setInPortAndChannelMask(unsigned int portmask, int chanmask)
 {
-	//if(!portmask || !chanmask)
-	//  return;
-
-	//RouteList* rl = inRoutes();
 	bool changed = false;
 
 	for (int port = 0; port < 32; ++port) // 32 is the old maximum number of ports.
@@ -504,53 +511,19 @@ void MidiTrack::setInPortAndChannelMask(unsigned int portmask, int chanmask)
 		if (!midiPorts[port].foundInSongFile())
 			continue;
 
-		//if(!(portmask & (1 << port)))
-		//  continue;
-
-		// p3.3.50 Removed. Allow to connect to port with no device so user can change device later.
-		//MidiPort* mp = &midiPorts[port];
-		//MidiDevice* md = mp->device();
-		//if(!md)
-		//  continue;
-
-		//for(int ch = 0; ch < MIDI_CHANNELS; ++ch)  // p3.3.50 Removed.
-		//{
-		//if(!(chanmask & (1 << ch)))
-		//  continue;
-
-		//Route aRoute(md, ch);
-		//Route bRoute(this, ch);
 		Route aRoute(port, chanmask); // p3.3.50
 		Route bRoute(this, chanmask);
 
-		// p3.3.50 Removed.
-		//iRoute iir = rl->begin();
-		//for(; iir != rl->end(); ++iir)
-		//{
-		//if(*iir == aRoute)
-		//  if(iir->type == Route::MIDI_PORT_ROUTE && iir->midiPort == port)      // p3.3.50
-		//    break;
-		//}
-
-		// Route wanted?
-		//if((portmask & (1 << port)) && (chanmask & (1 << ch)))
 		if (portmask & (1 << port)) // p3.3.50
 		{
-			// Route already exists?
-			//if(iir != rl->end())
-			//  continue;
 			audio->msgAddRoute(aRoute, bRoute);
 			changed = true;
 		}
 		else
 		{
-			// Route does not exist?
-			//if(iir == rl->end())
-			//  continue;
 			audio->msgRemoveRoute(aRoute, bRoute);
 			changed = true;
 		}
-		//}
 	}
 
 	if (changed)
@@ -559,91 +532,6 @@ void MidiTrack::setInPortAndChannelMask(unsigned int portmask, int chanmask)
 		song->update(SC_ROUTE);
 	}
 }
-
-/*
-//---------------------------------------------------------
-//   addPortCtrlEvents
-//---------------------------------------------------------
-
-void MidiTrack::addPortCtrlEvents()
-{
-  const PartList* pl = cparts();
-  for(ciPart ip = pl->begin(); ip != pl->end(); ++ip)
-  {
-	Part* part = ip->second;
-	const EventList* el = part->cevents();
-	for(ciEvent ie = el->begin(); ie != el->end(); ++ie)
-	{
-	  const Event& ev = ie->second;
-	  if(ev.type() == Controller)
-	  {
-		int tick  = ev.tick() + part->tick();
-		int cntrl = ev.dataA();
-		int val   = ev.dataB();
-		int ch = _outChannel;
-        
-		MidiPort* mp = &midiPorts[_outPort];
-		// Is it a drum controller event, according to the track port's instrument?
-		if(type() == DRUM)
-		{
-		  MidiController* mc = mp->drumController(cntrl);
-		  if(mc)
-		  {
-			int note = cntrl & 0x7f;
-			cntrl &= ~0xff;
-			ch = drumMap[note].channel;
-			mp = &midiPorts[drumMap[note].port];
-			cntrl |= drumMap[note].anote;
-		  }
-		}
-        
-		mp->setControllerVal(ch, tick, cntrl, val, part);
-	  }
-	}
-  }
-}
-
-//---------------------------------------------------------
-//   removePortCtrlEvents
-//---------------------------------------------------------
-
-void MidiTrack::removePortCtrlEvents()
-{
-  const PartList* pl = cparts();
-  for(ciPart ip = pl->begin(); ip != pl->end(); ++ip)
-  {
-	Part* part = ip->second;
-	const EventList* el = part->cevents();
-	for(ciEvent ie = el->begin(); ie != el->end(); ++ie)
-	{
-	  const Event& ev = ie->second;
-	  if(ev.type() == Controller)
-	  {
-		int tick  = ev.tick() + part->tick();
-		int cntrl = ev.dataA();
-		int ch = _outChannel;
-        
-		MidiPort* mp = &midiPorts[_outPort];
-		// Is it a drum controller event, according to the track port's instrument?
-		if(type() == DRUM)
-		{
-		  MidiController* mc = mp->drumController(cntrl);
-		  if(mc)
-		  {
-			int note = cntrl & 0x7f;
-			cntrl &= ~0xff;
-			ch = drumMap[note].channel;
-			mp = &midiPorts[drumMap[note].port];
-			cntrl |= drumMap[note].anote;
-		  }
-		}
-        
-		mp->deleteController(ch, tick, cntrl, part);
-	  }
-	}
-  }
-}
- */
 
 //---------------------------------------------------------
 //   addPart
@@ -713,11 +601,26 @@ void MidiTrack::setAutomationType(AutomationType t)
 	port->setAutomationType(outChannel(), t);
 }
 
+bool MidiTrack::setRecordFlag1(bool f, bool monitor)
+{
+    _recordFlag = f;
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, f ? 127 : 0);
+	}
+    return true;
+}
+
+void MidiTrack::setRecordFlag2(bool, bool)
+{
+}
+
 //---------------------------------------------------------
 //   Track::writeProperties
 //---------------------------------------------------------
 
-void Track::writeProperties(int level, Xml& xml) const
+void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 {
 	xml.strTag(level, "name", _name);
 	if (!_comment.isEmpty())
@@ -734,13 +637,26 @@ void Track::writeProperties(int level, Xml& xml) const
 	xml.intTag(level, "reminder3", _reminder3);
 	if (_selected)
 		xml.intTag(level, "selected", _selected);
-}
+	xml.nput(level, "<MidiAssign port=\"%d\"", m_midiassign.port);/*{{{*/
+	xml.nput(" channel=\"%d\"", m_midiassign.channel);
+	xml.nput(" enabled=\"%d\"", (int)m_midiassign.enabled);
+	QString assign;
+	QHashIterator<int, int> iter(m_midiassign.midimap);
+	while(iter.hasNext())
+	{
+		iter.next();
+		assign.append(QString::number(iter.key())).append(":").append(QString::number(iter.value())).append(" ");
+		//xml.nput(" %d=\"%d\"", iter.key(), iter.value());
+	}
+	xml.nput(" midimap=\"%s\"", assign.toUtf8().constData());
+	xml.put(" />");/*}}}*/
+}/*}}}*/
 
 //---------------------------------------------------------
 //   Track::readProperties
 //---------------------------------------------------------
 
-bool Track::readProperties(Xml& xml, const QString& tag)
+bool Track::readProperties(Xml& xml, const QString& tag)/*{{{*/
 {
 	if (tag == "name")
 		_name = xml.parse1();
@@ -776,16 +692,18 @@ bool Track::readProperties(Xml& xml, const QString& tag)
 		_reminder2 = (bool)xml.parseInt();
 	else if (tag == "reminder3")
 		_reminder3 = (bool)xml.parseInt();
+	else if(tag == "MidiAssign")
+		m_midiassign.read(xml, (Track*)this);
 	else
 		return true;
 	return false;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   writeRouting
 //---------------------------------------------------------
 
-void Track::writeRouting(int level, Xml& xml) const
+void Track::writeRouting(int level, Xml& xml) const/*{{{*/
 {
 	QString s;
 
@@ -800,28 +718,14 @@ void Track::writeRouting(int level, Xml& xml) const
 				if (r->channel != -1)
 					s += QString(QT_TRANSLATE_NOOP("@default", " channel=\"%1\"")).arg(r->channel);
 
-				///Route dst(name(), true, r->channel);
-				//xml.tag(level++, "Route");
 				xml.tag(level++, s.toAscii().constData());
 
-				// p3.3.38 New routing scheme.
-				///xml.strTag(level, "srcNode", r->name());
-				//xml.tag(level, "source type=\"%d\" name=\"%s\"/", r->type, r->name().toLatin1().constData());
 				s = QT_TRANSLATE_NOOP("@default", "source");
 				if (r->type != Route::TRACK_ROUTE)
 					s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
-				//s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(r->name());
 				s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 				xml.tag(level, s.toAscii().constData());
 
-				///xml.strTag(level, "dstNode", dst.name());
-
-				//if(r->channel != -1)
-				//  xml.tag(level, "dest type=\"%d\" channel=\"%d\" name=\"%s\"/", Route::TRACK_ROUTE, r->channel, name().toLatin1().constData());
-				//else
-				//  xml.tag(level, "dest type=\"%d\" name=\"%s\"/", Route::TRACK_ROUTE, name().toLatin1().constData());
-
-				//xml.tag(level, "dest name=\"%s\"/", name().toLatin1().constData());
 				xml.tag(level, "dest name=\"%s\"/", Xml::xmlString(name()).toLatin1().constData());
 
 				xml.etag(level--, "Route");
@@ -832,16 +736,8 @@ void Track::writeRouting(int level, Xml& xml) const
 	const RouteList* rl = &_outRoutes;
 	for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 	{
-		//if(!r->name().isEmpty())
 		if (r->midiPort != -1 || !r->name().isEmpty()) // p3.3.49
 		{
-			///QString src(name());
-			///if (type() == Track::AUDIO_OUTPUT)
-			///{
-			///Route s(src, false, r->channel);
-			///src = s.name();
-			///}
-
 			s = QT_TRANSLATE_NOOP("@default", "Route");
 			if (r->type == Route::MIDI_PORT_ROUTE) // p3.3.50
 			{
@@ -858,54 +754,15 @@ void Track::writeRouting(int level, Xml& xml) const
 			if (r->remoteChannel != -1)
 				s += QString(QT_TRANSLATE_NOOP("@default", " remch=\"%1\"")).arg(r->remoteChannel);
 
-			//xml.tag(level++, "Route");
 			xml.tag(level++, s.toAscii().constData());
 
-			///xml.strTag(level, "srcNode", src);
-			//if(r->channel != -1)
-
-			// Allow for a regular mono or stereo track to feed a multi-channel synti.
-			// thisChannel is the 'starting' channel of this source if feeding a regular track.
-			//if(r->type == Route::TRACK_ROUTE && r->track->isSynti() && r->channel != -1)
-			//if(isSynti() && r->thisChannel != -1)
-			//xml.tag(level, "source type=\"%d\" channel=\"%d\" name=\"%s\"/", Route::TRACK_ROUTE, r->channel, name().toLatin1().constData());
-			//  xml.tag(level, "source type=\"%d\" channel=\"%d\" name=\"%s\"/", Route::TRACK_ROUTE, r->thisChannel, name().toLatin1().constData());
-			//else
-
-			//if(r->channel != -1)
-			//  xml.tag(level, "source type=\"%d\" channel=\"%d\" name=\"%s\"/", Route::TRACK_ROUTE, r->channel, name().toLatin1().constData());
-			//else
-			//  xml.tag(level, "source type=\"%d\" name=\"%s\"/", Route::TRACK_ROUTE, name().toLatin1().constData());
-			//xml.tag(level, "source name=\"%s\"/", name().toLatin1().constData());
 			xml.tag(level, "source name=\"%s\"/", Xml::xmlString(name()).toLatin1().constData());
-
-			///xml.strTag(level, "dstNode", r->name());
-			//if(r->channel != -1)
-			//  xml.tag(level, "dest type=\"%d\" channel=\"%d\" name=\"%s\"/", r->type, r->channel, r->name().toLatin1().constData());
-			//else
-			//  xml.tag(level, "dest type=\"%d\" name=\"%s\"/", r->type, r->name().toLatin1().constData());
-
-			// Allow for a regular mono or stereo track to feed a multi-channel synti.
-			// Channel is the 'starting' channel of the destination.
-			//if(r->type == Route::TRACK_ROUTE && r->track->isSynti() && r->channel != -1)
-
-			//if(r->type == Route::TRACK_ROUTE && r->track->type() == Track::AUDIO_SOFTSYNTH && r->remoteChannel != -1)
-			//  xml.tag(level, "dest type=\"%d\" channel=\"%d\" name=\"%s\"/", r->type, r->remoteChannel, r->name().toLatin1().constData());
-			//else
-			//if(r->type == Route::MIDI_DEVICE_ROUTE)
-			//  xml.tag(level, "dest devtype=\"%d\" name=\"%s\"/", r->device->deviceType(), r->name().toLatin1().constData());
-			//else
-			//  xml.tag(level, "dest type=\"%d\" name=\"%s\"/", r->type, r->name().toLatin1().constData());
 
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 
-			//if(r->type == Route::MIDI_DEVICE_ROUTE)                                      // p3.3.49 Obsolete since 1.1-RC2
-			//  s += QString(QT_TRANSLATE_NOOP("@default", " devtype=\"%1\"")).arg(r->device->deviceType());  //
-			//if(r->type != Route::TRACK_ROUTE)                                            //
 			if (r->type != Route::TRACK_ROUTE && r->type != Route::MIDI_PORT_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
 
-			//s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(r->name());
 			if (r->type == Route::MIDI_PORT_ROUTE) // p3.3.49
 				s += QString(QT_TRANSLATE_NOOP("@default", " mport=\"%1\"/")).arg(r->midiPort);
 			else
@@ -916,13 +773,13 @@ void Track::writeRouting(int level, Xml& xml) const
 			xml.etag(level--, "Route");
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   MidiTrack::write
 //---------------------------------------------------------
 
-void MidiTrack::write(int level, Xml& xml) const
+void MidiTrack::write(int level, Xml& xml) const/*{{{*/
 {
 	const char* tag;
 
@@ -935,9 +792,6 @@ void MidiTrack::write(int level, Xml& xml) const
 
 	xml.intTag(level, "device", outPort());
 	xml.intTag(level, "channel", outChannel());
-	//xml.intTag(level, "inportMap", inPortMask());
-	///xml.uintTag(level, "inportMap", inPortMask());       // Obsolete
-	///xml.intTag(level, "inchannelMap", inChannelMask());  // Obsolete
 	xml.intTag(level, "locked", _locked);
 	xml.intTag(level, "echo", _recEcho);
 
@@ -953,13 +807,13 @@ void MidiTrack::write(int level, Xml& xml) const
 	for (ciPart p = pl->begin(); p != pl->end(); ++p)
 		p->second->write(level, xml);
 	xml.etag(level, tag);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   MidiTrack::read
 //---------------------------------------------------------
 
-void MidiTrack::read(Xml& xml)
+void MidiTrack::read(Xml& xml)/*{{{*/
 {
 	unsigned int portmask = 0;
 	int chanmask = 0;
@@ -988,8 +842,6 @@ void MidiTrack::read(Xml& xml)
 					compression = xml.parseInt();
 				else if (tag == "part")
 				{
-					//Part* p = newPart();
-					//p->read(xml);
 					Part* p = 0;
 					p = readXmlPart(xml, this);
 					if (p)
@@ -1000,13 +852,8 @@ void MidiTrack::read(Xml& xml)
 				else if (tag == "channel")
 					setOutChannel(xml.parseInt());
 				else if (tag == "inportMap")
-					//setInPortMask(xml.parseInt());
-					///setInPortMask(xml.parseUInt());
-					//xml.skip(tag);                      // Obsolete.
 					portmask = xml.parseUInt(); // p3.3.48: Support old files.
 				else if (tag == "inchannelMap")
-					///setInChannelMask(xml.parseInt());
-					//xml.skip(tag);                      // Obsolete.
 					chanmask = xml.parseInt(); // p3.3.48: Support old files.
 				else if (tag == "locked")
 					_locked = xml.parseInt();
@@ -1034,5 +881,66 @@ void MidiTrack::read(Xml& xml)
 				break;
 		}
 	}
+}/*}}}*/
+
+void MidiAssignData::read(Xml& xml, Track* t)
+{
+	enabled = false;
+	port = 0;
+	channel = 0;
+	track = t;
+	midimap.clear();
+	midimap[CTRL_VOLUME] = -1;
+	midimap[CTRL_PANPOT] = -1;
+	midimap[CTRL_REVERB_SEND] = -1;
+	midimap[CTRL_CHORUS_SEND] = -1;
+	midimap[CTRL_VARIATION_SEND] = -1;
+	midimap[CTRL_RECORD] = -1;
+	midimap[CTRL_MUTE] = -1;
+	midimap[CTRL_SOLO] = -1;
+	for (;;)/*{{{*/
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::Attribut:
+			{
+				QString s = xml.s2();
+				if (tag == "port")
+					port = xml.s2().toInt();
+				else if (tag == "channel")
+					channel = xml.s2().toInt();
+				else if(tag == "enabled")
+					enabled = (bool)xml.s2().toInt();
+				else if (tag == "midimap")
+				{
+					QStringList vals = xml.s2().split(" ", QString::SkipEmptyParts);
+					foreach(QString ccpair, vals)
+					{
+						QStringList cclist = ccpair.split(":", QString::SkipEmptyParts);
+						if(cclist.size() == 2)
+						{
+							midimap[cclist[0].toInt()] = cclist[1].toInt();
+						}
+					}
+				}
+			}
+				break;
+			case Xml::TagStart:
+				xml.unknown("MidiAssign");
+				break;
+			case Xml::TagEnd:
+				if (tag == "MidiAssign")
+				{
+					return;
+				}
+			default:
+				break;
+		}
+	}/*}}}*/
 }
 

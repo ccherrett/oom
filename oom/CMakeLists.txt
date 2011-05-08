@@ -61,12 +61,14 @@ QT4_WRAP_CPP ( oom_moc_headers
       miditransform.h 
       plugin.h 
       song.h 
+	  thread.h
       transport.h 
       transpose.h 
       value.h 
       traverso_shared/TConfig.h
 	  cthread.h
 	  cserver.h
+	  midimonitor.h
       )
 
 ##
@@ -139,6 +141,7 @@ file (GLOB core_source_files
       traverso_shared/TConfig.cpp
 	  cthread.cpp
 	  cserver.cpp
+	  midimonitor.cpp
       )
 file (GLOB main_source_files
       main.cpp

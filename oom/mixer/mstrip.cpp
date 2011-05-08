@@ -42,7 +42,7 @@
 #include "icons.h"
 #include "gconfig.h"
 #include "ttoolbutton.h"
-//#include "utils.h"
+#include "widgets/utils.h"
 #include "popupmenu.h"
 
 enum
@@ -1003,7 +1003,7 @@ void MidiStrip::volLabelChanged(double val)
 void MidiStrip::setVolume(double val)
 {
 
-	// printf("Vol %d\n", lrint(val));
+	//printf("MidiStrip::setVolume(%g)\n", midiToDb(lrint(val)));
 	ctrlChanged(CTRL_VOLUME, lrint(val));
 }
 
@@ -1013,7 +1013,7 @@ void MidiStrip::setVolume(double val)
 
 void MidiStrip::setPan(double val)
 {
-
+	//printf("MidiStrip::setPan(%g)\n", midiToDb(lrint(val)));
 	ctrlChanged(CTRL_PANPOT, lrint(val));
 }
 
