@@ -20,6 +20,10 @@
 #include "xml.h"
 #include "plugin.h"
 #include "audiodev.h"
+#include "midictrl.h"
+#include "mididev.h"
+#include "midiport.h"
+#include "midimonitor.h"
 
 // By T356. For caching jack in/out routing names BEFORE file save. 
 // Jack often shuts down during file save, causing the routes to be lost in the file.
@@ -111,7 +115,7 @@ AudioTrack::AudioTrack(TrackType t)
 
 	bufferPos = MAXINT;
 
-	setVolume(1.0);
+	setVolume(1.0, true);
 }
 
 //AudioTrack::AudioTrack(const AudioTrack& t)
@@ -714,7 +718,7 @@ double AudioTrack::volume() const
 //   setVolume
 //---------------------------------------------------------
 
-void AudioTrack::setVolume(double val)
+void AudioTrack::setVolume(double val, bool monitor)
 {
 	iCtrlList cl = _controller.find(AC_VOLUME);
 	if (cl == _controller.end())
@@ -724,6 +728,11 @@ void AudioTrack::setVolume(double val)
 		return;
 	}
 	cl->second->setCurVal(val);
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		midiMonitor->msgSendAudioOutputEvent((Track*)this, CTRL_VOLUME, val);
+	}
 }
 
 //---------------------------------------------------------
@@ -747,7 +756,7 @@ double AudioTrack::pan() const
 //   setPan
 //---------------------------------------------------------
 
-void AudioTrack::setPan(double val)
+void AudioTrack::setPan(double val, bool monitor)
 {
 	iCtrlList cl = _controller.find(AC_PAN);
 	if (cl == _controller.end())
@@ -756,6 +765,11 @@ void AudioTrack::setPan(double val)
 		return;
 	}
 	cl->second->setCurVal(val);
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		midiMonitor->msgSendAudioOutputEvent((Track*)this, CTRL_PANPOT, val);
+	}
 }
 
 //---------------------------------------------------------
@@ -1596,9 +1610,14 @@ void AudioAux::setChannels(int n)
 //    gui part (executed in gui thread)
 //---------------------------------------------------------
 
-bool AudioTrack::setRecordFlag1(bool f, bool /*monitor*/)
+bool AudioTrack::setRecordFlag1(bool f, bool monitor)
 {
 	//TODO: add monitor code
+	if(!monitor)
+	{
+		//Call the monitor here if it was not called from the monitor
+		midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_RECORD, f ? 127 : 0);
+	}
 	if (f == _recordFlag)
 		return true;
 	if (f)

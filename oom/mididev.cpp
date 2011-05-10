@@ -313,12 +313,15 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 
 		//#endif
 
-	}
+		//TODO: Jack in here and call our midimonitor with the data, it can then decide what to do
+		if(midiMonitor->isManagedInputPort(_port))
+		{
+			printf("Calling midimonitor from MidiDevice::recordEvent\n");
+			event.setPort(_port);
+			midiMonitor->msgSendMidiInputEvent(event);
+			return; //If we manage this input port return
+		}
 
-	//TODO: Jack in here and call our midimonitor with the data, it can then decide what to do
-	if(typ == ME_CONTROLLER && midiMonitor->isManagedController(event.dataA()))
-	{
-		printf("Calling midimonitor from MidiDevice::recordEvent\n");
 	}
 
 	//

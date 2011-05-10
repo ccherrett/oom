@@ -19,6 +19,7 @@
 #include "audio.h"
 #include "globaldefs.h"
 #include "route.h"
+#include "midimonitor.h"
 
 unsigned int Track::_soloRefCnt = 0;
 Track* Track::_tmpSoloChainTrack = 0;
@@ -455,6 +456,20 @@ void MidiTrack::init()
 	compression = 100; // percent
 	_recEcho = true;
 	transpose = false;
+
+	m_midiassign.enabled = false;
+	m_midiassign.port = 0;
+	m_midiassign.channel = 0;
+	m_midiassign.track = this;
+	m_midiassign.midimap.clear();
+	m_midiassign.midimap.insert(CTRL_VOLUME, -1);
+	m_midiassign.midimap.insert(CTRL_PANPOT, -1);
+	m_midiassign.midimap.insert(CTRL_REVERB_SEND, -1);
+	m_midiassign.midimap.insert(CTRL_CHORUS_SEND, -1);
+	m_midiassign.midimap.insert(CTRL_VARIATION_SEND, -1);
+	m_midiassign.midimap.insert(CTRL_RECORD, -1);
+	m_midiassign.midimap.insert(CTRL_MUTE, -1);
+	m_midiassign.midimap.insert(CTRL_SOLO, -1);
 }
 
 int MidiTrack::getTransposition()
@@ -607,7 +622,7 @@ bool MidiTrack::setRecordFlag1(bool f, bool monitor)
 	if(!monitor)
 	{
 		//Call the monitor here if it was not called from the monitor
-		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, f ? 127 : 0);
+		midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_RECORD, f ? 127 : 0);
 	}
     return true;
 }

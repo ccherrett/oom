@@ -72,7 +72,6 @@ private:
 	bool _reminder1;
 	bool _reminder2;
 	bool _reminder3;
-	MidiAssignData m_midiassign;
 
 
 protected:
@@ -110,7 +109,10 @@ protected:
 
     bool _locked;
     bool _selected;
-    bool readProperties(Xml& xml, const QString& tag);
+
+	MidiAssignData m_midiassign;
+    
+	bool readProperties(Xml& xml, const QString& tag);
     void writeProperties(int level, Xml& xml) const;
 
 public:
@@ -673,9 +675,9 @@ public:
     }
 
     double volume() const;
-    void setVolume(double val);
+    void setVolume(double val, bool monitor = false);
     double pan() const;
-    void setPan(double val);
+    void setPan(double val, bool monitor = false);
 
     bool prefader() const
     {

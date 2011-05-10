@@ -250,8 +250,8 @@ SynthI::SynthI()
 	_curBankL = 0;
 	_curProgram = 0;
 
-	setVolume(1.0);
-	setPan(0.0);
+	setVolume(1.0, true);
+	setPan(0.0, true);
 }
 
 //---------------------------------------------------------

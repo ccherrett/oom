@@ -24,6 +24,10 @@
 #include "utils.h"      //debug
 #include "ticksynth.h"  // metronome
 #include "al/dsp.h"
+#include "midictrl.h"
+#include "mididev.h"
+#include "midiport.h"
+#include "midimonitor.h"
 
 // Uncomment this (and make sure to set Jack buffer size high like 2048) 
 //  to see process flow messages.
@@ -79,7 +83,7 @@ void MidiTrack::setSolo(bool val, bool monitor)
 	if(!monitor)
 	{
 		//Call the monitor here if it was not called from the monitor
-		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, val ? 127 : 0);
+		midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, val ? 127 : 0);
 	}
 }
 
@@ -97,7 +101,7 @@ void AudioTrack::setSolo(bool val, bool monitor)
 	if(!monitor)
 	{
 		//Call the monitor here if it was not called from the monitor
-		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, val ? 127 : 0);
+		midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, val ? 127 : 0);
 	}
 	if (isMute())
 		resetMeter();
@@ -295,7 +299,7 @@ void Track::setMute(bool val, bool monitor)
 	if(!monitor)
 	{//call the monitor with the update if it was not called from the monitor
 		//Call the monitor here if it was not called from the monitor
-		//midimonitor->msgSendMidiOutputEvent(track, CTRL_MUTE, val ? 127 : 0);
+		midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_MUTE, val ? 127 : 0);
 	}
 }
 
@@ -1147,7 +1151,7 @@ void AudioTrack::readVolume(Xml& xml)
 				xml.unknown("readVolume");
 				break;
 			case Xml::Text:
-				setVolume(xml.s1().toDouble());
+				setVolume(xml.s1().toDouble(), true);
 				break;
 			case Xml::Attribut:
 				if (xml.s1() == "ch")
@@ -1448,7 +1452,7 @@ void AudioTrack::setRecordFlag2(bool f, bool monitor)
 	if(!monitor)
 	{
 		//Call the monitor here if it was not called from the monitor
-		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, f ? 127 : 0);
+		midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_RECORD, f ? 127 : 0);
 	}
 	if (f == _recordFlag)
 		return;
@@ -1469,7 +1473,7 @@ void AudioTrack::setMute(bool f, bool monitor)
 	if(!monitor)
 	{
 		//Call the monitor here if it was not called from the monitor
-		//midimonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, f ? 127 : 0);
+		midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_MUTE, f ? 127 : 0);
 	}
 }
 

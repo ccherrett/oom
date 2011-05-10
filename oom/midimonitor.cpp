@@ -129,7 +129,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 	switch(type)
 	{
 		case MONITOR_AUDIO_OUT:	//Used to process outgoing midi from audio tracks
-			printf("MidiMonitor::processMsg1() Audio Output\n");
+			//printf("MidiMonitor::processMsg1() Audio Output\n");
 			if(msg->track && isAssigned(msg->track->name()))/*{{{*/
 			{
 				MidiAssignData* data = m_assignments.value(msg->track->name());
@@ -143,7 +143,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 					val = trackPanToMidi(msg->aval);//, midiToTrackPan(trackPanToMidi(val)));
 				else
 					val = dbToMidi(trackVolToDb(msg->aval));
-				printf("Sending midivalue from audio track: %d\n", val);
+				//printf("Sending midivalue from audio track: %d\n", val);
 				//TODO: Check if feedback is required before bothering with this
 				MidiPlayEvent ev(0, data->port, data->channel, ME_CONTROLLER, ccval, val);
 				midiPorts[ev.port()].device()->putEvent(ev);
@@ -152,8 +152,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 		break;
 		case MONITOR_MIDI_IN:	//Used to process incomming midi going to midi tracks/controllers
 		{/*{{{*/
-			printf("MidiMonitor::processMsg1() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",
-				msg->mevent.type(), msg->mevent.port(), msg->mevent.channel(), msg->mevent.dataA(), msg->mevent.dataB());
+			//printf("MidiMonitor::processMsg1() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",
+			//	msg->mevent.type(), msg->mevent.port(), msg->mevent.channel(), msg->mevent.dataA(), msg->mevent.dataB());
 			if(isManagedInputPort(msg->mevent.port()))
 			{
 				//printf("MidiMonitor::processMsg1() Processing Midi Input\n");
@@ -181,7 +181,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										cmd.append(QString::number(ctl)).append(":");
 										cmd.append(QString::number(msg->mevent.dataB())).append("$$");
 										QByteArray ba(cmd.toUtf8().constData());
-										printf("ByteArray size in MidiMonitor: %d\n", ba.size());
+										//printf("ByteArray size in MidiMonitor: %d\n", ba.size());
 										write(sigFd, ba.constData(), 16);
 									}
 									else
@@ -203,7 +203,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										cmd.append(QString::number(ctl)).append(":");
 										cmd.append(QString::number(msg->mevent.dataB())).append("$$");
 										QByteArray ba(cmd.toUtf8().constData());
-										printf("ByteArray size in MidiMonitor: %d\n", ba.size());
+										//printf("ByteArray size in MidiMonitor: %d\n", ba.size());
 										write(sigFd, ba.constData(), 16);
 									}
 									else
@@ -214,14 +214,14 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 								}
 								break;
 								case CTRL_RECORD:
-									song->setRecordFlag(data->track, msg->mevent.dataB() ? true : false, true);
+									song->setRecordFlag(data->track, !data->track->recordFlag(), true);
 								break;
 								case CTRL_MUTE:
-									data->track->setMute(msg->mevent.dataB() ? true : false, true);
+									data->track->setMute(!data->track->isMute(), true);//msg->mevent.dataB() ? true : false, true);
 									song->update(SC_MUTE);
 								break;
 								case CTRL_SOLO:
-									data->track->setSolo(msg->mevent.dataB() ? true : false, true);
+									data->track->setSolo(!data->track->solo(), true);//msg->mevent.dataB() ? true : false, true);
 									song->update(SC_SOLO);
 								break;
 								case CTRL_REVERB_SEND:
@@ -238,7 +238,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										cmd.append(QString::number(ctl)).append(":");
 										cmd.append(QString::number(msg->mevent.dataB())).append("$$");
 										QByteArray ba(cmd.toUtf8().constData());
-										printf("ByteArray size in MidiMonitor: %d\n", ba.size());
+										//printf("ByteArray size in MidiMonitor: %d\n", ba.size());
 										write(sigFd, ba.constData(), 16);
 									}
 								}
@@ -252,7 +252,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 		}/*}}}*/
 		break;
 		case MONITOR_MIDI_OUT:	//Used to process outgoing midi from midi tracks
-			printf("MidiMonitor::processMsg1() Midi Output\n");
+			//printf("MidiMonitor::processMsg1() Midi Output\n");
 			if(msg->track && isAssigned(msg->track->name()))/*{{{*/
 			{
 				MidiAssignData* data = m_assignments.value(msg->track->name());
@@ -261,7 +261,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 				int ccval = data->midimap.value(msg->ctl);
 				if(ccval < 0)
 					return;
-				printf("Sending midivalue from audio track: %d\n", msg->mval);
+				//printf("Sending midivalue from audio track: %d\n", msg->mval);
 				//TODO: Check if feedback is required before bothering with this
 				MidiPlayEvent ev(0, data->port, data->channel, ME_CONTROLLER, ccval, msg->mval);
 				midiPorts[ev.port()].device()->putEvent(ev);

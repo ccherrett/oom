@@ -1885,14 +1885,17 @@ void Song::setRecordFlag(Track* track, bool val, bool monitor)
 	if (track->type() == Track::WAVE)
 	{
 		WaveTrack* audioTrack = (WaveTrack*) track;
-		if (!audioTrack->setRecordFlag1(val))
+		if (!audioTrack->setRecordFlag1(val, monitor))
+		{
+			printf("AudioTrack returns false on set record flag");
 			return;
+		}
 		audio->msgSetRecord(audioTrack, val);
 	}
 	else
 	{
-		track->setRecordFlag1(val);
-		track->setRecordFlag2(val);
+		track->setRecordFlag1(val, monitor);
+		track->setRecordFlag2(val, monitor);
 	}
 	//      updateFlags |= SC_RECFLAG;
 	update(SC_RECFLAG|SC_VIEW_CHANGED);

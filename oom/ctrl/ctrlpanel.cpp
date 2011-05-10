@@ -38,6 +38,7 @@
 #include "doublelabel.h"
 #include "midi.h"
 #include "audio.h"
+#include "midimonitor.h"
 
 //---------------------------------------------------------
 //   CtrlPanel
@@ -302,12 +303,14 @@ void CtrlPanel::labelDoubleClicked()
 				//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, kiv);
 				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, kiv);
 				audio->msgPlayMidiEvent(&ev);
+				midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, kiv);
 			}
 			else
 			{
 				//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, lastv);
 				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, lastv);
 				audio->msgPlayMidiEvent(&ev);
+				midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, lastv);
 			}
 		}
 		else
@@ -377,6 +380,7 @@ void CtrlPanel::ctrlChanged(double val)
 		//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, ival);
 		MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, ival);
 		audio->msgPlayMidiEvent(&ev);
+		midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, ival);
 	}
 	song->update(SC_MIDI_CONTROLLER);
 }

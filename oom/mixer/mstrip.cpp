@@ -44,6 +44,7 @@
 #include "ttoolbutton.h"
 #include "widgets/utils.h"
 #include "popupmenu.h"
+#include "midimonitor.h"
 
 enum
 {
@@ -980,6 +981,7 @@ void MidiStrip::ctrlChanged(int num, int val)
 		MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, num, val);
 
 		audio->msgPlayMidiEvent(&ev);
+		midiMonitor->msgSendMidiOutputEvent((Track*)track, num, val);
 	}
 	song->update(SC_MIDI_CONTROLLER);
 }
