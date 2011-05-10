@@ -274,7 +274,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			if(msg->track && isAssigned(msg->track->name()))/*{{{*/
 			{
 				MidiAssignData* data = m_assignments.value(msg->track->name());
-				if(!isManagedController(msg->ctl) || !data->enabled)
+				if(!isManagedController(msg->ctl) || !data->enabled || data->midimap.isEmpty())
 					return;
 				int ccval = data->midimap.value(msg->ctl);
 				if(ccval < 0)
