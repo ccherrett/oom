@@ -45,6 +45,7 @@
 #include <sys/wait.h>
 #include "trackview.h"
 #include "mpevent.h"
+#include "midimonitor.h"
 
 extern void clearMidiTransforms();
 extern void clearMidiInputTransforms();
@@ -249,6 +250,8 @@ Track* Song::addNewTrack(QAction* action)
 			return 0;
 
 		Track* t = addTrack((Track::TrackType)n);
+		if(t)
+			midiMonitor->msgAddMonitoredTrack(t);
 		deselectTracks();
 		t->setSelected(true);
 		updateTrackViews1();
@@ -3971,6 +3974,7 @@ void Song::removeTrack1(Track* track)
 void Song::removeTrack2(Track* track)
 {
 	//printf("Song::removeTrack2 track:%s\n", track->name().toLatin1().constData());  // p3.3.50
+	midiMonitor->msgDeleteMonitoredTrack(track);
 
 	switch (track->type())
 	{
@@ -4029,37 +4033,6 @@ void Song::removeTrack2(Track* track)
 	updateTrackViews1();
 
 
-	/*
-	if (track->isMidiTrack())
-		  return;
-	//
-	//  remove routes
-	//
-
-	AudioTrack* at = (AudioTrack*)track;
-	Route src(at, -1);
-	if (at->type() == Track::AUDIO_OUTPUT) {
-		  const RouteList* rl = at->inRoutes();
-		  for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-				r->track->outRoutes()->removeRoute(src);
-		  }
-	else if (at->type() == Track::AUDIO_INPUT) {
-		  const RouteList* rl = at->outRoutes();
-		  for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-				r->track->inRoutes()->removeRoute(src);
-		  }
-	else {
-		  const RouteList* rl = at->inRoutes();
-		  for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-				r->track->outRoutes()->removeRoute(src);
-		  rl = at->outRoutes();
-		  for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-				r->track->inRoutes()->removeRoute(src);
-		  }
-	 */
-
-	// p3.3.38
-
 	//
 	//  remove routes
 	//
@@ -4069,10 +4042,6 @@ void Song::removeTrack2(Track* track)
 		const RouteList* rl = track->inRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//if(r->track == track)
-			//  r->track->outRoutes()->removeRoute(*r);
-			//printf("Song::removeTrack2 %s audio out track:%s\n", track->name().toLatin1().constData(), r->track->name().toLatin1().constData());  // p3.3.50
-			// p3.3.50
 			Route src(track, r->channel, r->channels);
 			src.remoteChannel = r->remoteChannel;
 			r->track->outRoutes()->removeRoute(src);
@@ -4083,10 +4052,6 @@ void Song::removeTrack2(Track* track)
 		const RouteList* rl = track->outRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//if(r->track == track)
-			//  r->track->inRoutes()->removeRoute(*r);
-			//printf("Song::removeTrack2 %s audio in track:%s\n", track->name().toLatin1().constData(), r->track->name().toLatin1().constData());  // p3.3.50
-			// p3.3.50
 			Route src(track, r->channel, r->channels);
 			src.remoteChannel = r->remoteChannel;
 			r->track->inRoutes()->removeRoute(src);

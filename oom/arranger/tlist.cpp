@@ -47,6 +47,7 @@
 #include "synth.h"
 #include "config.h"
 #include "menulist.h"
+#include "midimonitor.h"
 
 #ifdef DSSI_SUPPORT
 #include "dssihost.h"
@@ -1042,6 +1043,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 
 					if (t)
 					{
+						midiMonitor->msgAddMonitoredTrack(t);
 						song->deselectTracks();
 						t->setSelected(true);
 

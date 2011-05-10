@@ -442,7 +442,7 @@ void AudioStrip::volumeChanged(double val)
 	audio->msgSetVolume((AudioTrack*) track, vol);
 	((AudioTrack*) track)->recordAutomation(AC_VOLUME, vol);
 	//double vv = (vol + 60)/0.5546875;
-	printf("AudioStrip::volumeChanged(%g) - val: %g - midiNum: %d whacky: %d\n", vol, dbToTrackVol(val), dbToMidi(val), dbToMidi(trackVolToDb(vol)));
+	//printf("AudioStrip::volumeChanged(%g) - val: %g - midiNum: %d whacky: %d\n", vol, dbToTrackVol(val), dbToMidi(val), dbToMidi(trackVolToDb(vol)));
 }
 
 //---------------------------------------------------------
@@ -527,7 +527,7 @@ void AudioStrip::panChanged(double val)
 	panVal = val;
 	audio->msgSetPan(((AudioTrack*) track), val);
 	((AudioTrack*) track)->recordAutomation(AC_PAN, val);
-	printf("AudioStrip::panChanged(%d) midiToTrackPan(%g)\n", trackPanToMidi(val), midiToTrackPan(trackPanToMidi(val)));
+	//printf("AudioStrip::panChanged(%d) midiToTrackPan(%g)\n", trackPanToMidi(val), midiToTrackPan(trackPanToMidi(val)));
 }
 
 //---------------------------------------------------------

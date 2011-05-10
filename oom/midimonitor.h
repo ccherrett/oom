@@ -55,6 +55,8 @@ class MidiMonitor : public Thread
     int sigFd; // pipe fd for messages to gui
 
 	virtual void processMsg1(const void*);
+	void addMonitoredTrack(Track*);
+	void deleteMonitoredTrack(Track*);
 
 public:
 	MidiMonitor(const char* name);
@@ -67,6 +69,8 @@ public:
 	void msgSendAudioOutputEvent(Track*, int ctl, double val);
 	void msgModifyTrackController(Track*, int ctl, int cc);
 	void msgModifyTrackPort(Track*, int port);
+	void msgAddMonitoredTrack(Track*);
+	void msgDeleteMonitoredTrack(Track*);
 
 	bool isAssigned(QString track)
 	{

@@ -44,6 +44,7 @@
 #include "arranger.h"
 #include "tlist.h"
 #include "utils.h"
+#include "midimonitor.h"
 
 // Moved into global config by Tim.
 /* 
@@ -716,6 +717,8 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 			WaveTrack* dt = (WaveTrack*) newTrack;
 			dt->setChannels(st->channels());
 		}
+		if(newTrack)
+			midiMonitor->msgAddMonitoredTrack(newTrack);
 		emit tracklistChanged();
 	}
 	Track* dtrack = tracks->index(ntrack);

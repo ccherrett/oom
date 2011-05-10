@@ -28,6 +28,7 @@
 MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 {
 	setupUi(this);
+	m_lasttype = 0;
 	m_midicontrols = (QStringList() << "Volume" << "Pan" << "Chor" << "Rev" << "Var" << "Rec" << "Mute" << "Solo");
 	m_allowed << CTRL_VOLUME << CTRL_PANPOT << CTRL_REVERB_SEND << CTRL_CHORUS_SEND << CTRL_VARIATION_SEND << CTRL_RECORD << CTRL_MUTE << CTRL_SOLO ;
 	m_model = new QStandardItemModel(0, 11, this);
@@ -48,7 +49,7 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	connect(btnClose, SIGNAL(clicked(bool)), SLOT(btnCloseClicked()));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), SLOT(itemChanged(QStandardItem*)));
 	//updateTableHeader();
-	cmbTypeSelected(0);
+	cmbTypeSelected(m_lasttype);
 }
 void MidiAssignDialog::btnCloseClicked()
 {
@@ -119,6 +120,7 @@ void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 	//We need to repopulate and filter the allTrackList
 	//"Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Soft_Synth"
 	//m_model->blockSignals(true);
+	m_lasttype = type;
 	QString defaultname;
 	defaultname.sprintf("%d:%s", 1, midiPorts[0].portname().toLatin1().constData());
 	m_model->clear();
@@ -217,3 +219,7 @@ void MidiAssignDialog::updateTableHeader()/*{{{*/
 	tableView->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/
 
+void MidiAssignDialog::showEvent(QShowEvent*)
+{
+	cmbTypeSelected(m_lasttype);
+}

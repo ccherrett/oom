@@ -20,6 +20,7 @@ class QStandardItem;
 class QStandardItemModel;
 class MidiPort;
 class QString;
+class QShowEvent;
 
 
 class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
@@ -30,6 +31,7 @@ class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 	QStringList m_midicontrols;
 	QStringList _trackTypes;
 	QList<int> m_allowed;
+	int m_lasttype;
 
 public:
 	MidiAssignDialog(QWidget* parent = 0);
@@ -41,5 +43,8 @@ private slots:
 	void updateTableHeader();
 	void btnCloseClicked();
 	void itemChanged(QStandardItem*);
+
+protected:
+	virtual void showEvent(QShowEvent*);
 };
 #endif
