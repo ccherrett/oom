@@ -354,7 +354,7 @@ void MidiJackDevice::recordEvent(MidiRecordEvent& event)
 		}
 			
 		//TODO: Jack in here and call our midimonitor with the data, it can then decide what to do
-		printf("MidiJackDevice::recordEvent _port:%d, event.port():%d\n",_port, event.port());
+		//printf("MidiJackDevice::recordEvent _port:%d, event.port():%d\n",_port, event.port());
 		if(midiMonitor->isManagedInputPort(_port))
 		{
 			//MidiRecordEvent ev(event);

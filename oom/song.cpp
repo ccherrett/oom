@@ -2424,11 +2424,11 @@ void Song::playMonitorEvent(int fd)
 	QStringList raw = str.split("$$");
 	str = raw.at(0);
 	QStringList cmds = str.split(":", QString::SkipEmptyParts);
-	printf("playMonitorEvent to gui:<%s>\n", str.toUtf8().constData());
+	//printf("playMonitorEvent to gui:<%s>\n", str.toUtf8().constData());
 	if(cmds.size() == 4)
 	{
 		MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
-		printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
+		//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
 		//audio->msgPlayMidiEvent(&ev);
 		midiPorts[ev.port()].sendEvent(ev);
 	

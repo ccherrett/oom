@@ -316,7 +316,7 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 		//TODO: Jack in here and call our midimonitor with the data, it can then decide what to do
 		if(midiMonitor->isManagedInputPort(_port))
 		{
-			printf("Calling midimonitor from MidiDevice::recordEvent\n");
+			//printf("Calling midimonitor from MidiDevice::recordEvent\n");
 			event.setPort(_port);
 			midiMonitor->msgSendMidiInputEvent(event);
 			return; //If we manage this input port return
