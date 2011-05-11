@@ -20,7 +20,8 @@ enum {
 	MONITOR_MODIFY_CC,
 	MONITOR_MODIFY_PORT,
 	MONITOR_ADD_TRACK,
-	MONITOR_DEL_TRACK
+	MONITOR_DEL_TRACK,
+	MONITOR_TOGGLE_FEEDBACK
 };
 
 //This container holds all the types that can be handled
@@ -45,6 +46,7 @@ class MidiMonitor : public Thread
 	//This is so we dont try to processing read/write on the containers
 	//QHash/QList at the same time from different threads
 	bool m_editing; 
+	bool m_feedback;
 
 	QMultiHash<int, QString> m_inputports;
 	QMultiHash<int, QString> m_outputports;
@@ -71,6 +73,7 @@ public:
 	void msgModifyTrackPort(Track*, int port);
 	void msgAddMonitoredTrack(Track*);
 	void msgDeleteMonitoredTrack(Track*);
+	void msgToggleFeedback(bool);
 
 	bool isAssigned(QString track)
 	{

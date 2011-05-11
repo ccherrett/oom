@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
-    <height>492</height>
+    <width>828</width>
+    <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>OOMidi: Midi Ports Manager</string>
   </property>
-  <layout class="QGridLayout">
-   <item row="0" column="0" colspan="2">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <widget class="QGroupBox" name="groupBox10">
      <property name="title">
       <string>Midi connections</string>
@@ -78,9 +78,33 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>SynthConfigBase</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>413</x>
+     <y>693</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>413</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

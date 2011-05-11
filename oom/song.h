@@ -601,6 +601,7 @@ public slots:
 	void updateTrackViews(QAction*);
 	void updateTrackViews1();
 	void closeJackBox();
+	void toggleFeedback(bool);
 
 signals:
 	void replayChanged(bool, unsigned);

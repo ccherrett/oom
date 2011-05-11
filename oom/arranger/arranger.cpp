@@ -140,6 +140,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	toolbar2->setObjectName("tbSnap");
 	toolbar2->setMovable(false);
 	toolbar2->setFloatable(false);
+	toolbar2->setFixedHeight(24);
 
 
 	_rtabs = new QTabWidget(oom->resourceDock());
@@ -162,6 +163,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	QToolButton* preloadCtrl  = new QToolButton();
 	preloadCtrl->setText(QString("PC"));
 	toolbar2->addWidget(preloadCtrl);
+	toolbar2->addAction(feedbackAction);
 	connect(preloadCtrl, SIGNAL(clicked()), SLOT(preloadControllers()));
 	const char* rastval[] = {
 		QT_TRANSLATE_NOOP("@default", "Off"), QT_TRANSLATE_NOOP("@default", "Bar"), "1/2", "1/4", "1/8", "1/16"

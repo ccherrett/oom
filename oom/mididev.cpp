@@ -82,6 +82,7 @@ void MidiDevice::init()
 //---------------------------------------------------------
 
 MidiDevice::MidiDevice()
+: m_feedback(false)
 {
 	///_recBufFlipped = false;
 	//_tmpRecordCount = 0;
@@ -96,7 +97,7 @@ MidiDevice::MidiDevice()
 }
 
 MidiDevice::MidiDevice(const QString& n)
-: _name(n)
+: _name(n),m_feedback(false)
 {
 	///_recBufFlipped = false;
 	//_tmpRecordCount = 0;
@@ -317,9 +318,12 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 		if(typ == ME_CONTROLLER && midiMonitor->isManagedInputPort(_port))
 		{
 			//printf("Calling midimonitor from MidiDevice::recordEvent\n");
-			event.setPort(_port);
-			midiMonitor->msgSendMidiInputEvent(event);
-			return; //If we manage this input port return
+			MidiRecordEvent ev(event);
+			ev.setPort(_port);
+			midiMonitor->msgSendMidiInputEvent(ev);
+			//FIXME: We need a way to tell if any track/part is expecting this event so we dont double up events going
+			//to a controller lanes.
+			//return; //If we manage this input port return
 		}
 
 	}

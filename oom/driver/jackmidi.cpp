@@ -358,9 +358,12 @@ void MidiJackDevice::recordEvent(MidiRecordEvent& event)
 		if(typ == ME_CONTROLLER && midiMonitor->isManagedInputPort(_port))
 		{
 			//MidiRecordEvent ev(event);
-			event.setPort(_port);
-			midiMonitor->msgSendMidiInputEvent(event);
-			return; //If we manage this input port return
+			MidiRecordEvent ev(event);
+			ev.setPort(_port);
+			midiMonitor->msgSendMidiInputEvent(ev);
+			//FIXME: We need a way to tell if any track/part is expecting this event so we dont double up events going
+			//to a controller lanes.
+			//return; //If we manage this input port return
 		}
 	}
 

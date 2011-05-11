@@ -138,6 +138,15 @@ void MidiMonitor::msgDeleteMonitoredTrack(Track* track)/*{{{*/
 	sendMsg1(&msg, sizeof (msg));
 }/*}}}*/
 
+void MidiMonitor::msgToggleFeedback(bool f)/*{{{*/
+{
+	MonitorMsg msg;
+	msg.id = MONITOR_TOGGLE_FEEDBACK;
+	msg.mval = (int)f;
+	
+	sendMsg1(&msg, sizeof (msg));
+}/*}}}*/
+
 void MidiMonitor::processMsg1(const void* m)/*{{{*/
 {
 	if(m_editing)
@@ -148,10 +157,12 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 	{
 		case MONITOR_AUDIO_OUT:	//Used to process outgoing midi from audio tracks
 			//printf("MidiMonitor::processMsg1() Audio Output\n");
+			if(!m_feedback)
+				return;
 			if(msg->track && isAssigned(msg->track->name()))/*{{{*/
 			{
 				MidiAssignData* data = m_assignments.value(msg->track->name());
-				if(!isManagedController(msg->ctl) || !data->enabled)
+				if(!isManagedController(msg->ctl) || !data->enabled || data->midimap.isEmpty())
 					return;
 				int ccval = data->midimap.value(msg->ctl);
 				if(ccval < 0)
@@ -271,6 +282,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 		break;
 		case MONITOR_MIDI_OUT:	//Used to process outgoing midi from midi tracks
 			//printf("MidiMonitor::processMsg1() Midi Output\n");
+			if(!m_feedback)
+				return;
 			if(msg->track && isAssigned(msg->track->name()))/*{{{*/
 			{
 				MidiAssignData* data = m_assignments.value(msg->track->name());
@@ -326,6 +339,11 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			m_editing = true;
 			deleteMonitoredTrack(msg->track);
 			m_editing = false;
+		}
+		break;
+		case MONITOR_TOGGLE_FEEDBACK:
+		{
+			m_feedback = (bool)msg->mval;
 		}
 		break;
 		default:

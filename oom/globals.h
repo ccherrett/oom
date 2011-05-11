@@ -141,6 +141,7 @@ extern QAction* punchinAction;
 extern QAction* punchoutAction;
 extern QAction* recordAction;
 extern QAction* panicAction;
+extern QAction* feedbackAction;
 
 //class AudioMixerApp;
 class OOMidi;

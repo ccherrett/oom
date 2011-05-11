@@ -249,6 +249,7 @@ SynthI::SynthI()
 	_curBankH = 0;
 	_curBankL = 0;
 	_curProgram = 0;
+	m_feedback = false;
 
 	setVolume(1.0, true);
 	setPan(0.0, true);

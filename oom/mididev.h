@@ -52,6 +52,7 @@ protected:
     //int _sysexReadChunk;
     //bool _sysexWritingChunks;
     bool _sysexReadingChunks;
+	bool m_feedback;
 
     // Recording fifo.
     //MidiFifo _recordFifo;
@@ -231,6 +232,14 @@ public:
         _nextPlayEvent = i;
     }
     bool sendNullRPNParams(int, bool);
+	virtual bool isFeedbackEnabled()
+	{
+		return _writeEnable && m_feedback;
+	}
+	virtual void setFeedback(bool f)
+	{
+		m_feedback = f;
+	}
 };
 
 //---------------------------------------------------------

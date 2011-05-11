@@ -4372,3 +4372,8 @@ void Song::setTrackHeights(TrackList &list, int height)
 
         song->update(SC_TRACK_MODIFIED);
 }
+
+void Song::toggleFeedback(bool f)
+{	
+	midiMonitor->msgToggleFeedback(f);
+}

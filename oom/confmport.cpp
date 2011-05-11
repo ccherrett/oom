@@ -42,11 +42,9 @@ extern std::vector<Synth*> synthis;
 
 enum
 {
-	DEVCOL_NO = 0, DEVCOL_GUI, DEVCOL_REC, DEVCOL_PLAY, DEVCOL_INSTR, DEVCOL_NAME,
-	//DEVCOL_STATE };
-	//DEVCOL_ROUTES, DEVCOL_STATE };
-	//DEVCOL_INROUTES, DEVCOL_OUTROUTES, DEVCOL_STATE };  // p3.3.55
+	DEVCOL_NO = 0, DEVCOL_GUI, DEVCOL_FEEDBACK, DEVCOL_REC, DEVCOL_PLAY, DEVCOL_INSTR, DEVCOL_NAME,
 	DEVCOL_INROUTES, DEVCOL_OUTROUTES, DEVCOL_DEF_IN_CHANS, DEVCOL_DEF_OUT_CHANS, DEVCOL_STATE
+	
 };
 
 //---------------------------------------------------------
@@ -160,6 +158,16 @@ void MPConfig::rbClicked(QTableWidgetItem* item)
 				port->instrument()->showGui(!port->guiVisible());
 				item->setIcon(port->guiVisible() ? QIcon(*dotIcon) : QIcon(*dothIcon));
 			}
+			//break;
+			return;
+
+		case DEVCOL_FEEDBACK:
+			if (!dev)
+				return;
+			dev->setFeedback(!dev->isFeedbackEnabled());
+			//midiSeq->msgSetMidiDevice(port, dev); // reopen device
+			item->setIcon(dev->isFeedbackEnabled() ? QIcon(*dotIcon) : QIcon(*dothIcon));
+
 			//break;
 			return;
 
@@ -686,6 +694,8 @@ void MPConfig::setToolTip(QTableWidgetItem *item, int col)
 			break;
 		case DEVCOL_GUI: item->setToolTip(tr("Enable gui"));
 			break;
+		case DEVCOL_FEEDBACK: item->setToolTip(tr("Enable feedback"));
+			break;
 		case DEVCOL_REC: item->setToolTip(tr("Enable reading"));
 			break;
 		case DEVCOL_PLAY: item->setToolTip(tr("Enable writing"));
@@ -799,6 +809,7 @@ MPConfig::MPConfig(QWidget* parent)
 	QStringList columnnames;
 	columnnames << tr("Port")
 			<< tr("GUI")
+			<< tr("F")
 			<< tr("I")
 			<< tr("O")
 			<< tr("Instr")
@@ -819,6 +830,7 @@ MPConfig::MPConfig(QWidget* parent)
 	mdevView->setFocusPolicy(Qt::NoFocus);
 	//mdevView->horizontalHeader()->setMinimumSectionSize(60);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_NO, 50);
+	mdevView->horizontalHeader()->resizeSection(DEVCOL_FEEDBACK, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_REC, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_PLAY, 20);
 	mdevView->horizontalHeader()->resizeSection(DEVCOL_GUI, 40);
@@ -866,6 +878,10 @@ MPConfig::MPConfig(QWidget* parent)
 		addItem(i, DEVCOL_GUI, itemgui, mdevView);
 		itemgui->setTextAlignment(Qt::AlignHCenter);
 		itemgui->setFlags(Qt::ItemIsEnabled);
+		QTableWidgetItem* itemfb = new QTableWidgetItem;
+		addItem(i, DEVCOL_FEEDBACK, itemfb, mdevView);
+		itemfb->setTextAlignment(Qt::AlignHCenter);
+		itemfb->setFlags(Qt::ItemIsEnabled);
 		QTableWidgetItem* itemrec = new QTableWidgetItem;
 		addItem(i, DEVCOL_REC, itemrec, mdevView);
 		itemrec->setTextAlignment(Qt::AlignHCenter);
@@ -944,6 +960,7 @@ void MPConfig::songChanged(int flags)
 		iteminstr->setToolTip(instrumentName);
 		QTableWidgetItem* itemname = mdevView->item(i, DEVCOL_NAME);
 		QTableWidgetItem* itemgui = mdevView->item(i, DEVCOL_GUI);
+		QTableWidgetItem* itemfb = mdevView->item(i, DEVCOL_FEEDBACK);
 		QTableWidgetItem* itemrec = mdevView->item(i, DEVCOL_REC);
 		QTableWidgetItem* itemplay = mdevView->item(i, DEVCOL_PLAY);
 		QTableWidgetItem* itemout = mdevView->item(i, DEVCOL_OUTROUTES);
@@ -966,13 +983,21 @@ void MPConfig::songChanged(int flags)
 				itemname->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
 
 			if (dev->rwFlags() & 0x2)
+			{
 				itemrec->setIcon(dev->openFlags() & 2 ? QIcon(*dotIcon) : QIcon(*dothIcon));
+			}
 			else
+			{
 				itemrec->setIcon(QIcon(QPixmap()));
+			}
+
 			if (dev->rwFlags() & 0x1)
+			{
 				itemplay->setIcon(dev->openFlags() & 1 ? QIcon(*dotIcon) : QIcon(*dothIcon));
+			}
 			else
 				itemplay->setIcon(QIcon(QPixmap()));
+			itemfb->setIcon(dev->isFeedbackEnabled() ? QIcon(*dotIcon) : QIcon(*dothIcon));
 		}
 		else
 		{
