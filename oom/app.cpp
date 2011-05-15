@@ -275,6 +275,8 @@ bool OOMidi::seqStart()
 	//  printf("OOMidi: WARNING: Midi realtime priority %d is the same as audio realtime priority %d. Try a different setting.\n",
 	//         midiprio, realTimePriority);
 
+	//Starting midiMonitor
+	printf("Starting midiMonitor\n");
 	midiMonitor->start(monitorprio);
 
 	audioPrefetch->start(pfprio);
@@ -327,6 +329,7 @@ void OOMidi::seqStop()
 	song->setStop(true);
 	song->setStopPlay(false);
 	//Stop the midiMonitor before the sequencer
+	printf("Stoping midiMonitor\n");
 	midiMonitor->stop(true);
 	midiSeq->stop(true);
 	audio->stop(true);
