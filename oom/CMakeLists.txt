@@ -69,6 +69,7 @@ QT4_WRAP_CPP ( oom_moc_headers
 	  cthread.h
 	  cserver.h
 	  midimonitor.h
+	  ccinfo.h
       )
 
 ##
@@ -142,6 +143,7 @@ file (GLOB core_source_files
 	  cthread.cpp
 	  cserver.cpp
 	  midimonitor.cpp
+	  ccinfo.cpp
       )
 file (GLOB main_source_files
       main.cpp

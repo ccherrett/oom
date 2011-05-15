@@ -12,16 +12,19 @@
 class Track;
 class MidiAssignData;
 class QString;
+class CCInfo;
 
 enum { 
 	MONITOR_AUDIO_OUT,	//Used to process outgoing midi from audio tracks
 	MONITOR_MIDI_IN,	//Used to process incomming midi going to midi tracks/controllers
 	MONITOR_MIDI_OUT,	//Used to process outgoing midi from midi tracks
 	MONITOR_MODIFY_CC,
+	MONITOR_DEL_CC,
 	MONITOR_MODIFY_PORT,
 	MONITOR_ADD_TRACK,
 	MONITOR_DEL_TRACK,
-	MONITOR_TOGGLE_FEEDBACK
+	MONITOR_TOGGLE_FEEDBACK,
+	MONITOR_LEARN
 };
 
 //This container holds all the types that can be handled
@@ -36,6 +39,7 @@ struct MonitorMsg : public ThreadMsg
 	MidiAssignData* data;
 	MEvent mevent;
 	unsigned pos; //song position at time of the event
+	CCInfo* info;
 };
 
 class MidiMonitor : public Thread 
@@ -47,13 +51,18 @@ class MidiMonitor : public Thread
 	//QHash/QList at the same time from different threads
 	bool m_editing; 
 	bool m_feedback;
+	bool m_learning;
+	int m_learnport;
 
 	QMultiHash<int, QString> m_inputports;
 	QMultiHash<int, QString> m_outputports;
 	//Contains 0 - 127 with a list of tracks listening to this cc
 	QMultiHash<int, QString> m_portccmap; 
 	QHash<QString, MidiAssignData*> m_assignments; //list of managed assignments
-    int fromThreadFdw, fromThreadFdr; // message pipe
+	//Holds CCInfo/CC map for fast lookups at run time
+	QMultiHash<int, CCInfo*> m_midimap;
+
+    int fromThreadFdw, fromThreadFdr; // message pipes
     int sigFd; // pipe fd for messages to gui
 
 	virtual void processMsg1(const void*);
@@ -69,11 +78,13 @@ public:
 	void msgSendMidiInputEvent(MEvent&);
 	void msgSendMidiOutputEvent(Track*,  int ctl, int val);
 	void msgSendAudioOutputEvent(Track*, int ctl, double val);
-	void msgModifyTrackController(Track*, int ctl, int cc);
+	void msgModifyTrackController(Track*, int ctl, CCInfo* cc);
+	void msgDeleteTrackController(CCInfo* cc);
 	void msgModifyTrackPort(Track*, int port);
 	void msgAddMonitoredTrack(Track*);
 	void msgDeleteMonitoredTrack(Track*);
 	void msgToggleFeedback(bool);
+	void msgStartLearning(int port);
 
 	bool isAssigned(QString track)
 	{

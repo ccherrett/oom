@@ -21,6 +21,7 @@
 #include "song.h"
 #include "widgets/utils.h"
 #include "midimonitor.h"
+#include "ccinfo.h"
 
 MidiMonitor* midiMonitor;
 
@@ -34,6 +35,9 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
 {
 	//Start with this mode on so we dont process any events at all untill populateList is called
 	m_editing = true;
+	m_learning = false;
+	m_learnport = -1;
+
 	int filedes[2]; // 0 - reading   1 - writing/*{{{*/
 	if (pipe(filedes) == -1)
 	{
@@ -99,15 +103,30 @@ void MidiMonitor::msgSendAudioOutputEvent(Track* track, int ctl, double val)/*{{
 	sendMsg1(&msg, sizeof (msg));
 }/*}}}*/
 
-void MidiMonitor::msgModifyTrackController(Track* track,int ctl ,int cc)/*{{{*/
+void MidiMonitor::msgModifyTrackController(Track* track, int ctl, CCInfo* cc)/*{{{*/
 {
-	MonitorMsg msg;
-	msg.id = MONITOR_MODIFY_CC;
-	msg.track = track;
-	msg.ctl = ctl;
-	msg.mval = cc;
-	
-	sendMsg1(&msg, sizeof (msg));
+	if(track && cc)
+	{
+		MonitorMsg msg;
+		msg.id = MONITOR_MODIFY_CC;
+		msg.track = track;
+		msg.ctl = ctl;
+		msg.info = cc;
+		
+		sendMsg1(&msg, sizeof (msg));
+	}
+}/*}}}*/
+
+void MidiMonitor::msgDeleteTrackController(CCInfo* cc)/*{{{*/
+{
+	if(cc)
+	{
+		MonitorMsg msg;
+		msg.id = MONITOR_DEL_CC;
+		msg.info = cc;
+		
+		sendMsg1(&msg, sizeof (msg));
+	}
 }/*}}}*/
 
 void MidiMonitor::msgModifyTrackPort(Track* track,int port)/*{{{*/
@@ -147,6 +166,15 @@ void MidiMonitor::msgToggleFeedback(bool f)/*{{{*/
 	sendMsg1(&msg, sizeof (msg));
 }/*}}}*/
 
+void MidiMonitor::msgStartLearning(int port)/*{{{*/
+{
+	MonitorMsg msg;
+	msg.id = MONITOR_LEARN;
+	msg.port = port;
+	
+	sendMsg1(&msg, sizeof (msg));
+}/*}}}*/
+
 void MidiMonitor::processMsg1(const void* m)/*{{{*/
 {
 	if(m_editing)
@@ -159,23 +187,27 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			//printf("MidiMonitor::processMsg1() Audio Output\n");
 			if(!m_feedback)
 				return;
-			if(msg->track && isAssigned(msg->track->name()))/*{{{*/
+			if(msg->track /*&& isAssigned(msg->track->name())*/) /*{{{*/
 			{
 				MidiAssignData* data = m_assignments.value(msg->track->name());
-				if(!isManagedController(msg->ctl) || !data->enabled || data->midimap.isEmpty())
+				if(/*!isManagedController(msg->ctl) || */!data->enabled || data->midimap.isEmpty())
 					return;
-				int ccval = data->midimap.value(msg->ctl);
-				if(ccval < 0)
-					return;
-				int val = 0;
-				if(msg->ctl == CTRL_PANPOT)
-					val = trackPanToMidi(msg->aval);//, midiToTrackPan(trackPanToMidi(val)));
-				else
-					val = dbToMidi(trackVolToDb(msg->aval));
-				//printf("Sending midivalue from audio track: %d\n", val);
-				//TODO: Check if feedback is required before bothering with this
-				MidiPlayEvent ev(0, data->port, data->channel, ME_CONTROLLER, ccval, val);
-				midiPorts[ev.port()].device()->putEvent(ev);
+				CCInfo *info = data->midimap.value(msg->ctl);
+				if(info && info->assignedControl() >= 0)
+				{
+					//int ccval = info->assignedControl();
+					//if(ccval < 0)
+					//	return;
+					int val = 0;
+					if(msg->ctl == CTRL_PANPOT)
+						val = trackPanToMidi(msg->aval);//, midiToTrackPan(trackPanToMidi(val)));
+					else
+						val = dbToMidi(trackVolToDb(msg->aval));
+					//printf("Sending midivalue from audio track: %d\n", val);
+					//TODO: Check if feedback is required before bothering with this
+					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), val);
+					midiPorts[ev.port()].device()->putEvent(ev);
+				}
 				//audio->msgPlayMidiEvent(&ev);
 			}/*}}}*/
 		break;
@@ -183,26 +215,45 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 		{/*{{{*/
 			//printf("MidiMonitor::processMsg1() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",
 			//	msg->mevent.type(), msg->mevent.port(), msg->mevent.channel(), msg->mevent.dataA(), msg->mevent.dataB());
+			if(m_learning && m_learnport == msg->mevent.port())
+			{
+				QString cmd;
+				cmd.append(QString::number(msg->mevent.port())).append(":");
+				cmd.append(QString::number(msg->mevent.channel())).append(":");
+				cmd.append(QString::number(msg->mevent.dataA())).append("$$");
+				QByteArray ba(cmd.toUtf8().constData());
+				write(sigFd, ba.constData(), 16);
+				m_learning = false;
+				m_learnport = -1;
+				return;
+			}
 			if(isManagedInputPort(msg->mevent.port()))
 			{
 				//printf("MidiMonitor::processMsg1() Processing Midi Input\n");
-				QMultiHash<int, QString>::iterator i = m_portccmap.find(msg->mevent.dataA());
-				while (i != m_portccmap.end()) 
+				//QMultiHash<int, QString>::iterator i = m_portccmap.find(msg->mevent.dataA());
+				QMultiHash<int, CCInfo*>::iterator iter = m_midimap.find(msg->mevent.dataA());//FIXME
+				while(iter != m_midimap.end())
+				//while (i != m_portccmap.end()) 
 				{
-					QString tname(i.value());
-					MidiAssignData* data = m_assignments.value(tname);
-					if(data && data->enabled && data->port == msg->mevent.port() && data->channel == msg->mevent.channel() && !data->midimap.isEmpty())
+					CCInfo* info = iter.value();
+					//QString tname(i.value());
+					//MidiAssignData* data = m_assignments.value(tname);
+					if(info && info->track()->midiAssign()->enabled && info->port() == msg->mevent.port() && info->channel() == msg->mevent.channel())
+					//if(data && data->enabled && data->port == msg->mevent.port() && data->channel == msg->mevent.channel() && !data->midimap.isEmpty())
 					{
-						int ctl = data->midimap.key(msg->mevent.dataA());
-						if(data->track)
+						//int ctl = data->midimap.key(msg->mevent.dataA());
+						int ctl = info->controller();
+						if(info->track())
 						{
 							switch(ctl)/*{{{*/
 							{
 								case CTRL_VOLUME:
 								{
-									if(data->track->isMidiTrack())/*{{{*/
+									if(info->track()->isMidiTrack())/*{{{*/
+									//if(data->track->isMidiTrack())
 									{
-										MidiTrack* track = (MidiTrack*)data->track;
+										MidiTrack* track = (MidiTrack*)info->track();
+										//MidiTrack* track = (MidiTrack*)data->track;
 										QString cmd;
 										//cmd.append(QString::number(msg->mevent.time())).append(":");
 										cmd.append(QString::number(track->outPort())).append(":");
@@ -215,16 +266,16 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 									}
 									else
 									{
-										audio->msgSetVolume((AudioTrack*) data->track, dbToTrackVol(midiToDb(msg->mevent.dataB())));
-										((AudioTrack*) data->track)->startAutoRecord(AC_VOLUME, dbToTrackVol(midiToDb(msg->mevent.dataB())));
+										audio->msgSetVolume((AudioTrack*) info->track(), dbToTrackVol(midiToDb(msg->mevent.dataB())));
+										((AudioTrack*) info->track())->startAutoRecord(AC_VOLUME, dbToTrackVol(midiToDb(msg->mevent.dataB())));
 									}/*}}}*/
 								}
 								break;
 								case CTRL_PANPOT:
 								{
-									if(data->track->isMidiTrack())/*{{{*/
+									if(info->track()->isMidiTrack())/*{{{*/
 									{
-										MidiTrack* track = (MidiTrack*)data->track;
+										MidiTrack* track = (MidiTrack*)info->track();
 										QString cmd;
 										//cmd.append(QString::number(msg->mevent.time())).append(":");
 										cmd.append(QString::number(track->outPort())).append(":");
@@ -237,29 +288,30 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 									}
 									else
 									{
-										audio->msgSetPan(((AudioTrack*) data->track), midiToTrackPan(msg->mevent.dataB()));
-										((AudioTrack*) data->track)->recordAutomation(AC_PAN, midiToTrackPan(msg->mevent.dataB()));
+										audio->msgSetPan(((AudioTrack*) info->track()), midiToTrackPan(msg->mevent.dataB()));
+										((AudioTrack*) info->track())->recordAutomation(AC_PAN, midiToTrackPan(msg->mevent.dataB()));
 									}/*}}}*/
 								}
 								break;
 								case CTRL_RECORD:
-									song->setRecordFlag(data->track, !data->track->recordFlag(), true);
+									song->setRecordFlag(info->track(), !info->track()->recordFlag(), true);
 								break;
 								case CTRL_MUTE:
-									data->track->setMute(!data->track->isMute(), true);//msg->mevent.dataB() ? true : false, true);
+									info->track()->setMute(!info->track()->isMute(), true);//msg->mevent.dataB() ? true : false, true);
 									song->update(SC_MUTE);
 								break;
 								case CTRL_SOLO:
-									data->track->setSolo(!data->track->solo(), true);//msg->mevent.dataB() ? true : false, true);
+									info->track()->setSolo(!info->track()->solo(), true);//msg->mevent.dataB() ? true : false, true);
 									song->update(SC_SOLO);
 								break;
-								case CTRL_REVERB_SEND:
-								case CTRL_CHORUS_SEND:
-								case CTRL_VARIATION_SEND:
+								default:
+								//case CTRL_REVERB_SEND:
+								//case CTRL_CHORUS_SEND:
+								//case CTRL_VARIATION_SEND:
 								{
-									if(data->track->isMidiTrack())
+									if(info->track()->isMidiTrack())
 									{
-										MidiTrack* track = (MidiTrack*)data->track;
+										MidiTrack* track = (MidiTrack*)info->track();
 										QString cmd;
 										//cmd.append(QString::number(msg->mevent.time())).append(":");
 										cmd.append(QString::number(track->outPort())).append(":");
@@ -275,7 +327,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 							}/*}}}*/
 						}
 					}
-					++i;
+					++iter;
 				}//END while loop
 			}
 		}/*}}}*/
@@ -284,39 +336,58 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			//printf("MidiMonitor::processMsg1() Midi Output\n");
 			if(!m_feedback)
 				return;
-			if(msg->track && isAssigned(msg->track->name()))/*{{{*/
+			if(msg->track/* && isAssigned(msg->track->name())*/)/*{{{*/
 			{
-				MidiAssignData* data = m_assignments.value(msg->track->name());
-				if(!isManagedController(msg->ctl) || !data->enabled || data->midimap.isEmpty())
+				MidiAssignData* data = msg->track->midiAssign();//m_assignments.value(msg->track->name());
+				if(/*!isManagedController(msg->ctl) || */!data->enabled || data->midimap.isEmpty())
 					return;
-				int ccval = data->midimap.value(msg->ctl);
-				if(ccval < 0)
-					return;
-				//printf("Sending midivalue from audio track: %d\n", msg->mval);
-				//TODO: Check if feedback is required before bothering with this
-				MidiPlayEvent ev(0, data->port, data->channel, ME_CONTROLLER, ccval, msg->mval);
-				midiPorts[ev.port()].device()->putEvent(ev);
-				//audio->msgPlayMidiEvent(&ev);
+				CCInfo* info = data->midimap.value(msg->ctl);
+				if(info && info->assignedControl() >= 0)
+				{
+					//int ccval = data->midimap.value(msg->ctl);
+					//if(ccval < 0)
+					//	return;
+					//printf("Sending midivalue from audio track: %d\n", msg->mval);
+					//TODO: Check if feedback is required before bothering with this
+					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mval);
+					midiPorts[ev.port()].device()->putEvent(ev);
+				}
 			}/*}}}*/
 		break;
 		case MONITOR_MODIFY_CC:
-		{
+		{/*{{{*/
 			m_editing = true;
-			MidiAssignData* data = msg->track->midiAssign();
-			if(isManagedInputController(msg->mval, msg->track->name()))
+			//MidiAssignData* data = msg->track->midiAssign();
+			if(!m_midimap.isEmpty() && m_midimap.contains(msg->ctl, msg->info))
 			{
-				m_portccmap.remove(msg->mval, msg->track->name());
+				m_midimap.remove(msg->ctl, msg->info);
 			}
-			if(data->midimap[msg->ctl] != -1)
+			if(msg->info->assignedControl() >= 0)
+				m_midimap.insert(msg->info->assignedControl(), msg->info);
+			//if(isManagedInputController(msg->mval, msg->track->name()))
+			//{
+			//	m_portccmap.remove(msg->mval, msg->track->name());
+			//}
+			//if(data->midimap[msg->ctl] != -1)
+			//{
+			//	printf("Adding CC to portccmap %d, for controller: %d\n", data->midimap[msg->ctl], msg->ctl);
+			//	m_portccmap.insert(data->midimap[msg->ctl], msg->track->name());
+			//}
+			m_editing = false;
+		}/*}}}*/
+		break;
+		case MONITOR_DEL_CC:
+		{/*{{{*/
+			m_editing = true;
+			if(!m_midimap.isEmpty() && m_midimap.contains(msg->info->assignedControl(), msg->info))
 			{
-				printf("Adding CC to portccmap %d, for controller: %d\n", data->midimap[msg->ctl], msg->ctl);
-				m_portccmap.insert(data->midimap[msg->ctl], msg->track->name());
+				m_midimap.remove(msg->info->assignedControl(), msg->info);
 			}
 			m_editing = false;
-		}
+		}/*}}}*/
 		break;
 		case MONITOR_MODIFY_PORT:
-		{
+		{/*{{{*/
 			m_editing = true;
 			MidiAssignData* data = msg->track->midiAssign();
 			if(isManagedInputPort(msg->port, msg->track->name()))
@@ -325,25 +396,31 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			}
 			m_inputports.insert(data->port,  msg->track->name());
 			m_editing = false;
-		}
+		}/*}}}*/
 		break;
 		case MONITOR_ADD_TRACK:
-		{
+		{/*{{{*/
 			m_editing = true;
 			addMonitoredTrack(msg->track);
 			m_editing = false;
-		}
+		}/*}}}*/
 		break;
 		case MONITOR_DEL_TRACK:
-		{
+		{/*{{{*/
 			m_editing = true;
 			deleteMonitoredTrack(msg->track);
 			m_editing = false;
-		}
+		}/*}}}*/
 		break;
 		case MONITOR_TOGGLE_FEEDBACK:
 		{
 			m_feedback = (bool)msg->mval;
+		}
+		break;
+		case MONITOR_LEARN:
+		{
+			m_learning = true;
+			m_learnport = msg->port;
 		}
 		break;
 		default:
@@ -359,7 +436,7 @@ void MidiMonitor::populateList()/*{{{*/
 	m_inputports.clear();
 	m_outputports.clear();
 	m_assignments.clear();
-	m_portccmap.clear();
+	//m_portccmap.clear();
 	for(ciTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 	{
 		addMonitoredTrack((*t));
@@ -372,12 +449,16 @@ void MidiMonitor::addMonitoredTrack(Track* t)
 	MidiAssignData* data = t->midiAssign();
 	m_assignments[t->name()] = data;
 	m_inputports.insert(data->port,  t->name());
-	QHashIterator<int, int> iter(data->midimap);
+	QHashIterator<int, CCInfo*> iter(data->midimap);
 	while(iter.hasNext())
 	{
 		iter.next();
-		if(iter.value() >= 0)
-			m_portccmap.insert(iter.value(), t->name());
+		CCInfo* info = iter.value();
+		if(info && info->assignedControl() >= 0)
+		{
+			//m_portccmap.insert(info->assignedControl(), t->name());
+			m_midimap.insert(info->assignedControl(), info);
+		}
 	}
 	if(t->isMidiTrack())
 	{
@@ -393,14 +474,16 @@ void MidiMonitor::deleteMonitoredTrack(Track* t)
 		m_assignments.remove(t->name());
 	if(isManagedInputPort(data->port, t->name()))
 		m_inputports.remove(data->port, t->name());
-	QHashIterator<int, int> iter(data->midimap);
+	QHashIterator<int, CCInfo*> iter(data->midimap);
 	while(iter.hasNext())
 	{
 		iter.next();
-		if(iter.value() >= 0)
+		CCInfo* info = iter.value();
+		if(info && info->assignedControl() >= 0)
 		{
-			if(isManagedInputController(iter.value(), t->name()))
-				m_portccmap.remove(iter.value(), t->name());
+			//if(isManagedInputController(info->assignedControl(), t->name()))
+			//	m_portccmap.remove(info->assignedControl(), t->name());
+			m_midimap.remove(info->assignedControl(), info);
 		}
 	}
 	if(t->isMidiTrack())

@@ -2427,8 +2427,8 @@ void Song::playMonitorEvent(int fd)
 	QStringList raw = str.split("$$");
 	str = raw.at(0);
 	QStringList cmds = str.split(":", QString::SkipEmptyParts);
-	//printf("playMonitorEvent to gui:<%s>\n", str.toUtf8().constData());
-	if(cmds.size() == 4)
+	printf("playMonitorEvent to gui:<%s>\n", str.toUtf8().constData());
+	if(cmds.size() == 4) //MidiPlay
 	{
 		MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
 		//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
@@ -2437,6 +2437,10 @@ void Song::playMonitorEvent(int fd)
 	
 		update(SC_MIDI_CONTROLLER);
 		return;
+	}
+	else if(cmds.size() == 3) //MidiLearn
+	{
+		emit midiLearned(cmds.at(0).toInt(), cmds.at(1).toInt(), cmds.at(2).toInt());
 	}
 }
 

@@ -25,44 +25,6 @@
 #include "midiport.h"
 #include "midimonitor.h"
 
-// By T356. For caching jack in/out routing names BEFORE file save. 
-// Jack often shuts down during file save, causing the routes to be lost in the file.
-// cacheJackRouteNames() is ONLY called from OOMidi::save() in app.cpp
-// Update: Not required any more because the real problem was Jack RT priority, which has been fixed.
-/*
-typedef std::multimap <const int, QString> jackRouteNameMap;
-std::map <const AudioTrack*, jackRouteNameMap > jackRouteNameCache;
-typedef std::multimap <const int, QString>::const_iterator ciJackRouteNameMap;
-typedef std::map <const AudioTrack*, jackRouteNameMap>::const_iterator ciJackRouteNameCache;
-void cacheJackRouteNames()
-{
-	jackRouteNameCache.clear();
-	const InputList* il = song->inputs();
-	for(ciAudioInput iai = il->begin(); iai != il->end(); ++iai)
-	{
-	  const RouteList* rl = (*iai)->inRoutes();
-	  if(!rl->empty())
-	  {
-		jackRouteNameMap rm = jackRouteNameMap();
-		for(ciRoute r = rl->begin(); r != rl->end(); ++r)
-		  rm.insert(std::pair<const int, QString>(r->channel, r->name()));
-		jackRouteNameCache.insert(std::pair<const AudioTrack*, jackRouteNameMap>(*iai, rm));
-	  }
-	}
-	const OutputList* ol = song->outputs();
-	for(ciAudioOutput iao = ol->begin(); iao != ol->end(); ++iao)
-	{
-	  const RouteList* rl = (*iao)->outRoutes();
-	  if(!rl->empty())
-	  {
-		jackRouteNameMap rm = jackRouteNameMap();
-		for(ciRoute r = rl->begin(); r != rl->end(); ++r)
-		  rm.insert(std::pair<const int, QString>(r->channel, r->name()));
-		jackRouteNameCache.insert(std::pair<const AudioTrack*, jackRouteNameMap>(*iao, rm));
-	  }
-	}
-}
- */
 
 //---------------------------------------------------------
 //   AudioTrack
@@ -86,20 +48,6 @@ AudioTrack::AudioTrack(TrackType t)
 	addController(new CtrlList(AC_VOLUME,"Volume", 0.001, 3.16 /* roughly 10 db */));
 	addController(new CtrlList(AC_PAN, "Pan", -1.0, 1.0));
 	addController(new CtrlList(AC_MUTE, "Mute", 0.0, 1.0, true /*dont show in arranger */));
-
-	// Changed by Tim. p3.3.15
-	//outBuffers = new float*[MAX_CHANNELS];
-	//for (int i = 0; i < MAX_CHANNELS; ++i)
-	//      outBuffers[i] = new float[segmentSize];
-	//for (int i = 0; i < MAX_CHANNELS; ++i)
-	//      posix_memalign((void**)(outBuffers + i), 16, sizeof(float) * segmentSize);
-
-	// Let's allocate it all in one block, and just point the remaining buffer pointers into the block
-	//  which allows faster one-shot buffer copying.
-	// Nope. Nice but interferes with possibility we don't know if other buffers are contiguous (jack buffers, local stack buffers etc.).
-	//posix_memalign((void**)(outBuffers), 16, sizeof(float) * segmentSize * MAX_CHANNELS);
-	//for (int i = 0; i < MAX_CHANNELS; ++i)
-	//  *(outBuffers + i) = sizeof(float) * segmentSize * i;
 
 	// p3.3.38
 	// Easy way, less desirable... Start out with enough for MAX_CHANNELS. Then multi-channel syntis can re-allocate,

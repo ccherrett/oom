@@ -50,6 +50,10 @@
 #include "menutitleitem.h"
 #include "popupmenu.h"
 #include "widgets/utils.h"
+#include "midictrl.h"
+#include "mididev.h"
+#include "midiport.h"
+#include "midimonitor.h"
 
 //---------------------------------------------------------
 //   MenuTitleItem
@@ -286,6 +290,7 @@ void AudioStrip::updateVolume()
 		sl->blockSignals(false);
 		slider->blockSignals(false);
 		volume = vol;
+		midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_VOLUME, vol);
 	}
 }
 
@@ -307,6 +312,7 @@ void AudioStrip::updatePan()
 		panl->blockSignals(false);
 		pan->blockSignals(false);
 		panVal = v;
+		midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_PANPOT, v);
 	}
 }
 

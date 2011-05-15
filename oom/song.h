@@ -618,6 +618,7 @@ signals:
     void markerChanged(int);
     void midiPortsChanged();
     void midiNote(int pitch, int velo);
+	void midiLearned(int port, int chan, int cc);
 };
 
 extern Song* song;

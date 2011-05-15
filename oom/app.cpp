@@ -62,6 +62,7 @@
 #include "midiassign.h"
 #include "midimonitor.h"
 
+#include "ccinfo.h"
 #ifdef DSSI_SUPPORT
 #include "dssihost.h"
 #endif
@@ -261,9 +262,9 @@ bool OOMidi::seqStart()
 	{
 		monitorprio = realTimePriority + 1;
 
-		pfprio = realTimePriority + 1;
+		pfprio = realTimePriority + 2;
 
-		midiprio = realTimePriority + 2;
+		midiprio = realTimePriority + 3;
 	}
 
 	if (midiRTPrioOverride > 0)
@@ -760,6 +761,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	appName = QString("The Composer - OOMidi");
 	setWindowTitle(appName);
+
+	qRegisterMetaType<CCInfo>("CCInfo");
+	
 	editSignalMapper = new QSignalMapper(this);
 	midiPluginSignalMapper = new QSignalMapper(this);
 	followSignalMapper = new QSignalMapper(this);

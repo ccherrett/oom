@@ -23,50 +23,68 @@
 #include "midiassign.h"
 #include "tablespinner.h"
 #include "midiportdelegate.h"
+#include "ccdelegate.h"
+#include "ccinfo.h"
 #include "midimonitor.h"
 
 MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 {
 	setupUi(this);
 	m_lasttype = 0;
+	m_selected = 0;
+
 	m_midicontrols = (QStringList() << "Volume" << "Pan" << "Chor" << "Rev" << "Var" << "Rec" << "Mute" << "Solo");
 	m_allowed << CTRL_VOLUME << CTRL_PANPOT << CTRL_REVERB_SEND << CTRL_CHORUS_SEND << CTRL_VARIATION_SEND << CTRL_RECORD << CTRL_MUTE << CTRL_SOLO ;
-	m_model = new QStandardItemModel(0, 11, this);
+	
+	m_model = new QStandardItemModel(0, 4, this);
 	tableView->setModel(m_model);
+
+	m_ccmodel = new QStandardItemModel(0, 2, this);
+	m_ccEdit->setModel(m_ccmodel);
+	m_selmodel = new QItemSelectionModel(m_model);
+	tableView->setSelectionModel(m_selmodel);
+
 	_trackTypes = (QStringList() << "All Types" << "Outputs" << "Inputs" << "Auxs" << "Busses" << "Midi Tracks" << "Soft Synth" << "Audio Tracks");
 	cmbType->addItems(_trackTypes);
 	connect(cmbType, SIGNAL(currentIndexChanged(int)), SLOT(cmbTypeSelected(int)));
 	cmbType->setCurrentIndex(0);
 
-	TableSpinnerDelegate* tdelegate = new TableSpinnerDelegate(this, -1);
+	//TableSpinnerDelegate* tdelegate = new TableSpinnerDelegate(this, -1);
 	TableSpinnerDelegate* chandelegate = new TableSpinnerDelegate(this, 0, 15);
 	MidiPortDelegate* mpdelegate = new MidiPortDelegate(this);
+	CCInfoDelegate *infodelegate = new CCInfoDelegate(this);
 	tableView->setItemDelegateForColumn(2, mpdelegate);
 	tableView->setItemDelegateForColumn(3, chandelegate);
-	for(int i = 4; i < 12; ++i)
-		tableView->setItemDelegateForColumn(i, tdelegate);
+	//for(int i = 4; i < 12; ++i)
+	//	tableView->setItemDelegateForColumn(i, tdelegate);
+	
+	m_ccEdit->setItemDelegateForColumn(1, infodelegate);
+	m_cmbControl->addItem(tr("Track Record"), CTRL_RECORD);
+	m_cmbControl->addItem(tr("Track Mute"), CTRL_MUTE);
+	m_cmbControl->addItem(tr("Track Solo"), CTRL_SOLO);
+	for(int i = 0; i < 128; ++i)
+	{
+		QString ctl(QString::number(i)+": ");
+		m_cmbControl->addItem(ctl.append(midiCtrlName(i)), i);
+	}
 
 	connect(btnClose, SIGNAL(clicked(bool)), SLOT(btnCloseClicked()));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), SLOT(itemChanged(QStandardItem*)));
-	//updateTableHeader();
+	//connect(m_ccmodel, SIGNAL(itemChanged(QStandardItem*)), SLOT(controllerChanged(QStandardItem*)));
+	connect(m_selmodel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(itemSelected(const QItemSelection&, const QItemSelection&)));
+	connect(m_btnAdd, SIGNAL(clicked()), SLOT(btnAddController()));
+	connect(m_btnDelete, SIGNAL(clicked()), SLOT(btnDeleteController()));
 	cmbTypeSelected(m_lasttype);
 }
+
 void MidiAssignDialog::btnCloseClicked()
 {
 	close();
 }
 
-void MidiAssignDialog::portChanged(int)
+void MidiAssignDialog::itemChanged(QStandardItem* item)/*{{{*/
 {
-}
-
-void MidiAssignDialog::channelChanged(int)
-{
-}
-
-void MidiAssignDialog::itemChanged(QStandardItem* item)
-{
-	printf("itemChanged\n");
+	//printf("itemChanged\n");
 	if(item)
 	{
 		int row = item->row();
@@ -87,6 +105,13 @@ void MidiAssignDialog::itemChanged(QStandardItem* item)
 				{
 					int p = data->port;
 					data->port = item->data(MidiPortRole).toInt();
+					QHashIterator<int, CCInfo*> iter(data->midimap);
+					while(iter.hasNext())
+					{
+						iter.next();
+						CCInfo* info = iter.value();
+						info->setPort(data->port);
+					}
 					midiMonitor->msgModifyTrackPort(track, p);
 				}
 				break;
@@ -100,7 +125,7 @@ void MidiAssignDialog::itemChanged(QStandardItem* item)
 				case 8: //Var Send
 				case 9: //Rec
 				case 10: //mute
-				case 11: //Solo*/
+				case 11: //Solo
 				default:
 				{
 					int ctl = item->data(MidiControlRole).toInt();
@@ -108,22 +133,180 @@ void MidiAssignDialog::itemChanged(QStandardItem* item)
 					data->midimap[ctl] = item->data(Qt::EditRole).toInt();
 					midiMonitor->msgModifyTrackController(track, ctl, cc);
 				}
-				break;
+				break;*/
 			}
 		}
 	}
-}
+}/*}}}*/
+
+void MidiAssignDialog::itemSelected(const QItemSelection& isel, const QItemSelection&) //Update the ccEdit table/*{{{*/
+{
+	printf("Selection changed\n");
+	m_ccmodel->clear();
+	QModelIndexList list = isel.indexes();
+	if(list.size() > 0)
+	{
+		QModelIndex index = list.at(0);
+		int row = index.row();
+		QStandardItem* item = m_model->item(row, 1);
+		if(item)
+		{
+			Track* track = song->findTrack(item->text());
+			if(track)
+			{
+				m_trackname->setText(track->name());
+				m_selected = track;
+				MidiAssignData* data = track->midiAssign();
+				if(data && !data->midimap.isEmpty())
+				{
+					QHashIterator<int, CCInfo*> iter(data->midimap);
+					while(iter.hasNext())
+					{
+						iter.next();
+						CCInfo* info = iter.value();
+						QList<QStandardItem*> rowData;/*{{{*/
+						QStandardItem* chk = new QStandardItem(data->enabled);
+						chk->setCheckable(true);
+						chk->setEditable(false);
+						rowData.append(chk);
+						QStandardItem* control = new QStandardItem(track->name());
+						control->setEditable(true);
+						control->setData(track->name(), TrackRole);
+						control->setData(info->port(), PortRole);
+						control->setData(info->channel(), ChannelRole);
+						control->setData(info->controller(), ControlRole);
+						control->setData(info->assignedControl(), CCRole);
+						QString str;
+						if(info->controller() == CTRL_RECORD)
+							str.append(tr("Track Record"));
+						else if(info->controller() == CTRL_MUTE)
+							str.append(tr("Track Mute"));
+						else if(info->controller() == CTRL_SOLO)
+							str.append(tr("Track Solo"));
+						else
+							str.append(midiCtrlName(info->controller()));
+						str.append(" Assigned To: ").append(QString::number(info->assignedControl())).append(" Chan : ");
+						str.append(QString::number(info->channel()));
+						control->setData(str, Qt::DisplayRole);
+						rowData.append(control);
+						m_ccmodel->appendRow(rowData);/*}}}*/
+						m_ccEdit->setRowHeight(m_ccmodel->rowCount()-1, 50);
+					}
+				}
+			}
+		}
+	}
+	updateCCTableHeader();
+}/*}}}*/
+
+//Deals with the m_ccEdit table on a per track basis
+void MidiAssignDialog::controllerChanged(QStandardItem*)/*{{{*/
+{
+}/*}}}*/
+
+void MidiAssignDialog::btnAddController()/*{{{*/
+{
+	if(!m_selected)
+		return;
+	int ctrl = m_cmbControl->itemData(m_cmbControl->currentIndex()).toInt();
+	MidiAssignData *data = m_selected->midiAssign();
+	if(data)
+	{
+		bool allowed = true;
+		if(!m_selected->isMidiTrack())
+		{
+			allowed = false;
+			switch(ctrl)//{{{
+			{
+				case CTRL_VOLUME:
+				case CTRL_PANPOT:
+				case CTRL_MUTE:
+				case CTRL_SOLO:
+					allowed = true;
+				break;
+				case CTRL_RECORD:
+					if(m_selected->type() != Track::AUDIO_INPUT)
+					{
+						allowed = true;
+					}
+				break;
+			}//}}}
+		}
+		if(!allowed)
+			return;
+		if(data->midimap.isEmpty() || !data->midimap.contains(ctrl))
+		{
+			CCInfo* info = new CCInfo(m_selected, data->port, data->channel, ctrl, -1);
+			data->midimap.insert(ctrl, info);
+			QList<QStandardItem*> rowData;
+			QStandardItem* chk = new QStandardItem(data->enabled);
+			chk->setCheckable(true);
+			chk->setEditable(false);
+			rowData.append(chk);
+			QStandardItem* control = new QStandardItem(m_selected->name());
+			control->setEditable(true);
+			control->setData(m_selected->name(), TrackRole);
+			control->setData(info->port(), PortRole);
+			control->setData(info->channel(), ChannelRole);
+			control->setData(info->controller(), ControlRole);
+			control->setData(info->assignedControl(), CCRole);
+			QString str;
+			if(info->controller() == CTRL_RECORD)
+				str.append(tr("Track Record"));
+			else if(info->controller() == CTRL_MUTE)
+				str.append(tr("Track Mute"));
+			else if(info->controller() == CTRL_SOLO)
+				str.append(tr("Track Solo"));
+			else
+				str.append(midiCtrlName(info->controller()));
+			str.append(" Assigned To: ").append(QString::number(info->assignedControl())).append(" Chan : ");
+			str.append(QString::number(info->channel()));
+			control->setData(str, Qt::DisplayRole);
+			rowData.append(control);
+			m_ccmodel->appendRow(rowData);
+			m_ccEdit->setRowHeight(m_ccmodel->rowCount()-1, 50);
+			//TODO: dirty the song here to force save
+		}
+	}
+	updateCCTableHeader();
+}/*}}}*/
+
+void MidiAssignDialog::btnDeleteController()/*{{{*/
+{
+	if(!m_selected)
+		return;
+	MidiAssignData* data = m_selected->midiAssign();
+	for(int i = 0; i < m_ccmodel->rowCount(); ++i)
+	{
+		QStandardItem* item = m_ccmodel->item(i, 0);
+		if(item->checkState() == Qt::Checked)
+		{
+			QStandardItem* ctl = m_ccmodel->item(i, 1);
+			int control = ctl->data(ControlRole).toInt();
+			if(!data->midimap.isEmpty() && data->midimap.contains(control))
+			{
+			printf("Delete clicked\n");
+				CCInfo* info = data->midimap.value(control);
+				midiMonitor->msgDeleteTrackController(info);
+				data->midimap.remove(control);
+				m_ccmodel->takeRow(i);
+				//TODO: dirty the song here to force save
+			}
+		}
+	}
+	updateCCTableHeader();
+}/*}}}*/
 
 void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 {
 	//Perform actions to populate list below based on selected type
 	//We need to repopulate and filter the allTrackList
 	//"Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Soft_Synth"
-	//m_model->blockSignals(true);
 	m_lasttype = type;
 	QString defaultname;
 	defaultname.sprintf("%d:%s", 1, midiPorts[0].portname().toLatin1().constData());
 	m_model->clear();
+	m_ccmodel->clear();
 
 	for (ciTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 	{
@@ -142,7 +325,7 @@ void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 		else if(type == 7 && (*t)->type() != Track::WAVE)
 			continue;
 		MidiAssignData* data = (*t)->midiAssign();
-		QList<QStandardItem*> rowData;/*{{{*/
+		QList<QStandardItem*> rowData;
 		QStandardItem* enable = new QStandardItem(data->enabled);
 		enable->setCheckable(true);
 		enable->setCheckState(data->enabled ? Qt::Checked : Qt::Unchecked);
@@ -165,38 +348,15 @@ void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 		chan->setData(data->channel, Qt::EditRole);
 		chan->setEditable(true);
 		rowData.append(chan);
-		for(int i = 0; i < m_allowed.size(); ++i)
-		{
-			int ctl = m_allowed.at(i);
-			QStandardItem* item = new QStandardItem(QString::number(data->midimap[ctl]));
-			item->setData(data->midimap[ctl], Qt::EditRole);
-			item->setData(ctl, MidiControlRole);
-			rowData.append(item);
-			item->setEditable(true);
-			if(!(*t)->isMidiTrack())
-			{
-				item->setEditable(false);
-				switch(ctl)/*{{{*/
-				{
-					case CTRL_VOLUME:
-					case CTRL_PANPOT:
-					case CTRL_RECORD:
-					case CTRL_MUTE:
-					case CTRL_SOLO:
-						item->setEditable(true);
-					break;
-				}/*}}}*/
-			}
-		}
-		m_model->appendRow(rowData);/*}}}*/
+		m_model->appendRow(rowData);
 	}
 	updateTableHeader();
-	//m_model->blockSignals(false);
+	updateCCTableHeader();
 }/*}}}*/
 
 void MidiAssignDialog::updateTableHeader()/*{{{*/
 {
-	int inum = 4;
+	//int inum = 4;
 	QStandardItem* en = new QStandardItem(tr("En"));
 	m_model->setHorizontalHeaderItem(0, en);
 	tableView->setColumnWidth(0, 20);
@@ -209,17 +369,23 @@ void MidiAssignDialog::updateTableHeader()/*{{{*/
 	QStandardItem* chan = new QStandardItem(tr("Chan"));
 	m_model->setHorizontalHeaderItem(3, chan);
 	tableView->setColumnWidth(3, 60);
-	foreach(QString ctl, m_midicontrols)
-	{
-		QStandardItem* item = new QStandardItem(ctl);
-		m_model->setHorizontalHeaderItem(inum, item);
-		tableView->setColumnWidth(inum, 60);
-		inum++;
-	}
 	tableView->horizontalHeader()->setStretchLastSection(true);
+}/*}}}*/
+
+void MidiAssignDialog::updateCCTableHeader()/*{{{*/
+{
+	QStandardItem* en = new QStandardItem(tr("Sel"));
+	m_ccmodel->setHorizontalHeaderItem(0, en);
+	m_ccEdit->setColumnWidth(0, 30);
+	QStandardItem* track = new QStandardItem(tr("Controller"));
+	m_ccmodel->setHorizontalHeaderItem(1, track);
+	m_ccEdit->setColumnWidth(1, 180);
+	m_ccEdit->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/
 
 void MidiAssignDialog::showEvent(QShowEvent*)
 {
+	m_ccmodel->clear();
+	m_trackname->setText("");
 	cmbTypeSelected(m_lasttype);
 }

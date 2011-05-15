@@ -30,11 +30,12 @@ class SynthI;
 class PluginI;
 class MidiAssignData;
 class MidiPort;
+class CCInfo;
 
 class Track;
 struct MidiAssignData {/*{{{*/
 	Track* track;
-	QHash<int, int> midimap;
+	QHash<int, CCInfo*> midimap;
 	int port;
 	int channel;
 	bool enabled;
