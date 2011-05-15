@@ -83,6 +83,7 @@ void MidiMonitor::msgSendMidiInputEvent(MEvent& event)/*{{{*/
 
 void MidiMonitor::msgSendMidiOutputEvent(Track* track,  int ctl, int val)/*{{{*/
 {
+	printf("MidiMonitor::msgSendMidiOutputEvent \n");
 	MonitorMsg msg;
 	msg.id = MONITOR_MIDI_OUT;
 	msg.track = track;
@@ -94,6 +95,7 @@ void MidiMonitor::msgSendMidiOutputEvent(Track* track,  int ctl, int val)/*{{{*/
 
 void MidiMonitor::msgSendAudioOutputEvent(Track* track, int ctl, double val)/*{{{*/
 {
+	printf("MidiMonitor::msgSendAudioOutputEvent\n");
 	MonitorMsg msg;
 	msg.id = MONITOR_AUDIO_OUT;
 	msg.track = track;
