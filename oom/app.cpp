@@ -260,11 +260,11 @@ bool OOMidi::seqStart()
 	//  in JackAudioDevice::realtimePriority() which is a bit flawed - it reports there's no RT...
 	if (realTimeScheduling)
 	{
-		monitorprio = realTimePriority + 1;
+		//monitorprio = realTimePriority + 1;
 
-		pfprio = realTimePriority + 2;
+		pfprio = realTimePriority + 1;
 
-		midiprio = realTimePriority + 3;
+		midiprio = realTimePriority + 2;
 	}
 
 	if (midiRTPrioOverride > 0)
