@@ -141,7 +141,7 @@ void MidiAssignDialog::itemChanged(QStandardItem* item)/*{{{*/
 
 void MidiAssignDialog::itemSelected(const QItemSelection& isel, const QItemSelection&) //Update the ccEdit table/*{{{*/
 {
-	printf("Selection changed\n");
+	//printf("Selection changed\n");
 	m_ccmodel->clear();
 	QModelIndexList list = isel.indexes();
 	if(list.size() > 0)
@@ -225,7 +225,7 @@ void MidiAssignDialog::btnAddController()/*{{{*/
 					allowed = true;
 				break;
 				case CTRL_RECORD:
-					if(m_selected->type() != Track::AUDIO_INPUT)
+					if(m_selected->type() == Track::AUDIO_OUTPUT || m_selected->type() == Track::WAVE)
 					{
 						allowed = true;
 					}
@@ -285,7 +285,7 @@ void MidiAssignDialog::btnDeleteController()/*{{{*/
 			int control = ctl->data(ControlRole).toInt();
 			if(!data->midimap.isEmpty() && data->midimap.contains(control))
 			{
-			printf("Delete clicked\n");
+				//printf("Delete clicked\n");
 				CCInfo* info = data->midimap.value(control);
 				midiMonitor->msgDeleteTrackController(info);
 				data->midimap.remove(control);

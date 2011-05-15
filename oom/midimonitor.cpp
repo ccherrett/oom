@@ -74,6 +74,8 @@ void MidiMonitor::start(int priority)/*{{{*/
 
 void MidiMonitor::msgSendMidiInputEvent(MEvent& event)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_MIDI_IN;
 	msg.mevent = event;
@@ -85,7 +87,7 @@ void MidiMonitor::msgSendMidiOutputEvent(Track* track,  int ctl, int val)/*{{{*/
 {
 	if(!isRunning())
 		return;
-	printf("MidiMonitor::msgSendMidiOutputEvent \n");
+	//printf("MidiMonitor::msgSendMidiOutputEvent \n");
 	MonitorMsg msg;
 	msg.id = MONITOR_MIDI_OUT;
 	msg.track = track;
@@ -99,7 +101,7 @@ void MidiMonitor::msgSendAudioOutputEvent(Track* track, int ctl, double val)/*{{
 {
 	if(!isRunning())
 		return;
-	printf("MidiMonitor::msgSendAudioOutputEvent\n");
+	//printf("MidiMonitor::msgSendAudioOutputEvent\n");
 	MonitorMsg msg;
 	msg.id = MONITOR_AUDIO_OUT;
 	msg.track = track;
@@ -244,7 +246,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 					CCInfo* info = iter.value();
 					//QString tname(i.value());
 					//MidiAssignData* data = m_assignments.value(tname);
-					if(info && info->track()->midiAssign()->enabled && info->port() == msg->mevent.port() && info->channel() == msg->mevent.channel())
+					if(info && info->track()->midiAssign()->enabled && info->port() == msg->mevent.port() 
+						&& info->channel() == msg->mevent.channel() && info->assignedControl() == msg->mevent.dataA())
 					//if(data && data->enabled && data->port == msg->mevent.port() && data->channel == msg->mevent.channel() && !data->midimap.isEmpty())
 					{
 						//int ctl = data->midimap.key(msg->mevent.dataA());
@@ -272,6 +275,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 									}
 									else
 									{
+										//printf("track volume\n");
 										audio->msgSetVolume((AudioTrack*) info->track(), dbToTrackVol(midiToDb(msg->mevent.dataB())));
 										((AudioTrack*) info->track())->startAutoRecord(AC_VOLUME, dbToTrackVol(midiToDb(msg->mevent.dataB())));
 									}/*}}}*/
@@ -294,6 +298,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 									}
 									else
 									{
+										//printf("track pan\n");
 										audio->msgSetPan(((AudioTrack*) info->track()), midiToTrackPan(msg->mevent.dataB()));
 										((AudioTrack*) info->track())->recordAutomation(AC_PAN, midiToTrackPan(msg->mevent.dataB()));
 									}/*}}}*/
