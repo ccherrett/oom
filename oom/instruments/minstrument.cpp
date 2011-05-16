@@ -22,6 +22,9 @@
 
 #include "minstrument.h"
 #include "midiport.h"
+#include "mididev.h"
+#include "audio.h"
+#include "midi.h"
 #include "globals.h"
 #include "xml.h"
 #include "event.h"
@@ -472,12 +475,13 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 
 void MidiInstrument::reset(int portNo, MType)
 {
+	MidiPort* port = &midiPorts[portNo];
 	MidiPlayEvent ev;
 	ev.setType(0x90);
-	MidiPort* port = &midiPorts[portNo];
-	if (port == 0)
-		return;
+	//if (port == 0)
+	//	return;
 	ev.setPort(portNo);
+	ev.setTime(0);
 	for (int chan = 0; chan < MIDI_CHANNELS; ++chan)
 	{
 		ev.setChannel(chan);

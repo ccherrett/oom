@@ -551,7 +551,7 @@ void MidiJackDevice::collectMidiEvents()
 
 bool MidiJackDevice::putEvent(const MidiPlayEvent& ev)
 {
-	if (!_writeEnable)
+	if (!_writeEnable || !_out_client_jackport)
 		//return true;
 		return false;
 
@@ -626,7 +626,9 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 			unsigned char* p = jack_midi_event_reserve(pb, ft, 3);
 			if (p == 0)
 			{
-				fprintf(stderr, "MidiJackDevice::queueEvent #1: buffer overflow, event lost\n");
+				#ifdef JACK_MIDI_DEBUG
+				fprintf(stderr, "MidiJackDevice::queueEvent NOTE CTL PAT or PB: buffer overflow, stopping until next cycle\n");  
+				#endif
 				return false;
 			}
 			p[0] = e.type() | e.channel();
@@ -645,7 +647,9 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 			unsigned char* p = jack_midi_event_reserve(pb, ft, 2);
 			if (p == 0)
 			{
-				fprintf(stderr, "MidiJackDevice::queueEvent #2: buffer overflow, event lost\n");
+				#ifdef JACK_MIDI_DEBUG
+				fprintf(stderr, "MidiJackDevice::queueEvent PROG or AT: buffer overflow, stopping until next cycle\n");  
+				#endif
 				return false;
 			}
 			p[0] = e.type() | e.channel();
@@ -663,8 +667,8 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 			unsigned char* p = jack_midi_event_reserve(pb, ft, len + 2);
 			if (p == 0)
 			{
-				fprintf(stderr, "MidiJackDevice::queueEvent #3: buffer overflow, event lost\n");
-				return false;
+				fprintf(stderr, "MidiJackDevice::queueEvent ME_SYSEX: buffer overflow, sysex too big, event lost\n");
+				return true;
 			}
 			p[0] = 0xf0;
 			p[len + 1] = 0xf7;
@@ -676,8 +680,9 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 		case ME_START:
 		case ME_CONTINUE:
 		case ME_STOP:
-			printf("MidiJackDevice::queueEvent: event type %x not supported\n", e.type());
-			return false;
+			if(debugMsg)
+				printf("MidiJackDevice::queueEvent: event type %x not supported\n", e.type());
+			return true;
 			break;
 	}
 
@@ -688,7 +693,7 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 //    processEvent
 //---------------------------------------------------------
 
-void MidiJackDevice::processEvent(const MidiPlayEvent& event)
+bool MidiJackDevice::processEvent(const MidiPlayEvent& event)
 {
 	int chn = event.channel();
 	unsigned t = event.time();
@@ -702,11 +707,11 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 	// Just do this 'standard midi 64T timing thing' for now until we figure out more precise external timings.
 	// Does require relatively short audio buffers, in order to catch the resolution, but buffer <= 256 should be OK...
 	// Tested OK so far with 128.
-	if (extSyncFlag.value())
+	if (t == 0 || extSyncFlag.value())
 		t = audio->getFrameOffset() + audio->pos().frame();
 
 #ifdef JACK_MIDI_DEBUG
-	printf("MidiJackDevice::processEvent time:%d type:%d ch:%d A:%d B:%d\n", event.time(), event.type(), event.channel(), event.dataA(), event.dataB());
+	//printf("MidiJackDevice::processEvent time:%d type:%d ch:%d A:%d B:%d\n", event.time(), event.type(), event.channel(), event.dataA(), event.dataB());
 #endif  
 
 	if (event.type() == ME_PROGRAM)
@@ -716,29 +721,28 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 		int lb = (a >> 8) & 0xff;
 		int pr = a & 0x7f;
 
-		// p3.3.44
-		//printf("MidiJackDevice::processEvent ME_PROGRAM time:%d type:%d ch:%d A:%d B:%d hb:%d lb:%d pr:%d\n",
-		//       event.time(), event.type(), event.channel(), event.dataA(), event.dataB(), hb, lb, pr);
-
 		//TODO: NOTE this is where program changes are sent we can later debug this to diagnose the dropped events
 		if (hb != 0xff)
-			queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HBANK, hb));
+		{
+			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HBANK, hb)))
+				return false;
+		}
 		if (lb != 0xff)
-			queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LBANK, lb));
-		sleep(1);
-		queueEvent(MidiPlayEvent(t + 2, port, chn, ME_PROGRAM, pr, 0));
+		{
+			if(!queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LBANK, lb)))
+				return false;
+		}
+		//sleep(1);
+		if(!queueEvent(MidiPlayEvent(t + 2, port, chn, ME_PROGRAM, pr, 0)))
+			return false;
 	}
-	else
-		if (event.type() == ME_PITCHBEND)
+	else if (event.type() == ME_PITCHBEND)
 	{
 		int v = a + 8192;
-		// p3.3.44
-		//printf("MidiJackDevice::processEvent ME_PITCHBEND v:%d time:%d type:%d ch:%d A:%d B:%d\n", v, event.time(), event.type(), event.channel(), event.dataA(), event.dataB());
-
-		queueEvent(MidiPlayEvent(t, port, chn, ME_PITCHBEND, v & 0x7f, (v >> 7) & 0x7f));
+		if(!queueEvent(MidiPlayEvent(t, port, chn, ME_PITCHBEND, v & 0x7f, (v >> 7) & 0x7f)))
+			return false;
 	}
-	else
-		if (event.type() == ME_CONTROLLER)
+	else if (event.type() == ME_CONTROLLER)
 	{
 		//int a      = event.dataA();
 		//int b      = event.dataB();
@@ -764,7 +768,8 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			// p3.3.44
 			//printf("MidiJackDevice::processEvent CTRL_PITCH v:%d time:%d type:%d ch:%d A:%d B:%d\n", v, event.time(), event.type(), event.channel(), event.dataA(), event.dataB());
 
-			queueEvent(MidiPlayEvent(t, port, chn, ME_PITCHBEND, v & 0x7f, (v >> 7) & 0x7f));
+			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_PITCHBEND, v & 0x7f, (v >> 7) & 0x7f)))
+				return false;
 		}
 		else if (a == CTRL_PROGRAM)
 		{
@@ -777,14 +782,22 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			//       event.time(), event.type(), event.channel(), event.dataA(), event.dataB(), hb, lb, pr);
 
 			if (hb != 0xff)
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HBANK, hb));
+			{
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HBANK, hb)))
+					return false;
+			}
 			if (lb != 0xff)
-				queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LBANK, lb));
-			queueEvent(MidiPlayEvent(t + 2, port, chn, ME_PROGRAM, pr, 0));
+			{
+				if(!queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LBANK, lb)))
+					return false;
+			}
+			if(!queueEvent(MidiPlayEvent(t + 2, port, chn, ME_PROGRAM, pr, 0)))
+				return false;
 		}
 		else if (a < CTRL_14_OFFSET)
 		{ // 7 Bit Controller
-			queueEvent(event);
+			if(!queueEvent(event))
+				return false;
 		}
 		else if (a < CTRL_RPN_OFFSET)
 		{ // 14 bit high resolution controller
@@ -792,43 +805,55 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			int ctrlL = a & 0x7f;
 			int dataH = (b >> 7) & 0x7f;
 			int dataL = b & 0x7f;
-			queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, ctrlH, dataH));
-			queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, ctrlL, dataL));
+			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, ctrlH, dataH)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, ctrlL, dataL)))
+				return false;
 		}
 		else if (a < CTRL_NRPN_OFFSET)
 		{ // RPN 7-Bit Controller
 			int ctrlH = (a >> 8) & 0x7f;
 			int ctrlL = a & 0x7f;
-			queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, ctrlH));
-			queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LRPN, ctrlL));
-			queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, b));
+			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, ctrlH)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LRPN, ctrlL)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, b)))
+				return false;
 
 			t += 3;
 			// Select null parameters so that subsequent data controller events do not upset the last *RPN controller.
 			if (nvh != 0xff)
 			{
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, nvh & 0x7f));
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, nvh & 0x7f)))
+					return false;
 				t += 1;
 			}
 			if (nvl != 0xff)
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LRPN, nvl & 0x7f));
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LRPN, nvl & 0x7f)))
+					return false;
 		}
 		else if (a < CTRL_INTERNAL_OFFSET)
 		{ // NRPN 7-Bit Controller
 			int ctrlH = (a >> 8) & 0x7f;
 			int ctrlL = a & 0x7f;
-			queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, ctrlH));
-			queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LNRPN, ctrlL));
-			queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, b));
+			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, ctrlH)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LNRPN, ctrlL)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, b)))
+				return false;
 
 			t += 3;
 			if (nvh != 0xff)
 			{
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, nvh & 0x7f));
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, nvh & 0x7f)))
+					return false;
 				t += 1;
 			}
 			if (nvl != 0xff)
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LNRPN, nvl & 0x7f));
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LNRPN, nvl & 0x7f)))
+					return false;
 		}
 		else if (a < CTRL_NRPN14_OFFSET)
 		{ // RPN14 Controller
@@ -836,19 +861,25 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			int ctrlL = a & 0x7f;
 			int dataH = (b >> 7) & 0x7f;
 			int dataL = b & 0x7f;
-			queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, ctrlH));
-			queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LRPN, ctrlL));
-			queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, dataH));
-			queueEvent(MidiPlayEvent(t + 3, port, chn, ME_CONTROLLER, CTRL_LDATA, dataL));
+			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, ctrlH)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LRPN, ctrlL)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, dataH)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 3, port, chn, ME_CONTROLLER, CTRL_LDATA, dataL)))
+				return false;
 
 			t += 4;
 			if (nvh != 0xff)
 			{
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, nvh & 0x7f));
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, nvh & 0x7f)))
+					return false;
 				t += 1;
 			}
 			if (nvl != 0xff)
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LRPN, nvl & 0x7f));
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LRPN, nvl & 0x7f)))
+					return false;
 		}
 		else if (a < CTRL_NONE_OFFSET)
 		{ // NRPN14 Controller
@@ -856,19 +887,25 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 			int ctrlL = a & 0x7f;
 			int dataH = (b >> 7) & 0x7f;
 			int dataL = b & 0x7f;
-			queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, ctrlH));
-			queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LNRPN, ctrlL));
-			queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, dataH));
-			queueEvent(MidiPlayEvent(t + 3, port, chn, ME_CONTROLLER, CTRL_LDATA, dataL));
+			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, ctrlH)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 1, port, chn, ME_CONTROLLER, CTRL_LNRPN, ctrlL)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 2, port, chn, ME_CONTROLLER, CTRL_HDATA, dataH)))
+				return false;
+			if(!queueEvent(MidiPlayEvent(t + 3, port, chn, ME_CONTROLLER, CTRL_LDATA, dataL)))
+				return false;
 
 			t += 4;
 			if (nvh != 0xff)
 			{
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, nvh & 0x7f));
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, nvh & 0x7f)))
+					return false;
 				t += 1;
 			}
 			if (nvl != 0xff)
-				queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LNRPN, nvl & 0x7f));
+				if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_LNRPN, nvl & 0x7f)))
+					return false;
 		}
 		else
 		{
@@ -877,8 +914,10 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 	}
 	else
 	{
-		queueEvent(event);
+		if(!queueEvent(event))
+			return false;
 	}
+	return true;
 }
 
 //---------------------------------------------------------
@@ -887,33 +926,29 @@ void MidiJackDevice::processEvent(const MidiPlayEvent& event)
 
 void MidiJackDevice::processMidi()
 {
-	if (!_out_client_jackport) // p3.3.55
-		return;
-	void* port_buf = jack_port_get_buffer(_out_client_jackport, segmentSize); // p3.3.55
-	jack_midi_clear_buffer(port_buf);
+	//if (!_out_client_jackport) // p3.3.55
+	//	return;
+	void* port_buf = 0;
+	if(_out_client_jackport && _writeEnable)
+	{
+		port_buf = jack_port_get_buffer(_out_client_jackport, segmentSize); // p3.3.55
+		jack_midi_clear_buffer(port_buf);
+	}
 
 	while (!eventFifo.isEmpty())
 	{
-		MidiPlayEvent e(eventFifo.get());
-		int evTime = e.time();
-		// Is event marked to be played immediately?
-		if (evTime == 0)
-		{
-			// Nothing to do but stamp the event to be queued for frame 0+.
-			e.setTime(audio->getFrameOffset() + audio->pos().frame());
-		}
+		MidiPlayEvent e(eventFifo.peek());
 
-#ifdef JACK_MIDI_DEBUG
-		printf("MidiJackDevice::processMidi eventFifo time:%d type:%d ch:%d A:%d B:%d\n", e.time(), e.type(), e.channel(), e.dataA(), e.dataB());
-#endif  
-		processEvent(e);
+		if(port_buf && !processEvent(e))
+			return
+		eventFifo.remove();;
 	}
 
 	MPEventList* el = playEvents();
 	if (el->empty())
 		return;
 
-	iMPEvent i = nextPlayEvent();
+	iMPEvent i = el->begin(); //nextPlayEvent();
 	for (; i != el->end(); ++i)
 	{
 		// p3.3.39 Update hardware state so knobs and boxes are updated. Optimize to avoid re-setting existing values.
@@ -945,10 +980,12 @@ void MidiJackDevice::processMidi()
 			}
 		}
 
-		processEvent(*i);
+		if(port_buf && !processEvent(*i))
+			break;
 	}
-
-	setNextPlayEvent(i);
+	//Remove events already played
+	el->erase(el->begin(), i);
+	//setNextPlayEvent(i);
 }
 
 //---------------------------------------------------------

@@ -28,7 +28,7 @@ class Xml;
 class MidiDevice {
     MPEventList _stuckNotes;
     MPEventList _playEvents;
-    iMPEvent _nextPlayEvent;
+    //iMPEvent _nextPlayEvent;
     ///MREventList _recordEvents;
     ///MREventList _recordEvents2;
 
@@ -52,12 +52,14 @@ protected:
     //int _sysexReadChunk;
     //bool _sysexWritingChunks;
     bool _sysexReadingChunks;
+
+	MidiFifo eventFifo;
 	bool m_feedback;
 
     // Recording fifo.
     //MidiFifo _recordFifo;
     // Recording fifos. To speed up processing, one per channel plus one special system 'channel' for channel-less events like sysex.
-    MidiFifo _recordFifo[MIDI_CHANNELS + 1];
+    MidiRecFifo _recordFifo[MIDI_CHANNELS + 1];
 
     RouteList _inRoutes, _outRoutes;
 
@@ -172,7 +174,10 @@ public:
     virtual void recordEvent(MidiRecordEvent&);
 
     virtual bool putEvent(const MidiPlayEvent&);
-
+	
+	// 2 tries, 50 mS by default.
+	bool putEventWithRetry(const MidiPlayEvent&, int /*tries*/ = 2, long /*delayUs*/ = 50000);  
+	       
     // For Jack-based devices - called in Jack audio process callback
 
     virtual void collectMidiEvents() {
@@ -201,7 +206,7 @@ public:
     }
     //MidiFifo& recordEvents() { return _recordFifo; }
 
-    MidiFifo& recordEvents(const unsigned int ch) {
+    MidiRecFifo& recordEvents(const unsigned int ch) {
         return _recordFifo[ch];
     }
 
@@ -224,13 +229,13 @@ public:
     }
     //virtual void getEvents(unsigned /*from*/, unsigned /*to*/, int /*channel*/, MPEventList* /*dst*/);
 
-    iMPEvent nextPlayEvent() {
-        return _nextPlayEvent;
-    }
+    //iMPEvent nextPlayEvent() {
+    //    return _nextPlayEvent;
+    //}
 
-    void setNextPlayEvent(iMPEvent i) {
-        _nextPlayEvent = i;
-    }
+    //void setNextPlayEvent(iMPEvent i) {
+    //    _nextPlayEvent = i;
+    //}
     bool sendNullRPNParams(int, bool);
 	virtual bool isFeedbackEnabled()
 	{

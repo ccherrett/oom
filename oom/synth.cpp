@@ -915,6 +915,14 @@ void SynthI::preProcessAlways()
 	if (_sif)
 		_sif->preProcessAlways();
 	_processed = false;
+	if(off())
+	{
+	    // Clear any accumulated play events.
+	    playEvents()->clear();
+	    // Eat up any fifo events.
+	    while(!eventFifo.isEmpty()) 
+	      eventFifo.get();  
+	}
 }
 
 void MessSynthIF::preProcessAlways()
@@ -936,11 +944,12 @@ bool SynthI::getData(unsigned pos, int ports, unsigned n, float** buffer)
 	MidiPort* mp = (p != -1) ? &midiPorts[p] : 0;
 	MPEventList* el = playEvents();
 
-	iMPEvent ie = nextPlayEvent();
+	iMPEvent ie = el->begin(); //nextPlayEvent();
 
 	ie = _sif->getData(mp, el, ie, pos, ports, n, buffer);
 
-	setNextPlayEvent(ie);
+	//setNextPlayEvent(ie);
+	el->erase(el->begin(), ie);
 	return true;
 }
 

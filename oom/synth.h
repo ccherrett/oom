@@ -220,7 +220,7 @@ public MidiInstrument
 
 protected:
     Synth* synthesizer;
-    MidiFifo putFifo;
+    //MidiFifo putFifo;
 
     // List of initial floating point parameters, for synths which use them.
     // Used once upon song reload, then discarded.

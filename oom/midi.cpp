@@ -1064,12 +1064,12 @@ void Audio::processMidi()
 	{
 		MidiDevice* md = *id;
 
-		MPEventList* playEvents = md->playEvents();
+		//MPEventList* playEvents = md->playEvents();
 		//
 		// erase already played events:
 		//
-		iMPEvent nextPlayEvent = md->nextPlayEvent();
-		playEvents->erase(playEvents->begin(), nextPlayEvent);
+		//iMPEvent nextPlayEvent = md->nextPlayEvent();
+		//playEvents->erase(playEvents->begin(), nextPlayEvent);
 
 		// klumsy hack for synti devices:
 		if (md->isSynti())
@@ -1089,9 +1089,9 @@ void Audio::processMidi()
 		md->beforeProcess();
 	}
 
-	MPEventList* playEvents = metronome->playEvents();
-	iMPEvent nextPlayEvent = metronome->nextPlayEvent();
-	playEvents->erase(playEvents->begin(), nextPlayEvent);
+	//MPEventList* playEvents = metronome->playEvents();
+	//iMPEvent nextPlayEvent = metronome->nextPlayEvent();
+	//playEvents->erase(playEvents->begin(), nextPlayEvent);
 
 	// p3.3.25
 	bool extsync = extSyncFlag.value();
@@ -1148,7 +1148,7 @@ void Audio::processMidi()
 					if (!dev->sysexFIFOProcessed())
 					{
 						// Set to the sysex fifo at first.
-						MidiFifo& rf = dev->recordEvents(MIDI_CHANNELS);
+						MidiRecFifo& rf = dev->recordEvents(MIDI_CHANNELS);
 						// Get the frozen snapshot of the size.
 						int count = dev->tmpRecordCount(MIDI_CHANNELS);
 
@@ -1177,7 +1177,7 @@ void Audio::processMidi()
 					}
 
 					{
-						MidiFifo& rf = dev->recordEvents(channel);
+						MidiRecFifo& rf = dev->recordEvents(channel);
 						int count = dev->tmpRecordCount(channel);
 
 						for (int i = 0; i < count; ++i)
@@ -1368,12 +1368,12 @@ void Audio::processMidi()
 			}
 		}
 		// Added by Tim. p3.3.8
-		if (md)
-		{
+		//if (md)
+		//{
 			//printf("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n");
 
-			md->setNextPlayEvent(playEvents->begin());
-		}
+		//	md->setNextPlayEvent(playEvents->begin());
+		//}
 	}
 
 	//
@@ -1414,7 +1414,7 @@ void Audio::processMidi()
 			playEvents->add(ev);
 		}
 		stuckNotes->erase(stuckNotes->begin(), k);
-		md->setNextPlayEvent(playEvents->begin());
+		//md->setNextPlayEvent(playEvents->begin());
 	}
 
 	//---------------------------------------------------
@@ -1493,10 +1493,10 @@ void Audio::processMidi()
 					state = START_PLAY;
 			}
 		}
-		if (md)
-			md->setNextPlayEvent(playEvents->begin());
-		if (audioClickFlag)
-			metronome->setNextPlayEvent(metronome->playEvents()->begin());
+		//if (md)
+		//	md->setNextPlayEvent(playEvents->begin());
+		//if (audioClickFlag)
+		//	metronome->setNextPlayEvent(metronome->playEvents()->begin());
 	}
 
 	if (state == STOP)
@@ -1608,7 +1608,7 @@ void Audio::preloadControllers()/*{{{*/
 				}
 			}
 		}
-		md->setNextPlayEvent(playEvents->begin());
+		//md->setNextPlayEvent(playEvents->begin());
 	}
 	midiBusy = false;
 }/*}}}*/

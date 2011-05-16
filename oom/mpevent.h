@@ -14,7 +14,8 @@
 #include "evdata.h"
 #include "memory.h"
 
-#define MIDI_FIFO_SIZE    512
+#define MIDI_FIFO_SIZE    2100
+#define MIDI_REC_FIFO_SIZE    160
 
 class Event;
 class EvData;
@@ -272,9 +273,9 @@ typedef std::multiset<MidiPlayEvent, std::less<MidiPlayEvent>, audioRTalloc<Midi
 struct MPEventList : public MPEL
 {
 
-    void add(const MidiPlayEvent & ev)
+    iterator add(const MidiPlayEvent & ev)
     {
-        MPEL::insert(ev);
+        return MPEL::insert(ev);
     }
 };
 
@@ -337,6 +338,24 @@ public:
     {
         return size;
     }
+};
+
+class MidiRecFifo
+{
+	MidiPlayEvent fifo[MIDI_REC_FIFO_SIZE];
+	volatile int size;
+	int wIndex;
+	int rIndex;
+
+public:
+	MidiRecFifo() { clear(); }
+	bool put(const MidiPlayEvent&);
+	MidiPlayEvent get();
+	const MidiPlayEvent& peek(int n = 0);
+	void remove();
+	bool isEmpty() const { return size == 0; }
+	void clear() { size = 0, wIndex = 0, rIndex = 0; }
+	int getSize() const { return size; }
 };
 
 #endif

@@ -58,9 +58,9 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 		case SEQM_PRELOAD_PROGRAM:
 			audio->preloadControllers();
 			break;
-		case MS_PROCESS:
-			audio->processMidi();
-			break;
+		//case MS_PROCESS:
+		//	audio->processMidi();
+		//	break;
 		case SEQM_SEEK:
 			processSeek();
 			break;
@@ -155,7 +155,7 @@ void MidiSeq::processStop()
 			pel->add(ev);
 		}
 		sel->clear();
-		md->setNextPlayEvent(pel->begin());
+		//md->setNextPlayEvent(pel->begin());
 	}
 }
 
@@ -197,8 +197,8 @@ void MidiSeq::processSeek()
 			}
 			sel->clear();
 		}
-		else
-			el->erase(el->begin(), dev->nextPlayEvent());
+		//else
+		//	el->erase(el->begin(), dev->nextPlayEvent());
 
 		for (iMidiCtrlValList ivl = cll->begin(); ivl != cll->end(); ++ivl)
 		{
@@ -218,7 +218,7 @@ void MidiSeq::processSeek()
 					el->add(MidiPlayEvent(0, port, ivl->first >> 24, ME_CONTROLLER, vl->num(), imcv->second.val));
 			}
 		}
-		dev->setNextPlayEvent(el->begin());
+		//dev->setNextPlayEvent(el->begin());
 	}
 }
 
@@ -730,7 +730,7 @@ void MidiSeq::processTimerTick()
 		MPEventList* el = md->playEvents();
 		if (el->empty())
 			continue;
-		iMPEvent i = md->nextPlayEvent();
+		iMPEvent i = el->begin(); //md->nextPlayEvent();
 		for (; i != el->end(); ++i)
 		{
 			// p3.3.25
@@ -754,7 +754,8 @@ void MidiSeq::processTimerTick()
 					break;
 			}
 		}
-		md->setNextPlayEvent(i);
+		el->erase(el->begin(), i);
+		//md->setNextPlayEvent(i);
 	}
 }
 
@@ -795,10 +796,10 @@ void MidiSeq::msgPreloadCtrl()
 	msgMsg(SEQM_PRELOAD_PROGRAM);
 }
 
-void MidiSeq::msgProcess()
+/*void MidiSeq::msgProcess()
 {
 	msgMsg(MS_PROCESS);
-}
+}*/
 
 void MidiSeq::msgSeek()
 {
