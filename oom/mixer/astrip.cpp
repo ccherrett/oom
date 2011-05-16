@@ -290,7 +290,11 @@ void AudioStrip::updateVolume()
 		sl->blockSignals(false);
 		slider->blockSignals(false);
 		volume = vol;
-		midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_VOLUME, vol);
+		if(((AudioTrack*) track)->volFromAutomation())
+		{
+			//printf("AudioStrip::updateVolume via automation\n");
+			midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_VOLUME, vol);
+		}
 	}
 }
 
@@ -312,7 +316,10 @@ void AudioStrip::updatePan()
 		panl->blockSignals(false);
 		pan->blockSignals(false);
 		panVal = v;
-		midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_PANPOT, v);
+		if(((AudioTrack*) track)->panFromAutomation())
+		{
+			midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_PANPOT, v);
+		}
 	}
 }
 

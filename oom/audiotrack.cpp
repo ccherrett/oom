@@ -645,6 +645,18 @@ void AudioTrack::addACEvent(int id, int frame, double val)
 	return;
 }
 
+bool AudioTrack::volFromAutomation()
+{
+	ciCtrlList cl = _controller.find(AC_VOLUME);
+	if (cl == _controller.end())
+		return false;
+
+	if (automation && automationType() != AUTO_OFF && _volumeEnCtrl && _volumeEn2Ctrl)
+		return true;
+
+	return false;
+}
+
 //---------------------------------------------------------
 //   volume
 //---------------------------------------------------------
@@ -681,6 +693,18 @@ void AudioTrack::setVolume(double val, bool monitor)
 		//Call the monitor here if it was not called from the monitor
 		midiMonitor->msgSendAudioOutputEvent((Track*)this, CTRL_VOLUME, val);
 	}
+}
+
+bool AudioTrack::panFromAutomation()
+{
+	ciCtrlList cl = _controller.find(AC_PAN);
+	if (cl == _controller.end())
+		return false;
+
+	if (automation && automationType() != AUTO_OFF && _panEnCtrl && _panEn2Ctrl)
+		return true;
+	
+	return false;
 }
 
 //---------------------------------------------------------

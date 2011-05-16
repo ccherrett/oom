@@ -675,8 +675,10 @@ public:
         return _sendMetronome;
     }
 
+	bool volFromAutomation();
     double volume() const;
     void setVolume(double val, bool monitor = false);
+	bool panFromAutomation();
     double pan() const;
     void setPan(double val, bool monitor = false);
 
