@@ -33,6 +33,7 @@ extern double trackVolToDb(double val);
 extern double dbToTrackVol(double val);
 extern int trackPanToMidi(double val);
 extern double midiToTrackPan(int val);
+extern qint64 genId();
 
 #endif
 

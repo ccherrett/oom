@@ -209,6 +209,7 @@ QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#option
 	color: black;
 	font-size: 14px;
 	alternate-background-color: #bec0cf;
+	selection-background-color: #3d3e44;
 }
 QTableView#tblTrackView::focus, QTableView#routeList::focus
 {
@@ -629,9 +630,9 @@ QSplitter::handle{
 background-color: #696977;
 }
 
-QFrame { 
+QFrame, QWidget#CCEditBase { 
 border: 0px solid #595966;
-background-color: #595966
+background-color: #595966;
 }
 
 

@@ -71,7 +71,6 @@ MidiJackDevice::~MidiJackDevice()
 
 MidiDevice* MidiJackDevice::createJackMidiDevice(QString name, int rwflags) // p3.3.55 1:Writable 2: Readable 3: Writable + Readable
 {
-	// p3.3.55
 	int ni = 0;
 	if (name.isEmpty())
 	{
@@ -88,7 +87,7 @@ MidiDevice* MidiJackDevice::createJackMidiDevice(QString name, int rwflags) // p
 		return 0;
 	}
 
-	MidiJackDevice* dev = new MidiJackDevice(name); // p3.3.55
+	MidiJackDevice* dev = new MidiJackDevice(name); 
 	dev->setrwFlags(rwflags);
 	midiDevices.add(dev);
 	return dev;
@@ -124,7 +123,6 @@ QString MidiJackDevice::open()
 #endif  
 
 	QString s;
-	// p3.3.55 Moved from createJackMidiDevice()
 	if (_openFlags & 1)
 	{
 		if (!_out_client_jackport)
@@ -148,26 +146,6 @@ QString MidiJackDevice::open()
 	{
 		if (_out_client_jackport)
 		{
-			// We want to unregister the port (which will also disconnect it), AND remove Routes, and then NULL-ify _out_client_jackport.
-			// We could let our graph change callback (the gui thread one) remove the Routes (which it would anyway).
-			// But that happens later (gui thread) and it needs a valid  _out_client_jackport,
-			//  so use of a registration callback would be required to finally NULL-ify _out_client_jackport,
-			//  and that would require some MidiDevice setter or re-scanner function.
-			// So instead, manually remove the Routes (in the audio thread), then unregister the port, then immediately NULL-ify _out_client_jackport.
-			// Our graph change callback (the gui thread one) will see a NULL  _out_client_jackport
-			//  so it cannot possibly remove the Routes, but that won't matter - we are removing them manually.
-			// This is the same technique that is used for audio elsewhere in the code, like Audio::msgSetChannels()
-			//  (but not Song::connectJackRoutes() which keeps the Routes for when undoing deletion of a track).
-			//
-			// NOTE: TESTED: Possibly a bug in QJackCtl, with Jack-1 (not Jack-2 !):
-			// After toggling the input/output green lights in the midi ports list (which gets us here), intermittently
-			//  qjackctl refuses to draw connections. It allows them to be made (OOMidi responds) but blanks them out immediately
-			//  and does not show 'disconnect', as if it is not properly aware of the connections.
-			// But ALL else is OK - the connection is fine in OOMidi, verbose Jack messages show all went OK.
-			// Yes, there's no doubt the connections are being made.
-			// When I toggle the lights again (which kills, then recreates the ports here), the problem can disappear or come back again.
-			// Also once observed a weird double connection from the port to two different Jack ports but one of
-			//  the connections should not have been there and kept toggling along with the other (like a 'ghost' connection).
 			audio->msgRemoveRoutes(Route(this, 0), Route()); // New function msgRemoveRoutes simply uses Routes, for their pointers.
 			audioDevice->unregisterPort(_out_client_jackport);
 		}
@@ -552,7 +530,6 @@ void MidiJackDevice::collectMidiEvents()
 bool MidiJackDevice::putEvent(const MidiPlayEvent& ev)
 {
 	if (!_writeEnable || !_out_client_jackport)
-		//return true;
 		return false;
 
 #ifdef JACK_MIDI_DEBUG
@@ -574,21 +551,6 @@ bool MidiJackDevice::putEvent(const MidiPlayEvent& ev)
 
 bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 {
-	// Perhaps we can find use for this value later, together with the Jack midi OOMidi port(s).
-	// No big deal if not. Not used for now.
-	//int port = e.port();
-
-	//if(port >= JACK_MIDI_CHANNELS)
-	//  return false;
-
-	//if (midiOutputTrace) {
-	//      printf("MidiOut<%s>: jackMidi: ", portName(port).toLatin1().constData());
-	//      e.dump();
-	//      }
-
-	//if(debugMsg)
-	//  printf("MidiJackDevice::queueEvent\n");
-
 	if (!_out_client_jackport) // p3.3.55
 		return false;
 	void* pb = jack_port_get_buffer(_out_client_jackport, segmentSize); // p3.3.55
@@ -926,8 +888,6 @@ bool MidiJackDevice::processEvent(const MidiPlayEvent& event)
 
 void MidiJackDevice::processMidi()
 {
-	//if (!_out_client_jackport) // p3.3.55
-	//	return;
 	void* port_buf = 0;
 	if(_out_client_jackport && _writeEnable)
 	{
@@ -966,7 +926,6 @@ void MidiJackDevice::processMidi()
 			}
 			else if (i->type() == ME_PITCHBEND)
 			{
-				// p3.3.44
 				//printf("MidiJackDevice::processMidi playEvents ME_PITCHBEND time:%d type:%d ch:%d A:%d B:%d\n", (*i).time(), (*i).type(), (*i).channel(), (*i).dataA(), (*i).dataB());
 
 				int da = mp->limitValToInstrCtlRange(CTRL_PITCH, i->dataA());
@@ -985,7 +944,6 @@ void MidiJackDevice::processMidi()
 	}
 	//Remove events already played
 	el->erase(el->begin(), i);
-	//setNextPlayEvent(i);
 }
 
 //---------------------------------------------------------

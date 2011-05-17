@@ -12,7 +12,7 @@
 #include "ccedit.h"
 #include "midimonitor.h"
 
-CCEdit::CCEdit(QWidget* parent, CCInfo* n) : QWidget(parent)
+CCEdit::CCEdit(QWidget* parent, CCInfo* n) : QFrame(parent)
 {
 	setupUi(this);
 	m_info = n;
@@ -26,9 +26,10 @@ CCEdit::CCEdit(QWidget* parent, CCInfo* n) : QWidget(parent)
 	connect(m_learn, SIGNAL(clicked()), this, SLOT(startLearning()));
 	connect(m_channel, SIGNAL(valueChanged(int)), this, SLOT(channelChanged(int)));
 	connect(m_controlcombo, SIGNAL(currentIndexChanged(int)), this, SLOT(controlChanged(int)));
+	connect(m_chkRecord, SIGNAL(toggled(bool)), this, SLOT(recordOnlyChanged(bool)));
 }
 
-CCEdit::CCEdit(QWidget* parent) : QWidget(parent)
+CCEdit::CCEdit(QWidget* parent) : QFrame(parent)
 {
 	setupUi(this);
 	m_info = 0;
@@ -42,6 +43,7 @@ CCEdit::CCEdit(QWidget* parent) : QWidget(parent)
 	connect(m_learn, SIGNAL(clicked()), this, SLOT(startLearning()));
 	connect(m_channel, SIGNAL(valueChanged(int)), this, SLOT(channelChanged(int)));
 	connect(m_controlcombo, SIGNAL(currentIndexChanged(int)), this, SLOT(controlChanged(int)));
+	connect(m_chkRecord, SIGNAL(toggled(bool)), this, SLOT(recordOnlyChanged(bool)));
 	updateValues();
 }
 
@@ -63,6 +65,10 @@ void CCEdit::updateValues()
 		m_channel->blockSignals(true);
 		m_channel->setValue(1);
 		m_channel->blockSignals(false);
+
+		m_chkRecord->blockSignals(true);
+		m_chkRecord->setChecked(false);
+		m_chkRecord->blockSignals(false);
 	}
 	else
 	{
@@ -82,7 +88,17 @@ void CCEdit::updateValues()
 		m_channel->blockSignals(true);
 		m_channel->setValue(m_info->channel()+1);
 		m_channel->blockSignals(false);
+		m_chkRecord->blockSignals(true);
+		m_chkRecord->setChecked(m_info->recordOnly());
+		m_chkRecord->blockSignals(false);
 	}
+}
+
+void CCEdit::recordOnlyChanged(bool state)
+{
+	if(!m_info)
+		return;
+	m_info->setRecordOnly(state);
 }
 
 void CCEdit::channelChanged(int val)

@@ -14,7 +14,7 @@
 class Track;
 class CCInfo;
 
-class CCEdit : public QWidget, public Ui::CCEditBase
+class CCEdit : public QFrame, public Ui::CCEditBase
 {
 	Q_OBJECT
 	CCInfo* m_info;
@@ -36,6 +36,7 @@ private slots:
 	void updateValues();
 	void channelChanged(int val);
 	void controlChanged(int val);
+	void recordOnlyChanged(bool);
 
 signals:
 	void valuesUpdated(CCInfo* i);

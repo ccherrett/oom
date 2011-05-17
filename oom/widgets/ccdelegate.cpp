@@ -97,5 +97,6 @@ void CCInfoDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
 void CCInfoDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
 	editor->setGeometry(option.rect);
+	//editor->setStyleSheet("QWidget#CCEditBase { background-color: #595966; }");
 }
 
