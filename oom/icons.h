@@ -108,6 +108,7 @@ extern QPixmap* configureIcon;
 extern QPixmap* editmuteIcon;
 extern QPixmap* editmuteSIcon;
 extern QPixmap* panicIcon;
+extern QPixmap* feedbackIcon;
 extern QPixmap* upPCIcon;
 extern QPixmap* downPCIcon;
 extern QPixmap* garbagePCIcon;

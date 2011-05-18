@@ -904,7 +904,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	panicAction->setWhatsThis(tr(infoPanicButton));
 	connect(panicAction, SIGNAL(triggered()), song, SLOT(panic()));
 
-	feedbackAction = new QAction(QIcon(*panicIcon), tr("Feedback"), this);
+	feedbackAction = new QAction(QIcon(*feedbackIcon), tr("Feedback"), this);
 	feedbackAction->setCheckable(true);
 	connect(feedbackAction, SIGNAL(toggled(bool)), song, SLOT(toggleFeedback(bool)));
 

@@ -370,6 +370,7 @@ QIcon* soloIconSet2;
 QPixmap* editmuteIcon;
 QPixmap* editmuteSIcon;
 QPixmap* panicIcon;
+QPixmap* feedbackIcon;
 
 QPixmap* arranger_record_on_Icon;
 QPixmap* arranger_record_off_Icon;
@@ -605,6 +606,7 @@ void initIcons()
       editmuteIcon  = new MPIXMAP(":/images/icons/mute-all.png", NULL);
       editmuteSIcon = new MPIXMAP(editmuteS_xpm, NULL);
       panicIcon  = new MPIXMAP(":/images/icons/transport-panic.png", NULL);
+      feedbackIcon  = new MPIXMAP(":/images/icons/feedback.png", NULL);
 
       editcutIconSet       = new MICON(editcutS_xpm, NULL);//"edit-cut"); // ddskrjo
       editcopyIconSet      = new MICON(editcopyS_xpm, NULL);//"edit-copy");
