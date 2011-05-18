@@ -914,7 +914,6 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)
 
 void PianoCanvas::pianoReleased(int pitch, bool)
 {
-	printf("PianoCanvas::pianoReleased\n");
 	if(m_globalKey)
 	{
 		PartList* pl = editor->parts();
