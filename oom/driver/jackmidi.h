@@ -19,68 +19,11 @@
 #include "route.h"
 
 class QString;
-class MidiFifo;
+//class MidiFifo;
 class MidiRecordEvent;
 class MidiPlayEvent;
 //class RouteList;
 class Xml;
-
-// Turn on to show multiple devices, work in progress, 
-//  not working fully yet, can't seem to connect...
-//#define JACK_MIDI_SHOW_MULTIPLE_DEVICES
-
-// It appears one client port per remote port will be necessary.
-// Jack doesn't seem to like manipulation of non-local ports buffers.
-//#define JACK_MIDI_USE_MULTIPLE_CLIENT_PORTS
-
-/* jack-midi channels */
-//#define JACK_MIDI_CHANNELS 32
-
-/* jack-midi buffer size */
-//#define JACK_MIDI_BUFFER_SIZE 32
-
-/*
-typedef struct {
-  int  give;
-  int  take;
-  // 32 parallel midi events, where each event contains three
-  //  midi-bytes and one busy-byte 
-  char buffer[4 * JACK_MIDI_BUFFER_SIZE];
-} oom_jack_midi_buffer;
- */
-
-/*
-struct JackMidiPort 
-{
-  jack_port_t* _jackPort;
-  QString _name;
-  int _flags; // 1 = writable, 2 = readable - do not mix
-  JackMidiPort(jack_port_t* jp, const QString& s, int f) 
-  {
-    _jackPort = jp;
-    _name = QString(s);
-    _flags = f;
-  }
-};
-
-typedef std::map<jack_port_t*, JackMidiPort, std::less<jack_port_t*> >::iterator iJackMidiPort;
-typedef std::map<jack_port_t*, JackMidiPort, std::less<jack_port_t*> >::const_iterator ciJackMidiPort;
-
-class JackMidiPortList : public std::map<jack_port_t*, JackMidiPort, std::less<jack_port_t*> > 
-{
-   private:   
-      static int _nextOutIdNum;
-      static int _nextInIdNum;
-      
-   public:
-      JackMidiPortList();
-      ~JackMidiPortList();
-      iJackMidiPort createClientPort(int flags);
-      bool removeClientPort(jack_port_t* port);
-};
-
-extern JackMidiPortList jackMidiClientPorts;
- */
 
 //---------------------------------------------------------
 //   MidiJackDevice
@@ -94,7 +37,7 @@ public:
 private:
     // fifo for midi events sent from gui
     // direct to midi port:
-    MidiFifo eventFifo;
+    //MidiFifo eventFifo;
 
     //static int _nextOutIdNum;
     //static int _nextInIdNum;
@@ -110,7 +53,7 @@ private:
     virtual void close();
     //bool putEvent(int*);
 
-    void processEvent(const MidiPlayEvent&);
+    bool processEvent(const MidiPlayEvent&);
     // Port is not midi port, it is the port(s) created for OOMidi.
     bool queueEvent(const MidiPlayEvent&);
 

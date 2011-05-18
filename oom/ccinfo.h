@@ -20,9 +20,10 @@ class CCInfo : public QObject
 	int m_channel;
 	int m_control;
 	int m_ccnum;
+	int m_reconly;
 
 public:
-	CCInfo(Track* , int port, int chan, int control, int cc);
+	CCInfo(Track* , int port, int chan, int control, int cc, int rec = 0);
 	CCInfo();
 	CCInfo(const CCInfo&);
 	~CCInfo();
@@ -37,11 +38,13 @@ public:
 	void setAssignedControl(int c) { m_ccnum = c; }
 	void setTrack(Track* t) { m_track = t; }
 	Track* track() { return m_track; }
+	bool recordOnly() { return (bool)m_reconly; } 
+	void setRecordOnly(bool r) { m_reconly = (int)r; }
 
 	inline bool operator==(CCInfo nfo)
 	{
 		return nfo.port() == m_port && nfo.channel() == m_channel && nfo.controller() == m_control 
-			&& nfo.assignedControl() == m_ccnum && nfo.track() == m_track;
+			&& nfo.assignedControl() == m_ccnum && nfo.track() == m_track && (int)nfo.recordOnly() == m_reconly;
 	}
 
 	inline uint qHash(CCInfo m)

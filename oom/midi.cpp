@@ -544,22 +544,11 @@ void buildMidiEventList(EventList* del, const MPEventList* el, MidiTrack* track,
 		if (!e.empty())
 		{
 			e.setTick(tick);
-			// Added by Tim. p3.3.8
 			//printf("buildMidiEventList: mel adding t:%d type:%d A:%d B:%d C:%d\n", tick, e.type(), e.dataA(), e.dataB(), e.dataC());
 
 			mel.add(e);
 		}
-	} // i != el->end()
-
-	//---------------------------------------------------
-	//    resolve NoteOff events
-	//---------------------------------------------------
-
-	//      for (iEvent i = mel.begin(); i != mel.end(); ++i) {
-	//            Event event = i->second;
-	//            if (event.isNote())
-	//                  event.setLenTick(0);
-	//            }
+	} 
 
 	// Added by Tim. p3.3.8
 
@@ -668,32 +657,18 @@ void buildMidiEventList(EventList* del, const MPEventList* el, MidiTrack* track,
 		}
 	} while (loop);
 
-	// DEBUG: any note offs left?
-
-	// Removed by Tim. p3.3.8
-	//for (iEvent i = mel.begin(); i != mel.end(); ++i) {
-	//      Event ev  = i->second;
-	//      if (ev.isNoteOff()) {
-	//            printf("+extra note-off! %d pitch %d velo %d\n",
-	//                     i->first, ev.pitch(), ev.velo());
-	//                  ev.dump();
-	//            }
-	//      }
-
 	for (iEvent i = mel.begin(); i != mel.end(); ++i)
 	{
 		Event ev = i->second;
 		if (ev.isNoteOff())
 		{
-			printf("+extra note-off! %d pitch %d velo %d\n",
-					i->first, ev.pitch(), ev.velo());
-			//                  ev.dump();
+			printf("+extra note-off! %d pitch %d velo %d\n",i->first, ev.pitch(), ev.velo());
 			continue;
 		}
-		int tick = CALC_TICK(ev.tick()); //(ev.tick() * config.division + div/2) / div;
+		int tick = CALC_TICK(ev.tick());
 		if (ev.isNote())
 		{
-			int lenTick = CALC_TICK(ev.lenTick()); //(ev.lenTick() * config.division + div/2) / div;
+			int lenTick = CALC_TICK(ev.lenTick()); 
 			ev.setLenTick(lenTick);
 		}
 		ev.setTick(tick);
@@ -959,8 +934,7 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 
 							playEvents->add(MidiPlayEvent(frame, port, channel, 0x90, pitch, velo));
 
-						stuckNotes->add(MidiPlayEvent(tick + len, port, channel,
-								veloOff ? 0x80 : 0x90, pitch, veloOff));
+						stuckNotes->add(MidiPlayEvent(tick + len, port, channel, veloOff ? 0x80 : 0x90, pitch, veloOff));
 					}
 					else
 					{ //Handle events to different port than standard.
@@ -975,8 +949,7 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 
 								mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel, 0x90, pitch, velo));
 
-							mdAlt->stuckNotes()->add(MidiPlayEvent(tick + len, port, channel,
-									veloOff ? 0x80 : 0x90, pitch, veloOff));
+							mdAlt->stuckNotes()->add(MidiPlayEvent(tick + len, port, channel, veloOff ? 0x80 : 0x90, pitch, veloOff));
 						}
 					}
 
@@ -1009,13 +982,10 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 								// If syncing to external midi sync, we cannot use the tempo map.
 								// Therefore we cannot get sub-tick resolution. Just use ticks instead of frames.
 								if (extSyncFlag.value())
-									mdAlt->playEvents()->add(MidiPlayEvent(tick, port, channel,
-										ME_CONTROLLER, ctl | pitch, ev.dataB()));
+									mdAlt->playEvents()->add(MidiPlayEvent(tick, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB()));
 								else
 
-									//playEvents->add(MidiPlayEvent(frame, port, channel, ev));
-									mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel,
-										ME_CONTROLLER, ctl | pitch, ev.dataB()));
+									mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB()));
 
 							}
 							break;
@@ -1064,13 +1034,6 @@ void Audio::processMidi()
 	{
 		MidiDevice* md = *id;
 
-		MPEventList* playEvents = md->playEvents();
-		//
-		// erase already played events:
-		//
-		iMPEvent nextPlayEvent = md->nextPlayEvent();
-		playEvents->erase(playEvents->begin(), nextPlayEvent);
-
 		// klumsy hack for synti devices:
 		if (md->isSynti())
 		{
@@ -1089,11 +1052,6 @@ void Audio::processMidi()
 		md->beforeProcess();
 	}
 
-	MPEventList* playEvents = metronome->playEvents();
-	iMPEvent nextPlayEvent = metronome->nextPlayEvent();
-	playEvents->erase(playEvents->begin(), nextPlayEvent);
-
-	// p3.3.25
 	bool extsync = extSyncFlag.value();
 
 	for (iMidiTrack t = song->midis()->begin(); t != song->midis()->end(); ++t)
@@ -1148,7 +1106,7 @@ void Audio::processMidi()
 					if (!dev->sysexFIFOProcessed())
 					{
 						// Set to the sysex fifo at first.
-						MidiFifo& rf = dev->recordEvents(MIDI_CHANNELS);
+						MidiRecFifo& rf = dev->recordEvents(MIDI_CHANNELS);
 						// Get the frozen snapshot of the size.
 						int count = dev->tmpRecordCount(MIDI_CHANNELS);
 
@@ -1177,7 +1135,7 @@ void Audio::processMidi()
 					}
 
 					{
-						MidiFifo& rf = dev->recordEvents(channel);
+						MidiRecFifo& rf = dev->recordEvents(channel);
 						int count = dev->tmpRecordCount(channel);
 
 						for (int i = 0; i < count; ++i)
@@ -1367,13 +1325,6 @@ void Audio::processMidi()
 				}//END for loop
 			}
 		}
-		// Added by Tim. p3.3.8
-		if (md)
-		{
-			//printf("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n");
-
-			md->setNextPlayEvent(playEvents->begin());
-		}
 	}
 
 	//
@@ -1385,9 +1336,6 @@ void Audio::processMidi()
 		//printf("--------------------------aaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 		MidiDevice* md = *id;
 
-		///md->recordEvents()->clear();
-		// By T356. Done processing this rec buffer, now flip to the other one.
-		///md->flipRecBuffer();
 		// We are done with the 'frozen' recording fifos, remove the events.
 		md->afterProcess();
 
@@ -1414,7 +1362,6 @@ void Audio::processMidi()
 			playEvents->add(ev);
 		}
 		stuckNotes->erase(stuckNotes->begin(), k);
-		md->setNextPlayEvent(playEvents->begin());
 	}
 
 	//---------------------------------------------------
@@ -1449,8 +1396,7 @@ void Audio::processMidi()
 			}
 			int evtime = extsync ? midiClick : tempomap.tick2frame(midiClick) + frameOffset;
 
-			MidiPlayEvent ev(evtime, clickPort, clickChan, ME_NOTEON,
-					beatClickNote, beatClickVelo);
+			MidiPlayEvent ev(evtime, clickPort, clickChan, ME_NOTEON, beatClickNote, beatClickVelo);
 
 			if (md)
 			{
@@ -1493,10 +1439,6 @@ void Audio::processMidi()
 					state = START_PLAY;
 			}
 		}
-		if (md)
-			md->setNextPlayEvent(playEvents->begin());
-		if (audioClickFlag)
-			metronome->setNextPlayEvent(metronome->playEvents()->begin());
 	}
 
 	if (state == STOP)
@@ -1608,7 +1550,7 @@ void Audio::preloadControllers()/*{{{*/
 				}
 			}
 		}
-		md->setNextPlayEvent(playEvents->begin());
+		//md->setNextPlayEvent(playEvents->begin());
 	}
 	midiBusy = false;
 }/*}}}*/

@@ -113,6 +113,8 @@ void MidiMonitor::msgSendAudioOutputEvent(Track* track, int ctl, double val)/*{{
 
 void MidiMonitor::msgModifyTrackController(Track* track, int ctl, CCInfo* cc)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	if(track && cc)
 	{
 		MonitorMsg msg;
@@ -127,6 +129,8 @@ void MidiMonitor::msgModifyTrackController(Track* track, int ctl, CCInfo* cc)/*{
 
 void MidiMonitor::msgDeleteTrackController(CCInfo* cc)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	if(cc)
 	{
 		MonitorMsg msg;
@@ -139,6 +143,8 @@ void MidiMonitor::msgDeleteTrackController(CCInfo* cc)/*{{{*/
 
 void MidiMonitor::msgModifyTrackPort(Track* track,int port)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_MODIFY_PORT;
 	msg.track = track;
@@ -149,6 +155,8 @@ void MidiMonitor::msgModifyTrackPort(Track* track,int port)/*{{{*/
 
 void MidiMonitor::msgAddMonitoredTrack(Track* track)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_ADD_TRACK;
 	msg.track = track;
@@ -158,6 +166,8 @@ void MidiMonitor::msgAddMonitoredTrack(Track* track)/*{{{*/
 
 void MidiMonitor::msgDeleteMonitoredTrack(Track* track)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_ADD_TRACK;
 	msg.track = track;
@@ -167,6 +177,8 @@ void MidiMonitor::msgDeleteMonitoredTrack(Track* track)/*{{{*/
 
 void MidiMonitor::msgToggleFeedback(bool f)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_TOGGLE_FEEDBACK;
 	msg.mval = (int)f;
@@ -176,6 +188,8 @@ void MidiMonitor::msgToggleFeedback(bool f)/*{{{*/
 
 void MidiMonitor::msgStartLearning(int port)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_LEARN;
 	msg.port = port;
@@ -239,7 +253,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			{
 				//printf("MidiMonitor::processMsg1() Processing Midi Input\n");
 				//QMultiHash<int, QString>::iterator i = m_portccmap.find(msg->mevent.dataA());
-				QMultiHash<int, CCInfo*>::iterator iter = m_midimap.find(msg->mevent.dataA());//FIXME
+				QMultiHash<int, CCInfo*>::iterator iter = m_midimap.find(msg->mevent.dataA());
 				while(iter != m_midimap.end())
 				//while (i != m_portccmap.end()) 
 				{
@@ -254,6 +268,11 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 						int ctl = info->controller();
 						if(info->track())
 						{
+							if(info->recordOnly() && !info->track()->recordFlag())
+							{
+								++iter;
+								continue;
+							}
 							switch(ctl)/*{{{*/
 							{
 								case CTRL_VOLUME:
@@ -440,7 +459,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 	}
 }/*}}}*/
 
-
+//Private members
 void MidiMonitor::populateList()/*{{{*/
 {
 	m_editing = true;
@@ -455,7 +474,7 @@ void MidiMonitor::populateList()/*{{{*/
 	m_editing = false;
 }/*}}}*/
 
-void MidiMonitor::addMonitoredTrack(Track* t)
+void MidiMonitor::addMonitoredTrack(Track* t)/*{{{*/
 {
 	MidiAssignData* data = t->midiAssign();
 	m_assignments[t->name()] = data;
@@ -476,9 +495,9 @@ void MidiMonitor::addMonitoredTrack(Track* t)
 		MidiTrack* track = (MidiTrack*)t;
 		m_outputports.insert(track->outPort(), track->name());
 	}
-}
+}/*}}}*/
 
-void MidiMonitor::deleteMonitoredTrack(Track* t)
+void MidiMonitor::deleteMonitoredTrack(Track* t)/*{{{*/
 {
 	MidiAssignData* data = t->midiAssign();
 	if(isAssigned(t->name()))
@@ -503,7 +522,7 @@ void MidiMonitor::deleteMonitoredTrack(Track* t)
 		if(isManagedOutputPort(track->outPort(), track->name()))
 			m_outputports.remove(track->outPort(), track->name());
 	}
-}
+}/*}}}*/
 
 bool MidiMonitor::isManagedController(int ctl)/*{{{*/
 {

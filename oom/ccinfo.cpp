@@ -9,13 +9,14 @@
 #include "track.h"
 #include "ccinfo.h"
 
-CCInfo::CCInfo(Track* t, int port, int chan, int control, int cc)
+CCInfo::CCInfo(Track* t, int port, int chan, int control, int cc, int rec)
 {
 	m_track = t;
 	m_port = port;
 	m_channel = chan;
 	m_control = control;
 	m_ccnum = cc;
+	m_reconly = rec;
 }
 
 CCInfo::CCInfo()
@@ -25,6 +26,7 @@ CCInfo::CCInfo()
 	m_channel = 0;
 	m_control = 0;
 	m_ccnum = 0;
+	m_reconly = 0;
 }
 
 CCInfo::CCInfo(const CCInfo& i)
@@ -34,6 +36,7 @@ CCInfo::CCInfo(const CCInfo& i)
 ,m_channel(i.m_channel)
 ,m_control(i.m_control)
 ,m_ccnum(i.m_ccnum)
+,m_reconly(i.m_reconly)
 {
 }
 

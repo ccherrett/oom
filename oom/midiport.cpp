@@ -206,7 +206,7 @@ const QString& MidiPort::portname() const
 
 void MidiPort::tryCtrlInitVal(int chan, int ctl, int val)
 {
-	printf("Entering: MidiPort::tryCtrlInitVal");
+	//printf("Entering: MidiPort::tryCtrlInitVal\n");
 	if (_instrument)
 	{
 		MidiControllerList* cl = _instrument->controller();
@@ -591,6 +591,7 @@ bool MidiPort::sendEvent(const MidiPlayEvent& ev, bool forceSend)
 			printf("no device for this midi port\n");
 		return true;
 	}
+	//printf("MidiPort::sendEvent\n");
 	return _device->putEvent(ev);
 }
 

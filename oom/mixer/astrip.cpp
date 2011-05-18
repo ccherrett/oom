@@ -454,6 +454,7 @@ void AudioStrip::volumeChanged(double val)
 	volume = vol;
 	audio->msgSetVolume((AudioTrack*) track, vol);
 	((AudioTrack*) track)->recordAutomation(AC_VOLUME, vol);
+	song->update(SC_TRACK_MODIFIED);
 	//double vv = (vol + 60)/0.5546875;
 	//printf("AudioStrip::volumeChanged(%g) - val: %g - midiNum: %d whacky: %d\n", vol, dbToTrackVol(val), dbToMidi(val), dbToMidi(trackVolToDb(vol)));
 }

@@ -679,7 +679,8 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 		assign.append(QString::number(info->port())).append(":")
 			.append(QString::number(info->channel())).append(":")
 			.append(QString::number(info->controller())).append(":")
-			.append(QString::number(info->assignedControl())).append(" ");
+			.append(QString::number(info->assignedControl())).append(":")
+			.append(QString::number((int)info->recordOnly())).append(" ");
 		//assign.append(QString::number(iter.key())).append(":").append(QString::number(iter.value())).append(" ");
 	}
 	xml.nput(" midimap=\"%s\"", assign.toUtf8().constData());
@@ -924,8 +925,17 @@ void MidiAssignData::read(Xml& xml, Track* t)
 	channel = 0;
 	track = t;
 	midimap.clear();
-	if(t->type() == Track::AUDIO_OUTPUT || t->type() == Track::WAVE || t->isMidiTrack())
-		midimap.insert(CTRL_RECORD, new CCInfo(t, 0, 0, CTRL_RECORD, -1));
+	switch(t->type())
+	{
+		case Track::AUDIO_INPUT:
+		case Track::AUDIO_BUSS:
+		case Track::AUDIO_SOFTSYNTH:
+		case Track::AUDIO_AUX:
+		break;
+		default:
+			midimap.insert(CTRL_RECORD, new CCInfo(t, 0, 0, CTRL_RECORD, -1));
+		break;
+	}
 	midimap.insert(CTRL_MUTE, new CCInfo(t, 0, 0, CTRL_MUTE, -1));
 	midimap.insert(CTRL_SOLO, new CCInfo(t, 0, 0, CTRL_SOLO, -1));
 	midimap.insert(CTRL_VOLUME, new CCInfo(t, 0, 0, CTRL_VOLUME, -1));
@@ -968,6 +978,10 @@ void MidiAssignData::read(Xml& xml, Track* t)
 						else if(cclist.size() == 4)
 						{ //New style
 							midimap.insert(cclist[2].toInt(), new CCInfo(t, cclist[0].toInt(), cclist[1].toInt(), cclist[2].toInt(), cclist[3].toInt()));
+						}
+						else if(cclist.size() == 5)
+						{ //New style
+							midimap.insert(cclist[2].toInt(), new CCInfo(t, cclist[0].toInt(), cclist[1].toInt(), cclist[2].toInt(), cclist[3].toInt(), cclist[4].toInt()));
 						}
 					}
 				}

@@ -48,6 +48,7 @@ struct OscControlValue
 {
     //int idx;
     float value;
+	int frame;
     // maybe timestamp, too ?
 };
 

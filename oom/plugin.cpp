@@ -2523,6 +2523,7 @@ int PluginI::oscControl(unsigned long port, float value)
 		OscControlValue cv;
 		//cv.idx = cport;
 		cv.value = value;
+		cv.frame = audio->timestamp();
 		if (cfifo->put(cv))
 		{
 			fprintf(stderr, "PluginI::oscControl: fifo overflow: in control number:%ld\n", cport);
