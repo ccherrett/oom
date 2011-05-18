@@ -900,8 +900,12 @@ void MidiJackDevice::processMidi()
 		MidiPlayEvent e(eventFifo.peek());
 
 		if(port_buf && !processEvent(e))
-			return
-		eventFifo.remove();;
+		{
+			//printf("MidiJackDevice::processMidi Event send failed\n");
+			return;
+		}
+		eventFifo.remove();
+		//printf("MidiJackDevice::processMidi removed event\n");
 	}
 
 	MPEventList* el = playEvents();

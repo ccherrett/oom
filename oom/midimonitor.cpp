@@ -113,6 +113,8 @@ void MidiMonitor::msgSendAudioOutputEvent(Track* track, int ctl, double val)/*{{
 
 void MidiMonitor::msgModifyTrackController(Track* track, int ctl, CCInfo* cc)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	if(track && cc)
 	{
 		MonitorMsg msg;
@@ -127,6 +129,8 @@ void MidiMonitor::msgModifyTrackController(Track* track, int ctl, CCInfo* cc)/*{
 
 void MidiMonitor::msgDeleteTrackController(CCInfo* cc)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	if(cc)
 	{
 		MonitorMsg msg;
@@ -139,6 +143,8 @@ void MidiMonitor::msgDeleteTrackController(CCInfo* cc)/*{{{*/
 
 void MidiMonitor::msgModifyTrackPort(Track* track,int port)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_MODIFY_PORT;
 	msg.track = track;
@@ -149,6 +155,8 @@ void MidiMonitor::msgModifyTrackPort(Track* track,int port)/*{{{*/
 
 void MidiMonitor::msgAddMonitoredTrack(Track* track)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_ADD_TRACK;
 	msg.track = track;
@@ -158,6 +166,8 @@ void MidiMonitor::msgAddMonitoredTrack(Track* track)/*{{{*/
 
 void MidiMonitor::msgDeleteMonitoredTrack(Track* track)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_ADD_TRACK;
 	msg.track = track;
@@ -167,6 +177,8 @@ void MidiMonitor::msgDeleteMonitoredTrack(Track* track)/*{{{*/
 
 void MidiMonitor::msgToggleFeedback(bool f)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_TOGGLE_FEEDBACK;
 	msg.mval = (int)f;
@@ -176,6 +188,8 @@ void MidiMonitor::msgToggleFeedback(bool f)/*{{{*/
 
 void MidiMonitor::msgStartLearning(int port)/*{{{*/
 {
+	if(!isRunning())
+		return;
 	MonitorMsg msg;
 	msg.id = MONITOR_LEARN;
 	msg.port = port;
