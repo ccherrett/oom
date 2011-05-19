@@ -52,6 +52,7 @@ private slots:
 	void controllerChanged(QStandardItem*);
 	void btnAddController();
 	void btnDeleteController();
+	void btnUpdateDefault();
 
 protected:
 	virtual void showEvent(QShowEvent*);

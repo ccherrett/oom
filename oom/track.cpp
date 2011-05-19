@@ -680,7 +680,8 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 			.append(QString::number(info->channel())).append(":")
 			.append(QString::number(info->controller())).append(":")
 			.append(QString::number(info->assignedControl())).append(":")
-			.append(QString::number((int)info->recordOnly())).append(" ");
+			.append(QString::number((int)info->recordOnly())).append(":")
+			.append(QString::number((int)info->fakeToggle())).append(" ");
 		//assign.append(QString::number(iter.key())).append(":").append(QString::number(iter.value())).append(" ");
 	}
 	xml.nput(" midimap=\"%s\"", assign.toUtf8().constData());
@@ -918,7 +919,7 @@ void MidiTrack::read(Xml& xml)/*{{{*/
 	}
 }/*}}}*/
 
-void MidiAssignData::read(Xml& xml, Track* t)
+void MidiAssignData::read(Xml& xml, Track* t)/*{{{*/
 {
 	enabled = false;
 	port = 0;
@@ -946,7 +947,7 @@ void MidiAssignData::read(Xml& xml, Track* t)
 		midimap.insert(CTRL_CHORUS_SEND, new CCInfo(t, 0, 0, CTRL_CHORUS_SEND, -1));
 		midimap.insert(CTRL_VARIATION_SEND, new CCInfo(t, 0, 0, CTRL_VARIATION_SEND, -1));
 	}
-	for (;;)/*{{{*/
+	for (;;)
 	{
 		Xml::Token token = xml.parse();
 		const QString& tag = xml.s1();
@@ -976,12 +977,16 @@ void MidiAssignData::read(Xml& xml, Track* t)
 							midimap.insert(cclist[0].toInt(), new CCInfo(t, port, channel, cclist[0].toInt(), cclist[1].toInt()));
 						}
 						else if(cclist.size() == 4)
-						{ //New style
+						{ //Added change and port to assign data
 							midimap.insert(cclist[2].toInt(), new CCInfo(t, cclist[0].toInt(), cclist[1].toInt(), cclist[2].toInt(), cclist[3].toInt()));
 						}
 						else if(cclist.size() == 5)
-						{ //New style
+						{ //Added record only
 							midimap.insert(cclist[2].toInt(), new CCInfo(t, cclist[0].toInt(), cclist[1].toInt(), cclist[2].toInt(), cclist[3].toInt(), cclist[4].toInt()));
+						}
+						else if(cclist.size() == 6)
+						{ //Added fakeToggle
+							midimap.insert(cclist[2].toInt(), new CCInfo(t, cclist[0].toInt(), cclist[1].toInt(), cclist[2].toInt(), cclist[3].toInt(), cclist[4].toInt(), cclist[5].toInt()));
 						}
 					}
 				}
@@ -998,6 +1003,6 @@ void MidiAssignData::read(Xml& xml, Track* t)
 			default:
 				break;
 		}
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 

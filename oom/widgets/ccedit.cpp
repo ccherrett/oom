@@ -27,6 +27,7 @@ CCEdit::CCEdit(QWidget* parent, CCInfo* n) : QFrame(parent)
 	connect(m_channel, SIGNAL(valueChanged(int)), this, SLOT(channelChanged(int)));
 	connect(m_controlcombo, SIGNAL(currentIndexChanged(int)), this, SLOT(controlChanged(int)));
 	connect(m_chkRecord, SIGNAL(toggled(bool)), this, SLOT(recordOnlyChanged(bool)));
+	connect(m_chkToggle, SIGNAL(toggled(bool)), this, SLOT(toggleChanged(bool)));
 }
 
 CCEdit::CCEdit(QWidget* parent) : QFrame(parent)
@@ -44,6 +45,7 @@ CCEdit::CCEdit(QWidget* parent) : QFrame(parent)
 	connect(m_channel, SIGNAL(valueChanged(int)), this, SLOT(channelChanged(int)));
 	connect(m_controlcombo, SIGNAL(currentIndexChanged(int)), this, SLOT(controlChanged(int)));
 	connect(m_chkRecord, SIGNAL(toggled(bool)), this, SLOT(recordOnlyChanged(bool)));
+	connect(m_chkToggle, SIGNAL(toggled(bool)), this, SLOT(toggleChanged(bool)));
 	updateValues();
 }
 
@@ -69,6 +71,10 @@ void CCEdit::updateValues()
 		m_chkRecord->blockSignals(true);
 		m_chkRecord->setChecked(false);
 		m_chkRecord->blockSignals(false);
+
+		m_chkToggle->blockSignals(true);
+		m_chkToggle->setChecked(false);
+		m_chkToggle->blockSignals(false);
 	}
 	else
 	{
@@ -91,6 +97,10 @@ void CCEdit::updateValues()
 		m_chkRecord->blockSignals(true);
 		m_chkRecord->setChecked(m_info->recordOnly());
 		m_chkRecord->blockSignals(false);
+
+		m_chkToggle->blockSignals(true);
+		m_chkToggle->setChecked(m_info->fakeToggle());
+		m_chkToggle->blockSignals(false);
 	}
 }
 
@@ -99,6 +109,12 @@ void CCEdit::recordOnlyChanged(bool state)
 	if(!m_info)
 		return;
 	m_info->setRecordOnly(state);
+}
+
+void CCEdit::toggleChanged(bool state)
+{
+	if(m_info)
+		m_info->setFakeToggle(state);
 }
 
 void CCEdit::channelChanged(int val)

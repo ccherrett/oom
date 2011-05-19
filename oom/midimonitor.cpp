@@ -205,34 +205,6 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 	int type = msg->id;
 	switch(type)
 	{
-		case MONITOR_AUDIO_OUT:	//Used to process outgoing midi from audio tracks
-			//printf("MidiMonitor::processMsg1() Audio Output\n");
-			if(!m_feedback)
-				return;
-			if(msg->track /*&& isAssigned(msg->track->name())*/) /*{{{*/
-			{
-				MidiAssignData* data = m_assignments.value(msg->track->name());
-				if(/*!isManagedController(msg->ctl) || */!data->enabled || data->midimap.isEmpty())
-					return;
-				CCInfo *info = data->midimap.value(msg->ctl);
-				if(info && info->assignedControl() >= 0)
-				{
-					//int ccval = info->assignedControl();
-					//if(ccval < 0)
-					//	return;
-					int val = 0;
-					if(msg->ctl == CTRL_PANPOT)
-						val = trackPanToMidi(msg->aval);//, midiToTrackPan(trackPanToMidi(val)));
-					else
-						val = dbToMidi(trackVolToDb(msg->aval));
-					//printf("Sending midivalue from audio track: %d\n", val);
-					//TODO: Check if feedback is required before bothering with this
-					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), val);
-					midiPorts[ev.port()].device()->putEvent(ev);
-				}
-				//audio->msgPlayMidiEvent(&ev);
-			}/*}}}*/
-		break;
 		case MONITOR_MIDI_IN:	//Used to process incomming midi going to midi tracks/controllers
 		{/*{{{*/
 			//printf("MidiMonitor::processMsg1() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",
@@ -247,6 +219,10 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 				write(sigFd, ba.constData(), 16);
 				m_learning = false;
 				m_learnport = -1;
+				//TODO: Send an event back to the device
+				//This will set toggle enable buttons to off and zero the slider as an indication of learning
+				MidiPlayEvent ev(0, msg->mevent.port(), msg->mevent.channel(), ME_CONTROLLER, msg->mevent.dataA(), 0);
+				midiPorts[ev.port()].device()->putEvent(ev);
 				return;
 			}
 			if(isManagedInputPort(msg->mevent.port()))
@@ -324,14 +300,32 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 								}
 								break;
 								case CTRL_RECORD:
-									song->setRecordFlag(info->track(), !info->track()->recordFlag(), true);
+									if(info->fakeToggle())
+									{
+										if(msg->mevent.dataB())
+											song->setRecordFlag(info->track(), !info->track()->recordFlag(), true);
+									}
+									else
+										song->setRecordFlag(info->track(), msg->mevent.dataB() ? true : false, true);
 								break;
 								case CTRL_MUTE:
-									info->track()->setMute(!info->track()->isMute(), true);//msg->mevent.dataB() ? true : false, true);
+									if(info->fakeToggle())
+									{
+										if(msg->mevent.dataB())
+											info->track()->setMute(!info->track()->isMute(), true);
+									}
+									else
+										info->track()->setMute(msg->mevent.dataB() ? true : false, true);
 									song->update(SC_MUTE);
 								break;
 								case CTRL_SOLO:
-									info->track()->setSolo(!info->track()->solo(), true);//msg->mevent.dataB() ? true : false, true);
+									if(info->fakeToggle())
+									{
+										if(msg->mevent.dataB())
+											info->track()->setSolo(!info->track()->solo(), true);
+									}
+									else
+										info->track()->setSolo(msg->mevent.dataB() ? true : false, true);
 									song->update(SC_SOLO);
 								break;
 								default:
@@ -361,6 +355,34 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 				}//END while loop
 			}
 		}/*}}}*/
+		break;
+		case MONITOR_AUDIO_OUT:	//Used to process outgoing midi from audio tracks
+			//printf("MidiMonitor::processMsg1() Audio Output\n");
+			if(!m_feedback)
+				return;
+			if(msg->track /*&& isAssigned(msg->track->name())*/) /*{{{*/
+			{
+				MidiAssignData* data = m_assignments.value(msg->track->name());
+				if(/*!isManagedController(msg->ctl) || */!data->enabled || data->midimap.isEmpty())
+					return;
+				CCInfo *info = data->midimap.value(msg->ctl);
+				if(info && info->assignedControl() >= 0)
+				{
+					//int ccval = info->assignedControl();
+					//if(ccval < 0)
+					//	return;
+					int val = 0;
+					if(msg->ctl == CTRL_PANPOT)
+						val = trackPanToMidi(msg->aval);//, midiToTrackPan(trackPanToMidi(val)));
+					else
+						val = dbToMidi(trackVolToDb(msg->aval));
+					//printf("Sending midivalue from audio track: %d\n", val);
+					//TODO: Check if feedback is required before bothering with this
+					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), val);
+					midiPorts[ev.port()].device()->putEvent(ev);
+				}
+				//audio->msgPlayMidiEvent(&ev);
+			}/*}}}*/
 		break;
 		case MONITOR_MIDI_OUT:	//Used to process outgoing midi from midi tracks
 			//printf("MidiMonitor::processMsg1() Midi Output\n");

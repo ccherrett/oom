@@ -37,6 +37,7 @@ private slots:
 	void channelChanged(int val);
 	void controlChanged(int val);
 	void recordOnlyChanged(bool);
+	void toggleChanged(bool);
 
 signals:
 	void valuesUpdated(CCInfo* i);

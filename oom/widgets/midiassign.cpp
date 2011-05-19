@@ -68,12 +68,20 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 		m_cmbControl->addItem(ctl.append(midiCtrlName(i)), i);
 	}
 
+	for (int i = 0; i < MIDI_PORTS; ++i)
+	{
+		QString name;
+		name.sprintf("%d:%s", i + 1, midiPorts[i].portname().toLatin1().constData());
+		m_cmbPort->insertItem(i, name);
+	}
+
 	connect(btnClose, SIGNAL(clicked(bool)), SLOT(btnCloseClicked()));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), SLOT(itemChanged(QStandardItem*)));
 	//connect(m_ccmodel, SIGNAL(itemChanged(QStandardItem*)), SLOT(controllerChanged(QStandardItem*)));
 	connect(m_selmodel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(itemSelected(const QItemSelection&, const QItemSelection&)));
 	connect(m_btnAdd, SIGNAL(clicked()), SLOT(btnAddController()));
 	connect(m_btnDelete, SIGNAL(clicked()), SLOT(btnDeleteController()));
+	connect(m_btnDefault, SIGNAL(clicked()), SLOT(btnUpdateDefault()));
 	cmbTypeSelected(m_lasttype);
 }
 
@@ -297,6 +305,62 @@ void MidiAssignDialog::btnDeleteController()/*{{{*/
 	updateCCTableHeader();
 }/*}}}*/
 
+void MidiAssignDialog::btnUpdateDefault()
+{
+	//printf("MidiAssignDialog::btnUpdateDefault rowCount:%d \n", m_model->rowCount());
+	bool override = false;
+	if(m_chkOverride->isChecked())
+	{
+		int btn = QMessageBox::question(this, tr("Midi Assign Change"), tr("You are about to override the settings of pre-assigned tracks.\nAre you sure you want to do this?"),QMessageBox::Ok|QMessageBox::Cancel);
+		if(btn == QMessageBox::Ok)
+			override = true;
+		else
+			return; //Dont do anything as they canceled
+	}
+	for(int i = 0; i < m_model->rowCount(); ++i)
+	{
+		QStandardItem* trk = m_model->item(i, 1);
+		Track* track = song->findTrack(trk->text());
+		if(track)
+		{
+			MidiAssignData* data = track->midiAssign();
+			bool unassigned = true;
+			int p = data->port;
+			QHashIterator<int, CCInfo*> iter(data->midimap);
+			if(!override)
+			{
+				while(iter.hasNext())
+				{
+					iter.next();
+					CCInfo* info = iter.value();
+					if(info->assignedControl() >= 0)
+					{
+						unassigned = false;
+						break;
+					}
+				}
+			}
+			if(unassigned)
+			{
+				iter.toFront();
+				data->port = m_cmbPort->currentIndex();
+				//QHashIterator<int, CCInfo*> iter2(data->midimap);
+				while(iter.hasNext())
+				{
+					iter.next();
+					CCInfo* info = iter.value();
+					info->setPort(data->port);
+				}
+				midiMonitor->msgModifyTrackPort(track, p);
+			}
+		}
+	}
+	//Update the view
+	m_ccmodel->clear();
+	m_trackname->setText("");
+	cmbTypeSelected(m_lasttype);
+}
+
 void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 {
 	//Perform actions to populate list below based on selected type
@@ -359,7 +423,7 @@ void MidiAssignDialog::updateTableHeader()/*{{{*/
 	//int inum = 4;
 	QStandardItem* en = new QStandardItem(tr("En"));
 	m_model->setHorizontalHeaderItem(0, en);
-	tableView->setColumnWidth(0, 20);
+	tableView->setColumnWidth(0, 25);
 	QStandardItem* track = new QStandardItem(tr("Track"));
 	m_model->setHorizontalHeaderItem(1, track);
 	tableView->setColumnWidth(1, 180);

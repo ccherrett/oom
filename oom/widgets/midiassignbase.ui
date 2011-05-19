@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,1,0,0,0">
      <item>
       <widget class="QLabel" name="label">
        <property name="sizePolicy">
@@ -33,9 +33,55 @@
       <widget class="QComboBox" name="cmbType">
        <property name="maximumSize">
         <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="m_cmbPort">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
          <width>300</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Select default port to assign</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="m_chkOverride">
+       <property name="toolTip">
+        <string>Check to override already assigned track with default port</string>
+       </property>
+       <property name="text">
+        <string>Override</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_btnDefault">
+       <property name="toolTip">
+        <string>Set selected port as default for all unassigned tracks</string>
+       </property>
+       <property name="text">
+        <string>Set as Default</string>
        </property>
       </widget>
      </item>
