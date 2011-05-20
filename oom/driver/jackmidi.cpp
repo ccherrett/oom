@@ -589,7 +589,7 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 			if (p == 0)
 			{
 				#ifdef JACK_MIDI_DEBUG
-				fprintf(stderr, "MidiJackDevice::queueEvent NOTE CTL PAT or PB: buffer overflow, stopping until next cycle\n");  
+				fprintf(stderr, "MidiJackDevice::queueEvent NOTE CONTROL PAT or PB: buffer overflow, stopping until next cycle\n");  
 				#endif
 				return false;
 			}
@@ -632,8 +632,10 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 				fprintf(stderr, "MidiJackDevice::queueEvent ME_SYSEX: buffer overflow, sysex too big, event lost\n");
 				return true;
 			}
-			p[0] = 0xf0;
-			p[len + 1] = 0xf7;
+			if(data[0] != 0xf0)
+				p[0] = 0xf0;
+			if(data[len] != 0xf7)
+				p[len + 1] = 0xf7;
 			memcpy(p + 1, data, len);
 		}
 			break;

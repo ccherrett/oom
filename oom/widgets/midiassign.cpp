@@ -452,6 +452,7 @@ void MidiAssignDialog::showEvent(QShowEvent*)
 	m_ccmodel->clear();
 	m_trackname->setText("");
 	cmbTypeSelected(m_lasttype);
+	//printf("Midi Buffer size: %d\n", MIDI_FIFO_SIZE);
 	//QString idstr = QString::number(genId());
 	//QByteArray ba(idstr.toUtf8().constData());
 	//qDebug() << "ID Size: " << ba.size() << " ID: " << idstr;

@@ -13,9 +13,10 @@
 #include <list>
 #include "evdata.h"
 #include "memory.h"
+#include "config.h"
 
-#define MIDI_FIFO_SIZE    2100
-#define MIDI_REC_FIFO_SIZE    160
+//#define MIDI_FIFO_SIZE    2100
+//#define MIDI_REC_FIFO_SIZE    160
 
 class Event;
 class EvData;
