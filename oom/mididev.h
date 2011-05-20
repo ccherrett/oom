@@ -175,9 +175,6 @@ public:
 
     virtual bool putEvent(const MidiPlayEvent&);
 	
-	// 2 tries, 50 mS by default.
-	bool putEventWithRetry(const MidiPlayEvent&, int /*tries*/ = 2, long /*delayUs*/ = 50000);  
-	       
     // For Jack-based devices - called in Jack audio process callback
 
     virtual void collectMidiEvents() {

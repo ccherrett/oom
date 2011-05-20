@@ -1300,190 +1300,188 @@ void DeicsOnze::loadSutulaPresets()
 
     file = fopen (presetPath.toLatin1().constData(), "rt");
     if (file == NULL) {
-	printf("can't open ");
-	printf(presetPath.toLatin1().constData());
-	printf("\n");
+		printf("can't open %s\n", presetPath.toLatin1().constData());
     }
     else
     {
-	while(fgets(s, 500, file) && !strstr(s, "** Source:"))
-	{
-	    if (strstr(s,"* CATEGORY"))
-	    {
-		sscanf(s, "* CATEGORY %s", scategory);
-		categoryTemp=new Category(_set, scategory,0);
-	    }
-	    if (strstr(s,"* SUBCATEGORY"))
-	    {
-		sscanf(s, "* SUBCATEGORY %s", ssubcategory);
-		subcategoryTemp=new Subcategory(categoryTemp,ssubcategory,0);
-		nlBank++;
-	    }
-	}
-	while(!feof(file))
-	{
-	
-	    presetTemp=new Preset(subcategoryTemp);
-	    // Fill the preset
-            //OP.4 to OP.1
-	    for(int kaka=(NBROP-1); kaka>=0; kaka--)
-	    {
-		k=(kaka==2?1:(kaka==1?2:kaka));
+		while(fgets(s, 500, file) && !strstr(s, "** Source:"))
+		{
+		    if (strstr(s,"* CATEGORY"))
+		    {
+				sscanf(s, "* CATEGORY %s", scategory);
+				categoryTemp=new Category(_set, scategory,0);
+		    }
+		    if (strstr(s,"* SUBCATEGORY"))
+		    {
+				sscanf(s, "* SUBCATEGORY %s", ssubcategory);
+				subcategoryTemp=new Subcategory(categoryTemp,ssubcategory,0);
+				nlBank++;
+	    	}
+		}
+		while(!feof(file))
+		{
 		
-		fscanf(file, "%x", &v);//0
-		presetTemp->eg[k].ar=v;
-		fscanf(file, "%x", &v);//1
-		presetTemp->eg[k].d1r=v;
-		fscanf(file, "%x", &v);//2
-		presetTemp->eg[k].d2r=v;
-		fscanf(file, "%x", &v);//3
-		presetTemp->eg[k].rr=v;
-		fscanf(file, "%x", &v);//4
-		presetTemp->eg[k].d1l=v;
-		fscanf(file, "%x", &v);//5
-		presetTemp->scaling.level[k]=v;
-		fscanf(file, "%x", &v);//6
-		presetTemp->sensitivity.keyVelocity[k]=
-		    v & 0x7;
-		presetTemp->sensitivity.egBias[k]=
-		    (v & 0x38)>>3;
-		presetTemp->sensitivity.ampOn[k]=
-		    (v & 0x40)>>6;
-		fscanf(file, "%x", &v);//7
-		presetTemp->outLevel[k]=v;
-		fscanf(file, "%x", &v);//8
-		crs[k]=v;
-		fscanf(file, "%x", &v);//9
-		presetTemp->detune[k]=(v & 0x7)-3;
-		presetTemp->scaling.rate[k]=(v & 0x18)>>3;
-	    }
-	    fscanf(file, "%x", &v);//40
-	    presetTemp->algorithm=
-		((v & 0x7)==0?FIRST:
-		 ((v & 0x7)==1?SECOND:
-		  ((v & 0x7)==2?THIRD:
-		   ((v & 0x7)==3?FOURTH:
-		    ((v & 0x7)==4?FIFTH:
-		     ((v & 0x7)==5?SIXTH:
-		      ((v & 0x7)==6?SEVENTH:EIGHTH)))))));
-	    presetTemp->feedback=(v & 0x38)>>3;
-	    presetTemp->lfo.sync=(v & 0x40)>>6;	
-	    fscanf(file, "%x", &v);//41
-	    presetTemp->lfo.speed=v;
-	    fscanf(file, "%x", &v);//42
-	    presetTemp->lfo.delay=v;
-	    fscanf(file, "%x", &v);//43
-	    presetTemp->lfo.pModDepth=v;
-	    fscanf(file, "%x", &v);//44
-	    presetTemp->lfo.aModDepth=v;
-	    fscanf(file, "%x", &v);//45
-	    presetTemp->lfo.wave=
-		((v & 0x3)==0?SAWUP:
-		 ((v & 0x3)==1?SQUARE:
-		  ((v & 0x3)==2?TRIANGL:SHOLD)));
-	    presetTemp->sensitivity.amplitude=(v & 0xc)>>2;
-	    presetTemp->sensitivity.pitch=(v & 0x70)>>4;
-	    fscanf(file, "%x", &v);//46
-	    presetTemp->function.transpose=v-24;
-	    fscanf(file, "%x", &v);//47
-	    presetTemp->function.pBendRange=v;
-	    fscanf(file, "%x", &v);//48
-	    presetTemp->function.portamento=
-		((v & 0x1)==0?FULL:FINGER);
-	    presetTemp->function.footSw=
-		((v & 0x4)==0?SUS:POR);
-	    presetTemp->function.mode=
-		((v & 0x8)==0?POLY:MONO);
-	    fscanf(file, "%x", &v);//49
-	    presetTemp->function.portamentoTime=v;
-	    fscanf(file, "%x", &v);//50
-	    presetTemp->function.fcVolume=v;
-	    fscanf(file, "%x", &v);//51
-	    presetTemp->function.mwPitch=v;
-	    fscanf(file, "%x", &v);//52
-	    presetTemp->function.mwAmplitude=v;
-	    fscanf(file, "%x", &v);//53
-	    presetTemp->function.bcPitch=v;
-	    fscanf(file, "%x", &v);//54
-	    presetTemp->function.bcAmplitude=v;
-	    fscanf(file, "%x", &v);//55
-	    presetTemp->function.bcPitchBias=v;
-	    fscanf(file, "%x", &v);//56
-	    presetTemp->function.bcEgBias=v;
-	    for(int l=0; l<10; l++)
-	    {
-		fscanf(file, "%x", &v);//57 to 66
-		sname[l]=(char)v;
-	    }
-	    sname[10]='\0';
-	    presetTemp->name=sname;
-	    fscanf(file, "%x", &v);//67
-	    presetTemp->pitchEg.pr1=v;
-	    fscanf(file, "%x", &v);//68
-	    presetTemp->pitchEg.pr2=v;
-	    fscanf(file, "%x", &v);//69
-	    presetTemp->pitchEg.pr3=v;
-	    fscanf(file, "%x", &v);//70
-	    presetTemp->pitchEg.pl1=v;
-	    fscanf(file, "%x", &v);//71
-	    presetTemp->pitchEg.pl1=v;
-	    fscanf(file, "%x", &v);//72
-	    presetTemp->pitchEg.pl1=v;
-	    for(int kaka=(NBROP-1); kaka>=0; kaka--)
-	    {
-		k=(kaka==2?1:(kaka==1?2:kaka));
-
-		fscanf(file, "%x", &v);//73, 75, 77, 79
-		presetTemp->frequency[k].isFix=(v & 0x8)>>3;
-		presetTemp->frequency[k].freq=((v & 0x7)==0?8:(v & 0x7)*16);
-		presetTemp->eg[k].egShift=
-		    (((v & 0x30)>>4)==0?VOF:
-		     (((v & 0x30)>>4)==1?V48:
-		      (((v & 0x30)>>4)==2?V24:V12)));
-		fscanf(file, "%x", &v);//74, 76, 78, 80
-		fin[k]=v & 0xF;
-		presetTemp->frequency[k].freq+=fin[k];
-		presetTemp->frequency[k].ratio=
-		    coarseFine2Ratio(crs[k],fin[k]);
-		presetTemp->oscWave[k]=
-		    (((v & 0x70)>>4)==0?W1:
-		     (((v & 0x70)>>4)==1?W2:
-		      (((v & 0x70)>>4)==2?W3:
-		       (((v & 0x70)>>4)==3?W4:
-			(((v & 0x70)>>4)==4?W5:
-			 (((v & 0x70)>>4)==5?W6:
-			  (((v & 0x70)>>4)==6?W7:W8)))))));
-	    }
-	    fscanf(file, "%x", &v);//81
-	    presetTemp->function.reverbRate=v;
-	    fscanf(file, "%x", &v);//82
-	    presetTemp->function.fcPitch=v;
-	    fscanf(file, "%x", &v);//83
-	    presetTemp->function.fcAmplitude=v;
-	    //presetTemp->globalDetune=0;
-	    presetTemp->prog=nPreset;
-            // End of filling the preset
-
-	    nPreset++;
-	    while(fgets(s, 500, file) && !strstr(s, "** Source:"))
-	    {
-		if (strstr(s,"* CATEGORY"))
-		{
-		    sscanf(s, "* CATEGORY %s", scategory);
-		    nhBank++;
-		    categoryTemp=new Category(_set,scategory,nhBank);
-		    nlBank=0;
+		    presetTemp=new Preset(subcategoryTemp);
+		    // Fill the preset
+	            //OP.4 to OP.1
+		    for(int kaka=(NBROP-1); kaka>=0; kaka--)
+		    {
+			k=(kaka==2?1:(kaka==1?2:kaka));
+			
+			fscanf(file, "%x", &v);//0
+			presetTemp->eg[k].ar=v;
+			fscanf(file, "%x", &v);//1
+			presetTemp->eg[k].d1r=v;
+			fscanf(file, "%x", &v);//2
+			presetTemp->eg[k].d2r=v;
+			fscanf(file, "%x", &v);//3
+			presetTemp->eg[k].rr=v;
+			fscanf(file, "%x", &v);//4
+			presetTemp->eg[k].d1l=v;
+			fscanf(file, "%x", &v);//5
+			presetTemp->scaling.level[k]=v;
+			fscanf(file, "%x", &v);//6
+			presetTemp->sensitivity.keyVelocity[k]=
+			    v & 0x7;
+			presetTemp->sensitivity.egBias[k]=
+			    (v & 0x38)>>3;
+			presetTemp->sensitivity.ampOn[k]=
+			    (v & 0x40)>>6;
+			fscanf(file, "%x", &v);//7
+			presetTemp->outLevel[k]=v;
+			fscanf(file, "%x", &v);//8
+			crs[k]=v;
+			fscanf(file, "%x", &v);//9
+			presetTemp->detune[k]=(v & 0x7)-3;
+			presetTemp->scaling.rate[k]=(v & 0x18)>>3;
+		    }
+		    fscanf(file, "%x", &v);//40
+		    presetTemp->algorithm=
+			((v & 0x7)==0?FIRST:
+			 ((v & 0x7)==1?SECOND:
+			  ((v & 0x7)==2?THIRD:
+			   ((v & 0x7)==3?FOURTH:
+			    ((v & 0x7)==4?FIFTH:
+			     ((v & 0x7)==5?SIXTH:
+			      ((v & 0x7)==6?SEVENTH:EIGHTH)))))));
+		    presetTemp->feedback=(v & 0x38)>>3;
+		    presetTemp->lfo.sync=(v & 0x40)>>6;	
+		    fscanf(file, "%x", &v);//41
+		    presetTemp->lfo.speed=v;
+		    fscanf(file, "%x", &v);//42
+		    presetTemp->lfo.delay=v;
+		    fscanf(file, "%x", &v);//43
+		    presetTemp->lfo.pModDepth=v;
+		    fscanf(file, "%x", &v);//44
+		    presetTemp->lfo.aModDepth=v;
+		    fscanf(file, "%x", &v);//45
+		    presetTemp->lfo.wave=
+			((v & 0x3)==0?SAWUP:
+			 ((v & 0x3)==1?SQUARE:
+			  ((v & 0x3)==2?TRIANGL:SHOLD)));
+		    presetTemp->sensitivity.amplitude=(v & 0xc)>>2;
+		    presetTemp->sensitivity.pitch=(v & 0x70)>>4;
+		    fscanf(file, "%x", &v);//46
+		    presetTemp->function.transpose=v-24;
+		    fscanf(file, "%x", &v);//47
+		    presetTemp->function.pBendRange=v;
+		    fscanf(file, "%x", &v);//48
+		    presetTemp->function.portamento=
+			((v & 0x1)==0?FULL:FINGER);
+		    presetTemp->function.footSw=
+			((v & 0x4)==0?SUS:POR);
+		    presetTemp->function.mode=
+			((v & 0x8)==0?POLY:MONO);
+		    fscanf(file, "%x", &v);//49
+		    presetTemp->function.portamentoTime=v;
+		    fscanf(file, "%x", &v);//50
+		    presetTemp->function.fcVolume=v;
+		    fscanf(file, "%x", &v);//51
+		    presetTemp->function.mwPitch=v;
+		    fscanf(file, "%x", &v);//52
+		    presetTemp->function.mwAmplitude=v;
+		    fscanf(file, "%x", &v);//53
+		    presetTemp->function.bcPitch=v;
+		    fscanf(file, "%x", &v);//54
+		    presetTemp->function.bcAmplitude=v;
+		    fscanf(file, "%x", &v);//55
+		    presetTemp->function.bcPitchBias=v;
+		    fscanf(file, "%x", &v);//56
+		    presetTemp->function.bcEgBias=v;
+		    for(int l=0; l<10; l++)
+		    {
+			fscanf(file, "%x", &v);//57 to 66
+			sname[l]=(char)v;
+		    }
+		    sname[10]='\0';
+		    presetTemp->name=sname;
+		    fscanf(file, "%x", &v);//67
+		    presetTemp->pitchEg.pr1=v;
+		    fscanf(file, "%x", &v);//68
+		    presetTemp->pitchEg.pr2=v;
+		    fscanf(file, "%x", &v);//69
+		    presetTemp->pitchEg.pr3=v;
+		    fscanf(file, "%x", &v);//70
+		    presetTemp->pitchEg.pl1=v;
+		    fscanf(file, "%x", &v);//71
+		    presetTemp->pitchEg.pl1=v;
+		    fscanf(file, "%x", &v);//72
+		    presetTemp->pitchEg.pl1=v;
+		    for(int kaka=(NBROP-1); kaka>=0; kaka--)
+		    {
+			k=(kaka==2?1:(kaka==1?2:kaka));
+	
+			fscanf(file, "%x", &v);//73, 75, 77, 79
+			presetTemp->frequency[k].isFix=(v & 0x8)>>3;
+			presetTemp->frequency[k].freq=((v & 0x7)==0?8:(v & 0x7)*16);
+			presetTemp->eg[k].egShift=
+			    (((v & 0x30)>>4)==0?VOF:
+			     (((v & 0x30)>>4)==1?V48:
+			      (((v & 0x30)>>4)==2?V24:V12)));
+			fscanf(file, "%x", &v);//74, 76, 78, 80
+			fin[k]=v & 0xF;
+			presetTemp->frequency[k].freq+=fin[k];
+			presetTemp->frequency[k].ratio=
+			    coarseFine2Ratio(crs[k],fin[k]);
+			presetTemp->oscWave[k]=
+			    (((v & 0x70)>>4)==0?W1:
+			     (((v & 0x70)>>4)==1?W2:
+			      (((v & 0x70)>>4)==2?W3:
+			       (((v & 0x70)>>4)==3?W4:
+				(((v & 0x70)>>4)==4?W5:
+				 (((v & 0x70)>>4)==5?W6:
+				  (((v & 0x70)>>4)==6?W7:W8)))))));
+		    }
+		    fscanf(file, "%x", &v);//81
+		    presetTemp->function.reverbRate=v;
+		    fscanf(file, "%x", &v);//82
+		    presetTemp->function.fcPitch=v;
+		    fscanf(file, "%x", &v);//83
+		    presetTemp->function.fcAmplitude=v;
+		    //presetTemp->globalDetune=0;
+		    presetTemp->prog=nPreset;
+	            // End of filling the preset
+	
+		    nPreset++;
+		    while(fgets(s, 500, file) && !strstr(s, "** Source:"))
+		    {
+			if (strstr(s,"* CATEGORY"))
+			{
+			    sscanf(s, "* CATEGORY %s", scategory);
+			    nhBank++;
+			    categoryTemp=new Category(_set,scategory,nhBank);
+			    nlBank=0;
+			}
+			if (strstr(s,"* SUBCATEGORY"))
+			{
+			    sscanf(s, "* SUBCATEGORY %s", ssubcategory);
+			    subcategoryTemp=new
+				Subcategory(categoryTemp,ssubcategory,nlBank);
+			    nlBank++;
+			    nPreset=0;
+			}
+		    }
 		}
-		if (strstr(s,"* SUBCATEGORY"))
-		{
-		    sscanf(s, "* SUBCATEGORY %s", ssubcategory);
-		    subcategoryTemp=new
-			Subcategory(categoryTemp,ssubcategory,nlBank);
-		    nlBank++;
-		    nPreset=0;
-		}
-	    }
-	}
     }
     fclose(file);
 }

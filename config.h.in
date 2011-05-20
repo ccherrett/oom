@@ -24,6 +24,7 @@
 #cmakedefine VST_SUPPORT
 #cmakedefine LSCP_SUPPORT
 #cmakedefine USE_SSE
+#cmakedefine JACK2_SUPPORT
 
 #define VERSION          "${OOMidi_VERSION_FULL}"
 #define SVNVERSION       "${OOMidi_SVNVER}"

@@ -1100,6 +1100,8 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 //   addMenuItem
 //---------------------------------------------------------
 
+//No longer used {{{
+/*
 static int addMenuItem(AudioTrack* track, Track* route_track, PopupMenu* lb, int id, RouteMenuMap& mm, int channel, int channels, bool isOutput)
 {
 	// totalInChannels is only used by syntis.
@@ -1162,7 +1164,6 @@ static int addMenuItem(AudioTrack* track, Track* route_track, PopupMenu* lb, int
 //---------------------------------------------------------
 //   addAuxPorts
 //---------------------------------------------------------
-
 static int addAuxPorts(AudioTrack* t, PopupMenu* lb, int id, RouteMenuMap& mm, int channel, int channels, bool isOutput)
 {
 	AuxList* al = song->auxs();
@@ -1340,7 +1341,6 @@ static int addSyntiPorts(AudioTrack* t, PopupMenu* lb, int id,
 //---------------------------------------------------------
 //   addMultiChannelOutPorts
 //---------------------------------------------------------
-
 static int addMultiChannelPorts(AudioTrack* t, PopupMenu* pup, int id, RouteMenuMap& mm, bool isOutput)
 {
 	int toch = t->totalOutChannels();
@@ -1658,7 +1658,7 @@ static int nonSyntiTrackAddSyntis(AudioTrack* t, PopupMenu* lb, int id, RouteMen
 		}
 	}
 	return id;
-}
+}*/ //}}}
 
 //---------------------------------------------------------
 //   iRoutePressed

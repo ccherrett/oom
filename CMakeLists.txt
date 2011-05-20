@@ -195,6 +195,17 @@ PKG_CHECK_MODULES(JACK REQUIRED jack>=0.103)
 include_directories(${JACK_INCLUDE_DIRS})
 
 ##
+## find if jack is jack2
+##
+
+PKG_CHECK_MODULES(JACK2 jack>=1.95)
+if (JACK2_FOUND)
+	set(JACK2_SUPPORT ON)
+else (JACK2_FOUND)
+	set(JACK2_SUPPORT OFF)
+endif (JACK2_FOUND)
+
+##
 ## find LASH 
 ##
 

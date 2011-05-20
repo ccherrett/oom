@@ -19,7 +19,7 @@
 .\" This manual page was written especially for Debian but may be used by
 .\" others of course.
 .\"
-.TH MUSE 1 "December 2010"
+.TH OOMIDI 1 "May 2011"
 .SH NAME
 OOMidi \- MIDI/Audio Sequencer
 .SH SYNOPSIS
@@ -88,14 +88,18 @@ Enable Python control support.
 Force midi real time priority to n.
 .SH "SEE ALSO"
 .B OOMidi
-provides an integrated help system in the graphical user interface.
+provides integrated links to our online documentation in the graphical user interface.
 .SH AUTHORS
 .B OOMidi
-was written by Werner Schweer, Robert Jonnson, Mathias Lundgren,
+was written by Andrew Williams and Christopher Cherrett.
+Documentation written by Alex Stone.
+.PP
+.B OOMidi 
+is a fork of the MusE project that was written by Werner Schweer, Robert Jonnson, Mathias Lundgren,
 Frank Neumann, Joachim Schiele, Tim Donnelly, Nil Geisweiller, 
 Orcan Ogetbil and others.
 .PP
 This manual page was originally written by Daniel Kobras 
 <kobras@debian.org> for the Debian GNU/Linux system
 (but may be used by others). It was updated later by
-Orcan Ogetbil for OOMidi2.
+Orcan Ogetbil of MusE2 then by Andrew Williams for OOMidi2.

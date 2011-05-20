@@ -139,14 +139,12 @@ static int processSync(jack_transport_state_t state, jack_position_t* pos, void*
 
 			audioState = Audio::START_PLAY;
 			break;
-			//case JackTransportNetStarting:
-			// FIXME: Quick and dirty hack to support both Jack-1 and Jack-2
-			// Really need a config check of version...
-		case 4:
+#ifdef JACK2_SUPPORT
+		case JackTransportNetStarting:
 			//printf("processSync JackTransportNetStarting\n");
-
 			audioState = Audio::START_PLAY;
 			break;
+#endif
 	}
 
 	unsigned frame = pos->frame;
@@ -1318,12 +1316,11 @@ int JackAudioDevice::getState()
 			return Audio::PLAY;
 		case JackTransportStarting:
 			return Audio::START_PLAY;
-			//case JackTransportNetStarting:
-			// FIXME: Quick and dirty hack to support both Jack-1 and Jack-2
-			// Really need a config check of version...
-		case 4:
+#ifdef JACK2_SUPPORT
+		case JackTransportNetStarting:
 			return Audio::START_PLAY;
 			break;
+#endif
 		default:
 			return Audio::STOP;
 	}
