@@ -12,6 +12,7 @@
 #include "globaldefs.h"
 #include "sync.h"
 #include "route.h"
+#include <QHash>
 
 class MidiDevice;
 class MidiInstrument;
@@ -48,6 +49,8 @@ class MidiPort
     // When creating a new midi track, add these global default channel routes to/from this port. Ignored if 0.
     int _defaultInChannels; // These are bit-wise channel masks.
     int _defaultOutChannels; //
+
+	QHash<int, QString>  m_presets;
 
     RouteList _inRoutes, _outRoutes;
 
@@ -213,6 +216,20 @@ public:
     {
         return _syncInfo;
     }
+
+	void addPreset(int i, QString p) { m_presets.insert(i, p); }
+	bool hasPreset(int i)
+	{
+		return (!m_presets.isEmpty() && m_presets.contains(i));
+	}
+	//Return the preset sysex value as QString, returns an empty QString if there is no such preset.
+	QString preset(int i) { 
+		QString def;
+		if(!hasPreset(i))
+			return def;
+		return m_presets.value(i);
+	}
+	QHash<int, QString> * presets() { return &m_presets; }
 };
 
 extern MidiPort midiPorts[MIDI_PORTS];

@@ -9,6 +9,8 @@
 #include <sndfile.h>
 #include <errno.h>
 #include <stdio.h>
+#include <QPair>
+#include <QHash>
 
 #include "app.h"
 #include "transport.h"
@@ -212,6 +214,36 @@ static PatchSequence* readMidiPortPatchSequences(Xml& xml)/*{{{*/
 	return p;
 }/*}}}*/
 
+static QPair<int, QString> readMidiPortPreset(Xml& xml)/*{{{*/
+{
+	int id = 0;
+	QString sysex;
+
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		QString tag = xml.s1();
+		switch (token)
+		{
+			case Xml::TagStart:
+				xml.unknown("midiPreset");
+				break;
+			case Xml::Attribut:
+				if (tag == "id")
+					id = xml.s2().toInt();
+				else if (tag == "sysex")
+				{
+					sysex = xml.s2();
+				}
+				break;
+			case Xml::TagEnd:
+				return qMakePair(id, sysex);
+			default:
+				break;
+		}
+	}
+}/*}}}*/
+
 //---------------------------------------------------------
 //   readPortChannel
 //---------------------------------------------------------
@@ -267,6 +299,7 @@ static void readConfigMidiPort(Xml& xml)
 	QString instrument("GM");
 
 	QList<PatchSequence*> patchSequences;
+	QList<QPair<int, QString> > presets;
 
 	int openFlags = 1;
 	bool thruFlag = false;
@@ -322,6 +355,10 @@ static void readConfigMidiPort(Xml& xml)
 					if (p)
 						patchSequences.append(p);
 				}
+				else if(tag == "midiPreset")
+				{
+					presets.append(readMidiPortPreset(xml));
+				}
 				else
 					xml.unknown("MidiDevice");
 				break;
@@ -373,6 +410,14 @@ static void readConfigMidiPort(Xml& xml)
 						for (int i = 0; i < patchSequences.size(); ++i)
 						{
 							mp->appendPatchSequence(patchSequences.at(i));
+						}
+					}
+					if(!presets.isEmpty())
+					{
+						for(int i = 0; i < presets.size(); ++i)
+						{
+							QPair<int, QString> pair = presets.at(i);
+							mp->addPreset(pair.first, pair.second);
 						}
 					}
 
@@ -1200,11 +1245,11 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 	xml.floatTag(level, "audioClickVolume", audioClickVolume);
 	xml.tag(level--, "/metronom");
 
-	xml.intTag(level, "rcEnable", rcEnable);
-	xml.intTag(level, "rcStop", rcStopNote);
-	xml.intTag(level, "rcRecord", rcRecordNote);
-	xml.intTag(level, "rcGotoLeft", rcGotoLeftMarkNote);
-	xml.intTag(level, "rcPlay", rcPlayNote);
+	//xml.intTag(level, "rcEnable", rcEnable);
+	//xml.intTag(level, "rcStop", rcStopNote);
+	//xml.intTag(level, "rcRecord", rcRecordNote);
+	//xml.intTag(level, "rcGotoLeft", rcGotoLeftMarkNote);
+	//xml.intTag(level, "rcPlay", rcPlayNote);
 
 	if (writePortInfo)
 	{
@@ -1369,8 +1414,8 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.intTag(level, "midiFilterCtrl3", midiFilterCtrl3);
 	xml.intTag(level, "midiFilterCtrl4", midiFilterCtrl4);
 
-	xml.strTag(level, "theme", config.style);
-	xml.strTag(level, "styleSheetFile", config.styleSheetFile);
+	//xml.strTag(level, "theme", config.style);
+	//xml.strTag(level, "styleSheetFile", config.styleSheetFile);
 	xml.strTag(level, "externalWavEditor", config.externalWavEditor);
 	xml.intTag(level, "useOldStyleStopShortCut", config.useOldStyleStopShortCut);
 	xml.intTag(level, "moveArmedCheckBox", config.moveArmedCheckBox);
