@@ -49,7 +49,7 @@
 #include "ttoolbutton.h"
 #include "menutitleitem.h"
 #include "popupmenu.h"
-#include "widgets/utils.h"
+#include "utils.h"
 #include "midictrl.h"
 #include "mididev.h"
 #include "midiport.h"

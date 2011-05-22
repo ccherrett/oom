@@ -39,7 +39,11 @@ class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 	QItemSelectionModel *m_mpselmodel;
 	QStandardItemModel *m_presetmodel;
 	
-	QStringList m_midicontrols;
+	QStringList m_assignlabels;
+	QStringList m_cclabels;
+	QStringList m_mplabels;
+	QStringList m_presetlabels;
+
 	QStringList _trackTypes;
 	QList<int> m_allowed;
 	Track* m_selected;
@@ -58,11 +62,9 @@ private slots:
 	void cmbTypeSelected(int);
 	void updateTableHeader();
 	void updateCCTableHeader();
-	void btnCloseClicked();
 	void itemChanged(QStandardItem*);
 	void itemSelected(const QItemSelection&, const QItemSelection&); //Update the ccEdit table
 	//Deals with the m_ccEdit table on a per track basis
-	void controllerChanged(QStandardItem*);
 	void btnAddController();
 	void btnDeleteController();
 	void btnUpdateDefault();

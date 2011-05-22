@@ -56,7 +56,6 @@ QT4_WRAP_CPP ( oom_moc_headers
       app.h 
       cobject.h 
       conf.h 
-      confmport.h 
       midieditor.h 
       miditransform.h 
       plugin.h 
@@ -87,7 +86,6 @@ file (GLOB core_source_files
       audiotrack.cpp
       cobject.cpp
       conf.cpp
-      confmport.cpp
       ctrl.cpp
       dssihost.cpp 
       event.cpp
@@ -132,6 +130,7 @@ file (GLOB core_source_files
 	  trackview.cpp
       transport.cpp
       transpose.cpp
+      utils.cpp 
       undo.cpp
       value.cpp
       vst.cpp

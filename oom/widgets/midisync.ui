@@ -144,6 +144,9 @@ Enabled inputs in the list will
    </item>
    <item>
     <widget class="QTreeWidget" name="devicesListView">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
      <column>
       <property name="text">
        <string notr="true">1</string>

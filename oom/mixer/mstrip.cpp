@@ -42,7 +42,7 @@
 #include "icons.h"
 #include "gconfig.h"
 #include "ttoolbutton.h"
-#include "widgets/utils.h"
+#include "utils.h"
 #include "popupmenu.h"
 #include "midimonitor.h"
 

@@ -56,16 +56,20 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	m_btnAddPreset->setIcon(*addTVIcon);
 	m_btnAddPreset->setIconSize(addTVIcon->size());
 
-	m_midicontrols = (QStringList() << "Volume" << "Pan" << "Chor" << "Rev" << "Var" << "Rec" << "Mute" << "Solo");
+	m_assignlabels = (QStringList() << "En" << "Track" << "Midi Port" << "Chan" );
+	m_cclabels = (QStringList() << "Sel" << "Controller");
+	m_mplabels = (QStringList() << "Midi Port");
+	m_presetlabels = (QStringList() << "Sel" << "Id" << "Sysex Text");
+
 	m_allowed << CTRL_VOLUME << CTRL_PANPOT << CTRL_REVERB_SEND << CTRL_CHORUS_SEND << CTRL_VARIATION_SEND << CTRL_RECORD << CTRL_MUTE << CTRL_SOLO ;
 	
 	m_model = new QStandardItemModel(0, 4, this);
 	tableView->setModel(m_model);
+	m_selmodel = new QItemSelectionModel(m_model);
+	tableView->setSelectionModel(m_selmodel);
 
 	m_ccmodel = new QStandardItemModel(0, 2, this);
 	m_ccEdit->setModel(m_ccmodel);
-	m_selmodel = new QItemSelectionModel(m_model);
-	tableView->setSelectionModel(m_selmodel);
 
 	m_mpmodel = new QStandardItemModel(0, 1, this);
 	m_porttable->setModel(m_mpmodel);
@@ -85,8 +89,6 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	CCInfoDelegate *infodelegate = new CCInfoDelegate(this);
 	tableView->setItemDelegateForColumn(2, mpdelegate);
 	tableView->setItemDelegateForColumn(3, chandelegate);
-	//for(int i = 4; i < 12; ++i)
-	//	tableView->setItemDelegateForColumn(i, tdelegate);
 	
 	m_ccEdit->setItemDelegateForColumn(1, infodelegate);
 	m_cmbControl->addItem(tr("Track Record"), CTRL_RECORD);
@@ -102,7 +104,6 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 
 	connect(m_btnReset, SIGNAL(clicked(bool)), SLOT(btnResetClicked()));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), SLOT(itemChanged(QStandardItem*)));
-	//connect(m_ccmodel, SIGNAL(itemChanged(QStandardItem*)), SLOT(controllerChanged(QStandardItem*)));
 	connect(m_selmodel, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(itemSelected(const QItemSelection&, const QItemSelection&)));
 	connect(m_btnAdd, SIGNAL(clicked()), SLOT(btnAddController()));
 	connect(m_btnDelete, SIGNAL(clicked()), SLOT(btnDeleteController()));
@@ -113,11 +114,6 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	connect(m_btnDeletePreset, SIGNAL(clicked()), SLOT(btnDeleteMidiPresets()));
 	connect(m_tabpanel, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
 	cmbTypeSelected(m_lasttype);
-}
-
-void MidiAssignDialog::btnCloseClicked()
-{
-	close();
 }
 
 void MidiAssignDialog::itemChanged(QStandardItem* item)/*{{{*/
@@ -156,28 +152,13 @@ void MidiAssignDialog::itemChanged(QStandardItem* item)/*{{{*/
 				case 3: //Channel
 					data->channel = item->data(Qt::EditRole).toInt();
 				break;
-				/*case 4: //volume
-				case 5: //Pan
-				case 6: //Chorus
-				case 7: //Reverb
-				case 8: //Var Send
-				case 9: //Rec
-				case 10: //mute
-				case 11: //Solo
-				default:
-				{
-					int ctl = item->data(MidiControlRole).toInt();
-					int cc = data->midimap[ctl];
-					data->midimap[ctl] = item->data(Qt::EditRole).toInt();
-					midiMonitor->msgModifyTrackController(track, ctl, cc);
-				}
-				break;*/
 			}
 		}
 	}
 }/*}}}*/
 
-void MidiAssignDialog::itemSelected(const QItemSelection& isel, const QItemSelection&) //Update the ccEdit table/*{{{*/
+//Update the ccEdit table
+void MidiAssignDialog::itemSelected(const QItemSelection& isel, const QItemSelection&) /*{{{*/
 {
 	//printf("Selection changed\n");
 	m_ccmodel->clear();
@@ -235,11 +216,6 @@ void MidiAssignDialog::itemSelected(const QItemSelection& isel, const QItemSelec
 		}
 	}
 	updateCCTableHeader();
-}/*}}}*/
-
-//Deals with the m_ccEdit table on a per track basis
-void MidiAssignDialog::controllerChanged(QStandardItem*)/*{{{*/
-{
 }/*}}}*/
 
 void MidiAssignDialog::btnAddController()/*{{{*/
@@ -374,7 +350,6 @@ void MidiAssignDialog::btnUpdateDefault()/*{{{*/
 			{
 				iter.toFront();
 				data->port = m_cmbPort->currentIndex();
-				//QHashIterator<int, CCInfo*> iter2(data->midimap);
 				while(iter.hasNext())
 				{
 					iter.next();
@@ -394,8 +369,6 @@ void MidiAssignDialog::btnUpdateDefault()/*{{{*/
 void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 {
 	//Perform actions to populate list below based on selected type
-	//We need to repopulate and filter the allTrackList
-	//"Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Soft_Synth"
 	m_lasttype = type;
 	QString defaultname;
 	defaultname.sprintf("%d:%s", 1, midiPorts[0].portname().toLatin1().constData());
@@ -450,48 +423,31 @@ void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 
 void MidiAssignDialog::updateTableHeader()/*{{{*/
 {
-	//int inum = 4;
-	QStandardItem* en = new QStandardItem(tr("En"));
-	m_model->setHorizontalHeaderItem(0, en);
 	tableView->setColumnWidth(0, 25);
-	QStandardItem* track = new QStandardItem(tr("Track"));
-	m_model->setHorizontalHeaderItem(1, track);
 	tableView->setColumnWidth(1, 180);
-	QStandardItem* port = new QStandardItem(tr("MidiPort"));
-	m_model->setHorizontalHeaderItem(2, port);
 	tableView->setColumnWidth(2, 120);
-	QStandardItem* chan = new QStandardItem(tr("Chan"));
-	m_model->setHorizontalHeaderItem(3, chan);
 	tableView->setColumnWidth(3, 60);
+	m_model->setHorizontalHeaderLabels(m_assignlabels);
 	tableView->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/
 
 void MidiAssignDialog::updateCCTableHeader()/*{{{*/
 {
-	QStandardItem* en = new QStandardItem(tr("Sel"));
-	m_ccmodel->setHorizontalHeaderItem(0, en);
 	m_ccEdit->setColumnWidth(0, 30);
-	QStandardItem* track = new QStandardItem(tr("Controller"));
-	m_ccmodel->setHorizontalHeaderItem(1, track);
 	m_ccEdit->setColumnWidth(1, 180);
+	m_ccmodel->setHorizontalHeaderLabels(m_cclabels);
 	m_ccEdit->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/
 
 void MidiAssignDialog::updateMPTableHeader()/*{{{*/
 {
-	QStandardItem* mport = new QStandardItem(tr("Midi Port"));
-	m_mpmodel->setHorizontalHeaderItem(0, mport);
+	m_mpmodel->setHorizontalHeaderLabels(m_mplabels);
 	m_porttable->horizontalHeader()->setStretchLastSection(true);
 
-	QStandardItem* en = new QStandardItem(tr("Sel"));
-	m_presetmodel->setHorizontalHeaderItem(0, en);
 	m_presettable->setColumnWidth(0, 30);
-	QStandardItem* num = new QStandardItem(tr("Id"));
-	m_presetmodel->setHorizontalHeaderItem(1, num);
 	m_presettable->setColumnWidth(1, 30);
-	QStandardItem* sysex = new QStandardItem(tr("Sysex Text"));
-	m_presetmodel->setHorizontalHeaderItem(2, sysex);
 	m_presettable->setColumnWidth(2, 200);
+	m_presetmodel->setHorizontalHeaderLabels(m_presetlabels);
 	m_presettable->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/
 
@@ -605,7 +561,7 @@ void MidiAssignDialog::btnDeleteMidiPresets()/*{{{*/
 		updateMPTableHeader();
 }/*}}}*/
 
-void MidiAssignDialog::btnResetClicked()
+void MidiAssignDialog::btnResetClicked()/*{{{*/
 {
 	m_selectport = 0;
 	m_presetmodel->clear();
@@ -620,9 +576,9 @@ void MidiAssignDialog::btnResetClicked()
 		midiSyncConfig->songChanged(-1);
 	if(midiPortConfig)
 		midiPortConfig->songChanged(-1);
-}
+}/*}}}*/
 
-void MidiAssignDialog::populateMidiPorts()
+void MidiAssignDialog::populateMidiPorts()/*{{{*/
 {
 	m_mpmodel->clear();
 	QAbstractItemModel* mod = m_cmbPort->model();
@@ -640,9 +596,9 @@ void MidiAssignDialog::populateMidiPorts()
 		m_mpmodel->appendRow(port);
 	}
 	updateMPTableHeader();
-}
+}/*}}}*/
 
-void MidiAssignDialog::currentTabChanged(int flags)
+void MidiAssignDialog::currentTabChanged(int flags)/*{{{*/
 {
 	switch(flags)
 	{
@@ -665,7 +621,7 @@ void MidiAssignDialog::currentTabChanged(int flags)
 			midiSyncConfig->songChanged(-1);
 		break;
 	}
-}
+}/*}}}*/
 
 //Virtuals
 void MidiAssignDialog::showEvent(QShowEvent*)

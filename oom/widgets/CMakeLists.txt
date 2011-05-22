@@ -29,6 +29,7 @@ QT4_WRAP_CPP (widget_mocs
       checkbox.h  
       comboQuant.h  
       combobox.h  
+      confmport.h 
       comment.h  
       commentdock.h  
       ctrlcombo.h  
@@ -52,6 +53,7 @@ QT4_WRAP_CPP (widget_mocs
       pcscale.h  
 	  tvieweditor.h
 	  tviewdock.h
+      routedialog.h
 	  rmap.h
 	  rmapdialog.h
 	  pctablemodel.h
@@ -105,7 +107,7 @@ QT4_WRAP_CPP (widget_mocs
 ##
 file (GLOB widgets_ui_files
       aboutbox.ui  
-      appearancebase.ui 
+	  #      appearancebase.ui 
       cliplisteditorbase.ui  
       commentbase.ui  
       commentdockbase.ui  
@@ -133,6 +135,7 @@ file (GLOB widgets_ui_files
 	  trackvieweditorbase.ui
 	  tviewdockbase.ui
 	  rmapdialogbase.ui
+      routedialogbase.ui
 	  routemapbase.ui
 	  midiassignbase.ui
 	  cceditbase.ui
@@ -150,6 +153,7 @@ file (GLOB widgets_source_files
       citem.cpp
       comboQuant.cpp 
       combobox.cpp  
+      confmport.cpp
       comment.cpp 
       commentdock.cpp 
       ctrlcombo.cpp 
@@ -174,6 +178,7 @@ file (GLOB widgets_source_files
       mtrackinfo.cpp
 	  tvieweditor.cpp
 	  tviewdock.cpp
+      routedialog.cpp 
 	  rmap.cpp
 	  rmapdialog.cpp
       mtscale.cpp 
@@ -208,7 +213,6 @@ file (GLOB widgets_source_files
       tools.cpp 
       ttoolbar.cpp 
       ttoolbutton.cpp 
-      utils.cpp 
       velocity.cpp 
       view.cpp    
       vscale.cpp

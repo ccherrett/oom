@@ -29,7 +29,6 @@ QT4_WRAP_CPP ( mixer_mocs
       mstrip.h
       panknob.h
       rack.h
-      routedialog.h
       strip.h
       )
 
@@ -37,7 +36,6 @@ QT4_WRAP_CPP ( mixer_mocs
 ## UI files
 ##
 file (GLOB mixer_ui_files
-      routedialogbase.ui
       )
 QT4_WRAP_UI ( mixer_uis ${mixer_ui_files} )
 
@@ -52,7 +50,6 @@ file (GLOB mixer_source_files
       mstrip.cpp
       panknob.cpp 
       rack.cpp 
-      routedialog.cpp 
       strip.cpp
       )
 

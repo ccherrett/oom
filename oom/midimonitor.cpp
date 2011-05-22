@@ -19,7 +19,7 @@
 #include "midi.h"
 #include "audio.h"
 #include "song.h"
-#include "widgets/utils.h"
+#include "utils.h"
 #include "midimonitor.h"
 #include "ccinfo.h"
 
