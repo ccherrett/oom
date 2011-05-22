@@ -923,9 +923,10 @@ void MidiSyncConfig::updateSyncInfoLV()
 
 		addDevice(lvi, devicesListView);
 	}
-	devicesListView->resizeColumnToContents(DEVCOL_NO);
+	//devicesListView->resizeColumnToContents(DEVCOL_NO);
+	devicesListView->header()->resizeSection(DEVCOL_NO, 60);
 	//devicesListView->resizeColumnToContents(DEVCOL_NAME);
-	devicesListView->header()->resizeSection(DEVCOL_NAME, 120);
+	devicesListView->header()->resizeSection(DEVCOL_NAME, 180);
 	devicesListView->resizeColumnToContents(DEVCOL_IN);
 	devicesListView->resizeColumnToContents(DEVCOL_TICKIN);
 	devicesListView->resizeColumnToContents(DEVCOL_MRTIN);

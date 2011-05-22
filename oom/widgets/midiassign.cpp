@@ -41,6 +41,7 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	midiSyncConfig = new MidiSyncConfig(this);
 	m_tabpanel->insertTab(0, midiPortConfig, tr("Midi Port Manager"));
 	m_tabpanel->insertTab(3, midiSyncConfig, tr("Midi Sync"));
+	m_tabpanel->setCurrentIndex(0);
 	m_btnReset = m_buttonBox->button(QDialogButtonBox::Reset);
 
 	m_btnDelete->setIcon(*garbagePCIcon);
