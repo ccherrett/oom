@@ -1347,6 +1347,15 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 					xml.put(level, "<patchSequence id=\"%d\" name=\"%s\" checked=\"%d\" />", ps->id, pm.toStdString().c_str(), ps->selected);
 				}
 			}
+			if(!mport->presets()->isEmpty())
+			{
+				QHashIterator<int, QString> iter(*mport->presets());
+				while(iter.hasNext())
+				{
+					iter.next();
+					xml.put(level, "<midiPreset id=\"%d\" sysex=\"%s\"/>", iter.key(), iter.value().toLatin1().constData());
+				}
+			}
 			xml.etag(level--, "midiport");
 		}
 	}

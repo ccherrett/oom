@@ -97,7 +97,7 @@ void RouteDialog::routingChanged()
 
 void RouteDialog::songChanged(int v)
 {
-	if (v & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_ROUTE | SC_CHANNELS))
+	if (v & (SC_TRACK_INSERTED | SC_TRACK_MODIFIED | SC_TRACK_REMOVED | SC_ROUTE | SC_CHANNELS))
 	{
 		routingChanged();
 	}

@@ -229,6 +229,13 @@ public:
 			return def;
 		return m_presets.value(i);
 	}
+	void removePreset(int i)
+	{
+		if(hasPreset(i))
+		{
+			m_presets.remove(i);
+		}
+	}
 	QHash<int, QString> * presets() { return &m_presets; }
 };
 

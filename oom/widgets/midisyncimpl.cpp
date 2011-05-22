@@ -198,7 +198,7 @@ void MidiSyncLViewItem::copyToSyncInfo(MidiSyncInfo &sp)
 //---------------------------------------------------------
 
 MidiSyncConfig::MidiSyncConfig(QWidget* parent)
-: QDialog(parent)
+: QFrame(parent)
 {
 	setupUi(this);
 
@@ -283,7 +283,7 @@ MidiSyncConfig::MidiSyncConfig(QWidget* parent)
 	//connect(devicesListView, SIGNAL(itemRenamed(QListViewItem*, int, const QString&)),
 	//   this, SLOT(renameOk(QListViewItem*, int, const QString&)));
 
-	connect(okButton, SIGNAL(clicked()), SLOT(ok()));
+	//connect(okButton, SIGNAL(clicked()), SLOT(ok()));
 	connect(applyButton, SIGNAL(clicked()), SLOT(apply()));
 	connect(cancelButton, SIGNAL(clicked()), SLOT(cancel()));
 
@@ -296,8 +296,8 @@ MidiSyncConfig::MidiSyncConfig(QWidget* parent)
 	connect(syncDelaySpinBox, SIGNAL(valueChanged(int)), SLOT(syncChanged()));
 
 	// Done in show().
-	//connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
-	//connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
+	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 
 	//inHeartBeat = false;
 }
@@ -364,6 +364,13 @@ void MidiSyncConfig::songChanged(int flags)
 	//selectionChanged();
 }
 
+void MidiSyncConfig::showEvent(QShowEvent*)
+{
+	//printf("MidiSyncConfig::showEvent\n");
+	//connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+	//connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
+}
+
 //---------------------------------------------------------
 //   heartBeat
 //---------------------------------------------------------
@@ -392,8 +399,7 @@ void MidiSyncConfig::heartBeat()
 						lvi->setIcon(DEVCOL_IN, QIcon(*record1_Icon));
 					}
 				}
-				else
-					if (!lvi->_inDet)
+				else if (!lvi->_inDet)
 				{
 					// Added by Tim. p3.3.6
 					//printf("MidiSyncConfig::heartBeat setting non-current green icon\n");
@@ -617,16 +623,6 @@ void MidiSyncConfig::extSyncChanged(bool v)
 }
 
 //---------------------------------------------------------
-//   ok Pressed
-//---------------------------------------------------------
-
-void MidiSyncConfig::ok()
-{
-	apply();
-	cancel();
-}
-
-//---------------------------------------------------------
 //   cancel Pressed
 //---------------------------------------------------------
 
@@ -636,19 +632,7 @@ void MidiSyncConfig::cancel()
 	if (applyButton->isEnabled())
 		applyButton->setEnabled(false);
 
-	close();
-}
-
-//---------------------------------------------------------
-//   show
-//---------------------------------------------------------
-
-void MidiSyncConfig::show()
-{
 	songChanged(-1);
-	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
-	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
-	QDialog::show();
 }
 
 //---------------------------------------------------------
@@ -659,7 +643,8 @@ void MidiSyncConfig::closeEvent(QCloseEvent* e)
 {
 	if (_dirty)
 	{
-		int n = QMessageBox::warning(this, tr("OOMidi"),
+		songChanged(-1);
+		/*int n = QMessageBox::warning(this, tr("OOMidi"),
 				tr("Settings have changed\n"
 				"Apply sync settings?"),
 				tr("&Apply"), tr("&No"), tr("&Abort"), 0, 2);
@@ -672,12 +657,13 @@ void MidiSyncConfig::closeEvent(QCloseEvent* e)
 
 		if (n == 0)
 			apply();
+		*/
 	}
 
 	//emit deleted((unsigned long)this);
 
-	disconnect(heartBeatTimer, SIGNAL(timeout()), this, SLOT(heartBeat()));
-	disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	//disconnect(heartBeatTimer, SIGNAL(timeout()), this, SLOT(heartBeat()));
+	//disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 
 	e->accept();
 }

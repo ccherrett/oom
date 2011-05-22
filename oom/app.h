@@ -150,8 +150,8 @@ class OOMidi : public QMainWindow
     QAction *autoMixerAction, *autoSnapshotAction, *autoClearAction;
 
     // Settings Menu Actions
-    QAction *settingsGlobalAction, *settingsShortcutsAction, *settingsMetronomeAction, *settingsMidiSyncAction;
-    QAction *settingsMidiIOAction, /*settingsAppearanceAction,*/ *settingsMidiPortAction, *settingsMidiAssignAction;
+    QAction *settingsGlobalAction, *settingsShortcutsAction, *settingsMetronomeAction/*, *settingsMidiSyncAction*/;
+    QAction *settingsMidiIOAction, /*settingsAppearanceAction, *settingsMidiPortAction,*/ *settingsMidiAssignAction;
     QAction *dontFollowAction, *followPageAction, *followCtsAction;
 
     // Help Menu Actions

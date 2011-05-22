@@ -23,7 +23,9 @@ class QItemSelection;
 class MidiPort;
 class QString;
 class QShowEvent;
-
+class QPushButton;
+class MPConfig;
+class MidiSyncConfig;
 
 class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 {
@@ -32,16 +34,27 @@ class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 	QStandardItemModel *m_model;
 	QStandardItemModel *m_ccmodel;
 	QItemSelectionModel *m_selmodel;
+
+	QStandardItemModel *m_mpmodel;
+	QItemSelectionModel *m_mpselmodel;
+	QStandardItemModel *m_presetmodel;
+	
 	QStringList m_midicontrols;
 	QStringList _trackTypes;
 	QList<int> m_allowed;
 	Track* m_selected;
+	MidiPort* m_selectport;
 	int m_lasttype;
+	QPushButton* m_btnReset;
+	MPConfig *midiPortConfig;
+	MidiSyncConfig* midiSyncConfig;
 
 public:
 	MidiAssignDialog(QWidget* parent = 0);
 
 private slots:
+	void btnResetClicked();
+	void populateMidiPorts();
 	void cmbTypeSelected(int);
 	void updateTableHeader();
 	void updateCCTableHeader();
@@ -53,6 +66,15 @@ private slots:
 	void btnAddController();
 	void btnDeleteController();
 	void btnUpdateDefault();
+	void currentTabChanged(int);
+
+	//midi port presets
+	void updateMPTableHeader();
+	void midiPresetChanged(QStandardItem*);
+	//update the presets table
+	void midiPortSelected(const QItemSelection&, const QItemSelection&);
+	void btnAddMidiPreset();
+	void btnDeleteMidiPresets();
 
 protected:
 	virtual void showEvent(QShowEvent*);

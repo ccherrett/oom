@@ -61,6 +61,7 @@
 #include "ctrl/ctrledit.h"
 #include "midiassign.h"
 #include "midimonitor.h"
+#include "confmport.h"
 
 #include "ccinfo.h"
 #ifdef DSSI_SUPPORT
@@ -766,6 +767,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	setWindowTitle(appName);
 
 	qRegisterMetaType<CCInfo>("CCInfo");
+	//qRegisterMetaType<MPConfig>("MPConfig");
 	
 	editSignalMapper = new QSignalMapper(this);
 	midiPluginSignalMapper = new QSignalMapper(this);
@@ -1051,11 +1053,11 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	followCtsAction->setCheckable(true);
 
 	settingsMetronomeAction = new QAction(QIcon(*settings_metronomeIcon), tr("Metronome"), this);
-	settingsMidiSyncAction = new QAction(QIcon(*settings_midisyncIcon), tr("Midi Sync"), this);
+	//settingsMidiSyncAction = new QAction(QIcon(*settings_midisyncIcon), tr("Midi Sync"), this);
 	settingsMidiIOAction = new QAction(QIcon(*settings_midifileexportIcon), tr("Midi File Import/Export"), this);
 	//settingsAppearanceAction = new QAction(QIcon(*settings_appearance_settingsIcon), tr("Appearance Settings"), this);
-	settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports Manager"), this);
-	settingsMidiAssignAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Assign"), this);
+	//settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports Manager"), this);
+	settingsMidiAssignAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Connections Manager"), this);
 
 	//-------- Help Actions
 	helpManualAction = new QAction(tr("&Manual"), this);
@@ -1184,10 +1186,10 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(settingsGlobalAction, SIGNAL(triggered()), SLOT(configGlobalSettings()));
 	connect(settingsShortcutsAction, SIGNAL(triggered()), SLOT(configShortCuts()));
 	connect(settingsMetronomeAction, SIGNAL(triggered()), SLOT(configMetronome()));
-	connect(settingsMidiSyncAction, SIGNAL(triggered()), SLOT(configMidiSync()));
+	//connect(settingsMidiSyncAction, SIGNAL(triggered()), SLOT(configMidiSync()));
 	connect(settingsMidiIOAction, SIGNAL(triggered()), SLOT(configMidiFile()));
 	//connect(settingsAppearanceAction, SIGNAL(triggered()), SLOT(configAppearance()));
-	connect(settingsMidiPortAction, SIGNAL(triggered()), SLOT(configMidiPorts()));
+	//connect(settingsMidiPortAction, SIGNAL(triggered()), SLOT(configMidiPorts()));
 	connect(settingsMidiAssignAction, SIGNAL(triggered()), SLOT(configMidiAssign()));
 
 	connect(dontFollowAction, SIGNAL(triggered()), followSignalMapper, SLOT(map()));
@@ -1446,12 +1448,12 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	follow->addAction(followCtsAction);
 	//menuSettings->addAction(settingsMetronomeAction);
 	menuSettings->addSeparator();
-	menuSettings->addAction(settingsMidiSyncAction);
+	//menuSettings->addAction(settingsMidiSyncAction);
 	menuSettings->addAction(settingsMidiIOAction);
 	menuSettings->addSeparator();
 	//menuSettings->addAction(settingsAppearanceAction);
 	//menuSettings->addSeparator();
-	menuSettings->addAction(settingsMidiPortAction);
+	//menuSettings->addAction(settingsMidiPortAction);
 	menuSettings->addAction(settingsMidiAssignAction);
 
 	//---------------------------------------------------
@@ -5372,10 +5374,10 @@ void OOMidi::updateConfiguration()
 	settingsGlobalAction->setShortcut(shortcuts[SHRT_GLOBAL_CONFIG].key);
 	settingsShortcutsAction->setShortcut(shortcuts[SHRT_CONFIG_SHORTCUTS].key);
 	settingsMetronomeAction->setShortcut(shortcuts[SHRT_CONFIG_METRONOME].key);
-	settingsMidiSyncAction->setShortcut(shortcuts[SHRT_CONFIG_MIDISYNC].key);
+	//settingsMidiSyncAction->setShortcut(shortcuts[SHRT_CONFIG_MIDISYNC].key);
 	// settingsMidiIOAction does not have acceleration
 	//settingsAppearanceAction->setShortcut(shortcuts[SHRT_APPEARANCE_SETTINGS].key);
-	settingsMidiPortAction->setShortcut(shortcuts[SHRT_CONFIG_MIDI_PORTS].key);
+	settingsMidiAssignAction->setShortcut(shortcuts[SHRT_CONFIG_MIDI_PORTS].key);
 
 
 	dontFollowAction->setShortcut(shortcuts[SHRT_FOLLOW_NO].key);

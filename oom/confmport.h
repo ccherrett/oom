@@ -25,7 +25,7 @@ class Xml;
 //    Midi Port Config
 //---------------------------------------------------------
 
-class MPConfig : public QDialog, Ui::SynthConfigBase
+class MPConfig : public QFrame, Ui::SynthConfigBase
 {
     QMenu* instrPopup;
     //QMenu* popup;
@@ -39,10 +39,13 @@ class MPConfig : public QDialog, Ui::SynthConfigBase
 private slots:
     void rbClicked(QTableWidgetItem*);
     void mdevViewItemRenamed(QTableWidgetItem*);
-    void songChanged(int);
+    //void songChanged(int);
     void selectionChanged();
     void addInstanceClicked();
     void removeInstanceClicked();
+
+public slots:
+    void songChanged(int);
 
 public:
     MPConfig(QWidget* parent = 0);

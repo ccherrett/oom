@@ -331,10 +331,12 @@ bool MidiAlsaDevice::putMidiEvent(const MidiPlayEvent& e)
 			event.data.ext.ptr = (void*) (buf + sizeof (event));
 			memcpy(buf, &event, sizeof (event));
 			char* pp = buf + sizeof (event);
-			*pp++ = 0xf0;
+			if(p[0] != 0xf0)
+				*pp++ = 0xf0;
 			memcpy(pp, p, n);
 			pp += n;
-			*pp = 0xf7;
+			if(p[e.len()] != 0xf7)
+				*pp = 0xf7;
 			return putEvent(&event);
 		}
 		case ME_SONGPOS:

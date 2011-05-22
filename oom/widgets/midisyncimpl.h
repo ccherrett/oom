@@ -13,7 +13,7 @@
 #include "sync.h"
 
 class QCloseEvent;
-class QDialog;
+class QShowEvent;
 class QTreeWidgetItem;
 
 //----------------------------------------------------------
@@ -87,7 +87,7 @@ public:
 //   MSConfig
 //---------------------------------------------------------
 
-class MidiSyncConfig : public QDialog, public Ui::MidiSyncConfigBase
+class MidiSyncConfig : public QFrame, public Ui::MidiSyncConfigBase
 {
     Q_OBJECT
 
@@ -99,28 +99,30 @@ class MidiSyncConfig : public QDialog, public Ui::MidiSyncConfigBase
     void setToolTips(QTreeWidgetItem *item);
     void setWhatsThis(QTreeWidgetItem *item);
     void addDevice(QTreeWidgetItem *item, QTreeWidget *tree);
+	virtual void showEvent(QShowEvent*);
 
 private slots:
     void heartBeat();
     void syncChanged();
     void extSyncChanged(bool v);
-    void ok();
+    //void ok();
     void cancel();
     void apply();
     //void dlvClicked(QListViewItem*, const QPoint&, int);
     void dlvClicked(QTreeWidgetItem*, int);
     void dlvDoubleClicked(QTreeWidgetItem*, int);
     //void renameOk(QListViewItem*, int, const QString&);
-    void songChanged(int);
 
     //signals:
     //   void deleted(unsigned long);
+
+public slots:
+    void songChanged(int);
 
 public:
     MidiSyncConfig(QWidget* parent = 0);
     //MidiSyncConfig();
     ~MidiSyncConfig();
-    void show();
     void setDirty();
 };
 
