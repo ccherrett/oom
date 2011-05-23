@@ -68,7 +68,7 @@ class ShortcutConfig;
 class WaveTrack;
 class AudioOutput;
 class EditInstrument;
-class RouteDialog;
+class AudioPortConfig;
 class QDocWidget;
 class MidiAssignDialog;
 class MidiPlayEvent;
@@ -131,7 +131,7 @@ class OOMidi : public QMainWindow
     //QAction *editSongInfoAction;
 
     // View Menu actions
-    QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, *viewMixerBAction, *viewCliplistAction, *viewMarkerAction, *viewRoutesAction;
+    QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, *viewMixerBAction, *viewCliplistAction, *viewMarkerAction;//, *viewRoutesAction;
 
     // Structure Menu actions
     QAction *strGlobalCutAction, *strGlobalInsertAction, *strGlobalSplitAction, *strCopyRangeAction, *strCutEventsAction;
@@ -197,7 +197,7 @@ class OOMidi : public QMainWindow
     //Appearance* appearance;
     AudioMixerApp* mixer1;
     AudioMixerApp* mixer2;
-    RouteDialog* routingDialog;
+    AudioPortConfig* routingDialog;
 
     ToplevelList toplevels;
     ClipListEdit* clipListEdit;
@@ -273,10 +273,8 @@ private slots:
     void toggleTransport(bool);
     void toggleMarker(bool);
     void toggleBigTime(bool);
-    //void toggleMixer();
     void toggleMixer1(bool);
     void toggleMixer2(bool);
-	void toggleRoutes(bool);
 
     void configMidiSync();
     void configMidiFile();
@@ -341,11 +339,9 @@ private slots:
     void takeAutomationSnapshot();
     void clearAutomation();
     void bigtimeClosed();
-    //void mixerClosed();
     void mixer1Closed();
     void mixer2Closed();
     void markerClosed();
-	void routingDialogClosed();
 
     void execDeliveredScript(int);
     void execUserScript(int);
@@ -364,7 +360,6 @@ public slots:
     bool seqRestart();
     void loadTemplate();
     void showBigtime(bool);
-    //void showMixer(bool);
     void showMixer1(bool);
     void showMixer2(bool);
     void showMarker(bool);
@@ -373,8 +368,7 @@ public slots:
     void showDidYouKnowDialog();
 
     void routingPopupMenuAboutToHide();
-    void configMidiPorts();
-    void configMidiAssign();
+    void configMidiAssign(int tab = 0);
 	bool startServer();
 	void stopServer();
 #ifdef LSCP_SUPPORT
@@ -406,7 +400,7 @@ public:
     QWidget* mixer2Window();
     QWidget* transportWindow();
     QWidget* bigtimeWindow();
-	RouteDialog* getRoutingDialog(bool);
+	AudioPortConfig* getRoutingDialog(bool);
     bool importWaveToTrack(QString& name, unsigned tick = 0, Track* track = NULL);
     void importPartToTrack(QString& filename, unsigned tick, Track* track);
 

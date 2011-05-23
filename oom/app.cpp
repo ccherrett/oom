@@ -31,6 +31,7 @@
 #include "audio.h"
 #include "audiodev.h"
 #include "audioprefetch.h"
+#include "apconfig.h"
 #include "bigtime.h"
 #include "cliplist/cliplist.h"
 #include "conf.h"
@@ -996,8 +997,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	viewMixerAAction->setCheckable(true);
 	viewMixerBAction = new QAction(QIcon(*mixerSIcon), tr("Mixer B"), this);
 	viewMixerBAction->setCheckable(true);
-	viewRoutesAction = new QAction(QIcon(*mixerSIcon), tr("Audio Routing Manager"), this);
-	viewRoutesAction->setCheckable(true);
+	//viewRoutesAction = new QAction(QIcon(*mixerSIcon), tr("Audio Routing Manager"), this);
+	//viewRoutesAction->setCheckable(true);
 	viewCliplistAction = new QAction(QIcon(*cliplistSIcon), tr("Cliplist"), this);
 	viewCliplistAction->setCheckable(true);
 	viewMarkerAction = new QAction(QIcon(*view_markerIcon), tr("Marker View"), this);
@@ -1057,7 +1058,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	settingsMidiIOAction = new QAction(QIcon(*settings_midifileexportIcon), tr("Midi File Import/Export"), this);
 	//settingsAppearanceAction = new QAction(QIcon(*settings_appearance_settingsIcon), tr("Appearance Settings"), this);
 	//settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports Manager"), this);
-	settingsMidiAssignAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Connections Manager"), this);
+	settingsMidiAssignAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Connections Manager"), this);
 
 	//-------- Help Actions
 	helpManualAction = new QAction(tr("&Manual"), this);
@@ -1138,7 +1139,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(viewBigtimeAction, SIGNAL(toggled(bool)), SLOT(toggleBigTime(bool)));
 	connect(viewMixerAAction, SIGNAL(toggled(bool)), SLOT(toggleMixer1(bool)));
 	connect(viewMixerBAction, SIGNAL(toggled(bool)), SLOT(toggleMixer2(bool)));
-	connect(viewRoutesAction, SIGNAL(toggled(bool)), SLOT(toggleRoutes(bool)));
+	//connect(viewRoutesAction, SIGNAL(toggled(bool)), SLOT(toggleRoutes(bool)));
 	connect(viewCliplistAction, SIGNAL(toggled(bool)), SLOT(startClipList(bool)));
 	connect(viewMarkerAction, SIGNAL(toggled(bool)), SLOT(toggleMarker(bool)));
 
@@ -1370,7 +1371,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuView->addAction(viewTransportAction);
 	menuView->addAction(viewMixerAAction);
 	menuView->addAction(viewMixerBAction);
-	menuView->addAction(viewRoutesAction);
+	//menuView->addAction(viewRoutesAction);
 	menuView->addAction(viewBigtimeAction);
 	menuView->addAction(viewCliplistAction);
 	menuView->addAction(viewMarkerAction);
@@ -4114,10 +4115,10 @@ void OOMidi::kbAccel(int key)
 	{
 		toggleMixer2(!viewMixerBAction->isChecked());
 	}
-	else if(key == shortcuts[SHRT_OPEN_ROUTES].key)
+	/*else if(key == shortcuts[SHRT_OPEN_ROUTES].key)
 	{
-		toggleRoutes(!viewRoutesAction->isChecked());
-	}
+		toggleRoutes(true);//!viewRoutesAction->isChecked());
+	}*/
 	else if (key == shortcuts[SHRT_NEXT_MARKER].key)
 	{
 		if (markerView)
@@ -5343,7 +5344,7 @@ void OOMidi::updateConfiguration()
 	viewMixerBAction->setShortcut(shortcuts[SHRT_OPEN_MIXER2].key);
 	//viewCliplistAction has no acceleration
 	viewMarkerAction->setShortcut(shortcuts[SHRT_OPEN_MARKER].key);
-	viewRoutesAction->setShortcut(shortcuts[SHRT_OPEN_ROUTES].key);
+	//viewRoutesAction->setShortcut(shortcuts[SHRT_OPEN_ROUTES].key);
 
 	strGlobalCutAction->setShortcut(shortcuts[SHRT_GLOBAL_CUT].key);
 	strGlobalInsertAction->setShortcut(shortcuts[SHRT_GLOBAL_INSERT].key);
@@ -5445,25 +5446,6 @@ void OOMidi::bigtimeClosed()
 }
 
 //---------------------------------------------------------
-//   showMixer
-//---------------------------------------------------------
-
-/*
-void OOMidi::showMixer(bool on)
-	  {
-	  if (on && audioMixer == 0) {
-			audioMixer = new AudioMixerApp(this);
-			connect(audioMixer, SIGNAL(closed()), SLOT(mixerClosed()));
-			audioMixer->resize(config.geometryMixer.size());
-			audioMixer->move(config.geometryMixer.topLeft());
-			}
-	  if (audioMixer)
-			audioMixer->setVisible(on);
-	  menuView->setItemChecked(aid1, on);
-	  }
- */
-
-//---------------------------------------------------------
 //   showMixer1
 //---------------------------------------------------------
 
@@ -5503,45 +5485,11 @@ void OOMidi::showMixer2(bool on)
 	viewMixerBAction->setChecked(on);
 }
 
-void OOMidi::routingDialogClosed()
+AudioPortConfig* OOMidi::getRoutingDialog(bool)
 {
-	viewRoutesAction->setChecked(false);
-	//routingDialog = 0;
+	configMidiAssign(0);
+	return midiAssignDialog->getAudioPortConfig();
 }
-
-void OOMidi::toggleRoutes(bool on)
-{
-	if(on && routingDialog == 0)
-	{
-		routingDialog = new RouteDialog(this);
-		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
-	}
-	if (routingDialog)
-		routingDialog->setVisible(on);
-	viewRoutesAction->setChecked(on);
-}
-
-RouteDialog* OOMidi::getRoutingDialog(bool on)
-{
-	if(routingDialog == 0)
-	{
-		routingDialog = new RouteDialog(this);
-		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
-		routingDialog->setVisible(on);
-	}
-	viewRoutesAction->setChecked(on);
-	return routingDialog;
-}
-//---------------------------------------------------------
-//   toggleMixer
-//---------------------------------------------------------
-
-/*
-void OOMidi::toggleMixer()
-	  {
-	  showMixer(!menuView->isItemChecked(aid1));
-	  }
- */
 
 //---------------------------------------------------------
 //   toggleMixer1
@@ -5560,17 +5508,6 @@ void OOMidi::toggleMixer2(bool checked)
 {
 	showMixer2(checked);
 }
-
-//---------------------------------------------------------
-//   mixerClosed
-//---------------------------------------------------------
-
-/*
-void OOMidi::mixerClosed()
-	  {
-	  menuView->setItemChecked(aid1, false);
-	  }
- */
 
 //---------------------------------------------------------
 //   mixer1Closed
@@ -5638,7 +5575,7 @@ void OOMidi::setUsedTool(int tool)
 	tools1->set(tool);
 }
 
-void OOMidi::configMidiAssign()
+void OOMidi::configMidiAssign(int tab)
 {
 	if(!midiAssignDialog)
 	{
@@ -5647,6 +5584,7 @@ void OOMidi::configMidiAssign()
 	midiAssignDialog->show();
 	midiAssignDialog->raise();
 	midiAssignDialog->activateWindow();
+	midiAssignDialog->switchTabs(tab);
 }
 
 //---------------------------------------------------------

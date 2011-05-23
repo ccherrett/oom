@@ -90,7 +90,7 @@ void initShortCuts()
 	//defShrt(SHRT_OPEN_MIXER,            Qt::Key_F10, "View: Open mixer window", ARRANG_SHRT, "toggle_mixer");
 	defShrt(SHRT_OPEN_MIXER, Qt::Key_F10, "View: Open mixer #1 window", ARRANG_SHRT, "toggle_mixer");
 	defShrt(SHRT_OPEN_MIXER2, Qt::CTRL + Qt::Key_F10, "View: Open mixer #2 window", ARRANG_SHRT, "toggle_mixer2");
-	defShrt(SHRT_OPEN_ROUTES, Qt::Key_F7, "View: Open routes window", ARRANG_SHRT, "toggle_routes");
+	//defShrt(SHRT_OPEN_ROUTES, Qt::Key_F7, "View: Open routes window", ARRANG_SHRT, "toggle_routes");
 	defShrt(SHRT_OPEN_TRANSPORT, Qt::Key_F11, "View: Toggle transport window", ARRANG_SHRT, "toggle_transport");
 	defShrt(SHRT_OPEN_BIGTIME, Qt::Key_F12, "View: Toggle bigtime window", ARRANG_SHRT, "toggle_bigtime");
 	defShrt(SHRT_OPEN_MARKER, Qt::Key_F9, "View: Open marker window", ARRANG_SHRT, "marker_window");

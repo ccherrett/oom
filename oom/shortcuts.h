@@ -118,7 +118,7 @@ enum
     SHRT_OPEN_MIXER2, //Ctrl+*
     SHRT_OPEN_MARKER, // F9
     SHRT_OPEN_CLIPS, //Default: undefined
-	SHRT_OPEN_ROUTES,
+	//SHRT_OPEN_ROUTES,
 
     SHRT_FOLLOW_JUMP, //Default: undefined
     SHRT_FOLLOW_NO, //Default: undefined

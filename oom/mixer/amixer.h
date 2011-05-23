@@ -14,7 +14,6 @@
 #include "cobject.h"
 #include "synth.h"
 #include "node.h"
-#include "routedialog.h"
 
 class QHBoxLayout;
 class QLabel;
@@ -31,7 +30,7 @@ class Slider;
 class Knob;
 class DoubleLabel;
 class ComboBox;
-class RouteDialog;
+class AudioPortConfig;
 class Strip;
 
 struct MixerConfig;
@@ -76,7 +75,7 @@ class AudioMixerApp : public QMainWindow
     //Strip* master;
     QHBoxLayout* layout;
     QMenu* menuView;
-    RouteDialog* routingDialog;
+    AudioPortConfig* routingDialog;
     QAction* routingId;
     int oldAuxsSize;
 
@@ -97,7 +96,7 @@ protected:
 	virtual void showEvent(QShowEvent*);
 
     void addStrip(Track*, int);
-    void showRouteDialog(bool);
+    void showAudioPortConfig(bool);
 
     enum UpdateAction
     {
@@ -114,7 +113,7 @@ private slots:
     //void configChanged()    { songChanged(-1); }
     void configChanged();
     void setSizing();
-    void toggleRouteDialog();
+    void toggleAudioPortConfig();
     void routingDialogClosed();
     //void showTracksChanged(QAction*);
     void showMidiTracksChanged(bool);

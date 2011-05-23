@@ -106,15 +106,6 @@ MPConfig::MPConfig(QWidget* parent)
 	connect(mdevView, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(mdevViewItemRenamed(QTableWidgetItem*)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 
-	//connect(synthList, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
-	//connect(instanceList, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
-
-	//connect(addInstance, SIGNAL(clicked()), SLOT(addInstanceClicked()));
-	//connect(synthList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(addInstanceClicked()));
-	//connect(removeInstance, SIGNAL(clicked()), SLOT(removeInstanceClicked()));
-	//connect(instanceList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(removeInstanceClicked()));
-
-
 	for (int i = MIDI_PORTS - 1; i >= 0; --i)
 	{
 		mdevView->blockSignals(true); // otherwise itemChanged() is triggered and bad things happen.
@@ -574,11 +565,6 @@ _redisplay:
 
 				QAction* act;
 
-				// Could do it this way...
-				//act = pup->addAction(tr("Create") + QT_TRANSLATE_NOOP("@default", " Jack") + tr(" input"));
-				//act = pup->addAction(tr("Create") + QT_TRANSLATE_NOOP("@default", " Jack") + tr(" output"));
-				//act = pup->addAction(tr("Create") + QT_TRANSLATE_NOOP("@default", " Jack") + tr(" combo"));
-				// ... or keep it simple and let the user click on the green lights instead.
 				act = pup->addAction(tr("Create") + QT_TRANSLATE_NOOP("@default", " Jack") + tr(" device"));
 				act->setData(0);
 
@@ -918,8 +904,6 @@ void MPConfig::addItem(int row, int col, QTableWidgetItem *item, QTableWidget *t
 
 void MPConfig::selectionChanged()
 {
-	//addInstance->setEnabled(synthList->currentItem());
-	//removeInstance->setEnabled(instanceList->currentItem());
 }
 
 //---------------------------------------------------------
@@ -1072,30 +1056,6 @@ void MPConfig::songChanged(int flags)
 
 void MPConfig::addInstanceClicked()
 {
-	/*
-	QTreeWidgetItem* item = synthList->currentItem();
-	if (item == 0)
-		return;
-	//SynthI *si = song->createSynthI(item->text(2));
-	SynthI *si = song->createSynthI(item->text(0), item->text(2));
-	if (!si)
-		return;
-*/
-	/*
-	// add instance last in midi device list
-	for (int i = 0; i < MIDI_PORTS; ++i)
-	{
-		MidiPort* port = &midiPorts[i];
-		MidiDevice* dev = port->device();
-		if (dev == 0)
-		{
-			midiSeq->msgSetMidiDevice(port, si);
-			oom->changeConfig(true); // save configuration file
-			song->update();
-			break;
-		}
-	}
-*/	
 }
 
 //---------------------------------------------------------
@@ -1104,38 +1064,6 @@ void MPConfig::addInstanceClicked()
 
 void MPConfig::removeInstanceClicked()
 {
-/*
-	QTreeWidgetItem* item = instanceList->currentItem();
-	if (item == 0)
-		return;
-	SynthIList* sl = song->syntis();
-	iSynthI ii;
-	for (ii = sl->begin(); ii != sl->end(); ++ii)
-	{
-		if ((*ii)->iname() == item->text(0))
-			break;
-	}
-	if (ii == sl->end())
-	{
-		printf("synthesizerConfig::removeInstanceClicked(): synthi not found\n");
-		return;
-	}
-	audio->msgRemoveTrack(*ii);
-	*/
 }
 
-//---------------------------------------------------------
-//   configMidiPorts
-//---------------------------------------------------------
-
-void OOMidi::configMidiPorts()
-{
-	if (!midiPortConfig)
-	{
-		midiPortConfig = new MPConfig(this);
-	}
-	midiPortConfig->show();
-	midiPortConfig->raise();
-	midiPortConfig->activateWindow();
-}
 

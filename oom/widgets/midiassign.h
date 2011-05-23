@@ -23,9 +23,11 @@ class QItemSelection;
 class MidiPort;
 class QString;
 class QShowEvent;
+class QCloseEvent;
 class QPushButton;
 class MPConfig;
 class MidiSyncConfig;
+class AudioPortConfig;
 
 class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 {
@@ -52,9 +54,24 @@ class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 	QPushButton* m_btnReset;
 	MPConfig *midiPortConfig;
 	MidiSyncConfig* midiSyncConfig;
+	AudioPortConfig* audioPortConfig;
 
 public:
 	MidiAssignDialog(QWidget* parent = 0);
+	~MidiAssignDialog();
+	
+	MPConfig *getMidiPortConfig()
+	{
+		return midiPortConfig;
+	}
+	MidiSyncConfig* getMidiSyncConfig()
+	{
+		return midiSyncConfig;
+	}
+	AudioPortConfig* getAudioPortConfig()
+	{
+		return audioPortConfig;
+	}
 
 private slots:
 	void btnResetClicked();
@@ -78,7 +95,11 @@ private slots:
 	void btnAddMidiPreset();
 	void btnDeleteMidiPresets();
 
+public slots:
+	void switchTabs(int tab = 1); //MIDI by default
+
 protected:
 	virtual void showEvent(QShowEvent*);
+	virtual void closeEvent(QCloseEvent*);
 };
 #endif

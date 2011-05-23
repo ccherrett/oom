@@ -6,20 +6,20 @@
 //  (C) Copyright 2004 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#ifndef __ROUTEDIALOG_H__
-#define __ROUTEDIALOG_H__
+#ifndef __AUDIOPORTCONFIG_H__
+#define __AUDIOPORTCONFIG_H__
 
-#include "ui_routedialogbase.h"
+#include "ui_apconfigbase.h"
 
 class QCloseEvent;
 class QDialog;
 class AudioTrack;
 
 //---------------------------------------------------------
-//   RouteDialog
+//   AudioPortConfig
 //---------------------------------------------------------
 
-class RouteDialog : public QDialog, public Ui::RouteDialogBase
+class AudioPortConfig : public QFrame, public Ui::APConfigBase
 {
     Q_OBJECT
 	AudioTrack* _selected;
@@ -44,8 +44,8 @@ signals:
     void closed();
 
 public:
-    RouteDialog(QWidget* parent = 0);
-	~RouteDialog();
+    AudioPortConfig(QWidget* parent = 0);
+	~AudioPortConfig();
 	void setSourceSelection(QString);
 	void setDestSelection(QString);
 	void setSelected(AudioTrack* s);

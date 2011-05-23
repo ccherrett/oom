@@ -9,6 +9,7 @@
 #include <QtGui>
 #include <QStringList>
 #include <QList>
+#include "apconfig.h"
 #include "song.h"
 #include "globals.h"
 #include "config.h"
@@ -29,6 +30,7 @@
 #include "midimonitor.h"
 #include "confmport.h"
 #include "midisyncimpl.h"
+#include "traverso_shared/TConfig.h"
 
 MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 {
@@ -39,8 +41,10 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 
 	midiPortConfig = new MPConfig(this);
 	midiSyncConfig = new MidiSyncConfig(this);
-	m_tabpanel->insertTab(0, midiPortConfig, tr("Midi Port Manager"));
-	m_tabpanel->insertTab(3, midiSyncConfig, tr("Midi Sync"));
+	audioPortConfig = new AudioPortConfig(this);
+	m_tabpanel->insertTab(0, audioPortConfig, tr("Audio Routing Manager"));
+	m_tabpanel->insertTab(1, midiPortConfig, tr("Midi Port Manager"));
+	m_tabpanel->insertTab(4, midiSyncConfig, tr("Midi Sync"));
 	m_tabpanel->setCurrentIndex(0);
 	m_btnReset = m_buttonBox->button(QDialogButtonBox::Reset);
 
@@ -114,6 +118,14 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	connect(m_btnDeletePreset, SIGNAL(clicked()), SLOT(btnDeleteMidiPresets()));
 	connect(m_tabpanel, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
 	cmbTypeSelected(m_lasttype);
+}
+
+MidiAssignDialog::~MidiAssignDialog()
+{
+	tconfig().set_property("ConnectionsManager", "size", size());
+	tconfig().set_property("ConnectionsManager", "pos", pos());
+    // Save the new global settings to the configuration file
+    tconfig().save();
 }
 
 void MidiAssignDialog::itemChanged(QStandardItem* item)/*{{{*/
@@ -602,11 +614,13 @@ void MidiAssignDialog::currentTabChanged(int flags)/*{{{*/
 {
 	switch(flags)
 	{
-		case 0: //MidiPortConfig
+		case 0: //AudioPortConfig
+		break;
+		case 1: //MidiPortConfig
 			midiPortConfig->songChanged(-1);
 		break;
-		case 1: //MidiPortPreset
-		case 2: //MidiAssign
+		case 2: //MidiPortPreset
+		case 3: //MidiAssign
 			m_selectport = 0;
 			m_presetmodel->clear();
 			populateMidiPorts();
@@ -617,19 +631,34 @@ void MidiAssignDialog::currentTabChanged(int flags)/*{{{*/
 			m_portlabel->setText("");
 			updateMPTableHeader();
 		break;
-		case 3: //MidiSync
+		case 4: //MidiSync
 			midiSyncConfig->songChanged(-1);
 		break;
 	}
 }/*}}}*/
 
+void MidiAssignDialog::switchTabs(int tab)
+{
+	m_tabpanel->setCurrentIndex(tab);
+}
+
 //Virtuals
 void MidiAssignDialog::showEvent(QShowEvent*)
 {
 	currentTabChanged(m_tabpanel->currentIndex());
+	resize(tconfig().get_property("ConnectionsManager", "size", QSize(891, 691)).toSize());
+	move(tconfig().get_property("ConnectionsManager", "pos", QPoint(0, 0)).toPoint());
 	//btnResetClicked();
 	//printf("Midi Buffer size: %d\n", MIDI_FIFO_SIZE);
 	//QString idstr = QString::number(genId());
 	//QByteArray ba(idstr.toUtf8().constData());
 	//qDebug() << "ID Size: " << ba.size() << " ID: " << idstr;
+}
+
+void MidiAssignDialog::closeEvent(QCloseEvent*)
+{
+	tconfig().set_property("ConnectionsManager", "size", size());
+	tconfig().set_property("ConnectionsManager", "pos", pos());
+    // Save the new global settings to the configuration file
+    tconfig().save();
 }

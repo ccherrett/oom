@@ -10,7 +10,6 @@
 
 #include <QLayout>
 #include <QApplication>
-//#include <QDialog>
 #include <QToolButton>
 #include <QLabel>
 #include <QComboBox>
@@ -29,6 +28,7 @@
 
 #include "app.h"
 #include "globals.h"
+#include "apconfig.h"
 #include "audio.h"
 #include "driver/audiodev.h"
 #include "song.h"
@@ -223,8 +223,6 @@ void AudioStrip::songChanged(int val)
 		setLabelFont();
 
 	}
-	//if (val & SC_CHANNELS)
-	//      updateChannels();
 	if (val & SC_ROUTE)
 	{
 		if (pre)
@@ -254,14 +252,12 @@ void AudioStrip::songChanged(int val)
 		autoType->setCurrentItem(track->automationType());
 		if (track->automationType() == AUTO_TOUCH || track->automationType() == AUTO_WRITE)
 		{
-			//autoType->setPaletteBackgroundColor(Qt::red);
 			QPalette palette;
 			palette.setColor(autoType->backgroundRole(), QColor(Qt::red));
 			autoType->setPalette(palette);
 		}
 		else
 		{
-			//autoType->setPaletteBackgroundColor(qApp->palette().active().background());
 			QPalette palette;
 			palette.setColor(autoType->backgroundRole(), qApp->palette().color(QPalette::Active, QPalette::Background));
 			autoType->setPalette(palette);
@@ -748,7 +744,6 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 
 	record = 0;
 	off = 0;
-	routingDialog = 0;
 
 	AudioTrack* t = (AudioTrack*) track;
 	channel = at->channels();
@@ -1672,134 +1667,9 @@ void AudioStrip::iRoutePressed()
 		gRoutingPopupMenuMaster = 0;
 		return;
 	}
-	//TODO: Prepare the routeeditor dialog
-	iR->setDown(true);
-	if(!routingDialog)
-	{
-		routingDialog = oom->getRoutingDialog(true);
-		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
-		routingDialog->setSelected((AudioTrack*)track);
-		//routingDialog->setVisible(true);
-	}
-/*
-	QPoint ppt = QCursor::pos();
-
-	PopupMenu* pup = oom->getRoutingPopupMenu();
-	pup->disconnect();
-
-
-	AudioTrack* t = (AudioTrack*) track;
-	RouteList* irl = t->inRoutes();
-
-	QAction* act = 0;
-	int gid = 0;
-	int id = 0;
-
-	pup->clear();
-	gRoutingMenuMap.clear();
-	gid = 0;
-
-	switch (track->type())
-	{
-		case Track::AUDIO_INPUT:
-		{
-			for (int i = 0; i < channel; ++i)
-			{
-				char buffer[128];
-				snprintf(buffer, 128, "%s %d", tr("Channel").toLatin1().constData(), i + 1);
-				MenuTitleItem* titel = new MenuTitleItem(QString(buffer), pup);
-				pup->addAction(titel);
-
-				if (!checkAudioDevice())
-				{
-					gRoutingPopupMenuMaster = 0;
-					pup->clear();
-					gRoutingMenuMap.clear();
-					iR->setDown(false);
-					return;
-				}
-				std::list<QString> ol = audioDevice->outputPorts();
-
-				if (ol.size() >= 75 && ol.size() <= 125)
-				{
-					pup->setStyleSheet("font-size:8pt");
-				}
-				else if (ol.size() >= 126)
-				{
-					pup->setStyleSheet("font-size:6pt; font-family:'fixed'; ");
-				}
-
-				for (std::list<QString>::iterator ip = ol.begin(); ip != ol.end(); ++ip)
-				{
-					id = gid * 16 + i;
-					act = pup->addAction(*ip);
-					act->setData(id);
-					act->setCheckable(true);
-
-					Route dst(*ip, true, i, Route::JACK_ROUTE);
-					gRoutingMenuMap.insert(pRouteMenuMap(id, dst));
-					++gid;
-					for (iRoute ir = irl->begin(); ir != irl->end(); ++ir)
-					{
-						if (*ir == dst)
-						{
-							act->setChecked(true);
-							break;
-						}
-					}
-				}
-				if (i + 1 != channel)
-					pup->addSeparator();
-			}
-		}
-			break;
-			//case Track::AUDIO_OUTPUT:
-			//case Track::WAVE:
-			//case Track::AUDIO_BUSS:
-
-		case Track::AUDIO_OUTPUT:
-			gid = addWavePorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			gid = addInPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			gid = addGroupPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			gid = addAuxPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			gid = nonSyntiTrackAddSyntis(t, pup, gid, gRoutingMenuMap, false);
-			break;
-		case Track::WAVE:
-			gid = addInPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			break;
-		case Track::AUDIO_BUSS:
-			gid = addWavePorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			gid = addInPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			gid = addGroupPorts(t, pup, gid, gRoutingMenuMap, -1, -1, false);
-			gid = nonSyntiTrackAddSyntis(t, pup, gid, gRoutingMenuMap, false);
-			break;
-
-		case Track::AUDIO_SOFTSYNTH:
-			gid = addMultiChannelPorts(t, pup, gid, gRoutingMenuMap, false);
-			break;
-		default:
-			gRoutingPopupMenuMaster = 0;
-			pup->clear();
-			gRoutingMenuMap.clear();
-			iR->setDown(false);
-			return;
-	}
-
-	if (pup->actions().isEmpty())
-	{
-		gRoutingPopupMenuMaster = 0;
-		gRoutingMenuMap.clear();
-		iR->setDown(false);
-		return;
-	}
-
-	gIsOutRoutingPopupMenu = false;
-	gRoutingPopupMenuMaster = this;
-	connect(pup, SIGNAL(triggered(QAction*)), SLOT(routingPopupMenuActivated(QAction*)));
-	connect(pup, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
-	pup->popup(ppt);
-	iR->setDown(false);
-	*/
+	AudioPortConfig* aconf = oom->getRoutingDialog(true);
+	if(aconf)
+		aconf->setSelected((AudioTrack*)track);
 }
 
 //---------------------------------------------------------
@@ -1944,13 +1814,6 @@ void AudioStrip::routingPopupMenuActivated(QAction* act)
 	}
 }
 
-void AudioStrip::routingDialogClosed()
-{
-	//oR->setDown(false);
-	//iR->setDown(false);
-	routingDialog = 0;
-}
-
 //---------------------------------------------------------
 //   oRoutePressed
 //---------------------------------------------------------
@@ -1962,120 +1825,9 @@ void AudioStrip::oRoutePressed()
 		gRoutingPopupMenuMaster = 0;
 		return;
 	}
-	oR->setDown(true);
-	//TODO: Prepare the routeeditor dialog
-	if(!routingDialog)
-	{
-		routingDialog = oom->getRoutingDialog(true);
-		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
-		routingDialog->setSelected((AudioTrack*)track);
-	}
-
-/*	QPoint ppt = QCursor::pos();
-
-	PopupMenu* pup = oom->getRoutingPopupMenu();
-	pup->disconnect();
-
-	AudioTrack* t = (AudioTrack*) track;
-	RouteList* orl = t->outRoutes();
-
-	QAction* act = 0;
-	int gid = 0;
-	int id = 0;
-
-	pup->clear();
-	gRoutingMenuMap.clear();
-	gid = 0;
-
-	switch (track->type())
-	{
-		case Track::AUDIO_OUTPUT:
-		{
-			for (int i = 0; i < channel; ++i)
-			{
-				char buffer[128];
-				snprintf(buffer, 128, "%s %d", tr("Channel").toLatin1().constData(), i + 1);
-				MenuTitleItem* titel = new MenuTitleItem(QString(buffer), pup);
-				pup->addAction(titel);
-
-				if (!checkAudioDevice())
-				{
-					gRoutingPopupMenuMaster = 0;
-					pup->clear();
-					gRoutingMenuMap.clear();
-					oR->setDown(false);
-					return;
-				}
-				std::list<QString> ol = audioDevice->inputPorts();
-				for (std::list<QString>::iterator ip = ol.begin(); ip != ol.end(); ++ip)
-				{
-					id = gid * 16 + i;
-					act = pup->addAction(*ip);
-					act->setData(id);
-					act->setCheckable(true);
-
-					Route dst(*ip, true, i, Route::JACK_ROUTE);
-					gRoutingMenuMap.insert(pRouteMenuMap(id, dst));
-					++gid;
-					for (iRoute ir = orl->begin(); ir != orl->end(); ++ir)
-					{
-						if (*ir == dst)
-						{
-							act->setChecked(true);
-							break;
-						}
-					}
-				}
-				if (i + 1 != channel)
-					pup->addSeparator();
-			}
-		}
-			break;
-			//case Track::AUDIO_INPUT:
-			//case Track::WAVE:
-			//case Track::AUDIO_BUSS:
-
-		case Track::AUDIO_SOFTSYNTH:
-			gid = addMultiChannelPorts(t, pup, gid, gRoutingMenuMap, true);
-			break;
-
-		case Track::AUDIO_INPUT:
-			gid = addWavePorts(t, pup, gid, gRoutingMenuMap, -1, -1, true);
-		case Track::WAVE:
-		case Track::AUDIO_BUSS:
-		case Track::AUDIO_AUX:
-			//case Track::AUDIO_SOFTSYNTH:
-			gid = addOutPorts(t, pup, gid, gRoutingMenuMap, -1, -1, true);
-			gid = addGroupPorts(t, pup, gid, gRoutingMenuMap, -1, -1, true);
-			gid = nonSyntiTrackAddSyntis(t, pup, gid, gRoutingMenuMap, true);
-			break;
-			//case Track::AUDIO_AUX:
-			//      gid = addOutPorts(         t, pup, gid, gRoutingMenuMap, -1, -1, true);
-			//break;
-
-		default:
-			gRoutingPopupMenuMaster = 0;
-			pup->clear();
-			gRoutingMenuMap.clear();
-			oR->setDown(false);
-			return;
-	}
-
-	if (pup->actions().isEmpty())
-	{
-		gRoutingPopupMenuMaster = 0;
-		gRoutingMenuMap.clear();
-		oR->setDown(false);
-		return;
-	}
-
-	gIsOutRoutingPopupMenu = true;
-	gRoutingPopupMenuMaster = this;
-	connect(pup, SIGNAL(triggered(QAction*)), SLOT(routingPopupMenuActivated(QAction*)));
-	connect(pup, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
-	pup->popup(ppt);
-	oR->setDown(false);
-	*/
+	AudioPortConfig* apconfig = oom->getRoutingDialog(true);
+	if(apconfig)
+		apconfig->setSelected((AudioTrack*)track);
 }
 
 void AudioStrip::playbackClipped()

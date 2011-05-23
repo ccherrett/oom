@@ -12,19 +12,18 @@
 #include <QTreeWidgetItem>
 #include <QList>
 
-#include "routedialog.h"
+#include "apconfig.h"
 #include "track.h"
 #include "song.h"
 #include "audio.h"
 #include "driver/jackaudio.h"
-#include "traverso_shared/TConfig.h"
 
 //---------------------------------------------------------
-//   RouteDialog
+//   AudioPortConfig
 //---------------------------------------------------------
 
-RouteDialog::RouteDialog(QWidget* parent)
-: QDialog(parent)
+AudioPortConfig::AudioPortConfig(QWidget* parent)
+: QFrame(parent)
 {
 	setupUi(this);
 	_selected = 0;
@@ -38,23 +37,17 @@ RouteDialog::RouteDialog(QWidget* parent)
 	connect(btnConnectOut, SIGNAL(clicked()), SLOT(addOutRoute()));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	routingChanged();
-	resize(tconfig().get_property("RouteDialog", "size", QSize(891, 691)).toSize());
-	move(tconfig().get_property("RouteDialog", "pos", QPoint(0, 0)).toPoint());
 }
 
-RouteDialog::~RouteDialog()
+AudioPortConfig::~AudioPortConfig()
 {
-	tconfig().set_property("RouteDialog", "size", size());
-	tconfig().set_property("RouteDialog", "pos", pos());
-    // Save the new global settings to the configuration file
-    tconfig().save();
 }
 
 //---------------------------------------------------------
 //   routingChanged
 //---------------------------------------------------------
 
-void RouteDialog::routingChanged()
+void AudioPortConfig::routingChanged()
 {
 	//---------------------------------------------------
 	//  populate lists
@@ -95,7 +88,7 @@ void RouteDialog::routingChanged()
 //   songChanged
 //---------------------------------------------------------
 
-void RouteDialog::songChanged(int v)
+void AudioPortConfig::songChanged(int v)
 {
 	if (v & (SC_TRACK_INSERTED | SC_TRACK_MODIFIED | SC_TRACK_REMOVED | SC_ROUTE | SC_CHANNELS))
 	{
@@ -107,7 +100,7 @@ void RouteDialog::songChanged(int v)
 //   routeSelectionChanged
 //---------------------------------------------------------
 
-void RouteDialog::routeSelectionChanged()
+void AudioPortConfig::routeSelectionChanged()
 {
 	QTreeWidgetItem* item = routeList->currentItem();
 	removeButton->setEnabled(item != 0);
@@ -117,7 +110,7 @@ void RouteDialog::routeSelectionChanged()
 //   removeRoute
 //---------------------------------------------------------
 
-void RouteDialog::removeRoute()
+void AudioPortConfig::removeRoute()
 {
 	QTreeWidgetItem* item = routeList->currentItem();
 	if (item == 0)
@@ -147,7 +140,7 @@ void RouteDialog::removeRoute()
 //   addRoute
 //---------------------------------------------------------
 
-void RouteDialog::addRoute()/*{{{*/
+void AudioPortConfig::addRoute()/*{{{*/
 {
 	QListWidgetItem* srcItem = newSrcList->currentItem();
         QListWidgetItem* tItem = tracksList->currentItem();
@@ -208,7 +201,7 @@ void RouteDialog::addRoute()/*{{{*/
 	connectButton->setEnabled(false);*/
 }/*}}}*/
 
-void RouteDialog::addOutRoute()/*{{{*/
+void AudioPortConfig::addOutRoute()/*{{{*/
 {
 	QListWidgetItem* dstItem = newDstList->currentItem();
 	QListWidgetItem* tItem = tracksList->currentItem();
@@ -274,7 +267,7 @@ void RouteDialog::addOutRoute()/*{{{*/
 	*/
 }/*}}}*/
 
-void RouteDialog::setSourceSelection(QString src)
+void AudioPortConfig::setSourceSelection(QString src)
 {
 	newSrcList->setCurrentRow(-1);
 	QList<QListWidgetItem*> found = newSrcList->findItems(src, Qt::MatchExactly);
@@ -287,7 +280,7 @@ void RouteDialog::setSourceSelection(QString src)
 	newDstList->setCurrentRow(-1);
 }
 
-void RouteDialog::setDestSelection(QString dest)
+void AudioPortConfig::setDestSelection(QString dest)
 {
 	newDstList->setCurrentRow(-1);
 	QList<QListWidgetItem*> found = newDstList->findItems(dest, Qt::MatchExactly);
@@ -300,7 +293,7 @@ void RouteDialog::setDestSelection(QString dest)
 	newSrcList->setCurrentRow(-1);
 }
 
-void RouteDialog::trackSelectionChanged()
+void AudioPortConfig::trackSelectionChanged()
 {
 	routeList->clear();
 	newSrcList->clear();
@@ -485,7 +478,7 @@ void RouteDialog::trackSelectionChanged()
 	}
 }
 
-void RouteDialog::insertOutputs()
+void AudioPortConfig::insertOutputs()
 {
 	if (checkAudioDevice()) 
 	{
@@ -496,7 +489,7 @@ void RouteDialog::insertOutputs()
 	}
 }
 
-void RouteDialog::insertInputs()
+void AudioPortConfig::insertInputs()
 {
 	if (checkAudioDevice()) 
 	{
@@ -507,7 +500,7 @@ void RouteDialog::insertInputs()
 	}
 }
 
-void RouteDialog::setSelected(QString t)
+void AudioPortConfig::setSelected(QString t)
 {
 	QList<QListWidgetItem*> found = tracksList->findItems(t, Qt::MatchExactly);
 	if(found.isEmpty())
@@ -515,7 +508,7 @@ void RouteDialog::setSelected(QString t)
 	tracksList->setCurrentItem(found.at(0));
 }
 
-void RouteDialog::setSelected(AudioTrack* t)
+void AudioPortConfig::setSelected(AudioTrack* t)
 {
 	//_selected = s;
 	if(t)
@@ -532,7 +525,7 @@ void RouteDialog::setSelected(AudioTrack* t)
 //   srcSelectionChanged
 //---------------------------------------------------------
 
-void RouteDialog::srcSelectionChanged()
+void AudioPortConfig::srcSelectionChanged()
 {
 	QListWidgetItem* srcItem = newSrcList->currentItem();
 	QListWidgetItem* tItem = tracksList->currentItem();
@@ -583,7 +576,7 @@ void RouteDialog::srcSelectionChanged()
 //   dstSelectionChanged
 //---------------------------------------------------------
 
-void RouteDialog::dstSelectionChanged()
+void AudioPortConfig::dstSelectionChanged()
 {
 	QListWidgetItem* dstItem = newDstList->currentItem();
 	QListWidgetItem* tItem = tracksList->currentItem();
@@ -634,23 +627,23 @@ void RouteDialog::dstSelectionChanged()
 //   closeEvent
 //---------------------------------------------------------
 
-void RouteDialog::closeEvent(QCloseEvent* e)
+void AudioPortConfig::closeEvent(QCloseEvent* e)
 {
         emit closed();
 	e->accept();
 }
 
-void RouteDialog::resizeEvent(QResizeEvent *)
+void AudioPortConfig::resizeEvent(QResizeEvent *)
 {
         updateRoutingHeaderWidths();
 }
 
-void RouteDialog::showEvent(QShowEvent *)
+void AudioPortConfig::showEvent(QShowEvent *)
 {
         updateRoutingHeaderWidths();
 }
 
-void RouteDialog::updateRoutingHeaderWidths()
+void AudioPortConfig::updateRoutingHeaderWidths()
 {
         int routeListWidth = routeList->header()->width();
         routeListWidth -= 60;
@@ -664,7 +657,7 @@ void RouteDialog::updateRoutingHeaderWidths()
 
 }
 
-void RouteDialog::reject()
+void AudioPortConfig::reject()
 {
         emit closed();
 }

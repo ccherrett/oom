@@ -28,6 +28,7 @@
 
 #include "astrip.h"
 #include "mstrip.h"
+#include "apconfig.h"
 
 #include "gconfig.h"
 #include "xml.h"
@@ -159,7 +160,7 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 	populateAddTrack(menuConfig);
 
 	QMenu* menuView = menuBar()->addMenu(tr("&View"));
-	routingId = menuView->addAction(tr("Routing"), this, SLOT(toggleRouteDialog()));
+	routingId = menuView->addAction(tr("Routing"), this, SLOT(toggleAudioPortConfig()));
 	routingId->setCheckable(true);
 
 	menuView->addSeparator();
@@ -670,23 +671,23 @@ void AudioMixerApp::toggleShowEffectsRack()
 }
 
 //---------------------------------------------------------
-//   toggleRouteDialog
+//   toggleAudioPortConfig
 //---------------------------------------------------------
 
-void AudioMixerApp::toggleRouteDialog()
+void AudioMixerApp::toggleAudioPortConfig()
 {
-	showRouteDialog(routingId->isChecked());
+	showAudioPortConfig(routingId->isChecked());
 }
 
 //---------------------------------------------------------
-//   showRouteDialog
+//   showAudioPortConfig
 //---------------------------------------------------------
 
-void AudioMixerApp::showRouteDialog(bool on)
+void AudioMixerApp::showAudioPortConfig(bool on)
 {
 	if (on && routingDialog == 0)
 	{
-		routingDialog = oom->getRoutingDialog(true);//new RouteDialog(this);
+		routingDialog = oom->getRoutingDialog(true);//new AudioPortConfig(this);
 		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
 	}
 	if (routingDialog)

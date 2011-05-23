@@ -26,7 +26,6 @@ class TransparentToolButton;
 class AudioTrack;
 class DoubleLabel;
 class EffectRack;
-class RouteDialog;
 
 //---------------------------------------------------------
 //   AudioStrip
@@ -55,10 +54,6 @@ class AudioStrip : public Strip
     double panVal;
 
     QString slDefaultStyle;
-    RouteDialog* routingDialog;
-
-    //QToolButton* iR;
-    //QToolButton* oR;
 
     Knob* addKnob(int, int, DoubleLabel**);
 
@@ -66,7 +61,6 @@ class AudioStrip : public Strip
     void updateVolume();
     void updatePan();
     void updateChannels();
-    //void updateRouteMenus();
 
 private slots:
     void stereoToggled(bool);
@@ -89,7 +83,6 @@ private slots:
     void panRightClicked(const QPoint &);
     void playbackClipped();
     void resetPeaks();
-	void routingDialogClosed();
 
 protected slots:
     virtual void heartBeat();

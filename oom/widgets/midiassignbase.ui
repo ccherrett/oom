@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>OOMidi: Midi Connections Manager</string>
+   <string>OOMidi: Audio/Midi Connections Manager</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>

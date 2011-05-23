@@ -865,7 +865,7 @@ void MidiTrackInfo::inRoutesPressed()
 		if (ret == QMessageBox::Ok)
 		{
 			// printf("open config midi ports\n");
-			oom->configMidiPorts();
+			oom->configMidiAssign(1);
 		}
 		return;
 	}

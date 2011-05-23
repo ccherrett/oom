@@ -24,6 +24,7 @@
 QT4_WRAP_CPP (widget_mocs
       aboutbox_impl.h 
       action.h
+      apconfig.h
       bigtime.h  
       canvas.h  
       checkbox.h  
@@ -53,7 +54,6 @@ QT4_WRAP_CPP (widget_mocs
       pcscale.h  
 	  tvieweditor.h
 	  tviewdock.h
-      routedialog.h
 	  rmap.h
 	  rmapdialog.h
 	  pctablemodel.h
@@ -108,6 +108,7 @@ QT4_WRAP_CPP (widget_mocs
 file (GLOB widgets_ui_files
       aboutbox.ui  
 	  #      appearancebase.ui 
+      apconfigbase.ui
       cliplisteditorbase.ui  
       commentbase.ui  
       commentdockbase.ui  
@@ -135,7 +136,6 @@ file (GLOB widgets_ui_files
 	  trackvieweditorbase.ui
 	  tviewdockbase.ui
 	  rmapdialogbase.ui
-      routedialogbase.ui
 	  routemapbase.ui
 	  midiassignbase.ui
 	  cceditbase.ui
@@ -147,6 +147,7 @@ QT4_WRAP_UI (widget_ui_headers ${widgets_ui_files})
 ##
 file (GLOB widgets_source_files
       aboutbox_impl.cpp 
+      apconfig.cpp 
       bigtime.cpp 
       canvas.cpp 
       checkbox.cpp 
@@ -178,7 +179,6 @@ file (GLOB widgets_source_files
       mtrackinfo.cpp
 	  tvieweditor.cpp
 	  tviewdock.cpp
-      routedialog.cpp 
 	  rmap.cpp
 	  rmapdialog.cpp
       mtscale.cpp 
