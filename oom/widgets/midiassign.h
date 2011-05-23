@@ -96,7 +96,7 @@ private slots:
 	void btnDeleteMidiPresets();
 
 public slots:
-	void switchTabs(int tab = 1); //MIDI by default
+	void switchTabs(int tab = 0);
 
 protected:
 	virtual void showEvent(QShowEvent*);
