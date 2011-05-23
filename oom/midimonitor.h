@@ -24,7 +24,8 @@ enum {
 	MONITOR_ADD_TRACK,
 	MONITOR_DEL_TRACK,
 	MONITOR_TOGGLE_FEEDBACK,
-	MONITOR_LEARN
+	MONITOR_LEARN,
+	MONITOR_SEND_PRESET
 };
 
 //This container holds all the types that can be handled
@@ -85,6 +86,11 @@ public:
 	void msgDeleteMonitoredTrack(Track*);
 	void msgToggleFeedback(bool);
 	void msgStartLearning(int port);
+
+	bool isFeedbackEnabled()
+	{
+		return m_feedback;
+	}
 
 	bool isAssigned(QString track)
 	{

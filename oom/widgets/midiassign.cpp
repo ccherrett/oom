@@ -648,6 +648,16 @@ void MidiAssignDialog::showEvent(QShowEvent*)
 	currentTabChanged(m_tabpanel->currentIndex());
 	resize(tconfig().get_property("ConnectionsManager", "size", QSize(891, 691)).toSize());
 	move(tconfig().get_property("ConnectionsManager", "pos", QPoint(0, 0)).toPoint());
+
+	QString qsrc("F0 41 10 42 12 40 00 7F 00 41 F7");
+	QByteArray ba = qsrc.toLatin1();
+	const char* src = ba.constData();
+
+	int len;
+	int stat;
+	unsigned char* sysex = (unsigned char*) hex2string(src, len, stat);
+	QString rev = string2hex(sysex, len);
+	qDebug() << "HexToString: " << sysex << " Length: " << len << " StringToHex: " << rev;
 	//btnResetClicked();
 	//printf("Midi Buffer size: %d\n", MIDI_FIFO_SIZE);
 	//QString idstr = QString::number(genId());

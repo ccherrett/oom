@@ -33,6 +33,9 @@ extern double trackVolToDb(double val);
 extern double dbToTrackVol(double val);
 extern int trackPanToMidi(double val);
 extern double midiToTrackPan(int val);
+extern const unsigned char* stringToSysex(QString);
+extern QString string2hex(const unsigned char* data, int len);
+extern char* hex2string(const char* src, int& len, int& status);
 extern qint64 genId();
 
 #endif

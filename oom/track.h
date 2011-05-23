@@ -37,6 +37,7 @@ struct MidiAssignData {/*{{{*/
 	Track* track;
 	QHash<int, CCInfo*> midimap;
 	int port;
+	int preset;
 	int channel;
 	bool enabled;
 	void read(Xml&, Track*);
@@ -187,10 +188,10 @@ public:
         return _selected;
     }
 
-    void setSelected(bool f)
-    {
+    void setSelected(bool f);
+    /*{
         _selected = f;
-    }
+    }*/
 
 	void deselectParts();
 

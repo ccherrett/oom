@@ -25,6 +25,7 @@
 
 #include "song.h"
 #include "event.h"
+#include "utils.h"
 #include "midictrl.h"
 #include "editevent.h"
 #include "pitchedit.h"
@@ -37,67 +38,6 @@
 #include "instruments/minstrument.h"
 #include "midi.h"
 
-//---------------------------------------------------------
-//   string2qhex
-//---------------------------------------------------------
-
-QString string2hex(const unsigned char* data, int len)
-{
-	QString d;
-	QString s;
-	for (int i = 0; i < len; ++i)
-	{
-		if ((i > 0) && ((i % 8) == 0))
-		{
-			d += "\n";
-		}
-		else if (i)
-			d += " ";
-		d += s.sprintf("%02x", data[i]);
-	}
-	return d;
-}
-
-//---------------------------------------------------------
-//   hex2string
-//---------------------------------------------------------
-
-char* hex2string(QWidget* parent, const char* src, int& len)
-{
-	char buffer[2048];
-	char* dst = buffer;
-
-	while (*src)
-	{
-		while (*src == ' ' || *src == '\n')
-			++src;
-		char* ep;
-		long val = strtol(src, &ep, 16);
-		if (ep == src)
-		{
-			QMessageBox::information(parent,
-					QString("OOMidi"),
-					QWidget::tr("Cannot convert sysex string"));
-			return 0;
-		}
-		src = ep;
-		*dst++ = val;
-		if (dst - buffer >= 2048)
-		{
-			QMessageBox::information(parent,
-					QString("OOMidi"),
-					QWidget::tr("Hex String too long (2048 bytes limit)"));
-			return 0;
-		}
-	}
-	len = dst - buffer;
-	if (len == 0)
-		return 0;
-	char* b = new char[len + 1];
-	memcpy(b, buffer, len);
-	b[len] = 0;
-	return b;
-}
 
 //---------------------------------------------------------
 //   getEvent
@@ -289,7 +229,23 @@ void EditSysexDialog::accept()
 	QByteArray ba = qsrc.toLatin1();
 	const char* src = ba.constData();
 
-	sysex = (unsigned char*) hex2string(this, src, len);
+	int status = 0;
+	sysex = (unsigned char*) hex2string(src, len, status);
+	switch(status)
+	{
+		case 1:
+			QMessageBox::information(this,
+				QString("OOMidi"),
+				QWidget::tr("Cannot convert sysex string"));
+		break;
+		case 2:
+			QMessageBox::information(this,
+				QString("OOMidi"),
+				QWidget::tr("Hex String too long (2048 bytes limit)"));
+		break;
+		default:
+		break;
+	}
 	if (sysex)
 		QDialog::accept();
 }
@@ -385,7 +341,23 @@ void EditMetaDialog::toggled(bool flag)
 	else
 	{ // convert to string
 		int len;
-		dst = hex2string(this, src, len);
+		int status = 0;
+		dst = hex2string(src, len, status);
+		switch(status)
+		{
+			case 1:
+				QMessageBox::information(this,
+					QString("OOMidi"),
+					QWidget::tr("Cannot convert sysex string"));
+			break;
+			case 2:
+				QMessageBox::information(this,
+					QString("OOMidi"),
+					QWidget::tr("Hex String too long (2048 bytes limit)"));
+			break;
+			default:
+			break;
+		}
 	}
 	edit->setText(dst);
 }
@@ -430,7 +402,23 @@ void EditMetaDialog::accept()
 		return;
 	}
 
-	meta = (unsigned char*) hex2string(this, src, len);
+	int status = 0;
+	meta = (unsigned char*) hex2string(src, len, status);
+	switch(status)
+	{
+		case 1:
+			QMessageBox::information(this,
+				QString("OOMidi"),
+				QWidget::tr("Cannot convert sysex string"));
+		break;
+		case 2:
+			QMessageBox::information(this,
+				QString("OOMidi"),
+				QWidget::tr("Hex String too long (2048 bytes limit)"));
+		break;
+		default:
+		break;
+	}
 	if (meta)
 		QDialog::accept();
 }

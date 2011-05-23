@@ -11,6 +11,7 @@
 #include <math.h>
 #include <sys/time.h>
 
+#include <QtGui>
 #include <QFrame>
 #include <QDateTime>
 
@@ -452,3 +453,80 @@ qint64 genId( )
 	return id;
 }
 							
+const unsigned char* stringToSysex(QString p)
+{
+	return NULL;
+	/*
+	if(p.isEmpty())
+	{
+		return NULL;
+	}
+	QStringList list = p.split(" ", QString::SkipEmptyParts);
+	foreach(QString str, list)
+	{
+		if(!str.startsWith("0x"))
+			
+	}*/
+}
+
+//---------------------------------------------------------
+//   string2qhex
+//---------------------------------------------------------
+
+QString string2hex(const unsigned char* data, int len)
+{
+	QString d;
+	QString s;
+	for (int i = 0; i < len; ++i)
+	{
+		if ((i > 0) && ((i % 8) == 0))
+		{
+			d += "\n";
+		}
+		else if (i)
+			d += " ";
+		d += s.sprintf("%02x", data[i]);
+	}
+	return d;
+}
+
+//---------------------------------------------------------
+//   hex2string
+//---------------------------------------------------------
+
+char* hex2string(const char* src, int& len, int& status)
+{
+	char buffer[2048];
+	char* dst = buffer;
+
+	while (*src)
+	{
+		while (*src == ' ' || *src == '\n')
+			++src;
+		char* ep;
+		long val = strtol(src, &ep, 16);
+		if (ep == src)
+		{
+			status = 1;
+			return 0;
+		}
+		src = ep;
+		*dst++ = val;
+		if (dst - buffer >= 2048)
+		{
+			status = 2;
+			return 0;
+		}
+	}
+	len = dst - buffer;
+	if (len == 0)
+	{
+		status = false;
+		return 0;
+	}
+	char* b = new char[len + 1];
+	memcpy(b, buffer, len);
+	b[len] = 0;
+	status = 0;
+	return b;
+}

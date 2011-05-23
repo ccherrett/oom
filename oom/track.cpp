@@ -9,6 +9,8 @@
 #include <QStringList>
 #include "track.h"
 #include "event.h"
+#include "utils.h"
+#include "midi.h"
 #include "midictrl.h"
 #include "mididev.h"
 #include "midiport.h"
@@ -167,22 +169,18 @@ void Track::init()
 	_volumeEn2Ctrl = true;
 	_panEnCtrl = true;
 	_panEn2Ctrl = true;
-	m_midiassign.port = -1;
-	m_midiassign.channel = -1;
-	m_midiassign.enabled = false;
 
 	_selected = false;
 	_height = 40;
 	_locked = false;
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 	{
-		//_meter[i] = 0;
-		//_peak[i]  = 0;
 		_meter[i] = 0.0;
 		_peak[i] = 0.0;
 	}
 	m_midiassign.enabled = false;
 	m_midiassign.port = 0;
+	m_midiassign.preset = 0;
 	m_midiassign.channel = 0;
 	m_midiassign.track = this;
 	m_midiassign.midimap.clear();
@@ -214,8 +212,6 @@ Track::Track(Track::TrackType t)
 	init();
 	_type = t;
 }
-
-//Track::Track(const Track& t)
 
 Track::Track(const Track& t, bool cloneParts)
 {
@@ -376,6 +372,30 @@ void Track::deselectParts()
 	}
 }
 
+void Track::setSelected(bool sel)
+{
+	_selected = sel;
+	if(sel && m_midiassign.enabled && m_midiassign.preset && midiMonitor->isFeedbackEnabled())
+	{
+		MidiPort* mport = &midiPorts[m_midiassign.port];
+		if(mport)
+		{
+			//const unsigned char* preset = stringToSysex(mport->preset(m_midiassign.preset));
+			const char* src = mport->preset(m_midiassign.preset).toLatin1().constData();
+
+			int len;
+			int status;
+			unsigned char* sysex = (unsigned char*) hex2string(src, len, status);
+			if(sysex && !status)
+			{
+				//Send the event from the sequencer thread
+				MidiPlayEvent ev(0, m_midiassign.port, ME_SYSEX, sysex, len);
+				audio->msgPlayMidiEvent(&ev);
+			}
+		}
+	}
+}
+
 //---------------------------------------------------------
 //   clearRecAutomation
 //---------------------------------------------------------
@@ -473,6 +493,7 @@ void MidiTrack::init()
 
 	m_midiassign.enabled = false;
 	m_midiassign.port = 0;
+	m_midiassign.preset = 0;
 	m_midiassign.channel = 0;
 	m_midiassign.track = this;
 	m_midiassign.midimap.clear();
@@ -670,6 +691,7 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 	xml.nput(level, "<MidiAssign port=\"%d\"", m_midiassign.port);/*{{{*/
 	xml.nput(" channel=\"%d\"", m_midiassign.channel);
 	xml.nput(" enabled=\"%d\"", (int)m_midiassign.enabled);
+	xml.nput(" preset=\"%d\"", (int)m_midiassign.preset);
 	QString assign;
 	QHashIterator<int, CCInfo*> iter(m_midiassign.midimap);
 	while(iter.hasNext())
@@ -923,6 +945,7 @@ void MidiAssignData::read(Xml& xml, Track* t)/*{{{*/
 {
 	enabled = false;
 	port = 0;
+	preset = 0;
 	channel = 0;
 	track = t;
 	midimap.clear();
@@ -965,6 +988,8 @@ void MidiAssignData::read(Xml& xml, Track* t)/*{{{*/
 					channel = xml.s2().toInt();
 				else if(tag == "enabled")
 					enabled = (bool)xml.s2().toInt();
+				else if(tag == "preset")
+					preset = xml.s2().toInt();
 				else if (tag == "midimap")
 				{
 					QStringList vals = xml.s2().split(" ", QString::SkipEmptyParts);
