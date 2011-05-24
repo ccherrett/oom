@@ -6,8 +6,8 @@
 //  (C) Copyright 2011 Andrew Williams and Christopher Cherrett
 //=========================================================
 
-#ifndef _OOM_MIDIPORT_DELEGATE_
-#define _OOM_MIDIPORT_DELEGATE_
+#ifndef _OOM_MIDIPRESETT_DELEGATE_
+#define _OOM_MIDIPRESET_DELEGATE_
 
 #include <QItemDelegate>
 #include <QModelIndex>
@@ -31,12 +31,12 @@
 #define MidiPresetRole Qt::UserRole+7
 #endif
 
-class MidiPortDelegate : public QItemDelegate
+class MidiPresetDelegate : public QItemDelegate
 {
 	Q_OBJECT
 
 public:
-	MidiPortDelegate(QObject *parent = 0);
+	MidiPresetDelegate(QObject *parent = 0);
 
 	QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &opt, const QModelIndex &ind) const;
 

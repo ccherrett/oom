@@ -26,7 +26,7 @@ class QShowEvent;
 class QCloseEvent;
 class QPushButton;
 class MPConfig;
-class MidiSyncConfig;
+//class MidiSyncConfig;
 class AudioPortConfig;
 
 class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
@@ -53,7 +53,7 @@ class MidiAssignDialog : public QDialog, public Ui::MidiAssignBase
 	int m_lasttype;
 	QPushButton* m_btnReset;
 	MPConfig *midiPortConfig;
-	MidiSyncConfig* midiSyncConfig;
+	//MidiSyncConfig* midiSyncConfig;
 	AudioPortConfig* audioPortConfig;
 
 public:
@@ -64,10 +64,10 @@ public:
 	{
 		return midiPortConfig;
 	}
-	MidiSyncConfig* getMidiSyncConfig()
+	/*MidiSyncConfig* getMidiSyncConfig()
 	{
 		return midiSyncConfig;
-	}
+	}*/
 	AudioPortConfig* getAudioPortConfig()
 	{
 		return audioPortConfig;
@@ -94,6 +94,37 @@ private slots:
 	void midiPortSelected(const QItemSelection&, const QItemSelection&);
 	void btnAddMidiPreset();
 	void btnDeleteMidiPresets();
+
+	//midi sync transport
+	void updateUseJackTransport(int);
+	void updateJackMaster(int);
+	void updateSlaveSync(int);
+	void updateSyncDelay(int);
+	//MTC timing
+	void updateMTCType(int);
+	void updateMTCHour(int);
+	void updateMTCMinute(int);
+	void updateMTCSecond(int);
+	void updateMTCFrame(int);
+	void updateMTCSubFrame(int);
+	//midi sync slots Input
+	void updateInputRewindBeforePlay(int);
+
+	void updateInputDeviceId(int);
+	void updateInputClock(int);
+	void updateInputRealtime(int);
+	void updateInputMMC(int);
+	void updateInputMTC(int);
+
+	//midi sync slots Output
+	void updateOutputDeviceId(int);
+	void updateOutputClock(int);
+	void updateOutputRealtime(int);
+	void updateOutputMMC(int);
+	void updateOutputMTC(int);
+
+	void populateSyncInfo();
+	void populateMMCSettings();
 
 public slots:
 	void switchTabs(int tab = 0);

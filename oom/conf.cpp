@@ -338,10 +338,6 @@ static void readConfigMidiPort(Xml& xml)
 				else if (tag == "instrument")
 				{
 					instrument = xml.parse1();
-					// Moved by Tim.
-					//midiPorts[idx].setInstrument(
-					//   registerMidiInstrument(instrument)
-					//   );
 				}
 				else if (tag == "midithru")
 					thruFlag = xml.parseInt(); // obsolete
@@ -433,83 +429,6 @@ static void readConfigMidiPort(Xml& xml)
 		}
 	}
 }
-
-/*
-//---------------------------------------------------------
-//   readConfigMidiSyncInfo
-//---------------------------------------------------------
-
-static void readConfigMidiSyncInfo(Xml& xml)
-{
-	  QString device;
-	  int idOut       = 127;
-	  int idIn        = 127;
-	  bool sendMC     = false;
-	  bool sendMMC    = false;
-	  bool sendMTC    = false;
-	  bool recMC      = false;
-	  bool recMMC     = false;
-	  bool recMTC     = false;
-      
-	  for (;;) {
-			Xml::Token token = xml.parse();
-			if (token == Xml::Error || token == Xml::End)
-				  break;
-			QString tag = xml.s1();
-			switch (token) {
-				  case Xml::TagStart:
-						if (tag == "device")
-							  device = xml.parse1();
-						else if (tag == "idOut")
-							  idOut = (xml.parseInt());
-						else if (tag == "idIn")
-							  idIn = xml.parseInt();
-						else if (tag == "sendMC")
-							  sendMC = xml.parseInt();
-						else if (tag == "sendMMC")
-							  sendMMC = xml.parseInt();
-						else if (tag == "sendMTC")
-							  sendMTC = xml.parseInt();
-						else if (tag == "recMC")
-							  recMC = xml.parseInt();
-						else if (tag == "recMMC")
-							  recMMC = xml.parseInt();
-						else if (tag == "recMTC")
-							  recMTC = xml.parseInt();
-						else
-							  xml.unknown("midiSyncInfo");
-						break;
-				  case Xml::Attribut:
-						break;
-				  case Xml::TagEnd:
-						if(tag == "midiSyncInfo")
-						{
-						  MidiDevice* dev = midiDevices.find(device);
-						  if(dev)
-						  {
-							MidiSyncInfo& si = dev->syncInfo();
-							si.setIdIn(idIn);
-							si.setIdOut(idOut);
-                            
-							si.setMCIn(recMC);
-							si.setMMCIn(recMMC);
-							si.setMTCIn(recMTC);
-                            
-							si.setMCOut(sendMC);
-							si.setMMCOut(sendMMC);
-							si.setMTCOut(sendMTC);
-						  }
-						  else
-							fprintf(stderr, "Read configuration: Sync device: %s not found\n", device.toLatin1().constData());
-                            
-						  return;
-						}
-				  default:
-						break;
-				  }
-			}
-}
- */
 
 //---------------------------------------------------------
 //   loadConfigMetronom
@@ -1514,45 +1433,7 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 	xml.intTag(level, "midiFilterCtrl2", midiFilterCtrl2);
 	xml.intTag(level, "midiFilterCtrl3", midiFilterCtrl3);
 	xml.intTag(level, "midiFilterCtrl4", midiFilterCtrl4);
-	// Removed by Tim. p3.3.6
 
-	//xml.intTag(level, "txDeviceId", txDeviceId);
-	//xml.intTag(level, "rxDeviceId", rxDeviceId);
-
-	// Changed by Tim. p3.3.6
-
-	//xml.intTag(level, "txSyncPort", txSyncPort);
-	/*
-	// To keep old oom versions happy...
-	bool mcsync = mmc = mtc = false;
-	for(int sp = 0; sp < MIDI_PORTS; ++sp)
-	{
-	  MidiSyncTxPort* txPort = &midiSyncTxPorts[sp];
-	  if(txPort->doMCSync() || txPort->doMMC() || txPort->doMTC())
-	  {
-		if(txPort->doMCSync())
-		  mcsync = true;
-		if(txPort->doMMC())
-		  mmc = true;
-		if(txPort->doMTC())
-		  mtc = true;
-		xml.intTag(level, "txSyncPort", sp);
-		break;
-	  }
-	}
-	 */
-
-	// Added by Tim. p3.3.6
-
-	//xml.tag(level++, "midiSyncInfo");
-	//for(iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
-	//{
-	//  MidiDevice* md = *id;
-	//  md->syncInfo().write(level, xml, md);
-	//}
-	//xml.etag(level, "midiSyncInfo");
-
-	//xml.intTag(level, "rxSyncPort", rxSyncPort);
 	xml.intTag(level, "mtctype", mtcType);
 	xml.nput(level, "<mtcoffset>%02d:%02d:%02d:%02d:%02d</mtcoffset>\n",
 			mtcOffset.h(), mtcOffset.m(), mtcOffset.s(),
@@ -1602,25 +1483,6 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 	writeMidiTransforms(level, xml);
 	writeMidiInputTransforms(level, xml);
 	xml.etag(level, "configuration");
-}
-
-//---------------------------------------------------------
-//   configMidiSync
-//---------------------------------------------------------
-
-void OOMidi::configMidiSync()
-{
-	if (!midiSyncConfig)
-		//midiSyncConfig = new MidiSyncConfig(this);
-		midiSyncConfig = new MidiSyncConfig;
-
-	if (midiSyncConfig->isVisible())
-	{
-		midiSyncConfig->raise();
-		midiSyncConfig->activateWindow();
-	}
-	else
-		midiSyncConfig->show();
 }
 
 //---------------------------------------------------------

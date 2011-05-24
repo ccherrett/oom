@@ -25,7 +25,7 @@
 #include "midiport.h"
 #include "mididev.h"
 #include "xml.h"
-#include "midisyncimpl.h"
+//#include "midisyncimpl.h"
 #include "midifilterimpl.h"
 #include "ctrlcombo.h"
 #include "minstrument.h"

@@ -276,7 +276,6 @@ private slots:
     void toggleMixer1(bool);
     void toggleMixer2(bool);
 
-    void configMidiSync();
     void configMidiFile();
     void configShortCuts();
     void configMetronome();

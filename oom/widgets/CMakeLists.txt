@@ -47,7 +47,7 @@ QT4_WRAP_CPP (widget_mocs
       lcombo.h  
       gcombo.h  
       metronome.h  
-      midisyncimpl.h  
+	  #midisyncimpl.h  
       mixdowndialog.h  
       mlabel.h  
       mtscale.h  
@@ -98,6 +98,7 @@ QT4_WRAP_CPP (widget_mocs
 	  keymapmenu.h
 	  midiassign.h
 	  midiportdelegate.h
+	  midipresetdelegate.h
 	  ccdelegate.h
 	  ccedit.h
       )
@@ -121,7 +122,7 @@ file (GLOB widgets_ui_files
       gensetbase.ui  
       itransformbase.ui  
       metronomebase.ui  
-      midisync.ui  
+	  #midisync.ui  
       mittransposebase.ui  
       mixdowndialogbase.ui  
       mtrackinfobase.ui
@@ -172,7 +173,7 @@ file (GLOB widgets_source_files
       lcombo.cpp 
       gcombo.cpp 
       metronome.cpp 
-      midisyncimpl.cpp 
+	  #midisyncimpl.cpp 
       mixdowndialog.cpp 
       mlabel.cpp 
       mmath.cpp
@@ -226,6 +227,7 @@ file (GLOB widgets_source_files
 	  keymapmenu.cpp
 	  midiassign.cpp
 	  midiportdelegate.cpp
+	  midipresetdelegate.cpp
 	  ccdelegate.cpp
 	  ccedit.cpp
       )

@@ -22,12 +22,7 @@ class QTreeWidgetItem;
 
 class MidiSyncLViewItem : public QTreeWidgetItem
 {
-    //MidiSyncInfo _syncInfo;
-    //MidiDevice* _device;
     int _port;
-
-    //protected:
-    //int _port;
 
 public:
 
@@ -37,15 +32,7 @@ public:
         _port = -1;
         _inDet = _curDet = _tickDet = false;
     }
-    //: QListViewItem(parent) { _device = 0; }
 
-    //MidiSyncLViewItem(QListView* parent, QListViewItem* after)
-    //   : QListViewItem(parent, after) { _port = -1; }
-
-    //virtual QString text(int column) const;
-    //virtual unsigned tick() = 0;
-
-    //int _port;
     bool _inDet;
     bool _curDet;
     bool _curMTCDet;
@@ -68,17 +55,13 @@ public:
     bool _recMTC;
 
     bool _recRewOnStart;
-    //bool _sendContNotStart;
 
     int port() const
     {
         return _port;
     }
     void setPort(int port);
-    //MidiDevice* device() const { return _device; }
-    //void setDevice(MidiDevice* d);
 
-    //MidiSyncInfo& syncInfo()  { return _syncInfo; }
     void copyFromSyncInfo(const MidiSyncInfo &sp);
     void copyToSyncInfo(MidiSyncInfo &sp);
 };
@@ -105,23 +88,16 @@ private slots:
     void heartBeat();
     void syncChanged();
     void extSyncChanged(bool v);
-    //void ok();
     void cancel();
     void apply();
-    //void dlvClicked(QListViewItem*, const QPoint&, int);
     void dlvClicked(QTreeWidgetItem*, int);
     void dlvDoubleClicked(QTreeWidgetItem*, int);
-    //void renameOk(QListViewItem*, int, const QString&);
-
-    //signals:
-    //   void deleted(unsigned long);
 
 public slots:
     void songChanged(int);
 
 public:
     MidiSyncConfig(QWidget* parent = 0);
-    //MidiSyncConfig();
     ~MidiSyncConfig();
     void setDirty();
 };

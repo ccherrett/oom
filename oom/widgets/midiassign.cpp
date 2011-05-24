@@ -25,11 +25,14 @@
 #include "midiassign.h"
 #include "tablespinner.h"
 #include "midiportdelegate.h"
+#include "midipresetdelegate.h"
 #include "ccdelegate.h"
 #include "ccinfo.h"
 #include "midimonitor.h"
 #include "confmport.h"
-#include "midisyncimpl.h"
+//#include "midisyncimpl.h"
+#include "sync.h"
+#include "driver/audiodev.h"
 #include "traverso_shared/TConfig.h"
 
 MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
@@ -40,12 +43,12 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	m_selectport = 0;
 
 	midiPortConfig = new MPConfig(this);
-	midiSyncConfig = new MidiSyncConfig(this);
+	//midiSyncConfig = new MidiSyncConfig(this);
 	audioPortConfig = new AudioPortConfig(this);
 	m_tabpanel->insertTab(0, audioPortConfig, tr("Audio Routing Manager"));
 	m_tabpanel->insertTab(1, midiPortConfig, tr("Midi Port Manager"));
-	m_tabpanel->insertTab(4, midiSyncConfig, tr("Midi Sync"));
-	m_tabpanel->setCurrentIndex(0);
+	//m_tabpanel->insertTab(4, midiSyncConfig, tr("Midi Sync"));
+	//m_tabpanel->setCurrentIndex(0);
 	m_btnReset = m_buttonBox->button(QDialogButtonBox::Reset);
 
 	m_btnDelete->setIcon(*garbagePCIcon);
@@ -60,14 +63,14 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	m_btnAddPreset->setIcon(*addTVIcon);
 	m_btnAddPreset->setIconSize(addTVIcon->size());
 
-	m_assignlabels = (QStringList() << "En" << "Track" << "Midi Port" << "Chan" );
+	m_assignlabels = (QStringList() << "En" << "Track" << "Midi Port" << "Chan" << "Preset" );
 	m_cclabels = (QStringList() << "Sel" << "Controller");
 	m_mplabels = (QStringList() << "Midi Port");
 	m_presetlabels = (QStringList() << "Sel" << "Id" << "Sysex Text");
 
 	m_allowed << CTRL_VOLUME << CTRL_PANPOT << CTRL_REVERB_SEND << CTRL_CHORUS_SEND << CTRL_VARIATION_SEND << CTRL_RECORD << CTRL_MUTE << CTRL_SOLO ;
 	
-	m_model = new QStandardItemModel(0, 4, this);
+	m_model = new QStandardItemModel(0, 5, this);
 	tableView->setModel(m_model);
 	m_selmodel = new QItemSelectionModel(m_model);
 	tableView->setSelectionModel(m_selmodel);
@@ -90,9 +93,11 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	//TableSpinnerDelegate* tdelegate = new TableSpinnerDelegate(this, -1);
 	TableSpinnerDelegate* chandelegate = new TableSpinnerDelegate(this, 0, 15);
 	MidiPortDelegate* mpdelegate = new MidiPortDelegate(this);
+	MidiPresetDelegate* presetdelegate = new MidiPresetDelegate(this);
 	CCInfoDelegate *infodelegate = new CCInfoDelegate(this);
 	tableView->setItemDelegateForColumn(2, mpdelegate);
 	tableView->setItemDelegateForColumn(3, chandelegate);
+	tableView->setItemDelegateForColumn(4, presetdelegate);
 	
 	m_ccEdit->setItemDelegateForColumn(1, infodelegate);
 	m_cmbControl->addItem(tr("Track Record"), CTRL_RECORD);
@@ -117,6 +122,30 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	connect(m_btnAddPreset, SIGNAL(clicked()), SLOT(btnAddMidiPreset()));
 	connect(m_btnDeletePreset, SIGNAL(clicked()), SLOT(btnDeleteMidiPresets()));
 	connect(m_tabpanel, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
+	
+	//TODO: Prepare the midi sync connections
+	connect(useJackTransportCheckbox, SIGNAL(stateChanged(int)), SLOT(updateUseJackTransport(int)));
+	connect(jackTransportMasterCheckbox, SIGNAL(stateChanged(int)), SLOT(updateJackMaster(int)));
+	connect(extSyncCheckbox, SIGNAL(stateChanged(int)), SLOT(updateSlaveSync(int)));
+	connect(syncDelaySpinBox, SIGNAL(valueChanged(int)), SLOT(updateSyncDelay(int)));
+	connect(mtcSyncType, SIGNAL(currentIndexChanged(int)), SLOT(updateMTCType(int)));
+	connect(mtcOffH, SIGNAL(valueChanged(int)), SLOT(updateMTCHour(int)));
+	connect(mtcOffM, SIGNAL(valueChanged(int)), SLOT(updateMTCMinute(int)));
+	connect(mtcOffS, SIGNAL(valueChanged(int)), SLOT(updateMTCSecond(int)));
+	connect(mtcOffF, SIGNAL(valueChanged(int)), SLOT(updateMTCFrame(int)));
+	connect(mtcOffSf, SIGNAL(valueChanged(int)), SLOT(updateMTCSubFrame(int)));
+	connect(m_midirewplay, SIGNAL(stateChanged(int)), SLOT(updateInputRewindBeforePlay(int)));
+	connect(m_imididevid, SIGNAL(valueChanged(int)), SLOT(updateInputDeviceId(int)));
+	connect(m_imidiclock, SIGNAL(stateChanged(int)), SLOT(updateInputClock(int)));
+	connect(m_imidirtinput, SIGNAL(stateChanged(int)), SLOT(updateInputRealtime(int)));
+	connect(m_imidimmc, SIGNAL(stateChanged(int)), SLOT(updateInputMMC(int)));
+	connect(m_imidimtc, SIGNAL(stateChanged(int)), SLOT(updateInputMTC(int)));
+	connect(m_omididevid, SIGNAL(valueChanged(int)), SLOT(updateOutputDeviceId(int)));
+	connect(m_omidiclock, SIGNAL(stateChanged(int)), SLOT(updateOutputClock(int)));
+	connect(m_omidirtoutput, SIGNAL(stateChanged(int)), SLOT(updateOutputRealtime(int)));
+	connect(m_omidimmc, SIGNAL(stateChanged(int)), SLOT(updateOutputMMC(int)));
+	connect(m_omidimtc,SIGNAL(stateChanged(int)), SLOT(updateOutputMTC(int)));
+	
 	cmbTypeSelected(m_lasttype);
 }
 
@@ -163,6 +192,9 @@ void MidiAssignDialog::itemChanged(QStandardItem* item)/*{{{*/
 				break;
 				case 3: //Channel
 					data->channel = item->data(Qt::EditRole).toInt();
+				break;
+				case 4: //Preset
+					data->preset = item->data(MidiPresetRole).toInt();
 				break;
 			}
 		}
@@ -427,6 +459,12 @@ void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 		chan->setData(data->channel, Qt::EditRole);
 		chan->setEditable(true);
 		rowData.append(chan);
+		QStandardItem* preset = new QStandardItem(QString::number(data->preset));
+		if(!data->preset)
+			preset->setData(tr("None"), Qt::DisplayRole);
+		preset->setData(data->preset, MidiPresetRole);
+		preset->setEditable(true);
+		rowData.append(preset);
 		m_model->appendRow(rowData);
 	}
 	updateTableHeader();
@@ -439,6 +477,7 @@ void MidiAssignDialog::updateTableHeader()/*{{{*/
 	tableView->setColumnWidth(1, 180);
 	tableView->setColumnWidth(2, 120);
 	tableView->setColumnWidth(3, 60);
+	tableView->setColumnWidth(4, 50);
 	m_model->setHorizontalHeaderLabels(m_assignlabels);
 	tableView->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/
@@ -517,7 +556,8 @@ void MidiAssignDialog::midiPortSelected(const QItemSelection& isel, const QItemS
 				}
 			}
 		}
-	}
+	}	
+	populateMMCSettings();
 	updateMPTableHeader();
 }/*}}}*/
 
@@ -584,8 +624,10 @@ void MidiAssignDialog::btnResetClicked()/*{{{*/
 
 	m_portlabel->setText("");
 	updateMPTableHeader();
-	if(midiSyncConfig)
-		midiSyncConfig->songChanged(-1);
+	populateSyncInfo();
+	populateMMCSettings();
+	//if(midiSyncConfig)
+	//	midiSyncConfig->songChanged(-1);
 	if(midiPortConfig)
 		midiPortConfig->songChanged(-1);
 }/*}}}*/
@@ -630,16 +672,232 @@ void MidiAssignDialog::currentTabChanged(int flags)/*{{{*/
 
 			m_portlabel->setText("");
 			updateMPTableHeader();
+			populateSyncInfo();
+			populateMMCSettings();
 		break;
-		case 4: //MidiSync
-			midiSyncConfig->songChanged(-1);
-		break;
+		//case 4: //MidiSync
+		//	midiSyncConfig->songChanged(-1);
+		//break;
 	}
 }/*}}}*/
 
 void MidiAssignDialog::switchTabs(int tab)
 {
 	m_tabpanel->setCurrentIndex(tab);
+}
+
+//midi sync transport
+void MidiAssignDialog::populateSyncInfo()/*{{{*/
+{
+	extSyncCheckbox->blockSignals(true);
+	useJackTransportCheckbox->blockSignals(true);
+	jackTransportMasterCheckbox->blockSignals(true);
+	syncDelaySpinBox->blockSignals(true);
+	extSyncCheckbox->setChecked(extSyncFlag.value());
+	useJackTransportCheckbox->setChecked(useJackTransport.value());
+	jackTransportMasterCheckbox->setChecked(jackTransportMaster);
+	syncDelaySpinBox->setValue(syncSendFirstClockDelay);
+	syncDelaySpinBox->blockSignals(false);
+	jackTransportMasterCheckbox->blockSignals(false);
+	useJackTransportCheckbox->blockSignals(false);
+	extSyncCheckbox->blockSignals(false);
+
+	mtcSyncType->blockSignals(true);
+	mtcSyncType->setCurrentIndex(mtcType);
+	mtcSyncType->blockSignals(false);
+
+	mtcOffH->blockSignals(true);
+	mtcOffM->blockSignals(true);
+	mtcOffS->blockSignals(true);
+	mtcOffF->blockSignals(true);
+	mtcOffSf->blockSignals(true);
+	mtcOffH->setValue(mtcOffset.h());
+	mtcOffM->setValue(mtcOffset.m());
+	mtcOffS->setValue(mtcOffset.s());
+	mtcOffF->setValue(mtcOffset.f());
+	mtcOffSf->setValue(mtcOffset.sf());
+	mtcOffH->blockSignals(false);
+	mtcOffM->blockSignals(false);
+	mtcOffS->blockSignals(false);
+	mtcOffF->blockSignals(false);
+	mtcOffSf->blockSignals(false);
+}/*}}}*/
+
+void MidiAssignDialog::updateUseJackTransport(int val)
+{
+	useJackTransport.setValue(val == Qt::Checked);
+}
+void MidiAssignDialog::updateJackMaster(int val)
+{
+	if (audioDevice)
+		audioDevice->setMaster(val == Qt::Checked);
+}
+void MidiAssignDialog::updateSlaveSync(int val)
+{
+	extSyncFlag.setValue(val == Qt::Checked);
+}
+void MidiAssignDialog::updateSyncDelay(int val)
+{
+	syncSendFirstClockDelay = val;
+}
+//MTC timing
+void MidiAssignDialog::updateMTCType(int val)
+{
+	mtcType = val;
+}
+void MidiAssignDialog::updateMTCHour(int h)
+{
+	mtcOffset.setH(h);
+}
+void MidiAssignDialog::updateMTCMinute(int m)
+{
+	mtcOffset.setM(m);
+}
+void MidiAssignDialog::updateMTCSecond(int s)
+{
+	mtcOffset.setS(s);
+}
+void MidiAssignDialog::updateMTCFrame(int f)
+{
+	mtcOffset.setF(f);
+}
+void MidiAssignDialog::updateMTCSubFrame(int sf)
+{
+	mtcOffset.setSf(sf);
+}
+
+void MidiAssignDialog::populateMMCSettings()/*{{{*/
+{
+	m_midirewplay->blockSignals(true);
+
+	m_imididevid->blockSignals(true);
+	m_imidiclock->blockSignals(true);
+	m_imidirtinput->blockSignals(true);
+	m_imidimmc->blockSignals(true);
+	m_imidimtc->blockSignals(true);
+
+	m_omididevid->blockSignals(true);
+	m_omidiclock->blockSignals(true);
+	m_omidirtoutput->blockSignals(true);
+	m_omidimmc->blockSignals(true);
+	m_omidimtc->blockSignals(true);
+	if(!m_selectport)
+	{
+		m_midirewplay->setChecked(false);
+
+		m_imididevid->setValue(127);
+		m_imidiclock->setChecked(false);
+		m_imidirtinput->setChecked(false);
+		m_imidimmc->setChecked(false);
+		m_imidimtc->setChecked(false);
+
+		m_omididevid->setValue(127);
+		m_omidiclock->setChecked(false);
+		m_omidirtoutput->setChecked(false);
+		m_omidimmc->setChecked(false);
+		m_omidimtc->setChecked(false);
+	}
+	else
+	{
+		MidiSyncInfo& si = m_selectport->syncInfo();
+		m_midirewplay->setChecked(si.recRewOnStart());
+
+		m_imididevid->setValue(si.idIn());
+		m_imidiclock->setChecked(si.MCIn());
+		m_imidirtinput->setChecked(si.MRTIn());
+		m_imidimmc->setChecked(si.MMCIn());
+		m_imidimtc->setChecked(si.MTCIn());
+
+		m_omididevid->setValue(si.idOut());
+		m_omidiclock->setChecked(si.MCOut());
+		m_omidirtoutput->setChecked(si.MRTOut());
+		m_omidimmc->setChecked(si.MMCOut());
+		m_omidimtc->setChecked(si.MTCOut());
+	}
+	m_midirewplay->blockSignals(false);
+
+	m_imididevid->blockSignals(false);
+	m_imidiclock->blockSignals(false);
+	m_imidirtinput->blockSignals(false);
+	m_imidimmc->blockSignals(false);
+	m_imidimtc->blockSignals(false);
+
+	m_omididevid->blockSignals(false);
+	m_omidiclock->blockSignals(false);
+	m_omidirtoutput->blockSignals(false);
+	m_omidimmc->blockSignals(false);
+	m_omidimtc->blockSignals(false);
+}/*}}}*/
+
+//midi sync slots Input
+void MidiAssignDialog::updateInputRewindBeforePlay(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setRecRewOnStart(val == Qt::Checked);
+}
+
+void MidiAssignDialog::updateInputDeviceId(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setIdIn(val);
+}
+void MidiAssignDialog::updateInputClock(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setMCIn(val == Qt::Checked);
+}
+void MidiAssignDialog::updateInputRealtime(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setMRTIn(val == Qt::Checked);
+}
+void MidiAssignDialog::updateInputMMC(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setMMCIn(val == Qt::Checked);
+}
+void MidiAssignDialog::updateInputMTC(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setMTCIn(val == Qt::Checked);
+}
+
+//midi sync slots Output
+void MidiAssignDialog::updateOutputDeviceId(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setIdOut(val);
+}
+void MidiAssignDialog::updateOutputClock(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setMCOut(val == Qt::Checked);
+}
+void MidiAssignDialog::updateOutputRealtime(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setMRTOut(val == Qt::Checked);
+}
+void MidiAssignDialog::updateOutputMMC(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setMMCOut(val == Qt::Checked);
+}
+void MidiAssignDialog::updateOutputMTC(int val)
+{
+	if(!m_selectport)
+		return;
+	m_selectport->syncInfo().setMTCOut(val == Qt::Checked);
 }
 
 //Virtuals
@@ -649,7 +907,7 @@ void MidiAssignDialog::showEvent(QShowEvent*)
 	resize(tconfig().get_property("ConnectionsManager", "size", QSize(891, 691)).toSize());
 	move(tconfig().get_property("ConnectionsManager", "pos", QPoint(0, 0)).toPoint());
 
-	QString qsrc("F0 41 10 42 12 40 00 7F 00 41 F7");
+	/*QString qsrc("F0 41 10 42 12 40 00 7F 00 41 F7");
 	QByteArray ba = qsrc.toLatin1();
 	const char* src = ba.constData();
 
@@ -657,12 +915,8 @@ void MidiAssignDialog::showEvent(QShowEvent*)
 	int stat;
 	unsigned char* sysex = (unsigned char*) hex2string(src, len, stat);
 	QString rev = string2hex(sysex, len);
-	qDebug() << "HexToString: " << sysex << " Length: " << len << " StringToHex: " << rev;
+	qDebug() << "HexToString: " << sysex << " Length: " << len << " StringToHex: " << rev;*/
 	//btnResetClicked();
-	//printf("Midi Buffer size: %d\n", MIDI_FIFO_SIZE);
-	//QString idstr = QString::number(genId());
-	//QByteArray ba(idstr.toUtf8().constData());
-	//qDebug() << "ID Size: " << ba.size() << " ID: " << idstr;
 }
 
 void MidiAssignDialog::closeEvent(QCloseEvent*)

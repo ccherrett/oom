@@ -433,6 +433,9 @@ Enabled inputs in the list will
                 <string>MMC/MTC Input</string>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="margin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QSpinBox" name="m_imididevid">
                   <property name="prefix">
@@ -474,6 +477,13 @@ Enabled inputs in the list will
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QCheckBox" name="m_midirewplay">
+                  <property name="text">
+                   <string>Rewind before play</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
@@ -483,6 +493,18 @@ Enabled inputs in the list will
                 <string>MMC/MTC Output</string>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_7">
+                <property name="leftMargin">
+                 <number>4</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>4</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QSpinBox" name="m_omididevid">
                   <property name="prefix">
@@ -625,7 +647,14 @@ Enabled inputs in the list will
               </layout>
              </item>
              <item>
-              <widget class="QTableView" name="m_presettable"/>
+              <widget class="QTableView" name="m_presettable">
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+              </widget>
              </item>
             </layout>
            </item>
@@ -739,7 +768,7 @@ Enabled inputs in the list will
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,1">
          <item>
           <widget class="QTableView" name="tableView">
            <property name="editTriggers">
@@ -757,11 +786,8 @@ Enabled inputs in the list will
            <property name="cornerButtonEnabled">
             <bool>false</bool>
            </property>
-           <attribute name="horizontalHeaderVisible">
-            <bool>true</bool>
-           </attribute>
-           <attribute name="horizontalHeaderStretchLastSection">
-            <bool>true</bool>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
            </attribute>
            <attribute name="verticalHeaderVisible">
             <bool>false</bool>
@@ -839,6 +865,12 @@ Enabled inputs in the list will
            </item>
            <item>
             <widget class="QTableView" name="m_ccEdit">
+             <property name="minimumSize">
+              <size>
+               <width>400</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="editTriggers">
               <set>QAbstractItemView::AllEditTriggers</set>
              </property>
@@ -851,6 +883,9 @@ Enabled inputs in the list will
              <property name="selectionBehavior">
               <enum>QAbstractItemView::SelectRows</enum>
              </property>
+             <attribute name="horizontalHeaderVisible">
+              <bool>true</bool>
+             </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
              </attribute>
@@ -861,6 +896,9 @@ Enabled inputs in the list will
               <bool>false</bool>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderVisible">
               <bool>true</bool>
              </attribute>
             </widget>
