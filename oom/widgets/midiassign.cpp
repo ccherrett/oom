@@ -241,15 +241,15 @@ void MidiAssignDialog::itemSelected(const QItemSelection& isel, const QItemSelec
 						control->setData(info->assignedControl(), CCRole);
 						QString str;
 						if(info->controller() == CTRL_RECORD)
-							str.append(tr("Track Record"));
+							str.append(tr("( Record )"));
 						else if(info->controller() == CTRL_MUTE)
-							str.append(tr("Track Mute"));
+							str.append(tr("( Mute )"));
 						else if(info->controller() == CTRL_SOLO)
-							str.append(tr("Track Solo"));
+							str.append(tr("( Solo )"));
 						else
-							str.append(midiCtrlName(info->controller()));
-						str.append(" Assigned To: ").append(QString::number(info->assignedControl())).append(" Chan : ");
-						str.append(QString::number(info->channel()));
+							str.append("( ").append(midiCtrlName(info->controller())).append(" )");
+						if(info->assignedControl() >= 0)
+							str.append(" Assigned to CC: ").append(QString::number(info->assignedControl())).append(" on Chan: ").append(QString::number(info->channel()+1));
 						control->setData(str, Qt::DisplayRole);
 						rowData.append(control);
 						m_ccmodel->appendRow(rowData);

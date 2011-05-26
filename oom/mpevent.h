@@ -283,26 +283,6 @@ struct MPEventList : public MPEL
 typedef MPEventList::iterator iMPEvent;
 typedef MPEventList::const_iterator ciMPEvent;
 
-/*
-//---------------------------------------------------------
-//   MREventList
-//    memory allocation in midi thread domain
-//---------------------------------------------------------
-
-// Changed by Tim. p3.3.8
-
-// audioRTalloc? Surely this must have been a mistake?  
-//typedef std::list<MidiRecordEvent, audioRTalloc<MidiRecordEvent> > MREL;
-typedef std::list<MidiRecordEvent, midiRTalloc<MidiRecordEvent> > MREL;
-
-struct MREventList : public MREL {
-      void add(const MidiRecordEvent& ev) { MREL::push_back(ev); }
-      };
-
-typedef MREventList::iterator iMREvent;
-typedef MREventList::const_iterator ciMREvent;
- */
-
 //---------------------------------------------------------
 //   MidiFifo
 //---------------------------------------------------------

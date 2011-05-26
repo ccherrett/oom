@@ -57,8 +57,6 @@ class MidiMonitor : public Thread
 
 	QMultiHash<int, QString> m_inputports;
 	QMultiHash<int, QString> m_outputports;
-	//Contains 0 - 127 with a list of tracks listening to this cc
-	QMultiHash<int, QString> m_portccmap; 
 	QHash<QString, MidiAssignData*> m_assignments; //list of managed assignments
 	//Holds CCInfo/CC map for fast lookups at run time
 	QMultiHash<int, CCInfo*> m_midimap;
@@ -115,16 +113,6 @@ public:
 	bool isManagedOutputPort(int port, QString track)
 	{
 		return !m_outputports.isEmpty() && m_outputports.contains(port, track);
-	}
-
-	bool isManagedInputController(int ctl)
-	{
-		return !m_portccmap.isEmpty() && m_portccmap.contains(ctl);
-	}
-
-	bool isManagedInputController(int ctl, QString track)
-	{
-		return !m_portccmap.isEmpty() && m_portccmap.contains(ctl, track);
 	}
 
 	bool isManagedController(int);

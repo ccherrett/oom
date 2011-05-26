@@ -199,12 +199,12 @@ void Track::init()
 	m_midiassign.midimap.insert(CTRL_SOLO, new CCInfo(this, 0, 0, CTRL_SOLO, -1));
 	m_midiassign.midimap.insert(CTRL_VOLUME, new CCInfo(this, 0, 0, CTRL_VOLUME, -1));
 	m_midiassign.midimap.insert(CTRL_PANPOT, new CCInfo(this, 0, 0, CTRL_PANPOT, -1));
-	if(isMidiTrack())
+	/*if(isMidiTrack())
 	{
 		m_midiassign.midimap.insert(CTRL_REVERB_SEND, new CCInfo(this, 0, 0, CTRL_REVERB_SEND, -1));
 		m_midiassign.midimap.insert(CTRL_CHORUS_SEND, new CCInfo(this, 0, 0, CTRL_CHORUS_SEND, -1));
 		m_midiassign.midimap.insert(CTRL_VARIATION_SEND, new CCInfo(this, 0, 0, CTRL_VARIATION_SEND, -1));
-	}
+	}*/
 }
 
 Track::Track(Track::TrackType t)
@@ -503,9 +503,9 @@ void MidiTrack::init()
 	m_midiassign.midimap.insert(CTRL_SOLO, new CCInfo((Track*)this, 0, 0, CTRL_SOLO, -1));
 	m_midiassign.midimap.insert(CTRL_VOLUME, new CCInfo((Track*)this, 0, 0, CTRL_VOLUME, -1));
 	m_midiassign.midimap.insert(CTRL_PANPOT, new CCInfo((Track*)this, 0, 0, CTRL_PANPOT, -1));
-	m_midiassign.midimap.insert(CTRL_REVERB_SEND, new CCInfo((Track*)this, 0, 0, CTRL_REVERB_SEND, -1));
-	m_midiassign.midimap.insert(CTRL_CHORUS_SEND, new CCInfo((Track*)this, 0, 0, CTRL_CHORUS_SEND, -1));
-	m_midiassign.midimap.insert(CTRL_VARIATION_SEND, new CCInfo((Track*)this, 0, 0, CTRL_VARIATION_SEND, -1));
+	//m_midiassign.midimap.insert(CTRL_REVERB_SEND, new CCInfo((Track*)this, 0, 0, CTRL_REVERB_SEND, -1));
+	//m_midiassign.midimap.insert(CTRL_CHORUS_SEND, new CCInfo((Track*)this, 0, 0, CTRL_CHORUS_SEND, -1));
+	//m_midiassign.midimap.insert(CTRL_VARIATION_SEND, new CCInfo((Track*)this, 0, 0, CTRL_VARIATION_SEND, -1));
 }
 
 int MidiTrack::getTransposition()
@@ -964,12 +964,12 @@ void MidiAssignData::read(Xml& xml, Track* t)/*{{{*/
 	midimap.insert(CTRL_SOLO, new CCInfo(t, 0, 0, CTRL_SOLO, -1));
 	midimap.insert(CTRL_VOLUME, new CCInfo(t, 0, 0, CTRL_VOLUME, -1));
 	midimap.insert(CTRL_PANPOT, new CCInfo(t, 0, 0, CTRL_PANPOT, -1));
-	if(t->isMidiTrack())
+	/*if(t->isMidiTrack())
 	{
 		midimap.insert(CTRL_REVERB_SEND, new CCInfo(t, 0, 0, CTRL_REVERB_SEND, -1));
 		midimap.insert(CTRL_CHORUS_SEND, new CCInfo(t, 0, 0, CTRL_CHORUS_SEND, -1));
 		midimap.insert(CTRL_VARIATION_SEND, new CCInfo(t, 0, 0, CTRL_VARIATION_SEND, -1));
-	}
+	}*/
 	for (;;)
 	{
 		Xml::Token token = xml.parse();

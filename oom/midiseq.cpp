@@ -197,17 +197,10 @@ void MidiSeq::processSeek()
 			}
 			sel->clear();
 		}
-		//else
-		//	el->erase(el->begin(), dev->nextPlayEvent());
 
 		for (iMidiCtrlValList ivl = cll->begin(); ivl != cll->end(); ++ivl)
 		{
 			MidiCtrlValList* vl = ivl->second;
-			//int val = vl->value(pos);
-			//if (val != CTRL_VAL_UNKNOWN) {
-			//      int channel = ivl->first >> 24;
-			//      el->add(MidiPlayEvent(0, port, channel, ME_CONTROLLER, vl->num(), val));
-			//      }
 			iMidiCtrlVal imcv = vl->iValue(pos);
 			if (imcv != vl->end())
 			{
@@ -218,7 +211,6 @@ void MidiSeq::processSeek()
 					el->add(MidiPlayEvent(0, port, ivl->first >> 24, ME_CONTROLLER, vl->num(), imcv->second.val));
 			}
 		}
-		//dev->setNextPlayEvent(el->begin());
 	}
 }
 
@@ -226,14 +218,9 @@ void MidiSeq::processSeek()
 //   MidiSeq
 //---------------------------------------------------------
 
-//MidiSeq::MidiSeq(int priority, const char* name)
-//   : Thread(priority, name)
-
 MidiSeq::MidiSeq(const char* name)
 : Thread(name)
 {
-	// Changed by Tim. p3.3.17
-	//prio = priority;
 	prio = 0;
 
 	idle = false;
