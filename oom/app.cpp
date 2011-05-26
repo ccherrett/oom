@@ -5584,7 +5584,8 @@ void OOMidi::configMidiAssign(int tab)
 	midiAssignDialog->show();
 	midiAssignDialog->raise();
 	midiAssignDialog->activateWindow();
-	midiAssignDialog->switchTabs(tab);
+	if(tab >= 0)
+		midiAssignDialog->switchTabs(tab);
 }
 
 //---------------------------------------------------------

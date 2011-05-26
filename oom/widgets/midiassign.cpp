@@ -91,7 +91,7 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	cmbType->setCurrentIndex(0);
 
 	//TableSpinnerDelegate* tdelegate = new TableSpinnerDelegate(this, -1);
-	TableSpinnerDelegate* chandelegate = new TableSpinnerDelegate(this, 0, 15);
+	TableSpinnerDelegate* chandelegate = new TableSpinnerDelegate(this, 1, 16);
 	MidiPortDelegate* mpdelegate = new MidiPortDelegate(this);
 	MidiPresetDelegate* presetdelegate = new MidiPresetDelegate(this);
 	CCInfoDelegate *infodelegate = new CCInfoDelegate(this);
@@ -147,6 +147,7 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	connect(m_omidimtc,SIGNAL(stateChanged(int)), SLOT(updateOutputMTC(int)));
 	
 	cmbTypeSelected(m_lasttype);
+	switchTabs(0);
 }
 
 MidiAssignDialog::~MidiAssignDialog()
@@ -191,7 +192,7 @@ void MidiAssignDialog::itemChanged(QStandardItem* item)/*{{{*/
 				}
 				break;
 				case 3: //Channel
-					data->channel = item->data(Qt::EditRole).toInt();
+					data->channel = item->data(Qt::EditRole).toInt()-1;
 				break;
 				case 4: //Preset
 					data->preset = item->data(MidiPresetRole).toInt();
@@ -455,8 +456,8 @@ void MidiAssignDialog::cmbTypeSelected(int type)/*{{{*/
 		port->setData(data->port, MidiPortRole);
 		port->setEditable(true);
 		rowData.append(port);
-		QStandardItem* chan = new QStandardItem(QString::number(data->channel));
-		chan->setData(data->channel, Qt::EditRole);
+		QStandardItem* chan = new QStandardItem(QString::number(data->channel+1));
+		chan->setData(data->channel+1, Qt::EditRole);
 		chan->setEditable(true);
 		rowData.append(chan);
 		QStandardItem* preset = new QStandardItem(QString::number(data->preset));

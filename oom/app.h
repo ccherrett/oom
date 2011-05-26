@@ -367,7 +367,7 @@ public slots:
     void showDidYouKnowDialog();
 
     void routingPopupMenuAboutToHide();
-    void configMidiAssign(int tab = 0);
+    void configMidiAssign(int tab = -1);
 	bool startServer();
 	void stopServer();
 #ifdef LSCP_SUPPORT
