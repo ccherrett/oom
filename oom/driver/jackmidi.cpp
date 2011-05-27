@@ -632,10 +632,8 @@ bool MidiJackDevice::queueEvent(const MidiPlayEvent& e)
 				fprintf(stderr, "MidiJackDevice::queueEvent ME_SYSEX: buffer overflow, sysex too big, event lost\n");
 				return true;
 			}
-			if(data[0] != 0xf0)
-				p[0] = 0xf0;
-			if(data[len] != 0xf7)
-				p[len + 1] = 0xf7;
+			p[0] = 0xf0;
+			p[len + 1] = 0xf7;
 			memcpy(p + 1, data, len);
 		}
 			break;

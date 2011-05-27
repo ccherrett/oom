@@ -423,7 +423,7 @@ void Track::setSelected(bool sel)
 										{
 											int chan = ((MidiTrack*)this)->outChannel();
 											//int mn = mc->minVal();
-											int max = mc->maxVal();
+											//int max = mc->maxVal();
 											int v = mp->hwCtrlState(chan, CTRL_VOLUME);
 											if (v == CTRL_VAL_UNKNOWN)
 											{
@@ -436,14 +436,9 @@ void Track::setSelected(bool sel)
 														v = mc->initVal();
 												}
 												else
-													v = lastv + mc->bias();
+													v = lastv;
 											}
-											else
-											{
-												// Auto bias...
-												v += mc->bias();
-											}
-											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), max);
+											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 10);
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
 										}
 									}
@@ -464,33 +459,26 @@ void Track::setSelected(bool sel)
 										{
 											int chan = ((MidiTrack*)this)->outChannel();
 											//int mn = mc->minVal();
-											int max = mc->maxVal();
+											//int max = mc->maxVal();
 											int v = mp->hwCtrlState(chan, CTRL_PANPOT);
 											if (v == CTRL_VAL_UNKNOWN)
 											{
 												int lastv = mp->lastValidHWCtrlState(chan, CTRL_PANPOT);
 												if (lastv == CTRL_VAL_UNKNOWN)
 												{
-													if (mc->initVal() == CTRL_VAL_UNKNOWN)
-														v = 0;
-													else
-														v = mc->initVal();
+													//Center it
+													v = 64;
 												}
-												else
-													v = lastv + mc->bias();
 											}
-											else
-											{
-												// Auto bias...
-												v += mc->bias();
-											}
-											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), max);
+											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 10);
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
 										}
 									}
 								}
 								else
+								{
 									midiMonitor->msgSendAudioOutputEvent((Track*)this, iter.key(), ((AudioTrack*)this)->pan());
+								}
 							}
 							break;
 						}
