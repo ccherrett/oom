@@ -436,12 +436,12 @@ void Track::setSelected(bool sel)
 														v = mc->initVal();
 												}
 												else
-													v = lastv - mc->bias();
+													v = lastv + mc->bias();
 											}
 											else
 											{
 												// Auto bias...
-												v -= mc->bias();
+												v += mc->bias();
 											}
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), max);
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
@@ -477,12 +477,12 @@ void Track::setSelected(bool sel)
 														v = mc->initVal();
 												}
 												else
-													v = lastv - mc->bias();
+													v = lastv + mc->bias();
 											}
 											else
 											{
 												// Auto bias...
-												v -= mc->bias();
+												v += mc->bias();
 											}
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), max);
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
