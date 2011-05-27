@@ -438,13 +438,16 @@ void Track::setSelected(bool sel)
 												else
 													v = lastv;
 											}
-											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 10);
+											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 127);
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
 										}
 									}
 								}
 								else
+								{
+									midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 127);
 									midiMonitor->msgSendAudioOutputEvent((Track*)this, iter.key(), ((AudioTrack*)this)->volume());
+								}
 							}
 							break;
 							case CTRL_PANPOT:
@@ -470,13 +473,14 @@ void Track::setSelected(bool sel)
 													v = 64;
 												}
 											}
-											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 10);
+											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 127);
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
 										}
 									}
 								}
 								else
 								{
+									midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 127);
 									midiMonitor->msgSendAudioOutputEvent((Track*)this, iter.key(), ((AudioTrack*)this)->pan());
 								}
 							}
