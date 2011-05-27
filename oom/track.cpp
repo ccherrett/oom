@@ -438,16 +438,12 @@ void Track::setSelected(bool sel)
 												else
 													v = lastv;
 											}
-											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 127);
-											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 0);
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
 										}
 									}
 								}
 								else
 								{
-									midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 127);
-									midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 0);
 									midiMonitor->msgSendAudioOutputEvent((Track*)this, iter.key(), ((AudioTrack*)this)->volume());
 								}
 							}
@@ -475,16 +471,12 @@ void Track::setSelected(bool sel)
 													v = 64;
 												}
 											}
-											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 127);
-											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 0);
 											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
 										}
 									}
 								}
 								else
 								{
-									midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 127);
-									midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), 0);
 									midiMonitor->msgSendAudioOutputEvent((Track*)this, iter.key(), ((AudioTrack*)this)->pan());
 								}
 							}
