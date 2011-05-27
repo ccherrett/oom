@@ -321,7 +321,7 @@ Track& Track::operator=(const Track& t)
 void Track::setDefaultName()
 {
 	QString base;
-	switch (_type)
+	switch (_type)/*{{{*/
 	{
 		case MIDI:
 			base = QString("Midi");
@@ -347,7 +347,7 @@ void Track::setDefaultName()
 		case AUDIO_SOFTSYNTH:
 			base = QString("Synth");
 			break;
-	};
+	};/*}}}*/
 	base += " ";
 	for (int i = 1; true; ++i)
 	{
@@ -391,6 +391,111 @@ void Track::setSelected(bool sel)
 				//Send the event from the sequencer thread
 				MidiPlayEvent ev(0, m_midiassign.port, ME_SYSEX, sysex, len);
 				audio->msgPlayMidiEvent(&ev);
+
+				//Send adjustments to all the mixer based dials assigned to this track
+				QHashIterator<int, CCInfo*> iter(m_midiassign.midimap);
+				while(iter.hasNext())
+				{
+					iter.next();
+					CCInfo* info = iter.value();
+					if(info && info->assignedControl() >= 0)
+					{
+						switch(iter.key())
+						{
+							case CTRL_RECORD:
+								midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_RECORD, _recordFlag ? 127 : 0);
+							break;
+							case CTRL_MUTE:
+								midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_MUTE, mute() ? 127 : 0);
+							break;
+							case CTRL_SOLO:
+								midiMonitor->msgSendMidiOutputEvent((Track*)this, CTRL_SOLO, solo() ? 127 : 0);
+							break;
+							case CTRL_VOLUME:
+							{
+								if(isMidiTrack())
+								{
+									MidiPort* mp = &midiPorts[((MidiTrack*)this)->outPort()];
+									if(mp)
+									{
+										MidiController* mc = mp->midiController(CTRL_VOLUME);
+										if(mc)
+										{
+											int chan = ((MidiTrack*)this)->outChannel();
+											//int mn = mc->minVal();
+											int max = mc->maxVal();
+											int v = mp->hwCtrlState(chan, CTRL_VOLUME);
+											if (v == CTRL_VAL_UNKNOWN)
+											{
+												int lastv = mp->lastValidHWCtrlState(chan, CTRL_VOLUME);
+												if (lastv == CTRL_VAL_UNKNOWN)
+												{
+													if (mc->initVal() == CTRL_VAL_UNKNOWN)
+														v = 0;
+													else
+														v = mc->initVal();
+												}
+												else
+													v = lastv - mc->bias();
+											}
+											else
+											{
+												// Auto bias...
+												v -= mc->bias();
+											}
+											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), max);
+											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
+										}
+									}
+								}
+								else
+									midiMonitor->msgSendAudioOutputEvent((Track*)this, iter.key(), ((AudioTrack*)this)->volume());
+							}
+							break;
+							case CTRL_PANPOT:
+							{
+								if(isMidiTrack())
+								{
+									MidiPort* mp = &midiPorts[((MidiTrack*)this)->outPort()];
+									if(mp)
+									{
+										MidiController* mc = mp->midiController(CTRL_PANPOT);
+										if(mc)
+										{
+											int chan = ((MidiTrack*)this)->outChannel();
+											//int mn = mc->minVal();
+											int max = mc->maxVal();
+											int v = mp->hwCtrlState(chan, CTRL_PANPOT);
+											if (v == CTRL_VAL_UNKNOWN)
+											{
+												int lastv = mp->lastValidHWCtrlState(chan, CTRL_PANPOT);
+												if (lastv == CTRL_VAL_UNKNOWN)
+												{
+													if (mc->initVal() == CTRL_VAL_UNKNOWN)
+														v = 0;
+													else
+														v = mc->initVal();
+												}
+												else
+													v = lastv - mc->bias();
+											}
+											else
+											{
+												// Auto bias...
+												v -= mc->bias();
+											}
+											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), max);
+											midiMonitor->msgSendMidiOutputEvent((Track*)this, iter.key(), v);
+										}
+									}
+								}
+								else
+									midiMonitor->msgSendAudioOutputEvent((Track*)this, iter.key(), ((AudioTrack*)this)->pan());
+							}
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
