@@ -688,7 +688,7 @@ public:
         return _prefader;
     }
     double auxSend(int idx) const;
-    void setAuxSend(int idx, double v);
+    void setAuxSend(int idx, double v, bool monitor = false);
     void addAuxSend(int n);
 
     void setPrefader(bool val);

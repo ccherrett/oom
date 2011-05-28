@@ -251,6 +251,42 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 							}
 							switch(ctl)/*{{{*/
 							{
+								case CTRL_AUX1:
+									//Midi tracks dont have Aux Sends
+									if(!info->track()->isMidiTrack())/*{{{*/
+									{
+										//printf("auxSend\n");
+										((AudioTrack*) info->track())->setAuxSend(0, dbToTrackVol(midiToDb(msg->mevent.dataB())), true);
+										song->update(SC_AUX);
+									}/*}}}*/
+								break;
+								case CTRL_AUX2:
+									//Midi tracks dont have Aux Sends
+									if(!info->track()->isMidiTrack())/*{{{*/
+									{
+										//printf("auxSend\n");
+										((AudioTrack*) info->track())->setAuxSend(1, dbToTrackVol(midiToDb(msg->mevent.dataB())), true);
+										song->update(SC_AUX);
+									}/*}}}*/
+								break;
+								case CTRL_AUX3:
+									//Midi tracks dont have Aux Sends
+									if(!info->track()->isMidiTrack())/*{{{*/
+									{
+										//printf("auxSend\n");
+										((AudioTrack*) info->track())->setAuxSend(2, dbToTrackVol(midiToDb(msg->mevent.dataB())), true);
+										song->update(SC_AUX);
+									}/*}}}*/
+								break;
+								case CTRL_AUX4:
+									//Midi tracks dont have Aux Sends
+									if(!info->track()->isMidiTrack())/*{{{*/
+									{
+										//printf("auxSend\n");
+										((AudioTrack*) info->track())->setAuxSend(3, dbToTrackVol(midiToDb(msg->mevent.dataB())), true);
+										song->update(SC_AUX);
+									}/*}}}*/
+								break;
 								case CTRL_VOLUME:
 								{
 									if(info->track()->isMidiTrack())/*{{{*/

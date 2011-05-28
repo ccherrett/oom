@@ -100,9 +100,13 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	tableView->setItemDelegateForColumn(4, presetdelegate);
 	
 	m_ccEdit->setItemDelegateForColumn(1, infodelegate);
-	m_cmbControl->addItem(tr("Record"), CTRL_RECORD);
-	m_cmbControl->addItem(tr("Mute"), CTRL_MUTE);
-	m_cmbControl->addItem(tr("Solo"), CTRL_SOLO);
+	m_cmbControl->addItem(midiControlToString(CTRL_RECORD), CTRL_RECORD);
+	m_cmbControl->addItem(midiControlToString(CTRL_MUTE), CTRL_MUTE);
+	m_cmbControl->addItem(midiControlToString(CTRL_SOLO), CTRL_SOLO);
+	m_cmbControl->addItem(midiControlToString(CTRL_AUX1), CTRL_AUX1);
+	m_cmbControl->addItem(midiControlToString(CTRL_AUX2), CTRL_AUX2);
+	m_cmbControl->addItem(midiControlToString(CTRL_AUX3), CTRL_AUX3);
+	m_cmbControl->addItem(midiControlToString(CTRL_AUX4), CTRL_AUX4);
 	for(int i = 0; i < 128; ++i)
 	{
 		QString ctl(QString::number(i)+": ");
@@ -241,14 +245,7 @@ void MidiAssignDialog::itemSelected(const QItemSelection& isel, const QItemSelec
 						control->setData(info->controller(), ControlRole);
 						control->setData(info->assignedControl(), CCRole);
 						QString str;
-						if(info->controller() == CTRL_RECORD)
-							str.append(tr("( Record )"));
-						else if(info->controller() == CTRL_MUTE)
-							str.append(tr("( Mute )"));
-						else if(info->controller() == CTRL_SOLO)
-							str.append(tr("( Solo )"));
-						else
-							str.append("( ").append(midiCtrlName(info->controller())).append(" )");
+						str.append("( ").append(midiControlToString(info->controller())).append(" )");
 						if(info->assignedControl() >= 0)
 							str.append(" Assigned to CC: ").append(QString::number(info->assignedControl())).append(" on Chan: ").append(QString::number(info->channel()+1));
 						control->setData(str, Qt::DisplayRole);
@@ -289,6 +286,12 @@ void MidiAssignDialog::btnAddController()/*{{{*/
 						allowed = true;
 					}
 				break;
+				case CTRL_AUX1:
+				case CTRL_AUX2:
+				case CTRL_AUX3:
+				case CTRL_AUX4:
+					allowed = ((AudioTrack*)m_selected)->hasAuxSend();
+				break;
 			}//}}}
 		}
 		if(!allowed)
@@ -310,14 +313,7 @@ void MidiAssignDialog::btnAddController()/*{{{*/
 			control->setData(info->controller(), ControlRole);
 			control->setData(info->assignedControl(), CCRole);
 			QString str;
-			if(info->controller() == CTRL_RECORD)
-				str.append(tr("( Record )"));
-			else if(info->controller() == CTRL_MUTE)
-				str.append(tr("( Mute )"));
-			else if(info->controller() == CTRL_SOLO)
-				str.append(tr("( Solo )"));
-			else
-				str.append("( ").append(midiCtrlName(info->controller())).append(" )");
+			str.append("( ").append(midiControlToString(info->controller())).append(" )");
 			if(info->assignedControl() >= 0)
 				str.append(" Assigned to CC: ").append(QString::number(info->assignedControl())).append(" on Chan: ").append(QString::number(info->channel()));
 			control->setData(str, Qt::DisplayRole);

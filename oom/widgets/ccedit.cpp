@@ -6,6 +6,7 @@
 //  (C) Copyright 2011 Andrew Williams and Christopher Cherrett
 //================================================================
 
+#include "utils.h"
 #include "midictrl.h"
 #include "song.h"
 #include "ccinfo.h"
@@ -79,14 +80,10 @@ void CCEdit::updateValues()
 	else
 	{
 		QString l;
-		if(m_info->controller() == CTRL_RECORD)
-			l.append(tr("Track Record"));
-		else if(m_info->controller() == CTRL_MUTE)
-			l.append(tr("Track Mute"));
-		else if(m_info->controller() == CTRL_SOLO)
-			l.append(tr("Track Solo"));
-		else
+		if(m_info->controller() >= 0 && m_info->controller() <= 127)
 			l.append(QString::number(m_info->controller())).append(": ").append(midiCtrlName(m_info->controller()));
+		else
+			l.append(midiControlToString(m_info->controller()));
 		label->setText(l);
 		m_controlcombo->blockSignals(true);
 		m_controlcombo->setCurrentIndex(m_info->assignedControl()+1);

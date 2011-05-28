@@ -778,7 +778,9 @@ void AudioTrack::recordAutomation(int n, double v)
 	if (!automation)
 		return;
 	if (audio->isPlaying())
+	{
 		_recEvents.push_back(CtrlRecVal(song->cPos().frame(), n, v));
+	}
 	else
 	{
 		if (automationType() == AUTO_WRITE)
@@ -823,6 +825,8 @@ void AudioTrack::startAutoRecord(int n, double v)
 			if (automationType() == AUTO_WRITE)
 			_recEvents.push_back(CtrlRecVal(song->cPos().frame(), n, v));
 	}
+	//Trigger update of the gui here
+	//song->update(SC_TRACK_MODIFIED|SC_VIEW_CHANGED);
 }
 
 void AudioTrack::stopAutoRecord(int n, double v)
@@ -1681,7 +1685,7 @@ double AudioTrack::auxSend(int idx) const
 	return _auxSend[idx];
 }
 
-void AudioTrack::setAuxSend(int idx, double v)
+void AudioTrack::setAuxSend(int idx, double v, bool monitor)
 {
 	if (unsigned(idx) >= _auxSend.size())
 	{
@@ -1690,5 +1694,29 @@ void AudioTrack::setAuxSend(int idx, double v)
 		return;
 	}
 	_auxSend[idx] = v;
+	if(!monitor)
+	{
+		int ctl = -1;/*{{{*/
+		switch(idx)
+		{
+			case 0:
+				ctl = CTRL_AUX1;
+			break;
+			case 1:
+				ctl = CTRL_AUX2;
+			break;
+			case 3:
+				ctl = CTRL_AUX3;
+			break;
+			case 4:
+				ctl = CTRL_AUX4;
+			break;
+		}
+		if(ctl)
+		{
+			//Send feedback
+			midiMonitor->msgSendAudioOutputEvent((Track*)this, ctl, v);
+		}/*}}}*/
+	}
 }
 

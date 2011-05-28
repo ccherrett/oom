@@ -15,6 +15,7 @@
 #include <QFrame>
 #include <QDateTime>
 
+#include "midictrl.h"
 #include "utils.h"
 
 //---------------------------------------------------------
@@ -441,7 +442,7 @@ double midiToTrackPan(int val)
 	return v;
 }
 									
-qint64 genId( )
+/*qint64 genId( )
 {
 	uint r = qrand();
 	QDateTime time = QDateTime::currentDateTime();
@@ -451,24 +452,8 @@ qint64 genId( )
 	id += r;
 
 	return id;
-}
+}*/
 							
-const unsigned char* stringToSysex(QString p)
-{
-	return NULL;
-	/*
-	if(p.isEmpty())
-	{
-		return NULL;
-	}
-	QStringList list = p.split(" ", QString::SkipEmptyParts);
-	foreach(QString str, list)
-	{
-		if(!str.startsWith("0x"))
-			
-	}*/
-}
-
 //---------------------------------------------------------
 //   string2qhex
 //---------------------------------------------------------
@@ -529,4 +514,37 @@ char* hex2string(const char* src, int& len, int& status)
 	b[len] = 0;
 	status = 0;
 	return b;
+}
+
+QString midiControlToString(int ctrl)
+{
+	QString name;
+	switch(ctrl)
+	{
+		case CTRL_RECORD:
+			name.append(QObject::tr("Record"));
+		break;
+		case CTRL_MUTE:
+			name.append(QObject::tr("Mute"));
+		break;
+		case CTRL_SOLO:
+			name.append(QObject::tr("Solo"));
+		break;
+		case CTRL_AUX1:
+			name.append(QObject::tr("AuxSend 1"));
+		break;
+		case CTRL_AUX2:
+			name.append(QObject::tr("AuxSend 2"));
+		break;
+		case CTRL_AUX3:
+			name.append(QObject::tr("AuxSend 3"));
+		break;
+		case CTRL_AUX4:
+			name.append(QObject::tr("AuxSend 4"));
+		break;
+		default:
+			name.append(midiCtrlName(ctrl));
+		break;
+	}
+	return name;
 }

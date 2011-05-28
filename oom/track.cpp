@@ -209,8 +209,8 @@ void Track::init()
 
 Track::Track(Track::TrackType t)
 {
-	init();
 	_type = t;
+	init();
 }
 
 Track::Track(const Track& t, bool cloneParts)
