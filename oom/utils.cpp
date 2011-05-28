@@ -519,7 +519,7 @@ char* hex2string(const char* src, int& len, int& status)
 QString midiControlToString(int ctrl)
 {
 	QString name;
-	switch(ctrl)
+	switch(ctrl)/*{{{*/
 	{
 		case CTRL_RECORD:
 			name.append(QObject::tr("Record"));
@@ -545,6 +545,45 @@ QString midiControlToString(int ctrl)
 		default:
 			name.append(midiCtrlName(ctrl));
 		break;
-	}
+	}/*}}}*/
 	return name;
+}
+
+int midiControlSortIndex(int ctrl)
+{
+	QString val;
+	switch(ctrl)/*{{{*/
+	{
+		case CTRL_RECORD:
+			val.sprintf("%41d", 1);
+		break;
+		case CTRL_MUTE:
+			val.sprintf("%41d", 2);
+		break;
+		case CTRL_SOLO:
+			val.sprintf("%41d", 3);
+		break;
+		case CTRL_VOLUME:
+			val.sprintf("%41d", 4);
+		break;
+		case CTRL_PANPOT:
+			val.sprintf("%41d", 5);
+		break;
+		case CTRL_AUX1:
+			val.sprintf("%41d", 6);
+		break;
+		case CTRL_AUX2:
+			val.sprintf("%41d", 7);
+		break;
+		case CTRL_AUX3:
+			val.sprintf("%41d", 8);
+		break;
+		case CTRL_AUX4:
+			val.sprintf("%41d", 9);
+		break;
+		default:
+			val.sprintf("%41d", (10 + ctrl));
+		break;
+	}/*}}}*/
+	return val.toInt();
 }

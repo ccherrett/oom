@@ -21,6 +21,7 @@
 #define ControlRole Qt::UserRole+6
 #define CCRole Qt::UserRole+7
 #define TrackRole Qt::UserRole+8
+#define CCSortRole Qt::UserRole+9
 
 
 class CCInfoDelegate : public QItemDelegate

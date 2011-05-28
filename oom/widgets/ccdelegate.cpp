@@ -78,6 +78,7 @@ void CCInfoDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
 			model->setData(index, info->channel(), ChannelRole);
 			model->setData(index, info->controller(), ControlRole);
 			model->setData(index, info->assignedControl(), CCRole);
+			model->setData(index, midiControlSortIndex(info->controller()), CCSortRole);
 			QString str;//(midiCtrlName(info->controller()));
 			str.append("( ").append(midiControlToString(info->controller())).append(" )");
 			if(info->assignedControl() >= 0)

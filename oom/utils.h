@@ -37,6 +37,7 @@ extern QString string2hex(const unsigned char* data, int len);
 extern char* hex2string(const char* src, int& len, int& status);
 //extern qint64 genId();
 extern QString midiControlToString(int ctrl);
+extern int midiControlSortIndex(int ctrl);
 
 #endif
 

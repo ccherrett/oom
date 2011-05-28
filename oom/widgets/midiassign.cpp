@@ -77,6 +77,7 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 
 	m_ccmodel = new QStandardItemModel(0, 2, this);
 	m_ccEdit->setModel(m_ccmodel);
+	m_ccEdit->setSortingEnabled(true);
 
 	m_mpmodel = new QStandardItemModel(0, 1, this);
 	m_porttable->setModel(m_mpmodel);
@@ -98,6 +99,7 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	tableView->setItemDelegateForColumn(2, mpdelegate);
 	tableView->setItemDelegateForColumn(3, chandelegate);
 	tableView->setItemDelegateForColumn(4, presetdelegate);
+	m_ccmodel->setSortRole(CCSortRole);
 	
 	m_ccEdit->setItemDelegateForColumn(1, infodelegate);
 	m_cmbControl->addItem(midiControlToString(CTRL_RECORD), CTRL_RECORD);
@@ -244,6 +246,7 @@ void MidiAssignDialog::itemSelected(const QItemSelection& isel, const QItemSelec
 						control->setData(info->channel(), ChannelRole);
 						control->setData(info->controller(), ControlRole);
 						control->setData(info->assignedControl(), CCRole);
+						control->setData(midiControlSortIndex(info->controller()), CCSortRole);
 						QString str;
 						str.append("( ").append(midiControlToString(info->controller())).append(" )");
 						if(info->assignedControl() >= 0)
@@ -312,6 +315,7 @@ void MidiAssignDialog::btnAddController()/*{{{*/
 			control->setData(info->channel(), ChannelRole);
 			control->setData(info->controller(), ControlRole);
 			control->setData(info->assignedControl(), CCRole);
+			control->setData(midiControlSortIndex(info->controller()), CCSortRole);
 			QString str;
 			str.append("( ").append(midiControlToString(info->controller())).append(" )");
 			if(info->assignedControl() >= 0)
@@ -485,6 +489,8 @@ void MidiAssignDialog::updateCCTableHeader()/*{{{*/
 	m_ccEdit->setColumnWidth(1, 180);
 	m_ccmodel->setHorizontalHeaderLabels(m_cclabels);
 	m_ccEdit->horizontalHeader()->setStretchLastSection(true);
+	m_ccEdit->horizontalHeader()->setSortIndicatorShown(false);
+	m_ccEdit->sortByColumn(1, Qt::AscendingOrder);
 }/*}}}*/
 
 void MidiAssignDialog::updateMPTableHeader()/*{{{*/
