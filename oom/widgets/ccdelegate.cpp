@@ -79,14 +79,7 @@ void CCInfoDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
 			model->setData(index, info->controller(), ControlRole);
 			model->setData(index, info->assignedControl(), CCRole);
 			QString str;//(midiCtrlName(info->controller()));
-			if(info->controller() == CTRL_RECORD)
-				str.append(tr("( Record )"));
-			else if(info->controller() == CTRL_MUTE)
-				str.append(tr("( Mute )"));
-			else if(info->controller() == CTRL_SOLO)
-				str.append(tr("( Solo )"));
-			else
-				str.append("( ").append(midiCtrlName(info->controller())).append(" )");
+			str.append("( ").append(midiControlToString(info->controller())).append(" )");
 			if(info->assignedControl() >= 0)
 				str.append(" Assigned to CC: ").append(QString::number(info->assignedControl())).append(" on Chan: ").append(QString::number(info->channel()+1));
 			model->setData(index, str, Qt::DisplayRole);
