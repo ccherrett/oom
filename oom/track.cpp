@@ -188,8 +188,16 @@ void Track::init()
 	{
 		case AUDIO_INPUT:
 		case AUDIO_BUSS:
+			m_midiassign.midimap.insert(CTRL_AUX1, new CCInfo(this, 0, 0, CTRL_AUX1, -1));
+			m_midiassign.midimap.insert(CTRL_AUX2, new CCInfo(this, 0, 0, CTRL_AUX2, -1));
+		break;
 		case AUDIO_SOFTSYNTH:
 		case AUDIO_AUX:
+		break;
+		case Track::WAVE:
+			m_midiassign.midimap.insert(CTRL_AUX1, new CCInfo(this, 0, 0, CTRL_AUX1, -1));
+			m_midiassign.midimap.insert(CTRL_AUX2, new CCInfo(this, 0, 0, CTRL_AUX2, -1));
+			m_midiassign.midimap.insert(CTRL_RECORD, new CCInfo(this, 0, 0, CTRL_RECORD, -1));
 		break;
 		default:
 			m_midiassign.midimap.insert(CTRL_RECORD, new CCInfo(this, 0, 0, CTRL_RECORD, -1));
@@ -1046,8 +1054,16 @@ void MidiAssignData::read(Xml& xml, Track* t)/*{{{*/
 	{
 		case Track::AUDIO_INPUT:
 		case Track::AUDIO_BUSS:
+			midimap.insert(CTRL_AUX1, new CCInfo(t, 0, 0, CTRL_AUX1, -1));
+			midimap.insert(CTRL_AUX2, new CCInfo(t, 0, 0, CTRL_AUX2, -1));
+		break;
 		case Track::AUDIO_SOFTSYNTH:
 		case Track::AUDIO_AUX:
+		break;
+		case Track::WAVE:
+			midimap.insert(CTRL_AUX1, new CCInfo(t, 0, 0, CTRL_AUX1, -1));
+			midimap.insert(CTRL_AUX2, new CCInfo(t, 0, 0, CTRL_AUX2, -1));
+			midimap.insert(CTRL_RECORD, new CCInfo(t, 0, 0, CTRL_RECORD, -1));
 		break;
 		default:
 			midimap.insert(CTRL_RECORD, new CCInfo(t, 0, 0, CTRL_RECORD, -1));
