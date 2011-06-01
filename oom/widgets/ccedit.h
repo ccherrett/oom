@@ -31,13 +31,16 @@ public:
 	}
 
 private slots:
-	void doLearn(int port, int chan, int cc);
+	void doLearn(int port, int chan, int cc, int lsb = -1);
 	void startLearning();
 	void updateValues();
 	void channelChanged(int val);
 	void controlChanged(int val);
 	void recordOnlyChanged(bool);
 	void toggleChanged(bool);
+	void toggleNRPN(bool);
+	void msbChanged(int val);
+	void lsbChanged(int val);
 
 signals:
 	void valuesUpdated(CCInfo* i);

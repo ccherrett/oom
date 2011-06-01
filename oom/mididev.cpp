@@ -74,7 +74,10 @@ void MidiDevice::init()
 	_rwFlags = 3;
 	_openFlags = 3;
 	_port = -1;
-	//_nextPlayEvent = _playEvents.begin();
+	m_nrpnCache.msb = -1;
+	m_nrpnCache.lsb = -1;
+	m_nrpnCache.data_msb = -1;
+	m_nrpnCache.data_lsb = -1; //Currently unused till further notice
 }
 
 //---------------------------------------------------------
@@ -82,10 +85,8 @@ void MidiDevice::init()
 //---------------------------------------------------------
 
 MidiDevice::MidiDevice()
-: m_feedback(false)
+: m_cachenrpn(false)
 {
-	///_recBufFlipped = false;
-	//_tmpRecordCount = 0;
 	for (unsigned int i = 0; i < MIDI_CHANNELS + 1; ++i)
 		_tmpRecordCount[i] = 0;
 
@@ -97,10 +98,8 @@ MidiDevice::MidiDevice()
 }
 
 MidiDevice::MidiDevice(const QString& n)
-: _name(n),m_feedback(false)
+: _name(n),m_cachenrpn(false)
 {
-	///_recBufFlipped = false;
-	//_tmpRecordCount = 0;
 	for (unsigned int i = 0; i < MIDI_CHANNELS + 1; ++i)
 		_tmpRecordCount[i] = 0;
 
@@ -111,12 +110,70 @@ MidiDevice::MidiDevice(const QString& n)
 	init();
 }
 
+//Send incomming events to the midiMonitor
+void MidiDevice::monitorEvent(const MidiRecordEvent& event)
+{
+	int type = event.type();
+	if(type == ME_CONTROLLER && midiMonitor->isManagedInputPort(_port))/*{{{*/
+	{
+		if(cacheNRPN())
+		{
+			if(event.dataA() == CTRL_HNRPN) //NRPN MSB
+			{
+				//if(m_nrpnCache.msb != event.dataB())
+				//	resetNRPNCache();
+				m_nrpnCache.msb = event.dataB();
+				//printf("Caching nrpn MSB with value: %d\n", event.dataB());
+			}
+			else if(event.dataA() == CTRL_LNRPN) //NRPN LSB
+			{
+				//if(m_nrpnCache.lsb != event.dataB())
+				//	resetNRPNCache();
+				m_nrpnCache.lsb = event.dataB();
+				//printf("Caching nrpn LSB with value: %d\n", event.dataB());
+			}
+			else if(event.dataA() == CTRL_HDATA && hasNRPNIndex()) //NRPN Data MSB
+			{
+				//TODO: Create the event and send it to the monitor
+				MidiRecordEvent ev(event);
+				ev.setPort(_port);
+				int val = CTRL_NRPN_OFFSET | (m_nrpnCache.msb << 8) | m_nrpnCache.lsb;
+				ev.setA(val);
+				midiMonitor->msgSendMidiInputEvent(ev);
+				//printf("Sending NRPN event with value: %d\n", val);
+			}
+			/*else if(event.dataA() == CTRL_LDATA && hasNRPNIndex()) //NRPN Data LSB
+			{
+				//TODO: Create the event and send it to the monitor
+				MidiRecordEvent ev(event);
+				ev.setPort(_port);
+				ev.setA((m_nrpnCache.msb << 8 | m_nrpnCache.lsb) | CTRL_NRPN14_OFFSET);
+				midiMonitor->msgSendMidiInputEvent(ev);
+			}*/
+			else //Normal event
+			{
+				//TODO: Reset the cache events
+				resetNRPNCache();
+				MidiRecordEvent ev(event);
+				ev.setPort(_port);
+				midiMonitor->msgSendMidiInputEvent(ev);
+			}
+		}
+		else
+		{
+			//TODO: Reset the cache events
+			resetNRPNCache();
+			MidiRecordEvent ev(event);
+			ev.setPort(_port);
+			midiMonitor->msgSendMidiInputEvent(ev);
+		}
+	}/*}}}*/
+}
+
 //---------------------------------------------------------
 //   filterEvent
 //    return true if event filtered
 //---------------------------------------------------------
-
-//static bool filterEvent(const MEvent& event, int type, bool thru)
 
 bool filterEvent(const MEvent& event, int type, bool thru)
 {
@@ -172,9 +229,6 @@ bool filterEvent(const MEvent& event, int type, bool thru)
 
 void MidiDevice::afterProcess()
 {
-	//while (_tmpRecordCount--)
-	//  _recordFifo.remove();
-
 	for (unsigned int i = 0; i < MIDI_CHANNELS + 1; ++i)
 	{
 		while (_tmpRecordCount[i]--)
@@ -189,53 +243,12 @@ void MidiDevice::afterProcess()
 
 void MidiDevice::beforeProcess()
 {
-	//if (!jackPort(0).isZero())
-	//      audioDriver->collectMidiEvents(this, jackPort(0));
-
-	//_tmpRecordCount = _recordFifo.getSize();
 	for (unsigned int i = 0; i < MIDI_CHANNELS + 1; ++i)
 		_tmpRecordCount[i] = _recordFifo[i].getSize();
 
 	// Reset this.
 	_sysexFIFOProcessed = false;
 }
-
-/*
-//---------------------------------------------------------
-//   getEvents
-//---------------------------------------------------------
-
-void MidiDevice::getEvents(unsigned , unsigned , int ch, MPEventList* dst)  //from //to
-{
-  for (int i = 0; i < _tmpRecordCount; ++i) {
-		const MidiPlayEvent& ev = _recordFifo.peek(i);
-		if (ch == -1 || (ev.channel() == ch))
-			  dst->insert(ev);
-		}
-  
-  //while(!recordFifo.isEmpty())
-  //{
-  //  MidiPlayEvent e(recordFifo.get());
-  //  if (ch == -1 || (e.channel() == ch))
-  //        dst->insert(e);
-  //}  
-}
- */
-
-/*
-//---------------------------------------------------------
-//   recordEvent
-//---------------------------------------------------------
-
-MREventList* MidiDevice::recordEvents()        
-{ 
-  // Return which list is NOT currently being filled with incoming midi events. By T356.
-  if(_recBufFlipped) 
-	return &_recordEvents;
-  else  
-	return &_recordEvents2;
-}
- */
 
 //---------------------------------------------------------
 //   recordEvent
@@ -269,9 +282,6 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 	{
 		int idin = midiPorts[_port].syncInfo().idIn();
 
-		// p3.3.26 1/23/10 Section was disabled, enabled by Tim.
-		//#if 0
-
 		//---------------------------------------------------
 		// filter some SYSEX events
 		//---------------------------------------------------
@@ -282,26 +292,21 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 			int n = event.len();
 			if (n >= 4)
 			{
-				if ((p[0] == 0x7f)
-						//&& ((p[1] == 0x7f) || (p[1] == rxDeviceId))) {
-						&& ((p[1] == 0x7f) || (idin == 0x7f) || (p[1] == idin)))
+				if ((p[0] == 0x7f) && ((p[1] == 0x7f) || (idin == 0x7f) || (p[1] == idin)))
 				{
 					if (p[2] == 0x06)
 					{
-						//mmcInput(p, n);
 						midiSeq->mmcInput(_port, p, n);
 						return;
 					}
 					if (p[2] == 0x01)
 					{
-						//mtcInputFull(p, n);
 						midiSeq->mtcInputFull(_port, p, n);
 						return;
 					}
 				}
 				else if (p[0] == 0x7e)
 				{
-					//nonRealtimeSystemSysex(p, n);
 					midiSeq->nonRealtimeSystemSysex(_port, p, n);
 					return;
 				}
@@ -312,19 +317,8 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 			// Trigger general activity indicator detector. Sysex has no channel, don't trigger.
 			midiPorts[_port].syncInfo().trigActDetect(event.channel());
 
-		//#endif
-
-		//TODO: Jack in here and call our midimonitor with the data, it can then decide what to do
-		if(typ == ME_CONTROLLER && midiMonitor->isManagedInputPort(_port))
-		{
-			//printf("Calling midimonitor from MidiDevice::recordEvent\n");
-			MidiRecordEvent ev(event);
-			ev.setPort(_port);
-			midiMonitor->msgSendMidiInputEvent(ev);
-			//FIXME: We need a way to tell if any track/part is expecting this event so we dont double up events going
-			//to a controller lanes.
-			//return; //If we manage this input port return
-		}
+		//call our midimonitor with the data, it can then decide what to do
+		monitorEvent(event);
 
 	}
 
@@ -355,15 +349,6 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 		song->putEvent(pv);
 	}
 
-	///if(_recBufFlipped)
-	///  _recordEvents2.add(event);     // add event to secondary list of recorded events
-	///else
-	///  _recordEvents.add(event);     // add event to primary list of recorded events
-
-	//if(_recordFifo.put(MidiPlayEvent(event)))
-	//  printf("MidiDevice::recordEvent: fifo overflow\n");
-
-	// p3.3.38
 	// Do not bother recording if it is NOT actually being used by a port.
 	// Because from this point on, process handles things, by selected port.
 	if (_port == -1)
@@ -415,8 +400,7 @@ void MidiDeviceList::add(MidiDevice* dev)
 			{
 				char incstr[4];
 				sprintf(incstr, "_%d", ++increment);
-				//dev->setName(origname + incstr);
-				dev->setName(origname + QString(incstr)); // p4.0.0
+				dev->setName(origname + QString(incstr)); 
 				gotUniqueName = false;
 			}
 		}
@@ -509,16 +493,12 @@ bool MidiDevice::putEvent(const MidiPlayEvent& ev)
 				return putMidiEvent(MidiPlayEvent(0, 0, chn, ME_PROGRAM, pr, 0));
 			}
 		}
-#if 1 // if ALSA cannot handle RPN NRPN etc.
-
-		// p3.3.37
-		//if (a < 0x1000) {          // 7 Bit Controller
 		if (a < CTRL_14_OFFSET)
 		{ // 7 Bit Controller
 			//putMidiEvent(MidiPlayEvent(0, 0, chn, ME_CONTROLLER, a, b));
 			putMidiEvent(ev);
+			//printf("a < CTRL_14_OFFSET\n");
 		}
-			//else if (a < 0x20000) {     // 14 bit high resolution controller
 		else if (a < CTRL_RPN_OFFSET)
 		{ // 14 bit high resolution controller
 			int ctrlH = (a >> 8) & 0x7f;
@@ -527,8 +507,8 @@ bool MidiDevice::putEvent(const MidiPlayEvent& ev)
 			int dataL = b & 0x7f;
 			putMidiEvent(MidiPlayEvent(0, 0, chn, ME_CONTROLLER, ctrlH, dataH));
 			putMidiEvent(MidiPlayEvent(0, 0, chn, ME_CONTROLLER, ctrlL, dataL));
+			//printf("a < CTRL_RPN_OFFSET\n");
 		}
-			//else if (a < 0x30000) {     // RPN 7-Bit Controller
 		else if (a < CTRL_NRPN_OFFSET)
 		{ // RPN 7-Bit Controller
 			int ctrlH = (a >> 8) & 0x7f;
@@ -540,8 +520,8 @@ bool MidiDevice::putEvent(const MidiPlayEvent& ev)
 			// Added by T356. Select null parameters so that subsequent data controller
 			//  events do not upset the last *RPN controller.
 			sendNullRPNParams(chn, false);
+			//printf("a < CTRL_NRPN_OFFSET\n");
 		}
-			//else if (a < 0x40000) {     // NRPN 7-Bit Controller
 		else if (a < CTRL_INTERNAL_OFFSET)
 		{ // NRPN 7-Bit Controller
 			int ctrlH = (a >> 8) & 0x7f;
@@ -551,8 +531,8 @@ bool MidiDevice::putEvent(const MidiPlayEvent& ev)
 			putMidiEvent(MidiPlayEvent(0, 0, chn, ME_CONTROLLER, CTRL_HDATA, b));
 
 			sendNullRPNParams(chn, true);
+			//printf("a < CTRL_INTERNAL_OFFSET\n");
 		}
-			//else if (a < 0x60000) {     // RPN14 Controller
 		else if (a < CTRL_NRPN14_OFFSET)
 		{ // RPN14 Controller
 			int ctrlH = (a >> 8) & 0x7f;
@@ -565,8 +545,8 @@ bool MidiDevice::putEvent(const MidiPlayEvent& ev)
 			putMidiEvent(MidiPlayEvent(0, 0, chn, ME_CONTROLLER, CTRL_LDATA, dataL));
 
 			sendNullRPNParams(chn, false);
+			//printf("a < CTRL_NRPN14_OFFSET\n");
 		}
-			//else if (a < 0x70000) {     // NRPN14 Controller
 		else if (a < CTRL_NONE_OFFSET)
 		{ // NRPN14 Controller
 			int ctrlH = (a >> 8) & 0x7f;
@@ -579,13 +559,13 @@ bool MidiDevice::putEvent(const MidiPlayEvent& ev)
 			putMidiEvent(MidiPlayEvent(0, 0, chn, ME_CONTROLLER, CTRL_LDATA, dataL));
 
 			sendNullRPNParams(chn, true);
+			//printf("a < CTRL_NONE_OFFSET\n");
 		}
 		else
 		{
 			printf("putEvent: unknown controller type 0x%x\n", a);
 		}
 		return false;
-#endif
 	}
 	return putMidiEvent(ev);
 }

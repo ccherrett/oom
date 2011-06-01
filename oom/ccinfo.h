@@ -22,6 +22,8 @@ class CCInfo : public QObject
 	int m_ccnum;
 	int m_reconly;
 	int m_faketoggle;
+	bool m_nrpn;
+	int m_msb, m_lsb;
 
 public:
 	CCInfo(Track* , int port, int chan, int control, int cc, int rec = 0, int toggle = 0);
@@ -35,7 +37,7 @@ public:
 	void setChannel(int c) { m_channel = c; }
 	int controller() { return m_control; }
 	void setController(int c) { m_control = c; }
-	int assignedControl() { return m_ccnum; }
+	int assignedControl();
 	void setAssignedControl(int c) { m_ccnum = c; }
 	void setTrack(Track* t) { m_track = t; }
 	Track* track() { return m_track; }
@@ -43,6 +45,13 @@ public:
 	void setRecordOnly(bool r) { m_reconly = (int)r; }
 	bool fakeToggle() { return (bool)m_faketoggle; }
 	void setFakeToggle(bool f) { m_faketoggle = (int)f; }
+	//NRPN Course support
+	void setNRPN(bool f) { m_nrpn = f; }
+	bool nrpn() { return m_nrpn; }
+	void setMSB(int msb) { m_msb = msb; }
+	int msb() { return m_msb; }
+	void setLSB(int lsb) { m_lsb = lsb; }
+	int lsb() { return m_lsb; }
 
 	inline bool operator==(CCInfo nfo)
 	{
@@ -55,7 +64,6 @@ public:
 	{
 		return (m.channel() ^ m.port())*(m.assignedControl()+m.controller());
 	}
-
 };
 
 #endif

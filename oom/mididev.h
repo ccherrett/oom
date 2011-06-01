@@ -21,6 +21,13 @@
 //class RouteList;
 class Xml;
 
+struct NRPNCache {
+	int msb;
+	int lsb;
+	int data_msb;
+	int data_lsb;
+};
+
 //---------------------------------------------------------
 //   MidiDevice
 //---------------------------------------------------------
@@ -28,18 +35,11 @@ class Xml;
 class MidiDevice {
     MPEventList _stuckNotes;
     MPEventList _playEvents;
-    //iMPEvent _nextPlayEvent;
-    ///MREventList _recordEvents;
-    ///MREventList _recordEvents2;
 
     // Used for multiple reads of fifos during process.
-    //int _tmpRecordCount;
     int _tmpRecordCount[MIDI_CHANNELS + 1];
     bool _sysexFIFOProcessed;
 
-    ///bool _recBufFlipped;
-    // Holds sync settings and detection monitors.
-    //MidiSyncInfo _syncInfo;
 
 protected:
     QString _name;
@@ -48,16 +48,12 @@ protected:
     int _openFlags; // configured open flags
     bool _readEnable; // set when opened/closed.
     bool _writeEnable; //
-    //int _sysexWriteChunk;
-    //int _sysexReadChunk;
-    //bool _sysexWritingChunks;
     bool _sysexReadingChunks;
 
 	MidiFifo eventFifo;
-	bool m_feedback;
+	bool m_cachenrpn;
+	NRPNCache m_nrpnCache;
 
-    // Recording fifo.
-    //MidiFifo _recordFifo;
     // Recording fifos. To speed up processing, one per channel plus one special system 'channel' for channel-less events like sysex.
     MidiRecFifo _recordFifo[MIDI_CHANNELS + 1];
 
@@ -65,6 +61,14 @@ protected:
 
     void init();
     virtual bool putMidiEvent(const MidiPlayEvent&) = 0;
+	virtual void monitorEvent(const MidiRecordEvent&);
+	virtual void resetNRPNCache()
+	{
+		m_nrpnCache.msb = -1;
+		m_nrpnCache.lsb = -1;
+		m_nrpnCache.data_msb = -1;
+		m_nrpnCache.data_lsb = -1;
+	}
 
 public:
 
@@ -79,9 +83,6 @@ public:
     }
 
     virtual int deviceType() = 0;
-
-    //virtual void* clientPort() { return 0; }
-    // p3.3.55
 
     virtual void* inClientPort() {
         return 0;
@@ -144,7 +145,6 @@ public:
     void setrwFlags(int val) {
         _rwFlags = val;
     }
-    //MidiSyncInfo& syncInfo()         { return _syncInfo; }
 
     virtual bool isSynti() const {
         return false;
@@ -191,17 +191,12 @@ public:
         return &_playEvents;
     }
 
-    ///MREventList* recordEvents();
-    ///void flipRecBuffer()               { _recBufFlipped = _recBufFlipped ? false : true; }
-    ///bool recBufFlipped()               { return _recBufFlipped; }
     void beforeProcess();
     void afterProcess();
-    //int tmpRecordCount() { return _tmpRecordCount; }
 
     int tmpRecordCount(const unsigned int ch) {
         return _tmpRecordCount[ch];
     }
-    //MidiFifo& recordEvents() { return _recordFifo; }
 
     MidiRecFifo& recordEvents(const unsigned int ch) {
         return _recordFifo[ch];
@@ -214,8 +209,6 @@ public:
     void setSysexFIFOProcessed(bool v) {
         _sysexFIFOProcessed = v;
     }
-    //bool sysexWritingChunks() { return _sysexWritingChunks; }
-    //void setSysexWritingChunks(bool v) { _sysexWritingChunks = v; }
 
     bool sysexReadingChunks() {
         return _sysexReadingChunks;
@@ -224,23 +217,24 @@ public:
     void setSysexReadingChunks(bool v) {
         _sysexReadingChunks = v;
     }
-    //virtual void getEvents(unsigned /*from*/, unsigned /*to*/, int /*channel*/, MPEventList* /*dst*/);
 
-    //iMPEvent nextPlayEvent() {
-    //    return _nextPlayEvent;
-    //}
-
-    //void setNextPlayEvent(iMPEvent i) {
-    //    _nextPlayEvent = i;
-    //}
     bool sendNullRPNParams(int, bool);
-	virtual bool isFeedbackEnabled()
+	virtual bool cacheNRPN()
 	{
-		return _writeEnable && m_feedback;
+		return m_cachenrpn;
 	}
-	virtual void setFeedback(bool f)
+	virtual void setCacheNRPN(bool f)
 	{
-		m_feedback = f;
+		m_cachenrpn = f;
+	}
+
+	bool hasNRPNIndex() {
+		return (m_nrpnCache.msb >= 0 && m_nrpnCache.lsb >= 0);
+	}
+
+	NRPNCache* rpnCache()
+	{
+		return &m_nrpnCache;
 	}
 };
 

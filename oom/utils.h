@@ -38,6 +38,7 @@ extern char* hex2string(const char* src, int& len, int& status);
 //extern qint64 genId();
 extern QString midiControlToString(int ctrl);
 extern int midiControlSortIndex(int ctrl);
+extern int calcNRPN7(int, int);
 
 #endif
 

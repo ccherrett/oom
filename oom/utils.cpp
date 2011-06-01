@@ -587,3 +587,8 @@ int midiControlSortIndex(int ctrl)
 	}/*}}}*/
 	return val.toInt();
 }
+
+int calcNRPN7(int msb, int lsb)
+{
+	return (msb * 128) + lsb;
+}

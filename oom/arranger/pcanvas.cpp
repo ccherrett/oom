@@ -4208,7 +4208,7 @@ void PartCanvas::drawTooltipText(QPainter& p, const QRect& rr, int height, doubl
 
 void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)/*{{{*/
 {
-	int circumference = 15;
+	int circumference = 5;
 	if (t->isMidiTrack())
 	{
 		return;

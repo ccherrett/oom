@@ -405,7 +405,7 @@ void AudioTrack::setAutomationType(AutomationType t)
 //   processAutomationEvents
 //---------------------------------------------------------
 
-void AudioTrack::processAutomationEvents()
+void AudioTrack::processAutomationEvents()/*{{{*/
 {
 	if (_automationType != AUTO_TOUCH && _automationType != AUTO_WRITE)
 		return;
@@ -513,7 +513,20 @@ void AudioTrack::processAutomationEvents()
 	  }
 	 */
 
-}
+}/*}}}*/
+
+/*double AudioTrack::getAutomationEventForID(int id, int frame)//{{{
+{
+	// Erase old events only if there were recorded events.
+	for (iCtrlRec icr = _recEvents.begin(); icr != _recEvents.end(); ++icr)
+	{
+		if (icr->id == id && icr->frame == frame) // && icr->type == ARVT_VAL && icr->frame >= s->frame && icr->frame <= e->frame)
+		{
+			return icr->val;
+		}
+	}
+
+}//}}}*/
 
 //---------------------------------------------------------
 //   setControllerMode

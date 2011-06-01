@@ -211,16 +211,67 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			//	msg->mevent.type(), msg->mevent.port(), msg->mevent.channel(), msg->mevent.dataA(), msg->mevent.dataB());
 			if(m_learning && m_learnport == msg->mevent.port())
 			{
-				QString cmd;
-				cmd.append(QString::number(msg->mevent.port())).append(":");
-				cmd.append(QString::number(msg->mevent.channel())).append(":");
-				cmd.append(QString::number(msg->mevent.dataA())).append("$$");
-				QByteArray ba(cmd.toUtf8().constData());
-				write(sigFd, ba.constData(), 16);
+				int a = msg->mevent.dataA();
+				//int b = msg->mevent.dataB();
+
+				if (a < CTRL_14_OFFSET)//{{{
+				{ // 7 Bit Controller
+					QString cmd;
+					cmd.append(QString::number(msg->mevent.port())).append(":");
+					cmd.append(QString::number(msg->mevent.channel())).append(":");
+					cmd.append(QString::number(a)).append("$$");
+					QByteArray ba(cmd.toUtf8().constData());
+					write(sigFd, ba.constData(), 16);
+				}
+				else if (a < CTRL_RPN_OFFSET)
+				{ // 14 bit high resolution controller
+					printf("Controller 14bit unsupported\n");
+					//int ctrlH = (a >> 8) & 0x7f;
+					//int ctrlL = a & 0x7f;
+					//int dataH = (b >> 7) & 0x7f;
+					//int dataL = b & 0x7f;
+				}
+				else if (a > CTRL_RPN_OFFSET && a < CTRL_NRPN_OFFSET)
+				{ // RPN 7-Bit Controller
+					printf("RPN 7 Controller unsupported\n");
+					//int ctrlH = (a >> 8) & 0x7f;
+					//int ctrlL = a & 0x7f;
+				}
+				else if (/*a >= CTRL_NRPN_OFFSET && */a < CTRL_INTERNAL_OFFSET)
+				{ // NRPN 7-Bit Controller
+					printf("NRPN 7 Controller\n");
+					int msb = (a >> 8) & 0x7f;
+					int lsb = a & 0x7f;
+					QString cmd;
+					cmd.append(QString::number(msg->mevent.port())).append(":");
+					cmd.append(QString::number(msg->mevent.channel())).append(":");
+					cmd.append(QString::number(msb)).append(":");
+					cmd.append(QString::number(lsb)).append(":").append("N").append("$$");
+					QByteArray ba(cmd.toUtf8().constData());
+					write(sigFd, ba.constData(), 16);
+				}
+				else if (a < CTRL_NRPN14_OFFSET)
+				{ // RPN14 Controller
+					printf("RPN 14 Controller unsupported\n");
+					//int ctrlH = (a >> 8) & 0x7f;
+					//int ctrlL = a & 0x7f;
+					//int dataH = (b >> 7) & 0x7f;
+					//int dataL = b & 0x7f;
+				}
+				else if (a < CTRL_NONE_OFFSET)
+				{ // NRPN14 Controller
+					//int ctrlH = (a >> 8) & 0x7f;
+					//int ctrlL = a & 0x7f;
+					//int dataH = (b >> 7) & 0x7f;
+					//int dataL = b & 0x7f;
+					printf("NRPN 14 Controller unsupported\n");//: msb: %d, lsb: %d, datamsb: %d, datalsb: %d\n", ctrlH, ctrlL, dataH, dataL);
+				} //}}}
 				m_learning = false;
 				m_learnport = -1;
 				//TODO: Send an event back to the device
 				//This will set toggle enable buttons to off and zero the slider as an indication of learning
+				//We need a way to know if this is a button or not, maybe send another field from the gui
+				//since we know in the gui if there is a toggle or not.
 				MidiPlayEvent ev(0, msg->mevent.port(), msg->mevent.channel(), ME_CONTROLLER, msg->mevent.dataA(), 0);
 				midiPorts[ev.port()].device()->putEvent(ev);
 				return;
@@ -228,19 +279,13 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			if(isManagedInputPort(msg->mevent.port()))
 			{
 				//printf("MidiMonitor::processMsg1() Processing Midi Input\n");
-				//QMultiHash<int, QString>::iterator i = m_portccmap.find(msg->mevent.dataA());
 				QMultiHash<int, CCInfo*>::iterator iter = m_midimap.find(msg->mevent.dataA());
 				while(iter != m_midimap.end())
-				//while (i != m_portccmap.end()) 
 				{
 					CCInfo* info = iter.value();
-					//QString tname(i.value());
-					//MidiAssignData* data = m_assignments.value(tname);
 					if(info && info->track()->midiAssign()->enabled && info->port() == msg->mevent.port() 
 						&& info->channel() == msg->mevent.channel() && info->assignedControl() == msg->mevent.dataA())
-					//if(data && data->enabled && data->port == msg->mevent.port() && data->channel == msg->mevent.channel() && !data->midimap.isEmpty())
 					{
-						//int ctl = data->midimap.key(msg->mevent.dataA());
 						int ctl = info->controller();
 						if(info->track())
 						{
@@ -289,6 +334,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 								break;
 								case CTRL_VOLUME:
 								{
+									//FIXME: For NRPN Support this needs to take into account the Controller type
 									if(info->track()->isMidiTrack())/*{{{*/
 									//if(data->track->isMidiTrack())
 									{
@@ -365,9 +411,6 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 									song->update(SC_SOLO);
 								break;
 								default:
-								//case CTRL_REVERB_SEND:
-								//case CTRL_CHORUS_SEND:
-								//case CTRL_VARIATION_SEND:
 								{
 									if(info->track()->isMidiTrack())
 									{
@@ -445,22 +488,12 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 		case MONITOR_MODIFY_CC:
 		{/*{{{*/
 			m_editing = true;
-			//MidiAssignData* data = msg->track->midiAssign();
 			if(!m_midimap.isEmpty() && m_midimap.contains(msg->ctl, msg->info))
 			{
 				m_midimap.remove(msg->ctl, msg->info);
 			}
 			if(msg->info->assignedControl() >= 0)
 				m_midimap.insert(msg->info->assignedControl(), msg->info);
-			//if(isManagedInputController(msg->mval, msg->track->name()))
-			//{
-			//	m_portccmap.remove(msg->mval, msg->track->name());
-			//}
-			//if(data->midimap[msg->ctl] != -1)
-			//{
-			//	printf("Adding CC to portccmap %d, for controller: %d\n", data->midimap[msg->ctl], msg->ctl);
-			//	m_portccmap.insert(data->midimap[msg->ctl], msg->track->name());
-			//}
 			m_editing = false;
 		}/*}}}*/
 		break;

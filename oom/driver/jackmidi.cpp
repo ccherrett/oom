@@ -331,18 +331,8 @@ void MidiJackDevice::recordEvent(MidiRecordEvent& event)
 			midiPorts[_port].syncInfo().trigActDetect(event.channel());
 		}
 			
-		//TODO: Jack in here and call our midimonitor with the data, it can then decide what to do
-		//printf("MidiJackDevice::recordEvent _port:%d, event.port():%d\n",_port, event.port());
-		if(typ == ME_CONTROLLER && midiMonitor->isManagedInputPort(_port))
-		{
-			//MidiRecordEvent ev(event);
-			MidiRecordEvent ev(event);
-			ev.setPort(_port);
-			midiMonitor->msgSendMidiInputEvent(ev);
-			//FIXME: We need a way to tell if any track/part is expecting this event so we dont double up events going
-			//to a controller lanes.
-			//return; //If we manage this input port return
-		}
+		//call our midimonitor with the data, it can then decide what to do
+		monitorEvent(event);
 	}
 
 	//
@@ -758,11 +748,13 @@ bool MidiJackDevice::processEvent(const MidiPlayEvent& event)
 		}
 		else if (a < CTRL_14_OFFSET)
 		{ // 7 Bit Controller
+			//printf("a < CTRL_14_OFFSET\n");
 			if(!queueEvent(event))
 				return false;
 		}
 		else if (a < CTRL_RPN_OFFSET)
 		{ // 14 bit high resolution controller
+			//printf("a < CTRL_RPN_OFFSET\n");
 			int ctrlH = (a >> 8) & 0x7f;
 			int ctrlL = a & 0x7f;
 			int dataH = (b >> 7) & 0x7f;
@@ -774,6 +766,7 @@ bool MidiJackDevice::processEvent(const MidiPlayEvent& event)
 		}
 		else if (a < CTRL_NRPN_OFFSET)
 		{ // RPN 7-Bit Controller
+			//printf("a < CTRL_NRPN_OFFSET\n");
 			int ctrlH = (a >> 8) & 0x7f;
 			int ctrlL = a & 0x7f;
 			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HRPN, ctrlH)))
@@ -797,6 +790,7 @@ bool MidiJackDevice::processEvent(const MidiPlayEvent& event)
 		}
 		else if (a < CTRL_INTERNAL_OFFSET)
 		{ // NRPN 7-Bit Controller
+			//printf("a < CTRL_INTERNAL_OFFSET\n");
 			int ctrlH = (a >> 8) & 0x7f;
 			int ctrlL = a & 0x7f;
 			if(!queueEvent(MidiPlayEvent(t, port, chn, ME_CONTROLLER, CTRL_HNRPN, ctrlH)))
@@ -819,6 +813,7 @@ bool MidiJackDevice::processEvent(const MidiPlayEvent& event)
 		}
 		else if (a < CTRL_NRPN14_OFFSET)
 		{ // RPN14 Controller
+			//printf("a < CTRL_NRPN14_OFFSET\n");
 			int ctrlH = (a >> 8) & 0x7f;
 			int ctrlL = a & 0x7f;
 			int dataH = (b >> 7) & 0x7f;
@@ -845,6 +840,7 @@ bool MidiJackDevice::processEvent(const MidiPlayEvent& event)
 		}
 		else if (a < CTRL_NONE_OFFSET)
 		{ // NRPN14 Controller
+			//printf("a < CTRL_NONE_OFFSET\n");
 			int ctrlH = (a >> 8) & 0x7f;
 			int ctrlL = a & 0x7f;
 			int dataH = (b >> 7) & 0x7f;

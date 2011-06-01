@@ -2428,6 +2428,7 @@ void Song::playMonitorEvent(int fd)
 	str = raw.at(0);
 	QStringList cmds = str.split(":", QString::SkipEmptyParts);
 	//printf("playMonitorEvent to gui:<%s>\n", str.toUtf8().constData());
+	//FIXME: For NRPN Support this needs to take into account the Controller type
 	if(cmds.size() == 4) //MidiPlay
 	{
 		MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
@@ -2442,6 +2443,11 @@ void Song::playMonitorEvent(int fd)
 	{
 		//Values are: Port, Channel, CC
 		emit midiLearned(cmds.at(0).toInt(), cmds.at(1).toInt(), cmds.at(2).toInt());
+	}
+	else if(cmds.size() == 5) //MidiLearn NRPN
+	{//The fifth param is just a padding
+		//Values are: Port, Channel, MSB, LSB 
+		emit midiLearned(cmds.at(0).toInt(), cmds.at(1).toInt(), cmds.at(2).toInt(), cmds.at(3).toInt());
 	}
 }
 
