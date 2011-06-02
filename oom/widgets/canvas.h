@@ -48,8 +48,9 @@ protected:
         DRAGX_MOVE, DRAGY_MOVE,
         DRAGX_COPY, DRAGY_COPY,
         DRAGX_CLONE, DRAGY_CLONE,
-        DRAG_DELETE,
-        DRAG_RESIZE, DRAG_LASSO_START, DRAG_LASSO,
+        DRAG_DELETE, DRAG_RESIZE,
+		DRAG_LASSO_START, DRAG_LASSO,
+		DRAG_RESIZE_LEFT
     };
 
     enum DragType
@@ -76,6 +77,7 @@ protected:
     DragMode _drag;
     QRect _lasso;
     QPoint _start;
+    QPoint _end;
     Tool _tool;
     unsigned _pos[3];
 
@@ -131,6 +133,7 @@ protected:
     virtual bool moveItem(CItem*, const QPoint&, DragType) = 0;
     virtual CItem* newItem(const QPoint&, int state) = 0;
     virtual void resizeItem(CItem*, bool noSnap = false) = 0;
+    virtual void resizeItemLeft(CItem*, bool noSnap = false) = 0;
     virtual void newItem(CItem*, bool noSnap = false) = 0;
     virtual bool deleteItem(CItem*) = 0;
     virtual void startUndo(DragType) = 0;

@@ -861,23 +861,38 @@ void PartCanvas::updateSelection()
 //   resizeItem
 //---------------------------------------------------------
 
-void PartCanvas::resizeItem(CItem* i, bool noSnap)
+void PartCanvas::resizeItem(CItem* i, bool noSnap)/*{{{*/
 {
 	Track* t = ((NPart*) (i))->track();
 	Part* p = ((NPart*) (i))->part();
 
 	int pos = p->tick() + i->width();
-	int snappedpos = p->tick();
-	if (!noSnap)
+	int snappedpos = AL::sigmap.raster(pos, *_raster);
+	if (noSnap)
 	{
-		snappedpos = AL::sigmap.raster(pos, *_raster);
+		snappedpos = p->tick();
 	}
 	unsigned int newwidth = snappedpos - p->tick();
 	if (newwidth == 0)
 		newwidth = AL::sigmap.rasterStep(p->tick(), *_raster);
 
 	song->cmdResizePart(t, p, newwidth);
-}
+}/*}}}*/
+
+void PartCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
+{
+	Track* t = ((NPart*) (i))->track();
+	Part* p = ((NPart*) (i))->part();
+
+	//int pos = p->tick() + i->width();
+	int endtick = (p->tick() + p->lenTick()); //AL::sigmap.raster(_end.x(), *_raster);
+	int snappedpos = AL::sigmap.raster(i->x(), *_raster);
+	if (noSnap)
+	{
+		snappedpos = i->width();//p->tick();
+	}
+	song->cmdResizePartLeft(t, p, snappedpos, endtick);
+}/*}}}*/
 
 CItem* PartCanvas::addPartAtCursor(Track* track)
 {

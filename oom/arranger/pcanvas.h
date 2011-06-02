@@ -107,6 +107,7 @@ class PartCanvas : public Canvas
     virtual bool moveItem(CItem*, const QPoint&, DragType);
     virtual CItem* newItem(const QPoint&, int);
     virtual void resizeItem(CItem*, bool);
+    virtual void resizeItemLeft(CItem*, bool);
     virtual bool deleteItem(CItem*);
     virtual void startUndo(DragType);
 

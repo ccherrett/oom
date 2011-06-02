@@ -712,7 +712,7 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 	{
 		switch (_tool)
 		{
-		case PointerTool:
+			case PointerTool:
 			if (_curItem)
 			{
 				if (_curItem->part() != _curPart)
@@ -768,11 +768,27 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			case PencilTool:
 			if (_curItem)
 			{
-				_drag = DRAG_RESIZE;
-				setCursor();
-				int dx = _start.x() - _curItem->x();
-				_curItem->setWidth(dx);
-				_start.setX(_curItem->x());
+				if(shift)
+				{
+					_drag = DRAG_RESIZE_LEFT;
+					setCursor();
+					int endp = _curItem->x() + _curItem->width();
+					_end.setX(endp);
+
+					int dx = _end.x() - _start.x();
+					//Need a setLWidth function that knows how to resize from left
+					_curItem->setWidth(dx);
+					QPoint np(_start.x(), _curItem->y());
+					_curItem->move(np);
+				}
+				else
+				{
+					_drag = DRAG_RESIZE;
+					setCursor();
+					int dx = _start.x() - _curItem->x();
+					_curItem->setWidth(dx);
+					_start.setX(_curItem->x());
+				}
 			}
 			else
 			{
@@ -821,6 +837,7 @@ void Canvas::scrollTimerDone()/*{{{*/
 			{
 			case DRAG_NEW:
 			case DRAG_RESIZE:
+			case DRAG_RESIZE_LEFT:
 			case DRAGX_MOVE:
 			case DRAGX_COPY:
 			case DRAGX_CLONE:
@@ -973,6 +990,20 @@ void Canvas::scrollTimerDone()/*{{{*/
 				redraw();
 			}
 			break;
+		case DRAG_RESIZE_LEFT:
+			if (dist.x())
+			{
+				if(_evPos.x() < _end.x())
+				{
+					//_curItem->setWidth(_evPos.x());
+					int dx = _end.x() - _evPos.x();
+					//Need a setLWidth function that knows how to resize from left
+					_curItem->setWidth(dx);
+					QPoint np(_evPos.x(), _curItem->y());
+					_curItem->move(np);
+				}
+			}
+			break;
 			default:
 			break;
 		}
@@ -1037,6 +1068,9 @@ void Canvas::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 			case DRAG_COPY:
 			case DRAG_CLONE:
 			_hscrollDir = HSCROLL_RIGHT;
+			break;
+			case DRAG_RESIZE_LEFT:
+			_hscrollDir = HSCROLL_LEFT;
 			break;
 			default:
 			if (_canScrollRight)
@@ -1189,6 +1223,20 @@ void Canvas::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 			redraw();
 		}
 		break;
+		case DRAG_RESIZE_LEFT:
+		if (dist.x())
+		{
+			if(_evPos.x() < _end.x())
+			{
+				int dx = _end.x() - _evPos.x();
+				//Need a setLWidth function that knows how to resize from left
+				_curItem->setWidth(dx);
+				QPoint np(_evPos.x(), _curItem->y());
+				_curItem->move(np);
+			}
+			redraw();
+		}
+		break;
 		case DRAG_DELETE:
 		deleteItem(_evPos);
 		break;
@@ -1269,6 +1317,9 @@ void Canvas::viewMouseReleaseEvent(QMouseEvent* event)/*{{{*/
 		break;
 	case DRAG_RESIZE:
 		resizeItem(_curItem, false);
+		break;
+	case DRAG_RESIZE_LEFT:
+		resizeItemLeft(_curItem, false);
 		break;
 	case DRAG_NEW:
 		newItem(_curItem, false);
@@ -1532,6 +1583,7 @@ void Canvas::setCursor()
 		break;
 
 	case DRAG_RESIZE:
+	case DRAG_RESIZE_LEFT:
 		QWidget::setCursor(QCursor(Qt::SizeHorCursor));
 		break;
 

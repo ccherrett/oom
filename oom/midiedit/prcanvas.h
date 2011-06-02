@@ -60,6 +60,7 @@ class PianoCanvas : public EventCanvas
     virtual bool moveItem(CItem*, const QPoint&, DragType);
     virtual CItem* newItem(const QPoint&, int);
     virtual void resizeItem(CItem*, bool noSnap);
+    virtual void resizeItemLeft(CItem*, bool){}
     virtual void newItem(CItem*, bool noSnap);
     virtual bool deleteItem(CItem*);
     virtual void startDrag(CItem* item, bool copymode);

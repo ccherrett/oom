@@ -367,6 +367,7 @@ public:
     //-----------------------------------------
 
     void cmdResizePart(Track* t, Part* p, unsigned int size);
+    void cmdResizePartLeft(Track* t, Part* p, unsigned int start, unsigned int end);
     void cmdSplitPart(Track* t, Part* p, int tick);
     void cmdGluePart(Track* t, Part* p);
 
