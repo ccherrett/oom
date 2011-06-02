@@ -776,7 +776,6 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 					_end.setX(endp);
 
 					int dx = _end.x() - _start.x();
-					//Need a setLWidth function that knows how to resize from left
 					_curItem->setWidth(dx);
 					QPoint np(_start.x(), _curItem->y());
 					_curItem->move(np);
@@ -1229,7 +1228,6 @@ void Canvas::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 			if(_evPos.x() < _end.x())
 			{
 				int dx = _end.x() - _evPos.x();
-				//Need a setLWidth function that knows how to resize from left
 				_curItem->setWidth(dx);
 				QPoint np(_evPos.x(), _curItem->y());
 				_curItem->move(np);

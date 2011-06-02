@@ -884,12 +884,11 @@ void PartCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
 	Track* t = ((NPart*) (i))->track();
 	Part* p = ((NPart*) (i))->part();
 
-	//int pos = p->tick() + i->width();
-	int endtick = (p->tick() + p->lenTick()); //AL::sigmap.raster(_end.x(), *_raster);
+	int endtick = (p->tick() + p->lenTick());
 	int snappedpos = AL::sigmap.raster(i->x(), *_raster);
 	if (noSnap)
 	{
-		snappedpos = i->width();//p->tick();
+		snappedpos = i->x();
 	}
 	song->cmdResizePartLeft(t, p, snappedpos, endtick);
 }/*}}}*/

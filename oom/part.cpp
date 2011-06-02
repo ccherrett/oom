@@ -1183,84 +1183,45 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 			unsigned part_end = pend - part_start;
 			unsigned old_start = oPart->frame();
 			nPart->setFrame(part_start);
-			//unsigned new_partlength = tempomap.deltaTick2frame(oPart->tick(), oPart->tick() + len);
+
+			startUndo();
 			if (old_start > part_start)
 			{
-				//{{{
-				
-				startUndo();
-
+				printf("Part grew to the left\n");
+				unsigned int diff = old_start - part_start;
 				for (iEvent i = el->begin(); i != el->end(); i++)
 				{
 					Event e = i->second;
 					unsigned event_startframe = e.frame();
-					unsigned event_endframe = event_startframe + e.lenFrame();
-					//printf("Event frame=%d, length=%d\n", event_startframe, event_length);
-					if (event_startframe > part_start)
-						continue;
-					if (event_startframe < part_start && event_endframe < part_start)
-					{ // If event start was after the new length, remove it from part
-						// Indicate no undo, and do not do port controller values and clone parts.
-						audio->msgDeleteEvent(e, nPart, false, false, false);
-						continue;
-					}
-					if (event_startframe < part_start && event_endframe > part_start)
-					{ // If this event starts before new length and ends after, shrink it
-						Event newEvent = e.clone();
-						newEvent.setFrame(part_start);
-						// Indicate no undo, and do not do port controller values and clone parts.
-						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-					}
+					Event newEvent = e.clone();
+					newEvent.setFrame(event_startframe+diff);
+					// Indicate no undo, and do not do port controller values and clone parts.
+					audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
 				}
-				nPart->setLenFrame(part_end);
-				// Indicate no undo, and do not do port controller values and clone parts.
-				audio->msgChangePart(oPart, nPart, false, false, false);
-
-				endUndo(SC_PART_MODIFIED);
-				
-				//}}}
 			}
 			else
 			{
-				if (!el->empty())
+				unsigned int diff = part_start - old_start;
+				for (iEvent i = el->begin(); i != el->end(); i++)
 				{
-					iEvent i = el->begin();
-					Event first = i->second;
-					unsigned first_start = first.frame();
-					SndFileR file = first.sndFile();
-					if (file.isNull())
-						return;
-
-					//unsigned clipframes = (file.samples() - first.spos()); // / file.channels();
-					Event newEvent = first.clone();
-					//printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d\n", file.samples(), file.channels(), last.spos(), clipframes);
-
-					//unsigned new_eventlength = new_partlength - first_start;
-					//if (new_eventlength > clipframes) // Shrink event length if new partlength exceeds last clip
-					//	new_eventlength = clipframes;
-					//TODO: Figure out the start of the audio clip
-					newEvent.setFrame(part_start);
-					startUndo();
+					Event e = i->second;
+					unsigned event_startframe = e.frame();
+					Event newEvent = e.clone();
+					newEvent.setFrame(event_startframe-diff);
 					// Indicate no undo, and do not do port controller values and clone parts.
-					audio->msgChangeEvent(first, newEvent, nPart, false, false, false);
+					audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
 				}
-				else
-				{
-					startUndo();
-				}
-
-				nPart->setLenFrame(part_end);
-				// Indicate no undo, and do not do port controller values and clone parts.
-				//audio->msgChangePart(oPart, nPart, false);
-				audio->msgChangePart(oPart, nPart, false, false, false);
-				endUndo(SC_PART_MODIFIED);
 			}
+			nPart->setLenFrame(part_end);
+			// Indicate no undo, and do not do port controller values and clone parts.
+			audio->msgChangePart(oPart, nPart, false, false, false);
+			endUndo(SC_PART_MODIFIED);
 		}
 			break;
 		default:
 			break;
 	}
-}/*}}}*/
+}
 
 //---------------------------------------------------------
 //   splitPart
