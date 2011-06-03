@@ -1169,7 +1169,7 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 // cmbResizePartLeft
 // Attempt to resize the part from the left while leaving the events in place
 //----------------------------------------------------------
-void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsigned int endtick)//{{{
+void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsigned int /*endtick*/)//{{{
 {
 	switch (track->type())
 	{
@@ -1177,15 +1177,13 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 		{
 			WavePart* nPart = new WavePart(*(WavePart*) oPart);
 			EventList* el = nPart->events();
-			unsigned pend = tempomap.tick2frame(endtick);
+			//unsigned pend = tempomap.tick2frame(endtick);
 			unsigned part_start = tempomap.tick2frame(len);
-			
 			unsigned old_start = oPart->frame();
 			unsigned pos1 = part_start - old_start;
 			unsigned part_end = nPart->lenFrame() - pos1;
 
-			//unsigned part_end = pend - part_start;
-			printf("Old Part start:%d, end:%d\n",nPart->frame(), nPart->frame()+nPart->lenFrame());
+			//printf("Old Part start:%d, end:%d\n",nPart->frame(), nPart->frame()+nPart->lenFrame());
 			nPart->setFrame(part_start);
 			nPart->setLenFrame(part_end);
 
@@ -1208,16 +1206,10 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 						printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
 							part_start, part_end, event_startframe, event_endframe, newEvent.frame(), newEvent.endFrame());
 					}
-					Event newEvent = e.clone();
-					unsigned new_frame = event_startframe+diff;
-					newEvent.setFrame(new_frame);
-					// Indicate no undo, and do not do port controller values and clone parts.
-					audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
 				}
 			}
 			else
 			{*/
-				//unsigned int diff = part_start - old_start;
 				for (iEvent i = el->begin(); i != el->end(); i++)
 				{
 					Event e = i->second;
@@ -1229,33 +1221,11 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 					{
 						Event newEvent = e.mid(part_start - old_start, old_start - event_endframe);//old_start);
 						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-						printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
-							part_start, part_end, event_startframe, event_endframe, newEvent.frame(), newEvent.endFrame());
+						//printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
+						//	part_start, part_end, event_startframe, event_endframe, newEvent.frame(), newEvent.endFrame());
 					}
-					//Event newEvent = e.clone();
-					//unsigned new_frame = event_startframe-diff;
-					//unsigned new_lenframe = event_endframe-new_frame;
-					//newEvent.setFrame(new_frame);
-					//newEvent.setLenFrame(new_lenframe);
-					// Indicate no undo, and do not do port controller values and clone parts.
-					//audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-					//printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", part_start, part_end, event_startframe, event_endframe, new_frame, new_lenframe);
 				}
 			//}
-			/*for (iEvent i = el->begin(); i != el->end(); i++) //{{{
-			{
-				Event e = i->second;
-				unsigned event_startframe = e.frame();
-				unsigned event_endframe = event_startframe + e.lenFrame();
-				if (event_startframe < part_start)
-				{ // If this event starts before new length, shrink it
-					Event newEvent = e.clone();
-					newEvent.setFrame(part_start);
-					newEvent.setLenFrame(event_endframe - part_start);
-					// Indicate no undo, and do not do port controller values and clone parts.
-					audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-				}
-			} //}}}*/
 			// Indicate no undo, and do not do port controller values and clone parts.
 			audio->msgChangePart(oPart, nPart, false, false, false);
 			endUndo(SC_PART_MODIFIED);

@@ -768,7 +768,8 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			case PencilTool:
 			if (_curItem)
 			{
-				if(shift)
+				Track* ctrack = ((NPart*) (_curItem))->track();
+				if(shift && ctrack->type() == Track::WAVE)
 				{
 					_drag = DRAG_RESIZE_LEFT;
 					setCursor();
