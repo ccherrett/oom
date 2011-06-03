@@ -2585,8 +2585,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				vuGrad.setColorAt(0.10, yellow);
 				vuGrad.setColorAt(0, red);*/
 				QPen myPen = QPen();
-				myPen.setBrush(QBrush(vuGrad));
+				//myPen.setBrush(QBrush(vuGrad));
 				p.setPen(myPen);
+				p.setPen(green);
 				
 				p.drawLine(i, y - peak - cc, i, y + peak);
 				p.setPen(rms_color);
@@ -2629,8 +2630,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 						vuGrad.setColorAt(0.10, yellow);
 						vuGrad.setColorAt(0, red);*/
 						QPen myPen = QPen();
-						myPen.setBrush(QBrush(vuGrad));
+						//myPen.setBrush(QBrush(vuGrad));
 						p.setPen(myPen);
+						p.setPen(green);
 						//p.setPen(QColor(Qt::darkGray));
 						p.drawLine(i, y - peak - cc, i, y + peak);
 						//p.drawLine(0, pr.height(), 3000, pr.height());
@@ -2650,9 +2652,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 						vuGrad.setColorAt(0.10, yellow);
 						vuGrad.setColorAt(0, red);*/
 						QPen myPen = QPen();
-						myPen.setBrush(QBrush(vuGrad));
+						//myPen.setBrush(QBrush(vuGrad));
 						p.setPen(myPen);
-						//p.setPen(QColor(Qt::darkGray));
+						p.setPen(green);
 						p.drawLine(i, y - peak - cc, i, y + peak);
 						
 					}
