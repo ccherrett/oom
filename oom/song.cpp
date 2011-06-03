@@ -2123,8 +2123,6 @@ void Song::cmdRemovePart(Part* part)
 //   cmdChangePart
 //---------------------------------------------------------
 
-//void Song::cmdChangePart(Part* oldPart, Part* newPart)
-
 void Song::cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClones)
 {
 	//printf("Song::cmdChangePart before changePart oldPart:%p events:%p refs:%d Arefs:%d sn:%d newPart:%p events:%p refs:%d Arefs:%d sn:%d\n", oldPart, oldPart->events(), oldPart->events()->refCount(), oldPart->events()->arefCount(), oldPart->sn(), newPart, newPart->events(), newPart->events()->refCount(), newPart->events()->arefCount(), newPart->sn());
@@ -2134,15 +2132,12 @@ void Song::cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClon
 
 	changePart(oldPart, newPart);
 
-	//undoOp(UndoOp::ModifyPart, oldPart, newPart);
 	undoOp(UndoOp::ModifyPart, oldPart, newPart, doCtrls, doClones);
 
 	// Changed by T356. Do not decrement ref count if the new part is a clone of the old part, since the event list
 	//  will still be active.
 	if (oldPart->cevents() != newPart->cevents())
 		oldPart->events()->incARef(-1);
-
-	//oldPart->replaceClone(newPart);
 
 	//printf("Song::cmdChangePart before repl/unchClone oldPart:%p events:%p refs:%d Arefs:%d sn:%d newPart:%p events:%p refs:%d Arefs:%d sn:%d\n", oldPart, oldPart->events(), oldPart->events()->refCount(), oldPart->events()->arefCount(), oldPart->sn(), newPart, newPart->events(), newPart->events()->refCount(), newPart->events()->arefCount(), newPart->sn());
 
