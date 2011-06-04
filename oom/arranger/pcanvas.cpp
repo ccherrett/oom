@@ -886,7 +886,7 @@ void PartCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
 
 	int endtick = (p->tick() + p->lenTick());
 	int snappedpos = AL::sigmap.raster(i->x(), *_raster);
-	printf("PartCanvas::resizeItemLeft snap pos:%d , nosnap pos: %d\n", snappedpos, i->x());
+	//printf("PartCanvas::resizeItemLeft snap pos:%d , nosnap pos: %d\n", snappedpos, i->x());
 	if (noSnap)
 	{
 		snappedpos = i->x();
