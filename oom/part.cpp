@@ -1212,14 +1212,10 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 						unsigned currentFrames = totalFrames - (e.spos()+e.rightClip());
 						unsigned remainingFrames = (totalFrames - currentFrames);
 						unsigned minframe = (old_start - remainingFrames)+e.rightClip();
-						//unsigned rem = eend - part_start;
-						//unsigned diff = rem - remainingFrames;
 
 						//printf("SndFileR before samples=%d event samplepos=%d currentframes=%d event frame=%d rightclip=%d rem=%d remframes=%d diff=%d minframe=%d part_start=%d old_start=%d\n", 
 						//	file.samples(), e.spos(), currentFrames, event_startframe, e.rightClip(), rem, remainingFrames, diff, minframe, part_start, old_start);
 						
-						//Event newEvent = e.clone();
-						//I need to figure out if the right side of the event has been cropped
 						if(!remainingFrames)
 						{
 							//Called to update the part with as its stored in the CItem container
@@ -1227,7 +1223,7 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 							song->update(SC_SELECTION);
 							return;
 						}
-						if(/*rem >= remainingFrames || */part_start <= minframe)
+						if(part_start <= minframe)
 						{
 						//	printf("Sample is shorter than part length\n");
 							part_start = minframe;
