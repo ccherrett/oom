@@ -66,6 +66,23 @@ public:
         _spos = s;
     }
 
+	virtual int rightClip() const
+	{
+		return m_rightclip;
+	}
+	virtual void setRightClip(int clip)
+	{
+		m_rightclip = clip;
+	}
+	virtual int leftClip() const
+	{
+		return m_leftclip;
+	}
+	virtual void setLeftClip(int clip)
+	{
+		m_leftclip = clip;
+	}
+
     virtual SndFileR sndFile() const
     {
         return f;

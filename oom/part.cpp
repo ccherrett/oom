@@ -1015,13 +1015,6 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 			EventList* el = nPart->events();
 			unsigned new_partlength = tempomap.deltaTick2frame(oPart->tick(), oPart->tick() + len);
 			//printf("new partlength in frames: %d\n", new_partlength);
-			/*startUndo();
-			nPart->setLenFrame(new_partlength);
-			// Indicate no undo, and do not do port controller values and clone parts.
-			//audio->msgChangePart(oPart, nPart, false);
-			audio->msgChangePart(oPart, nPart, false, false, false);
-
-			endUndo(SC_PART_MODIFIED);*/
 
 			// If new nr of frames is less than previous what can happen is:
 			// -   0 or more events are beginning after the new final position. Those are removed from the part
@@ -1035,15 +1028,20 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 					Event e = i->second;
 					unsigned event_startframe = e.frame();
 					unsigned event_endframe = event_startframe + e.lenFrame();
+					unsigned rclip = e.rightClip();
+					unsigned clipframes = -1;
 					SndFileR file = e.sndFile();
 					if (!file.isNull())
 					{
-						unsigned clipframes = (file.samples() - e.spos());
-						printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d\n", file.samples(), file.channels(), e.spos(), clipframes);
+						clipframes = (file.samples() - e.spos());
+						printf("SndFileR samples=%d channels=%d event samplepos=%d event frame=%d clipframes=%d \n", file.samples(), file.channels(), e.spos(), e.frame(), clipframes);
 					}
 					//printf("Event frame=%d, length=%d\n", event_startframe, event_length);
 					if (event_endframe < new_partlength)
+					{
+						printf("event_endframe < new_partlength\n");
 						continue;
+					}
 					if (event_startframe > new_partlength)
 					{ // If event start was after the new length, remove it from part
 						// Indicate no undo, and do not do port controller values and clone parts.
@@ -1056,6 +1054,9 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 					{ // If this event starts before new length and ends after, shrink it
 						Event newEvent = e.clone();
 						newEvent.setLenFrame(new_partlength - event_startframe);
+						rclip = clipframes - newEvent.lenFrame();
+						newEvent.setRightClip(rclip);
+						printf("newEvent.setLenFrame(new_partlength:%d - event_startframe:%d) = %d right clip=%d\n",new_partlength, event_startframe, (new_partlength - event_startframe), rclip);
 						// Indicate no undo, and do not do port controller values and clone parts.
 						//audio->msgChangeEvent(e, newEvent, nPart, false);
 						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
@@ -1084,15 +1085,18 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 					if (file.isNull())
 						return;
 
-					unsigned clipframes = (file.samples() - last.spos()); // / file.channels();
+					unsigned clipframes = (file.samples() - last.spos());
 					Event newEvent = last.clone();
 					//printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d\n", file.samples(), file.channels(), last.spos(), clipframes);
 
 					unsigned new_eventlength = new_partlength - last_start;
 					if (new_eventlength > clipframes) // Shrink event length if new partlength exceeds last clip
+					{
 						new_eventlength = clipframes;
+					}
 
 					newEvent.setLenFrame(new_eventlength);
+					newEvent.setRightClip(clipframes - new_eventlength);
 					startUndo();
 					// Indicate no undo, and do not do port controller values and clone parts.
 					//audio->msgChangeEvent(last, newEvent, nPart, false);
@@ -1186,17 +1190,16 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 			//unsigned pend = tempomap.tick2frame(endtick);
 			unsigned part_start = tempomap.tick2frame(len);
 			unsigned old_start = oPart->frame();
-			unsigned pos1 = part_start - old_start;
-			unsigned part_end = nPart->lenFrame() - pos1;
+			unsigned old_end = nPart->lenFrame() + old_start;
+			unsigned part_end = old_end - part_start;
 
-			//printf("Old Part start:%d, end:%d\n",nPart->frame(), nPart->frame()+nPart->lenFrame());
 			nPart->setFrame(part_start);
 			nPart->setLenFrame(part_end);
 
 			startUndo();
 			if (old_start > part_start)
 			{
-				printf("Part grew to the left\n");
+				//printf("Part grew to the left\n");
 				for (iEvent i = el->begin(); i != el->end(); i++)
 				{
 					Event e = i->second;
@@ -1209,43 +1212,46 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 						SndFileR file = e.sndFile();
 						if (file.isNull())
 							continue;
-						unsigned sampleLength = file.samples();
-						unsigned clipframes = (sampleLength - e.spos());
+						unsigned totalFrames = file.samples();
+						unsigned currentFrames = totalFrames - (e.spos()+e.rightClip());
+						unsigned remainingFrames = (totalFrames - currentFrames);
+						unsigned minframe = (old_start - remainingFrames)+e.rightClip();
 						unsigned rem = eend - part_start;
+						unsigned diff = rem - remainingFrames;
 
-						printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d rem=%d\n", 
-							file.samples(), file.channels(), e.spos(), clipframes, rem);
+						//printf("SndFileR before samples=%d event samplepos=%d currentframes=%d event frame=%d rightclip=%d rem=%d remframes=%d diff=%d minframe=%d part_start=%d old_start=%d\n", 
+						//	file.samples(), e.spos(), currentFrames, event_startframe, e.rightClip(), rem, remainingFrames, diff, minframe, part_start, old_start);
 						
-						Event newEvent = e.clone();
+						//Event newEvent = e.clone();
 						//I need to figure out if the right side of the event has been cropped
-						if(rem > sampleLength)
+						if(!remainingFrames)
 						{
-							/*if(e.spos() == 0)
-							{
-								printf("Part already resized from the right shorter than sample length\n");
-								Event newEvent = e.mid(event_endframe - (rem - sampleLength) , event_endframe);
-								audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-							}
-							else
-							{*///Pad the front of the event
-								printf("Sample is shorter than part length\n");
-								Event newEvent = e.clone();//e.mid(event_endframe - sampleLength, event_endframe);
-								newEvent.setFrame(estart - part_start);
-								newEvent.setSpos(0);	
-								audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-							//}
+							//Called to update the part with as its stored in the CItem container
+							//which is already modified
+							song->update(SC_SELECTION);
+							return;
+						}
+						if(rem >= remainingFrames || part_start <= minframe)
+						{
+						//	printf("Sample is shorter than part length\n");
+							part_start = minframe;
+							part_end = old_end - part_start;
+							nPart->setFrame(part_start);
+							nPart->setLenFrame(part_end);
+							Event newEvent = e.clone();
+							newEvent.setFrame(0);
+							newEvent.setLenFrame(part_end);
+							newEvent.setSpos(0);	
+							audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
 						}
 						else
 						{
-							Event newEvent = e.mid(part_start - old_start, event_endframe);//old_start);
+							Event newEvent = e.mid(part_start - old_start, event_endframe);
 							audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-							printf("Sample is longer than part length\n");
+							//printf("Sample is longer than part length\n");
+							//printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
+							//	part_start, part_end, event_startframe, event_endframe, newEvent.frame(), newEvent.endFrame());
 						}
-						//newEvent.setLenFrame();
-						////Event newEvent = e.mid(part_start - old_start, old_start - event_endframe);//old_start);
-						//audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-						//printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
-						//	part_start, part_end, event_startframe, event_endframe, newEvent.frame(), newEvent.endFrame());
 					}
 				}
 			}
@@ -1254,22 +1260,22 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 				for (iEvent i = el->begin(); i != el->end(); i++)
 				{
 					Event e = i->second;
-					SndFileR file = e.sndFile();
-					if (!file.isNull())
-					{	
-						unsigned clipframes = (file.samples() - e.spos());
-						printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d\n", 
-							file.samples(), file.channels(), e.spos(), clipframes);
-					}
+					//SndFileR file = e.sndFile();
+					//if (!file.isNull())
+					//{	
+						//unsigned clipframes = (file.samples() - e.spos());
+						//printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d\n", 
+						//	file.samples(), file.channels(), e.spos(), clipframes);
+					//}
 					unsigned event_startframe = e.frame();
 					unsigned event_endframe = event_startframe + e.lenFrame();
 					unsigned estart = event_startframe + old_start;
 					unsigned eend = e.endFrame() + old_start;
 					if(eend > part_start && estart < part_start)
 					{
-						Event newEvent = e.mid(part_start - old_start, old_start - event_endframe);//old_start);
+						Event newEvent = e.mid(part_start - old_start, old_start - event_endframe);
 						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-						//printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
+						//printf("Right > Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
 						//	part_start, part_end, event_startframe, event_endframe, newEvent.frame(), newEvent.endFrame());
 					}
 				}

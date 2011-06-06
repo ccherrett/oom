@@ -141,12 +141,24 @@ Jack-session is not implemented yet, but is on our long list of intended feature
             chmod 660 /dev/rtc
             chgrp audio /dev/rtc
 
+      - for newer kernels with the portable rtc interface
+            chmod 660 /dev/rtc0
+            chgrp audio /dev/rtc0
+
 NOTE: Alsa now uses the HPET timer, and adds a symlink for RTC based applications.
 
       - make sure OOMidi can set the rtc clock:
             echo 8192 > /proc/sys/dev/rtc/max-user-freq
             inspect with:
             cat /proc/sys/dev/rtc/max-user-freq
+
+      - for newer kernels there is a new portable rtc interface that is configured
+        via the /sys filesystem.
+            echo 8192 >/sys/class/rtc/rtc0/max_user_freq
+            echo 8192 >/proc/sys/dev/hpet/max-user-freq
+			inspect with:
+			cat /sys/class/rtc/rtc0/max_user_freq
+			cat /proc/sys/dev/hpet/max-user-freq
 
       - for OOMidi to gain RT priviledges load the "realtime-lsm"
         modul; the modul should be configured to give all "audio"

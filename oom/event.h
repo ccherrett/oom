@@ -97,6 +97,10 @@ public:
     void setName(const QString& s);
     int spos() const;
     void setSpos(int s);
+	int rightClip() const;
+	void setRightClip(int clip);
+	int leftClip() const;
+	void setLeftClip(int clip);
     //AudioConverter* audioConverter() { return _audConv;}
     SndFileR sndFile() const;
     virtual void setSndFile(SndFileR& sf);
