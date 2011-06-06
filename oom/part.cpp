@@ -1358,11 +1358,29 @@ void Track::splitPart(Part* part, int tickpos, Part*& p1, Part*& p2)
 			if ((s2 > d1p1) && (s1 < d2p1))
 			{
 				Event si = event.mid(d1p1 - ps, d2p1 - ps);
+				unsigned rclip = si.rightClip();
+				unsigned clipframes = 0;
+				SndFileR file = si.sndFile();
+				if (!file.isNull())
+				{
+					clipframes = (file.samples() - si.spos());
+					rclip = clipframes - si.lenFrame();
+					si.setRightClip(rclip);
+				}
 				de1->add(si);
 			}
 			if ((s2 > d1p2) && (s1 < d2p2))
 			{
 				Event si = event.mid(d1p2 - ps, d2p2 - ps);
+				unsigned rclip = si.rightClip();
+				unsigned clipframes = 0;
+				SndFileR file = si.sndFile();
+				if (!file.isNull())
+				{
+					clipframes = (file.samples() - si.spos());
+					rclip = clipframes - si.lenFrame();
+					si.setRightClip(rclip);
+				}
 				de2->add(si);
 			}
 		}
