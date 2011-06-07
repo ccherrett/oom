@@ -17,6 +17,7 @@
 #include "globaldefs.h"
 
 #include <QString>
+#include <QHash>
 
 //class RouteList;
 class Xml;
@@ -52,7 +53,8 @@ protected:
 
 	MidiFifo eventFifo;
 	bool m_cachenrpn;
-	NRPNCache m_nrpnCache;
+	//NRPNCache m_nrpnCache;
+	QHash<int, NRPNCache*> m_nrpnCache;
 
     // Recording fifos. To speed up processing, one per channel plus one special system 'channel' for channel-less events like sysex.
     MidiRecFifo _recordFifo[MIDI_CHANNELS + 1];
@@ -62,12 +64,16 @@ protected:
     void init();
     virtual bool putMidiEvent(const MidiPlayEvent&) = 0;
 	virtual void monitorEvent(const MidiRecordEvent&);
-	virtual void resetNRPNCache()
+	virtual void resetNRPNCache(int chan)
 	{
-		m_nrpnCache.msb = -1;
-		m_nrpnCache.lsb = -1;
-		m_nrpnCache.data_msb = -1;
-		m_nrpnCache.data_lsb = -1;
+		NRPNCache* c = m_nrpnCache.value(chan);
+		if(c)
+		{
+			c->msb = -1;
+			c->lsb = -1;
+			c->data_msb = -1;
+			c->data_lsb = -1;
+		}
 	}
 
 public:
@@ -228,13 +234,13 @@ public:
 		m_cachenrpn = f;
 	}
 
-	bool hasNRPNIndex() {
-		return (m_nrpnCache.msb >= 0 && m_nrpnCache.lsb >= 0);
+	bool hasNRPNIndex(int index) {
+		return ((!m_nrpnCache.isEmpty() && m_nrpnCache.contains(index)) && m_nrpnCache.value(index)->msb >= 0 && m_nrpnCache.value(index)->lsb >= 0);
 	}
 
-	NRPNCache* rpnCache()
+	NRPNCache* rpnCache(int index)
 	{
-		return &m_nrpnCache;
+		return m_nrpnCache.value(index);;
 	}
 };
 

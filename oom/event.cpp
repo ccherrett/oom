@@ -28,6 +28,8 @@ EventBase::EventBase(EventType t)
 	Pos::setType(_type == Wave ? FRAMES : TICKS);
 	refCount = 0;
 	_selected = false;
+	m_leftclip = 0;
+	m_rightclip = 0;
 }
 
 EventBase::EventBase(const EventBase& ev)
@@ -36,6 +38,8 @@ EventBase::EventBase(const EventBase& ev)
 	refCount = 0;
 	_selected = ev._selected;
 	_type = ev._type;
+	m_leftclip = ev.m_leftclip;
+	m_rightclip = ev.m_rightclip;
 }
 
 //---------------------------------------------------------
@@ -403,6 +407,23 @@ int Event::spos() const
 void Event::setSpos(int s)
 {
 	ev->setSpos(s);
+}
+
+int Event::rightClip() const
+{
+	return ev->rightClip();
+}
+void Event::setRightClip(int clip)
+{
+	ev->setRightClip(clip);
+}
+int Event::leftClip() const
+{
+	return ev->leftClip();
+}
+void Event::setLeftClip(int clip)
+{
+	ev->setLeftClip(clip);
 }
 
 SndFileR Event::sndFile() const

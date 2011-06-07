@@ -100,7 +100,7 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 				//event.read(srcOffset, bpp, channels(), nn, false);
 				//event.readAudio(srcOffset, bpp, channels(), nn, doSeek, false);
 				// p3.3.33
-				event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, false);
+				event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, true);
 
 			}
 		}
@@ -113,14 +113,6 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 			for (unsigned int j = 0; j < samples; ++j)
 			{
 				bp[i][j] += denormalBias;
-
-				/*
-				// p3.3.41
-				if(j & 1)
-				  bp[i][j] -=denormalBias;
-				else
-				  bp[i][j] +=denormalBias;
-				 */
 			}
 	}
 

@@ -307,6 +307,7 @@ static void readConfigMidiPort(Xml& xml)
 	int doc = 0;
 	MidiSyncInfo tmpSi;
 	int type = MidiDevice::ALSA_MIDI;
+	bool cachenrpn = false;
 
 	for (;;)
 	{
@@ -354,6 +355,10 @@ static void readConfigMidiPort(Xml& xml)
 				else if(tag == "midiPreset")
 				{
 					presets.append(readMidiPortPreset(xml));
+				}
+				else if(tag == "cacheNRPN")
+				{
+					cachenrpn = xml.parseInt();
 				}
 				else
 					xml.unknown("MidiDevice");
@@ -421,6 +426,7 @@ static void readConfigMidiPort(Xml& xml)
 					{
 						dev->setOpenFlags(openFlags);
 						midiSeq->msgSetMidiDevice(mp, dev);
+						dev->setCacheNRPN(cachenrpn);
 					}
 					return;
 				}
@@ -1218,6 +1224,7 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 			if (dev)
 			{
 				xml.strTag(level, "name", dev->name());
+				xml.intTag(level, "cacheNRPN", (int)dev->cacheNRPN());
 
 				// p3.3.38
 				//if(dynamic_cast<MidiJackDevice*>(dev))

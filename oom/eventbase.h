@@ -29,6 +29,8 @@ class EventBase : public PosLen
 protected:
     int refCount;
     bool _selected;
+	int m_rightclip; //The amount of the sample remove on the right
+	int m_leftclip; //Same as above for the left
 
 public:
     EventBase(EventType t);
@@ -193,7 +195,22 @@ public:
     {
     }
 
-    virtual SndFileR sndFile() const
+	virtual int rightClip() const
+	{
+		return 0;
+	}
+	virtual void setRightClip(int)
+	{
+	}
+	virtual int leftClip() const
+	{
+		return 0;
+	}
+	virtual void setLeftClip(int)
+	{
+	}
+    
+	virtual SndFileR sndFile() const
     {
         return 0;
     }

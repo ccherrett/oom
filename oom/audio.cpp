@@ -345,7 +345,7 @@ void Audio::process(unsigned frames)
 		}
 	}
 
-        OutputList* ol = song->outputs();
+    OutputList* ol = song->outputs();
 	if (idle)
 	{
 		// deliver no audio
@@ -1019,15 +1019,6 @@ void Audio::startRolling()
 	if (!extSyncFlag.value())
 	{
 
-		// Changed by Tim. p3.3.6
-		//if (genMMC)
-		//    midiPorts[txSyncPort].sendSysex(mmcDeferredPlayMsg, sizeof(mmcDeferredPlayMsg));
-		//if (genMCSync) {
-		//      if (curTickPos)
-		//            midiPorts[txSyncPort].sendContinue();
-		//      else
-		//            midiPorts[txSyncPort].sendStart();
-		//      }
 		for (int port = 0; port < MIDI_PORTS; ++port)
 		{
 			MidiPort* mp = &midiPorts[port];
@@ -1035,20 +1026,11 @@ void Audio::startRolling()
 			if (!dev)
 				continue;
 
-			// Shall we check open flags?
-			//if(!(dev->rwFlags() & 0x1) || !(dev->openFlags() & 1))
-			//if(!(dev->openFlags() & 1))
-			//  continue;
-
 			MidiSyncInfo& si = mp->syncInfo();
 
-			//if(genMMC && si.MMCOut())
 			if (si.MMCOut())
-				//mp->sendSysex(mmcDeferredPlayMsg, sizeof(mmcDeferredPlayMsg));
 				mp->sendMMCDeferredPlay();
 
-			//if(genMCSync && si.MCOut())
-			//if(si.MCOut())
 			if (si.MRTOut())
 			{
 				if (curTickPos)
@@ -1058,68 +1040,6 @@ void Audio::startRolling()
 			}
 		}
 	}
-
-	/*
-	for(iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
-	{
-	  MidiDevice* dev = (*imd);
-          
-	  // Shall we check open flags?
-	  //if(!(dev->rwFlags() & 0x1) || !(dev->openFlags() & 1))
-	  //if(!(dev->openFlags() & 1))
-	  //  continue;
-        
-	  int port = dev->midiPort();
-        
-	  // Without this -1 check, interesting sync things can be done by the user without ever
-	  //  assigning any devices to ports !
-	  //if(port < 0 || port > MIDI_PORTS)
-	  if(port < -1 || port > MIDI_PORTS)
-		continue;
-        
-	  MidiSyncInfo& si = dev->syncInfo();
-          
-	  if(port == -1)
-	  // Send straight to the device... Copied from MidiPort.
-	  {
-		if(genMMC && si.MMCOut())
-		{
-		  MidiPlayEvent event(0, 0, ME_SYSEX, mmcDeferredPlayMsg, sizeof(mmcDeferredPlayMsg));
-		  dev->putEvent(event);
-		}
-          
-		if(genMCSync && si.MCOut())
-		{
-		  if(curTickPos)
-		  {
-			MidiPlayEvent event(0, 0, 0, ME_CONTINUE, 0, 0);
-			dev->putEvent(event);
-		  }
-		  else
-		  {
-			MidiPlayEvent event(0, 0, 0, ME_START, 0, 0);
-			dev->putEvent(event);
-		  }
-		}
-	  }
-	  else
-	  // Go through the port...
-	  {
-		MidiPort* mp = &midiPorts[port];
-            
-		if(genMMC && si.MMCOut())
-		  mp->sendSysex(mmcDeferredPlayMsg, sizeof(mmcDeferredPlayMsg));
-          
-		if(genMCSync && si.MCOut())
-		{
-		  if(curTickPos)
-			mp->sendContinue();
-		  else
-			mp->sendStart();
-		}
-	  }
-	}
-	 */
 
 	if (precountEnableFlag
 			&& song->click()

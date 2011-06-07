@@ -200,9 +200,9 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 {
 	/*if(mtype == DBMeter)
 	{*/
-	double range = maxScale - minScale;
-	int y1 = int((maxScale - redScale) * h / range);
-	int y2 = int((maxScale - yellowScale) * h / range);
+	//double range = maxScale - minScale;
+	//int y1 = int((maxScale - redScale) * h / range);
+	//int y2 = int((maxScale - yellowScale) * h / range);
 	QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, h));
 	vuGrad.setColorAt(1, green);
 	//vuGrad.setColorAt(0.3, yellow);

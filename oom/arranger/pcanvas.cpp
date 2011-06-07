@@ -886,12 +886,13 @@ void PartCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
 
 	int endtick = (p->tick() + p->lenTick());
 	int snappedpos = AL::sigmap.raster(i->x(), *_raster);
-	printf("PartCanvas::resizeItemLeft snap pos:%d , nosnap pos: %d\n", snappedpos, i->x());
+	//printf("PartCanvas::resizeItemLeft snap pos:%d , nosnap pos: %d\n", snappedpos, i->x());
 	if (noSnap)
 	{
 		snappedpos = i->x();
 	}
 	song->cmdResizePartLeft(t, p, snappedpos, endtick);
+	//redraw();
 }/*}}}*/
 
 CItem* PartCanvas::addPartAtCursor(Track* track)
@@ -2530,6 +2531,10 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 			printf("drawWavePart: channels==0! %s\n", f.name().toLatin1().constData());
 			continue;
 		}
+
+		//unsigned clipframes = (f.samples() - event.spos());
+		//printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d event lenframe=%d, event.frame=%d part_start=%d part_length=%d\n", 
+		//		f.samples(), f.channels(), event.spos(), clipframes, event.lenFrame(), event.frame(), wp->frame(), wp->lenFrame());
 
 		int xScale;
 		int pos;
