@@ -66,6 +66,9 @@
 #include "rmap.h"
 #include "shortcuts.h"
 
+static int rasterTable[] = {
+	1, 0, 768, 384, 192, 96
+};
 //---------------------------------------------------------
 //   Arranger::setHeaderToolTips
 //---------------------------------------------------------
@@ -695,6 +698,16 @@ void Arranger::trackSelectionChanged()
 		{
 			vscroll->setValue(trackYPos - (canvas->height() / 2));
 		}
+		if(selected->isMidiTrack())
+		{
+			raster->setCurrentIndex(config.midiRaster);
+			//printf("Setting midi raster in trackSelectionChanged(%d)\n", config.midiRaster);
+		}
+		else
+		{
+			raster->setCurrentIndex(config.audioRaster);
+			//printf("Setting audio raster in trackSelectionChanged(%d)\n", config.audioRaster);
+		}
 	}
 }
 
@@ -822,14 +835,18 @@ void Arranger::readStatus(Xml& xml)
 //   setRaster
 //---------------------------------------------------------
 
-void Arranger::_setRaster(int index)
+void Arranger::_setRaster(int index, bool setDefault)
 {
-	static int rasterTable[] = {
-		1, 0, 768, 384, 192, 96
-	};
 	_raster = rasterTable[index];
 	// Set the audio record part snapping.
 	song->setArrangerRaster(_raster);
+	if(selected && setDefault)
+	{
+		if(selected->isMidiTrack())
+			config.midiRaster = index;
+		else
+			config.audioRaster = index;
+	}
 	canvas->redraw();
 }
 

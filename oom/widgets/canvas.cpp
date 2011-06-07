@@ -17,7 +17,13 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QComboBox>
 
+#include "app.h"
+#include "config.h"
+#include "globals.h"
+#include "gconfig.h"
+#include "arranger.h"
 #include "song.h"
 #include "event.h"
 #include "citem.h"
@@ -769,6 +775,16 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			if (_curItem)
 			{
 				Track* ctrack = _curItem->part()->track();
+				if(ctrack && ctrack->isMidiTrack())
+				{
+					oom->arranger->_setRaster(config.midiRaster, false);
+					oom->arranger->raster->setCurrentIndex(config.midiRaster);
+				}
+				else
+				{
+					oom->arranger->_setRaster(config.audioRaster, false);
+					oom->arranger->raster->setCurrentIndex(config.audioRaster);
+				}
 				if(shift && ctrack->type() == Track::WAVE)
 				{
 					_drag = DRAG_RESIZE_LEFT;
@@ -805,7 +821,12 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			}
 			deselectAll();
 			if (_curItem)
+			{
 				selectItem(_curItem, true);
+				//song->deselectTracks();
+				//_curItem->part()->track()->setSelected(true);
+				//song->update(SC_SELECTION);
+			}
 			updateSelection();
 			redraw();
 			break;

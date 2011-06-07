@@ -136,7 +136,7 @@ public slots:
     void configChanged();
     void controllerChanged(Track *t);
     void showTrackViews();
-    void _setRaster(int);
+    void _setRaster(int, bool setDefault = true);
     void verticalScrollSetYpos(unsigned);
 	void addCanvasPart(Track*);
 

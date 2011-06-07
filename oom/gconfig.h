@@ -149,6 +149,8 @@ struct GlobalConfigValues
 	QString lsClientHost;
 	int lsClientRetry;
 	int lsClientTimeout;
+	int audioRaster;
+	int midiRaster;
 };
 
 extern GlobalConfigValues config;

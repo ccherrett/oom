@@ -173,6 +173,8 @@ GlobalConfigValues config = {
 	8888, //LSCP client port
 	QString("localhost"), //LSCP default hostname
 	5, //LSCP client retries
-	1  //LSCP client timeout
+	1,  //LSCP client timeout
+	0, //Default audio raster index
+	1 //Default midi raster index
 };
 
