@@ -2313,8 +2313,8 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 
 		p.setPen(pen);
 		// Hm, put some kind of lower limit? If so do that globally to the adjustment.
-		QColor c(Qt::black);
-		c.setAlpha(config.globalAlphaBlend);
+		QColor c(0,0,0,0);
+		//c.setAlpha(config.globalAlphaBlend);
 		p.setBrush(c);
 		p.drawRect(r);
 	}
