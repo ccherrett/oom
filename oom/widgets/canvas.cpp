@@ -721,6 +721,17 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			case PointerTool:
 			if (_curItem)
 			{
+				Track* ctrack = _curItem->part()->track();
+				if(ctrack && ctrack->isMidiTrack())
+				{
+					oom->arranger->_setRaster(config.midiRaster, false);
+					oom->arranger->raster->setCurrentIndex(config.midiRaster);
+				}
+				else
+				{
+					oom->arranger->_setRaster(config.audioRaster, false);
+					oom->arranger->raster->setCurrentIndex(config.audioRaster);
+				}
 				if (_curItem->part() != _curPart)
 				{
 					_curPart = _curItem->part();
