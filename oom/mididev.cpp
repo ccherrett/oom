@@ -74,10 +74,16 @@ void MidiDevice::init()
 	_rwFlags = 3;
 	_openFlags = 3;
 	_port = -1;
-	m_nrpnCache.msb = -1;
-	m_nrpnCache.lsb = -1;
-	m_nrpnCache.data_msb = -1;
-	m_nrpnCache.data_lsb = -1; //Currently unused till further notice
+	m_nrpnCache.clear();
+	for (unsigned int i = 0; i < MIDI_CHANNELS + 1; ++i)
+	{
+		NRPNCache* c = new NRPNCache;
+		c->msb = -1;
+		c->lsb = -1;
+		c->data_msb = -1;
+		c->data_lsb = -1; //Currently unused till further notice
+		m_nrpnCache.insert(i, c);
+	}
 }
 
 //---------------------------------------------------------
@@ -114,6 +120,7 @@ MidiDevice::MidiDevice(const QString& n)
 void MidiDevice::monitorEvent(const MidiRecordEvent& event)
 {
 	int type = event.type();
+	int chan = event.channel();
 	if(type == ME_CONTROLLER && midiMonitor->isManagedInputPort(_port))/*{{{*/
 	{
 		if(cacheNRPN())
@@ -122,22 +129,22 @@ void MidiDevice::monitorEvent(const MidiRecordEvent& event)
 			{
 				//if(m_nrpnCache.msb != event.dataB())
 				//	resetNRPNCache();
-				m_nrpnCache.msb = event.dataB();
+				m_nrpnCache.value(chan)->msb = event.dataB();
 				//printf("Caching nrpn MSB with value: %d\n", event.dataB());
 			}
 			else if(event.dataA() == CTRL_LNRPN) //NRPN LSB
 			{
 				//if(m_nrpnCache.lsb != event.dataB())
 				//	resetNRPNCache();
-				m_nrpnCache.lsb = event.dataB();
+				m_nrpnCache.value(chan)->lsb = event.dataB();
 				//printf("Caching nrpn LSB with value: %d\n", event.dataB());
 			}
-			else if(event.dataA() == CTRL_HDATA && hasNRPNIndex()) //NRPN Data MSB
+			else if(event.dataA() == CTRL_HDATA && hasNRPNIndex(chan)) //NRPN Data MSB
 			{
 				//TODO: Create the event and send it to the monitor
 				MidiRecordEvent ev(event);
 				ev.setPort(_port);
-				int val = CTRL_NRPN_OFFSET | (m_nrpnCache.msb << 8) | m_nrpnCache.lsb;
+				int val = CTRL_NRPN_OFFSET | (m_nrpnCache.value(chan)->msb << 8) | m_nrpnCache.value(chan)->lsb;
 				ev.setA(val);
 				midiMonitor->msgSendMidiInputEvent(ev);
 				//printf("Sending NRPN event with value: %d\n", val);
@@ -153,7 +160,7 @@ void MidiDevice::monitorEvent(const MidiRecordEvent& event)
 			else //Normal event
 			{
 				//TODO: Reset the cache events
-				resetNRPNCache();
+				resetNRPNCache(chan);
 				MidiRecordEvent ev(event);
 				ev.setPort(_port);
 				midiMonitor->msgSendMidiInputEvent(ev);
@@ -162,7 +169,7 @@ void MidiDevice::monitorEvent(const MidiRecordEvent& event)
 		else
 		{
 			//TODO: Reset the cache events
-			resetNRPNCache();
+			resetNRPNCache(chan);
 			MidiRecordEvent ev(event);
 			ev.setPort(_port);
 			midiMonitor->msgSendMidiInputEvent(ev);
