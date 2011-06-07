@@ -2480,10 +2480,21 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 {
 	//printf("PartCanvas::drawWavePart bb.x:%d bb.y:%d bb.w:%d bb.h:%d  pr.x:%d pr.y:%d pr.w:%d pr.h:%d\n",
 	//  bb.x(), bb.y(), bb.width(), bb.height(), _pr.x(), _pr.y(), _pr.width(), _pr.height());
+	//QColor green = QColor(143, 75, 236);
+	//QColor green = QColor(133, 182, 94);
 	QColor green = QColor(49, 175, 197);
 	QColor yellow = QColor(127,12,128);
 	QColor red = QColor(197, 49, 87);
 	QColor rms_color = QColor(0,19,23);
+	
+	if(wp->selected())
+	{
+		////////green = QColor(249, 197, 105);
+		green = QColor(219, 168, 79);
+		yellow = QColor(127,12,128);
+		red = QColor(197, 49, 87);
+		rms_color = QColor(0,19,23);
+	}
 
 	QRect rr = p.worldMatrix().mapRect(bb);
 	QRect pr = p.worldMatrix().mapRect(_pr);
@@ -2584,9 +2595,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				vuGrad.setColorAt(0.5, green);
 				vuGrad.setColorAt(0.10, yellow);
 				vuGrad.setColorAt(0, red);*/
-				QPen myPen = QPen();
+				//QPen myPen = QPen();
 				//myPen.setBrush(QBrush(vuGrad));
-				p.setPen(myPen);
+				//p.setPen(myPen);
 				p.setPen(green);
 				
 				p.drawLine(i, y - peak - cc, i, y + peak);
@@ -2629,11 +2640,10 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 						vuGrad.setColorAt(0.5, green);
 						vuGrad.setColorAt(0.10, yellow);
 						vuGrad.setColorAt(0, red);*/
-						QPen myPen = QPen();
+						//QPen myPen = QPen();
 						//myPen.setBrush(QBrush(vuGrad));
-						p.setPen(myPen);
+						///p.setPen(myPen);
 						p.setPen(green);
-						//p.setPen(QColor(Qt::darkGray));
 						p.drawLine(i, y - peak - cc, i, y + peak);
 						//p.drawLine(0, pr.height(), 3000, pr.height());
 					}
@@ -2651,9 +2661,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 						vuGrad.setColorAt(0.5, green);
 						vuGrad.setColorAt(0.10, yellow);
 						vuGrad.setColorAt(0, red);*/
-						QPen myPen = QPen();
+						//QPen myPen = QPen();
 						//myPen.setBrush(QBrush(vuGrad));
-						p.setPen(myPen);
+						//p.setPen(myPen);
 						p.setPen(green);
 						p.drawLine(i, y - peak - cc, i, y + peak);
 						
