@@ -246,6 +246,7 @@ extern QPixmap* view_markerIcon;
 extern QPixmap* view_mixerIcon;
 extern QPixmap* view_transport_windowIcon;
 
+extern QPixmap* expandIcon;
 extern QPixmap* monoIcon;
 extern QPixmap* stereoIcon;
 extern QPixmap* automationIcon;
