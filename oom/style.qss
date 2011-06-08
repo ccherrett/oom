@@ -322,7 +322,8 @@ QFrame#MixerAudioInStrip {
 }
 QFrame#MixerAudioInAuxbox { 
 	border: 1px solid #29292a;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #749f71, stop:0.5 #4d6a4c);
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #749f71, stop:0.5 #4d6a4c);*/
+	background-color: #4d6a4c;
 }
 QFrame#MixerAudioInStrip QLabel { 
 	background-color: none;
@@ -354,7 +355,8 @@ QFrame#MixerSynthStrip {
 }
 QFrame#MixerSynthAuxbox { 
 	border: 1px solid #29292a;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #9b5a26, stop:0.5 #523218);
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #9b5a26, stop:0.5 #523218);*/
+	background-color: #523218;
 }
 QFrame#MixerSynthStrip QLabel { 
 	background-color: none;
@@ -389,7 +391,8 @@ QFrame#MixerWaveStrip {
 QFrame#MixerWaveAuxbox { 
 	border: 1px solid #5e5e5f;
 	/*background-color: #1d1f20;*/
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4f7077, stop:0.5 #1e2122);
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4f7077, stop:0.5 #1e2122);*/
+	background-color: #1e2122;
 }
 QFrame#MixerWaveStrip QLabel { 
 	background-color: none;
@@ -421,7 +424,8 @@ QFrame#MidiTrackStrip {
 }
 QFrame#MidiTrackAuxbox { 
 	border: 1px solid #29292a;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #504655, stop:0.5 #28222c);
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #504655, stop:0.5 #28222c);*/
+	background-color: #28222c;
 }
 QFrame#MidiTrackStrip QLabel { 
 	background-color: none;
@@ -450,7 +454,8 @@ QFrame#MidiDrumTrackStrip {
 }
 QFrame#MidiDrumTrackAuxbox { 
 	border: 1px solid #29292a;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #807187, stop:0.5 #504655);
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #807187, stop:0.5 #504655);*/
+	background-color: #504655;
 }
 QFrame#MidiDrumTrackStrip QLabel { 
 	background-color: none;
@@ -481,7 +486,8 @@ QFrame#MixerAudioBussStrip {
 }
 QFrame#MixerAudioBussAuxbox { 
 	border: 1px solid #29292a;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6c797b, stop:0.5 #3a4041);
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6c797b, stop:0.5 #3a4041);*/
+	background-color: #3a4041;
 }
 QFrame#MixerAudioBussStrip QLabel { 
 	background-color: none;
@@ -514,7 +520,8 @@ QFrame#MixerAuxStrip {
 }
 QFrame#MixerAuxAuxbox { 
 	border: 1px solid #29292a;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #696eb0, stop:0.5 #343652);
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #696eb0, stop:0.5 #343652);*/
+	background-color: #343652;
 }
 QFrame#MixerAuxStrip QLabel { 
 	background-color: none;
@@ -547,7 +554,8 @@ QFrame#MixerAudioOutStrip {
 }
 QFrame#MixerAudioOutAuxbox { 
 	border: 1px solid #29292a;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ab3232, stop:0.5 #4e1010);
+    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ab3232, stop:0.5 #4e1010);*/
+	background-color: #4e1010;
 }
 QFrame#MixerAudioOutStrip QLabel { 
 	background-color: none;
