@@ -472,6 +472,7 @@ QPixmap* view_markerIcon;
 QPixmap* view_mixerIcon;
 QPixmap* view_transport_windowIcon;
 
+QPixmap* expandIcon;
 QPixmap* monoIcon;
 QPixmap* stereoIcon;
 QPixmap* automationIcon;
@@ -742,6 +743,7 @@ void initIcons()
       view_mixerIcon                                = new MPIXMAP(view_mixer_xpm, NULL);
       view_transport_windowIcon                     = new MPIXMAP(view_transport_window_xpm, NULL);
 
+      expandIcon                                    = new MPIXMAP(":/images/icons/mixer-expand.png", NULL);
       monoIcon                                      = new MPIXMAP(":/images/icons/mixer-mono.png", NULL);
       stereoIcon                                    = new MPIXMAP(":/images/icons/mixer-stereo.png", NULL);
       automationIcon                                = new MPIXMAP(":/images/icons/automation.png", NULL);
