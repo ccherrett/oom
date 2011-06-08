@@ -28,8 +28,8 @@ class EffectRack : public QListWidget
     AudioTrack* track;
     Q_OBJECT
 
-    virtual QSize minimumSizeHint() const;
-    virtual QSize sizeHint() const;
+    //virtual QSize minimumSizeHint() const;
+    //virtual QSize sizeHint() const;
 
     void startDrag(int idx);
     void initPlugin(Xml xml, int idx);

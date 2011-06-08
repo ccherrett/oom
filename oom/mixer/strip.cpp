@@ -71,8 +71,8 @@ Strip::Strip(QWidget* parent, Track* t)
 	//    label
 	//---------------------------------------------
 
-	QPixmap topRack(":/images/top_rack.png");
-	QPixmap bottomRack(":/images/bottom_rack.png");
+	QPixmap topRack(":/images/top_rack_midi.png");//":/images/top_rack.png");
+	QPixmap bottomRack(":/images/bottom_rack_midi.png");
 	switch (track->type())/*{{{*/
 	{
 		case Track::AUDIO_OUTPUT:
@@ -215,14 +215,14 @@ void Strip::layoutUi()/*{{{*/
 	
 	//m_mainVBoxLayout->addItem(new QSpacerItem(0, 4));
 
-	m_rackBox = new QWidget(this);
-	m_rackBox->setObjectName(QString::fromUtf8("m_rackBox"));
-	rackBox = new QVBoxLayout(m_rackBox);
+	//m_rackBox = new QWidget(this);
+	//m_rackBox->setObjectName(QString::fromUtf8("m_rackBox"));
+	/*rackBox = new QVBoxLayout(m_rackBox);
 	rackBox->setObjectName(QString::fromUtf8("rackBox"));
 	rackBox->setSpacing(0);
 	rackBox->setContentsMargins(0, 0, 0, 0);
 	
-	m_mainVBoxLayout->addWidget(m_rackBox);
+	m_mainVBoxLayout->addWidget(m_rackBox);*/
 	
 	m_mainVBoxLayout->addItem(new QSpacerItem(0, 4));
 
@@ -253,7 +253,7 @@ void Strip::layoutUi()/*{{{*/
 	m_vuContainer->setMaximumSize(QSize(55, 2048));
 	m_vuBox = new QHBoxLayout(m_vuContainer);
 	m_vuBox->setObjectName(QString::fromUtf8("m_vuBox"));
-	m_vuBox->setContentsMargins(0, 0, 0, 0);
+	m_vuBox->setContentsMargins(3, 0, 0, 0);
 	m_vuBox->setSpacing(0);
 	
 	horizontalLayout_2->addWidget(m_vuContainer);
@@ -318,6 +318,16 @@ void Strip::layoutUi()/*{{{*/
 	
 	horizontalLayout_2->addWidget(m_buttonStrip);
 	
+	m_tabWidget = new QTabWidget(m_mixerBox);
+	m_tabWidget->setObjectName(QString::fromUtf8("m_tabWidget"));
+	m_tabWidget->setTabPosition(QTabWidget::North);
+	m_tabWidget->setIconSize(QSize(0, 0));
+	auxTab = new QWidget();
+	auxTab->setObjectName(QString::fromUtf8("auxTab"));
+	auxTabLayout = new QVBoxLayout(auxTab);
+	auxTabLayout->setSpacing(0);
+	auxTabLayout->setContentsMargins(0, 0, 0, 0);
+	auxTabLayout->setObjectName(QString::fromUtf8("auxTabLayout"));
 	
 	verticalLayout_5->addLayout(horizontalLayout_2);
 	
@@ -341,7 +351,7 @@ void Strip::layoutUi()/*{{{*/
 	
 	horizontalLayout->addWidget(m_mixerBox);
 	
-	m_auxScroll = new QScrollArea(this);
+	m_auxScroll = new QScrollArea(auxTab);
 	m_auxScroll->setObjectName(QString::fromUtf8("m_auxScroll"));
 	QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	sizePolicy2.setHorizontalStretch(1);
@@ -395,7 +405,19 @@ void Strip::layoutUi()/*{{{*/
 	m_auxBox->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
 	m_auxScroll->setWidget(m_auxContainer);
 	
-	horizontalLayout->addWidget(m_auxScroll);
+	m_tabWidget->addTab(auxTab, QString(tr("Aux")));
+
+	auxTabLayout->addWidget(m_auxScroll);
+	fxTab = new QWidget();
+	fxTab->setObjectName(QString::fromUtf8("fxTab"));
+	rackBox = new QVBoxLayout(fxTab);
+	rackBox->setSpacing(0);
+	rackBox->setContentsMargins(0, 0, 0, 0);
+	rackBox->setObjectName(QString::fromUtf8("rackBox"));
+	
+	m_tabWidget->addTab(fxTab, QString(tr("FX")));
+	
+	horizontalLayout->addWidget(m_tabWidget);
 	
 	horizontalLayout->setStretch(0, 2);
 	
@@ -492,7 +514,7 @@ void Strip::setLabelText()
 
 void Strip::toggleAuxPanel(bool open)
 {
-	m_auxScroll->setVisible(open);
+	m_tabWidget->setVisible(open);
 	m_collapsed = !open;
 	setLabelText();
 }

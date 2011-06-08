@@ -31,6 +31,7 @@ class QHBoxLayout;
 class TransparentToolButton;
 class QScrollArea;
 class QSPacerItem;
+class QTabWidget;
 
 static const int STRIP_WIDTH = 65;
 
@@ -51,8 +52,7 @@ protected:
     QLabel *label;
     QLabel *toprack;
 	QLabel *brack;
-    QWidget *m_rackBox;
-    QVBoxLayout *rackBox;
+    //QWidget *m_rackBox;
     QHBoxLayout *horizontalLayout;
     QWidget *m_mixerBox;
     QVBoxLayout *verticalLayout_5;
@@ -76,6 +76,11 @@ protected:
     QScrollArea *m_auxScroll;
     QFrame *m_auxContainer;
     QVBoxLayout *m_auxBox;
+	QTabWidget* m_tabWidget;
+	QWidget *auxTab;
+	QVBoxLayout *auxTabLayout;
+	QWidget *fxTab;
+    QVBoxLayout *rackBox;
 
     int _curGridRow;
     Meter* meter[MAX_CHANNELS];

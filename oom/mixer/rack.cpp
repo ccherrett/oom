@@ -78,9 +78,9 @@ EffectRack::EffectRack(QWidget* parent, AudioTrack* t)
 	setFont(config.fonts[1]);
 
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setSelectionMode(QAbstractItemView::SingleSelection);
-	setMaximumHeight(19 * PipelineDepth);
+	//setMaximumHeight(19 * PipelineDepth);
 	for (int i = 0; i < PipelineDepth; ++i)
 		new RackSlot(this, track, i);
 	updateContents();
@@ -132,7 +132,7 @@ void EffectRack::songChanged(int typ)
 //   minimumSizeHint
 //---------------------------------------------------------
 
-QSize EffectRack::minimumSizeHint() const
+/*QSize EffectRack::minimumSizeHint() const
 {
 	return QSize(10, 19 * PipelineDepth);
 }
@@ -144,7 +144,7 @@ QSize EffectRack::minimumSizeHint() const
 QSize EffectRack::sizeHint() const
 {
 	return minimumSizeHint();
-}
+}*/
 
 void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 {

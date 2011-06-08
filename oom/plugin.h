@@ -690,7 +690,7 @@ public:
 //    chain of connected efx inserts
 //---------------------------------------------------------
 
-const int PipelineDepth = 4;
+const int PipelineDepth = 100;
 
 class Pipeline : public std::vector<PluginI*>
 {

@@ -623,7 +623,7 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
 	{
 		pl->setPrecision(0);
 	}
-	pl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	pl->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
 	QString label;
 	if (type == 0)
@@ -641,16 +641,16 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
 	plb->setAlignment(Qt::AlignCenter);
 
 
+	QHBoxLayout *container = new QHBoxLayout();
+	container->setContentsMargins(0, 0, 0, 0);
+	container->setSpacing(0);
 	QVBoxLayout *labelBox = new QVBoxLayout();
 	labelBox->setContentsMargins(0, 0, 0, 0);
 	labelBox->setSpacing(0);
 	labelBox->addWidget(plb);
-	labelBox->addWidget(pl);
 	if(type == 0)
 	{ //Pan
-		QHBoxLayout *container = new QHBoxLayout();
-		container->setContentsMargins(0, 0, 0, 0);
-		container->setSpacing(0);
+		labelBox->addWidget(pl);
 		container->addLayout(labelBox);
 		container->addWidget(knob);
 		m_panBox->addLayout(container);
@@ -658,7 +658,9 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
 	else
 	{ //Aux
 		plb->setToolTip(name);
-		labelBox->addWidget(knob);
+		container->addWidget(pl);
+		container->addWidget(knob);
+		labelBox->addLayout(container);
 		m_auxBox->addLayout(labelBox);
 	}
 	connect(knob, SIGNAL(valueChanged(double, int)), pl, SLOT(setValue(double)));
