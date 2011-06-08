@@ -334,6 +334,7 @@ void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
 	dl->setFrame(true);
 	dl->setPrecision(0);
 	dl->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+	dl->setAlignment(Qt::AlignCenter);
 	dl->setEnabled(enabled);
 
 	double dlv;
@@ -371,9 +372,11 @@ void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
 
 	QHBoxLayout *container = new QHBoxLayout();
 	container->setContentsMargins(0, 0, 0, 0);
+	container->setAlignment(Qt::AlignHCenter|Qt::AlignCenter);
 	container->setSpacing(0);
 	QVBoxLayout *labelBox = new QVBoxLayout();
 	labelBox->setContentsMargins(0, 0, 0, 0);
+	labelBox->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
 	labelBox->setSpacing(0);
 	labelBox->addWidget(lb);
 	if(idx == KNOB_PAN)
@@ -385,6 +388,7 @@ void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
 	}
 	else
 	{ //Controller
+		container->addItem(new QSpacerItem(12, 0));
 		container->addWidget(dl);
 		container->addWidget(knob);
 		labelBox->addLayout(container);

@@ -617,6 +617,7 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
 	pl->setFont(config.fonts[1]);
 	pl->setBackgroundRole(QPalette::Mid);
 	pl->setFrame(true);
+	pl->setAlignment(Qt::AlignCenter);
 	if (type == 0)
 		pl->setPrecision(2);
 	else
@@ -644,9 +645,11 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
 	QHBoxLayout *container = new QHBoxLayout();
 	container->setContentsMargins(0, 0, 0, 0);
 	container->setSpacing(0);
+	container->setAlignment(Qt::AlignHCenter|Qt::AlignCenter);
 	QVBoxLayout *labelBox = new QVBoxLayout();
 	labelBox->setContentsMargins(0, 0, 0, 0);
 	labelBox->setSpacing(0);
+	labelBox->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
 	labelBox->addWidget(plb);
 	if(type == 0)
 	{ //Pan
@@ -658,6 +661,7 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
 	else
 	{ //Aux
 		plb->setToolTip(name);
+		container->addItem(new QSpacerItem(8, 0));
 		container->addWidget(pl);
 		container->addWidget(knob);
 		labelBox->addLayout(container);

@@ -32,6 +32,7 @@ class TransparentToolButton;
 class QScrollArea;
 class QSPacerItem;
 class QTabWidget;
+class QPixmap;
 
 static const int STRIP_WIDTH = 65;
 
@@ -44,6 +45,10 @@ class Strip : public QFrame
     Q_OBJECT
 
 	void layoutUi();
+	QPixmap topRack;
+	QPixmap topRackLarge;
+	QPixmap bottomRack;
+	QPixmap bottomRackLarge;
 
 protected:
     Track* track;

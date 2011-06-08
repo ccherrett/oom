@@ -54,7 +54,7 @@ Strip::Strip(QWidget* parent, Track* t)
 	//setBackgroundRole(QPalette::Mid);
 	//setFrameStyle(Panel | Raised);
 	//setLineWidth(2);
-
+	setMaximumWidth(170);
 	// NOTE: Workaround for improper disabled button text colour (at least with Oxygen colours).
 	// Just set the parent palette.
 	QPalette pal(palette());
@@ -71,8 +71,13 @@ Strip::Strip(QWidget* parent, Track* t)
 	//    label
 	//---------------------------------------------
 
-	QPixmap topRack(":/images/top_rack_midi.png");//":/images/top_rack.png");
-	QPixmap bottomRack(":/images/bottom_rack_midi.png");
+	topRack = QPixmap(":/images/top_rack_midi.png");//":/images/top_rack.png");
+	bottomRack = QPixmap(":/images/bottom_rack_midi.png");
+	topRackLarge = QPixmap(":/images/top_rack_large.png");
+	bottomRackLarge = QPixmap(":/images/bottom_rack_large.png");
+	//Add your top image here
+	toprack->setPixmap(topRackLarge);
+	brack->setPixmap(bottomRackLarge);
 	switch (track->type())/*{{{*/
 	{
 		case Track::AUDIO_OUTPUT:
@@ -138,8 +143,8 @@ Strip::Strip(QWidget* parent, Track* t)
 		{
 			label->setObjectName("MidiTrackLabel");
 			m_auxContainer->setObjectName("MidiTrackAuxbox");
-			topRack = QPixmap(":/images/top_rack_midi.png");
-			bottomRack = QPixmap(":/images/bottom_rack_midi.png");
+			//topRack = QPixmap(":/images/top_rack_midi.png");
+			//bottomRack = QPixmap(":/images/bottom_rack_midi.png");
 			m_btnStereo->setVisible(false);
 			hasRecord = true;
 			hasAux = true; //Used for controller knobs in midi
@@ -152,8 +157,8 @@ Strip::Strip(QWidget* parent, Track* t)
 		{
 			label->setObjectName("MidiDrumTrackLabel");
 			m_auxContainer->setObjectName("MidiDrumTrackAuxbox");
-			topRack = QPixmap(":/images/top_rack_midi.png");
-			bottomRack = QPixmap(":/images/bottom_rack_midi.png");
+			//topRack = QPixmap(":/images/top_rack_midi.png");
+			//bottomRack = QPixmap(":/images/bottom_rack_midi.png");
 			m_btnStereo->setVisible(false);
 			hasRecord = true;
 			hasAux = true; //Used for controller knobs in midi
@@ -178,9 +183,6 @@ Strip::Strip(QWidget* parent, Track* t)
 
 	setLabelText();
 
-	//Add your top image here
-	toprack->setPixmap(topRack);
-	brack->setPixmap(bottomRack);
 }
 
 //---------------------------------------------------------
@@ -516,6 +518,16 @@ void Strip::toggleAuxPanel(bool open)
 {
 	m_tabWidget->setVisible(open);
 	m_collapsed = !open;
+	if(open)
+	{
+		toprack->setPixmap(topRackLarge);
+		brack->setPixmap(bottomRackLarge);
+	}
+	else
+	{
+		toprack->setPixmap(topRack);
+		brack->setPixmap(bottomRack);
+	}
 	setLabelText();
 }
 
