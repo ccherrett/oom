@@ -124,7 +124,7 @@ private slots:
     void showGroupTracksChanged(bool);
     void showAuxTracksChanged(bool);
     void showSyntiTracksChanged(bool);
-    void toggleShowEffectsRack();
+    void toggleShowEffectsRack(bool);
 
     //protected:
     //   virtual bool event(QEvent* event);

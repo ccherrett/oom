@@ -1779,16 +1779,17 @@ void AudioStrip::resetPeaks()
 	sl->setStyleSheet(slDefaultStyle);
 }
 
-void AudioStrip::toggleShowEffectsRack()
+void AudioStrip::toggleShowEffectsRack(bool open)
 {
-	if (rack->isVisible())
+	toggleAuxPanel(open);
+	/*if (rack->isVisible())
 	{
 		rack->hide();
 	}
 	else
 	{
 		rack->show();
-	}
+	}*/
 }
 
 //---------------------------------------------------------

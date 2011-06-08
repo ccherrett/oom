@@ -85,7 +85,7 @@ Strip::Strip(QWidget* parent, Track* t)
 			label->setObjectName("MixerAudioOutLabel");
 			m_auxContainer->setObjectName("MixerAudioOutAuxbox");
 			m_btnAux->toggle(); //Collapse the box by default
-			m_btnAux->setEnabled(false);
+			//m_btnAux->setEnabled(false);
 			hasRecord = true;
 			hasAux = false;
 			hasStereo = true;
@@ -105,7 +105,7 @@ Strip::Strip(QWidget* parent, Track* t)
 			label->setObjectName("MixerAuxLabel");
 			m_auxContainer->setObjectName("MixerAuxAuxbox");
 			m_btnAux->toggle(); //Collapse the box by default
-			m_btnAux->setEnabled(false);
+			//m_btnAux->setEnabled(false);
 			hasRecord = false;
 			hasAux = false;
 			hasStereo = true;
@@ -170,6 +170,10 @@ Strip::Strip(QWidget* parent, Track* t)
 			break;
 	}/*}}}*/
 
+	if(hasAux)
+		m_tabWidget->addTab(auxTab, QString(tr("Aux")));
+	if(!track->isMidiTrack())
+		m_tabWidget->addTab(fxTab, QString(tr("FX")));
 	//printf("Strip::Strip w:%d frw:%d layoutmarg:%d lx:%d ly:%d lw:%d lh:%d\n", STRIP_WIDTH, frameWidth(), layout->margin(), label->x(), label->y(), label->width(), label->height());
 
 	label->setTextFormat(Qt::PlainText);
@@ -409,7 +413,6 @@ void Strip::layoutUi()/*{{{*/
 	m_auxBox->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
 	m_auxScroll->setWidget(m_auxContainer);
 	
-	m_tabWidget->addTab(auxTab, QString(tr("Aux")));
 
 	auxTabLayout->addWidget(m_auxScroll);
 	fxTab = new QWidget();
@@ -419,7 +422,8 @@ void Strip::layoutUi()/*{{{*/
 	rackBox->setContentsMargins(0, 0, 0, 0);
 	rackBox->setObjectName(QString::fromUtf8("rackBox"));
 	
-	m_tabWidget->addTab(fxTab, QString(tr("FX")));
+//	m_tabWidget->addTab(auxTab, QString(tr("Aux")));
+//	m_tabWidget->addTab(fxTab, QString(tr("FX")));
 	
 	horizontalLayout->addWidget(m_tabWidget);
 	

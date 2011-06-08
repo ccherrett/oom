@@ -109,11 +109,11 @@ private slots:
 
 protected slots:
     virtual void heartBeat();
-	virtual void toggleAuxPanel(bool);
     void setAutomationType(int t, int);
 
 public slots:
     void resetPeaks();
+	virtual void toggleAuxPanel(bool);
     virtual void songChanged(int) = 0;
 
 public:

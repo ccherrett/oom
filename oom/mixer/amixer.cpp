@@ -188,6 +188,7 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 
 	toggleShowEffectsRackAction = new QAction(tr("Show/hide Effects Rack"), actionItems);
 	toggleShowEffectsRackAction->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
+	toggleShowEffectsRackAction->setCheckable(true);
 
 	showMidiTracksId->setCheckable(true);
 	//showDrumTracksId->setCheckable(true);
@@ -208,7 +209,7 @@ AudioMixerApp::AudioMixerApp(QWidget* parent, MixerConfig* c)
 	connect(showGroupTracksId, SIGNAL(triggered(bool)), SLOT(showGroupTracksChanged(bool)));
 	connect(showAuxTracksId, SIGNAL(triggered(bool)), SLOT(showAuxTracksChanged(bool)));
 	//connect(showSyntiTracksId, SIGNAL(triggered(bool)), SLOT(showSyntiTracksChanged(bool)));
-	connect(toggleShowEffectsRackAction, SIGNAL(triggered()), SLOT(toggleShowEffectsRack()));
+	connect(toggleShowEffectsRackAction, SIGNAL(triggered(bool)), SLOT(toggleShowEffectsRack(bool)));
 
 	menuView->addActions(actionItems->actions());
 
@@ -656,15 +657,16 @@ void AudioMixerApp::closeEvent(QCloseEvent* e)
 	e->accept();
 }
 
-void AudioMixerApp::toggleShowEffectsRack()
+void AudioMixerApp::toggleShowEffectsRack(bool toggle)
 {
 	StripList::iterator si = stripList.begin();
 	for (; si != stripList.end(); ++si)
 	{
-		AudioStrip* audioStrip = qobject_cast<AudioStrip*>(*si);
+		Strip* audioStrip = qobject_cast<Strip*>(*si);
 		if (audioStrip)
 		{
-			audioStrip->toggleShowEffectsRack();
+			//audioStrip->toggleShowEffectsRack(toggle);
+			audioStrip->toggleAuxPanel(toggle);
 		}
 
 	}

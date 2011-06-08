@@ -88,7 +88,7 @@ public:
     AudioStrip(QWidget* parent, AudioTrack*);
     ~AudioStrip();
 
-    void toggleShowEffectsRack();
+    void toggleShowEffectsRack(bool);
 };
 
 #endif
