@@ -25,6 +25,7 @@
 #include "gconfig.h"
 #include "app.h"
 #include "audio.h"
+#include "icons.h"
 #include "song.h"
 #include "track.h"
 #include "strip.h"
@@ -275,6 +276,7 @@ void Strip::layoutUi()/*{{{*/
 	m_btnAux->setObjectName(QString::fromUtf8("m_btnAux"));
 	m_btnAux->setCheckable(true);
 	m_btnAux->setChecked(true);
+	m_btnAux->setIcon(*expandIcon);
 	
 	verticalLayout_6->addWidget(m_btnAux);
 	
