@@ -55,7 +55,7 @@ Strip::Strip(QWidget* parent, Track* t)
 	//setBackgroundRole(QPalette::Mid);
 	//setFrameStyle(Panel | Raised);
 	//setLineWidth(2);
-	setMaximumWidth(170);
+	setMaximumWidth(182);
 	// NOTE: Workaround for improper disabled button text colour (at least with Oxygen colours).
 	// Just set the parent palette.
 	QPalette pal(palette());
