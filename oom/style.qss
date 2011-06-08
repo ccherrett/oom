@@ -320,6 +320,10 @@ QFrame#MixerAudioInStrip {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #749f71, stop:0.5 #4d6a4c);
 	border-radius: 7px;
 }
+QFrame#MixerAudioInAuxbox { 
+	border: 1px solid #29292a;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #749f71, stop:0.5 #4d6a4c);
+}
 QFrame#MixerAudioInStrip QLabel { 
 	background-color: none;
 	color: #d7d7d7;
@@ -347,6 +351,10 @@ QFrame#MixerSynthStrip {
 	/*background-color: #523218;*/
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #9b5a26, stop:0.5 #523218);
 	border-radius: 7px;
+}
+QFrame#MixerSynthAuxbox { 
+	border: 1px solid #29292a;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #9b5a26, stop:0.5 #523218);
 }
 QFrame#MixerSynthStrip QLabel { 
 	background-color: none;
@@ -378,6 +386,11 @@ QFrame#MixerWaveStrip {
 	/*border-radius: 3px;*/
 	border-radius: 7px;
 }
+QFrame#MixerWaveAuxbox { 
+	border: 1px solid #5e5e5f;
+	/*background-color: #1d1f20;*/
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4f7077, stop:0.5 #1e2122);
+}
 QFrame#MixerWaveStrip QLabel { 
 	background-color: none;
 	color: #d7d7d7;
@@ -406,6 +419,10 @@ QFrame#MidiTrackStrip {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #504655, stop:0.5 #28222c);
 	border-radius: 7px;
 }
+QFrame#MidiTrackAuxbox { 
+	border: 1px solid #29292a;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #504655, stop:0.5 #28222c);
+}
 QFrame#MidiTrackStrip QLabel { 
 	background-color: none;
 	color: #d6dfd6;
@@ -430,6 +447,10 @@ QFrame#MidiDrumTrackStrip {
 	border: 1px solid #29292a;
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #807187, stop:0.5 #504655);
 	border-radius: 7px;
+}
+QFrame#MidiDrumTrackAuxbox { 
+	border: 1px solid #29292a;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #807187, stop:0.5 #504655);
 }
 QFrame#MidiDrumTrackStrip QLabel { 
 	background-color: none;
@@ -457,6 +478,10 @@ QFrame#MixerAudioBussStrip {
 	/*background-color: #4a5152;*/
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6c797b, stop:0.5 #3a4041);
 	border-radius: 7px;
+}
+QFrame#MixerAudioBussAuxbox { 
+	border: 1px solid #29292a;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6c797b, stop:0.5 #3a4041);
 }
 QFrame#MixerAudioBussStrip QLabel { 
 	background-color: none;
@@ -487,6 +512,10 @@ QFrame#MixerAuxStrip {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #696eb0, stop:0.5 #343652);
 	border-radius: 7px;
 }
+QFrame#MixerAuxAuxbox { 
+	border: 1px solid #29292a;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #696eb0, stop:0.5 #343652);
+}
 QFrame#MixerAuxStrip QLabel { 
 	background-color: none;
 	color: #d7d7d7;
@@ -515,6 +544,10 @@ QFrame#MixerAudioOutStrip {
 	/*background-color: #4e1010;*/
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ab3232, stop:0.5 #4e1010);
 	border-radius: 7px;
+}
+QFrame#MixerAudioOutAuxbox { 
+	border: 1px solid #29292a;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ab3232, stop:0.5 #4e1010);
 }
 QFrame#MixerAudioOutStrip QLabel { 
 	background-color: none;
@@ -1184,95 +1217,95 @@ QMenuBar::item {
      padding: 1px 4px;
      background: transparent;
      border-radius: 3px;
- }
+}
 
- QMenuBar::item:selected { /* when selected using mouse or keyboard */
+QMenuBar::item:selected { /* when selected using mouse or keyboard */
      background: #101819;
 	 color: #42cae6;
- }
+}
 
- QMenuBar::item:pressed {
+QMenuBar::item:pressed {
      background: #101819;
 	 color: #42cae6;
- }
+}
 
 
- QScrollBar:horizontal {
+QScrollBar:horizontal {
      border: 1px solid #393941;
      background: #101819;
      height: 15px;
      margin: 0px 15px 0 15px;
- }
- QScrollBar::handle:horizontal {
+}
+QScrollBar::handle:horizontal {
      /*border: 1px solid #393941;*/
      border: 1px solid #aac0c2;
      /*background: #545463;*/
      background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #71707f, stop:1 #4a4d5a);
      min-width: 15px;
- }
- QScrollBar::add-line:horizontal {
+}
+QScrollBar::add-line:horizontal {
      border: 1px solid #393941;
      background: #585867;
      width: 15px;
      subcontrol-position: right;
      subcontrol-origin: margin;
- }
+}
 
- QScrollBar::sub-line:horizontal {
+QScrollBar::sub-line:horizontal {
      border: 1px solid #393941;
      background: #585867;
      width: 15px;
      subcontrol-position: left;
      subcontrol-origin: margin;
- }
+}
 QScrollBar:left-arrow:horizontal {
      image: url(:/images/left_arrow.png);
- }
+}
 QScrollBar::right-arrow:horizontal {
      image: url(:/images/right_arrow.png);
- }
+}
 
- QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
      background: none;
- }
- QScrollBar:vertical {
+}
+QScrollBar:vertical {
      border: 1px solid #393941;
      background: #101819;/*#858599;*/
      width: 15px;
      margin: 15px 0 15px 0px;
- }
- QScrollBar::handle:vertical {
+}
+QScrollBar::handle:vertical {
      /*border: 1px solid #393941;*/
      border: 1px solid #aac0c2;
      /*background: #545463;*/
      background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #71707f, stop:1 #4a4d5a);
      min-height: 15px;
- }
- QScrollBar::add-line:vertical {
+}
+QScrollBar::add-line:vertical {
      border: 1px solid #393941;
      background: #585867;
      height: 15px;
      subcontrol-position: bottom;
      subcontrol-origin: margin;
- }
+}
 
- QScrollBar::sub-line:vertical {
+QScrollBar::sub-line:vertical {
      border: 1px solid #393941;
      background: #585867;
      height: 15px;
      subcontrol-position: top;
      subcontrol-origin: margin;
- }
+}
 QScrollBar:up-arrow:vertical {
      image: url(:/images/up_arrow.png);
- }
+}
 QScrollBar::down-arrow:vertical {
      image: url(:/images/down_arrow.png);
- }
+}
 
- QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
      background: none;
- }
+}
 
 QSlider::groove:horizontal 
 {

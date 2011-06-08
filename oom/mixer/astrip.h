@@ -16,10 +16,7 @@
 
 class Slider;
 class Knob;
-//class QDialog;
 class QToolButton;
-//class QAction;
-//class QPopupMenu;
 class PopupMenu;
 class QButton;
 class TransparentToolButton;
@@ -46,16 +43,12 @@ class AudioStrip : public Strip
     std::vector<Knob*> auxKnob;
     std::vector<DoubleLabel*> auxLabel;
 
-    QToolButton* stereo;
-    QToolButton* pre;
-    TransparentToolButton* off;
-
     double volume;
     double panVal;
 
     QString slDefaultStyle;
 
-    Knob* addKnob(int, int, DoubleLabel**);
+    Knob* addKnob(int, int, QString, DoubleLabel**);
 
     void updateOffState();
     void updateVolume();
@@ -94,8 +87,6 @@ public slots:
 public:
     AudioStrip(QWidget* parent, AudioTrack*);
     ~AudioStrip();
-    ///virtual QSize minimumSizeHint () const;
-    //virtual QSize sizeHint () const;
 
     void toggleShowEffectsRack();
 };

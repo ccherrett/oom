@@ -25,6 +25,12 @@ class Meter;
 class QToolButton;
 class QGridLayout;
 class ComboBox;
+class QWidget;
+class QHeaderView;
+class QHBoxLayout;
+class TransparentToolButton;
+class QScrollArea;
+class QSPacerItem;
 
 static const int STRIP_WIDTH = 65;
 
@@ -36,21 +42,52 @@ class Strip : public QFrame
 {
     Q_OBJECT
 
+	void layoutUi();
+
 protected:
     Track* track;
-    QLabel* label;
-    //QVBoxLayout* layout;
-    QGridLayout* grid;
-    QVBoxLayout* rackgrid;
+
+    QVBoxLayout *m_mainVBoxLayout;
+    QLabel *label;
+    QLabel *toprack;
+	QLabel *brack;
+    QWidget *m_rackBox;
+    QVBoxLayout *rackBox;
+    QHBoxLayout *horizontalLayout;
+    QWidget *m_mixerBox;
+    QVBoxLayout *verticalLayout_5;
+    QHBoxLayout *horizontalLayout_2;
+    QWidget *m_vuContainer;
+    QHBoxLayout *m_vuBox;
+    QWidget *m_buttonStrip;
+    QVBoxLayout *verticalLayout_6;
+    QToolButton *m_btnAux;
+    QToolButton *m_btnStereo;
+    QToolButton *m_btnIRoute;
+    QToolButton *m_btnORoute;
+    QSpacerItem *verticalSpacer;
+    TransparentToolButton *m_btnPower;
+    TransparentToolButton *m_btnRecord;
+    QToolButton *m_btnMute;
+    QToolButton *m_btnSolo;
+    QWidget *m_panContainer;
+    QVBoxLayout *m_panBox;
+    QVBoxLayout *m_autoBox;
+    QScrollArea *m_auxScroll;
+    QFrame *m_auxContainer;
+    QVBoxLayout *m_auxBox;
+
     int _curGridRow;
     Meter* meter[MAX_CHANNELS];
     bool useSoloIconSet2;
 
-    QToolButton* record;
-    QToolButton* solo;
-    QToolButton* mute;
-    QToolButton* iR; // Input routing button
-    QToolButton* oR; // Output routing button
+	bool hasRecord;
+	bool hasAux;
+	bool hasStereo;
+	bool hasIRoute;
+	bool hasORoute;
+	bool m_collapsed;
+
     QGridLayout* sliderGrid;
     ComboBox* autoType;
     void setLabelText();
@@ -62,6 +99,7 @@ private slots:
 
 protected slots:
     virtual void heartBeat();
+	virtual void toggleAuxPanel(bool);
     void setAutomationType(int t, int);
 
 public slots:

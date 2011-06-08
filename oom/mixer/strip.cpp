@@ -13,6 +13,13 @@
 #include <QColor>
 #include <QVBoxLayout>
 #include <QFrame>
+#include <QHBoxLayout>
+#include <QScrollArea>
+#include <QSpacerItem>
+#include <QToolButton>
+#include <QVBoxLayout>
+#include <QWidget>
+
 
 #include "globals.h"
 #include "gconfig.h"
@@ -23,6 +30,383 @@
 #include "strip.h"
 #include "meter.h"
 #include "utils.h"
+#include "ttoolbutton.h"
+
+//---------------------------------------------------------
+//   Strip
+//    create mixer strip
+//---------------------------------------------------------
+
+Strip::Strip(QWidget* parent, Track* t)
+: QFrame(parent)
+{
+	track = t;
+	_curGridRow = 0;
+	m_collapsed = false;
+	hasRecord = true;
+	hasAux = true;
+	hasStereo = true;
+	hasIRoute = true;
+	hasORoute = true;
+	setAttribute(Qt::WA_DeleteOnClose);
+	layoutUi();
+
+	//setBackgroundRole(QPalette::Mid);
+	//setFrameStyle(Panel | Raised);
+	//setLineWidth(2);
+
+	// NOTE: Workaround for improper disabled button text colour (at least with Oxygen colours).
+	// Just set the parent palette.
+	QPalette pal(palette());
+	pal.setColor(QPalette::Disabled, QPalette::ButtonText, pal.color(QPalette::Disabled, QPalette::WindowText));
+	setPalette(pal);
+
+	useSoloIconSet2 = false;
+
+	meter[0] = 0;
+	meter[1] = 0;
+	setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding));
+
+	//---------------------------------------------
+	//    label
+	//---------------------------------------------
+
+	QPixmap topRack(":/images/top_rack.png");
+	QPixmap bottomRack(":/images/bottom_rack.png");
+	switch (track->type())/*{{{*/
+	{
+		case Track::AUDIO_OUTPUT:
+			label->setObjectName("MixerAudioOutLabel");
+			m_auxContainer->setObjectName("MixerAudioOutAuxbox");
+			m_btnAux->toggle(); //Collapse the box by default
+			m_btnAux->setEnabled(false);
+			hasRecord = true;
+			hasAux = false;
+			hasStereo = true;
+			hasIRoute = true;
+			hasORoute = true;
+			break;
+		case Track::AUDIO_BUSS:
+			label->setObjectName("MixerAudioBussLabel");
+			m_auxContainer->setObjectName("MixerAudioBussAuxbox");
+			hasRecord = false;
+			hasAux = true;
+			hasStereo = true;
+			hasIRoute = true;
+			hasORoute = true;
+			break;
+		case Track::AUDIO_AUX:
+			label->setObjectName("MixerAuxLabel");
+			m_auxContainer->setObjectName("MixerAuxAuxbox");
+			m_btnAux->toggle(); //Collapse the box by default
+			m_btnAux->setEnabled(false);
+			hasRecord = false;
+			hasAux = false;
+			hasStereo = true;
+			hasIRoute = false;
+			hasORoute = true;
+			break;
+		case Track::WAVE:
+			label->setObjectName("MixerWaveLabel");
+			m_auxContainer->setObjectName("MixerWaveAuxbox");
+			hasRecord = true;
+			hasAux = true;
+			hasStereo = true;
+			hasIRoute = true;
+			hasORoute = true;
+			break;
+		case Track::AUDIO_INPUT:
+			label->setObjectName("MixerAudioInLabel");
+			m_auxContainer->setObjectName("MixerAudioInAuxbox");
+			hasRecord = false;
+			hasAux = true;
+			hasStereo = true;
+			hasIRoute = true;
+			hasORoute = true;
+			break;
+		case Track::AUDIO_SOFTSYNTH:
+			label->setObjectName("MixerSynthLabel");
+			m_auxContainer->setObjectName("MixerSynthAuxbox");
+			m_btnAux->toggle(); //Collapse the box by default
+			hasRecord = true;
+			hasAux = true;
+			hasStereo = false;
+			hasIRoute = true;
+			hasORoute = true;
+			break;
+		case Track::MIDI:
+		{
+			label->setObjectName("MidiTrackLabel");
+			m_auxContainer->setObjectName("MidiTrackAuxbox");
+			topRack = QPixmap(":/images/top_rack_midi.png");
+			bottomRack = QPixmap(":/images/bottom_rack_midi.png");
+			m_btnStereo->setVisible(false);
+			hasRecord = true;
+			hasAux = true; //Used for controller knobs in midi
+			hasStereo = false;
+			hasIRoute = true;
+			hasORoute = false;
+		}
+			break;
+		case Track::DRUM:
+		{
+			label->setObjectName("MidiDrumTrackLabel");
+			m_auxContainer->setObjectName("MidiDrumTrackAuxbox");
+			topRack = QPixmap(":/images/top_rack_midi.png");
+			bottomRack = QPixmap(":/images/bottom_rack_midi.png");
+			m_btnStereo->setVisible(false);
+			hasRecord = true;
+			hasAux = true; //Used for controller knobs in midi
+			hasStereo = false;
+			hasIRoute = true;
+			hasORoute = false;
+		}
+			break;
+	}/*}}}*/
+
+	//printf("Strip::Strip w:%d frw:%d layoutmarg:%d lx:%d ly:%d lw:%d lh:%d\n", STRIP_WIDTH, frameWidth(), layout->margin(), label->x(), label->y(), label->width(), label->height());
+
+	label->setTextFormat(Qt::PlainText);
+
+	label->setAlignment(Qt::AlignCenter);
+	label->setWordWrap(false);
+	label->setAutoFillBackground(true);
+	label->setLineWidth(2);
+	label->setFrameStyle(Sunken | StyledPanel);
+
+	//label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Minimum));
+
+	setLabelText();
+
+	//Add your top image here
+	toprack->setPixmap(topRack);
+	brack->setPixmap(bottomRack);
+}
+
+//---------------------------------------------------------
+//   Strip
+//---------------------------------------------------------
+
+Strip::~Strip()
+{
+}
+
+void Strip::layoutUi()/*{{{*/
+{
+	//if (MixerStripBase->objectName().isEmpty())
+	//	MixerStripBase->setObjectName(QString::fromUtf8("MixerStripBase"));
+	//resize(213, 441);
+	setFrameShape(QFrame::StyledPanel);
+	setFrameShadow(QFrame::Raised);
+	m_mainVBoxLayout = new QVBoxLayout(this);
+	m_mainVBoxLayout->setSpacing(0);
+	m_mainVBoxLayout->setContentsMargins(0, 0, 0, 0);
+	m_mainVBoxLayout->setObjectName(QString::fromUtf8("m_mainVBoxLayout"));
+
+	toprack = new QLabel(this);
+	toprack->setObjectName(QString::fromUtf8("toprack"));
+
+	m_mainVBoxLayout->addWidget(toprack);
+
+	label = new QLabel(this);
+	label->setObjectName(QString::fromUtf8("label"));
+	
+	m_mainVBoxLayout->addWidget(label);
+	
+	//m_mainVBoxLayout->addItem(new QSpacerItem(0, 4));
+
+	m_rackBox = new QWidget(this);
+	m_rackBox->setObjectName(QString::fromUtf8("m_rackBox"));
+	rackBox = new QVBoxLayout(m_rackBox);
+	rackBox->setObjectName(QString::fromUtf8("rackBox"));
+	rackBox->setSpacing(0);
+	rackBox->setContentsMargins(0, 0, 0, 0);
+	
+	m_mainVBoxLayout->addWidget(m_rackBox);
+	
+	m_mainVBoxLayout->addItem(new QSpacerItem(0, 4));
+
+	horizontalLayout = new QHBoxLayout();
+	horizontalLayout->setContentsMargins(0, 0, 0, 0);
+	horizontalLayout->setSpacing(0);
+	horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+	m_mixerBox = new QWidget(this);
+	m_mixerBox->setObjectName(QString::fromUtf8("m_mixerBox"));
+	verticalLayout_5 = new QVBoxLayout(m_mixerBox);
+	verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+	verticalLayout_5->setContentsMargins(0, 0, 0, 0);
+	verticalLayout_5->setSpacing(0);
+	horizontalLayout_2 = new QHBoxLayout();
+//#ifndef Q_OS_MAC
+	horizontalLayout_2->setSpacing(0);
+//#endif
+	horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
+	horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+	m_vuContainer = new QWidget(m_mixerBox);
+	m_vuContainer->setObjectName(QString::fromUtf8("m_vuBox"));
+	QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+	sizePolicy.setHorizontalStretch(1);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(m_vuContainer->sizePolicy().hasHeightForWidth());
+	m_vuContainer->setSizePolicy(sizePolicy);
+	//m_vuContainer->setMinimumSize(QSize(55, 0));
+	m_vuContainer->setMaximumSize(QSize(55, 2048));
+	m_vuBox = new QHBoxLayout(m_vuContainer);
+	m_vuBox->setObjectName(QString::fromUtf8("m_vuBox"));
+	m_vuBox->setContentsMargins(0, 0, 0, 0);
+	m_vuBox->setSpacing(0);
+	
+	horizontalLayout_2->addWidget(m_vuContainer);
+	
+	m_buttonStrip = new QWidget(m_mixerBox);
+	m_buttonStrip->setObjectName(QString::fromUtf8("m_buttonStrip"));
+	m_buttonStrip->setMaximumSize(QSize(24, 2048));
+	QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Preferred);
+	sizePolicy1.setHorizontalStretch(1);
+	sizePolicy1.setVerticalStretch(0);
+	sizePolicy1.setHeightForWidth(m_buttonStrip->sizePolicy().hasHeightForWidth());
+	m_buttonStrip->setSizePolicy(sizePolicy1);
+	verticalLayout_6 = new QVBoxLayout(m_buttonStrip);
+	verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+	verticalLayout_6->setContentsMargins(0, 0, 0, 0);
+	m_btnAux = new QToolButton(m_buttonStrip);
+	m_btnAux->setObjectName(QString::fromUtf8("m_btnAux"));
+	m_btnAux->setCheckable(true);
+	m_btnAux->setChecked(true);
+	
+	verticalLayout_6->addWidget(m_btnAux);
+	
+	m_btnStereo = new QToolButton(m_buttonStrip);
+	m_btnStereo->setObjectName(QString::fromUtf8("m_btnStereo"));
+	
+	verticalLayout_6->addWidget(m_btnStereo);
+	
+	m_btnIRoute = new QToolButton(m_buttonStrip);
+	m_btnIRoute->setObjectName(QString::fromUtf8("m_btnIRoute"));
+	
+	verticalLayout_6->addWidget(m_btnIRoute);
+	
+	m_btnORoute = new QToolButton(m_buttonStrip);
+	m_btnORoute->setObjectName(QString::fromUtf8("m_btnORoute"));
+	
+	verticalLayout_6->addWidget(m_btnORoute);
+	
+	verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	
+	verticalLayout_6->addItem(verticalSpacer);
+	
+	m_btnPower = new TransparentToolButton(m_buttonStrip);
+	m_btnPower->setObjectName(QString::fromUtf8("m_btnPower"));
+	
+	verticalLayout_6->addWidget(m_btnPower);
+	
+	m_btnRecord = new TransparentToolButton(m_buttonStrip);
+	m_btnRecord->setObjectName(QString::fromUtf8("m_btnRecord"));
+	
+	verticalLayout_6->addWidget(m_btnRecord);
+	
+	m_btnMute = new QToolButton(m_buttonStrip);
+	m_btnMute->setObjectName(QString::fromUtf8("m_btnMute"));
+	
+	verticalLayout_6->addWidget(m_btnMute);
+	
+	m_btnSolo = new QToolButton(m_buttonStrip);
+	m_btnSolo->setObjectName(QString::fromUtf8("m_btnSolo"));
+	
+	verticalLayout_6->addWidget(m_btnSolo);
+	
+	
+	horizontalLayout_2->addWidget(m_buttonStrip);
+	
+	
+	verticalLayout_5->addLayout(horizontalLayout_2);
+	
+	m_panContainer = new QWidget(m_mixerBox);
+	m_panContainer->setObjectName(QString::fromUtf8("m_panContainer"));
+	m_panBox = new QVBoxLayout(m_panContainer);
+	m_panBox->setObjectName(QString::fromUtf8("m_panBox"));
+	m_panBox->setSpacing(0);
+	m_panBox->setContentsMargins(2, 0, 0, 0);
+	m_panBox->addItem(new QSpacerItem(0, 4));
+	
+	verticalLayout_5->addWidget(m_panContainer);
+	
+	m_autoBox = new QVBoxLayout();
+	m_autoBox->setObjectName(QString::fromUtf8("m_autoBox"));
+	m_autoBox->setSpacing(0);
+	m_autoBox->setContentsMargins(0, 0, 0, -1);
+	
+	verticalLayout_5->addLayout(m_autoBox);
+	
+	
+	horizontalLayout->addWidget(m_mixerBox);
+	
+	m_auxScroll = new QScrollArea(this);
+	m_auxScroll->setObjectName(QString::fromUtf8("m_auxScroll"));
+	QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	sizePolicy2.setHorizontalStretch(1);
+	sizePolicy2.setVerticalStretch(0);
+	sizePolicy2.setHeightForWidth(m_auxScroll->sizePolicy().hasHeightForWidth());
+	m_auxScroll->setSizePolicy(sizePolicy2);
+	m_auxScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_auxScroll->setWidgetResizable(true);
+	m_auxScroll->setAlignment(Qt::AlignCenter);
+	m_auxScroll->setAutoFillBackground(true);
+	m_auxScroll->setMinimumSize(QSize(95,0));
+	
+	m_auxContainer = new QFrame(this);
+	switch (track->type())/*{{{*/
+	{
+		case Track::AUDIO_OUTPUT:
+			m_auxContainer->setObjectName("MixerAudioOutAuxbox");
+			break;
+		case Track::AUDIO_BUSS:
+			m_auxContainer->setObjectName("MixerAudioBussAuxbox");
+			break;
+		case Track::AUDIO_AUX:
+			m_auxContainer->setObjectName("MixerAuxAuxbox");
+			break;
+		case Track::WAVE:
+			m_auxContainer->setObjectName("MixerWaveAuxbox");
+			break;
+		case Track::AUDIO_INPUT:
+			m_auxContainer->setObjectName("MixerAudioInAuxbox");
+			break;
+		case Track::AUDIO_SOFTSYNTH:
+			m_auxContainer->setObjectName("MixerSynthAuxbox");
+			break;
+		case Track::MIDI:
+			m_auxContainer->setObjectName("MidiTrackAuxbox");
+			break;
+		case Track::DRUM:
+			m_auxContainer->setObjectName("MidiDrumTrackAuxbox");
+			break;
+	}/*}}}*/
+	QSizePolicy auxSizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	auxSizePolicy2.setHorizontalStretch(1);
+	auxSizePolicy2.setVerticalStretch(0);
+	auxSizePolicy2.setHeightForWidth(m_auxContainer->sizePolicy().hasHeightForWidth());
+	//m_auxContainer->setObjectName("m_auxContainer");
+	//m_auxContainer->setGeometry(QRect(0, 0, 80, 330));
+	
+	m_auxBox = new QVBoxLayout(m_auxContainer);
+	m_auxBox->setObjectName(QString::fromUtf8("m_auxBox"));
+	m_auxBox->setContentsMargins(0, -1, 0, -1);
+	m_auxBox->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
+	m_auxScroll->setWidget(m_auxContainer);
+	
+	horizontalLayout->addWidget(m_auxScroll);
+	
+	horizontalLayout->setStretch(0, 2);
+	
+	m_mainVBoxLayout->addLayout(horizontalLayout);
+
+	brack = new QLabel(this);
+    brack->setObjectName(QString::fromUtf8("brack"));
+
+	m_mainVBoxLayout->addWidget(brack);
+	connect(m_btnAux, SIGNAL(toggled(bool)), this, SLOT(toggleAuxPanel(bool)));
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setRecordFlag
@@ -30,11 +414,11 @@
 
 void Strip::setRecordFlag(bool flag)
 {
-	if (record)
+	if (hasRecord)
 	{
-		record->blockSignals(true);
-		record->setChecked(flag);
-		record->blockSignals(false);
+		m_btnRecord->blockSignals(true);
+		m_btnRecord->setChecked(flag);
+		m_btnRecord->blockSignals(false);
 	}
 }
 
@@ -61,7 +445,7 @@ void Strip::recordToggled(bool val)
 		}
 		audio->msgSetRecord((AudioOutput*) track, val);
 		if (!((AudioOutput*) track)->recFile())
-			record->setChecked(false);
+			m_btnRecord->setChecked(false);
 		return;
 	}
 	song->setRecordFlag(track, val);
@@ -95,46 +479,22 @@ void Strip::setLabelFont()
 
 void Strip::setLabelText()
 {
-	// QColor c;
-	// switch(track->type()) {
-	//       case Track::AUDIO_OUTPUT:
-	//             c = Qt::green;
-	//             break;
-	//       case Track::AUDIO_BUSS:
-	//             c = Qt::yellow;
-	//             break;
-	//       case Track::AUDIO_AUX:
-	//             c = QColor(120, 255, 255);   // Light blue
-	//             break;
-	//       case Track::WAVE:
-	//             c = Qt::magenta;
-	//             break;
-	//       case Track::AUDIO_INPUT:
-	//             c = Qt::red;
-	//             break;
-	//       case Track::AUDIO_SOFTSYNTH:
-	//             c = QColor(255, 130, 0);  // Med orange
-	//             break;
-	//       case Track::MIDI:
-	//       case Track::DRUM:
-	//             {
-	//             c = QColor(0, 160, 255); // Med blue
-	//             }
-	//             break;
-	//       default:
-	//             return;
-	//       }
-
 	QString trackName = track->name();
-	if (track->name().length() > 8)
-		trackName = track->name().mid(0, 7) + "..";
+	if(m_collapsed)
+	{
+		if (track->name().length() > 8)
+			trackName = track->name().mid(0, 7) + "..";
+	}
 
 	label->setText(trackName);
 	label->setToolTip(track->name());
-	//QPalette palette;
-	//palette.setColor(label->backgroundRole(), c);
-	//label->setPalette(palette);
-	//label->setStyleSheet(QString("background-color: ") + c.name());
+}
+
+void Strip::toggleAuxPanel(bool open)
+{
+	m_auxScroll->setVisible(open);
+	m_collapsed = !open;
+	setLabelText();
 }
 
 //---------------------------------------------------------
@@ -155,146 +515,6 @@ void Strip::soloToggled(bool val)
 {
 	audio->msgSetSolo(track, val);
 	song->update(SC_SOLO);
-}
-
-//---------------------------------------------------------
-//   Strip
-//    create mixer strip
-//---------------------------------------------------------
-
-Strip::Strip(QWidget* parent, Track* t)
-: QFrame(parent)
-{
-	_curGridRow = 0;
-	setAttribute(Qt::WA_DeleteOnClose);
-	iR = 0;
-	oR = 0;
-
-	setBackgroundRole(QPalette::Mid);
-	setFrameStyle(Panel | Raised);
-	setLineWidth(2);
-
-	// NOTE: Workaround for freakin' improper disabled button text colour (at least with Oxygen colours).
-	// Just set the parent palette.
-	QPalette pal(palette());
-	pal.setColor(QPalette::Disabled, QPalette::ButtonText,
-			pal.color(QPalette::Disabled, QPalette::WindowText));
-	setPalette(pal);
-
-	useSoloIconSet2 = false;
-
-	track = t;
-	meter[0] = 0;
-	meter[1] = 0;
-	//setFixedWidth(STRIP_WIDTH);
-	//setMinimumWidth(STRIP_WIDTH);     // TESTING Tim.
-	//setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding)); // TESTING Tim.
-	setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding)); // TESTING Tim.
-
-	rackgrid = new QVBoxLayout();
-	rackgrid->setContentsMargins(0, 0, 0, 0);
-	rackgrid->setSpacing(0);
-
-	grid = new QGridLayout();
-	grid->setContentsMargins(0, 0, 0, 0);
-	grid->setSpacing(0);
-	setLayout(grid);
-
-	//---------------------------------------------
-	//    label
-	//---------------------------------------------
-
-	//label = new QLabel(this);
-	// NOTE: This was required, otherwise the strip labels have no colour in the mixer only - track info OK !
-	// Not sure why...
-	label = new QLabel(this);
-	QPixmap topRack(":/images/top_rack.png");
-	switch (track->type())
-	{
-		case Track::AUDIO_OUTPUT:
-			label->setObjectName("MixerAudioOutLabel");
-			break;
-		case Track::AUDIO_BUSS:
-			label->setObjectName("MixerAudioBussLabel");
-			break;
-		case Track::AUDIO_AUX:
-			label->setObjectName("MixerAuxLabel");
-			break;
-		case Track::WAVE:
-			label->setObjectName("MixerWaveLabel");
-			break;
-		case Track::AUDIO_INPUT:
-			label->setObjectName("MixerAudioInLabel");
-			break;
-		case Track::AUDIO_SOFTSYNTH:
-			label->setObjectName("MixerSynthLabel");
-			break;
-		case Track::MIDI:
-		{
-			label->setObjectName("MidiTrackLabel");
-			topRack = QPixmap(":/images/top_rack_midi.png");
-		}
-			break;
-		case Track::DRUM:
-		{
-			label->setObjectName("MidiDrumTrackLabel");
-			topRack = QPixmap(":/images/top_rack_midi.png");
-		}
-			break;
-	}
-
-	// Moved by Tim. p3.3.9
-	//setLabelText();
-	//label->setFont(config.fonts[1]);
-
-	//printf("Strip::Strip w:%d frw:%d layoutmarg:%d lx:%d ly:%d lw:%d lh:%d\n", STRIP_WIDTH, frameWidth(), layout->margin(), label->x(), label->y(), label->width(), label->height());
-
-	// Tested: The label's width is 100. It does not become STRIP_WIDTH - 2*layout->margin
-	//  until the mixer is shown in OOMidi::showMixer.
-	// Therefore 'fake' set the size of the label now.
-	// Added by Tim. p3.3.9
-	//label->setGeometry(label->x(), label->y(), STRIP_WIDTH - 2*frameWidth() - 2*layout->margin(), label->height());
-	label->setGeometry(label->x(), label->y(), STRIP_WIDTH - 2 * grid->margin(), label->height());
-
-	label->setTextFormat(Qt::PlainText);
-
-	// Unfortunately for the mixer labels, QLabel doesn't support the BreakAnywhere flag.
-	// Changed by Tim. p3.3.9
-	//label->setAlignment(AlignCenter);
-	//label->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
-	// OOMidi-2 Tested: TextWrapAnywhere actually works, but in fact it takes precedence
-	//  over word wrap, so I found it is not really desirable. Maybe with a user setting...
-	//label->setAlignment(Qt::AlignCenter | Qt::TextWordWrap | Qt::TextWrapAnywhere);
-	// changed by Orcan: We can't use Qt::TextWordWrap in alignment in Qt4.
-	label->setAlignment(Qt::AlignCenter);
-	label->setWordWrap(false);
-	label->setAutoFillBackground(true);
-	label->setLineWidth(2);
-	label->setFrameStyle(Sunken | StyledPanel);
-
-	//label->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum));
-	label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Minimum));
-
-	// Added by Tim. p3.3.9
-	setLabelText();
-	//setLabelFont();
-
-	//Add you top image here
-	QLabel* toprack = new QLabel();
-	toprack->setPixmap(topRack);//QPixmap(":/images/top_rack.png"));
-	grid->addWidget(toprack, _curGridRow++, 0, 1, 2);
-	//layout->addWidget(label);
-	grid->addWidget(label, _curGridRow++, 0, 1, 2);
-	//rackgrid->addLayout(grid);
-	//rackgrid->addWidget(toprack);
-}
-
-//---------------------------------------------------------
-//   Strip
-//---------------------------------------------------------
-
-Strip::~Strip()
-{
 }
 
 //---------------------------------------------------------

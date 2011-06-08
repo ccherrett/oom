@@ -1225,7 +1225,7 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 						}
 						if(part_start <= minframe)
 						{
-						//	printf("Sample is shorter than part length\n");
+							printf("Sample is shorter than part length\n");
 							part_start = minframe;
 							part_end = old_end - part_start;
 							nPart->setFrame(part_start);
@@ -1240,10 +1240,16 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 						{
 							Event newEvent = e.mid(part_start - old_start, event_endframe);
 							audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-							//printf("Sample is longer than part length\n");
+							printf("Sample is longer than part length\n");
 							//printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
 							//	part_start, part_end, event_startframe, event_endframe, newEvent.frame(), newEvent.endFrame());
 						}
+					}
+					else
+					{
+						//Delete the event
+						printf("Deleting event\n");
+						audio->msgDeleteEvent(e, nPart, false, false, false);
 					}
 				}
 			}

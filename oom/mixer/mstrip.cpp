@@ -52,115 +52,6 @@ enum
 };
 
 //---------------------------------------------------------
-//   addKnob
-//---------------------------------------------------------
-
-void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
-		const char* slot, bool enabled)
-{
-	int ctl = CTRL_PANPOT, mn, mx, v;
-	int chan = ((MidiTrack*) track)->outChannel();
-	QString img;
-	switch (idx)
-	{
-		case KNOB_PAN:
-			//  ctl = CTRL_PANPOT;
-			img = QString(":images/knob.png");
-			break;
-		case KNOB_VAR_SEND:
-			ctl = CTRL_VARIATION_SEND;
-			img = QString(":images/knob_aux.png");
-			break;
-		case KNOB_REV_SEND:
-			ctl = CTRL_REVERB_SEND;
-			img = QString(":images/knob_aux.png");
-			break;
-		case KNOB_CHO_SEND:
-			ctl = CTRL_CHORUS_SEND;
-			img = QString(":images/knob_aux.png");
-			break;
-	}
-	MidiPort* mp = &midiPorts[((MidiTrack*) track)->outPort()];
-	MidiController* mc = mp->midiController(ctl);
-	mn = mc->minVal();
-	mx = mc->maxVal();
-
-	Knob* knob = new Knob(this);
-	knob->setRange(double(mn), double(mx), 1.0);
-	knob->setId(ctl);
-	knob->setKnobImage(img);
-
-	controller[idx].knob = knob;
-	knob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	knob->setBackgroundRole(QPalette::Mid);
-	knob->setToolTip(tt);
-	knob->setEnabled(enabled);
-
-	DoubleLabel* dl = new DoubleLabel(0.0, double(mn), double(mx), this);
-	dl->setId(idx);
-	dl->setSpecialText(tr("off"));
-	dl->setToolTip(tr("double click on/off"));
-	controller[idx].dl = dl;
-	dl->setFont(config.fonts[1]);
-	dl->setBackgroundRole(QPalette::Mid);
-	dl->setFrame(true);
-	dl->setPrecision(0);
-	dl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	dl->setEnabled(enabled);
-
-	double dlv;
-	v = mp->hwCtrlState(chan, ctl);
-	if (v == CTRL_VAL_UNKNOWN)
-	{
-		//v = mc->initVal();
-		//if(v == CTRL_VAL_UNKNOWN)
-		//  v = 0;
-		//        v = mn - 1;
-		int lastv = mp->lastValidHWCtrlState(chan, ctl);
-		if (lastv == CTRL_VAL_UNKNOWN)
-		{
-			if (mc->initVal() == CTRL_VAL_UNKNOWN)
-				v = 0;
-			else
-				v = mc->initVal();
-		}
-		else
-			v = lastv - mc->bias();
-		//dlv = mn - 1;
-		dlv = dl->off() - 1.0;
-	}
-	else
-	{
-		// Auto bias...
-		v -= mc->bias();
-		dlv = double(v);
-	}
-
-	knob->setValue(double(v));
-	dl->setValue(dlv);
-	//}
-	//else
-	//      knob->setRange(0.0, 127.0);
-
-	QLabel* lb = new QLabel(label, this);
-	controller[idx].lb = lb;
-	lb->setFont(config.fonts[1]);
-	lb->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	lb->setAlignment(Qt::AlignCenter);
-	lb->setEnabled(enabled);
-
-	grid->addWidget(lb, _curGridRow, 0);
-	grid->addWidget(dl, _curGridRow + 1, 0);
-	grid->addWidget(knob, _curGridRow, 1, 2, 1);
-	_curGridRow += 2;
-
-	connect(knob, SIGNAL(sliderMoved(double, int)), slot);
-	connect(knob, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
-	connect(dl, SIGNAL(valueChanged(double, int)), slot);
-	connect(dl, SIGNAL(doubleClicked(int)), SLOT(labelDoubleClicked(int)));
-}
-
-//---------------------------------------------------------
 //   MidiStrip
 //---------------------------------------------------------
 
@@ -179,15 +70,9 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	chorusSend = CTRL_VAL_UNKNOWN;
 	reverbSend = CTRL_VAL_UNKNOWN;
 
-	grid->addItem(new QSpacerItem(0, 10), _curGridRow++, 0);
-	addKnob(KNOB_VAR_SEND, tr("VariationSend"), tr("Var"), SLOT(setVariSend(double)), false);
-	addKnob(KNOB_REV_SEND, tr("ReverbSend"), tr("Rev"), SLOT(setReverbSend(double)), false);
-	addKnob(KNOB_CHO_SEND, tr("ChorusSend"), tr("Cho"), SLOT(setChorusSend(double)), false);
-	grid->addItem(new QSpacerItem(0, 5), _curGridRow++, 0);
-	///int auxsSize = song->auxs()->size();
-	///if (auxsSize)
-	//layout->addSpacing((STRIP_WIDTH/2 + 1) * auxsSize);
-	///grid->addSpacing((STRIP_WIDTH/2 + 1) * auxsSize);  // ??
+	addKnob(KNOB_VAR_SEND, tr("VariationSend"), tr("Variantion"), SLOT(setVariSend(double)), false);
+	addKnob(KNOB_REV_SEND, tr("ReverbSend"), tr("Reverb"), SLOT(setReverbSend(double)), false);
+	addKnob(KNOB_CHO_SEND, tr("ChorusSend"), tr("Chorus"), SLOT(setChorusSend(double)), false);
 
 	//---------------------------------------------------
 	//    slider, label, meter
@@ -212,12 +97,11 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	meter[0]->setFixedWidth(15);
 	connect(meter[0], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
 
-	grid->addItem(new QSpacerItem(0, 10), _curGridRow++, 0);
 	sliderGrid = new QGridLayout();
 	sliderGrid->setRowStretch(0, 100);
 	sliderGrid->addWidget(slider, 0, 0, Qt::AlignRight);
 	sliderGrid->addWidget(meter[0], 0, 1, Qt::AlignLeft);
-	grid->addLayout(sliderGrid, _curGridRow++, 0, 1, 2);
+	m_vuBox->addLayout(sliderGrid);
 
 	sl = new DoubleLabel(0.0, -98.0, 0.0, this);
 	sl->setFont(config.fonts[1]);
@@ -271,9 +155,7 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	connect(sl, SIGNAL(valueChanged(double, int)), SLOT(volLabelChanged(double)));
 	connect(sl, SIGNAL(doubleClicked(int)), SLOT(labelDoubleClicked(int)));
 
-	grid->addItem(new QSpacerItem(0, 5), _curGridRow++, 0);
-	grid->addWidget(sl, _curGridRow++, 0, 1, 2, Qt::AlignCenter);
-	grid->addItem(new QSpacerItem(0, 10), _curGridRow++, 0);
+	m_panBox->addWidget(sl);
 
 	//---------------------------------------------------
 	//    pan, balance
@@ -281,182 +163,112 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 
 	addKnob(KNOB_PAN, tr("Pan/Balance"), tr("Pan"), SLOT(setPan(double)), true);
 
-	grid->addItem(new QSpacerItem(0, 9), _curGridRow++, 0);
 	updateControls();
 
 	//---------------------------------------------------
 	//    mute, solo
 	//    or
-	//    record, mixdownfile
+	//    m_btnRecord, mixdownfile
 	//---------------------------------------------------
-
-	record = new TransparentToolButton(this);
-	record->setBackgroundRole(QPalette::Mid);
-	record->setCheckable(true);
-	record->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 
 	QIcon iconSet;
 	iconSet.addPixmap(*record_on_Icon, QIcon::Normal, QIcon::On);
 	iconSet.addPixmap(*record_off_Icon, QIcon::Normal, QIcon::Off);
-	record->setIcon(iconSet);
-	record->setIconSize(record_on_Icon->size());
-	record->setToolTip(tr("record"));
-	record->setObjectName("btnRecord");
-	record->setChecked(track->recordFlag());
-	connect(record, SIGNAL(clicked(bool)), SLOT(recordToggled(bool)));
+	m_btnRecord->setIcon(iconSet);
+	m_btnRecord->setCheckable(true);
+	m_btnRecord->setIconSize(record_on_Icon->size());
+	m_btnRecord->setToolTip(tr("record"));
+	m_btnRecord->setObjectName("btnRecord");
+	m_btnRecord->setChecked(track->recordFlag());
+	connect(m_btnRecord, SIGNAL(clicked(bool)), SLOT(recordToggled(bool)));
 
-	mute = new QToolButton();
 	QIcon muteSet;
 	muteSet.addPixmap(*muteIconOn, QIcon::Normal, QIcon::Off);
 	muteSet.addPixmap(*muteIconOff, QIcon::Normal, QIcon::On);
-	mute->setIcon(muteSet);
-	mute->setIconSize(muteIconOn->size());
-	mute->setCheckable(true);
-	mute->setToolTip(tr("mute"));
-	mute->setObjectName("btnMute");
-	mute->setChecked(track->mute());
-	mute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	connect(mute, SIGNAL(clicked(bool)), SLOT(muteToggled(bool)));
-
-	solo = new QToolButton();
+	m_btnMute->setIcon(muteSet);
+	m_btnMute->setIconSize(muteIconOn->size());
+	m_btnMute->setCheckable(true);
+	m_btnMute->setToolTip(tr("mute"));
+	m_btnMute->setObjectName("btnMute");
+	m_btnMute->setChecked(track->mute());
+	m_btnMute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+	connect(m_btnMute, SIGNAL(clicked(bool)), SLOT(muteToggled(bool)));
 
 	if ((bool)t->internalSolo())
 	{
-		solo->setIcon(*soloIconSet2);
-		solo->setIconSize(soloIconOn->size());
+		m_btnSolo->setIcon(*soloIconSet2);
+		m_btnSolo->setIconSize(soloIconOn->size());
 		useSoloIconSet2 = true;
 	}
 	else
 	{
-		solo->setIcon(*soloIconSet1);
-		solo->setIconSize(soloblksqIconOn->size());
+		m_btnSolo->setIcon(*soloIconSet1);
+		m_btnSolo->setIconSize(soloblksqIconOn->size());
 		useSoloIconSet2 = false;
 	}
 
-	//solo->setToolTip(tr("pre fader listening"));
-	solo->setToolTip(tr("solo mode"));
-	solo->setCheckable(true);
-	solo->setObjectName("btnSolo");
-	solo->setChecked(t->solo());
-	solo->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	connect(solo, SIGNAL(clicked(bool)), SLOT(soloToggled(bool)));
+	m_btnSolo->setToolTip(tr("solo mode"));
+	m_btnSolo->setCheckable(true);
+	m_btnSolo->setObjectName("btnSolo");
+	m_btnSolo->setChecked(t->solo());
+	m_btnSolo->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+	connect(m_btnSolo, SIGNAL(clicked(bool)), SLOT(soloToggled(bool)));
 
-	/*
-	// Changed by Tim. p3.3.21
-	//QToolTip::add(record, tr("record"));
-	//smBox1->addStretch(100);
-	//smBox1->addWidget(record);
-	QLabel* dev_ch_label = new QLabel();
-	///dev_ch_label->setMinimumWidth(STRIP_WIDTH/2);
-      
-	// Special here: Must make label same size as the 'exit' button would be IF this were an audio strip...
-	// (The 'exit1' icon is BIGGER than the 'record on' icon.)
-	TransparentToolButton* off  = new TransparentToolButton(this);
 	QIcon iconOff;
 	iconOff.addPixmap(*exit1Icon, QIcon::Normal, QIcon::On);
 	iconOff.addPixmap(*exitIcon, QIcon::Normal, QIcon::Off);
-	off->setIcon(iconOff);
-	off->setIconSize(exit1Icon->size());
-	dev_ch_label->setMinimumHeight(off->height());
-	delete off;
-      
-	//dev_ch_label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Minimum));
-	///dev_ch_label->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum));
-	dev_ch_label->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	dev_ch_label->setAlignment(Qt::AlignCenter);
-	int port = t->outPort();
-	int channel = t->outChannel();
-	QString dcs;
-	dcs.sprintf("%d-%d", port + 1, channel + 1);
-	dev_ch_label->setText(dcs);
-	//dev_ch_label->setBackgroundColor(QColor(0, 160, 255)); // Med blue
-	//dev_ch_label->setFont(config.fonts[6]);
-	dev_ch_label->setFont(config.fonts[1]);
-	// Dealing with a horizontally constrained label. Ignore vertical. Use a minimum readable point size.
-	//autoAdjustFontSize(dev_ch_label, dev_ch_label->text(), false, true, config.fonts[6].pointSize(), 5);
-	QToolTip::add(dev_ch_label, tr("output port and channel"));
-	 */
-
-	off = new TransparentToolButton(this);
-	QIcon iconOff;
-	iconOff.addPixmap(*exit1Icon, QIcon::Normal, QIcon::On);
-	iconOff.addPixmap(*exitIcon, QIcon::Normal, QIcon::Off);
-	off->setIcon(iconOff);
-	off->setIconSize(exit1Icon->size());
-	off->setBackgroundRole(QPalette::Mid);
-	off->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	off->setCheckable(true);
-	off->setToolTip(tr("off"));
-	off->setObjectName("btnExit");
-	off->setChecked(t->off());
-	connect(off, SIGNAL(clicked(bool)), SLOT(offToggled(bool)));
-
-	grid->addWidget(off, _curGridRow, 0);
-	grid->addWidget(record, _curGridRow++, 1);
-	grid->addWidget(mute, _curGridRow, 0);
-	grid->addWidget(solo, _curGridRow++, 1);
+	m_btnPower->setIcon(iconOff);
+	m_btnPower->setIconSize(exit1Icon->size());
+	m_btnPower->setBackgroundRole(QPalette::Mid);
+	m_btnPower->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+	m_btnPower->setCheckable(true);
+	m_btnPower->setToolTip(tr("off"));
+	m_btnPower->setObjectName("btnExit");
+	m_btnPower->setChecked(t->off());
+	connect(m_btnPower, SIGNAL(clicked(bool)), SLOT(offToggled(bool)));
 
 	//---------------------------------------------------
 	//    routing
 	//---------------------------------------------------
 
-	iR = new QToolButton();
-	iR->setFont(config.fonts[1]);
-	iR->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	//iR->setText(tr("iR"));
-	iR->setIcon(*mixerIn);
-	iR->setIconSize(mixerIn->size());
-	iR->setCheckable(false);
-	iR->setToolTip(tr("input routing"));
-	iR->setObjectName("btnIns");
-	grid->addWidget(iR, _curGridRow, 0);
-	connect(iR, SIGNAL(pressed()), SLOT(iRoutePressed()));
-	oR = new QToolButton();
-	oR->setFont(config.fonts[1]);
-	oR->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	//oR->setText(tr("oR"));
-	oR->setIcon(*mixerOut);
-	oR->setIconSize(mixerOut->size());
-	oR->setCheckable(false);
-	oR->setObjectName("btnOuts");
+	m_btnIRoute->setFont(config.fonts[1]);
+	m_btnIRoute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+	//m_btnIRoute->setText(tr("iR"));
+	m_btnIRoute->setIcon(*mixerIn);
+	m_btnIRoute->setIconSize(mixerIn->size());
+	m_btnIRoute->setCheckable(false);
+	m_btnIRoute->setToolTip(tr("input routing"));
+	m_btnIRoute->setObjectName("btnIns");
+	connect(m_btnIRoute, SIGNAL(pressed()), SLOT(iRoutePressed()));
+	
+	m_btnORoute->setFont(config.fonts[1]);
+	m_btnORoute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+	//m_btnORoute->setText(tr("oR"));
+	m_btnORoute->setIcon(*mixerOut);
+	m_btnORoute->setIconSize(mixerOut->size());
+	m_btnORoute->setCheckable(false);
+	m_btnORoute->setObjectName("btnOuts");
 	// TODO: Works OK, but disabled for now, until we figure out what to do about multiple out routes and display values...
-	oR->setEnabled(false);
-	oR->setToolTip(tr("output routing"));
-	grid->addWidget(oR, _curGridRow++, 1);
-	connect(oR, SIGNAL(pressed()), SLOT(oRoutePressed()));
+	m_btnORoute->setEnabled(false);
+	m_btnORoute->setToolTip(tr("output routing"));
+	connect(m_btnORoute, SIGNAL(pressed()), SLOT(oRoutePressed()));
 
-	grid->addItem(new QSpacerItem(0, 5), _curGridRow++, 0);
 	//---------------------------------------------------
 	//    automation mode
 	//---------------------------------------------------
 
 	autoType = new ComboBox(this);
 	autoType->setFont(config.fonts[1]);
-	autoType->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+	//autoType->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	autoType->setAlignment(Qt::AlignCenter);
 	autoType->setEnabled(false);
+	QSizePolicy autoSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	autoSizePolicy.setHorizontalStretch(1);
+	autoSizePolicy.setVerticalStretch(0);
+	autoSizePolicy.setHeightForWidth(autoType->sizePolicy().hasHeightForWidth());
+	autoType->setSizePolicy(autoSizePolicy);
+	m_autoBox->addWidget(autoType);
 
-	// Removed by T356.
-	// Disabled for now. There is no midi automation mechanism yet...
-	//autoType->insertItem(tr("Off"), AUTO_OFF);
-	//autoType->insertItem(tr("Read"), AUTO_READ);
-	//autoType->insertItem(tr("Touch"), AUTO_TOUCH);
-	//autoType->insertItem(tr("Write"), AUTO_WRITE);
-	//autoType->setCurrentItem(t->automationType());
-	// TODO: Convert ComboBox to QT4
-	//autoType->insertItem(AUTO_OFF, tr("Off"));
-	//autoType->insertItem(AUTO_READ, tr("Read"));
-	//autoType->insertItem(AUTO_TOUCH, tr("Touch"));
-	//autoType->insertItem(AUTO_WRITE, tr("Write"));
-	//autoType->setCurrentIndex(t->automationType());
-	//autoType->setToolTip(tr("automation type"));
-
-	//connect(autoType, SIGNAL(activated(int,int)), SLOT(setAutomationType(int,int)));
-	grid->addWidget(autoType, _curGridRow++, 0, 1, 2);
-	grid->addItem(new QSpacerItem(0, 5), _curGridRow++, 0);
-	QLabel* toprack = new QLabel();
-	toprack->setPixmap(QPixmap(":/images/bottom_rack_midi.png"));
-	grid->addWidget(toprack, _curGridRow++, 0, 1, 2);
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 	inHeartBeat = false;
 }
@@ -466,6 +278,122 @@ MidiStrip::~MidiStrip()
 {
 }
 
+
+//---------------------------------------------------------
+//   addKnob
+//---------------------------------------------------------
+
+void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
+		const char* slot, bool enabled)
+{
+	int ctl = CTRL_PANPOT, mn, mx, v;
+	int chan = ((MidiTrack*) track)->outChannel();
+	QString img;
+	switch (idx)
+	{
+		case KNOB_PAN:
+			//  ctl = CTRL_PANPOT;
+			img = QString(":images/knob.png");
+			break;
+		case KNOB_VAR_SEND:
+			ctl = CTRL_VARIATION_SEND;
+			img = QString(":images/knob_aux.png");
+			break;
+		case KNOB_REV_SEND:
+			ctl = CTRL_REVERB_SEND;
+			img = QString(":images/knob_aux.png");
+			break;
+		case KNOB_CHO_SEND:
+			ctl = CTRL_CHORUS_SEND;
+			img = QString(":images/knob_aux.png");
+			break;
+	}
+	MidiPort* mp = &midiPorts[((MidiTrack*) track)->outPort()];
+	MidiController* mc = mp->midiController(ctl);
+	mn = mc->minVal();
+	mx = mc->maxVal();
+
+	Knob* knob = new Knob(this);
+	knob->setRange(double(mn), double(mx), 1.0);
+	knob->setId(ctl);
+	knob->setKnobImage(img);
+
+	controller[idx].knob = knob;
+	knob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+	knob->setBackgroundRole(QPalette::Mid);
+	knob->setToolTip(tt);
+	knob->setEnabled(enabled);
+
+	DoubleLabel* dl = new DoubleLabel(0.0, double(mn), double(mx), this);
+	dl->setId(idx);
+	dl->setSpecialText(tr("off"));
+	dl->setToolTip(tr("double click on/off"));
+	controller[idx].dl = dl;
+	dl->setFont(config.fonts[1]);
+	dl->setBackgroundRole(QPalette::Mid);
+	dl->setFrame(true);
+	dl->setPrecision(0);
+	dl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	dl->setEnabled(enabled);
+
+	double dlv;
+	v = mp->hwCtrlState(chan, ctl);
+	if (v == CTRL_VAL_UNKNOWN)
+	{
+		int lastv = mp->lastValidHWCtrlState(chan, ctl);
+		if (lastv == CTRL_VAL_UNKNOWN)
+		{
+			if (mc->initVal() == CTRL_VAL_UNKNOWN)
+				v = 0;
+			else
+				v = mc->initVal();
+		}
+		else
+			v = lastv - mc->bias();
+		dlv = dl->off() - 1.0;
+	}
+	else
+	{
+		// Auto bias...
+		v -= mc->bias();
+		dlv = double(v);
+	}
+
+	knob->setValue(double(v));
+	dl->setValue(dlv);
+
+	QLabel* lb = new QLabel(label, this);
+	controller[idx].lb = lb;
+	lb->setFont(config.fonts[1]);
+	lb->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	lb->setAlignment(Qt::AlignCenter);
+	lb->setEnabled(enabled);
+
+	QVBoxLayout *labelBox = new QVBoxLayout();
+	labelBox->setContentsMargins(0, 0, 0, 0);
+	labelBox->setSpacing(0);
+	labelBox->addWidget(lb);
+	labelBox->addWidget(dl);
+	if(idx == KNOB_PAN)
+	{ //Pan
+		QHBoxLayout *container = new QHBoxLayout();
+		container->setContentsMargins(0, 0, 0, 0);
+		container->setSpacing(0);
+		container->addLayout(labelBox);
+		container->addWidget(knob);
+		m_panBox->addLayout(container);
+	}
+	else
+	{ //Controller
+		labelBox->addWidget(knob);
+		m_auxBox->addLayout(labelBox);
+	}
+
+	connect(knob, SIGNAL(sliderMoved(double, int)), slot);
+	connect(knob, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
+	connect(dl, SIGNAL(valueChanged(double, int)), slot);
+	connect(dl, SIGNAL(doubleClicked(int)), SLOT(labelDoubleClicked(int)));
+}
 
 //---------------------------------------------------------
 //   updateOffState
@@ -480,25 +408,22 @@ void MidiStrip::updateOffState()
 	controller[KNOB_PAN].dl->setEnabled(val);
 	label->setEnabled(val);
 
-	if (record)
-		record->setEnabled(val);
-	if (solo)
-		solo->setEnabled(val);
-	if (mute)
-		mute->setEnabled(val);
+	if (hasRecord)
+		m_btnRecord->setEnabled(val);
+	//if (solo)
+		m_btnSolo->setEnabled(val);
+	//if (mute)
+		m_btnMute->setEnabled(val);
 	if (autoType)
 		autoType->setEnabled(val);
-	if (iR)
-		iR->setEnabled(val);
+	if (hasIRoute)
+		m_btnIRoute->setEnabled(val);
 	// TODO: Disabled for now.
-	//if (oR)
-	//      oR->setEnabled(val);
-	if (off)
-	{
-		off->blockSignals(true);
-		off->setChecked(track->off());
-		off->blockSignals(false);
-	}
+	if (hasORoute)
+	      m_btnORoute->setEnabled(val);
+	m_btnPower->blockSignals(true);
+	m_btnPower->setChecked(track->off());
+	m_btnPower->blockSignals(false);
 }
 
 //---------------------------------------------------------
@@ -507,33 +432,33 @@ void MidiStrip::updateOffState()
 
 void MidiStrip::songChanged(int val)
 {
-	if (mute && (val & SC_MUTE))
+	if (m_btnMute && (val & SC_MUTE))
 	{ // mute && off
-		mute->blockSignals(true);
-		mute->setChecked(track->isMute());
+		m_btnMute->blockSignals(true);
+		m_btnMute->setChecked(track->isMute());
 		updateOffState();
-		mute->blockSignals(false);
+		m_btnMute->blockSignals(false);
 	}
-	if (solo && (val & SC_SOLO))
+	if (m_btnSolo && (val & SC_SOLO))
 	{
 		if ((bool)track->internalSolo())
 		{
 			if (!useSoloIconSet2)
 			{
-				solo->setIcon(*soloIconSet2);
-				solo->setIconSize(soloIconOn->size());
+				m_btnSolo->setIcon(*soloIconSet2);
+				m_btnSolo->setIconSize(soloIconOn->size());
 				useSoloIconSet2 = true;
 			}
 		}
 		else if (useSoloIconSet2)
 		{
-			solo->setIcon(*soloIconSet1);
-			solo->setIconSize(soloblksqIconOn->size());
+			m_btnSolo->setIcon(*soloIconSet1);
+			m_btnSolo->setIconSize(soloblksqIconOn->size());
 			useSoloIconSet2 = false;
 		}
-		solo->blockSignals(true);
-		solo->setChecked(track->solo());
-		solo->blockSignals(false);
+		m_btnSolo->blockSignals(true);
+		m_btnSolo->setChecked(track->solo());
+		m_btnSolo->blockSignals(false);
 	}
 
 	if (val & SC_RECFLAG)
@@ -1075,7 +1000,7 @@ void MidiStrip::iRoutePressed()
 	connect(pup, SIGNAL(triggered(QAction*)), SLOT(routingPopupMenuActivated(QAction*)));
 	connect(pup, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
 	pup->popup(QCursor::pos());
-	iR->setDown(false);
+	m_btnIRoute->setDown(false);
 }
 
 //---------------------------------------------------------
@@ -1095,7 +1020,7 @@ void MidiStrip::oRoutePressed()
 	connect(pup, SIGNAL(triggered(QAction*)), SLOT(routingPopupMenuActivated(QAction*)));
 	connect(pup, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
 	pup->popup(QCursor::pos());
-	oR->setDown(false);
+	m_btnORoute->setDown(false);
 }
 
 

@@ -32,10 +32,6 @@ class MidiStrip : public Strip
 
     Slider* slider;
     DoubleLabel* sl;
-    TransparentToolButton* off;
-    //QToolButton* route;
-    //QToolButton* iR;
-    //QToolButton* oR;
 
     struct KNOB
     {
