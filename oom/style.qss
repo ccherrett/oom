@@ -929,8 +929,7 @@ QTabWidget#tabControlCenter::tab-bar {
 /* Style the tab using the tab sub-control. Note that
     it reads QTabBar _not_ QTabWidget */
 QTabWidget#tabControlCenter QTabBar::tab {
-	/*background-color: #47474d;*/							
-	background-color: #0000FF;							
+	background-color: #47474d;							
     border: 1px solid #a5a6a5;
     border-right-color: #5a5963; /* same as the pane color */
     border-top-left-radius: 6px;
@@ -1003,8 +1002,7 @@ QTabWidget::tab-bar {
 /* Style the tab using the tab sub-control. Note that
     it reads QTabBar _not_ QTabWidget */
 QTabBar::tab {
-	/*background-color: #47474d;*/							
-	background-color: #00FF00;							
+	background-color: #47474d;							
     border: 1px solid #a5a6a5;
     border-bottom-color: #595966; /* same as the pane color */
     border-top-left-radius: 4px;
