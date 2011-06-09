@@ -182,6 +182,9 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	m_btnRecord->setChecked(track->recordFlag());
 	connect(m_btnRecord, SIGNAL(clicked(bool)), SLOT(recordToggled(bool)));
 
+	//Fix toggle icon
+	m_btnAux->setIconSize(record_on_Icon->size());
+
 	QIcon muteSet;
 	muteSet.addPixmap(*muteIconOn, QIcon::Normal, QIcon::Off);
 	muteSet.addPixmap(*muteIconOff, QIcon::Normal, QIcon::On);

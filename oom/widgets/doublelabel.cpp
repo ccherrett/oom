@@ -164,9 +164,9 @@ void DoubleLabel::setPrecision(int v)
 
 QSize DoubleLabel::sizeHint() const
 {
-	QFontMetrics fm = fontMetrics();
-	int h = fm.height() + 4;
-	int n = _precision;
+	//QFontMetrics fm = fontMetrics();
+	//int h = fm.height() + 4;
+	/*int n = _precision;
 
 	++n; // For some reason I have to add one digit. Shouldn't have to.
 	double aval = fmax(fabs(max), fabs(min));
@@ -185,8 +185,9 @@ QSize DoubleLabel::sizeHint() const
 	if (!_suffix.isEmpty())
 	{
 		w += fm.width(QString(" ")) + fm.width(_suffix);
-	}
-	return QSize(w, h);
+	}*/
+	//return QSize(w, h);
+	return QSize(50, 16);
 }
 
 QSize DoubleLabel::minimumSizeHint() const

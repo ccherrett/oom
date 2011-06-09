@@ -277,7 +277,7 @@ void Strip::layoutUi()/*{{{*/
 	verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
 	verticalLayout_6->setContentsMargins(0, 0, 0, 0);
 	m_btnAux = new QToolButton(m_buttonStrip);
-	m_btnAux->setObjectName(QString::fromUtf8("m_btnAux"));
+	m_btnAux->setObjectName("m_btnAux");
 	m_btnAux->setCheckable(true);
 	m_btnAux->setChecked(true);
 	m_btnAux->setIcon(*expandIcon);

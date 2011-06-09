@@ -649,6 +649,7 @@ QToolButton#btnIns, QToolButton#btnIns::checked, QToolButton#btnIns::pressed,
 QToolButton#btnOuts, QToolButton#btnOuts::checked, QToolButton#btnOuts::pressed, 
 QToolButton#btnStereo, QToolButton#btnStereo::checked, QToolButton#btnStereo::pressed, 
 QToolButton#btnPre, QToolButton#btnPre::checked, QToolButton#btnPre::pressed, QToolButton#btnPre::hover 
+QToolButton#m_btnAux, QToolButton#m_btnAux::checked, QToolButton#m_btnAux::pressed, QToolButton#m_btnAux::hover 
 { 
 	background-color:none;
 	border: none;
