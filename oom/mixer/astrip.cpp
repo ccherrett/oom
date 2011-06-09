@@ -632,8 +632,8 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
 	else
 	{
 		label = name;//.sprintf("Aux%d", id + 1);
-		if (name.length() > 11)
-			label = name.mid(0, 10).append("..");
+		if (name.length() > 17)
+			label = name.mid(0, 16).append("..");
 	}
 
 	QLabel* plb = new QLabel(label, this);
@@ -661,7 +661,7 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
 	else
 	{ //Aux
 		plb->setToolTip(name);
-		container->addItem(new QSpacerItem(8, 0));
+		container->addItem(new QSpacerItem(15, 0));
 		container->addWidget(pl);
 		container->addWidget(knob);
 		labelBox->addLayout(container);

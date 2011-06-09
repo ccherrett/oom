@@ -391,7 +391,7 @@ void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
 	}
 	else
 	{ //Controller
-		container->addItem(new QSpacerItem(12, 0));
+		container->addItem(new QSpacerItem(19, 0));
 		container->addWidget(dl);
 		container->addWidget(knob);
 		labelBox->addLayout(container);

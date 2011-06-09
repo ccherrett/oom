@@ -55,7 +55,7 @@ Strip::Strip(QWidget* parent, Track* t)
 	//setBackgroundRole(QPalette::Mid);
 	//setFrameStyle(Panel | Raised);
 	//setLineWidth(2);
-	setMaximumWidth(182);
+	setMaximumWidth(210);
 	// NOTE: Workaround for improper disabled button text colour (at least with Oxygen colours).
 	// Just set the parent palette.
 	QPalette pal(palette());
@@ -526,7 +526,7 @@ void Strip::toggleAuxPanel(bool open)
 	m_collapsed = !open;
 	if(open)
 	{
-		setMaximumWidth(182);
+		setMaximumWidth(210);
 		toprack->setPixmap(topRackLarge);
 		brack->setPixmap(bottomRackLarge);
 	}
