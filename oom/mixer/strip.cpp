@@ -526,11 +526,13 @@ void Strip::toggleAuxPanel(bool open)
 	m_collapsed = !open;
 	if(open)
 	{
+		setMaximumWidth(182);
 		toprack->setPixmap(topRackLarge);
 		brack->setPixmap(bottomRackLarge);
 	}
 	else
 	{
+		setMaximumWidth(81);
 		toprack->setPixmap(topRack);
 		brack->setPixmap(bottomRack);
 	}
