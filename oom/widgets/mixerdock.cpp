@@ -258,7 +258,10 @@ void MixerDock::songChanged(int flags)
 	if (flags == -1)
 		action = UPDATE_ALL;
 	else if(flags & SC_VIEW_CHANGED)
+	{
+		//printf("SC_VIEW_CHANGED fired\n");
 		action = UPDATE_ALL;
+	}
 	else if (flags & SC_TRACK_REMOVED)
 		action = STRIP_REMOVED;
 	else if (flags & SC_TRACK_INSERTED)
@@ -266,9 +269,13 @@ void MixerDock::songChanged(int flags)
 	else if (flags & SC_MIDI_TRACK_PROP)
 		action = UPDATE_MIDI;
 	if (action != NO_UPDATE)
+	{
+		//printf("running updateMixer()\n");
 		updateMixer(action);
+	}
 	if (action != UPDATE_ALL)
 	{
+		//printf("Running songChanged() on all strips\n");
 		StripList::iterator si = stripList.begin();
 		for (; si != stripList.end(); ++si)
 		{

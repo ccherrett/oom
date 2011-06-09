@@ -49,6 +49,11 @@ class Strip : public QFrame
 	QPixmap topRackLarge;
 	QPixmap bottomRack;
 	QPixmap bottomRackLarge;
+    QWidget *m_buttonBase;
+    QWidget *m_mixerBase;
+    QWidget *m_vuBase;
+    QWidget *m_panBase;
+    QFrame *m_auxBase;
 
 protected:
     Track* track;
@@ -57,15 +62,12 @@ protected:
     QLabel *label;
     QLabel *toprack;
 	QLabel *brack;
-    //QWidget *m_rackBox;
     QHBoxLayout *horizontalLayout;
-    QWidget *m_mixerBox;
-    QVBoxLayout *verticalLayout_5;
+    QVBoxLayout *m_mixerBox;
     QHBoxLayout *horizontalLayout_2;
-    QWidget *m_vuContainer;
     QHBoxLayout *m_vuBox;
-    QWidget *m_buttonStrip;
-    QVBoxLayout *verticalLayout_6;
+    QVBoxLayout *m_buttonBox;
+
     QToolButton *m_btnAux;
     QToolButton *m_btnStereo;
     QToolButton *m_btnIRoute;
@@ -75,16 +77,14 @@ protected:
     TransparentToolButton *m_btnRecord;
     QToolButton *m_btnMute;
     QToolButton *m_btnSolo;
-    QWidget *m_panContainer;
     QVBoxLayout *m_panBox;
     QVBoxLayout *m_autoBox;
     QScrollArea *m_auxScroll;
-    QFrame *m_auxContainer;
     QVBoxLayout *m_auxBox;
 	QTabWidget* m_tabWidget;
-	QWidget *auxTab;
-	QVBoxLayout *auxTabLayout;
-	QWidget *fxTab;
+	QWidget *m_auxTab;
+	QVBoxLayout *m_auxTabLayout;
+	QWidget *m_fxTab;
     QVBoxLayout *rackBox;
 
     int _curGridRow;

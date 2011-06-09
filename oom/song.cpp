@@ -1516,7 +1516,7 @@ void Song::update(int flags)
 		return;
 	}
 	++level;
-	if(flags & (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
+	if(flags & (SC_TRACK_REMOVED | SC_TRACK_INSERTED/* | SC_TRACK_MODIFIED*/))
 		updateTrackViews1();
 	emit songChanged(flags);
 	--level;
