@@ -144,6 +144,9 @@ Jack-session is not implemented yet, but is on our long list of intended feature
       - for newer kernels with the portable rtc interface
             chmod 660 /dev/rtc0
             chgrp audio /dev/rtc0
+	
+	  - create a udev rule for the permissions in this file: /etc/udev/rules.d/85-hwclock.rules
+	  		KERNEL=="rtc0", GROUP:="audio"
 
 NOTE: Alsa now uses the HPET timer, and adds a symlink for RTC based applications.
 
