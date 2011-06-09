@@ -153,7 +153,7 @@ void MixerDock::clear()/*{{{*/
 	oldAuxsSize = -1;
 }/*}}}*/
 
-void MixerDock::updateMixer(UpdateAction action)/*{{{*/
+void MixerDock::updateMixer(UpdateAction action)
 {
 
 	int auxsSize = song->auxs()->size();
@@ -275,4 +275,4 @@ void MixerDock::songChanged(int flags)
 			(*si)->songChanged(flags);
 		}
 	}
-}/*}}}*/
+}
