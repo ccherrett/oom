@@ -187,7 +187,7 @@ QSize DoubleLabel::sizeHint() const
 		w += fm.width(QString(" ")) + fm.width(_suffix);
 	}*/
 	//return QSize(w, h);
-	return QSize(50, 16);
+	return QSize(40, 16);
 }
 
 QSize DoubleLabel::minimumSizeHint() const
