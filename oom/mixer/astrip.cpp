@@ -894,6 +894,9 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 		m_btnRecord->setIconSize(record_on_Icon->size());
 	}
 
+	//Fix toggle icon
+	m_btnAux->setIconSize(record_on_Icon->size());
+	
 	Track::TrackType type = t->type();
 
 	QIcon muteSet;
