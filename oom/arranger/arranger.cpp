@@ -1039,10 +1039,10 @@ void Arranger::genTrackInfo(QWidget*)
 	_commentdock = new CommentDock(this);
 	_rtabs->addTab(_tvdock, tr("   Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
-	_rtabs->addTab(midiTrackInfo, tr("   The Conductor   "));
+	_rtabs->addTab(midiTrackInfo, tr("   Conductor   "));
 	//_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
-	_rtabs->addTab(_rmdock, tr("  Route Connector  "));
 	_rtabs->addTab(_commentdock, tr("  Comments  "));
+	_rtabs->addTab(_rmdock, tr("  Routes  "));
 
 	central = new QWidget(this);
 	central->setObjectName("dockMixerCenter");
