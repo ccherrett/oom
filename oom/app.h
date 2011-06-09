@@ -72,6 +72,7 @@ class AudioPortConfig;
 class QDocWidget;
 class MidiAssignDialog;
 class MidiPlayEvent;
+class MixerDock;
 
 #define MENU_ADD_SYNTH_ID_BASE 0x1000
 #define OOCMD_PORT 8415
@@ -206,6 +207,7 @@ class OOMidi : public QMainWindow
     QMenu* openRecent;
 
 	QDockWidget* _resourceDock;
+	MixerDock *m_mixerDock;
 	QMessageBox *pipelineBox;
 
     bool readMidi(FILE*);

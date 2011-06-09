@@ -99,6 +99,7 @@ QT4_WRAP_CPP (widget_mocs
 	  midiassign.h
 	  midiportdelegate.h
 	  midipresetdelegate.h
+	  mixerdock.h
 	  ccdelegate.h
 	  ccedit.h
       )
@@ -228,6 +229,7 @@ file (GLOB widgets_source_files
 	  midiassign.cpp
 	  midiportdelegate.cpp
 	  midipresetdelegate.cpp
+	  mixerdock.cpp
 	  ccdelegate.cpp
 	  ccedit.cpp
       )

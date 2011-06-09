@@ -467,6 +467,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 		vl.append(val);
 	}
 	split->setSizes(vl);
+
 }
 
 Arranger::~Arranger()

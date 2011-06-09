@@ -63,6 +63,7 @@
 #include "midiassign.h"
 #include "midimonitor.h"
 #include "confmport.h"
+#include "mixerdock.h"
 
 #include "ccinfo.h"
 #ifdef DSSI_SUPPORT
@@ -1596,6 +1597,11 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	}
 
 	song->update();
+
+	m_mixerDock = new MixerDock(tr("The Mixer Dock"), this);
+	m_mixerDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+	m_mixerDock->setObjectName("m_mixerDock");
+	addDockWidget(Qt::BottomDockWidgetArea, m_mixerDock);
 
 }
 
