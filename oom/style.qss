@@ -448,7 +448,6 @@ QFrame#MidiTrackStrip QLabel#MidiTrackLabel  {
 /*{{{ deleted midi drum track styles
 QFrame#MidiDrumTrackStrip { 
 	border: 1px solid #29292a;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #807187, stop:0.5 #504655);
 	border-radius: 7px;
 }
 QFrame#MidiDrumTrackAuxbox { 
