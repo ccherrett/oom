@@ -43,6 +43,7 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 	routingDialog = 0;
 	oldAuxsSize = 0;
 
+	setMinimumHeight(300);
 	view = new QScrollArea(this);
 	view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
