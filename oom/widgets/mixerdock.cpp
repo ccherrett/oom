@@ -47,7 +47,7 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 	view = new QScrollArea(this);
 	view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	setLayout(new QVBoxLayout());
+	//setLayout(new QVBoxLayout());
 
 	central = new QWidget(view);
 	central->setObjectName("MixerCenter");
