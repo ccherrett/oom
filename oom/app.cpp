@@ -1473,6 +1473,12 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//menu_help->addSeparator();
 	//menu_ids[CMD_START_WHATSTHIS] = menu_help->insertItem(tr("What's &This?"), this, SLOT(whatsThis()), 0);
 
+	m_mixerDock = new MixerDock(tr("The Mixer Dock"), this);
+	m_mixerDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+	m_mixerDock->setObjectName("m_mixerDock");
+	addDockWidget(Qt::BottomDockWidgetArea, m_mixerDock);
+	m_mixerDock->setVisible(false);
+
 	//---------------------------------------------------
 	//    Central Widget
 	//---------------------------------------------------
@@ -1596,11 +1602,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	}
 
 	song->update();
-
-	m_mixerDock = new MixerDock(tr("The Mixer Dock"), this);
-	m_mixerDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
-	m_mixerDock->setObjectName("m_mixerDock");
-	addDockWidget(Qt::BottomDockWidgetArea, m_mixerDock);
 
 	setCorner(Qt::BottomLeftCorner, Qt:: LeftDockWidgetArea);
 }

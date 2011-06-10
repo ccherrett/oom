@@ -57,6 +57,8 @@ private slots:
     void configChanged();
 	void toggleAuxRack(bool);
 	void toggleDetach();
+	void toggleClose();
+	void updateConnections(bool);
 	
 protected:
     void addStrip(Track*, int);

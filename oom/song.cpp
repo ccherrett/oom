@@ -90,6 +90,7 @@ Song::Song(const char* name)
 	jackErrorBox = 0;
 	viewselected = false;
 	hasSelectedParts = false;
+	invalid = false;
 	_replay = false;
 	_replayPos = 0;
 	//Create the AutoView
@@ -2402,6 +2403,7 @@ void Song::cleanupForQuit()
 	// Nothing required for ladspa plugin list, and rack instances of them
 	//  are handled by ~AudioTrack.
 
+	invalid = true;
 	if (debugMsg)
 		printf("...finished cleaning up.\n");
 }

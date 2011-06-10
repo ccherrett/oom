@@ -198,6 +198,7 @@ public:
     }
 
     bool dirty;
+	bool invalid; //used to deturmin is song is valid
 	bool viewselected;
 	bool hasSelectedParts;
 	QString associatedRoute;

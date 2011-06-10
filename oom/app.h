@@ -426,6 +426,7 @@ public:
 		else
 			return new QString();
 	}
+	MixerDock* mixerDock() { return m_mixerDock; }
 
 #ifdef HAVE_LASH
     void lash_idle_cb();

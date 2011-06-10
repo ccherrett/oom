@@ -38,6 +38,7 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 	setMinimumHeight(300);
 	setFeatures(QDockWidget::DockWidgetVerticalTitleBar|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetClosable);
 	QFrame* titleWidget = new QFrame(this);
+	titleWidget->setObjectName("mixerDockTitle");
 	titleWidget->setFrameShape(QFrame::StyledPanel);
 	titleWidget->setFrameShadow(QFrame::Raised);
 	//titleWidget->setMaximumWidth(250);
@@ -108,13 +109,34 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 
 	connect(m_btnAux, SIGNAL(toggled(bool)), SLOT(toggleAuxRack(bool)));
 	connect(m_btnDock, SIGNAL(clicked(bool)), SLOT(toggleDetach()));
-	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+	connect(this, SIGNAL(visibilityChanged(bool)), this, SLOT(updateConnections(bool)));
 	connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
-	song->update(); // calls update mixer
+	songChanged(-1);
+	//song->update(); // calls update mixer
 }
 
 MixerDock::~MixerDock()
 {
+}
+
+void MixerDock::updateConnections(bool visible)
+{
+	if(visible)
+	{
+		songChanged(-1);
+		connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	}
+	else
+	{
+		if(song && !song->invalid)
+			disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	}
+}
+
+void MixerDock::toggleClose()
+{ 
+	if(m_btnClose) 
+		m_btnClose->click();
 }
 
 void MixerDock::toggleDetach()
@@ -341,6 +363,7 @@ void MixerDock::configChanged()
 
 void MixerDock::songChanged(int flags)
 {
+	//printf("MixerDock::songChanged(%d)\n",flags);
 	// Is it simply a midi controller value adjustment? Forget it.
 	if (flags == SC_MIDI_CONTROLLER)
 		return;

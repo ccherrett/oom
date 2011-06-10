@@ -65,6 +65,7 @@
 #include "commentdock.h"
 #include "rmap.h"
 #include "shortcuts.h"
+#include "mixerdock.h"
 
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96
@@ -157,6 +158,11 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(oom->resourceDock(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(resourceDockAreaChanged(Qt::DockWidgetArea)));
 
 
+	QToolButton* btnToggleMixer  = new QToolButton();
+	btnToggleMixer->setIcon(QPixmap(":/images/icons/showmixer.png"));
+	btnToggleMixer->setMaximumSize(QSize(24,24));
+	connect(btnToggleMixer, SIGNAL(clicked(bool)), oom->mixerDock(), SLOT(toggleClose()));
+	toolbar2->addWidget(btnToggleMixer);
 	cursorPos = new PosLabel(0);
 	cursorPos->setEnabled(false);
 	cursorPos->setFixedHeight(22);
