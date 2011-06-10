@@ -1818,7 +1818,7 @@ iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent i, uns
 	for (; i != el->end(); ++i)
 	{
 		// So it misses all the notes.
-		if (i.time() >= (endPos + frameOffset)) // NOTE: frameOffset? Tested, examined printouts of times: Seems OK for playback.
+		if (i->time() >= (endPos + frameOffset)) // NOTE: frameOffset? Tested, examined printouts of times: Seems OK for playback.
 			break;
 
 #ifdef DSSI_DEBUG 
@@ -1830,35 +1830,35 @@ iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent i, uns
 		if (synti->midiPort() != -1)
 		{
 			MidiPort* mp = &midiPorts[synti->midiPort()];
-			if (i.type() == ME_CONTROLLER)
+			if (i->type() == ME_CONTROLLER)
 			{
-				int da = i.dataA();
-				int db = i.dataB();
+				int da = i->dataA();
+				int db = i->dataB();
 				db = mp->limitValToInstrCtlRange(da, db);
 				if (!mp->setHwCtrlState(i->channel(), da, db))
 					continue;
 				//mp->setHwCtrlState(i->channel(), da, db);
 			}
 			else
-				if (i.type() == ME_PITCHBEND)
+				if (i->type() == ME_PITCHBEND)
 			{
-				int da = mp->limitValToInstrCtlRange(CTRL_PITCH, i.dataA());
-				if (!mp->setHwCtrlState(i.channel(), CTRL_PITCH, da))
+				int da = mp->limitValToInstrCtlRange(CTRL_PITCH, i->dataA());
+				if (!mp->setHwCtrlState(i->channel(), CTRL_PITCH, da))
 					continue;
-				//mp->setHwCtrlState(i.channel(), CTRL_PITCH, da);
+				//mp->setHwCtrlState(i->channel(), CTRL_PITCH, da);
 			}
 			else
-				if (i.type() == ME_PROGRAM)
+				if (i->type() == ME_PROGRAM)
 			{
-				if (!mp->setHwCtrlState(i.channel(), CTRL_PROGRAM, i.dataA()))
+				if (!mp->setHwCtrlState(i->channel(), CTRL_PROGRAM, i->dataA()))
 					continue;
-				//mp->setHwCtrlState(i.channel(), CTRL_PROGRAM, i.dataA());
+				//mp->setHwCtrlState(i->channel(), CTRL_PROGRAM, i->dataA());
 			}
 		}
 
 		if (processEvent(*i, &events[nevents]))
 		{
-			int eventTick = i.time() - frameOffset - pos;
+			int eventTick = i->time() - frameOffset - pos;
 			if(eventTick < 0)
 				eventTick = 0;
 			if (eventTick >= (int)segmentSize)
@@ -1946,7 +1946,7 @@ iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent i, uns
 	//  memset(audioInBuffers[k], 0, sizeof(float) * n);
 
 	// Watch our limits.
-	np = ports > synth->_outports ? synth->_outports : ports;
+	np = (unsigned)ports > synth->_outports ? synth->_outports : ports;
 
 	const DSSI_Descriptor* dssi = synth->dssi;
 	const LADSPA_Descriptor* descr = dssi->LADSPA_Plugin;
@@ -2917,7 +2917,7 @@ int DssiSynthIF::getControllerInfo(int id, const char** name, int* ctrl, int* mi
 
 int DssiSynthIF::channels() const
 {
-	return synth->_outports > MAX_CHANNELS ? MAX_CHANNELS : synth->_outports;
+	return synth->_outports > (unsigned)MAX_CHANNELS ? MAX_CHANNELS : synth->_outports;
 }
 
 int DssiSynthIF::totalOutChannels() const
