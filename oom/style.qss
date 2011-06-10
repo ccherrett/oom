@@ -383,7 +383,9 @@ QFrame#MixerSynthStrip QFrame#MixerSynthLabel {
 /* Mixer Wave Track Style*/
 QFrame#MixerWaveStrip { 
 	border: 1px solid #5e5e5f;
-	background-color: #283e44;
+	background-color: #1e2122;
+	background-image: url(:/images/audio_mixer_bg.png);
+	background-repeat: repeat-x;
     /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4f7077, stop:0.5 #1e2122);*/
 	/*border-radius: 3px;*/
 	border-radius: 7px;
