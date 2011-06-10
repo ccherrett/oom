@@ -164,6 +164,7 @@ void Track::init()
 	_reminder1 = false;
 	_reminder2 = false;
 	_reminder3 = false;
+	_collapsed = true;
 
 	_volumeEnCtrl = true;
 	_volumeEn2Ctrl = true;
@@ -245,6 +246,10 @@ Track::Track(const Track& t, bool cloneParts)
 	_type = t.type();
 	_locked = t.locked();
 	m_midiassign = t.m_midiassign;
+	_collapsed = t._collapsed;
+	_reminder1 = t._reminder1;
+	_reminder2 = t._reminder2;
+	_reminder3 = t._reminder3;
 
 	if (cloneParts)
 	{
@@ -787,6 +792,7 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 	xml.intTag(level, "reminder1", _reminder1);
 	xml.intTag(level, "reminder2", _reminder2);
 	xml.intTag(level, "reminder3", _reminder3);
+	xml.intTag(level, "collapsed", _collapsed);
 	if (_selected)
 		xml.intTag(level, "selected", _selected);
 	xml.nput(level, "<MidiAssign port=\"%d\"", m_midiassign.port);/*{{{*/
@@ -851,6 +857,8 @@ bool Track::readProperties(Xml& xml, const QString& tag)/*{{{*/
 		_reminder2 = (bool)xml.parseInt();
 	else if (tag == "reminder3")
 		_reminder3 = (bool)xml.parseInt();
+	else if (tag == "collapsed")
+		_collapsed = (bool)xml.parseInt();
 	else if(tag == "MidiAssign")
 		m_midiassign.read(xml, (Track*)this);
 	else

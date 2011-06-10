@@ -85,7 +85,7 @@ Strip::Strip(QWidget* parent, Track* t)
 		case Track::AUDIO_OUTPUT:
 			label->setObjectName("MixerAudioOutLabel");
 			m_auxBase->setObjectName("MixerAudioOutAuxbox");
-			m_btnAux->toggle(); //Collapse the box by default
+			//m_btnAux->toggle(); //Collapse the box by default
 			//m_btnAux->setEnabled(false);
 			hasRecord = true;
 			hasAux = false;
@@ -105,7 +105,7 @@ Strip::Strip(QWidget* parent, Track* t)
 		case Track::AUDIO_AUX:
 			label->setObjectName("MixerAuxLabel");
 			m_auxBase->setObjectName("MixerAuxAuxbox");
-			m_btnAux->toggle(); //Collapse the box by default
+			//m_btnAux->toggle(); //Collapse the box by default
 			//m_btnAux->setEnabled(false);
 			hasRecord = false;
 			hasAux = false;
@@ -187,6 +187,8 @@ Strip::Strip(QWidget* parent, Track* t)
 
 	//label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Minimum));
 
+	if(track->collapsed())
+		m_btnAux->toggle();//setChecked(!track->collapsed());
 	setLabelText();
 
 }
@@ -280,7 +282,7 @@ void Strip::layoutUi()/*{{{*/
 	m_btnAux = new QToolButton(m_buttonBase);
 	m_btnAux->setObjectName("m_btnAux");
 	m_btnAux->setCheckable(true);
-	m_btnAux->setChecked(true);
+	//m_btnAux->setChecked(true);
 	m_btnAux->setIcon(*expandIcon);
 	
 	m_buttonBox->addWidget(m_btnAux);
@@ -522,11 +524,11 @@ void Strip::setLabelText()
 	label->setToolTip(track->name());
 }
 
-void Strip::toggleAuxPanel(bool open)
+void Strip::toggleAuxPanel(bool collapse)
 {
-	m_tabWidget->setVisible(open);
-	m_collapsed = !open;
-	if(open)
+	m_tabWidget->setVisible(!collapse);
+	m_collapsed = collapse;
+	if(!collapse)
 	{
 		setMaximumWidth(212);
 		toprack->setPixmap(topRackLarge);
@@ -538,6 +540,11 @@ void Strip::toggleAuxPanel(bool open)
 		toprack->setPixmap(topRack);
 		brack->setPixmap(bottomRack);
 	}
+	track->setCollapsed(m_collapsed);
+
+	m_btnAux->blockSignals(true);
+	m_btnAux->setChecked(collapse);
+	m_btnAux->blockSignals(false);
 	setLabelText();
 }
 
