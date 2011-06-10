@@ -9,12 +9,17 @@
 #ifndef _OOM_MIXERDOCK_H_
 #define _OOM_MIXERDOCK_H_
 
-#include <QtGui>
+#include <QDockWidget>
+
+class QAction;
 class QString;
 class QWidget;
-class QDockWidget;
+class QMenu;
 class QScrollArea;
 class QHBoxLayout;
+class QVBoxLayout;
+class QToolButton;
+class QPushButton;
 class AudioPortConfig;
 class Strip;
 class Track;
@@ -28,10 +33,18 @@ class MixerDock : public QDockWidget
     StripList stripList;
     QScrollArea* view;
     QWidget* central;
-    QHBoxLayout* lbox;
+    QWidget* m_mixerBase;
+    QHBoxLayout* m_mixerBox;
+	QVBoxLayout* m_adminBox;
+    QHBoxLayout* m_dockButtonBox;
     QHBoxLayout* layout;
     QMenu* menuView;
     AudioPortConfig* routingDialog;
+	QToolButton* m_btnDock;
+	QToolButton* m_btnClose;
+	QPushButton* m_btnAux;
+	QAction* closeAction;
+
 	int oldAuxsSize;
 	
 public:
@@ -42,6 +55,8 @@ public:
 private slots:
 	void songChanged(int);
     void configChanged();
+	void toggleAuxRack(bool);
+	void toggleDetach();
 	
 protected:
     void addStrip(Track*, int);

@@ -12,15 +12,6 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QtGui>
-/*#include <QMenuBar>
-#include <QResizeEvent>
-#include <QPaintEvent>
-#include <QHBoxLayout>
-#include <QCloseEvent>
-#include <QShowEvent>
-#include <QMenu>
-#include <QActionGroup>
-#include <QAction>*/
 
 #include "app.h"
 #include "icons.h"
@@ -43,8 +34,56 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 	routingDialog = 0;
 	oldAuxsSize = 0;
 
+	setObjectName("MixerDock");
 	setMinimumHeight(300);
-	view = new QScrollArea(this);
+	setFeatures(QDockWidget::DockWidgetVerticalTitleBar|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetClosable);
+	QFrame* titleWidget = new QFrame(this);
+	titleWidget->setFrameShape(QFrame::StyledPanel);
+	titleWidget->setFrameShadow(QFrame::Raised);
+	//titleWidget->setMaximumWidth(250);
+	setTitleBarWidget(titleWidget);
+	m_mixerBase = new QWidget(this);
+	m_mixerBase->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	m_mixerBox = new QHBoxLayout(m_mixerBase);
+	m_mixerBox->setContentsMargins(0, 0, 0, 0);
+	m_mixerBox->setSpacing(0);
+	m_mixerBox->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
+
+	m_adminBox = new QVBoxLayout();
+	m_adminBox->setAlignment(Qt::AlignHCenter);
+	titleWidget->setLayout(m_adminBox);
+	m_dockButtonBox = new QHBoxLayout();
+	m_dockButtonBox->setContentsMargins(0, 0, 0, 0);
+	m_dockButtonBox->setSpacing(0);
+	
+	m_btnDock = new QToolButton(titleWidget);
+	m_btnDock->setMaximumSize(QSize(16,16));
+	m_btnDock->setIcon(QPixmap(":/images/icons/detach.png"));
+	m_btnClose = new QToolButton(titleWidget);
+	m_btnClose->setMaximumSize(QSize(16,16));
+	closeAction = toggleViewAction();
+	closeAction->setIcon(QPixmap(":/images/icons/x.png"));
+	m_btnClose->setDefaultAction(closeAction);
+
+	m_dockButtonBox->addWidget(m_btnClose);
+	m_dockButtonBox->addWidget(m_btnDock);
+	m_adminBox->addLayout(m_dockButtonBox);
+	m_adminBox->addItem(new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Minimum));
+
+	m_btnAux = new QPushButton(titleWidget);
+	m_btnAux->setToolTip(tr("Show/hide Effects Rack"));
+	m_btnAux->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
+	m_btnAux->setMaximumSize(QSize(22,18));
+	m_btnAux->setObjectName("m_btnAux");
+	m_btnAux->setCheckable(true);
+	m_btnAux->setChecked(true);
+	m_btnAux->setIcon(*expandIcon);
+	m_btnAux->setIconSize(record_on_Icon->size());
+	m_adminBox->addWidget(m_btnAux);
+
+	//m_mixerBox->addLayout(m_adminBox);
+
+	view = new QScrollArea(m_mixerBase);
 	view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	//setLayout(new QVBoxLayout());
@@ -61,8 +100,14 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 	layout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 	view->setWidget(central);
 	view->setWidgetResizable(true);
-	setWidget(view);
+	m_mixerBox->addWidget(view);
+	setWidget(m_mixerBase);
 
+	//Push all the widgets in the m_adminBox to the top
+	m_adminBox->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	connect(m_btnAux, SIGNAL(toggled(bool)), SLOT(toggleAuxRack(bool)));
+	connect(m_btnDock, SIGNAL(clicked(bool)), SLOT(toggleDetach()));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
 	song->update(); // calls update mixer
@@ -71,6 +116,51 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 MixerDock::~MixerDock()
 {
 }
+
+void MixerDock::toggleDetach()
+{
+	setFloating(!isFloating());
+	if(!isFloating())
+	{
+		setWindowModality(Qt::NonModal);
+	}
+	/*if(isFloating())
+	{
+		printf("toggleDetach docking\n");
+		//setWindowFlags(Qt::Window);
+		//setFloating(false);
+		//setFloating(true);
+		closeAction->setChecked(true);
+		setWindowFlags(Qt::Window);
+		setFloating(false);
+		setWindowFlags(Qt::Window);
+		setFloating(false);
+		closeAction->setChecked(false);
+		//m_btnClose->toggle();
+	}
+	else
+	{
+		printf("toggleDetach undocking\n");
+		setWindowFlags(0);
+		setFloating(true);
+		m_btnClose->toggle();
+		m_btnClose->toggle();
+	}*/
+}
+
+void MixerDock::toggleAuxRack(bool toggle)/*{{{*/
+{
+	StripList::iterator si = stripList.begin();
+	for (; si != stripList.end(); ++si)
+	{
+		Strip* audioStrip = (*si);
+		if (audioStrip)
+		{
+			audioStrip->toggleAuxPanel(toggle);
+		}
+
+	}
+}/*}}}*/
 
 void MixerDock::addStrip(Track* t, int idx)/*{{{*/
 {

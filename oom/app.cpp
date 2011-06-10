@@ -1600,8 +1600,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	m_mixerDock = new MixerDock(tr("The Mixer Dock"), this);
 	m_mixerDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
 	m_mixerDock->setObjectName("m_mixerDock");
-	QWidget* titleWidget = new QWidget(this);
-	m_mixerDock->setTitleBarWidget(titleWidget);
 	addDockWidget(Qt::BottomDockWidgetArea, m_mixerDock);
 
 	setCorner(Qt::BottomLeftCorner, Qt:: LeftDockWidgetArea);
