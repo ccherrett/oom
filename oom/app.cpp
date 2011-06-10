@@ -778,7 +778,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	_resourceDock = new QDockWidget(tr("The Orchestra Pit"), this);
 	_resourceDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	_resourceDock->setObjectName("dockResourceCenter");
-	addDockWidget(Qt::LeftDockWidgetArea, _resourceDock);
 
 	song = new Song("song");
 	song->blockSignals(true);
@@ -1604,6 +1603,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	QWidget* titleWidget = new QWidget(this);
 	m_mixerDock->setTitleBarWidget(titleWidget);
 	addDockWidget(Qt::BottomDockWidgetArea, m_mixerDock);
+	addDockWidget(Qt::LeftDockWidgetArea, _resourceDock);
 
 }
 

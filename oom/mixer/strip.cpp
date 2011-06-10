@@ -56,6 +56,7 @@ Strip::Strip(QWidget* parent, Track* t)
 	//setFrameStyle(Panel | Raised);
 	//setLineWidth(2);
 	setMaximumWidth(212);
+	setMinimumHeight(300);
 	// NOTE: Workaround for improper disabled button text colour (at least with Oxygen colours).
 	// Just set the parent palette.
 	QPalette pal(palette());
@@ -274,6 +275,7 @@ void Strip::layoutUi()/*{{{*/
 	m_buttonBox = new QVBoxLayout(m_buttonBase);
 	m_buttonBox->setObjectName(QString::fromUtf8("m_buttonBox"));
 	m_buttonBox->setContentsMargins(0, 0, 0, 0);
+	m_buttonBox->setSpacing(0);
 	
 	m_btnAux = new QToolButton(m_buttonBase);
 	m_btnAux->setObjectName("m_btnAux");
