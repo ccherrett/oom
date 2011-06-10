@@ -1107,60 +1107,6 @@ QTabWidget#m_tabWidget QTabBar::tab::disabled {
 }
 /*}}}*/
 
-QDockWidget#MixerDock {/*{{{*/
-    /*border: 1px solid lightgray;*/
-    titlebar-close-icon: url(:/images/icons/x.png);
-    titlebar-normal-icon: url(:/images/icons/detach.png);
-    color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 11px;
-	background-color: #595966;
-	
-}
-
-QDockWidget#MixerDock::title {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #727180, stop:0.1 #727180, stop:0.5 #4a4d5a, stop:1 #4a4d5a);
-    text-align: center;
-    /*background: lightgray;*/
-    padding-left: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-	color: #d6dfd6;
-	border-top: 1px solid #2b2b2f;
-	border-left: 1px solid #2b2b2f;
-	border-right: none;
-	border-bottom: 1px solid #2b2b2f;
-}
-
-QDockWidget#MixerDock::close-button, QDockWidget#MixerDock::float-button {
-    background: #47474d;
-    padding: 2px;
-    icon-size: 15px; /* maximum icon size */
-}
-
-QDockWidget#MixerDock::close-button:hover, QDockWidget#MixerDock::float-button:hover {
-}
-
-QDockWidget#MixerDock::close-button:pressed, QDockWidget#MixerDock::float-button:pressed {
-    /*padding: 1px -1px -1px 1px;*/
-}
-
-QDockWidget#MixerDock::close-button {
-    subcontrol-position: top left;
-    subcontrol-origin: margin;
-    position: absolute;
-    top: 0px; left: 0px; bottom: 0px;
-    width: 14px;
-}
-
-QDockWidget#MixerDock::float-button {
-    subcontrol-position: top left;
-    subcontrol-origin: margin;
-    position: absolute;
-    top: 0px; left: 16px; bottom: 0px;
-    width: 14px;
-}/*}}}*/
 
 QDockWidget {/*{{{*/
     /*border: 1px solid lightgray;*/
@@ -1217,6 +1163,76 @@ QDockWidget::float-button {
     width: 14px;
 }/*}}}*/
 
+QDockWidget#MixerDock {/*{{{*/
+    /*border: 1px solid lightgray;*/
+    titlebar-close-icon: url(:/images/icons/x.png);
+    titlebar-normal-icon: url(:/images/icons/detach.png);
+    color: #d6dfd6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+	background-color: #595966;
+	
+}
+
+QDockWidget#MixerDock::title {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #727180, stop:0.1 #727180, stop:0.5 #4a4d5a, stop:1 #4a4d5a);
+    text-align: center;
+    /*background: lightgray;*/
+    padding-left: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+	color: #d6dfd6;
+	border-top: 1px solid #2b2b2f;
+	border-left: 1px solid #2b2b2f;
+	border-right: none;
+	border-bottom: 1px solid #2b2b2f;
+}
+
+QDockWidget#MixerDock::close-button, QDockWidget#MixerDock::float-button {
+    background: #47474d;
+    padding: 2px;
+    icon-size: 15px; /* maximum icon size */
+}
+
+QDockWidget#MixerDock::close-button:hover, QDockWidget#MixerDock::float-button:hover {
+}
+
+QDockWidget#MixerDock::close-button:pressed, QDockWidget#MixerDock::float-button:pressed {
+    /*padding: 1px -1px -1px 1px;*/
+}
+
+QDockWidget#MixerDock::close-button {
+    subcontrol-position: top left;
+    subcontrol-origin: margin;
+    position: absolute;
+    top: 0px; left: 0px; bottom: 0px;
+    width: 14px;
+}
+
+QDockWidget#MixerDock::float-button {
+    subcontrol-position: top left;
+    subcontrol-origin: margin;
+    position: absolute;
+    top: 0px; left: 16px; bottom: 0px;
+    width: 14px;
+}/*}}}*/
+
+QFrame#mixerDockTitle
+{
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #727180, stop:0.1 #727180, stop:0.5 #4a4d5a, stop:1 #4a4d5a);
+    text-align: center;
+    /*background: lightgray;*/
+    padding-left: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+	color: #d6dfd6;
+	border-top: 1px solid #2b2b2f;
+	border-left: 1px solid #2b2b2f;
+	border-right: none;
+	border-bottom: 1px solid #2b2b2f;
+	border-radius: 4px;
+}
 
 InstrumentTree/*{{{*/
 {
