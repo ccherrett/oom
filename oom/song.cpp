@@ -1901,7 +1901,7 @@ void Song::setRecordFlag(Track* track, bool val, bool monitor)
 		track->setRecordFlag2(val, monitor);
 	}
 	//      updateFlags |= SC_RECFLAG;
-	update(SC_RECFLAG|SC_VIEW_CHANGED);
+	update(SC_RECFLAG/*|SC_VIEW_CHANGED*/);
 
 }
 
