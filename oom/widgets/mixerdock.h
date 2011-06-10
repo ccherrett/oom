@@ -13,13 +13,17 @@
 
 class QAction;
 class QString;
+class QFrame;
 class QWidget;
 class QMenu;
 class QScrollArea;
 class QHBoxLayout;
 class QVBoxLayout;
+class QResizeEvent;
 class QToolButton;
 class QPushButton;
+class QPixmap;
+class QImage;
 class AudioPortConfig;
 class Strip;
 class Track;
@@ -32,8 +36,8 @@ class MixerDock : public QDockWidget
 
     StripList stripList;
     QScrollArea* view;
-    QWidget* central;
-    QWidget* m_mixerBase;
+    QFrame* central;
+    QFrame* m_mixerBase;
     QHBoxLayout* m_mixerBox;
 	QVBoxLayout* m_adminBox;
     QHBoxLayout* m_dockButtonBox;

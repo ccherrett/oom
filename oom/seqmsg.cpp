@@ -663,6 +663,8 @@ void Song::msgInsertTrack(Track* track, int idx, bool doUndoFlag)
 
 void Audio::msgRemoveTrack(Track* track, bool doUndoFlag)
 {
+	if(track && track->name() == "Master")
+		return;
 	AudioMsg msg;
 	msg.id = SEQM_REMOVE_TRACK;
 	msg.track = track;
@@ -684,7 +686,7 @@ void Audio::msgRemoveTracks()
 		for (iTrack t = tl->begin(); t != tl->end(); ++t)
 		{
 			Track* tr = *t;
-			if (tr->selected())
+			if (tr->selected() && tr->name() != "Master")
 			{
 				song->removeTrack1(tr);
 				msgRemoveTrack(tr, false);
@@ -694,35 +696,6 @@ void Audio::msgRemoveTracks()
 			}
 		}
 	} while (loop);
-
-	/*
-		   // TESTED: DIDN'T WORK: It still skipped some selected tracks !
-		   // Quote from SGI STL: "Erasing an element from a map also does not invalidate any iterators,
-		   //                      except, of course, for iterators that actually point to the element
-		   //                      that is being erased."
-		   // Well that doesn't seem true here...
-            
-		   TrackList* tl = song->tracks();
-		   for(ciTrack t = tl->begin(); t != tl->end() ; )
-		   {
-				 if((*t)->selected())
-				 {
-					   // Changed 20070102: - Iterator t becomes invalid after msgRemoveTrack.
-					   ciTrack tt = t;
-					   ++t;
-					   Track* tr = *tt;
-                        
-					   song->removeTrack1(tr);
-					   msgRemoveTrack(tr, false);
-					   song->removeTrack3(tr);
-                        
-				 }
-				 else
-				   ++t;
-                        
-		   }
-	 */
-
 }
 
 //---------------------------------------------------------

@@ -1723,7 +1723,6 @@ bool DssiSynthIF::processEvent(const MidiPlayEvent& e, snd_seq_event_t* event)
 
 			}
 
-			//{
 			float val = midi2LadspaValue(ld, i, ctlnum, b);
 
 #ifdef DSSI_DEBUG 
@@ -1740,84 +1739,6 @@ bool DssiSynthIF::processEvent(const MidiPlayEvent& e, snd_seq_event_t* event)
 
 			// Since we absorbed the message as a ladspa control change, return false - the event is not filled.
 			return false;
-			//}
-
-			// p3.3.39 Removed.
-			// "Hosts should not deliver through run_synth any MIDI controller events that have already
-			//   been mapped to control port values."
-			// D'oh! My mistake, did not understand that the mapping is only a *request* that the app map MIDI
-			//  controller events to a LADSPA port, and must do the conversion, not to actually *send* them via MIDI...
-			/*
-			else
-			{
-			  switch(midiControllerType(a))
-			  {
-				case MidiController::Controller7:
-					  #ifdef DSSI_DEBUG
-					  //fprintf(stderr, "DssiSynthIF::processEvent midi event is Controller7. Changing to DSSI_CC type. Current dataA:%d\n", a);
-					  fprintf(stderr, "DssiSynthIF::processEvent midi event is Controller7. Current dataA:%d\n", a);
-					  #endif
-					  //a = DSSI_CC(a);
-					  a &= 0x7f;
-					  ctlnum = DSSI_CC_NUMBER(ctlnum);
-					  break;
-				case MidiController::NRPN14:
-					  #ifdef DSSI_DEBUG
-					  //  fprintf(stderr, "DssiSynthIF::processEvent midi event is NRPN. Changing to DSSI_NRPN type. Current dataA:%d\n", a);
-					  fprintf(stderr, "DssiSynthIF::processEvent midi event is NRPN. Current dataA:%d\n", a);
-					  #endif
-					  //a = DSSI_NRPN(a - CTRL_NRPN14_OFFSET);
-					  a &= 0x3fff;
-					  ctlnum = DSSI_NRPN_NUMBER(ctlnum);
-					  break;
-				case MidiController::Controller14:
-					  a &= 0x7f;
-					  break;
-				case MidiController::Pitch:
-					  #ifdef DSSI_DEBUG
-					  fprintf(stderr, "DssiSynthIF::processEvent midi event is Pitch. DataA:%d\n", a);
-					  #endif
-					  a &= 0x3fff;
-					  break;
-				case MidiController::Program:
-					  #ifdef DSSI_DEBUG
-					  fprintf(stderr, "DssiSynthIF::processEvent midi event is Program. DataA:%d\n", a);
-					  #endif
-					  a &= 0x3fff;
-					  break;
-				case MidiController::RPN:
-				case MidiController::RPN14:
-				case MidiController::NRPN:
-				default:
-					  #ifdef DSSI_DEBUG
-					  fprintf(stderr, "DssiSynthIF::processEvent midi event is RPN, RPN14, or NRPN type. DataA:%d\n", a);
-					  #endif
-					  break;
-			  }
-        
-			  // Verify it's the same number.
-			  if(ctlnum != a)
-			  {
-				#ifdef DSSI_DEBUG
-				printf("DssiSynthIF::processEvent Error! ctlnum:%d != event dataA:%d\n", ctlnum, a);
-				#endif
-				// Event not filled. Return false.
-          
-				// TEMP: TODO: Turn on later
-				//return false;
-			  }
-        
-			  // Fill the event.
-			  // FIXME: Darn! We get to this point, but no change in sound (later). Nothing happens, at least with LTS -
-			  //         which is the only one I found so far with midi controllers.
-			  //        Tried with/without converting to DSSI_CC and DSSI_NRPN. What could be wrong here?
-			  #ifdef DSSI_DEBUG
-			  printf("DssiSynthIF::processEvent filling event chn:%d dataA:%d dataB:%d\n", chn, a, b);
-			  #endif
-			  snd_seq_ev_set_controller(event, chn, a, b);
-			}
-			 */
-
 		}
 			break;
 		case ME_PITCHBEND:
@@ -1842,61 +1763,6 @@ bool DssiSynthIF::processEvent(const MidiPlayEvent& e, snd_seq_event_t* event)
 				// Event not filled.
 				return false;
 			}
-				/*
-				// p3.3.39 Read the state of current bank and program and all input control values.
-				// TODO: Needs to be better. See write().
-				else
-				if (QString((const char*)e.data()).startsWith("PARAMSAVE"))
-				{
-				  #ifdef DSSI_DEBUG
-				  fprintf(stderr, "DssiSynthIF::processEvent midi event is ME_SYSEX PARAMSAVE\n");
-				  #endif
-        
-				  unsigned long dlen = e.len() - 9; // Minus "PARAMSAVE"
-				  if(dlen > 0)
-				  {
-					//if(dlen < 2 * sizeof(unsigned long))
-					if(dlen < (2 + 2 * sizeof(unsigned long))) // Version major and minor bytes, bank and program.
-					  printf("DssiSynthIF::processEvent Error: PARAMSAVE data length does not include at least version major and minor, bank and program!\n");
-					else
-					{
-					  // Not required, yet.
-					  //char vmaj = *((char*)(e.data() + 9));  // After "PARAMSAVE"
-					  //char vmin = *((char*)(e.data() + 10));
-            
-					  unsigned long* const ulp = (unsigned long*)(e.data() + 11);  // After "PARAMSAVE" + version major and minor.
-					  // TODO: TODO: Set plugin bank and program.
-					  _curBank = ulp[0];
-					  _curProgram = ulp[1];
-            
-					  dlen -= (2 + 2 * sizeof(unsigned long)); // After the version major and minor, bank and program.
-            
-					  if(dlen > 0)
-					  {
-						if((dlen % sizeof(float)) != 0)
-						  printf("DssiSynthIF::processEvent Error: PARAMSAVE float data length not integral multiple of float size!\n");
-						else
-						{
-						  const unsigned long n = dlen / sizeof(float);
-						  if(n != synth->_controlInPorts)
-							printf("DssiSynthIF::processEvent Warning: PARAMSAVE number of floats:%ld != number of controls:%ld\n", n, synth->_controlInPorts);
-                
-						  // Point to location after "PARAMSAVE", version major and minor, bank and progam.
-						  float* const fp = (float*)(e.data() + 9 + 2 + 2 * sizeof(unsigned long));
-                
-						  for(unsigned long i = 0; i < synth->_controlInPorts && i < n; ++i)
-						  {
-							const float v = fp[i];
-							controls[i].val = v;
-						  }
-						}
-					  }
-					}
-				  }
-				  // Event not filled.
-				  return false;
-				}
-				 */
 			else
 			{
 				// NOTE: There is a limit on the size of a sysex. Got this:
@@ -1923,9 +1789,7 @@ bool DssiSynthIF::processEvent(const MidiPlayEvent& e, snd_seq_event_t* event)
 //   getData
 //---------------------------------------------------------
 
-//void DssiSynthIF::getData(MidiEventList* el, unsigned pos, int ch, unsigned samples, float** data)
-
-iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent /*i*/, unsigned pos, int ports, unsigned n, float** buffer)
+iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent i, unsigned pos, int ports, unsigned n, float** buffer)
 {
 	//#ifdef DSSI_DEBUG
 	//  fprintf(stderr, "DssiSynthIF::getData elsize:%d pos:%d ports:%d samples:%d processed already?:%d\n", el->size(), pos, ports, n, synti->processed());
@@ -1934,12 +1798,11 @@ iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent /*i*/,
 	//BEGIN: Process midi events
 
 	// FIXME: Add 10(?) for good luck in case volatile size changes (increments) while we're processing.
-	//unsigned long nevents = el->size();
-	unsigned long nevents = el->size() + synti->putFifo.getSize() + 10;
+	unsigned long nevents = el->size() + synti->eventFifo.getSize() + 10;
 
 	/*
 	while (!synti->putFifo.isEmpty()) {
-		  MidiEvent event = synti->putFifo.get();
+		  MidiEvent event = synti->eventFifo.get();
 		  printf("Dssi: FIFO\n");
 		  }
 	 */
@@ -1948,22 +1811,14 @@ iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent /*i*/,
 	memset(events, 0, sizeof (events));
 	nevents = 0;
 
-	//int curPos      = pos;
-	//unsigned endPos = pos + samples;
 	unsigned endPos = pos + n;
-	//int off         = pos;
 	int frameOffset = audio->getFrameOffset();
-
-	//iMidiEvent i = el->begin();
-	iMPEvent i = el->begin();
 
 	// Process event list events...
 	for (; i != el->end(); ++i)
 	{
-		//if(i->time() >= endPos)                // Doesn't work, at least here in oom-1. The event times are all
-		//  just slightly after the endPos, EVEN IF transport is stopped.
 		// So it misses all the notes.
-		if (i->time() >= (endPos + frameOffset)) // NOTE: frameOffset? Tested, examined printouts of times: Seems OK for playback.
+		if (i.time() >= (endPos + frameOffset)) // NOTE: frameOffset? Tested, examined printouts of times: Seems OK for playback.
 			break;
 
 #ifdef DSSI_DEBUG 
@@ -1975,40 +1830,50 @@ iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent /*i*/,
 		if (synti->midiPort() != -1)
 		{
 			MidiPort* mp = &midiPorts[synti->midiPort()];
-			if (i->type() == ME_CONTROLLER)
+			if (i.type() == ME_CONTROLLER)
 			{
-				int da = i->dataA();
-				int db = i->dataB();
+				int da = i.dataA();
+				int db = i.dataB();
 				db = mp->limitValToInstrCtlRange(da, db);
 				if (!mp->setHwCtrlState(i->channel(), da, db))
 					continue;
 				//mp->setHwCtrlState(i->channel(), da, db);
 			}
 			else
-				if (i->type() == ME_PITCHBEND)
+				if (i.type() == ME_PITCHBEND)
 			{
-				int da = mp->limitValToInstrCtlRange(CTRL_PITCH, i->dataA());
-				if (!mp->setHwCtrlState(i->channel(), CTRL_PITCH, da))
+				int da = mp->limitValToInstrCtlRange(CTRL_PITCH, i.dataA());
+				if (!mp->setHwCtrlState(i.channel(), CTRL_PITCH, da))
 					continue;
-				//mp->setHwCtrlState(i->channel(), CTRL_PITCH, da);
+				//mp->setHwCtrlState(i.channel(), CTRL_PITCH, da);
 			}
 			else
-				if (i->type() == ME_PROGRAM)
+				if (i.type() == ME_PROGRAM)
 			{
-				if (!mp->setHwCtrlState(i->channel(), CTRL_PROGRAM, i->dataA()))
+				if (!mp->setHwCtrlState(i.channel(), CTRL_PROGRAM, i.dataA()))
 					continue;
-				//mp->setHwCtrlState(i->channel(), CTRL_PROGRAM, i->dataA());
+				//mp->setHwCtrlState(i.channel(), CTRL_PROGRAM, i.dataA());
 			}
 		}
 
 		if (processEvent(*i, &events[nevents]))
+		{
+			int eventTick = i.time() - frameOffset - pos;
+			if(eventTick < 0)
+				eventTick = 0;
+			if (eventTick >= (int)segmentSize)
+			{
+				eventTick = segmentSize - 1;
+			}
+			events[nevents].time.tick = eventTick;
 			++nevents;
+		}
 	}
 
 	// Now process putEvent events...
-	while (!synti->putFifo.isEmpty())
+	while (!synti->eventFifo.isEmpty())
 	{
-		MidiPlayEvent e = synti->putFifo.get();
+		MidiPlayEvent e = synti->eventFifo.get();
 
 #ifdef DSSI_DEBUG 
 		fprintf(stderr, "DssiSynthIF::getData putFifo event time:%d\n", e.time());
@@ -2018,7 +1883,18 @@ iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent /*i*/,
 		// FIXME: FIXME: Wrong - we should be setting some kind of linear realtime wallclock here, not song pos.
 		e.setTime(pos);
 		if (processEvent(e, &events[nevents]))
+		{
+			int eventTick = e.time() - frameOffset - pos;
+			if(eventTick < 0)
+				eventTick = 0;
+			if (eventTick >= (int)segmentSize)
+			{
+				eventTick = segmentSize - 1;
+			}
+			events[nevents].time.tick = eventTick;
+			
 			++nevents;
+		}
 	}
 
 	// Now process OSC gui input control fifo events.
@@ -2056,40 +1932,6 @@ iMPEvent DssiSynthIF::getData(MidiPort* /*mp*/, MPEventList* el, iMPEvent /*i*/,
 		}
 	}
 #endif
-
-	/*  // This is from MESS... Tried this here, didn't work, need to re-adapt, try again.
-		int evTime = i->time();
-		if(evTime == 0)
-		{
-		  printf("DssiSynthIF::getData - time is 0!\n");
-		  //continue;
-		  evTime=frameOffset; // will cause frame to be zero, problem?
-		}
-    
-		int frame = evTime - frameOffset;
-      
-		if(frame >= endPos)
-		{
-		  printf("DssiSynthIF::getData frame > endPos!! frame = %d >= endPos %d, i->time() %d, frameOffset %d curPos=%d\n", frame, endPos, i->time(), frameOffset,curPos);
-		  continue;
-		}
-    
-		if(frame > curPos)
-		{
-		  if(frame < pos)
-			printf("DssiSynthIF::getData should not happen: missed event %d\n", pos -frame);
-		  else
-		  {
-	 */
-
-	/*
-		  }
-		  curPos = frame;
-		}
-	 */
-	//  }
-
-	el->erase(el->begin(), i);
 	//END: Process midi events
 
 	//BEGIN: Run the synth
@@ -2213,7 +2055,7 @@ bool DssiSynthIF::putEvent(const MidiPlayEvent& ev)
 	if (midiOutputTrace)
 		ev.dump();
 
-	return synti->putFifo.put(ev);
+	return synti->eventFifo.put(ev);
 
 	//return false;
 }
@@ -2619,6 +2461,7 @@ int DssiSynthIF::oscControl(unsigned long port, float value)
 		OscControlValue cv;
 		//cv.idx = cport;
 		cv.value = value;
+		cv.frame = audio->timestamp();
 		if (cfifo->put(cv))
 		{
 			fprintf(stderr, "DssiSynthIF::oscControl: fifo overflow: in control number:%ld\n", cport);

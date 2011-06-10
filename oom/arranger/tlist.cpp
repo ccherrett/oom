@@ -479,7 +479,7 @@ void TList::mouseDoubleClickEvent(QMouseEvent* ev)
 
 void TList::renameTrack(Track* t)
 {
-	if (t)
+	if (t && t->name() != "Master")
 	{
 		int colx = header->sectionPosition(COL_NAME);
 		int colw = header->sectionSize(COL_NAME);
@@ -1380,18 +1380,20 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						switch (n)
 						{
 							case 0: // delete track
-				    if (multipleSelectedTracks)
-				    {
-					    song->startUndo();
-					    audio->msgRemoveTracks();
-					    song->endUndo(SC_TRACK_REMOVED);
-					    song->updateSoloStates();
-				    }
-				    else
-				    {
-					    song->removeTrack0(t);
-					    audio->msgUpdateSoloStates();
-				    }
+								if (multipleSelectedTracks)
+								{
+								    song->startUndo();
+								    audio->msgRemoveTracks();
+								    song->endUndo(SC_TRACK_REMOVED);
+								    song->updateSoloStates();
+								}
+								else
+								{
+									if(t->name() == "Master")
+										break;
+								    song->removeTrack0(t);
+								    audio->msgUpdateSoloStates();
+								}
 
 							break;
 

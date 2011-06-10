@@ -43,7 +43,8 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 	titleWidget->setFrameShadow(QFrame::Raised);
 	//titleWidget->setMaximumWidth(250);
 	setTitleBarWidget(titleWidget);
-	m_mixerBase = new QWidget(this);
+	m_mixerBase = new QFrame(this);
+	m_mixerBase->setObjectName("mixerBase");
 	m_mixerBase->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	m_mixerBox = new QHBoxLayout(m_mixerBase);
 	m_mixerBox->setContentsMargins(0, 0, 0, 0);
@@ -89,8 +90,10 @@ MixerDock::MixerDock(const QString& title, QWidget* parent)
 	view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	//setLayout(new QVBoxLayout());
 
-	central = new QWidget(view);
+	central = new QFrame(view);
 	central->setObjectName("MixerCenter");
+	central->setFrameShape(QFrame::StyledPanel);
+	central->setFrameShadow(QFrame::Raised);
 	//lbox = new QHBoxLayout();
 	layout = new QHBoxLayout();
 	central->setLayout(layout);
