@@ -312,17 +312,16 @@ void Strip::layoutUi()/*{{{*/
 	m_btnRecord = new TransparentToolButton(m_buttonBase);
 	m_btnRecord->setObjectName(QString::fromUtf8("m_btnRecord"));
 	
-	m_buttonBox->addWidget(m_btnRecord);
 	
 	m_btnMute = new QToolButton(m_buttonBase);
 	m_btnMute->setObjectName(QString::fromUtf8("m_btnMute"));
-	
-	m_buttonBox->addWidget(m_btnMute);
 	
 	m_btnSolo = new QToolButton(m_buttonBase);
 	m_btnSolo->setObjectName(QString::fromUtf8("m_btnSolo"));
 	
 	m_buttonBox->addWidget(m_btnSolo);
+	m_buttonBox->addWidget(m_btnMute);
+	m_buttonBox->addWidget(m_btnRecord);
 	
 	
 	horizontalLayout_2->addWidget(m_buttonBase);
@@ -495,7 +494,6 @@ void Strip::heartBeat()
 //---------------------------------------------------------
 //   setLabelFont
 //---------------------------------------------------------
-// Added by Tim. p3.3.9
 
 void Strip::setLabelFont()
 {
