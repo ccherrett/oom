@@ -2564,10 +2564,14 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 			//    combine multi channels into one waveform
 			//
 			//printf("PartCanvas::drawWavePart i:%d ex:%d\n", i, ex);  // REMOVE Tim.
+			int hm = hh / 2;
+			QPen myPen = QPen();
+			QPixmap *pixmap = new QPixmap(":/images/vugrad_wave.png");
+			QPixmap scaledPixmap = pixmap->scaled(1, y+hm, Qt::IgnoreAspectRatio);
+			myPen.setBrush(scaledPixmap);
 
 			for (; i < ex; i++)
 			{
-				int hm = hh / 2;
 				//if(channels == 1)
 				//{
 					//printf("one channel found: %d\n", channels);
@@ -2590,12 +2594,12 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				peak = (peak * (hh - 2)) >> 9;
 				rms = (rms * (hh - 2)) >> 9;
 				
-				QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-				vuGrad.setColorAt(1, red);
-				vuGrad.setColorAt(0.6, green);
-				vuGrad.setColorAt(0.5, green);
-				vuGrad.setColorAt(0.4, green);
-				vuGrad.setColorAt(0, red);
+				//QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+				///vuGrad.setColorAt(1, red);
+				//vuGrad.setColorAt(0.6, green);
+				//vuGrad.setColorAt(0.5, green);
+				//vuGrad.setColorAt(0.4, green);
+				//vuGrad.setColorAt(0, red);
 				/*vuGrad.setColorAt(1, red);
 				vuGrad.setColorAt(0.90, yellow);
 				vuGrad.setColorAt(0.5, green);
@@ -2604,7 +2608,12 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				//QPen myPen = QPen();
 				//myPen.setBrush(QBrush(vuGrad));
 				//p.setPen(myPen);
-				p.setPen(green);
+				//QPen myPen = QPen();
+				//QPixmap *pixmap = new QPixmap(":/images/vugrad_wave.png");
+				//QPixmap scaledPixmap = pixmap->scaled(1, y+hm, Qt::IgnoreAspectRatio);
+				//myPen.setBrush(scaledPixmap);
+				p.setPen(myPen);
+				//p.setPen(green);
 				
 				p.drawLine(i, y - peak - cc, i, y + peak);
 				p.setPen(rms_color);
@@ -2628,19 +2637,23 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				f.read(sa, xScale, pos);
 				postick += tickstep;
 				pos += xScale;
+				QPen myPen = QPen();
+				QPixmap *pixmap = new QPixmap(":/images/vugrad_wave.png");
+				QPixmap scaledPixmap = pixmap->scaled(1, y+hm, Qt::IgnoreAspectRatio);
+				myPen.setBrush(scaledPixmap);
 				for (unsigned k = 0; k < channels; ++k)
 				{
 					int peak = (sa[k].peak * (hm - 1)) >> 8;
 					int rms = (sa[k].rms * (hm - 1)) >> 8;
 					if(k == 0)
 					{
-						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+						//QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
 						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
-						vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.6, green);
-						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.4, green);
-						vuGrad.setColorAt(0, red);
+						//vuGrad.setColorAt(1, red);
+						//vuGrad.setColorAt(0.6, green);
+						//vuGrad.setColorAt(0.5, green);
+						//vuGrad.setColorAt(0.4, green);
+						//vuGrad.setColorAt(0, red);
 						/*vuGrad.setColorAt(1, red);
 						vuGrad.setColorAt(0.90, yellow);
 						vuGrad.setColorAt(0.5, green);
@@ -2648,20 +2661,20 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 						vuGrad.setColorAt(0, red);*/
 						//QPen myPen = QPen();
 						//myPen.setBrush(QBrush(vuGrad));
-						///p.setPen(myPen);
-						p.setPen(green);
+						p.setPen(myPen);
+						//p.setPen(green);
 						p.drawLine(i, y - peak - cc, i, y + peak);
 						//p.drawLine(0, pr.height(), 3000, pr.height());
 					}
 					else
 					{
 						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
-						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-						vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.6, green);
-						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.4, green);
-						vuGrad.setColorAt(0, red);
+						//QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+						///vuGrad.setColorAt(1, red);
+						//vuGrad.setColorAt(0.6, green);
+						//vuGrad.setColorAt(0.5, green);
+						//vuGrad.setColorAt(0.4, green);
+						//vuGrad.setColorAt(0, red);
 						/*vuGrad.setColorAt(1, red);
 						vuGrad.setColorAt(0.90, yellow);
 						vuGrad.setColorAt(0.5, green);
@@ -2669,8 +2682,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 						vuGrad.setColorAt(0, red);*/
 						//QPen myPen = QPen();
 						//myPen.setBrush(QBrush(vuGrad));
-						//p.setPen(myPen);
-						p.setPen(green);
+						p.setPen(myPen);
+						//p.setPen(green);
 						p.drawLine(i, y - peak - cc, i, y + peak);
 						
 					}

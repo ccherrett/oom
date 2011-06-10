@@ -435,17 +435,20 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 
 void Slider::drawVsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb, const QBrush &brBack)
 {
-	QColor green = QColor(49, 175, 197);
-	QColor yellow = QColor(156, 85, 115);
-	QColor red = QColor(197, 49, 87);
-	QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, rBound.height()));
-	vuGrad.setColorAt(1, green);
+	//QColor green = QColor(49, 175, 197);
+	//QColor yellow = QColor(156, 85, 115);
+	//QColor red = QColor(197, 49, 87);
+	//QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, rBound.height()));
+	//vuGrad.setColorAt(1, green);
 	//vuGrad.setColorAt(0.3, yellow);
-	vuGrad.setColorAt(0, red);
+	//vuGrad.setColorAt(0, red);
 	QPen myPen = QPen();
 	//myPen.setCapStyle(Qt::RoundCap);
 	//myPen.setStyle(Qt::DashLine);
-	myPen.setBrush(QBrush(vuGrad));
+	QPixmap *pixmap = new QPixmap(":/images/vugrad.png");
+	QPixmap scaledPixmap = pixmap->scaled(1, rBound.height(), Qt::IgnoreAspectRatio);
+	myPen.setBrush(scaledPixmap);
+	//myPen.setBrush(QBrush(vuGrad));
 	//myPen.setWidth(w-8);
 	myPen.setWidth(1);
 
