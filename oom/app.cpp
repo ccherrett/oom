@@ -1766,8 +1766,9 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	//      audioMixer->clear();
 	if (mixer1)
 		mixer1->clear();
-	if (mixer2)
-		mixer2->clear();
+	m_mixerWidget->clear();
+	//if (mixer2)
+	//	mixer2->clear();
 	arranger->clear(); // clear track info
 	if (clearSong())
 	{
@@ -1896,7 +1897,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		showBigtime(config.bigTimeVisible);
 		//showMixer(config.mixerVisible);
 		showMixer1(config.mixer1Visible);
-		showMixer2(config.mixer2Visible);
+		//showMixer2(config.mixer2Visible);
 
 		// Added p3.3.43 Make sure the geometry is correct because showMixerX() will NOT
 		//  set the geometry if the mixer has already been created.
@@ -1908,14 +1909,14 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 			if (mixer1->geometry().topLeft() != config.mixer1.geometry.topLeft())
 				mixer1->move(config.mixer1.geometry.topLeft());
 		}
-		if (mixer2)
+		/*if (mixer2)
 		{
 			//if(mixer2->geometry().size() != config.mixer2.geometry.size())   // p3.3.53 Moved below
 			//  mixer2->resize(config.mixer2.geometry.size());
 
 			if (mixer2->geometry().topLeft() != config.mixer2.geometry.topLeft())
 				mixer2->move(config.mixer2.geometry.topLeft());
-		}
+		}*/
 
 		//showMarker(config.markerVisible);  // Moved below. Tim.
 		//resize(config.geometryMain.size());
@@ -1946,13 +1947,13 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 				mixer1->resize(config.mixer1.geometry.size());
 			}
 		}
-		if (mixer2)
+		/*if (mixer2)
 		{
 			if (mixer2->geometry().size() != config.mixer2.geometry.size())
 			{
 				mixer2->resize(config.mixer2.geometry.size());
 			}
-		}
+		}*/
 
 		// Moved here from above due to crash with a song loaded and then File->New.
 		// Marker view list was not updated, had non-existent items from marker list (cleared in ::clear()).
@@ -5575,8 +5576,8 @@ void OOMidi::focusInEvent(QFocusEvent* ev)
 	//      audioMixer->raise();
 	if (mixer1)
 		mixer1->raise();
-	if (mixer2)
-		mixer2->raise();
+	//if (mixer2)
+	//	mixer2->raise();
 	raise();
 	QMainWindow::focusInEvent(ev);
 }

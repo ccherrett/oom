@@ -132,7 +132,7 @@ class OOMidi : public QMainWindow
     //QAction *editSongInfoAction;
 
     // View Menu actions
-    QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, *viewMixerBAction, *viewCliplistAction, *viewMarkerAction;//, *viewRoutesAction;
+    QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, /*viewMixerBAction,*/ *viewCliplistAction, *viewMarkerAction;//, *viewRoutesAction;
 
     // Structure Menu actions
     QAction *strGlobalCutAction, *strGlobalInsertAction, *strGlobalSplitAction, *strCopyRangeAction, *strCutEventsAction;

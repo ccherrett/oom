@@ -1471,7 +1471,7 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 	//if (audioMixer)
 	//      xml.geometryTag(level, "geometryMixer", audioMixer);   // Obsolete
 	xml.intTag(level, "mixer1Visible", viewMixerAAction->isChecked());
-	xml.intTag(level, "mixer2Visible", viewMixerBAction->isChecked());
+	//xml.intTag(level, "mixer2Visible", viewMixerBAction->isChecked());
 	//if (mixer1)
 		//mixer1->write(level, xml, "mixer1");
 	//	mixer1->write(level, xml);
