@@ -157,8 +157,8 @@ NOTE: Alsa now uses the HPET timer, and adds a symlink for RTC based application
 
       - for newer kernels there is a new portable rtc interface that is configured
         via the /sys filesystem.
-            echo 8192 >/sys/class/rtc/rtc0/max_user_freq
-            echo 8192 >/proc/sys/dev/hpet/max-user-freq
+            echo 2048 >/sys/class/rtc/rtc0/max_user_freq
+            echo 2048 >/proc/sys/dev/hpet/max-user-freq
 			inspect with:
 			cat /sys/class/rtc/rtc0/max_user_freq
 			cat /proc/sys/dev/hpet/max-user-freq

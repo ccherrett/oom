@@ -39,22 +39,9 @@ extern QActionGroup* populateAddTrack(QMenu* addTrack);
 AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 : QMainWindow(parent)
 {
-	oldAuxsSize = 0;
-	routingDialog = 0;
 	setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding)); 
 	setWindowTitle(title);
 	setWindowIcon(*oomIcon);
-
-	QMenu* menuView = menuBar()->addMenu(tr("&View"));
-	routingId = menuView->addAction(tr("Audio Connections Manager"), this, SLOT(toggleAudioPortConfig()));
-	routingId->setCheckable(true);
-
-	menuView->addSeparator();
-
-	QActionGroup* actionItems = new QActionGroup(this);
-	actionItems->setExclusive(false);
-
-	menuView->addActions(actionItems->actions());
 
 	/*QWidget *dock = new QWidget(this);
 	QVBoxLayout* dockBox = new QVBoxLayout(dock);
@@ -128,7 +115,6 @@ void AudioMixerApp::clear()
 		delete *si;
 	}
 	m_dockList.clear();
-	oldAuxsSize = -1;
 }
 
 void AudioMixerApp::trackListChanged(TrackList* list)
@@ -253,10 +239,20 @@ void AudioMixerApp::configChanged()
 
 void AudioMixerApp::songChanged(int flags)
 {
+	//printf("AudioMixerApp::songChanged\n");
 	DockList::iterator si = m_dockList.begin();
 	for (; si != m_dockList.end(); ++si)
 	{
 		(*si)->songChanged(flags);
+	}
+}
+
+void AudioMixerApp::toggleAuxRack(bool toggle)
+{
+	DockList::iterator si = m_dockList.begin();
+	for (; si != m_dockList.end(); ++si)
+	{
+		(*si)->toggleAuxRack(toggle);
 	}
 }
 
@@ -292,44 +288,9 @@ void AudioMixerApp::hideEvent(QHideEvent* e)
 {
 	if(!e->spontaneous())
 	{
+		tconfig().set_property(objectName(), "rows", m_cmbRows->currentIndex());
 		if(song && !song->invalid)
 			disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	}
-}
-
-void AudioMixerApp::toggleAuxRack(bool toggle)
-{
-	DockList::iterator si = m_dockList.begin();
-	for (; si != m_dockList.end(); ++si)
-	{
-		(*si)->toggleAuxRack(toggle);
-	}
-}
-
-//---------------------------------------------------------
-//   toggleAudioPortConfig
-//---------------------------------------------------------
-
-void AudioMixerApp::toggleAudioPortConfig()
-{
-	showAudioPortConfig(routingId->isChecked());
-}
-
-//---------------------------------------------------------
-//   showAudioPortConfig
-//---------------------------------------------------------
-
-void AudioMixerApp::showAudioPortConfig(bool on)
-{
-	if (on && routingDialog == 0)
-	{
-		routingDialog = oom->getRoutingDialog(true);
-		connect(routingDialog, SIGNAL(closed()), SLOT(routingDialogClosed()));
-	}
-	if (routingDialog)
-    {
-        routingDialog->show();
-    }
-	routingId->setChecked(on);
 }
 

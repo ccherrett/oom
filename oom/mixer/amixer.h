@@ -56,10 +56,6 @@ class AudioMixerApp : public QMainWindow
 	QComboBox* m_cmbRows;
 	MixerView *m_mixerView;
 	QPushButton* m_btnAux;
-    QMenu* menuView;
-    AudioPortConfig* routingDialog;
-    QAction* routingId;
-    int oldAuxsSize;
 
 	TrackList* m_tracklist;
 	void getRowCount(int, int, int&, int&);
@@ -69,16 +65,12 @@ protected:
 	virtual void hideEvent(QHideEvent*);
 	virtual void showEvent(QShowEvent*);
 
-    void showAudioPortConfig(bool);
-
-
 signals:
-    void closed();
+	void closed();
 
 private slots:
     void songChanged(int);
     void configChanged();
-    void toggleAudioPortConfig();
     void toggleAuxRack(bool);
     void updateMixer(int);
 	void trackListChanged(TrackList* list);

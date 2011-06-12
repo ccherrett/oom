@@ -54,7 +54,7 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	connect(_autoTableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(autoTrackviewChanged(QStandardItem*)));
 	connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(contextPopupMenu(QPoint)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
-	populateTable(SC_VIEW_CHANGED);
+	populateTable(-1);
 	//updateTableHeader();
 }
 

@@ -354,7 +354,10 @@ void MixerDock::songChanged(int flags)
 
 	UpdateAction action = NO_UPDATE;
 	if (flags == -1)
+	{
+		//printf("MixerDock::songChanged -1 fired\n");
 		action = UPDATE_ALL;
+	}
 	else if(flags & SC_VIEW_CHANGED)
 	{
 		//printf("SC_VIEW_CHANGED fired\n");
