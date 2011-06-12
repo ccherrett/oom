@@ -92,7 +92,7 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 	setCentralWidget(m_view);
 
 	m_splitter = new QSplitter(Qt::Vertical, m_view);
-	m_splitter->setHandleWidth(2);
+	m_splitter->setHandleWidth(4);
 	m_splitter->setChildrenCollapsible(true);
 	m_view->setWidget(m_splitter);
 	m_view->setWidgetResizable(true);
@@ -263,12 +263,12 @@ void AudioMixerApp::showEvent(QShowEvent* e)
 {
 	QRect geometry = tconfig().get_property(objectName(), "geometry", QRect(0,0,600, 600)).toRect();
 	setGeometry(geometry);
-	int rows = tconfig().get_property(objectName(), "rows", 1).toInt();
-	m_cmbRows->blockSignals(true);
-	m_cmbRows->setCurrentIndex(rows);
-	m_cmbRows->blockSignals(false);
 	if(!e->spontaneous())
 	{
+		int rows = tconfig().get_property(objectName(), "rows", 1).toInt();
+		m_cmbRows->blockSignals(true);
+		m_cmbRows->setCurrentIndex(rows);
+		m_cmbRows->blockSignals(false);
 		connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 		m_mixerView->updateTrackList();
 	}
