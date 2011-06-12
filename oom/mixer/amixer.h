@@ -22,6 +22,7 @@ class QWidget;
 class QShowEvent;
 class QScrollArea;
 class QSplitter;
+class QPushButton;
 
 class AudioTrack;
 class Meter;
@@ -33,6 +34,7 @@ class ComboBox;
 class AudioPortConfig;
 class Strip;
 class MixerDock;
+class MixerView;
 
 struct MixerConfig;
 
@@ -52,6 +54,8 @@ class AudioMixerApp : public QMainWindow
 	QScrollArea* m_view;
 	QSplitter* m_splitter;
 	QComboBox* m_cmbRows;
+	MixerView *m_mixerView;
+	QPushButton* m_btnAux;
     QMenu* menuView;
     AudioPortConfig* routingDialog;
     QAction* routingId;
@@ -75,7 +79,7 @@ private slots:
     void songChanged(int);
     void configChanged();
     void toggleAudioPortConfig();
-    void toggleShowEffectsRack(bool);
+    void toggleAuxRack(bool);
     void updateMixer(int);
 	void trackListChanged(TrackList* list);
 

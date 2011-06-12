@@ -15,6 +15,7 @@ MixerView::MixerView(QWidget* parent)
 	//m_tracklist = song->visibletracks();
 	toggleButtons(false);
 	populateTable(-1, true);
+	//connect(song, SIGNAL(songChanged(int)), this, SLOT(populateTable(int)));
 }
 
 MixerView::~MixerView()
@@ -128,6 +129,7 @@ void MixerView::autoTrackviewChanged(QStandardItem *item)/*{{{*/
 			TrackView* tv = song->findAutoTrackView(tname->text());
 			if(tv)
 			{
+				//printf("MixerView::autoTrackviewChanged: %s\n", tname->text().toLatin1().constData());
 				if(chk->checkState() == Qt::Checked)
 				{
 					if(!m_selectList.contains(tv->viewName()))
@@ -177,7 +179,6 @@ void MixerView::updateTrackList()/*{{{*/
 				if(workview && (*t)->parts()->empty()) {
 					continue;
 				}
-				//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
 				for (ciTrack i = m_tracklist.begin(); i != m_tracklist.end(); ++i)
 				{
 					if ((*i)->name() == (*t)->name())
@@ -296,12 +297,8 @@ void MixerView::updateTrackList()/*{{{*/
 		//Make the viewtracks the artracks
 		for(ciTrack it = song->artracks()->begin(); it != song->artracks()->end(); ++it)
 		{
-			//if((*it)->isMidiTrack() || (*it)->type() == Track::WAVE || (*it)->type() == Track::AUDIO_SOFTSYNTH)
-			//{
-				m_tracklist.push_back((*it));
-			//}
+			m_tracklist.push_back((*it));
 		}
 	}
 	emit trackListChanged(&m_tracklist);
-	//emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }/*}}}*/

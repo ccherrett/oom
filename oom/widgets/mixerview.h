@@ -24,7 +24,7 @@ class MixerView : public TrackViewDock
 		virtual void autoTrackviewChanged(QStandardItem*);
 	
 	public slots:
-		virtual void populateTable(int, bool);
+		virtual void populateTable(int, bool startup = false);
 		void updateTrackList();
 	
 	signals:

@@ -80,7 +80,8 @@ void MixerDock::layoutUi()
 
 	m_btnAux = new QPushButton(titleWidget);
 	m_btnAux->setToolTip(tr("Show/hide Effects Rack"));
-	m_btnAux->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
+	if(m_mode == DOCKED)
+		m_btnAux->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
 	m_btnAux->setMaximumSize(QSize(22,18));
 	m_btnAux->setObjectName("m_btnAux");
 	m_btnAux->setCheckable(true);
@@ -161,6 +162,10 @@ void MixerDock::toggleAuxRack(bool toggle)/*{{{*/
 		}
 
 	}
+	//Just in case this was called from outside the button
+	m_btnAux->blockSignals(true);
+	m_btnAux->setChecked(toggle);
+	m_btnAux->blockSignals(false);
 }/*}}}*/
 
 void MixerDock::addStrip(Track* t, int idx)/*{{{*/

@@ -995,8 +995,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	viewBigtimeAction->setCheckable(true);
 	viewMixerAAction = new QAction(QIcon(*mixerSIcon), tr("Mixer A"), this);
 	viewMixerAAction->setCheckable(true);
-	viewMixerBAction = new QAction(QIcon(*mixerSIcon), tr("Mixer B"), this);
-	viewMixerBAction->setCheckable(true);
+	//viewMixerBAction = new QAction(QIcon(*mixerSIcon), tr("Mixer B"), this);
+	//viewMixerBAction->setCheckable(true);
 	//viewRoutesAction = new QAction(QIcon(*mixerSIcon), tr("Audio Routing Manager"), this);
 	//viewRoutesAction->setCheckable(true);
 	viewCliplistAction = new QAction(QIcon(*cliplistSIcon), tr("Cliplist"), this);
@@ -1138,7 +1138,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(viewTransportAction, SIGNAL(toggled(bool)), SLOT(toggleTransport(bool)));
 	connect(viewBigtimeAction, SIGNAL(toggled(bool)), SLOT(toggleBigTime(bool)));
 	connect(viewMixerAAction, SIGNAL(toggled(bool)), SLOT(toggleMixer1(bool)));
-	connect(viewMixerBAction, SIGNAL(toggled(bool)), SLOT(toggleMixer2(bool)));
+	//connect(viewMixerBAction, SIGNAL(toggled(bool)), SLOT(toggleMixer2(bool)));
 	//connect(viewRoutesAction, SIGNAL(toggled(bool)), SLOT(toggleRoutes(bool)));
 	connect(viewCliplistAction, SIGNAL(toggled(bool)), SLOT(startClipList(bool)));
 	connect(viewMarkerAction, SIGNAL(toggled(bool)), SLOT(toggleMarker(bool)));
@@ -1370,7 +1370,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	master->addAction(masterListAction);
 	menuView->addAction(viewTransportAction);
 	menuView->addAction(viewMixerAAction);
-	menuView->addAction(viewMixerBAction);
+	//menuView->addAction(viewMixerBAction);
 	//menuView->addAction(viewRoutesAction);
 	menuView->addAction(viewBigtimeAction);
 	menuView->addAction(viewCliplistAction);
@@ -4125,11 +4125,11 @@ void OOMidi::kbAccel(int key)
 	{
 		toggleMixer1(!viewMixerAAction->isChecked());
 	}
-	else if (key == shortcuts[SHRT_OPEN_MIXER2].key)
+	/*else if (key == shortcuts[SHRT_OPEN_MIXER2].key)
 	{
-		toggleMixer2(!viewMixerBAction->isChecked());
+		//toggleMixer2(!viewMixerBAction->isChecked());
 	}
-	/*else if(key == shortcuts[SHRT_OPEN_ROUTES].key)
+	else if(key == shortcuts[SHRT_OPEN_ROUTES].key)
 	{
 		toggleRoutes(true);//!viewRoutesAction->isChecked());
 	}*/
@@ -5355,7 +5355,7 @@ void OOMidi::updateConfiguration()
 	viewTransportAction->setShortcut(shortcuts[SHRT_OPEN_TRANSPORT].key);
 	viewBigtimeAction->setShortcut(shortcuts[SHRT_OPEN_BIGTIME].key);
 	viewMixerAAction->setShortcut(shortcuts[SHRT_OPEN_MIXER].key);
-	viewMixerBAction->setShortcut(shortcuts[SHRT_OPEN_MIXER2].key);
+	//viewMixerBAction->setShortcut(shortcuts[SHRT_OPEN_MIXER2].key);
 	//viewCliplistAction has no acceleration
 	viewMarkerAction->setShortcut(shortcuts[SHRT_OPEN_MARKER].key);
 	//viewRoutesAction->setShortcut(shortcuts[SHRT_OPEN_ROUTES].key);
@@ -5483,7 +5483,7 @@ void OOMidi::showMixer1(bool on)
 //   showMixer2
 //---------------------------------------------------------
 
-void OOMidi::showMixer2(bool on)
+void OOMidi::showMixer2(bool)
 {
 	/*if (on && mixer2 == 0)
 	{
@@ -5539,7 +5539,7 @@ void OOMidi::mixer1Closed()
 
 void OOMidi::mixer2Closed()
 {
-	viewMixerBAction->setChecked(false);
+	//viewMixerBAction->setChecked(false);
 }
 
 
@@ -5552,7 +5552,7 @@ QWidget* OOMidi::mixer1Window()
 
 QWidget* OOMidi::mixer2Window()
 {
-	return mixer2;
+	return 0;
 }
 
 QWidget* OOMidi::transportWindow()

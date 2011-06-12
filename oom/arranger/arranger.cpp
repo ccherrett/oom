@@ -28,7 +28,6 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QLayoutItem>
-#include <QDockWidget>
 
 #include "arranger.h"
 #include "song.h"
@@ -161,6 +160,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	QToolButton* btnToggleMixer  = new QToolButton();
 	btnToggleMixer->setMaximumSize(QSize(24,24));
 	QAction* closeAction = oom->mixerDock()->toggleViewAction();
+	closeAction->setShortcut(shortcuts[SHRT_OPEN_MIXER2].key);
 	closeAction->setIcon(QPixmap(":/images/icons/showmixer.png"));
 	btnToggleMixer->setDefaultAction(closeAction);
 	//connect(btnToggleMixer, SIGNAL(clicked(bool)), oom->mixerDock(), SLOT(toggleClose()));

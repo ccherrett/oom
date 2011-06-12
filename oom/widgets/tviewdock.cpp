@@ -72,7 +72,7 @@ void TrackViewDock::toggleButtons(bool show)
 	chkViewAll->setVisible(show);
 }
 
-void TrackViewDock::populateTable(int flag)/*{{{*/
+void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 {
 	if(flag & (SC_VIEW_CHANGED | SC_VIEW_DELETED | SC_VIEW_ADDED) || flag == -1)
 	{

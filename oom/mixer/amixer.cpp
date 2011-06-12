@@ -71,14 +71,25 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 	//m_mixerDock->setTitleBarWidget(faketitle);
 	m_mixerDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::LeftDockWidgetArea, m_mixerDock);
-	MixerView *m_mixerView = new MixerView(this);
+	m_mixerView = new MixerView(this);
 	m_mixerDock->setWidget(m_mixerView);
 	
+	m_btnAux = new QPushButton(m_mixerDock);
+	m_btnAux->setToolTip(tr("Show/hide Effects Rack"));
+	m_btnAux->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
+	m_btnAux->setMaximumSize(QSize(22,18));
+	m_btnAux->setObjectName("m_btnAux");
+	m_btnAux->setCheckable(true);
+	m_btnAux->setChecked(true);
+	m_btnAux->setIcon(*expandIcon);
+
 	m_cmbRows = new QComboBox(m_mixerDock);
 	for(int i = 1; i < 6; i++)
 	{
 		m_cmbRows->addItem(QString::number(i), i);
 	}
+	m_cmbRows->setCurrentIndex(1);
+	m_mixerView->addButton(m_btnAux);
 	m_mixerView->addButton(m_cmbRows);
 	m_mixerView->addButton(new QLabel(tr("Rows ")));
 
@@ -96,24 +107,16 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 	layout->setSpacing(0);*/
 
 	//connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
-	//connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
+	connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
 	connect(m_cmbRows, SIGNAL(currentIndexChanged(int)), this, SLOT(updateMixer(int)));
-	//m_cmbRows->setCurrentIndex(1);
+	connect(m_btnAux, SIGNAL(toggled(bool)), this, SLOT(toggleAuxRack(bool)));
+	connect(m_mixerView, SIGNAL(trackListChanged(TrackList*)), this, SLOT(trackListChanged(TrackList*)));
 }
 
 AudioMixerApp::~AudioMixerApp()
 {
 	tconfig().set_property(objectName(), "geometry", geometry());
     tconfig().save();
-}
-
-void AudioMixerApp::showEvent(QShowEvent*)
-{
-	QRect geometry = tconfig().get_property(objectName(), "geometry", QRect(0,0,600, 600)).toRect();
-	setGeometry(geometry);
-	int rows = tconfig().get_property(objectName(), "rows", 1).toInt();
-	//m_cmbRows->setCurrentIndex(rows);
-	//song->update(); // calls update mixer
 }
 
 //---------------------------------------------------------
@@ -125,7 +128,6 @@ void AudioMixerApp::clear()
 	DockList::iterator si = m_dockList.begin();
 	for (; si != m_dockList.end(); ++si)
 	{
-		//m_splitter->removeWidget(*si);
 		delete *si;
 	}
 	m_dockList.clear();
@@ -135,20 +137,20 @@ void AudioMixerApp::clear()
 void AudioMixerApp::trackListChanged(TrackList* list)
 {
 	m_tracklist = list;
-	//updateMixer(m_cmbRows->currentIndex());
+	updateMixer(m_cmbRows->currentIndex());
 }
 
 //---------------------------------------------------------
 //   updateMixer
 //---------------------------------------------------------
 
-void AudioMixerApp::updateMixer(int index)
+void AudioMixerApp::updateMixer(int index)/*{{{*/
 {
-	m_dockList.clear();
+	clear();
 	int rows = m_cmbRows->itemData(index).toInt();
-	for(int i = 1; rows+1; ++i)
+	for(int i = 1; i < rows+1; ++i)
 	{
-		MixerDock *mixerRow = new MixerDock(this);
+		MixerDock *mixerRow = new MixerDock(PANE, this);
 		mixerRow->setObjectName("MixerDock");
 		m_dockList.push_back(mixerRow);
 		m_splitter->addWidget(mixerRow);
@@ -156,11 +158,80 @@ void AudioMixerApp::updateMixer(int index)
 
 	if(m_tracklist->size())
 	{
-		int count = m_tracklist->size()-1;
-		int rowCount,rem;
+		int count = m_tracklist->size();
+		int rowCount,rem,lastrow = 0;
 		getRowCount(count, rows, rowCount, rem);
+		if(!rowCount)
+		{
+			//printf("getRowcount return zero\n");
+			clear();
+			MixerDock *mixerRow = new MixerDock(PANE, this);
+			mixerRow->setObjectName("MixerDock");
+			m_dockList.push_back(mixerRow);
+			m_splitter->addWidget(mixerRow);
+			TrackList* list = new TrackList();
+			for(iTrack it = m_tracklist->begin(); it != m_tracklist->end(); ++it)
+			{
+				list->push_back(*it);
+			}
+			mixerRow->setTracklist(list);
+
+			m_cmbRows->blockSignals(true);
+			m_cmbRows->setCurrentIndex(0);
+			m_cmbRows->blockSignals(false);
+		}
+		else
+		{
+			if(rem && rem >= rows)
+			{//split the remainder among the rows
+				int add,addrem;
+				getRowCount(rem, rows, add, addrem);
+				rowCount = rowCount+add;
+				lastrow = rowCount+addrem;
+			}
+			else
+			{
+				lastrow = rowCount+rem;
+			}
+			DockList::iterator si = m_dockList.begin();
+			
+			iTrack it = m_tracklist->begin();
+			//printf("Tracklist size; %d\n", (int)m_tracklist->size());
+			for (int i = 0; i < rows; ++i)
+			{
+				TrackList* list = new TrackList();
+				if(i != (rows-1))
+				{
+					for(int c = 1; it != m_tracklist->end() && c <= rowCount; ++it, ++c)
+					{
+						list->push_back(*it);
+					}
+				}
+				else
+				{
+					for(int c = 1; it != m_tracklist->end() && c <= lastrow; ++it, ++c)
+					{
+						list->push_back(*it);
+					}
+				}
+				if(si != m_dockList.end())
+					(*si)->setTracklist(list);
+				++si;
+			}
+		}
 	}
-}
+	else
+	{
+		//printf("TrackList is empty\n");
+		DockList::iterator si = m_dockList.begin();
+		for(; si != m_dockList.end(); ++si)
+		{
+			
+			TrackList* list = new TrackList();
+			(*si)->setTracklist(list);
+		}
+	}
+}/*}}}*/
 
 void AudioMixerApp::getRowCount(int trackCount, int rows, int& rowcount, int& remainder)
 {
@@ -192,6 +263,21 @@ void AudioMixerApp::songChanged(int flags)
 	}
 }
 
+void AudioMixerApp::showEvent(QShowEvent* e)
+{
+	QRect geometry = tconfig().get_property(objectName(), "geometry", QRect(0,0,600, 600)).toRect();
+	setGeometry(geometry);
+	int rows = tconfig().get_property(objectName(), "rows", 1).toInt();
+	m_cmbRows->blockSignals(true);
+	m_cmbRows->setCurrentIndex(rows);
+	m_cmbRows->blockSignals(false);
+	if(!e->spontaneous())
+	{
+		connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+		m_mixerView->updateTrackList();
+	}
+}
+
 //---------------------------------------------------------
 //   closeEvent
 //---------------------------------------------------------
@@ -205,24 +291,22 @@ void AudioMixerApp::closeEvent(QCloseEvent* e)
 	e->accept();
 }
 
-void AudioMixerApp::hideEvent(QHideEvent*)
+void AudioMixerApp::hideEvent(QHideEvent* e)
 {
+	if(!e->spontaneous())
+	{
+		if(song && !song->invalid)
+			disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	}
 }
 
-void AudioMixerApp::toggleShowEffectsRack(bool)
+void AudioMixerApp::toggleAuxRack(bool toggle)
 {
-/*
-	StripList::iterator si = stripList.begin();
-	for (; si != stripList.end(); ++si)
+	DockList::iterator si = m_dockList.begin();
+	for (; si != m_dockList.end(); ++si)
 	{
-		Strip* audioStrip = qobject_cast<Strip*>(*si);
-		if (audioStrip)
-		{
-			audioStrip->toggleAuxPanel(toggle);
-		}
-
+		(*si)->toggleAuxRack(toggle);
 	}
-	*/
 }
 
 //---------------------------------------------------------
