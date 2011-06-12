@@ -1473,11 +1473,18 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//menu_help->addSeparator();
 	//menu_ids[CMD_START_WHATSTHIS] = menu_help->insertItem(tr("What's &This?"), this, SLOT(whatsThis()), 0);
 
-	m_mixerDock = new MixerDock(tr("The Mixer Dock"), this);
+	QWidget *faketitle = new QWidget();
+	m_mixerDock = new QDockWidget(tr("The Mixer Dock"), this);
+	m_mixerDock->setTitleBarWidget(faketitle);
 	m_mixerDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
 	m_mixerDock->setObjectName("m_mixerDock");
 	addDockWidget(Qt::BottomDockWidgetArea, m_mixerDock);
+
+	m_mixerWidget = new MixerDock(m_mixerDock);
+	m_mixerWidget->setObjectName("MixerDock");
+	connect(m_mixerDock, SIGNAL(visibilityChanged(bool)), m_mixerWidget, SLOT(updateConnections(bool)));
 	m_mixerDock->setVisible(false);
+	m_mixerDock->setWidget(m_mixerWidget);
 
 	//---------------------------------------------------
 	//    Central Widget
@@ -5460,7 +5467,7 @@ void OOMidi::showMixer1(bool on)
 {
 	if (on && mixer1 == 0)
 	{
-		mixer1 = new AudioMixerApp(this, &(config.mixer1));
+		mixer1 = new AudioMixerApp("Mixer1", this);
 		mixer1->setObjectName("Mixer1");
 		mixer1->setWindowRole("Mixer1");
 		connect(mixer1, SIGNAL(closed()), SLOT(mixer1Closed()));
@@ -5478,7 +5485,7 @@ void OOMidi::showMixer1(bool on)
 
 void OOMidi::showMixer2(bool on)
 {
-	if (on && mixer2 == 0)
+	/*if (on && mixer2 == 0)
 	{
 		mixer2 = new AudioMixerApp(this, &(config.mixer2));
 		mixer2->setObjectName("Mixer2");
@@ -5490,6 +5497,7 @@ void OOMidi::showMixer2(bool on)
 	if (mixer2)
 		mixer2->setVisible(on);
 	viewMixerBAction->setChecked(on);
+	*/
 }
 
 AudioPortConfig* OOMidi::getRoutingDialog(bool)

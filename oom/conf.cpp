@@ -1472,12 +1472,12 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 	//      xml.geometryTag(level, "geometryMixer", audioMixer);   // Obsolete
 	xml.intTag(level, "mixer1Visible", viewMixerAAction->isChecked());
 	xml.intTag(level, "mixer2Visible", viewMixerBAction->isChecked());
-	if (mixer1)
+	//if (mixer1)
 		//mixer1->write(level, xml, "mixer1");
-		mixer1->write(level, xml);
-	if (mixer2)
+	//	mixer1->write(level, xml);
+	//if (mixer2)
 		//mixer2->write(level, xml, "mixer2");
-		mixer2->write(level, xml);
+	//	mixer2->write(level, xml);
 
 	arranger->writeStatus(level, xml);
 	writeSeqConfiguration(level, xml, true);

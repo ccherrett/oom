@@ -9,12 +9,11 @@
 #ifndef _OOM_MIXERDOCK_H_
 #define _OOM_MIXERDOCK_H_
 
-#include <QDockWidget>
+#include <QFrame>
+#include "track.h"
 
 class QAction;
 class QString;
-class QFrame;
-class QWidget;
 class QMenu;
 class QScrollArea;
 class QHBoxLayout;
@@ -29,39 +28,44 @@ class Strip;
 class Track;
 
 typedef std::list<Strip*> StripList;
+enum MixerMode
+{
+	DOCKED, //docked as part of the main application
+	PANE  //Just a row in the main mixer <dumb mode>
+};
 
-class MixerDock : public QDockWidget
+class MixerDock : public QFrame
 {
 	Q_OBJECT
 
     StripList stripList;
     QScrollArea* view;
     QFrame* central;
-    QFrame* m_mixerBase;
     QHBoxLayout* m_mixerBox;
 	QVBoxLayout* m_adminBox;
     QHBoxLayout* m_dockButtonBox;
     QHBoxLayout* layout;
     QMenu* menuView;
     AudioPortConfig* routingDialog;
-	QToolButton* m_btnDock;
-	QToolButton* m_btnClose;
 	QPushButton* m_btnAux;
-	QAction* closeAction;
+	TrackList* m_tracklist;
+	MixerMode m_mode;
 
 	int oldAuxsSize;
+	void layoutUi();
 	
 public:
-	MixerDock(const QString& title, QWidget *parent = 0);
+	MixerDock(QWidget *parent = 0);
+	MixerDock(MixerMode, QWidget *parent = 0 );
 	~MixerDock();
+	void setTracklist(TrackList* list);
+	TrackList* tracklist();
     void clear();
 	
-private slots:
+public slots:
 	void songChanged(int);
     void configChanged();
 	void toggleAuxRack(bool);
-	void toggleDetach();
-	void toggleClose();
 	void updateConnections(bool);
 	
 protected:

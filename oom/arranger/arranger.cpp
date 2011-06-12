@@ -159,9 +159,11 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 
 
 	QToolButton* btnToggleMixer  = new QToolButton();
-	btnToggleMixer->setIcon(QPixmap(":/images/icons/showmixer.png"));
 	btnToggleMixer->setMaximumSize(QSize(24,24));
-	connect(btnToggleMixer, SIGNAL(clicked(bool)), oom->mixerDock(), SLOT(toggleClose()));
+	QAction* closeAction = oom->mixerDock()->toggleViewAction();
+	closeAction->setIcon(QPixmap(":/images/icons/showmixer.png"));
+	btnToggleMixer->setDefaultAction(closeAction);
+	//connect(btnToggleMixer, SIGNAL(clicked(bool)), oom->mixerDock(), SLOT(toggleClose()));
 	toolbar2->addWidget(btnToggleMixer);
 	cursorPos = new PosLabel(0);
 	cursorPos->setEnabled(false);

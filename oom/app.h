@@ -207,7 +207,8 @@ class OOMidi : public QMainWindow
     QMenu* openRecent;
 
 	QDockWidget* _resourceDock;
-	MixerDock *m_mixerDock;
+	MixerDock *m_mixerWidget;
+	QDockWidget *m_mixerDock;
 	QMessageBox *pipelineBox;
 
     bool readMidi(FILE*);
@@ -426,7 +427,7 @@ public:
 		else
 			return new QString();
 	}
-	MixerDock* mixerDock() { return m_mixerDock; }
+	QDockWidget* mixerDock() { return m_mixerDock; }
 
 #ifdef HAVE_LASH
     void lash_idle_cb();
