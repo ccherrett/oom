@@ -75,6 +75,7 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 	m_btnAux->setCheckable(true);
 	m_btnAux->setChecked(true);
 	m_btnAux->setIcon(*expandIcon);
+	m_btnAux->setIconSize(expandIcon->size());
 
 	m_cmbRows = new QComboBox(m_mixerDock);
 	for(int i = 1; i < 6; i++)
