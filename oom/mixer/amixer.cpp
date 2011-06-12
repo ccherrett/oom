@@ -46,19 +46,13 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 	setWindowIcon(*oomIcon);
 
 	QMenu* menuView = menuBar()->addMenu(tr("&View"));
-	routingId = menuView->addAction(tr("Routing"), this, SLOT(toggleAudioPortConfig()));
+	routingId = menuView->addAction(tr("Audio Connections Manager"), this, SLOT(toggleAudioPortConfig()));
 	routingId->setCheckable(true);
 
 	menuView->addSeparator();
 
 	QActionGroup* actionItems = new QActionGroup(this);
 	actionItems->setExclusive(false);
-
-	//toggleShowEffectsRackAction = new QAction(tr("Show/hide Effects Rack"), actionItems);
-	//toggleShowEffectsRackAction->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
-	//toggleShowEffectsRackAction->setCheckable(true);
-
-	//connect(toggleShowEffectsRackAction, SIGNAL(triggered(bool)), SLOT(toggleShowEffectsRack(bool)));
 
 	menuView->addActions(actionItems->actions());
 
@@ -68,7 +62,6 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 	dockBox->setSpacing(2);*/
 
 	QDockWidget* m_mixerDock = new QDockWidget(tr("Mixer Views"), this);
-	//m_mixerDock->setTitleBarWidget(faketitle);
 	m_mixerDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::LeftDockWidgetArea, m_mixerDock);
 	m_mixerView = new MixerView(this);
@@ -99,6 +92,8 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 	setCentralWidget(m_view);
 
 	m_splitter = new QSplitter(Qt::Vertical, m_view);
+	m_splitter->setHandleWidth(2);
+	m_splitter->setChildrenCollapsible(true);
 	m_view->setWidget(m_splitter);
 	m_view->setWidgetResizable(true);
 
@@ -116,6 +111,7 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 AudioMixerApp::~AudioMixerApp()
 {
 	tconfig().set_property(objectName(), "geometry", geometry());
+	tconfig().set_property(objectName(), "rows", m_cmbRows->currentIndex());
     tconfig().save();
 }
 
