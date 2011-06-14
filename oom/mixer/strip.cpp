@@ -42,6 +42,7 @@ Strip::Strip(QWidget* parent, Track* t)
 : QFrame(parent)
 {
 	track = t;
+	m_type = t->type();
 	_curGridRow = 0;
 	m_collapsed = false;
 	hasRecord = true;
@@ -450,7 +451,8 @@ void Strip::layoutUi()/*{{{*/
  */
 bool Strip::setTrack(Track* t)
 {
-	if(t)// t->type() == track->type())
+	Track::TrackType type = (Track::TrackType)m_type;
+	if(t && t->type() == type)
 	{
 		track = t;
 		trackChanged();
