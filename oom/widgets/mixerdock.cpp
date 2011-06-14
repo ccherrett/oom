@@ -121,7 +121,7 @@ void MixerDock::layoutUi()/*{{{*/
 	if(m_mode == DOCKED)
 	{
 		m_masterBox = new QHBoxLayout();
-		m_masterBox->setContentsMargins(0, 0, 0, 0);
+		m_masterBox->setContentsMargins(4, 0, 0, 0);
 		m_masterBox->setSpacing(0);
 		Track* master = song->findTrack("Master");
 		if(master)
