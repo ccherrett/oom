@@ -1284,7 +1284,8 @@ void Song::setMasterFlag(bool val)
 	if (tempomap.setMasterFlag(cpos(), val))
 	{
 		//audioDevice->setMaster(val);
-		emit songChanged(SC_MASTER);
+		if(!invalid)
+			emit songChanged(SC_MASTER);
 	}
 	// Removed. p3.3.26
 	//audioDevice->setMaster(val);
@@ -1519,7 +1520,8 @@ void Song::update(int flags)
 	++level;
 	if(flags & (SC_TRACK_REMOVED | SC_TRACK_INSERTED/* | SC_TRACK_MODIFIED*/))
 		updateTrackViews1();
-	emit songChanged(flags);
+	if(!invalid)
+		emit songChanged(flags);
 	--level;
 }
 
@@ -1549,7 +1551,8 @@ void Song::setChannelMute(int channel, bool val)
 		if (track->outChannel() == channel)
 			track->setMute(val);
 	}
-	emit songChanged(SC_MUTE);
+	if(!invalid)
+		emit songChanged(SC_MUTE);
 }
 
 //---------------------------------------------------------
@@ -1581,7 +1584,8 @@ void Song::initLen()
 
 void Song::tempoChanged()
 {
-	emit songChanged(SC_TEMPO);
+	if(!invalid)
+		emit songChanged(SC_TEMPO);
 }
 
 //---------------------------------------------------------
@@ -1931,7 +1935,8 @@ void Song::endMsgCmd()
 			//printf("Song::endMsgCmd() calling updateTrackViews1()\n");
 			updateTrackViews1();
 		}
-		emit songChanged(updateFlags);
+		if(!invalid)
+			emit songChanged(updateFlags);
 	}
 }
 
@@ -1955,7 +1960,8 @@ void Song::undo()
 	if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
 		updateTrackViews1();
 
-	emit songChanged(updateFlags);
+	if(!invalid)
+		emit songChanged(updateFlags);
 }
 
 //---------------------------------------------------------
@@ -1977,7 +1983,8 @@ void Song::redo()
 
 	if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
 		updateTrackViews1();
-	emit songChanged(updateFlags);
+	if(!invalid)
+		emit songChanged(updateFlags);
 }
 
 //---------------------------------------------------------
@@ -3672,7 +3679,8 @@ void Song::updateTrackViews1()
 			//}
 		}
 	}
-	emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
+	if(!invalid)
+		emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
 
 //---------------------------------------------------------

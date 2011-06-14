@@ -1028,6 +1028,12 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 }
 
+void AudioStrip::trackChanged()
+{
+	rack->setTrack((AudioTrack*)track);
+	songChanged(-1);
+}
+
 //---------------------------------------------------------
 //   addMenuItem
 //---------------------------------------------------------

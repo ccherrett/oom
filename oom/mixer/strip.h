@@ -101,6 +101,7 @@ protected:
     QGridLayout* sliderGrid;
     ComboBox* autoType;
     void setLabelText();
+	virtual void trackChanged() = 0;
 
 private slots:
     void recordToggled(bool);
@@ -125,6 +126,8 @@ public:
     {
         return track;
     }
+
+	bool setTrack(Track* t);
     void setLabelFont();
 };
 

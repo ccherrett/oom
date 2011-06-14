@@ -1725,6 +1725,7 @@ void OOMidi::loadProjectFile(const QString& name)
 void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAll)
 {
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	song->invalid = true;
 	//
 	// stop audio threads if running
 	//
@@ -1745,6 +1746,8 @@ void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAl
 	microSleep(100000);
 	if (restartSequencer)
 		seqStart();
+	song->invalid = false;
+	song->update();
 
 	//if (song->getSongInfo().length() > 0)
 	//	startSongInfo(false);

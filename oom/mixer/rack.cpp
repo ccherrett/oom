@@ -122,7 +122,7 @@ EffectRack::~EffectRack()
 
 void EffectRack::songChanged(int typ)
 {
-	if (typ & (SC_ROUTE | SC_RACK))
+	if (typ & (SC_ROUTE | SC_RACK) || typ == -1)
 	{
 		updateContents();
 	}

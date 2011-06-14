@@ -52,6 +52,9 @@ class MidiStrip : public Strip
     void updateControls();
     void updateOffState();
 
+protected:
+	void trackChanged(){}
+
 private slots:
     //void routeClicked();
     void offToggled(bool);

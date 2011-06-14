@@ -60,6 +60,11 @@ public:
     {
         return track;
     }
+	void setTrack(AudioTrack* t)
+	{
+		track = t;
+		songChanged(-1);
+	}
 
     QPoint getDragPos()
     {

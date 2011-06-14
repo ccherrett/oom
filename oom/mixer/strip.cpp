@@ -443,6 +443,23 @@ void Strip::layoutUi()/*{{{*/
 	connect(m_btnAux, SIGNAL(toggled(bool)), this, SLOT(toggleAuxPanel(bool)));
 }/*}}}*/
 
+/**
+ * @param t Track object.
+ * NOTE: The track being passed in MUST be of the same type as the current 
+ * track. This function is only currently used to manage Master
+ */
+bool Strip::setTrack(Track* t)
+{
+	if(t)// t->type() == track->type())
+	{
+		track = t;
+		trackChanged();
+		//songChanged(-1);
+		return true;
+	}
+	return false;
+}
+
 //---------------------------------------------------------
 //   setRecordFlag
 //---------------------------------------------------------

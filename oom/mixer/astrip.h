@@ -54,6 +54,8 @@ class AudioStrip : public Strip
     void updateVolume();
     void updatePan();
     void updateChannels();
+protected:
+	void trackChanged();
 
 private slots:
     void stereoToggled(bool);

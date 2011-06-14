@@ -35,10 +35,13 @@ MixerDock::MixerDock(QWidget* parent)
 {
 	routingDialog = 0;
 	oldAuxsSize = 0;
+	masterStrip = 0;
 	m_mode = DOCKED;
 	m_tracklist = song->visibletracks();
 
+	loading = true;
 	layoutUi();
+	loading = false;
 }
 
 MixerDock::MixerDock(MixerMode mode, QWidget* parent)
@@ -46,16 +49,23 @@ MixerDock::MixerDock(MixerMode mode, QWidget* parent)
 {
 	routingDialog = 0;
 	oldAuxsSize = 0;
+	masterStrip = 0;
 	if(mode == DOCKED)
 		m_tracklist = song->visibletracks();
 	else
 		m_tracklist = new TrackList();
 	
 	m_mode = mode;
+	loading = true;
 	layoutUi();
+	loading = false;
 }
 
-void MixerDock::layoutUi()
+MixerDock::~MixerDock()
+{
+}
+
+void MixerDock::layoutUi()/*{{{*/
 {
 	setObjectName("MixerDock");
 	setMinimumHeight(300);
@@ -102,13 +112,26 @@ void MixerDock::layoutUi()
 	central->setFrameShadow(QFrame::Raised);
 	layout = new QHBoxLayout();
 	central->setLayout(layout);
-	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
 	layout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 	view->setWidget(central);
 	view->setWidgetResizable(true);
 	m_mixerBox->addWidget(view);
+	if(m_mode == DOCKED)
+	{
+		m_masterBox = new QHBoxLayout();
+		m_masterBox->setContentsMargins(0, 0, 0, 0);
+		m_masterBox->setSpacing(0);
+		Track* master = song->findTrack("Master");
+		if(master)
+		{
+			masterStrip = new AudioStrip(this, (AudioTrack*)master);
+			masterStrip->setObjectName("MixerAudioOutStrip");
+			m_masterBox->addWidget(masterStrip);
+		}
+		m_mixerBox->addLayout(m_masterBox);
+	}
 
 	//Push all the widgets in the m_adminBox to the top
 	m_adminBox->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -119,11 +142,7 @@ void MixerDock::layoutUi()
 		connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
 	//	connect(this, SIGNAL(visibilityChanged(bool)), this, SLOT(updateConnections(bool)));
 	songChanged(-1);
-}
-
-MixerDock::~MixerDock()
-{
-}
+}/*}}}*/
 
 TrackList* MixerDock::tracklist()
 {
@@ -252,7 +271,7 @@ void MixerDock::clear()/*{{{*/
 
 void MixerDock::updateMixer(UpdateAction action)
 {
-
+	loading = true;
 	int auxsSize = song->auxs()->size();
 	if ((action == UPDATE_ALL) || (auxsSize != oldAuxsSize))
 	{
@@ -328,8 +347,25 @@ void MixerDock::updateMixer(UpdateAction action)
 
 	TrackList* itl = m_tracklist;
 	for (iTrack i = itl->begin(); i != itl->end(); ++i)
-		addStrip(*i, idx++);
-
+	{
+		if((*i)->name() != "Master")
+			addStrip(*i, idx++);
+	}
+	Track* master = song->findTrack("Master");
+	if(master)
+	{
+		if(m_mode == DOCKED && !masterStrip)
+		{
+			masterStrip = new AudioStrip(this, (AudioTrack*)master);
+			masterStrip->setObjectName("MixerAudioOutStrip");
+			m_masterBox->addWidget(masterStrip);
+		}
+		else if(m_mode == DOCKED)
+		{
+			masterStrip->setTrack(master);
+		}
+	}
+	loading= false;
 }
 
 //---------------------------------------------------------
@@ -374,13 +410,17 @@ void MixerDock::songChanged(int flags)
 		//printf("running updateMixer()\n");
 		updateMixer(action);
 	}
-	if (action != UPDATE_ALL)
+	if (action != UPDATE_ALL && !loading)
 	{
 		//printf("Running songChanged() on all strips\n");
 		StripList::iterator si = stripList.begin();
 		for (; si != stripList.end(); ++si)
 		{
 			(*si)->songChanged(flags);
+		}
+		if(m_mode == DOCKED && masterStrip)
+		{
+			masterStrip->songChanged(flags);
 		}
 	}
 }

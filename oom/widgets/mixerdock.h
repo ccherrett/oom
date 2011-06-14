@@ -25,6 +25,7 @@ class QPixmap;
 class QImage;
 class AudioPortConfig;
 class Strip;
+class AudioStrip;
 class Track;
 
 typedef std::list<Strip*> StripList;
@@ -45,11 +46,13 @@ class MixerDock : public QFrame
 	QVBoxLayout* m_adminBox;
     QHBoxLayout* m_dockButtonBox;
     QHBoxLayout* layout;
-    QMenu* menuView;
+    QHBoxLayout* m_masterBox;
+	Strip* masterStrip;
     AudioPortConfig* routingDialog;
 	QPushButton* m_btnAux;
 	TrackList* m_tracklist;
 	MixerMode m_mode;
+	bool loading;
 
 	int oldAuxsSize;
 	void layoutUi();
