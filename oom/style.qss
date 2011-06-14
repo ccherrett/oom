@@ -1072,7 +1072,7 @@ QTabWidget#m_tabWidget QTabBar::tab:selected, QTabWidget#m_tabWidget QTabBar::ta
 
 QTabWidget#m_tabWidget QTabBar::tab:selected {
     border-color: #9B9B9B;
-    border-bottom-color: #C2C7CB; /* same as pane color */
+    border-bottom: 0px;
     margin-top: 0px;
     margin-left: 0px;
 }
@@ -1080,6 +1080,7 @@ QTabWidget#m_tabWidget QTabBar::tab:selected {
 QTabWidget#m_tabWidget QTabBar::tab:!selected {
     margin-top: 2px; /* make non-selected tabs look smaller */
     margin-left: 0px;
+    border-bottom: 0px;
 }
 
 /* make use of negative margins for overlapping tabs */
