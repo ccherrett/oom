@@ -182,6 +182,10 @@ void MixerDock::toggleAuxRack(bool toggle)/*{{{*/
 		}
 
 	}
+	if((m_mode == DOCKED || m_mode == MASTER )&& masterStrip)
+	{
+		masterStrip->toggleAuxPanel(toggle);
+	}
 	//Just in case this was called from outside the button
 	m_btnAux->blockSignals(true);
 	m_btnAux->setChecked(toggle);
@@ -270,7 +274,7 @@ void MixerDock::clear()/*{{{*/
 	oldAuxsSize = -1;
 }/*}}}*/
 
-void MixerDock::updateMixer(UpdateAction action)
+void MixerDock::updateMixer(UpdateAction action)/*{{{*/
 {
 	loading = true;
 	int auxsSize = song->auxs()->size();
@@ -367,7 +371,7 @@ void MixerDock::updateMixer(UpdateAction action)
 		}
 	}
 	loading= false;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   configChanged
@@ -382,7 +386,7 @@ void MixerDock::configChanged()
 //   songChanged
 //---------------------------------------------------------
 
-void MixerDock::songChanged(int flags)
+void MixerDock::songChanged(int flags)/*{{{*/
 {
 	//printf("MixerDock::songChanged(%d)\n",flags);
 	// Is it simply a midi controller value adjustment? Forget it.
@@ -424,4 +428,4 @@ void MixerDock::songChanged(int flags)
 			masterStrip->songChanged(flags);
 		}
 	}
-}
+}/*}}}*/
