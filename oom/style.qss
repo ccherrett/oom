@@ -1044,7 +1044,8 @@ QTabWidget#m_tabWidget::tab-bar {
 /* Style the tab using the tab sub-control. Note that
     it reads QTabBar _not_ QTabWidget */
 QTabWidget#m_tabWidget QTabBar::tab {
-	background-color: #47474d;							
+	/*background-color: #47474d;*/							
+	background-color: #7b7b7b;							
 	/*background-color: #FF0000;*/							
     border: 1px solid #a5a6a5;
     border-bottom-color: #595966; /* same as the pane color */
@@ -1072,7 +1073,7 @@ QTabWidget#m_tabWidget QTabBar::tab:selected, QTabWidget#m_tabWidget QTabBar::ta
 
 QTabWidget#m_tabWidget QTabBar::tab:selected {
     border-color: #9B9B9B;
-    border-bottom-color: #C2C7CB; /* same as pane color */
+    border-bottom: 0px;
     margin-top: 0px;
     margin-left: 0px;
 }
@@ -1080,6 +1081,7 @@ QTabWidget#m_tabWidget QTabBar::tab:selected {
 QTabWidget#m_tabWidget QTabBar::tab:!selected {
     margin-top: 2px; /* make non-selected tabs look smaller */
     margin-left: 0px;
+    border-bottom: 0px;
 }
 
 /* make use of negative margins for overlapping tabs */
