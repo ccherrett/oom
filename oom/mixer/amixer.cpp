@@ -133,7 +133,11 @@ void AudioMixerApp::updateMixer(int index)/*{{{*/
 	int rows = m_cmbRows->itemData(index).toInt();
 	for(int i = 1; i < rows+1; ++i)
 	{
-		MixerDock *mixerRow = new MixerDock(PANE, this);
+		MixerDock *mixerRow;
+		if(i == 1)
+			mixerRow = new MixerDock(MASTER, this);
+		else
+			mixerRow = new MixerDock(PANE, this);
 		mixerRow->setObjectName("MixerDock");
 		m_dockList.push_back(mixerRow);
 		m_splitter->addWidget(mixerRow);
@@ -148,14 +152,27 @@ void AudioMixerApp::updateMixer(int index)/*{{{*/
 		{
 			//printf("getRowcount return zero\n");
 			clear();
-			MixerDock *mixerRow = new MixerDock(PANE, this);
+			MixerDock *mixerRow = new MixerDock(MASTER, this);
 			mixerRow->setObjectName("MixerDock");
 			m_dockList.push_back(mixerRow);
 			m_splitter->addWidget(mixerRow);
 			TrackList* list = new TrackList();
+			bool found = false;
 			for(iTrack it = m_tracklist->begin(); it != m_tracklist->end(); ++it)
 			{
 				list->push_back(*it);
+				if((*it)->name() == "Master")
+				{
+					found = true;
+				}
+			}
+			if(!found)
+			{
+				Track* master = song->findTrack("Master");
+				if(master)
+				{
+					list->push_back(master);
+				}
 			}
 			mixerRow->setTracklist(list);
 
@@ -180,10 +197,23 @@ void AudioMixerApp::updateMixer(int index)/*{{{*/
 			
 			iTrack it = m_tracklist->begin();
 			//printf("Tracklist size; %d\n", (int)m_tracklist->size());
+			int last = rows-1;
 			for (int i = 0; i < rows; ++i)
 			{
 				TrackList* list = new TrackList();
-				if(i != (rows-1))
+				if(i == 0)
+				{
+					Track* master = song->findTrack("Master");
+					if(master)
+					{
+						list->push_back(master);
+					}
+					for(int c = 1; it != m_tracklist->end() && c <= rowCount; ++it, ++c)
+					{
+						list->push_back(*it);
+					}
+				}
+				else if(i != last)
 				{
 					for(int c = 1; it != m_tracklist->end() && c <= rowCount; ++it, ++c)
 					{

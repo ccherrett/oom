@@ -187,7 +187,7 @@ void MixerView::updateTrackList()/*{{{*/
 						break;
 					}
 				}
-				if(!found)
+				if(!found && (*t)->name() != "Master")
 				{
 					m_tracklist.push_back((*t));
 					customview = true;
@@ -237,11 +237,11 @@ void MixerView::updateTrackList()/*{{{*/
 							}
 							break;
 						case Track::AUDIO_OUTPUT:
-							if((*ait)->viewName() == "Outputs View")
+							if((*ait)->viewName() == "Outputs View" && (*t)->name() != "Master")
 							{
 								m_tracklist.push_back((*t));
 							}
-							else if((*ait)->viewName() == "Comment View")
+							else if((*ait)->viewName() == "Comment View" && (*t)->name() != "Master")
 							{
 								if((*t)->comment().isEmpty())
 									break;
@@ -297,6 +297,7 @@ void MixerView::updateTrackList()/*{{{*/
 		//Make the viewtracks the artracks
 		for(ciTrack it = song->artracks()->begin(); it != song->artracks()->end(); ++it)
 		{
+			if((*it)->name() != "Master")
 			m_tracklist.push_back((*it));
 		}
 	}

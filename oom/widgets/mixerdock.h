@@ -32,6 +32,7 @@ typedef std::list<Strip*> StripList;
 enum MixerMode
 {
 	DOCKED, //docked as part of the main application
+	MASTER, //contains the master strip in the mixer
 	PANE  //Just a row in the main mixer <dumb mode>
 };
 

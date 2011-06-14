@@ -118,7 +118,7 @@ void MixerDock::layoutUi()/*{{{*/
 	view->setWidget(central);
 	view->setWidgetResizable(true);
 	m_mixerBox->addWidget(view);
-	if(m_mode == DOCKED)
+	if(m_mode == DOCKED || m_mode == MASTER)
 	{
 		m_masterBox = new QHBoxLayout();
 		m_masterBox->setContentsMargins(4, 0, 0, 0);
@@ -159,7 +159,8 @@ void MixerDock::updateConnections(bool visible)
 {
 	if(visible)
 	{
-		songChanged(-1);
+		if(!song->invalid)
+			songChanged(-1);
 		connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	}
 	else
@@ -354,13 +355,13 @@ void MixerDock::updateMixer(UpdateAction action)
 	Track* master = song->findTrack("Master");
 	if(master)
 	{
-		if(m_mode == DOCKED && !masterStrip)
+		if((m_mode == DOCKED || m_mode == MASTER) && !masterStrip)
 		{
 			masterStrip = new AudioStrip(this, (AudioTrack*)master);
 			masterStrip->setObjectName("MixerAudioOutStrip");
 			m_masterBox->addWidget(masterStrip);
 		}
-		else if(m_mode == DOCKED)
+		else if(m_mode == DOCKED || m_mode == MASTER)
 		{
 			masterStrip->setTrack(master);
 		}
@@ -418,7 +419,7 @@ void MixerDock::songChanged(int flags)
 		{
 			(*si)->songChanged(flags);
 		}
-		if(m_mode == DOCKED && masterStrip)
+		if((m_mode == DOCKED || m_mode == MASTER )&& masterStrip)
 		{
 			masterStrip->songChanged(flags);
 		}
