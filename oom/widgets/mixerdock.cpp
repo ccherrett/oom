@@ -82,7 +82,7 @@ void MixerDock::layoutUi()/*{{{*/
 	titleWidget->setFrameShadow(QFrame::Raised);
 	//titleWidget->setMaximumWidth(250);
 	m_adminBox = new QVBoxLayout(titleWidget);
-	m_adminBox->setContentsMargins(2, 2, 2, 0);
+	m_adminBox->setContentsMargins(2, 4, 2, 0);
 	m_adminBox->setSpacing(0);
 	m_adminBox->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
 	

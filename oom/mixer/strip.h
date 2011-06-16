@@ -57,6 +57,7 @@ class Strip : public QFrame
 
 protected:
     Track* track;
+	int m_type;
 
     QVBoxLayout *m_mainVBoxLayout;
     QLabel *label;
