@@ -2590,12 +2590,12 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				peak = (peak * (hh - 2)) >> 9;
 				rms = (rms * (hh - 2)) >> 9;
 				
-				QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+				/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
 				vuGrad.setColorAt(1, red);
 				vuGrad.setColorAt(0.6, green);
 				vuGrad.setColorAt(0.5, green);
 				vuGrad.setColorAt(0.4, green);
-				vuGrad.setColorAt(0, red);
+				vuGrad.setColorAt(0, red);*/
 				/*vuGrad.setColorAt(1, red);
 				vuGrad.setColorAt(0.90, yellow);
 				vuGrad.setColorAt(0.5, green);
@@ -2609,6 +2609,13 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				p.drawLine(i, y - peak - cc, i, y + peak);
 				p.setPen(rms_color);
 				p.drawLine(i, y - rms - cc, i, y + rms);
+			
+				if(peak >= (hm - 2))
+				{
+					p.setPen(QColor(255,0,0));
+					p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
+					p.drawLine(i, y + peak - 1, i, y + peak);
+				}	
 			}
 		}
 		else
@@ -2617,6 +2624,17 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 			//  multi channel display
 			//
 			int hm = hh / (channels * 2);
+			int cliprange = 1;
+			//TODO: I need to base the calculation for clipping on the actual sample and db and not on the height of the track.
+			if(hm < 50)
+				cliprange = 2;
+			else if(hm >= 50 & hm <= 200)
+				cliprange = 3;
+			else if(hm < 300)
+				cliprange = 5;
+			else
+				cliprange = 6;
+
 			int cc = hh % (channels * 2) ? 0 : 1;
 			//printf("channels = %d, pr = %d, h = %d, hh = %d, hm = %d\n", channels, pr.height(), h, hh, hm);
 			//printf("canvas height: %d\n", height());
@@ -2634,13 +2652,12 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 					int rms = (sa[k].rms * (hm - 1)) >> 8;
 					if(k == 0)
 					{
-						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
+						/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
 						vuGrad.setColorAt(1, red);
 						vuGrad.setColorAt(0.6, green);
 						vuGrad.setColorAt(0.5, green);
 						vuGrad.setColorAt(0.4, green);
-						vuGrad.setColorAt(0, red);
+						vuGrad.setColorAt(0, red);*/
 						/*vuGrad.setColorAt(1, red);
 						vuGrad.setColorAt(0.90, yellow);
 						vuGrad.setColorAt(0.5, green);
@@ -2656,12 +2673,12 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 					else
 					{
 						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
-						QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+						/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
 						vuGrad.setColorAt(1, red);
 						vuGrad.setColorAt(0.6, green);
 						vuGrad.setColorAt(0.5, green);
 						vuGrad.setColorAt(0.4, green);
-						vuGrad.setColorAt(0, red);
+						vuGrad.setColorAt(0, red);*/
 						/*vuGrad.setColorAt(1, red);
 						vuGrad.setColorAt(0.90, yellow);
 						vuGrad.setColorAt(0.5, green);
@@ -2674,6 +2691,13 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 						p.drawLine(i, y - peak - cc, i, y + peak);
 						
 					}
+					//printf("peak value: %d hm value: %d\n", peak, hm);
+					if(peak >= (hm - cliprange))
+					{
+						p.setPen(QColor(255,0,0));
+						p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
+						p.drawLine(i, y + peak - 1, i, y + peak);
+					}	
 					p.setPen(rms_color);//QColor(0,19,23));
 					p.drawLine(i, y - rms - cc, i, y + rms);
 					
