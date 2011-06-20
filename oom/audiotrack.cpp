@@ -24,6 +24,9 @@
 #include "mididev.h"
 #include "midiport.h"
 #include "midimonitor.h"
+#ifdef LV2_SUPPORT
+#include "lv2_plugin.h"
+#endif
 
 
 //---------------------------------------------------------
@@ -196,14 +199,26 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)
 			int id = genACnum(idx, i);
 			const char* name = plugin->paramName(i);
 			float min, max;
-			plugin->range(i, &min, &max);
+#ifdef LV2_SUPPORT
+			//printf("AudioTrack::addPlugin %d\n", plugin->type());
+			if(plugin->type() == 2)
+			{
+				LV2PluginI* plug = (LV2PluginI*)plugin;
+				if(plug)
+					plug->range(i, &min, &max);
+			}
+			else
+#endif
+			{
+				plugin->range(i, &min, &max);
+			}
 			CtrlValueType t = plugin->valueType();
 			CtrlList* cl = new CtrlList(id);
 			cl->setRange(min, max);
 			cl->setName(QString(name));
 			cl->setValueType(t);
-			LADSPA_PortRangeHint range = plugin->range(i);
-			if (LADSPA_IS_HINT_TOGGLED(range.HintDescriptor))
+			Port* cport = plugin->getControlPort(i);
+			if (cport->toggle)
 				cl->setMode(CtrlList::DISCRETE);
 			else
 				cl->setMode(CtrlList::INTERPOLATE);
@@ -960,6 +975,8 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		}
 		if (rackpos < PipelineDepth)
 		{
+			//TODO: This must take into account and create as LV2PluginI 
+			//when reading here and writing
 			PluginI* pi = new PluginI();
 			pi->setTrack(this);
 			pi->setID(rackpos);
@@ -1028,8 +1045,9 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		if (ctlfound)
 		{
 			l->setCurVal(p->param(m));
-			LADSPA_PortRangeHint range = p->range(m);
-			if (LADSPA_IS_HINT_TOGGLED(range.HintDescriptor))
+			Port* cport = p->getControlPort(m);
+			//LADSPA_PortRangeHint range = p->range(m);
+			if (cport->toggle)
 				l->setMode(CtrlList::DISCRETE);
 			else
 				l->setMode(CtrlList::INTERPOLATE);
@@ -1132,8 +1150,9 @@ void AudioTrack::mapRackPluginsToControllers()
 			l->setRange(min, max);
 			l->setName(QString(p->paramName(i)));
 			l->setValueType(t);
-			LADSPA_PortRangeHint rh = p->range(i);
-			if (LADSPA_IS_HINT_TOGGLED(rh.HintDescriptor))
+			Port* cport = p->getControlPort(i);
+			//LADSPA_PortRangeHint rh = p->range(i);
+			if (cport->toggle)
 				l->setMode(CtrlList::DISCRETE);
 			else
 				l->setMode(CtrlList::INTERPOLATE);

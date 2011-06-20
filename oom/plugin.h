@@ -12,11 +12,8 @@
 #include <list>
 #include <vector>
 
-#include <QDialog>
 #include <QFileInfo>
-#include <QMainWindow>
 #include <QUiLoader>
-
 
 #include "ladspa.h"
 #include "globals.h"
@@ -36,11 +33,15 @@
 #include <dssi.h>
 #endif
 
+//#ifdef LV2_SUPPORT
+//#include "lilv/lilv.h"
+//#include "suil/suil.h"
+//#endif
+
 class QAbstractButton;
 class QComboBox;
 class QRadioButton;
 class QScrollArea;
-class QToolButton;
 class QToolButton;
 class QTreeWidget;
 
@@ -49,6 +50,7 @@ class Slider;
 class DoubleLabel;
 class AudioTrack;
 class MidiController;
+class PluginGui;
 
 //---------------------------------------------------------
 //   PluginLoader
@@ -64,13 +66,26 @@ public:
     }
 };
 
+enum PluginType {
+	LADSPA = 0,
+	DSSI,
+	LV2
+};
+
+typedef int PluginHint;
+#define Toggle 0x4
+#define SampleRate 0x8
+#define Logarithmic 0x10
+#define Integer 0x20
+
 //---------------------------------------------------------
 //   Plugin
 //---------------------------------------------------------
 
-class Plugin
+class Plugin/*{{{*/
 {
 protected:
+	PluginType m_type;
     void* _handle;
     int _references;
     int _instNo;
@@ -82,6 +97,7 @@ protected:
     QString _name;
     QString _maker;
     QString _copyright;
+	QString m_uri;
 
     bool _isDssi;
 #ifdef DSSI_SUPPORT
@@ -97,9 +113,11 @@ protected:
     std::vector<unsigned long> rpIdx; // Port number to control input index. Item is -1 if it's not a control input.
 
     bool _inPlaceCapable;
+	virtual void initLadspa(QFileInfo* f, const LADSPA_Descriptor* d, bool isDssi = false);
 
 public:
     Plugin(QFileInfo* f, const LADSPA_Descriptor* d, bool isDssi = false);
+    Plugin(PluginType t, const char* a);
     ~Plugin();
 
     QString label() const
@@ -127,9 +145,29 @@ public:
         return _copyright;
     }
 
+	int type() {return m_type;}
+
+	virtual QString uri()
+	{
+		return m_uri;
+	}
+
     QString lib(bool complete = true) /*const*/
     {
-        return complete ? fi.completeBaseName() : fi.baseName();
+		QString rv;
+		switch(m_type)
+		{
+			case LV2:
+				rv = m_uri;
+			break;
+			default:
+        		if(complete)
+					rv = fi.completeBaseName();
+				else
+					rv = fi.baseName();
+			break;
+		}
+		return rv;
     } // ddskrjo const
 
     QString dirPath(bool complete = true) const
@@ -146,7 +184,7 @@ public:
     {
         return _references;
     }
-    int incReferences(int);
+    virtual int incReferences(int);
 
     int instNo()
     {
@@ -184,6 +222,7 @@ public:
             plugin->connect_port(handle, port, value);
     }
 
+	//This is renamed to run(int n) for LV2Plugin::run();
     void apply(LADSPA_Handle handle, int n)
     {
         if (plugin)
@@ -214,13 +253,10 @@ public:
         return plugin->PortRangeHints[i];
     }
 
-    double defaultValue(unsigned long port) const;
-    void range(unsigned long i, float*, float*) const;
+    virtual double defaultValue(unsigned long port) const;
+    virtual void range(unsigned long i, float*, float*) const;
 
-    const char* portName(unsigned long i)
-    {
-        return plugin ? plugin->PortNames[i] : 0;
-    }
+    virtual const char* portName(unsigned long i);
 
     // Returns (int)-1 if not an input control.
 
@@ -253,21 +289,7 @@ public:
     {
         return _inPlaceCapable;
     }
-
-    /*
-    bool isLog(int k) const {
-          LADSPA_PortRangeHint r = plugin->PortRangeHints[pIdx[k]];
-          return LADSPA_IS_HINT_LOGARITHMIC(r.HintDescriptor);
-          }
-    bool isBool(int k) const {
-          return LADSPA_IS_HINT_TOGGLED(plugin->PortRangeHints[pIdx[k]].HintDescriptor);
-          }
-    bool isInt(int k) const {
-          LADSPA_PortRangeHint r = plugin->PortRangeHints[pIdx[k]];
-          return LADSPA_IS_HINT_INTEGER(r.HintDescriptor);
-          }
-     */
-};
+};/*}}}*/
 
 typedef std::list<Plugin>::iterator iPlugin;
 
@@ -275,7 +297,7 @@ typedef std::list<Plugin>::iterator iPlugin;
 //   PluginList
 //---------------------------------------------------------
 
-class PluginList : public std::list<Plugin>
+class PluginList : public std::list<Plugin>/*{{{*/
 {
 public:
 
@@ -289,7 +311,7 @@ public:
     PluginList()
     {
     }
-};
+};/*}}}*/
 
 //---------------------------------------------------------
 //   Port
@@ -303,81 +325,25 @@ struct Port
 
     bool enCtrl; // Enable controller stream.
     bool en2Ctrl; // Second enable controller stream (and'ed with enCtrl).
-};
-
-//---------------------------------------------------------
-//   GuiParam
-//---------------------------------------------------------
-
-struct GuiParam
-{
-
-    enum
-    {
-        GUI_SLIDER, GUI_SWITCH
-    };
-    int type;
-    int hint;
-
-    DoubleLabel* label;
-    QWidget* actuator; // Slider or Toggle Button (SWITCH)
-};
-
-//---------------------------------------------------------
-//   GuiWidgets
-//---------------------------------------------------------
-
-struct GuiWidgets
-{
-
-    enum
-    {
-        SLIDER, DOUBLE_LABEL, QCHECKBOX, QCOMBOBOX
-    };
-    QWidget* widget;
-    int type;
-    int param;
+	bool logarithmic;
+	bool isInt;
+	bool toggle;
+	bool samplerate;
+	float min;
+	float max;
+	std::string name;
+	/*Port(){
+		name = "Unknown";
+	}*/
 };
 
 class PluginI;
-
-/*
-class PluginBase 
-{
-   public:
-      bool on() const        { return _on; }
-      void setOn(bool val)   { _on = val; }
-      int pluginID()                { return plugin()->id(); }
-      int id()                      { return _id; }
-      QString pluginLabel() const    { return _plugin->label(); }
-      QString name() const           { return _name; }
-      
-      AudioTrack* track()           { return _track; }
-      
-      void enableController(int i, bool v = true)   { controls[i].enCtrl = v; }
-      bool controllerEnabled(int i) const           { return controls[i].enCtrl; }
-      bool controllerEnabled2(int i) const          { return controls[i].en2Ctrl; }
-      void updateControllers();
-      
-      void writeConfiguration(int level, Xml& xml);
-      bool readConfiguration(Xml& xml, bool readPreset=false);
-      
-      int parameters() const           { return controlPorts; }
-      void setParam(int i, double val) { controls[i].tmpVal = val; }
-      double param(int i) const        { return controls[i].val; }
-      const char* paramName(int i)     { return _plugin->portName(controls[i].idx); }
-      LADSPA_PortRangeHint range(int i) 
-      {
-            return _plugin->range(controls[i].idx);
-      }
-};
- */
 
 //---------------------------------------------------------
 //   PluginIBase 
 //---------------------------------------------------------
 
-class PluginIBase
+class PluginIBase/*{{{*/
 {
 public:
     virtual bool on() const = 0;
@@ -401,57 +367,9 @@ public:
     virtual void setParam(int /*i*/, double /*val*/) = 0;
     virtual double param(int /*i*/) const = 0;
     virtual const char* paramName(int /*i*/) = 0;
-    virtual LADSPA_PortRangeHint range(int /*i*/) = 0;
-};
-
-//---------------------------------------------------------
-//   PluginGui
-//---------------------------------------------------------
-
-class PluginGui : public QMainWindow
-{
-    Q_OBJECT
-
-    //PluginI* plugin;        // plugin instance
-    PluginIBase* plugin; // plugin instance
-
-    GuiParam* params;
-    int nobj; // number of widgets in gw
-    GuiWidgets* gw;
-
-    QAction* onOff;
-    QWidget* mw; // main widget
-    QScrollArea* view;
-
-    void updateControls();
-
-private slots:
-    void load();
-    void save();
-    void bypassToggled(bool);
-    void sliderChanged(double, int);
-    void labelChanged(double, int);
-    void guiParamChanged(int);
-    void ctrlPressed(int);
-    void ctrlReleased(int);
-    void guiParamPressed(int);
-    void guiParamReleased(int);
-    void guiSliderPressed(int);
-    void guiSliderReleased(int);
-    void ctrlRightClicked(const QPoint &, int);
-    void guiSliderRightClicked(const QPoint &, int);
-
-protected slots:
-    void heartBeat();
-
-public:
-    //PluginGui(PluginI*);
-    PluginGui(PluginIBase*);
-
-    ~PluginGui();
-    void setOn(bool);
-    void updateValues();
-};
+    virtual Port* getControlPort(int) = 0;
+	//virtual LADSPA_PortRangeHint range(int /*i*/) = 0;
+};/*}}}*/
 
 //---------------------------------------------------------
 //   PluginI
@@ -461,39 +379,38 @@ public:
 #define AUDIO_IN (LADSPA_PORT_AUDIO  | LADSPA_PORT_INPUT)
 #define AUDIO_OUT (LADSPA_PORT_AUDIO | LADSPA_PORT_OUTPUT)
 
-//class PluginI {
-
-class PluginI : public PluginIBase
+class PluginI : public PluginIBase/*{{{*/
 {
+protected:
+	int m_type; //redundant type until we get all the code moved to using type
     Plugin* _plugin;
     int channel;
     int instances;
     AudioTrack* _track;
     int _id;
 
-    LADSPA_Handle* handle; // per instance
-    Port* controls;
-    Port* controlsOut;
-
-    int controlPorts;
-    int controlOutPorts;
-    PluginGui* _gui;
-    bool _on;
-    bool initControlValues;
     QString _name;
     QString _label;
 
-    //#ifdef DSSI_SUPPORT
-    //StringParamMap _stringParamMap;
-    //#endif
+    int controlPorts;
+    int controlOutPorts;
+    bool _on;
+    bool initControlValues;
+    Port* controls;
+    Port* controlsOut;
+
+    PluginGui* _gui;
+    bool _showNativeGuiPending;
+
+    virtual void init();
+    virtual void makeGui();
+private:
+
+    LADSPA_Handle* handle; // per instance
 
 #ifdef OSC_SUPPORT
     OscEffectIF _oscif;
 #endif
-    bool _showNativeGuiPending;
-
-    void init();
-    void makeGui();
 
 public:
     PluginI();
@@ -503,6 +420,11 @@ public:
     {
         return _plugin;
     }
+
+	int type()
+	{
+		return m_type;
+	}
 
     bool on() const
     {
@@ -542,10 +464,10 @@ public:
     }
     void updateControllers();
 
-    bool initPluginInstance(Plugin*, int channels);
-    void setChannels(int);
-    void connect(int ports, float** src, float** dst);
-    void apply(int n);
+    virtual bool initPluginInstance(Plugin*, int channels);
+    virtual void setChannels(int);
+    virtual void connect(int ports, float** src, float** dst);
+    virtual void apply(int n);
 
     void enableController(int i, bool v = true)
     {
@@ -569,8 +491,8 @@ public:
     void enableAllControllers(bool v = true);
     void enable2AllControllers(bool v = true);
 
-    void activate();
-    void deactivate();
+    virtual void activate();
+    virtual void deactivate();
 
     QString pluginLabel() const
     {
@@ -599,12 +521,6 @@ public:
     {
         return _oscif;
     }
-    /*
-    int oscConfigure(lo_arg**);
-    int oscControl(lo_arg**);
-    //int oscUpdate(lo_arg**);
-    //int oscExiting(lo_arg**);
-     */
 
     int oscControl(unsigned long /*dssiPort*/, float /*val*/);
     int oscConfigure(const char */*key*/, const char */*val*/);
@@ -616,15 +532,15 @@ public:
     bool readConfiguration(Xml& xml, bool readPreset = false);
     bool loadControl(Xml& xml);
     bool setControl(const QString& s, double val);
-    void showGui();
-    void showGui(bool);
+    virtual void showGui();
+    virtual void showGui(bool);
 
     bool isDssiPlugin() const
     {
         return _plugin->isDssiPlugin();
     }
-    void showNativeGui();
-    void showNativeGui(bool);
+    virtual void showNativeGui();
+    virtual void showNativeGui(bool);
 
     bool isShowNativeGuiPending()
     {
@@ -647,11 +563,14 @@ public:
     {
         return controls[i].val;
     }
-    double defaultValue(unsigned int param) const;
+    virtual double defaultValue(unsigned int param) const;
 
     const char* paramName(int i)
     {
-        return _plugin->portName(controls[i].idx);
+		if(m_type == 2)
+        	return controls[i].name.c_str();
+		else
+			return _plugin->portName(controls[i].idx);
     }
 
     LADSPA_PortDescriptor portd(int i) const
@@ -659,31 +578,30 @@ public:
         return _plugin->portd(controls[i].idx);
     }
 
-    void range(int i, float* min, float* max) const
+    virtual void range(int i, float* min, float* max) const
     {
         _plugin->range(controls[i].idx, min, max);
     }
 
-    bool isAudioIn(int k)
-    {
-        return (_plugin->portd(k) & AUDIO_IN) == AUDIO_IN;
-    }
+    virtual bool isAudioIn(int k);
 
-    bool isAudioOut(int k)
-    {
-        return (_plugin->portd(k) & AUDIO_OUT) == AUDIO_OUT;
-    }
+    virtual bool isAudioOut(int k);
 
     bool inPlaceCapable() const
     {
         return _plugin->inPlaceCapable();
     }
 
-    LADSPA_PortRangeHint range(int i)
+    /*LADSPA_PortRangeHint range(int i)
     {
         return _plugin->range(controls[i].idx);
-    }
-};
+    }*/
+
+	Port* getControlPort(int i)
+	{
+		return &controls[i];
+	}
+};/*}}}*/
 
 //---------------------------------------------------------
 //   Pipeline
@@ -692,7 +610,7 @@ public:
 
 const int PipelineDepth = 100;
 
-class Pipeline : public std::vector<PluginI*>
+class Pipeline : public std::vector<PluginI*>/*{{{*/
 {
     float* buffer[MAX_CHANNELS];
 
@@ -718,52 +636,14 @@ public:
     void move(int idx, bool up);
     bool empty(int idx) const;
     void setChannels(int);
-};
+};/*}}}*/
 
 typedef Pipeline::iterator iPluginI;
 typedef Pipeline::const_iterator ciPluginI;
 
-//---------------------------------------------------------
-//   PluginDialog
-//---------------------------------------------------------
-
-enum
-{
-    SEL_SM, SEL_S, SEL_M, SEL_ALL
-};
-
-class PluginDialog : public QDialog
-{
-    QTreeWidget* pList;
-    QRadioButton* allPlug;
-    QRadioButton* onlyM;
-    QRadioButton* onlyS;
-    QRadioButton* onlySM;
-    QPushButton *okB;
-
-    Q_OBJECT
-
-public:
-    PluginDialog(QWidget* parent = 0);
-    static Plugin* getPlugin(QWidget* parent);
-    Plugin* value();
-    void accept();
-
-public slots:
-    void fillPlugs(QAbstractButton*);
-    void fillPlugs(int i);
-    void fillPlugs(const QString& sortValue);
-
-private slots:
-    void enableOkB();
-
-private:
-    QComboBox *sortBox;
-    static int selectedPlugType;
-    static QStringList sortItems;
-};
 
 extern void initPlugins();
+//extern void initLV2();
 extern PluginList plugins;
 
 extern bool ladspaDefaultValue(const LADSPA_Descriptor* plugin, int port, float* val);

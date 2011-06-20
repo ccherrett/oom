@@ -27,7 +27,12 @@
 #include "icons.h"
 #include "gconfig.h"
 #include "plugin.h"
+#ifdef LV2_SUPPORT
+#include "lv2_plugin.h"
+#endif
 #include "filedialog.h"
+#include "plugindialog.h"
+#include "plugingui.h"
 
 //---------------------------------------------------------
 //   class RackSlot
@@ -152,17 +157,38 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 	if (plugin)
 	{
 		PluginI* plugi = new PluginI();
-		if (plugi->initPluginInstance(plugin, track->channels()))
+#ifdef LV2_SUPPORT
+		if(plugin->type() == LV2)
 		{
-			printf("cannot instantiate plugin <%s>\n",
-					plugin->name().toLatin1().constData());
-			delete plugi;
-			return;
+			printf("LV2 Plugin select for rack\n");
+			LV2PluginI* lplugi = new LV2PluginI();
+			if (!lplugi->initPluginInstance(plugin, track->channels()))
+			{
+				printf("cannot instantiate lv2 plugin <%s>\n",
+						plugin->name().toLatin1().constData());
+				delete plugi;
+				return;
+			}
+			int idx = row(it);
+			if (replace)
+				audio->msgAddPlugin(track, idx, 0);
+			audio->msgAddPlugin(track, idx, lplugi);
 		}
-		int idx = row(it);
-		if (replace)
-			audio->msgAddPlugin(track, idx, 0);
-		audio->msgAddPlugin(track, idx, plugi);
+		else
+#endif
+		{
+			if (!plugi->initPluginInstance(plugin, track->channels()))
+			{
+				printf("cannot instantiate plugin <%s>\n",
+						plugin->name().toLatin1().constData());
+				delete plugi;
+				return;
+			}
+			int idx = row(it);
+			if (replace)
+				audio->msgAddPlugin(track, idx, 0);
+			audio->msgAddPlugin(track, idx, plugi);
+		}
 		updateContents();
 	}
 }
@@ -243,7 +269,9 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 			showNativeGuiAction->setEnabled(false);
 	}
 
-#ifndef OSC_SUPPORT
+#if defined(OSC_SUPPORT) || defined(LV2_SUPPORT)
+	showNativeGuiAction->setEnabled(true);
+#else
 	showNativeGuiAction->setEnabled(false);
 #endif
 

@@ -191,5 +191,9 @@ extern uid_t euid, ruid;
 extern void doSetuid();
 extern void undoSetuid();
 extern bool checkAudioDevice();
+#ifdef LV2_SUPPORT
+struct LV2World;
+extern LV2World* lv2world;
+#endif
 #endif
 

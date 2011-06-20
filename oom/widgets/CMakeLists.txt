@@ -103,6 +103,8 @@ QT4_WRAP_CPP (widget_mocs
 	  mixerdock.h
 	  ccdelegate.h
 	  ccedit.h
+	  plugingui.h
+	  plugindialog.h
       )
 
 ##
@@ -234,6 +236,8 @@ file (GLOB widgets_source_files
 	  mixerdock.cpp
 	  ccdelegate.cpp
 	  ccedit.cpp
+	  plugingui.cpp
+	  plugindialog.cpp
       )
 
 ##

@@ -281,6 +281,7 @@ public:
     void setParam(int /*i*/, double /*val*/);
     double param(int /*i*/) const;
     const char* paramName(int /*i*/);
+	Port* getControlPort(int){return 0;}
     LADSPA_PortRangeHint range(int /*i*/);
 
     friend class DssiSynth;

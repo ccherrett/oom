@@ -38,6 +38,7 @@ extern void initVST();
 extern void initPlugins();
 extern void initShortCuts();
 extern void initDSSI();
+extern void initLV2();
 extern void readConfiguration();
 
 static QString locale_override;
@@ -506,7 +507,9 @@ int main(int argc, char* argv[])
 
 	if (loadPlugins)
 		initPlugins();
-
+#ifdef LV2_SUPPORT
+	initLV2();
+#endif
 	if (loadVST)
 		initVST();
 

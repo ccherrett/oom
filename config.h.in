@@ -22,6 +22,8 @@
 #cmakedefine OSC_SUPPORT
 #cmakedefine DSSI_SUPPORT
 #cmakedefine VST_SUPPORT
+#cmakedefine LV2_SUPPORT
+#cmakedefine LV2UI_SUPPORT
 #cmakedefine LSCP_SUPPORT
 #cmakedefine USE_SSE
 #cmakedefine JACK2_SUPPORT

@@ -59,6 +59,7 @@ QT4_WRAP_CPP ( oom_moc_headers
       midieditor.h 
       miditransform.h 
       plugin.h 
+	  lv2_plugin.h
       song.h 
 	  thread.h
       transport.h 
@@ -113,6 +114,7 @@ file (GLOB core_source_files
       osc.cpp
       part.cpp
       plugin.cpp
+	  lv2_plugin.cpp
       pos.cpp
       route.cpp
       seqmsg.cpp 
@@ -260,6 +262,14 @@ endif(HAVE_LASH)
 if(OSC_SUPPORT)
       target_link_libraries(core ${LIBLO_LIBRARIES})
 endif(OSC_SUPPORT)
+
+if(LV2_SUPPORT)
+      target_link_libraries(core ${LILV_LIBRARIES})
+endif(LV2_SUPPORT)
+
+if(LV2UI_SUPPORT)
+      target_link_libraries(core ${SUIL_LIBRARIES})
+endif(LV2UI_SUPPORT)
 
 target_link_libraries(oom
       midiedit

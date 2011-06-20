@@ -123,6 +123,8 @@ option ( ENABLE_EXPERIMENTAL "enable building experimental features"            
 option ( UPDATE_TRANSLATIONS "Update source translation share/locale/*.ts files 
          (WARNING: This will modify the .ts files in the source tree!!)"                     OFF)
 option ( ENABLE_LSCP         "enable lscp client"                                            ON)
+option ( ENABLE_LV2         "enable LV2 plugin support"                                      ON)
+option ( ENABLE_LV2UI       "enable LV2 plugin UI support"                                   ON)
 
 ##
 ## Just print a notice if this is OS X
@@ -279,6 +281,36 @@ else (ENABLE_LSCP)
       set (LSCP_SUPPORT FALSE)
 endif (ENABLE_LSCP)
 
+if (ENABLE_LV2)
+      PKG_CHECK_MODULES(LILV lilv-0)
+      if (LILV_FOUND)
+          message("LILV support enabled")
+          include_directories(${LILV_INCLUDE_DIRS})
+          set (LV2_SUPPORT TRUE)
+	  else (LILV_FOUND)
+          message("LV2 support disabled")
+          set (LV2_SUPPORT FALSE)
+      endif (LILV_FOUND)
+else (ENABLE_LV2)
+      message("LV2 support disabled")
+      set (LV2_SUPPORT FALSE)
+endif (ENABLE_LV2)
+
+if (ENABLE_LV2UI)
+      PKG_CHECK_MODULES(SUIL suil-0)
+      if (SUIL_FOUND)
+          message("SUIL support enabled")
+          include_directories(${SUIL_INCLUDE_DIRS})
+          set (LV2UI_SUPPORT TRUE)
+	  else (SUIL_FOUND)
+          message("LV2UI support disabled")
+          set (LV2UI_SUPPORT FALSE)
+      endif (SUIL_FOUND)
+else (ENABLE_LV2UI)
+      message("LV2UI support disabled")
+      set (LV2UI_SUPPORT FALSE)
+endif (ENABLE_LV2UI)
+
 ##
 ## TODO
 ##
@@ -382,8 +414,8 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   SET(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 
   SET(CPACK_PACKAGE_FILE_NAME "${CPACK_SOURCE_PACKAGE_FILE_NAME}-${CPACK_SYSTEM_NAME}")
-  SET(CPACK_STRIP_FILES "bin/oom;bin/grepmidi")
-  SET(CPACK_PACKAGE_EXECUTABLES "oom" "OOMidi" "grepmidi" "grepmidi")
+  SET(CPACK_STRIP_FILES "bin/oomidi;bin/grepmidi")
+  SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "grepmidi" "grepmidi")
   INCLUDE(CPack)
 ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 
@@ -430,6 +462,8 @@ summary_add("Lash support" HAVE_LASH)
 summary_add("OSC (Liblo) support" OSC_SUPPORT)
 summary_add("DSSI support" DSSI_SUPPORT)
 summary_add("VST support" VST_SUPPORT)
+summary_add("LV2 support" LV2_SUPPORT)
+summary_add("LV2UI support" LV2UI_SUPPORT)
 summary_add("LSCP support" LSCP_SUPPORT)
 summary_add("Fluidsynth support" HAVE_FLUIDSYNTH)
 summary_add("Experimental features" ENABLE_EXPERIMENTAL)

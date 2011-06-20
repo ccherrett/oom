@@ -916,6 +916,9 @@ QMainWindow::separator {
 	width: 5px;
 }
 
+/* /////////////Internal Plugin GUI/////////// */
+QMainWindow#PluginGui, QWidget#PluginGuiBase { background-color: #595966 }
+
 /*{{{*/
 QTabWidget#tabControlCenter::pane { /* The tab widget frame */
     border-top: 0px solid #C2C7CB;
