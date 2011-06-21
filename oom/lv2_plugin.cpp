@@ -7,7 +7,7 @@
 //  	(info@openoctave.org)
 //=========================================================
 
-#include <QHash>
+#include <QDialog>
 #include <string.h>
 
 #include "track.h"
@@ -20,9 +20,12 @@
 #include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
 #include "lv2/lv2plug.in/ns/ext/uri-unmap/uri-unmap.h"
 #include "lv2/lv2plug.in/ns/ext/instance-access/instance-access.h"
+#include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
+#include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
 
 #define LV2_GTK_UI_URI "http://lv2plug.in/ns/extensions/ui#GtkUI"
 #define LV2_QT4_UI_URI "http://lv2plug.in/ns/extensions/ui#Qt4UI"
+#define LV2_NS_UI   "http://lv2plug.in/ns/extensions/ui#"
 
 static QHash<QString, uint32_t>    uri_map;
 static QHash<uint32_t, QByteArray> ids_map;
@@ -52,9 +55,28 @@ static const char *lv2_id_to_uri (LV2_URI_Unmap_Callback_Data /*data*/, const ch
 static LV2_URI_Unmap_Feature lv2_uri_unmap = { NULL, lv2_id_to_uri };
 static LV2_Feature lv2_uri_unmap_feature = { LV2_URI_UNMAP_URI, &lv2_uri_unmap };
 
+//static LV2_Feature data_access_feature = {"http://lv2plug.in/ns/ext/data-access", NULL};
+static LV2_Feature instance_access_feature = {"http://lv2plug.in/ns/ext/instance-access", NULL};
+//static LV2_Feature path_support_feature = {LV2_FILES_PATH_SUPPORT_URI, NULL};
+//static LV2_Feature new_file_support_feature = {LV2_FILES_NEW_FILE_SUPPORT_URI, NULL};
+//static LV2_Feature persist_feature = {"http://lv2plug.in/ns/ext/persist", NULL};
+static LV2_Feature external_ui_feature = {LV2_NS_UI "external", NULL};
+		
+static const LV2_Feature* features[5] = { 
+	//&data_access_feature,
+	&instance_access_feature,
+	//&path_support_feature,
+	//&new_file_support_feature,
+	//&persist_feature,
+	&lv2_uri_map_feature,
+	&lv2_uri_unmap_feature,
+	&external_ui_feature,
+    NULL
+};
+
 static LV2World* lv2world;
 
-void initLV2()
+void initLV2()/*{{{*/
 {
 	lv2world = new LV2World;
 	lv2world->world = lilv_world_new();
@@ -91,7 +113,7 @@ void initLV2()
 		//lv2plugins.add(curi);
 	}
 	printf("Master plugin list contains %d plugins", (int)plugins.size());
-}
+}/*}}}*/
 
 
 LV2Plugin::LV2Plugin(const char* uri)
@@ -119,23 +141,6 @@ void LV2Plugin::init(const char* uri)/*{{{*/
 	_inPlaceCapable = false;
 	if(lv2world)
 	{
-		m_data_access_feature.URI = "http://lv2plug.in/ns/ext/data-access";
-		m_instance_access_feature.URI = "http://lv2plug.in/ns/ext/instance-access";
-		m_path_support_feature.URI = LV2_FILES_PATH_SUPPORT_URI;
-		m_new_file_support_feature.URI = LV2_FILES_NEW_FILE_SUPPORT_URI;
-		m_persist_feature.URI = "http://lv2plug.in/ns/ext/persist";
-		m_persist_feature.data = NULL;
-		
-		m_features  = (LV2_Feature**)malloc(sizeof(LV2_Feature*) * 8);
-		m_features[0] = &m_data_access_feature;
-		m_features[1] = &m_instance_access_feature;
-		m_features[2] = &m_path_support_feature;
-		m_features[3] = &m_new_file_support_feature;
-		m_features[4] = &m_persist_feature;
-		m_features[5] = &lv2_uri_map_feature;
-		m_features[6] = &lv2_uri_unmap_feature;
-		m_features[7] = NULL;
-		
 		//const LilvPlugin *p = lv2world->plugin_list.value(QString(uri));
 		LilvNode* plugin_uri = lilv_new_uri(lv2world->world, uri);
 		const LilvPlugin *p = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
@@ -143,6 +148,8 @@ void LV2Plugin::init(const char* uri)/*{{{*/
 		if(p)
 		{
 			m_plugin = const_cast<LilvPlugin*>(p);
+			if(m_plugin && debugMsg)
+				printf("LV2Plugin::init Found LilvPlugin, setting m_plugin\n");
 			LilvNode* name = lilv_plugin_get_name(m_plugin);
 			if(name)
 			{
@@ -208,7 +215,7 @@ void LV2Plugin::init(const char* uri)/*{{{*/
 	}
 }/*}}}*/
 
-const LilvPlugin* LV2Plugin::getPlugin()
+const LilvPlugin* LV2Plugin::getPlugin()/*{{{*/
 {
 	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());
 	const LilvPlugin *p = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
@@ -218,9 +225,9 @@ const LilvPlugin* LV2Plugin::getPlugin()
 		return NULL;
 	}
 	return p;
-}
+}/*}}}*/
 
-LilvInstance* LV2Plugin::instantiatelv2()
+LilvInstance* LV2Plugin::instantiatelv2()/*{{{*/
 {
 	printf("LV2Plugin::instantiatelv2()\n");
 	if(m_plugin == NULL)
@@ -232,7 +239,7 @@ LilvInstance* LV2Plugin::instantiatelv2()
 	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());
 	const LilvPlugin *p = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
 	lilv_node_free(plugin_uri);
-	LilvInstance* lvinstance = lilv_plugin_instantiate(p, sampleRate, NULL);
+	LilvInstance* lvinstance = lilv_plugin_instantiate(p, sampleRate, features);//NULL);
 	printf("After instantiate\n");
 	if(lvinstance == NULL)
 	{
@@ -240,10 +247,10 @@ LilvInstance* LV2Plugin::instantiatelv2()
 		return NULL;
 	}
 	//Set the pointer the shared plugin handle
-	if(m_instance_access_feature.data == NULL)
-		m_instance_access_feature.data = lilv_instance_get_handle(lvinstance);
+	if(instance_access_feature.data == NULL)
+		instance_access_feature.data = lilv_instance_get_handle(lvinstance);
 	return lvinstance;
-}
+}/*}}}*/
 
 void LV2Plugin::lv2range(unsigned long i, float* min, float* max) const/*{{{*/
 {
@@ -419,6 +426,7 @@ LV2PluginI::LV2PluginI()
 : PluginI()
 {
 	m_type = LV2;
+	m_nativeui = 0;
 }
 
 LV2PluginI::~LV2PluginI()
@@ -427,12 +435,14 @@ LV2PluginI::~LV2PluginI()
 	if(m_plugin)
 	{
 		//deactivate();
-		for(int j = 0; j < instances; ++j)/*{{{*/
+		for(int j = 0; j < instances; ++j)
 		{
 			lilv_instance_deactivate((LilvInstance*)m_instance[j]);
 			lilv_instance_free((LilvInstance*)m_instance[j]);
-		}/*}}}*/
+		}
 		m_plugin->updateReferences(-1);
+		if(m_nativeui)
+			delete m_nativeui;
 	}
 }
 
@@ -558,7 +568,10 @@ void LV2PluginI::activate()
 {
 	printf("LV2PluginI::activate()\n");
 	for(int j = 0; j < instances; ++j)
-		lilv_instance_activate(m_instance[j]);
+	{
+		//if(m_instance[j])
+			lilv_instance_activate(m_instance[j]);
+	}
 }
 
 void LV2PluginI::deactivate()
@@ -586,20 +599,16 @@ void LV2PluginI::apply(int frames)/*{{{*/
 	for (int i = 0; i < instances; ++i)
 	{
 		lilv_instance_run(m_instance[i], (long)frames);
-		//_plugin->apply(handle[i], n);
 	}
 }/*}}}*/
 
 void LV2PluginI::showGui()
 {
-	printf("LV2PluginI::showGui()\n");
 	if (m_plugin)/*{{{*/
 	{
 		if (!_gui)
 		{
-			printf("LV2PluginI::showGui() before makeGui\n");
 			makeGui();
-			printf("LV2PluginI::showGui() after makeGui\n");
 		}
 		if (_gui->isVisible())
 			_gui->hide();
@@ -610,16 +619,13 @@ void LV2PluginI::showGui()
 
 void LV2PluginI::showGui(bool flag)
 {
-	printf("LV2PluginI::showGui(%d)\n", flag);
 	if (m_plugin)/*{{{*/
 	{
 		if (flag)
 		{
 			if (!_gui)
 			{
-				printf("LV2PluginI::showGui() before makeGui\n");
 				makeGui();
-				printf("LV2PluginI::showGui() after makeGui\n");
 			}
 			if (_gui)
 				_gui->show();
@@ -632,12 +638,125 @@ void LV2PluginI::showGui(bool flag)
 	}/*}}}*/
 }
 
-void LV2PluginI::showNativeGui()
+static void
+lv2_ui_write(SuilController controller, uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer)
 {
+	fprintf(stderr, "UI WRITE\n");
 }
 
-void LV2PluginI::showNativeGui(bool)
+void LV2PluginI::showNativeGui()
 {
+	if (m_plugin)/*{{{*/
+	{
+		if (!m_nativeui)
+		{
+			makeNativeGui();
+		}
+		if (m_nativeui->isVisible())
+			m_nativeui->hide();
+		else
+			m_nativeui->show();
+	}/*}}}*/
+}
+
+void LV2PluginI::showNativeGui(bool flag)
+{
+	printf("LV2PluginI::showNativeGui(%d) \n", flag);
+	if (m_plugin)/*{{{*/
+	{
+		if (flag)
+		{
+			//if (!m_nativeui)
+			//{
+			//	printf("no gui found, ");
+				makeNativeGui();
+			//}
+			/*if (m_nativeui)
+			{
+				printf("gui created, showing\n");
+				m_nativeui->show();
+			}*/
+		}
+		else
+		{
+			if (m_nativeui)
+			{
+				m_nativeui->hide();
+			}
+			//printf("hiding gui\n");
+		}
+	}/*}}}*/
+}
+
+void LV2PluginI::makeNativeGui()
+{
+	printf("LV2PluginI::makeNativeGui()\n");
+	LilvNode* qtui = lilv_new_uri(lv2world->world, LV2_QT4_UI_URI);
+	LilvNode* gtkui = lilv_new_uri(lv2world->world, LV2_GTK_UI_URI);
+	LilvNode* extui = lilv_new_uri(lv2world->world, LV2_NS_UI "external");
+	//const LV2_Feature instance_feature = { "http://lv2plug.in/ns/ext/instance-access", NULL};
+	
+	LilvNode* selectui = NULL;
+	const LilvUI* ui = NULL;
+	const LilvNode* ui_type = NULL;
+	bool isexternal = false;
+	if (qtui && gtkui) {
+		printf("LV2PluginI::makeNativeGui() Found qt4ui uri\n");
+		LilvUIs* uis = lilv_plugin_get_uis(m_plugin->getPlugin());
+		LILV_FOREACH(uis, u, uis) {
+			const LilvUI* this_ui = lilv_uis_get(uis, u);
+			if (lilv_ui_is_supported(this_ui, suil_ui_supported, qtui, &ui_type)) {
+				printf("LV2PluginI::makeNativeGui() qtui is supported\n");
+				ui = this_ui;
+				selectui = qtui;
+				break;
+			}
+			else if(lilv_ui_is_supported(this_ui, suil_ui_supported, extui, &ui_type))
+			{
+				printf("LV2PluginI::makeNativeGui() extui is supported\n");
+				ui = this_ui;
+				isexternal = true;
+				break;
+			}
+		}
+	}
+
+	SuilHost*     ui_host     = NULL;
+	SuilInstance* ui_instance = NULL;
+	if (ui) {
+		printf("LV2PluginI::makeNativeGui() Found ui for plugin\n");
+		ui_host = suil_host_new(lv2_ui_write, NULL, NULL, NULL);
+		//const LV2_Feature* features = m_plugin->features();
+		if(ui_host)
+			ui_instance = suil_instance_new( 
+										ui_host, 
+										this, 
+										lilv_node_as_uri(qtui),
+										lilv_node_as_uri(lilv_plugin_get_uri(m_plugin->getPlugin())),
+										lilv_node_as_uri(lilv_ui_get_uri(ui)),
+										lilv_node_as_uri(ui_type),
+										lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_bundle_uri(ui))),
+										lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_binary_uri(ui))),
+										features
+										);
+	}
+	if(ui_instance && !isexternal)
+	{
+		printf("LV2PluginI::makeNativeGui() Suil gui instance created\n");
+		m_nativeui = (QWidget*)suil_instance_get_widget(ui_instance);
+		if(m_nativeui)
+		{
+			printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
+			m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
+			m_nativeui->show();
+		}
+	}
+
+	if(isexternal && ui)
+	{
+		//m_slv2_ui_instance = slv2_ui_instantiate(m_plugin->getPlugin(),
+		//            ui, lv2_ui_write, this, features);
+	}
 }
 
 void LV2PluginI::makeGui()
@@ -735,8 +854,11 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 	for (int i = 0; i < instances; ++i)
 	{
 		m_instance.append(m_plugin->instantiatelv2());
-		//if (m_instance[i] == NULL)
-		//	return;
+		if (m_instance[i] == NULL)
+		{
+			printf("LV2PluginI::setChannels(%d) Instance creation failed\n", c);
+			return;
+		}
 	}
 	//printf("222222222222222222222222222\n");
 
@@ -780,7 +902,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						if(pname)
 						{
 							const char* pn = lilv_node_as_string(pname);
-							printf("Found port %s\n", pn);
+							//printf("Found port %s\n", pn);
 							controls[i].name = std::string(pn);
 							lilv_node_free(pname);
 						}

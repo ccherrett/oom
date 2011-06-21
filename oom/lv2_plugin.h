@@ -17,6 +17,7 @@
 #include <QHash>
 #include <QList>
 
+
 struct LV2World {/*{{{*/
 	LilvWorld* world;
 	const LilvPlugins* plugins;
@@ -44,12 +45,13 @@ protected:
 	void init(const char* uri);
 
 private:
-	LV2_Feature**     m_features;
-	LV2_Feature m_data_access_feature;
-	LV2_Feature m_instance_access_feature;
-	LV2_Feature m_path_support_feature;
-	LV2_Feature m_new_file_support_feature;
-	LV2_Feature m_persist_feature;
+	//LV2_Feature*     m_features[9];
+	//LV2_Feature m_data_access_feature;
+	//LV2_Feature m_instance_access_feature;
+	//LV2_Feature m_path_support_feature;
+	//LV2_Feature m_new_file_support_feature;
+	//LV2_Feature m_persist_feature;
+	//LV2_Feature m_external_ui_feature;
 
 	LilvPlugin* m_plugin;
 
@@ -57,7 +59,7 @@ public:
 	LV2Plugin(const char* uri);
 	const LilvPlugin* getPlugin();
 	LilvInstance* instantiatelv2();
-	const LV2_Feature* const* features () { return m_features; }
+	//const LV2_Feature* const* features () { return m_features; }
     double defaultValue(unsigned int port) const;
     void lv2range(unsigned long i, float*, float*) const;
     int updateReferences(int);
@@ -95,6 +97,7 @@ protected:
 private:
 	QList<LilvInstance*> m_instance;
 	LV2Plugin* m_plugin;
+	QWidget* m_nativeui;
 	//QList<LilvInstance*> m_instance;
 public:
 	LV2PluginI();
@@ -110,6 +113,7 @@ public:
     virtual void showNativeGui();
     virtual void showNativeGui(bool);
 	void makeGui();
+	void makeNativeGui();
     virtual bool isAudioIn(int k);
     virtual bool isAudioOut(int k);
     virtual void range(int i, float* min, float* max) const

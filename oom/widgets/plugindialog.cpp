@@ -54,16 +54,17 @@ PluginDialog::PluginDialog(QWidget* parent)
 	int sizes[] = {110, 110, 0, 30, 30, 30, 30, 30, 40, 110, 110};
 	for (int i = 0; i < 11; ++i)
 	{
-		if (sizes[i] == 0)
+		/*if (sizes[i] == 0)
 		{
 			pList->header()->setResizeMode(i, QHeaderView::Stretch);
 		}
 		else
-		{
-			if (sizes[i] <= 40) // hack alert!
-				pList->header()->setResizeMode(i, QHeaderView::Custom);
-			pList->header()->resizeSection(i, sizes[i]);
-		}
+		{*/
+			//if (sizes[i] <= 40) // hack alert!
+			//	pList->header()->setResizeMode(i, QHeaderView::Custom);
+			if(sizes[i])
+				pList->header()->resizeSection(i, sizes[i]);
+		//}
 	}
 
 	pList->setHeaderLabels(headerLabels);

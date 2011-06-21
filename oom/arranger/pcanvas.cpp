@@ -2628,7 +2628,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 			//TODO: I need to base the calculation for clipping on the actual sample and db and not on the height of the track.
 			if(hm < 50)
 				cliprange = 2;
-			else if(hm >= 50 & hm <= 200)
+			else if(hm >= 50 && hm <= 200)
 				cliprange = 3;
 			else if(hm < 300)
 				cliprange = 5;
