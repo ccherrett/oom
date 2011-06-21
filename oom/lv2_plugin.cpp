@@ -639,7 +639,11 @@ void LV2PluginI::showGui(bool flag)
 }
 
 static void
-lv2_ui_write(SuilController controller, uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer)
+lv2_ui_write(SuilController /*controller*/, 
+			uint32_t /*port_index*/,
+			uint32_t /*buffer_size*/,
+			uint32_t /*format*/,
+			const void* /*buffer*/)
 {
 	fprintf(stderr, "UI WRITE\n");
 }
@@ -748,6 +752,11 @@ void LV2PluginI::makeNativeGui()
 		{
 			printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
 			m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
+			QString title("OOMIDI: ");
+			title.append(m_plugin->name());
+			if(_track)
+				title.append(" - ").append(_track->name());
+			m_nativeui->setWindowTitle(title);
 			m_nativeui->show();
 		}
 	}
