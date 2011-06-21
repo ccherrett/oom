@@ -230,11 +230,11 @@ const LilvPlugin* LV2Plugin::getPlugin()/*{{{*/
 LilvInstance* LV2Plugin::instantiatelv2()/*{{{*/
 {
 	printf("LV2Plugin::instantiatelv2()\n");
-	if(m_plugin == NULL)
+	/*if(m_plugin == NULL)
 	{
 		printf("m_plugin is NULL\n");
 		return NULL;
-	}
+	}*/
 	//LilvInstance* lvinstance = lilv_plugin_instantiate(m_plugin, sampleRate, m_features);
 	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());
 	const LilvPlugin *p = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
