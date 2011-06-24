@@ -26,6 +26,7 @@
 #include "audio.h"
 #include "icons.h"
 #include "gconfig.h"
+#include "globals.h"
 #include "plugin.h"
 #ifdef LV2_SUPPORT
 #include "lv2_plugin.h"

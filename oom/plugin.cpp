@@ -1418,8 +1418,19 @@ void Pipeline::deleteGui(int idx)
 	if (idx >= PipelineDepth)
 		return;
 	PluginI* p = (*this)[idx];
-	if (p)
-		p->deleteGui();
+#ifdef LV2_SUPPORT
+	if(p && p->type() == 2)
+	{
+		LV2PluginI* lp = (LV2PluginI*)p;
+		if(lp)
+			lp->deleteGui();
+	}
+	else
+#endif
+	{
+		if (p)
+			p->deleteGui();
+	}
 }
 
 //---------------------------------------------------------
@@ -1456,6 +1467,21 @@ bool Pipeline::nativeGuiVisible(int idx)
 	return false;
 }
 
+void Pipeline::updateNativeGui()
+{
+#ifdef LV2_SUPPORT/*{{{*/
+	for (iPluginI i = begin(); i != end(); ++i)
+	{
+		PluginI* p = (PluginI*)*i;
+		if(p && p->type() == 2)
+		{
+			LV2PluginI* lp = (LV2PluginI*)p;
+			if(lp)
+				lp->heartBeat();
+		}
+	}
+#endif/*}}}*/
+}
 //---------------------------------------------------------
 //   apply
 //---------------------------------------------------------
@@ -1889,6 +1915,7 @@ void PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 		{
 			if (isAudioIn(k))
 			{
+				//printf("PluginI::connect Audio input port: %d value: %4.2f\n", port, *src[port]);
 				_plugin->connectPort(handle[i], k, src[port]);
 				port = (port + 1) % ports;
 			}
@@ -1901,6 +1928,7 @@ void PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 		{
 			if (isAudioOut(k))
 			{
+				//printf("PluginI::connect Audio output port: %d value: %4.2f\n", port, *dst[port]);
 				_plugin->connectPort(handle[i], k, dst[port]);
 				port = (port + 1) % ports; // overwrite output?
 			}

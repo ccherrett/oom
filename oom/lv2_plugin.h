@@ -16,7 +16,49 @@
 #include <suil/suil.h>
 #include <QHash>
 #include <QList>
+#include <QObject>
+#define LV2_FIFO_SIZE 1024
 
+struct LV2Data
+{
+	int frame;
+	float value;
+	unsigned time;
+};
+
+class LV2ControlFifo/*{{{*/
+{
+    LV2Data fifo[LV2_FIFO_SIZE];
+    volatile int size;
+    int wIndex;
+    int rIndex;
+
+public:
+
+    LV2ControlFifo()
+    {
+        clear();
+    }
+    bool put(const LV2Data& event); // returns true on fifo overflow
+    LV2Data get();
+    const LV2Data& peek(int n = 0);
+    void remove();
+
+    bool isEmpty() const
+    {
+        return size == 0;
+    }
+
+    void clear()
+    {
+        size = 0, wIndex = 0, rIndex = 0;
+    }
+
+    int getSize() const
+    {
+        return size;
+    }
+};/*}}}*/
 
 struct LV2World {/*{{{*/
 	LilvWorld* world;
@@ -61,7 +103,7 @@ public:
 	LilvInstance* instantiatelv2();
 	//const LV2_Feature* const* features () { return m_features; }
     double defaultValue(unsigned int port) const;
-    void lv2range(unsigned long i, float*, float*) const;
+    void lv2range(unsigned long i, float*, float*, float*) const;
     int updateReferences(int);
     const char* portName(unsigned long i);
 
@@ -93,15 +135,26 @@ public:
 
 class LV2PluginI : public PluginI
 {
-protected:
 private:
 	QList<LilvInstance*> m_instance;
+	QList<SuilInstance*> m_uinstance;
 	LV2Plugin* m_plugin;
 	QWidget* m_nativeui;
+	bool m_guiVisible;
+	LV2ControlFifo* m_controlFifo;
 	//QList<LilvInstance*> m_instance;
 public:
 	LV2PluginI();
 	~LV2PluginI();
+	LV2Plugin* plugin() {
+		return m_plugin;
+	}
+	LV2ControlFifo* getControlFifo(unsigned long p)
+	{
+		if(!m_controlFifo)
+			return 0;
+		return &m_controlFifo[p];
+	}
     virtual bool initPluginInstance(Plugin*, int channels);
     virtual void connect(int ports, float** src, float** dst);
     virtual void activate();
@@ -112,14 +165,24 @@ public:
 	void showGui(bool);
     virtual void showNativeGui();
     virtual void showNativeGui(bool);
+	virtual bool nativeGuiVisible()
+	{
+		return m_guiVisible;
+	}
 	void makeGui();
 	void makeNativeGui();
     virtual bool isAudioIn(int k);
     virtual bool isAudioOut(int k);
     virtual void range(int i, float* min, float* max) const
     {
-        m_plugin->lv2range(controls[i].idx, min, max);
+		float def;
+        m_plugin->lv2range(controls[i].idx, &def, min, max);
     }
+	int paramIndex(int i)
+	{
+		return controls[i].idx;
+	}
+	void heartBeat();
 };
 
 extern LV2PluginList lv2plugins;

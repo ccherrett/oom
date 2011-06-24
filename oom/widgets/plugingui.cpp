@@ -68,7 +68,7 @@ const char* presetBypassText = "Click this button to bypass effect unit";
 //   PluginGui
 //---------------------------------------------------------
 
-PluginGui::PluginGui(PluginIBase* p)/*{{{*/
+PluginGui::PluginGui(PluginIBase* p)
 : QMainWindow(0)
 {
 	gw = 0;
@@ -359,7 +359,7 @@ PluginGui::PluginGui(PluginIBase* p)/*{{{*/
 		view->setWidget(mw);
 	}
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
-}/*}}}*/
+}
 
 //---------------------------------------------------------
 //   PluginGui

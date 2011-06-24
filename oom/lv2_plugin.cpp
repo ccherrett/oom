@@ -8,11 +8,13 @@
 //=========================================================
 
 #include <QDialog>
+#include <QMessageBox>
 #include <string.h>
 
 #include "track.h"
 #include "lv2_plugin.h"
 #include "plugingui.h"
+#include "audio.h"
 
 #include "lv2/lv2plug.in/ns/ext/event/event-helpers.h"
 #include "lv2/lv2plug.in/ns/ext/event/event.h"
@@ -22,6 +24,7 @@
 #include "lv2/lv2plug.in/ns/ext/instance-access/instance-access.h"
 #include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
 #include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
+#include "lv2_external_ui.h"
 
 #define LV2_GTK_UI_URI "http://lv2plug.in/ns/extensions/ui#GtkUI"
 #define LV2_QT4_UI_URI "http://lv2plug.in/ns/extensions/ui#Qt4UI"
@@ -252,7 +255,7 @@ LilvInstance* LV2Plugin::instantiatelv2()/*{{{*/
 	return lvinstance;
 }/*}}}*/
 
-void LV2Plugin::lv2range(unsigned long i, float* min, float* max) const/*{{{*/
+void LV2Plugin::lv2range(unsigned long i, float* def, float* min, float* max) const/*{{{*/
 {
 	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());
 	const LilvPlugin *plug = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
@@ -269,6 +272,10 @@ void LV2Plugin::lv2range(unsigned long i, float* min, float* max) const/*{{{*/
 		{
 			*min = 0.0f;
 			*max = 1.0f;
+			if(ldef)
+				*def = lilv_node_as_float(ldef);
+			else
+				*def = 0.0f;
 			if(lmin) lilv_node_free(lmin);
 			if(lmax) lilv_node_free(lmax);
 			if(ldef) lilv_node_free(ldef);
@@ -283,6 +290,10 @@ void LV2Plugin::lv2range(unsigned long i, float* min, float* max) const/*{{{*/
 			*max = lilv_node_as_float(lmax);
 		else
 			*max = 1.0f;
+		if(ldef)
+			*def = lilv_node_as_float(ldef);
+		else
+			*def = 0.0f;
 
 		if(lmin) lilv_node_free(lmin);
 		if(lmax) lilv_node_free(lmax);
@@ -427,6 +438,9 @@ LV2PluginI::LV2PluginI()
 {
 	m_type = LV2;
 	m_nativeui = 0;
+	m_controlFifo = 0;
+	m_guiVisible = false;
+	//QObject::connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 }
 
 LV2PluginI::~LV2PluginI()
@@ -564,6 +578,17 @@ bool LV2PluginI::initPluginInstance(Plugin* plug, int c)/*{{{*/
 	return true;
 }/*}}}*/
 
+void LV2PluginI::heartBeat()
+{
+	if(nativeGuiVisible() && !m_uinstance.isEmpty())
+	{
+		for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
+		{
+			suil_instance_port_event(m_uinstance[0], controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+		}
+	}
+}
+
 void LV2PluginI::activate()
 {
 	printf("LV2PluginI::activate()\n");
@@ -590,10 +615,26 @@ void LV2PluginI::apply(int frames)/*{{{*/
 	unsigned long ctls = controlPorts;
 	for (unsigned long k = 0; k < ctls; ++k)
 	{
-		if (automation && _track && _track->automationType() != AUTO_OFF && _id != -1)
+		//TODO: Read from lv2 gui fifo here and apply to controls
+		LV2ControlFifo* cfifo = getControlFifo(k);
+		if(cfifo && !cfifo->isEmpty())
 		{
-			if (controls[k].enCtrl && controls[k].en2Ctrl)
-				controls[k].tmpVal = _track->pluginCtrlVal(genACnum(_id, k));
+			//printf("Applying values from fifo\n");
+			LV2Data v = cfifo->get();
+			controls[k].tmpVal = v.value;
+			if (_track && _id != -1)
+			{
+				_track->setPluginCtrlVal(genACnum(_id, k), v.value);
+			}
+		}
+		else
+		{
+			if (automation && _track && _track->automationType() != AUTO_OFF && _id != -1)
+			{
+				if (controls[k].enCtrl && controls[k].en2Ctrl)
+					controls[k].tmpVal = _track->pluginCtrlVal(genACnum(_id, k));
+			}
+			controls[k].val = controls[k].tmpVal;
 		}
 	}
 	for (int i = 0; i < instances; ++i)
@@ -638,14 +679,60 @@ void LV2PluginI::showGui(bool flag)
 	}/*}}}*/
 }
 
-static void
-lv2_ui_write(SuilController /*controller*/, 
-			uint32_t /*port_index*/,
-			uint32_t /*buffer_size*/,
-			uint32_t /*format*/,
-			const void* /*buffer*/)
+static void lv2_ui_write(SuilController controller, 
+			uint32_t port_index,
+			uint32_t buffer_size,
+			uint32_t format,
+			const void* buffer)
 {
-	fprintf(stderr, "UI WRITE\n");
+	LV2PluginI* p = static_cast<LV2PluginI*>(controller);
+	if(p)
+	{
+		if(buffer_size != sizeof(float) || format != 0)
+			return;
+		float value = *(float*)buffer;
+		LV2Plugin* lp = (LV2Plugin*)p->plugin();
+
+		unsigned long index = lp->port2InCtrl(port_index);
+		//Port* cport = plugin->getControlPort(index);
+
+		if ((int) index == -1)
+		{
+			fprintf(stderr, "lv2_ui_write: port number:%d is not a control input\n", port_index);
+			return;
+		}
+
+		//TODO: Put event into fifo
+		LV2ControlFifo* cfifo = p->getControlFifo(index);/*{{{*/
+		if (cfifo)
+		{
+			LV2Data cv;
+			//cv.idx = cport;
+			cv.value = value;
+			cv.frame = audio->timestamp();
+			if (!cfifo->put(cv))
+			{
+				fprintf(stderr, "lv2_ui_write: fifo overflow: in control number:%ld\n", index);
+			}
+			//else
+			//	printf("Put values from gui for port: %d value: %f\n", index, value);
+		}/*}}}*/
+
+		if (p->track() && p->id() != -1)/*{{{*/
+		{
+			int id = genACnum(p->id(), index);
+			AutomationType at = p->track()->automationType();
+
+			// TODO: Taken from our native gui control handlers.
+			// This may need modification or may cause problems -
+			//  we don't have the luxury of access to the dssi gui controls !
+			if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+				p->enableController(index, false);
+
+			p->track()->recordAutomation(id, value);
+		}/*}}}*/
+	}
+	//fprintf(stderr, "UI WRITE\n");
 }
 
 void LV2PluginI::showNativeGui()
@@ -657,7 +744,10 @@ void LV2PluginI::showNativeGui()
 			makeNativeGui();
 		}
 		if (m_nativeui->isVisible())
+		{
+			m_guiVisible = false;
 			m_nativeui->hide();
+		}
 		else
 			m_nativeui->show();
 	}/*}}}*/
@@ -683,6 +773,7 @@ void LV2PluginI::showNativeGui(bool flag)
 		}
 		else
 		{
+			m_guiVisible = false;
 			if (m_nativeui)
 			{
 				m_nativeui->hide();
@@ -692,7 +783,7 @@ void LV2PluginI::showNativeGui(bool flag)
 	}/*}}}*/
 }
 
-void LV2PluginI::makeNativeGui()
+void LV2PluginI::makeNativeGui()/*{{{*/
 {
 	printf("LV2PluginI::makeNativeGui()\n");
 	LilvNode* qtui = lilv_new_uri(lv2world->world, LV2_QT4_UI_URI);
@@ -709,17 +800,18 @@ void LV2PluginI::makeNativeGui()
 		LilvUIs* uis = lilv_plugin_get_uis(m_plugin->getPlugin());
 		LILV_FOREACH(uis, u, uis) {
 			const LilvUI* this_ui = lilv_uis_get(uis, u);
+			if(lilv_ui_is_a(this_ui, extui))
+			{
+				printf("LV2PluginI::makeNativeGui() extui is supported\n");
+				ui = this_ui;
+				ui_type = extui;
+				isexternal = true;
+				break;
+			}
 			if (lilv_ui_is_supported(this_ui, suil_ui_supported, qtui, &ui_type)) {
 				printf("LV2PluginI::makeNativeGui() qtui is supported\n");
 				ui = this_ui;
 				selectui = qtui;
-				break;
-			}
-			else if(lilv_ui_is_supported(this_ui, suil_ui_supported, extui, &ui_type))
-			{
-				printf("LV2PluginI::makeNativeGui() extui is supported\n");
-				ui = this_ui;
-				isexternal = true;
 				break;
 			}
 		}
@@ -727,7 +819,8 @@ void LV2PluginI::makeNativeGui()
 
 	SuilHost*     ui_host     = NULL;
 	SuilInstance* ui_instance = NULL;
-	if (ui) {
+	m_uinstance.clear();
+	if (ui && !isexternal) {
 		printf("LV2PluginI::makeNativeGui() Found ui for plugin\n");
 		ui_host = suil_host_new(lv2_ui_write, NULL, NULL, NULL);
 		//const LV2_Feature* features = m_plugin->features();
@@ -735,7 +828,7 @@ void LV2PluginI::makeNativeGui()
 			ui_instance = suil_instance_new( 
 										ui_host, 
 										this, 
-										lilv_node_as_uri(qtui),
+										isexternal ? lilv_node_as_uri(extui) : lilv_node_as_uri(qtui),
 										lilv_node_as_uri(lilv_plugin_get_uri(m_plugin->getPlugin())),
 										lilv_node_as_uri(lilv_ui_get_uri(ui)),
 										lilv_node_as_uri(ui_type),
@@ -744,29 +837,46 @@ void LV2PluginI::makeNativeGui()
 										features
 										);
 	}
+	QString title("OOMIDI: ");
+	title.append(m_plugin->name());
+	if(_track)
+		title.append(" - ").append(_track->name());
 	if(ui_instance && !isexternal)
 	{
+		m_uinstance.append(ui_instance);
 		printf("LV2PluginI::makeNativeGui() Suil gui instance created\n");
+		for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
+		{
+			//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
+			suil_instance_port_event(ui_instance, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+		}
 		m_nativeui = (QWidget*)suil_instance_get_widget(ui_instance);
 		if(m_nativeui)
 		{
 			printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
 			m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
-			QString title("OOMIDI: ");
-			title.append(m_plugin->name());
-			if(_track)
-				title.append(" - ").append(_track->name());
 			m_nativeui->setWindowTitle(title);
 			m_nativeui->show();
+			m_guiVisible = true;
 		}
 	}
-
-	if(isexternal && ui)
+	else if(isexternal && ui_instance)
 	{
+		printf("LV2PluginI::makeNativeGui() Creating external GUI\n");
+		QMessageBox::critical(0, QString("Unsupported UI"), QString("We're sorry but we do not currently support the external extension"));
+		/*struct lv2_external_ui_host external_ui_host;
+		external_ui_host.plugin_human_id = title.toUtf8().constData();
+		external_ui_feature.data = &external_ui_host;
+
+		struct lv2_external_ui* external_ui = (struct lv2_external_ui*)suil_instance_get_widget(ui_instance);
+		if(external_ui)
+		{
+			LV2_EXTERNAL_UI_SHOW(external_ui);
+		}*/
 		//m_slv2_ui_instance = slv2_ui_instantiate(m_plugin->getPlugin(),
 		//            ui, lv2_ui_write, this, features);
 	}
-}
+}/*}}}*/
 
 void LV2PluginI::makeGui()
 {
@@ -807,6 +917,7 @@ bool LV2PluginI::isAudioOut(int p)/*{{{*/
 
 void LV2PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 {
+	//printf("LV2PluginI::connect\n");
 	int port = 0;
 	for (int i = 0; i < instances; ++i)
 	{
@@ -814,11 +925,13 @@ void LV2PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 		{
 			if (isAudioIn(k))
 			{
+				//printf("LV2PluginI::connect Audio input port: %d value: %4.2f\n", port, *src[port]);
 				lilv_instance_connect_port(m_instance[i], k, src[port]);
 				port = (port + 1) % ports;
 			}
 			else if(isAudioOut(k))
 			{
+				//printf("LV2PluginI::connect Audio output port: %d value: %4.2f\n", port, *dst[port]);
 				lilv_instance_connect_port(m_instance[i], k, dst[port]);
 				port = (port + 1) % ports;
 			}
@@ -857,6 +970,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 
 	controls = new Port[controlPorts];
 	controlsOut = new Port[controlOutPorts];
+	m_controlFifo = new LV2ControlFifo[controlPorts];
 	
 	//printf("111111111111111111111111111\n");
 	m_instance.clear();
@@ -894,9 +1008,13 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 				{
 					if(lilv_port_is_a(p, port, lv2world->input_class))
 					{
-						double val = m_plugin->defaultValue(k);
-						controls[i].val = val;
-						controls[i].tmpVal = val;
+						//double val = m_plugin->defaultValue(k);
+						float min;
+						float max;
+						float def;
+						m_plugin->lv2range(k, &def, &min, &max);
+						controls[i].val = def;
+						controls[i].tmpVal = def;
 						controls[i].enCtrl = true;
 						controls[i].en2Ctrl = true;
 						controls[i].idx = k;
@@ -906,7 +1024,8 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						controls[i].isInt = lilv_port_has_property(p, port, lv2world->integer_prop);
 						controls[i].toggle = lilv_port_has_property(p, port, lv2world->toggle_prop);
 						controls[i].samplerate = lilv_port_has_property(p, port, lv2world->samplerate_prop);
-						m_plugin->lv2range(k, &controls[i].min, &controls[i].max);
+						controls[i].min = min;
+						controls[i].max = max;
 						LilvNode* pname = lilv_port_get_name(p, port);
 						if(pname)
 						{
@@ -921,8 +1040,13 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 					}
 					else if(lilv_port_is_a(p, port, lv2world->output_class))
 					{
-						controlsOut[ii].val = 0.0f;
-						controlsOut[ii].tmpVal = 0.0f;
+						float min;
+						float max;
+						float def;
+						m_plugin->lv2range(k, &def, &min, &max);
+						//printf("LV2PluginI::setChannels Port range for index: %d default:%f min:%f max:%f\n", k, def, min, max);
+						controlsOut[ii].val = def;
+						controlsOut[ii].tmpVal = def;
 						controlsOut[ii].enCtrl = false;
 						controlsOut[ii].en2Ctrl = false;
 						controlsOut[ii].idx = k;
@@ -932,7 +1056,8 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						controlsOut[ii].isInt = lilv_port_has_property(p, port, lv2world->integer_prop);
 						controlsOut[ii].toggle = lilv_port_has_property(p, port, lv2world->toggle_prop);
 						controlsOut[ii].samplerate = lilv_port_has_property(p, port, lv2world->samplerate_prop);
-						m_plugin->lv2range(k, &controlsOut[ii].min, &controlsOut[ii].max);
+						controlsOut[ii].min = min;
+						controlsOut[ii].max = max;
 						LilvNode* pname = lilv_port_get_name(p, port);
 						if(pname)
 						{
@@ -950,6 +1075,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 	}/*}}}*/
 
 	activate();
+	//apply(1);
 }/*}}}*/
 
 LV2Plugin* LV2PluginList::find(const QString& uri, const QString& name)
@@ -963,3 +1089,38 @@ LV2Plugin* LV2PluginList::find(const QString& uri, const QString& name)
 	return 0;
 }
 
+
+bool LV2ControlFifo::put(const LV2Data& event)/*{{{*/
+{
+	if (size < LV2_FIFO_SIZE)
+	{
+		fifo[wIndex] = event;
+		wIndex = (wIndex + 1) % LV2_FIFO_SIZE;
+		++size;
+		return true;
+	}
+	return false;
+}/*}}}*/
+
+LV2Data LV2ControlFifo::get()/*{{{*/
+{
+	LV2Data event(fifo[rIndex]);
+	rIndex = (rIndex + 1) % LV2_FIFO_SIZE;
+	--size;
+	return event;
+}/*}}}*/
+
+
+const LV2Data& LV2ControlFifo::peek(int n)/*{{{*/
+{
+	int idx = (rIndex + n) % LV2_FIFO_SIZE;
+	return fifo[idx];
+
+}/*}}}*/
+
+
+void LV2ControlFifo::remove()/*{{{*/
+{
+	rIndex = (rIndex + 1) % LV2_FIFO_SIZE;
+	--size;
+}/*}}}*/

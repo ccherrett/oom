@@ -96,51 +96,6 @@ public:
 //  Open Sound Control Interface
 //---------------------------------------------------------
 
-/*
-class OscIF
-{
-   private:
-      PluginI* _oscPluginI;
-      
-      #ifdef DSSI_SUPPORT
-      DssiSynthIF* _oscSynthIF;
-      #endif
-      
-      QProcess* _oscGuiQProc;
-      void* _uiOscTarget;
-      char* _uiOscShowPath;
-      char* _uiOscControlPath;
-      char* _uiOscConfigurePath;
-      char* _uiOscProgramPath;
-      char* _uiOscPath;
-      bool _oscGuiVisible;
-   
-      OscControlFifo* _oscControlFifos;
-      
-   public:
-      OscIF();
-      ~OscIF();
-      
-      void oscSetPluginI(PluginI*);
-      
-      #ifdef DSSI_SUPPORT
-      void oscSetSynthIF(DssiSynthIF*);
-      #endif
-      
-      int oscUpdate(lo_arg**);    
-      int oscProgram(lo_arg**);   
-      int oscControl(lo_arg**);   
-      int oscExiting(lo_arg**);   
-      int oscMidi(lo_arg**);      
-      int oscConfigure(lo_arg**); 
-   
-      bool oscInitGui();
-      void oscShowGui(bool);
-      bool oscGuiVisible() const;
-      OscControlFifo* oscFifo(unsigned long) const;
-};
- */
-
 class OscIF
 {
 protected:

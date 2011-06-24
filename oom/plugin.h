@@ -260,7 +260,7 @@ public:
 
     // Returns (int)-1 if not an input control.
 
-    unsigned long port2InCtrl(unsigned long p)
+    virtual unsigned long port2InCtrl(unsigned long p)
     {
         return p >= rpIdx.size() ? (unsigned long) - 1 : rpIdx[p];
     }
@@ -547,7 +547,7 @@ public:
         return _showNativeGuiPending;
     }
     bool guiVisible();
-    bool nativeGuiVisible();
+    virtual bool nativeGuiVisible();
 
     int parameters() const
     {
@@ -636,6 +636,7 @@ public:
     void move(int idx, bool up);
     bool empty(int idx) const;
     void setChannels(int);
+	void updateNativeGui();
 };/*}}}*/
 
 typedef Pipeline::iterator iPluginI;

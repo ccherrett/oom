@@ -612,78 +612,6 @@ int OscIF::oscUpdate(lo_arg **argv)
 	// Send sample rate.
 	lo_send(_uiOscTarget, _uiOscSampleRatePath, "i", sampleRate);
 
-	// Send project directory.
-	//lo_send(_uiOscTarget, _uiOscConfigurePath, "ss",
-	//   DSSI_PROJECT_DIRECTORY_KEY, oomProject.toLatin1().constData());  // song->projectPath()
-
-	// Done in sub-classes.
-	/*
-	#ifdef DSSI_SUPPORT
-	//lo_send(_uiOscTarget, _uiOscConfigurePath, "ss",
-	   //DSSI_PROJECT_DIRECTORY_KEY, song->projectPath().toAscii().data());
-	lo_send(_uiOscTarget, _uiOscConfigurePath, "ss",
-	   DSSI_PROJECT_DIRECTORY_KEY, oomProject.toLatin1().constData());
-      
-	if(_oscSynthIF)
-	{
-	  for(ciStringParamMap r = _oscSynthIF->synthI->_stringParamMap.begin(); r != synti->_stringParamMap.end(); ++r)
-	  {
-		rv = 0;
-		rv = dssi->configure(handle, r->first.c_str(), r->second.c_str());
-		if(rv)
-		{
-		  fprintf(stderr, "OOMidi: Warning: plugin config key: %s value: %s \"%s\"\n", r->first.c_str(), r->second.c_str(), rv);
-		  free(rv);
-		}
-	  }
-	}
-	#endif
-	 */
-
-	/*
-	char uiOscGuiPath[strlen(_uiOscPath)+6];
-	sprintf(uiOscGuiPath, "%s/%s", _uiOscPath, "show");
-      
-	#ifdef OSC_DEBUG
-	printf("OscIF::oscUpdate Sending show uiOscGuiPath:%s\n", uiOscGuiPath);
-	#endif
-      
-	lo_send(_uiOscTarget, uiOscGuiPath, "");
-      
-	sprintf(uiOscGuiPath, "%s/%s", _uiOscPath, "hide");
-      
-	#ifdef OSC_DEBUG
-	printf("OscIF::oscUpdate Sending hide uiOscGuiPath:%s\n", uiOscGuiPath);
-	#endif
-      
-	lo_send(_uiOscTarget, uiOscGuiPath, "");
-	 */
-
-#if 0
-	/* Send current bank/program  (-FIX- another race...) */
-	if (instance->pendingProgramChange < 0)
-	{
-		unsigned long bank = instance->currentBank;
-		unsigned long program = instance->currentProgram;
-		instance->uiNeedsProgramUpdate = 0;
-		if (instance->uiTarget)
-		{
-			lo_send(instance->uiTarget, instance->ui_osc_program_path, "ii", bank, program);
-		}
-	}
-
-	/* Send control ports */
-	for (i = 0; i < instance->plugin->controlIns; i++)
-	{
-		int in = i + instance->firstControlIn;
-		int port = pluginControlInPortNumbers[in];
-		lo_send(instance->uiTarget, instance->ui_osc_control_path, "if", port,
-				pluginControlIns[in]);
-		/* Avoid overloading the GUI if there are lots and lots of ports */
-		if ((i + 1) % 50 == 0)
-			usleep(300000);
-	}
-#endif
 	return 0;
 }
 
@@ -737,68 +665,6 @@ int OscIF::oscExiting(lo_arg**)
 		free(_uiOscPath);
 	_uiOscPath = 0;
 
-	//if(_oscControlFifos)
-	//  delete[] _oscControlFifos;
-
-	//const DSSI_Descriptor* dssi = synth->dssi;
-	//const LADSPA_Descriptor* ld = dssi->LADSPA_Plugin;
-	//if(ld->deactivate)
-	//  ld->deactivate(handle);
-
-	/*
-	if (_uiOscPath == 0) {
-		  printf("OscIF::oscExiting(): no _uiOscPath\n");
-		  return 1;
-		  }
-	char uiOscGuiPath[strlen(_uiOscPath)+6];
-        
-	sprintf(uiOscGuiPath, "%s/%s", _uiOscPath, "quit");
-	#ifdef OSC_DEBUG
-	printf("OscIF::oscExiting(): sending quit to uiOscGuiPath:%s\n", uiOscGuiPath);
-	#endif
-      
-	lo_send(_uiOscTarget, uiOscGuiPath, "");
-	 */
-
-#if 0
-	int i;
-
-	if (verbose)
-	{
-		printf("OOMidi: OSC: got exiting notification for instance %d\n",
-				instance->number);
-	}
-
-	if (instance->plugin)
-	{
-
-		/*!!! No, this isn't safe -- plugins deactivated in this way
-		  would still be included in a run_multiple_synths call unless
-		  we re-jigged the instance array at the same time -- leave it
-		  for now
-		if (instance->plugin->descriptor->LADSPA_Plugin->deactivate) {
-			  instance->plugin->descriptor->LADSPA_Plugin->deactivate
-				 (instanceHandles[instance->number]);
-			  }
-		 */
-		/* Leave this flag though, as we need it to determine when to exit */
-		instance->inactive = 1;
-	}
-
-	/* Do we have any plugins left running? */
-
-	for (i = 0; i < instance_count; ++i)
-	{
-		if (!instances[i].inactive)
-			return 0;
-	}
-
-	if (verbose)
-	{
-		printf("OOMidi: That was the last remaining plugin, exiting...\n");
-	}
-	exiting = 1;
-#endif
 	return 0;
 }
 
@@ -858,54 +724,8 @@ bool OscIF::oscInitGui(const QString& typ, const QString& baseName, const QStrin
 	//char oscUrl[1024];
 	QString oscUrl;
 
-	/*
-	QString typ;
-	QString baseName;
-	QString name;
-	QString label;
-	QString filePath;
-	QString dirPath;
-	#ifdef DSSI_SUPPORT
-	if(_oscSynthIF)
-	{
-	  //snprintf(oscUrl, 1024, "%s/%s", url, synti->name().toAscii().data());
-	  //snprintf(oscUrl, 1024, "%s/%s", url, synti->name().ascii());
-	  //snprintf(oscUrl, 1024, "%s/%s/%s", url, synth->info.baseName().ascii(), synti->name().ascii());
-	  typ = QT_TRANSLATE_NOOP("@default", "dssi_synth");
-	  baseName = _oscSynthIF->dssiSynth()->baseName(false);
-	  label = _oscSynthIF->dssiSynthI()->name();
-	  name = _oscSynthIF->dssiSynth()->name();
-        
-	  dirPath = _oscSynthIF->dssiSynth()->dirPath(false);
-	  filePath = _oscSynthIF->dssiSynth()->filePath();
-	}
-	else
-	#endif
-	if(_oscPluginI)
-	{
-	  typ = QT_TRANSLATE_NOOP("@default", "ladspa_efx");
-	  baseName = _oscPluginI->plugin()->lib(false);
-	  //name = _oscPluginI->name();
-	  name = _oscPluginI->plugin()->label();
-	  label = _oscPluginI->label();
-        
-	  dirPath = _oscPluginI->plugin()->dirPath(false);
-	  //dirPath.replace("ladspa", "dssi", true);
-        
-	  filePath = _oscPluginI->plugin()->filePath();
-	  //filePath.replace("ladspa", "dssi", true);
-	}
-	else
-	  return false;
-	 */
-
-	//snprintf(oscUrl, 1024, "%s/%s/%s", url, baseName.ascii(), name.ascii());
-	//snprintf(oscUrl, 1024, "%s%s/%s/%s", url, typ.toLatin1().constData(), baseName.toLatin1().constData(), name.toLatin1().constData());
-	//oscUrl = QString("%1%2/%3/%4").arg(QString(QT_TRANSLATE_NOOP("@default", url))).arg(typ).arg(baseName).arg(name);
 	oscUrl = QString("%1%2/%3/%4").arg(QString(QT_TRANSLATE_NOOP("@default", url))).arg(typ).arg(baseName).arg(label);
 
-	//QString guiPath(info.path() + "/" + info.baseName());
-	//QString guiPath(synth->info.dirPath() + "/" + synth->info.baseName());
 	QString guiPath(dirPath + "/" + baseName);
 
 #ifdef OSC_DEBUG 
@@ -915,14 +735,10 @@ bool OscIF::oscInitGui(const QString& typ, const QString& baseName, const QStrin
 	QDir guiDir(guiPath, "*", QDir::Unsorted, QDir::Files);
 	if (guiDir.exists())
 	{
-		//const QFileInfoList list = guiDir.entryInfoList();
 		QStringList list = guiDir.entryList();
 
-		//for (int i = 0; i < list.size(); ++i) {
 		for (int i = 0; i < list.count(); ++i)
 		{
-
-			//QFileInfo fi = list.at(i);
 			QFileInfo fi(guiPath + QString("/") + list[i]);
 
 			QString gui(fi.filePath());
@@ -930,10 +746,8 @@ bool OscIF::oscInitGui(const QString& typ, const QString& baseName, const QStrin
 				continue;
 			struct stat buf;
 
-			//if (stat(gui.toAscii().data(), &buf)) {
 			if (stat(gui.toLatin1().constData(), &buf))
 			{
-
 				perror("stat failed");
 				continue;
 			}

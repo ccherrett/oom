@@ -46,6 +46,7 @@
 #include "trackview.h"
 #include "mpevent.h"
 #include "midimonitor.h"
+#include "plugin.h"
 
 extern void clearMidiTransforms();
 extern void clearMidiInputTransforms();
@@ -1779,6 +1780,18 @@ void Song::beat()
 	// p3.3.40 Update synth native guis at the heartbeat rate.
 	for (ciSynthI is = _synthIs.begin(); is != _synthIs.end(); ++is)
 		(*is)->guiHeartBeat();
+	
+	//Update LV2 native guis
+	for(ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
+	{
+		if((*i)->isMidiTrack())
+			continue;
+		AudioTrack* t = (AudioTrack*)*i;
+		if(t)
+		{
+			t->efxPipe()->updateNativeGui();
+		}
+	}
 
 	while (noteFifoSize)
 	{
