@@ -9,6 +9,8 @@
 
 #include <QDialog>
 #include <QMessageBox>
+#include <QEvent>
+#include <QX11EmbedContainer>
 #include <string.h>
 
 #include "track.h"
@@ -29,6 +31,33 @@
 #define LV2_GTK_UI_URI "http://lv2plug.in/ns/extensions/ui#GtkUI"
 #define LV2_QT4_UI_URI "http://lv2plug.in/ns/extensions/ui#Qt4UI"
 #define LV2_NS_UI   "http://lv2plug.in/ns/extensions/ui#"
+
+LV2EventFilter::LV2EventFilter(LV2PluginI *p, QX11EmbedContainer *w)
+	: QObject(), m_plugin(p), m_widget(w)
+{
+	//m_widget->installEventFilter(this); 
+	connect(m_widget, SIGNAL(clientClosed()), this, SLOT(closeWidget()));
+}
+
+void LV2EventFilter::closeWidget()
+{
+	if(m_plugin)
+		m_plugin->showNativeGui(false);
+}
+
+bool LV2EventFilter::eventFilter(QObject *o, QEvent *event)/*{{{*/
+{
+	if(m_widget)
+	{
+		if (event->type() == QEvent::Close) {
+			m_widget = NULL;
+			printf("LV2EventFilter::eventFilter() Plugin window closed\n");
+			if(m_plugin)
+				m_plugin->showNativeGui(false);
+		}
+	}
+	return QObject::eventFilter(o, event);
+}/*}}}*/
 
 static QHash<QString, uint32_t>    uri_map;
 static QHash<uint32_t, QByteArray> ids_map;
@@ -439,8 +468,8 @@ LV2PluginI::LV2PluginI()
 	m_type = LV2;
 	m_nativeui = 0;
 	m_controlFifo = 0;
+	m_eventFilter = 0;
 	m_guiVisible = false;
-	//QObject::connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 }
 
 LV2PluginI::~LV2PluginI()
@@ -448,12 +477,7 @@ LV2PluginI::~LV2PluginI()
 	//We need to free the resources from lilv here
 	if(m_plugin)
 	{
-		//deactivate();
-		for(int j = 0; j < instances; ++j)
-		{
-			lilv_instance_deactivate((LilvInstance*)m_instance[j]);
-			lilv_instance_free((LilvInstance*)m_instance[j]);
-		}
+		deactivate();
 		m_plugin->updateReferences(-1);
 		if(m_nativeui)
 			delete m_nativeui;
@@ -488,93 +512,7 @@ bool LV2PluginI::initPluginInstance(Plugin* plug, int c)/*{{{*/
 	//TODO: virtualize this method in Plugin
 	
 	m_plugin->updateReferences(1);
-
-	/*controlPorts = m_plugin->controlInPorts();
-	controlOutPorts = m_plugin->controlOutPorts();
-
-	controls = new Port[controlPorts];
-	controlsOut = new Port[controlOutPorts];
-
-	// Also, pick the least number of ins or outs, and base the number of instances on that.
-	unsigned long ins = m_plugin->inports();
-	unsigned long outs = m_plugin->outports();
-	if (outs)
-	{
-		instances = channel / outs;
-		if (instances < 1)
-			instances = 1;
-	}
-	else
-		if (ins)
-	{
-		instances = channel / ins;
-		if (instances < 1)
-			instances = 1;
-	}
-	else
-		instances = 1;
-
-	m_instance.clear();// = new LilvInstance[instances];
-	for (int i = 0; i < instances; ++i)
-	{
-		m_instance[i] = m_plugin->instantiatelv2();
-		if (m_instance[i] == NULL)
-			return false;
-	}
-
-	unsigned long ports = m_plugin->ports();
-	const LilvPlugin *p = m_plugin->getPlugin();
-	if(p)
-	{
-		const LilvPluginClass* pclass = lilv_plugin_get_class(p);
-		const LilvNode* clabel = lilv_plugin_class_get_label(pclass);
-		_label = QString(lilv_node_as_string(clabel));
-
-		int i = 0;
-		int ii = 0;
-		for(unsigned long k = 0; k < ports; ++k)
-		{
-			//TODO: virtualize this method in Plugin
-			for (int in = 0; in < instances; ++in)
-			{
-				lilv_instance_connect_port(m_instance[in], k, NULL);
-				//_plugin->connectPort(handle[i], k, &controls[curPort].val);
-			}
-			const LilvPort* port = lilv_plugin_get_port_by_index(p, k);
-			if(port)
-			{
-				if(lilv_port_is_a(p, port, lv2world->control_class))//Controll
-				{
-					if(lilv_port_is_a(p, port, lv2world->input_class))
-					{
-						//TODO: virtualize this method in Plugin
-						double val = _plugin->defaultValue(k);
-						controls[i].val = val;
-						controls[i].tmpVal = val;
-						controls[i].enCtrl = true;
-						controls[i].en2Ctrl = true;
-						controls[i].idx = k;
-						for(int j = 0; j < instances; ++j)
-							lilv_instance_connect_port(m_instance[j], k, &controls[i].val);
-						++i;
-					}
-					else if(lilv_port_is_a(p, port, lv2world->output_class))
-					{
-						controlsOut[ii].val = 0.0f;
-						controlsOut[ii].tmpVal = 0.0f;
-						controlsOut[ii].enCtrl = false;
-						controlsOut[ii].en2Ctrl = false;
-						controlsOut[ii].idx = k;
-						for(int j = 0; j < instances; ++j)
-							lilv_instance_connect_port(m_instance[j], k, &controlsOut[ii].val);
-						++ii;
-					}
-				}
-			}
-		}
-	}*/
-
-	activate();
+	//activate();
 	return true;
 }/*}}}*/
 
@@ -604,7 +542,7 @@ void LV2PluginI::deactivate()
 	printf("LV2PluginI::deactivate()\n");
 	for(int j = 0; j < instances; ++j)
 	{
-		lilv_instance_deactivate(m_instance[j]);
+		lilv_instance_deactivate((LilvInstance*)m_instance[j]);
 		lilv_instance_free((LilvInstance*)m_instance[j]);
 	}
 }
@@ -685,7 +623,7 @@ static void lv2_ui_write(SuilController controller,
 			uint32_t format,
 			const void* buffer)
 {
-	LV2PluginI* p = static_cast<LV2PluginI*>(controller);
+	LV2PluginI* p = static_cast<LV2PluginI*>(controller);/*{{{*/
 	if(p)
 	{
 		if(buffer_size != sizeof(float) || format != 0)
@@ -731,7 +669,7 @@ static void lv2_ui_write(SuilController controller,
 
 			p->track()->recordAutomation(id, value);
 		}/*}}}*/
-	}
+	}/*}}}*/
 	//fprintf(stderr, "UI WRITE\n");
 }
 
@@ -746,10 +684,15 @@ void LV2PluginI::showNativeGui()
 		if (m_nativeui->isVisible())
 		{
 			m_guiVisible = false;
-			m_nativeui->hide();
+			delete m_nativeui;//->hide();
+			m_nativeui = 0;
 		}
-		else
-			m_nativeui->show();
+		/*else
+		{
+			delete m_nativeui;//->hide();
+			m_nativeui = 0;
+			//m_nativeui->show();
+		}*/
 	}/*}}}*/
 }
 
@@ -760,25 +703,34 @@ void LV2PluginI::showNativeGui(bool flag)
 	{
 		if (flag)
 		{
-			//if (!m_nativeui)
-			//{
-			//	printf("no gui found, ");
-				makeNativeGui();
-			//}
-			/*if (m_nativeui)
-			{
-				printf("gui created, showing\n");
-				m_nativeui->show();
-			}*/
+			makeNativeGui();
 		}
 		else
 		{
 			m_guiVisible = false;
-			if (m_nativeui)
+			if(!m_uinstance.isEmpty())
 			{
-				m_nativeui->hide();
+				SuilInstance* inst = m_uinstance.takeAt(0);
+				if(inst)
+				{
+					suil_instance_free(inst);
+				}
+				/*if(m_uihost)
+				{
+					suil_host_free(m_uihost);
+				}*/
 			}
-			//printf("hiding gui\n");
+			/*if(m_nativeui != NULL)
+			{
+				delete m_nativeui;
+				m_nativeui = 0;
+			}*/
+			/*if(m_eventFilter)
+			{
+				delete m_eventFilter;
+				m_eventFilter = 0;
+			}*/
+			//TODO: Cleanup the ui host and ui_event handlers
 		}
 	}/*}}}*/
 }
@@ -825,6 +777,8 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 		ui_host = suil_host_new(lv2_ui_write, NULL, NULL, NULL);
 		//const LV2_Feature* features = m_plugin->features();
 		if(ui_host)
+		{
+			m_uihost = ui_host;
 			ui_instance = suil_instance_new( 
 										ui_host, 
 										this, 
@@ -836,6 +790,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 										lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_binary_uri(ui))),
 										features
 										);
+		}
 	}
 	QString title("OOMIDI: ");
 	title.append(m_plugin->name());
@@ -853,6 +808,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 		m_nativeui = (QWidget*)suil_instance_get_widget(ui_instance);
 		if(m_nativeui)
 		{
+			m_eventFilter = new LV2EventFilter(this, (QX11EmbedContainer*)m_nativeui);
 			printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
 			m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
 			m_nativeui->setWindowTitle(title);
@@ -1124,3 +1080,4 @@ void LV2ControlFifo::remove()/*{{{*/
 	rIndex = (rIndex + 1) % LV2_FIFO_SIZE;
 	--size;
 }/*}}}*/
+

@@ -18,6 +18,7 @@
 #include <QList>
 #include <QObject>
 #define LV2_FIFO_SIZE 1024
+class QX11EmbedContainer;
 
 struct LV2Data
 {
@@ -132,16 +133,37 @@ public:
     {
     }
 };/*}}}*/
+class LV2PluginI;
+
+class LV2EventFilter : public QObject/*{{{*/
+{
+	Q_OBJECT
+private slots:
+	void closeWidget();
+
+public:
+
+	// Constructor.
+	LV2EventFilter(LV2PluginI *p, QX11EmbedContainer *w);
+	bool eventFilter(QObject*, QEvent*);
+
+private:
+	
+	LV2PluginI *m_plugin;
+	QX11EmbedContainer *m_widget;
+};/*}}}*/
 
 class LV2PluginI : public PluginI
 {
 private:
 	QList<LilvInstance*> m_instance;
 	QList<SuilInstance*> m_uinstance;
+	SuilHost* m_uihost;
 	LV2Plugin* m_plugin;
 	QWidget* m_nativeui;
 	bool m_guiVisible;
 	LV2ControlFifo* m_controlFifo;
+	LV2EventFilter* m_eventFilter;
 	//QList<LilvInstance*> m_instance;
 public:
 	LV2PluginI();
