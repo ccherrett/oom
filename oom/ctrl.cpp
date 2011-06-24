@@ -20,15 +20,35 @@
 
 void CtrlList::initColor(int i)
 {
-	QColor collist[] = { QColor(219,129,0), QColor(0,219,5), QColor(113,0,219) , QColor(144,0,219), QColor(0,0,219), QColor(219,0,0) };
-	if (i < 5)
-	{
-		_displayColor = collist[i%6];
-	}
-	else
-	{
-		_displayColor = Qt::gray;
-	}
+	QColor collist[] = { QColor(219,0,93),
+						 QColor(0,219,5), 
+						 QColor(219,0,0), 
+						 QColor(0,219,216), 
+						 QColor(219,211,0), 
+						 QColor(0,15,219), 
+						 QColor(0,219,93), 
+						 QColor(219,93,0), 
+						 QColor(0,219,72), 
+						 QColor(180,0,219), 
+						 QColor(0,168,255), 
+						 QColor(255,0,252), 
+						 QColor(255,0,0), 
+						 QColor(255,210,0), 
+						 QColor(0,6,255), 
+						 QColor(0,255,0), 
+						 QColor(126,255,0) , 
+						 QColor(255,174,0), 
+						 QColor(0,255,138), 
+						 };
+	//if (i < 5)
+	//{
+		//_displayColor = collist[i%6];
+		_displayColor = collist[i%19];
+	//}
+	//else
+	//{
+	//	_displayColor = Qt::gray;
+	//}
 
 	_displayColor.setAlpha(255);
 
