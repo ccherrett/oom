@@ -1218,8 +1218,8 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 	#ifdef GTK2UI_SUPPORT
 				m_gtkWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 				gtk_window_set_resizable(GTK_WINDOW(m_gtkWindow), 1);
+				gtk_window_set_role(GTK_WINDOW(m_gtkWindow), title.c_str());
 				gtk_window_set_title(GTK_WINDOW(m_gtkWindow), title.c_str());
-				gtk_window_set_role(GTK_WINDOW(m_gtkWindow), m_plugin->name().toLatin1().constData());
 				gtk_container_add(GTK_CONTAINER(m_gtkWindow), static_cast<GtkWidget *> (m_lv2_ui_widget));
 				g_signal_connect(G_OBJECT(m_gtkWindow), "destroy", G_CALLBACK(lv2_gtk_window_destroy), this);
 	#endif
