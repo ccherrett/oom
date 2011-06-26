@@ -26,6 +26,8 @@ QStringList PluginDialog::sortItems = QStringList();
 PluginDialog::PluginDialog(QWidget* parent)
 : QDialog(parent)
 {
+	m_display_type = 2; //Default to LV2
+
 	setWindowTitle(tr("OOMidi: select plugin"));
 	QVBoxLayout* vbox = new QVBoxLayout(this);
 
@@ -155,6 +157,15 @@ PluginDialog::PluginDialog(QWidget* parent)
 	sortBox->setMinimumSize(100, 10);
 	panelbox->addWidget(sortBox);
 	panelbox->addSpacing(12);
+
+	m_cmbType = new QComboBox(this);
+	m_cmbType->addItem("LADSPA");
+	m_cmbType->addItem("DSSI");
+	m_cmbType->addItem("LV2");
+	m_cmbType->setCurrentIndex(2);
+	panelbox->addWidget(m_cmbType);
+	panelbox->addSpacing(12);
+
 	panelbox->addWidget(plugSelGroup);
 	panelbox->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
@@ -169,6 +180,7 @@ PluginDialog::PluginDialog(QWidget* parent)
 	connect(okB, SIGNAL(clicked()), SLOT(accept()));
 	connect(plugSel, SIGNAL(buttonClicked(QAbstractButton*)), SLOT(fillPlugs(QAbstractButton*)));
 	connect(sortBox, SIGNAL(editTextChanged(const QString&)), SLOT(fillPlugs(const QString&)));
+	connect(m_cmbType, SIGNAL(currentIndexChanged(int)), SLOT(typeChanged(int)));
 	sortBox->setFocus();
 	resize(800, 600);
 }
@@ -213,6 +225,12 @@ void PluginDialog::accept()/*{{{*/
 	}
 	QDialog::accept();
 }/*}}}*/
+
+void PluginDialog::typeChanged(int index)
+{
+	m_display_type = index;
+	fillPlugs(selectedPlugType);
+}
 
 //---------------------------------------------------------
 //    fillPlugs
@@ -264,6 +282,8 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 				addFlag = true;
 				break;
 		}
+		if(m_display_type != i->type())
+			addFlag = false;
 		if (addFlag)
 		{
 			QTreeWidgetItem* item = new QTreeWidgetItem;
@@ -282,56 +302,6 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 		}
 
 	}
-#if 0//def LV2_SUPPORT
-	for(iLV2Plugin i = lv2plugins.begin(); i != lv2plugins.end(); ++i)
-	{
-		int ai = i->inports();
-		int ao = i->outports();
-		int ci = i->controlInPorts();
-		int co = i->controlOutPorts();
-		bool addFlag = false;
-		switch (nbr)
-		{
-			case SEL_SM: // stereo & mono
-				if ((ai == 1 || ai == 2) && (ao == 1 || ao == 2))
-				{
-					addFlag = true;
-				}
-				break;
-			case SEL_S: // stereo
-				if ((ai == 1 || ai == 2) && ao == 2)
-				{
-					addFlag = true;
-				}
-				break;
-			case SEL_M: // mono
-				if (ai == 1 && ao == 1)
-				{
-					addFlag = true;
-				}
-				break;
-			case SEL_ALL: // all
-				addFlag = true;
-				break;
-		}
-		if (addFlag)
-		{
-			QTreeWidgetItem* item = new QTreeWidgetItem;
-			item->setText(0, i->uri());
-			item->setText(1, i->label());
-			item->setText(2, i->name());
-			item->setText(3, QString().setNum(ai));
-			item->setText(4, QString().setNum(ao));
-			item->setText(5, QString().setNum(ci));
-			item->setText(6, QString().setNum(co));
-			item->setText(7, QString().setNum(i->inPlaceCapable()));
-			item->setText(8, QString().setNum(i->id()));
-			item->setText(9, i->maker());
-			item->setText(10, i->copyright());
-			pList->addTopLevelItem(item);
-		}
-	}
-#endif
 	selectedPlugType = nbr;
 }/*}}}*/
 
@@ -351,6 +321,8 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 			addFlag = true;
 		else if (i->name().toLower().contains(sortValue.toLower()))
 			addFlag = true;
+		if(m_display_type != i->type())
+			addFlag = false;
 		if (addFlag)
 		{
 			QTreeWidgetItem* item = new QTreeWidgetItem;

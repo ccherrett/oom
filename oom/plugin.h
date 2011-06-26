@@ -33,11 +33,6 @@
 #include <dssi.h>
 #endif
 
-//#ifdef LV2_SUPPORT
-//#include "lilv/lilv.h"
-//#include "suil/suil.h"
-//#endif
-
 class QAbstractButton;
 class QComboBox;
 class QRadioButton;

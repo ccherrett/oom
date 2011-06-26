@@ -7,17 +7,30 @@
 //  	(info@openoctave.org)
 //=========================================================
 
-//#ifdef LV2_SUPPORT
 #ifndef _OOM_LV2_PLUGIN_H_
 #define _OOM_LV2_PLUGIN_H_
 #define OOM_LV2_MIDI_EVENT_ID 1
 #include "plugin.h"
+#ifdef LILV_SUPPORT
 #include <lilv/lilv.h>
+#endif
+#ifdef SUIL_SUPPORT
 #include <suil/suil.h>
+#endif
+#ifdef SLV2_SUPPORT
+#include <slv2/slv2.h>
+#endif
+#include "lv2_external_ui.h"
+#include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
 #include <QHash>
 #include <QList>
 #include <QObject>
 #define LV2_FIFO_SIZE 1024
+
+#define UITYPE_QT4  1
+#define UITYPE_GTK2 2
+#define UITYPE_EXT  4
+
 class QX11EmbedContainer;
 
 struct LV2Data
@@ -62,6 +75,25 @@ public:
 };/*}}}*/
 
 struct LV2World {/*{{{*/
+#ifdef SLV2_SUPPORT
+	SLV2World world;
+	SLV2Plugins plugins;
+	SLV2Instance instance;
+	SLV2Value input_class;
+	SLV2Value output_class;
+	SLV2Value control_class;
+	SLV2Value event_class;
+	SLV2Value audio_class;
+	SLV2Value midi_class;
+	SLV2Value opt_class;
+	SLV2Value qtui_class;
+	SLV2Value gtkui_class;
+	SLV2Value in_place_broken;
+	SLV2Value toggle_prop;
+	SLV2Value integer_prop;
+	SLV2Value logarithmic_prop;
+	SLV2Value samplerate_prop;
+#else
 	LilvWorld* world;
 	const LilvPlugins* plugins;
 	LilvInstance* instance;
@@ -79,6 +111,7 @@ struct LV2World {/*{{{*/
 	LilvNode* integer_prop;
 	LilvNode* logarithmic_prop;
 	LilvNode* samplerate_prop;
+#endif
 };/*}}}*/
 
 
@@ -88,20 +121,19 @@ protected:
 	void init(const char* uri);
 
 private:
-	//LV2_Feature*     m_features[9];
-	//LV2_Feature m_data_access_feature;
-	//LV2_Feature m_instance_access_feature;
-	//LV2_Feature m_path_support_feature;
-	//LV2_Feature m_new_file_support_feature;
-	//LV2_Feature m_persist_feature;
-	//LV2_Feature m_external_ui_feature;
-
+#ifdef SLV2_SUPPORT
+	SLV2Plugin m_plugin;
+#else
 	LilvPlugin* m_plugin;
+#endif
 
 public:
 	LV2Plugin(const char* uri);
+#ifdef SLV2_SUPPORT
+	SLV2Plugin getPlugin();
+#else
 	const LilvPlugin* getPlugin();
-	LilvInstance* instantiatelv2();
+#endif
 	//const LV2_Feature* const* features () { return m_features; }
     double defaultValue(unsigned int port) const;
     void lv2range(unsigned long i, float*, float*, float*) const;
@@ -112,27 +144,6 @@ public:
 	static uint32_t lv2_uri_to_id(const char *uri);
 };
 
-typedef std::list<LV2Plugin>::iterator iLV2Plugin;
-
-//---------------------------------------------------------
-//   PluginList
-//---------------------------------------------------------
-
-class LV2PluginList : public std::list<LV2Plugin>/*{{{*/
-{
-public:
-
-    void add(const char* uri)
-    {
-        push_back(LV2Plugin(uri));
-    }
-
-    LV2Plugin* find(const QString&, const QString&);
-
-    LV2PluginList()
-    {
-    }
-};/*}}}*/
 class LV2PluginI;
 
 class LV2EventFilter : public QObject/*{{{*/
@@ -156,21 +167,50 @@ private:
 class LV2PluginI : public PluginI
 {
 private:
+#ifdef SLV2_SUPPORT
+	QList<SLV2Instance> m_instance;
+	SLV2UIInstance m_slv2_ui_instance;
+	LV2UI_Widget   m_lv2_ui_widget;
+	lv2_external_ui_host m_lv2_ui_external;
+	SLV2UIs        m_slv2_uis;
+	SLV2UI         m_slv2_ui;
+#else
 	QList<LilvInstance*> m_instance;
+#endif
+#ifdef SUIL_SUPPORT
 	QList<SuilInstance*> m_uinstance;
 	SuilHost* m_uihost;
+#endif
+#ifdef GTK2UI_SUPPORT
+	struct _GtkWidget *m_gtkWindow;
+#endif
 	LV2Plugin* m_plugin;
 	QWidget* m_nativeui;
 	bool m_guiVisible;
+	int m_ui_type;
 	LV2ControlFifo* m_controlFifo;
 	LV2EventFilter* m_eventFilter;
-	//QList<LilvInstance*> m_instance;
+
+	LV2_Feature  **m_features;
+	LV2_Feature    m_data_access_feature;
+	LV2_Feature    m_instance_access_feature;
+	LV2_Extension_Data_Feature m_data_access;
+
+	LV2_Feature    m_ui_feature;
+	LV2_Feature  **m_ui_features;
 public:
 	LV2PluginI();
 	~LV2PluginI();
 	LV2Plugin* plugin() {
 		return m_plugin;
 	}
+#ifdef SLV2_SUPPORT
+	const LV2UI_Descriptor *lv2_ui_descriptor() const;
+	LV2UI_Handle lv2_ui_handle() const;
+	SLV2Instance instantiatelv2();
+#else
+	LilvInstance* instantiatelv2();
+#endif
 	LV2ControlFifo* getControlFifo(unsigned long p)
 	{
 		if(!m_controlFifo)
@@ -193,6 +233,7 @@ public:
 	}
 	void makeGui();
 	void makeNativeGui();
+	void closeNativeGui();
     virtual bool isAudioIn(int k);
     virtual bool isAudioOut(int k);
     virtual void range(int i, float* min, float* max) const
@@ -206,7 +247,4 @@ public:
 	}
 	void heartBeat();
 };
-
-extern LV2PluginList lv2plugins;
 #endif
-//#endif

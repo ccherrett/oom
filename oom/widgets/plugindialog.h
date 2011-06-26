@@ -21,6 +21,7 @@ class QTreeWidget;
 
 class AudioTrack;
 class PluginGui;
+class PluginI;
 class Plugin;
 
 //---------------------------------------------------------
@@ -42,6 +43,8 @@ class PluginDialog : public QDialog
     QRadioButton* onlyS;
     QRadioButton* onlySM;
     QPushButton *okB;
+	QComboBox* m_cmbType;
+	int m_display_type;
 
 public:
     PluginDialog(QWidget* parent = 0);
@@ -53,6 +56,7 @@ public slots:
     void fillPlugs(QAbstractButton*);
     void fillPlugs(int i);
     void fillPlugs(const QString& sortValue);
+	void typeChanged(int);
 
 private slots:
     void enableOkB();

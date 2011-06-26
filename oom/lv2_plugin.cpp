@@ -24,9 +24,7 @@
 #include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
 #include "lv2/lv2plug.in/ns/ext/uri-unmap/uri-unmap.h"
 #include "lv2/lv2plug.in/ns/ext/instance-access/instance-access.h"
-#include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
 #include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
-#include "lv2_external_ui.h"
 
 #define LV2_GTK_UI_URI "http://lv2plug.in/ns/extensions/ui#GtkUI"
 #define LV2_QT4_UI_URI "http://lv2plug.in/ns/extensions/ui#Qt4UI"
@@ -42,7 +40,7 @@ LV2EventFilter::LV2EventFilter(LV2PluginI *p, QX11EmbedContainer *w)
 void LV2EventFilter::closeWidget()
 {
 	if(m_plugin)
-		m_plugin->showNativeGui(false);
+		m_plugin->closeNativeGui();
 }
 
 bool LV2EventFilter::eventFilter(QObject *o, QEvent *event)/*{{{*/
@@ -53,7 +51,7 @@ bool LV2EventFilter::eventFilter(QObject *o, QEvent *event)/*{{{*/
 			m_widget = NULL;
 			printf("LV2EventFilter::eventFilter() Plugin window closed\n");
 			if(m_plugin)
-				m_plugin->showNativeGui(false);
+				m_plugin->closeNativeGui();
 		}
 	}
 	return QObject::eventFilter(o, event);
@@ -61,8 +59,6 @@ bool LV2EventFilter::eventFilter(QObject *o, QEvent *event)/*{{{*/
 
 static QHash<QString, uint32_t>    uri_map;
 static QHash<uint32_t, QByteArray> ids_map;
-
-LV2PluginList lv2plugins;
 
 static uint32_t lv2_uri_to_id(LV2_URI_Map_Callback_Data /*data*/, const char *map, const char *uri )
 {
@@ -88,30 +84,88 @@ static LV2_URI_Unmap_Feature lv2_uri_unmap = { NULL, lv2_id_to_uri };
 static LV2_Feature lv2_uri_unmap_feature = { LV2_URI_UNMAP_URI, &lv2_uri_unmap };
 
 //static LV2_Feature data_access_feature = {"http://lv2plug.in/ns/ext/data-access", NULL};
-static LV2_Feature instance_access_feature = {"http://lv2plug.in/ns/ext/instance-access", NULL};
-//static LV2_Feature path_support_feature = {LV2_FILES_PATH_SUPPORT_URI, NULL};
-//static LV2_Feature new_file_support_feature = {LV2_FILES_NEW_FILE_SUPPORT_URI, NULL};
 //static LV2_Feature persist_feature = {"http://lv2plug.in/ns/ext/persist", NULL};
-static LV2_Feature external_ui_feature = {LV2_NS_UI "external", NULL};
+static LV2_Feature instance_access_feature = {"http://lv2plug.in/ns/ext/instance-access", NULL};
+static LV2_Feature external_ui_feature = {LV2_EXTERNAL_UI_URI, NULL};
 		
-static const LV2_Feature* features[5] = { 
-	//&data_access_feature,
-	&instance_access_feature,
-	//&path_support_feature,
-	//&new_file_support_feature,
-	//&persist_feature,
+static const LV2_Feature* features[] = { 
 	&lv2_uri_map_feature,
 	&lv2_uri_unmap_feature,
-	&external_ui_feature,
     NULL
 };
+
+#ifdef SLV2_SUPPORT
+static void external_ui_closed(LV2UI_Controller ui_controller)
+{
+	printf("external_ui_closed()\n");
+	LV2PluginI* plugin = static_cast<LV2PluginI*>(ui_controller);
+	if(plugin)
+	{
+		printf("external_ui_closed: calling closeNativeGui\n");
+		plugin->closeNativeGui();
+	}
+}
+#ifdef GTK2UI_SUPPORT
+
+#undef signals 
+
+#include <gtk/gtk.h>
+#include <gdk/gdkx.h>
+
+static void lv2_gtk_window_destroy (GtkWidget * /*gtkWindow*/, gpointer plug )
+{
+	LV2PluginI* plugin = static_cast<LV2PluginI*> (plug);
+	if(plugin)
+	{
+		printf("lv2_gtk_window_destroy: calling closeNativeGui\n");
+		plugin->closeNativeGui();
+	}
+}
+
+#endif
+#endif
 
 static LV2World* lv2world;
 
 void initLV2()/*{{{*/
 {
 	lv2world = new LV2World;
-	lv2world->world = lilv_world_new();
+#ifdef SLV2_SUPPORT
+	lv2world->world = slv2_world_new();/*{{{*/
+	slv2_world_load_all(lv2world->world);
+
+	lv2world->plugins = slv2_world_get_all_plugins(lv2world->world);
+
+	lv2world->input_class = slv2_value_new_uri(lv2world->world, LILV_URI_INPUT_PORT);
+	lv2world->output_class = slv2_value_new_uri(lv2world->world, LILV_URI_OUTPUT_PORT);
+	lv2world->control_class = slv2_value_new_uri(lv2world->world, LILV_URI_CONTROL_PORT);
+	lv2world->event_class = slv2_value_new_uri(lv2world->world, LILV_URI_EVENT_PORT);
+	lv2world->audio_class = slv2_value_new_uri(lv2world->world, LILV_URI_AUDIO_PORT);
+	lv2world->midi_class = slv2_value_new_uri(lv2world->world, LILV_URI_MIDI_EVENT);
+
+	lv2world->opt_class = slv2_value_new_uri(lv2world->world, LILV_NS_LV2 "connectionOptional");
+	lv2world->qtui_class = slv2_value_new_uri(lv2world->world, LV2_QT4_UI_URI);
+	lv2world->gtkui_class = slv2_value_new_uri(lv2world->world, LV2_GTK_UI_URI);
+	lv2world->in_place_broken = slv2_value_new_uri(lv2world->world, LILV_NS_LV2 "inPlaceBroken");
+
+	lv2world->toggle_prop = slv2_value_new_uri(lv2world->world, LILV_NS_LV2 "toggled");    
+	lv2world->integer_prop = slv2_value_new_uri(lv2world->world, LILV_NS_LV2 "integer");
+	lv2world->samplerate_prop = slv2_value_new_uri(lv2world->world, LILV_NS_LV2 "sampleRate");
+	lv2world->logarithmic_prop = slv2_value_new_uri(lv2world->world, "http://lv2plug.in/ns/dev/extportinfo#logarithmic");
+
+	//printf("initLV2()\n");
+	printf("Found %d LV2 Plugins\n", slv2_plugins_size(lv2world->plugins));
+	for(uint32_t i = 0; i < slv2_plugins_size(lv2world->plugins); ++i) 
+	{
+		SLV2Plugin p = slv2_plugins_get_at(lv2world->plugins, i);
+		//lv2world->plugin_list.insert(QString(lilv_node_as_string(lilv_plugin_get_uri(p))), p);
+		const char* curi = slv2_value_as_string(slv2_plugin_get_uri(p));
+		//printf(" uri: %s\n", curi);
+        plugins.push_back(LV2Plugin(curi));
+		//lv2plugins.add(curi);
+	}/*}}}*/
+#else
+	lv2world->world = lilv_world_new();/*{{{*/
 	lilv_world_load_all(lv2world->world);
 
 	lv2world->plugins = lilv_world_get_all_plugins(lv2world->world);
@@ -143,7 +197,8 @@ void initLV2()/*{{{*/
 		//printf(" uri: %s\n", curi);
         plugins.push_back(LV2Plugin(curi));
 		//lv2plugins.add(curi);
-	}
+	}/*}}}*/
+#endif
 	printf("Master plugin list contains %d plugins", (int)plugins.size());
 }/*}}}*/
 
@@ -173,8 +228,68 @@ void LV2Plugin::init(const char* uri)/*{{{*/
 	_inPlaceCapable = false;
 	if(lv2world)
 	{
-		//const LilvPlugin *p = lv2world->plugin_list.value(QString(uri));
-		LilvNode* plugin_uri = lilv_new_uri(lv2world->world, uri);
+#ifdef SLV2_SUPPORT
+		SLV2Value plugin_uri = slv2_value_new_uri(lv2world->world, uri);/*{{{*/
+		//                    slv2_world_get_plugin_by_uri_string
+		SLV2Plugin p = slv2_plugins_get_by_uri(lv2world->plugins, plugin_uri);
+		slv2_value_free(plugin_uri);
+		if(p)
+		{
+			m_plugin = p;//const_cast<SLV2Plugin*>(p);
+			if(m_plugin && debugMsg)
+				printf("LV2Plugin::init Found LilvPlugin, setting m_plugin\n");
+			SLV2Value name = slv2_plugin_get_name(m_plugin);
+			if(name)
+			{
+				_name = QString(slv2_value_as_string(name));
+				slv2_value_free(name);
+				//printf("Found plugin: %s\n", _name.toLatin1().constData());
+			}
+			SLV2Value lvmaker = slv2_plugin_get_author_name(m_plugin);
+			_maker = QString(lvmaker ? slv2_value_as_string(lvmaker) : "Unknown");
+			slv2_value_free(lvmaker);
+			//QString uri(lilv_node_as_string(lilv_plugin_get_uri(p)));
+			SLV2PluginClass pclass = slv2_plugin_get_class(m_plugin);
+			SLV2Value clabel = slv2_plugin_class_get_label(pclass);
+			_label = QString(slv2_value_as_string(clabel));
+			//printf("Found label: %s\n", _label.toLatin1().constData());
+			//lilv_node_free(clabel);
+			_uniqueID = (unsigned long)lv2_uri_to_id(uri);
+
+			_portCount = slv2_plugin_get_num_ports(m_plugin);
+			
+			for(int i = 0; i < (int)_portCount; ++i)
+			{
+				SLV2Port port = slv2_plugin_get_port_by_index(m_plugin, i);
+				if(port)
+				{
+					if(slv2_port_is_a(m_plugin, port, lv2world->control_class))//Controll
+					{
+						if(slv2_port_is_a(m_plugin, port, lv2world->input_class))
+						{
+							++_controlInPorts;;
+						}
+						else if(slv2_port_is_a(m_plugin, port, lv2world->output_class))
+						{
+							++_controlOutPorts;
+						}
+					}
+					else if(slv2_port_is_a(m_plugin, port, lv2world->audio_class))//Audio I/O
+					{
+						if(slv2_port_is_a(m_plugin, port, lv2world->input_class))
+						{
+							++_inports;;
+						}
+						else if(slv2_port_is_a(m_plugin, port, lv2world->output_class))
+						{
+							++_outports;
+						}
+					}
+				}
+			}
+		}/*}}}*/
+#else
+		LilvNode* plugin_uri = lilv_new_uri(lv2world->world, uri);/*{{{*/
 		const LilvPlugin *p = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
 		lilv_node_free(plugin_uri);
 		if(p)
@@ -230,7 +345,7 @@ void LV2Plugin::init(const char* uri)/*{{{*/
 						}
 					}
 					//I donf think we currently have a machanism to deal with this outside of the synths
-					else if(lilv_port_is_a(m_plugin, port, lv2world->event_class)) //Midi I/O
+					/*else if(lilv_port_is_a(m_plugin, port, lv2world->event_class)) //Midi I/O
 					{
 						if(lilv_port_is_a(m_plugin, port, lv2world->input_class))
 						{
@@ -240,14 +355,24 @@ void LV2Plugin::init(const char* uri)/*{{{*/
 						{
 							//++_outports;
 						}
-					}
+					}*/
 				}
 			}
-		}
+		}/*}}}*/
+#endif
 	}
 }/*}}}*/
-
-const LilvPlugin* LV2Plugin::getPlugin()/*{{{*/
+#ifdef SLV2_SUPPORT
+SLV2Plugin LV2Plugin::getPlugin()/*{{{*/
+{
+	SLV2Value plugin_uri = slv2_value_new_uri(lv2world->world, m_uri.toUtf8().constData());
+	SLV2Plugin p = slv2_plugins_get_by_uri(lv2world->plugins, plugin_uri);
+	slv2_value_free(plugin_uri);
+	if(!p)
+		return NULL;
+	return p;
+#else
+const LilvPlugin* LV2Plugin::getPlugin()
 {
 	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());
 	const LilvPlugin *p = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
@@ -257,36 +382,56 @@ const LilvPlugin* LV2Plugin::getPlugin()/*{{{*/
 		return NULL;
 	}
 	return p;
-}/*}}}*/
-
-LilvInstance* LV2Plugin::instantiatelv2()/*{{{*/
-{
-	printf("LV2Plugin::instantiatelv2()\n");
-	/*if(m_plugin == NULL)
-	{
-		printf("m_plugin is NULL\n");
-		return NULL;
-	}*/
-	//LilvInstance* lvinstance = lilv_plugin_instantiate(m_plugin, sampleRate, m_features);
-	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());
-	const LilvPlugin *p = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
-	lilv_node_free(plugin_uri);
-	LilvInstance* lvinstance = lilv_plugin_instantiate(p, sampleRate, features);//NULL);
-	printf("After instantiate\n");
-	if(lvinstance == NULL)
-	{
-		fprintf(stderr, "Plugin::instantiate() Error: plugin:%s instantiate failed!\n", _label.toUtf8().constData());
-		return NULL;
-	}
-	//Set the pointer the shared plugin handle
-	if(instance_access_feature.data == NULL)
-		instance_access_feature.data = lilv_instance_get_handle(lvinstance);
-	return lvinstance;
+#endif
 }/*}}}*/
 
 void LV2Plugin::lv2range(unsigned long i, float* def, float* min, float* max) const/*{{{*/
 {
-	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());
+#ifdef SLV2_SUPPORT
+	SLV2Value plugin_uri = slv2_value_new_uri(lv2world->world, m_uri.toUtf8().constData());/*{{{*/
+	SLV2Plugin plug = slv2_plugins_get_by_uri(lv2world->plugins, plugin_uri);
+	slv2_value_free(plugin_uri);
+	SLV2Port port = slv2_plugin_get_port_by_index(plug, i);
+	if(port)
+	{
+		SLV2Value lmin;
+		SLV2Value lmax;
+		SLV2Value ldef;
+		slv2_port_get_range(plug, port, &ldef, &lmin, &lmax);
+
+		if(slv2_port_has_property(plug, port, lv2world->toggle_prop))
+		{
+			*min = 0.0f;
+			*max = 1.0f;
+			if(ldef)
+				*def = slv2_value_as_float(ldef);
+			else
+				*def = 0.0f;
+			if(lmin) slv2_value_free(lmin);
+			if(lmax) slv2_value_free(lmax);
+			if(ldef) slv2_value_free(ldef);
+			return;
+		}
+		//if(lilv_port_has_property(m_plugin, port, lv2world->samplerate_prop))
+		if(lmin)
+			*min = slv2_value_as_float(lmin);
+		else
+			*min = 0.0f;
+		if(lmax)
+			*max = slv2_value_as_float(lmax);
+		else
+			*max = 1.0f;
+		if(ldef)
+			*def = slv2_value_as_float(ldef);
+		else
+			*def = 0.0f;
+
+		if(lmin) slv2_value_free(lmin);
+		if(lmax) slv2_value_free(lmax);
+		if(ldef) slv2_value_free(ldef);
+	}/*}}}*/
+#else
+	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());/*{{{*/
 	const LilvPlugin *plug = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
 	lilv_node_free(plugin_uri);
 	const LilvPort* port = lilv_plugin_get_port_by_index(plug, i);
@@ -327,19 +472,51 @@ void LV2Plugin::lv2range(unsigned long i, float* def, float* min, float* max) co
 		if(lmin) lilv_node_free(lmin);
 		if(lmax) lilv_node_free(lmax);
 		if(ldef) lilv_node_free(ldef);
-	}
+	}/*}}}*/
+#endif
 }/*}}}*/
 
 double LV2Plugin::defaultValue(unsigned int p) const/*{{{*/
 {
-	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());
+#ifdef SLV2_SUPPORT
+	SLV2Value plugin_uri = slv2_value_new_uri(lv2world->world, m_uri.toUtf8().constData());/*{{{*/
+	SLV2Plugin plug = slv2_plugins_get_by_uri(lv2world->plugins, plugin_uri);
+	slv2_value_free(plugin_uri);
+	if (p >= _portCount)//lilv_plugin_get_num_ports(plug))
+		return 0.0;
+
+	double val = 1.0;
+	SLV2Port port = slv2_plugin_get_port_by_index(plug, p);
+	if(port)
+	{
+		SLV2Value lmin;
+		SLV2Value lmax;
+		SLV2Value ldef;
+		slv2_port_get_range(plug, port, &ldef, &lmin, &lmax);
+
+		//TODO: implement proper logarithmic support
+		/*if(lilv_port_has_property(m_plugin, port, lv2world->logarithmic_prop))
+		{
+		}
+		else
+		{
+		}*/
+		if(ldef)
+			val = (double)slv2_value_as_float(ldef);
+		if(lmin) slv2_value_free(lmin);
+		if(lmax) slv2_value_free(lmax);
+		if(ldef) slv2_value_free(ldef);
+	}/*}}}*/
+	return val;
+#else
+	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_uri.toUtf8().constData());/*{{{*/
 	const LilvPlugin *plug = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
 	lilv_node_free(plugin_uri);
 	if (p >= _portCount)//lilv_plugin_get_num_ports(plug))
 		return 0.0;
 
 	double val = 1.0;
-	const LilvPort* port = lilv_plugin_get_port_by_index(plug, p);/*{{{*/
+	const LilvPort* port = lilv_plugin_get_port_by_index(plug, p);
 	if(port)
 	{
 		LilvNode* lmin;
@@ -362,6 +539,7 @@ double LV2Plugin::defaultValue(unsigned int p) const/*{{{*/
 	}/*}}}*/
 
 	return val;
+#endif
 }/*}}}*/
 
 int LV2Plugin::updateReferences(int val)/*{{{*/
@@ -385,7 +563,30 @@ int LV2Plugin::updateReferences(int val)/*{{{*/
 		unsigned long cin = 0;
 		for(int i = 0; i < (int)_portCount; ++i)
 		{
-			const LilvPort* port = lilv_plugin_get_port_by_index(getPlugin(), i);
+#ifdef SLV2_SUPPORT
+			SLV2Port port = slv2_plugin_get_port_by_index(getPlugin(), i);/*{{{*/
+			if(port)
+			{
+				if(slv2_port_is_a(getPlugin(), port, lv2world->control_class))//Controll
+				{
+					if(slv2_port_is_a(getPlugin(), port, lv2world->input_class))
+					{
+						rpIdx.push_back(cin);
+						++cin;;
+					}
+					else if(slv2_port_is_a(getPlugin(), port, lv2world->output_class))
+					{
+						rpIdx.push_back((unsigned long) - 1);
+					}
+				}
+				else if(slv2_port_is_a(getPlugin(), port, lv2world->audio_class))//Audio I/O
+				{
+					rpIdx.push_back((unsigned long) - 1);
+				}
+				_inPlaceCapable = !slv2_port_has_property(getPlugin(), port, lv2world->in_place_broken);
+			}/*}}}*/
+#else
+			const LilvPort* port = lilv_plugin_get_port_by_index(getPlugin(), i);/*{{{*/
 			if(port)
 			{
 				if(lilv_port_is_a(getPlugin(), port, lv2world->control_class))//Controll
@@ -405,7 +606,8 @@ int LV2Plugin::updateReferences(int val)/*{{{*/
 					rpIdx.push_back((unsigned long) - 1);
 				}
 				_inPlaceCapable = !lilv_port_has_property(getPlugin(), port, lv2world->in_place_broken);
-			}
+			}/*}}}*/
+#endif
 		}
 	}
 
@@ -425,6 +627,18 @@ const char* LV2Plugin::portName(unsigned long i)/*{{{*/
     //return plugin ? plugin->PortNames[i] : 0;
 
 	const char* rv = 0;
+#ifdef SLV2_SUPPORT
+	SLV2Port port = slv2_plugin_get_port_by_index(getPlugin(), i);
+	if(port)
+	{
+		SLV2Value pname = slv2_port_get_name(getPlugin(), port);
+		if(pname)
+		{
+			rv = slv2_value_as_string(pname);
+			slv2_value_free(pname);
+		}
+	}
+#else
 	const LilvPort* port = lilv_plugin_get_port_by_index(getPlugin(), i);
 	if(port)
 	{
@@ -435,6 +649,7 @@ const char* LV2Plugin::portName(unsigned long i)/*{{{*/
 			lilv_node_free(pname);
 		}
 	}
+#endif
 	return rv;
 }/*}}}*/
 
@@ -470,6 +685,23 @@ LV2PluginI::LV2PluginI()
 	m_controlFifo = 0;
 	m_eventFilter = 0;
 	m_guiVisible = false;
+	m_ui_type = 0;
+#ifdef SLV2_SUPPORT
+	m_slv2_ui_instance = NULL;
+	m_lv2_ui_widget = NULL;
+	m_slv2_uis = NULL;
+	m_slv2_ui = NULL;
+#endif
+#ifdef GTK2UI_SUPPORT
+	m_gtkWindow = 0;
+#endif
+	int fcount = 0;
+	while (features[fcount]) { ++fcount; }
+
+	m_features = new LV2_Feature * [fcount + 1];
+	for (int i = 0; i < fcount; ++i)
+		m_features[i] = (LV2_Feature *) features[i];
+	m_features[fcount] = NULL;
 }
 
 LV2PluginI::~LV2PluginI()
@@ -516,8 +748,74 @@ bool LV2PluginI::initPluginInstance(Plugin* plug, int c)/*{{{*/
 	return true;
 }/*}}}*/
 
+#ifdef SLV2_SUPPORT
+SLV2Instance LV2PluginI::instantiatelv2()/*{{{*/
+{
+	printf("LV2PluginI::instantiatelv2()\n");
+	SLV2Value plugin_uri = slv2_value_new_uri(lv2world->world, m_plugin->uri().toUtf8().constData());
+	SLV2Plugin p = slv2_plugins_get_by_uri(lv2world->plugins, plugin_uri);
+	slv2_value_free(plugin_uri);
+	if(p)
+	{
+		SLV2Instance lvinstance = slv2_plugin_instantiate(p, sampleRate, m_features);
+		printf("After instantiate\n");
+		if(lvinstance == NULL)
+		{
+			fprintf(stderr, "LV2PluginI::instantiatelv2() Error: plugin:%s instantiate failed!\n", m_plugin->label().toUtf8().constData());
+			return NULL;
+		}
+		//Set the pointer the shared plugin handle
+		if(instance_access_feature.data == NULL)
+			instance_access_feature.data = slv2_instance_get_handle(lvinstance);
+		return lvinstance;
+	}
+	else
+		printf("LV2PluginI::instantiatelv2() Plugin is null\n");
+	return NULL;
+#else
+LilvInstance* LV2PluginI::instantiatelv2()
+{
+	printf("LV2PluginI::instantiatelv2()\n");
+	LilvNode* plugin_uri = lilv_new_uri(lv2world->world, m_plugin->uri().toUtf8().constData());
+	const LilvPlugin *p = lilv_plugins_get_by_uri(lv2world->plugins, plugin_uri);
+	lilv_node_free(plugin_uri);
+	LilvInstance* lvinstance = lilv_plugin_instantiate(p, sampleRate, m_features);//NULL);
+	printf("After instantiate\n");
+	if(lvinstance == NULL)
+	{
+		fprintf(stderr, "LV2PluginI::instantiate() Error: plugin:%s instantiate failed!\n", m_plugin->label().toUtf8().constData());
+		return NULL;
+	}
+	//Set the pointer the shared plugin handle
+	if(instance_access_feature.data == NULL)
+		instance_access_feature.data = lilv_instance_get_handle(lvinstance);
+	return lvinstance;
+#endif
+}/*}}}*/
+
 void LV2PluginI::heartBeat()
 {
+#ifdef SLV2_SUPPORT
+//TODO: Write the slv2 native ui update
+	const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+	if (ui_descriptor == NULL)
+		return;
+	if (ui_descriptor->port_event == NULL)
+		return;
+
+	LV2UI_Handle ui_handle = lv2_ui_handle();
+	if (ui_handle == NULL)
+		return;
+
+	for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
+	{
+		//printf("LV2PluginI::heartBeat()\n");
+		if(nativeGuiVisible())
+			(*ui_descriptor->port_event)(ui_handle,	controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+	}
+	if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
+		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
+#else
 	if(nativeGuiVisible() && !m_uinstance.isEmpty())
 	{
 		for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
@@ -525,6 +823,7 @@ void LV2PluginI::heartBeat()
 			suil_instance_port_event(m_uinstance[0], controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
 		}
 	}
+#endif
 }
 
 void LV2PluginI::activate()
@@ -532,8 +831,11 @@ void LV2PluginI::activate()
 	printf("LV2PluginI::activate()\n");
 	for(int j = 0; j < instances; ++j)
 	{
-		//if(m_instance[j])
-			lilv_instance_activate(m_instance[j]);
+#ifdef SLV2_SUPPORT
+		slv2_instance_activate(m_instance[j]);
+#else
+		lilv_instance_activate(m_instance[j]);
+#endif
 	}
 }
 
@@ -542,8 +844,13 @@ void LV2PluginI::deactivate()
 	printf("LV2PluginI::deactivate()\n");
 	for(int j = 0; j < instances; ++j)
 	{
+#ifdef SLV2_SUPPORT
+		slv2_instance_deactivate((SLV2Instance)m_instance[j]);
+		slv2_instance_free((SLV2Instance)m_instance[j]);
+#else
 		lilv_instance_deactivate((LilvInstance*)m_instance[j]);
 		lilv_instance_free((LilvInstance*)m_instance[j]);
+#endif
 	}
 }
 
@@ -577,7 +884,15 @@ void LV2PluginI::apply(int frames)/*{{{*/
 	}
 	for (int i = 0; i < instances; ++i)
 	{
+#ifdef SLV2_SUPPORT
+
+		if (m_lv2_ui_widget && m_ui_type == UITYPE_EXT)
+			LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
+		if(m_ui_type == UITYPE_GTK2)
+			slv2_instance_run(m_instance[i], (long)frames);
+#else
 		lilv_instance_run(m_instance[i], (long)frames);
+#endif
 	}
 }/*}}}*/
 
@@ -701,13 +1016,48 @@ void LV2PluginI::showNativeGui(bool flag)
 	printf("LV2PluginI::showNativeGui(%d) \n", flag);
 	if (m_plugin)/*{{{*/
 	{
-		if (flag)
+		if (flag && !m_guiVisible)
 		{
+#ifdef SLV2_SUPPORT
+//TODO: SLV2 gui handling
+			if(m_lv2_ui_widget == NULL)
+				makeNativeGui();
+			switch(m_ui_type)
+			{
+				case UITYPE_EXT:
+					LV2_EXTERNAL_UI_SHOW((lv2_external_ui *) m_lv2_ui_widget);
+				break;
+			#ifdef GTK2UI_SUPPORT
+				case UITYPE_GTK2:
+					if(m_gtkWindow)
+						gtk_widget_show_all(m_gtkWindow);
+				break;
+			#endif
+			}
+			m_guiVisible = true;
+#else
 			makeNativeGui();
+#endif
 		}
 		else
 		{
 			m_guiVisible = false;
+#ifdef SLV2_SUPPORT
+//TODO: SLV2 gui handling
+			switch(m_ui_type)
+			{
+				case UITYPE_EXT:
+					LV2_EXTERNAL_UI_HIDE((lv2_external_ui *) m_lv2_ui_widget);
+				break;
+			#ifdef GTK2UI_SUPPORT
+				case UITYPE_GTK2:
+					if(m_gtkWindow)
+						gtk_widget_hide_all(m_gtkWindow);
+				break;
+			#endif
+			}
+#else
+#ifdef SUIL_SUPPORT
 			if(!m_uinstance.isEmpty())
 			{
 				SuilInstance* inst = m_uinstance.takeAt(0);
@@ -731,12 +1081,150 @@ void LV2PluginI::showNativeGui(bool flag)
 				m_eventFilter = 0;
 			}*/
 			//TODO: Cleanup the ui host and ui_event handlers
+#endif
+#endif
 		}
 	}/*}}}*/
 }
 
+void LV2PluginI::closeNativeGui()
+{
+#ifdef SLV2_SUPPORT
+	#ifdef GTK2UI_SUPPORT
+		if(m_gtkWindow)
+			m_gtkWindow = NULL;
+	#endif
+		if(m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
+			LV2_EXTERNAL_UI_HIDE((lv2_external_ui *) m_lv2_ui_widget);
+		const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+		if (ui_descriptor && ui_descriptor->cleanup) 
+		{
+			LV2UI_Handle ui_handle = lv2_ui_handle();
+			if (ui_handle)
+				(*ui_descriptor->cleanup)(ui_handle);
+		}
+	m_lv2_ui_widget = NULL;
+	m_guiVisible = false;
+#else
+	if(m_nativeui)
+		m_nativeui = NULL;
+#endif
+}
+
 void LV2PluginI::makeNativeGui()/*{{{*/
 {
+	std::string title("OOMIDI: ");
+	//QString title("OOMIDI: ");
+	title.append(m_plugin->name().toLatin1().constData());
+	if(_track)
+		title.append(" - ").append(_track->name().toLatin1().constData());
+	printf("Title: %s\n", title.c_str());
+//TODO: SLV2 gui handling
+#ifdef SLV2_SUPPORT
+	SLV2Value qtui = slv2_value_new_uri(lv2world->world, LV2_QT4_UI_URI);
+	SLV2Value gtkui = slv2_value_new_uri(lv2world->world, LV2_GTK_UI_URI);
+	SLV2Value extui = slv2_value_new_uri(lv2world->world, LV2_NS_UI "external");
+	
+	m_slv2_uis = slv2_plugin_get_uis(m_plugin->getPlugin());
+	if(m_slv2_uis == NULL)
+		return;
+	int uinum = slv2_uis_size(m_slv2_uis);
+	for(int i = 0; i < uinum; ++i)
+	{
+		SLV2UI ui = const_cast<SLV2UI> (slv2_uis_get_at(m_slv2_uis, i));
+		if(slv2_ui_is_a(ui, extui))
+		{
+			m_ui_type = UITYPE_EXT;
+			m_slv2_ui = const_cast<SLV2UI> (ui);
+			break;
+		}
+		if(slv2_ui_is_a(ui, gtkui))
+		{
+			m_ui_type = UITYPE_GTK2;
+			m_slv2_ui = const_cast<SLV2UI> (ui);
+			break;
+		}
+	}
+
+	if (m_slv2_ui == NULL)
+		return;
+	
+	const SLV2Instance instance = m_instance.at(0);
+	if (instance == NULL)
+		return;
+	
+	const LV2_Descriptor *descriptor = slv2_instance_get_descriptor(instance);
+	if (descriptor == NULL)
+		return;
+
+	int fcount = 0;
+	while (m_features[fcount]) { ++fcount; }
+
+	m_ui_features = new LV2_Feature * [fcount + 4];
+	for (int i = 0; i < fcount; ++i)
+		m_ui_features[i] = (LV2_Feature *) m_features[i];
+
+	m_instance_access_feature.URI = LV2_INSTANCE_ACCESS_URI;
+	m_instance_access_feature.data = slv2_instance_get_handle(instance);
+	m_ui_features[fcount++] = &m_instance_access_feature;
+
+	m_data_access.data_access = descriptor->extension_data;
+	m_data_access_feature.URI = LV2_DATA_ACCESS_URI;
+	m_data_access_feature.data = &m_data_access;
+	m_ui_features[fcount++] = &m_data_access_feature;
+
+	if(m_ui_type == UITYPE_EXT)
+	{
+		m_lv2_ui_external.ui_closed = external_ui_closed;
+		m_lv2_ui_external.plugin_human_id = title.c_str();
+		m_ui_feature.URI = LV2_EXTERNAL_UI_URI;
+		m_ui_feature.data = &m_lv2_ui_external;
+		m_ui_features[fcount++] = &m_ui_feature;
+	}
+	m_ui_features[fcount] = NULL;
+
+	m_slv2_ui_instance = slv2_ui_instantiate(m_plugin->getPlugin(),
+											m_slv2_ui, 
+											lv2_ui_write, 
+											this, 
+											m_ui_features);
+	if(m_slv2_ui_instance == NULL)
+		return;
+	const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+	if (ui_descriptor && ui_descriptor->port_event)
+	{
+		LV2UI_Handle ui_handle = lv2_ui_handle();
+		if (ui_handle)
+		{
+			for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
+			{
+				//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
+				(*ui_descriptor->port_event)(ui_handle, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+			}
+		}
+	}
+
+	if (m_slv2_ui_instance) 
+	{
+		m_lv2_ui_widget = slv2_ui_instance_get_widget(m_slv2_ui_instance);
+		if (m_lv2_ui_widget)
+		{
+			if (m_ui_type == UITYPE_EXT)
+				LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
+			if(m_ui_type == UITYPE_GTK2)
+			{
+	#ifdef GTK2UI_SUPPORT
+				m_gtkWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+				gtk_window_set_resizable(GTK_WINDOW(m_gtkWindow), 1);
+				gtk_window_set_title(GTK_WINDOW(m_gtkWindow), title.c_str());
+				gtk_container_add(GTK_CONTAINER(m_gtkWindow), static_cast<GtkWidget *> (m_lv2_ui_widget));
+				g_signal_connect(G_OBJECT(m_gtkWindow), "destroy", G_CALLBACK(lv2_gtk_window_destroy), this);
+	#endif
+			}
+		}
+	}
+
+#else
 	printf("LV2PluginI::makeNativeGui()\n");
 	LilvNode* qtui = lilv_new_uri(lv2world->world, LV2_QT4_UI_URI);
 	LilvNode* gtkui = lilv_new_uri(lv2world->world, LV2_GTK_UI_URI);
@@ -792,10 +1280,6 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 										);
 		}
 	}
-	QString title("OOMIDI: ");
-	title.append(m_plugin->name());
-	if(_track)
-		title.append(" - ").append(_track->name());
 	if(ui_instance && !isexternal)
 	{
 		m_uinstance.append(ui_instance);
@@ -811,7 +1295,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 			m_eventFilter = new LV2EventFilter(this, (QX11EmbedContainer*)m_nativeui);
 			printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
 			m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
-			m_nativeui->setWindowTitle(title);
+			m_nativeui->setWindowTitle(QString(title.c_str()));
 			m_nativeui->show();
 			m_guiVisible = true;
 		}
@@ -832,6 +1316,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 		//m_slv2_ui_instance = slv2_ui_instantiate(m_plugin->getPlugin(),
 		//            ui, lv2_ui_write, this, features);
 	}
+#endif
 }/*}}}*/
 
 void LV2PluginI::makeGui()
@@ -839,8 +1324,42 @@ void LV2PluginI::makeGui()
 	_gui = new PluginGui(this);
 }
 
+const LV2UI_Descriptor *LV2PluginI::lv2_ui_descriptor(void) const
+{
+#ifdef SLV2_SUPPORT
+	if (m_slv2_ui_instance)
+		return slv2_ui_instance_get_descriptor(m_slv2_ui_instance);
+	else
+#endif
+	return NULL;
+}
+
+
+LV2UI_Handle LV2PluginI::lv2_ui_handle(void) const
+{
+#ifdef SLV2_SUPPORT
+	if (m_slv2_ui_instance)
+		return slv2_ui_instance_get_handle(m_slv2_ui_instance);
+	else
+#endif
+	return NULL;
+}
+
 bool LV2PluginI::isAudioIn(int p)/*{{{*/
 {
+#ifdef SLV2_SUPPORT
+	SLV2Port port = slv2_plugin_get_port_by_index(m_plugin->getPlugin(), p);
+	if(port)
+	{
+		if(slv2_port_is_a(m_plugin->getPlugin(), port, lv2world->audio_class))//Audio I/O
+		{
+			if(slv2_port_is_a(m_plugin->getPlugin(), port, lv2world->input_class))
+			{
+				return true;
+			}
+		}
+	}
+#else
 	const LilvPort* port = lilv_plugin_get_port_by_index(m_plugin->getPlugin(), p);
 	if(port)
 	{
@@ -852,11 +1371,25 @@ bool LV2PluginI::isAudioIn(int p)/*{{{*/
 			}
 		}
 	}
+#endif
 	return false;
 }/*}}}*/
 
 bool LV2PluginI::isAudioOut(int p)/*{{{*/
 {
+#ifdef SLV2_SUPPORT
+	SLV2Port port = slv2_plugin_get_port_by_index(m_plugin->getPlugin(), p);
+	if(port)
+	{
+		if(slv2_port_is_a(m_plugin->getPlugin(), port, lv2world->audio_class))//Audio I/O
+		{
+			if(slv2_port_is_a(m_plugin->getPlugin(), port, lv2world->output_class))
+			{
+				return true;
+			}
+		}
+	}
+#else
 	const LilvPort* port = lilv_plugin_get_port_by_index(m_plugin->getPlugin(), p);
 	if(port)
 	{
@@ -868,6 +1401,7 @@ bool LV2PluginI::isAudioOut(int p)/*{{{*/
 			}
 		}
 	}
+#endif
 	return false;
 }/*}}}*/
 
@@ -882,13 +1416,21 @@ void LV2PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 			if (isAudioIn(k))
 			{
 				//printf("LV2PluginI::connect Audio input port: %d value: %4.2f\n", port, *src[port]);
+#ifdef SLV2_SUPPORT
+				slv2_instance_connect_port(m_instance[i], k, src[port]);
+#else
 				lilv_instance_connect_port(m_instance[i], k, src[port]);
+#endif
 				port = (port + 1) % ports;
 			}
 			else if(isAudioOut(k))
 			{
 				//printf("LV2PluginI::connect Audio output port: %d value: %4.2f\n", port, *dst[port]);
+#ifdef SLV2_SUPPORT
+				slv2_instance_connect_port(m_instance[i], k, dst[port]);
+#else
 				lilv_instance_connect_port(m_instance[i], k, dst[port]);
+#endif
 				port = (port + 1) % ports;
 			}
 		}
@@ -932,7 +1474,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 	m_instance.clear();
 	for (int i = 0; i < instances; ++i)
 	{
-		m_instance.append(m_plugin->instantiatelv2());
+		m_instance.append(instantiatelv2());
 		if (m_instance[i] == NULL)
 		{
 			printf("LV2PluginI::setChannels(%d) Instance creation failed\n", c);
@@ -942,6 +1484,96 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 	//printf("222222222222222222222222222\n");
 
 	unsigned long ports = m_plugin->ports();
+
+#ifdef SLV2_SUPPORT
+	SLV2Plugin p = m_plugin->getPlugin();/*{{{*/
+	if(p)
+	{
+		SLV2PluginClass pclass = slv2_plugin_get_class(p);
+		SLV2Value clabel = slv2_plugin_class_get_label(pclass);
+		_label = QString(slv2_value_as_string(clabel));
+
+		int i = 0;
+		int ii = 0;
+		for(unsigned long k = 0; k < ports; ++k)
+		{
+			for (int in = 0; in < instances; ++in)
+			{
+				slv2_instance_connect_port(m_instance[in], k, NULL);
+			}
+			SLV2Port port = slv2_plugin_get_port_by_index(p, k);
+			if(port)
+			{
+				if(slv2_port_is_a(p, port, lv2world->control_class))//Controll
+				{
+					if(slv2_port_is_a(p, port, lv2world->input_class))
+					{
+						//double val = m_plugin->defaultValue(k);
+						float min;
+						float max;
+						float def;
+						m_plugin->lv2range(k, &def, &min, &max);
+						controls[i].val = def;
+						controls[i].tmpVal = def;
+						controls[i].enCtrl = true;
+						controls[i].en2Ctrl = true;
+						controls[i].idx = k;
+						for(int j = 0; j < instances; ++j)
+							slv2_instance_connect_port(m_instance[j], k, &controls[i].val);
+						controls[i].logarithmic = slv2_port_has_property(p, port, lv2world->logarithmic_prop);
+						controls[i].isInt = slv2_port_has_property(p, port, lv2world->integer_prop);
+						controls[i].toggle = slv2_port_has_property(p, port, lv2world->toggle_prop);
+						controls[i].samplerate = slv2_port_has_property(p, port, lv2world->samplerate_prop);
+						controls[i].min = min;
+						controls[i].max = max;
+						SLV2Value pname = slv2_port_get_name(p, port);
+						if(pname)
+						{
+							const char* pn = slv2_value_as_string(pname);
+							//printf("Found port %s\n", pn);
+							controls[i].name = std::string(pn);
+							slv2_value_free(pname);
+						}
+						//controls[i].name = m_plugin->portName(i);
+						printf("Portname: %s, index:%ld\n",controls[i].name.c_str(), k);
+						++i;
+					}
+					else if(slv2_port_is_a(p, port, lv2world->output_class))
+					{
+						float min;
+						float max;
+						float def;
+						m_plugin->lv2range(k, &def, &min, &max);
+						//printf("LV2PluginI::setChannels Port range for index: %d default:%f min:%f max:%f\n", k, def, min, max);
+						controlsOut[ii].val = def;
+						controlsOut[ii].tmpVal = 1.0f;
+						controlsOut[ii].enCtrl = false;
+						controlsOut[ii].en2Ctrl = false;
+						controlsOut[ii].idx = k;
+						for(int j = 0; j < instances; ++j)
+							slv2_instance_connect_port(m_instance[j], k, &controlsOut[ii].val);
+						controlsOut[ii].logarithmic = slv2_port_has_property(p, port, lv2world->logarithmic_prop);
+						controlsOut[ii].isInt = slv2_port_has_property(p, port, lv2world->integer_prop);
+						controlsOut[ii].toggle = slv2_port_has_property(p, port, lv2world->toggle_prop);
+						controlsOut[ii].samplerate = slv2_port_has_property(p, port, lv2world->samplerate_prop);
+						controlsOut[ii].min = min;
+						controlsOut[ii].max = max;
+						SLV2Value pname = slv2_port_get_name(p, port);
+						if(pname)
+						{
+							const char* pn = slv2_value_as_string(pname);
+							controlsOut[ii].name = std::string(pn);
+							//controlsOut[ii].name = pn;//lilv_node_as_string(pname);
+							slv2_value_free(pname);
+						}
+						//controlsOut[ii].name = m_plugin->portName(i);
+						++ii;
+					}
+				}
+			}
+		}
+	}/*}}}*/
+#else
 	const LilvPlugin *p = m_plugin->getPlugin();/*{{{*/
 	if(p)
 	{
@@ -1029,22 +1661,10 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 			}
 		}
 	}/*}}}*/
-
+#endif
 	activate();
 	//apply(1);
 }/*}}}*/
-
-LV2Plugin* LV2PluginList::find(const QString& uri, const QString& name)
-{
-	for (iLV2Plugin i = begin(); i != end(); ++i)
-	{
-		if ((uri == i->uri()) && (name == i->label()))
-			return &*i;
-	}
-	//printf("Plugin <%s> not found\n", name.ascii());
-	return 0;
-}
-
 
 bool LV2ControlFifo::put(const LV2Data& event)/*{{{*/
 {
