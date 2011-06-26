@@ -185,6 +185,16 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)
 				int id = genACnum(idx, i);
 				removeController(id);
 			}
+#ifdef LV2_SUPPORT
+			if(oldPlugin->type() == 2)
+			{
+				LV2PluginI* plug = (LV2PluginI*)plugin;
+				if(plug)
+					delete plug;
+			}
+			else
+#endif
+				delete oldPlugin;
 		}
 	}
 	efxPipe()->insert(plugin, idx);

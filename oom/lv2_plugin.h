@@ -200,7 +200,7 @@ private:
 	LV2_Feature  **m_ui_features;
 public:
 	LV2PluginI();
-	~LV2PluginI();
+	virtual ~LV2PluginI();
 	LV2Plugin* plugin() {
 		return m_plugin;
 	}

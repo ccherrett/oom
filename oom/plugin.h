@@ -409,7 +409,7 @@ private:
 
 public:
     PluginI();
-    ~PluginI();
+    virtual ~PluginI();
 
     Plugin* plugin() const
     {

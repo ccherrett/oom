@@ -83,10 +83,7 @@ static const char *lv2_id_to_uri (LV2_URI_Unmap_Callback_Data /*data*/, const ch
 static LV2_URI_Unmap_Feature lv2_uri_unmap = { NULL, lv2_id_to_uri };
 static LV2_Feature lv2_uri_unmap_feature = { LV2_URI_UNMAP_URI, &lv2_uri_unmap };
 
-//static LV2_Feature data_access_feature = {"http://lv2plug.in/ns/ext/data-access", NULL};
 //static LV2_Feature persist_feature = {"http://lv2plug.in/ns/ext/persist", NULL};
-static LV2_Feature instance_access_feature = {"http://lv2plug.in/ns/ext/instance-access", NULL};
-static LV2_Feature external_ui_feature = {LV2_EXTERNAL_UI_URI, NULL};
 		
 static const LV2_Feature* features[] = { 
 	&lv2_uri_map_feature,
@@ -765,9 +762,6 @@ SLV2Instance LV2PluginI::instantiatelv2()/*{{{*/
 			fprintf(stderr, "LV2PluginI::instantiatelv2() Error: plugin:%s instantiate failed!\n", m_plugin->label().toUtf8().constData());
 			return NULL;
 		}
-		//Set the pointer the shared plugin handle
-		if(instance_access_feature.data == NULL)
-			instance_access_feature.data = slv2_instance_get_handle(lvinstance);
 		return lvinstance;
 	}
 	else
@@ -787,14 +781,11 @@ LilvInstance* LV2PluginI::instantiatelv2()
 		fprintf(stderr, "LV2PluginI::instantiate() Error: plugin:%s instantiate failed!\n", m_plugin->label().toUtf8().constData());
 		return NULL;
 	}
-	//Set the pointer the shared plugin handle
-	if(instance_access_feature.data == NULL)
-		instance_access_feature.data = lilv_instance_get_handle(lvinstance);
 	return lvinstance;
 #endif
 }/*}}}*/
 
-void LV2PluginI::heartBeat()
+void LV2PluginI::heartBeat()/*{{{*/
 {
 #ifdef SLV2_SUPPORT
 //TODO: Write the slv2 native ui update
@@ -825,9 +816,9 @@ void LV2PluginI::heartBeat()
 		}
 	}
 #endif
-}
+}/*}}}*/
 
-void LV2PluginI::activate()
+void LV2PluginI::activate()/*{{{*/
 {
 	printf("LV2PluginI::activate()\n");
 	for(int j = 0; j < instances; ++j)
@@ -838,9 +829,9 @@ void LV2PluginI::activate()
 		lilv_instance_activate(m_instance[j]);
 #endif
 	}
-}
+}/*}}}*/
 
-void LV2PluginI::deactivate()
+void LV2PluginI::deactivate()/*{{{*/
 {
 	printf("LV2PluginI::deactivate()\n");
 	for(int j = 0; j < instances; ++j)
@@ -853,7 +844,7 @@ void LV2PluginI::deactivate()
 		lilv_instance_free((LilvInstance*)m_instance[j]);
 #endif
 	}
-}
+}/*}}}*/
 
 void LV2PluginI::apply(int frames)/*{{{*/
 {
@@ -934,7 +925,12 @@ void LV2PluginI::showGui(bool flag)
 	}/*}}}*/
 }
 
-static void lv2_ui_write(SuilController controller, 
+static void lv2_ui_write(
+#ifdef SLV2_SUPPORT
+			LV2UI_Controller controller,
+#else
+			SuilController controller, 
+#endif
 			uint32_t port_index,
 			uint32_t buffer_size,
 			uint32_t format,
@@ -1091,6 +1087,7 @@ void LV2PluginI::showNativeGui(bool flag)
 
 void LV2PluginI::closeNativeGui()
 {
+printf("LV2PluginI::closeNativeGui()\n");
 #ifdef SLV2_SUPPORT
 	#ifdef GTK2UI_SUPPORT
 		if(m_gtkWindow)
