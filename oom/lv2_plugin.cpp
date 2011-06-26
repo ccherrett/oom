@@ -886,9 +886,9 @@ void LV2PluginI::apply(int frames)/*{{{*/
 	{
 #ifdef SLV2_SUPPORT
 
-		if (m_lv2_ui_widget && m_ui_type == UITYPE_EXT)
-			LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
-		if(m_ui_type == UITYPE_GTK2)
+		//if (m_lv2_ui_widget && m_ui_type == UITYPE_EXT)
+		//	LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
+		//if(m_ui_type == UITYPE_GTK2)
 			slv2_instance_run(m_instance[i], (long)frames);
 #else
 		lilv_instance_run(m_instance[i], (long)frames);
