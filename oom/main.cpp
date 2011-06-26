@@ -49,6 +49,12 @@ extern lash_client_t * lash_client;
 extern snd_seq_t * alsaSeq;
 #endif
 
+//GTK2 LV2 GUI support
+#ifdef GTK2UI_SUPPORT
+#undef signals 
+#include <gtk/gtk.h>
+#endif
+
 //---------------------------------------------------------
 //   getCapabilities
 //---------------------------------------------------------
@@ -292,6 +298,10 @@ int main(int argc, char* argv[])
 	lash_args_t * lash_args = 0;
 	if (useLASH)
 		lash_args = lash_extract_args(&argc, &argv);
+#endif
+
+#ifdef GTK2UI_SUPPORT
+	gtk_init(&argc, &argv);
 #endif
 
 	srand(time(0)); // initialize random number generator

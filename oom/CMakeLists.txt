@@ -263,13 +263,21 @@ if(OSC_SUPPORT)
       target_link_libraries(core ${LIBLO_LIBRARIES})
 endif(OSC_SUPPORT)
 
-if(LV2_SUPPORT)
+if(LILV_SUPPORT)
       target_link_libraries(core ${LILV_LIBRARIES})
-endif(LV2_SUPPORT)
+endif(LILV_SUPPORT)
 
-if(LV2UI_SUPPORT)
+if(SUIL_SUPPORT)
       target_link_libraries(core ${SUIL_LIBRARIES})
-endif(LV2UI_SUPPORT)
+endif(SUIL_SUPPORT)
+
+if(SLV2_SUPPORT)
+	target_link_libraries(core ${SLV2_LIBRARIES})
+endif(SLV2_SUPPORT)
+
+if(GTK2UI_SUPPORT)
+	target_link_libraries(core ${GTK2_LIBRARIES})
+endif(GTK2UI_SUPPORT)
 
 target_link_libraries(oom
       midiedit

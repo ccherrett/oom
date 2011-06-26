@@ -610,8 +610,13 @@ Plugin::Plugin(PluginType t, const char*)
 
 void Plugin::initLadspa(QFileInfo* f, const LADSPA_Descriptor* d, bool isDssi)/*{{{*/
 {
-	//m_type = LADSPA;
 	_isDssi = isDssi;
+	if(isDssi)
+	{
+		m_type = DSSI;
+	}
+	else
+		m_type = LADSPA;
 #ifdef DSSI_SUPPORT
 	dssi_descr = NULL;
 #endif
