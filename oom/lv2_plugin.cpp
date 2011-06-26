@@ -709,6 +709,7 @@ LV2PluginI::~LV2PluginI()
 	//We need to free the resources from lilv here
 	if(m_plugin)
 	{
+		closeNativeGui();
 		deactivate();
 		m_plugin->updateReferences(-1);
 		if(m_nativeui)
@@ -879,7 +880,8 @@ void LV2PluginI::apply(int frames)/*{{{*/
 				if (controls[k].enCtrl && controls[k].en2Ctrl)
 					controls[k].tmpVal = _track->pluginCtrlVal(genACnum(_id, k));
 			}
-			controls[k].val = controls[k].tmpVal;
+			if(controls[k].val != controls[k].tmpVal)
+				controls[k].val = controls[k].tmpVal;
 		}
 	}
 	for (int i = 0; i < instances; ++i)
@@ -955,22 +957,22 @@ static void lv2_ui_write(SuilController controller,
 			return;
 		}
 
-		//TODO: Put event into fifo
-		LV2ControlFifo* cfifo = p->getControlFifo(index);/*{{{*/
+		LV2ControlFifo* cfifo = p->getControlFifo(index);
 		if (cfifo)
 		{
 			LV2Data cv;
 			//cv.idx = cport;
 			cv.value = value;
 			cv.frame = audio->timestamp();
-			if (!cfifo->put(cv))
+			if (!cfifo->put(cv) && debugMsg)
 			{
 				fprintf(stderr, "lv2_ui_write: fifo overflow: in control number:%ld\n", index);
 			}
 			//else
 			//	printf("Put values from gui for port: %d value: %f\n", index, value);
-		}/*}}}*/
+		}
 
+		//FIXME:Should this only happen during playback since that's the only time in matters
 		if (p->track() && p->id() != -1)/*{{{*/
 		{
 			int id = genACnum(p->id(), index);
@@ -1217,6 +1219,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 				m_gtkWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 				gtk_window_set_resizable(GTK_WINDOW(m_gtkWindow), 1);
 				gtk_window_set_title(GTK_WINDOW(m_gtkWindow), title.c_str());
+				gtk_window_set_role(GTK_WINDOW(m_gtkWindow), m_plugin->name().toLatin1().constData());
 				gtk_container_add(GTK_CONTAINER(m_gtkWindow), static_cast<GtkWidget *> (m_lv2_ui_widget));
 				g_signal_connect(G_OBJECT(m_gtkWindow), "destroy", G_CALLBACK(lv2_gtk_window_destroy), this);
 	#endif
