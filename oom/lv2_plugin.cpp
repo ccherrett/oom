@@ -803,7 +803,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 	for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
 	{
 		//printf("LV2PluginI::heartBeat()\n");
-		if(nativeGuiVisible())
+		//if(nativeGuiVisible())
 			(*ui_descriptor->port_event)(ui_handle,	controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
 	}
 	if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
@@ -1318,6 +1318,8 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 					//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
 					suil_instance_port_event(ui_instance, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
 				}
+				if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
+					LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
 				if(m_ui_type == UITYPE_GTK2)
 				{
 				#ifdef GTK2UI_SUPPORT
@@ -1345,22 +1347,6 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 				}
 			}/*}}}*/
 		}
-	}
-	else if(m_ui_type != UITYPE_EXT)
-	{
-		//printf("LV2PluginI::makeNativeGui() Creating external GUI\n");
-		QMessageBox::critical(0, QString("Unsupported UI"), QString("We're sorry but we do not currently support the external extension"));
-		/*struct lv2_external_ui_host external_ui_host;
-		external_ui_host.plugin_human_id = title.toUtf8().constData();
-		external_ui_feature.data = &external_ui_host;
-
-		struct lv2_external_ui* external_ui = (struct lv2_external_ui*)suil_instance_get_widget(ui_instance);
-		if(external_ui)
-		{
-			LV2_EXTERNAL_UI_SHOW(external_ui);
-		}*/
-		//m_slv2_ui_instance = slv2_ui_instantiate(m_plugin->getPlugin(),
-		//            ui, lv2_ui_write, this, features);
 	}
 #endif
 }/*}}}*/

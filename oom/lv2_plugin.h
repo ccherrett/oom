@@ -205,12 +205,12 @@ public:
 		return m_plugin;
 	}
 #ifdef SLV2_SUPPORT
-	const LV2UI_Descriptor *lv2_ui_descriptor() const;
-	LV2UI_Handle lv2_ui_handle() const;
 	SLV2Instance instantiatelv2();
 #else
 	LilvInstance* instantiatelv2();
 #endif
+	const LV2UI_Descriptor *lv2_ui_descriptor() const;
+	LV2UI_Handle lv2_ui_handle() const;
 	LV2ControlFifo* getControlFifo(unsigned long p)
 	{
 		if(!m_controlFifo)
