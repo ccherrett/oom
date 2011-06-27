@@ -20,8 +20,9 @@
 #ifdef SLV2_SUPPORT
 #include <slv2/slv2.h>
 #endif
-#include "lv2_external_ui.h"
 #include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
+#include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
+#include "lv2_external_ui.h"
 #include <QHash>
 #include <QList>
 #include <QObject>
@@ -168,10 +169,14 @@ class LV2PluginI : public PluginI
 {
 private:
 	LV2UI_Widget   m_lv2_ui_widget;
+	lv2_external_ui_host m_lv2_ui_external;
+	QWidget* m_nativeui;
+#ifdef GTK2UI_SUPPORT
+	struct _GtkWidget *m_gtkWindow;
+#endif
 #ifdef SLV2_SUPPORT
 	QList<SLV2Instance> m_instance;
 	SLV2UIInstance m_slv2_ui_instance;
-	lv2_external_ui_host m_lv2_ui_external;
 	SLV2UIs        m_slv2_uis;
 	SLV2UI         m_slv2_ui;
 #else
@@ -181,11 +186,7 @@ private:
 	QList<SuilInstance*> m_uinstance;
 	SuilHost* m_uihost;
 #endif
-#ifdef GTK2UI_SUPPORT
-	struct _GtkWidget *m_gtkWindow;
-#endif
 	LV2Plugin* m_plugin;
-	QWidget* m_nativeui;
 	bool m_guiVisible;
 	int m_ui_type;
 	LV2ControlFifo* m_controlFifo;
