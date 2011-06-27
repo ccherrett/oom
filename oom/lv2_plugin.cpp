@@ -872,7 +872,7 @@ void LV2PluginI::apply(int frames)/*{{{*/
 				if (controls[k].enCtrl && controls[k].en2Ctrl)
 					controls[k].tmpVal = _track->pluginCtrlVal(genACnum(_id, k));
 			}
-			if(controls[k].val != controls[k].tmpVal)
+			//if(controls[k].val != controls[k].tmpVal)
 				controls[k].val = controls[k].tmpVal;
 		}
 	}
