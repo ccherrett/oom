@@ -167,10 +167,10 @@ private:
 class LV2PluginI : public PluginI
 {
 private:
+	LV2UI_Widget   m_lv2_ui_widget;
 #ifdef SLV2_SUPPORT
 	QList<SLV2Instance> m_instance;
 	SLV2UIInstance m_slv2_ui_instance;
-	LV2UI_Widget   m_lv2_ui_widget;
 	lv2_external_ui_host m_lv2_ui_external;
 	SLV2UIs        m_slv2_uis;
 	SLV2UI         m_slv2_ui;

@@ -16,6 +16,7 @@
 #include "track.h"
 #include "lv2_plugin.h"
 #include "plugingui.h"
+#include "song.h"
 #include "audio.h"
 
 #include "lv2/lv2plug.in/ns/ext/event/event-helpers.h"
@@ -988,25 +989,7 @@ static void lv2_ui_write(
 
 void LV2PluginI::showNativeGui()
 {
-	if (m_plugin)/*{{{*/
-	{
-		if (!m_nativeui)
-		{
-			makeNativeGui();
-		}
-		if (m_nativeui->isVisible())
-		{
-			m_guiVisible = false;
-			delete m_nativeui;//->hide();
-			m_nativeui = 0;
-		}
-		/*else
-		{
-			delete m_nativeui;//->hide();
-			m_nativeui = 0;
-			//m_nativeui->show();
-		}*/
-	}/*}}}*/
+	showNativeGui(!m_guiVisible);
 }
 
 void LV2PluginI::showNativeGui(bool flag)
@@ -1028,7 +1011,10 @@ void LV2PluginI::showNativeGui(bool flag)
 			#ifdef GTK2UI_SUPPORT
 				case UITYPE_GTK2:
 					if(m_gtkWindow)
+					{
+						song->update();
 						gtk_widget_show_all(m_gtkWindow);
+					}
 				break;
 			#endif
 			}
@@ -1091,7 +1077,10 @@ printf("LV2PluginI::closeNativeGui()\n");
 #ifdef SLV2_SUPPORT
 	#ifdef GTK2UI_SUPPORT
 		if(m_gtkWindow)
+		{
+			gtk_widget_hide_all(m_gtkWindow);
 			m_gtkWindow = NULL;
+		}
 	#endif
 		if(m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
 			LV2_EXTERNAL_UI_HIDE((lv2_external_ui *) m_lv2_ui_widget);
@@ -1493,6 +1482,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 		SLV2Value clabel = slv2_plugin_class_get_label(pclass);
 		_label = QString(slv2_value_as_string(clabel));
 
+		double init_val = 1.0;
 		int i = 0;
 		int ii = 0;
 		for(unsigned long k = 0; k < ports; ++k)
@@ -1514,7 +1504,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						float def;
 						m_plugin->lv2range(k, &def, &min, &max);
 						controls[i].val = def;
-						controls[i].tmpVal = def;
+						controls[i].tmpVal = 1.0f;
 						controls[i].enCtrl = true;
 						controls[i].en2Ctrl = true;
 						controls[i].idx = k;
@@ -1526,6 +1516,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						controls[i].samplerate = slv2_port_has_property(p, port, lv2world->samplerate_prop);
 						controls[i].min = min;
 						controls[i].max = max;
+						init_val = (double)def;
 						SLV2Value pname = slv2_port_get_name(p, port);
 						if(pname)
 						{
@@ -1572,6 +1563,8 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 				}
 			}
 		}
+		activate();
+		//audio->msgSetPluginCtrlVal(_track, genACnum(_id, controls[i].idx), init_val);
 	}/*}}}*/
 #else
 	const LilvPlugin *p = m_plugin->getPlugin();/*{{{*/
@@ -1660,9 +1653,9 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 				}
 			}
 		}
+		activate();
 	}/*}}}*/
 #endif
-	activate();
 	//apply(1);
 }/*}}}*/
 
