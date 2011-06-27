@@ -803,7 +803,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 	for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
 	{
 		//printf("LV2PluginI::heartBeat()\n");
-		//if(nativeGuiVisible())
+		if(nativeGuiVisible())
 			(*ui_descriptor->port_event)(ui_handle,	controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
 	}
 	if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
@@ -872,7 +872,7 @@ void LV2PluginI::apply(int frames)/*{{{*/
 				if (controls[k].enCtrl && controls[k].en2Ctrl)
 					controls[k].tmpVal = _track->pluginCtrlVal(genACnum(_id, k));
 			}
-			//if(controls[k].val != controls[k].tmpVal)
+			if(controls[k].val != controls[k].tmpVal)
 				controls[k].val = controls[k].tmpVal;
 		}
 	}
@@ -1546,7 +1546,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						float def;
 						m_plugin->lv2range(k, &def, &min, &max);
 						controls[i].val = def;
-						controls[i].tmpVal = 1.0f;
+						controls[i].tmpVal = def;
 						controls[i].enCtrl = true;
 						controls[i].en2Ctrl = true;
 						controls[i].idx = k;
