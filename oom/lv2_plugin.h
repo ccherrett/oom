@@ -155,13 +155,13 @@ private slots:
 public:
 
 	// Constructor.
-	LV2EventFilter(LV2PluginI *p, QX11EmbedContainer *w);
+	LV2EventFilter(LV2PluginI *p, QWidget *w);
 	bool eventFilter(QObject*, QEvent*);
 
 private:
 	
 	LV2PluginI *m_plugin;
-	QX11EmbedContainer *m_widget;
+	QWidget *m_widget;
 };/*}}}*/
 
 class LV2PluginI : public PluginI

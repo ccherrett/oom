@@ -21,7 +21,7 @@
 
 #include "lv2/lv2plug.in/ns/ext/event/event-helpers.h"
 #include "lv2/lv2plug.in/ns/ext/event/event.h"
-#include "lv2/lv2plug.in/ns/ext/files/files.h"
+//#include "lv2/lv2plug.in/ns/ext/files/files.h"
 #include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
 #include "lv2/lv2plug.in/ns/ext/uri-unmap/uri-unmap.h"
 #include "lv2/lv2plug.in/ns/ext/instance-access/instance-access.h"
@@ -31,11 +31,11 @@
 #define LV2_QT4_UI_URI "http://lv2plug.in/ns/extensions/ui#Qt4UI"
 #define LV2_NS_UI   "http://lv2plug.in/ns/extensions/ui#"
 
-LV2EventFilter::LV2EventFilter(LV2PluginI *p, QX11EmbedContainer *w)
+LV2EventFilter::LV2EventFilter(LV2PluginI *p, QWidget *w)
 	: QObject(), m_plugin(p), m_widget(w)
 {
-	//m_widget->installEventFilter(this); 
-	connect(m_widget, SIGNAL(clientClosed()), this, SLOT(closeWidget()));
+	m_widget->installEventFilter(this); 
+	//connect(m_widget, SIGNAL(clientClosed()), this, SLOT(closeWidget()));
 }
 
 void LV2EventFilter::closeWidget()
@@ -58,6 +58,8 @@ bool LV2EventFilter::eventFilter(QObject *o, QEvent *event)/*{{{*/
 	return QObject::eventFilter(o, event);
 }/*}}}*/
 
+//Temporary id to uri maps
+//These are used to convert uri to id and back during the lifecycle of the plugin instance
 static QHash<QString, uint32_t>    uri_map;
 static QHash<uint32_t, QByteArray> ids_map;
 
@@ -93,7 +95,7 @@ static const LV2_Feature* features[] = {
 };
 
 #ifdef SLV2_SUPPORT
-static void external_ui_closed(LV2UI_Controller ui_controller)
+static void external_ui_closed(LV2UI_Controller ui_controller)/*{{{*/
 {
 	printf("external_ui_closed()\n");
 	LV2PluginI* plugin = static_cast<LV2PluginI*>(ui_controller);
@@ -102,15 +104,14 @@ static void external_ui_closed(LV2UI_Controller ui_controller)
 		printf("external_ui_closed: calling closeNativeGui\n");
 		plugin->closeNativeGui();
 	}
-}
+}/*}}}*/
 #ifdef GTK2UI_SUPPORT
 
 #undef signals 
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
-
-static void lv2_gtk_window_destroy (GtkWidget * /*gtkWindow*/, gpointer plug )
+static void lv2_gtk_window_destroy (GtkWidget * /*gtkWindow*/, gpointer plug )/*{{{*/
 {
 	LV2PluginI* plugin = static_cast<LV2PluginI*> (plug);
 	if(plugin)
@@ -118,8 +119,7 @@ static void lv2_gtk_window_destroy (GtkWidget * /*gtkWindow*/, gpointer plug )
 		printf("lv2_gtk_window_destroy: calling closeNativeGui\n");
 		plugin->closeNativeGui();
 	}
-}
-
+}/*}}}*/
 #endif
 #endif
 
@@ -880,34 +880,31 @@ void LV2PluginI::apply(int frames)/*{{{*/
 	{
 #ifdef SLV2_SUPPORT
 
-		//if (m_lv2_ui_widget && m_ui_type == UITYPE_EXT)
-		//	LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
-		//if(m_ui_type == UITYPE_GTK2)
-			slv2_instance_run(m_instance[i], (long)frames);
+		slv2_instance_run(m_instance[i], (long)frames);
 #else
 		lilv_instance_run(m_instance[i], (long)frames);
 #endif
 	}
 }/*}}}*/
 
-void LV2PluginI::showGui()
+void LV2PluginI::showGui()/*{{{*/
 {
-	if (m_plugin)/*{{{*/
+	if (m_plugin)
 	{
 		if (!_gui)
 		{
-			makeGui();
+			showGui(true);
 		}
 		if (_gui->isVisible())
-			_gui->hide();
+			showGui(false);
 		else
-			_gui->show();
-	}/*}}}*/
-}
+			showGui(true);
+	}
+}/*}}}*/
 
-void LV2PluginI::showGui(bool flag)
+void LV2PluginI::showGui(bool flag)/*{{{*/
 {
-	if (m_plugin)/*{{{*/
+	if (m_plugin)
 	{
 		if (flag)
 		{
@@ -923,10 +920,10 @@ void LV2PluginI::showGui(bool flag)
 			if (_gui)
 				_gui->hide();
 		}
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
-static void lv2_ui_write(
+static void lv2_ui_write(/*{{{*/
 #ifdef SLV2_SUPPORT
 			LV2UI_Controller controller,
 #else
@@ -937,7 +934,7 @@ static void lv2_ui_write(
 			uint32_t format,
 			const void* buffer)
 {
-	LV2PluginI* p = static_cast<LV2PluginI*>(controller);/*{{{*/
+	LV2PluginI* p = static_cast<LV2PluginI*>(controller);
 	if(p)
 	{
 		if(buffer_size != sizeof(float) || format != 0)
@@ -958,80 +955,71 @@ static void lv2_ui_write(
 		if (cfifo)
 		{
 			LV2Data cv;
-			//cv.idx = cport;
 			cv.value = value;
 			cv.frame = audio->timestamp();
 			if (!cfifo->put(cv) && debugMsg)
 			{
 				fprintf(stderr, "lv2_ui_write: fifo overflow: in control number:%ld\n", index);
 			}
-			//else
-			//	printf("Put values from gui for port: %d value: %f\n", index, value);
 		}
 
 		//FIXME:Should this only happen during playback since that's the only time in matters
-		if (p->track() && p->id() != -1)/*{{{*/
+		if (p->track() && p->id() != -1)
 		{
 			int id = genACnum(p->id(), index);
 			AutomationType at = p->track()->automationType();
 
-			// TODO: Taken from our native gui control handlers.
-			// This may need modification or may cause problems -
-			//  we don't have the luxury of access to the dssi gui controls !
 			if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
 				p->enableController(index, false);
 
 			p->track()->recordAutomation(id, value);
-		}/*}}}*/
-	}/*}}}*/
-	//fprintf(stderr, "UI WRITE\n");
-}
+		}
+	}
+}/*}}}*/
 
-void LV2PluginI::showNativeGui()
+void LV2PluginI::showNativeGui()/*{{{*/
 {
 	showNativeGui(!m_guiVisible);
-}
+}/*}}}*/
 
-void LV2PluginI::showNativeGui(bool flag)
+void LV2PluginI::showNativeGui(bool flag)/*{{{*/
 {
 	printf("LV2PluginI::showNativeGui(%d) \n", flag);
-	if (m_plugin)/*{{{*/
+	if (m_plugin)
 	{
-		if (flag && !m_guiVisible)
+		if (flag)
 		{
-#ifdef SLV2_SUPPORT
-//TODO: SLV2 gui handling
 			if(m_lv2_ui_widget == NULL)
 				makeNativeGui();
 			switch(m_ui_type)
 			{
 				case UITYPE_EXT:
-					LV2_EXTERNAL_UI_SHOW((lv2_external_ui *) m_lv2_ui_widget);
+					if(m_lv2_ui_widget)
+						LV2_EXTERNAL_UI_SHOW((lv2_external_ui *) m_lv2_ui_widget);
 				break;
 			#ifdef GTK2UI_SUPPORT
 				case UITYPE_GTK2:
 					if(m_gtkWindow)
 					{
-						song->update();
 						gtk_widget_show_all(m_gtkWindow);
 					}
 				break;
 			#endif
+				case UITYPE_QT4:
+					if(m_nativeui)
+						m_nativeui->show();
+				break;
 			}
 			m_guiVisible = true;
-#else
-			makeNativeGui();
-#endif
 		}
 		else
 		{
 			m_guiVisible = false;
-#ifdef SLV2_SUPPORT
-//TODO: SLV2 gui handling
 			switch(m_ui_type)
 			{
 				case UITYPE_EXT:
-					LV2_EXTERNAL_UI_HIDE((lv2_external_ui *) m_lv2_ui_widget);
+					if(m_lv2_ui_widget)
+						LV2_EXTERNAL_UI_HIDE((lv2_external_ui *) m_lv2_ui_widget);
 				break;
 			#ifdef GTK2UI_SUPPORT
 				case UITYPE_GTK2:
@@ -1039,51 +1027,28 @@ void LV2PluginI::showNativeGui(bool flag)
 						gtk_widget_hide_all(m_gtkWindow);
 				break;
 			#endif
-			}
-#else
-#ifdef SUIL_SUPPORT
-			if(!m_uinstance.isEmpty())
-			{
-				SuilInstance* inst = m_uinstance.takeAt(0);
-				if(inst)
+				case UITYPE_QT4:
 				{
-					suil_instance_free(inst);
+					if(m_nativeui)
+						m_nativeui->hide();
 				}
-				/*if(m_uihost)
-				{
-					suil_host_free(m_uihost);
-				}*/
+				break;
 			}
-			/*if(m_nativeui != NULL)
-			{
-				delete m_nativeui;
-				m_nativeui = 0;
-			}*/
-			/*if(m_eventFilter)
-			{
-				delete m_eventFilter;
-				m_eventFilter = 0;
-			}*/
-			//TODO: Cleanup the ui host and ui_event handlers
-#endif
-#endif
 		}
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
-void LV2PluginI::closeNativeGui()
+void LV2PluginI::closeNativeGui()/*{{{*/
 {
-printf("LV2PluginI::closeNativeGui()\n");
+	printf("LV2PluginI::closeNativeGui()\n");
+	showNativeGui(false);
 #ifdef SLV2_SUPPORT
 	#ifdef GTK2UI_SUPPORT
 		if(m_gtkWindow)
 		{
-			gtk_widget_hide_all(m_gtkWindow);
 			m_gtkWindow = NULL;
 		}
 	#endif
-		if(m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
-			LV2_EXTERNAL_UI_HIDE((lv2_external_ui *) m_lv2_ui_widget);
 		const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
 		if (ui_descriptor && ui_descriptor->cleanup) 
 		{
@@ -1091,27 +1056,43 @@ printf("LV2PluginI::closeNativeGui()\n");
 			if (ui_handle)
 				(*ui_descriptor->cleanup)(ui_handle);
 		}
-	m_lv2_ui_widget = NULL;
-	m_guiVisible = false;
 #else
+	if(!m_uinstance.isEmpty())
+	{
+		SuilInstance* inst = m_uinstance.takeAt(0);
+		if(inst)
+		{
+			suil_instance_free(inst);
+		}
+		if(m_uihost)
+		{
+			suil_host_free(m_uihost);
+		}
+	}
+	if(m_eventFilter)
+	{
+		delete m_eventFilter;
+		m_eventFilter = 0;
+	}
 	if(m_nativeui)
-		m_nativeui = NULL;
+	{
+		delete m_nativeui;
+		m_nativeui = 0;
+	}
 #endif
-}
+	m_lv2_ui_widget = NULL;
+}/*}}}*/
 
 void LV2PluginI::makeNativeGui()/*{{{*/
 {
 	std::string title("OOMIDI: ");
-	//QString title("OOMIDI: ");
 	title.append(m_plugin->name().toLatin1().constData());
 	if(_track)
 		title.append(" - ").append(_track->name().toLatin1().constData());
-	printf("Title: %s\n", title.c_str());
-//TODO: SLV2 gui handling
 #ifdef SLV2_SUPPORT
 	SLV2Value qtui = slv2_value_new_uri(lv2world->world, LV2_QT4_UI_URI);
 	SLV2Value gtkui = slv2_value_new_uri(lv2world->world, LV2_GTK_UI_URI);
-	SLV2Value extui = slv2_value_new_uri(lv2world->world, LV2_NS_UI "external");
+	SLV2Value extui = slv2_value_new_uri(lv2world->world, LV2_EXTERNAL_UI_URI);
 	
 	m_slv2_uis = slv2_plugin_get_uis(m_plugin->getPlugin());
 	if(m_slv2_uis == NULL)
@@ -1129,6 +1110,12 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 		if(slv2_ui_is_a(ui, gtkui))
 		{
 			m_ui_type = UITYPE_GTK2;
+			m_slv2_ui = const_cast<SLV2UI> (ui);
+			break;
+		}
+		if(slv2_ui_is_a(ui, qtui))
+		{
+			m_ui_type = UITYPE_QT4;
 			m_slv2_ui = const_cast<SLV2UI> (ui);
 			break;
 		}
@@ -1210,6 +1197,20 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 				g_signal_connect(G_OBJECT(m_gtkWindow), "destroy", G_CALLBACK(lv2_gtk_window_destroy), this);
 	#endif
 			}
+			if(m_ui_type == UITYPE_QT4)
+			{
+				m_nativeui = (QWidget*)m_lv2_ui_widget;
+				if(m_nativeui)
+				{
+					m_eventFilter = new LV2EventFilter(this, m_nativeui);
+					printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
+					m_nativeui->setWindowRole(QString(title.c_str()));
+					m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
+					m_nativeui->setWindowTitle(QString(title.c_str()));
+					//m_nativeui->show();
+					//m_guiVisible = true;
+				}
+			}
 		}
 	}
 
@@ -1217,13 +1218,10 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 	printf("LV2PluginI::makeNativeGui()\n");
 	LilvNode* qtui = lilv_new_uri(lv2world->world, LV2_QT4_UI_URI);
 	LilvNode* gtkui = lilv_new_uri(lv2world->world, LV2_GTK_UI_URI);
-	LilvNode* extui = lilv_new_uri(lv2world->world, LV2_NS_UI "external");
-	//const LV2_Feature instance_feature = { "http://lv2plug.in/ns/ext/instance-access", NULL};
+	LilvNode* extui = lilv_new_uri(lv2world->world, LV2_EXTERNAL_UI_URI);
 	
-	LilvNode* selectui = NULL;
 	const LilvUI* ui = NULL;
 	const LilvNode* ui_type = NULL;
-	bool isexternal = false;
 	if (qtui && gtkui) {
 		printf("LV2PluginI::makeNativeGui() Found qt4ui uri\n");
 		LilvUIs* uis = lilv_plugin_get_uis(m_plugin->getPlugin());
@@ -1231,25 +1229,68 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 			const LilvUI* this_ui = lilv_uis_get(uis, u);
 			if(lilv_ui_is_a(this_ui, extui))
 			{
-				printf("LV2PluginI::makeNativeGui() extui is supported\n");
+				printf("LV2PluginI::makeNativeGui() GUI type is extui\n");
 				ui = this_ui;
+				m_ui_type = UITYPE_EXT;
 				ui_type = extui;
-				isexternal = true;
 				break;
 			}
-			if (lilv_ui_is_supported(this_ui, suil_ui_supported, qtui, &ui_type)) {
-				printf("LV2PluginI::makeNativeGui() qtui is supported\n");
+			if(lilv_ui_is_a(this_ui, gtkui))
+			{
+				printf("LV2PluginI::makeNativeGui() GUI type is gtk\n");
 				ui = this_ui;
-				selectui = qtui;
+				m_ui_type = UITYPE_GTK2;
+				ui_type = gtkui;
+				break;
+			}
+			if (lilv_ui_is_a(this_ui, qtui)) {
+				printf("LV2PluginI::makeNativeGui() GUI type is qtui\n");
+				ui = this_ui;
+				m_ui_type = UITYPE_QT4;
+				ui_type = qtui
 				break;
 			}
 		}
 	}
 
+	const LilvInstance *instance = m_instance.at(0);
+	if (instance == NULL)
+		return;
+	
+	const LV2_Descriptor *descriptor = lilv_instance_get_descriptor(instance);
+	if (descriptor == NULL)
+		return;
+
+	int fcount = 0;
+	while (m_features[fcount]) { ++fcount; }
+
+	m_ui_features = new LV2_Feature * [fcount + 4];
+	for (int i = 0; i < fcount; ++i)
+		m_ui_features[i] = (LV2_Feature *) m_features[i];
+
+	m_instance_access_feature.URI = LV2_INSTANCE_ACCESS_URI;
+	m_instance_access_feature.data = lilv_instance_get_handle(instance);
+	m_ui_features[fcount++] = &m_instance_access_feature;
+
+	m_data_access.data_access = descriptor->extension_data;
+	m_data_access_feature.URI = LV2_DATA_ACCESS_URI;
+	m_data_access_feature.data = &m_data_access;
+	m_ui_features[fcount++] = &m_data_access_feature;
+
+	if(m_ui_type == UITYPE_EXT)
+	{
+		m_lv2_ui_external.ui_closed = external_ui_closed;
+		m_lv2_ui_external.plugin_human_id = title.c_str();
+		m_ui_feature.URI = LV2_EXTERNAL_UI_URI;
+		m_ui_feature.data = &m_lv2_ui_external;
+		m_ui_features[fcount++] = &m_ui_feature;
+	}
+	m_ui_features[fcount] = NULL;
+
 	SuilHost*     ui_host     = NULL;
 	SuilInstance* ui_instance = NULL;
 	m_uinstance.clear();
-	if (ui && !isexternal) {
+	if (ui && m_ui_type != UITYPE_EXT) {
 		printf("LV2PluginI::makeNativeGui() Found ui for plugin\n");
 		ui_host = suil_host_new(lv2_ui_write, NULL, NULL, NULL);
 		//const LV2_Feature* features = m_plugin->features();
@@ -1259,39 +1300,55 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 			ui_instance = suil_instance_new( 
 										ui_host, 
 										this, 
-										isexternal ? lilv_node_as_uri(extui) : lilv_node_as_uri(qtui),
-										lilv_node_as_uri(lilv_plugin_get_uri(m_plugin->getPlugin())),
+										lilv_node_as_uri(ui_type),
+										m_plugin->uri(),
 										lilv_node_as_uri(lilv_ui_get_uri(ui)),
 										lilv_node_as_uri(ui_type),
 										lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_bundle_uri(ui))),
 										lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_binary_uri(ui))),
-										features
+										m_ui_features
 										);
+			if(ui_instance)/*{{{*/
+			{	
+				m_lv2_ui_widget = ui_instance->ui_widget;//suil_instance_get_widget(ui_instance);
+				m_uinstance.append(ui_instance);
+				printf("LV2PluginI::makeNativeGui() Suil gui instance created\n");
+				for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
+				{
+					//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
+					suil_instance_port_event(ui_instance, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+				}
+				if(m_ui_type == UITYPE_GTK2)
+				{
+				#ifdef GTK2UI_SUPPORT
+					m_gtkWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+					gtk_window_set_resizable(GTK_WINDOW(m_gtkWindow), 1);
+					gtk_window_set_role(GTK_WINDOW(m_gtkWindow), title.c_str());
+					gtk_window_set_title(GTK_WINDOW(m_gtkWindow), title.c_str());
+					gtk_container_add(GTK_CONTAINER(m_gtkWindow), static_cast<GtkWidget *> (m_lv2_ui_widget));
+					g_signal_connect(G_OBJECT(m_gtkWindow), "destroy", G_CALLBACK(lv2_gtk_window_destroy), this);
+				#endif
+				}
+				if(m_ui_type == UITYPE_QT4)
+				{
+					m_nativeui = (QWidget*)m_lv2_ui_widget;
+					if(m_nativeui)
+					{
+						m_eventFilter = new LV2EventFilter(this, (QX11EmbedContainer*)m_nativeui);
+						printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
+						m_nativeui->setWindowRole(QString(title.c_str()));
+						m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
+						m_nativeui->setWindowTitle(QString(title.c_str()));
+						//m_nativeui->show();
+						//m_guiVisible = true;
+					}
+				}
+			}/*}}}*/
 		}
 	}
-	if(ui_instance && !isexternal)
+	else if(m_ui_type != UITYPE_EXT)
 	{
-		m_uinstance.append(ui_instance);
-		printf("LV2PluginI::makeNativeGui() Suil gui instance created\n");
-		for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
-		{
-			//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
-			suil_instance_port_event(ui_instance, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
-		}
-		m_nativeui = (QWidget*)suil_instance_get_widget(ui_instance);
-		if(m_nativeui)
-		{
-			m_eventFilter = new LV2EventFilter(this, (QX11EmbedContainer*)m_nativeui);
-			printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
-			m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
-			m_nativeui->setWindowTitle(QString(title.c_str()));
-			m_nativeui->show();
-			m_guiVisible = true;
-		}
-	}
-	else if(isexternal && ui_instance)
-	{
-		printf("LV2PluginI::makeNativeGui() Creating external GUI\n");
+		//printf("LV2PluginI::makeNativeGui() Creating external GUI\n");
 		QMessageBox::critical(0, QString("Unsupported UI"), QString("We're sorry but we do not currently support the external extension"));
 		/*struct lv2_external_ui_host external_ui_host;
 		external_ui_host.plugin_human_id = title.toUtf8().constData();
@@ -1482,7 +1539,6 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 		SLV2Value clabel = slv2_plugin_class_get_label(pclass);
 		_label = QString(slv2_value_as_string(clabel));
 
-		double init_val = 1.0;
 		int i = 0;
 		int ii = 0;
 		for(unsigned long k = 0; k < ports; ++k)
@@ -1516,7 +1572,6 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						controls[i].samplerate = slv2_port_has_property(p, port, lv2world->samplerate_prop);
 						controls[i].min = min;
 						controls[i].max = max;
-						init_val = (double)def;
 						SLV2Value pname = slv2_port_get_name(p, port);
 						if(pname)
 						{
@@ -1526,7 +1581,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 							slv2_value_free(pname);
 						}
 						//controls[i].name = m_plugin->portName(i);
-						printf("Portname: %s, index:%ld\n",controls[i].name.c_str(), k);
+						//printf("Portname: %s, index:%ld\n",controls[i].name.c_str(), k);
 						++i;
 					}
 					else if(slv2_port_is_a(p, port, lv2world->output_class))
