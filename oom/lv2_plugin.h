@@ -7,10 +7,11 @@
 //  	(info@openoctave.org)
 //=========================================================
 
+#include "plugin.h"
+#ifdef LV2_SUPPORT
 #ifndef _OOM_LV2_PLUGIN_H_
 #define _OOM_LV2_PLUGIN_H_
 #define OOM_LV2_MIDI_EVENT_ID 1
-#include "plugin.h"
 #ifdef LILV_SUPPORT
 #include <lilv/lilv.h>
 #endif
@@ -248,4 +249,5 @@ public:
 	}
 	void heartBeat();
 };
+#endif
 #endif

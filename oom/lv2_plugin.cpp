@@ -7,6 +7,8 @@
 //  	(info@openoctave.org)
 //=========================================================
 
+#include "lv2_plugin.h"
+#ifdef LV2_SUPPORT
 #include <QDialog>
 #include <QMessageBox>
 #include <QEvent>
@@ -14,7 +16,6 @@
 #include <string.h>
 
 #include "track.h"
-#include "lv2_plugin.h"
 #include "plugingui.h"
 #include "song.h"
 #include "audio.h"
@@ -1724,4 +1725,4 @@ void LV2ControlFifo::remove()/*{{{*/
 	rIndex = (rIndex + 1) % LV2_FIFO_SIZE;
 	--size;
 }/*}}}*/
-
+#endif

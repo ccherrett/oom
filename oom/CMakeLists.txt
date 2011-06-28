@@ -264,7 +264,7 @@ if(OSC_SUPPORT)
 endif(OSC_SUPPORT)
 
 if(LILV_SUPPORT)
-      target_link_libraries(core ${LILV_LIBRARIES})
+      target_link_libraries(core ${LIBLILV_LIBRARIES})
 endif(LILV_SUPPORT)
 
 if(SUIL_SUPPORT)
