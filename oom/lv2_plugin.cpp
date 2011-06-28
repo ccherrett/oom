@@ -1057,13 +1057,19 @@ void LV2PluginI::closeNativeGui()/*{{{*/
 		m_nativeui = 0;
 	}
 #ifdef SLV2_SUPPORT
-		const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+		//FIXME:Both of these causes crash of oom we need to find a proper way to free
+		//the ui_handle for now we'll just null the internal copy of the instance
+		//and clear the internal list for lilv mode.
+		if(m_slv2_ui_instance)
+			m_slv2_ui_instance = NULL;
+		//	slv2_ui_instance_free(m_slv2_ui_instance);
+		/*const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
 		if (ui_descriptor && ui_descriptor->cleanup) 
 		{
 			LV2UI_Handle ui_handle = lv2_ui_handle();
 			if (ui_handle)
 				(*ui_descriptor->cleanup)(ui_handle);
-		}
+		}*/
 #else
 	/*if(!m_uinstance.isEmpty())
 	{
