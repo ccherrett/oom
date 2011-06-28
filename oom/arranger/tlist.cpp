@@ -1140,7 +1140,8 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						//printf("id = %d", cl->id());
 						if (cl->dontShow())
 							continue;
-						act = p->addAction(cl->name());
+						QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
+						act = p->addAction(name);
 						act->setCheckable(true);
 						act->setChecked(cl->isVisible());
 						act->setData(cl->id());

@@ -226,6 +226,7 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)
 			CtrlList* cl = new CtrlList(id);
 			cl->setRange(min, max);
 			cl->setName(QString(name));
+			cl->setPluginName(plugin->name());
 			cl->setValueType(t);
 			Port* cport = plugin->getControlPort(i);
 			if (cport->toggle)

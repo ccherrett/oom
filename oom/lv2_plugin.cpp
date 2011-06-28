@@ -738,11 +738,8 @@ bool LV2PluginI::initPluginInstance(Plugin* plug, int c)/*{{{*/
 	_label = m_plugin->label() + inst;
 
 	setChannels(c);
-	//TODO: virtualize this method in Plugin
 	
 	int ref = m_plugin->updateReferences(1);
-	printf("Reference count:%d\n", ref);
-	//activate();
 	return true;
 }/*}}}*/
 
@@ -788,7 +785,6 @@ LilvInstance* LV2PluginI::instantiatelv2()
 void LV2PluginI::heartBeat()/*{{{*/
 {
 #ifdef SLV2_SUPPORT
-//TODO: Write the slv2 native ui update
 	const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
 	if (ui_descriptor == NULL)
 		return;
@@ -1043,33 +1039,12 @@ void LV2PluginI::closeNativeGui()/*{{{*/
 {
 	printf("LV2PluginI::closeNativeGui()\n");
 	showNativeGui(false);
-#ifdef SLV2_SUPPORT
 	#ifdef GTK2UI_SUPPORT
-		if(m_gtkWindow)
-		{
-			m_gtkWindow = NULL;
-		}
-	#endif
-		const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
-		if (ui_descriptor && ui_descriptor->cleanup) 
-		{
-			LV2UI_Handle ui_handle = lv2_ui_handle();
-			if (ui_handle)
-				(*ui_descriptor->cleanup)(ui_handle);
-		}
-#else
-	if(!m_uinstance.isEmpty())
+	if(m_gtkWindow)
 	{
-		SuilInstance* inst = m_uinstance.takeAt(0);
-		if(inst)
-		{
-			suil_instance_free(inst);
-		}
-		if(m_uihost)
-		{
-			suil_host_free(m_uihost);
-		}
+		m_gtkWindow = NULL;
 	}
+	#endif
 	if(m_eventFilter)
 	{
 		delete m_eventFilter;
@@ -1080,6 +1055,28 @@ void LV2PluginI::closeNativeGui()/*{{{*/
 		delete m_nativeui;
 		m_nativeui = 0;
 	}
+#ifdef SLV2_SUPPORT
+		const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+		if (ui_descriptor && ui_descriptor->cleanup) 
+		{
+			LV2UI_Handle ui_handle = lv2_ui_handle();
+			if (ui_handle)
+				(*ui_descriptor->cleanup)(ui_handle);
+		}
+#else
+	/*if(!m_uinstance.isEmpty())
+	{
+		SuilInstance* inst = m_uinstance.takeAt(0);
+		if(inst)
+		{
+			suil_instance_free(inst);
+		}
+		if(m_uihost)
+		{
+			suil_host_free(m_uihost);
+		}
+	}*/
+	m_uinstance.clear();
 #endif
 	m_lv2_ui_widget = NULL;
 }/*}}}*/
@@ -1217,40 +1214,37 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 /*}}}*/
 #else
 	printf("LV2PluginI::makeNativeGui()\n");
-	LilvNode* qtui = lilv_new_uri(lv2world->world, LV2_QT4_UI_URI);
+	LilvNode* qtui = lilv_new_uri(lv2world->world, LV2_QT4_UI_URI);/*{{{*/
 	LilvNode* gtkui = lilv_new_uri(lv2world->world, LV2_GTK_UI_URI);
 	LilvNode* extui = lilv_new_uri(lv2world->world, LV2_EXTERNAL_UI_URI);
 	
 	const LilvUI* ui = NULL;
 	const LilvNode* ui_type = NULL;
-	if (qtui && gtkui) {
-		printf("LV2PluginI::makeNativeGui() Found qt4ui uri\n");
-		LilvUIs* uis = lilv_plugin_get_uis(m_plugin->getPlugin());
-		LILV_FOREACH(uis, u, uis) {
-			const LilvUI* this_ui = lilv_uis_get(uis, u);
-			if(lilv_ui_is_a(this_ui, extui))
-			{
-				printf("LV2PluginI::makeNativeGui() GUI type is extui\n");
-				ui = this_ui;
-				m_ui_type = UITYPE_EXT;
-				ui_type = extui;
-				break;
-			}
-			if(lilv_ui_is_a(this_ui, gtkui))
-			{
-				printf("LV2PluginI::makeNativeGui() GUI type is gtk\n");
-				ui = this_ui;
-				m_ui_type = UITYPE_GTK2;
-				ui_type = gtkui;
-				break;
-			}
-			if (lilv_ui_is_a(this_ui, qtui)) {
-				printf("LV2PluginI::makeNativeGui() GUI type is qtui\n");
-				ui = this_ui;
-				m_ui_type = UITYPE_QT4;
-				ui_type = qtui;
-				break;
-			}
+	LilvUIs* uis = lilv_plugin_get_uis(m_plugin->getPlugin());
+	LILV_FOREACH(uis, u, uis) {
+		const LilvUI* this_ui = lilv_uis_get(uis, u);
+		if(lilv_ui_is_a(this_ui, extui))
+		{
+			printf("LV2PluginI::makeNativeGui() GUI type is extui\n");
+			ui = this_ui;
+			m_ui_type = UITYPE_EXT;
+			ui_type = extui;
+			break;
+		}
+		if(lilv_ui_is_a(this_ui, gtkui))
+		{
+			printf("LV2PluginI::makeNativeGui() GUI type is gtk\n");
+			ui = this_ui;
+			m_ui_type = UITYPE_GTK2;
+			ui_type = gtkui;
+			break;
+		}
+		if (lilv_ui_is_a(this_ui, qtui)) {
+			printf("LV2PluginI::makeNativeGui() GUI type is qtui\n");
+			ui = this_ui;
+			m_ui_type = UITYPE_QT4;
+			ui_type = qtui;
+			break;
 		}
 	}
 
@@ -1309,7 +1303,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 										lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_binary_uri(ui))),
 										m_ui_features
 										);
-			if(ui_instance)/*{{{*/
+			if(ui_instance)
 			{	
 				m_lv2_ui_widget = suil_instance_get_widget(ui_instance);
 				m_uinstance.append(ui_instance);
@@ -1338,17 +1332,14 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 					if(m_nativeui)
 					{
 						m_eventFilter = new LV2EventFilter(this, (QX11EmbedContainer*)m_nativeui);
-						printf("LV2PluginI::makeNativeGui() Suil successfully wraped gui\n");
 						m_nativeui->setWindowRole(QString(title.c_str()));
 						m_nativeui->setAttribute(Qt::WA_DeleteOnClose);
 						m_nativeui->setWindowTitle(QString(title.c_str()));
-						//m_nativeui->show();
-						//m_guiVisible = true;
 					}
 				}
-			}/*}}}*/
+			}
 		}
-	}
+	}/*}}}*/
 #endif
 }/*}}}*/
 
@@ -1721,14 +1712,12 @@ LV2Data LV2ControlFifo::get()/*{{{*/
 	return event;
 }/*}}}*/
 
-
 const LV2Data& LV2ControlFifo::peek(int n)/*{{{*/
 {
 	int idx = (rIndex + n) % LV2_FIFO_SIZE;
 	return fifo[idx];
 
 }/*}}}*/
-
 
 void LV2ControlFifo::remove()/*{{{*/
 {
