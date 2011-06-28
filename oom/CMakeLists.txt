@@ -272,7 +272,7 @@ if(SUIL_SUPPORT)
 endif(SUIL_SUPPORT)
 
 if(SLV2_SUPPORT)
-	target_link_libraries(core ${SLV2_LIBRARIES})
+	target_link_libraries(core ${LIBSLV2_LIBRARIES})
 endif(SLV2_SUPPORT)
 
 if(GTK2UI_SUPPORT)
