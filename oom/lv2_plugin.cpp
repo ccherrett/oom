@@ -706,7 +706,8 @@ LV2PluginI::~LV2PluginI()
 	{
 		closeNativeGui();
 		deactivate();
-		m_plugin->updateReferences(-1);
+		int ref = m_plugin->updateReferences(-1);
+		printf("Reference count:%d\n", ref);
 		if(m_nativeui)
 			delete m_nativeui;
 	}
@@ -739,7 +740,8 @@ bool LV2PluginI::initPluginInstance(Plugin* plug, int c)/*{{{*/
 	setChannels(c);
 	//TODO: virtualize this method in Plugin
 	
-	m_plugin->updateReferences(1);
+	int ref = m_plugin->updateReferences(1);
+	printf("Reference count:%d\n", ref);
 	//activate();
 	return true;
 }/*}}}*/

@@ -18,6 +18,9 @@ class QRadioButton;
 class QScrollArea;
 class QToolButton;
 class QTreeWidget;
+class QShowEvent;
+class QHideEvent;
+class QCloseEvent;
 
 class AudioTrack;
 class PluginGui;
@@ -65,6 +68,11 @@ private:
     QComboBox *sortBox;
     static int selectedPlugType;
     static QStringList sortItems;
+
+protected:
+	virtual void showEvent(QShowEvent*);
+	virtual void closeEvent(QCloseEvent*);
+	virtual void hideEvent(QHideEvent*);
 };
 
 #endif
