@@ -2005,7 +2005,7 @@ bool PluginI::setControl(const QString& s, double val)
 //   saveConfiguration
 //---------------------------------------------------------
 
-void PluginI::writeConfiguration(int level, Xml& xml)
+void PluginI::writeConfiguration(int level, Xml& xml)/*{{{*/
 {
 	xml.tag(level++, "plugin file=\"%s\" label=\"%s\" channel=\"%d\"",
 			Xml::xmlString(_plugin->lib()).toLatin1().constData(), Xml::xmlString(_plugin->label()).toLatin1().constData(), channel);
@@ -2028,13 +2028,13 @@ void PluginI::writeConfiguration(int level, Xml& xml)
 		xml.intTag(level, "nativegui", 1);
 	}
 	xml.tag(level--, "/plugin");
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   loadControl
 //---------------------------------------------------------
 
-bool PluginI::loadControl(Xml& xml)
+bool PluginI::loadControl(Xml& xml)/*{{{*/
 {
 	QString file;
 	QString label;
@@ -2075,14 +2075,14 @@ bool PluginI::loadControl(Xml& xml)
 		}
 	}
 	return true;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   readConfiguration
 //    return true on error
 //---------------------------------------------------------
 
-bool PluginI::readConfiguration(Xml& xml, bool readPreset)
+bool PluginI::readConfiguration(Xml& xml, bool readPreset)/*{{{*/
 {
 	QString file;
 	QString label;
@@ -2194,7 +2194,7 @@ bool PluginI::readConfiguration(Xml& xml, bool readPreset)
 		}
 	}
 	return true;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   showGui

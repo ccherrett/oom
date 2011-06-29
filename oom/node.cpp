@@ -316,8 +316,6 @@ void Track::setOff(bool val)
 //   copyData
 //---------------------------------------------------------
 
-//void AudioTrack::copyData(unsigned pos, int dstChannels, unsigned nframes, float** dstBuffer)
-
 void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int srcChannels, unsigned nframes, float** dstBuffer)
 {
 	//Changed by T356. 12/12/09.
@@ -1293,13 +1291,7 @@ bool AudioTrack::getData(unsigned pos, int channels, unsigned nframes, float** b
 	printf("    calling copyData on %s...\n", ir->track->name().toLatin1().constData());
 #endif
 
-	// p3.3.38
-	//((AudioTrack*)ir->track)->copyData(pos, channels, nframes, buffer);
-	((AudioTrack*) ir->track)->copyData(pos, channels,
-			//(ir->track->type() == Track::AUDIO_SOFTSYNTH && ir->channel != -1) ? ir->channel : 0,
-			ir->channel,
-			ir->channels,
-			nframes, buffer);
+	((AudioTrack*) ir->track)->copyData(pos, channels, ir->channel, ir->channels, nframes, buffer);
 
 	// p3.3.41
 	//fprintf(stderr, "AudioTrack::getData %s data: nframes:%ld %e %e %e %e\n", name().toLatin1().constData(), nframes, buffer[0][0], buffer[0][1], buffer[0][2], buffer[0][3]);
@@ -1314,13 +1306,7 @@ bool AudioTrack::getData(unsigned pos, int channels, unsigned nframes, float** b
 		if (ir->track->isMidiTrack())
 			continue;
 
-		// p3.3.38
-		//((AudioTrack*)ir->track)->addData(pos, channels, nframes, buffer);
-		((AudioTrack*) ir->track)->addData(pos, channels,
-				//(ir->track->type() == Track::AUDIO_SOFTSYNTH && ir->channel != -1) ? ir->channel : 0,
-				ir->channel,
-				ir->channels,
-				nframes, buffer);
+		((AudioTrack*) ir->track)->addData(pos, channels, ir->channel, ir->channels, nframes, buffer);
 	}
 	return true;
 }
@@ -1336,9 +1322,7 @@ bool AudioInput::getData(unsigned, int channels, unsigned nframes, float** buffe
 	for (int ch = 0; ch < channels; ++ch)
 	{
 		void* jackPort = jackPorts[ch];
-		//float* jackbuf = 0;
 
-		//if (jackPort) {
 		// p3.3.41 Do not get buffers of unconnected client ports. Causes repeating leftover data, can be loud, or DC !
 		if (jackPort && audioDevice->connections(jackPort))
 		{

@@ -785,7 +785,10 @@ LilvInstance* LV2PluginI::instantiatelv2()
 
 void LV2PluginI::heartBeat()/*{{{*/
 {
+	if(m_lv2_ui_widget == NULL)
+		return;
 #ifdef SLV2_SUPPORT
+		//printf("LV2PluginI::heartBeat() SLV2\n");
 	const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
 	if (ui_descriptor == NULL)
 		return;
@@ -798,22 +801,30 @@ void LV2PluginI::heartBeat()/*{{{*/
 
 	for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
 	{
-		//printf("LV2PluginI::heartBeat()\n");
-		if(nativeGuiVisible())
+		if(controlsOut[j].tmpVal != controlsOut[j].val)
+		{
+	//		printf("LV2PluginI::heartBeat() updating value\n");
 			(*ui_descriptor->port_event)(ui_handle,	controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+			controlsOut[j].tmpVal = controlsOut[j].val;
+		}
+	}
+	if (m_ui_type == UITYPE_EXT)
+		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
+#else
+	if(m_uinstance.isEmpty())
+		return;
+	//printf("LV2PluginI::heartBeat() LILV %d\n", controlOutPorts);
+	for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
+	{
+		if(controlsOut[j].tmpVal != controlsOut[j].val)
+		{
+			//printf("LV2PluginI::heartBeat() updating value\n");
+			suil_instance_port_event(m_uinstance[0], controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+			controlsOut[j].tmpVal = controlsOut[j].val;
+		}
 	}
 	if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
 		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
-#else
-	if(nativeGuiVisible() && !m_uinstance.isEmpty())
-	{
-		for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
-		{
-			suil_instance_port_event(m_uinstance[0], controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
-		}
-		if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
-			LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
-	}
 #endif
 }/*}}}*/
 
@@ -827,6 +838,23 @@ void LV2PluginI::activate()/*{{{*/
 #else
 		lilv_instance_activate(m_instance[j]);
 #endif
+		if (initControlValues)/*{{{*/
+		{
+			for (int i = 0; i < controlPorts; ++i)
+			{
+				controls[i].val = controls[i].tmpVal;
+			}
+		}
+		else
+		{
+			//
+			// get initial control values from plugin
+			//
+			for (int i = 0; i < controlPorts; ++i)
+			{
+				controls[i].tmpVal = controls[i].val;
+			}
+		}/*}}}*/
 	}
 }/*}}}*/
 
@@ -855,11 +883,12 @@ void LV2PluginI::apply(int frames)/*{{{*/
 		LV2ControlFifo* cfifo = getControlFifo(k);
 		if(cfifo && !cfifo->isEmpty())
 		{
-			//printf("Applying values from fifo\n");
 			LV2Data v = cfifo->get();
 			controls[k].tmpVal = v.value;
 			if (_track && _id != -1)
 			{
+				if(debugMsg)
+					printf("Applying values from fifo %f\n", v.value);
 				_track->setPluginCtrlVal(genACnum(_id, k), v.value);
 			}
 		}
@@ -871,13 +900,16 @@ void LV2PluginI::apply(int frames)/*{{{*/
 					controls[k].tmpVal = _track->pluginCtrlVal(genACnum(_id, k));
 			}
 			if(controls[k].val != controls[k].tmpVal)
+			{
+				if(debugMsg)
+					printf("Applying values from automation %f\n", controls[k].tmpVal);
 				controls[k].val = controls[k].tmpVal;
+			}
 		}
 	}
 	for (int i = 0; i < instances; ++i)
 	{
 #ifdef SLV2_SUPPORT
-
 		slv2_instance_run(m_instance[i], (long)frames);
 #else
 		lilv_instance_run(m_instance[i], (long)frames);
@@ -941,7 +973,7 @@ static void lv2_ui_write(/*{{{*/
 		LV2Plugin* lp = (LV2Plugin*)p->plugin();
 
 		unsigned long index = lp->port2InCtrl(port_index);
-		//Port* cport = plugin->getControlPort(index);
+		Port* cport = p->getControlPort(index);
 
 		if ((int) index == -1)
 		{
@@ -949,15 +981,19 @@ static void lv2_ui_write(/*{{{*/
 			return;
 		}
 
-		LV2ControlFifo* cfifo = p->getControlFifo(index);
-		if (cfifo)
+		if(cport && cport->tmpVal != value)
 		{
-			LV2Data cv;
-			cv.value = value;
-			cv.frame = audio->timestamp();
-			if (!cfifo->put(cv) && debugMsg)
+			printf("lv2_ui_write: gui changed param %d\n", port_index);
+			LV2ControlFifo* cfifo = p->getControlFifo(index);
+			if (cfifo)
 			{
-				fprintf(stderr, "lv2_ui_write: fifo overflow: in control number:%ld\n", index);
+				LV2Data cv;
+				cv.value = value;
+				cv.frame = audio->timestamp();
+				if (!cfifo->put(cv) && debugMsg)
+				{
+					fprintf(stderr, "lv2_ui_write: fifo overflow: in control number:%ld\n", index);
+				}
 			}
 		}
 
@@ -1060,29 +1096,35 @@ void LV2PluginI::closeNativeGui()/*{{{*/
 		//FIXME:Both of these causes crash of oom we need to find a proper way to free
 		//the ui_handle for now we'll just null the internal copy of the instance
 		//and clear the internal list for lilv mode.
-		if(m_slv2_ui_instance)
-			m_slv2_ui_instance = NULL;
+	if(m_ui_type == UITYPE_EXT)
+	{
 		//	slv2_ui_instance_free(m_slv2_ui_instance);
-		/*const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+		const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
 		if (ui_descriptor && ui_descriptor->cleanup) 
 		{
 			LV2UI_Handle ui_handle = lv2_ui_handle();
 			if (ui_handle)
 				(*ui_descriptor->cleanup)(ui_handle);
-		}*/
+		}
+	}
+	if(m_slv2_ui_instance)
+		m_slv2_ui_instance = NULL;
 #else
-	/*if(!m_uinstance.isEmpty())
+	if(m_ui_type == UITYPE_EXT)
 	{
-		SuilInstance* inst = m_uinstance.takeAt(0);
-		if(inst)
+		if(!m_uinstance.isEmpty())
 		{
-			suil_instance_free(inst);
+			SuilInstance* inst = m_uinstance.takeAt(0);
+			if(inst)
+			{
+				suil_instance_free(inst);
+			}
+			if(m_uihost)
+			{
+				suil_host_free(m_uihost);
+			}
 		}
-		if(m_uihost)
-		{
-			suil_host_free(m_uihost);
-		}
-	}*/
+	}
 	m_uinstance.clear();
 #endif
 	m_lv2_ui_widget = NULL;
@@ -1314,7 +1356,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 			{	
 				m_lv2_ui_widget = suil_instance_get_widget(ui_instance);
 				m_uinstance.append(ui_instance);
-				printf("LV2PluginI::makeNativeGui() Suil gui instance created\n");
+				printf("LV2PluginI::makeNativeGui() Suil gui instance created controlOutPorts:%d\n", controlOutPorts);
 				for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
 				{
 					//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
@@ -1350,12 +1392,12 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 #endif
 }/*}}}*/
 
-void LV2PluginI::makeGui()
+void LV2PluginI::makeGui()/*{{{*/
 {
 	_gui = new PluginGui(this);
-}
+}/*}}}*/
 
-const LV2UI_Descriptor *LV2PluginI::lv2_ui_descriptor(void) const
+const LV2UI_Descriptor *LV2PluginI::lv2_ui_descriptor(void) const/*{{{*/
 {
 #ifdef SLV2_SUPPORT
 	if (m_slv2_ui_instance)
@@ -1363,10 +1405,9 @@ const LV2UI_Descriptor *LV2PluginI::lv2_ui_descriptor(void) const
 	else
 #endif
 	return NULL;
-}
+}/*}}}*/
 
-
-LV2UI_Handle LV2PluginI::lv2_ui_handle(void) const
+LV2UI_Handle LV2PluginI::lv2_ui_handle(void) const/*{{{*/
 {
 #ifdef SLV2_SUPPORT
 	if (m_slv2_ui_instance)
@@ -1374,7 +1415,7 @@ LV2UI_Handle LV2PluginI::lv2_ui_handle(void) const
 	else
 #endif
 	return NULL;
-}
+}/*}}}*/
 
 bool LV2PluginI::isAudioIn(int p)/*{{{*/
 {
@@ -1497,6 +1538,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 	controlPorts = m_plugin->controlInPorts();
 	controlOutPorts = m_plugin->controlOutPorts();
 
+	printf("LV2PluginI::setChannels(%d): controls:%d, controlsOut:%d\n", c, controlPorts, controlOutPorts);
 	controls = new Port[controlPorts];
 	controlsOut = new Port[controlOutPorts];
 	m_controlFifo = new LV2ControlFifo[controlPorts];

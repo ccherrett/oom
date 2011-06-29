@@ -1168,7 +1168,18 @@ void AudioTrack::mapRackPluginsToControllers()
 			else
 				l->setMode(CtrlList::INTERPOLATE);
 			l->setCurVal(p->param(i));
-			//l->setDefault(p->defaultValue(i));
+		#ifdef LV2_SUPPORT
+			if(p->type() == 2)
+			{
+				LV2PluginI* lp = (LV2PluginI*)p;
+				if(lp)
+				{
+					l->setDefault(lp->defaultValue(i));
+				}
+			}
+			else
+		#endif
+				l->setDefault(p->defaultValue(i));
 		}
 	}
 
