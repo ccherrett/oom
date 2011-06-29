@@ -1011,7 +1011,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 	}
 	else if(tag == "lv2plugin")
 	{
-		printf("AudioTrack::readProperties found lv2plugin tag\n");
+		//printf("AudioTrack::readProperties found lv2plugin tag\n");
 		int rackpos;
 		for (rackpos = 0; rackpos < PipelineDepth; ++rackpos)
 		{
@@ -1020,8 +1020,6 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		}
 		if (rackpos < PipelineDepth)
 		{
-			//TODO: This must take into account and create as LV2PluginI 
-			//when reading here and writing
 			LV2PluginI* pi = new LV2PluginI();
 			pi->setTrack(this);
 			pi->setID(rackpos);

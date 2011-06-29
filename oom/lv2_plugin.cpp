@@ -708,7 +708,8 @@ LV2PluginI::~LV2PluginI()
 		closeNativeGui();
 		deactivate();
 		int ref = m_plugin->updateReferences(-1);
-		printf("Reference count:%d\n", ref);
+		if(debugMsg)
+			printf("Reference count:%d\n", ref);
 		if(m_nativeui)
 			delete m_nativeui;
 	}
@@ -741,6 +742,8 @@ bool LV2PluginI::initPluginInstance(Plugin* plug, int c)/*{{{*/
 	setChannels(c);
 	
 	int ref = m_plugin->updateReferences(1);
+	if(debugMsg)
+		printf("LV2PluginI: Reference count: %d\n", ref);
 	return true;
 }/*}}}*/
 
@@ -1751,7 +1754,7 @@ bool LV2PluginI::setControl(const QString& s, double val)/*{{{*/
 			return false;
 		}
 	}
-	printf("PluginI:setControl(%s, %f) controller not found\n",
+	printf("LV2PluginI:setControl(%s, %f) controller not found\n",
 			s.toLatin1().constData(), val);
 	return true;
 }/*}}}*/
@@ -1841,7 +1844,7 @@ bool LV2PluginI::readConfiguration(Xml& xml, bool readPreset)/*{{{*/
 			case Xml::TagStart:
 				if (!readPreset && _plugin == 0)
 				{
-					printf("LV2PluginI::readConfiguration 1111111111111\n");
+					//printf("LV2PluginI::readConfiguration 1111111111111\n");
 					_plugin = plugins.find(uri, label);
 
 					if (_plugin && !initPluginInstance(_plugin, channel))

@@ -452,6 +452,7 @@ void Song::deselectAllParts()
 
 void Song::disarmAllTracks()
 {
+	//printf("Song::disarmAllTracks()\n");
 	if(viewselected)
 	{
 		unsigned int noop = -1;
@@ -1112,6 +1113,7 @@ void Song::setLoop(bool f)
 
 void Song::clearTrackRec()
 {
+	//printf("Song::clearTrackRec()\n");
 	for (iTrack it = tracks()->begin(); it != tracks()->end(); ++it)
 		setRecordFlag(*it, false);
 }
@@ -1123,7 +1125,7 @@ void Song::clearTrackRec()
 void Song::setRecord(bool f, bool autoRecEnable)
 {
 	if(debugMsg)
-		printf("setRecord recordflag =%d f(record state)=%d autoRecEnable=%d\n", recordFlag, f, autoRecEnable);
+		printf("Song::setRecord recordflag =%d f(record state)=%d autoRecEnable=%d\n", recordFlag, f, autoRecEnable);
 	if (f && oomProject == oomProjectInitPath)
 	{ // check that there is a project stored before commencing
 		// no project, we need to create one.
