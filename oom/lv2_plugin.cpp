@@ -792,7 +792,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 		return;
 #ifdef SLV2_SUPPORT
 		//printf("LV2PluginI::heartBeat() SLV2\n");
-	const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+	const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();/*{{{*/
 	if (ui_descriptor == NULL)
 		return;
 	if (ui_descriptor->port_event == NULL)
@@ -800,7 +800,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 
 	LV2UI_Handle ui_handle = lv2_ui_handle();
 	if (ui_handle == NULL)
-		return;
+		return;/*}}}*/
 
 	if (m_ui_type == UITYPE_EXT)
 		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
@@ -905,9 +905,29 @@ void LV2PluginI::apply(int frames)/*{{{*/
 			}
 			if(controls[k].val != controls[k].tmpVal)
 			{
-				if(debugMsg)
-					printf("Applying values from automation %f\n", controls[k].tmpVal);
+				//if(debugMsg)
+					printf("Applying values from automation tmpVal: %f val:%f\n", controls[k].tmpVal, controls[k].val);
 				controls[k].val = controls[k].tmpVal;
+				if(m_lv2_ui_widget != NULL)
+				{
+			#ifdef SLV2_SUPPORT
+					const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+					if (ui_descriptor != NULL)
+					{
+						if(ui_descriptor->port_event != NULL)
+						{
+							LV2UI_Handle ui_handle = lv2_ui_handle();
+							if(ui_handle != NULL)
+							{
+								(*ui_descriptor->port_event)(ui_handle,	controls[k].idx, sizeof(float), 0, &controls[k].val);
+							}
+						}
+					}
+			#else
+					if(!m_uinstance.isEmpty())
+						suil_instance_port_event(m_uinstance[0], controls[k].idx, sizeof(float), 0, &controls[k].val);
+			#endif
+				}
 			}
 		}
 	}
