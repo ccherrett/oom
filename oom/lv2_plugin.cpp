@@ -1741,6 +1741,202 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 	//apply(1);
 }/*}}}*/
 
+bool LV2PluginI::setControl(const QString& s, double val)/*{{{*/
+{
+	for (int i = 0; i < controlPorts; ++i)
+	{
+		if (m_plugin->portName(controls[i].idx) == s)
+		{
+			controls[i].val = controls[i].tmpVal = val;
+			return false;
+		}
+	}
+	printf("PluginI:setControl(%s, %f) controller not found\n",
+			s.toLatin1().constData(), val);
+	return true;
+}/*}}}*/
+
+void LV2PluginI::writeConfiguration(int level, Xml& xml)/*{{{*/
+{
+	xml.tag(level++, "lv2plugin uri=\"%s\" label=\"%s\" channel=\"%d\"",
+			Xml::xmlString(m_plugin->uri()).toLatin1().constData(), Xml::xmlString(_plugin->label()).toLatin1().constData(), channel);
+
+	for (int i = 0; i < controlPorts; ++i)
+	{
+		int idx = controls[i].idx;
+		QString s("control name=\"%1\" val=\"%2\" /");
+		xml.tag(level, s.arg(Xml::xmlString(m_plugin->portName(idx)).toLatin1().constData()).arg(controls[i].tmpVal).toLatin1().constData());
+	}
+	if (_on == false)
+		xml.intTag(level, "on", _on);
+	if (guiVisible())
+	{
+		xml.intTag(level, "gui", 1);
+		xml.geometryTag(level, "geometry", _gui);
+	}
+	if (nativeGuiVisible())
+	{
+		xml.intTag(level, "nativegui", 1);
+	}
+	xml.tag(level--, "/lv2plugin");
+}/*}}}*/
+
+bool LV2PluginI::loadControl(Xml& xml)/*{{{*/
+{
+	QString name("mops");
+	double val = 0.0;
+
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return true;
+			case Xml::TagStart:
+				xml.unknown("PluginI-Control");
+				break;
+			case Xml::Attribut:
+				if (tag == "name")
+					name = xml.s2();
+				else if (tag == "val")
+					val = xml.s2().toDouble();
+				break;
+			case Xml::TagEnd:
+				if (tag == "control")
+				{
+					if (setControl(name, val))
+					{
+						return false;
+					}
+					initControlValues = true;
+				}
+				return true;
+			default:
+				break;
+		}
+	}
+	return true;
+}/*}}}*/
+
+bool LV2PluginI::readConfiguration(Xml& xml, bool readPreset)/*{{{*/
+{
+	QString uri;
+	QString label;
+	if (!readPreset)
+		channel = 1;
+
+	for (;;)
+	{
+		Xml::Token token(xml.parse());
+		const QString & tag(xml.s1());
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return true;
+			case Xml::TagStart:
+				if (!readPreset && _plugin == 0)
+				{
+					printf("LV2PluginI::readConfiguration 1111111111111\n");
+					_plugin = plugins.find(uri, label);
+
+					if (_plugin && !initPluginInstance(_plugin, channel))
+					{
+						_plugin = 0;
+						xml.parse1();
+						break;
+					}
+				}
+				if (tag == "control")
+					loadControl(xml);
+				else if (tag == "on")
+				{
+					bool flag = xml.parseInt();
+					if (!readPreset)
+						_on = flag;
+				}
+				else if (tag == "gui")
+				{
+					bool flag = xml.parseInt();
+					showGui(flag);
+				}
+				else if (tag == "nativegui")
+				{
+					// We can't tell OSC to show the native plugin gui
+					//  until the parent track is added to the lists.
+					// OSC needs to find the plugin in the track lists.
+					// Use this 'pending' flag so it gets done later.
+					_showNativeGuiPending = xml.parseInt();
+				}
+				else if (tag == "geometry")
+				{
+					QRect r(readGeometry(xml, tag));
+					if (_gui)
+					{
+						_gui->resize(r.size());
+						_gui->move(r.topLeft());
+					}
+				}
+				else
+					xml.unknown("LV2PluginI");
+				break;
+			case Xml::Attribut:
+				if (tag == "uri")
+				{
+					QString s = xml.s2();
+					if (readPreset)
+					{
+						if (s != plugin()->lib())
+						{
+							printf("Error: Wrong preset type %s. Type must be a %s\n",
+									s.toLatin1().constData(), plugin()->lib().toLatin1().constData());
+							return true;
+						}
+					}
+					else
+					{
+						uri = s;
+					}
+				}
+				else if (tag == "label")
+				{
+					if (!readPreset)
+						label = xml.s2();
+				}
+				else if (tag == "channel")
+				{
+					if (!readPreset)
+						channel = xml.s2().toInt();
+				}
+				break;
+			case Xml::TagEnd:
+				if (tag == "lv2plugin")
+				{
+					if (!readPreset && _plugin == 0)
+					{
+						_plugin = plugins.find(uri, label);
+						if (_plugin == 0)
+							return true;
+
+						if (!initPluginInstance(_plugin, channel))
+							return true;
+					}
+					if (_gui)
+						_gui->updateValues();
+					return false;
+				}
+				return true;
+			default:
+				break;
+		}
+	}
+	return true;
+}/*}}}*/
+
 bool LV2ControlFifo::put(const LV2Data& event)/*{{{*/
 {
 	if (size < LV2_FIFO_SIZE)

@@ -233,6 +233,12 @@ public:
 	{
 		return m_guiVisible;
 	}
+    virtual double defaultValue(unsigned int port)
+	{
+		if(m_plugin)
+			return m_plugin->defaultValue(port);
+		return 0.0;
+	}
 	void makeGui();
 	void makeNativeGui();
 	void closeNativeGui();
@@ -248,6 +254,10 @@ public:
 		return controls[i].idx;
 	}
 	void heartBeat();
+    virtual void writeConfiguration(int level, Xml& xml);
+    virtual bool readConfiguration(Xml& xml, bool readPreset = false);
+    virtual bool loadControl(Xml& xml);
+    virtual bool setControl(const QString& s, double val);
 };
 #endif
 #endif

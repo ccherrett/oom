@@ -396,7 +396,16 @@ void EffectRack::savePreset(int idx)
 		{
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
-			(*pipe)[idx]->writeConfiguration(1, xml);
+		#ifdef LV2_SUPPORT
+			if((*pipe)[idx]->type() == 2)
+			{
+				LV2PluginI* lp = (LV2PluginI*)(*pipe)[idx];
+				if(lp)
+					lp->writeConfiguration(1, xml);
+			}
+			else
+		#endif
+				(*pipe)[idx]->writeConfiguration(1, xml);
 			xml.tag(0, "/oom");
 		}
 		else
@@ -444,7 +453,16 @@ void EffectRack::startDrag(int idx)
 		{
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
-			(*pipe)[idx]->writeConfiguration(1, xml);
+		#ifdef LV2_SUPPORT
+			if((*pipe)[idx]->type() == 2)
+			{
+				LV2PluginI* lp = (LV2PluginI*)(*pipe)[idx];
+				if(lp)
+					lp->writeConfiguration(1, xml);
+			}
+			else
+		#endif
+				(*pipe)[idx]->writeConfiguration(1, xml);
 			xml.tag(0, "/oom");
 		}
 		else
@@ -624,7 +642,7 @@ void EffectRack::initPlugin(Xml xml, int idx)
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if (tag == "plugin")
+				if (tag == "plugin")/*{{{*/
 				{
 					PluginI* plugi = new PluginI();
 					if (plugi->readConfiguration(xml, false))
@@ -639,7 +657,23 @@ void EffectRack::initPlugin(Xml xml, int idx)
 						song->update(SC_RACK);
 						return;
 					}
-				}
+				}/*}}}*/
+				else if (tag == "lv2plugin")/*{{{*/
+				{
+					LV2PluginI* plugi = new LV2PluginI();
+					if (plugi->readConfiguration(xml, false))
+					{
+						printf("cannot instantiate plugin\n");
+						delete plugi;
+					}
+					else
+					{
+						//printf("instantiated!\n");
+						audio->msgAddPlugin(track, idx, plugi);
+						song->update(SC_RACK);
+						return;
+					}
+				}/*}}}*/
 				else if (tag == "oom" || tag == "muse")
 					break;
 				else

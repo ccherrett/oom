@@ -523,10 +523,10 @@ public:
     //int oscExiting();
 #endif
 
-    void writeConfiguration(int level, Xml& xml);
-    bool readConfiguration(Xml& xml, bool readPreset = false);
-    bool loadControl(Xml& xml);
-    bool setControl(const QString& s, double val);
+    virtual void writeConfiguration(int level, Xml& xml);
+    virtual bool readConfiguration(Xml& xml, bool readPreset = false);
+    virtual bool loadControl(Xml& xml);
+    virtual bool setControl(const QString& s, double val);
     virtual void showGui();
     virtual void showGui(bool);
 

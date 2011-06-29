@@ -904,7 +904,17 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 	for (ciPluginI ip = _efxPipe->begin(); ip != _efxPipe->end(); ++ip)
 	{
 		if (*ip)
+		{
+	#ifdef LV2_SUPPORT
+			if((*ip)->type() == 2)
+			{
+				LV2PluginI* lp = (LV2PluginI*)*ip;
+					lp->writeConfiguration(level, xml);
+			}
+			else
+	#endif
 			(*ip)->writeConfiguration(level, xml);
+		}
 	}
 	for (ciCtrlList icl = _controller.begin(); icl != _controller.end(); ++icl)
 	{
@@ -999,6 +1009,33 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		else
 			printf("can't load plugin - plugin rack is already full\n");
 	}
+	else if(tag == "lv2plugin")
+	{
+		printf("AudioTrack::readProperties found lv2plugin tag\n");
+		int rackpos;
+		for (rackpos = 0; rackpos < PipelineDepth; ++rackpos)
+		{
+			if (!(*_efxPipe)[rackpos])
+				break;
+		}
+		if (rackpos < PipelineDepth)
+		{
+			//TODO: This must take into account and create as LV2PluginI 
+			//when reading here and writing
+			LV2PluginI* pi = new LV2PluginI();
+			pi->setTrack(this);
+			pi->setID(rackpos);
+			if (pi->readConfiguration(xml, false))
+			{
+				printf("LV2PluginI read config failed\n");
+				delete pi;
+			}
+			else
+				(*_efxPipe)[rackpos] = pi;
+		}
+		else
+			printf("can't load plugin - plugin rack is already full\n");
+	}
 	else if (tag == "auxSend")
 		readAuxSend(xml);
 	else if (tag == "prefader")
@@ -1084,7 +1121,18 @@ void AudioTrack::showPendingPluginNativeGuis()
 			continue;
 
 		if (p->isShowNativeGuiPending())
-			p->showNativeGui(true);
+		{
+	#ifdef LV2_SUPPORT
+			if(p->type() == 2)
+			{
+				LV2PluginI* lp = (LV2PluginI*)p;
+				if(lp)
+					lp->showNativeGui(true);
+			}
+			else
+	#endif
+				p->showNativeGui(true);
+		}
 	}
 }
 
@@ -1108,16 +1156,34 @@ void AudioTrack::mapRackPluginsToControllers()
 			if (!p)
 				continue;
 
-			// We found a plugin at a rack position. If the rack position is not the same as the controller index...
-			if (i != idx)
+		#ifdef LV2_SUPPORT
+			if(p->type() == 2)
 			{
-				(*_efxPipe)[i] = 0;
-				(*_efxPipe)[idx] = p;
-			}
-			p->setID(idx);
+				LV2PluginI* lp = (LV2PluginI*)p;
+				if (i != idx)
+				{
+					(*_efxPipe)[i] = 0;
+					(*_efxPipe)[idx] = lp;
+				}
+				lp->setID(idx);
 
-			// It is now safe to update the controllers.
-			p->updateControllers();
+				// It is now safe to update the controllers.
+				lp->updateControllers();
+			}
+			else
+		#endif
+			{
+				// We found a plugin at a rack position. If the rack position is not the same as the controller index...
+				if (i != idx)
+				{
+					(*_efxPipe)[i] = 0;
+					(*_efxPipe)[idx] = p;
+				}
+				p->setID(idx);
+
+				// It is now safe to update the controllers.
+				p->updateControllers();
+			}
 
 			break;
 		}

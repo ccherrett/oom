@@ -1986,7 +1986,7 @@ void PluginI::activate()
 //    set plugin instance controller value by name
 //---------------------------------------------------------
 
-bool PluginI::setControl(const QString& s, double val)
+bool PluginI::setControl(const QString& s, double val)/*{{{*/
 {
 	for (int i = 0; i < controlPorts; ++i)
 	{
@@ -1999,7 +1999,7 @@ bool PluginI::setControl(const QString& s, double val)
 	printf("PluginI:setControl(%s, %f) controller not found\n",
 			s.toLatin1().constData(), val);
 	return true;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   saveConfiguration
