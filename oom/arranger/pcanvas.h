@@ -65,6 +65,7 @@ class MidiEditor;
 class QMenu;
 class Xml;
 class CtrlVal;
+class CtrlList;
 class CurveNodeSelection;
 
 //---------------------------------------------------------
@@ -135,7 +136,7 @@ class PartCanvas : public Canvas
     void drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* track);
     void drawAutomation(QPainter& p, const QRect& r, AudioTrack* track);
     void drawTopItem(QPainter& p, const QRect& rect);
-	void drawTooltipText(QPainter& p, const QRect& rr, int height, double lazySelNodeVal, double lazySelNodePrevVal, int lazySelNodeFrame, bool paintAsDb);
+	void drawTooltipText(QPainter& p, const QRect& rr, int height, double lazySelNodeVal, double lazySelNodePrevVal, int lazySelNodeFrame, bool paintAsDb, CtrlList*);
 
     void checkAutomation(Track * t, const QPoint& pointer, bool addNewCtrl);
     void selectAutomation(Track * t, const QPoint& pointer);

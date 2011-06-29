@@ -802,6 +802,9 @@ void LV2PluginI::heartBeat()/*{{{*/
 	if (ui_handle == NULL)
 		return;
 
+	if (m_ui_type == UITYPE_EXT)
+		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
+
 	for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
 	{
 		if(controlsOut[j].tmpVal != controlsOut[j].val)
@@ -811,12 +814,12 @@ void LV2PluginI::heartBeat()/*{{{*/
 			controlsOut[j].tmpVal = controlsOut[j].val;
 		}
 	}
-	if (m_ui_type == UITYPE_EXT)
-		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
 #else
 	if(m_uinstance.isEmpty())
 		return;
 	//printf("LV2PluginI::heartBeat() LILV %d\n", controlOutPorts);
+	if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
+		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
 	for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
 	{
 		if(controlsOut[j].tmpVal != controlsOut[j].val)
@@ -826,8 +829,6 @@ void LV2PluginI::heartBeat()/*{{{*/
 			controlsOut[j].tmpVal = controlsOut[j].val;
 		}
 	}
-	if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
-		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
 #endif
 }/*}}}*/
 
