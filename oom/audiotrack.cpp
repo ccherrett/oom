@@ -1226,6 +1226,7 @@ void AudioTrack::mapRackPluginsToControllers()
 			CtrlValueType t = p->valueType();
 			l->setRange(min, max);
 			l->setName(QString(p->paramName(i)));
+			l->setPluginName(p->name());
 			l->setValueType(t);
 			Port* cport = p->getControlPort(i);
 			//LADSPA_PortRangeHint rh = p->range(i);
