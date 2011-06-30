@@ -2484,21 +2484,27 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	//  bb.x(), bb.y(), bb.width(), bb.height(), _pr.x(), _pr.y(), _pr.width(), _pr.height());
 	//QColor green = QColor(143, 75, 236);
 	//QColor green = QColor(133, 182, 94);
-	int alphawave = 255;
-	if (_tool == AutomationTool)
-		alphawave = 70;
-	QColor green = QColor(49, 175, 197, alphawave);
+	QColor green = QColor(49, 175, 197);
 	QColor yellow = QColor(127,12,128);
 	QColor red = QColor(197, 49, 87);
-	QColor rms_color = QColor(0,19,23,alphawave);
-	
+	QColor rms_color = QColor(0,19,23);
 	if(wp->selected())
 	{
-		////////green = QColor(249, 197, 105);
-		green = QColor(219, 168, 79, alphawave);
-		yellow = QColor(127,12,128);
-		red = QColor(197, 49, 87);
-		rms_color = QColor(0,19,23,alphawave);
+		green = QColor(219, 168, 79);
+		rms_color = QColor(0,19,23);
+	}
+	
+	if (_tool == AutomationTool)
+	{
+		rms_color = QColor(42,75,81);
+		if(wp->selected())
+		{
+			green = QColor(87,73,49);
+		}
+		else
+		{
+			green = QColor(58,96,103);
+		}
 	}
 
 	QRect rr = p.worldMatrix().mapRect(bb);
