@@ -317,6 +317,7 @@ struct Port
     int idx;
     float val;
     float tmpVal;
+    float lastGuiVal;
 
     bool enCtrl; // Enable controller stream.
     bool en2Ctrl; // Second enable controller stream (and'ed with enCtrl).
@@ -324,6 +325,7 @@ struct Port
 	bool isInt;
 	bool toggle;
 	bool samplerate;
+	bool update;
 	float min;
 	float max;
 	std::string name;

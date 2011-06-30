@@ -682,6 +682,7 @@ LV2PluginI::LV2PluginI()
 	m_eventFilter = 0;
 	m_guiVisible = false;
 	m_ui_type = 0;
+	m_update_gui = false;
 	m_lv2_ui_widget = NULL;
 #ifdef SLV2_SUPPORT
 	m_slv2_ui_instance = NULL;
@@ -830,6 +831,31 @@ void LV2PluginI::heartBeat()/*{{{*/
 		}
 	}
 #endif
+	unsigned long ctls = controlPorts;
+	for (unsigned long k = 0; k < ctls; ++k)
+	{
+		if(controls[k].update || controls[k].lastGuiVal != controls[k].val)/*{{{*/
+		{
+	#ifdef SLV2_SUPPORT
+			const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
+			if (ui_descriptor != NULL)
+			{
+				if(ui_descriptor->port_event != NULL)
+				{
+					LV2UI_Handle ui_handle = lv2_ui_handle();
+					if(ui_handle != NULL)
+					{
+						(*ui_descriptor->port_event)(ui_handle,	controls[k].idx, sizeof(float), 0, &controls[k].val);
+					}
+				}
+			}
+	#else
+			if(!m_uinstance.isEmpty())
+				suil_instance_port_event(m_uinstance[0], controls[k].idx, sizeof(float), 0, &controls[k].val);
+	#endif
+			controls[k].lastGuiVal = controls[k].val;
+		}/*}}}*/
+	}
 }/*}}}*/
 
 void LV2PluginI::activate()/*{{{*/
@@ -895,6 +921,8 @@ void LV2PluginI::apply(int frames)/*{{{*/
 					printf("Applying values from fifo %f\n", v.value);
 				_track->setPluginCtrlVal(genACnum(_id, k), v.value);
 			}
+			controls[k].update = false;
+			controls[k].lastGuiVal = v.value;
 		}
 		else
 		{
@@ -905,30 +933,15 @@ void LV2PluginI::apply(int frames)/*{{{*/
 			}
 			if(controls[k].val != controls[k].tmpVal)
 			{
-				//if(debugMsg)
+				if(debugMsg)
 					printf("Applying values from automation tmpVal: %f val:%f\n", controls[k].tmpVal, controls[k].val);
 				controls[k].val = controls[k].tmpVal;
-				if(m_lv2_ui_widget != NULL)
-				{
-			#ifdef SLV2_SUPPORT
-					const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
-					if (ui_descriptor != NULL)
-					{
-						if(ui_descriptor->port_event != NULL)
-						{
-							LV2UI_Handle ui_handle = lv2_ui_handle();
-							if(ui_handle != NULL)
-							{
-								(*ui_descriptor->port_event)(ui_handle,	controls[k].idx, sizeof(float), 0, &controls[k].val);
-							}
-						}
-					}
-			#else
-					if(!m_uinstance.isEmpty())
-						suil_instance_port_event(m_uinstance[0], controls[k].idx, sizeof(float), 0, &controls[k].val);
-			#endif
-				}
+				controls[k].update = true;
+				//FIXME: Not sure if this is being called in the right thread
+				//I suspect this should happen in the gui thread
 			}
+			else
+				controls[k].update = false;
 		}
 	}
 	for (int i = 0; i < instances; ++i)
@@ -1007,7 +1020,7 @@ static void lv2_ui_write(/*{{{*/
 
 		if(cport && cport->tmpVal != value)
 		{
-			printf("lv2_ui_write: gui changed param %d\n", port_index);
+			//printf("lv2_ui_write: gui changed param %d\n", port_index);
 			LV2ControlFifo* cfifo = p->getControlFifo(index);
 			if (cfifo)
 			{
@@ -1614,6 +1627,8 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						controls[i].tmpVal = def;
 						controls[i].enCtrl = true;
 						controls[i].en2Ctrl = true;
+						controls[i].update = true;
+						controls[i].lastGuiVal = def;
 						controls[i].idx = k;
 						for(int j = 0; j < instances; ++j)
 							slv2_instance_connect_port(m_instance[j], k, &controls[i].val);
@@ -1704,6 +1719,8 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 						controls[i].tmpVal = def;
 						controls[i].enCtrl = true;
 						controls[i].en2Ctrl = true;
+						controls[i].update = true;
+						controls[i].lastGuiVal = def;
 						controls[i].idx = k;
 						for(int j = 0; j < instances; ++j)
 							lilv_instance_connect_port(m_instance[j], k, &controls[i].val);

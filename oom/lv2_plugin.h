@@ -189,6 +189,7 @@ private:
 #endif
 	LV2Plugin* m_plugin;
 	bool m_guiVisible;
+	bool m_update_gui;
 	int m_ui_type;
 	LV2ControlFifo* m_controlFifo;
 	LV2EventFilter* m_eventFilter;
@@ -238,6 +239,10 @@ public:
 		if(m_plugin)
 			return m_plugin->defaultValue(port);
 		return 0.0;
+	}
+	bool wantUpdate()
+	{
+		return m_update_gui;
 	}
 	void makeGui();
 	void makeNativeGui();
