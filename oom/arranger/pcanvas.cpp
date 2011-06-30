@@ -2291,7 +2291,7 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	if (item->isMoving())
 	{
 		QColor c(Qt::gray);
-		//c.setAlpha(config.globalAlphaBlend);
+		c.setAlpha(config.globalAlphaBlend);
 		p.setBrush(c);
 
 		// NOTE: For one-pixel border use first line. For two-pixel border use second.
