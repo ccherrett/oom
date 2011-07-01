@@ -4255,10 +4255,6 @@ void PartCanvas::drawTooltipText(QPainter& p,
 	// calculate the dB value for the dB string.
 	double vol = lazySelNodeVal;
 	QString dbString;
-	if(cl->pluginName().isEmpty())
-		dbString.append(cl->name()+"  ");
-	else
-		dbString.append(cl->pluginName()).append(" : ").append(cl->name()).append(" ");
 	if(paintTextAsDb)
 	{
 		if (vol < 0.0001f)
@@ -4274,13 +4270,17 @@ void PartCanvas::drawTooltipText(QPainter& p,
 	{
 		dbString += QString::number(vol, 'f', 2);
 	}
+	if(cl->pluginName().isEmpty())
+		dbString.append("  "+cl->name());
+	else
+		dbString.append("  "+cl->name()).append(" : ").append(cl->pluginName());
 	// Set the color for the dB text
 	p.setPen(QColor(255,255,255,190));
 	//p.drawText(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 15, (rr.bottom()-2)-lazySelNodePrevVal*height, dbString);
 	int top = (rr.bottom()-40)-lazySelNodePrevVal*height;
 	if(top < 0)
 		top = 0;
-	p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)), top, 120, 60), Qt::TextWordWrap|Qt::AlignHCenter, dbString);
+	p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)), top, 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
 }
 
 //---------------------------------------------------------
