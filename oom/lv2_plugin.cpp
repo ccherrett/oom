@@ -826,14 +826,21 @@ void LV2PluginI::heartBeat()/*{{{*/
 		if(controlsOut[j].tmpVal != controlsOut[j].val)
 		{
 			//printf("LV2PluginI::heartBeat() updating value\n");
-			suil_instance_port_event(m_uinstance[0], controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
-			controlsOut[j].tmpVal = controlsOut[j].val;
+			if(!m_uinstance.isEmpty())
+			{
+				suil_instance_port_event(m_uinstance.at(0), controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+				controlsOut[j].tmpVal = controlsOut[j].val;
+			}
+			else
+				return;
 		}
 	}
 #endif
 	unsigned long ctls = controlPorts;
 	for (unsigned long k = 0; k < ctls; ++k)
 	{
+		if(m_uinstance.isEmpty())
+			return;
 		if(controls[k].update || controls[k].lastGuiVal != controls[k].val)/*{{{*/
 		{
 	#ifdef SLV2_SUPPORT
@@ -846,14 +853,19 @@ void LV2PluginI::heartBeat()/*{{{*/
 					if(ui_handle != NULL)
 					{
 						(*ui_descriptor->port_event)(ui_handle,	controls[k].idx, sizeof(float), 0, &controls[k].val);
+						controls[k].lastGuiVal = controls[k].val;
+						controls[k].update = false;
 					}
 				}
 			}
 	#else
 			if(!m_uinstance.isEmpty())
-				suil_instance_port_event(m_uinstance[0], controls[k].idx, sizeof(float), 0, &controls[k].val);
+			{
+				suil_instance_port_event(m_uinstance.at(0), controls[k].idx, sizeof(float), 0, &controls[k].val);
+				controls[k].lastGuiVal = controls[k].val;
+				controls[k].update = false;
+			}
 	#endif
-			controls[k].lastGuiVal = controls[k].val;
 		}/*}}}*/
 	}
 }/*}}}*/
@@ -921,7 +933,7 @@ void LV2PluginI::apply(int frames)/*{{{*/
 					printf("Applying values from fifo %f\n", v.value);
 				_track->setPluginCtrlVal(genACnum(_id, k), v.value);
 			}
-			controls[k].update = false;
+			//controls[k].update = false;
 			controls[k].lastGuiVal = v.value;
 		}
 		else
@@ -936,12 +948,12 @@ void LV2PluginI::apply(int frames)/*{{{*/
 				if(debugMsg)
 					printf("Applying values from automation tmpVal: %f val:%f\n", controls[k].tmpVal, controls[k].val);
 				controls[k].val = controls[k].tmpVal;
-				controls[k].update = true;
+			//	controls[k].update = true;
 				//FIXME: Not sure if this is being called in the right thread
 				//I suspect this should happen in the gui thread
 			}
-			else
-				controls[k].update = false;
+			//else
+			//	controls[k].update = false;
 		}
 	}
 	for (int i = 0; i < instances; ++i)
@@ -1427,6 +1439,12 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 		}
 	}/*}}}*/
 #endif
+	//Update all the gui ports to the plugin value
+	unsigned long ctls = controlPorts;
+	for (unsigned long k = 0; k < ctls; ++k)
+	{
+		controls[k].update = true;
+	}
 }/*}}}*/
 
 void LV2PluginI::makeGui()/*{{{*/
