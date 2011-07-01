@@ -926,6 +926,8 @@ void LV2PluginI::apply(int frames)/*{{{*/
 		if(cfifo && !cfifo->isEmpty())
 		{
 			LV2Data v = cfifo->get();
+			controls[k].lastGuiVal = v.value;
+			controls[k].update = false;
 			controls[k].tmpVal = v.value;
 			if (_track && _id != -1)
 			{
@@ -933,8 +935,6 @@ void LV2PluginI::apply(int frames)/*{{{*/
 					printf("Applying values from fifo %f\n", v.value);
 				_track->setPluginCtrlVal(genACnum(_id, k), v.value);
 			}
-			//controls[k].update = false;
-			controls[k].lastGuiVal = v.value;
 		}
 		else
 		{
