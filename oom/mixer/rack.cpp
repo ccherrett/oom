@@ -248,6 +248,12 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 	showGuiAction->setChecked(pipe->guiVisible(idx));
 	showNativeGuiAction->setChecked(pipe->nativeGuiVisible(idx));
 
+#if defined(OSC_SUPPORT) || defined(LV2_SUPPORT)
+	showNativeGuiAction->setEnabled(true);
+#else
+	showNativeGuiAction->setEnabled(false);
+#endif
+
 	if (pipe->empty(idx))
 	{
 		menu->removeAction(changeAction);
@@ -269,12 +275,6 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 		if (!pipe->isDssiPlugin(idx))
 			showNativeGuiAction->setEnabled(false);
 	}
-
-#if defined(OSC_SUPPORT) || defined(LV2_SUPPORT)
-	showNativeGuiAction->setEnabled(true);
-#else
-	showNativeGuiAction->setEnabled(false);
-#endif
 
 	QPoint pt = QCursor::pos();
 	QAction* act = menu->exec(pt, 0);

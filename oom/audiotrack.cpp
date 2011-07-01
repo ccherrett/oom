@@ -1220,6 +1220,7 @@ void AudioTrack::mapRackPluginsToControllers()
 			// Force all of these now, even though they may have already been set. With a pre-
 			//  0.9pre1 oom file with broken controller sections they may not be set correct.
 			float min, max;
+			//TODO: This needs to be wrapped as range is different for lv2
 			p->range(i, &min, &max);
 			CtrlValueType t = p->valueType();
 			l->setRange(min, max);

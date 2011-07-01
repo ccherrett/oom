@@ -6,25 +6,12 @@
 //=========================================================
 
 #include <QApplication>
-#include <QClipboard>
-#include <QPainter>
-#include <QDrag>
-#include <QDragLeaveEvent>
-#include <QDragEnterEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QMouseEvent>
 #include <QtGui>
 
 #include <values.h>
 #include <stdio.h>
 #include <math.h>
 #include <errno.h>
-//#include <sys/stat.h>
-//#include <sys/types.h>
-//#include <sys/mman.h>
-//#include <fcntl.h>
-//#include <dirent.h>
 
 #include "xml.h"
 #include "prcanvas.h"
