@@ -4277,10 +4277,10 @@ void PartCanvas::drawTooltipText(QPainter& p,
 	// Set the color for the dB text
 	p.setPen(QColor(255,255,255,190));
 	//p.drawText(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 15, (rr.bottom()-2)-lazySelNodePrevVal*height, dbString);
-	int top = (rr.bottom()-40)-lazySelNodePrevVal*height;
+	int top = (rr.bottom()-20)-lazySelNodePrevVal*height;
 	if(top < 0)
 		top = 0;
-	p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)), top, 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
+	p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 10, top, 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
 }
 
 //---------------------------------------------------------
