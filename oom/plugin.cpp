@@ -1349,7 +1349,18 @@ bool Pipeline::isDssiPlugin(int idx) const
 {
 	PluginI* p = (*this)[idx];
 	if (p)
-		return p->isDssiPlugin();
+	{
+#ifdef LV2_SUPPORT
+		if(p->type() == 2)
+		{
+			//LV2PluginI* lp = (LV2PluginI*)p;
+			//FIXME: For now this just check to enable native gui support, so we return true for lv2
+			return true;
+		}
+		else
+#endif
+			return p->isDssiPlugin();
+	}
 
 	return false;
 }

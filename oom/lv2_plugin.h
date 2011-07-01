@@ -95,6 +95,7 @@ struct LV2World {/*{{{*/
 	SLV2Value integer_prop;
 	SLV2Value logarithmic_prop;
 	SLV2Value samplerate_prop;
+	SLV2Value units_prop;
 #else
 	LilvWorld* world;
 	const LilvPlugins* plugins;
@@ -113,6 +114,7 @@ struct LV2World {/*{{{*/
 	LilvNode* integer_prop;
 	LilvNode* logarithmic_prop;
 	LilvNode* samplerate_prop;
+	LilvNode* units_prop;
 #endif
 };/*}}}*/
 
