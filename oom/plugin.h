@@ -505,7 +505,7 @@ public:
     {
         return _name;
     }
-    CtrlValueType valueType() const;
+    virtual CtrlValueType valueType() const;
 
     QString lib() const
     {

@@ -63,7 +63,7 @@ public:
     int getFrame() const {return frame;}
 
     friend int operator==(const CtrlVal& first, const CtrlVal& second) {
-	    return first.frame == second.frame;
+	    return first.frame == second.frame && first.val == second.val;
     }
 
 };

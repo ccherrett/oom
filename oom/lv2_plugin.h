@@ -263,6 +263,7 @@ public:
     virtual bool readConfiguration(Xml& xml, bool readPreset = false);
     virtual bool loadControl(Xml& xml);
     virtual bool setControl(const QString& s, double val);
+    virtual CtrlValueType valueType() const;
 };
 #endif
 #endif

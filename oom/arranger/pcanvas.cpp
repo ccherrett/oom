@@ -4095,6 +4095,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 					paintTextAsDb = false;
 					paintLines = true;
 				}
+				paintTextAsDb = false;
 				// we need to set curVal between 0 and 1
 				double min, max;
 				cl->range(&min, &max);

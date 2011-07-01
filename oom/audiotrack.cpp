@@ -216,25 +216,38 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)
 				LV2PluginI* plug = (LV2PluginI*)plugin;
 				if(plug)
 					plug->range(i, &min, &max);
+				CtrlValueType t = plug->valueType();
+				CtrlList* cl = new CtrlList(id);
+				cl->setRange(min, max);
+				cl->setName(QString(name));
+				cl->setPluginName(plug->name());
+				cl->setValueType(t);
+				Port* cport = plug->getControlPort(i);
+				if (cport->toggle)
+					cl->setMode(CtrlList::DISCRETE);
+				else
+					cl->setMode(CtrlList::INTERPOLATE);
+				cl->setCurVal(plug->param(i));
+				addController(cl);
 			}
 			else
 #endif
 			{
 				plugin->range(i, &min, &max);
+				CtrlValueType t = plugin->valueType();
+				CtrlList* cl = new CtrlList(id);
+				cl->setRange(min, max);
+				cl->setName(QString(name));
+				cl->setPluginName(plugin->name());
+				cl->setValueType(t);
+				Port* cport = plugin->getControlPort(i);
+				if (cport->toggle)
+					cl->setMode(CtrlList::DISCRETE);
+				else
+					cl->setMode(CtrlList::INTERPOLATE);
+				cl->setCurVal(plugin->param(i));
+				addController(cl);
 			}
-			CtrlValueType t = plugin->valueType();
-			CtrlList* cl = new CtrlList(id);
-			cl->setRange(min, max);
-			cl->setName(QString(name));
-			cl->setPluginName(plugin->name());
-			cl->setValueType(t);
-			Port* cport = plugin->getControlPort(i);
-			if (cport->toggle)
-				cl->setMode(CtrlList::DISCRETE);
-			else
-				cl->setMode(CtrlList::INTERPOLATE);
-			cl->setCurVal(plugin->param(i));
-			addController(cl);
 		}
 	}
 }

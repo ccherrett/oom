@@ -748,6 +748,11 @@ bool LV2PluginI::initPluginInstance(Plugin* plug, int c)/*{{{*/
 	return true;
 }/*}}}*/
 
+CtrlValueType LV2PluginI::valueType() const
+{
+	return VAL_LINEAR;
+}
+
 #ifdef SLV2_SUPPORT
 SLV2Instance LV2PluginI::instantiatelv2()/*{{{*/
 {
