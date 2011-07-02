@@ -2484,6 +2484,21 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	//  bb.x(), bb.y(), bb.width(), bb.height(), _pr.x(), _pr.y(), _pr.width(), _pr.height());
 	//QColor green = QColor(143, 75, 236);
 	//QColor green = QColor(133, 182, 94);
+	QPolygonF m_monoPolygonTop;
+	QPolygonF m_monoPolygonBottom;
+	
+	QPolygonF m_stereoOnePolygonTop;
+	QPolygonF m_stereoOnePolygonBottom;
+
+	QPolygonF m_stereoTwoPolygonTop;
+	QPolygonF m_stereoTwoPolygonBottom;
+	
+	int firstIn = 1;
+	int stereoOneFirstIn = 1;
+	int stereoTwoFirstIn = 1;
+	QColor waveEdge = QColor(0,182,203);
+	QColor waveFill = QColor(27,47,49);
+
 	QColor green = QColor(49, 175, 197);
 	QColor yellow = QColor(127,12,128);
 	QColor red = QColor(197, 49, 87);
@@ -2492,6 +2507,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	{
 		green = QColor(219, 168, 79);
 		rms_color = QColor(0,19,23);
+		waveEdge = QColor(222,94,0);
+		waveFill = QColor(49,36,27);
 	}
 	
 	if (_tool == AutomationTool)
@@ -2500,10 +2517,14 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 		if(wp->selected())
 		{
 			green = QColor(87,73,49);
+			waveEdge = QColor(95,63,39);
+			waveFill = QColor(10,9,8);
 		}
 		else
 		{
 			green = QColor(58,96,103);
+			waveEdge = QColor(40,67,70);
+			waveFill = QColor(7,10,10);
 		}
 	}
 
@@ -2526,6 +2547,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	//	hh = hh +1;
 	int h = hh / 2;
 	int y = pr.y() + h;
+	int drawLines = 1;
 
 	EventList* el = wp->events();
 	for (iEvent e = el->begin(); e != el->end(); ++e)
@@ -2567,64 +2589,122 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 		int ex = mapx(tempomap.frame2tick(wp->frame() + event.frame() + event.lenFrame()));
 		if (ex > x2)
 			ex = x2;
+		//if (h < 41)
 		if (h < 41)
 		{
 			//
 			//    combine multi channels into one waveform
 			//
 			//printf("PartCanvas::drawWavePart i:%d ex:%d\n", i, ex);  // REMOVE Tim.
-
-			for (; i < ex; i++)
+			if(drawLines == 0)
 			{
-				int hm = hh / 2;
-				//if(channels == 1)
-				//{
-					//printf("one channel found: %d\n", channels);
-				//	hm = h;
-				//}	
-				SampleV sa[channels];
-				xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
-				f.read(sa, xScale, pos);
-				postick += tickstep;
-				pos += xScale;
-				int peak = 0;
-				int rms = 0;
-				for (unsigned k = 0; k < channels; ++k)
+				for (; i < ex; i++)//{{{
 				{
-					if (sa[k].peak > peak)
-						peak = sa[k].peak;
-					rms += sa[k].rms;
-				}
-				rms /= channels;
-				peak = (peak * (hh - 2)) >> 9;
-				rms = (rms * (hh - 2)) >> 9;
+					int hm = hh / 2;
+					//if(channels == 1)
+					//{
+						//printf("one channel found: %d\n", channels);
+					//	hm = h;
+					//}	
+					SampleV sa[channels];
+					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
+					f.read(sa, xScale, pos);
+					postick += tickstep;
+					pos += xScale;
+					int peak = 0;
+					int rms = 0;
+					for (unsigned k = 0; k < channels; ++k)
+					{
+						if (sa[k].peak > peak)
+							peak = sa[k].peak;
+						rms += sa[k].rms;
+					}
+					rms /= channels;
+					peak = (peak * (hh - 2)) >> 9;
+					rms = (rms * (hh - 2)) >> 9;
+					
+					/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+					vuGrad.setColorAt(1, red);
+					vuGrad.setColorAt(0.6, green);
+					vuGrad.setColorAt(0.5, green);
+					vuGrad.setColorAt(0.4, green);
+					vuGrad.setColorAt(0, red);*/
+					/*vuGrad.setColorAt(1, red);
+					vuGrad.setColorAt(0.90, yellow);
+					vuGrad.setColorAt(0.5, green);
+					vuGrad.setColorAt(0.10, yellow);
+					vuGrad.setColorAt(0, red);*/
+					//QPen myPen = QPen();
+					//myPen.setBrush(QBrush(vuGrad));
+					//p.setPen(myPen);
+					p.setPen(green);
+					
+					p.drawLine(i, y - peak - cc, i, y + peak);
+					p.setPen(rms_color);
+					p.drawLine(i, y - rms - cc, i, y + rms);
 				
-				/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-				vuGrad.setColorAt(1, red);
-				vuGrad.setColorAt(0.6, green);
-				vuGrad.setColorAt(0.5, green);
-				vuGrad.setColorAt(0.4, green);
-				vuGrad.setColorAt(0, red);*/
-				/*vuGrad.setColorAt(1, red);
-				vuGrad.setColorAt(0.90, yellow);
-				vuGrad.setColorAt(0.5, green);
-				vuGrad.setColorAt(0.10, yellow);
-				vuGrad.setColorAt(0, red);*/
-				//QPen myPen = QPen();
-				//myPen.setBrush(QBrush(vuGrad));
-				//p.setPen(myPen);
-				p.setPen(green);
-				
-				p.drawLine(i, y - peak - cc, i, y + peak);
-				p.setPen(rms_color);
-				p.drawLine(i, y - rms - cc, i, y + rms);
-			
-				if(peak >= (hm - 2))
+					if(peak >= (hm - 2))
+					{
+						p.setPen(QColor(255,0,0));
+						p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
+						p.drawLine(i, y + peak - 1, i, y + peak);
+					}	
+				}//}}}
+			}
+			else
+			{
+				for (; i < ex; i++)//{{{//drawMonoWave
 				{
-					p.setPen(QColor(255,0,0));
-					p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
-					p.drawLine(i, y + peak - 1, i, y + peak);
-				}	
+					if(firstIn == 1)
+					{
+						m_monoPolygonTop.append(QPointF(i, y));
+						m_monoPolygonBottom.append(QPointF(i, y));
+						firstIn = 0;
+					}
+					int hm = hh / 2;
+					SampleV sa[channels];
+					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
+					f.read(sa, xScale, pos);
+					postick += tickstep;
+					pos += xScale;
+					int peak = 0;
+					int rms = 0;
+					for (unsigned k = 0; k < channels; ++k)
+					{
+						if (sa[k].peak > peak)
+							peak = sa[k].peak;
+						rms += sa[k].rms;
+					}
+					rms /= channels;
+					peak = (peak * (hh - 2)) >> 9;
+					rms = (rms * (hh - 2)) >> 9;
+				
+					m_monoPolygonTop.append(QPointF(i, y-peak));
+					m_monoPolygonBottom.append(QPointF(i, y+peak));
+					
+					//p.drawLine(i, y - peak - cc, i, y + peak);
+					
+					//p.drawLine(i, y - rms - cc, i, y + rms);
+				
+					/*
+					if(peak >= (hm - 2))
+					{
+						p.setPen(QColor(255,0,0));
+						p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
+						p.drawLine(i, y + peak - 1, i, y + peak);
+					}
+					*/
+				}//}}}
+				m_monoPolygonTop.append(QPointF(i, y));
+				m_monoPolygonBottom.append(QPointF(i, y));
+				
+				p.setPen(waveEdge);//this is the outline of the wave
+				p.setBrush(waveFill);//this is the fill color of the wave
+				
+				p.drawPolygon(m_monoPolygonTop);
+				p.drawPolygon(m_monoPolygonBottom);
+				firstIn = 1;
+				
 			}
 		}
 		else
@@ -2647,82 +2727,166 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 			int cc = hh % (channels * 2) ? 0 : 1;
 			//printf("channels = %d, pr = %d, h = %d, hh = %d, hm = %d\n", channels, pr.height(), h, hh, hm);
 			//printf("canvas height: %d\n", height());
-			for (; i < ex; i++)
+			if(drawLines == 0)
 			{
-				y = pr.y() + hm;
-				SampleV sa[channels];
-				xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
-				f.read(sa, xScale, pos);
-				postick += tickstep;
-				pos += xScale;
-				for (unsigned k = 0; k < channels; ++k)
+				for (; i < ex; i++)//{{{ //stereo line draw mode
 				{
-					int peak = (sa[k].peak * (hm - 1)) >> 8;
-					int rms = (sa[k].rms * (hm - 1)) >> 8;
-					if(k == 0)
+					y = pr.y() + hm;
+					SampleV sa[channels];
+					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
+					f.read(sa, xScale, pos);
+					postick += tickstep;
+					pos += xScale;
+					for (unsigned k = 0; k < channels; ++k)
 					{
-						/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-						vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.6, green);
-						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.4, green);
-						vuGrad.setColorAt(0, red);*/
-						/*vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.90, yellow);
-						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.10, yellow);
-						vuGrad.setColorAt(0, red);*/
-						//QPen myPen = QPen();
-						//myPen.setBrush(QBrush(vuGrad));
-						///p.setPen(myPen);
-						p.setPen(green);
-						p.drawLine(i, y - peak - cc, i, y + peak);
-						//p.drawLine(0, pr.height(), 3000, pr.height());
-					}
-					else
-					{
-						//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
-						/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-						vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.6, green);
-						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.4, green);
-						vuGrad.setColorAt(0, red);*/
-						/*vuGrad.setColorAt(1, red);
-						vuGrad.setColorAt(0.90, yellow);
-						vuGrad.setColorAt(0.5, green);
-						vuGrad.setColorAt(0.10, yellow);
-						vuGrad.setColorAt(0, red);*/
-						//QPen myPen = QPen();
-						//myPen.setBrush(QBrush(vuGrad));
-						//p.setPen(myPen);
-						p.setPen(green);
-						p.drawLine(i, y - peak - cc, i, y + peak);
+						int peak = (sa[k].peak * (hm - 1)) >> 8;
+						int rms = (sa[k].rms * (hm - 1)) >> 8;
+						if(k == 0)
+						{
+							/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+							vuGrad.setColorAt(1, red);
+							vuGrad.setColorAt(0.6, green);
+							vuGrad.setColorAt(0.5, green);
+							vuGrad.setColorAt(0.4, green);
+							vuGrad.setColorAt(0, red);*/
+							/*vuGrad.setColorAt(1, red);
+							vuGrad.setColorAt(0.90, yellow);
+							vuGrad.setColorAt(0.5, green);
+							vuGrad.setColorAt(0.10, yellow);
+							vuGrad.setColorAt(0, red);*/
+							//QPen myPen = QPen();
+							//myPen.setBrush(QBrush(vuGrad));
+							///p.setPen(myPen);
+							p.setPen(green);
+							p.drawLine(i, y - peak - cc, i, y + peak);
+							//p.drawLine(0, pr.height(), 3000, pr.height());
+						}
+						else
+						{
+							//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
+							/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
+							vuGrad.setColorAt(1, red);
+							vuGrad.setColorAt(0.6, green);
+							vuGrad.setColorAt(0.5, green);
+							vuGrad.setColorAt(0.4, green);
+							vuGrad.setColorAt(0, red);*/
+							/*vuGrad.setColorAt(1, red);
+							vuGrad.setColorAt(0.90, yellow);
+							vuGrad.setColorAt(0.5, green);
+							vuGrad.setColorAt(0.10, yellow);
+							vuGrad.setColorAt(0, red);*/
+							//QPen myPen = QPen();
+							//myPen.setBrush(QBrush(vuGrad));
+							//p.setPen(myPen);
+							p.setPen(green);
+							p.drawLine(i, y - peak - cc, i, y + peak);
+							
+						}
+						//printf("peak value: %d hm value: %d\n", peak, hm);
+						if(peak >= (hm - cliprange))
+						{
+							p.setPen(QColor(255,0,0));
+							p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
+							p.drawLine(i, y + peak - 1, i, y + peak);
+						}	
+						p.setPen(rms_color);//QColor(0,19,23));
+						p.drawLine(i, y - rms - cc, i, y + rms);
 						
-					}
-					//printf("peak value: %d hm value: %d\n", peak, hm);
-					if(peak >= (hm - cliprange))
-					{
-						p.setPen(QColor(255,0,0));
-						p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
-						p.drawLine(i, y + peak - 1, i, y + peak);
-					}	
-					p.setPen(rms_color);//QColor(0,19,23));
-					p.drawLine(i, y - rms - cc, i, y + rms);
-					
-					if(k == 0)
-					{
-						p.setPen(QColor(102,177,205));//QColor(0,19,23));
-						p.drawLine(0, y, width(), y);
-					}
-					else
-					{
-						p.setPen(QColor(213,93,93));//QColor(0,19,23));
-						p.drawLine(0, y, width(), y);
-					}
+						if(k == 0)
+						{
+							p.setPen(QColor(102,177,205));//QColor(0,19,23));
+							p.drawLine(0, y, width(), y);
+						}
+						else
+						{
+							p.setPen(QColor(213,93,93));//QColor(0,19,23));
+							p.drawLine(0, y, width(), y);
+						}
 
-					y += 2 * hm;
-				}
+						y += 2 * hm;
+					}
+				}//}}}
+			}
+			else
+			{
+				int stereoOneY = 0;
+				int stereoTwoY = 0;
+				for (; i < ex; i++)//{{{ //stereo curve draw mode
+				{
+					y = pr.y() + hm;
+					SampleV sa[channels];
+					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
+					f.read(sa, xScale, pos);
+					postick += tickstep;
+					pos += xScale;
+					for (unsigned k = 0; k < channels; ++k)
+					{
+						int peak = (sa[k].peak * (hm - 1)) >> 8;
+						int rms = (sa[k].rms * (hm - 1)) >> 8;
+						if(k == 0)
+						{
+							stereoOneY = y;
+							if(stereoOneFirstIn == 1)
+							{
+								m_stereoOnePolygonTop.append(QPointF(i, stereoOneY));
+								m_stereoOnePolygonBottom.append(QPointF(i, stereoOneY));
+								stereoOneFirstIn = 0;
+							}
+							//p.setPen(green);
+							//p.drawLine(i, y - peak - cc, i, y + peak);
+							m_stereoOnePolygonTop.append(QPointF(i, y-peak));
+							m_stereoOnePolygonBottom.append(QPointF(i, y+peak));
+						}
+						else
+						{
+							stereoTwoY = y;
+							if(stereoTwoFirstIn == 1)
+							{
+								m_stereoTwoPolygonTop.append(QPointF(i, stereoTwoY));
+								m_stereoTwoPolygonBottom.append(QPointF(i, stereoTwoY));
+								stereoTwoFirstIn = 0;
+							}
+							m_stereoTwoPolygonTop.append(QPointF(i, y-peak));
+							m_stereoTwoPolygonBottom.append(QPointF(i, y+peak));
+						}
+						//printf("peak value: %d hm value: %d\n", peak, hm);
+						/*if(peak >= (hm - cliprange))
+						{
+							p.setPen(QColor(255,0,0));
+							p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
+							p.drawLine(i, y + peak - 1, i, y + peak);
+						}*/	
+						//p.setPen(rms_color);//QColor(0,19,23));
+						//p.drawLine(i, y - rms - cc, i, y + rms);
+						
+						/*if(k == 0)
+						{
+							p.setPen(QColor(102,177,205));//QColor(0,19,23));
+							p.drawLine(0, y, width(), y);
+						}
+						else
+						{
+							p.setPen(QColor(213,93,93));//QColor(0,19,23));
+							p.drawLine(0, y, width(), y);
+						}*/
+
+						y += 2 * hm;
+					}
+				}//}}}
+				m_stereoOnePolygonTop.append(QPointF(i, stereoOneY));
+				m_stereoOnePolygonBottom.append(QPointF(i, stereoOneY));
+				m_stereoTwoPolygonTop.append(QPointF(i, stereoTwoY));
+				m_stereoTwoPolygonBottom.append(QPointF(i, stereoTwoY));
+				
+				p.setPen(waveEdge);//this is the outline of the wave
+				p.setBrush(waveFill);//this is the fill color of the wave
+				
+				p.drawPolygon(m_stereoOnePolygonTop);
+				p.drawPolygon(m_stereoOnePolygonBottom);
+				p.drawPolygon(m_stereoTwoPolygonTop);
+				p.drawPolygon(m_stereoTwoPolygonBottom);
+				stereoOneFirstIn = 1;
+				stereoTwoFirstIn = 1;
 			}
 		}
 	}
