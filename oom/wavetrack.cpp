@@ -100,6 +100,7 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 				//event.read(srcOffset, bpp, channels(), nn, false);
 				//event.readAudio(srcOffset, bpp, channels(), nn, doSeek, false);
 				// p3.3.33
+				//FIXME: this is where the audio is overwriting
 				event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, true);
 
 			}
