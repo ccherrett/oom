@@ -2497,9 +2497,12 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	int stereoOneFirstIn = 1;
 	int stereoTwoFirstIn = 1;
 	QColor waveEdge = QColor(0,182,203);
-	QColor waveFill = QColor(27,47,49);
+	QColor waveFill = QColor(19,31,32);
+	
+	p.setPen(QColor(255,0,0));
 
 	QColor green = QColor(49, 175, 197);
+	//QColor green = QColor(27,47,49);
 	QColor yellow = QColor(127,12,128);
 	QColor red = QColor(197, 49, 87);
 	QColor rms_color = QColor(0,19,23);
@@ -2507,8 +2510,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	{
 		green = QColor(219, 168, 79);
 		rms_color = QColor(0,19,23);
-		waveEdge = QColor(222,94,0);
-		waveFill = QColor(49,36,27);
+		waveEdge = QColor(201,85,0);
+		waveFill = QColor(10,9,8);
 	}
 	
 	if (_tool == AutomationTool)
@@ -2653,6 +2656,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 			}
 			else
 			{
+				int hm = 0;
 				for (; i < ex; i++)//{{{//drawMonoWave
 				{
 					if(firstIn == 1)
@@ -2661,7 +2665,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 						m_monoPolygonBottom.append(QPointF(i, y));
 						firstIn = 0;
 					}
-					int hm = hh / 2;
+					hm = hh / 2;
 					SampleV sa[channels];
 					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
 					f.read(sa, xScale, pos);
@@ -2686,22 +2690,35 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 					
 					//p.drawLine(i, y - rms - cc, i, y + rms);
 				
-					/*
+					
 					if(peak >= (hm - 2))
 					{
-						p.setPen(QColor(255,0,0));
 						p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
 						p.drawLine(i, y + peak - 1, i, y + peak);
 					}
-					*/
+					
 				}//}}}
+				/*
+				QLinearGradient vuGrad(QPointF(0, y), QPointF(0, y+hm));
+				vuGrad.setColorAt(0, green);
+				vuGrad.setColorAt(0.5, green);
+				vuGrad.setColorAt(1, red);
+				
+				QLinearGradient vuGradTop(QPointF(0, y), QPointF(0, y-hm));
+				vuGradTop.setColorAt(0, green);
+				vuGradTop.setColorAt(0.5, green);
+				vuGradTop.setColorAt(1, red);
+				*/
 				m_monoPolygonTop.append(QPointF(i, y));
 				m_monoPolygonBottom.append(QPointF(i, y));
 				
 				p.setPen(waveEdge);//this is the outline of the wave
-				p.setBrush(waveFill);//this is the fill color of the wave
+				//p.setPen(Qt::NoPen);//this is the outline of the wave
+				p.setBrush(waveFill);//waveFill);//this is the fill color of the wave
 				
+				//p.setBrush(QBrush(vuGradTop));//waveFill);//this is the fill color of the wave
 				p.drawPolygon(m_monoPolygonTop);
+				//p.setBrush(QBrush(vuGrad));//waveFill);//this is the fill color of the wave
 				p.drawPolygon(m_monoPolygonBottom);
 				firstIn = 1;
 				
@@ -2850,12 +2867,11 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 							m_stereoTwoPolygonBottom.append(QPointF(i, y+peak));
 						}
 						//printf("peak value: %d hm value: %d\n", peak, hm);
-						/*if(peak >= (hm - cliprange))
+						if(peak >= (hm - cliprange))
 						{
-							p.setPen(QColor(255,0,0));
 							p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
 							p.drawLine(i, y + peak - 1, i, y + peak);
-						}*/	
+						}	
 						//p.setPen(rms_color);//QColor(0,19,23));
 						//p.drawLine(i, y - rms - cc, i, y + rms);
 						
