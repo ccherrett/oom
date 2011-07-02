@@ -2496,8 +2496,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	int firstIn = 1;
 	int stereoOneFirstIn = 1;
 	int stereoTwoFirstIn = 1;
-	QColor waveEdge = QColor(0,182,203);
-	QColor waveFill = QColor(19,31,32);
+	QColor waveEdge = QColor(123,105,150);
+	//QColor waveFill = QColor(19,31,32);
+	QColor waveFill = QColor(198,160,253);
 	
 	p.setPen(QColor(255,0,0));
 
@@ -2510,8 +2511,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	{
 		green = QColor(219, 168, 79);
 		rms_color = QColor(0,19,23);
-		waveEdge = QColor(201,85,0);
-		waveFill = QColor(10,9,8);
+		waveFill = QColor(49,48,24);
+		//waveFill = QColor(253,199,103);
+		waveEdge = QColor(253,246,129);
 	}
 	
 	if (_tool == AutomationTool)
@@ -2521,13 +2523,13 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 		{
 			green = QColor(87,73,49);
 			waveEdge = QColor(95,63,39);
-			waveFill = QColor(10,9,8);
+			waveFill = QColor(99,92,78);
 		}
 		else
 		{
 			green = QColor(58,96,103);
 			waveEdge = QColor(40,67,70);
-			waveFill = QColor(7,10,10);
+			waveFill = QColor(89,82,104);
 		}
 	}
 
@@ -2895,6 +2897,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				m_stereoTwoPolygonBottom.append(QPointF(i, stereoTwoY));
 				
 				p.setPen(waveEdge);//this is the outline of the wave
+				//p.setPen(Qt::NoPen);//this is the outline of the wave
 				p.setBrush(waveFill);//this is the fill color of the wave
 				
 				p.drawPolygon(m_stereoOnePolygonTop);
