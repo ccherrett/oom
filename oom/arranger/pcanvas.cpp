@@ -465,7 +465,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 	{
 		if (event->button() == Qt::LeftButton && shift)
 		{
-            editPart = (NPart*) _curItem;
+            /*editPart = (NPart*) _curItem;
             QRect r = map(_curItem->bbox());
 			if (lineEditor == 0)
 			{
@@ -476,7 +476,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 			lineEditor->setGeometry(r);
 			lineEditor->setText(editPart->name());
 			lineEditor->setFocus();
-			lineEditor->show();
+			lineEditor->show();*/
 		}
 		else if (event->button() == Qt::LeftButton)
 		{
@@ -2496,9 +2496,10 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	int firstIn = 1;
 	int stereoOneFirstIn = 1;
 	int stereoTwoFirstIn = 1;
-	QColor waveEdge = QColor(123,105,150);
-	//QColor waveFill = QColor(19,31,32);
-	QColor waveFill = QColor(198,160,253);
+	//QColor waveEdge = QColor(123,105,150);
+	//QColor waveFill = QColor(198,160,253);
+	QColor waveEdge = QColor(131,208,149);
+	QColor waveFill = QColor(159,255,182);
 	
 	p.setPen(QColor(255,0,0));
 
