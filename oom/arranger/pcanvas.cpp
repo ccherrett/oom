@@ -465,7 +465,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 	{
 		if (event->button() == Qt::LeftButton && shift)
 		{
-            editPart = (NPart*) _curItem;
+            /*editPart = (NPart*) _curItem;
             QRect r = map(_curItem->bbox());
 			if (lineEditor == 0)
 			{
@@ -476,7 +476,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 			lineEditor->setGeometry(r);
 			lineEditor->setText(editPart->name());
 			lineEditor->setFocus();
-			lineEditor->show();
+			lineEditor->show();*/
 		}
 		else if (event->button() == Qt::LeftButton)
 		{
@@ -2496,9 +2496,10 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	int firstIn = 1;
 	int stereoOneFirstIn = 1;
 	int stereoTwoFirstIn = 1;
-	QColor waveEdge = QColor(123,105,150);
-	//QColor waveFill = QColor(19,31,32);
-	QColor waveFill = QColor(198,160,253);
+	//QColor waveEdge = QColor(123,105,150);
+	//QColor waveFill = QColor(198,160,253);
+	QColor waveEdge = QColor(131,208,149);
+	QColor waveFill = QColor(159,255,182);
 	
 	p.setPen(QColor(255,0,0));
 
@@ -2511,9 +2512,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	{
 		green = QColor(219, 168, 79);
 		rms_color = QColor(0,19,23);
-		waveFill = QColor(49,48,24);
+		waveFill = QColor(0,48,58);
 		//waveFill = QColor(253,199,103);
-		waveEdge = QColor(253,246,129);
+		waveEdge = QColor(0,171,208);
 	}
 	
 	if (_tool == AutomationTool)
@@ -2522,14 +2523,14 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 		if(wp->selected())
 		{
 			green = QColor(87,73,49);
-			waveEdge = QColor(95,63,39);
-			waveFill = QColor(99,92,78);
+			waveEdge = QColor(43,92,102);
+			waveFill = QColor(43,59,62);
 		}
 		else
 		{
 			green = QColor(58,96,103);
-			waveEdge = QColor(40,67,70);
 			waveFill = QColor(89,82,104);
+			waveEdge = QColor(89,82,104);
 		}
 	}
 
@@ -4198,7 +4199,7 @@ void PartCanvas::drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* /* t */
 //   drawAutomation
 //---------------------------------------------------------
 
-void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
+void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{*/
 {
 	//printf("PartCanvas::drawAutomation\n");
 	QRect tempRect = r;
@@ -4225,6 +4226,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 	bool firstRun = true;
 	for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 	{
+		QPolygonF automationLine;
 		CtrlList *cl = icll->second;
 
 		if (cl->dontShow())
@@ -4238,7 +4240,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 		//printf("4444444444444444444444444444444444444444444444444444\n");
 		QColor curveColor = cl->color();
-		if (!cl->selected()) {
+		if (!cl->selected() || _tool != AutomationTool) {
 			curveColor.setAlpha(100);
 		}
 		p.setPen(QPen(curveColor, 2, Qt::SolidLine));
@@ -4313,10 +4315,12 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 
 				int currentPixel = mapx(tempomap.frame2tick(cv.getFrame()));
 				p.setPen(QPen(curveColor, 2, Qt::SolidLine));
-				p.drawLine(leftX,
-					   (rr.bottom()-2)-prevVal*height,
-					   currentPixel,
-					   (rr.bottom()-2)-nextVal*height);
+				
+				//This draws the connecting lines between nodes
+				//p.drawLine(leftX,(rr.bottom()-2)-prevVal*height,currentPixel,(rr.bottom()-2)-nextVal*height);
+				
+				automationLine.append(QPointF(currentPixel,(rr.bottom()-2)-nextVal*height));
+				
 				firstRun = false;
 				//printf("draw line: %d %f %d %f\n",tempomap.frame2tick(lastPos),rr.bottom()-lastVal*height,tempomap.frame2tick(cv.frame),rr.bottom()-curVal*height);
 				prevPosFrame=cv.getFrame();
@@ -4375,6 +4379,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 					}
 					else
 					{
+						p.setBrush(Qt::NoBrush);
 						p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-2, (rr.bottom()-2)-prevVal*height-2, 4, 4);
 					}
 				}	
@@ -4387,14 +4392,20 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 				}*/
 				//paint the text
 			}
-			p.setPen(QPen(curveColor, 2, Qt::SolidLine));
 			//printf("outer draw %f\n", cvFirst.val );
-			p.drawLine(mapx(tempomap.frame2tick(prevPosFrame)),
-				   (rr.bottom()-2)-prevVal*height,
-				   rr.x()+rr.width(),
-				   (rr.bottom()-2)-prevVal*height);
+			
+			//This next line draw is drawing the end line
+			//p.drawLine(mapx(tempomap.frame2tick(prevPosFrame)),(rr.bottom()-2)-prevVal*height,rr.x()+rr.width(),(rr.bottom()-2)-prevVal*height);
+			automationLine.append(QPointF(rr.x()+rr.width(),(rr.bottom()-2)-prevVal*height));
 			//printf("draw last line: %d %f %d %f\n",tempomap.frame2tick(prevPosFrame),(rr.bottom()-2)-prevVal*height,tempomap.frame2tick(prevPosFrame)+rr.width(),(rr.bottom()-2)-prevVal*height);
 		}//END if(ci = end())
+		p.setPen(QPen(curveColor, 2, Qt::SolidLine));
+		QPainterPath automationPath;
+		automationPath.addPolygon(automationLine);
+		p.setBrush(Qt::NoBrush);
+		//Set the CtrlList curvePath for use in selection
+		cl->setCurvePath(automationPath);
+		p.drawPath(automationPath);
 	} //END first for loop
 
 	if (paintLines)
@@ -4425,9 +4436,9 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)
 	}
 
 	p.restore();
-}
+}/*}}}*/
 
-void PartCanvas::drawTooltipText(QPainter& p, 
+void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 		const QRect& rr, 
 		int height,
 		double lazySelNodeVal,
@@ -4465,7 +4476,7 @@ void PartCanvas::drawTooltipText(QPainter& p,
 	if(top < 0)
 		top = 0;
 	p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 10, top, 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //  checkAutomation
@@ -4567,6 +4578,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 
 		if (addNewCtrl)
 		{
+			//FIXME This is faulty logic as you can now select or add a node anywhere on the line
 			// check if we are reasonably close to a line, we only need to check Y
 			// as the line is straight after the last controller
 			bool foundIt=false;
@@ -4594,9 +4606,9 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 
 	setCursor();
 }/*}}}*/
+
 void PartCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 {
-	int circumference = 15;
 	if (t->isMidiTrack())
 	{
 		return;
@@ -4604,7 +4616,9 @@ void PartCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 
 	//printf("selectAutomation p.x()=%d p.y()=%d\n", mapx(pointer.x()), mapx(pointer.y()));
 
-	int currY =  mapy(pointer.y());
+	int currY = mapy(pointer.y());
+	int currX = mapx(pointer.x());
+	QRect clickPoint(currX-5, currY-5, 10, 10);
 
 	CtrlListList* cll = ((AudioTrack*) t)->controller();
 	cll->deselectAll();
@@ -4614,43 +4628,19 @@ void PartCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 		if (cl->dontShow() || !cl->isVisible()) {
 			continue;
 		}
-		//cl->setSelected(false);
-		iCtrl ic=cl->begin();
+		QPainterPath cpath = cl->curvePath();
+		if(cpath.isEmpty())
+			continue;
 
-		int oldY=-1;
-		int ypixel;
-
-		// First check that there ARE automation, ic == cl->end means no automation
-		if (ic != cl->end()) {
-			for (; ic !=cl->end(); ic++)/*{{{*/
-			{
-				CtrlVal &cv = ic->second;
-				double y;
-				if (cl->id() == AC_VOLUME ) { // use db scale for volume
-					y = dbToVal(cv.val); // represent volume between 0 and 1
-					if (y < 0) y = 0;
-				}
-				else {
-					// we need to set curVal between 0 and 1
-					double min, max;
-					cl->range(&min,&max);
-					y = ( cv.val - min)/(max-min);
-				}
-
-				int yy = track2Y(t) + t->height();
-
-				ypixel = mapy(yy-2-y*t->height());
-
-				if (oldY==-1) oldY = ypixel;
-
-				//printf("point at x=%d xdiff=%d y=%d ydiff=%d\n", mapx(tempomap.frame2tick(cv.frame)), x1, mapx(ypixel), y1);
-				oldY = ypixel;
-			}/*}}}*/
-		} // if
-		// check if we are reasonably close to a line, we only need to check Y
-		// as the line is straight after the last controller
+		// Check if the mouse click intersecs an automation line
+		// NOTE: QT uses a fill pattern to deturmin if the intersection is valid.
+		// this calculation starts to break down for us when automation lines start 
+		// to cross each other. This is so far the easiest selection we have had but 
+		// try not to crown your automation lanes with lots of overlapping lines.
+		// Maybe we can implement our own class to solve this issue one day. - Andrew
 		bool foundIt=false;
-		if ( ypixel == oldY && abs(currY-ypixel) < circumference) {
+		if (cpath.intersects(clickPoint))
+		{
 			foundIt=true;
 		}
 

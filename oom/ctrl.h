@@ -14,6 +14,7 @@
 #include <map>
 #include <list>
 #include <qcolor.h>
+#include <QPainterPath>
 
 const int AC_VOLUME = 0;
 const int AC_PAN = 1;
@@ -127,6 +128,7 @@ private:
     double _min, _max;
     CtrlValueType _valueType;
     QColor _displayColor;
+	QPainterPath m_curvePath;
     bool _visible;
     bool _dontShow; // when this is true the control exists but is not compatible with viewing in the arranger
 	bool _selected;
@@ -138,6 +140,16 @@ public:
     CtrlList(int id, QString name, double min, double max, bool dontShow = false);
 
     CtrlVal& setCtrlFrameValue(CtrlVal* ctrl, int frame);
+
+	QPainterPath curvePath()
+	{
+		return m_curvePath;
+	}
+
+	void setCurvePath(QPainterPath path)
+	{
+		m_curvePath = path;
+	}
 
     Mode mode() const
     {
