@@ -21,9 +21,11 @@
 #ifdef SLV2_SUPPORT
 #include <slv2/slv2.h>
 #endif
-#include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
-#include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
-#include "lv2_external_ui.h"
+#include "lv2_includes/lv2_data_access.h"
+#include "lv2_includes/lv2_ui.h"
+#include "lv2_includes/lv2_files.h"
+#include "lv2_includes/lv2_persist.h"
+#include "lv2_includes/lv2_external_ui.h"
 #include <QHash>
 #include <QList>
 #include <QObject>
@@ -203,6 +205,15 @@ private:
 
 	LV2_Feature    m_ui_feature;
 	LV2_Feature  **m_ui_features;
+
+	QHash<QString, QByteArray> m_persist_configs;
+	QHash<QString, uint32_t>   m_persist_ctypes;
+
+	LV2_Feature                m_files_path_feature;
+	LV2_Files_Path_Support     m_files_path_support;
+	LV2_Feature                m_files_new_file_feature;
+	LV2_Files_New_File_Support m_files_new_file_support;
+
 public:
 	LV2PluginI();
 	virtual ~LV2PluginI();
@@ -216,6 +227,11 @@ public:
 #endif
 	const LV2UI_Descriptor *lv2_ui_descriptor() const;
 	LV2UI_Handle lv2_ui_handle() const;
+	const LV2_Persist *lv2_persist_descriptor(unsigned short) const;
+
+	//int lv2_persist_store(uint32_t, const void *, size_t, uint32_t, uint32_t);
+	//const void *lv2_persist_retrieve(uint32_t, size_t *, uint32_t *, uint32_t *);
+
 	LV2ControlFifo* getControlFifo(unsigned long p)
 	{
 		if(!m_controlFifo)

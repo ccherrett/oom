@@ -399,6 +399,7 @@ void EffectRack::savePreset(int idx)
 		#ifdef LV2_SUPPORT
 			if((*pipe)[idx]->type() == 2)
 			{
+				printf("Saving LV2 preset\n");
 				LV2PluginI* lp = (LV2PluginI*)(*pipe)[idx];
 				if(lp)
 					lp->writeConfiguration(1, xml);

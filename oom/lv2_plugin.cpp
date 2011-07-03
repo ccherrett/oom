@@ -9,6 +9,7 @@
 
 #include "lv2_plugin.h"
 #ifdef LV2_SUPPORT
+#include <QFileInfo>
 #include <QDialog>
 #include <QMessageBox>
 #include <QEvent>
@@ -20,12 +21,11 @@
 #include "song.h"
 #include "audio.h"
 
-#include "lv2/lv2plug.in/ns/ext/event/event-helpers.h"
-#include "lv2/lv2plug.in/ns/ext/event/event.h"
-//#include "lv2/lv2plug.in/ns/ext/files/files.h"
-#include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
-#include "lv2/lv2plug.in/ns/ext/uri-unmap/uri-unmap.h"
-#include "lv2/lv2plug.in/ns/ext/instance-access/instance-access.h"
+#include "lv2_includes/lv2_event_helpers.h"
+#include "lv2_includes/lv2_event.h"
+#include "lv2_includes/lv2_uri_map.h"
+#include "lv2_includes/lv2_uri_unmap.h"
+#include "lv2_includes/lv2_instance_access.h"
 
 #define LV2_GTK_UI_URI "http://lv2plug.in/ns/extensions/ui#GtkUI"
 #define LV2_QT4_UI_URI "http://lv2plug.in/ns/extensions/ui#Qt4UI"
@@ -86,11 +86,140 @@ static const char *lv2_id_to_uri (LV2_URI_Unmap_Callback_Data /*data*/, const ch
 static LV2_URI_Unmap_Feature lv2_uri_unmap = { NULL, lv2_id_to_uri };
 static LV2_Feature lv2_uri_unmap_feature = { LV2_URI_UNMAP_URI, &lv2_uri_unmap };
 
-//static LV2_Feature persist_feature = {"http://lv2plug.in/ns/ext/persist", NULL};
+static LV2_Feature lv2_persist_feature = {LV2_PERSIST_URI, NULL};
 		
+/*static int persist_store_callback ( void *callback_data, uint32_t key, const void *value, size_t size, uint32_t type, uint32_t flags )
+{
+	LV2PluginI *plugin = static_cast<LV2PluginI *> (callback_data);
+	if (plugin == NULL)
+		return 1;
+
+#ifdef PLUGIN_DEBUG
+	printf("lv2_persist_store(%p, %d, %d, %d, %d)\n", plugin, int(key), int(size), int(type), int(flags));
+#endif
+
+	return plugin->lv2_persist_store(key, value, size, type, flags);
+}*/
+
+/*static QString lv2_files_prefix ( LV2PluginI *pLv2Plugin )//{{{
+{
+	QString sPrefix;
+	
+	const QString& sPresetName = pLv2Plugin->preset();
+	if (sPresetName.isEmpty()) {
+		qtractorSession *pSession = qtractorSession::getInstance();
+		if (pSession) {
+			const QString& sSessionName = pSession->sessionName();
+			if (!sSessionName.isEmpty()) {
+				sPrefix += qtractorSession::sanitize(sSessionName);
+				sPrefix += '-';
+			}
+		}
+		const QString& sListName = pLv2Plugin->list()->name();
+		if (!sListName.isEmpty()) {
+			sPrefix += qtractorSession::sanitize(sListName);
+			sPrefix += '-';
+		}
+	}
+
+	sPrefix += pLv2Plugin->type()->label();
+	sPrefix += '-';
+
+	if (sPresetName.isEmpty()) {
+		sPrefix += QString::number(pLv2Plugin->type()->uniqueID(), 16);
+	} else {
+		sPrefix += qtractorSession::sanitize(sPresetName);
+	}
+
+	return sPrefix;
+}*///}}}
+
+/*static char *lv2_files_abstract_path (LV2_Files_Host_Data host_data, const char *absolute_path )//{{{
+{
+	LV2PluginI *plugin = static_cast<LV2PluginI *> (host_data);
+	if (plugin == NULL)
+		return NULL;
+
+#ifdef PLUGIN_DEBUG
+	printf("lv2_files_abstract_path(%p, \"%s\"\n", plugin, absolute_path);
+#endif
+
+	QFileInfo fi(absolute_path);
+
+	const QString& sFileName = lv2_files_prefix(plugin) + fi.fileName();
+	
+	// abstract_path...
+	const QString& sAbstractPath = QFileInfo(sFileName).filePath();
+	return ::strdup(sAbstractPath.toUtf8().constData());
+}*///}}}
+
+/*static char *lv2_files_absolute_path (LV2_Files_Host_Data host_data, const char *abstract_path )//{{{
+{
+	LV2PluginI *plugin = static_cast<LV2PluginI *> (host_data);
+	if (plugin == NULL)
+		return NULL;
+
+#ifdef PLUGIN_DEBUG
+	printf("lv2_files_absolute_path(%p, \"%s\"\n", plugin, abstract_path);
+#endif
+
+	qtractorSession *pSession = qtractorSession::getInstance();
+	if (pSession == NULL)
+		return NULL;
+
+	QFileInfo fi(abstract_path);
+
+	const QDir dir(pSession->sessionDir());
+	if (fi.isAbsolute())
+		fi.setFile(dir, fi.fileName());
+	else
+		fi.setFile(dir, fi.filePath());
+
+	const QString& sFilePath = fi.path();
+	const QString& sFileName = lv2_files_prefix(plugin) + fi.fileName();
+	
+	// absolute_path...
+	const QString& sAbsolutePath = QFileInfo(sFilePath, sFileName).canonicalFilePath();
+	return ::strdup(sAbsolutePath.toUtf8().constData());
+}//}}}*/
+
+/*static char *lv2_files_new_file_path (LV2_Files_Host_Data host_data, const char *relative_path )//{{{
+{
+	LV2PluginI *plugin = static_cast<LV2PluginI *> (host_data);
+	if (plugin == NULL)
+		return NULL;
+
+#ifdef CONFIG_DEBUG
+	printf("lv2_files_new_file_path(%p, \"%s\"\n", plugin, relative_path);
+#endif
+
+	qtractorSession *pSession = qtractorSession::getInstance();
+	if (pSession == NULL)
+		return NULL;
+
+	QFileInfo fi(relative_path);
+
+	const QDir dir(pSession->sessionDir());
+	if (fi.isAbsolute())
+		fi.setFile(dir, fi.fileName());
+	else
+		fi.setFile(dir, fi.filePath());
+
+	const QString& sFilePath = fi.path();
+	if (!QDir(sFilePath).exists())
+		dir.mkpath(sFilePath);
+
+	const QString& sFileName = lv2_files_prefix(plugin) + fi.fileName();
+	
+	// new_file_path...
+	const QString& sNewFilePath = QFileInfo(sFilePath, sFileName).canonicalFilePath();
+	return ::strdup(sNewFilePath.toUtf8().constData());
+}*//*}}}*/
+
 static const LV2_Feature* features[] = { 
 	&lv2_uri_map_feature,
 	&lv2_uri_unmap_feature,
+	&lv2_persist_feature,
     NULL
 };
 
@@ -104,6 +233,7 @@ static void external_ui_closed(LV2UI_Controller ui_controller)/*{{{*/
 		plugin->closeNativeGui();
 	}
 }/*}}}*/
+
 #ifdef GTK2UI_SUPPORT
 
 #undef signals 
@@ -622,7 +752,8 @@ const char* LV2Plugin::portName(unsigned long i)/*{{{*/
 {
     //return plugin ? plugin->PortNames[i] : 0;
 
-	const char* rv = 0;
+	printf("LV2Plugin::portName(%d)\n", i);
+	std::string rv;
 #ifdef SLV2_SUPPORT
 	SLV2Port port = slv2_plugin_get_port_by_index(getPlugin(), i);
 	if(port)
@@ -630,7 +761,7 @@ const char* LV2Plugin::portName(unsigned long i)/*{{{*/
 		SLV2Value pname = slv2_port_get_name(getPlugin(), port);
 		if(pname)
 		{
-			rv = slv2_value_as_string(pname);
+			rv.append(slv2_value_as_string(pname));
 			slv2_value_free(pname);
 		}
 	}
@@ -638,15 +769,17 @@ const char* LV2Plugin::portName(unsigned long i)/*{{{*/
 	const LilvPort* port = lilv_plugin_get_port_by_index(getPlugin(), i);
 	if(port)
 	{
+		printf("Found port for index\n");
 		LilvNode* pname = lilv_port_get_name(getPlugin(), port);
 		if(pname)
 		{
-			rv = lilv_node_as_string(pname);
+			printf("Found plugin name\n");
+			rv.append(lilv_node_as_string(pname));
 			lilv_node_free(pname);
 		}
 	}
 #endif
-	return rv;
+	return rv.c_str();
 }/*}}}*/
 
 //The following two functions borrowed for qtractor
@@ -1805,6 +1938,88 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 	//apply(1);
 }/*}}}*/
 
+/*const LV2_Persist *LV2PluginI::lv2_persist_descriptor(unsigned short iInstance ) const
+{
+	const SLV2Instance instance = slv2_instance(iInstance);
+	if (instance == NULL)
+		return NULL;
+
+	const LV2_Descriptor *descriptor = slv2_instance_get_descriptor(instance);
+	if (descriptor == NULL)
+		return NULL;
+	if (descriptor->extension_data == NULL)
+		return NULL;
+
+	return (const LV2_Persist *)
+		(*descriptor->extension_data)(LV2_PERSIST_URI);
+}
+
+
+int LV2PluginI::lv2_persist_store (uint32_t key, const void *value, size_t size, uint32_t type, uint32_t flags )
+{
+	if (value == NULL)
+		return 1;
+
+	if ((flags & (LV2_PERSIST_IS_POD | LV2_PERSIST_IS_PORTABLE)) == 0)
+		return 1;
+
+	const char *pszKey = lv2_id_to_uri(key);
+	if (pszKey == NULL)
+		return 1;
+
+	const char *pszType = lv2_id_to_uri(type);
+	if (pszType == NULL)
+		return 1;
+
+	const QString& sKey = QString::fromUtf8(pszKey);
+	if (::strcmp(pszType, LV2_ATOM_STRING_URI) == 0)
+	{
+		setConfig(sKey, QString::fromUtf8((const char *) value, (int) size - 1));//FIXME
+	}
+	else
+	{
+		QByteArray data = qCompress(QByteArray((const char *) value, size)).toBase64();
+		for (int i = data.size() - (data.size() % 72); i >= 0; i -= 72)
+			data.insert(i, "\n       "); // Indentation.
+		setConfig(sKey, data.constData());//FIXME
+		setConfigType(sKey, QString::fromUtf8(pszType));//FIXME
+	}
+	return 0;
+}
+
+
+const void *LV2PluginI::lv2_persist_retrieve (uint32_t key, size_t *size, uint32_t *type, uint32_t *flags )
+{
+	const char *pszKey = lv2_id_to_uri(key);
+	if (pszKey == NULL)
+		return NULL;
+
+	const QString& sKey = QString::fromUtf8(pszKey);
+	if (sKey.isEmpty())
+		return NULL;
+
+	QHash<QString, QByteArray>::ConstIterator iter = m_persist_configs.constFind(sKey);
+	if (iter == m_lv2_persist_configs.constEnd())
+		return NULL;
+
+	const QByteArray& data = iter.value();
+
+	if (size)
+		*size = data.size();
+	if (type)
+	{
+		QHash<QString, uint32_t>::ConstIterator ctype = m_lv2_persist_ctypes.constFind(sKey);
+		if (ctype != m_persist_ctypes.constEnd())
+			*type = ctype.value();
+		else
+			*type = lv2_uri_to_id(LV2_ATOM_STRING_URI);
+	}
+	if (flags)
+		*flags = LV2_PERSIST_IS_POD | LV2_PERSIST_IS_PORTABLE;
+
+	return data.constData();
+}*/
+
 bool LV2PluginI::setControl(const QString& s, double val)/*{{{*/
 {
 	for (int i = 0; i < controlPorts; ++i)
@@ -1827,9 +2042,9 @@ void LV2PluginI::writeConfiguration(int level, Xml& xml)/*{{{*/
 
 	for (int i = 0; i < controlPorts; ++i)
 	{
-		int idx = controls[i].idx;
+		//unsigned long idx = controls[i].idx;
 		QString s("control name=\"%1\" val=\"%2\" /");
-		xml.tag(level, s.arg(Xml::xmlString(m_plugin->portName(idx)).toLatin1().constData()).arg(controls[i].tmpVal).toLatin1().constData());
+		xml.tag(level, s.arg(Xml::xmlString(controls[i].name.c_str()).toLatin1().constData()).arg(controls[i].tmpVal).toLatin1().constData());
 	}
 	if (_on == false)
 		xml.intTag(level, "on", _on);
