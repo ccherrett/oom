@@ -313,7 +313,7 @@ public:
 };
 
 
-QIcon colorRect(const QColor& color, int width, int height)
+QIcon colorRect(const QColor& color, const QColor& color2, int width, int height)
 {
 	QPainter painter;
 	QPixmap image(width, height);
@@ -321,6 +321,37 @@ QIcon colorRect(const QColor& color, int width, int height)
 	painter.setBrush(color);
 	QRect rectangle(0, 0, width, height);
 	painter.drawRect(rectangle);
+	painter.setPen(color2);
+	painter.drawLine(0,(height/2)-1,width,(height/2)-1);
+	painter.drawLine(0,(height/2),width,(height/2));
+	painter.drawLine(0,(height/2)+1,width,(height/2)+1);
+
+	painter.drawLine((width/2)-12,(height/2)+15,(width/2)-12,(height/2)-15);
+	painter.drawLine((width/2)-13,(height/2)+15,(width/2)-13,(height/2)-15);
+	painter.drawLine((width/2)-14,(height/2)+15,(width/2)-14,(height/2)-15);
+	painter.drawLine((width/2)-18,(height/2)+5,(width/2)-18,(height/2)-5);
+	painter.drawLine((width/2)-19,(height/2)+5,(width/2)-19,(height/2)-5);
+	painter.drawLine((width/2)-20,(height/2)+10,(width/2)-20,(height/2)-10);
+	painter.drawLine((width/2)-23,(height/2)+20,(width/2)-23,(height/2)-20);
+	painter.drawLine((width/2)-24,(height/2)+10,(width/2)-24,(height/2)-10);
+	painter.drawLine((width/2)-25,(height/2)+5,(width/2)-25,(height/2)-5);
+
+	painter.drawLine((width/2)-5,(height/2)+15,(width/2)-5,(height/2)-15);
+	painter.drawLine((width/2)-6,(height/2)+15,(width/2)-6,(height/2)-15);
+	painter.drawLine((width/2)-7,(height/2)+15,(width/2)-7,(height/2)-15);
+	painter.drawLine((width/2)-8,(height/2)+5,(width/2)-8,(height/2)-5);
+	painter.drawLine((width/2)-9,(height/2)+5,(width/2)-9,(height/2)-5);
+	
+	painter.drawLine((width/2)+12,(height/2)+15,(width/2)+12,(height/2)-15);
+	painter.drawLine((width/2)+13,(height/2)+15,(width/2)+13,(height/2)-15);
+	painter.drawLine((width/2)+14,(height/2)+15,(width/2)+14,(height/2)-15);
+	painter.drawLine((width/2)+18,(height/2)+5,(width/2)+18,(height/2)-5);
+	painter.drawLine((width/2)+19,(height/2)+5,(width/2)+19,(height/2)-5);
+	painter.drawLine((width/2)+20,(height/2)+10,(width/2)+20,(height/2)-10);
+	painter.drawLine((width/2)+23,(height/2)+30,(width/2)+23,(height/2)-30);
+	painter.drawLine((width/2)+24,(height/2)+20,(width/2)+24,(height/2)-20);
+	painter.drawLine((width/2)+25,(height/2)+10,(width/2)+25,(height/2)-10);
+	
 	painter.end();
 	QIcon icon(image);
 	return icon;
@@ -1073,7 +1104,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	for (int i = 0; i < NUM_PARTCOLORS; ++i)
 	{
 		//ColorListItem* item = new ColorListItem(config.partColors[i], h, fontMetrics().height(), partColorNames[i]); //ddskrjo
-		QAction *act_color = colorPopup->addAction(colorRect(config.partWaveColors[i], 80, 80), config.partColorNames[i]);
+		QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), config.partColorNames[i]);
 		act_color->setData(20 + i);
 	}
 
