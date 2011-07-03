@@ -2360,24 +2360,18 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.drawRect(r);
 	}
 
-	//MidiPart* mp = 0;
-	//WavePart* wp = 0;
-	//Track::TrackType type = part->track()->type();
 	trackOffset += part->track()->height();
-	/*if (type == Track::WAVE)
-	{
-		wp = (WavePart*) part;
-	}
-	else
-	{
-		mp = (MidiPart*) part;
-	}*/
+	partColor.setAlpha(255);
+	partWaveColor.setAlpha(255);
 
 	if (wp)
 		drawWavePart(p, rect, wp, r);
 	else if (mp)
 	{
-		drawMidiPart(p, rect, mp->events(),(MidiTrack*)part->track(), r, mp->tick(), from, to);
+		if(part->selected())
+			drawMidiPart(p, rect, mp->events(),(MidiTrack*)part->track(), r, mp->tick(), from, to, partColor);
+		else
+			drawMidiPart(p, rect, mp->events(),(MidiTrack*)part->track(), r, mp->tick(), from, to, partWaveColor);
 	}
 
 	if (config.canvasShowPartType & 1)
@@ -2396,30 +2390,14 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.save();
 		p.setFont(config.fonts[1]);
 		p.setWorldMatrixEnabled(false);
-		partColor.setAlpha(255);
-		partWaveColor.setAlpha(255);
 		if(part->selected())
 		{
-			//if (wp)
-			//{
-				p.setPen(partColor);
-			//}
-			//else if (mp)
-			//{
-			//	p.setPen(partWaveColor);
-			//}
+			p.setPen(partColor);
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		else
 		{
-			//if (wp)
-			//{
-				p.setPen(partWaveColor);
-			//}
-			//else if (mp)
-			//{
-			//	p.setPen(partColor);
-			//}
+			p.setPen(partWaveColor);
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		p.drawText(rr, Qt::AlignBottom | Qt::AlignLeft, part->name());
@@ -2453,13 +2431,13 @@ void PartCanvas::drawMoving(QPainter& p, const CItem* item, const QRect&)
 	p.drawRect(item->mp().x(), item->mp().y(), item->width(), item->height());
 }
 
-void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to)
+void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to, QColor c)
 {
 	if (config.canvasShowPartType & 2) {      // show events
 		// Do not allow this, causes segfault.
 		if(from <= to)
 		{
-			p.setPen(Qt::darkGray);
+			p.setPen(c);
 			//EventList* events = mp->events();
 			iEvent ito(events->lower_bound(to));
 
@@ -2482,7 +2460,7 @@ void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, Midi
 	}
 	else
 	{      // show Cakewalk Style
-		p.setPen(Qt::darkGray);
+		p.setPen(c);
 		iEvent ito(events->lower_bound(to));
 
 		for (iEvent i = events->begin(); i != ito; ++i)
@@ -4209,7 +4187,8 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 						}
 					}
 				}
-				drawMidiPart(p, rect, &newEventList, mt, partRect, startPos, 0, (song->cpos() - startPos));
+				QColor c(0,0,0);
+				drawMidiPart(p, rect, &newEventList, mt, partRect, startPos, 0, (song->cpos() - startPos), c);
 			}
 		}
     }
