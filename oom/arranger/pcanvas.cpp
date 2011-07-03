@@ -2321,35 +2321,42 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	else if (part->selected())
 	{
 		bool clone = part->events()->arefCount() > 1;
+		//if (wp)
+		//{
 		if (wp)
-		{
 			p.setPen(Qt::NoPen);
-			partColor.setAlpha(150);
-			p.setBrush(partWaveColor);
-		}
-		else if (mp)
+		else if(mp)
+			p.setPen(partColor);
+		
+		partWaveColor.setAlpha(150);
+		p.setBrush(partWaveColor);
+		//}
+		/*else if (mp)
 		{
-			partWaveColor.setAlpha(150);
+			partColor.setAlpha(150);
 			p.setBrush(partColor);
 			p.setPen(partWaveColor);
-		}
+		}*/
 		p.drawRect(r);
 	}
 	else
 	{
 		bool clone = part->events()->arefCount() > 1;
+		
 		if (wp)
-		{
 			p.setPen(Qt::NoPen);
-			partColor.setAlpha(150);
-			p.setBrush(partColor);
-		}
+		else if(mp)
+			p.setPen(partWaveColor);
+			
+		partColor.setAlpha(150);
+		p.setBrush(partColor);
+		/*}
 		else if (mp)
 		{
 			partWaveColor.setAlpha(150);
 			p.setBrush(partWaveColor);
 			p.setPen(partColor);
-		}
+		}*/
 		p.drawRect(r);
 	}
 
@@ -2393,26 +2400,26 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		partWaveColor.setAlpha(255);
 		if(part->selected())
 		{
-			if (wp)
-			{
+			//if (wp)
+			//{
 				p.setPen(partColor);
-			}
-			else if (mp)
-			{
-				p.setPen(partWaveColor);
-			}
+			//}
+			//else if (mp)
+			//{
+			//	p.setPen(partWaveColor);
+			//}
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		else
 		{
-			if (wp)
-			{
+			//if (wp)
+			//{
 				p.setPen(partWaveColor);
-			}
-			else if (mp)
-			{
-				p.setPen(partColor);
-			}
+			//}
+			//else if (mp)
+			//{
+			//	p.setPen(partColor);
+			//}
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		p.drawText(rr, Qt::AlignBottom | Qt::AlignLeft, part->name());
