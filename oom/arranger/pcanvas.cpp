@@ -2250,6 +2250,23 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 
 	//printf("from %d to %d\n", from,to);
 	Part* part = ((NPart*) item)->part();
+	
+	MidiPart* mp = 0;
+	WavePart* wp = 0;
+	Track::TrackType type = part->track()->type();
+	if (type == Track::WAVE)
+	{
+		wp = (WavePart*) part;
+	}
+	else
+	{
+		mp = (MidiPart*) part;
+	}
+	
+	int i = part->colorIndex();
+	QColor partWaveColor(config.partWaveColors[i]);
+	QColor partColor(config.partColors[i]);
+	
 	int pTick = part->tick();
 	from -= pTick;
 	to -= pTick;
@@ -2274,8 +2291,8 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	//  rect.x(), rect.y(), rect.width(), rect.height(),
 	//  r.x(), r.y(), r.width(), r.height());
 
-	int i = part->colorIndex();
 	p.setPen(Qt::black);
+	//p.setPen(Qt::NoPen);
 	if (part->mute())
 	{
 		QColor c(Qt::white);
@@ -2304,53 +2321,50 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	else if (part->selected())
 	{
 		bool clone = part->events()->arefCount() > 1;
-
-		// NOTE: For one-pixel border use first line and don't bother with setCosmetic.
-		//       For a two-pixel border use second line and MUST use setCosmetic! Tim.
-		//p.setPen(QPen(config.partColors[i], 0, clone ? Qt::DashLine : Qt::SolidLine));
-		QPen pen(config.partColors[i], 2, clone ? Qt::DashLine : Qt::SolidLine);
-		pen.setCosmetic(true);
-
-		p.setPen(pen);
-		// Hm, put some kind of lower limit? If so do that globally to the adjustment.
-		//QColor c(0,0,0,150);
-		QColor c(config.partWaveColors[i]);
-		c.setAlpha(150);
-		//c.setAlpha(config.globalAlphaBlend);
-		p.setBrush(c);
+		if (wp)
+		{
+			p.setPen(Qt::NoPen);
+			partColor.setAlpha(150);
+			p.setBrush(partWaveColor);
+		}
+		else if (mp)
+		{
+			partWaveColor.setAlpha(150);
+			p.setBrush(partColor);
+			p.setPen(partWaveColor);
+		}
 		p.drawRect(r);
 	}
 	else
 	{
 		bool clone = part->events()->arefCount() > 1;
-
-		// NOTE: Pixel width: See above note.
-		//p.setPen(QPen(Qt::black, 0, clone ? Qt::DashLine : Qt::SolidLine));
-		QPen pen(Qt::black, 2, clone ? Qt::DashLine : Qt::SolidLine);
-		pen.setCosmetic(true);
-
-		p.setPen(pen);
-		QColor c(config.partColors[i]);
-		//c.setAlpha(config.globalAlphaBlend);
-		c.setAlpha(150);
-		p.setBrush(c);
-		//p.setBrush(QColor(211,193,224,150));
-
+		if (wp)
+		{
+			p.setPen(Qt::NoPen);
+			partColor.setAlpha(150);
+			p.setBrush(partColor);
+		}
+		else if (mp)
+		{
+			partWaveColor.setAlpha(150);
+			p.setBrush(partWaveColor);
+			p.setPen(partColor);
+		}
 		p.drawRect(r);
 	}
 
-	MidiPart* mp = 0;
-	WavePart* wp = 0;
-	Track::TrackType type = part->track()->type();
+	//MidiPart* mp = 0;
+	//WavePart* wp = 0;
+	//Track::TrackType type = part->track()->type();
 	trackOffset += part->track()->height();
-	if (type == Track::WAVE)
+	/*if (type == Track::WAVE)
 	{
 		wp = (WavePart*) part;
 	}
 	else
 	{
 		mp = (MidiPart*) part;
-	}
+	}*/
 
 	if (wp)
 		drawWavePart(p, rect, wp, r);
@@ -2375,14 +2389,30 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.save();
 		p.setFont(config.fonts[1]);
 		p.setWorldMatrixEnabled(false);
+		partColor.setAlpha(255);
+		partWaveColor.setAlpha(255);
 		if(part->selected())
 		{
-			p.setPen(QColor(66,202,230,127));
+			if (wp)
+			{
+				p.setPen(partColor);
+			}
+			else if (mp)
+			{
+				p.setPen(partWaveColor);
+			}
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		else
 		{
-			p.setPen(QColor(255,255,255,127));
+			if (wp)
+			{
+				p.setPen(partWaveColor);
+			}
+			else if (mp)
+			{
+				p.setPen(partColor);
+			}
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		p.drawText(rr, Qt::AlignBottom | Qt::AlignLeft, part->name());
