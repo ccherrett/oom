@@ -2331,29 +2331,20 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.setBrush(c);
 
 		// NOTE: For one-pixel border use first line For two-pixel border use second.
-		p.drawRect(QRect(r.x(), r.y() - 1, r.width(), r.height()));
+		p.drawRect(QRect(r.x(), r.y(), r.width(), r.height()-1));
 		//p.drawRect(r);
 
 		return;
 	}
-	if (item->isMoving())
+	if(item->isMoving())
 	{
 		QColor c(Qt::gray);
 		c.setAlpha(config.globalAlphaBlend);
 		p.setBrush(c);
-
-		// NOTE: For one-pixel border use first line. For two-pixel border use second.
-		p.drawRect(QRect(r.x(), r.y() - 1, r.width(), r.height()));
-		//p.drawRect(r);
-
 	}
-		//else if (part->mute())
-		//      return;
 	else if (part->selected())
 	{
 		bool clone = part->events()->arefCount() > 1;
-		//if (wp)
-		//{
 		if (wp)
 			p.setPen(Qt::NoPen);
 		else if(mp)
@@ -2361,14 +2352,6 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		
 		partWaveColor.setAlpha(150);
 		p.setBrush(partWaveColor);
-		//}
-		/*else if (mp)
-		{
-			partColor.setAlpha(150);
-			p.setBrush(partColor);
-			p.setPen(partWaveColor);
-		}*/
-		p.drawRect(r);
 	}
 	else
 	{
@@ -2381,15 +2364,8 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 			
 		partColor.setAlpha(150);
 		p.setBrush(partColor);
-		/*}
-		else if (mp)
-		{
-			partWaveColor.setAlpha(150);
-			p.setBrush(partWaveColor);
-			p.setPen(partColor);
-		}*/
-		p.drawRect(r);
 	}
+	p.drawRect(QRect(r.x(), r.y(), r.width(), mp ? r.height()-2 : r.height()-1));
 
 	trackOffset += part->track()->height();
 	partColor.setAlpha(255);
@@ -2418,6 +2394,7 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 			p.setPen(Qt::black); /* otherwise use black */
 		QRect rr = map(r);
 		rr.setX(rr.x() + 3);
+		rr.setHeight(rr.height()-2);
 		p.save();
 		p.setFont(config.fonts[1]);
 		p.setWorldMatrixEnabled(false);
