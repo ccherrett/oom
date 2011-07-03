@@ -30,13 +30,13 @@ GlobalConfigValues config = {
 	},
 	{
 		QColor(175,235,255), // part colors partColor0
-		QColor(210,203,219), // partColor1
-		QColor(195,193,169), // partColor2
-		QColor(61, 55, 61), // partColor3
-		QColor(61, 61, 55), // partColor4
-		QColor(25, 53, 59), // partColor5
-		QColor(34, 59, 25), // partColor6
-		QColor(58, 59, 25), // partColor7
+		QColor(239,225,214), // partColor1
+		QColor(219,189,135), // partColor2
+		QColor(233,226,248), // partColor3
+		QColor(211,225,210), // partColor4
+		QColor(245,233,234), // partColor5
+		QColor(201,212,242), // partColor6
+		QColor(228,221,202), // partColor7
 		QColor(25, 59, 51), // partColor8
 		QColor(47, 25, 59), // partColor9
 		QColor(59, 25, 25), // partColor10
@@ -49,13 +49,13 @@ GlobalConfigValues config = {
 	},
 	{
 		QColor(1,53,70), // part colors partWaveColor0
-		QColor(74,57,96), // partWaveColor1
-		QColor(67,76,38), // partWaveColor2
-		QColor(0, 55, 61), // partWaveColor3
-		QColor(0, 61, 55), // partWaveColor4
-		QColor(0, 53, 59), // partWaveColor5
-		QColor(0, 59, 25), // partWaveColor6
-		QColor(0, 59, 25), // partWaveColor7
+		QColor(66,16,15), // partWaveColor1
+		QColor(130,65,27), // partWaveColor2
+		QColor(78,69,96), // partWaveColor3
+		QColor(36,46,35), // partWaveColor4
+		QColor(90,99,79), // partWaveColor5
+		QColor(16,26,64), // partWaveColor6
+		QColor(67,81,88), // partWaveColor7
 		QColor(0, 59, 51), // partWaveColor8
 		QColor(0, 25, 59), // partWaveColor9
 		QColor(0, 25, 25), // partWaveColor10
