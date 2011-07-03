@@ -29,9 +29,9 @@ GlobalConfigValues config = {
 		QColor(0xff, 0xff, 0xff)
 	},
 	{
-		QColor(43, 49, 51), // part colors partColor0
-		QColor(55, 61, 55), // partColor1
-		QColor(61, 55, 55), // partColor2
+		QColor(175,235,255), // part colors partColor0
+		QColor(210,203,219), // partColor1
+		QColor(195,193,169), // partColor2
 		QColor(61, 55, 61), // partColor3
 		QColor(61, 61, 55), // partColor4
 		QColor(25, 53, 59), // partColor5
@@ -46,6 +46,25 @@ GlobalConfigValues config = {
 		QColor(88, 17, 87), // partColor14
 		QColor(88, 84, 17), // partColor15
 		QColor(2, 128, 121) // partColor16
+	},
+	{
+		QColor(1,53,70), // part colors partWaveColor0
+		QColor(74,57,96), // partWaveColor1
+		QColor(67,76,38), // partWaveColor2
+		QColor(0, 55, 61), // partWaveColor3
+		QColor(0, 61, 55), // partWaveColor4
+		QColor(0, 53, 59), // partWaveColor5
+		QColor(0, 59, 25), // partWaveColor6
+		QColor(0, 59, 25), // partWaveColor7
+		QColor(0, 59, 51), // partWaveColor8
+		QColor(0, 25, 59), // partWaveColor9
+		QColor(0, 25, 25), // partWaveColor10
+		QColor(0, 74, 88), // partWaveColor11
+		QColor(0, 17, 17), // partWaveColor12
+		QColor(0, 88, 19), // partWaveColor13
+		QColor(0, 17, 87), // partWaveColor14
+		QColor(0, 84, 17), // partWaveColor15
+		QColor(0, 128, 121) // partWaveColor16
 	},
 	{
 		QString("Default"), // Default part color names

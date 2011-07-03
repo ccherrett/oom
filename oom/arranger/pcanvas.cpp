@@ -2313,7 +2313,9 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 
 		p.setPen(pen);
 		// Hm, put some kind of lower limit? If so do that globally to the adjustment.
-		QColor c(0,0,0,150);
+		//QColor c(0,0,0,150);
+		QColor c(config.partWaveColors[i]);
+		c.setAlpha(150);
 		//c.setAlpha(config.globalAlphaBlend);
 		p.setBrush(c);
 		p.drawRect(r);
@@ -2331,8 +2333,8 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		QColor c(config.partColors[i]);
 		//c.setAlpha(config.globalAlphaBlend);
 		c.setAlpha(150);
-		//p.setBrush(c);
-		p.setBrush(QColor(211,193,224,150));
+		p.setBrush(c);
+		//p.setBrush(QColor(211,193,224,150));
 
 		p.drawRect(r);
 	}
@@ -2481,6 +2483,8 @@ void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, Midi
 
 void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const QRect& _pr)
 {
+	int i = wp->colorIndex();
+	QColor waveFill(config.partWaveColors[i]);
 	//printf("PartCanvas::drawWavePart bb.x:%d bb.y:%d bb.w:%d bb.h:%d  pr.x:%d pr.y:%d pr.w:%d pr.h:%d\n",
 	//  bb.x(), bb.y(), bb.width(), bb.height(), _pr.x(), _pr.y(), _pr.width(), _pr.height());
 	//QColor green = QColor(143, 75, 236);
@@ -2500,7 +2504,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	//QColor waveEdge = QColor(123,105,150);
 	//QColor waveFill = QColor(198,160,253);
 	QColor waveEdge = QColor(211,193,224);
-	QColor waveFill = QColor(62,41,77);
+	//QColor waveFill = QColor(62,41,77);
 	
 	p.setPen(QColor(255,0,0));
 
@@ -2513,7 +2517,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	{
 		green = QColor(219, 168, 79);
 		rms_color = QColor(0,19,23);
-		waveFill = QColor(215,215,215);
+		//waveFill = QColor(215,215,215);
+		waveFill = QColor(config.partColors[i]);
+		//waveFill.setAlpha(150);
 		//waveFill = QColor(253,199,103);
 		waveEdge = QColor(215,215,215);
 	}
