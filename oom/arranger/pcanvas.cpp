@@ -2331,7 +2331,8 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		QColor c(config.partColors[i]);
 		//c.setAlpha(config.globalAlphaBlend);
 		c.setAlpha(150);
-		p.setBrush(c);
+		//p.setBrush(c);
+		p.setBrush(QColor(211,193,224,150));
 
 		p.drawRect(r);
 	}
@@ -2498,8 +2499,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	int stereoTwoFirstIn = 1;
 	//QColor waveEdge = QColor(123,105,150);
 	//QColor waveFill = QColor(198,160,253);
-	QColor waveEdge = QColor(131,208,149);
-	QColor waveFill = QColor(159,255,182);
+	QColor waveEdge = QColor(211,193,224);
+	QColor waveFill = QColor(62,41,77);
 	
 	p.setPen(QColor(255,0,0));
 
@@ -2512,9 +2513,9 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	{
 		green = QColor(219, 168, 79);
 		rms_color = QColor(0,19,23);
-		waveFill = QColor(0,48,58);
+		waveFill = QColor(215,215,215);
 		//waveFill = QColor(253,199,103);
-		waveEdge = QColor(0,171,208);
+		waveEdge = QColor(215,215,215);
 	}
 	
 	if (_tool == AutomationTool)
@@ -2715,8 +2716,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				m_monoPolygonTop.append(QPointF(i, y));
 				m_monoPolygonBottom.append(QPointF(i, y));
 				
-				p.setPen(waveEdge);//this is the outline of the wave
-				//p.setPen(Qt::NoPen);//this is the outline of the wave
+				//p.setPen(waveEdge);//this is the outline of the wave
+				p.setPen(Qt::NoPen);//this is the outline of the wave
 				p.setBrush(waveFill);//waveFill);//this is the fill color of the wave
 				
 				//p.setBrush(QBrush(vuGradTop));//waveFill);//this is the fill color of the wave
@@ -2897,8 +2898,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				m_stereoTwoPolygonTop.append(QPointF(i, stereoTwoY));
 				m_stereoTwoPolygonBottom.append(QPointF(i, stereoTwoY));
 				
-				p.setPen(waveEdge);//this is the outline of the wave
-				//p.setPen(Qt::NoPen);//this is the outline of the wave
+				//p.setPen(waveEdge);//this is the outline of the wave
+				p.setPen(Qt::NoPen);//this is the outline of the wave
 				p.setBrush(waveFill);//this is the fill color of the wave
 				
 				p.drawPolygon(m_stereoOnePolygonTop);
