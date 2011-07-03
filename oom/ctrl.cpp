@@ -20,7 +20,7 @@
 
 void CtrlList::initColor(int i)
 {
-	QColor collist[] = { QColor(219,0,93),
+	QColor collist[] = { QColor(255,90,0),
 						 QColor(0,219,5), 
 						 QColor(219,0,0), 
 						 QColor(0,219,216), 

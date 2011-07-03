@@ -11,6 +11,7 @@
 #include "song.h"
 #include "canvas.h"
 #include "trackautomationview.h"
+#include <QHash>
 
 class QDragMoveEvent;
 class QDropEvent;
