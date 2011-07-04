@@ -313,7 +313,7 @@ public:
 };
 
 
-QIcon colorRect(const QColor& color, int width, int height)
+QIcon colorRect(const QColor& color, const QColor& color2, int width, int height)
 {
 	QPainter painter;
 	QPixmap image(width, height);
@@ -321,6 +321,37 @@ QIcon colorRect(const QColor& color, int width, int height)
 	painter.setBrush(color);
 	QRect rectangle(0, 0, width, height);
 	painter.drawRect(rectangle);
+	painter.setPen(color2);
+	painter.drawLine(0,(height/2)-1,width,(height/2)-1);
+	painter.drawLine(0,(height/2),width,(height/2));
+	painter.drawLine(0,(height/2)+1,width,(height/2)+1);
+
+	painter.drawLine((width/2)-12,(height/2)+15,(width/2)-12,(height/2)-15);
+	painter.drawLine((width/2)-13,(height/2)+15,(width/2)-13,(height/2)-15);
+	painter.drawLine((width/2)-14,(height/2)+15,(width/2)-14,(height/2)-15);
+	painter.drawLine((width/2)-18,(height/2)+5,(width/2)-18,(height/2)-5);
+	painter.drawLine((width/2)-19,(height/2)+5,(width/2)-19,(height/2)-5);
+	painter.drawLine((width/2)-20,(height/2)+10,(width/2)-20,(height/2)-10);
+	painter.drawLine((width/2)-23,(height/2)+20,(width/2)-23,(height/2)-20);
+	painter.drawLine((width/2)-24,(height/2)+10,(width/2)-24,(height/2)-10);
+	painter.drawLine((width/2)-25,(height/2)+5,(width/2)-25,(height/2)-5);
+
+	painter.drawLine((width/2)-5,(height/2)+15,(width/2)-5,(height/2)-15);
+	painter.drawLine((width/2)-6,(height/2)+15,(width/2)-6,(height/2)-15);
+	painter.drawLine((width/2)-7,(height/2)+15,(width/2)-7,(height/2)-15);
+	painter.drawLine((width/2)-8,(height/2)+5,(width/2)-8,(height/2)-5);
+	painter.drawLine((width/2)-9,(height/2)+5,(width/2)-9,(height/2)-5);
+	
+	painter.drawLine((width/2)+12,(height/2)+15,(width/2)+12,(height/2)-15);
+	painter.drawLine((width/2)+13,(height/2)+15,(width/2)+13,(height/2)-15);
+	painter.drawLine((width/2)+14,(height/2)+15,(width/2)+14,(height/2)-15);
+	painter.drawLine((width/2)+18,(height/2)+5,(width/2)+18,(height/2)-5);
+	painter.drawLine((width/2)+19,(height/2)+5,(width/2)+19,(height/2)-5);
+	painter.drawLine((width/2)+20,(height/2)+10,(width/2)+20,(height/2)-10);
+	painter.drawLine((width/2)+23,(height/2)+30,(width/2)+23,(height/2)-30);
+	painter.drawLine((width/2)+24,(height/2)+20,(width/2)+24,(height/2)-20);
+	painter.drawLine((width/2)+25,(height/2)+10,(width/2)+25,(height/2)-10);
+	
 	painter.end();
 	QIcon icon(image);
 	return icon;
@@ -1073,7 +1104,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	for (int i = 0; i < NUM_PARTCOLORS; ++i)
 	{
 		//ColorListItem* item = new ColorListItem(config.partColors[i], h, fontMetrics().height(), partColorNames[i]); //ddskrjo
-		QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], 80, 80), config.partColorNames[i]);
+		QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), config.partColorNames[i]);
 		act_color->setData(20 + i);
 	}
 
@@ -2250,6 +2281,23 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 
 	//printf("from %d to %d\n", from,to);
 	Part* part = ((NPart*) item)->part();
+	
+	MidiPart* mp = 0;
+	WavePart* wp = 0;
+	Track::TrackType type = part->track()->type();
+	if (type == Track::WAVE)
+	{
+		wp = (WavePart*) part;
+	}
+	else
+	{
+		mp = (MidiPart*) part;
+	}
+	
+	int i = part->colorIndex();
+	QColor partWaveColor(config.partWaveColors[i]);
+	QColor partColor(config.partColors[i]);
+	
 	int pTick = part->tick();
 	from -= pTick;
 	to -= pTick;
@@ -2274,8 +2322,8 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	//  rect.x(), rect.y(), rect.width(), rect.height(),
 	//  r.x(), r.y(), r.width(), r.height());
 
-	int i = part->colorIndex();
 	p.setPen(Qt::black);
+	//p.setPen(Qt::NoPen);
 	if (part->mute())
 	{
 		QColor c(Qt::white);
@@ -2283,77 +2331,54 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.setBrush(c);
 
 		// NOTE: For one-pixel border use first line For two-pixel border use second.
-		p.drawRect(QRect(r.x(), r.y() - 1, r.width(), r.height()));
+		p.drawRect(QRect(r.x(), r.y(), r.width(), r.height()-1));
 		//p.drawRect(r);
 
 		return;
 	}
-	if (item->isMoving())
+	if(item->isMoving())
 	{
 		QColor c(Qt::gray);
 		c.setAlpha(config.globalAlphaBlend);
 		p.setBrush(c);
-
-		// NOTE: For one-pixel border use first line. For two-pixel border use second.
-		p.drawRect(QRect(r.x(), r.y() - 1, r.width(), r.height()));
-		//p.drawRect(r);
-
 	}
-		//else if (part->mute())
-		//      return;
 	else if (part->selected())
 	{
 		bool clone = part->events()->arefCount() > 1;
-
-		// NOTE: For one-pixel border use first line and don't bother with setCosmetic.
-		//       For a two-pixel border use second line and MUST use setCosmetic! Tim.
-		//p.setPen(QPen(config.partColors[i], 0, clone ? Qt::DashLine : Qt::SolidLine));
-		QPen pen(config.partColors[i], 2, clone ? Qt::DashLine : Qt::SolidLine);
-		pen.setCosmetic(true);
-
-		p.setPen(pen);
-		// Hm, put some kind of lower limit? If so do that globally to the adjustment.
-		QColor c(0,0,0,150);
-		//c.setAlpha(config.globalAlphaBlend);
-		p.setBrush(c);
-		p.drawRect(r);
+		if (wp)
+			p.setPen(Qt::NoPen);
+		else if(mp)
+			p.setPen(partColor);
+		
+		partWaveColor.setAlpha(150);
+		p.setBrush(partWaveColor);
 	}
 	else
 	{
 		bool clone = part->events()->arefCount() > 1;
-
-		// NOTE: Pixel width: See above note.
-		//p.setPen(QPen(Qt::black, 0, clone ? Qt::DashLine : Qt::SolidLine));
-		QPen pen(Qt::black, 2, clone ? Qt::DashLine : Qt::SolidLine);
-		pen.setCosmetic(true);
-
-		p.setPen(pen);
-		QColor c(config.partColors[i]);
-		//c.setAlpha(config.globalAlphaBlend);
-		c.setAlpha(150);
-		p.setBrush(c);
-
-		p.drawRect(r);
+		
+		if (wp)
+			p.setPen(Qt::NoPen);
+		else if(mp)
+			p.setPen(partWaveColor);
+			
+		partColor.setAlpha(150);
+		p.setBrush(partColor);
 	}
+	p.drawRect(QRect(r.x(), r.y(), r.width(), mp ? r.height()-2 : r.height()-1));
 
-	MidiPart* mp = 0;
-	WavePart* wp = 0;
-	Track::TrackType type = part->track()->type();
 	trackOffset += part->track()->height();
-	if (type == Track::WAVE)
-	{
-		wp = (WavePart*) part;
-	}
-	else
-	{
-		mp = (MidiPart*) part;
-	}
+	partColor.setAlpha(255);
+	partWaveColor.setAlpha(255);
 
 	if (wp)
 		drawWavePart(p, rect, wp, r);
 	else if (mp)
 	{
-		drawMidiPart(p, rect, mp->events(),(MidiTrack*)part->track(), r, mp->tick(), from, to);
+		if(part->selected())
+			drawMidiPart(p, rect, mp->events(),(MidiTrack*)part->track(), r, mp->tick(), from, to, partColor);
+		else
+			drawMidiPart(p, rect, mp->events(),(MidiTrack*)part->track(), r, mp->tick(), from, to, partWaveColor);
 	}
 
 	if (config.canvasShowPartType & 1)
@@ -2369,17 +2394,18 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 			p.setPen(Qt::black); /* otherwise use black */
 		QRect rr = map(r);
 		rr.setX(rr.x() + 3);
+		rr.setHeight(rr.height()-2);
 		p.save();
 		p.setFont(config.fonts[1]);
 		p.setWorldMatrixEnabled(false);
 		if(part->selected())
 		{
-			p.setPen(QColor(66,202,230,127));
+			p.setPen(partColor);
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		else
 		{
-			p.setPen(QColor(255,255,255,127));
+			p.setPen(partWaveColor);
 			p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		}
 		p.drawText(rr, Qt::AlignBottom | Qt::AlignLeft, part->name());
@@ -2413,13 +2439,13 @@ void PartCanvas::drawMoving(QPainter& p, const CItem* item, const QRect&)
 	p.drawRect(item->mp().x(), item->mp().y(), item->width(), item->height());
 }
 
-void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to)
+void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to, QColor c)
 {
 	if (config.canvasShowPartType & 2) {      // show events
 		// Do not allow this, causes segfault.
 		if(from <= to)
 		{
-			p.setPen(Qt::darkGray);
+			p.setPen(c);
 			//EventList* events = mp->events();
 			iEvent ito(events->lower_bound(to));
 
@@ -2442,7 +2468,7 @@ void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, Midi
 	}
 	else
 	{      // show Cakewalk Style
-		p.setPen(Qt::darkGray);
+		p.setPen(c);
 		iEvent ito(events->lower_bound(to));
 
 		for (iEvent i = events->begin(); i != ito; ++i)
@@ -2480,6 +2506,8 @@ void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, Midi
 
 void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const QRect& _pr)
 {
+	int i = wp->colorIndex();
+	QColor waveFill(config.partWaveColors[i]);
 	//printf("PartCanvas::drawWavePart bb.x:%d bb.y:%d bb.w:%d bb.h:%d  pr.x:%d pr.y:%d pr.w:%d pr.h:%d\n",
 	//  bb.x(), bb.y(), bb.width(), bb.height(), _pr.x(), _pr.y(), _pr.width(), _pr.height());
 	//QColor green = QColor(143, 75, 236);
@@ -2498,8 +2526,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	int stereoTwoFirstIn = 1;
 	//QColor waveEdge = QColor(123,105,150);
 	//QColor waveFill = QColor(198,160,253);
-	QColor waveEdge = QColor(131,208,149);
-	QColor waveFill = QColor(159,255,182);
+	QColor waveEdge = QColor(211,193,224);
+	//QColor waveFill = QColor(62,41,77);
 	
 	p.setPen(QColor(255,0,0));
 
@@ -2512,9 +2540,11 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	{
 		green = QColor(219, 168, 79);
 		rms_color = QColor(0,19,23);
-		waveFill = QColor(0,48,58);
+		//waveFill = QColor(215,215,215);
+		waveFill = QColor(config.partColors[i]);
+		//waveFill.setAlpha(150);
 		//waveFill = QColor(253,199,103);
-		waveEdge = QColor(0,171,208);
+		waveEdge = QColor(215,215,215);
 	}
 	
 	if (_tool == AutomationTool)
@@ -2715,8 +2745,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				m_monoPolygonTop.append(QPointF(i, y));
 				m_monoPolygonBottom.append(QPointF(i, y));
 				
-				p.setPen(waveEdge);//this is the outline of the wave
-				//p.setPen(Qt::NoPen);//this is the outline of the wave
+				//p.setPen(waveEdge);//this is the outline of the wave
+				p.setPen(Qt::NoPen);//this is the outline of the wave
 				p.setBrush(waveFill);//waveFill);//this is the fill color of the wave
 				
 				//p.setBrush(QBrush(vuGradTop));//waveFill);//this is the fill color of the wave
@@ -2897,8 +2927,8 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 				m_stereoTwoPolygonTop.append(QPointF(i, stereoTwoY));
 				m_stereoTwoPolygonBottom.append(QPointF(i, stereoTwoY));
 				
-				p.setPen(waveEdge);//this is the outline of the wave
-				//p.setPen(Qt::NoPen);//this is the outline of the wave
+				//p.setPen(waveEdge);//this is the outline of the wave
+				p.setPen(Qt::NoPen);//this is the outline of the wave
 				p.setBrush(waveFill);//this is the fill color of the wave
 				
 				p.drawPolygon(m_stereoOnePolygonTop);
@@ -4165,7 +4195,8 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 						}
 					}
 				}
-				drawMidiPart(p, rect, &newEventList, mt, partRect, startPos, 0, (song->cpos() - startPos));
+				QColor c(0,0,0);
+				drawMidiPart(p, rect, &newEventList, mt, partRect, startPos, 0, (song->cpos() - startPos), c);
 			}
 		}
     }

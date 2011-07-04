@@ -29,14 +29,14 @@ GlobalConfigValues config = {
 		QColor(0xff, 0xff, 0xff)
 	},
 	{
-		QColor(43, 49, 51), // part colors partColor0
-		QColor(55, 61, 55), // partColor1
-		QColor(61, 55, 55), // partColor2
-		QColor(61, 55, 61), // partColor3
-		QColor(61, 61, 55), // partColor4
-		QColor(25, 53, 59), // partColor5
-		QColor(34, 59, 25), // partColor6
-		QColor(58, 59, 25), // partColor7
+		QColor(175,235,255), // part colors partColor0
+		QColor(239,225,214), // partColor1
+		QColor(219,189,135), // partColor2
+		QColor(233,226,248), // partColor3
+		QColor(211,225,210), // partColor4
+		QColor(245,233,234), // partColor5
+		QColor(201,212,242), // partColor6
+		QColor(228,221,202), // partColor7
 		QColor(25, 59, 51), // partColor8
 		QColor(47, 25, 59), // partColor9
 		QColor(59, 25, 25), // partColor10
@@ -48,14 +48,33 @@ GlobalConfigValues config = {
 		QColor(2, 128, 121) // partColor16
 	},
 	{
-		QString("Default"), // Default part color names
-		QString("Color 2"),
-		QString("Color 3"),
-		QString("Color 4"),
-		QString("Color 5"),
-		QString("Color 6"),
-		QString("Color 7"),
-		QString("Color 8"),
+		QColor(1,53,70), // part colors partWaveColor0
+		QColor(66,16,15), // partWaveColor1
+		QColor(130,65,27), // partWaveColor2
+		QColor(78,69,96), // partWaveColor3
+		QColor(36,46,35), // partWaveColor4
+		QColor(90,99,79), // partWaveColor5
+		QColor(16,26,64), // partWaveColor6
+		QColor(67,81,88), // partWaveColor7
+		QColor(0, 59, 51), // partWaveColor8
+		QColor(0, 25, 59), // partWaveColor9
+		QColor(0, 25, 25), // partWaveColor10
+		QColor(0, 74, 88), // partWaveColor11
+		QColor(0, 17, 17), // partWaveColor12
+		QColor(0, 88, 19), // partWaveColor13
+		QColor(0, 17, 87), // partWaveColor14
+		QColor(0, 84, 17), // partWaveColor15
+		QColor(0, 128, 121) // partWaveColor16
+	},
+	{
+		QString("OOM"), // Default part color names
+		QString("Burgundy Berry"),
+		QString("Pumpkin Spice"),
+		QString("Lavender Linen"),
+		QString("Mint"),
+		QString("-----"),
+		QString("Evening Blue"),
+		QString("Sea and Sand"),
 		QString("Color 9"),
 		QString("Color 10"),
 		QString("Color 11"),
