@@ -29,42 +29,44 @@ GlobalConfigValues config = {
 		QColor(0xff, 0xff, 0xff)
 	},
 	{
-		QColor(175,235,255), // part colors partColor0
-		QColor(239,225,214), // partColor1
-		QColor(219,189,135), // partColor2
-		QColor(233,226,248), // partColor3
-		QColor(211,225,210), // partColor4
-		QColor(245,233,234), // partColor5
-		QColor(201,212,242), // partColor6
-		QColor(228,221,202), // partColor7
-		QColor(25, 59, 51), // partColor8
-		QColor(47, 25, 59), // partColor9
-		QColor(59, 25, 25), // partColor10
-		QColor(17, 74, 88), // partColor11
-		QColor(88, 17, 17), // partColor12
-		QColor(17, 88, 19), // partColor13
-		QColor(88, 17, 87), // partColor14
-		QColor(88, 84, 17), // partColor15
-		QColor(2, 128, 121) // partColor16
+		QColor(175,235,255), // OOM Part Color 
+		QColor(239,225,214), // Burgundy Berry
+		QColor(219,189,135), // Pumpkin Spice
+		QColor(233,226,248), // Lavender Linen
+		QColor(211,225,210), // Mint
+		QColor(245,233,234), // -----
+		QColor(201,212,242), // Evening Blue
+		QColor(228,221,202), // Sea and Sand
+		QColor(231,206,213), // Cranberry Frosting
+		QColor(220,207,232), // Grape Frosting
+		QColor(207,207,232), // Blueberry Frosting
+		QColor(205,230,225), // Matcha Frosting
+		QColor(206,231,209), // Green Apple Frosting
+		QColor(230,216,205), // Mochaccino Frosting
+		QColor(145,255,115), // Key Lime Splash
+		QColor(252,253,154), // Lemon Splash
+		QColor(145,255,249), // Saltwater Splash
+		QColor(255,198,250)  // Wendy Cherrett
 	},
 	{
-		QColor(1,53,70), // part colors partWaveColor0
-		QColor(66,16,15), // partWaveColor1
-		QColor(130,65,27), // partWaveColor2
-		QColor(78,69,96), // partWaveColor3
-		QColor(36,46,35), // partWaveColor4
-		QColor(90,99,79), // partWaveColor5
-		QColor(16,26,64), // partWaveColor6
-		QColor(67,81,88), // partWaveColor7
-		QColor(0, 59, 51), // partWaveColor8
-		QColor(0, 25, 59), // partWaveColor9
-		QColor(0, 25, 25), // partWaveColor10
-		QColor(0, 74, 88), // partWaveColor11
-		QColor(0, 17, 17), // partWaveColor12
-		QColor(0, 88, 19), // partWaveColor13
-		QColor(0, 17, 87), // partWaveColor14
-		QColor(0, 84, 17), // partWaveColor15
-		QColor(0, 128, 121) // partWaveColor16
+		QColor(1,53,70),  // OOM Wave Color
+		QColor(66,16,15), // Burgundy Berry
+		QColor(130,65,27),// Pumpkin Spice
+		QColor(78,69,96), // Lavender Linen
+		QColor(36,46,35), // Mint
+		QColor(90,99,79), // -----
+		QColor(16,26,64), // Evening Blue
+		QColor(67,81,88), // Sea and Sand
+		QColor(87,48,59), // Cranberry Frosting 
+		QColor(68,48,87), // Grape Frosting
+		QColor(48,47,86), // Blueberry Frosting
+		QColor(47,86,78), // Matcha Frosting
+		QColor(47,86,53), // Green Apple Frosting
+		QColor(87,65,48), // Mochaccino Frosting
+		QColor(86,87,86), // Key Lime Splash
+		QColor(86,87,86), // Lemon Splash
+		QColor(86,87,86), // Saltwater Splash
+		QColor(86,87,86)  // Wendy Cherrett
 	},
 	{
 		QString("OOM"), // Default part color names
@@ -75,15 +77,16 @@ GlobalConfigValues config = {
 		QString("-----"),
 		QString("Evening Blue"),
 		QString("Sea and Sand"),
-		QString("Color 9"),
-		QString("Color 10"),
-		QString("Color 11"),
-		QString("Color 12"),
-		QString("Color 13"),
-		QString("Color 14"),
-		QString("Color 15"),
-		QString("Color 16"),
-		QString("Color 17")
+		QString("Cranberry Frosting"),
+		QString("Grape Frosting"),
+		QString("Blueberry Frosting"),
+		QString("Matcha Frosting"),
+		QString("Green Apple Frosting"),
+		QString("Mochaccino Frosting"),
+		QString("Key Lime Splash"),
+		QString("Lemon Splash"),
+		QString("Saltwater Splash"),
+		QString("Wendy Cherrett")
 	}
 ,
 	QColor(16, 24, 25), // transportHandleColor;
