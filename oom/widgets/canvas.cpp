@@ -698,7 +698,8 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 					QAction *act = _itemPopupMenu->exec(QCursor::pos());
 					if (act)
 						itemPopup(_curItem, act->data().toInt(), _start);
-					delete _itemPopupMenu;
+					if(_itemPopupMenu)
+						delete _itemPopupMenu;
 				}
 			}
 		}
@@ -710,7 +711,8 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 				QAction *act = _canvasPopupMenu->exec(QCursor::pos(), 0);
 				if (act)
 					canvasPopup(act->data().toInt());
-				delete _canvasPopupMenu;
+				if(_canvasPopupMenu)
+					delete _canvasPopupMenu;
 			}
 		}
 	}
