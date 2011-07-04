@@ -142,6 +142,7 @@ class PartCanvas : public Canvas
     void checkAutomation(Track * t, const QPoint& pointer, bool addNewCtrl);
     void selectAutomation(Track * t, const QPoint& pointer);
     void processAutomationMovements(QMouseEvent *event);    
+    void addNewAutomation(QMouseEvent *event);    
 
 protected:
     virtual void drawCanvas(QPainter&, const QRect&);

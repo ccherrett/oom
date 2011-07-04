@@ -135,6 +135,8 @@ private:
 	LilvPlugin* m_plugin;
 #endif
 	bool m_config;
+	int controlInputs;
+	int controlOutputs;
 
 public:
 	LV2Plugin(const char* uri);
@@ -147,6 +149,16 @@ public:
 	bool configSupport()
 	{
 		return m_config;
+	}
+
+	int inputPorts()
+	{
+		return controlInputs;
+	}
+
+	int outputPorts()
+	{
+		return controlOutputs;
 	}
 
 	//const LV2_Feature* const* features () { return m_features; }
@@ -182,6 +194,7 @@ private:
 typedef QHash<QString, QString> Configs;
 typedef QHash<QString, QString> ConfigTypes;
 typedef QHash<unsigned long, float> Values;
+typedef QList<LV2ControlFifo> ControlPipes;
 
 class LV2PluginI : public PluginI
 {
@@ -290,9 +303,9 @@ public:
 		return m_ctypes[sKey];
 	}
 
-	void realizeConfigs();
-	void freezeConfigs();
-	void releaseConfigs();
+	//void realizeConfigs();
+	//void freezeConfigs();
+	//void releaseConfigs();
 
 
 	//void freezeValues();
