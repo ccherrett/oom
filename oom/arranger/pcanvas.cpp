@@ -1401,6 +1401,10 @@ void PartCanvas::mousePress(QMouseEvent* event)
 				automation.moveController = true;
 				return;
 			}
+			if (event->modifiers() & Qt::ControlModifier && event->button() & Qt::LeftButton)
+			{
+				addNewAutomation(event);
+			}
 
 			if (automation.controllerState != doNothing)
 			{
@@ -4601,7 +4605,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 						redraw();
 						automation.controllerState = movingController;
 					}
-						return;
+					return;
 				}
 				
 			}/*}}}*/
@@ -4704,6 +4708,18 @@ void PartCanvas::controllerChanged(Track* /* t */)
 	redraw();
 }
 
+void PartCanvas::addNewAutomation(QMouseEvent *event)
+{
+	//printf("PartCanvas::addNewAutomation(%p)\n", event);
+	Track * t = y2Track(event->pos().y());
+	if (t) 
+	{
+		checkAutomation(t, event->pos(), true);
+
+		automation.moveController = true;
+		processAutomationMovements(event);
+	}
+}
 
 void PartCanvas::processAutomationMovements(QMouseEvent *event)
 {

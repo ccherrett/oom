@@ -98,6 +98,7 @@ struct LV2World {/*{{{*/
 	SLV2Value logarithmic_prop;
 	SLV2Value samplerate_prop;
 	SLV2Value units_prop;
+	SLV2Value persist_prop;
 #else
 	LilvWorld* world;
 	const LilvPlugins* plugins;
@@ -117,6 +118,7 @@ struct LV2World {/*{{{*/
 	LilvNode* logarithmic_prop;
 	LilvNode* samplerate_prop;
 	LilvNode* units_prop;
+	LilvNode* persist_prop;
 #endif
 };/*}}}*/
 
@@ -132,6 +134,9 @@ private:
 #else
 	LilvPlugin* m_plugin;
 #endif
+	bool m_config;
+	int controlInputs;
+	int controlOutputs;
 
 public:
 	LV2Plugin(const char* uri);
@@ -140,6 +145,22 @@ public:
 #else
 	const LilvPlugin* getPlugin();
 #endif
+	
+	bool configSupport()
+	{
+		return m_config;
+	}
+
+	int inputPorts()
+	{
+		return controlInputs;
+	}
+
+	int outputPorts()
+	{
+		return controlOutputs;
+	}
+
 	//const LV2_Feature* const* features () { return m_features; }
     double defaultValue(unsigned int port) const;
     void lv2range(unsigned long i, float*, float*, float*) const;
@@ -170,6 +191,11 @@ private:
 	QWidget *m_widget;
 };/*}}}*/
 
+typedef QHash<QString, QString> Configs;
+typedef QHash<QString, QString> ConfigTypes;
+typedef QHash<unsigned long, float> Values;
+typedef QList<LV2ControlFifo> ControlPipes;
+
 class LV2PluginI : public PluginI
 {
 private:
@@ -191,6 +217,12 @@ private:
 	QList<SuilInstance*> m_uinstance;
 	SuilHost* m_uihost;
 #endif
+	Configs m_configs;
+
+	ConfigTypes m_ctypes;
+
+	Values m_values;
+
 	LV2Plugin* m_plugin;
 	bool m_guiVisible;
 	bool m_update_gui;
@@ -227,10 +259,89 @@ public:
 #endif
 	const LV2UI_Descriptor *lv2_ui_descriptor() const;
 	LV2UI_Handle lv2_ui_handle() const;
+	LV2_Handle lv2_handle(unsigned short );
 	const LV2_Persist *lv2_persist_descriptor(unsigned short) const;
 
-	//int lv2_persist_store(uint32_t, const void *, size_t, uint32_t, uint32_t);
-	//const void *lv2_persist_retrieve(uint32_t, size_t *, uint32_t *, uint32_t *);
+	int lv2_persist_store(uint32_t, const void *, size_t, uint32_t, uint32_t);
+	const void *lv2_persist_retrieve(uint32_t, size_t *, uint32_t *, uint32_t *);
+
+
+	void setConfigs(const Configs& configs)/*{{{*/
+	{ 
+		m_configs = configs;
+	}
+	const Configs& configs() const
+	{
+		return m_configs; 
+	}
+
+	void setConfig(const QString& sKey, const QString& sValue)
+	{
+		m_configs[sKey] = sValue;
+	}
+	const QString& config(const QString& sKey)
+	{
+		return m_configs[sKey];
+	}
+
+
+	void setConfigTypes(const ConfigTypes& ctypes)
+	{
+		m_ctypes = ctypes;
+	}
+	const ConfigTypes& configTypes() const
+	{
+		return m_ctypes;
+	}
+
+	void setConfigType(const QString& sKey, const QString& sType)
+	{
+		m_ctypes[sKey] = sType;
+	}
+	const QString& configType(const QString& sKey)
+	{
+		return m_ctypes[sKey];
+	}
+
+	//void realizeConfigs();
+	//void freezeConfigs();
+	//void releaseConfigs();
+
+
+	//void freezeValues();
+	//void releaseValues();
+
+	//void realizeValues();
+
+	void setValues(const Values& values)
+	{
+		m_values = values;
+	}
+	const Values& values() const
+	{
+		return m_values;
+	}
+
+	void setValue(unsigned long iIndex, float fValue)
+	{
+		m_values[iIndex] = fValue;
+	}
+	float value(unsigned long iIndex) const
+	{
+		return m_values[iIndex];
+	}
+
+	void clearConfigs()
+	{
+		m_configs.clear();
+		m_ctypes.clear();
+	}
+	void clearValues()
+	{
+		m_values.clear();
+	}
+
+	/*}}}*/
 
 	LV2ControlFifo* getControlFifo(unsigned long p)
 	{
