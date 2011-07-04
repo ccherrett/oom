@@ -67,14 +67,14 @@ GlobalConfigValues config = {
 		QColor(0, 128, 121) // partWaveColor16
 	},
 	{
-		QString("Default"), // Default part color names
-		QString("Color 2"),
-		QString("Color 3"),
-		QString("Color 4"),
-		QString("Color 5"),
-		QString("Color 6"),
-		QString("Color 7"),
-		QString("Color 8"),
+		QString("OOM"), // Default part color names
+		QString("Burgundy Berry"),
+		QString("Pumpkin Spice"),
+		QString("Lavender Linen"),
+		QString("Mint"),
+		QString("-----"),
+		QString("Evening Blue"),
+		QString("Sea and Sand"),
 		QString("Color 9"),
 		QString("Color 10"),
 		QString("Color 11"),
