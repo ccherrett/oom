@@ -2298,6 +2298,9 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	QColor partWaveColor(config.partWaveColors[i]);
 	QColor partColor(config.partColors[i]);
 	
+	QColor partWaveColorAutomation(config.partWaveColorsAutomation[i]);
+	QColor partColorAutomation(config.partColorsAutomation[i]);
+	
 	int pTick = part->tick();
 	from -= pTick;
 	to -= pTick;
@@ -2344,26 +2347,38 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	}
 	else if (part->selected())
 	{
+		partWaveColor.setAlpha(150);
+		partWaveColorAutomation.setAlpha(150);
+		
 		bool clone = part->events()->arefCount() > 1;
+		p.setBrush(partWaveColor);
 		if (wp)
+		{
 			p.setPen(Qt::NoPen);
+			if (_tool == AutomationTool)
+				p.setBrush(partWaveColorAutomation);
+		}
 		else if(mp)
 			p.setPen(partColor);
-		
-		partWaveColor.setAlpha(150);
-		p.setBrush(partWaveColor);
 	}
 	else
 	{
 		bool clone = part->events()->arefCount() > 1;
 		
+		partColor.setAlpha(150);
+		partColorAutomation.setAlpha(150);
+	
+		p.setBrush(partColor);
 		if (wp)
+		{
 			p.setPen(Qt::NoPen);
+			if (_tool == AutomationTool)
+				p.setBrush(partColorAutomation);
+		}
 		else if(mp)
 			p.setPen(partWaveColor);
 			
-		partColor.setAlpha(150);
-		p.setBrush(partColor);
+		
 	}
 	p.drawRect(QRect(r.x(), r.y(), r.width(), mp ? r.height()-2 : r.height()-1));
 
@@ -2400,13 +2415,19 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.setWorldMatrixEnabled(false);
 		if(part->selected())
 		{
-			p.setPen(partColor);
-			p.setFont(QFont("fixed-width", 8, QFont::Bold));
+			if (_tool == AutomationTool)
+				p.setPen(partColorAutomation);
+			else
+				p.setPen(partColor);
+			p.setFont(QFont("fixed-width", 7, QFont::Bold));
 		}
 		else
 		{
-			p.setPen(partWaveColor);
-			p.setFont(QFont("fixed-width", 8, QFont::Bold));
+			if (_tool == AutomationTool)
+				p.setPen(partWaveColorAutomation);
+			else
+				p.setPen(partWaveColor);
+			p.setFont(QFont("fixed-width", 7, QFont::Bold));
 		}
 		p.drawText(rr, Qt::AlignBottom | Qt::AlignLeft, part->name());
 		p.restore();
@@ -2508,10 +2529,10 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 {
 	int i = wp->colorIndex();
 	QColor waveFill(config.partWaveColors[i]);
+	QColor waveEdge = QColor(211,193,224);
+	
 	//printf("PartCanvas::drawWavePart bb.x:%d bb.y:%d bb.w:%d bb.h:%d  pr.x:%d pr.y:%d pr.w:%d pr.h:%d\n",
 	//  bb.x(), bb.y(), bb.width(), bb.height(), _pr.x(), _pr.y(), _pr.width(), _pr.height());
-	//QColor green = QColor(143, 75, 236);
-	//QColor green = QColor(133, 182, 94);
 	QPolygonF m_monoPolygonTop;
 	QPolygonF m_monoPolygonBottom;
 	
@@ -2524,44 +2545,23 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 	int firstIn = 1;
 	int stereoOneFirstIn = 1;
 	int stereoTwoFirstIn = 1;
-	//QColor waveEdge = QColor(123,105,150);
-	//QColor waveFill = QColor(198,160,253);
-	QColor waveEdge = QColor(211,193,224);
-	//QColor waveFill = QColor(62,41,77);
 	
 	p.setPen(QColor(255,0,0));
 
 	QColor green = QColor(49, 175, 197);
-	//QColor green = QColor(27,47,49);
 	QColor yellow = QColor(127,12,128);
 	QColor red = QColor(197, 49, 87);
 	QColor rms_color = QColor(0,19,23);
+	
 	if(wp->selected())
-	{
-		green = QColor(219, 168, 79);
-		rms_color = QColor(0,19,23);
-		//waveFill = QColor(215,215,215);
 		waveFill = QColor(config.partColors[i]);
-		//waveFill.setAlpha(150);
-		//waveFill = QColor(253,199,103);
-		waveEdge = QColor(215,215,215);
-	}
 	
 	if (_tool == AutomationTool)
 	{
-		rms_color = QColor(42,75,81);
 		if(wp->selected())
-		{
-			green = QColor(87,73,49);
-			waveEdge = QColor(43,92,102);
-			waveFill = QColor(43,59,62);
-		}
+			waveFill = QColor(config.partColorsAutomation[i]);
 		else
-		{
-			green = QColor(58,96,103);
-			waveFill = QColor(89,82,104);
-			waveEdge = QColor(89,82,104);
-		}
+			waveFill = QColor(config.partWaveColorsAutomation[i]);
 	}
 
 	QRect rr = p.worldMatrix().mapRect(bb);
