@@ -9,7 +9,7 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#define NUM_PARTCOLORS 18
+#define NUM_PARTCOLORS 27
 #define NUM_FONTS 7
 
 #include <QColor>
@@ -55,6 +55,8 @@ struct GlobalConfigValues
     QColor palette[16];
     QColor partColors[NUM_PARTCOLORS];
     QColor partWaveColors[NUM_PARTCOLORS];
+    QColor partColorsAutomation[NUM_PARTCOLORS];
+    QColor partWaveColorsAutomation[NUM_PARTCOLORS];
     QString partColorNames[NUM_PARTCOLORS];
     QColor transportHandleColor;
     QColor bigTimeForegroundColor;

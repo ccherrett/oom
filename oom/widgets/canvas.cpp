@@ -384,6 +384,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 		QColor outlineColor = QColor(55,80,45);
 		QColor fillColor = QColor(148, 177, 106,127);
 		QPen mypen3 = QPen(outlineColor, 2, Qt::SolidLine);
+		mypen3.setCosmetic(true);
 		p.setPen(mypen3);
 		//p.setPen(QColor(181, 109, 16));
 		p.setBrush(QBrush(fillColor));

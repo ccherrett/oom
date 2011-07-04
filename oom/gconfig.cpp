@@ -29,7 +29,8 @@ GlobalConfigValues config = {
 		QColor(0xff, 0xff, 0xff)
 	},
 	{
-		QColor(175,235,255), // OOM Part Color 
+		QColor(175,235,255), // OOM Part Color //{{{
+		QColor(255,198,250), // Wendy Cherrett//}}}
 		QColor(239,225,214), // Burgundy Berry
 		QColor(219,189,135), // Pumpkin Spice
 		QColor(233,226,248), // Lavender Linen
@@ -46,10 +47,19 @@ GlobalConfigValues config = {
 		QColor(145,255,115), // Key Lime Splash
 		QColor(252,253,154), // Lemon Splash
 		QColor(145,255,249), // Saltwater Splash
-		QColor(255,198,250)  // Wendy Cherrett
+		QColor(255,255,255), // Designer: Tux
+		QColor(192,192,192), // Designer: Black Tie
+		QColor(188,187,186), // Designer: Dad's Suit
+		QColor(208,202,193), // Designer: Khaki
+		QColor(201,201,201), // Designer: Midnight Stars
+		QColor(255,255,255), // Designer: Friday Valet
+		QColor(228,231,205), // Designer: Veranda Olivia
+		QColor(255,255,255), // Designer: Gentlemen
+		QColor(253,197,249)  // Designer: Wendy's Dress
 	},
 	{
-		QColor(1,53,70),  // OOM Wave Color
+		QColor(1,53,70),  // OOM Wave Color //{{{
+		QColor(86,87,86), // Wendy Cherrett //}}}
 		QColor(66,16,15), // Burgundy Berry
 		QColor(130,65,27),// Pumpkin Spice
 		QColor(78,69,96), // Lavender Linen
@@ -66,10 +76,77 @@ GlobalConfigValues config = {
 		QColor(86,87,86), // Key Lime Splash
 		QColor(86,87,86), // Lemon Splash
 		QColor(86,87,86), // Saltwater Splash
-		QColor(86,87,86)  // Wendy Cherrett
+		QColor(24,24,24), // Designer: Tux
+		QColor(0,0,0),    // Designer: Black Tie
+		QColor(40,2,1),   // Designer: Dad's Suit
+		QColor(0,0,0),    // Designer: Khaki
+		QColor(0,6,55),   // Designer: Midnight Stars
+		QColor(96,1,0),   // Designer: Friday Valet
+		QColor(38,36,0),  // Designer: Veranda Olivia
+		QColor(0,0,0),    // Designer: Gentlemen
+		QColor(24,24,24)  // Designer: Wendy's Dress
+	},
+	{
+		QColor(84,102,108),  // OOM Part Color Automation//{{{
+		QColor(255,198,250), // Wendy Cherrett//}}}
+		QColor(239,225,214), // Burgundy Berry
+		QColor(219,189,135), // Pumpkin Spice
+		QColor(233,226,248), // Lavender Linen
+		QColor(211,225,210), // Mint
+		QColor(245,233,234), // -----
+		QColor(201,212,242), // Evening Blue
+		QColor(228,221,202), // Sea and Sand
+		QColor(231,206,213), // Cranberry Frosting
+		QColor(220,207,232), // Grape Frosting
+		QColor(207,207,232), // Blueberry Frosting
+		QColor(205,230,225), // Matcha Frosting
+		QColor(206,231,209), // Green Apple Frosting
+		QColor(230,216,205), // Mochaccino Frosting
+		QColor(145,255,115), // Key Lime Splash
+		QColor(252,253,154), // Lemon Splash
+		QColor(145,255,249), // Saltwater Splash
+		QColor(145,255,249), // Designer: Tux
+		QColor(145,255,249), // Designer: Black Tie
+		QColor(145,255,249), // Designer: Dad's Suit
+		QColor(145,255,249), // Designer: Khaki
+		QColor(145,255,249), // Designer: Midnight Stars
+		QColor(145,255,249), // Designer: Friday Valet
+		QColor(145,255,249), // Designer: Veranda Olivia
+		QColor(145,255,249), // Designer: Gentlemen
+		QColor(145,255,249)  // Designer: Wendy's Dress
+	},
+	{
+		QColor(10,25,30), // OOM Wave Color Automation//{{{
+		QColor(86,87,86), // Wendy Cherrett //}}}
+		QColor(66,16,15), // Burgundy Berry
+		QColor(130,65,27),// Pumpkin Spice
+		QColor(78,69,96), // Lavender Linen
+		QColor(36,46,35), // Mint
+		QColor(90,99,79), // -----
+		QColor(16,26,64), // Evening Blue
+		QColor(67,81,88), // Sea and Sand
+		QColor(87,48,59), // Cranberry Frosting 
+		QColor(68,48,87), // Grape Frosting
+		QColor(48,47,86), // Blueberry Frosting
+		QColor(47,86,78), // Matcha Frosting
+		QColor(47,86,53), // Green Apple Frosting
+		QColor(87,65,48), // Mochaccino Frosting
+		QColor(86,87,86), // Key Lime Splash
+		QColor(86,87,86), // Lemon Splash
+		QColor(86,87,86), // Saltwater Splash
+		QColor(145,255,249), // Designer: Tux
+		QColor(145,255,249), // Designer: Black Tie
+		QColor(145,255,249), // Designer: Dad's Suit
+		QColor(145,255,249), // Designer: Khaki
+		QColor(145,255,249), // Designer: Midnight Stars
+		QColor(145,255,249), // Designer: Friday Valet
+		QColor(145,255,249), // Designer: Veranda Olivia
+		QColor(145,255,249), // Designer: Gentlemen
+		QColor(145,255,249)  // Designer: Wendy's Dress
 	},
 	{
 		QString("OOM"), // Default part color names
+		QString("Wendy Cherrett"),
 		QString("Burgundy Berry"),
 		QString("Pumpkin Spice"),
 		QString("Lavender Linen"),
@@ -86,7 +163,15 @@ GlobalConfigValues config = {
 		QString("Key Lime Splash"),
 		QString("Lemon Splash"),
 		QString("Saltwater Splash"),
-		QString("Wendy Cherrett")
+		QString("Designer: Tux"),
+		QString("Designer: Black Tie"),
+		QString("Designer: Dad's Suit"),
+		QString("Designer: Khaki"),
+		QString("Designer: Midnight Stars"),
+		QString("Designer: Friday Valet"),
+		QString("Designer: Veranda Olivia"),
+		QString("Designer: Gentlemen"),
+		QString("Designer: Wendy's Dress")
 	}
 ,
 	QColor(16, 24, 25), // transportHandleColor;
