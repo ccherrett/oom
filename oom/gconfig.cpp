@@ -53,7 +53,7 @@ GlobalConfigValues config = {
 		QColor(195,193,169), // Day Off: Appetizer
 		QColor(249,241,237), // Drinks: Raspberry Milkshake
 		QColor(250,243,240), // Drinks: Marshmallow Hot Chocolate
-		QColor(229,251,223), // Drinks: Irish Hot Chocolate
+		QColor(192,255,185), // Drinks: Irish Hot Chocolate
 		QColor(242,232,229), // Drinks: Mochaccino
 		QColor(242,232,229), // Drinks: Cream Soda Float
 		QColor(219,189,135), // Drinks: Pumpkin Spice Latte
@@ -109,7 +109,7 @@ GlobalConfigValues config = {
 		QColor(36,46,35),  // Drinks: Wintermint Steamer
 		QColor(24,24,24),  // Designer: Tux
 		QColor(0,0,0),     // Designer: Black Tie
-		QColor(40,2,1),    // Designer: Dad's Suit
+		QColor(42,16,15),  // Designer: Dad's Suit
 		QColor(0,0,0),     // Designer: Khaki
 		QColor(0,6,55),    // Designer: Midnight Stars
 		QColor(96,1,0),    // Designer: Friday Valet
@@ -143,7 +143,7 @@ GlobalConfigValues config = {
 		QColor(88,87,82),    // Day Off: Appetizer
 		QColor(108,106,104), // Drinks: Raspberry Milkshake
 		QColor(106,103,102), // Drinks: Marshmallow Hot Chocolate
-		QColor(101,109,99),  // Drinks: Irish Hot Chocolate
+		QColor(93,109,91),   // Drinks: Irish Hot Chocolate
 		QColor(106,103,102), // Drinks: Mochaccino
 		QColor(106,103,102), // Drinks: Cream Soda Float
 		QColor(91,85,75),    // Drinks: Pumpkin Spice Latte
@@ -199,7 +199,7 @@ GlobalConfigValues config = {
 		QColor(23,25,23), // Drinks: Wintermint Steamer
 		QColor(13,13,13), // Designer: Tux
 		QColor(0,0,0),    // Designer: Black Tie
-		QColor(16,6,6),   // Designer: Dad's Suit
+		QColor(21,14,13), // Designer: Dad's Suit
 		QColor(0,0,0),    // Designer: Khaki
 		QColor(8,9,22),   // Designer: Midnight Stars
 		QColor(40,14,14), // Designer: Friday Valet
