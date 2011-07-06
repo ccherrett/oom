@@ -85,6 +85,7 @@ class PartCanvas : public Canvas
     int trackOffset;
     bool editMode;
     bool unselectNodes;
+	bool show_tip;
 
     AutomationObject automation;
     CurveNodeSelection* _curveNodeSelection;
@@ -143,6 +144,7 @@ class PartCanvas : public Canvas
     void selectAutomation(Track * t, const QPoint& pointer);
     void processAutomationMovements(QMouseEvent *event);    
     void addNewAutomation(QMouseEvent *event);    
+	double getControlValue(CtrlList*, double);
 
 protected:
     virtual void drawCanvas(QPainter&, const QRect&);

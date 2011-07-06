@@ -303,9 +303,9 @@ public:
 		return m_ctypes[sKey];
 	}
 
-	//void realizeConfigs();
-	//void freezeConfigs();
-	//void releaseConfigs();
+	void realizeConfigs();
+	void freezeConfigs();
+	void releaseConfigs();
 
 
 	//void freezeValues();

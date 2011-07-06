@@ -1117,6 +1117,7 @@ QToolTip {
 	padding: 2px;
 	border-radius: 7px;
 	opacity: 200;
+	background-color: none;
 }
 
 QDockWidget {/*{{{*/

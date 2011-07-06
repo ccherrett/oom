@@ -393,6 +393,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	editMode = false;
 	unselectNodes = false;
 	trackOffset = 0;
+	show_tip = false;
 
 	//This changes to song->visibletracks()
 	tracks = song->visibletracks();
@@ -1487,12 +1488,48 @@ void PartCanvas::mouseRelease(const QPoint&)
 void PartCanvas::mouseMove(QMouseEvent* event)
 {
 	int x = event->pos().x();
+	int y = event->pos().y();
 	if (x < 0)
 		x = 0;
 
 	processAutomationMovements(event);
 
 	emit timeChanged(AL::sigmap.raster(x, *_raster));
+
+	if (show_tip && _tool == AutomationTool && automation.currentCtrlList && !automation.moveController) //{{{
+	{
+		Track* t = y2Track(y);
+		if(t && !t->isMidiTrack())
+		{
+			CtrlListList *cll = ((AudioTrack*)t)->controller();
+			for(CtrlListList::iterator ic = cll->begin(); ic != cll->end(); ++ic)
+			{
+				CtrlList* cl = ic->second;
+				if(cl->selected())
+				{
+					double min, max;/*{{{*/
+					cl->range(&min,&max);
+					double range = max - min;
+					double relativeY = double(y - track2Y(t)) / t->height();
+					double newValue;
+
+					if (cl->id() == AC_VOLUME )
+					{
+						newValue = dbToVal(max) - relativeY;
+						newValue = valToDb(newValue);
+					}
+					else
+					{
+						newValue = max - (relativeY * range);
+					}
+					const QRect r(0, 0, 1, 1);
+					QPainter nullPainter(this);
+					drawTooltipText(nullPainter, r, 0, (double)newValue, 0.0, 0, true, (CtrlList*)cl);/*}}}*/
+					break;
+				}
+			}
+		}
+	}//}}}
 }
 
 //---------------------------------------------------------
@@ -4104,6 +4141,7 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 	//This changes to song->visibletracks()
 	TrackList* tl = song->visibletracks();
 
+	show_tip = true;
 	int yy = 0;
 	int th;
 	for (iTrack it = tl->begin(); it != tl->end(); ++it) {
@@ -4119,6 +4157,7 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 		}
 		yy += track->height();
 	}
+
 
 	QRect rr = p.worldMatrix().mapRect(rect);
 
@@ -4156,7 +4195,7 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 	}
 	p.restore();
 	
-	//Draw notes are recorded
+	//Draw notes they are recorded
 	if (song->record() && audio->isPlaying())
 	{
 		for (iTrack it = tl->begin(); it != tl->end(); ++it)
@@ -4230,6 +4269,26 @@ void PartCanvas::drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* /* t */
 	p.drawRect(r);
 }
 
+double PartCanvas::getControlValue(CtrlList *cl, double val)
+{
+	double prevVal = val;
+	//FIXME: this check needs to be more robust to deal with plugin automation
+	//that have different type ie: sec, milisec, also db which is not covered by our controllers
+	if (cl->id() == AC_VOLUME)/*{{{*/
+	{ // use db scale for volume
+		//printf("volume cvval=%f\n", cvFirst.val);
+		prevVal = dbToVal(val); // represent volume between 0 and 1
+		if (prevVal < 0) prevVal = 0.0;
+	}
+	else
+	{
+		double min, max;
+		cl->range(&min, &max);
+		prevVal = (prevVal - min) / (max - min);
+	}/*}}}*/
+	return prevVal;
+}
+
 //---------------------------------------------------------
 //   drawAutomation
 //---------------------------------------------------------
@@ -4287,8 +4346,9 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 		if (ic != cl->end())
 		{
 			CtrlVal cvFirst = ic->second;
-			int prevPosFrame=cvFirst.getFrame();
+			int prevPosFrame = cvFirst.getFrame();
 			prevVal = cvFirst.val;
+			//TODO:Write out automation as its being recorded
 			/*CtrlRecList::iterator recIter;
 			if(audio->isPlaying())
 			{
@@ -4297,7 +4357,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 			}*/
 
 			// prepare prevVal
-			if (cl->id() == AC_VOLUME)
+			if (cl->id() == AC_VOLUME)/*{{{*/
 			{ // use db scale for volume
 //				printf("volume cvval=%f\n", cvFirst.val);
 				prevVal = dbToVal(cvFirst.val); // represent volume between 0 and 1
@@ -4320,7 +4380,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 				double min, max;
 				cl->range(&min, &max);
 				prevVal = (prevVal - min) / (max - min);
-			}
+			}/*}}}*/
 
 			// draw a square around the point
 			p.drawRect(mapx(tempomap.frame2tick(prevPosFrame))-1, (rr.bottom()-2)-prevVal*height-1, 3, 3);
@@ -4343,7 +4403,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 					cl->range(&min, &max);
 					nextVal = (nextVal - min) / (max - min);
 				}
-				int leftX=mapx(tempomap.frame2tick(prevPosFrame));
+				int leftX = mapx(tempomap.frame2tick(prevPosFrame));
 				if (firstRun && leftX>rr.x()) {
 					leftX=rr.x();
 				}
@@ -4358,7 +4418,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 				
 				firstRun = false;
 				//printf("draw line: %d %f %d %f\n",tempomap.frame2tick(lastPos),rr.bottom()-lastVal*height,tempomap.frame2tick(cv.frame),rr.bottom()-curVal*height);
-				prevPosFrame=cv.getFrame();
+				prevPosFrame = cv.getFrame();
 				prevVal = nextVal;
 				if (currentPixel < rr.x()+ rr.width())
 				{
@@ -4397,7 +4457,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 
 						p.drawEllipse(mapx(tempomap.frame2tick(lazySelectedNodeFrame)) - 5, (rr.bottom()-2)-lazySelectedNodePrevVal*height - 5, 8, 8);
 
-						if ((lazySelectedNodeFrame >= 0) && paintdBText)/*{{{*/
+						if ((lazySelectedNodeFrame >= 0) && paintdBText)
 						{
 							if (automation.currentCtrlVal && *automation.currentCtrlVal == cv)
 							{
@@ -4407,10 +4467,13 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 												lazySelectedNodeVal,
 												lazySelectedNodePrevVal,
 												lazySelectedNodeFrame,
-												paintTextAsDb,
+												false, //use painting to show tip
 												cl);
+								show_tip = false;
 							}
-						}/*}}}*/
+							else
+								show_tip = true;
+						}
 					}
 					else
 					{
@@ -4443,6 +4506,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 		p.drawPath(automationPath);
 	} //END first for loop
 
+	
 	if (paintLines)
 	{
 		
@@ -4473,19 +4537,21 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 	p.restore();
 }/*}}}*/
 
+#include <QToolTip>
 void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 		const QRect& rr, 
 		int height,
 		double lazySelNodeVal,
 		double lazySelNodePrevVal,
 		int lazySelNodeFrame,
-		bool paintTextAsDb,
+		bool useTooltip,
 		CtrlList* cl)
 {
 	// calculate the dB value for the dB string.
 	double vol = lazySelNodeVal;
 	QString dbString;
-	if(paintTextAsDb)
+	//if(paintTextAsDb)
+	if(cl && cl->id() == AC_VOLUME)
 	{
 		if (vol < 0.0001f)
 		{
@@ -4505,12 +4571,21 @@ void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 	else
 		dbString.append("  "+cl->name()).append(" : ").append(cl->pluginName());
 	// Set the color for the dB text
-	p.setPen(QColor(255,255,255,190));
+	if(!useTooltip)
+	{
+		p.setPen(QColor(255,255,255,190));
 	//p.drawText(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 15, (rr.bottom()-2)-lazySelNodePrevVal*height, dbString);
-	int top = (rr.bottom()-20)-lazySelNodePrevVal*height;
-	if(top < 0)
-		top = 0;
-	p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 10, top, 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
+		int top = (rr.bottom()-20)-lazySelNodePrevVal*height;
+		if(top < 0)
+			top = 0;
+		p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 10, top, 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
+	}
+	else
+	{
+		QPoint cursorPos = QCursor::pos();
+		QToolTip::showText(cursorPos, dbString, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
+	}
+	//p.drawText(QRect(cursorPos.x() + 10, cursorPos.y(), 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
 }/*}}}*/
 
 //---------------------------------------------------------
@@ -4783,7 +4858,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 
 		if (addNode)
 		{
-			automation.currentCtrlList->range(&min,&max);
+			automation.currentCtrlList->range(&min,&max);/*{{{*/
 			double range = max - min;
 			double newValue;
 			double relativeY = double(event->pos().y() - track2Y(automation.currentTrack)) / automation.currentTrack->height();
@@ -4796,7 +4871,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			else
 			{
 				newValue = max - (relativeY * range);
-			}
+			}/*}}}*/
 
 			automation.currentCtrlList->add( currFrame, newValue);
 		}

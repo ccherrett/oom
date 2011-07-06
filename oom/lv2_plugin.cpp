@@ -207,7 +207,7 @@ static char *lv2_files_new_file_path (LV2_Files_Host_Data host_data, const char 
 static const LV2_Feature* features[] = { 
 	&lv2_uri_map_feature,
 	&lv2_uri_unmap_feature,
-//	&lv2_persist_feature,
+	&lv2_persist_feature,
     NULL
 };
 
@@ -315,7 +315,7 @@ void initLV2()/*{{{*/
 		//lv2plugins.add(curi);
 	}/*}}}*/
 #endif
-	printf("Master plugin list contains %d plugins", (int)plugins.size());
+	printf("Master plugin list contains %d plugins\n", (int)plugins.size());
 }/*}}}*/
 
 
@@ -829,7 +829,7 @@ LV2PluginI::LV2PluginI()
 	int fcount = 0;
 	while (features[fcount]) { ++fcount; }
 
-	m_features = new LV2_Feature * [fcount + 1];
+	m_features = new LV2_Feature * [fcount + 3];
 	for (int i = 0; i < fcount; ++i)
 		m_features[i] = (LV2_Feature *) features[i];
 
@@ -839,14 +839,14 @@ LV2PluginI::LV2PluginI()
 
 	m_files_path_feature.URI = LV2_FILES_PATH_SUPPORT_URI;
 	m_files_path_feature.data = &m_files_path_support;
-	//m_features[fcount++] = &m_files_path_feature;
+	m_features[fcount++] = &m_files_path_feature;
 
 	m_files_new_file_support.host_data = this;
 	m_files_new_file_support.new_file_path = &lv2_files_new_file_path;
 
 	m_files_new_file_feature.URI = LV2_FILES_NEW_FILE_SUPPORT_URI;
 	m_files_new_file_feature.data = &m_files_new_file_support;
-	//m_features[fcount++] = &m_files_new_file_feature;
+	m_features[fcount++] = &m_files_new_file_feature;
 	m_features[fcount] = NULL;
 }
 
@@ -1948,9 +1948,9 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 		}
 	}/*}}}*/
 #endif
-	//realizeConfigs();
+	realizeConfigs();
 
-	//releaseConfigs();
+	releaseConfigs();
 	activate();
 	//apply(1);
 }/*}}}*/
@@ -2070,7 +2070,7 @@ LV2_Handle LV2PluginI::lv2_handle(unsigned short i)
 #endif
 }
 
-/*void LV2PluginI::freezeConfigs (void)//{{{
+void LV2PluginI::freezeConfigs (void)//{{{
 {
 	if (!m_plugin->configSupport())
 		return;
@@ -2135,7 +2135,7 @@ void LV2PluginI::releaseConfigs (void)//{{{
 
 	m_persist_configs.clear();
 	m_persist_ctypes.clear();
-}//}}}*/
+}//}}}
 
 bool LV2PluginI::setControl(const QString& s, double val)/*{{{*/
 {
