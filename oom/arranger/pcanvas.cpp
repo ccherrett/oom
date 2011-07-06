@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include <QClipboard>
+#include <QToolTip>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
@@ -1499,7 +1500,7 @@ void PartCanvas::mouseMove(QMouseEvent* event)
 
 	emit timeChanged(AL::sigmap.raster(x, *_raster));
 
-	if (show_tip && _tool == AutomationTool && automation.currentCtrlList && !automation.moveController) //{{{
+	if (show_tip && _tool == AutomationTool && automation.currentCtrlList && !automation.moveController) 
 	{
 		Track* t = y2Track(y);
 		if(t && !t->isMidiTrack())
@@ -1510,29 +1511,42 @@ void PartCanvas::mouseMove(QMouseEvent* event)
 				CtrlList* cl = ic->second;
 				if(cl->selected())
 				{
-					double min, max;/*{{{*/
+					QString dbString;
+					double min, max;
 					cl->range(&min,&max);
 					double range = max - min;
 					double relativeY = double(y - track2Y(t)) / t->height();
 					double newValue;
 
-					if (cl->id() == AC_VOLUME )
+					if(cl && cl->id() == AC_VOLUME)
 					{
 						newValue = dbToVal(max) - relativeY;
 						newValue = valToDb(newValue);
+						if (newValue < 0.0001f)
+						{
+							newValue = 0.0001f;
+						}
+						newValue = 20.0f * log10 (newValue);
+						if(newValue < -60.0f)
+							newValue = -60.0f;
+						 dbString += QString::number (newValue, 'f', 2) + " dB";
 					}
 					else
 					{
 						newValue = max - (relativeY * range);
+						dbString += QString::number(newValue, 'f', 2);
 					}
-					const QRect r(0, 0, 1, 1);
-					QPainter nullPainter(this);
-					drawTooltipText(nullPainter, r, 0, (double)newValue, 0.0, 0, true, (CtrlList*)cl);/*}}}*/
+					if(cl->pluginName().isEmpty())
+						dbString.append("  "+cl->name());
+					else
+						dbString.append("  "+cl->name()).append(" : ").append(cl->pluginName());
+					QPoint cursorPos = QCursor::pos();
+					QToolTip::showText(cursorPos, dbString, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
 					break;
 				}
 			}
 		}
-	}//}}}
+	}//
 }
 
 //---------------------------------------------------------
@@ -4540,7 +4554,6 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 	p.restore();
 }/*}}}*/
 
-#include <QToolTip>
 void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 		const QRect& rr, 
 		int height,
@@ -4551,7 +4564,7 @@ void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 		CtrlList* cl)
 {
 	// calculate the dB value for the dB string.
-	double vol = lazySelNodeVal;
+	double vol = lazySelNodeVal;/*{{{*/
 	QString dbString;
 	//if(paintTextAsDb)
 	if(cl && cl->id() == AC_VOLUME)
@@ -4572,7 +4585,7 @@ void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 	if(cl->pluginName().isEmpty())
 		dbString.append("  "+cl->name());
 	else
-		dbString.append("  "+cl->name()).append(" : ").append(cl->pluginName());
+		dbString.append("  "+cl->name()).append(" : ").append(cl->pluginName());/*}}}*/
 	// Set the color for the dB text
 	if(!useTooltip)
 	{
@@ -4581,6 +4594,7 @@ void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 		int top = (rr.bottom()-20)-lazySelNodePrevVal*height;
 		if(top < 0)
 			top = 0;
+		p.setFont(QFont("fixed-width", 7, QFont::Bold));
 		p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 10, top, 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
 	}
 	else

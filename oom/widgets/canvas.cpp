@@ -1649,7 +1649,7 @@ void Canvas::setCursor()
 			break;
 		case AutomationTool:
 			//QWidget::setCursor(QCursor(Qt::PointingHandCursor));
-			QWidget::setCursor(QCursor(*crosshairIcon, 4, 15));
+			QWidget::setCursor(QCursor(*crosshairIcon));
 			break;
 		default:
 			QWidget::setCursor(QCursor(Qt::ArrowCursor));
