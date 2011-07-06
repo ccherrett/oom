@@ -2,6 +2,8 @@
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
 
+//  (C) Copyright 2011 Andrew Williams
+//  (C) Copyright 2011 Christopher Cherrett
 //  (C) Copyright 2011 Remon Sijrier
 //	14-feb:	Automation Curves:
 //		Fixed multiple drawing issues, highlight lazy selected node,
@@ -1405,6 +1407,7 @@ void PartCanvas::mousePress(QMouseEvent* event)
 			if (event->modifiers() & Qt::ControlModifier && event->button() & Qt::LeftButton)
 			{
 				addNewAutomation(event);
+				return;
 			}
 
 			if (automation.controllerState != doNothing)
@@ -4516,7 +4519,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 
 		// line color
 		p.setRenderHint(QPainter::Antialiasing, false);
-		p.setPen(QColor(255, 255, 255, 30));
+		p.setPen(QColor(255, 255, 255, 60));
 		//p.setPen(QColor(255, 0, 0, 255));
 		if(paintdBLines)
 		{
@@ -4873,7 +4876,10 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 				newValue = max - (relativeY * range);
 			}/*}}}*/
 
+			//FIXME: Select the last inserted node
 			automation.currentCtrlList->add( currFrame, newValue);
+			//CtrlVal cv = automation.currentCtrlList->cvalue(currFrame);
+			//_curveNodeSelection->addNodeToSelection(&cv);
 		}
 
 		QWidget::setCursor(Qt::BlankCursor);
@@ -4884,6 +4890,8 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			if (cv.getFrame() == currFrame) {
 				automation.currentCtrlVal = &cv;
 				automation.controllerState = movingController;
+				printf("Adding new node to selectio----------------n\n");
+				_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
 				break;
 			}
 		}

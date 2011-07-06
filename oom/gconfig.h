@@ -9,7 +9,7 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#define NUM_PARTCOLORS 27
+#define NUM_PARTCOLORS 42
 #define NUM_FONTS 7
 
 #include <QColor>

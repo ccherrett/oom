@@ -224,6 +224,7 @@ public:
         _valueType = t;
     }
 
+	const CtrlVal cvalue(int frame);
     double value(int frame);
     void add(int tick, double value);
     void del(int tick);

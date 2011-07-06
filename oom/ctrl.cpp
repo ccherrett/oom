@@ -110,7 +110,7 @@ CtrlList::CtrlList()
 //   value
 //---------------------------------------------------------
 
-double CtrlList::value(int frame)
+double CtrlList::value(int frame)/*{{{*/
 {
 	if (!automation || empty())
 	{
@@ -161,8 +161,39 @@ double CtrlList::value(int frame)
 	}
 	// printf("autoVal %d %f\n", frame, _curVal);
 	return _curVal;
-}
+}/*}}}*/
 
+const CtrlVal CtrlList::cvalue(int frame)/*{{{*/
+{
+	if (!automation || empty())
+	{
+		return CtrlVal(-1, -1);
+	}
+	ciCtrl i = upper_bound(frame);
+	if (i == end())
+	{
+		ciCtrl i = end();
+		--i;
+		const CtrlVal& val = i->second;
+		return val;
+	}
+	else if (_mode == DISCRETE)
+	{
+		if (i == begin())
+		{	
+			const CtrlVal& val = i->second;
+			return val;
+		}
+		else
+		{
+			--i;
+			const CtrlVal& val = i->second;
+			return val;
+		}
+	}
+	// printf("autoVal %d %f\n", frame, _curVal);
+	return CtrlVal(-1, -1);
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setCurVal
