@@ -271,6 +271,7 @@ QPixmap* exit1Icon;
 QPixmap* newmuteIcon;
 QPixmap* soloIcon;
 
+QPixmap* crosshairIcon;
 QPixmap* pointerIcon;
 QPixmap* pencilIcon;
 QPixmap* pencilCursorIcon;
@@ -508,6 +509,7 @@ QPixmap* sawIcon;
 void initIcons()
       {
       track_commentIcon = new MPIXMAP(track_comment_xpm, NULL);
+      crosshairIcon  = new MPIXMAP(":/images/crosshair.png", NULL);
       pointerIcon  = new MPIXMAP(":/images/icons/select.png", NULL);
       pencilIcon   = new MPIXMAP(":/images/icons/pencil.png", NULL);
       pencilCursorIcon   = new MPIXMAP(":/images/icons/pencil_cursor.png", NULL);

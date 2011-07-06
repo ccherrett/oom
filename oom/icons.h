@@ -13,6 +13,7 @@ class QPixmap;
 class QIcon;
 
 extern QPixmap* track_commentIcon;
+extern QPixmap* crosshairIcon;
 extern QPixmap* pointerIcon;
 extern QPixmap* pencilIcon;
 extern QPixmap* pencilCursorIcon;
