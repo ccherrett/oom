@@ -1113,11 +1113,16 @@ QTabWidget#m_tabWidget QTabBar::tab::disabled {
 /*}}}*/
 
 QToolTip {
-    border: 2px solid darkkhaki;
-	padding: 2px;
-	border-radius: 7px;
-	opacity: 200;
-	background-color: none;
+    border: 1px solid #1e1e1e;
+    /*color: #e0e0e0;*/
+    color: #d6dfd6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+	padding: 3px;
+	border-radius: 3px;
+	opacity: 0;
+	background-color: #5a5a5a;
 }
 
 QDockWidget {/*{{{*/
