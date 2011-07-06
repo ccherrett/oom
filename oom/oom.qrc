@@ -2,6 +2,7 @@
 <RCC version="1.0">
    <qresource prefix="/">
 		<file>style.qss</file>
+		<file>images/crosshair.png</file>
 		<file>images/frame.png</file>
 		<file>images/frame_clipping.png</file>
 		<file>images/checkbox_checked.png</file>
