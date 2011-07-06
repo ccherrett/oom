@@ -4534,6 +4534,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 		// line color
 		p.setRenderHint(QPainter::Antialiasing, false);
 		p.setPen(QColor(255, 255, 255, 60));
+		p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		//p.setPen(QColor(255, 0, 0, 255));
 		if(paintdBLines)
 		{
@@ -4594,7 +4595,7 @@ void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 		int top = (rr.bottom()-20)-lazySelNodePrevVal*height;
 		if(top < 0)
 			top = 0;
-		p.setFont(QFont("fixed-width", 7, QFont::Bold));
+		p.setFont(QFont("fixed-width", 8, QFont::Bold));
 		p.drawText(QRect(mapx(tempomap.frame2tick(lazySelNodeFrame)) + 10, top, 400, 60), Qt::TextWordWrap|Qt::AlignLeft, dbString);
 	}
 	else
