@@ -65,6 +65,7 @@ bool LV2EventFilter::eventFilter(QObject *o, QEvent *event)/*{{{*/
 //These are used to convert uri to id and back during the lifecycle of the plugin instance
 static QHash<QString, uint32_t>    uri_map;
 static QHash<uint32_t, QByteArray> ids_map;
+bool updating = false;
 
 static uint32_t lv2_uri_to_id(LV2_URI_Map_Callback_Data /*data*/, const char *map, const char *uri )
 {
@@ -995,7 +996,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 	{
 		if(m_uinstance.isEmpty())
 			return;
-		if(controls[k].update || controls[k].lastGuiVal != controls[k].val)/*{{{*/
+		if(!updating && (controls[k].update || controls[k].lastGuiVal != controls[k].val))/*{{{*/
 		{
 	#ifdef SLV2_SUPPORT
 			const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
@@ -1015,7 +1016,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 	#else
 			if(!m_uinstance.isEmpty())
 			{
-				suil_instance_port_event(m_uinstance.at(0), controls[k].idx, sizeof(float), 0, &controls[k].val);
+				suil_instance_port_event(m_uinstance.at(0), controls[k].idx, sizeof(float), 0, &controls[k].tmpVal);
 				controls[k].lastGuiVal = controls[k].val;
 				controls[k].update = false;
 			}
@@ -1085,10 +1086,11 @@ void LV2PluginI::apply(int frames)/*{{{*/
 			controls[k].tmpVal = v.value;
 			if (_track && _id != -1)
 			{
-				if(debugMsg)
+				//if(debugMsg)
 					printf("Applying values from fifo %f\n", v.value);
 				_track->setPluginCtrlVal(genACnum(_id, k), v.value);
 			}
+			updating = false;
 		}
 		else
 		{
@@ -1186,8 +1188,9 @@ static void lv2_ui_write(/*{{{*/
 
 		if(cport && cport->tmpVal != value)
 		{
-			//printf("lv2_ui_write: gui changed param %d\n", port_index);
-			LV2ControlFifo* cfifo = p->getControlFifo(index);
+			updating = true;
+			//printf("lv2_ui_write: gui changed param %d value: %f\n", port_index, value);
+			/*LV2ControlFifo* cfifo = p->getControlFifo(index);
 			if (cfifo)
 			{
 				LV2Data cv;
@@ -1197,7 +1200,13 @@ static void lv2_ui_write(/*{{{*/
 				{
 					fprintf(stderr, "lv2_ui_write: fifo overflow: in control number:%ld\n", index);
 				}
-			}
+			}*/
+			AudioTrack* track = p->track();
+			if(track)
+				audio->msgSetPluginCtrlVal(track, index, value);
+			cport->tmpVal = value;
+			//cport->val = value;
+			updating = false;
 		}
 
 		//FIXME:Should this only happen during playback since that's the only time in matters
