@@ -391,7 +391,7 @@ public:
     virtual void writeConfiguration(int level, Xml& xml);
     virtual bool readConfiguration(Xml& xml, bool readPreset = false);
     virtual bool loadControl(Xml& xml);
-    virtual bool setControl(const QString& s, double val);
+    virtual bool setControl(const QString& s, float val);
     virtual CtrlValueType valueType() const;
 };
 #endif
