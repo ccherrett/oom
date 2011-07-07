@@ -1016,7 +1016,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 	#else
 			if(!m_uinstance.isEmpty())
 			{
-				suil_instance_port_event(m_uinstance.at(0), controls[k].idx, sizeof(float), 0, &controls[k].tmpVal);
+				suil_instance_port_event(m_uinstance.at(0), controls[k].idx, sizeof(float), 0, &controls[k].val);
 				controls[k].lastGuiVal = controls[k].val;
 				controls[k].update = false;
 			}
@@ -1105,8 +1105,6 @@ void LV2PluginI::apply(int frames)/*{{{*/
 					printf("Applying values from automation tmpVal: %f val:%f\n", controls[k].tmpVal, controls[k].val);
 				controls[k].val = controls[k].tmpVal;
 			//	controls[k].update = true;
-				//FIXME: Not sure if this is being called in the right thread
-				//I suspect this should happen in the gui thread
 			}
 			//else
 			//	controls[k].update = false;
@@ -1189,7 +1187,8 @@ static void lv2_ui_write(/*{{{*/
 		if(cport && cport->tmpVal != value)
 		{
 			updating = true;
-			//printf("lv2_ui_write: gui changed param %d value: %f\n", port_index, value);
+			if(debugMsg)
+				printf("lv2_ui_write: gui changed param %d value: %f\n", port_index, value);
 			/*LV2ControlFifo* cfifo = p->getControlFifo(index);
 			if (cfifo)
 			{
@@ -2151,19 +2150,20 @@ void LV2PluginI::releaseConfigs (void)//{{{
 	m_persist_ctypes.clear();
 }//}}}
 
-bool LV2PluginI::setControl(const QString& s, double val)/*{{{*/
+bool LV2PluginI::setControl(const QString& s, float val)/*{{{*/
 {
 	for (int i = 0; i < controlPorts; ++i)
 	{
 		QString cname(controls[i].name.c_str());
 		if (cname == s)
 		{
+			if(debugMsg)
+				printf("LV2PluginI::setControl() name: %s, value: %f\n", controls[i].name.c_str(), val);
 			controls[i].val = controls[i].tmpVal = val;
 			return false;
 		}
 	}
-	printf("LV2PluginI:setControl(%s, %f) controller not found\n",
-			s.toLatin1().constData(), val);
+	printf("LV2PluginI:setControl(%s, %f) controller not found\n", s.toLatin1().constData(), val);
 	return true;
 }/*}}}*/
 
@@ -2176,7 +2176,7 @@ void LV2PluginI::writeConfiguration(int level, Xml& xml)/*{{{*/
 	{
 		//unsigned long idx = controls[i].idx;
 		QString s("control name=\"%1\" val=\"%2\" /");
-		xml.tag(level, s.arg(Xml::xmlString(controls[i].name.c_str()).toLatin1().constData()).arg(controls[i].tmpVal).toLatin1().constData());
+		xml.tag(level, s.arg(Xml::xmlString(controls[i].name.c_str()).toLatin1().constData()).arg(controls[i].tmpVal, 0, 'f', 6).toLatin1().constData());
 	}
 	if (_on == false)
 		xml.intTag(level, "on", _on);
@@ -2195,7 +2195,7 @@ void LV2PluginI::writeConfiguration(int level, Xml& xml)/*{{{*/
 bool LV2PluginI::loadControl(Xml& xml)/*{{{*/
 {
 	QString name("mops");
-	double val = 0.0;
+	float val = 0.0f;
 
 	for (;;)
 	{
@@ -2214,7 +2214,7 @@ bool LV2PluginI::loadControl(Xml& xml)/*{{{*/
 				if (tag == "name")
 					name = xml.s2();
 				else if (tag == "val")
-					val = xml.s2().toDouble();
+					val = xml.s2().toFloat();
 				break;
 			case Xml::TagEnd:
 				if (tag == "control")
