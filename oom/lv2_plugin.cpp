@@ -1559,14 +1559,19 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 			{	
 				m_lv2_ui_widget = suil_instance_get_widget(ui_instance);
 				m_uinstance.append(ui_instance);
+				if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
+					LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
 				printf("LV2PluginI::makeNativeGui() Suil gui instance created controlOutPorts:%d\n", controlOutPorts);
 				for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
 				{
 					//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
 					suil_instance_port_event(ui_instance, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
 				}
-				if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
-					LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
+				for(unsigned long j = 0; j < (unsigned)controlPorts; ++j)
+				{
+					//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
+					suil_instance_port_event(ui_instance, controls[j].idx, sizeof(float), 0, &controls[j].val);
+				}
 				if(m_ui_type == UITYPE_GTK2)
 				{
 				#ifdef GTK2UI_SUPPORT
