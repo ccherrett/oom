@@ -225,7 +225,7 @@ private:
 
 	LV2Plugin* m_plugin;
 	bool m_guiVisible;
-	bool m_update_gui;
+	bool m_stop_process;
 	int m_ui_type;
 	LV2ControlFifo* m_controlFifo;
 	LV2EventFilter* m_eventFilter;
@@ -251,6 +251,10 @@ public:
 	virtual ~LV2PluginI();
 	LV2Plugin* plugin() {
 		return m_plugin;
+	}
+	void setStop(bool f)
+	{
+		m_stop_process = f;
 	}
 #ifdef SLV2_SUPPORT
 	SLV2Instance instantiatelv2();
@@ -369,13 +373,13 @@ public:
 			return m_plugin->defaultValue(port);
 		return 0.0;
 	}
-	bool wantUpdate()
+	bool canProcess()
 	{
-		return m_update_gui;
+		return !m_stop_process;
 	}
 	void makeGui();
 	void makeNativeGui();
-	void closeNativeGui();
+	void closeNativeGui(bool cleanup = false);
     virtual bool isAudioIn(int k);
     virtual bool isAudioOut(int k);
     virtual void range(int i, float* min, float* max) const

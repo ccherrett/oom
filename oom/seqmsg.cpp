@@ -221,6 +221,15 @@ void Audio::msgAddPlugin(AudioTrack* node, int idx, PluginI* plugin)
 	sendMsg(&msg);
 }
 
+void Audio::msgIdlePlugin(AudioTrack* node, PluginI* plugin)
+{
+	AudioMsg msg;
+	msg.id = AUDIO_IDLEPLUGIN;
+	msg.snode = node;
+	msg.plugin = plugin;
+	sendMsg(&msg);
+}
+
 //---------------------------------------------------------
 //   msgSetRecord
 //---------------------------------------------------------

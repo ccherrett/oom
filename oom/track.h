@@ -703,6 +703,7 @@ public:
     void deleteAllEfxGuis();
     void clearEfxList();
     void addPlugin(PluginI* plugin, int idx);
+    void idlePlugin(PluginI* plugin);
 
     double pluginCtrlVal(int ctlID) const;
     void setPluginCtrlVal(int param, double val);

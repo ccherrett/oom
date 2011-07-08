@@ -235,7 +235,7 @@ static void lv2_gtk_window_destroy (GtkWidget * /*gtkWindow*/, gpointer plug )/*
 	if(plugin)
 	{
 		printf("lv2_gtk_window_destroy: calling closeNativeGui\n");
-		plugin->closeNativeGui();
+		plugin->closeNativeGui(true);
 	}
 }/*}}}*/
 #endif
@@ -744,6 +744,7 @@ int LV2Plugin::updateReferences(int val)/*{{{*/
 	}
 
 	_references = newref;
+	//_instNo = val ? (_instNo + 1) : (_instNo - 1);
 
 	return _references;
 }/*}}}*/
@@ -817,7 +818,7 @@ LV2PluginI::LV2PluginI()
 	m_eventFilter = 0;
 	m_guiVisible = false;
 	m_ui_type = 0;
-	m_update_gui = false;
+	m_stop_process = false;
 	m_lv2_ui_widget = NULL;
 #ifdef SLV2_SUPPORT
 	m_slv2_ui_instance = NULL;
@@ -856,7 +857,9 @@ LV2PluginI::~LV2PluginI()
 	//We need to free the resources from lilv here
 	if(m_plugin)
 	{
-		closeNativeGui();
+		updating = true;
+		m_stop_process = true;
+		closeNativeGui(true);
 		deactivate();
 		int ref = m_plugin->updateReferences(-1);
 		if(debugMsg)
@@ -944,7 +947,7 @@ LilvInstance* LV2PluginI::instantiatelv2()
 
 void LV2PluginI::heartBeat()/*{{{*/
 {
-	if(m_lv2_ui_widget == NULL)
+	if(m_lv2_ui_widget == NULL || m_stop_process) 
 		return;
 #ifdef SLV2_SUPPORT
 		//printf("LV2PluginI::heartBeat() SLV2\n");
@@ -1072,6 +1075,8 @@ void LV2PluginI::deactivate()/*{{{*/
 
 void LV2PluginI::apply(int frames)/*{{{*/
 {
+	if(m_stop_process)
+		return;
 	//printf("LV2PluginI::apply()\n");
 	unsigned long ctls = controlPorts;
 	for (unsigned long k = 0; k < ctls; ++k)
@@ -1256,6 +1261,13 @@ void LV2PluginI::showNativeGui(bool flag)/*{{{*/
 				break;
 			}
 			m_guiVisible = true;
+			//Update all the gui ports to the plugin value
+			unsigned long ctls = controlPorts;
+			for (unsigned long k = 0; k < ctls; ++k)
+			{
+				controls[k].update = true;
+				controls[k].lastGuiVal = 0.0f;
+			}
 		}
 		else
 		{
@@ -1283,7 +1295,7 @@ void LV2PluginI::showNativeGui(bool flag)/*{{{*/
 	}
 }/*}}}*/
 
-void LV2PluginI::closeNativeGui()/*{{{*/
+void LV2PluginI::closeNativeGui(bool cleanup)/*{{{*/
 {
 	printf("LV2PluginI::closeNativeGui()\n");
 	showNativeGui(false);
@@ -1307,7 +1319,7 @@ void LV2PluginI::closeNativeGui()/*{{{*/
 		//FIXME:Both of these causes crash of oom we need to find a proper way to free
 		//the ui_handle for now we'll just null the internal copy of the instance
 		//and clear the internal list for lilv mode.
-	if(m_ui_type == UITYPE_EXT)
+	if(m_ui_type == UITYPE_EXT || cleanup)
 	{
 		//	slv2_ui_instance_free(m_slv2_ui_instance);
 		const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
@@ -1321,7 +1333,7 @@ void LV2PluginI::closeNativeGui()/*{{{*/
 	if(m_slv2_ui_instance)
 		m_slv2_ui_instance = NULL;
 #else
-	if(m_ui_type == UITYPE_EXT)
+	if(m_ui_type == UITYPE_EXT || cleanup)
 	{
 		if(!m_uinstance.isEmpty())
 		{
@@ -1606,12 +1618,8 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 		}
 	}/*}}}*/
 #endif
-	//Update all the gui ports to the plugin value
-	unsigned long ctls = controlPorts;
-	for (unsigned long k = 0; k < ctls; ++k)
-	{
-		controls[k].update = true;
-	}
+	//if(!audio->isPlaying() && m_ui_type != UITYPE_EXT)
+	//	audio->msgIdlePlugin(_track, this);
 }/*}}}*/
 
 void LV2PluginI::makeGui()/*{{{*/
@@ -1624,7 +1632,9 @@ const LV2UI_Descriptor *LV2PluginI::lv2_ui_descriptor(void) const/*{{{*/
 #ifdef SLV2_SUPPORT
 	if (m_slv2_ui_instance)
 		return slv2_ui_instance_get_descriptor(m_slv2_ui_instance);
-	else
+//#else
+//	if(!m_uinstance.isEmpty())
+//		return m_uinstance.at(0)->descriptor;
 #endif
 	return NULL;
 }/*}}}*/
@@ -1634,7 +1644,9 @@ LV2UI_Handle LV2PluginI::lv2_ui_handle(void) const/*{{{*/
 #ifdef SLV2_SUPPORT
 	if (m_slv2_ui_instance)
 		return slv2_ui_instance_get_handle(m_slv2_ui_instance);
-	else
+//#else 
+//	if(!m_uinstance.isEmpty())
+//		return m_uinstance.at(0)->handle;
 #endif
 	return NULL;
 }/*}}}*/
@@ -1702,6 +1714,8 @@ bool LV2PluginI::isAudioOut(int p)/*{{{*/
 void LV2PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 {
 	//printf("LV2PluginI::connect\n");
+	if(m_stop_process)
+		return;
 	int port = 0;
 	for (int i = 0; i < instances; ++i)
 	{
@@ -2000,7 +2014,6 @@ const LV2_Persist *LV2PluginI::lv2_persist_descriptor(unsigned short i ) const/*
 #endif
 }/*}}}*/
 
-
 int LV2PluginI::lv2_persist_store (uint32_t key, const void *value, size_t size, uint32_t type, uint32_t flags )/*{{{*/
 {
 	if (value == NULL)
@@ -2066,7 +2079,7 @@ const void *LV2PluginI::lv2_persist_retrieve (uint32_t key, size_t *size, uint32
 	return data.constData();
 }/*}}}*/
 
-LV2_Handle LV2PluginI::lv2_handle(unsigned short i)
+LV2_Handle LV2PluginI::lv2_handle(unsigned short i)/*{{{*/
 {
 	if(m_instance.isEmpty() || i >= m_instance.size())
 		return NULL;
@@ -2081,7 +2094,7 @@ LV2_Handle LV2PluginI::lv2_handle(unsigned short i)
 		return NULL;
 	return lilv_instance_get_handle(ins);
 #endif
-}
+}/*}}}*/
 
 void LV2PluginI::freezeConfigs (void)//{{{
 {
@@ -2100,7 +2113,6 @@ void LV2PluginI::freezeConfigs (void)//{{{
 	}
 }//}}}
 
-// Plugin configuration/state (load) realization.
 void LV2PluginI::realizeConfigs (void)//{{{
 {
 	if (!m_plugin->configSupport())
@@ -2139,7 +2151,6 @@ void LV2PluginI::realizeConfigs (void)//{{{
 		}
 	}
 }//}}}
-
 
 void LV2PluginI::releaseConfigs (void)//{{{
 {

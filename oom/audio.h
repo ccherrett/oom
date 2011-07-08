@@ -63,6 +63,7 @@ enum
     AUDIO_ROUTEADD, AUDIO_ROUTEREMOVE, AUDIO_REMOVEROUTES,
     AUDIO_VOL, AUDIO_PAN,
     AUDIO_ADDPLUGIN,
+    AUDIO_IDLEPLUGIN,
     AUDIO_SET_SEG_SIZE,
     AUDIO_SET_PREFADER, AUDIO_SET_CHANNELS,
     AUDIO_SET_PLUGIN_CTRL_VAL,
@@ -262,6 +263,7 @@ public:
     void msgAddRoute(Route, Route);
     void msgAddRoute1(Route, Route);
     void msgAddPlugin(AudioTrack*, int idx, PluginI* plugin);
+    void msgIdlePlugin(AudioTrack*, PluginI* plugin);
     void msgSetMute(AudioTrack*, bool val);
     void msgSetVolume(AudioTrack*, double val);
     void msgSetPan(AudioTrack*, double val);

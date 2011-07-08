@@ -165,12 +165,22 @@ Part* AudioTrack::newPart(Part*, bool /*clone*/)
 	return 0;
 }
 
+void AudioTrack::idlePlugin(PluginI* plugin)
+{
+	if(plugin)
+	{
+		for(int i = 0; i < 7; ++i)
+			plugin->apply(1);
+	}
+}
+
 //---------------------------------------------------------
 //   addPlugin
 //---------------------------------------------------------
 
 void AudioTrack::addPlugin(PluginI* plugin, int idx)
 {
+	printf("AudioTrack::addPlugin(%p, %d) \n", plugin, idx);
 	if (plugin == 0)
 	{
 		PluginI* oldPlugin = (*_efxPipe)[idx];
@@ -188,18 +198,21 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)
 #ifdef LV2_SUPPORT
 			if(oldPlugin->type() == 2)
 			{
-				LV2PluginI* plug = (LV2PluginI*)plugin;
+				LV2PluginI* plug = (LV2PluginI*)oldPlugin;
 				if(plug)
-					delete plug;
+					plug->setStop(true);
+				//if(plug)
+				//	delete plug;
 			}
-			else
+			//else
 #endif
-				delete oldPlugin;
+				//delete oldPlugin;
 		}
 	}
-	efxPipe()->insert(plugin, idx);
+
 	if (plugin)
 	{
+		efxPipe()->insert(plugin, idx);
 		plugin->setID(idx);
 		plugin->setTrack(this);
 

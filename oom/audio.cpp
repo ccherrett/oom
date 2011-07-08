@@ -683,6 +683,9 @@ void Audio::processMsg(AudioMsg* msg)
 		case AUDIO_SET_CHANNELS:
 			msg->snode->setChannels(msg->ival);
 			break;
+		case AUDIO_IDLEPLUGIN:
+			msg->snode->idlePlugin(msg->plugin);
+			break;
 		case AUDIO_ADDPLUGIN:
 			msg->snode->addPlugin(msg->plugin, msg->ival);
 			break;

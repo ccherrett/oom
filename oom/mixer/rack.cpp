@@ -172,7 +172,11 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 			}
 			int idx = row(it);
 			if (replace)
+			{
 				audio->msgAddPlugin(track, idx, 0);
+				//Do this part from the GUI context so user interfaces can be properly deleted
+				track->efxPipe()->insert(0, idx);
+			}
 			audio->msgAddPlugin(track, idx, lplugi);
 		}
 		else
@@ -302,8 +306,25 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 			break;
 		}
 		case REMOVE:
+		{
 			audio->msgAddPlugin(track, idx, 0);
+			Pipeline* epipe = track->efxPipe();
+			/*PluginI* oldPlugin = (*epipe)[idx];
+			if(oldPlugin)
+			{
+		#ifdef LV2_SUPPORT
+				if(oldPlugin->type() == 2)
+				{
+					LV2PluginI* lp = (LV2PluginI*)oldPlugin;
+					delete lp;
+				}
+				else
+		#endif
+					delete oldPlugin;
+			}*/
+			epipe->insert(0, idx);
 			break;
+		}
 		case BYPASS:
 		{
 			bool flag = !pipe->isOn(idx);
