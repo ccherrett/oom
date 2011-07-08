@@ -65,7 +65,6 @@ bool LV2EventFilter::eventFilter(QObject *o, QEvent *event)/*{{{*/
 //These are used to convert uri to id and back during the lifecycle of the plugin instance
 static QHash<QString, uint32_t>    uri_map;
 static QHash<uint32_t, QByteArray> ids_map;
-bool updating = false;
 
 static uint32_t lv2_uri_to_id(LV2_URI_Map_Callback_Data /*data*/, const char *map, const char *uri )
 {
@@ -857,7 +856,6 @@ LV2PluginI::~LV2PluginI()
 	//We need to free the resources from lilv here
 	if(m_plugin)
 	{
-		updating = true;
 		m_stop_process = true;
 		closeNativeGui(true);
 		deactivate();
@@ -998,7 +996,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 	unsigned long ctls = controlPorts;
 	for (unsigned long k = 0; k < ctls; ++k)
 	{
-		if(m_uinstance.isEmpty())
+		if(m_uinstance.isEmpty() || m_stop_process)
 			return;
 		if(controls[k].update)// || controls[k].lastGuiVal != controls[k].val))/*{{{*/
 		{
@@ -1018,10 +1016,11 @@ void LV2PluginI::heartBeat()/*{{{*/
 				}
 			}
 	#else
-			if(!m_uinstance.isEmpty())
+			if(!m_uinstance.isEmpty() && !m_stop_process)
 			{
-				suil_instance_port_event(m_uinstance.at(0), controls[k].idx, sizeof(float), 0, &controls[k].val);
+				suil_instance_port_event(m_uinstance.at(0), controls[k].idx, sizeof(float), 0, &controls[k].tmpVal);
 				controls[k].lastGuiVal = controls[k].val;
+				//printf("Setting port: %s value: %f\n", controls[k].name.c_str(), controls[k].tmpVal);
 				controls[k].update = false;
 			}
 	#endif
@@ -1107,7 +1106,6 @@ void LV2PluginI::apply(int frames)/*{{{*/
 					printf("Applying values from fifo %f\n", v.value);
 				_track->setPluginCtrlVal(genACnum(_id, k), v.value);
 			}
-			updating = false;
 		}
 		else
 		{
@@ -1203,7 +1201,6 @@ static void lv2_ui_write(/*{{{*/
 
 		if(cport && cport->tmpVal != value)
 		{
-			updating = true;
 			if(debugMsg)
 				printf("lv2_ui_write: gui changed param %d value: %f\n", port_index, value);
 			LV2ControlFifo* cfifo = p->getControlFifo(index);
@@ -1223,7 +1220,6 @@ static void lv2_ui_write(/*{{{*/
 			cport->tmpVal = value;
 			cport->update = false;
 			//cport->val = value;
-			//updating = false;
 		}
 
 		//FIXME:Should this only happen during playback since that's the only time in matters

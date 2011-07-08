@@ -61,6 +61,8 @@
 
 void AudioStrip::heartBeat()
 {
+	if(song->invalid)
+		return;
 	for (int ch = 0; ch < track->channels(); ++ch)
 	{
 		if (meter[ch])

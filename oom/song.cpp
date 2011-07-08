@@ -2317,6 +2317,7 @@ void Song::clear(bool signal)
 void Song::cleanupForQuit()
 {
 	bounceTrack = 0;
+	invalid = true;
 
 	if (debugMsg)
 		printf("OOMidi: Song::cleanupForQuit...\n");
