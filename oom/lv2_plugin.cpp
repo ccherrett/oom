@@ -1000,7 +1000,7 @@ void LV2PluginI::heartBeat()/*{{{*/
 	{
 		if(m_uinstance.isEmpty())
 			return;
-		if(!updating && (controls[k].update || controls[k].lastGuiVal != controls[k].val))/*{{{*/
+		if(controls[k].update)// || controls[k].lastGuiVal != controls[k].val))/*{{{*/
 		{
 	#ifdef SLV2_SUPPORT
 			const LV2UI_Descriptor *ui_descriptor = lv2_ui_descriptor();
@@ -1103,7 +1103,7 @@ void LV2PluginI::apply(int frames)/*{{{*/
 			controls[k].tmpVal = v.value;
 			if (_track && _id != -1)
 			{
-				//if(debugMsg)
+				if(debugMsg)
 					printf("Applying values from fifo %f\n", v.value);
 				_track->setPluginCtrlVal(genACnum(_id, k), v.value);
 			}
@@ -1121,7 +1121,7 @@ void LV2PluginI::apply(int frames)/*{{{*/
 				if(debugMsg)
 					printf("Applying values from automation tmpVal: %f val:%f\n", controls[k].tmpVal, controls[k].val);
 				controls[k].val = controls[k].tmpVal;
-			//	controls[k].update = true;
+				controls[k].update = true;
 			}
 			//else
 			//	controls[k].update = false;
@@ -1206,7 +1206,7 @@ static void lv2_ui_write(/*{{{*/
 			updating = true;
 			if(debugMsg)
 				printf("lv2_ui_write: gui changed param %d value: %f\n", port_index, value);
-			/*LV2ControlFifo* cfifo = p->getControlFifo(index);
+			LV2ControlFifo* cfifo = p->getControlFifo(index);
 			if (cfifo)
 			{
 				LV2Data cv;
@@ -1216,13 +1216,14 @@ static void lv2_ui_write(/*{{{*/
 				{
 					fprintf(stderr, "lv2_ui_write: fifo overflow: in control number:%ld\n", index);
 				}
-			}*/
-			AudioTrack* track = p->track();
-			if(track)
-				audio->msgSetPluginCtrlVal(track, index, value);
+			}
+			//AudioTrack* track = p->track();
+			//if(track)
+			//	audio->msgSetPluginCtrlVal(track, index, value);
 			cport->tmpVal = value;
+			cport->update = false;
 			//cport->val = value;
-			updating = false;
+			//updating = false;
 		}
 
 		//FIXME:Should this only happen during playback since that's the only time in matters
