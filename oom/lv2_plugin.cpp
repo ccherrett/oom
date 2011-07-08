@@ -235,7 +235,7 @@ static void lv2_gtk_window_destroy (GtkWidget * /*gtkWindow*/, gpointer plug )/*
 	if(plugin)
 	{
 		printf("lv2_gtk_window_destroy: calling closeNativeGui\n");
-		plugin->closeNativeGui(true);
+		plugin->closeNativeGui();
 	}
 }/*}}}*/
 #endif
@@ -861,6 +861,7 @@ LV2PluginI::~LV2PluginI()
 		m_stop_process = true;
 		closeNativeGui(true);
 		deactivate();
+		cleanup();
 		int ref = m_plugin->updateReferences(-1);
 		if(debugMsg)
 			printf("Reference count:%d\n", ref);
@@ -1038,7 +1039,7 @@ void LV2PluginI::activate()/*{{{*/
 #else
 		lilv_instance_activate(m_instance[j]);
 #endif
-		if (initControlValues)/*{{{*/
+		if (initControlValues)
 		{
 			for (int i = 0; i < controlPorts; ++i)
 			{
@@ -1054,7 +1055,7 @@ void LV2PluginI::activate()/*{{{*/
 			{
 				controls[i].tmpVal = controls[i].val;
 			}
-		}/*}}}*/
+		}
 	}
 }/*}}}*/
 
@@ -1065,9 +1066,20 @@ void LV2PluginI::deactivate()/*{{{*/
 	{
 #ifdef SLV2_SUPPORT
 		slv2_instance_deactivate((SLV2Instance)m_instance[j]);
-		slv2_instance_free((SLV2Instance)m_instance[j]);
 #else
 		lilv_instance_deactivate((LilvInstance*)m_instance[j]);
+#endif
+	}
+}/*}}}*/
+
+void LV2PluginI::cleanup()/*{{{*/
+{
+	printf("LV2PluginI::cleanup()\n");
+	for(int j = 0; j < instances; ++j)
+	{
+#ifdef SLV2_SUPPORT
+		slv2_instance_free((SLV2Instance)m_instance[j]);
+#else
 		lilv_instance_free((LilvInstance*)m_instance[j]);
 #endif
 	}
@@ -1745,6 +1757,48 @@ void LV2PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 	}
 }/*}}}*/
 
+void LV2PluginI::idlePlugin()/*{{{*/
+{
+	activate();
+	unsigned long bufsize = 1024;
+	float buffer[bufsize];
+	memset(buffer, 0, sizeof(float) * bufsize);
+	for (int i = 0; i < instances; ++i)
+	{
+		for (unsigned long k = 0; k < m_plugin->ports(); ++k)
+		{
+			if (isAudioIn(k))
+			{
+#ifdef SLV2_SUPPORT
+				slv2_instance_connect_port(m_instance[i], k, buffer);
+#else
+				lilv_instance_connect_port(m_instance[i], k, buffer);
+#endif
+			}
+			else if(isAudioOut(k))
+			{
+#ifdef SLV2_SUPPORT
+				slv2_instance_connect_port(m_instance[i], k, buffer);
+#else
+				lilv_instance_connect_port(m_instance[i], k, buffer);
+#endif
+			}
+		}
+	}
+	for (int i = 0; i < instances; ++i)
+	{
+#ifdef SLV2_SUPPORT
+		for(int r = 0; r < 6; ++r)
+			slv2_instance_run(m_instance[i], bufsize);
+#else
+		//This inner loop is just a hack to satisfy the ir plugin
+		for(int r = 0; r < 6; ++r)
+			lilv_instance_run(m_instance[i], bufsize);
+#endif
+	}
+	deactivate();
+}/*}}}*/
+
 void LV2PluginI::setChannels(int c)/*{{{*/
 {
 	channel = c;
@@ -1769,6 +1823,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 
 	// remove old instances if any:
 	deactivate();
+	cleanup();
 	instances = ni;
 
 	controlPorts = m_plugin->controlInPorts();
@@ -1978,6 +2033,7 @@ void LV2PluginI::setChannels(int c)/*{{{*/
 	realizeConfigs();
 
 	releaseConfigs();
+	idlePlugin();
 	activate();
 	//apply(1);
 }/*}}}*/

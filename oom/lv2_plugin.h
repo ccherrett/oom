@@ -357,6 +357,7 @@ public:
     virtual void connect(int ports, float** src, float** dst);
     virtual void activate();
     virtual void deactivate();
+	void cleanup();
     virtual void apply(int n);
     virtual void setChannels(int);
 	void showGui();
@@ -391,6 +392,7 @@ public:
 	{
 		return controls[i].idx;
 	}
+	void idlePlugin();
 	void heartBeat();
     virtual void writeConfiguration(int level, Xml& xml);
     virtual bool readConfiguration(Xml& xml, bool readPreset = false);

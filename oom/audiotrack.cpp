@@ -169,6 +169,7 @@ void AudioTrack::idlePlugin(PluginI* plugin)
 {
 	if(plugin)
 	{
+		audio->process(1);
 		for(int i = 0; i < 7; ++i)
 			plugin->apply(1);
 	}
