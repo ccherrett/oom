@@ -316,13 +316,16 @@ public:
 };
 
 
-QIcon colorRect(const QColor& color, const QColor& color2, int width, int height)//{{{
+QIcon colorRect(const QColor& color, const QColor& color2, int width, int height, bool selected = false)//{{{
 {
+	int selectedPad = 0;
+	if(selected)
+		selectedPad = 5;
 	QPainter painter;
-	QPixmap image(width, height);
+	QPixmap image(width+selectedPad, height+selectedPad);
 	painter.begin(&image);
 	painter.setBrush(color);
-	QRect rectangle(0, 0, width, height);
+	QRect rectangle(0, 0, width+selectedPad, height+selectedPad);
 	painter.drawRect(rectangle);
 	painter.setPen(color2);
 	painter.drawLine(0,(height/2)-1,width,(height/2)-1);
@@ -1099,7 +1102,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	QAction *act_rename = partPopup->addAction(tr("rename"));
 	act_rename->setData(0);
 
-	QMenu* colorPopup = partPopup->addMenu(tr("color"));
+	QMenu* colorPopup = partPopup->addMenu(tr("Part Color"));
 
 	// part color selection
 	//const QFontMetrics& fm = colorPopup->fontMetrics();
@@ -1108,8 +1111,18 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	for (int i = 0; i < NUM_PARTCOLORS; ++i)
 	{
 		//ColorListItem* item = new ColorListItem(config.partColors[i], h, fontMetrics().height(), partColorNames[i]); //ddskrjo
-		QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), config.partColorNames[i]);
-		act_color->setData(20 + i);
+		//Part* ipart = npart->part();
+		if(npart->part()->colorIndex() == i)
+		{
+			printf("Part color matched\n");
+			QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), "* "+config.partColorNames[i]);
+			act_color->setData(20 + i);
+		}
+		else
+		{
+			QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), config.partColorNames[i]);
+			act_color->setData(20 + i);
+		}
 	}
 
 	QAction *act_delete = partPopup->addAction(QIcon(*deleteIcon), tr("delete")); // ddskrjo added QIcon to all
