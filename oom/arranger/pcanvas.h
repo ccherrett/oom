@@ -12,6 +12,10 @@
 #include "canvas.h"
 #include "trackautomationview.h"
 #include <QHash>
+#include <QIcon>
+#include <QPixmap>
+#include <QRect>
+#include <QPainter>
 
 class QDragMoveEvent;
 class QDropEvent;
@@ -183,6 +187,49 @@ public:
 	bool isEditing() { return editMode; }
 	CItem* addPartAtCursor(Track*);
     virtual void newItem(CItem*, bool);
+	static QIcon colorRect(const QColor& color, const QColor& color2, int width, int height, bool selected = false)//{{{
+	{
+		QPainter painter;
+		QPixmap image(width, height);
+		painter.begin(&image);
+		painter.setBrush(selected ? color2 : color);
+		QRect rectangle(0, 0, width, height);
+		painter.drawRect(rectangle);
+		painter.setPen(selected ? color : color2);
+		painter.drawLine(0,(height/2)-1,width,(height/2)-1);
+		painter.drawLine(0,(height/2),width,(height/2));
+		painter.drawLine(0,(height/2)+1,width,(height/2)+1);
+	
+		painter.drawLine((width/2)-12,(height/2)+15,(width/2)-12,(height/2)-15);
+		painter.drawLine((width/2)-13,(height/2)+15,(width/2)-13,(height/2)-15);
+		painter.drawLine((width/2)-14,(height/2)+15,(width/2)-14,(height/2)-15);
+		painter.drawLine((width/2)-18,(height/2)+5,(width/2)-18,(height/2)-5);
+		painter.drawLine((width/2)-19,(height/2)+5,(width/2)-19,(height/2)-5);
+		painter.drawLine((width/2)-20,(height/2)+10,(width/2)-20,(height/2)-10);
+		painter.drawLine((width/2)-23,(height/2)+20,(width/2)-23,(height/2)-20);
+		painter.drawLine((width/2)-24,(height/2)+10,(width/2)-24,(height/2)-10);
+		painter.drawLine((width/2)-25,(height/2)+5,(width/2)-25,(height/2)-5);
+	
+		painter.drawLine((width/2)-5,(height/2)+15,(width/2)-5,(height/2)-15);
+		painter.drawLine((width/2)-6,(height/2)+15,(width/2)-6,(height/2)-15);
+		painter.drawLine((width/2)-7,(height/2)+15,(width/2)-7,(height/2)-15);
+		painter.drawLine((width/2)-8,(height/2)+5,(width/2)-8,(height/2)-5);
+		painter.drawLine((width/2)-9,(height/2)+5,(width/2)-9,(height/2)-5);
+		
+		painter.drawLine((width/2)+12,(height/2)+15,(width/2)+12,(height/2)-15);
+		painter.drawLine((width/2)+13,(height/2)+15,(width/2)+13,(height/2)-15);
+		painter.drawLine((width/2)+14,(height/2)+15,(width/2)+14,(height/2)-15);
+		painter.drawLine((width/2)+18,(height/2)+5,(width/2)+18,(height/2)-5);
+		painter.drawLine((width/2)+19,(height/2)+5,(width/2)+19,(height/2)-5);
+		painter.drawLine((width/2)+20,(height/2)+10,(width/2)+20,(height/2)-10);
+		painter.drawLine((width/2)+23,(height/2)+30,(width/2)+23,(height/2)-30);
+		painter.drawLine((width/2)+24,(height/2)+20,(width/2)+24,(height/2)-20);
+		painter.drawLine((width/2)+25,(height/2)+10,(width/2)+25,(height/2)-10);
+		
+		painter.end();
+		QIcon icon(image);
+		return icon;
+	}//}}}
 
 public slots:
 

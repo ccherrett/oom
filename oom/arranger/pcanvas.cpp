@@ -316,52 +316,6 @@ public:
 };
 
 
-QIcon colorRect(const QColor& color, const QColor& color2, int width, int height, bool selected = false)//{{{
-{
-	int selectedPad = 0;
-	if(selected)
-		selectedPad = 5;
-	QPainter painter;
-	QPixmap image(width+selectedPad, height+selectedPad);
-	painter.begin(&image);
-	painter.setBrush(color);
-	QRect rectangle(0, 0, width+selectedPad, height+selectedPad);
-	painter.drawRect(rectangle);
-	painter.setPen(color2);
-	painter.drawLine(0,(height/2)-1,width,(height/2)-1);
-	painter.drawLine(0,(height/2),width,(height/2));
-	painter.drawLine(0,(height/2)+1,width,(height/2)+1);
-
-	painter.drawLine((width/2)-12,(height/2)+15,(width/2)-12,(height/2)-15);
-	painter.drawLine((width/2)-13,(height/2)+15,(width/2)-13,(height/2)-15);
-	painter.drawLine((width/2)-14,(height/2)+15,(width/2)-14,(height/2)-15);
-	painter.drawLine((width/2)-18,(height/2)+5,(width/2)-18,(height/2)-5);
-	painter.drawLine((width/2)-19,(height/2)+5,(width/2)-19,(height/2)-5);
-	painter.drawLine((width/2)-20,(height/2)+10,(width/2)-20,(height/2)-10);
-	painter.drawLine((width/2)-23,(height/2)+20,(width/2)-23,(height/2)-20);
-	painter.drawLine((width/2)-24,(height/2)+10,(width/2)-24,(height/2)-10);
-	painter.drawLine((width/2)-25,(height/2)+5,(width/2)-25,(height/2)-5);
-
-	painter.drawLine((width/2)-5,(height/2)+15,(width/2)-5,(height/2)-15);
-	painter.drawLine((width/2)-6,(height/2)+15,(width/2)-6,(height/2)-15);
-	painter.drawLine((width/2)-7,(height/2)+15,(width/2)-7,(height/2)-15);
-	painter.drawLine((width/2)-8,(height/2)+5,(width/2)-8,(height/2)-5);
-	painter.drawLine((width/2)-9,(height/2)+5,(width/2)-9,(height/2)-5);
-	
-	painter.drawLine((width/2)+12,(height/2)+15,(width/2)+12,(height/2)-15);
-	painter.drawLine((width/2)+13,(height/2)+15,(width/2)+13,(height/2)-15);
-	painter.drawLine((width/2)+14,(height/2)+15,(width/2)+14,(height/2)-15);
-	painter.drawLine((width/2)+18,(height/2)+5,(width/2)+18,(height/2)-5);
-	painter.drawLine((width/2)+19,(height/2)+5,(width/2)+19,(height/2)-5);
-	painter.drawLine((width/2)+20,(height/2)+10,(width/2)+20,(height/2)-10);
-	painter.drawLine((width/2)+23,(height/2)+30,(width/2)+23,(height/2)-30);
-	painter.drawLine((width/2)+24,(height/2)+20,(width/2)+24,(height/2)-20);
-	painter.drawLine((width/2)+25,(height/2)+10,(width/2)+25,(height/2)-10);
-	
-	painter.end();
-	QIcon icon(image);
-	return icon;
-}//}}}
 
 //---------------------------------------------------------
 //   NPart
@@ -1112,15 +1066,17 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	{
 		//ColorListItem* item = new ColorListItem(config.partColors[i], h, fontMetrics().height(), partColorNames[i]); //ddskrjo
 		//Part* ipart = npart->part();
+		QString colorname(config.partColorNames[i]);
 		if(npart->part()->colorIndex() == i)
 		{
-			printf("Part color matched\n");
-			QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), "* "+config.partColorNames[i]);
+			//printf("Part color matched\n");
+			colorname = QString("* "+config.partColorNames[i]);
+			QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
 			act_color->setData(20 + i);
 		}
 		else
 		{
-			QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), config.partColorNames[i]);
+			QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
 			act_color->setData(20 + i);
 		}
 	}
@@ -2599,7 +2555,6 @@ void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, Midi
 void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const QRect& _pr)
 {
 	int i = wp->colorIndex();
-	printf("color index: %d\n", wp->colorIndex());
 	QColor waveFill(config.partWaveColors[i]);
 	QColor waveEdge = QColor(211,193,224);
 	
