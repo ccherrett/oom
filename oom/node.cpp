@@ -907,7 +907,7 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 						float* db = dst[ch % a->channels()];
 						float* sb = buffer[ch];
 						for (unsigned f = 0; f < nframes; ++f)
-							*db++ += (*sb++ * m * vol[ch]); // add to mix
+							*db++ += (*sb++ * m);// * vol[ch]); // add to mix
 					}
 				}
 				else if (srcChans == 1 && auxChannels == 2)
@@ -917,7 +917,7 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 						float* db = dst[ch % a->channels()];
 						float* sb = buffer[0];
 						for (unsigned f = 0; f < nframes; ++f)
-							*db++ += (*sb++ * m * vol[ch]); // add to mix
+							*db++ += (*sb++ * m);// * vol[ch]); // add to mix
 					}
 				}
 			}
@@ -1163,62 +1163,6 @@ void AudioTrack::readVolume(Xml& xml)
 		}
 	}
 }
-
-// Removed by T356
-// "recfile" tag not saved anymore
-/*
-//---------------------------------------------------------
-//   readRecfile
-//---------------------------------------------------------
-
-void AudioTrack::readRecfile(Xml& xml)
-	  {
-	  QString path;
-	  int channels = 2;
-	  int format   = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-
-	  for (;;) {
-			Xml::Token token = xml.parse();
-			if (token == Xml::Error || token == Xml::End)
-				  break;
-			const QString& tag = xml.s1();
-			switch (token) {
-				  case Xml::TagStart:
-						if (tag == "path")
-							  path = xml.parse1();
-						else if (tag == "channels")
-							  channels = xml.parseInt();
-						else if (tag == "format")
-							  format = xml.parseInt();
-						else if (tag == "samplebits")
-							  ;
-						else
-							  xml.unknown("recfile");
-						break;
-				  case Xml::TagEnd:
-						if (tag == "recfile") {
-							  if (QFile::exists(path)) {
-									setRecFile(getWave(path, true));
-									}
-							  else {
-									setRecFile(new SndFile(path));
-									recFile()->setFormat(format, channels, sampleRate);
-									if (recFile()->openWrite()) {
-										  fprintf(stderr, "create wave file(%s) failed: %s\n",
-											 path.toLatin1().constData(), recFile()->strerror().toLatin1().constData());
-										  delete _recFile;
-										  _recFile = 0;
-										  }
-									}
-							  return;
-							  }
-				  default:
-						break;
-				  }
-			}
-	  }
- */
-
 //---------------------------------------------------------
 //   setChannels
 //---------------------------------------------------------
