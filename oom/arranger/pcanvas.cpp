@@ -2586,6 +2586,7 @@ void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, Midi
 void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const QRect& _pr)
 {
 	int i = wp->colorIndex();
+	printf("color index: %d\n", wp->colorIndex());
 	QColor waveFill(config.partWaveColors[i]);
 	QColor waveEdge = QColor(211,193,224);
 	
