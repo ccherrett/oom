@@ -3808,7 +3808,7 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 			if (track && track->recordFlag())
 			{
 				int mypos = track2Y(track)-ypos;
-				p.fillRect(start, mypos, ww, track->height(), config.partColors[0]);
+				p.fillRect(start, mypos, ww, track->height(), config.partColors[track->getDefaultPartColor()]);
 				p.setPen(Qt::black); //TODO: Fix colors
 				p.drawLine(start, mypos, start+ww, mypos);
 				p.drawLine(start, mypos+1, start+ww, mypos+1);
