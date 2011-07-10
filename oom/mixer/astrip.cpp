@@ -1001,10 +1001,11 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)/
 	else
 	{ //Aux
 		plb->setToolTip(name);
-		container->addItem(new QSpacerItem(15, 0));
+		container->addItem(new QSpacerItem(7, 0));
 		container->addWidget(pl);
 		container->addWidget(knob);
 		container->addWidget(chkPre);
+		container->addItem(new QSpacerItem(7, 0));
 		labelBox->addLayout(container);
 		m_auxBox->addLayout(labelBox);
 	}
