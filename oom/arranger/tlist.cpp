@@ -1065,12 +1065,11 @@ void TList::mousePressEvent(QMouseEvent* ev)
 	}//END no Track
 
 	//x y
-	int ctpos = (t->y()+(t->height()/2))+1;
-	QRect vRange(this->x(), ctpos-8, 100, 16);
-	// FIXME does not work with vscroll!
-	bool valid = true;//vRange.contains(ev->pos());
+	int ctpos = ((t->y())+(t->height()/2));
+	QRect vRange(this->x(), ctpos-8, 175, 16);
+	bool valid = vRange.contains(x, y+ypos);
 	//printf("validRange: x: %d, y: %d, height: %d, width: %d, right: %d, left: %d, top: %d, bottom: %d\n", vRange.x(), vRange.y(), vRange.height(), vRange.width(), vRange.right(), vRange.left(), vRange.top(), vRange.bottom());
-	//printf("Click Point: x: %d, y: %d, Global: x: %d, y: %d, valid: %d\n", x, y, ev->globalX(), ev->globalY(), (int)valid);
+	//printf("Click Point: x: %d, y: %d, Global: x: %d, y: %d, valid: %d ypos: %d center: %d trackY: %d trackH: %d\n", x, y, ev->globalX(), ev->globalY(), (int)valid, ypos, ctpos, t->y(), t->height());
 
 	//This changes to song->visibletracks()
 	TrackList* tracks = song->visibletracks();
@@ -1226,16 +1225,19 @@ void TList::mousePressEvent(QMouseEvent* ev)
 			case COL_NONE:
 				break;
 			case COL_CLASS:
-				t->setReminder1(!t->getReminder1());
+				if(valid)
+					t->setReminder1(!t->getReminder1());
 				break;
 			case COL_OCHANNEL:
 			{
-				t->setReminder2(!t->getReminder2());
+				if(valid)
+					t->setReminder2(!t->getReminder2());
 			}
 				break;
 			case COL_OPORT:
 			{
-				t->setReminder3(!t->getReminder3());
+				if(valid)
+					t->setReminder3(!t->getReminder3());
 			}
 				break;
 			case COL_MUTE:
@@ -1273,54 +1275,23 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				if (button == Qt::LeftButton)
 				{
 					updateSelection(t, shift);
-					/*if (!shift)
-					{
-						song->deselectTracks();
-						if(song->hasSelectedParts)
-							song->deselectAllParts();
-						t->setSelected(true);
-
-						// rec enable track if expected
-						TrackList recd = getRecEnabledTracks();
-						if (recd.size() == 1 && config.moveArmedCheckBox)
-						{ // one rec enabled track, move rec enabled with selection
-							song->setRecordFlag((Track*) recd.front(), false);
-							song->setRecordFlag(t, true);
-						}
-					}
-					else
-					{
-						song->deselectAllParts();
-						t->setSelected(!t->selected());
-					}
-					if (editTrack && editTrack != t)
-					{
-						returnPressed();
-					}
-					///emit selectionChanged();
-					emit selectionChanged(t->selected() ? t : 0);*/
 				}
 				else if (button == Qt::RightButton)
 				{
 					mode = NORMAL;
 					QMenu* p = new QMenu;
-					//p->clear();
+					if(t && t->type() == Track::WAVE)
+						p->addAction(tr("Import Audio File"))->setData(1);
 					if (!multipleSelectedTracks)
 					{
 						p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
-						//p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
 					}
 					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 	
 					QMenu* colorPopup = p->addMenu(tr("Default Part Color"));
 				
-					// part color selection
-					//const QFontMetrics& fm = colorPopup->fontMetrics();
-					//int h = fm.lineSpacing();
-				
 					for (int i = 0; i < NUM_PARTCOLORS; ++i)
 					{
-						//ColorListItem* item = new ColorListItem(config.partColors[i], h, fontMetrics().height(), partColorNames[i]); //ddskrjo
 						QString colorname(config.partColorNames[i]);
 						if(t->getDefaultPartColor() == i)
 						{
@@ -1347,7 +1318,6 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					{
 						trackHeightsMenu->addAction("Fit Selection in View")->setData(13);
 					}
-
 
 					if (t->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
 					{
@@ -1422,13 +1392,11 @@ void TList::mousePressEvent(QMouseEvent* ev)
 
 					break;
 
-					/*case 1: // show track comment
+					case 1: // Import audio file
 					{
-						TrackComment* tc = new TrackComment(t, 0);
-						tc->show();
-						//QToolTip::add( this, "FOOOOOOOOOOOOO" );
+						oom->importWave(t);
 					}
-					break;*/
+					break;
 					case 2:
 					{
 						SynthI* synth = (SynthI*) t;

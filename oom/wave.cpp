@@ -868,9 +868,11 @@ void SndFile::applyUndoFile(const QString& original, const QString& tmpfile, uns
 //   importAudio
 //---------------------------------------------------------
 
-void OOMidi::importWave()
+void OOMidi::importWave(Track* t)
 {
 	Track* track = arranger->curTrack();
+	if(t)
+		track = t;
 	if (track == 0 || track->type() != Track::WAVE)
 	{
 		QMessageBox::critical(this, QString("OOMidi"),
@@ -884,7 +886,10 @@ void OOMidi::importWave()
 	if (!fn.isEmpty())
 	{
 		lastWavePath = fn;
-		importWaveToTrack(fn);
+		if(track)
+			importWaveToTrack(fn, song->cpos(), track);
+		else
+			importWaveToTrack(fn);
 	}
 }
 

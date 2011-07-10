@@ -269,7 +269,6 @@ private slots:
     void startBugBrowser();
     void launchBrowser(QString &whereTo);
     void importMidi();
-    void importWave();
     void importPart();
     void exportMidi();
 
@@ -368,6 +367,7 @@ public slots:
     void importMidi(const QString &file);
     void setUsedTool(int);
     void showDidYouKnowDialog();
+    void importWave(Track* track = NULL);
 
     void routingPopupMenuAboutToHide();
     void configMidiAssign(int tab = -1);
