@@ -74,7 +74,6 @@ private:
 	bool _reminder1;
 	bool _reminder2;
 	bool _reminder3;
-	bool _collapsed;
 
 
 protected:
@@ -99,6 +98,8 @@ protected:
     bool _volumeEn2Ctrl;
     bool _panEnCtrl;
     bool _panEn2Ctrl;
+	bool _collapsed;
+	int _mixerTab;
 
     int _activity;
     int _lastActivity;
@@ -156,6 +157,8 @@ public:
 	}
 	bool collapsed() { return _collapsed; }
 	void setCollapsed(bool f) { _collapsed = f; }
+	int mixerTab(){return _mixerTab;}
+	void setMixerTab(int i){_mixerTab = i;}
 
     QString comment() const
     {

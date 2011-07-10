@@ -176,6 +176,9 @@ Strip::Strip(QWidget* parent, Track* t)
 		m_tabWidget->addTab(m_auxTab, QString(tr("Aux")));
 	if(!track->isMidiTrack())
 		m_tabWidget->addTab(m_fxTab, QString(tr("FX")));
+	
+	m_tabWidget->setCurrentIndex(track->mixerTab());
+	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 	//printf("Strip::Strip w:%d frw:%d layoutmarg:%d lx:%d ly:%d lw:%d lh:%d\n", STRIP_WIDTH, frameWidth(), layout->margin(), label->x(), label->y(), label->width(), label->height());
 
 	label->setTextFormat(Qt::PlainText);
@@ -443,6 +446,12 @@ void Strip::layoutUi()/*{{{*/
 	m_mainVBoxLayout->addWidget(brack);
 	connect(m_btnAux, SIGNAL(toggled(bool)), this, SLOT(toggleAuxPanel(bool)));
 }/*}}}*/
+
+void Strip::tabChanged(int tab)
+{
+	if(track)
+		track->setMixerTab(tab);
+}
 
 /**
  * @param t Track object.

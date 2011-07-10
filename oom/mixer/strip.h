@@ -108,6 +108,7 @@ private slots:
     void recordToggled(bool);
     void soloToggled(bool);
     void muteToggled(bool);
+	void tabChanged(int);
 
 protected slots:
     virtual void heartBeat();
