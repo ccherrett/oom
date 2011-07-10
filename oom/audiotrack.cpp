@@ -275,7 +275,7 @@ void AudioTrack::addAuxSend(int n)
 	int nn = _auxSend.size();
 	for (int i = nn; i < n; ++i)
 	{
-		AuxInfo info(0.0, false);
+		AuxInfo info(0.0, true);
 		_auxSend.push_back(info);
 		//_auxSend.push_back(0.0);
 		//_auxSend[i] = 0.0; //??
