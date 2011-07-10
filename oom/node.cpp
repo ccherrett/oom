@@ -491,7 +491,7 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 						float* db = dst[ch % a->channels()]; // no matter whether there's one or two dst buffers
 						float* sb = buffer[ch];
 						for (unsigned f = 0; f < nframes; ++f)
-							*db++ += (*sb++ * m * vol[ch]); // add to mix
+							*db++ += (*sb++ * m);// * vol[ch]); // add to mix
 					}
 				}
 				else if (srcChans == 1 && auxChannels == 2) // copy mono to both channels
@@ -501,7 +501,7 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 						float* db = dst[ch % a->channels()];
 						float* sb = buffer[0];
 						for (unsigned f = 0; f < nframes; ++f)
-							*db++ += (*sb++ * m * vol[ch]); // add to mix
+							*db++ += (*sb++ * m);// * vol[ch]); // add to mix
 					}
 				}
 			}
