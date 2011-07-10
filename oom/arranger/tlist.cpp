@@ -1330,6 +1330,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						}
 						else
 						{
+							colorname = QString("     "+config.partColorNames[i]);
 							QAction *act_color = colorPopup->addAction(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
 							act_color->setData(20 + i);
 						}
