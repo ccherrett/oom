@@ -1364,7 +1364,10 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					for (int i = 0; i < NUM_PARTCOLORS; ++i)
 					{
 						//ColorListItem* item = new ColorListItem(config.partColors[i], h, fontMetrics().height(), partColorNames[i]); //ddskrjo
-						QAction *act_color = colorPopup->addAction(colorRect2(config.partColors[i], config.partWaveColors[i], 80, 80), config.partColorNames[i]);
+						QString clrname(config.partColorNames[i]);
+						if(t->getDefaultPartColor() == i)
+							clrname = QString("* "+config.partColorNames[i]);
+						QAction *act_color = colorPopup->addAction(colorRect2(config.partColors[i], config.partWaveColors[i], 80, 80), clrname);
 						act_color->setData(20 + i);
 					}
 
