@@ -1076,6 +1076,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 		}
 		else
 		{
+			colorname = QString("     "+config.partColorNames[i]);
 			QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
 			act_color->setData(20 + i);
 		}
