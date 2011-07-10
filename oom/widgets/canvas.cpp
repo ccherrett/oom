@@ -203,27 +203,6 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 				drawItem(p, ci, rect);
 			}
 		}
-		/*
-		for (iCItem i = items.begin(); i != to; ++i)
-		{
-			CItem* ci = i->second;
-			// Draw unselected parts behind selected.
-			if (!ci->isSelected() && !ci->isMoving() && (ci->event().empty() || ci->part() == curPart))
-			{
-				drawItem(p, ci, rect);
-			}
-		}
-
-		// Draw selected parts in front of unselected.
-		for (iCItem i = items.begin(); i != to; ++i)
-		{
-			CItem* ci = i->second;
-			if (ci->isSelected() && !ci->isMoving() && (ci->event().empty() || ci->part() == curPart))
-			{
-				drawItem(p, ci, rect);
-			}
-		}
-		*/
 		to = _moving.lower_bound(x2);
 		for (iCItem i = _moving.begin(); i != to; ++i)
 		{

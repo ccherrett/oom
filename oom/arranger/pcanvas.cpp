@@ -551,110 +551,9 @@ void PartCanvas::endUndo(DragType t, int flags)
 
 void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtype, int*)
 {
-	/*
-	if(editor->parts()->empty())
-	  return;
-    
-	//struct p2c
-	//{
-	//  Part* newp;
-	//  int   xdiff;
-	//}
-  
-	//std::set<Part*> parts2change;
-	//typedef std::set<Part*>::iterator iptc;
-	std::map<Part*, Part*> parts2change;
-	typedef std::map<Part*, Part*>::iterator iP2C;
-  
-	int modified = 0;
-	for(iPart ip = editor->parts()->begin(); ip != editor->parts()->end(); ++ip)
-	{
-	  Part* part = ip->second;
-	  if(!part)
-		continue;
-    
-	  int npartoffset = 0;
-	  for(iCItem ici = items.begin(); ici != items.end(); ++ici)
-	  {
-		CItem* ci = ici->second;
-		//Part* pt = ci->part();
-		//if(!pt)
-		if(ci->part() != part)
-		  continue;
-      
-		int x = ci->pos().x() + dx;
-		int y = pitch2y(y2pitch(ci->pos().y()) + dp);
-		QPoint newpos = raster(QPoint(x, y));
-      
-		// Test moving the item...
-      
-		//int offset = testMoveItem(ci, newpos, dragtype);
-		NEvent* nevent = (NEvent*) ci;
-		Event event    = nevent->event();
-		//int npitch     = y2pitch(newpos.y());
-		x              = newpos.x();
-		if (x < 0)
-			  x = 0;
-      
-		int ntick = editor->rasterVal(x) - part->tick();
-		if (ntick < 0)
-			  ntick = 0;
-		int diff = ntick + event.lenTick() - part->lenTick();
-      
-		// If moving the item would require a new part size...
-		if(diff > npartoffset)
-		  npartoffset = diff;
-	  }
-        
-	  if(npartoffset > 0)
-	  {
-		// Create new part...
-		// if there are several events that are moved outside the part, it will be recreated for each
-		// so the part _in_ the event will not be valid, ask the authority.
-		Part* newPart = part->clone();
-		//Part* newPart = Canvas::part()->clone();
-
-		newPart->setLenTick(newPart->lenTick() + npartoffset);
-		audio->msgChangePart(part, newPart,false);
-
-		modified = SC_PART_MODIFIED;
-
-		// BUG FIX: #1650953
-		// Added by T356.
-		// Fixes posted "select and drag past end of part - crashing" bug
-		for(iPart ip = editor->parts()->begin(); ip != editor->parts()->end(); ++ip)
-		{
-		  if(ip->second == part)
-		  {
-			editor->parts()->erase(ip);
-			break;
-		  }
-		}
-      
-		editor->parts()->add(newPart);
-		if(parts2change.find(part) == parts2change.end())
-		  parts2change.insert(std::pair<Part*, Part*> (part, newPart));
-      
-  //      part = newPart; // reassign
-  //      item->setPart(part);
-  //      item->setEvent(newEvent);
-  //      curPart = part;
-  //      curPartId = curPart->sn();
-
-	  }
-	}
-	 */
-
-	//    int modified = 0;
 	for (iCItem ici = items.begin(); ici != items.end(); ++ici)
 	{
 		CItem* ci = ici->second;
-
-		// If this item's part is in the parts2change list, change the item's part to the new part.
-		//Part* pt = ci->part();
-		//iP2C ip2c = parts2change.find(pt);
-		//if(ip2c != parts2change.end())
-		//  ci->setPart(ip2c->second);
 
 		int x = ci->pos().x();
 		int y = ci->pos().y();
@@ -672,19 +571,12 @@ void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 		if (dtype == MOVE_COPY || dtype == MOVE_CLONE)
 			selectItem(ci, false);
 	}
-
-
-	//if(pflags)
-	//  *pflags = modified;
 }
 
 //---------------------------------------------------------
 //   moveItem
 //    return false, if copy/move not allowed
 //---------------------------------------------------------
-
-// Changed by T356.
-//bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t, int*)
 
 bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 {
@@ -723,8 +615,6 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	}
 
 	Part* dpart;
-	//bool clone = (t == MOVE_CLONE) || (spart->events()->arefCount() > 1);
-	//bool clone = (t == MOVE_CLONE);
 	bool clone = (t == MOVE_CLONE || (t == MOVE_COPY && spart->events()->arefCount() > 1));
 
 	if (t == MOVE_MOVE)
@@ -1053,6 +943,14 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	act_select->setData(18);
 
 	partPopup->addSeparator();
+	QAction *act_back = partPopup->addAction(tr("Send To Back"));
+	act_back->setData(4000);
+	QAction *act_front = partPopup->addAction(tr("Send To Front"));
+	act_front->setData(4001);
+	if(item->zValue())
+		act_front->setEnabled(false);
+	else
+		act_back->setEnabled(false);
 	QAction *act_rename = partPopup->addAction(tr("rename"));
 	act_rename->setData(0);
 
@@ -1319,6 +1217,16 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 				item->part()->setColorIndex(curColorIndex);
 
 			redraw();
+			break;
+		}
+		case 4000:
+		{
+			item->setZValue(0);
+			break;
+		}
+		case 4001:
+		{
+			item->setZValue(1);
 			break;
 		}
 		default:
