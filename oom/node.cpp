@@ -823,10 +823,6 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 		// First time here during this process cycle.
 
 		// Point the input buffers at a temporary stack buffer.
-		//float data[nframes * srcChannels];
-		//for(i = 0; i < srcChannels; ++i)
-		//  buffer[i] = data + i * nframes;
-		// p3.3.38
 		float data[nframes * srcTotalOutChans];
 		for (i = 0; i < srcTotalOutChans; ++i)
 			buffer[i] = data + i * nframes;
@@ -834,8 +830,6 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 
 		// getData can use the supplied buffers, or change buffer to point to its own local buffers or Jack buffers etc.
 		// For ex. if this is an audio input, Jack will set the pointers for us.
-		//if(!getData(pos, srcChannels, nframes, buffer))
-		// p3.3.38
 		if (!getData(pos, srcTotalOutChans, nframes, buffer))
 		{
 			// No data was available. Nothing to add, but zero our local buffers and the meters.
@@ -843,20 +837,7 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 			{
 				// If we're using local buffers, we must zero them so that the next thing requiring them
 				//  during this process cycle will see zeros.
-				/*
-				if(!usedirectbuf)
-				{
-				  if(config.useDenormalBias)
-				  {
-					for(unsigned int q = 0; q < nframes; ++q)
-					  outBuffers[i][q] = denormalBias;
-				  }
-				  else
-					memset(outBuffers[i], 0, sizeof(float) * nframes);
-				}
-				 */
 
-				//_meter[i] = 0;
 				_meter[i] = 0.0;
 			}
 
@@ -864,24 +845,6 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 			_processed = true;
 			return;
 		}
-
-		/*
-		// p3.3.41 Added.
-		unsigned int q;
-		for(i = 0; i < srcChans; ++i)
-		{
-		  if(config.useDenormalBias)
-		  {
-			for(q = 0; q < nframes; ++q)
-			{
-			  if(q & 1)
-				buffer[i][q] -= denormalBias;
-			  else
-				buffer[i][q] += denormalBias;
-			}
-		  }
-		}
-		 */
 
 		//---------------------------------------------------
 		// apply plugin chain

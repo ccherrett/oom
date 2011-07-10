@@ -166,6 +166,7 @@ void Track::init()
 	_reminder2 = false;
 	_reminder3 = false;
 	_collapsed = true;
+	_mixerTab = 0;
 
 	_volumeEnCtrl = true;
 	_volumeEn2Ctrl = true;
@@ -799,6 +800,8 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 	xml.intTag(level, "reminder2", _reminder2);
 	xml.intTag(level, "reminder3", _reminder3);
 	xml.intTag(level, "collapsed", _collapsed);
+	xml.intTag(level, "mixertab", _mixerTab);
+	xml.intTag(level, "partcolor", _partDefaultColor);
 	if (_selected)
 		xml.intTag(level, "selected", _selected);
 	xml.nput(level, "<MidiAssign port=\"%d\"", m_midiassign.port);/*{{{*/
@@ -865,6 +868,10 @@ bool Track::readProperties(Xml& xml, const QString& tag)/*{{{*/
 		_reminder3 = (bool)xml.parseInt();
 	else if (tag == "collapsed")
 		_collapsed = (bool)xml.parseInt();
+	else if(tag == "mixertab")
+		_mixerTab = xml.parseInt();
+	else if(tag == "partcolor")
+		_partDefaultColor = xml.parseInt();
 	else if(tag == "MidiAssign")
 		m_midiassign.read(xml, (Track*)this);
 	else
