@@ -478,7 +478,8 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 			unsigned naux = al->size();
 			for (unsigned k = 0; k < naux; ++k)
 			{
-				float m = _auxSend[k];
+				float m = _auxSend[k].value;
+				bool preaux = _auxSend[k].pre;
 				if (m <= 0.0001) // optimize
 					continue;
 				AudioAux* a = (AudioAux*) ((*al)[k]);
@@ -491,7 +492,12 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 						float* db = dst[ch % a->channels()]; // no matter whether there's one or two dst buffers
 						float* sb = buffer[ch];
 						for (unsigned f = 0; f < nframes; ++f)
-							*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+						{
+							if(preaux)
+								*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+							else
+								*db++ += (*sb++ * m * vol[ch]); // add to mix
+						}
 					}
 				}
 				else if (srcChans == 1 && auxChannels == 2) // copy mono to both channels
@@ -501,7 +507,12 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 						float* db = dst[ch % a->channels()];
 						float* sb = buffer[0];
 						for (unsigned f = 0; f < nframes; ++f)
-							*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+						{
+							if(preaux)
+								*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+							else
+								*db++ += (*sb++ * m * vol[ch]); // add to mix
+						}
 					}
 				}
 			}
@@ -894,7 +905,8 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 			unsigned naux = al->size();
 			for (unsigned k = 0; k < naux; ++k)
 			{
-				float m = _auxSend[k];
+				float m = _auxSend[k].value;
+				bool preaux = _auxSend[k].pre;
 				if (m <= 0.0001) // optimize
 					continue;
 				AudioAux* a = (AudioAux*) ((*al)[k]);
@@ -907,7 +919,13 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 						float* db = dst[ch % a->channels()];
 						float* sb = buffer[ch];
 						for (unsigned f = 0; f < nframes; ++f)
-							*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+						{
+							if(preaux)
+								*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+							else
+								*db++ += (*sb++ * m * vol[ch]); // add to mix
+							//*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+						}
 					}
 				}
 				else if (srcChans == 1 && auxChannels == 2)
@@ -917,7 +935,13 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 						float* db = dst[ch % a->channels()];
 						float* sb = buffer[0];
 						for (unsigned f = 0; f < nframes; ++f)
-							*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+						{
+							if(preaux)
+								*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+							else
+								*db++ += (*sb++ * m * vol[ch]); // add to mix
+							//*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+						}
 					}
 				}
 			}

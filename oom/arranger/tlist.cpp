@@ -48,6 +48,7 @@
 #include "config.h"
 #include "menulist.h"
 #include "midimonitor.h"
+#include "pcanvas.h"
 
 #ifdef DSSI_SUPPORT
 #include "dssihost.h"
@@ -57,6 +58,49 @@ extern QMenu* populateAddSynth(QWidget* parent);
 
 static const int MIN_TRACKHEIGHT = 40;
 static const int WHEEL_DELTA = 120;
+QIcon colorRect2(const QColor& color, const QColor& color2, int width, int height)//{{{
+{
+	QPainter painter;
+	QPixmap image(width, height);
+	painter.begin(&image);
+	painter.setBrush(color);
+	QRect rectangle(0, 0, width, height);
+	painter.drawRect(rectangle);
+	painter.setPen(color2);
+	painter.drawLine(0,(height/2)-1,width,(height/2)-1);
+	painter.drawLine(0,(height/2),width,(height/2));
+	painter.drawLine(0,(height/2)+1,width,(height/2)+1);
+
+	painter.drawLine((width/2)-12,(height/2)+15,(width/2)-12,(height/2)-15);
+	painter.drawLine((width/2)-13,(height/2)+15,(width/2)-13,(height/2)-15);
+	painter.drawLine((width/2)-14,(height/2)+15,(width/2)-14,(height/2)-15);
+	painter.drawLine((width/2)-18,(height/2)+5,(width/2)-18,(height/2)-5);
+	painter.drawLine((width/2)-19,(height/2)+5,(width/2)-19,(height/2)-5);
+	painter.drawLine((width/2)-20,(height/2)+10,(width/2)-20,(height/2)-10);
+	painter.drawLine((width/2)-23,(height/2)+20,(width/2)-23,(height/2)-20);
+	painter.drawLine((width/2)-24,(height/2)+10,(width/2)-24,(height/2)-10);
+	painter.drawLine((width/2)-25,(height/2)+5,(width/2)-25,(height/2)-5);
+
+	painter.drawLine((width/2)-5,(height/2)+15,(width/2)-5,(height/2)-15);
+	painter.drawLine((width/2)-6,(height/2)+15,(width/2)-6,(height/2)-15);
+	painter.drawLine((width/2)-7,(height/2)+15,(width/2)-7,(height/2)-15);
+	painter.drawLine((width/2)-8,(height/2)+5,(width/2)-8,(height/2)-5);
+	painter.drawLine((width/2)-9,(height/2)+5,(width/2)-9,(height/2)-5);
+	
+	painter.drawLine((width/2)+12,(height/2)+15,(width/2)+12,(height/2)-15);
+	painter.drawLine((width/2)+13,(height/2)+15,(width/2)+13,(height/2)-15);
+	painter.drawLine((width/2)+14,(height/2)+15,(width/2)+14,(height/2)-15);
+	painter.drawLine((width/2)+18,(height/2)+5,(width/2)+18,(height/2)-5);
+	painter.drawLine((width/2)+19,(height/2)+5,(width/2)+19,(height/2)-5);
+	painter.drawLine((width/2)+20,(height/2)+10,(width/2)+20,(height/2)-10);
+	painter.drawLine((width/2)+23,(height/2)+30,(width/2)+23,(height/2)-30);
+	painter.drawLine((width/2)+24,(height/2)+20,(width/2)+24,(height/2)-20);
+	painter.drawLine((width/2)+25,(height/2)+10,(width/2)+25,(height/2)-10);
+	
+	painter.end();
+	QIcon icon(image);
+	return icon;
+}//}}}
 
 //---------------------------------------------------------
 //   TList
@@ -1310,6 +1354,19 @@ void TList::mousePressEvent(QMouseEvent* ev)
 						//p->addAction(QIcon(*track_commentIcon), tr("Track Comment"))->setData(1);
 					}
 					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
+	
+					QMenu* colorPopup = p->addMenu(tr("Default Part Color"));
+				
+					// part color selection
+					//const QFontMetrics& fm = colorPopup->fontMetrics();
+					//int h = fm.lineSpacing();
+				
+					for (int i = 0; i < NUM_PARTCOLORS; ++i)
+					{
+						//ColorListItem* item = new ColorListItem(config.partColors[i], h, fontMetrics().height(), partColorNames[i]); //ddskrjo
+						QAction *act_color = colorPopup->addAction(colorRect2(config.partColors[i], config.partWaveColors[i], 80, 80), config.partColorNames[i]);
+						act_color->setData(20 + i);
+					}
 
 					QMenu* trackHeightsMenu = p->addMenu("Track Height");
 					trackHeightsMenu->addAction("Default")->setData(6);
@@ -1348,188 +1405,188 @@ void TList::mousePressEvent(QMouseEvent* ev)
 	#endif
 					}/*}}}*/
 			else if(t->isMidiTrack() && !multipleSelectedTracks)
-					{
-						int oPort = ((MidiTrack*) t)->outPort();
-						MidiPort* port = &midiPorts[oPort];
+			{
+				int oPort = ((MidiTrack*) t)->outPort();
+				MidiPort* port = &midiPorts[oPort];
 
-						QAction* mact = p->addAction(tr("Show Gui"));
-						mact->setCheckable(true);
-						//printf("synth hasgui %d, gui visible %d\n",port->hasGui(), port->guiVisible());
-						mact->setEnabled(port->hasGui());
-						mact->setChecked(port->guiVisible());
-						mact->setData(3);
+				QAction* mact = p->addAction(tr("Show Gui"));
+				mact->setCheckable(true);
+				//printf("synth hasgui %d, gui visible %d\n",port->hasGui(), port->guiVisible());
+				mact->setEnabled(port->hasGui());
+				mact->setChecked(port->guiVisible());
+				mact->setData(3);
 
-						// If it has a gui but we don't have OSC, disable the action.
+				// If it has a gui but we don't have OSC, disable the action.
 #ifndef OSC_SUPPORT
 #ifdef DSSI_SUPPORT
 						MidiDevice* dev = port->device();
-						if (dev && dev->isSynti() && (dynamic_cast<DssiSynthIF*> (((SynthI*) dev)->sif())))
+				if (dev && dev->isSynti() && (dynamic_cast<DssiSynthIF*> (((SynthI*) dev)->sif())))
+				{
+					mact->setChecked(false);
+					mact->setEnabled(false);
+				}
+#endif
+#endif
+				//p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
+				//p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
+			}
+
+			QAction* act = p->exec(ev->globalPos(), 0);
+			if (act)
+			{
+				int n = act->data().toInt();
+				switch (n)
+				{
+					case 0: // delete track
+						if (multipleSelectedTracks)
 						{
-							mact->setChecked(false);
-							mact->setEnabled(false);
+						    song->startUndo();
+						    audio->msgRemoveTracks();
+						    song->endUndo(SC_TRACK_REMOVED);
+						    song->updateSoloStates();
 						}
-#endif
-#endif
-						//p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
-						//p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
-					}
-
-					QAction* act = p->exec(ev->globalPos(), 0);
-					if (act)
-					{
-						int n = act->data().toInt();
-						switch (n)
+						else
 						{
-							case 0: // delete track
-								if (multipleSelectedTracks)
-								{
-								    song->startUndo();
-								    audio->msgRemoveTracks();
-								    song->endUndo(SC_TRACK_REMOVED);
-								    song->updateSoloStates();
-								}
-								else
-								{
-									if(t->name() == "Master")
-										break;
-								    song->removeTrack0(t);
-								    audio->msgUpdateSoloStates();
-								}
+							if(t->name() == "Master")
+								break;
+						    song->removeTrack0(t);
+						    audio->msgUpdateSoloStates();
+						}
 
-							break;
+					break;
 
-							/*case 1: // show track comment
+					/*case 1: // show track comment
+					{
+						TrackComment* tc = new TrackComment(t, 0);
+						tc->show();
+						//QToolTip::add( this, "FOOOOOOOOOOOOO" );
+					}
+					break;*/
+					case 2:
+					{
+						SynthI* synth = (SynthI*) t;
+						bool show = !synth->guiVisible();
+						audio->msgShowInstrumentGui(synth, show);
+					}
+					break;
+					case 3:
+					{
+						int oPort = ((MidiTrack*) t)->outPort();
+						MidiPort* port = &midiPorts[oPort];
+						bool show = !port->guiVisible();
+						audio->msgShowInstrumentGui(port->instrument(), show);
+					}
+					break;
+					case 4:
+					{
+						if (t->type() == Track::DRUM)
+						{
+							//
+							//    Drum -> Midi
+							//
+							audio->msgIdle(true);
+							PartList* pl = t->parts();
+							MidiTrack* m = (MidiTrack*) t;
+							for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
 							{
-								TrackComment* tc = new TrackComment(t, 0);
-								tc->show();
-								//QToolTip::add( this, "FOOOOOOOOOOOOO" );
-							}
-							break;*/
-							case 2:
-							{
-								SynthI* synth = (SynthI*) t;
-								bool show = !synth->guiVisible();
-								audio->msgShowInstrumentGui(synth, show);
-							}
-							break;
-							case 3:
-							{
-								int oPort = ((MidiTrack*) t)->outPort();
-								MidiPort* port = &midiPorts[oPort];
-								bool show = !port->guiVisible();
-								audio->msgShowInstrumentGui(port->instrument(), show);
-							}
-							break;
-							case 4:
-							{
-								if (t->type() == Track::DRUM)
+								EventList* el = ip->second->events();
+								for (iEvent ie = el->begin(); ie != el->end(); ++ie)
 								{
-									//
-									//    Drum -> Midi
-									//
-									audio->msgIdle(true);
-									PartList* pl = t->parts();
-									MidiTrack* m = (MidiTrack*) t;
-									for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+									Event ev = ie->second;
+									if (ev.type() == Note)
 									{
-										EventList* el = ip->second->events();
-										for (iEvent ie = el->begin(); ie != el->end(); ++ie)
-										{
-											Event ev = ie->second;
-											if (ev.type() == Note)
-											{
-												int pitch = ev.pitch();
-												// Changed by T356.
-												// Tested: Notes were being mixed up switching back and forth between midi and drum.
-												//pitch = drumMap[pitch].anote;
-												pitch = drumMap[pitch].enote;
+										int pitch = ev.pitch();
+										// Changed by T356.
+										// Tested: Notes were being mixed up switching back and forth between midi and drum.
+										//pitch = drumMap[pitch].anote;
+										pitch = drumMap[pitch].enote;
 
-												ev.setPitch(pitch);
-											}
-											else
-												if (ev.type() == Controller)
-											{
-												int ctl = ev.dataA();
-												// Is it a drum controller event, according to the track port's instrument?
-												MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
-												if (mc)
-													// Change the controller event's index into the drum map to an instrument note.
-													ev.setA((ctl & ~0xff) | drumMap[ctl & 0x7f].enote);
-											}
-
-										}
+										ev.setPitch(pitch);
 									}
-									t->setType(Track::MIDI);
-									audio->msgIdle(false);
-								}
-							}
-							break;
-							case 5:
-							{
-								if (t->type() == Track::MIDI)
-								{
-									//
-									//    Midi -> Drum
-									//
-									bool change = QMessageBox::question(this, tr("Update drummap?"),
-											tr("Do you want to use same port and channel for all instruments in the drummap?"),
-											tr("&Yes"), tr("&No"), QString::null, 0, 1);
-
-									audio->msgIdle(true);
-									// Delete all port controller events.
-									//audio->msgChangeAllPortDrumCtrlEvents(false);
-									song->changeAllPortDrumCtrlEvents(false);
-
-									if (!change)
+									else
+										if (ev.type() == Controller)
 									{
-										MidiTrack* m = (MidiTrack*) t;
-										for (int i = 0; i < DRUM_MAPSIZE; i++)
-										{
-											drumMap[i].channel = m->outChannel();
-											drumMap[i].port = m->outPort();
-										}
+										int ctl = ev.dataA();
+										// Is it a drum controller event, according to the track port's instrument?
+										MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
+										if (mc)
+											// Change the controller event's index into the drum map to an instrument note.
+											ev.setA((ctl & ~0xff) | drumMap[ctl & 0x7f].enote);
 									}
 
-									//audio->msgIdle(true);
-									PartList* pl = t->parts();
-									MidiTrack* m = (MidiTrack*) t;
-									for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
-									{
-										EventList* el = ip->second->events();
-										for (iEvent ie = el->begin(); ie != el->end(); ++ie)
-										{
-											Event ev = ie->second;
-											if (ev.type() == Note)
-											{
-												int pitch = ev.pitch();
-												pitch = drumInmap[pitch];
-												ev.setPitch(pitch);
-											}
-											else
-											{
-												if (ev.type() == Controller)
-												{
-													int ctl = ev.dataA();
-													// Is it a drum controller event, according to the track port's instrument?
-													MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
-													if (mc)
-														// Change the controller event's instrument note to an index into the drum map.
-														ev.setA((ctl & ~0xff) | drumInmap[ctl & 0x7f]);
-												}
-
-											}
-
-										}
-									}
-									t->setType(Track::DRUM);
-
-									// Add all port controller events.
-									//audio->msgChangeAllPortDrumCtrlEvents(true);
-									song->changeAllPortDrumCtrlEvents(true);
-
-									audio->msgIdle(false);
 								}
 							}
+							t->setType(Track::MIDI);
+							audio->msgIdle(false);
+						}
+					}
+					break;
+					case 5:
+					{
+						if (t->type() == Track::MIDI)
+						{
+							//
+							//    Midi -> Drum
+							//
+							bool change = QMessageBox::question(this, tr("Update drummap?"),
+									tr("Do you want to use same port and channel for all instruments in the drummap?"),
+									tr("&Yes"), tr("&No"), QString::null, 0, 1);
+
+							audio->msgIdle(true);
+							// Delete all port controller events.
+							//audio->msgChangeAllPortDrumCtrlEvents(false);
+							song->changeAllPortDrumCtrlEvents(false);
+
+							if (!change)
+							{
+								MidiTrack* m = (MidiTrack*) t;
+								for (int i = 0; i < DRUM_MAPSIZE; i++)
+								{
+									drumMap[i].channel = m->outChannel();
+									drumMap[i].port = m->outPort();
+								}
+							}
+
+							//audio->msgIdle(true);
+							PartList* pl = t->parts();
+							MidiTrack* m = (MidiTrack*) t;
+							for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+							{
+								EventList* el = ip->second->events();
+								for (iEvent ie = el->begin(); ie != el->end(); ++ie)
+								{
+									Event ev = ie->second;
+									if (ev.type() == Note)
+									{
+										int pitch = ev.pitch();
+										pitch = drumInmap[pitch];
+										ev.setPitch(pitch);
+									}
+									else
+									{
+										if (ev.type() == Controller)
+										{
+											int ctl = ev.dataA();
+											// Is it a drum controller event, according to the track port's instrument?
+											MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
+											if (mc)
+												// Change the controller event's instrument note to an index into the drum map.
+												ev.setA((ctl & ~0xff) | drumInmap[ctl & 0x7f]);
+										}
+
+									}
+
+								}
+							}
+							t->setType(Track::DRUM);
+
+							// Add all port controller events.
+							//audio->msgChangeAllPortDrumCtrlEvents(true);
+							song->changeAllPortDrumCtrlEvents(true);
+
+							audio->msgIdle(false);
+						}
+					}
 				case 6:
 							{
 								if (multipleSelectedTracks)
@@ -1653,6 +1710,13 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								}
 								break;
 							}
+							case 20 ... NUM_PARTCOLORS + 20:
+							{
+								int curColorIndex = n - 20;
+								t->setDefaultPartColor(curColorIndex);
+								break;
+							}
+							
 							default:
 								printf("action %d\n", n);
 							break;

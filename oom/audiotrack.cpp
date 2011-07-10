@@ -179,7 +179,7 @@ void AudioTrack::idlePlugin(PluginI* plugin)
 //   addPlugin
 //---------------------------------------------------------
 
-void AudioTrack::addPlugin(PluginI* plugin, int idx)
+void AudioTrack::addPlugin(PluginI* plugin, int idx)/*{{{*/
 {
 	printf("AudioTrack::addPlugin(%p, %d) \n", plugin, idx);
 	if (plugin == 0)
@@ -264,7 +264,7 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)
 			}
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   addAuxSend
@@ -275,8 +275,10 @@ void AudioTrack::addAuxSend(int n)
 	int nn = _auxSend.size();
 	for (int i = nn; i < n; ++i)
 	{
-		_auxSend.push_back(0.0);
-		_auxSend[i] = 0.0; //??
+		AuxInfo info(0.0, false);
+		_auxSend.push_back(info);
+		//_auxSend.push_back(0.0);
+		//_auxSend[i] = 0.0; //??
 	}
 }
 
@@ -370,75 +372,6 @@ void AudioTrack::swapControllerIDX(int idx1, int idx2)
 		newcl = icl->second;
 		_controller.insert(std::pair<const int, CtrlList*>(newcl->id(), newcl));
 	}
-
-
-	/*
-	unsigned int idmask = ~AC_PLUGIN_CTL_ID_MASK;
-  
-	CtrlList* cl;
-	CtrlList* ctl1 = 0;
-	CtrlList* ctl2 = 0;
-	CtrlList* newcl1 = 0;
-	CtrlList* newcl2 = 0;
-	CtrlVal cv(0, 0.0);
-	int id1 = (idx1 + 1) * AC_PLUGIN_CTL_BASE;
-	int id2 = (idx2 + 1) * AC_PLUGIN_CTL_BASE;
-	int i, j;
-	double min, max;
-  
-	for(ciCtrlList icl = _controller.begin(); icl != _controller.end(); ++icl)
-	{
-	  cl = icl->second;
-	  i = cl->id() & AC_PLUGIN_CTL_ID_MASK;
-	  j = cl->id() & idmask;
-    
-	  if(j == id1)
-	  {
-		ctl1 = cl;
-		newcl1 = new CtrlList( i | id2 );
-		newcl1->setMode(cl->mode());
-		newcl1->setValueType(cl->valueType());
-		newcl1->setName(cl->name());
-		cl->range(&min, &max);
-		newcl1->setRange(min, max);
-		newcl1->setCurVal(cl->curVal());
-		newcl1->setDefault(cl->getDefault());
-		for(iCtrl ic = cl->begin(); ic != cl->end(); ++ic)
-		{
-		  cv = ic->second;
-		  newcl1->insert(std::pair<const int, CtrlVal>(cv.frame, cv));
-		}
-	  }
-	  //else
-	  if(j == id2)
-	  {
-		ctl2 = cl;
-		newcl2 = new CtrlList( i | id1 );
-		newcl2->setMode(cl->mode());
-		newcl2->setValueType(cl->valueType());
-		newcl2->setName(cl->name());
-		cl->range(&min, &max);
-		newcl2->setRange(min, max);
-		newcl2->setCurVal(cl->curVal());
-		newcl2->setDefault(cl->getDefault());
-		for(iCtrl ic = cl->begin(); ic != cl->end(); ++ic)
-		{
-		  cv = ic->second;
-		  newcl2->insert(std::pair<const int, CtrlVal>(cv.frame, cv));
-		}
-	  }
-	}
-	if(ctl1)
-	  _controller.erase(ctl1->id());
-	if(ctl2)
-	  _controller.erase(ctl2->id());
-	if(newcl1)
-	  //_controller.add(newcl1);
-	  _controller.insert(std::pair<const int, CtrlList*>(newcl1->id(), newcl1));
-	if(newcl2)
-	  _controller.insert(std::pair<const int, CtrlList*>(newcl2->id(), newcl2));
-	  //_controller.add(newcl2);
-	 */
 }
 
 //---------------------------------------------------------
@@ -924,8 +857,8 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 		int naux = song->auxs()->size();
 		for (int idx = 0; idx < naux; ++idx)
 		{
-			QString s("<auxSend idx=\"%1\">%2</auxSend>\n");
-			xml.nput(level, s.arg(idx).arg(_auxSend[idx]).toAscii().constData());
+			QString s("<auxSend idx=\"%1\" pre=\"%2\">%3</auxSend>\n");
+			xml.nput(level, s.arg(idx).arg(_auxSend[idx].pre).arg(_auxSend[idx].value).toAscii().constData());
 		}
 	}
 	for (ciPluginI ip = _efxPipe->begin(); ip != _efxPipe->end(); ++ip)
@@ -976,6 +909,7 @@ void AudioTrack::readAuxSend(Xml& xml)
 {
 	unsigned idx = 0;
 	double val;
+	bool pre = true;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -986,9 +920,15 @@ void AudioTrack::readAuxSend(Xml& xml)
 			case Xml::End:
 				return;
 			case Xml::Attribut:
+			{
 				if (tag == "idx")
 					idx = xml.s2().toInt();
+				else if(tag == "pre")
+				{
+					pre = xml.s2().toInt();
+				}
 				break;
+			}
 			case Xml::Text:
 				val = tag.toDouble();
 				break;
@@ -996,9 +936,15 @@ void AudioTrack::readAuxSend(Xml& xml)
 				if (xml.s1() == "auxSend")
 				{
 					if (_auxSend.size() < idx + 1)
-						_auxSend.push_back(val);
+					{
+						AuxInfo info(val, pre);
+						_auxSend.push_back(info);
+					}
 					else
-						_auxSend[idx] = val;
+					{
+						_auxSend[idx].value = val;
+						_auxSend[idx].pre = pre;
+					}
 					return;
 				}
 			default:
@@ -1337,69 +1283,6 @@ void AudioTrack::mapRackPluginsToControllers()
 	 */
 }
 
-/*
-//---------------------------------------------------------
-//   writeRouting
-//---------------------------------------------------------
-
-void AudioTrack::writeRouting(int level, Xml& xml) const
-{
-	  QString n;
-	  if (type() == Track::AUDIO_INPUT) {
-				ciJackRouteNameCache circ = jackRouteNameCache.find(this);
-				if(circ != jackRouteNameCache.end())
-				{
-				  jackRouteNameMap rm = circ->second;
-				  for(ciJackRouteNameMap cirm = rm.begin(); cirm != rm.end(); ++cirm)
-				  {
-					n = cirm->second;
-					if(!n.isEmpty())
-					{
-					  Route dst(name(), true, cirm->first);
-					  xml.tag(level++, "Route");
-					  xml.strTag(level, "srcNode", n);
-					  xml.strTag(level, "dstNode", dst.name());
-					  xml.etag(level--, "Route");
-					}
-				  }
-				}
-			}
-	  if(type() == Track::AUDIO_OUTPUT)
-	  {
-		ciJackRouteNameCache circ = jackRouteNameCache.find(this);
-		if(circ != jackRouteNameCache.end())
-		{
-		  jackRouteNameMap rm = circ->second;
-		  for(ciJackRouteNameMap cirm = rm.begin(); cirm != rm.end(); ++cirm)
-		  {
-			n = cirm->second;
-			if(!n.isEmpty())
-			{
-			  Route src(name(), false, cirm->first);
-			  xml.tag(level++, "Route");
-			  xml.strTag(level, "srcNode", src.name());
-			  xml.strTag(level, "dstNode", n);
-			  xml.etag(level--, "Route");
-			}
-		  }
-		}
-	  }
-	  else
-	  {
-		const RouteList* rl = &_outRoutes;
-		for (ciRoute r = rl->begin(); r != rl->end(); ++r) {
-			if(!r->name().isEmpty())
-			{
-			  xml.tag(level++, "Route");
-			  xml.strTag(level, "srcNode", name());
-			  xml.strTag(level, "dstNode", r->name());
-			  xml.etag(level--, "Route");
-			}
-		}
-	  }
-}
- */
-
 //---------------------------------------------------------
 //   AudioInput
 //---------------------------------------------------------
@@ -1412,12 +1295,8 @@ AudioInput::AudioInput()
 	//setVolume(1.0);
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 		jackPorts[i] = 0;
-	//_channels = 0;
-	//setChannels(2);
 }
 
-//AudioInput::AudioInput(const AudioInput& t)
-//  : AudioTrack(t)
 
 AudioInput::AudioInput(const AudioInput& t, bool cloneParts)
 : AudioTrack(t, cloneParts)
@@ -1492,12 +1371,7 @@ AudioOutput::AudioOutput()
 {
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 		jackPorts[i] = 0;
-	//_channels = 0;
-	//setChannels(2);
 }
-
-//AudioOutput::AudioOutput(const AudioOutput& t)
-//  : AudioTrack(t)
 
 AudioOutput::AudioOutput(const AudioOutput& t, bool cloneParts)
 : AudioTrack(t, cloneParts)
@@ -1626,11 +1500,6 @@ void AudioAux::write(int level, Xml& xml) const
 AudioAux::AudioAux()
 : AudioTrack(AUDIO_AUX)
 {
-	//_channels = 0;
-	//setChannels(2);
-	// Changed by Tim. p3.3.15
-	//for (int i = 0; i < MAX_CHANNELS; ++i)
-	//      buffer[i] = (i < channels()) ? new float[segmentSize] : 0;
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 	{
 		if (i < channels())
@@ -1646,9 +1515,6 @@ AudioAux::AudioAux()
 
 AudioAux::~AudioAux()
 {
-	// Changed by Tim. p3.3.15
-	//for (int i = 0; i < channels(); ++i)
-	//      delete[] buffer[i];
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 	{
 		if (buffer[i])
@@ -1704,7 +1570,7 @@ bool AudioAux::getData(unsigned /*pos*/, int ch, unsigned /*samples*/, float** d
 //   setChannels
 //---------------------------------------------------------
 
-void AudioAux::setChannels(int n)
+void AudioAux::setChannels(int n)/*{{{*/
 {
 	if (n > channels())
 	{
@@ -1726,14 +1592,14 @@ void AudioAux::setChannels(int n)
 		}
 	}
 	AudioTrack::setChannels(n);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setRecordFlag1
 //    gui part (executed in gui thread)
 //---------------------------------------------------------
 
-bool AudioTrack::setRecordFlag1(bool f, bool monitor)
+bool AudioTrack::setRecordFlag1(bool f, bool monitor)/*{{{*/
 {
 	//TODO: add monitor code
 	if(!monitor)
@@ -1778,7 +1644,7 @@ bool AudioTrack::setRecordFlag1(bool f, bool monitor)
 		}
 	}
 	return true;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 // prepareRecording
@@ -1787,7 +1653,7 @@ bool AudioTrack::setRecordFlag1(bool f, bool monitor)
 // also called from track->setRecordFlag (above)
 // if global rec enable already was done
 //---------------------------------------------------------
-bool AudioTrack::prepareRecording()
+bool AudioTrack::prepareRecording()/*{{{*/
 {
 	if(debugMsg)
 		printf("prepareRecording for track %s\n", _name.toLatin1().constData());
@@ -1819,7 +1685,7 @@ bool AudioTrack::prepareRecording()
 
 	}
 	return true;
-}
+}/*}}}*/
 
 double AudioTrack::auxSend(int idx) const
 {
@@ -1829,10 +1695,10 @@ double AudioTrack::auxSend(int idx) const
 				name().toLatin1().constData(), idx, _auxSend.size());
 		return 0.0;
 	}
-	return _auxSend[idx];
+	return _auxSend[idx].value;
 }
 
-void AudioTrack::setAuxSend(int idx, double v, bool monitor)
+void AudioTrack::setAuxSend(int idx, double v, bool monitor)/*{{{*/
 {
 	if (unsigned(idx) >= _auxSend.size())
 	{
@@ -1840,7 +1706,7 @@ void AudioTrack::setAuxSend(int idx, double v, bool monitor)
 				name().toLatin1().constData(), idx, _auxSend.size());
 		return;
 	}
-	_auxSend[idx] = v;
+	_auxSend[idx].value = v;
 	if(!monitor)
 	{
 		int ctl = -1;/*{{{*/
@@ -1865,5 +1731,18 @@ void AudioTrack::setAuxSend(int idx, double v, bool monitor)
 			midiMonitor->msgSendAudioOutputEvent((Track*)this, ctl, v);
 		}/*}}}*/
 	}
+}/*}}}*/
+
+bool AudioTrack::auxIsPrefader(int idx)
+{
+	if (unsigned(idx) >= _auxSend.size())
+		return false;
+	return _auxSend[idx].pre;
 }
 
+void AudioTrack::setAuxPrefader(int idx, bool p)
+{
+	if (unsigned(idx) >= _auxSend.size())
+		return;
+	_auxSend[idx].pre = p;
+}

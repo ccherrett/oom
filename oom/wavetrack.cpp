@@ -189,15 +189,18 @@ Part* WaveTrack::newPart(Part*p, bool clone)
 	if (p)
 	{
 		part->setName(p->name());
-		part->setColorIndex(p->colorIndex());
+		part->setColorIndex(getDefaultPartColor());
 
 		*(PosLen*) part = *(PosLen*) p;
 		part->setMute(p->mute());
 	}
 
 	if (clone)
+	{
 		//p->chainClone(part);
 		chainClone(p, part);
+		part->setColorIndex(p->colorIndex());
+	}
 
 	return part;
 }

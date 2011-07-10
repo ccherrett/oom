@@ -153,6 +153,7 @@ int Track::y() const
 
 void Track::init()
 {
+	_partDefaultColor = 0;
 	_activity = 0;
 	_lastActivity = 0;
 	_recordFlag = false;
@@ -224,6 +225,7 @@ Track::Track(Track::TrackType t)
 
 Track::Track(const Track& t, bool cloneParts)
 {
+	_partDefaultColor = t._partDefaultColor;
 	_activity = t._activity;
 	_lastActivity = t._lastActivity;
 	_recordFlag = t._recordFlag;
@@ -291,6 +293,7 @@ Track::Track(const Track& t, bool cloneParts)
 
 Track& Track::operator=(const Track& t)
 {
+	_partDefaultColor = t._partDefaultColor;
 	_activity = t._activity;
 	_lastActivity = t._lastActivity;
 	_recordFlag = t._recordFlag;
@@ -725,15 +728,18 @@ Part* MidiTrack::newPart(Part*p, bool clone)
 	if (p)
 	{
 		part->setName(p->name());
-		part->setColorIndex(p->colorIndex());
+		part->setColorIndex(getDefaultPartColor());
 
 		*(PosLen*) part = *(PosLen*) p;
 		part->setMute(p->mute());
 	}
 
 	if (clone)
+	{
 		//p->chainClone(part);
+		part->setColorIndex(p->colorIndex());
 		chainClone(p, part);
+	}
 
 	return part;
 }

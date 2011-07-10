@@ -56,660 +56,11 @@
 #include "midimonitor.h"
 
 //---------------------------------------------------------
-//   heartBeat
-//---------------------------------------------------------
-
-void AudioStrip::heartBeat()
-{
-	if(song->invalid)
-		return;
-	for (int ch = 0; ch < track->channels(); ++ch)
-	{
-		if (meter[ch])
-		{
-			//int meterVal = track->meter(ch);
-			//int peak  = track->peak(ch);
-			//meter[ch]->setVal(meterVal, peak, false);
-			meter[ch]->setVal(track->meter(ch), track->peak(ch), false);
-		}
-	}
-	Strip::heartBeat();
-	updateVolume();
-	updatePan();
-}
-
-//---------------------------------------------------------
-//   configChanged
-//---------------------------------------------------------
-
-void AudioStrip::configChanged()
-{
-	songChanged(SC_CONFIG);
-}
-
-//---------------------------------------------------------
-//   songChanged
-//---------------------------------------------------------
-
-void AudioStrip::songChanged(int val)
-{
-	// Is it simply a midi controller value adjustment? Forget it.
-	if (val == SC_MIDI_CONTROLLER)
-		return;
-
-	AudioTrack* src = (AudioTrack*) track;
-
-	// Do channels before config...
-	if (val & SC_CHANNELS)
-		updateChannels();
-
-	// p3.3.47
-	// Update the routing popup menu if anything relevant changed.
-	if (val & (SC_ROUTE | SC_CHANNELS | SC_CONFIG))
-	{
-		//updateRouteMenus();
-		oom->updateRouteMenus(track, this); // p3.3.50 Use this handy shared routine.
-	}
-
-	// Catch when label font, or configuration min slider and meter values change.
-	if (val & SC_CONFIG)
-	{
-		// Added by Tim. p3.3.9
-
-		// Set the strip label's font.
-		//label->setFont(config.fonts[1]);
-		setLabelFont();
-
-		// Adjust minimum volume slider and label values.
-		slider->setRange(config.minSlider - 0.1, 10.0);
-		sl->setRange(config.minSlider, 10.0);
-
-		// Adjust minimum aux knob and label values.
-		int n = auxKnob.size();
-		for (int idx = 0; idx < n; ++idx)
-		{
-			auxKnob[idx]->blockSignals(true);
-			auxLabel[idx]->blockSignals(true);
-			auxKnob[idx]->setRange(config.minSlider - 0.1, 10.0);
-			auxLabel[idx]->setRange(config.minSlider, 10.1);
-			auxKnob[idx]->blockSignals(false);
-			auxLabel[idx]->blockSignals(false);
-		}
-
-		// Adjust minimum meter values.
-		for (int c = 0; c < channel; ++c)
-			meter[c]->setRange(config.minMeter, 10.0);
-	}
-
-	if (m_btnMute && (val & SC_MUTE))
-	{ // m_btnMute && m_btnPower
-		m_btnMute->blockSignals(true);
-		m_btnMute->setChecked(src->mute());
-		m_btnMute->blockSignals(false);
-		updateOffState();
-	}
-	if (m_btnSolo && (val & SC_SOLO))
-	{
-		if ((bool)track->internalSolo())
-		{
-			if (!useSoloIconSet2)
-			{
-				m_btnSolo->setIcon(*soloIconSet2);
-				m_btnSolo->setIconSize(soloIconOn->size());
-				useSoloIconSet2 = true;
-			}
-		}
-		else if (useSoloIconSet2)
-		{
-			m_btnSolo->setIcon(*soloIconSet1);
-			m_btnSolo->setIconSize(soloblksqIconOn->size());
-			useSoloIconSet2 = false;
-		}
-
-		m_btnSolo->blockSignals(true);
-		m_btnSolo->setChecked(track->solo());
-		m_btnSolo->blockSignals(false);
-	}
-	if (val & SC_RECFLAG)
-		setRecordFlag(track->recordFlag());
-	if (val & SC_TRACK_MODIFIED)
-	{
-		setLabelText();
-		// Added by Tim. p3.3.9
-		setLabelFont();
-
-	}
-	if (val & SC_ROUTE)
-	{
-		/*if (pre)
-		{
-			pre->blockSignals(true);
-			pre->setChecked(src->prefader());
-			pre->blockSignals(false);
-		}*/
-	}
-	if (val & SC_AUX)
-	{
-		int n = auxKnob.size();
-		for (int idx = 0; idx < n; ++idx)
-		{
-			double val = fast_log10(src->auxSend(idx)) * 20.0;
-			auxKnob[idx]->blockSignals(true);
-			auxLabel[idx]->blockSignals(true);
-			auxKnob[idx]->setValue(val);
-			auxLabel[idx]->setValue(val);
-			auxKnob[idx]->blockSignals(false);
-			auxLabel[idx]->blockSignals(false);
-		}
-	}
-	if (autoType && (val & SC_AUTOMATION))
-	{
-		autoType->blockSignals(true);
-		autoType->setCurrentItem(track->automationType());
-		if (track->automationType() == AUTO_TOUCH || track->automationType() == AUTO_WRITE)
-		{
-			QPalette palette;
-			palette.setColor(autoType->backgroundRole(), QColor(Qt::red));
-			autoType->setPalette(palette);
-		}
-		else
-		{
-			QPalette palette;
-			palette.setColor(autoType->backgroundRole(), qApp->palette().color(QPalette::Active, QPalette::Background));
-			autoType->setPalette(palette);
-		}
-
-		autoType->blockSignals(false);
-	}
-}
-
-//---------------------------------------------------------
-//   updateVolume
-//---------------------------------------------------------
-
-void AudioStrip::updateVolume()
-{
-	double vol = ((AudioTrack*) track)->volume();
-	if (vol != volume)
-	{
-		//printf("AudioStrip::updateVolume setting slider and label\n");
-
-		slider->blockSignals(true);
-		sl->blockSignals(true);
-		double val = fast_log10(vol) * 20.0;
-		slider->setValue(val);
-		sl->setValue(val);
-		sl->blockSignals(false);
-		slider->blockSignals(false);
-		volume = vol;
-		if(((AudioTrack*) track)->volFromAutomation())
-		{
-			//printf("AudioStrip::updateVolume via automation\n");
-			midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_VOLUME, vol);
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   updatePan
-//---------------------------------------------------------
-
-void AudioStrip::updatePan()
-{
-	double v = ((AudioTrack*) track)->pan();
-	if (v != panVal)
-	{
-		//printf("AudioStrip::updatePan setting slider and label\n");
-
-		pan->blockSignals(true);
-		panl->blockSignals(true);
-		pan->setValue(v);
-		panl->setValue(v);
-		panl->blockSignals(false);
-		pan->blockSignals(false);
-		panVal = v;
-		if(((AudioTrack*) track)->panFromAutomation())
-		{
-			midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_PANPOT, v);
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   offToggled
-//---------------------------------------------------------
-
-void AudioStrip::offToggled(bool val)
-{
-	track->setOff(val);
-	song->update(SC_MUTE);
-}
-
-//---------------------------------------------------------
-//   updateOffState
-//---------------------------------------------------------
-
-void AudioStrip::updateOffState()
-{
-	bool val = !track->off();
-	slider->setEnabled(val);
-	sl->setEnabled(val);
-	pan->setEnabled(val);
-	panl->setEnabled(val);
-	if (track->type() != Track::AUDIO_SOFTSYNTH)
-		m_btnStereo->setEnabled(val);
-	label->setEnabled(val);
-
-	int n = auxKnob.size();
-	for (int i = 0; i < n; ++i)
-	{
-		auxKnob[i]->setEnabled(val);
-		auxLabel[i]->setEnabled(val);
-	}
-
-	//if (pre)
-	//	pre->setEnabled(val);
-	if (hasRecord)
-		m_btnRecord->setEnabled(val);
-	//if (m_btnSolo)
-		m_btnSolo->setEnabled(val);
-	//if (m_btnMute)
-		m_btnMute->setEnabled(val);
-	if (autoType)
-		autoType->setEnabled(val);
-	if (hasIRoute)
-		m_btnIRoute->setEnabled(val);
-	if (hasORoute)
-		m_btnORoute->setEnabled(val);
-	m_btnPower->blockSignals(true);
-	m_btnPower->setChecked(track->off());
-	m_btnPower->blockSignals(false);
-}
-
-//---------------------------------------------------------
-//   preToggled
-//---------------------------------------------------------
-
-void AudioStrip::preToggled(bool val)
-{
-	audio->msgSetPrefader((AudioTrack*) track, val);
-	resetPeaks();
-	song->update(SC_ROUTE);
-}
-
-//---------------------------------------------------------
-//   stereoToggled
-//---------------------------------------------------------
-
-void AudioStrip::stereoToggled(bool val)
-{
-	int oc = track->channels();
-	int nc = val ? 2 : 1;
-	//      m_btnStereo->setIcon(nc == 2 ? *stereoIcon : *monoIcon);
-	if (oc == nc)
-		return;
-	audio->msgSetChannels((AudioTrack*) track, nc);
-	song->update(SC_CHANNELS);
-}
-
-//---------------------------------------------------------
-//   auxChanged
-//---------------------------------------------------------
-
-void AudioStrip::auxChanged(double val, int idx)
-{
-	double vol;
-	if (val <= config.minSlider)
-	{
-		vol = 0.0;
-		val -= 1.0; // display special value "off"
-	}
-	else
-		vol = pow(10.0, val / 20.0);
-	audio->msgSetAux((AudioTrack*) track, idx, vol);
-	song->update(SC_AUX);
-}
-
-//---------------------------------------------------------
-//   auxLabelChanged
-//---------------------------------------------------------
-
-void AudioStrip::auxLabelChanged(double val, unsigned int idx)
-{
-	if (idx >= auxKnob.size())
-		return;
-	auxKnob[idx]->setValue(val);
-}
-
-//---------------------------------------------------------
-//   volumeChanged
-//---------------------------------------------------------
-
-void AudioStrip::volumeChanged(double val)
-{
-	AutomationType at = ((AudioTrack*) track)->automationType();
-	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		track->enableVolumeController(false);
-
-	//printf("AudioStrip::volumeChanged(%g) \n", val);
-	double vol;
-	if (val <= config.minSlider)
-	{
-		vol = 0.0;
-		val -= 1.0; // display special value "off"
-	}
-	else
-		vol = pow(10.0, val / 20.0);
-	volume = vol;
-	audio->msgSetVolume((AudioTrack*) track, vol);
-	((AudioTrack*) track)->recordAutomation(AC_VOLUME, vol);
-	song->update(SC_TRACK_MODIFIED);
-	//double vv = (vol + 60)/0.5546875;
-	//printf("AudioStrip::volumeChanged(%g) - val: %g - midiNum: %d whacky: %d\n", vol, dbToTrackVol(val), dbToMidi(val), dbToMidi(trackVolToDb(vol)));
-}
-
-//---------------------------------------------------------
-//   volumePressed
-//---------------------------------------------------------
-
-void AudioStrip::volumePressed()
-{
-	AutomationType at = ((AudioTrack*) track)->automationType();
-	if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-		track->enableVolumeController(false);
-
-	double val = slider->value();
-	double vol;
-	if (val <= config.minSlider)
-	{
-		vol = 0.0;
-		//val -= 1.0; // display special value "off"
-	}
-	else
-		vol = pow(10.0, val / 20.0);
-	volume = vol;
-	audio->msgSetVolume((AudioTrack*) track, volume);
-	((AudioTrack*) track)->startAutoRecord(AC_VOLUME, volume);
-}
-
-//---------------------------------------------------------
-//   volumeReleased
-//---------------------------------------------------------
-
-void AudioStrip::volumeReleased()
-{
-	if (track->automationType() != AUTO_WRITE)
-		track->enableVolumeController(true);
-
-	((AudioTrack*) track)->stopAutoRecord(AC_VOLUME, volume);
-}
-
-//---------------------------------------------------------
-//   volumeRightClicked
-//---------------------------------------------------------
-
-void AudioStrip::volumeRightClicked(const QPoint &p)
-{
-	song->execAutomationCtlPopup((AudioTrack*) track, p, AC_VOLUME);
-}
-
-//---------------------------------------------------------
-//   volLabelChanged
-//---------------------------------------------------------
-
-void AudioStrip::volLabelChanged(double val)
-{
-	AutomationType at = ((AudioTrack*) track)->automationType();
-	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		track->enableVolumeController(false);
-
-	double vol;
-	if (val <= config.minSlider)
-	{
-		vol = 0.0;
-		val -= 1.0; // display special value "off"
-	}
-	else
-		vol = pow(10.0, val / 20.0);
-	volume = vol;
-	slider->setValue(val);
-	audio->msgSetVolume((AudioTrack*) track, vol);
-	((AudioTrack*) track)->startAutoRecord(AC_VOLUME, vol);
-}
-
-//---------------------------------------------------------
-//   panChanged
-//---------------------------------------------------------
-
-void AudioStrip::panChanged(double val)
-{
-	AutomationType at = ((AudioTrack*) track)->automationType();
-	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		track->enablePanController(false);
-
-	panVal = val;
-	audio->msgSetPan(((AudioTrack*) track), val);
-	((AudioTrack*) track)->recordAutomation(AC_PAN, val);
-	//printf("AudioStrip::panChanged(%d) midiToTrackPan(%g)\n", trackPanToMidi(val), midiToTrackPan(trackPanToMidi(val)));
-}
-
-//---------------------------------------------------------
-//   panPressed
-//---------------------------------------------------------
-
-void AudioStrip::panPressed()
-{
-	AutomationType at = ((AudioTrack*) track)->automationType();
-	if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-		track->enablePanController(false);
-
-	panVal = pan->value();
-	audio->msgSetPan(((AudioTrack*) track), panVal);
-	((AudioTrack*) track)->startAutoRecord(AC_PAN, panVal);
-}
-
-//---------------------------------------------------------
-//   panReleased
-//---------------------------------------------------------
-
-void AudioStrip::panReleased()
-{
-	if (track->automationType() != AUTO_WRITE)
-		track->enablePanController(true);
-	((AudioTrack*) track)->stopAutoRecord(AC_PAN, panVal);
-}
-
-//---------------------------------------------------------
-//   panRightClicked
-//---------------------------------------------------------
-
-void AudioStrip::panRightClicked(const QPoint &p)
-{
-	song->execAutomationCtlPopup((AudioTrack*) track, p, AC_PAN);
-}
-
-//---------------------------------------------------------
-//   panLabelChanged
-//---------------------------------------------------------
-
-void AudioStrip::panLabelChanged(double val)
-{
-	AutomationType at = ((AudioTrack*) track)->automationType();
-	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		track->enablePanController(false);
-
-	panVal = val;
-	pan->setValue(val);
-	audio->msgSetPan((AudioTrack*) track, val);
-	((AudioTrack*) track)->startAutoRecord(AC_PAN, val);
-}
-
-//---------------------------------------------------------
-//   updateChannels
-//---------------------------------------------------------
-
-void AudioStrip::updateChannels()
-{
-	AudioTrack* t = (AudioTrack*) track;
-	int c = t->channels();
-	//printf("AudioStrip::updateChannels track channels:%d current channels:%d\n", c, channel);
-
-	if (c > channel)
-	{
-		for (int cc = channel; cc < c; ++cc)
-		{
-			meter[cc] = new Meter(this);
-			//meter[cc]->setRange(config.minSlider, 10.0);
-			meter[cc]->setRange(config.minMeter, 10.0);
-			meter[cc]->setFixedWidth(15);
-			connect(meter[cc], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
-			m_vuBox->addWidget(meter[cc]);
-			//sliderGrid->addWidget(meter[cc], 0, cc + 1, Qt::AlignHCenter);
-			//sliderGrid->setColumnStretch(cc, 50);
-			meter[cc]->show();
-		}
-	}
-	else if (c < channel)
-	{
-		for (int cc = channel - 1; cc >= c; --cc)
-		{
-			delete meter[cc];
-			meter[cc] = 0;
-		}
-	}
-	channel = c;
-	m_btnStereo->blockSignals(true);
-	m_btnStereo->setChecked(channel == 2);
-	m_btnStereo->blockSignals(false);
-}
-
-//---------------------------------------------------------
-//   addKnob
-//    type = 0 - panorama
-//           1 - aux send
-//---------------------------------------------------------
-
-Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)
-{
-	Knob* knob = new Knob(this);
-	knob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	if (type == 0)
-	{
-		knob->setRange(-1.0, +1.0);
-		knob->setToolTip(tr("panorama"));
-		knob->setKnobImage(":/images/knob.png");
-	}
-	else
-	{
-		knob->setRange(config.minSlider - 0.1, 10.0);
-		knob->setKnobImage(":/images/knob_aux.png");
-		knob->setToolTip(tr("aux send level"));
-	}
-	knob->setBackgroundRole(QPalette::Mid);
-
-	DoubleLabel* pl;
-	if (type == 0)
-		pl = new DoubleLabel(0, -1.0, +1.0, this);
-	else
-		pl = new DoubleLabel(0.0, config.minSlider, 10.1, this);
-
-	if (dlabel)
-		*dlabel = pl;
-	pl->setSlider(knob);
-	pl->setFont(config.fonts[1]);
-	pl->setBackgroundRole(QPalette::Mid);
-	pl->setFrame(true);
-	pl->setAlignment(Qt::AlignCenter);
-	if (type == 0)
-		pl->setPrecision(2);
-	else
-	{
-		pl->setPrecision(0);
-	}
-	pl->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-
-	QString label;
-	if (type == 0)
-		label = name;//tr("Pan");
-	else
-	{
-		label = name;//.sprintf("Aux%d", id + 1);
-		if (name.length() > 17)
-			label = name.mid(0, 16).append("..");
-	}
-
-	QLabel* plb = new QLabel(label, this);
-	plb->setFont(config.fonts[1]);
-	plb->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-	plb->setAlignment(Qt::AlignCenter);
-
-
-	QHBoxLayout *container = new QHBoxLayout();
-	container->setContentsMargins(0, 0, 0, 0);
-	container->setSpacing(0);
-	container->setAlignment(Qt::AlignHCenter|Qt::AlignCenter);
-	QVBoxLayout *labelBox = new QVBoxLayout();
-	labelBox->setContentsMargins(0, 0, 0, 0);
-	labelBox->setSpacing(0);
-	labelBox->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
-	labelBox->addWidget(plb);
-	if(type == 0)
-	{ //Pan
-		labelBox->addWidget(pl);
-		container->addLayout(labelBox);
-		container->addWidget(knob);
-		m_panBox->addLayout(container);
-	}
-	else
-	{ //Aux
-		plb->setToolTip(name);
-		container->addItem(new QSpacerItem(15, 0));
-		container->addWidget(pl);
-		container->addWidget(knob);
-		labelBox->addLayout(container);
-		m_auxBox->addLayout(labelBox);
-	}
-	connect(knob, SIGNAL(valueChanged(double, int)), pl, SLOT(setValue(double)));
-	//connect(pl, SIGNAL(valueChanged(double, int)), SLOT(panChanged(double)));
-
-	if (type == 0)
-	{
-		connect(pl, SIGNAL(valueChanged(double, int)), SLOT(panLabelChanged(double)));
-		connect(knob, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
-		connect(knob, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
-		connect(knob, SIGNAL(sliderReleased(int)), SLOT(panReleased()));
-		connect(knob, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(panRightClicked(const QPoint &)));
-	}
-	else
-	{
-		knob->setId(id);
-		pl->setId(id);
-
-		connect(pl, SIGNAL(valueChanged(double, int)), knob, SLOT(setValue(double)));
-		connect(pl, SIGNAL(valueChanged(double, int)), SLOT(auxChanged(double, int)));
-		// Not used yet. Switch if/when necessary.
-		//connect(pl, SIGNAL(valueChanged(double, int)), SLOT(auxLabelChanged(double, int)));
-
-		connect(knob, SIGNAL(sliderMoved(double, int)), SLOT(auxChanged(double, int)));
-	}
-	return knob;
-}
-
-//---------------------------------------------------------
-//   AudioStrip
-//---------------------------------------------------------
-
-AudioStrip::~AudioStrip()
-{
-}
-
-
-//---------------------------------------------------------
 //   AudioStrip
 //    create mixer strip
 //---------------------------------------------------------
 
-AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
+AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 : Strip(parent, at)
 {
 
@@ -756,7 +107,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 	if (t->type() == Track::AUDIO_SOFTSYNTH)
 		m_btnStereo->setEnabled(false);
 
-	//pre = new QToolButton();
+	//pre = new QToolButton();/*{{{*/
 	//pre->setFont(config.fonts[1]);
 	//pre->setCheckable(true);
 	//pre->setText(tr("Pre"));
@@ -771,7 +122,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 	//pre->setChecked(t->prefader());
 	//pre->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	//connect(pre, SIGNAL(clicked(bool)), SLOT(preToggled(bool)));
-	//pre->setAttribute(Qt::WA_Hover);
+	//pre->setAttribute(Qt::WA_Hover);/*}}}*/
 
 
         // FIXME
@@ -798,11 +149,6 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 			ak->setValue(val);
 			al->setValue(val);
 		}
-	}
-	else
-	{
-		///if (auxsSize)
-		//layout->addSpacing((STRIP_WIDTH/2 + 2) * auxsSize);
 	}
 
 	//---------------------------------------------------
@@ -1028,7 +374,666 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)
 	updateOffState(); // init state
 	m_btnPower->blockSignals(false);
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
+}/*}}}*/
+
+//---------------------------------------------------------
+//   AudioStrip
+//---------------------------------------------------------
+
+AudioStrip::~AudioStrip()
+{
 }
+
+//---------------------------------------------------------
+//   heartBeat
+//---------------------------------------------------------
+
+void AudioStrip::heartBeat()
+{
+	if(song->invalid)
+		return;
+	for (int ch = 0; ch < track->channels(); ++ch)
+	{
+		if (meter[ch])
+		{
+			//int meterVal = track->meter(ch);
+			//int peak  = track->peak(ch);
+			//meter[ch]->setVal(meterVal, peak, false);
+			meter[ch]->setVal(track->meter(ch), track->peak(ch), false);
+		}
+	}
+	Strip::heartBeat();
+	updateVolume();
+	updatePan();
+}
+
+//---------------------------------------------------------
+//   configChanged
+//---------------------------------------------------------
+
+void AudioStrip::configChanged()
+{
+	songChanged(SC_CONFIG);
+}
+
+//---------------------------------------------------------
+//   songChanged
+//---------------------------------------------------------
+
+void AudioStrip::songChanged(int val)/*{{{*/
+{
+	// Is it simply a midi controller value adjustment? Forget it.
+	if (val == SC_MIDI_CONTROLLER)
+		return;
+
+	AudioTrack* src = (AudioTrack*) track;
+
+	// Do channels before config...
+	if (val & SC_CHANNELS)
+		updateChannels();
+
+	// p3.3.47
+	// Update the routing popup menu if anything relevant changed.
+	if (val & (SC_ROUTE | SC_CHANNELS | SC_CONFIG))
+	{
+		//updateRouteMenus();
+		oom->updateRouteMenus(track, this); // p3.3.50 Use this handy shared routine.
+	}
+
+	// Catch when label font, or configuration min slider and meter values change.
+	if (val & SC_CONFIG)
+	{
+		// Added by Tim. p3.3.9
+
+		// Set the strip label's font.
+		//label->setFont(config.fonts[1]);
+		setLabelFont();
+
+		// Adjust minimum volume slider and label values.
+		slider->setRange(config.minSlider - 0.1, 10.0);
+		sl->setRange(config.minSlider, 10.0);
+
+		// Adjust minimum aux knob and label values.
+		int n = auxKnob.size();
+		for (int idx = 0; idx < n; ++idx)
+		{
+			auxKnob[idx]->blockSignals(true);
+			auxLabel[idx]->blockSignals(true);
+			auxKnob[idx]->setRange(config.minSlider - 0.1, 10.0);
+			auxLabel[idx]->setRange(config.minSlider, 10.1);
+			auxKnob[idx]->blockSignals(false);
+			auxLabel[idx]->blockSignals(false);
+		}
+
+		// Adjust minimum meter values.
+		for (int c = 0; c < channel; ++c)
+			meter[c]->setRange(config.minMeter, 10.0);
+	}
+
+	if (m_btnMute && (val & SC_MUTE))
+	{ // m_btnMute && m_btnPower
+		m_btnMute->blockSignals(true);
+		m_btnMute->setChecked(src->mute());
+		m_btnMute->blockSignals(false);
+		updateOffState();
+	}
+	if (m_btnSolo && (val & SC_SOLO))
+	{
+		if ((bool)track->internalSolo())
+		{
+			if (!useSoloIconSet2)
+			{
+				m_btnSolo->setIcon(*soloIconSet2);
+				m_btnSolo->setIconSize(soloIconOn->size());
+				useSoloIconSet2 = true;
+			}
+		}
+		else if (useSoloIconSet2)
+		{
+			m_btnSolo->setIcon(*soloIconSet1);
+			m_btnSolo->setIconSize(soloblksqIconOn->size());
+			useSoloIconSet2 = false;
+		}
+
+		m_btnSolo->blockSignals(true);
+		m_btnSolo->setChecked(track->solo());
+		m_btnSolo->blockSignals(false);
+	}
+	if (val & SC_RECFLAG)
+		setRecordFlag(track->recordFlag());
+	if (val & SC_TRACK_MODIFIED)
+	{
+		setLabelText();
+		// Added by Tim. p3.3.9
+		setLabelFont();
+
+	}
+	if (val & SC_ROUTE)
+	{
+		/*if (pre)
+		{
+			pre->blockSignals(true);
+			pre->setChecked(src->prefader());
+			pre->blockSignals(false);
+		}*/
+	}
+	if (val & SC_AUX)
+	{
+		int n = auxKnob.size();
+		for (int idx = 0; idx < n; ++idx)
+		{
+			double val = fast_log10(src->auxSend(idx)) * 20.0;
+			auxKnob[idx]->blockSignals(true);
+			auxLabel[idx]->blockSignals(true);
+			auxKnob[idx]->setValue(val);
+			auxLabel[idx]->setValue(val);
+			auxKnob[idx]->blockSignals(false);
+			auxLabel[idx]->blockSignals(false);
+		}
+	}
+	if (autoType && (val & SC_AUTOMATION))
+	{
+		autoType->blockSignals(true);
+		autoType->setCurrentItem(track->automationType());
+		if (track->automationType() == AUTO_TOUCH || track->automationType() == AUTO_WRITE)
+		{
+			QPalette palette;
+			palette.setColor(autoType->backgroundRole(), QColor(Qt::red));
+			autoType->setPalette(palette);
+		}
+		else
+		{
+			QPalette palette;
+			palette.setColor(autoType->backgroundRole(), qApp->palette().color(QPalette::Active, QPalette::Background));
+			autoType->setPalette(palette);
+		}
+
+		autoType->blockSignals(false);
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   updateVolume
+//---------------------------------------------------------
+
+void AudioStrip::updateVolume()/*{{{*/
+{
+	double vol = ((AudioTrack*) track)->volume();
+	if (vol != volume)
+	{
+		//printf("AudioStrip::updateVolume setting slider and label\n");
+
+		slider->blockSignals(true);
+		sl->blockSignals(true);
+		double val = fast_log10(vol) * 20.0;
+		slider->setValue(val);
+		sl->setValue(val);
+		sl->blockSignals(false);
+		slider->blockSignals(false);
+		volume = vol;
+		if(((AudioTrack*) track)->volFromAutomation())
+		{
+			//printf("AudioStrip::updateVolume via automation\n");
+			midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_VOLUME, vol);
+		}
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   updatePan
+//---------------------------------------------------------
+
+void AudioStrip::updatePan()/*{{{*/
+{
+	double v = ((AudioTrack*) track)->pan();
+	if (v != panVal)
+	{
+		//printf("AudioStrip::updatePan setting slider and label\n");
+
+		pan->blockSignals(true);
+		panl->blockSignals(true);
+		pan->setValue(v);
+		panl->setValue(v);
+		panl->blockSignals(false);
+		pan->blockSignals(false);
+		panVal = v;
+		if(((AudioTrack*) track)->panFromAutomation())
+		{
+			midiMonitor->msgSendAudioOutputEvent((Track*)track, CTRL_PANPOT, v);
+		}
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   offToggled
+//---------------------------------------------------------
+
+void AudioStrip::offToggled(bool val)
+{
+	track->setOff(val);
+	song->update(SC_MUTE);
+}
+
+//---------------------------------------------------------
+//   updateOffState
+//---------------------------------------------------------
+
+void AudioStrip::updateOffState()/*{{{*/
+{
+	bool val = !track->off();
+	slider->setEnabled(val);
+	sl->setEnabled(val);
+	pan->setEnabled(val);
+	panl->setEnabled(val);
+	if (track->type() != Track::AUDIO_SOFTSYNTH)
+		m_btnStereo->setEnabled(val);
+	label->setEnabled(val);
+
+	int n = auxKnob.size();
+	for (int i = 0; i < n; ++i)
+	{
+		auxKnob[i]->setEnabled(val);
+		auxLabel[i]->setEnabled(val);
+	}
+
+	//if (pre)
+	//	pre->setEnabled(val);
+	if (hasRecord)
+		m_btnRecord->setEnabled(val);
+	//if (m_btnSolo)
+		m_btnSolo->setEnabled(val);
+	//if (m_btnMute)
+		m_btnMute->setEnabled(val);
+	if (autoType)
+		autoType->setEnabled(val);
+	if (hasIRoute)
+		m_btnIRoute->setEnabled(val);
+	if (hasORoute)
+		m_btnORoute->setEnabled(val);
+	m_btnPower->blockSignals(true);
+	m_btnPower->setChecked(track->off());
+	m_btnPower->blockSignals(false);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   preToggled
+//---------------------------------------------------------
+
+void AudioStrip::preToggled(bool val)
+{
+	audio->msgSetPrefader((AudioTrack*) track, val);
+	resetPeaks();
+	song->update(SC_ROUTE);
+}
+
+//---------------------------------------------------------
+//   stereoToggled
+//---------------------------------------------------------
+
+void AudioStrip::stereoToggled(bool val)
+{
+	int oc = track->channels();
+	int nc = val ? 2 : 1;
+	//      m_btnStereo->setIcon(nc == 2 ? *stereoIcon : *monoIcon);
+	if (oc == nc)
+		return;
+	audio->msgSetChannels((AudioTrack*) track, nc);
+	song->update(SC_CHANNELS);
+}
+
+//---------------------------------------------------------
+//   auxChanged
+//---------------------------------------------------------
+
+void AudioStrip::auxChanged(double val, int idx)
+{
+	double vol;
+	if (val <= config.minSlider)
+	{
+		vol = 0.0;
+		val -= 1.0; // display special value "off"
+	}
+	else
+		vol = pow(10.0, val / 20.0);
+	audio->msgSetAux((AudioTrack*) track, idx, vol);
+	song->update(SC_AUX);
+}
+
+void AudioStrip::auxPreToggled(int idx, bool state)
+{
+	((AudioTrack*)track)->setAuxPrefader(idx, state);
+}
+
+//---------------------------------------------------------
+//   auxLabelChanged
+//---------------------------------------------------------
+
+void AudioStrip::auxLabelChanged(double val, unsigned int idx)
+{
+	if (idx >= auxKnob.size())
+		return;
+	auxKnob[idx]->setValue(val);
+}
+
+//---------------------------------------------------------
+//   volumeChanged
+//---------------------------------------------------------
+
+void AudioStrip::volumeChanged(double val)
+{
+	AutomationType at = ((AudioTrack*) track)->automationType();
+	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+		track->enableVolumeController(false);
+
+	//printf("AudioStrip::volumeChanged(%g) \n", val);
+	double vol;
+	if (val <= config.minSlider)
+	{
+		vol = 0.0;
+		val -= 1.0; // display special value "off"
+	}
+	else
+		vol = pow(10.0, val / 20.0);
+	volume = vol;
+	audio->msgSetVolume((AudioTrack*) track, vol);
+	((AudioTrack*) track)->recordAutomation(AC_VOLUME, vol);
+	song->update(SC_TRACK_MODIFIED);
+	//double vv = (vol + 60)/0.5546875;
+	//printf("AudioStrip::volumeChanged(%g) - val: %g - midiNum: %d whacky: %d\n", vol, dbToTrackVol(val), dbToMidi(val), dbToMidi(trackVolToDb(vol)));
+}
+
+//---------------------------------------------------------
+//   volumePressed
+//---------------------------------------------------------
+
+void AudioStrip::volumePressed()
+{
+	AutomationType at = ((AudioTrack*) track)->automationType();
+	if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
+		track->enableVolumeController(false);
+
+	double val = slider->value();
+	double vol;
+	if (val <= config.minSlider)
+	{
+		vol = 0.0;
+		//val -= 1.0; // display special value "off"
+	}
+	else
+		vol = pow(10.0, val / 20.0);
+	volume = vol;
+	audio->msgSetVolume((AudioTrack*) track, volume);
+	((AudioTrack*) track)->startAutoRecord(AC_VOLUME, volume);
+}
+
+//---------------------------------------------------------
+//   volumeReleased
+//---------------------------------------------------------
+
+void AudioStrip::volumeReleased()
+{
+	if (track->automationType() != AUTO_WRITE)
+		track->enableVolumeController(true);
+
+	((AudioTrack*) track)->stopAutoRecord(AC_VOLUME, volume);
+}
+
+//---------------------------------------------------------
+//   volumeRightClicked
+//---------------------------------------------------------
+
+void AudioStrip::volumeRightClicked(const QPoint &p)
+{
+	song->execAutomationCtlPopup((AudioTrack*) track, p, AC_VOLUME);
+}
+
+//---------------------------------------------------------
+//   volLabelChanged
+//---------------------------------------------------------
+
+void AudioStrip::volLabelChanged(double val)
+{
+	AutomationType at = ((AudioTrack*) track)->automationType();
+	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+		track->enableVolumeController(false);
+
+	double vol;
+	if (val <= config.minSlider)
+	{
+		vol = 0.0;
+		val -= 1.0; // display special value "off"
+	}
+	else
+		vol = pow(10.0, val / 20.0);
+	volume = vol;
+	slider->setValue(val);
+	audio->msgSetVolume((AudioTrack*) track, vol);
+	((AudioTrack*) track)->startAutoRecord(AC_VOLUME, vol);
+}
+
+//---------------------------------------------------------
+//   panChanged
+//---------------------------------------------------------
+
+void AudioStrip::panChanged(double val)
+{
+	AutomationType at = ((AudioTrack*) track)->automationType();
+	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+		track->enablePanController(false);
+
+	panVal = val;
+	audio->msgSetPan(((AudioTrack*) track), val);
+	((AudioTrack*) track)->recordAutomation(AC_PAN, val);
+	//printf("AudioStrip::panChanged(%d) midiToTrackPan(%g)\n", trackPanToMidi(val), midiToTrackPan(trackPanToMidi(val)));
+}
+
+//---------------------------------------------------------
+//   panPressed
+//---------------------------------------------------------
+
+void AudioStrip::panPressed()
+{
+	AutomationType at = ((AudioTrack*) track)->automationType();
+	if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
+		track->enablePanController(false);
+
+	panVal = pan->value();
+	audio->msgSetPan(((AudioTrack*) track), panVal);
+	((AudioTrack*) track)->startAutoRecord(AC_PAN, panVal);
+}
+
+//---------------------------------------------------------
+//   panReleased
+//---------------------------------------------------------
+
+void AudioStrip::panReleased()
+{
+	if (track->automationType() != AUTO_WRITE)
+		track->enablePanController(true);
+	((AudioTrack*) track)->stopAutoRecord(AC_PAN, panVal);
+}
+
+//---------------------------------------------------------
+//   panRightClicked
+//---------------------------------------------------------
+
+void AudioStrip::panRightClicked(const QPoint &p)
+{
+	song->execAutomationCtlPopup((AudioTrack*) track, p, AC_PAN);
+}
+
+//---------------------------------------------------------
+//   panLabelChanged
+//---------------------------------------------------------
+
+void AudioStrip::panLabelChanged(double val)
+{
+	AutomationType at = ((AudioTrack*) track)->automationType();
+	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+		track->enablePanController(false);
+
+	panVal = val;
+	pan->setValue(val);
+	audio->msgSetPan((AudioTrack*) track, val);
+	((AudioTrack*) track)->startAutoRecord(AC_PAN, val);
+}
+
+//---------------------------------------------------------
+//   updateChannels
+//---------------------------------------------------------
+
+void AudioStrip::updateChannels()/*{{{*/
+{
+	AudioTrack* t = (AudioTrack*) track;
+	int c = t->channels();
+	//printf("AudioStrip::updateChannels track channels:%d current channels:%d\n", c, channel);
+
+	if (c > channel)
+	{
+		for (int cc = channel; cc < c; ++cc)
+		{
+			meter[cc] = new Meter(this);
+			//meter[cc]->setRange(config.minSlider, 10.0);
+			meter[cc]->setRange(config.minMeter, 10.0);
+			meter[cc]->setFixedWidth(15);
+			connect(meter[cc], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
+			m_vuBox->addWidget(meter[cc]);
+			//sliderGrid->addWidget(meter[cc], 0, cc + 1, Qt::AlignHCenter);
+			//sliderGrid->setColumnStretch(cc, 50);
+			meter[cc]->show();
+		}
+	}
+	else if (c < channel)
+	{
+		for (int cc = channel - 1; cc >= c; --cc)
+		{
+			delete meter[cc];
+			meter[cc] = 0;
+		}
+	}
+	channel = c;
+	m_btnStereo->blockSignals(true);
+	m_btnStereo->setChecked(channel == 2);
+	m_btnStereo->blockSignals(false);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   addKnob
+//    type = 0 - panorama
+//           1 - aux send
+//---------------------------------------------------------
+
+Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)/*{{{*/
+{
+	Knob* knob = new Knob(this);
+	knob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+	if (type == 0)
+	{
+		knob->setRange(-1.0, +1.0);
+		knob->setToolTip(tr("panorama"));
+		knob->setKnobImage(":/images/knob.png");
+	}
+	else
+	{
+		knob->setRange(config.minSlider - 0.1, 10.0);
+		knob->setKnobImage(":/images/knob_aux.png");
+		knob->setToolTip(tr("aux send level"));
+	}
+	knob->setBackgroundRole(QPalette::Mid);
+
+	DoubleLabel* pl;
+	if (type == 0)
+		pl = new DoubleLabel(0, -1.0, +1.0, this);
+	else
+		pl = new DoubleLabel(0.0, config.minSlider, 10.1, this);
+
+	if (dlabel)
+		*dlabel = pl;
+	pl->setSlider(knob);
+	pl->setFont(config.fonts[1]);
+	pl->setBackgroundRole(QPalette::Mid);
+	pl->setFrame(true);
+	pl->setAlignment(Qt::AlignCenter);
+	if (type == 0)
+		pl->setPrecision(2);
+	else
+	{
+		pl->setPrecision(0);
+	}
+	pl->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+	AuxCheckBox* chkPre;
+	QString label;
+	if (type == 0)
+		label = name;//tr("Pan");
+	else
+	{
+		label = name;//.sprintf("Aux%d", id + 1);
+		if (name.length() > 17)
+			label = name.mid(0, 16).append("..");
+		chkPre = new AuxCheckBox("Pre", id, this);
+		chkPre->setToolTip(tr("Make Aux Send Prefader"));
+		chkPre->setChecked(((AudioTrack*)track)->auxIsPrefader(id));
+	}
+
+	QLabel* plb = new QLabel(label, this);
+	plb->setFont(config.fonts[1]);
+	plb->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	plb->setAlignment(Qt::AlignCenter);
+
+
+	QHBoxLayout *container = new QHBoxLayout();
+	container->setContentsMargins(0, 0, 0, 0);
+	container->setSpacing(0);
+	container->setAlignment(Qt::AlignHCenter|Qt::AlignCenter);
+	QVBoxLayout *labelBox = new QVBoxLayout();
+	labelBox->setContentsMargins(0, 0, 0, 0);
+	labelBox->setSpacing(0);
+	labelBox->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+	labelBox->addWidget(plb);
+	if(type == 0)
+	{ //Pan
+		labelBox->addWidget(pl);
+		container->addLayout(labelBox);
+		container->addWidget(knob);
+		m_panBox->addLayout(container);
+	}
+	else
+	{ //Aux
+		plb->setToolTip(name);
+		container->addItem(new QSpacerItem(15, 0));
+		container->addWidget(pl);
+		container->addWidget(knob);
+		container->addWidget(chkPre);
+		labelBox->addLayout(container);
+		m_auxBox->addLayout(labelBox);
+	}
+	connect(knob, SIGNAL(valueChanged(double, int)), pl, SLOT(setValue(double)));
+	//connect(pl, SIGNAL(valueChanged(double, int)), SLOT(panChanged(double)));
+
+	if (type == 0)
+	{
+		connect(pl, SIGNAL(valueChanged(double, int)), SLOT(panLabelChanged(double)));
+		connect(knob, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
+		connect(knob, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
+		connect(knob, SIGNAL(sliderReleased(int)), SLOT(panReleased()));
+		connect(knob, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(panRightClicked(const QPoint &)));
+	}
+	else
+	{
+		knob->setId(id);
+		pl->setId(id);
+
+		connect(pl, SIGNAL(valueChanged(double, int)), knob, SLOT(setValue(double)));
+		connect(pl, SIGNAL(valueChanged(double, int)), SLOT(auxChanged(double, int)));
+		// Not used yet. Switch if/when necessary.
+		//connect(pl, SIGNAL(valueChanged(double, int)), SLOT(auxLabelChanged(double, int)));
+
+		connect(knob, SIGNAL(sliderMoved(double, int)), SLOT(auxChanged(double, int)));
+		connect(chkPre, SIGNAL(toggled(int, bool)), SLOT(auxPreToggled(int, bool)));
+	}
+	return knob;
+}/*}}}*/
 
 void AudioStrip::trackChanged()
 {

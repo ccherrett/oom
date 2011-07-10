@@ -83,11 +83,11 @@ protected:
     static bool _tmpSoloChainDoIns;
     static bool _tmpSoloChainNoDec;
 
-    // p3.3.38
     RouteList _inRoutes;
     RouteList _outRoutes;
 
     QString _name;
+    int _partDefaultColor;
     bool _recordFlag;
     bool _mute;
     bool _solo;
@@ -362,6 +362,15 @@ public:
     {
         return _recordFlag;
     }
+    
+	void setDefaultPartColor(int pc)
+    {
+        _partDefaultColor = pc;
+    }
+	int getDefaultPartColor()
+    {
+        return _partDefaultColor;
+    }
 
     int activity()
     {
@@ -551,6 +560,17 @@ public:
     }
 };
 
+typedef struct _AuxInfo
+{
+	double value;
+	bool pre;
+	_AuxInfo(double v, bool p = false)
+	{
+		value = v;
+		pre = p;
+	}
+} AuxInfo;
+
 //---------------------------------------------------------
 //   AudioTrack
 //    this track can hold audio automation data and can
@@ -569,7 +589,9 @@ class AudioTrack : public Track
     CtrlRecList _recEvents; // recorded automation events
 
     bool _prefader; // prefader metering
-    std::vector<double> _auxSend;
+    //std::vector<double> _auxSend;
+    std::vector<AuxInfo> _auxSend;
+	//Create a list of 
     Pipeline* _efxPipe;
 
     AutomationType _automationType;
@@ -693,6 +715,8 @@ public:
     double auxSend(int idx) const;
     void setAuxSend(int idx, double v, bool monitor = false);
     void addAuxSend(int n);
+	bool auxIsPrefader(int idx);
+	void setAuxPrefader(int idx, bool);
 
     void setPrefader(bool val);
 
@@ -1001,7 +1025,6 @@ public:
     {
             return _mute;
     }
-
 };
 
 //---------------------------------------------------------

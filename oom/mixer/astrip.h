@@ -10,6 +10,7 @@
 #define __ASTRIP_H__
 
 #include <vector>
+#include <QCheckBox>
 
 #include "strip.h"
 #include "route.h"
@@ -23,6 +24,38 @@ class TransparentToolButton;
 class AudioTrack;
 class DoubleLabel;
 class EffectRack;
+
+class AuxCheckBox : public QCheckBox
+{
+	Q_OBJECT
+	
+	int m_index;
+
+public:
+	AuxCheckBox(QString label, int index, QWidget *parent = 0)
+	:QCheckBox(label, parent)
+	{
+		m_index = index;
+		QObject::connect(this, SIGNAL(toggled(bool)), this, SLOT(checkToggled(bool)));
+	}
+	int index()
+	{
+		return m_index;
+	}
+	void setIndex(int i)
+	{
+		m_index = i;
+	}
+
+private slots:
+	void checkToggled(bool state)
+	{
+		emit toggled(m_index, state);
+	}
+
+signals:
+	void toggled(int, bool);
+};
 
 //---------------------------------------------------------
 //   AudioStrip
@@ -65,6 +98,7 @@ private slots:
     void oRoutePressed();
     void routingPopupMenuActivated(QAction*);
     void auxChanged(double, int);
+    void auxPreToggled(int, bool);
     void volumeChanged(double);
     void volumePressed();
     void volumeReleased();
