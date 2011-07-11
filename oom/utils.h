@@ -11,6 +11,7 @@
 class QFrame;
 class QString;
 class QWidget;
+class CItem;
 
 
 extern QString bitmap2String(int bm);

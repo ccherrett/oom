@@ -58,6 +58,8 @@ public:
     int zValue(bool fromPart = true) const; 
 
     void setZValue(int value, bool updatePart = true);
+	
+	static bool smallerZValue(const CItem*, const CItem*);
 
     void setWidth(int l) {
         _bbox.setWidth(l);

@@ -349,7 +349,6 @@ void SndFile::read(SampleV* s, int mag, unsigned pos, bool overwrite)
 
 			if (overwrite)
 				s[ch].rms = rms / mag;
-
 			else
 				s[ch].rms += rms / mag;
 		}

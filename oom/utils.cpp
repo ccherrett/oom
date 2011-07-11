@@ -17,6 +17,7 @@
 
 #include "midictrl.h"
 #include "utils.h"
+#include "citem.h"
 
 //---------------------------------------------------------
 //   curTime

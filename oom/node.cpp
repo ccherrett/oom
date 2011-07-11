@@ -345,14 +345,7 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 
 	int i;
 
-	// p3.3.38
-	//float* buffer[srcChannels];
 	float* buffer[srcTotalOutChans];
-
-
-	//float data[nframes * srcChannels];
-	//for(i = 0; i < srcChannels; ++i)
-	//      buffer[i] = data + i * nframes;
 
 	// precalculate stereo volume
 	double vol[2];
@@ -375,9 +368,6 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 		if (_haveData)
 		{
 			// Point the input buffers at our local cached 'pre-volume' buffers. They need processing, so continue on after.
-			//for(i = 0; i < srcChannels; ++i)
-			//  buffer[i] = outBuffers[i];
-			// p3.3.38
 			for (i = 0; i < srcTotalOutChans; ++i)
 				buffer[i] = outBuffers[i];
 		}

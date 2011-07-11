@@ -744,6 +744,7 @@ Part* MidiTrack::newPart(Part*p, bool clone)
 	{
 		//p->chainClone(part);
 		part->setColorIndex(p->colorIndex());
+		part->setZIndex(p->getZIndex());
 		chainClone(p, part);
 	}
 

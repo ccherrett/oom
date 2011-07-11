@@ -30,6 +30,7 @@
 #include "icons.h"
 #include "../marker/marker.h"
 #include "part.h"
+#include "utils.h"
 
 #define ABS(x)  ((x) < 0) ? -(x) : (x)
 
@@ -154,11 +155,6 @@ void Canvas::setPos(int idx, unsigned val, bool adjustScrollbar)
 //   draw
 //---------------------------------------------------------
 
-static bool smallerZValue(const CItem* first, const CItem* second)
-{
-	return first->zValue() < second->zValue();
-}
-
 void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 {
 	//      printf("draw canvas %x virt %d\n", this, virt());
@@ -191,7 +187,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 			sortedByZValue.append(i->second);
 		}
 
-		qSort(sortedByZValue.begin(), sortedByZValue.end(), smallerZValue);
+		qSort(sortedByZValue.begin(), sortedByZValue.end(), CItem::smallerZValue);
 
 		foreach(CItem* ci, sortedByZValue)
 		{

@@ -969,8 +969,6 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		}
 		if (rackpos < PipelineDepth)
 		{
-			//TODO: This must take into account and create as LV2PluginI 
-			//when reading here and writing
 			PluginI* pi = new PluginI();
 			pi->setTrack(this);
 			pi->setID(rackpos);
@@ -1193,7 +1191,6 @@ void AudioTrack::mapRackPluginsToControllers()
 			// Force all of these now, even though they may have already been set. With a pre-
 			//  0.9pre1 oom file with broken controller sections they may not be set correct.
 			float min, max;
-			//TODO: This needs to be wrapped as range is different for lv2
 			p->range(i, &min, &max);
 			CtrlValueType t = p->valueType();
 			l->setRange(min, max);
@@ -1601,7 +1598,6 @@ void AudioAux::setChannels(int n)/*{{{*/
 
 bool AudioTrack::setRecordFlag1(bool f, bool monitor)/*{{{*/
 {
-	//TODO: add monitor code
 	if(!monitor)
 	{
 		//Call the monitor here if it was not called from the monitor

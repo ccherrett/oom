@@ -24,7 +24,11 @@
 //    called from prefetch thread
 //---------------------------------------------------------
 
-//void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp)
+static bool smallerZValue(Part* first, Part* second)
+{
+	return first->getZIndex() > second->getZIndex();
+}
+
 
 void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSeek)
 {
@@ -44,11 +48,19 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 
 		PartList* pl = parts();
 		unsigned n = samples;
+		QList<Part*> sortedByZValue;
 		for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
 		{
-			WavePart* part = (WavePart*) (ip->second);
-			// Changed by Tim. p3.3.17
-			//if (part->mute() || isMute())
+		/*	sortedByZValue.append(ip->second);
+		}
+
+		qSort(sortedByZValue.begin(), sortedByZValue.end(), smallerZValue);
+
+		foreach(Part* wp, sortedByZValue)
+		{
+			WavePart* part = (WavePart*) wp;
+			*/WavePart* part = (WavePart*) (ip->second);
+
 			if (part->mute())
 				continue;
 
@@ -200,6 +212,7 @@ Part* WaveTrack::newPart(Part*p, bool clone)
 		//p->chainClone(part);
 		chainClone(p, part);
 		part->setColorIndex(p->colorIndex());
+		part->setZIndex(p->getZIndex());
 	}
 
 	return part;
