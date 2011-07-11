@@ -948,12 +948,12 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	act_rename->setData(0);
 
 	QString zvalue = QString::number(item->zValue());
-	QMenu* layerMenu = partPopup->addMenu(tr("Part Layers"));
+	QMenu* layerMenu = partPopup->addMenu(tr("Part Layers: ")+zvalue);
 	QAction *act_front = layerMenu->addAction(tr("Top"));
 	act_front->setData(4003);
-	QAction *act_up = layerMenu->addAction(tr("Up ")+zvalue);
+	QAction *act_up = layerMenu->addAction(tr("Up"));
 	act_up->setData(4002);
-	QAction *act_down = layerMenu->addAction(tr("Down ")+zvalue);
+	QAction *act_down = layerMenu->addAction(tr("Down"));
 	act_down->setData(4001);
 	QAction *act_back = layerMenu->addAction(tr("Bottom"));
 	act_back->setData(4000);
