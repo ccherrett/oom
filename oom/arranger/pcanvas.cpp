@@ -942,37 +942,30 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	QAction *act_select = partPopup->addAction(st);
 	act_select->setData(18);
 
-	QString zvalue = QString::number(item->zValue());
 	partPopup->addSeparator();
-	QAction *act_back = partPopup->addAction(tr("Move to Back"));
-	act_back->setData(4000);
-	QAction *act_down = partPopup->addAction(tr("Decrease Z-Index ")+zvalue);
-	act_down->setData(4001);
-	QAction *act_up = partPopup->addAction(tr("Increase Z-Index ")+zvalue);
-	act_up->setData(4002);
-	QAction *act_front = partPopup->addAction(tr("Move to Front"));
-	act_front->setData(4003);
-	/*if(item->zValue())
-		act_front->setEnabled(false);
-	else
-		act_back->setEnabled(false);*/
+	
 	QAction *act_rename = partPopup->addAction(tr("rename"));
 	act_rename->setData(0);
 
+	QString zvalue = QString::number(item->zValue());
+	QMenu* layerMenu = partPopup->addMenu(tr("Part Layers"));
+	QAction *act_front = layerMenu->addAction(tr("Top"));
+	act_front->setData(4003);
+	QAction *act_up = layerMenu->addAction(tr("Up ")+zvalue);
+	act_up->setData(4002);
+	QAction *act_down = layerMenu->addAction(tr("Down ")+zvalue);
+	act_down->setData(4001);
+	QAction *act_back = layerMenu->addAction(tr("Bottom"));
+	act_back->setData(4000);
+
 	QMenu* colorPopup = partPopup->addMenu(tr("Part Color"));
 
-	// part color selection
-	//const QFontMetrics& fm = colorPopup->fontMetrics();
-	//int h = fm.lineSpacing();
 
 	for (int i = 0; i < NUM_PARTCOLORS; ++i)
 	{
-		//ColorListItem* item = new ColorListItem(config.partColors[i], h, fontMetrics().height(), partColorNames[i]); //ddskrjo
-		//Part* ipart = npart->part();
 		QString colorname(config.partColorNames[i]);
 		if(npart->part()->colorIndex() == i)
 		{
-			//printf("Part color matched\n");
 			colorname = QString("* "+config.partColorNames[i]);
 			QAction *act_color = colorPopup->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
 			act_color->setData(20 + i);
@@ -1099,17 +1092,6 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 			return;
 		case 14: // wave edit
 		{
-			// Changed to allow multiple selected parts to be shown. By T356
-			// Slightly inefficient to add (above), then clear here.
-			// Should really only add npart->part() to pl only if NOT here.
-			// Removed. Added wave editor menu item instead.
-			//pl->clear();
-			//PartList* ptl = npart->track()->parts();
-			//for(ciPart pi = ptl->begin(); pi != ptl->end(); pi++)
-			//{
-			//  if(pi->second->selected())
-			//    pl->add(pi->second);
-			//}
 			emit startEditor(pl, 4);
 		}
 			return;
