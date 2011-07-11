@@ -693,6 +693,7 @@ Part::Part(Track* t)
 	_track = t;
 	_selected = false;
 	_mute = false;
+	m_zIndex = 0;
 	_colorIndex = 0;
 	if(t)
 		_colorIndex = t->getDefaultPartColor();
@@ -713,12 +714,20 @@ Part::Part(Track* t, EventList* ev)
 	_track = t;
 	_selected = false;
 	_mute = false;
+	m_zIndex = 0;
 	_colorIndex = 0;
 	if(t)
 		_colorIndex = t->getDefaultPartColor();
 	_events = ev;
 	_events->incRef(1);
 	_events->incARef(1);
+}
+
+void Part::setZIndex(int i)
+{
+	m_zIndex = i;
+	if(_track)
+		_track->setMaxZIndex(i);
 }
 
 //---------------------------------------------------------
@@ -730,6 +739,7 @@ MidiPart::MidiPart(const MidiPart& p) : Part(p)
 {
 	_prevClone = this;
 	_nextClone = this;
+	m_zIndex = p.m_zIndex;
 	//setSn(newSn());
 	//_sn = p._sn;
 	//_name = p._name;
@@ -765,6 +775,7 @@ WavePart::WavePart(const WavePart& p) : Part(p)
 {
 	_prevClone = this;
 	_nextClone = this;
+	m_zIndex = p.m_zIndex;
 	//setSn(newSn());
 	//_sn = p._sn;
 	//_name = p._name;
@@ -785,140 +796,6 @@ Part::~Part()
 	if (_events->refCount() <= 0)
 		delete _events;
 }
-
-/*
-//---------------------------------------------------------
-//   unchainClone
-//---------------------------------------------------------
-
-void Part::unchainClone()
-{
-  chainCheckErr();
-  
-  _prevClone->setNextClone(_nextClone);
-  _nextClone->setPrevClone(_prevClone);
-  
-  _prevClone = this;
-  _nextClone = this;
-}
-
-//---------------------------------------------------------
-//   chainClone
-//   The quick way - if part to chain to is known...
-//---------------------------------------------------------
-
-void Part::chainClone(const Part* p)
-{
-  chainCheckErr();
-  
-  // Make sure the part is unchained first.
-  p->prevClone()->setNextClone(p->nextClone());
-  p->nextClone()->setPrevClone(p->prevClone());
-  
-  p->setPrevClone(this);
-  p->setNextClone(_nextClone->prevClone());
-  
-  _nextClone->setPrevClone(p);
-  _nextClone = (Part*)p;
-}
-
-//---------------------------------------------------------
-//   chainClone
-//   The slow way - if part to chain to is not known...
-//---------------------------------------------------------
-
-void Part::chainClone()
-{
-  chainCheckErr();
-  
-  // Look for a part with the same event list, that we can chain to...
-  Part* p = 0;
-  if(!_track || (_track && _track->isMidiTrack()))
-  {
-	MidiTrackList* mtl = song->midis();
-	for(ciMidiTrack imt = mtl->begin(); imt != mtl->end(); ++imt)
-	{
-	  const PartList* pl = (*imt)->cparts();
-	  for(ciPart ip = pl->begin(); ip != pl->end(); ++ip)
-	  {
-		if(ip->second != this && ip->second->events() == _events)
-		{
-		  p = ip->second;
-		  break;
-		}
-	  }
-	}
-  }  
-  
-  if((!p && !_track) || (_track && _track->type() == Track::WAVE))
-  {
-	WaveTrackList* wtl = song->waves();
-	for(ciWaveTrack iwt = wtl->begin(); iwt != wtl->end(); ++iwt)
-	{
-	  const PartList* pl = (*iwt)->cparts();
-	  for(ciPart ip = pl->begin(); ip != pl->end(); ++ip)
-	  {
-		if(ip->second != this && ip->second->events() == _events)
-		{
-		  p = ip->second;
-		  break;
-		}
-	  }
-	}
-  }
-  
-  // No part found with same event list? Done.
-  if(!p)
-	return;
-    
-  // Make sure this part is unchained first.
-  _prevClone->setNextClone(_nextClone);
-  _nextClone->setPrevClone(_prevClone);
-  
-  _prevClone = p;
-  _nextClone = p->nextClone();
-  
-  p->nextClone()->setPrevClone(this);
-  p->setNextClone(this);
-}
-
-//---------------------------------------------------------
-//   replaceClone
-//---------------------------------------------------------
-
-void Part::replaceClone(const Part* p)
-{
-  chainCheckErr();
-  
-  // Make sure the part is unchained first.
-  p->prevClone()->setNextClone(p->nextClone());
-  p->nextClone()->setPrevClone(p->prevClone());
-  
-  // If this part is a clone, not a single lone part...
-  if(_prevClone != this)
-	_prevClone->setNextClone(p);
-  if(_nextClone != this)
-	_nextClone->setPrevClone(p);
-  
-  p->setPrevClone(_prevClone);
-  p->setNextClone(_nextClone);
-  
-  _nextClone = this;
-  _prevClone = this;
-}
-
-//---------------------------------------------------------
-//   chainCheckErr
-//---------------------------------------------------------
-
-void Part::chainCheckErr()
-{
-  if(_nextClone->prevClone() != this)
-	printf("Part::chainCheckErr Error! Next clone:%s %x prev clone:%s %x != this:%s %x\n", _nextClone->name().toLatin1().constData(), _nextClone, _nextClone->prevClone()->name().toLatin1().constData(), _nextClone->prevClone(), name().toLatin1().constData(), this);
-  if(_prevClone->nextClone() != this)
-	printf("Part::chainCheckErr Error! Prev clone:%s %x next clone:%s %x != this:%s %x\n", _prevClone->name().toLatin1().constData(), _prevClone, _prevClone->nextClone()->name().toLatin1().constData(), _prevClone->nextClone(), name().toLatin1().constData(), this);
-}
- */
 
 //---------------------------------------------------------
 //   findPart
@@ -1447,6 +1324,7 @@ void Song::changePart(Part* oPart, Part* nPart)
 
 	oTrack->parts()->remove(oPart);
 	nTrack->parts()->add(nPart);
+	nPart->setZIndex(oPart->getZIndex());
 
 	// adjust song len:
 	unsigned epos = nPart->tick() + nPart->lenTick();

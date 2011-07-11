@@ -100,6 +100,7 @@ protected:
     bool _panEn2Ctrl;
 	bool _collapsed;
 	int _mixerTab;
+	int m_maxZIndex;
 
     int _activity;
     int _lastActivity;
@@ -159,6 +160,12 @@ public:
 	void setCollapsed(bool f) { _collapsed = f; }
 	int mixerTab(){return _mixerTab;}
 	void setMixerTab(int i){_mixerTab = i;}
+	void setMaxZIndex(int i)
+	{
+		if(i > m_maxZIndex)
+			m_maxZIndex = i;
+	}
+	int maxZIndex() { return m_maxZIndex; }
 
     QString comment() const
     {

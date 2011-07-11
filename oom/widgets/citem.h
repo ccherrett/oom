@@ -55,9 +55,9 @@ public:
         return _bbox.width();
     }
 
-    int zValue() const {return _zValue;}
+    int zValue(bool fromPart = true) const; 
 
-    void setZValue(int value) {_zValue = value;}
+    void setZValue(int value, bool updatePart = true);
 
     void setWidth(int l) {
         _bbox.setWidth(l);
@@ -132,9 +132,7 @@ public:
         return _part;
     }
 
-    void setPart(Part* p) {
-        _part = p;
-    }
+    void setPart(Part* p);
 };
 
 typedef std::multimap<int, CItem*, std::less<int> >::iterator iCItem;

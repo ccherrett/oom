@@ -16,7 +16,8 @@
 CItem::CItem()
 {
 	_isMoving = false;
-        _part = 0;
+	_part = 0;
+	_zValue = 0;
 }
 
 CItem::CItem(const QPoint&p, const QRect& r)
@@ -24,19 +25,42 @@ CItem::CItem(const QPoint&p, const QRect& r)
 	_pos = p;
 	_bbox = r;
 	_isMoving = false;
-        _part = 0;
+	_part = 0;
 	_zValue = 0;
 }
-
-// Changed by Tim. p3.3.20
-//CItem::CItem(Event e, Part* p)
 
 CItem::CItem(const Event& e, Part* p)
 {
 	_event = e;
 	_part = p;
-	_isMoving = false;
 	_zValue = 0;
+	if(p)
+	{
+		_zValue = p->getZIndex();
+	}
+	_isMoving = false;
+}
+
+void CItem::setZValue(int value, bool updatePart)
+{
+	_zValue = value;
+	if(_part && updatePart)
+		_part->setZIndex(value);
+}
+
+int CItem::zValue(bool fromPart) const 
+{
+	if(_part && fromPart)
+		return _part->getZIndex();
+	return _zValue;
+}
+
+void CItem::setPart(Part* p) {
+    _part = p;
+	if(p)
+	{
+		_zValue = p->getZIndex();
+	}
 }
 
 //---------------------------------------------------------

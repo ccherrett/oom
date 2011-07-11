@@ -61,6 +61,7 @@ protected:
     EventList* _events;
     Part* _prevClone;
     Part* _nextClone;
+	int m_zIndex;
 
 public:
     Part(Track*);
@@ -160,6 +161,12 @@ public:
     {
         _nextClone = p;
     }
+
+	void setZIndex(int i);
+	int getZIndex()
+	{	
+		return m_zIndex;
+	}
 
     iEvent addEvent(Event& p);
 

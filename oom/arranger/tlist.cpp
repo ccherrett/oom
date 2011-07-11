@@ -1922,7 +1922,7 @@ void TList::resizeEvent(QResizeEvent* /*ev*/)
 //   classesPopupMenu
 //---------------------------------------------------------
 
-void TList::classesPopupMenu(Track* t, int x, int y)
+void TList::classesPopupMenu(Track* t, int x, int y)/*{{{*/
 {
 	QMenu p;
 	p.clear();
@@ -2037,7 +2037,7 @@ void TList::classesPopupMenu(Track* t, int x, int y)
 
 		audio->msgIdle(false);
 	}
-}
+}/*}}}*/
 
 void TList::moveSelectedTrack(int dir)/*{{{*/
 {

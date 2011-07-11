@@ -171,6 +171,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 
 	if (virt())
 	{
+		//printf("If virt() code running\n");
 		drawCanvas(p, rect);
 
 		//---------------------------------------------------
@@ -214,6 +215,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 	}
 	else
 	{
+		//printf("If NOT virt() code running\n");
 		p.save();
 		setPainter(p);
 
@@ -1724,11 +1726,11 @@ void Canvas::updateCItemsZValues()
 		CItem* cItem = k->second;
 		if(cItem->part() == _curPart)
 		{
-			cItem->setZValue(1);
+			cItem->setZValue(1, false);
 		}
 		else
 		{
-			cItem->setZValue(0);
+			cItem->setZValue(0, false);
 		}
 	}
 }

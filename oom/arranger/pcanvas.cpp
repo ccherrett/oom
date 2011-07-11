@@ -564,9 +564,9 @@ void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 
 		if (moveItem(ci, newpos, dtype))
 			ci->move(newpos);
-                if (_moving.size() == 1)
+		if (_moving.size() == 1)
 		{
-                        itemReleased(_curItem, newpos);
+			itemReleased(_curItem, newpos);
 		}
 		if (dtype == MOVE_COPY || dtype == MOVE_CLONE)
 			selectItem(ci, false);
@@ -942,15 +942,20 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	QAction *act_select = partPopup->addAction(st);
 	act_select->setData(18);
 
+	QString zvalue = QString::number(item->zValue());
 	partPopup->addSeparator();
-	QAction *act_back = partPopup->addAction(tr("Send To Back"));
+	QAction *act_back = partPopup->addAction(tr("Move to Back"));
 	act_back->setData(4000);
-	QAction *act_front = partPopup->addAction(tr("Send To Front"));
-	act_front->setData(4001);
-	if(item->zValue())
+	QAction *act_down = partPopup->addAction(tr("Decrease Z-Index ")+zvalue);
+	act_down->setData(4001);
+	QAction *act_up = partPopup->addAction(tr("Increase Z-Index ")+zvalue);
+	act_up->setData(4002);
+	QAction *act_front = partPopup->addAction(tr("Move to Front"));
+	act_front->setData(4003);
+	/*if(item->zValue())
 		act_front->setEnabled(false);
 	else
-		act_back->setEnabled(false);
+		act_back->setEnabled(false);*/
 	QAction *act_rename = partPopup->addAction(tr("rename"));
 	act_rename->setData(0);
 
@@ -1048,6 +1053,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 	PartList* pl = new PartList;
 	NPart* npart = (NPart*) (item);
 	pl->add(npart->part());
+	int zvalue = item->zValue();
 	switch (n)
 	{
 		case 0: // rename
@@ -1219,14 +1225,27 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 			redraw();
 			break;
 		}
-		case 4000:
+		case 4000: //Move to zero
 		{
 			item->setZValue(0);
 			break;
 		}
-		case 4001:
+		case 4001: //down one layer
 		{
-			item->setZValue(1);
+			if(item->zValue())
+				item->setZValue(zvalue-1);
+			break;
+		}
+		case 4002: //up one layer
+		{
+			item->setZValue(zvalue+1);
+			break;
+		}
+		case 4003: // move to top layer
+		{
+			zvalue = item->part()->track()->maxZIndex();
+			
+			item->setZValue(zvalue+1);
 			break;
 		}
 		default:

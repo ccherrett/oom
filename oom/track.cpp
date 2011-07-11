@@ -167,6 +167,7 @@ void Track::init()
 	_reminder3 = false;
 	_collapsed = true;
 	_mixerTab = 0;
+	m_maxZIndex = 0;
 
 	_volumeEnCtrl = true;
 	_volumeEn2Ctrl = true;
@@ -248,7 +249,9 @@ Track::Track(const Track& t, bool cloneParts)
 	_name = t.name();
 	_type = t.type();
 	_locked = t.locked();
+	_mixerTab = t._mixerTab;
 	m_midiassign = t.m_midiassign;
+	m_maxZIndex = t.m_maxZIndex;
 	_collapsed = t._collapsed;
 	_reminder1 = t._reminder1;
 	_reminder2 = t._reminder2;
@@ -316,6 +319,8 @@ Track& Track::operator=(const Track& t)
 	_name = t.name();
 	_type = t.type();
 	_locked = t.locked();
+	_collapsed = t._collapsed;
+	m_maxZIndex = t.m_maxZIndex;
 
 	_parts = *(t.cparts());
 	// NOTE: Can't do this. See comments in copy constructor.
