@@ -47,6 +47,7 @@
 #include "mpevent.h"
 #include "midimonitor.h"
 #include "plugin.h"
+#include <omp.h>
 
 extern void clearMidiTransforms();
 extern void clearMidiInputTransforms();
@@ -3534,6 +3535,8 @@ void Song::updateTrackViews(QAction* act)
 void Song::updateTrackViews1()
 {
 	//printf("Song::updateTrackViews1()\n");
+	double start,end;
+	start = omp_get_wtime();
 	_viewtracks.clear();
 	viewselected = false;
 	bool customview = false;
@@ -3552,11 +3555,17 @@ void Song::updateTrackViews1()
 		commentview = true;
 		viewselected = true;
 	}
-	for(iTrackView it = _tviews.begin(); it != _tviews.end(); ++it)
+	//iTrackView it;
+	//TrackList* tl;
+	int vsize = (int)_tviews.size();
+#pragma omp parallel for
+	//for(it = _tviews.begin(); it != _tviews.end(); ++it)
+	for(int p = 0; p < vsize; ++p)
 	{
-		if((*it)->selected())
+		TrackView* it = _tviews[p];
+		if(it->selected())
 		{
-			TrackList* tl = (*it)->tracks();
+			TrackList* tl = it->tracks();
 			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
 			{
 				bool found = false;
@@ -3571,27 +3580,32 @@ void Song::updateTrackViews1()
 					{
 						found = true;
 						//Make sure to record arm the ones that were in other views as well
-						(*t)->setRecordFlag1((*it)->record());
-						(*t)->setRecordFlag2((*it)->record());
+						(*t)->setRecordFlag1(it->record());
+						(*t)->setRecordFlag2(it->record());
 						break;
 					}
 				}
 				if(!found)
 				{
 					_viewtracks.push_back((*t));
-					(*t)->setRecordFlag1((*it)->record());
-					(*t)->setRecordFlag2((*it)->record());
+					(*t)->setRecordFlag1(it->record());
+					(*t)->setRecordFlag2(it->record());
 					customview = true;
 					viewselected = true;
 				}
 			}
 		}
 	}
-	for(iTrackView ait = _autotviews.begin(); ait != _autotviews.end(); ++ait)
+	
+	int asize = (int)_autotviews.size();
+#pragma omp parallel for
+	//for(iTrackView ait = _autotviews.begin(); ait != _autotviews.end(); ++ait)
+	for(int p = 0; p < asize; ++p)
 	{
-		if(customview && (*ait)->viewName() == "Working View")
+		TrackView* ait = _autotviews[p];
+		if(customview && ait->viewName() == "Working View")
 			continue;
-		if((*ait)->selected())/*{{{*/
+		if(ait->selected())/*{{{*/
 		{
 			TrackList* tl = tracks();
 			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
@@ -3615,13 +3629,13 @@ void Song::updateTrackViews1()
 						case Track::DRUM:
 						case Track::AUDIO_SOFTSYNTH:
 						case Track::WAVE:
-							if((*ait)->viewName() == "Working View")
+							if(ait->viewName() == "Working View")
 							{
 								if((*t)->parts()->empty())
 									break;
 								_viewtracks.push_back((*t));
 							}
-							else if((*ait)->viewName() == "Comment View")
+							else if(ait->viewName() == "Comment View")
 							{
 								if((*t)->comment().isEmpty())
 									break;
@@ -3629,11 +3643,11 @@ void Song::updateTrackViews1()
 							}
 							break;
 						case Track::AUDIO_OUTPUT:
-							if((*ait)->viewName() == "Outputs View")
+							if(ait->viewName() == "Outputs View")
 							{
 								_viewtracks.push_back((*t));
 							}
-							else if((*ait)->viewName() == "Comment View")
+							else if(ait->viewName() == "Comment View")
 							{
 								if((*t)->comment().isEmpty())
 									break;
@@ -3641,11 +3655,11 @@ void Song::updateTrackViews1()
 							}
 							break;
 						case Track::AUDIO_BUSS:
-							if((*ait)->viewName() == "Buss View")
+							if(ait->viewName() == "Buss View")
 							{
 								_viewtracks.push_back((*t));
 							}
-							else if((*ait)->viewName() == "Comment View")
+							else if(ait->viewName() == "Comment View")
 							{
 								if((*t)->comment().isEmpty())
 									break;
@@ -3653,11 +3667,11 @@ void Song::updateTrackViews1()
 							}
 							break;
 						case Track::AUDIO_AUX:
-							if((*ait)->viewName() == "Aux View")
+							if(ait->viewName() == "Aux View")
 							{
 								_viewtracks.push_back((*t));
 							}
-							else if((*ait)->viewName() == "Comment View")
+							else if(ait->viewName() == "Comment View")
 							{
 								if((*t)->comment().isEmpty())
 									break;
@@ -3665,11 +3679,11 @@ void Song::updateTrackViews1()
 							}
 							break;
 						case Track::AUDIO_INPUT:
-							if((*ait)->viewName() == "Inputs  View")
+							if(ait->viewName() == "Inputs  View")
 							{
 								_viewtracks.push_back((*t));
 							}
-							else if((*ait)->viewName() == "Comment View")
+							else if(ait->viewName() == "Comment View")
 							{
 								if((*t)->comment().isEmpty())
 									break;
@@ -3678,12 +3692,13 @@ void Song::updateTrackViews1()
 							break;
 						default:
 							fprintf(stderr, "unknown track type %d\n", (*t)->type());
-							return;
+							break;
 					}/*}}}*/
 				}
 			}
 		}/*}}}*/
 	}
+	
 	if(!viewselected)
 	{
 		//Make the viewtracks the artracks
@@ -3695,6 +3710,8 @@ void Song::updateTrackViews1()
 			//}
 		}
 	}
+	end = omp_get_wtime();
+	printf("Song::updateTrackViews1() took %f seconds to run\n", end-start);
 	if(!invalid)
 		emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }

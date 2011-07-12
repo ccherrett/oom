@@ -253,6 +253,7 @@ public:
     void remove(Part* part);
     int index(Part*);
     Part* find(int idx);
+	PartList* findParts(unsigned tick, unsigned samples);
 };
 
 extern void chainClone(Part* p);

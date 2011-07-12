@@ -60,6 +60,9 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 		{
 			WavePart* part = (WavePart*) wp;
 			*/WavePart* part = (WavePart*) (ip->second);
+			//Find all parts under current pos, if there is a part under pos that is not
+			//the current part and has a heigher zIndex than the current part skip this cycle
+			PartList* partAtPos = pl->findParts(pos, n);
 
 			if (part->mute())
 				continue;
@@ -70,6 +73,33 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 				break;
 			if (pos >= p_epos)
 				continue;
+			bool skipPos = false;
+			unsigned maxSamples = n;
+			unsigned maxPos = 0;
+			if(!partAtPos->empty())
+			{
+				
+				for(iPart p = partAtPos->begin(); p != partAtPos->end(); ++p)
+				{
+					WavePart* fpart = (WavePart*) (p->second);
+					if(fpart != part && fpart->getZIndex() > part->getZIndex())
+					{ //Let the top one continue to play
+						if(fpart->frame() < pos + n)
+						{
+							maxPos = fpart->frame();
+							maxSamples = pos + maxPos;
+						}
+						skipPos = true;
+						printf("Found %s under %s\n", part->name().toUtf8().constData(), fpart->name().toUtf8().constData());
+						printf("Skipping this process cycle for %s\n", part->name().toUtf8().constData());
+						break;
+					}
+				}
+				/*if(skipPos)
+				{
+					continue;
+				}*/
+			}
 
 			EventList* events = part->events();
 			for (iEvent ie = events->begin(); ie != events->end(); ++ie)
@@ -87,11 +117,13 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 				int offset = e_spos - pos;
 
 				unsigned srcOffset, dstOffset;
+				bool trimed = false;
 				if (offset > 0)
 				{
 					nn = n - offset;
 					srcOffset = 0;
 					dstOffset = offset;
+					trimed = true;
 				}
 				else
 				{
@@ -102,6 +134,12 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 					if (nn > n)
 						nn = n;
 				}
+				/*if((pos + nn) > maxPos)
+				{
+					printf("nn : %d maxPos: %d", nn, maxPos);
+					nn = (pos + nn) - maxPos;
+					printf(" nn after: %d\n", nn);
+				}*/
 				float* bpp[channels()];
 				for (int i = 0; i < channels(); ++i)
 					bpp[i] = bp[i] + dstOffset;
@@ -113,7 +151,7 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 				//event.readAudio(srcOffset, bpp, channels(), nn, doSeek, false);
 				// p3.3.33
 				//FIXME: this is where the audio is overwriting
-				event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, true);
+				event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, false);
 
 			}
 		}

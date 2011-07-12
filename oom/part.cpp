@@ -810,6 +810,28 @@ iPart PartList::findPart(unsigned tick)
 	return i;
 }
 
+PartList* PartList::findParts(unsigned tick, unsigned samples)
+{
+	iPart i;
+	PartList* list = new PartList;
+	for (i = begin(); i != end(); ++i)
+	{
+		unsigned start = i->second->tick();
+		unsigned end = start + i->second->lenTick();
+		if(tick + samples < start)
+			continue;
+		if (start <= tick && end > tick)
+		{
+			Part* part = (Part*)(i->second);
+			if (part->type() == Pos::FRAMES)
+				list->insert(std::pair<const int, Part*> (part->frame(), part));
+			else
+				list->insert(std::pair<const int, Part*> (part->tick(), part));
+		}
+	}
+	return list;
+}
+
 //---------------------------------------------------------
 //   add
 //---------------------------------------------------------
