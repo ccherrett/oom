@@ -338,11 +338,14 @@ void MixerDock::updateMixer(UpdateAction action)/*{{{*/
 		//---------------------------------------------------
 
 		TrackList* mtl = m_tracklist;
-		for (iTrack i = mtl->begin(); i != mtl->end(); ++i)
+		int s = (int)mtl->size();
+#pragma omp parallel for
+		//for (iTrack i = mtl->begin(); i != mtl->end(); ++i)
+		for(int t = 0; t < s; ++t)
 		{
-			Track* mt = *i;
+			Track* mt = mtl->index(t);
 			if ((mt->type() == Track::MIDI) || (mt->type() == Track::DRUM))
-				addStrip(*i, idx++);
+				addStrip(mt, idx++);
 		}
 
 		return;
@@ -351,10 +354,15 @@ void MixerDock::updateMixer(UpdateAction action)/*{{{*/
 	int idx = 0;
 
 	TrackList* itl = m_tracklist;
-	for (iTrack i = itl->begin(); i != itl->end(); ++i)
+	int sz = (int)itl->size();
+
+	//for (iTrack i = itl->begin(); i != itl->end(); ++i)
+#pragma omp parallel for
+	for(int p = 0; p < sz; ++p)
 	{
-		if((*i)->name() != "Master")
-			addStrip(*i, idx++);
+		Track* mt = itl->index(p);
+		if(mt->name() != "Master")
+			addStrip(mt, idx++);
 	}
 	Track* master = song->findTrack("Master");
 	if(master)
