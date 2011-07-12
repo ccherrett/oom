@@ -47,7 +47,7 @@
 #include "mpevent.h"
 #include "midimonitor.h"
 #include "plugin.h"
-#include <omp.h>
+//#include <omp.h>
 
 extern void clearMidiTransforms();
 extern void clearMidiInputTransforms();
@@ -3535,8 +3535,8 @@ void Song::updateTrackViews(QAction* act)
 void Song::updateTrackViews1()
 {
 	//printf("Song::updateTrackViews1()\n");
-	double start,end;
-	start = omp_get_wtime();
+	//double start,end;
+	//start = omp_get_wtime();
 	_viewtracks.clear();
 	viewselected = false;
 	bool customview = false;
@@ -3558,7 +3558,7 @@ void Song::updateTrackViews1()
 	//iTrackView it;
 	//TrackList* tl;
 	int vsize = (int)_tviews.size();
-#pragma omp parallel for
+//#pragma omp parallel for
 	//for(it = _tviews.begin(); it != _tviews.end(); ++it)
 	for(int p = 0; p < vsize; ++p)
 	{
@@ -3598,7 +3598,7 @@ void Song::updateTrackViews1()
 	}
 	
 	int asize = (int)_autotviews.size();
-#pragma omp parallel for
+//#pragma omp parallel for
 	//for(iTrackView ait = _autotviews.begin(); ait != _autotviews.end(); ++ait)
 	for(int p = 0; p < asize; ++p)
 	{
@@ -3710,8 +3710,8 @@ void Song::updateTrackViews1()
 			//}
 		}
 	}
-	end = omp_get_wtime();
-	printf("Song::updateTrackViews1() took %f seconds to run\n", end-start);
+	//end = omp_get_wtime();
+	//printf("Song::updateTrackViews1() took %f seconds to run\n", end-start);
 	if(!invalid)
 		emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }

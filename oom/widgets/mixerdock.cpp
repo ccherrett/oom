@@ -339,7 +339,7 @@ void MixerDock::updateMixer(UpdateAction action)/*{{{*/
 
 		TrackList* mtl = m_tracklist;
 		int s = (int)mtl->size();
-#pragma omp parallel for
+//#pragma omp parallel for
 		//for (iTrack i = mtl->begin(); i != mtl->end(); ++i)
 		for(int t = 0; t < s; ++t)
 		{
@@ -357,7 +357,7 @@ void MixerDock::updateMixer(UpdateAction action)/*{{{*/
 	int sz = (int)itl->size();
 
 	//for (iTrack i = itl->begin(); i != itl->end(); ++i)
-#pragma omp parallel for
+//#pragma omp parallel for
 	for(int p = 0; p < sz; ++p)
 	{
 		Track* mt = itl->index(p);

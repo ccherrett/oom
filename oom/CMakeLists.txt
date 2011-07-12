@@ -212,8 +212,9 @@ set_target_properties( core
       # PROPERTIES COMPILE_FLAGS "-include ${PROJECT_BINARY_DIR}/all.h"
       # PROPERTIES COMPILE_FLAGS "-Imidiedit -Iarranger -Iliste -Iwidgets -Imixer -Idriver -Iwaveedit -Implugins -Iinstruments -Iremote ${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h "
       # PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -DINSTPREFIX='\"${CMAKE_INSTALL_PREFIX}\"' -DINSTLIBDIR='\"${LIBRARY_OUTPUT_DIRECTORY}\"' -include ${PROJECT_BINARY_DIR}/all.h "
-      PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC -fopenmp"
-	  LINK_FLAGS "-fopenmp"
+      PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC"
+	  #PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC -fopenmp"
+	  #LINK_FLAGS "-fopenmp"
       OUTPUT_NAME oom_core
       )
 set_target_properties( oom
