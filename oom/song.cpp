@@ -1523,7 +1523,10 @@ void Song::update(int flags)
 	}
 	++level;
 	if(flags & (SC_TRACK_REMOVED | SC_TRACK_INSERTED/* | SC_TRACK_MODIFIED*/))
+	{
+		//printf("Song::update firing updateTrackViews\n");
 		updateTrackViews1();
+	}
 	if(!invalid)
 		emit songChanged(flags);
 	--level;
@@ -1922,7 +1925,7 @@ void Song::setRecordFlag(Track* track, bool val, bool monitor)
 		track->setRecordFlag2(val, monitor);
 	}
 	//      updateFlags |= SC_RECFLAG;
-	update(SC_RECFLAG/*|SC_VIEW_CHANGED*/);
+	update(SC_RECFLAG);
 
 }
 
@@ -1946,10 +1949,12 @@ void Song::endMsgCmd()
 		redoList->clear(); // TODO: delete elements in list
 		undoAction->setEnabled(true);
 		redoAction->setEnabled(false);
-		if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
+		if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED/* | SC_TRACK_MODIFIED*/))
 		{
+			//NOTE: This call was causing our mixer to update repeatedly, removed for now
+			//keep an eye out for trackviews not updating after a undo/redo operation
 			//printf("Song::endMsgCmd() calling updateTrackViews1()\n");
-			updateTrackViews1();
+			//updateTrackViews1();
 		}
 		if(!invalid)
 			emit songChanged(updateFlags);
