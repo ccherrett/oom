@@ -818,9 +818,10 @@ PartList* PartList::findParts(unsigned tick, unsigned samples)
 	{
 		unsigned start = i->second->tick();
 		unsigned end = start + i->second->lenTick();
-		if(tick + samples < start)
-			continue;
-		if (start <= tick && end > tick)
+		unsigned range = tick + samples;
+		//if(tick + samples < start)
+		//	continue;
+		if (start >= tick && start <= range)
 		{
 			Part* part = (Part*)(i->second);
 			if (part->type() == Pos::FRAMES)
