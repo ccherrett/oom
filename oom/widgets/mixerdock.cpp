@@ -417,7 +417,10 @@ void MixerDock::songChanged(int flags)/*{{{*/
 	else if (flags & SC_TRACK_INSERTED)
 		action = STRIP_INSERTED;
 	else if (flags & SC_MIDI_TRACK_PROP)
+	{
+		//printf("MixerDock::songChanged(%d)\n",flags);
 		action = UPDATE_MIDI;
+	}
 	if (action != NO_UPDATE)
 	{
 		//printf("running updateMixer()\n");

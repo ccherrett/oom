@@ -1610,7 +1610,7 @@ void Canvas::setCursor()
 		switch (_tool)
 		{
 		case PencilTool:
-			QWidget::setCursor(QCursor(*pencilCursorIcon, 4, 15));
+			QWidget::setCursor(QCursor(*pencilCursorIcon, 6, 15));
 			break;
 		case RubberTool:
 			QWidget::setCursor(QCursor(*deleteIcon, 4, 15));

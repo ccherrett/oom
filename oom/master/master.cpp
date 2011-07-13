@@ -344,7 +344,7 @@ void Master::setTool(int t)
 	switch (tool)
 	{
 		case PencilTool:
-			setCursor(QCursor(*pencilCursorIcon, 4, 15));
+			setCursor(QCursor(*pencilCursorIcon, 6, 15));
 			break;
 		default:
 			setCursor(QCursor(Qt::ArrowCursor));
