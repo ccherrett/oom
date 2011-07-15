@@ -63,11 +63,6 @@ void CItem::setPart(Part* p) {
 	}
 }
 
-bool CItem::smallerZValue(const CItem* first, const CItem* second)
-{
-	return first->zValue() < second->zValue();
-}
-
 //---------------------------------------------------------
 //   isSelected
 //---------------------------------------------------------

@@ -55,12 +55,10 @@ public:
         return _bbox.width();
     }
 
-    int zValue(bool fromPart = true) const; 
+    int zValue(bool fromPart = false) const; 
 
-    void setZValue(int value, bool updatePart = true);
+    void setZValue(int value, bool updatePart = false);
 	
-	static bool smallerZValue(const CItem*, const CItem*);
-
     void setWidth(int l) {
         _bbox.setWidth(l);
     }

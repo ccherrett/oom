@@ -92,6 +92,7 @@ protected:
 	int _selectedProgramPos;
 	bool _drawSelectedProgram;
 	bool _drawPartLines;
+	bool m_PartZIndex;
 
     void setCursor();
     virtual void viewKeyPressEvent(QKeyEvent* event);
@@ -257,6 +258,8 @@ public:
     }
 	virtual bool isEventSelected(Event e);
 	void setDrawPartLines(bool v) { _drawPartLines = v; }
+	static bool smallerZValue(const CItem*, const CItem*);
+
 };
 #endif
 

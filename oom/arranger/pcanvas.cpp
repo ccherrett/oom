@@ -346,6 +346,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 {
 	setAcceptDrops(true);
 	_raster = r;
+	m_PartZIndex = true;
 
 	setFocusPolicy(Qt::StrongFocus);
 	// Defaults:
@@ -359,7 +360,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	tracks = song->visibletracks();
 	//tracks = song->tracks();
 	setMouseTracking(true);
-        _drag = DRAG_OFF;
+	_drag = DRAG_OFF;
 	curColorIndex = 0;
 	automation.currentCtrlVal = 0;
 	automation.controllerState = doNothing;
@@ -947,7 +948,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	QAction *act_rename = partPopup->addAction(tr("rename"));
 	act_rename->setData(0);
 
-	QString zvalue = QString::number(item->zValue());
+	QString zvalue = QString::number(item->zValue(true));
 	QMenu* layerMenu = partPopup->addMenu(tr("Part Layers: ")+zvalue);
 	QAction *act_front = layerMenu->addAction(tr("Top"));
 	act_front->setData(4003);
@@ -1046,7 +1047,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 	PartList* pl = new PartList;
 	NPart* npart = (NPart*) (item);
 	pl->add(npart->part());
-	int zvalue = item->zValue();
+	int zvalue = item->zValue(true);
 	switch (n)
 	{
 		case 0: // rename
@@ -1209,25 +1210,25 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 		}
 		case 4000: //Move to zero
 		{
-			item->setZValue(0);
+			item->setZValue(0, true);
 			break;
 		}
 		case 4001: //down one layer
 		{
-			if(item->zValue())
-				item->setZValue(zvalue-1);
+			if(item->zValue(true))
+				item->setZValue(zvalue-1, true);
 			break;
 		}
 		case 4002: //up one layer
 		{
-			item->setZValue(zvalue+1);
+			item->setZValue(zvalue+1, true);
 			break;
 		}
 		case 4003: // move to top layer
 		{
 			zvalue = item->part()->track()->maxZIndex();
 			
-			item->setZValue(zvalue+1);
+			item->setZValue(zvalue+1, true);
 			break;
 		}
 		default:

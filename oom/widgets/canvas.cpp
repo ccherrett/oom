@@ -33,6 +33,7 @@
 #include "utils.h"
 
 #define ABS(x)  ((x) < 0) ? -(x) : (x)
+bool PartZIndex = false;
 
 //---------------------------------------------------------
 //   Canvas
@@ -43,6 +44,7 @@ Canvas::Canvas(QWidget* parent, int sx, int sy, const char* name)
 {
 	_canvasTools = 0;
 	_itemPopupMenu = 0;
+	m_PartZIndex = false;
 
 	_button = Qt::NoButton;
 	_keyState = 0;
@@ -151,6 +153,11 @@ void Canvas::setPos(int idx, unsigned val, bool adjustScrollbar)
 	update();
 }
 
+bool Canvas::smallerZValue(const CItem* first, const CItem* second)
+{
+	return first->zValue(PartZIndex) < second->zValue(PartZIndex);
+}
+
 //---------------------------------------------------------
 //   draw
 //---------------------------------------------------------
@@ -186,8 +193,9 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 		{
 			sortedByZValue.append(i->second);
 		}
+		PartZIndex = m_PartZIndex;
 
-		qSort(sortedByZValue.begin(), sortedByZValue.end(), CItem::smallerZValue);
+		qSort(sortedByZValue.begin(), sortedByZValue.end(), Canvas::smallerZValue);
 
 		foreach(CItem* ci, sortedByZValue)
 		{
@@ -207,7 +215,6 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 		}
 
 		drawTopItem(p,rect);
-
 	}
 	else
 	{
