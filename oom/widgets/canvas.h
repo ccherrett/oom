@@ -70,6 +70,7 @@ protected:
 
     CItemList _items;
     CItemList _moving;
+    CItemList m_multiSelect;
     CItem* _curItem;
     Part* _curPart;
     int _curPartId;
@@ -208,6 +209,10 @@ protected:
     virtual void curPartChanged()
     {
     }
+	
+	virtual void populateMultiSelect(CItem*)
+	{
+	}
 
 
     bool allItemsAreSelected();
@@ -232,6 +237,7 @@ public:
     bool isSingleSelection();
     int selectionSize();
     CItemList getItemlistForCurrentPart();
+    CItemList getItemlistForPart(Part*);
     CItemList getSelectedItemsForCurrentPart();
 
     Tool tool() const

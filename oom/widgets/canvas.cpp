@@ -1455,7 +1455,7 @@ int Canvas::getCurrentDrag()
 	return _drag;
 }
 
-CItemList Canvas::getItemlistForCurrentPart()
+CItemList Canvas::getItemlistForCurrentPart()/*{{{*/
 {
 	CItemList list;
 	iCItem i;
@@ -1481,7 +1481,35 @@ CItemList Canvas::getItemlistForCurrentPart()
 	}
 
 	return list;
-}
+}/*}}}*/
+
+CItemList Canvas::getItemlistForPart(Part* part)/*{{{*/
+{
+	CItemList list;
+	iCItem i;
+
+	if (!part)
+	{
+		return list;
+	}
+
+	if (_items.size() == 0) {
+		return list;
+	}
+
+	i = _items.begin();
+	while (i != _items.end())
+	{
+		if (i->second->part() == part)
+		{
+			list.add(i->second);
+		}
+
+		++i;
+	}
+
+	return list;
+}/*}}}*/
 
 CItemList Canvas::getSelectedItemsForCurrentPart()
 {

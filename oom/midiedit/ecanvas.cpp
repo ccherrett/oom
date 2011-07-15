@@ -146,7 +146,7 @@ void EventCanvas::updateSelection()
 //   songChanged(type)
 //---------------------------------------------------------
 
-void EventCanvas::songChanged(int flags)
+void EventCanvas::songChanged(int flags)/*{{{*/
 {
 	// Is it simply a midi controller value adjustment? Forget it.
 	if (flags == SC_MIDI_CONTROLLER)
@@ -228,13 +228,13 @@ void EventCanvas::songChanged(int flags)
 	updateCItemsZValues();
 
 	redraw();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   selectAtTick
 //---------------------------------------------------------
 
-void EventCanvas::selectAtTick(unsigned int tick)
+void EventCanvas::selectAtTick(unsigned int tick)/*{{{*/
 {
 	CItemList list = getItemlistForCurrentPart();
 
@@ -264,7 +264,7 @@ void EventCanvas::selectAtTick(unsigned int tick)
 			songChanged(SC_SELECTION);
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   track
@@ -274,6 +274,44 @@ MidiTrack* EventCanvas::track() const
 {
 	return ((MidiPart*) _curPart)->track();
 }
+
+void EventCanvas::populateMultiSelect(CItem* baseItem)/*{{{*/
+{
+	if(editor->isGlobalEdit() && baseItem)
+	{
+		PartList* pl = editor->parts();
+		int curTranspose = ((MidiTrack*)baseItem->part()->track())->getTransposition();
+		Event curEvent = baseItem->event();
+		int curPitch = curEvent.pitch();
+		int curRawPitch = curPitch - curTranspose;
+		int curLen = curEvent.lenTick();
+		m_multiSelect.clear();
+		for(iPart p = pl->begin(); p != pl->end(); ++p)
+		{
+			if(p->second == _curPart)
+				continue;
+			CItemList pitems = getItemlistForPart(p->second);
+			for (iCItem i = pitems.begin(); i != pitems.end(); ++i)
+			{
+				MidiTrack* mtrack = (MidiTrack*)i->second->part()->track();
+				int transp = mtrack->getTransposition();
+				Event e = i->second->event();
+				if(e.empty())
+					continue;
+				int pitch = e.pitch();
+				int rpitch = pitch - transp;
+				int len = e.lenTick();
+				//printf("Current pitch: %d, rawpitch: %d - note pitch: %d, raw: %d\n", curPitch, curRawPitch, pitch, rpitch);
+				if(e.tick() == curEvent.tick() && rpitch == curRawPitch/*, len == curLen*/)
+				{
+					m_multiSelect.add(i->second);
+						break;
+				}
+			}
+		}
+		printf("MultiSelect list size: %d \n", (int)m_multiSelect.size());
+	}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   viewMousePressEvent
@@ -289,7 +327,6 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 
 	// special events if right button is clicked while operations
 	// like moving or drawing lasso is performed.
-	///if (event->stateAfter() & Qt::RightButton) {
 	if (event->buttons() & Qt::RightButton & ~(event->button()))
 	{
 		//printf("viewMousePressEvent special buttons:%x mods:%x button:%x\n", (int)event->buttons(), (int)keyState, event->button());
@@ -309,7 +346,6 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 	}
 
 	// ignore event if (another) button is already active:
-	///if (keyState & (Qt::LeftButton|Qt::RightButton|Qt::MidButton)) {
 	if (event->buttons() & (Qt::LeftButton | Qt::RightButton | Qt::MidButton) & ~(event->button()))
 	{
 		//printf("viewMousePressEvent ignoring buttons:%x mods:%x button:%x\n", (int)event->buttons(), (int)keyState, event->button());
@@ -326,10 +362,12 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 	//---------------------------------------------------
 
 	CItemList list = getItemlistForCurrentPart();
-	if(editor->isGlobalEdit())
-		list = _items;
+	//if(editor->isGlobalEdit())
+	//	list = _items;
 	if (virt())
+	{
 		_curItem = list.find(_start);//_items.find(_start);
+	}
 	else
 	{
 		_curItem = 0; //selectAtTick(_start.x());
@@ -350,9 +388,7 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			int w = rmapxDev(box.width());
 			int h = rmapyDev(box.height());
 			QRect r(x, y, w, h);
-			///r.moveBy(i->second->pos().x(), i->second->pos().y());
 			r.translate(i->second->pos().x(), i->second->pos().y());
-			//if (r.contains(_start))
 			if(r.contains(lpos))
 			{
 				if (i->second->isSelected())
@@ -370,6 +406,11 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 		if (!_curItem && usfound)
 			_curItem = ius->second;
 		
+	}
+
+	if(editor->isGlobalEdit() && _curItem)
+	{
+		populateMultiSelect(_curItem);
 	}
 
 	if (_curItem && (event->button() == Qt::MidButton))

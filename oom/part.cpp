@@ -27,7 +27,7 @@ int Part::snGen;
 //   unchainClone
 //---------------------------------------------------------
 
-void unchainClone(Part* p)
+void unchainClone(Part* p)/*{{{*/
 {
 	chainCheckErr(p);
 
@@ -38,14 +38,14 @@ void unchainClone(Part* p)
 	// Isolate the part.
 	p->setPrevClone(p);
 	p->setNextClone(p);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   chainClone
 //   The quick way - if part to chain to is known...
 //---------------------------------------------------------
 
-void chainClone(Part* p1, Part* p2)
+void chainClone(Part* p1, Part* p2)/*{{{*/
 {
 	chainCheckErr(p1);
 
@@ -60,14 +60,14 @@ void chainClone(Part* p1, Part* p2)
 	// Re-link the existing part.
 	p1->nextClone()->setPrevClone(p2);
 	p1->setNextClone(p2);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   chainCloneInternal
 //   No error check, so it can be called by replaceClone()
 //---------------------------------------------------------
 
-void chainCloneInternal(Part* p)
+void chainCloneInternal(Part* p)/*{{{*/
 {
 	Track* t = p->track();
 	Part* p1 = 0;
@@ -137,14 +137,14 @@ void chainCloneInternal(Part* p)
 	// Re-link the existing part.
 	p1->nextClone()->setPrevClone(p);
 	p1->setNextClone(p);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   chainClone
 //   The slow way - if part to chain to is not known...
 //---------------------------------------------------------
 
-void chainClone(Part* p)
+void chainClone(Part* p)/*{{{*/
 {
 	chainCheckErr(p);
 	chainCloneInternal(p);
@@ -225,13 +225,13 @@ void replaceClone(Part* p1, Part* p2)
 	p1->setPrevClone(p1);
 	//printf("replaceClone p1: %s %p arefs:%d p2: %s %p arefs:%d\n", p1->name().toLatin1().constData(), p1, );
 
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   unchainTrackParts
 //---------------------------------------------------------
 
-void unchainTrackParts(Track* t, bool decRefCount)
+void unchainTrackParts(Track* t, bool decRefCount)/*{{{*/
 {
 	PartList* pl = t->parts();
 	for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
@@ -251,13 +251,13 @@ void unchainTrackParts(Track* t, bool decRefCount)
 		p->setPrevClone(p);
 		p->setNextClone(p);
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   chainTrackParts
 //---------------------------------------------------------
 
-void chainTrackParts(Track* t, bool incRefCount)
+void chainTrackParts(Track* t, bool incRefCount)/*{{{*/
 {
 	PartList* pl = t->parts();
 	for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
@@ -340,26 +340,26 @@ void chainTrackParts(Track* t, bool incRefCount)
 		p1->nextClone()->setPrevClone(p);
 		p1->setNextClone(p);
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   chainCheckErr
 //---------------------------------------------------------
 
-void chainCheckErr(Part* p)
+void chainCheckErr(Part* p)/*{{{*/
 {
 	// At all times these must be true...
 	if (p->nextClone()->prevClone() != p)
 		printf("chainCheckErr: Next clone:%s %p prev clone:%s %p != %s %p\n", p->nextClone()->name().toLatin1().constData(), p->nextClone(), p->nextClone()->prevClone()->name().toLatin1().constData(), p->nextClone()->prevClone(), p->name().toLatin1().constData(), p);
 	if (p->prevClone()->nextClone() != p)
 		printf("chainCheckErr: Prev clone:%s %p next clone:%s %p != %s %p\n", p->prevClone()->name().toLatin1().constData(), p->prevClone(), p->prevClone()->nextClone()->name().toLatin1().constData(), p->prevClone()->nextClone(), p->name().toLatin1().constData(), p);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   addPortCtrlEvents
 //---------------------------------------------------------
 
-void addPortCtrlEvents(Event& event, Part* part, bool doClones)
+void addPortCtrlEvents(Event& event, Part* part, bool doClones)/*{{{*/
 {
 	// Traverse and process the clone chain ring until we arrive at the same part again.
 	// The loop is a safety net.
@@ -428,13 +428,13 @@ void addPortCtrlEvents(Event& event, Part* part, bool doClones)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   addPortCtrlEvents
 //---------------------------------------------------------
 
-void addPortCtrlEvents(Part* part, bool doClones)
+void addPortCtrlEvents(Part* part, bool doClones)/*{{{*/
 {
 	// Traverse and process the clone chain ring until we arrive at the same part again.
 	// The loop is a safety net.
@@ -499,13 +499,13 @@ void addPortCtrlEvents(Part* part, bool doClones)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   removePortCtrlEvents
 //---------------------------------------------------------
 
-void removePortCtrlEvents(Event& event, Part* part, bool doClones)
+void removePortCtrlEvents(Event& event, Part* part, bool doClones)/*{{{*/
 {
 	// Traverse and process the clone chain ring until we arrive at the same part again.
 	// The loop is a safety net.
@@ -569,13 +569,13 @@ void removePortCtrlEvents(Event& event, Part* part, bool doClones)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   removePortCtrlEvents
 //---------------------------------------------------------
 
-void removePortCtrlEvents(Part* part, bool doClones)
+void removePortCtrlEvents(Part* part, bool doClones)/*{{{*/
 {
 	// Traverse and process the clone chain ring until we arrive at the same part again.
 	// The loop is a safety net.
@@ -639,7 +639,7 @@ void removePortCtrlEvents(Part* part, bool doClones)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   addEvent
@@ -730,6 +730,11 @@ void Part::setZIndex(int i)
 		_track->setMaxZIndex(i);
 }
 
+bool Part::smallerZValue(Part* first, Part* second)
+{
+	return first->getZIndex() < second->getZIndex();
+}
+
 //---------------------------------------------------------
 //   MidiPart
 //   copy constructor
@@ -740,14 +745,6 @@ MidiPart::MidiPart(const MidiPart& p) : Part(p)
 	_prevClone = this;
 	_nextClone = this;
 	m_zIndex = p.m_zIndex;
-	//setSn(newSn());
-	//_sn = p._sn;
-	//_name = p._name;
-	//_selected = p._selected;
-	//_mute = p._mute;
-	//_colorIndex = p._colorIndex;
-	//_track = p._track;
-	//_events = p._events;
 }
 
 //---------------------------------------------------------
@@ -776,14 +773,6 @@ WavePart::WavePart(const WavePart& p) : Part(p)
 	_prevClone = this;
 	_nextClone = this;
 	m_zIndex = p.m_zIndex;
-	//setSn(newSn());
-	//_sn = p._sn;
-	//_name = p._name;
-	//_selected = p._selected;
-	//_mute = p._mute;
-	//_colorIndex = p._colorIndex;
-	//_track = p._track;
-	//_events = p._events;
 }
 
 //---------------------------------------------------------
@@ -808,29 +797,6 @@ iPart PartList::findPart(unsigned tick)
 		if (i->second->tick() == tick)
 			break;
 	return i;
-}
-
-PartList* PartList::findParts(unsigned tick, unsigned samples)
-{
-	iPart i;
-	PartList* list = new PartList;
-	for (i = begin(); i != end(); ++i)
-	{
-		unsigned start = i->second->tick();
-		unsigned end = start + i->second->lenTick();
-		unsigned range = tick + samples;
-		//if(tick + samples < start)
-		//	continue;
-		if (start >= tick && start <= range)
-		{
-			Part* part = (Part*)(i->second);
-			if (part->type() == Pos::FRAMES)
-				list->insert(std::pair<const int, Part*> (part->frame(), part));
-			else
-				list->insert(std::pair<const int, Part*> (part->tick(), part));
-		}
-	}
-	return list;
 }
 
 //---------------------------------------------------------

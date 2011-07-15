@@ -63,6 +63,7 @@ protected:
     // Added by T356.
     virtual QPoint raster(const QPoint&) const;
     virtual void viewMousePressEvent(QMouseEvent* event);
+	virtual void populateMultiSelect(CItem*);
 
 public slots:
 

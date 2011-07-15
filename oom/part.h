@@ -11,7 +11,6 @@
 
 #include <map>
 
-// Added by T356.
 #include <uuid/uuid.h>
 
 #include "event.h"
@@ -24,18 +23,13 @@ class MidiTrack;
 class WaveTrack;
 class Xml;
 class Part;
-//class AudioConvertMap;
 
-// typedef std::multimap<unsigned, Event*, std::less<unsigned> >::iterator iEvent;
 
 struct ClonePart
 {
-    //const EventList* el;
     const Part* cp;
     int id;
     uuid_t uuid;
-    //ClonePart(const EventList* e, int i) : el(e), id(i) {}
-    //ClonePart(const Part* p, int i) : cp(p), id(i) {}
     ClonePart(const Part*, int i = -1);
 };
 
@@ -167,15 +161,12 @@ public:
 	{	
 		return m_zIndex;
 	}
+	static bool smallerZValue(Part* first, Part* second);
 
     iEvent addEvent(Event& p);
 
-    //virtual void read(Xml&, int newPartOffset=0, bool toTrack = true);
-    //virtual void write(int, Xml&) const;
-    //virtual void write(int, Xml&, bool isCopy = false) const;
     virtual void write(int, Xml&, bool isCopy = false, bool forceWavePaths = false) const;
 
-    //      virtual Event* newEvent() const = 0;
     virtual void dump(int n = 0) const;
 };
 
@@ -206,7 +197,6 @@ public:
         return (MidiTrack*) Part::track();
     }
 
-    //      virtual Event* newEvent() const;
     virtual void dump(int n = 0) const;
 };
 
@@ -216,7 +206,6 @@ public:
 
 class WavePart : public Part
 {
-    // p3.3.31
     AudioConvertMap _converters;
 
 public:
@@ -234,7 +223,6 @@ public:
         return (WaveTrack*) Part::track();
     }
 
-    //      virtual Event* newEvent() const;
     virtual void dump(int n = 0) const;
 };
 
@@ -253,7 +241,6 @@ public:
     void remove(Part* part);
     int index(Part*);
     Part* find(int idx);
-	PartList* findParts(unsigned tick, unsigned samples);
 };
 
 extern void chainClone(Part* p);
@@ -268,9 +255,6 @@ extern void addPortCtrlEvents(Event& event, Part* part, bool doClones);
 extern void removePortCtrlEvents(Part* part, bool doClones);
 extern void removePortCtrlEvents(Event& event, Part* part, bool doClones);
 extern CloneList cloneList;
-//extern CloneList copyCloneList;
-//extern void updateCloneList(Part* oPart, Part* nPart);
-//extern void clearClipboardAndCloneList();
 extern Part* readXmlPart(Xml&, Track*, bool doClone = false, bool toTrack = true);
 
 #endif

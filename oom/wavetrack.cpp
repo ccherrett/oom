@@ -24,12 +24,6 @@
 //    called from prefetch thread
 //---------------------------------------------------------
 
-static bool smallerZValue(Part* first, Part* second)
-{
-	return first->getZIndex() < second->getZIndex();
-}
-
-
 void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSeek)
 {
 	// Added by Tim. p3.3.17
@@ -47,26 +41,20 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 	{
 
 		PartList* pl = parts();
-		//printf("Partlist Size:%d\n", (int)pl->size());
 		unsigned n = samples;
 		QList<Part*> sortedByZValue;
 		for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
 		{
 			sortedByZValue.append(ip->second);
-			//printf("Part name: %s\n", ip->second->name().toUtf8().constData());
 		}
 
-		qSort(sortedByZValue.begin(), sortedByZValue.end(), smallerZValue);
+		qSort(sortedByZValue.begin(), sortedByZValue.end(), Part::smallerZValue);
 		//printf("Sorted List Size:%d\n", sortedByZValue.size());
 
 		foreach(Part* wp, sortedByZValue)
 		{
 			WavePart* part = (WavePart*) wp;
-			//WavePart* part = (WavePart*) (ip->second);
 			//printf("Part name: %s\n", part->name().toUtf8().constData());
-			//Find all parts under current pos, if there is a part under pos that is not
-			//the current part and has a heigher zIndex than the current part skip this cycle
-			//PartList* partAtPos = pl->findParts(pos, samples);
 
 			if (part->mute())
 				continue;
@@ -116,14 +104,10 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 				for (int i = 0; i < channels(); ++i)
 					bpp[i] = bp[i] + dstOffset;
 
-				// By T356. Allow overlapping parts or events to mix together !
-				// Since the buffers are cleared above, just read and add (don't overwrite) the samples.
-				//event.read(srcOffset, bpp, channels(), nn);
-				//event.read(srcOffset, bpp, channels(), nn, false);
-				//event.readAudio(srcOffset, bpp, channels(), nn, doSeek, false);
-				// p3.3.33
-				//FIXME: this is where the audio is overwriting
-				//printf("Source offset: %u sample count: %u\n", srcOffset, nn);
+				//Read in samples, since the parts are now processed via zIndex and 
+				//not left to right we can overwrite as we always want to hear the part on top
+				//Set false here to mix all layers togather, maybe we should make this a user
+				//setting.
 				event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, true);
 
 			}
@@ -313,21 +297,18 @@ bool WaveTrack::getData(unsigned framePos, int channels, unsigned nframe, float*
 		unsigned pos;
 		if (_prefetchFifo.get(channels, nframe, bp, &pos))
 		{
-			printf("WaveTrack::getData(%s) fifo underrun\n",
-					name().toLatin1().constData());
+			printf("WaveTrack::getData(%s) fifo underrun\n", name().toLatin1().constData());
 			return false;
 		}
 		if (pos != framePos)
 		{
 			if (debugMsg)
-				printf("fifo get error expected %d, got %d\n",
-					framePos, pos);
+				printf("fifo get error expected %d, got %d\n", framePos, pos);
 			while (pos < framePos)
 			{
 				if (_prefetchFifo.get(channels, nframe, bp, &pos))
 				{
-					printf("WaveTrack::getData(%s) fifo underrun\n",
-							name().toLatin1().constData());
+					printf("WaveTrack::getData(%s) fifo underrun\n", name().toLatin1().constData());
 					return false;
 				}
 			}
@@ -354,8 +335,7 @@ void WaveTrack::setChannels(int n)
 		if (sf->samples() == 0)
 		{
 			sf->remove();
-			sf->setFormat(sf->format(), _channels,
-					sf->samplerate());
+			sf->setFormat(sf->format(), _channels, sf->samplerate());
 			sf->openWrite();
 		}
 	}
