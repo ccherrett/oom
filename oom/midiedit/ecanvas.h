@@ -131,8 +131,10 @@ public:
     void pasteAt(const QString& pt, int pos);
     void viewDropEvent(QDropEvent* event);
 
-    virtual void modifySelected(NoteInfo::ValType, int)
+    virtual void modifySelected(NoteInfo::ValType, int, bool strict = false)
     {
+		if(strict)
+			return;
     }
     virtual void keyPress(QKeyEvent*);
 	virtual bool showComments() { return m_showcomments; }

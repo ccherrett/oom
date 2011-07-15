@@ -131,7 +131,7 @@ public:
 		colorMode = mode;
 		redraw();
     }
-    virtual void modifySelected(NoteInfo::ValType type, int delta);
+    virtual void modifySelected(NoteInfo::ValType type, int delta, bool strict = false);
 	virtual bool isEventSelected(Event);
 	void doModify(NoteInfo::ValType type, int delta, CItem*, bool);
 };

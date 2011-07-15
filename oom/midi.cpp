@@ -903,7 +903,7 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 						//
 						// transpose non drum notes
 						//
-						pitch += (track->getTransposition() + song->globalPitchShift());
+						pitch += /*(track->getTransposition() +*/ song->globalPitchShift();
 					}
 
 					if (pitch > 127)

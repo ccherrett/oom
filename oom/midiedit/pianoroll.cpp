@@ -1725,7 +1725,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_NOTE_VELOCITY_UP].key)
 	{
-		canvas->modifySelected(NoteInfo::VAL_VELON, 5);
+		canvas->modifySelected(NoteInfo::VAL_VELON, 5, true);
 		/*CItemList list = canvas->getSelectedItemsForCurrentPart();
 
 		song->startUndo();
@@ -1758,7 +1758,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_NOTE_VELOCITY_DOWN].key)
 	{
-		canvas->modifySelected(NoteInfo::VAL_VELON, -5);
+		canvas->modifySelected(NoteInfo::VAL_VELON, -5, true);
 		/*CItemList list = canvas->getSelectedItemsForCurrentPart();
 
 		song->startUndo();

@@ -2216,14 +2216,17 @@ void PianoCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, bool 
 //   modifySelected
 //---------------------------------------------------------
 
-void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
+void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta, bool strict)
 {
 	audio->msgIdle(true);
 	song->startUndo();
 	//i use this to make sure I only sound a note once if you are
 	//moving multiple notes at once
 	int count = 1;
-    for (iCItem i = _items.begin(); i != _items.end(); ++i)/*{{{*/
+	CItemList list = _items;
+	if(strict)
+		list = getItemlistForCurrentPart();
+    for (iCItem i = list.begin(); i != list.end(); ++i)/*{{{*/
 	{
 		if (!(i->second->isSelected()))
 			continue;
