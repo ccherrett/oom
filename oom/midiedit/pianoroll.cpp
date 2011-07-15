@@ -1725,7 +1725,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_NOTE_VELOCITY_UP].key)
 	{
-		CItemList list = canvas->getSelectedItemsForCurrentPart();
+		canvas->modifySelected(NoteInfo::VAL_VELON, 5);
+		/*CItemList list = canvas->getSelectedItemsForCurrentPart();
 
 		song->startUndo();
 		for (iCItem k = list.begin(); k != list.end(); ++k)
@@ -1751,13 +1752,14 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 				audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
 			}
 		}
-		song->endUndo(SC_EVENT_MODIFIED);
+		song->endUndo(SC_EVENT_MODIFIED);*/
 		return;
 
 	}
 	else if (key == shortcuts[SHRT_NOTE_VELOCITY_DOWN].key)
 	{
-		CItemList list = canvas->getSelectedItemsForCurrentPart();
+		canvas->modifySelected(NoteInfo::VAL_VELON, -5);
+		/*CItemList list = canvas->getSelectedItemsForCurrentPart();
 
 		song->startUndo();
 		for (iCItem k = list.begin(); k != list.end(); ++k)
@@ -1783,7 +1785,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 				audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
 			}
 		}
-		song->endUndo(SC_EVENT_MODIFIED);
+		song->endUndo(SC_EVENT_MODIFIED);*/
 		return;
 	}
 	else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)

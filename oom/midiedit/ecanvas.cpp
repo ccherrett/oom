@@ -286,7 +286,7 @@ void EventCanvas::populateMultiSelect(CItem* baseItem)/*{{{*/
 		Event curEvent = baseItem->event();
 		int curPitch = curEvent.pitch();
 		int curRawPitch = curPitch - curTranspose;
-		int curLen = curEvent.lenTick();
+		//int curLen = curEvent.lenTick();
 		m_multiSelect.clear();
 		for(iPart p = pl->begin(); p != pl->end(); ++p)
 		{
@@ -302,7 +302,7 @@ void EventCanvas::populateMultiSelect(CItem* baseItem)/*{{{*/
 					continue;
 				int pitch = e.pitch();
 				int rpitch = pitch - transp;
-				int len = e.lenTick();
+				//int len = e.lenTick();
 				//printf("Current pitch: %d, rawpitch: %d - note pitch: %d, raw: %d\n", curPitch, curRawPitch, pitch, rpitch);
 				if(e.tick() == curEvent.tick() && rpitch == curRawPitch/*, len == curLen*/)
 				{
@@ -311,7 +311,7 @@ void EventCanvas::populateMultiSelect(CItem* baseItem)/*{{{*/
 				}
 			}
 		}
-		printf("MultiSelect list size: %d \n", (int)m_multiSelect.size());
+		//printf("MultiSelect list size: %d \n", (int)m_multiSelect.size());
 	}
 }/*}}}*/
 
