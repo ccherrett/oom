@@ -2128,25 +2128,14 @@ void PianoCanvas::curPartChanged()
 	emit partChanged(editor->curCanvasPart());
 }
 
-//---------------------------------------------------------
-//   modifySelected
-//---------------------------------------------------------
-
-void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
+void PianoCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, bool play)
 {
-	audio->msgIdle(true);
-	song->startUndo();
-	//i use this to make sure I only sound a note once if you are
-	//moving multiple notes at once
-	int count = 1;
-    for (iCItem i = _items.begin(); i != _items.end(); ++i)
+    if(item)/*{{{*/
 	{
-		if (!(i->second->isSelected()))
-			continue;
-		NEvent* e = (NEvent*) (i->second);
+		NEvent* e = (NEvent*) (item);
 		Event event = e->event();
 		if (event.type() != Note)
-			continue;
+			return;
 
 		MidiPart* part = (MidiPart*) (e->part());
 		Event newEvent = event.clone();
@@ -2204,7 +2193,7 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
 		song->changeEvent(event, newEvent, part);
 		emit pitchChanged(newEvent.pitch());
 		//This is a vertical movement
-		if(_playEvents && newEvent.pitch() != epitch && count == 1)
+		if(_playEvents && newEvent.pitch() != epitch && play)
 		{
 			int port = track()->outPort();
 			int channel = track()->outChannel();
@@ -2217,11 +2206,42 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
 			MidiPlayEvent pe3(0, port, channel, 0x90, newEvent.pitch(), 0);
 			audio->msgPlayMidiEvent(&pe3);
 		}
-		++count;
 		// Indicate do not do port controller values and clone parts.
 		//song->undoOp(UndoOp::ModifyEvent, newEvent, event, part);
 		song->undoOp(UndoOp::ModifyEvent, newEvent, event, part, false, false);
-	}
+	}/*}}}*/
+}
+
+//---------------------------------------------------------
+//   modifySelected
+//---------------------------------------------------------
+
+void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta)
+{
+	audio->msgIdle(true);
+	song->startUndo();
+	//i use this to make sure I only sound a note once if you are
+	//moving multiple notes at once
+	int count = 1;
+    for (iCItem i = _items.begin(); i != _items.end(); ++i)/*{{{*/
+	{
+		if (!(i->second->isSelected()))
+			continue;
+		CItem* item = i->second;
+		if(editor->isGlobalEdit())
+			populateMultiSelect(item);
+		doModify(type, delta, item, (count == 1));
+		
+		if(editor->isGlobalEdit())
+		{
+			for(iCItem ci = m_multiSelect.begin(); ci != m_multiSelect.end(); ++ci)
+			{
+				CItem* citem = ci->second;
+				doModify(type, delta, citem, false);
+			}
+		}
+		++count;
+	}/*}}}*/
 	song->endUndo(SC_EVENT_MODIFIED);
 	audio->msgIdle(false);
 }

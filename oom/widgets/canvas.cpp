@@ -474,6 +474,7 @@ void Canvas::deselectAll()
 {
 	for (iCItem i = _items.begin(); i != _items.end(); ++i)
 		i->second->setSelected(false);
+	m_multiSelect.clear();
 }
 
 //---------------------------------------------------------

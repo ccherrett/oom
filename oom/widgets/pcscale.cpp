@@ -288,7 +288,7 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 	}/*}}}*/
 	else if (i == 0)/*{{{*/
 	{ // If LMB select the program change
-		if (selectProgramChange(x))
+		if (selectProgramChange(x) && !_pc.event.empty())
 		{
 			Event nevent = _pc.event.clone();
 

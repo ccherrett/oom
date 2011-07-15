@@ -133,6 +133,7 @@ public:
     }
     virtual void modifySelected(NoteInfo::ValType type, int delta);
 	virtual bool isEventSelected(Event);
+	void doModify(NoteInfo::ValType type, int delta, CItem*, bool);
 };
 #endif
 

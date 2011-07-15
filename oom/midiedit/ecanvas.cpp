@@ -261,6 +261,8 @@ void EventCanvas::selectAtTick(unsigned int tick)/*{{{*/
 		if (!nearest->isSelected())
 		{
 			selectItem(nearest, true);
+			if(editor->isGlobalEdit())
+				populateMultiSelect(nearest);
 			songChanged(SC_SELECTION);
 		}
 	}
@@ -637,6 +639,8 @@ void EventCanvas::keyPress(QKeyEvent* event)
 
 				iRightmost++;
 				iRightmost->second->setSelected(true);
+				if(editor->isGlobalEdit())
+					populateMultiSelect(iRightmost->second);
 				updateSelection();
 			}
 		} else // there was no item selected at all? Then select nearest to tick if there is any
@@ -686,9 +690,13 @@ void EventCanvas::keyPress(QKeyEvent* event)
 
 					iLeftmost--;
 					iLeftmost->second->setSelected(true);
+					if(editor->isGlobalEdit())
+						populateMultiSelect(iLeftmost->second);
 					updateSelection();
 				} else {
 					leftmost->setSelected(true);
+					if(editor->isGlobalEdit())
+						populateMultiSelect(leftmost);
 					updateSelection();
 				}
 			} else // there was no item selected at all? Then select nearest to tick if there is any
