@@ -641,14 +641,36 @@ CItem* PianoCanvas::newItem(const QPoint& p, int)/*{{{*/
 	int pitch = y2pitch(p.y());
 	int tick = editor->rasterVal1(p.x());
 	int len = p.x() - tick;
-	tick -= _curPart->tick();
-	if (tick < 0)
-		tick = 0;
+	int etick = tick - _curPart->tick();
+	if (etick < 0)
+		etick = 0;
 	Event e = Event(Note);
-	e.setTick(tick);
+	e.setTick(etick);
 	e.setPitch(pitch);
 	e.setVelo(curVelo);
 	e.setLenTick(len);
+	//Populate epic mode showdow notes
+	if(editor->isGlobalEdit())
+	{
+		printf("Populating list for new Items\n");
+		PartList* pl = editor->parts();
+		m_multiSelect.clear();
+		for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
+		{
+			Part* part = ip->second;
+			if(part == _curPart)
+				continue;
+			MidiTrack* track = (MidiTrack*)part->track();
+			int evpitch = pitch + track->getTransposition();
+			int evtick = tick - part->tick();
+			Event ev = Event(Note);
+			ev.setTick(evtick);
+			ev.setPitch(evpitch);
+			ev.setVelo(curVelo);
+			ev.setLenTick(len);
+			m_multiSelect.add(new NEvent(ev, part, pitch2y(evpitch)));
+		}
+	}
     return new NEvent(e, _curPart, pitch2y(pitch));
 }/*}}}*/
 
@@ -679,18 +701,46 @@ void PianoCanvas::newItem(CItem* item, bool noSnap)/*{{{*/
 	int diff = event.endTick() - part->lenTick();
 	if (diff > 0)
 	{// too short part? extend it
-		//printf("extend Part!\n");
 		Part* newPart = part->clone();
 		newPart->setLenTick(newPart->lenTick() + diff);
 		// Indicate no undo, and do port controller values but not clone parts.
-		//audio->msgChangePart(part, newPart,false);
 		audio->msgChangePart(part, newPart, false, true, false);
 		modified = modified | SC_PART_MODIFIED;
-		part = newPart; // reassign
+		part = newPart; 
 	}
 	// Indicate no undo, and do not do port controller values and clone parts.
-	//audio->msgAddEvent(event, part,false);
 	audio->msgAddEvent(event, part, false, false, false);
+	printf("PianoCanvas::newItem\n");
+	if(editor->isGlobalEdit() && !m_multiSelect.empty())/*{{{*/
+	{
+		printf("Adding multipart events");
+		for(iCItem i = m_multiSelect.begin(); i != m_multiSelect.end(); ++i)
+		{
+			CItem* ni = i->second;
+			ni->setWidth(item->width());
+			NEvent* nevent2 = (NEvent*) ni;
+			Part* npart = nevent2->part();
+			Event ev = nevent2->event();
+			ev.setTick(x - npart->tick());
+			ev.setLenTick(w);
+			ev.setPitch(y2pitch(ni->y()));
+
+
+			int diff2 = ev.endTick() - npart->lenTick();
+			if (diff2 > 0)
+			{// too short part? extend it
+				Part* newPart2 = npart->clone();
+				newPart2->setLenTick(newPart2->lenTick() + diff2);
+				audio->msgChangePart(npart, newPart2, false, true, false);
+				if(!modified & SC_PART_MODIFIED)
+					modified = modified | SC_PART_MODIFIED;
+				npart = newPart2; 
+			}
+
+			audio->msgAddEvent(ev, npart, false, false, false);
+			_items.add(ni);
+		}
+	}/*}}}*/
 	emit pitchChanged(event.pitch());
 	song->endUndo(modified);
 }/*}}}*/
@@ -1626,7 +1676,7 @@ int PianoCanvas::stepInputQwerty(QKeyEvent *event)
 //   midiNote
 //---------------------------------------------------------
 
-void PianoCanvas::midiNote(int pitch, int velo)
+void PianoCanvas::midiNote(int pitch, int velo)/*{{{*/
 {
 	unsigned songtick = song->cpos();
 	//Filter the noteoff events/*{{{*/
@@ -1756,7 +1806,7 @@ void PianoCanvas::midiNote(int pitch, int velo)
 	
 	//TODO: emit a signal to flash keyboard here
 	emit pitchChanged(pitch);
-}
+}/*}}}*/
 
 void PianoCanvas::stepInputNote(Part* part, unsigned tick, int pitch, int velo)
 {
@@ -2128,9 +2178,13 @@ void PianoCanvas::curPartChanged()
 	emit partChanged(editor->curCanvasPart());
 }
 
-void PianoCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, bool play)
+//---------------------------------------------------------
+// doModify
+//---------------------------------------------------------
+
+void PianoCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, bool play)/*{{{*/
 {
-    if(item)/*{{{*/
+    if(item)
 	{
 		NEvent* e = (NEvent*) (item);
 		Event event = e->event();
@@ -2209,14 +2263,14 @@ void PianoCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, bool 
 		// Indicate do not do port controller values and clone parts.
 		//song->undoOp(UndoOp::ModifyEvent, newEvent, event, part);
 		song->undoOp(UndoOp::ModifyEvent, newEvent, event, part, false, false);
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   modifySelected
 //---------------------------------------------------------
 
-void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta, bool strict)
+void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta, bool strict)/*{{{*/
 {
 	audio->msgIdle(true);
 	song->startUndo();
@@ -2225,8 +2279,8 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta, bool strict)
 	int count = 1;
 	CItemList list = _items;
 	if(strict)
-		list = getItemlistForCurrentPart();
-    for (iCItem i = list.begin(); i != list.end(); ++i)/*{{{*/
+		list = getSelectedItemsForCurrentPart();
+    for (iCItem i = list.begin(); i != list.end(); ++i)
 	{
 		if (!(i->second->isSelected()))
 			continue;
@@ -2244,10 +2298,10 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta, bool strict)
 			}
 		}
 		++count;
-	}/*}}}*/
+	}
 	song->endUndo(SC_EVENT_MODIFIED);
 	audio->msgIdle(false);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   resizeEvent
@@ -2260,10 +2314,10 @@ void PianoCanvas::resizeEvent(QResizeEvent* ev)
 	EventCanvas::resizeEvent(ev);
 }
 
-bool PianoCanvas::isEventSelected(Event e)
+bool PianoCanvas::isEventSelected(Event e)/*{{{*/
 {
 	bool rv = false;
-	CItemList list = getSelectedItemsForCurrentPart();/*{{{*/
+	CItemList list = getSelectedItemsForCurrentPart();
 
 	for (iCItem k = list.begin(); k != list.end(); ++k)
 	{
@@ -2277,6 +2331,6 @@ bool PianoCanvas::isEventSelected(Event e)
 			rv = true;
 			break;
 		}
-	}/*}}}*/
+	}
 	return rv;
-}
+}/*}}}*/
