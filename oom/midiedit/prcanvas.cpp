@@ -278,8 +278,16 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 		}
 		else
 		{
-			p.setPen(config.partWaveColors[nevent->part()->colorIndex()]);
-			p.setBrush(config.partColors[nevent->part()->colorIndex()]);
+			QColor fillColor;
+			fillColor = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
+			fillColor.setAlpha(alpha);
+			mainPen.setColor(fillColor);
+			p.setPen(mainPen);
+			
+			QColor color;
+			color = QColor(config.partColors[nevent->part()->colorIndex()]);
+			color.setAlpha(alpha);
+			p.setBrush(color);
 		}
 	}
 	else
@@ -296,10 +304,14 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 		}
 		else
 		{
+			QColor fillColor;
+			fillColor = QColor(config.partColors[nevent->part()->colorIndex()]);
+			fillColor.setAlpha(alpha);
+			mainPen.setColor(fillColor);
+			
 			QColor color;
-			//color.setRgb(13, 124, 151, alpha);
-			mainPen.setColor(config.partColors[nevent->part()->colorIndex()]);
 			color = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
+			color.setAlpha(alpha);
 			switch (colorMode)
 			{
 				case 0:
