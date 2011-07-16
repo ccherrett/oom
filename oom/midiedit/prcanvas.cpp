@@ -27,6 +27,7 @@
 #include "velocity.h"
 #include "song.h"
 #include "audio.h"
+#include "gconfig.h"
 
 //---------------------------------------------------------
 //   NEvent
@@ -277,8 +278,8 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 		}
 		else
 		{
-			p.setPen(movingPen);
-			p.setBrush(QColor(192, 192, 192, alpha));
+			p.setPen(config.partWaveColors[nevent->part()->colorIndex()]);
+			p.setBrush(config.partColors[nevent->part()->colorIndex()]);
 		}
 	}
 	else
@@ -296,11 +297,15 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 		else
 		{
 			QColor color;
-			color.setRgb(13, 124, 151, alpha);
+			//color.setRgb(13, 124, 151, alpha);
+			mainPen.setColor(config.partColors[nevent->part()->colorIndex()]);
+			color = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
 			switch (colorMode)
 			{
 				case 0:
+				{
 					break;
+				}	
 				case 1: // pitch
 				{
 					Triple* c = &myColors/*Qt::color1*/[event.pitch() % 12];
