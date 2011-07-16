@@ -343,7 +343,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 				case 2: // velocity
 				{
 					int velo = event.velo();
-
+/*{{{
 					if (velo <= 11)
 						color.setRgb(147, 186, 195, alpha);
 					else if (velo <= 22)
@@ -368,6 +368,9 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 						color.setRgb(0, 69, 86, alpha);
 					else
 						color.setRgb(0, 58, 72, alpha);
+//}}}*/
+					color = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
+					color.setAlpha(velo+148);
 
 				}
 					break;
