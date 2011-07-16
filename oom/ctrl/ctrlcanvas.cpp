@@ -110,7 +110,8 @@ void CEventList::clearDelete()
 CtrlCanvas::CtrlCanvas(MidiEditor* e, QWidget* parent, int xmag,
 		const char* name, CtrlPanel* pnl) : View(parent, xmag, 1, name)
 {
-	setBg(QColor(195, 198, 196));
+	//setBg(QColor(195, 198, 196));
+	setBg(QColor(63,63,63));
 
 	editor = e;
 	drag = DRAG_OFF;
@@ -1213,7 +1214,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
         int w = rect.width() + 2;
 	int wh = height();
 
-	if (velo)
+	if (velo)/*{{{*/
 	{
 		for (iCEvent i = items.begin(); i != items.end(); ++i)
 		{
@@ -1385,7 +1386,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				p.drawLine(tick + 4, wh, tick + 4, y1);
 			}
 		}
-	}
+	}/*}}}*/
 	else
 	{
 		MidiTrack* mt = part->track();
@@ -1469,17 +1470,12 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				break;
 			//int velo2 = e->val();
 
-			if (lval == CTRL_VAL_UNKNOWN)
-			{
-				// fg means 'draw unselected parts'.
-				if (!fg)
-					p.fillRect(x1, 0, tick - x1, wh, QColor(192, 192, 192, 127));
-			}
-			else
+			if (lval != CTRL_VAL_UNKNOWN)
 			{
 				if (fg)
 				{
 					QColor tickColor = QColor(config.partColors[part->colorIndex()]);
+					tickColor.setAlpha(127);
 					p.setPen(tickColor);
 					p.drawLine(x1, lval, tick, lval);
 				}
@@ -1506,7 +1502,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 		{
 			if (!fg)
 			{
-				p.fillRect(x1, 0, (x + w) - x1, wh, QColor(192, 192, 192, 127));
+				//p.fillRect(x1, 0, (x + w) - x1, wh, QColor(192, 192, 192, 127));
 				noEvents = true;
 			}
 		}
@@ -1653,9 +1649,7 @@ QRect CtrlCanvas::overlayRect() const
 
 void CtrlCanvas::draw(QPainter& p, const QRect& rect)
 {
-	drawTickRaster(p, rect.x(), rect.y(),
-			//rect.width(), rect.height(), editor->quant());
-			rect.width(), rect.height(), editor->raster());
+	//drawTickRaster(p, rect.x(), rect.y(), //rect.width(), rect.height(), editor->raster());
 
 	//---------------------------------------------------
 	//    draw line tool
