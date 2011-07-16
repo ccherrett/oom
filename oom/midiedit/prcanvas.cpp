@@ -649,10 +649,11 @@ CItem* PianoCanvas::newItem(const QPoint& p, int)/*{{{*/
 	e.setPitch(pitch);
 	e.setVelo(curVelo);
 	e.setLenTick(len);
+	int transp = ((MidiTrack*)_curPart->track())->getTransposition();
 	//Populate epic mode showdow notes
 	if(editor->isGlobalEdit())
 	{
-		printf("Populating list for new Items\n");
+		//printf("Populating list for new Items\n");
 		PartList* pl = editor->parts();
 		m_multiSelect.clear();
 		for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
@@ -661,7 +662,7 @@ CItem* PianoCanvas::newItem(const QPoint& p, int)/*{{{*/
 			if(part == _curPart)
 				continue;
 			MidiTrack* track = (MidiTrack*)part->track();
-			int evpitch = pitch + track->getTransposition();
+			int evpitch = (pitch + track->getTransposition())-transp;
 			int evtick = tick - part->tick();
 			Event ev = Event(Note);
 			ev.setTick(evtick);
@@ -710,10 +711,10 @@ void PianoCanvas::newItem(CItem* item, bool noSnap)/*{{{*/
 	}
 	// Indicate no undo, and do not do port controller values and clone parts.
 	audio->msgAddEvent(event, part, false, false, false);
-	printf("PianoCanvas::newItem\n");
+	//Add in the duplicate events
 	if(editor->isGlobalEdit() && !m_multiSelect.empty())/*{{{*/
 	{
-		printf("Adding multipart events");
+		//printf("Adding multipart events");
 		for(iCItem i = m_multiSelect.begin(); i != m_multiSelect.end(); ++i)
 		{
 			CItem* ni = i->second;
