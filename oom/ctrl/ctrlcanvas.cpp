@@ -1417,9 +1417,11 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 		int lval = CTRL_VAL_UNKNOWN;
 		noEvents = false;
 		QColor color = QColor();
-		QColor green = QColor(119, 169, 181, 127);
+		QColor green = QColor(config.partColors[part->colorIndex()]);
+		green.setAlpha(140);
 		QColor yellow = QColor(41, 130, 140);
-		QColor red = QColor(0, 37, 46, 127);
+		QColor red = QColor(config.partWaveColors[part->colorIndex()]);
+		red.setAlpha(140);
 		QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, height()));
 		vuGrad.setColorAt(1, green);
 		//vuGrad.setColorAt(0.45, yellow);
@@ -1477,7 +1479,8 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			{
 				if (fg)
 				{
-					p.setPen(Qt::gray);
+					QColor tickColor = QColor(config.partColors[part->colorIndex()]);
+					p.setPen(tickColor);
 					p.drawLine(x1, lval, tick, lval);
 				}
 				else

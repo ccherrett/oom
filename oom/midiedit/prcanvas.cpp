@@ -316,6 +316,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 			
 			QColor color;
 			color = QColor(config.partColors[nevent->part()->colorIndex()]);
+			color.setAlpha(alpha);
 			p.setBrush(color);
 		}
 		else
