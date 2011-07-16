@@ -23,7 +23,7 @@
 #include "audio.h"
 
 extern void drawTickRaster(QPainter& p, int x, int y,
-		int w, int h, int quant);
+		int w, int h, int quant, bool ctrl);
 
 //---------------------------------------------------------
 //   Master
@@ -212,7 +212,7 @@ void Master::pdraw(QPainter& p, const QRect& rect)
 void Master::draw(QPainter& p, const QRect& rect)
 {
 	drawTickRaster(p, rect.x(), rect.y(),
-			rect.width(), rect.height(), 0);
+			rect.width(), rect.height(), 0, false);
 }
 
 //---------------------------------------------------------

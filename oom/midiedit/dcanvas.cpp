@@ -571,7 +571,7 @@ void DrumCanvas::drawMoving(QPainter& p, const CItem* item, const QRect& rect)
 //   drawCanvas
 //---------------------------------------------------------
 
-extern void drawTickRaster(QPainter& p, int, int, int, int, int);
+extern void drawTickRaster(QPainter& p, int, int, int, int, int, bool);
 
 void DrumCanvas::drawCanvas(QPainter& p, const QRect& rect)
 {
@@ -595,7 +595,7 @@ void DrumCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	// vertical lines
 	//---------------------------------------------------
 
-	drawTickRaster(p, x, y, w, h, editor->raster());
+	drawTickRaster(p, x, y, w, h, editor->raster(), false);
 }
 
 //   drawTopItem

@@ -25,8 +25,7 @@
 #include "ctrlpanel.h"
 #include "midiedit/drummap.h"
 
-extern void drawTickRaster(QPainter& p, int x, int y,
-		int w, int h, int quant);
+extern void drawTickRaster(QPainter& p, int x, int y, int w, int h, int quant, bool ctrl);
 
 static MidiCtrlValList veloList(CTRL_VELOCITY); // dummy
 
@@ -1649,7 +1648,7 @@ QRect CtrlCanvas::overlayRect() const
 
 void CtrlCanvas::draw(QPainter& p, const QRect& rect)
 {
-	//drawTickRaster(p, rect.x(), rect.y(), //rect.width(), rect.height(), editor->raster());
+	drawTickRaster(p, rect.x(), rect.y(), rect.width(), rect.height(), editor->raster(), true);
 
 	//---------------------------------------------------
 	//    draw line tool

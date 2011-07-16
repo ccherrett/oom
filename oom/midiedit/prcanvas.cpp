@@ -1094,15 +1094,24 @@ void PianoCanvas::pianoReleased(int pitch, bool)/*{{{*/
 //   drawTickRaster
 //---------------------------------------------------------
 
-void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster)/*{{{*/
+void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster, bool ctrl)/*{{{*/
 {
 
 	QColor colBeat;
-	colBeat.setRgb(210, 216, 219);
 	QColor colBar1;
-	colBar1.setRgb(82, 85, 87);
 	QColor colBar2;
-	colBar2.setRgb(150, 160, 167);
+	if(ctrl)
+	{
+		colBar1.setRgb(134,137,138);
+		colBar2.setRgb(102,104,105);
+		colBeat.setRgb(89,91,92);
+	}
+	else
+	{
+		colBeat.setRgb(210, 216, 219);
+		colBar1.setRgb(82, 85, 87);
+		colBar2.setRgb(150, 160, 167);
+	}
 
 
 	int bar1, bar2, beat;
@@ -1198,7 +1207,7 @@ void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)/*{{{*/
 	// vertical lines
 	//---------------------------------------------------
 
-	drawTickRaster(p, x, y, w, h, editor->raster());
+	drawTickRaster(p, x, y, w, h, editor->raster(), false);
 }/*}}}*/
 
 //---------------------------------------------------------
