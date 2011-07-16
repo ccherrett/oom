@@ -370,7 +370,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 						color.setRgb(0, 58, 72, alpha);
 //}}}*/
 					color = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
-					color.setAlpha(velo+148);
+					color.setAlpha(velo+125);
 
 				}
 					break;
