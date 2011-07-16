@@ -252,7 +252,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 	};
 
 	QPen mainPen(Qt::black);
-	int alpha = 150;
+	int alpha = 175;
 
 	QColor colMoving;
 	colMoving.setRgb(220, 220, 120, alpha);
@@ -273,20 +273,29 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 		}
 		else if (item->isSelected())
 		{
+			QColor fillColor;
+			fillColor = QColor(config.partColors[nevent->part()->colorIndex()]);
+			fillColor.setAlpha(alpha);
+			mainPen.setColor(fillColor);
+			
+			QColor color;
+			color = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
+			color.setAlpha(alpha);
+			
 			p.setPen(mainPen);
-			p.setBrush(colSelected);
+			p.setBrush(color);
 		}
 		else
 		{
 			QColor fillColor;
 			fillColor = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
-			fillColor.setAlpha(alpha);
+			fillColor.setAlpha(alpha-75);
 			mainPen.setColor(fillColor);
 			p.setPen(mainPen);
 			
 			QColor color;
 			color = QColor(config.partColors[nevent->part()->colorIndex()]);
-			color.setAlpha(alpha);
+			color.setAlpha(alpha-75);
 			p.setBrush(color);
 		}
 	}
@@ -299,8 +308,15 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 		}
 		else if (item->isSelected())
 		{
+			QColor fillColor;
+			fillColor = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
+			fillColor.setAlpha(alpha);
+			mainPen.setColor(fillColor);
 			p.setPen(mainPen);
-			p.setBrush(colSelected);
+			
+			QColor color;
+			color = QColor(config.partColors[nevent->part()->colorIndex()]);
+			p.setBrush(color);
 		}
 		else
 		{
