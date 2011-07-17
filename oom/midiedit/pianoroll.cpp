@@ -406,8 +406,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	noteAlphaAction = new QAction(QIcon(*multiDisplay), tr("multipart"), this);
 	noteAlphaAction->setToolTip(tr("Toggle Display of multiple parts"));
 	noteAlphaAction->setCheckable(true);
-	bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
-	noteAlphaAction->setChecked(ghostedAlpha);
+	//bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
+	noteAlphaAction->setChecked(true);
 	tools2->addAction(noteAlphaAction);
 
 	QWidget* spacer = new QWidget();
@@ -831,7 +831,7 @@ PianoRoll::~PianoRoll()
 	tconfig().set_property("PianoRollEdit", "ypos", vscroll->pos());
 	tconfig().set_property("PianoRollEdit", "colormode", colorMode);
 	tconfig().set_property("PianoRollEdit", "showcomments", canvas->showComments());
-	tconfig().set_property("PianoRollEdit", "showghostpart", noteAlphaAction->isChecked());
+	//tconfig().set_property("PianoRollEdit", "showghostpart", noteAlphaAction->isChecked());
 	//printf("Canvas show comments: %d\n", canvas->showComments());
     tconfig().save();
 	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();i != ctrlEditList.end(); ++i)
@@ -983,6 +983,8 @@ CtrlEdit* PianoRoll::addCtrl()
 	connect(ctrlEdit, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	connect(ctrlEdit, SIGNAL(destroyedCtrl(CtrlEdit*)), SLOT(removeCtrl(CtrlEdit*)));
 	connect(ctrlEdit, SIGNAL(yposChanged(int)), pitchLabel, SLOT(setInt(int)));
+	connect(info, SIGNAL(alphaChanged()), ctrlEdit, SLOT(updateCanvas()));
+	connect(noteAlphaAction, SIGNAL(toggled(bool)), ctrlEdit, SLOT(updateCanvas()));
 
 	ctrlEdit->setTool(tools2->curTool());
 	ctrlEdit->setXPos(hscroll->pos());
@@ -1016,6 +1018,16 @@ void PianoRoll::removeCtrl(CtrlEdit* ctrl)
 
 void PianoRoll::closeEvent(QCloseEvent* e)
 {
+	tconfig().set_property("PianoRollEdit", "widgetwidth", width());
+	tconfig().set_property("PianoRollEdit", "widgetheigth", height());
+	tconfig().set_property("PianoRollEdit", "hscale", hscroll->mag());
+	tconfig().set_property("PianoRollEdit", "yscale", vscroll->mag());
+	tconfig().set_property("PianoRollEdit", "ypos", vscroll->pos());
+	tconfig().set_property("PianoRollEdit", "colormode", colorMode);
+	tconfig().set_property("PianoRollEdit", "showcomments", canvas->showComments());
+	//tconfig().set_property("PianoRollEdit", "showghostpart", noteAlphaAction->isChecked());
+	//printf("Canvas show comments: %d\n", canvas->showComments());
+    tconfig().save();
 	emit deleted((unsigned long) this);
 	e->accept();
 }

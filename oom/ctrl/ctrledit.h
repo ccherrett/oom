@@ -46,6 +46,10 @@ public slots:
         canvas->setXMag(val);
     }
     void setCanvasWidth(int w);
+	void updateCanvas()
+	{
+		canvas->update();
+	}
 signals:
     void timeChanged(unsigned);
     void destroyedCtrl(CtrlEdit*);
