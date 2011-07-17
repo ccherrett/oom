@@ -694,7 +694,7 @@ Part::Part(Track* t)
 	_selected = false;
 	_mute = false;
 	m_zIndex = 0;
-	_colorIndex = 0;
+	_colorIndex = 1;
 	if(t)
 		_colorIndex = t->getDefaultPartColor();
 	_events = new EventList;
@@ -715,7 +715,7 @@ Part::Part(Track* t, EventList* ev)
 	_selected = false;
 	_mute = false;
 	m_zIndex = 0;
-	_colorIndex = 0;
+	_colorIndex = 1;
 	if(t)
 		_colorIndex = t->getDefaultPartColor();
 	_events = ev;
