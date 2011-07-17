@@ -1201,19 +1201,20 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 		case 20 ... NUM_PARTCOLORS + 20:
 		{
 			curColorIndex = n - 20;
-			bool selfound = false;
+			bool single = true;
 			//Loop through all parts and set color on selected:
-            for (iCItem i = _items.begin(); i != _items.end(); i++)
+			CItemList list = getSelectedItems();
+			if(list.size() && list.size() > 1)
 			{
-				if (i->second->isSelected())
+				single = false;
+            	for (iCItem i = list.begin(); i != list.end(); i++)
 				{
-					selfound = true;
 					i->second->part()->setColorIndex(curColorIndex);
 				}
 			}
 
 			// If no items selected, use the one clicked on.
-			if (!selfound)
+			if (single)
 				item->part()->setColorIndex(curColorIndex);
 
 			redraw();
@@ -1247,6 +1248,19 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 			break;
 	}
 	delete pl;
+}
+
+CItemList PartCanvas::getSelectedItems()
+{
+	CItemList list;
+    for (iCItem i = _items.begin(); i != _items.end(); i++)/*{{{*/
+	{
+		if (i->second->isSelected())
+		{
+			list.add(i->second);
+		}
+	}/*}}}*/
+	return list;
 }
 
 //---------------------------------------------------------

@@ -79,6 +79,7 @@ class CurveNodeSelection;
 
 class PartCanvas : public Canvas
 {
+    Q_OBJECT
     int* _raster;
     TrackList* tracks;
 
@@ -94,7 +95,7 @@ class PartCanvas : public Canvas
     AutomationObject automation;
     CurveNodeSelection* _curveNodeSelection;
 
-    Q_OBJECT
+	CItemList getSelectedItems();
     virtual void keyPress(QKeyEvent*);
     virtual void mousePress(QMouseEvent*);
     virtual void mouseMove(QMouseEvent* event);
