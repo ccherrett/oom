@@ -153,7 +153,7 @@ int Track::y() const
 
 void Track::init()
 {
-	_partDefaultColor = 0;
+	_partDefaultColor = 1;
 	_activity = 0;
 	_lastActivity = 0;
 	_recordFlag = false;
