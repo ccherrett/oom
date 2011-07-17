@@ -352,6 +352,7 @@ QPixmap* speakerIcon;
 QPixmap* buttondownIcon;
 QPixmap* configureIcon;
 
+QPixmap* multiDisplay;
 QPixmap* blankRecord;
 QPixmap* preIcon;
 QPixmap* preIconOn;
@@ -635,6 +636,7 @@ void initIcons()
       newmuteIcon          = new MPIXMAP(newmutebutton_xpm, NULL);
       soloIcon             = new MPIXMAP(solobutton_xpm, NULL);
 
+      multiDisplay         = new MPIXMAP(":/images/icons/multi_display.png", NULL);
       blankRecord          = new MPIXMAP(":/images/icons/blank_record.png", NULL);
       preIcon        	   = new MPIXMAP(":/images/icons/mixer-pre.png", NULL);
       preIconOn        	   = new MPIXMAP(":/images/icons/mixer-pre_on.png", NULL);
