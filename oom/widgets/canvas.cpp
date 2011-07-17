@@ -408,14 +408,15 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 	if(_curPart && _drawPartLines)
 	{
 		//p.setPen(QColor(200,146,0));
-		QColor pcolor(200,146,0);
-		p.setPen(pcolor);
+		QPen posPen = QPen(QColor(200,146,0), 1);
+		posPen.setCosmetic(true);
+		p.setPen(posPen);
 		p.drawLine(_curPart->tick(), y, _curPart->tick(), y2);
-		p.drawLine(_curPart->tick()+1, y, _curPart->tick()+1, y2);
-		p.drawLine(_curPart->tick()+2, y, _curPart->tick()+2, y2);
+		//p.drawLine(_curPart->tick()+1, y, _curPart->tick()+1, y2);
+		//p.drawLine(_curPart->tick()+2, y, _curPart->tick()+2, y2);
 		p.drawLine(_curPart->endTick(), y, _curPart->endTick(), y2);
-		p.drawLine(_curPart->endTick()+1, y, _curPart->endTick()+1, y2);
-		p.drawLine(_curPart->endTick()+2, y, _curPart->endTick()+2, y2);
+		//p.drawLine(_curPart->endTick()+1, y, _curPart->endTick()+1, y2);
+		//p.drawLine(_curPart->endTick()+2, y, _curPart->endTick()+2, y2);
 	}
 	//QPen playbackPen(QColor(8,193,156), 1);
 	//p.setPen(playbackPen);

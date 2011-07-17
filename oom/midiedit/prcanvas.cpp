@@ -170,17 +170,16 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 					patch = instr->getPatch(channel, program, song->mtype(), mtrack->type() == Track::DRUM);
 				}
 
+				p.setPen(config.partColors[_curPart->colorIndex()]);
+				QFont font("sans-serif", 5);
+				font.setWeight(QFont::Light);
+				font.setStretch(cmag);
+				p.setFont(font);
 				for(int key = 0; key < 128; ++key)
 				{
 					//printf("Found key: %d ", key);
 	  				KeyMap* km = instr->keymap(key);
-					p.setPen(QColor(0,26,30));
 					QString text(km->comment);
-					QFont font("sans-serif", 5);
-					font.setWeight(QFont::Light);
-					//font.setLetterSpacing(QFont::AbsoluteSpacing, 1);
-					font.setStretch(cmag);
-					p.setFont(font);
 					int offset = 2;
 					QString label(" ");
 					bool hasComment = false;
@@ -252,7 +251,8 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 	};
 
 	QPen mainPen(Qt::black);
-	int alpha = 175;
+	int alpha = 180;
+	int ghostedAlpha = 80;
 
 	QColor colMoving;
 	colMoving.setRgb(220, 220, 120, alpha);
@@ -289,13 +289,13 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 		{
 			QColor fillColor;
 			fillColor = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
-			fillColor.setAlpha(alpha-75);
+			fillColor.setAlpha(ghostedAlpha);
 			mainPen.setColor(fillColor);
 			p.setPen(mainPen);
 			
 			QColor color;
 			color = QColor(config.partColors[nevent->part()->colorIndex()]);
-			color.setAlpha(alpha-75);
+			color.setAlpha(ghostedAlpha);
 			p.setBrush(color);
 		}
 	}
@@ -1102,15 +1102,23 @@ void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster, bool ct
 	QColor colBar2;
 	if(ctrl)
 	{
-		colBar1.setRgb(102,104,105);
-		colBar2.setRgb(89,91,92);
-		colBeat.setRgb(77,78,79);
+		colBar1.setRgb(94,96,97);
+		colBar2.setRgb(82,83,84);
+		colBeat.setRgb(72,73,74);
 	}
 	else
 	{
-		colBeat.setRgb(210, 216, 219);
-		colBar1.setRgb(82, 85, 87);
-		colBar2.setRgb(150, 160, 167);
+		colBar1.setRgb(94,96,97);
+		colBar2.setRgb(82,83,84);
+		colBeat.setRgb(72,73,74);
+		
+		/*colBar1.setRgb(104,106,107);
+		colBar2.setRgb(89,91,92);
+		colBeat.setRgb(83,86,87);
+		*/
+		//colBeat.setRgb(210, 216, 219);
+		//colBar1.setRgb(82, 85, 87);
+		//colBar2.setRgb(150, 160, 167);
 	}
 
 
@@ -1183,6 +1191,7 @@ void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)/*{{{*/
 
 	int yy = ((y - 1) / KH) * KH + KH;
 	int key = 75 - (yy / KH);
+	QColor blackNoteColor = QColor(56,56,56);
 	for (; yy < y + h; yy += KH)
 	{
 		//printf("Drawing lines\n");
@@ -1190,13 +1199,13 @@ void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)/*{{{*/
 		{
 			case 0:
 			case 3:
-				p.setPen(QColor(213, 220, 213));
+				p.setPen(blackNoteColor);
 				p.drawLine(x, yy, x + w, yy);
 				break;
 			default:
 				//p.setPen(lightGray);
 				//p.fillRect(x, yy-3, w, 6, QBrush(QColor(230,230,230)));
-				p.fillRect(x, yy - 3, w, 6, QBrush(QColor(209, 213, 209)));
+				p.fillRect(x, yy - 3, w, 6, QBrush(blackNoteColor));
 				//p.drawLine(x, yy, x + w, yy);
 				break;
 		}

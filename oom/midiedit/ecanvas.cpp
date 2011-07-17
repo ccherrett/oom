@@ -42,7 +42,8 @@ EventCanvas::EventCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy, const 
 	m_showcomments = false;
 	curVelo = 70;
 
-	setBg(QColor(226, 229, 229));
+	//setBg(QColor(226, 229, 229));//this was the old ligh color we are moving to dark now
+	setBg(QColor(63,63,63));
 	setAcceptDrops(true);
 	setFocusPolicy(Qt::StrongFocus);
 	setMouseTracking(true);

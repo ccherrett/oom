@@ -1209,8 +1209,8 @@ void CtrlCanvas::setTool(int t)
 void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part, bool velo, bool fg)
 {
         // Remon: Do we really have to do that ???? Seems unnesecary to me.
-        int x = 0;//rect.x() - 1; // compensate for 3 pixel line width
-        int w = rect.width() + 2;
+    int x = 0;//rect.x() - 1; // compensate for 3 pixel line width
+    int w = rect.width() + 2;
 	int wh = height();
 
 	if (velo)/*{{{*/
@@ -1229,160 +1229,55 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				break;
 			int y1 = wh - (e->val() * wh / 128);
 			// fg means 'draw selected parts'.
-			QColor fillColor = QColor(255, 201, 144,255);
-			int bgalpha = 127;
-			QColor bgfillColor = QColor(255, 201, 144, bgalpha);
-			if (fg)
+			QColor fillColor = QColor(config.partColors[part->colorIndex()]);
+			QColor bgfillColor = QColor(config.partColors[part->colorIndex()]);
+			int bgalpha = 200;
+			int bgBarColorOutlineAlpha = 80;
+			if(fg)
 			{
-				int velo2 = e->val();
-				QColor color = QColor(147, 186, 195, 127);
-				if (velo2 <= 11)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 201, 144, 255);	
-						bgfillColor.setRgb(255, 201, 144, bgalpha);	
-					}
-					color.setRgb(147, 186, 195, 127);
-				}
-				else if (velo2 <= 22)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 195, 131, 255);	
-						bgfillColor.setRgb(255, 195, 131, bgalpha);	
-					}
-					color.setRgb(119, 169, 181, 127);
-				}
-				else if (velo2 <= 33)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 189, 118, 255);	
-						bgfillColor.setRgb(255, 189, 118, bgalpha);	
-					}
-					color.setRgb(85, 157, 175, 127);
-				}
-				else if (velo2 <= 44)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 184, 107, 255);	
-						bgfillColor.setRgb(255, 184, 107, bgalpha);	
-					}
-					color.setRgb(58, 152, 176, 127);
-				}
-				else if (velo2 <= 55)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 177, 94, 255);	
-						bgfillColor.setRgb(255, 177, 94, bgalpha);	
-					}
-					color.setRgb(33, 137, 163, 127);
-				}
-				else if (velo2 <= 66)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 171, 81, 255);	
-						bgfillColor.setRgb(255, 171, 81, bgalpha);	
-					}
-					color.setRgb(30, 136, 162, 127);
-				}
-				else if (velo2 <= 77)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 166, 70, 255);	
-						bgfillColor.setRgb(255, 166, 70, bgalpha);	
-					}
-					color.setRgb(13, 124, 151, 127);
-				}
-				else if (velo2 <= 88)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 158, 53, 255);	
-						bgfillColor.setRgb(255, 158, 53, bgalpha);	
-					}
-					color.setRgb(0, 110, 138, 127);
-				}
-				else if (velo2 <= 99)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 153, 44, 255);	
-						bgfillColor.setRgb(255, 153, 44, bgalpha);	
-					}
-					color.setRgb(0, 99, 124, 127);
-				}
-				else if (velo2 <= 110)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 146, 28, 255);	
-						bgfillColor.setRgb(255, 146, 28, bgalpha);	
-					}
-					color.setRgb(0, 77, 96, 127);
-				}
-				else if (velo2 <= 121)
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 139, 14, 255);	
-						bgfillColor.setRgb(255, 139, 14, bgalpha);	
-					}
-					color.setRgb(0, 69, 86, 127);
-				}
-				else
-				{
-					if(e->selected())
-					{
-						fillColor.setRgb(255, 132, 0, 255);	
-						bgfillColor.setRgb(255, 132, 0, bgalpha);	
-					}
-					color.setRgb(0, 58, 72, 127);
-				}
-				p.setPen(QPen(color, 6));
+				QColor bgBarColor = QColor(config.partColors[part->colorIndex()]);
+				bgBarColor.setAlpha(bgalpha);
+				QPen borderPen = QPen(bgBarColor, 1);
+				borderPen.setCosmetic(true);
+				p.setPen(borderPen);
+				
+				QColor bgBarColorOutline = QColor(config.partWaveColors[part->colorIndex()]);
+				bgBarColorOutline.setAlpha(bgalpha);
+				p.setBrush(bgBarColorOutline);
 			}
 			else
-				p.setPen(QPen(QColor(172, 172, 172), 6));
-
+			{
+				QColor bgBarColor = QColor(config.partWaveColors[part->colorIndex()]);
+				bgBarColor.setAlpha(bgBarColorOutlineAlpha);
+				QPen borderPen = QPen(bgBarColor, 1);
+				borderPen.setCosmetic(true);
+				p.setPen(borderPen);
+				
+				QColor bgBarColorOutline = QColor(config.partColors[part->colorIndex()]);
+				bgBarColorOutline.setAlpha(bgBarColorOutlineAlpha);
+				p.setBrush(bgBarColorOutline);
+			}
 			//int alpha = 255;
-			QColor outlineColor = QColor(0,0,0,255);
-			QColor bgoutlineColor = QColor(0,0,0,bgalpha);
-			//QColor bgfillColor = QColor(224, 123, 23,80);
-
-			//QColor color = QColor();
-			//QColor green = QColor(53, 171, 193, 255);
-			//QColor red = QColor(169, 72, 107, 255);
-			//QLinearGradient vuGrad3(QPointF(0, 0), QPointF(0, height()));
-			//vuGrad3.setColorAt(1, green);
-			//vuGrad3.setColorAt(0, red);
-			//QPen mypen7 = QPen();
+			QColor outlineColor = QColor(config.partWaveColors[part->colorIndex()]);
+			QColor bgoutlineColor = QColor(config.partWaveColors[part->colorIndex()]);
+			bgoutlineColor.setAlpha(127);
 			
 			if(e->selected())
 			{
 				QPen mypen6 = QPen(outlineColor, 1, Qt::SolidLine);
 				QPen mypen7 = QPen(bgoutlineColor, 1, Qt::SolidLine);
-				//p.setBrush(QBrush(bgfillColor));
-				//mypen7.setBrush(QBrush(vuGrad3));
-				//p.setPen(mypen7);
-				//p.setPen(mypen);
-				//p.setBrush(QBrush(fillColor));
 				p.setPen(mypen7);
 				p.setBrush(QBrush(bgfillColor));
 				p.drawRect(tick+1, y1-3, 5, wh);
 				p.setPen(mypen6);
 				p.setBrush(QBrush(fillColor));
 				QRect rect(tick+1, y1-3, 5, 5);
-				//p.drawRoundedRect(rect,3,3);
 				p.drawRect(rect);
 			}
 			else
 			{
-				p.drawLine(tick + 4, wh, tick + 4, y1);
+				p.drawRect(tick+1, y1-3, 5, wh);
+				//p.drawLine(tick + 4, wh, tick + 4, y1);
 			}
 		}
 	}/*}}}*/
@@ -1417,10 +1312,10 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 		int lval = CTRL_VAL_UNKNOWN;
 		noEvents = false;
 		QColor color = QColor();
-		QColor green = QColor(config.partColors[part->colorIndex()]);
+		QColor green = QColor(config.partWaveColors[part->colorIndex()]);
 		green.setAlpha(140);
 		QColor yellow = QColor(41, 130, 140);
-		QColor red = QColor(config.partWaveColors[part->colorIndex()]);
+		QColor red = QColor(config.partColors[part->colorIndex()]);
 		red.setAlpha(140);
 		QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, height()));
 		vuGrad.setColorAt(1, green);
@@ -1471,14 +1366,11 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 
 			if (lval != CTRL_VAL_UNKNOWN)
 			{
-				if (fg)
-				{
-					QColor tickColor = QColor(config.partColors[part->colorIndex()]);
-					tickColor.setAlpha(127);
-					p.setPen(tickColor);
-					p.drawLine(x1, lval, tick, lval);
-				}
-				else
+				QColor tickColor = QColor(config.partColors[part->colorIndex()]);
+				tickColor.setAlpha(127);
+				p.setPen(tickColor);
+				p.drawLine(x1, lval, tick, lval);
+				if (!fg)
 				{
 					p.setPen(myPen);
 					p.fillRect(x1, lval, tick - x1, wh - lval, QBrush(vuGrad)); //, config.ctrlGraphFg);
@@ -1576,14 +1468,14 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)
 		p.drawLine(xp, y, xp, y + h);
 	}
 	xp = mapx(pos[1]);
-	if (xp >= x && xp < x + w)
+	if ((song->loop() || song->punchin()) && xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
 		//p.setPen(Qt::blue);
 		p.drawLine(xp, y, xp, y + h);
 	}
 	xp = mapx(pos[2]);
-	if (xp >= x && xp < x + w)
+	if ((song->loop() || song->punchout()) && xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
 		//p.setPen(Qt::blue);
@@ -1617,10 +1509,10 @@ void CtrlCanvas::drawOverlay(QPainter& p, const QRect&)
 	QString s(_controller->name());
 	p.setFont(config.fonts[3]);
 	
-	QColor textColor = QColor(0,0,0,127);
+	QColor textColor = QColor(0,0,0,180);
 	if(curPart)
 		textColor = QColor(config.partColors[curPart->colorIndex()]);
-	textColor.setAlpha(127);
+	textColor.setAlpha(180);
 	p.setPen(textColor);
 
 	QFontMetrics fm(config.fonts[3]);
