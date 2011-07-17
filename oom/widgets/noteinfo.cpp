@@ -15,11 +15,11 @@
 #include "globals.h"
 ///#include "posedit.h"
 #include "pitchedit.h"
+#include "traverso_shared/TConfig.h"
 
 //---------------------------------------------------
 //    NoteInfo
 //    ToolBar
-//    Start, Lï¿½nge, Note, Velo an, Velo aus, Kanal
 //---------------------------------------------------
 
 //NoteInfo::NoteInfo(QMainWindow* parent)
@@ -84,11 +84,34 @@ NoteInfo::NoteInfo(QWidget* parent)
 	selVelOff->setSingleStep(1);
 	addWidget(selVelOff);
 
+	label = new QLabel(tr("Transparency"));
+	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	label->setIndent(3);
+	addWidget(label);
+
+	m_renderAlpha = new QSpinBox();
+	m_renderAlpha->setRange(0, 255);
+	m_renderAlpha->setSingleStep(1);
+	int alpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+	m_renderAlpha->setValue(alpha);
+
+	addWidget(m_renderAlpha);
+
 	connect(selLen, SIGNAL(valueChanged(int)), SLOT(lenChanged(int)));
 	connect(selPitch, SIGNAL(valueChanged(int)), SLOT(pitchChanged(int)));
 	connect(selVelOn, SIGNAL(valueChanged(int)), SLOT(velOnChanged(int)));
 	connect(selVelOff, SIGNAL(valueChanged(int)), SLOT(velOffChanged(int)));
+	connect(m_renderAlpha, SIGNAL(valueChanged(int)), SLOT(alphaChanged(int)));
 	connect(selTime, SIGNAL(valueChanged(const Pos&)), SLOT(timeChanged(const Pos&)));
+}
+
+//---------------------------------------------------------
+// alphaChanged
+//---------------------------------------------------------
+void NoteInfo::alphaChanged(int alpha)
+{
+	tconfig().set_property("PianoRollEdit", "renderalpha", alpha);
+	tconfig().save();
 }
 
 //---------------------------------------------------------

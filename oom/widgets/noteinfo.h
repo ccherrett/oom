@@ -33,6 +33,7 @@ class NoteInfo : public QToolBar
     PitchEdit* selPitch;
     QSpinBox* selVelOn;
     QSpinBox* selVelOff;
+    QSpinBox* m_renderAlpha;
     bool deltaMode;
 
     Q_OBJECT
@@ -53,6 +54,7 @@ private slots:
     void velOffChanged(int);
     void pitchChanged(int);
     void timeChanged(const Pos&);
+	void alphaChanged(int);
 
 public slots:
     void setValue(ValType, int);
