@@ -34,6 +34,9 @@
   <layout class="QVBoxLayout" name="verticalLayout_7">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <property name="topMargin">
       <number>0</number>
      </property>
