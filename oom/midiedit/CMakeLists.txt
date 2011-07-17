@@ -28,9 +28,9 @@ QT4_WRAP_CPP ( midiedit_mocs
       # miditracker.h
       # trackpattern.h
       # velocity.h
-      dcanvas.h 
-      dlist.h 
-      drumedit.h 
+	  #dcanvas.h 
+	  #dlist.h 
+	  #drumedit.h 
       ecanvas.h
       piano.h 
       pianoroll.h 
@@ -49,10 +49,10 @@ file (GLOB midiedit_source_files
       # miditracker.cpp
       # trackpattern.cpp
       # velocity.cpp
-      dcanvas.cpp
-      dlist.cpp
-      drumedit.cpp
-      drummap.cpp
+	  #dcanvas.cpp
+	  #dlist.cpp
+	  #drumedit.cpp
+	  drummap.cpp
       ecanvas.cpp
       piano.cpp
       pianoroll.cpp

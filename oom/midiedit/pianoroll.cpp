@@ -461,11 +461,11 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	//addToolBarBreak();
 	info = new NoteInfo(this);
-	addToolBar(Qt::TopToolBarArea, info);
-	info->setAllowedAreas(Qt::TopToolBarArea);
-	info->setFloatable(false);
-	info->setMovable(false);
-	info->hide();
+	//addToolBar(Qt::TopToolBarArea, info);
+	//info->setAllowedAreas(Qt::TopToolBarArea);
+	//info->setFloatable(false);
+	//info->setMovable(false);
+	//info->hide();
 
 	//---------------------------------------------------
 	//    split
@@ -504,6 +504,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
 	m_tabs->addTab(midiTrackInfo, tr("   The Conductor   "));
+	m_tabs->addTab(info, tr("   Note Info   "));
 	//hsplitter->addWidget(midiTrackInfo);
 	hsplitter->addWidget(splitter);
 

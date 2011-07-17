@@ -20,30 +20,32 @@ class QSpinBox;
 ///class PosEdit;
 class PitchEdit;
 class Pos;
+class QVBoxLayout;
 
 //---------------------------------------------------------
 //   NoteInfo
 //---------------------------------------------------------
 
-class NoteInfo : public QToolBar
+class NoteInfo : public QWidget
 {
-    ///PosEdit* selTime;
+    Q_OBJECT
+
     Awl::PosEdit* selTime;
+	QVBoxLayout* m_layout;
     QSpinBox* selLen;
     PitchEdit* selPitch;
     QSpinBox* selVelOn;
     QSpinBox* selVelOff;
     QSpinBox* m_renderAlpha;
     bool deltaMode;
-
-    Q_OBJECT
+	
+	void addTool(QString label, QWidget* tool);
 
 public:
     enum ValType
     {
         VAL_TIME, VAL_LEN, VAL_VELON, VAL_VELOFF, VAL_PITCH
     };
-    //NoteInfo(QMainWindow* parent);
     NoteInfo(QWidget* parent = 0);
     void setValues(unsigned, int, int, int, int);
     void setDeltaMode(bool);

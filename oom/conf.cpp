@@ -1482,7 +1482,7 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 	arranger->writeStatus(level, xml);
 	writeSeqConfiguration(level, xml, true);
 
-	DrumEdit::writeConfiguration(level, xml);
+	//DrumEdit::writeConfiguration(level, xml);
 	PianoRoll::writeConfiguration(level, xml);
 	MasterEdit::writeConfiguration(level, xml);
 	WaveEdit::writeConfiguration(level, xml);

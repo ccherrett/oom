@@ -5,7 +5,7 @@
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#include <QLabel>
+#include <QtGui>
 
 #include "config.h"
 #include "noteinfo.h"
@@ -19,75 +19,68 @@
 
 //---------------------------------------------------
 //    NoteInfo
-//    ToolBar
 //---------------------------------------------------
 
-//NoteInfo::NoteInfo(QMainWindow* parent)
-
 NoteInfo::NoteInfo(QWidget* parent)
-: QToolBar(tr("Note Info"), parent)
+: QWidget(parent)
 {
 	deltaMode = false;
 
-	//QLabel* label = new QLabel(tr("Start"), this, "Start");
-	QLabel* label = new QLabel(tr("Start"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	addWidget(label);
+	m_layout = new QVBoxLayout(this);
 
-	//selTime = new PosEdit(this, "Start");
-	///selTime = new PosEdit(0, "Start");
+	//QLabel* label = new QLabel(tr("Start"));
+	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//label->setIndent(3);
+
 	selTime = new Awl::PosEdit;
 	selTime->setObjectName("Start");
+	addTool(tr("Start"), selTime);
 
-	addWidget(selTime);
+	//addWidget(selTime);
 
-	//label = new QLabel(tr("Len"), this, "Len");
-	label = new QLabel(tr("Len"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	addWidget(label);
-	//selLen = new QSpinBox(0, 100000, 1, this);
+	//label = new QLabel(tr("Len"));
+	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//label->setIndent(3);
+	//addWidget(label);
+	
 	selLen = new QSpinBox();
 	selLen->setRange(0, 100000);
 	selLen->setSingleStep(1);
-	addWidget(selLen);
+	addTool(tr("Len"), selLen);
 
-	//label = new QLabel(tr("Pitch"), this, "Pitch");
-	label = new QLabel(tr("Pitch"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	addWidget(label);
-	//selPitch = new PitchEdit(this, "selPitch");
+	//label = new QLabel(tr("Pitch"));
+	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//label->setIndent(3);
+	//addWidget(label);
+	
 	selPitch = new PitchEdit;
-	addWidget(selPitch);
+	addTool(tr("Pitch"), selPitch);
 
-	//label = new QLabel(tr("Velo On"), this, "Velocity On");
-	label = new QLabel(tr("Velo On"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	addWidget(label);
-	//selVelOn = new QSpinBox(0, 127, 1, this);
+	//label = new QLabel(tr("Velo On"));
+	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//label->setIndent(3);
+	//addWidget(label);
+	
 	selVelOn = new QSpinBox();
 	selVelOn->setRange(0, 127);
 	selVelOn->setSingleStep(1);
-	addWidget(selVelOn);
+	addTool(tr("Velo On"), selVelOn);
 
-	//label = new QLabel(tr("Velo Off"), this, "Velocity Off");
-	label = new QLabel(tr("Velo Off"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	addWidget(label);
-	//selVelOff = new QSpinBox(0, 127, 1, this);
+	//label = new QLabel(tr("Velo Off"));
+	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//label->setIndent(3);
+	//addWidget(label);
+	
 	selVelOff = new QSpinBox();
 	selVelOff->setRange(0, 127);
 	selVelOff->setSingleStep(1);
-	addWidget(selVelOff);
+	addTool(tr("Velo Off"), selVelOff);
+	//addSeparator();
 
-	label = new QLabel(tr("Transparency"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	addWidget(label);
+	//label = new QLabel(tr(" BG Brightness"));
+	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//label->setIndent(3);
+	//addWidget(label);
 
 	m_renderAlpha = new QSpinBox();
 	m_renderAlpha->setRange(0, 255);
@@ -95,7 +88,9 @@ NoteInfo::NoteInfo(QWidget* parent)
 	int alpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
 	m_renderAlpha->setValue(alpha);
 
-	addWidget(m_renderAlpha);
+	addTool(tr(" BG Brightness"), m_renderAlpha);
+	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	m_layout->addItem(vSpacer);
 
 	connect(selLen, SIGNAL(valueChanged(int)), SLOT(lenChanged(int)));
 	connect(selPitch, SIGNAL(valueChanged(int)), SLOT(pitchChanged(int)));
@@ -103,6 +98,14 @@ NoteInfo::NoteInfo(QWidget* parent)
 	connect(selVelOff, SIGNAL(valueChanged(int)), SLOT(velOffChanged(int)));
 	connect(m_renderAlpha, SIGNAL(valueChanged(int)), SLOT(alphaChanged(int)));
 	connect(selTime, SIGNAL(valueChanged(const Pos&)), SLOT(timeChanged(const Pos&)));
+}
+
+void NoteInfo::addTool(QString label, QWidget *tool)
+{
+	QHBoxLayout *box = new QHBoxLayout();
+	box->addWidget(new QLabel(label));
+	box->addWidget(tool);
+	m_layout->addLayout(box);
 }
 
 //---------------------------------------------------------

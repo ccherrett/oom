@@ -37,7 +37,7 @@
 #include "conf.h"
 #include "debug.h"
 #include "didyouknow.h"
-#include "drumedit.h"
+//#include "drumedit.h"
 #include "filedialog.h"
 #include "gatetime.h"
 #include "gconfig.h"
@@ -52,6 +52,7 @@
 #include "mixdowndialog.h"
 #include "pianoroll.h"
 #include "popupmenu.h"
+#include "shortcuts.h"
 #include "shortcutconfig.h"
 #include "songinfo.h"
 #include "ticksynth.h"
@@ -3581,7 +3582,7 @@ void OOMidi::startEditor(PartList* pl, int type)
 			break;
 		case 1: startListEditor(pl);
 			break;
-		case 3: startDrumEditor(pl, true);
+		case 3: //startDrumEditor(pl, true);
 			break;
 		//case 4: startWaveEditor(pl);
 		default:
@@ -3597,9 +3598,8 @@ void OOMidi::startEditor(Track* t)
 {
 	switch (t->type())
 	{
-		case Track::MIDI: startPianoroll();
-			break;
-		case Track::DRUM: startDrumEditor();
+		case Track::MIDI:
+		case Track::DRUM: startPianoroll(); 
 			break;
 		//case Track::WAVE: startWaveEditor();
 		//	break;

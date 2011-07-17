@@ -12,26 +12,20 @@
 #include "app.h"
 #include "song.h"
 #include "arranger.h"
-//#include "arranger/arranger.h"  // p4.0.2
 #include "cobject.h"
-#include "drumedit.h"
-//#include "midiedit/drumedit.h"  // p4.0.2
+//#include "drumedit.h"
 #include "pianoroll.h"
-//#include "midiedit/pianoroll.h"  // p4.0.2
 #include "globals.h"
 #include "xml.h"
 #include "drummap.h"
-//#include "midiedit/drummap.h"    // p4.0.2
 #include "event.h"
 #include "marker/marker.h"
 #include "midiport.h"
 #include "audio.h"
 #include "mitplugin.h"
-//#include "mplugins/mitplugin.h"           // p4.0.2
 #include "wave.h"
 #include "midictrl.h"
 #include "amixer.h"
-//#include "mixer/amixer.h"              // p4.0.2
 #include "conf.h"
 #include "driver/jackmidi.h"
 #include "trackview.h"
@@ -1009,7 +1003,8 @@ void Song::read(Xml& xml)
 					setPos(Song::RPOS, p, false, false, false);
 				}
 				else if (tag == "drummap")
-					readDrumMap(xml, false);
+					xml.skip(tag);
+					//readDrumMap(xml, false);
 				else if (tag == "trackview")
 				{//Read in our trackviews
 					//printf("Song::read() found track view\n");
@@ -1223,7 +1218,7 @@ void Song::write(int level, Xml& xml) const
 	AL::sigmap.write(level, xml);
 	_markerList->write(level, xml);
 
-	writeDrumMap(level, xml, false);
+	//writeDrumMap(level, xml, false);
 	xml.tag(level, "/song");
 
 	// Restore backup of the clone list, to retain any 'copy' items,
