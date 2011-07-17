@@ -1380,7 +1380,10 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				}
 				else
 				{
-					tickColor.setAlpha(30);
+					int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+					if(noteAlphaAction && !noteAlphaAction->isChecked())
+						ghostedAlpha = 0;
+					tickColor.setAlpha(ghostedAlpha);
 					p.setPen(tickColor);
 					p.drawLine(x1, lval, tick, lval);
 				}
