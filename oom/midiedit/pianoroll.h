@@ -123,6 +123,7 @@ class PianoRoll : public MidiEditor
     bool _stepQwerty;
 
     NoteInfo* info;
+    QToolButton* alpha;
     QToolButton* srec;
     QToolButton* midiin;
     QToolButton* solo;

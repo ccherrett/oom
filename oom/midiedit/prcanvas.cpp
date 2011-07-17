@@ -254,6 +254,8 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 	QPen mainPen(Qt::black);
 	int alpha = 195;
 	int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+	if(noteAlphaAction && !noteAlphaAction->isChecked())
+		ghostedAlpha = 0;
 
 	QColor colMoving;
 	colMoving.setRgb(220, 220, 120, alpha);

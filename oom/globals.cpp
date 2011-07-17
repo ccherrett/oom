@@ -249,6 +249,7 @@ QAction* punchoutAction;
 QAction* recordAction;
 QAction* panicAction;
 QAction* feedbackAction;
+QAction* noteAlphaAction;
 
 //AudioMixerApp* audioMixer;
 OOMidi* oom;
