@@ -353,6 +353,8 @@ QPixmap* buttondownIcon;
 QPixmap* configureIcon;
 
 QPixmap* multiDisplay;
+QPixmap* previousPart;
+QPixmap* nextPart;
 QPixmap* blankRecord;
 QPixmap* preIcon;
 QPixmap* preIconOn;
@@ -637,6 +639,8 @@ void initIcons()
       soloIcon             = new MPIXMAP(solobutton_xpm, NULL);
 
       multiDisplay         = new MPIXMAP(":/images/icons/multi_display.png", NULL);
+      previousPart         = new MPIXMAP(":/images/icons/previous_part.png", NULL);
+      nextPart             = new MPIXMAP(":/images/icons/next_part.png", NULL);
       blankRecord          = new MPIXMAP(":/images/icons/blank_record.png", NULL);
       preIcon        	   = new MPIXMAP(":/images/icons/mixer-pre.png", NULL);
       preIconOn        	   = new MPIXMAP(":/images/icons/mixer-pre_on.png", NULL);
