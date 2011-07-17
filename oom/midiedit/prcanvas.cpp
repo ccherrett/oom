@@ -251,7 +251,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 	};
 
 	QPen mainPen(Qt::black);
-	int alpha = 180;
+	int alpha = 195;
 	int ghostedAlpha = 30;
 
 	QColor colMoving;
