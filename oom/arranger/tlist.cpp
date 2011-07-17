@@ -1280,15 +1280,7 @@ void TList::mousePressEvent(QMouseEvent* ev)
 				{
 					mode = NORMAL;
 					QMenu* p = new QMenu;
-					if(t && t->type() == Track::WAVE)
-						p->addAction(tr("Import Audio File"))->setData(1);
-					if (!multipleSelectedTracks)
-					{
-						p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
-					}
-					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
-	
-					QMenu* colorPopup = p->addMenu(tr("Default Part Color"));
+					QMenu* colorPopup = p->addMenu(tr("Default Part Color"));/*{{{*/
 
 					QMenu* colorSub;
 					for (int i = 0; i < NUM_PARTCOLORS; ++i)
@@ -1317,7 +1309,15 @@ void TList::mousePressEvent(QMouseEvent* ev)
 								act_color->setData(20 + i);
 							}
 						}
+					}/*}}}*/
+					if(t && t->type() == Track::WAVE)
+						p->addAction(tr("Import Audio File"))->setData(1);
+					if (!multipleSelectedTracks)
+					{
+						p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
 					}
+					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
+	
 
 					QMenu* trackHeightsMenu = p->addMenu("Track Height");
 					trackHeightsMenu->addAction("Default")->setData(6);

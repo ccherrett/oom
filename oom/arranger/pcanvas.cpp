@@ -925,41 +925,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	Track::TrackType trackType = npart->track()->type();
 
 	QMenu* partPopup = new QMenu(this);
-
-	QAction *act_cut = partPopup->addAction(*editcutIconSet, tr("C&ut"));
-	act_cut->setData(4);
-	act_cut->setShortcut(Qt::CTRL + Qt::Key_X);
-
-	QAction *act_copy = partPopup->addAction(*editcopyIconSet, tr("&Copy"));
-	act_copy->setData(5);
-	act_copy->setShortcut(Qt::CTRL + Qt::Key_C);
-
-	partPopup->addSeparator();
-	int rc = npart->part()->events()->arefCount();
-	QString st = QString(tr("s&elect "));
-	if (rc > 1)
-		st += (QString().setNum(rc) + QString(" "));
-	st += QString(tr("clones"));
-	QAction *act_select = partPopup->addAction(st);
-	act_select->setData(18);
-
-	partPopup->addSeparator();
-	
-	QAction *act_rename = partPopup->addAction(tr("rename"));
-	act_rename->setData(0);
-
-	QString zvalue = QString::number(item->zValue(true));
-	QMenu* layerMenu = partPopup->addMenu(tr("Part Layers: ")+zvalue);
-	QAction *act_front = layerMenu->addAction(tr("Top"));
-	act_front->setData(4003);
-	QAction *act_up = layerMenu->addAction(tr("Up"));
-	act_up->setData(4002);
-	QAction *act_down = layerMenu->addAction(tr("Down"));
-	act_down->setData(4001);
-	QAction *act_back = layerMenu->addAction(tr("Bottom"));
-	act_back->setData(4000);
-
-	QMenu* colorPopup = partPopup->addMenu(tr("Part Color"));
+	QMenu* colorPopup = partPopup->addMenu(tr("Part Color"));/*{{{*/
 
 	QMenu* colorSub; 
 	for (int i = 0; i < NUM_PARTCOLORS; ++i)
@@ -988,7 +954,41 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 				act_color->setData(20 + i);
 			}
 		}	
-	}
+	}/*}}}*/
+	QString zvalue = QString::number(item->zValue(true));/*{{{*/
+	QMenu* layerMenu = partPopup->addMenu(tr("Part Layers: ")+zvalue);
+	QAction *act_front = layerMenu->addAction(tr("Top"));
+	act_front->setData(4003);
+	QAction *act_up = layerMenu->addAction(tr("Up"));
+	act_up->setData(4002);
+	QAction *act_down = layerMenu->addAction(tr("Down"));
+	act_down->setData(4001);
+	QAction *act_back = layerMenu->addAction(tr("Bottom"));
+	act_back->setData(4000);/*}}}*/
+
+	QAction *act_cut = partPopup->addAction(*editcutIconSet, tr("C&ut"));
+	act_cut->setData(4);
+	act_cut->setShortcut(Qt::CTRL + Qt::Key_X);
+
+	QAction *act_copy = partPopup->addAction(*editcopyIconSet, tr("&Copy"));
+	act_copy->setData(5);
+	act_copy->setShortcut(Qt::CTRL + Qt::Key_C);
+
+	partPopup->addSeparator();
+	int rc = npart->part()->events()->arefCount();
+	QString st = QString(tr("s&elect "));
+	if (rc > 1)
+		st += (QString().setNum(rc) + QString(" "));
+	st += QString(tr("clones"));
+	QAction *act_select = partPopup->addAction(st);
+	act_select->setData(18);
+
+	partPopup->addSeparator();
+	
+	QAction *act_rename = partPopup->addAction(tr("rename"));
+	act_rename->setData(0);
+
+
 
 	QAction *act_delete = partPopup->addAction(QIcon(*deleteIcon), tr("delete")); // ddskrjo added QIcon to all
 	act_delete->setData(1);
