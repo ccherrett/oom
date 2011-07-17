@@ -1231,8 +1231,8 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			// fg means 'draw selected parts'.
 			QColor fillColor = QColor(config.partColors[part->colorIndex()]);
 			QColor bgfillColor = QColor(config.partColors[part->colorIndex()]);
-			int bgalpha = 200;
-			int bgBarColorOutlineAlpha = 80;
+			int bgalpha = 180;
+			int bgBarColorOutlineAlpha = 60;
 			if(fg)
 			{
 				QColor bgBarColor = QColor(config.partColors[part->colorIndex()]);
@@ -1367,13 +1367,19 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			if (lval != CTRL_VAL_UNKNOWN)
 			{
 				QColor tickColor = QColor(config.partColors[part->colorIndex()]);
-				tickColor.setAlpha(127);
-				p.setPen(tickColor);
-				p.drawLine(x1, lval, tick, lval);
 				if (!fg)
 				{
 					p.setPen(myPen);
 					p.fillRect(x1, lval, tick - x1, wh - lval, QBrush(vuGrad)); //, config.ctrlGraphFg);
+					tickColor.setAlpha(127);
+					p.setPen(tickColor);
+					p.drawLine(x1, lval, tick, lval);
+				}
+				else
+				{
+					tickColor.setAlpha(80);
+					p.setPen(tickColor);
+					p.drawLine(x1, lval, tick, lval);
 				}
 			}
 
@@ -1401,7 +1407,9 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 		{
 			if (fg)
 			{
-				p.setPen(QColor(192, 192, 192, 127));
+				QColor tickColor = QColor(config.partColors[part->colorIndex()]);
+				tickColor.setAlpha(80);
+				p.setPen(tickColor);
 				p.drawLine(x1, lval, x + w, lval);
 			}
 			else

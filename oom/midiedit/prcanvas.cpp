@@ -252,7 +252,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 
 	QPen mainPen(Qt::black);
 	int alpha = 180;
-	int ghostedAlpha = 80;
+	int ghostedAlpha = 60;
 
 	QColor colMoving;
 	colMoving.setRgb(220, 220, 120, alpha);
@@ -1110,7 +1110,7 @@ void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster, bool ct
 	{
 		colBar1.setRgb(94,96,97);
 		colBar2.setRgb(82,83,84);
-		colBeat.setRgb(72,73,74);
+		colBeat.setRgb(67,68,69);
 		
 		/*colBar1.setRgb(104,106,107);
 		colBar2.setRgb(89,91,92);
