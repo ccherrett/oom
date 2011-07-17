@@ -214,6 +214,8 @@ private slots:
     void updateTrackInfo();
 	void splitterMoved(int, int);
 	void dockAreaChanged(Qt::DockWidgetArea);
+	void selectPrevPart();
+	void selectNextPart();
 #ifdef LSCP_SUPPORT
 	void setKeyBindings(LSCPChannelInfo);
 #endif

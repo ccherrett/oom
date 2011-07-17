@@ -497,6 +497,14 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	midiTrackInfo = new MidiTrackInfo(this, 0, _rasterInit, _quantInit);
 	midiTrackInfo->setObjectName("prTrackInfo");
+	midiTrackInfo->btnPrev->setIcon(*previousPartIcon);
+	midiTrackInfo->btnPrev->setToolTip(tr("Select Previous Part"));
+	midiTrackInfo->btnNext->setIcon(*nextPartIcon);
+	midiTrackInfo->btnNext->setToolTip(tr("Select Next Part"));
+	midiTrackInfo->btnPrev->setVisible(true);
+	midiTrackInfo->btnNext->setVisible(true);
+	connect(midiTrackInfo->btnPrev, SIGNAL(clicked()), this, SLOT(selectPrevPart()));
+	connect(midiTrackInfo->btnNext, SIGNAL(clicked()), this, SLOT(selectNextPart()));
 	int mtiw = 280; //midiTrackInfo->width(); // Save this.
 	//midiTrackInfo->setMinimumWidth(100);
 	midiTrackInfo->setMinimumSize(QSize(190,100));
@@ -728,6 +736,16 @@ void PianoRoll::songChanged1(int bits)
 	// We'll receive SC_SELECTION if a different part is selected.
 	if (bits & SC_SELECTION)
 		updateTrackInfo();
+}
+
+void PianoRoll::selectPrevPart()
+{
+	cmd(PianoCanvas::CMD_SELECT_PREV_PART);
+}
+
+void PianoRoll::selectNextPart()
+{
+	cmd(PianoCanvas::CMD_SELECT_NEXT_PART);
 }
 
 void PianoRoll::dockAreaChanged(Qt::DockWidgetArea area)

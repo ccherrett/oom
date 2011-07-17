@@ -154,6 +154,11 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	_patchSelModel = new QItemSelectionModel(_patchModel);
 	patchList->installEventFilter(oom);
 
+	//These buttons are only valid in PR so we hide them by default and PR init will 
+	//show and config them with propper actions.
+	btnNext->setVisible(false);
+	btnPrev->setVisible(false);
+
 	selected = sel_track;
 
 	// Since program covers 3 controls at once, it is in 'midi controller' units rather than 'gui control' units.
