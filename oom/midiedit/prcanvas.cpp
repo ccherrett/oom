@@ -28,6 +28,7 @@
 #include "song.h"
 #include "audio.h"
 #include "gconfig.h"
+#include "traverso_shared/TConfig.h"
 
 //---------------------------------------------------------
 //   NEvent
@@ -252,7 +253,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 
 	QPen mainPen(Qt::black);
 	int alpha = 195;
-	int ghostedAlpha = 30;
+	int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
 
 	QColor colMoving;
 	colMoving.setRgb(220, 220, 120, alpha);

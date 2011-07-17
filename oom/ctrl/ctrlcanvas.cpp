@@ -24,6 +24,7 @@
 #include "gconfig.h"
 #include "ctrlpanel.h"
 #include "midiedit/drummap.h"
+#include "traverso_shared/TConfig.h"
 
 extern void drawTickRaster(QPainter& p, int x, int y, int w, int h, int quant, bool ctrl);
 
@@ -1232,7 +1233,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			QColor fillColor = QColor(config.partColors[part->colorIndex()]);
 			QColor bgfillColor = QColor(config.partColors[part->colorIndex()]);
 			int bgalpha = 180;
-			int bgBarColorOutlineAlpha = 60;
+			int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
 			if(fg)
 			{
 				QColor bgBarColor = QColor(config.partColors[part->colorIndex()]);
@@ -1248,13 +1249,13 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			else
 			{
 				QColor bgBarColor = QColor(config.partWaveColors[part->colorIndex()]);
-				bgBarColor.setAlpha(bgBarColorOutlineAlpha);
+				bgBarColor.setAlpha(ghostedAlpha);
 				QPen borderPen = QPen(bgBarColor, 1);
 				borderPen.setCosmetic(true);
 				p.setPen(borderPen);
 				
 				QColor bgBarColorOutline = QColor(config.partColors[part->colorIndex()]);
-				bgBarColorOutline.setAlpha(bgBarColorOutlineAlpha);
+				bgBarColorOutline.setAlpha(ghostedAlpha);
 				p.setBrush(bgBarColorOutline);
 			}
 			//int alpha = 255;
@@ -1377,7 +1378,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				}
 				else
 				{
-					tickColor.setAlpha(65);
+					tickColor.setAlpha(30);
 					p.setPen(tickColor);
 					p.drawLine(x1, lval, tick, lval);
 				}
