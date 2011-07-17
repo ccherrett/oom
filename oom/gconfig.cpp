@@ -29,17 +29,21 @@ GlobalConfigValues config = {
 		QColor(0xff, 0xff, 0xff)
 	},
 	{
-		QColor(175,235,255), // OOM Part Color //{{{
+		QColor(0,0,0),       // OOM Colors //{{{
+		QColor(175,235,255), // OOM Part Color
 		QColor(255,198,250), // Wendy Cherrett
+		QColor(0,0,0),       // Frosting Menu
 		QColor(231,206,213), // Cranberry Frosting
 		QColor(220,207,232), // Grape Frosting
 		QColor(207,207,232), // Blueberry Frosting
 		QColor(205,230,225), // Matcha Frosting
 		QColor(206,231,209), // Green Apple Frosting
 		QColor(230,216,205), // Mochaccino Frosting
+		QColor(0,0,0),       // Splash Menu
 		QColor(145,255,115), // Key Lime Splash
 		QColor(252,253,154), // Lemon Splash
 		QColor(145,255,249), // Saltwater Splash
+		QColor(0,0,0),       // Day Off Menu
 		QColor(228,221,202), // Day Off: Sea & Sand 
 		QColor(255,220,252), // Day Off: Table Cloth
 		QColor(200,211,240), // Day Off: His Golf Shirt 
@@ -51,6 +55,7 @@ GlobalConfigValues config = {
 		QColor(239,239,239), // Day Off: Cherry on the Side
 		QColor(255,208,200), // Day Off: Redwood Grill
 		QColor(195,193,169), // Day Off: Appetizer
+		QColor(0,0,0),       // Drinks Menu
 		QColor(249,241,237), // Drinks: Raspberry Milkshake
 		QColor(250,243,240), // Drinks: Marshmallow Hot Chocolate
 		QColor(192,255,185), // Drinks: Irish Hot Chocolate
@@ -62,6 +67,7 @@ GlobalConfigValues config = {
 		QColor(253,249,123), // Drinks: Lemonade
 		QColor(229,255,210), // Drinks: Good Morning Glass
 		QColor(211,225,210), // Drinks: Wintermint Steamer
+		QColor(0,0,0),       // Designer Menu
 		QColor(255,255,255), // Designer: Tux
 		QColor(192,192,192), // Designer: Black Tie
 		QColor(188,187,186), // Designer: Dad's Suit
@@ -74,17 +80,21 @@ GlobalConfigValues config = {
 		//}}}
 	},
 	{
-		QColor(1,53,70),   // OOM Wave Color //{{{
+		QColor(0,0,0),     // OOM Colors //{{{
+		QColor(1,53,70),   // OOM Wave Color
 		QColor(86,87,86),  // Wendy Cherrett 
+		QColor(0,0,0),     // Frosting Menu
 		QColor(87,48,59),  // Cranberry Frosting 
 		QColor(68,48,87),  // Grape Frosting
 		QColor(48,47,86),  // Blueberry Frosting
 		QColor(47,86,78),  // Matcha Frosting
 		QColor(47,86,53),  // Green Apple Frosting
 		QColor(87,65,48),  // Mochaccino Frosting
+		QColor(0,0,0),     // Splash Menu
 		QColor(86,87,86),  // Key Lime Splash
 		QColor(86,87,86),  // Lemon Splash
 		QColor(86,87,86),  // Saltwater Splash
+		QColor(0,0,0),     // Day Off Menu
 		QColor(67,81,88),  // Day Off: Sea & Sand 
 		QColor(110,82,108),// Day Off: Table Cloth
 		QColor(16,28,64),  // Day Off: His Golf Shirt 
@@ -96,6 +106,7 @@ GlobalConfigValues config = {
 		QColor(102,30,36), // Day Off: Cherry on the Side
 		QColor(101,29,35), // Day Off: Redwood Grill
 		QColor(71,70,13),  // Day Off: Appetizer
+		QColor(0,0,0),     // Drinks Menu
 		QColor(154,43,82), // Drinks: Raspberry Milkshake
 		QColor(65,32,17),  // Drinks: Marshmallow Hot Chocolate
 		QColor(65,32,17),  // Drinks: Irish Hot Chocolate
@@ -107,6 +118,7 @@ GlobalConfigValues config = {
 		QColor(51,51,51),  // Drinks: Lemonade
 		QColor(133,36,223),// Drinks: Good Morning Glass
 		QColor(36,46,35),  // Drinks: Wintermint Steamer
+		QColor(0,0,0),     // Designer Menu
 		QColor(24,24,24),  // Designer: Tux
 		QColor(0,0,0),     // Designer: Black Tie
 		QColor(42,16,15),  // Designer: Dad's Suit
@@ -119,17 +131,21 @@ GlobalConfigValues config = {
 		//}}}
 	},
 	{
-		QColor(84,102,108),  // OOM Part Color Automation//{{{
+		QColor(0,0,0),    // OOM Colors //{{{
+		QColor(84,102,108),  // OOM Part Color Automation
 		QColor(109,91,108),  // Wendy Cherrett
+		QColor(0,0,0),       // Frosting Menu
 		QColor(100,94,95),   // Cranberry Frosting
 		QColor(97,94,100),   // Grape Frosting
 		QColor(94,94,100),   // Blueberry Frosting
 		QColor(94,100,99),   // Matcha Frosting
 		QColor(94,100,95),   // Green Apple Frosting
 		QColor(100,96,94),   // Mochaccino Frosting
+		QColor(0,0,0),       // Splash Menu
 		QColor(78,101,71),   // Key Lime Splash
 		QColor(104,104,80),  // Lemon Splash
 		QColor(78,104,103),  // Saltwater Splash
+		QColor(0,0,0),       // Day Off Menu
 		QColor(100,99,94),   // Day Off: Sea & Sand 
 		QColor(110,98,109),  // Day Off: Table Cloth
 		QColor(94,96,104),   // Day Off: His Golf Shirt 
@@ -141,6 +157,7 @@ GlobalConfigValues config = {
 		QColor(105,105,105), // Day Off: Cherry on the Side
 		QColor(109,95,93),   // Day Off: Redwood Grill
 		QColor(88,87,82),    // Day Off: Appetizer
+		QColor(0,0,0),       // Drinks Menu
 		QColor(108,106,104), // Drinks: Raspberry Milkshake
 		QColor(106,103,102), // Drinks: Marshmallow Hot Chocolate
 		QColor(93,109,91),   // Drinks: Irish Hot Chocolate
@@ -152,6 +169,7 @@ GlobalConfigValues config = {
 		QColor(101,100,73),  // Drinks: Lemonade
 		QColor(102,110,96),  // Drinks: Good Morning Glass
 		QColor(95,99,95),    // Drinks: Wintermint Steamer
+		QColor(0,0,0),       // Designer Menu
 		QColor(110,110,110), // Designer: Tux
 		QColor(88,88,88),    // Designer: Black Tie
 		QColor(86,86,86),    // Designer: Dad's Suit
@@ -164,17 +182,21 @@ GlobalConfigValues config = {
 		//}}}
 	},
 	{
-		QColor(10,25,30), // OOM Wave Color Automation//{{{
+		QColor(0,0,0),    // OOM Colors //{{{
+		QColor(10,25,30), // OOM Wave Color Automation
 		QColor(51,51,51), // Wendy Cherrett
+		QColor(0,0,0),    // Frosting Menu
 		QColor(44,34,37), // Cranberry Frosting 
 		QColor(39,34,44), // Grape Frosting
 		QColor(33,33,43), // Blueberry Frosting
 		QColor(33,43,41), // Matcha Frosting
 		QColor(33,43,35), // Green Apple Frosting
 		QColor(44,38,34), // Mochaccino Frosting
+		QColor(0,0,0),    // Splash Menu
 		QColor(50,50,50), // Key Lime Splash
 		QColor(50,50,50), // Lemon Splash
 		QColor(50,50,50), // Saltwater Splash
+		QColor(0,0,0),    // Day Off Menu
 		QColor(43,47,49), // Day Off: Sea & Sand 
 		QColor(60,52,59), // Day Off: Table Cloth
 		QColor(17,20,29), // Day Off: His Golf Shirt 
@@ -186,6 +208,7 @@ GlobalConfigValues config = {
 		QColor(48,30,31), // Day Off: Cherry on the Side
 		QColor(47,29,30), // Day Off: Redwood Grill
 		QColor(31,31,17), // Day Off: Appetizer
+		QColor(0,0,0),    // Drinks Menu
 		QColor(73,43,54), // Drinks: Raspberry Milkshake
 		QColor(30,22,18), // Drinks: Marshmallow Hot Chocolate
 		QColor(30,22,18), // Drinks: Irish Hot Chocolate
@@ -197,6 +220,7 @@ GlobalConfigValues config = {
 		QColor(30,30,30), // Drinks: Lemonade
 		QColor(77,51,101),// Drinks: Good Morning Glass
 		QColor(23,25,23), // Drinks: Wintermint Steamer
+		QColor(0,0,0),    // Designer Menu
 		QColor(13,13,13), // Designer: Tux
 		QColor(0,0,0),    // Designer: Black Tie
 		QColor(21,14,13), // Designer: Dad's Suit
@@ -209,48 +233,54 @@ GlobalConfigValues config = {
 		//}}}
 	},
 	{
+		QString("menu:OOM Colors"),
 		QString("OOM"), // Default part color names
 		QString("Wendy Cherrett"),
+		QString("menu:Frostings"),
 		QString("Cranberry Frosting"),
 		QString("Grape Frosting"),
 		QString("Blueberry Frosting"),
 		QString("Matcha Frosting"),
 		QString("Green Apple Frosting"),
 		QString("Cappuccino Frosting"),
+		QString("menu:Splash"),
 		QString("Key Lime Splash"),
 		QString("Lemon Splash"),
 		QString("Saltwater Splash"),
-		QString("Day Off: Sea and Sand"),
-		QString("Day Off: Tablecloth"),
-		QString("Day Off: His Golf Shirt"),
-		QString("Day Off: Her Golf Shirt"),
-		QString("Day Off: Baby's Golf Shirt"),
-		QString("Day Off: Book and Blanket"),
-		QString("Day Off: Almond Roca"),
-		QString("Day Off: Kiwi Cabana"),
-		QString("Day Off: Cherry on the Side"),
-		QString("Day Off: Redwood Grill"),
-		QString("Day Off: Appetizer"),
-		QString("Drinks: Raspberry Milkshake"),
-		QString("Drinks: Marshmallow Hot Chocolate"),
-		QString("Drinks: Irish Hot Chocolate"),
-		QString("Drinks: Mochaccino"),
-		QString("Drinks: Cream Soda Float"),
-		QString("Drinks: Pumpkin Spice Latte"),
-		QString("Drinks: Strawberry Apple Smoothie"),
-		QString("Drinks: Very Berry Smoothie"),
-		QString("Drinks: Lemonade"),
-		QString("Drinks: Good Morning Glass"),
-		QString("Drinks: Wintermint Steamer"),
-		QString("Designer: Tux"),
-		QString("Designer: Black Tie"),
-		QString("Designer: Dad's Suit"),
-		QString("Designer: Khaki"),
-		QString("Designer: Midnight Stars"),
-		QString("Designer: Friday Valet"),
-		QString("Designer: Veranda Olivia"),
-		QString("Designer: Gentlemen"),
-		QString("Designer: Wendy's Dress")
+		QString("menu:Day Off"),
+		QString("Sea and Sand"),
+		QString("Tablecloth"),
+		QString("His Golf Shirt"),
+		QString("Her Golf Shirt"),
+		QString("Baby's Golf Shirt"),
+		QString("Book and Blanket"),
+		QString("Almond Roca"),
+		QString("Kiwi Cabana"),
+		QString("Cherry on the Side"),
+		QString("Redwood Grill"),
+		QString("Appetizer"),
+		QString("menu:Drinks"),
+		QString("Raspberry Milkshake"),
+		QString("Marshmallow Hot Chocolate"),
+		QString("Irish Hot Chocolate"),
+		QString("Mochaccino"),
+		QString("Cream Soda Float"),
+		QString("Pumpkin Spice Latte"),
+		QString("Strawberry Apple Smoothie"),
+		QString("Very Berry Smoothie"),
+		QString("Lemonade"),
+		QString("Good Morning Glass"),
+		QString("Wintermint Steamer"),
+		QString("menu:Designer"),
+		QString("Tux"),
+		QString("Black Tie"),
+		QString("Dad's Suit"),
+		QString("Khaki"),
+		QString("Midnight Stars"),
+		QString("Friday Valet"),
+		QString("Veranda Olivia"),
+		QString("Gentlemen"),
+		QString("Wendy's Dress")
 	}
 ,
 	QColor(16, 24, 25), // transportHandleColor;

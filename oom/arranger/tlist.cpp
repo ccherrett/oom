@@ -1289,21 +1289,35 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 	
 					QMenu* colorPopup = p->addMenu(tr("Default Part Color"));
-				
+					QAction *act_colorSelected = colorPopup->addAction(PartCanvas::colorRect(config.partColors[1], config.partWaveColors[1], 80, 80, true), "selectedColor");
+
+					QMenu* colorSub;
 					for (int i = 0; i < NUM_PARTCOLORS; ++i)
 					{
 						QString colorname(config.partColorNames[i]);
-						if(t->getDefaultPartColor() == i)
+						if(colorname.contains("menu:", Qt::CaseSensitive))
 						{
-							colorname = QString("* "+config.partColorNames[i]);
-							QAction *act_color = colorPopup->addAction(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
-							act_color->setData(20 + i);
+							colorSub = colorPopup->addMenu(colorname.replace("menu:", ""));
 						}
 						else
 						{
-							colorname = QString("     "+config.partColorNames[i]);
-							QAction *act_color = colorPopup->addAction(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
-							act_color->setData(20 + i);
+							if(t->getDefaultPartColor() == i)
+							{
+								colorname = QString(config.partColorNames[i]);
+								act_colorSelected->setIcon(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+								act_colorSelected->setText(colorSub->title()+": "+colorname);
+								act_colorSelected->setData(20 + i);
+
+								colorname = QString("* "+config.partColorNames[i]);
+								QAction *act_color = colorSub->addAction(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
+								act_color->setData(20 + i);
+							}
+							else
+							{
+								colorname = QString("     "+config.partColorNames[i]);
+								QAction *act_color = colorSub->addAction(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
+								act_color->setData(20 + i);
+							}
 						}
 					}
 
