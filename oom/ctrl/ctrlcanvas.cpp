@@ -1377,7 +1377,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				}
 				else
 				{
-					tickColor.setAlpha(80);
+					tickColor.setAlpha(65);
 					p.setPen(tickColor);
 					p.drawLine(x1, lval, tick, lval);
 				}
