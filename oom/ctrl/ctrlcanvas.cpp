@@ -1234,6 +1234,8 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			QColor bgfillColor = QColor(config.partColors[part->colorIndex()]);
 			int bgalpha = 180;
 			int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+			if(noteAlphaAction && !noteAlphaAction->isChecked())
+				ghostedAlpha = 0;
 			if(fg)
 			{
 				QColor bgBarColor = QColor(config.partColors[part->colorIndex()]);

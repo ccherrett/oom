@@ -402,6 +402,14 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tools2->setFloatable(false);
 	tools2->setMovable(false);
 	tools2->setAllowedAreas(Qt::BottomToolBarArea);
+
+	noteAlphaAction = new QAction(QIcon(*multiDisplay), tr("multipart"), this);
+	noteAlphaAction->setToolTip(tr("Toggle Display of multiple parts"));
+	noteAlphaAction->setCheckable(true);
+	bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
+	noteAlphaAction->setChecked(ghostedAlpha);
+	tools2->addAction(noteAlphaAction);
+
 	QWidget* spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer->setMaximumWidth(35);
@@ -573,6 +581,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
     connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 
+	connect(noteAlphaAction, SIGNAL(toggled(bool)), canvas, SLOT(update()));
     //connect(midiTrackInfo, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
 	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
     connect(ctrl, SIGNAL(clicked()), SLOT(addCtrl()));
@@ -822,6 +831,7 @@ PianoRoll::~PianoRoll()
 	tconfig().set_property("PianoRollEdit", "ypos", vscroll->pos());
 	tconfig().set_property("PianoRollEdit", "colormode", colorMode);
 	tconfig().set_property("PianoRollEdit", "showcomments", canvas->showComments());
+	tconfig().set_property("PianoRollEdit", "showghostpart", noteAlphaAction->isChecked());
 	//printf("Canvas show comments: %d\n", canvas->showComments());
     tconfig().save();
 	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();i != ctrlEditList.end(); ++i)
