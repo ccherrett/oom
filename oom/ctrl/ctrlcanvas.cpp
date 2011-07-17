@@ -1374,7 +1374,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				{
 					p.setPen(myPen);
 					p.fillRect(x1, lval, tick - x1, wh - lval, QBrush(vuGrad)); //, config.ctrlGraphFg);
-					tickColor.setAlpha(127);
+					//tickColor.setAlpha(127);
 					p.setPen(tickColor);
 					p.drawLine(x1, lval, tick, lval);
 				}
@@ -1401,6 +1401,13 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 					lval = wh - ((val - min - bias) * wh / (max - min));
 			}
 		}
+		if(!fg)
+		{
+			QColor tickColor = QColor(config.partColors[part->colorIndex()]);
+			//tickColor.setAlpha(127);
+			p.setPen(tickColor);
+			p.drawLine(x1, lval-1, x + w, lval-1);
+		}	
 		if (lval == CTRL_VAL_UNKNOWN)
 		{
 			if (!fg)
@@ -1413,8 +1420,11 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 		{
 			if (fg)
 			{
+				int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+				if(noteAlphaAction && !noteAlphaAction->isChecked())
+					ghostedAlpha = 0;
 				QColor tickColor = QColor(config.partColors[part->colorIndex()]);
-				tickColor.setAlpha(80);
+				tickColor.setAlpha(ghostedAlpha);
 				p.setPen(tickColor);
 				p.drawLine(x1, lval, x + w, lval);
 			}
