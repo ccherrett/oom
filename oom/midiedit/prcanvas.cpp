@@ -699,7 +699,11 @@ CItem* PianoCanvas::newItem(const QPoint& p, int)/*{{{*/
 			if(part == _curPart)
 				continue;
 			MidiTrack* track = (MidiTrack*)part->track();
-			int evpitch = (pitch + track->getTransposition())-transp;
+			int evpitch = (pitch + track->getTransposition());
+			if(transp >= 0)
+				evpitch = evpitch - transp;
+			else
+				evpitch = evpitch + (transp * -1);
 			int evtick = tick - part->tick();
 			Event ev = Event(Note);
 			ev.setTick(evtick);
