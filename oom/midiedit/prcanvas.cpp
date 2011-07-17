@@ -1102,9 +1102,9 @@ void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster, bool ct
 	QColor colBar2;
 	if(ctrl)
 	{
-		colBar1.setRgb(134,137,138);
-		colBar2.setRgb(102,104,105);
-		colBeat.setRgb(89,91,92);
+		colBar1.setRgb(102,104,105);
+		colBar2.setRgb(89,91,92);
+		colBeat.setRgb(77,78,79);
 	}
 	else
 	{

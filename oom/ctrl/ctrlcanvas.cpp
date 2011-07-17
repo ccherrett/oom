@@ -1616,15 +1616,22 @@ void CtrlCanvas::drawOverlay(QPainter& p, const QRect&)
 {
 	QString s(_controller->name());
 	p.setFont(config.fonts[3]);
-	p.setPen(QColor(0,0,0,75));
+	
+	QColor textColor = QColor(0,0,0,127);
+	if(curPart)
+		textColor = QColor(config.partColors[curPart->colorIndex()]);
+	textColor.setAlpha(127);
+	p.setPen(textColor);
+
 	QFontMetrics fm(config.fonts[3]);
 	int y = fm.lineSpacing() + 2;
 	p.drawText(2, y, s);
 	if (noEvents)
 	{
 		p.setFont(config.fonts[3]);
-		p.setPen(Qt::black);
-                p.drawText(width() / 2 - 100, height() / 2 - 10, "Use shift + pencil or line tool to draw new events");
+		//p.setPen(Qt::black);
+		//p.setPen(Qt::black);
+        p.drawText(width() / 2 - 100, height() / 2 - 10, "Use shift + pencil or line tool to draw new events");
 		//p.drawText(2 , y * 2, "Use shift + pencil or line tool to draw new events");
 	}
 }
