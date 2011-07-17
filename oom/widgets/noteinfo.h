@@ -47,6 +47,7 @@ public:
     NoteInfo(QWidget* parent = 0);
     void setValues(unsigned, int, int, int, int);
     void setDeltaMode(bool);
+	void enableTools(bool);
 
 private slots:
     void lenChanged(int);
@@ -61,6 +62,7 @@ public slots:
 
 signals:
     void valueChanged(NoteInfo::ValType, int);
+	void alphaChanged();
 };
 #endif
 

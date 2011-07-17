@@ -112,6 +112,16 @@ void NoteInfo::alphaChanged(int alpha)
 {
 	tconfig().set_property("PianoRollEdit", "renderalpha", alpha);
 	tconfig().save();
+	emit alphaChanged();
+}
+
+void NoteInfo::enableTools(bool state)
+{
+	selTime->setEnabled(state);
+	selLen->setEnabled(state);
+	selPitch->setEnabled(state);
+	selVelOn->setEnabled(state);
+	selVelOff->setEnabled(state);
 }
 
 //---------------------------------------------------------

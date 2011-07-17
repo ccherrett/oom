@@ -616,7 +616,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     canvas->setYPos(KH * 30);
     vscroll->setPos(KH * 30);
     //setSelection(0, 0, 0); //Really necessary? Causes segfault when only 1 item selected, replaced by the following:
-    info->setEnabled(false);
+    info->enableTools(false);
+	connect(info, SIGNAL(alphaChanged()), canvas, SLOT(update()));
 
     connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
     connect(song, SIGNAL(punchinChanged(bool)), canvas, SLOT(update()));
@@ -854,7 +855,7 @@ void PianoRoll::setSelection(int tick, Event& e, Part* p)
 
 	if (selections > 1)
 	{
-		info->setEnabled(true);
+		info->enableTools(true);
 		info->setDeltaMode(true);
 		if (!deltaMode)
 		{
@@ -870,7 +871,7 @@ void PianoRoll::setSelection(int tick, Event& e, Part* p)
 	else if (selections == 1)
 	{
 		deltaMode = false;
-		info->setEnabled(true);
+		info->enableTools(true);
 		info->setDeltaMode(false);
 		info->setValues(tick,
 						selEvent.lenTick(),
@@ -881,7 +882,7 @@ void PianoRoll::setSelection(int tick, Event& e, Part* p)
 	else
 	{
 		deltaMode = false;
-		info->setEnabled(false);
+		info->enableTools(false);
 	}
 	selectionChanged();
 }
