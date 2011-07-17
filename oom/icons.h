@@ -42,6 +42,8 @@ extern QPixmap* synthIcon;
 extern QPixmap* markIcon[3];
 
 extern QPixmap* multiDisplay;
+extern QPixmap* previousPart;
+extern QPixmap* nextPart;
 extern QPixmap* blankRecord;
 extern QPixmap* preIcon;
 extern QPixmap* preIconOn;
