@@ -1289,7 +1289,6 @@ void TList::mousePressEvent(QMouseEvent* ev)
 					p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 	
 					QMenu* colorPopup = p->addMenu(tr("Default Part Color"));
-					QAction *act_colorSelected = colorPopup->addAction(PartCanvas::colorRect(config.partColors[1], config.partWaveColors[1], 80, 80, true), "selectedColor");
 
 					QMenu* colorSub;
 					for (int i = 0; i < NUM_PARTCOLORS; ++i)
@@ -1304,9 +1303,8 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							if(t->getDefaultPartColor() == i)
 							{
 								colorname = QString(config.partColorNames[i]);
-								act_colorSelected->setIcon(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
-								act_colorSelected->setText(colorSub->title()+": "+colorname);
-								act_colorSelected->setData(20 + i);
+								colorPopup->setIcon(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+								colorPopup->setTitle(colorSub->title()+": "+colorname);
 
 								colorname = QString("* "+config.partColorNames[i]);
 								QAction *act_color = colorSub->addAction(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);

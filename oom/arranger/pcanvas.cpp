@@ -960,7 +960,6 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	act_back->setData(4000);
 
 	QMenu* colorPopup = partPopup->addMenu(tr("Part Color"));
-	QAction *act_colorSelected = colorPopup->addAction(PartCanvas::colorRect(config.partColors[1], config.partWaveColors[1], 80, 80, true), "selectedColor");
 
 	QMenu* colorSub; 
 	for (int i = 0; i < NUM_PARTCOLORS; ++i)
@@ -975,9 +974,8 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 			if(npart->part()->colorIndex() == i)
 			{
 				colorname = QString(config.partColorNames[i]);
-				act_colorSelected->setIcon(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
-				act_colorSelected->setText(colorSub->title()+": "+colorname);
-				act_colorSelected->setData(20 + i);
+				colorPopup->setIcon(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+				colorPopup->setTitle(colorSub->title()+": "+colorname);
 
 				colorname = QString("* "+config.partColorNames[i]);
 				QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
