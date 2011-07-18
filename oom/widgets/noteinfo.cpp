@@ -3,6 +3,7 @@
 //  OpenOctave Midi and Audio Editor
 //    $Id: noteinfo.cpp,v 1.4.2.1 2008/08/18 00:15:26 terminator356 Exp $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //=========================================================
 
 #include <QtGui>
@@ -28,59 +29,27 @@ NoteInfo::NoteInfo(QWidget* parent)
 
 	m_layout = new QVBoxLayout(this);
 
-	//QLabel* label = new QLabel(tr("Start"));
-	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	//label->setIndent(3);
-
 	selTime = new Awl::PosEdit;
 	selTime->setObjectName("Start");
 	addTool(tr("Start"), selTime);
 
-	//addWidget(selTime);
-
-	//label = new QLabel(tr("Len"));
-	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	//label->setIndent(3);
-	//addWidget(label);
-	
 	selLen = new QSpinBox();
 	selLen->setRange(0, 100000);
 	selLen->setSingleStep(1);
 	addTool(tr("Len"), selLen);
 
-	//label = new QLabel(tr("Pitch"));
-	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	//label->setIndent(3);
-	//addWidget(label);
-	
 	selPitch = new PitchEdit;
 	addTool(tr("Pitch"), selPitch);
 
-	//label = new QLabel(tr("Velo On"));
-	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	//label->setIndent(3);
-	//addWidget(label);
-	
 	selVelOn = new QSpinBox();
 	selVelOn->setRange(0, 127);
 	selVelOn->setSingleStep(1);
 	addTool(tr("Velo On"), selVelOn);
 
-	//label = new QLabel(tr("Velo Off"));
-	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	//label->setIndent(3);
-	//addWidget(label);
-	
 	selVelOff = new QSpinBox();
 	selVelOff->setRange(0, 127);
 	selVelOff->setSingleStep(1);
 	addTool(tr("Velo Off"), selVelOff);
-	//addSeparator();
-
-	//label = new QLabel(tr(" BG Brightness"));
-	//label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	//label->setIndent(3);
-	//addWidget(label);
 
 	m_renderAlpha = new QSpinBox();
 	m_renderAlpha->setRange(0, 255);

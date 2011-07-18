@@ -705,7 +705,17 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	bool showcomment = tconfig().get_property("PianoRollEdit", "showcomments", false).toBool();
 	//printf("Canvas show comments: %d\n", showcomment);
 	midiTrackInfo->updateCommentState(showcomment, false);
-	//qDebug() << QThread::currentThread();
+	CtrlEdit* mainVol = addCtrl();
+	if (!mainVol->setType(QString("MainVolume")))
+		removeCtrl(mainVol);
+	addCtrl();
+	CtrlEdit* modctrl = addCtrl();
+	modctrl->setType(QString("Modulation"));
+	/*if (!modctrl->setType(QString("Modulation")))
+	{
+		modctrl->hide();
+		pianoroll->removeCtrl(modctrl);
+	}*/
 
     // At this point in time the range of the canvas hasn't
     // been calculated right ?

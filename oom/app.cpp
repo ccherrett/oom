@@ -3640,7 +3640,7 @@ void OOMidi::startPianoroll()
 	startPianoroll(pl, true);
 }
 
-void OOMidi::startPianoroll(PartList* pl, bool showDefaultCtrls)
+void OOMidi::startPianoroll(PartList* pl, bool /*showDefaultCtrls*/)
 {
 	PianoRoll* pianoroll = new PianoRoll(pl, this, 0, arranger->cursorValue());
 	pianoroll->setWindowRole("pianoroll");
@@ -3652,20 +3652,6 @@ void OOMidi::startPianoroll(PartList* pl, bool showDefaultCtrls)
     // same for save shortcut
     pianoroll->addAction(fileSaveAction);
 
-	if (showDefaultCtrls) // p4.0.12
-	{
-		CtrlEdit* mainVol = pianoroll->addCtrl();
-		if (!mainVol->setType(QString("MainVolume")))
-			pianoroll->removeCtrl(mainVol);
-		pianoroll->addCtrl();
-		CtrlEdit* modctrl = pianoroll->addCtrl();
-		modctrl->setType(QString("Modulation"));
-		/*if (!modctrl->setType(QString("Modulation")))
-		{
-			modctrl->hide();
-			pianoroll->removeCtrl(modctrl);
-		}*/
-	}
 	toplevels.push_back(Toplevel(Toplevel::PIANO_ROLL, (unsigned long) (pianoroll), pianoroll));
 	connect(pianoroll, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
 	connect(oom, SIGNAL(configChanged()), pianoroll, SLOT(configChanged()));

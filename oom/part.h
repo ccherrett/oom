@@ -241,6 +241,7 @@ public:
     void remove(Part* part);
     int index(Part*);
     Part* find(int idx);
+    Part* find(unsigned tick, QString name);
 };
 
 extern void chainClone(Part* p);

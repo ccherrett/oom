@@ -19,7 +19,6 @@
 #include "midiport.h"
 #include "drummap.h"
 #include "song.h"
-//#include "midiedit/drummap.h"    // p4.0.2
 
 int Part::snGen;
 
@@ -797,6 +796,20 @@ iPart PartList::findPart(unsigned tick)
 		if (i->second->tick() == tick)
 			break;
 	return i;
+}
+
+Part* PartList::findPart(unsigned tick, QString name)
+{
+	Part* rv = 0;
+	for (iPart i = begin(); i != end(); ++i)
+	{
+		if (i->second->tick() == tick && i->second->name() == name)
+		{
+			rv = i->second;
+			break;
+		}
+	}
+	return rv;
 }
 
 //---------------------------------------------------------

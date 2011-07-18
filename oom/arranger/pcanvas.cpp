@@ -2313,7 +2313,7 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		partWaveColor.setAlpha(150);
 		partWaveColorAutomation.setAlpha(150);
 		
-		bool clone = part->events()->arefCount() > 1;
+		//bool clone = part->events()->arefCount() > 1;
 		p.setBrush(partWaveColor);
 		if (wp)
 		{
@@ -2326,7 +2326,7 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	}
 	else
 	{
-		bool clone = part->events()->arefCount() > 1;
+		//bool clone = part->events()->arefCount() > 1;
 		
 		partColor.setAlpha(150);
 		partColorAutomation.setAlpha(150);
@@ -2835,7 +2835,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 					for (unsigned k = 0; k < channels; ++k)
 					{
 						int peak = (sa[k].peak * (hm - 1)) >> 8;
-						int rms = (sa[k].rms * (hm - 1)) >> 8;
+						//int rms = (sa[k].rms * (hm - 1)) >> 8;
 						if(k == 0)
 						{
 							stereoOneY = y;
