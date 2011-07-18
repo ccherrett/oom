@@ -592,6 +592,7 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	{
 		return false;
 	}
+	printf("PartCanvas::moveItem ntrack: %d  tracks->size(): %d\n",ntrack,(int)tracks->size());
 	if (ntrack >= tracks->size())
 	{
 		ntrack = tracks->size();
@@ -604,9 +605,21 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		}
 		if(newTrack)
 			midiMonitor->msgAddMonitoredTrack(newTrack);
+		else
+			printf("PartCanvas::moveItem failed to create new track\n");
+		
+		printf("PartCanvas::moveItem new track type: %d\n",newTrack->type());
+
 		emit tracklistChanged();
 	}
+	//FIXME: for some reason we are getting back an invalid track on this next call
+	//This is a bug caused by removing the track view update from the undo section of song I think
+	//the breakage happens in commit 4484dc5
+	//it looks like cloning a part is calling the endMsgCmd in song.cpp and the track is 
+	//not making it into the undo system or something like that
 	Track* dtrack = tracks->index(ntrack);
+	
+	printf("PartCanvas::moveItem track type is: %d\n",dtrack->type());
 
 	if (dtrack->type() != type)
 	{
@@ -614,6 +627,7 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 				tr("Cannot copy/move/clone to different Track-Type"));
 		return false;
 	}
+	printf("PartCanvas::moveItem did not crash\n");
 
 	Part* dpart;
 	bool clone = (t == MOVE_CLONE || (t == MOVE_COPY && spart->events()->arefCount() > 1));

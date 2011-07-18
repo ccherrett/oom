@@ -172,6 +172,8 @@ extern unsigned char rcRecordNote;
 extern unsigned char rcGotoLeftMarkNote;
 extern unsigned char rcPlayNote;
 
+extern int lastTrackPartColorIndex;
+
 extern bool midiSeqRunning;
 extern bool automation;
 

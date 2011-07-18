@@ -174,6 +174,7 @@ private:
 	//Audition feature
 	bool _replay;
 	unsigned _replayPos;
+	
 	//key to note mapping
 	QHash<int, QString> m_midiKeys;
 
@@ -198,7 +199,7 @@ public:
     FollowMode follow() const {
         return _follow;
     }
-
+    
     bool dirty;
 	bool invalid; //used to deturmin is song is valid
 	bool viewselected;
