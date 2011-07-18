@@ -286,6 +286,8 @@ uid_t euid, ruid;  // effective user id, real user id
 
 bool midiSeqRunning = false;
 
+int lastTrackPartColorIndex = 1;
+
 //---------------------------------------------------------
 //   doSetuid
 //    Restore the effective UID to its original value.
