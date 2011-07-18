@@ -798,7 +798,7 @@ iPart PartList::findPart(unsigned tick)
 	return i;
 }
 
-Part* PartList::findPart(unsigned tick, QString name)
+Part* PartList::find(unsigned tick, QString name)
 {
 	Part* rv = 0;
 	for (iPart i = begin(); i != end(); ++i)
