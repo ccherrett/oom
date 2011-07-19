@@ -209,7 +209,7 @@ QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#option
 	padding: 0px;
 	color: #bbbfbb;
 	font-size: 14px;
-	alternate-background-color: #3d3d3d;
+	alternate-background-color: #3a3a3a;
 	selection-background-color: #2e2e2e;
 }
 QTableView#tblTrackView::focus, QTableView#routeList::focus, QTableView#TrackListView::focus
