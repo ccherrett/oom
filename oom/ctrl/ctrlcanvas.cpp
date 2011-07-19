@@ -1254,7 +1254,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				bgBarColor.setAlpha(ghostedAlpha);
 				QPen borderPen = QPen(bgBarColor, 1);
 				borderPen.setCosmetic(true);
-				p.setPen(borderPen);
+				p.setPen(Qt::NoPen);
 				
 				QColor bgBarColorOutline = QColor(config.partColors[part->colorIndex()]);
 				bgBarColorOutline.setAlpha(ghostedAlpha);
