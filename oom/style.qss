@@ -207,7 +207,7 @@ QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#option
 	border: 2px solid #29292a;/*set for highlighting on focus*/
 	border-radius: 0px;
 	padding: 0px;
-	color: #d6dfd6;
+	color: #bbbfbb;
 	font-size: 14px;
 	alternate-background-color: #bec0cf;
 	selection-background-color: #3d3e44;
