@@ -694,7 +694,9 @@ void EventCanvas::keyPress(QKeyEvent* event)
 		// get a list of items that belong to the current part
 		// since multiple parts have populated the _items list
 		// we need to filter on the actual current Part!
-		CItemList list = getItemlistForCurrentPart();
+		CItemList list = _items;
+		if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+			list = getItemlistForCurrentPart();
 
 		//Get the rightmost selected note (if any)
 		i = list.begin();
@@ -746,7 +748,9 @@ void EventCanvas::keyPress(QKeyEvent* event)
 		// get a list of items that belong to the current part
 		// since multiple parts have populated the _items list
 		// we need to filter on the actual current Part!
-		CItemList list = getItemlistForCurrentPart();
+		CItemList list = _items;
+		if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+			list = getItemlistForCurrentPart();
 
 		if (list.size() > 0)
 		{
