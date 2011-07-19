@@ -14,6 +14,7 @@
 #include <QActionGroup>
 #include <QDir>
 #include <QFileInfo>
+#include <QIcon>
 
 #include "globals.h"
 #include "config.h"
@@ -288,6 +289,8 @@ uid_t euid, ruid;  // effective user id, real user id
 bool midiSeqRunning = false;
 
 int lastTrackPartColorIndex = 1;
+
+QList<QIcon> partColorIcons;
 
 //---------------------------------------------------------
 //   doSetuid

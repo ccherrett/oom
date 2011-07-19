@@ -42,7 +42,7 @@ TrackListView::~TrackListView()
 
 void TrackListView::songChanged(int flags)/*{{{*/
 {
-	if(flags == -1 || flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_PART_INSERTED | SC_PART_REMOVED))
+	if(flags == -1 || flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_COLOR_MODIFIED))
 	{
 		m_model->clear();
 		for(iMidiTrack i = song->midis()->begin(); i != song->midis()->end(); ++i)
@@ -79,7 +79,9 @@ void TrackListView::songChanged(int flags)/*{{{*/
 					chkPart->setCheckState(Qt::Checked);
 				}
 				QStandardItem* partName = new QStandardItem();
-				partName->setText("    "+part->name());
+				partName->setText(part->name());
+				if(!partColorIcons.isEmpty() && part->colorIndex() < partColorIcons.size())
+					partName->setIcon(partColorIcons.at(part->colorIndex()));
 				partsRow.append(chkPart);
 				partsRow.append(partName);
 				m_model->appendRow(partsRow);
@@ -89,13 +91,13 @@ void TrackListView::songChanged(int flags)/*{{{*/
 	}
 }/*}}}*/
 
-void TrackListView::toggleTrackPart(QStandardItem* item)
+void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 {
 	int type = item->data(TrackRole).toInt();
 	bool checked = (item->checkState() == Qt::Checked);
 	QString trackName = item->data(TrackNameRole).toString();
 	Track* track = song->findTrack(trackName);
-	if(!track || !m_editor)
+	if(!track || !m_editor || item->column() != 0)
 		return;
 
 	PartList* list = track->parts();
@@ -155,8 +157,5 @@ void TrackListView::toggleTrackPart(QStandardItem* item)
 		break;
 	}
 	update();
-}
+}/*}}}*/
 
-void TrackListView::removePart(unsigned, QString)
-{
-}

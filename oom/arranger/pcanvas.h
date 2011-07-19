@@ -91,6 +91,7 @@ class PartCanvas : public Canvas
     bool editMode;
     bool unselectNodes;
 	bool show_tip;
+	bool build_icons;
 
     AutomationObject automation;
     CurveNodeSelection* _curveNodeSelection;

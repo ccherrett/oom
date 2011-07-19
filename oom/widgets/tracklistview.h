@@ -35,7 +35,6 @@ class TrackListView : public QFrame
 private slots:
 	void songChanged(int);
 public slots:
-	void removePart(unsigned tick, QString name);
 	void toggleTrackPart(QStandardItem*);
 public:
 	TrackListView(MidiEditor* e, QWidget* parent = 0);
