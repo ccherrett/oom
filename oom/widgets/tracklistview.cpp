@@ -62,7 +62,7 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			QFont font = trackName->font();
 			font.setBold(true);
 			trackName->setFont(font);
-			trackName->setTextAlignment(Qt::AlignHCenter);
+			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			trackRow.append(trackName);
 			m_model->appendRow(trackRow);
 			for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
