@@ -54,6 +54,8 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			chkTrack->setCheckable(true);
 			chkTrack->setData(1, TrackRole);
 			chkTrack->setData(track->name(), TrackNameRole);
+			if(m_selected.contains(track->name()))
+				chkTrack->setCheckState(Qt::Checked);
 			trackRow.append(chkTrack);
 			QStandardItem* trackName = new QStandardItem();
 			trackName->setText(track->name());
@@ -102,23 +104,27 @@ void TrackListView::toggleTrackPart(QStandardItem* item)
 	{
 		case 1: //Track
 		{
-			for(iPart i = list->begin(); i != list->end(); ++i)
+			iPart i;
+			if(checked)
 			{
-				if(checked)
-				{
-					if(!m_editor->hasPart(i->second->sn()))
-						m_editor->addPart(i->second);
-				}
-				else
-				{
-					if(m_editor->hasPart(i->second->sn()))
-					{
-						m_editor->removePart(i->second->sn());
-					}
-				}
+				m_editor->addParts(list);
+				m_selected.append(trackName);
+			}
+			else
+			{
+				m_editor->removeParts(list);
+				m_editor->updateCanvas();
+				m_selected.removeAll(trackName);
+				song->update(SC_SELECTION);
 			}
 			if(!list->empty())
+			{
+				if(checked)
+					m_editor->setCurCanvasPart(list->begin()->second);
+				m_model->blockSignals(true);
 				songChanged(-1);
+				m_model->blockSignals(false);
+			}
 		}
 		break;
 		case 2: //Part
@@ -129,13 +135,25 @@ void TrackListView::toggleTrackPart(QStandardItem* item)
 			if(part)
 			{
 				if(checked)
+				{
 					m_editor->addPart(part);
+					m_editor->setCurCanvasPart(part);
+				}
 				else
+				{
 					m_editor->removePart(sn);
+					m_editor->updateCanvas();
+					m_selected.removeAll(trackName);
+					m_model->blockSignals(true);
+					songChanged(-1);
+					m_model->blockSignals(false);
+					song->update(SC_SELECTION);
+				}
 			}
 		}
 		break;
 	}
+	update();
 }
 
 void TrackListView::removePart(unsigned, QString)

@@ -5,6 +5,7 @@
 //===========================================================
 
 #include <QFrame>
+#include <QList>
 #define PartRole Qt::UserRole+2
 #define TrackRole Qt::UserRole+3
 #define TrackNameRole Qt::UserRole+4
@@ -29,6 +30,7 @@ class TrackListView : public QFrame
 	QStandardItemModel* m_model;
 	QVBoxLayout* m_layout;
 	MidiEditor* m_editor;
+	QList<QString> m_selected;
 
 private slots:
 	void songChanged(int);

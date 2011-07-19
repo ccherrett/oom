@@ -183,20 +183,45 @@ void MidiEditor::writeStatus(int level, Xml& xml) const
 	xml.tag(level, "/midieditor");
 }
 
+void MidiEditor::addParts(PartList* pl)
+{
+	if(pl)
+	{
+		for(iPart i = pl->begin(); i != pl->end(); ++i)
+		{
+			if(!hasPart(i->second->sn()))
+				_parts.push_back(i->second->sn());
+		}
+		songChanged(SC_PART_INSERTED);
+		//setCurCanvasPart(p);
+	}
+}
+
 void MidiEditor::addPart(Part* p)
 {
 	if(p)
 	{
-		printf("MidiEditor::addPart\n");
 		_parts.push_back(p->sn());
 		songChanged(SC_PART_INSERTED);
-		setCurCanvasPart(p);
+		//setCurCanvasPart(p);
+	}
+}
+
+void MidiEditor::removeParts(PartList* pl)
+{
+	if(pl)
+	{
+		for(iPart i = pl->begin(); i != pl->end(); ++i)
+		{
+			if(hasPart(i->second->sn()))
+				_parts.remove(i->second->sn());
+		}
+		songChanged(SC_PART_REMOVED);
 	}
 }
 
 void MidiEditor::removePart(int sn)
 {
-	printf("MidiEditor::removePart\n");
 	_parts.remove(sn);
 	songChanged(SC_PART_REMOVED);
 }
