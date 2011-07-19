@@ -200,7 +200,7 @@ QHeaderView::section
 	font-size: 11px;
 }
 /*{{{*/
-QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#optionsTable, MidiAssignDialog QTableView
+QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#optionsTable, MidiAssignDialog QTableView, QTableView#TrackListView
 {
 	background-color: #d8dbe8;
 	border: 2px solid #29292a;/*set for highlighting on focus*/
@@ -211,29 +211,29 @@ QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#option
 	alternate-background-color: #bec0cf;
 	selection-background-color: #3d3e44;
 }
-QTableView#tblTrackView::focus, QTableView#routeList::focus
+QTableView#tblTrackView::focus, QTableView#routeList::focus, QTableView#TrackListView::focus
 {
 	border: 2px solid #f3ce69;
 }
 
-QTableView#tblTrackView::item, QTableView#routeList::item,TrackViewEditor  QTableView#optionsTable::item, MidiAssignDialog QTableView::item
+QTableView#tblTrackView::item, QTableView#routeList::item,TrackViewEditor  QTableView#optionsTable::item, MidiAssignDialog QTableView::item, QTableView#TrackListView::item
 {
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
 
-QTableView#tblTrackView::item:selected, QTableView#routeList::item:selected, TrackViewEditor QTableView#optionsTable::item:selected, MidiAssignDialog QTableView::item:selected
+QTableView#tblTrackView::item:selected, QTableView#routeList::item:selected, TrackViewEditor QTableView#optionsTable::item:selected, MidiAssignDialog QTableView::item:selected, QTableView#TrackListView::item:selected
 {
 	background-color: #3d3e44;
 	border: none;
 }
 
-QTableView#tblTrackView::item:selected:active, QTableView#routeList::item:selected:active, TrackViewEditor QTableView#optionsTable::item:selected:active, MidiAssignDialog QTableView::item:selected:active
+QTableView#tblTrackView::item:selected:active, QTableView#routeList::item:selected:active, TrackViewEditor QTableView#optionsTable::item:selected:active, MidiAssignDialog QTableView::item:selected:active, QTableView#TrackListView::item:selected:active
 {
 	border: none;
 }
 
-QTableView#tblTrackView::item:selected:!active, QTableView#routeList::item:selected:!active, TrackViewEditor QTableView#optionsTable::item:selected:!active, MidiAssignDialog QTableView::item:selected:!active
+QTableView#tblTrackView::item:selected:!active, QTableView#routeList::item:selected:!active, TrackViewEditor QTableView#optionsTable::item:selected:!active, MidiAssignDialog QTableView::item:selected:!active, QTableView#TrackListView::item:selected:!active
 {
 	border: none;
 }

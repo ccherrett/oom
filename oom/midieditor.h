@@ -70,6 +70,9 @@ public:
             QWidget* parent = 0, const char* name = 0);
     ~MidiEditor();
 
+	bool hasPart(int sn);
+	void addPart(Part* p);
+	void removePart(int sn);
     int quantVal(int v) const;
     ///int rasterStep(unsigned tick) const   { return sigmap.rasterStep(tick, _raster); }
     ///unsigned rasterVal(unsigned v)  const { return sigmap.raster(v, _raster);  }
@@ -129,7 +132,7 @@ public:
 	bool isEventSelected(Event e);
 	QList<Event> getSelectedEvents();
     WavePart* curWavePart();
-    void setCurCanvasPart(Part*);
+    virtual void setCurCanvasPart(Part*);
 	virtual bool isGlobalEdit(){ return false; }
 };
 

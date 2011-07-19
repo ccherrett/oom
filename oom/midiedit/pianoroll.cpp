@@ -63,6 +63,7 @@
 #include "shortcuts.h"
 
 #include "mtrackinfo.h"
+#include "tracklistview.h"
 
 #include "traverso_shared/TConfig.h"
 
@@ -519,7 +520,10 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
+	m_trackListView = new TrackListView(this ,this);
+
 	m_tabs->addTab(midiTrackInfo, tr("   The Conductor   "));
+	m_tabs->addTab(m_trackListView, tr("   Track List   "));
 	m_tabs->addTab(info, tr("   Note Info   "));
 	//hsplitter->addWidget(midiTrackInfo);
 	hsplitter->addWidget(splitter);
@@ -725,6 +729,16 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     // This is now done via the showEvent();
 
     //      hscroll->setOffset((int)pos); // changed that to:
+}
+
+void PianoRoll::setCurCanvasPart(Part* part)
+{
+	if (canvas)
+	{
+		canvas->setCurrentPart(part);
+	}
+	updateTrackInfo();
+	song->update(SC_SELECTION);
 }
 
 //---------------------------------------------------------

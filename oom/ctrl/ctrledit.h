@@ -25,10 +25,10 @@ class Xml;
 
 class CtrlEdit : public QWidget
 {
+    Q_OBJECT
+
     CtrlCanvas* canvas;
     CtrlPanel* panel;
-
-    Q_OBJECT
 
 private slots:
     void destroy();
@@ -59,6 +59,7 @@ signals:
 public:
     CtrlEdit(QWidget*, MidiEditor* e, int xmag,
             bool expand = false, const char* name = 0);
+	virtual ~CtrlEdit(){}
     void readStatus(Xml&);
     void writeStatus(int, Xml&);
     bool setType(QString);
