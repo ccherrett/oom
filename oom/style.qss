@@ -202,14 +202,14 @@ QHeaderView::section
 /*{{{*/
 QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#optionsTable, MidiAssignDialog QTableView, QTableView#TrackListView
 {
-	background-color: #383838;
+	background-color: #1e1e1e;
 	gridline-color:#424242;
 	border: 2px solid #29292a;/*set for highlighting on focus*/
 	border-radius: 0px;
 	padding: 0px;
 	color: #bbbfbb;
 	font-size: 14px;
-	alternate-background-color: #3a3a3a;
+	alternate-background-color: #1b1b1b;
 	selection-background-color: #2e2e2e;
 }
 QTableView#tblTrackView::focus, QTableView#routeList::focus, QTableView#TrackListView::focus
