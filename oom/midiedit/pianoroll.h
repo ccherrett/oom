@@ -54,6 +54,7 @@ class Piano;
 class Patch;
 class QDockWidget;
 class QTabWidget;
+class TrackListView;
 
 //---------------------------------------------------------
 //   PianoRoll
@@ -61,6 +62,8 @@ class QTabWidget;
 
 class PianoRoll : public MidiEditor
 {
+    Q_OBJECT
+
     Event selEvent;
     MidiPart* selPart;
     int selTick;
@@ -162,8 +165,8 @@ class PianoRoll : public MidiEditor
     QScrollArea* infoScroll;
 	QDockWidget* m_prDock;
 	QTabWidget* m_tabs;
+	TrackListView* m_trackListView;
 
-    Q_OBJECT
     void initShortcuts();
     void setEventColorMode(int);
     QWidget* genToolbar(QWidget* parent);
@@ -239,6 +242,7 @@ public:
 	bool isCurrentPatch(int, int, int);
 	bool isGlobalEdit();
 
+    virtual void setCurCanvasPart(Part*);
 	virtual void updateCanvas();
     virtual void readStatus(Xml&);
     virtual void writeStatus(int, Xml&) const;

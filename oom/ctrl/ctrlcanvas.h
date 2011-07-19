@@ -114,6 +114,8 @@ public:
 
 class CtrlCanvas : public View
 {
+    Q_OBJECT
+
     MidiEditor* editor;
     MidiTrack* curTrack;
     MidiPart* curPart;
@@ -151,7 +153,6 @@ class CtrlCanvas : public View
     void pdrawItems(QPainter&, const QRect&, const MidiPart*, bool, bool);
     void partControllers(const MidiPart*, int, int*, int*, MidiController**, MidiCtrlValList**);
 
-    Q_OBJECT
 
 protected:
     enum DragMode

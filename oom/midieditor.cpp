@@ -25,8 +25,8 @@
 //   MidiEditor
 //---------------------------------------------------------
 
-MidiEditor::MidiEditor(int q, int r, PartList* pl,
-		QWidget* parent, const char* name) : TopWin(parent, name)
+MidiEditor::MidiEditor(int q, int r, PartList* pl, QWidget* parent, const char* name)
+: TopWin(parent, name)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	_pl = pl;
@@ -75,6 +75,20 @@ void MidiEditor::genPartlist()
 				break;
 		}
 	}
+}
+
+bool MidiEditor::hasPart(int sn)
+{
+	bool rv = false;
+	for (std::list<int>::iterator i = _parts.begin(); i != _parts.end(); ++i)
+	{
+		if(sn == *i)
+		{
+			rv = true;
+			break;
+		}
+	}
+	return rv;
 }
 
 //---------------------------------------------------------
@@ -167,6 +181,49 @@ void MidiEditor::writeStatus(int level, Xml& xml) const
 	xml.intTag(level, "quant", _quant);
 	xml.intTag(level, "raster", _raster);
 	xml.tag(level, "/midieditor");
+}
+
+void MidiEditor::addParts(PartList* pl)
+{
+	if(pl)
+	{
+		for(iPart i = pl->begin(); i != pl->end(); ++i)
+		{
+			if(!hasPart(i->second->sn()))
+				_parts.push_back(i->second->sn());
+		}
+		songChanged(SC_PART_INSERTED);
+		//setCurCanvasPart(p);
+	}
+}
+
+void MidiEditor::addPart(Part* p)
+{
+	if(p)
+	{
+		_parts.push_back(p->sn());
+		songChanged(SC_PART_INSERTED);
+		//setCurCanvasPart(p);
+	}
+}
+
+void MidiEditor::removeParts(PartList* pl)
+{
+	if(pl)
+	{
+		for(iPart i = pl->begin(); i != pl->end(); ++i)
+		{
+			if(hasPart(i->second->sn()))
+				_parts.remove(i->second->sn());
+		}
+		songChanged(SC_PART_REMOVED);
+	}
+}
+
+void MidiEditor::removePart(int sn)
+{
+	_parts.remove(sn);
+	songChanged(SC_PART_REMOVED);
 }
 
 //---------------------------------------------------------
@@ -267,12 +324,12 @@ Part* MidiEditor::curCanvasPart()
 		return 0;
 }
 
-QList<Event> MidiEditor::getSelectedEvents()
+QList<Event> MidiEditor::getSelectedEvents()/*{{{*/
 {
 	QList<Event> rv;
 	if(canvas)
 	{
-		CItemList list = canvas->getSelectedItemsForCurrentPart();/*{{{*/
+		CItemList list = canvas->getSelectedItemsForCurrentPart();
 	
 		for (iCItem k = list.begin(); k != list.end(); ++k)
 		{
@@ -282,10 +339,10 @@ QList<Event> MidiEditor::getSelectedEvents()
 				continue;
 			
 			rv.append(event);
-		}/*}}}*/
+		}
 	}
 	return rv;
-}
+}/*}}}*/
 
 bool MidiEditor::isEventSelected(Event e)
 {
