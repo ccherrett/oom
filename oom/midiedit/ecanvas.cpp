@@ -23,17 +23,21 @@
 #include "xml.h"
 #include "midieditor.h"
 #include "ecanvas.h"
+#include "app.h"
+#include "arranger.h"
 #include "song.h"
 #include "event.h"
 #include "shortcuts.h"
 #include "audio.h"
+#include "gconfig.h"
+#include "globals.h"
 
 //---------------------------------------------------------
 //   EventCanvas
 //---------------------------------------------------------
 
 EventCanvas::EventCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy, const char* name)
-		: Canvas(parent, sx, sy, name)
+: Canvas(parent, sx, sy, name)
 {
 	editor = pr;
 	_steprec = false;
@@ -456,12 +460,20 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 		}
 		else
 		{
-			_canvasPopupMenu = genCanvasPopup();
+			_canvasPopupMenu = genCanvasPopup(true);
 			if (_canvasPopupMenu)
 			{
 				QAction *act = _canvasPopupMenu->exec(QCursor::pos(), 0);
 				if (act)
-					canvasPopup(act->data().toInt());
+				{
+					int actnum = act->data().toInt();
+					canvasPopup(actnum);
+					if(actnum >= 20) //Nome of the tools have a higher number than 9
+					{
+						editor->updateCanvas();
+						oom->arranger->updateCanvas();
+					}	
+				}
 				delete _canvasPopupMenu;
 			}
 		}
@@ -546,6 +558,74 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 		}
 	}
 	mousePress(event);
+}/*}}}*/
+
+QMenu* EventCanvas::genItemPopup(CItem* item)/*{{{*/
+{
+	QMenu* notePopup = new QMenu(this);
+	QMenu* colorPopup = notePopup->addMenu(tr("Part Color"));
+
+	QMenu* colorSub; 
+	for (int i = 0; i < NUM_PARTCOLORS; ++i)
+	{
+		QString colorname(config.partColorNames[i]);
+		if(colorname.contains("menu:", Qt::CaseSensitive))
+		{
+			colorSub = colorPopup->addMenu(colorname.replace("menu:", ""));
+		}
+		else
+		{
+			if(item->part()->colorIndex() == i)
+			{
+				colorname = QString(config.partColorNames[i]);
+				colorPopup->setIcon(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+				colorPopup->setTitle(colorSub->title()+": "+colorname);
+
+				colorname = QString("* "+config.partColorNames[i]);
+				QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
+				act_color->setData(20 + i);
+			}
+			else
+			{
+				colorname = QString("     "+config.partColorNames[i]);
+				QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
+				act_color->setData(20 + i);
+			}
+		}	
+	}
+
+	notePopup->addSeparator();
+	for (unsigned i = 0; i < 9; ++i)
+	{
+		if ((_canvasTools & (1 << i)) == 0)
+			continue;
+		QAction* act = notePopup->addAction(QIcon(**toolList[i].icon), tr(toolList[i].tip));
+		act->setData(1 << i); 
+	}
+	
+	return notePopup;
+}/*}}}*/
+
+
+void EventCanvas::itemPopup(CItem* item, int n, const QPoint&)/*{{{*/
+{
+	switch (n)
+	{
+		case 20 ... NUM_PARTCOLORS + 20:
+		{
+			int curColorIndex = n - 20;
+			if (item)
+				item->part()->setColorIndex(curColorIndex);
+
+			editor->updateCanvas();
+			oom->arranger->updateCanvas();
+			redraw();
+			break;
+		}
+		default:
+			canvasPopup(n);
+			break;
+	}
 }/*}}}*/
 
 //---------------------------------------------------------

@@ -239,6 +239,7 @@ public:
 	bool isCurrentPatch(int, int, int);
 	bool isGlobalEdit();
 
+	virtual void updateCanvas();
     virtual void readStatus(Xml&);
     virtual void writeStatus(int, Xml&) const;
     static void readConfiguration(Xml&);

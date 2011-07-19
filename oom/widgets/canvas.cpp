@@ -1710,11 +1710,55 @@ int Canvas::selectionSize()
 //   genCanvasPopup
 //---------------------------------------------------------
 
-QMenu* Canvas::genCanvasPopup()
+QMenu* Canvas::genCanvasPopup(bool colors)
 {
 	if (_canvasTools == 0)
 		return 0;
 	QMenu* canvasPopup = new QMenu(this);
+	if(colors)
+	{
+		QMenu* colorPopup = canvasPopup->addMenu(tr("Part Color"));/*{{{*/
+	
+		QMenu* colorSub; 
+		for (int i = 0; i < NUM_PARTCOLORS; ++i)
+		{
+			QString colorname(config.partColorNames[i]);
+			if(colorname.contains("menu:", Qt::CaseSensitive))
+			{
+				colorSub = colorPopup->addMenu(colorname.replace("menu:", ""));
+			}
+			else
+			{
+				if(_curPart)
+				{
+					if(_curPart->colorIndex() == i)
+					{
+						colorname = QString(config.partColorNames[i]);
+						colorPopup->setIcon(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+						colorPopup->setTitle(colorSub->title()+": "+colorname);
+	
+						colorname = QString("* "+config.partColorNames[i]);
+						QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
+						act_color->setData(20 + i);
+					}
+					else
+					{
+						colorname = QString("     "+config.partColorNames[i]);
+						QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
+						act_color->setData(20 + i);
+					}
+				}
+				else
+				{
+					colorname = QString("     "+config.partColorNames[i]);
+					QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
+					act_color->setData(20 + i);
+				}
+			}	
+		}
+	
+		canvasPopup->addSeparator();/*}}}*/
+	}
 	QAction* act0 = 0;
 
 	for (unsigned i = 0; i < 9; ++i)
@@ -1736,8 +1780,24 @@ QMenu* Canvas::genCanvasPopup()
 
 void Canvas::canvasPopup(int n)
 {
-	setTool(n);
-	emit toolChanged(n);
+	switch(n)
+	{
+		case 20 ... NUM_PARTCOLORS + 20:
+		{
+			int curColorIndex = n - 20;
+			if (_curPart)
+				_curPart->setColorIndex(curColorIndex);
+
+			redraw();
+			break;
+		}
+		default:
+		{
+			setTool(n);
+			emit toolChanged(n);
+			break;
+		}
+	}
 }
 
 void Canvas::setCurrentPart(Part* part)

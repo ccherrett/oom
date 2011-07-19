@@ -131,6 +131,7 @@ public:
     WavePart* curWavePart();
     void setCurCanvasPart(Part*);
 	virtual bool isGlobalEdit(){ return false; }
+	virtual void updateCanvas() {}
 };
 
 #endif
