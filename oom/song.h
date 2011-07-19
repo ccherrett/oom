@@ -54,6 +54,7 @@ class AudioDevice;
 #define SC_PART_INSERTED      8
 #define SC_PART_REMOVED       0x10
 #define SC_PART_MODIFIED      0x20
+#define SC_PART_COLOR_MODIFIED      0x30
 #define SC_EVENT_INSERTED     0x40
 #define SC_EVENT_REMOVED      0x80
 #define SC_EVENT_MODIFIED     0x100

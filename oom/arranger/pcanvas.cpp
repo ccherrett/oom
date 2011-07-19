@@ -347,6 +347,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 	setAcceptDrops(true);
 	_raster = r;
 	m_PartZIndex = true;
+	build_icons = true;
 
 	setFocusPolicy(Qt::StrongFocus);
 	// Defaults:
@@ -954,17 +955,17 @@ QMenu* PartCanvas::genItemPopup(CItem* item)/*{{{*/
 			if(npart->part()->colorIndex() == i)
 			{
 				colorname = QString(config.partColorNames[i]);
-				colorPopup->setIcon(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+				colorPopup->setIcon(partColorIcons.at(i));
 				colorPopup->setTitle(colorSub->title()+": "+colorname);
 
 				colorname = QString("* "+config.partColorNames[i]);
-				QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
+				QAction *act_color = colorSub->addAction(partColorIcons.at(i), colorname);
 				act_color->setData(20 + i);
 			}
 			else
 			{
 				colorname = QString("     "+config.partColorNames[i]);
-				QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
+				QAction *act_color = colorSub->addAction(partColorIcons.at(i), colorname);
 				act_color->setData(20 + i);
 			}
 		}	
@@ -1231,6 +1232,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 			if (single)
 				item->part()->setColorIndex(curColorIndex);
 
+			song->update(SC_PART_COLOR_MODIFIED);
 			redraw();
 			break;
 		}
@@ -3668,6 +3670,17 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 			p.setPen(baseColor);
 		}
 		yy += track->height();
+	}
+	
+	//If this is the first run build the icons list
+	if(build_icons)
+	{
+		partColorIcons.clear();
+		for (int i = 0; i < NUM_PARTCOLORS; ++i)
+		{
+			partColorIcons.append(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80));
+		}
+		build_icons = false;
 	}
 }
 

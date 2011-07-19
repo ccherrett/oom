@@ -16,11 +16,13 @@
 #include "route.h"
 
 #include <unistd.h>
+#include <QList>
 
 class QString;
 class QAction;
 class QActionGroup;
 class QStringList;
+class QIcon;
 
 extern const float denormalBias;
 
@@ -195,6 +197,7 @@ extern uid_t euid, ruid;
 extern void doSetuid();
 extern void undoSetuid();
 extern bool checkAudioDevice();
+extern QList<QIcon> partColorIcons;
 #ifdef LV2_SUPPORT
 struct LV2World;
 extern LV2World* lv2world;

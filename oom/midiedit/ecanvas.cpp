@@ -578,17 +578,17 @@ QMenu* EventCanvas::genItemPopup(CItem* item)/*{{{*/
 			if(item->part()->colorIndex() == i)
 			{
 				colorname = QString(config.partColorNames[i]);
-				colorPopup->setIcon(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+				colorPopup->setIcon(partColorIcons.at(i));
 				colorPopup->setTitle(colorSub->title()+": "+colorname);
 
 				colorname = QString("* "+config.partColorNames[i]);
-				QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
+				QAction *act_color = colorSub->addAction(partColorIcons.at(i), colorname);
 				act_color->setData(20 + i);
 			}
 			else
 			{
 				colorname = QString("     "+config.partColorNames[i]);
-				QAction *act_color = colorSub->addAction(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
+				QAction *act_color = colorSub->addAction(partColorIcons.at(i), colorname);
 				act_color->setData(20 + i);
 			}
 		}	
@@ -619,6 +619,7 @@ void EventCanvas::itemPopup(CItem* item, int n, const QPoint&)/*{{{*/
 
 			editor->updateCanvas();
 			oom->arranger->updateCanvas();
+			song->update(SC_PART_COLOR_MODIFIED);
 			redraw();
 			break;
 		}
