@@ -212,6 +212,7 @@ extern QPixmap* mastertrack_listIcon;
 extern QPixmap* midi_transformIcon;
 extern QPixmap* midi_transposeIcon;
 extern QPixmap* selectIcon;
+extern QPixmap* selectMultipleIcon;
 extern QPixmap* select_allIcon;
 extern QPixmap* select_all_parts_on_trackIcon;
 extern QPixmap* select_deselect_allIcon;

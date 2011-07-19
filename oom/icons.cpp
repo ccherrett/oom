@@ -438,6 +438,7 @@ QPixmap* mastertrack_listIcon;
 QPixmap* midi_transformIcon;
 QPixmap* midi_transposeIcon;
 QPixmap* selectIcon;
+QPixmap* selectMultiIcon;
 QPixmap* select_allIcon;
 QPixmap* select_all_parts_on_trackIcon;
 QPixmap* select_deselect_allIcon;
@@ -713,6 +714,7 @@ void initIcons()
       midi_transformIcon            = new MPIXMAP(midi_transform_xpm, NULL);
       midi_transposeIcon            = new MPIXMAP(midi_transpose_xpm, NULL);
       selectIcon                    = new MPIXMAP(select_xpm, NULL);
+      selectMultiIcon               = new MPIXMAP(":/images/icons/select_multi.png", NULL);
       select_allIcon                = new MPIXMAP(select_all_xpm, NULL);
       select_all_parts_on_trackIcon = new MPIXMAP(select_all_parts_on_track_xpm, NULL);
       select_deselect_allIcon       = new MPIXMAP(":/images/icons/deselectall.png", NULL);

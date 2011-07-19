@@ -243,6 +243,7 @@ public:
 	bool isGlobalEdit();
 
     virtual void setCurCanvasPart(Part*);
+	virtual void updateCanvas();
     virtual void readStatus(Xml&);
     virtual void writeStatus(int, Xml&) const;
     static void readConfiguration(Xml&);

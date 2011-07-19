@@ -29,8 +29,8 @@ GlobalConfigValues config = {
 		QColor(0xff, 0xff, 0xff)
 	},
 	{
-		QColor(0,0,0),       // OOM Colors //{{{
-		QColor(175,235,255), // OOM Part Color
+		QColor(0,0,0),       // OOM Menu Part Color //{{{
+		QColor(175,235,255), // OOM
 		QColor(255,198,250), // Wendy Cherrett
 		QColor(0,0,0),       // Frosting Menu
 		QColor(231,206,213), // Cranberry Frosting
@@ -127,8 +127,8 @@ GlobalConfigValues config = {
 		//}}}
 	},
 	{
-		QColor(0,0,0),     // OOM Colors //{{{
-		QColor(1,53,70),   // OOM Wave Color
+		QColor(0,0,0),     // OOM Menu Wave Colors //{{{
+		QColor(1,53,70),   // OOM
 		QColor(86,87,86),  // Wendy Cherrett 
 		QColor(0,0,0),     // Frosting Menu
 		QColor(87,48,59),  // Cranberry Frosting 
@@ -221,12 +221,12 @@ GlobalConfigValues config = {
 		QColor(59,53,54),  // Rosy Cheeks
 		QColor(49,49,49),  // Snowman's Smile
 		QColor(0,0,0),     // Winter Tires
-		QColor(64,46,64)   // Short Days
+		QColor(64,64,64)   // Short Days
 		//}}}
 	},
 	{
-		QColor(0,0,0),    // OOM Colors //{{{
-		QColor(84,102,108),  // OOM Part Color Automation
+		QColor(0,0,0),    	 // OOM Menu Colors Part Color Automation//{{{
+		QColor(84,102,108),  // OOM
 		QColor(109,91,108),  // Wendy Cherrett
 		QColor(0,0,0),       // Frosting Menu
 		QColor(100,94,95),   // Cranberry Frosting
@@ -274,57 +274,57 @@ GlobalConfigValues config = {
 		QColor(111,111,111), // Designer: Gentlemen
 		QColor(109,91,107),  // Designer: Wendy's Dress
 		QColor(0,0,0),       // Glow Sticks Menu
-		QColor(51,255,248),  // Glow Sticks:  Electric Teal
-		QColor(255,51,214),  // Glow Sticks:  Paint Spill Pink
-		QColor(51,255,75),   // Glow Sticks:  Go
-		QColor(186,51,255),  // Glow Sticks:  Purple City
-		QColor(255,167,51),  // Glow Sticks:  Orange Sherbet
-		QColor(51,167,255),  // Glow Sticks:  Blue Blast
-		QColor(248,255,51),  // Glow Sticks:  Bumble Bee
+		QColor(68,110,108),  // Glow Sticks:  Electric Teal
+		QColor(110,68,101),  // Glow Sticks:  Paint Spill Pink
+		QColor(68,110,73),   // Glow Sticks:  Go
+		QColor(96,68,110),   // Glow Sticks:  Purple City
+		QColor(110,92,68),   // Glow Sticks:  Orange Sherbet
+		QColor(68,92,110),   // Glow Sticks:  Blue Blast
+		QColor(108,110,68),  // Glow Sticks:  Bumble Bee
 		QColor(0,0,0),       // Spring Menu
-		QColor(191,255,251), // Spring: Salt Water Splash
-		QColor(255,191,232), // Spring: Rosewater Splash
-		QColor(196,255,191), // Spring: Mint Splash
-		QColor(229,191,255), // Spring: Lilac Splash
-		QColor(255,224,191), // Spring: Orange Splash
-		QColor(191,211,255), // Spring: Freshwater Splash
-		QColor(255,253,191), // Spring: Lemon Splash
+		QColor(101,159,155), // Spring: Salt Water Splash
+		QColor(159,101,138), // Spring: Rosewater Splash
+		QColor(105,159,101), // Spring: Mint Splash
+		QColor(135,101,159), // Spring: Lilac Splash
+		QColor(159,132,101), // Spring: Orange Splash
+		QColor(101,119,159), // Spring: Freshwater Splash
+		QColor(159,157,101), // Spring: Lemon Splash
 		QColor(0,0,0),       // menu:Summer
-		QColor(255,251,131), // Sun Umbrella
-		QColor(143,184,255), // Ice Water
-		QColor(49,253,242),  // The Pool
-		QColor(49,253,242),  // Night Pool
-		QColor(253,173,255), // Picnic
-		QColor(255,184,92),  // Track Pants
-		QColor(159,255,152), // Overpriced Ice Cream 
-		QColor(159,255,152), // His Towel
-		QColor(255,179,253), // Wendy's Towel
+		QColor(136,134,86),  // Sun Umbrella
+		QColor(86,109,143),  // Ice Water
+		QColor(67,107,105),  // The Pool
+		QColor(67,107,105),  // Night Pool
+		QColor(151,95,153),  // Picnic
+		QColor(123,103,77),  // Track Pants
+		QColor(95,147,91),   // Overpriced Ice Cream 
+		QColor(94,143,91),   // His Towel
+		QColor(155,97,153),  // Wendy's Towel
 		QColor(0,0,0),       // menu:Autumn
-		QColor(251,206,0),   // October
-		QColor(253,105,0),   // 70s Hoodie
-		QColor(253,207,0),   // Leaf Pile
-		QColor(253,197,95),  // Wheat Harvest
-		QColor(228,199,132), // Canadian Maple
-		QColor(255,174,0),   // Changing Tree
-		QColor(249,175,130), // Peach Pie
-		QColor(246,239,220), // Birch and Bark
-		QColor(229,200,133), // Last Grass
-		QColor(219,189,135), // Pumpkin Spice
+		QColor(110,97,36),   // October
+		QColor(112,68,36),   // 70s Hoodie
+		QColor(110,97,36),   // Leaf Pile
+		QColor(134,113,58),  // Wheat Harvest
+		QColor(137,118,71),  // Canadian Maple
+		QColor(112,88,36),   // Changing Tree
+		QColor(160,98,60),   // Peach Pie
+		QColor(170,151,102), // Birch and Bark
+		QColor(139,119,71),  // Last Grass
+		QColor(91,85,75),    // Pumpkin Spice
 		QColor(0,0,0),       // menu:Winter
-		QColor(255,251,250), // Sled
-		QColor(168,209,255), // Frost
-		QColor(255,251,250), // Evergreen
-		QColor(254,250,249), // Big Boots
-		QColor(235,244,255), // Icicle
-		QColor(255,214,221), // Rosy Cheeks
-		QColor(238,232,228), // Snowman's Smile
-		QColor(232,226,225), // Winter Tires
-		QColor(171,171,171)  // Short Days
+		QColor(168,135,126), // Sled
+		QColor(94,121,152),  // Frost
+		QColor(168,135,126), // Evergreen
+		QColor(168,135,126), // Big Boots
+		QColor(116,141,166), // Icicle
+		QColor(164,110,119), // Rosy Cheeks
+		QColor(142,135,130), // Snowman's Smile
+		QColor(136,132,130), // Winter Tires
+		QColor(100,100,100)  // Short Days
 		//}}}
 	},
 	{
-		QColor(0,0,0),    // OOM Colors //{{{
-		QColor(10,25,30), // OOM Wave Color Automation
+		QColor(0,0,0),    // OOM Menu Automation Wave Colors//{{{
+		QColor(10,25,30), // OOM
 		QColor(51,51,51), // Wendy Cherrett
 		QColor(0,0,0),    // Frosting Menu
 		QColor(44,34,37), // Cranberry Frosting 
@@ -380,49 +380,49 @@ GlobalConfigValues config = {
 		QColor(0,0,0),    // Glow Sticks: Blue Blast
 		QColor(0,0,0),    // Glow Sticks: Bumble Bee
 		QColor(0,0,0),    // Spring Menu
-		QColor(64,64,64), // Spring: Salt Water Splash
-		QColor(64,64,64), // Spring: Rosewater Splash
-		QColor(64,64,64), // Spring: Mint Splash
-		QColor(64,64,64), // Spring: Lilac Splash
-		QColor(64,64,64), // Spring: Orange Splash
-		QColor(64,64,64), // Spring: Freshwater Splash
-		QColor(64,64,64), // Spring: Lemon Splash
+		QColor(37,37,37), // Spring: Salt Water Splash
+		QColor(37,37,37), // Spring: Rosewater Splash
+		QColor(37,37,37), // Spring: Mint Splash
+		QColor(37,37,37), // Spring: Lilac Splash
+		QColor(37,37,37), // Spring: Orange Splash
+		QColor(37,37,37), // Spring: Freshwater Splash
+		QColor(37,37,37), // Spring: Lemon Splash
 		QColor(0,0,0),    // menu:Summer
-		QColor(0,19,83),  // Sun Umbrella
-		QColor(0,19,83),  // Ice Water
-		QColor(0,127,119),// The Pool
+		QColor(17,20,29), // Sun Umbrella
+		QColor(17,20,29), // Ice Water
+		QColor(27,45,44), // The Pool
 		QColor(0,0,0),    // Night Pool
-		QColor(63,0,106), // Picnic
-		QColor(0,19,83),  // Track Pants
-		QColor(63,0,106), // Overpriced Ice Cream 
-		QColor(0,19,83),  // His Towel
-		QColor(0,19,83),  // Wendy's Towel
+		QColor(31,23,37), // Picnic
+		QColor(17,20,29), // Track Pants
+		QColor(31,23,37), // Overpriced Ice Cream 
+		QColor(17,20,29), // His Towel
+		QColor(17,20,29), // Wendy's Towel
 		QColor(0,0,0),    // menu:Autumn
-		QColor(154,20,0), // October
-		QColor(42,18,0),  // 70s Hoodie
-		QColor(97,51,7),  // Leaf Pile
-		QColor(45,28,0),  // Wheat Harvest
-		QColor(103,38,3), // Canadian Maple
-		QColor(24,61,22), // Changing Tree
-		QColor(144,46,0), // Peach Pie
-		QColor(35,28,23), // Birch and Bark
-		QColor(24,61,22), // Last Grass
-		QColor(130,65,27),// Pumpkin Spice
+		QColor(67,28,21), // October
+		QColor(17,10,5),  // 70s Hoodie
+		QColor(42,29,16), // Leaf Pile
+		QColor(19,14,5),  // Wheat Harvest
+		QColor(44,26,16), // Canadian Maple
+		QColor(18,29,17), // Changing Tree
+		QColor(62,34,20), // Peach Pie
+		QColor(18,16,14), // Birch and Bark
+		QColor(18,29,17), // Last Grass
+		QColor(60,43,32), // Pumpkin Spice
 		QColor(0,0,0),    // menu:Winter
-		QColor(119,0,0),  // Sled
-		QColor(15,15,15), // Frost
-		QColor(4,43,0),   // Evergreen
-		QColor(46,38,30), // Big Boots
-		QColor(0,38,82),  // Icicle
-		QColor(59,53,54), // Rosy Cheeks
-		QColor(49,49,49), // Snowman's Smile
+		QColor(42,26,26), // Sled
+		QColor(7,7,7),    // Frost
+		QColor(9,14,8),   // Evergreen
+		QColor(22,21,20), // Big Boots
+		QColor(17,23,29), // Icicle
+		QColor(31,31,31), // Rosy Cheeks
+		QColor(27,27,27), // Snowman's Smile
 		QColor(0,0,0),    // Winter Tires
-		QColor(64,46,64)  // Short Days
+		QColor(37,37,37)  // Short Days
 		//}}}
 	},
 	{
-		QString("menu:OOM Colors"),
-		QString("OOM"), // Default part color names
+		QString("menu:OOM Colors"), //{{{ Part Color Names
+		QString("OOM"),
 		QString("Wendy Cherrett"),
 		QString("menu:Frostings"),
 		QString("Cranberry Frosting"),
@@ -515,7 +515,7 @@ GlobalConfigValues config = {
 		QString("Rosy Cheeks"),
 		QString("Snowman's Smile"),
 		QString("Winter Tires"),
-		QString("Short Days")
+		QString("Short Days") //}}}
 	}
 ,
 	QColor(16, 24, 25), // transportHandleColor;

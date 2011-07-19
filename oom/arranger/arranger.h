@@ -153,8 +153,14 @@ public:
 
     PartCanvas* getCanvas()
     {
-	return canvas;
+		return canvas;
     }
+
+	void updateCanvas()
+	{
+		if(canvas)
+			canvas->update();
+	}
 
     TList* getTrackList() const
     {

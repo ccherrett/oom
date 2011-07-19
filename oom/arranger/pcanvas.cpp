@@ -933,7 +933,7 @@ void PartCanvas::glueItem(CItem* item)
 //   genItemPopup
 //---------------------------------------------------------
 
-QMenu* PartCanvas::genItemPopup(CItem* item)
+QMenu* PartCanvas::genItemPopup(CItem* item)/*{{{*/
 {
 	NPart* npart = (NPart*) item;
 	Track::TrackType trackType = npart->track()->type();
@@ -954,7 +954,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 			if(npart->part()->colorIndex() == i)
 			{
 				colorname = QString(config.partColorNames[i]);
-				colorPopup->setIcon(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+				colorPopup->setIcon(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
 				colorPopup->setTitle(colorSub->title()+": "+colorname);
 
 				colorname = QString("* "+config.partColorNames[i]);
@@ -1061,13 +1061,13 @@ QMenu* PartCanvas::genItemPopup(CItem* item)
 	act_declone->setEnabled(rc > 1);
 
 	return partPopup;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   itemPopup
 //---------------------------------------------------------
 
-void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
+void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 {
 	PartList* pl = new PartList;
 	NPart* npart = (NPart*) (item);
@@ -1262,7 +1262,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)
 			break;
 	}
 	delete pl;
-}
+}/*}}}*/
 
 CItemList PartCanvas::getSelectedItems()
 {

@@ -57,7 +57,8 @@ PCScale::PCScale(int* r, QWidget* parent, PianoRoll* editor, int xs, bool _mode)
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 
 	setFixedHeight(14);
-	setBg(QColor(110, 141, 152));
+	//setBg(QColor(110, 141, 152));
+	setBg(QColor(30,30,30));
 	_pc.state = doNothing;
 	_pc.valid = false;
 }

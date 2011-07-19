@@ -64,6 +64,8 @@ protected:
     virtual QPoint raster(const QPoint&) const;
     virtual void viewMousePressEvent(QMouseEvent* event);
 	virtual void populateMultiSelect(CItem*);
+    virtual QMenu* genItemPopup(CItem*);
+    virtual void itemPopup(CItem*, int, const QPoint&);
 
 public slots:
 

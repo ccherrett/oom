@@ -279,6 +279,16 @@ Track* Song::addTrack(int t)/*{{{*/
 		case Track::MIDI:
 			track = new MidiTrack();
 			track->setType(Track::MIDI);
+			
+			if(config.partColorNames[lastTrackPartColorIndex].contains("menu:", Qt::CaseSensitive))
+				lastTrackPartColorIndex ++;
+			
+			track->setDefaultPartColor(lastTrackPartColorIndex);
+			lastTrackPartColorIndex ++;
+			
+			if(lastTrackPartColorIndex == NUM_PARTCOLORS)
+				lastTrackPartColorIndex = 1;
+
 			break;
 		case Track::DRUM:
 			track = new MidiTrack();
@@ -287,6 +297,16 @@ Track* Song::addTrack(int t)/*{{{*/
 			break;
 		case Track::WAVE:
 			track = new WaveTrack();
+			
+			if(config.partColorNames[lastTrackPartColorIndex].contains("menu:", Qt::CaseSensitive))
+				lastTrackPartColorIndex ++;
+			
+			track->setDefaultPartColor(lastTrackPartColorIndex);
+			lastTrackPartColorIndex ++;
+			
+			if(lastTrackPartColorIndex == NUM_PARTCOLORS)
+				lastTrackPartColorIndex = 1;
+			
 			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
 			break;
 		case Track::AUDIO_OUTPUT:

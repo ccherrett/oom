@@ -1011,6 +1011,17 @@ void PianoRoll::noteinfoChanged(NoteInfo::ValType type, int val)
 	}
 }
 
+void PianoRoll::updateCanvas()
+{
+	for(std::list<CtrlEdit*>::iterator i = ctrlEditList.begin(); i != ctrlEditList.end(); ++i)
+	{
+		CtrlEdit* edit = (CtrlEdit*)*i;
+		if(edit)
+			edit->updateCanvas();
+	}
+	canvas->update();
+}
+
 //---------------------------------------------------------
 //   addCtrl
 //---------------------------------------------------------

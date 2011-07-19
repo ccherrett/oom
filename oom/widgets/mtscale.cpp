@@ -48,7 +48,8 @@ MTScale::MTScale(int* r, QWidget* parent, int xs, bool _mode)
 
 	setFixedHeight(28);
 	//setBg(QColor(53, 51, 56));
-	setBg(QColor(150, 176, 187));
+	//setBg(QColor(150, 176, 187));
+	setBg(QColor(60,60,60));
 }
 
 //---------------------------------------------------------
@@ -214,7 +215,7 @@ void MTScale::leaveEvent(QEvent*)
 
 void MTScale::pdraw(QPainter& p, const QRect& r)
 {
-	QColor colTimeLine = QColor(0, 0, 0);
+	QColor colTimeLine = QColor(172,181,176);
 	int x = r.x();
 	int w = r.width();
 
@@ -231,7 +232,8 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 	int y = 12;
 	//p.setPen(QColor(255,255,255));
 	p.setPen(colTimeLine);
-	p.setFont(config.fonts[4]);
+	//p.setFont(config.fonts[4]);
+	p.setFont(QFont("fixed-width", 9, QFont::Bold));
 	p.drawLine(r.x(), y + 1, r.x() + r.width(), y + 1);
 	QRect tr(r);
 	tr.setHeight(12);
@@ -410,13 +412,14 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 				n = 32;
 			if (bar % n)
 				continue;
-			p.setFont(config.fonts[3]);
+			//p.setFont(config.fonts[3]);
 			int x = mapx(waveMode ? b : stick);
 			QString s;
 			s.setNum(bar + 1);
 			p.drawLine(x, y + 1, x, y + 1 + h);
 			//                  QRect r = QRect(x+2, y, 0, h);
 			QRect r = QRect(x + 2, y, 1000, h);
+			p.setFont(QFont("fixed-width", 9, QFont::Bold));
 			p.drawText(r, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip, s);
 		}
 		else
@@ -437,13 +440,15 @@ void MTScale::pdraw(QPainter& p, const QRect& r)
 				{
 					num = bar + 1;
 					y1 = y + 1;
-					p.setFont(config.fonts[3]);
+					//p.setFont(config.fonts[3]);
+					p.setFont(QFont("fixed-width", 9, QFont::Bold));
 				}
 				else
 				{
 					num = beat + 1;
 					y1 = y + 7;
-					p.setFont(config.fonts[1]);
+					//p.setFont(config.fonts[1]);
+					p.setFont(QFont("fixed-width", 7, QFont::Normal));
 					r.setY(y + 3);
 				}
 				s.setNum(num);
