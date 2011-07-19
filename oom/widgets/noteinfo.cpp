@@ -57,7 +57,7 @@ NoteInfo::NoteInfo(QWidget* parent)
 	int alpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
 	m_renderAlpha->setValue(alpha);
 
-	addTool(tr(" BG Brightness"), m_renderAlpha);
+	addTool(tr("BG Brightness"), m_renderAlpha);
 	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	m_layout->addItem(vSpacer);
 

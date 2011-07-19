@@ -409,6 +409,12 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
 	noteAlphaAction->setChecked(true);
 	tools2->addAction(noteAlphaAction);
+	
+	multiPartSelectionAction = new QAction(QIcon(*selectMultiIcon), tr("multiselection"), this);
+	multiPartSelectionAction->setToolTip(tr("Toggle ability to select multiple part notes"));
+	multiPartSelectionAction->setCheckable(true);
+	multiPartSelectionAction->setChecked(false);
+	tools2->addAction(multiPartSelectionAction);
 
 	QWidget* spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

@@ -250,6 +250,7 @@ QAction* recordAction;
 QAction* panicAction;
 QAction* feedbackAction;
 QAction* noteAlphaAction;
+QAction* multiPartSelectionAction;
 
 //AudioMixerApp* audioMixer;
 OOMidi* oom;

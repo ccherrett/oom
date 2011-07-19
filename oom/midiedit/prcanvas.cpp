@@ -860,8 +860,8 @@ void PianoCanvas::resizeItem(CItem* item, bool noSnap) // experimental changes t
 bool PianoCanvas::deleteItem(CItem* item)/*{{{*/
 {
 	NEvent* nevent = (NEvent*) item;
-	if (nevent->part() == _curPart)
-	{
+	//if (nevent->part() == _curPart)
+	//{
 		Event ev = nevent->event();
 		song->startUndo();
 		// Indicate do undo, and do not do port controller values and clone parts.
@@ -880,8 +880,8 @@ bool PianoCanvas::deleteItem(CItem* item)/*{{{*/
 		}/*}}}*/
 		song->endUndo(0);
 		return true;
-	}
-	return false;
+	//}
+	//return false;
 }/*}}}*/
 
 //---------------------------------------------------------
@@ -1298,7 +1298,9 @@ void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen,
 			// get a list of items that belong to the current part
 			// since (if) multiple parts have populated the _items list
 			// we need to filter on the actual current Part!
-			CItemList list = getItemlistForCurrentPart();
+			CItemList list = _items;
+			if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+				list = getItemlistForCurrentPart();
 			
 			for (iCItem k = list.begin(); k != list.end(); ++k)
 			{
@@ -2085,7 +2087,9 @@ void PianoCanvas::dragLeaveEvent(QDragLeaveEvent*)
 
 void PianoCanvas::selectLasso(bool toggle)
 {
-	CItemList curPartItems = getItemlistForCurrentPart();
+	CItemList curPartItems = _items;
+	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+		curPartItems = getItemlistForCurrentPart();
 
 	int n = 0;
 	if (virt())
