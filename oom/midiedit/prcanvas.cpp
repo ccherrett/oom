@@ -383,7 +383,6 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 			p.setPen(mainPen);
 		}
 	}
-
 	p.drawRect(r);
 }/*}}}*/
 
