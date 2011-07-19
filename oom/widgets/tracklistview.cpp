@@ -78,7 +78,8 @@ void TrackListView::songChanged(int flags)/*{{{*/
 				{
 					chkPart->setCheckState(Qt::Checked);
 				}
-				QStandardItem* partName = new QStandardItem(part->name());
+				QStandardItem* partName = new QStandardItem();
+				partName->setText("    "+part->name());
 				partsRow.append(chkPart);
 				partsRow.append(partName);
 				m_model->appendRow(partsRow);
