@@ -271,21 +271,30 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 	{
 		if (item->isMoving())
 		{
-			p.setPen(movingPen);
-			p.setBrush(colMoving);
+			//p.setPen(movingPen);
+			//p.setBrush(colMoving);
+			QColor fillColor;
+			fillColor = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
+			fillColor.setAlpha(20);
+			mainPen.setColor(fillColor);
+			p.setPen(mainPen);
+			
+			QColor color;
+			color = QColor(config.partColors[nevent->part()->colorIndex()]);
+			color.setAlpha(20);
+			p.setBrush(color);
 		}
 		else if (item->isSelected())
 		{
 			QColor fillColor;
-			fillColor = QColor(config.partColors[nevent->part()->colorIndex()]);
+			fillColor = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
 			fillColor.setAlpha(alpha);
 			mainPen.setColor(fillColor);
+			p.setPen(mainPen);
 			
 			QColor color;
-			color = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
+			color = QColor(config.partColors[nevent->part()->colorIndex()]);
 			color.setAlpha(alpha);
-			
-			p.setPen(mainPen);
 			p.setBrush(color);
 		}
 		else
@@ -306,8 +315,18 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 	{
 		if (item->isMoving())
 		{
-			p.setPen(movingPen);
-			p.setBrush(colMoving);
+			//p.setPen(movingPen);
+			//p.setBrush(colMoving);
+			QColor fillColor;
+			fillColor = QColor(config.partWaveColors[nevent->part()->colorIndex()]);
+			fillColor.setAlpha(20);
+			mainPen.setColor(fillColor);
+			p.setPen(mainPen);
+			
+			QColor color;
+			color = QColor(config.partColors[nevent->part()->colorIndex()]);
+			color.setAlpha(20);
+			p.setBrush(color);
 		}
 		else if (item->isSelected())
 		{
@@ -402,8 +421,20 @@ void PianoCanvas::drawMoving(QPainter& p, const CItem* item, const QRect& rect)/
 	mr = mr.intersected(rect);
 	if (!mr.isValid())
 		return;
-	p.setPen(Qt::black);
-	p.setBrush(Qt::NoBrush);
+	//p.setPen(Qt::black);
+	//p.setBrush(Qt::NoBrush);
+		
+	QColor fillColor;
+	fillColor = QColor(config.partWaveColors[item->part()->colorIndex()]);
+	fillColor.setAlpha(127);
+	QPen mainPen;
+	mainPen.setColor(fillColor);
+	p.setPen(mainPen);
+	
+	QColor color;
+	color = QColor(config.partColors[item->part()->colorIndex()]);
+	color.setAlpha(127);
+	p.setBrush(color);
 	p.drawRect(mr);
 }/*}}}*/
 

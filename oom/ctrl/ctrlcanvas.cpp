@@ -487,6 +487,9 @@ void CtrlCanvas::updateItems()
 			partControllers(part, _cnum, 0, 0, &mc, &mcvl);
 			unsigned len = part->lenTick();
 			bool isPart = (cPart && cPart == part);
+			if(multiPartSelectionAction && multiPartSelectionAction->isChecked())
+				isPart = true;
+
 
 			for (iEvent i = el->begin(); i != el->end(); ++i)
 			{
