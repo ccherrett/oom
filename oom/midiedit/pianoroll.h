@@ -177,6 +177,8 @@ class PianoRoll : public MidiEditor
     bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
+    void toggleMultiPartSelection(bool);
+    void toggleEpicEdit(bool);
     void setSelection(int, Event&, Part*);
     void noteinfoChanged(NoteInfo::ValType, int);
     void soloChanged(bool flag);

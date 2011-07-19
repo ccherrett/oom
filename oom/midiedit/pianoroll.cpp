@@ -411,15 +411,10 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	noteAlphaAction->setChecked(true);
 	tools2->addAction(noteAlphaAction);
 	
-	multiPartSelectionAction = new QAction(QIcon(*selectMultiIcon), tr("multiselection"), this);
-	multiPartSelectionAction->setToolTip(tr("Toggle ability to select multiple part notes"));
-	multiPartSelectionAction->setCheckable(true);
-	multiPartSelectionAction->setChecked(false);
-	tools2->addAction(multiPartSelectionAction);
 
 	QWidget* spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer->setMaximumWidth(35);
+	spacer->setMaximumWidth(15);
 	tools2->addWidget(spacer);
 
 
@@ -431,23 +426,28 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tools2->addWidget(speaker);
 	QWidget* actionSpacer = new QWidget();
 	actionSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	actionSpacer->setMaximumWidth(5);
+	actionSpacer->setMaximumWidth(15);
 	tools2->addWidget(actionSpacer);
+	multiPartSelectionAction = new QAction(QIcon(*selectMultiIcon), tr("multiselection"), this);
+	multiPartSelectionAction->setToolTip(tr("Toggle ability to select multiple part notes"));
+	multiPartSelectionAction->setCheckable(true);
+	multiPartSelectionAction->setChecked(false);
+	tools2->addAction(multiPartSelectionAction);
 	tools2->addWidget(m_globalKey);
 	tools2->addWidget(m_globalArm);
-	QWidget* spacer1 = new QWidget();
-	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer1->setMaximumWidth(10);
-	tools2->addWidget(spacer1);
+	//QWidget* spacer1 = new QWidget();
+	//spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	//spacer1->setMaximumWidth(10);
+	//tools2->addWidget(spacer1);
 	QWidget* spacer5 = new QWidget();
 	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer5->setMaximumWidth(10);
+	spacer5->setMaximumWidth(15);
 	tools2->addWidget(spacer5);
 	tools2->addActions(transportAction->actions());
 	tools2->addWidget(solo);
 	QWidget* spacer2 = new QWidget();
 	spacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer2->setMaximumWidth(10);
+	spacer2->setMaximumWidth(15);
 	tools2->addWidget(spacer2);
 	tools2->addAction(panicAction);
 	/*#ifdef LSCP_SUPPORT
@@ -635,6 +635,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(m_globalArm, SIGNAL(clicked()), canvas, SLOT(recordArmAll()));
 	connect(m_globalKey, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
 	connect(m_globalKey, SIGNAL(toggled(bool)), midiTrackInfo, SLOT(setGlobalState(bool)));
+	connect(m_globalKey, SIGNAL(toggled(bool)), this, SLOT(toggleEpicEdit(bool)));
+	connect(multiPartSelectionAction, SIGNAL(toggled(bool)), this, SLOT(toggleMultiPartSelection(bool)));
 	connect(midiTrackInfo, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
@@ -897,6 +899,18 @@ PianoRoll::~PianoRoll()
 void PianoRoll::cmd(int cmd)
 {
 	((PianoCanvas*) canvas)->cmd(cmd, _quantStrength, _quantLimit, _quantLen, _to);
+}
+
+void PianoRoll::toggleMultiPartSelection(bool toggle)
+{
+	if(toggle)
+		m_globalKey->setChecked(!toggle);
+}
+
+void PianoRoll::toggleEpicEdit(bool toggle)
+{
+	if(toggle)
+		multiPartSelectionAction->setChecked(!toggle);
 }
 
 //---------------------------------------------------------
