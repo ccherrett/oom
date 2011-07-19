@@ -60,9 +60,8 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			trackRow.append(chkTrack);
 			QStandardItem* trackName = new QStandardItem();
 			trackName->setText(track->name());
-			QFont font = trackName->font();
-			font.setBold(true);
-			trackName->setFont(font);
+			//QFont font = trackName->font();
+			trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
 			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			trackRow.append(trackName);
 			m_model->appendRow(trackRow);
@@ -81,6 +80,7 @@ void TrackListView::songChanged(int flags)/*{{{*/
 					chkPart->setCheckState(Qt::Checked);
 				}
 				QStandardItem* partName = new QStandardItem();
+				partName->setFont(QFont("fixed-width", 8, QFont::Bold));
 				partName->setText(part->name());
 				if(!partColorIcons.isEmpty() && part->colorIndex() < partColorIcons.size())
 					partName->setIcon(partColorIcons.at(part->colorIndex()));
