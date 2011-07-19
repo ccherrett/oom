@@ -203,6 +203,7 @@ QHeaderView::section
 QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#optionsTable, MidiAssignDialog QTableView, QTableView#TrackListView
 {
 	background-color: #383838;
+	gridline-color:#424242;
 	border: 2px solid #29292a;/*set for highlighting on focus*/
 	border-radius: 0px;
 	padding: 0px;
