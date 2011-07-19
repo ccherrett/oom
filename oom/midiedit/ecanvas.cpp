@@ -241,7 +241,10 @@ void EventCanvas::songChanged(int flags)/*{{{*/
 
 void EventCanvas::selectAtTick(unsigned int tick)/*{{{*/
 {
-	CItemList list = getItemlistForCurrentPart();
+	CItemList list = _items;
+	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+		list = getItemlistForCurrentPart();
+	//CItemList list = getItemlistForCurrentPart();
 
 	//Select note nearest tick, if none selected and there are any
 	if (!list.empty() && selectionSize() == 0)
@@ -368,7 +371,10 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 	//    (if any)
 	//---------------------------------------------------
 
-	CItemList list = getItemlistForCurrentPart();
+	CItemList list = _items;
+	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+		list = getItemlistForCurrentPart();
+	//CItemList list = getItemlistForCurrentPart();
 	//if(editor->isGlobalEdit())
 	//	list = _items;
 	if (virt())
@@ -1022,7 +1028,10 @@ CItem* EventCanvas::getRightMostSelected()
 	// get a list of items that belong to the current part
 	// since multiple parts have populated the _items list
 	// we need to filter on the actual current Part!
-	CItemList list = getItemlistForCurrentPart();
+	CItemList list = _items;
+	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+		list = getItemlistForCurrentPart();
+	//CItemList list = getItemlistForCurrentPart();
 
 	//Get the rightmost selected note (if any)
 	i = list.begin();
@@ -1048,7 +1057,10 @@ CItem* EventCanvas::getLeftMostSelected()
 	// get a list of items that belong to the current part
 	// since multiple parts have populated the _items list
 	// we need to filter on the actual current Part!
-	CItemList list = getItemlistForCurrentPart();
+	//CItemList list = getItemlistForCurrentPart();
+	CItemList list = _items;
+	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+		list = getItemlistForCurrentPart();
 
 	if (list.size() > 0)
 	{

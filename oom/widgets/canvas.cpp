@@ -1522,7 +1522,9 @@ CItemList Canvas::getItemlistForPart(Part* part)/*{{{*/
 
 CItemList Canvas::getSelectedItemsForCurrentPart()
 {
-	CItemList list = getItemlistForCurrentPart();
+	CItemList list = _items;
+	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+		list = getItemlistForCurrentPart();
 	CItemList selected;
 
 	iCItem i = list.begin();
@@ -1541,7 +1543,10 @@ CItemList Canvas::getSelectedItemsForCurrentPart()
 
 bool Canvas::allItemsAreSelected()
 {
-	CItemList list = getItemlistForCurrentPart();
+	CItemList list = _items;
+	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+		list = getItemlistForCurrentPart();
+	//CItemList list = getItemlistForCurrentPart();
 	CItemList selected = getSelectedItemsForCurrentPart();
 
 	return (list.size() == selected.size());
