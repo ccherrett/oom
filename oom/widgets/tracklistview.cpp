@@ -18,6 +18,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 : QFrame(parent)
 {
 	m_editor = editor;
+	m_displayRole = PartRole;
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(8, 2, 8, 2);
 	m_model = new QStandardItemModel(0, 2, this);
@@ -32,13 +33,40 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_table->horizontalHeader()->setStretchLastSection(true);
 	m_table->verticalHeader()->hide();
 	m_layout->addWidget(m_table);
+
+	m_buttonBox = new QHBoxLayout;
+	m_chkPart = new QCheckBox(tr("Parts"), this);
+	m_chkPart->setToolTip(tr("Show Parts Only"));
+	m_chkPart->setChecked(true);
+	m_chkTrack = new QCheckBox(tr("Tracks"), this);
+	m_chkTrack->setToolTip(tr("Show Tracks and Parts"));
+
+	m_buttons = new QButtonGroup(this);
+	m_buttons->setExclusive(true);
+	m_buttons->addButton(m_chkPart, PartRole);
+	m_buttons->addButton(m_chkTrack, TrackRole);
+
+	m_buttonBox->addWidget(m_chkPart);
+	m_buttonBox->addWidget(m_chkTrack);
+	QSpacerItem* hSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+	m_buttonBox->addItem(hSpacer);
+
+	m_layout->addLayout(m_buttonBox);
+
 	songChanged(-1);
 	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
+	connect(m_buttons, SIGNAL(buttonClicked(int)), this, SLOT(displayRoleChanged(int)));
 }
 
 TrackListView::~TrackListView()
 {
+}
+
+void TrackListView::displayRoleChanged(int role)
+{
+	m_displayRole = role;
+	songChanged(-1);
 }
 
 void TrackListView::songChanged(int flags)/*{{{*/
@@ -50,21 +78,24 @@ void TrackListView::songChanged(int flags)/*{{{*/
 		{
 			MidiTrack* track = (MidiTrack*)(*i);
 			PartList* pl = track->parts();
-			QList<QStandardItem*> trackRow;
-			QStandardItem* chkTrack = new QStandardItem(true);
-			chkTrack->setCheckable(true);
-			chkTrack->setData(1, TrackRole);
-			chkTrack->setData(track->name(), TrackNameRole);
-			if(m_selected.contains(track->name()))
-				chkTrack->setCheckState(Qt::Checked);
-			trackRow.append(chkTrack);
-			QStandardItem* trackName = new QStandardItem();
-			trackName->setText(track->name());
-			//QFont font = trackName->font();
-			trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
-			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-			trackRow.append(trackName);
-			m_model->appendRow(trackRow);
+			if(m_displayRole == TrackRole)
+			{
+				QList<QStandardItem*> trackRow;
+				QStandardItem* chkTrack = new QStandardItem(true);
+				chkTrack->setCheckable(true);
+				chkTrack->setData(1, TrackRole);
+				chkTrack->setData(track->name(), TrackNameRole);
+				if(m_selected.contains(track->name()))
+					chkTrack->setCheckState(Qt::Checked);
+				trackRow.append(chkTrack);
+				QStandardItem* trackName = new QStandardItem();
+				trackName->setText(track->name());
+				//QFont font = trackName->font();
+				trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
+				trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+				trackRow.append(trackName);
+				m_model->appendRow(trackRow);
+			}
 			for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
 			{
 				QList<QStandardItem*> partsRow;
@@ -81,7 +112,10 @@ void TrackListView::songChanged(int flags)/*{{{*/
 				}
 				QStandardItem* partName = new QStandardItem();
 				partName->setFont(QFont("fixed-width", 8, QFont::Bold));
-				partName->setText(part->name());
+				if(m_displayRole == TrackRole)
+					partName->setText(part->name());
+				else
+					partName->setText(track->name()+" : "+part->name());
 				if(!partColorIcons.isEmpty() && part->colorIndex() < partColorIcons.size())
 					partName->setIcon(partColorIcons.at(part->colorIndex()));
 				partsRow.append(chkPart);
