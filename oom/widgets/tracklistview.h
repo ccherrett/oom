@@ -17,6 +17,9 @@ class QStandardItemModel;
 class QItemSelectionModel;
 class QString;
 class QVBoxLayout;
+class QHBoxLayout;
+class QButtonGroup;
+class QCheckBox;
 
 class Part;
 class Track;
@@ -29,11 +32,18 @@ class TrackListView : public QFrame
 	QTableView* m_table;
 	QStandardItemModel* m_model;
 	QVBoxLayout* m_layout;
+	QHBoxLayout* m_buttonBox;
 	MidiEditor* m_editor;
 	QList<QString> m_selected;
+	QButtonGroup* m_buttons;
+	QCheckBox* m_chkTrack;
+	QCheckBox* m_chkPart;
+	int m_displayRole;
+
 
 private slots:
 	void songChanged(int);
+	void displayRoleChanged(int);
 public slots:
 	void toggleTrackPart(QStandardItem*);
 public:
