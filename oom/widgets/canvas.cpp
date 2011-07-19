@@ -1791,7 +1791,10 @@ void Canvas::canvasPopup(int n)
 		{
 			int curColorIndex = n - 20;
 			if (_curPart)
+			{
 				_curPart->setColorIndex(curColorIndex);
+				song->update(SC_PART_COLOR_MODIFIED);
+			}
 
 			redraw();
 			break;
