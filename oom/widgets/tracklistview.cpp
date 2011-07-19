@@ -25,7 +25,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_table->setObjectName("TrackListView");
 	m_table->setModel(m_model);
 	m_table->setAlternatingRowColors(true);
-	m_table->setShowGrid(true);
+	//m_table->setShowGrid(true);
 	m_table->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->setCornerButtonEnabled(false);
