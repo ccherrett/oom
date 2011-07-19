@@ -866,7 +866,7 @@ bool PianoCanvas::deleteItem(CItem* item)/*{{{*/
 		song->startUndo();
 		// Indicate do undo, and do not do port controller values and clone parts.
 		//audio->msgDeleteEvent(ev, curPart);
-		audio->msgDeleteEvent(ev, _curPart, false, false, false);
+		audio->msgDeleteEvent(ev, nevent->part(), false, false, false);
 		
 		if(editor->isGlobalEdit() && !m_multiSelect.empty())/*{{{*/
 		{
