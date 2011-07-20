@@ -25,8 +25,8 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_table = new QTableView(this);
 	m_table->setObjectName("TrackListView");
 	m_table->setModel(m_model);
-	m_table->setAlternatingRowColors(true);
-	m_table->setShowGrid(false);
+	m_table->setAlternatingRowColors(false);
+	m_table->setShowGrid(true);
 	m_table->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->setCornerButtonEnabled(false);
@@ -95,16 +95,18 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			QStandardItem* chkTrack = new QStandardItem(true);
 			chkTrack->setCheckable(true);
 			chkTrack->setData(1, TrackRole);
+			chkTrack->setBackground(QBrush(QColor(20,20,20)));
 			chkTrack->setData(track->name(), TrackNameRole);
 			if(m_selected.contains(track->name()))
 				chkTrack->setCheckState(Qt::Checked);
 			trackRow.append(chkTrack);
 			QStandardItem* trackName = new QStandardItem();
+			trackName->setForeground(QBrush(QColor(205,209,205)));
+			trackName->setBackground(QBrush(QColor(20,20,20)));
 			trackName->setFont(QFont("fixed-width", 10, QFont::Bold));
 			trackName->setText(track->name());
 			//QFont font = trackName->font();
-			trackName->setBackground(QBrush(QColor(20,20,20)));
-			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);//Qt::AlignVCenter);
+			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			trackRow.append(trackName);
 			m_model->appendRow(trackRow);
 
