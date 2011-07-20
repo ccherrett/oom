@@ -89,9 +89,9 @@ void TrackListView::songChanged(int flags)/*{{{*/
 					chkTrack->setCheckState(Qt::Checked);
 				trackRow.append(chkTrack);
 				QStandardItem* trackName = new QStandardItem();
+				trackName->setFont(QFont("fixed-width", 10, QFont::Bold));
 				trackName->setText(track->name());
 				//QFont font = trackName->font();
-				trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
 				trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 				trackRow.append(trackName);
 				m_model->appendRow(trackRow);
@@ -111,7 +111,7 @@ void TrackListView::songChanged(int flags)/*{{{*/
 					chkPart->setCheckState(Qt::Checked);
 				}
 				QStandardItem* partName = new QStandardItem();
-				partName->setFont(QFont("fixed-width", 8, QFont::Bold));
+				partName->setFont(QFont("fixed-width", 9, QFont::Bold));
 				if(m_displayRole == TrackRole)
 					partName->setText(part->name());
 				else
