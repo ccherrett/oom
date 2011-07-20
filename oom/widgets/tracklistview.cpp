@@ -237,6 +237,8 @@ void TrackListView::selectionChanged(const QModelIndex current, const QModelInde
 
 void TrackListView::movePlaybackToPart(Part* part)
 {
+	if(audio->isPlaying())
+		return;
 	if(part)/*{{{*/
 	{
 		unsigned tick = part->tick();
