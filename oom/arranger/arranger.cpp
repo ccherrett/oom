@@ -720,10 +720,11 @@ void Arranger::trackSelectionChanged()
 	}
 }
 
-void Arranger::addCanvasPart(Track* t)
+CItem* Arranger::addCanvasPart(Track* t)
 {
 	CItem* item = canvas->addPartAtCursor(t);
 	canvas->newItem(item, false);
+	return item;
 }
 
 //---------------------------------------------------------

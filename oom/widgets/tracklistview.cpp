@@ -13,6 +13,8 @@
 #include "track.h"
 #include "part.h"
 #include "midieditor.h"
+#include "citem.h"
+#include "arranger.h"
 
 TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 : QFrame(parent)
@@ -23,6 +25,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_layout->setContentsMargins(8, 2, 8, 2);
 	m_model = new QStandardItemModel(0, 2, this);
 	m_table = new QTableView(this);
+	m_table->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_table->setObjectName("TrackListView");
 	m_table->setModel(m_model);
 	m_table->setAlternatingRowColors(true);
@@ -54,6 +57,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
 	connect(m_chkWorkingView, SIGNAL(stateChanged(int)), this, SLOT(displayRoleChanged(int)));
+	connect(m_table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(contextPopupMenu(QPoint)));
 }
 
 TrackListView::~TrackListView()
@@ -138,6 +142,54 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			}
 		}
 		m_table->setColumnWidth(0, 20);
+	}
+}/*}}}*/
+
+void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
+{
+	QModelIndex index = m_table->indexAt(pos);
+	if(!index.isValid())
+		return;
+	QStandardItem* item = m_model->itemFromIndex(index);
+	if(item)
+	{
+		//Make it works even if you rightclick on the checkbox
+		QStandardItem* chkcol = m_model->item(item->row(), 0);
+		if(chkcol)
+		{
+			QString trackName = chkcol->data(TrackNameRole).toString();
+			Track* track = song->findTrack(trackName);
+			if(!track || !m_editor || chkcol->column() != 0)
+				return;
+			QMenu* p = new QMenu(this);
+			p->addAction(tr("Add Part"))->setData(1);
+			p->addAction(tr("Add Part and Select"))->setData(2);
+
+			QAction* act = p->exec(QCursor::pos());
+			if (act)
+			{
+				int selection = act->data().toInt();
+				switch(selection)
+				{
+					case 1:
+						oom->arranger->addCanvasPart(track);
+					break;
+					case 2:
+					{
+						CItem* citem = oom->arranger->addCanvasPart(track);
+						Part* p = citem->part();
+						if(p)
+						{
+							m_editor->addPart(p);
+							m_editor->setCurCanvasPart(p);
+							songChanged(-1);//update check state
+						}
+					}
+					break;
+				}
+			}
+			delete p;
+		}
 	}
 }/*}}}*/
 
