@@ -136,7 +136,7 @@ GlobalConfigValues config = {
 		QColor(232,191,155), // Shoeless Shore
 		QColor(232,205,165), // Jamaican Rainforest
 		QColor(0,0,0),       // OOM Menu
-		QColor(175,235,255), // CSC
+		QColor(175,235,255), // ccherrett
 		QColor(255,195,0),   // Jus'maican a DAW
 		QColor(179,203,232), // A Stone
 		QColor(255,198,250)  // Wendy Cherrett//}}}
@@ -249,7 +249,7 @@ GlobalConfigValues config = {
 		QColor(87,45,26),  // Shoeless Shore
 		QColor(40,54,37),  // Jamaican Rainforest
 		QColor(0,0,0),     // OOM Menu
-		QColor(1,53,70),   // CSC
+		QColor(1,53,70),   // ccherrett
 		QColor(24,61,22),  // Jus'maican a DAW
 		QColor(21,37,56),  // A Stone
 		QColor(77,77,77)   // Wendy Cherrett//}}}
@@ -362,7 +362,7 @@ GlobalConfigValues config = {
 		QColor(147,111,79),  // Shoeless Shore
 		QColor(149,122,83),  // Jamaican Rainforest
 		QColor(0,0,0),    	 // OOM Menu Colors
-		QColor(63,156,187),  // CSC
+		QColor(63,156,187),  // ccherrett
 		QColor(112,95,36),   // Jus'maican a DAW
 		QColor(88,117,152),  // A Stone
 		QColor(192,72,182)   // Wendy Cherrett//}}}
@@ -475,7 +475,7 @@ GlobalConfigValues config = {
 		QColor(41,29,23), // Shoeless Shore
 		QColor(24,28,24),  // Jamaican Rainforest
 		QColor(0,0,0),     // OOM Menu
-		QColor(10,25,30),  // CSC
+		QColor(10,25,30),  // ccherrett
 		QColor(18,29,17),  // Jus'maican a DAW
 		QColor(16,20,26),  // A Stone
 		QColor(43,43,43)   // Wendy Cherrett 
@@ -589,7 +589,7 @@ GlobalConfigValues config = {
 		QString("Shoeless Shore"), 
 		QString("Jamaican Rainforest"), 
 		QString("menu:OOM Colors"),
-		QString("CSC"),
+		QString("ccherrett"),
 		QString("Jus'maican a DAW"),
 		QString("A Stone"),
 		QString("Wendy Cherrett")//}}}

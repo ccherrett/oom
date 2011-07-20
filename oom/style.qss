@@ -1,7 +1,10 @@
 /*
  *    OOMidi application style sheet
  */
-
+QTableWidget#listSnap, QTableWidget#listQuant
+{
+	color: black;
+}
 QWidget#MRConfigBase, QWidget#MITTransposeBase 
 {
 	background-color: #595966;
