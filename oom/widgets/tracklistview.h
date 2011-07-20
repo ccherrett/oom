@@ -21,6 +21,7 @@ class QHBoxLayout;
 class QButtonGroup;
 class QCheckBox;
 class QPoint;
+class QStringList;
 
 class Part;
 class Track;
@@ -39,6 +40,7 @@ class TrackListView : public QFrame
 	QButtonGroup* m_buttons;
 	QCheckBox* m_chkWorkingView;
 	int m_displayRole;
+	QStringList m_headers;
 
 
 private slots:

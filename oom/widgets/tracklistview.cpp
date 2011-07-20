@@ -21,6 +21,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 {
 	m_editor = editor;
 	m_displayRole = PartRole;
+	m_headers << "V" << "Track List";
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(8, 2, 8, 2);
 	m_model = new QStandardItemModel(0, 2, this);
@@ -141,6 +142,7 @@ void TrackListView::songChanged(int flags)/*{{{*/
 				m_model->appendRow(partsRow);
 			}
 		}
+		m_model->setHorizontalHeaderLabels(m_headers);
 		m_table->setColumnWidth(0, 20);
 	}
 }/*}}}*/
