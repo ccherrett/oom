@@ -241,7 +241,9 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
     quantLabel = new GridCombo(this);
 
 	rlist = new QTableWidget(10, 3);
+	rlist->setObjectName("listSnap");
 	qlist = new QTableWidget(8, 3);
+	qlist->setObjectName("listQuant");
 	rlist->verticalHeader()->setDefaultSectionSize(22);
 	rlist->horizontalHeader()->setDefaultSectionSize(32);
 	rlist->setSelectionMode(QAbstractItemView::SingleSelection);
