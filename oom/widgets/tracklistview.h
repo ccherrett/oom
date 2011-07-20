@@ -4,6 +4,8 @@
 //  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //===========================================================
 
+#ifndef _OOM_TRACKLISTVIEW_H_
+#define _OOM_TRACKLISTVIEW_H_
 #include <QFrame>
 #include <QList>
 #include <QModelIndex>
@@ -64,3 +66,5 @@ public:
 	static void movePlaybackToPart(Part*);
 	virtual ~TrackListView();
 };
+
+#endif

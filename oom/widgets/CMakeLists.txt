@@ -55,6 +55,7 @@ QT4_WRAP_CPP (widget_mocs
 	  tvieweditor.h
 	  tviewdock.h
 	  tracklistview.h
+	  trackheader.h
 	  rmap.h
 	  rmapdialog.h
 	  pctablemodel.h
@@ -141,6 +142,7 @@ file (GLOB widgets_ui_files
       velocitybase.ui
 	  trackvieweditorbase.ui
 	  tviewdockbase.ui
+	  trackheaderbase.ui
 	  rmapdialogbase.ui
 	  routemapbase.ui
 	  midiassignbase.ui
@@ -186,6 +188,7 @@ file (GLOB widgets_source_files
 	  tvieweditor.cpp
 	  tviewdock.cpp
 	  tracklistview.cpp
+	  trackheader.cpp
 	  rmap.cpp
 	  rmapdialog.cpp
       mtscale.cpp 
