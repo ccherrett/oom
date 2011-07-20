@@ -20,6 +20,7 @@ class QVBoxLayout;
 class QHBoxLayout;
 class QButtonGroup;
 class QCheckBox;
+class QPoint;
 
 class Part;
 class Track;
@@ -43,6 +44,7 @@ class TrackListView : public QFrame
 private slots:
 	void songChanged(int);
 	void displayRoleChanged(int);
+	void contextPopupMenu(QPoint);
 public slots:
 	void toggleTrackPart(QStandardItem*);
 public:

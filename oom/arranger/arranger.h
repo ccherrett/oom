@@ -43,6 +43,7 @@ class SpinBox;
 class TrackViewDock;
 class RouteMapDock;
 class CommentDock;
+class CItem;
 
 //---------------------------------------------------------
 //   Arranger
@@ -138,7 +139,6 @@ public slots:
     void showTrackViews();
     void _setRaster(int, bool setDefault = true);
     void verticalScrollSetYpos(unsigned);
-	void addCanvasPart(Track*);
 
 public:
 
@@ -161,6 +161,8 @@ public:
 		if(canvas)
 			canvas->update();
 	}
+
+	CItem*  addCanvasPart(Track*);
 
     TList* getTrackList() const
     {
