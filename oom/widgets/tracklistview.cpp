@@ -79,8 +79,10 @@ void TrackListView::songChanged(int flags)/*{{{*/
 	if(flags == -1 || flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_COLOR_MODIFIED))
 	{
 		m_model->clear();
-		for(iMidiTrack i = song->midis()->begin(); i != song->midis()->end(); ++i)
+		for(iTrack i = song->artracks()->begin(); i != song->artracks()->end(); ++i)
 		{
+			if(!(*i)->isMidiTrack())
+				continue;
 			MidiTrack* track = (MidiTrack*)(*i);
 			PartList* pl = track->parts();
 			if(m_displayRole == PartRole && pl->empty())
