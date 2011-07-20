@@ -16,6 +16,7 @@
 #include "midieditor.h"
 #include "citem.h"
 #include "arranger.h"
+#include "event.h"
 
 TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 : QFrame(parent)
@@ -26,10 +27,12 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(8, 2, 8, 2);
 	m_model = new QStandardItemModel(0, 2, this);
+	m_selmodel = new QItemSelectionModel(m_model);
 	m_table = new QTableView(this);
 	m_table->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_table->setObjectName("TrackListView");
 	m_table->setModel(m_model);
+	m_table->setSelectionModel(m_selmodel);
 	m_table->setAlternatingRowColors(false);
 	m_table->setShowGrid(true);
 	m_table->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -58,6 +61,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	songChanged(-1);
 	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
+	connect(m_selmodel, SIGNAL(currentRowChanged(const QModelIndex, const QModelIndex)), this, SLOT(selectionChanged(const QModelIndex, const QModelIndex)));
 	connect(m_chkWorkingView, SIGNAL(stateChanged(int)), this, SLOT(displayRoleChanged(int)));
 	connect(m_table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(contextPopupMenu(QPoint)));
 }
@@ -195,6 +199,7 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 						{
 							m_editor->addPart(p);
 							m_editor->setCurCanvasPart(p);
+							movePlaybackToPart(p);
 							songChanged(-1);//update check state
 						}
 					}
@@ -205,6 +210,57 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 		}
 	}
 }/*}}}*/
+
+void TrackListView::selectionChanged(const QModelIndex current, const QModelIndex)/*{{{*/
+{
+	if(!current.isValid())
+		return;
+	int row = current.row();
+	QStandardItem* item = m_model->item(row, 0);
+	int type = item->data(TrackRole).toInt();
+	bool checked = (item->checkState() == Qt::Checked);
+	QString trackName = item->data(TrackNameRole).toString();
+	Track* track = song->findTrack(trackName);
+	if(!track || !m_editor || type == 1 || !checked)
+		return;
+
+	PartList* list = track->parts();
+	int sn = item->data(PartRole).toInt();
+	unsigned tick = item->data(TickRole).toInt();
+	Part* part = list->find(tick, sn);
+	if(part)
+	{
+		m_editor->setCurCanvasPart(part);
+		movePlaybackToPart(part);
+	}
+}/*}}}*/
+
+void TrackListView::movePlaybackToPart(Part* part)
+{
+	if(part)/*{{{*/
+	{
+		unsigned tick = part->tick();
+		EventList* el = part->events();
+		if(el->empty())
+		{//move pb to part start
+			Pos p(tick, true);
+			song->setPos(0, p, true, true, true);
+		}
+		else
+		{
+			for(iEvent i = el->begin(); i != el->end(); ++i)
+			{
+				Event ev = i->second;
+				if(ev.isNote())
+				{
+					Pos p(tick+ev.tick(), true);
+					song->setPos(0, p, true, true, true);
+					break;
+				}
+			}
+		}
+	}/*}}}*/
+}
 
 void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 {
@@ -241,7 +297,10 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 				if(!list->empty())
 				{
 					if(checked)
+					{
 						m_editor->setCurCanvasPart(list->begin()->second);
+						movePlaybackToPart(list->begin()->second);
+					}
 					m_model->blockSignals(true);
 					songChanged(-1);
 					m_model->blockSignals(false);
@@ -301,6 +360,7 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 					{
 						m_editor->addPart(part);
 						m_editor->setCurCanvasPart(part);
+						movePlaybackToPart(part);
 					}
 					else
 					{

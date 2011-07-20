@@ -6,6 +6,7 @@
 
 #include <QFrame>
 #include <QList>
+#include <QModelIndex>
 #define PartRole Qt::UserRole+2
 #define TrackRole Qt::UserRole+3
 #define TrackNameRole Qt::UserRole+4
@@ -33,6 +34,7 @@ class TrackListView : public QFrame
 
 	QTableView* m_table;
 	QStandardItemModel* m_model;
+	QItemSelectionModel* m_selmodel;
 	QVBoxLayout* m_layout;
 	QHBoxLayout* m_buttonBox;
 	MidiEditor* m_editor;
@@ -47,6 +49,8 @@ private slots:
 	void songChanged(int);
 	void displayRoleChanged(int);
 	void contextPopupMenu(QPoint);
+	void selectionChanged(const QModelIndex, const QModelIndex);
+	void movePlaybackToPart(Part*);
 public slots:
 	void toggleTrackPart(QStandardItem*);
 public:
