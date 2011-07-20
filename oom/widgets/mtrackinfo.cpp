@@ -211,7 +211,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 
 
 	tableView->setModel(_tableModel);
-	//tableView->setShowGrid(true);
+	tableView->setShowGrid(true);
 	tableView->setSelectionModel(_selModel);
 	tableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
 	updateTableHeader();

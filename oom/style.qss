@@ -49,8 +49,21 @@ TrackViewEditor QListView, TrackViewEditor QTextField, QTableView
 	border: 1px solid #29292a;
 	border-radius: 6px;
 	padding: 8px;
+	background-color: #1e1e1e;
+	gridline-color:#343434;
+	alternate-background-color: #1b1b1b;
+	selection-background-color: #2e2e2e;
+	color: #bbbfbb;
 }
 
+TrackViewEditor QListView::item
+{
+	border-bottom: 1px solid #343434;
+}
+TrackViewEditor QListView::item::selected
+{
+	background-color: #0a0a0a;
+}
 /*MidiTrackInfo styles*/
 
 QLabel#patchLabel
@@ -103,8 +116,8 @@ MidiTrackInfo QTableView::item
 
 MidiTrackInfo QTableView::item:selected, QTableView#mapTable::item:selected 
 {
-	background-color: #3d3e44;
-	border: none;
+	background-color: #0a0a0a;
+	border-bottom: 1px solid #343434;
 }
 
 MidiTrackInfo QTableView::item:selected:active 
@@ -122,6 +135,11 @@ MidiTrackInfo QWidget#patchSeqContents
 {
 	background-color: #595966;
 	color: #d0d4d0;
+}
+
+QTreeView::item
+{
+	border-bottom: 1px solid #343434;
 }
 
 MidiTrackInfo QTreeView/*{{{*/
@@ -165,7 +183,7 @@ MidiTrackInfo QTreeView::item
 
 MidiTrackInfo QTreeView::item:selected
 {
-	background-color: #3d3e44;
+	background-color: #0a0a0a;
 	border: none;
 }
 
@@ -232,7 +250,7 @@ QTableView#tblAutoTable::item, QTableView#tblTrackView::item, QTableView#routeLi
 
 QTableView#tblAutoTable::item:selected, QTableView#tblTrackView::item:selected, QTableView#routeList::item:selected, TrackViewEditor QTableView#optionsTable::item:selected, MidiAssignDialog QTableView::item:selected
 {
-	background-color: #3d3e44;
+	background-color: #0a0a0a;
 	border: none;
 }
 
@@ -251,7 +269,7 @@ QTableView#TrackListView
 {
 	background-color: #1e1e1e;
 	alternate-background-color: #1b1b1b;
-	selection-background-color: #2e2e2e;
+	selection-background-color: #1e1e1e;
 	gridline-color:#343434;
 	color: #bbbfbb;
 	border: 2px solid #29292a;/*set for highlighting on focus*/
@@ -285,11 +303,12 @@ QListWidget::item
 {
 	padding-top: 4px;
 	padding-bottom: 4px;
+	border-bottom: 1px solid #343434;
 }
 
 QListWidget::item:selected
 {
-	background-color: #3d3e44;
+	background-color: #0a0a0a;
 	border: none;
 }
 
@@ -330,7 +349,7 @@ QTableView#autoTable::item
 
 QTableView#autoTable::item:selected
 {
-	background-color: #3d3e44;
+	background-color: #0a0a0a;
 	border: none;
 }
 
@@ -732,9 +751,9 @@ QListWidget#newSrcList::item:selected:active, QListWidget#newSrcList::item:selec
 QListWidget#newDstList::item:selected:active, QListWidget#newDstList::item:selected, 
 QListWidget#tracksList::item:selected {
 	 border-radius: 3px;
-     border: 0px solid #47cae1;
-	 background-color: #12191c;
-	 color: #47cae1;
+     border: 0px solid #cdd1cd;
+	 background-color: #0a0a0a;
+	 color: #cdd1cd;
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -775,9 +794,9 @@ QTreeWidget, QTreeWidget#routeList {
 	 show-decoration-selected: 0; 
 }
 QTreeWidget::item:selected:active, QTreeWidget::item:selected, QTreeWidget#routeList::item:selected:active, QTreeWidget#routeList::item:selected {
-     border: 0px solid #47cae1;
-	 background-color: #12191c;
-	 color: #47cae1;
+     border: 0px solid #cdd1cd;
+	 background-color: #0a0a0a;
+	 color: #cdd1cd;
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -824,9 +843,9 @@ QToolButton#connectButton::disabled, QToolButton#removeButton::disabled, QToolBu
 /*///////////START MIDI PORT MANAGER///////////////{{{*/
 QObject#mdevView::item:selected:active, QObject#mdevView::item:selected {
 	 border-radius: 3px;
-     border: 0px solid #47cae1;
-	 background-color: #12191c;
-	 color: #47cae1;
+     border: 0px solid #cdd1cd;
+	 background-color: #0a0a0a;
+	 color: #cdd1cd;
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -869,9 +888,9 @@ QTreeWidget#mdevView {
 	 show-decoration-selected: 0; 
 }
 QTreeWidget#mdevView::item:selected:active, QTreeWidget#mdevView::item:selected {
-     border: 0px solid #47cae1;
-	 background-color: #12191c;
-	 color: #47cae1;
+     border: 0px solid #cdd1cd;
+	 background-color: #0a0a0a;
+	 color: #cdd1cd;
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -883,9 +902,9 @@ QTreeWidget#mdevView::item:selected:active, QTreeWidget#mdevView::item:selected 
 QObject#scListView::item:selected:active, QObject#scListView::item:selected,
 QObject#cgListView::item:selected:active, QObject#cgListView::item:selected {
 	 border-radius: 3px;
-     border: 0px solid #47cae1;
-	 background-color: #12191c;
-	 color: #47cae1;
+     border: 0px solid #cdd1cd;
+	 background-color: #0a0a0a;
+	 color: #cdd1cd;
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -920,9 +939,9 @@ QObject#ctrlList::item:selected:active, QObject#ctrlList::item:selected,
 QTreeWidget::item:selected:active, QTreeWidget::item:selected
 {
 	 border-radius: 3px;
-     border: 0px solid #47cae1;
-	 background-color: #12191c;
-	 color: #47cae1;
+     border: 0px solid #cdd1cd;
+	 background-color: #0a0a0a;
+	 color: #cdd1cd;
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -996,7 +1015,7 @@ QTabWidget#tabControlCenter QTabBar::tab:selected {
                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);*/
     background-color: #101819;
-	color: #47cae1; 
+	color: #cdd1cd; 
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 11px;
@@ -1063,7 +1082,7 @@ QTabBar::tab {
 
 QTabBar::tab:selected, QTabBar::tab:hover {
     background-color: #101819;
-	color: #47cae1; 
+	color: #cdd1cd; 
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 10px;
@@ -1111,7 +1130,7 @@ QTabWidget#m_tabWidget QTabBar::tab {
 
 QTabWidget#m_tabWidget QTabBar::tab:selected, QTabWidget#m_tabWidget QTabBar::tab:hover {
     background-color: #101819;
-	color: #47cae1; 
+	color: #cdd1cd; 
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 10px;
@@ -1301,9 +1320,9 @@ QListWidget#presetList, QListWidget#TrackViewMenuList {
 }
 QListWidget#presetList::item:selected:active, QListWidget#presetList::item:selected {
 	 border-radius: 3px;
-     border: 0px solid #47cae1;
-	 background-color: #12191c;
-	 color: #47cae1;
+     border: 0px solid #cdd1cd;
+	 background-color: #0a0a0a;
+	 color: #cdd1cd;
 	 text-decoration: none;
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -1311,7 +1330,7 @@ QListWidget#presetList::item:selected:active, QListWidget#presetList::item:selec
 }
 QTextEdit#commentEntry
 {
-	background-color: #d6d2d6;
+	background-color: #1e1e1e;
 	border: 1px solid #29292a;
 	border-radius: 6px;
 	padding: 8px;
@@ -1322,7 +1341,7 @@ QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Splitter, Spinner, Dou
 
 QTextEdit, QTextEdit#songInfoText
 {
-	background-color: #d6d2d6;
+	background-color: #1e1e1e;
 	border: 1px solid #29292a;
 	border-radius: 6px;
 	padding: 8px;
