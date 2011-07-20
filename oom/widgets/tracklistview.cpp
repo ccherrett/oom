@@ -35,19 +35,16 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_layout->addWidget(m_table);
 
 	m_buttonBox = new QHBoxLayout;
-	m_chkPart = new QCheckBox(tr("Parts"), this);
-	m_chkPart->setToolTip(tr("Show Parts Only"));
-	m_chkPart->setChecked(true);
-	m_chkTrack = new QCheckBox(tr("Tracks"), this);
-	m_chkTrack->setToolTip(tr("Show Tracks and Parts"));
+	m_chkWorkingView = new QCheckBox(tr("Working View"), this);
+	m_chkWorkingView->setToolTip(tr("Toggle Working View. Show only tracks with parts in them"));
+	m_chkWorkingView->setChecked(true);
 
-	m_buttons = new QButtonGroup(this);
+	/*m_buttons = new QButtonGroup(this);
 	m_buttons->setExclusive(true);
 	m_buttons->addButton(m_chkPart, PartRole);
-	m_buttons->addButton(m_chkTrack, TrackRole);
+	m_buttons->addButton(m_chkTrack, TrackRole);*/
 
-	m_buttonBox->addWidget(m_chkPart);
-	m_buttonBox->addWidget(m_chkTrack);
+	m_buttonBox->addWidget(m_chkWorkingView);
 	QSpacerItem* hSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	m_buttonBox->addItem(hSpacer);
 
@@ -56,7 +53,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	songChanged(-1);
 	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
-	connect(m_buttons, SIGNAL(buttonClicked(int)), this, SLOT(displayRoleChanged(int)));
+	connect(m_chkWorkingView, SIGNAL(stateChanged(int)), this, SLOT(displayRoleChanged(int)));
 }
 
 TrackListView::~TrackListView()
@@ -65,7 +62,15 @@ TrackListView::~TrackListView()
 
 void TrackListView::displayRoleChanged(int role)
 {
-	m_displayRole = role;
+	switch(role)
+	{
+		case Qt::Checked:
+			m_displayRole = PartRole;
+		break;
+		case Qt::Unchecked:
+			m_displayRole = TrackRole;
+		break;
+	}
 	songChanged(-1);
 }
 
@@ -78,24 +83,26 @@ void TrackListView::songChanged(int flags)/*{{{*/
 		{
 			MidiTrack* track = (MidiTrack*)(*i);
 			PartList* pl = track->parts();
-			if(m_displayRole == TrackRole)
+			if(m_displayRole == PartRole && pl->empty())
 			{
-				QList<QStandardItem*> trackRow;
-				QStandardItem* chkTrack = new QStandardItem(true);
-				chkTrack->setCheckable(true);
-				chkTrack->setData(1, TrackRole);
-				chkTrack->setData(track->name(), TrackNameRole);
-				if(m_selected.contains(track->name()))
-					chkTrack->setCheckState(Qt::Checked);
-				trackRow.append(chkTrack);
-				QStandardItem* trackName = new QStandardItem();
-				trackName->setText(track->name());
-				//QFont font = trackName->font();
-				trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
-				trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-				trackRow.append(trackName);
-				m_model->appendRow(trackRow);
+				continue;
 			}
+			QList<QStandardItem*> trackRow;
+			QStandardItem* chkTrack = new QStandardItem(true);
+			chkTrack->setCheckable(true);
+			chkTrack->setData(1, TrackRole);
+			chkTrack->setData(track->name(), TrackNameRole);
+			if(m_selected.contains(track->name()))
+				chkTrack->setCheckState(Qt::Checked);
+			trackRow.append(chkTrack);
+			QStandardItem* trackName = new QStandardItem();
+			trackName->setText(track->name());
+			//QFont font = trackName->font();
+			trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
+			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			trackRow.append(trackName);
+			m_model->appendRow(trackRow);
+			
 			for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
 			{
 				QList<QStandardItem*> partsRow;
@@ -112,10 +119,10 @@ void TrackListView::songChanged(int flags)/*{{{*/
 				}
 				QStandardItem* partName = new QStandardItem();
 				partName->setFont(QFont("fixed-width", 8, QFont::Bold));
-				if(m_displayRole == TrackRole)
-					partName->setText(part->name());
-				else
-					partName->setText(track->name()+" : "+part->name());
+				//if(m_displayRole == TrackRole)
+				partName->setText(part->name());
+				//else
+				//	partName->setText(track->name()+" : "+part->name());
 				if(!partColorIcons.isEmpty() && part->colorIndex() < partColorIcons.size())
 					partName->setIcon(partColorIcons.at(part->colorIndex()));
 				partsRow.append(chkPart);
