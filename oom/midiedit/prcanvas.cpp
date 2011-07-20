@@ -1402,7 +1402,9 @@ void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen,
 				// and turn it on for the new parts track
 				song->setRecordFlag(track(), true);
 				song->deselectTracks();
+				song->deselectAllParts();
 				track()->setSelected(true);
+				newpt->setSelected(true);
 				song->update(SC_SELECTION);
 			}
 		}
@@ -1434,7 +1436,9 @@ void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen,
 				// and turn it on for the new parts track
 				song->setRecordFlag(track(), true);
 				song->deselectTracks();
+				song->deselectAllParts();
 				track()->setSelected(true);
+				newpt->setSelected(true);
 				song->update(SC_SELECTION);
 			}
 		}
