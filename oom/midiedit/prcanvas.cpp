@@ -29,6 +29,7 @@
 #include "audio.h"
 #include "gconfig.h"
 #include "traverso_shared/TConfig.h"
+#include "tracklistview.h"
 
 //---------------------------------------------------------
 //   NEvent
@@ -1406,6 +1407,7 @@ void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen,
 				track()->setSelected(true);
 				newpt->setSelected(true);
 				song->update(SC_SELECTION);
+				TrackListView::movePlaybackToPart(newpt);
 			}
 		}
 			break;
@@ -1440,6 +1442,7 @@ void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen,
 				track()->setSelected(true);
 				newpt->setSelected(true);
 				song->update(SC_SELECTION);
+				TrackListView::movePlaybackToPart(newpt);
 			}
 		}
 			break;

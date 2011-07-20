@@ -50,10 +50,10 @@ private slots:
 	void displayRoleChanged(int);
 	void contextPopupMenu(QPoint);
 	void selectionChanged(const QModelIndex, const QModelIndex);
-	void movePlaybackToPart(Part*);
 public slots:
 	void toggleTrackPart(QStandardItem*);
 public:
 	TrackListView(MidiEditor* e, QWidget* parent = 0);
+	static void movePlaybackToPart(Part*);
 	~TrackListView();
 };
