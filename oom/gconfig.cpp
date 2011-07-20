@@ -555,7 +555,7 @@ GlobalConfigValues config = {
 	QColor(83, 87, 137), // auxTrackBg;
 	QColor(125, 73, 32), // synthTrackBg;
 
-	QColor(90, 90, 90), // part canvas bg
+	QColor(63,63,63), // part canvas bg
 	QColor(255, 170, 0), // ctrlGraphFg;    Medium orange
 	QColor(0, 0, 0), // mixerBg;
 
