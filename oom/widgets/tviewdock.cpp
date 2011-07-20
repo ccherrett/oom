@@ -35,6 +35,9 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	_autoTableModel = new QStandardItemModel(autoTable);
 	tableView->setModel(_tableModel);
 	tableView->setObjectName("tblTrackView");
+	autoTable->setObjectName("tblAutoTable");
+	//tableView->setShowGrid(true);
+	//autoTable->setShowGrid(true);
 	autoTable->setModel(_autoTableModel);
 	btnUp->setIcon(*upPCIcon);
 	btnDown->setIcon(*downPCIcon);

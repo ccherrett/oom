@@ -26,7 +26,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_table->setObjectName("TrackListView");
 	m_table->setModel(m_model);
 	m_table->setAlternatingRowColors(true);
-	m_table->setShowGrid(true);
+	m_table->setShowGrid(false);
 	m_table->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_table->setCornerButtonEnabled(false);
@@ -100,14 +100,14 @@ void TrackListView::songChanged(int flags)/*{{{*/
 				chkTrack->setCheckState(Qt::Checked);
 			trackRow.append(chkTrack);
 			QStandardItem* trackName = new QStandardItem();
+			trackName->setFont(QFont("fixed-width", 10, QFont::Bold));
 			trackName->setText(track->name());
 			//QFont font = trackName->font();
-			trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
-			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 			trackName->setBackground(QBrush(QColor(20,20,20)));
+			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);//Qt::AlignVCenter);
 			trackRow.append(trackName);
 			m_model->appendRow(trackRow);
-			
+
 			for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
 			{
 				QList<QStandardItem*> partsRow;
@@ -123,11 +123,13 @@ void TrackListView::songChanged(int flags)/*{{{*/
 					chkPart->setCheckState(Qt::Checked);
 				}
 				QStandardItem* partName = new QStandardItem();
-				partName->setFont(QFont("fixed-width", 8, QFont::Bold));
+
+				partName->setFont(QFont("fixed-width", 9, QFont::Bold));
 				//if(m_displayRole == TrackRole)
 				partName->setText(part->name());
 				//else
 				//	partName->setText(track->name()+" : "+part->name());
+
 				if(!partColorIcons.isEmpty() && part->colorIndex() < partColorIcons.size())
 					partName->setIcon(partColorIcons.at(part->colorIndex()));
 				partsRow.append(chkPart);
