@@ -198,6 +198,7 @@ extern void doSetuid();
 extern void undoSetuid();
 extern bool checkAudioDevice();
 extern QList<QIcon> partColorIcons;
+extern QList<QIcon> partColorIconsSelected;
 #ifdef LV2_SUPPORT
 struct LV2World;
 extern LV2World* lv2world;

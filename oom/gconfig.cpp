@@ -29,9 +29,14 @@ GlobalConfigValues config = {
 		QColor(0xff, 0xff, 0xff)
 	},
 	{
-		QColor(0,0,0),       // OOM Menu Part Color //{{{
-		QColor(175,235,255), // OOM
-		QColor(255,198,250), // Wendy Cherrett
+		QColor(0,0,0),       // Splash Menu Part Color //{{{
+		QColor(145,255,250), // Saltwater Splash
+		QColor(225,145,248), // Bubblegum Splash
+		QColor(158,255,145), // Key Lime Splash
+		QColor(186,145,255), // Violet Splash
+		QColor(255,196,145), // Orange Splash
+		QColor(145,182,255), // Freshwater Splash
+		QColor(254,255,145), // Lemon Splash
 		QColor(0,0,0),       // Frosting Menu
 		QColor(231,206,213), // Cranberry Frosting
 		QColor(220,207,232), // Grape Frosting
@@ -39,10 +44,6 @@ GlobalConfigValues config = {
 		QColor(205,230,225), // Matcha Frosting
 		QColor(206,231,209), // Green Apple Frosting
 		QColor(230,216,205), // Mochaccino Frosting
-		QColor(0,0,0),       // Splash Menu
-		QColor(145,255,115), // Key Lime Splash
-		QColor(252,253,154), // Lemon Splash
-		QColor(145,255,249), // Saltwater Splash
 		QColor(0,0,0),       // Day Off Menu
 		QColor(228,221,202), // Day Off: Sea & Sand 
 		QColor(255,220,252), // Day Off: Table Cloth
@@ -123,13 +124,32 @@ GlobalConfigValues config = {
 		QColor(255,214,221), // Rosy Cheeks
 		QColor(238,232,228), // Snowman's Smile
 		QColor(232,226,225), // Winter Tires
-		QColor(171,171,171)  // Short Days
-		//}}}
+		QColor(171,171,171), // Short Days
+		QColor(0,0,0),       // menu:Naturals
+		QColor(229,196,177), // Breathe
+		QColor(198,181,169), // Bridge and Breeze
+		QColor(217,194,188), // Serene Clay
+		QColor(219,202,192), // Argan Oil
+		QColor(232,203,189), // Stoney Stream
+		QColor(219,182,171), // Hazelnut Candle
+		QColor(204,163,163), // R and R
+		QColor(232,191,155), // Shoeless Shore
+		QColor(232,205,165), // Jamaican Rainforest
+		QColor(0,0,0),       // OOM Menu
+		QColor(175,235,255), // CSC
+		QColor(255,195,0),   // Jus'maican a DAW
+		QColor(179,203,232), // A Stone
+		QColor(255,198,250)  // Wendy Cherrett//}}}
 	},
 	{
-		QColor(0,0,0),     // OOM Menu Wave Colors //{{{
-		QColor(1,53,70),   // OOM
-		QColor(86,87,86),  // Wendy Cherrett 
+		QColor(0,0,0),    // Splash Menu Wave Colors //{{{
+		QColor(63,63,63), // Saltwater Splash
+		QColor(63,63,63), // Bubblegum Splash
+		QColor(63,63,63), // Key Lime Splash
+		QColor(63,63,63), // Violet Splash
+		QColor(63,63,63), // Orange Splash
+		QColor(63,63,63), // Freshwater Splash
+		QColor(63,63,63), // Lemon Splash
 		QColor(0,0,0),     // Frosting Menu
 		QColor(87,48,59),  // Cranberry Frosting 
 		QColor(68,48,87),  // Grape Frosting
@@ -137,10 +157,6 @@ GlobalConfigValues config = {
 		QColor(47,86,78),  // Matcha Frosting
 		QColor(47,86,53),  // Green Apple Frosting
 		QColor(87,65,48),  // Mochaccino Frosting
-		QColor(0,0,0),     // Splash Menu
-		QColor(86,87,86),  // Key Lime Splash
-		QColor(86,87,86),  // Lemon Splash
-		QColor(86,87,86),  // Saltwater Splash
 		QColor(0,0,0),     // Day Off Menu
 		QColor(67,81,88),  // Day Off: Sea & Sand 
 		QColor(110,82,108),// Day Off: Table Cloth
@@ -221,13 +237,32 @@ GlobalConfigValues config = {
 		QColor(59,53,54),  // Rosy Cheeks
 		QColor(49,49,49),  // Snowman's Smile
 		QColor(0,0,0),     // Winter Tires
-		QColor(64,64,64)   // Short Days
-		//}}}
+		QColor(64,64,64),  // Short Days
+		QColor(0,0,0),     // menu:Naturals
+		QColor(53,23,7),   // Breathe
+		QColor(20,10,0),   // Bridge and Breeze
+		QColor(34,32,29),  // Serene Clay
+		QColor(80,62,53),  // Argan Oil
+		QColor(34,47,63),  // Stoney Stream
+		QColor(0,0,0),     // Hazelnut Candle
+		QColor(59,45,42),  // R and R
+		QColor(87,45,26),  // Shoeless Shore
+		QColor(40,54,37),  // Jamaican Rainforest
+		QColor(0,0,0),     // OOM Menu
+		QColor(1,53,70),   // CSC
+		QColor(24,61,22),  // Jus'maican a DAW
+		QColor(21,37,56),  // A Stone
+		QColor(77,77,77)   // Wendy Cherrett//}}}
 	},
 	{
-		QColor(0,0,0),    	 // OOM Menu Colors Part Color Automation//{{{
-		QColor(84,102,108),  // OOM
-		QColor(109,91,108),  // Wendy Cherrett
+		QColor(0,0,0),       // Splash Menu Part Color Automation//{{{
+		QColor(58,174,170),  // Saltwater Splash
+		QColor(174,58,167),  // Bubblegum Splash
+		QColor(72,174,58),   // Key Lime Splash
+		QColor(102,58,174),  // Violet Splash
+		QColor(174,113,58),  // Orange Splash
+		QColor(58,96,174),   // Freshwater Splash
+		QColor(172,174,58),  // Lemon Splash
 		QColor(0,0,0),       // Frosting Menu
 		QColor(100,94,95),   // Cranberry Frosting
 		QColor(97,94,100),   // Grape Frosting
@@ -235,10 +270,6 @@ GlobalConfigValues config = {
 		QColor(94,100,99),   // Matcha Frosting
 		QColor(94,100,95),   // Green Apple Frosting
 		QColor(100,96,94),   // Mochaccino Frosting
-		QColor(0,0,0),       // Splash Menu
-		QColor(78,101,71),   // Key Lime Splash
-		QColor(104,104,80),  // Lemon Splash
-		QColor(78,104,103),  // Saltwater Splash
 		QColor(0,0,0),       // Day Off Menu
 		QColor(100,99,94),   // Day Off: Sea & Sand 
 		QColor(110,98,109),  // Day Off: Table Cloth
@@ -319,13 +350,32 @@ GlobalConfigValues config = {
 		QColor(164,110,119), // Rosy Cheeks
 		QColor(142,135,130), // Snowman's Smile
 		QColor(136,132,130), // Winter Tires
-		QColor(100,100,100)  // Short Days
-		//}}}
+		QColor(100,100,100), // Short Days
+		QColor(0,0,0),       // menu:Naturals
+		QColor(146,111,90),  // Breathe
+		QColor(117,105,97),  // Bridge and Breeze
+		QColor(133,109,103), // Serene Clay
+		QColor(136,116,104), // Argan Oil
+		QColor(151,113,95),  // Stoney Stream
+		QColor(134,102,92),  // Hazelnut Candle
+		QColor(122,92,92),   // R and R
+		QColor(147,111,79),  // Shoeless Shore
+		QColor(149,122,83),  // Jamaican Rainforest
+		QColor(0,0,0),    	 // OOM Menu Colors
+		QColor(63,156,187),  // CSC
+		QColor(112,95,36),   // Jus'maican a DAW
+		QColor(88,117,152),  // A Stone
+		QColor(192,72,182)   // Wendy Cherrett//}}}
 	},
 	{
-		QColor(0,0,0),    // OOM Menu Automation Wave Colors//{{{
-		QColor(10,25,30), // OOM
-		QColor(51,51,51), // Wendy Cherrett
+		QColor(0,0,0),    // Splash Menu Automation Wave Colors//{{{
+		QColor(63,63,63), // Saltwater Splash
+		QColor(63,63,63), // Bubblegum Splash
+		QColor(63,63,63), // Key Lime Splash
+		QColor(63,63,63), // Violet Splash
+		QColor(63,63,63), // Orange Splash
+		QColor(63,63,63), // Freshwater Splash
+		QColor(63,63,63), // Lemon Splash
 		QColor(0,0,0),    // Frosting Menu
 		QColor(44,34,37), // Cranberry Frosting 
 		QColor(39,34,44), // Grape Frosting
@@ -333,10 +383,6 @@ GlobalConfigValues config = {
 		QColor(33,43,41), // Matcha Frosting
 		QColor(33,43,35), // Green Apple Frosting
 		QColor(44,38,34), // Mochaccino Frosting
-		QColor(0,0,0),    // Splash Menu
-		QColor(50,50,50), // Key Lime Splash
-		QColor(50,50,50), // Lemon Splash
-		QColor(50,50,50), // Saltwater Splash
 		QColor(0,0,0),    // Day Off Menu
 		QColor(43,47,49), // Day Off: Sea & Sand 
 		QColor(60,52,59), // Day Off: Table Cloth
@@ -417,13 +463,33 @@ GlobalConfigValues config = {
 		QColor(31,31,31), // Rosy Cheeks
 		QColor(27,27,27), // Snowman's Smile
 		QColor(0,0,0),    // Winter Tires
-		QColor(37,37,37)  // Short Days
+		QColor(37,37,37), // Short Days
+		QColor(0,0,0),    // menu:Naturals
+		QColor(22,14,10), // Breathe
+		QColor(8,6,4),    // Bridge and Breeze
+		QColor(18,17,16), // Serene Clay
+		QColor(42,37,34), // Argan Oil
+		QColor(23,27,31), // Stoney Stream
+		QColor(0,0,0),    // Hazelnut Candle
+		QColor(31,28,27), // R and R
+		QColor(41,29,23), // Shoeless Shore
+		QColor(24,28,24),  // Jamaican Rainforest
+		QColor(0,0,0),     // OOM Menu
+		QColor(10,25,30),  // CSC
+		QColor(18,29,17),  // Jus'maican a DAW
+		QColor(16,20,26),  // A Stone
+		QColor(43,43,43)   // Wendy Cherrett 
 		//}}}
 	},
 	{
-		QString("menu:OOM Colors"), //{{{ Part Color Names
-		QString("OOM"),
-		QString("Wendy Cherrett"),
+		QString("menu:Splash"),//{{{ Part Color Names
+		QString("Saltwater Splash"),
+		QString("Bubblegum Splash"),
+		QString("Key Lime Splash"),
+		QString("Violet Splash"),
+		QString("Orange Splash"),
+		QString("Freshwater Splash"),
+		QString("Lemon Splash"),
 		QString("menu:Frostings"),
 		QString("Cranberry Frosting"),
 		QString("Grape Frosting"),
@@ -431,10 +497,6 @@ GlobalConfigValues config = {
 		QString("Matcha Frosting"),
 		QString("Green Apple Frosting"),
 		QString("Cappuccino Frosting"),
-		QString("menu:Splash"),
-		QString("Key Lime Splash"),
-		QString("Lemon Splash"),
-		QString("Saltwater Splash"),
 		QString("menu:Day Off"),
 		QString("Sea and Sand"),
 		QString("Tablecloth"),
@@ -478,13 +540,13 @@ GlobalConfigValues config = {
 		QString("Blue Blast"),
 		QString("Bumble Bee"),
 		QString("menu:Spring"),
-		QString("Salt Water Splash"),
-		QString("Rosewater Splash"),
-		QString("Mint Splash"),
-		QString("Lilac Splash"),
-		QString("Orange Splash"),
-		QString("Freshwater Splash"),
-		QString("Lemon Splash"),
+		QString("Botanical Spray"),
+		QString("Cherry Blossom"),
+		QString("Spring Mint"),
+		QString("Lilac Song"),
+		QString("Peach Mousse"),
+		QString("Smell of Rain"),
+		QString("Duckling"),
 		QString("menu:Summer"),
 		QString("Sun Umbrella"),
 		QString("Ice Water"),
@@ -515,7 +577,22 @@ GlobalConfigValues config = {
 		QString("Rosy Cheeks"),
 		QString("Snowman's Smile"),
 		QString("Winter Tires"),
-		QString("Short Days") //}}}
+		QString("Short Days"), 
+		QString("menu:Naturals"),
+		QString("Breathe"), 
+		QString("Bridge and Breeze"), 
+		QString("Serene Clay"), 
+		QString("Argan Oil"), 
+		QString("Stoney Stream"), 
+		QString("Hazelnut Candle"), 
+		QString("R and R"), 
+		QString("Shoeless Shore"), 
+		QString("Jamaican Rainforest"), 
+		QString("menu:OOM Colors"),
+		QString("CSC"),
+		QString("Jus'maican a DAW"),
+		QString("A Stone"),
+		QString("Wendy Cherrett")//}}}
 	}
 ,
 	QColor(16, 24, 25), // transportHandleColor;
