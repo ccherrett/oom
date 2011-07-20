@@ -36,8 +36,7 @@ class TrackListView : public QFrame
 	MidiEditor* m_editor;
 	QList<QString> m_selected;
 	QButtonGroup* m_buttons;
-	QCheckBox* m_chkTrack;
-	QCheckBox* m_chkPart;
+	QCheckBox* m_chkWorkingView;
 	int m_displayRole;
 
 
