@@ -53,11 +53,6 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	bool snap = tconfig().get_property("PianoRollEdit", "snaptopart", true).toBool();
 	m_chkSnapToPart->setChecked(snap);
 
-	/*m_buttons = new QButtonGroup(this);
-	m_buttons->setExclusive(true);
-	m_buttons->addButton(m_chkPart, PartRole);
-	m_buttons->addButton(m_chkTrack, TrackRole);*/
-
 	m_buttonBox->addWidget(m_chkWorkingView);
 	QSpacerItem* hSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	m_buttonBox->addItem(hSpacer);
@@ -80,13 +75,13 @@ TrackListView::~TrackListView()
 	tconfig().save();
 }
 
-void TrackListView::snapToPartChanged(int state)
+void TrackListView::snapToPartChanged(int state)/*{{{*/
 {
 	tconfig().set_property("PianoRollEdit", "snaptopart", state);
 	tconfig().save();
-}
+}/*}}}*/
 
-void TrackListView::displayRoleChanged(int role)
+void TrackListView::displayRoleChanged(int role)/*{{{*/
 {
 	switch(role)
 	{
@@ -98,7 +93,7 @@ void TrackListView::displayRoleChanged(int role)
 		break;
 	}
 	songChanged(-1);
-}
+}/*}}}*/
 
 void TrackListView::songChanged(int flags)/*{{{*/
 {
@@ -193,10 +188,55 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 		if(chkcol)
 		{
 			QString trackName = chkcol->data(TrackNameRole).toString();
+			int type = chkcol->data(TrackRole).toInt();
 			Track* track = song->findTrack(trackName);
 			if(!track || !m_editor || chkcol->column() != 0)
 				return;
 			QMenu* p = new QMenu(this);
+			QString title(tr("Part Color"));
+			int index = track->getDefaultPartColor();
+			Part* npart = 0;
+			if(type == 1)
+				title = QString(tr("Default Part Color"));
+			else
+			{
+				PartList* list = track->parts();
+				int sn = item->data(PartRole).toInt();
+				unsigned tick = item->data(TickRole).toInt();
+				npart = list->find(tick, sn);
+				if(npart)
+					index = npart->colorIndex();
+			}
+			QMenu* colorPopup = p->addMenu(title);
+		
+			QMenu* colorSub; 
+			for (int i = 0; i < NUM_PARTCOLORS; ++i)
+			{
+				QString colorname(config.partColorNames[i]);
+				if(colorname.contains("menu:", Qt::CaseSensitive))
+				{
+					colorSub = colorPopup->addMenu(colorname.replace("menu:", ""));
+				}
+				else
+				{
+					if(index == i)
+					{
+						colorname = QString(config.partColorNames[i]);
+						colorPopup->setIcon(partColorIconsSelected.at(i));
+						colorPopup->setTitle(colorSub->title()+": "+colorname);
+		
+						colorname = QString("* "+config.partColorNames[i]);
+						QAction *act_color = colorSub->addAction(partColorIconsSelected.at(i), colorname);
+						act_color->setData(20 + i);
+					}
+					else
+					{
+						colorname = QString("     "+config.partColorNames[i]);
+						QAction *act_color = colorSub->addAction(partColorIcons.at(i), colorname);
+						act_color->setData(20 + i);
+					}
+				}	
+			}
 			p->addAction(tr("Add Part"))->setData(1);
 			p->addAction(tr("Add Part and Select"))->setData(2);
 
@@ -220,8 +260,22 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 							movePlaybackToPart(p);
 							songChanged(-1);//update check state
 						}
+						break;
 					}
-					break;
+					case 20 ... NUM_PARTCOLORS + 20:
+					{
+						int curColorIndex = selection - 20;
+						if(npart)
+						{
+							npart->setColorIndex(curColorIndex);
+							song->update(SC_PART_COLOR_MODIFIED);
+						}
+						else
+						{
+							track->setDefaultPartColor(curColorIndex);
+						}
+						break;
+					}
 				}
 			}
 			delete p;
