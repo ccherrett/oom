@@ -766,7 +766,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	firstrun = true;
 	//routingPopupView      = 0;
 
-	appName = QString("The Composer - OOMidi");
+	appName = QString("The Composer - OOMidi     ");
 	setWindowTitle(appName);
 
 	qRegisterMetaType<CCInfo>("CCInfo");
@@ -1886,7 +1886,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	if (!songTemplate)
 	{
 		addProject(project.absoluteFilePath());
-		setWindowTitle(QString("OOMidi: Song: ") + project.completeBaseName());
+		setWindowTitle(QString("The Composer - OOMidi:     ") + project.completeBaseName() + QString("     "));
 	}
 	song->dirty = false;
 
@@ -1977,7 +1977,8 @@ void OOMidi::setUntitledProject()
 	oomProject = "./"; //QFileInfo(name).absolutePath();
 	project.setFile(name);
 	oomProjectFile = project.filePath();
-	setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
+	//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
+	setWindowTitle(QString("The Composer - OOMidi:     ") + project.completeBaseName() + QString("     "));
 }
 
 //---------------------------------------------------------
@@ -3560,7 +3561,8 @@ bool OOMidi::saveAs()
 		{
 			project.setFile(name);
 			oomProjectFile = project.filePath();
-			setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
+			//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
+			setWindowTitle(QString("The Composer - OOMidi:     ") + project.completeBaseName() + QString("     "));
 			addProject(name);
 		}
 		else
@@ -5106,7 +5108,8 @@ OOMidi::lash_idle_cb()
 				if (ok)
 				{
 					project.setFile(ss.toAscii());
-					setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
+					//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
+					setWindowTitle(QString("The Composer - OOMidi:     ") + project.completeBaseName()  + QString("     "));
 					addProject(ss.toAscii());
 					oomProject = QFileInfo(ss.toAscii()).absolutePath();
 					oomProjectFile = QFileInfo(ss.toAscii()).filePath();

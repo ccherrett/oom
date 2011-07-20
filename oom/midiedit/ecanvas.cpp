@@ -70,8 +70,7 @@ QString EventCanvas::getCaption() const
 	///sigmap.tickValues(curPart->tick() + curPart->lenTick(), &bar2, &xx, &x);
 	AL::sigmap.tickValues(_curPart->tick() + _curPart->lenTick(), &bar2, &xx, &x);
 
-	return QString("OOMidi: Part <") + _curPart->name()
-			+ QString("> %1-%2").arg(bar1 + 1).arg(bar2 + 1);
+	return QString("") + _curPart->track()->name() + QString("  :  ") + _curPart->name() + QString("     Bar: %1 to %2     ").arg(bar1 + 1).arg(bar2 + 1);
 }
 
 //---------------------------------------------------------

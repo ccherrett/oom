@@ -2274,7 +2274,7 @@ void PianoCanvas::itemMoved(const CItem* item, const QPoint& pos)
 
 void PianoCanvas::curPartChanged()
 {
-	editor->setWindowTitle(getCaption());
+	editor->setWindowTitle("The Performer:     "+getCaption());
 	emit partChanged(editor->curCanvasPart());
 }
 

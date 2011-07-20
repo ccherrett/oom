@@ -655,7 +655,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(song, SIGNAL(loopChanged(bool)), canvas, SLOT(update()));
     //connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
 
-    setWindowTitle(canvas->getCaption() + " - The Performer");
+    setWindowTitle("The Performer:     " + canvas->getCaption());
 
     updateHScrollRange();
     // connect to toolbar
