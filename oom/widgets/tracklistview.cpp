@@ -85,26 +85,24 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			PartList* pl = track->parts();
 			if(m_displayRole == PartRole && pl->empty())
 			{
-<<<<<<< HEAD
-				QList<QStandardItem*> trackRow;
-				QStandardItem* chkTrack = new QStandardItem(true);
-				chkTrack->setCheckable(true);
-				chkTrack->setData(1, TrackRole);
-				chkTrack->setData(track->name(), TrackNameRole);
-				if(m_selected.contains(track->name()))
-					chkTrack->setCheckState(Qt::Checked);
-				trackRow.append(chkTrack);
-				QStandardItem* trackName = new QStandardItem();
-				trackName->setFont(QFont("fixed-width", 10, QFont::Bold));
-				trackName->setText(track->name());
-				//QFont font = trackName->font();
-				trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-				trackRow.append(trackName);
-				m_model->appendRow(trackRow);
-=======
 				continue;
->>>>>>> 39c58e5a526aa3f1528ee0ff2ea26a3d0778542d
 			}
+			QList<QStandardItem*> trackRow;
+			QStandardItem* chkTrack = new QStandardItem(true);
+			chkTrack->setCheckable(true);
+			chkTrack->setData(1, TrackRole);
+			chkTrack->setData(track->name(), TrackNameRole);
+			if(m_selected.contains(track->name()))
+				chkTrack->setCheckState(Qt::Checked);
+			trackRow.append(chkTrack);
+			QStandardItem* trackName = new QStandardItem();
+			trackName->setFont(QFont("fixed-width", 10, QFont::Bold));
+			trackName->setText(track->name());
+			//QFont font = trackName->font();
+			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			trackRow.append(trackName);
+			m_model->appendRow(trackRow);
+
 			QList<QStandardItem*> trackRow;
 			QStandardItem* chkTrack = new QStandardItem(true);
 			chkTrack->setCheckable(true);
