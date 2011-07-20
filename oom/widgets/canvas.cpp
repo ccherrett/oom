@@ -408,13 +408,11 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 	if(_curPart && _drawPartLines)
 	{
 		//p.setPen(QColor(200,146,0));
-		QPen posPen = QPen(QColor(200,146,0), 1);
+		QPen posPen = QPen(QColor(200,146,0), 5);
 		posPen.setCosmetic(true);
 		p.setPen(posPen);
 		p.drawLine(_curPart->tick(), y, _curPart->tick(), y2);
 		p.drawLine(_curPart->endTick(), y, _curPart->endTick(), y2);
-		p.drawText(QPoint(_curPart->tick(), y+10), tr("Start"));
-		p.drawText(QPoint(_curPart->endTick(), y+10), tr("End"));
 	}
 	//QPen playbackPen(QColor(8,193,156), 1);
 	//p.setPen(playbackPen);

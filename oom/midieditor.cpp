@@ -213,7 +213,7 @@ void MidiEditor::removeParts(PartList* pl)
 	{
 		for(iPart i = pl->begin(); i != pl->end(); ++i)
 		{
-			if(hasPart(i->second->sn()))
+			if(hasPart(i->second->sn()) && _parts.size() >= 2)
 				_parts.remove(i->second->sn());
 		}
 		songChanged(SC_PART_REMOVED);
@@ -222,7 +222,10 @@ void MidiEditor::removeParts(PartList* pl)
 
 void MidiEditor::removePart(int sn)
 {
-	_parts.remove(sn);
+	if(_parts.size() >= 2)
+	{
+		_parts.remove(sn);
+	}
 	songChanged(SC_PART_REMOVED);
 }
 

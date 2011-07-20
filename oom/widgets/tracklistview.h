@@ -25,6 +25,7 @@ class QPoint;
 class QStringList;
 
 class Part;
+class PartList;
 class Track;
 class MidiEditor;
 
@@ -42,6 +43,7 @@ class TrackListView : public QFrame
 	QButtonGroup* m_buttons;
 	QCheckBox* m_chkWorkingView;
 	int m_displayRole;
+	bool m_busy;
 	QStringList m_headers;
 
 
@@ -50,8 +52,11 @@ private slots:
 	void displayRoleChanged(int);
 	void contextPopupMenu(QPoint);
 	void selectionChanged(const QModelIndex, const QModelIndex);
+	void updateCheck(PartList*, bool);
+
 public slots:
 	void toggleTrackPart(QStandardItem*);
+
 public:
 	TrackListView(MidiEditor* e, QWidget* parent = 0);
 	static void movePlaybackToPart(Part*);
