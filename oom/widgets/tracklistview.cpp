@@ -134,19 +134,13 @@ void TrackListView::songChanged(int flags)/*{{{*/
 					chkPart->setCheckState(Qt::Checked);
 				}
 				QStandardItem* partName = new QStandardItem();
-<<<<<<< HEAD
+
 				partName->setFont(QFont("fixed-width", 9, QFont::Bold));
-				if(m_displayRole == TrackRole)
-					partName->setText(part->name());
-				else
-					partName->setText(track->name()+" : "+part->name());
-=======
-				partName->setFont(QFont("fixed-width", 8, QFont::Bold));
 				//if(m_displayRole == TrackRole)
 				partName->setText(part->name());
 				//else
 				//	partName->setText(track->name()+" : "+part->name());
->>>>>>> 39c58e5a526aa3f1528ee0ff2ea26a3d0778542d
+
 				if(!partColorIcons.isEmpty() && part->colorIndex() < partColorIcons.size())
 					partName->setIcon(partColorIcons.at(part->colorIndex()));
 				partsRow.append(chkPart);
