@@ -76,8 +76,10 @@ void TrackListView::displayRoleChanged(int role)
 
 void TrackListView::songChanged(int flags)/*{{{*/
 {
-	if(flags == -1 || flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_COLOR_MODIFIED))
+	if(flags == -1 || flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_COLOR_MODIFIED))
 	{
+		if(debugMsg)
+			printf("TrackListView::songChanged\n");
 		m_model->clear();
 		for(iTrack i = song->artracks()->begin(); i != song->artracks()->end(); ++i)
 		{
@@ -102,6 +104,7 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			//QFont font = trackName->font();
 			trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
 			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			trackName->setBackground(QBrush(QColor(20,20,20)));
 			trackRow.append(trackName);
 			m_model->appendRow(trackRow);
 			
