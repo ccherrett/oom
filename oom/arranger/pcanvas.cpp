@@ -955,11 +955,11 @@ QMenu* PartCanvas::genItemPopup(CItem* item)/*{{{*/
 			if(npart->part()->colorIndex() == i)
 			{
 				colorname = QString(config.partColorNames[i]);
-				colorPopup->setIcon(partColorIcons.at(i));
+				colorPopup->setIcon(partColorIconsSelected.at(i));
 				colorPopup->setTitle(colorSub->title()+": "+colorname);
 
 				colorname = QString("* "+config.partColorNames[i]);
-				QAction *act_color = colorSub->addAction(partColorIcons.at(i), colorname);
+				QAction *act_color = colorSub->addAction(partColorIconsSelected.at(i), colorname);
 				act_color->setData(20 + i);
 			}
 			else
@@ -3676,9 +3676,11 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	if(build_icons)
 	{
 		partColorIcons.clear();
+		partColorIconsSelected.clear();
 		for (int i = 0; i < NUM_PARTCOLORS; ++i)
 		{
 			partColorIcons.append(colorRect(config.partColors[i], config.partWaveColors[i], 80, 80));
+			partColorIconsSelected.append(colorRect(config.partWaveColors[i], config.partColors[i], 80, 80));
 		}
 		build_icons = false;
 	}

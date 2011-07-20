@@ -291,6 +291,7 @@ bool midiSeqRunning = false;
 int lastTrackPartColorIndex = 1;
 
 QList<QIcon> partColorIcons;
+QList<QIcon> partColorIconsSelected;
 
 //---------------------------------------------------------
 //   doSetuid
