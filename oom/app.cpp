@@ -813,10 +813,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	undoRedo = new QActionGroup(this);
 	undoRedo->setExclusive(false);
-	undoAction = new QAction(QIcon(*undoIconS), tr("Und&o"),
-			undoRedo);
-	redoAction = new QAction(QIcon(*redoIconS), tr("Re&do"),
-			undoRedo);
+	undoAction = new QAction(QIcon(*undoIconS), tr("Und&o"), undoRedo);
+	redoAction = new QAction(QIcon(*redoIconS), tr("Re&do"), undoRedo);
 
 	undoAction->setWhatsThis(tr("undo last change to song"));
 	redoAction->setWhatsThis(tr("redo last undo"));
@@ -825,6 +823,17 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(redoAction, SIGNAL(triggered()), song, SLOT(redo()));
 	connect(undoAction, SIGNAL(triggered()), song, SLOT(undo()));
 
+	//---------------------------------------------------
+	// Canvas Actions
+	//---------------------------------------------------
+	noteAlphaAction = new QAction(QIcon(*multiDisplay), tr("multipart"), this);
+	noteAlphaAction->setToolTip(tr("Toggle Display of multiple parts"));
+	noteAlphaAction->setCheckable(true);
+
+	multiPartSelectionAction = new QAction(QIcon(*selectMultiIcon), tr("multiselection"), this);
+	multiPartSelectionAction->setToolTip(tr("Toggle ability to select multiple part notes"));
+	multiPartSelectionAction->setCheckable(true);
+	
 	//---------------------------------------------------
 	//    Transport
 	//---------------------------------------------------
@@ -837,22 +846,19 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	replayAction->setCheckable(true);
 	connect(replayAction, SIGNAL(toggled(bool)), song, SLOT(setReplay(bool)));
 
-	loopAction = new QAction(QIcon(*loop1Icon),
-			tr("Loop"), transportAction);
+	loopAction = new QAction(QIcon(*loop1Icon), tr("Loop"), transportAction);
 	loopAction->setCheckable(true);
 
 	loopAction->setWhatsThis(tr(infoLoopButton));
 	connect(loopAction, SIGNAL(toggled(bool)), song, SLOT(setLoop(bool)));
 
-	punchinAction = new QAction(QIcon(*punchin1Icon),
-			tr("Punchin"), transportAction);
+	punchinAction = new QAction(QIcon(*punchin1Icon), tr("Punchin"), transportAction);
 	punchinAction->setCheckable(true);
 
 	punchinAction->setWhatsThis(tr(infoPunchinButton));
 	connect(punchinAction, SIGNAL(toggled(bool)), song, SLOT(setPunchin(bool)));
 
-	punchoutAction = new QAction(QIcon(*punchout1Icon),
-			tr("Punchout"), transportAction);
+	punchoutAction = new QAction(QIcon(*punchout1Icon), tr("Punchout"), transportAction);
 	punchoutAction->setCheckable(true);
 
 	punchoutAction->setWhatsThis(tr(infoPunchoutButton));
@@ -862,48 +868,41 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	tseparator->setSeparator(true);
 	//transportAction->addAction(tseparator);
 
-	startAction = new QAction(QIcon(*startIcon),
-			tr("Start"), transportAction);
+	startAction = new QAction(QIcon(*startIcon), tr("Start"), transportAction);
 
 	startAction->setWhatsThis(tr(infoStartButton));
 	connect(startAction, SIGNAL(triggered()), song, SLOT(rewindStart()));
 
-	rewindAction = new QAction(QIcon(*frewindIcon),
-			tr("Rewind"), transportAction);
+	rewindAction = new QAction(QIcon(*frewindIcon), tr("Rewind"), transportAction);
 
 	rewindAction->setWhatsThis(tr(infoRewindButton));
 	connect(rewindAction, SIGNAL(triggered()), song, SLOT(rewind()));
 
-	forwardAction = new QAction(QIcon(*fforwardIcon),
-			tr("Forward"), transportAction);
+	forwardAction = new QAction(QIcon(*fforwardIcon), tr("Forward"), transportAction);
 
 	forwardAction->setWhatsThis(tr(infoForwardButton));
 	connect(forwardAction, SIGNAL(triggered()), song, SLOT(forward()));
 
-	stopAction = new QAction(QIcon(*stopIcon),
-			tr("Stop"), transportAction);
+	stopAction = new QAction(QIcon(*stopIcon), tr("Stop"), transportAction);
 	stopAction->setCheckable(true);
 
 	stopAction->setWhatsThis(tr(infoStopButton));
 	stopAction->setChecked(true);
 	connect(stopAction, SIGNAL(toggled(bool)), song, SLOT(setStop(bool)));
 
-	playAction = new QAction(QIcon(*playIcon),
-			tr("Play"), transportAction);
+	playAction = new QAction(QIcon(*playIcon), tr("Play"), transportAction);
 	playAction->setCheckable(true);
 
 	playAction->setWhatsThis(tr(infoPlayButton));
 	playAction->setChecked(false);
 	connect(playAction, SIGNAL(toggled(bool)), song, SLOT(setPlay(bool)));
 
-	recordAction = new QAction(QIcon(*recordIcon),
-			tr("Record"), transportAction);
+	recordAction = new QAction(QIcon(*recordIcon), tr("Record"), transportAction);
 	recordAction->setCheckable(true);
 	recordAction->setWhatsThis(tr(infoRecordButton));
 	connect(recordAction, SIGNAL(toggled(bool)), song, SLOT(setRecord(bool)));
 
-	panicAction = new QAction(QIcon(*panicIcon),
-			tr("Panic"), this);
+	panicAction = new QAction(QIcon(*panicIcon), tr("Panic"), this);
 
 	panicAction->setWhatsThis(tr(infoPanicButton));
 	connect(panicAction, SIGNAL(triggered()), song, SLOT(panic()));
@@ -1219,28 +1218,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(sc, SIGNAL(activated()), editSignalMapper, SLOT(map()));
 	editSignalMapper->setMapping(sc, CMD_DELETE);
 
-	//--------------------------------------------------
-	//    Toolbar
-	//--------------------------------------------------
-
-	//tools = addToolBar(tr("File Buttons"));
-	//tools->addAction(fileNewAction);
-	//tools->addAction(fileOpenAction);
-	//tools->addAction(fileSaveAction);
-	//tools->setObjectName("tbFileButtons");
-	//tools->hide();
-
-	//
-	//    Whats This
-	//
-	//tools->addAction(QWhatsThis::createAction(this));
-
-	//tools->addSeparator();
-	//tools->addActions(undoRedo->actions());
-
-
-	//QToolBar* panicToolbar = addToolBar(tr("Panic"));
-	//panicToolbar->addAction(panicAction);
 
 	if (realTimePriority < sched_get_priority_min(SCHED_FIFO))
 		realTimePriority = sched_get_priority_min(SCHED_FIFO);
@@ -1256,11 +1233,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 			midiRTPrioOverride = sched_get_priority_max(SCHED_FIFO);
 	}
 
-	// Changed by Tim. p3.3.17
-	//midiSeq       = new MidiSeq(realTimeScheduling ? realTimePriority : 0, "Midi");
 	midiSeq = new MidiSeq("Midi");
 	audio = new Audio();
-	//audioPrefetch = new AudioPrefetch(0, "Disc");
 	audioPrefetch = new AudioPrefetch("Prefetch");
 	//Define the MidiMonitor
 	midiMonitor = new MidiMonitor("MidiMonitor");
@@ -1268,13 +1242,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//---------------------------------------------------
 	//    Popups
 	//---------------------------------------------------
-
-	//       QPopupMenu *foo = new QPopupMenu(this);
-	//       testAction = new QAction(foo,"testPython");
-	//       testAction->addTo(foo);
-	//       menuBar()->insertItem(tr("&testpython"), foo);
-	//       connect(testAction, SIGNAL(triggered()), this, SLOT(runPythonScript()));
-
 
 	//-------------------------------------------------------------
 	//    popup File
@@ -1317,8 +1284,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuEdit->addSeparator();
 	menuEdit->addAction(editDeleteSelectedAction);
 
-	// Moved below. Have to wait until synths are available...
-	//populateAddTrack(addTrack);
 	menuEdit->addMenu(addTrack);
 	menuEdit->addMenu(select);
 	select->addAction(editSelectAllAction);
@@ -1330,9 +1295,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuEdit->addSeparator();
 
 	menuEdit->addAction(startPianoEditAction);
-	//menuEdit->addAction(startDrumEditAction);
 	menuEdit->addAction(startListEditAction);
-	//menuEdit->addAction(startWaveEditAction);
 
 	menuEdit->addSeparator();
 
@@ -1363,7 +1326,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//-------------------------------------------------------------
 
 	menuView = menuBar()->addMenu(tr("View"));
-	//menuView->setCheckable(true);// not necessary with Qt4
 
 	menuView->addMenu(master);
 	master->addAction(masterGraphicAction);
@@ -1371,24 +1333,10 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	master->addAction(masterListAction);
 	menuView->addAction(viewTransportAction);
 	menuView->addAction(viewMixerAAction);
-	//menuView->addAction(viewMixerBAction);
-	//menuView->addAction(viewRoutesAction);
 	menuView->addAction(viewBigtimeAction);
 	menuView->addAction(viewCliplistAction);
 	menuView->addAction(viewMarkerAction);
 
-
-	//-------------------------------------------------------------
-	//    popup Structure
-	//-------------------------------------------------------------
-
-	//menuStructure = menuBar()->addMenu(tr("&Structure"));
-	//menuStructure->addAction(strGlobalCutAction);
-	//menuStructure->addAction(strGlobalInsertAction);
-	//menuStructure->addAction(strGlobalSplitAction);
-	//menuStructure->addAction(strCopyRangeAction);
-	//menuStructure->addSeparator();
-	//menuStructure->addAction(strCutEventsAction);
 
 	//-------------------------------------------------------------
 	//    popup Midi
@@ -1411,10 +1359,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//menu_functions->addAction(midiResetInstAction);
 	//menu_functions->addAction(midiInitInstActions);
 	menu_functions->addAction(midiLocalOffAction);
-	/*
-	 **      mpid4 = midiInputPlugins->insertItem(
-	 **         QIconSet(*midi_inputplugins_random_rhythm_generatorIcon), tr("Random Rhythm Generator"), 4);
-	 */
 
 	//-------------------------------------------------------------
 	//    popup Audio
@@ -1466,13 +1410,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menu_help->addAction(helpManualAction);
 	menu_help->addAction(helpHomepageAction);
 	menu_help->addSeparator();
-	//menu_help->addAction(helpReportAction);
-	//menu_help->addSeparator();
 	menu_help->addAction(helpAboutAction);
-
-	//menu_help->insertItem(tr("About&Qt"), this, SLOT(aboutQt()));
-	//menu_help->addSeparator();
-	//menu_ids[CMD_START_WHATSTHIS] = menu_help->insertItem(tr("What's &This?"), this, SLOT(whatsThis()), 0);
 
 	QWidget *faketitle = new QWidget();
 	m_mixerDock = new QDockWidget(tr("The Mixer Dock"), this);
@@ -1539,7 +1477,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	QActionGroup *grp = populateAddTrack(addTrack);
 
 	trackMidiAction = grp->actions()[0];
-	//trackDrumAction = grp->actions()[1];
 	trackWaveAction = grp->actions()[1];
 	trackAOutputAction = grp->actions()[2];
 	trackAGroupAction = grp->actions()[3];

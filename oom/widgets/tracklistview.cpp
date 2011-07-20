@@ -17,13 +17,13 @@
 #include "citem.h"
 #include "arranger.h"
 #include "event.h"
+#include "traverso_shared/TConfig.h"
 
 TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 : QFrame(parent)
 {
 	m_editor = editor;
 	m_displayRole = PartRole;
-	m_busy = false;
 	m_headers << "V" << "Track List";
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(8, 2, 8, 2);
@@ -48,6 +48,11 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_chkWorkingView->setToolTip(tr("Toggle Working View. Show only tracks with parts in them"));
 	m_chkWorkingView->setChecked(true);
 
+	m_chkSnapToPart = new QCheckBox(tr("Snap To Part"), this);
+	m_chkSnapToPart->setToolTip(tr("Move Playback cursor to the first note in a part when changing parts."));
+	bool snap = tconfig().get_property("PianoRollEdit", "snaptopart", true).toBool();
+	m_chkSnapToPart->setChecked(snap);
+
 	/*m_buttons = new QButtonGroup(this);
 	m_buttons->setExclusive(true);
 	m_buttons->addButton(m_chkPart, PartRole);
@@ -56,6 +61,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_buttonBox->addWidget(m_chkWorkingView);
 	QSpacerItem* hSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	m_buttonBox->addItem(hSpacer);
+	m_buttonBox->addWidget(m_chkSnapToPart);
 
 	m_layout->addLayout(m_buttonBox);
 
@@ -64,11 +70,20 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
 	connect(m_selmodel, SIGNAL(currentRowChanged(const QModelIndex, const QModelIndex)), this, SLOT(selectionChanged(const QModelIndex, const QModelIndex)));
 	connect(m_chkWorkingView, SIGNAL(stateChanged(int)), this, SLOT(displayRoleChanged(int)));
+	connect(m_chkSnapToPart, SIGNAL(stateChanged(int)), this, SLOT(snapToPartChanged(int)));
 	connect(m_table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(contextPopupMenu(QPoint)));
 }
 
 TrackListView::~TrackListView()
 {
+	tconfig().set_property("PianoRollEdit", "snaptopart", m_chkSnapToPart->isChecked());
+	tconfig().save();
+}
+
+void TrackListView::snapToPartChanged(int state)
+{
+	tconfig().set_property("PianoRollEdit", "snaptopart", state);
+	tconfig().save();
 }
 
 void TrackListView::displayRoleChanged(int role)
@@ -87,8 +102,6 @@ void TrackListView::displayRoleChanged(int role)
 
 void TrackListView::songChanged(int flags)/*{{{*/
 {
-	//if(m_busy)
-	//	return;
 	if(flags == -1 || flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_COLOR_MODIFIED))
 	{
 		if(debugMsg)
@@ -218,7 +231,7 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 
 void TrackListView::selectionChanged(const QModelIndex current, const QModelIndex)/*{{{*/
 {
-	if(!current.isValid() || m_busy)
+	if(!current.isValid())
 		return;
 	QStandardItem* test = m_model->itemFromIndex(current);
 	if(test && test->column() == 0)
@@ -245,7 +258,8 @@ void TrackListView::selectionChanged(const QModelIndex current, const QModelInde
 
 void TrackListView::movePlaybackToPart(Part* part)/*{{{*/
 {
-	if(audio->isPlaying())
+	bool snap = tconfig().get_property("PianoRollEdit", "snaptopart", true).toBool();
+	if(audio->isPlaying() || !snap)
 		return;
 	if(part)
 	{
@@ -272,7 +286,7 @@ void TrackListView::movePlaybackToPart(Part* part)/*{{{*/
 	}
 }/*}}}*/
 
-void TrackListView::updateCheck(PartList* list, bool on)
+void TrackListView::updateCheck(PartList* list, bool on)/*{{{*/
 {
 	for(iPart i = list->begin(); i != list->end(); ++i)
 	{
@@ -281,23 +295,55 @@ void TrackListView::updateCheck(PartList* list, bool on)
 		foreach(QStandardItem* item, found)
 		{
 			int type = item->data(TrackRole).toInt();
-			int sn = item->data(PartRole).toInt();
-			if(sn != part->sn())
-				continue;
 			if(type == 1)
+				continue;
+			int sn = item->data(PartRole).toInt();
+			int psn = part->sn();
+			//printf("Serial no. item: %d, part: %d\n", sn, psn);
+			if(sn == psn)
 			{
+				QStandardItem* pitem = m_model->item(item->row(), 0);
+				//printf("Updating item\n");
 				if(on)
+					pitem->setCheckState(Qt::Checked);
+				else
+					pitem->setCheckState(Qt::Unchecked);
+			}
+		}
+	}
+}/*}}}*/
+
+void TrackListView::updateCheck()/*{{{*/
+{
+	for(int i = 0; i < m_model->rowCount(); ++i)
+	{
+		QStandardItem* item = m_model->item(i, 0);
+		if(item)
+		{
+			int type = item->data(TrackRole).toInt();
+			QString trackName = item->data(TrackNameRole).toString();
+			if(type == 1)
+			{//TrackMode
+				if(m_selected.contains(trackName))
+					item->setCheckState(Qt::Checked);
+				else
+					item->setCheckState(Qt::Unchecked);
+			}
+			else
+			{//PartMode
+				int sn = item->data(PartRole).toInt();
+				//printf("Serial no. item: %d, part: %d\n", sn, psn);
+				if(m_editor->hasPart(sn))
 					item->setCheckState(Qt::Checked);
 				else
 					item->setCheckState(Qt::Unchecked);
 			}
 		}
 	}
-}
+}/*}}}*/
 
 void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 {
-	m_busy = true;
 	int type = item->data(TrackRole).toInt();
 	int column = item->column();
 	QStandardItem* chkItem = m_model->item(item->row(), 0);
@@ -320,26 +366,25 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 				{
 					m_editor->addParts(list);
 					m_selected.append(trackName);
+					if(!list->empty())
+					{
+						m_editor->setCurCanvasPart(list->begin()->second);
+						movePlaybackToPart(list->begin()->second);
+
+						m_model->blockSignals(true);
+						updateCheck(list, checked);
+						m_model->blockSignals(false);
+					}
 				}
 				else
 				{
 					m_editor->removeParts(list);
 					m_editor->updateCanvas();
 					m_selected.removeAll(trackName);
-					song->update(SC_SELECTION);
-				}
-				if(!list->empty())
-				{
-					if(checked)
-					{
-						m_editor->setCurCanvasPart(list->begin()->second);
-						movePlaybackToPart(list->begin()->second);
-					}
-					//m_busy = false;
 					m_model->blockSignals(true);
-					updateCheck(list, checked);
-					//songChanged(-1);
+					updateCheck();
 					m_model->blockSignals(false);
+					song->update(SC_SELECTION);
 				}
 			}
 			else
@@ -366,7 +411,6 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 					QMessageBox::critical(this, tr("OOMidi: bad trackname"),
 							tr("please choose a unique track name"),
 							QMessageBox::Ok, Qt::NoButton, Qt::NoButton);
-					m_busy = false;
 					m_model->blockSignals(true);
 					item->setText(item->data(TrackNameRole).toString());
 					m_model->blockSignals(false);
@@ -404,18 +448,19 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 						m_editor->removePart(sn);
 						m_editor->updateCanvas();
 						m_selected.removeAll(trackName);
-						QList<QStandardItem*> found = m_model->findItems(trackName, Qt::MatchExactly, 1);
+						/*QList<QStandardItem*> found = m_model->findItems(trackName, Qt::MatchExactly, 1);
 						foreach(QStandardItem* item1, found)
 						{
 							int type = item1->data(TrackRole).toInt();
 							if(type == 2)
-							{
+							{*/
 								m_model->blockSignals(true);
-								item1->setCheckState(Qt::Unchecked);
+								updateCheck();
+								//item1->setCheckState(Qt::Unchecked);
 								m_model->blockSignals(false);
-								break;
+							/*	break;
 							}
-						}
+						}*/
 						song->update(SC_SELECTION);
 					}
 				}
