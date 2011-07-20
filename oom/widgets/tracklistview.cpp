@@ -99,26 +99,10 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			trackName->setFont(QFont("fixed-width", 10, QFont::Bold));
 			trackName->setText(track->name());
 			//QFont font = trackName->font();
-			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);//Qt::AlignVCenter);
 			trackRow.append(trackName);
 			m_model->appendRow(trackRow);
 
-			QList<QStandardItem*> trackRow;
-			QStandardItem* chkTrack = new QStandardItem(true);
-			chkTrack->setCheckable(true);
-			chkTrack->setData(1, TrackRole);
-			chkTrack->setData(track->name(), TrackNameRole);
-			if(m_selected.contains(track->name()))
-				chkTrack->setCheckState(Qt::Checked);
-			trackRow.append(chkTrack);
-			QStandardItem* trackName = new QStandardItem();
-			trackName->setText(track->name());
-			//QFont font = trackName->font();
-			trackName->setFont(QFont("fixed-width", 9, QFont::Bold));
-			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-			trackRow.append(trackName);
-			m_model->appendRow(trackRow);
-			
 			for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
 			{
 				QList<QStandardItem*> partsRow;
