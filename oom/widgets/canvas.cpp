@@ -395,7 +395,6 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 	//    draw location marker
 	//---------------------------------------------------
 
-	//p.setPen(Qt::blue);
 	p.setPen(QColor(139, 225, 69));
 	if ((song->loop() || song->punchin()) && _pos[1] >= unsigned(x) && _pos[1] < unsigned(x2))
 	{
@@ -407,10 +406,15 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 	//Draw part end start lines
 	if(_curPart && _drawPartLines)
 	{
-		//p.setPen(QColor(200,146,0));
-		QPen posPen = QPen(QColor(200,146,0), 5);
+		QColor lineColor(config.partColors[_curPart->colorIndex()]);
+		//QColor fillColor(config.partWaveColors[_curPart->colorIndex()]);
+		QPen posPen(lineColor, 5);
+		//QBrush fillBrush(fillColor);
 		posPen.setCosmetic(true);
 		p.setPen(posPen);
+		//p.setBrush(fillBrush);
+		//p.drawRect(QRect(_curPart->tick(), y, 10, y2));
+		//p.drawRect(QRect(_curPart->endTick(), y, 10, y2));
 		p.drawLine(_curPart->tick(), y, _curPart->tick(), y2);
 		p.drawLine(_curPart->endTick(), y, _curPart->endTick(), y2);
 	}

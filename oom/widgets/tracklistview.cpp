@@ -256,8 +256,7 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 						if(p)
 						{
 							m_editor->addPart(p);
-							m_editor->setCurCanvasPart(p);
-							movePlaybackToPart(p);
+							updatePartSelection(p);
 							songChanged(-1);//update check state
 						}
 						break;
@@ -303,12 +302,30 @@ void TrackListView::selectionChanged(const QModelIndex current, const QModelInde
 	int sn = item->data(PartRole).toInt();
 	unsigned tick = item->data(TickRole).toInt();
 	Part* part = list->find(tick, sn);
-	if(part)
+	updatePartSelection(part);
+}/*}}}*/
+
+void TrackListView::updatePartSelection(Part* part)
+{
+	if(part)/*{{{*/
 	{
+		Track* track = part->track();
+		Part* curPart = m_editor->curCanvasPart();
+		if (curPart)
+		{
+			song->setRecordFlag(curPart->track(), false);
+		}
 		m_editor->setCurCanvasPart(part);
 		movePlaybackToPart(part);
-	}
-}/*}}}*/
+		// and turn it on for the new parts track
+		song->setRecordFlag(track, true);
+		song->deselectTracks();
+		song->deselectAllParts();
+		track->setSelected(true);
+		part->setSelected(true);
+		song->update(SC_SELECTION);
+	}/*}}}*/
+}
 
 void TrackListView::movePlaybackToPart(Part* part)/*{{{*/
 {
@@ -358,10 +375,12 @@ void TrackListView::updateCheck(PartList* list, bool on)/*{{{*/
 			{
 				QStandardItem* pitem = m_model->item(item->row(), 0);
 				//printf("Updating item\n");
+				m_model->blockSignals(true);
 				if(on)
 					pitem->setCheckState(Qt::Checked);
 				else
 					pitem->setCheckState(Qt::Unchecked);
+				m_model->blockSignals(false);
 			}
 		}
 	}
@@ -378,19 +397,23 @@ void TrackListView::updateCheck()/*{{{*/
 			QString trackName = item->data(TrackNameRole).toString();
 			if(type == 1)
 			{//TrackMode
+				m_model->blockSignals(true);
 				if(m_selected.contains(trackName))
 					item->setCheckState(Qt::Checked);
 				else
 					item->setCheckState(Qt::Unchecked);
+				m_model->blockSignals(false);
 			}
 			else
 			{//PartMode
 				int sn = item->data(PartRole).toInt();
 				//printf("Serial no. item: %d, part: %d\n", sn, psn);
+				m_model->blockSignals(true);
 				if(m_editor->hasPart(sn))
 					item->setCheckState(Qt::Checked);
 				else
 					item->setCheckState(Qt::Unchecked);
+				m_model->blockSignals(false);
 			}
 		}
 	}
@@ -409,7 +432,10 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 
 	PartList* list = track->parts();
 	if(list->empty())
+	{
+		updateCheck();
 		return;
+	}
 	switch(type)
 	{
 		case 1: //Track
@@ -422,12 +448,9 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 					m_selected.append(trackName);
 					if(!list->empty())
 					{
-						m_editor->setCurCanvasPart(list->begin()->second);
-						movePlaybackToPart(list->begin()->second);
+						updatePartSelection(list->begin()->second);
 
-						m_model->blockSignals(true);
 						updateCheck(list, checked);
-						m_model->blockSignals(false);
 					}
 				}
 				else
@@ -435,9 +458,7 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 					m_editor->removeParts(list);
 					m_editor->updateCanvas();
 					m_selected.removeAll(trackName);
-					m_model->blockSignals(true);
 					updateCheck();
-					m_model->blockSignals(false);
 					song->update(SC_SELECTION);
 				}
 			}
@@ -494,27 +515,14 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 					if(checked)
 					{
 						m_editor->addPart(part);
-						m_editor->setCurCanvasPart(part);
-						movePlaybackToPart(part);
+						updatePartSelection(part);
 					}
 					else
 					{
 						m_editor->removePart(sn);
 						m_editor->updateCanvas();
 						m_selected.removeAll(trackName);
-						/*QList<QStandardItem*> found = m_model->findItems(trackName, Qt::MatchExactly, 1);
-						foreach(QStandardItem* item1, found)
-						{
-							int type = item1->data(TrackRole).toInt();
-							if(type == 2)
-							{*/
-								m_model->blockSignals(true);
-								updateCheck();
-								//item1->setCheckState(Qt::Unchecked);
-								m_model->blockSignals(false);
-							/*	break;
-							}
-						}*/
+						updateCheck();
 						song->update(SC_SELECTION);
 					}
 				}
