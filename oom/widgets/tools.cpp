@@ -60,7 +60,7 @@ ToolB toolList[] = {
 EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 : QToolBar(tr("Edit Tools"), parent)
 {
-	QActionGroup* action = new QActionGroup(parent); // Parent needed.
+	action = new QActionGroup(parent);
 	action->setExclusive(true);
 
 	nactions = 0;
@@ -110,6 +110,11 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 void EditToolBar::toolChanged(QAction* action)
 {
 	emit toolChanged(((Action*) action)->id());
+}
+
+QList<QAction*> EditToolBar::getActions()
+{
+	return action->actions();
 }
 
 //---------------------------------------------------------

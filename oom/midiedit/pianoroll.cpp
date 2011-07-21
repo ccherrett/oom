@@ -396,28 +396,42 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	cursorBar->setFloatable(false);
 	cursorBar->setMovable(false);
 	cursorBar->setAllowedAreas(Qt::BottomToolBarArea);
-
-	tools2 = new EditToolBar(this, pianorollTools);
+	
+	tools22 = new EditToolBar(this, pianorollTools);
+    tools2 = new QToolBar(tr("Edit Tools"));
 	tools2->setIconSize(QSize(22, 22));
 	addToolBar(Qt::BottomToolBarArea, tools2);
 	tools2->setFloatable(false);
 	tools2->setMovable(false);
 	tools2->setAllowedAreas(Qt::BottomToolBarArea);
-
-	//bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
-	noteAlphaAction->setChecked(true);
-	tools2->addAction(noteAlphaAction);
-	
-
-	QWidget* spacer = new QWidget();
-	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer->setMaximumWidth(15);
-	tools2->addWidget(spacer);
+	QWidget* tspacer = new QWidget();
+	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tools2->addWidget(tspacer);
 
 
+	//tools2->addActions(transportAction->actions());
+	QList<QAction*> transActions = transportAction->actions();
+	foreach(QAction *act, transActions)
+	{
+		if(act == recordAction)
+		{
+			tools2->addAction(act);
+			tools2->addWidget(solo);
+			QWidget* spacer55 = new QWidget();
+			spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+			spacer55->setMaximumWidth(15);
+			tools2->addWidget(spacer55);
+			tools2->addActions(tools22->getActions());
+			QWidget* spacer = new QWidget();
+			spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+			spacer->setMaximumWidth(15);
+			tools2->addWidget(spacer);
+		}
+		else
+			tools2->addAction(act);
+	}
 	//-------------------------------------------------------------
 	//    Transport Bar
-    //QToolBar* transport = new QToolBar(tr("Transport"));
 	//addToolBar(Qt::BottomToolBarArea, transport);
 	QWidget* actionSpacer = new QWidget();
 	actionSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -427,6 +441,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tools2->addAction(multiPartSelectionAction);
 	tools2->addWidget(m_globalKey);
 	tools2->addWidget(m_globalArm);
+	//bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
+	noteAlphaAction->setChecked(true);
+	tools2->addAction(noteAlphaAction);
 	//QWidget* spacer1 = new QWidget();
 	//spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	//spacer1->setMaximumWidth(10);
@@ -435,12 +452,6 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer5->setMaximumWidth(15);
 	tools2->addWidget(spacer5);
-	tools2->addActions(transportAction->actions());
-	tools2->addWidget(solo);
-	QWidget* spacer2 = new QWidget();
-	spacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer2->setMaximumWidth(15);
-	tools2->addWidget(spacer2);
 	tools2->addWidget(srec);
 	tools2->addWidget(speaker);
 	tools2->addAction(panicAction);
@@ -551,7 +562,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     canvas->setOrigin(offset, 0);
     canvas->setCanvasTools(pianorollTools);
     canvas->setFocus();
-    connect(canvas, SIGNAL(toolChanged(int)), tools2, SLOT(set(int)));
+    connect(canvas, SIGNAL(toolChanged(int)), tools22, SLOT(set(int)));
     time->setOrigin(offset, 0);
     pcbar->setOrigin(offset, 0);
 
@@ -591,7 +602,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     hsplitter->setStretchFactor(0, 0);
     hsplitter->setStretchFactor(1, 15);
 
-    connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
+    connect(tools22, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 
 	connect(noteAlphaAction, SIGNAL(toggled(bool)), canvas, SLOT(update()));
     //connect(midiTrackInfo, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
@@ -1044,7 +1055,7 @@ CtrlEdit* PianoRoll::addCtrl()
 {
 	///CtrlEdit* ctrlEdit = new CtrlEdit(splitter, this, xscale, false, "pianoCtrlEdit");
 	CtrlEdit* ctrlEdit = new CtrlEdit(ctrlLane/*splitter*/, this, xscale, false, "pianoCtrlEdit"); // ccharrett
-	connect(tools2, SIGNAL(toolChanged(int)), ctrlEdit, SLOT(setTool(int)));
+	connect(tools22, SIGNAL(toolChanged(int)), ctrlEdit, SLOT(setTool(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), ctrlEdit, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scaleChanged(float)), ctrlEdit, SLOT(setXMag(float)));
 	connect(ctrlEdit, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
@@ -1053,7 +1064,7 @@ CtrlEdit* PianoRoll::addCtrl()
 	connect(info, SIGNAL(alphaChanged()), ctrlEdit, SLOT(updateCanvas()));
 	connect(noteAlphaAction, SIGNAL(toggled(bool)), ctrlEdit, SLOT(updateCanvas()));
 
-	ctrlEdit->setTool(tools2->curTool());
+	ctrlEdit->setTool(tools22->curTool());
 	ctrlEdit->setXPos(hscroll->pos());
 	ctrlEdit->setXMag(hscroll->getScaleValue());
 
@@ -1261,7 +1272,7 @@ void PianoRoll::readStatus(Xml& xml)
 			{
 				int tool = xml.parseInt();
 				canvas->setTool(tool);
-				tools2->set(tool);
+				tools22->set(tool);
 			}
 			else if (tag == "midieditor")
 				MidiEditor::readStatus(xml);
@@ -1514,22 +1525,22 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_TOOL_POINTER].key)
 	{
-		tools2->set(PointerTool);
+		tools22->set(PointerTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_PENCIL].key)
 	{
-		tools2->set(PencilTool);
+		tools22->set(PencilTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_RUBBER].key)
 	{
-		tools2->set(RubberTool);
+		tools22->set(RubberTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_LINEDRAW].key)
 	{
-		tools2->set(DrawTool);
+		tools22->set(DrawTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_POS_INC].key)

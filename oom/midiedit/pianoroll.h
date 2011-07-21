@@ -142,7 +142,8 @@ class PianoRoll : public MidiEditor
     QToolButton* m_globalKey;
     QToolButton* m_globalArm;
     QToolBar* tools;
-    EditToolBar* tools2;
+    QToolBar* tools2;
+    EditToolBar* tools22;
 
     int colorMode;
 

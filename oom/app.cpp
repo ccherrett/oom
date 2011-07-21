@@ -847,9 +847,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(replayAction, SIGNAL(toggled(bool)), song, SLOT(setReplay(bool)));
 
 
-	QAction *tseparator = new QAction(this);
-	tseparator->setSeparator(true);
-	//transportAction->addAction(tseparator);
 
 	startAction = new QAction(QIcon(*startIcon), tr("Start"), transportAction);
 

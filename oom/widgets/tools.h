@@ -9,12 +9,14 @@
 #define __TOOLS_H__
 
 #include <QToolBar>
+#include <QList>
 
 class Action;
 
 class QAction;
 class QPixmap;
 class QWidget;
+class QActionGroup;
 
 enum Tool
 {
@@ -40,6 +42,7 @@ class EditToolBar : public QToolBar
 {
     Q_OBJECT
     Action** actions;
+	QActionGroup* action;
     int nactions;
 
 private slots:
@@ -56,6 +59,7 @@ public:
     EditToolBar(QWidget* /*parent*/, int /*tools*/, const char* name = 0); // Needs a parent !
     ~EditToolBar();
     int curTool();
+	QList<QAction*> getActions();
 };
 
 #endif
