@@ -426,28 +426,24 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 			spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 			spacer->setMaximumWidth(15);
 			tools2->addWidget(spacer);
+	
+			multiPartSelectionAction->setChecked(false);
+			tools2->addAction(multiPartSelectionAction);
+			tools2->addWidget(m_globalKey);
+			tools2->addWidget(m_globalArm);
+			//bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
+			noteAlphaAction->setChecked(true);
+			tools2->addAction(noteAlphaAction);
+			
+			QWidget* spacer222 = new QWidget();
+			spacer222->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+			spacer222->setMaximumWidth(15);
+			tools2->addWidget(spacer222);
+	
 		}
 		else
 			tools2->addAction(act);
 	}
-	//-------------------------------------------------------------
-	//    Transport Bar
-	//addToolBar(Qt::BottomToolBarArea, transport);
-	QWidget* actionSpacer = new QWidget();
-	actionSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	actionSpacer->setMaximumWidth(15);
-	tools2->addWidget(actionSpacer);
-	multiPartSelectionAction->setChecked(false);
-	tools2->addAction(multiPartSelectionAction);
-	tools2->addWidget(m_globalKey);
-	tools2->addWidget(m_globalArm);
-	//bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
-	noteAlphaAction->setChecked(true);
-	tools2->addAction(noteAlphaAction);
-	//QWidget* spacer1 = new QWidget();
-	//spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//spacer1->setMaximumWidth(10);
-	//tools2->addWidget(spacer1);
 	QWidget* spacer5 = new QWidget();
 	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer5->setMaximumWidth(15);
