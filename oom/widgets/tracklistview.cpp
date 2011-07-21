@@ -24,6 +24,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 {
 	m_editor = editor;
 	m_displayRole = PartRole;
+	m_selectedIndex = -1;
 	m_headers << "V" << "Track List";
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(8, 2, 8, 2);
@@ -172,6 +173,8 @@ void TrackListView::songChanged(int flags)/*{{{*/
 		}
 		m_model->setHorizontalHeaderLabels(m_headers);
 		m_table->setColumnWidth(0, 20);
+		if(m_selectedIndex < m_model->rowCount())
+			m_table->selectRow(m_selectedIndex);
 	}
 }/*}}}*/
 
@@ -290,6 +293,7 @@ void TrackListView::selectionChanged(const QModelIndex current, const QModelInde
 	if(test && test->column() == 0)
 		return;
 	int row = current.row();
+	m_selectedIndex = row;
 	QStandardItem* item = m_model->item(row, 0);
 	int type = item->data(TrackRole).toInt();
 	bool checked = (item->checkState() == Qt::Checked);
@@ -305,9 +309,9 @@ void TrackListView::selectionChanged(const QModelIndex current, const QModelInde
 	updatePartSelection(part);
 }/*}}}*/
 
-void TrackListView::updatePartSelection(Part* part)
+void TrackListView::updatePartSelection(Part* part)/*{{{*/
 {
-	if(part)/*{{{*/
+	if(part)
 	{
 		Track* track = part->track();
 		Part* curPart = m_editor->curCanvasPart();
@@ -324,8 +328,8 @@ void TrackListView::updatePartSelection(Part* part)
 		track->setSelected(true);
 		part->setSelected(true);
 		song->update(SC_SELECTION);
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
 void TrackListView::movePlaybackToPart(Part* part)/*{{{*/
 {
@@ -492,14 +496,14 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 					update();
 					return;
 				}
+				m_model->blockSignals(true);
+				item->setData(newName, TrackNameRole);
+				m_model->blockSignals(false);
+
 				Track* newTrack = track->clone(false);
 				newTrack->setName(newName);
 				track->setName(newName);
 				audio->msgChangeTrack(newTrack, track);
-
-				m_model->blockSignals(true);
-				item->setData(newName, TrackNameRole);
-				m_model->blockSignals(false);
 			}
 		}
 		break;
@@ -541,19 +545,22 @@ void TrackListView::toggleTrackPart(QStandardItem* item)/*{{{*/
 						update();
 						return;
 					}
-					Part* newPart = part->clone();
-					newPart->setName(name);
-					// Indicate do undo, and do port controller values but not clone parts.
-					audio->msgChangePart(part, newPart, true, true, false);
 
 					m_model->blockSignals(true);
 					item->setData(name, PartRole);
 					m_model->blockSignals(false);
+
+					Part* newPart = part->clone();
+					newPart->setName(name);
+					// Indicate do undo, and do port controller values but not clone parts.
+					audio->msgChangePart(part, newPart, true, true, false);
 				}
 			}
 		}
 		break;
 	}
 	update();
+	if(m_selectedIndex < m_model->rowCount())
+		m_table->selectRow(m_selectedIndex);
 }/*}}}*/
 

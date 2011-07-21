@@ -74,6 +74,9 @@ void UndoOp::dump()
 		case DeleteSig:
 		case ModifyClip:
 		case ModifyMarker:
+		case AddTrackView:
+		case ModifyTrackView:
+		case DeleteTrackView:
 			break;
 	}
 }
@@ -448,6 +451,10 @@ void Song::doUndo2()
 			case UndoOp::ModifyClip:
 			case UndoOp::ModifyMarker:
 				break;
+			case UndoOp::AddTrackView:
+			case UndoOp::ModifyTrackView:
+			case UndoOp::DeleteTrackView:
+				break;
 		}
 	}
 }
@@ -677,6 +684,10 @@ void Song::doRedo2()
 				break;
 			case UndoOp::ModifyClip:
 			case UndoOp::ModifyMarker:
+				break;
+			case UndoOp::AddTrackView:
+			case UndoOp::ModifyTrackView:
+			case UndoOp::DeleteTrackView:
 				break;
 		}
 	}
