@@ -407,6 +407,7 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 	if(_curPart && _drawPartLines)
 	{
 		QColor lineColor(config.partColors[_curPart->colorIndex()]);
+		lineColor.setAlpha(200);
 		//QColor fillColor(config.partWaveColors[_curPart->colorIndex()]);
 		QPen posPen(lineColor, 5);
 		//QBrush fillBrush(fillColor);
