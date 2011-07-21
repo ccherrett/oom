@@ -305,8 +305,20 @@ void TrackListView::selectionChanged(const QModelIndex current, const QModelInde
 	Part* part = list->find(tick, sn);
 	if(part)
 	{
+		Part* curPart = m_editor->curCanvasPart();
+		if (curPart)
+		{
+			song->setRecordFlag(curPart->track(), false);
+		}
 		m_editor->setCurCanvasPart(part);
 		movePlaybackToPart(part);
+		// and turn it on for the new parts track
+		song->setRecordFlag(track, true);
+		song->deselectTracks();
+		song->deselectAllParts();
+		track->setSelected(true);
+		part->setSelected(true);
+		song->update(SC_SELECTION);
 	}
 }/*}}}*/
 

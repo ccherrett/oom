@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+    <layout class="QHBoxLayout" name="m_nameHBox" stretch="0">
      <property name="spacing">
       <number>0</number>
      </property>
@@ -44,20 +44,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="trackName">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>18</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Track Name</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="trackEdit">
+      <widget class="QLineEdit" name="m_trackName">
        <property name="maximumSize">
         <size>
          <width>16777215</width>
@@ -72,12 +59,12 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="m_buttonHBox">
      <property name="spacing">
       <number>2</number>
      </property>
      <item>
-      <widget class="QToolButton" name="btnReminder1">
+      <widget class="QToolButton" name="m_btnReminder1">
        <property name="minimumSize">
         <size>
          <width>22</width>
@@ -90,13 +77,16 @@
          <height>18</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnReminder2">
+      <widget class="QToolButton" name="m_btnReminder2">
        <property name="minimumSize">
         <size>
          <width>22</width>
@@ -109,13 +99,16 @@
          <height>18</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnReminder3">
+      <widget class="QToolButton" name="m_btnReminder3">
        <property name="minimumSize">
         <size>
          <width>22</width>
@@ -128,13 +121,16 @@
          <height>18</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnAutomation">
+      <widget class="QToolButton" name="m_btnAutomation">
        <property name="minimumSize">
         <size>
          <width>22</width>
@@ -147,13 +143,16 @@
          <height>18</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnRecord">
+      <widget class="QToolButton" name="m_btnRecord">
        <property name="minimumSize">
         <size>
          <width>18</width>
@@ -165,6 +164,9 @@
          <width>18</width>
          <height>18</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
         <string>Record</string>
@@ -178,7 +180,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnMute">
+      <widget class="QToolButton" name="m_btnMute">
        <property name="minimumSize">
         <size>
          <width>18</width>
@@ -190,6 +192,9 @@
          <width>18</width>
          <height>18</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
         <string>Mute</string>
@@ -203,7 +208,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnSolo">
+      <widget class="QToolButton" name="m_btnSolo">
        <property name="minimumSize">
         <size>
          <width>18</width>
@@ -215,6 +220,9 @@
          <width>18</width>
          <height>18</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
         <string>Solo</string>
