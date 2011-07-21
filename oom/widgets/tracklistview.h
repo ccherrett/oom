@@ -47,6 +47,8 @@ class TrackListView : public QFrame
 	QCheckBox* m_chkSnapToPart;
 	int m_displayRole;
 	QStringList m_headers;
+	
+	void updatePartSelection(Part*);
 
 
 private slots:
