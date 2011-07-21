@@ -419,8 +419,6 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//    Transport Bar
     //QToolBar* transport = new QToolBar(tr("Transport"));
 	//addToolBar(Qt::BottomToolBarArea, transport);
-	tools2->addWidget(srec);
-	tools2->addWidget(speaker);
 	QWidget* actionSpacer = new QWidget();
 	actionSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	actionSpacer->setMaximumWidth(15);
@@ -443,6 +441,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer2->setMaximumWidth(15);
 	tools2->addWidget(spacer2);
+	tools2->addWidget(srec);
+	tools2->addWidget(speaker);
 	tools2->addAction(panicAction);
 	/*#ifdef LSCP_SUPPORT
 	QToolButton *btnLSCP = new QToolButton();
