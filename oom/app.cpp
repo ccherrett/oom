@@ -846,23 +846,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	replayAction->setCheckable(true);
 	connect(replayAction, SIGNAL(toggled(bool)), song, SLOT(setReplay(bool)));
 
-	loopAction = new QAction(QIcon(*loop1Icon), tr("Loop"), transportAction);
-	loopAction->setCheckable(true);
-
-	loopAction->setWhatsThis(tr(infoLoopButton));
-	connect(loopAction, SIGNAL(toggled(bool)), song, SLOT(setLoop(bool)));
-
-	punchinAction = new QAction(QIcon(*punchin1Icon), tr("Punchin"), transportAction);
-	punchinAction->setCheckable(true);
-
-	punchinAction->setWhatsThis(tr(infoPunchinButton));
-	connect(punchinAction, SIGNAL(toggled(bool)), song, SLOT(setPunchin(bool)));
-
-	punchoutAction = new QAction(QIcon(*punchout1Icon), tr("Punchout"), transportAction);
-	punchoutAction->setCheckable(true);
-
-	punchoutAction->setWhatsThis(tr(infoPunchoutButton));
-	connect(punchoutAction, SIGNAL(toggled(bool)), song, SLOT(setPunchout(bool)));
 
 	QAction *tseparator = new QAction(this);
 	tseparator->setSeparator(true);
@@ -901,6 +884,24 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	recordAction->setCheckable(true);
 	recordAction->setWhatsThis(tr(infoRecordButton));
 	connect(recordAction, SIGNAL(toggled(bool)), song, SLOT(setRecord(bool)));
+	
+	loopAction = new QAction(QIcon(*loop1Icon), tr("Loop"), transportAction);/*{{{*/
+	loopAction->setCheckable(true);
+
+	loopAction->setWhatsThis(tr(infoLoopButton));
+	connect(loopAction, SIGNAL(toggled(bool)), song, SLOT(setLoop(bool)));
+
+	punchinAction = new QAction(QIcon(*punchin1Icon), tr("Punchin"), transportAction);
+	punchinAction->setCheckable(true);
+
+	punchinAction->setWhatsThis(tr(infoPunchinButton));
+	connect(punchinAction, SIGNAL(toggled(bool)), song, SLOT(setPunchin(bool)));
+
+	punchoutAction = new QAction(QIcon(*punchout1Icon), tr("Punchout"), transportAction);
+	punchoutAction->setCheckable(true);
+
+	punchoutAction->setWhatsThis(tr(infoPunchoutButton));
+	connect(punchoutAction, SIGNAL(toggled(bool)), song, SLOT(setPunchout(bool)));/*}}}*/
 
 	panicAction = new QAction(QIcon(*panicIcon), tr("Panic"), this);
 
