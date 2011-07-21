@@ -141,6 +141,7 @@ class PianoRoll : public MidiEditor
     QToolButton* speaker;
     QToolButton* m_globalKey;
     QToolButton* m_globalArm;
+    QToolButton* m_mutePart;
     QToolBar* tools;
     QToolBar* tools2;
     EditToolBar* tools22;
@@ -178,6 +179,7 @@ class PianoRoll : public MidiEditor
     bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
+	void toggleMuteCurrentPart(bool);
     void toggleMultiPartSelection(bool);
     void toggleEpicEdit(bool);
     void setSelection(int, Event&, Part*);

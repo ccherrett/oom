@@ -371,6 +371,11 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	m_globalArm->setIcon(*armAllIcon);
 	//m_globalArm->setCheckable(true);
 
+    m_mutePart = new QToolButton();
+	m_mutePart->setToolTip(tr("Mute current part"));
+	m_mutePart->setIcon(*editmuteIcon);
+	m_mutePart->setCheckable(true);
+
 	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
 	posLabel = new PosLabel(0, "pos");
 	posLabel->setFixedHeight(22);
@@ -398,6 +403,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	cursorBar->setAllowedAreas(Qt::BottomToolBarArea);
 	
 	tools22 = new EditToolBar(this, pianorollTools);
+	tools22->setVisible(false);
     tools2 = new QToolBar(tr("Edit Tools"));
 	tools2->setIconSize(QSize(22, 22));
 	addToolBar(Qt::BottomToolBarArea, tools2);
@@ -416,6 +422,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 		if(act == recordAction)
 		{
 			tools2->addAction(act);
+			tools2->addWidget(m_mutePart);
 			tools2->addWidget(solo);
 			QWidget* spacer55 = new QWidget();
 			spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -641,6 +648,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(midiTrackInfo, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
+	connect(m_mutePart, SIGNAL(toggled(bool)), this, SLOT(toggleMuteCurrentPart(bool)));
 
     connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
     piano->setYPos(KH * 30);
@@ -739,12 +747,27 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
     //      hscroll->setOffset((int)pos); // changed that to:
 }
+void PianoRoll::toggleMuteCurrentPart(bool mute)
+{
+	if(canvas)
+	{
+		Part* part = curCanvasPart();
+		if(part)
+		{
+			part->setMute(mute);
+			song->update(SC_SELECTION);
+		}
+	}
+}
 
 void PianoRoll::setCurCanvasPart(Part* part)
 {
 	if (canvas)
 	{
 		canvas->setCurrentPart(part);
+		m_mutePart->blockSignals(true);
+		m_mutePart->setChecked(part->mute());
+		m_mutePart->blockSignals(false);
 	}
 	updateTrackInfo();
 	song->update(SC_SELECTION);
