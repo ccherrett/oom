@@ -15,6 +15,7 @@ class Action;
 
 class QAction;
 class QPixmap;
+class QIcon;
 class QWidget;
 class QActionGroup;
 
@@ -27,8 +28,9 @@ const int arrangerTools = PointerTool | PencilTool | RubberTool | CutTool | Glue
 
 struct ToolB
 {
-    QPixmap** icon;
-    const char* tip;
+    //QPixmap** icon;
+	QIcon** icon;
+	const char* tip;
     const char* ltip;
 };
 

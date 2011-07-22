@@ -247,11 +247,11 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	
 	Track::TrackType type = t->type();
 
-	QIcon muteSet;
+	/*QIcon muteSet;
 	muteSet.addPixmap(*muteIconOn, QIcon::Normal, QIcon::Off);
-	muteSet.addPixmap(*muteIconOff, QIcon::Normal, QIcon::On);
-	m_btnMute->setIcon(muteSet);
-	m_btnMute->setIconSize(muteIconOn->size());
+	muteSet.addPixmap(*muteIconOff, QIcon::Normal, QIcon::On);*/
+	m_btnMute->setIcon(*muteIconSet4);
+	m_btnMute->setIconSize(monoIcon->size());
 	m_btnMute->setCheckable(true);
 	m_btnMute->setToolTip(tr("mute"));
 	m_btnMute->setObjectName("btnMute");

@@ -51,8 +51,6 @@ extern QPixmap* mixerIn;
 extern QPixmap* mixerOut;
 extern QPixmap* recEchoIconOn;
 extern QPixmap* recEchoIconOff;
-extern QPixmap* muteIconOn;
-extern QPixmap* muteIconOff;
 extern QPixmap* soloIconOn;
 extern QPixmap* soloIconOff;
 
@@ -119,10 +117,13 @@ extern QPixmap* garbagePCIcon;
 extern QPixmap* duplicatePCIcon;
 extern QPixmap* arranger_record_on_Icon;
 extern QPixmap* arranger_record_off_Icon;
+extern QPixmap* arranger_record_over_Icon;
 extern QPixmap* arranger_mute_on_Icon;
 extern QPixmap* arranger_mute_off_Icon;
+extern QPixmap* arranger_mute_over_Icon;
 extern QPixmap* arranger_solo_on_Icon;
 extern QPixmap* arranger_solo_off_Icon;
+extern QPixmap* arranger_solo_over_Icon;
 
 extern QIcon* pianoIconSet;
 extern QIcon* scoreIconSet;
@@ -149,17 +150,154 @@ extern QPixmap* exit1Icon;
 extern QPixmap* record1_Icon;
 extern QPixmap* record_on_Icon;
 extern QPixmap* record_off_Icon;
+extern QPixmap* record_over_Icon;
 extern QPixmap* newmuteIcon;
 extern QPixmap* soloIcon;
 
-extern QPixmap* muteIconOn;
-extern QPixmap* muteIconOff;
 extern QPixmap* soloIconOn;
 extern QPixmap* soloIconOff;
+extern QPixmap* soloIconOver;
+extern QPixmap* transport_soloIconOn;
+extern QPixmap* transport_soloIconOff;
+extern QPixmap* transport_soloIconOver;
 extern QPixmap* soloblksqIconOn;
 extern QPixmap* soloblksqIconOff;
+extern QPixmap* soloblksqIconOver;
 extern QIcon* soloIconSet1;
 extern QIcon* soloIconSet2;
+extern QIcon* soloIconSet3;
+
+extern QIcon* transport_muteIconOn;
+extern QIcon* transport_muteIconOff;
+extern QIcon* transport_muteIconOver;
+extern QIcon* muteIconSet3;
+
+extern QPixmap* muteIconOn;
+extern QPixmap* muteIconOff;
+extern QPixmap* muteIconOver;
+extern QIcon* muteIconSet4;
+
+extern QIcon* transport_recordIconOn;
+extern QIcon* transport_recordIconOff;
+extern QIcon* transport_recordIconOver;
+extern QIcon* recordIconSet3;
+
+extern QIcon* transport_playIconOn;
+extern QIcon* transport_playIconOff;
+extern QIcon* transport_playIconOver;
+extern QIcon* playIconSet3;
+
+extern QIcon* transport_startIconOn;
+extern QIcon* transport_startIconOff;
+extern QIcon* transport_startIconOver;
+extern QIcon* startIconSet3;
+
+extern QIcon* transport_rewindIconOn;
+extern QIcon* transport_rewindIconOff;
+extern QIcon* transport_rewindIconOver;
+extern QIcon* rewindIconSet3;
+
+extern QIcon* transport_forwardIconOn;
+extern QIcon* transport_forwardIconOff;
+extern QIcon* transport_forwardIconOver;
+extern QIcon* forwardIconSet3;
+
+extern QIcon* transport_stopIconOn;
+extern QIcon* transport_stopIconOff;
+extern QIcon* transport_stopIconOver;
+extern QIcon* stopIconSet3;
+
+extern QIcon* pointerIconOn;
+extern QIcon* pointerIconOff;
+extern QIcon* pointerIconOver;
+extern QIcon* pointerIconSet3;
+
+extern QIcon* pencilIconOn;
+extern QIcon* pencilIconOff;
+extern QIcon* pencilIconOver;
+extern QIcon* pencilIconSet3;
+
+extern QIcon* deleteIconOn;
+extern QIcon* deleteIconOff;
+extern QIcon* deleteIconOver;
+extern QIcon* deleteIconSet3;
+
+extern QIcon* cutIconOn;
+extern QIcon* cutIconOff;
+extern QIcon* cutIconOver;
+extern QIcon* cutIconSet3;
+
+extern QIcon* note1IconSet3;
+
+extern QIcon* glueIconOn;
+extern QIcon* glueIconOff;
+extern QIcon* glueIconOver;
+extern QIcon* glueIconSet3;
+
+extern QIcon* quantIconSet3;
+
+extern QIcon* drawIconOn;
+extern QIcon* drawIconOff;
+extern QIcon* drawIconOver;
+extern QIcon* drawIconSet3;
+
+extern QIcon* multiDisplayIconOn;
+extern QIcon* multiDisplayIconOff;
+extern QIcon* multiDisplayIconOver;
+extern QIcon* multiDisplayIconSet3;
+
+extern QIcon* selectMultiIconOn;
+extern QIcon* selectMultiIconOff;
+extern QIcon* selectMultiIconOver;
+extern QIcon* selectMultiIconSet3;
+
+extern QIcon* auditionIconOn;
+extern QIcon* auditionIconOff;
+extern QIcon* auditionIconOver;
+extern QIcon* auditionIconSet3;
+
+extern QIcon* feedbackIconOn;
+extern QIcon* feedbackIconOff;
+extern QIcon* feedbackIconOver;
+extern QIcon* feedbackIconSet3;
+
+extern QIcon* globalKeysIconOn;
+extern QIcon* globalKeysIconOff;
+extern QIcon* globalKeysIconOver;
+extern QIcon* globalKeysIconSet3;
+
+extern QIcon* stepIconOn;
+extern QIcon* stepIconOff;
+extern QIcon* stepIconOver;
+extern QIcon* stepIconSet3;
+
+extern QIcon* punchinIconOn;
+extern QIcon* punchinIconOff;
+extern QIcon* punchinIconOver;
+extern QIcon* punchinIconSet3;
+
+extern QIcon* punchoutIconOn;
+extern QIcon* punchoutIconOff;
+extern QIcon* punchoutIconOver;
+extern QIcon* punchoutIconSet3;
+
+extern QIcon* loopIconOn;
+extern QIcon* loopIconOff;
+extern QIcon* loopIconOver;
+extern QIcon* loopIconSet3;
+
+extern QIcon* speakerIconOn;
+extern QIcon* speakerIconOff;
+extern QIcon* speakerIconOver;
+extern QIcon* speakerIconSet3;
+
+extern QIcon* globalArmIconOff;
+extern QIcon* globalArmIconOver;
+extern QIcon* globalArmIconSet3;
+
+extern QIcon* panicIconOff;
+extern QIcon* panicIconOver;
+extern QIcon* panicIconSet3;
 
 extern QPixmap* redLedIcon;
 extern QPixmap* darkRedLedIcon;

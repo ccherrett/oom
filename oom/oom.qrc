@@ -37,6 +37,8 @@
 		<file>images/icons/add_tracks.png</file>
 		<file>images/icons/delete_track.png</file>
 		<file>images/icons/eraser.png</file>
+		<file>images/icons/eraser_off.png</file>
+		<file>images/icons/eraser_over.png</file>
 		<file>images/icons/eventfilter.png</file>
 		<file>images/icons/eventlist.png</file>
 		<file>images/icons/manage-midi-devices.png</file>
@@ -47,25 +49,52 @@
 		<file>images/icons/move_track_up.png</file>
 		<file>images/icons/mute-all.png</file>
 		<file>images/icons/pencil.png</file>
+		<file>images/icons/pencil_off.png</file>
+		<file>images/icons/pencil_over.png</file>
 		<file>images/icons/pencil_cursor.png</file>
 		<file>images/icons/programchange.png</file>
 		<file>images/icons/quantize.png</file>
 		<file>images/icons/resize.png</file>
 		<file>images/icons/select.png</file>
+		<file>images/icons/select_off.png</file>
+		<file>images/icons/select_over.png</file>
 		<file>images/icons/select_multi.png</file>
+		<file>images/icons/select_multi_off.png</file>
+		<file>images/icons/select_multi_over.png</file>
 		<file>images/icons/split.png</file>
+		<file>images/icons/split_off.png</file>
+		<file>images/icons/split_over.png</file>
 		<file>images/icons/step_by_step.png</file>
+		<file>images/icons/step_by_step_off.png</file>
+		<file>images/icons/step_by_step_over.png</file>
 		<file>images/icons/transport-cursor-to-pointer.png</file>
 		<file>images/icons/transport-ffwd.png</file>
+		<file>images/icons/transport-ffwd_off.png</file>
 		<file>images/icons/transport-ffwd-end.png</file>
 		<file>images/icons/transport-panic.png</file>
+		<file>images/icons/transport-panic_off.png</file>
 		<file>images/icons/transport-play.png</file>
+		<file>images/icons/transport-play_off.png</file>
+		<file>images/icons/transport-play_over.png</file>
 		<file>images/icons/transport-pointer-to-cursor.png</file>
 		<file>images/icons/transport-record.png</file>
 		<file>images/icons/transport-rewind.png</file>
+		<file>images/icons/transport-rewind_off.png</file>
 		<file>images/icons/transport-rewind-end.png</file>
+		<file>images/icons/transport-rewind-end_off.png</file>
+		<file>images/icons/transport-solo_on.png</file>
+		<file>images/icons/transport-solo_off.png</file>
+		<file>images/icons/transport-solo_over.png</file>
+		<file>images/icons/transport-mute_on.png</file>
+		<file>images/icons/transport-mute_off.png</file>
+		<file>images/icons/transport-mute_over.png</file>
+		<file>images/icons/transport-record_on.png</file>
+		<file>images/icons/transport-record_off.png</file>
+		<file>images/icons/transport-record_over.png</file>
 		<file>images/icons/transport-solo.png</file>
 		<file>images/icons/transport-stop.png</file>
+		<file>images/icons/transport-stop_off.png</file>
+		<file>images/icons/transport-stop_over.png</file>
 		<file>images/icons/transport-tracking.png</file>
 		<file>images/icons/un-mute-all.png</file>
 		<file>images/icons/velocity.png</file>
@@ -73,8 +102,10 @@
 		<file>images/icons/mixer-record_on.png</file>
 		<file>images/icons/mixer-solo.png</file>
 		<file>images/icons/mixer-solo_on.png</file>
+		<file>images/icons/mixer-solo_over.png</file>
 		<file>images/icons/mixer-mute.png</file>
 		<file>images/icons/mixer-mute_on.png</file>
+		<file>images/icons/mixer-mute_over.png</file>
 		<file>images/icons/mixer-stereo.png</file>
 		<file>images/icons/mixer-mono.png</file>
 		<file>images/icons/mixer-expand.png</file>
@@ -86,9 +117,13 @@
 		<file>images/icons/mixer-pre_on.png</file>
 		<file>images/icons/blank_record.png</file>
 		<file>images/icons/multi_display.png</file>
+		<file>images/icons/multi_display_off.png</file>
+		<file>images/icons/multi_display_over.png</file>
 		<file>images/icons/previous_part.png</file>
 		<file>images/icons/next_part.png</file>
 		<file>images/icons/feedback.png</file>
+		<file>images/icons/feedback_off.png</file>
+		<file>images/icons/feedback_over.png</file>
 		<file>images/mixer_bg_audio.png</file>
 		<file>images/mixer_bg_midi.png</file>
 		<file>images/mixer_bg_buss.png</file>
@@ -121,11 +156,23 @@
 		<file>images/icons/arranger_solo_on.png</file>
 		<file>images/icons/arranger_solo_off.png</file>
 		<file>images/icons/transport-loop.png</file>
+		<file>images/icons/transport-loop_off.png</file>
+		<file>images/icons/transport-loop_over.png</file>
 		<file>images/icons/transport-punchin.png</file>
 		<file>images/icons/transport-punchout.png</file>
+		<file>images/icons/transport-punchin_off.png</file>
+		<file>images/icons/transport-punchout_off.png</file>
+		<file>images/icons/transport-punchin_over.png</file>
+		<file>images/icons/transport-punchout_over.png</file>
 		<file>images/icons/line-tool.png</file>
+		<file>images/icons/line-tool_off.png</file>
+		<file>images/icons/line-tool_over.png</file>
 		<file>images/icons/join_tracks.png</file>
+		<file>images/icons/join_tracks_off.png</file>
+		<file>images/icons/join_tracks_over.png</file>
 		<file>images/icons/speaker.png</file>
+		<file>images/icons/speaker_off.png</file>
+		<file>images/icons/speaker_over.png</file>
 		<file>images/icons/mixeraudioS.png</file>
 		<file>images/icons/deselectall.png</file>
 		<file>images/icons/select_invert_selection.png</file>
@@ -142,12 +189,17 @@
 		<file>images/icons/x.png</file>
 		<file>images/icons/detach.png</file>
 		<file>images/icons/audition.png</file>
+		<file>images/icons/audition_off.png</file>
+		<file>images/icons/audition_over.png</file>
 		<file>images/icons/reminder_off.png</file>
 		<file>images/icons/reminder1_on.png</file>
 		<file>images/icons/reminder2_on.png</file>
 		<file>images/icons/reminder3_on.png</file>
 		<file>images/icons/globe-edit.png</file>
+		<file>images/icons/globe-edit_off.png</file>
 		<file>images/icons/globe.png</file>
+		<file>images/icons/globe_off.png</file>
+		<file>images/icons/globe_over.png</file>
 		<file>images/icons/comment.png</file>
 		<file>images/icons/arrow_switch.png</file>
 	</qresource>
