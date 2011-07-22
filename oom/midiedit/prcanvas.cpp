@@ -1379,14 +1379,38 @@ void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen,
 		case CMD_SELECT_PREV_PART: // select previous part
 		{
 			Part* pt = editor->curCanvasPart();
+			Track* cTrack = pt->track();
 			Part* newpt = pt;
 			PartList* pl = editor->parts();
-			for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+			QList<Track*> editorTracks = pl->tracks();
+			int listSize = (editorTracks.size() - 1);
+			int trackIndex = editorTracks.indexOf(pt->track());
+			PartMap partMap = pl->partMap(cTrack);
+			PartList* plist = partMap.parts;
+			for (iPart ip = plist->begin(); ip != plist->end(); ++ip)
 			{
 				if (ip->second == pt)
 				{
-					if (ip == pl->begin())
-						ip = pl->end();
+					if (ip == plist->begin() && !listSize)
+					{
+						ip = plist->end();
+					}
+					else if(ip == plist->begin())
+					{
+						int next = listSize;
+						if(trackIndex > 0)
+						{
+							next = (trackIndex - 1);
+						}
+						PartMap map = pl->partMap(editorTracks.at(next));
+						if(map.parts)
+						{
+							iPart ip2 = map.parts->end();
+							--ip2;
+							newpt = ip2->second;
+							break;
+						}
+					}
 					--ip;
 					newpt = ip->second;
 					break;
@@ -1414,15 +1438,38 @@ void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen,
 		case CMD_SELECT_NEXT_PART: // select next part
 		{
 			Part* pt = editor->curCanvasPart();
+			Track* cTrack = pt->track();
 			Part* newpt = pt;
 			PartList* pl = editor->parts();
-			for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+			QList<Track*> editorTracks = pl->tracks();
+			int listSize = (editorTracks.size() - 1);
+			int trackIndex = editorTracks.indexOf(pt->track());
+			PartMap partMap = pl->partMap(cTrack);
+			PartList* plist = partMap.parts;
+			for (iPart ip = plist->begin(); ip != plist->end(); ++ip)
 			{
 				if (ip->second == pt)
 				{
 					++ip;
-					if (ip == pl->end())
-						ip = pl->begin();
+					if (ip == plist->end() && !listSize)
+					{
+						ip = plist->begin();
+					}
+					else if(ip == plist->end())
+					{
+						int next = 0;
+						if(trackIndex < listSize)
+						{
+							next = (trackIndex + 1);
+						}
+						PartMap map = pl->partMap(editorTracks.at(next));
+						if(map.parts)
+						{
+							iPart ip2 = map.parts->begin();
+							newpt = ip2->second;
+							break;
+						}
+					}
 					newpt = ip->second;
 					break;
 				}

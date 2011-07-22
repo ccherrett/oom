@@ -12,6 +12,7 @@
 #include <map>
 
 #include <uuid/uuid.h>
+#include <QList>
 
 #include "event.h"
 #include "audioconvert.h"
@@ -226,9 +227,16 @@ public:
     virtual void dump(int n = 0) const;
 };
 
+
 //---------------------------------------------------------
 //   PartList
 //---------------------------------------------------------
+class PartList;
+
+struct PartMap {
+	PartList* parts;
+	Track* track;
+};
 
 typedef std::multimap<int, Part*, std::less<unsigned> >::iterator iPart;
 typedef std::multimap<int, Part*, std::less<unsigned> >::const_iterator ciPart;
@@ -242,6 +250,8 @@ public:
     int index(Part*);
     Part* find(int idx);
     Part* find(unsigned tick, int sn);
+	PartMap partMap(Track*);
+	QList<Track*> tracks();
 };
 
 extern void chainClone(Part* p);

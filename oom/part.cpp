@@ -10,8 +10,8 @@
 #include <assert.h>
 #include <cmath>
 
-#include "part.h"
 #include "track.h"
+#include "part.h"
 #include "globals.h"
 #include "event.h"
 #include "audio.h"
@@ -810,6 +810,33 @@ Part* PartList::find(unsigned tick, int sn)
 		}
 	}
 	return rv;
+}
+
+PartMap PartList::partMap(Track* track)
+{
+	PartMap pmap;
+	PartList* list = new PartList;
+	for (iPart i = begin(); i != end(); ++i)
+	{
+		if (i->second->track() == track)
+		{
+			list->add(i->second);
+		}
+	}
+	pmap.track = track;
+	pmap.parts = list;
+	return pmap;
+}
+
+QList<Track*> PartList::tracks()
+{
+	QList<Track*> list;
+	for (iPart i = begin(); i != end(); ++i)
+	{
+		if(list.isEmpty() || !list.contains(i->second->track()))
+			list.append(i->second->track());
+	}
+	return list;
 }
 
 //---------------------------------------------------------
