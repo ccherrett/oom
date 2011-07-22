@@ -338,7 +338,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
     srec = new QToolButton();
 	srec->setToolTip(tr("Step Record"));
-	srec->setIcon(*steprecIcon);
+	srec->setIcon(*stepIconSet3);
     srec->setCheckable(true);
 	//srec->setObjectName("StepRecord");
 	//tools->addWidget(srec);
@@ -351,29 +351,30 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
     speaker = new QToolButton();
 	speaker->setToolTip(tr("Play Events"));
-	speaker->setIcon(*speakerIcon);
+	speaker->setIcon(*speakerIconSet3);
 	speaker->setCheckable(true);
 	//tools->addWidget(speaker);
 
 	solo = new QToolButton();
-	solo->setIcon(*soloIconSet2);
+	solo->setIcon(*soloIconSet3);
 	solo->setIconSize(soloIconOn->size());
 	solo->setToolTip(tr("Solo"));
 	solo->setCheckable(true);
 
     m_globalKey = new QToolButton();
-	m_globalKey->setToolTip(tr("Enable keyswitches across all parts"));
-	m_globalKey->setIcon(*globalKeysIcon);
+	m_globalKey->setToolTip(tr("EPIC: Enable editing across all parts"));
+	m_globalKey->setIcon(*globalKeysIconSet3);
 	m_globalKey->setCheckable(true);
 
     m_globalArm = new QToolButton();
-	m_globalArm->setToolTip(tr("Globally record arm all parts"));
-	m_globalArm->setIcon(*armAllIcon);
+	m_globalArm->setToolTip(tr("EPIC: Globally record arm all parts"));
+	m_globalArm->setIcon(*globalArmIconSet3);
 	//m_globalArm->setCheckable(true);
 
     m_mutePart = new QToolButton();
 	m_mutePart->setToolTip(tr("Mute current part"));
-	m_mutePart->setIcon(*editmuteIcon);
+	m_mutePart->setIconSize(soloIconOn->size());
+	m_mutePart->setIcon(*muteIconSet3);
 	m_mutePart->setCheckable(true);
 
 	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
@@ -928,7 +929,10 @@ void PianoRoll::cmd(int cmd)
 void PianoRoll::toggleMultiPartSelection(bool toggle)
 {
 	if(toggle)
+	{
 		m_globalKey->setChecked(!toggle);
+		tools22->set(PointerTool);
+	}	
 }
 
 void PianoRoll::toggleEpicEdit(bool toggle)

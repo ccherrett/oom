@@ -186,8 +186,9 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	m_btnAux->setIconSize(record_on_Icon->size());
 
 	QIcon muteSet;
-	muteSet.addPixmap(*muteIconOn, QIcon::Normal, QIcon::Off);
-	muteSet.addPixmap(*muteIconOff, QIcon::Normal, QIcon::On);
+	muteSet.addPixmap(*muteIconOn, QIcon::Normal, QIcon::On);
+	muteSet.addPixmap(*muteIconOff, QIcon::Normal, QIcon::Off);
+	muteSet.addPixmap(*muteIconOver, QIcon::Active);
 	m_btnMute->setIcon(muteSet);
 	m_btnMute->setIconSize(muteIconOn->size());
 	m_btnMute->setCheckable(true);

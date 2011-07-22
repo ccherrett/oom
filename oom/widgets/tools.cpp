@@ -11,6 +11,8 @@
 #include <QActionGroup>
 #include <QSpacerItem>
 #include <QBoxLayout>
+#include <QIconSet>
+#include <QIcon>
 
 #include "icons.h"
 #include "action.h"
@@ -39,16 +41,16 @@ const char* infoMute = QT_TRANSLATE_NOOP("@default", "select Muting Tool:\n"
 const char* infoAutomation = QT_TRANSLATE_NOOP("@default", "Manipulate automation");
 
 ToolB toolList[] = {
-	{&pointerIcon, QT_TRANSLATE_NOOP("@default", "pointer"), infoPointer},
-	{&pencilIcon, QT_TRANSLATE_NOOP("@default", "pencil"), infoPencil},
-	{&deleteIcon, QT_TRANSLATE_NOOP("@default", "eraser"), infoDel},
-	{&cutIcon, QT_TRANSLATE_NOOP("@default", "cutter"), infoCut},
-	{&note1Icon, QT_TRANSLATE_NOOP("@default", "score"), infoScore},
-	{&glueIcon, QT_TRANSLATE_NOOP("@default", "glue"), infoGlue},
-	{&quantIcon, QT_TRANSLATE_NOOP("@default", "quantize"), infoQuant},
-	{&drawIcon, QT_TRANSLATE_NOOP("@default", "draw"), infoDraw},
-	{&editmuteIcon, QT_TRANSLATE_NOOP("@default", "mute parts"), infoMute},
-	{&drawIcon, QT_TRANSLATE_NOOP("@default", "edit automation"),    infoAutomation},
+	{&pointerIconSet3, QT_TRANSLATE_NOOP("@default", "pointer"), infoPointer},
+	{&pencilIconSet3, QT_TRANSLATE_NOOP("@default", "pencil"), infoPencil},
+	{&deleteIconSet3, QT_TRANSLATE_NOOP("@default", "eraser"), infoDel},
+	{&cutIconSet3, QT_TRANSLATE_NOOP("@default", "cutter"), infoCut},
+	{&note1IconSet3, QT_TRANSLATE_NOOP("@default", "score"), infoScore},
+	{&glueIconSet3, QT_TRANSLATE_NOOP("@default", "glue"), infoGlue},
+	{&quantIconSet3, QT_TRANSLATE_NOOP("@default", "quantize"), infoQuant},
+	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "draw"), infoDraw},
+	{&muteIconSet3, QT_TRANSLATE_NOOP("@default", "mute parts"), infoMute},
+	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "edit automation"),    infoAutomation},
 };
 
 //---------------------------------------------------------
@@ -81,8 +83,8 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 
 		Action* a = new Action(action, 1 << i, t->tip, true);
 		actions[n] = a;
-		//a->setIconSet(QIcon(**(t->icon)));
 		a->setIcon(QIcon(**(t->icon)));
+		//a->setIcon(QIcon(**(t->icon)));
 		a->setToolTip(tr(t->tip));
 		a->setWhatsThis(tr(t->ltip));
 		if (first)

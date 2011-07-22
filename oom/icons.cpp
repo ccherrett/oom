@@ -288,6 +288,7 @@ QPixmap* auditionIcon;
 QPixmap* record1_Icon;
 QPixmap* record_on_Icon;
 QPixmap* record_off_Icon;
+QPixmap* record_over_Icon;
 QPixmap* recordIcon;
 QPixmap* stopIcon;
 QPixmap* startIcon;
@@ -362,14 +363,151 @@ QPixmap* mixerIn;
 QPixmap* mixerOut;
 QPixmap* recEchoIconOn;
 QPixmap* recEchoIconOff;
+
 QPixmap* muteIconOn;
 QPixmap* muteIconOff;
+QPixmap* muteIconOver;
+QIcon* muteIconSet4;
+
 QPixmap* soloIconOn;
 QPixmap* soloIconOff;
+QPixmap* soloIconOver;
+QPixmap* transport_soloIconOn;
+QPixmap* transport_soloIconOff;
+QPixmap* transport_soloIconOver;
 QPixmap* soloblksqIconOn;
 QPixmap* soloblksqIconOff;
+QPixmap* soloblksqIconOver;
 QIcon* soloIconSet1;
 QIcon* soloIconSet2;
+QIcon* soloIconSet3;
+
+QPixmap* transport_muteIconOn;
+QPixmap* transport_muteIconOff;
+QPixmap* transport_muteIconOver;
+QIcon* muteIconSet3;
+
+QPixmap* transport_recordIconOn;
+QPixmap* transport_recordIconOff;
+QPixmap* transport_recordIconOver;
+QIcon* recordIconSet3;
+
+QPixmap* transport_playIconOn;
+QPixmap* transport_playIconOff;
+QPixmap* transport_playIconOver;
+QIcon* playIconSet3;
+
+QPixmap* transport_startIconOn;
+QPixmap* transport_startIconOff;
+QPixmap* transport_startIconOver;
+QIcon* startIconSet3;
+
+QPixmap* transport_rewindIconOn;
+QPixmap* transport_rewindIconOff;
+QPixmap* transport_rewindIconOver;
+QIcon* rewindIconSet3;
+
+QPixmap* transport_forwardIconOn;
+QPixmap* transport_forwardIconOff;
+QPixmap* transport_forwardIconOver;
+QIcon* forwardIconSet3;
+
+QPixmap* transport_stopIconOn;
+QPixmap* transport_stopIconOff;
+QPixmap* transport_stopIconOver;
+QIcon* stopIconSet3;
+
+QPixmap* pointerIconOn;
+QPixmap* pointerIconOff;
+QPixmap* pointerIconOver;
+QIcon* pointerIconSet3;
+
+QPixmap* pencilIconOn;
+QPixmap* pencilIconOff;
+QPixmap* pencilIconOver;
+QIcon* pencilIconSet3;
+
+QPixmap* deleteIconOn;
+QPixmap* deleteIconOff;
+QPixmap* deleteIconOver;
+QIcon* deleteIconSet3;
+
+QPixmap* cutIconOn;
+QPixmap* cutIconOff;
+QPixmap* cutIconOver;
+QIcon* cutIconSet3;
+
+QIcon* note1IconSet3;
+
+QPixmap* glueIconOn;
+QPixmap* glueIconOff;
+QPixmap* glueIconOver;
+QIcon* glueIconSet3;
+
+QIcon* quantIconSet3;
+
+QPixmap* drawIconOn;
+QPixmap* drawIconOff;
+QPixmap* drawIconOver;
+QIcon* drawIconSet3;
+
+QPixmap* multiDisplayIconOn;
+QPixmap* multiDisplayIconOff;
+QPixmap* multiDisplayIconOver;
+QIcon* multiDisplayIconSet3;
+
+QPixmap* selectMultiIconOn;
+QPixmap* selectMultiIconOff;
+QPixmap* selectMultiIconOver;
+QIcon* selectMultiIconSet3;
+
+QPixmap* auditionIconOn;
+QPixmap* auditionIconOff;
+QPixmap* auditionIconOver;
+QIcon* auditionIconSet3;
+
+QPixmap* feedbackIconOn;
+QPixmap* feedbackIconOff;
+QPixmap* feedbackIconOver;
+QIcon* feedbackIconSet3;
+
+QPixmap* globalKeysIconOn;
+QPixmap* globalKeysIconOff;
+QPixmap* globalKeysIconOver;
+QIcon* globalKeysIconSet3;
+
+QPixmap* stepIconOn;
+QPixmap* stepIconOff;
+QPixmap* stepIconOver;
+QIcon* stepIconSet3;
+
+QPixmap* punchinIconOn;
+QPixmap* punchinIconOff;
+QPixmap* punchinIconOver;
+QIcon* punchinIconSet3;
+
+QPixmap* punchoutIconOn;
+QPixmap* punchoutIconOff;
+QPixmap* punchoutIconOver;
+QIcon* punchoutIconSet3;
+
+QPixmap* loopIconOn;
+QPixmap* loopIconOff;
+QPixmap* loopIconOver;
+QIcon* loopIconSet3;
+
+QPixmap* speakerIconOn;
+QPixmap* speakerIconOff;
+QPixmap* speakerIconOver;
+QIcon* speakerIconSet3;
+
+QPixmap* globalArmIconOff;
+QPixmap* globalArmIconOver;
+QIcon* globalArmIconSet3;
+
+QPixmap* panicIconOff;
+QPixmap* panicIconOver;
+QIcon* panicIconSet3;
 
 QPixmap* editmuteIcon;
 QPixmap* editmuteSIcon;
@@ -378,10 +516,13 @@ QPixmap* feedbackIcon;
 
 QPixmap* arranger_record_on_Icon;
 QPixmap* arranger_record_off_Icon;
+QPixmap* arranger_record_over_Icon;
 QPixmap* arranger_mute_on_Icon;
 QPixmap* arranger_mute_off_Icon;
+QPixmap* arranger_mute_over_Icon;
 QPixmap* arranger_solo_on_Icon;
 QPixmap* arranger_solo_off_Icon;
+QPixmap* arranger_solo_over_Icon;
 QPixmap* duplicatePCIcon;
 QPixmap* garbagePCIcon;
 QPixmap* upPCIcon;
@@ -530,6 +671,7 @@ void initIcons()
       record1_Icon  = new MPIXMAP(":/images/icons/mixer-record.png", NULL);
       record_on_Icon = new MPIXMAP(":/images/icons/mixer-record_on.png", NULL);
       record_off_Icon = new MPIXMAP(":/images/icons/mixer-record.png", NULL);
+      record_over_Icon = new MPIXMAP(":/images/icons/mixer-record_over.png", NULL);
       recordIcon   = new MPIXMAP(":/images/icons/transport-record.png", NULL);
       stopIcon     = new MPIXMAP(":/images/icons/transport-stop.png", NULL);
       startIcon    = new MPIXMAP(":/images/icons/transport-rewind-end.png", NULL);
@@ -591,10 +733,13 @@ void initIcons()
       duplicatePCIcon = new MPIXMAP(":/images/icons/duplicate.png", NULL);//ProgramChange Flag
       arranger_record_on_Icon = new MPIXMAP(":/images/icons/arranger_record_on.png", NULL);//ProgramChange Flag
       arranger_record_off_Icon = new MPIXMAP(":/images/icons/arranger_record_off.png", NULL);//ProgramChange Flag
+      arranger_record_over_Icon = new MPIXMAP(":/images/icons/arranger_record_over.png", NULL);//ProgramChange Flag
       arranger_mute_on_Icon = new MPIXMAP(":/images/icons/arranger_mute_on.png", NULL);//ProgramChange Flag
       arranger_mute_off_Icon = new MPIXMAP(":/images/icons/arranger_mute_off.png", NULL);//ProgramChange Flag
+      arranger_mute_over_Icon = new MPIXMAP(":/images/icons/arranger_mute_over.png", NULL);//ProgramChange Flag
       arranger_solo_on_Icon = new MPIXMAP(":/images/icons/arranger_solo_on.png", NULL);//ProgramChange Flag
       arranger_solo_off_Icon = new MPIXMAP(":/images/icons/arranger_solo_off.png", NULL);//ProgramChange Flag
+      arranger_solo_over_Icon = new MPIXMAP(":/images/icons/arranger_solo_over.png", NULL);//ProgramChange Flag
       duplicatePCIcon = new MPIXMAP(":/images/icons/duplicate.png", NULL);//ProgramChange Flag
       lockIcon    = new MPIXMAP(lock_xpm, NULL);
       tocIcon     = new MPIXMAP(toc_xpm, NULL);
@@ -649,20 +794,236 @@ void initIcons()
       mixerOut        	   = new MPIXMAP(":/images/icons/mixer-out.png", NULL);
       recEchoIconOn        = new MPIXMAP(":/images/icons/mixer-record.png", NULL);
       recEchoIconOff       = new MPIXMAP(":/images/icons/mixer-record.png", NULL);
-      muteIconOn           = new MPIXMAP(":/images/icons/mixer-mute.png", NULL);
-      muteIconOff          = new MPIXMAP(":/images/icons/mixer-mute_on.png", NULL);
+      muteIconOn           = new MPIXMAP(":/images/icons/mixer-mute_on.png", NULL);
+      muteIconOff          = new MPIXMAP(":/images/icons/mixer-mute.png", NULL);
+      muteIconOver         = new MPIXMAP(":/images/icons/mixer-mute_over.png", NULL);
       soloIconOn           = new MPIXMAP(":/images/icons/mixer-solo_on.png", NULL);
       soloIconOff          = new MPIXMAP(":/images/icons/mixer-solo.png", NULL);
+      soloIconOver         = new MPIXMAP(":/images/icons/mixer-solo_over.png", NULL);
       soloblksqIconOn      = new MPIXMAP(":/images/icons/mixer-solo_on.png", NULL);
       soloblksqIconOff     = new MPIXMAP(":/images/icons/mixer-solo.png", NULL);
+      soloblksqIconOver    = new MPIXMAP(":/images/icons/mixer-solo_over.png", NULL);
+      transport_soloIconOn = new MPIXMAP(":/images/icons/transport-solo_on.png", NULL);
+      transport_soloIconOff= new MPIXMAP(":/images/icons/transport-solo_off.png", NULL);
+      transport_soloIconOver= new MPIXMAP(":/images/icons/transport-solo_over.png", NULL);
       soloIconSet1         = new QIcon(); 
       soloIconSet2         = new QIcon();
+      soloIconSet3         = new QIcon();
       soloIconSet1->addPixmap(*soloIconOn, QIcon::Normal, QIcon::On);
       soloIconSet1->addPixmap(*soloIconOff, QIcon::Normal, QIcon::Off);
+      soloIconSet1->addPixmap(*soloIconOver, QIcon::Active);
       soloIconSet2->addPixmap(*soloblksqIconOn, QIcon::Normal, QIcon::On);
       soloIconSet2->addPixmap(*soloblksqIconOff, QIcon::Normal, QIcon::Off);
+      soloIconSet2->addPixmap(*soloblksqIconOver, QIcon::Active);
+      soloIconSet3->addPixmap(*transport_soloIconOn, QIcon::Normal, QIcon::On);
+      soloIconSet3->addPixmap(*transport_soloIconOff, QIcon::Normal, QIcon::Off);
+      soloIconSet3->addPixmap(*transport_soloIconOver, QIcon::Active);
       
-      redLedIcon           = new MPIXMAP(redled_xpm, NULL);
+      transport_muteIconOn = new MPIXMAP(":/images/icons/transport-mute_on.png", NULL);
+      transport_muteIconOff= new MPIXMAP(":/images/icons/transport-mute_off.png", NULL);
+      transport_muteIconOver= new MPIXMAP(":/images/icons/transport-mute_over.png", NULL);
+	  muteIconSet3         = new QIcon();
+      muteIconSet3->addPixmap(*transport_muteIconOn, QIcon::Normal, QIcon::On);
+      muteIconSet3->addPixmap(*transport_muteIconOff, QIcon::Normal, QIcon::Off);
+      muteIconSet3->addPixmap(*transport_muteIconOver, QIcon::Active);
+     /* 
+	  muteIconOn = new MPIXMAP(":/images/icons/mixer-mute_on.png", NULL);
+      muteIconOff= new MPIXMAP(":/images/icons/mixer-mute.png", NULL);
+      muteIconOver= new MPIXMAP(":/images/icons/mixer-mute_over.png", NULL);
+	  */
+	  muteIconSet4         = new QIcon();
+      /*
+	  muteIconSet4->addPixmap(*muteIconOn, QIcon::Normal, QIcon::On);
+      muteIconSet4->addPixmap(*muteIconOff, QIcon::Normal, QIcon::Off);
+      muteIconSet4->addPixmap(*muteIconOver, QIcon::Active);
+      */
+	  transport_recordIconOn = new MPIXMAP(":/images/icons/transport-record_on.png", NULL);
+      transport_recordIconOff = new MPIXMAP(":/images/icons/transport-record_off.png", NULL);
+      transport_recordIconOver = new MPIXMAP(":/images/icons/transport-record_over.png", NULL);
+	  recordIconSet3         = new QIcon();
+      recordIconSet3->addPixmap(*transport_recordIconOn, QIcon::Normal, QIcon::On);
+      recordIconSet3->addPixmap(*transport_recordIconOff, QIcon::Normal, QIcon::Off);
+      recordIconSet3->addPixmap(*transport_recordIconOver, QIcon::Active);
+	  
+	  transport_playIconOn = new MPIXMAP(":/images/icons/transport-play.png", NULL);
+      transport_playIconOff= new MPIXMAP(":/images/icons/transport-play_off.png", NULL);
+      transport_playIconOver= new MPIXMAP(":/images/icons/transport-play_over.png", NULL);
+	  playIconSet3         = new QIcon();
+      playIconSet3->addPixmap(*transport_playIconOn, QIcon::Normal, QIcon::On);
+      playIconSet3->addPixmap(*transport_playIconOff, QIcon::Normal, QIcon::Off);
+      playIconSet3->addPixmap(*transport_playIconOver, QIcon::Active);
+	  
+      transport_startIconOff= new MPIXMAP(":/images/icons/transport-rewind-end_off.png", NULL);
+      transport_startIconOver= new MPIXMAP(":/images/icons/transport-rewind-end.png", NULL);
+	  startIconSet3         = new QIcon();
+      startIconSet3->addPixmap(*transport_startIconOff, QIcon::Normal, QIcon::Off);
+      startIconSet3->addPixmap(*transport_startIconOver, QIcon::Active);
+      
+	  transport_rewindIconOff= new MPIXMAP(":/images/icons/transport-rewind_off.png", NULL);
+      transport_rewindIconOver= new MPIXMAP(":/images/icons/transport-rewind.png", NULL);
+	  rewindIconSet3         = new QIcon();
+      rewindIconSet3->addPixmap(*transport_rewindIconOff, QIcon::Normal, QIcon::Off);
+      rewindIconSet3->addPixmap(*transport_rewindIconOver, QIcon::Active);
+	  
+      transport_forwardIconOff= new MPIXMAP(":/images/icons/transport-ffwd_off.png", NULL);
+      transport_forwardIconOver= new MPIXMAP(":/images/icons/transport-ffwd.png", NULL);
+	  forwardIconSet3         = new QIcon();
+      forwardIconSet3->addPixmap(*transport_forwardIconOff, QIcon::Normal, QIcon::Off);
+      forwardIconSet3->addPixmap(*transport_forwardIconOver, QIcon::Active);
+	  
+	  transport_stopIconOn = new MPIXMAP(":/images/icons/transport-stop.png", NULL);
+      transport_stopIconOff= new MPIXMAP(":/images/icons/transport-stop_off.png", NULL);
+      transport_stopIconOver= new MPIXMAP(":/images/icons/transport-stop_over.png", NULL);
+	  stopIconSet3         = new QIcon();
+      stopIconSet3->addPixmap(*transport_stopIconOn, QIcon::Normal, QIcon::On);
+      stopIconSet3->addPixmap(*transport_stopIconOff, QIcon::Normal, QIcon::Off);
+      stopIconSet3->addPixmap(*transport_stopIconOver, QIcon::Active);
+	  
+	  pointerIconOn = new MPIXMAP(":/images/icons/select.png", NULL);
+      pointerIconOff= new MPIXMAP(":/images/icons/select_off.png", NULL);
+      pointerIconOver= new MPIXMAP(":/images/icons/select_over.png", NULL);
+	  pointerIconSet3         = new QIcon();
+      pointerIconSet3->addPixmap(*pointerIconOn, QIcon::Normal, QIcon::On);
+      pointerIconSet3->addPixmap(*pointerIconOff, QIcon::Normal, QIcon::Off);
+      pointerIconSet3->addPixmap(*pointerIconOver, QIcon::Active);
+	  
+	  deleteIconOn = new MPIXMAP(":/images/icons/eraser.png", NULL);
+      deleteIconOff= new MPIXMAP(":/images/icons/eraser_off.png", NULL);
+      deleteIconOver= new MPIXMAP(":/images/icons/eraser_over.png", NULL);
+	  deleteIconSet3         = new QIcon();
+      deleteIconSet3->addPixmap(*deleteIconOn, QIcon::Normal, QIcon::On);
+      deleteIconSet3->addPixmap(*deleteIconOff, QIcon::Normal, QIcon::Off);
+      deleteIconSet3->addPixmap(*deleteIconOver, QIcon::Active);
+	  
+	  pencilIconOn = new MPIXMAP(":/images/icons/pencil.png", NULL);
+      pencilIconOff= new MPIXMAP(":/images/icons/pencil_off.png", NULL);
+      pencilIconOver= new MPIXMAP(":/images/icons/pencil_over.png", NULL);
+	  pencilIconSet3         = new QIcon();
+      pencilIconSet3->addPixmap(*pencilIconOn, QIcon::Normal, QIcon::On);
+      pencilIconSet3->addPixmap(*pencilIconOff, QIcon::Normal, QIcon::Off);
+      pencilIconSet3->addPixmap(*pencilIconOver, QIcon::Active);
+	  
+	  cutIconOn = new MPIXMAP(":/images/icons/split.png", NULL);
+      cutIconOff= new MPIXMAP(":/images/icons/split_off.png", NULL);
+      cutIconOver= new MPIXMAP(":/images/icons/split_over.png", NULL);
+	  cutIconSet3         = new QIcon();
+      cutIconSet3->addPixmap(*cutIconOn, QIcon::Normal, QIcon::On);
+      cutIconSet3->addPixmap(*cutIconOff, QIcon::Normal, QIcon::Off);
+      cutIconSet3->addPixmap(*cutIconOver, QIcon::Active);
+	  
+	  note1IconSet3         = new QIcon();
+	  
+	  glueIconOn = new MPIXMAP(":/images/icons/join_tracks.png", NULL);
+      glueIconOff= new MPIXMAP(":/images/icons/join_tracks_off.png", NULL);
+      glueIconOver= new MPIXMAP(":/images/icons/join_tracks_over.png", NULL);
+	  glueIconSet3         = new QIcon();
+      glueIconSet3->addPixmap(*glueIconOn, QIcon::Normal, QIcon::On);
+      glueIconSet3->addPixmap(*glueIconOff, QIcon::Normal, QIcon::Off);
+      glueIconSet3->addPixmap(*glueIconOver, QIcon::Active);
+	  
+	  quantIconSet3         = new QIcon();
+	  
+	  drawIconOn = new MPIXMAP(":/images/icons/line-tool.png", NULL);
+      drawIconOff= new MPIXMAP(":/images/icons/line-tool_off.png", NULL);
+      drawIconOver= new MPIXMAP(":/images/icons/line-tool_over.png", NULL);
+	  drawIconSet3         = new QIcon();
+      drawIconSet3->addPixmap(*drawIconOn, QIcon::Normal, QIcon::On);
+      drawIconSet3->addPixmap(*drawIconOff, QIcon::Normal, QIcon::Off);
+      drawIconSet3->addPixmap(*drawIconOver, QIcon::Active);
+	  
+	  multiDisplayIconOn = new MPIXMAP(":/images/icons/multi_display.png", NULL);
+      multiDisplayIconOff= new MPIXMAP(":/images/icons/multi_display_off.png", NULL);
+      multiDisplayIconOver= new MPIXMAP(":/images/icons/multi_display_over.png", NULL);
+	  multiDisplayIconSet3         = new QIcon();
+      multiDisplayIconSet3->addPixmap(*multiDisplayIconOn, QIcon::Normal, QIcon::On);
+      multiDisplayIconSet3->addPixmap(*multiDisplayIconOff, QIcon::Normal, QIcon::Off);
+      multiDisplayIconSet3->addPixmap(*multiDisplayIconOver, QIcon::Active);
+	  
+	  selectMultiIconOn = new MPIXMAP(":/images/icons/select_multi.png", NULL);
+      selectMultiIconOff= new MPIXMAP(":/images/icons/select_multi_off.png", NULL);
+      selectMultiIconOver= new MPIXMAP(":/images/icons/select_multi_over.png", NULL);
+	  selectMultiIconSet3         = new QIcon();
+      selectMultiIconSet3->addPixmap(*selectMultiIconOn, QIcon::Normal, QIcon::On);
+      selectMultiIconSet3->addPixmap(*selectMultiIconOff, QIcon::Normal, QIcon::Off);
+      selectMultiIconSet3->addPixmap(*selectMultiIconOver, QIcon::Active);
+	  
+	  auditionIconOn = new MPIXMAP(":/images/icons/audition.png", NULL);
+      auditionIconOff= new MPIXMAP(":/images/icons/audition_off.png", NULL);
+      auditionIconOver= new MPIXMAP(":/images/icons/audition_over.png", NULL);
+	  auditionIconSet3         = new QIcon();
+      auditionIconSet3->addPixmap(*auditionIconOn, QIcon::Normal, QIcon::On);
+      auditionIconSet3->addPixmap(*auditionIconOff, QIcon::Normal, QIcon::Off);
+      auditionIconSet3->addPixmap(*auditionIconOver, QIcon::Active);
+	  
+	  feedbackIconOn = new MPIXMAP(":/images/icons/feedback.png", NULL);
+      feedbackIconOff= new MPIXMAP(":/images/icons/feedback_off.png", NULL);
+      feedbackIconOver= new MPIXMAP(":/images/icons/feedback_over.png", NULL);
+	  feedbackIconSet3         = new QIcon();
+      feedbackIconSet3->addPixmap(*feedbackIconOn, QIcon::Normal, QIcon::On);
+      feedbackIconSet3->addPixmap(*feedbackIconOff, QIcon::Normal, QIcon::Off);
+      feedbackIconSet3->addPixmap(*feedbackIconOver, QIcon::Active);
+	  
+	  globalKeysIconOn = new MPIXMAP(":/images/icons/globe.png", NULL);
+      globalKeysIconOff= new MPIXMAP(":/images/icons/globe_off.png", NULL);
+      globalKeysIconOver= new MPIXMAP(":/images/icons/globe_over.png", NULL);
+	  globalKeysIconSet3         = new QIcon();
+      globalKeysIconSet3->addPixmap(*globalKeysIconOn, QIcon::Normal, QIcon::On);
+      globalKeysIconSet3->addPixmap(*globalKeysIconOff, QIcon::Normal, QIcon::Off);
+      globalKeysIconSet3->addPixmap(*globalKeysIconOver, QIcon::Active);
+	  
+	  stepIconOn = new MPIXMAP(":/images/icons/step_by_step.png", NULL);
+      stepIconOff= new MPIXMAP(":/images/icons/step_by_step_off.png", NULL);
+      stepIconOver= new MPIXMAP(":/images/icons/step_by_step_over.png", NULL);
+	  stepIconSet3         = new QIcon();
+      stepIconSet3->addPixmap(*stepIconOn, QIcon::Normal, QIcon::On);
+      stepIconSet3->addPixmap(*stepIconOff, QIcon::Normal, QIcon::Off);
+      stepIconSet3->addPixmap(*stepIconOver, QIcon::Active);
+	  
+	  punchinIconOn = new MPIXMAP(":/images/icons/transport-punchin.png", NULL);
+      punchinIconOff= new MPIXMAP(":/images/icons/transport-punchin_off.png", NULL);
+      punchinIconOver= new MPIXMAP(":/images/icons/transport-punchin_over.png", NULL);
+	  punchinIconSet3         = new QIcon();
+      punchinIconSet3->addPixmap(*punchinIconOn, QIcon::Normal, QIcon::On);
+      punchinIconSet3->addPixmap(*punchinIconOff, QIcon::Normal, QIcon::Off);
+      punchinIconSet3->addPixmap(*punchinIconOver, QIcon::Active);
+	  
+	  punchoutIconOn = new MPIXMAP(":/images/icons/transport-punchout.png", NULL);
+      punchoutIconOff= new MPIXMAP(":/images/icons/transport-punchout_off.png", NULL);
+      punchoutIconOver= new MPIXMAP(":/images/icons/transport-punchout_over.png", NULL);
+	  punchoutIconSet3         = new QIcon();
+      punchoutIconSet3->addPixmap(*punchoutIconOn, QIcon::Normal, QIcon::On);
+      punchoutIconSet3->addPixmap(*punchoutIconOff, QIcon::Normal, QIcon::Off);
+      punchoutIconSet3->addPixmap(*punchoutIconOver, QIcon::Active);
+	  
+	  loopIconOn = new MPIXMAP(":/images/icons/transport-loop.png", NULL);
+      loopIconOff= new MPIXMAP(":/images/icons/transport-loop_off.png", NULL);
+      loopIconOver= new MPIXMAP(":/images/icons/transport-loop_over.png", NULL);
+	  loopIconSet3         = new QIcon();
+      loopIconSet3->addPixmap(*loopIconOn, QIcon::Normal, QIcon::On);
+      loopIconSet3->addPixmap(*loopIconOff, QIcon::Normal, QIcon::Off);
+      loopIconSet3->addPixmap(*loopIconOver, QIcon::Active);
+	  
+	  speakerIconOn = new MPIXMAP(":/images/icons/speaker.png", NULL);
+      speakerIconOff= new MPIXMAP(":/images/icons/speaker_off.png", NULL);
+      speakerIconOver= new MPIXMAP(":/images/icons/speaker_over.png", NULL);
+	  speakerIconSet3         = new QIcon();
+      speakerIconSet3->addPixmap(*speakerIconOn, QIcon::Normal, QIcon::On);
+      speakerIconSet3->addPixmap(*speakerIconOff, QIcon::Normal, QIcon::Off);
+      speakerIconSet3->addPixmap(*speakerIconOver, QIcon::Active);
+	  
+	  globalArmIconOver = new MPIXMAP(":/images/icons/globe-edit.png", NULL);
+      globalArmIconOff= new MPIXMAP(":/images/icons/globe-edit_off.png", NULL);
+	  globalArmIconSet3         = new QIcon();
+      globalArmIconSet3->addPixmap(*globalArmIconOff, QIcon::Normal, QIcon::Off);
+      globalArmIconSet3->addPixmap(*globalArmIconOver, QIcon::Active);
+	  
+	  panicIconOver = new MPIXMAP(":/images/icons/transport-panic.png", NULL);
+      panicIconOff= new MPIXMAP(":/images/icons/transport-panic_off.png", NULL);
+	  panicIconSet3         = new QIcon();
+      panicIconSet3->addPixmap(*panicIconOff, QIcon::Normal, QIcon::Off);
+      panicIconSet3->addPixmap(*panicIconOver, QIcon::Active);
+	  
+	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);
       greendotIcon         = new MPIXMAP(greendot_xpm, NULL);
       //darkgreendotIcon     = new MPIXMAP(darkgreendot_xpm, NULL);

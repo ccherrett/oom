@@ -826,12 +826,12 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//---------------------------------------------------
 	// Canvas Actions
 	//---------------------------------------------------
-	noteAlphaAction = new QAction(QIcon(*multiDisplay), tr("multipart"), this);
-	noteAlphaAction->setToolTip(tr("Toggle Display of multiple parts"));
+	noteAlphaAction = new QAction(QIcon(*multiDisplayIconSet3), tr("multipart"), this);
+	noteAlphaAction->setToolTip(tr("EPIC: Toggle Display of multiple parts"));
 	noteAlphaAction->setCheckable(true);
 
-	multiPartSelectionAction = new QAction(QIcon(*selectMultiIcon), tr("multiselection"), this);
-	multiPartSelectionAction->setToolTip(tr("Toggle ability to select multiple part notes"));
+	multiPartSelectionAction = new QAction(QIcon(*selectMultiIconSet3), tr("multiselection"), this);
+	multiPartSelectionAction->setToolTip(tr("EPIC: Toggle ability to select multiple part notes"));
 	multiPartSelectionAction->setCheckable(true);
 	
 	//---------------------------------------------------
@@ -842,70 +842,70 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	transportAction->setExclusive(false);
 
 	//repPlay->setIconSize(soloIconOn->size());
-	replayAction = new QAction(QIcon(*auditionIcon), tr("Toggle Audition Mode"), transportAction);
+	replayAction = new QAction(QIcon(*auditionIconSet3), tr("Toggle Audition Mode"), transportAction);
 	replayAction->setCheckable(true);
 	connect(replayAction, SIGNAL(toggled(bool)), song, SLOT(setReplay(bool)));
 
 
 
-	startAction = new QAction(QIcon(*startIcon), tr("Start"), transportAction);
+	startAction = new QAction(QIcon(*startIconSet3), tr("Start"), transportAction);
 
 	startAction->setWhatsThis(tr(infoStartButton));
 	connect(startAction, SIGNAL(triggered()), song, SLOT(rewindStart()));
 
-	rewindAction = new QAction(QIcon(*frewindIcon), tr("Rewind"), transportAction);
+	rewindAction = new QAction(QIcon(*rewindIconSet3), tr("Rewind"), transportAction);
 
 	rewindAction->setWhatsThis(tr(infoRewindButton));
 	connect(rewindAction, SIGNAL(triggered()), song, SLOT(rewind()));
 
-	forwardAction = new QAction(QIcon(*fforwardIcon), tr("Forward"), transportAction);
+	forwardAction = new QAction(QIcon(*forwardIconSet3), tr("Forward"), transportAction);
 
 	forwardAction->setWhatsThis(tr(infoForwardButton));
 	connect(forwardAction, SIGNAL(triggered()), song, SLOT(forward()));
 
-	stopAction = new QAction(QIcon(*stopIcon), tr("Stop"), transportAction);
+	stopAction = new QAction(QIcon(*stopIconSet3), tr("Stop"), transportAction);
 	stopAction->setCheckable(true);
 
 	stopAction->setWhatsThis(tr(infoStopButton));
 	stopAction->setChecked(true);
 	connect(stopAction, SIGNAL(toggled(bool)), song, SLOT(setStop(bool)));
 
-	playAction = new QAction(QIcon(*playIcon), tr("Play"), transportAction);
+	playAction = new QAction(QIcon(*playIconSet3), tr("Play"), transportAction);
 	playAction->setCheckable(true);
 
 	playAction->setWhatsThis(tr(infoPlayButton));
 	playAction->setChecked(false);
 	connect(playAction, SIGNAL(toggled(bool)), song, SLOT(setPlay(bool)));
 
-	recordAction = new QAction(QIcon(*recordIcon), tr("Record"), transportAction);
+	recordAction = new QAction(QIcon(*recordIconSet3), tr("Record"), transportAction);
 	recordAction->setCheckable(true);
 	recordAction->setWhatsThis(tr(infoRecordButton));
 	connect(recordAction, SIGNAL(toggled(bool)), song, SLOT(setRecord(bool)));
 	
-	loopAction = new QAction(QIcon(*loop1Icon), tr("Loop"), transportAction);/*{{{*/
+	loopAction = new QAction(QIcon(*loopIconSet3), tr("Loop"), transportAction);/*{{{*/
 	loopAction->setCheckable(true);
 
 	loopAction->setWhatsThis(tr(infoLoopButton));
 	connect(loopAction, SIGNAL(toggled(bool)), song, SLOT(setLoop(bool)));
 
-	punchinAction = new QAction(QIcon(*punchin1Icon), tr("Punchin"), transportAction);
+	punchinAction = new QAction(QIcon(*punchinIconSet3), tr("Punchin"), transportAction);
 	punchinAction->setCheckable(true);
 
 	punchinAction->setWhatsThis(tr(infoPunchinButton));
 	connect(punchinAction, SIGNAL(toggled(bool)), song, SLOT(setPunchin(bool)));
 
-	punchoutAction = new QAction(QIcon(*punchout1Icon), tr("Punchout"), transportAction);
+	punchoutAction = new QAction(QIcon(*punchoutIconSet3), tr("Punchout"), transportAction);
 	punchoutAction->setCheckable(true);
 
 	punchoutAction->setWhatsThis(tr(infoPunchoutButton));
 	connect(punchoutAction, SIGNAL(toggled(bool)), song, SLOT(setPunchout(bool)));/*}}}*/
 
-	panicAction = new QAction(QIcon(*panicIcon), tr("Panic"), this);
+	panicAction = new QAction(QIcon(*panicIconSet3), tr("Panic"), this);
 
 	panicAction->setWhatsThis(tr(infoPanicButton));
 	connect(panicAction, SIGNAL(triggered()), song, SLOT(panic()));
 
-	feedbackAction = new QAction(QIcon(*feedbackIcon), tr("Feedback"), this);
+	feedbackAction = new QAction(QIcon(*feedbackIconSet3), tr("Feedback"), this);
 	feedbackAction->setCheckable(true);
 	connect(feedbackAction, SIGNAL(toggled(bool)), song, SLOT(toggleFeedback(bool)));
 
