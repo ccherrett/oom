@@ -25,6 +25,7 @@ QT4_WRAP_CPP (arranger_mocs
       arranger.h 
       pcanvas.h 
       tlist.h 
+	  headerlist.h
       )
 
 #
@@ -34,6 +35,7 @@ file (GLOB arranger_source_files
       arranger.cpp
       pcanvas.cpp
       tlist.cpp
+	  headerlist.cpp
       )
 
 #

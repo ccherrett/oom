@@ -116,11 +116,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	_raster = 0; // measure
 	_lastStrip = 0;
 	selected = 0;
-	// Since program covers 3 controls at once, it is in 'midi controller' units rather than 'gui control' units.
-	//program  = -1;
-	///program  = CTRL_VAL_UNKNOWN;
-	///pan      = -65;
-	///volume   = -1;
 	setMinimumSize(600, 50);
 	showTrackinfoFlag = true;
 
@@ -401,7 +396,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	canvas->setCanvasTools(arrangerTools);
 	canvas->setOrigin(-offset, 0);
 	canvas->setFocus();
-	//parent->setFocusProxy(canvas);   // Tim.
 
 	connect(canvas, SIGNAL(setUsedTool(int)), this, SIGNAL(setUsedTool(int)));
 	connect(canvas, SIGNAL(trackChanged(Track*)), list, SLOT(selectTrack(Track*)));
@@ -414,8 +408,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(this, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
 	connect(list, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
 
-	//egrid->addMultiCellWidget(time,           0, 0, 0, 1);
-	//egrid->addMultiCellWidget(hLine(editor),  1, 1, 0, 1);
 	egrid->addWidget(time, 0, 0, 1, 2);
 	egrid->addWidget(hLine(editor), 1, 0, 1, 2);
 
@@ -443,7 +435,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
     connect(song, SIGNAL(punchinChanged(bool)), canvas, SLOT(update()));
     connect(song, SIGNAL(punchoutChanged(bool)), canvas, SLOT(update()));
     connect(song, SIGNAL(loopChanged(bool)), canvas, SLOT(update()));
-	//connect(song,   SIGNAL(mTypeChanged(MType)), SLOT(setMode((int)MType)));    // p4.0.7 Tim.
 	connect(canvas, SIGNAL(followEvent(int)), hscroll, SLOT(setOffset(int)));
 	connect(canvas, SIGNAL(selectionChanged()), SIGNAL(selectionChanged()));
 	connect(canvas, SIGNAL(dropSongFile(const QString&)), SIGNAL(dropSongFile(const QString&)));
@@ -451,15 +442,10 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 
 	connect(canvas, SIGNAL(toolChanged(int)), SIGNAL(toolChanged(int)));
 	connect(split, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
-	//      connect(song, SIGNAL(posChanged(int, unsigned, bool)), SLOT(seek()));
-
-	// Removed p3.3.43
-	// Song::addMarker() already emits a 'markerChanged'.
-	//connect(time, SIGNAL(addMarker(int)), SIGNAL(addMarker(int)));
 
 	configChanged(); // set configuration values
 	if (canvas->part())
-		midiTrackInfo->setTrack(canvas->part()->track()); // Tim.
+		midiTrackInfo->setTrack(canvas->part()->track());
 	showTrackInfo(showTrackinfoFlag);
 
 	// Take care of some tabbies!
@@ -484,25 +470,6 @@ Arranger::~Arranger()
 	//tconfig().set_property(split->objectName(), "canvaswidth", split->sizes().at(1));
 }
 
-//---------------------------------------------------------
-//   updateHScrollRange
-//---------------------------------------------------------
-
-//void Arranger::updateHScrollRange()
-//{
-//      int s = 0, e = song->len();
-// Show one more measure.
-//      e += AL::sigmap.ticksMeasure(e);
-// Show another quarter measure due to imprecise drawing at canvas end point.
-//      e += AL::sigmap.ticksMeasure(e) / 4;
-// Compensate for the fixed vscroll width.
-//      e += canvas->rmapxDev(-vscroll->width());
-//      int s1, e1;
-//      hscroll->range(&s1, &e1);
-//      if(s != s1 || e != e1)
-//        hscroll->setRange(s, e);
-//}
-
 void Arranger::currentTabChanged(int tab)
 {
 	if(tab == 2) //patch sequencer
@@ -511,7 +478,6 @@ void Arranger::currentTabChanged(int tab)
 		{
 			//printf("PatchSequencer Tab clicked\n");
 			midiTrackInfo->update();
-			//midiTrackInfo->resize(midiTrackInfo->size());
 		}
 	}
 }
