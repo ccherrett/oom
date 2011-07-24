@@ -1515,10 +1515,15 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)
 
 	if (drag == DRAG_LASSO)
 	{
-		QColor outlineColor = QColor(55,80,45);
-		QColor fillColor = QColor(148, 177, 106,127);
+		QColor outlineColor = QColor(config.partColors[curPart->colorIndex()]);
+		QColor fillColor = QColor(config.partWaveColors[curPart->colorIndex()]);
+		//QColor outlineColor = QColor(55,80,45);
+		//QColor fillColor = QColor(148, 177, 106,127);
+		fillColor.setAlpha(127);
+		//QColor outlineColor = QColor(55,80,45);
 		setPainter(p);
 		QPen mypen2 = QPen(outlineColor, 2, Qt::SolidLine);
+		mypen2.setCosmetic(true);
 		p.setPen(mypen2);
 		//p.setPen(Qt::blue);
 		//p.setBrush(Qt::NoBrush);
@@ -1584,7 +1589,7 @@ void CtrlCanvas::draw(QPainter& p, const QRect& rect)
 	{
 		p.setRenderHint(QPainter::Antialiasing, true);
 		//p.setPen(Qt::black);
-		QPen mypen = QPen(QColor(55,80,45), 2, Qt::SolidLine);
+		QPen mypen = QPen(QColor(config.partColors[curPart->colorIndex()]), 2, Qt::SolidLine);
 		p.setPen(mypen);
 		p.drawLine(line1x, line1y, line2x, line2y);
 	}

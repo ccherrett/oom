@@ -365,8 +365,14 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 
     if (_drag == DRAG_LASSO)
 	{
-		QColor outlineColor = QColor(55,80,45);
-		QColor fillColor = QColor(148, 177, 106,127);
+		QColor outlineColor = QColor(145,255,250);
+		QColor fillColor = QColor(63,63,63);
+		if(_curPart)
+		{
+			outlineColor = QColor(config.partColors[_curPart->colorIndex()]);
+			fillColor = QColor(config.partWaveColors[_curPart->colorIndex()]);
+		}	
+		fillColor.setAlpha(127);
 		QPen mypen3 = QPen(outlineColor, 2, Qt::SolidLine);
 		mypen3.setCosmetic(true);
 		p.setPen(mypen3);
