@@ -45,6 +45,7 @@ SliderBase::SliderBase(QWidget *parent, const char *name)
 	_id = -1;
 	_cursorHoming = false;
 	_ignoreMouseMove = false;
+	_ignoreMouseWheel = false;
 	d_tmrID = 0;
 	d_updTime = 150;
 	d_mass = 0.0;
@@ -79,17 +80,11 @@ SliderBase::~SliderBase()
 
 void SliderBase::wheelEvent(QWheelEvent *e)
 {
-	// Avoid unwanted wheel events from outside the control.
-	// Just in case it grabs focus somehow.
-	// Tested: No go, can't seem to determine where event came from.
-	/*
-	const QPoint gp = mapToGlobal(e->pos());
-	const QRect gr = QRect(mapToGlobal(rect().topLeft()), mapToGlobal(rect().bottomRight()));
-	if(!gr.contains(gp))
+	if(_ignoreMouseWheel)
 	{
-	  e->ignore();
-	  return;
-	} */
+		e->ignore();
+		return;
+	}
 
 	e->accept();
 

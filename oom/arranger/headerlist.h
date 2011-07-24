@@ -10,7 +10,8 @@
 
 #include "track.h"
 
-#include <QWidget>
+#include <QScrollArea>
+#include <QList>
 
 class QKeyEvent;
 class QLineEdit;
@@ -18,10 +19,15 @@ class QMouseEvent;
 class QPaintEvent;
 class QResizeEvent;
 class QScrollBar;
+class QWidget;
 class QWheelEvent;
 class QVBoxLayout;
+class QDragEnterEvent;
+class QDragMoveEvent;
+class QDropEvent;
 
-class ScrollScale;
+class TrackHeader;
+class QSpacerItem;
 class Track;
 class Xml;
 
@@ -29,7 +35,7 @@ class Xml;
 //   TList
 //---------------------------------------------------------
 
-class HeaderList : public QWidget
+class HeaderList : public QFrame
 {
     Q_OBJECT
 
@@ -38,8 +44,8 @@ class HeaderList : public QWidget
     QPixmap bgPixmap; // background Pixmap
     bool resizeFlag; // true if resize cursor is shown
 
-    QScrollBar* _scroll;
-	Track* editAutomation;
+	QWidget* m_viewPort;
+	QList<TrackHeader*> m_headers;
 
     int startY;
     int curY;
@@ -53,19 +59,20 @@ class HeaderList : public QWidget
         NORMAL, START_DRAG, DRAG, RESIZE
     } mode;
 
+    //virtual void resizeEvent(QResizeEvent*);
+    Track* y2Track(int) const;
+    void classesPopupMenu(Track*, int x, int y);
+    TrackList getRecEnabledTracks();
+
+protected:
     virtual void mousePressEvent(QMouseEvent* event);
-    //virtual void mouseDoubleClickEvent(QMouseEvent*);
     virtual void mouseMoveEvent(QMouseEvent*);
     virtual void mouseReleaseEvent(QMouseEvent*);
     virtual void keyPressEvent(QKeyEvent* e);
     virtual void wheelEvent(QWheelEvent* e);
-    virtual void paintEvent(QPaintEvent*);
-
-    void adjustScrollbar();
-    virtual void resizeEvent(QResizeEvent*);
-    Track* y2Track(int) const;
-    void classesPopupMenu(Track*, int x, int y);
-    TrackList getRecEnabledTracks();
+	void dragEnterEvent(QDragEnterEvent*);
+	void dragMoveEvent(QDragMoveEvent*);
+	void dropEvent(QDropEvent*);
 
 private slots:
     void songChanged(int flags);
@@ -80,21 +87,17 @@ signals:
 
 public slots:
     void tracklistChanged();
-    void setYPos(int);
-    void redraw();
     void selectTrack(Track*);
     void selectTrackAbove();
     void selectTrackBelow();
     void moveSelection(int n);
     void moveSelectedTrack(int n);
+	void updateTrackList();
+	void renameTrack(Track*);
 
 public:
     HeaderList(QWidget* parent, const char* name);
-
-    void setScroll(QScrollBar* s)
-    {
-        _scroll = s;
-    }
+	bool isEditing();
 };
 
 #endif

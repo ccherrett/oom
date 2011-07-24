@@ -433,7 +433,7 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 //
 //------------------------------------------------------------
 
-void Slider::drawVsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb, const QBrush &brBack)
+void Slider::drawVsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb, const QBrush&/*brBack*/)
 {
 	//QColor green = QColor(49, 175, 197);
 	//QColor yellow = QColor(156, 85, 115);
@@ -536,7 +536,7 @@ void Slider::drawVsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(0, 12, 16)));
 			p->setPen(myPen);
 			int myoffset = rSlot.left() + 1;
-			int scrollTop = rSlot.bottom() - rThumb.bottom() - 1;
+			//int scrollTop = rSlot.bottom() - rThumb.bottom() - 1;
 			int scrollB = rThumb.bottom() + 1;
 			for (int i = 0; i < 2; i++)
 			{

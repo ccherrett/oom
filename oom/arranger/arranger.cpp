@@ -44,7 +44,8 @@
 #include "mididev.h"
 #include "utils.h"
 #include "globals.h"
-#include "tlist.h"
+//#include "tlist.h"
+#include "headerlist.h"
 #include "icons.h"
 #include "header.h"
 #include "utils.h"
@@ -75,7 +76,7 @@ static int rasterTable[] = {
 
 void Arranger::setHeaderToolTips()
 {
-	header->setToolTip(COL_RECORD, tr("Enable Recording"));
+	/*header->setToolTip(COL_RECORD, tr("Enable Recording"));
 	header->setToolTip(COL_MUTE, tr("Mute/Off Indicator"));
 	header->setToolTip(COL_SOLO, tr("Solo Indicator"));
 	header->setToolTip(COL_CLASS, tr("Track Type"));
@@ -83,7 +84,7 @@ void Arranger::setHeaderToolTips()
 	header->setToolTip(COL_OCHANNEL, tr("Midi output channel number or audio channels"));
 	header->setToolTip(COL_OPORT, tr("Midi output port or synth midi port"));
 	header->setToolTip(COL_TIMELOCK, tr("Time Lock"));
-	header->setToolTip(COL_AUTOMATION, tr("Automation parameter selection"));
+	header->setToolTip(COL_AUTOMATION, tr("Automation parameter selection"));*/
 }
 
 
@@ -94,6 +95,7 @@ void Arranger::setHeaderToolTips()
 
 void Arranger::setHeaderWhatsThis()
 {
+	/*
 	header->setWhatsThis(COL_RECORD, tr("Enable recording. Click to toggle."));
 	header->setWhatsThis(COL_MUTE, tr("Mute indicator. Click to toggle.\nRight-click to toggle track on/off.\nMute is designed for rapid, repeated action.\nOn/Off is not!"));
 	header->setWhatsThis(COL_SOLO, tr("Solo indicator. Click to toggle.\nConnected tracks are also 'phantom' soloed,\n indicated by a dark square."));
@@ -102,6 +104,7 @@ void Arranger::setHeaderWhatsThis()
 	header->setWhatsThis(COL_OCHANNEL, tr("Midi/drum track: Output channel number.\nAudio track: Channels.\nMid/right-click to change."));
 	header->setWhatsThis(COL_OPORT, tr("Midi/drum track: Output port.\nSynth track: Assigned midi port.\nLeft-click to change.\nRight-click to show GUI."));
 	header->setWhatsThis(COL_TIMELOCK, tr("Time lock"));
+	*/
 }
 
 //---------------------------------------------------------
@@ -270,30 +273,35 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 
 	split = new Splitter(Qt::Horizontal, this, "arsplit");
 	split->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+	split->setHandleWidth(2);
 	box->addWidget(split, 1000);
-	//split->setHandleWidth(10);
 
-	QWidget* tracklist = new QWidget();
-	QWidget* wtlist = new QWidget(split);
-	QVBoxLayout *tg = new QVBoxLayout(wtlist);
-	tg->setSpacing(0);
+	m_trackheader = new HeaderList(this, "trackHeaderList");
 
-	split->setStretchFactor(split->indexOf(wtlist), 0);
-	//split->setStretchFactor(split->indexOf(tracklist), 1);
-	//tracklist->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding, 0, 100));
-	QSizePolicy tpolicy = QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-	tpolicy.setHorizontalStretch(0);
-	tpolicy.setVerticalStretch(100);
-	wtlist->setSizePolicy(tpolicy);
-	//tracklist->setSizePolicy(tpolicy);
+	QWidget* newtlist = new QWidget(split);
+	QVBoxLayout *trackLayout = new QVBoxLayout(newtlist);
+	trackLayout->setContentsMargins(0, 0, 0, 0);
+	trackLayout->setSpacing(0);
+	listScroll = new QScrollArea(newtlist);
+	listScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	listScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	listScroll->setWidgetResizable(true);
+	listScroll->setWidget(m_trackheader);
+	listScroll->setMouseTracking(true);
+	listScroll->setMinimumWidth(210);
+	listScroll->setMaximumWidth(400);
+	trackLayout->addItem(new QSpacerItem(0, 32, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	trackLayout->addWidget(listScroll);
+
+	split->setStretchFactor(split->indexOf(newtlist), 0);
 
 	QWidget* editor = new QWidget(split);
 	split->setStretchFactor(split->indexOf(editor), 1);
-	//editor->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding,
 	QSizePolicy epolicy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	epolicy.setHorizontalStretch(255);
 	epolicy.setVerticalStretch(100);
 	editor->setSizePolicy(epolicy);
+
 
 	//---------------------------------------------------
 	//    Track Info
@@ -302,65 +310,23 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	infoScroll = new QScrollArea;
 	infoScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	infoScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	//infoScroll->setMaximumWidth(300);
 	infoScroll->setMinimumWidth(100);
-	//infoScroll->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
+
 	mixerScroll = new QScrollArea;
 	mixerScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	mixerScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	//mixerScroll->setMaximumWidth(300);
 	mixerScroll->setMinimumWidth(100);
-	//mixerScroll->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
-
-	header = new Header(tracklist, "header");
-	header->setObjectName("trackHeaders");
-
-	header->setFixedHeight(30);
-
-	QFontMetrics fm1(header->font());
-	int fw = 8;
-
-	header->setColumnLabel(tr("R"), COL_RECORD, fm1.width('R') + fw);
-	header->setColumnLabel(tr("M"), COL_MUTE, fm1.width('M') + fw);
-	header->setColumnLabel(tr("S"), COL_SOLO, fm1.width('S') + fw);
-	//header->setColumnLabel(tr("C"), COL_CLASS, fm1.width('C') + fw);
-	header->setColumnLabel(tr("C"), COL_CLASS, 22);
-	header->setColumnLabel(tr("Track"), COL_NAME, 375);
-	header->setColumnLabel(tr("Port"), COL_OPORT, 22);
-	header->setColumnLabel(tr(""), COL_OCHANNEL, 22);
-	header->setColumnLabel(tr("T"), COL_TIMELOCK, 0/*fm1.width('T') + fw*/);
-	header->setColumnLabel(tr("Automation"), COL_AUTOMATION, 22);
-	header->setResizeMode(COL_RECORD, QHeaderView::Fixed);
-	header->setResizeMode(COL_MUTE, QHeaderView::Fixed);
-	header->setResizeMode(COL_SOLO, QHeaderView::Fixed);
-	header->setResizeMode(COL_CLASS, QHeaderView::Fixed);
-	header->setResizeMode(COL_NAME, QHeaderView::Interactive);
-	header->setResizeMode(COL_OPORT, QHeaderView::Interactive);
-	header->setResizeMode(COL_OCHANNEL, QHeaderView::Fixed);
-	header->setResizeMode(COL_TIMELOCK, QHeaderView::Fixed);
-	header->setResizeMode(COL_AUTOMATION, QHeaderView::Fixed);
-
-	setHeaderToolTips();
-	setHeaderWhatsThis();
-	header->setMovable(true);
-	list = new TList(header, wtlist, "tracklist");
 
 	// Do this now that the list is available.
-	genTrackInfo(tracklist);
+	genTrackInfo(listScroll);
 
 	if(_tvdock)
-		connect(list, SIGNAL(trackInserted(int)), _tvdock, SLOT(selectStaticView(int)));
-	connect(list, SIGNAL(selectionChanged(Track*)), SLOT(trackSelectionChanged()));
-	connect(list, SIGNAL(selectionChanged(Track*)), midiTrackInfo, SLOT(setTrack(Track*)));
-	connect(header, SIGNAL(sectionResized(int, int, int)), list, SLOT(redraw()));
-	connect(header, SIGNAL(sectionMoved(int, int, int)), list, SLOT(redraw()));
-	connect(header, SIGNAL(sectionMoved(int, int, int)), this, SLOT(headerMoved()));
-
-	tg->addItem(new QSpacerItem(0, 24));
-	tg->addWidget(list);
-	list->setMinimumSize(QSize(100, 50));
-	list->setMaximumSize(QSize(540, 10000));
-
+	{
+		connect(m_trackheader, SIGNAL(trackInserted(int)), _tvdock, SLOT(selectStaticView(int)));
+	}
+	
+	connect(m_trackheader, SIGNAL(selectionChanged(Track*)), SLOT(trackSelectionChanged()));
+	connect(m_trackheader, SIGNAL(selectionChanged(Track*)), midiTrackInfo, SLOT(setTrack(Track*)));
 
 	//---------------------------------------------------
 	//    Editor
@@ -370,18 +336,13 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	hscroll = new ScrollScale(-1000, -10, xscale, song->len(), Qt::Horizontal, editor, -offset);
 	hscroll->setFocusPolicy(Qt::NoFocus);
 
-	// Changed p3.3.43 Too small steps for me...
-	//vscroll = new QScrollBar(1, 20*20, 1, 5, 0, Vertical, editor);
-	//vscroll = new QScrollBar(1, 20*20, 5, 25, 0, Qt::Vertical, editor);
-	vscroll = new QScrollBar(editor);
+	vscroll = new QScrollBar(Qt::Vertical, editor);
+	listScroll->setVerticalScrollBar(vscroll);
 	vscroll->setMinimum(0);
 	vscroll->setMaximum(20 * 20);
 	vscroll->setSingleStep(5);
 	vscroll->setPageStep(25);
 	vscroll->setValue(0);
-	vscroll->setOrientation(Qt::Vertical);
-
-	list->setScroll(vscroll);
 
 	QGridLayout* egrid = new QGridLayout(editor);
 	egrid->setColumnStretch(0, 50);
@@ -398,15 +359,15 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	canvas->setFocus();
 
 	connect(canvas, SIGNAL(setUsedTool(int)), this, SIGNAL(setUsedTool(int)));
-	connect(canvas, SIGNAL(trackChanged(Track*)), list, SLOT(selectTrack(Track*)));
-	connect(canvas, SIGNAL(renameTrack(Track*)), list, SLOT(renameTrack(Track*)));
-	connect(list, SIGNAL(keyPressExt(QKeyEvent*)), canvas, SLOT(redirKeypress(QKeyEvent*)));
-	connect(canvas, SIGNAL(selectTrackAbove()), list, SLOT(selectTrackAbove()));
-	connect(canvas, SIGNAL(selectTrackBelow()), list, SLOT(selectTrackBelow()));
-	connect(canvas, SIGNAL(moveSelectedTracks(int)), list, SLOT(moveSelectedTrack(int)));
+	connect(canvas, SIGNAL(trackChanged(Track*)), m_trackheader, SLOT(selectTrack(Track*)));
+	connect(canvas, SIGNAL(renameTrack(Track*)), m_trackheader, SLOT(renameTrack(Track*)));
+	connect(m_trackheader, SIGNAL(keyPressExt(QKeyEvent*)), canvas, SLOT(redirKeypress(QKeyEvent*)));
+	connect(canvas, SIGNAL(selectTrackAbove()), m_trackheader, SLOT(selectTrackAbove()));
+	connect(canvas, SIGNAL(selectTrackBelow()), m_trackheader, SLOT(selectTrackBelow()));
+	connect(canvas, SIGNAL(moveSelectedTracks(int)), m_trackheader, SLOT(moveSelectedTrack(int)));
 
 	connect(this, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
-	connect(list, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
+	connect(m_trackheader, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
 
 	egrid->addWidget(time, 0, 0, 1, 2);
 	egrid->addWidget(hLine(editor), 1, 0, 1, 2);
@@ -418,7 +379,6 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(vscroll, SIGNAL(valueChanged(int)), canvas, SLOT(setYPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
-	connect(vscroll, SIGNAL(valueChanged(int)), list, SLOT(setYPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int))); //
 	connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
 	connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
@@ -427,7 +387,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(canvas, SIGNAL(horizontalScrollNoLimit(unsigned)), hscroll, SLOT(setPosNoLimit(unsigned)));
 	connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 
-	connect(canvas, SIGNAL(tracklistChanged()), list, SLOT(tracklistChanged()));
+	connect(canvas, SIGNAL(tracklistChanged()), m_trackheader, SLOT(tracklistChanged()));
 	connect(canvas, SIGNAL(dclickPart(Track*)), SIGNAL(editPart(Track*)));
 	connect(canvas, SIGNAL(startEditor(PartList*, int)), SIGNAL(startEditor(PartList*, int)));
 
@@ -449,8 +409,8 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	showTrackInfo(showTrackinfoFlag);
 
 	// Take care of some tabbies!
-	setTabOrder(tempo200, list);
-	setTabOrder(list, canvas);
+	setTabOrder(tempo200, m_trackheader);
+	setTabOrder(m_trackheader, canvas);
 
 	QList<int> vl;
 	QString str = tconfig().get_property("arsplit", "sizes", "200 50").toString();
@@ -632,10 +592,10 @@ void Arranger::songChanged(int type)
 
 void Arranger::splitterMoved(int pos, int)
 {
-	if(pos > list->maximumSize().width())
+	if(pos > listScroll->maximumSize().width())
 	{
 		QList<int> def;
-		def.append(list->maximumSize().width());
+		def.append(listScroll->maximumSize().width());
 		def.append(50);
 		split->setSizes(def);
 	}
@@ -745,7 +705,7 @@ void Arranger::writeStatus(int level, Xml& xml)
 	xml.tag(level++, "arranger");
 	//xml.intTag(level, "info", ib->isChecked());
 	split->writeStatus(level, xml);
-	list->writeStatus(level, xml, "list");
+	//list->writeStatus(level, xml, "list");
 
 	xml.intTag(level, "xpos", hscroll->pos());
 	xml.intTag(level, "xmag", hscroll->mag());
@@ -1170,15 +1130,15 @@ void Arranger::preloadControllers()
 
 bool Arranger::isEditing()
 {
-	return (list->isEditing() || canvas->isEditing());
+	return (m_trackheader->isEditing() || canvas->isEditing());
 }
 
 void Arranger::endEditing()
 {
-	if(list->isEditing())
+	/*if(m_trackheader->isEditing())
 	{
-		list->returnPressed();
-	}
+		m_trackheader->returnPressed();
+	}*/
 	if(canvas->isEditing())
 	{
 		canvas->returnPressed();

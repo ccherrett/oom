@@ -27,8 +27,8 @@ class QComboBox;
 class QStackedWidget;
 class QVBoxLayout;
 
-class Header;
-class TList;
+//class Header;
+//class TList;
 class ScrollScale;
 class MTScale;
 class Track;
@@ -44,6 +44,7 @@ class TrackViewDock;
 class RouteMapDock;
 class CommentDock;
 class CItem;
+class HeaderList;
 
 //---------------------------------------------------------
 //   Arranger
@@ -57,13 +58,15 @@ class Arranger : public QWidget
     PartCanvas* canvas;
     ScrollScale* hscroll;
     QScrollBar* vscroll;
-    TList* list;
-    Header* header;
+    //TList* list;
+	HeaderList* m_trackheader;
+    //Header* header;
     MTScale* time;
     SpinBox* lenEntry;
     bool showTrackinfoFlag;
     MidiTrackInfo* midiTrackInfo;
 	QScrollArea *infoScroll;
+	QScrollArea *listScroll;
 	QScrollArea *mixerScroll;
     AudioStrip* waveTrackInfo;
 
@@ -164,10 +167,11 @@ public:
 
 	CItem*  addCanvasPart(Track*);
 
-    TList* getTrackList() const
+    /*TList* getTrackList() const
     {
 	    return list;
     }
+	*/
 	bool isEditing();
 	void endEditing();
 

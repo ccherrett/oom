@@ -1664,7 +1664,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 				{
 					Track* previous = *(--t);
 					previous->setSelected(true);
-					oom->arranger->getTrackList()->update();
+					song->update(SC_SELECTION);
 					return;
 				}
 
@@ -1690,7 +1690,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 				{
 					Track* next = *(++t);
 					next->setSelected(true);
-					oom->arranger->getTrackList()->update();
+					song->update(SC_SELECTION);
 					return;
 				}
 

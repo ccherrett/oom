@@ -9,24 +9,11 @@
 
 #include <cmath>
 
-#include <QKeyEvent>
-#include <QLineEdit>
-#include <QMenu>
-#include <QMessageBox>
-#include <QMouseEvent>
-#include <QPainter>
-#include <QPaintEvent>
-#include <QPixmap>
-#include <QResizeEvent>
-#include <QScrollBar>
-#include <QWheelEvent>
-#include <QListWidget>
-#include <QWidgetAction>
+#include <QtGui>
 
 #include "popupmenu.h"
 #include "globals.h"
 #include "icons.h"
-#include "scrollscale.h"
 #include "headerlist.h"
 #include "xml.h"
 #include "mididev.h"
@@ -35,7 +22,6 @@
 #include "comment.h"
 #include "track.h"
 #include "song.h"
-#include "header.h"
 #include "node.h"
 #include "audio.h"
 #include "instruments/minstrument.h"
@@ -57,85 +43,92 @@
 
 extern QMenu* populateAddSynth(QWidget* parent);
 
-static const int MIN_TRACKHEIGHT = 40;
 static const int WHEEL_DELTA = 120;
+static const int TOP_SPACER_SIZE = 32;
 
 //---------------------------------------------------------
 //   HeaderList
 //---------------------------------------------------------
 
 HeaderList::HeaderList(QWidget* parent, const char* name)
-: QWidget(parent) 
+: QFrame(parent) 
 {
-	setBackgroundRole(QPalette::NoRole);
-	setAttribute(Qt::WA_NoSystemBackground);
-	setAttribute(Qt::WA_StaticContents);
 	// This is absolutely required for speed! Otherwise painfully slow because we get
 	//  full rect paint events even on small scrolls! See help on QPainter::scroll().
-	setAttribute(Qt::WA_OpaquePaintEvent);
+	//setAttribute(Qt::WA_OpaquePaintEvent);
 
 	setObjectName(name);
+	setMouseTracking(true);
+	setAcceptDrops(true);
 	
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_layout = new QVBoxLayout(this);
+	m_layout->setSpacing(0);
+	m_layout->setContentsMargins(12, 0, 2, 0);
+	m_layout->setAlignment(Qt::AlignTop|Qt::AlignLeft);
+	//m_layout->addItem(new QSpacerItem(0, TOP_SPACER_SIZE, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
+	m_layout->addItem(vSpacer);
 
 	ypos = 0;
 	setFocusPolicy(Qt::StrongFocus);
-	setMouseTracking(true);
 
-	_scroll = 0;
 	mode = NORMAL;
 
 	resizeFlag = false;
 
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
-	connect(oom, SIGNAL(configChanged()), SLOT(redraw()));
 }
 
 //---------------------------------------------------------
 //   songChanged
 //---------------------------------------------------------
 
-void HeaderList::songChanged(int flags)
+void HeaderList::songChanged(int flags)/*{{{*/
 {
-	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
+	/*if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
 			| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
-		redraw();
-	if (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_VIEW_CHANGED))
-		adjustScrollbar();
-}
+	{
+	}*/
+	if (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/ | SC_VIEW_CHANGED))
+	{
+		updateTrackList();
+	}
+}/*}}}*/
 
-//---------------------------------------------------------
-//   drawCenteredPixmap
-//    small helper function for "draw()" below
-//---------------------------------------------------------
-
-/*static void drawCenteredPixmap(QPainter& p, const QPixmap* pm, const QRect& r)
+void HeaderList::updateTrackList()/*{{{*/
 {
-	p.drawPixmap(r.x() + (r.width() - pm->width()) / 2, r.y() + (r.height() - pm->height()) / 2, *pm);
-}*/
-
-//---------------------------------------------------------
-//   redraw
-//---------------------------------------------------------
-
-void HeaderList::redraw()
-{
-	update();
-}
-
-//---------------------------------------------------------
-//   adjustScrollbar
-//---------------------------------------------------------
-
-void HeaderList::adjustScrollbar()/*{{{*/
-{
-	int h = 0;
-	//This changes to song->visibletracks()
+	printf("HeaderList::updateTrackList\n");
+	TrackHeader* item;
+	while(!m_headers.isEmpty() && (item = m_headers.takeAt(0)) != 0)
+	{
+		if(item)
+		{
+			delete item;
+		}
+	}
 	TrackList* l = song->visibletracks();
-	for (iTrack it = l->begin(); it != l->end(); ++it)
-		h += (*it)->height();
-	_scroll->setMaximum(h + 30);
-	redraw();
+	m_headers.clear();
+	int index = 0;
+	for (iTrack i = l->begin(); i != l->end();++index, ++i)
+	{
+		Track* track = *i;
+		//Track::TrackType type = track->type();
+		//int trackHeight = track->height();
+		TrackHeader* header = new TrackHeader(track, this);
+		header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+		header->setFixedHeight(track->height());
+		m_headers.append(header);
+		m_layout->insertWidget(index, header);
+	}
+	printf("Leaving updateTrackList\n");
+}/*}}}*/
+
+void HeaderList::renameTrack(Track* t)/*{{{*/
+{
+	if (t && t->name() != "Master")
+	{
+	}
 }/*}}}*/
 
 //---------------------------------------------------------
@@ -163,17 +156,39 @@ Track* HeaderList::y2Track(int y) const/*{{{*/
 
 void HeaderList::tracklistChanged()
 {
-	redraw();
+	updateTrackList();
 }
 
 //---------------------------------------------------------
 //   keyPressEvent
 //---------------------------------------------------------
 
-void HeaderList::keyPressEvent(QKeyEvent* e)
+void HeaderList::keyPressEvent(QKeyEvent* e)/*{{{*/
 {
+	if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
+	{
+		if(isEditing())
+			return;
+	}
 	emit keyPressExt(e); //redirect keypress events to main app
-}
+}/*}}}*/
+
+bool HeaderList::isEditing()/*{{{*/
+{
+	if (m_headers.isEmpty())
+	{
+		return false;
+	}
+	else
+	{
+		foreach(TrackHeader* h, m_headers)
+		{
+			if(h->isEditing())
+				return true;
+		}
+	}
+	return false;
+}/*}}}*/
 
 //---------------------------------------------------------
 //   moveSelection
@@ -199,7 +214,6 @@ void HeaderList::moveSelection(int n)/*{{{*/
 			if(song->hasSelectedParts)
 				song->deselectAllParts();
 			emit selectionChanged(track);
-			redraw();
 		}
 		return;
 	}
@@ -268,7 +282,6 @@ void HeaderList::moveSelection(int n)/*{{{*/
 				song->setRecordFlag((*t), true);
 			}
 
-			redraw();
 			break;
 		}
 	}
@@ -294,6 +307,163 @@ TrackList HeaderList::getRecEnabledTracks()/*{{{*/
 	return recEnabled;
 }/*}}}*/
 
+void HeaderList::updateSelection(Track* t, bool shift)/*{{{*/
+{
+	printf("HeaderList::updateSelection Before track check\n");
+	if(t)
+	{
+		printf("HeaderList::updateSelection\n");
+		if (!shift)
+		{
+			song->deselectTracks();
+			if(song->hasSelectedParts)
+				song->deselectAllParts();
+			t->setSelected(true);
+
+			// rec enable track if expected
+			TrackList recd = getRecEnabledTracks();
+			if (recd.size() == 1 && config.moveArmedCheckBox)
+			{ // one rec enabled track, move rec enabled with selection
+				song->setRecordFlag((Track*) recd.front(), false);
+				song->setRecordFlag(t, true);
+			}
+		}
+		else
+		{
+			song->deselectAllParts();
+			t->setSelected(!t->selected());
+		}
+		emit selectionChanged(t->selected() ? t : 0);
+		song->update(SC_SELECTION);
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   selectTrack
+//---------------------------------------------------------
+
+void HeaderList::selectTrack(Track* tr)/*{{{*/
+{
+	song->deselectTracks();
+	tr->setSelected(true);
+
+
+	// rec enable track if expected
+	TrackList recd = getRecEnabledTracks();
+	if (recd.size() == 1 && config.moveArmedCheckBox)
+	{ // one rec enabled track, move rec enabled with selection
+		song->setRecordFlag((Track*) recd.front(), false);
+		song->setRecordFlag(tr, true);
+	}
+
+	song->update(SC_SELECTION);
+	emit selectionChanged(tr);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   selectTrackAbove
+//---------------------------------------------------------
+
+void HeaderList::selectTrackAbove()
+{
+	moveSelection(-1);
+}
+//---------------------------------------------------------
+//   selectTrackBelow
+//---------------------------------------------------------
+
+void HeaderList::selectTrackBelow()
+{
+	moveSelection(1);
+}
+
+void HeaderList::dragEnterEvent(QDragEnterEvent *event)/*{{{*/
+{
+	if (event->mimeData()->hasFormat("oomidi/x-trackinfo"))
+	{
+		if (children().contains(event->source()))
+		{
+		    event->setDropAction(Qt::MoveAction);
+		    event->accept();
+		}
+		else
+		{
+		    event->acceptProposedAction();
+		}
+	}
+	else if (event->mimeData()->hasText())
+	{
+	    event->acceptProposedAction();
+	}
+	else
+	{
+	    event->ignore();
+	}
+
+}/*}}}*/
+
+void HeaderList::dragMoveEvent(QDragMoveEvent *event)/*{{{*/
+{
+	if (event->mimeData()->hasFormat("oomidi/x-trackinfo"))
+	{
+		if (children().contains(event->source()))
+		{
+		    event->setDropAction(Qt::MoveAction);
+		    event->accept();
+		}
+		else
+		{
+		    event->acceptProposedAction();
+		}
+	}
+	else if (event->mimeData()->hasText())
+	{
+	    event->acceptProposedAction();
+	}
+	else
+	{
+	    event->ignore();
+	}
+
+}/*}}}*/
+
+void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
+{
+	if (event->mimeData()->hasFormat("oomidi/x-trackinfo"))
+	{
+		const QMimeData *mime = event->mimeData();
+		QByteArray itemData = mime->data("oomidi/x-trackinfo");
+		QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+		
+		QString trackName;
+		int index;
+		QPoint offset;
+		dataStream >> trackName >> index >> offset;
+		Track* srcTrack = song->findTrack(trackName);
+		Track* t = y2Track(event->pos().y() + ypos);
+		if (srcTrack && t)
+		{
+			int sTrack = song->visibletracks()->index(srcTrack);
+			int dTrack = song->visibletracks()->index(t);
+			audio->msgMoveTrack(sTrack, dTrack);
+		}
+		
+		if (event->source() != this)
+		{
+		    event->setDropAction(Qt::MoveAction);
+		    event->accept();
+		}
+		else
+		{
+		    event->acceptProposedAction();
+		}
+	}
+	else
+	{
+		event->ignore();
+	}
+}/*}}}*/
+
 //---------------------------------------------------------
 //   mousePressEvent
 //---------------------------------------------------------
@@ -307,8 +477,9 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 
 	Track* t = y2Track(y + ypos);
 
-	if (t == 0)
+	if (!t)/*{{{*/
 	{
+		printf("No track found\n");
 		if (button == Qt::RightButton)
 		{
 			QMenu* p = new QMenu;
@@ -381,7 +552,6 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 						emit selectionChanged(t);
 						emit trackInserted(n);
 						song->updateTrackViews1();
-						adjustScrollbar();
 					}
 				}
 			}
@@ -391,126 +561,17 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 			delete p;
 		}
 		return;
-	}//END no Track
+	}//END no Track/*}}}*/
 
-	//This changes to song->visibletracks()
-	TrackList* tracks = song->visibletracks();
-	dragYoff = y - (t->y() - ypos);
 	startY = y;
-
-	if (resizeFlag)
-	{
-		mode = RESIZE;
-		int y = ev->y();
-		int ty = -ypos;
-		sTrack = 0;
-		for (iTrack it = tracks->begin(); it != tracks->end(); ++it, ++sTrack)
-		{
-			int h = (*it)->height();
-			ty += h;
-			if (y >= (ty - 2))
-			{
-
-				if ((*it) == tracks->back() && y > ty)
-				{
-					//printf("tracks->back() && y > ty\n");
-				}
-				else if (y > (ty + 2))
-				{
-					//printf(" y > (ty+2) \n");
-				}
-				else
-				{
-					//printf("ogga ogga\n");
-
-					break;
-				}
-
-
-				//&& y < (ty))
-				//     break;
-			}
-		}
-
-		return;
-	}
 
 	mode = START_DRAG;
 
-//updateSelection(t, shift);
 	if (button == Qt::RightButton)
 	{
 		mode = NORMAL;
 	}
-	redraw();
 }/*}}}*/
-
-void HeaderList::updateSelection(Track* t, bool shift)/*{{{*/
-{
-	if(t)
-	{
-		if (!shift)
-		{
-			song->deselectTracks();
-			if(song->hasSelectedParts)
-				song->deselectAllParts();
-			t->setSelected(true);
-
-			// rec enable track if expected
-			TrackList recd = getRecEnabledTracks();
-			if (recd.size() == 1 && config.moveArmedCheckBox)
-			{ // one rec enabled track, move rec enabled with selection
-				song->setRecordFlag((Track*) recd.front(), false);
-				song->setRecordFlag(t, true);
-			}
-		}
-		else
-		{
-			song->deselectAllParts();
-			t->setSelected(!t->selected());
-		}
-		emit selectionChanged(t->selected() ? t : 0);
-	}
-}/*}}}*/
-
-//---------------------------------------------------------
-//   selectTrack
-//---------------------------------------------------------
-
-void HeaderList::selectTrack(Track* tr)/*{{{*/
-{
-	song->deselectTracks();
-	tr->setSelected(true);
-
-
-	// rec enable track if expected
-	TrackList recd = getRecEnabledTracks();
-	if (recd.size() == 1 && config.moveArmedCheckBox)
-	{ // one rec enabled track, move rec enabled with selection
-		song->setRecordFlag((Track*) recd.front(), false);
-		song->setRecordFlag(tr, true);
-	}
-
-	redraw();
-	emit selectionChanged(tr);
-}/*}}}*/
-
-//---------------------------------------------------------
-//   selectTrackAbove
-//---------------------------------------------------------
-
-void HeaderList::selectTrackAbove()
-{
-	moveSelection(-1);
-}
-//---------------------------------------------------------
-//   selectTrackBelow
-//---------------------------------------------------------
-
-void HeaderList::selectTrackBelow()
-{
-	moveSelection(1);
-}
 
 //---------------------------------------------------------
 //   mouseMoveEvent
@@ -520,41 +581,6 @@ void HeaderList::mouseMoveEvent(QMouseEvent* ev)/*{{{*/
 {
 	if ((((QInputEvent*) ev)->modifiers() | ev->buttons()) == 0)
 	{
-		int y = ev->y();
-		int ty = -ypos;
-	//This changes to song->visibletracks()
-		TrackList* tracks = song->visibletracks();
-		iTrack it;
-		for (it = tracks->begin(); it != tracks->end(); ++it)
-		{
-			int h = (*it)->height();
-			ty += h;
-			if (y >= (ty - 2))
-			{
-				if ((*it) == tracks->back() && y >= ty)
-				{
-					// outside last track don't change to splitVCursor
-				}
-				else if (y > (ty + 2))
-				{
-					//printf(" y > (ty+2) \n");
-				}
-				else
-				{
-					if (!resizeFlag)
-					{
-						resizeFlag = true;
-						setCursor(QCursor(Qt::SplitVCursor));
-					}
-					break;
-				}
-			}
-		}
-		if (it == tracks->end() && resizeFlag)
-		{
-			setCursor(QCursor(Qt::ArrowCursor));
-			resizeFlag = false;
-		}
 		return;
 	}
 	curY = ev->y();
@@ -562,11 +588,11 @@ void HeaderList::mouseMoveEvent(QMouseEvent* ev)/*{{{*/
 	switch (mode)
 	{
 		case START_DRAG:
+		{
 			if (delta < 0)
 				delta = -delta;
 			if (delta <= 2)
 				break;
-		{
 			Track* t = y2Track(startY + ypos);
 			if (t == 0)
 				mode = NORMAL;
@@ -577,35 +603,15 @@ void HeaderList::mouseMoveEvent(QMouseEvent* ev)/*{{{*/
 				//This changes to song->visibletracks()
 				sTrack = song->visibletracks()->index(t);
 				setCursor(QCursor(Qt::SizeVerCursor));
-				redraw();
 			}
 		}
-			break;
+		break;
 		case NORMAL:
-			break;
+		break;
 		case DRAG:
-			redraw();
-			break;
+		break;
 		case RESIZE:
-		{
-			if (sTrack >= 0 && (unsigned) sTrack < song->visibletracks()->size())
-			{
-				//This changes to song->visibletracks()
-				Track* t = song->visibletracks()->index(sTrack);
-				if (t)
-				{
-					int h = t->height() + delta;
-					startY = curY;
-					if (h < MIN_TRACKHEIGHT)
-						h = MIN_TRACKHEIGHT;
-					//if((h / 2) != 0)
-					//	h = h +1;
-					t->setHeight(h);
-					song->update(SC_TRACK_MODIFIED);
-				}
-			}
-		}
-			break;
+		break;
 	}
 }/*}}}*/
 
@@ -615,27 +621,29 @@ void HeaderList::mouseMoveEvent(QMouseEvent* ev)/*{{{*/
 
 void HeaderList::mouseReleaseEvent(QMouseEvent* ev)/*{{{*/
 {
+	bool shift = ((QInputEvent*) ev)->modifiers() & Qt::ShiftModifier;
 	if (mode == DRAG)
 	{
 		//printf("HeaderList::mouseReleaseEvent()\n");
-		Track* t = y2Track(ev->y() + ypos);
+		Track* t = y2Track(ev->y() + ypos);/*{{{*/
 		if (t)
 		{
 			//printf("HeaderList::mouseReleaseEvent() track found: %s\n", t->name().toStdString().c_str());
-			//This changes to song->visibletracks()
-
 			int dTrack = song->visibletracks()->index(t);
 			//printf("HeaderList::mouseReleaseEvent: TrackView mode sTrack: %d  dTrack: %d\n", sTrack, dTrack);
 			audio->msgMoveTrack(sTrack, dTrack);
-		}
+		}/*}}}*/
 	}
 	if (mode != NORMAL)
 	{
 		mode = NORMAL;
 		setCursor(QCursor(Qt::ArrowCursor));
-		redraw();
 	}
-	adjustScrollbar();
+	printf("Before update selection\n");
+	Track *t = y2Track(ev->y() + ypos);
+	if(t)
+		updateSelection(t, shift);
+	printf("After update selection\n");
 }/*}}}*/
 
 //---------------------------------------------------------
@@ -645,29 +653,13 @@ void HeaderList::mouseReleaseEvent(QMouseEvent* ev)/*{{{*/
 void HeaderList::wheelEvent(QWheelEvent* ev)
 {
 	emit redirectWheelEvent(ev);
+	QFrame::wheelEvent(ev);
 	return;
 }
 
-//---------------------------------------------------------
-//   setYPos
-//---------------------------------------------------------
-
-void HeaderList::setYPos(int y)
+/*void HeaderList::resizeEvent(QResizeEvent*)
 {
-	int delta = ypos - y; // -  -> shift up
-	ypos = y;
-
-	scroll(0, delta);
-}
-
-//---------------------------------------------------------
-//   resizeEvent
-//---------------------------------------------------------
-
-void HeaderList::resizeEvent(QResizeEvent* /*ev*/)
-{
-
-}
+}*/
 
 //---------------------------------------------------------
 //   classesPopupMenu
@@ -813,7 +805,6 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 					int dTrack = song->visibletracks()->index(t);
 					audio->msgMoveTrack(i, dTrack);
 					//The selection event should be harmless enough to call here to update 
-					redraw();
 					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(src));
 				}
 			}
@@ -836,25 +827,3 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 	}
 }/*}}}*/
 
-void HeaderList::paintEvent(QPaintEvent* ev)
-{
-	//Clear the list and repopulate then call QWidget::paintEvent()
-	QLayoutItem* item;
-	while((item = m_layout->takeAt(0)) != 0)
-	{
-		delete item;
-	}
-	TrackList* l = song->visibletracks();
-	for (iTrack i = l->begin(); i != l->end(); ++i)
-	{
-		Track* track = *i;
-		Track::TrackType type = track->type();
-		int trackHeight = track->height();
-		TrackHeader* header = new TrackHeader(track, this);
-		m_layout->addWidget(header);
-	}
-	//Add spacer object
-	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	m_layout->addItem(vSpacer);
-	QWidget::paintEvent(ev);
-}

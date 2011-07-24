@@ -40,6 +40,7 @@ class SliderBase : public QWidget, public DoubleRange
     double d_mass;
     bool _cursorHoming;
     bool _ignoreMouseMove;
+	bool _ignoreMouseWheel;
 
     void buttonReleased();
 
@@ -138,6 +139,11 @@ public:
     {
         _id = i;
     }
+
+	void setIgnoreWheel(bool val)
+	{
+		_ignoreMouseWheel = val;
+	}
 };
 
 #endif

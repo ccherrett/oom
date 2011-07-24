@@ -640,6 +640,72 @@ QLineEdit
 	 color: #03c0e2;
 }
 
+/*--------------------Track Header styles-----------------*/
+QFrame#AudioInHeader { 
+	border: 1px solid #29292a;
+	/*background-color: #5f855f;*/
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #749f71, stop:0.5 #4d6a4c);
+	/*border-radius: 7px;*/
+}
+QFrame#AudioOutHeader { 
+	border: 1px solid #29292a;
+	background-color: #4d0f0f;
+	background-image: url(:/images/mixer_bg_out.png);
+	background-repeat: repeat-x;
+	/*border-radius: 7px;*/
+}
+QFrame#AuxHeader { 
+	border: 1px solid #29292a;
+	background-color: #343652;
+	background-image: url(:/images/mixer_bg_aux.png);
+	background-repeat: repeat-x;
+	/*border-radius: 7px;*/
+}
+QFrame#AudioBussHeader { 
+	border: 1px solid #29292a;
+	background-color: #252727;
+	background-image: url(:/images/mixer_bg_buss.png);
+	background-repeat: repeat-x;
+	/*border-radius: 7px;*/
+}
+QFrame#MidiTrackHeader { 
+	border: 1px solid #29292a;
+	background-color: #28222c;
+	background-image: url(:/images/mixer_bg_midi.png);
+	background-repeat: repeat-x;
+	/*border-radius: 7px;*/
+}
+QFrame#MidiTrackHeader [selected="true"]{ 
+	border: 1px solid #29292a;
+	background-color: #12191c;
+	/*background-image: url(:/images/mixer_bg_midi.png);
+	background-repeat: repeat-x;*/
+	/*border-radius: 7px;*/
+}
+QFrame#WaveHeader { 
+	border: 1px solid #29292a;
+	background-color: #1e2122;
+	background-image: url(:/images/mixer_bg_audio.png);
+	background-repeat: repeat-x;
+	/*border-radius: 7px;*/
+}
+
+QFrame#MidiTrackHeader QLineEdit,
+QFrame#AudioBussHeader QLineEdit,
+QFrame#AuxHeader QLineEdit,
+QFrame#AudioOutHeader QLineEdit,
+QFrame#AudioInHeader QLineEdit,
+QFrame#WaveHeader QLineEdit
+{
+	 border-radius: 0;
+     border-image: url(:/images/frame.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #010f14;
+	 color: #03c0e2;
+}
+
+
 Dentry
 {
 	 border-radius: 8px;
@@ -1848,4 +1914,9 @@ QAbstractSpinBox {
  QAbstractSpinBox::down-arrow:off { /* off state when value in min */
     image: url(:/images/down_arrow_disabled.png);
  }
+
+QFrame [selectedTrack="true"]
+{
+	background-color: yellow;
+}
 
