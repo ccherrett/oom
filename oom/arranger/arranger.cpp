@@ -287,7 +287,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	listScroll->setWidgetResizable(true);
 	listScroll->setWidget(m_trackheader);
 	listScroll->setMouseTracking(true);
-	listScroll->setMinimumWidth(210);
+	listScroll->setMinimumWidth(250);
 	listScroll->setMaximumWidth(400);
 	trackLayout->addItem(new QSpacerItem(0, 32, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	trackLayout->addWidget(listScroll);

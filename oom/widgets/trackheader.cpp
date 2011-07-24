@@ -273,7 +273,7 @@ void TrackHeader::initPan()/*{{{*/
 
 		m_pan->setValue(double(v));
 
-		m_buttonHBox->addWidget(m_pan);
+		m_buttonHBox->insertWidget(0, m_pan);
 
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		//connect(m_pan, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
@@ -288,7 +288,7 @@ void TrackHeader::initPan()/*{{{*/
 		m_pan->setIgnoreWheel(true);
 		m_pan->setBackgroundRole(QPalette::Mid);
 		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-		m_buttonHBox->addWidget(m_pan);
+		m_buttonHBox->insertWidget(0, m_pan);
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		connect(m_pan, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
 		connect(m_pan, SIGNAL(sliderReleased(int)), SLOT(panReleased()));
