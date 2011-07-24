@@ -44,7 +44,6 @@
 #include "mididev.h"
 #include "utils.h"
 #include "globals.h"
-//#include "tlist.h"
 #include "headerlist.h"
 #include "icons.h"
 #include "header.h"

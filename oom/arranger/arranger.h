@@ -27,8 +27,6 @@ class QComboBox;
 class QStackedWidget;
 class QVBoxLayout;
 
-//class Header;
-//class TList;
 class ScrollScale;
 class MTScale;
 class Track;
@@ -58,9 +56,7 @@ class Arranger : public QWidget
     PartCanvas* canvas;
     ScrollScale* hscroll;
     QScrollBar* vscroll;
-    //TList* list;
 	HeaderList* m_trackheader;
-    //Header* header;
     MTScale* time;
     SpinBox* lenEntry;
     bool showTrackinfoFlag;
