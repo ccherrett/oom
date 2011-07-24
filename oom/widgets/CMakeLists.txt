@@ -56,6 +56,11 @@ QT4_WRAP_CPP (widget_mocs
 	  tviewdock.h
 	  tracklistview.h
 	  trackheader.h
+	  transporttools.h
+	  edittools.h
+	  epictools.h
+	  looptools.h
+	  misctools.h
 	  rmap.h
 	  rmapdialog.h
 	  pctablemodel.h
@@ -189,6 +194,11 @@ file (GLOB widgets_source_files
 	  tviewdock.cpp
 	  tracklistview.cpp
 	  trackheader.cpp
+	  transporttools.cpp
+	  edittools.cpp
+	  epictools.cpp
+	  looptools.cpp
+	  misctools.cpp
 	  rmap.cpp
 	  rmapdialog.cpp
       mtscale.cpp 

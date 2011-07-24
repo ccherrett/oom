@@ -64,6 +64,11 @@
 
 #include "mtrackinfo.h"
 #include "tracklistview.h"
+#include "transporttools.h"
+#include "edittools.h"
+#include "epictools.h"
+#include "looptools.h"
+#include "misctools.h"
 
 #include "traverso_shared/TConfig.h"
 
@@ -335,11 +340,16 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//tools->addActions(undoRedo->actions());
 	//tools->addSeparator();
 	//tools->setIconSize(QSize(22, 22));
+	
+	m_stepAction = new QAction(this);
+	m_stepAction->setToolTip(tr("Step Record"));
+	m_stepAction->setIcon(*stepIconSet3);
+	m_stepAction->setCheckable(true);
 
-    srec = new QToolButton();
+    /*srec = new QToolButton();
 	srec->setToolTip(tr("Step Record"));
 	srec->setIcon(*stepIconSet3);
-    srec->setCheckable(true);
+    srec->setCheckable(true);*/
 	//srec->setObjectName("StepRecord");
 	//tools->addWidget(srec);
 
@@ -349,37 +359,53 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	midiin->setCheckable(true);
 	//tools->addWidget(midiin);
 
-    speaker = new QToolButton();
+    /*speaker = new QToolButton();
 	speaker->setToolTip(tr("Play Events"));
 	speaker->setIcon(*speakerIconSet3);
-	speaker->setCheckable(true);
+	speaker->setCheckable(true);*/
 	//tools->addWidget(speaker);
+	
+	m_speakerAction = new QAction(this);
+	m_speakerAction->setToolTip(tr("Play Events"));
+	m_speakerAction->setIcon(*speakerIconSet3);
+	m_speakerAction->setCheckable(true);
 
 	solo = new QToolButton();
-	solo->setIcon(*soloIconSet3);
-	solo->setIconSize(soloIconOn->size());
-	solo->setToolTip(tr("Solo"));
-	solo->setCheckable(true);
+	///solo->setIcon(*soloIconSet3);
+	//solo->setIconSize(soloIconOn->size());
+	//solo->setToolTip(tr("Solo"));
+	//solo->setCheckable(true);
+	m_soloAction = new QAction(this);
+	m_soloAction->setIcon(*soloIconSet3);
+	m_soloAction->setToolTip(tr("Solo"));
+	m_soloAction->setCheckable(true);
+	solo->setDefaultAction(m_soloAction);
 
-    m_globalKey = new QToolButton();
-	m_globalKey->setToolTip(tr("EPIC: Enable editing across all parts"));
-	m_globalKey->setIcon(*globalKeysIconSet3);
-	m_globalKey->setCheckable(true);
 
-    m_globalArm = new QToolButton();
-	m_globalArm->setToolTip(tr("EPIC: Globally record arm all parts"));
-	m_globalArm->setIcon(*globalArmIconSet3);
-	//m_globalArm->setCheckable(true);
+    //m_globalKey = new QToolButton();
+	m_globalKeyAction = new QAction(this);
+	m_globalKeyAction->setToolTip(tr("EPIC: Enable editing across all parts"));
+	m_globalKeyAction->setIcon(*globalKeysIconSet3);
+	m_globalKeyAction->setCheckable(true);
+	//m_globalKey->setDefaultAction(globalKeyAction);
+
+    //m_globalArm = new QToolButton();
+	m_globalArmAction = new QAction(this);
+	m_globalArmAction->setToolTip(tr("EPIC: Globally record arm all parts"));
+	m_globalArmAction->setIcon(*globalArmIconSet3);
+	//m_globalArm->setDefaultAction(globalArmAction);
 
     m_mutePart = new QToolButton();
-	m_mutePart->setToolTip(tr("Mute current part"));
-	m_mutePart->setIconSize(soloIconOn->size());
-	m_mutePart->setIcon(*muteIconSet3);
-	m_mutePart->setCheckable(true);
+	m_muteAction = new QAction(this);
+	m_muteAction->setToolTip(tr("Mute current part"));
+	//m_muteAction->setIconSize(soloIconOn->size());
+	m_muteAction->setIcon(*muteIconSet3);
+	m_muteAction->setCheckable(true);
+	m_mutePart->setDefaultAction(m_muteAction);
 
 	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
 	posLabel = new PosLabel(0, "pos");
-	posLabel->setFixedHeight(22);
+	posLabel->setFixedHeight(25);
 	posLabel->setObjectName("Cursor");
 	cursorBar->addWidget(posLabel);
 
@@ -406,7 +432,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tools22 = new EditToolBar(this, pianorollTools);
 	tools22->setVisible(false);
     tools2 = new QToolBar(tr("Edit Tools"));
-	tools2->setIconSize(QSize(22, 22));
+	tools2->setIconSize(QSize(29, 25));
 	addToolBar(Qt::BottomToolBarArea, tools2);
 	tools2->setFloatable(false);
 	tools2->setMovable(false);
@@ -415,50 +441,51 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tools2->addWidget(tspacer);
 
+	TransportToolbar *transportbar = new TransportToolbar(this);
+	transportbar->setMuteAction(m_muteAction);
+	transportbar->setSoloAction(m_soloAction);
+	tools2->addWidget(transportbar);
+	QWidget* spacer55 = new QWidget();
+	spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer55->setMaximumWidth(15);
+	tools2->addWidget(spacer55);
+	EditTools *edittools = new EditTools(tools22->getActions(), this);
+	tools2->addWidget(edittools);
+	QWidget* spacer555 = new QWidget();
+	spacer555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer555->setMaximumWidth(15);
+	tools2->addWidget(spacer555);
+	QList<QAction*> epicList;
+	epicList.append(m_globalKeyAction);
+	epicList.append(m_globalArmAction);
 
-	//tools2->addActions(transportAction->actions());
-	QList<QAction*> transActions = transportAction->actions();
-	foreach(QAction *act, transActions)
-	{
-		if(act == recordAction)
-		{
-			tools2->addAction(act);
-			tools2->addWidget(m_mutePart);
-			tools2->addWidget(solo);
-			QWidget* spacer55 = new QWidget();
-			spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-			spacer55->setMaximumWidth(15);
-			tools2->addWidget(spacer55);
-			tools2->addActions(tools22->getActions());
-			QWidget* spacer = new QWidget();
-			spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-			spacer->setMaximumWidth(15);
-			tools2->addWidget(spacer);
+	EpicToolbar* epicBar = new EpicToolbar(epicList, this);
+	tools2->addWidget(epicBar);
+	noteAlphaAction->setChecked(true);
+	QWidget* spacer5555 = new QWidget();
+	spacer5555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer5555->setMaximumWidth(15);
+	tools2->addWidget(spacer5555);
+	LoopToolbar* loopBar = new LoopToolbar(this);
+	tools2->addWidget(loopBar);
+	QWidget* spacer55555 = new QWidget();
+	spacer55555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer55555->setMaximumWidth(15);
+	tools2->addWidget(spacer55555);
 	
-			multiPartSelectionAction->setChecked(false);
-			tools2->addAction(multiPartSelectionAction);
-			tools2->addWidget(m_globalKey);
-			tools2->addWidget(m_globalArm);
-			//bool ghostedAlpha = tconfig().get_property("PianoRollEdit", "showghostpart", 1).toBool();
-			noteAlphaAction->setChecked(true);
-			tools2->addAction(noteAlphaAction);
-			
-			QWidget* spacer222 = new QWidget();
-			spacer222->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-			spacer222->setMaximumWidth(15);
-			tools2->addWidget(spacer222);
-	
-		}
-		else
-			tools2->addAction(act);
-	}
+	QList<QAction*> miscList;
+	miscList.append(m_stepAction);
+	miscList.append(m_speakerAction);
+
+	MiscToolbar* miscBar = new MiscToolbar(miscList, this);
+	tools2->addWidget(miscBar);
 	QWidget* spacer5 = new QWidget();
 	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer5->setMaximumWidth(15);
 	tools2->addWidget(spacer5);
-	tools2->addWidget(srec);
-	tools2->addWidget(speaker);
-	tools2->addAction(panicAction);
+	//tools2->addWidget(srec);
+	//tools2->addWidget(speaker);
+	//tools2->addAction(panicAction);
 	/*#ifdef LSCP_SUPPORT
 	QToolButton *btnLSCP = new QToolButton();
 	btnLSCP->setText(tr("L"));
@@ -637,14 +664,14 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
     connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
 	connect(piano, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
-    connect(srec, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
+    connect(m_stepAction, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
     //connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
-    connect(speaker, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
+    connect(m_speakerAction, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
     connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
-	connect(m_globalArm, SIGNAL(clicked()), canvas, SLOT(recordArmAll()));
-	connect(m_globalKey, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
-	connect(m_globalKey, SIGNAL(toggled(bool)), midiTrackInfo, SLOT(setGlobalState(bool)));
-	connect(m_globalKey, SIGNAL(toggled(bool)), this, SLOT(toggleEpicEdit(bool)));
+	connect(m_globalArmAction, SIGNAL(triggered()), canvas, SLOT(recordArmAll()));
+	connect(m_globalKeyAction, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
+	connect(m_globalKeyAction, SIGNAL(toggled(bool)), midiTrackInfo, SLOT(setGlobalState(bool)));
+	connect(m_globalKeyAction, SIGNAL(toggled(bool)), this, SLOT(toggleEpicEdit(bool)));
 	connect(multiPartSelectionAction, SIGNAL(toggled(bool)), this, SLOT(toggleMultiPartSelection(bool)));
 	connect(midiTrackInfo, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
@@ -689,7 +716,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     canvas->setMidiin(true);
     midiin->setChecked(true);
     canvas->playEvents(true);
-    speaker->setChecked(true);
+    m_speakerAction->setChecked(true);
 
     QClipboard* cb = QApplication::clipboard();
     connect(cb, SIGNAL(dataChanged()), SLOT(clipboardChanged()));
@@ -930,7 +957,7 @@ void PianoRoll::toggleMultiPartSelection(bool toggle)
 {
 	if(toggle)
 	{
-		m_globalKey->setChecked(!toggle);
+		m_globalKeyAction->setChecked(!toggle);
 		tools22->set(PointerTool);
 	}	
 }
@@ -1283,7 +1310,7 @@ void PianoRoll::readStatus(Xml& xml)
 			{
 				int val = xml.parseInt();
 				canvas->setSteprec(val);
-				srec->setChecked(val);
+				m_stepAction->setChecked(val);
 			}
 			else if (tag == "midiin")
 			{
@@ -1318,7 +1345,7 @@ void PianoRoll::readStatus(Xml& xml)
 			{
 				_playEvents = xml.parseInt();
 				canvas->playEvents(_playEvents);
-				speaker->setChecked(_playEvents);
+				m_speakerAction->setChecked(_playEvents);
 			}
 			else if (tag == "xmag")
 				hscroll->setMag(xml.parseInt());
@@ -1356,7 +1383,7 @@ static int rasterTable[] = {
 
 bool PianoRoll::isGlobalEdit()
 {
-	return m_globalKey->isChecked();
+	return m_globalKeyAction->isChecked();
 }
 
 bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
@@ -1399,7 +1426,7 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 		}
 		if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
 		{
-			srec->toggle();
+			m_stepAction->toggle();
 			return true;
 		}
 		if (key == shortcuts[SHRT_MIDI_PANIC].key)
@@ -1420,7 +1447,7 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 		else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
 		{
 			unsigned utick = song->cpos() + rasterStep(song->cpos());
-			if(m_globalKey->isChecked())
+			if(m_globalKeyAction->isChecked())
 			{
 				for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
 				{
@@ -1687,7 +1714,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
 	{
 		unsigned utick = song->cpos() + rasterStep(song->cpos());
-		if(m_globalKey->isChecked())
+		if(m_globalKeyAction->isChecked())
 		{
 			for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
 			{
@@ -1726,7 +1753,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	{
 		//printf("Delete KeyStroke recieved\n");
 		int x = song->cpos();
-		if(m_globalKey->isChecked())
+		if(m_globalKeyAction->isChecked())
 		{
 			for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
 			{
@@ -1833,17 +1860,17 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
 	{
-		srec->toggle();
+		m_stepAction->toggle();
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOGGLE_STEPQWERTY].key)
 	{
 		_stepQwerty = !_stepQwerty;
-		if (_stepQwerty && !srec->isChecked()) {
-			srec->toggle();
+		if (_stepQwerty && !m_stepAction->isChecked()) {
+			m_stepAction->toggle();
 		}
-		if (!_stepQwerty && srec->isChecked()) {
-			srec->toggle();
+		if (!_stepQwerty && m_stepAction->isChecked()) {
+			m_stepAction->toggle();
 		}
 
 		return;
@@ -1924,7 +1951,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_TOGGLE_SOUND].key)
 	{
-		speaker->toggle();
+		m_speakerAction->toggle();
 		return;
 	}
 	else

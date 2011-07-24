@@ -127,7 +127,7 @@ class PianoRoll : public MidiEditor
 
     NoteInfo* info;
     QToolButton* alpha;
-    QToolButton* srec;
+    //QToolButton* srec;
     QToolButton* midiin;
     QToolButton* solo;
     PosLabel* posLabel;
@@ -142,6 +142,12 @@ class PianoRoll : public MidiEditor
     QToolButton* m_globalKey;
     QToolButton* m_globalArm;
     QToolButton* m_mutePart;
+	QAction* m_muteAction;
+	QAction* m_soloAction;
+	QAction* m_globalKeyAction;
+	QAction* m_globalArmAction;
+	QAction* m_stepAction;
+	QAction* m_speakerAction;
     QToolBar* tools;
     QToolBar* tools2;
     EditToolBar* tools22;

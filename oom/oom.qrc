@@ -39,6 +39,9 @@
 		<file>images/icons/eraser.png</file>
 		<file>images/icons/eraser_off.png</file>
 		<file>images/icons/eraser_over.png</file>
+		<file>images/icons/eraser_new_on.png</file>
+		<file>images/icons/eraser_new_off.png</file>
+		<file>images/icons/eraser_new_over.png</file>
 		<file>images/icons/eventfilter.png</file>
 		<file>images/icons/eventlist.png</file>
 		<file>images/icons/manage-midi-devices.png</file>
@@ -51,6 +54,9 @@
 		<file>images/icons/pencil.png</file>
 		<file>images/icons/pencil_off.png</file>
 		<file>images/icons/pencil_over.png</file>
+		<file>images/icons/pencil_new_on.png</file>
+		<file>images/icons/pencil_new_off.png</file>
+		<file>images/icons/pencil_new_over.png</file>
 		<file>images/icons/pencil_cursor.png</file>
 		<file>images/icons/programchange.png</file>
 		<file>images/icons/quantize.png</file>
@@ -58,6 +64,9 @@
 		<file>images/icons/select.png</file>
 		<file>images/icons/select_off.png</file>
 		<file>images/icons/select_over.png</file>
+		<file>images/icons/pointer_new_on.png</file>
+		<file>images/icons/pointer_new_off.png</file>
+		<file>images/icons/pointer_new_over.png</file>
 		<file>images/icons/select_multi.png</file>
 		<file>images/icons/select_multi_off.png</file>
 		<file>images/icons/select_multi_over.png</file>
@@ -70,31 +79,55 @@
 		<file>images/icons/transport-cursor-to-pointer.png</file>
 		<file>images/icons/transport-ffwd.png</file>
 		<file>images/icons/transport-ffwd_off.png</file>
+		<file>images/icons/transport-ffwd_new_on.png</file>
+		<file>images/icons/transport-ffwd_new_over.png</file>
+		<file>images/icons/transport-ffwd_new_off.png</file>
 		<file>images/icons/transport-ffwd-end.png</file>
 		<file>images/icons/transport-panic.png</file>
 		<file>images/icons/transport-panic_off.png</file>
 		<file>images/icons/transport-play.png</file>
 		<file>images/icons/transport-play_off.png</file>
 		<file>images/icons/transport-play_over.png</file>
+		<file>images/icons/transport-play_new_on.png</file>
+		<file>images/icons/transport-play_new_over.png</file>
+		<file>images/icons/transport-play_new_off.png</file>
 		<file>images/icons/transport-pointer-to-cursor.png</file>
 		<file>images/icons/transport-record.png</file>
 		<file>images/icons/transport-rewind.png</file>
 		<file>images/icons/transport-rewind_off.png</file>
+		<file>images/icons/transport-rewind_new_on.png</file>
+		<file>images/icons/transport-rewind_new_over.png</file>
+		<file>images/icons/transport-rewind_new_off.png</file>
 		<file>images/icons/transport-rewind-end.png</file>
 		<file>images/icons/transport-rewind-end_off.png</file>
+		<file>images/icons/transport-rewind-end_new_on.png</file>
+		<file>images/icons/transport-rewind-end_new_over.png</file>
+		<file>images/icons/transport-rewind-end_new_off.png</file>
 		<file>images/icons/transport-solo_on.png</file>
 		<file>images/icons/transport-solo_off.png</file>
 		<file>images/icons/transport-solo_over.png</file>
+		<file>images/icons/transport-solo_new_on.png</file>
+		<file>images/icons/transport-solo_new_over.png</file>
+		<file>images/icons/transport-solo_new_off.png</file>
 		<file>images/icons/transport-mute_on.png</file>
 		<file>images/icons/transport-mute_off.png</file>
 		<file>images/icons/transport-mute_over.png</file>
+		<file>images/icons/transport-mute_new_on.png</file>
+		<file>images/icons/transport-mute_new_over.png</file>
+		<file>images/icons/transport-mute_new_off.png</file>
 		<file>images/icons/transport-record_on.png</file>
 		<file>images/icons/transport-record_off.png</file>
 		<file>images/icons/transport-record_over.png</file>
+		<file>images/icons/transport-record_new_on.png</file>
+		<file>images/icons/transport-record_new_over.png</file>
+		<file>images/icons/transport-record_new_off.png</file>
 		<file>images/icons/transport-solo.png</file>
 		<file>images/icons/transport-stop.png</file>
 		<file>images/icons/transport-stop_off.png</file>
 		<file>images/icons/transport-stop_over.png</file>
+		<file>images/icons/transport-stop_new_on.png</file>
+		<file>images/icons/transport-stop_new_over.png</file>
+		<file>images/icons/transport-stop_new_off.png</file>
 		<file>images/icons/transport-tracking.png</file>
 		<file>images/icons/un-mute-all.png</file>
 		<file>images/icons/velocity.png</file>
@@ -167,6 +200,9 @@
 		<file>images/icons/line-tool.png</file>
 		<file>images/icons/line-tool_off.png</file>
 		<file>images/icons/line-tool_over.png</file>
+		<file>images/icons/linetool_new_on.png</file>
+		<file>images/icons/linetool_new_off.png</file>
+		<file>images/icons/linetool_new_over.png</file>
 		<file>images/icons/join_tracks.png</file>
 		<file>images/icons/join_tracks_off.png</file>
 		<file>images/icons/join_tracks_over.png</file>
@@ -191,6 +227,9 @@
 		<file>images/icons/audition.png</file>
 		<file>images/icons/audition_off.png</file>
 		<file>images/icons/audition_over.png</file>
+		<file>images/icons/audition_new_on.png</file>
+		<file>images/icons/audition_new_over.png</file>
+		<file>images/icons/audition_new_off.png</file>
 		<file>images/icons/reminder_off.png</file>
 		<file>images/icons/reminder1_on.png</file>
 		<file>images/icons/reminder2_on.png</file>
@@ -202,6 +241,36 @@
 		<file>images/icons/globe_over.png</file>
 		<file>images/icons/comment.png</file>
 		<file>images/icons/arrow_switch.png</file>
+		<file>images/icons/epicSelect_new_on.png</file>
+		<file>images/icons/epicSelect_new_off.png</file>
+		<file>images/icons/epicSelect_new_over.png</file>
+		<file>images/icons/epicDraw_new_on.png</file>
+		<file>images/icons/epicDraw_new_off.png</file>
+		<file>images/icons/epicDraw_new_over.png</file>
+		<file>images/icons/epicRecord_new_on.png</file>
+		<file>images/icons/epicRecord_new_off.png</file>
+		<file>images/icons/epicRecord_new_over.png</file>
+		<file>images/icons/epicParts_new_on.png</file>
+		<file>images/icons/epicParts_new_off.png</file>
+		<file>images/icons/epicParts_new_over.png</file>
+		<file>images/icons/loop_new_on.png</file>
+		<file>images/icons/loop_new_off.png</file>
+		<file>images/icons/loop_new_over.png</file>
+		<file>images/icons/right_new_on.png</file>
+		<file>images/icons/right_new_off.png</file>
+		<file>images/icons/right_new_over.png</file>
+		<file>images/icons/left_new_on.png</file>
+		<file>images/icons/left_new_off.png</file>
+		<file>images/icons/left_new_over.png</file>
+		<file>images/icons/step_new_on.png</file>
+		<file>images/icons/step_new_off.png</file>
+		<file>images/icons/step_new_over.png</file>
+		<file>images/icons/speaker_new_on.png</file>
+		<file>images/icons/speaker_new_off.png</file>
+		<file>images/icons/speaker_new_over.png</file>
+		<file>images/icons/panic_new_on.png</file>
+		<file>images/icons/panic_new_off.png</file>
+		<file>images/icons/panic_new_over.png</file>
 	</qresource>
 </RCC>
 
