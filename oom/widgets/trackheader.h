@@ -8,7 +8,7 @@
 #define _OOM_TRACKHEADER_H_
 #include "ui_trackheaderbase.h"
 
-static const int MIN_TRACKHEIGHT = 50;
+static const int MIN_TRACKHEIGHT = 58;
 
 class Track;
 class Knob;
@@ -24,7 +24,8 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 	Track* m_track;
 	Knob* m_pan;
 	bool resizeFlag;
-	bool selected;
+	bool m_selected;
+    bool m_midiDetect;
 	double panVal;
 	double volume;
     int startY;
@@ -72,7 +73,7 @@ protected:
 
 public:
 	TrackHeader(Track* track, QWidget* parent = 0);
-	//virtual ~TrackHeader(){}
+	virtual ~TrackHeader(){}
 	bool isSelected();
 	bool isEditing()
 	{

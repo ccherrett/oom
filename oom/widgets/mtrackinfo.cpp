@@ -376,7 +376,6 @@ MidiTrackInfo::~MidiTrackInfo()
 
 void MidiTrackInfo::heartBeat()
 {
-	///if(!showTrackinfoFlag || !selected)
 	if (!isVisible() || !isEnabled() || !selected)
 		return;
 	switch (selected->type())
@@ -388,81 +387,45 @@ void MidiTrackInfo::heartBeat()
 
 			int outChannel = track->outChannel();
 			int outPort = track->outPort();
-			///int ichMask    = track->inChannelMask();
-			//int iptMask    = track->inPortMask();
-			///unsigned int iptMask    = track->inPortMask();
 
 			MidiPort* mp = &midiPorts[outPort];
 
-			// Set record echo.
-			//if(recEchoButton->isChecked() != track->recEcho())
-			//{
-			//  recEchoButton->blockSignals(true);
-			//  recEchoButton->setChecked(track->recEcho());
-			//  recEchoButton->blockSignals(false);
-			//}
-
 			// Check for detection of midi general activity on chosen channels...
 			int mpt = 0;
-			//int mch = 0;
 			RouteList* rl = track->inRoutes();
 
 			ciRoute r = rl->begin();
-			//for( ; mpt < MIDI_PORTS; ++mpt)
 			for (; r != rl->end(); ++r)
 			{
-				//if(!r->isValid() || ((r->type != Route::ALSA_MIDI_ROUTE) && (r->type != Route::JACK_MIDI_ROUTE)))
-				//if(!r->isValid() || (r->type != Route::MIDI_DEVICE_ROUTE))
-				if (!r->isValid() || (r->type != Route::MIDI_PORT_ROUTE)) // p3.3.49
+				if (!r->isValid() || (r->type != Route::MIDI_PORT_ROUTE))
 					continue;
 
-				// NOTE: TODO: Code for channelless events like sysex, ** IF we end up using the 'special channel 17' method.
-				//if(r->channel == -1)
-				if (r->channel == -1 || r->channel == 0) // p3.3.50
+				// NOTE: TODO: Code for channelless events like sysex,
+				// ** IF we end up using the 'special channel 17' method.
+				if (r->channel == -1 || r->channel == 0) 
 					continue;
 
 				// No port assigned to the device?
-				//mpt = r->device->midiPort();
-				mpt = r->midiPort; // p3.3.49
+				mpt = r->midiPort;
 				if (mpt < 0 || mpt >= MIDI_PORTS)
 					continue;
 
-				//for(; mch < MIDI_CHANNELS; ++mch)
-				//{
-				//if(midiPorts[mpt].syncInfo().actDetect(mch) && (iptMask & (1 << mpt)) && (ichMask & (1 << mch)) )
-				//if((iptMask & bitShiftLU[mpt]) && (midiPorts[mpt].syncInfo().actDetectBits() & ichMask) )
-				//if(midiPorts[mpt].syncInfo().actDetectBits() & bitShiftLU[r->channel])
-				if (midiPorts[mpt].syncInfo().actDetectBits() & r->channel) // p3.3.50 Use new channel mask.
+				if (midiPorts[mpt].syncInfo().actDetectBits() & r->channel)
 				{
-					//if(iChanTextLabel->paletteBackgroundColor() != green)
-					//  iChanTextLabel->setPaletteBackgroundColor(green);
-					//if(iChanDetectLabel->pixmap() != greendotIcon)
 					if (!_midiDetect)
 					{
-						//printf("Arranger::midiTrackInfoHeartBeat setting green icon\n");
-
 						_midiDetect = true;
-						//iChanDetectLabel->setPixmap(*greendotIcon);
 						iChanDetectLabel->setPixmap(*redLedIcon);
 					}
 					break;
 				}
-				//}
 			}
 			// No activity detected?
-			//if(mch == MIDI_CHANNELS)
-			//if(mpt == MIDI_PORTS)
 			if (r == rl->end())
 			{
-				//if(iChanTextLabel->paletteBackgroundColor() != darkGreen)
-				//  iChanTextLabel->setPaletteBackgroundColor(darkGreen);
-				//if(iChanDetectLabel->pixmap() != darkgreendotIcon)
 				if (_midiDetect)
 				{
-					//printf("Arranger::midiTrackInfoHeartBeat setting darkgreen icon\n");
-
 					_midiDetect = false;
-					//iChanDetectLabel->setPixmap(*darkgreendotIcon);
 					iChanDetectLabel->setPixmap(*darkRedLedIcon);
 				}
 			}
@@ -498,15 +461,8 @@ void MidiTrackInfo::heartBeat()
 				nprogram = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
 				if (nprogram == CTRL_VAL_UNKNOWN)
 				{
-					//const char* n = "<unknown>";
 					const QString n(tr("Select Patch"));
 					emit updateCurrentPatch(n);
-					/*if (iPatch->text() != n)
-					{
-						//printf("Arranger::midiTrackInfoHeartBeat setting patch <unknown>\n");
-
-						iPatch->setText(n);
-					}*/
 				}
 				else
 				{
@@ -515,16 +471,7 @@ void MidiTrackInfo::heartBeat()
 					if (name.isEmpty())
 					{
 						name = "???";
-						//if (iPatch->text() != n)
-						//	iPatch->setText(n);
 					}
-					/*else
-						if (iPatch->text() != name)
-					{
-						//printf("Arranger::midiTrackInfoHeartBeat setting patch name\n");
-
-						iPatch->setText(name);
-					}*/
 					Patch *patch = instr->getPatch(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
 					if(patch)
 					{
@@ -542,17 +489,8 @@ void MidiTrackInfo::heartBeat()
 			{
 				program = nprogram;
 
-				//int hb, lb, pr;
-				//if (program == CTRL_VAL_UNKNOWN) {
-				//      hb = lb = pr = 0;
-				//      iPatch->setText("---");
-				//      }
-				//else
-				//{
 				MidiInstrument* instr = mp->instrument();
 				QString name = instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM);
-				//if (iPatch->text() != name)
-				//	iPatch->setText(name);
 				Patch *patch = instr->getPatch(outChannel, program, song->mtype(), track->type() == Track::DRUM);
 				if(patch)
 				{
@@ -573,9 +511,6 @@ void MidiTrackInfo::heartBeat()
 				int pr = (program & 0xff) + 1;
 				if (pr == 0x100)
 					pr = 0;
-				//}
-
-				//printf("Arranger::midiTrackInfoHeartBeat setting program\n");
 
 				if (iHBank->value() != hb)
 				{
@@ -602,24 +537,15 @@ void MidiTrackInfo::heartBeat()
 			int mn = mc->minVal();
 			int v = mp->hwCtrlState(outChannel, CTRL_VOLUME);
 			if (v == CTRL_VAL_UNKNOWN)
-				//{
-				//v = mc->initVal();
-				//if(v == CTRL_VAL_UNKNOWN)
-				//  v = 0;
 				v = mn - 1;
-				//}
 			else
-				// Auto bias...
 				v -= mc->bias();
 			if (volume != v)
 			{
 				volume = v;
 				if (iLautst->value() != v)
 				{
-					//printf("Arranger::midiTrackInfoHeartBeat setting volume\n");
-
 					iLautst->blockSignals(true);
-					//iLautst->setRange(mn - 1, mc->maxVal());
 					iLautst->setValue(v);
 					iLautst->blockSignals(false);
 				}
@@ -629,45 +555,20 @@ void MidiTrackInfo::heartBeat()
 			mn = mc->minVal();
 			v = mp->hwCtrlState(outChannel, CTRL_PANPOT);
 			if (v == CTRL_VAL_UNKNOWN)
-				//{
-				//v = mc->initVal();
-				//if(v == CTRL_VAL_UNKNOWN)
-				//  v = 0;
 				v = mn - 1;
-				//}
 			else
-				// Auto bias...
 				v -= mc->bias();
 			if (pan != v)
 			{
 				pan = v;
 				if (iPan->value() != v)
 				{
-					//printf("Arranger::midiTrackInfoHeartBeat setting pan\n");
-
 					iPan->blockSignals(true);
-					//iPan->setRange(mn - 1, mc->maxVal());
 					iPan->setValue(v);
 					iPan->blockSignals(false);
 				}
 			}
 
-			// Does it include a midi controller value adjustment? Then handle it...
-			//if(flags & SC_MIDI_CONTROLLER)
-			//  seek();
-
-			/*
-			if(iTransp->value() != track->transposition)
-			  iTransp->setValue(track->transposition);
-			if(iAnschl->value() != track->velocity)
-			  iAnschl->setValue(track->velocity);
-			if(iVerz->value() != track->delay)
-			  iVerz->setValue(track->delay);
-			if(iLen->value() != track->len)
-			  iLen->setValue(track->len);
-			if(iKompr->value() != track->compression)
-			  iKompr->setValue(track->compression);
-			 */
 			QList<PatchSequence*> *list = mp->patchSequences();
 			if (_progRowNum != list->size())
 			{

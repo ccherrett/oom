@@ -45,6 +45,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	setupUi(this);
 	inHeartBeat = true;
 	m_editing = false;
+	m_midiDetect = false;
 	panVal = 0.0;
 	volume = 0.0;
 	m_track = 0;
@@ -56,6 +57,9 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	if(m_track)
 	{
 		setSelected(m_track->selected());
+		//m_lblInputDetect->setVisible(m_track->isMidiTrack());
+		m_lblInputDetect->setVisible(false);
+		//m_btnAutomation->setVisible(!m_track->isMidiTrack());
 	}
 	initPan();
 
@@ -90,21 +94,50 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 		}
 	}/*}}}*/
 	setAcceptDrops(false);
+	m_buttonHBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+	QIcon solo;
+    solo.addPixmap(*arranger_solo_on_Icon, QIcon::Normal, QIcon::On);
+    solo.addPixmap(*arranger_solo_off_Icon, QIcon::Normal, QIcon::Off);
+	QIcon record;
+    record.addPixmap(*arranger_record_on_Icon, QIcon::Normal, QIcon::On);
+    record.addPixmap(*arranger_record_off_Icon, QIcon::Normal, QIcon::Off);
+	QIcon mute;
+    mute.addPixmap(*arranger_mute_on_Icon, QIcon::Normal, QIcon::On);
+    mute.addPixmap(*arranger_mute_off_Icon, QIcon::Normal, QIcon::Off);
+	QIcon automate;
+    automate.addPixmap(*automationIcon, QIcon::Normal, QIcon::On);
+    automate.addPixmap(*automationIcon, QIcon::Normal, QIcon::Off);
+	QIcon automate2;
+    automate2.addPixmap(*redLedIcon, QIcon::Normal, QIcon::On);
+    automate2.addPixmap(*darkRedLedIcon, QIcon::Normal, QIcon::Off);
+	QIcon remind1;
+    remind1.addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
+    remind1.addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
+	QIcon remind2;
+    remind2.addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
+    remind2.addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
+	QIcon remind3;
+    remind3.addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
+    remind3.addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
 	m_trackName->setAcceptDrops(false);
 	m_btnSolo->setAcceptDrops(false);
-	m_btnSolo->setText("S");
+	m_btnSolo->setIcon(solo);
 	m_btnRecord->setAcceptDrops(false);
-	m_btnRecord->setText("R");
+	m_btnRecord->setIcon(record);
 	m_btnMute->setAcceptDrops(false);
-	m_btnMute->setText("M");
+	m_btnMute->setIcon(mute);
 	m_btnAutomation->setAcceptDrops(false);
-	m_btnAutomation->setText("A");
+	if(m_track->isMidiTrack())
+		m_btnAutomation->setIcon(automate2);
+	else
+		m_btnAutomation->setIcon(automate);
 	m_btnReminder1->setAcceptDrops(false);
 	m_btnReminder2->setAcceptDrops(false);
 	m_btnReminder3->setAcceptDrops(false);
-	m_btnReminder1->setText("1");
-	m_btnReminder2->setText("2");
-	m_btnReminder3->setText("3");
+	m_btnReminder1->setIcon(remind1);
+	m_btnReminder2->setIcon(remind2);
+	m_btnReminder3->setIcon(remind3);
+	m_lblInputDetect->setPixmap(*darkRedLedIcon);
 	m_strip->setAcceptDrops(false);
 	m_pan->setAcceptDrops(false);
 	songChanged(-1);
@@ -131,8 +164,8 @@ void TrackHeader::heartBeat()/*{{{*/
 	inHeartBeat = true;
 	if(m_track->isMidiTrack())
 	{
-		/*
 		MidiTrack* track = (MidiTrack*)m_track;
+		/*
 		int act = track->activity();
 		double dact = double(act) * (slider->value() / 127.0);
 
@@ -146,6 +179,52 @@ void TrackHeader::heartBeat()/*{{{*/
 		if (act)
 			track->setActivity((int) ((double) act * 0.8));
 		*/
+		//int outChannel = track->outChannel();
+		//int outPort = track->outPort();
+
+		//MidiPort* mp = &midiPorts[outPort];
+
+		// Check for detection of midi general activity on chosen channels...
+		int mpt = 0;
+		RouteList* rl = track->inRoutes();
+
+		ciRoute r = rl->begin();
+		for (; r != rl->end(); ++r)
+		{
+			if (!r->isValid() || (r->type != Route::MIDI_PORT_ROUTE))
+				continue;
+
+			// NOTE: TODO: Code for channelless events like sysex,
+			// ** IF we end up using the 'special channel 17' method.
+			if (r->channel == -1 || r->channel == 0) 
+				continue;
+
+			// No port assigned to the device?
+			mpt = r->midiPort;
+			if (mpt < 0 || mpt >= MIDI_PORTS)
+				continue;
+
+			if (midiPorts[mpt].syncInfo().actDetectBits() & r->channel)
+			{
+				if (!m_midiDetect)
+				{
+					m_midiDetect = true;
+					//m_lblInputDetect->setPixmap(*redLedIcon);
+					m_btnAutomation->setIcon(QIcon(*redLedIcon));
+				}
+				break;
+			}
+		}
+		// No activity detected?
+		if (r == rl->end())
+		{
+			if (m_midiDetect)
+			{
+				m_midiDetect = false;
+				//m_lblInputDetect->setPixmap(*darkRedLedIcon);
+				m_btnAutomation->setIcon(QIcon(*darkRedLedIcon));
+			}
+		}
 	}
 	else
 	{
@@ -352,16 +431,16 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 {
 	if(!m_track)
 	{
-		selected = false;
+		m_selected = false;
 	}
 	else
 	{
-		selected = sel;
+		m_selected = sel;
 		m_track->setSelected(sel);
 	}
 	if(!m_editing)
 	{
-		if(selected)
+		if(m_selected)
 		{
 			m_strip->setStyleSheet("QFrame {background-color: yellow;}");
 		}

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>273</width>
-    <height>44</height>
+    <height>56</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -107,15 +107,21 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QHBoxLayout" name="m_buttonHBox" stretch="0,0,0,0,0,0,1,0">
+      <layout class="QHBoxLayout" name="m_buttonHBox" stretch="0,0,0,0,0,0,0,1,0">
        <property name="spacing">
-        <number>2</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>10</number>
        </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
        <property name="rightMargin">
         <number>8</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
        </property>
        <item>
         <widget class="QToolButton" name="m_btnReminder1">
@@ -242,6 +248,40 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="m_lblInputDetect">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>22</width>
+           <height>18</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>22</width>
+           <height>18</height>
+          </size>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="m_btnRecord">
          <property name="minimumSize">
           <size>
@@ -354,7 +394,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>50</width>
-           <height>18</height>
+           <height>20</height>
           </size>
          </property>
         </spacer>
