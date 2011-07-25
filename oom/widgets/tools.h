@@ -59,6 +59,7 @@ signals:
 
 public slots:
     void set(int id);
+    void setNoUpdate(int id);
 
 public:
     //EditToolBar(QMainWindow*, int, const char* name = 0);

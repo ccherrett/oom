@@ -291,10 +291,12 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	listScroll->setMinimumWidth(250);
 	listScroll->setMaximumWidth(400);
 
-	EditToolBar *edittools = new EditToolBar(this, arrangerTools, true);
+	edittools = new EditToolBar(this, arrangerTools, true);
 	edittools->setFixedHeight(32);
 	connect(edittools, SIGNAL(toolChanged(int)), this, SLOT(setTool(int)));
+	connect(edittools, SIGNAL(toolChanged(int)), SIGNAL(updateFooterTool(int)));
 	connect(this, SIGNAL(toolChanged(int)), edittools, SLOT(set(int)));
+	connect(this, SIGNAL(updateHeaderTool(int)), edittools, SLOT(setNoUpdate(int)));
 	trackLayout->addWidget(edittools);
 	
 	//trackLayout->addItem(new QSpacerItem(0, 32, QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -408,6 +410,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(canvas, SIGNAL(dropMidiFile(const QString&)), SIGNAL(dropMidiFile(const QString&)));
 
 	connect(canvas, SIGNAL(toolChanged(int)), SIGNAL(toolChanged(int)));
+	//connect(canvas, SIGNAL(toolChanged(int)), edittools, SLOT(setTool(int)));
 	connect(split, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
 	configChanged(); // set configuration values

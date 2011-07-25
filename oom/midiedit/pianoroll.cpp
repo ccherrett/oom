@@ -430,7 +430,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	cursorBar->setAllowedAreas(Qt::BottomToolBarArea);
 	
 	tools22 = new EditToolBar(this, pianorollTools);
-	tools22->setVisible(false);
+	//tools22->setVisible(false);
     tools2 = new QToolBar(tr("Edit Tools"));
 	tools2->setIconSize(QSize(29, 25));
 	addToolBar(Qt::BottomToolBarArea, tools2);

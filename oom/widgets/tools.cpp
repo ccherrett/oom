@@ -144,7 +144,7 @@ EditToolBar::~EditToolBar()
 //   set
 //---------------------------------------------------------
 
-void EditToolBar::set(int id)
+void EditToolBar::set(int id)/*{{{*/
 {
 	for (int i = 0; i < nactions; ++i)
 	{
@@ -156,7 +156,20 @@ void EditToolBar::set(int id)
 			return;
 		}
 	}
-}
+}/*}}}*/
+
+void EditToolBar::setNoUpdate(int id)/*{{{*/
+{
+	for (int i = 0; i < nactions; ++i)
+	{
+		Action* action = actions[i];
+		if (action->id() == id)
+		{
+			action->setChecked(true);
+			return;
+		}
+	}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   curTool

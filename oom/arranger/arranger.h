@@ -43,6 +43,7 @@ class RouteMapDock;
 class CommentDock;
 class CItem;
 class HeaderList;
+class EditToolBar;
 
 //---------------------------------------------------------
 //   Arranger
@@ -65,6 +66,7 @@ class Arranger : public QWidget
 	QScrollArea *listScroll;
 	QScrollArea *mixerScroll;
     AudioStrip* waveTrackInfo;
+	EditToolBar *edittools;
 
     Track* selected;
 
@@ -122,6 +124,8 @@ signals:
     void dropMidiFile(const QString&);
     void startEditor(PartList*, int);
     void toolChanged(int);
+    void updateHeaderTool(int);
+    void updateFooterTool(int);
     //void addMarker(int);
     void setUsedTool(int);
 

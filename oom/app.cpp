@@ -1606,7 +1606,10 @@ void OOMidi::addTransportToolbar()
 	//addToolBar(Qt::BottomToolBarArea, tools1);
 	tools1->setObjectName("tbEditTools");
 	connect(tools1, SIGNAL(toolChanged(int)), arranger, SLOT(setTool(int)));
+	connect(tools1, SIGNAL(toolChanged(int)), arranger, SIGNAL(updateHeaderTool(int)));
 	connect(arranger, SIGNAL(toolChanged(int)), tools1, SLOT(set(int)));
+	connect(arranger, SIGNAL(updateFooterTool(int)), tools1, SLOT(set(int)));
+	//toolByHeaderChanged
 	tools->addWidget(tools1);
 	QWidget* tspacer2 = new QWidget();
 	tspacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
