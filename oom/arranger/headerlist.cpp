@@ -61,6 +61,7 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 	setMouseTracking(true);
 	setAcceptDrops(true);
 	
+	wantCleanup = false;
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_layout = new QVBoxLayout(this);
 	m_layout->setSpacing(0);
@@ -86,6 +87,16 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 
 void HeaderList::songChanged(int flags)/*{{{*/
 {
+	if(wantCleanup && !m_dirtyheaders.isEmpty())
+	{
+		TrackHeader* item;
+		while(!m_dirtyheaders.isEmpty() && (item = m_dirtyheaders.takeAt(0)) != 0)
+		{
+			if(item)
+				delete item;
+		}
+		wantCleanup = false;
+	}
 	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
 	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
 	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED))
@@ -106,7 +117,8 @@ void HeaderList::updateTrackList()/*{{{*/
 	{
 		if(item)
 		{
-			delete item;
+			item->hide();
+			m_dirtyheaders.append(item);
 		}
 	}
 	TrackList* l = song->visibletracks();
@@ -124,6 +136,7 @@ void HeaderList::updateTrackList()/*{{{*/
 		m_headers.append(header);
 		m_layout->insertWidget(index, header);
 	}
+	wantCleanup = true;
 	printf("Leaving updateTrackList\n");
 }/*}}}*/
 

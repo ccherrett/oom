@@ -46,6 +46,8 @@ class HeaderList : public QFrame
 
 	QWidget* m_viewPort;
 	QList<TrackHeader*> m_headers;
+	QList<TrackHeader*> m_dirtyheaders;
+	bool wantCleanup;
 
     int startY;
     int curY;

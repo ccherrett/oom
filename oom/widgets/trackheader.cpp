@@ -1446,10 +1446,8 @@ void TrackHeader::panRightClicked(const QPoint &p)/*{{{*/
 
 bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 {
-	// Force left/right arrow key events to move the focus
-	// back on the canvas if it doesn't have the focus.
-	// Currently the object that we're filtering is the
-	// midiTrackInfo.
+	if(!m_processEvents)
+		return true;
 	if (event->type() == QEvent::MouseButtonPress) {
 		QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
 		if(mEvent)
