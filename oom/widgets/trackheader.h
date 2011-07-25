@@ -7,6 +7,7 @@
 #ifndef _OOM_TRACKHEADER_H_
 #define _OOM_TRACKHEADER_H_
 #include "ui_trackheaderbase.h"
+#include <QHash>
 
 static const int MIN_TRACKHEIGHT = 58;
 
@@ -32,10 +33,14 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 	QPoint m_startPos;
     int startY;
     int curY;
+	int m_tracktype;
 	bool inHeartBeat;
 	bool m_editing;
 	bool m_processEvents;
+	QHash<int, QString> m_selectedStyle;
+	QHash<int, QString> m_style;
 	void initPan();
+	void setupStyles();
 
 private slots:
 	void heartBeat();
