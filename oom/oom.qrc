@@ -278,12 +278,12 @@
 		<file>images/icons/join_new_on.png</file>
 		<file>images/icons/join_new_off.png</file>
 		<file>images/icons/join_new_over.png</file>
-		<file>images/icons/knob_aux_new.png</file>
-		<file>images/icons/knob_input_new.png</file>
-		<file>images/icons/knob_output_new.png</file>
-		<file>images/icons/knob_midi_new.png</file>
-		<file>images/icons/knob_buss_new.png</file>
-		<file>images/icons/knob_audio_new.png</file>
+		<file>images/knob_aux_new.png</file>
+		<file>images/knob_input_new.png</file>
+		<file>images/knob_output_new.png</file>
+		<file>images/knob_midi_new.png</file>
+		<file>images/knob_buss_new.png</file>
+		<file>images/knob_audio_new.png</file>
 	</qresource>
 </RCC>
 
