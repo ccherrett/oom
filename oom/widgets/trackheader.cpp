@@ -184,10 +184,10 @@ void TrackHeader::setupStyles()
 	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("757576")));
 	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("757576")));
 	
-	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("e18fff")));
-	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("01e6ee")));
+	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("e18fff")));
+	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee")));
 	m_selectedStyle.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("fc7676")));
-	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("81f476")));
+	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("81f476")));
 	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("aabcc7")));
 	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276")));
 	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee")));
@@ -353,16 +353,16 @@ void TrackHeader::initPan()/*{{{*/
 	{
 		case Track::MIDI:
 		case Track::DRUM:
-			img = QString(":images/knob_midi_new.png");
+			img = QString(":images/knob_audio_new.png");
 		break;
 		case Track::WAVE:
-			img = QString(":images/knob_audio_new.png");
+			img = QString(":images/knob_input_new.png");
 		break;
 		case Track::AUDIO_OUTPUT:
 			img = QString(":images/knob_output_new.png");
 		break;
 		case Track::AUDIO_INPUT:
-			img = QString(":images/knob_input_new.png");
+			img = QString(":images/knob_midi_new.png");
 		break;
 		case Track::AUDIO_BUSS:
 			img = QString(":images/knob_buss_new.png");
