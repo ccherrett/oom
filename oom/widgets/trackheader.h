@@ -15,6 +15,7 @@ class Knob;
 class QAction;
 class QSize;
 class QMouseEvent;
+class QPoint;
 
 class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 {
@@ -28,15 +29,16 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
     bool m_midiDetect;
 	double panVal;
 	double volume;
+	QPoint m_startPos;
     int startY;
     int curY;
 	bool inHeartBeat;
 	bool m_editing;
+	bool m_processEvents;
 	void initPan();
 
 private slots:
 	void heartBeat();
-	void songChanged(int);
 	void generateAutomationMenu();
 	void toggleRecord(bool);
 	void toggleMute(bool);
@@ -60,6 +62,9 @@ private slots:
 	}
 
 public slots:
+	void songChanged(int);
+	void stopProcessing();
+	void startProcessing();
 
 protected:
     enum
@@ -73,7 +78,7 @@ protected:
 
 public:
 	TrackHeader(Track* track, QWidget* parent = 0);
-	virtual ~TrackHeader(){}
+	virtual ~TrackHeader();
 	bool isSelected();
 	bool isEditing()
 	{

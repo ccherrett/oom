@@ -2061,7 +2061,7 @@ void Song::processMsg(AudioMsg* msg)
 					swapTracks(i, i + 1);
 				}
 			}
-			updateFlags = SC_TRACK_MODIFIED | SC_VIEW_CHANGED;
+			updateFlags = SC_TRACK_MODIFIED;
 			break;
 		case SEQM_ADD_EVENT:
 			updateFlags = SC_EVENT_INSERTED;

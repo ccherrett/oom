@@ -1925,6 +1925,22 @@ QFrame#WaveHeader QLineEdit
 	 color: #03c0e2;
 }
 
+QFrame#trackHeaderList {/*{{{*/
+    color: #d6dfd6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+	background-color: #595966;
+	border-top: 0px;
+	border-bottom: 0px;
+	border-left: 18px;
+	border-right: 18px;
+	border-image: url(:/images/tracklist_rack.png) repeat;
+	padding-left: -18px;
+	padding-right: -18px;
+	
+}/*}}}*/
+
 QFrame [selected="true"]
 {
 	background-color: yellow;

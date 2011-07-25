@@ -64,9 +64,9 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_layout = new QVBoxLayout(this);
 	m_layout->setSpacing(0);
-	m_layout->setContentsMargins(12, 0, 2, 0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setAlignment(Qt::AlignTop|Qt::AlignLeft);
-	//m_layout->addItem(new QSpacerItem(0, TOP_SPACER_SIZE, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	m_layout->addItem(new QSpacerItem(0, TOP_SPACER_SIZE, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
 	m_layout->addItem(vSpacer);
 
@@ -86,10 +86,12 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 
 void HeaderList::songChanged(int flags)/*{{{*/
 {
-	/*if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
-			| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
+	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
+	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
+	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED))
 	{
-	}*/
+		emit updateHeader(flags);
+	}
 	if (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/ | SC_VIEW_CHANGED))
 	{
 		updateTrackList();
@@ -109,7 +111,7 @@ void HeaderList::updateTrackList()/*{{{*/
 	}
 	TrackList* l = song->visibletracks();
 	m_headers.clear();
-	int index = 0;
+	int index = 1;
 	for (iTrack i = l->begin(); i != l->end();++index, ++i)
 	{
 		Track* track = *i;
@@ -118,6 +120,7 @@ void HeaderList::updateTrackList()/*{{{*/
 		TrackHeader* header = new TrackHeader(track, this);
 		header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		header->setFixedHeight(track->height());
+		connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
 		m_headers.append(header);
 		m_layout->insertWidget(index, header);
 	}
@@ -388,18 +391,13 @@ void HeaderList::dragEnterEvent(QDragEnterEvent *event)/*{{{*/
 		}
 		else
 		{
-		    event->acceptProposedAction();
+		    event->ignore();
 		}
-	}
-	else if (event->mimeData()->hasText())
-	{
-	    event->acceptProposedAction();
 	}
 	else
 	{
 	    event->ignore();
 	}
-
 }/*}}}*/
 
 void HeaderList::dragMoveEvent(QDragMoveEvent *event)/*{{{*/
@@ -413,18 +411,13 @@ void HeaderList::dragMoveEvent(QDragMoveEvent *event)/*{{{*/
 		}
 		else
 		{
-		    event->acceptProposedAction();
+		    event->ignore();
 		}
-	}
-	else if (event->mimeData()->hasText())
-	{
-	    event->acceptProposedAction();
 	}
 	else
 	{
 	    event->ignore();
 	}
-
 }/*}}}*/
 
 void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
@@ -445,7 +438,18 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 		{
 			int sTrack = song->visibletracks()->index(srcTrack);
 			int dTrack = song->visibletracks()->index(t);
+			//We are about to repopulate the whole list so lets disconnect all the signals here
+			//This will prevent race condition crashing from event firing when widget is dying
+			if(!m_headers.isEmpty() && index < m_headers.size())
+			{
+				foreach(TrackHeader* head, m_headers)
+				{
+					head->stopProcessing();
+					disconnect(this, SIGNAL(updateHeader(int)), head, SLOT(songChanged(int)));
+				}
+			}
 			audio->msgMoveTrack(sTrack, dTrack);
+			updateTrackList();
 		}
 		
 		if (event->source() != this)

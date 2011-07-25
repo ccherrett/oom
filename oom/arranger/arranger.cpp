@@ -289,7 +289,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	listScroll->setMouseTracking(true);
 	listScroll->setMinimumWidth(250);
 	listScroll->setMaximumWidth(400);
-	trackLayout->addItem(new QSpacerItem(0, 32, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	//trackLayout->addItem(new QSpacerItem(0, 32, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	trackLayout->addWidget(listScroll);
 
 	split->setStretchFactor(split->indexOf(newtlist), 0);

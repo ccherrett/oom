@@ -43,24 +43,18 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 : QFrame(parent)
 {
 	setupUi(this);
+	m_track = t;
+	resizeFlag = false;
+	mode = NORMAL;
 	inHeartBeat = true;
 	m_editing = false;
 	m_midiDetect = false;
+	m_processEvents = true;
 	panVal = 0.0;
 	volume = 0.0;
-	m_track = 0;
 	setFrameStyle(QFrame::StyledPanel|QFrame::Raised);
-	setSelected(false);
-	resizeFlag = false;
-	mode = NORMAL;
-	m_track = t;
-	if(m_track)
-	{
-		setSelected(m_track->selected());
-		//m_lblInputDetect->setVisible(m_track->isMidiTrack());
-		m_lblInputDetect->setVisible(false);
-		//m_btnAutomation->setVisible(!m_track->isMidiTrack());
-	}
+	m_buttonHBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+	m_panBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	initPan();
 
 	setMouseTracking(true);
@@ -94,7 +88,6 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 		}
 	}/*}}}*/
 	setAcceptDrops(false);
-	m_buttonHBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	QIcon solo;
     solo.addPixmap(*arranger_solo_on_Icon, QIcon::Normal, QIcon::On);
     solo.addPixmap(*arranger_solo_off_Icon, QIcon::Normal, QIcon::Off);
@@ -127,10 +120,6 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_btnMute->setAcceptDrops(false);
 	m_btnMute->setIcon(mute);
 	m_btnAutomation->setAcceptDrops(false);
-	if(m_track->isMidiTrack())
-		m_btnAutomation->setIcon(automate2);
-	else
-		m_btnAutomation->setIcon(automate);
 	m_btnReminder1->setAcceptDrops(false);
 	m_btnReminder2->setAcceptDrops(false);
 	m_btnReminder3->setAcceptDrops(false);
@@ -140,6 +129,26 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_lblInputDetect->setPixmap(*darkRedLedIcon);
 	m_strip->setAcceptDrops(false);
 	m_pan->setAcceptDrops(false);
+	if(m_track)
+	{
+		setSelected(m_track->selected());
+		//m_lblInputDetect->setVisible(m_track->isMidiTrack());
+		m_lblInputDetect->setVisible(false);
+		//m_btnAutomation->setVisible(!m_track->isMidiTrack());
+		if(m_track->height() < MIN_TRACKHEIGHT)
+		{
+			setFixedHeight(MIN_TRACKHEIGHT);
+			m_track->setHeight(MIN_TRACKHEIGHT);
+		}
+		else
+		{
+			setFixedHeight(m_track->height());
+		}
+		if(m_track->isMidiTrack())
+			m_btnAutomation->setIcon(automate2);
+		else
+			m_btnAutomation->setIcon(automate);
+	}
 	songChanged(-1);
 	connect(m_trackName, SIGNAL(editingFinished()), this, SLOT(updateTrackName()));
 	connect(m_trackName, SIGNAL(textEdited(QString)), this, SLOT(setEditing()));
@@ -150,14 +159,20 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	connect(m_btnReminder2, SIGNAL(toggled(bool)), this, SLOT(toggleReminder2(bool)));
 	connect(m_btnReminder3, SIGNAL(toggled(bool)), this, SLOT(toggleReminder3(bool)));
 	connect(m_btnAutomation, SIGNAL(clicked()), this, SLOT(generateAutomationMenu()));
-	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	//connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 	inHeartBeat = false;
 }
 
+TrackHeader::~TrackHeader()
+{
+	m_processEvents = false;
+	//disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+}
+
 void TrackHeader::heartBeat()/*{{{*/
 {
-	if(!m_track || inHeartBeat)
+	if(!m_track || inHeartBeat || !m_processEvents)
 		return;
 	if(song->invalid)
 		return;
@@ -244,7 +259,7 @@ void TrackHeader::heartBeat()/*{{{*/
 
 void TrackHeader::updateVolume()/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	if(m_track->isMidiTrack())
 	{
@@ -307,7 +322,7 @@ void TrackHeader::updateVolume()/*{{{*/
 
 void TrackHeader::initPan()/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	QString img(":images/knob.png");
 	if(m_track->isMidiTrack())
@@ -352,7 +367,7 @@ void TrackHeader::initPan()/*{{{*/
 
 		m_pan->setValue(double(v));
 
-		m_buttonHBox->insertWidget(0, m_pan);
+		m_panLayout->insertWidget(0, m_pan);
 
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		//connect(m_pan, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
@@ -367,7 +382,7 @@ void TrackHeader::initPan()/*{{{*/
 		m_pan->setIgnoreWheel(true);
 		m_pan->setBackgroundRole(QPalette::Mid);
 		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-		m_buttonHBox->insertWidget(0, m_pan);
+		m_panLayout->insertWidget(0, m_pan);
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		connect(m_pan, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
 		connect(m_pan, SIGNAL(sliderReleased(int)), SLOT(panReleased()));
@@ -376,7 +391,7 @@ void TrackHeader::initPan()/*{{{*/
 
 void TrackHeader::updatePan()/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	if(m_track->isMidiTrack())
 	{
@@ -438,7 +453,7 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 		m_selected = sel;
 		m_track->setSelected(sel);
 	}
-	if(!m_editing)
+	if(!m_editing && m_processEvents)
 	{
 		if(m_selected)
 		{
@@ -449,7 +464,6 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 			m_strip->setStyleSheet("QFrame {background-color: blue;}");
 		}
 	}
-	update();
 }/*}}}*/
 
 bool TrackHeader::isSelected()/*{{{*/
@@ -461,10 +475,11 @@ bool TrackHeader::isSelected()/*{{{*/
 
 void TrackHeader::songChanged(int flags)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	if (flags == -1 || (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED)))
 	{
+		//printf("TrackHeader::songChanged\n");
 		m_btnRecord->blockSignals(true);
 		m_btnRecord->setChecked(m_track->recordFlag());
 		m_btnRecord->blockSignals(false);
@@ -508,9 +523,19 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 	}
 }/*}}}*/
 
+void TrackHeader::stopProcessing()
+{
+	m_processEvents = false;
+}
+
+void TrackHeader::startProcessing()
+{
+	m_processEvents = true;
+}
+
 void TrackHeader::generateAutomationMenu()/*{{{*/
 {
-	if(!m_track || m_track->isMidiTrack())
+	if(!m_track || m_track->isMidiTrack() || !m_processEvents)
 		return;
 	QMenu* p = new QMenu(this);
 	p->disconnect();
@@ -568,7 +593,7 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
 
 void TrackHeader::toggleRecord(bool state)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	if (!m_track->isMidiTrack())
 	{
@@ -639,7 +664,7 @@ void TrackHeader::toggleRecord(bool state)/*{{{*/
 
 void TrackHeader::toggleMute(bool state)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	m_track->setMute(state);
 	m_btnMute->blockSignals(true);
@@ -650,7 +675,7 @@ void TrackHeader::toggleMute(bool state)/*{{{*/
 
 void TrackHeader::toggleSolo(bool state)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	audio->msgSetSolo(m_track, state);
 	m_btnSolo->blockSignals(true);
@@ -661,35 +686,35 @@ void TrackHeader::toggleSolo(bool state)/*{{{*/
 
 void TrackHeader::toggleOffState(bool state)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	m_track->setOff(state);
 }/*}}}*/
 
 void TrackHeader::toggleReminder1(bool state)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	m_track->setReminder1(state);
 }/*}}}*/
 
 void TrackHeader::toggleReminder2(bool state)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	m_track->setReminder2(state);
 }/*}}}*/
 
 void TrackHeader::toggleReminder3(bool state)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	m_track->setReminder3(state);
 }/*}}}*/
 
 void TrackHeader::updateTrackName()/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	QString name = m_trackName->text();
 	if (name != m_track->name())
@@ -721,6 +746,8 @@ void TrackHeader::updateTrackName()/*{{{*/
 
 void TrackHeader::generatePopupMenu()/*{{{*/
 {
+	if(!m_track || !m_processEvents)
+		return;
 	TrackList selectedTracksList = song->getSelectedTracks();
 	bool multipleSelectedTracks = false;
 	if (selectedTracksList.size() > 1)
@@ -1124,7 +1151,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 
 void TrackHeader::mousePressEvent(QMouseEvent* ev) //{{{
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	int button = ev->button();
 	bool shift = ((QInputEvent*) ev)->modifiers() & Qt::ShiftModifier;
@@ -1139,6 +1166,7 @@ void TrackHeader::mousePressEvent(QMouseEvent* ev) //{{{
 		}
 		else
 		{
+			m_startPos = ev->pos();
 			if (!shift)
 			{
 				song->deselectTracks();
@@ -1182,7 +1210,7 @@ void TrackHeader::mousePressEvent(QMouseEvent* ev) //{{{
 
 void TrackHeader::mouseMoveEvent(QMouseEvent* ev)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	bool shift = ((QInputEvent*) ev)->modifiers() & Qt::ShiftModifier;
 	if(shift)
@@ -1218,6 +1246,9 @@ void TrackHeader::mouseMoveEvent(QMouseEvent* ev)/*{{{*/
 	{
 		case START_DRAG:
 		{
+			if ((ev->pos() - m_startPos).manhattanLength() < QApplication::startDragDistance())
+				return;
+
 			m_editing = true;
 			mode = DRAG;
 			QPoint hotSpot = ev->pos();
@@ -1267,7 +1298,7 @@ void TrackHeader::mouseReleaseEvent(QMouseEvent*)/*{{{*/
 
 void TrackHeader::panChanged(double val)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	if(m_track->isMidiTrack())
 	{
@@ -1318,7 +1349,7 @@ void TrackHeader::panChanged(double val)/*{{{*/
 
 void TrackHeader::panPressed()/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	if(m_track->isMidiTrack())
 	{
@@ -1337,7 +1368,7 @@ void TrackHeader::panPressed()/*{{{*/
 
 void TrackHeader::panReleased()/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	if(m_track->isMidiTrack())
 	{
@@ -1352,7 +1383,7 @@ void TrackHeader::panReleased()/*{{{*/
 
 void TrackHeader::panRightClicked(const QPoint &p)/*{{{*/
 {
-	if(!m_track)
+	if(!m_track || !m_processEvents)
 		return;
 	if(m_track->isMidiTrack())
 	{
