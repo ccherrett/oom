@@ -277,6 +277,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	box->addWidget(split, 1000);
 
 	m_trackheader = new HeaderList(this, "trackHeaderList");
+	m_trackheader->setMinimumWidth(250);
 
 	QWidget* newtlist = new QWidget(split);
 	QVBoxLayout *trackLayout = new QVBoxLayout(newtlist);
