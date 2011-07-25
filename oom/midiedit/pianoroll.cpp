@@ -439,6 +439,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tools2->setAllowedAreas(Qt::BottomToolBarArea);
 	QWidget* tspacer = new QWidget();
 	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tspacer->setMaximumWidth(170);
 	tools2->addWidget(tspacer);
 
 	bool showPanic = false;
@@ -498,7 +499,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     QSizeGrip* corner = new QSizeGrip(mainw);
 	QWidget* spacer3 = new QWidget();
 	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer3->setMaximumWidth(5);
+	//spacer3->setMaximumWidth(5);
 	tools2->addWidget(spacer3);
 	tools2->addWidget(corner);
 

@@ -1580,7 +1580,7 @@ void OOMidi::addTransportToolbar()
 	addToolBar(Qt::BottomToolBarArea, tools);
 	QWidget* spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//spacer->setMaximumWidth(15);
+	spacer->setMaximumWidth(205);
 	tools->addWidget(spacer);
 
 	bool showPanic = true;
@@ -1627,11 +1627,14 @@ void OOMidi::addTransportToolbar()
 	//addToolBar(Qt::BottomToolBarArea, transportToolbar);
 	//tools1->addActions(transportAction->actions());
     QSizeGrip* corner = new QSizeGrip(tools);
+	QWidget* spacer4444 = new QWidget();
+	spacer4444->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tools->addWidget(spacer4444);
+	tools->addWidget(corner);
 	QWidget* spacer3 = new QWidget();
 	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer3->setMaximumWidth(5);
 	tools->addWidget(spacer3);
-	tools->addWidget(corner);
 	// toolBar is a pointer to an existing toolbar
 	//transportToolbar->addWidget(spacer);
 	//transportToolbar->addActions(transportAction->actions());
