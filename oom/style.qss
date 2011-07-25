@@ -1861,53 +1861,17 @@ QAbstractSpinBox {
 
 
 /*--------------------Track Header styles-----------------*/
-QFrame#AudioInHeader { 
-	border: 1px solid #29292a;
-	/*background-color: #5f855f;*/
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #749f71, stop:0.5 #4d6a4c);
-	/*border-radius: 7px;*/
-}
-QFrame#AudioOutHeader { 
-	border: 1px solid #29292a;
-	background-color: #4d0f0f;
-	background-image: url(:/images/mixer_bg_out.png);
-	background-repeat: repeat-x;
-	/*border-radius: 7px;*/
-}
-QFrame#AuxHeader { 
-	border: 1px solid #29292a;
-	background-color: #343652;
-	background-image: url(:/images/mixer_bg_aux.png);
-	background-repeat: repeat-x;
-	/*border-radius: 7px;*/
-}
-QFrame#AudioBussHeader { 
-	border: 1px solid #29292a;
-	background-color: #252727;
-	background-image: url(:/images/mixer_bg_buss.png);
-	background-repeat: repeat-x;
-	/*border-radius: 7px;*/
-}
-QFrame#MidiTrackHeader { 
-	border: 1px solid #29292a;
-	background-color: #28222c;
-	background-image: url(:/images/mixer_bg_midi.png);
-	background-repeat: repeat-x;
-	/*border-radius: 7px;*/
-}
-QFrame#MidiTrackHeader QLabel{ 
-	border: 0;
-	background-color: red; /*#12191c;*/
-	/*background-image: url(:/images/mixer_bg_midi.png);
-	background-repeat: repeat-x;*/
-	border-radius: 3px;
-}
-QFrame#WaveHeader { 
-	border: 1px solid #29292a;
-	background-color: #1e2122;
-	background-image: url(:/images/mixer_bg_audio.png);
-	background-repeat: repeat-x;
-	/*border-radius: 7px;*/
+QFrame#MidiTrackHeader,
+QFrame#AudioBussHeader,
+QFrame#AuxHeader,
+QFrame#AudioOutHeader,
+QFrame#AudioInHeader,
+QFrame#WaveHeader
+{
+	border-bottom: 1px solid #888888;
+	border-right: 1px solid #888888;
+	border-left: 1px solid #888888;
+	background-color: #1b1b1b;
 }
 
 QFrame#MidiTrackHeader QLineEdit,
@@ -1917,19 +1881,20 @@ QFrame#AudioOutHeader QLineEdit,
 QFrame#AudioInHeader QLineEdit,
 QFrame#WaveHeader QLineEdit
 {
-	 border-radius: 0;
-     border-image: url(:/images/frame.png) 4;
-     border-width: 3;
-	 border-color: #484848;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	border-width:1px;
+	border-radius: 0px;
+    border-image: url(:/images/frame.png) 4;
+	border-top-color: #1f1f22;
+	border-bottom-color: #505050;
+	background-color: #1a1a1a;
+	color: #757576;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 15px;
+	padding-left: 15px;
 }
 
 QFrame#trackHeaderList {/*{{{*/
-    color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 11px;
 	background-color: #595966;
 	border-top: 0px;
 	border-bottom: 0px;
