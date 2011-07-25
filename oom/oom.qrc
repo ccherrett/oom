@@ -272,6 +272,12 @@
 		<file>images/icons/panic_new_on.png</file>
 		<file>images/icons/panic_new_off.png</file>
 		<file>images/icons/panic_new_over.png</file>
+		<file>images/icons/split_new_on.png</file>
+		<file>images/icons/split_new_off.png</file>
+		<file>images/icons/split_new_over.png</file>
+		<file>images/icons/join_new_on.png</file>
+		<file>images/icons/join_new_off.png</file>
+		<file>images/icons/join_new_over.png</file>
 	</qresource>
 </RCC>
 

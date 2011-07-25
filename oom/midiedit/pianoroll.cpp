@@ -410,7 +410,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	cursorBar->addWidget(posLabel);
 
 	pitchLabel = new PitchLabel(0);
-	pitchLabel->setFixedHeight(22);
+	pitchLabel->setFixedHeight(25);
 	pitchLabel->setObjectName("pitchLabel");
 	cursorBar->addWidget(pitchLabel);
 
@@ -441,7 +441,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tools2->addWidget(tspacer);
 
-	TransportToolbar *transportbar = new TransportToolbar(this);
+	bool showPanic = false;
+	bool showMuteSolo = true;
+	TransportToolbar *transportbar = new TransportToolbar(this,showPanic,showMuteSolo);
 	transportbar->setMuteAction(m_muteAction);
 	transportbar->setSoloAction(m_soloAction);
 	tools2->addWidget(transportbar);
@@ -449,8 +451,8 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer55->setMaximumWidth(15);
 	tools2->addWidget(spacer55);
-	EditTools *edittools = new EditTools(tools22->getActions(), this);
-	tools2->addWidget(edittools);
+	//EditTools *edittools = new EditTools(tools22->getActions(), this);
+	tools2->addWidget(tools22);
 	QWidget* spacer555 = new QWidget();
 	spacer555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer555->setMaximumWidth(15);

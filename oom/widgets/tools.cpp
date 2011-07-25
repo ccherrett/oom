@@ -11,6 +11,8 @@
 #include <QActionGroup>
 #include <QSpacerItem>
 #include <QBoxLayout>
+#include <QHBoxLayout>
+#include <QToolButton>
 #include <QIconSet>
 #include <QIcon>
 
@@ -57,11 +59,12 @@ ToolB toolList[] = {
 //   EditToolBar
 //---------------------------------------------------------
 
-//EditToolBar::EditToolBar(QMainWindow* parent, int tools, const char*)
-
 EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
-: QToolBar(tr("Edit Tools"), parent)
+: QFrame(parent)
 {
+	m_layout = new QHBoxLayout(this);
+	m_layout->setSpacing(0);
+	m_layout->setContentsMargins(0,0,0,0);
 	action = new QActionGroup(parent);
 	action->setExclusive(true);
 
@@ -75,6 +78,7 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 	actions = new Action*[nactions];
 	bool first = true;
 	int n = 0;
+	//m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
 	for (unsigned i = 0; i < sizeof (toolList) / sizeof (*toolList); ++i)
 	{
 		if ((tools & (1 << i)) == 0)
@@ -92,15 +96,21 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 			a->setChecked(true);
 			first = false;
 		}
+		QToolButton* button = new QToolButton(this);
+		button->setDefaultAction(a);
+		button->setIconSize(QSize(29, 25));
+		button->setFixedSize(QSize(29, 25));
+		button->setAutoRaise(true);
+		m_layout->addWidget(button);
 		++n;
 	}
 	action->setVisible(true);
-	QWidget* spacer = new QWidget();
-	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	addWidget(spacer);
-	//action->addTo(this);
+	//QWidget* spacer = new QWidget();
+	//spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	//addWidget(spacer);
 	// Note: Does not take ownership.
-	addActions(action->actions());
+	//addActions(action->actions());
+	//m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
 	connect(action, SIGNAL(selected(QAction*)), this, SLOT(toolChanged(QAction*)));
 }

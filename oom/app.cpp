@@ -65,6 +65,9 @@
 #include "midimonitor.h"
 #include "confmport.h"
 #include "mixerdock.h"
+#include "transporttools.h"
+#include "edittools.h"
+#include "looptools.h"
 
 #include "ccinfo.h"
 #ifdef DSSI_SUPPORT
@@ -122,6 +125,7 @@ extern snd_seq_t * alsaSeq;
 
 int watchAudio, watchAudioPrefetch, watchMidi;
 pthread_t splashThread;
+//static int pianorollTools = PointerTool | PencilTool | RubberTool | CutTool | GlueTool | DrawTool;
 
 
 //PyScript *pyscript;
@@ -1567,29 +1571,64 @@ OOMidi::~OOMidi()
  */
 void OOMidi::addTransportToolbar()
 {
-	tools1 = new EditToolBar(this, arrangerTools);
+    tools = new QToolBar(tr("Transport Tools"));
+	tools->setAllowedAreas(Qt::BottomToolBarArea);
+	tools->setFloatable(false);
+	tools->setMovable(false);
+	tools->setIconSize(QSize(29, 25));
+	tools->setObjectName("transTools");
+	addToolBar(Qt::BottomToolBarArea, tools);
+	QWidget* spacer = new QWidget();
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	//spacer->setMaximumWidth(15);
+	tools->addWidget(spacer);
+
+	bool showPanic = true;
+	bool showMuteSolo = false;
+	
+	TransportToolbar *transportbar = new TransportToolbar(this, showPanic, showMuteSolo);
+	tools->addWidget(transportbar);
+	
+	/*tools22 = new EditToolBar(this, pianorollTools);
+	tools22->setVisible(false);
+    tools1 = new QToolBar(tr("Edit Tools"));
+	tools1->setIconSize(QSize(29, 25));
 	addToolBar(Qt::BottomToolBarArea, tools1);
-	tools1->setObjectName("tbEditTools");
-	tools1->setAllowedAreas(Qt::BottomToolBarArea);
 	tools1->setFloatable(false);
 	tools1->setMovable(false);
+	tools1->setAllowedAreas(Qt::BottomToolBarArea);*/
+	QWidget* tspacer = new QWidget();
+	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tspacer->setMaximumWidth(15);
+	tools->addWidget(tspacer);
+	
+	tools1 = new EditToolBar(this, arrangerTools);
+	//addToolBar(Qt::BottomToolBarArea, tools1);
+	tools1->setObjectName("tbEditTools");
 	connect(tools1, SIGNAL(toolChanged(int)), arranger, SLOT(setTool(int)));
 	connect(arranger, SIGNAL(toolChanged(int)), tools1, SLOT(set(int)));
+	tools->addWidget(tools1);
+	QWidget* tspacer2 = new QWidget();
+	tspacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tspacer2->setMaximumWidth(15);
+	tools->addWidget(tspacer2);
+
+	LoopToolbar* loopBar = new LoopToolbar(this);
+	tools->addWidget(loopBar);
+	QWidget* spacer55555 = new QWidget();
+	spacer55555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer55555->setMaximumWidth(15);
+	tools->addWidget(spacer55555);
 
 	//QToolBar* transportToolbar = new QToolBar(tr("Transport"));
 	//addToolBar(Qt::BottomToolBarArea, transportToolbar);
-	QWidget* spacer = new QWidget();
-	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer->setMaximumWidth(35);
-	tools1->addWidget(spacer);
-	tools1->addActions(transportAction->actions());
-	tools1->addAction(panicAction);
-    QSizeGrip* corner = new QSizeGrip(tools1);
+	//tools1->addActions(transportAction->actions());
+    QSizeGrip* corner = new QSizeGrip(tools);
 	QWidget* spacer3 = new QWidget();
 	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer3->setMaximumWidth(5);
-	tools1->addWidget(spacer3);
-	tools1->addWidget(corner);
+	tools->addWidget(spacer3);
+	tools->addWidget(corner);
 	// toolBar is a pointer to an existing toolbar
 	//transportToolbar->addWidget(spacer);
 	//transportToolbar->addActions(transportAction->actions());

@@ -903,9 +903,9 @@ void initIcons()
       pencilIconSet3->addPixmap(*pencilIconOff, QIcon::Normal, QIcon::Off);
       pencilIconSet3->addPixmap(*pencilIconOver, QIcon::Active);
 	  
-	  cutIconOn = new MPIXMAP(":/images/icons/split.png", NULL);
-      cutIconOff= new MPIXMAP(":/images/icons/split_off.png", NULL);
-      cutIconOver= new MPIXMAP(":/images/icons/split_over.png", NULL);
+	  cutIconOn = new MPIXMAP(":/images/icons/split_new_on.png", NULL);
+      cutIconOff= new MPIXMAP(":/images/icons/split_new_off.png", NULL);
+      cutIconOver= new MPIXMAP(":/images/icons/split_new_over.png", NULL);
 	  cutIconSet3         = new QIcon();
       cutIconSet3->addPixmap(*cutIconOn, QIcon::Normal, QIcon::On);
       cutIconSet3->addPixmap(*cutIconOff, QIcon::Normal, QIcon::Off);
@@ -913,9 +913,9 @@ void initIcons()
 	  
 	  note1IconSet3         = new QIcon();
 	  
-	  glueIconOn = new MPIXMAP(":/images/icons/join_tracks.png", NULL);
-      glueIconOff= new MPIXMAP(":/images/icons/join_tracks_off.png", NULL);
-      glueIconOver= new MPIXMAP(":/images/icons/join_tracks_over.png", NULL);
+	  glueIconOn = new MPIXMAP(":/images/icons/join_new_on.png", NULL);
+      glueIconOff= new MPIXMAP(":/images/icons/join_new_off.png", NULL);
+      glueIconOver= new MPIXMAP(":/images/icons/join_new_over.png", NULL);
 	  glueIconSet3         = new QIcon();
       glueIconSet3->addPixmap(*glueIconOn, QIcon::Normal, QIcon::On);
       glueIconSet3->addPixmap(*glueIconOff, QIcon::Normal, QIcon::Off);

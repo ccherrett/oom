@@ -8,11 +8,13 @@
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
 
-#include <QToolBar>
+#include <QFrame>
 #include <QList>
 
 class Action;
 
+class QHBoxLayout;
+class QToolButton;
 class QAction;
 class QPixmap;
 class QIcon;
@@ -22,7 +24,8 @@ class QActionGroup;
 enum Tool
 {
     PointerTool = 1, PencilTool = 2, RubberTool = 4, CutTool = 8,
-    ScoreTool=16, GlueTool=32, QuantTool=64, DrawTool=128, MuteTool=256, AutomationTool=512};
+    ScoreTool=16, GlueTool=32, QuantTool=64, DrawTool=128, MuteTool=256, AutomationTool=512
+};
 
 const int arrangerTools = PointerTool | PencilTool | RubberTool | CutTool | GlueTool | MuteTool | AutomationTool;
 
@@ -40,9 +43,10 @@ extern ToolB toolList[];
 //   EditToolBar
 //---------------------------------------------------------
 
-class EditToolBar : public QToolBar
+class EditToolBar : public QFrame
 {
     Q_OBJECT
+	QHBoxLayout* m_layout;
     Action** actions;
 	QActionGroup* action;
     int nactions;
