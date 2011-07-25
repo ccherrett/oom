@@ -293,12 +293,38 @@ void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
 	int ctl = CTRL_PANPOT, mn, mx, v;
 	int chan = ((MidiTrack*) track)->outChannel();
 	QString img;
+	img = QString(":images/knob_audio_new.png");
+	/*(Track::TrackType type_tmp = ((MidiTrack*) track)->type();
+	switch (type_tmp)
+	{
+		case Track::MIDI:
+		case Track::DRUM:
+			img = QString(":images/knob_audio_new.png");
+		break;
+		case Track::WAVE:
+			img = QString(":images/knob_input_new.png");
+		break;
+		case Track::AUDIO_OUTPUT:
+			img = QString(":images/knob_output_new.png");
+		break;
+		case Track::AUDIO_INPUT:
+			img = QString(":images/knob_midi_new.png");
+		break;
+		case Track::AUDIO_BUSS:
+			img = QString(":images/knob_buss_new.png");
+		break;
+		case Track::AUDIO_AUX:
+			img = QString(":images/knob_aux_new.png");
+		break;
+		case Track::AUDIO_SOFTSYNTH:
+			img = QString(":images/knob_audio_new.png");
+		break;
+		default:
+			img = QString(":images/knob_aux.png");
+		break;
+	}*/
 	switch (idx)
 	{
-		case KNOB_PAN:
-			//  ctl = CTRL_PANPOT;
-			img = QString(":images/knob.png");
-			break;
 		case KNOB_VAR_SEND:
 			ctl = CTRL_VARIATION_SEND;
 			img = QString(":images/knob_aux.png");
