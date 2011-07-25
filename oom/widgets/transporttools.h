@@ -19,12 +19,13 @@ class TransportToolbar : public QFrame
 	QToolButton* m_btnRecord;
 	QToolButton* m_btnMute;
 	QToolButton* m_btnSolo;
+	QToolButton* m_btnPanic;
 
 private slots:
 	void songChanged(int);
 public slots:
 public:
-	TransportToolbar(QWidget* parent = 0);
+	TransportToolbar(QWidget* parent = 0, bool showMuteSolo = false, bool showPanic = false);
 	virtual ~TransportToolbar(){}
 	void setSoloAction(QAction*);
 	void setMuteAction(QAction*);

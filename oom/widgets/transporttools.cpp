@@ -7,7 +7,7 @@
 #include "song.h"
 #include "transporttools.h"
 
-TransportToolbar::TransportToolbar(QWidget* parent)
+TransportToolbar::TransportToolbar(QWidget* parent, bool showPanic, bool showMuteSolo)
 : QFrame(parent)	
 {
 	setMouseTracking(true);
@@ -67,20 +67,32 @@ TransportToolbar::TransportToolbar(QWidget* parent)
 	m_btnRecord->setAutoRaise(true);
 	m_layout->addWidget(m_btnRecord);
 	
-	m_btnMute = new QToolButton(this);
-	//m_btnMute->setDefaultAction();
-	m_btnMute->setIconSize(QSize(29, 25));
-	m_btnMute->setFixedSize(QSize(29, 25));
-	m_btnMute->setAutoRaise(true);
-	m_layout->addWidget(m_btnMute);
+	if(showMuteSolo)
+	{
+		m_btnMute = new QToolButton(this);
+		//m_btnMute->setDefaultAction();
+		m_btnMute->setIconSize(QSize(29, 25));
+		m_btnMute->setFixedSize(QSize(29, 25));
+		m_btnMute->setAutoRaise(true);
+		m_layout->addWidget(m_btnMute);
+		
+		m_btnSolo = new QToolButton(this);
+		//m_btnSolo->setDefaultAction();
+		m_btnSolo->setIconSize(QSize(29, 25));
+		m_btnSolo->setFixedSize(QSize(29, 25));
+		m_btnSolo->setAutoRaise(true);
+		m_layout->addWidget(m_btnSolo);
+	}	
 	
-	m_btnSolo = new QToolButton(this);
-	//m_btnSolo->setDefaultAction();
-	m_btnSolo->setIconSize(QSize(29, 25));
-	m_btnSolo->setFixedSize(QSize(29, 25));
-	m_btnSolo->setAutoRaise(true);
-	m_layout->addWidget(m_btnSolo);
-	//m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	if(showPanic)
+	{
+		m_btnPanic = new QToolButton(this);
+		m_btnPanic->setDefaultAction(panicAction);
+		m_btnPanic->setIconSize(QSize(29, 25));
+		m_btnPanic->setFixedSize(QSize(29, 25));
+		m_btnPanic->setAutoRaise(true);
+		m_layout->addWidget(m_btnPanic);
+	}
 }
 
 void TransportToolbar::songChanged(int)

@@ -91,7 +91,7 @@ MasterEdit::MasterEdit()
 	tools->addActions(undoRedo->actions());
 
 	tools2 = new EditToolBar(this, PointerTool | PencilTool | RubberTool);
-	addToolBar(tools2);
+	//addToolBar(tools2);
 
 	QToolBar* enableMaster = addToolBar(tr("Enable master"));
 	enableButton = new QToolButton();
@@ -100,6 +100,7 @@ MasterEdit::MasterEdit()
 	enableButton->setToolTip(tr("Enable usage of master track"));
 	enableButton->setChecked(song->masterFlag());
 	enableMaster->addWidget(enableButton);
+	enableMaster->addWidget(tools2);
 	connect(enableButton, SIGNAL(toggled(bool)), song, SLOT(setMasterFlag(bool)));
 
 	QToolBar* info = addToolBar(tr("Info"));
@@ -199,23 +200,15 @@ MasterEdit::MasterEdit()
 
 	connect(hscroll, SIGNAL(scrollChanged(int)), time1, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), sign, SLOT(setXPos(int)));
-	//      connect(hscroll, SIGNAL(scrollChanged(int)), thits,  SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
-	//      connect(hscroll, SIGNAL(scrollChanged(int)), zhits,  SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), time2, SLOT(setXPos(int)));
 
 	connect(hscroll, SIGNAL(scaleChanged(float)), time1, SLOT(setXMag(float)));
 	connect(hscroll, SIGNAL(scaleChanged(float)), sign, SLOT(setXMag(float)));
-	//      connect(hscroll, SIGNAL(scaleChanged(int)), thits,  SLOT(setXMag(int)));
 	connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
-	//      connect(hscroll, SIGNAL(scaleChanged(int)), zhits,  SLOT(setXMag(int)));
 	connect(hscroll, SIGNAL(scaleChanged(float)), time2, SLOT(setXMag(float)));
 
 	connect(time1, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-	//      connect(sign,   SIGNAL(timeChanged(unsigned)), pos, SLOT(setValue(unsigned)));
-	//      connect(thits,  SIGNAL(timeChanged(unsigned)), pos, SLOT(setValue(unsigned)));
-	//      connect(canvas, SIGNAL(timeChanged(unsigned)), pos, SLOT(setValue(unsigned)));
-	//      connect(zhits,  SIGNAL(timeChanged(unsigned)), pos, SLOT(setValue(unsigned)));
 	connect(time2, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 
 	connect(tscale, SIGNAL(tempoChanged(int)), SLOT(setTempo(int)));
