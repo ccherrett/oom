@@ -177,13 +177,13 @@ TrackHeader::~TrackHeader()
 
 void TrackHeader::setupStyles()
 {//#757576
-	m_style.insert(Track::MIDI, styletemplate.arg(QString("757576")));
-	m_style.insert(Track::WAVE, styletemplate.arg(QString("757576")));
-	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("757576")));
-	m_style.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("757576")));
-	m_style.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("757576")));
-	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("757576")));
-	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("757576")));
+	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::WAVE, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("939393")));
 	
 	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("e18fff")));
 	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee")));
