@@ -132,14 +132,10 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_btnReminder1->setIcon(remind1);
 	m_btnReminder2->setIcon(remind2);
 	m_btnReminder3->setIcon(remind3);
-	m_lblInputDetect->setPixmap(*darkRedLedIcon);
 	m_pan->setAcceptDrops(false);
 	if(m_track)
 	{
 		setSelected(m_track->selected());
-		//m_lblInputDetect->setVisible(m_track->isMidiTrack());
-		m_lblInputDetect->setVisible(false);
-		//m_btnAutomation->setVisible(!m_track->isMidiTrack());
 		if(m_track->height() < MIN_TRACKHEIGHT)
 		{
 			setFixedHeight(MIN_TRACKHEIGHT);
@@ -156,6 +152,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	}
 	songChanged(-1);
 	connect(m_trackName, SIGNAL(editingFinished()), this, SLOT(updateTrackName()));
+	connect(m_trackName, SIGNAL(returnPressed()), this, SLOT(updateTrackName()));
 	connect(m_trackName, SIGNAL(textEdited(QString)), this, SLOT(setEditing()));
 	connect(m_btnRecord, SIGNAL(toggled(bool)), this, SLOT(toggleRecord(bool)));
 	connect(m_btnMute, SIGNAL(toggled(bool)), this, SLOT(toggleMute(bool)));
@@ -175,8 +172,8 @@ TrackHeader::~TrackHeader()
 	//disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 }
 
-void TrackHeader::setupStyles()
-{//#757576
+void TrackHeader::setupStyles()/*{{{*/
+{
 	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393")));
 	m_style.insert(Track::WAVE, styletemplate.arg(QString("939393")));
 	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("939393")));
@@ -192,7 +189,7 @@ void TrackHeader::setupStyles()
 	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("aabcc7")));
 	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276")));
 	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee")));
-}
+}/*}}}*/
 
 void TrackHeader::heartBeat()/*{{{*/
 {
@@ -248,7 +245,6 @@ void TrackHeader::heartBeat()/*{{{*/
 				if (!m_midiDetect)
 				{
 					m_midiDetect = true;
-					//m_lblInputDetect->setPixmap(*redLedIcon);
 					m_btnAutomation->setIcon(QIcon(*redLedIcon));
 				}
 				break;
@@ -260,7 +256,6 @@ void TrackHeader::heartBeat()/*{{{*/
 			if (m_midiDetect)
 			{
 				m_midiDetect = false;
-				//m_lblInputDetect->setPixmap(*darkRedLedIcon);
 				m_btnAutomation->setIcon(QIcon(*darkRedLedIcon));
 			}
 		}
@@ -393,7 +388,7 @@ void TrackHeader::initPan()/*{{{*/
 		m_pan->setBackgroundRole(QPalette::Mid);
 		m_pan->setToolTip("Panorama");
 		m_pan->setEnabled(true);
-		m_pan->setIgnoreWheel(true);
+		//m_pan->setIgnoreWheel(true);
 
 		v = mp->hwCtrlState(chan, ctl);
 		if (v == CTRL_VAL_UNKNOWN)
@@ -429,7 +424,7 @@ void TrackHeader::initPan()/*{{{*/
 		m_pan->setRange(-1.0, +1.0);
 		m_pan->setToolTip(tr("Panorama"));
 		m_pan->setKnobImage(img);
-		m_pan->setIgnoreWheel(true);
+		//m_pan->setIgnoreWheel(true);
 		m_pan->setBackgroundRole(QPalette::Mid);
 		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 		m_panLayout->insertWidget(0, m_pan);
@@ -769,6 +764,14 @@ void TrackHeader::updateTrackName()/*{{{*/
 	if(!m_track || !m_processEvents)
 		return;
 	QString name = m_trackName->text();
+	if(name.isEmpty())
+	{
+		m_trackName->blockSignals(true);
+		m_trackName->setText(m_track->name());
+		m_trackName->blockSignals(false);
+		setEditing(false);
+		return;
+	}
 	if (name != m_track->name())
 	{
 		TrackList* tl = song->tracks();

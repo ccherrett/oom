@@ -60,6 +60,7 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 	setObjectName(name);
 	setMouseTracking(true);
 	setAcceptDrops(true);
+	setFocusPolicy(Qt::NoFocus);
 	
 	wantCleanup = false;
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -184,7 +185,10 @@ void HeaderList::keyPressEvent(QKeyEvent* e)/*{{{*/
 	if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
 	{
 		if(isEditing())
+		{
+			printf("HeaderList::keyPressEvent editing\n");
 			return;
+		}
 	}
 	emit keyPressExt(e); //redirect keypress events to main app
 }/*}}}*/
