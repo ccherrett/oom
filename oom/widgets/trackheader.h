@@ -41,6 +41,7 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 	QHash<int, QString> m_style;
 	void initPan();
 	void setupStyles();
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
 	void heartBeat();
