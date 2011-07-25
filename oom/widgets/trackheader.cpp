@@ -127,7 +127,6 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_btnReminder2->setIcon(remind2);
 	m_btnReminder3->setIcon(remind3);
 	m_lblInputDetect->setPixmap(*darkRedLedIcon);
-	m_strip->setAcceptDrops(false);
 	m_pan->setAcceptDrops(false);
 	if(m_track)
 	{
@@ -453,7 +452,7 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 		m_selected = sel;
 		m_track->setSelected(sel);
 	}
-	if(!m_editing && m_processEvents)
+	/*if(!m_editing && m_processEvents)
 	{
 		if(m_selected)
 		{
@@ -463,7 +462,7 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 		{
 			m_strip->setStyleSheet("QFrame {background-color: blue;}");
 		}
-	}
+	}*/
 }/*}}}*/
 
 bool TrackHeader::isSelected()/*{{{*/

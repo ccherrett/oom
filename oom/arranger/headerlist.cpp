@@ -66,7 +66,7 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 	m_layout->setSpacing(0);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setAlignment(Qt::AlignTop|Qt::AlignLeft);
-	m_layout->addItem(new QSpacerItem(0, TOP_SPACER_SIZE, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	//m_layout->addItem(new QSpacerItem(0, TOP_SPACER_SIZE, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
 	m_layout->addItem(vSpacer);
 
@@ -111,7 +111,7 @@ void HeaderList::updateTrackList()/*{{{*/
 	}
 	TrackList* l = song->visibletracks();
 	m_headers.clear();
-	int index = 1;
+	int index = 0;
 	for (iTrack i = l->begin(); i != l->end();++index, ++i)
 	{
 		Track* track = *i;

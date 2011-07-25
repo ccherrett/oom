@@ -62,7 +62,7 @@ public slots:
 
 public:
     //EditToolBar(QMainWindow*, int, const char* name = 0);
-    EditToolBar(QWidget* /*parent*/, int /*tools*/, const char* name = 0); // Needs a parent !
+    EditToolBar(QWidget* /*parent*/, int /*tools*/, bool addSpacer = false, const char* name = 0); // Needs a parent !
     ~EditToolBar();
     int curTool();
 	QList<QAction*> getActions();

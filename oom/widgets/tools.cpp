@@ -59,7 +59,7 @@ ToolB toolList[] = {
 //   EditToolBar
 //---------------------------------------------------------
 
-EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
+EditToolBar::EditToolBar(QWidget* parent, int tools, bool addSpacer, const char*)
 : QFrame(parent)
 {
 	m_layout = new QHBoxLayout(this);
@@ -78,7 +78,8 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 	actions = new Action*[nactions];
 	bool first = true;
 	int n = 0;
-	//m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	if(addSpacer)
+		m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
 	for (unsigned i = 0; i < sizeof (toolList) / sizeof (*toolList); ++i)
 	{
 		if ((tools & (1 << i)) == 0)
@@ -110,7 +111,8 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, const char*)
 	//addWidget(spacer);
 	// Note: Does not take ownership.
 	//addActions(action->actions());
-	//m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	if(addSpacer)
+		m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
 	connect(action, SIGNAL(selected(QAction*)), this, SLOT(toolChanged(QAction*)));
 }

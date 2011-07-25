@@ -65,6 +65,7 @@
 #include "rmap.h"
 #include "shortcuts.h"
 #include "mixerdock.h"
+#include "tools.h"
 
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96
@@ -289,6 +290,13 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	listScroll->setMouseTracking(true);
 	listScroll->setMinimumWidth(250);
 	listScroll->setMaximumWidth(400);
+
+	EditToolBar *edittools = new EditToolBar(this, arrangerTools, true);
+	edittools->setFixedHeight(32);
+	connect(edittools, SIGNAL(toolChanged(int)), this, SLOT(setTool(int)));
+	connect(this, SIGNAL(toolChanged(int)), edittools, SLOT(set(int)));
+	trackLayout->addWidget(edittools);
+	
 	//trackLayout->addItem(new QSpacerItem(0, 32, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	trackLayout->addWidget(listScroll);
 
