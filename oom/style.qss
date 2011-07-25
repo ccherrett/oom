@@ -84,7 +84,7 @@ QLabel#patchLabel
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 	 padding: 0px 8px;
 }
 
@@ -374,38 +374,6 @@ QTableView#autoTable::item:selected:!active
 	border: none;
 }
 /*}}}*/
-/* Mixer Audio In Style*/
-QFrame#MixerAudioInStrip { 
-	border: 1px solid #29292a;
-	/*background-color: #5f855f;*/
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #749f71, stop:0.5 #4d6a4c);
-	border-radius: 7px;
-}
-QFrame#MixerAudioInAuxbox { 
-	border: 1px solid #29292a;
-    /*background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #749f71, stop:0.5 #4d6a4c);*/
-	background-color: #4d6a4c;
-}
-QFrame#MixerAudioInStrip QLabel { 
-	background-color: none;
-	color: #d7d7d7;
-	color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 10px;
-}
-QFrame#MixerAudioInStrip QFrame#MixerAudioInLabel { 
-    border: 1px solid #393941;
-	border-radius: 3px;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:0.1 #4d6a4c, stop:0.9 #4d6a4c, stop:1 white);
-	color: #d7d7d7;
-	font-size: 10px;
-	padding: 3px;
-	color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 10px;
-}
 
 /* Mixer Synth Style*/
 /*{{{ deleted synth strip styles
@@ -438,20 +406,70 @@ QFrame#MixerSynthStrip QFrame#MixerSynthLabel {
 }
 }}}*/
 
-/* Mixer Wave Track Style*/
-QFrame#MixerWaveStrip { 
-	border: 1px solid #5e5e5f;
-	background-color: #1e2122;
-	background-image: url(:/images/mixer_bg_audio.png);
-	background-repeat: repeat-x;
-	/*border-radius: 3px;*/
+
+QFrame#MixerAudioInStrip, 
+QFrame#MixerWaveStrip, 
+QFrame#MixerAudioBussStrip, 
+QFrame#MixerAuxStrip, 
+QFrame#MixerAudioOutStrip, 
+QFrame#MidiTrackStrip { 
+	border: 1px solid #29292a;
+	background-color: #1b1b1b;
 	border-radius: 7px;
 }
-QFrame#MixerWaveAuxbox { 
-	border: 1px solid #5e5e5f;
-	/*background-color: #1d1f20;*/
-	background-color: #1e2122;
+QFrame#MixerAudioInAuxbox, 
+QFrame#MixerWaveAuxbox, 
+QFrame#MixerAudioBussAuxbox, 
+QFrame#MixerAuxAuxbox, 
+QFrame#MixerAudioOutAuxbox, 
+QFrame#MidiTrackAuxbox { 
+	border: 1px solid #29292a;
+	background-color: #141414;
 }
+
+/* Mixer Audio In Style*//*{{{*/
+QFrame#MixerAudioInStrip QLabel { 
+	background-color: none;
+	color: #d6dfd6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+}
+QFrame#MixerAudioInStrip QFrame#MixerAudioInLabel { 
+    border-top: 1px solid #bd7ad6;
+    border-bottom: 1px solid #bd7ad6;
+	border-radius: 3px;
+	background-color: #141414;
+	font-size: 10px;
+	padding: 3px;
+	color: #bd7ad6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+}/*}}}*/
+
+/* Mixer Midi Track Style*//*{{{*/
+QFrame#MidiTrackStrip QLabel { 
+	background-color: none;
+	color: #d6dfd6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+}
+QFrame#MidiTrackStrip QLabel#MidiTrackLabel  { 
+    border-top: 1px solid #01e6ee;
+    border-bottom: 1px solid #01e6ee;
+	border-radius: 3px;
+	background-color: #141414;
+	font-size: 10px;
+	padding: 3px;
+	color: #01e6ee;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+}/*}}}*/
+
+/* Mixer Wave Track Style*//*{{{*/
 QFrame#MixerWaveStrip QLabel { 
 	background-color: none;
 	color: #d7d7d7;
@@ -461,93 +479,19 @@ QFrame#MixerWaveStrip QLabel {
 	font-size: 10px;
 }
 QFrame#MixerWaveStrip QLabel#MixerWaveLabel  { 
-    border-top: 1px solid #d6dfd6;
-    border-bottom: 1px solid #d6dfd6;
+    border-top: 1px solid #81f476;
+    border-bottom: 1px solid #81f476;
 	border-radius: 3px;
-	background-color: #1e2122;
+	background-color: #141414;
 	font-size: 10px;
 	padding: 3px;
-	color: #d6dfd6;
+	color: #81f476;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 10px;
-}
+}/*}}}*/
 
-/* Mixer Midi Track Style*/
-QFrame#MidiTrackStrip { 
-	border: 1px solid #29292a;
-	background-color: #28222c;
-	background-image: url(:/images/mixer_bg_midi.png);
-	background-repeat: repeat-x;
-	border-radius: 7px;
-}
-QFrame#MidiTrackAuxbox { 
-	border: 1px solid #29292a;
-	background-color: #28222c;
-}
-QFrame#MidiTrackStrip QLabel { 
-	background-color: none;
-	color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 10px;
-}
-QFrame#MidiTrackStrip QLabel#MidiTrackLabel  { 
-    border-top: 1px solid #d6dfd6;
-    border-bottom: 1px solid #d6dfd6;
-	border-radius: 3px;
-	background-color: #28222c;
-	font-size: 10px;
-	padding: 3px;
-	color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 10px;
-}
-/* Mixer Midi Drum Track Style*/
-
-/*{{{ deleted midi drum track styles
-QFrame#MidiDrumTrackStrip { 
-	border: 1px solid #29292a;
-	border-radius: 7px;
-}
-QFrame#MidiDrumTrackAuxbox { 
-	border: 1px solid #29292a;
-	background-color: #504655;
-}
-QFrame#MidiDrumTrackStrip QLabel { 
-	background-color: none;
-	color: #d7d7d7;
-	color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 10px;
-}
-QFrame#MidiDrumTrackStrip QLabel#MidiDrumTrackLabel  { 
-    border: 1px solid #393941;
-	border-radius: 3px;
-	color: #d7d7d7;
-	font-size: 10px;
-	padding: 3px;
-	color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 10px;
-}
-}}}*/
-
-/* Mixer AudioBuss Track Style*/
-QFrame#MixerAudioBussStrip { 
-	border: 1px solid #29292a;
-	background-color: #252727;
-	background-image: url(:/images/mixer_bg_buss.png);
-	background-repeat: repeat-x;
-	border-radius: 7px;
-}
-QFrame#MixerAudioBussAuxbox { 
-	border: 1px solid #29292a;
-	background-color: #252727;
-}
+/* Mixer AudioBuss Track Style*//*{{{*/
 QFrame#MixerAudioBussStrip QLabel { 
 	background-color: none;
 	color: #d7d7d7;
@@ -558,30 +502,19 @@ QFrame#MixerAudioBussStrip QLabel {
 }
 QFrame#MixerAudioBussStrip QLabel#MixerAudioBussLabel
 {
-    border-top: 1px solid #d6dfd6;
-    border-bottom: 1px solid #d6dfd6;
+    border-top: 1px solid #aabcc7;
+    border-bottom: 1px solid #aabcc7;
 	border-radius: 3px;
-	background-color: #252727;
+	background-color: #141414;
 	font-size: 10px;
 	padding: 3px;
-	color: #d6dfd6;
+	color: #aabcc7;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 10px;
-}
+}/*}}}*/
 
-/* Mixer Aux Track Style*/
-QFrame#MixerAuxStrip { 
-	border: 1px solid #29292a;
-	background-color: #343652;
-	background-image: url(:/images/mixer_bg_aux.png);
-	background-repeat: repeat-x;
-	border-radius: 7px;
-}
-QFrame#MixerAuxAuxbox { 
-	border: 1px solid #29292a;
-	background-color: #343652;
-}
+/* Mixer Aux Track Style*//*{{{*/
 QFrame#MixerAuxStrip QLabel { 
 	background-color: none;
 	color: #d7d7d7;
@@ -592,31 +525,20 @@ QFrame#MixerAuxStrip QLabel {
 }
 QFrame#MixerAuxStrip QLabel#MixerAuxLabel
 {
-    border-top: 1px solid #d6dfd6;
-    border-bottom: 1px solid #d6dfd6;
-	background-color: #343652;
+    border-top: 1px solid #e3e972;
+    border-bottom: 1px solid #e3e972;
+	background-color: #141414;
 	border-radius: 3px;
 	color: #d7d7d7;
 	font-size: 10px;
 	padding: 3px;
-	color: #d6dfd6;
+	color: #e3e972;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 10px;
-}
+}/*}}}*/
 
-/* Mixer Audio Out Style*/
-QFrame#MixerAudioOutStrip { 
-	border: 1px solid #29292a;
-	background-color: #4d0f0f;
-	background-image: url(:/images/mixer_bg_out.png);
-	background-repeat: repeat-x;
-	border-radius: 7px;
-}
-QFrame#MixerAudioOutAuxbox { 
-	border: 1px solid #29292a;
-	background-color: #4e1010;
-}
+/* Mixer Audio Out Style*//*{{{*/
 QFrame#MixerAudioOutStrip QLabel { 
 	background-color: none;
 	color: #d6dfd6;
@@ -625,18 +547,18 @@ QFrame#MixerAudioOutStrip QLabel {
 	font-size: 11px;
 }
 QFrame#MixerAudioOutStrip QLabel#MixerAudioOutLabel  { 
-    border-top: 1px solid #d6dfd6;
-    border-bottom: 1px solid #d6dfd6;
-	background-color: #4d0f0f;
+    border-top: 1px solid #fc7676;
+    border-bottom: 1px solid #fc7676;
+	background-color: #141414;
 	border-radius: 3px;
 	color: #ededed;
 	font-size: 10px;
 	padding: 3px;
-	color: #d6dfd6;
+	color: #fc7676;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 10px;
-}
+}/*}}}*/
 
 QLineEdit
 {
@@ -645,7 +567,7 @@ QLineEdit
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 }
 
 
@@ -656,7 +578,7 @@ Dentry
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 }
 
 QPushButton 
@@ -1311,7 +1233,7 @@ QWidget#mitPluginTranspose QLabel#transposeLabel
      border-width: 3;
 	 border-right: 0;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 	 border-radius: 8px;
 }
 
@@ -1721,7 +1643,7 @@ QHeaderView#header {
      border-width: 3;
 	 border-right: 0;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 	 /*color: #76ac01;*/
  }
 
@@ -1732,7 +1654,7 @@ CtrlEdit QWidget#ctrlLabelBox
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 }
 
 QLabel#Cursor {
@@ -1741,7 +1663,7 @@ QLabel#Cursor {
      border-width: 3;
 	 border-right: 0;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
  }
@@ -1751,7 +1673,7 @@ QLabel#arrangerCursor {
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
  }
@@ -1762,7 +1684,7 @@ QLabel#pitchLabel {
      border-width: 3;
 	 border-left: 0;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
 }
@@ -1770,22 +1692,22 @@ QLabel#pitchLabel {
 /* Bigtime stying */
 QWidget#bigtime-dwin {
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 }
 
 QLabel#bigwinmiddle {
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 }
 
 QLabel#bigwinleft {
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 }
 
 QLabel#bigwinright {
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 }
 
 
@@ -1796,7 +1718,7 @@ QAbstractSpinBox {
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #757576;
+	 color: #939393;
 	 /*color: #76ac01;*/
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -1887,7 +1809,7 @@ QFrame#WaveHeader QLineEdit
 	border-top-color: #1f1f22;
 	border-bottom-color: #505050;
 	background-color: #1a1a1a;
-	color: #757576;
+	color: #939393;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 15px;

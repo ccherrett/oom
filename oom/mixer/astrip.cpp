@@ -927,16 +927,43 @@ Knob* AudioStrip::addKnob(int type, int id, QString name, DoubleLabel** dlabel)/
 {
 	Knob* knob = new Knob(this);
 	knob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	if (type == 0)
+	knob->setRange(-1.0, +1.0);
+	knob->setToolTip(tr("panorama"));
+	Track::TrackType type_tmp = track->type();
+	switch (type_tmp)
 	{
-		knob->setRange(-1.0, +1.0);
-		knob->setToolTip(tr("panorama"));
-		knob->setKnobImage(":/images/knob.png");
+		case Track::MIDI:
+		case Track::DRUM:
+			knob->setKnobImage(":images/knob_audio_new.png");
+		break;
+		case Track::WAVE:
+			knob->setKnobImage(":images/knob_input_new.png");
+		break;
+		case Track::AUDIO_OUTPUT:
+			knob->setKnobImage(":images/knob_output_new.png");
+		break;
+		case Track::AUDIO_INPUT:
+			knob->setKnobImage(":images/knob_midi_new.png");
+		break;
+		case Track::AUDIO_BUSS:
+			knob->setKnobImage(":images/knob_buss_new.png");
+		break;
+		case Track::AUDIO_AUX:
+			knob->setKnobImage(":images/knob_aux_new.png");
+		break;
+		case Track::AUDIO_SOFTSYNTH:
+			knob->setKnobImage(":images/knob_audio_new.png");
+		break;
+		default:
+			knob->setKnobImage(":images/knob_aux_new.png");
+		break;
 	}
-	else
+
+	if(type > 0)
 	{
 		knob->setRange(config.minSlider - 0.1, 10.0);
-		knob->setKnobImage(":/images/knob_aux.png");
+		//knob->setKnobImage(":/images/knob_aux.png");
+		knob->setKnobImage(":images/knob_aux_new.png");
 		knob->setToolTip(tr("aux send level"));
 	}
 	knob->setBackgroundRole(QPalette::Mid);
