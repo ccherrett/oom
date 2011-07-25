@@ -83,8 +83,8 @@ QLabel#patchLabel
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 	 padding: 0px 8px;
 }
 
@@ -644,8 +644,8 @@ QLineEdit
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 }
 
 
@@ -655,8 +655,8 @@ Dentry
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 }
 
 QPushButton 
@@ -1310,8 +1310,8 @@ QWidget#mitPluginTranspose QLabel#transposeLabel
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-right: 0;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 	 border-radius: 8px;
 }
 
@@ -1720,8 +1720,8 @@ QHeaderView#header {
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-right: 0;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 	 /*color: #76ac01;*/
  }
 
@@ -1731,8 +1731,8 @@ CtrlEdit QWidget#ctrlLabelBox
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 }
 
 QLabel#Cursor {
@@ -1740,8 +1740,8 @@ QLabel#Cursor {
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-right: 0;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
  }
@@ -1750,8 +1750,8 @@ QLabel#arrangerCursor {
      /*padding-right: 15px;  make room for the arrows */
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
  }
@@ -1761,31 +1761,31 @@ QLabel#pitchLabel {
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-left: 0;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
 }
 
 /* Bigtime stying */
 QWidget#bigtime-dwin {
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 }
 
 QLabel#bigwinmiddle {
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 }
 
 QLabel#bigwinleft {
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 }
 
 QLabel#bigwinright {
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 }
 
 
@@ -1795,8 +1795,8 @@ QAbstractSpinBox {
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #010f14;
-	 color: #03c0e2;
+	 background-color: #1b1b1b;
+	 color: #757576;
 	 /*color: #76ac01;*/
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -1891,7 +1891,7 @@ QFrame#WaveHeader QLineEdit
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 15px;
-	padding-left: 15px;
+	padding-left: 12px;
 }
 
 QFrame#trackHeaderList {/*{{{*/
