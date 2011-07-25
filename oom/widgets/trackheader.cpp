@@ -161,6 +161,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	connect(m_btnReminder2, SIGNAL(toggled(bool)), this, SLOT(toggleReminder2(bool)));
 	connect(m_btnReminder3, SIGNAL(toggled(bool)), this, SLOT(toggleReminder3(bool)));
 	connect(m_btnAutomation, SIGNAL(clicked()), this, SLOT(generateAutomationMenu()));
+	//Let header list control this for now
 	//connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 	inHeartBeat = false;
@@ -169,28 +170,106 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 TrackHeader::~TrackHeader()
 {
 	m_processEvents = false;
-	//disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 }
 
-void TrackHeader::setupStyles()/*{{{*/
+//Public member functions
+
+void TrackHeader::stopProcessing()/*{{{*/
 {
-	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::WAVE, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("939393")));
-	
-	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("e18fff")));
-	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee")));
-	m_selectedStyle.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("fc7676")));
-	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("81f476")));
-	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("aabcc7")));
-	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276")));
-	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee")));
+	m_processEvents = false;
 }/*}}}*/
 
+void TrackHeader::startProcessing()/*{{{*/
+{
+	m_processEvents = true;
+}/*}}}*/
+
+//Public slots
+
+void TrackHeader::setSelected(bool sel)/*{{{*/
+{
+	if(!m_track)
+	{
+		m_selected = false;
+	}
+	else
+	{
+		m_selected = sel;
+		m_track->setSelected(sel);
+	}
+	if(!m_editing && m_processEvents)
+	{
+		if(m_selected)
+		{
+			//m_trackName->setFont();
+			m_trackName->setStyleSheet(m_selectedStyle[m_tracktype]);
+		}
+		else
+		{
+			m_trackName->setStyleSheet(m_style[m_tracktype]);
+			//m_strip->setStyleSheet("QFrame {background-color: blue;}");
+		}
+	}
+}/*}}}*/
+
+void TrackHeader::songChanged(int flags)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	if (flags == -1 || (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED)))
+	{
+		//printf("TrackHeader::songChanged\n");
+		m_btnRecord->blockSignals(true);
+		m_btnRecord->setChecked(m_track->recordFlag());
+		m_btnRecord->blockSignals(false);
+
+		m_btnMute->blockSignals(true);
+		m_btnMute->setChecked(m_track->mute());
+		m_btnMute->blockSignals(false);
+
+		m_btnSolo->blockSignals(true);
+		m_btnSolo->setChecked(m_track->solo());
+		m_btnSolo->blockSignals(false);
+
+		m_btnReminder1->blockSignals(true);
+		m_btnReminder1->setChecked(m_track->getReminder1());
+		m_btnReminder1->blockSignals(false);
+		
+		m_btnReminder2->blockSignals(true);
+		m_btnReminder2->setChecked(m_track->getReminder2());
+		m_btnReminder2->blockSignals(false);
+
+		m_btnReminder3->blockSignals(true);
+		m_btnReminder3->setChecked(m_track->getReminder3());
+		m_btnReminder3->blockSignals(false);
+
+		m_trackName->blockSignals(true);
+		m_trackName->setText(m_track->name());
+		m_trackName->blockSignals(false);
+		m_trackName->setReadOnly((m_track->name() == "Master"));
+		setSelected(m_track->selected());
+		//setProperty("selected", m_track->selected());
+		if(m_track->height() < MIN_TRACKHEIGHT)
+		{
+			setFixedHeight(MIN_TRACKHEIGHT);
+			m_track->setHeight(MIN_TRACKHEIGHT);
+		}
+		else
+		{
+			setFixedHeight(m_track->height());
+		}
+		//updateBackground();
+	}
+}/*}}}*/
+
+bool TrackHeader::isSelected()/*{{{*/
+{
+	if(!m_track)
+		return false;
+	return m_track->selected();
+}/*}}}*/
+
+//Private slots
 void TrackHeader::heartBeat()/*{{{*/
 {
 	if(!m_track || inHeartBeat || !m_processEvents)
@@ -275,310 +354,6 @@ void TrackHeader::heartBeat()/*{{{*/
 	updatePan();
 	inHeartBeat = false;
 }/*}}}*/
-
-void TrackHeader::updateVolume()/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	if(m_track->isMidiTrack())
-	{
-		/*bool en;
-		int channel = ((MidiTrack*) m_track)->outChannel();
-		MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
-		MidiCtrlValListList* mc = mp->controller();
-		ciMidiCtrlValList icl;
-
-		MidiController* ctrl = mp->midiController(CTRL_VOLUME);
-		int nvolume = mp->hwCtrlState(channel, CTRL_VOLUME);
-		if (nvolume == CTRL_VAL_UNKNOWN)
-		{
-			sl->setValue(sl->off() - 1.0);
-			volume = CTRL_VAL_UNKNOWN;
-			nvolume = mp->lastValidHWCtrlState(channel, CTRL_VOLUME);
-			if (nvolume != CTRL_VAL_UNKNOWN)
-			{
-				nvolume -= ctrl->bias();
-				if (double(nvolume) != slider->value())
-				{
-					slider->setValue(double(nvolume));
-				}
-			}
-		}
-		else
-		{
-			int ivol = nvolume;
-			nvolume -= ctrl->bias();
-			if (nvolume != volume)
-			{
-				slider->setValue(double(nvolume));
-				volume = nvolume;
-			}
-		}*/
-	}
-	else
-	{
-		/*double vol = ((AudioTrack*) m_track)->volume();
-		if (vol != volume)
-		{
-			//printf("AudioStrip::updateVolume setting slider and label\n");
-
-			slider->blockSignals(true);
-			sl->blockSignals(true);
-			double val = fast_log10(vol) * 20.0;
-			slider->setValue(val);
-			sl->setValue(val);
-			sl->blockSignals(false);
-			slider->blockSignals(false);
-			volume = vol;
-			if(((AudioTrack*) m_track)->volFromAutomation())
-			{
-				//printf("AudioStrip::updateVolume via automation\n");
-				midiMonitor->msgSendAudioOutputEvent((Track*)m_track, CTRL_VOLUME, vol);
-			}
-		}*/
-	}
-}/*}}}*/
-
-void TrackHeader::initPan()/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	QString img(":images/knob_midi_new.png");
-	Track::TrackType type = m_track->type();
-	switch (type)
-	{
-		case Track::MIDI:
-		case Track::DRUM:
-			img = QString(":images/knob_audio_new.png");
-		break;
-		case Track::WAVE:
-			img = QString(":images/knob_input_new.png");
-		break;
-		case Track::AUDIO_OUTPUT:
-			img = QString(":images/knob_output_new.png");
-		break;
-		case Track::AUDIO_INPUT:
-			img = QString(":images/knob_midi_new.png");
-		break;
-		case Track::AUDIO_BUSS:
-			img = QString(":images/knob_buss_new.png");
-		break;
-		case Track::AUDIO_AUX:
-			img = QString(":images/knob_aux_new.png");
-		break;
-		case Track::AUDIO_SOFTSYNTH:
-			img = QString(":images/knob_audio_new.png");
-		break;
-	}
-	if(m_track->isMidiTrack())
-	{
-		int ctl = CTRL_PANPOT, mn, mx, v;
-		int chan = ((MidiTrack*) m_track)->outChannel();
-		MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
-		MidiController* mc = mp->midiController(ctl);
-		mn = mc->minVal();
-		mx = mc->maxVal();
-
-		m_pan = new Knob(this);
-		m_pan->setRange(double(mn), double(mx), 1.0);
-		m_pan->setId(ctl);
-		m_pan->setKnobImage(img);
-
-		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-		m_pan->setBackgroundRole(QPalette::Mid);
-		m_pan->setToolTip("Panorama");
-		m_pan->setEnabled(true);
-		//m_pan->setIgnoreWheel(true);
-
-		v = mp->hwCtrlState(chan, ctl);
-		if (v == CTRL_VAL_UNKNOWN)
-		{
-			int lastv = mp->lastValidHWCtrlState(chan, ctl);
-			if (lastv == CTRL_VAL_UNKNOWN)
-			{
-				if (mc->initVal() == CTRL_VAL_UNKNOWN)
-					v = 0;
-				else
-					v = mc->initVal();
-			}
-			else
-				v = lastv - mc->bias();
-		}
-		else
-		{
-			// Auto bias...
-			v -= mc->bias();
-		}
-
-		m_pan->setValue(double(v));
-
-		m_panLayout->insertWidget(0, m_pan);
-
-		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
-		//connect(m_pan, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
-	}
-	else
-	{
-		m_pan = new Knob(this);
-		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-		m_pan->setRange(-1.0, +1.0);
-		m_pan->setToolTip(tr("Panorama"));
-		m_pan->setKnobImage(img);
-		//m_pan->setIgnoreWheel(true);
-		m_pan->setBackgroundRole(QPalette::Mid);
-		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-		m_panLayout->insertWidget(0, m_pan);
-		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
-		connect(m_pan, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
-		connect(m_pan, SIGNAL(sliderReleased(int)), SLOT(panReleased()));
-	}
-}/*}}}*/
-
-void TrackHeader::updatePan()/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	if(m_track->isMidiTrack())
-	{
-		int channel = ((MidiTrack*) m_track)->outChannel();
-		MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
-		//MidiCtrlValListList* mc = mp->controller();
-		ciMidiCtrlValList icl;
-
-		MidiController* ctrl = mp->midiController(CTRL_PANPOT);
-		int npan = mp->hwCtrlState(channel, CTRL_PANPOT);
-		if (npan == CTRL_VAL_UNKNOWN)
-		{
-			panVal = CTRL_VAL_UNKNOWN;
-			npan = mp->lastValidHWCtrlState(channel, CTRL_PANPOT);
-			if (npan != CTRL_VAL_UNKNOWN)
-			{
-				npan -= ctrl->bias();
-				if (double(npan) != m_pan->value())
-				{
-					m_pan->setValue(double(npan));
-				}
-			}
-		}
-		else
-		{
-			npan -= ctrl->bias();
-			if (npan != panVal)
-			{
-				m_pan->setValue(double(npan));
-				panVal = npan;
-			}
-		}
-	}
-	else
-	{
-		double v = ((AudioTrack*) m_track)->pan();
-		if (v != panVal)
-		{
-			m_pan->blockSignals(true);
-			m_pan->setValue(v);
-			m_pan->blockSignals(false);
-			panVal = v;
-			if(((AudioTrack*) m_track)->panFromAutomation())
-			{
-				midiMonitor->msgSendAudioOutputEvent((Track*)m_track, CTRL_PANPOT, v);
-			}
-		}
-	}
-}/*}}}*/
-
-void TrackHeader::setSelected(bool sel)/*{{{*/
-{
-	if(!m_track)
-	{
-		m_selected = false;
-	}
-	else
-	{
-		m_selected = sel;
-		m_track->setSelected(sel);
-	}
-	if(!m_editing && m_processEvents)
-	{
-		if(m_selected)
-		{
-			//m_trackName->setFont();
-			m_trackName->setStyleSheet(m_selectedStyle[m_tracktype]);
-		}
-		else
-		{
-			m_trackName->setStyleSheet(m_style[m_tracktype]);
-			//m_strip->setStyleSheet("QFrame {background-color: blue;}");
-		}
-	}
-}/*}}}*/
-
-bool TrackHeader::isSelected()/*{{{*/
-{
-	if(!m_track)
-		return false;
-	return m_track->selected();
-}/*}}}*/
-
-void TrackHeader::songChanged(int flags)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	if (flags == -1 || (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED)))
-	{
-		//printf("TrackHeader::songChanged\n");
-		m_btnRecord->blockSignals(true);
-		m_btnRecord->setChecked(m_track->recordFlag());
-		m_btnRecord->blockSignals(false);
-
-		m_btnMute->blockSignals(true);
-		m_btnMute->setChecked(m_track->mute());
-		m_btnMute->blockSignals(false);
-
-		m_btnSolo->blockSignals(true);
-		m_btnSolo->setChecked(m_track->solo());
-		m_btnSolo->blockSignals(false);
-
-		m_btnReminder1->blockSignals(true);
-		m_btnReminder1->setChecked(m_track->getReminder1());
-		m_btnReminder1->blockSignals(false);
-		
-		m_btnReminder2->blockSignals(true);
-		m_btnReminder2->setChecked(m_track->getReminder2());
-		m_btnReminder2->blockSignals(false);
-
-		m_btnReminder3->blockSignals(true);
-		m_btnReminder3->setChecked(m_track->getReminder3());
-		m_btnReminder3->blockSignals(false);
-
-		m_trackName->blockSignals(true);
-		m_trackName->setText(m_track->name());
-		m_trackName->blockSignals(false);
-		m_trackName->setReadOnly((m_track->name() == "Master"));
-		setSelected(m_track->selected());
-		//setProperty("selected", m_track->selected());
-		if(m_track->height() < MIN_TRACKHEIGHT)
-		{
-			setFixedHeight(MIN_TRACKHEIGHT);
-			m_track->setHeight(MIN_TRACKHEIGHT);
-		}
-		else
-		{
-			setFixedHeight(m_track->height());
-		}
-		//updateBackground();
-	}
-}/*}}}*/
-
-void TrackHeader::stopProcessing()
-{
-	m_processEvents = false;
-}
-
-void TrackHeader::startProcessing()
-{
-	m_processEvents = true;
-}
 
 void TrackHeader::generateAutomationMenu()/*{{{*/
 {
@@ -1204,6 +979,356 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	delete p;
 }/*}}}*/
 
+void TrackHeader::updateVolume()/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	if(m_track->isMidiTrack())
+	{
+		/*bool en;
+		int channel = ((MidiTrack*) m_track)->outChannel();
+		MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
+		MidiCtrlValListList* mc = mp->controller();
+		ciMidiCtrlValList icl;
+
+		MidiController* ctrl = mp->midiController(CTRL_VOLUME);
+		int nvolume = mp->hwCtrlState(channel, CTRL_VOLUME);
+		if (nvolume == CTRL_VAL_UNKNOWN)
+		{
+			sl->setValue(sl->off() - 1.0);
+			volume = CTRL_VAL_UNKNOWN;
+			nvolume = mp->lastValidHWCtrlState(channel, CTRL_VOLUME);
+			if (nvolume != CTRL_VAL_UNKNOWN)
+			{
+				nvolume -= ctrl->bias();
+				if (double(nvolume) != slider->value())
+				{
+					slider->setValue(double(nvolume));
+				}
+			}
+		}
+		else
+		{
+			int ivol = nvolume;
+			nvolume -= ctrl->bias();
+			if (nvolume != volume)
+			{
+				slider->setValue(double(nvolume));
+				volume = nvolume;
+			}
+		}*/
+	}
+	else
+	{
+		/*double vol = ((AudioTrack*) m_track)->volume();
+		if (vol != volume)
+		{
+			//printf("AudioStrip::updateVolume setting slider and label\n");
+
+			slider->blockSignals(true);
+			sl->blockSignals(true);
+			double val = fast_log10(vol) * 20.0;
+			slider->setValue(val);
+			sl->setValue(val);
+			sl->blockSignals(false);
+			slider->blockSignals(false);
+			volume = vol;
+			if(((AudioTrack*) m_track)->volFromAutomation())
+			{
+				//printf("AudioStrip::updateVolume via automation\n");
+				midiMonitor->msgSendAudioOutputEvent((Track*)m_track, CTRL_VOLUME, vol);
+			}
+		}*/
+	}
+}/*}}}*/
+
+void TrackHeader::updatePan()/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	if(m_track->isMidiTrack())
+	{
+		int channel = ((MidiTrack*) m_track)->outChannel();
+		MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
+		//MidiCtrlValListList* mc = mp->controller();
+		ciMidiCtrlValList icl;
+
+		MidiController* ctrl = mp->midiController(CTRL_PANPOT);
+		int npan = mp->hwCtrlState(channel, CTRL_PANPOT);
+		if (npan == CTRL_VAL_UNKNOWN)
+		{
+			panVal = CTRL_VAL_UNKNOWN;
+			npan = mp->lastValidHWCtrlState(channel, CTRL_PANPOT);
+			if (npan != CTRL_VAL_UNKNOWN)
+			{
+				npan -= ctrl->bias();
+				if (double(npan) != m_pan->value())
+				{
+					m_pan->setValue(double(npan));
+				}
+			}
+		}
+		else
+		{
+			npan -= ctrl->bias();
+			if (npan != panVal)
+			{
+				m_pan->setValue(double(npan));
+				panVal = npan;
+			}
+		}
+	}
+	else
+	{
+		double v = ((AudioTrack*) m_track)->pan();
+		if (v != panVal)
+		{
+			m_pan->blockSignals(true);
+			m_pan->setValue(v);
+			m_pan->blockSignals(false);
+			panVal = v;
+			if(((AudioTrack*) m_track)->panFromAutomation())
+			{
+				midiMonitor->msgSendAudioOutputEvent((Track*)m_track, CTRL_PANPOT, v);
+			}
+		}
+	}
+}/*}}}*/
+
+void TrackHeader::panChanged(double val)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	if(m_track->isMidiTrack())
+	{
+		int ctrl = CTRL_PANPOT;
+		int ival =  lrint(val);
+		MidiTrack* t = (MidiTrack*) m_track;
+		int port = t->outPort();
+
+		int chan = t->outChannel();
+		MidiPort* mp = &midiPorts[port];
+		MidiController* mctl = mp->midiController(ctrl);
+		if ((ival < mctl->minVal()) || (ival > mctl->maxVal()))
+		{
+			if (mp->hwCtrlState(chan, ctrl) != CTRL_VAL_UNKNOWN)
+				audio->msgSetHwCtrlState(mp, chan, ctrl, CTRL_VAL_UNKNOWN);
+			panVal = 0.0;
+		}
+		else
+		{
+			val += mctl->bias();
+
+			int tick = song->cpos();
+
+			MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, ctrl, val);
+
+			audio->msgPlayMidiEvent(&ev);
+			midiMonitor->msgSendMidiOutputEvent(m_track, ctrl, val);
+			panVal = ival;
+		}
+		song->update(SC_MIDI_CONTROLLER);
+	}
+	else
+	{
+		AutomationType at = ((AudioTrack*) m_track)->automationType();
+		if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+			m_track->enablePanController(false);
+
+		panVal = val;
+		audio->msgSetPan(((AudioTrack*) m_track), val);
+		((AudioTrack*) m_track)->recordAutomation(AC_PAN, val);
+	}
+	QString span = QString::number(panVal);
+	span.append(tr(" Panorama"));
+
+	QPoint cursorPos = QCursor::pos();
+	QToolTip::showText(cursorPos, span, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
+}/*}}}*/
+
+void TrackHeader::panPressed()/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	if(m_track->isMidiTrack())
+	{
+	}
+	else
+	{
+		AutomationType at = ((AudioTrack*) m_track)->automationType();
+		if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
+			m_track->enablePanController(false);
+
+		panVal = m_pan->value();
+		audio->msgSetPan(((AudioTrack*) m_track), panVal);
+		((AudioTrack*) m_track)->startAutoRecord(AC_PAN, panVal);
+	}
+}/*}}}*/
+
+void TrackHeader::panReleased()/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	if(m_track->isMidiTrack())
+	{
+	}
+	else
+	{
+		if (m_track->automationType() != AUTO_WRITE)
+			m_track->enablePanController(true);
+		((AudioTrack*) m_track)->stopAutoRecord(AC_PAN, panVal);
+	}
+}/*}}}*/
+
+void TrackHeader::panRightClicked(const QPoint &p)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	if(m_track->isMidiTrack())
+	{
+	}
+	else
+		song->execAutomationCtlPopup((AudioTrack*) m_track, p, AC_PAN);
+}/*}}}*/
+
+
+//Private member functions
+
+bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
+{
+	if(!m_processEvents)
+		return true;
+	if (event->type() == QEvent::MouseButtonPress) {
+		QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
+		if(mEvent)
+		{
+			mousePressEvent(mEvent);
+			mode = NORMAL;
+		}
+	}
+
+	// standard event processing
+	return QObject::eventFilter(obj, event);
+
+}/*}}}*/
+
+void TrackHeader::initPan()/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	QString img(":images/knob_midi_new.png");
+	Track::TrackType type = m_track->type();
+	switch (type)
+	{
+		case Track::MIDI:
+		case Track::DRUM:
+			img = QString(":images/knob_audio_new.png");
+		break;
+		case Track::WAVE:
+			img = QString(":images/knob_input_new.png");
+		break;
+		case Track::AUDIO_OUTPUT:
+			img = QString(":images/knob_output_new.png");
+		break;
+		case Track::AUDIO_INPUT:
+			img = QString(":images/knob_midi_new.png");
+		break;
+		case Track::AUDIO_BUSS:
+			img = QString(":images/knob_buss_new.png");
+		break;
+		case Track::AUDIO_AUX:
+			img = QString(":images/knob_aux_new.png");
+		break;
+		case Track::AUDIO_SOFTSYNTH:
+			img = QString(":images/knob_audio_new.png");
+		break;
+	}
+	if(m_track->isMidiTrack())
+	{
+		int ctl = CTRL_PANPOT, mn, mx, v;
+		int chan = ((MidiTrack*) m_track)->outChannel();
+		MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
+		MidiController* mc = mp->midiController(ctl);
+		mn = mc->minVal();
+		mx = mc->maxVal();
+
+		m_pan = new Knob(this);
+		m_pan->setRange(double(mn), double(mx), 1.0);
+		m_pan->setId(ctl);
+		m_pan->setKnobImage(img);
+
+		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+		m_pan->setBackgroundRole(QPalette::Mid);
+		m_pan->setToolTip("Panorama");
+		m_pan->setEnabled(true);
+		//m_pan->setIgnoreWheel(true);
+
+		v = mp->hwCtrlState(chan, ctl);
+		if (v == CTRL_VAL_UNKNOWN)
+		{
+			int lastv = mp->lastValidHWCtrlState(chan, ctl);
+			if (lastv == CTRL_VAL_UNKNOWN)
+			{
+				if (mc->initVal() == CTRL_VAL_UNKNOWN)
+					v = 0;
+				else
+					v = mc->initVal();
+			}
+			else
+				v = lastv - mc->bias();
+		}
+		else
+		{
+			// Auto bias...
+			v -= mc->bias();
+		}
+
+		m_pan->setValue(double(v));
+
+		m_panLayout->insertWidget(0, m_pan);
+
+		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
+		//connect(m_pan, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
+	}
+	else
+	{
+		m_pan = new Knob(this);
+		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
+		m_pan->setRange(-1.0, +1.0);
+		m_pan->setToolTip(tr("Panorama"));
+		m_pan->setKnobImage(img);
+		//m_pan->setIgnoreWheel(true);
+		m_pan->setBackgroundRole(QPalette::Mid);
+		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+		m_panLayout->insertWidget(0, m_pan);
+		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
+		connect(m_pan, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
+		connect(m_pan, SIGNAL(sliderReleased(int)), SLOT(panReleased()));
+	}
+}/*}}}*/
+
+void TrackHeader::setupStyles()/*{{{*/
+{
+	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::WAVE, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("939393")));
+	
+	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("e18fff")));
+	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee")));
+	m_selectedStyle.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("fc7676")));
+	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("81f476")));
+	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("aabcc7")));
+	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276")));
+	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee")));
+}/*}}}*/
+
+//Protected events
+//We overwrite these from QWidget to implement our own functionality
+
 void TrackHeader::mousePressEvent(QMouseEvent* ev) //{{{
 {
 	if(!m_track || !m_processEvents)
@@ -1351,117 +1476,10 @@ void TrackHeader::mouseReleaseEvent(QMouseEvent*)/*{{{*/
 	resizeFlag = false;
 }/*}}}*/
 
-void TrackHeader::panChanged(double val)/*{{{*/
+void TrackHeader::resizeEvent(QResizeEvent* event)
 {
-	if(!m_track || !m_processEvents)
-		return;
-	if(m_track->isMidiTrack())
-	{
-		int ctrl = CTRL_PANPOT;
-		int ival =  lrint(val);
-		MidiTrack* t = (MidiTrack*) m_track;
-		int port = t->outPort();
-
-		int chan = t->outChannel();
-		MidiPort* mp = &midiPorts[port];
-		MidiController* mctl = mp->midiController(ctrl);
-		if ((ival < mctl->minVal()) || (ival > mctl->maxVal()))
-		{
-			if (mp->hwCtrlState(chan, ctrl) != CTRL_VAL_UNKNOWN)
-				audio->msgSetHwCtrlState(mp, chan, ctrl, CTRL_VAL_UNKNOWN);
-			panVal = 0.0;
-		}
-		else
-		{
-			val += mctl->bias();
-
-			int tick = song->cpos();
-
-			MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, ctrl, val);
-
-			audio->msgPlayMidiEvent(&ev);
-			midiMonitor->msgSendMidiOutputEvent(m_track, ctrl, val);
-			panVal = ival;
-		}
-		song->update(SC_MIDI_CONTROLLER);
-	}
-	else
-	{
-		AutomationType at = ((AudioTrack*) m_track)->automationType();
-		if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-			m_track->enablePanController(false);
-
-		panVal = val;
-		audio->msgSetPan(((AudioTrack*) m_track), val);
-		((AudioTrack*) m_track)->recordAutomation(AC_PAN, val);
-	}
-	QString span = QString::number(panVal);
-	span.append(tr(" Panorama"));
-
-	QPoint cursorPos = QCursor::pos();
-	QToolTip::showText(cursorPos, span, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
-}/*}}}*/
-
-void TrackHeader::panPressed()/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	if(m_track->isMidiTrack())
-	{
-	}
-	else
-	{
-		AutomationType at = ((AudioTrack*) m_track)->automationType();
-		if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-			m_track->enablePanController(false);
-
-		panVal = m_pan->value();
-		audio->msgSetPan(((AudioTrack*) m_track), panVal);
-		((AudioTrack*) m_track)->startAutoRecord(AC_PAN, panVal);
-	}
-}/*}}}*/
-
-void TrackHeader::panReleased()/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	if(m_track->isMidiTrack())
-	{
-	}
-	else
-	{
-		if (m_track->automationType() != AUTO_WRITE)
-			m_track->enablePanController(true);
-		((AudioTrack*) m_track)->stopAutoRecord(AC_PAN, panVal);
-	}
-}/*}}}*/
-
-void TrackHeader::panRightClicked(const QPoint &p)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	if(m_track->isMidiTrack())
-	{
-	}
-	else
-		song->execAutomationCtlPopup((AudioTrack*) m_track, p, AC_PAN);
-}/*}}}*/
-
-bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
-{
-	if(!m_processEvents)
-		return true;
-	if (event->type() == QEvent::MouseButtonPress) {
-		QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
-		if(mEvent)
-		{
-			mousePressEvent(mEvent);
-			mode = NORMAL;
-		}
-	}
-
-	// standard event processing
-	return QObject::eventFilter(obj, event);
-
-}/*}}}*/
+	//We will trap this to disappear widgets like vu's and volume slider
+	//on the track header. For now we'll just pass it up the chain
+	QFrame::resizeEvent(event);
+}
 

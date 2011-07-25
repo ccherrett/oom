@@ -40,7 +40,6 @@ QT4_WRAP_CPP (widget_mocs
       filedialog.h  
       gatetime.h  
       genset.h  
-      header.h  
       hitscale.h  
       intlabel.h  
       knob.h  
@@ -178,7 +177,6 @@ file (GLOB widgets_source_files
       filedialog.cpp 
       gatetime.cpp 
       genset.cpp 
-      header.cpp 
       hitscale.cpp 
       intlabel.cpp 
       knob.cpp 

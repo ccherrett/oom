@@ -16,6 +16,7 @@ class Knob;
 class QAction;
 class QSize;
 class QMouseEvent;
+class QResizeEvent;
 class QPoint;
 
 class TrackHeader : public QFrame, public Ui::TrackHeaderBase
@@ -53,7 +54,6 @@ private slots:
 	void toggleReminder1(bool);
 	void toggleReminder2(bool);
 	void toggleReminder3(bool);
-	void setSelected(bool);
 	void updateTrackName();
 	void generatePopupMenu();
 	void panChanged(double);
@@ -71,6 +71,7 @@ public slots:
 	void songChanged(int);
 	void stopProcessing();
 	void startProcessing();
+	void setSelected(bool);
 
 protected:
     enum
@@ -81,6 +82,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent*);
     virtual void mouseMoveEvent(QMouseEvent*);
     virtual void mouseReleaseEvent(QMouseEvent*);
+	virtual void resizeEvent(QResizeEvent*);
 
 public:
 	TrackHeader(Track* track, QWidget* parent = 0);
