@@ -60,6 +60,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_buttonHBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	m_panBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	initPan();
+	m_trackName->installEventFilter(this);
 
 	setMouseTracking(true);
 	if(m_track)/*{{{*/
@@ -1442,3 +1443,24 @@ void TrackHeader::panRightClicked(const QPoint &p)/*{{{*/
 	else
 		song->execAutomationCtlPopup((AudioTrack*) m_track, p, AC_PAN);
 }/*}}}*/
+
+bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
+{
+	// Force left/right arrow key events to move the focus
+	// back on the canvas if it doesn't have the focus.
+	// Currently the object that we're filtering is the
+	// midiTrackInfo.
+	if (event->type() == QEvent::MouseButtonPress) {
+		QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
+		if(mEvent)
+		{
+			mousePressEvent(mEvent);
+			mode = NORMAL;
+		}
+	}
+
+	// standard event processing
+	return QObject::eventFilter(obj, event);
+
+}/*}}}*/
+
