@@ -329,6 +329,7 @@
 		<file>images/icons/mixer_mono_new_on.png</file>
 		<file>images/icons/mixer_stereo_new_on.png</file>
 		<file>images/icons/mixer_blank_new_off.png</file>
+		<file>images/slider_thumb_new.png</file>
 	</qresource>
 </RCC>
 

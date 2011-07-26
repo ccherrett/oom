@@ -433,6 +433,7 @@ extern QIcon* mixer_powerIconSet3;
 extern QIcon* mixer_recordIconSet3;
 extern QIcon* mixer_muteIconSet3;
 extern QIcon* mixer_soloIconSet3;
+extern QIcon* mixer_stereoIconSet3;
 
 extern QPixmap* mixer_record_OnIcon;
 extern QPixmap* mixer_record_OffIcon;
@@ -453,6 +454,8 @@ extern QPixmap* mixer_power_OnIcon;
 extern QPixmap* mixer_power_OffIcon;
 extern QPixmap* mixer_power_OverIcon;
 extern QPixmap* mixer_blank_OffIcon;
+extern QPixmap* mixer_stereo_OnIcon;
+extern QPixmap* mixer_mono_OnIcon;
 
 extern QIcon* record_trackIconSet3;
 extern QIcon* mute_trackIconSet3;

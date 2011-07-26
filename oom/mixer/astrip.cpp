@@ -89,18 +89,10 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	//    mono/stereo  pre/post
 	//---------------------------------------------------
 
-	//m_btnStereo->setFont(config.fonts[1]);
-	QIcon stereoSet;
-	stereoSet.addPixmap(*monoIcon, QIcon::Normal, QIcon::Off);
-	stereoSet.addPixmap(*stereoIcon, QIcon::Normal, QIcon::On);
-	m_btnStereo->setIcon(stereoSet);
-	m_btnStereo->setIconSize(monoIcon->size());
-
 	m_btnStereo->setCheckable(true);
 	m_btnStereo->setObjectName("btnStereo");
 	m_btnStereo->setToolTip(tr("1/2 channel"));
 	m_btnStereo->setChecked(channel == 2);
-	//m_btnStereo->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	connect(m_btnStereo, SIGNAL(clicked(bool)), SLOT(stereoToggled(bool)));
 
 	// disable mono/stereo for Synthesizer-Plugins
@@ -218,13 +210,6 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	if (track->canRecord())
 	{
 		m_btnRecord->setCheckable(true);
-		m_btnRecord->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-		m_btnRecord->setBackgroundRole(QPalette::Mid);
-		QIcon iconSet;
-		iconSet.addPixmap(*record_on_Icon, QIcon::Normal, QIcon::On);
-		iconSet.addPixmap(*record_off_Icon, QIcon::Normal, QIcon::Off);
-		m_btnRecord->setIcon(iconSet);
-		m_btnRecord->setIconSize(record_on_Icon->size());
 		m_btnRecord->setToolTip(tr("record"));
 		m_btnRecord->setObjectName("btnRecord");
 		m_btnRecord->setChecked(t->recordFlag());
@@ -233,33 +218,19 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	else
 	{
 		m_btnRecord->setCheckable(false);
-		m_btnRecord->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-		m_btnRecord->setBackgroundRole(QPalette::Mid);
-		QIcon iconSet;
-		iconSet.addPixmap(*blankRecord, QIcon::Normal, QIcon::On);
-		m_btnRecord->setIcon(iconSet);
+		m_btnRecord->setIcon(QIcon(*mixer_blank_OffIcon));
 		m_btnRecord->setObjectName("btnRecord");
-		m_btnRecord->setIconSize(record_on_Icon->size());
 	}
-
-	//Fix toggle icon
-	m_btnAux->setIconSize(record_on_Icon->size());
 	
 	Track::TrackType type = t->type();
 
-	/*QIcon muteSet;
-	muteSet.addPixmap(*muteIconOn, QIcon::Normal, QIcon::Off);
-	muteSet.addPixmap(*muteIconOff, QIcon::Normal, QIcon::On);*/
-	m_btnMute->setIcon(*muteIconSet4);
-	m_btnMute->setIconSize(monoIcon->size());
 	m_btnMute->setCheckable(true);
 	m_btnMute->setToolTip(tr("mute"));
 	m_btnMute->setObjectName("btnMute");
 	m_btnMute->setChecked(t->mute());
-	m_btnMute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	connect(m_btnMute, SIGNAL(clicked(bool)), SLOT(muteToggled(bool)));
 
-	if ((bool)t->internalSolo())
+	/*if ((bool)t->internalSolo())
 	{
 		m_btnSolo->setIcon(*soloIconSet2);
 		m_btnSolo->setIconSize(soloIconOn->size());
@@ -270,17 +241,15 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 		m_btnSolo->setIcon(*soloIconSet1);
 		m_btnSolo->setIconSize(soloblksqIconOn->size());
 		useSoloIconSet2 = false;
-	}
+	}*/
 
 	m_btnSolo->setCheckable(true);
 	m_btnSolo->setChecked(t->solo());
 	m_btnSolo->setObjectName("btnSolo");
-	m_btnSolo->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	connect(m_btnSolo, SIGNAL(clicked(bool)), SLOT(soloToggled(bool)));
 	if (type == Track::AUDIO_OUTPUT)
 	{
 		m_btnRecord->setToolTip(tr("record downmix"));
-		//m_btnSolo->setToolTip(tr("solo mode (monitor)"));
 		m_btnSolo->setToolTip(tr("solo mode"));
 	}
 	else
@@ -289,14 +258,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 		m_btnSolo->setToolTip(tr("solo mode"));
 	}
 
-	QIcon iconSet;
-	iconSet.addPixmap(*exit1Icon, QIcon::Normal, QIcon::On);
-	iconSet.addPixmap(*exitIcon, QIcon::Normal, QIcon::Off);
-	m_btnPower->setIcon(iconSet);
 	m_btnPower->setObjectName("btnExit");
-	m_btnPower->setIconSize(exit1Icon->size());
-	m_btnPower->setBackgroundRole(QPalette::Mid);
-	m_btnPower->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	m_btnPower->setCheckable(true);
 	m_btnPower->setToolTip(tr("off"));
 	m_btnPower->setChecked(t->off());
@@ -308,27 +270,19 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 
 	if (hasIRoute)
 	{
-		m_btnIRoute->setFont(config.fonts[1]);
-		m_btnIRoute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-		//m_btnIRoute->setText(tr("iR"));
-		m_btnIRoute->setIcon(*mixerIn);
 		m_btnIRoute->setObjectName("btnIns");
-		m_btnIRoute->setIconSize(mixerIn->size());
 		m_btnIRoute->setCheckable(false);
 		m_btnIRoute->setToolTip(tr("input routing"));
 		connect(m_btnIRoute, SIGNAL(pressed()), SLOT(iRoutePressed()));
 	}
 	else
 	{
-		m_btnIRoute->setVisible(false);
+		//m_btnIRoute->setEnabled(false);
+		m_btnIRoute->setIcon(QIcon(*mixer_blank_OffIcon));
+		m_btnIRoute->setToolTip("");
 	}
 
-	m_btnORoute->setFont(config.fonts[1]);
-	m_btnORoute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	//m_btnORoute->setText(tr("oR"));
-	m_btnORoute->setIcon(*mixerOut);
 	m_btnORoute->setObjectName("btnOuts");
-	m_btnORoute->setIconSize(mixerOut->size());
 	m_btnORoute->setCheckable(false);
 	m_btnORoute->setToolTip(tr("output routing"));
 	connect(m_btnORoute, SIGNAL(pressed()), SLOT(oRoutePressed()));
@@ -479,7 +433,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 	}
 	if (m_btnSolo && (val & SC_SOLO))
 	{
-		if ((bool)track->internalSolo())
+		/*if ((bool)track->internalSolo())
 		{
 			if (!useSoloIconSet2)
 			{
@@ -493,7 +447,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 			m_btnSolo->setIcon(*soloIconSet1);
 			m_btnSolo->setIconSize(soloblksqIconOn->size());
 			useSoloIconSet2 = false;
-		}
+		}*/
 
 		m_btnSolo->blockSignals(true);
 		m_btnSolo->setChecked(track->solo());
@@ -504,9 +458,7 @@ void AudioStrip::songChanged(int val)/*{{{*/
 	if (val & SC_TRACK_MODIFIED)
 	{
 		setLabelText();
-		// Added by Tim. p3.3.9
 		setLabelFont();
-
 	}
 	if (val & SC_ROUTE)
 	{
