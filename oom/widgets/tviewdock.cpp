@@ -106,11 +106,12 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 			QStandardItem *chk = new QStandardItem(true);
 			chk->setCheckable(true);
 			chk->setCheckState((*ait)->selected() ? Qt::Checked : Qt::Unchecked);
-			if((*ait)->viewName() != "Working View" && (*ait)->viewName() != "Comment View")
-				chk->setForeground(QBrush(g_trackColorList.value(list.at(index))));
 			QStandardItem *tname = new QStandardItem((*ait)->viewName());
 			if((*ait)->viewName() != "Working View" && (*ait)->viewName() != "Comment View")
-				tname->setForeground(QBrush(g_trackColorList.value(list.at(index))));
+			{
+				chk->setForeground(QBrush(QColor(g_trackColorList.value(list.at(index)))));
+				tname->setForeground(QBrush(QColor(g_trackColorList.value(list.at(index)))));
+			}
 			rowData2.append(chk);
 			rowData2.append(tname);
 			_autoTableModel->blockSignals(true);

@@ -6,6 +6,7 @@
 
 #include <QtGui>
 #include "mixerview.h"
+#include "globals.h"
 #include "song.h"
 
 
@@ -58,7 +59,10 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 			tableView->setRowHeight(_tableModel->rowCount(), 25);
 		}
 		_autoTableModel->clear();
-		for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++ait)
+		int index = 0;
+		QList<int> list;
+		list << Track::MIDI << Track::AUDIO_INPUT << Track::AUDIO_OUTPUT << Track::AUDIO_BUSS << Track::AUDIO_AUX << Track::WAVE;
+		for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++index,++ait)
 		{
 			QList<QStandardItem*> rowData2;
 			QStandardItem *chk = new QStandardItem(true);
@@ -75,6 +79,11 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 			}
 			//chk->setCheckState((*ait)->selected() ? Qt::Checked : Qt::Unchecked);
 			QStandardItem *tname = new QStandardItem((*ait)->viewName());
+			if((*ait)->viewName() != "Working View" && (*ait)->viewName() != "Comment View")
+			{
+				chk->setForeground(QBrush(QColor(g_trackColorList.value(list.at(index)))));
+				tname->setForeground(QBrush(QColor(g_trackColorList.value(list.at(index)))));
+			}
 			rowData2.append(chk);
 			rowData2.append(tname);
 			_autoTableModel->blockSignals(true);
