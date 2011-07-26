@@ -94,44 +94,20 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 		}
 	}/*}}}*/
 	setAcceptDrops(false);
-	QIcon solo;
-    solo.addPixmap(*arranger_solo_on_Icon, QIcon::Normal, QIcon::On);
-    solo.addPixmap(*arranger_solo_off_Icon, QIcon::Normal, QIcon::Off);
-	QIcon record;
-    record.addPixmap(*arranger_record_on_Icon, QIcon::Normal, QIcon::On);
-    record.addPixmap(*arranger_record_off_Icon, QIcon::Normal, QIcon::Off);
-	QIcon mute;
-    mute.addPixmap(*arranger_mute_on_Icon, QIcon::Normal, QIcon::On);
-    mute.addPixmap(*arranger_mute_off_Icon, QIcon::Normal, QIcon::Off);
-	QIcon automate;
-    automate.addPixmap(*automationIcon, QIcon::Normal, QIcon::On);
-    automate.addPixmap(*automationIcon, QIcon::Normal, QIcon::Off);
-	QIcon automate2;
-    automate2.addPixmap(*redLedIcon, QIcon::Normal, QIcon::On);
-    automate2.addPixmap(*darkRedLedIcon, QIcon::Normal, QIcon::Off);
-	QIcon remind1;
-    remind1.addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
-    remind1.addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
-	QIcon remind2;
-    remind2.addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
-    remind2.addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
-	QIcon remind3;
-    remind3.addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
-    remind3.addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
 	m_trackName->setAcceptDrops(false);
 	m_btnSolo->setAcceptDrops(false);
-	m_btnSolo->setIcon(solo);
+	m_btnSolo->setIcon(*solo_trackIconSet3);
 	m_btnRecord->setAcceptDrops(false);
-	m_btnRecord->setIcon(record);
+	m_btnRecord->setIcon(*record_trackIconSet3);
 	m_btnMute->setAcceptDrops(false);
-	m_btnMute->setIcon(mute);
+	m_btnMute->setIcon(*mute_trackIconSet3);
 	m_btnAutomation->setAcceptDrops(false);
 	m_btnReminder1->setAcceptDrops(false);
 	m_btnReminder2->setAcceptDrops(false);
 	m_btnReminder3->setAcceptDrops(false);
-	m_btnReminder1->setIcon(remind1);
-	m_btnReminder2->setIcon(remind2);
-	m_btnReminder3->setIcon(remind3);
+	m_btnReminder1->setIcon(*reminder1IconSet3);
+	m_btnReminder2->setIcon(*reminder2IconSet3);
+	m_btnReminder3->setIcon(*reminder3IconSet3);
 	m_pan->setAcceptDrops(false);
 	if(m_track)
 	{
@@ -146,9 +122,9 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 			setFixedHeight(m_track->height());
 		}
 		if(m_track->isMidiTrack())
-			m_btnAutomation->setIcon(automate2);
+			m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 		else
-			m_btnAutomation->setIcon(automate);
+			m_btnAutomation->setIcon(*automation_trackIconSet3);
 	}
 	songChanged(-1);
 	connect(m_trackName, SIGNAL(editingFinished()), this, SLOT(updateTrackName()));
@@ -324,7 +300,7 @@ void TrackHeader::heartBeat()/*{{{*/
 				if (!m_midiDetect)
 				{
 					m_midiDetect = true;
-					m_btnAutomation->setIcon(QIcon(*redLedIcon));
+					m_btnAutomation->setIcon(QIcon(*input_indicator_OnIcon));
 				}
 				break;
 			}
@@ -335,7 +311,7 @@ void TrackHeader::heartBeat()/*{{{*/
 			if (m_midiDetect)
 			{
 				m_midiDetect = false;
-				m_btnAutomation->setIcon(QIcon(*darkRedLedIcon));
+				m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 			}
 		}
 	}
