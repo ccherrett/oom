@@ -355,225 +355,6 @@ void TrackHeader::heartBeat()/*{{{*/
 	inHeartBeat = false;
 }/*}}}*/
 
-void TrackHeader::generateAutomationMenu()/*{{{*/
-{
-	if(!m_track || m_track->isMidiTrack() || !m_processEvents)
-		return;
-	QMenu* p = new QMenu(this);
-	p->disconnect();
-	p->clear();
-	p->setTitle(tr("Viewable automation"));
-	CtrlListList* cll = ((AudioTrack*) m_track)->controller();
-	QAction* act = 0;
-	for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
-	{
-		CtrlList *cl = icll->second;
-		if (cl->dontShow())
-			continue;
-		QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
-		act = p->addAction(name);
-		act->setCheckable(true);
-		act->setChecked(cl->isVisible());
-		act->setData(cl->id());
-	}
-	//connect(p, SIGNAL(triggered(QAction*)), SLOT(changeAutomation(QAction*)));
-	
-	QAction* act1 = p->exec(QCursor::pos());
-
-	if(act1)
-	{
-		int id = act1->data().toInt();
-
-		CtrlListList* cll = ((AudioTrack*)m_track)->controller();
-		for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
-		{
-			CtrlList *cl = icll->second;
-			if (id == cl->id()) 
-			{
-				cl->setVisible(!cl->isVisible());
-				if(cl->id() == AC_PAN)
-				{
-					AutomationType at = ((AudioTrack*) m_track)->automationType();
-					if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-						((AudioTrack*) m_track)->enablePanController(false);
-				
-					double panVal = ((AudioTrack*) m_track)->pan();
-					audio->msgSetPan(((AudioTrack*) m_track), panVal);
-					((AudioTrack*) m_track)->startAutoRecord(AC_PAN, panVal);
-
-					if (((AudioTrack*) m_track)->automationType() != AUTO_WRITE)
-						((AudioTrack*) m_track)->enablePanController(true);
-					((AudioTrack*) m_track)->stopAutoRecord(AC_PAN, panVal);
-				}
-			}
-		}
-		song->update(SC_TRACK_MODIFIED);
-	}
-
-	delete p;
-}/*}}}*/
-
-void TrackHeader::toggleRecord(bool state)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	if (!m_track->isMidiTrack())
-	{
-		if (m_track->type() == Track::AUDIO_OUTPUT)
-		{
-			if (state && !m_track->recordFlag())
-			{
-				oom->bounceToFile((AudioOutput*) m_track);
-			}
-			audio->msgSetRecord((AudioOutput*) m_track, state);
-			if (!((AudioOutput*) m_track)->recFile())
-			{
-				state = false;
-			}
-			else
-			{
-				m_btnRecord->blockSignals(true);
-				m_btnRecord->setChecked(state);
-				m_btnRecord->blockSignals(false);
-				return;
-			}
-		}
-		m_btnRecord->blockSignals(true);
-		m_btnRecord->setChecked(state);
-		m_btnRecord->blockSignals(false);
-		song->setRecordFlag(m_track, state);
-	}
-	else
-	{
-		m_btnRecord->blockSignals(true);
-		m_btnRecord->setChecked(state);
-		m_btnRecord->blockSignals(false);
-		song->setRecordFlag(m_track, state);
-	}
-	/*
-	else if (button == Qt::RightButton)
-	{
-		// enable or disable ALL tracks of this type
-		if (!m_track->isMidiTrack() && valid)
-		{
-			if (m_track->type() == Track::AUDIO_OUTPUT)
-			{
-				return;
-			}
-			WaveTrackList* wtl = song->waves();
-
-			foreach(WaveTrack *wt, *wtl)
-			{
-				song->setRecordFlag(wt, val);
-			}
-		}
-		else if(valid)
-		{
-			MidiTrackList* mtl = song->midis();
-
-			foreach(MidiTrack *mt, *mtl)
-			{
-				song->setRecordFlag(mt, val);
-			}
-		}
-		else
-		{
-			updateSelection(m_track, shift);
-		}
-	}
-	*/
-}/*}}}*/
-
-void TrackHeader::toggleMute(bool state)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	m_track->setMute(state);
-	m_btnMute->blockSignals(true);
-	m_btnMute->setChecked(state);
-	m_btnMute->blockSignals(false);
-	song->update(SC_MUTE);
-}/*}}}*/
-
-void TrackHeader::toggleSolo(bool state)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	audio->msgSetSolo(m_track, state);
-	m_btnSolo->blockSignals(true);
-	m_btnSolo->setChecked(state);
-	m_btnSolo->blockSignals(false);
-	song->update(SC_SOLO);
-}/*}}}*/
-
-void TrackHeader::toggleOffState(bool state)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	m_track->setOff(state);
-}/*}}}*/
-
-void TrackHeader::toggleReminder1(bool state)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	m_track->setReminder1(state);
-}/*}}}*/
-
-void TrackHeader::toggleReminder2(bool state)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	m_track->setReminder2(state);
-}/*}}}*/
-
-void TrackHeader::toggleReminder3(bool state)/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	m_track->setReminder3(state);
-}/*}}}*/
-
-void TrackHeader::updateTrackName()/*{{{*/
-{
-	if(!m_track || !m_processEvents)
-		return;
-	QString name = m_trackName->text();
-	if(name.isEmpty())
-	{
-		m_trackName->blockSignals(true);
-		m_trackName->setText(m_track->name());
-		m_trackName->blockSignals(false);
-		setEditing(false);
-		return;
-	}
-	if (name != m_track->name())
-	{
-		TrackList* tl = song->tracks();
-		for (iTrack i = tl->begin(); i != tl->end(); ++i)
-		{
-			if ((*i)->name() == name)
-			{
-				QMessageBox::critical(this,
-						tr("OOMidi: bad trackname"),
-						tr("please choose a unique track name"),
-						QMessageBox::Ok,
-						Qt::NoButton,
-						Qt::NoButton);
-				m_trackName->blockSignals(true);
-				m_trackName->setText(m_track->name());
-				m_trackName->blockSignals(false);
-				setEditing(false);
-				return;
-			}
-		}
-		Track* track = m_track->clone(false);
-		m_track->setName(name);
-		audio->msgChangeTrack(track, m_track);
-	}
-	setEditing(false);
-}/*}}}*/
-
 void TrackHeader::generatePopupMenu()/*{{{*/
 {
 	if(!m_track || !m_processEvents)
@@ -586,7 +367,8 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	}
 
 	QMenu* p = new QMenu;
-	QMenu* colorPopup = p->addMenu(tr("Default Part Color"));
+	//Part Color menu
+	QMenu* colorPopup = p->addMenu(tr("Default Part Color"));/*{{{*/
 
 	QMenu* colorSub;
 	for (int i = 0; i < NUM_PARTCOLORS; ++i)
@@ -615,13 +397,30 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 				act_color->setData(20 + i);
 			}
 		}
-	}
+	}/*}}}*/
 	if(m_track && m_track->type() == Track::WAVE)
 		p->addAction(tr("Import Audio File"))->setData(1);
-	if (!multipleSelectedTracks)
+	/*if (!multipleSelectedTracks)
 	{
 		p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
-	}
+	}*/
+
+	//Add Track menu
+	QMenu* trackMenu = p->addMenu(tr("Add Track"));
+	QAction* midi = trackMenu->addAction(*addtrack_addmiditrackIcon, tr("Midi Track"));
+	midi->setData(Track::MIDI+10000);
+	QAction* wave = trackMenu->addAction(*addtrack_wavetrackIcon, tr("Audio Track"));
+	wave->setData(Track::WAVE+10000);
+	QAction* aoutput = trackMenu->addAction(*addtrack_audiooutputIcon, tr("Output"));
+	aoutput->setData(Track::AUDIO_OUTPUT+10000);
+	QAction* ainput = trackMenu->addAction(*addtrack_audioinputIcon, tr("Input"));
+	ainput->setData(Track::AUDIO_INPUT+10000);
+	QAction* agroup = trackMenu->addAction(*addtrack_audiogroupIcon, tr("Buss"));
+	agroup->setData(Track::AUDIO_BUSS+10000);
+	QAction* aaux = trackMenu->addAction(*addtrack_auxsendIcon, tr("Aux Send"));
+	aaux->setData(Track::AUDIO_AUX+10000);
+
+
 	p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 	
 
@@ -667,7 +466,6 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 
 		QAction* mact = p->addAction(tr("Show Gui"));
 		mact->setCheckable(true);
-		//printf("synth hasgui %d, gui visible %d\n",port->hasGui(), port->guiVisible());
 		mact->setEnabled(port->hasGui());
 		mact->setChecked(port->guiVisible());
 		mact->setData(3);
@@ -970,6 +768,23 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 				m_track->setDefaultPartColor(curColorIndex);
 				break;
 			}
+			case Track::MIDI+10000 ... Track::AUDIO_AUX+10000:
+			{
+				Track* t = song->addTrack((Track::TrackType)n-10000);
+
+				if (t)
+				{
+					midiMonitor->msgAddMonitoredTrack(t);
+					song->deselectTracks();
+					t->setSelected(true);
+
+					emit selectionChanged(t);
+					emit trackInserted(n-10000);
+
+					song->updateTrackViews1();
+				}
+				break;
+			}
 			default:
 				printf("action %d\n", n);
 			break;
@@ -977,6 +792,225 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	}
 	delete trackHeightsMenu;
 	delete p;
+}/*}}}*/
+
+void TrackHeader::generateAutomationMenu()/*{{{*/
+{
+	if(!m_track || m_track->isMidiTrack() || !m_processEvents)
+		return;
+	QMenu* p = new QMenu(this);
+	p->disconnect();
+	p->clear();
+	p->setTitle(tr("Viewable automation"));
+	CtrlListList* cll = ((AudioTrack*) m_track)->controller();
+	QAction* act = 0;
+	for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+	{
+		CtrlList *cl = icll->second;
+		if (cl->dontShow())
+			continue;
+		QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
+		act = p->addAction(name);
+		act->setCheckable(true);
+		act->setChecked(cl->isVisible());
+		act->setData(cl->id());
+	}
+	//connect(p, SIGNAL(triggered(QAction*)), SLOT(changeAutomation(QAction*)));
+	
+	QAction* act1 = p->exec(QCursor::pos());
+
+	if(act1)
+	{
+		int id = act1->data().toInt();
+
+		CtrlListList* cll = ((AudioTrack*)m_track)->controller();
+		for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+		{
+			CtrlList *cl = icll->second;
+			if (id == cl->id()) 
+			{
+				cl->setVisible(!cl->isVisible());
+				if(cl->id() == AC_PAN)
+				{
+					AutomationType at = ((AudioTrack*) m_track)->automationType();
+					if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
+						((AudioTrack*) m_track)->enablePanController(false);
+				
+					double panVal = ((AudioTrack*) m_track)->pan();
+					audio->msgSetPan(((AudioTrack*) m_track), panVal);
+					((AudioTrack*) m_track)->startAutoRecord(AC_PAN, panVal);
+
+					if (((AudioTrack*) m_track)->automationType() != AUTO_WRITE)
+						((AudioTrack*) m_track)->enablePanController(true);
+					((AudioTrack*) m_track)->stopAutoRecord(AC_PAN, panVal);
+				}
+			}
+		}
+		song->update(SC_TRACK_MODIFIED);
+	}
+
+	delete p;
+}/*}}}*/
+
+void TrackHeader::toggleRecord(bool state)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	if (!m_track->isMidiTrack())
+	{
+		if (m_track->type() == Track::AUDIO_OUTPUT)
+		{
+			if (state && !m_track->recordFlag())
+			{
+				oom->bounceToFile((AudioOutput*) m_track);
+			}
+			audio->msgSetRecord((AudioOutput*) m_track, state);
+			if (!((AudioOutput*) m_track)->recFile())
+			{
+				state = false;
+			}
+			else
+			{
+				m_btnRecord->blockSignals(true);
+				m_btnRecord->setChecked(state);
+				m_btnRecord->blockSignals(false);
+				return;
+			}
+		}
+		m_btnRecord->blockSignals(true);
+		m_btnRecord->setChecked(state);
+		m_btnRecord->blockSignals(false);
+		song->setRecordFlag(m_track, state);
+	}
+	else
+	{
+		m_btnRecord->blockSignals(true);
+		m_btnRecord->setChecked(state);
+		m_btnRecord->blockSignals(false);
+		song->setRecordFlag(m_track, state);
+	}
+	/*
+	else if (button == Qt::RightButton)
+	{
+		// enable or disable ALL tracks of this type
+		if (!m_track->isMidiTrack() && valid)
+		{
+			if (m_track->type() == Track::AUDIO_OUTPUT)
+			{
+				return;
+			}
+			WaveTrackList* wtl = song->waves();
+
+			foreach(WaveTrack *wt, *wtl)
+			{
+				song->setRecordFlag(wt, val);
+			}
+		}
+		else if(valid)
+		{
+			MidiTrackList* mtl = song->midis();
+
+			foreach(MidiTrack *mt, *mtl)
+			{
+				song->setRecordFlag(mt, val);
+			}
+		}
+		else
+		{
+			updateSelection(m_track, shift);
+		}
+	}
+	*/
+}/*}}}*/
+
+void TrackHeader::toggleMute(bool state)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	m_track->setMute(state);
+	m_btnMute->blockSignals(true);
+	m_btnMute->setChecked(state);
+	m_btnMute->blockSignals(false);
+	song->update(SC_MUTE);
+}/*}}}*/
+
+void TrackHeader::toggleSolo(bool state)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	audio->msgSetSolo(m_track, state);
+	m_btnSolo->blockSignals(true);
+	m_btnSolo->setChecked(state);
+	m_btnSolo->blockSignals(false);
+	song->update(SC_SOLO);
+}/*}}}*/
+
+void TrackHeader::toggleOffState(bool state)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	m_track->setOff(state);
+}/*}}}*/
+
+void TrackHeader::toggleReminder1(bool state)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	m_track->setReminder1(state);
+}/*}}}*/
+
+void TrackHeader::toggleReminder2(bool state)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	m_track->setReminder2(state);
+}/*}}}*/
+
+void TrackHeader::toggleReminder3(bool state)/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	m_track->setReminder3(state);
+}/*}}}*/
+
+void TrackHeader::updateTrackName()/*{{{*/
+{
+	if(!m_track || !m_processEvents)
+		return;
+	QString name = m_trackName->text();
+	if(name.isEmpty())
+	{
+		m_trackName->blockSignals(true);
+		m_trackName->setText(m_track->name());
+		m_trackName->blockSignals(false);
+		setEditing(false);
+		return;
+	}
+	if (name != m_track->name())
+	{
+		TrackList* tl = song->tracks();
+		for (iTrack i = tl->begin(); i != tl->end(); ++i)
+		{
+			if ((*i)->name() == name)
+			{
+				QMessageBox::critical(this,
+						tr("OOMidi: bad trackname"),
+						tr("please choose a unique track name"),
+						QMessageBox::Ok,
+						Qt::NoButton,
+						Qt::NoButton);
+				m_trackName->blockSignals(true);
+				m_trackName->setText(m_track->name());
+				m_trackName->blockSignals(false);
+				setEditing(false);
+				return;
+			}
+		}
+		Track* track = m_track->clone(false);
+		m_track->setName(name);
+		audio->msgChangeTrack(track, m_track);
+	}
+	setEditing(false);
 }/*}}}*/
 
 void TrackHeader::updateVolume()/*{{{*/
@@ -1200,7 +1234,7 @@ bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 		return true;
 	if (event->type() == QEvent::MouseButtonPress) {
 		QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
-		if(mEvent)
+		if(mEvent && mEvent->button() == Qt::LeftButton)
 		{
 			mousePressEvent(mEvent);
 			mode = NORMAL;
@@ -1354,7 +1388,7 @@ void TrackHeader::mousePressEvent(QMouseEvent* ev) //{{{
 					song->deselectAllParts();
 				setSelected(true);
 
-				// rec enable track if expected
+				//record enable track if expected
 				int recd = 0;
 				TrackList* tracks = song->visibletracks();
 				Track* recTrack = 0;
@@ -1368,7 +1402,8 @@ void TrackHeader::mousePressEvent(QMouseEvent* ev) //{{{
 					}
 				}
 				if (recd == 1 && config.moveArmedCheckBox)
-				{ // one rec enabled track, move rec enabled with selection
+				{ 
+					//one rec enabled track, move rec enabled with selection
 					song->setRecordFlag(recTrack, false);
 					song->setRecordFlag(m_track, true);
 				}

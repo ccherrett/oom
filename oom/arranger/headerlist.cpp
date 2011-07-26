@@ -107,6 +107,8 @@ void HeaderList::updateTrackList()/*{{{*/
 		header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 		header->setFixedHeight(track->height());
 		connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
+		connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
+		connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
 		m_headers.append(header);
 		m_layout->insertWidget(index, header);
 	}

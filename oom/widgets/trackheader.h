@@ -84,6 +84,10 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent*);
 	virtual void resizeEvent(QResizeEvent*);
 
+signals:
+    void selectionChanged(Track*);
+	void trackInserted(int);
+
 public:
 	TrackHeader(Track* track, QWidget* parent = 0);
 	virtual ~TrackHeader();
