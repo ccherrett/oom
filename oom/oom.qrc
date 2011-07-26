@@ -309,6 +309,26 @@
 		<file>images/icons/automation_track_new_over.png</file>
 		<file>images/icons/automation_track_new_off.png</file>
 
+		<file>images/icons/mixer_record_new_on.png</file>
+		<file>images/icons/mixer_record_new_over.png</file>
+		<file>images/icons/mixer_record_new_off.png</file>
+		<file>images/icons/mixer_mute_new_on.png</file>
+		<file>images/icons/mixer_mute_new_over.png</file>
+		<file>images/icons/mixer_mute_new_off.png</file>
+		<file>images/icons/mixer_solo_new_on.png</file>
+		<file>images/icons/mixer_solo_new_over.png</file>
+		<file>images/icons/mixer_solo_new_off.png</file>
+		<file>images/icons/mixer_resize_new_over.png</file>
+		<file>images/icons/mixer_resize_new_off.png</file>
+		<file>images/icons/mixer_power_new_on.png</file>
+		<file>images/icons/mixer_power_new_off.png</file>
+		<file>images/icons/mixer_input_new_over.png</file>
+		<file>images/icons/mixer_input_new_off.png</file>
+		<file>images/icons/mixer_output_new_over.png</file>
+		<file>images/icons/mixer_output_new_off.png</file>
+		<file>images/icons/mixer_mono_new_on.png</file>
+		<file>images/icons/mixer_stereo_new_on.png</file>
+		<file>images/icons/mixer_blank_new_off.png</file>
 	</qresource>
 </RCC>
 
