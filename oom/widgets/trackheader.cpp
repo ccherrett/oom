@@ -38,6 +38,8 @@
 #include "midimonitor.h"
 #include "pcanvas.h"
 #include "trackheader.h"
+#include "slider.h"
+#include "mixer/meter.h"
 
 static QString styletemplate = "QLineEdit { border-width:1px; border-radius: 0px; border-image: url(:/images/frame.png) 4; border-top-color: #1f1f22; border-bottom-color: #505050; background-color: #1a1a1a; color: #%1; font-family: fixed-width; font-weight: bold; font-size: 15px; padding-left: 15px; }";
 
@@ -60,6 +62,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_buttonHBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	m_panBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	initPan();
+	initVolume();
 	m_trackName->installEventFilter(this);
 
 	setMouseTracking(true);
@@ -256,9 +259,9 @@ void TrackHeader::heartBeat()/*{{{*/
 	if(m_track->isMidiTrack())
 	{
 		MidiTrack* track = (MidiTrack*)m_track;
-		/*
+		
 		int act = track->activity();
-		double dact = double(act) * (slider->value() / 127.0);
+		double dact = double(act) * (m_slider->value() / 127.0);
 
 		if ((int) dact > track->lastActivity())
 			track->setLastActivity((int) dact);
@@ -269,7 +272,7 @@ void TrackHeader::heartBeat()/*{{{*/
 		// Gives reasonable decay with gui update set to 20/sec.
 		if (act)
 			track->setActivity((int) ((double) act * 0.8));
-		*/
+		
 		//int outChannel = track->outChannel();
 		//int outPort = track->outPort();
 
@@ -1323,6 +1326,58 @@ void TrackHeader::initPan()/*{{{*/
 	}
 }/*}}}*/
 
+void TrackHeader::initVolume()
+{
+	if(!m_track)
+		return;
+	if(m_track->isMidiTrack())
+	{
+		MidiTrack* track = (MidiTrack*)m_track;
+		MidiPort* mp = &midiPorts[track->outPort()];
+		MidiController* mc = mp->midiController(CTRL_VOLUME);
+		//int chan = track->outChannel();
+		int mn = mc->minVal();
+		int mx = mc->maxVal();
+
+		m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, g_trackColorList.value(m_track->type()));
+		m_slider->setCursorHoming(true);
+		m_slider->setRange(double(mn), double(mx), 1.0);
+		m_slider->setFixedHeight(20);
+		m_slider->setFont(config.fonts[1]);
+		m_slider->setId(CTRL_VOLUME);
+		m_mainVBox->insertWidget(2, m_slider);
+
+		meter[0] = new Meter(this, Meter::LinMeter, Qt::Horizontal);
+		meter[0]->setRange(0, 127.0);
+		meter[0]->setFixedHeight(15);
+		meter[0]->setFixedWidth(150);
+		m_mainVBox->insertWidget(3, meter[0]);
+		//connect(meter[0], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
+	}
+	else
+	{
+		int channels = ((AudioTrack*)m_track)->channels();
+		m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, g_trackColorList.value(m_track->type()));
+		m_slider->setCursorHoming(true);
+		m_slider->setRange(config.minSlider - 0.1, 10.0);
+		m_slider->setFixedHeight(20);
+		m_slider->setFont(config.fonts[1]);
+		m_slider->setValue(fast_log10(((AudioTrack*)m_track)->volume())*20.0);
+		m_mainVBox->insertWidget(2, m_slider);
+
+		for (int i = 0; i < channels; ++i)/*{{{*/
+		{
+			meter[i] = new Meter(this, Meter::DBMeter, Qt::Horizontal);
+			meter[i]->setRange(config.minMeter, 10.0);
+			meter[i]->setFixedHeight(15);
+			meter[i]->setFixedWidth(150);
+			//connect(meter[i], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
+			//connect(meter[i], SIGNAL(meterClipped()), this, SLOT(playbackClipped()));
+			m_mainVBox->insertWidget(3+i, meter[i]);
+		}/*}}}*/
+	}
+}
+
 void TrackHeader::setupStyles()/*{{{*/
 {
 	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393")));
@@ -1497,6 +1552,27 @@ void TrackHeader::resizeEvent(QResizeEvent* event)
 {
 	//We will trap this to disappear widgets like vu's and volume slider
 	//on the track header. For now we'll just pass it up the chain
+	QSize size = event->size();
+	if(m_track)
+	{
+		if(m_track->isMidiTrack())
+		{
+			if(meter[0])
+				meter[0]->setVisible(size.height() > MIN_TRACKHEIGHT_VU);
+		}
+		else
+		{
+			for (int ch = 0; ch < ((AudioTrack*)m_track)->channels(); ++ch)
+			{
+				if (meter[ch])
+				{
+					meter[ch]->setVisible(size.height() > MIN_TRACKHEIGHT_VU);
+				}
+			}
+		}
+		if(m_slider)
+			m_slider->setVisible(size.height() > MIN_TRACKHEIGHT_SLIDER);
+	}
 	QFrame::resizeEvent(event);
 }
 

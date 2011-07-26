@@ -7,9 +7,12 @@
 #ifndef _OOM_TRACKHEADER_H_
 #define _OOM_TRACKHEADER_H_
 #include "ui_trackheaderbase.h"
+#include "globaldefs.h"
 #include <QHash>
 
 static const int MIN_TRACKHEIGHT = 58;
+static const int MIN_TRACKHEIGHT_SLIDER = 78;
+static const int MIN_TRACKHEIGHT_VU = 98;
 
 class Track;
 class Knob;
@@ -18,6 +21,8 @@ class QSize;
 class QMouseEvent;
 class QResizeEvent;
 class QPoint;
+class Slider;
+class Meter;
 
 class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 {
@@ -26,6 +31,7 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 
 	Track* m_track;
 	Knob* m_pan;
+	Slider* m_slider;
 	bool resizeFlag;
 	bool m_selected;
     bool m_midiDetect;
@@ -40,7 +46,9 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 	bool m_processEvents;
 	QHash<int, QString> m_selectedStyle;
 	QHash<int, QString> m_style;
+    Meter* meter[MAX_CHANNELS];
 	void initPan();
+	void initVolume();
 	void setupStyles();
     bool eventFilter(QObject *obj, QEvent *event);
 

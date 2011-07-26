@@ -17,12 +17,13 @@ class QPainter;
 
 class Meter : public QFrame
 {
+    Q_OBJECT
 public:
+	enum MeterType
+	{
+	    DBMeter, LinMeter
+	};
 
-    enum MeterType
-    {
-        DBMeter, LinMeter
-    };
 private:
     MeterType mtype;
     bool overflow;
@@ -34,10 +35,10 @@ private:
     QColor red;
     QColor yellow;
     QColor bgColor;
+	Qt::Orientation m_layout;
 
     void drawVU(QPainter& p, int, int, int);
 
-    Q_OBJECT
     void paintEvent(QPaintEvent*);
     virtual void resizeEvent(QResizeEvent*);
     virtual void mousePressEvent(QMouseEvent*);
@@ -51,7 +52,7 @@ signals:
     void meterClipped();
 
 public:
-    Meter(QWidget* parent, MeterType type = DBMeter);
+    Meter(QWidget* parent, MeterType type = DBMeter, Qt::Orientation = Qt::Vertical);
     void setRange(double min, double max);
 };
 #endif
