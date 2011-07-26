@@ -423,8 +423,9 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	setTabOrder(tempo200, m_trackheader);
 	setTabOrder(m_trackheader, canvas);
 
+	QString def = QString::number(MIN_HEADER_WIDTH);
 	QList<int> vl;
-	QString str = tconfig().get_property("arsplit", "sizes", "200 50").toString();
+	QString str = tconfig().get_property("arsplit", "sizes", def+" 200").toString();
 	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
 	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
 	{
