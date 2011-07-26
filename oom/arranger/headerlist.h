@@ -71,6 +71,7 @@ public slots:
     void moveSelectedTrack(int n);
 	void updateTrackList();
 	void renameTrack(Track*);
+	void clear();
 
 public:
     HeaderList(QWidget* parent, const char* name);

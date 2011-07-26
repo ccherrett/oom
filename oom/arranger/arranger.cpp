@@ -944,6 +944,7 @@ void Arranger::clear()
 	{
 		canvas->setCurrentPart(0);
 	}
+	m_trackheader->clear();
 }
 
 void Arranger::wheelEvent(QWheelEvent* ev)

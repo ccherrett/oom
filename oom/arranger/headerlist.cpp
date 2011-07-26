@@ -71,15 +71,16 @@ void HeaderList::songChanged(int flags)/*{{{*/
 		}
 		wantCleanup = false;
 	}
+	if (flags == -1 || (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/ | SC_VIEW_CHANGED)))
+	{
+		updateTrackList();
+	}
 	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
 	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
 	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED))
 	{
-		emit updateHeader(flags);
-	}
-	if (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/ | SC_VIEW_CHANGED))
-	{
-		updateTrackList();
+		if(!song->invalid)
+			emit updateHeader(flags);
 	}
 }/*}}}*/
 
@@ -91,6 +92,7 @@ void HeaderList::updateTrackList()/*{{{*/
 	{
 		if(item)
 		{
+			item->stopProcessing();
 			item->hide();
 			m_dirtyheaders.append(item);
 		}
@@ -117,6 +119,25 @@ void HeaderList::updateTrackList()/*{{{*/
 	//20ms guaranteed.
 	wantCleanup = true;
 	//printf("Leaving updateTrackList\n");
+}/*}}}*/
+
+void HeaderList::clear()/*{{{*/
+{
+	TrackHeader* item;
+	while(!m_headers.isEmpty() && (item = m_headers.takeAt(0)) != 0)
+	{
+		if(item)
+		{
+			item->stopProcessing();
+			item->hide();
+			m_dirtyheaders.append(item);
+		}
+	}
+	m_headers.clear();
+	//Request a cleanup on the next song change, this should be frequent enough to 
+	//keep things tidy, If it proves not to be we just switch to the heartBeat that is 
+	//20ms guaranteed.
+	wantCleanup = true;
 }/*}}}*/
 
 void HeaderList::renameTrack(Track* t)/*{{{*/
