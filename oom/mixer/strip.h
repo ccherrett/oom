@@ -14,7 +14,6 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QLabel>
-#include <QHash>
 
 #include "globaldefs.h"
 //#include "route.h"
@@ -59,7 +58,6 @@ class Strip : public QFrame
 protected:
     Track* track;
 	int m_type;
-	QHash<int, QColor> m_colorList;
 
     QVBoxLayout *m_mainVBoxLayout;
     QLabel *label;

@@ -770,6 +770,14 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	firstrun = true;
 	//routingPopupView      = 0;
 
+	g_trackColorList.insert(Track::AUDIO_INPUT, QColor(189,122,214));
+	g_trackColorList.insert(Track::MIDI, QColor(1,230,238));
+	g_trackColorList.insert(Track::AUDIO_OUTPUT, QColor(252,118,118));
+	g_trackColorList.insert(Track::WAVE, QColor(129,244,118));
+	g_trackColorList.insert(Track::AUDIO_BUSS, QColor(252,164,36));
+	g_trackColorList.insert(Track::AUDIO_AUX, QColor(227,233,114));
+	g_trackColorList.insert(Track::AUDIO_SOFTSYNTH, QColor(129,244,118));
+
 	appName = QString("The Composer - OOMidi     ");
 	setWindowTitle(appName);
 

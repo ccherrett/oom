@@ -17,12 +17,14 @@
 
 #include <unistd.h>
 #include <QList>
+#include <QHash>
 
 class QString;
 class QAction;
 class QActionGroup;
 class QStringList;
 class QIcon;
+class QColor;
 
 extern const float denormalBias;
 
@@ -199,6 +201,7 @@ extern void undoSetuid();
 extern bool checkAudioDevice();
 extern QList<QIcon> partColorIcons;
 extern QList<QIcon> partColorIconsSelected;
+extern QHash<int, QColor> g_trackColorList;
 #ifdef LV2_SUPPORT
 struct LV2World;
 extern LV2World* lv2world;
