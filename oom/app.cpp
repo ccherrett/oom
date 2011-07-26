@@ -5144,7 +5144,7 @@ bool OOMidi::clearSong()
 				tr("The current Project contains unsaved data\n"
 				"Load overwrites current Project:\n"
 				"Save Current Project?"),
-				tr("&Save"), tr("&Skip"), tr("&Cancel"), 0, 2);
+				tr("&Save"), tr("&Don't Save"), tr("&Cancel"), 0, 2);
 		switch (n)
 		{
 			case 0:

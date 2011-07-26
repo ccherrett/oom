@@ -244,15 +244,40 @@ void AudioMixerApp::updateMixer(int index)/*{{{*/
 			(*si)->setTracklist(list);
 		}
 	}
+	if(rows > 1)/*{{{*/
+	{
+		int size = geometry().height() / rows;
+		QList<int> sizelist;
+		for(int i = 0; i < rows; ++i)
+		{
+			sizelist.append(size);
+		}
+		m_splitter->setSizes(sizelist);
+	}/*}}}*/
 }/*}}}*/
 
-void AudioMixerApp::getRowCount(int trackCount, int rows, int& rowcount, int& remainder)
+void AudioMixerApp::resizeEvent(QResizeEvent* event)/*{{{*/
+{
+	int rows = m_cmbRows->itemData(m_cmbRows->currentIndex()).toInt();
+	if(rows > 1)
+	{
+		int size = event->size().height() / rows;
+		QList<int> sizelist;
+		for(int i = 0; i < rows; ++i)
+		{
+			sizelist.append(size);
+		}
+		m_splitter->setSizes(sizelist);
+	}
+}/*}}}*/
+
+void AudioMixerApp::getRowCount(int trackCount, int rows, int& rowcount, int& remainder)/*{{{*/
 {
 	int q;
 	q = trackCount / rows;
 	rowcount = q;
 	remainder = trackCount - (rows * q);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   configChanged

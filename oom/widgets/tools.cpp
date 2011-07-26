@@ -106,11 +106,6 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, bool addSpacer, const char*
 		++n;
 	}
 	action->setVisible(true);
-	//QWidget* spacer = new QWidget();
-	//spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//addWidget(spacer);
-	// Note: Does not take ownership.
-	//addActions(action->actions());
 	if(addSpacer)
 		m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
@@ -175,7 +170,7 @@ void EditToolBar::setNoUpdate(int id)/*{{{*/
 //   curTool
 //---------------------------------------------------------
 
-int EditToolBar::curTool()
+int EditToolBar::curTool()/*{{{*/
 {
 	for (int i = 0; i < nactions; ++i)
 	{
@@ -184,5 +179,5 @@ int EditToolBar::curTool()
 			return action->id();
 	}
 	return -1;
-}
+}/*}}}*/
 

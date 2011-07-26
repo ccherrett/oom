@@ -45,6 +45,9 @@ class CItem;
 class HeaderList;
 class EditToolBar;
 
+static const int MIN_HEADER_WIDTH = 250;
+static const int MAX_HEADER_WIDTH = 400;
+
 //---------------------------------------------------------
 //   Arranger
 //---------------------------------------------------------

@@ -277,6 +277,7 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	box->addWidget(split, 1000);
 
 	m_trackheader = new HeaderList(this, "trackHeaderList");
+	m_trackheader->setMinimumWidth(MIN_HEADER_WIDTH);
 
 	QWidget* newtlist = new QWidget(split);
 	QVBoxLayout *trackLayout = new QVBoxLayout(newtlist);
@@ -288,8 +289,8 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	listScroll->setWidgetResizable(true);
 	listScroll->setWidget(m_trackheader);
 	listScroll->setMouseTracking(true);
-	listScroll->setMinimumWidth(250);
-	listScroll->setMaximumWidth(400);
+	listScroll->setMinimumWidth(MIN_HEADER_WIDTH);
+	listScroll->setMaximumWidth(MAX_HEADER_WIDTH);
 
 	edittools = new EditToolBar(this, arrangerTools, true);
 	edittools->setFixedHeight(32);

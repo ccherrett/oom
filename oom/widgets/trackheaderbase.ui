@@ -124,7 +124,7 @@
           <number>0</number>
          </property>
          <property name="sizeConstraint">
-          <enum>QLayout::SetFixedSize</enum>
+          <enum>QLayout::SetDefaultConstraint</enum>
          </property>
          <property name="leftMargin">
           <number>10</number>
@@ -133,7 +133,7 @@
           <number>2</number>
          </property>
          <property name="rightMargin">
-          <number>8</number>
+          <number>0</number>
          </property>
          <property name="bottomMargin">
           <number>2</number>
@@ -142,13 +142,13 @@
           <widget class="QToolButton" name="m_btnReminder1">
            <property name="minimumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
@@ -173,13 +173,13 @@
           <widget class="QToolButton" name="m_btnReminder2">
            <property name="minimumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
@@ -210,7 +210,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
@@ -235,13 +235,13 @@
           <widget class="QToolButton" name="m_btnAutomation">
            <property name="minimumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
@@ -266,13 +266,13 @@
           <widget class="QToolButton" name="m_btnRecord">
            <property name="minimumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
@@ -300,13 +300,13 @@
           <widget class="QToolButton" name="m_btnMute">
            <property name="minimumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
@@ -334,13 +334,13 @@
           <widget class="QToolButton" name="m_btnSolo">
            <property name="minimumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>22</width>
+             <width>21</width>
              <height>18</height>
             </size>
            </property>
@@ -370,7 +370,7 @@
             <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeType">
-            <enum>QSizePolicy::MinimumExpanding</enum>
+            <enum>QSizePolicy::Expanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
