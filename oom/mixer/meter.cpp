@@ -306,6 +306,14 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
 
+		//p.drawLine(4, 0, 4, w);
+		//p.drawLine(5, 0, 5, w);
+		//p.drawLine(6, 0, 6, w);
+		//p.drawLine(7, 0, 7, w);
+		//p.drawLine(8, 0, 8, w);
+		//p.drawLine(9, 0, 9, w);
+		//p.drawLine(10, 0, 10, w);
+		
 		p.drawLine(4, 0, 4, w);
 		p.drawLine(5, 0, 5, w);
 		p.drawLine(6, 0, 6, w);

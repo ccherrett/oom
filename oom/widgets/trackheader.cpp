@@ -1372,10 +1372,10 @@ void TrackHeader::updateChannels()/*{{{*/
 				//meter[cc] = new Meter(this);
 				meter[cc] = new Meter(this, Meter::DBMeter, Qt::Horizontal);
 				meter[cc]->setRange(config.minMeter, 10.0);
-				meter[cc]->setFixedHeight(15);
+				meter[cc]->setFixedHeight(5);
 				meter[cc]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 				//connect(meter[cc], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
-				m_mainVBox->insertWidget(size, meter[cc]);
+				m_buttonVBox->addWidget(meter[cc]);
 				meter[cc]->show();
 			}
 		}
@@ -1507,16 +1507,16 @@ void TrackHeader::initVolume()
 		m_slider->setFixedHeight(20);
 		m_slider->setFont(config.fonts[1]);
 		m_slider->setId(CTRL_VOLUME);
-		m_mainVBox->insertWidget(2, m_slider);
+		m_buttonVBox->addWidget(m_slider);
 		connect(m_slider, SIGNAL(sliderMoved(double, int)), SLOT(volumeChanged(double)));
 		connect(m_slider, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(volumeRightClicked(const QPoint &, int)));
 
 		meter[0] = new Meter(this, Meter::LinMeter, Qt::Horizontal);
 		meter[0]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 		meter[0]->setRange(0, 127.0);
-		meter[0]->setFixedHeight(15);
+		meter[0]->setFixedHeight(5);
 		//meter[0]->setFixedWidth(150);
-		m_mainVBox->insertWidget(3, meter[0]);
+		m_buttonVBox->addWidget(meter[0]);
 		//connect(meter[0], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
 	}
 	else
@@ -1529,7 +1529,7 @@ void TrackHeader::initVolume()
 		m_slider->setFixedHeight(20);
 		m_slider->setFont(config.fonts[1]);
 		m_slider->setValue(fast_log10(((AudioTrack*)m_track)->volume())*20.0);
-		m_mainVBox->insertWidget(2, m_slider);
+		m_buttonVBox->addWidget(m_slider);
 
 		connect(m_slider, SIGNAL(sliderMoved(double, int)), SLOT(volumeChanged(double)));
 		connect(m_slider, SIGNAL(sliderPressed(int)), SLOT(volumePressed()));
@@ -1540,12 +1540,12 @@ void TrackHeader::initVolume()
 		{
 			meter[i] = new Meter(this, Meter::DBMeter, Qt::Horizontal);
 			meter[i]->setRange(config.minMeter, 10.0);
-			meter[i]->setFixedHeight(15);
+			meter[i]->setFixedHeight(5);
 			//meter[i]->setFixedWidth(150);
 			meter[i]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 			//connect(meter[i], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
 			//connect(meter[i], SIGNAL(meterClipped()), this, SLOT(playbackClipped()));
-			m_mainVBox->insertWidget(3+i, meter[i]);
+			m_buttonVBox->addWidget(meter[i]);
 		}/*}}}*/
 		m_channels = channels;
 	}
@@ -1725,7 +1725,7 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 {
 	//We will trap this to disappear widgets like vu's and volume slider
 	//on the track header. For now we'll just pass it up the chain
-	QSize size = event->size();
+	/*QSize size = event->size();
 	if(m_track)
 	{
 		m_meterVisible = size.height() > MIN_TRACKHEIGHT_VU;
@@ -1747,7 +1747,7 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 		}
 		if(m_slider)
 			m_slider->setVisible(m_sliderVisible);
-	}
+	}*/
 	QFrame::resizeEvent(event);
 }/*}}}*/
 
