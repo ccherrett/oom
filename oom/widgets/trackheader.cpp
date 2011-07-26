@@ -285,7 +285,7 @@ void TrackHeader::heartBeat()/*{{{*/
 		if ((int) dact > track->lastActivity())
 			track->setLastActivity((int) dact);
 
-		if (meter[0] && m_meterVisible)
+		if (meter[0])
 			meter[0]->setVal(dact, track->lastActivity(), false);
 
 		// Gives reasonable decay with gui update set to 20/sec.
@@ -339,8 +339,8 @@ void TrackHeader::heartBeat()/*{{{*/
 	}
 	else
 	{
-		if(m_meterVisible)
-		{
+		//if(m_meterVisible)
+		//{
 			for (int ch = 0; ch < ((AudioTrack*)m_track)->channels(); ++ch)
 			{
 				if (meter[ch])
@@ -348,7 +348,7 @@ void TrackHeader::heartBeat()/*{{{*/
 					meter[ch]->setVal(((AudioTrack*)m_track)->meter(ch), ((AudioTrack*)m_track)->peak(ch), false);
 				}
 			}
-		}
+		//}
 	}
 
 	updateVolume();

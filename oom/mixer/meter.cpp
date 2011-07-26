@@ -300,7 +300,7 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 	{
 		QPixmap *pixmap = new QPixmap(":/images/vugrad_h.png");
 		QPixmap scaledPixmap = pixmap->scaled(1, width(), Qt::IgnoreAspectRatio);/*{{{*/
-		myPen.setBrush(scaledPixmap);
+		myPen.setBrush(*pixmap);
 		myPen.setWidth(1);
 		p.setPen(myPen);
 
@@ -322,9 +322,11 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 		//p.drawLine(9, 0, 9, w);
 		//p.drawLine(10, 0, 10, w);
 		
-		int start = width - yv;
-		p.fillRect(start, start, yv, h, QBrush(bgColor)); // dark red
-		if (yv == w)
+		int start = w - yv;
+		printf("w = %d, yv = %d, start = %d, h = %d\n", w, yv, start, h);
+		//p.fillRect(0, yv, start, h, QBrush(bgColor)); // dark red
+		p.fillRect(start, 0, yv, h, QBrush(bgColor)); // dark red
+		if (yv == 0)
 		{
 			emit meterClipped();
 		}/*}}}*/
