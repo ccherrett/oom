@@ -284,6 +284,31 @@
 		<file>images/knob_midi_new.png</file>
 		<file>images/knob_buss_new.png</file>
 		<file>images/knob_audio_new.png</file>
+		
+		<file>images/icons/record_track_new_on.png</file>
+		<file>images/icons/record_track_new_over.png</file>
+		<file>images/icons/record_track_new_off.png</file>
+		<file>images/icons/mute_track_new_on.png</file>
+		<file>images/icons/mute_track_new_over.png</file>
+		<file>images/icons/mute_track_new_off.png</file>
+		<file>images/icons/solo_track_new_on.png</file>
+		<file>images/icons/solo_track_new_over.png</file>
+		<file>images/icons/solo_track_new_off.png</file>
+		<file>images/icons/reminder1_new_on.png</file>
+		<file>images/icons/reminder1_new_over.png</file>
+		<file>images/icons/reminder1_new_off.png</file>
+		<file>images/icons/reminder2_new_on.png</file>
+		<file>images/icons/reminder2_new_over.png</file>
+		<file>images/icons/reminder2_new_off.png</file>
+		<file>images/icons/reminder3_new_on.png</file>
+		<file>images/icons/reminder3_new_over.png</file>
+		<file>images/icons/reminder3_new_off.png</file>
+		<file>images/icons/input_indicator_new_on.png</file>
+		<file>images/icons/input_indicator_new_over.png</file>
+		<file>images/icons/input_indicator_new_off.png</file>
+		<file>images/icons/automation_track_new_over.png</file>
+		<file>images/icons/automation_track_new_off.png</file>
+
 	</qresource>
 </RCC>
 

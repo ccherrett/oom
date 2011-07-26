@@ -400,10 +400,37 @@ extern QPixmap* portDisabledIcon;
 extern QPixmap* addTVIcon;
 extern QPixmap* reminder1_OnIcon;
 extern QPixmap* reminder1_OffIcon;
+extern QPixmap* reminder1_OverIcon;
 extern QPixmap* reminder2_OnIcon;
 extern QPixmap* reminder2_OffIcon;
+extern QPixmap* reminder2_OverIcon;
 extern QPixmap* reminder3_OnIcon;
 extern QPixmap* reminder3_OffIcon;
+extern QPixmap* reminder3_OverIcon;
+extern QPixmap* record_track_OnIcon;
+extern QPixmap* record_track_OffIcon;
+extern QPixmap* record_track_OverIcon;
+extern QPixmap* mute_track_OnIcon;
+extern QPixmap* mute_track_OffIcon;
+extern QPixmap* mute_track_OverIcon;
+extern QPixmap* solo_track_OnIcon;
+extern QPixmap* solo_track_OffIcon;
+extern QPixmap* solo_track_OverIcon;
+extern QPixmap* input_indicator_OnIcon;
+extern QPixmap* input_indicator_OffIcon;
+extern QPixmap* input_indicator_OverIcon;
+extern QPixmap* automation_track_OffIcon;
+extern QPixmap* automation_track_OverIcon;
+
+extern QIcon* reminder1IconSet3;
+extern QIcon* reminder2IconSet3;
+extern QIcon* reminder3IconSet3;
+
+extern QIcon* record_trackIconSet3;
+extern QIcon* mute_trackIconSet3;
+extern QIcon* solo_trackIconSet3;
+extern QIcon* input_indicatorIconSet3;
+extern QIcon* automation_trackIconSet3;
 
 extern QPixmap* oomIcon;
 extern QPixmap* aboutOOMidiImage;

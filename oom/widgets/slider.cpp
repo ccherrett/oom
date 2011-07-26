@@ -39,7 +39,7 @@
 //------------------------------------------------------------
 
 Slider::Slider(QWidget *parent, const char *name,
-		Qt::Orientation orient, ScalePos scalePos, int bgStyle)
+		Qt::Orientation orient, ScalePos scalePos, int bgStyle, QColor sliderBg)
 : SliderBase(parent, name)
 {
 	if (bgStyle == BgSlot)
@@ -55,6 +55,8 @@ Slider::Slider(QWidget *parent, const char *name,
 		d_thumbHalf = 16;
 		d_thumbWidth = 16;
 	}
+
+	d_sliderBgColor = QColor(sliderBg);
 
 	d_borderWidth = 2;
 	d_scaleDist = 4;
@@ -445,9 +447,10 @@ void Slider::drawVsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 	QPen myPen = QPen();
 	//myPen.setCapStyle(Qt::RoundCap);
 	//myPen.setStyle(Qt::DashLine);
-	QPixmap *pixmap = new QPixmap(":/images/vugrad.png");
-	QPixmap scaledPixmap = pixmap->scaled(1, rBound.height(), Qt::IgnoreAspectRatio);
-	myPen.setBrush(scaledPixmap);
+	//QPixmap *pixmap = new QPixmap(":/images/vugrad.png");
+	//QPixmap scaledPixmap = pixmap->scaled(1, rBound.height(), Qt::IgnoreAspectRatio);
+	//myPen.setBrush(scaledPixmap);
+	myPen.setBrush(d_sliderBgColor);
 	//myPen.setBrush(QBrush(vuGrad));
 	//myPen.setWidth(w-8);
 	myPen.setWidth(1);

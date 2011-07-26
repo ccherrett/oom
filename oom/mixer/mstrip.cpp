@@ -84,8 +84,7 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	int mn = mc->minVal();
 	int mx = mc->maxVal();
 
-	slider = new Slider(this, "vol", Qt::Vertical, Slider::None,
-			Slider::BgSlot);
+	slider = new Slider(this, "vol", Qt::Vertical, Slider::None, Slider::BgSlot, m_colorList.value(t->type()));
 	slider->setCursorHoming(true);
 	slider->setRange(double(mn), double(mx), 1.0);
 	slider->setFixedWidth(20);

@@ -45,6 +45,7 @@ private:
     Q_PROPERTY(Qt::Orientation orientation READ orientation WRITE setOrientation)
 
     QRect d_sliderRect;
+	QColor d_sliderBgColor;
 
     int d_thumbLength;
     int d_thumbHalf;
@@ -82,7 +83,7 @@ public:
     Slider(QWidget *parent, const char *name = 0,
             Qt::Orientation orient = Qt::Vertical,
             ScalePos scalePos = None,
-            int bgStyle = BgTrough);
+            int bgStyle = BgTrough, QColor sliderBg = QColor(255, 0, 0));
 
     ~Slider();
     void setThumbLength(int l);

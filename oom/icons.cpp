@@ -632,10 +632,38 @@ QPixmap* aboutOOMidiImage;
 QPixmap* oomLeftSideLogo;
 QPixmap* reminder1_OnIcon;
 QPixmap* reminder1_OffIcon;
+QPixmap* reminder1_OverIcon;
 QPixmap* reminder2_OnIcon;
 QPixmap* reminder2_OffIcon;
+QPixmap* reminder2_OverIcon;
 QPixmap* reminder3_OnIcon;
 QPixmap* reminder3_OffIcon;
+QPixmap* reminder3_OverIcon;
+QPixmap* record_track_OnIcon;
+QPixmap* record_track_OffIcon;
+QPixmap* record_track_OverIcon;
+QPixmap* mute_track_OnIcon;
+QPixmap* mute_track_OffIcon;
+QPixmap* mute_track_OverIcon;
+QPixmap* solo_track_OnIcon;
+QPixmap* solo_track_OffIcon;
+QPixmap* solo_track_OverIcon;
+QPixmap* input_indicator_OnIcon;
+QPixmap* input_indicator_OffIcon;
+QPixmap* input_indicator_OverIcon;
+QPixmap* automation_track_OffIcon;
+QPixmap* automation_track_OverIcon;
+
+QIcon* reminder1IconSet3;
+QIcon* reminder2IconSet3;
+QIcon* reminder3IconSet3;
+
+QIcon* record_trackIconSet3;
+QIcon* mute_trackIconSet3;
+QIcon* solo_trackIconSet3;
+QIcon* automation_trackIconSet3;
+QIcon* input_indicatorIconSet3;
+
 QPixmap* armAllIcon;
 QPixmap* globalKeysIcon;
 
@@ -1124,12 +1152,73 @@ void initIcons()
       automationDisabledIcon                        = new MPIXMAP(":/images/icons/automation_disabled.png", NULL);
       portDisabledIcon                              = new MPIXMAP(":/images/icons/ports_disabled.png", NULL);
       addTVIcon                              		= new MPIXMAP(":/images/icons/add_tv.png", NULL);
-      reminder1_OnIcon                              = new MPIXMAP(":/images/icons/reminder1_on.png", NULL);
-      reminder1_OffIcon                        		= new MPIXMAP(":/images/icons/reminder_off.png", NULL);
-      reminder2_OnIcon                              = new MPIXMAP(":/images/icons/reminder2_on.png", NULL);
-      reminder2_OffIcon                        		= new MPIXMAP(":/images/icons/reminder_off.png", NULL);
-      reminder3_OnIcon                              = new MPIXMAP(":/images/icons/reminder3_on.png", NULL);
-      reminder3_OffIcon                        		= new MPIXMAP(":/images/icons/reminder_off.png", NULL);
+      reminder1_OnIcon                              = new MPIXMAP(":/images/icons/reminder1_new_on.png", NULL);
+      reminder1_OffIcon                        		= new MPIXMAP(":/images/icons/reminder1_new_off.png", NULL);
+      reminder1_OverIcon                       		= new MPIXMAP(":/images/icons/reminder1_new_over.png", NULL);
+      reminder2_OnIcon                              = new MPIXMAP(":/images/icons/reminder2_new_on.png", NULL);
+      reminder2_OffIcon                        		= new MPIXMAP(":/images/icons/reminder2_new_off.png", NULL);
+      reminder2_OverIcon                       		= new MPIXMAP(":/images/icons/reminder2_new_over.png", NULL);
+      reminder3_OnIcon                              = new MPIXMAP(":/images/icons/reminder3_new_on.png", NULL);
+      reminder3_OffIcon                        		= new MPIXMAP(":/images/icons/reminder3_new_off.png", NULL);
+      reminder3_OverIcon                       		= new MPIXMAP(":/images/icons/reminder3_new_over.png", NULL);
+      
+	  record_track_OnIcon                           = new MPIXMAP(":/images/icons/record_track_new_on.png", NULL);
+      record_track_OffIcon                          = new MPIXMAP(":/images/icons/record_track_new_off.png", NULL);
+      record_track_OverIcon                       	= new MPIXMAP(":/images/icons/record_track_new_over.png", NULL);
+      
+	  mute_track_OnIcon                          	= new MPIXMAP(":/images/icons/mute_track_new_on.png", NULL);
+      mute_track_OffIcon                         	= new MPIXMAP(":/images/icons/mute_track_new_off.png", NULL);
+      mute_track_OverIcon                        	= new MPIXMAP(":/images/icons/mute_track_new_over.png", NULL);
+	  
+	  solo_track_OnIcon                          	= new MPIXMAP(":/images/icons/solo_track_new_on.png", NULL);
+      solo_track_OffIcon                         	= new MPIXMAP(":/images/icons/solo_track_new_off.png", NULL);
+      solo_track_OverIcon                        	= new MPIXMAP(":/images/icons/solo_track_new_over.png", NULL);
+	  
+	  input_indicator_OnIcon                        = new MPIXMAP(":/images/icons/input_indicator_new_on.png", NULL);
+      input_indicator_OffIcon                       = new MPIXMAP(":/images/icons/input_indicator_new_off.png", NULL);
+      input_indicator_OverIcon                      = new MPIXMAP(":/images/icons/input_indicator_new_over.png", NULL);
+	  
+      automation_track_OffIcon                      = new MPIXMAP(":/images/icons/automation_track_new_off.png", NULL);
+      automation_track_OverIcon                     = new MPIXMAP(":/images/icons/automation_track_new_over.png", NULL);
+	  
+	  reminder1IconSet3         = new QIcon();
+	  reminder1IconSet3->addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
+      reminder1IconSet3->addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
+      reminder1IconSet3->addPixmap(*reminder1_OverIcon, QIcon::Active);
+	  
+	  reminder2IconSet3         = new QIcon();
+	  reminder2IconSet3->addPixmap(*reminder2_OnIcon, QIcon::Normal, QIcon::On);
+      reminder2IconSet3->addPixmap(*reminder2_OffIcon, QIcon::Normal, QIcon::Off);
+      reminder2IconSet3->addPixmap(*reminder2_OverIcon, QIcon::Active);
+	  
+	  reminder3IconSet3         = new QIcon();
+	  reminder3IconSet3->addPixmap(*reminder3_OnIcon, QIcon::Normal, QIcon::On);
+      reminder3IconSet3->addPixmap(*reminder3_OffIcon, QIcon::Normal, QIcon::Off);
+      reminder3IconSet3->addPixmap(*reminder3_OverIcon, QIcon::Active);
+	  
+	  record_trackIconSet3         = new QIcon();
+	  record_trackIconSet3->addPixmap(*record_track_OnIcon, QIcon::Normal, QIcon::On);
+      record_trackIconSet3->addPixmap(*record_track_OffIcon, QIcon::Normal, QIcon::Off);
+      record_trackIconSet3->addPixmap(*record_track_OverIcon, QIcon::Active);
+	  
+	  mute_trackIconSet3         = new QIcon();
+	  mute_trackIconSet3->addPixmap(*mute_track_OnIcon, QIcon::Normal, QIcon::On);
+      mute_trackIconSet3->addPixmap(*mute_track_OffIcon, QIcon::Normal, QIcon::Off);
+      mute_trackIconSet3->addPixmap(*mute_track_OverIcon, QIcon::Active);
+	  
+	  solo_trackIconSet3         = new QIcon();
+	  solo_trackIconSet3->addPixmap(*solo_track_OnIcon, QIcon::Normal, QIcon::On);
+      solo_trackIconSet3->addPixmap(*solo_track_OffIcon, QIcon::Normal, QIcon::Off);
+      solo_trackIconSet3->addPixmap(*solo_track_OverIcon, QIcon::Active);
+	  
+	  input_indicatorIconSet3         = new QIcon();
+	  input_indicatorIconSet3->addPixmap(*input_indicator_OnIcon, QIcon::Normal, QIcon::On);
+      input_indicatorIconSet3->addPixmap(*input_indicator_OffIcon, QIcon::Normal, QIcon::Off);
+      input_indicatorIconSet3->addPixmap(*input_indicator_OverIcon, QIcon::Active);
+	  
+	  automation_trackIconSet3         = new QIcon();
+      automation_trackIconSet3->addPixmap(*automation_track_OffIcon, QIcon::Normal, QIcon::Off);
+      automation_trackIconSet3->addPixmap(*automation_track_OverIcon, QIcon::Active);
 
       oomIcon                                      = new MPIXMAP(oom_icon_xpm, NULL);
       aboutOOMidiImage                             = new MPIXMAP(":/images/oom-about.png", NULL);

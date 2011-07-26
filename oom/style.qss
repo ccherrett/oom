@@ -439,6 +439,7 @@ QFrame#MixerAudioInStrip QFrame#MixerAudioInLabel {
     border-top: 1px solid #bd7ad6;
     border-bottom: 1px solid #bd7ad6;
 	border-radius: 3px;
+    border-image: url(:/images/frame.png) 4;
 	background-color: #141414;
 	font-size: 10px;
 	padding: 3px;
@@ -459,6 +460,7 @@ QFrame#MidiTrackStrip QLabel {
 QFrame#MidiTrackStrip QLabel#MidiTrackLabel  { 
     border-top: 1px solid #01e6ee;
     border-bottom: 1px solid #01e6ee;
+    border-image: url(:/images/frame.png) 4;
 	border-radius: 3px;
 	background-color: #141414;
 	font-size: 10px;
@@ -481,6 +483,7 @@ QFrame#MixerWaveStrip QLabel {
 QFrame#MixerWaveStrip QLabel#MixerWaveLabel  { 
     border-top: 1px solid #81f476;
     border-bottom: 1px solid #81f476;
+    border-image: url(:/images/frame.png) 4;
 	border-radius: 3px;
 	background-color: #141414;
 	font-size: 10px;
@@ -502,13 +505,14 @@ QFrame#MixerAudioBussStrip QLabel {
 }
 QFrame#MixerAudioBussStrip QLabel#MixerAudioBussLabel
 {
-    border-top: 1px solid #aabcc7;
-    border-bottom: 1px solid #aabcc7;
+    border-top: 1px solid #fca424;
+    border-bottom: 1px solid #fca424;
+    border-image: url(:/images/frame.png) 4;
 	border-radius: 3px;
 	background-color: #141414;
 	font-size: 10px;
 	padding: 3px;
-	color: #aabcc7;
+	color: #fca424;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 10px;
@@ -527,6 +531,7 @@ QFrame#MixerAuxStrip QLabel#MixerAuxLabel
 {
     border-top: 1px solid #e3e972;
     border-bottom: 1px solid #e3e972;
+    border-image: url(:/images/frame.png) 4;
 	background-color: #141414;
 	border-radius: 3px;
 	color: #d7d7d7;
@@ -550,6 +555,7 @@ QFrame#MixerAudioOutStrip QLabel#MixerAudioOutLabel  {
     border-top: 1px solid #fc7676;
     border-bottom: 1px solid #fc7676;
 	background-color: #141414;
+    border-image: url(:/images/frame.png) 4;
 	border-radius: 3px;
 	color: #ededed;
 	font-size: 10px;

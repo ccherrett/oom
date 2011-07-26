@@ -186,7 +186,7 @@ void TrackHeader::setupStyles()/*{{{*/
 	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee")));
 	m_selectedStyle.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("fc7676")));
 	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("81f476")));
-	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("aabcc7")));
+	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("fca424")));
 	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276")));
 	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee")));
 }/*}}}*/

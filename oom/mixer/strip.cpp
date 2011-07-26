@@ -207,6 +207,13 @@ Strip::~Strip()
 
 void Strip::layoutUi()/*{{{*/
 {
+	m_colorList.insert(Track::AUDIO_INPUT, QColor(189,122,214));/*{{{*/
+	m_colorList.insert(Track::MIDI, QColor(1,230,238));
+	m_colorList.insert(Track::AUDIO_OUTPUT, QColor(252,118,118));
+	m_colorList.insert(Track::WAVE, QColor(129,244,118));
+	m_colorList.insert(Track::AUDIO_BUSS, QColor(252,164,36));
+	m_colorList.insert(Track::AUDIO_AUX, QColor(227,233,114));
+	m_colorList.insert(Track::AUDIO_SOFTSYNTH, QColor(129,244,118));/*}}}*/
 	//if (MixerStripBase->objectName().isEmpty())
 	//	MixerStripBase->setObjectName(QString::fromUtf8("MixerStripBase"));
 	//resize(213, 441);
