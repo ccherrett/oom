@@ -166,6 +166,7 @@
 		<file>images/mixer_rack_border2.png</file>
 		<file>images/tracklist_rack.png</file>
 		<file>images/vugrad.png</file>
+		<file>images/vugrad_h.png</file>
 		<file>images/vugrad_wave.png</file>
 		<file>images/vugrad_wave_highlight.png</file>
 		<file>images/icons/showmixer.png</file>
@@ -330,6 +331,7 @@
 		<file>images/icons/mixer_stereo_new_on.png</file>
 		<file>images/icons/mixer_blank_new_off.png</file>
 		<file>images/slider_thumb_new.png</file>
+		<file>images/slider_thumb_new_h.png</file>
 	</qresource>
 </RCC>
 

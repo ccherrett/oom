@@ -197,9 +197,9 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 	else
 	{
 		if (mtype == DBMeter)/*{{{*/
-			yv = val == 0 ? w : int(((maxScale - (fast_log10(val) * 20.0)) * w) / range);
+			yv = val == 0 ? 0 : int(((maxScale - (fast_log10(val) * 20.0)) * w) / range);
 		else
-			yv = val == 0 ? w : int(((maxScale - val) * w) / range);
+			yv = val == 0 ? 0 : int(((maxScale - val) * w) / range);
 
 		if (yv > w) yv = w;
 
@@ -274,9 +274,9 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 {
 	QPen myPen = QPen();
 	myPen.setStyle(Qt::DashLine);
-	QPixmap *pixmap = new QPixmap(":/images/vugrad.png");
 	if(m_layout == Qt::Vertical)
 	{
+		QPixmap *pixmap = new QPixmap(":/images/vugrad.png");
 		QPixmap scaledPixmap = pixmap->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
 		myPen.setBrush(scaledPixmap);
 		myPen.setWidth(1);
@@ -298,27 +298,14 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 	}
 	else
 	{
-		QPixmap rotated(pixmap->size());
-		QPainter mp(&rotated);
-		QSize size = pixmap->size();
-		mp.translate(size.height()/2,size.height()/2);
-		 
-		// Rotate the painter 90 degrees
-		mp.rotate(90);
-		
-		//  // Set origo back to upper left corner 
-		mp.translate(-size.height()/2,-size.height()/2);
-		
-		//   // Draw your original pixmap on it
-		mp.drawPixmap(0, 0, *pixmap);
-		mp.end();
-		 
-		QPixmap scaledPixmap = rotated.scaled(1, width(), Qt::IgnoreAspectRatio);/*{{{*/
+		QPixmap *pixmap = new QPixmap(":/images/vugrad_h.png");
+		QPixmap scaledPixmap = pixmap->scaled(1, width(), Qt::IgnoreAspectRatio);/*{{{*/
 		myPen.setBrush(scaledPixmap);
 		myPen.setWidth(1);
 		p.setPen(myPen);
 
-		p.fillRect(0, 0, h, w, QBrush(bgColor)); // dark red
+		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
+
 		p.drawLine(4, 0, 4, w);
 		p.drawLine(5, 0, 5, w);
 		p.drawLine(6, 0, 6, w);
@@ -326,7 +313,8 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 		p.drawLine(8, 0, 8, w);
 		p.drawLine(9, 0, 9, w);
 		p.drawLine(10, 0, 10, w);
-		p.fillRect(0, 0, h, yv, QBrush(bgColor)); // dark red
+		
+		p.fillRect(0, 0, yv, h, QBrush(bgColor)); // dark red
 		if (yv == 0)
 		{
 			emit meterClipped();

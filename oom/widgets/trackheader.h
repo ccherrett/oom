@@ -41,9 +41,12 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
     int startY;
     int curY;
 	int m_tracktype;
+	int m_channels;
 	bool inHeartBeat;
 	bool m_editing;
 	bool m_processEvents;
+	bool m_meterVisible;
+	bool m_sliderVisible;
 	QHash<int, QString> m_selectedStyle;
 	QHash<int, QString> m_style;
     Meter* meter[MAX_CHANNELS];
@@ -51,6 +54,7 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 	void initVolume();
 	void setupStyles();
     bool eventFilter(QObject *obj, QEvent *event);
+	void updateChannels();
 
 private slots:
 	void heartBeat();
@@ -70,6 +74,10 @@ private slots:
 	void panRightClicked(const QPoint &p);
 	void updatePan();
 	void updateVolume();
+    void volumeChanged(double);
+    void volumePressed();
+    void volumeReleased();
+    void volumeRightClicked(const QPoint &, int ctl = 0);
 	void setEditing(bool edit = true)
 	{
 		m_editing = edit;
