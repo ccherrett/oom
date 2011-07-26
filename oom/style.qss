@@ -84,7 +84,7 @@ QLabel#patchLabel
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 	 padding: 0px 8px;
 }
 
@@ -413,7 +413,7 @@ QFrame#MixerAudioBussStrip,
 QFrame#MixerAuxStrip, 
 QFrame#MixerAudioOutStrip, 
 QFrame#MidiTrackStrip { 
-	border: 1px solid #29292a;
+	border-right: 1px solid #888888;
 	background-color: #1b1b1b;
 	border-radius: 7px;
 }
@@ -573,7 +573,7 @@ QLineEdit
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 }
 
 
@@ -584,7 +584,7 @@ Dentry
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 }
 
 QPushButton 
@@ -669,14 +669,19 @@ background-color: #595966;
 
 
 MidiRack, EffectRack  { 
-	 border-radius: 6px;
-     padding: 3px;
-     /*border-image: url(:/images/frame.png) 4;*/
-	 /*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #000c10, stop: 1.0 #1b0019);*/
-     border-width: 1;
-	 border-color: #b883a1;
-	 background-color: #000c10;
-	 color: #b883a1;
+	background-color: #141414;
+	gridline-color:#343434;
+	alternate-background-color: #1b1b1b;
+	selection-background-color: #2e2e2e;
+	color: #bbbfbb;
+	border-radius: 0px;
+    border: 1px solid #29292a;
+	text-decoration: none;
+    padding: 3px;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+	show-decoration-selected: 0; 
 }
 QListWidget#EffectRack::item:selected:active, QListWidget#EffectsRack::item:selected {
 	 border-radius: 3px;
@@ -1051,7 +1056,7 @@ QTabWidget#m_tabWidget::tab-bar {
     it reads QTabBar _not_ QTabWidget */
 QTabWidget#m_tabWidget QTabBar::tab {
 	/*background-color: #47474d;*/							
-	background-color: #7b7b7b;							
+	background-color: #47474d;							
 	/*background-color: #FF0000;*/							
     border: 1px solid #a5a6a5;
     border-bottom-color: #595966; /* same as the pane color */
@@ -1239,7 +1244,7 @@ QWidget#mitPluginTranspose QLabel#transposeLabel
      border-width: 3;
 	 border-right: 0;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 	 border-radius: 8px;
 }
 
@@ -1649,7 +1654,7 @@ QHeaderView#header {
      border-width: 3;
 	 border-right: 0;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 	 /*color: #76ac01;*/
  }
 
@@ -1660,7 +1665,7 @@ CtrlEdit QWidget#ctrlLabelBox
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 }
 
 QLabel#Cursor {
@@ -1669,7 +1674,7 @@ QLabel#Cursor {
      border-width: 3;
 	 border-right: 0;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
  }
@@ -1679,7 +1684,7 @@ QLabel#arrangerCursor {
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
  }
@@ -1690,7 +1695,7 @@ QLabel#pitchLabel {
      border-width: 3;
 	 border-left: 0;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 	 /*color: #76ac01;*/
 	 border-radius: 8px;
 }
@@ -1698,22 +1703,22 @@ QLabel#pitchLabel {
 /* Bigtime stying */
 QWidget#bigtime-dwin {
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 }
 
 QLabel#bigwinmiddle {
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 }
 
 QLabel#bigwinleft {
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 }
 
 QLabel#bigwinright {
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 }
 
 
@@ -1724,7 +1729,7 @@ QAbstractSpinBox {
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;
-	 color: #939393;
+	 color: #b8b8b8;
 	 /*color: #76ac01;*/
 	 font-family: "fixed-width";
 	 font-weight: bold;
@@ -1815,7 +1820,7 @@ QFrame#WaveHeader QLineEdit
 	border-top-color: #1f1f22;
 	border-bottom-color: #505050;
 	background-color: #1a1a1a;
-	color: #939393;
+	color: #b8b8b8;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 15px;
