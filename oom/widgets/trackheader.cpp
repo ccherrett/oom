@@ -63,6 +63,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	volume = 0.0;
 	setFrameStyle(QFrame::StyledPanel|QFrame::Raised);
 	m_buttonHBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+	m_buttonVBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	m_panBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	initPan();
 	initVolume();
@@ -1504,7 +1505,7 @@ void TrackHeader::initVolume()
 		m_slider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 		m_slider->setCursorHoming(true);
 		m_slider->setRange(double(mn), double(mx), 1.0);
-		m_slider->setFixedHeight(20);
+		m_slider->setFixedHeight(15);
 		m_slider->setFont(config.fonts[1]);
 		m_slider->setId(CTRL_VOLUME);
 		m_buttonVBox->addWidget(m_slider);
@@ -1526,7 +1527,7 @@ void TrackHeader::initVolume()
 		m_slider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 		m_slider->setCursorHoming(true);
 		m_slider->setRange(config.minSlider - 0.1, 10.0);
-		m_slider->setFixedHeight(20);
+		m_slider->setFixedHeight(15);
 		m_slider->setFont(config.fonts[1]);
 		m_slider->setValue(fast_log10(((AudioTrack*)m_track)->volume())*20.0);
 		m_buttonVBox->addWidget(m_slider);
