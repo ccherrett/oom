@@ -148,7 +148,8 @@ Strip::Strip(QWidget* parent, Track* t)
 			m_auxBase->setObjectName("MidiTrackAuxbox");
 			//topRack = QPixmap(":/images/top_rack_midi.png");
 			//bottomRack = QPixmap(":/images/bottom_rack_midi.png");
-			m_btnStereo->setVisible(false);
+			//m_btnStereo->setVisible(false);
+			m_btnStereo->setIcon(QIcon(*mixer_blank_OffIcon));
 			hasRecord = true;
 			hasAux = true; //Used for controller knobs in midi
 			hasStereo = false;
@@ -162,7 +163,8 @@ Strip::Strip(QWidget* parent, Track* t)
 			m_auxBase->setObjectName("MidiDrumTrackAuxbox");
 			//topRack = QPixmap(":/images/top_rack_midi.png");
 			//bottomRack = QPixmap(":/images/bottom_rack_midi.png");
-			m_btnStereo->setVisible(false);
+			//m_btnStereo->setEnabled(false);
+			m_btnStereo->setIcon(*mixer_blank_OffIcon);
 			hasRecord = true;
 			hasAux = true; //Used for controller knobs in midi
 			hasStereo = false;
@@ -210,6 +212,7 @@ void Strip::layoutUi()/*{{{*/
 	//if (MixerStripBase->objectName().isEmpty())
 	//	MixerStripBase->setObjectName(QString::fromUtf8("MixerStripBase"));
 	//resize(213, 441);
+	QSize iconSize = QSize(22, 20);
 	setFrameShape(QFrame::StyledPanel);
 	setFrameShadow(QFrame::Raised);
 	
@@ -283,51 +286,77 @@ void Strip::layoutUi()/*{{{*/
 	m_buttonBox->setContentsMargins(0, 0, 0, 0);
 	m_buttonBox->setSpacing(0);
 	
+	m_buttonBox->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
 	m_btnAux = new QToolButton(m_buttonBase);
 	m_btnAux->setObjectName("m_btnAux");
 	m_btnAux->setCheckable(true);
 	//m_btnAux->setChecked(true);
-	m_btnAux->setIcon(*expandIcon);
+	m_btnAux->setIcon(*mixer_resizeIconSet3);
+	m_btnAux->setIconSize(iconSize);
+	m_btnAux->setFixedSize(iconSize);
+	//m_btnAux->setIcon(*expandIcon);
 	
 	m_buttonBox->addWidget(m_btnAux);
 	
 	m_btnStereo = new QToolButton(m_buttonBase);
 	m_btnStereo->setObjectName(QString::fromUtf8("m_btnStereo"));
+	m_btnStereo->setIcon(*mixer_stereoIconSet3);
+	m_btnStereo->setIconSize(iconSize);
+	m_btnStereo->setFixedSize(iconSize);
 	
 	m_buttonBox->addWidget(m_btnStereo);
 	
 	m_btnIRoute = new QToolButton(m_buttonBase);
 	m_btnIRoute->setObjectName(QString::fromUtf8("m_btnIRoute"));
+	m_btnIRoute->setIcon(*mixer_inputIconSet3);
+	m_btnIRoute->setIconSize(iconSize);
+	m_btnIRoute->setFixedSize(iconSize);
 	
 	m_buttonBox->addWidget(m_btnIRoute);
 	
 	m_btnORoute = new QToolButton(m_buttonBase);
 	m_btnORoute->setObjectName(QString::fromUtf8("m_btnORoute"));
+	m_btnORoute->setIcon(*mixer_outputIconSet3);
+	m_btnORoute->setIconSize(iconSize);
+	m_btnORoute->setFixedSize(iconSize);
 	
 	m_buttonBox->addWidget(m_btnORoute);
 	
 	verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	
-	m_buttonBox->addItem(verticalSpacer);
+	//m_buttonBox->addItem(verticalSpacer);
 	
 	m_btnPower = new TransparentToolButton(m_buttonBase);
 	m_btnPower->setObjectName(QString::fromUtf8("m_btnPower"));
+	m_btnPower->setIcon(*mixer_powerIconSet3);
+	m_btnPower->setIconSize(iconSize);
+	m_btnPower->setFixedSize(iconSize);
 	
 	m_buttonBox->addWidget(m_btnPower);
 	
 	m_btnRecord = new TransparentToolButton(m_buttonBase);
 	m_btnRecord->setObjectName(QString::fromUtf8("m_btnRecord"));
+	m_btnRecord->setIcon(*mixer_recordIconSet3);
+	m_btnRecord->setIconSize(iconSize);
+	m_btnRecord->setFixedSize(iconSize);
 	
 	
 	m_btnMute = new QToolButton(m_buttonBase);
 	m_btnMute->setObjectName(QString::fromUtf8("m_btnMute"));
+	m_btnMute->setIcon(*mixer_muteIconSet3);
+	m_btnMute->setIconSize(iconSize);
+	m_btnMute->setFixedSize(iconSize);
 	
 	m_btnSolo = new QToolButton(m_buttonBase);
 	m_btnSolo->setObjectName(QString::fromUtf8("m_btnSolo"));
+	m_btnSolo->setIcon(*mixer_soloIconSet3);
+	m_btnSolo->setIconSize(iconSize);
+	m_btnSolo->setFixedSize(iconSize);
 	
-	m_buttonBox->addWidget(m_btnSolo);
-	m_buttonBox->addWidget(m_btnMute);
 	m_buttonBox->addWidget(m_btnRecord);
+	m_buttonBox->addWidget(m_btnMute);
+	m_buttonBox->addWidget(m_btnSolo);
 	
 	
 	horizontalLayout_2->addWidget(m_buttonBase);

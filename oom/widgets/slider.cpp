@@ -295,7 +295,7 @@ void Slider::drawSlider(QPainter *p, const QRect &r)
 		//qDrawShadePanel(p,cr.x(),ipos , cr.width(), d_thumbLength,
 		//    pal,FALSE,d_borderWidth, &brBack);
 		QPixmap thumbp;
-		bool loaded = thumbp.load(":images/slider_thumb.png");
+		bool loaded = thumbp.load(":images/slider_thumb_new.png");
 		int knobx = cr.x() + 2;
 		int knoby = ipos - 12;
 		QRect knobRect(knobx, knoby, 18, 33);

@@ -496,6 +496,37 @@ QPixmap* loopIconOff;
 QPixmap* loopIconOver;
 QIcon* loopIconSet3;
 
+QIcon* mixer_resizeIconSet3;
+QIcon* mixer_inputIconSet3;
+QIcon* mixer_outputIconSet3;
+QIcon* mixer_powerIconSet3;
+QIcon* mixer_recordIconSet3;
+QIcon* mixer_muteIconSet3;
+QIcon* mixer_soloIconSet3;
+QIcon* mixer_stereoIconSet3;
+
+QPixmap* mixer_record_OnIcon;
+QPixmap* mixer_record_OffIcon;
+QPixmap* mixer_record_OverIcon;
+QPixmap* mixer_mute_OnIcon;
+QPixmap* mixer_mute_OffIcon;
+QPixmap* mixer_mute_OverIcon;
+QPixmap* mixer_solo_OnIcon;
+QPixmap* mixer_solo_OffIcon;
+QPixmap* mixer_solo_OverIcon;
+QPixmap* mixer_resize_OffIcon;
+QPixmap* mixer_resize_OverIcon;
+QPixmap* mixer_input_OffIcon;
+QPixmap* mixer_input_OverIcon;
+QPixmap* mixer_output_OffIcon;
+QPixmap* mixer_output_OverIcon;
+QPixmap* mixer_power_OnIcon;
+QPixmap* mixer_power_OffIcon;
+QPixmap* mixer_power_OverIcon;
+QPixmap* mixer_blank_OffIcon;
+QPixmap* mixer_stereo_OnIcon;
+QPixmap* mixer_mono_OnIcon;
+
 QPixmap* speakerIconOn;
 QPixmap* speakerIconOff;
 QPixmap* speakerIconOver;
@@ -1050,6 +1081,64 @@ void initIcons()
 	  panicIconSet3         = new QIcon();
       panicIconSet3->addPixmap(*panicIconOff, QIcon::Normal, QIcon::Off);
       panicIconSet3->addPixmap(*panicIconOver, QIcon::Active);
+	  
+      mixer_resize_OffIcon= new MPIXMAP(":/images/icons/mixer_resize_new_off.png", NULL);
+      mixer_resize_OverIcon= new MPIXMAP(":/images/icons/mixer_resize_new_over.png", NULL);
+	  mixer_resizeIconSet3         = new QIcon();
+      mixer_resizeIconSet3->addPixmap(*mixer_resize_OffIcon, QIcon::Normal, QIcon::Off);
+      mixer_resizeIconSet3->addPixmap(*mixer_resize_OverIcon, QIcon::Active);
+	  
+	  mixer_record_OnIcon = new MPIXMAP(":/images/icons/mixer_record_new_on.png", NULL);
+      mixer_record_OffIcon= new MPIXMAP(":/images/icons/mixer_record_new_off.png", NULL);
+      mixer_record_OverIcon= new MPIXMAP(":/images/icons/mixer_record_new_over.png", NULL);
+	  mixer_recordIconSet3         = new QIcon();
+      mixer_recordIconSet3->addPixmap(*mixer_record_OnIcon, QIcon::Normal, QIcon::On);
+      mixer_recordIconSet3->addPixmap(*mixer_record_OffIcon, QIcon::Normal, QIcon::Off);
+      mixer_recordIconSet3->addPixmap(*mixer_record_OverIcon, QIcon::Active);
+	  
+	  mixer_mute_OnIcon = new MPIXMAP(":/images/icons/mixer_mute_new_on.png", NULL);
+      mixer_mute_OffIcon= new MPIXMAP(":/images/icons/mixer_mute_new_off.png", NULL);
+      mixer_mute_OverIcon= new MPIXMAP(":/images/icons/mixer_mute_new_over.png", NULL);
+	  mixer_muteIconSet3         = new QIcon();
+      mixer_muteIconSet3->addPixmap(*mixer_mute_OnIcon, QIcon::Normal, QIcon::On);
+      mixer_muteIconSet3->addPixmap(*mixer_mute_OffIcon, QIcon::Normal, QIcon::Off);
+      mixer_muteIconSet3->addPixmap(*mixer_mute_OverIcon, QIcon::Active);
+	  
+	  mixer_solo_OnIcon = new MPIXMAP(":/images/icons/mixer_solo_new_on.png", NULL);
+      mixer_solo_OffIcon= new MPIXMAP(":/images/icons/mixer_solo_new_off.png", NULL);
+      mixer_solo_OverIcon= new MPIXMAP(":/images/icons/mixer_solo_new_over.png", NULL);
+	  mixer_soloIconSet3         = new QIcon();
+      mixer_soloIconSet3->addPixmap(*mixer_solo_OnIcon, QIcon::Normal, QIcon::On);
+      mixer_soloIconSet3->addPixmap(*mixer_solo_OffIcon, QIcon::Normal, QIcon::Off);
+      mixer_soloIconSet3->addPixmap(*mixer_solo_OverIcon, QIcon::Active);
+	  
+      mixer_input_OffIcon= new MPIXMAP(":/images/icons/mixer_input_new_off.png", NULL);
+      mixer_input_OverIcon= new MPIXMAP(":/images/icons/mixer_input_new_over.png", NULL);
+	  mixer_inputIconSet3         = new QIcon();
+      mixer_inputIconSet3->addPixmap(*mixer_input_OffIcon, QIcon::Normal, QIcon::Off);
+      mixer_inputIconSet3->addPixmap(*mixer_input_OverIcon, QIcon::Active);
+	  
+      mixer_output_OffIcon= new MPIXMAP(":/images/icons/mixer_output_new_off.png", NULL);
+      mixer_output_OverIcon= new MPIXMAP(":/images/icons/mixer_output_new_over.png", NULL);
+	  mixer_outputIconSet3         = new QIcon();
+      mixer_outputIconSet3->addPixmap(*mixer_output_OffIcon, QIcon::Normal, QIcon::Off);
+      mixer_outputIconSet3->addPixmap(*mixer_output_OverIcon, QIcon::Active);
+	  
+      mixer_power_OnIcon= new MPIXMAP(":/images/icons/mixer_power_new_on.png", NULL);
+      mixer_power_OffIcon= new MPIXMAP(":/images/icons/mixer_power_new_off.png", NULL);
+      mixer_power_OverIcon= new MPIXMAP(":/images/icons/mixer_power_new_over.png", NULL);
+	  mixer_powerIconSet3         = new QIcon();
+      mixer_powerIconSet3->addPixmap(*mixer_power_OnIcon, QIcon::Normal, QIcon::On);
+      mixer_powerIconSet3->addPixmap(*mixer_power_OffIcon, QIcon::Normal, QIcon::Off);
+      mixer_powerIconSet3->addPixmap(*mixer_power_OverIcon, QIcon::Active);
+      
+	  mixer_blank_OffIcon= new MPIXMAP(":/images/icons/mixer_blank_new_off.png", NULL);
+	  
+      mixer_stereo_OnIcon= new MPIXMAP(":/images/icons/mixer_stereo_new_on.png", NULL);
+      mixer_mono_OnIcon= new MPIXMAP(":/images/icons/mixer_mono_new_on.png", NULL);
+	  mixer_stereoIconSet3         = new QIcon();
+      mixer_stereoIconSet3->addPixmap(*mixer_stereo_OnIcon, QIcon::Normal, QIcon::On);
+      mixer_stereoIconSet3->addPixmap(*mixer_mono_OnIcon, QIcon::Normal, QIcon::Off);
 	  
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);

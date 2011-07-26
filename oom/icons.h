@@ -426,6 +426,37 @@ extern QIcon* reminder1IconSet3;
 extern QIcon* reminder2IconSet3;
 extern QIcon* reminder3IconSet3;
 
+extern QIcon* mixer_resizeIconSet3;
+extern QIcon* mixer_inputIconSet3;
+extern QIcon* mixer_outputIconSet3;
+extern QIcon* mixer_powerIconSet3;
+extern QIcon* mixer_recordIconSet3;
+extern QIcon* mixer_muteIconSet3;
+extern QIcon* mixer_soloIconSet3;
+extern QIcon* mixer_stereoIconSet3;
+
+extern QPixmap* mixer_record_OnIcon;
+extern QPixmap* mixer_record_OffIcon;
+extern QPixmap* mixer_record_OverIcon;
+extern QPixmap* mixer_mute_OnIcon;
+extern QPixmap* mixer_mute_OffIcon;
+extern QPixmap* mixer_mute_OverIcon;
+extern QPixmap* mixer_solo_OnIcon;
+extern QPixmap* mixer_solo_OffIcon;
+extern QPixmap* mixer_solo_OverIcon;
+extern QPixmap* mixer_resize_OffIcon;
+extern QPixmap* mixer_resize_OverIcon;
+extern QPixmap* mixer_input_OffIcon;
+extern QPixmap* mixer_input_OverIcon;
+extern QPixmap* mixer_output_OffIcon;
+extern QPixmap* mixer_output_OverIcon;
+extern QPixmap* mixer_power_OnIcon;
+extern QPixmap* mixer_power_OffIcon;
+extern QPixmap* mixer_power_OverIcon;
+extern QPixmap* mixer_blank_OffIcon;
+extern QPixmap* mixer_stereo_OnIcon;
+extern QPixmap* mixer_mono_OnIcon;
+
 extern QIcon* record_trackIconSet3;
 extern QIcon* mute_trackIconSet3;
 extern QIcon* solo_trackIconSet3;

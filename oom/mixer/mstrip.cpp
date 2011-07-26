@@ -170,34 +170,19 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	//    m_btnRecord, mixdownfile
 	//---------------------------------------------------
 
-	QIcon iconSet;
-	iconSet.addPixmap(*record_on_Icon, QIcon::Normal, QIcon::On);
-	iconSet.addPixmap(*record_off_Icon, QIcon::Normal, QIcon::Off);
-	m_btnRecord->setIcon(iconSet);
 	m_btnRecord->setCheckable(true);
-	m_btnRecord->setIconSize(record_on_Icon->size());
 	m_btnRecord->setToolTip(tr("record"));
 	m_btnRecord->setObjectName("btnRecord");
 	m_btnRecord->setChecked(track->recordFlag());
 	connect(m_btnRecord, SIGNAL(clicked(bool)), SLOT(recordToggled(bool)));
 
-	//Fix toggle icon
-	m_btnAux->setIconSize(record_on_Icon->size());
-
-	QIcon muteSet;
-	muteSet.addPixmap(*muteIconOn, QIcon::Normal, QIcon::On);
-	muteSet.addPixmap(*muteIconOff, QIcon::Normal, QIcon::Off);
-	muteSet.addPixmap(*muteIconOver, QIcon::Active);
-	m_btnMute->setIcon(muteSet);
-	m_btnMute->setIconSize(muteIconOn->size());
 	m_btnMute->setCheckable(true);
 	m_btnMute->setToolTip(tr("mute"));
 	m_btnMute->setObjectName("btnMute");
 	m_btnMute->setChecked(track->mute());
-	m_btnMute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	connect(m_btnMute, SIGNAL(clicked(bool)), SLOT(muteToggled(bool)));
 
-	if ((bool)t->internalSolo())
+	/*if ((bool)t->internalSolo())
 	{
 		m_btnSolo->setIcon(*soloIconSet2);
 		m_btnSolo->setIconSize(soloIconOn->size());
@@ -208,22 +193,14 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 		m_btnSolo->setIcon(*soloIconSet1);
 		m_btnSolo->setIconSize(soloblksqIconOn->size());
 		useSoloIconSet2 = false;
-	}
+	}*/
 
 	m_btnSolo->setToolTip(tr("solo mode"));
 	m_btnSolo->setCheckable(true);
 	m_btnSolo->setObjectName("btnSolo");
 	m_btnSolo->setChecked(t->solo());
-	m_btnSolo->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	connect(m_btnSolo, SIGNAL(clicked(bool)), SLOT(soloToggled(bool)));
 
-	QIcon iconOff;
-	iconOff.addPixmap(*exit1Icon, QIcon::Normal, QIcon::On);
-	iconOff.addPixmap(*exitIcon, QIcon::Normal, QIcon::Off);
-	m_btnPower->setIcon(iconOff);
-	m_btnPower->setIconSize(exit1Icon->size());
-	m_btnPower->setBackgroundRole(QPalette::Mid);
-	m_btnPower->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
 	m_btnPower->setCheckable(true);
 	m_btnPower->setToolTip(tr("off"));
 	m_btnPower->setObjectName("btnExit");
@@ -234,27 +211,19 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	//    routing
 	//---------------------------------------------------
 
-	m_btnIRoute->setFont(config.fonts[1]);
-	m_btnIRoute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	//m_btnIRoute->setText(tr("iR"));
-	m_btnIRoute->setIcon(*mixerIn);
-	m_btnIRoute->setIconSize(mixerIn->size());
 	m_btnIRoute->setCheckable(false);
 	m_btnIRoute->setToolTip(tr("input routing"));
 	m_btnIRoute->setObjectName("btnIns");
 	connect(m_btnIRoute, SIGNAL(pressed()), SLOT(iRoutePressed()));
 	
-	m_btnORoute->setFont(config.fonts[1]);
-	m_btnORoute->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	//m_btnORoute->setText(tr("oR"));
-	m_btnORoute->setIcon(*mixerOut);
-	m_btnORoute->setIconSize(mixerOut->size());
 	m_btnORoute->setCheckable(false);
 	m_btnORoute->setObjectName("btnOuts");
 	// TODO: Works OK, but disabled for now, until we figure out what to do about multiple out routes and display values...
-	m_btnORoute->setEnabled(false);
-	m_btnORoute->setToolTip(tr("output routing"));
-	connect(m_btnORoute, SIGNAL(pressed()), SLOT(oRoutePressed()));
+	//m_btnORoute->setEnabled(false);
+	//m_btnORoute->setToolTip(tr("output routing"));
+	m_btnIRoute->setToolTip("");
+	m_btnORoute->setIcon(QIcon(*mixer_blank_OffIcon));
+	//connect(m_btnORoute, SIGNAL(pressed()), SLOT(oRoutePressed()));
 
 	//---------------------------------------------------
 	//    automation mode
@@ -476,7 +445,7 @@ void MidiStrip::songChanged(int val)
 	}
 	if (m_btnSolo && (val & SC_SOLO))
 	{
-		if ((bool)track->internalSolo())
+		/*if ((bool)track->internalSolo())
 		{
 			if (!useSoloIconSet2)
 			{
@@ -490,7 +459,7 @@ void MidiStrip::songChanged(int val)
 			m_btnSolo->setIcon(*soloIconSet1);
 			m_btnSolo->setIconSize(soloblksqIconOn->size());
 			useSoloIconSet2 = false;
-		}
+		}*/
 		m_btnSolo->blockSignals(true);
 		m_btnSolo->setChecked(track->solo());
 		m_btnSolo->blockSignals(false);
