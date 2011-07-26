@@ -322,7 +322,8 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 		//p.drawLine(9, 0, 9, w);
 		//p.drawLine(10, 0, 10, w);
 		
-		p.fillRect(0, 0, h, yv, QBrush(bgColor)); // dark red
+		int start = width - yv;
+		p.fillRect(start, start, yv, h, QBrush(bgColor)); // dark red
 		if (yv == w)
 		{
 			emit meterClipped();
