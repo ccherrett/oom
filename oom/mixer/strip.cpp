@@ -291,10 +291,12 @@ void Strip::layoutUi()/*{{{*/
 	m_btnAux = new QToolButton(m_buttonBase);
 	m_btnAux->setObjectName("m_btnAux");
 	m_btnAux->setCheckable(true);
+	m_btnAux->setToolTip(tr("Toggle Mixer Rack"));
 	//m_btnAux->setChecked(true);
 	m_btnAux->setIcon(*mixer_resizeIconSet3);
 	m_btnAux->setIconSize(iconSize);
 	m_btnAux->setFixedSize(iconSize);
+	m_btnAux->setAutoRaise(true);
 	//m_btnAux->setIcon(*expandIcon);
 	
 	m_buttonBox->addWidget(m_btnAux);
@@ -304,6 +306,7 @@ void Strip::layoutUi()/*{{{*/
 	m_btnStereo->setIcon(*mixer_stereoIconSet3);
 	m_btnStereo->setIconSize(iconSize);
 	m_btnStereo->setFixedSize(iconSize);
+	m_btnStereo->setAutoRaise(true);
 	
 	m_buttonBox->addWidget(m_btnStereo);
 	
@@ -312,6 +315,7 @@ void Strip::layoutUi()/*{{{*/
 	m_btnIRoute->setIcon(*mixer_inputIconSet3);
 	m_btnIRoute->setIconSize(iconSize);
 	m_btnIRoute->setFixedSize(iconSize);
+	m_btnIRoute->setAutoRaise(true);
 	
 	m_buttonBox->addWidget(m_btnIRoute);
 	
@@ -320,6 +324,7 @@ void Strip::layoutUi()/*{{{*/
 	m_btnORoute->setIcon(*mixer_outputIconSet3);
 	m_btnORoute->setIconSize(iconSize);
 	m_btnORoute->setFixedSize(iconSize);
+	m_btnORoute->setAutoRaise(true);
 	
 	m_buttonBox->addWidget(m_btnORoute);
 	
@@ -332,6 +337,7 @@ void Strip::layoutUi()/*{{{*/
 	m_btnPower->setIcon(*mixer_powerIconSet3);
 	m_btnPower->setIconSize(iconSize);
 	m_btnPower->setFixedSize(iconSize);
+	m_btnPower->setAutoRaise(true);
 	
 	m_buttonBox->addWidget(m_btnPower);
 	
@@ -340,6 +346,7 @@ void Strip::layoutUi()/*{{{*/
 	m_btnRecord->setIcon(*mixer_recordIconSet3);
 	m_btnRecord->setIconSize(iconSize);
 	m_btnRecord->setFixedSize(iconSize);
+	m_btnRecord->setAutoRaise(true);
 	
 	
 	m_btnMute = new QToolButton(m_buttonBase);
@@ -347,12 +354,14 @@ void Strip::layoutUi()/*{{{*/
 	m_btnMute->setIcon(*mixer_muteIconSet3);
 	m_btnMute->setIconSize(iconSize);
 	m_btnMute->setFixedSize(iconSize);
+	m_btnMute->setAutoRaise(true);
 	
 	m_btnSolo = new QToolButton(m_buttonBase);
 	m_btnSolo->setObjectName(QString::fromUtf8("m_btnSolo"));
 	m_btnSolo->setIcon(*mixer_soloIconSet3);
 	m_btnSolo->setIconSize(iconSize);
 	m_btnSolo->setFixedSize(iconSize);
+	m_btnSolo->setAutoRaise(true);
 	
 	m_buttonBox->addWidget(m_btnRecord);
 	m_buttonBox->addWidget(m_btnMute);
