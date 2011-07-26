@@ -20,6 +20,7 @@ class QMenu;
 class QToolButton;
 class QWidget;
 class QShowEvent;
+class QResizeEvent;
 class QScrollArea;
 class QSplitter;
 class QPushButton;
@@ -64,6 +65,7 @@ protected:
     virtual void closeEvent(QCloseEvent*);
 	virtual void hideEvent(QHideEvent*);
 	virtual void showEvent(QShowEvent*);
+	virtual void resizeEvent(QResizeEvent*);
 
 signals:
 	void closed();

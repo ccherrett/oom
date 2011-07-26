@@ -1127,6 +1127,13 @@ void TrackHeader::updatePan()/*{{{*/
 			}
 		}
 	}
+	if(m_pan && panVal != CTRL_VAL_UNKNOWN)
+	{
+		QString val = QString::number(panVal);
+		m_pan->setToolTip(val+" Panorama");
+	}
+	else if(m_pan)
+		m_pan->setToolTip("Panorama");
 }/*}}}*/
 
 void TrackHeader::panChanged(double val)/*{{{*/
@@ -1224,7 +1231,6 @@ void TrackHeader::panRightClicked(const QPoint &p)/*{{{*/
 	else
 		song->execAutomationCtlPopup((AudioTrack*) m_track, p, AC_PAN);
 }/*}}}*/
-
 
 //Private member functions
 
