@@ -1338,14 +1338,14 @@ QMenu::item {
  }
 
 QMenu::item:selected { /* when selected using mouse or keyboard */
-     background: #101819;
-	 color: #42cae6;
+     background: #000000;
+	 color: #ffffff;
 	 font-weight: bold;
 	 font-size: 10px;
  }
 QMenu::item:pressed {
-     background: #101819;
-	 color: #42cae6;
+     background: #1e1e1e;
+	 color: #bfbfbf;
 	 font-weight: bold;
 	 font-size: 10px;
 }
