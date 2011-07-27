@@ -332,6 +332,15 @@
 		<file>images/icons/mixer_blank_new_off.png</file>
 		<file>images/slider_thumb_new.png</file>
 		<file>images/slider_thumb_new_h.png</file>
+		<file>images/icons/mixer_new_on.png</file>
+		<file>images/icons/mixer_new_over.png</file>
+		<file>images/icons/mixer_new_off.png</file>
+		<file>images/icons/pcloader_new_on.png</file>
+		<file>images/icons/pcloader_new_over.png</file>
+		<file>images/icons/pcloader_new_off.png</file>
+		<file>images/icons/feedback_new_on.png</file>
+		<file>images/icons/feedback_new_over.png</file>
+		<file>images/icons/feedback_new_off.png</file>
 	</qresource>
 </RCC>
 

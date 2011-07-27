@@ -42,9 +42,9 @@ Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout)
 	redScale = 0;
 	setLineWidth(0);
 	setMidLineWidth(0);
-	green = QColor(49, 175, 197);
-	yellow = QColor(156, 85, 115);
-	red = QColor(197, 49, 87);
+	green = QColor(0,130,154);
+	yellow = QColor(152,33,84);
+	red = QColor(160,3,43);
 	bgColor = QColor(12, 12, 12);
 }
 
