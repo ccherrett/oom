@@ -504,6 +504,8 @@ QIcon* mixer_recordIconSet3;
 QIcon* mixer_muteIconSet3;
 QIcon* mixer_soloIconSet3;
 QIcon* mixer_stereoIconSet3;
+QIcon* mixerIconSet3;
+QIcon* pcloaderIconSet3;
 
 QPixmap* mixer_record_OnIcon;
 QPixmap* mixer_record_OffIcon;
@@ -526,6 +528,13 @@ QPixmap* mixer_power_OverIcon;
 QPixmap* mixer_blank_OffIcon;
 QPixmap* mixer_stereo_OnIcon;
 QPixmap* mixer_mono_OnIcon;
+
+QPixmap* mixer_OnIcon;
+QPixmap* mixer_OffIcon;
+QPixmap* mixer_OverIcon;
+QPixmap* pcloader_OnIcon;
+QPixmap* pcloader_OffIcon;
+QPixmap* pcloader_OverIcon;
 
 QPixmap* speakerIconOn;
 QPixmap* speakerIconOff;
@@ -1014,9 +1023,9 @@ void initIcons()
       auditionIconSet3->addPixmap(*auditionIconOff, QIcon::Normal, QIcon::Off);
       auditionIconSet3->addPixmap(*auditionIconOver, QIcon::Active);
 	  
-	  feedbackIconOn = new MPIXMAP(":/images/icons/feedback.png", NULL);
-      feedbackIconOff= new MPIXMAP(":/images/icons/feedback_off.png", NULL);
-      feedbackIconOver= new MPIXMAP(":/images/icons/feedback_over.png", NULL);
+	  feedbackIconOn = new MPIXMAP(":/images/icons/feedback_new_on.png", NULL);
+      feedbackIconOff= new MPIXMAP(":/images/icons/feedback_new_off.png", NULL);
+      feedbackIconOver= new MPIXMAP(":/images/icons/feedback_new_over.png", NULL);
 	  feedbackIconSet3         = new QIcon();
       feedbackIconSet3->addPixmap(*feedbackIconOn, QIcon::Normal, QIcon::On);
       feedbackIconSet3->addPixmap(*feedbackIconOff, QIcon::Normal, QIcon::Off);
@@ -1139,6 +1148,22 @@ void initIcons()
 	  mixer_stereoIconSet3         = new QIcon();
       mixer_stereoIconSet3->addPixmap(*mixer_stereo_OnIcon, QIcon::Normal, QIcon::On);
       mixer_stereoIconSet3->addPixmap(*mixer_mono_OnIcon, QIcon::Normal, QIcon::Off);
+	  
+      mixer_OnIcon= new MPIXMAP(":/images/icons/mixer_new_on.png", NULL);
+      mixer_OffIcon= new MPIXMAP(":/images/icons/mixer_new_off.png", NULL);
+      mixer_OverIcon= new MPIXMAP(":/images/icons/mixer_new_over.png", NULL);
+	  mixerIconSet3         = new QIcon();
+      mixerIconSet3->addPixmap(*mixer_OnIcon, QIcon::Normal, QIcon::On);
+      mixerIconSet3->addPixmap(*mixer_OffIcon, QIcon::Normal, QIcon::Off);
+      mixerIconSet3->addPixmap(*mixer_OverIcon, QIcon::Active);
+	  
+      pcloader_OnIcon= new MPIXMAP(":/images/icons/pcloader_new_on.png", NULL);
+      pcloader_OffIcon= new MPIXMAP(":/images/icons/pcloader_new_off.png", NULL);
+      pcloader_OverIcon= new MPIXMAP(":/images/icons/pcloader_new_over.png", NULL);
+	  pcloaderIconSet3         = new QIcon();
+      pcloaderIconSet3->addPixmap(*pcloader_OnIcon, QIcon::Normal, QIcon::On);
+      pcloaderIconSet3->addPixmap(*pcloader_OffIcon, QIcon::Normal, QIcon::Off);
+      pcloaderIconSet3->addPixmap(*pcloader_OverIcon, QIcon::Active);
 	  
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);
