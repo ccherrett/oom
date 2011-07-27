@@ -1590,6 +1590,11 @@ void OOMidi::addTransportToolbar()
 	tools->setObjectName("transTools");
 	addToolBar(Qt::BottomToolBarArea, tools);
 
+	QWidget* spacer15 = new QWidget();
+	spacer15->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	spacer15->setFixedWidth(15);
+	tools->addWidget(spacer15);
+
 	FeedbackTools * feedbackBar = new FeedbackTools(this);
 	tools->addWidget(feedbackBar);
 	
