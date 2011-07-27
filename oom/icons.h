@@ -286,6 +286,21 @@ extern QIcon* loopIconOff;
 extern QIcon* loopIconOver;
 extern QIcon* loopIconSet3;
 
+extern QIcon* punchinVertIconOn;
+extern QIcon* punchinVertIconOff;
+extern QIcon* punchinVertIconOver;
+extern QIcon* punchinVertIconSet3;
+
+extern QIcon* punchoutVertIconOn;
+extern QIcon* punchoutVertIconOff;
+extern QIcon* punchoutVertIconOver;
+extern QIcon* punchoutVertIconSet3;
+
+extern QIcon* loopVertIconOn;
+extern QIcon* loopVertIconOff;
+extern QIcon* loopVertIconOver;
+extern QIcon* loopVertIconSet3;
+
 extern QIcon* speakerIconOn;
 extern QIcon* speakerIconOff;
 extern QIcon* speakerIconOver;

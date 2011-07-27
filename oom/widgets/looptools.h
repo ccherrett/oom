@@ -2,23 +2,27 @@
 #define _LOOPTOOLS_H_
 #include <QFrame>
 
-class QHBoxLayout;
+class QBoxLayout;
 class QToolButton;
 class QAction;
 
 class LoopToolbar : public QFrame
 {
 	Q_OBJECT
-	QHBoxLayout* m_layout;
+	QBoxLayout* m_layout;
 	QToolButton* m_btnLoop;
 	QToolButton* m_btnPunchin;
 	QToolButton* m_btnPunchout;
+	Qt::Orientation m_orient;
 
 private slots:
 	void songChanged(int);
+	void setLoopSilent(bool);
+	void setPunchinSilent(bool);
+	void setPunchoutSilent(bool);
 public slots:
 public:
-	LoopToolbar(QWidget* parent = 0);
+	LoopToolbar(Qt::Orientation orient = Qt::Horizontal, QWidget* parent = 0);
 	virtual ~LoopToolbar(){}
 };
 

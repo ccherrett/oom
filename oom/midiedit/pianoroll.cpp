@@ -469,7 +469,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	spacer5555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer5555->setMaximumWidth(15);
 	tools2->addWidget(spacer5555);
-	LoopToolbar* loopBar = new LoopToolbar(this);
+	LoopToolbar* loopBar = new LoopToolbar(Qt::Horizontal, this);
 	tools2->addWidget(loopBar);
 	QWidget* spacer55555 = new QWidget();
 	spacer55555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

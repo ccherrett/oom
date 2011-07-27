@@ -1636,7 +1636,7 @@ void OOMidi::addTransportToolbar()
 	tspacer2->setMaximumWidth(15);
 	tools->addWidget(tspacer2);
 
-	LoopToolbar* loopBar = new LoopToolbar(this);
+	LoopToolbar* loopBar = new LoopToolbar(Qt::Horizontal, this);
 	tools->addWidget(loopBar);
 	QWidget* spacer55555 = new QWidget();
 	spacer55555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

@@ -264,6 +264,15 @@
 		<file>images/icons/left_new_on.png</file>
 		<file>images/icons/left_new_off.png</file>
 		<file>images/icons/left_new_over.png</file>
+		<file>images/icons/loop_new_on_v.png</file>
+		<file>images/icons/loop_new_off_v.png</file>
+		<file>images/icons/loop_new_over_v.png</file>
+		<file>images/icons/right_new_on_v.png</file>
+		<file>images/icons/right_new_off_v.png</file>
+		<file>images/icons/right_new_over_v.png</file>
+		<file>images/icons/left_new_on_v.png</file>
+		<file>images/icons/left_new_off_v.png</file>
+		<file>images/icons/left_new_over_v.png</file>
 		<file>images/icons/step_new_on.png</file>
 		<file>images/icons/step_new_off.png</file>
 		<file>images/icons/step_new_over.png</file>

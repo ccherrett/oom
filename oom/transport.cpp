@@ -27,6 +27,8 @@
 #include "shortcuts.h"
 #include "gconfig.h"
 #include "app.h"
+#include "transporttools.h"
+#include "looptools.h"
 
 static const char* recordTransportText = QT_TRANSLATE_NOOP("@default", "Click this button to enable recording");
 static const char* stopTransportText = QT_TRANSLATE_NOOP("@default", "Click this button to stop playback");
@@ -279,8 +281,10 @@ Transport::Transport(QWidget* parent, const char* name)
 
 	QVBoxLayout *button2 = new QVBoxLayout;
 	button2->setSpacing(0);
+	LoopToolbar* loopBar = new LoopToolbar(Qt::Vertical, this);
+	button2->addWidget(loopBar);
 
-	QToolButton* b1 = newButton(punchinIcon, tr("punchin"), true);
+	/*QToolButton* b1 = newButton(punchinIcon, tr("punchin"), true);
 	QToolButton* b2 = newButton(loopIcon, tr("loop"), true);
 	b2->setShortcut(shortcuts[SHRT_TOGGLE_LOOP].key);
 
@@ -306,6 +310,7 @@ Transport::Transport(QWidget* parent, const char* name)
 	connect(song, SIGNAL(punchinChanged(bool)), b1, SLOT(setChecked(bool)));
 	connect(song, SIGNAL(punchoutChanged(bool)), b3, SLOT(setChecked(bool)));
 	connect(song, SIGNAL(loopChanged(bool)), b2, SLOT(setChecked(bool)));
+	*/
 
 	hbox->addLayout(button2);
 
@@ -385,7 +390,13 @@ Transport::Transport(QWidget* parent, const char* name)
 	tb = new QHBoxLayout;
 	tb->setSpacing(0);
 
-	buttons[0] = newButton(startIcon, tr("rewind to start"));
+	bool showPanic = true;
+	bool showMuteSolo = false;
+
+	TransportToolbar *transportbar = new TransportToolbar(this, showPanic, showMuteSolo);
+	tb->addWidget(transportbar);
+
+	/*buttons[0] = newButton(startIcon, tr("rewind to start"));
 	buttons[0]->setWhatsThis(tr(startTransportText));
 
 	buttons[1] = newButton(frewindIcon, tr("rewind"));
@@ -418,7 +429,7 @@ Transport::Transport(QWidget* parent, const char* name)
 	connect(song, SIGNAL(recordChanged(bool)), SLOT(setRecord(bool)));
 	connect(buttons[0], SIGNAL(clicked()), song, SLOT(rewindStart()));
 	connect(buttons[1], SIGNAL(clicked()), song, SLOT(rewind()));
-	connect(buttons[2], SIGNAL(clicked()), song, SLOT(forward()));
+	connect(buttons[2], SIGNAL(clicked()), song, SLOT(forward()));*/
 
 	box4->addLayout(tb);
 	hbox->addLayout(box4);
@@ -646,12 +657,12 @@ void Transport::rposChanged(const Pos& pos)
 
 void Transport::setPlay(bool f)
 {
-	buttons[3]->blockSignals(true);
+	/*buttons[3]->blockSignals(true);
 	buttons[4]->blockSignals(true);
 	buttons[3]->setChecked(!f);
 	buttons[4]->setChecked(f);
 	buttons[3]->blockSignals(false);
-	buttons[4]->blockSignals(false);
+	buttons[4]->blockSignals(false);*/
 }
 
 //---------------------------------------------------------
@@ -748,11 +759,11 @@ void Transport::songChanged(int flags)
 void Transport::syncChanged(bool flag)
 {
 	syncButton->setChecked(flag);
-	buttons[0]->setEnabled(!flag); // goto start
-	buttons[1]->setEnabled(!flag); // rewind
-	buttons[2]->setEnabled(!flag); // forward
-	buttons[3]->setEnabled(!flag); // stop
-	buttons[4]->setEnabled(!flag); // play
+	//buttons[0]->setEnabled(!flag); // goto start
+	//buttons[1]->setEnabled(!flag); // rewind
+	//buttons[2]->setEnabled(!flag); // forward
+	//buttons[3]->setEnabled(!flag); // stop
+	//buttons[4]->setEnabled(!flag); // play
 	slider->setEnabled(!flag);
 	masterButton->setEnabled(!flag);
 	if (flag)
@@ -782,12 +793,12 @@ void Transport::stopToggled(bool val)
 {
 	if (val)
 		song->setStop(true);
-	else
+	/*else
 	{
 		buttons[3]->blockSignals(true);
 		buttons[3]->setChecked(true);
 		buttons[3]->blockSignals(false);
-	}
+	}*/
 }
 
 //---------------------------------------------------------
@@ -798,11 +809,11 @@ void Transport::playToggled(bool val)
 {
 	if (val)
 		song->setPlay(true);
-	else
+	/*else
 	{
 		buttons[4]->blockSignals(true);
 		buttons[4]->setChecked(true);
 		buttons[4]->blockSignals(false);
-	}
+	}*/
 }
 
