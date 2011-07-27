@@ -68,6 +68,7 @@
 #include "transporttools.h"
 #include "edittools.h"
 #include "looptools.h"
+#include "feedbacktools.h"
 
 #include "ccinfo.h"
 #ifdef DSSI_SUPPORT
@@ -1588,6 +1589,10 @@ void OOMidi::addTransportToolbar()
 	tools->setIconSize(QSize(29, 25));
 	tools->setObjectName("transTools");
 	addToolBar(Qt::BottomToolBarArea, tools);
+
+	FeedbackTools * feedbackBar = new FeedbackTools(this);
+	tools->addWidget(feedbackBar);
+	
 	QWidget* spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer->setMaximumWidth(205);
@@ -1595,7 +1600,7 @@ void OOMidi::addTransportToolbar()
 
 	bool showPanic = true;
 	bool showMuteSolo = false;
-	
+
 	TransportToolbar *transportbar = new TransportToolbar(this, showPanic, showMuteSolo);
 	tools->addWidget(transportbar);
 	
