@@ -176,7 +176,7 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 		if (mtype == DBMeter)
 		{
 			myPen.setWidth(1);
-			myPen.setColor(QColor(63, 74, 80));
+			myPen.setColor(QColor(63, 74, 80, 127));
 			p.setPen(myPen); //0 db
 			p.drawLine(3, y1, w - 4, y1);
 			

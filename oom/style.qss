@@ -960,7 +960,7 @@ QTabWidget#tabControlCenter QTabBar::tab:selected {
     /*background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);*/
-    background-color: #101819;
+    background-color: #0b0b0b;
 	color: #cdd1cd; 
 	font-family: "fixed-width";
 	font-weight: bold;
@@ -1027,7 +1027,7 @@ QTabBar::tab {
 }
 
 QTabBar::tab:selected, QTabBar::tab:hover {
-    background-color: #101819;
+    background-color: #0b0b0b;
 	color: #cdd1cd; 
 	font-family: "fixed-width";
 	font-weight: bold;
@@ -1075,7 +1075,7 @@ QTabWidget#m_tabWidget QTabBar::tab {
 }
 
 QTabWidget#m_tabWidget QTabBar::tab:selected, QTabWidget#m_tabWidget QTabBar::tab:hover {
-    background-color: #101819;
+    background-color: #0b0b0b;
 	color: #cdd1cd; 
 	font-family: "fixed-width";
 	font-weight: bold;
@@ -1366,19 +1366,19 @@ QMenuBar::item {
 }
 
 QMenuBar::item:selected { /* when selected using mouse or keyboard */
-     background: #101819;
-	 color: #42cae6;
+     background: #0b0b0b;
+	 color: #e7e7e7;
 }
 
 QMenuBar::item:pressed {
-     background: #101819;
-	 color: #42cae6;
+     background: #0b0b0b;
+	 color: #e7e7e7;
 }
 
 
 QScrollBar:horizontal {
      border: 1px solid #393941;
-     background: #101819;
+     background: #0b0b0b;
      height: 15px;
      margin: 0px 15px 0 15px;
 }
@@ -1416,7 +1416,7 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 }
 QScrollBar:vertical {
      border: 1px solid #393941;
-     background: #101819;/*#858599;*/
+     background: #0b0b0b;/*#858599;*/
      width: 15px;
      margin: 15px 0 15px 0px;
 }
@@ -1457,7 +1457,7 @@ QSlider::groove:horizontal
 {
     border: 1px solid #393941;
     height: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3f3f3f, stop:1 #101819);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3f3f3f, stop:1 #0b0b0b);
     margin: 2px 0;
 }
 QSlider::handle:horizontal 
@@ -1472,7 +1472,7 @@ QSlider::groove:vertical
 {
     border: 1px solid #393941;
     width: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3f3f3f, stop:1 #101819);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3f3f3f, stop:1 #0b0b0b);
     margin: 0 2px;
 }
 QSlider::handle:vertical 
