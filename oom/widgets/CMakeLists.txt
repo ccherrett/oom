@@ -60,6 +60,7 @@ QT4_WRAP_CPP (widget_mocs
 	  epictools.h
 	  looptools.h
 	  misctools.h
+	  feedbacktools.h
 	  rmap.h
 	  rmapdialog.h
 	  pctablemodel.h
@@ -197,6 +198,7 @@ file (GLOB widgets_source_files
 	  epictools.cpp
 	  looptools.cpp
 	  misctools.cpp
+	  feedbacktools.cpp
 	  rmap.cpp
 	  rmapdialog.cpp
       mtscale.cpp 

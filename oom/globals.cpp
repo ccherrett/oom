@@ -251,6 +251,7 @@ QAction* punchoutAction;
 QAction* recordAction;
 QAction* panicAction;
 QAction* feedbackAction;
+QAction* pcloaderAction;
 QAction* noteAlphaAction;
 QAction* multiPartSelectionAction;
 

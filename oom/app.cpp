@@ -917,6 +917,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	panicAction->setWhatsThis(tr(infoPanicButton));
 	connect(panicAction, SIGNAL(triggered()), song, SLOT(panic()));
 
+	pcloaderAction = new QAction(QIcon(*pcloaderIconSet3), tr("Program Change Loader"), this);
 	feedbackAction = new QAction(QIcon(*feedbackIconSet3), tr("Feedback"), this);
 	feedbackAction->setCheckable(true);
 	connect(feedbackAction, SIGNAL(toggled(bool)), song, SLOT(toggleFeedback(bool)));
@@ -1448,6 +1449,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(arranger, SIGNAL(dropMidiFile(const QString&)), SLOT(importMidi(const QString&)));
 	connect(arranger, SIGNAL(startEditor(PartList*, int)), SLOT(startEditor(PartList*, int)));
 	connect(this, SIGNAL(configChanged()), arranger, SLOT(configChanged()));
+	connect(pcloaderAction, SIGNAL(clicked()), arranger, SLOT(preloadControllers()));
 
 	connect(arranger, SIGNAL(setUsedTool(int)), SLOT(setUsedTool(int)));
 

@@ -146,6 +146,7 @@ extern QAction* punchoutAction;
 extern QAction* recordAction;
 extern QAction* panicAction;
 extern QAction* feedbackAction;
+extern QAction* pcloaderAction;
 extern QAction* noteAlphaAction;
 extern QAction* multiPartSelectionAction;
 

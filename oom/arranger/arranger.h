@@ -114,7 +114,6 @@ private slots:
     void setTempo100();
     void setTempo200();
     //void seek();
-	void preloadControllers();
 	void splitterMoved(int, int);
 	void resourceDockAreaChanged(Qt::DockWidgetArea);
 	void currentTabChanged(int);
@@ -145,6 +144,7 @@ public slots:
     void showTrackViews();
     void _setRaster(int, bool setDefault = true);
     void verticalScrollSetYpos(unsigned);
+	void preloadControllers();
 
 public:
 
