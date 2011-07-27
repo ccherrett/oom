@@ -15,19 +15,19 @@ QTableWidget#listSnap, QTableWidget#listQuant
 }
 QWidget#MRConfigBase, QWidget#MITTransposeBase 
 {
-	background-color: #595966;
+	background-color: #525252;
 }
 QWidget#dockMixerCenter 
 {
-	background-color: #595966;
+	background-color: #525252;
 }
 QWidget#transport 
 {
-	background-color: #595966;
+	background-color: #525252;
 }
 QTableView#trackHeaders 
 {
-	background-color: #595966;
+	background-color: #525252;
 	border: none;
 	padding: 0px;
 }
@@ -36,7 +36,7 @@ QHeaderView#trackHeaders
 {
 	text-align: left;
 	border: none;
-	background-color: #595966;
+	background-color: #525252;
 }
 
  QWidget#WaveView
@@ -112,7 +112,7 @@ MidiTrackInfo QTableView QHeaderView::section
 	border-radius: 0px;
 	padding: 5px;
 	/*background-color: #936b9c;*/
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #727180, stop:0.1 #727180, stop:0.3 #4a4d5a, stop:1 #4a4d5a);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.3 #5c5c5c, stop:1 #5c5c5c);
 	color: #d6dfd6;
 	font-family: "fixed-width";
 	font-weight: bold;
@@ -144,7 +144,7 @@ MidiTrackInfo QTableView::item:selected:!active
 /* Patch tree styles */
 MidiTrackInfo QWidget#patchSeqContents
 {
-	background-color: #595966;
+	background-color: #525252;
 	color: #d0d4d0;
 }
 
@@ -178,7 +178,7 @@ MidiTrackInfo QTreeView QHeaderView::section
 	border-radius: 0px;
 	padding: 5px;
 	/*background-color: #936b9c;*/
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #727180, stop:0.1 #727180, stop:0.3 #4a4d5a, stop:1 #4a4d5a);
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.3 #5c5c5c, stop:1 #5c5c5c);
 	color: #d6dfd6;
 	font-family: "fixed-width";
 	font-weight: bold;
@@ -228,7 +228,7 @@ QHeaderView::section
 	border-radius: 0px;
 	padding: 5px;
 	/*background-color: #936b9c;*/
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #727180, stop:0.1 #727180, stop:0.3 #4a4d5a, stop:1 #4a4d5a);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.3 #5c5c5c, stop:1 #5c5c5c);
 	color: #d6dfd6;
 	font-family: "fixed-width";
 	font-weight: bold;
@@ -663,8 +663,8 @@ background-color: #696977;
 }
 
 QFrame, QWidget#CCEditBase { 
-border: 0px solid #595966;
-background-color: #595966;
+border: 0px solid #525252;
+background-color: #525252;
 }
 
 
@@ -780,7 +780,7 @@ QToolButton#removeButton::hover
 QToolButton#connectButton::disabled, QToolButton#removeButton::disabled, QToolButton#btnConnectOut::disabled
 {
 	padding: 12px;
-	background-color: #595966;
+	background-color: #525252;
 	color: #8f9198;
     /*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                   stop: 0 #d0d4d0, stop:0.3 #5b5b6b, stop: 1.0 #4d4d5b);*/
@@ -917,15 +917,15 @@ QObject#patchView{
 	 show-decoration-selected: 0; 
 }
 /*///////////END CLIPLIST MANAGER///////////////}}}*/
-QWidget#MixerCenter { background-color: #595966 }
-QMainWindow { background-color: #595966 }
+QWidget#MixerCenter { background-color: #525252 }
+QMainWindow { background-color: #525252 }
 QMainWindow::separator {
-	background-color: #6b6973;
+	background-color: #444444;
 	width: 5px;
 }
 
 /* /////////////Internal Plugin GUI/////////// */
-QMainWindow#PluginGui, QWidget#PluginGuiBase { background-color: #595966 }
+QMainWindow#PluginGui, QWidget#PluginGuiBase { background-color: #525252 }
 
 /*{{{*/
 QTabWidget#tabControlCenter::pane { /* The tab widget frame */
@@ -997,7 +997,7 @@ QTabWidget#tabControlCenter QTabBar::tab:only-one {
 QTabWidget#tabControlCenter QTabBar::tab::disabled {
     color: #8f9198;; /* if there is only one tab, we don't want overlapping margins */
 	border-color: #47474d;							
-	background-color: #595966;
+	background-color: #525252;
 }
 /*}}}*/
 /*{{{*/
@@ -1014,7 +1014,7 @@ QTabWidget::tab-bar {
 QTabBar::tab {
 	background-color: #47474d;							
     border: 1px solid #a5a6a5;
-    border-bottom-color: #595966; /* same as the pane color */
+    border-bottom-color: #525252; /* same as the pane color */
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     min-width: 8ex;
@@ -1059,7 +1059,7 @@ QTabWidget#m_tabWidget QTabBar::tab {
 	background-color: #47474d;							
 	/*background-color: #FF0000;*/							
     border: 1px solid #a5a6a5;
-    border-bottom-color: #595966; /* same as the pane color */
+    border-bottom-color: #525252; /* same as the pane color */
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom-left-radius: 0px;
@@ -1116,7 +1116,7 @@ QTabWidget#m_tabWidget QTabBar::tab:only-one {
 QTabWidget#m_tabWidget QTabBar::tab::disabled {
     color: #8f9198;; /* if there is only one tab, we don't want overlapping margins */
 	border-color: #47474d;							
-	background-color: #595966;
+	background-color: #525252;
 }
 /*}}}*/
 
@@ -1141,12 +1141,12 @@ QDockWidget {/*{{{*/
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 11px;
-	background-color: #595966;
+	background-color: #525252;
 	
 }
 
 QDockWidget::title {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #727180, stop:0.1 #727180, stop:0.5 #4a4d5a, stop:1 #4a4d5a);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.5 #5c5c5c, stop:1 #5c5c5c);
     text-align: center;
     /*background: lightgray;*/
     padding-left: 35px;
@@ -1193,7 +1193,7 @@ QFrame#MixerCenter {/*{{{*/
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 11px;
-	background-color: #595966;
+	background-color: #525252;
 	border-top: 18px;
 	border-bottom: 18px;
 	border-left: 0px;
@@ -1206,7 +1206,7 @@ QFrame#MixerCenter {/*{{{*/
 
 QFrame#mixerDockTitle
 {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #727180, stop:0.1 #727180, stop:0.5 #4a4d5a, stop:1 #4a4d5a);
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #808080, stop:0.1 #808080, stop:0.5 #5c5c5c, stop:1 #5c5c5c);
     text-align: center;
     /*background: lightgray;*/
     padding-left: 0px;
@@ -1236,7 +1236,7 @@ InstrumentTree/*{{{*/
 /*//////////////////////// MIDI INPUT PLUGINS ////////////////////////////{{{*/
 QWidget#mitPluginTranspose, QDialog#midiInputTransform, QDialog#midiFilterConfig, QWidget#midiRemoteConfig, QDialog#midiRhythmGenerator 
 {
-	background-color: #595966;
+	background-color: #525252;
 }
 QWidget#mitPluginTranspose QLabel#transposeLabel
 {
@@ -1283,7 +1283,7 @@ QTextEdit#commentEntry
 }
 /*////////////////////////////////////////////////////////////////////////}}}*/
 
-QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Splitter, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea, QLabel#TrackViewMenuLabel { background-color: #595966; color: #d0d4d0; }
+QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Splitter, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea, QLabel#TrackViewMenuLabel { background-color: #525252; color: #d0d4d0; }
 
 QTextEdit, QTextEdit#songInfoText
 {
@@ -1294,7 +1294,7 @@ QTextEdit, QTextEdit#songInfoText
 }
 
 QToolBar { 
-	background-color: #595966; 
+	background-color: #525252; 
 	color: #d0d4d0; 
 	border: 0px solid #393941;
 }
@@ -1351,7 +1351,7 @@ QMenu::item:pressed {
 }
 
 QMenuBar{ 
-	background-color: #595966; 
+	background-color: #525252; 
 	color: #d0d4d0; 
 	border: 0px; 
 	font-family: "fixed-width";
@@ -1386,7 +1386,7 @@ QScrollBar::handle:horizontal {
      /*border: 1px solid #393941;*/
      border: 1px solid #aac0c2;
      /*background: #545463;*/
-     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #71707f, stop:1 #4a4d5a);
+     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #71707f, stop:1 #5c5c5c);
      min-width: 15px;
 }
 QScrollBar::add-line:horizontal {
@@ -1424,7 +1424,7 @@ QScrollBar::handle:vertical {
      /*border: 1px solid #393941;*/
      border: 1px solid #aac0c2;
      /*background: #545463;*/
-     background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #71707f, stop:1 #4a4d5a);
+     background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #71707f, stop:1 #5c5c5c);
      min-height: 15px;
 }
 QScrollBar::add-line:vertical {
@@ -1828,7 +1828,7 @@ QFrame#WaveHeader QLineEdit
 }
 
 QFrame#trackHeaderList {/*{{{*/
-	background-color: #595966;
+	background-color: #525252;
 	border-top: 0px;
 	border-bottom: 0px;
 	border-left: 18px;

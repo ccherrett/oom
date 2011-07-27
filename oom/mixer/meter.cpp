@@ -45,7 +45,7 @@ Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout)
 	green = QColor(49, 175, 197);
 	yellow = QColor(156, 85, 115);
 	red = QColor(197, 49, 87);
-	bgColor = QColor(0, 12, 16);
+	bgColor = QColor(12, 12, 12);
 }
 
 //---------------------------------------------------------

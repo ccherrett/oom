@@ -357,7 +357,7 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 	myPen.setBrush(d_sliderBgColor);
 	myPen.setWidth(1);
 
-	QColor darkColor = QColor(17, 31, 40);
+	QColor darkColor = QColor(12, 12, 12);
 	QColor lightColor = QColor(80, 96, 109);
 	int ws, ds, dLeft;
 	int lPos, rPos;
@@ -400,7 +400,7 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 
 			p->fillRect(rSlot.x(), rSlot.y(), dLeft - ds + 5, rSlot.height() + 1, 
 				QBrush(pal.currentColorGroup() == QPalette::Disabled ?
-					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(0, 12, 16)));
+					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(12, 12, 12)));
 		}
 	}
 
@@ -431,7 +431,7 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 			p->drawLine(rThumb.right() + 1, rSlot.bottom(), rSlot.right() - 1, rSlot.bottom());
 			p->fillRect(rThumb.right() + 1, rSlot.y(), rSlot.right() - rThumb.right() - 1,
 					rSlot.height() + 1, QBrush(pal.currentColorGroup() == QPalette::Disabled ?
-					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(0, 12, 16)));
+					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(12, 12, 12)));
 		}
 			p->setPen(myPen);
 			int myoffset = rSlot.top() + 2;/*{{{*/
@@ -505,7 +505,7 @@ void Slider::drawVsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 
 			p->fillRect(rSlot.x() - 1, rSlot.y() + 1, rSlot.width() + 2,
 					dTop - ds - 1, QBrush(pal.currentColorGroup() == QPalette::Disabled ?
-					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(0, 12, 16)));
+					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(12, 12, 12)));
 		}
 	}
 
@@ -527,7 +527,7 @@ void Slider::drawVsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 			p->fillRect(rSlot.left() - 1, rThumb.bottom() + 1,
 					rSlot.width() + 2, rSlot.bottom() - rThumb.bottom() - 1,
 					QBrush(pal.currentColorGroup() == QPalette::Disabled ?
-					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(0, 12, 16)));
+					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(12, 12, 12)));
 			p->setPen(myPen);
 			int myoffset = rSlot.left() + 1;/*{{{*/
 			int scrollB = rThumb.bottom() + 1;
