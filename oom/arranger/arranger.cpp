@@ -155,25 +155,12 @@ Arranger::Arranger(QMainWindow* parent, const char* name)
 	connect(oom->resourceDock(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(resourceDockAreaChanged(Qt::DockWidgetArea)));
 
 
-	QToolButton* btnToggleMixer  = new QToolButton();
-	btnToggleMixer->setMaximumSize(QSize(24,24));
-	QAction* closeAction = oom->mixerDock()->toggleViewAction();
-	closeAction->setShortcut(shortcuts[SHRT_OPEN_MIXER2].key);
-	closeAction->setIcon(QPixmap(":/images/icons/showmixer.png"));
-	btnToggleMixer->setDefaultAction(closeAction);
-	//connect(btnToggleMixer, SIGNAL(clicked(bool)), oom->mixerDock(), SLOT(toggleClose()));
-	toolbar2->addWidget(btnToggleMixer);
 	cursorPos = new PosLabel(0);
 	cursorPos->setEnabled(false);
 	cursorPos->setFixedHeight(22);
 	cursorPos->setObjectName("arrangerCursor");
 	toolbar2->addWidget(cursorPos);
 
-	QToolButton* preloadCtrl  = new QToolButton();
-	preloadCtrl->setText(QString("PC"));
-	toolbar2->addWidget(preloadCtrl);
-	toolbar2->addAction(feedbackAction);
-	connect(preloadCtrl, SIGNAL(clicked()), SLOT(preloadControllers()));
 	const char* rastval[] = {
 		QT_TRANSLATE_NOOP("@default", "Off"), QT_TRANSLATE_NOOP("@default", "Bar"), "1/2", "1/4", "1/8", "1/16"
 	};

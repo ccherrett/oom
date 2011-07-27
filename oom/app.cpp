@@ -1450,7 +1450,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(arranger, SIGNAL(dropMidiFile(const QString&)), SLOT(importMidi(const QString&)));
 	connect(arranger, SIGNAL(startEditor(PartList*, int)), SLOT(startEditor(PartList*, int)));
 	connect(this, SIGNAL(configChanged()), arranger, SLOT(configChanged()));
-	connect(pcloaderAction, SIGNAL(clicked()), arranger, SLOT(preloadControllers()));
+	connect(pcloaderAction, SIGNAL(triggered()), arranger, SLOT(preloadControllers()));
 
 	connect(arranger, SIGNAL(setUsedTool(int)), SLOT(setUsedTool(int)));
 
