@@ -36,8 +36,9 @@ private:
     QColor yellow;
     QColor bgColor;
 	Qt::Orientation m_layout;
+	bool m_redrawVU;
 
-    void drawVU(QPainter& p, int, int, int);
+    void drawVU(QPainter& p, int, int, int, bool);
 
     void paintEvent(QPaintEvent*);
     virtual void resizeEvent(QResizeEvent*);
