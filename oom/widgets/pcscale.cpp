@@ -58,7 +58,7 @@ PCScale::PCScale(int* r, QWidget* parent, PianoRoll* editor, int xs, bool _mode)
 
 	setFixedHeight(14);
 	//setBg(QColor(110, 141, 152));
-	setBg(QColor(30,30,30));
+	setBg(QColor(18,18,18));
 	_pc.state = doNothing;
 	_pc.valid = false;
 }

@@ -49,7 +49,7 @@ MTScale::MTScale(int* r, QWidget* parent, int xs, bool _mode)
 	setFixedHeight(28);
 	//setBg(QColor(53, 51, 56));
 	//setBg(QColor(150, 176, 187));
-	setBg(QColor(60,60,60));
+	setBg(QColor(30,30,30));
 }
 
 //---------------------------------------------------------

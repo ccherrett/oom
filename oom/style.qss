@@ -48,11 +48,11 @@ QHeaderView#trackHeaders
  }
  QScrollArea#scrollArea
  {
- 	background-color: #696977;
+ 	background-color: #2f2f2f;
  }
  QScrollArea
  {
- 	background-color: #696977;
+ 	background-color: #2f2f2f;
  }
 /*Trackview editor styles*/
 TrackViewEditor QListView, TrackViewEditor QTextField, QTableView
@@ -594,7 +594,7 @@ QPushButton
     /*background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);*/
 	/*background-color: #393941;*/
       background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #626272, stop:0.1 #5b5b6b, stop: 1.0 #4d4d5b);
+                                  stop: 0 #6d6d6d, stop:0.1 #6b6b6b, stop: 1.0 #5b5b5b);
     border: 1px solid #393941;
 	font-family: "fixed-width";
 	font-weight: bold;
@@ -616,7 +616,7 @@ QToolButton
     /*background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);*/
 	/*background-color:#6f6e77;*/
       background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #626272, stop:0.1 #5b5b6b, stop: 1.0 #4d4d5b);
+                                  stop: 0 #6d6d6d, stop:0.1 #6b6b6b, stop: 1.0 #5b5b5b);
 	/*border: 1px solid #181819; */
     /*border: 1px solid #393941;*/
 	background-color:none;
@@ -659,7 +659,7 @@ QLabel::disabled
 }
 
 QSplitter::handle{
-background-color: #696977;
+background-color: #2f2f2f;
 }
 
 QFrame, QWidget#CCEditBase { 
@@ -783,7 +783,7 @@ QToolButton#connectButton::disabled, QToolButton#removeButton::disabled, QToolBu
 	background-color: #525252;
 	color: #8f9198;
     /*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #d0d4d0, stop:0.3 #5b5b6b, stop: 1.0 #4d4d5b);*/
+                                  stop: 0 #d0d4d0, stop:0.3 #6b6b6b, stop: 1.0 #5b5b5b);*/
 }
 /*///////////END AUDIO PORT MANAGER///////////////}}}*/
 /*///////////START MIDI PORT MANAGER///////////////{{{*/
@@ -920,8 +920,8 @@ QObject#patchView{
 QWidget#MixerCenter { background-color: #525252 }
 QMainWindow { background-color: #525252 }
 QMainWindow::separator {
-	background-color: #444444;
-	width: 5px;
+	background-color: #2f2f2f;
+	width: 2px;
 }
 
 /* /////////////Internal Plugin GUI/////////// */
@@ -1146,7 +1146,7 @@ QDockWidget {/*{{{*/
 }
 
 QDockWidget::title {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.5 #5c5c5c, stop:1 #5c5c5c);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5e5e5e, stop:0.1 #5e5e5e, stop:0.5 #414141, stop:1 #414141);
     text-align: center;
     /*background: lightgray;*/
     padding-left: 35px;
@@ -1206,7 +1206,7 @@ QFrame#MixerCenter {/*{{{*/
 
 QFrame#mixerDockTitle
 {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #808080, stop:0.1 #808080, stop:0.5 #5c5c5c, stop:1 #5c5c5c);
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #5a5a5a, stop:0.1 #5a5a5a, stop:0.5 #414141, stop:1 #414141);
     text-align: center;
     /*background: lightgray;*/
     padding-left: 0px;
@@ -1384,9 +1384,9 @@ QScrollBar:horizontal {
 }
 QScrollBar::handle:horizontal {
      /*border: 1px solid #393941;*/
-     border: 1px solid #aac0c2;
+     border: 1px solid #a7a7a7;
      /*background: #545463;*/
-     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #71707f, stop:1 #5c5c5c);
+     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5c5c5c, stop:1 #3d3d3d);
      min-width: 15px;
 }
 QScrollBar::add-line:horizontal {
@@ -1422,9 +1422,9 @@ QScrollBar:vertical {
 }
 QScrollBar::handle:vertical {
      /*border: 1px solid #393941;*/
-     border: 1px solid #aac0c2;
+     border: 1px solid #a7a7a7;
      /*background: #545463;*/
-     background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #71707f, stop:1 #5c5c5c);
+     background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #5c5c5c, stop:1 #3d3d3d);
      min-height: 15px;
 }
 QScrollBar::add-line:vertical {
@@ -1457,12 +1457,12 @@ QSlider::groove:horizontal
 {
     border: 1px solid #393941;
     height: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #858599, stop:1 #6d6d7e);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3f3f3f, stop:1 #101819);
     margin: 2px 0;
 }
 QSlider::handle:horizontal 
 {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b3b3b3, stop:1 #8e8e8e);
     border: 1px solid #5c5c5c;
     width: 8px;
     margin: -2px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
@@ -1472,12 +1472,12 @@ QSlider::groove:vertical
 {
     border: 1px solid #393941;
     width: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #858599, stop:1 #6d6d7e);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3f3f3f, stop:1 #101819);
     margin: 0 2px;
 }
 QSlider::handle:vertical 
 {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #8e8e8e, stop:1 #8e8e8e);
     border: 1px solid #5c5c5c;
     width: 8px;
     height: 8px;
@@ -1608,13 +1608,13 @@ QCheckBox {
 
  QComboBox:!editable, QComboBox::drop-down:editable {
       background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #626272, stop:0.1 #5b5b6b, stop: 1.0 #4d4d5b);
+                                  stop: 0 #6d6d6d, stop:0.1 #6b6b6b, stop: 1.0 #5b5b5b);
  }
 
  /* QComboBox gets the "on" state when the popup is open */
  QComboBox:!editable:on, QComboBox::drop-down:editable:on, QComboBox::hover {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                  stop: 0 #9cadb6, stop:0.2 #5b5b6b, stop: 0.8 #4d4d5b, stop: 1.0 #9cadb6);
+                                  stop: 0 #9cadb6, stop:0.2 #6b6b6b, stop: 0.8 #5b5b5b, stop: 1.0 #9cadb6);
  }
 
  QComboBox:on { /* shift the text when the popup opens */
