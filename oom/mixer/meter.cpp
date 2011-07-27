@@ -219,7 +219,7 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 
 		int y1 = int((maxScale - redScale) * w / range);
 		int y2 = int((maxScale - yellowScale) * w / range);
-		int y3 = int((maxScale - yellowScale) * w / range);
+		//int y3 = int((maxScale - yellowScale) * w / range);
 		int y4 = int((maxScale - -15) * w / range);
 		int y5 = int((maxScale - -20) * w / range);
 		int y6 = int((maxScale - -25) * w / range);
@@ -361,8 +361,9 @@ void Meter::resizeEvent(QResizeEvent* /*ev*/)
 //   mousePressEvent
 //---------------------------------------------------------
 
-void Meter::mousePressEvent(QMouseEvent*)
+void Meter::mousePressEvent(QMouseEvent* ev)
 {
-	emit mousePress();
+	bool shift = ((QInputEvent*) ev)->modifiers() & Qt::ShiftModifier;
+	emit mousePress(shift);
 }
 

@@ -1,9 +1,10 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//  $Id: transport.cpp,v 1.8.2.3 2009/07/01 10:39:42 spamatica Exp $
+//  $Id: $
 //
 //  (C) Copyright 1999/2000 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011 Andrew Williams and Christopher Cherrett
 //=========================================================
 
 #include <QAction>
@@ -22,7 +23,6 @@
 #include "siglabel.h"
 #include "globals.h"
 #include "icons.h"
-///#include "posedit.h"
 #include "sync.h"
 #include "shortcuts.h"
 #include "gconfig.h"
@@ -30,19 +30,11 @@
 #include "transporttools.h"
 #include "looptools.h"
 
-static const char* recordTransportText = QT_TRANSLATE_NOOP("@default", "Click this button to enable recording");
-static const char* stopTransportText = QT_TRANSLATE_NOOP("@default", "Click this button to stop playback");
-static const char* playTransportText = QT_TRANSLATE_NOOP("@default", "Click this button to start playback");
-static const char* startTransportText = QT_TRANSLATE_NOOP("@default", "Click this button to rewind to start position");
-static const char* frewindTransportText = QT_TRANSLATE_NOOP("@default", "Click this button to rewind");
-static const char* fforwardTransportText = QT_TRANSLATE_NOOP("@default", "Click this button to forward current play position");
-
 //---------------------------------------------------------
 //   toolButton
 //---------------------------------------------------------
 
-static QToolButton* newButton(const QString& s, const QString& tt,
-		bool toggle = false, int height = 25, QWidget* parent = 0)
+static QToolButton* newButton(const QString& s, const QString& tt, bool toggle = false, int height = 25, QWidget* parent = 0)
 {
 	QToolButton* button = new QToolButton(parent);
 	button->setFixedHeight(height);
@@ -51,20 +43,6 @@ static QToolButton* newButton(const QString& s, const QString& tt,
 	button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 	button->setFocusPolicy(Qt::NoFocus);
 	button->setToolTip(tt);
-	return button;
-}
-
-static QToolButton* newButton(const QPixmap* pm, const QString& tt,
-		bool toggle = false, QWidget* parent = 0)
-{
-	QToolButton* button = new QToolButton(parent);
-	button->setFixedHeight(25);
-	QIcon icon(*pm);
-	button->setIcon(icon);
-	button->setIconSize(pm->size());
-	button->setCheckable(toggle);
-	button->setToolTip(tt);
-	button->setFocusPolicy(Qt::NoFocus);
 	return button;
 }
 
@@ -108,7 +86,7 @@ void Handle::mousePressEvent(QMouseEvent* ev)
 
 //---------------------------------------------------------
 //   TempoSig
-//    Widget fï¿½r Tempo + Signature
+//    Widget for Tempo + Signature
 //---------------------------------------------------------
 
 TempoSig::TempoSig(QWidget* parent)
@@ -210,11 +188,8 @@ void TempoSig::setTimesig(int a, int b)
 //   setRecord
 //---------------------------------------------------------
 
-void Transport::setRecord(bool flag)
+void Transport::setRecord(bool)
 {
-	buttons[5]->blockSignals(true);
-	buttons[5]->setChecked(flag);
-	buttons[5]->blockSignals(false);
 }
 
 //---------------------------------------------------------
@@ -222,11 +197,7 @@ void Transport::setRecord(bool flag)
 //---------------------------------------------------------
 
 Transport::Transport(QWidget* parent, const char* name)
-// : QWidget(0, name, WStyle_Customize | WType_TopLevel | WStyle_Tool
-//| WStyle_NoBorder | WStyle_StaysOnTop)
-//: QWidget(0, name, Qt::WStyle_Customize | Qt::Window | Qt::WStyle_NoBorder | Qt::WStyle_StaysOnTop)
-//: QWidget(0, name, Qt::Window | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint )  // Possibly also Qt::X11BypassWindowManagerHint
-: QWidget(parent, Qt::Window | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint) // Possibly also Qt::X11BypassWindowManagerHint
+: QWidget(parent, Qt::Window | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint) 
 {
 	setObjectName(name);
 	setWindowTitle(QString("OOMidi: Transport"));
@@ -284,34 +255,6 @@ Transport::Transport(QWidget* parent, const char* name)
 	LoopToolbar* loopBar = new LoopToolbar(Qt::Vertical, this);
 	button2->addWidget(loopBar);
 
-	/*QToolButton* b1 = newButton(punchinIcon, tr("punchin"), true);
-	QToolButton* b2 = newButton(loopIcon, tr("loop"), true);
-	b2->setShortcut(shortcuts[SHRT_TOGGLE_LOOP].key);
-
-	QToolButton* b3 = newButton(punchoutIcon, tr("punchout"), true);
-	button2->addWidget(b1);
-	button2->addWidget(b2);
-	button2->addWidget(b3);
-	b1->setToolTip(tr("Punch In"));
-	b2->setToolTip(tr("Loop"));
-	b3->setToolTip(tr("Punch Out"));
-	b1->setWhatsThis(tr("Punch In"));
-	b2->setWhatsThis(tr("Loop"));
-	b3->setWhatsThis(tr("Punch Out"));
-
-	connect(b1, SIGNAL(toggled(bool)), song, SLOT(setPunchin(bool)));
-	connect(b2, SIGNAL(toggled(bool)), song, SLOT(setLoop(bool)));
-	connect(b3, SIGNAL(toggled(bool)), song, SLOT(setPunchout(bool)));
-
-	b1->setChecked(song->punchin());
-	b2->setChecked(song->loop());
-	b3->setChecked(song->punchout());
-
-	connect(song, SIGNAL(punchinChanged(bool)), b1, SLOT(setChecked(bool)));
-	connect(song, SIGNAL(punchoutChanged(bool)), b3, SLOT(setChecked(bool)));
-	connect(song, SIGNAL(loopChanged(bool)), b2, SLOT(setChecked(bool)));
-	*/
-
 	hbox->addLayout(button2);
 
 	//-----------------------------------------------------
@@ -323,7 +266,6 @@ Transport::Transport(QWidget* parent, const char* name)
 	marken->setSpacing(0);
 	marken->setContentsMargins(0, 0, 0, 0);
 
-	///tl1 = new PosEdit(0);
 	tl1 = new Awl::PosEdit(0);
 	tl1->setMinimumSize(105, 0);
 	tl1->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
@@ -336,7 +278,6 @@ Transport::Transport(QWidget* parent, const char* name)
 	l5->setAlignment(Qt::AlignCenter);
 	marken->addWidget(l5);
 
-	///tl2 = new PosEdit(0);
 	tl2 = new Awl::PosEdit(0);
 	tl2->setMinimumSize(105, 0);
 	tl2->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
@@ -361,9 +302,7 @@ Transport::Transport(QWidget* parent, const char* name)
 	QHBoxLayout *hbox1 = new QHBoxLayout;
 	hbox1->setContentsMargins(0, 0, 0, 0);
 
-	///time1 = new PosEdit(0);
 	time1 = new Awl::PosEdit(0);
-	///time2 = new PosEdit(0);
 	time2 = new Awl::PosEdit(0);
 	time2->setSmpte(true);
 	time1->setMinimumSize(105, 0);
@@ -395,41 +334,6 @@ Transport::Transport(QWidget* parent, const char* name)
 
 	TransportToolbar *transportbar = new TransportToolbar(this, showPanic, showMuteSolo);
 	tb->addWidget(transportbar);
-
-	/*buttons[0] = newButton(startIcon, tr("rewind to start"));
-	buttons[0]->setWhatsThis(tr(startTransportText));
-
-	buttons[1] = newButton(frewindIcon, tr("rewind"));
-	buttons[1]->setAutoRepeat(true);
-	buttons[1]->setWhatsThis(tr(frewindTransportText));
-
-	buttons[2] = newButton(fforwardIcon, tr("forward"));
-	buttons[2]->setAutoRepeat(true);
-	buttons[2]->setWhatsThis(tr(fforwardTransportText));
-
-	buttons[3] = newButton(stopIcon, tr("stop"), true);
-	buttons[3]->setChecked(true); // set STOP
-	buttons[3]->setWhatsThis(tr(stopTransportText));
-
-	buttons[4] = newButton(playIcon, tr("play"), true);
-	buttons[4]->setWhatsThis(tr(playTransportText));
-
-	buttons[5] = newButton(recordIcon, tr("record"), true);
-	buttons[5]->setWhatsThis(tr(recordTransportText));
-
-	for (int i = 0; i < 6; ++i)
-	{
-		buttons[i]->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
-		tb->addWidget(buttons[i]);
-	}
-	connect(buttons[3], SIGNAL(toggled(bool)), SLOT(stopToggled(bool)));
-	connect(buttons[4], SIGNAL(toggled(bool)), SLOT(playToggled(bool)));
-
-	connect(buttons[5], SIGNAL(toggled(bool)), song, SLOT(setRecord(bool)));
-	connect(song, SIGNAL(recordChanged(bool)), SLOT(setRecord(bool)));
-	connect(buttons[0], SIGNAL(clicked()), song, SLOT(rewindStart()));
-	connect(buttons[1], SIGNAL(clicked()), song, SLOT(rewind()));
-	connect(buttons[2], SIGNAL(clicked()), song, SLOT(forward()));*/
 
 	box4->addLayout(tb);
 	hbox->addLayout(box4);
@@ -655,14 +559,8 @@ void Transport::rposChanged(const Pos& pos)
 //   setPlay
 //---------------------------------------------------------
 
-void Transport::setPlay(bool f)
+void Transport::setPlay(bool)
 {
-	/*buttons[3]->blockSignals(true);
-	buttons[4]->blockSignals(true);
-	buttons[3]->setChecked(!f);
-	buttons[4]->setChecked(f);
-	buttons[3]->blockSignals(false);
-	buttons[4]->blockSignals(false);*/
 }
 
 //---------------------------------------------------------
@@ -744,7 +642,6 @@ void Transport::songChanged(int flags)
 	if (flags & SC_SIG)
 	{
 		int z, n;
-		///sigmap.timesig(cpos, z, n);
 		AL::sigmap.timesig(cpos, z, n);
 		setTimesig(z, n);
 	}
@@ -759,11 +656,6 @@ void Transport::songChanged(int flags)
 void Transport::syncChanged(bool flag)
 {
 	syncButton->setChecked(flag);
-	//buttons[0]->setEnabled(!flag); // goto start
-	//buttons[1]->setEnabled(!flag); // rewind
-	//buttons[2]->setEnabled(!flag); // forward
-	//buttons[3]->setEnabled(!flag); // stop
-	//buttons[4]->setEnabled(!flag); // play
 	slider->setEnabled(!flag);
 	masterButton->setEnabled(!flag);
 	if (flag)
@@ -793,12 +685,6 @@ void Transport::stopToggled(bool val)
 {
 	if (val)
 		song->setStop(true);
-	/*else
-	{
-		buttons[3]->blockSignals(true);
-		buttons[3]->setChecked(true);
-		buttons[3]->blockSignals(false);
-	}*/
 }
 
 //---------------------------------------------------------
@@ -809,11 +695,5 @@ void Transport::playToggled(bool val)
 {
 	if (val)
 		song->setPlay(true);
-	/*else
-	{
-		buttons[4]->blockSignals(true);
-		buttons[4]->setChecked(true);
-		buttons[4]->blockSignals(false);
-	}*/
 }
 

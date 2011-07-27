@@ -1336,6 +1336,14 @@ void TrackHeader::panRightClicked(const QPoint &p)/*{{{*/
 		song->execAutomationCtlPopup((AudioTrack*) m_track, p, AC_PAN);
 }/*}}}*/
 
+void TrackHeader::resetPeaks(bool)
+{
+	if(!m_track)
+		return;
+		
+	m_track->resetPeaks();
+}
+
 //Private member functions
 
 bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
@@ -1375,7 +1383,8 @@ void TrackHeader::updateChannels()/*{{{*/
 				meter[cc]->setRange(config.minMeter, 10.0);
 				meter[cc]->setFixedHeight(5);
 				meter[cc]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-				//connect(meter[cc], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
+				connect(meter[cc], SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
+				connect(meter[cc], SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
 				m_buttonVBox->addWidget(meter[cc]);
 				meter[cc]->show();
 			}
@@ -1488,7 +1497,7 @@ void TrackHeader::initPan()/*{{{*/
 	}
 }/*}}}*/
 
-void TrackHeader::initVolume()
+void TrackHeader::initVolume()/*{{{*/
 {
 	if(!m_track)
 		return;
@@ -1511,6 +1520,7 @@ void TrackHeader::initVolume()
 		m_buttonVBox->addWidget(m_slider);
 		connect(m_slider, SIGNAL(sliderMoved(double, int)), SLOT(volumeChanged(double)));
 		connect(m_slider, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(volumeRightClicked(const QPoint &, int)));
+		connect(m_slider, SIGNAL(sliderPressed(int)), SLOT(updateSelection()));
 
 		meter[0] = new Meter(this, Meter::LinMeter, Qt::Horizontal);
 		meter[0]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
@@ -1518,7 +1528,8 @@ void TrackHeader::initVolume()
 		meter[0]->setFixedHeight(5);
 		//meter[0]->setFixedWidth(150);
 		m_buttonVBox->addWidget(meter[0]);
-		//connect(meter[0], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
+		connect(meter[0], SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
+		connect(meter[0], SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
 	}
 	else
 	{
@@ -1534,6 +1545,7 @@ void TrackHeader::initVolume()
 
 		connect(m_slider, SIGNAL(sliderMoved(double, int)), SLOT(volumeChanged(double)));
 		connect(m_slider, SIGNAL(sliderPressed(int)), SLOT(volumePressed()));
+		connect(m_slider, SIGNAL(sliderPressed(int)), SLOT(updateSelection()));
 		connect(m_slider, SIGNAL(sliderReleased(int)), SLOT(volumeReleased()));
 		connect(m_slider, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(volumeRightClicked(const QPoint &)));
 
@@ -1544,13 +1556,14 @@ void TrackHeader::initVolume()
 			meter[i]->setFixedHeight(5);
 			//meter[i]->setFixedWidth(150);
 			meter[i]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-			//connect(meter[i], SIGNAL(mousePress()), this, SLOT(resetPeaks()));
+			connect(meter[i], SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
+			connect(meter[i], SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
 			//connect(meter[i], SIGNAL(meterClipped()), this, SLOT(playbackClipped()));
 			m_buttonVBox->addWidget(meter[i]);
 		}/*}}}*/
 		m_channels = channels;
 	}
-}
+}/*}}}*/
 
 void TrackHeader::setupStyles()/*{{{*/
 {
@@ -1569,6 +1582,45 @@ void TrackHeader::setupStyles()/*{{{*/
 	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("fca424")));
 	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276")));
 	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee")));
+}/*}}}*/
+
+void TrackHeader::updateSelection(bool shift)/*{{{*/
+{
+	if(!m_track)
+		return;
+	if (!shift)
+	{
+		song->deselectTracks();
+		if(song->hasSelectedParts)
+			song->deselectAllParts();
+		setSelected(true);
+
+		//record enable track if expected
+		int recd = 0;
+		TrackList* tracks = song->visibletracks();
+		Track* recTrack = 0;
+		for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
+		{
+			if ((*t)->recordFlag())
+			{
+				if(!recTrack)
+					recTrack = *t;
+				recd++;
+			}
+		}
+		if (recd == 1 && config.moveArmedCheckBox)
+		{ 
+			//one rec enabled track, move rec enabled with selection
+			song->setRecordFlag(recTrack, false);
+			song->setRecordFlag(m_track, true);
+		}
+	}
+	else
+	{
+		song->deselectAllParts();
+		setSelected(true);
+	}
+	song->update(SC_SELECTION | SC_RECFLAG);
 }/*}}}*/
 
 //Protected events
@@ -1592,39 +1644,7 @@ void TrackHeader::mousePressEvent(QMouseEvent* ev) //{{{
 		else
 		{
 			m_startPos = ev->pos();
-			if (!shift)
-			{
-				song->deselectTracks();
-				if(song->hasSelectedParts)
-					song->deselectAllParts();
-				setSelected(true);
-
-				//record enable track if expected
-				int recd = 0;
-				TrackList* tracks = song->visibletracks();
-				Track* recTrack = 0;
-				for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
-				{
-					if ((*t)->recordFlag())
-					{
-						if(!recTrack)
-							recTrack = *t;
-						recd++;
-					}
-				}
-				if (recd == 1 && config.moveArmedCheckBox)
-				{ 
-					//one rec enabled track, move rec enabled with selection
-					song->setRecordFlag(recTrack, false);
-					song->setRecordFlag(m_track, true);
-				}
-			}
-			else
-			{
-				song->deselectAllParts();
-				setSelected(true);
-			}
-			song->update(SC_SELECTION | SC_RECFLAG);
+			updateSelection(shift);
 			mode = START_DRAG;
 		}
 	}

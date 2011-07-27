@@ -48,7 +48,7 @@ public slots:
     void setVal(double, double, bool);
 
 signals:
-    void mousePress();
+    void mousePress(bool shift = false);
     void meterClipped();
 
 public:

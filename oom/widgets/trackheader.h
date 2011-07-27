@@ -78,6 +78,8 @@ private slots:
     void volumePressed();
     void volumeReleased();
     void volumeRightClicked(const QPoint &, int ctl = 0);
+	void resetPeaks(bool);
+	void updateSelection(bool shift = false);
 	void setEditing(bool edit = true)
 	{
 		m_editing = edit;

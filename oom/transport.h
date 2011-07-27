@@ -94,7 +94,6 @@ class Transport : public QWidget
     QToolButton* clickButton;
     QToolButton* syncButton;
     QToolButton* jackTransportButton;
-    QToolButton* buttons[6]; // transport buttons
     QLabel* l2;
     QLabel* l3;
     QLabel* l5;
