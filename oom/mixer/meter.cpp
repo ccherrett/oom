@@ -227,7 +227,7 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 		int y12 = int((maxScale - -55) * w / range);
 		int y13 = int((maxScale - -5) * w / range);
 		int y14 = int((maxScale - 5) * w / range);
-		QPen myPen = QPen(green, 5, Qt::SolidLine, Qt::RoundCap);
+		QPen myPen = QPen(green, 3, Qt::SolidLine);
 		if (ymax == 0)
 		{
 			myPen.setColor(bgColor);
@@ -241,7 +241,8 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 			myPen.setColor(yellow);
 		}
 		p.setPen(myPen); //floating vu levels
-		p.drawLine(5, ymax, h - 6, ymax);
+		int start = w - ymax;
+		p.drawLine(start, 2, start+1, 2);
 
 		myPen.setWidth(1);
 		myPen.setColor(QColor(63, 74, 80));
@@ -329,7 +330,7 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv)
 			startVU = w;
 			start = 0;
 		}
-		printf("w = %d, yv = %d, start = %d, h = %d\n", w, yv, start, h);
+		//printf("w = %d, yv = %d, start = %d, h = %d\n", w, yv, start, h);
 		//p.fillRect(0, yv, start, h, QBrush(bgColor)); // dark red
 		p.fillRect(start, 0, startVU, h, QBrush(bgColor)); // dark red
 		if (yv == 0)
