@@ -173,26 +173,30 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 		p.setPen(myPen); //floating vu levels
 		p.drawLine(5, ymax, w - 6, ymax);
 
-		myPen.setWidth(1);
-		myPen.setColor(QColor(63, 74, 80));
-		p.setPen(myPen); //0 db
-		p.drawLine(3, y1, w - 4, y1);
-		
-		p.setPen(myPen); //-10 db
-		p.drawLine(3, y2, w - 4, y2);
-		p.drawLine(3, y2, w - 4, y2);
-		p.drawLine(6, y3, w - 8, y3);
-		p.drawLine(6, y4, w - 8, y4);
-		p.drawLine(6, y5, w - 8, y5);
-		p.drawLine(6, y6, w - 8, y6);
-		p.drawLine(6, y7, w - 8, y7);
-		p.drawLine(6, y8, w - 8, y8);
-		p.drawLine(6, y9, w - 8, y9);
-		p.drawLine(6, y10, w - 8, y10);
-		p.drawLine(6, y11, w - 8, y11);
-		p.drawLine(6, y12, w - 8, y12);
-		p.drawLine(6, y13, w - 8, y13);
-		p.drawLine(6, y14, w - 8, y14);/*}}}*/
+		if (mtype == DBMeter)
+		{
+			myPen.setWidth(1);
+			myPen.setColor(QColor(63, 74, 80));
+			p.setPen(myPen); //0 db
+			p.drawLine(3, y1, w - 4, y1);
+			
+			p.setPen(myPen); //-10 db
+			p.drawLine(3, y2, w - 4, y2);
+			p.drawLine(3, y2, w - 4, y2);
+			p.drawLine(6, y3, w - 8, y3);
+			p.drawLine(6, y4, w - 8, y4);
+			p.drawLine(6, y5, w - 8, y5);
+			p.drawLine(6, y6, w - 8, y6);
+			p.drawLine(6, y7, w - 8, y7);
+			p.drawLine(6, y8, w - 8, y8);
+			p.drawLine(6, y9, w - 8, y9);
+			p.drawLine(6, y10, w - 8, y10);
+			p.drawLine(6, y11, w - 8, y11);
+			p.drawLine(6, y12, w - 8, y12);
+			p.drawLine(6, y13, w - 8, y13);
+			p.drawLine(6, y14, w - 8, y14);
+		}
+		/*}}}*/
 	}
 	else
 	{
@@ -244,26 +248,30 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 		int start = w - ymax;
 		p.drawLine(start, 2, start+1, 2);
 
-		myPen.setWidth(1);
-		myPen.setColor(QColor(63, 74, 80, 175));
-		p.setPen(myPen); //0 db
-		//p.drawLine(3, y1, w - 4, y1);
-		p.drawLine(w-y1, 0, w-y1, h);
-		
-		//p.setPen(myPen); //-10 db
-		p.drawLine(w-y2, 0, w-y2, h );
-		p.drawLine(w-y3, 1, w-y3, 2);
-		p.drawLine(w-y4, 1, w-y4, 2);
-		p.drawLine(w-y5, 1, w-y5, 2);
-		p.drawLine(w-y6, 1, w-y6, 2);
-		p.drawLine(w-y7, 1, w-y7, 2);
-		p.drawLine(w-y8, 1, w-y8, 2);
-		p.drawLine(w-y9, 1, w-y9, 2);
-		p.drawLine(w-y10, 1, w-y10, 2);
-		p.drawLine(w-y11, 1, w-y11, 2);
-		p.drawLine(w-y12, 1, w-y12, 2);
-		p.drawLine(w-y13, 1, w-y13, 2);
-		p.drawLine(w-y14, 1, w-y14, 2);/*}}}*/
+		if (mtype == DBMeter)
+		{
+			myPen.setWidth(1);
+			myPen.setColor(QColor(127,127,127, 100));
+			p.setPen(myPen); //0 db
+			//p.drawLine(3, y1, w - 4, y1);
+			p.drawLine(w-y1, 0, w-y1, h);
+			
+			//p.setPen(myPen); //-10 db
+			p.drawLine(w-y2, 0, w-y2, h );
+			//p.drawLine(w-y3, 1, w-y3, 2);
+			p.drawLine(w-y4, 1, w-y4, 2);
+			p.drawLine(w-y5, 1, w-y5, 2);
+			p.drawLine(w-y6, 1, w-y6, 2);
+			p.drawLine(w-y7, 1, w-y7, 2);
+			p.drawLine(w-y8, 1, w-y8, 2);
+			p.drawLine(w-y9, 1, w-y9, 2);
+			p.drawLine(w-y10, 1, w-y10, 2);
+			p.drawLine(w-y11, 1, w-y11, 2);
+			p.drawLine(w-y12, 1, w-y12, 2);
+			p.drawLine(w-y13, 1, w-y13, 2);
+			p.drawLine(w-y14, 1, w-y14, 2);
+		}
+		/*}}}*/
 	}
 }
 

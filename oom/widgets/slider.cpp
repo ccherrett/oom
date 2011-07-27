@@ -376,11 +376,13 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 	rSlot = QRect(rBound.x() + ds, rBound.y() + (rBound.height() - ws) / 2, rBound.width() - 2 * ds, ws);
 
 	rPos = qwtMin(rSlot.x(), rThumb.left());
+	
+	p->setPen(darkColor);
 
 	if (rThumb.left() > rBound.x())
 	{
-		p->setPen(lightColor);
-		p->setPen(darkColor);
+		//p->setPen(lightColor);
+		//p->setPen(darkColor);
 		//p->fillRect(rBound.x(), rBound.y(), dLeft, rSlot.top() - rBound.top(), brBack);
 		//p->fillRect(rBound.x(), rSlot.bottom() + 1, dLeft, rBound.bottom() - rSlot.bottom(), brBack);
 		//if (rPos > rBound.left())
@@ -396,7 +398,7 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 			p->setPen(lightColor);
 			p->drawLine(rSlot.x() + 1, rSlot.bottom(), rThumb.left() - 1, rSlot.bottom());
 
-			p->fillRect(rSlot.x() + 1, rSlot.y() - 1, dLeft - ds + 4, rSlot.height() + 2, 
+			p->fillRect(rSlot.x(), rSlot.y(), dLeft - ds + 5, rSlot.height() + 1, 
 				QBrush(pal.currentColorGroup() == QPalette::Disabled ?
 					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(0, 12, 16)));
 		}
@@ -405,7 +407,7 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 	lPos = qwtMax(rSlot.right(), rThumb.right()) + 1;
 	//if (rThumb.right() < rBound.right())
 	//{
-		p->setPen(lightColor);
+		p->setPen(darkColor);
 		//p->fillRect(rThumb.right() + 1, rBound.y(), rBound.right() - rThumb.right(),
 		//		rSlot.top() - rBound.top(), brBack);
 		//p->fillRect(rThumb.right() + 1, rSlot.bottom() + 1,
@@ -414,22 +416,21 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 		//if (lPos <= rBound.right())
 		//	p->fillRect(lPos, rSlot.y(), rBound.right() - lPos + 1, ws, brBack);
 
-		p->setPen(darkColor);
 		//p->setPen(pal.dark().color());
 		//if (rSlot.right() > rThumb.right())
 		//{
 			p->drawLine(rThumb.right() + 1, rSlot.top(), rSlot.right(), rSlot.top());
-			p->setPen(lightColor);
+			//p->setPen(lightColor);
 			//p->setPen(pal.light().color());
-			p->drawLine(rSlot.right(), rSlot.bottom(), rSlot.right(), rSlot.top() + 1);
+			//p->drawLine(rSlot.right(), rSlot.bottom(), rSlot.right(), rSlot.top() + 1);
 		//}
 
 		if (rSlot.right() > rThumb.right() + 1)
 		{
 			p->setPen(lightColor);
 			p->drawLine(rThumb.right() + 1, rSlot.bottom(), rSlot.right() - 1, rSlot.bottom());
-			p->fillRect(rThumb.right() + 1, rSlot.y()- 1, rSlot.right() - rThumb.right() - 1,
-					rSlot.height() + 2, QBrush(pal.currentColorGroup() == QPalette::Disabled ?
+			p->fillRect(rThumb.right() + 1, rSlot.y(), rSlot.right() - rThumb.right() - 1,
+					rSlot.height() + 1, QBrush(pal.currentColorGroup() == QPalette::Disabled ?
 					pal.color(QPalette::Disabled, QPalette::WindowText) : QColor(0, 12, 16)));
 		}
 			p->setPen(myPen);
