@@ -133,6 +133,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 			m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 		else
 			m_btnAutomation->setIcon(*automation_trackIconSet3);
+		m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorList.value(m_track->type()).name()));
 	}
 	songChanged(-1);
 	connect(m_trackName, SIGNAL(editingFinished()), this, SLOT(updateTrackName()));
@@ -1788,14 +1789,14 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 			m_slider->setVisible(m_sliderVisible);
 		if(m_pan)
 			m_pan->setVisible(m_sliderVisible);
-		if(m_sliderVisible)
+		/*if(m_sliderVisible)
 		{
 			m_colorLine->setStyleSheet(lineStyleTemplate.arg("#1b1b1b"));
 		}
 		else
-		{
-			m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorList.value(m_track->type()).name()));
-		}
+		{*/
+	//		m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorList.value(m_track->type()).name()));
+		//}
 	}
 	QFrame::resizeEvent(event);
 }/*}}}*/
