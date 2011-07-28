@@ -33,6 +33,7 @@ Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout)
 
 	mtype = type;
 	m_layout = layout;
+	m_redrawVU = false;
 	overflow = false;
 	val = 0.0;
 	maxVal = 0.0;
@@ -133,8 +134,11 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 
 		if (yv > h) yv = h;
 
+		if(yv > 0)
+			m_redrawVU = true;
+
 		// Draw the red, green, and yellow sections.
-		drawVU(p, w, h, yv);
+		drawVU(p, w, h, yv, m_redrawVU);
 
 		// Draw the peak white line.
 		int ymax;
@@ -206,9 +210,13 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 			yv = val == 0 ? 0 : int(((maxScale - val) * w) / range);
 
 		if (yv > w) yv = w;
+		
+		printf("yv = %d\n",yv);
+		if(yv > 0)
+			m_redrawVU = true;
 
 		// Draw the red, green, and yellow sections.
-		drawVU(p, w, h, yv);
+		drawVU(p, w, h, yv, m_redrawVU);
 
 		// Draw the peak white line.
 		int ymax;
@@ -219,7 +227,7 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 
 		int y1 = int((maxScale - redScale) * w / range);
 		int y2 = int((maxScale - yellowScale) * w / range);
-		//int y3 = int((maxScale - yellowScale) * w / range);
+		int y3 = int((maxScale - yellowScale) * w / range);
 		int y4 = int((maxScale - -15) * w / range);
 		int y5 = int((maxScale - -20) * w / range);
 		int y6 = int((maxScale - -25) * w / range);
@@ -279,72 +287,63 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 //   drawVU
 //---------------------------------------------------------
 
-void Meter::drawVU(QPainter& p, int w, int h, int yv)
+void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 {
 	QPen myPen = QPen();
 	myPen.setStyle(Qt::DashLine);
 	if(m_layout == Qt::Vertical)
 	{
-		QPixmap *pixmap = new QPixmap(":/images/vugrad.png");
-		QPixmap scaledPixmap = pixmap->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
-		myPen.setBrush(scaledPixmap);
-		myPen.setWidth(1);
-		p.setPen(myPen);
-
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
-		p.drawLine(4, 0, 4, h);
-		p.drawLine(5, 0, 5, h);
-		p.drawLine(6, 0, 6, h);
-		p.drawLine(7, 0, 7, h);
-		p.drawLine(8, 0, 8, h);
-		p.drawLine(9, 0, 9, h);
-		p.drawLine(10, 0, 10, h);
-		p.fillRect(0, 0, w, yv, QBrush(bgColor)); // dark red
-		if (yv == 0)
+		if(redrawVU)
 		{
-			emit meterClipped();
-		}/*}}}*/
+			QPixmap *pixmap = new QPixmap(":/images/vugrad.png");
+			QPixmap scaledPixmap = pixmap->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
+			myPen.setBrush(scaledPixmap);
+			myPen.setWidth(1);
+			p.setPen(myPen);
+	
+			p.drawLine(4, 0, 4, h);
+			p.drawLine(5, 0, 5, h);
+			p.drawLine(6, 0, 6, h);
+			p.drawLine(7, 0, 7, h);
+			p.drawLine(8, 0, 8, h);
+			p.drawLine(9, 0, 9, h);
+			p.drawLine(10, 0, 10, h);
+			p.fillRect(0, 0, w, yv, QBrush(bgColor)); // dark red
+			if (yv == 0)
+			{
+				emit meterClipped();
+			}/*}}}*/
+		}
 	}
 	else
 	{
-		QPixmap *pixmap = new QPixmap(":/images/vugrad_h.png");
-		QPixmap scaledPixmap = pixmap->scaled(w, 1, Qt::IgnoreAspectRatio);/*{{{*/
-		myPen.setBrush(scaledPixmap);
-		myPen.setWidth(1);
-		p.setPen(myPen);
-
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
-
-		//p.drawLine(4, 0, 4, w);
-		//p.drawLine(5, 0, 5, w);
-		//p.drawLine(6, 0, 6, w);
-		//p.drawLine(7, 0, 7, w);
-		//p.drawLine(8, 0, 8, w);
-		//p.drawLine(9, 0, 9, w);
-		//p.drawLine(10, 0, 10, w);
-		
-		p.drawLine(0, 1, w, 1);
-		p.drawLine(0, 2, w, 2);
-		p.drawLine(0, 3, w, 3);
-		//p.drawLine(7, 0, 7, w);
-		//p.drawLine(8, 0, 8, w);
-		//p.drawLine(9, 0, 9, w);
-		//p.drawLine(10, 0, 10, w);
-		
-		int start = w - yv;
-		int startVU = yv;
-		if(yv == 0)
+		if(redrawVU)
 		{
-			startVU = w;
-			start = 0;
+			QPixmap *pixmap = new QPixmap(":/images/vugrad_h.png");
+			QPixmap scaledPixmap = pixmap->scaled(w, 1, Qt::IgnoreAspectRatio);/*{{{*/
+			myPen.setBrush(scaledPixmap);
+			myPen.setWidth(1);
+			p.setPen(myPen);
+			p.drawLine(0, 1, w, 1);
+			p.drawLine(0, 2, w, 2);
+			p.drawLine(0, 3, w, 3);
+			
+			int start = w - yv;
+			int startVU = yv;
+			if(yv == 0)
+			{
+				startVU = w;
+				start = 0;
+			}
+			//printf("w = %d, yv = %d, start = %d, h = %d\n", w, yv, start, h);
+			p.fillRect(start, 0, startVU, h, QBrush(bgColor)); // dark red
+			if (yv == 0)
+			{
+				emit meterClipped();
+			}/*}}}*/
 		}
-		//printf("w = %d, yv = %d, start = %d, h = %d\n", w, yv, start, h);
-		//p.fillRect(0, yv, start, h, QBrush(bgColor)); // dark red
-		p.fillRect(start, 0, startVU, h, QBrush(bgColor)); // dark red
-		if (yv == 0)
-		{
-			emit meterClipped();
-		}/*}}}*/
 	}
 }
 
@@ -361,9 +360,8 @@ void Meter::resizeEvent(QResizeEvent* /*ev*/)
 //   mousePressEvent
 //---------------------------------------------------------
 
-void Meter::mousePressEvent(QMouseEvent* ev)
+void Meter::mousePressEvent(QMouseEvent*)
 {
-	bool shift = ((QInputEvent*) ev)->modifiers() & Qt::ShiftModifier;
-	emit mousePress(shift);
+	emit mousePress();
 }
 
