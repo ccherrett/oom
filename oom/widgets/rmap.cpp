@@ -38,10 +38,10 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	//btnDelete->setIconSize(garbagePCIcon->size());
 	btnAdd->setIcon(*plusIconSet3);
 	//btnAdd->setIconSize(addTVIcon->size());
-	btnEdit->setIcon(*midi_edit_instrumentIcon);
-	btnEdit->setIconSize(midi_edit_instrumentIcon->size());
-	btnLoad->setIcon(*midi_reset_instrIcon);
-	btnLoad->setIconSize(midi_reset_instrIcon->size());
+	btnEdit->setIcon(*route_editIconSet3);
+	//btnEdit->setIconSize(midi_edit_instrumentIcon->size());
+	btnLoad->setIcon(*loadIconSet3);
+	//btnLoad->setIconSize(midi_reset_instrIcon->size());
 	btnCopy->setIcon(*duplicateIconSet3);
 	//btnCopy->setIconSize(duplicatePCIcon->size());
 	btnLink->setIcon(*connectIconSet3);

@@ -479,7 +479,17 @@ extern QIcon* transposeIconSet3;
 extern QPixmap* connect_OnIcon;
 extern QPixmap* connect_OffIcon;
 extern QPixmap* connect_OverIcon;
-extern QIcon* connectIconSet3;
+extern QIcon*   connectIconSet3;
+
+extern QPixmap* load_OnIcon;
+extern QPixmap* load_OffIcon;
+extern QPixmap* load_OverIcon;
+extern QIcon*   loadIconSet3;
+
+extern QPixmap* route_edit_OnIcon;
+extern QPixmap* route_edit_OffIcon;
+extern QPixmap* route_edit_OverIcon;
+extern QIcon*   route_editIconSet3;
 
 extern QPixmap* dragMidiIcon;
 extern QPixmap* dragAudioIcon;
