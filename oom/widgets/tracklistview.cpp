@@ -199,7 +199,7 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 	QModelIndex mindex = m_table->indexAt(pos);
 	if(!mindex.isValid())
 		return;
-	int row = mindex.row();
+	//int row = mindex.row();
 	QStandardItem* item = m_model->itemFromIndex(mindex);
 	if(item)
 	{

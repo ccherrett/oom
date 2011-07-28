@@ -19,6 +19,7 @@
 #include "popupmenu.h"
 #include "globals.h"
 #include "icons.h"
+#include "shortcuts.h"
 #include "scrollscale.h"
 #include "xml.h"
 #include "midi.h"
@@ -434,7 +435,9 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	if(m_track->name() != "Master")
 		p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 	
-	p->addAction(tr("Select All Tracks"))->setData(4);
+	QAction* selectAllAction = p->addAction(tr("Select All Tracks"));
+	selectAllAction->setData(4);
+	selectAllAction->setShortcut(shortcuts[SHRT_SEL_ALL_TRACK].key);
 
 	QMenu* trackHeightsMenu = p->addMenu(tr("Track Height"));
 	trackHeightsMenu->addAction(tr("Compact"))->setData(7);
@@ -543,9 +546,17 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			break;
 			case 4:
 			{
-				for(ciTrack ci = song->visibletracks()->begin(); ci != song->visibletracks()->end(); ++ci)
+				TrackList* tl = song->visibletracks();
+				TrackList selectedTracks = song->getSelectedTracks();
+				bool select = true;
+				if (selectedTracks.size() == tl->size())
 				{
-					(*ci)->setSelected(true);
+					select = false;
+				}
+
+				for (iTrack t = tl->begin(); t != tl->end(); ++t)
+				{
+					(*t)->setSelected(select);
 				}
 				song->update(SC_SELECTION);
 				/*if (m_track->type() == Track::DRUM)

@@ -1698,6 +1698,24 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		}
 		return;
 	}
+	else if (key == shortcuts[SHRT_SEL_ALL_TRACK].key)
+	{
+		//printf("Select all tracks called\n");
+		TrackList* tl = song->visibletracks();
+		TrackList selectedTracks = song->getSelectedTracks();
+		bool select = true;
+		if (selectedTracks.size() == tl->size())
+		{
+			select = false;
+		}
+
+		for (iTrack t = tl->begin(); t != tl->end(); ++t)
+		{
+			(*t)->setSelected(select);
+		}
+		song->update(SC_SELECTION);
+		return;
+	}
 	else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
 	{
 		Track* t =oom->arranger->curTrack();

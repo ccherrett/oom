@@ -92,7 +92,7 @@ class OOMidi : public QMainWindow
 	CMD_SELECT_ALL, CMD_SELECT_NONE, CMD_SELECT_INVERT,
 	CMD_SELECT_ILOOP, CMD_SELECT_OLOOP, CMD_SELECT_PARTS,
 	CMD_FOLLOW_NO, CMD_FOLLOW_JUMP, CMD_FOLLOW_CONTINUOUS,
-	CMD_DELETE_TRACK
+	CMD_DELETE_TRACK, CMD_SELECT_ALL_TRACK
     };
 
     //File menu items:
@@ -121,7 +121,7 @@ class OOMidi : public QMainWindow
 
     // Edit Menu actions
     QAction *editCutAction, *editCopyAction, *editPasteAction, *editInsertAction, *editPasteCloneAction, *editPaste2TrackAction;
-    QAction *editPasteC2TAction, *editInsertEMAction, *editDeleteSelectedAction, *editSelectAllAction, *editDeselectAllAction;
+    QAction *editPasteC2TAction, *editInsertEMAction, *editDeleteSelectedAction, *editSelectAllAction, *editDeselectAllAction, *editSelectAllTracksAction;
     QAction *editInvertSelectionAction, *editInsideLoopAction, *editOutsideLoopAction, *editAllPartsAction;
     QAction *trackMidiAction, *trackDrumAction, *trackWaveAction, *trackAOutputAction, *trackAGroupAction;
     QAction *trackAInputAction, *trackAAuxAction;

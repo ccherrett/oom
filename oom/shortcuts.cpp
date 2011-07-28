@@ -148,6 +148,7 @@ void initShortCuts()
 
 	defShrt(SHRT_SEL_TRACK_ABOVE, Qt::CTRL + Qt::Key_Up, "Select track above", ARRANG_SHRT, "sel_track_above");
 	defShrt(SHRT_SEL_TRACK_BELOW, Qt::CTRL + Qt::Key_Down, "Select track below", ARRANG_SHRT, "sel_track_below");
+	defShrt(SHRT_SEL_ALL_TRACK, Qt::META + Qt::Key_A, "Select all tracks in view", ARRANG_SHRT, "sel_all_tracks");
 
 	defShrt(SHRT_INSERT_PART, Qt::CTRL + Qt::Key_Insert, "Insert new part at cursor", ARRANG_SHRT, "insert_part_at_cursor");
 

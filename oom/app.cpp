@@ -990,6 +990,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	editInsideLoopAction = new QAction(QIcon(*select_inside_loopIcon), tr("&Inside Loop"), this);
 	editOutsideLoopAction = new QAction(QIcon(*select_outside_loopIcon), tr("&Outside Loop"), this);
 	editAllPartsAction = new QAction(QIcon(*select_all_parts_on_trackIcon), tr("All &Parts on Track"), this);
+	editSelectAllTracksAction = new QAction(QIcon(*select_allIcon), tr("Select All &Tracks"), this);
+	
 
 	startPianoEditAction = new QAction(*pianoIconSet, tr("Pianoroll"), this);
 	//startDrumEditAction = new QAction(QIcon(*edit_drummsIcon), tr("Drums"), this);
@@ -1123,6 +1125,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(editDeleteSelectedAction, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
 
 	connect(editSelectAllAction, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
+	connect(editSelectAllTracksAction, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
 	connect(editDeselectAllAction, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
 	connect(editInvertSelectionAction, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
 	connect(editInsideLoopAction, SIGNAL(triggered()), editSignalMapper, SLOT(map()));
@@ -1139,6 +1142,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	editSignalMapper->setMapping(editInsertEMAction, CMD_INSERTMEAS);
 	editSignalMapper->setMapping(editDeleteSelectedAction, CMD_DELETE_TRACK);
 	editSignalMapper->setMapping(editSelectAllAction, CMD_SELECT_ALL);
+	editSignalMapper->setMapping(editSelectAllTracksAction, CMD_SELECT_ALL_TRACK);
 	editSignalMapper->setMapping(editDeselectAllAction, CMD_SELECT_NONE);
 	editSignalMapper->setMapping(editInvertSelectionAction, CMD_SELECT_INVERT);
 	editSignalMapper->setMapping(editInsideLoopAction, CMD_SELECT_ILOOP);
@@ -1312,6 +1316,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	menuEdit->addMenu(addTrack);
 	menuEdit->addMenu(select);
+	select->addAction(editSelectAllTracksAction);
 	select->addAction(editSelectAllAction);
 	select->addAction(editDeselectAllAction);
 	select->addAction(editInvertSelectionAction);
@@ -4286,6 +4291,23 @@ void OOMidi::cmd(int cmd)
 			audio->msgUpdateSoloStates();
 			break;
 
+		case CMD_SELECT_ALL_TRACK:
+		{
+			TrackList* tl = song->visibletracks();
+			TrackList selectedTracks = song->getSelectedTracks();
+			bool select = true;
+			if (selectedTracks.size() == tl->size())
+			{
+				select = false;
+			}
+
+			for (iTrack t = tl->begin(); t != tl->end(); ++t)
+			{
+				(*t)->setSelected(select);
+			}
+			song->update(SC_SELECTION);
+			break;
+		}
 		case CMD_SELECT_ALL:
 		case CMD_SELECT_NONE:
 		case CMD_SELECT_INVERT:
@@ -5341,6 +5363,7 @@ void OOMidi::updateConfiguration()
 	trackAAuxAction->setShortcut(shortcuts[SHRT_ADD_AUDIO_AUX].key);
 
 	editSelectAllAction->setShortcut(shortcuts[SHRT_SELECT_ALL].key);
+	editSelectAllTracksAction->setShortcut(shortcuts[SHRT_SEL_ALL_TRACK].key);
 	editDeselectAllAction->setShortcut(shortcuts[SHRT_SELECT_NONE].key);
 	editInvertSelectionAction->setShortcut(shortcuts[SHRT_SELECT_INVERT].key);
 	editInsideLoopAction->setShortcut(shortcuts[SHRT_SELECT_OLOOP].key);
