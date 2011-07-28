@@ -522,6 +522,31 @@ QIcon* mixer_stereoIconSet3;
 QIcon* mixerIconSet3;
 QIcon* pcloaderIconSet3;
 
+QPixmap* enabled_OnIcon;
+QPixmap* enabled_OffIcon;
+QPixmap* enabled_OverIcon;
+QIcon* enabledIconSet3;
+
+QPixmap* up_arrow_OnIcon;
+QPixmap* up_arrow_OffIcon;
+QPixmap* up_arrow_OverIcon;
+QIcon* up_arrowIconSet3;
+
+QPixmap* down_arrow_OnIcon;
+QPixmap* down_arrow_OffIcon;
+QPixmap* down_arrow_OverIcon;
+QIcon* down_arrowIconSet3;
+
+QPixmap* plus_OnIcon;
+QPixmap* plus_OffIcon;
+QPixmap* plus_OverIcon;
+QIcon* plusIconSet3;
+
+QPixmap* garbage_OnIcon;
+QPixmap* garbage_OffIcon;
+QPixmap* garbage_OverIcon;
+QIcon* garbageIconSet3;
+
 QPixmap* mixer_record_OnIcon;
 QPixmap* mixer_record_OffIcon;
 QPixmap* mixer_record_OverIcon;
@@ -1203,6 +1228,46 @@ void initIcons()
       pcloaderIconSet3->addPixmap(*pcloader_OnIcon, QIcon::Normal, QIcon::On);
       pcloaderIconSet3->addPixmap(*pcloader_OffIcon, QIcon::Normal, QIcon::Off);
       pcloaderIconSet3->addPixmap(*pcloader_OverIcon, QIcon::Active);
+	  
+      enabled_OnIcon= new MPIXMAP(":/images/icons/enabled_new_on.png", NULL);
+      enabled_OffIcon= new MPIXMAP(":/images/icons/enabled_new_off.png", NULL);
+      enabled_OverIcon= new MPIXMAP(":/images/icons/enabled_new_over.png", NULL);
+	  enabledIconSet3         = new QIcon();
+      enabledIconSet3->addPixmap(*enabled_OnIcon, QIcon::Normal, QIcon::On);
+      enabledIconSet3->addPixmap(*enabled_OffIcon, QIcon::Normal, QIcon::Off);
+      enabledIconSet3->addPixmap(*enabled_OverIcon, QIcon::Active);
+	  
+      up_arrow_OnIcon= new MPIXMAP(":/images/up_arrow_new_on.png", NULL);
+      up_arrow_OffIcon= new MPIXMAP(":/images/up_arrow_new_off.png", NULL);
+      up_arrow_OverIcon= new MPIXMAP(":/images/up_arrow_new_over.png", NULL);
+	  up_arrowIconSet3         = new QIcon();
+      up_arrowIconSet3->addPixmap(*up_arrow_OnIcon, QIcon::Normal, QIcon::On);
+      up_arrowIconSet3->addPixmap(*up_arrow_OffIcon, QIcon::Normal, QIcon::Off);
+      up_arrowIconSet3->addPixmap(*up_arrow_OverIcon, QIcon::Active);
+	  
+      down_arrow_OnIcon= new MPIXMAP(":/images/down_arrow_new_on.png", NULL);
+      down_arrow_OffIcon= new MPIXMAP(":/images/down_arrow_new_off.png", NULL);
+      down_arrow_OverIcon= new MPIXMAP(":/images/down_arrow_new_over.png", NULL);
+	  down_arrowIconSet3         = new QIcon();
+      down_arrowIconSet3->addPixmap(*down_arrow_OnIcon, QIcon::Normal, QIcon::On);
+      down_arrowIconSet3->addPixmap(*down_arrow_OffIcon, QIcon::Normal, QIcon::Off);
+      down_arrowIconSet3->addPixmap(*down_arrow_OverIcon, QIcon::Active);
+	  
+      plus_OnIcon= new MPIXMAP(":/images/plus_new_on.png", NULL);
+      plus_OffIcon= new MPIXMAP(":/images/plus_new_off.png", NULL);
+      plus_OverIcon= new MPIXMAP(":/images/plus_new_over.png", NULL);
+	  plusIconSet3         = new QIcon();
+      plusIconSet3->addPixmap(*plus_OnIcon, QIcon::Normal, QIcon::On);
+      plusIconSet3->addPixmap(*plus_OffIcon, QIcon::Normal, QIcon::Off);
+      plusIconSet3->addPixmap(*plus_OverIcon, QIcon::Active);
+	  
+      garbage_OnIcon= new MPIXMAP(":/images/garbage_new_on.png", NULL);
+      garbage_OffIcon= new MPIXMAP(":/images/garbage_new_off.png", NULL);
+      garbage_OverIcon= new MPIXMAP(":/images/garbage_new_over.png", NULL);
+	  garbageIconSet3         = new QIcon();
+      garbageIconSet3->addPixmap(*garbage_OnIcon, QIcon::Normal, QIcon::On);
+      garbageIconSet3->addPixmap(*garbage_OffIcon, QIcon::Normal, QIcon::Off);
+      garbageIconSet3->addPixmap(*garbage_OverIcon, QIcon::Active);
 	  
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);
