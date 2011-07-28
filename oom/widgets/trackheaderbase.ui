@@ -48,6 +48,28 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="QLineEdit" name="m_trackName">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>23</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>23</height>
+      </size>
+     </property>
+     <property name="acceptDrops">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
       <number>0</number>
@@ -77,35 +99,13 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="m_nameHBox" stretch="0">
+        <layout class="QHBoxLayout" name="m_nameHBox" stretch="">
          <property name="spacing">
           <number>0</number>
          </property>
          <property name="topMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QLineEdit" name="m_trackName">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="acceptDrops">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
