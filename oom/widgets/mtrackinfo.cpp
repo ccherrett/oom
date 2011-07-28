@@ -223,14 +223,14 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	//HTMLDelegate *delegate = new HTMLDelegate;
 	//tableView->setItemDelegateForColumn(1, delegate);
 
-	btnUp->setIcon(*upPCIcon);
-	btnDown->setIcon(*downPCIcon);
-	btnDelete->setIcon(*garbagePCIcon);
-	btnUp->setIconSize(upPCIcon->size());
-	btnDown->setIconSize(downPCIcon->size());
-	btnDelete->setIconSize(garbagePCIcon->size());
-	btnCopy->setIcon(*duplicatePCIcon);
-	btnCopy->setIconSize(duplicatePCIcon->size());
+	btnUp->setIcon(*up_arrowIconSet3);
+	btnDown->setIcon(*down_arrowIconSet3);
+	btnDelete->setIcon(*garbageIconSet3);
+	//btnUp->setIconSize(upPCIcon->size());
+	//btnDown->setIconSize(downPCIcon->size());
+	//btnDelete->setIconSize(garbagePCIcon->size());
+	btnCopy->setIcon(*duplicateIconSet3);
+	//btnCopy->setIconSize(duplicatePCIcon->size());
 
 	//start tb1 merge
 	//---------------------------------------------------

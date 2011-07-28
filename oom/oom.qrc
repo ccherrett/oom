@@ -365,6 +365,9 @@
 		<file>images/garbage_new_on.png</file>
 		<file>images/garbage_new_over.png</file>
 		<file>images/garbage_new_off.png</file>
+		<file>images/duplicate_new_on.png</file>
+		<file>images/duplicate_new_over.png</file>
+		<file>images/duplicate_new_off.png</file>
 	</qresource>
 </RCC>
 

@@ -34,16 +34,16 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	routeList->setModel(_listModel);
 	//routeList->setObjectName("rmDockRouteList");
 
-	btnDelete->setIcon(*garbagePCIcon);
-	btnDelete->setIconSize(garbagePCIcon->size());
-	btnAdd->setIcon(*addTVIcon);
-	btnAdd->setIconSize(addTVIcon->size());
+	btnDelete->setIcon(*garbageIconSet3);
+	//btnDelete->setIconSize(garbagePCIcon->size());
+	btnAdd->setIcon(*plusIconSet3);
+	//btnAdd->setIconSize(addTVIcon->size());
 	btnEdit->setIcon(*midi_edit_instrumentIcon);
 	btnEdit->setIconSize(midi_edit_instrumentIcon->size());
 	btnLoad->setIcon(*midi_reset_instrIcon);
 	btnLoad->setIconSize(midi_reset_instrIcon->size());
-	btnCopy->setIcon(*duplicatePCIcon);
-	btnCopy->setIconSize(duplicatePCIcon->size());
+	btnCopy->setIcon(*duplicateIconSet3);
+	//btnCopy->setIconSize(duplicatePCIcon->size());
 	btnLink->setIcon(*midi_inputpluginsIcon);
 	btnLink->setIconSize(midi_inputpluginsIcon->size());
 	btnClear->setIcon(*editcutIconSet);

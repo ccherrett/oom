@@ -547,6 +547,11 @@ QPixmap* garbage_OffIcon;
 QPixmap* garbage_OverIcon;
 QIcon* garbageIconSet3;
 
+QPixmap* duplicate_OnIcon;
+QPixmap* duplicate_OffIcon;
+QPixmap* duplicate_OverIcon;
+QIcon* duplicateIconSet3;
+
 QPixmap* mixer_record_OnIcon;
 QPixmap* mixer_record_OffIcon;
 QPixmap* mixer_record_OverIcon;
@@ -1268,6 +1273,14 @@ void initIcons()
       garbageIconSet3->addPixmap(*garbage_OnIcon, QIcon::Normal, QIcon::On);
       garbageIconSet3->addPixmap(*garbage_OffIcon, QIcon::Normal, QIcon::Off);
       garbageIconSet3->addPixmap(*garbage_OverIcon, QIcon::Active);
+	  
+      duplicate_OnIcon= new MPIXMAP(":/images/duplicate_new_on.png", NULL);
+      duplicate_OffIcon= new MPIXMAP(":/images/duplicate_new_off.png", NULL);
+      duplicate_OverIcon= new MPIXMAP(":/images/duplicate_new_over.png", NULL);
+	  duplicateIconSet3         = new QIcon();
+      duplicateIconSet3->addPixmap(*duplicate_OnIcon, QIcon::Normal, QIcon::On);
+      duplicateIconSet3->addPixmap(*duplicate_OffIcon, QIcon::Normal, QIcon::Off);
+      duplicateIconSet3->addPixmap(*duplicate_OverIcon, QIcon::Active);
 	  
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);

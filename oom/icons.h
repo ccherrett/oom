@@ -461,6 +461,11 @@ extern QPixmap* garbage_OffIcon;
 extern QPixmap* garbage_OverIcon;
 extern QIcon* garbageIconSet3;
 
+extern QPixmap* duplicate_OnIcon;
+extern QPixmap* duplicate_OffIcon;
+extern QPixmap* duplicate_OverIcon;
+extern QIcon* duplicateIconSet3;
+
 extern QIcon* reminder1IconSet3;
 extern QIcon* reminder2IconSet3;
 extern QIcon* reminder3IconSet3;
