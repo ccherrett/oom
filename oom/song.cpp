@@ -1307,12 +1307,12 @@ void Song::setMasterFlag(bool val)
 	_masterFlag = val;
 	if (tempomap.setMasterFlag(cpos(), val))
 	{
-		//audioDevice->setMaster(val);
 		if(!invalid)
 			emit songChanged(SC_MASTER);
 	}
-	// Removed. p3.3.26
-	//audioDevice->setMaster(val);
+	masterEnableAction->blockSignals(true);
+	masterEnableAction->setChecked(val);
+	masterEnableAction->blockSignals(false);
 }
 
 //---------------------------------------------------------

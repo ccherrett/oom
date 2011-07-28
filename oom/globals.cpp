@@ -254,6 +254,7 @@ QAction* feedbackAction;
 QAction* pcloaderAction;
 QAction* noteAlphaAction;
 QAction* multiPartSelectionAction;
+QAction* masterEnableAction;
 
 //AudioMixerApp* audioMixer;
 OOMidi* oom;

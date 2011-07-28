@@ -33,6 +33,7 @@ SigScale::SigScale(int* r, QWidget* parent, int xs)
 	setMouseTracking(true);
 	connect(song, SIGNAL(posChanged(int, unsigned, bool)), this, SLOT(setPos(int, unsigned, bool)));
 	setFixedHeight(18);
+	setBg(QColor(30,30,30));
 }
 
 //---------------------------------------------------------
@@ -118,7 +119,10 @@ void SigScale::pdraw(QPainter& p, const QRect& r)
 
 	if (x < 0)
 		x = 0;
-	p.setFont(config.fonts[3]);
+	QColor colTimeLine = QColor(172,181,176);
+	p.setPen(colTimeLine);
+	p.setFont(QFont("fixed-width", 9, QFont::Bold));
+	//p.setFont(config.fonts[3]);
 	///for (ciSigEvent si = sigmap.begin(); si != sigmap.end(); ++si) {
 	for (AL::ciSigEvent si = AL::sigmap.begin(); si != AL::sigmap.end(); ++si)
 	{

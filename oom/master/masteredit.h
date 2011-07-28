@@ -19,8 +19,11 @@ namespace Awl
 using Awl::SigEdit;
 
 class QCloseEvent;
+class QShowEvent;
+class QKeyEvent;
 class QToolBar;
 class QToolButton;
+class QComboBox;
 
 class Master;
 class ScrollScale;
@@ -29,11 +32,9 @@ class SigScale;
 class HitScale;
 class TScale;
 class TempoEdit;
-class LabelCombo;
 class PosLabel;
 class TempoLabel;
 class EditToolBar;
-class QShowEvent;
 
 //---------------------------------------------------------
 //   MasterEdit
@@ -47,18 +48,14 @@ class MasterEdit : public MidiEditor
     MTScale* time1;
     MTScale* time2;
     SigScale* sign;
-    HitScale* thits;
-    HitScale* zhits;
     TScale* tscale;
 
     TempoEdit* curTempo;
     SigEdit* curSig;
-    LabelCombo* rasterLabel;
-    QToolBar* tools;
+    QComboBox* rasterLabel;
     PosLabel* cursorPos;
     TempoLabel* tempo;
-    QToolButton* enableButton;
-    EditToolBar* tools2;
+    EditToolBar* editbar;
 
     static int _rasterInit;
 
@@ -73,10 +70,10 @@ private slots:
 
 public slots:
     void songChanged(int);
-    //      void tempoChanged(double);
 
 signals:
     void deleted(unsigned long);
+    void keyPressExt(QKeyEvent*);
 
 public:
     MasterEdit();

@@ -17,6 +17,7 @@
 #include <QIcon>
 
 #include "icons.h"
+#include "globals.h"
 #include "action.h"
 
 const char* infoPointer = QT_TRANSLATE_NOOP("@default", "select Pointer Tool:\n"
@@ -41,18 +42,20 @@ const char* infoDraw = QT_TRANSLATE_NOOP("@default", "select Drawing Tool");
 const char* infoMute = QT_TRANSLATE_NOOP("@default", "select Muting Tool:\n"
 		"click on part to mute/unmute");
 const char* infoAutomation = QT_TRANSLATE_NOOP("@default", "Manipulate automation");
+const char* infoMaster = QT_TRANSLATE_NOOP("@default", "Enable Tempo Editor to affect song");
 
 ToolB toolList[] = {
-	{&pointerIconSet3, QT_TRANSLATE_NOOP("@default", "pointer"), infoPointer},
-	{&pencilIconSet3, QT_TRANSLATE_NOOP("@default", "pencil"), infoPencil},
-	{&deleteIconSet3, QT_TRANSLATE_NOOP("@default", "eraser"), infoDel},
-	{&cutIconSet3, QT_TRANSLATE_NOOP("@default", "cutter"), infoCut},
-	{&note1IconSet3, QT_TRANSLATE_NOOP("@default", "score"), infoScore},
-	{&glueIconSet3, QT_TRANSLATE_NOOP("@default", "glue"), infoGlue},
-	{&quantIconSet3, QT_TRANSLATE_NOOP("@default", "quantize"), infoQuant},
-	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "draw"), infoDraw},
-	{&muteIconSet3, QT_TRANSLATE_NOOP("@default", "mute parts"), infoMute},
-	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "edit automation"),    infoAutomation},
+	{&pointerIconSet3, QT_TRANSLATE_NOOP("@default", "Pointer"), infoPointer},
+	{&pencilIconSet3, QT_TRANSLATE_NOOP("@default", "Pencil"), infoPencil},
+	{&deleteIconSet3, QT_TRANSLATE_NOOP("@default", "Eraser"), infoDel},
+	{&cutIconSet3, QT_TRANSLATE_NOOP("@default", "Cutter"), infoCut},
+	{&note1IconSet3, QT_TRANSLATE_NOOP("@default", "Score"), infoScore},
+	{&glueIconSet3, QT_TRANSLATE_NOOP("@default", "Glue"), infoGlue},
+	{&quantIconSet3, QT_TRANSLATE_NOOP("@default", "Quantize"), infoQuant},
+	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "Draw"), infoDraw},
+	{&muteIconSet3, QT_TRANSLATE_NOOP("@default", "Mute parts"), infoMute},
+	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "Edit automation"),    infoAutomation},
+	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "Enable Tempo Editor"),    infoMaster},
 };
 
 //---------------------------------------------------------
@@ -80,10 +83,16 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, bool addSpacer, const char*
 	int n = 0;
 	if(addSpacer)
 		m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	bool addmaster = false;
 	for (unsigned i = 0; i < sizeof (toolList) / sizeof (*toolList); ++i)
 	{
 		if ((tools & (1 << i)) == 0)
 			continue;
+		if((tools & (1 << i)) == MasterTool)
+		{
+			addmaster = true;
+			continue;
+		}
 		ToolB* t = &toolList[i];
 
 		Action* a = new Action(action, 1 << i, t->tip, true);
@@ -106,6 +115,15 @@ EditToolBar::EditToolBar(QWidget* parent, int tools, bool addSpacer, const char*
 		++n;
 	}
 	action->setVisible(true);
+	if(addmaster)
+	{
+		QToolButton* button = new QToolButton(this);
+		button->setDefaultAction(masterEnableAction);
+		button->setIconSize(QSize(29, 25));
+		button->setFixedSize(QSize(29, 25));
+		button->setAutoRaise(true);
+		m_layout->addWidget(button);
+	}
 	if(addSpacer)
 		m_layout->addItem(new QSpacerItem(4, 2, QSizePolicy::Expanding, QSizePolicy::Minimum));
 

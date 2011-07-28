@@ -15,6 +15,7 @@
 #include "poslabel.h"
 #include "master.h"
 #include "utils.h"
+#include "song.h"
 #include "tscale.h"
 #include "tempolabel.h"
 #include "xml.h"
@@ -24,6 +25,7 @@
 ///#include "sigedit.h"
 #include "globals.h"
 #include "traverso_shared/TConfig.h"
+#include "icons.h"
 
 #include <values.h>
 
@@ -63,9 +65,9 @@ void MasterEdit::songChanged(int type)
 	}
 	if (type & SC_MASTER)
 	{
-		enableButton->blockSignals(true);
-		enableButton->setChecked(song->masterFlag());
-		enableButton->blockSignals(false);
+		masterEnableAction->blockSignals(true);
+		masterEnableAction->setChecked(song->masterFlag());
+		masterEnableAction->blockSignals(false);
 	}
 }
 
@@ -87,47 +89,47 @@ MasterEdit::MasterEdit()
 
 	//---------ToolBar----------------------------------
 
-	tools = addToolBar(tr("Master tools"));
-	tools->addActions(undoRedo->actions());
+	QToolBar* info = new QToolBar(tr("Info Tools"));
+	addToolBar(Qt::BottomToolBarArea, info);
 
-	tools2 = new EditToolBar(this, PointerTool | PencilTool | RubberTool);
-	//addToolBar(tools2);
+	editbar = new EditToolBar(this, masterTools);
 
-	QToolBar* enableMaster = addToolBar(tr("Enable master"));
-	enableButton = new QToolButton();
-	enableButton->setCheckable(true);
-	enableButton->setText(tr("Enable"));
-	enableButton->setToolTip(tr("Enable usage of master track"));
-	enableButton->setChecked(song->masterFlag());
-	enableMaster->addWidget(enableButton);
-	enableMaster->addWidget(tools2);
-	connect(enableButton, SIGNAL(toggled(bool)), song, SLOT(setMasterFlag(bool)));
-
-	QToolBar* info = addToolBar(tr("Info"));
-	QLabel* label = new QLabel(tr("Cursor"));
-	label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	label->setIndent(3);
-	info->addWidget(label);
+	info->setFloatable(false);
+	info->setMovable(false);
 
 	cursorPos = new PosLabel(0);
 	cursorPos->setFixedHeight(22);
 	cursorPos->setToolTip(tr("time at cursor position"));
+	cursorPos->setObjectName("arrangerCursor");
 	info->addWidget(cursorPos);
 	tempo = new TempoLabel(0);
 	tempo->setFixedHeight(22);
 	tempo->setToolTip(tr("tempo at cursor position"));
+	tempo->setObjectName("pitchLabel");
 	info->addWidget(tempo);
 
 	const char* rastval[] = {
 		QT_TRANSLATE_NOOP("@default", "Off"), "Bar", "1/2", "1/4", "1/8", "1/16"
 	};
-	rasterLabel = new LabelCombo(tr("Snap"), 0);
+	rasterLabel = new QComboBox(this);
 	rasterLabel->setFocusPolicy(Qt::NoFocus);
 	for (int i = 0; i < 6; i++)
 		rasterLabel->insertItem(i, tr(rastval[i]));
 	rasterLabel->setCurrentIndex(1);
 	info->addWidget(rasterLabel);
-	connect(rasterLabel, SIGNAL(activated(int)), SLOT(_setRaster(int)));
+	connect(rasterLabel, SIGNAL(currentIndexChanged(int)), SLOT(_setRaster(int)));
+
+	QWidget* spacer = new QWidget();
+	spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	spacer->setFixedWidth(15);
+	info->addWidget(spacer);
+
+	info->addWidget(editbar);
+
+	QWidget* spacer15 = new QWidget();
+	spacer15->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	spacer15->setFixedWidth(15);
+	info->addWidget(spacer15);
 
 	//---------values for current position---------------
 	info->addWidget(new QLabel(tr("CurPos ")));
@@ -155,11 +157,9 @@ MasterEdit::MasterEdit()
 	vscroll->setRange(30000, 250000);
 	time1 = new MTScale(&_raster, mainw, xscale);
 	sign = new SigScale(&_raster, mainw, xscale);
-	//      thits     = new HitScale(&_raster, mainw, xscale);
 
 	canvas = new Master(this, mainw, xscale, yscale);
 
-	//      zhits     = new HitScale(&_raster, mainw, xscale);
 	time2 = new MTScale(&_raster, mainw, xscale);
 	tscale = new TScale(mainw, yscale);
 	time2->setBarLocator(true);
@@ -178,20 +178,15 @@ MasterEdit::MasterEdit()
 	mainGrid->addWidget(hLine(mainw), 2, 1);
 	mainGrid->addWidget(sign, 3, 1);
 	mainGrid->addWidget(hLine(mainw), 4, 1);
-	//    mainGrid->addWidget(thits,         5, 1);
-	//    mainGrid->addWidget(hLine(mainw),  6, 1);
 	mainGrid->addWidget(canvas, 5, 1);
 	mainGrid->addWidget(tscale, 5, 0);
 	mainGrid->addWidget(hLine(mainw), 6, 1);
-	//    mainGrid->addWidget(zhits,         9, 1);
-	//    mainGrid->addWidget(hLine(mainw),  7, 1);
 	mainGrid->addWidget(time2, 7, 1);
 	mainGrid->addWidget(hscroll, 8, 1);
 	mainGrid->addWidget(vscroll, 0, 2, 10, 1);
-	//      mainGrid->addWidget(corner,  9, 2, AlignBottom | AlignRight);
 
 
-	connect(tools2, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
+	connect(editbar, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 	connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
 	connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
 
@@ -435,11 +430,8 @@ void MasterEdit::posChanged(int idx, unsigned val, bool)
 
 void MasterEdit::setTime(unsigned tick)
 {
-	if (tick == MAXINT)
-		cursorPos->setEnabled(false);
-	else
+	if (tick != MAXINT)
 	{
-		cursorPos->setEnabled(true);
 		cursorPos->setValue(tick);
 		time1->setPos(3, tick, false);
 		time2->setPos(3, tick, false);
@@ -452,11 +444,8 @@ void MasterEdit::setTime(unsigned tick)
 
 void MasterEdit::setTempo(int val)
 {
-	if (val == -1)
-		tempo->setEnabled(false);
-	else
+	if (val != -1)
 	{
-		tempo->setEnabled(true);
 		tempo->setValue(val);
 	}
 }
@@ -475,17 +464,17 @@ void MasterEdit::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_TOOL_POINTER].key)
 	{
-		tools2->set(PointerTool);
+		editbar->set(PointerTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_RUBBER].key)
 	{
-		tools2->set(RubberTool);
+		editbar->set(RubberTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_PENCIL].key)
 	{
-		tools2->set(PencilTool);
+		editbar->set(PencilTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_SET_QUANT_1].key)
@@ -515,7 +504,19 @@ void MasterEdit::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_TOGGLE_ENABLE].key)
 	{
-		enableButton->toggle();
+		masterEnableAction->toggle();
+	}
+	else if(shortcuts[SHRT_UNDO].key)
+	{
+		undoAction->trigger();
+	}
+	else if(shortcuts[SHRT_REDO].key)
+	{
+		redoAction->trigger();
+	}
+	else
+	{
+		//emit keyPressExt(e); //redirect keypress events to main app
 	}
 
 }

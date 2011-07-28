@@ -24,10 +24,11 @@ class QActionGroup;
 enum Tool
 {
     PointerTool = 1, PencilTool = 2, RubberTool = 4, CutTool = 8,
-    ScoreTool=16, GlueTool=32, QuantTool=64, DrawTool=128, MuteTool=256, AutomationTool=512
+    ScoreTool=16, GlueTool=32, QuantTool=64, DrawTool=128, MuteTool=256, AutomationTool=512, MasterTool=1024
 };
 
 const int arrangerTools = PointerTool | PencilTool | RubberTool | CutTool | GlueTool | MuteTool | AutomationTool;
+const int masterTools = PointerTool | PencilTool | RubberTool | MasterTool;
 
 struct ToolB
 {

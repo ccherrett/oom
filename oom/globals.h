@@ -149,6 +149,7 @@ extern QAction* feedbackAction;
 extern QAction* pcloaderAction;
 extern QAction* noteAlphaAction;
 extern QAction* multiPartSelectionAction;
+extern QAction* masterEnableAction;
 
 //class AudioMixerApp;
 class OOMidi;

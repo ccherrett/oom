@@ -33,12 +33,13 @@ Master::Master(MidiEditor* e, QWidget* parent, int xmag, int ymag)
 : View(parent, xmag, ymag)
 {
 	editor = e;
-	setBg(QColor(195,198,196));
+	//setBg(QColor(195,198,196));
+	setBg(QColor(63,63,63));
 	vscroll = 0;
 	pos[0] = 0;
 	pos[1] = 0;
 	pos[2] = 0;
-	setFocusPolicy(Qt::StrongFocus); // Tim.
+	setFocusPolicy(Qt::StrongFocus);
 	setMouseTracking(true);
 	connect(song, SIGNAL(posChanged(int, unsigned, bool)), this, SLOT(setPos(int, unsigned, bool)));
 	connect(song, SIGNAL(songChanged(int)), this, SLOT(redraw()));
@@ -167,12 +168,8 @@ void Master::pdraw(QPainter& p, const QRect& rect)
 			QColor red = QColor(0, 37, 46, 127);
 			QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, height()));
 			vuGrad.setColorAt(1, green);
-			//vuGrad.setColorAt(0.45, yellow);
-			//vuGrad.setColorAt(0.3, yellow);
 			vuGrad.setColorAt(0, red);
 			QPen myPen = QPen();
-			//myPen.setCapStyle(Qt::RoundCap);
-			//myPen.setStyle(Qt::DashLine);
 			myPen.setBrush(QBrush(vuGrad));
 			p.fillRect(stick, tempo, etick - stick, wh, QBrush(vuGrad));
 		}
@@ -211,8 +208,7 @@ void Master::pdraw(QPainter& p, const QRect& rect)
 
 void Master::draw(QPainter& p, const QRect& rect)
 {
-	drawTickRaster(p, rect.x(), rect.y(),
-			rect.width(), rect.height(), 0, false);
+	drawTickRaster(p, rect.x(), rect.y(), rect.width(), rect.height(), 0, false);
 }
 
 //---------------------------------------------------------
@@ -223,7 +219,7 @@ void Master::viewMousePressEvent(QMouseEvent* event)
 {
 	start = event->pos();
 	Tool activeTool = tool;
-	//      bool shift = event->state() & ShiftButton;
+	//bool shift = event->state() & ShiftButton;
 
 	switch (activeTool)
 	{
