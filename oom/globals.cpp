@@ -16,6 +16,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QIcon>
+#include <QPixmap>
 
 #include "globals.h"
 #include "config.h"
@@ -296,6 +297,7 @@ int lastTrackPartColorIndex = 1;
 QList<QIcon> partColorIcons;
 QList<QIcon> partColorIconsSelected;
 QHash<int, QColor> g_trackColorList;
+QHash<int, QPixmap> g_trackDragImageList;
 
 //---------------------------------------------------------
 //   doSetuid

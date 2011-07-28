@@ -480,7 +480,7 @@ extern QPixmap* dragMidiIcon;
 extern QPixmap* dragAudioIcon;
 extern QPixmap* dragInputIcon;
 extern QPixmap* dragOutputIcon;
-extern QPixmap* dragAuxsIcon;
+extern QPixmap* dragAuxIcon;
 extern QPixmap* dragBussIcon;
 
 extern QIcon* reminder1IconSet3;

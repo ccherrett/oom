@@ -25,6 +25,7 @@ class QActionGroup;
 class QStringList;
 class QIcon;
 class QColor;
+class QPixmap;
 
 extern const float denormalBias;
 
@@ -204,6 +205,7 @@ extern bool checkAudioDevice();
 extern QList<QIcon> partColorIcons;
 extern QList<QIcon> partColorIconsSelected;
 extern QHash<int, QColor> g_trackColorList;
+extern QHash<int, QPixmap> g_trackDragImageList;
 #ifdef LV2_SUPPORT
 struct LV2World;
 extern LV2World* lv2world;

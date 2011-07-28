@@ -773,11 +773,21 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	g_trackColorList.insert(Track::AUDIO_INPUT, QColor(189,122,214));
 	g_trackColorList.insert(Track::MIDI, QColor(1,230,238));
+	g_trackColorList.insert(Track::DRUM, QColor(1,230,238));
 	g_trackColorList.insert(Track::AUDIO_OUTPUT, QColor(252,118,118));
 	g_trackColorList.insert(Track::WAVE, QColor(129,244,118));
 	g_trackColorList.insert(Track::AUDIO_BUSS, QColor(252,164,36));
 	g_trackColorList.insert(Track::AUDIO_AUX, QColor(227,233,114));
 	g_trackColorList.insert(Track::AUDIO_SOFTSYNTH, QColor(129,244,118));
+
+	g_trackDragImageList.insert(Track::AUDIO_INPUT, *dragMidiIcon);
+	g_trackDragImageList.insert(Track::MIDI, *dragInputIcon);
+	g_trackDragImageList.insert(Track::DRUM, *dragInputIcon);
+	g_trackDragImageList.insert(Track::AUDIO_OUTPUT, *dragOutputIcon);
+	g_trackDragImageList.insert(Track::WAVE, *dragAudioIcon);
+	g_trackDragImageList.insert(Track::AUDIO_BUSS, *dragBussIcon);
+	g_trackDragImageList.insert(Track::AUDIO_AUX, *dragAuxIcon);
+	g_trackDragImageList.insert(Track::AUDIO_SOFTSYNTH, *dragAudioIcon);
 
 	appName = QString("The Composer - OOMidi     ");
 	setWindowTitle(appName);
