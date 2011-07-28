@@ -562,6 +562,21 @@ QPixmap* transpose_OffIcon;
 QPixmap* transpose_OverIcon;
 QIcon* transposeIconSet3;
 
+QPixmap* connect_OnIcon;
+QPixmap* connect_OffIcon;
+QPixmap* connect_OverIcon;
+QIcon*   connectIconSet3;
+
+QPixmap* load_OnIcon;
+QPixmap* load_OffIcon;
+QPixmap* load_OverIcon;
+QIcon*   loadIconSet3;
+
+QPixmap* route_edit_OnIcon;
+QPixmap* route_edit_OffIcon;
+QPixmap* route_edit_OverIcon;
+QIcon*   route_editIconSet3;
+
 QPixmap* dragMidiIcon;
 QPixmap* dragAudioIcon;
 QPixmap* dragInputIcon;
@@ -1321,6 +1336,30 @@ void initIcons()
       transposeIconSet3->addPixmap(*transpose_OnIcon, QIcon::Normal, QIcon::On);
       transposeIconSet3->addPixmap(*transpose_OffIcon, QIcon::Normal, QIcon::Off);
       transposeIconSet3->addPixmap(*transpose_OverIcon, QIcon::Active);
+	  
+      connect_OnIcon= new MPIXMAP(":/images/connect_new_on.png", NULL);
+      connect_OffIcon= new MPIXMAP(":/images/connect_new_off.png", NULL);
+      connect_OverIcon= new MPIXMAP(":/images/connect_new_over.png", NULL);
+	  connectIconSet3         = new QIcon();
+      connectIconSet3->addPixmap(*connect_OnIcon, QIcon::Normal, QIcon::On);
+      connectIconSet3->addPixmap(*connect_OffIcon, QIcon::Normal, QIcon::Off);
+      connectIconSet3->addPixmap(*connect_OverIcon, QIcon::Active);
+	  
+      load_OnIcon= new MPIXMAP(":/images/load_new_on.png", NULL);
+      load_OffIcon= new MPIXMAP(":/images/load_new_off.png", NULL);
+      load_OverIcon= new MPIXMAP(":/images/load_new_over.png", NULL);
+	  loadIconSet3         = new QIcon();
+      loadIconSet3->addPixmap(*load_OnIcon, QIcon::Normal, QIcon::On);
+      loadIconSet3->addPixmap(*load_OffIcon, QIcon::Normal, QIcon::Off);
+      loadIconSet3->addPixmap(*load_OverIcon, QIcon::Active);
+	  
+      route_edit_OnIcon= new MPIXMAP(":/images/route_edit_new_on.png", NULL);
+      route_edit_OffIcon= new MPIXMAP(":/images/route_edit_new_off.png", NULL);
+      route_edit_OverIcon= new MPIXMAP(":/images/route_edit_new_over.png", NULL);
+	  route_editIconSet3         = new QIcon();
+      route_editIconSet3->addPixmap(*route_edit_OnIcon, QIcon::Normal, QIcon::On);
+      route_editIconSet3->addPixmap(*route_edit_OffIcon, QIcon::Normal, QIcon::Off);
+      route_editIconSet3->addPixmap(*route_edit_OverIcon, QIcon::Active);
 	  
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);

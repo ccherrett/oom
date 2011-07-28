@@ -38,16 +38,16 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	//btnDelete->setIconSize(garbagePCIcon->size());
 	btnAdd->setIcon(*plusIconSet3);
 	//btnAdd->setIconSize(addTVIcon->size());
-	btnEdit->setIcon(*midi_edit_instrumentIcon);
-	btnEdit->setIconSize(midi_edit_instrumentIcon->size());
-	btnLoad->setIcon(*midi_reset_instrIcon);
-	btnLoad->setIconSize(midi_reset_instrIcon->size());
+	btnEdit->setIcon(*route_editIconSet3);
+	//btnEdit->setIconSize(midi_edit_instrumentIcon->size());
+	btnLoad->setIcon(*loadIconSet3);
+	//btnLoad->setIconSize(midi_reset_instrIcon->size());
 	btnCopy->setIcon(*duplicateIconSet3);
 	//btnCopy->setIconSize(duplicatePCIcon->size());
-	btnLink->setIcon(*midi_inputpluginsIcon);
-	btnLink->setIconSize(midi_inputpluginsIcon->size());
-	btnClear->setIcon(*editcutIconSet);
-	btnClear->setIconSize(midi_inputpluginsIcon->size());
+	btnLink->setIcon(*connectIconSet3);
+	//btnLink->setIconSize(midi_inputpluginsIcon->size());
+	btnClear->setIcon(*garbageIconSet3);
+	//btnClear->setIconSize(midi_inputpluginsIcon->size());
 
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
 	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddClicked(bool)));
