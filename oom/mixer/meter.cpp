@@ -296,7 +296,7 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 {
 	QPen myPen = QPen();
-	//myPen.setStyle(Qt::DashLine);
+	myPen.setStyle(Qt::DashLine);
 	if(m_layout == Qt::Vertical)
 	{
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
