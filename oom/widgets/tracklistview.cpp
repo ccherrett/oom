@@ -180,7 +180,10 @@ void TrackListView::songChanged(int flags)/*{{{*/
 			QStandardItem* item = m_model->item(m_selectedIndex, 1);
 			if(item)
 			{
-				m_table->scrollTo(item->index(), QAbstractItemView::PositionAtTop);
+				//m_table->scrollTo(item->index(), QAbstractItemView::EnsureVisible);
+				//m_table->scrollTo(item->index(), QAbstractItemView::PositionAtTop);
+				//m_table->scrollTo(item->index(), QAbstractItemView::PositionAtBottom);
+				m_table->scrollTo(item->index(), QAbstractItemView::PositionAtCenter);
 			}
 		}
 		else
@@ -286,11 +289,11 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 						{
 							audio->msgRemovePart(npart);
 							scrollPos = pos;
-							if(row < m_model->rowCount())
+							/*if(row < m_model->rowCount())
 							{
 								QModelIndex rowIndex = m_table->indexAt(pos);
 								m_table->scrollTo(rowIndex, QAbstractItemView::PositionAtTop);
-							}
+							}*/
 						}
 						break;
 					}
