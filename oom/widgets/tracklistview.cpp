@@ -25,6 +25,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 	m_editor = editor;
 	m_displayRole = PartRole;
 	m_selectedIndex = -1;
+	scrollPos = QPoint(1, 1);
 	m_headers << "V" << "Track List";
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(8, 2, 8, 2);
@@ -174,16 +175,29 @@ void TrackListView::songChanged(int flags)/*{{{*/
 		m_model->setHorizontalHeaderLabels(m_headers);
 		m_table->setColumnWidth(0, 20);
 		if(m_selectedIndex < m_model->rowCount())
+		{
 			m_table->selectRow(m_selectedIndex);
+			QStandardItem* item = m_model->item(m_selectedIndex, 1);
+			if(item)
+			{
+				m_table->scrollTo(item->index(), QAbstractItemView::PositionAtTop);
+			}
+		}
+		else
+		{
+			QModelIndex rowIndex = m_table->indexAt(scrollPos);
+			m_table->scrollTo(rowIndex, QAbstractItemView::PositionAtTop);
+		}
 	}
 }/*}}}*/
 
 void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 {
-	QModelIndex index = m_table->indexAt(pos);
-	if(!index.isValid())
+	QModelIndex mindex = m_table->indexAt(pos);
+	if(!mindex.isValid())
 		return;
-	QStandardItem* item = m_model->itemFromIndex(index);
+	int row = mindex.row();
+	QStandardItem* item = m_model->itemFromIndex(mindex);
 	if(item)
 	{
 		//Make it works even if you rightclick on the checkbox
@@ -242,6 +256,8 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 			}
 			p->addAction(tr("Add Part"))->setData(1);
 			p->addAction(tr("Add Part and Select"))->setData(2);
+			if(type == 2)
+				p->addAction(tr("Delete Part"))->setData(3);
 
 			QAction* act = p->exec(QCursor::pos());
 			if (act)
@@ -255,12 +271,26 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 					case 2:
 					{
 						CItem* citem = oom->arranger->addCanvasPart(track);
-						Part* p = citem->part();
-						if(p)
+						Part* mp = citem->part();
+						if(mp)
 						{
-							m_editor->addPart(p);
-							updatePartSelection(p);
+							m_editor->addPart(mp);
+							updatePartSelection(mp);
 							songChanged(-1);//update check state
+						}
+						break;
+					}
+					case 3:
+					{
+						if(npart)
+						{
+							audio->msgRemovePart(npart);
+							scrollPos = pos;
+							if(row < m_model->rowCount())
+							{
+								QModelIndex rowIndex = m_table->indexAt(pos);
+								m_table->scrollTo(rowIndex, QAbstractItemView::PositionAtTop);
+							}
 						}
 						break;
 					}

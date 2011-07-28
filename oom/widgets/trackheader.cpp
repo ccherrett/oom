@@ -1730,7 +1730,7 @@ void TrackHeader::mouseMoveEvent(QMouseEvent* ev)/*{{{*/
 			QDrag *drag = new QDrag(this);
 			drag->setMimeData(mimeData);
 			drag->setPixmap(g_trackDragImageList.value(m_track->type()));
-			drag->setHotSpot(hotSpot);
+			drag->setHotSpot(QPoint(0,0));//hotSpot);
 			drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::MoveAction);
 		}
 		break;

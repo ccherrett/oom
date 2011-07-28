@@ -48,6 +48,7 @@ class TrackListView : public QFrame
 	int m_displayRole;
 	int m_selectedIndex;
 	QStringList m_headers;
+	QPoint scrollPos;
 	
 	void updatePartSelection(Part*);
 
