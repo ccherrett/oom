@@ -47,6 +47,12 @@ Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout)
 	yellow = QColor(152,33,84);
 	red = QColor(160,3,43);
 	bgColor = QColor(12, 12, 12);
+	m_pixmap_h = new QPixmap(":/images/vugrad.png");
+	m_pixmap_w = new QPixmap(":/images/vugrad_h.png");
+	m_height = 0;
+	m_width = 0;
+	m_scaledPixmap_w = m_pixmap_w->scaled(0, 1, Qt::IgnoreAspectRatio);
+	m_scaledPixmap_h = m_pixmap_h->scaled(1, 0, Qt::IgnoreAspectRatio);
 }
 
 //---------------------------------------------------------
@@ -211,7 +217,7 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 
 		if (yv > w) yv = w;
 		
-		printf("yv = %d\n",yv);
+		//printf("yv = %d\n",yv);
 		if(yv > 0)
 			m_redrawVU = true;
 
@@ -296,9 +302,10 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
 		if(redrawVU)
 		{
-			QPixmap *pixmap = new QPixmap(":/images/vugrad.png");
-			QPixmap scaledPixmap = pixmap->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
-			myPen.setBrush(scaledPixmap);
+			if(height() != m_height)
+				m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
+			m_height = height();	
+			myPen.setBrush(m_scaledPixmap_h);
 			myPen.setWidth(1);
 			p.setPen(myPen);
 	
@@ -321,9 +328,10 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
 		if(redrawVU)
 		{
-			QPixmap *pixmap = new QPixmap(":/images/vugrad_h.png");
-			QPixmap scaledPixmap = pixmap->scaled(w, 1, Qt::IgnoreAspectRatio);/*{{{*/
-			myPen.setBrush(scaledPixmap);
+			if(width() != m_width)
+				m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);/*{{{*/
+			m_width = width();	
+			myPen.setBrush(m_scaledPixmap_w);
 			myPen.setWidth(1);
 			p.setPen(myPen);
 			p.drawLine(0, 1, w, 1);

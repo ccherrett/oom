@@ -37,6 +37,12 @@ private:
     QColor bgColor;
 	Qt::Orientation m_layout;
 	bool m_redrawVU;
+	QPixmap *m_pixmap_h;
+	QPixmap *m_pixmap_w;
+	int m_height;
+	int m_width;
+	QPixmap m_scaledPixmap_w;
+	QPixmap m_scaledPixmap_h;
 
     void drawVU(QPainter& p, int, int, int, bool);
 
