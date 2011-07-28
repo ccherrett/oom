@@ -73,10 +73,10 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 
 	btnAdd = actionBox->button(QDialogButtonBox::Yes);
 	btnAdd->setText(tr("Add Track"));
-	btnUp->setIcon(*upPCIcon);
-	btnDown->setIcon(*downPCIcon);
-	btnUp->setIconSize(upPCIcon->size());
-	btnDown->setIconSize(downPCIcon->size());
+	btnUp->setIcon(*up_arrowIconSet3);
+	btnDown->setIcon(*down_arrowIconSet3);
+	//btnUp->setIconSize(upPCIcon->size());
+	//btnDown->setIconSize(downPCIcon->size());
 
 	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddTrack(bool)));
 	

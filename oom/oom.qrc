@@ -368,6 +368,18 @@
 		<file>images/duplicate_new_on.png</file>
 		<file>images/duplicate_new_over.png</file>
 		<file>images/duplicate_new_off.png</file>
+		<file>images/comment_new_on.png</file>
+		<file>images/comment_new_over.png</file>
+		<file>images/comment_new_off.png</file>
+		<file>images/drag_midi.png</file>
+		<file>images/drag_audio.png</file>
+		<file>images/drag_out.png</file>
+		<file>images/drag_input.png</file>
+		<file>images/drag_aux.png</file>
+		<file>images/drag_buss.png</file>
+		<file>images/transpose_new_on.png</file>
+		<file>images/transpose_new_over.png</file>
+		<file>images/transpose_new_off.png</file>
 	</qresource>
 </RCC>
 

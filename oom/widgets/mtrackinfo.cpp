@@ -349,8 +349,8 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(iRButton, SIGNAL(pressed()), SLOT(inRoutesPressed()));
 	connect(btnTranspose, SIGNAL(toggled(bool)), SIGNAL(globalTransposeClicked(bool)));
 	connect(btnComments, SIGNAL(toggled(bool)), SIGNAL(toggleComments(bool)));
-	btnComments->setIcon(QIcon(*commentIcon));
-	btnTranspose->setIcon(QIcon(*miditransposeSIcon));
+	btnComments->setIcon(QIcon(*commentIconSet3));
+	btnTranspose->setIcon(QIcon(*transposeIconSet3));
 
 	// TODO: Works OK, but disabled for now, until we figure out what to do about multiple out routes and display values...
 	//oRButton->setEnabled(false);
