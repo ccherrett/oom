@@ -466,6 +466,23 @@ extern QPixmap* duplicate_OffIcon;
 extern QPixmap* duplicate_OverIcon;
 extern QIcon* duplicateIconSet3;
 
+extern QPixmap* comment_OnIcon;
+extern QPixmap* comment_OffIcon;
+extern QPixmap* comment_OverIcon;
+extern QIcon* commentIconSet3;
+
+extern QPixmap* transpose_OnIcon;
+extern QPixmap* transpose_OffIcon;
+extern QPixmap* transpose_OverIcon;
+extern QIcon* transposeIconSet3;
+
+extern QPixmap* dragMidiIcon;
+extern QPixmap* dragAudioIcon;
+extern QPixmap* dragInputIcon;
+extern QPixmap* dragOutputIcon;
+extern QPixmap* dragAuxsIcon;
+extern QPixmap* dragBussIcon;
+
 extern QIcon* reminder1IconSet3;
 extern QIcon* reminder2IconSet3;
 extern QIcon* reminder3IconSet3;

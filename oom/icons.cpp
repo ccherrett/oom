@@ -552,6 +552,23 @@ QPixmap* duplicate_OffIcon;
 QPixmap* duplicate_OverIcon;
 QIcon* duplicateIconSet3;
 
+QPixmap* comment_OnIcon;
+QPixmap* comment_OffIcon;
+QPixmap* comment_OverIcon;
+QIcon* commentIconSet3;
+
+QPixmap* transpose_OnIcon;
+QPixmap* transpose_OffIcon;
+QPixmap* transpose_OverIcon;
+QIcon* transposeIconSet3;
+
+QPixmap* dragMidiIcon;
+QPixmap* dragAudioIcon;
+QPixmap* dragInputIcon;
+QPixmap* dragOutputIcon;
+QPixmap* dragAuxIcon;
+QPixmap* dragBussIcon;
+
 QPixmap* mixer_record_OnIcon;
 QPixmap* mixer_record_OffIcon;
 QPixmap* mixer_record_OverIcon;
@@ -1281,6 +1298,29 @@ void initIcons()
       duplicateIconSet3->addPixmap(*duplicate_OnIcon, QIcon::Normal, QIcon::On);
       duplicateIconSet3->addPixmap(*duplicate_OffIcon, QIcon::Normal, QIcon::Off);
       duplicateIconSet3->addPixmap(*duplicate_OverIcon, QIcon::Active);
+	  
+      comment_OnIcon= new MPIXMAP(":/images/comment_new_on.png", NULL);
+      comment_OffIcon= new MPIXMAP(":/images/comment_new_off.png", NULL);
+      comment_OverIcon= new MPIXMAP(":/images/comment_new_over.png", NULL);
+	  commentIconSet3         = new QIcon();
+      commentIconSet3->addPixmap(*comment_OnIcon, QIcon::Normal, QIcon::On);
+      commentIconSet3->addPixmap(*comment_OffIcon, QIcon::Normal, QIcon::Off);
+      commentIconSet3->addPixmap(*comment_OverIcon, QIcon::Active);
+      
+	  dragMidiIcon= new MPIXMAP(":/images/drag_midi.png", NULL);
+	  dragAudioIcon= new MPIXMAP(":/images/drag_audio.png", NULL);
+	  dragInputIcon= new MPIXMAP(":/images/drag_input.png", NULL);
+	  dragOutputIcon= new MPIXMAP(":/images/drag_out.png", NULL);
+	  dragAuxIcon= new MPIXMAP(":/images/drag_aux.png", NULL);
+	  dragBussIcon= new MPIXMAP(":/images/drag_buss.png", NULL);
+	  
+      transpose_OnIcon= new MPIXMAP(":/images/transpose_new_on.png", NULL);
+      transpose_OffIcon= new MPIXMAP(":/images/transpose_new_off.png", NULL);
+      transpose_OverIcon= new MPIXMAP(":/images/transpose_new_over.png", NULL);
+	  transposeIconSet3         = new QIcon();
+      transposeIconSet3->addPixmap(*transpose_OnIcon, QIcon::Normal, QIcon::On);
+      transposeIconSet3->addPixmap(*transpose_OffIcon, QIcon::Normal, QIcon::Off);
+      transposeIconSet3->addPixmap(*transpose_OverIcon, QIcon::Active);
 	  
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);
