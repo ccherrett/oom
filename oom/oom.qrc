@@ -350,6 +350,24 @@
 		<file>images/icons/feedback_new_on.png</file>
 		<file>images/icons/feedback_new_over.png</file>
 		<file>images/icons/feedback_new_off.png</file>
+		<file>images/icons/enabled_new_on.png</file>
+		<file>images/icons/enabled_new_over.png</file>
+		<file>images/icons/enabled_new_off.png</file>
+		<file>images/up_arrow_new_on.png</file>
+		<file>images/up_arrow_new_over.png</file>
+		<file>images/up_arrow_new_off.png</file>
+		<file>images/down_arrow_new_on.png</file>
+		<file>images/down_arrow_new_over.png</file>
+		<file>images/down_arrow_new_off.png</file>
+		<file>images/plus_new_on.png</file>
+		<file>images/plus_new_over.png</file>
+		<file>images/plus_new_off.png</file>
+		<file>images/garbage_new_on.png</file>
+		<file>images/garbage_new_over.png</file>
+		<file>images/garbage_new_off.png</file>
+		<file>images/duplicate_new_on.png</file>
+		<file>images/duplicate_new_over.png</file>
+		<file>images/duplicate_new_off.png</file>
 	</qresource>
 </RCC>
 

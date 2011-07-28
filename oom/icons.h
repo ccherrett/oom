@@ -436,6 +436,35 @@ extern QPixmap* input_indicator_OffIcon;
 extern QPixmap* input_indicator_OverIcon;
 extern QPixmap* automation_track_OffIcon;
 extern QPixmap* automation_track_OverIcon;
+extern QPixmap* enabled_OnIcon;
+extern QPixmap* enabled_OffIcon;
+extern QPixmap* enabled_OverIcon;
+extern QIcon* enabledIconSet3;
+
+extern QPixmap* up_arrow_OnIcon;
+extern QPixmap* up_arrow_OffIcon;
+extern QPixmap* up_arrow_OverIcon;
+extern QIcon* up_arrowIconSet3;
+
+extern QPixmap* down_arrow_OnIcon;
+extern QPixmap* down_arrow_OffIcon;
+extern QPixmap* down_arrow_OverIcon;
+extern QIcon* down_arrowIconSet3;
+
+extern QPixmap* plus_OnIcon;
+extern QPixmap* plus_OffIcon;
+extern QPixmap* plus_OverIcon;
+extern QIcon* plusIconSet3;
+
+extern QPixmap* garbage_OnIcon;
+extern QPixmap* garbage_OffIcon;
+extern QPixmap* garbage_OverIcon;
+extern QIcon* garbageIconSet3;
+
+extern QPixmap* duplicate_OnIcon;
+extern QPixmap* duplicate_OffIcon;
+extern QPixmap* duplicate_OverIcon;
+extern QIcon* duplicateIconSet3;
 
 extern QIcon* reminder1IconSet3;
 extern QIcon* reminder2IconSet3;

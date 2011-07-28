@@ -990,7 +990,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	master->setIcon(QIcon(*edit_mastertrackIcon));
 	masterGraphicAction = new QAction(QIcon(*mastertrack_graphicIcon), tr("Graphic"), this);
 	masterListAction = new QAction(QIcon(*mastertrack_listIcon), tr("List"), this);
-	masterEnableAction = new QAction(QIcon(*drawIconSet3), tr("Enable usage of Tempo Editor"), this);
+	masterEnableAction = new QAction(QIcon(*enabledIconSet3), tr("Enable usage of Tempo Editor"), this);
 	masterEnableAction->setCheckable(true);
 	masterEnableAction->setChecked(song->masterFlag());
 	connect(masterEnableAction, SIGNAL(triggered(bool)), song, SLOT(setMasterFlag(bool)));
