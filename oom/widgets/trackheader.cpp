@@ -42,6 +42,7 @@
 #include "mixer/meter.h"
 
 static QString styletemplate = "QLineEdit { border-width:1px; border-radius: 0px; border-image: url(:/images/frame.png) 4; border-top-color: #1f1f22; border-bottom-color: #505050; background-color: #1a1a1a; color: #%1; font-family: fixed-width; font-weight: bold; font-size: 15px; padding-left: 15px; }";
+static QString lineStyleTemplate = "QFrame { border: 0px; background-color: %1; }";
 
 TrackHeader::TrackHeader(Track* t, QWidget* parent)
 : QFrame(parent)
@@ -1787,6 +1788,15 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 			m_slider->setVisible(m_sliderVisible);
 		if(m_pan)
 			m_pan->setVisible(m_sliderVisible);
+		if(m_sliderVisible)
+		{
+			m_colorLine->setStyleSheet(lineStyleTemplate.arg("#1b1b1b"));
+static QString lineStyleTemplate = "QFrame { border: 0px; background-color: #1b1b1b; }";
+		}
+		else
+		{
+			m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorList.value(m_track->type()).name()));
+		}
 	}
 	QFrame::resizeEvent(event);
 }/*}}}*/
