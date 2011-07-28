@@ -175,7 +175,7 @@ void Track::init()
 	_panEn2Ctrl = true;
 
 	_selected = false;
-	_height = 40;
+	_height = DEFAULT_TRACKHEIGHT;
 	_locked = false;
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 	{

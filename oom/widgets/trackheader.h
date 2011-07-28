@@ -10,10 +10,6 @@
 #include "globaldefs.h"
 #include <QHash>
 
-static const int MIN_TRACKHEIGHT = 78;
-static const int MIN_TRACKHEIGHT_SLIDER = 78;
-static const int MIN_TRACKHEIGHT_VU = 98;
-
 class Track;
 class Knob;
 class QAction;

@@ -285,7 +285,7 @@ void TrackHeader::heartBeat()/*{{{*/
 		if ((int) dact > track->lastActivity())
 			track->setLastActivity((int) dact);
 
-		if (meter[0])
+		if (meter[0] && m_meterVisible)
 			meter[0]->setVal(dact, track->lastActivity(), false);
 
 		// Gives reasonable decay with gui update set to 20/sec.
@@ -298,49 +298,56 @@ void TrackHeader::heartBeat()/*{{{*/
 		//MidiPort* mp = &midiPorts[outPort];
 
 		// Check for detection of midi general activity on chosen channels...
-		int mpt = 0;
-		RouteList* rl = track->inRoutes();
-
-		ciRoute r = rl->begin();
-		for (; r != rl->end(); ++r)
+		if(m_track->recordFlag())
 		{
-			if (!r->isValid() || (r->type != Route::MIDI_PORT_ROUTE))
-				continue;
+			int mpt = 0;
+			RouteList* rl = track->inRoutes();
 
-			// NOTE: TODO: Code for channelless events like sysex,
-			// ** IF we end up using the 'special channel 17' method.
-			if (r->channel == -1 || r->channel == 0) 
-				continue;
-
-			// No port assigned to the device?
-			mpt = r->midiPort;
-			if (mpt < 0 || mpt >= MIDI_PORTS)
-				continue;
-
-			if (midiPorts[mpt].syncInfo().actDetectBits() & r->channel)
+			ciRoute r = rl->begin();
+			for (; r != rl->end(); ++r)
 			{
-				if (!m_midiDetect)
+				if (!r->isValid() || (r->type != Route::MIDI_PORT_ROUTE))
+					continue;
+
+				// NOTE: TODO: Code for channelless events like sysex,
+				// ** IF we end up using the 'special channel 17' method.
+				if (r->channel == -1 || r->channel == 0) 
+					continue;
+
+				// No port assigned to the device?
+				mpt = r->midiPort;
+				if (mpt < 0 || mpt >= MIDI_PORTS)
+					continue;
+
+				if (midiPorts[mpt].syncInfo().actDetectBits() & r->channel)
 				{
-					m_midiDetect = true;
-					m_btnAutomation->setIcon(QIcon(*input_indicator_OnIcon));
+					if (!m_midiDetect)
+					{
+						m_midiDetect = true;
+						m_btnAutomation->setIcon(QIcon(*input_indicator_OnIcon));
+					}
+					break;
 				}
-				break;
+			}
+			// No activity detected?
+			if (r == rl->end())
+			{
+				if (m_midiDetect)
+				{
+					m_midiDetect = false;
+					m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
+				}
 			}
 		}
-		// No activity detected?
-		if (r == rl->end())
+		else
 		{
-			if (m_midiDetect)
-			{
-				m_midiDetect = false;
-				m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
-			}
+			m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 		}
 	}
 	else
 	{
-		//if(m_meterVisible)
-		//{
+		if(m_meterVisible)
+		{
 			for (int ch = 0; ch < ((AudioTrack*)m_track)->channels(); ++ch)
 			{
 				if (meter[ch])
@@ -348,7 +355,7 @@ void TrackHeader::heartBeat()/*{{{*/
 					meter[ch]->setVal(((AudioTrack*)m_track)->meter(ch), ((AudioTrack*)m_track)->peak(ch), false);
 				}
 			}
-		//}
+		}
 	}
 
 	updateVolume();
@@ -645,11 +652,11 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			{
 				if (multipleSelectedTracks)
 				{
-					song->setTrackHeights(selectedTracksList, 40);
+					song->setTrackHeights(selectedTracksList, DEFAULT_TRACKHEIGHT);
 				}
 				else
 				{
-					m_track->setHeight(40);
+					m_track->setHeight(DEFAULT_TRACKHEIGHT);
 					song->update(SC_TRACK_MODIFIED);
 				}
 				break;
@@ -1476,7 +1483,10 @@ void TrackHeader::initPan()/*{{{*/
 
 		m_pan->setValue(double(v));
 
-		m_panLayout->insertWidget(0, m_pan);
+		m_panLayout->addItem(new QSpacerItem(30, 9, QSizePolicy::Fixed, QSizePolicy::Fixed));
+		m_panLayout->addWidget(m_pan);
+		m_pan->show();
+		m_panLayout->addItem(new QSpacerItem(30, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
 
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		//connect(m_pan, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
@@ -1491,7 +1501,10 @@ void TrackHeader::initPan()/*{{{*/
 		//m_pan->setIgnoreWheel(true);
 		m_pan->setBackgroundRole(QPalette::Mid);
 		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-		m_panLayout->insertWidget(0, m_pan);
+		m_panLayout->addItem(new QSpacerItem(30, 9, QSizePolicy::Fixed, QSizePolicy::Fixed));
+		m_panLayout->addWidget(m_pan);
+		m_pan->show();
+		m_panLayout->addItem(new QSpacerItem(30, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		connect(m_pan, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
 		connect(m_pan, SIGNAL(sliderReleased(int)), SLOT(panReleased()));
@@ -1748,11 +1761,11 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 {
 	//We will trap this to disappear widgets like vu's and volume slider
 	//on the track header. For now we'll just pass it up the chain
-	/*QSize size = event->size();
+	QSize size = event->size();
 	if(m_track)
 	{
-		m_meterVisible = size.height() > MIN_TRACKHEIGHT_VU;
-		m_sliderVisible = size.height() > MIN_TRACKHEIGHT_SLIDER;
+		m_meterVisible = size.height() >= MIN_TRACKHEIGHT_VU;
+		m_sliderVisible = size.height() >= MIN_TRACKHEIGHT_SLIDER;
 		if(m_track->isMidiTrack())
 		{
 			if(meter[0])
@@ -1770,7 +1783,9 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 		}
 		if(m_slider)
 			m_slider->setVisible(m_sliderVisible);
-	}*/
+		if(m_pan)
+			m_pan->setVisible(m_sliderVisible);
+	}
 	QFrame::resizeEvent(event);
 }/*}}}*/
 

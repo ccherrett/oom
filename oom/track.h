@@ -55,6 +55,11 @@ struct MidiAssignData {/*{{{*/
 //   Track
 //---------------------------------------------------------
 
+static const int DEFAULT_TRACKHEIGHT = 78;
+static const int MIN_TRACKHEIGHT = 50;
+static const int MIN_TRACKHEIGHT_SLIDER = 68;
+static const int MIN_TRACKHEIGHT_VU = 78;
+
 class Track
 {
 public:

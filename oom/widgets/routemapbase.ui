@@ -99,17 +99,17 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QPushButton" name="btnLoad">
+         <widget class="QToolButton" name="btnLoad">
           <property name="minimumSize">
            <size>
-            <width>28</width>
-            <height>28</height>
+            <width>25</width>
+            <height>25</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>28</width>
-            <height>28</height>
+            <width>25</width>
+            <height>25</height>
            </size>
           </property>
           <property name="toolTip">
@@ -117,6 +117,15 @@
           </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>25</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -134,17 +143,17 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="btnClear">
+         <widget class="QToolButton" name="btnClear">
           <property name="minimumSize">
            <size>
-            <width>28</width>
-            <height>28</height>
+            <width>25</width>
+            <height>25</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>28</width>
-            <height>28</height>
+            <width>25</width>
+            <height>25</height>
            </size>
           </property>
           <property name="toolTip">
@@ -153,20 +162,29 @@
           <property name="text">
            <string/>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>25</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btnLink">
+         <widget class="QToolButton" name="btnLink">
           <property name="minimumSize">
            <size>
-            <width>28</width>
-            <height>28</height>
+            <width>25</width>
+            <height>25</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>28</width>
-            <height>28</height>
+            <width>25</width>
+            <height>25</height>
            </size>
           </property>
           <property name="toolTip">
@@ -175,8 +193,17 @@
           <property name="text">
            <string/>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>25</width>
+            <height>25</height>
+           </size>
+          </property>
           <property name="shortcut">
            <string>Ctrl+Shift+L</string>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -219,17 +246,17 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="btnEdit">
+      <widget class="QToolButton" name="btnEdit">
        <property name="minimumSize">
         <size>
-         <width>28</width>
-         <height>28</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>28</width>
-         <height>28</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="toolTip">
@@ -238,20 +265,29 @@
        <property name="text">
         <string/>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnAdd">
+      <widget class="QToolButton" name="btnAdd">
        <property name="minimumSize">
         <size>
-         <width>28</width>
-         <height>28</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>28</width>
-         <height>28</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="toolTip">
@@ -260,20 +296,29 @@
        <property name="text">
         <string/>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnCopy">
+      <widget class="QToolButton" name="btnCopy">
        <property name="minimumSize">
         <size>
-         <width>28</width>
-         <height>28</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>28</width>
-         <height>28</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="toolTip">
@@ -281,6 +326,15 @@
        </property>
        <property name="text">
         <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -298,17 +352,17 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnDelete">
+      <widget class="QToolButton" name="btnDelete">
        <property name="minimumSize">
         <size>
-         <width>28</width>
-         <height>28</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>28</width>
-         <height>28</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="toolTip">
@@ -316,6 +370,15 @@
        </property>
        <property name="text">
         <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
