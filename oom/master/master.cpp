@@ -179,6 +179,8 @@ void Master::pdraw(QPainter& p, const QRect& rect)
 			QPen myPen = QPen();
 			myPen.setBrush(QBrush(vuGrad));
 			p.fillRect(stick, tempo, etick - stick, wh, QBrush(vuGrad));
+			p.setPen(red);
+			p.drawLine(stick, tempo, etick, tempo);
 		}
 	}
 
