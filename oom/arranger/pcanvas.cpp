@@ -1814,7 +1814,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 			Track* tr = *t;
 			if (tr->selected())
 			{
-				tr->setHeight(60);
+				tr->setHeight(MIN_TRACKHEIGHT);
 			}
 		}
 		song->update(SC_TRACK_MODIFIED);

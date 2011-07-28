@@ -257,10 +257,10 @@ void initShortCuts()
 	defShrt(SHRT_NAVIGATE_TO_CANVAS, Qt::CTRL + Qt::Key_Enter, "Navigate: to canvas", GLOBAL_SHRT, "navigate_to_canvas");
 	defShrt(SHRT_NAVIGATE_TO_CANVAS, Qt::CTRL + Qt::Key_Return, "Navigate: to canvas", GLOBAL_SHRT, "navigate_to_canvas");
 
-	defShrt(SHRT_TRACK_HEIGHT_DEFAULT, Qt::ALT + Qt::Key_1, "Track: Default Height", GLOBAL_SHRT, "track_height_default");
 	defShrt(SHRT_TRACK_HEIGHT_FULL_SCREEN, Qt::ALT + Qt::Key_0, "Track: Full screen height", GLOBAL_SHRT, "track_height_full_screen");
 	defShrt(SHRT_TRACK_HEIGHT_SELECTION_FITS_IN_VIEW, Qt::ALT + Qt::Key_7, "Track: Full screen height", GLOBAL_SHRT, "track_height_fit_selection_in_view");
-	defShrt(SHRT_TRACK_HEIGHT_2, Qt::ALT + Qt::Key_2, "Track: height 2", GLOBAL_SHRT, "track_height_2");
+	defShrt(SHRT_TRACK_HEIGHT_2, Qt::ALT + Qt::Key_1, "Track: Compact Height", GLOBAL_SHRT, "track_height_compact");
+	defShrt(SHRT_TRACK_HEIGHT_DEFAULT, Qt::ALT + Qt::Key_2, "Track: Default Height", GLOBAL_SHRT, "track_height_default");
 	defShrt(SHRT_TRACK_HEIGHT_3, Qt::ALT + Qt::Key_3, "Track: height 3", GLOBAL_SHRT, "track_height_3");
 	defShrt(SHRT_TRACK_HEIGHT_4, Qt::ALT + Qt::Key_4, "Track: height 4", GLOBAL_SHRT, "track_height_4");
 	defShrt(SHRT_TRACK_HEIGHT_5, Qt::ALT + Qt::Key_5, "Track: height 5", GLOBAL_SHRT, "track_height_5");

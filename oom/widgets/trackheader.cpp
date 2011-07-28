@@ -434,8 +434,8 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	
 
 	QMenu* trackHeightsMenu = p->addMenu("Track Height");
+	trackHeightsMenu->addAction("Compact")->setData(7);
 	trackHeightsMenu->addAction("Default")->setData(6);
-	trackHeightsMenu->addAction("2")->setData(7);
 	trackHeightsMenu->addAction("3")->setData(8);
 	trackHeightsMenu->addAction("4")->setData(9);
 	trackHeightsMenu->addAction("5")->setData(10);
@@ -665,11 +665,11 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			{
 				if (multipleSelectedTracks)
 				{
-					song->setTrackHeights(selectedTracksList, 60);
+					song->setTrackHeights(selectedTracksList, MIN_TRACKHEIGHT);
 				}
 				else
 				{
-					m_track->setHeight(60);
+					m_track->setHeight(MIN_TRACKHEIGHT);
 					song->update(SC_TRACK_MODIFIED);
 				}
 				break;
