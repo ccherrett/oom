@@ -42,6 +42,8 @@ class EditToolBar;
 
 class MasterEdit : public MidiEditor
 {
+    Q_OBJECT
+
     Master* canvas;
     ScrollScale* hscroll;
     ScrollScale* vscroll;
@@ -58,9 +60,6 @@ class MasterEdit : public MidiEditor
     EditToolBar* editbar;
 
     static int _rasterInit;
-
-    Q_OBJECT
-    virtual void closeEvent(QCloseEvent*);
 
 private slots:
     void _setRaster(int);
@@ -84,8 +83,10 @@ public:
     static void writeConfiguration(int, Xml&);
 
 protected:
-	void showEvent(QShowEvent*);
+	virtual void showEvent(QShowEvent*);
     virtual void keyPressEvent(QKeyEvent*);
+    virtual void closeEvent(QCloseEvent*);
+
 };
 
 #endif

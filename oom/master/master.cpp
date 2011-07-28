@@ -225,7 +225,11 @@ void Master::viewMousePressEvent(QMouseEvent* event)
 {
 	start = event->pos();
 	Tool activeTool = tool;
-	//bool shift = event->state() & ShiftButton;
+	bool shift = ((QInputEvent*) event)->modifiers() & Qt::ShiftModifier;
+	bool ctrl = ((QInputEvent*) event)->modifiers() & Qt::ControlModifier;
+	bool alt = ((QInputEvent*) event)->modifiers() & Qt::AltModifier;
+	if(shift || ctrl || alt)
+		return;
 
 	switch (activeTool)
 	{
@@ -257,6 +261,11 @@ void Master::viewMousePressEvent(QMouseEvent* event)
 void Master::viewMouseMoveEvent(QMouseEvent* event)
 {
 	QPoint pos = event->pos();
+	bool shift = ((QInputEvent*) event)->modifiers() & Qt::ShiftModifier;
+	bool ctrl = ((QInputEvent*) event)->modifiers() & Qt::ControlModifier;
+	bool alt = ((QInputEvent*) event)->modifiers() & Qt::AltModifier;
+	if(shift || ctrl || alt)
+		return;
 	//      QPoint dist = pos - start;
 	//      bool moving = dist.y() >= 3 || dist.y() <= 3 || dist.x() >= 3 || dist.x() <= 3;
 
@@ -330,6 +339,7 @@ bool Master::deleteVal1(unsigned int x1, unsigned int x2)
 
 void Master::deleteVal(int x1, int x2)
 {
+	//printf("Master::deleteVal\n");
 	if (deleteVal1(editor->rasterVal1(x1), x2))
 		redraw();
 }

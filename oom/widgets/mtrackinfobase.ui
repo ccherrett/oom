@@ -161,7 +161,7 @@
          <x>0</x>
          <y>0</y>
          <width>188</width>
-         <height>522</height>
+         <height>520</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -195,7 +195,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="btnUp">
+             <widget class="QToolButton" name="btnUp">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -204,70 +204,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>28</width>
-                <height>28</height>
+                <width>25</width>
+                <height>25</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>28</width>
-                <height>28</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnDown">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>28</width>
-                <height>28</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>28</width>
-                <height>28</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnCopy">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>28</width>
-                <height>28</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>28</width>
-                <height>28</height>
+                <width>25</width>
+                <height>25</height>
                </size>
               </property>
               <property name="focusPolicy">
@@ -278,9 +222,86 @@
               </property>
               <property name="iconSize">
                <size>
-                <width>22</width>
-                <height>22</height>
+                <width>25</width>
+                <height>25</height>
                </size>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btnDown">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btnCopy">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -301,7 +322,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="btnDelete">
+             <widget class="QToolButton" name="btnDelete">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -310,14 +331,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>28</width>
-                <height>28</height>
+                <width>25</width>
+                <height>25</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>28</width>
-                <height>28</height>
+                <width>25</width>
+                <height>25</height>
                </size>
               </property>
               <property name="focusPolicy">
@@ -325,6 +346,15 @@
               </property>
               <property name="text">
                <string/>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -355,17 +385,23 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QPushButton" name="btnTranspose">
+                <widget class="QToolButton" name="btnTranspose">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="minimumSize">
                   <size>
-                   <width>24</width>
-                   <height>24</height>
+                   <width>25</width>
+                   <height>25</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>24</width>
-                   <height>24</height>
+                   <width>25</width>
+                   <height>25</height>
                   </size>
                  </property>
                  <property name="focusPolicy">
@@ -377,7 +413,16 @@
                  <property name="text">
                   <string/>
                  </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>25</width>
+                   <height>25</height>
+                  </size>
+                 </property>
                  <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <property name="autoRaise">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -466,17 +511,23 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="btnComments">
+                <widget class="QToolButton" name="btnComments">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="minimumSize">
                   <size>
-                   <width>24</width>
-                   <height>24</height>
+                   <width>25</width>
+                   <height>25</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>24</width>
-                   <height>24</height>
+                   <width>25</width>
+                   <height>25</height>
                   </size>
                  </property>
                  <property name="focusPolicy">
@@ -488,7 +539,16 @@
                  <property name="text">
                   <string/>
                  </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>25</width>
+                   <height>25</height>
+                  </size>
+                 </property>
                  <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <property name="autoRaise">
                   <bool>true</bool>
                  </property>
                 </widget>
