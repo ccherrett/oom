@@ -422,7 +422,8 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	aaux->setData(Track::AUDIO_AUX+10000);
 
 
-	p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
+	if(m_track->name() != "Master")
+		p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 	
 
 	QMenu* trackHeightsMenu = p->addMenu("Track Height");
@@ -1645,7 +1646,8 @@ void TrackHeader::mousePressEvent(QMouseEvent* ev) //{{{
 		{
 			m_startPos = ev->pos();
 			updateSelection(shift);
-			mode = START_DRAG;
+			if(m_track->name() != "Master")
+				mode = START_DRAG;
 		}
 	}
 	else if(button == Qt::RightButton)

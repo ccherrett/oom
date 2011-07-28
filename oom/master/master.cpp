@@ -14,6 +14,7 @@
 #include <QPainter>
 
 #include "globals.h"
+#include "gconfig.h"
 #include "master.h"
 #include "song.h"
 #include "scrollscale.h"
@@ -163,9 +164,15 @@ void Master::pdraw(QPainter& p, const QRect& rect)
 			tempo = 0;
 		if (tempo < wh)
 		{
-			QColor green = QColor(119, 169, 181, 127);
+			//QColor green = QColor(119, 169, 181, 127);
+			//QColor yellow = QColor(41, 130, 140);
+			//QColor red = QColor(0, 37, 46, 127);
+			//QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, height()));
+			QColor green = QColor(config.partWaveColors[1]);
+			green.setAlpha(140);
 			QColor yellow = QColor(41, 130, 140);
-			QColor red = QColor(0, 37, 46, 127);
+			QColor red = QColor(config.partColors[1]);
+			red.setAlpha(140);
 			QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, height()));
 			vuGrad.setColorAt(1, green);
 			vuGrad.setColorAt(0, red);
@@ -183,21 +190,18 @@ void Master::pdraw(QPainter& p, const QRect& rect)
 	if (xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(0, 186, 255));
-		//p.setPen(Qt::red);
 		p.drawLine(xp, y, xp, y + h);
 	}
 	xp = mapx(pos[1]);
 	if (xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
-		//p.setPen(Qt::blue);
 		p.drawLine(xp, y, xp, y + h);
 	}
 	xp = mapx(pos[2]);
 	if (xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
-		//p.setPen(Qt::blue);
 		p.drawLine(xp, y, xp, y + h);
 	}
 }

@@ -454,7 +454,7 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 		dataStream >> trackName >> index >> offset;
 		Track* srcTrack = song->findTrack(trackName);
 		Track* t = y2Track(event->pos().y() + ypos);
-		if (srcTrack && t)
+		if (srcTrack && t && t->name() != "Master")
 		{
 			int sTrack = song->visibletracks()->index(srcTrack);
 			int dTrack = song->visibletracks()->index(t);

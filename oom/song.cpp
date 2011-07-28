@@ -1311,7 +1311,7 @@ void Song::setMasterFlag(bool val)
 			emit songChanged(SC_MASTER);
 	}
 	masterEnableAction->blockSignals(true);
-	masterEnableAction->setChecked(val);
+	masterEnableAction->setChecked(song->masterFlag());
 	masterEnableAction->blockSignals(false);
 }
 
@@ -3563,6 +3563,10 @@ void Song::updateTrackViews1()
 	//double start,end;
 	//start = omp_get_wtime();
 	_viewtracks.clear();
+	//Create omnipresent Master track at top of all list.
+	Track* master = findTrack("Master");
+	if(master)
+		_viewtracks.push_back(master);
 	viewselected = false;
 	bool customview = false;
 	bool workview = false;
@@ -3595,7 +3599,7 @@ void Song::updateTrackViews1()
 			{
 				bool found = false;
 				(*t)->setSelected(false);
-				if(workview && (*t)->parts()->empty()) {
+				if((workview && (*t)->parts()->empty()) || (*t) == master) {
 					continue;
 				}
 				//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
@@ -3637,6 +3641,8 @@ void Song::updateTrackViews1()
 			{
 				bool found = false;
 				(*t)->setSelected(false);
+				if((*t) == master)
+					continue;
 				for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
 				{
 					if ((*i)->name() == (*t)->name())
