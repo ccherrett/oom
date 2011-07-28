@@ -380,6 +380,9 @@
 		<file>images/transpose_new_on.png</file>
 		<file>images/transpose_new_over.png</file>
 		<file>images/transpose_new_off.png</file>
+		<file>images/connect_new_on.png</file>
+		<file>images/connect_new_over.png</file>
+		<file>images/connect_new_off.png</file>
 	</qresource>
 </RCC>
 

@@ -562,6 +562,11 @@ QPixmap* transpose_OffIcon;
 QPixmap* transpose_OverIcon;
 QIcon* transposeIconSet3;
 
+QPixmap* connect_OnIcon;
+QPixmap* connect_OffIcon;
+QPixmap* connect_OverIcon;
+QIcon*   connectIconSet3;
+
 QPixmap* dragMidiIcon;
 QPixmap* dragAudioIcon;
 QPixmap* dragInputIcon;
@@ -1321,6 +1326,14 @@ void initIcons()
       transposeIconSet3->addPixmap(*transpose_OnIcon, QIcon::Normal, QIcon::On);
       transposeIconSet3->addPixmap(*transpose_OffIcon, QIcon::Normal, QIcon::Off);
       transposeIconSet3->addPixmap(*transpose_OverIcon, QIcon::Active);
+	  
+      connect_OnIcon= new MPIXMAP(":/images/connect_new_on.png", NULL);
+      connect_OffIcon= new MPIXMAP(":/images/connect_new_off.png", NULL);
+      connect_OverIcon= new MPIXMAP(":/images/connect_new_over.png", NULL);
+	  connectIconSet3         = new QIcon();
+      connectIconSet3->addPixmap(*connect_OnIcon, QIcon::Normal, QIcon::On);
+      connectIconSet3->addPixmap(*connect_OffIcon, QIcon::Normal, QIcon::Off);
+      connectIconSet3->addPixmap(*connect_OverIcon, QIcon::Active);
 	  
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);

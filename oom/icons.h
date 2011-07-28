@@ -476,6 +476,11 @@ extern QPixmap* transpose_OffIcon;
 extern QPixmap* transpose_OverIcon;
 extern QIcon* transposeIconSet3;
 
+extern QPixmap* connect_OnIcon;
+extern QPixmap* connect_OffIcon;
+extern QPixmap* connect_OverIcon;
+extern QIcon* connectIconSet3;
+
 extern QPixmap* dragMidiIcon;
 extern QPixmap* dragAudioIcon;
 extern QPixmap* dragInputIcon;

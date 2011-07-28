@@ -44,10 +44,10 @@ RouteMapDock::RouteMapDock(QWidget* parent) : QFrame(parent)
 	btnLoad->setIconSize(midi_reset_instrIcon->size());
 	btnCopy->setIcon(*duplicateIconSet3);
 	//btnCopy->setIconSize(duplicatePCIcon->size());
-	btnLink->setIcon(*midi_inputpluginsIcon);
-	btnLink->setIconSize(midi_inputpluginsIcon->size());
-	btnClear->setIcon(*editcutIconSet);
-	btnClear->setIconSize(midi_inputpluginsIcon->size());
+	btnLink->setIcon(*connectIconSet3);
+	//btnLink->setIconSize(midi_inputpluginsIcon->size());
+	btnClear->setIcon(*garbageIconSet3);
+	//btnClear->setIconSize(midi_inputpluginsIcon->size());
 
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
 	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddClicked(bool)));
