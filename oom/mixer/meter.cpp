@@ -296,15 +296,15 @@ void Meter::paintEvent(QPaintEvent* /*ev*/)
 void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 {
 	QPen myPen = QPen();
-	myPen.setStyle(Qt::DashLine);
+	//myPen.setStyle(Qt::DashLine);
 	if(m_layout == Qt::Vertical)
 	{
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
 		if(redrawVU)
 		{
-			if(h != m_height)
+			if(height() != m_height)
 				m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
-			m_height = h;	
+			m_height = height();	
 			myPen.setBrush(m_scaledPixmap_h);
 			myPen.setWidth(1);
 			p.setPen(myPen);
@@ -328,9 +328,9 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
 		if(redrawVU)
 		{
-			if(w != m_width)
-				m_scaledPixmap_w = m_pixmap_w->scaled(w, 1, Qt::IgnoreAspectRatio);/*{{{*/
-			m_width = w;	
+			if(width() != m_width)
+				m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);/*{{{*/
+			m_width = width();	
 			myPen.setBrush(m_scaledPixmap_w);
 			myPen.setWidth(1);
 			p.setPen(myPen);
