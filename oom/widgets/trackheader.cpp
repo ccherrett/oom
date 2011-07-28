@@ -1459,7 +1459,7 @@ void TrackHeader::initPan()/*{{{*/
 		m_pan->setBackgroundRole(QPalette::Mid);
 		m_pan->setToolTip("Panorama");
 		m_pan->setEnabled(true);
-		//m_pan->setIgnoreWheel(true);
+		m_pan->setIgnoreWheel(true);
 
 		v = mp->hwCtrlState(chan, ctl);
 		if (v == CTRL_VAL_UNKNOWN)
@@ -1498,7 +1498,7 @@ void TrackHeader::initPan()/*{{{*/
 		m_pan->setRange(-1.0, +1.0);
 		m_pan->setToolTip(tr("Panorama"));
 		m_pan->setKnobImage(img);
-		//m_pan->setIgnoreWheel(true);
+		m_pan->setIgnoreWheel(true);
 		m_pan->setBackgroundRole(QPalette::Mid);
 		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 		m_panLayout->addItem(new QSpacerItem(30, 9, QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -1531,6 +1531,7 @@ void TrackHeader::initVolume()/*{{{*/
 		m_slider->setFixedHeight(15);
 		m_slider->setFont(config.fonts[1]);
 		m_slider->setId(CTRL_VOLUME);
+		m_slider->setIgnoreWheel(true);
 		m_buttonVBox->addWidget(m_slider);
 		connect(m_slider, SIGNAL(sliderMoved(double, int)), SLOT(volumeChanged(double)));
 		connect(m_slider, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(volumeRightClicked(const QPoint &, int)));
@@ -1555,6 +1556,7 @@ void TrackHeader::initVolume()/*{{{*/
 		m_slider->setFixedHeight(15);
 		m_slider->setFont(config.fonts[1]);
 		m_slider->setValue(fast_log10(((AudioTrack*)m_track)->volume())*20.0);
+		m_slider->setIgnoreWheel(true);
 		m_buttonVBox->addWidget(m_slider);
 
 		connect(m_slider, SIGNAL(sliderMoved(double, int)), SLOT(volumeChanged(double)));
