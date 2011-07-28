@@ -275,6 +275,7 @@ void initShortCuts()
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
 	defShrt(SHRT_POS_INC, Qt::CTRL + Qt::Key_Right, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
 	defShrt(SHRT_POS_DEC, Qt::CTRL + Qt::Key_Left, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
+	defShrt(SHRT_ADD_REST, Qt::Key_Plus, "Step Record: Add Rest", GLOBAL_SHRT, "add_rest");
 
 	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Period, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
 	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Comma, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");

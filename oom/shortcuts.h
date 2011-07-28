@@ -59,6 +59,7 @@ enum
     SHRT_GOTO_START, // W
     SHRT_GOTO_LEFT, //End-keypad
     SHRT_GOTO_RIGHT, //Cursordown-keypad
+    SHRT_ADD_REST, // Plus
     SHRT_POS_INC, // Plus
     SHRT_POS_DEC, // Minus
     SHRT_TOGGLE_LOOP, // Slash

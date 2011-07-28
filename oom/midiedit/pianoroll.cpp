@@ -1476,6 +1476,12 @@ bool PianoRoll::eventFilter(QObject *obj, QEvent *event)
 			pc->pianoCmd(CMD_LEFT);
 			return true;
 		}
+		else if (key == shortcuts[SHRT_ADD_REST].key)
+		{
+			PianoCanvas* pc = (PianoCanvas*) canvas;
+			pc->pianoCmd(CMD_RIGHT);
+			return true;
+		}
 	}
 
 	// standard event processing
