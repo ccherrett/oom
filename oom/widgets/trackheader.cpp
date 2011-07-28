@@ -434,18 +434,19 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	if(m_track->name() != "Master")
 		p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
 	
+	p->addAction(tr("Select All Tracks"))->setData(4);
 
-	QMenu* trackHeightsMenu = p->addMenu("Track Height");
-	trackHeightsMenu->addAction("Compact")->setData(7);
-	trackHeightsMenu->addAction("Default")->setData(6);
+	QMenu* trackHeightsMenu = p->addMenu(tr("Track Height"));
+	trackHeightsMenu->addAction(tr("Compact"))->setData(7);
+	trackHeightsMenu->addAction(tr("Default"))->setData(6);
 	trackHeightsMenu->addAction("3")->setData(8);
 	trackHeightsMenu->addAction("4")->setData(9);
 	trackHeightsMenu->addAction("5")->setData(10);
 	trackHeightsMenu->addAction("6")->setData(11);
-	trackHeightsMenu->addAction("Full Screen")->setData(12);
+	trackHeightsMenu->addAction(tr("Full Screen"))->setData(12);
 	if (selectedTracksList.size() > 1)
 	{
-		trackHeightsMenu->addAction("Fit Selection in View")->setData(13);
+		trackHeightsMenu->addAction(tr("Fit Selection in View"))->setData(13);
 	}
 
 	if (m_track->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
@@ -542,7 +543,12 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			break;
 			case 4:
 			{
-				if (m_track->type() == Track::DRUM)
+				for(ciTrack ci = song->visibletracks()->begin(); ci != song->visibletracks()->end(); ++ci)
+				{
+					(*ci)->setSelected(true);
+				}
+				song->update(SC_SELECTION);
+				/*if (m_track->type() == Track::DRUM)
 				{
 					//
 					//    Drum -> Midi
@@ -581,7 +587,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					}
 					m_track->setType(Track::MIDI);
 					audio->msgIdle(false);
-				}
+				}*/
 			}
 			break;
 			case 5:
