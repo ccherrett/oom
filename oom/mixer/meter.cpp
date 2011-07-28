@@ -304,6 +304,7 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 		{
 			if(h != m_height)
 				m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
+			m_height = h;	
 			myPen.setBrush(m_scaledPixmap_h);
 			myPen.setWidth(1);
 			p.setPen(myPen);
@@ -329,6 +330,7 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 		{
 			if(w != m_width)
 				m_scaledPixmap_w = m_pixmap_w->scaled(w, 1, Qt::IgnoreAspectRatio);/*{{{*/
+			m_width = w;	
 			myPen.setBrush(m_scaledPixmap_w);
 			myPen.setWidth(1);
 			p.setPen(myPen);
