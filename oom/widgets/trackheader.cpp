@@ -1791,7 +1791,6 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 		if(m_sliderVisible)
 		{
 			m_colorLine->setStyleSheet(lineStyleTemplate.arg("#1b1b1b"));
-static QString lineStyleTemplate = "QFrame { border: 0px; background-color: #1b1b1b; }";
 		}
 		else
 		{
