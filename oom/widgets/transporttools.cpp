@@ -82,7 +82,9 @@ TransportToolbar::TransportToolbar(QWidget* parent, bool showPanic, bool showMut
 		m_btnSolo->setFixedSize(QSize(29, 25));
 		m_btnSolo->setAutoRaise(true);
 		m_layout->addWidget(m_btnSolo);
+		//NOTE: These are to isolate the Performer transport tools from global scope.
 		connect(m_btnRecord, SIGNAL(clicked(bool)), SIGNAL(recordTriggered(bool)));
+		connect(m_btnPlay, SIGNAL(clicked(bool)), SIGNAL(recordTriggered(bool)));
 	}	
 	
 	if(showPanic)

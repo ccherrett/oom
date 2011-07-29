@@ -2028,6 +2028,23 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		//printf("Record key pressed from PR\n");
 		return;
 	}
+	else if (key == shortcuts[SHRT_PLAY_TOGGLE].key)/*{{{*/
+	{
+		checkPartLengthForRecord(song->record());
+		if (audio->isPlaying())
+			//song->setStopPlay(false);
+			song->setStop(true);
+		else if (!config.useOldStyleStopShortCut)
+			song->setPlay(true);
+		else if (song->cpos() != song->lpos())
+			song->setPos(0, song->lPos());
+		else
+		{
+			Pos p(0, true);
+			song->setPos(0, p);
+		}
+		return;
+	}/*}}}*/
 	else
 	{ //Default:
 		event->ignore();
