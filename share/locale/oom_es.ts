@@ -6621,7 +6621,7 @@ Enabled inputs in the list will
     </message>
 </context>
 <context>
-    <name>MidiTrackInfoBase</name>
+    <name>ConductorBase</name>
     <message>
         <source>OOMidi: TrackInfo</source>
         <translation type="unfinished">OOMidi: Informaci� de pista</translation>

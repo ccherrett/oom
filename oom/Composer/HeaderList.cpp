@@ -13,7 +13,7 @@
 #include "popupmenu.h"
 #include "globals.h"
 #include "icons.h"
-#include "headerlist.h"
+#include "HeaderList.h"
 #include "mididev.h"
 #include "midiport.h"
 #include "midiseq.h"
@@ -32,7 +32,7 @@
 #include "config.h"
 #include "menulist.h"
 #include "midimonitor.h"
-#include "pcanvas.h"
+#include "ComposerCanvas.h"
 #include "trackheader.h"
 
 

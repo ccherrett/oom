@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <values.h>
 
-#include "mtrackinfo.h"
+#include "Conductor.h"
 #include "song.h"
 #include "globals.h"
 #include "config.h"
@@ -70,7 +70,7 @@ static const char* quantStrings[] = {
 //   setTrack
 //---------------------------------------------------------
 
-void MidiTrackInfo::setTrack(Track* t)
+void Conductor::setTrack(Track* t)
 {
 	if (!t)
 	{
@@ -90,8 +90,8 @@ void MidiTrackInfo::setTrack(Track* t)
 	trackNameLabel->setPalette(pal);
 
 	populatePatches();
-	updateTrackInfo(-1);
-	//printf("MidiTrackInfo::setTrack()\n");
+	updateConductor(-1);
+	//printf("Conductor::setTrack()\n");
 	populateMatrix();
 	rebuildMatrix();
 	if(_resetProgram)
@@ -129,10 +129,10 @@ void MidiTrackInfo::setTrack(Track* t)
 }
 
 //---------------------------------------------------------
-//   midiTrackInfo
+//   midiConductor
 //---------------------------------------------------------
 
-MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int quant) : QFrame(parent)//QWidget(parent)
+Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : QFrame(parent)//QWidget(parent)
 {
 	setupUi(this);
 	_midiDetect = false;
@@ -362,20 +362,20 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
 
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
-	bool adv = tconfig().get_property("MidiTrackInfo", "advanced", false).toBool();
+	bool adv = tconfig().get_property("Conductor", "advanced", false).toBool();
 	chkAdvanced->setChecked(adv);
 }
 
-MidiTrackInfo::~MidiTrackInfo()
+Conductor::~Conductor()
 {
-	tconfig().set_property("MidiTrackInfo", "advanced", chkAdvanced->isChecked());
+	tconfig().set_property("Conductor", "advanced", chkAdvanced->isChecked());
 }
 
 //---------------------------------------------------------
 //   heartBeat
 //---------------------------------------------------------
 
-void MidiTrackInfo::heartBeat()
+void Conductor::heartBeat()
 {
 	if (!isVisible() || !isEnabled() || !selected)
 		return;
@@ -436,7 +436,7 @@ void MidiTrackInfo::heartBeat()
 			{
 				if (program != CTRL_VAL_UNKNOWN)
 				{
-					//printf("Composer::midiTrackInfoHeartBeat setting program to unknown\n");
+					//printf("Composer::midiConductorHeartBeat setting program to unknown\n");
 
 					program = CTRL_VAL_UNKNOWN;
 					if (iHBank->value() != 0)
@@ -594,9 +594,9 @@ void MidiTrackInfo::heartBeat()
 //   configChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::configChanged()
+void Conductor::configChanged()
 {
-	//printf("MidiTrackInfo::configChanged\n");
+	//printf("Conductor::configChanged\n");
 
 	//if (config.canvasBgPixmap.isEmpty()) {
 	//      canvas->setBg(config.partCanvasBg);
@@ -607,16 +607,16 @@ void MidiTrackInfo::configChanged()
 	//}
 
 	setFont(config.fonts[2]);
-	//updateTrackInfo(type);
+	//updateConductor(type);
 }
 
 //---------------------------------------------------------
 //   songChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::songChanged(int type)
+void Conductor::songChanged(int type)
 {
-	//printf("MidiTrackInfo::songChanged() Type: %d\n", type);
+	//printf("Conductor::songChanged() Type: %d\n", type);
 	// Is it simply a midi controller value adjustment? Forget it.
 	if (type == SC_MIDI_CONTROLLER)
 		return;
@@ -631,14 +631,14 @@ void MidiTrackInfo::songChanged(int type)
 		rebuildMatrix();
 		return;
 	}
-	updateTrackInfo(type);
+	updateConductor(type);
 }
 
 //---------------------------------------------------------
 //   setLabelText
 //---------------------------------------------------------
 
-void MidiTrackInfo::setLabelText()
+void Conductor::setLabelText()
 {
 	MidiTrack* track = (MidiTrack*) selected;
 	if (track)
@@ -651,7 +651,7 @@ void MidiTrackInfo::setLabelText()
 //   setLabelFont
 //---------------------------------------------------------
 
-void MidiTrackInfo::setLabelFont()
+void Conductor::setLabelFont()
 {
 	//if(!selected)
 	//  return;
@@ -668,7 +668,7 @@ void MidiTrackInfo::setLabelFont()
 //   iOutputChannelChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iOutputChannelChanged(int channel)
+void Conductor::iOutputChannelChanged(int channel)
 {
 	--channel;
 	if (!selected)
@@ -693,7 +693,7 @@ void MidiTrackInfo::iOutputChannelChanged(int channel)
 //   iOutputPortChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iOutputPortChanged(int index)
+void Conductor::iOutputPortChanged(int index)
 {
 	if (!selected)
 		return;
@@ -715,7 +715,7 @@ void MidiTrackInfo::iOutputPortChanged(int index)
 	song->update(SC_MIDI_TRACK_PROP);
 }
 
-void MidiTrackInfo::updateCommentState(bool state, bool block)
+void Conductor::updateCommentState(bool state, bool block)
 {
 	if(block)
 		btnComments->blockSignals(true);
@@ -728,11 +728,11 @@ void MidiTrackInfo::updateCommentState(bool state, bool block)
 //   routingPopupMenuActivated
 //---------------------------------------------------------
 
-//void MidiTrackInfo::routingPopupMenuActivated(int n)
+//void Conductor::routingPopupMenuActivated(int n)
 
-void MidiTrackInfo::routingPopupMenuActivated(QAction* act)
+void Conductor::routingPopupMenuActivated(QAction* act)
 {
-	///if(!midiTrackInfo || gRoutingPopupMenuMaster != midiTrackInfo || !selected || !selected->isMidiTrack())
+	///if(!midiConductor || gRoutingPopupMenuMaster != midiConductor || !selected || !selected->isMidiTrack())
 	if ((gRoutingPopupMenuMaster != this) || !selected || !selected->isMidiTrack())
 		return;
 	oom->routingPopupMenuActivated(selected, act->data().toInt());
@@ -743,9 +743,9 @@ void MidiTrackInfo::routingPopupMenuActivated(QAction* act)
 //   routingPopupViewActivated
 //---------------------------------------------------------
 
-void MidiTrackInfo::routingPopupViewActivated(const QModelIndex& mdi)
+void Conductor::routingPopupViewActivated(const QModelIndex& mdi)
 {
-	///if(!midiTrackInfo || gRoutingPopupMenuMaster != midiTrackInfo || !selected || !selected->isMidiTrack())
+	///if(!midiConductor || gRoutingPopupMenuMaster != midiConductor || !selected || !selected->isMidiTrack())
 	if (gRoutingPopupMenuMaster != this || !selected || !selected->isMidiTrack())
 		return;
 	oom->routingPopupMenuActivated(selected, mdi.data().toInt());
@@ -756,7 +756,7 @@ void MidiTrackInfo::routingPopupViewActivated(const QModelIndex& mdi)
 //   inRoutesPressed
 //---------------------------------------------------------
 
-void MidiTrackInfo::inRoutesPressed()
+void Conductor::inRoutesPressed()
 {
 	if (!selected)
 		return;
@@ -781,7 +781,7 @@ void MidiTrackInfo::inRoutesPressed()
 		return;
 	}
 
-	///gRoutingPopupMenuMaster = midiTrackInfo;
+	///gRoutingPopupMenuMaster = midiConductor;
 	gRoutingPopupMenuMaster = this;
 	connect(pup, SIGNAL(triggered(QAction*)), SLOT(routingPopupMenuActivated(QAction*)));
 	//connect(pup, SIGNAL(activated(const QModelIndex&)), SLOT(routingPopupViewActivated(const QModelIndex&)));
@@ -797,7 +797,7 @@ void MidiTrackInfo::inRoutesPressed()
 //   outRoutesPressed
 //---------------------------------------------------------
 
-void MidiTrackInfo::outRoutesPressed()
+void Conductor::outRoutesPressed()
 {
 	if (!selected)
 		return;
@@ -808,7 +808,7 @@ void MidiTrackInfo::outRoutesPressed()
 	if (!pup)
 		return;
 
-	///gRoutingPopupMenuMaster = midiTrackInfo;
+	///gRoutingPopupMenuMaster = midiConductor;
 	gRoutingPopupMenuMaster = this;
 	connect(pup, SIGNAL(triggered(QAction*)), SLOT(routingPopupMenuActivated(QAction*)));
 	connect(pup, SIGNAL(aboutToHide()), oom, SLOT(routingPopupMenuAboutToHide()));
@@ -821,7 +821,7 @@ void MidiTrackInfo::outRoutesPressed()
 //   iProgHBankChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iProgHBankChanged()
+void Conductor::iProgHBankChanged()
 {
 	if (!selected)
 		return;
@@ -908,7 +908,7 @@ void MidiTrackInfo::iProgHBankChanged()
 //   iProgLBankChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iProgLBankChanged()
+void Conductor::iProgLBankChanged()
 {
 	if (!selected)
 		return;
@@ -995,7 +995,7 @@ void MidiTrackInfo::iProgLBankChanged()
 //   iProgramChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iProgramChanged()
+void Conductor::iProgramChanged()
 {
 	if (!selected)
 		return;
@@ -1078,14 +1078,14 @@ void MidiTrackInfo::iProgramChanged()
 		//iPatch->setText(instr->getPatchName(channel, program, song->mtype(), track->type() == Track::DRUM));
 	}
 
-	//      updateTrackInfo();
+	//      updateConductor();
 }
 
 //---------------------------------------------------------
 //   iLautstChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iLautstChanged(int val)
+void Conductor::iLautstChanged(int val)
 {
 	if (!selected)
 		return;
@@ -1114,7 +1114,7 @@ void MidiTrackInfo::iLautstChanged(int val)
 //   iTranspChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iTranspChanged(int val)
+void Conductor::iTranspChanged(int val)
 {
 	if (!selected)
 		return;
@@ -1123,7 +1123,7 @@ void MidiTrackInfo::iTranspChanged(int val)
 	song->update(SC_MIDI_TRACK_PROP);
 }
 
-void MidiTrackInfo::transposeStateChanged(bool state)
+void Conductor::transposeStateChanged(bool state)
 {
 	if(!selected)
 		return;
@@ -1142,7 +1142,7 @@ void MidiTrackInfo::transposeStateChanged(bool state)
 //   iAnschlChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iAnschlChanged(int val)
+void Conductor::iAnschlChanged(int val)
 {
 	if (!selected)
 		return;
@@ -1155,7 +1155,7 @@ void MidiTrackInfo::iAnschlChanged(int val)
 //   iVerzChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iVerzChanged(int val)
+void Conductor::iVerzChanged(int val)
 {
 	if (!selected)
 		return;
@@ -1168,7 +1168,7 @@ void MidiTrackInfo::iVerzChanged(int val)
 //   iLenChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iLenChanged(int val)
+void Conductor::iLenChanged(int val)
 {
 	if (!selected)
 		return;
@@ -1181,7 +1181,7 @@ void MidiTrackInfo::iLenChanged(int val)
 //   iKomprChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iKomprChanged(int val)
+void Conductor::iKomprChanged(int val)
 {
 	if (!selected)
 		return;
@@ -1194,7 +1194,7 @@ void MidiTrackInfo::iKomprChanged(int val)
 //   iPanChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::iPanChanged(int val)
+void Conductor::iPanChanged(int val)
 {
 	if (!selected)
 		return;
@@ -1224,7 +1224,7 @@ void MidiTrackInfo::iPanChanged(int val)
 //   instrPopup
 //---------------------------------------------------------
 
-void MidiTrackInfo::instrPopup()
+void Conductor::instrPopup()
 {
 	return;
 	/*
@@ -1289,7 +1289,7 @@ void MidiTrackInfo::instrPopup()
 			_tableModel->insertRow(row, rowData);
 			tableView->setRowHeight(row, 50);
 			tableView->resizeRowsToContents();
-			updateTrackInfo(-1);
+			updateConductor(-1);
 			updateTableHeader();
 			//_selModel->blockSignals(true);
 			//printf("Calling selectedRow after insert\n");
@@ -1306,7 +1306,7 @@ void MidiTrackInfo::instrPopup()
 //   recEchoToggled
 //---------------------------------------------------------
 
-void MidiTrackInfo::recEchoToggled(bool v)
+void Conductor::recEchoToggled(bool v)
 {
 	if (!selected)
 		return;
@@ -1319,7 +1319,7 @@ void MidiTrackInfo::recEchoToggled(bool v)
 //   iProgramDoubleClicked
 //---------------------------------------------------------
 
-void MidiTrackInfo::iProgramDoubleClicked()
+void Conductor::iProgramDoubleClicked()
 {
 	if (!selected)
 		return;
@@ -1377,7 +1377,7 @@ void MidiTrackInfo::iProgramDoubleClicked()
 //   iLautstDoubleClicked
 //---------------------------------------------------------
 
-void MidiTrackInfo::iLautstDoubleClicked()
+void Conductor::iLautstDoubleClicked()
 {
 	if (!selected)
 		return;
@@ -1435,7 +1435,7 @@ void MidiTrackInfo::iLautstDoubleClicked()
 //   iPanDoubleClicked
 //---------------------------------------------------------
 
-void MidiTrackInfo::iPanDoubleClicked()
+void Conductor::iPanDoubleClicked()
 {
 	if (!selected)
 		return;
@@ -1491,12 +1491,12 @@ void MidiTrackInfo::iPanDoubleClicked()
 
 
 //---------------------------------------------------------
-//   updateTrackInfo
+//   updateConductor
 //---------------------------------------------------------
 
-void MidiTrackInfo::updateTrackInfo(int flags)
+void Conductor::updateConductor(int flags)
 {
-	//printf("MidiTrackInfo::updateTrackInfo(%d) called\n", flags);
+	//printf("Conductor::updateConductor(%d) called\n", flags);
 	// Is it simply a midi controller value adjustment? Forget it.
 	if (flags == SC_MIDI_CONTROLLER)
 		return;
@@ -1508,11 +1508,11 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 	MidiTrack* track = (MidiTrack*) selected;
 
 	// p3.3.47 Update the routing popup menu if anything relevant changes.
-	//if(gRoutingPopupMenuMaster == midiTrackInfo && selected && (flags & (SC_ROUTE | SC_CHANNELS | SC_CONFIG)))
+	//if(gRoutingPopupMenuMaster == midiConductor && selected && (flags & (SC_ROUTE | SC_CHANNELS | SC_CONFIG)))
 	if (flags & (SC_ROUTE | SC_CHANNELS | SC_CONFIG)) // p3.3.50
 		// Use this handy shared routine.
 		//oom->updateRouteMenus(selected);
-		///oom->updateRouteMenus(selected, midiTrackInfo);   // p3.3.50
+		///oom->updateRouteMenus(selected, midiConductor);   // p3.3.50
 		oom->updateRouteMenus(selected, this);
 
 	// Added by Tim. p3.3.9
@@ -1723,7 +1723,7 @@ void MidiTrackInfo::updateTrackInfo(int flags)
 	//rebuildMatrix();
 }
 
-void MidiTrackInfo::editorPartChanged(Part* p)
+void Conductor::editorPartChanged(Part* p)
 {
 	if(p)
 	{
@@ -1735,14 +1735,14 @@ void MidiTrackInfo::editorPartChanged(Part* p)
 //   progRecClicked
 //---------------------------------------------------------
 
-void MidiTrackInfo::progRecClicked()
+void Conductor::progRecClicked()
 {
 	if (!selected)
 		return;
 	progRecClicked(selected);
 }
 
-void MidiTrackInfo::progRecClicked(Track* t)
+void Conductor::progRecClicked(Track* t)
 {
 	if (!t)
 		return;
@@ -1770,7 +1770,7 @@ void MidiTrackInfo::progRecClicked(Track* t)
 //   volRecClicked
 //---------------------------------------------------------
 
-void MidiTrackInfo::volRecClicked()
+void Conductor::volRecClicked()
 {
 	if (!selected)
 		return;
@@ -1795,7 +1795,7 @@ void MidiTrackInfo::volRecClicked()
 //   panRecClicked
 //---------------------------------------------------------
 
-void MidiTrackInfo::panRecClicked()
+void Conductor::panRecClicked()
 {
 	if (!selected)
 		return;
@@ -1820,7 +1820,7 @@ void MidiTrackInfo::panRecClicked()
 //   recordClicked
 //---------------------------------------------------------
 
-void MidiTrackInfo::recordClicked()
+void Conductor::recordClicked()
 {
 	if (!selected)
 		return;
@@ -1859,7 +1859,7 @@ void MidiTrackInfo::recordClicked()
 	}
 }
 
-void MidiTrackInfo::toggleAdvanced(int checked)
+void Conductor::toggleAdvanced(int checked)
 {
 	if (checked == Qt::Checked)
 	{
@@ -1871,7 +1871,7 @@ void MidiTrackInfo::toggleAdvanced(int checked)
 	}
 }
 
-void MidiTrackInfo::rebuildMatrix()
+void Conductor::rebuildMatrix()
 {
 	//printf("Entering rebuildMatrix()\n");
 	if (!selected)
@@ -1939,7 +1939,7 @@ void MidiTrackInfo::rebuildMatrix()
 	//printf("Leaving rebuildMatrix()\n");
 }
 
-void MidiTrackInfo::matrixItemChanged(QStandardItem* item)
+void Conductor::matrixItemChanged(QStandardItem* item)
 {
 	//printf("Entering matrixItemChanged()\n");
 	if (!selected)
@@ -1959,7 +1959,7 @@ void MidiTrackInfo::matrixItemChanged(QStandardItem* item)
 				ps->selected = item->checkState() == Qt::Checked ? true : false;
 				_useMatrix = ps->selected;
 			}
-			//updateTrackInfo(-1);
+			//updateConductor(-1);
 			editing = true;
 			song->update(SC_PATCH_UPDATED);
 			editing = false;
@@ -1971,7 +1971,7 @@ void MidiTrackInfo::matrixItemChanged(QStandardItem* item)
 	//printf("Leaving matrixItemChanged()\n");
 }
 
-void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
+void Conductor::insertMatrixEvent(Part* curPart, unsigned tick)
 {
 	if (!curPart)
 		return;
@@ -1979,7 +1979,7 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 	MidiTrack* track = (MidiTrack*) curPart->track();
 	int channel = track->outChannel();
 	int port = track->outPort();
-	//printf("MidiTrackInfo::insertMatrixEvent() _matrix->size() = %d\n", _matrix->size());
+	//printf("Conductor::insertMatrixEvent() _matrix->size() = %d\n", _matrix->size());
 	if (_matrix->size() == 1 || !_useMatrix)
 	{
 		//Get the QStandardItem in the hidden third column
@@ -1995,7 +1995,7 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 				m_eventPart = 0;
 				return; //Nothing is selected and we are in selection mode
 			}
-			//printf("MidiTrackInfo::insertMatrixEvent() not using matrix\n");
+			//printf("Conductor::insertMatrixEvent() not using matrix\n");
 		}
 		else
 			row = _matrix->at(0);
@@ -2012,7 +2012,7 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 		MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
 		audio->msgPlayMidiEvent(&ev);
 		_selectedIndex = item->row();
-		updateTrackInfo(-1);
+		updateConductor(-1);
 		//_selModel->blockSignals(true);
 		tableView->selectRow(item->row());
 		//_selModel->blockSignals(false);
@@ -2040,7 +2040,7 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 			}
 			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
 			audio->msgPlayMidiEvent(&ev);
-			updateTrackInfo(-1);
+			updateConductor(-1);
 			progRecClicked(track);
 		}
 		_matrix->push_back(row);
@@ -2048,13 +2048,13 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 	m_eventPart = 0;
 }
 
-void MidiTrackInfo::populateMatrix()
+void Conductor::populateMatrix()
 {
-	//printf("MidiTrackInfo::populateMatrix() entering\n");
+	//printf("Conductor::populateMatrix() entering\n");
 	_tableModel->clear();
 	if (!selected)
 		return;
-	//printf("MidiTrackInfo::populateMatrix() found track\n");
+	//printf("Conductor::populateMatrix() found track\n");
 	MidiTrack* track = (MidiTrack*) selected;
 	int port = track->outPort();
 	MidiPort* mp = &midiPorts[port];
@@ -2065,7 +2065,7 @@ void MidiTrackInfo::populateMatrix()
 		{
 			for (int i = 0; i < ps->size(); ++i)
 			{
-				//printf("MidiTrackInfo::populateMatrix() found preset: %d\n", i);
+				//printf("Conductor::populateMatrix() found preset: %d\n", i);
 				QList<QStandardItem*> rowData;
 				PatchSequence* p = ps->at(i);
 				QStandardItem *id = new QStandardItem(QString::number(p->id));
@@ -2101,7 +2101,7 @@ void MidiTrackInfo::populateMatrix()
 	updateTableHeader();
 }
 
-void MidiTrackInfo::deleteSelectedPatches(bool)
+void Conductor::deleteSelectedPatches(bool)
 {
 	QList<int> rows = tableView->getSelectedRows();
 	if (!rows.isEmpty())
@@ -2156,7 +2156,7 @@ void MidiTrackInfo::deleteSelectedPatches(bool)
 	}
 }
 
-void MidiTrackInfo::movePatchDown(bool)
+void Conductor::movePatchDown(bool)
 {
 	QList<int> rows = tableView->getSelectedRows();
 	if (!rows.isEmpty())
@@ -2180,7 +2180,7 @@ void MidiTrackInfo::movePatchDown(bool)
 	}
 }
 
-void MidiTrackInfo::movePatchUp(bool)
+void Conductor::movePatchUp(bool)
 {
 	QList<int> rows = tableView->getSelectedRows();
 	if (!rows.isEmpty())
@@ -2204,7 +2204,7 @@ void MidiTrackInfo::movePatchUp(bool)
 	}
 }
 
-void MidiTrackInfo::updateTableHeader()/*{{{*/
+void Conductor::updateTableHeader()/*{{{*/
 {
 	QStandardItem* hid = new QStandardItem(tr("I"));
 	QStandardItem* hstat = new QStandardItem(true);
@@ -2228,7 +2228,7 @@ void MidiTrackInfo::updateTableHeader()/*{{{*/
 	patchList->setColumnHidden(1, true);
 }/*}}}*/
 
-void MidiTrackInfo::patchSequenceInserted(QModelIndex /*index*/, int start, int end)
+void Conductor::patchSequenceInserted(QModelIndex /*index*/, int start, int end)
 {
 	//printf("Entering patchSequenceInserted()\n");
 	if (!selected)/*{{{*/
@@ -2265,7 +2265,7 @@ void MidiTrackInfo::patchSequenceInserted(QModelIndex /*index*/, int start, int 
 	//printf("Leaving patchSequenceInserted()\n");
 }
 
-void MidiTrackInfo::patchSequenceRemoved(QModelIndex /*index*/, int start, int end)
+void Conductor::patchSequenceRemoved(QModelIndex /*index*/, int start, int end)
 {
 	//printf("Leaving patchSequenceDeleted()\n");
 	if (!selected)/*{{{*/
@@ -2304,7 +2304,7 @@ void MidiTrackInfo::patchSequenceRemoved(QModelIndex /*index*/, int start, int e
 	//printf("Leaving patchSequenceDeleted()\n");
 }
 
-void MidiTrackInfo::matrixSelectionChanged(QItemSelection sel, QItemSelection)
+void Conductor::matrixSelectionChanged(QItemSelection sel, QItemSelection)
 {
 	//if(sel == unsel)
 	//	return;
@@ -2330,7 +2330,7 @@ void MidiTrackInfo::matrixSelectionChanged(QItemSelection sel, QItemSelection)
 	}
 }
 
-void MidiTrackInfo::clonePatchSequence()
+void Conductor::clonePatchSequence()
 {
 	QList<int> rows = tableView->getSelectedRows();
 	if (!rows.isEmpty())
@@ -2375,7 +2375,7 @@ void MidiTrackInfo::clonePatchSequence()
 	}
 }
 
-void MidiTrackInfo::populatePatches()
+void Conductor::populatePatches()
 {
 	if(!selected)
 	{
@@ -2389,7 +2389,7 @@ void MidiTrackInfo::populatePatches()
 	instr->populatePatchModel(_patchModel, channel, song->mtype(), track->type() == Track::DRUM);
 }
 
-void MidiTrackInfo::patchDoubleClicked(QModelIndex index)/*{{{*/
+void Conductor::patchDoubleClicked(QModelIndex index)/*{{{*/
 {
 	if(!selected)
 		return;
@@ -2451,13 +2451,13 @@ void MidiTrackInfo::patchDoubleClicked(QModelIndex index)/*{{{*/
 			_tableModel->insertRow(trow, rowData);
 			tableView->setRowHeight(trow, 50);
 			tableView->resizeRowsToContents();
-			updateTrackInfo(-1);
+			updateConductor(-1);
 			updateTableHeader();
 		}
 	}
 }/*}}}*/
 
-void MidiTrackInfo::patchClicked(QModelIndex index)/*{{{*/
+void Conductor::patchClicked(QModelIndex index)/*{{{*/
 {
 	if(!selected)
 		return;
@@ -2496,12 +2496,12 @@ void MidiTrackInfo::patchClicked(QModelIndex index)/*{{{*/
 }/*}}}*/
 
 	//void patchSelectionChanged(QItemSelection, QItemSelection);
-void MidiTrackInfo::patchSelectionChanged(QItemSelection index, QItemSelection)
+void Conductor::patchSelectionChanged(QItemSelection index, QItemSelection)
 {
 	patchClicked(index.indexes().at(0));
 }
 
-void MidiTrackInfo::patchSequenceClicked(QModelIndex index)/*{{{*/
+void Conductor::patchSequenceClicked(QModelIndex index)/*{{{*/
 {
 	if(!selected)
 		return;
@@ -2526,34 +2526,34 @@ void MidiTrackInfo::patchSequenceClicked(QModelIndex index)/*{{{*/
 	}
 }/*}}}*/
 
-void MidiTrackInfo::previewSelectedPatch()
+void Conductor::previewSelectedPatch()
 {
 	if(!selected)
 		return;
 	if(_patchSelModel->hasSelection())
 	{
-		//printf("MidiTrackInfo::addSelectedPatch()\n");
+		//printf("Conductor::addSelectedPatch()\n");
 		patchClicked(_patchSelModel->currentIndex());
 	}
 }
 
-void MidiTrackInfo::addSelectedPatch()
+void Conductor::addSelectedPatch()
 {
 	if(!selected)
 		return;
 	if(_patchSelModel->hasSelection())
 	{
-		//printf("MidiTrackInfo::addSelectedPatch()\n");
+		//printf("Conductor::addSelectedPatch()\n");
 		patchDoubleClicked(_patchSelModel->currentIndex());
 	}
 }
 
-void MidiTrackInfo::updateSize()
+void Conductor::updateSize()
 {
 	tableView->resizeRowsToContents();
 }
 
-void MidiTrackInfo::showEvent(QShowEvent* /*evt*/)
+void Conductor::showEvent(QShowEvent* /*evt*/)
 {
 	tableView->resizeRowsToContents();
 	/*if(_autoExapand)
@@ -2565,7 +2565,7 @@ void MidiTrackInfo::showEvent(QShowEvent* /*evt*/)
 //   rasterChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::_rasterChanged(int /*i*/)
+void Conductor::_rasterChanged(int /*i*/)
 {
 	emit rasterChanged(rasterTable[rlist->currentRow() + rlist->currentColumn() * 10]);
 }
@@ -2574,7 +2574,7 @@ void MidiTrackInfo::_rasterChanged(int /*i*/)
 //   quantChanged
 //---------------------------------------------------------
 
-void MidiTrackInfo::_quantChanged(int /*i*/)
+void Conductor::_quantChanged(int /*i*/)
 {
 	emit quantChanged(quantTable[qlist->currentRow() + qlist->currentColumn() * 8]);
 }
@@ -2583,7 +2583,7 @@ void MidiTrackInfo::_quantChanged(int /*i*/)
 //   setRaster
 //---------------------------------------------------------
 
-void MidiTrackInfo::setRaster(int val)
+void Conductor::setRaster(int val)
 {
 	for (unsigned i = 0; i < sizeof (rasterTable) / sizeof (*rasterTable); i++)
 	{
@@ -2601,7 +2601,7 @@ void MidiTrackInfo::setRaster(int val)
 //   setQuant
 //---------------------------------------------------------
 
-void MidiTrackInfo::setQuant(int val)
+void Conductor::setQuant(int val)
 {
 	for (unsigned i = 0; i < sizeof (quantTable) / sizeof (*quantTable); i++)
 	{

@@ -75,7 +75,7 @@ TrackViewEditor QListView::item::selected
 {
 	background-color: #0a0a0a;
 }
-/*MidiTrackInfo styles*/
+/*Conductor styles*/
 
 QLabel#patchLabel
 {
@@ -88,7 +88,7 @@ QLabel#patchLabel
 	 padding: 0px 8px;
 }
 
-MidiTrackInfo QTableView, QTableView#mapTable
+Conductor QTableView, QTableView#mapTable
 {
 	background-color: #1e1e1e;
 	gridline-color:#343434;
@@ -100,12 +100,12 @@ MidiTrackInfo QTableView, QTableView#mapTable
 	padding: 0px;
 	font-size: 14px;
 }
-MidiTrackInfo QTableView::focus, QTableView#mapTable::focus
+Conductor QTableView::focus, QTableView#mapTable::focus
 {
 	border: 2px solid #f3ce69;
 }
 
-MidiTrackInfo QTableView QHeaderView::section 
+Conductor QTableView QHeaderView::section
 {
 	text-align: left;
 	border: 0px solid black;
@@ -119,30 +119,30 @@ MidiTrackInfo QTableView QHeaderView::section
 	font-size: 11px;
 }
 
-MidiTrackInfo QTableView::item 
+Conductor QTableView::item
 {
 	padding-top: 8px;
 	padding-bottom: 8px;
 }
 
-MidiTrackInfo QTableView::item:selected, QTableView#mapTable::item:selected 
+Conductor QTableView::item:selected, QTableView#mapTable::item:selected
 {
 	background-color: #0a0a0a;
 	border-bottom: 1px solid #343434;
 }
 
-MidiTrackInfo QTableView::item:selected:active 
+Conductor QTableView::item:selected:active
 {
 	border: none;
 }
 
-MidiTrackInfo QTableView::item:selected:!active 
+Conductor QTableView::item:selected:!active
 {
 	border: none;
 }
 
 /* Patch tree styles */
-MidiTrackInfo QWidget#patchSeqContents
+Conductor QWidget#patchSeqContents
 {
 	background-color: #525252;
 	color: #d0d4d0;
@@ -153,7 +153,7 @@ QTreeView::item
 	border-bottom: 1px solid #343434;
 }
 
-MidiTrackInfo QTreeView/*{{{*/
+Conductor QTreeView/*{{{*/
 {
 	background-color: #1e1e1e;
 	gridline-color:#343434;
@@ -166,12 +166,12 @@ MidiTrackInfo QTreeView/*{{{*/
 	font-size: 14px;
 	/*selection-background-color:red;*//*this can be used to change the selection background color*/
 }
-MidiTrackInfo QTreeView::focus
+Conductor QTreeView::focus
 {
 	border: 2px solid #f3ce69;
 }/*}}}*/
 
-MidiTrackInfo QTreeView QHeaderView::section
+Conductor QTreeView QHeaderView::section
 {
 	text-align: left;
 	border: 0px solid black;
@@ -185,25 +185,25 @@ MidiTrackInfo QTreeView QHeaderView::section
 	font-size: 11px;
 }
 
-MidiTrackInfo QTreeView::item
+Conductor QTreeView::item
 {
 	padding-top: 3px;
 	padding-bottom: 3px;
 	border-bottom: 1px solid #343434;
 }
 
-MidiTrackInfo QTreeView::item:selected
+Conductor QTreeView::item:selected
 {
 	background-color: #0a0a0a;
 	border: none;
 }
 
-MidiTrackInfo QTreeView::item:selected:active
+Conductor QTreeView::item:selected:active
 {
 	border: none;
 }
 
-MidiTrackInfo QTreeView::item:selected:!active
+Conductor QTreeView::item:selected:!active
 {
 	border: none;
 }
@@ -1283,7 +1283,7 @@ QTextEdit#commentEntry
 }
 /*////////////////////////////////////////////////////////////////////////}}}*/
 
-QMainWindow, MidiTrackInfo, MidiStrip, AudioStrip, QMenu, Splitter, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea, QLabel#TrackViewMenuLabel { background-color: #525252; color: #d0d4d0; }
+QMainWindow, Conductor, MidiStrip, AudioStrip, QMenu, Splitter, Spinner, DoubleRange, SliderBase, QDialog, QTabWidget, QMessageBox, QScrollArea, QLabel#TrackViewMenuLabel { background-color: #525252; color: #d0d4d0; }
 
 QTextEdit, QTextEdit#songInfoText
 {

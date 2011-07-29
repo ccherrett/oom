@@ -9,7 +9,7 @@
 //		Fixed multiple drawing issues, highlight lazy selected node,
 //		implemented CurveNodeSelection to move a selection of nodes.
 //
-//    $Id: pcanvas.cpp,v 1.48.2.26 2009/11/22 11:08:33 spamatica Exp $
+//    $Id: $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
@@ -31,7 +31,7 @@
 #include <QComboBox>
 
 #include "widgets/tools.h"
-#include "pcanvas.h"
+#include "ComposerCanvas.h"
 #include "midieditor.h"
 #include "globals.h"
 #include "icons.h"
@@ -45,7 +45,7 @@
 #include "filedialog.h"
 #include "marker/marker.h"
 #include "Composer.h"
-#include "tlist.h"
+//#include "tlist.h"
 #include "utils.h"
 #include "midimonitor.h"
 
@@ -338,10 +338,10 @@ NPart::NPart(Part* e) : CItem(Event(), e)
 }
 
 //---------------------------------------------------------
-//   PartCanvas
+//   ComposerCanvas
 //---------------------------------------------------------
 
-PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
+ComposerCanvas::ComposerCanvas(int* r, QWidget* parent, int sx, int sy)
 : Canvas(parent, sx, sy)
 {
 	setAcceptDrops(true);
@@ -374,7 +374,7 @@ PartCanvas::PartCanvas(int* r, QWidget* parent, int sx, int sy)
 //   y2pitch
 //---------------------------------------------------------
 
-int PartCanvas::y2pitch(int y) const
+int ComposerCanvas::y2pitch(int y) const
 {
 	//This changes to song->visibletracks()
 	TrackList* tl = song->visibletracks();
@@ -395,7 +395,7 @@ int PartCanvas::y2pitch(int y) const
 //   pitch2y
 //---------------------------------------------------------
 
-int PartCanvas::pitch2y(int p) const
+int ComposerCanvas::pitch2y(int p) const
 {
 	//This changes to song->visibletracks()
 	TrackList* tl = song->visibletracks();
@@ -414,7 +414,7 @@ int PartCanvas::pitch2y(int p) const
 //   leaveEvent
 //---------------------------------------------------------
 
-void PartCanvas::leaveEvent(QEvent*)
+void ComposerCanvas::leaveEvent(QEvent*)
 {
 	emit timeChanged(MAXINT);
 }
@@ -423,20 +423,20 @@ void PartCanvas::leaveEvent(QEvent*)
 //   returnPressed
 //---------------------------------------------------------
 
-void PartCanvas::returnPressed()
+void ComposerCanvas::returnPressed()
 {
 	if(editMode)
 	{
 		lineEditor->hide();
 		Part* oldPart = editPart->part();
 		Part* newPart = oldPart->clone();
-		//printf("PartCanvas::returnPressed before msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
+		//printf("ComposerCanvas::returnPressed before msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
 
 		newPart->setName(lineEditor->text());
 		// Indicate do undo, and do port controller values but not clone parts.
 		//audio->msgChangePart(oldPart, newPart);
 		audio->msgChangePart(oldPart, newPart, true, true, false);
-		//printf("PartCanvas::returnPressed after msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
+		//printf("ComposerCanvas::returnPressed after msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
 	}
 	editMode = false;
 }
@@ -445,7 +445,7 @@ void PartCanvas::returnPressed()
 //   viewMouseDoubleClick
 //---------------------------------------------------------
 
-void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
+void ComposerCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 {
 	if (_tool != PointerTool)
 	{
@@ -532,7 +532,7 @@ void PartCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 //   startUndo
 //---------------------------------------------------------
 
-void PartCanvas::startUndo(DragType)
+void ComposerCanvas::startUndo(DragType)
 {
 	song->startUndo();
 }
@@ -541,7 +541,7 @@ void PartCanvas::startUndo(DragType)
 //   endUndo
 //---------------------------------------------------------
 
-void PartCanvas::endUndo(DragType t, int flags)
+void ComposerCanvas::endUndo(DragType t, int flags)
 {
 	song->endUndo(flags | ((t == MOVE_COPY || t == MOVE_CLONE)
 			? SC_PART_INSERTED : SC_PART_MODIFIED));
@@ -551,7 +551,7 @@ void PartCanvas::endUndo(DragType t, int flags)
 //   moveCanvasItems
 //---------------------------------------------------------
 
-void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtype, int*)
+void ComposerCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtype, int*)
 {
 	for (iCItem ici = items.begin(); ici != items.end(); ++ici)
 	{
@@ -580,7 +580,7 @@ void PartCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtyp
 //    return false, if copy/move not allowed
 //---------------------------------------------------------
 
-bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
+bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 {
 	tracks = song->visibletracks();
 	NPart* npart = (NPart*) item;
@@ -593,7 +593,7 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	{
 		return false;
 	}
-	printf("PartCanvas::moveItem ntrack: %d  tracks->size(): %d\n",ntrack,(int)tracks->size());
+	printf("ComposerCanvas::moveItem ntrack: %d  tracks->size(): %d\n",ntrack,(int)tracks->size());
 	if (ntrack >= tracks->size())
 	{
 		ntrack = tracks->size();
@@ -607,9 +607,9 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		if(newTrack)
 			midiMonitor->msgAddMonitoredTrack(newTrack);
 		else
-			printf("PartCanvas::moveItem failed to create new track\n");
+			printf("ComposerCanvas::moveItem failed to create new track\n");
 		
-		printf("PartCanvas::moveItem new track type: %d\n",newTrack->type());
+		printf("ComposerCanvas::moveItem new track type: %d\n",newTrack->type());
 
 		emit tracklistChanged();
 	}
@@ -620,7 +620,7 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	//not making it into the undo system or something like that
 	Track* dtrack = tracks->index(ntrack);
 	
-	printf("PartCanvas::moveItem track type is: %d\n",dtrack->type());
+	printf("ComposerCanvas::moveItem track type is: %d\n",dtrack->type());
 
 	if (dtrack->type() != type)
 	{
@@ -628,7 +628,7 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 				tr("Cannot copy/move/clone to different Track-Type"));
 		return false;
 	}
-	printf("PartCanvas::moveItem did not crash\n");
+	printf("ComposerCanvas::moveItem did not crash\n");
 
 	Part* dpart;
 	bool clone = (t == MOVE_CLONE || (t == MOVE_COPY && spart->events()->arefCount() > 1));
@@ -648,7 +648,7 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 
 	dpart->setTick(dtick);
 
-	//printf("PartCanvas::moveItem before add/changePart clone:%d spart:%p events:%p refs:%d Arefs:%d sn:%d dpart:%p events:%p refs:%d Arefs:%d sn:%d\n", clone, spart, spart->events(), spart->events()->refCount(), spart->events()->arefCount(), spart->sn(), dpart, dpart->events(), dpart->events()->refCount(), dpart->events()->arefCount(), dpart->sn());
+	//printf("ComposerCanvas::moveItem before add/changePart clone:%d spart:%p events:%p refs:%d Arefs:%d sn:%d dpart:%p events:%p refs:%d Arefs:%d sn:%d\n", clone, spart, spart->events(), spart->events()->refCount(), spart->events()->arefCount(), spart->sn(), dpart, dpart->events(), dpart->events()->refCount(), dpart->events()->arefCount(), dpart->sn());
 
 	if (t == MOVE_MOVE)
 		item->setPart(dpart);
@@ -690,7 +690,7 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 
 		spart->setSelected(false);
 	}
-	//printf("PartCanvas::moveItem after add/changePart spart:%p events:%p refs:%d Arefs:%d dpart:%p events:%p refs:%d Arefs:%d\n", spart, spart->events(), spart->events()->refCount(), spart->events()->arefCount(), dpart, dpart->events(), dpart->events()->refCount(), dpart->events()->arefCount());
+	//printf("ComposerCanvas::moveItem after add/changePart spart:%p events:%p refs:%d Arefs:%d dpart:%p events:%p refs:%d Arefs:%d\n", spart, spart->events(), spart->events()->refCount(), spart->events()->arefCount(), dpart, dpart->events(), dpart->events()->refCount(), dpart->events()->arefCount());
 
 	if (song->len() < (dpart->lenTick() + dpart->tick()))
 		song->setLen(dpart->lenTick() + dpart->tick());
@@ -702,7 +702,7 @@ bool PartCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 //   raster
 //---------------------------------------------------------
 
-QPoint PartCanvas::raster(const QPoint& p) const
+QPoint ComposerCanvas::raster(const QPoint& p) const
 {
 	int y = pitch2y(y2pitch(p.y()));
 	int x = p.x();
@@ -718,7 +718,7 @@ QPoint PartCanvas::raster(const QPoint& p) const
 //   partsChanged
 //---------------------------------------------------------
 
-void PartCanvas::partsChanged()
+void ComposerCanvas::partsChanged()
 {
 	tracks = song->visibletracks();
 	_items.clear();
@@ -744,7 +744,7 @@ void PartCanvas::partsChanged()
 //   updateSelection
 //---------------------------------------------------------
 
-void PartCanvas::updateSelection()
+void ComposerCanvas::updateSelection()
 {
     for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
@@ -759,7 +759,7 @@ void PartCanvas::updateSelection()
 //   resizeItem
 //---------------------------------------------------------
 
-void PartCanvas::resizeItem(CItem* i, bool noSnap)/*{{{*/
+void ComposerCanvas::resizeItem(CItem* i, bool noSnap)/*{{{*/
 {
 	Track* t = ((NPart*) (i))->track();
 	Part* p = ((NPart*) (i))->part();
@@ -777,14 +777,14 @@ void PartCanvas::resizeItem(CItem* i, bool noSnap)/*{{{*/
 	song->cmdResizePart(t, p, newwidth);
 }/*}}}*/
 
-void PartCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
+void ComposerCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
 {
 	Track* t = ((NPart*) (i))->track();
 	Part* p = ((NPart*) (i))->part();
 
 	int endtick = (p->tick() + p->lenTick());
 	int snappedpos = AL::sigmap.raster(i->x(), *_raster);
-	//printf("PartCanvas::resizeItemLeft snap pos:%d , nosnap pos: %d\n", snappedpos, i->x());
+	//printf("ComposerCanvas::resizeItemLeft snap pos:%d , nosnap pos: %d\n", snappedpos, i->x());
 	if (noSnap)
 	{
 		snappedpos = i->x();
@@ -793,7 +793,7 @@ void PartCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
 	//redraw();
 }/*}}}*/
 
-CItem* PartCanvas::addPartAtCursor(Track* track)
+CItem* ComposerCanvas::addPartAtCursor(Track* track)
 {
 	if (!track)
 		return 0;
@@ -832,7 +832,7 @@ CItem* PartCanvas::addPartAtCursor(Track* track)
 //    first create local Item
 //---------------------------------------------------------
 
-CItem* PartCanvas::newItem(const QPoint& pos, int)
+CItem* ComposerCanvas::newItem(const QPoint& pos, int)
 {
 	tracks = song->visibletracks();
 	int x = pos.x();
@@ -878,7 +878,7 @@ CItem* PartCanvas::newItem(const QPoint& pos, int)
 //   newItem
 //---------------------------------------------------------
 
-void PartCanvas::newItem(CItem* i, bool noSnap)
+void ComposerCanvas::newItem(CItem* i, bool noSnap)
 {
 	Part* p = ((NPart*) (i))->part();
 
@@ -896,7 +896,7 @@ void PartCanvas::newItem(CItem* i, bool noSnap)
 //   deleteItem
 //---------------------------------------------------------
 
-bool PartCanvas::deleteItem(CItem* i)
+bool ComposerCanvas::deleteItem(CItem* i)
 {
 	Part* p = ((NPart*) (i))->part();
 	audio->msgRemovePart(p); //Invokes songChanged which calls partsChanged which makes it difficult to delete them there
@@ -907,7 +907,7 @@ bool PartCanvas::deleteItem(CItem* i)
 //   splitItem
 //---------------------------------------------------------
 
-void PartCanvas::splitItem(CItem* item, const QPoint& pt)
+void ComposerCanvas::splitItem(CItem* item, const QPoint& pt)
 {
 	NPart* np = (NPart*) item;
 	Track* t = np->track();
@@ -922,7 +922,7 @@ void PartCanvas::splitItem(CItem* item, const QPoint& pt)
 //   glueItem
 //---------------------------------------------------------
 
-void PartCanvas::glueItem(CItem* item)
+void ComposerCanvas::glueItem(CItem* item)
 {
 	NPart* np = (NPart*) item;
 	Track* t = np->track();
@@ -934,7 +934,7 @@ void PartCanvas::glueItem(CItem* item)
 //   genItemPopup
 //---------------------------------------------------------
 
-QMenu* PartCanvas::genItemPopup(CItem* item)/*{{{*/
+QMenu* ComposerCanvas::genItemPopup(CItem* item)/*{{{*/
 {
 	NPart* npart = (NPart*) item;
 	Track::TrackType trackType = npart->track()->type();
@@ -1068,7 +1068,7 @@ QMenu* PartCanvas::genItemPopup(CItem* item)/*{{{*/
 //   itemPopup
 //---------------------------------------------------------
 
-void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
+void ComposerCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 {
 	PartList* pl = new PartList;
 	NPart* npart = (NPart*) (item);
@@ -1127,8 +1127,8 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 			Part* spart = npart->part();
 			Track* track = npart->track();
 			Part* dpart = track->newPart(spart, false);
-			//printf("PartCanvas::itemPopup: #1 spart %s %p next:%s %p prev:%s %p\n", spart->name().toLatin1().constData(), spart, spart->nextClone()->name().toLatin1().constData(), spart->nextClone(), spart->prevClone()->name().toLatin1().constData(), spart->prevClone());
-			//printf("PartCanvas::itemPopup: #1 dpart %s %p next:%s %p prev:%s %p\n", dpart->name().toLatin1().constData(), dpart, dpart->nextClone()->name().toLatin1().constData(), dpart->nextClone(), dpart->prevClone()->name().toLatin1().constData(), dpart->prevClone());
+			//printf("ComposerCanvas::itemPopup: #1 spart %s %p next:%s %p prev:%s %p\n", spart->name().toLatin1().constData(), spart, spart->nextClone()->name().toLatin1().constData(), spart->nextClone(), spart->prevClone()->name().toLatin1().constData(), spart->prevClone());
+			//printf("ComposerCanvas::itemPopup: #1 dpart %s %p next:%s %p prev:%s %p\n", dpart->name().toLatin1().constData(), dpart, dpart->nextClone()->name().toLatin1().constData(), dpart->nextClone(), dpart->prevClone()->name().toLatin1().constData(), dpart->prevClone());
 
 			EventList* se = spart->events();
 			EventList* de = dpart->events();
@@ -1142,8 +1142,8 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 			// Indicate no undo, and do port controller values but not clone parts.
 			//audio->msgChangePart(spart, dpart, false);
 			audio->msgChangePart(spart, dpart, false, true, false);
-			//printf("PartCanvas::itemPopup: #2 spart %s %p next:%s %p prev:%s %p\n", spart->name().toLatin1().constData(), spart, spart->nextClone()->name().toLatin1().constData(), spart->nextClone(), spart->prevClone()->name().toLatin1().constData(), spart->prevClone());
-			//printf("PartCanvas::itemPopup: #2 dpart %s %p next:%s %p prev:%s %p\n", dpart->name().toLatin1().constData(), dpart, dpart->nextClone()->name().toLatin1().constData(), dpart->nextClone(), dpart->prevClone()->name().toLatin1().constData(), dpart->prevClone());
+			//printf("ComposerCanvas::itemPopup: #2 spart %s %p next:%s %p prev:%s %p\n", spart->name().toLatin1().constData(), spart, spart->nextClone()->name().toLatin1().constData(), spart->nextClone(), spart->prevClone()->name().toLatin1().constData(), spart->prevClone());
+			//printf("ComposerCanvas::itemPopup: #2 dpart %s %p next:%s %p prev:%s %p\n", dpart->name().toLatin1().constData(), dpart, dpart->nextClone()->name().toLatin1().constData(), dpart->nextClone(), dpart->prevClone()->name().toLatin1().constData(), dpart->prevClone());
 
 			song->endUndo(SC_PART_MODIFIED);
 			break; // Has to be break here, right?
@@ -1200,7 +1200,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 			{
 				for (int i = 0; i < j; ++i)
 				{
-					//printf("PartCanvas::itemPopup i:%d %s %p events %p refs:%d arefs:%d\n", i, p->name().toLatin1().constData(), p, part->cevents(), part->cevents()->refCount(), j);
+					//printf("ComposerCanvas::itemPopup i:%d %s %p events %p refs:%d arefs:%d\n", i, p->name().toLatin1().constData(), p, part->cevents(), part->cevents()->refCount(), j);
 
 					p->setSelected(true);
 					p = p->nextClone();
@@ -1266,7 +1266,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 	delete pl;
 }/*}}}*/
 
-CItemList PartCanvas::getSelectedItems()
+CItemList ComposerCanvas::getSelectedItems()
 {
 	CItemList list;
     for (iCItem i = _items.begin(); i != _items.end(); i++)/*{{{*/
@@ -1283,7 +1283,7 @@ CItemList PartCanvas::getSelectedItems()
 //   viewMousePressEvent
 //---------------------------------------------------------
 
-void PartCanvas::mousePress(QMouseEvent* event)
+void ComposerCanvas::mousePress(QMouseEvent* event)
 {
 	if (event->modifiers() & Qt::ShiftModifier && _tool != AutomationTool)
 	{
@@ -1399,7 +1399,7 @@ void PartCanvas::mousePress(QMouseEvent* event)
 //   viewMouseReleaseEvent
 //---------------------------------------------------------
 
-void PartCanvas::mouseRelease(const QPoint&)
+void ComposerCanvas::mouseRelease(const QPoint&)
 {
 	// clear all the automation parameters
 	automation.moveController=false;
@@ -1411,7 +1411,7 @@ void PartCanvas::mouseRelease(const QPoint&)
 //   viewMouseMoveEvent
 //---------------------------------------------------------
 
-void PartCanvas::mouseMove(QMouseEvent* event)
+void ComposerCanvas::mouseMove(QMouseEvent* event)
 {
 	int x = event->pos().x();
 	int y = event->pos().y();
@@ -1475,7 +1475,7 @@ void PartCanvas::mouseMove(QMouseEvent* event)
 //   y2Track
 //---------------------------------------------------------
 
-Track* PartCanvas::y2Track(int y) const
+Track* ComposerCanvas::y2Track(int y) const
 {
 	//This changes to song->visibletracks()
 	TrackList* l = song->visibletracks();
@@ -1492,7 +1492,7 @@ Track* PartCanvas::y2Track(int y) const
 
 
 // Return the track Y position, if track was not found, return -1
-int PartCanvas::track2Y(Track * track) const
+int ComposerCanvas::track2Y(Track * track) const
 {
 	//This changes to song->visibletracks()
 	TrackList* l = song->visibletracks();
@@ -1517,7 +1517,7 @@ int PartCanvas::track2Y(Track * track) const
 //   keyPress
 //---------------------------------------------------------
 
-void PartCanvas::keyPress(QKeyEvent* event)
+void ComposerCanvas::keyPress(QKeyEvent* event)
 {
 	int key = event->key();
 	if (editMode)
@@ -2272,7 +2272,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 //    draws a part
 //---------------------------------------------------------
 
-void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
+void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 {
 	int from = rect.x();
 	int to = from + rect.width();
@@ -2310,13 +2310,13 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	// Item bounding box x is in tick coordinates, same as rectangle.
 	if (item->bbox().intersect(rect).isNull())
 	{
-		//printf("PartCanvas::drawItem rectangle is null\n");
+		//printf("ComposerCanvas::drawItem rectangle is null\n");
 		return;
 	}
 
 	QRect r = item->bbox();
 
-	//printf("PartCanvas::drawItem %s evRefs:%d pTick:%d pLen:%d\nbb.x:%d bb.y:%d bb.w:%d bb.h:%d\n"
+	//printf("ComposerCanvas::drawItem %s evRefs:%d pTick:%d pLen:%d\nbb.x:%d bb.y:%d bb.w:%d bb.h:%d\n"
 	//       "rect.x:%d rect.y:%d rect.w:%d rect.h:%d\nr.x:%d r.y:%d r.w:%d r.h:%d\n",
 	//  part->name().toLatin1().constData(), part->events()->arefCount(), pTick, part->lenTick(),
 	//  bb.x(), bb.y(), bb.width(), bb.height(),
@@ -2446,7 +2446,7 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 //    draws moving items
 //---------------------------------------------------------
 
-void PartCanvas::drawMoving(QPainter& p, const CItem* item, const QRect&)
+void ComposerCanvas::drawMoving(QPainter& p, const CItem* item, const QRect&)
 {
 	//if(!item->isMoving())
 	//  return;
@@ -2467,7 +2467,7 @@ void PartCanvas::drawMoving(QPainter& p, const CItem* item, const QRect&)
 	p.drawRect(item->mp().x(), item->mp().y(), item->width(), item->height());
 }
 
-void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to, QColor c)
+void ComposerCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to, QColor c)
 {
 	if (config.canvasShowPartType & 2) {      // show events
 		// Do not allow this, causes segfault.
@@ -2532,13 +2532,13 @@ void PartCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, Midi
 //    pr - part rectangle
 //---------------------------------------------------------
 
-void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const QRect& _pr)
+void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const QRect& _pr)
 {
 	int i = wp->colorIndex();
 	QColor waveFill(config.partWaveColors[i]);
 	QColor waveEdge = QColor(211,193,224);
 	
-	//printf("PartCanvas::drawWavePart bb.x:%d bb.y:%d bb.w:%d bb.h:%d  pr.x:%d pr.y:%d pr.w:%d pr.h:%d\n",
+	//printf("ComposerCanvas::drawWavePart bb.x:%d bb.y:%d bb.w:%d bb.h:%d  pr.x:%d pr.y:%d pr.w:%d pr.h:%d\n",
 	//  bb.x(), bb.y(), bb.width(), bb.height(), _pr.x(), _pr.y(), _pr.width(), _pr.height());
 	QPolygonF m_monoPolygonTop;
 	QPolygonF m_monoPolygonBottom;
@@ -2638,7 +2638,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 			//
 			//    combine multi channels into one waveform
 			//
-			//printf("PartCanvas::drawWavePart i:%d ex:%d\n", i, ex);  // REMOVE Tim.
+			//printf("ComposerCanvas::drawWavePart i:%d ex:%d\n", i, ex);  // REMOVE Tim.
 			if(drawLines == 0)
 			{
 				for (; i < ex; i++)//{{{
@@ -2953,7 +2953,7 @@ void PartCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const 
 //   cmd
 //---------------------------------------------------------
 
-void PartCanvas::cmd(int cmd)
+void ComposerCanvas::cmd(int cmd)
 {
 	PartList pl;
         for (iCItem i = _items.begin(); i != _items.end(); ++i)
@@ -3054,9 +3054,9 @@ void PartCanvas::cmd(int cmd)
 //    cut copy paste
 //---------------------------------------------------------
 
-void PartCanvas::copy(PartList* pl)
+void ComposerCanvas::copy(PartList* pl)
 {
-	//printf("void PartCanvas::copy(PartList* pl)\n");
+	//printf("void ComposerCanvas::copy(PartList* pl)\n");
 	if (pl->empty())
 		return;
 	// Changed by T356. Support mixed .mpt files.
@@ -3083,7 +3083,7 @@ void PartCanvas::copy(PartList* pl)
 	FILE* tmp = tmpfile();
 	if (tmp == 0)
 	{
-		fprintf(stderr, "PartCanvas::copy() fopen failed: %s\n",
+		fprintf(stderr, "ComposerCanvas::copy() fopen failed: %s\n",
 				strerror(errno));
 		return;
 	}
@@ -3116,7 +3116,7 @@ void PartCanvas::copy(PartList* pl)
 	struct stat f_stat;
 	if (fstat(fileno(tmp), &f_stat) == -1)
 	{
-		fprintf(stderr, "PartCanvas::copy() fstat failed:<%s>\n",
+		fprintf(stderr, "ComposerCanvas::copy() fstat failed:<%s>\n",
 				strerror(errno));
 		fclose(tmp);
 		return;
@@ -3149,9 +3149,9 @@ void PartCanvas::copy(PartList* pl)
 //   pasteAt
 //---------------------------------------------------------
 
-int PartCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, bool clone, bool toTrack)
+int ComposerCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, bool clone, bool toTrack)
 {
-	//printf("int PartCanvas::pasteAt(const QString& pt, Track* track, int pos)\n");
+	//printf("int ComposerCanvas::pasteAt(const QString& pt, Track* track, int pos)\n");
 	QByteArray ba = pt.toLatin1();
 	const char* ptxt = ba.constData();
 	Xml xml(ptxt);
@@ -3224,7 +3224,7 @@ int PartCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, bool 
 					audio->msgAddPart(p, false);
 				}
 				else
-					xml.unknown("PartCanvas::pasteAt");
+					xml.unknown("ComposerCanvas::pasteAt");
 				break;
 			case Xml::TagEnd:
 				break;
@@ -3256,7 +3256,7 @@ int PartCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, bool 
 //    paste part to current selected track at cpos
 //---------------------------------------------------------
 
-void PartCanvas::paste(bool clone, bool toTrack, bool doInsert)
+void ComposerCanvas::paste(bool clone, bool toTrack, bool doInsert)
 {
 	Track* track = 0;
 
@@ -3366,7 +3366,7 @@ void PartCanvas::paste(bool clone, bool toTrack, bool doInsert)
 //   movePartsToTheRight
 //---------------------------------------------------------
 
-void PartCanvas::movePartsTotheRight(unsigned int startTicks, int length)
+void ComposerCanvas::movePartsTotheRight(unsigned int startTicks, int length)
 {
 	// all parts that start after the pasted parts will be moved the entire length of the pasted parts
         for (iCItem i = _items.begin(); i != _items.end(); ++i)
@@ -3409,9 +3409,9 @@ void PartCanvas::movePartsTotheRight(unsigned int startTicks, int length)
 //   startDrag
 //---------------------------------------------------------
 
-void PartCanvas::startDrag(CItem* item, DragType t)
+void ComposerCanvas::startDrag(CItem* item, DragType t)
 {
-	//printf("PartCanvas::startDrag(CItem* item, DragType t)\n");
+	//printf("ComposerCanvas::startDrag(CItem* item, DragType t)\n");
 	NPart* p = (NPart*) (item);
 	Part* part = p->part();
 
@@ -3422,7 +3422,7 @@ void PartCanvas::startDrag(CItem* item, DragType t)
 	FILE* tmp = tmpfile();
 	if (tmp == 0)
 	{
-		fprintf(stderr, "PartCanvas::startDrag() fopen failed: %s\n",
+		fprintf(stderr, "ComposerCanvas::startDrag() fopen failed: %s\n",
 				strerror(errno));
 		return;
 	}
@@ -3438,7 +3438,7 @@ void PartCanvas::startDrag(CItem* item, DragType t)
 	struct stat f_stat;
 	if (fstat(fileno(tmp), &f_stat) == -1)
 	{
-		fprintf(stderr, "PartCanvas::startDrag fstat failed:<%s>\n",
+		fprintf(stderr, "ComposerCanvas::startDrag fstat failed:<%s>\n",
 				strerror(errno));
 		fclose(tmp);
 		return;
@@ -3472,7 +3472,7 @@ void PartCanvas::startDrag(CItem* item, DragType t)
 //   dragEnterEvent
 //---------------------------------------------------------
 
-void PartCanvas::dragEnterEvent(QDragEnterEvent* event)
+void ComposerCanvas::dragEnterEvent(QDragEnterEvent* event)
 {
 	///event->accept(Q3TextDrag::canDecode(event));
 	event->acceptProposedAction(); // TODO CHECK Tim.
@@ -3482,7 +3482,7 @@ void PartCanvas::dragEnterEvent(QDragEnterEvent* event)
 //   dragMoveEvent
 //---------------------------------------------------------
 
-void PartCanvas::dragMoveEvent(QDragMoveEvent*)
+void ComposerCanvas::dragMoveEvent(QDragMoveEvent*)
 {
 	//      printf("drag move %x\n", this);
 	//event->acceptProposedAction();
@@ -3492,7 +3492,7 @@ void PartCanvas::dragMoveEvent(QDragMoveEvent*)
 //   dragLeaveEvent
 //---------------------------------------------------------
 
-void PartCanvas::dragLeaveEvent(QDragLeaveEvent*)
+void ComposerCanvas::dragLeaveEvent(QDragLeaveEvent*)
 {
 	//      printf("drag leave\n");
 	//event->acceptProposedAction();
@@ -3502,10 +3502,10 @@ void PartCanvas::dragLeaveEvent(QDragLeaveEvent*)
 //   dropEvent
 //---------------------------------------------------------
 
-void PartCanvas::viewDropEvent(QDropEvent* event)
+void ComposerCanvas::viewDropEvent(QDropEvent* event)
 {
 	tracks = song->visibletracks();
-	//printf("void PartCanvas::viewDropEvent(QDropEvent* event)\n");
+	//printf("void ComposerCanvas::viewDropEvent(QDropEvent* event)\n");
 	if (event->source() == this)
 	{
 		printf("local DROP\n");
@@ -3611,7 +3611,7 @@ void PartCanvas::viewDropEvent(QDropEvent* event)
 //   drawCanvas
 //---------------------------------------------------------
 
-void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
+void ComposerCanvas::drawCanvas(QPainter& p, const QRect& rect)
 {
 	int x = rect.x();
 	int y = rect.y();
@@ -3692,7 +3692,7 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 		th = track->height();
 		if (config.canvasShowGrid)
 		{
-			//printf("PartCanvas::drawCanvas track name:%s, y:%d h:%d\n", track->name().toLatin1().constData(), yy, th);
+			//printf("ComposerCanvas::drawCanvas track name:%s, y:%d h:%d\n", track->name().toLatin1().constData(), yy, th);
 			p.setPen(baseColor.dark(130));
 			p.drawLine(x, yy + th, x + w, yy + th); 
 			p.setPen(baseColor);
@@ -3714,7 +3714,7 @@ void PartCanvas::drawCanvas(QPainter& p, const QRect& rect)
 	}
 }
 
-void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
+void ComposerCanvas::drawTopItem(QPainter& p, const QRect& rect)
 {
 	int x = rect.x();
 	int y = rect.y();
@@ -3835,7 +3835,7 @@ void PartCanvas::drawTopItem(QPainter& p, const QRect& rect)
 //   drawAudioTrack
 //---------------------------------------------------------
 
-void PartCanvas::drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* /* t */)
+void ComposerCanvas::drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* /* t */)
 {
 	// NOTE: For one-pixel border use first line and don't bother with setCosmetic.
 	//       For a two-pixel border use second line and MUST use setCosmetic! Tim.
@@ -3855,7 +3855,7 @@ void PartCanvas::drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* /* t */
 	p.drawRect(r);
 }
 
-double PartCanvas::getControlValue(CtrlList *cl, double val)
+double ComposerCanvas::getControlValue(CtrlList *cl, double val)
 {
 	double prevVal = val;
 	//FIXME: this check needs to be more robust to deal with plugin automation
@@ -3879,9 +3879,9 @@ double PartCanvas::getControlValue(CtrlList *cl, double val)
 //   drawAutomation
 //---------------------------------------------------------
 
-void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{*/
+void ComposerCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{*/
 {
-	//printf("PartCanvas::drawAutomation\n");
+	//printf("ComposerCanvas::drawAutomation\n");
 	QRect tempRect = r;
 	tempRect.setBottom(track2Y(t) + t->height());
 	QRect rr = p.worldMatrix().mapRect(tempRect);
@@ -4124,7 +4124,7 @@ void PartCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{
 	p.restore();
 }/*}}}*/
 
-void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
+void ComposerCanvas::drawTooltipText(QPainter& p, /*{{{*/
 		const QRect& rr, 
 		int height,
 		double lazySelNodeVal,
@@ -4186,7 +4186,7 @@ void PartCanvas::drawTooltipText(QPainter& p, /*{{{*/
 //    controller added.
 //---------------------------------------------------------
 
-void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)/*{{{*/
+void ComposerCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)/*{{{*/
 {
 	int circumference = 5;
 	if (t->isMidiTrack())
@@ -4304,7 +4304,7 @@ void PartCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCt
 	setCursor();
 }/*}}}*/
 
-void PartCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
+void ComposerCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 {
 	if (t->isMidiTrack())
 	{
@@ -4365,14 +4365,14 @@ void PartCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 }/*}}}*/
 
 
-void PartCanvas::controllerChanged(Track* /* t */)
+void ComposerCanvas::controllerChanged(Track* /* t */)
 {
 	redraw();
 }
 
-void PartCanvas::addNewAutomation(QMouseEvent *event)
+void ComposerCanvas::addNewAutomation(QMouseEvent *event)
 {
-	//printf("PartCanvas::addNewAutomation(%p)\n", event);
+	//printf("ComposerCanvas::addNewAutomation(%p)\n", event);
 	Track * t = y2Track(event->pos().y());
 	if (t) 
 	{
@@ -4383,7 +4383,7 @@ void PartCanvas::addNewAutomation(QMouseEvent *event)
 	}
 }
 
-void PartCanvas::processAutomationMovements(QMouseEvent *event)
+void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 {
 
 	if (_tool != AutomationTool)
@@ -4509,9 +4509,9 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 	controllerChanged(automation.currentTrack);
 }
 
-void PartCanvas::trackViewChanged()
+void ComposerCanvas::trackViewChanged()
 {
-	//printf("PartCanvas::trackViewChanged()\n");
+	//printf("ComposerCanvas::trackViewChanged()\n");
     for (iCItem i = _items.begin(); i != _items.end(); ++i)
 	{
 		NPart* part = (NPart*) (i->second);

@@ -28,7 +28,6 @@
 #include "midiseq.h"
 #include "midictrl.h"
 #include "comment.h"
-#include "header.h"
 #include "node.h"
 #include "instruments/minstrument.h"
 #include "Composer.h"
@@ -37,7 +36,7 @@
 #include "synth.h"
 #include "menulist.h"
 #include "midimonitor.h"
-#include "pcanvas.h"
+#include "ComposerCanvas.h"
 #include "trackheader.h"
 #include "slider.h"
 #include "mixer/meter.h"
@@ -408,17 +407,17 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			if(m_track->getDefaultPartColor() == i)
 			{
 				colorname = QString(config.partColorNames[i]);
-				colorPopup->setIcon(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
+				colorPopup->setIcon(ComposerCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true));
 				colorPopup->setTitle(colorSub->title()+": "+colorname);
 	
 				colorname = QString("* "+config.partColorNames[i]);
-				QAction *act_color = colorSub->addAction(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
+				QAction *act_color = colorSub->addAction(ComposerCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80, true), colorname);
 				act_color->setData(20 + i);
 			}
 			else
 			{
 				colorname = QString("     "+config.partColorNames[i]);
-				QAction *act_color = colorSub->addAction(PartCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
+				QAction *act_color = colorSub->addAction(ComposerCanvas::colorRect(config.partColors[i], config.partWaveColors[i], 80, 80), colorname);
 				act_color->setData(20 + i);
 			}
 		}

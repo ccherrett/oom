@@ -823,7 +823,7 @@ void PerformerCanvas::newItem(CItem* item, bool noSnap)/*{{{*/
 
 void PerformerCanvas::resizeItem(CItem* item, bool noSnap) // experimental changes to try dynamically extending parts/*{{{*/
 {
-	//printf("PartCanvas::resizeItem!\n");
+	//printf("ComposerCanvas::resizeItem!\n");
 	NEvent* nevent = (NEvent*) item;
 	Event event = nevent->event();
 	Event newEvent = event.clone();

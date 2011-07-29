@@ -35,19 +35,18 @@
 #include "app.h"
 #include "mtscale.h"
 #include "scrollscale.h"
-#include "pcanvas.h"
+#include "ComposerCanvas.h"
 #include "poslabel.h"
 #include "xml.h"
 #include "splitter.h"
 #include "lcombo.h"
-#include "mtrackinfo.h"
+#include "Conductor.h"
 #include "midiport.h"
 #include "mididev.h"
 #include "utils.h"
 #include "globals.h"
-#include "headerlist.h"
+#include "HeaderList.h"
 #include "icons.h"
-#include "header.h"
 #include "utils.h"
 #include "audio.h"
 #include "event.h"
@@ -324,7 +323,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	}
 	
 	connect(m_trackheader, SIGNAL(selectionChanged(Track*)), SLOT(trackSelectionChanged()));
-	connect(m_trackheader, SIGNAL(selectionChanged(Track*)), midiTrackInfo, SLOT(setTrack(Track*)));
+	connect(m_trackheader, SIGNAL(selectionChanged(Track*)), midiConductor, SLOT(setTrack(Track*)));
 
 	//---------------------------------------------------
 	//    Editor
@@ -350,7 +349,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 
 	time = new MTScale(&_raster, editor, xscale);
 	time->setOrigin(-offset, 0);
-	canvas = new PartCanvas(&_raster, editor, xscale, yscale);
+	canvas = new ComposerCanvas(&_raster, editor, xscale, yscale);
 	canvas->setBg(config.partCanvasBg);
 	canvas->setCanvasTools(composerTools);
 	canvas->setOrigin(-offset, 0);
@@ -404,7 +403,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 
 	configChanged(); // set configuration values
 	if (canvas->part())
-		midiTrackInfo->setTrack(canvas->part()->track());
+		midiConductor->setTrack(canvas->part()->track());
 	showTrackInfo(showTrackinfoFlag);
 
 	// Take care of some tabbies!
@@ -434,10 +433,10 @@ void Composer::currentTabChanged(int tab)
 {
 	if(tab == 2) //patch sequencer
 	{
-		if(midiTrackInfo)
+		if(midiConductor)
 		{
 			//printf("PatchSequencer Tab clicked\n");
-			midiTrackInfo->update();
+			midiConductor->update();
 		}
 	}
 }
@@ -506,8 +505,8 @@ void Composer::configChanged()
 		//printf("Composer::configChanged - bitmap %s!\n", config.canvasBgPixmap.ascii());
 		canvas->setBg(QPixmap(config.canvasBgPixmap));
 	}
-	///midiTrackInfo->setFont(config.fonts[2]);
-	//updateTrackInfo(type);
+	///midiConductor->setFont(config.fonts[2]);
+	//updateConductor(type);
 }
 
 //---------------------------------------------------------
@@ -557,8 +556,8 @@ void Composer::songChanged(int type)
 		if (type & (SC_TRACK_REMOVED | SC_VIEW_CHANGED))
 		{
 			canvas->trackViewChanged();
-			/*AudioStrip* w = (AudioStrip*) _lastStrip;//(trackInfo->getWidget(2));
-			//AudioStrip* w = (AudioStrip*)(trackInfo->widget(2));
+			/*AudioStrip* w = (AudioStrip*) _lastStrip;//(midiConductor->getWidget(2));
+			//AudioStrip* w = (AudioStrip*)(midiConductor->widget(2));
 			if (w)
 			{
 				Track* t = w->getTrack();
@@ -573,8 +572,8 @@ void Composer::songChanged(int type)
 					if (it == tl->end())
 					{
 						delete w;
-						//trackInfo->addWidget(0, 2);
-						//trackInfo->insertWidget(2, 0);
+						//midiConductor->addWidget(0, 2);
+						//midiConductor->insertWidget(2, 0);
 						selected = 0;
 					}
 				}
@@ -587,7 +586,7 @@ void Composer::songChanged(int type)
 		}
 	}
 
-	updateTrackInfo(type);
+	updateConductor(type);
 }
 
 void Composer::splitterMoved(int pos, int)
@@ -621,7 +620,7 @@ void Composer::trackSelectionChanged()
 	if (track == selected)
 		return;
 	selected = track;
-	updateTrackInfo(-1);
+	updateConductor(-1);
 
 	// Check if the selected track is inside the view, if not
 	// scroll the track to the center of the view
@@ -660,7 +659,7 @@ CItem* Composer::addCanvasPart(Track* t)
 void Composer::modeChange(int mode)
 {
 	song->setMType(MType(mode));
-	updateTrackInfo(-1);
+	updateConductor(-1);
 }
 
 //---------------------------------------------------------
@@ -810,28 +809,28 @@ void Composer::cmd(int cmd)
 	switch (cmd)
 	{
 		case CMD_CUT_PART:
-			ncmd = PartCanvas::CMD_CUT_PART;
+			ncmd = ComposerCanvas::CMD_CUT_PART;
 			break;
 		case CMD_COPY_PART:
-			ncmd = PartCanvas::CMD_COPY_PART;
+			ncmd = ComposerCanvas::CMD_COPY_PART;
 			break;
 		case CMD_PASTE_PART:
-			ncmd = PartCanvas::CMD_PASTE_PART;
+			ncmd = ComposerCanvas::CMD_PASTE_PART;
 			break;
 		case CMD_PASTE_CLONE_PART:
-			ncmd = PartCanvas::CMD_PASTE_CLONE_PART;
+			ncmd = ComposerCanvas::CMD_PASTE_CLONE_PART;
 			break;
 		case CMD_PASTE_PART_TO_TRACK:
-			ncmd = PartCanvas::CMD_PASTE_PART_TO_TRACK;
+			ncmd = ComposerCanvas::CMD_PASTE_PART_TO_TRACK;
 			break;
 		case CMD_PASTE_CLONE_PART_TO_TRACK:
-			ncmd = PartCanvas::CMD_PASTE_CLONE_PART_TO_TRACK;
+			ncmd = ComposerCanvas::CMD_PASTE_CLONE_PART_TO_TRACK;
 			break;
 		case CMD_INSERT_PART:
-			ncmd = PartCanvas::CMD_INSERT_PART;
+			ncmd = ComposerCanvas::CMD_INSERT_PART;
 			break;
 		case CMD_INSERT_EMPTYMEAS:
-			ncmd = PartCanvas::CMD_INSERT_EMPTYMEAS;
+			ncmd = ComposerCanvas::CMD_INSERT_EMPTYMEAS;
 			break;
 		default:
 			return;
@@ -905,13 +904,13 @@ void Composer::verticalScrollSetYpos(unsigned ypos)
 }
 
 //---------------------------------------------------------
-//   trackInfoScroll
+//   midiConductorScroll
 //---------------------------------------------------------
 
 void Composer::trackInfoScroll(int)
 {
-	//if (trackInfo->visibleWidget())
-	//	trackInfo->visibleWidget()->move(0, -y);
+	//if (midiConductor->visibleWidget())
+	//	midiConductor->visibleWidget()->move(0, -y);
 }
 
 //---------------------------------------------------------
@@ -921,7 +920,7 @@ void Composer::trackInfoScroll(int)
 void Composer::clear()
 {
 	selected = 0;
-	midiTrackInfo->setTrack(0);
+	midiConductor->setTrack(0);
 	foreach(Strip* strip, m_strips)
 	{
 		delete strip;
@@ -952,9 +951,9 @@ void Composer::controllerChanged(Track *t)
 void Composer::showTrackInfo(bool)
 {
 	//showTrackinfoFlag = flag;
-	//trackInfo->setVisible(flag);
+	//midiConductor->setVisible(flag);
 	//infoScroll->setVisible(flag);
-	updateTrackInfo(-1);
+	updateConductor(-1);
 }
 
 //---------------------------------------------------------
@@ -963,21 +962,21 @@ void Composer::showTrackInfo(bool)
 
 void Composer::genTrackInfo(QWidget*)
 {
-	midiTrackInfo = new MidiTrackInfo(this);
+	midiConductor = new Conductor(this);
 	foreach(QObject* obj, oom->resourceDock()->children())
 	{
 		obj->installEventFilter(this);
 	}
-	midiTrackInfo->groupBox->hide();
+	midiConductor->groupBox->hide();
 
 	_tvdock = new TrackViewDock(this);
-	//infoScroll->setWidget(midiTrackInfo);
+	//infoScroll->setWidget(midiConductor);
 	infoScroll->setWidgetResizable(true);
 	_rmdock = new RouteMapDock(this);
 	_commentdock = new CommentDock(this);
 	_rtabs->addTab(_tvdock, tr("   Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
-	_rtabs->addTab(midiTrackInfo, tr("   Conductor   "));
+	_rtabs->addTab(midiConductor, tr("   Conductor   "));
 	//_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
 	_rtabs->addTab(_commentdock, tr("  Comments  "));
 	_rtabs->addTab(_rmdock, tr("  Routes  "));
@@ -995,10 +994,10 @@ void Composer::genTrackInfo(QWidget*)
 }
 
 //---------------------------------------------------------
-//   updateTrackInfo
+//   updateConductor
 //---------------------------------------------------------
 
-void Composer::updateTrackInfo(int flags)
+void Composer::updateConductor(int flags)
 {
 	_commentdock->setTrack(selected);
 	if (!showTrackinfoFlag)
@@ -1016,12 +1015,12 @@ void Composer::updateTrackInfo(int flags)
 		if ((flags & SC_SELECTION) || (flags & SC_TRACK_REMOVED))
 			switchInfo(2);
 		// If a new part was selected, and only if it's different.
-		if ((flags & SC_SELECTION) && midiTrackInfo->track() != selected)
+		if ((flags & SC_SELECTION) && midiConductor->track() != selected)
 			// Set a new track and do a complete update.
-			midiTrackInfo->setTrack(selected);
+			midiConductor->setTrack(selected);
 		else
 			// Otherwise just regular update with specific flags.
-			midiTrackInfo->updateTrackInfo(flags);
+			midiConductor->updateConductor(flags);
 	}
 	else
 	{
@@ -1037,6 +1036,7 @@ void Composer::updateTrackInfo(int flags)
 void Composer::switchInfo(int n)/*{{{*/
 {
 	bool chview = false;
+        midiConductor->update();
 	if(selected && n == 2)
 	{
 		Strip* w = 0;
@@ -1152,7 +1152,7 @@ bool Composer::eventFilter(QObject *obj, QEvent *event)
 	// Force left/right arrow key events to move the focus
 	// back on the canvas if it doesn't have the focus.
 	// Currently the object that we're filtering is the
-	// midiTrackInfo.
+	// midiConductor.
 	if (event->type() == QEvent::KeyPress) {
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 		int key = keyEvent->key();

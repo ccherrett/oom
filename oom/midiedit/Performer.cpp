@@ -62,7 +62,7 @@
 #include "quantconfig.h"
 #include "shortcuts.h"
 
-#include "mtrackinfo.h"
+#include "Conductor.h"
 #include "tracklistview.h"
 #include "transporttools.h"
 #include "edittools.h"
@@ -545,40 +545,40 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());
 	//ctrl->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());  // Tim.
 
-	midiTrackInfo = new MidiTrackInfo(this, 0, _rasterInit, _quantInit);
-	midiTrackInfo->setObjectName("prTrackInfo");
-	midiTrackInfo->btnPrev->setIcon(*previousIconSet3);
-	midiTrackInfo->btnPrev->setIconSize(QSize(25, 25));
-	midiTrackInfo->btnPrev->setFixedSize(QSize(25, 25));
-	midiTrackInfo->btnPrev->setToolTip(tr("Select Previous Part"));
-	midiTrackInfo->btnNext->setIcon(*nextIconSet3);
-	midiTrackInfo->btnNext->setIconSize(QSize(25, 25));
-	midiTrackInfo->btnNext->setFixedSize(QSize(25, 25));
-	midiTrackInfo->btnNext->setToolTip(tr("Select Next Part"));
-	midiTrackInfo->btnPrev->setVisible(true);
-	midiTrackInfo->btnNext->setVisible(true);
-	connect(midiTrackInfo->btnPrev, SIGNAL(clicked()), this, SLOT(selectPrevPart()));
-	connect(midiTrackInfo->btnNext, SIGNAL(clicked()), this, SLOT(selectNextPart()));
-	int mtiw = 280; //midiTrackInfo->width(); // Save this.
-	//midiTrackInfo->setMinimumWidth(100);
-	midiTrackInfo->setMinimumSize(QSize(190,100));
-	//midiTrackInfo->setMaximumWidth(300);
+	midiConductor = new Conductor(this, 0, _rasterInit, _quantInit);
+	midiConductor->setObjectName("prTrackInfo");
+	midiConductor->btnPrev->setIcon(*previousIconSet3);
+	midiConductor->btnPrev->setIconSize(QSize(25, 25));
+	midiConductor->btnPrev->setFixedSize(QSize(25, 25));
+	midiConductor->btnPrev->setToolTip(tr("Select Previous Part"));
+	midiConductor->btnNext->setIcon(*nextIconSet3);
+	midiConductor->btnNext->setIconSize(QSize(25, 25));
+	midiConductor->btnNext->setFixedSize(QSize(25, 25));
+	midiConductor->btnNext->setToolTip(tr("Select Next Part"));
+	midiConductor->btnPrev->setVisible(true);
+	midiConductor->btnNext->setVisible(true);
+	connect(midiConductor->btnPrev, SIGNAL(clicked()), this, SLOT(selectPrevPart()));
+	connect(midiConductor->btnNext, SIGNAL(clicked()), this, SLOT(selectNextPart()));
+	int mtiw = 280; //midiConductor->width(); // Save this.
+	//midiConductor->setMinimumWidth(100);
+	midiConductor->setMinimumSize(QSize(190,100));
+	//midiConductor->setMaximumWidth(300);
 	// Catch left/right arrow key events for this widget so we
 	// can easily move the focus back from this widget to the canvas.
 	installEventFilter(this);
-	midiTrackInfo->installEventFilter(this);
-	midiTrackInfo->getView()->installEventFilter(this);
-	midiTrackInfo->getPatchListview()->installEventFilter(this);
+	midiConductor->installEventFilter(this);
+	midiConductor->getView()->installEventFilter(this);
+	midiConductor->getPatchListview()->installEventFilter(this);
 
-	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiTrackInfo, SLOT(updateSize()));
+	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiConductor, SLOT(updateSize()));
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
 	m_trackListView = new TrackListView(this ,this);
 
-	m_tabs->addTab(midiTrackInfo, tr("   The Conductor   "));
+	m_tabs->addTab(midiConductor, tr("   The Conductor   "));
 	m_tabs->addTab(m_trackListView, tr("   Track List   "));
 	m_tabs->addTab(info, tr("   Note Info   "));
-	//hsplitter->addWidget(midiTrackInfo);
+	//hsplitter->addWidget(midiConductor);
 	hsplitter->addWidget(splitter);
 
 	mainGrid->setRowStretch(0, 100);
@@ -647,7 +647,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(tools22, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 
 	connect(noteAlphaAction, SIGNAL(toggled(bool)), canvas, SLOT(update()));
-    //connect(midiTrackInfo, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
+    //connect(midiConductor, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
 	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
     connect(ctrl, SIGNAL(clicked()), SLOT(addCtrl()));
     connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
@@ -681,12 +681,12 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
 	connect(m_globalArmAction, SIGNAL(triggered()), canvas, SLOT(recordArmAll()));
 	connect(m_globalKeyAction, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
-	connect(m_globalKeyAction, SIGNAL(toggled(bool)), midiTrackInfo, SLOT(setGlobalState(bool)));
+	connect(m_globalKeyAction, SIGNAL(toggled(bool)), midiConductor, SLOT(setGlobalState(bool)));
 	connect(m_globalKeyAction, SIGNAL(toggled(bool)), this, SLOT(toggleEpicEdit(bool)));
 	connect(multiPartSelectionAction, SIGNAL(toggled(bool)), this, SLOT(toggleMultiPartSelection(bool)));
-	connect(midiTrackInfo, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
-	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
-	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
+	connect(midiConductor, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
+	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
+	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
 	connect(m_muteAction, SIGNAL(triggered(bool)), this, SLOT(toggleMuteCurrentPart(bool)));
 
     connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
@@ -711,15 +711,15 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
     connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
     connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-    //connect(pcbar, SIGNAL(selectInstrument()), midiTrackInfo, SLOT(instrPopup()));
-    connect(pcbar, SIGNAL(addProgramChange(Part*, unsigned)), midiTrackInfo, SLOT(insertMatrixEvent(Part*, unsigned)));
-    connect(midiTrackInfo, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
-    connect(midiTrackInfo, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
-    connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
-    connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
-    connect(canvas, SIGNAL(partChanged(Part*)), midiTrackInfo, SLOT(editorPartChanged(Part*)));
+    //connect(pcbar, SIGNAL(selectInstrument()), midiConductor, SLOT(instrPopup()));
+    connect(pcbar, SIGNAL(addProgramChange(Part*, unsigned)), midiConductor, SLOT(insertMatrixEvent(Part*, unsigned)));
+    connect(midiConductor, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
+    connect(midiConductor, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
+    connect(midiConductor, SIGNAL(toChanged(int)), SLOT(setTo(int)));
+    connect(midiConductor, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
+    connect(canvas, SIGNAL(partChanged(Part*)), midiConductor, SLOT(editorPartChanged(Part*)));
     connect(m_soloAction, SIGNAL(triggered(bool)), SLOT(soloChanged(bool)));
-	connect(midiTrackInfo, SIGNAL(patchChanged(Patch*)), this ,SLOT(setKeyBindings(Patch*)));
+	connect(midiConductor, SIGNAL(patchChanged(Patch*)), this ,SLOT(setKeyBindings(Patch*)));
     //connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
 
     setFocusPolicy(Qt::StrongFocus);
@@ -748,7 +748,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 		canvas->track()->setSelected(true);
 		song->update(SC_SELECTION);
 
-	 	updateTrackInfo();
+	 	updateConductor();
 	 	m_soloAction->blockSignals(true);
 	 	m_soloAction->setChecked(canvas->track()->solo());
 	 	m_soloAction->blockSignals(false);
@@ -771,7 +771,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	bool showcomment = tconfig().get_property("PerformerEdit", "showcomments", false).toBool();
 	//printf("Canvas show comments: %d\n", showcomment);
-	midiTrackInfo->updateCommentState(showcomment, false);
+	midiConductor->updateCommentState(showcomment, false);
 	CtrlEdit* mainVol = addCtrl();
 	if (!mainVol->setType(QString("MainVolume")))
 		removeCtrl(mainVol);
@@ -844,7 +844,7 @@ void Performer::setCurCanvasPart(Part* part)
 		m_muteAction->setChecked(part->mute());
 		m_muteAction->blockSignals(false);
 	}
-	updateTrackInfo();
+	updateConductor();
 	song->update(SC_SELECTION);
 }
 
@@ -863,10 +863,10 @@ void Performer::songChanged1(int bits)
 	//	return;
 	//}
 	songChanged(bits);
-	//trackInfo->songChanged(bits);
+	//midiConductor->songChanged(bits);
 	// We'll receive SC_SELECTION if a different part is selected.
 	if (bits & SC_SELECTION)
-		updateTrackInfo();
+		updateConductor();
 	if (bits & SC_MUTE)
 	{
 		Part* part = curCanvasPart();
@@ -911,7 +911,7 @@ void Performer::dockAreaChanged(Qt::DockWidgetArea area)
 void Performer::configChanged()
 {
 	initShortcuts();
-	//trackInfo->updateTrackInfo();
+	//midiConductor->updateConductor();
 }
 
 //---------------------------------------------------------
@@ -934,18 +934,18 @@ void Performer::updateHScrollRange()
 		hscroll->setRange(s, e);
 }
 
-void Performer::updateTrackInfo()
+void Performer::updateConductor()
 {
 	if(selected != curCanvasPart()->track())
 	{
 		selected = curCanvasPart()->track();
 		if (selected->isMidiTrack())
 		{
-			midiTrackInfo->setTrack(selected);
-			///midiTrackInfo->updateTrackInfo(-1);
+			midiConductor->setTrack(selected);
+			///midiConductor->updateConductor(-1);
 		}
 	}
-	midiTrackInfo->updateCommentState(canvas->showComments(), false);
+	midiConductor->updateCommentState(canvas->showComments(), false);
 }
 
 //---------------------------------------------------------
@@ -1420,8 +1420,8 @@ void Performer::readStatus(Xml& xml)
 			{
 				_quantInit = _quant;
 				_rasterInit = _raster;
-				midiTrackInfo->setRaster(_raster);
-				midiTrackInfo->setQuant(_quant);
+				midiConductor->setRaster(_raster);
+				midiConductor->setQuant(_quant);
 				canvas->redrawGrid();
 				return;
 			}
@@ -1448,7 +1448,7 @@ bool Performer::eventFilter(QObject *obj, QEvent *event)
 	// Force left/right arrow key events to move the focus
 	// back on the canvas if it doesn't have the focus.
 	// Currently the object that we're filtering is the
-	// midiTrackInfo.
+	// midiConductor.
 	if (event->type() == QEvent::KeyPress) {
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 		int key = keyEvent->key();
@@ -1469,11 +1469,11 @@ bool Performer::eventFilter(QObject *obj, QEvent *event)
 		{
 			if (canvas->hasFocus())
 			{
-				midiTrackInfo->getPatchListview()->setFocus();
+				midiConductor->getPatchListview()->setFocus();
 			}
-			else if (midiTrackInfo->getPatchListview()->hasFocus())
+			else if (midiConductor->getPatchListview()->hasFocus())
 			{
-				midiTrackInfo->getView()->setFocus();
+				midiConductor->getView()->setFocus();
 			}
 			else
 			{
@@ -1493,12 +1493,12 @@ bool Performer::eventFilter(QObject *obj, QEvent *event)
 		}
 		if(key == shortcuts[SHRT_SEL_INSTRUMENT].key)
 		{
-			midiTrackInfo->addSelectedPatch();
+			midiConductor->addSelectedPatch();
 			return true;
 		}
 		if(key == shortcuts[SHRT_PREVIEW_INSTRUMENT].key)
 		{
-			midiTrackInfo->previewSelectedPatch();
+			midiConductor->previewSelectedPatch();
 			return true;
 		}
 		else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
@@ -1509,12 +1509,12 @@ bool Performer::eventFilter(QObject *obj, QEvent *event)
 				for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
 				{
 					Part* part = ip->second;
-					midiTrackInfo->insertMatrixEvent(part, utick);
+					midiConductor->insertMatrixEvent(part, utick);
 				}
 			}
 			else
 			{
-				midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick);
+				midiConductor->insertMatrixEvent(curCanvasPart(), utick);
 			}
 			return true;
 		}
@@ -1771,7 +1771,7 @@ void Performer::keyPressEvent(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_SEL_INSTRUMENT].key)
 	{
-		midiTrackInfo->addSelectedPatch();
+		midiConductor->addSelectedPatch();
 		return;
 	}
 	else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
@@ -1782,14 +1782,14 @@ void Performer::keyPressEvent(QKeyEvent* event)
 			for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
 			{
 				Part* part = ip->second;
-				midiTrackInfo->insertMatrixEvent(part, utick);
+				midiConductor->insertMatrixEvent(part, utick);
 			}
 		}
 		else
 		{
-			midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick);
+			midiConductor->insertMatrixEvent(curCanvasPart(), utick);
 		}
-		//midiTrackInfo->insertMatrixEvent(curCanvasPart(), utick); //progRecClicked();
+		//midiConductor->insertMatrixEvent(curCanvasPart(), utick); //progRecClicked();
 		return;
 	}
 	if(key == shortcuts[SHRT_COPY_PROGRAM].key)
@@ -2052,8 +2052,8 @@ void Performer::keyPressEvent(QKeyEvent* event)
 	}
 	setQuant(val);
 	setRaster(val);
-	midiTrackInfo->setQuant(_quant);
-	midiTrackInfo->setRaster(_raster);
+	midiConductor->setQuant(_quant);
+	midiConductor->setRaster(_raster);
 }
 
 //---------------------------------------------------------
@@ -2440,10 +2440,10 @@ void Performer::newCanvasWidth(int /*w*/)
 
 void Performer::splitterMoved(int pos, int)
 {
-	if(pos < midiTrackInfo->minimumSize().width())
+	if(pos < midiConductor->minimumSize().width())
 	{
 		QList<int> def;
-		def.append(midiTrackInfo->minimumSize().width());
+		def.append(midiConductor->minimumSize().width());
 		def.append(50);
 		hsplitter->setSizes(def);
 	}

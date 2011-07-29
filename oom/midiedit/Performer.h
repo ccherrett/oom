@@ -48,7 +48,7 @@ class QMenu;
 class QAction;
 class QWidget;
 class QScrollBar;
-class MidiTrackInfo;
+class Conductor;
 class QScrollArea;
 class Piano;
 class Patch;
@@ -74,7 +74,7 @@ class Performer : public MidiEditor
 
 
     QMenu *menuEdit, *menuFunctions, *menuSelect, *menuConfig, *eventColor, *menuPlugins;
-    MidiTrackInfo *midiTrackInfo;
+    Conductor *midiConductor;
     Track* selected;
     PCScale* pcbar;
 	Piano* piano;
@@ -225,7 +225,7 @@ private slots:
     void songChanged1(int);
     void configChanged();
     void newCanvasWidth(int);
-    void updateTrackInfo();
+    void updateConductor();
 	void splitterMoved(int, int);
 	void dockAreaChanged(Qt::DockWidgetArea);
 	void selectPrevPart();

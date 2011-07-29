@@ -6215,7 +6215,7 @@ Enabled inputs in the list will
     </message>
 </context>
 <context>
-    <name>MidiTrackInfoBase</name>
+    <name>ConductorBase</name>
     <message>
         <source>OOMidi: TrackInfo</source>
         <translation>Info o śladzie</translation>

@@ -23,8 +23,8 @@
 #
 QT4_WRAP_CPP (composer_mocs
       Composer.h 
-      pcanvas.h 
-	  headerlist.h
+      ComposerCanvas.h 
+	  HeaderList.h
       )
 
 #
@@ -32,8 +32,8 @@ QT4_WRAP_CPP (composer_mocs
 #
 file (GLOB composer_source_files
       Composer.cpp
-      pcanvas.cpp
-	  headerlist.cpp
+      ComposerCanvas.cpp
+	  HeaderList.cpp
       )
 
 #

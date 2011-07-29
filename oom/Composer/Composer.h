@@ -11,8 +11,8 @@
 #include <vector>
 
 #include "midieditor.h"
-#include "pcanvas.h"
-#include "trackautomationview.h"
+#include "ComposerCanvas.h"
+//#include "trackautomationview.h"
 
 class QAction;
 class QCheckBox;
@@ -34,7 +34,7 @@ class Xml;
 class Splitter;
 class LabelCombo;
 class PosLabel;
-class MidiTrackInfo;
+class Conductor;
 class AudioStrip;
 class Strip;
 class SpinBox;
@@ -57,14 +57,14 @@ class Composer : public QWidget
     Q_OBJECT
 
     int _quant, _raster;
-    PartCanvas* canvas;
+    ComposerCanvas* canvas;
     ScrollScale* hscroll;
     QScrollBar* vscroll;
 	HeaderList* m_trackheader;
     MTScale* time;
     SpinBox* lenEntry;
     bool showTrackinfoFlag;
-    MidiTrackInfo* midiTrackInfo;
+    Conductor* midiConductor;
 	QScrollArea *infoScroll;
 	QScrollArea *listScroll;
 	QScrollArea *mixerScroll;
@@ -138,7 +138,7 @@ protected:
 public slots:
     void dclickPart(Track*);
     void setTool(int);
-    void updateTrackInfo(int flags);
+    void updateConductor(int flags);
     void configChanged();
     void controllerChanged(Track *t);
     void showTrackViews();
@@ -157,7 +157,7 @@ public:
     Composer(QMainWindow* parent, const char* name = 0);
 	~Composer();
 
-    PartCanvas* getCanvas()
+    ComposerCanvas* getCanvas()
     {
 		return canvas;
     }

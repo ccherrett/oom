@@ -1,16 +1,17 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: pcanvas.h,v 1.11.2.4 2009/05/24 21:43:44 terminator356 Exp $
+//    $Id: $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //=========================================================
 
-#ifndef __PCANVAS_H__
-#define __PCANVAS_H__
+#ifndef __COMPOSERCANVAS_H__
+#define __COMPOSERCANVAS_H__
 
 #include "song.h"
 #include "canvas.h"
-#include "trackautomationview.h"
+//#include "trackautomationview.h"
 #include <QHash>
 #include <QIcon>
 #include <QPixmap>
@@ -74,10 +75,10 @@ class CtrlList;
 class CurveNodeSelection;
 
 //---------------------------------------------------------
-//   PartCanvas
+//   ComposerCanvas
 //---------------------------------------------------------
 
-class PartCanvas : public Canvas
+class ComposerCanvas : public Canvas
 {
     Q_OBJECT
     int* _raster;
@@ -181,7 +182,7 @@ public:
 	CMD_INSERT_PART, CMD_INSERT_EMPTYMEAS
     };
 
-    PartCanvas(int* raster, QWidget* parent, int, int);
+    ComposerCanvas(int* raster, QWidget* parent, int, int);
     void partsChanged();
     void cmd(int);
     void controllerChanged(Track *t);

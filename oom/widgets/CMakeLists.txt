@@ -65,7 +65,7 @@ QT4_WRAP_CPP (widget_mocs
 	  rmapdialog.h
 	  pctablemodel.h
 	  pctable.h
-      mtrackinfo.h
+      Conductor.h
       nentry.h  
       noteinfo.h  
       pitchedit.h  
@@ -136,7 +136,7 @@ file (GLOB widgets_ui_files
 	  #midisync.ui  
       mittransposebase.ui  
       mixdowndialogbase.ui  
-      mtrackinfobase.ui
+      ConductorBase.ui
       projectcreate.ui
       shortcutcapturedialogbase.ui  
       shortcutconfigbase.ui  
@@ -188,7 +188,7 @@ file (GLOB widgets_source_files
       mixdowndialog.cpp 
       mlabel.cpp 
       mmath.cpp
-      mtrackinfo.cpp
+      Conductor.cpp
 	  tvieweditor.cpp
 	  tviewdock.cpp
 	  tracklistview.cpp

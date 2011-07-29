@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MidiTrackInfoBase</class>
- <widget class="QFrame" name="MidiTrackInfoBase">
+ <class>ConductorBase</class>
+ <widget class="QFrame" name="ConductorBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>OOMidi: TrackInfo</string>
+   <string>OOMidi: The Conductor</string>
   </property>
   <property name="frameShape">
    <enum>QFrame::StyledPanel</enum>
@@ -190,8 +190,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>185</width>
-         <height>521</height>
+         <width>188</width>
+         <height>520</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">

@@ -4,10 +4,10 @@
 //  (C) Copyright 2010 Werner Schweer and others (ws@seh.de)
 //=========================================================
 
-#ifndef __MTRACKINFO_H__
-#define __MTRACKINFO_H__
+#ifndef __CONDUCTOR_H__
+#define __CONDUCTOR_H__
 
-#include "ui_mtrackinfobase.h"
+#include "ui_ConductorBase.h"
 #include "pctablemodel.h"
 #include "pctable.h"
 #include <QToolBar>
@@ -29,10 +29,10 @@ class QItemSelectionModel;
 class Patch;
 
 //---------------------------------------------------------
-//   MidiTrackInfo
+//   Conductor
 //---------------------------------------------------------
 
-class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
+class Conductor : public QFrame/*QWidget*/, public Ui::ConductorBase {
     Q_OBJECT
 
 	//ToolBar1 merge
@@ -49,15 +49,15 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
     ProgramChangeTable* tableView;
     QList<int>* _matrix;
     ProgramChangeTableModel* _tableModel;
-	QItemSelectionModel* _selModel;
-	QItemSelectionModel* _patchSelModel;
-	QStandardItemModel* _patchModel;
+    QItemSelectionModel* _selModel;
+    QItemSelectionModel* _patchSelModel;
+    QStandardItemModel* _patchModel;
     bool editing;
-	bool _useMatrix;
-	bool _autoExapand;
-	bool _resetProgram;
-	bool m_globalState;
-	Part* m_eventPart;
+    bool _useMatrix;
+    bool _autoExapand;
+    bool _resetProgram;
+    bool m_globalState;
+    Part* m_eventPart;
     virtual void showEvent(QShowEvent *);
 
 private slots:
@@ -86,21 +86,21 @@ private slots:
     //void routingPopupViewActivated(const QModelIndex&);
     void toggleAdvanced(int);
     void matrixItemChanged(QStandardItem*);
-	void matrixSelectionChanged(QItemSelection, QItemSelection);
+    void matrixSelectionChanged(QItemSelection, QItemSelection);
     void deleteSelectedPatches(bool);
     void movePatchUp(bool);
     void movePatchDown(bool);
     void patchSequenceInserted(QModelIndex, int, int);
     void patchSequenceRemoved(QModelIndex, int, int);
     void patchSequenceClicked(QModelIndex);
-	void clonePatchSequence();
-	void patchDoubleClicked(QModelIndex);
-	void patchClicked(QModelIndex);
-	void patchSelectionChanged(QItemSelection, QItemSelection);
-	void editorPartChanged(Part*);
-	void transposeStateChanged(bool);
+    void clonePatchSequence();
+    void patchDoubleClicked(QModelIndex);
+    void patchClicked(QModelIndex);
+    void patchSelectionChanged(QItemSelection, QItemSelection);
+    void editorPartChanged(Part*);
+    void transposeStateChanged(bool);
     //tb1
-	void _rasterChanged(int);
+    void _rasterChanged(int);
     void _quantChanged(int);
 	//end
 
@@ -117,24 +117,27 @@ public slots:
     void insertMatrixEvent(Part*, unsigned);
     void updateSize();
     void populateMatrix();
-	void populatePatches();
+    void populatePatches();
     void updateTableHeader();
     void rebuildMatrix();
-	void addSelectedPatch();
-	void previewSelectedPatch();
-	void updateCommentState(bool, bool = true);
-	void setGlobalState(bool state) { m_globalState = state; }
-	//tb1
+    void addSelectedPatch();
+    void previewSelectedPatch();
+    void updateCommentState(bool, bool = true);
+
+    void setGlobalState(bool state) {
+        m_globalState = state;
+    }
+    //tb1
     void setRaster(int);
     void setQuant(int);
-	//end
+    //end
 
 signals:
     void outputPortChanged(int);
-	void updateCurrentPatch(QString);
-	void patchChanged(Patch*);
-	void globalTransposeClicked(bool);
-	void toggleComments(bool);
+    void updateCurrentPatch(QString);
+    void patchChanged(Patch*);
+    void globalTransposeClicked(bool);
+    void toggleComments(bool);
 	//tb1
     void rasterChanged(int);
     void quantChanged(int);
@@ -143,8 +146,8 @@ signals:
 	//end
 
 public:
-    MidiTrackInfo(QWidget*, Track* = 0, int rast = 96, int quant = 96);
-	~MidiTrackInfo();
+    Conductor(QWidget*, Track* = 0, int rast = 96, int quant = 96);
+    ~Conductor();
 
     Track* track() const {
 	return selected;
@@ -159,7 +162,7 @@ public:
     }
     void setLabelText();
     void setLabelFont();
-    void updateTrackInfo(int);
+    void updateConductor(int);
     void setSolo(bool val);
 };
 
