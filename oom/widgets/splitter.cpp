@@ -66,21 +66,21 @@ void Splitter::saveStateInfo()
 
 void Splitter::showEvent(QShowEvent*)
 {
-	if(!m_configured)
+	/*if(!m_configured)
 	{
 		QList<int> vl;
 	
-		QString str = tconfig().get_property(objectName(), "sizes", "200 50").toString();
-		QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
+		//QString str = tconfig().get_property(objectName(), "sizes", "200 50").toString();
+		//QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
 		for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
 		{
 			int val = (*it).toInt();
 			vl.append(val);
 		}
 	
-		setSizes(vl);
+		//setSizes(vl);
 		m_configured = true;
-	}
+	}*/
 }
 
 //---------------------------------------------------------
@@ -111,7 +111,7 @@ void Splitter::writeStatus(int level, Xml& xml)
 
 void Splitter::readStatus(Xml& /*xml*/)
 {
-	QList<int> vl;
+	/*QList<int> vl;
 
 	QString str = tconfig().get_property(objectName(), "sizes", "200 50").toString();
 	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
@@ -122,7 +122,7 @@ void Splitter::readStatus(Xml& /*xml*/)
 	}
 
 	setSizes(vl);
-	return;
+	return;*/
 	/*for (;;)
 	{
 		Xml::Token token = xml.parse();
