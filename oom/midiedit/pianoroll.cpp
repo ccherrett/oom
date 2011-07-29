@@ -680,7 +680,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(midiTrackInfo, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
 	connect(midiTrackInfo, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
-	connect(m_mutePart, SIGNAL(toggled(bool)), this, SLOT(toggleMuteCurrentPart(bool)));
+	connect(m_muteAction, SIGNAL(triggered(bool)), this, SLOT(toggleMuteCurrentPart(bool)));
 
     connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
     piano->setYPos(KH * 30);
@@ -745,6 +745,13 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	 	m_soloAction->blockSignals(true);
 	 	m_soloAction->setChecked(canvas->track()->solo());
 	 	m_soloAction->blockSignals(false);
+		Part* part = curCanvasPart();
+		if(part)
+		{
+			m_muteAction->blockSignals(true);
+			m_muteAction->setChecked(part->mute());
+			m_muteAction->blockSignals(false);
+		}
     }
 
     unsigned pos;
@@ -796,10 +803,11 @@ void PianoRoll::setCurCanvasPart(Part* part)
 {
 	if (canvas)
 	{
+		printf("PianoRoll::setCurCanvasPart\n");
 		canvas->setCurrentPart(part);
-		m_mutePart->blockSignals(true);
-		m_mutePart->setChecked(part->mute());
-		m_mutePart->blockSignals(false);
+		m_muteAction->blockSignals(true);
+		m_muteAction->setChecked(part->mute());
+		m_muteAction->blockSignals(false);
 	}
 	updateTrackInfo();
 	song->update(SC_SELECTION);
@@ -824,6 +832,16 @@ void PianoRoll::songChanged1(int bits)
 	// We'll receive SC_SELECTION if a different part is selected.
 	if (bits & SC_SELECTION)
 		updateTrackInfo();
+	if (bits & SC_MUTE)
+	{
+		Part* part = curCanvasPart();
+		if(part)
+		{
+			m_muteAction->blockSignals(true);
+			m_muteAction->setChecked(part->mute());
+			m_muteAction->blockSignals(false);
+		}
+	}	
 }
 
 void PianoRoll::selectPrevPart()

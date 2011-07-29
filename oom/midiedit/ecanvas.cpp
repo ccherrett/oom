@@ -227,7 +227,13 @@ void EventCanvas::songChanged(int flags)/*{{{*/
 	}
 	emit selectionChanged(x, event, part);
     if (_curPart == 0)
+	{
 		_curPart = (MidiPart*) (editor->parts()->begin()->second);
+		if(_curPart)
+		{
+			editor->setCurCanvasPart(_curPart);
+		}
+	}	
 
 	updateCItemsZValues();
 

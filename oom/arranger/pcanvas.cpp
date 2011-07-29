@@ -1314,6 +1314,7 @@ void PartCanvas::mousePress(QMouseEvent* event)
 			NPart* np = (NPart*) item;
 			Part* p = np->part();
 			p->setMute(!p->mute());
+			song->update(SC_MUTE);
 			redraw();
 			break;
 		}
