@@ -115,12 +115,12 @@ TempoSig::TempoSig(QWidget* parent)
 	l2->setFocusPolicy(Qt::NoFocus);
 	vb2->addWidget(l2);
 
+	l3 = new QLabel(tr("Tempo/TSig"));
+	//l3->setFont(config.fonts[2]);
+	vb1->addWidget(l3);
+
 	f->setLayout(vb2);
 	vb1->addWidget(f);
-
-	l3 = new QLabel(tr("Tempo/Sig"));
-	l3->setFont(config.fonts[2]);
-	vb1->addWidget(l3);
 
 	l1->setBackgroundRole(QPalette::Light);
 	l1->setAlignment(Qt::AlignCenter);
@@ -388,7 +388,7 @@ Transport::Transport(QWidget* parent, const char* name)
 	tempo->setFocusPolicy(Qt::NoFocus);
 	box5->addWidget(tempo);
 
-	masterButton = newButton(tr("Master"), tr("use master track"), true);
+	masterButton = newButton(tr("Tempo"), tr("Apply Tempo Editor events to song"), true);
 	masterButton->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
 	masterButton->setFocusPolicy(Qt::NoFocus);
 	box5->addWidget(masterButton);
