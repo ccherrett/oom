@@ -4474,7 +4474,7 @@ void PartCanvas::processAutomationMovements(QMouseEvent *event)
 			if (cv.getFrame() == currFrame) {
 				automation.currentCtrlVal = &cv;
 				automation.controllerState = movingController;
-				printf("Adding new node to selectio----------------n\n");
+				//printf("Adding new node to selectio----------------n\n");
 				_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
 				break;
 			}

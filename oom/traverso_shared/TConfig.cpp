@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA.
 */
 
 #include "TConfig.h"
+#include "config.h"
 
 #include <QSettings>
 #include <QString>
@@ -40,7 +41,7 @@ TConfig::~ TConfig( )
 
 void TConfig::load_configuration()
 {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "OpenOctaveMidi", "oom2");
+        QSettings settings(QSettings::IniFormat, QSettings::UserScope, PACKAGE_NAME, "oom-"VERSION);
 	
 	QStringList keys = settings.allKeys();
 	
@@ -51,7 +52,7 @@ void TConfig::load_configuration()
 
 void TConfig::reset_settings( )
 {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "OpenOctaveMidi", "oom2");
+        QSettings settings(QSettings::IniFormat, QSettings::UserScope, PACKAGE_NAME, "oom-"VERSION);
 
 	settings.clear();
 
@@ -65,7 +66,7 @@ void TConfig::reset_settings( )
 
 void TConfig::check_and_load_configuration( )
 {
-        QSettings::setPath (QSettings::IniFormat, QSettings::UserScope, QDir::homePath () + "/.oom");
+        QSettings::setPath (QSettings::IniFormat, QSettings::UserScope, QDir::homePath () + "/.config");
 
         load_configuration();
 
@@ -78,7 +79,7 @@ void TConfig::check_and_load_configuration( )
 
 void TConfig::save( )
 {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "OpenOctaveMidi", "oom2");
+        QSettings settings(QSettings::IniFormat, QSettings::UserScope, PACKAGE_NAME, "oom-"VERSION);
 
 	QHash<QString, QVariant>::const_iterator i = m_configs.constBegin();
 	
