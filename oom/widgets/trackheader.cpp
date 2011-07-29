@@ -1403,9 +1403,32 @@ bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 {
 	if(!m_processEvents)
 		return true;
-	if (event->type() == QEvent::MouseButtonPress) {
+	if (event->type() & (QEvent::MouseButtonPress | QEvent::MouseMove | QEvent::MouseButtonRelease))
+	{
+		bool alltype = false;
+		bool isname = false;
+		if(obj == m_trackName)
+		{
+			isname = true;
+			QLineEdit* tname = static_cast<QLineEdit*>(obj);
+			if(tname && tname->isReadOnly())
+			{
+				alltype = true;
+			}
+		}
+		if(alltype && isname)
+		{
+			QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
+			mousePressEvent(mEvent);
+			mode = NORMAL;
+			return true;
+			//return QObject::eventFilter(obj, event);
+		}
+	}
+	if (event->type() == QEvent::MouseButtonPress)
+	{
 		QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
-		if(mEvent && mEvent->button() == Qt::LeftButton)
+		if(mEvent && mEvent->button() == Qt::LeftButton )
 		{
 			mousePressEvent(mEvent);
 			mode = NORMAL;
@@ -1416,7 +1439,6 @@ bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 			mode = NORMAL;
 		}
 	}
-
 	// standard event processing
 	return QObject::eventFilter(obj, event);
 
