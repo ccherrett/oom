@@ -397,6 +397,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 
     m_mutePart = new QToolButton();
 	m_muteAction = new QAction(this);
+	m_muteAction->setShortcut(shortcuts[SHRT_PART_TOGGLE_MUTE].key);
 	m_muteAction->setToolTip(tr("Mute current part"));
 	//m_muteAction->setIconSize(soloIconOn->size());
 	m_muteAction->setIcon(*muteIconSet3);
@@ -710,7 +711,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(midiTrackInfo, SIGNAL(toChanged(int)), SLOT(setTo(int)));
     connect(midiTrackInfo, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
     connect(canvas, SIGNAL(partChanged(Part*)), midiTrackInfo, SLOT(editorPartChanged(Part*)));
-    connect(solo, SIGNAL(toggled(bool)), SLOT(soloChanged(bool)));
+    connect(m_soloAction, SIGNAL(triggered(bool)), SLOT(soloChanged(bool)));
 	connect(midiTrackInfo, SIGNAL(patchChanged(Patch*)), this ,SLOT(setKeyBindings(Patch*)));
     //connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
 
@@ -741,9 +742,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 		song->update(SC_SELECTION);
 
 	 	updateTrackInfo();
-	 	solo->blockSignals(true);
-	 	solo->setChecked(canvas->track()->solo());
-	 	solo->blockSignals(false);
+	 	m_soloAction->blockSignals(true);
+	 	m_soloAction->setChecked(canvas->track()->solo());
+	 	m_soloAction->blockSignals(false);
     }
 
     unsigned pos;
@@ -813,9 +814,9 @@ void PianoRoll::songChanged1(int bits)
 
 	//if (bits & SC_SOLO)
 	//{
-		solo->blockSignals(true);
-		solo->setChecked(canvas->track()->solo());
-		solo->blockSignals(false);
+		m_soloAction->blockSignals(true);
+		m_soloAction->setChecked(canvas->track()->solo());
+		m_soloAction->blockSignals(false);
 	//	return;
 	//}
 	songChanged(bits);

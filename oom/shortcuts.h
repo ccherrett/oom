@@ -201,6 +201,8 @@ enum
     SHRT_SEL_LEFT_ADD, //move left and add to selection
     SHRT_SEL_RIGHT, //Right
     SHRT_SEL_RIGHT_ADD, //move right and add to selection
+    SHRT_INC_PITCH_OCTAVE,
+    SHRT_DEC_PITCH_OCTAVE,
     SHRT_INC_PITCH,
     SHRT_DEC_PITCH,
     SHRT_INC_POS,
@@ -318,6 +320,7 @@ enum
     SHRT_RMOVE_SELECT, //Move to next program change right Ctrl+Alt+right
     SHRT_SEL_INSTRUMENT,
     SHRT_PREVIEW_INSTRUMENT,
+    SHRT_PART_TOGGLE_MUTE,
 
     // Shortcuts for tools
     // global

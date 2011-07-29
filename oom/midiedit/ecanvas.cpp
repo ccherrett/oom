@@ -797,6 +797,14 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			}
 		}
 	}
+	else if (key == shortcuts[SHRT_INC_PITCH_OCTAVE].key)
+	{
+		modifySelected(NoteInfo::VAL_PITCH, 12);
+	}
+	else if (key == shortcuts[SHRT_DEC_PITCH_OCTAVE].key)
+	{
+		modifySelected(NoteInfo::VAL_PITCH, -12);
+	}
 	else if (key == shortcuts[SHRT_INC_PITCH].key)
 	{
 		modifySelected(NoteInfo::VAL_PITCH, 1);
