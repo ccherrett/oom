@@ -85,6 +85,13 @@ Slider::Slider(QWidget *parent, const char *name,
 	setOrientation(orient);
 }
 
+void Slider::setSliderBackground(QColor color)
+{
+	d_sliderBgColor = QColor(color);
+	update();
+}
+
+
 //------------------------------------------------------------
 //.F  Slider::~Slider
 //    Destructor

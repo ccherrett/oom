@@ -296,7 +296,9 @@ int lastTrackPartColorIndex = 1;
 
 QList<QIcon> partColorIcons;
 QList<QIcon> partColorIconsSelected;
+QHash<int, QColor> g_trackColorListLine;
 QHash<int, QColor> g_trackColorList;
+QHash<int, QColor> g_trackColorListSelected;
 QHash<int, QPixmap> g_trackDragImageList;
 
 //---------------------------------------------------------

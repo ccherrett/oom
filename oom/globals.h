@@ -204,7 +204,9 @@ extern void undoSetuid();
 extern bool checkAudioDevice();
 extern QList<QIcon> partColorIcons;
 extern QList<QIcon> partColorIconsSelected;
+extern QHash<int, QColor> g_trackColorListLine;
 extern QHash<int, QColor> g_trackColorList;
+extern QHash<int, QColor> g_trackColorListSelected;
 extern QHash<int, QPixmap> g_trackDragImageList;
 #ifdef LV2_SUPPORT
 struct LV2World;
