@@ -2017,6 +2017,17 @@ void PianoRoll::keyPressEvent(QKeyEvent* event)
 		m_speakerAction->toggle();
 		return;
 	}
+	else if (key == shortcuts[SHRT_START_REC].key)
+	{
+		//
+		if (!audio->isPlaying())
+		{
+			checkPartLengthForRecord(!song->record());
+			song->setRecord(!song->record());
+		}
+		//printf("Record key pressed from PR\n");
+		return;
+	}
 	else
 	{ //Default:
 		event->ignore();
