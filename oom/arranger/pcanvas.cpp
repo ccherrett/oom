@@ -1314,6 +1314,7 @@ void PartCanvas::mousePress(QMouseEvent* event)
 			NPart* np = (NPart*) item;
 			Part* p = np->part();
 			p->setMute(!p->mute());
+			song->update(SC_MUTE);
 			redraw();
 			break;
 		}
@@ -2324,18 +2325,6 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 
 	p.setPen(Qt::black);
 	//p.setPen(Qt::NoPen);
-	if (part->mute())
-	{
-		QColor c(Qt::white);
-		c.setAlpha(config.globalAlphaBlend);
-		p.setBrush(c);
-
-		// NOTE: For one-pixel border use first line For two-pixel border use second.
-		p.drawRect(QRect(r.x(), r.y(), r.width(), r.height()-1));
-		//p.drawRect(r);
-
-		return;
-	}
 	if(item->isMoving())
 	{
 		QColor c(Qt::gray);
@@ -2378,6 +2367,35 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		
 	}
 	p.drawRect(QRect(r.x(), r.y(), r.width(), mp ? r.height()-2 : r.height()-1));
+	if (part->mute())
+	{
+		//QColor c(Qt::white);
+		//c.setAlpha(config.globalAlphaBlend);
+		//p.setBrush(c);
+		//QPen mutePen;// = QPen(partColorAutomation, 2, Qt::BDiagPattern);
+		//mutePen.setColor(partWaveColor);
+		//mutePen.setCosmetic(true);
+		//p.setPen(mutePen);
+		QBrush muteBrush;
+		muteBrush.setStyle(Qt::HorPattern);
+		if(part->selected())
+		{
+			partColor.setAlpha(120);
+			muteBrush.setColor(partColor);
+		}
+		else
+		{
+			partWaveColor.setAlpha(120);
+			muteBrush.setColor(partWaveColor);
+		}
+		p.setBrush(muteBrush);
+
+		// NOTE: For one-pixel border use first line For two-pixel border use second.
+		p.drawRect(QRect(r.x(), r.y(), r.width(), r.height()-1));
+		//p.drawRect(r);
+
+		//return;
+	}
 
 	trackOffset += part->track()->height();
 	partColor.setAlpha(255);
@@ -2396,14 +2414,6 @@ void PartCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	if (config.canvasShowPartType & 1)
 	{ // show names
 		// draw name
-		// FN: Set text color depending on part color (black / white)
-		int part_r, part_g, part_b, brightness;
-		config.partColors[i].getRgb(&part_r, &part_g, &part_b);
-		brightness = part_r * 29 + part_g * 59 + part_b * 12;
-		if (brightness < 12000 || part->selected())
-			p.setPen(Qt::white); /* too dark: use white for text color */
-		else
-			p.setPen(Qt::black); /* otherwise use black */
 		QRect rr = map(r);
 		rr.setX(rr.x() + 3);
 		rr.setHeight(rr.height()-2);

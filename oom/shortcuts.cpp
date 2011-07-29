@@ -176,6 +176,8 @@ void initShortCuts()
 	defShrt(SHRT_SEL_RIGHT, Qt::Key_Right, "Edit: Select nearest part/event to the left", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_right");
 	defShrt(SHRT_SEL_RIGHT_ADD, Qt::Key_Right + Qt::SHIFT, "Edit: Add nearest part/event to the right to selection", PROLL_SHRT + DEDIT_SHRT, "sel_right_add");
 	defShrt(SHRT_LOCATORS_TO_SELECTION, Qt::ALT + Qt::Key_P, "Edit: Set locators to selection", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "loc_to_sel");
+	defShrt(SHRT_INC_PITCH_OCTAVE, Qt::SHIFT + Qt::Key_Up, "Edit: Increase pitch by octave", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pitch_octave");
+	defShrt(SHRT_DEC_PITCH_OCTAVE, Qt::SHIFT + Qt::Key_Down, "Edit: Decrease pitch by octave", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pitch_octave");
 	defShrt(SHRT_INC_PITCH, Qt::ALT + Qt::Key_Up, "Edit: Increase pitch", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pitch");
 	defShrt(SHRT_DEC_PITCH, Qt::ALT + Qt::Key_Down, "Edit: Decrease pitch", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pitch");
 	defShrt(SHRT_INC_POS, Qt::ALT + Qt::Key_Right, "Edit: Increase event position", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pos");
@@ -238,6 +240,7 @@ void initShortCuts()
 	defShrt(SHRT_OCTAVE_QWERTY_4, Qt::CTRL + Qt::Key_4, "Edit: Set Qwerty Range To C4", PROLL_SHRT, "qwerty_range_C4");
 	defShrt(SHRT_OCTAVE_QWERTY_5, Qt::CTRL + Qt::Key_5, "Edit: Set Qwerty Range To C5", PROLL_SHRT, "qwerty_range_C5");
 	defShrt(SHRT_OCTAVE_QWERTY_6, Qt::CTRL + Qt::Key_6, "Edit: Set Qwerty Range To C6", PROLL_SHRT, "qwerty_range_C6");
+	defShrt(SHRT_PART_TOGGLE_MUTE, Qt::Key_M, "State: Mute", PROLL_SHRT, "toggle_mute");
 
 	// Shortcuts for tools
 	// global
@@ -275,6 +278,7 @@ void initShortCuts()
 	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
 	defShrt(SHRT_POS_INC, Qt::CTRL + Qt::Key_Right, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
 	defShrt(SHRT_POS_DEC, Qt::CTRL + Qt::Key_Left, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
+	defShrt(SHRT_ADD_REST, Qt::Key_Plus, "Step Record: Add Rest", GLOBAL_SHRT, "add_rest");
 
 	defShrt(SHRT_POS_INC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Period, "Transport: Increase current position, no snap", GLOBAL_SHRT, "curpos_increase_nosnap");
 	defShrt(SHRT_POS_DEC_NOSNAP, Qt::SHIFT + Qt::CTRL + Qt::Key_Comma, "Transport: Decrease current position, no snap", GLOBAL_SHRT, "curpos_decrease_nosnap");

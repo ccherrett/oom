@@ -227,7 +227,13 @@ void EventCanvas::songChanged(int flags)/*{{{*/
 	}
 	emit selectionChanged(x, event, part);
     if (_curPart == 0)
+	{
 		_curPart = (MidiPart*) (editor->parts()->begin()->second);
+		if(_curPart)
+		{
+			editor->setCurCanvasPart(_curPart);
+		}
+	}	
 
 	updateCItemsZValues();
 
@@ -796,6 +802,14 @@ void EventCanvas::keyPress(QKeyEvent* event)
 				updateSelection();
 			}
 		}
+	}
+	else if (key == shortcuts[SHRT_INC_PITCH_OCTAVE].key)
+	{
+		modifySelected(NoteInfo::VAL_PITCH, 12);
+	}
+	else if (key == shortcuts[SHRT_DEC_PITCH_OCTAVE].key)
+	{
+		modifySelected(NoteInfo::VAL_PITCH, -12);
 	}
 	else if (key == shortcuts[SHRT_INC_PITCH].key)
 	{
