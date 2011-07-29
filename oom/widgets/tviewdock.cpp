@@ -110,8 +110,8 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 			QStandardItem *tname = new QStandardItem((*ait)->viewName());
 			if((*ait)->viewName() != "Working View" && (*ait)->viewName() != "Comment View")
 			{
-				chk->setForeground(QBrush(QColor(g_trackColorList.value(list.at(index)))));
-				tname->setForeground(QBrush(QColor(g_trackColorList.value(list.at(index)))));
+				chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
+				tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
 			}
 			rowData2.append(chk);
 			rowData2.append(tname);
