@@ -1839,6 +1839,86 @@ QFrame#trackHeaderList {/*{{{*/
 	
 }/*}}}*/
 
+/*{{{*/
+QToolBox#m_toolBox::tab 
+{
+    border-radius: 5px;
+	background-color: #47474d;							
+    border: 1px solid #a5a6a5;
+    border-bottom-color: #525252; /* same as the pane color */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 14px;
+    border-bottom-left-radius: 0px;
+    min-width: 6ex;
+    padding-top: 4px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+	color: #d6dfd6; 
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+}
+
+QToolBox#m_toolBox::tab:selected 
+{ 
+    background-color: #0b0b0b;
+	color: #cdd1cd; 
+    font: italic;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+}
+
+QStackedWidget#m_toolBox
+{
+	border: 0px;
+	background-color: #1b1b1b;
+}
+/*}}}*/
+
+/*{{{*/
+QTableView#m_autoTable 
+{
+	background-color: #1e1e1e;
+	gridline-color:#343434;
+	alternate-background-color: #1b1b1b;
+	selection-background-color: #2e2e2e;
+	color: #bbbfbb;
+	border: 2px solid #29292a;/*set for highlighting on focus*/
+	border-radius: 0px;
+	padding: 0px;
+	font-size: 14px;
+}
+/*
+QTableView#m_autoTable::focus
+{
+	border: 2px solid #f3ce69;
+}*/
+
+QTableView#m_autoTable::item
+{
+	padding-top: 4px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid #343434;
+}
+
+QTableView#m_autoTable::item:selected
+{
+	background-color: #0a0a0a;
+	border: none;
+}
+
+QTableView#m_autoTable::item:selected:active
+{
+	border: none;
+}
+
+QTableView#m_autoTable::item:selected:!active
+{
+	border: none;
+}
+/*}}}*/
 QFrame [selected="true"]
 {
 	background-color: yellow;

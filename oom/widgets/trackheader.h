@@ -6,6 +6,9 @@
 
 #ifndef _OOM_TRACKHEADER_H_
 #define _OOM_TRACKHEADER_H_
+
+#define CtrlIDRole Qt::UserRole+2
+
 #include "ui_trackheaderbase.h"
 #include "globaldefs.h"
 #include <QHash>
@@ -17,6 +20,9 @@ class QSize;
 class QMouseEvent;
 class QResizeEvent;
 class QPoint;
+class QStandardItem;
+class QStandardItemModel;
+class QStringList;
 class Slider;
 class Meter;
 
@@ -43,14 +49,19 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 	bool m_processEvents;
 	bool m_meterVisible;
 	bool m_sliderVisible;
+	bool m_toolsVisible;
+	bool m_nopopulate;
 	QHash<int, QString> m_selectedStyle;
 	QHash<int, QString> m_style;
     Meter* meter[MAX_CHANNELS];
+	QStandardItemModel* m_automodel;
+	QStringList m_autoheaders;
 	void initPan();
 	void initVolume();
 	void setupStyles();
     bool eventFilter(QObject *obj, QEvent *event);
 	void updateChannels();
+	void populateAutomationTable();
 
 private slots:
 	void heartBeat();
@@ -80,6 +91,7 @@ private slots:
 	{
 		m_editing = edit;
 	}
+	void toggleAutomationCurve(QStandardItem*);
 
 public slots:
 	void songChanged(int);
