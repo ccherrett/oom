@@ -28,6 +28,7 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QLayoutItem>
+#include <QGroupBox>
 
 #include "arranger.h"
 #include "song.h"
@@ -967,6 +968,7 @@ void Arranger::genTrackInfo(QWidget*)
 	{
 		obj->installEventFilter(this);
 	}
+	midiTrackInfo->groupBox->hide();
 
 	_tvdock = new TrackViewDock(this);
 	//infoScroll->setWidget(midiTrackInfo);

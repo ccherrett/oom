@@ -577,6 +577,16 @@ QPixmap* route_edit_OffIcon;
 QPixmap* route_edit_OverIcon;
 QIcon*   route_editIconSet3;
 
+QPixmap* next_OnIcon;
+QPixmap* next_OffIcon;
+QPixmap* next_OverIcon;
+QIcon*   nextIconSet3;
+
+QPixmap* previous_OnIcon;
+QPixmap* previous_OffIcon;
+QPixmap* previous_OverIcon;
+QIcon*   previousIconSet3;
+
 QPixmap* dragMidiIcon;
 QPixmap* dragAudioIcon;
 QPixmap* dragInputIcon;
@@ -1360,6 +1370,22 @@ void initIcons()
       route_editIconSet3->addPixmap(*route_edit_OnIcon, QIcon::Normal, QIcon::On);
       route_editIconSet3->addPixmap(*route_edit_OffIcon, QIcon::Normal, QIcon::Off);
       route_editIconSet3->addPixmap(*route_edit_OverIcon, QIcon::Active);
+	  
+      next_OnIcon= new MPIXMAP(":/images/next_new_on.png", NULL);
+      next_OffIcon= new MPIXMAP(":/images/next_new_off.png", NULL);
+      next_OverIcon= new MPIXMAP(":/images/next_new_over.png", NULL);
+	  nextIconSet3         = new QIcon();
+      nextIconSet3->addPixmap(*next_OnIcon, QIcon::Normal, QIcon::On);
+      nextIconSet3->addPixmap(*next_OffIcon, QIcon::Normal, QIcon::Off);
+      nextIconSet3->addPixmap(*next_OverIcon, QIcon::Active);
+	  
+      previous_OnIcon= new MPIXMAP(":/images/previous_new_on.png", NULL);
+      previous_OffIcon= new MPIXMAP(":/images/previous_new_off.png", NULL);
+      previous_OverIcon= new MPIXMAP(":/images/previous_new_over.png", NULL);
+	  previousIconSet3         = new QIcon();
+      previousIconSet3->addPixmap(*previous_OnIcon, QIcon::Normal, QIcon::On);
+      previousIconSet3->addPixmap(*previous_OffIcon, QIcon::Normal, QIcon::Off);
+      previousIconSet3->addPixmap(*previous_OverIcon, QIcon::Active);
 	  
 	  redLedIcon           = new MPIXMAP(redled_xpm, NULL);
       darkRedLedIcon       = new MPIXMAP(darkredled_xpm, NULL);

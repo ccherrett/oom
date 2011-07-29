@@ -491,6 +491,16 @@ extern QPixmap* route_edit_OffIcon;
 extern QPixmap* route_edit_OverIcon;
 extern QIcon*   route_editIconSet3;
 
+extern QPixmap* next_OnIcon;
+extern QPixmap* next_OffIcon;
+extern QPixmap* next_OverIcon;
+extern QIcon*   nextIconSet3;
+
+extern QPixmap* previous_OnIcon;
+extern QPixmap* previous_OffIcon;
+extern QPixmap* previous_OverIcon;
+extern QIcon*   previousIconSet3;
+
 extern QPixmap* dragMidiIcon;
 extern QPixmap* dragAudioIcon;
 extern QPixmap* dragInputIcon;

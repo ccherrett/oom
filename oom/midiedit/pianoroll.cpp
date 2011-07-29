@@ -537,16 +537,22 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	ctrl->setObjectName("Ctrl");
 	ctrl->setFont(config.fonts[3]);
 	ctrl->setToolTip(tr("Add Controller Lane"));
-	ctrl->setIcon(*mastertrackSIcon);
+	ctrl->setIcon(*plus_OffIcon);
+	ctrl->setIconSize(QSize(25,25));
+	ctrl->setFixedSize(QSize(25,25));
 	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
 	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());
 	//ctrl->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());  // Tim.
 
 	midiTrackInfo = new MidiTrackInfo(this, 0, _rasterInit, _quantInit);
 	midiTrackInfo->setObjectName("prTrackInfo");
-	midiTrackInfo->btnPrev->setIcon(*previousPartIcon);
+	midiTrackInfo->btnPrev->setIcon(*previousIconSet3);
+	midiTrackInfo->btnPrev->setIconSize(QSize(25, 25));
+	midiTrackInfo->btnPrev->setFixedSize(QSize(25, 25));
 	midiTrackInfo->btnPrev->setToolTip(tr("Select Previous Part"));
-	midiTrackInfo->btnNext->setIcon(*nextPartIcon);
+	midiTrackInfo->btnNext->setIcon(*nextIconSet3);
+	midiTrackInfo->btnNext->setIconSize(QSize(25, 25));
+	midiTrackInfo->btnNext->setFixedSize(QSize(25, 25));
 	midiTrackInfo->btnNext->setToolTip(tr("Select Next Part"));
 	midiTrackInfo->btnPrev->setVisible(true);
 	midiTrackInfo->btnNext->setVisible(true);
@@ -803,7 +809,7 @@ void PianoRoll::setCurCanvasPart(Part* part)
 {
 	if (canvas)
 	{
-		printf("PianoRoll::setCurCanvasPart\n");
+		//printf("PianoRoll::setCurCanvasPart\n");
 		canvas->setCurrentPart(part);
 		m_muteAction->blockSignals(true);
 		m_muteAction->setChecked(part->mute());
