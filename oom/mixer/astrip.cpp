@@ -152,7 +152,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	sliderGrid->setContentsMargins(0, 0, 8, 0);
 	sliderGrid->setSpacing(0);
 
-	slider = new Slider(this, "vol", Qt::Vertical, Slider::None, Slider::BgSlot, g_trackColorList.value(t->type()));
+	slider = new Slider(this, "vol", Qt::Vertical, Slider::None, Slider::BgSlot, g_trackColorListSelected.value(t->type()));
 	slider->setCursorHoming(true);
 	slider->setRange(config.minSlider - 0.1, 10.0);
 	slider->setFixedWidth(20);
