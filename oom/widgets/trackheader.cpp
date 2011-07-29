@@ -74,6 +74,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	initPan();
 	initVolume();
 	m_trackName->installEventFilter(this);
+	m_trackName->setReadOnly(true);
 
 	setMouseTracking(true);
 	if(m_track)/*{{{*/
@@ -268,7 +269,7 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 		m_trackName->blockSignals(true);
 		m_trackName->setText(m_track->name());
 		m_trackName->blockSignals(false);
-		m_trackName->setReadOnly((m_track->name() == "Master"));
+		//m_trackName->setReadOnly((m_track->name() == "Master"));
 		setSelected(m_track->selected());
 		//setProperty("selected", m_track->selected());
 		if(m_track->height() < MIN_TRACKHEIGHT)
@@ -424,10 +425,6 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	}/*}}}*/
 	if(m_track && m_track->type() == Track::WAVE)
 		p->addAction(tr("Import Audio File"))->setData(1);
-	/*if (!multipleSelectedTracks)
-	{
-		p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
-	}*/
 
 	//Add Track menu
 	QMenu* trackMenu = p->addMenu(tr("Add Track"));
@@ -446,7 +443,10 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 
 
 	if(m_track->name() != "Master")
+	{
+		p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
 		p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
+	}
 	
 	QAction* selectAllAction = p->addAction(tr("Select All Tracks"));
 	selectAllAction->setData(4);
@@ -797,6 +797,12 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			}
 			case 15:
 			{
+				if(m_track->name() != "Master")
+				{
+					m_trackName->setReadOnly(false);
+					m_trackName->setFocus();
+					setEditing(true);
+				}
 				//if(!multipleSelectedTracks)
 				//{
 				//	renameTrack(m_track);
@@ -1017,14 +1023,18 @@ void TrackHeader::toggleReminder3(bool state)/*{{{*/
 void TrackHeader::updateTrackName()/*{{{*/
 {
 	if(!m_track || !m_processEvents)
+	{
+		m_trackName->setReadOnly(true);
 		return;
+	}
 	QString name = m_trackName->text();
 	if(name.isEmpty())
 	{
-		m_trackName->blockSignals(true);
-		m_trackName->setText(m_track->name());
-		m_trackName->blockSignals(false);
+		//m_trackName->blockSignals(true);
+		m_trackName->undo();//setText(m_track->name());
+		//m_trackName->blockSignals(false);
 		setEditing(false);
+		m_trackName->setReadOnly(true);
 		return;
 	}
 	if (name != m_track->name())
@@ -1040,10 +1050,12 @@ void TrackHeader::updateTrackName()/*{{{*/
 						QMessageBox::Ok,
 						Qt::NoButton,
 						Qt::NoButton);
-				m_trackName->blockSignals(true);
-				m_trackName->setText(m_track->name());
-				m_trackName->blockSignals(false);
+				//m_trackName->blockSignals(true);
+				//m_trackName->setText(m_track->name());
+				//m_trackName->blockSignals(false);
+				m_trackName->undo();//setText(m_track->name());
 				setEditing(false);
+				m_trackName->setReadOnly(true);
 				return;
 			}
 		}
@@ -1051,6 +1063,7 @@ void TrackHeader::updateTrackName()/*{{{*/
 		m_track->setName(name);
 		audio->msgChangeTrack(track, m_track);
 	}
+	m_trackName->setReadOnly(true);
 	setEditing(false);
 }/*}}}*/
 
@@ -1393,6 +1406,11 @@ bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 	if (event->type() == QEvent::MouseButtonPress) {
 		QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
 		if(mEvent && mEvent->button() == Qt::LeftButton)
+		{
+			mousePressEvent(mEvent);
+			mode = NORMAL;
+		}
+		else if(mEvent && mEvent->button() == Qt::RightButton && obj == m_trackName)
 		{
 			mousePressEvent(mEvent);
 			mode = NORMAL;
