@@ -91,7 +91,6 @@ class Transport : public QWidget
     QComboBox* recMode;
     QComboBox* cycleMode;
     QToolButton* quantizeButton;
-    QToolButton* clickButton;
     QToolButton* syncButton;
     QToolButton* jackTransportButton;
     QLabel* l2;
@@ -123,7 +122,7 @@ public slots:
     void setTimesig(int a, int b);
     void setPos(int, unsigned, bool);
     void setMasterFlag(bool);
-    void setClickFlag(bool);
+    //void setClickFlag(bool);
     void setQuantizeFlag(bool);
     void setSyncFlag(bool);
     void setPlay(bool f);

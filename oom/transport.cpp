@@ -348,29 +348,22 @@ Transport::Transport(QWidget* parent, const char* name)
 
 	quantizeButton = newButton(tr("AC"), tr("quantize during record"), true, 19);
 
-	clickButton = newButton(tr("Click"), tr("metronom click on/off"), true, 19);
-	clickButton->setShortcut(shortcuts[SHRT_TOGGLE_METRO].key);
-
 	syncButton = newButton(tr("Sync"), tr("external sync on/off"), true, 19);
 
 	jackTransportButton = newButton(tr("Jack"), tr("Jack transport sync on/off"), true, 19);
 
 	quantizeButton->setChecked(song->quantize());
-	clickButton->setChecked(song->click());
 	syncButton->setChecked(extSyncFlag.value());
 	jackTransportButton->setChecked(useJackTransport.value());
 	quantizeButton->setFocusPolicy(Qt::NoFocus);
-	clickButton->setFocusPolicy(Qt::NoFocus);
 	syncButton->setFocusPolicy(Qt::NoFocus);
 	jackTransportButton->setFocusPolicy(Qt::NoFocus);
 
 	button1->addWidget(quantizeButton);
-	button1->addWidget(clickButton);
 	button1->addWidget(syncButton);
 	button1->addWidget(jackTransportButton);
 
 	connect(quantizeButton, SIGNAL(toggled(bool)), song, SLOT(setQuantize(bool)));
-	connect(clickButton, SIGNAL(toggled(bool)), song, SLOT(setClick(bool)));
 
 	connect(syncButton, SIGNAL(toggled(bool)), &extSyncFlag, SLOT(setValue(bool)));
 	connect(jackTransportButton, SIGNAL(toggled(bool)), &useJackTransport, SLOT(setValue(bool)));
@@ -378,7 +371,6 @@ Transport::Transport(QWidget* parent, const char* name)
 	connect(&useJackTransport, SIGNAL(valueChanged(bool)), SLOT(jackSyncChanged(bool)));
 
 	connect(song, SIGNAL(quantizeChanged(bool)), this, SLOT(setQuantizeFlag(bool)));
-	connect(song, SIGNAL(clickChanged(bool)), this, SLOT(setClickFlag(bool)));
 
 	hbox->addLayout(button1);
 
@@ -570,17 +562,6 @@ void Transport::setPlay(bool)
 void Transport::setMasterFlag(bool f)
 {
 	masterButton->setChecked(f);
-}
-
-//---------------------------------------------------------
-//   setClickFlag
-//---------------------------------------------------------
-
-void Transport::setClickFlag(bool f)
-{
-	clickButton->blockSignals(true);
-	clickButton->setChecked(f);
-	clickButton->blockSignals(false);
 }
 
 //---------------------------------------------------------

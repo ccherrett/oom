@@ -5,6 +5,8 @@
 #include "globals.h"
 #include "app.h"
 #include "song.h"
+#include "icons.h"
+#include "shortcuts.h"
 #include "transporttools.h"
 
 TransportToolbar::TransportToolbar(QWidget* parent, bool showPanic, bool showMuteSolo)
@@ -60,6 +62,19 @@ TransportToolbar::TransportToolbar(QWidget* parent, bool showPanic, bool showMut
 	m_btnPlay->setAutoRaise(true);
 	m_layout->addWidget(m_btnPlay);
 	
+	m_btnClick = new QToolButton(this);
+	m_btnClick->setIcon(QIcon(*metronomeIconSet3));
+	m_btnClick->setIconSize(QSize(29, 25));
+	m_btnClick->setFixedSize(QSize(29, 25));
+	m_btnClick->setAutoRaise(true);
+	m_btnClick->setCheckable(true);
+	m_btnClick->setShortcut(shortcuts[SHRT_TOGGLE_METRO].key);
+	m_btnClick->setToolTip(tr("Turn on/off metronome click"));
+	m_btnClick->setChecked(song->click());
+	m_layout->addWidget(m_btnClick);
+	connect(m_btnClick, SIGNAL(toggled(bool)), song, SLOT(setClick(bool)));
+	connect(song, SIGNAL(clickChanged(bool)), this, SLOT(updateClick(bool)));
+	
 	m_btnRecord = new QToolButton(this);
 	m_btnRecord->setDefaultAction(recordAction);
 	m_btnRecord->setIconSize(QSize(29, 25));
@@ -100,6 +115,13 @@ TransportToolbar::TransportToolbar(QWidget* parent, bool showPanic, bool showMut
 
 void TransportToolbar::songChanged(int)
 {
+}
+
+void TransportToolbar::updateClick(bool state)
+{
+	m_btnClick->blockSignals(true);
+	m_btnClick->setChecked(state);
+	m_btnClick->blockSignals(false);
 }
 
 void TransportToolbar::setSoloAction(QAction* act)

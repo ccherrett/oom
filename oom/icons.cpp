@@ -1337,9 +1337,9 @@ void initIcons()
       commentIconSet3->addPixmap(*comment_OffIcon, QIcon::Normal, QIcon::Off);
       commentIconSet3->addPixmap(*comment_OverIcon, QIcon::Active);
 	  
-      metronome_OnIcon= new MPIXMAP(":/images/metronome_new_on.png", NULL);
-      metronome_OffIcon= new MPIXMAP(":/images/metronome_new_off.png", NULL);
-      metronome_OverIcon= new MPIXMAP(":/images/metronome_new_over.png", NULL);
+      metronome_OnIcon= new MPIXMAP(":/images/icons/metronome_new_on.png", NULL);
+      metronome_OffIcon= new MPIXMAP(":/images/icons/metronome_new_off.png", NULL);
+      metronome_OverIcon= new MPIXMAP(":/images/icons/metronome_new_over.png", NULL);
 	  metronomeIconSet3         = new QIcon();
       metronomeIconSet3->addPixmap(*metronome_OnIcon, QIcon::Normal, QIcon::On);
       metronomeIconSet3->addPixmap(*metronome_OffIcon, QIcon::Normal, QIcon::Off);

@@ -20,9 +20,11 @@ class TransportToolbar : public QFrame
 	QToolButton* m_btnMute;
 	QToolButton* m_btnSolo;
 	QToolButton* m_btnPanic;
+	QToolButton* m_btnClick;
 
 private slots:
 	void songChanged(int);
+	void updateClick(bool);
 public slots:
 signals:
 	void recordTriggered(bool);
