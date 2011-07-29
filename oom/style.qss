@@ -1838,9 +1838,3 @@ QFrame#trackHeaderList {/*{{{*/
 	padding-right: -18px;
 	
 }/*}}}*/
-
-QFrame [selected="true"]
-{
-	background-color: yellow;
-}
-

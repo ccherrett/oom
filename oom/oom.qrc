@@ -395,6 +395,9 @@
 		<file>images/previous_new_on.png</file>
 		<file>images/previous_new_over.png</file>
 		<file>images/previous_new_off.png</file>
+		<file>images/icons/metronome_new_on.png</file>
+		<file>images/icons/metronome_new_over.png</file>
+		<file>images/icons/metronome_new_off.png</file>
 	</qresource>
 </RCC>
 

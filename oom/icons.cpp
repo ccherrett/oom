@@ -587,6 +587,11 @@ QPixmap* previous_OffIcon;
 QPixmap* previous_OverIcon;
 QIcon*   previousIconSet3;
 
+QPixmap* metronome_OnIcon;
+QPixmap* metronome_OffIcon;
+QPixmap* metronome_OverIcon;
+QIcon*   metronomeIconSet3;
+
 QPixmap* dragMidiIcon;
 QPixmap* dragAudioIcon;
 QPixmap* dragInputIcon;
@@ -1331,6 +1336,14 @@ void initIcons()
       commentIconSet3->addPixmap(*comment_OnIcon, QIcon::Normal, QIcon::On);
       commentIconSet3->addPixmap(*comment_OffIcon, QIcon::Normal, QIcon::Off);
       commentIconSet3->addPixmap(*comment_OverIcon, QIcon::Active);
+	  
+      metronome_OnIcon= new MPIXMAP(":/images/metronome_new_on.png", NULL);
+      metronome_OffIcon= new MPIXMAP(":/images/metronome_new_off.png", NULL);
+      metronome_OverIcon= new MPIXMAP(":/images/metronome_new_over.png", NULL);
+	  metronomeIconSet3         = new QIcon();
+      metronomeIconSet3->addPixmap(*metronome_OnIcon, QIcon::Normal, QIcon::On);
+      metronomeIconSet3->addPixmap(*metronome_OffIcon, QIcon::Normal, QIcon::Off);
+      metronomeIconSet3->addPixmap(*metronome_OverIcon, QIcon::Active);
       
 	  dragMidiIcon= new MPIXMAP(":/images/drag_midi.png", NULL);
 	  dragAudioIcon= new MPIXMAP(":/images/drag_audio.png", NULL);

@@ -501,6 +501,11 @@ extern QPixmap* previous_OffIcon;
 extern QPixmap* previous_OverIcon;
 extern QIcon*   previousIconSet3;
 
+extern QPixmap* metronome_OnIcon;
+extern QPixmap* metronome_OffIcon;
+extern QPixmap* metronome_OverIcon;
+extern QIcon*   metronomeIconSet3;
+
 extern QPixmap* dragMidiIcon;
 extern QPixmap* dragAudioIcon;
 extern QPixmap* dragInputIcon;
