@@ -537,7 +537,9 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	ctrl->setObjectName("Ctrl");
 	ctrl->setFont(config.fonts[3]);
 	ctrl->setToolTip(tr("Add Controller Lane"));
-	ctrl->setIcon(*mastertrackSIcon);
+	ctrl->setIcon(*plus_OffIcon);
+	ctrl->setIconSize(QSize(25,25));
+	ctrl->setFixedSize(QSize(25,25));
 	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
 	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());
 	//ctrl->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());  // Tim.

@@ -74,7 +74,8 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	selCtrl->setSizePolicy(
 			QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	selCtrl->setToolTip(tr("Select Controller Type"));
-	selCtrl->setIcon(*edit_listIcon);
+	selCtrl->setIcon(*plus_OffIcon);
+	selCtrl->setIconSize(QSize(22,22));
 
 	///pop = new QMenu;
 
@@ -85,7 +86,8 @@ CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
 	destroy->setSizePolicy(
 			QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	destroy->setToolTip(tr("Remove Controller Lane"));
-	destroy->setIcon(*remove_ctrlIcon);
+	destroy->setIcon(*garbage_OffIcon);
+	destroy->setIconSize(QSize(22,22));
 	// Cursor Position
 	connect(selCtrl, SIGNAL(clicked()), SLOT(ctrlPopup()));
 	connect(destroy, SIGNAL(clicked()), SIGNAL(destroyPanel()));
@@ -617,7 +619,7 @@ void CtrlPanel::ctrlPopup()
 			pop->addAction(i->s);
 	}
 
-	pop->addAction(QIcon(*configureIcon), tr("add new ..."))->setData(2);
+	pop->addAction(QIcon(*plusIconSet3), tr("add new ..."))->setData(2);
 	QAction *act = pop->exec(selCtrl->mapToGlobal(QPoint(0, 0)));
 	selCtrl->setDown(false);
 
