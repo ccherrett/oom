@@ -11,10 +11,10 @@
 
 #include "app.h"
 #include "song.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "cobject.h"
 //#include "drumedit.h"
-#include "pianoroll.h"
+#include "Performer.h"
 #include "globals.h"
 #include "xml.h"
 #include "drummap.h"
@@ -632,7 +632,7 @@ void OOMidi::readToplevels(Xml& xml)
 						pl->add(part);
 					}
 				}
-				else if (tag == "pianoroll")
+                                else if (tag == "pianoroll" || tag == "performer")
 				{
 					// p3.3.34
 					// Do not open if there are no parts.
@@ -645,7 +645,7 @@ void OOMidi::readToplevels(Xml& xml)
 					if (!pl->empty())
 					{
 
-						startPianoroll(pl);
+						startPerformer(pl);
 						//FIXME: When started from here in a song loaded from the commandline
 						//closing the PR window segfaults OOM no doing it untill I trace this down
 						//toplevels.back().cobject()->readStatus(xml);
@@ -1089,7 +1089,7 @@ void OOMidi::read(Xml& xml, bool skipConfig)
 				else if (tag == "toplevels")
 				{
 					//We no longer want to start top level windows with oom
-					//Start with only the arranger and that's all.
+					//Start with only the Composer and that's all.
 					xml.skip(tag);
 					//readToplevels(xml);
 				}
@@ -1147,7 +1147,7 @@ void Song::write(int level, Xml& xml) const
 	CloneList copyCloneList = cloneList;
 	cloneList.clear();
 
-	// write arranger visible tracks first so we maintain sort order
+	// write Composer visible tracks first so we maintain sort order
 	//for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
 	//	(*i)->write(level, xml);
 

@@ -1236,7 +1236,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			QColor fillColor = QColor(config.partColors[part->colorIndex()]);
 			QColor bgfillColor = QColor(config.partColors[part->colorIndex()]);
 			int bgalpha = 180;
-			int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+			int ghostedAlpha = tconfig().get_property("PerformerEdit", "renderalpha", 50).toInt();
 			if(noteAlphaAction && !noteAlphaAction->isChecked())
 				ghostedAlpha = 0;
 			if(fg)
@@ -1383,7 +1383,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				}
 				else
 				{
-					int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+					int ghostedAlpha = tconfig().get_property("PerformerEdit", "renderalpha", 50).toInt();
 					if(noteAlphaAction && !noteAlphaAction->isChecked())
 						ghostedAlpha = 0;
 					tickColor.setAlpha(ghostedAlpha);
@@ -1423,7 +1423,7 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 		{
 			if (fg)
 			{
-				int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+				int ghostedAlpha = tconfig().get_property("PerformerEdit", "renderalpha", 50).toInt();
 				if(noteAlphaAction && !noteAlphaAction->isChecked())
 					ghostedAlpha = 0;
 				QColor tickColor = QColor(config.partColors[part->colorIndex()]);

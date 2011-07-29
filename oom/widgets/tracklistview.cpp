@@ -15,7 +15,7 @@
 #include "part.h"
 #include "midieditor.h"
 #include "citem.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "event.h"
 #include "traverso_shared/TConfig.h"
 
@@ -52,7 +52,7 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 
 	m_chkSnapToPart = new QCheckBox(tr("Snap To Part"), this);
 	m_chkSnapToPart->setToolTip(tr("Move Playback cursor to the first note in a part when changing parts."));
-	bool snap = tconfig().get_property("PianoRollEdit", "snaptopart", true).toBool();
+	bool snap = tconfig().get_property("PerformerEdit", "snaptopart", true).toBool();
 	m_chkSnapToPart->setChecked(snap);
 
 	m_buttonBox->addWidget(m_chkWorkingView);
@@ -73,13 +73,13 @@ TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
 
 TrackListView::~TrackListView()
 {
-	tconfig().set_property("PianoRollEdit", "snaptopart", m_chkSnapToPart->isChecked());
+	tconfig().set_property("PerformerEdit", "snaptopart", m_chkSnapToPart->isChecked());
 	tconfig().save();
 }
 
 void TrackListView::snapToPartChanged(int state)/*{{{*/
 {
-	tconfig().set_property("PianoRollEdit", "snaptopart", state);
+	tconfig().set_property("PerformerEdit", "snaptopart", state);
 	tconfig().save();
 }/*}}}*/
 
@@ -269,11 +269,11 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 				switch(selection)
 				{
 					case 1:
-						oom->arranger->addCanvasPart(track);
+						oom->composer->addCanvasPart(track);
 					break;
 					case 2:
 					{
-						CItem* citem = oom->arranger->addCanvasPart(track);
+						CItem* citem = oom->composer->addCanvasPart(track);
 						Part* mp = citem->part();
 						if(mp)
 						{
@@ -366,7 +366,7 @@ void TrackListView::updatePartSelection(Part* part)/*{{{*/
 
 void TrackListView::movePlaybackToPart(Part* part)/*{{{*/
 {
-	bool snap = tconfig().get_property("PianoRollEdit", "snaptopart", true).toBool();
+	bool snap = tconfig().get_property("PerformerEdit", "snaptopart", true).toBool();
 	if(audio->isPlaying() || !snap)
 		return;
 	if(part)

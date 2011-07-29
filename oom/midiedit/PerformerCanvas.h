@@ -1,15 +1,15 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: prcanvas.h,v 1.5.2.6 2009/11/16 11:29:33 lunar_shuttle Exp $
+//    $Id: PerformerCanvas.h,v 1.5.2.6 2009/11/16 11:29:33 lunar_shuttle Exp $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#ifndef __PRCANVAS_H__
-#define __PRCANVAS_H__
+#ifndef __PERFORMERCANVAS_H__
+#define __PERFORMERCANVAS_H__
 
 #include "ecanvas.h"
-#include "pianoroll.h"
+#include "Performer.h"
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMouseEvent>
@@ -30,14 +30,14 @@ public:
 };
 
 class ScrollScale;
-class PianoRoll;
+class Performer;
 class QRect;
 
 //---------------------------------------------------------
-//   PianoCanvas
+//   PerformerCanvas
 //---------------------------------------------------------
 
-class PianoCanvas : public EventCanvas
+class PerformerCanvas : public EventCanvas
 {
     int cmdRange;
     int colorMode;
@@ -122,7 +122,7 @@ public:
 	CMD_FIXED_LEN, CMD_DELETE_OVERLAPS
     };
 
-    PianoCanvas(MidiEditor*, QWidget*, int, int);
+    PerformerCanvas(MidiEditor*, QWidget*, int, int);
     void cmd(int, int, int, bool, int);
     int stepInputQwerty(QKeyEvent* event);
 

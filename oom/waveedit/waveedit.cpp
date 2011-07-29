@@ -149,7 +149,7 @@ WaveEdit::WaveEdit(PartList* pl)
 	//    ToolBar:   Solo  Cursor1 Cursor2
 
 	addToolBarBreak();
-	tb1 = addToolBar(tr("Pianoroll tools"));
+	tb1 = addToolBar(tr("Performer tools"));
 
 	//tb1->setLabel(tr("weTools"));
 	solo = new QToolButton();

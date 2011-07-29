@@ -21,8 +21,8 @@
 #
 # Expand Qt macros
 #
-QT4_WRAP_CPP (arranger_mocs
-      arranger.h 
+QT4_WRAP_CPP (composer_mocs
+      Composer.h 
       pcanvas.h 
 	  headerlist.h
       )
@@ -30,8 +30,8 @@ QT4_WRAP_CPP (arranger_mocs
 #
 # List of source files to compile
 #
-file (GLOB arranger_source_files
-      arranger.cpp
+file (GLOB composer_source_files
+      Composer.cpp
       pcanvas.cpp
 	  headerlist.cpp
       )
@@ -39,9 +39,9 @@ file (GLOB arranger_source_files
 #
 # Define target
 #
-add_library ( arranger SHARED
-      ${arranger_source_files}
-      ${arranger_mocs}
+add_library ( Composer SHARED
+      ${composer_source_files}
+      ${composer_mocs}
       )
 
 #
@@ -49,22 +49,22 @@ add_library ( arranger SHARED
 #
 set (FILES_TO_TRANSLATE
       ${FILES_TO_TRANSLATE}
-      ${arranger_source_files}
+      ${composer_source_files}
       CACHE INTERNAL ""
       )
 
 #
 # Compilation flags and target name
 #
-set_target_properties( arranger
+set_target_properties( Composer
       PROPERTIES COMPILE_FLAGS "-include ${PROJECT_BINARY_DIR}/all.h -fPIC"
-      OUTPUT_NAME oom_arranger
+      OUTPUT_NAME oom_composer
       )
 
 #
 # Linkage
 #
-target_link_libraries ( arranger
+target_link_libraries ( Composer
       ${QT_LIBRARIES}
       awl
       mixer
@@ -74,7 +74,7 @@ target_link_libraries ( arranger
 #
 # Install location
 #
-install(TARGETS arranger
+install(TARGETS Composer
       DESTINATION ${OOMidi_MODULES_DIR}
       )
 

@@ -27,7 +27,7 @@
 #include "al/dsp.h"
 #include "amixer.h"
 //#include "appearance.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "audio.h"
 #include "audiodev.h"
 #include "audioprefetch.h"
@@ -50,7 +50,7 @@
 #include "metronome.h"
 #include "midiseq.h"
 #include "mixdowndialog.h"
-#include "pianoroll.h"
+#include "Performer.h"
 #include "popupmenu.h"
 #include "shortcuts.h"
 #include "shortcutconfig.h"
@@ -126,7 +126,7 @@ extern snd_seq_t * alsaSeq;
 
 int watchAudio, watchAudioPrefetch, watchMidi;
 pthread_t splashThread;
-//static int pianorollTools = PointerTool | PencilTool | RubberTool | CutTool | GlueTool | DrawTool;
+//static int performerTools = PointerTool | PencilTool | RubberTool | CutTool | GlueTool | DrawTool;
 
 
 //PyScript *pyscript;
@@ -1010,7 +1010,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	editSelectAllTracksAction = new QAction(QIcon(*select_allIcon), tr("Select All &Tracks"), this);
 	
 
-	startPianoEditAction = new QAction(*pianoIconSet, tr("Pianoroll"), this);
+	startPianoEditAction = new QAction(*pianoIconSet, tr("Performer"), this);
 	//startDrumEditAction = new QAction(QIcon(*edit_drummsIcon), tr("Drums"), this);
 	startListEditAction = new QAction(QIcon(*edit_listIcon), tr("List"), this);
 	startWaveEditAction = new QAction(QIcon(*edit_waveIcon), tr("Audio"), this);
@@ -1168,7 +1168,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	connect(editSignalMapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
 
-	connect(startPianoEditAction, SIGNAL(triggered()), SLOT(startPianoroll()));
+	connect(startPianoEditAction, SIGNAL(triggered()), SLOT(startPerformer()));
 	//connect(startDrumEditAction, SIGNAL(triggered()), SLOT(startDrumEditor()));
 	connect(startListEditAction, SIGNAL(triggered()), SLOT(startListEditor()));
 	//connect(startWaveEditAction, SIGNAL(triggered()), SLOT(startWaveEditor()));
@@ -1477,18 +1477,18 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//    Central Widget
 	//---------------------------------------------------
 
-	arranger = new Arranger(this, "arranger");
-	setCentralWidget(arranger);
+	composer = new Composer(this, "composer");
+	setCentralWidget(composer);
 	addTransportToolbar();
 
-	connect(arranger, SIGNAL(editPart(Track*)), SLOT(startEditor(Track*)));
-	connect(arranger, SIGNAL(dropSongFile(const QString&)), SLOT(loadProjectFile(const QString&)));
-	connect(arranger, SIGNAL(dropMidiFile(const QString&)), SLOT(importMidi(const QString&)));
-	connect(arranger, SIGNAL(startEditor(PartList*, int)), SLOT(startEditor(PartList*, int)));
-	connect(this, SIGNAL(configChanged()), arranger, SLOT(configChanged()));
-	connect(pcloaderAction, SIGNAL(triggered()), arranger, SLOT(preloadControllers()));
+	connect(composer, SIGNAL(editPart(Track*)), SLOT(startEditor(Track*)));
+	connect(composer, SIGNAL(dropSongFile(const QString&)), SLOT(loadProjectFile(const QString&)));
+	connect(composer, SIGNAL(dropMidiFile(const QString&)), SLOT(importMidi(const QString&)));
+	connect(composer, SIGNAL(startEditor(PartList*, int)), SLOT(startEditor(PartList*, int)));
+	connect(this, SIGNAL(configChanged()), composer, SLOT(configChanged()));
+	connect(pcloaderAction, SIGNAL(triggered()), composer, SLOT(preloadControllers()));
 
-	connect(arranger, SIGNAL(setUsedTool(int)), SLOT(setUsedTool(int)));
+	connect(composer, SIGNAL(setUsedTool(int)), SLOT(setUsedTool(int)));
 
 	//---------------------------------------------------
 	//  read list of "Recent Projects"
@@ -1538,7 +1538,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	QClipboard* cb = QApplication::clipboard();
 	connect(cb, SIGNAL(dataChanged()), SLOT(clipboardChanged()));
 	connect(cb, SIGNAL(selectionChanged()), SLOT(clipboardChanged()));
-	connect(arranger, SIGNAL(selectionChanged()), SLOT(selectionChanged()));
+	connect(composer, SIGNAL(selectionChanged()), SLOT(selectionChanged()));
 
 	//---------------------------------------------------
 	//  load project
@@ -1614,7 +1614,7 @@ OOMidi::~OOMidi()
 }
 
 /**
- * Called from within the after Arranger Constructor
+ * Called from within the after Composer Constructor
  */
 void OOMidi::addTransportToolbar()
 {
@@ -1645,7 +1645,7 @@ void OOMidi::addTransportToolbar()
 	TransportToolbar *transportbar = new TransportToolbar(this, showPanic, showMuteSolo);
 	tools->addWidget(transportbar);
 	
-	/*tools22 = new EditToolBar(this, pianorollTools);
+	/*tools22 = new EditToolBar(this, performerTools);
 	tools22->setVisible(false);
     tools1 = new QToolBar(tr("Edit Tools"));
 	tools1->setIconSize(QSize(29, 25));
@@ -1658,13 +1658,13 @@ void OOMidi::addTransportToolbar()
 	tspacer->setMaximumWidth(15);
 	tools->addWidget(tspacer);
 	
-	tools1 = new EditToolBar(this, arrangerTools);
+	tools1 = new EditToolBar(this, composerTools);
 	//addToolBar(Qt::BottomToolBarArea, tools1);
 	tools1->setObjectName("tbEditTools");
-	connect(tools1, SIGNAL(toolChanged(int)), arranger, SLOT(setTool(int)));
-	connect(tools1, SIGNAL(toolChanged(int)), arranger, SIGNAL(updateHeaderTool(int)));
-	connect(arranger, SIGNAL(toolChanged(int)), tools1, SLOT(set(int)));
-	connect(arranger, SIGNAL(updateFooterTool(int)), tools1, SLOT(set(int)));
+	connect(tools1, SIGNAL(toolChanged(int)), composer, SLOT(setTool(int)));
+	connect(tools1, SIGNAL(toolChanged(int)), composer, SIGNAL(updateHeaderTool(int)));
+	connect(composer, SIGNAL(toolChanged(int)), tools1, SLOT(set(int)));
+	connect(composer, SIGNAL(updateFooterTool(int)), tools1, SLOT(set(int)));
 	//toolByHeaderChanged
 	tools->addWidget(tools1);
 	QWidget* tspacer2 = new QWidget();
@@ -1809,7 +1809,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	m_mixerWidget->clear();
 	//if (mixer2)
 	//	mixer2->clear();
-	arranger->clear(); // clear track info
+	composer->clear(); // clear track info
 	if (clearSong())
 	{
 		return;
@@ -2612,7 +2612,7 @@ void OOMidi::showMarker(bool flag)
 
 		// Removed p3.3.43
 		// Song::addMarker() already emits a 'markerChanged'.
-		//connect(arranger, SIGNAL(addMarker(int)), markerView, SLOT(addMarker(int)));
+		//connect(composer, SIGNAL(addMarker(int)), markerView, SLOT(addMarker(int)));
 
 		connect(markerView, SIGNAL(closed()), SLOT(markerClosed()));
 		toplevels.push_back(Toplevel(Toplevel::MARKER, (unsigned long) (markerView), markerView));
@@ -3616,7 +3616,7 @@ void OOMidi::startEditor(PartList* pl, int type)
 {
 	switch (type)
 	{
-		case 0: startPianoroll(pl, true);
+		case 0: startPerformer(pl, true);
 			break;
 		case 1: startListEditor(pl);
 			break;
@@ -3637,7 +3637,7 @@ void OOMidi::startEditor(Track* t)
 	switch (t->type())
 	{
 		case Track::MIDI:
-		case Track::DRUM: startPianoroll(); 
+		case Track::DRUM: startPerformer(); 
 			break;
 		//case Track::WAVE: startWaveEditor();
 		//	break;
@@ -3662,37 +3662,37 @@ PartList* OOMidi::getMidiPartsToEdit()
 }
 
 //---------------------------------------------------------
-//   startPianoroll
+//   startPerformer
 //---------------------------------------------------------
 
-void OOMidi::startPianoroll()
+void OOMidi::startPerformer()
 {
-	if(arranger->isEditing())
+	if(composer->isEditing())
 	{
-		arranger->endEditing();
+		composer->endEditing();
 		return;
 	}
 	PartList* pl = getMidiPartsToEdit();
 	if (pl == 0)
 		return;
-	startPianoroll(pl, true);
+	startPerformer(pl, true);
 }
 
-void OOMidi::startPianoroll(PartList* pl, bool /*showDefaultCtrls*/)
+void OOMidi::startPerformer(PartList* pl, bool /*showDefaultCtrls*/)
 {
-	PianoRoll* pianoroll = new PianoRoll(pl, this, 0, arranger->cursorValue());
-	pianoroll->setWindowRole("pianoroll");
-	pianoroll->show();
+	Performer* performer = new Performer(pl, this, 0, composer->cursorValue());
+	performer->setWindowRole("performer");
+	performer->show();
 
     // Be able to open the List Editor from the Piano Roll
     // with the application global shortcut to open the L.E.
-    pianoroll->addAction(startListEditAction);
+    performer->addAction(startListEditAction);
     // same for save shortcut
-    pianoroll->addAction(fileSaveAction);
+    performer->addAction(fileSaveAction);
 
-	toplevels.push_back(Toplevel(Toplevel::PIANO_ROLL, (unsigned long) (pianoroll), pianoroll));
-	connect(pianoroll, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
-	connect(oom, SIGNAL(configChanged()), pianoroll, SLOT(configChanged()));
+	toplevels.push_back(Toplevel(Toplevel::PIANO_ROLL, (unsigned long) (performer), performer));
+	connect(performer, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
+	connect(oom, SIGNAL(configChanged()), performer, SLOT(configChanged()));
 }
 
 //---------------------------------------------------------
@@ -3760,7 +3760,7 @@ void OOMidi::startDrumEditor()
 void OOMidi::startDrumEditor(PartList*, bool)
 {
 	return;
-	/*DrumEdit* drumEditor = new DrumEdit(pl, this, 0, arranger->cursorValue());
+	/*DrumEdit* drumEditor = new DrumEdit(pl, this, 0, composer->cursorValue());
 	drumEditor->show();
 	if (showDefaultCtrls) // p4.0.12
 	{
@@ -3953,7 +3953,7 @@ void OOMidi::toplevelDeleted(unsigned long tl)
 
 void OOMidi::ctrlChanged()
 {
-	arranger->updateInspector();
+	composer->updateInspector();
 }
 #endif
 
@@ -3963,8 +3963,8 @@ void OOMidi::ctrlChanged()
 
 void OOMidi::keyPressEvent(QKeyEvent* event)
 {
-	// Pass it on to arranger part canvas.
-	arranger->getCanvas()->redirKeypress(event);
+	// Pass it on to composer part canvas.
+	composer->getCanvas()->redirKeypress(event);
 }
 
 bool OOMidi::eventFilter(QObject *obj, QEvent *event)
@@ -4058,14 +4058,14 @@ void OOMidi::kbAccel(int key)
 		// p4.0.10 Tim. Normally each editor window handles these, to inc by the editor's raster snap value.
 		// But users were asking for a global version - "they don't work when I'm in mixer or transport".
 		// Since no editor claimed the key event, we don't know a specific editor's snap setting,
-		//  so adopt a policy where the arranger is the 'main' raster reference, I guess...
+		//  so adopt a policy where the composer is the 'main' raster reference, I guess...
 	else if (key == shortcuts[SHRT_POS_DEC].key)
 	{
 		int spos = song->cpos();
 		if (spos > 0)
 		{
 			spos -= 1; // Nudge by -1, then snap down with raster1.
-			spos = AL::sigmap.raster1(spos, song->arrangerRaster());
+			spos = AL::sigmap.raster1(spos, song->composerRaster());
 		}
 		if (spos < 0)
 			spos = 0;
@@ -4075,14 +4075,14 @@ void OOMidi::kbAccel(int key)
 	}
 	else if (key == shortcuts[SHRT_POS_INC].key)
 	{
-		int spos = AL::sigmap.raster2(song->cpos() + 1, song->arrangerRaster()); // Nudge by +1, then snap up with raster2.
+		int spos = AL::sigmap.raster2(song->cpos() + 1, song->composerRaster()); // Nudge by +1, then snap up with raster2.
 		Pos p(spos, true);
 		song->setPos(0, p, true, true, true); //CDW
 		return;
 	}
 	else if (key == shortcuts[SHRT_POS_DEC_NOSNAP].key)
 	{
-		int spos = song->cpos() - AL::sigmap.rasterStep(song->cpos(), song->arrangerRaster());
+		int spos = song->cpos() - AL::sigmap.rasterStep(song->cpos(), song->composerRaster());
 		if (spos < 0)
 			spos = 0;
 		Pos p(spos, true);
@@ -4091,7 +4091,7 @@ void OOMidi::kbAccel(int key)
 	}
 	else if (key == shortcuts[SHRT_POS_INC_NOSNAP].key)
 	{
-		Pos p(song->cpos() + AL::sigmap.rasterStep(song->cpos(), song->arrangerRaster()), true);
+		Pos p(song->cpos() + AL::sigmap.rasterStep(song->cpos(), song->composerRaster()), true);
 		song->setPos(0, p, true, true, true);
 		return;
 	}
@@ -4219,7 +4219,7 @@ void OOMidi::configPart(int id)
 		partConfig->setItemChecked(0, id == 0);
 		partConfig->setItemChecked(1, id == 1);
 		partConfig->setItemChecked(2, id == 2);
-		arranger->setShowPartType(id);
+		composer->setShowPartType(id);
 		for (int i = 3; i < 10; ++i)
 		{
 			partConfig->setItemEnabled(i, id == 2);
@@ -4229,7 +4229,7 @@ void OOMidi::configPart(int id)
 	{
 		bool flag = !partConfig->isItemChecked(id);
 		partConfig->setItemChecked(id, flag);
-		int val = arranger->showPartEvent();
+		int val = composer->showPartEvent();
 		if (flag)
 		{
 			val |= 1 << (id - 3);
@@ -4238,7 +4238,7 @@ void OOMidi::configPart(int id)
 		{
 			val &= ~(1 << (id - 3));
 		}
-		arranger->setShowPartEvent(val);
+		composer->setShowPartEvent(val);
 	}
 }
 #endif
@@ -4257,33 +4257,33 @@ void OOMidi::cmd(int cmd)
 	switch (cmd)
 	{
 		case CMD_CUT:
-			arranger->cmd(Arranger::CMD_CUT_PART);
+			composer->cmd(Composer::CMD_CUT_PART);
 			break;
 		case CMD_COPY:
-			arranger->cmd(Arranger::CMD_COPY_PART);
+			composer->cmd(Composer::CMD_COPY_PART);
 			break;
 		case CMD_PASTE:
-			arranger->cmd(Arranger::CMD_PASTE_PART);
+			composer->cmd(Composer::CMD_PASTE_PART);
 			break;
 		case CMD_PASTE_CLONE:
-			arranger->cmd(Arranger::CMD_PASTE_CLONE_PART);
+			composer->cmd(Composer::CMD_PASTE_CLONE_PART);
 			break;
 		case CMD_PASTE_TO_TRACK:
-			arranger->cmd(Arranger::CMD_PASTE_PART_TO_TRACK);
+			composer->cmd(Composer::CMD_PASTE_PART_TO_TRACK);
 			break;
 		case CMD_PASTE_CLONE_TO_TRACK:
-			arranger->cmd(Arranger::CMD_PASTE_CLONE_PART_TO_TRACK);
+			composer->cmd(Composer::CMD_PASTE_CLONE_PART_TO_TRACK);
 			break;
 		case CMD_INSERT:
-			arranger->cmd(Arranger::CMD_INSERT_PART);
+			composer->cmd(Composer::CMD_INSERT_PART);
 			break;
 		case CMD_INSERTMEAS:
-			arranger->cmd(Arranger::CMD_INSERT_EMPTYMEAS);
+			composer->cmd(Composer::CMD_INSERT_EMPTYMEAS);
 			break;
 		case CMD_DELETE:
-			if (arranger->getCanvas()->tool() == AutomationTool)
+			if (composer->getCanvas()->tool() == AutomationTool)
 			{
-				arranger->getCanvas()->cmd(Arranger::CMD_REMOVE_SELECTED_AUTOMATION_NODES);
+				composer->getCanvas()->cmd(Composer::CMD_REMOVE_SELECTED_AUTOMATION_NODES);
 			}
 			else
 			{
@@ -4442,8 +4442,8 @@ void OOMidi::clipboardChanged()
 
 void OOMidi::selectionChanged()
 {
-	//bool flag = arranger->isSingleSelection();  // -- Hmm, why only single?
-	bool flag = arranger->selectionSize() > 0; // -- Test OK cut and copy. For oom2. Tim.
+	//bool flag = composer->isSingleSelection();  // -- Hmm, why only single?
+	bool flag = composer->selectionSize() > 0; // -- Test OK cut and copy. For oom2. Tim.
 	editCutAction->setEnabled(flag);
 	editCopyAction->setEnabled(flag);
 }
@@ -4574,7 +4574,7 @@ void OOMidi::mixTrack()
 void OOMidi::configAppearance()
 {
 	if (!appearance)
-		appearance = new Appearance(arranger);
+		appearance = new Appearance(composer);
 	appearance->resetValues();
 	if (appearance->isVisible())
 	{
@@ -5657,7 +5657,7 @@ void OOMidi::configMidiAssign(int tab)
 void OOMidi::execDeliveredScript(int id)
 {
 	//QString scriptfile = QString(INSTPREFIX) + SCRIPTSSUFFIX + deliveredScriptNames[id];
-	song->executeScript(song->getScriptPath(id, true).toLatin1().constData(), song->getSelectedMidiParts(), 0, false); // TODO: get quant from arranger
+	song->executeScript(song->getScriptPath(id, true).toLatin1().constData(), song->getSelectedMidiParts(), 0, false); // TODO: get quant from composer
 }
 //---------------------------------------------------------
 //   execUserScript
@@ -5665,6 +5665,6 @@ void OOMidi::execDeliveredScript(int id)
 
 void OOMidi::execUserScript(int id)
 {
-	song->executeScript(song->getScriptPath(id, false).toLatin1().constData(), song->getSelectedMidiParts(), 0, false); // TODO: get quant from arranger
+	song->executeScript(song->getScriptPath(id, false).toLatin1().constData(), song->getSelectedMidiParts(), 0, false); // TODO: get quant from composer
 }
 

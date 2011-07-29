@@ -24,7 +24,7 @@
 #include "midieditor.h"
 #include "ecanvas.h"
 #include "app.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "song.h"
 #include "event.h"
 #include "shortcuts.h"
@@ -482,7 +482,7 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 					if(actnum >= 20) //Nome of the tools have a higher number than 9
 					{
 						editor->updateCanvas();
-						oom->arranger->updateCanvas();
+						oom->composer->updateCanvas();
 					}	
 				}
 				delete _canvasPopupMenu;
@@ -629,7 +629,7 @@ void EventCanvas::itemPopup(CItem* item, int n, const QPoint&)/*{{{*/
 				item->part()->setColorIndex(curColorIndex);
 
 			editor->updateCanvas();
-			oom->arranger->updateCanvas();
+			oom->composer->updateCanvas();
 			song->update(SC_PART_COLOR_MODIFIED);
 			redraw();
 			break;
@@ -660,7 +660,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 	if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
 		key += Qt::META;
 	//
-	//  Shortcut for DrumEditor & PianoRoll
+	//  Shortcut for DrumEditor & Performer
 	//  Sets locators to selected events
 	//
 	if (key == shortcuts[SHRT_LOCATORS_TO_SELECTION].key)
@@ -690,7 +690,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			song->setPos(2, p2);
 		}
 	}
-	// Select items by key (PianoRoll & DrumEditor)
+	// Select items by key (Performer & DrumEditor)
 	else if (key == shortcuts[SHRT_SEL_RIGHT].key || key == shortcuts[SHRT_SEL_RIGHT_ADD].key)
 	{
 		if (key == shortcuts[SHRT_SEL_RIGHT].key && allItemsAreSelected())
@@ -744,7 +744,7 @@ void EventCanvas::keyPress(QKeyEvent* event)
 			updateSelection();
 		}
 	}
-	//Select items by key: (PianoRoll & DrumEditor)
+	//Select items by key: (Performer & DrumEditor)
 	else if (key == shortcuts[SHRT_SEL_LEFT].key || key == shortcuts[SHRT_SEL_LEFT_ADD].key)
 	{
 		if (key == shortcuts[SHRT_SEL_LEFT].key && allItemsAreSelected())
@@ -912,7 +912,7 @@ QMimeData* EventCanvas::getTextDrag()
 	struct stat f_stat;
 	if (fstat(fileno(tmp), &f_stat) == -1)
 	{
-		fprintf(stderr, "PianoCanvas::copy() fstat failes:<%s>\n",
+		fprintf(stderr, "PerformerCanvas::copy() fstat failes:<%s>\n",
 				strerror(errno));
 		fclose(tmp);
 		return 0;

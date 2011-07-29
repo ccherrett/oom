@@ -18,11 +18,11 @@
 //
 // Shortcut categories
 //
-#define PROLL_SHRT       1  // Pianoroll shortcut
+#define PROLL_SHRT       1  // Performer shortcut
 #define DEDIT_SHRT       2  // Drumedit shortcut
 #define LEDIT_SHRT       4  // Listedit shortcut
 #define SCORE_SHRT       8  // Score shortcut
-#define ARRANG_SHRT     16  // Arranger shortcut
+#define ARRANG_SHRT     16  // Composer shortcut
 #define TRANSP_SHRT     32  // Transport shortcut
 #define WAVE_SHRT       64  // Waveedit shortcut
 #define GLOBAL_SHRT    128  // Global shortcuts
@@ -165,7 +165,7 @@ enum
     SHRT_OPEN_HELP, //F1
     SHRT_START_WHATSTHIS, //Shift-F1
 
-    //Arranger, parts:
+    //Composer, parts:
     SHRT_EDIT_PART, //Enter
     SHRT_SEL_ABOVE, //Up
     SHRT_SEL_ABOVE_ADD, //move up and add to selection
@@ -180,7 +180,7 @@ enum
     SHRT_PASTE_CLONE_TO_TRACK, //CTRL+SHIFT+Key_B
 	SHRT_INSERT_PART, //Ctrl+Insert
 
-    //Arranger tracks
+    //Composer tracks
     SHRT_SEL_TRACK_BELOW,
     SHRT_SEL_TRACK_ABOVE,
     SHRT_SEL_TRACK_ABOVE_ADD,
@@ -188,7 +188,7 @@ enum
 	SHRT_RENAME_TRACK, //Ctrl+R
     SHRT_SEL_ALL_TRACK, //(Windows Key)Mod4+A 
 
-    //To be in arranger, pianoroll & drumeditor. p4.0.10 now globally handled, too.
+    //To be in Composer, performer & drumeditor. p4.0.10 now globally handled, too.
     SHRT_SELECT_ALL, //Ctrl+A
     SHRT_SELECT_NONE, //
     SHRT_SELECT_ALL_NODES, //Ctrl+Shift+A
@@ -242,7 +242,7 @@ enum
     SHRT_POS_DEC_FRAME,
      */
 
-    SHRT_LOCATORS_TO_SELECTION, //Alt+P, currently in arranger & pianoroll
+    SHRT_LOCATORS_TO_SELECTION, //Alt+P, currently in Composer & performer
     SHRT_INSERT_AT_LOCATION, //Shift+CrsrRight
     SHRT_INCREASE_LEN,
     SHRT_DECREASE_LEN,
@@ -255,7 +255,7 @@ enum
     SHRT_TOOL_6, //Shift+6
     SHRT_TRANSPOSE, //Default: undefined
 
-    //Shortcuts to be in pianoroll & drumeditor
+    //Shortcuts to be in performer & drumeditor
 	SHRT_ZOOM_IN, // Ctrl+PgUp
 	SHRT_ZOOM_OUT, // Ctrl+PgDown
 	SHRT_VZOOM_IN, // Ctrl+Shift+PgUp
@@ -285,14 +285,14 @@ enum
     SHRT_ERASE_MEASURE,
     SHRT_DELETE_MEASURE,
     SHRT_CREATE_MEASURE,
-    SHRT_SET_QUANT_0, //1 - pianoroll
-    SHRT_SET_QUANT_1, //1 - pianoroll
-    SHRT_SET_QUANT_2, //2 - pianoroll
-    SHRT_SET_QUANT_3, //3 - pianoroll
-    SHRT_SET_QUANT_4, //4 - pianoroll
-    SHRT_SET_QUANT_5, //5 - pianoroll
-    SHRT_SET_QUANT_6, //6 - pianoroll
-    SHRT_SET_QUANT_7, //7 - pianoroll
+    SHRT_SET_QUANT_0, //1 - performer
+    SHRT_SET_QUANT_1, //1 - performer
+    SHRT_SET_QUANT_2, //2 - performer
+    SHRT_SET_QUANT_3, //3 - performer
+    SHRT_SET_QUANT_4, //4 - performer
+    SHRT_SET_QUANT_5, //5 - performer
+    SHRT_SET_QUANT_6, //6 - performer
+    SHRT_SET_QUANT_7, //7 - performer
     SHRT_TOGGLE_TRIOL, //t
     SHRT_TOGGLE_PUNCT, //.-keypad
     SHRT_TOGGLE_PUNCT2, // ,
@@ -330,10 +330,10 @@ enum
     SHRT_MIDI_PANIC,
     SHRT_NAVIGATE_TO_CANVAS,
 
-    // pianoroll and drum editor
+    // performer and drum editor
     SHRT_TOOL_LINEDRAW,
 
-    // arranger
+    // Composer
 	SHRT_TOOL_SCISSORS, // j
     SHRT_TOOL_GLUE,
     SHRT_TOOL_MUTE,

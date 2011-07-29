@@ -7,7 +7,7 @@ class QColor;
 class QDialog;
 
 class OOMidi;
-class Arranger;
+class Composer;
 class GlobalConfigValues;
 
 //---------------------------------------------------------
@@ -16,7 +16,7 @@ class GlobalConfigValues;
 
 class Appearance : public QDialog, public Ui::AppearanceDialogBase
 {
-    Arranger* arr;
+    Composer* arr;
     QColor* color;
     GlobalConfigValues* config;
     QButtonGroup* aPalette;
@@ -61,7 +61,7 @@ private slots:
     void colorNameEditFinished();
 
 public:
-    Appearance(Arranger*, QWidget* parent = 0);
+    Appearance(Composer*, QWidget* parent = 0);
     ~Appearance();
     void resetValues();
 };

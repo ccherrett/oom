@@ -132,8 +132,8 @@ private:
     int updateFlags;
 
     TrackList _tracks; // tracklist as seen by globally
-    TrackList _artracks; // tracklist as seen by arranger
-    TrackViewList _tviews; // trackviewlist as seen by arranger
+    TrackList _artracks; // tracklist as seen by Composer
+    TrackViewList _tviews; // trackviewlist as seen by Composer
 	TrackViewList _autotviews;
     MidiTrackList _midis;
     WaveTrackList _waves;
@@ -161,7 +161,7 @@ private:
     int _cycleMode;
     bool _click;
     bool _quantize;
-    int _arrangerRaster; // Used for audio rec new part snapping. Set by Arranger snap combo box.
+    int _composerRaster; // Used for audio rec new part snapping. Set by Composer snap combo box.
     unsigned _len; // song len in ticks
     FollowMode _follow;
     int _globalPitchShift;
@@ -388,13 +388,13 @@ public:
     void cmdRemovePart(Part* part);
     void cmdAddPart(Part* part);
 
-    int arrangerRaster() {
-        return _arrangerRaster;
+    int composerRaster() {
+        return _composerRaster;
     } // Used by Song::cmdAddRecordedWave to snap new wave parts
 
-    void setArrangerRaster(int r) {
-        _arrangerRaster = r;
-    } // Used by Arranger snap combo box
+    void setComposerRaster(int r) {
+        _composerRaster = r;
+    } // Used by Composer snap combo box
 
     //-----------------------------------------
     //   track manipulations

@@ -31,7 +31,7 @@
 #include "header.h"
 #include "node.h"
 #include "instruments/minstrument.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "event.h"
 #include "midiedit/drummap.h"
 #include "synth.h"
@@ -760,38 +760,38 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			}
 			case 12:
 			{
-				int canvasHeight = oom->arranger->getCanvas()->height();
+				int canvasHeight = oom->composer->getCanvas()->height();
 
 				if (multipleSelectedTracks)
 				{
 					song->setTrackHeights(selectedTracksList, canvasHeight);
 					Track* firstSelectedTrack = *selectedTracksList.begin();
-					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(firstSelectedTrack));
 
 				}
 				else
 				{
 					m_track->setHeight(canvasHeight);
 					song->update(SC_TRACK_MODIFIED);
-					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(m_track));
+					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(m_track));
 				}
 				break;
 			}
 			case 13:
 			{
-				int canvasHeight = oom->arranger->getCanvas()->height();
+				int canvasHeight = oom->composer->getCanvas()->height();
 				if (multipleSelectedTracks)
 				{
 					song->setTrackHeights(selectedTracksList, canvasHeight / selectedTracksList.size());
 					Track* firstSelectedTrack = *selectedTracksList.begin();
-					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(firstSelectedTrack));
 
 				}
 				else
 				{
 					m_track->setHeight(canvasHeight);
 					song->update(SC_TRACK_MODIFIED);
-					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(m_track));
+					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(m_track));
 				}
 				break;
 			}

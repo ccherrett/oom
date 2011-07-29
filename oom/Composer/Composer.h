@@ -1,12 +1,12 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: arranger.h,v 1.17.2.15 2009/11/14 03:37:48 terminator356 Exp $
+//    $Id: Composer.h,v 1.17.2.15 2009/11/14 03:37:48 terminator356 Exp $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#ifndef __ARRANGER_H__
-#define __ARRANGER_H__
+#ifndef __COMPOSER_H__
+#define __COMPOSER_H__
 
 #include <vector>
 
@@ -49,10 +49,10 @@ static const int MIN_HEADER_WIDTH = 240;
 static const int MAX_HEADER_WIDTH = 400;
 
 //---------------------------------------------------------
-//   Arranger
+//   Composer
 //---------------------------------------------------------
 
-class Arranger : public QWidget
+class Composer : public QWidget
 {
     Q_OBJECT
 
@@ -154,8 +154,8 @@ public:
 	CMD_INSERT_PART, CMD_INSERT_EMPTYMEAS, CMD_REMOVE_SELECTED_AUTOMATION_NODES
     };
 
-    Arranger(QMainWindow* parent, const char* name = 0);
-	~Arranger();
+    Composer(QMainWindow* parent, const char* name = 0);
+	~Composer();
 
     PartCanvas* getCanvas()
     {

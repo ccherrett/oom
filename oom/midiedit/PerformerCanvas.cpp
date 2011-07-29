@@ -1,7 +1,7 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: prcanvas.cpp,v 1.20.2.19 2009/11/16 11:29:33 lunar_shuttle Exp $
+//    $Id: PerformerCanvas.cpp,v 1.20.2.19 2009/11/16 11:29:33 lunar_shuttle Exp $
 //  (C) Copyright 1999-2004 Werner Schweer (ws@seh.de)
 //=========================================================
 
@@ -14,7 +14,7 @@
 #include <errno.h>
 
 #include "xml.h"
-#include "prcanvas.h"
+#include "PerformerCanvas.h"
 #include "midiport.h"
 #include "minstrument.h"
 #include "midictrl.h"
@@ -44,10 +44,10 @@ NEvent::NEvent(Event& e, Part* p, int y) : CItem(e, p)
 }
 
 //---------------------------------------------------------
-//   PianoCanvas
+//   PerformerCanvas
 //---------------------------------------------------------
 
-PianoCanvas::PianoCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy)
+PerformerCanvas::PerformerCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy)
 : EventCanvas(pr, parent, sx, sy)
 {
 	colorMode = 0;
@@ -66,7 +66,7 @@ PianoCanvas::PianoCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy)
 //   addItem
 //---------------------------------------------------------
 
-void PianoCanvas::addItem(Part* part, Event& event)
+void PerformerCanvas::addItem(Part* part, Event& event)
 {
 	if (signed(event.tick()) < 0)
 	{
@@ -94,7 +94,7 @@ void PianoCanvas::addItem(Part* part, Event& event)
 //   pitch2y
 //---------------------------------------------------------
 
-int PianoCanvas::pitch2y(int pitch) const
+int PerformerCanvas::pitch2y(int pitch) const
 {
 	int tt[] = {
 		5, 12, 19, 26, 33, 44, 51, 58, 64, 71, 78, 85
@@ -109,7 +109,7 @@ int PianoCanvas::pitch2y(int pitch) const
 //   y2pitch
 //---------------------------------------------------------
 
-int PianoCanvas::y2pitch(int y) const
+int PerformerCanvas::y2pitch(int y) const
 {
 	const int total = (10 * 7 + 5) * KH; // 75 Ganztonschritte
 	y = total - y;
@@ -131,19 +131,19 @@ int PianoCanvas::y2pitch(int y) const
 	return kt[y % 91] + oct;
 }
 
-void PianoCanvas::toggleComments(bool state)
+void PerformerCanvas::toggleComments(bool state)
 {
 	m_showcomments = state;
 	update();
 }
 
-void PianoCanvas::drawOverlay(QPainter&, const QRect&)
+void PerformerCanvas::drawOverlay(QPainter&, const QRect&)
 {
 }
 //---------------------------------------------------------
 //   drawTopItem
 //---------------------------------------------------------
-void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
+void PerformerCanvas::drawTopItem(QPainter& p, const QRect& rect)
 {
 	int x = rect.x();
 	if(_curPart && m_showcomments)/*{{{*/
@@ -153,11 +153,11 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 			cmag = 1;
 		if(cmag > 4000)
 			cmag = 4000;
-		//printf("PianoCanvas::drawCanvas(): Current xMag: %f, cMag: %d\n", xmag, cmag);
+		//printf("PerformerCanvas::drawCanvas(): Current xMag: %f, cMag: %d\n", xmag, cmag);
 		Track* track = _curPart->track();
 		if(track && track->isMidiTrack())
 		{
-			//printf("PianoCanvas::drawCanvas() track is MidiTrack\n");
+			//printf("PerformerCanvas::drawCanvas() track is MidiTrack\n");
 			MidiTrack* mtrack = (MidiTrack*)track;
 			int port = mtrack->outPort();
 			int channel = mtrack->outChannel();
@@ -219,7 +219,7 @@ void PianoCanvas::drawTopItem(QPainter& p, const QRect& rect)
 //    draws a note
 //---------------------------------------------------------
 
-void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{{{*/
+void PerformerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{{{*/
 {
 	QRect r = item->bbox();
 	if (!virt())
@@ -254,7 +254,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 
 	QPen mainPen(Qt::black);
 	int alpha = 195;
-	int ghostedAlpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+	int ghostedAlpha = tconfig().get_property("PerformerEdit", "renderalpha", 50).toInt();
 	if(noteAlphaAction && !noteAlphaAction->isChecked())
 		ghostedAlpha = 0;
 
@@ -412,7 +412,7 @@ void PianoCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{
 //    draws moving items
 //---------------------------------------------------------
 
-void PianoCanvas::drawMoving(QPainter& p, const CItem* item, const QRect& rect)/*{{{*/
+void PerformerCanvas::drawMoving(QPainter& p, const CItem* item, const QRect& rect)/*{{{*/
 {
 	//if(((NEvent*)item)->part() != curPart)
 	//  return;
@@ -443,7 +443,7 @@ void PianoCanvas::drawMoving(QPainter& p, const CItem* item, const QRect& rect)/
 //   viewMouseDoubleClickEvent
 //---------------------------------------------------------
 
-void PianoCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
+void PerformerCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 {
 	if ((_tool != PointerTool) && (event->button() != Qt::LeftButton))
 	{
@@ -456,7 +456,7 @@ void PianoCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 //   moveCanvasItems
 //---------------------------------------------------------
 
-void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtype, int* pflags)/*{{{*/
+void PerformerCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dtype, int* pflags)/*{{{*/
 {
 	if (editor->parts()->empty())
 		return;
@@ -611,9 +611,9 @@ void PianoCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType dty
 //---------------------------------------------------------
 
 // Changed by T356.
-//bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype, int* pflags)
+//bool PerformerCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype, int* pflags)
 
-bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)/*{{{*/
+bool PerformerCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)/*{{{*/
 {
 	NEvent* nevent = (NEvent*) item;
 	Event event = nevent->event();
@@ -650,7 +650,7 @@ bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)/*{{{*
 
 	// Added by T356.
 	if (((int) newEvent.endTick() - (int) part->lenTick()) > 0)
-		printf("PianoCanvas::moveItem Error! New event end:%d exceeds length:%d of part:%s\n", newEvent.endTick(), part->lenTick(), part->name().toLatin1().constData());
+		printf("PerformerCanvas::moveItem Error! New event end:%d exceeds length:%d of part:%s\n", newEvent.endTick(), part->lenTick(), part->name().toLatin1().constData());
 
 	song->startUndo();
 	if (dtype == MOVE_COPY || dtype == MOVE_CLONE)
@@ -706,7 +706,7 @@ bool PianoCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)/*{{{*
 //   newItem(p, state)
 //---------------------------------------------------------
 
-CItem* PianoCanvas::newItem(const QPoint& p, int)/*{{{*/
+CItem* PerformerCanvas::newItem(const QPoint& p, int)/*{{{*/
 {
 	//printf("newItem point\n");
 	int pitch = y2pitch(p.y());
@@ -746,7 +746,7 @@ CItem* PianoCanvas::newItem(const QPoint& p, int)/*{{{*/
     return new NEvent(e, _curPart, pitch2y(pitch));
 }/*}}}*/
 
-void PianoCanvas::newItem(CItem* item, bool noSnap)/*{{{*/
+void PerformerCanvas::newItem(CItem* item, bool noSnap)/*{{{*/
 {
 	//printf("newItem citem\n");
 	NEvent* nevent = (NEvent*) item;
@@ -821,7 +821,7 @@ void PianoCanvas::newItem(CItem* item, bool noSnap)/*{{{*/
 //   resizeItem
 //---------------------------------------------------------
 
-void PianoCanvas::resizeItem(CItem* item, bool noSnap) // experimental changes to try dynamically extending parts/*{{{*/
+void PerformerCanvas::resizeItem(CItem* item, bool noSnap) // experimental changes to try dynamically extending parts/*{{{*/
 {
 	//printf("PartCanvas::resizeItem!\n");
 	NEvent* nevent = (NEvent*) item;
@@ -889,7 +889,7 @@ void PianoCanvas::resizeItem(CItem* item, bool noSnap) // experimental changes t
 //   deleteItem
 //---------------------------------------------------------
 
-bool PianoCanvas::deleteItem(CItem* item)/*{{{*/
+bool PerformerCanvas::deleteItem(CItem* item)/*{{{*/
 {
 	NEvent* nevent = (NEvent*) item;
 	//if (nevent->part() == _curPart)
@@ -920,7 +920,7 @@ bool PianoCanvas::deleteItem(CItem* item)/*{{{*/
 //   pianoCmd
 //---------------------------------------------------------
 
-void PianoCanvas::pianoCmd(int cmd)/*{{{*/
+void PerformerCanvas::pianoCmd(int cmd)/*{{{*/
 {
 	switch (cmd)
 	{
@@ -1024,7 +1024,7 @@ void PianoCanvas::pianoCmd(int cmd)/*{{{*/
 //   pianoPressed
 //---------------------------------------------------------
 
-void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)/*{{{*/
+void PerformerCanvas::pianoPressed(int pitch, int velocity, bool shift)/*{{{*/
 {
 	int port = track()->outPort();
 	int channel = track()->outChannel();
@@ -1095,7 +1095,7 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)/*{{{*/
 //   pianoReleased
 //---------------------------------------------------------
 
-void PianoCanvas::pianoReleased(int pitch, bool)/*{{{*/
+void PerformerCanvas::pianoReleased(int pitch, bool)/*{{{*/
 {
 	if(m_globalKey)
 	{
@@ -1213,7 +1213,7 @@ void drawTickRaster(QPainter& p, int x, int y, int w, int h, int raster, bool ct
 //   draw
 //---------------------------------------------------------
 
-void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)/*{{{*/
+void PerformerCanvas::drawCanvas(QPainter& p, const QRect& rect)/*{{{*/
 {
 	int x = rect.x();
 	int y = rect.y();
@@ -1259,10 +1259,10 @@ void PianoCanvas::drawCanvas(QPainter& p, const QRect& rect)/*{{{*/
 //    pulldown menu commands
 //---------------------------------------------------------
 
-void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen, int range)/*{{{*/
+void PerformerCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen, int range)/*{{{*/
 {
 	cmdRange = range;
-	//printf("PianoCanvas cmd called with command: %d\n\n", cmd);
+	//printf("PerformerCanvas cmd called with command: %d\n\n", cmd);
 	switch (cmd)
 	{
 		case CMD_CUT:
@@ -1708,7 +1708,7 @@ void PianoCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quantLen,
 //   quantize
 //---------------------------------------------------------
 
-void PianoCanvas::quantize(int strength, int limit, bool quantLen)/*{{{*/
+void PerformerCanvas::quantize(int strength, int limit, bool quantLen)/*{{{*/
 {
 	song->startUndo();
     for (iCItem k = _items.begin(); k != _items.end(); ++k)
@@ -1756,7 +1756,7 @@ void PianoCanvas::quantize(int strength, int limit, bool quantLen)/*{{{*/
 }/*}}}*/
 
 
-void PianoCanvas::createQWertyToMidiBindings()/*{{{*/
+void PerformerCanvas::createQWertyToMidiBindings()/*{{{*/
 {
 	_qwertyToMidiMap.clear();
 
@@ -1789,18 +1789,18 @@ void PianoCanvas::createQWertyToMidiBindings()/*{{{*/
 	bindQwertyKeyToMidiValue("u", 35);
 }/*}}}*/
 
-void PianoCanvas::setOctaveQwerty(int octave)
+void PerformerCanvas::setOctaveQwerty(int octave)
 {
 	_octaveQwerty = octave + 1;
 }
 
-void PianoCanvas::bindQwertyKeyToMidiValue(const char* key, int note)
+void PerformerCanvas::bindQwertyKeyToMidiValue(const char* key, int note)
 {
 	_qwertyToMidiMap.insert(key, note);
 }
 
 
-int PianoCanvas::stepInputQwerty(QKeyEvent *event)
+int PerformerCanvas::stepInputQwerty(QKeyEvent *event)
 {
 	//const char* key = event->text().toAscii().data();
 	int pitch = _qwertyToMidiMap.value(event->text(), -1);
@@ -1822,7 +1822,7 @@ int PianoCanvas::stepInputQwerty(QKeyEvent *event)
 //   midiNote
 //---------------------------------------------------------
 
-void PianoCanvas::midiNote(int pitch, int velo)/*{{{*/
+void PerformerCanvas::midiNote(int pitch, int velo)/*{{{*/
 {
 	unsigned songtick = song->cpos();
 	//Filter the noteoff events/*{{{*/
@@ -1843,7 +1843,7 @@ void PianoCanvas::midiNote(int pitch, int velo)/*{{{*/
 			processKeySwitches(_curPart, pitch, songtick);
 		}
 	}/*}}}*/
-	//printf("PianoCanvas::midiNote(pitch:%d, velo:%d) \n", pitch, velo);
+	//printf("PerformerCanvas::midiNote(pitch:%d, velo:%d) \n", pitch, velo);
     if (_midiin && _steprec && _curPart && !audio->isPlaying() && velo && _pos[0] >= start_tick && !(globalKeyState & Qt::AltModifier))
 	{
 		//MidiTrack* ctrack = (MidiTrack*)_curPart->track();
@@ -1954,7 +1954,7 @@ void PianoCanvas::midiNote(int pitch, int velo)/*{{{*/
 	emit pitchChanged(pitch);
 }/*}}}*/
 
-void PianoCanvas::stepInputNote(Part* part, unsigned tick, int pitch, int velo)
+void PerformerCanvas::stepInputNote(Part* part, unsigned tick, int pitch, int velo)
 {
 	unsigned int len = editor->quant(); //prevent compiler warning: comparison singed/unsigned/*{{{*/
 	//unsigned tick = _pos[0]; //CDW
@@ -2020,7 +2020,7 @@ void PianoCanvas::stepInputNote(Part* part, unsigned tick, int pitch, int velo)
 	//itemPressed(new CItem(e, part));/*}}}*/
 }
 
-void PianoCanvas::recordArmAll()
+void PerformerCanvas::recordArmAll()
 {
 	PartList* pl = editor->parts();
 	for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
@@ -2034,7 +2034,7 @@ void PianoCanvas::recordArmAll()
 	song->update(SC_RECFLAG);
 }
 
-void PianoCanvas::globalTransposeClicked(bool state)/*{{{*/
+void PerformerCanvas::globalTransposeClicked(bool state)/*{{{*/
 {
 	PartList* pl = editor->parts();
 	for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
@@ -2048,7 +2048,7 @@ void PianoCanvas::globalTransposeClicked(bool state)/*{{{*/
 	song->update(SC_MIDI_TRACK_PROP);
 }/*}}}*/
 
-void PianoCanvas::processKeySwitches(Part* part, int pitch, int songtick)/*{{{*/
+void PerformerCanvas::processKeySwitches(Part* part, int pitch, int songtick)/*{{{*/
 {
 	MidiTrack* track = (MidiTrack*)part->track();
 	int port = track->outPort();
@@ -2096,7 +2096,7 @@ void PianoCanvas::processKeySwitches(Part* part, int pitch, int songtick)/*{{{*/
 //    cut copy paste
 //---------------------------------------------------------
 
-void PianoCanvas::copy()
+void PerformerCanvas::copy()
 {
 	//QDrag* drag = getTextDrag();
 	QMimeData* drag = getTextDrag();
@@ -2110,7 +2110,7 @@ void PianoCanvas::copy()
 //    paste events
 //---------------------------------------------------------
 
-void PianoCanvas::paste()
+void PerformerCanvas::paste()
 {
 	QString stype("x-oom-eventlist");
 
@@ -2123,7 +2123,7 @@ void PianoCanvas::paste()
 //   startDrag
 //---------------------------------------------------------
 
-void PianoCanvas::startDrag(CItem* /* item*/, bool copymode)
+void PerformerCanvas::startDrag(CItem* /* item*/, bool copymode)
 {
 	QMimeData* md = getTextDrag();
 
@@ -2146,7 +2146,7 @@ void PianoCanvas::startDrag(CItem* /* item*/, bool copymode)
 //   dragEnterEvent
 //---------------------------------------------------------
 
-void PianoCanvas::dragEnterEvent(QDragEnterEvent* event)
+void PerformerCanvas::dragEnterEvent(QDragEnterEvent* event)
 {
 	///event->accept(Q3TextDrag::canDecode(event));
 	event->acceptProposedAction(); // TODO CHECK Tim.
@@ -2156,7 +2156,7 @@ void PianoCanvas::dragEnterEvent(QDragEnterEvent* event)
 //   dragMoveEvent
 //---------------------------------------------------------
 
-void PianoCanvas::dragMoveEvent(QDragMoveEvent*)
+void PerformerCanvas::dragMoveEvent(QDragMoveEvent*)
 {
 	//printf("drag move %x\n", this);
 	//event->acceptProposedAction();
@@ -2166,13 +2166,13 @@ void PianoCanvas::dragMoveEvent(QDragMoveEvent*)
 //   dragLeaveEvent
 //---------------------------------------------------------
 
-void PianoCanvas::dragLeaveEvent(QDragLeaveEvent*)
+void PerformerCanvas::dragLeaveEvent(QDragLeaveEvent*)
 {
 	//printf("drag leave\n");
 	//event->acceptProposedAction();
 }
 
-void PianoCanvas::selectLasso(bool toggle)
+void PerformerCanvas::selectLasso(bool toggle)
 {
 	CItemList curPartItems = _items;
 	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
@@ -2225,7 +2225,7 @@ void PianoCanvas::selectLasso(bool toggle)
 //   dropEvent
 //---------------------------------------------------------
 
-void PianoCanvas::viewDropEvent(QDropEvent* event)
+void PerformerCanvas::viewDropEvent(QDropEvent* event)
 	  {
 	  QString text;
 	  if (event->source() == this) {
@@ -2259,7 +2259,7 @@ void PianoCanvas::viewDropEvent(QDropEvent* event)
 //   itemPressed
 //---------------------------------------------------------
 
-void PianoCanvas::itemPressed(const CItem* item)
+void PerformerCanvas::itemPressed(const CItem* item)
 {
 	if (!_playEvents)
 		return;
@@ -2280,7 +2280,7 @@ void PianoCanvas::itemPressed(const CItem* item)
 //   itemReleased
 //---------------------------------------------------------
 
-void PianoCanvas::itemReleased(const CItem*, const QPoint&)
+void PerformerCanvas::itemReleased(const CItem*, const QPoint&)
 {
 	if (!_playEvents)
 		return;
@@ -2297,7 +2297,7 @@ void PianoCanvas::itemReleased(const CItem*, const QPoint&)
 //   itemMoved
 //---------------------------------------------------------
 
-void PianoCanvas::itemMoved(const CItem* item, const QPoint& pos)
+void PerformerCanvas::itemMoved(const CItem* item, const QPoint& pos)
 {
 	int npitch = y2pitch(pos.y());
 	if ((playedPitch != -1) && (playedPitch != npitch))
@@ -2321,7 +2321,7 @@ void PianoCanvas::itemMoved(const CItem* item, const QPoint& pos)
 //   curPartChanged
 //---------------------------------------------------------
 
-void PianoCanvas::curPartChanged()
+void PerformerCanvas::curPartChanged()
 {
 	editor->setWindowTitle("The Performer:     "+getCaption());
 	emit partChanged(editor->curCanvasPart());
@@ -2331,7 +2331,7 @@ void PianoCanvas::curPartChanged()
 // doModify
 //---------------------------------------------------------
 
-void PianoCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, bool play)/*{{{*/
+void PerformerCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, bool play)/*{{{*/
 {
     if(item)
 	{
@@ -2419,7 +2419,7 @@ void PianoCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, bool 
 //   modifySelected
 //---------------------------------------------------------
 
-void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta, bool strict)/*{{{*/
+void PerformerCanvas::modifySelected(NoteInfo::ValType type, int delta, bool strict)/*{{{*/
 {
 	audio->msgIdle(true);
 	song->startUndo();
@@ -2456,14 +2456,14 @@ void PianoCanvas::modifySelected(NoteInfo::ValType type, int delta, bool strict)
 //   resizeEvent
 //---------------------------------------------------------
 
-void PianoCanvas::resizeEvent(QResizeEvent* ev)
+void PerformerCanvas::resizeEvent(QResizeEvent* ev)
 {
 	if (ev->size().width() != ev->oldSize().width())
 		emit newWidth(ev->size().width());
 	EventCanvas::resizeEvent(ev);
 }
 
-bool PianoCanvas::isEventSelected(Event e)/*{{{*/
+bool PerformerCanvas::isEventSelected(Event e)/*{{{*/
 {
 	bool rv = false;
 	CItemList list = getSelectedItemsForCurrentPart();

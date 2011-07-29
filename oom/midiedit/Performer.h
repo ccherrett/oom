@@ -1,12 +1,12 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: pianoroll.h,v 1.5.2.4 2009/11/16 11:29:33 lunar_shuttle Exp $
+//    $Id: Performer.h,v 1.5.2.4 2009/11/16 11:29:33 lunar_shuttle Exp $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#ifndef __PIANOROLL_H__
-#define __PIANOROLL_H__
+#ifndef __PERFORMER_H__
+#define __PERFORMER_H__
 
 #include <QCloseEvent>
 #include <QResizeEvent>
@@ -29,7 +29,7 @@ class TimeLabel;
 class PitchLabel;
 class PosLabel;
 class QLabel;
-class PianoCanvas;
+class PerformerCanvas;
 class MTScale;
 class PCScale;
 class Track;
@@ -57,10 +57,10 @@ class QTabWidget;
 class TrackListView;
 
 //---------------------------------------------------------
-//   PianoRoll
+//   Performer
 //---------------------------------------------------------
 
-class PianoRoll : public MidiEditor
+class Performer : public MidiEditor
 {
     Q_OBJECT
 
@@ -248,8 +248,8 @@ public slots:
 	void setKeyBindings(Patch*);
 
 public:
-    PianoRoll(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);
-    ~PianoRoll();
+    Performer(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);
+    ~Performer();
     //void setSolo(bool val);
 	bool isCurrentPatch(int, int, int);
 	bool isGlobalEdit();

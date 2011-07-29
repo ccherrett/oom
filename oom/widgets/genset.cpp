@@ -101,10 +101,10 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	//showMixer->setChecked(config.mixer1Visible);
 	//showMixer2->setChecked(config.mixer2Visible);
 
-	/*arrangerX->setValue(config.geometryMain.x());
-	arrangerY->setValue(config.geometryMain.y());
-	arrangerW->setValue(config.geometryMain.width());
-	arrangerH->setValue(config.geometryMain.height());
+	/*composerX->setValue(config.geometryMain.x());
+	composerY->setValue(config.geometryMain.y());
+	composerW->setValue(config.geometryMain.width());
+	composerH->setValue(config.geometryMain.height());
 
 	transportX->setValue(config.geometryTransport.x());
 	transportY->setValue(config.geometryTransport.y());
@@ -148,7 +148,7 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	//connect(setMixerCurrent, SIGNAL(clicked()), SLOT(mixerCurrent()));
 	//connect(setMixer2Current, SIGNAL(clicked()), SLOT(mixer2Current()));
 	//connect(setBigtimeCurrent, SIGNAL(clicked()), SLOT(bigtimeCurrent()));
-	//connect(setArrangerCurrent, SIGNAL(clicked()), SLOT(arrangerCurrent()));
+	//connect(setComposerCurrent, SIGNAL(clicked()), SLOT(composerCurrent()));
 	//connect(setTransportCurrent, SIGNAL(clicked()), SLOT(transportCurrent()));
 }
 
@@ -212,10 +212,10 @@ void GlobalSettingsConfig::updateSettings()
 	//showMixer->setChecked(config.mixer1Visible);
 	//showMixer2->setChecked(config.mixer2Visible);
 
-	/*arrangerX->setValue(config.geometryMain.x());
-	arrangerY->setValue(config.geometryMain.y());
-	arrangerW->setValue(config.geometryMain.width());
-	arrangerH->setValue(config.geometryMain.height());
+	/*composerX->setValue(config.geometryMain.x());
+	composerY->setValue(config.geometryMain.y());
+	composerW->setValue(config.geometryMain.width());
+	composerH->setValue(config.geometryMain.height());
 
 	transportX->setValue(config.geometryTransport.x());
 	transportY->setValue(config.geometryTransport.y());
@@ -295,10 +295,10 @@ void GlobalSettingsConfig::apply()
 	//config.mixer1Visible = showMixer->isChecked();
 	//config.mixer2Visible = showMixer2->isChecked();
 
-	//config.geometryMain.setX(arrangerX->value());
-	//config.geometryMain.setY(arrangerY->value());
-	//config.geometryMain.setWidth(arrangerW->value());
-	//config.geometryMain.setHeight(arrangerH->value());
+	//config.geometryMain.setX(composerX->value());
+	//config.geometryMain.setY(composerY->value());
+	//config.geometryMain.setWidth(composerW->value());
+	//config.geometryMain.setHeight(composerH->value());
 
 	//config.geometryTransport.setX(transportX->value());
 	//config.geometryTransport.setY(transportY->value());
@@ -441,16 +441,16 @@ void GlobalSettingsConfig::bigtimeCurrent()
 }
 
 //---------------------------------------------------------
-//   arrangerCurrent
+//   composerCurrent
 //---------------------------------------------------------
 
-void GlobalSettingsConfig::arrangerCurrent()
+void GlobalSettingsConfig::composerCurrent()
 {
 	QRect r(oom->frameGeometry());
-	arrangerX->setValue(r.x());
-	arrangerY->setValue(r.y());
-	arrangerW->setValue(r.width());
-	arrangerH->setValue(r.height());
+	composerX->setValue(r.x());
+	composerY->setValue(r.y());
+	composerW->setValue(r.width());
+	composerH->setValue(r.height());
 }
 
 //---------------------------------------------------------

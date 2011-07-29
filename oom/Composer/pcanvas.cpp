@@ -44,7 +44,7 @@
 #include "app.h"
 #include "filedialog.h"
 #include "marker/marker.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "tlist.h"
 #include "utils.h"
 #include "midimonitor.h"
@@ -1019,8 +1019,8 @@ QMenu* PartCanvas::genItemPopup(CItem* item)/*{{{*/
 	{
 		case Track::MIDI:
 		{
-			QAction *act_pianoroll = partPopup->addAction(QIcon(*pianoIconSet), tr("pianoroll"));
-			act_pianoroll->setData(10);
+			QAction *act_performer = partPopup->addAction(QIcon(*pianoIconSet), tr("performer"));
+			act_performer->setData(10);
 			QAction *act_mlist = partPopup->addAction(QIcon(*edit_listIcon), tr("list"));
 			act_mlist->setData(12);
 			QAction *act_mexport = partPopup->addAction(tr("export"));
@@ -1108,7 +1108,7 @@ void PartCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 		case 5:
 			copy(pl);
 			break;
-		case 10: // pianoroll edit
+		case 10: // performer edit
 			emit startEditor(pl, 0);
 			return;
 		case 12: // list edit
@@ -1719,7 +1719,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
 	{
-		Track* t =oom->arranger->curTrack();
+		Track* t =oom->composer->curTrack();
 		if (t)
 		{
 			audio->msgSetSolo(t, !t->solo());
@@ -1729,7 +1729,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_TRACK_TOGGLE_MUTE].key)
 	{
-		Track* t =oom->arranger->curTrack();
+		Track* t =oom->composer->curTrack();
 		if (t)
 		{
 			t->setMute(!t->mute());
@@ -1744,38 +1744,38 @@ void PartCanvas::keyPress(QKeyEvent* event)
 	}
 	else if (key == shortcuts[SHRT_SET_QUANT_0].key)
 	{
-		oom->arranger->_setRaster(0);
-		oom->arranger->raster->setCurrentIndex(0);
+		oom->composer->_setRaster(0);
+		oom->composer->raster->setCurrentIndex(0);
 		return;
 	}
 	else if (key == shortcuts[SHRT_SET_QUANT_1].key)
 	{
-		oom->arranger->_setRaster(1);
-		oom->arranger->raster->setCurrentIndex(1);
+		oom->composer->_setRaster(1);
+		oom->composer->raster->setCurrentIndex(1);
 		return;
 	}
 	else if (key == shortcuts[SHRT_SET_QUANT_2].key)
 	{
-		oom->arranger->_setRaster(2);
-		oom->arranger->raster->setCurrentIndex(2);
+		oom->composer->_setRaster(2);
+		oom->composer->raster->setCurrentIndex(2);
 		return;
 	}
 	else if (key == shortcuts[SHRT_SET_QUANT_3].key)
 	{
-		oom->arranger->_setRaster(3);
-		oom->arranger->raster->setCurrentIndex(3);
+		oom->composer->_setRaster(3);
+		oom->composer->raster->setCurrentIndex(3);
 		return;
 	}
 	else if (key == shortcuts[SHRT_SET_QUANT_4].key)
 	{
-		oom->arranger->_setRaster(4);
-		oom->arranger->raster->setCurrentIndex(4);
+		oom->composer->_setRaster(4);
+		oom->composer->raster->setCurrentIndex(4);
 		return;
 	}
 	else if (key == shortcuts[SHRT_SET_QUANT_5].key)
 	{
-		oom->arranger->_setRaster(5);
-		oom->arranger->raster->setCurrentIndex(5);
+		oom->composer->_setRaster(5);
+		oom->composer->raster->setCurrentIndex(5);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TRACK_HEIGHT_DEFAULT].key)
@@ -1803,7 +1803,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		if (tl.size())
 		{
 			Track* tr = *tl.begin();
-			oom->arranger->verticalScrollSetYpos(track2Y(tr));
+			oom->composer->verticalScrollSetYpos(track2Y(tr));
 		}
 		song->update(SC_TRACK_MODIFIED);
 		return;
@@ -1819,7 +1819,7 @@ void PartCanvas::keyPress(QKeyEvent* event)
 		if (tl.size())
 		{
 			Track* tr = *tl.begin();
-			oom->arranger->verticalScrollSetYpos(track2Y(tr));
+			oom->composer->verticalScrollSetYpos(track2Y(tr));
 		}
 		song->update(SC_TRACK_MODIFIED);
 		return;
@@ -3014,7 +3014,7 @@ void PartCanvas::cmd(int cmd)
 			song->endUndo(SC_PART_INSERTED);
 			break;
 		}
-		case Arranger::CMD_REMOVE_SELECTED_AUTOMATION_NODES:
+		case Composer::CMD_REMOVE_SELECTED_AUTOMATION_NODES:
 		{
 			if (_tool == AutomationTool)
 			{

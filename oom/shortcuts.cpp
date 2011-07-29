@@ -51,7 +51,7 @@ void initShortCuts()
 	defShrt(SHRT_DELETE, Qt::Key_Delete, "Edit: Delete", INVIS_SHRT, "delete");
 
 	//-----------------------------------------------------------
-	// Arranger:
+	// Composer:
 	defShrt(SHRT_NEW, Qt::CTRL + Qt::Key_N, "File: New project", ARRANG_SHRT, "new_project");
 	defShrt(SHRT_OPEN, Qt::CTRL + Qt::Key_O, "File: Open from disk", ARRANG_SHRT, "open_project");
 	defShrt(SHRT_SAVE, Qt::CTRL + Qt::Key_S, "File: Save project", ARRANG_SHRT, "save_project");
@@ -68,7 +68,7 @@ void initShortCuts()
 	defShrt(SHRT_QUIT, Qt::CTRL + Qt::Key_Q, "File: Quit OOMidi", ARRANG_SHRT, "quit");
 	//      defShrt(SHRT_DESEL_PARTS,           Qt::CTRL + Qt::Key_B, "Deselect all parts", ARRANG_SHRT, "deselect_parts");
 	defShrt(SHRT_SELECT_PRTSTRACK, Qt::CTRL + Qt::ALT + Qt::Key_P, "Edit: Select parts on track", ARRANG_SHRT, "select_parts_on_track");
-	defShrt(SHRT_OPEN_PIANO, Qt::Key_Return, "Open The Performer", ARRANG_SHRT, "open_pianoroll");
+	defShrt(SHRT_OPEN_PIANO, Qt::Key_Return, "Open The Performer", ARRANG_SHRT, "open_performer");
 	//defShrt(SHRT_OPEN_DRUMS, Qt::CTRL + Qt::Key_D, "Open drumeditor", ARRANG_SHRT, "open_drumedit");
 	defShrt(SHRT_OPEN_LIST, Qt::CTRL + Qt::Key_L, "Open listeditor", ARRANG_SHRT, "open_listedit");
 	//defShrt(SHRT_OPEN_WAVE, 0, "Open waveeditor", ARRANG_SHRT, "open_waveedit");
@@ -198,7 +198,7 @@ void initShortCuts()
 	defShrt(SHRT_FIXED_LEN, Qt::ALT + Qt::Key_L, "Edit: Set Fixed Length on Midi Events", PROLL_SHRT + DEDIT_SHRT, "midi_fixed_len");
 
 	//-----------------------------------------------------------
-	//Pianoroll:
+	//Performer:
 	//-----------------------------------------------------------
 
 	defShrt(SHRT_OVER_QUANTIZE, Qt::ALT + Qt::Key_E, "Quantize: Over Quantize", PROLL_SHRT, "midi_over_quant");
@@ -249,7 +249,7 @@ void initShortCuts()
 	defShrt(SHRT_TOOL_RUBBER, Qt::Key_B, "Tool: Eraser", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "eraser_tool");
 	// piano roll & drum editor
 	defShrt(SHRT_TOOL_LINEDRAW, Qt::Key_F, "Tool: Line Draw", PROLL_SHRT + DEDIT_SHRT, "line_draw_tool");
-	// arranger
+	// Composer
 	defShrt(SHRT_TOOL_SCISSORS, Qt::Key_J, "Tool: Scissor", ARRANG_SHRT, "scissor_tool");
 	defShrt(SHRT_TOOL_GLUE, Qt::Key_G, "Tool: Glue", ARRANG_SHRT, "glue_tool");
 	defShrt(SHRT_TOOL_MUTE, 0, "Tool: Mute", ARRANG_SHRT, "mute_tool");
@@ -274,8 +274,8 @@ void initShortCuts()
 	defShrt(SHRT_MOVE_TRACK_DOWN, Qt::CTRL + Qt::ALT + Qt::Key_Down, "Track: Move selected tracks down", GLOBAL_SHRT, "move_track_down");
 
 
-	//Increase/decrease current position, is going to be in arranger & drumeditor as well
-	// p4.0.10 Editors and arranger handle these by themselves, otherwise global handler will now use them, too.
+	//Increase/decrease current position, is going to be in Composer & drumeditor as well
+	// p4.0.10 Editors and Composer handle these by themselves, otherwise global handler will now use them, too.
 	defShrt(SHRT_POS_INC, Qt::CTRL + Qt::Key_Right, "Transport: Increase current position", GLOBAL_SHRT, "curpos_increase");
 	defShrt(SHRT_POS_DEC, Qt::CTRL + Qt::Key_Left, "Transport: Decrease current position", GLOBAL_SHRT, "curpos_decrease");
 	defShrt(SHRT_ADD_REST, Qt::Key_Plus, "Step Record: Add Rest", GLOBAL_SHRT, "add_rest");
@@ -328,8 +328,8 @@ void initShortCuts()
 
 const shortcut_cg shortcut_category[SHRT_NUM_OF_CATEGORIES] = {
 	{ GLOBAL_SHRT, "Global"},
-	{ ARRANG_SHRT, "Arranger"},
-	{ PROLL_SHRT, "Pianoroll"},
+	{ ARRANG_SHRT, "Composer"},
+	{ PROLL_SHRT, "Performer"},
 	{ DEDIT_SHRT, "Drumeditor"},
 	{ LEDIT_SHRT, "List editor"},
 	{ LMEDIT_SHRT, "List Mastertrack"},

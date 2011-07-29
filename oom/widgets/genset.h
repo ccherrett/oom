@@ -29,7 +29,7 @@ private slots:
     //void mixerCurrent();
     //void mixer2Current();
     //void bigtimeCurrent();
-    //void arrangerCurrent();
+    //void composerCurrent();
     //void transportCurrent();
     void selectInstrumentsPath();
     void defaultInstrumentsPath();

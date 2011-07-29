@@ -33,8 +33,8 @@ QT4_WRAP_CPP ( midiedit_mocs
 	  #drumedit.h 
       ecanvas.h
       piano.h 
-      pianoroll.h 
-      prcanvas.h 
+      Performer.h 
+      PerformerCanvas.h 
       quantconfig.h 
       )
 
@@ -55,8 +55,8 @@ file (GLOB midiedit_source_files
 	  drummap.cpp
       ecanvas.cpp
       piano.cpp
-      pianoroll.cpp
-      prcanvas.cpp
+      Performer.cpp
+      PerformerCanvas.cpp
       quantconfig.cpp
       )
 

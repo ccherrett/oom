@@ -21,7 +21,7 @@
 #include "wave.h"
 #include "app.h"
 #include "filedialog.h"
-#include "arranger/arranger.h"
+#include "Composer/Composer.h"
 #include "globals.h"
 #include "event.h"
 #include "audio.h"
@@ -869,7 +869,7 @@ void SndFile::applyUndoFile(const QString& original, const QString& tmpfile, uns
 
 void OOMidi::importWave(Track* t)
 {
-	Track* track = arranger->curTrack();
+	Track* track = composer->curTrack();
 	if(t)
 		track = t;
 	if (track == 0 || track->type() != Track::WAVE)
@@ -899,7 +899,7 @@ void OOMidi::importWave(Track* t)
 bool OOMidi::importWaveToTrack(QString& name, unsigned tick, Track* track)
 {
 	if (track == NULL)
-		track = (WaveTrack*) (arranger->curTrack());
+		track = (WaveTrack*) (composer->curTrack());
 
 	SndFile* f = getWave(name, true);
 
@@ -1170,10 +1170,10 @@ void Song::cmdAddRecordedWave(WaveTrack* track, Pos s, Pos e)
 			printf("Song::cmdAddRecordedWave: remove file %s\n", st.toLatin1().constData());
 		return;
 	}
-	// Round the start down using the Arranger part snap raster value.
-	unsigned startTick = AL::sigmap.raster1(s.tick(), song->arrangerRaster());
-	// Round the end up using the Arranger part snap raster value.
-	unsigned endTick = AL::sigmap.raster2(e.tick(), song->arrangerRaster());
+	// Round the start down using the Composer part snap raster value.
+	unsigned startTick = AL::sigmap.raster1(s.tick(), song->composerRaster());
+	// Round the end up using the Composer part snap raster value.
+	unsigned endTick = AL::sigmap.raster2(e.tick(), song->composerRaster());
 
 	f->update();
 

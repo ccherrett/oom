@@ -15,7 +15,7 @@
 #include "track.h"
 #include "song.h"
 #include "event.h"
-#include "prcanvas.h"
+#include "PerformerCanvas.h"
 
 #include <QRect>
 #include <QColor>

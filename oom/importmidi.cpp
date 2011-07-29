@@ -20,8 +20,8 @@
 #include "midifile.h"
 #include "midiport.h"
 #include "transport.h"
-#include "arranger.h"
-//#include "arranger/arranger.h"    // p4.0.2
+#include "Composer.h"
+//#include "Composer/Composer.h"    // p4.0.2
 #include "mpevent.h"
 #include "event.h"
 #include "midictrl.h"
@@ -271,8 +271,8 @@ bool OOMidi::importMidi(const QString name, bool merge)
 
 		song->updatePos();
 
-		arranger->reset();
-		///arranger->setMode(int(song->mtype())); // p4.0.7 Tim
+		composer->reset();
+		///composer->setMode(int(song->mtype())); // p4.0.7 Tim
 	}
 	else
 	{

@@ -54,7 +54,7 @@ NoteInfo::NoteInfo(QWidget* parent)
 	m_renderAlpha = new QSpinBox();
 	m_renderAlpha->setRange(0, 255);
 	m_renderAlpha->setSingleStep(1);
-	int alpha = tconfig().get_property("PianoRollEdit", "renderalpha", 50).toInt();
+	int alpha = tconfig().get_property("PerformerEdit", "renderalpha", 50).toInt();
 	m_renderAlpha->setValue(alpha);
 
 	addTool(tr("BG Brightness"), m_renderAlpha);
@@ -82,7 +82,7 @@ void NoteInfo::addTool(QString label, QWidget *tool)
 //---------------------------------------------------------
 void NoteInfo::alphaChanged(int alpha)
 {
-	tconfig().set_property("PianoRollEdit", "renderalpha", alpha);
+	tconfig().set_property("PerformerEdit", "renderalpha", alpha);
 	tconfig().save();
 	emit alphaChanged();
 }

@@ -81,7 +81,7 @@ Song::Song(const char* name)
 : QObject(0)
 {
 	setObjectName(name);
-	_arrangerRaster = 0; // Set to measure, the same as Arranger intial value. Arranger snap combo will set this.
+	_composerRaster = 0; // Set to measure, the same as Composer intial value. Composer snap combo will set this.
 	noteFifoSize = 0;
 	noteFifoWindex = 0;
 	noteFifoRindex = 0;
@@ -790,13 +790,13 @@ void Song::cmdAddRecordedEvents(MidiTrack* mt, EventList* events, unsigned start
 
 		// Changed by Tim. p3.3.8
 
-		// Honour the Arranger snap settings. (Set to bar by default).
+		// Honour the Composer snap settings. (Set to bar by default).
 		//startTick = roundDownBar(startTick);
 		//endTick   = roundUpBar(endTick);
-		// Round the start down using the Arranger part snap raster value.
-		startTick = AL::sigmap.raster1(startTick, arrangerRaster());
-		// Round the end up using the Arranger part snap raster value.
-		endTick = AL::sigmap.raster2(endTick, arrangerRaster());
+		// Round the start down using the Composer part snap raster value.
+		startTick = AL::sigmap.raster1(startTick, composerRaster());
+		// Round the end up using the Composer part snap raster value.
+		endTick = AL::sigmap.raster2(endTick, composerRaster());
 
 		part->setTick(startTick);
 		part->setLenTick(endTick - startTick);
@@ -833,8 +833,8 @@ void Song::cmdAddRecordedEvents(MidiTrack* mt, EventList* events, unsigned start
 		}
 		// Added by Tim. p3.3.8
 
-		// Round the end up (again) using the Arranger part snap raster value.
-		endTick = AL::sigmap.raster2(endTick, arrangerRaster());
+		// Round the end up (again) using the Composer part snap raster value.
+		endTick = AL::sigmap.raster2(endTick, composerRaster());
 
 		// Remove all of the part's port controller values. Indicate do not do clone parts.
 		removePortCtrlEvents(part, false);
@@ -3354,7 +3354,7 @@ void Song::chooseMidiRoutes(QButton* parent, MidiTrack* track, bool dst)
 
 //---------------------------------------------------------
 // insertTrackView
-//    add a new trackview for the arranger
+//    add a new trackview for the Composer
 //---------------------------------------------------------
 
 void Song::insertTrackView(TrackView* tv, int idx)
@@ -3378,7 +3378,7 @@ void Song::cmdRemoveTrackView(TrackView* tv)
 
 //---------------------------------------------------------
 // removeTrackView
-//    add a new trackview for the arranger
+//    add a new trackview for the Composer
 //---------------------------------------------------------
 
 void Song::removeTrackView(TrackView* tv)
@@ -3390,7 +3390,7 @@ void Song::removeTrackView(TrackView* tv)
 
 //---------------------------------------------------------
 // addNewTrackView
-//    add a new trackview for the arranger
+//    add a new trackview for the Composer
 //---------------------------------------------------------
 
 TrackView* Song::addNewTrackView()

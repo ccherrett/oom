@@ -116,7 +116,7 @@ protected:
     double _peak[MAX_CHANNELS];
 
     int _y;
-    int _height; // visual height in arranger
+    int _height; // visual height in Composer
 
     bool _locked;
     bool _selected;

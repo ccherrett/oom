@@ -50,7 +50,7 @@ AudioTrack::AudioTrack(TrackType t)
 	setChannels(2);
 	addController(new CtrlList(AC_VOLUME,"Volume", 0.001, 3.16 /* roughly 10 db */));
 	addController(new CtrlList(AC_PAN, "Pan", -1.0, 1.0));
-	addController(new CtrlList(AC_MUTE, "Mute", 0.0, 1.0, true /*dont show in arranger */));
+	addController(new CtrlList(AC_MUTE, "Mute", 0.0, 1.0, true /*dont show in Composer */));
 
 	// p3.3.38
 	// Easy way, less desirable... Start out with enough for MAX_CHANNELS. Then multi-channel syntis can re-allocate,

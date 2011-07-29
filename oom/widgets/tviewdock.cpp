@@ -14,7 +14,7 @@
 #include "tviewmenu.h"
 #include "trackview.h"
 #include "tvieweditor.h"
-#include "arranger.h"
+#include "Composer.h"
 
 #include "icons.h"
 #include <QStandardItemModel>
@@ -230,7 +230,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 					Track* track = song->findTrack(tname);
 					if(track)
 					{
-						oom->arranger->addCanvasPart(track);
+						oom->composer->addCanvasPart(track);
 					}
 				}
 				delete p;

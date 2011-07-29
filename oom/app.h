@@ -37,7 +37,7 @@ class Part;
 class PartList;
 class Transport;
 class BigTime;
-class Arranger;
+class Composer;
 class Instrument;
 class PopupMenu;
 class PopupView;
@@ -290,8 +290,8 @@ private slots:
     void startDrumEditor();
     void startDrumEditor(PartList* /*pl*/, bool /*showDefaultCtrls*/ = false);
     void startEditor(Track*);
-    void startPianoroll();
-    void startPianoroll(PartList* /*pl*/, bool /*showDefaultCtrls*/ = false);
+    void startPerformer();
+    void startPerformer(PartList* /*pl*/, bool /*showDefaultCtrls*/ = false);
     void startWaveEditor();
     void startWaveEditor(PartList*);
     void startSongInfo(bool editable = true);
@@ -384,7 +384,7 @@ public slots:
 public:
     OOMidi(int argc, char** argv);
     ~OOMidi();
-    Arranger* arranger;
+    Composer* composer;
 	//FIXME: Hack to make projects loaded from the commandline not start PR
 	//I need to track where and what is cause it to crash
 	bool firstrun;

@@ -436,7 +436,7 @@ void MidiTrackInfo::heartBeat()
 			{
 				if (program != CTRL_VAL_UNKNOWN)
 				{
-					//printf("Arranger::midiTrackInfoHeartBeat setting program to unknown\n");
+					//printf("Composer::midiTrackInfoHeartBeat setting program to unknown\n");
 
 					program = CTRL_VAL_UNKNOWN;
 					if (iHBank->value() != 0)

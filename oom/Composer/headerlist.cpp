@@ -24,7 +24,7 @@
 #include "audio.h"
 //#include "instruments/minstrument.h"
 #include "app.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "gconfig.h"
 #include "event.h"
 //#include "midiedit/drummap.h"
@@ -382,7 +382,7 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 					int dTrack = song->visibletracks()->index(t);
 					audio->msgMoveTrack(i, dTrack);
 					//The selection event should be harmless enough to call here to update 
-					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(src));
+					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(src));
 				}
 			}
 			else
@@ -397,7 +397,7 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 					int dTrack = song->visibletracks()->index(t);
 					audio->msgMoveTrack(i, dTrack);
 					//The selection event should be harmless enough to call here to update 
-					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(t));
 				}
 			}
 		}

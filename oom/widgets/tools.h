@@ -27,7 +27,7 @@ enum Tool
     ScoreTool=16, GlueTool=32, QuantTool=64, DrawTool=128, MuteTool=256, AutomationTool=512, MasterTool=1024
 };
 
-const int arrangerTools = PointerTool | PencilTool | RubberTool | CutTool | GlueTool | MuteTool | AutomationTool;
+const int composerTools = PointerTool | PencilTool | RubberTool | CutTool | GlueTool | MuteTool | AutomationTool;
 const int masterTools = PointerTool | PencilTool | RubberTool | MasterTool;
 
 struct ToolB

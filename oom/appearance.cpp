@@ -23,7 +23,7 @@
 #include "app.h"
 #include "song.h"
 #include "event.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "widgets/filedialog.h"
 #include "waveedit/waveedit.h"
 #include "globals.h"
@@ -108,7 +108,7 @@ public:
 //   Appearance
 //---------------------------------------------------------
 
-Appearance::Appearance(Arranger* a, QWidget* parent)
+Appearance::Appearance(Composer* a, QWidget* parent)
 : QDialog(parent, Qt::Window)
 {
 	setupUi(this);
@@ -120,7 +120,7 @@ Appearance::Appearance(Arranger* a, QWidget* parent)
 	lastSelectedBgItem = 0;
 
 	fontName0->setToolTip(tr("Main application font, and default font for any\n controls not defined here."));
-	fontName1->setToolTip(tr("For small controls like mixer strips.\nAlso timescale small numbers, arranger part name overlay,\n and effects rack."));
+	fontName1->setToolTip(tr("For small controls like mixer strips.\nAlso timescale small numbers, composer part name overlay,\n and effects rack."));
 	fontName2->setToolTip(tr("Midi track info panel. Transport controls."));
 	fontName3->setToolTip(tr("Controller graph and S/X buttons. Large numbers for time\n and tempo scale, and time signature."));
 	fontName4->setToolTip(tr("Time scale markers."));
@@ -177,7 +177,7 @@ Appearance::Appearance(Arranger* a, QWidget* parent)
 	IdListViewItem* id;
 	IdListViewItem* aid;
 	itemList->clear();
-	aid = new IdListViewItem(0, itemList, "Arranger");
+	aid = new IdListViewItem(0, itemList, "Composer");
 	id = new IdListViewItem(0, aid, "PartColors");
 	// Names moved into global config by Tim.
 	/*
@@ -542,7 +542,7 @@ void Appearance::bgSelectionChanged(QTreeWidgetItem* item)
 			removeBgButton->setEnabled(true);
 
 	lastSelectedBgItem = item;
-	oom->arranger->getCanvas()->setBg(QPixmap(item->data(0, Qt::UserRole).toString()));
+	oom->composer->getCanvas()->setBg(QPixmap(item->data(0, Qt::UserRole).toString()));
 }
 
 //---------------------------------------------------------
@@ -733,7 +733,7 @@ void Appearance::ok()
 
 void Appearance::cancel()
 {
-	oom->arranger->getCanvas()->setBg(QPixmap(config->canvasBgPixmap));
+	oom->composer->getCanvas()->setBg(QPixmap(config->canvasBgPixmap));
 	close();
 }
 
@@ -744,7 +744,7 @@ void Appearance::cancel()
 void Appearance::removeBackground()
 {
 	QTreeWidgetItem* item = backgroundTree->currentItem();
-	oom->arranger->getCanvas()->setBg(QPixmap());
+	oom->composer->getCanvas()->setBg(QPixmap());
 	user_bg->takeChild(user_bg->indexOfChild(item));
 	backgroundTree->setCurrentItem(0);
 	removeBgButton->setEnabled(false);
@@ -783,7 +783,7 @@ void Appearance::addBackground()
 
 void Appearance::clearBackground()
 {
-	oom->arranger->getCanvas()->setBg(QPixmap());
+	oom->composer->getCanvas()->setBg(QPixmap());
 	backgroundTree->setCurrentItem(0);
 	removeBgButton->setEnabled(false);
 }

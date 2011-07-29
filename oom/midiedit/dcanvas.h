@@ -33,7 +33,7 @@ class DEvent : public CItem {
       };
 
 class ScrollScale;
-class PianoRoll;
+class Performer;
 
 //---------------------------------------------------------
 //   DrumCanvas

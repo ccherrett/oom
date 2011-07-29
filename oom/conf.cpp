@@ -17,11 +17,11 @@
 #include "icons.h"
 #include "globals.h"
 #include "drumedit.h"
-#include "pianoroll.h"
+#include "Performer.h"
 #include "master/masteredit.h"
 ///#include "transport.h"
 #include "bigtime.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "conf.h"
 #include "gconfig.h"
 #include "pitchedit.h"
@@ -881,9 +881,9 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				else if (tag == "geometryBigTime")
 					xml.skip(tag);
 					//config.geometryBigTime = readGeometry(xml, tag);
-				else if (tag == "geometryPianoroll")
+				else if (tag == "geometryPerformer")
 					xml.skip(tag);
-					//config.geometryPianoroll = readGeometry(xml, tag);
+					//config.geometryPerformer = readGeometry(xml, tag);
 				else if (tag == "geometryDrumedit")
 					xml.skip(tag);
 					//config.geometryDrumedit = readGeometry(xml, tag);
@@ -982,11 +982,11 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				}
 					//else if (tag == "midiSyncInfo")
 					//      readConfigMidiSyncInfo(xml);
-				else if (tag == "arranger")
+                                else if (tag == "arranger" || tag == "composer")
 				{
 					xml.skip(tag);
-					/*if (oom && oom->arranger)
-						oom->arranger->readStatus(xml);
+					/*if (oom && oom->composer)
+						oom->composer->readStatus(xml);
 					else
 						xml.skip(tag);
 					*/
@@ -994,9 +994,9 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				else if (tag == "drumedit")
 					xml.skip(tag);
 					//DrumEdit::readConfiguration(xml);
-				else if (tag == "pianoroll")
+                                else if (tag == "pianoroll" || tag == "performer")
 					xml.skip(tag);
-					//PianoRoll::readConfiguration(xml);
+					//Performer::readConfiguration(xml);
 				else if (tag == "masteredit")
 					xml.skip(tag);
 					//MasterEdit::readConfiguration(xml);
@@ -1394,7 +1394,7 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	//xml.qrectTag(level, "geometryMain", config.geometryMain);
 	//xml.qrectTag(level, "geometryTransport", config.geometryTransport);
 	//xml.qrectTag(level, "geometryBigTime", config.geometryBigTime);
-	//xml.qrectTag(level, "geometryPianoroll", config.geometryPianoroll);
+	//xml.qrectTag(level, "geometryPerformer", config.geometryPerformer);
 	//xml.qrectTag(level, "geometryDrumedit", config.geometryDrumedit);
 
 	//xml.intTag(level, "bigtimeVisible", config.bigTimeVisible);
@@ -1415,7 +1415,7 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	writeSeqConfiguration(level, xml, false);
 
 	//DrumEdit::writeConfiguration(level, xml);
-	//PianoRoll::writeConfiguration(level, xml);
+	//Performer::writeConfiguration(level, xml);
 	//MasterEdit::writeConfiguration(level, xml);
 	//WaveEdit::writeConfiguration(level, xml);
 
@@ -1479,11 +1479,11 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 		//mixer2->write(level, xml, "mixer2");
 	//	mixer2->write(level, xml);
 
-	arranger->writeStatus(level, xml);
+	composer->writeStatus(level, xml);
 	writeSeqConfiguration(level, xml, true);
 
 	//DrumEdit::writeConfiguration(level, xml);
-	PianoRoll::writeConfiguration(level, xml);
+	Performer::writeConfiguration(level, xml);
 	MasterEdit::writeConfiguration(level, xml);
 	WaveEdit::writeConfiguration(level, xml);
 

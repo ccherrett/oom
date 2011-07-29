@@ -33,7 +33,7 @@ add_custom_target (translations ALL DEPENDS ${QM_FILES})
 if (UPDATE_TRANSLATIONS)
       add_dependencies(translations
             oom
-            arranger
+            Composer
             cliplist
             ctrl
             driver

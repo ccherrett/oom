@@ -1,7 +1,7 @@
 "Glossary" "glossary.html"
 "Getting Started" "getting_started.html"
 +"Window Reference Guide" "window_ref.html"
- +"The Arranger"    "window_ref.html"
+ +"The Composer"    "window_ref.html"
   "The Button Bar & Menus" "window_ref.html"
   "The Right Pane" "window_ref.html"
   +"The Left Pane"  "window_ref.html"

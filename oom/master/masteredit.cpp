@@ -100,7 +100,7 @@ MasterEdit::MasterEdit()
 	cursorPos = new PosLabel(0);
 	cursorPos->setFixedHeight(22);
 	cursorPos->setToolTip(tr("time at cursor position"));
-	cursorPos->setObjectName("arrangerCursor");
+	cursorPos->setObjectName("composerCursor");
 	info->addWidget(cursorPos);
 	tempo = new TempoLabel(0);
 	tempo->setFixedHeight(22);

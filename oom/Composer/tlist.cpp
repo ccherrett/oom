@@ -40,7 +40,7 @@
 #include "audio.h"
 #include "instruments/minstrument.h"
 #include "app.h"
-#include "arranger.h"
+#include "Composer.h"
 #include "gconfig.h"
 #include "event.h"
 #include "midiedit/drummap.h"
@@ -889,7 +889,7 @@ void TList::changeAutomation(QAction* act)
 	//printf("changeAutomation!\n");
 	if (editAutomation->type() == Track::MIDI)
 	{
-		printf("this is wrong, we can't edit automation for midi tracks from arranger yet!\n");
+		printf("this is wrong, we can't edit automation for midi tracks from composer yet!\n");
 		return;
 	}
 
@@ -1615,38 +1615,38 @@ void TList::mousePressEvent(QMouseEvent* ev)
 							}
 				case 12:
 							{
-								int canvasHeight = oom->arranger->getCanvas()->height();
+								int canvasHeight = oom->composer->getCanvas()->height();
 
 								if (multipleSelectedTracks)
 								{
 									song->setTrackHeights(selectedTracksList, canvasHeight);
 									Track* firstSelectedTrack = *selectedTracksList.begin();
-									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+									oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(firstSelectedTrack));
 
 								}
 								else
 								{
 									t->setHeight(canvasHeight);
 									song->update(SC_TRACK_MODIFIED);
-									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+									oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(t));
 								}
 								break;
 							}
 				case 13:
 							{
-								int canvasHeight = oom->arranger->getCanvas()->height();
+								int canvasHeight = oom->composer->getCanvas()->height();
 								if (multipleSelectedTracks)
 								{
 									song->setTrackHeights(selectedTracksList, canvasHeight / selectedTracksList.size());
 									Track* firstSelectedTrack = *selectedTracksList.begin();
-									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(firstSelectedTrack));
+									oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(firstSelectedTrack));
 
 								}
 								else
 								{
 									t->setHeight(canvasHeight);
 									song->update(SC_TRACK_MODIFIED);
-									oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+									oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(t));
 								}
 								break;
 							}
@@ -2075,7 +2075,7 @@ void TList::moveSelectedTrack(int dir)/*{{{*/
 					audio->msgMoveTrack(i, dTrack);
 					//The selection event should be harmless enough to call here to update 
 					redraw();
-					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(src));
+					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(src));
 				}
 			}
 			else
@@ -2090,7 +2090,7 @@ void TList::moveSelectedTrack(int dir)/*{{{*/
 					int dTrack = song->visibletracks()->index(t);
 					audio->msgMoveTrack(i, dTrack);
 					//The selection event should be harmless enough to call here to update 
-					oom->arranger->verticalScrollSetYpos(oom->arranger->getCanvas()->track2Y(t));
+					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(t));
 				}
 			}
 		}

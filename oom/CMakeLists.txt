@@ -25,7 +25,7 @@ include_directories(
       )
 
 set (SubDirs 
-      arranger 
+      Composer 
       cliplist 
       ctrl
       driver
@@ -179,7 +179,7 @@ set (FILES_TO_TRANSLATE
 ## Directories that will be passed to the compiler with -I flag
 ##
 include_directories (
-      arranger
+      Composer
       driver
       instruments
       liste
@@ -193,7 +193,7 @@ include_directories (
 
 # Make sure to include the uic generated headers paths.
 include_directories(
-      ${CMAKE_CURRENT_BINARY_DIR}/arranger
+      ${CMAKE_CURRENT_BINARY_DIR}/Composer
       ${CMAKE_CURRENT_BINARY_DIR}/driver
       ${CMAKE_CURRENT_BINARY_DIR}/instruments
       ${CMAKE_CURRENT_BINARY_DIR}/liste
@@ -210,7 +210,7 @@ include_directories(
 ##
 set_target_properties( core
       # PROPERTIES COMPILE_FLAGS "-include ${PROJECT_BINARY_DIR}/all.h"
-      # PROPERTIES COMPILE_FLAGS "-Imidiedit -Iarranger -Iliste -Iwidgets -Imixer -Idriver -Iwaveedit -Implugins -Iinstruments -Iremote ${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h "
+      # PROPERTIES COMPILE_FLAGS "-Imidiedit -Icomposer -Iliste -Iwidgets -Imixer -Idriver -Iwaveedit -Implugins -Iinstruments -Iremote ${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h "
       # PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -DINSTPREFIX='\"${CMAKE_INSTALL_PREFIX}\"' -DINSTLIBDIR='\"${LIBRARY_OUTPUT_DIRECTORY}\"' -include ${PROJECT_BINARY_DIR}/all.h "
       PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC"
 	  #PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC -fopenmp"
@@ -229,7 +229,7 @@ set_target_properties( icons
 ##
 target_link_libraries(core
       al      
-      arranger 
+      Composer 
       awl
       cliplist
       ctrl
