@@ -377,7 +377,7 @@ void MidiEditor::setCurCanvasPart(Part* part)
 {
 	if (canvas)
 	{
-		printf("MidiEditor::setCurCanvasPart\n");
+		//printf("MidiEditor::setCurCanvasPart\n");
 		canvas->setCurrentPart(part);
 	}
 }
