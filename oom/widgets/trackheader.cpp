@@ -69,10 +69,6 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_buttonHBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	m_buttonVBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	m_panBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-	m_automodel = new QStandardItemModel(1, 2, this);
-	m_autoTable->setModel(m_automodel);
-	m_autoheaders << "V" << "Curves";
-	m_automodel->setHorizontalHeaderLabels(m_autoheaders);
 	initPan();
 	initVolume();
 	m_trackName->installEventFilter(this);
@@ -109,7 +105,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 		}
 		if(!m_track->isMidiTrack())
 		{
-			populateAutomationTable();
+			//populateAutomationTable();
 		}
 	}/*}}}*/
 	setAcceptDrops(false);
@@ -160,7 +156,6 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	//Let header list control this for now
 	//connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
-	connect(m_automodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleAutomationCurve(QStandardItem*)));
 	inHeartBeat = false;
 }
 
@@ -277,9 +272,6 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 		{
 			setFixedHeight(m_track->height());
 		}
-		if(flags &(SC_TRACK_MODIFIED) || (!m_nopopulate && !m_track->isMidiTrack()))
-			populateAutomationTable();
-		//updateBackground();
 	}
 }/*}}}*/
 
@@ -1384,45 +1376,6 @@ void TrackHeader::resetPeaks(bool)/*{{{*/
 	m_track->resetPeaks();
 }/*}}}*/
 
-void TrackHeader::toggleAutomationCurve(QStandardItem* item)/*{{{*/
-{
-	if(!m_track || m_track->isMidiTrack() || !m_processEvents)
-		return;
-	AudioTrack* track = (AudioTrack*)m_track;
-	if(track && item && item->column() == 0)
-	{
-		
-		int id = item->data(CtrlIDRole).toInt();
-
-		CtrlListList* cll = track->controller();
-		for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
-		{
-			CtrlList *cl = icll->second;
-			if (id == cl->id()) 
-			{
-				cl->setVisible(!cl->isVisible());
-				if(cl->id() == AC_PAN)
-				{
-					AutomationType at = track->automationType();
-					if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-						track->enablePanController(false);
-				
-					double panVal = track->pan();
-					audio->msgSetPan(track, panVal);
-					track->startAutoRecord(AC_PAN, panVal);
-
-					if (track->automationType() != AUTO_WRITE)
-						track->enablePanController(true);
-					track->stopAutoRecord(AC_PAN, panVal);
-				}
-			}
-		}
-		m_nopopulate = true;
-		song->update(SC_TRACK_MODIFIED);
-		m_nopopulate = false;
-	}
-}/*}}}*/
-
 //Private member functions
 
 bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
@@ -1710,36 +1663,6 @@ void TrackHeader::updateSelection(bool shift)/*{{{*/
 	song->update(SC_SELECTION | SC_RECFLAG);
 }/*}}}*/
 
-void TrackHeader::populateAutomationTable()/*{{{*/
-{
-	if(!m_track || m_track->isMidiTrack())
-		return;
-	AudioTrack* track = (AudioTrack*)m_track;
-	if(track)
-	{
-		CtrlListList* cll = track->controller();
-		m_automodel->clear();
-		for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
-		{
-			CtrlList *cl = icll->second;
-			if (cl->dontShow())
-				continue;
-			QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
-			QList<QStandardItem*> rowData;
-			QStandardItem* chkID = new QStandardItem(true);
-			chkID->setCheckable(true);
-			chkID->setCheckState(cl->isVisible() ? Qt::Checked : Qt::Unchecked);
-			chkID->setData(cl->id(), CtrlIDRole);
-			rowData.append(chkID);
-			QStandardItem* ctlName = new QStandardItem(name);
-			rowData.append(ctlName);
-			m_automodel->appendRow(rowData);
-		}
-	}
-	m_autoTable->setColumnWidth(0, 20);
-	m_automodel->setHorizontalHeaderLabels(m_autoheaders);
-}/*}}}*/
-
 //Protected events
 //We overwrite these from QWidget to implement our own functionality
 
@@ -1889,8 +1812,6 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 			m_slider->setVisible(m_sliderVisible);
 		if(m_pan)
 			m_pan->setVisible(m_sliderVisible);
-		m_autoTable->setVisible(m_toolsVisible);
-		//m_toolBox->setVisible(false);
 		/*if(m_sliderVisible)
 		{
 			m_colorLine->setStyleSheet(lineStyleTemplate.arg("#1b1b1b"));
