@@ -43,7 +43,7 @@
 #include "mixer/meter.h"
 
 static QString styletemplate = "QLineEdit { border-width:1px; border-radius: 0px; border-image: url(:/images/frame.png) 4; border-top-color: #1f1f22; border-bottom-color: #505050; color: #%1; background-color: #%2; font-family: fixed-width; font-weight: bold; font-size: 15px; padding-left: 15px; }";
-static QString trackHeaderStyle = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #262626; }";
+static QString trackHeaderStyle = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #2e2e2e; }";
 static QString trackHeaderStyleSelected = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #171717; }";
 static QString lineStyleTemplate = "QFrame { border: 0px; background-color: %1; }";
 
@@ -1615,21 +1615,21 @@ void TrackHeader::initVolume()/*{{{*/
 
 void TrackHeader::setupStyles()/*{{{*/
 {
-	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393"), QString("262626")));
-	m_style.insert(Track::WAVE, styletemplate.arg(QString("939393"), QString("262626")));
-	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("939393"), QString("262626")));
-	m_style.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("939393"), QString("262626")));
-	m_style.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("939393"), QString("262626")));
-	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("939393"), QString("262626")));
-	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("939393"), QString("262626")));
+	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393"), QString("1a1a1a")));
+	m_style.insert(Track::WAVE, styletemplate.arg(QString("939393"), QString("1a1a1a")));
+	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("939393"), QString("1a1a1a")));
+	m_style.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("939393"), QString("1a1a1a")));
+	m_style.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("939393"), QString("1a1a1a")));
+	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("939393"), QString("1a1a1a")));
+	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("939393"), QString("1a1a1a")));
 	
-	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("e18fff"), QString("171717")));
-	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee"), QString("171717")));
-	m_selectedStyle.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("fc7676"), QString("171717")));
-	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("81f476"), QString("171717")));
-	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("fca424"), QString("171717")));
-	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276"), QString("171717")));
-	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee"), QString("171717")));
+	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("e18fff"), QString("0a0a0a")));
+	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee"), QString("0a0a0a")));
+	m_selectedStyle.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("fc7676"), QString("0a0a0a")));
+	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("81f476"), QString("0a0a0a")));
+	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("fca424"), QString("0a0a0a")));
+	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276"), QString("0a0a0a")));
+	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee"), QString("0a0a0a")));
 }/*}}}*/
 
 void TrackHeader::updateSelection(bool shift)/*{{{*/
@@ -1822,7 +1822,7 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 			m_pan->setVisible(m_sliderVisible);
 		/*if(m_sliderVisible)
 		{
-			m_colorLine->setStyleSheet(lineStyleTemplate.arg("#262626"));
+			m_colorLine->setStyleSheet(lineStyleTemplate.arg("#2e2e2e"));
 		}
 		else
 		{*/
