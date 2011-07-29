@@ -512,47 +512,7 @@ void Song::changeTrack(Track* oldTrack, Track* newTrack)
 
 bool Song::addEvent(Event& event, Part* part)
 {
-	/*
-	if (event.type() == Controller) {
-		  MidiTrack* track = (MidiTrack*)part->track();
-		  int ch    = track->outChannel();
-		  int tick  = event.tick() + part->tick();
-		  int cntrl = event.dataA();
-		  int val   = event.dataB();
-		  MidiPort* mp = &midiPorts[track->outPort()];
-            
-		  // Is it a drum controller event, according to the track port's instrument?
-		  if(track->type() == Track::DRUM)
-		  {
-			MidiController* mc = mp->drumController(cntrl);
-			if(mc)
-			{
-			  int note = cntrl & 0x7f;
-			  cntrl &= ~0xff;
-			  ch = drumMap[note].channel;
-			  mp = &midiPorts[drumMap[note].port];
-			  cntrl |= drumMap[note].anote;
-			}
-		  }
-            
-		  // Changed by T356.
-		  //if (!mp->setCtrl(ch, tick, cntrl, val)) {
-		  //      mp->addManagedController(ch, cntrl);
-		  //      if (!mp->setCtrl(ch, tick, cntrl, val))
-		  //            return false;
-		  //      }
-		  // Changed again. Don't depend on return value of this - search for the event, below.
-		  //if(!mp->setControllerVal(ch, tick, cntrl, val, part))
-		  //  return false;
-		  if(mp->setControllerVal(ch, tick, cntrl, val, part))
-			updateFlags |= SC_MIDI_CONTROLLER;
-		  }
-	 */
-
-	//addPortCtrlEvents(event, part);
-
 	// Return false if the event is already found.
-	// (But allow a port controller value, above, in case it is not already stored.)
 	if (part->events()->find(event) != part->events()->end())
 	{
 		// This can be normal for some (redundant) operations.
@@ -926,88 +886,6 @@ void Song::cmdAddRecordedEvents(MidiTrack* mt, EventList* events, unsigned start
 			// Add the event to the new part's port controller values, and do all clone parts.
 			addPortCtrlEvents(event, newPart, true);
 		}
-
-
-		/*
-		if (_recMode == REC_REPLACE)
-		{
-			  iEvent si = part->events()->lower_bound(startTick - part->tick());
-			  iEvent ei = part->events()->lower_bound(part->endTick() - part->tick());
-
-			  for (iEvent i = si; i != ei; ++i)
-			  {
-				Event event = i->second;
-				// Create an undo op. Indicate do port controller values and clone parts.
-				//undoOp(UndoOp::DeleteEvent, event, part);
-				undoOp(UndoOp::DeleteEvent, event, part, true, true);
-                    
-				//if (event.type() == Controller) {
-				//      MidiTrack* track = (MidiTrack*)part->track();
-				//      int ch    = track->outChannel();
-				//      int tick  = event.tick() + part->tick();
-				//      int cntrl = event.dataA();
-				//      midiPorts[track->outPort()].deleteController(ch, tick, cntrl, part);
-				//      }
-                    
-				// Remove the event from the part's port controller values, and do all clone parts.
-				//removePortCtrlEvents(event, part, true);
-			  }
-			  part->events()->erase(si, ei);
-		}
-            
-		// Remove all of the part's port controller values, and do all clone parts.
-		removePortCtrlEvents(part, true);
-            
-		// Clone the part. This doesn't increment aref count, and doesn't chain clones.
-		// It also gives the new part a new serial number, but it is
-		//  overwritten with the old one by Song::changePart(), below.
-		Part* newPart = part->clone();
-            
-		endTick = 0;
-		for (iEvent i = s; i != e; ++i) {
-			  Event event = i->second;
-			  unsigned tick = event.tick() - partTick;
-			  event.setTick(tick);
-			  Event e;
-			  // Create an undo op. Indicate do port controller values and clone parts.
-			  //undoOp(UndoOp::AddEvent, e, event, newPart);
-			  undoOp(UndoOp::AddEvent, e, event, newPart, true, true);
-                  
-			  // addEvent also adds port controller values. So does msgChangePart, below. Let msgChangePart handle them.
-			  //addEvent(event, (MidiPart*)newPart);
-			  if(newPart->events()->find(event) == newPart->events()->end())
-				newPart->events()->add(event);
-                  
-			  if (endTick < event.tick() + event.lenTick())
-					endTick = event.tick() + event.lenTick();
-			  }
-		newPart->setLenTick(endTick); // endTick - part->tick()
-
-		//printf("Song::cmdAddRecordedEvents before changePart part:%p events:%p refs:%d Arefs:%d newPart:%p events:%p refs:%d Arefs:%d\n", part, part->events(), part->events()->refCount(), part->events()->arefCount(), newPart, newPart->events(), newPart->events()->refCount(), newPart->events()->arefCount());
-      
-		// Change the part.
-		changePart(part, newPart);
-		// Manually adjust reference counts.
-		part->events()->incARef(-1);
-		newPart->events()->incARef(1);
-		// Replace the part in the clone chain with the new part.
-		replaceClone(part, newPart);
-		// Now add all of the new part's port controller values, and do all clone parts.
-		addPortCtrlEvents(newPart, true);
-
-		//printf("Song::cmdAddRecordedEvents after changePart part:%p events:%p refs:%d Arefs:%d newPart:%p events:%p refs:%d Arefs:%d\n", part, part->events(), part->events()->refCount(), part->events()->arefCount(), newPart, newPart->events(), newPart->events()->refCount(), newPart->events()->arefCount());
-      
-		//undoOp(UndoOp::ModifyPart, part, newPart);
-		// Create an undo op. Indicate do not do port controller values and clone parts.
-		undoOp(UndoOp::ModifyPart, part, newPart, false, false);
-            
-		// Removed by T356.
-		//part->events()->incARef(-1);
-            
-		updateFlags |= SC_PART_MODIFIED;
-		//printf("Song::cmdAddRecordedEvents final part:%p events:%p refs:%d Arefs:%d newPart:%p events:%p refs:%d Arefs:%d\n", part, part->events(), part->events()->refCount(), part->events()->arefCount(), newPart, newPart->events(), newPart->events()->refCount(), newPart->events()->arefCount());
-		 */
-
 	}
 	else
 	{
@@ -2626,7 +2504,7 @@ void Song::closeJackBox()
 //   recordEvent
 //---------------------------------------------------------
 
-void Song::recordEvent(MidiTrack* mt, Event& event)
+void Song::recordEvent(MidiTrack* mt, Event& event)/*{{{*/
 {
 	//---------------------------------------------------
 	//    if tick points into a part,
@@ -2694,7 +2572,58 @@ void Song::recordEvent(MidiTrack* mt, Event& event)
 	// Indicate do undo, and do port controller values and clone parts.
 	//audio->msgAddEvent(event, part);
 	audio->msgAddEvent(event, part, true, true, true);
-}
+}/*}}}*/
+
+void Song::recordEvent(MidiPart* part, Event& event)/*{{{*/
+{
+	//---------------------------------------------------
+	//    if tick points into a part,
+	//          record to that part
+	//    else
+	//          create new part
+	//---------------------------------------------------
+
+	unsigned tick = event.tick();
+	int diff = event.endTick() - part->lenTick();
+	if (diff > 0)
+	{// too short part? extend it
+		Part* newPart = part->clone();
+		newPart->setLenTick(newPart->lenTick() + diff);
+		// Indicate no undo, and do port controller values but not clone parts.
+		audio->msgChangePart(part, newPart, false, true, false);
+		updateFlags |= SC_PART_MODIFIED;
+		part = (MidiPart*)newPart;
+	}
+	updateFlags |= SC_EVENT_INSERTED;
+
+	tick -= part->tick();
+	event.setTick(tick);
+
+	Event ev;
+	if (event.type() == Controller)
+	{
+		EventRange range = part->events()->equal_range(tick);
+		for (iEvent i = range.first; i != range.second; ++i)
+		{
+			ev = i->second;
+			// At the moment, Song::recordEvent() is only called by the 'Rec' buttons in the
+			//  midi track info panel. So only controller types are fed to it. If other event types
+			//  are to be passed, we will have to expand on this to check if equal. Instead, maybe add an isEqual() to Event class.
+			if (ev.type() == Controller && ev.dataA() == event.dataA())
+			{
+				// Don't bother if already set.
+				if (ev.dataB() == event.dataB())
+					return;
+				// Indicate do undo, and do port controller values and clone parts.
+				audio->msgChangeEvent(ev, event, part, true, true, true);
+				return;
+			}
+		}
+	}
+
+	// Indicate do undo, and do port controller values and clone parts.
+	audio->msgAddEvent(event, part, true, true, true);
+}/*}}}*/
 
 //---------------------------------------------------------
 //   execAutomationCtlPopup

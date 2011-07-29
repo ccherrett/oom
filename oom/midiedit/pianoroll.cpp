@@ -449,6 +449,7 @@ PianoRoll::PianoRoll(PartList* pl, QWidget* parent, const char* name, unsigned i
 	transportbar->setMuteAction(m_muteAction);
 	transportbar->setSoloAction(m_soloAction);
 	tools2->addWidget(transportbar);
+	connect(transportbar, SIGNAL(recordTriggered(bool)), this, SLOT(checkPartLengthForRecord(bool)));
 	QWidget* spacer55 = new QWidget();
 	spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer55->setMaximumWidth(15);
@@ -804,6 +805,34 @@ void PianoRoll::toggleMuteCurrentPart(bool mute)
 		}
 	}
 }
+
+void PianoRoll::checkPartLengthForRecord(bool rec)/*{{{*/
+{
+	if(!rec)
+		return;
+	PartList* pl = parts();
+	for(iPart p = pl->begin(); p != pl->end(); ++p)
+	{
+		Part* part = p->second; //curCanvasPart();
+		if(part && part->track()->recordFlag())
+		{
+			unsigned spos = song->cpos();
+			unsigned ptick = part->tick();
+			unsigned pend = ptick + part->lenTick();
+			int diff = spos - pend;
+			if(diff > 0)
+			{//resize part
+				Part* newPart = part->clone();
+				unsigned ntick = newPart->lenTick() + diff;
+				newPart->setLenTick(ntick + (rasterStep(ntick)*2));
+				// Indicate no undo, and do port controller values but not clone parts.
+				audio->msgChangePart(part, newPart, true, true, false);
+				setCurCanvasPart(newPart);
+				song->update(SC_PART_MODIFIED);
+			}
+		}
+	}
+}/*}}}*/
 
 void PianoRoll::setCurCanvasPart(Part* part)
 {

@@ -464,6 +464,7 @@ public:
 	void disarmAllTracks();
     void readRoute(Xml& xml);
     void recordEvent(MidiTrack*, Event&);
+    void recordEvent(MidiPart*, Event&);
     void msgInsertTrack(Track* track, int idx, bool u = true);
     void clearRecAutomation(bool clearList);
     void processAutomationEvents();

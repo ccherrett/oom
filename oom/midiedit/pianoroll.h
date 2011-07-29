@@ -230,6 +230,7 @@ private slots:
 	void dockAreaChanged(Qt::DockWidgetArea);
 	void selectPrevPart();
 	void selectNextPart();
+	void checkPartLengthForRecord(bool);
 #ifdef LSCP_SUPPORT
 	void setKeyBindings(LSCPChannelInfo);
 #endif

@@ -86,7 +86,7 @@ void PianoCanvas::addItem(Part* part, Event& event)
 		//audio->msgChangePart(part, newPart,false);
 		//part = newPart;
 		int endTick = song->roundUpBar(part->lenTick() + diff);
-		part->setLenTick(endTick);
+		part->setLenTick(endTick + (editor->rasterStep(endTick)*2));
 	}
 }
 
@@ -1075,7 +1075,8 @@ void PianoCanvas::pianoPressed(int pitch, int velocity, bool shift)/*{{{*/
 		}
 		tick += editor->rasterStep(tick) + _curPart->tick();
 		unsigned int t = tick;
-		t += (editor->rasterStep(t)/2);
+		//t += (editor->rasterStep(t)/2); <-I think this is a mistake
+		t += (editor->rasterStep(t)*2);
 		if(song->len() <= (tick + editor->rasterStep(tick)))
 		{
 			t += editor->rasterStep(t);
@@ -1934,7 +1935,7 @@ void PianoCanvas::midiNote(int pitch, int velo)/*{{{*/
 		tick += editor->rasterStep(tick);
 		//printf("Song length %d current tick %d\n", song->len(), tick);
 		unsigned int t = tick;
-		t += (editor->rasterStep(t)/2);
+		t += (editor->rasterStep(t)*2);
 		if(song->len() <= (tick + editor->rasterStep(tick)))
 		{
 			t += editor->rasterStep(t);
@@ -2082,7 +2083,8 @@ void PianoCanvas::processKeySwitches(Part* part, int pitch, int songtick)/*{{{*/
 					a.setA(CTRL_PROGRAM);
 					a.setB(program);
 
-					song->recordEvent(track, a);
+					//song->recordEvent(track, a);
+					song->recordEvent((MidiPart*)part, a);
 				}
 			}
 		}

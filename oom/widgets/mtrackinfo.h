@@ -57,6 +57,7 @@ class MidiTrackInfo : public QFrame/*QWidget*/, public Ui::MidiTrackInfoBase {
 	bool _autoExapand;
 	bool _resetProgram;
 	bool m_globalState;
+	Part* m_eventPart;
     virtual void showEvent(QShowEvent *);
 
 private slots:
