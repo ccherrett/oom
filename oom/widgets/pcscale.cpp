@@ -339,7 +339,7 @@ void PCScale::viewMouseReleaseEvent(QMouseEvent* event)
 					song->setLen((unsigned int)endTick);
 				}
 			}
-			song->recordEvent((MidiTrack*)_pc.part->track(), _pc.event);
+			song->recordEvent((MidiPart*)_pc.part, _pc.event);
 		}
 		if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())/*{{{*/
 		{
@@ -683,7 +683,7 @@ void PCScale::copySelected(bool checked)/*{{{*/
 			int endTick = song->roundUpBar(_pc.part->lenTick() + diff);
 			_pc.part->setLenTick(endTick);
 		}
-		song->recordEvent((MidiTrack*)_pc.part->track(), nevent);
+		song->recordEvent((MidiPart*)_pc.part, nevent);
 	}
 	if(currentEditor->isGlobalEdit() && !selectionList.isEmpty())
 	{
@@ -699,7 +699,7 @@ void PCScale::copySelected(bool checked)/*{{{*/
 				int pendTick = song->roundUpBar(pco.part->lenTick() + diff1);
 				pco.part->setLenTick(pendTick);
 			}
-			song->recordEvent((MidiTrack*)pco.part->track(), nevent1);
+			song->recordEvent((MidiPart*)pco.part, nevent1);
 		}
 	}
 	_pc.valid = true;

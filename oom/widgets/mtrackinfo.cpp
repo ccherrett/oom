@@ -143,6 +143,7 @@ MidiTrackInfo::MidiTrackInfo(QWidget* parent, Track* sel_track, int rast, int qu
 	_autoExapand = true;
 	_resetProgram = false;
 	m_globalState = false;
+	m_eventPart = 0;
 	_matrix = new QList<int>;
 	_tableModel = new ProgramChangeTableModel(this);
 	tableView = new ProgramChangeTable(this);
@@ -1759,7 +1760,10 @@ void MidiTrackInfo::progRecClicked(Track* t)
 	a.setA(CTRL_PROGRAM);
 	a.setB(program);
 
-	song->recordEvent(track, a);
+	if(m_eventPart)
+		song->recordEvent((MidiPart*)m_eventPart, a);
+	else //Let song guess, its only that rec button we never use
+		song->recordEvent(track, a);
 }
 
 //---------------------------------------------------------
@@ -1971,6 +1975,7 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 {
 	if (!curPart)
 		return;
+	m_eventPart = curPart;
 	MidiTrack* track = (MidiTrack*) curPart->track();
 	int channel = track->outChannel();
 	int port = track->outPort();
@@ -1986,7 +1991,10 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 			if(!rows.isEmpty())
 				row = rows.at(0);
 			else
+			{
+				m_eventPart = 0;
 				return; //Nothing is selected and we are in selection mode
+			}
 			//printf("MidiTrackInfo::insertMatrixEvent() not using matrix\n");
 		}
 		else
@@ -2037,6 +2045,7 @@ void MidiTrackInfo::insertMatrixEvent(Part* curPart, unsigned tick)
 		}
 		_matrix->push_back(row);
 	}
+	m_eventPart = 0;
 }
 
 void MidiTrackInfo::populateMatrix()
