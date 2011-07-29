@@ -498,7 +498,7 @@ void HeaderList::keyPressEvent(QKeyEvent* e)/*{{{*/
 	{
 		if(isEditing())
 		{
-			printf("HeaderList::keyPressEvent editing\n");
+			//printf("HeaderList::keyPressEvent editing\n");
 			return;
 		}
 	}
