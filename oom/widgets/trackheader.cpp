@@ -42,7 +42,9 @@
 #include "slider.h"
 #include "mixer/meter.h"
 
-static QString styletemplate = "QLineEdit { border-width:1px; border-radius: 0px; border-image: url(:/images/frame.png) 4; border-top-color: #1f1f22; border-bottom-color: #505050; background-color: #1a1a1a; color: #%1; font-family: fixed-width; font-weight: bold; font-size: 15px; padding-left: 15px; }";
+static QString styletemplate = "QLineEdit { border-width:1px; border-radius: 0px; border-image: url(:/images/frame.png) 4; border-top-color: #1f1f22; border-bottom-color: #505050; color: #%1; background-color: #%2; font-family: fixed-width; font-weight: bold; font-size: 15px; padding-left: 15px; }";
+static QString trackHeaderStyle = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #262626; }";
+static QString trackHeaderStyleSelected = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #171717; }";
 static QString lineStyleTemplate = "QFrame { border: 0px; background-color: %1; }";
 
 TrackHeader::TrackHeader(Track* t, QWidget* parent)
@@ -78,7 +80,8 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	{
 		Track::TrackType type = m_track->type();
 		m_tracktype = (int)type;
-		switch (type)
+		setObjectName("TrackHeader");
+		/*switch (type)
 		{
 			case Track::MIDI:
 			case Track::DRUM:
@@ -102,7 +105,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 			case Track::AUDIO_SOFTSYNTH:
 				setObjectName("SynthTrackHeader");
 			break;
-		}
+		}*/
 		if(!m_track->isMidiTrack())
 		{
 			//populateAutomationTable();
@@ -140,7 +143,6 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 			m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 		else
 			m_btnAutomation->setIcon(*automation_trackIconSet3);
-		m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorList.value(m_track->type()).name()));
 	}
 	songChanged(-1);
 	connect(m_trackName, SIGNAL(editingFinished()), this, SLOT(updateTrackName()));
@@ -202,10 +204,16 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 		{
 			//m_trackName->setFont();
 			m_trackName->setStyleSheet(m_selectedStyle[m_tracktype]);
+			setStyleSheet(trackHeaderStyleSelected);
+			m_slider->setSliderBackground(g_trackColorListSelected.value(m_track->type()));
+			m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorListLine.value(m_track->type()).name()));
 		}
 		else
 		{
 			m_trackName->setStyleSheet(m_style[m_tracktype]);
+			setStyleSheet(trackHeaderStyle);
+			m_slider->setSliderBackground(g_trackColorList.value(m_track->type()));
+			m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorListLine.value(m_track->type()).name()));
 			//m_strip->setStyleSheet("QFrame {background-color: blue;}");
 		}
 	}
@@ -1607,21 +1615,21 @@ void TrackHeader::initVolume()/*{{{*/
 
 void TrackHeader::setupStyles()/*{{{*/
 {
-	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::WAVE, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("939393")));
-	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("939393")));
+	m_style.insert(Track::MIDI, styletemplate.arg(QString("939393"), QString("262626")));
+	m_style.insert(Track::WAVE, styletemplate.arg(QString("939393"), QString("262626")));
+	m_style.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("939393"), QString("262626")));
+	m_style.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("939393"), QString("262626")));
+	m_style.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("939393"), QString("262626")));
+	m_style.insert(Track::AUDIO_AUX, styletemplate.arg(QString("939393"), QString("262626")));
+	m_style.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("939393"), QString("262626")));
 	
-	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("e18fff")));
-	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee")));
-	m_selectedStyle.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("fc7676")));
-	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("81f476")));
-	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("fca424")));
-	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276")));
-	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee")));
+	m_selectedStyle.insert(Track::AUDIO_INPUT, styletemplate.arg(QString("e18fff"), QString("171717")));
+	m_selectedStyle.insert(Track::MIDI, styletemplate.arg(QString("01e6ee"), QString("171717")));
+	m_selectedStyle.insert(Track::AUDIO_OUTPUT, styletemplate.arg(QString("fc7676"), QString("171717")));
+	m_selectedStyle.insert(Track::WAVE, styletemplate.arg(QString("81f476"), QString("171717")));
+	m_selectedStyle.insert(Track::AUDIO_BUSS, styletemplate.arg(QString("fca424"), QString("171717")));
+	m_selectedStyle.insert(Track::AUDIO_AUX, styletemplate.arg(QString("ecf276"), QString("171717")));
+	m_selectedStyle.insert(Track::AUDIO_SOFTSYNTH, styletemplate.arg(QString("01e6ee"), QString("171717")));
 }/*}}}*/
 
 void TrackHeader::updateSelection(bool shift)/*{{{*/
@@ -1814,7 +1822,7 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 			m_pan->setVisible(m_sliderVisible);
 		/*if(m_sliderVisible)
 		{
-			m_colorLine->setStyleSheet(lineStyleTemplate.arg("#1b1b1b"));
+			m_colorLine->setStyleSheet(lineStyleTemplate.arg("#262626"));
 		}
 		else
 		{*/

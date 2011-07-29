@@ -101,5 +101,6 @@ public:
     void setBorderWidth(int bw);
     void setMargins(int x, int y);
     QSize sizeHint(); // const;
+	void setSliderBackground(QColor);
 };
 #endif

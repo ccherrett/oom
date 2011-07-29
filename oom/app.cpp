@@ -770,15 +770,32 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	routingDialog = 0;
 	firstrun = true;
 	//routingPopupView      = 0;
+	g_trackColorListLine.insert(Track::AUDIO_INPUT, QColor(189,122,214));
+	g_trackColorListLine.insert(Track::MIDI, QColor(1,230,238));
+	g_trackColorListLine.insert(Track::DRUM, QColor(1,230,238));
+	g_trackColorListLine.insert(Track::AUDIO_OUTPUT, QColor(252,118,118));
+	g_trackColorListLine.insert(Track::WAVE, QColor(129,244,118));
+	g_trackColorListLine.insert(Track::AUDIO_BUSS, QColor(252,164,36));
+	g_trackColorListLine.insert(Track::AUDIO_AUX, QColor(227,233,114));
+	g_trackColorListLine.insert(Track::AUDIO_SOFTSYNTH, QColor(129,244,118));
 
-	g_trackColorList.insert(Track::AUDIO_INPUT, QColor(189,122,214));
-	g_trackColorList.insert(Track::MIDI, QColor(1,230,238));
-	g_trackColorList.insert(Track::DRUM, QColor(1,230,238));
-	g_trackColorList.insert(Track::AUDIO_OUTPUT, QColor(252,118,118));
-	g_trackColorList.insert(Track::WAVE, QColor(129,244,118));
-	g_trackColorList.insert(Track::AUDIO_BUSS, QColor(252,164,36));
-	g_trackColorList.insert(Track::AUDIO_AUX, QColor(227,233,114));
-	g_trackColorList.insert(Track::AUDIO_SOFTSYNTH, QColor(129,244,118));
+	g_trackColorList.insert(Track::AUDIO_INPUT, QColor(105,105,105));
+	g_trackColorList.insert(Track::MIDI, QColor(105,105,105));
+	g_trackColorList.insert(Track::DRUM, QColor(105,105,105));
+	g_trackColorList.insert(Track::AUDIO_OUTPUT, QColor(105,105,105));
+	g_trackColorList.insert(Track::WAVE, QColor(105,105,105));
+	g_trackColorList.insert(Track::AUDIO_BUSS, QColor(105,105,105));
+	g_trackColorList.insert(Track::AUDIO_AUX, QColor(105,105,105));
+	g_trackColorList.insert(Track::AUDIO_SOFTSYNTH, QColor(105,105,105));
+
+	g_trackColorListSelected.insert(Track::AUDIO_INPUT, QColor(189,122,214));
+	g_trackColorListSelected.insert(Track::MIDI, QColor(1,230,238));
+	g_trackColorListSelected.insert(Track::DRUM, QColor(1,230,238));
+	g_trackColorListSelected.insert(Track::AUDIO_OUTPUT, QColor(252,118,118));
+	g_trackColorListSelected.insert(Track::WAVE, QColor(129,244,118));
+	g_trackColorListSelected.insert(Track::AUDIO_BUSS, QColor(252,164,36));
+	g_trackColorListSelected.insert(Track::AUDIO_AUX, QColor(227,233,114));
+	g_trackColorListSelected.insert(Track::AUDIO_SOFTSYNTH, QColor(129,244,118));
 
 	g_trackDragImageList.insert(Track::AUDIO_INPUT, *dragMidiIcon);
 	g_trackDragImageList.insert(Track::MIDI, *dragInputIcon);

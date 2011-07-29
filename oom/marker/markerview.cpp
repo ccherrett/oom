@@ -160,10 +160,10 @@ MarkerView::MarkerView(QWidget* parent)
 
 	setWindowTitle(tr("OOMidi: Marker"));
 
-	QAction* markerAdd = new QAction(QIcon(*flagIcon), tr("add marker"), this);
+	QAction* markerAdd = new QAction(QIcon(*plusIconSet3), tr("add marker"), this);
 	connect(markerAdd, SIGNAL(triggered()), SLOT(addMarker()));
 
-	QAction* markerDelete = new QAction(QIcon(*deleteIcon), tr("delete marker"), this);
+	QAction* markerDelete = new QAction(QIcon(*garbageIconSet3), tr("delete marker"), this);
 	connect(markerDelete, SIGNAL(triggered()), SLOT(deleteMarker()));
 
 	//---------Pulldown Menu----------------------------
@@ -177,8 +177,8 @@ MarkerView::MarkerView(QWidget* parent)
 	editMenu->addAction(markerDelete);
 
 	//---------ToolBar----------------------------------
-	tools = addToolBar(tr("marker-tools"));
-	tools->addActions(undoRedo->actions());
+	//tools = addToolBar(tr("marker-tools"));
+	//tools->addActions(undoRedo->actions());
 
 	QToolBar* edit = addToolBar(tr("edit tools"));
 	edit->addAction(markerAdd);
