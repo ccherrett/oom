@@ -269,6 +269,7 @@ void HeaderList::moveSelection(int n)/*{{{*/
 			if(song->hasSelectedParts)
 				song->deselectAllParts();
 			emit selectionChanged(track);
+			song->update(SC_SELECTION);
 		}
 		return;
 	}
@@ -283,6 +284,7 @@ void HeaderList::moveSelection(int n)/*{{{*/
 			if(song->hasSelectedParts)
 				song->deselectAllParts();
 			emit selectionChanged(bottomMostSelected);
+			song->update(SC_SELECTION);
 		}
 		else if (n == -1)
 		{
@@ -291,6 +293,7 @@ void HeaderList::moveSelection(int n)/*{{{*/
 			if(song->hasSelectedParts)
 				song->deselectAllParts();
 			emit selectionChanged(topMostSelected);
+			song->update(SC_SELECTION);
 		}
 		else
 		{
@@ -343,6 +346,7 @@ void HeaderList::moveSelection(int n)/*{{{*/
 	if(song->hasSelectedParts)
 		song->deselectAllParts();
 	emit selectionChanged(selTrack);
+	song->update(SC_SELECTION);
 }/*}}}*/
 
 void HeaderList::selectTrackAbove()/*{{{*/
