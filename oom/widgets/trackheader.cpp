@@ -1403,7 +1403,7 @@ bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 {
 	if(!m_processEvents)
 		return true;
-	if (event->type() & (QEvent::MouseButtonPress | QEvent::MouseMove | QEvent::MouseButtonRelease))
+	/*if (event->type() & (QEvent::MouseButtonPress | QEvent::MouseMove | QEvent::MouseButtonRelease))
 	{
 		bool alltype = false;
 		bool isname = false;
@@ -1425,6 +1425,7 @@ bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 			//return QObject::eventFilter(obj, event);
 		}
 	}
+	*/
 	if (event->type() == QEvent::MouseButtonPress)
 	{
 		QMouseEvent *mEvent = static_cast<QMouseEvent *>(event);
