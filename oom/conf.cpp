@@ -1486,7 +1486,7 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 	//DrumEdit::writeConfiguration(level, xml);
 	Performer::writeConfiguration(level, xml);
 	MasterEdit::writeConfiguration(level, xml);
-	WaveEdit::writeConfiguration(level, xml);
+	//WaveEdit::writeConfiguration(level, xml);
 
 	writeMidiTransforms(level, xml);
 	writeMidiInputTransforms(level, xml);
