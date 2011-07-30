@@ -186,7 +186,7 @@ HEADERS = \
 ./oom/mixer/meter.h \
 ./oom/mixer/mstrip.h \
 ./oom/mixer/rack.h \
-./oom/mixer/amixer.h \
+./oom/mixer/AudioMixer.h \
 ./oom/mixer/auxknob.h \
 ./oom/mixer/midiportroutebase.h \
 ./oom/mixer/routedialog.h \
@@ -200,7 +200,7 @@ HEADERS = \
 ./oom/evdata.h \
 ./oom/node.h \
 ./oom/midiedit/pianoroll.h \
-./oom/midiedit/piano.h \
+./oom/midiedit/Piano.h \
 ./oom/midiedit/prcanvas.h \
 ./oom/midiedit/dlist.h \
 ./oom/midiedit/cmd.h \
@@ -208,7 +208,7 @@ HEADERS = \
 ./oom/midiedit/dcanvas.h \
 ./oom/midiedit/quantconfig.h \
 ./oom/midiedit/drumedit.h \
-./oom/midiedit/ecanvas.h \
+./oom/midiedit/EventCanvas.h \
 ./oom/helper.h \
 ./oom/globals.h \
 ./oom/mplugins/rhythm.h \
@@ -223,7 +223,7 @@ HEADERS = \
 ./oom/mplugins/rhythmbase.h \
 ./oom/wave.h \
 ./oom/shortcuts.h \
-./oom/midieditor.h \
+./oom/AbstractMidiEditor.h \
 ./oom/midiport.h \
 ./oom/device.h \
 ./oom/cthread.h \
@@ -291,7 +291,7 @@ SOURCES =  \
 ./oom/driver/jack.cpp \
 ./oom/driver/alsatimer.cpp \
 ./oom/key.cpp \
-./oom/moc_midieditor.cpp \
+./oom/moc_AbstractMidiEditor.cpp \
 ./oom/remote/pyapi.cpp \
 ./oom/moc_conf.cpp \
 ./oom/gconfig.cpp \
@@ -368,7 +368,7 @@ SOURCES =  \
 ./oom/cliplist/cliplist.cpp \
 ./oom/cliplist/moc_cliplist.cpp \
 ./oom/mididev.cpp \
-./oom/midieditor.cpp \
+./oom/AbstractMidiEditor.cpp \
 ./oom/wavetrack.cpp \
 ./oom/confmport.cpp \
 ./oom/transpose.cpp \
@@ -550,7 +550,7 @@ SOURCES =  \
 ./oom/mixer/moc_strip.cpp \
 ./oom/mixer/strip.cpp \
 ./oom/mixer/astrip.cpp \
-./oom/mixer/amixer.cpp \
+./oom/mixer/AudioMixer.cpp \
 ./oom/mixer/moc_mstrip.cpp \
 ./oom/mixer/moc_astrip.cpp \
 ./oom/mixer/rack.cpp \
@@ -571,7 +571,7 @@ SOURCES =  \
 ./oom/midiedit/moc_pianoroll.cpp \
 ./oom/midiedit/moc_drumedit.cpp \
 ./oom/midiedit/dlist.cpp \
-./oom/midiedit/piano.cpp \
+./oom/midiedit/Piano.cpp \
 ./oom/midiedit/moc_piano.cpp \
 ./oom/midiedit/dcanvas.cpp \
 ./oom/midiedit/moc_quantconfig.cpp \
@@ -580,10 +580,10 @@ SOURCES =  \
 ./oom/midiedit/moc_prcanvas.cpp \
 ./oom/midiedit/drummap.cpp \
 ./oom/midiedit/moc_dlist.cpp \
-./oom/midiedit/ecanvas.cpp \
+./oom/midiedit/EventCanvas.cpp \
 ./oom/midiedit/prcanvas.cpp \
 ./oom/midiedit/quantconfig.cpp \
-./oom/midiedit/moc_ecanvas.cpp \
+./oom/midiedit/moc_EventCanvas.cpp \
 ./oom/app.cpp \
 ./oom/cobject.cpp \
 ./oom/midiseq.cpp \

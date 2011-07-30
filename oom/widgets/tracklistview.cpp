@@ -13,13 +13,13 @@
 #include "audio.h"
 #include "track.h"
 #include "part.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "citem.h"
 #include "Composer.h"
 #include "event.h"
 #include "traverso_shared/TConfig.h"
 
-TrackListView::TrackListView(MidiEditor* editor, QWidget* parent)
+TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 : QFrame(parent)
 {
 	m_editor = editor;

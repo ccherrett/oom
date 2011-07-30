@@ -15,7 +15,7 @@
 
 #include "globals.h"
 #include "ctrledit.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "icons.h"
 #include "midiport.h"
 #include "song.h"
@@ -107,7 +107,7 @@ void CEventList::clearDelete()
 //   CtrlCanvas
 //---------------------------------------------------------
 
-CtrlCanvas::CtrlCanvas(MidiEditor* e, QWidget* parent, int xmag,
+CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 		const char* name, CtrlPanel* pnl) : View(parent, xmag, 1, name)
 {
 	//setBg(QColor(195, 198, 196));

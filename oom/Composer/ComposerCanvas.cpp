@@ -32,7 +32,7 @@
 
 #include "widgets/tools.h"
 #include "ComposerCanvas.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "globals.h"
 #include "icons.h"
 #include "event.h"

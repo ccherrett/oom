@@ -19,7 +19,7 @@
 #include "song.h"
 #include "scrollscale.h"
 #include "midi.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "icons.h"
 #include "audio.h"
 
@@ -30,7 +30,7 @@ extern void drawTickRaster(QPainter& p, int x, int y,
 //   Master
 //---------------------------------------------------------
 
-Master::Master(MidiEditor* e, QWidget* parent, int xmag, int ymag)
+Master::Master(AbstractMidiEditor* e, QWidget* parent, int xmag, int ymag)
 : View(parent, xmag, ymag)
 {
 	editor = e;

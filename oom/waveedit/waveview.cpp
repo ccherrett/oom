@@ -30,7 +30,7 @@ bool modifyWarnedYet = false;
 //   WaveView
 //---------------------------------------------------------
 
-WaveView::WaveView(MidiEditor* pr, QWidget* parent, int xscale, int yscale)
+WaveView::WaveView(AbstractMidiEditor* pr, QWidget* parent, int xscale, int yscale)
 : View(parent, xscale, 1)
 {
 	editor = pr;

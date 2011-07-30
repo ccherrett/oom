@@ -25,7 +25,7 @@
 #include "mitplugin.h"
 #include "wave.h"
 #include "midictrl.h"
-#include "amixer.h"
+#include "AudioMixer.h"
 #include "conf.h"
 #include "driver/jackmidi.h"
 #include "trackview.h"

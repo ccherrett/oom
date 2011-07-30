@@ -17,7 +17,7 @@ class PartList;
 class QPainter;
 class QRect;
 class WavePart;
-class MidiEditor;
+class AbstractMidiEditor;
 class SndFileR;
 
 struct WaveEventSelection
@@ -36,7 +36,7 @@ typedef std::list<WaveEventSelection>::iterator iWaveSelection;
 
 class WaveView : public View
 {
-    MidiEditor* editor;
+    AbstractMidiEditor* editor;
     unsigned pos[3];
     int yScale;
     int button;
@@ -97,7 +97,7 @@ signals:
     void mouseWheelMoved(int);
 
 public:
-    WaveView(MidiEditor*, QWidget* parent, int xscale, int yscale);
+    WaveView(AbstractMidiEditor*, QWidget* parent, int xscale, int yscale);
     QString getCaption() const;
     void range(int*, int*);
     void cmd(int n);

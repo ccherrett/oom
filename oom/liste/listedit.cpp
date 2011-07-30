@@ -456,7 +456,7 @@ QString EventListItem::text(int col) const
 //---------------------------------------------------------
 
 ListEdit::ListEdit(PartList* pl)
-: MidiEditor(0, 0, pl)
+: AbstractMidiEditor(0, 0, pl)
 {
 	insertItems = new QActionGroup(this);
 	insertItems->setExclusive(false);
@@ -858,7 +858,7 @@ void ListEdit::readStatus(Xml& xml)
 		{
 			case Xml::TagStart:
 				if (tag == "midieditor")
-					MidiEditor::readStatus(xml);
+					AbstractMidiEditor::readStatus(xml);
 				else
 					xml.unknown("ListEdit");
 				break;
@@ -879,7 +879,7 @@ void ListEdit::writeStatus(int level, Xml& xml) const
 {
 	writePartList(level, xml);
 	xml.tag(level++, "listeditor");
-	MidiEditor::writeStatus(level, xml);
+	AbstractMidiEditor::writeStatus(level, xml);
 	xml.tag(level, "/listeditor");
 }
 

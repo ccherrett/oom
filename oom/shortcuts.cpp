@@ -247,7 +247,7 @@ void initShortCuts()
 	defShrt(SHRT_TOOL_POINTER, Qt::Key_A, "Tool: Pointer", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "pointer_tool");
 	defShrt(SHRT_TOOL_PENCIL, Qt::Key_D, "Tool: Pencil", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "pencil_tool");
 	defShrt(SHRT_TOOL_RUBBER, Qt::Key_B, "Tool: Eraser", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "eraser_tool");
-	// piano roll & drum editor
+	// Performer & drum editor
 	defShrt(SHRT_TOOL_LINEDRAW, Qt::Key_F, "Tool: Line Draw", PROLL_SHRT + DEDIT_SHRT, "line_draw_tool");
 	// Composer
 	defShrt(SHRT_TOOL_SCISSORS, Qt::Key_J, "Tool: Scissor", ARRANG_SHRT, "scissor_tool");

@@ -6,7 +6,7 @@
 //=========================================================
 
 #include "hitscale.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 
 #include <QMouseEvent>
 #include <QPainter>

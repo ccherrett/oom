@@ -1,12 +1,12 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: midieditor.cpp,v 1.2.2.2 2009/02/02 21:38:00 terminator356 Exp $
+//    $Id: AbstractMidiEditor.cpp,v 1.2.2.2 2009/02/02 21:38:00 terminator356 Exp $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#include "midieditor.h"
-#include "midiedit/ecanvas.h"
+#include "AbstractMidiEditor.h"
+#include "midiedit/EventCanvas.h"
 #include "waveedit/waveview.h"
 #include "scrollscale.h"
 #include "mtscale.h"
@@ -22,10 +22,10 @@
 #include <QGridLayout>
 
 //---------------------------------------------------------
-//   MidiEditor
+//   AbstractMidiEditor
 //---------------------------------------------------------
 
-MidiEditor::MidiEditor(int q, int r, PartList* pl, QWidget* parent, const char* name)
+AbstractMidiEditor::AbstractMidiEditor(int q, int r, PartList* pl, QWidget* parent, const char* name)
 : TopWin(parent, name)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
@@ -53,7 +53,7 @@ MidiEditor::MidiEditor(int q, int r, PartList* pl, QWidget* parent, const char* 
 //   genPartlist
 //---------------------------------------------------------
 
-void MidiEditor::genPartlist()
+void AbstractMidiEditor::genPartlist()
 {
 	_pl->clear();
 	for (std::list<int>::iterator i = _parts.begin(); i != _parts.end(); ++i)
@@ -77,7 +77,7 @@ void MidiEditor::genPartlist()
 	}
 }
 
-bool MidiEditor::hasPart(int sn)
+bool AbstractMidiEditor::hasPart(int sn)
 {
 	bool rv = false;
 	for (std::list<int>::iterator i = _parts.begin(); i != _parts.end(); ++i)
@@ -92,10 +92,10 @@ bool MidiEditor::hasPart(int sn)
 }
 
 //---------------------------------------------------------
-//   MidiEditor
+//   AbstractMidiEditor
 //---------------------------------------------------------
 
-MidiEditor::~MidiEditor()
+AbstractMidiEditor::~AbstractMidiEditor()
 {
 	if (_pl)
 		delete _pl;
@@ -105,7 +105,7 @@ MidiEditor::~MidiEditor()
 //   quantVal
 //---------------------------------------------------------
 
-int MidiEditor::quantVal(int v) const
+int AbstractMidiEditor::quantVal(int v) const
 {
 	int val = ((v + _quant / 2) / _quant) * _quant;
 	if (val == 0)
@@ -117,7 +117,7 @@ int MidiEditor::quantVal(int v) const
 //   readStatus
 //---------------------------------------------------------
 
-void MidiEditor::readStatus(Xml& xml)
+void AbstractMidiEditor::readStatus(Xml& xml)
 {
 	if (_pl == 0)
 		_pl = new PartList;
@@ -139,7 +139,7 @@ void MidiEditor::readStatus(Xml& xml)
 				else if (tag == "topwin")
 					TopWin::readStatus(xml);
 				else
-					xml.unknown("MidiEditor");
+					xml.unknown("AbstractMidiEditor");
 				break;
 			case Xml::TagEnd:
 				if (tag == "midieditor")
@@ -154,7 +154,7 @@ void MidiEditor::readStatus(Xml& xml)
 //   writePartList
 //---------------------------------------------------------
 
-void MidiEditor::writePartList(int level, Xml& xml) const
+void AbstractMidiEditor::writePartList(int level, Xml& xml) const
 {
 	for (ciPart p = _pl->begin(); p != _pl->end(); ++p)
 	{
@@ -164,7 +164,7 @@ void MidiEditor::writePartList(int level, Xml& xml) const
 		int partIdx = track->parts()->index(part);
 
 		if ((trkIdx == -1) || (partIdx == -1))
-			printf("MidiEditor::writePartList error: trkIdx:%d partIdx:%d\n", trkIdx, partIdx);
+			printf("AbstractMidiEditor::writePartList error: trkIdx:%d partIdx:%d\n", trkIdx, partIdx);
 
 		xml.put(level, "<part>%d:%d</part>", trkIdx, partIdx);
 	}
@@ -174,7 +174,7 @@ void MidiEditor::writePartList(int level, Xml& xml) const
 //   writeStatus
 //---------------------------------------------------------
 
-void MidiEditor::writeStatus(int level, Xml& xml) const
+void AbstractMidiEditor::writeStatus(int level, Xml& xml) const
 {
 	xml.tag(level++, "midieditor");
 	TopWin::writeStatus(level, xml);
@@ -183,7 +183,7 @@ void MidiEditor::writeStatus(int level, Xml& xml) const
 	xml.tag(level, "/midieditor");
 }
 
-void MidiEditor::addParts(PartList* pl)
+void AbstractMidiEditor::addParts(PartList* pl)
 {
 	if(pl)
 	{
@@ -197,7 +197,7 @@ void MidiEditor::addParts(PartList* pl)
 	}
 }
 
-void MidiEditor::addPart(Part* p)
+void AbstractMidiEditor::addPart(Part* p)
 {
 	if(p)
 	{
@@ -207,7 +207,7 @@ void MidiEditor::addPart(Part* p)
 	}
 }
 
-void MidiEditor::removeParts(PartList* pl)
+void AbstractMidiEditor::removeParts(PartList* pl)
 {
 	if(pl)
 	{
@@ -220,7 +220,7 @@ void MidiEditor::removeParts(PartList* pl)
 	}
 }
 
-void MidiEditor::removePart(int sn)
+void AbstractMidiEditor::removePart(int sn)
 {
 	if(_parts.size() >= 2)
 	{
@@ -233,7 +233,7 @@ void MidiEditor::removePart(int sn)
 //   songChanged
 //---------------------------------------------------------
 
-void MidiEditor::songChanged(int type)
+void AbstractMidiEditor::songChanged(int type)
 {
 
 	if (type)
@@ -309,7 +309,7 @@ void MidiEditor::songChanged(int type)
 //   setCurDrumInstrument
 //---------------------------------------------------------
 
-void MidiEditor::setCurDrumInstrument(int instr)
+void AbstractMidiEditor::setCurDrumInstrument(int instr)
 {
 	_curDrumInstrument = instr;
 	emit curDrumInstrumentChanged(_curDrumInstrument);
@@ -319,7 +319,7 @@ void MidiEditor::setCurDrumInstrument(int instr)
 //   curCanvasPart
 //---------------------------------------------------------
 
-Part* MidiEditor::curCanvasPart()
+Part* AbstractMidiEditor::curCanvasPart()
 {
 	if (canvas)
 		return canvas->part();
@@ -327,7 +327,7 @@ Part* MidiEditor::curCanvasPart()
 		return 0;
 }
 
-QList<Event> MidiEditor::getSelectedEvents()/*{{{*/
+QList<Event> AbstractMidiEditor::getSelectedEvents()/*{{{*/
 {
 	QList<Event> rv;
 	if(canvas)
@@ -347,7 +347,7 @@ QList<Event> MidiEditor::getSelectedEvents()/*{{{*/
 	return rv;
 }/*}}}*/
 
-bool MidiEditor::isEventSelected(Event e)
+bool AbstractMidiEditor::isEventSelected(Event e)
 {
 	bool rv = false;
 	if(canvas)
@@ -361,7 +361,7 @@ bool MidiEditor::isEventSelected(Event e)
 //   curWavePart
 //---------------------------------------------------------
 
-WavePart* MidiEditor::curWavePart()
+WavePart* AbstractMidiEditor::curWavePart()
 {
 	if (wview)
 		return wview->part();
@@ -373,11 +373,11 @@ WavePart* MidiEditor::curWavePart()
 //   setCurCanvasPart
 //---------------------------------------------------------
 
-void MidiEditor::setCurCanvasPart(Part* part)
+void AbstractMidiEditor::setCurCanvasPart(Part* part)
 {
 	if (canvas)
 	{
-		//printf("MidiEditor::setCurCanvasPart\n");
+		//printf("AbstractMidiEditor::setCurCanvasPart\n");
 		canvas->setCurrentPart(part);
 	}
 }

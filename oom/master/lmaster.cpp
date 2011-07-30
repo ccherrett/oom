@@ -62,7 +62,7 @@ void LMaster::songChanged(int type)
 //---------------------------------------------------------
 
 LMaster::LMaster()
-: MidiEditor(0, 0, 0)
+: AbstractMidiEditor(0, 0, 0)
 {
 	pos_editor = 0;
 	editor = 0;
@@ -268,7 +268,7 @@ void LMaster::readStatus(Xml& xml)
 		{
 			case Xml::TagStart:
 				if (tag == "midieditor")
-					MidiEditor::readStatus(xml);
+					AbstractMidiEditor::readStatus(xml);
 				else
 					xml.unknown("LMaster");
 				break;
@@ -288,7 +288,7 @@ void LMaster::readStatus(Xml& xml)
 void LMaster::writeStatus(int level, Xml& xml) const
 {
 	xml.tag(level++, "lmaster");
-	MidiEditor::writeStatus(level, xml);
+	AbstractMidiEditor::writeStatus(level, xml);
 	xml.tag(level, "/lmaster");
 }
 

@@ -1,9 +1,8 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//  $Id: amixer.cpp,v 1.49.2.5 2009/11/16 01:55:55 terminator356 Exp $
-//
-//  (C) Copyright 2000-2004 Werner Schweer (ws@seh.de)
+//  $Id: $
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //=========================================================
 
 #include <list>
@@ -14,7 +13,7 @@
 
 #include "app.h"
 #include "icons.h"
-#include "amixer.h"
+#include "AudioMixer.h"
 #include "song.h"
 #include "shortcuts.h"
 
@@ -36,7 +35,7 @@ extern QActionGroup* populateAddTrack(QMenu* addTrack);
 //   AudioMixer
 //---------------------------------------------------------
 
-AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
+AudioMixer::AudioMixer(const QString& title, QWidget* parent)
 : QMainWindow(parent)
 {
 	setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding)); 
@@ -96,7 +95,7 @@ AudioMixerApp::AudioMixerApp(const QString& title, QWidget* parent)
 	connect(m_mixerView, SIGNAL(trackListChanged(TrackList*)), this, SLOT(trackListChanged(TrackList*)));
 }
 
-AudioMixerApp::~AudioMixerApp()
+AudioMixer::~AudioMixer()
 {
 	tconfig().set_property(objectName(), "geometry", geometry());
 	tconfig().set_property(objectName(), "rows", m_cmbRows->currentIndex());
@@ -107,7 +106,7 @@ AudioMixerApp::~AudioMixerApp()
 //   clear
 //---------------------------------------------------------
 
-void AudioMixerApp::clear()
+void AudioMixer::clear()
 {
 	DockList::iterator si = m_dockList.begin();
 	for (; si != m_dockList.end(); ++si)
@@ -117,7 +116,7 @@ void AudioMixerApp::clear()
 	m_dockList.clear();
 }
 
-void AudioMixerApp::trackListChanged(TrackList* list)
+void AudioMixer::trackListChanged(TrackList* list)
 {
 	m_tracklist = list;
 	updateMixer(m_cmbRows->currentIndex());
@@ -127,7 +126,7 @@ void AudioMixerApp::trackListChanged(TrackList* list)
 //   updateMixer
 //---------------------------------------------------------
 
-void AudioMixerApp::updateMixer(int index)/*{{{*/
+void AudioMixer::updateMixer(int index)/*{{{*/
 {
 	clear();
 	int rows = m_cmbRows->itemData(index).toInt();
@@ -256,7 +255,7 @@ void AudioMixerApp::updateMixer(int index)/*{{{*/
 	}/*}}}*/
 }/*}}}*/
 
-void AudioMixerApp::resizeEvent(QResizeEvent* event)/*{{{*/
+void AudioMixer::resizeEvent(QResizeEvent* event)/*{{{*/
 {
 	int rows = m_cmbRows->itemData(m_cmbRows->currentIndex()).toInt();
 	if(rows > 1)
@@ -271,7 +270,7 @@ void AudioMixerApp::resizeEvent(QResizeEvent* event)/*{{{*/
 	}
 }/*}}}*/
 
-void AudioMixerApp::getRowCount(int trackCount, int rows, int& rowcount, int& remainder)/*{{{*/
+void AudioMixer::getRowCount(int trackCount, int rows, int& rowcount, int& remainder)/*{{{*/
 {
 	int q;
 	q = trackCount / rows;
@@ -283,7 +282,7 @@ void AudioMixerApp::getRowCount(int trackCount, int rows, int& rowcount, int& re
 //   configChanged
 //---------------------------------------------------------
 
-void AudioMixerApp::configChanged()
+void AudioMixer::configChanged()
 {
 	songChanged(SC_CONFIG);
 }
@@ -292,9 +291,9 @@ void AudioMixerApp::configChanged()
 //   songChanged
 //---------------------------------------------------------
 
-void AudioMixerApp::songChanged(int flags)
+void AudioMixer::songChanged(int flags)
 {
-	//printf("AudioMixerApp::songChanged\n");
+	//printf("AudioMixer::songChanged\n");
 	DockList::iterator si = m_dockList.begin();
 	for (; si != m_dockList.end(); ++si)
 	{
@@ -302,7 +301,7 @@ void AudioMixerApp::songChanged(int flags)
 	}
 }
 
-void AudioMixerApp::toggleAuxRack(bool toggle)
+void AudioMixer::toggleAuxRack(bool toggle)
 {
 	DockList::iterator si = m_dockList.begin();
 	for (; si != m_dockList.end(); ++si)
@@ -311,7 +310,7 @@ void AudioMixerApp::toggleAuxRack(bool toggle)
 	}
 }
 
-void AudioMixerApp::showEvent(QShowEvent* e)
+void AudioMixer::showEvent(QShowEvent* e)
 {
 	QRect geometry = tconfig().get_property(objectName(), "geometry", QRect(0,0,600, 600)).toRect();
 	setGeometry(geometry);
@@ -330,7 +329,7 @@ void AudioMixerApp::showEvent(QShowEvent* e)
 //   closeEvent
 //---------------------------------------------------------
 
-void AudioMixerApp::closeEvent(QCloseEvent* e)
+void AudioMixer::closeEvent(QCloseEvent* e)
 {
 	tconfig().set_property(objectName(), "geometry", geometry());
 	tconfig().set_property(objectName(), "rows", m_cmbRows->currentIndex());
@@ -339,7 +338,7 @@ void AudioMixerApp::closeEvent(QCloseEvent* e)
 	e->accept();
 }
 
-void AudioMixerApp::hideEvent(QHideEvent* e)
+void AudioMixer::hideEvent(QHideEvent* e)
 {
 	if(!e->spontaneous())
 	{

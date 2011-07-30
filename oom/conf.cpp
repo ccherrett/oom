@@ -44,7 +44,7 @@
 #include "sync.h"
 #include "wave.h"
 #include "midiseq.h"
-#include "amixer.h"
+#include "AudioMixer.h"
 
 extern void writeMidiTransforms(int level, Xml& xml);
 extern void readMidiTransform(Xml&);

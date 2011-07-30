@@ -48,7 +48,7 @@ class MRConfig;
 class MetronomeConfig;
 class AudioConf;
 class Xml;
-class AudioMixerApp;
+class AudioMixer;
 class ClipListEdit;
 class AudioRecord;
 class MidiFileConfig;
@@ -196,8 +196,8 @@ class OOMidi : public QMainWindow
     MidiInputTransformDialog* midiInputTransform;
     ShortcutConfig* shortcutConfig;
     //Appearance* appearance;
-    AudioMixerApp* mixer1;
-    AudioMixerApp* mixer2;
+    AudioMixer* mixer1;
+    AudioMixer* mixer2;
     AudioPortConfig* routingDialog;
 
     ToplevelList toplevels;

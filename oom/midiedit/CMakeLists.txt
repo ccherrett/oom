@@ -24,15 +24,12 @@
 QT4_WRAP_CPP ( midiedit_mocs
       # gatetime.h
       # midicmd.h
-      # midieditor.h
+      # AbstractMidiEditor.h
       # miditracker.h
       # trackpattern.h
       # velocity.h
-	  #dcanvas.h 
-	  #dlist.h 
-	  #drumedit.h 
-      ecanvas.h
-      piano.h 
+      EventCanvas.h
+      Piano.h 
       Performer.h 
       PerformerCanvas.h 
       quantconfig.h 
@@ -45,16 +42,13 @@ file (GLOB midiedit_source_files
       # citem.cpp
       # gatetime.cpp
       # midicmd.cpp
-      # midieditor.cpp
+      # AbstractMidiEditor.cpp
       # miditracker.cpp
       # trackpattern.cpp
       # velocity.cpp
-	  #dcanvas.cpp
-	  #dlist.cpp
-	  #drumedit.cpp
 	  drummap.cpp
-      ecanvas.cpp
-      piano.cpp
+      EventCanvas.cpp
+      Piano.cpp
       Performer.cpp
       PerformerCanvas.cpp
       quantconfig.cpp

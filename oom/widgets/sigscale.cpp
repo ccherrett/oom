@@ -12,7 +12,7 @@
 
 #include "al/sig.h"  // Tim.
 #include "globals.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "sigscale.h"
 #include "song.h"
 #include "gconfig.h"

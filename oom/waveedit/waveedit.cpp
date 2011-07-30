@@ -56,7 +56,7 @@ void WaveEdit::closeEvent(QCloseEvent* e)
 //---------------------------------------------------------
 
 WaveEdit::WaveEdit(PartList* pl)
-: MidiEditor(1, 1, pl)
+: AbstractMidiEditor(1, 1, pl)
 {
 	resize(_widthInit, _heightInit);
 
@@ -357,7 +357,7 @@ void WaveEdit::writeStatus(int level, Xml& xml) const
 {
 	writePartList(level, xml);
 	xml.tag(level++, "waveedit");
-	MidiEditor::writeStatus(level, xml);
+	AbstractMidiEditor::writeStatus(level, xml);
 	xml.intTag(level, "xpos", hscroll->pos());
 	xml.intTag(level, "xmag", hscroll->mag());
 	xml.intTag(level, "ymag", ymag->value());
@@ -380,7 +380,7 @@ void WaveEdit::readStatus(Xml& xml)
 		{
 			case Xml::TagStart:
 				if (tag == "midieditor")
-					MidiEditor::readStatus(xml);
+					AbstractMidiEditor::readStatus(xml);
 				else if (tag == "xmag")
 					hscroll->setMag(xml.parseInt());
 				else if (tag == "ymag")

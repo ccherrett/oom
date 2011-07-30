@@ -1,15 +1,15 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//  $Id: amixer.h,v 1.27.2.2 2009/10/18 06:13:00 terminator356 Exp $
-//
-//  (C) Copyright 2000-2004 Werner Schweer (ws@seh.de)
+//  $Id: $
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //=========================================================
 
-#ifndef __AMIXER_H__
-#define __AMIXER_H__
+#ifndef __AUDIOMIXER_H__
+#define __AUDIOMIXER_H__
 
-#include "cobject.h"
+#include <QMainWindow>
+#include "config.h"
 #include "synth.h"
 #include "node.h"
 
@@ -37,17 +37,13 @@ class Strip;
 class MixerDock;
 class MixerView;
 
-struct MixerConfig;
-
-#define EFX_HEIGHT     16
-
 typedef std::list<MixerDock*> DockList;
 
 //---------------------------------------------------------
-//   AudioMixerApp
+//   AudioMixer
 //---------------------------------------------------------
 
-class AudioMixerApp : public QMainWindow
+class AudioMixer : public QMainWindow
 {
     Q_OBJECT
 
@@ -78,8 +74,8 @@ private slots:
 	void trackListChanged(TrackList* list);
 
 public:
-    AudioMixerApp(const QString&, QWidget* parent = 0);
-    ~AudioMixerApp();
+    AudioMixer(const QString&, QWidget* parent = 0);
+    ~AudioMixer();
 	TrackList* tracklist() { return m_tracklist; }
     void clear();
 };

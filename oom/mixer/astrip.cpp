@@ -43,7 +43,7 @@
 #include "doublelabel.h"
 #include "rack.h"
 #include "node.h"
-#include "amixer.h"
+#include "AudioMixer.h"
 #include "icons.h"
 #include "gconfig.h"
 #include "ttoolbutton.h"

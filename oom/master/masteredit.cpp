@@ -76,7 +76,7 @@ void MasterEdit::songChanged(int type)
 //---------------------------------------------------------
 
 MasterEdit::MasterEdit()
-: MidiEditor(0, _rasterInit, 0)
+: AbstractMidiEditor(0, _rasterInit, 0)
 {
 	setWindowTitle(tr("OOMidi: Tempo Editor"));
 	_raster = 0; // measure
@@ -292,7 +292,7 @@ void MasterEdit::readStatus(Xml& xml)
 				return;
 			case Xml::TagStart:
 				if (tag == "midieditor")
-					MidiEditor::readStatus(xml);
+					AbstractMidiEditor::readStatus(xml);
 				else if (tag == "ypos")
 					vscroll->setPos(xml.parseInt());
 				else if (tag == "ymag")
@@ -343,7 +343,7 @@ void MasterEdit::writeStatus(int level, Xml& xml) const
 	xml.tag(level++, "master");
 	xml.intTag(level, "ypos", vscroll->pos());
 	xml.intTag(level, "ymag", vscroll->mag());
-	MidiEditor::writeStatus(level, xml);
+	AbstractMidiEditor::writeStatus(level, xml);
 	xml.tag(level, "/master");
 }
 

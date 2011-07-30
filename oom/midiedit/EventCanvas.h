@@ -1,12 +1,13 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: ecanvas.h,v 1.5.2.4 2009/02/02 21:38:00 terminator356 Exp $
+//    $Id:$
 //  (C) Copyright 2001 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //=========================================================
 
-#ifndef __ECANVAS_H__
-#define __ECANVAS_H__
+#ifndef __EVENTCANVAS_H__
+#define __EVENTCANVAS_H__
 
 #include "canvas.h"
 #include "noteinfo.h"
@@ -15,7 +16,7 @@
 
 class MidiPart;
 class MidiTrack;
-class MidiEditor;
+class AbstractMidiEditor;
 class Part;
 class QMimeData;
 class QDrag;
@@ -49,7 +50,7 @@ class EventCanvas : public Canvas
 
 protected:
     bool _playEvents;
-    MidiEditor* editor;
+    AbstractMidiEditor* editor;
     unsigned start_tick, end_tick;
     int curVelo;
     bool _steprec;
@@ -92,7 +93,7 @@ signals:
     void enterCanvas();
 
 public:
-    EventCanvas(MidiEditor*, QWidget*, int, int, const char* name = 0);
+    EventCanvas(AbstractMidiEditor*, QWidget*, int, int, const char* name = 0);
     MidiTrack* track() const;
 
     unsigned start() const

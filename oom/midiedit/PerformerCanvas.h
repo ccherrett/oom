@@ -8,7 +8,7 @@
 #ifndef __PERFORMERCANVAS_H__
 #define __PERFORMERCANVAS_H__
 
-#include "ecanvas.h"
+#include "EventCanvas.h"
 #include "Performer.h"
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -122,7 +122,7 @@ public:
 	CMD_FIXED_LEN, CMD_DELETE_OVERLAPS
     };
 
-    PerformerCanvas(MidiEditor*, QWidget*, int, int);
+    PerformerCanvas(AbstractMidiEditor*, QWidget*, int, int);
     void cmd(int, int, int, bool, int);
     int stepInputQwerty(QKeyEvent* event);
 

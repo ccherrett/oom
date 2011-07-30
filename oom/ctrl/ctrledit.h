@@ -13,7 +13,7 @@
 #include "ctrlcanvas.h"
 #include "song.h"
 
-class MidiEditor;
+class AbstractMidiEditor;
 class CtrlView;
 class CtrlPanel;
 class Xml;
@@ -57,7 +57,7 @@ signals:
     void yposChanged(int);
 
 public:
-    CtrlEdit(QWidget*, MidiEditor* e, int xmag,
+    CtrlEdit(QWidget*, AbstractMidiEditor* e, int xmag,
             bool expand = false, const char* name = 0);
 	virtual ~CtrlEdit(){}
     void readStatus(Xml&);

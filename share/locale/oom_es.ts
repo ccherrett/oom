@@ -1021,7 +1021,7 @@ Right-click to show GUI.</source>
     </message>
 </context>
 <context>
-    <name>AudioMixerApp</name>
+    <name>AudioMixer</name>
     <message>
         <source>1/2 channel</source>
         <translation type="obsolete">Canales 1/2</translation>
@@ -3757,7 +3757,7 @@ True range: Min: -8192 Max: 8191 (bias 0)</source>
 
 If a default value is chosen, the value will be sent
  to the controller when the controller is added to
- the song (in piano roll or event editor). When 
+ the song (in Performer or event editor). When 
  the song is re-loaded, the value is sent again.
 Otherwise the controller remains at its last value.
 Controllers are also automatically added to a 
@@ -3766,7 +3766,7 @@ Controllers are also automatically added to a
 Caution! Watch out for controllers such as 
  &apos;Sustain&apos; and &apos;ResetAllController&apos; with default 
  values. You should probably turn &apos;off&apos; their 
- default (in piano roll or drum edit, and 
+ default (in Performer or drum edit, and 
  instrument editor).</source>
         <translation type="unfinished"></translation>
     </message>

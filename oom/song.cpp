@@ -32,7 +32,7 @@
 #include "synth.h"
 #include "audio.h"
 #include "mididev.h"
-#include "amixer.h"
+#include "AudioMixer.h"
 #include "midiseq.h"
 #include "audiodev.h"
 #include "gconfig.h"

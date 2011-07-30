@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "ComposerCanvas.h"
 //#include "trackautomationview.h"
 

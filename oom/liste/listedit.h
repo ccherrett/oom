@@ -8,7 +8,7 @@
 #ifndef __LIST_EDIT_H__
 #define __LIST_EDIT_H__
 
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "noteinfo.h"
 #include "cobject.h"
 
@@ -32,7 +32,7 @@ class Xml;
 //   ListEdit
 //---------------------------------------------------------
 
-class ListEdit : public MidiEditor
+class ListEdit : public AbstractMidiEditor
 {
     QTreeWidget* liste;
     QMenu* menuEdit;

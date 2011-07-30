@@ -16,7 +16,7 @@
 #include <values.h>
 #include "noteinfo.h"
 #include "cobject.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "mididev.h"
 #include "tools.h"
 #include "event.h"
@@ -60,7 +60,7 @@ class TrackListView;
 //   Performer
 //---------------------------------------------------------
 
-class Performer : public MidiEditor
+class Performer : public AbstractMidiEditor
 {
     Q_OBJECT
 

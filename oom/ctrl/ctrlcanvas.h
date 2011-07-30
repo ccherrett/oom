@@ -24,7 +24,7 @@ class Event;
 class MidiPart;
 class PartList;
 class MidiTrack;
-class MidiEditor;
+class AbstractMidiEditor;
 class CtrlPanel;
 
 //---------------------------------------------------------
@@ -116,7 +116,7 @@ class CtrlCanvas : public View
 {
     Q_OBJECT
 
-    MidiEditor* editor;
+    AbstractMidiEditor* editor;
     MidiTrack* curTrack;
     MidiPart* curPart;
     MidiCtrlValList* ctrl;
@@ -205,7 +205,7 @@ signals:
     void yposChanged(int);
 
 public:
-    CtrlCanvas(MidiEditor*, QWidget* parent, int,
+    CtrlCanvas(AbstractMidiEditor*, QWidget* parent, int,
             const char* name = 0, CtrlPanel* pnl = 0);
 	~CtrlCanvas(){}
 

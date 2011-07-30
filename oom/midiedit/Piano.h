@@ -1,8 +1,9 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: piano.h,v 1.2 2004/05/31 11:48:55 lunar_shuttle Exp $
+//    $Id: $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //=========================================================
 
 #ifndef __PIANO_H__
@@ -16,7 +17,7 @@ class QMouseEvent;
 class QPainter;
 class QPixmap;
 class QWheelEvent;
-class MidiEditor;
+class AbstractMidiEditor;
 
 #define KH  13
 
@@ -61,17 +62,17 @@ class Piano : public View
 	QList<int> keyswitch;
 	bool m_menu;
 
-	MidiEditor *m_editor;
+	AbstractMidiEditor *m_editor;
 
     Q_OBJECT
     int y2pitch(int) const;
     int pitch2y(int) const;
     void viewMouseMoveEvent(QMouseEvent* event);
-	void setEditor(MidiEditor *e)
+	void setEditor(AbstractMidiEditor *e)
 	{
 		m_editor = e;
 	}
-	MidiEditor* editor()
+	AbstractMidiEditor* editor()
 	{
 		return m_editor;
 	}
@@ -94,7 +95,7 @@ public slots:
     void setPitch(int);
 
 public:
-    Piano(QWidget*, int, MidiEditor*);
+    Piano(QWidget*, int, AbstractMidiEditor*);
 	void setMIDIKeyBindings(QList<int>, QList<int>);
 };
 

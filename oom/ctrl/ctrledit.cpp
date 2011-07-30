@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "ctrledit.h"
 #include "ctrlcanvas.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "xml.h"
 #include "vscale.h"
 #include "ctrlpanel.h"
@@ -32,7 +32,7 @@ void CtrlEdit::setTool(int t)
 //   CtrlEdit
 //---------------------------------------------------------
 
-CtrlEdit::CtrlEdit(QWidget* parent, MidiEditor* e, int xmag,
+CtrlEdit::CtrlEdit(QWidget* parent, AbstractMidiEditor* e, int xmag,
 		bool expand, const char* name) : QWidget(parent)
 {
 	setObjectName(name);

@@ -257,7 +257,7 @@ QAction* noteAlphaAction;
 QAction* multiPartSelectionAction;
 QAction* masterEnableAction;
 
-//AudioMixerApp* audioMixer;
+//AudioMixer* audioMixer;
 OOMidi* oom;
 
 int preMeasures = 2;
