@@ -46,9 +46,9 @@ Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout)
 	//green = QColor(0,130,154);
 	//yellow = QColor(152,33,84);
 	//red = QColor(160,3,43);
-	green = QColor(189,122,214);
-	yellow = QColor(227,233,114);
-	red = QColor(252,118,118);
+	green = QColor(175,0,233);
+	yellow = QColor(221,233,0);
+	red = QColor(233,0,0);
 	bgColor = QColor(12, 12, 12);
 	m_pixmap_h = new QPixmap(":/images/vugrad.png");
 	m_pixmap_w = new QPixmap(":/images/vugrad_h.png");
@@ -309,7 +309,8 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 			//	m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
 			//m_height = height();	
 			//myPen.setBrush(m_scaledPixmap_h);
-			myPen.setBrush(QColor(1,230,238));
+			//myPen.setBrush(QColor(1,230,238));
+			myPen.setBrush(QColor(198,198,198));
 			myPen.setWidth(1);
 			p.setPen(myPen);
 	
@@ -336,7 +337,8 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 			//	m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);/*{{{*/
 			//m_width = width();	
 			//myPen.setBrush(m_scaledPixmap_w);
-			myPen.setBrush(QColor(1,230,238));
+			//myPen.setBrush(QColor(1,230,238));
+			myPen.setBrush(QColor(198,198,198));
 			myPen.setWidth(1);
 			p.setPen(myPen);
 			p.drawLine(0, 1, w, 1);
