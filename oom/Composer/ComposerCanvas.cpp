@@ -2126,7 +2126,8 @@ void ComposerCanvas::keyPress(QKeyEvent* event)
     else if (key == shortcuts[SHRT_DEC_POS].key)
     {
             Part* part = _curItem->part();
-            part->setLenTick(part->lenTick() - 200);
+			if(part->lenTick() > 200)
+            	part->setLenTick(part->lenTick() - 200);
     }
 	else if (key == shortcuts[SHRT_SELECT_ALL_NODES].key)
 	{
