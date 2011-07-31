@@ -51,8 +51,10 @@ class MixerDock : public QFrame
 	Strip* masterStrip;
     AudioPortConfig* routingDialog;
 	QPushButton* m_btnAux;
+	QToolButton* m_btnVUColor;
 	TrackList* m_tracklist;
 	MixerMode m_mode;
+	QAction* m_vuColorAction; 
 	bool loading;
 
 	int oldAuxsSize;
@@ -70,6 +72,7 @@ public slots:
 	void songChanged(int);
     void configChanged();
 	void toggleAuxRack(bool);
+	void generateVUColorMenu();
 	void updateConnections(bool);
 	
 protected:

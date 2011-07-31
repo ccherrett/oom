@@ -73,7 +73,8 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 
 	int ch = 0;
 	for (; ch < channel; ++ch)
-		meter[ch] = new Meter(this);
+		meter[ch] = new Meter(this, Meter::LinMeter, Qt::Vertical, track->type());
+		//meter[ch] = new Meter(this);
 	for (; ch < MAX_CHANNELS; ++ch)
 		meter[ch] = 0;
 
@@ -844,7 +845,8 @@ void AudioStrip::updateChannels()/*{{{*/
 	{
 		for (int cc = channel; cc < c; ++cc)
 		{
-			meter[cc] = new Meter(this);
+			//meter[cc] = new Meter(this);
+			meter[cc] = new Meter(this, Meter::LinMeter, Qt::Vertical);
 			//meter[cc]->setRange(config.minSlider, 10.0);
 			meter[cc]->setRange(config.minMeter, 10.0);
 			meter[cc]->setFixedWidth(15);

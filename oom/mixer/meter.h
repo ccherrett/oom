@@ -10,6 +10,7 @@
 #define __METER_H__
 
 #include <QFrame>
+#include "track.h"
 
 class QResizeEvent;
 class QMouseEvent;
@@ -26,6 +27,7 @@ public:
 
 private:
     MeterType mtype;
+    Track::TrackType m_track;
     bool overflow;
     double val;
     double maxVal;
@@ -35,6 +37,7 @@ private:
     QColor red;
     QColor yellow;
     QColor bgColor;
+    QColor m_trackColor;
 	Qt::Orientation m_layout;
 	bool m_redrawVU;
 	QPixmap *m_pixmap_h;
@@ -59,7 +62,7 @@ signals:
     void meterClipped();
 
 public:
-    Meter(QWidget* parent, MeterType type = DBMeter, Qt::Orientation = Qt::Vertical);
+	Meter(QWidget* parent, MeterType type = DBMeter, Qt::Orientation = Qt::Vertical, Track::TrackType track = Track::MIDI);
     void setRange(double min, double max);
 };
 #endif
