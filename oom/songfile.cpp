@@ -346,6 +346,10 @@ Part* readXmlPart(Xml& xml, Track* track, bool doClone, bool toTrack)
 					npart->setMute(xml.parseInt());
 				else if(tag == "zIndex")
 					npart->setZIndex(xml.parseInt());
+				else if(tag == "rightClip")
+					npart->setRightClip((unsigned)xml.parseInt());
+				else if(tag == "leftClip")
+					npart->setLeftClip((unsigned)xml.parseInt());
 				else if (tag == "event")
 				{
 					// If a new non-clone part was created, accept the events...
@@ -503,6 +507,8 @@ void Part::write(int level, Xml& xml, bool isCopy, bool forceWavePaths) const
 	xml.intTag(level, "selected", _selected);
 	xml.intTag(level, "color", _colorIndex);
 	xml.intTag(level, "zIndex", m_zIndex);
+	xml.intTag(level, "rightClip", m_rightClip);
+	xml.intTag(level, "leftClip", m_leftClip);
 	if (_mute)
 		xml.intTag(level, "mute", _mute);
 	if (dumpEvents)
