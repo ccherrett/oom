@@ -57,6 +57,9 @@ protected:
     Part* _prevClone;
     Part* _nextClone;
 	int m_zIndex;
+ //currently on used for wavetrack
+	unsigned int m_leftClip;
+	unsigned int m_rightClip;
 
 public:
     Part(Track*);
@@ -77,6 +80,24 @@ public:
     {
         return snGen++;
     }
+
+	void setLeftClip(unsigned int clip)
+	{
+		m_leftClip = clip;
+	}
+	unsigned int leftClip()
+	{
+		return m_leftClip;
+	}
+
+	void setRightClip(unsigned int clip)
+	{
+		m_rightClip = clip;
+	}
+	unsigned int rightClip()
+	{
+		return m_rightClip;
+	}
 
     virtual Part* clone() const = 0;
 

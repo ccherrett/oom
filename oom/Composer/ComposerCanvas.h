@@ -25,6 +25,7 @@ class QMouseEvent;
 class QKeyEvent;
 class QEvent;
 class QDragEnterEvent;
+class QPoint;
 
 #define beats     4
 
@@ -117,7 +118,7 @@ class ComposerCanvas : public Canvas
     virtual bool moveItem(CItem*, const QPoint&, DragType);
     virtual CItem* newItem(const QPoint&, int);
     virtual void resizeItem(CItem*, bool);
-    virtual void resizeItemLeft(CItem*, bool);
+    virtual void resizeItemLeft(CItem*, QPoint, bool);
     virtual bool deleteItem(CItem*);
     virtual void startUndo(DragType);
 

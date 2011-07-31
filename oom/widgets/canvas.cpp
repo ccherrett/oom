@@ -1346,7 +1346,7 @@ void Canvas::viewMouseReleaseEvent(QMouseEvent* event)/*{{{*/
 		resizeItem(_curItem, false);
 		break;
 	case DRAG_RESIZE_LEFT:
-		resizeItemLeft(_curItem, false);
+		resizeItemLeft(_curItem, raster(pos), false);
 		redrawFlag = true;
 		break;
 	case DRAG_NEW:

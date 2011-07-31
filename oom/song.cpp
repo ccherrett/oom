@@ -416,6 +416,7 @@ Track* Song::addTrack(int t)/*{{{*/
 		}
 	}
 	audio->msgUpdateSoloStates();
+	updateTrackViews1();
 	return track;
 }/*}}}*/
 

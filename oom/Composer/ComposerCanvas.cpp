@@ -570,6 +570,8 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		dpart = dtrack->newPart(spart, clone);
 
 	dpart->setTick(dtick);
+	dpart->setLeftClip(spart->leftClip());
+	dpart->setRightClip(spart->rightClip());
 
 	//printf("ComposerCanvas::moveItem before add/changePart clone:%d spart:%p events:%p refs:%d Arefs:%d sn:%d dpart:%p events:%p refs:%d Arefs:%d sn:%d\n", clone, spart, spart->events(), spart->events()->refCount(), spart->events()->arefCount(), spart->sn(), dpart, dpart->events(), dpart->events()->refCount(), dpart->events()->arefCount(), dpart->sn());
 
@@ -700,7 +702,7 @@ void ComposerCanvas::resizeItem(CItem* i, bool noSnap)/*{{{*/
 	song->cmdResizePart(t, p, newwidth);
 }/*}}}*/
 
-void ComposerCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
+void ComposerCanvas::resizeItemLeft(CItem* i, QPoint pos, bool noSnap)/*{{{*/
 {
 	Track* t = ((NPart*) (i))->track();
 	Part* p = ((NPart*) (i))->part();
@@ -712,7 +714,7 @@ void ComposerCanvas::resizeItemLeft(CItem* i, bool noSnap)/*{{{*/
 	{
 		snappedpos = i->x();
 	}
-	song->cmdResizePartLeft(t, p, snappedpos, endtick);
+	song->cmdResizePartLeft(t, p, snappedpos, endtick, pos);
 	//redraw();
 }/*}}}*/
 

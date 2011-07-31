@@ -139,7 +139,7 @@ protected:
     virtual bool moveItem(CItem*, const QPoint&, DragType) = 0;
     virtual CItem* newItem(const QPoint&, int state) = 0;
     virtual void resizeItem(CItem*, bool noSnap = false) = 0;
-    virtual void resizeItemLeft(CItem*, bool noSnap = false) = 0;
+    virtual void resizeItemLeft(CItem*, QPoint, bool noSnap = false) = 0;
     virtual void newItem(CItem*, bool noSnap = false) = 0;
     virtual bool deleteItem(CItem*) = 0;
     virtual void startUndo(DragType) = 0;
