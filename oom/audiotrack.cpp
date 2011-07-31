@@ -1645,7 +1645,7 @@ bool AudioTrack::setRecordFlag1(bool f, bool monitor)/*{{{*/
 //---------------------------------------------------------
 // prepareRecording
 // normally called from song->setRecord to defer creating
-// wave files until MusE is globally rec-enabled
+// wave files until OOMidi is globally rec-enabled
 // also called from track->setRecordFlag (above)
 // if global rec enable already was done
 //---------------------------------------------------------

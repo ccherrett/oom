@@ -923,18 +923,47 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 		{
 			WavePart* nPart = new WavePart(*(WavePart*) oPart);
 			EventList* el = nPart->events();
+			unsigned part_start = oPart->tick();
 			unsigned new_partlength = tempomap.deltaTick2frame(oPart->tick(), oPart->tick() + len);
 			//printf("new partlength in frames: %d\n", new_partlength);
 
 			// If new nr of frames is less than previous what can happen is:
 			// -   0 or more events are beginning after the new final position. Those are removed from the part
-			// -   The last event begins before new final position and ends after it. If so, it will be resized to end at new part length
+			// -   The last event begins before new final position and ends after it. 
+			//     If so, it will be resized to end at new part length
 			if (new_partlength < oPart->lenFrame())
 			{
 				startUndo();
 
-				for (iEvent i = el->begin(); i != el->end(); i++)
+				/*if (!el->empty())
 				{
+					iEvent i = el->end();
+					i--;
+					Event event = i->second;
+					unsigned event_start = event.frame();
+					SndFileR file = event.sndFile();
+					if (file.isNull())
+						return;
+					unsigned int samples = file.samples();
+					unsigned int samplepos = event.spos();
+					unsigned maxsamples = samples - samplepos;
+					unsigned int maxpos = part_start + maxsamples;
+					if(new_partlength > maxpos)
+					{//Adjust part to be the max end of the event
+						new_partlength = maxpos;
+					}
+					Event newEvent = last.clone();
+					printf("Part start: %d, Event start: %d\n", part_start, event_start);
+				}
+				else
+				{
+					startUndo();
+				}*/
+				//for (iEvent i = el->begin(); i != el->end(); i++)
+				if (!el->empty())
+				{
+					iEvent i = el->end();
+					i--;
 					Event e = i->second;
 					unsigned event_startframe = e.frame();
 					unsigned event_endframe = event_startframe + e.lenFrame();
@@ -946,19 +975,22 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 						clipframes = (file.samples() - e.spos());
 						//printf("SndFileR samples=%d channels=%d event samplepos=%d event frame=%d clipframes=%d \n", file.samples(), file.channels(), e.spos(), e.frame(), clipframes);
 					}
+					unsigned int samples = file.samples();
+					unsigned int samplepos = e.spos();
+					unsigned maxsamples = samples - samplepos;
+					unsigned int maxpos = part_start + maxsamples;
+					if(new_partlength > maxpos)
+					{//Adjust part to be the max end of the event
+						new_partlength = maxpos;
+					}
 					//printf("Event frame=%d, length=%d\n", event_startframe, event_length);
-					if (event_endframe < new_partlength)
+					/*if (event_endframe < new_partlength)
 					{
 						//printf("event_endframe < new_partlength\n");
 						continue;
-					}
-					if (event_startframe > new_partlength)
-					{ // If event start was after the new length, remove it from part
-						// Indicate no undo, and do not do port controller values and clone parts.
-						//printf("Event start past part end, Deleting event\n");
-						audio->msgDeleteEvent(e, nPart, false, false, false);
-						continue;
-					}
+					}*/
+
+					printf("Part start: %d, Event start: %d\n", part_start, event_startframe);
 					if (event_endframe > new_partlength)
 					{ // If this event starts before new length and ends after, shrink it
 						Event newEvent = e.clone();
@@ -992,6 +1024,15 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 					if (file.isNull())
 						return;
 
+					unsigned int samples = file.samples();
+					unsigned int samplepos = last.spos();
+					unsigned maxsamples = samples - samplepos;
+					unsigned int maxpos = part_start + maxsamples;
+					if(new_partlength > maxpos)
+					{//Adjust part to be the max end of the event
+						new_partlength = maxpos;
+					}
+					printf("Part start: %d, Event start: %d\n", part_start, last_start);
 					unsigned clipframes = (file.samples() - last.spos());
 					Event newEvent = last.clone();
 					//printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d\n", file.samples(), file.channels(), last.spos(), clipframes);
@@ -1367,8 +1408,8 @@ void Song::changePart(Part* oPart, Part* nPart)
 
 void Song::cmdGluePart(Track* track, Part* oPart)
 {
-	// p3.3.54
-	if (track->type() != Track::WAVE && !track->isMidiTrack())
+	//if (track->type() != Track::WAVE && !track->isMidiTrack())
+	if (!track->isMidiTrack())
 		return;
 
 	PartList* pl = track->parts();

@@ -1679,7 +1679,7 @@ QLabel#Cursor {
 	 border-radius: 8px;
  }
 
-QLabel#arrangerCursor {
+QLabel#composerCursor {
      /*padding-right: 15px;  make room for the arrows */
      border-image: url(:/images/frame.png) 4;
      border-width: 3;

@@ -70,42 +70,6 @@
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96
 };
-//---------------------------------------------------------
-//   Composer::setHeaderToolTips
-//---------------------------------------------------------
-
-void Composer::setHeaderToolTips()
-{
-	/*header->setToolTip(COL_RECORD, tr("Enable Recording"));
-	header->setToolTip(COL_MUTE, tr("Mute/Off Indicator"));
-	header->setToolTip(COL_SOLO, tr("Solo Indicator"));
-	header->setToolTip(COL_CLASS, tr("Track Type"));
-	header->setToolTip(COL_NAME, tr("Track Name"));
-	header->setToolTip(COL_OCHANNEL, tr("Midi output channel number or audio channels"));
-	header->setToolTip(COL_OPORT, tr("Midi output port or synth midi port"));
-	header->setToolTip(COL_TIMELOCK, tr("Time Lock"));
-	header->setToolTip(COL_AUTOMATION, tr("Automation parameter selection"));*/
-}
-
-
-
-//---------------------------------------------------------
-//   Composer::setHeaderWhatsThis
-//---------------------------------------------------------
-
-void Composer::setHeaderWhatsThis()
-{
-	/*
-	header->setWhatsThis(COL_RECORD, tr("Enable recording. Click to toggle."));
-	header->setWhatsThis(COL_MUTE, tr("Mute indicator. Click to toggle.\nRight-click to toggle track on/off.\nMute is designed for rapid, repeated action.\nOn/Off is not!"));
-	header->setWhatsThis(COL_SOLO, tr("Solo indicator. Click to toggle.\nConnected tracks are also 'phantom' soloed,\n indicated by a dark square."));
-	header->setWhatsThis(COL_CLASS, tr("Track type. Right-click to change\n midi and drum track types."));
-	header->setWhatsThis(COL_NAME, tr("Track name. Double-click to edit.\nRight-click for more options."));
-	header->setWhatsThis(COL_OCHANNEL, tr("Midi/drum track: Output channel number.\nAudio track: Channels.\nMid/right-click to change."));
-	header->setWhatsThis(COL_OPORT, tr("Midi/drum track: Output port.\nSynth track: Assigned midi port.\nLeft-click to change.\nRight-click to show GUI."));
-	header->setWhatsThis(COL_TIMELOCK, tr("Time lock"));
-	*/
-}
 
 //---------------------------------------------------------
 //   Composer
@@ -439,15 +403,6 @@ void Composer::currentTabChanged(int tab)
 			midiConductor->update();
 		}
 	}
-}
-
-//---------------------------------------------------------
-//   headerMoved
-//---------------------------------------------------------
-
-void Composer::headerMoved()
-{
-	//header->setResizeMode(COL_NAME, QHeaderView::Stretch);
 }
 
 //---------------------------------------------------------
