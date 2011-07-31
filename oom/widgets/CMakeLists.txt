@@ -22,6 +22,13 @@
 ## Expand Qt macros in source files
 ##
 QT4_WRAP_CPP (widget_mocs
+	  toolbars/transporttools.h
+	  toolbars/edittools.h
+	  toolbars/epictools.h
+	  toolbars/looptools.h
+	  toolbars/misctools.h
+	  toolbars/feedbacktools.h
+      toolbars/tools.h  
       aboutbox_impl.h 
       action.h
       apconfig.h
@@ -55,17 +62,11 @@ QT4_WRAP_CPP (widget_mocs
 	  tviewdock.h
 	  tracklistview.h
 	  trackheader.h
-	  transporttools.h
-	  edittools.h
-	  epictools.h
-	  looptools.h
-	  misctools.h
-	  feedbacktools.h
 	  rmap.h
 	  rmapdialog.h
-	  pctablemodel.h
-	  pctable.h
-      Conductor.h
+	  conductor/pctablemodel.h
+	  conductor/pctable.h
+	  conductor/Conductor.h
       nentry.h  
       noteinfo.h  
       pitchedit.h  
@@ -89,7 +90,6 @@ QT4_WRAP_CPP (widget_mocs
       swidget.h  
       tb1.h  
       tempolabel.h  
-      tools.h  
       # ttoolbar.h  
       ttoolbutton.h  
       velocity.h  
@@ -136,7 +136,7 @@ file (GLOB widgets_ui_files
 	  #midisync.ui  
       mittransposebase.ui  
       mixdowndialogbase.ui  
-      ConductorBase.ui
+	  conductor/ConductorBase.ui
       projectcreate.ui
       shortcutcapturedialogbase.ui  
       shortcutconfigbase.ui  
@@ -159,6 +159,13 @@ QT4_WRAP_UI (widget_ui_headers ${widgets_ui_files})
 ## List of source files to compile
 ##
 file (GLOB widgets_source_files
+      toolbars/tools.cpp 
+	  toolbars/transporttools.cpp
+	  toolbars/edittools.cpp
+	  toolbars/epictools.cpp
+	  toolbars/looptools.cpp
+	  toolbars/misctools.cpp
+	  toolbars/feedbacktools.cpp
       aboutbox_impl.cpp 
       apconfig.cpp 
       bigtime.cpp 
@@ -188,23 +195,17 @@ file (GLOB widgets_source_files
       mixdowndialog.cpp 
       mlabel.cpp 
       mmath.cpp
-      Conductor.cpp
+	  conductor/Conductor.cpp
 	  tvieweditor.cpp
 	  tviewdock.cpp
 	  tracklistview.cpp
 	  trackheader.cpp
-	  transporttools.cpp
-	  edittools.cpp
-	  epictools.cpp
-	  looptools.cpp
-	  misctools.cpp
-	  feedbacktools.cpp
 	  rmap.cpp
 	  rmapdialog.cpp
       mtscale.cpp 
       pcscale.cpp 
-	  pctablemodel.cpp
-	  pctable.cpp
+	  conductor/pctablemodel.cpp
+	  conductor/pctable.cpp
       nentry.cpp 
       noteinfo.cpp 
       pitchedit.cpp 
@@ -230,7 +231,6 @@ file (GLOB widgets_source_files
       swidget.cpp 
       tb1.cpp   
       tempolabel.cpp 
-      tools.cpp 
       ttoolbar.cpp 
       ttoolbutton.cpp 
       velocity.cpp 

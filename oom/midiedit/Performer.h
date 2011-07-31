@@ -18,7 +18,7 @@
 #include "cobject.h"
 #include "AbstractMidiEditor.h"
 #include "mididev.h"
-#include "tools.h"
+#include "toolbars/tools.h"
 #include "event.h"
 #ifdef LSCP_SUPPORT
 #include "network/lsclient.h"

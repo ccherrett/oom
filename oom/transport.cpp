@@ -27,8 +27,8 @@
 #include "shortcuts.h"
 #include "gconfig.h"
 #include "app.h"
-#include "transporttools.h"
-#include "looptools.h"
+#include "toolbars/transporttools.h"
+#include "toolbars/looptools.h"
 
 //---------------------------------------------------------
 //   toolButton

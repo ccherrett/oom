@@ -12,7 +12,7 @@
 
 
 #include "view.h"
-#include "tools.h"
+#include "toolbars/tools.h"
 #include "midictrl.h"
 #include "event.h"
 

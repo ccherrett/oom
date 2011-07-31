@@ -10,7 +10,7 @@
 
 #include "view.h"
 #include "song.h"
-#include "tools.h"
+#include "toolbars/tools.h"
 
 class QMouseEvent;
 class QPainter;

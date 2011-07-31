@@ -62,13 +62,13 @@
 #include "quantconfig.h"
 #include "shortcuts.h"
 
-#include "Conductor.h"
+#include "conductor/Conductor.h"
 #include "tracklistview.h"
-#include "transporttools.h"
-#include "edittools.h"
-#include "epictools.h"
-#include "looptools.h"
-#include "misctools.h"
+#include "toolbars/transporttools.h"
+#include "toolbars/edittools.h"
+#include "toolbars/epictools.h"
+#include "toolbars/looptools.h"
+#include "toolbars/misctools.h"
 
 #include "traverso_shared/TConfig.h"
 

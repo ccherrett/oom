@@ -65,10 +65,10 @@
 #include "midimonitor.h"
 #include "confmport.h"
 #include "mixerdock.h"
-#include "transporttools.h"
-#include "edittools.h"
-#include "looptools.h"
-#include "feedbacktools.h"
+#include "toolbars/transporttools.h"
+#include "toolbars/edittools.h"
+#include "toolbars/looptools.h"
+#include "toolbars/feedbacktools.h"
 
 #include "ccinfo.h"
 #ifdef DSSI_SUPPORT

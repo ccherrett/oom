@@ -40,7 +40,7 @@
 #include "xml.h"
 #include "splitter.h"
 #include "lcombo.h"
-#include "Conductor.h"
+#include "conductor/Conductor.h"
 #include "midiport.h"
 #include "mididev.h"
 #include "utils.h"
@@ -65,7 +65,7 @@
 #include "rmap.h"
 #include "shortcuts.h"
 #include "mixerdock.h"
-#include "tools.h"
+#include "toolbars/tools.h"
 
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96
