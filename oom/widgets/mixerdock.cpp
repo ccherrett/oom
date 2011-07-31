@@ -101,6 +101,17 @@ void MixerDock::layoutUi()/*{{{*/
 	m_adminBox->addWidget(m_btnAux);
 
 	m_mixerBox->addWidget(titleWidget);
+	
+	m_vuColorAction = new QAction(QIcon(*expandIcon), tr("vucolor"), this);
+	m_vuColorAction->setToolTip(tr("Change VU Colors"));
+	m_vuColorAction->setCheckable(false);
+	
+	m_btnVUColor = new  QToolButton(this);
+	m_btnVUColor->setDefaultAction(m_vuColorAction);
+	m_btnVUColor->setIconSize(QSize(22, 18));
+	m_btnVUColor->setFixedSize(QSize(22, 18));
+	m_btnVUColor->setAutoRaise(true);
+	m_adminBox->addWidget(m_btnVUColor);
 
 	view = new QScrollArea(this);
 	view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -137,6 +148,7 @@ void MixerDock::layoutUi()/*{{{*/
 	m_adminBox->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	connect(m_btnAux, SIGNAL(toggled(bool)), SLOT(toggleAuxRack(bool)));
+	connect(m_vuColorAction, SIGNAL(triggered(bool)), this, SLOT(generateVUColorMenu()));
 	//connect(m_btnDock, SIGNAL(clicked(bool)), SLOT(toggleDetach()));
 	if(m_mode == DOCKED)
 		connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
@@ -169,6 +181,72 @@ void MixerDock::updateConnections(bool visible)
 			disconnect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	}
 }
+
+void MixerDock::generateVUColorMenu()/*{{{*/
+{
+	QMenu* p = new QMenu(this);
+	p->disconnect();
+	p->clear();
+	p->setTitle(tr("Change VU Color"));
+
+	bool defaultChecked = false;
+	if(vuColorStrip == 0)
+		defaultChecked = true;
+	bool blueChecked = false;
+	if(vuColorStrip == 1)
+		blueChecked = true;
+	bool greyChecked = false;
+	if(vuColorStrip == 2)
+		greyChecked = true;
+	bool trackChecked = false;
+	if(vuColorStrip == 3)
+		trackChecked = true;
+	
+	QAction* act = 0;
+	act = p->addAction("Default");
+	act->setCheckable(true);
+	act->setChecked(defaultChecked);
+	act->setData(0);
+	act = p->addAction("Blue");
+	act->setCheckable(true);
+	act->setChecked(blueChecked);
+	act->setData(1);
+	act = p->addAction("Grey");
+	act->setCheckable(true);
+	act->setChecked(greyChecked);
+	act->setData(2);
+	act = p->addAction("Track Type");
+	act->setCheckable(true);
+	act->setChecked(trackChecked);
+	act->setData(3);
+	
+	QAction* act1 = p->exec(QCursor::pos());
+
+	if(act1)
+	{
+		int id = act1->data().toInt();
+		switch(id)
+		{
+			case 0:
+				vuColorStrip = id;
+				break;
+			case 1:
+				vuColorStrip = id;
+				break;
+			case 2:
+				vuColorStrip = id;
+				break;
+			case 3:
+				vuColorStrip = id;
+				break;
+			default:
+				vuColorStrip = 0;
+				break;
+		}
+		//song->update(SC_CONFIG);
+		oom->changeConfig(true); // save settings
+	}	
+}/*}}}*/
 
 void MixerDock::toggleAuxRack(bool toggle)/*{{{*/
 {

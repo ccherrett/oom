@@ -16,12 +16,14 @@
 #include "meter.h"
 #include "gconfig.h"
 #include "fastlog.h"
+#include "globals.h"
+#include "track.h"
 
 //---------------------------------------------------------
 //   Meter
 //---------------------------------------------------------
 
-Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout)
+Meter::Meter(QWidget* parent, Track::TrackType track, MeterType type, Qt::Orientation layout)
 : QFrame(parent) //Qt::WNoAutoErase
 {
 	setBackgroundRole(QPalette::NoRole);
@@ -32,6 +34,7 @@ Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout)
 	setAttribute(Qt::WA_OpaquePaintEvent);
 
 	mtype = type;
+	m_track = track;
 	m_layout = layout;
 	m_redrawVU = false;
 	overflow = false;
@@ -43,19 +46,42 @@ Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout)
 	redScale = 0;
 	setLineWidth(0);
 	setMidLineWidth(0);
-	//green = QColor(0,130,154);
-	//yellow = QColor(152,33,84);
-	//red = QColor(160,3,43);
-	green = QColor(175,0,233);
-	yellow = QColor(221,233,0);
-	red = QColor(233,0,0);
+	green = QColor(0,130,154);
+	yellow = QColor(152,33,84);
+	red = QColor(160,3,43);
 	bgColor = QColor(12, 12, 12);
 	m_pixmap_h = new QPixmap(":/images/vugrad.png");
 	m_pixmap_w = new QPixmap(":/images/vugrad_h.png");
 	m_height = 0;
 	m_width = 0;
-	//m_scaledPixmap_w = m_pixmap_w->scaled(0, 1, Qt::IgnoreAspectRatio);
-	//m_scaledPixmap_h = m_pixmap_h->scaled(1, 0, Qt::IgnoreAspectRatio);
+	m_scaledPixmap_w = m_pixmap_w->scaled(0, 1, Qt::IgnoreAspectRatio);
+	m_scaledPixmap_h = m_pixmap_h->scaled(1, 0, Qt::IgnoreAspectRatio);
+	m_trackColor = QColor(0,0,255);
+	switch (m_track)
+	{
+		case Track::MIDI:
+		case Track::DRUM:
+			m_trackColor= QColor(1,230,238);
+		break;
+		case Track::WAVE:
+			m_trackColor= QColor(129,244,118);
+		break;
+		case Track::AUDIO_OUTPUT:
+			m_trackColor= QColor(252,118,118);
+		break;
+		case Track::AUDIO_INPUT:
+			m_trackColor= QColor(189,122,214);
+		break;
+		case Track::AUDIO_BUSS:
+			m_trackColor= QColor(252,164,36);
+		break;
+		case Track::AUDIO_AUX:
+			m_trackColor= QColor(227,233,114);
+		break;
+		case Track::AUDIO_SOFTSYNTH:
+			m_trackColor= QColor(255,0,0);
+		break;
+	}
 }
 
 //---------------------------------------------------------
@@ -305,12 +331,34 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
 		if(redrawVU)
 		{
+   		     switch(vuColorStrip)
+   		     {
+   		         case 0:
+   		             if(height() != m_height)
+   		                 m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);
+   		             m_height = height();
+   		             myPen.setBrush(m_scaledPixmap_h);
+   		         	break;
+   		         case 1:
+   		             myPen.setBrush(QColor(0,166,172));//solid blue
+   		         	break;
+   		         case 2:
+   		             myPen.setBrush(QColor(131,131,131));//solid grey
+   		         	break;
+   		         case 3:
+   		             myPen.setBrush(m_trackColor);//solid grey
+   		        	 break;
+   		         default:
+   		            if(height() != m_height)
+   		                 m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);
+   		             m_height = height();
+   		             myPen.setBrush(m_scaledPixmap_h);
+					 break;
+   		     }
 			//if(height() != m_height)
-			//	m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);/*{{{*/
+			//	m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);
 			//m_height = height();	
 			//myPen.setBrush(m_scaledPixmap_h);
-			//myPen.setBrush(QColor(1,230,238));
-			myPen.setBrush(QColor(198,198,198));
 			myPen.setWidth(1);
 			p.setPen(myPen);
 	
@@ -325,7 +373,7 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 			if (yv == 0)
 			{
 				emit meterClipped();
-			}/*}}}*/
+			}
 		}
 	}
 	else
@@ -333,12 +381,34 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 		p.fillRect(0, 0, w, h, QBrush(bgColor)); // dark red
 		if(redrawVU)
 		{
+   		     switch(vuColorStrip)
+   		     {
+   		         case 0:
+   		             if(width() != m_width)
+   		                 m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
+   		             m_width = width();
+   		             myPen.setBrush(m_scaledPixmap_w);
+   		         break;
+   		         case 1:
+   		             myPen.setBrush(QColor(0,166,172));//solid blue
+   		         break;
+   		         case 2:
+   		             myPen.setBrush(QColor(131,131,131));//solid grey
+   		         break;
+   		         case 3:
+   		             myPen.setBrush(m_trackColor);
+   		         break;
+   		         default:
+   		             if(width() != m_width)
+   		                 m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
+   		             m_width = width();
+   		             myPen.setBrush(m_scaledPixmap_w);
+   		         break;
+   		     }
 			//if(width() != m_width)
-			//	m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);/*{{{*/
+			//	m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
 			//m_width = width();	
 			//myPen.setBrush(m_scaledPixmap_w);
-			//myPen.setBrush(QColor(1,230,238));
-			myPen.setBrush(QColor(198,198,198));
 			myPen.setWidth(1);
 			p.setPen(myPen);
 			p.drawLine(0, 1, w, 1);
@@ -357,7 +427,7 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
 			if (yv == 0)
 			{
 				emit meterClipped();
-			}/*}}}*/
+			}
 		}
 	}
 }

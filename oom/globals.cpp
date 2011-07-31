@@ -300,6 +300,7 @@ QHash<int, QColor> g_trackColorListLine;
 QHash<int, QColor> g_trackColorList;
 QHash<int, QColor> g_trackColorListSelected;
 QHash<int, QPixmap> g_trackDragImageList;
+int vuColorStrip = 0; //default vuColor is gradient
 
 //---------------------------------------------------------
 //   doSetuid

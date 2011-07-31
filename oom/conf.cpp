@@ -888,7 +888,14 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				else if (tag == "geometryDrumedit")
 					xml.skip(tag);
 					//config.geometryDrumedit = readGeometry(xml, tag);
-
+				else if(tag == "vuColorStrip")
+				{
+					vuColorStrip = xml.parseInt();	
+				}	
+				else if(tag == "nextTrackPartColor")
+				{
+					lastTrackPartColorIndex = xml.parseInt(); 
+				}
 				else if (tag == "geometryMixer")
 					// config.geometryMixer = readGeometry(xml, tag); // Obsolete
 					xml.skip(tag);
@@ -1355,6 +1362,7 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.strTag(level, "externalWavEditor", config.externalWavEditor);
 	xml.intTag(level, "useOldStyleStopShortCut", config.useOldStyleStopShortCut);
 	xml.intTag(level, "moveArmedCheckBox", config.moveArmedCheckBox);
+	xml.intTag(level, "vuColorStrip", vuColorStrip);
 
 	/*for (int i = 0; i < NUM_FONTS; ++i)
 	{
@@ -1432,6 +1440,8 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 void OOMidi::writeConfiguration(int level, Xml& xml) const
 {
 	xml.tag(level++, "configuration");
+	
+	xml.intTag(level, "nextTrackPartColor", lastTrackPartColorIndex);
 
 	xml.intTag(level, "midiInputDevice", midiInputPorts);
 	xml.intTag(level, "midiInputChannel", midiInputChannel);
