@@ -589,6 +589,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		{
 			Event oldEvent = i->second;
 			Event ev = oldEvent.clone();
+			ev.setRightClip(oldEvent.rightClip());
 			de->add(ev);
 		}
 	}

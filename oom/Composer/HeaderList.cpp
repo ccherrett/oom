@@ -75,6 +75,10 @@ void HeaderList::songChanged(int flags)/*{{{*/
 	{
 		updateTrackList();
 	}
+	if(flags &SC_VIEW_CHANGED)
+	{
+		printf("SC_VIEW_CHANGED\n");
+	}
 	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
 	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
 	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED | SC_CHANNELS))
@@ -86,7 +90,7 @@ void HeaderList::songChanged(int flags)/*{{{*/
 
 void HeaderList::updateTrackList()/*{{{*/
 {
-	//printf("HeaderList::updateTrackList\n");
+	printf("HeaderList::updateTrackList\n");
 	TrackHeader* item;
 	while(!m_headers.isEmpty() && (item = m_headers.takeAt(0)) != 0)
 	{
@@ -118,7 +122,7 @@ void HeaderList::updateTrackList()/*{{{*/
 	//keep things tidy, If it proves not to be we just switch to the heartBeat that is 
 	//20ms guaranteed.
 	wantCleanup = true;
-	//printf("Leaving updateTrackList\n");
+	printf("Leaving updateTrackList\n");
 }/*}}}*/
 
 void HeaderList::clear()/*{{{*/
@@ -163,7 +167,7 @@ Track* HeaderList::y2Track(int y) const/*{{{*/
 
 void HeaderList::tracklistChanged()/*{{{*/
 {
-	updateTrackList();
+	//updateTrackList();
 }/*}}}*/
 
 bool HeaderList::isEditing()/*{{{*/

@@ -1165,11 +1165,13 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 					{
 						//Called to update the part with as its stored in the CItem container
 						//which is already modified
-						printf("Nothing more to resize()");
-						song->update(SC_SELECTION);
-						return;
+						printf("Nothing more to resize()\n");
+						Event newEvent = e.mid(part_start - old_start, event_endframe);
+						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
+						//song->update(SC_SELECTION);
+						//return;
 					}
-					if(part_start <= minframe)
+					else if(part_start <= minframe)
 					{
 						printf("Sample is shorter than part length, start: %d, minframe: %d\n", part_start, minframe);
 						part_start = minframe;
