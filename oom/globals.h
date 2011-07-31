@@ -152,9 +152,9 @@ extern QAction* noteAlphaAction;
 extern QAction* multiPartSelectionAction;
 extern QAction* masterEnableAction;
 
-//class AudioMixerApp;
+//class AudioMixer;
 class OOMidi;
-//extern AudioMixerApp* audioMixer;
+//extern AudioMixer* audioMixer;
 extern OOMidi* oom;
 
 extern int preMeasures;

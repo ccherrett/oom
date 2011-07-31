@@ -30,9 +30,9 @@
 #include <QUrl>
 #include <QComboBox>
 
-#include "widgets/tools.h"
+#include "widgets/toolbars/tools.h"
 #include "ComposerCanvas.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "globals.h"
 #include "icons.h"
 #include "event.h"

@@ -14,7 +14,7 @@
 #include <QResizeEvent>
 #include <QKeyEvent>
 #include <QCloseEvent>
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 
 class QToolButton;
 class PartList;
@@ -30,7 +30,7 @@ class QAction;
 //   WaveEdit
 //---------------------------------------------------------
 
-class WaveEdit : public MidiEditor
+class WaveEdit : public AbstractMidiEditor
 {
     WaveView* view;
     QSlider* ymag;

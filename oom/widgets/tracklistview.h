@@ -29,7 +29,7 @@ class QStringList;
 class Part;
 class PartList;
 class Track;
-class MidiEditor;
+class AbstractMidiEditor;
 
 class TrackListView : public QFrame
 {
@@ -40,7 +40,7 @@ class TrackListView : public QFrame
 	QItemSelectionModel* m_selmodel;
 	QVBoxLayout* m_layout;
 	QHBoxLayout* m_buttonBox;
-	MidiEditor* m_editor;
+	AbstractMidiEditor* m_editor;
 	QList<QString> m_selected;
 	QButtonGroup* m_buttons;
 	QCheckBox* m_chkWorkingView;
@@ -66,7 +66,7 @@ public slots:
 	void toggleTrackPart(QStandardItem*);
 
 public:
-	TrackListView(MidiEditor* e, QWidget* parent = 0);
+	TrackListView(AbstractMidiEditor* e, QWidget* parent = 0);
 	static void movePlaybackToPart(Part*);
 	virtual ~TrackListView();
 };

@@ -20,7 +20,7 @@
 #include "PerformerCanvas.h"
 #include "audio.h"
 #include "midiport.h"
-#include "Conductor.h"
+#include "conductor/Conductor.h"
 #include "instrumentmenu.h"
 
 //---------------------------------------------------------

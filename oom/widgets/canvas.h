@@ -10,7 +10,7 @@
 
 #include "citem.h"
 #include "view.h"
-#include "tools.h"
+#include "toolbars/tools.h"
 
 #include <QWheelEvent>
 #include <QMouseEvent>

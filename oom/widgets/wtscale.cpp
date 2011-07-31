@@ -12,7 +12,7 @@
 #include <QToolTip>
 
 #include "wtscale.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "globals.h"
 #include "song.h"
 #include "../marker/marker.h"

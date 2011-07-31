@@ -25,7 +25,7 @@
 #include "app.h"
 #include "master/lmaster.h"
 #include "al/dsp.h"
-#include "amixer.h"
+#include "AudioMixer.h"
 //#include "appearance.h"
 #include "Composer.h"
 #include "audio.h"
@@ -65,10 +65,10 @@
 #include "midimonitor.h"
 #include "confmport.h"
 #include "mixerdock.h"
-#include "transporttools.h"
-#include "edittools.h"
-#include "looptools.h"
-#include "feedbacktools.h"
+#include "toolbars/transporttools.h"
+#include "toolbars/edittools.h"
+#include "toolbars/looptools.h"
+#include "toolbars/feedbacktools.h"
 
 #include "ccinfo.h"
 #ifdef DSSI_SUPPORT
@@ -5514,7 +5514,7 @@ void OOMidi::showMixer1(bool on)
 {
 	if (on && mixer1 == 0)
 	{
-		mixer1 = new AudioMixerApp("Mixer1", this);
+		mixer1 = new AudioMixer("Mixer1", this);
 		mixer1->setObjectName("Mixer1");
 		mixer1->setWindowRole("Mixer1");
 		connect(mixer1, SIGNAL(closed()), SLOT(mixer1Closed()));
@@ -5534,7 +5534,7 @@ void OOMidi::showMixer2(bool)
 {
 	/*if (on && mixer2 == 0)
 	{
-		mixer2 = new AudioMixerApp(this, &(config.mixer2));
+		mixer2 = new AudioMixer(this, &(config.mixer2));
 		mixer2->setObjectName("Mixer2");
 		mixer2->setWindowRole("Mixer2");
 		connect(mixer2, SIGNAL(closed()), SLOT(mixer2Closed()));

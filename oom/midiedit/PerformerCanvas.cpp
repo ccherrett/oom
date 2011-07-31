@@ -47,7 +47,7 @@ NEvent::NEvent(Event& e, Part* p, int y) : CItem(e, p)
 //   PerformerCanvas
 //---------------------------------------------------------
 
-PerformerCanvas::PerformerCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy)
+PerformerCanvas::PerformerCanvas(AbstractMidiEditor* pr, QWidget* parent, int sx, int sy)
 : EventCanvas(pr, parent, sx, sy)
 {
 	colorMode = 0;
@@ -1697,7 +1697,7 @@ void PerformerCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quant
 		case CMD_CREATE_MEASURE:
 			break;
 		default:
-			//                  printf("unknown ecanvas cmd %d\n", cmd);
+			//                  printf("unknown EventCanvas cmd %d\n", cmd);
 			break;
 	}
 	updateSelection();

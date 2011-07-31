@@ -56,7 +56,7 @@ QT4_WRAP_CPP ( oom_moc_headers
       app.h 
       cobject.h 
       conf.h 
-      midieditor.h 
+      AbstractMidiEditor.h 
       miditransform.h 
       plugin.h 
 	  lv2_plugin.h
@@ -102,7 +102,7 @@ file (GLOB core_source_files
       midi.cpp
       midictrl.cpp
       mididev.cpp 
-      midieditor.cpp
+      AbstractMidiEditor.cpp
       midievent.cpp 
       midifile.cpp 
       midiport.cpp

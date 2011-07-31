@@ -28,7 +28,7 @@
 #include "xml.h"
 #include "icons.h"
 #include "event.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "track.h"
 #include "part.h"
 #include "midiedit/drummap.h"
@@ -44,7 +44,7 @@
 //   CtrlPanel
 //---------------------------------------------------------
 
-CtrlPanel::CtrlPanel(QWidget* parent, MidiEditor* e, const char* name)
+CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 : QWidget(parent)
 {
 	setObjectName(name);

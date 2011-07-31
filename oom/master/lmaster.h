@@ -8,7 +8,7 @@
 #ifndef __LMASTER_EDIT_H__
 #define __LMASTER_EDIT_H__
 
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "noteinfo.h"
 #include "cobject.h"
 #include "tempo.h"
@@ -139,7 +139,7 @@ public:
 //   LMaster
 //---------------------------------------------------------
 
-class LMaster : public MidiEditor
+class LMaster : public AbstractMidiEditor
 {
     QTreeWidget* view;
     QToolBar* tools;

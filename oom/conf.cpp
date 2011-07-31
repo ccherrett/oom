@@ -44,7 +44,7 @@
 #include "sync.h"
 #include "wave.h"
 #include "midiseq.h"
-#include "amixer.h"
+#include "AudioMixer.h"
 
 extern void writeMidiTransforms(int level, Xml& xml);
 extern void readMidiTransform(Xml&);
@@ -1486,7 +1486,7 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 	//DrumEdit::writeConfiguration(level, xml);
 	Performer::writeConfiguration(level, xml);
 	MasterEdit::writeConfiguration(level, xml);
-	WaveEdit::writeConfiguration(level, xml);
+	//WaveEdit::writeConfiguration(level, xml);
 
 	writeMidiTransforms(level, xml);
 	writeMidiInputTransforms(level, xml);

@@ -22,7 +22,7 @@
 ## Expand Qt macros in source files
 ##
 QT4_WRAP_CPP ( mixer_mocs
-      amixer.h
+      AudioMixer.h
       astrip.h
       auxknob.h
       meter.h
@@ -43,7 +43,7 @@ QT4_WRAP_UI ( mixer_uis ${mixer_ui_files} )
 ## List of source files to compile
 ##
 file (GLOB mixer_source_files
-      amixer.cpp  
+      AudioMixer.cpp  
       astrip.cpp
       auxknob.cpp 
       meter.cpp 

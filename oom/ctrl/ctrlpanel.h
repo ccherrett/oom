@@ -16,7 +16,7 @@ class QMenu;
 class QPushButton;
 class QString;
 
-class MidiEditor;
+class AbstractMidiEditor;
 class Knob;
 class DoubleLabel;
 class MidiPort;
@@ -32,7 +32,7 @@ class CtrlPanel : public QWidget
 
     ///QMenu* pop;
     QPushButton* selCtrl;
-    MidiEditor* editor;
+    AbstractMidiEditor* editor;
 
     MidiTrack* _track;
     MidiController* _ctrl;
@@ -61,7 +61,7 @@ public slots:
     void ctrlPopup();
 
 public:
-    CtrlPanel(QWidget*, MidiEditor*, const char* name = 0);
+    CtrlPanel(QWidget*, AbstractMidiEditor*, const char* name = 0);
 	virtual ~CtrlPanel(){}
     void setHWController(MidiTrack* t, MidiController* ctrl);
     bool ctrlSetTypeByName(QString);

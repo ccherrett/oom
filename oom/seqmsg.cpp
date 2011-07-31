@@ -12,7 +12,7 @@
 #include "midiport.h"
 #include "minstrument.h"
 #include "app.h"
-#include "amixer.h"
+#include "AudioMixer.h"
 #include "tempo.h"
 ///#include "sig.h"
 #include "al/sig.h"

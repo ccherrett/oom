@@ -1,8 +1,9 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: ecanvas.cpp,v 1.8.2.6 2009/05/03 04:14:00 terminator356 Exp $
+//    $Id:$
 //  (C) Copyright 2001 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //=========================================================
 
 #include <errno.h>
@@ -21,8 +22,8 @@
 #include <QAction>
 
 #include "xml.h"
-#include "midieditor.h"
-#include "ecanvas.h"
+#include "AbstractMidiEditor.h"
+#include "EventCanvas.h"
 #include "app.h"
 #include "Composer.h"
 #include "song.h"
@@ -36,7 +37,7 @@
 //   EventCanvas
 //---------------------------------------------------------
 
-EventCanvas::EventCanvas(MidiEditor* pr, QWidget* parent, int sx, int sy, const char* name)
+EventCanvas::EventCanvas(AbstractMidiEditor* pr, QWidget* parent, int sx, int sy, const char* name)
 : Canvas(parent, sx, sy, name)
 {
 	editor = pr;

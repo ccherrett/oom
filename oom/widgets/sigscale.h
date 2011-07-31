@@ -10,7 +10,7 @@
 
 #include "view.h"
 
-class MidiEditor;
+class AbstractMidiEditor;
 
 //---------------------------------------------------------
 //   SigScale

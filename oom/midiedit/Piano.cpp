@@ -1,8 +1,9 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: piano.cpp,v 1.3 2004/05/31 11:48:55 lunar_shuttle Exp $
+//    $Id: $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //=========================================================
 
 #include <QMouseEvent>
@@ -16,11 +17,11 @@
 #include "midictrl.h"
 #include "midi.h"
 #include "song.h"
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "track.h"
 #include "part.h"
 #include "keymapmenu.h"
-#include "piano.h"
+#include "Piano.h"
 
 //{{{
 static const char *mk1_xpmC1[] = {
@@ -694,7 +695,7 @@ static const char *mk4_xpm_lswitch[] = {
       0   1   2  3  4  5  6  7  8  9  10
       c-2 c-1 C0 C1 C2 C3 C4 C5 C6 C7 C8 - G8
 
-      Grid über Oktave:
+      Grid ï¿½ber Oktave:
 
            +------------+ ------------------------------
        11  |            |
@@ -731,7 +732,7 @@ static const char *mk4_xpm_lswitch[] = {
 //   Piano
 //---------------------------------------------------------
 
-Piano::Piano(QWidget* parent, int ymag, MidiEditor *e)
+Piano::Piano(QWidget* parent, int ymag, AbstractMidiEditor *e)
    : View(parent, 1, ymag)
 {
 	m_editor = e;

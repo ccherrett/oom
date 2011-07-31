@@ -1,12 +1,12 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//    $Id: midieditor.h,v 1.3.2.2 2009/02/02 21:38:00 terminator356 Exp $
+//    $Id: AbstractMidiEditor.h,v 1.3.2.2 2009/02/02 21:38:00 terminator356 Exp $
 //  (C) Copyright 1999 Werner Schweer (ws@seh.de)
 //=========================================================
 
-#ifndef __MIDIEDITOR_H__
-#define __MIDIEDITOR_H__
+#ifndef __ABSTRACTMIDIEDITOR_H__
+#define __ABSTRACTMIDIEDITOR_H__
 
 ///#include "sig.h"
 #include "al/sig.h"
@@ -28,10 +28,10 @@ class WavePart;
 class Event;
 
 //---------------------------------------------------------
-//   MidiEditor
+//   AbstractMidiEditor
 //---------------------------------------------------------
 
-class MidiEditor : public TopWin
+class AbstractMidiEditor : public TopWin
 {
     Q_OBJECT
 
@@ -66,9 +66,9 @@ signals:
     void curDrumInstrumentChanged(int);
 
 public:
-    MidiEditor(int, int, PartList*,
+    AbstractMidiEditor(int, int, PartList*,
             QWidget* parent = 0, const char* name = 0);
-    ~MidiEditor();
+    ~AbstractMidiEditor();
 
 	bool hasPart(int sn);
 	void addPart(Part* p);

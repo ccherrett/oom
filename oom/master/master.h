@@ -10,7 +10,7 @@
 
 #include "view.h"
 #include "song.h"
-#include "tools.h"
+#include "toolbars/tools.h"
 
 class QMouseEvent;
 class QPainter;
@@ -18,7 +18,7 @@ class QPoint;
 class QRect;
 class QToolBar;
 
-class MidiEditor;
+class AbstractMidiEditor;
 class ScrollScale;
 
 //---------------------------------------------------------
@@ -39,7 +39,7 @@ class Master : public View
     QPoint start;
     Tool tool;
     DragMode drag;
-    MidiEditor* editor;
+    AbstractMidiEditor* editor;
 
     Q_OBJECT
     virtual void pdraw(QPainter&, const QRect&);
@@ -65,7 +65,7 @@ public slots:
     void setTool(int t);
 
 public:
-    Master(MidiEditor*, QWidget* parent, int xmag, int ymag);
+    Master(AbstractMidiEditor*, QWidget* parent, int xmag, int ymag);
 };
 
 #endif

@@ -8,7 +8,7 @@
 #ifndef __MASTER_EDIT_H__
 #define __MASTER_EDIT_H__
 
-#include "midieditor.h"
+#include "AbstractMidiEditor.h"
 #include "noteinfo.h"
 #include "cobject.h"
 
@@ -40,7 +40,7 @@ class EditToolBar;
 //   MasterEdit
 //---------------------------------------------------------
 
-class MasterEdit : public MidiEditor
+class MasterEdit : public AbstractMidiEditor
 {
     Q_OBJECT
 

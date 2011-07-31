@@ -45,7 +45,7 @@
 #include "poslabel.h"
 #include "pitchlabel.h"
 #include "scrollscale.h"
-#include "piano.h"
+#include "Piano.h"
 #include "../ctrl/ctrledit.h"
 #include "splitter.h"
 #include "ttoolbar.h"
@@ -62,13 +62,13 @@
 #include "quantconfig.h"
 #include "shortcuts.h"
 
-#include "Conductor.h"
+#include "conductor/Conductor.h"
 #include "tracklistview.h"
-#include "transporttools.h"
-#include "edittools.h"
-#include "epictools.h"
-#include "looptools.h"
-#include "misctools.h"
+#include "toolbars/transporttools.h"
+#include "toolbars/edittools.h"
+#include "toolbars/epictools.h"
+#include "toolbars/looptools.h"
+#include "toolbars/misctools.h"
 
 #include "traverso_shared/TConfig.h"
 
@@ -93,7 +93,7 @@ static int performerTools = PointerTool | PencilTool | RubberTool | DrawTool;
 //---------------------------------------------------------
 
 Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned initPos)
-	: MidiEditor(_quantInit, _rasterInit, pl, parent, name)
+	: AbstractMidiEditor(_quantInit, _rasterInit, pl, parent, name)
 {
 	deltaMode = false;
 	// Set size stored in global config, or use defaults.
@@ -1299,7 +1299,7 @@ void Performer::soloChanged(bool flag)
 void Performer::setRaster(int val)
 {
 	_rasterInit = val;
-	MidiEditor::setRaster(val);
+	AbstractMidiEditor::setRaster(val);
 	canvas->redrawGrid();
 	canvas->setFocus(); // give back focus after kb input
 }
@@ -1311,7 +1311,7 @@ void Performer::setRaster(int val)
 void Performer::setQuant(int val)
 {
 	_quantInit = val;
-	MidiEditor::setQuant(val);
+	AbstractMidiEditor::setQuant(val);
 	canvas->setFocus();
 }
 
@@ -1323,7 +1323,7 @@ void Performer::writeStatus(int level, Xml& xml) const
 {
 	writePartList(level, xml);
 	xml.tag(level++, "performer");
-	MidiEditor::writeStatus(level, xml);
+	AbstractMidiEditor::writeStatus(level, xml);
 	splitter->writeStatus(level, xml);
 	hsplitter->writeStatus(level, xml);
 
@@ -1382,7 +1382,7 @@ void Performer::readStatus(Xml& xml)
 				tools22->set(tool);
 			}
 			else if (tag == "midieditor")
-				MidiEditor::readStatus(xml);
+				AbstractMidiEditor::readStatus(xml);
 			else if (tag == "ctrledit")
 			{
 				CtrlEdit* ctrl = addCtrl();
