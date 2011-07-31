@@ -46,9 +46,9 @@ Meter::Meter(QWidget* parent, Track::TrackType track, MeterType type, Qt::Orient
 	redScale = 0;
 	setLineWidth(0);
 	setMidLineWidth(0);
-	green = QColor(0,130,154);
-	yellow = QColor(152,33,84);
-	red = QColor(160,3,43);
+	green = QColor(129,244,118);
+	yellow = QColor(244,240,118);
+	red = QColor(244,118,118);
 	bgColor = QColor(12, 12, 12);
 	m_pixmap_h = new QPixmap(":/images/vugrad.png");
 	m_pixmap_w = new QPixmap(":/images/vugrad_h.png");
@@ -334,25 +334,22 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
    		     switch(vuColorStrip)
    		     {
    		         case 0:
+   		             myPen.setBrush(m_trackColor);//solid grey
+   		        	 break;
+   		         case 1:
    		             if(height() != m_height)
    		                 m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);
    		             m_height = height();
    		             myPen.setBrush(m_scaledPixmap_h);
    		         	break;
-   		         case 1:
+   		         case 2:
    		             myPen.setBrush(QColor(0,166,172));//solid blue
    		         	break;
-   		         case 2:
+   		         case 3:
    		             myPen.setBrush(QColor(131,131,131));//solid grey
    		         	break;
-   		         case 3:
-   		             myPen.setBrush(m_trackColor);//solid grey
-   		        	 break;
    		         default:
-   		            if(height() != m_height)
-   		                 m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);
-   		             m_height = height();
-   		             myPen.setBrush(m_scaledPixmap_h);
+   		             myPen.setBrush(m_trackColor);//solid grey
 					 break;
    		     }
 			//if(height() != m_height)
@@ -384,25 +381,22 @@ void Meter::drawVU(QPainter& p, int w, int h, int yv, bool redrawVU)
    		     switch(vuColorStrip)
    		     {
    		         case 0:
-   		             if(width() != m_width)
-   		                 m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
-   		             m_width = width();
-   		             myPen.setBrush(m_scaledPixmap_w);
-   		         break;
-   		         case 1:
-   		             myPen.setBrush(QColor(0,166,172));//solid blue
-   		         break;
-   		         case 2:
-   		             myPen.setBrush(QColor(131,131,131));//solid grey
-   		         break;
-   		         case 3:
    		             myPen.setBrush(m_trackColor);
    		         break;
-   		         default:
+   		         case 1:
    		             if(width() != m_width)
    		                 m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
    		             m_width = width();
    		             myPen.setBrush(m_scaledPixmap_w);
+   		         break;
+   		         case 2:
+   		             myPen.setBrush(QColor(0,166,172));//solid blue
+   		         break;
+   		         case 3:
+   		             myPen.setBrush(QColor(131,131,131));//solid grey
+   		         break;
+   		         default:
+   		             myPen.setBrush(m_trackColor);
    		         break;
    		     }
 			//if(width() != m_width)
