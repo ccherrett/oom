@@ -1214,6 +1214,7 @@ void Song::setPlay(bool f)
 	{
 		audio->msgPlay(true);
 	}
+	emit playChanged(f); // signal transport window
 }
 
 void Song::setStop(bool f)

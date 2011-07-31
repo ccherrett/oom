@@ -157,6 +157,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	connect(m_btnAutomation, SIGNAL(clicked()), this, SLOT(generateAutomationMenu()));
 	//Let header list control this for now
 	//connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	connect(song, SIGNAL(playChanged(bool)), this, SLOT(resetPeaksOnPlay(bool)));
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 	inHeartBeat = false;
 }
@@ -1394,6 +1395,14 @@ void TrackHeader::resetPeaks(bool)/*{{{*/
 		return;
 		
 	m_track->resetPeaks();
+}/*}}}*/
+
+void TrackHeader::resetPeaksOnPlay(bool play)/*{{{*/
+{
+	if(!m_track)
+		return;
+	if(play)	
+		resetPeaks(play);
 }/*}}}*/
 
 //Private member functions

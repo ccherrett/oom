@@ -301,6 +301,16 @@ extern QIcon* loopVertIconOff;
 extern QIcon* loopVertIconOver;
 extern QIcon* loopVertIconSet3;
 
+extern QIcon* expandIconOn;
+extern QIcon* expandIconOff;
+extern QIcon* expandIconOver;
+extern QIcon* expandIconSet3;
+
+extern QIcon* vuIconOn;
+extern QIcon* vuIconOff;
+extern QIcon* vuIconOver;
+extern QIcon* vuIconSet3;
+
 extern QIcon* speakerIconOn;
 extern QIcon* speakerIconOff;
 extern QIcon* speakerIconOver;

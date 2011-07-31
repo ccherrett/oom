@@ -50,11 +50,14 @@ class MixerDock : public QFrame
     QHBoxLayout* m_masterBox;
 	Strip* masterStrip;
     AudioPortConfig* routingDialog;
-	QPushButton* m_btnAux;
+	QToolButton* m_btnAux;
 	QToolButton* m_btnVUColor;
+	QToolButton* m_btnFadeClipping;
 	TrackList* m_tracklist;
 	MixerMode m_mode;
+	QAction* m_auxAction; 
 	QAction* m_vuColorAction; 
+	QAction* m_fadeClippingAction; 
 	bool loading;
 
 	int oldAuxsSize;

@@ -87,32 +87,48 @@ void MixerDock::layoutUi()/*{{{*/
 	m_adminBox->setAlignment(Qt::AlignHCenter|Qt::AlignTop);
 	
 	//m_adminBox->addItem(new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Minimum));
-
+	m_auxAction = new QAction(QIcon(*expandIconSet3), tr("expandrack"), this);
+	m_auxAction->setToolTip(tr("Show/Hide Effect Rack"));
+	m_auxAction->setCheckable(true);
+	m_auxAction->setChecked(true);
+	if(m_mode == DOCKED)
+		m_auxAction->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
+	
+	m_btnAux = new  QToolButton(this);
+	m_btnAux->setDefaultAction(m_auxAction);
+	m_btnAux->setIconSize(QSize(25, 20));
+	m_btnAux->setFixedSize(QSize(25, 20));
+	m_btnAux->setAutoRaise(true);
+	m_adminBox->addWidget(m_btnAux);
+	
+	/*
 	m_btnAux = new QPushButton(titleWidget);
 	m_btnAux->setToolTip(tr("Show/hide Effects Rack"));
 	if(m_mode == DOCKED)
 		m_btnAux->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
-	m_btnAux->setMaximumSize(QSize(22,18));
+	m_btnAux->setIconSize(QSize(25, 20));
+	m_btnAux->setFixedSize(QSize(25, 20));
 	m_btnAux->setObjectName("m_btnAux");
 	m_btnAux->setCheckable(true);
 	m_btnAux->setChecked(true);
-	m_btnAux->setIcon(*expandIcon);
+	m_btnAux->setIcon(*expandIconSet3);
 	m_btnAux->setIconSize(record_on_Icon->size());
 	m_adminBox->addWidget(m_btnAux);
-
+	*/
+	
 	m_mixerBox->addWidget(titleWidget);
 	
-	m_vuColorAction = new QAction(QIcon(*expandIcon), tr("vucolor"), this);
+	m_vuColorAction = new QAction(QIcon(*vuIconSet3), tr("vucolor"), this);
 	m_vuColorAction->setToolTip(tr("Change VU Colors"));
 	m_vuColorAction->setCheckable(false);
 	
 	m_btnVUColor = new  QToolButton(this);
 	m_btnVUColor->setDefaultAction(m_vuColorAction);
-	m_btnVUColor->setIconSize(QSize(22, 18));
-	m_btnVUColor->setFixedSize(QSize(22, 18));
+	m_btnVUColor->setIconSize(QSize(25, 20));
+	m_btnVUColor->setFixedSize(QSize(25, 20));
 	m_btnVUColor->setAutoRaise(true);
 	m_adminBox->addWidget(m_btnVUColor);
-
+	
 	view = new QScrollArea(this);
 	view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -147,7 +163,7 @@ void MixerDock::layoutUi()/*{{{*/
 	//Push all the widgets in the m_adminBox to the top
 	m_adminBox->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	connect(m_btnAux, SIGNAL(toggled(bool)), SLOT(toggleAuxRack(bool)));
+	connect(m_auxAction, SIGNAL(triggered(bool)), SLOT(toggleAuxRack(bool)));
 	connect(m_vuColorAction, SIGNAL(triggered(bool)), this, SLOT(generateVUColorMenu()));
 	//connect(m_btnDock, SIGNAL(clicked(bool)), SLOT(toggleDetach()));
 	if(m_mode == DOCKED)
@@ -189,35 +205,35 @@ void MixerDock::generateVUColorMenu()/*{{{*/
 	p->clear();
 	p->setTitle(tr("Change VU Color"));
 
-	bool defaultChecked = false;
+	bool trackChecked = false;
 	if(vuColorStrip == 0)
+		trackChecked = true;
+	bool defaultChecked = false;
+	if(vuColorStrip == 1)
 		defaultChecked = true;
 	bool blueChecked = false;
-	if(vuColorStrip == 1)
+	if(vuColorStrip == 2)
 		blueChecked = true;
 	bool greyChecked = false;
-	if(vuColorStrip == 2)
-		greyChecked = true;
-	bool trackChecked = false;
 	if(vuColorStrip == 3)
-		trackChecked = true;
+		greyChecked = true;
 	
 	QAction* act = 0;
-	act = p->addAction("Default");
-	act->setCheckable(true);
-	act->setChecked(defaultChecked);
-	act->setData(0);
-	act = p->addAction("Blue");
-	act->setCheckable(true);
-	act->setChecked(blueChecked);
-	act->setData(1);
-	act = p->addAction("Grey");
-	act->setCheckable(true);
-	act->setChecked(greyChecked);
-	act->setData(2);
 	act = p->addAction("Track Type");
 	act->setCheckable(true);
 	act->setChecked(trackChecked);
+	act->setData(0);
+	act = p->addAction("Gradient");
+	act->setCheckable(true);
+	act->setChecked(defaultChecked);
+	act->setData(1);
+	act = p->addAction("Blue");
+	act->setCheckable(true);
+	act->setChecked(blueChecked);
+	act->setData(2);
+	act = p->addAction("Grey");
+	act->setCheckable(true);
+	act->setChecked(greyChecked);
 	act->setData(3);
 	
 	QAction* act1 = p->exec(QCursor::pos());
@@ -265,9 +281,9 @@ void MixerDock::toggleAuxRack(bool toggle)/*{{{*/
 		masterStrip->toggleAuxPanel(toggle);
 	}
 	//Just in case this was called from outside the button
-	m_btnAux->blockSignals(true);
-	m_btnAux->setChecked(toggle);
-	m_btnAux->blockSignals(false);
+	m_auxAction->blockSignals(true);
+	m_auxAction->setChecked(toggle);
+	m_auxAction->blockSignals(false);
 }/*}}}*/
 
 void MixerDock::addStrip(Track* t, int idx)/*{{{*/

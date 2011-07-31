@@ -398,6 +398,12 @@
 		<file>images/icons/metronome_new_on.png</file>
 		<file>images/icons/metronome_new_over.png</file>
 		<file>images/icons/metronome_new_off.png</file>
+		<file>images/expand_new_on.png</file>
+		<file>images/expand_new_over.png</file>
+		<file>images/expand_new_off.png</file>
+		<file>images/vu_new_on.png</file>
+		<file>images/vu_new_over.png</file>
+		<file>images/vu_new_off.png</file>
 	</qresource>
 </RCC>
 

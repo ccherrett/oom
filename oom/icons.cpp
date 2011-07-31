@@ -511,6 +511,16 @@ QPixmap* loopVertIconOff;
 QPixmap* loopVertIconOver;
 QIcon* loopVertIconSet3;
 
+QPixmap* expandIconOn;
+QPixmap* expandIconOff;
+QPixmap* expandIconOver;
+QIcon*   expandIconSet3;
+
+QPixmap* vuIconOn;
+QPixmap* vuIconOff;
+QPixmap* vuIconOver;
+QIcon*   vuIconSet3;
+
 QIcon* mixer_resizeIconSet3;
 QIcon* mixer_inputIconSet3;
 QIcon* mixer_outputIconSet3;
@@ -1186,6 +1196,22 @@ void initIcons()
       loopVertIconSet3->addPixmap(*loopVertIconOn, QIcon::Normal, QIcon::On);
       loopVertIconSet3->addPixmap(*loopVertIconOff, QIcon::Normal, QIcon::Off);
       loopVertIconSet3->addPixmap(*loopVertIconOver, QIcon::Active);
+	  
+	  expandIconOn = new MPIXMAP(":/images/expand_new_on.png", NULL);
+      expandIconOff= new MPIXMAP(":/images/expand_new_off.png", NULL);
+      expandIconOver= new MPIXMAP(":/images/expand_new_over.png", NULL);
+	  expandIconSet3         = new QIcon();
+      expandIconSet3->addPixmap(*expandIconOn, QIcon::Normal, QIcon::On);
+      expandIconSet3->addPixmap(*expandIconOff, QIcon::Normal, QIcon::Off);
+      expandIconSet3->addPixmap(*expandIconOver, QIcon::Active);
+	  
+	  vuIconOn = new MPIXMAP(":/images/vu_new_on.png", NULL);
+      vuIconOff= new MPIXMAP(":/images/vu_new_off.png", NULL);
+      vuIconOver= new MPIXMAP(":/images/vu_new_over.png", NULL);
+	  vuIconSet3         = new QIcon();
+      vuIconSet3->addPixmap(*vuIconOn, QIcon::Normal, QIcon::On);
+      vuIconSet3->addPixmap(*vuIconOff, QIcon::Normal, QIcon::Off);
+      vuIconSet3->addPixmap(*vuIconOver, QIcon::Active);
 	  
 	  speakerIconOn = new MPIXMAP(":/images/icons/speaker_new_on.png", NULL);
       speakerIconOff= new MPIXMAP(":/images/icons/speaker_new_off.png", NULL);
