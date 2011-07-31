@@ -1459,7 +1459,7 @@ void TrackHeader::updateChannels()/*{{{*/
 			for (int cc = m_channels; cc < c; ++size, ++cc)
 			{
 				//meter[cc] = new Meter(this);
-				meter[cc] = new Meter(this, Meter::DBMeter, Qt::Horizontal, m_track->type());
+				meter[cc] = new Meter(this, m_track->type(), Meter::DBMeter, Qt::Horizontal);
 				meter[cc]->setRange(config.minMeter, 10.0);
 				meter[cc]->setFixedHeight(5);
 				meter[cc]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
@@ -1609,7 +1609,7 @@ void TrackHeader::initVolume()/*{{{*/
 		connect(m_slider, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(volumeRightClicked(const QPoint &, int)));
 		connect(m_slider, SIGNAL(sliderPressed(int)), SLOT(updateSelection()));
 
-		meter[0] = new Meter(this, Meter::LinMeter, Qt::Horizontal, m_track->type());
+		meter[0] = new Meter(this, m_track->type(), Meter::LinMeter, Qt::Horizontal);
 		meter[0]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 		meter[0]->setRange(0, 127.0);
 		meter[0]->setFixedHeight(5);
@@ -1639,7 +1639,7 @@ void TrackHeader::initVolume()/*{{{*/
 
 		for (int i = 0; i < channels; ++i)/*{{{*/
 		{
-			meter[i] = new Meter(this, Meter::DBMeter, Qt::Horizontal, m_track->type());
+			meter[i] = new Meter(this, m_track->type(), Meter::DBMeter, Qt::Horizontal);
 			meter[i]->setRange(config.minMeter, 10.0);
 			meter[i]->setFixedHeight(5);
 			//meter[i]->setFixedWidth(150);

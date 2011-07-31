@@ -62,7 +62,7 @@ signals:
     void meterClipped();
 
 public:
-	Meter(QWidget* parent, MeterType type = DBMeter, Qt::Orientation = Qt::Vertical, Track::TrackType track = Track::MIDI);
+	Meter(QWidget* parent, Track::TrackType track = Track::MIDI, MeterType type = DBMeter, Qt::Orientation = Qt::Vertical);
     void setRange(double min, double max);
 };
 #endif

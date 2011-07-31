@@ -91,7 +91,7 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	slider->setFont(config.fonts[1]);
 	slider->setId(CTRL_VOLUME);
 
-	meter[0] = new Meter(this, Meter::LinMeter, Qt::Vertical, Track::MIDI);
+	meter[0] = new Meter(this, Track::MIDI, Meter::LinMeter, Qt::Vertical);
 	meter[0]->setRange(0, 127.0);
 	meter[0]->setFixedWidth(15);
 	connect(meter[0], SIGNAL(mousePress()), this, SLOT(resetPeaks()));

@@ -23,7 +23,7 @@
 //   Meter
 //---------------------------------------------------------
 
-Meter::Meter(QWidget* parent, MeterType type, Qt::Orientation layout, Track::TrackType track)
+Meter::Meter(QWidget* parent, Track::TrackType track, MeterType type, Qt::Orientation layout)
 : QFrame(parent) //Qt::WNoAutoErase
 {
 	setBackgroundRole(QPalette::NoRole);
