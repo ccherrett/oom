@@ -49,61 +49,6 @@
 #include "utils.h"
 #include "midimonitor.h"
 
-// Moved into global config by Tim.
-/* 
-const char* partColorNames[] = {
-	  "Default",
-	  "Refrain",
-	  "Bridge",
-	  "Intro",
-	  "Coda",
-	  "Chorus",
-	  "Solo",
-	  "Brass",
-	  "Percussion",
-	  "Drums",
-	  "Guitar",
-	  "Bass",
-	  "Flute",
-	  "Strings",
-	  "Keyboard",
-	  "Piano",
-	  "Saxophon",
-	  };
- */
-
-/*
-//---------------------------------------------------------
-//   ColorListItem
-//---------------------------------------------------------
-
-class ColorListItem { //: public QCustomMenuItem { ddskrjo
-	  QColor color;
-	  int h;
-	  int fontheight;
-	  QString label;
-	  virtual QSize sizeHint() { return QSize(80, h); }
-	  virtual void paint(QPainter* p, const QColorGroup&, bool act, bool enabled, int x, int y, int w, int h)
-			{
-			p->fillRect(x+5, y+2, h-4, h-4, QBrush(color));
-			p->drawText(x+5 + h - 4 + 3, y+(fontheight * 3) / 4, label);
-			}
-
-   public:
-	  ColorListItem(const QColor& c, int _h,  int _fh, const char* txt)
-		 : color(c), h(_h), fontheight(_fh), label(txt) {
-			}
-	  QString text() const { return QString("PartColor"); }
-	  };
- */
-// ORCAN : colorRect does the same job as the above class.
-//         Shall we get rid of the class?
-
-//---------------------------------------------------------
-//   colorRect
-//   paints a rectangular icon with a given color
-//---------------------------------------------------------
-
 class CurveNodeSelection
 {
 private:
@@ -327,10 +272,8 @@ NPart::NPart(Part* e) : CItem(Event(), e)
 	int y = track()->y();
 	//printf("NPart::NPart track name:%s, y:%d h:%d\n", track()->name().toLatin1().constData(), y, th);
 
-	///setPos(QPoint(e->tick(), y + 1));
 	setPos(QPoint(e->tick(), y));
 
-	///setBBox(QRect(e->tick(), y + 1, e->lenTick(), th));
 	// NOTE: For adjustable border size: If using a two-pixel border width while drawing, use second line.
 	//       If one-pixel width, use first line. Tim.
 	//setBBox(QRect(e->tick(), y, e->lenTick(), th));
@@ -357,9 +300,7 @@ ComposerCanvas::ComposerCanvas(int* r, QWidget* parent, int sx, int sy)
 	trackOffset = 0;
 	show_tip = false;
 
-	//This changes to song->visibletracks()
 	tracks = song->visibletracks();
-	//tracks = song->tracks();
 	setMouseTracking(true);
 	_drag = DRAG_OFF;
 	curColorIndex = 0;
@@ -376,14 +317,12 @@ ComposerCanvas::ComposerCanvas(int* r, QWidget* parent, int sx, int sy)
 
 int ComposerCanvas::y2pitch(int y) const
 {
-	//This changes to song->visibletracks()
 	TrackList* tl = song->visibletracks();
 	int yy = 0;
 	int idx = 0;
 	for (iTrack it = tl->begin(); it != tl->end(); ++it, ++idx)
 	{
 		int h = (*it)->height();
-		// if ((y >= yy) && (y < yy+h))
 		if (y < yy + h)
 			break;
 		yy += h;
@@ -397,7 +336,6 @@ int ComposerCanvas::y2pitch(int y) const
 
 int ComposerCanvas::pitch2y(int p) const
 {
-	//This changes to song->visibletracks()
 	TrackList* tl = song->visibletracks();
 	int yy = 0;
 	int idx = 0;
@@ -430,13 +368,10 @@ void ComposerCanvas::returnPressed()
 		lineEditor->hide();
 		Part* oldPart = editPart->part();
 		Part* newPart = oldPart->clone();
-		//printf("ComposerCanvas::returnPressed before msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
 
 		newPart->setName(lineEditor->text());
 		// Indicate do undo, and do port controller values but not clone parts.
-		//audio->msgChangePart(oldPart, newPart);
 		audio->msgChangePart(oldPart, newPart, true, true, false);
-		//printf("ComposerCanvas::returnPressed after msgChangePart oldPart refs:%d Arefs:%d newPart refs:%d Arefs:%d\n", oldPart->events()->refCount(), oldPart->events()->arefCount(), newPart->events()->refCount(), newPart->events()->arefCount());
 	}
 	editMode = false;
 }
@@ -459,18 +394,6 @@ void ComposerCanvas::viewMouseDoubleClickEvent(QMouseEvent* event)
 	{
 		if (event->button() == Qt::LeftButton && shift)
 		{
-            /*editPart = (NPart*) _curItem;
-            QRect r = map(_curItem->bbox());
-			if (lineEditor == 0)
-			{
-				lineEditor = new QLineEdit(this);
-				lineEditor->setFrame(true);
-			}
-			editMode = true;
-			lineEditor->setGeometry(r);
-			lineEditor->setText(editPart->name());
-			lineEditor->setFocus();
-			lineEditor->show();*/
 		}
 		else if (event->button() == Qt::LeftButton)
 		{
@@ -810,10 +733,10 @@ CItem* ComposerCanvas::addPartAtCursor(Track* track)
 			pa->setLenTick(0);
 			break;
 		case Track::WAVE:
-			pa = new WavePart((WaveTrack*) track);
-			pa->setTick(pos);
-			pa->setLenTick(0);
-			break;
+			//pa = new WavePart((WaveTrack*) track);
+			//pa->setTick(pos);
+			//pa->setLenTick(0);
+			//break;
 		case Track::AUDIO_OUTPUT:
 		case Track::AUDIO_INPUT:
 		case Track::AUDIO_BUSS:
@@ -857,10 +780,10 @@ CItem* ComposerCanvas::newItem(const QPoint& pos, int)
 			pa->setLenTick(0);
 			break;
 		case Track::WAVE:
-			pa = new WavePart((WaveTrack*) track);
-			pa->setTick(x);
-			pa->setLenTick(0);
-			break;
+			//pa = new WavePart((WaveTrack*) track);
+			//pa->setTick(x);
+			//pa->setLenTick(0);
+			//break;
 		case Track::AUDIO_OUTPUT:
 		case Track::AUDIO_INPUT:
 		case Track::AUDIO_BUSS:

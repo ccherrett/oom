@@ -95,8 +95,6 @@ class Composer : public QWidget
     void genMidiTrackInfo();
     void genWaveTrackInfo();
     void switchInfo(int);
-    void setHeaderToolTips();
-    void setHeaderWhatsThis();
     bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
@@ -107,7 +105,6 @@ private slots:
     void songChanged(int);
     void modeChange(int);
     void setTime(unsigned);
-    void headerMoved();
     void globalPitchChanged(int);
     void globalTempoChanged(int);
     void setTempo50();

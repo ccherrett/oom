@@ -1144,18 +1144,8 @@ void Song::cmdAddRecordedWave(WaveTrack* track, Pos s, Pos e)
 		return;
 	}
 
-	// Removed by Tim. p3.3.8
-	//unsigned startTick = roundDownBar(s.tick());
-	//unsigned endTick   = roundUpBar(e.tick());
-
-	// Added by Tim. p3.3.8
-
 	if ((audio->loopCount() > 0 && s.tick() > lPos().tick()) || (punchin() && s.tick() < lPos().tick()))
 		s.setTick(lPos().tick());
-	// If we are looping, just set the end to the right marker, since we don't know how many loops have occurred.
-	// (Fixed: Added Audio::loopCount)
-	// Otherwise if punchout is on, limit the end to the right marker.
-	//if(loop() || (punchout() && e.tick() > rPos().tick()) )
 	if ((audio->loopCount() > 0) || (punchout() && e.tick() > rPos().tick()))
 		e.setTick(rPos().tick());
 	// No part to be created? Delete the rec sound file.
