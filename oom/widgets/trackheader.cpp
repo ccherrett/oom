@@ -135,17 +135,17 @@ bool TrackHeader::isSelected()/*{{{*/
 	return m_track->selected();
 }/*}}}*/
 
-void TrackHeader::setTrack(Track* track)
+void TrackHeader::setTrack(Track* track)/*{{{*/
 {
-	if(m_track)
+	m_processEvents = false;
+	if(m_slider)
+		delete m_slider;
+	Meter* m;
+	while(!meter.isEmpty() && (m = meter.takeAt(0)) != 0)
 	{
-		if(m_slider)
-			delete m_slider;
-		Meter* m;
-		while(!meter.isEmpty() && (m = meter.takeAt(0)) != 0)
-		{
-			delete m;
-		}
+		//printf("Removing meter\n");
+		m->hide();
+		delete m;
 	}
 	m_track = track;
 	if(!m_track)
@@ -158,7 +158,7 @@ void TrackHeader::setTrack(Track* track)
 
 	if(m_pan)
 		m_pan->setAcceptDrops(false);
-	//setSelected(m_track->selected());
+	setSelected(m_track->selected());
 	if(m_track->height() < MIN_TRACKHEIGHT)
 	{
 		setFixedHeight(MIN_TRACKHEIGHT);
@@ -172,8 +172,49 @@ void TrackHeader::setTrack(Track* track)
 		m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 	else
 		m_btnAutomation->setIcon(*automation_trackIconSet3);
-	songChanged(-1);
-}
+
+	m_btnRecord->blockSignals(true);
+	m_btnRecord->setChecked(m_track->recordFlag());
+	m_btnRecord->blockSignals(false);
+
+	m_btnMute->blockSignals(true);
+	m_btnMute->setChecked(m_track->mute());
+	m_btnMute->blockSignals(false);
+
+	m_btnSolo->blockSignals(true);
+	m_btnSolo->setChecked(m_track->solo());
+	m_btnSolo->blockSignals(false);
+
+	m_btnReminder1->blockSignals(true);
+	m_btnReminder1->setChecked(m_track->getReminder1());
+	m_btnReminder1->blockSignals(false);
+	
+	m_btnReminder2->blockSignals(true);
+	m_btnReminder2->setChecked(m_track->getReminder2());
+	m_btnReminder2->blockSignals(false);
+
+	m_btnReminder3->blockSignals(true);
+	m_btnReminder3->setChecked(m_track->getReminder3());
+	m_btnReminder3->blockSignals(false);
+
+	m_trackName->blockSignals(true);
+	m_trackName->setText(m_track->name());
+	m_trackName->blockSignals(false);
+	//m_trackName->setReadOnly((m_track->name() == "Master"));
+	setSelected(m_track->selected());
+	//setProperty("selected", m_track->selected());
+	if(m_track->height() < MIN_TRACKHEIGHT)
+	{
+		setFixedHeight(MIN_TRACKHEIGHT);
+		m_track->setHeight(MIN_TRACKHEIGHT);
+	}
+	else
+	{
+		setFixedHeight(m_track->height());
+	}
+	m_processEvents = true;
+	//songChanged(-1);
+}/*}}}*/
 
 //Public slots
 
@@ -186,10 +227,11 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 	else
 	{
 		m_selected = sel;
-		m_track->setSelected(sel);
+		if(m_track->selected() != sel)
+			m_track->setSelected(sel);
 	}
-	if(!m_editing && m_processEvents)
-	{
+	//if(!m_editing)// && m_processEvents)
+	//{
 		if(m_selected)
 		{
 			//m_trackName->setFont();
@@ -206,7 +248,7 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 			m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorListLine.value(m_track->type()).name()));
 			//m_strip->setStyleSheet("QFrame {background-color: blue;}");
 		}
-	}
+	//}
 }/*}}}*/
 
 void TrackHeader::songChanged(int flags)/*{{{*/
@@ -221,7 +263,8 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 
 		if (flags & SC_CONFIG)
 		{
-			m_slider->setRange(config.minSlider - 0.1, 10.0);
+			if(m_slider)
+				m_slider->setRange(config.minSlider - 0.1, 10.0);
 
 			for (int c = 0; c < ((AudioTrack*)m_track)->channels(); ++c)
 			{
@@ -231,10 +274,40 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 		}
 	}
 
-	if (flags == -1 || (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED)))
+	if (flags & SC_MUTE)
 	{
-		//printf("TrackHeader::songChanged\n");
-		m_btnRecord->blockSignals(true);
+		//printf("TrackHeader::songChanged SC_MUTE\n");
+		m_btnMute->blockSignals(true);
+		m_btnMute->setChecked(m_track->mute());
+		m_btnMute->blockSignals(false);
+	}
+	if (flags & SC_SOLO)
+	{
+		//printf("TrackHeader::songChanged SC_SOLO\n");
+		m_btnSolo->blockSignals(true);
+		m_btnSolo->setChecked(m_track->solo());
+		m_btnSolo->blockSignals(false);
+	}
+	if (flags & SC_RECFLAG)
+	{
+		//printf("TrackHeader::songChanged SC_RECFLAG\n");
+		m_btnRecord->blockSignals(true);/*{{{*/
+		m_btnRecord->setChecked(m_track->recordFlag());
+		m_btnRecord->blockSignals(false);
+	}
+	if (flags & SC_MIDI_TRACK_PROP)
+	{
+		//printf("TrackHeader::songChanged SC_MIDI_TRACK_PROP\n");
+	}
+	if (flags & SC_SELECTION)
+	{
+		//printf("TrackHeader::songChanged SC_SELECTION\n");
+		setSelected(m_track->selected());
+	}
+	if (flags & SC_TRACK_MODIFIED)
+	{
+		//printf("TrackHeader::songChanged SC_TRACK_MODIFIED updating all\n");
+		m_btnRecord->blockSignals(true);/*{{{*/
 		m_btnRecord->setChecked(m_track->recordFlag());
 		m_btnRecord->blockSignals(false);
 
@@ -261,9 +334,9 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 		m_trackName->blockSignals(true);
 		m_trackName->setText(m_track->name());
 		m_trackName->blockSignals(false);
-		//m_trackName->setReadOnly((m_track->name() == "Master"));
+		
 		setSelected(m_track->selected());
-		//setProperty("selected", m_track->selected());
+		
 		if(m_track->height() < MIN_TRACKHEIGHT)
 		{
 			setFixedHeight(MIN_TRACKHEIGHT);
@@ -272,7 +345,7 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 		else
 		{
 			setFixedHeight(m_track->height());
-		}
+		}/*}}}*/
 	}
 }/*}}}*/
 
@@ -1449,7 +1522,7 @@ bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 
 void TrackHeader::updateChannels()/*{{{*/
 {
-	if(m_track && !m_track->isMidiTrack())
+	if(m_track && !m_track->isMidiTrack() && m_processEvents)
 	{
 		AudioTrack* t = (AudioTrack*) m_track;
 		int c = t->channels();
@@ -1487,7 +1560,7 @@ void TrackHeader::updateChannels()/*{{{*/
 
 void TrackHeader::initPan()/*{{{*/
 {
-	if(!m_track || !m_processEvents)
+	if(!m_track)
 		return;
 	QString img(":images/knob_midi_new.png");
 	Track::TrackType type = m_track->type();
@@ -1610,7 +1683,6 @@ void TrackHeader::initVolume()/*{{{*/
 {
 	if(!m_track)
 		return;
-	bool update = false;
 	if(m_track->isMidiTrack())
 	{
 		MidiTrack* track = (MidiTrack*)m_track;
@@ -1637,6 +1709,7 @@ void TrackHeader::initVolume()/*{{{*/
 		m->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 		m->setRange(0, 127.0);
 		m->setFixedHeight(5);
+		meter.append(m);
 		//m->setFixedWidth(150);
 		m_buttonVBox->addWidget(m);
 		connect(m, SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
@@ -1676,7 +1749,7 @@ void TrackHeader::initVolume()/*{{{*/
 		}/*}}}*/
 		m_channels = channels;
 	}
-	printf("TrackHeader::initVolume - button row item count: %d\n", m_buttonVBox->count());
+	//printf("TrackHeader::initVolume - button row item count: %d\n", m_buttonVBox->count());
 }/*}}}*/
 
 void TrackHeader::setupStyles()/*{{{*/
@@ -1702,6 +1775,7 @@ void TrackHeader::updateSelection(bool shift)/*{{{*/
 {
 	if(!m_track)
 		return;
+	printf("TrackHeader::updateSelection - shift; %d\n", shift);
 	if (!shift)
 	{
 		song->deselectTracks();

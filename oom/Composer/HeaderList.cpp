@@ -45,6 +45,7 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 	setFocusPolicy(Qt::NoFocus);
 	
 	wantCleanup = false;
+	m_lockupdate = false;
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_layout = new QVBoxLayout(this);
 	m_layout->setSpacing(0);
@@ -61,6 +62,8 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 
 void HeaderList::songChanged(int flags)/*{{{*/
 {
+	if(m_lockupdate)
+		return;
 	if(wantCleanup && !m_dirtyheaders.isEmpty())
 	{
 		TrackHeader* item;
@@ -77,21 +80,30 @@ void HeaderList::songChanged(int flags)/*{{{*/
 	}
 	if(flags &SC_VIEW_CHANGED)
 	{
-		printf("SC_VIEW_CHANGED\n");
+		//printf("SC_VIEW_CHANGED\n");
 		updateTrackList(true);
 	}
 	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
 	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
 	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED | SC_CHANNELS))
 	{
-		if(!song->invalid)
-			emit updateHeader(flags);
+		if(!song->invalid && !m_headers.isEmpty())
+		{
+			foreach(TrackHeader* header, m_headers)
+			{
+				header->songChanged(flags);
+			}
+		}
+		//	emit updateHeader(flags);
 	}
 }/*}}}*/
 
 void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 {
-	printf("HeaderList::updateTrackList\n");
+	if(m_lockupdate)
+		return;
+	m_lockupdate = true;
+	//printf("HeaderList::updateTrackList\n");
 	TrackList* l = song->visibletracks();
 	//Attempt to prevent widget destruction recreation cycle and just set 
 	//the track on the header instead. I will also try to never recreate 
@@ -100,32 +112,34 @@ void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 	int lsize = l->size();
 	if(viewupdate && !m_headers.isEmpty() && lsize == m_headers.size())
 	{
-		printf("Using optimized update\n");
+		//printf("Using optimized update\n");
 		iTrack i = l->begin();
 		foreach(TrackHeader* header, m_headers)
 		{
-			if((*i) != header->track())
-			{
+			//if((*i) != header->track())
+			//{
 				//Set the new track on the header
 				header->setTrack((*i));
-			}
+				//header->setSelected(false);
+			/*}
 			else
 			{
 				//Just let the header update itself as the track has not changed
 				header->songChanged(-1);
-			}
+			}*/
 			++i;
 		}
-		return;
+		emit updateHeader(-1);
 	}
 	else if(viewupdate && !m_headers.isEmpty() && lsize < m_headers.size())
 	{
-		printf("Using optimized update\n");
+		//printf("Using optimized update\n");
 		int remcount = m_headers.size() - lsize;
 		for(int i = 0; i < remcount; ++i)
 		{
 			TrackHeader *h = m_headers.takeLast();
 			h->stopProcessing();
+			h->hide();
 			m_dirtyheaders.append(h);
 		}
 		int hcount = 0;
@@ -134,30 +148,37 @@ void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 			m_headers.at(hcount)->setTrack((*i));
 		}
 		wantCleanup = true;
-		return;
+		update();
+		emit updateHeader(-1);
 	}
 	else if(viewupdate && !m_headers.isEmpty() && lsize > m_headers.size())
 	{
-		printf("Using optimized update\n");
+		//printf("Using optimized update\n");
 		int hcount = m_headers.size();
 		int addcount = 0;
 		for(iTrack i = l->begin(); i != l->end(); ++addcount, ++i)
 		{
+			Track* track = (Track*)(*i);
 			if(addcount < hcount)
-				m_headers.at(addcount)->setTrack((*i));
-			else
 			{
-				TrackHeader* header = new TrackHeader((*i), this);
-				header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-				header->setFixedHeight((*i)->height());
-				connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
-				connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
-				connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
-				m_layout->insertWidget(m_headers.size(), header);
-				m_headers.append(header);
+				m_headers.at(addcount)->setTrack(track);
+			}
+			else 
+			{
+				if(track)
+				{
+					TrackHeader* header = new TrackHeader(track, this);
+					header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+					//header->setFixedHeight(track->height());
+					//connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
+					connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
+					connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
+					m_layout->insertWidget(m_headers.size(), header);
+					m_headers.append(header);
+				}
 			}
 		}
-		return;
+		emit updateHeader(-1);
 	}
 	else
 	{
@@ -192,7 +213,8 @@ void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 		//20ms guaranteed.
 		wantCleanup = true;
 	}
-	printf("Leaving updateTrackList\n");
+	m_lockupdate = false;
+	//printf("Leaving updateTrackList\n");
 }/*}}}*/
 
 void HeaderList::clear()/*{{{*/
@@ -439,6 +461,8 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 	if(tl.size() == 1)
 	{
 		Track* src = (Track*)tl.front();
+		if(src && src->name() == "Master")
+			return;
 		if(src)
 		{
 			int i = song->visibletracks()->index(src);
@@ -450,6 +474,8 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 				{
 					ciTrack d = --it;
 					t = *(d);
+					if (t && t->name() == "Master")
+						return;
 				}
 				if (t)
 				{
@@ -465,6 +491,8 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 				{
 					ciTrack d = ++it;
 					t = *(d);
+					if (t && t->name() == "Master")
+						return;
 				}
 				if (t)
 				{
@@ -474,7 +502,9 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(t));
 				}
 			}
+			updateTrackList(true);
 		}
+		//song->update(SC_TRACK_MODIFIED);
 	}
 }/*}}}*/
 

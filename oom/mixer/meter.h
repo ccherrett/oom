@@ -63,6 +63,7 @@ signals:
 
 public:
 	Meter(QWidget* parent, Track::TrackType track = Track::MIDI, MeterType type = DBMeter, Qt::Orientation = Qt::Vertical);
+	virtual ~Meter(){}
     void setRange(double min, double max);
 };
 #endif

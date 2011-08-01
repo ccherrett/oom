@@ -35,6 +35,7 @@ class HeaderList : public QFrame
 	QList<TrackHeader*> m_headers;
 	QList<TrackHeader*> m_dirtyheaders;
 	bool wantCleanup;
+	bool m_lockupdate;
 
     int startY;
     int sTrack;
