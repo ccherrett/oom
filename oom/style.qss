@@ -1196,9 +1196,10 @@ QFrame#MixerCenter {/*{{{*/
 	background-color: #525252;
 	border-top: 18px;
 	border-bottom: 18px;
-	border-left: 0px;
+	border-left: 1px;/*2px solid #1e1e1e;*/
 	border-right: 0px;
 	border-image: url(:/images/mixer_rack_border2.png) repeat;
+/*	padding-left: 20px;*/
 	padding-top: -18px;
 	padding-bottom: -18px;
 	
@@ -1215,7 +1216,7 @@ QFrame#mixerDockTitle
 	color: #d6dfd6;
 	border-top: 1px solid #2b2b2f;
 	border-left: 1px solid #2b2b2f;
-	border-right: none;
+	border-right: 1px solid #888888;
 	border-bottom: 1px solid #2b2b2f;
 	border-radius: 4px;
 }
