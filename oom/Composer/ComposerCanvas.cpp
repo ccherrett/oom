@@ -2518,10 +2518,18 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 	int h = hh / 2;
 	int y = pr.y() + h;
 	int drawLines = 1;
-
+	int modulusVar = 10;
+	int remainderVar = 5;
 	EventList* el = wp->events();
-	for (iEvent e = el->begin(); e != el->end(); ++e)
+	for (iEvent e = el->begin(); e != el->end(); ++e)/*{{{*/
 	{
+		
+		/*if( eventcounter % 2==0 )
+		{ 
+			printf(" continue \n");
+			eventcounter ++;
+	  		continue;
+	 	}*/
 		int cc = hh % 2 ? 0 : 1;
 		Event event = e->second;
 		SndFileR f = event.sndFile();
@@ -2635,7 +2643,37 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 					hm = hh / 2;
 					SampleV sa[channels];
 					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
-					f.read(sa, xScale, pos);
+					//if( !i % modulusVar==remainderVar )
+					//printf("xmag == %f\n",xmag);
+					
+					if(xmag <= -301)/*{{{*/
+					{
+						if( i % 10==1 || i % 10==2 || i % 10==3 || i % 10==4 || i % 10==5 || i % 10 == 7 || i % 10==8 || i % 10==9)
+						{ 
+							postick += tickstep;
+							pos += xScale;
+	  						continue;
+	 					}
+					}
+					else if(xmag <= -41)
+					{
+						if( i % 10==1 || i % 10==2 || i % 10==4 || i % 10==5 || i % 10 == 7 || i % 10==8)
+						{ 
+							postick += tickstep;
+							pos += xScale;
+	  						continue;
+	 					}
+					}
+					else if(xmag <= -15)
+					{
+						if( i % 2==0)
+						{ 
+							postick += tickstep;
+							pos += xScale;
+	  						continue;
+	 					}
+					}/*}}}*/
+					f.read(sa, xScale, pos); //this read is slow
 					postick += tickstep;
 					pos += xScale;
 					int peak = 0;
@@ -2800,6 +2838,35 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 					y = pr.y() + hm;
 					SampleV sa[channels];
 					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
+					//if( !i % modulusVar==remainderVar )
+					//printf("xmag == %f\n",xmag);
+					if(xmag <= -301)/*{{{*/
+					{
+						if( i % 10==1 || i % 10==2 || i % 10==3 || i % 10==4 || i % 10==5 || i % 10 == 7 || i % 10==8 || i % 10==9)
+						{ 
+							postick += tickstep;
+							pos += xScale;
+	  						continue;
+	 					}
+					}
+					else if(xmag <= -41)
+					{
+						if( i % 10==1 || i % 10==2 || i % 10==4 || i % 10==5 || i % 10 == 7 || i % 10==8)
+						{ 
+							postick += tickstep;
+							pos += xScale;
+	  						continue;
+	 					}
+					}
+					else if(xmag <= -15)
+					{
+						if( i % 2==0)
+						{ 
+							postick += tickstep;
+							pos += xScale;
+	  						continue;
+	 					}
+					}/*}}}*/
 					f.read(sa, xScale, pos);
 					postick += tickstep;
 					pos += xScale;
@@ -2873,7 +2940,7 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 				stereoTwoFirstIn = 1;
 			}
 		}
-	}
+	}/*}}}*/
 	p.restore();
 }
 //---------------------------------------------------------
