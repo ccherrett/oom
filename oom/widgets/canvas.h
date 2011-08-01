@@ -239,6 +239,8 @@ signals:
     void horizontalScrollNoLimit(unsigned);
 public:
     Canvas(QWidget* parent, int sx, int sy, const char* name = 0);
+	bool m_myLeftFlag;
+	bool m_myRightFlag;
     bool isSingleSelection();
     int selectionSize();
     CItemList getItemlistForCurrentPart();

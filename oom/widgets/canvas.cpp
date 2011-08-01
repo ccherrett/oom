@@ -795,6 +795,10 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 				if(shift && ctrack->type() == Track::WAVE)
 				{
 					_drag = DRAG_RESIZE_LEFT;
+					//Christopher
+					//Set up you flag here to draw the left border
+					//Unset both flags in viewMouseRelease() function below
+					m_myLeftFlag = true;
 					setCursor();
 					int endp = _curItem->x() + _curItem->width();
 					_end.setX(endp);
@@ -807,6 +811,10 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 				else
 				{
 					_drag = DRAG_RESIZE;
+					//Christopher
+					//Set up you flag here to draw the right border
+					//Unset both flags in viewMouseRelease() function below
+					m_myRightFlag = true;
 					setCursor();
 					int dx = _start.x() - _curItem->x();
 					_curItem->setWidth(dx);
@@ -1283,6 +1291,9 @@ void Canvas::viewMouseReleaseEvent(QMouseEvent* event)/*{{{*/
 {
 	// printf("release %x %x\n", event->state(), event->button());
 
+	//Christopher
+	m_myLeftFlag = false;
+	m_myRightFlag = false;
 	_doScroll = false;
 	_canScrollLeft = true;
 	_canScrollRight = true;
