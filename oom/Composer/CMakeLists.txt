@@ -57,7 +57,9 @@ set (FILES_TO_TRANSLATE
 # Compilation flags and target name
 #
 set_target_properties( Composer
-      PROPERTIES COMPILE_FLAGS "-include ${PROJECT_BINARY_DIR}/all.h -fPIC"
+      #PROPERTIES COMPILE_FLAGS "-include ${PROJECT_BINARY_DIR}/all.h -fPIC"
+	  PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC -fopenmp"
+	  LINK_FLAGS "-fopenmp"
       OUTPUT_NAME oom_composer
       )
 
