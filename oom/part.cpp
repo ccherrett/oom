@@ -1161,6 +1161,7 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 					//printf("SndFileR before samples=%d event samplepos=%d currentframes=%d event frame=%d rightclip=%d rem=%d remframes=%d diff=%d minframe=%d part_start=%d old_start=%d\n", 
 					//	file.samples(), e.spos(), currentFrames, event_startframe, e.rightClip(), rem, remainingFrames, diff, minframe, part_start, old_start);
 					
+					//TODO: Fix resize problem when the start of the samples are past the start of song
 					if(!remainingFrames)
 					{
 						//Called to update the part with as its stored in the CItem container

@@ -69,7 +69,7 @@ public slots:
     void selectTrackBelow();
     void moveSelection(int n);
     void moveSelectedTrack(int n);
-	void updateTrackList();
+	void updateTrackList(bool viewupdate = false);
 	void renameTrack(Track*);
 	void clear();
 

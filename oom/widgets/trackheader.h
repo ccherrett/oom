@@ -12,6 +12,7 @@
 #include "ui_trackheaderbase.h"
 #include "globaldefs.h"
 #include <QHash>
+#include <QList>
 
 class Track;
 class Knob;
@@ -50,7 +51,8 @@ class TrackHeader : public QFrame, public Ui::TrackHeaderBase
 	bool m_nopopulate;
 	QHash<int, QString> m_selectedStyle;
 	QHash<int, QString> m_style;
-    Meter* meter[MAX_CHANNELS];
+    //Meter* meter[MAX_CHANNELS];
+	QList<Meter*> meter;
 	void initPan();
 	void initVolume();
 	void setupStyles();
@@ -116,6 +118,11 @@ public:
 	{
 		return m_editing;
 	}
+	Track* track()
+	{
+		return m_track;
+	}
+	void setTrack(Track*);
 };
 
 #endif

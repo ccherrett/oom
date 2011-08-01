@@ -71,13 +71,14 @@ void HeaderList::songChanged(int flags)/*{{{*/
 		}
 		wantCleanup = false;
 	}
-	if (flags == -1 || (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/ | SC_VIEW_CHANGED)))
+	if (flags == -1 || (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/)))
 	{
-		updateTrackList();
+		updateTrackList(true);
 	}
 	if(flags &SC_VIEW_CHANGED)
 	{
 		printf("SC_VIEW_CHANGED\n");
+		updateTrackList(true);
 	}
 	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
 	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
@@ -88,40 +89,109 @@ void HeaderList::songChanged(int flags)/*{{{*/
 	}
 }/*}}}*/
 
-void HeaderList::updateTrackList()/*{{{*/
+void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 {
 	printf("HeaderList::updateTrackList\n");
-	TrackHeader* item;
-	while(!m_headers.isEmpty() && (item = m_headers.takeAt(0)) != 0)
-	{
-		if(item)
-		{
-			item->stopProcessing();
-			item->hide();
-			m_dirtyheaders.append(item);
-		}
-	}
 	TrackList* l = song->visibletracks();
-	m_headers.clear();
-	int index = 0;
-	for (iTrack i = l->begin(); i != l->end();++index, ++i)
+	//Attempt to prevent widget destruction recreation cycle and just set 
+	//the track on the header instead. I will also try to never recreate 
+	//the list at all unless the size changes and when that happens just add the 
+	//new tracks and update the old headers with the new track of thier own.
+	int lsize = l->size();
+	if(viewupdate && !m_headers.isEmpty() && lsize == m_headers.size())
 	{
-		Track* track = *i;
-		//Track::TrackType type = track->type();
-		//int trackHeight = track->height();
-		TrackHeader* header = new TrackHeader(track, this);
-		header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-		header->setFixedHeight(track->height());
-		connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
-		connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
-		connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
-		m_headers.append(header);
-		m_layout->insertWidget(index, header);
+		printf("Using optimized update\n");
+		iTrack i = l->begin();
+		foreach(TrackHeader* header, m_headers)
+		{
+			if((*i) != header->track())
+			{
+				//Set the new track on the header
+				header->setTrack((*i));
+			}
+			else
+			{
+				//Just let the header update itself as the track has not changed
+				header->songChanged(-1);
+			}
+			++i;
+		}
+		return;
 	}
-	//Request a cleanup on the next song change, this should be frequent enough to 
-	//keep things tidy, If it proves not to be we just switch to the heartBeat that is 
-	//20ms guaranteed.
-	wantCleanup = true;
+	else if(viewupdate && !m_headers.isEmpty() && lsize < m_headers.size())
+	{
+		printf("Using optimized update\n");
+		int remcount = m_headers.size() - lsize;
+		for(int i = 0; i < remcount; ++i)
+		{
+			TrackHeader *h = m_headers.takeLast();
+			h->stopProcessing();
+			m_dirtyheaders.append(h);
+		}
+		int hcount = 0;
+		for(iTrack i = l->begin(); i != l->end(); ++hcount, ++i)
+		{
+			m_headers.at(hcount)->setTrack((*i));
+		}
+		wantCleanup = true;
+		return;
+	}
+	else if(viewupdate && !m_headers.isEmpty() && lsize > m_headers.size())
+	{
+		printf("Using optimized update\n");
+		int hcount = m_headers.size();
+		int addcount = 0;
+		for(iTrack i = l->begin(); i != l->end(); ++addcount, ++i)
+		{
+			if(addcount < hcount)
+				m_headers.at(addcount)->setTrack((*i));
+			else
+			{
+				TrackHeader* header = new TrackHeader((*i), this);
+				header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+				header->setFixedHeight((*i)->height());
+				connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
+				connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
+				connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
+				m_layout->insertWidget(m_headers.size(), header);
+				m_headers.append(header);
+			}
+		}
+		return;
+	}
+	else
+	{
+		TrackHeader* item;
+		while(!m_headers.isEmpty() && (item = m_headers.takeAt(0)) != 0)
+		{
+			if(item)
+			{
+				item->stopProcessing();
+				item->hide();
+				m_dirtyheaders.append(item);
+			}
+		}
+		m_headers.clear();
+		int index = 0;
+		for (iTrack i = l->begin(); i != l->end();++index, ++i)
+		{
+			Track* track = *i;
+			//Track::TrackType type = track->type();
+			//int trackHeight = track->height();
+			TrackHeader* header = new TrackHeader(track, this);
+			header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+			header->setFixedHeight(track->height());
+			connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
+			connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
+			connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
+			m_headers.append(header);
+			m_layout->insertWidget(index, header);
+		}
+		//Request a cleanup on the next song change, this should be frequent enough to 
+		//keep things tidy, If it proves not to be we just switch to the heartBeat that is 
+		//20ms guaranteed.
+		wantCleanup = true;
+	}
 	printf("Leaving updateTrackList\n");
 }/*}}}*/
 
@@ -167,7 +237,7 @@ Track* HeaderList::y2Track(int y) const/*{{{*/
 
 void HeaderList::tracklistChanged()/*{{{*/
 {
-	//updateTrackList();
+	updateTrackList(true);
 }/*}}}*/
 
 bool HeaderList::isEditing()/*{{{*/
@@ -477,7 +547,7 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 				}
 			}
 			audio->msgMoveTrack(sTrack, dTrack);
-			updateTrackList();
+			updateTrackList(true);
 		}
 		
 		if (event->source() != this)

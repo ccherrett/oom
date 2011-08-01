@@ -50,7 +50,9 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 : QFrame(parent)
 {
 	setupUi(this);
-	m_track = t;
+	m_track = 0;
+	m_pan = 0;
+	m_slider = 0;
 	m_tracktype = 0;
 	m_channels = 2;
 	setupStyles();
@@ -66,52 +68,15 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_nopopulate = false;
 	panVal = 0.0;
 	volume = 0.0;
+	setObjectName("TrackHeader");
 	setFrameStyle(QFrame::StyledPanel|QFrame::Raised);
 	m_buttonHBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	m_buttonVBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 	m_panBox->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-	initPan();
-	initVolume();
-	m_trackName->installEventFilter(this);
-	m_trackName->setReadOnly(true);
-
-	setMouseTracking(true);
-	if(m_track)/*{{{*/
-	{
-		Track::TrackType type = m_track->type();
-		m_tracktype = (int)type;
-		setObjectName("TrackHeader");
-		/*switch (type)
-		{
-			case Track::MIDI:
-			case Track::DRUM:
-				setObjectName("MidiTrackHeader");
-			break;
-			case Track::WAVE:
-				setObjectName("WaveHeader");
-			break;
-			case Track::AUDIO_OUTPUT:
-				setObjectName("AudioOutHeader");
-			break;
-			case Track::AUDIO_INPUT:
-				setObjectName("AudioInHeader");
-			break;
-			case Track::AUDIO_BUSS:
-				setObjectName("AudioBussHeader");
-			break;
-			case Track::AUDIO_AUX:
-				setObjectName("AuxHeader");
-			break;
-			case Track::AUDIO_SOFTSYNTH:
-				setObjectName("SynthTrackHeader");
-			break;
-		}*/
-		if(!m_track->isMidiTrack())
-		{
-			//populateAutomationTable();
-		}
-	}/*}}}*/
 	setAcceptDrops(false);
+	setMouseTracking(true);
+	
+	m_trackName->installEventFilter(this);
 	m_trackName->setAcceptDrops(false);
 	m_btnSolo->setAcceptDrops(false);
 	m_btnSolo->setIcon(*solo_trackIconSet3);
@@ -126,25 +91,9 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_btnReminder1->setIcon(*reminder1IconSet3);
 	m_btnReminder2->setIcon(*reminder2IconSet3);
 	m_btnReminder3->setIcon(*reminder3IconSet3);
-	m_pan->setAcceptDrops(false);
-	if(m_track)
-	{
-		setSelected(m_track->selected());
-		if(m_track->height() < MIN_TRACKHEIGHT)
-		{
-			setFixedHeight(MIN_TRACKHEIGHT);
-			m_track->setHeight(MIN_TRACKHEIGHT);
-		}
-		else
-		{
-			setFixedHeight(m_track->height());
-		}
-		if(m_track->isMidiTrack())
-			m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
-		else
-			m_btnAutomation->setIcon(*automation_trackIconSet3);
-	}
-	songChanged(-1);
+
+	setTrack(t);
+
 	connect(m_trackName, SIGNAL(editingFinished()), this, SLOT(updateTrackName()));
 	connect(m_trackName, SIGNAL(returnPressed()), this, SLOT(updateTrackName()));
 	connect(m_trackName, SIGNAL(textEdited(QString)), this, SLOT(setEditing()));
@@ -185,6 +134,46 @@ bool TrackHeader::isSelected()/*{{{*/
 		return false;
 	return m_track->selected();
 }/*}}}*/
+
+void TrackHeader::setTrack(Track* track)
+{
+	if(m_track)
+	{
+		if(m_slider)
+			delete m_slider;
+		Meter* m;
+		while(!meter.isEmpty() && (m = meter.takeAt(0)) != 0)
+		{
+			delete m;
+		}
+	}
+	m_track = track;
+	if(!m_track)
+		return;
+	Track::TrackType type = m_track->type();
+	m_tracktype = (int)type;
+	initPan();
+	initVolume();
+	m_trackName->setText(m_track->name());
+
+	if(m_pan)
+		m_pan->setAcceptDrops(false);
+	//setSelected(m_track->selected());
+	if(m_track->height() < MIN_TRACKHEIGHT)
+	{
+		setFixedHeight(MIN_TRACKHEIGHT);
+		m_track->setHeight(MIN_TRACKHEIGHT);
+	}
+	else
+	{
+		setFixedHeight(m_track->height());
+	}
+	if(m_track->isMidiTrack())
+		m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
+	else
+		m_btnAutomation->setIcon(*automation_trackIconSet3);
+	songChanged(-1);
+}
 
 //Public slots
 
@@ -235,7 +224,10 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 			m_slider->setRange(config.minSlider - 0.1, 10.0);
 
 			for (int c = 0; c < ((AudioTrack*)m_track)->channels(); ++c)
-				meter[c]->setRange(config.minMeter, 10.0);
+			{
+				if(!meter.isEmpty() && c > meter.size())
+					meter.at(c)->setRange(config.minMeter, 10.0);
+			}
 		}
 	}
 
@@ -302,8 +294,10 @@ void TrackHeader::heartBeat()/*{{{*/
 		if ((int) dact > track->lastActivity())
 			track->setLastActivity((int) dact);
 
-		if (meter[0] && m_meterVisible)
-			meter[0]->setVal(dact, track->lastActivity(), false);
+		foreach(Meter* m, meter)
+			m->setVal(dact, track->lastActivity(), false);
+		//if (meter[0] && m_meterVisible)
+		//	meter[0]->setVal(dact, track->lastActivity(), false);
 
 		// Gives reasonable decay with gui update set to 20/sec.
 		if (act)
@@ -367,9 +361,9 @@ void TrackHeader::heartBeat()/*{{{*/
 		{
 			for (int ch = 0; ch < ((AudioTrack*)m_track)->channels(); ++ch)
 			{
-				if (meter[ch])
+				if (!meter.isEmpty() && ch < meter.size())
 				{
-					meter[ch]->setVal(((AudioTrack*)m_track)->meter(ch), ((AudioTrack*)m_track)->peak(ch), false);
+					meter.at(ch)->setVal(((AudioTrack*)m_track)->meter(ch), ((AudioTrack*)m_track)->peak(ch), false);
 				}
 			}
 		}
@@ -1467,15 +1461,15 @@ void TrackHeader::updateChannels()/*{{{*/
 			int size = 3+m_channels;
 			for (int cc = m_channels; cc < c; ++size, ++cc)
 			{
-				//meter[cc] = new Meter(this);
-				meter[cc] = new Meter(this, m_track->type(), Meter::DBMeter, Qt::Horizontal);
-				meter[cc]->setRange(config.minMeter, 10.0);
-				meter[cc]->setFixedHeight(5);
-				meter[cc]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-				connect(meter[cc], SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
-				connect(meter[cc], SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
-				m_buttonVBox->addWidget(meter[cc]);
-				meter[cc]->show();
+				Meter* metercc = new Meter(this, m_track->type(), Meter::DBMeter, Qt::Horizontal);
+				metercc->setRange(config.minMeter, 10.0);
+				metercc->setFixedHeight(5);
+				metercc->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+				connect(metercc, SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
+				connect(metercc, SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
+				meter.append(metercc);
+				m_buttonVBox->addWidget(metercc);
+				metercc->show();
 			}
 		}
 		else if (c < m_channels)
@@ -1483,8 +1477,8 @@ void TrackHeader::updateChannels()/*{{{*/
 			//printf("Going mono\n");
 			for (int cc = m_channels - 1; cc >= c; --cc)
 			{
-				delete meter[cc];
-				meter[cc] = 0;
+				if(!meter.isEmpty() && cc < meter.size())
+					delete meter.takeAt(cc);
 			}
 		}
 		m_channels = c;
@@ -1521,6 +1515,12 @@ void TrackHeader::initPan()/*{{{*/
 		case Track::AUDIO_SOFTSYNTH:
 			img = QString(":images/knob_audio_new.png");
 		break;
+	}
+	bool update = false;
+	if(m_pan)
+	{
+		update = true;
+		delete m_pan;
 	}
 	if(m_track->isMidiTrack())
 	{
@@ -1564,10 +1564,17 @@ void TrackHeader::initPan()/*{{{*/
 
 		m_pan->setValue(double(v));
 
-		m_panLayout->addItem(new QSpacerItem(30, 9, QSizePolicy::Fixed, QSizePolicy::Fixed));
-		m_panLayout->addWidget(m_pan);
+		if(!update)
+		{
+			m_panLayout->addItem(new QSpacerItem(30, 9, QSizePolicy::Fixed, QSizePolicy::Fixed));
+			m_panLayout->addWidget(m_pan);
+			m_panLayout->addItem(new QSpacerItem(30, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
+		}
+		else
+		{
+			m_panLayout->insertWidget(1, m_pan);
+		}
 		m_pan->show();
-		m_panLayout->addItem(new QSpacerItem(30, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
 
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		//connect(m_pan, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(controlRightClicked(const QPoint &, int)));
@@ -1582,10 +1589,17 @@ void TrackHeader::initPan()/*{{{*/
 		m_pan->setIgnoreWheel(true);
 		m_pan->setBackgroundRole(QPalette::Mid);
 		m_pan->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-		m_panLayout->addItem(new QSpacerItem(30, 9, QSizePolicy::Fixed, QSizePolicy::Fixed));
-		m_panLayout->addWidget(m_pan);
+		if(!update)
+		{
+			m_panLayout->addItem(new QSpacerItem(30, 9, QSizePolicy::Fixed, QSizePolicy::Fixed));
+			m_panLayout->addWidget(m_pan);
+			m_panLayout->addItem(new QSpacerItem(30, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
+		}
+		else
+		{
+			m_panLayout->insertWidget(1, m_pan);
+		}
 		m_pan->show();
-		m_panLayout->addItem(new QSpacerItem(30, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
 		connect(m_pan, SIGNAL(sliderMoved(double, int)), SLOT(panChanged(double)));
 		connect(m_pan, SIGNAL(sliderPressed(int)), SLOT(panPressed()));
 		connect(m_pan, SIGNAL(sliderReleased(int)), SLOT(panReleased()));
@@ -1596,6 +1610,7 @@ void TrackHeader::initVolume()/*{{{*/
 {
 	if(!m_track)
 		return;
+	bool update = false;
 	if(m_track->isMidiTrack())
 	{
 		MidiTrack* track = (MidiTrack*)m_track;
@@ -1618,14 +1633,14 @@ void TrackHeader::initVolume()/*{{{*/
 		connect(m_slider, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(volumeRightClicked(const QPoint &, int)));
 		connect(m_slider, SIGNAL(sliderPressed(int)), SLOT(updateSelection()));
 
-		meter[0] = new Meter(this, m_track->type(), Meter::LinMeter, Qt::Horizontal);
-		meter[0]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-		meter[0]->setRange(0, 127.0);
-		meter[0]->setFixedHeight(5);
-		//meter[0]->setFixedWidth(150);
-		m_buttonVBox->addWidget(meter[0]);
-		connect(meter[0], SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
-		connect(meter[0], SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
+		Meter* m = new Meter(this, m_track->type(), Meter::LinMeter, Qt::Horizontal);
+		m->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+		m->setRange(0, 127.0);
+		m->setFixedHeight(5);
+		//m->setFixedWidth(150);
+		m_buttonVBox->addWidget(m);
+		connect(m, SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
+		connect(m, SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
 	}
 	else
 	{
@@ -1648,18 +1663,20 @@ void TrackHeader::initVolume()/*{{{*/
 
 		for (int i = 0; i < channels; ++i)/*{{{*/
 		{
-			meter[i] = new Meter(this, m_track->type(), Meter::DBMeter, Qt::Horizontal);
-			meter[i]->setRange(config.minMeter, 10.0);
-			meter[i]->setFixedHeight(5);
-			//meter[i]->setFixedWidth(150);
-			meter[i]->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-			connect(meter[i], SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
-			connect(meter[i], SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
-			//connect(meter[i], SIGNAL(meterClipped()), this, SLOT(playbackClipped()));
-			m_buttonVBox->addWidget(meter[i]);
+			Meter* m = new Meter(this, m_track->type(), Meter::DBMeter, Qt::Horizontal);
+			m->setRange(config.minMeter, 10.0);
+			m->setFixedHeight(5);
+			//m->setFixedWidth(150);
+			m->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+			connect(m, SIGNAL(mousePress(bool)), this, SLOT(resetPeaks(bool)));
+			connect(m, SIGNAL(mousePress(bool)), this, SLOT(updateSelection(bool)));
+			//connect(m, SIGNAL(meterClipped()), this, SLOT(playbackClipped()));
+			meter.append(m);
+			m_buttonVBox->addWidget(m);
 		}/*}}}*/
 		m_channels = channels;
 	}
+	printf("TrackHeader::initVolume - button row item count: %d\n", m_buttonVBox->count());
 }/*}}}*/
 
 void TrackHeader::setupStyles()/*{{{*/
@@ -1850,10 +1867,10 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 		m_meterVisible = size.height() >= MIN_TRACKHEIGHT_VU;
 		m_sliderVisible = size.height() >= MIN_TRACKHEIGHT_SLIDER;
 		m_toolsVisible = (size.height() >= MIN_TRACKHEIGHT_TOOLS && !m_track->isMidiTrack());
-		if(m_track->isMidiTrack())
+		foreach(Meter* m, meter)
+			m->setVisible(m_meterVisible);
+		/*if(m_track->isMidiTrack())
 		{
-			if(meter[0])
-				meter[0]->setVisible(m_meterVisible);
 		}
 		else
 		{
@@ -1864,7 +1881,7 @@ void TrackHeader::resizeEvent(QResizeEvent* event)/*{{{*/
 					meter[ch]->setVisible(m_meterVisible);
 				}
 			}
-		}
+		}*/
 		if(m_slider)
 			m_slider->setVisible(m_sliderVisible);
 		if(m_pan)
