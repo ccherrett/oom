@@ -1157,6 +1157,27 @@ void Song::setPunchout(bool f)
 
 void Song::setClick(bool val)
 {
+	if(val)/*{{{*/
+	{
+		AudioOutput* master = (AudioOutput*)findTrack("Master");
+		bool hasoutput = (master && master->sendMetronome());
+		if(!hasoutput)
+		{
+			for (iAudioOutput iao = _outputs.begin(); iao != _outputs.end(); ++iao)
+			{
+				AudioOutput* t = (AudioOutput*)*iao;
+				if(t && t->sendMetronome())
+				{
+					hasoutput = true;
+					break;
+				}
+			}
+		}
+		if(!hasoutput || !audioClickFlag)
+		{
+			oom->configMetronome();
+		}
+	}/*}}}*/
 	if (_click != val)
 	{
 		_click = val;
