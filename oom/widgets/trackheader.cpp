@@ -212,6 +212,15 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 	{
 		setFixedHeight(m_track->height());
 	}
+	m_meterVisible = m_track->height() >= MIN_TRACKHEIGHT_VU;
+	m_sliderVisible = m_track->height() >= MIN_TRACKHEIGHT_SLIDER;
+	m_toolsVisible = (m_track->height() >= MIN_TRACKHEIGHT_TOOLS && !m_track->isMidiTrack());
+	foreach(Meter* m, meter)
+		m->setVisible(m_meterVisible);
+	if(m_slider)
+		m_slider->setVisible(m_sliderVisible);
+	if(m_pan)
+		m_pan->setVisible(m_sliderVisible);
 	m_processEvents = true;
 	//songChanged(-1);
 }/*}}}*/
@@ -291,7 +300,7 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 	if (flags & SC_RECFLAG)
 	{
 		//printf("TrackHeader::songChanged SC_RECFLAG\n");
-		m_btnRecord->blockSignals(true);/*{{{*/
+		m_btnRecord->blockSignals(true);
 		m_btnRecord->setChecked(m_track->recordFlag());
 		m_btnRecord->blockSignals(false);
 	}
@@ -307,7 +316,7 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 	if (flags & SC_TRACK_MODIFIED)
 	{
 		//printf("TrackHeader::songChanged SC_TRACK_MODIFIED updating all\n");
-		m_btnRecord->blockSignals(true);/*{{{*/
+		m_btnRecord->blockSignals(true);
 		m_btnRecord->setChecked(m_track->recordFlag());
 		m_btnRecord->blockSignals(false);
 
@@ -345,7 +354,7 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 		else
 		{
 			setFixedHeight(m_track->height());
-		}/*}}}*/
+		}
 	}
 }/*}}}*/
 
