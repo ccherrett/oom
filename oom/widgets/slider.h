@@ -46,6 +46,7 @@ private:
 
     QRect d_sliderRect;
 	QColor d_sliderBgColor;
+	bool d_usePixmap;
 
     int d_thumbLength;
     int d_thumbHalf;
@@ -65,6 +66,13 @@ private:
     int d_bgStyle;
     int markerPos;
 
+	QPixmap *m_pixmap_h;
+	QPixmap *m_pixmap_w;
+	int m_height;
+	int m_width;
+	QPixmap m_scaledPixmap_w;
+	QPixmap m_scaledPixmap_h;
+
     void drawHsBgSlot(QPainter *, const QRect&, const QRect&, const QBrush&);
     void drawVsBgSlot(QPainter *, const QRect&, const QRect&, const QBrush&);
 
@@ -83,7 +91,7 @@ public:
     Slider(QWidget *parent, const char *name = 0,
             Qt::Orientation orient = Qt::Vertical,
             ScalePos scalePos = None,
-            int bgStyle = BgTrough, QColor sliderBg = QColor(255, 0, 0));
+            int bgStyle = BgTrough, QColor sliderBg = QColor(255, 0, 0), bool usepixmap = false);
 
     ~Slider();
     void setThumbLength(int l);
@@ -102,5 +110,6 @@ public:
     void setMargins(int x, int y);
     QSize sizeHint(); // const;
 	void setSliderBackground(QColor);
+	void setUsePixmap(bool pix = true);
 };
 #endif

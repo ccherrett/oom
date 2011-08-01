@@ -33,6 +33,7 @@ class QScrollArea;
 class QSPacerItem;
 class QTabWidget;
 class QPixmap;
+class QColor;
 
 static const int STRIP_WIDTH = 65;
 
@@ -101,6 +102,7 @@ protected:
 
     QGridLayout* sliderGrid;
     ComboBox* autoType;
+	QColor m_sliderBg;
     void setLabelText();
 	virtual void trackChanged() = 0;
 

@@ -243,10 +243,43 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 	//{
 		if(m_selected)
 		{
+			bool usePixmap = false;
+			QColor sliderBgColor = g_trackColorListSelected.value(m_track->type());/*{{{*/
+   		    switch(vuColorStrip)
+   		    {
+   		        case 0:
+   		            sliderBgColor = g_trackColorListSelected.value(m_track->type());
+   		        break;
+   		        case 1:
+   		            //if(width() != m_width)
+   		            //    m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
+   		            //m_width = width();
+   		            //myPen.setBrush(m_scaledPixmap_w);
+   		            //myPen.setBrush(m_trackColor);
+   		            sliderBgColor = g_trackColorListSelected.value(m_track->type());
+					usePixmap = true;
+   		        break;
+   		        case 2:
+   		            sliderBgColor = QColor(0,166,172);
+   		            //myPen.setBrush(QColor(0,166,172));//solid blue
+   		        break;
+   		        case 3:
+   		            sliderBgColor = QColor(131,131,131);
+   		            //myPen.setBrush(QColor(131,131,131));//solid grey
+   		        break;
+   		        default:
+   		            sliderBgColor = g_trackColorListSelected.value(m_track->type());
+   		            //myPen.setBrush(m_trackColor);
+   		        break;
+   		    }/*}}}*/
 			//m_trackName->setFont();
 			m_trackName->setStyleSheet(m_selectedStyle[m_tracktype]);
 			setStyleSheet(trackHeaderStyleSelected);
-			m_slider->setSliderBackground(g_trackColorListSelected.value(m_track->type()));
+			//m_slider->setSliderBackground(g_trackColorListSelected.value(m_track->type()));
+			if(usePixmap)
+				m_slider->setUsePixmap();
+			else
+				m_slider->setSliderBackground(sliderBgColor);
 			m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorListLine.value(m_track->type()).name()));
 		}
 		else
@@ -1690,6 +1723,35 @@ void TrackHeader::initPan()/*{{{*/
 
 void TrackHeader::initVolume()/*{{{*/
 {
+	bool usePixmap = false;
+	QColor sliderBgColor = g_trackColorList.value(m_track->type());/*{{{*/
+   	switch(vuColorStrip)
+   	{
+   	    case 0:
+   	        sliderBgColor = g_trackColorList.value(m_track->type());
+   	    break;
+   	    case 1:
+   	        //if(width() != m_width)
+   	        //    m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
+   	        //m_width = width();
+   	        //myPen.setBrush(m_scaledPixmap_w);
+   	        //myPen.setBrush(m_trackColor);
+   	        sliderBgColor = g_trackColorList.value(m_track->type());
+			usePixmap = true;
+   	    break;
+   	    case 2:
+   	        sliderBgColor = QColor(0,166,172);
+   	        //myPen.setBrush(QColor(0,166,172));//solid blue
+   	    break;
+   	    case 3:
+   	        sliderBgColor = QColor(131,131,131);
+   	        //myPen.setBrush(QColor(131,131,131));//solid grey
+   	    break;
+   	    default:
+   	        sliderBgColor = g_trackColorList.value(m_track->type());
+   	        //myPen.setBrush(m_trackColor);
+   	    break;
+   	}/*}}}*/
 	if(!m_track)
 		return;
 	if(m_track->isMidiTrack())
@@ -1701,7 +1763,7 @@ void TrackHeader::initVolume()/*{{{*/
 		int mn = mc->minVal();
 		int mx = mc->maxVal();
 
-		m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, g_trackColorList.value(m_track->type()));
+		m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, usePixmap);
 		m_slider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 		m_slider->setCursorHoming(true);
 		m_slider->setRange(double(mn), double(mx), 1.0);
@@ -1727,7 +1789,7 @@ void TrackHeader::initVolume()/*{{{*/
 	else
 	{
 		int channels = ((AudioTrack*)m_track)->channels();
-		m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, g_trackColorList.value(m_track->type()));
+		m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, usePixmap);
 		m_slider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 		m_slider->setCursorHoming(true);
 		m_slider->setRange(config.minSlider - 0.1, 10.0);

@@ -39,9 +39,16 @@
 //------------------------------------------------------------
 
 Slider::Slider(QWidget *parent, const char *name,
-		Qt::Orientation orient, ScalePos scalePos, int bgStyle, QColor sliderBg)
+		Qt::Orientation orient, ScalePos scalePos, int bgStyle, QColor sliderBg, bool usepixmap)
 : SliderBase(parent, name)
 {
+	d_usePixmap = usepixmap;
+	m_pixmap_h = new QPixmap(":/images/vugrad.png");
+	m_pixmap_w = new QPixmap(":/images/vugrad_h.png");
+	m_height = 0;
+	m_width = 0;
+	m_scaledPixmap_w = m_pixmap_w->scaled(0, 1, Qt::IgnoreAspectRatio);
+	m_scaledPixmap_h = m_pixmap_h->scaled(1, 0, Qt::IgnoreAspectRatio);
 	if (bgStyle == BgSlot)
 	{
 		if(orient == Qt::Horizontal)
@@ -88,7 +95,15 @@ Slider::Slider(QWidget *parent, const char *name,
 void Slider::setSliderBackground(QColor color)
 {
 	d_sliderBgColor = QColor(color);
-	update();
+	d_usePixmap = false;
+	repaint();
+	//update();
+}
+
+void Slider::setUsePixmap(bool val)
+{
+	d_usePixmap = val;
+	repaint();
 }
 
 
@@ -361,7 +376,18 @@ void Slider::drawSlider(QPainter *p, const QRect &r)
 void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb, const QBrush &brBack)
 {
 	QPen myPen = QPen();
-	myPen.setBrush(d_sliderBgColor);
+	if(d_usePixmap)
+	{
+		//Do you thing
+   		if(width() != m_width)
+   		    m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
+   		m_width = width();
+   		myPen.setBrush(m_scaledPixmap_w);
+	}
+	else
+	{
+		myPen.setBrush(d_sliderBgColor);
+	}
 	myPen.setWidth(1);
 
 	QColor darkColor = QColor(12, 12, 12);
@@ -448,7 +474,17 @@ void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb,
 void Slider::drawVsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb, const QBrush&/*brBack*/)
 {
 	QPen myPen = QPen();
-	myPen.setBrush(d_sliderBgColor);
+	if(d_usePixmap)
+	{
+		if(height() != m_height)
+		    m_scaledPixmap_h = m_pixmap_h->scaled(1, height(), Qt::IgnoreAspectRatio);
+		m_height = height();
+		myPen.setBrush(m_scaledPixmap_h);
+	}
+	else
+	{
+		myPen.setBrush(d_sliderBgColor);
+	}
 	myPen.setWidth(1);
 
 	QColor darkColor = QColor(17, 31, 40);

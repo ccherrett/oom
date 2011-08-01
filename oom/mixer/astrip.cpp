@@ -152,8 +152,39 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 	sliderGrid->setRowStretch(0, 100);
 	sliderGrid->setContentsMargins(0, 0, 8, 0);
 	sliderGrid->setSpacing(0);
+	bool usePixmap = false;
+	QColor sliderBgColor = g_trackColorListSelected.value(track->type());/*{{{*/
+    switch(vuColorStrip)
+    {
+        case 0:
+            sliderBgColor = g_trackColorListSelected.value(track->type());
+        break;
+        case 1:
+            //if(width() != m_width)
+            //    m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
+            //m_width = width();
+            //myPen.setBrush(m_scaledPixmap_w);
+            //myPen.setBrush(m_trackColor);
+            sliderBgColor = QColor(0,0,0);
+			usePixmap = true;
+        break;
+        case 2:
+            sliderBgColor = QColor(0,166,172);
+            //myPen.setBrush(QColor(0,166,172));//solid blue
+        break;
+        case 3:
+            sliderBgColor = QColor(131,131,131);
+            //myPen.setBrush(QColor(131,131,131));//solid grey
+        break;
+        default:
+            sliderBgColor = g_trackColorListSelected.value(track->type());
+            //myPen.setBrush(m_trackColor);
+        break;
+    }/*}}}*/
 
-	slider = new Slider(this, "vol", Qt::Vertical, Slider::None, Slider::BgSlot, g_trackColorListSelected.value(t->type()));
+	m_sliderBg = sliderBgColor;
+
+	slider = new Slider(this, "vol", Qt::Vertical, Slider::None, Slider::BgSlot, sliderBgColor, usePixmap);
 	slider->setCursorHoming(true);
 	slider->setRange(config.minSlider - 0.1, 10.0);
 	slider->setFixedWidth(20);
@@ -360,6 +391,46 @@ void AudioStrip::heartBeat()
 	Strip::heartBeat();
 	updateVolume();
 	updatePan();
+	bool usePixmap = false;
+	QColor sliderBgColor = g_trackColorListSelected.value(track->type());/*{{{*/
+    switch(vuColorStrip)
+    {
+        case 0:
+            sliderBgColor = g_trackColorListSelected.value(track->type());
+        break;
+        case 1:
+            //if(width() != m_width)
+            //    m_scaledPixmap_w = m_pixmap_w->scaled(width(), 1, Qt::IgnoreAspectRatio);
+            //m_width = width();
+            //myPen.setBrush(m_scaledPixmap_w);
+            //myPen.setBrush(m_trackColor);
+            sliderBgColor = QColor(0,0,0);
+			usePixmap = true;
+        break;
+        case 2:
+            sliderBgColor = QColor(0,166,172);
+            //myPen.setBrush(QColor(0,166,172));//solid blue
+        break;
+        case 3:
+            sliderBgColor = QColor(131,131,131);
+            //myPen.setBrush(QColor(131,131,131));//solid grey
+        break;
+        default:
+            sliderBgColor = g_trackColorListSelected.value(track->type());
+            //myPen.setBrush(m_trackColor);
+        break;
+    }/*}}}*/
+	if(sliderBgColor.name() != m_sliderBg.name())
+	{//color changed update the slider
+		if(slider)
+		{
+			if(usePixmap)
+				slider->setUsePixmap();
+			else
+				slider->setSliderBackground(sliderBgColor);
+		}	
+		m_sliderBg = sliderBgColor;
+	}
 }
 
 //---------------------------------------------------------

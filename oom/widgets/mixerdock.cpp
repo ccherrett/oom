@@ -259,7 +259,7 @@ void MixerDock::generateVUColorMenu()/*{{{*/
 				vuColorStrip = 0;
 				break;
 		}
-		//song->update(SC_CONFIG);
+		song->update(SC_SELECTION);
 		oom->changeConfig(true); // save settings
 	}	
 }/*}}}*/
