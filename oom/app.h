@@ -280,7 +280,6 @@ private slots:
 
     void configMidiFile();
     void configShortCuts();
-    void configMetronome();
     //void configAppearance();
     void startEditor(PartList*, int);
     void startMasterEditor();
@@ -368,6 +367,7 @@ public slots:
     void setUsedTool(int);
     void showDidYouKnowDialog();
     void importWave(Track* track = NULL);
+    void configMetronome();
 
     void routingPopupMenuAboutToHide();
     void configMidiAssign(int tab = -1);
