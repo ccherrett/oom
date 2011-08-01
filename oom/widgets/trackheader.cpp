@@ -155,6 +155,7 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 	initPan();
 	initVolume();
 	m_trackName->setText(m_track->name());
+	m_trackName->setReadOnly(true);
 
 	if(m_pan)
 		m_pan->setAcceptDrops(false);
@@ -200,7 +201,6 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 	m_trackName->blockSignals(true);
 	m_trackName->setText(m_track->name());
 	m_trackName->blockSignals(false);
-	//m_trackName->setReadOnly((m_track->name() == "Master"));
 	setSelected(m_track->selected());
 	//setProperty("selected", m_track->selected());
 	if(m_track->height() < MIN_TRACKHEIGHT)
