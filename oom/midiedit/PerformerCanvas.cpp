@@ -1424,6 +1424,16 @@ void PerformerCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quant
 				{
 					song->setRecordFlag(track(), false);
 				}
+				PartList *pl = editor->parts();
+				if(pl && !pl->empty())
+				{
+					for(iPart p = pl->begin(); p != pl->end(); ++p)
+					{
+						Track* t = p->second->track();
+						if(t != track() && t != newpt->track())
+							song->setRecordFlag(t, false);
+					}
+				}
 				editor->setCurCanvasPart(newpt);
 				// and turn it on for the new parts track
 				song->setRecordFlag(track(), true);
@@ -1481,6 +1491,16 @@ void PerformerCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quant
 				if (_curPart)
 				{
 					song->setRecordFlag(track(), false);
+				}
+				PartList *pl = editor->parts();
+				if(pl && !pl->empty())
+				{
+					for(iPart p = pl->begin(); p != pl->end(); ++p)
+					{
+						Track* t = p->second->track();
+						if(t != track() && t != newpt->track())
+							song->setRecordFlag(t, false);
+					}
 				}
 				editor->setCurCanvasPart(newpt);
 				// and turn it on for the new parts track
