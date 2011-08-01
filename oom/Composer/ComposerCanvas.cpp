@@ -2267,7 +2267,10 @@ void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.setBrush(partWaveColor);
 		if (wp)
 		{
-			p.setPen(Qt::NoPen);
+			if(m_myLeftFlag || m_myRightFlag)
+				p.setPen(partColor);
+			else
+				p.setPen(Qt::NoPen);
 			if (_tool == AutomationTool)
 				p.setBrush(partWaveColorAutomation);
 		}
