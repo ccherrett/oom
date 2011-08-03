@@ -255,12 +255,12 @@ void SndFile::read(SampleV* s, int mag, unsigned pos, bool overwrite)
 	{
 		float data[channels()][mag];
 		float* fp[channels()];
-#pragma omp parallel for
+//#pragma omp parallel for
 		for (unsigned i = 0; i < channels(); ++i)
 			fp[i] = &data[i][0];
 
 		sf_count_t ret = 0;
-		#pragma omp parallel shared(ret) 
+		//#pragma omp parallel shared(ret) 
 		{
 			if (sfUI)
 				ret = sf_seek(sfUI, pos, SEEK_SET);
@@ -287,7 +287,7 @@ void SndFile::read(SampleV* s, int mag, unsigned pos, bool overwrite)
 
 			if (srcChannels == dstChannels)
 			{
-#pragma omp parallel for
+//#pragma omp parallel for
 				for (size_t i = 0; i < rn; ++i)
 				{
 					for (int ch = 0; ch < srcChannels; ++ch)
@@ -297,14 +297,14 @@ void SndFile::read(SampleV* s, int mag, unsigned pos, bool overwrite)
 			else if ((srcChannels == 1) && (dstChannels == 2))
 			{
 				// stereo to mono
-#pragma omp parallel for
+//#pragma omp parallel for
 				for (size_t i = 0; i < rn; ++i)
 					*(dst[0] + i) = src[i + i] + src[i + i + 1];
 			}
 			else if ((srcChannels == 2) && (dstChannels == 1))
 			{
 				// mono to stereo
-#pragma omp parallel for
+//#pragma omp parallel for
 				for (size_t i = 0; i < rn; ++i)
 				{
 					float data = *src++;
@@ -314,7 +314,7 @@ void SndFile::read(SampleV* s, int mag, unsigned pos, bool overwrite)
 			}
 		}
 
-#pragma omp parallel for
+//#pragma omp parallel for
 		for (unsigned ch = 0; ch < channels(); ++ch)
 		{
 
@@ -344,7 +344,7 @@ void SndFile::read(SampleV* s, int mag, unsigned pos, bool overwrite)
 		if (rest < mag)
 			end = rest;
 
-#pragma omp parallel for
+//#pragma omp parallel for
 		for (unsigned ch = 0; ch < channels(); ++ch)
 		{
 			int rms = 0;
