@@ -1679,9 +1679,6 @@ void OOMidi::addTransportToolbar()
 	spacer55555->setMaximumWidth(15);
 	tools->addWidget(spacer55555);
 
-	//QToolBar* transportToolbar = new QToolBar(tr("Transport"));
-	//addToolBar(Qt::BottomToolBarArea, transportToolbar);
-	//tools1->addActions(transportAction->actions());
     QSizeGrip* corner = new QSizeGrip(tools);
 	QWidget* spacer4444 = new QWidget();
 	spacer4444->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1691,14 +1688,6 @@ void OOMidi::addTransportToolbar()
 	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer3->setMaximumWidth(5);
 	tools->addWidget(spacer3);
-	// toolBar is a pointer to an existing toolbar
-	//transportToolbar->addWidget(spacer);
-	//transportToolbar->addActions(transportAction->actions());
-	//transportToolbar->addAction(panicAction);
-	//transportToolbar->setObjectName("tbTransport");
-	//transportToolbar->setAllowedAreas(Qt::BottomToolBarArea);
-	//transportToolbar->setFloatable(false);
-	//transportToolbar->setMovable(false);
 }
 
 //---------------------------------------------------------

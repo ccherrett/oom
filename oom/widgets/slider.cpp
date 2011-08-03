@@ -3,6 +3,7 @@
 
 #include <QPainter>
 #include <QResizeEvent>
+#include <QDebug>
 
 #include "slider.h"
 
@@ -375,6 +376,7 @@ void Slider::drawSlider(QPainter *p, const QRect &r)
 
 void Slider::drawHsBgSlot(QPainter *p, const QRect &rBound, const QRect &rThumb, const QBrush &brBack)
 {
+	Q_UNUSED(brBack)
 	QPen myPen = QPen();
 	if(d_usePixmap)
 	{

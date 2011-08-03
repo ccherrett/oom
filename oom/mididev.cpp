@@ -355,6 +355,12 @@ void MidiDevice::recordEvent(MidiRecordEvent& event)
 		int pv = ((event.dataA() & 0xff) << 8) + (event.dataB() & 0xff);
 		song->putEvent(pv);
 	}
+	//This was not sending noteoff events at all sometimes causing strange endless note in step rec
+	else if(typ == ME_NOTEOFF)
+	{
+		int pv = ((event.dataA() & 0xff) << 8) + (0x00);
+		song->putEvent(pv);
+	}
 
 	// Do not bother recording if it is NOT actually being used by a port.
 	// Because from this point on, process handles things, by selected port.

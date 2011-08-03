@@ -361,6 +361,12 @@ void MidiJackDevice::recordEvent(MidiRecordEvent& event)
 		int pv = ((event.dataA() & 0xff) << 8) + (event.dataB() & 0xff);
 		song->putEvent(pv);
 	}
+	//This was not sending noteoff events at all sometimes causing strange endless note in step rec
+	else if(typ == ME_NOTEOFF)
+	{
+		int pv = ((event.dataA() & 0xff) << 8) + (0x00);
+		song->putEvent(pv);
+	}
 
 	//if(_recordFifo.put(MidiPlayEvent(event)))
 	//  printf("MidiJackDevice::recordEvent: fifo overflow\n");
