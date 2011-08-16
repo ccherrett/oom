@@ -62,7 +62,7 @@ TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 
 	m_layout->addLayout(m_buttonBox);
 
-	songChanged(-1);
+	populateTable();
 	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
 	connect(m_selmodel, SIGNAL(currentRowChanged(const QModelIndex, const QModelIndex)), this, SLOT(selectionChanged(const QModelIndex, const QModelIndex)));
@@ -94,103 +94,108 @@ void TrackListView::displayRoleChanged(int role)/*{{{*/
 			m_displayRole = TrackRole;
 		break;
 	}
-	songChanged(-1);
+	populateTable();
 }/*}}}*/
 
 void TrackListView::songChanged(int flags)/*{{{*/
 {
-	if(flags == -1 || flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_COLOR_MODIFIED))
+	if(flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_COLOR_MODIFIED))
 	{
 		if(debugMsg)
 			printf("TrackListView::songChanged\n");
-		m_model->clear();
-		for(iTrack i = song->artracks()->begin(); i != song->artracks()->end(); ++i)
-		{
-			if(!(*i)->isMidiTrack())
-				continue;
-			MidiTrack* track = (MidiTrack*)(*i);
-			PartList* pl = track->parts();
-			if(m_displayRole == PartRole && pl->empty())
-			{
-				continue;
-			}
-			QList<QStandardItem*> trackRow;
-			QStandardItem* chkTrack = new QStandardItem(true);
-			chkTrack->setCheckable(true);
-			chkTrack->setBackground(QBrush(QColor(20,20,20)));
-			chkTrack->setData(1, TrackRole);
-			chkTrack->setData(track->name(), TrackNameRole);
-			if(m_selected.contains(track->name()))
-				chkTrack->setCheckState(Qt::Checked);
-			chkTrack->setEditable(false);
-			trackRow.append(chkTrack);
-			QStandardItem* trackName = new QStandardItem();
-			trackName->setForeground(QBrush(QColor(205,209,205)));
-			trackName->setBackground(QBrush(QColor(20,20,20)));
-			trackName->setFont(QFont("fixed-width", 10, QFont::Bold));
-			trackName->setText(track->name());
-			//QFont font = trackName->font();
-			trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-			trackName->setData(1, TrackRole);
-			trackName->setData(track->name(), TrackNameRole);
-			trackName->setEditable(true);
-			trackRow.append(trackName);
-			m_model->appendRow(trackRow);
+		populateTable();
+	}
+}
 
-			for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
-			{
-				QList<QStandardItem*> partsRow;
-				Part* part = ip->second;
-				QStandardItem* chkPart = new QStandardItem(true);
-				chkPart->setCheckable(true);
-				chkPart->setData(part->sn(), PartRole);
-				chkPart->setData(2, TrackRole);
-				chkPart->setData(track->name(), TrackNameRole);
-				chkPart->setData(part->tick(), TickRole);
-				chkPart->setEditable(false);
-				if(m_editor->hasPart(part->sn()))
-				{
-					chkPart->setCheckState(Qt::Checked);
-				}
-				QStandardItem* partName = new QStandardItem();
-
-				partName->setFont(QFont("fixed-width", 9, QFont::Bold));
-				//if(m_displayRole == TrackRole)
-				partName->setText(part->name());
-				partName->setData(part->sn(), PartRole);
-				partName->setData(2, TrackRole);
-				partName->setData(track->name(), TrackNameRole);
-				partName->setData(part->tick(), TickRole);
-				partName->setEditable(true);
-				//else
-				//	partName->setText(track->name()+" : "+part->name());
-
-				if(!partColorIcons.isEmpty() && part->colorIndex() < partColorIcons.size())
-					partName->setIcon(partColorIcons.at(part->colorIndex()));
-				partsRow.append(chkPart);
-				partsRow.append(partName);
-				m_model->appendRow(partsRow);
-			}
-		}
-		m_model->setHorizontalHeaderLabels(m_headers);
-		m_table->setColumnWidth(0, 20);
-		if(m_selectedIndex < m_model->rowCount())
+void TrackListView::populateTable()
+{
+	m_model->clear();
+	for(iTrack i = song->artracks()->begin(); i != song->artracks()->end(); ++i)
+	{
+		if(!(*i)->isMidiTrack())
+			continue;
+		MidiTrack* track = (MidiTrack*)(*i);
+		PartList* pl = track->parts();
+		if(m_displayRole == PartRole && pl->empty())
 		{
-			m_table->selectRow(m_selectedIndex);
-			QStandardItem* item = m_model->item(m_selectedIndex, 1);
-			if(item)
-			{
-				//m_table->scrollTo(item->index(), QAbstractItemView::EnsureVisible);
-				//m_table->scrollTo(item->index(), QAbstractItemView::PositionAtTop);
-				//m_table->scrollTo(item->index(), QAbstractItemView::PositionAtBottom);
-				m_table->scrollTo(item->index(), QAbstractItemView::PositionAtCenter);
-			}
+			continue;
 		}
-		else
+		QList<QStandardItem*> trackRow;
+		QStandardItem* chkTrack = new QStandardItem(true);
+		chkTrack->setCheckable(true);
+		chkTrack->setBackground(QBrush(QColor(20,20,20)));
+		chkTrack->setData(1, TrackRole);
+		chkTrack->setData(track->name(), TrackNameRole);
+		if(m_selected.contains(track->name()))
+			chkTrack->setCheckState(Qt::Checked);
+		chkTrack->setEditable(false);
+		trackRow.append(chkTrack);
+		QStandardItem* trackName = new QStandardItem();
+		trackName->setForeground(QBrush(QColor(205,209,205)));
+		trackName->setBackground(QBrush(QColor(20,20,20)));
+		trackName->setFont(QFont("fixed-width", 10, QFont::Bold));
+		trackName->setText(track->name());
+		//QFont font = trackName->font();
+		trackName->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		trackName->setData(1, TrackRole);
+		trackName->setData(track->name(), TrackNameRole);
+		trackName->setEditable(true);
+		trackRow.append(trackName);
+		m_model->appendRow(trackRow);
+
+		for(iPart ip = pl->begin(); ip != pl->end(); ++ip)
 		{
-			QModelIndex rowIndex = m_table->indexAt(scrollPos);
-			m_table->scrollTo(rowIndex, QAbstractItemView::PositionAtTop);
+			QList<QStandardItem*> partsRow;
+			Part* part = ip->second;
+			QStandardItem* chkPart = new QStandardItem(true);
+			chkPart->setCheckable(true);
+			chkPart->setData(part->sn(), PartRole);
+			chkPart->setData(2, TrackRole);
+			chkPart->setData(track->name(), TrackNameRole);
+			chkPart->setData(part->tick(), TickRole);
+			chkPart->setEditable(false);
+			if(m_editor->hasPart(part->sn()))
+			{
+				chkPart->setCheckState(Qt::Checked);
+			}
+			QStandardItem* partName = new QStandardItem();
+
+			partName->setFont(QFont("fixed-width", 9, QFont::Bold));
+			//if(m_displayRole == TrackRole)
+			partName->setText(part->name());
+			partName->setData(part->sn(), PartRole);
+			partName->setData(2, TrackRole);
+			partName->setData(track->name(), TrackNameRole);
+			partName->setData(part->tick(), TickRole);
+			partName->setEditable(true);
+			//else
+			//	partName->setText(track->name()+" : "+part->name());
+
+			if(!partColorIcons.isEmpty() && part->colorIndex() < partColorIcons.size())
+				partName->setIcon(partColorIcons.at(part->colorIndex()));
+			partsRow.append(chkPart);
+			partsRow.append(partName);
+			m_model->appendRow(partsRow);
 		}
+	}
+	m_model->setHorizontalHeaderLabels(m_headers);
+	m_table->setColumnWidth(0, 20);
+	if(m_selectedIndex < m_model->rowCount())
+	{
+		m_table->selectRow(m_selectedIndex);
+		QStandardItem* item = m_model->item(m_selectedIndex, 1);
+		if(item)
+		{
+			//m_table->scrollTo(item->index(), QAbstractItemView::EnsureVisible);
+			//m_table->scrollTo(item->index(), QAbstractItemView::PositionAtTop);
+			//m_table->scrollTo(item->index(), QAbstractItemView::PositionAtBottom);
+			m_table->scrollTo(item->index(), QAbstractItemView::PositionAtCenter);
+		}
+	}
+	else
+	{
+		QModelIndex rowIndex = m_table->indexAt(scrollPos);
+		m_table->scrollTo(rowIndex, QAbstractItemView::PositionAtTop);
 	}
 }/*}}}*/
 
@@ -279,7 +284,7 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 						{
 							m_editor->addPart(mp);
 							updatePartSelection(mp);
-							songChanged(-1);//update check state
+							populateTable();//update check state
 						}
 						break;
 					}

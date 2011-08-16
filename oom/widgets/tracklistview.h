@@ -64,6 +64,7 @@ private slots:
 
 public slots:
 	void toggleTrackPart(QStandardItem*);
+	void populateTable();
 
 public:
 	TrackListView(AbstractMidiEditor* e, QWidget* parent = 0);

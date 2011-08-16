@@ -566,9 +566,9 @@ void Composer::trackSelectionChanged()
 	
 	for (iTrack t = tracks->begin(); t != tracks->end(); ++t)
 	{
-		if ((*t)->selected())
+		track = *t;
+		if (track && track->selected())
 		{
-			track = *t;
 			break;
 		}
 	}

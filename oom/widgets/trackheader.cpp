@@ -148,7 +148,7 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 		delete m;
 	}
 	m_track = track;
-	if(!m_track)
+	if(!m_track || !track)
 		return;
 	Track::TrackType type = m_track->type();
 	m_tracktype = (int)type;
