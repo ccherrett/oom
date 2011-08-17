@@ -70,6 +70,7 @@ QT4_WRAP_CPP ( oom_moc_headers
 	  cserver.h
 	  midimonitor.h
 	  ccinfo.h
+	  FadeCurve.h
       )
 
 ##
@@ -145,6 +146,7 @@ file (GLOB core_source_files
 	  cserver.cpp
 	  midimonitor.cpp
 	  ccinfo.cpp
+	  FadeCurve.cpp
       )
 file (GLOB main_source_files
       main.cpp

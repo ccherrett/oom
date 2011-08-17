@@ -758,12 +758,16 @@ WavePart::WavePart(WaveTrack* t)
 : Part(t)
 {
 	setType(FRAMES);
+	m_fadeIn = 0;//new FadeCurve(FadeIn, this);
+	m_fadeOut = 0;//new FadeCurve(FadeOut, this);
 }
 
 WavePart::WavePart(WaveTrack* t, EventList* ev)
 : Part(t, ev)
 {
 	setType(FRAMES);
+	m_fadeIn = 0;//new FadeCurve(FadeIn, this);
+	m_fadeOut = 0;//new FadeCurve(FadeOut, this);
 }
 
 //---------------------------------------------------------
@@ -778,6 +782,20 @@ WavePart::WavePart(const WavePart& p) : Part(p)
 	m_zIndex = p.m_zIndex;
 	m_leftClip = p.m_leftClip;
 	m_rightClip = p.m_rightClip;
+	m_fadeIn = p.m_fadeIn;
+	m_fadeOut = p.m_fadeOut;
+}
+
+void WavePart::createFadeIn()
+{
+	if(!m_fadeIn)
+		m_fadeIn = new FadeCurve(FadeCurve::FadeIn, this);
+}
+
+void WavePart::createFadeOut()
+{
+	if(!m_fadeOut)
+		m_fadeOut = new FadeCurve(FadeCurve::FadeOut, this);
 }
 
 //---------------------------------------------------------

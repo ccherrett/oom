@@ -16,6 +16,7 @@
 
 #include "event.h"
 #include "audioconvert.h"
+#include "FadeCurve.h"
 
 class QString;
 
@@ -229,6 +230,8 @@ public:
 class WavePart : public Part
 {
     AudioConvertMap _converters;
+	FadeCurve *m_fadeIn;
+	FadeCurve *m_fadeOut;
 
 public:
     WavePart(WaveTrack* t);
@@ -244,6 +247,17 @@ public:
     {
         return (WaveTrack*) Part::track();
     }
+	FadeCurve* fadeIn()
+	{
+		return m_fadeIn;
+	}
+	FadeCurve* fadeOut()
+	{
+		return m_fadeOut;
+	}
+
+	void createFadeIn();
+	void createFadeOut();
 
     virtual void dump(int n = 0) const;
 };
