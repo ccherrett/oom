@@ -103,7 +103,7 @@ void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 	if(m_lockupdate)
 		return;
 	m_lockupdate = true;
-	//printf("HeaderList::updateTrackList\n");
+	printf("HeaderList::updateTrackList\n");
 	TrackList* l = song->visibletracks();
 	//Attempt to prevent widget destruction recreation cycle and just set 
 	//the track on the header instead. I will also try to never recreate 

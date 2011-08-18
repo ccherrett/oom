@@ -2379,6 +2379,7 @@ void Song::playMonitorEvent(int fd)
 	if(cmds.size() == 4) //MidiPlay
 	{
 		MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
+		ev.setEventSource(MonitorSource);
 		//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
 		//audio->msgPlayMidiEvent(&ev);
 		midiPorts[ev.port()].sendEvent(ev);

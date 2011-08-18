@@ -1159,8 +1159,8 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 					Event e = i->second;
 					unsigned event_startframe = e.frame();
 					unsigned event_endframe = event_startframe + e.lenFrame();
-					unsigned estart = event_startframe + old_start;
-					unsigned eend = e.endFrame() + old_start;
+					//unsigned estart = event_startframe + old_start;
+					//unsigned eend = e.endFrame() + old_start;
 
 					SndFileR file = e.sndFile();
 					if (file.isNull())

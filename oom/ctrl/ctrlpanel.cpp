@@ -263,13 +263,13 @@ void CtrlPanel::labelDoubleClicked()
 				kiv &= 0x7f;
 				kiv |= 0xffff00;
 				//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, kiv);
-				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, kiv);
+				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, kiv, (Track*)_track);
 				audio->msgPlayMidiEvent(&ev);
 			}
 			else
 			{
 				//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, lastv);
-				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, lastv);
+				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, lastv, (Track*)_track);
 				audio->msgPlayMidiEvent(&ev);
 			}
 		}
@@ -303,14 +303,14 @@ void CtrlPanel::labelDoubleClicked()
 					kiv = _ctrl->maxVal();
 				kiv += _ctrl->bias();
 				//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, kiv);
-				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, kiv);
+				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, kiv, (Track*)_track);
 				audio->msgPlayMidiEvent(&ev);
 				midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, kiv);
 			}
 			else
 			{
 				//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, lastv);
-				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, lastv);
+				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, lastv, (Track*)_track);
 				audio->msgPlayMidiEvent(&ev);
 				midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, lastv);
 			}
@@ -363,7 +363,7 @@ void CtrlPanel::ctrlChanged(double val)
 		else
 			ival |= (curval & 0xffff00);
 		//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, ival);
-		MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, ival);
+		MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, ival, (Track*)_track);
 		audio->msgPlayMidiEvent(&ev);
 	}
 	else
@@ -380,7 +380,7 @@ void CtrlPanel::ctrlChanged(double val)
 		ival += _ctrl->bias();
 
 		//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, ival);
-		MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, ival);
+		MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, ival, (Track*)_track);
 		audio->msgPlayMidiEvent(&ev);
 		midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, ival);
 	}

@@ -1151,7 +1151,7 @@ bool Song::event(QEvent* _e)
 			int num = e->getP1();
 			int val = e->getP2();
 			int tick = song->cpos();
-			MidiPlayEvent ev(tick, track->outPort(), chan, ME_CONTROLLER, num, val);
+			MidiPlayEvent ev(tick, track->outPort(), chan, ME_CONTROLLER, num, val, t);
 			audio->msgPlayMidiEvent(&ev);
 			song->update(SC_MIDI_CONTROLLER);
 			break;

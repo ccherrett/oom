@@ -11,6 +11,7 @@
 #include "xml.h"
 #include "mpevent.h"
 #include "midictrl.h"
+#include "part.h"
 
 //---------------------------------------------------------
 //   MidiEventBase
@@ -22,6 +23,7 @@ MidiEventBase::MidiEventBase(EventType t)
 	a = 0;
 	b = 0;
 	c = 0;
+	m_part = 0;
 }
 
 //---------------------------------------------------------
@@ -33,6 +35,11 @@ EventBase* MidiEventBase::mid(unsigned b, unsigned e)
 	if (tick() < b || tick() >= e)
 		return 0;
 	return new MidiEventBase(*this);
+}
+
+void MidiEventBase::setPart(Part* part)
+{
+	m_part = part;
 }
 
 //---------------------------------------------------------

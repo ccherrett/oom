@@ -278,7 +278,7 @@ bool MidiJackDevice::putMidiEvent(const MidiPlayEvent& /*event*/)
 //   recordEvent
 //---------------------------------------------------------
 
-void MidiJackDevice::recordEvent(MidiRecordEvent& event)
+void MidiJackDevice::recordEvent(MidiRecordEvent& event)/*{{{*/
 {
 	if (audio->isPlaying())
 		event.setLoopNum(audio->loopCount());
@@ -381,13 +381,13 @@ void MidiJackDevice::recordEvent(MidiRecordEvent& event)
 	unsigned int ch = (typ == ME_SYSEX) ? MIDI_CHANNELS : event.channel();
 	if (_recordFifo[ch].put(MidiPlayEvent(event)))
 		printf("MidiJackDevice::recordEvent: fifo channel %d overflow\n", ch);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   midiReceived
 //---------------------------------------------------------
 
-void MidiJackDevice::eventReceived(jack_midi_event_t* ev)
+void MidiJackDevice::eventReceived(jack_midi_event_t* ev)/*{{{*/
 {
 	MidiRecordEvent event;
 	event.setB(0);
@@ -488,13 +488,13 @@ void MidiJackDevice::eventReceived(jack_midi_event_t* ev)
 
 	// Let recordEvent handle it from here, with timestamps, filtering, gui triggering etc.
 	recordEvent(event);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   collectMidiEvents
 //---------------------------------------------------------
 
-void MidiJackDevice::collectMidiEvents()
+void MidiJackDevice::collectMidiEvents()/*{{{*/
 {
 	if (!_readEnable)
 		return;
@@ -516,7 +516,7 @@ void MidiJackDevice::collectMidiEvents()
 
 		eventReceived(&event);
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   putEvent
@@ -671,6 +671,9 @@ bool MidiJackDevice::processEvent(const MidiPlayEvent& event)
 #ifdef JACK_MIDI_DEBUG
 	//printf("MidiJackDevice::processEvent time:%d type:%d ch:%d A:%d B:%d\n", event.time(), event.type(), event.channel(), event.dataA(), event.dataB());
 #endif  
+
+	//Send to monitor thread for processing
+	monitorOutputEvent(event);
 
 	if (event.type() == ME_PROGRAM)
 	{

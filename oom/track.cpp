@@ -411,7 +411,7 @@ void Track::setSelected(bool sel)
 			if(sysex && !status)
 			{
 				//Send the event from the sequencer thread
-				MidiPlayEvent ev(0, m_midiassign.port, ME_SYSEX, sysex, len);
+				MidiPlayEvent ev(0, m_midiassign.port, ME_SYSEX, sysex, len, this);
 				audio->msgPlayMidiEvent(&ev);
 
 				//Send adjustments to all the mixer based dials assigned to this track

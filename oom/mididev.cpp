@@ -75,7 +75,7 @@ void MidiDevice::init()
 	_openFlags = 3;
 	_port = -1;
 	m_nrpnCache.clear();
-	for (unsigned int i = 0; i < MIDI_CHANNELS + 1; ++i)
+	for (unsigned int i = 0; i <= MIDI_CHANNELS; ++i)
 	{
 		NRPNCache* c = new NRPNCache;
 		c->msb = -1;
@@ -117,11 +117,11 @@ MidiDevice::MidiDevice(const QString& n)
 }
 
 //Send incomming events to the midiMonitor
-void MidiDevice::monitorEvent(const MidiRecordEvent& event)
+void MidiDevice::monitorEvent(const MidiRecordEvent& event)/*{{{*/
 {
 	int type = event.type();
 	int chan = event.channel();
-	if(type == ME_CONTROLLER && midiMonitor->isManagedInputPort(_port))/*{{{*/
+	if(type == ME_CONTROLLER && midiMonitor->isManagedInputPort(_port))
 	{
 		if(cacheNRPN())
 		{
@@ -174,8 +174,19 @@ void MidiDevice::monitorEvent(const MidiRecordEvent& event)
 			ev.setPort(_port);
 			midiMonitor->msgSendMidiInputEvent(ev);
 		}
-	}/*}}}*/
-}
+	}
+}/*}}}*/
+
+void MidiDevice::monitorOutputEvent(const MidiPlayEvent& event)/*{{{*/
+{
+	int type = event.type();
+	//int chan = event.channel();
+	Track* track = event.track();
+	if(type == ME_CONTROLLER && !midiMonitor->isManagedInputPort(_port) && track && event.eventSource() != MonitorSource)
+	{
+		midiMonitor->msgSendMidiOutputEvent(event);
+	}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   filterEvent

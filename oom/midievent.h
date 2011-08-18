@@ -11,6 +11,8 @@
 
 #include "eventbase.h"
 
+class Part;
+
 //---------------------------------------------------------
 //   MidiEventBase
 //---------------------------------------------------------
@@ -19,6 +21,7 @@ class MidiEventBase : public EventBase
 {
     int a, b, c; // pitch, velo-on, velo-off
     EvData edata;
+	Part* m_part;
 
     virtual EventBase* clone()
     {
@@ -133,6 +136,13 @@ public:
     {
         return edata;
     }
+
+	Part* part()
+	{
+		return m_part;
+	}
+
+	void setPart(Part*);
 
     virtual void dump(int n = 0) const;
     virtual void read(Xml&);

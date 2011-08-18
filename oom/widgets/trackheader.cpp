@@ -1255,7 +1255,8 @@ void TrackHeader::volumeChanged(double val)/*{{{*/
 
 			int tick = song->cpos();
 
-			MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, num, mval);
+			MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, num, mval, m_track);
+			ev.setEventSource(AudioSource);
 
 			audio->msgPlayMidiEvent(&ev);
 			midiMonitor->msgSendMidiOutputEvent(m_track, num, mval);
@@ -1428,7 +1429,8 @@ void TrackHeader::panChanged(double val)/*{{{*/
 
 			int tick = song->cpos();
 
-			MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, ctrl, val);
+			MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, ctrl, val, m_track);
+			ev.setEventSource(AudioSource);
 
 			audio->msgPlayMidiEvent(&ev);
 			midiMonitor->msgSendMidiOutputEvent(m_track, ctrl, val);

@@ -87,7 +87,7 @@ void TrackView::setSelected(bool f)
 						int channel = track->outChannel();
 						int port = track->outPort();
 
-						MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, tset->program);
+						MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, tset->program, (Track*)track);
 						audio->msgPlayMidiEvent(&ev);
 					}
 				}

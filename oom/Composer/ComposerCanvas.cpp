@@ -2521,8 +2521,8 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 	int h = hh / 2;
 	int y = pr.y() + h;
 	int drawLines = 1;
-	int modulusVar = 10;
-	int remainderVar = 5;
+	//int modulusVar = 10;
+	//int remainderVar = 5;
 	EventList* el = wp->events();
 	for (iEvent e = el->begin(); e != el->end(); ++e)/*{{{*/
 	{

@@ -208,7 +208,7 @@ void MidiSeq::processSeek()
 				unsigned t = (unsigned) imcv->first;
 				// Do not add values that are outside of the part.
 				if (p && t >= p->tick() && t < (p->tick() + p->lenTick()))
-					el->add(MidiPlayEvent(0, port, ivl->first >> 24, ME_CONTROLLER, vl->num(), imcv->second.val));
+					el->add(MidiPlayEvent(0, port, ivl->first >> 24, ME_CONTROLLER, vl->num(), imcv->second.val, p->track()));
 			}
 		}
 	}

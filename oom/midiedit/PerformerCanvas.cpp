@@ -629,9 +629,9 @@ bool PerformerCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)/*
 		int port = track()->outPort();
 		int channel = track()->outChannel();
 		// release note:
-		MidiPlayEvent ev1(0, port, channel, 0x90, event.pitch() + track()->getTransposition(), 0);
+		MidiPlayEvent ev1(0, port, channel, 0x90, event.pitch() + track()->getTransposition(), 0, (Track*)track());
 		audio->msgPlayMidiEvent(&ev1);
-		MidiPlayEvent ev2(0, port, channel, 0x90, npitch + track()->getTransposition(), event.velo());
+		MidiPlayEvent ev2(0, port, channel, 0x90, npitch + track()->getTransposition(), event.velo(), (Track*)track());
 		audio->msgPlayMidiEvent(&ev2);
 	}
 
@@ -1032,7 +1032,7 @@ void PerformerCanvas::pianoPressed(int pitch, int velocity, bool shift)/*{{{*/
 	ipitch += track()->getTransposition();
 
 	// play note:
-	MidiPlayEvent e(0, port, channel, 0x90, ipitch, velocity);
+	MidiPlayEvent e(0, port, channel, 0x90, ipitch, velocity, (Track*)track());
 	audio->msgPlayMidiEvent(&e);
 
     if (_steprec && _pos[0] >= start_tick && _pos[0] < end_tick)
@@ -1109,7 +1109,7 @@ void PerformerCanvas::pianoReleased(int pitch, bool)/*{{{*/
 			int port = ctrack->outPort();
 			int channel = ctrack->outChannel();
 
-			MidiPlayEvent e(0, port, channel, 0x90, tpitch, 0);
+			MidiPlayEvent e(0, port, channel, 0x90, tpitch, 0, (Track*)track());
 			audio->msgPlayMidiEvent(&e);
 		}
 	}
@@ -1120,7 +1120,7 @@ void PerformerCanvas::pianoReleased(int pitch, bool)/*{{{*/
 		pitch += track()->getTransposition();
 
 	// release key:
-		MidiPlayEvent e(0, port, channel, 0x90, pitch, 0);
+		MidiPlayEvent e(0, port, channel, 0x90, pitch, 0, (Track*)track());
 		audio->msgPlayMidiEvent(&e);
 	}
 }/*}}}*/
@@ -2090,7 +2090,7 @@ void PerformerCanvas::processKeySwitches(Part* part, int pitch, int songtick)/*{
 				}
 				
 				//printf("Should be adding the program now\n");
-				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, km->program);
+				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, km->program, (Track*)track);
 				audio->msgPlayMidiEvent(&ev);
 
 				MidiPort* mport = &midiPorts[port];
@@ -2292,7 +2292,7 @@ void PerformerCanvas::itemPressed(const CItem* item)
 	int velo = event.velo();
 
 	// play note:
-	MidiPlayEvent e(0, port, channel, 0x90, playedPitch, velo);
+	MidiPlayEvent e(0, port, channel, 0x90, playedPitch, velo, (Track*)track());
 	audio->msgPlayMidiEvent(&e);
 }
 
@@ -2308,7 +2308,7 @@ void PerformerCanvas::itemReleased(const CItem*, const QPoint&)
 	int channel = track()->outChannel();
 
 	// release note:
-	MidiPlayEvent ev(0, port, channel, 0x90, playedPitch, 0);
+	MidiPlayEvent ev(0, port, channel, 0x90, playedPitch, 0, (Track*)track());
 	audio->msgPlayMidiEvent(&ev);
 	playedPitch = -1;
 }
@@ -2328,10 +2328,10 @@ void PerformerCanvas::itemMoved(const CItem* item, const QPoint& pos)
 		Event event = nevent->event();
 
 		// release note:
-		MidiPlayEvent ev1(0, port, channel, 0x90, playedPitch, 0);
+		MidiPlayEvent ev1(0, port, channel, 0x90, playedPitch, 0, (Track*)track());
 		audio->msgPlayMidiEvent(&ev1);
 		// play note:
-		MidiPlayEvent e2(0, port, channel, 0x90, npitch + track()->getTransposition(), event.velo());
+		MidiPlayEvent e2(0, port, channel, 0x90, npitch + track()->getTransposition(), event.velo(), (Track*)track());
 		audio->msgPlayMidiEvent(&e2);
 		playedPitch = npitch + track()->getTransposition();
 	}
@@ -2422,11 +2422,11 @@ void PerformerCanvas::doModify(NoteInfo::ValType type, int delta, CItem* item, b
 			int channel = track()->outChannel();
 
 			// release key:
-			MidiPlayEvent pe2(0, port, channel, 0x90, epitch, 0);
+			MidiPlayEvent pe2(0, port, channel, 0x90, epitch, 0, (Track*)track());
 			audio->msgPlayMidiEvent(&pe2);
-			MidiPlayEvent pe(0, port, channel, 0x90, newEvent.pitch(), newEvent.velo());
+			MidiPlayEvent pe(0, port, channel, 0x90, newEvent.pitch(), newEvent.velo(), (Track*)track());
 			audio->msgPlayMidiEvent(&pe);
-			MidiPlayEvent pe3(0, port, channel, 0x90, newEvent.pitch(), 0);
+			MidiPlayEvent pe3(0, port, channel, 0x90, newEvent.pitch(), 0, (Track*)track());
 			audio->msgPlayMidiEvent(&pe3);
 		}
 		// Indicate do not do port controller values and clone parts.

@@ -64,6 +64,7 @@ protected:
     void init();
     virtual bool putMidiEvent(const MidiPlayEvent&) = 0;
 	virtual void monitorEvent(const MidiRecordEvent&);
+	virtual void monitorOutputEvent(const MidiPlayEvent&);
 	virtual void resetNRPNCache(int chan)
 	{
 		NRPNCache* c = m_nrpnCache.value(chan);

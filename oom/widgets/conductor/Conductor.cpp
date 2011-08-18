@@ -121,7 +121,7 @@ void Conductor::setTrack(Track* t)
 			else
 				prog = 0xff;
 			program = (hbank << 16) + (lbank << 8) + prog;
-			MidiPlayEvent ev(0, outPort, outChannel, ME_CONTROLLER, CTRL_PROGRAM, program);
+			MidiPlayEvent ev(0, outPort, outChannel, ME_CONTROLLER, CTRL_PROGRAM, program, t);
 			audio->msgPlayMidiEvent(&ev);
 		}/*}}}*/
 	}
@@ -887,7 +887,7 @@ void Conductor::iProgHBankChanged()
 		iProgram->blockSignals(false);
 	}
 	program = (hbank << 16) + (lbank << 8) + prog;
-	MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, program);
+	MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, program, selected);
 	audio->msgPlayMidiEvent(&ev);
 
 	MidiInstrument* instr = mp->instrument();
@@ -974,7 +974,7 @@ void Conductor::iProgLBankChanged()
 		iProgram->blockSignals(false);
 	}
 	program = (hbank << 16) + (lbank << 8) + prog;
-	MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, program);
+	MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, program, selected);
 	audio->msgPlayMidiEvent(&ev);
 
 	MidiInstrument* instr = mp->instrument();
@@ -1061,7 +1061,7 @@ void Conductor::iProgramChanged()
 			}
 		}
 		program = (hbank << 16) + (lbank << 8) + prog;
-		MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, program);
+		MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, program, selected);
 		audio->msgPlayMidiEvent(&ev);
 
 		MidiInstrument* instr = mp->instrument();
@@ -1103,8 +1103,7 @@ void Conductor::iLautstChanged(int val)
 	{
 		val += mctl->bias();
 
-		MidiPlayEvent ev(0, outPort, chan,
-				ME_CONTROLLER, CTRL_VOLUME, val);
+		MidiPlayEvent ev(0, outPort, chan, ME_CONTROLLER, CTRL_VOLUME, val, selected);
 		audio->msgPlayMidiEvent(&ev);
 	}
 	song->update(SC_MIDI_CONTROLLER);
@@ -1213,8 +1212,7 @@ void Conductor::iPanChanged(int val)
 		val += mctl->bias();
 
 		// Realtime Change:
-		MidiPlayEvent ev(0, port, chan,
-				ME_CONTROLLER, CTRL_PANPOT, val);
+		MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PANPOT, val, selected);
 		audio->msgPlayMidiEvent(&ev);
 	}
 	song->update(SC_MIDI_CONTROLLER);
@@ -1355,12 +1353,12 @@ void Conductor::iProgramDoubleClicked()
 			//}
 
 			//MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, num, kiv);
-			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PROGRAM, kiv);
+			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PROGRAM, kiv, selected);
 			audio->msgPlayMidiEvent(&ev);
 		}
 		else
 		{
-			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PROGRAM, lastv);
+			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PROGRAM, lastv, selected);
 			audio->msgPlayMidiEvent(&ev);
 		}
 	}
@@ -1413,12 +1411,12 @@ void Conductor::iLautstDoubleClicked()
 				kiv += mctl->bias();
 			}
 
-			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_VOLUME, kiv);
+			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_VOLUME, kiv, selected);
 			audio->msgPlayMidiEvent(&ev);
 		}
 		else
 		{
-			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_VOLUME, lastv);
+			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_VOLUME, lastv, selected);
 			audio->msgPlayMidiEvent(&ev);
 		}
 	}
@@ -1471,12 +1469,12 @@ void Conductor::iPanDoubleClicked()
 				kiv += mctl->bias();
 			}
 
-			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PANPOT, kiv);
+			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PANPOT, kiv, selected);
 			audio->msgPlayMidiEvent(&ev);
 		}
 		else
 		{
-			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PANPOT, lastv);
+			MidiPlayEvent ev(0, port, chan, ME_CONTROLLER, CTRL_PANPOT, lastv, selected);
 			audio->msgPlayMidiEvent(&ev);
 		}
 	}
@@ -2009,7 +2007,7 @@ void Conductor::insertMatrixEvent(Part* curPart, unsigned tick)
 		{
 			song->setLen(tick);
 		}
-		MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+		MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id, (Track*)track);
 		audio->msgPlayMidiEvent(&ev);
 		_selectedIndex = item->row();
 		updateConductor(-1);
@@ -2038,7 +2036,7 @@ void Conductor::insertMatrixEvent(Part* curPart, unsigned tick)
 			{
 				song->setLen(tick);
 			}
-			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id, (Track*)track);
 			audio->msgPlayMidiEvent(&ev);
 			updateConductor(-1);
 			progRecClicked(track);
@@ -2425,7 +2423,7 @@ void Conductor::patchDoubleClicked(QModelIndex index)/*{{{*/
 			int channel = track->outChannel();
 			int port = track->outPort();
 
-			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id, selected);
 			audio->msgPlayMidiEvent(&ev);
 
 			if (!pg.isEmpty())
@@ -2519,7 +2517,7 @@ void Conductor::patchSequenceClicked(QModelIndex index)/*{{{*/
 				int channel = track->outChannel();
 				int port = track->outPort();
 
-				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id);
+				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id, selected);
 				audio->msgPlayMidiEvent(&ev);
 			}
 		}

@@ -18,6 +18,7 @@ enum {
 	MONITOR_AUDIO_OUT,	//Used to process outgoing midi from audio tracks
 	MONITOR_MIDI_IN,	//Used to process incomming midi going to midi tracks/controllers
 	MONITOR_MIDI_OUT,	//Used to process outgoing midi from midi tracks
+	MONITOR_MIDI_OUT_EVENT,	//Used to process outgoing midi from midi tracks
 	MONITOR_MODIFY_CC,
 	MONITOR_DEL_CC,
 	MONITOR_MODIFY_PORT,
@@ -76,6 +77,7 @@ public:
 
 	void msgSendMidiInputEvent(MEvent&);
 	void msgSendMidiOutputEvent(Track*,  int ctl, int val);
+	void msgSendMidiOutputEvent(MidiPlayEvent ev);
 	void msgSendAudioOutputEvent(Track*, int ctl, double val);
 	void msgModifyTrackController(Track*, int ctl, CCInfo* cc);
 	void msgDeleteTrackController(CCInfo* cc);

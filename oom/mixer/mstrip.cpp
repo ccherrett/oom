@@ -586,13 +586,13 @@ void MidiStrip::labelDoubleClicked(int idx)
 			kiv += mc->bias();
 
 			//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, num, kiv);
-			MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, num, kiv);
+			MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, num, kiv, track);
 			audio->msgPlayMidiEvent(&ev);
 		}
 		else
 		{
 			//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, num, lastv);
-			MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, num, lastv);
+			MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, num, lastv, track);
 			audio->msgPlayMidiEvent(&ev);
 		}
 	}
@@ -977,7 +977,7 @@ void MidiStrip::ctrlChanged(int num, int val)
 
 		int tick = song->cpos();
 
-		MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, num, val);
+		MidiPlayEvent ev(tick, port, chan, ME_CONTROLLER, num, val, track);
 
 		audio->msgPlayMidiEvent(&ev);
 		midiMonitor->msgSendMidiOutputEvent((Track*)track, num, val);

@@ -20,6 +20,7 @@
 
 class Event;
 class EvData;
+class Track;
 
 //---------------------------------------------------------
 //   MEvent
@@ -29,9 +30,16 @@ class EvData;
 //---------------------------------------------------------
 //   MEvent
 //---------------------------------------------------------
+enum EventSource {
+	SystemSource = 0,
+	MonitorSource,
+	AudioSource
+};
 
 class MEvent
 {
+	EventSource m_source;
+	Track *m_track;
     unsigned _time;
     EvData edata;
     unsigned char _port, _channel, _type;
@@ -43,20 +51,24 @@ public:
     MEvent()
     {
         _loopNum = 0;
+		m_track = 0;
+		m_source = SystemSource;
     }
 
-    MEvent(unsigned tm, int p, int c, int t, int a, int b)
-    : _time(tm), _port(p), _channel(c & 0xf), _type(t), _a(a), _b(b)
+    MEvent(unsigned tm, int p, int c, int t, int a, int b, Track* trk= 0)
+    : m_track(trk), _time(tm), _port(p), _channel(c & 0xf), _type(t), _a(a), _b(b)
     {
         _loopNum = 0;
+		m_source = SystemSource;
     }
-    MEvent(unsigned t, int p, int type, const unsigned char* data, int len);
+    MEvent(unsigned t, int p, int type, const unsigned char* data, int len, Track* trk = 0);
 
-    MEvent(unsigned t, int p, int tpe, EvData d) : _time(t), edata(d), _port(p), _type(tpe)
+    MEvent(unsigned t, int p, int tpe, EvData d, Track* trk = 0) : m_track(trk), _time(t), edata(d), _port(p), _type(tpe)
     {
         _loopNum = 0;
+		m_source = SystemSource;
     }
-    MEvent(unsigned t, int port, int channel, const Event& e);
+    MEvent(unsigned t, int port, int channel, const Event& e, Track* trk = 0);
 
     ~MEvent()
     {
@@ -72,6 +84,8 @@ public:
         _a = ed._a;
         _b = ed._b;
         _loopNum = ed._loopNum;
+		m_track = ed.m_track;
+		m_source = ed.m_source;
         return *this;
     }
 
@@ -181,6 +195,23 @@ public:
         return (_type == 0x80) || (_type == 0x90 && _b == 0);
     }
     bool operator<(const MEvent&) const;
+
+	EventSource eventSource() const
+	{
+		return m_source;
+	}
+	void setEventSource(EventSource es)
+	{
+		m_source = es;
+	}
+	Track* track() const
+	{
+		return m_track;
+	}
+	void setTrack(Track* t)
+	{
+		m_track = t;
+	}
 };
 
 //---------------------------------------------------------
@@ -239,23 +270,23 @@ public:
     {
     }
 
-    MidiPlayEvent(unsigned tm, int p, int c, int t, int a, int b)
-    : MEvent(tm, p, c, t, a, b)
+    MidiPlayEvent(unsigned tm, int p, int c, int t, int a, int b, Track* trk = 0)
+    : MEvent(tm, p, c, t, a, b, trk)
     {
     }
 
-    MidiPlayEvent(unsigned t, int p, int type, const unsigned char* data, int len)
-    : MEvent(t, p, type, data, len)
+    MidiPlayEvent(unsigned t, int p, int type, const unsigned char* data, int len, Track* trk = 0)
+    : MEvent(t, p, type, data, len, trk)
     {
     }
 
-    MidiPlayEvent(unsigned t, int p, int type, EvData data)
-    : MEvent(t, p, type, data)
+    MidiPlayEvent(unsigned t, int p, int type, EvData data, Track* trk = 0)
+    : MEvent(t, p, type, data, trk)
     {
     }
 
-    MidiPlayEvent(unsigned t, int port, int channel, const Event& e)
-    : MEvent(t, port, channel, e)
+    MidiPlayEvent(unsigned t, int port, int channel, const Event& e, Track* trk = 0)
+    : MEvent(t, port, channel, e, trk)
     {
     }
 

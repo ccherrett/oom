@@ -18,17 +18,21 @@
 //   MEvent
 //---------------------------------------------------------
 
-MEvent::MEvent(unsigned t, int port, int tpe, const unsigned char* data, int len)
+MEvent::MEvent(unsigned t, int port, int tpe, const unsigned char* data, int len, Track* trk)
 {
 	_time = t;
 	_port = port;
 	edata.setData(data, len);
 	_type = tpe;
 	_loopNum = 0;
+	m_track = trk;
+	m_source = SystemSource;
 }
 
-MEvent::MEvent(unsigned tick, int port, int channel, const Event& e)
+MEvent::MEvent(unsigned tick, int port, int channel, const Event& e, Track* trk)
 {
+	m_track = trk;
+	m_source = SystemSource;
 	setChannel(channel);
 	setTime(tick);
 	setPort(port);
