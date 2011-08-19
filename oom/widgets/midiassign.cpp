@@ -51,17 +51,13 @@ MidiAssignDialog::MidiAssignDialog(QWidget* parent):QDialog(parent)
 	//m_tabpanel->setCurrentIndex(0);
 	m_btnReset = m_buttonBox->button(QDialogButtonBox::Reset);
 
-	m_btnDelete->setIcon(*garbagePCIcon);
-	m_btnDelete->setIconSize(garbagePCIcon->size());
+	m_btnDelete->setIcon(*garbageIconSet3);
 
-	m_btnAdd->setIcon(*addTVIcon);
-	m_btnAdd->setIconSize(addTVIcon->size());
+	m_btnAdd->setIcon(*plusIconSet3);
 
-	m_btnDeletePreset->setIcon(*garbagePCIcon);
-	m_btnDeletePreset->setIconSize(garbagePCIcon->size());
+	m_btnDeletePreset->setIcon(*garbageIconSet3);
 
-	m_btnAddPreset->setIcon(*addTVIcon);
-	m_btnAddPreset->setIconSize(addTVIcon->size());
+	m_btnAddPreset->setIcon(*plusIconSet3);
 
 	m_assignlabels = (QStringList() << "En" << "Track" << "Midi Port" << "Chan" << "Preset" );
 	m_cclabels = (QStringList() << "Sel" << "Controller");

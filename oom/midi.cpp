@@ -929,27 +929,23 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 						// If syncing to external midi sync, we cannot use the tempo map.
 						// Therefore we cannot get sub-tick resolution. Just use ticks instead of frames.
 						if (extSyncFlag.value())
-							playEvents->add(MidiPlayEvent(tick, port, channel, 0x90, pitch, velo));
+							playEvents->add(MidiPlayEvent(tick, port, channel, 0x90, pitch, velo, (Track*)track));
 						else
+							playEvents->add(MidiPlayEvent(frame, port, channel, 0x90, pitch, velo, (Track*)track));
 
-							playEvents->add(MidiPlayEvent(frame, port, channel, 0x90, pitch, velo));
-
-						stuckNotes->add(MidiPlayEvent(tick + len, port, channel, veloOff ? 0x80 : 0x90, pitch, veloOff));
+						stuckNotes->add(MidiPlayEvent(tick + len, port, channel, veloOff ? 0x80 : 0x90, pitch, veloOff, (Track*)track));
 					}
 					else
 					{ //Handle events to different port than standard.
 						MidiDevice* mdAlt = midiPorts[port].device();
 						if (mdAlt)
 						{
-
-							// p3.3.25
 							if (extSyncFlag.value())
-								mdAlt->playEvents()->add(MidiPlayEvent(tick, port, channel, 0x90, pitch, velo));
+								mdAlt->playEvents()->add(MidiPlayEvent(tick, port, channel, 0x90, pitch, velo, (Track*)track));
 							else
+								mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel, 0x90, pitch, velo, (Track*)track));
 
-								mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel, 0x90, pitch, velo));
-
-							mdAlt->stuckNotes()->add(MidiPlayEvent(tick + len, port, channel, veloOff ? 0x80 : 0x90, pitch, veloOff));
+							mdAlt->stuckNotes()->add(MidiPlayEvent(tick + len, port, channel, veloOff ? 0x80 : 0x90, pitch, veloOff, (Track*)track));
 						}
 					}
 
@@ -982,10 +978,10 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 								// If syncing to external midi sync, we cannot use the tempo map.
 								// Therefore we cannot get sub-tick resolution. Just use ticks instead of frames.
 								if (extSyncFlag.value())
-									mdAlt->playEvents()->add(MidiPlayEvent(tick, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB()));
+									mdAlt->playEvents()->add(MidiPlayEvent(tick, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB(), (Track*)track));
 								else
 
-									mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB()));
+									mdAlt->playEvents()->add(MidiPlayEvent(frame, port, channel, ME_CONTROLLER, ctl | pitch, ev.dataB(), (Track*)track));
 
 							}
 							break;
@@ -993,21 +989,18 @@ void Audio::collectEvents(MidiTrack* track, unsigned int cts, unsigned int nts)
 					}
 					// p3.3.25
 					if (extSyncFlag.value())
-						playEvents->add(MidiPlayEvent(tick, port, channel, ev));
+						playEvents->add(MidiPlayEvent(tick, port, channel, ev, (Track*)track));
 					else
-
-						playEvents->add(MidiPlayEvent(frame, port, channel, ev));
+						playEvents->add(MidiPlayEvent(frame, port, channel, ev, (Track*)track));
 				}
 					break;
 
 
 				default:
-					// p3.3.25
 					if (extSyncFlag.value())
-						playEvents->add(MidiPlayEvent(tick, port, channel, ev));
+						playEvents->add(MidiPlayEvent(tick, port, channel, ev, (Track*)track));
 					else
-
-						playEvents->add(MidiPlayEvent(frame, port, channel, ev));
+						playEvents->add(MidiPlayEvent(frame, port, channel, ev, (Track*)track));
 
 					break;
 			}

@@ -30,17 +30,6 @@
 #include "driver/jackmidi.h"
 #include "trackview.h"
 
-//struct ClonePart {
-//const EventList* el;
-//      const Part* cp;
-//      int id;
-//ClonePart(const EventList* e, int i) : el(e), id(i) {}
-//      ClonePart(const Part* p, int i) : cp(p), id(i) {}
-//      };
-
-//typedef std::list<ClonePart> CloneList;
-//typedef CloneList::iterator iClone;
-
 //---------------------------------------------------------
 //   ClonePart
 //---------------------------------------------------------
@@ -52,10 +41,7 @@ ClonePart::ClonePart(const Part* p, int i)
 	uuid_generate(uuid);
 }
 
-//static CloneList cloneList;
-//static CloneList copyCloneList;
 CloneList cloneList;
-//CloneList copyCloneList;
 
 /*
 //---------------------------------------------------------

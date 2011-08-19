@@ -184,6 +184,7 @@ void MidiDevice::monitorOutputEvent(const MidiPlayEvent& event)/*{{{*/
 	Track* track = event.track();
 	if(type == ME_CONTROLLER && !midiMonitor->isManagedInputPort(_port) && track && event.eventSource() != MonitorSource)
 	{
+		//printf("MidiDevice::monitorOutputEvent Track: %p\n", track);
 		midiMonitor->msgSendMidiOutputEvent(event);
 	}
 }/*}}}*/
