@@ -373,6 +373,26 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										mdata.channel = track->outChannel();
 										mdata.controller = ctl;
 										mdata.value = msg->mevent.dataB();
+										if(track && track->recordFlag())
+										{
+											unsigned tick = song->cpos();
+											PartList* pl = track->parts();
+											if(pl && !pl->empty())
+											{
+												Part* part = pl->findAtTick(tick);
+												if(part)
+												{
+													//printf("Song::processMonitorMessage add event to part\n");
+													Event event(Controller);
+													event.setTick(tick);
+													event.setA(mdata.controller);
+													event.setB(mdata.value);
+													song->recordEvent((MidiPart*)part, event);
+													//audio->msgAddEvent(event, part, false, true, true);
+													//mods |= SC_EVENT_INSERTED;
+												}
+											}
+										}
 										write(sigFd, &mdata, sizeof (MonitorData));
 										/*QString cmd;
 										//cmd.append(QString::number(msg->mevent.time())).append(":");

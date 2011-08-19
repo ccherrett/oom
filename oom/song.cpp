@@ -2390,7 +2390,7 @@ void Song::processMonitorMessage(const void* m)
 				//MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
 				unsigned tick = cpos();
 				MidiTrack* track = (MidiTrack*)mdata->track;
-				if(track && track->recordFlag())
+				/*if(track && track->recordFlag())
 				{//get the parts list and find the part at position
 					PartList* pl = track->parts();
 					if(pl && !pl->empty())
@@ -2410,13 +2410,13 @@ void Song::processMonitorMessage(const void* m)
 					}
 				}
 				else
-				{
+				{*/
 					MidiPlayEvent ev(0, mdata->port, mdata->channel, ME_CONTROLLER, mdata->controller, mdata->value, mdata->track);
 					ev.setEventSource(MonitorSource);
 					midiPorts[ev.port()].sendEvent(ev);
 					//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
 					//audio->msgPlayMidiEvent(&ev);
-				}
+				//}
 			
 				update(mods);
 				return;

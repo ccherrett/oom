@@ -903,37 +903,16 @@ void CtrlCanvas::changeVal(int x1, int x2, int y)
 	bool changed = false;
 	int newval = computeVal(_controller, y, height());
 	int type = _controller->num();
-	//int xx1 = editor->rasterVal1(x1);
 
 	for (ciCEvent i = items.begin(); i != items.end(); ++i)
 	{
 		if (!(*i)->contains(x1, x2))
-			//if (!(*i)->contains(xx1, x2))
 			continue;
 		CEvent* ev = *i;
 		if (ev->part() != curPart)
 			continue;
 		Event event = ev->event();
-		//if(event.tick() >= curPart->lenTick())
-		//  break;
 
-		//MidiPart* part   = ev->part();
-		//int nval = newval;
-		//if(type == CTRL_PROGRAM)
-		//{
-		//  if(event.dataB() == CTRL_VAL_UNKNOWN)
-		//  {
-		//    --nval;
-		//    if(song->mtype() == MT_GM)
-		//      nval |= 0xffff00;
-		//  }
-		//  else
-		//    nval = (event.dataB() & 0xffff00) | (nval - 1);
-		//}
-		//ev->setVal(nval);
-
-		//MidiController::ControllerType type = midiControllerType(_controller->num());
-		//if (type == MidiController::Velo) {
 		if (type == CTRL_VELOCITY)
 		{
 			if ((event.velo() != newval))
@@ -942,7 +921,6 @@ void CtrlCanvas::changeVal(int x1, int x2, int y)
 				Event newEvent = event.clone();
 				newEvent.setVelo(newval);
 				// Indicate no undo, and do not do port controller values and clone parts.
-				//audio->msgChangeEvent(event, newEvent, part, false);
 				audio->msgChangeEvent(event, newEvent, curPart, false, false, false);
 				ev->setEvent(newEvent);
 				changed = true;
@@ -979,19 +957,6 @@ void CtrlCanvas::changeVal(int x1, int x2, int y)
 			}
 			else
 			{
-				//if(!ctrl)
-				//{
-				//  ctrl =
-				//}
-
-				// Removed by T356. Never gets here? A good thing, don't wan't auto-create values.
-				//int oval = ctrl->value(0);
-				//if (oval != nval) {
-				// Changed by T356.
-				//ctrl->add(0, nval);
-				//      ctrl->add(0, nval, part);
-				//      changed = true;
-				//      }
 			}
 		}
 	}
