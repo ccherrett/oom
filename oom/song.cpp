@@ -2395,25 +2395,27 @@ void Song::processMonitorMessage(const void* m)
 					PartList* pl = track->parts();
 					if(pl && !pl->empty())
 					{
-						iPart ipart = pl->findPart(tick);
-						Part* part = 0;
-						if(ipart != pl->end())
-							part = ipart->second;
+						Part* part = pl->findAtTick(tick);
 						if(part)
 						{
+							//printf("Song::processMonitorMessage add event to part\n");
 							Event event(Controller);
 							event.setTick(tick);
 							event.setA(mdata->controller);
 							event.setB(mdata->value);
-							audio->msgAddEvent(event, part, false, true, true);
-							mods |= SC_EVENT_INSERTED;
+							recordEvent((MidiPart*)part, event);
+							//audio->msgAddEvent(event, part, false, true, true);
+							//mods |= SC_EVENT_INSERTED;
 						}
 					}
 				}
-				MidiPlayEvent ev(tick, mdata->port, mdata->channel, ME_CONTROLLER, mdata->controller, mdata->value, mdata->track);
-				ev.setEventSource(MonitorSource);
-				//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
-				audio->msgPlayMidiEvent(&ev);
+				//else
+				//{
+					MidiPlayEvent ev(0, mdata->port, mdata->channel, ME_CONTROLLER, mdata->controller, mdata->value, mdata->track);
+					ev.setEventSource(MonitorSource);
+					//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
+					audio->msgPlayMidiEvent(&ev);
+				//}
 				//midiPorts[ev.port()].sendEvent(ev);
 			
 				update(mods);

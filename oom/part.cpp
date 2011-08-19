@@ -822,7 +822,7 @@ iPart PartList::findPart(unsigned tick)
 	return i;
 }
 
-Part* PartList::find(unsigned tick, int sn)
+Part* PartList::find(unsigned tick, int sn)/*{{{*/
 {
 	Part* rv = 0;
 	for (iPart i = begin(); i != end(); ++i)
@@ -834,7 +834,21 @@ Part* PartList::find(unsigned tick, int sn)
 		}
 	}
 	return rv;
-}
+}/*}}}*/
+
+Part* PartList::findAtTick(unsigned tick)/*{{{*/
+{
+	Part* rv = 0;
+	for (iPart i = begin(); i != end(); ++i)
+	{
+		if (tick > i->second->tick() && tick < (i->second->tick()+i->second->lenTick()))
+		{
+			rv = i->second;
+			break;
+		}
+	}
+	return rv;
+}/*}}}*/
 
 PartMap PartList::partMap(Track* track)
 {

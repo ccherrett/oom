@@ -285,6 +285,7 @@ public:
     int index(Part*);
     Part* find(int idx);
     Part* find(unsigned tick, int sn);
+    Part* findAtTick(unsigned tick);
 	PartMap partMap(Track*);
 	QList<Track*> tracks();
 };
