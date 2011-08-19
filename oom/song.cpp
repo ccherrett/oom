@@ -2409,14 +2409,14 @@ void Song::processMonitorMessage(const void* m)
 						}
 					}
 				}
-				//else
-				//{
+				else
+				{
 					MidiPlayEvent ev(0, mdata->port, mdata->channel, ME_CONTROLLER, mdata->controller, mdata->value, mdata->track);
 					ev.setEventSource(MonitorSource);
+					midiPorts[ev.port()].sendEvent(ev);
 					//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
-					audio->msgPlayMidiEvent(&ev);
-				//}
-				//midiPorts[ev.port()].sendEvent(ev);
+					//audio->msgPlayMidiEvent(&ev);
+				}
 			
 				update(mods);
 				return;
