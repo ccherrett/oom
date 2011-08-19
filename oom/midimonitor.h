@@ -29,6 +29,23 @@ enum {
 	MONITOR_SEND_PRESET
 };
 
+enum MonitorDataType {
+	MIDI_LEARN = 0,
+	MIDI_LEARN_NRPN,
+	MIDI_INPUT
+};
+
+struct MonitorData
+{
+	MonitorDataType dataType;
+	Track* track;
+	int channel;
+	int port;
+	int controller;
+	int value;
+	int msb;
+	int lsb;
+};
 //This container holds all the types that can be handled
 //by thread this monitor
 struct MonitorMsg : public ThreadMsg

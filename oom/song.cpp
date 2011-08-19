@@ -2360,42 +2360,79 @@ void Song::cleanupForQuit()
 
 void Song::playMonitorEvent(int fd)
 {
-	char buffer[16];
+	int size = sizeof(MonitorData);
+	//char buffer[16];
+	char buffer[size];
 
-	int n = ::read(fd, buffer, 16);
+	//int n = ::read(fd, buffer, 16);
+	int n = ::read(fd, buffer, size);
 	if (n < 0)
 	{
 		printf("Song: playMonitorEvent(): READ PIPE failed: %s\n",
 				strerror(errno));
 		return;
 	}
-	QByteArray ba(buffer);
-	QString str(ba);
-	QStringList raw = str.split("$$");
-	str = raw.at(0);
-	QStringList cmds = str.split(":", QString::SkipEmptyParts);
-	//printf("playMonitorEvent to gui:<%s>\n", str.toUtf8().constData());
-	//FIXME: For NRPN Support this needs to take into account the Controller type
-	if(cmds.size() == 4) //MidiPlay
+	processMonitorMessage(buffer);
+}
+void Song::processMonitorMessage(const void* m)
+{
+	MonitorData* mdata = (MonitorData*)m;
+	if(mdata)
 	{
-		MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
-		ev.setEventSource(MonitorSource);
-		//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
-		audio->msgPlayMidiEvent(&ev);
-		//midiPorts[ev.port()].sendEvent(ev);
-	
-		update(SC_MIDI_CONTROLLER);
-		return;
-	}
-	else if(cmds.size() == 3) //MidiLearn
-	{
-		//Values are: Port, Channel, CC
-		emit midiLearned(cmds.at(0).toInt(), cmds.at(1).toInt(), cmds.at(2).toInt());
-	}
-	else if(cmds.size() == 5) //MidiLearn NRPN
-	{//The fifth param is just a padding
-		//Values are: Port, Channel, MSB, LSB 
-		emit midiLearned(cmds.at(0).toInt(), cmds.at(1).toInt(), cmds.at(2).toInt(), cmds.at(3).toInt());
+		//FIXME: For NRPN Support this needs to take into account the Controller type
+		switch(mdata->dataType)
+		{
+			case MIDI_INPUT:
+			{
+				int mods = SC_MIDI_CONTROLLER;
+				//TODO: We must pass the track along here so we can write events to the part found 
+				//at the current song position
+				//MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
+				unsigned tick = cpos();
+				MidiTrack* track = (MidiTrack*)mdata->track;
+				if(track && track->recordFlag())
+				{//get the parts list and find the part at position
+					PartList* pl = track->parts();
+					if(pl && !pl->empty())
+					{
+						iPart ipart = pl->findPart(tick);
+						Part* part = 0;
+						if(ipart != pl->end())
+							part = ipart->second;
+						if(part)
+						{
+							Event event(Controller);
+							event.setTick(tick);
+							event.setA(mdata->controller);
+							event.setB(mdata->value);
+							audio->msgAddEvent(event, part, false, true, true);
+							mods |= SC_EVENT_INSERTED;
+						}
+					}
+				}
+				MidiPlayEvent ev(tick, mdata->port, mdata->channel, ME_CONTROLLER, mdata->controller, mdata->value, mdata->track);
+				ev.setEventSource(MonitorSource);
+				//printf("Song::playMonitorEvent() event type:%d port:%d channel:%d CC:%d CCVal:%d \n",ev.type(), ev.port(), ev.channel(), ev.dataA(), ev.dataB());
+				audio->msgPlayMidiEvent(&ev);
+				//midiPorts[ev.port()].sendEvent(ev);
+			
+				update(mods);
+				return;
+			}
+			break;
+			case MIDI_LEARN:
+			{
+				//Values are: Port, Channel, CC
+				emit midiLearned(mdata->port, mdata->channel, mdata->controller);
+			}
+			break;
+			case MIDI_LEARN_NRPN:
+			{//The fifth param is just a padding
+				//Values are: Port, Channel, MSB, LSB 
+				emit midiLearned(mdata->port, mdata->channel, mdata->msb, mdata->lsb);
+			}
+			break;
+		}
 	}
 }
 

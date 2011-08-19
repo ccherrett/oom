@@ -599,6 +599,7 @@ public slots:
     void panic();
     void seqSignal(int fd);
 	void playMonitorEvent(int fd);
+	void processMonitorMessage(const void*);
     Track* addTrack(int);
     Track* addNewTrack(QAction* action);
     TrackView* addNewTrackView();

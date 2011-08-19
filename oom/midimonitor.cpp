@@ -228,12 +228,18 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 
 				if (a < CTRL_14_OFFSET)//{{{
 				{ // 7 Bit Controller
-					QString cmd;
+					MonitorData mdata;
+					mdata.dataType = MIDI_LEARN;
+					mdata.port = msg->mevent.port();
+					mdata.channel = msg->mevent.channel();
+					mdata.controller = a;
+					write(sigFd, &mdata, sizeof (MonitorData));
+					/*QString cmd;
 					cmd.append(QString::number(msg->mevent.port())).append(":");
 					cmd.append(QString::number(msg->mevent.channel())).append(":");
 					cmd.append(QString::number(a)).append("$$");
 					QByteArray ba(cmd.toUtf8().constData());
-					write(sigFd, ba.constData(), 16);
+					write(sigFd, ba.constData(), 16);*/
 				}
 				else if (a < CTRL_RPN_OFFSET)
 				{ // 14 bit high resolution controller
@@ -254,13 +260,20 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 					printf("NRPN 7 Controller\n");
 					int msb = (a >> 8) & 0x7f;
 					int lsb = a & 0x7f;
-					QString cmd;
+					MonitorData mdata;
+					mdata.dataType = MIDI_LEARN_NRPN;
+					mdata.port = msg->mevent.port();
+					mdata.channel = msg->mevent.channel();
+					mdata.msb = msb;
+					mdata.lsb = lsb;
+					write(sigFd, &mdata, sizeof (MonitorData));
+					/*QString cmd;
 					cmd.append(QString::number(msg->mevent.port())).append(":");
 					cmd.append(QString::number(msg->mevent.channel())).append(":");
 					cmd.append(QString::number(msb)).append(":");
 					cmd.append(QString::number(lsb)).append(":").append("N").append("$$");
 					QByteArray ba(cmd.toUtf8().constData());
-					write(sigFd, ba.constData(), 16);
+					write(sigFd, ba.constData(), 16);*/
 				}
 				else if (a < CTRL_NRPN14_OFFSET)
 				{ // RPN14 Controller
@@ -353,7 +366,15 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 									{
 										MidiTrack* track = (MidiTrack*)info->track();
 										//MidiTrack* track = (MidiTrack*)data->track;
-										QString cmd;
+										MonitorData mdata;
+										mdata.track = info->track();
+										mdata.dataType = MIDI_INPUT;
+										mdata.port = track->outPort();
+										mdata.channel = track->outChannel();
+										mdata.controller = ctl;
+										mdata.value = msg->mevent.dataB();
+										write(sigFd, &mdata, sizeof (MonitorData));
+										/*QString cmd;
 										//cmd.append(QString::number(msg->mevent.time())).append(":");
 										cmd.append(QString::number(track->outPort())).append(":");
 										cmd.append(QString::number(track->outChannel())).append(":");
@@ -361,7 +382,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										cmd.append(QString::number(msg->mevent.dataB())).append("$$");
 										QByteArray ba(cmd.toUtf8().constData());
 										//printf("ByteArray size in MidiMonitor: %d\n", ba.size());
-										write(sigFd, ba.constData(), 16);
+										write(sigFd, ba.constData(), 16);*/
 									}
 									else
 									{
@@ -376,7 +397,15 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 									if(info->track()->isMidiTrack())/*{{{*/
 									{
 										MidiTrack* track = (MidiTrack*)info->track();
-										QString cmd;
+										MonitorData mdata;
+										mdata.track = info->track();
+										mdata.dataType = MIDI_INPUT;
+										mdata.port = track->outPort();
+										mdata.channel = track->outChannel();
+										mdata.controller = ctl;
+										mdata.value = msg->mevent.dataB();
+										write(sigFd, &mdata, sizeof (MonitorData));
+										/*QString cmd;
 										//cmd.append(QString::number(msg->mevent.time())).append(":");
 										cmd.append(QString::number(track->outPort())).append(":");
 										cmd.append(QString::number(track->outChannel())).append(":");
@@ -384,7 +413,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										cmd.append(QString::number(msg->mevent.dataB())).append("$$");
 										QByteArray ba(cmd.toUtf8().constData());
 										//printf("ByteArray size in MidiMonitor: %d\n", ba.size());
-										write(sigFd, ba.constData(), 16);
+										write(sigFd, ba.constData(), 16);*/
 									}
 									else
 									{
@@ -428,7 +457,15 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 									if(info->track()->isMidiTrack())
 									{
 										MidiTrack* track = (MidiTrack*)info->track();
-										QString cmd;
+										MonitorData mdata;
+										mdata.track = info->track();
+										mdata.dataType = MIDI_INPUT;
+										mdata.port = track->outPort();
+										mdata.channel = track->outChannel();
+										mdata.controller = ctl;
+										mdata.value = msg->mevent.dataB();
+										write(sigFd, &mdata, sizeof (MonitorData));
+										/*QString cmd;
 										//cmd.append(QString::number(msg->mevent.time())).append(":");
 										cmd.append(QString::number(track->outPort())).append(":");
 										cmd.append(QString::number(track->outChannel())).append(":");
@@ -436,7 +473,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										cmd.append(QString::number(msg->mevent.dataB())).append("$$");
 										QByteArray ba(cmd.toUtf8().constData());
 										//printf("ByteArray size in MidiMonitor: %d\n", ba.size());
-										write(sigFd, ba.constData(), 16);
+										write(sigFd, ba.constData(), 16);*/
 									}
 								}
 								break;

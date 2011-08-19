@@ -1022,24 +1022,15 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 		CEvent* ev = *i;
 		if (ev->part() != curPart)
 			continue;
-		//int partTick = ev->part()->tick();
+		
 		int partTick = curPart->tick();
 		Event event = ev->event();
 		if (event.empty())
 			continue;
 		int ax = event.tick() + partTick;
-		// Added by Tim. p3.3.6
-		//printf("CtrlCanvas::newVal ax:%d xx1:%d xx2:%d len:%d\n", ax, xx1, xx2, curPart->lenTick());
 
 		if (ax < xx1)
 			continue;
-		//if(ax <= xx1)
-		//{
-		//  if(type == CTRL_PROGRAM && event.dataB() != CTRL_VAL_UNKNOWN && ((event.dataB() & 0xffffff) != 0xffffff))
-		//    lastpv = event.dataB();
-		//  if(ax < xx1)
-		//    continue;
-		//}
 		if (ax >= xx2)
 			break;
 
@@ -1052,9 +1043,6 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 		{
 			if (event.dataB() == CTRL_VAL_UNKNOWN)
 			{
-				//if(lastpv == CTRL_VAL_UNKNOWN)
-				//  lastpv = ctrl->hwVal();
-
 				if (lastpv == CTRL_VAL_UNKNOWN)
 				{
 					--nval;
