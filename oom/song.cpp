@@ -2418,7 +2418,7 @@ void Song::processMonitorMessage(const void* m)
 					//audio->msgPlayMidiEvent(&ev);
 				//}
 			
-				update(mods);
+				//update(mods);
 				return;
 			}
 			break;
@@ -2444,7 +2444,7 @@ void Song::processMonitorMessage(const void* m)
 //    execution environment: gui thread
 //---------------------------------------------------------
 
-void Song::seqSignal(int fd)
+void Song::seqSignal(int fd)/*{{{*/
 {
 	char buffer[16];
 
@@ -2552,7 +2552,7 @@ void Song::seqSignal(int fd)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 void Song::closeJackBox()
 {
