@@ -3203,12 +3203,39 @@ void ComposerCanvas::pasteAutomation()/*{{{*/
 				{
 					if(partial)
 					{//Add nodes from PB forward
+						QDomNodeList nodeList = control.elementsByTagName("node");
+						if(!nodeList.count())
+							return;
 						cl->setVisible(visible);
 						cl->setCurVal(curVal);
-						QDomNodeList nodeList = control.elementsByTagName("node");
 						int spos = tempomap.tick2frame(song->cpos());
 						int lastframe = spos;
 						int lastreal;
+						if(nodeList.count() > 1)
+						{
+							QDomElement first = nodeList.at(0).toElement();
+							QDomElement last = nodeList.at(nodeList.count()-1).toElement();
+							int fframe = first.attribute("frame").toInt();
+							int lframe = last.attribute("frame").toInt();
+							int range = lframe-fframe;
+							int endframe = spos+range;
+							QList<int> delList;
+							for (ciCtrl ic = cl->begin(); ic != cl->end(); ++ic)
+							{
+								if(ic->second.getFrame() > spos && ic->second.getFrame() < endframe)
+								{
+									delList.append(ic->second.getFrame());
+								}
+							}
+							//now safely delete the selected nodes
+							if(!delList.isEmpty())
+							{
+								foreach(int cv, delList)
+								{
+									cl->del(cv);
+								}
+							}
+						}
 						for(int n = 0; n < nodeList.count(); ++n)
 						{
 							QDomElement node = nodeList.at(n).toElement();
