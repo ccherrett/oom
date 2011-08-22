@@ -4255,7 +4255,7 @@ void OOMidi::cmd(int cmd)
 			ComposerCanvas *canvas = composer->getCanvas();
 			if(canvas && canvas->tool() == AutomationTool)
 			{
-				printf("Automation copy\n");
+				//printf("Automation copy\n");
 				composer->cmd(Composer::CMD_COPY_AUTOMATION_NODES);
 			}
 			else
@@ -4270,7 +4270,7 @@ void OOMidi::cmd(int cmd)
 			ComposerCanvas *canvas = composer->getCanvas();
 			if(canvas && canvas->tool() == AutomationTool)
 			{
-				printf("Automation paste\n");
+				//printf("Automation paste\n");
 				composer->cmd(Composer::CMD_PASTE_AUTOMATION_NODES);
 			}
 			else

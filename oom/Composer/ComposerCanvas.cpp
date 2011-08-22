@@ -3052,7 +3052,7 @@ void ComposerCanvas::cmd(int cmd)
 		{
 			if (_tool == AutomationTool)
 			{
-				printf("Copy automation called\n");
+				//printf("Copy automation called\n");
 				copyAutomation();
 			}
 		}
@@ -3061,7 +3061,7 @@ void ComposerCanvas::cmd(int cmd)
 		{
 			if (_tool == AutomationTool)
 			{
-				printf("Paste automation called\n");
+				//printf("Paste automation called\n");
 				pasteAutomation();
 			}
 		}
