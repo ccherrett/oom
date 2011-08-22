@@ -1167,8 +1167,8 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 				//for (iEvent i = el->begin(); i != el->end(); i++)
 				if(!el->empty())
 				{	
-					printf("Part grew to the left and has an event\n");
-					printf("Old start:%d pos.x: %d\n", old_start, pos.x());
+					//printf("Part grew to the left and has an event\n");
+					//printf("Old start:%d pos.x: %d\n", old_start, pos.x());
 					iEvent i = el->begin();
 					Event e = i->second;
 					unsigned event_startframe = e.frame();
@@ -1183,32 +1183,28 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 						return;
 					}
 					unsigned totalFrames = file.samples();
-					//unsigned currentFrames = totalFrames - (e.spos()+e.rightClip());
 					unsigned currentFrames = old_length;//totalFrames - (e.spos()+e.rightClip());
 					unsigned remainingFrames = (totalFrames - currentFrames);
 					unsigned minframe = (old_start - remainingFrames)+oPart->rightClip();
-					printf("Part rightClip: %d\n", oPart->rightClip());
-					//unsigned minframe = (old_start - remainingFrames);
+					unsigned noop = -1;
+					if(minframe <= noop)
+						minframe = 0;
+					//printf("Part rightClip: %d\n", oPart->rightClip());
 
 					//printf("SndFileR before samples=%d event samplepos=%d currentframes=%d event frame=%d rightclip=%d rem=%d remframes=%d diff=%d minframe=%d part_start=%d old_start=%d\n", 
 					//	file.samples(), e.spos(), currentFrames, event_startframe, e.rightClip(), rem, remainingFrames, diff, minframe, part_start, old_start);
 					
-					//TODO: Fix resize problem when the start of the samples are past the start of song
 					if(!remainingFrames)
 					{
-						//Called to update the part with as its stored in the CItem container
-						//which is already modified
-						printf("Nothing more to resize()\n");
+						//printf("Nothing more to resize()\n");
 						Event newEvent = e.mid(part_start - old_start, event_endframe);
 						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
-						//song->update(SC_SELECTION);
-						//return;
 					}
 					else if(part_start <= minframe)
 					{
-						printf("Sample is shorter than part length, start: %d, minframe: %d\n", part_start, minframe);
+						//printf("Sample is shorter than part length, start: %d, minframe: %d\n", part_start, minframe);
 						part_start = minframe;
-						printf("start: %d, minframe: %d\n", part_start, minframe);
+						//printf("start: %d, minframe: %d\n", part_start, minframe);
 						part_end = old_end - part_start;
 						nPart->setFrame(part_start);
 						nPart->setLenFrame(part_end);
@@ -1220,22 +1216,7 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 					}
 					else
 					{
-						printf("Sample is longer than part length\n");
-						/*Part* p1 = 0; //this is disgarded
-						Part* p2 = 0; //the part we want
-						track->splitPart(oPart, pos.x(), p1, p2);
-						if(p2)
-						{
-							nPart = (WavePart*)p2;
-							nPart->setSelected(true);
-						}
-						else
-						{
-							song->update(SC_SELECTION);
-							return;
-						}
-						if(p1)
-							delete p1;*/
+						//printf("Sample is longer than part length\n");
 						Event newEvent = e.mid(part_start - old_start, event_endframe);
 						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
 						//printf("Part start:%d, Part end:%d, Event old_start:%d, Event oldend:%d, Event start:%d, Event end:%d\n", 
