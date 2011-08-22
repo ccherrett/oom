@@ -135,6 +135,8 @@ class ComposerCanvas : public Canvas
     void glueItem(CItem* item);
     void splitItem(CItem* item, const QPoint&);
 
+	void copyAutomation();
+	void pasteAutomation();
     void copy(PartList*);
     void paste(bool clone = false, bool toTrack = true, bool doInsert = false);
     int pasteAt(const QString&, Track*, unsigned int, bool clone = false, bool toTrack = true);
@@ -180,7 +182,7 @@ public:
     enum
     {
         CMD_CUT_PART, CMD_COPY_PART, CMD_PASTE_PART, CMD_PASTE_CLONE_PART, CMD_PASTE_PART_TO_TRACK, CMD_PASTE_CLONE_PART_TO_TRACK,
-	CMD_INSERT_PART, CMD_INSERT_EMPTYMEAS
+	CMD_INSERT_PART, CMD_INSERT_EMPTYMEAS, CMD_REMOVE_SELECTED_AUTOMATION_NODES, CMD_COPY_AUTOMATION_NODES, CMD_PASTE_AUTOMATION_NODES
     };
 
     ComposerCanvas(int* raster, QWidget* parent, int, int);

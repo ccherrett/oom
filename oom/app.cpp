@@ -4249,10 +4249,35 @@ void OOMidi::cmd(int cmd)
 			composer->cmd(Composer::CMD_CUT_PART);
 			break;
 		case CMD_COPY:
-			composer->cmd(Composer::CMD_COPY_PART);
+		{
+			//TODO: Hook right here and get the current tool from the composer
+			//copy automation if the automation tool is selected.
+			ComposerCanvas *canvas = composer->getCanvas();
+			if(canvas && canvas->tool() == AutomationTool)
+			{
+				printf("Automation copy\n");
+				composer->cmd(Composer::CMD_COPY_AUTOMATION_NODES);
+			}
+			else
+			{
+				composer->cmd(Composer::CMD_COPY_PART);
+			}
+		}
 			break;
 		case CMD_PASTE:
-			composer->cmd(Composer::CMD_PASTE_PART);
+		{
+			//TODO: Same as above
+			ComposerCanvas *canvas = composer->getCanvas();
+			if(canvas && canvas->tool() == AutomationTool)
+			{
+				printf("Automation paste\n");
+				composer->cmd(Composer::CMD_PASTE_AUTOMATION_NODES);
+			}
+			else
+			{
+				composer->cmd(Composer::CMD_PASTE_PART);
+			}
+		}
 			break;
 		case CMD_PASTE_CLONE:
 			composer->cmd(Composer::CMD_PASTE_CLONE_PART);
@@ -4272,7 +4297,7 @@ void OOMidi::cmd(int cmd)
 		case CMD_DELETE:
 			if (composer->getCanvas()->tool() == AutomationTool)
 			{
-				composer->getCanvas()->cmd(Composer::CMD_REMOVE_SELECTED_AUTOMATION_NODES);
+				composer->cmd(Composer::CMD_REMOVE_SELECTED_AUTOMATION_NODES);
 			}
 			else
 			{
@@ -4409,7 +4434,8 @@ void OOMidi::clipboardChanged()
 	bool flag = false;
 	if (QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-midipartlist")) ||
 			QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-wavepartlist")) ||
-			QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-mixedpartlist")))
+			QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-mixedpartlist")) ||
+			QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-automationcurve")))
 		flag = true;
 
 	//bool flag = false;
@@ -4432,7 +4458,7 @@ void OOMidi::clipboardChanged()
 void OOMidi::selectionChanged()
 {
 	//bool flag = composer->isSingleSelection();  // -- Hmm, why only single?
-	bool flag = composer->selectionSize() > 0; // -- Test OK cut and copy. For oom2. Tim.
+	bool flag = true;//composer->selectionSize() > 0; // -- Test OK cut and copy. For oom2. Tim.
 	editCutAction->setEnabled(flag);
 	editCopyAction->setEnabled(flag);
 }

@@ -787,6 +787,15 @@ void Composer::cmd(int cmd)
 		case CMD_INSERT_EMPTYMEAS:
 			ncmd = ComposerCanvas::CMD_INSERT_EMPTYMEAS;
 			break;
+		case CMD_REMOVE_SELECTED_AUTOMATION_NODES:
+			ncmd = ComposerCanvas::CMD_REMOVE_SELECTED_AUTOMATION_NODES;
+			break;
+		case CMD_COPY_AUTOMATION_NODES:
+			ncmd = ComposerCanvas::CMD_COPY_AUTOMATION_NODES;
+			break;
+		case CMD_PASTE_AUTOMATION_NODES:
+			ncmd = ComposerCanvas::CMD_PASTE_AUTOMATION_NODES;
+			break;
 		default:
 			return;
 	}

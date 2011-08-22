@@ -29,6 +29,10 @@
 #include <QPainter>
 #include <QUrl>
 #include <QComboBox>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QDomNodeList>
+#include <QDomNode>
 
 #include "widgets/toolbars/tools.h"
 #include "ComposerCanvas.h"
@@ -48,6 +52,7 @@
 //#include "tlist.h"
 #include "utils.h"
 #include "midimonitor.h"
+#include "ctrl.h"
 
 class CurveNodeSelection
 {
@@ -3011,7 +3016,7 @@ void ComposerCanvas::cmd(int cmd)
 			song->endUndo(SC_PART_INSERTED);
 			break;
 		}
-		case Composer::CMD_REMOVE_SELECTED_AUTOMATION_NODES:
+		case CMD_REMOVE_SELECTED_AUTOMATION_NODES:
 		{
 			if (_tool == AutomationTool)
 			{
@@ -3043,15 +3048,218 @@ void ComposerCanvas::cmd(int cmd)
 			}
 			break;
 		}
+		case CMD_COPY_AUTOMATION_NODES:
+		{
+			if (_tool == AutomationTool)
+			{
+				printf("Copy automation called\n");
+				copyAutomation();
+			}
+		}
+		break;
+		case CMD_PASTE_AUTOMATION_NODES:
+		{
+			if (_tool == AutomationTool)
+			{
+				printf("Paste automation called\n");
+				pasteAutomation();
+			}
+		}
+		break;
 	}
 }
+
+/**
+ * Copy portion of the copy paste of automation curves
+ * Copies the first selected autiomation curve from the selected track
+ * to the Clipboard as a xml text. The text has been converted to a byte array.
+ */
+void ComposerCanvas::copyAutomation()/*{{{*/
+{
+	if(automation.currentCtrlList)
+	{
+		const CtrlList* cl = automation.currentCtrlList;
+		QDomDocument doc("AutomationCurve");
+		QDomElement root = doc.createElement("AutomationCurve");
+		doc.appendChild(root);
+
+		QDomElement control = doc.createElement("controller");
+		root.appendChild(control);
+		control.setAttribute("id", cl->id());
+		control.setAttribute("cur", cl->curVal());
+		control.setAttribute("color", cl->color().name());
+		control.setAttribute("visible", cl->isVisible());
+
+		if(song->punchin() && song->punchout())
+		{
+			control.setAttribute("partial", true);
+			for (ciCtrl ic = cl->begin(); ic != cl->end(); ++ic)
+			{
+				int frame = ic->second.getFrame();
+				int lpos = tempomap.tick2frame(song->lpos());
+				int rpos = tempomap.tick2frame(song->rpos());
+				//printf("Node frame: %d, punchin: %d, punchout: %d\n", frame, lpos, rpos);
+				if(frame >= lpos && frame <= rpos)
+				{
+					QDomElement node = doc.createElement("node");
+					control.appendChild(node);
+					node.setAttribute("frame", ic->second.getFrame());
+					node.setAttribute("value", ic->second.val);
+				}
+			}
+		}
+		else
+		{
+			control.setAttribute("partial", false);
+			for (ciCtrl ic = cl->begin(); ic != cl->end(); ++ic)
+			{
+				QDomElement node = doc.createElement("node");
+				control.appendChild(node);
+				node.setAttribute("frame", ic->second.getFrame());
+				node.setAttribute("value", ic->second.val);
+			}
+		}
+		QString xml = doc.toString();
+		//qDebug() << xml;
+		QByteArray data = xml.toUtf8();
+		QMimeData* md = new QMimeData();
+		md->setData("text/x-oom-automationcurve", data);
+		QApplication::clipboard()->setMimeData(md, QClipboard::Clipboard);
+	}
+}/*}}}*/
+
+void ComposerCanvas::pasteAutomation()/*{{{*/
+{
+	TrackList selectedTracks = song->getSelectedTracks();
+	if (!selectedTracks.size())
+	{
+		if(debugMsg)
+			printf("No selected track for paste\n");
+		return;
+	}
+	if(selectedTracks.size() > 1)
+	{
+		QMessageBox::critical(this, tr("Copy Automation"), tr("You cannot copy automation with multiple tracks selected."));
+		return;
+	}
+	iTrack itrack = selectedTracks.begin();
+	if((*itrack)->isMidiTrack())
+	{
+		if(debugMsg)
+			printf("Midi track cannot paste automation\n");
+		return;
+	}
+	AudioTrack *track = (AudioTrack*)*itrack;
+	QString subtype("x-oom-automationcurve");
+	QString format("text/" + subtype);
+	QClipboard* cb = QApplication::clipboard();
+	const QMimeData* md = cb->mimeData(QClipboard::Clipboard);
+	if (!md->hasFormat(format))
+	{
+		if(debugMsg)
+			printf("No automation curves in clipboard");
+		return;
+	}
+	QString xml = cb->text(subtype, QClipboard::Clipboard);
+	//qDebug() << xml;
+	if(xml.isEmpty())
+	{
+		if(debugMsg)
+			printf("Empty xml string from clipboard\n");
+		return;
+	}
+	QDomDocument doc("AutomationCurve");
+	if(!doc.setContent(xml))
+	{//message dialog here???
+		if(debugMsg)
+			printf("failed to set content on dom document\n");
+		return;
+	}
+	if(track)
+	{
+		QDomElement root = doc.documentElement();
+		if(debugMsg)
+			printf("Root document name: %s\n", root.tagName().toUtf8().constData());
+		if(!root.isNull())
+		{
+			QDomNodeList cList = root.elementsByTagName("controller");
+			for(int i = 0; i < cList.count(); ++i)
+			{
+				QDomElement control = cList.at(i).toElement();
+				int id = control.attribute("id").toInt();
+				bool partial = control.attribute("partial").toInt();
+				bool visible = control.attribute("visible").toInt();
+				double curVal = control.attribute("cur").toDouble();
+				CtrlList *cl = 0;
+				for (ciCtrlList icl = track->controller()->begin(); icl != track->controller()->end(); ++icl)
+				{
+					if(icl->second->id() == id)
+					{
+						cl = icl->second;
+						break;
+					}
+				}
+				if(cl)
+				{
+					if(partial)
+					{//Add nodes from PB forward
+						cl->setVisible(visible);
+						cl->setCurVal(curVal);
+						QDomNodeList nodeList = control.elementsByTagName("node");
+						int spos = tempomap.tick2frame(song->cpos());
+						int lastframe = spos;
+						int lastreal;
+						for(int n = 0; n < nodeList.count(); ++n)
+						{
+							QDomElement node = nodeList.at(n).toElement();
+							int frame = node.attribute("frame").toInt();
+							if(n == 0)
+							{	
+								lastreal = frame;
+								frame = spos;
+							}
+							else
+							{
+								int diff = frame - lastreal;
+								lastreal = frame;
+								frame = lastframe+diff;
+								lastframe = frame;
+							}
+							double val = node.attribute("value").toDouble();
+							cl->add(frame, val);
+						}
+					}
+					else
+					{//Just add the whole line
+						QDomNodeList nodeList = control.elementsByTagName("node");
+						if(!nodeList.count())
+							return;
+						cl->clear();
+						cl->setVisible(visible);
+						cl->setCurVal(curVal);
+						for(int n = 0; n < nodeList.count(); ++n)
+						{
+							QDomElement node = nodeList.at(n).toElement();
+							int frame = node.attribute("frame").toInt();
+							double val = node.attribute("value").toDouble();
+							cl->add(frame, val);
+						}
+					}
+				}
+				//in the future we can support copying multiple lanes at once
+				break;
+			}
+		}
+	}
+	update();
+}/*}}}*/
 
 //---------------------------------------------------------
 //   copy
 //    cut copy paste
 //---------------------------------------------------------
 
-void ComposerCanvas::copy(PartList* pl)
+void ComposerCanvas::copy(PartList* pl)/*{{{*/
 {
 	//printf("void ComposerCanvas::copy(PartList* pl)\n");
 	if (pl->empty())
@@ -3140,13 +3348,13 @@ void ComposerCanvas::copy(PartList* pl)
 
 	munmap(fbuf, n);
 	fclose(tmp);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   pasteAt
 //---------------------------------------------------------
 
-int ComposerCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, bool clone, bool toTrack)
+int ComposerCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, bool clone, bool toTrack)/*{{{*/
 {
 	//printf("int ComposerCanvas::pasteAt(const QString& pt, Track* track, int pos)\n");
 	QByteArray ba = pt.toLatin1();
@@ -3246,7 +3454,7 @@ int ComposerCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, b
 	}
 
 	return finalPos;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   paste
