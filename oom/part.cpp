@@ -1205,7 +1205,7 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 						Event newEvent = e.mid(part_start - old_start, event_endframe);
 						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
 					}
-					else if(part_start <= minframe)
+					else if(part_start < minframe)
 					{
 						//printf("Sample is shorter than part length, start: %d, minframe: %d\n", part_start, minframe);
 						part_start = minframe;
