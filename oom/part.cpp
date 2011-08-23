@@ -1185,10 +1185,15 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 					unsigned totalFrames = file.samples();
 					unsigned currentFrames = old_length;//totalFrames - (e.spos()+e.rightClip());
 					unsigned remainingFrames = (totalFrames - currentFrames);
-					unsigned minframe = (old_start - remainingFrames)+oPart->rightClip();
-					unsigned noop = -1;
-					if(minframe <= noop)
+					int min = (old_start - remainingFrames)+oPart->rightClip();
+					bool is_neg = min < 0;
+					unsigned minframe = min;
+					//printf("start: %d, minframe: %d, noop:%d\n", part_start, minframe, is_neg);
+					if(is_neg)
+					{
+						//printf("Adjusting minframe\n");
 						minframe = 0;
+					}
 					//printf("Part rightClip: %d\n", oPart->rightClip());
 
 					//printf("SndFileR before samples=%d event samplepos=%d currentframes=%d event frame=%d rightclip=%d rem=%d remframes=%d diff=%d minframe=%d part_start=%d old_start=%d\n", 
@@ -1204,7 +1209,6 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 					{
 						//printf("Sample is shorter than part length, start: %d, minframe: %d\n", part_start, minframe);
 						part_start = minframe;
-						//printf("start: %d, minframe: %d\n", part_start, minframe);
 						part_end = old_end - part_start;
 						nPart->setFrame(part_start);
 						nPart->setLenFrame(part_end);
