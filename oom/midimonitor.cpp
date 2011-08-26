@@ -376,7 +376,12 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										if(track && track->recordFlag())
 										{
 											unsigned tick = song->cpos();
-											PartList* pl = track->parts();
+											Event event(Controller);
+											event.setTick(tick);
+											event.setA(mdata.controller);
+											event.setB(mdata.value);
+											audio->msgAddEventCheck(track, event);
+											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
 												Part* part = pl->findAtTick(tick);
@@ -389,7 +394,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 													event.setB(mdata.value);
 													song->recordEvent((MidiPart*)part, event);
 												}
-											}
+											}*/
 										}
 										write(sigFd, &mdata, sizeof (MonitorData));
 										/*QString cmd;
@@ -425,7 +430,12 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										if(track && track->recordFlag())
 										{
 											unsigned tick = song->cpos();
-											PartList* pl = track->parts();
+											Event event(Controller);
+											event.setTick(tick);
+											event.setA(mdata.controller);
+											event.setB(mdata.value);
+											audio->msgAddEventCheck(track, event);
+											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
 												Part* part = pl->findAtTick(tick);
@@ -438,7 +448,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 													event.setB(mdata.value);
 													song->recordEvent((MidiPart*)part, event);
 												}
-											}
+											}*/
 										}
 										write(sigFd, &mdata, sizeof (MonitorData));
 										/*QString cmd;
@@ -503,7 +513,12 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										if(track && track->recordFlag())
 										{
 											unsigned tick = song->cpos();
-											PartList* pl = track->parts();
+											Event event(Controller);
+											event.setTick(tick);
+											event.setA(mdata.controller);
+											event.setB(mdata.value);
+											audio->msgAddEventCheck(track, event);
+											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
 												Part* part = pl->findAtTick(tick);
@@ -516,7 +531,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 													event.setB(mdata.value);
 													song->recordEvent((MidiPart*)part, event);
 												}
-											}
+											}*/
 										}
 										write(sigFd, &mdata, sizeof (MonitorData));
 										/*QString cmd;

@@ -7,13 +7,14 @@
 #include "FadeCurve.h"
 #include "part.h"
 
-FadeCurve::FadeCurve(CurveType type, WavePart* p, QObject* parent)
+FadeCurve::FadeCurve(CurveType type, CurveMode mode, WavePart* p, QObject* parent)
 : QObject(parent)
 {
 	m_type = type;
+	m_mode = mode;
 	m_part = p;
 	m_active = false;
-	m_range = 1.0;
+	m_width = 0;
 }
 
 FadeCurve::~FadeCurve()
@@ -34,15 +35,22 @@ void FadeCurve::setActive(bool act)
 	}
 }
 
-double FadeCurve::range()
+void FadeCurve::setWidth(long width)
 {
-	return m_range;
+	if(width > m_part->lenFrame())
+	{
+		m_width = m_part->lenFrame();
+		return;
+	}
+	else if(width < 0)
+	{
+		m_width = 0;
+		return;
+	}
+	m_width = width;
 }
 
-void FadeCurve::setRange(double range)
+long FadeCurve::width()
 {
-	if(range >= 0.0 && range <= 1.0)
-		m_range = range;
-	//TODO: recalculate points
+	return m_width;
 }
-

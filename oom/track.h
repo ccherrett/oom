@@ -719,6 +719,7 @@ public:
 
 	bool volFromAutomation();
     double volume() const;
+    double volume(unsigned) const;
     void setVolume(double val, bool monitor = false);
 	bool panFromAutomation();
     double pan() const;

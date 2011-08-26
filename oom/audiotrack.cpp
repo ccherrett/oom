@@ -660,7 +660,7 @@ bool AudioTrack::volFromAutomation()
 //   volume
 //---------------------------------------------------------
 
-double AudioTrack::volume() const
+double AudioTrack::volume() const/*{{{*/
 {
 	ciCtrlList cl = _controller.find(AC_VOLUME);
 	if (cl == _controller.end())
@@ -671,7 +671,20 @@ double AudioTrack::volume() const
 		return cl->second->value(song->cPos().frame());
 	else
 		return cl->second->curVal();
-}
+}/*}}}*/
+
+double AudioTrack::volume(unsigned frame) const/*{{{*/
+{
+	ciCtrlList cl = _controller.find(AC_VOLUME);
+	if (cl == _controller.end())
+		return 0.0;
+
+	if (automation &&
+			automationType() != AUTO_OFF && _volumeEnCtrl && _volumeEn2Ctrl)
+		return cl->second->value(frame);
+	else
+		return cl->second->curVal();
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setVolume

@@ -26,6 +26,7 @@ class QKeyEvent;
 class QEvent;
 class QDragEnterEvent;
 class QPoint;
+class FadeCurve;
 
 #define beats     4
 
@@ -97,6 +98,7 @@ class ComposerCanvas : public Canvas
 
     AutomationObject automation;
     CurveNodeSelection* _curveNodeSelection;
+	FadeCurve* m_selectedCurve;
 
 	CItemList getSelectedItems();
     virtual void keyPress(QKeyEvent*);

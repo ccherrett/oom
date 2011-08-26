@@ -831,7 +831,7 @@ void Audio::msgChangePart(Part* oldPart, Part* newPart, bool doUndoFlag, bool do
 
 //void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag)
 
-void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls, bool doClones)
+void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls, bool doClones)/*{{{*/
 {
 	AudioMsg msg;
 	msg.id = SEQM_ADD_EVENT;
@@ -840,7 +840,18 @@ void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls,
 	msg.a = doCtrls;
 	msg.b = doClones;
 	sendMessage(&msg, doUndoFlag);
-}
+}/*}}}*/
+
+void Audio::msgAddEventCheck(Track* track, Event& e, bool doUndoFlag, bool doCtrls, bool doClones)/*{{{*/
+{
+	AudioMsg msg;
+	msg.id = SEQM_ADD_EVENT_CHECK;
+	msg.track = track;
+	msg.ev1 = e;
+	msg.a = doCtrls;
+	msg.b = doClones;
+	sendMessage(&msg, doUndoFlag);
+}/*}}}*/
 
 //---------------------------------------------------------
 //   msgDeleteEvent

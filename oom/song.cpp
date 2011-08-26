@@ -1977,6 +1977,65 @@ void Song::processMsg(AudioMsg* msg)
 			if (msg->a)
 				addPortCtrlEvents(msg->ev1, (Part*) msg->p2, msg->b);
 			break;
+		case SEQM_ADD_EVENT_CHECK:
+		{
+			Track* track = msg->track;
+			Event event = msg->ev1;
+			unsigned tick = event.tick();
+			PartList* pl = track->parts();
+			if(pl && !pl->empty())
+			{
+				Part* part = pl->findAtTick(tick);
+				if(part)
+				{
+					//recordEvent((MidiPart*)part, event);
+					//unsigned tick = event.tick();
+					int diff = event.endTick() - part->lenTick();
+					if (diff > 0)
+					{// too short part? extend it
+						part->setLenTick(part->lenTick() + diff);
+						updateFlags |= SC_PART_MODIFIED;
+					}
+					updateFlags |= SC_EVENT_INSERTED;
+				
+					tick -= part->tick();
+					event.setTick(tick);
+				
+					Event ev;
+					if (event.type() == Controller)
+					{
+						EventRange range = part->events()->equal_range(tick);
+						for (iEvent i = range.first; i != range.second; ++i)
+						{
+							ev = i->second;
+							// At the moment, Song::recordEvent() is only called by the 'Rec' buttons in the
+							//  midi track info panel. So only controller types are fed to it. If other event types
+							//  are to be passed, we will have to expand on this to check if equal. Instead, maybe add an isEqual() to Event class.
+							if (ev.type() == Controller && ev.dataA() == event.dataA())
+							{
+								// Don't bother if already set.
+								if (ev.dataB() == event.dataB())
+									return;
+								removePortCtrlEvents(ev, (MidiPart*) part, true);
+								changeEvent(ev, event, (MidiPart*) part);
+								addPortCtrlEvents(event, part, true);
+								undoOp(UndoOp::ModifyEvent, event, ev, part, true, true);
+								return;
+							}
+						}
+					}
+				
+					if (addEvent(event, (MidiPart*) part))
+					{
+						Event ev;
+						//undoOp(UndoOp::AddEvent, ev, msg->ev1, (Part*)msg->p2);
+						undoOp(UndoOp::AddEvent, ev, event, part, true, true);
+					}
+					addPortCtrlEvents(event, part, true);
+				}
+			}
+		}
+		break;
 		case SEQM_REMOVE_EVENT:
 		{
 			Event event = msg->ev1;
@@ -2384,12 +2443,12 @@ void Song::processMonitorMessage(const void* m)
 		{
 			case MIDI_INPUT:
 			{
-				int mods = SC_MIDI_CONTROLLER;
+				//int mods = SC_MIDI_CONTROLLER;
 				//TODO: We must pass the track along here so we can write events to the part found 
 				//at the current song position
 				//MidiPlayEvent ev(cpos(), cmds.at(0).toInt(), cmds.at(1).toInt(), ME_CONTROLLER, cmds.at(2).toInt(), cmds.at(3).toInt());
-				unsigned tick = cpos();
-				MidiTrack* track = (MidiTrack*)mdata->track;
+				//unsigned tick = cpos();
+				//MidiTrack* track = (MidiTrack*)mdata->track;
 				/*if(track && track->recordFlag())
 				{//get the parts list and find the part at position
 					PartList* pl = track->parts();

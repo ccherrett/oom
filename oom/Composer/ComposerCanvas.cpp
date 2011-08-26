@@ -53,6 +53,7 @@
 #include "utils.h"
 #include "midimonitor.h"
 #include "ctrl.h"
+#include "FadeCurve.h"
 
 class CurveNodeSelection
 {
@@ -306,6 +307,7 @@ ComposerCanvas::ComposerCanvas(int* r, QWidget* parent, int sx, int sy)
 	show_tip = false;
 
 	tracks = song->visibletracks();
+	m_selectedCurve = 0;
 	setMouseTracking(true);
 	_drag = DRAG_OFF;
 	curColorIndex = 0;
@@ -1234,6 +1236,61 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 		default:
 			emit trackChanged(item->part()->track());
 			break;
+		case PointerTool:
+		{ //Find out if we are clicking on a fade controll node and override drag move
+			emit trackChanged(item->part()->track());
+			if(_drag == DRAG_MOVE_START)
+			{
+				int boxSize = 14;
+				int currX =  mapx(pt.x());
+				int currY =  mapy(pt.y());
+				NPart* np = (NPart*) item;
+				Part* p = np->part();
+				Track* track = p->track();
+				if(track && track->type() == Track::WAVE)
+				{
+					int x = pt.x();
+					int y = pt.y();
+					int tracktop = track2Y(track)-ypos;
+					WavePart* part = (WavePart*)p;
+					long pstart = part->frame();
+					long pend = pstart+part->lenFrame();
+					long currFrame = tempomap.tick2frame(pt.x());
+					QPoint click(currX, currY);
+					FadeCurve* fadeIn = part->fadeIn();
+					FadeCurve* fadeOut = part->fadeOut();
+					if(fadeIn)
+					{
+						long fwidth = fadeIn->width();
+						long fiPos = pstart+fwidth;
+						fiPos = mapx(tempomap.frame2tick(fiPos));
+						QRect fiRect(fiPos-(boxSize/2), tracktop, boxSize, boxSize);
+						if(fiRect.contains(click))
+						{
+							m_selectedCurve = fadeIn;
+							_drag = DRAG_OFF;
+							return; //dont process fadeOut
+						}
+					}
+					if(fadeOut)
+					{
+						long fwidth = fadeOut->width();
+						long foPos = pend-fwidth;
+						foPos = mapx(tempomap.frame2tick(foPos));
+						QRect foRect(foPos-(boxSize/2), tracktop, boxSize, boxSize);
+						//qDebug() << "Rect: " << foRect;
+						//qDebug() << "click pos:" << click;
+						if(foRect.contains(click))
+						{
+							m_selectedCurve = fadeOut;
+							_drag = DRAG_OFF;
+							return; //dont process fadeOut
+						}
+					}
+				}
+			}
+		}
+		break;
 		case CutTool:
 			splitItem(item, pt);
 			break;
@@ -1336,6 +1393,7 @@ void ComposerCanvas::mouseRelease(const QPoint&)
 	automation.moveController=false;
 	automation.controllerState = doNothing;
 	automation.currentCtrlVal=0;
+	m_selectedCurve = 0;
 }
 
 //---------------------------------------------------------
@@ -1349,6 +1407,53 @@ void ComposerCanvas::mouseMove(QMouseEvent* event)
 	if (x < 0)
 		x = 0;
 
+	if(_tool == PointerTool && m_selectedCurve)
+	{
+		long currFrame = tempomap.tick2frame(event->pos().x());
+		WavePart *part = m_selectedCurve->part();
+		if(part)
+		{
+			long pstart = part->frame();
+			long pend = pstart+part->lenFrame();
+			switch(m_selectedCurve->type())
+			{
+				case FadeCurve::FadeIn:
+				{
+					if(currFrame <= pstart)
+					{
+						m_selectedCurve->setWidth(0);
+					}
+					else if(currFrame >= pend)
+					{
+						m_selectedCurve->setWidth(part->lenFrame());
+					}
+					else
+					{
+						m_selectedCurve->setWidth(currFrame-pstart);
+					}
+				}
+				break;
+				case FadeCurve::FadeOut:
+				{
+					if(currFrame <= pstart)
+					{
+						m_selectedCurve->setWidth(part->lenFrame());
+					}
+					else if(currFrame >= pend)
+					{
+						m_selectedCurve->setWidth(0);
+					}
+					else
+					{
+						m_selectedCurve->setWidth(pend-currFrame);
+					}
+				}
+				break;
+			}
+			redraw();
+			return;
+		}
+	}
 	processAutomationMovements(event);
 
 	emit timeChanged(AL::sigmap.raster(x, *_raster));
@@ -2949,6 +3054,42 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			}
 		}
 	}/*}}}*/
+	FadeCurve* fadeIn = wp->fadeIn();
+	FadeCurve* fadeOut = wp->fadeOut();
+	if(fadeIn)
+	{
+		p.setPen(green);
+		long pstart = tempomap.frame2tick(wp->frame());
+		long partx = mapx(pstart);
+		long fpos = tempomap.frame2tick(wp->frame()+fadeIn->width());
+		long fadex = mapx(fpos);
+		if(fadeIn->width() > 0)
+		{
+			QPolygon fadeInCurve;
+			fadeInCurve << QPoint(partx, pr.bottom()) << QPoint(fadex, pr.top());
+			p.drawPolygon(fadeInCurve);
+		}
+		QRect picker(fadex-3, pr.top(), 6, 6);
+		p.drawRect(picker);
+	}
+	if(fadeOut)
+	{
+		p.setPen(green);
+		//long pstart = tempomap.frame2tick(wp->frame());
+		long pend = tempomap.frame2tick(wp->frame() + wp->lenFrame());
+		long fpos = (wp->frame() + wp->lenFrame())-fadeOut->width();
+		fpos = tempomap.frame2tick(fpos);
+		long fadex = mapx(fpos);
+		long endx = mapx(pend);
+		if(fadeOut->width() > 0)
+		{
+			QPolygon fadeOutCurve;
+			fadeOutCurve << QPoint(endx, pr.bottom()) << QPoint(fadex, pr.top());
+			p.drawPolygon(fadeOutCurve);
+		}
+		QRect picker(fadex-3, pr.top(), 6, 6);
+		p.drawRect(picker);
+	}
 	p.restore();
 }
 //---------------------------------------------------------

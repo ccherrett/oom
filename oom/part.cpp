@@ -758,16 +758,16 @@ WavePart::WavePart(WaveTrack* t)
 : Part(t)
 {
 	setType(FRAMES);
-	m_fadeIn = 0;//new FadeCurve(FadeIn, this);
-	m_fadeOut = 0;//new FadeCurve(FadeOut, this);
+	m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
+	m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
 }
 
 WavePart::WavePart(WaveTrack* t, EventList* ev)
 : Part(t, ev)
 {
 	setType(FRAMES);
-	m_fadeIn = 0;//new FadeCurve(FadeIn, this);
-	m_fadeOut = 0;//new FadeCurve(FadeOut, this);
+	m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
+	m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
 }
 
 //---------------------------------------------------------
@@ -783,19 +783,21 @@ WavePart::WavePart(const WavePart& p) : Part(p)
 	m_leftClip = p.m_leftClip;
 	m_rightClip = p.m_rightClip;
 	m_fadeIn = p.m_fadeIn;
+	m_fadeIn->setPart(this);
 	m_fadeOut = p.m_fadeOut;
+	m_fadeOut->setPart(this);
 }
 
 void WavePart::createFadeIn()
 {
 	if(!m_fadeIn)
-		m_fadeIn = new FadeCurve(FadeCurve::FadeIn, this);
+		m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
 }
 
 void WavePart::createFadeOut()
 {
 	if(!m_fadeOut)
-		m_fadeOut = new FadeCurve(FadeCurve::FadeOut, this);
+		m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
 }
 
 //---------------------------------------------------------

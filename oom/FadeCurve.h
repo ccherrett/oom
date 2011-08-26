@@ -22,22 +22,37 @@ public:
 		FadeIn,
 		FadeOut
 	};
-	FadeCurve(CurveType t, WavePart *part, QObject* parent = 0);
+	enum CurveMode {
+		Linear = 0,
+		Spline
+	};
+	FadeCurve(CurveType t, CurveMode, WavePart *part, QObject* parent = 0);
 	~FadeCurve();
-	CurveType type();
+	CurveType type()
+	{
+		return m_type;
+	}
 	bool active();
-	double range();
-	void setRange(double);
+	long width();
+	void setWidth(long);
+	WavePart* part()
+	{
+		return m_part;
+	}
+	void setPart(WavePart *part)
+	{
+		m_part = part;
+	}
 
 public slots:
 	void setActive(bool);
 
 private:
 	CurveType m_type;
+	CurveMode m_mode;
 	WavePart* m_part;
 	bool m_active;
-	QList<QPointF> m_controlPoints;
-	double m_range;
+	long m_width;
 
 signals:
 	void stateChanged();
