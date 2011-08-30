@@ -800,6 +800,95 @@ void WavePart::createFadeOut()
 		m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
 }
 
+float WavePart::gain(unsigned pos, float def)
+{
+	float val = def;
+	//TODO: use srcOffset to get the gain for the part at this point is its in
+	//a curve range.
+	unsigned p_spos = frame();
+	unsigned p_epos = p_spos + lenFrame();
+	unsigned offset = pos-p_spos;
+	long fadeInWidth = m_fadeIn->width();
+	long fadeOutWidth = m_fadeOut->width();
+	long fadeInPos = p_spos+fadeInWidth;
+	if(fadeInWidth > 0 && fadeInPos < long(pos))
+	{//Process fadeIn gain//a * t + b;
+		float v = (float(offset) / float(fadeInWidth));
+		val *= calculateGain(m_fadeIn, v);
+	}
+	long fadeOutPos = p_epos-fadeOutWidth;
+	if(fadeOutWidth > 0 && long(pos) > fadeOutPos)
+	{//process fadeOut gain
+		float v = (float(offset - (lenFrame() - fadeOutWidth))	/ float(fadeOutWidth));
+		val = def;
+		val *= calculateGain(m_fadeOut, v);
+	}
+	return val;
+}
+
+/**
+ * This function was developed from the qtractorClipFadeFunctor.cpp 
+ * Great work Rui and thanks.
+ */
+float WavePart::calculateGain(FadeCurve* curve, float base)
+{
+	float a = curve->start();
+	float b = curve->end();
+	switch(curve->mode())
+	{
+		case FadeCurve::Linear:
+		{
+			return a * base + b;
+		}
+		case FadeCurve::InQuad:
+		{//Quadratic
+			return a * (base * base) + b;
+		}
+		break;
+		case FadeCurve::OutQuad:
+		{
+			return a * (base * (2.0f - base)) + b;
+		}
+		break;
+		case FadeCurve::InOutQuad:
+		{
+			base *= 2.0f;
+			if (base < 1.0f) {
+				return 0.5f * a * (base * base) + b;
+			} else {
+				base -= 1.0f;
+				return 0.5f * a * (1.0f - (base * (base - 2.0f))) + b;
+			}
+		}
+		break;
+		case FadeCurve::InCubic:
+		{
+			return a * (base * base * base) + b;
+		}
+		break;
+		case FadeCurve::OutCubic:
+		{
+			base -= 1.0f;
+			return a * ((base * base * base) + 1.0f) + b;
+		}
+		break;
+		case FadeCurve::InOutCubic:
+		{
+			base *= 2.0f;
+			if (base < 1.0f) {
+				return 0.5f * a * (base * base * base) + b;
+			} else {
+				base -= 2.0f;
+				return 0.5f * a * ((base * base * base) + 2.0f) + b;
+			}
+		}
+		break;
+		default:
+		break;
+	}
+	return 0.0f;
+}
+
 //---------------------------------------------------------
 //   Part
 //---------------------------------------------------------

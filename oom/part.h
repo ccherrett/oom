@@ -258,8 +258,12 @@ public:
 
 	void createFadeIn();
 	void createFadeOut();
+	
+	float gain(unsigned, float def);
+	float calculateGain(FadeCurve*, float);
 
     virtual void dump(int n = 0) const;
+
 };
 
 

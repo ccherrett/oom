@@ -15,6 +15,25 @@ FadeCurve::FadeCurve(CurveType type, CurveMode mode, WavePart* p, QObject* paren
 	m_part = p;
 	m_active = false;
 	m_width = 0;
+	switch(m_type)
+	{
+		case FadeIn:
+		{
+			float a = 0.0f;
+			float b = 1.0f;
+			m_startVol = (b - a);
+			m_endVol = b;
+		}
+		break;
+		case FadeOut:
+		{
+			float a = 1.0f;
+			float b = 0.0f;
+			m_startVol = (b - a);
+			m_endVol = b;
+		}
+		break;
+	}
 }
 
 FadeCurve::~FadeCurve()

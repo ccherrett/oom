@@ -173,7 +173,7 @@ void WaveEventBase::readAudio(WavePart* part, unsigned offset, float** buffer, i
 		if (!f.isNull())
 		{
 			sfCurFrame = f.seek(offset + _spos, 0);
-			sfCurFrame += f.read(channel, buffer, n, overwrite);
+			sfCurFrame += f.read(channel, buffer, n, offset, overwrite, part);
 		}
 	}
 	return;
@@ -183,7 +183,7 @@ void WaveEventBase::readAudio(WavePart* part, unsigned offset, float** buffer, i
 		return;
 
 	f.seek(offset + _spos, 0);
-	f.read(channel, buffer, n, overwrite);
+	f.read(channel, buffer, n, offset, overwrite, part);
 
 	return;
 #endif

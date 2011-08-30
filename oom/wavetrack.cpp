@@ -69,47 +69,47 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 			if (pos >= p_epos)
 				continue;
 
-			EventList* events = part->events();
-			for (iEvent ie = events->begin(); ie != events->end(); ++ie)
+			//we now only support a single event per wave part so no need for iteration
+			//EventList* events = part->events();
+			iEvent ie = part->events()->begin();
+			if(ie != part->events()->end())
 			{
 				Event& event = ie->second;
 				unsigned e_spos = event.frame() + p_spos;
 				unsigned nn = event.lenFrame();
 				unsigned e_epos = e_spos + nn;
 
-				if (pos + n < e_spos)
-					break;
-				if (pos >= e_epos)
-					continue;
-
-				int offset = e_spos - pos;
-
-				unsigned srcOffset, dstOffset;
-				if (offset > 0)
+				if (pos + n >= e_spos && pos < e_epos)
 				{
-					nn = n - offset;
-					srcOffset = 0;
-					dstOffset = offset;
+					int offset = e_spos - pos;
+
+					unsigned srcOffset, dstOffset;
+					if (offset > 0)
+					{
+						nn = n - offset;
+						srcOffset = 0;
+						dstOffset = offset;
+					}
+					else
+					{
+						srcOffset = -offset;
+						dstOffset = 0;
+
+						nn += offset;
+						if (nn > n)
+							nn = n;
+					}
+					float* bpp[channels()];
+					for (int i = 0; i < channels(); ++i)
+						bpp[i] = bp[i] + dstOffset;
+
+					//Read in samples, since the parts are now processed via zIndex and 
+					//not left to right we can overwrite as we always want to hear the part on top
+					//Set false here to mix all layers togather, maybe we should make this a user
+					//setting.
+	//printf("WaveTrack::fetchData %s samples:%u pos:%u pstart:%u srcOffset:%u\n", name().toLatin1().constData(), samples, pos, p_spos, srcOffset);
+					event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, true);
 				}
-				else
-				{
-					srcOffset = -offset;
-					dstOffset = 0;
-
-					nn += offset;
-					if (nn > n)
-						nn = n;
-				}
-				float* bpp[channels()];
-				for (int i = 0; i < channels(); ++i)
-					bpp[i] = bp[i] + dstOffset;
-
-				//Read in samples, since the parts are now processed via zIndex and 
-				//not left to right we can overwrite as we always want to hear the part on top
-				//Set false here to mix all layers togather, maybe we should make this a user
-				//setting.
-				event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, true);
-
 			}
 		}
 		//printf("\n");

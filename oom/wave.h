@@ -16,6 +16,7 @@
 
 class QFileInfo;
 class Xml;
+class WavePart;
 
 //---------------------------------------------------------
 //   SampleV
@@ -61,7 +62,7 @@ class SndFile
 
     bool openFlag;
     bool writeFlag;
-    size_t readInternal(int srcChannels, float** dst, size_t n, bool overwrite, float *buffer);
+    size_t readInternal(int srcChannels, float** dst, size_t n, bool overwrite, float *buffer, unsigned offset, WavePart* part = 0);
 
 protected:
     int refCount;
@@ -108,7 +109,7 @@ public:
     int sampleBits() const;
     void setFormat(int fmt, int ch, int rate);
 
-    size_t read(int channel, float**, size_t, bool overwrite = true);
+    size_t read(int channel, float**, size_t, unsigned offset, bool overwrite = true, WavePart* part = 0);
     size_t readWithHeap(int channel, float**, size_t, bool overwrite = true);
 
     size_t readDirect(float* buf, size_t n)
@@ -255,9 +256,9 @@ public:
         return sf->readWithHeap(channel, f, n, overwrite);
     }
 
-    size_t read(int channel, float** f, size_t n, bool overwrite = true)
+    size_t read(int channel, float** f, size_t n, unsigned offset, bool overwrite = true, WavePart* part = 0)
     {
-        return sf->read(channel, f, n, overwrite);
+        return sf->read(channel, f, n, offset, overwrite, part);
     }
 
     size_t readDirect(float* f, size_t n)

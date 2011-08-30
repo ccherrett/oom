@@ -3054,27 +3054,57 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			}
 		}
 	}/*}}}*/
+	QColor fadeColor(green);
+	fadeColor.setAlpha(120);
+	QPen greenPen(fadeColor);
+	greenPen.setCosmetic(true);
+	p.setPen(greenPen);
 	FadeCurve* fadeIn = wp->fadeIn();
 	FadeCurve* fadeOut = wp->fadeOut();
 	if(fadeIn)
 	{
-		p.setPen(green);
 		long pstart = tempomap.frame2tick(wp->frame());
 		long partx = mapx(pstart);
 		long fpos = tempomap.frame2tick(wp->frame()+fadeIn->width());
 		long fadex = mapx(fpos);
 		if(fadeIn->width() > 0)
 		{
+			int fiy = pr.top();
+			int fix = partx;
+			int fiw = int(fadex);
+			int fih = pr.bottom();
 			QPolygon fadeInCurve;
+			/*QPolygon fadeInCurve(5);
+			const int w2 = (fiw >> 1);
+			const int w4 = (fiw >> 2);
+			fadeInCurve.setPoint(0, fix, fiy);
+			fadeInCurve.setPoint(1, fix, fih);
+			switch(fadeIn->mode())
+			{
+				case FadeCurve::Linear:
+				{
+					//fadeInCurve.setPoint(2, fix, fih);
+					//fadeInCurve.setPoint(3, fix, fih);
+					fadeInCurve.setPoint(2, fix + w2, fih);
+					fadeInCurve.setPoint(3, fix + fiw, fiy);
+				}
+				break;
+			}
+			fadeInCurve.setPoint(4, fix + fiw, fiy);*/
 			fadeInCurve << QPoint(partx, pr.bottom()) << QPoint(fadex, pr.top());
 			p.drawPolygon(fadeInCurve);
+			//QPainterPath path;
+			//path.moveTo(fadeInCurve.at(0));
+			//path.lineTo(fadeInCurve.at(1));
+			//path.cubicTo(fadeInCurve.at(2), fadeInCurve.at(3), fadeInCurve.at(4));
+			//path.lineTo(fadeInCurve.at(0));
+			//p.drawPath(path);
 		}
 		QRect picker(fadex-3, pr.top(), 6, 6);
 		p.drawRect(picker);
 	}
 	if(fadeOut)
 	{
-		p.setPen(green);
 		//long pstart = tempomap.frame2tick(wp->frame());
 		long pend = tempomap.frame2tick(wp->frame() + wp->lenFrame());
 		long fpos = (wp->frame() + wp->lenFrame())-fadeOut->width();
