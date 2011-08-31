@@ -811,14 +811,14 @@ float WavePart::gain(unsigned pos, float def)
 	long fadeInWidth = m_fadeIn->width();
 	long fadeOutWidth = m_fadeOut->width();
 	long fadeInPos = p_spos+fadeInWidth;
-	if(fadeInWidth > 0 && fadeInPos < long(pos))
+	if(fadeInWidth > 0 && fadeInPos <= long(pos))
 	{//Process fadeIn gain//a * t + b;
 		float v = (float(offset) / float(fadeInWidth));
 		val *= calculateGain(m_fadeIn, v);
 		//printf("WavePart::gain fadeIn def:%f val:%f\n", def, val);
 	}
 	long fadeOutPos = p_epos-fadeOutWidth;
-	if(fadeOutWidth > 0 && long(pos) > fadeOutPos)
+	if(fadeOutWidth > 0 && long(pos) >= fadeOutPos)
 	{//process fadeOut gain
 		float v = (float(offset - (lenFrame() - fadeOutWidth))	/ float(fadeOutWidth));
 		val = def;
