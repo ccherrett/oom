@@ -802,6 +802,8 @@ void WavePart::createFadeOut()
 
 float WavePart::gain(unsigned pos, float def)
 {
+//NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+	//float convertValue = (((def - -0.999f) * (1.0f - 0.0f)) / (0.999f - -0.999f)) + 0.0f;
 	float val = def;
 	//TODO: use srcOffset to get the gain for the part at this point is its in
 	//a curve range.
@@ -810,20 +812,27 @@ float WavePart::gain(unsigned pos, float def)
 	unsigned offset = pos-p_spos;
 	long fadeInWidth = m_fadeIn->width();
 	long fadeOutWidth = m_fadeOut->width();
-	long fadeInPos = p_spos+fadeInWidth;
-	if(fadeInWidth > 0 && fadeInPos <= long(pos))
+	//long fadeInPos = p_spos+fadeInWidth;
+	//if(offset < 1001)
+	//	printf("WavePart::gain offset:%u pos:%u part_start:%u fadeInWidth:%ld, convertedValue:%f\n", offset, pos, p_spos, fadeInWidth, convertValue);
+	if(fadeInWidth > 0 && offset < fadeInWidth)//fadeInPos <= long(pos))
 	{//Process fadeIn gain//a * t + b;
+		val = def;//convertValue;
 		float v = (float(offset) / float(fadeInWidth));
-		val *= calculateGain(m_fadeIn, v);
-		//printf("WavePart::gain fadeIn def:%f val:%f\n", def, val);
+		float  calced = calculateGain(m_fadeIn, v);
+		val *= v;//calced;
+		//if(int(offset) < 1001)
+		//	printf("WavePart::gain fadeIn def:%f calced:%f v:%f offset:%u val:%f\n", def, calced, v, offset, val);
+		//val = (((val - 0.0f) * (0.999 - -0.999)) / (1.0f - 0.0f)) + -0.999;
 	}
-	long fadeOutPos = p_epos-fadeOutWidth;
-	if(fadeOutWidth > 0 && long(pos) >= fadeOutPos)
+	//long fadeOutPos = p_epos-fadeOutWidth;
+	if(fadeOutWidth > 0 && offset > (lenFrame() - fadeOutWidth))//long(pos) >= fadeOutPos)
 	{//process fadeOut gain
 		float v = (float(offset - (lenFrame() - fadeOutWidth))	/ float(fadeOutWidth));
 		val = def;
-		val *= calculateGain(m_fadeOut, v);
-		//printf("WavePart::gain fadeOut def:%f val:%f\n", def, val);
+		val *= (v - 1.0f);//calculateGain(m_fadeOut, v);
+		//val = (((val - 0.0f) * (0.999 - -0.999)) / (1.0f - 0.0f)) + -0.999;
+		//printf("WavePart::gain fadeOut def:%f val:%f v:%f\n", def, val, v);
 	}
 	return val;
 }
