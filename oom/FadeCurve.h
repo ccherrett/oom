@@ -24,12 +24,8 @@ public:
 	};
 	enum CurveMode {
 		Linear = 0,
-		InQuad,
-		OutQuad,
-		InOutQuad,
-		InCubic,
-		OutCubic,
-		InOutCubic
+		Quad,
+		Cubic,
 	};
 	FadeCurve(CurveType t, CurveMode, WavePart *part, QObject* parent = 0);
 	~FadeCurve();
@@ -56,14 +52,6 @@ public:
 	{
 		m_part = part;
 	}
-	float start()
-	{
-		return m_startVol;
-	}
-	float end()
-	{
-		return m_endVol;
-	}
 
 public slots:
 	void setActive(bool);
@@ -74,8 +62,6 @@ private:
 	WavePart* m_part;
 	bool m_active;
 	long m_width;
-	float m_startVol;
-	float m_endVol;
 
 signals:
 	void stateChanged();

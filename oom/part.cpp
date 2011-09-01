@@ -802,104 +802,29 @@ void WavePart::createFadeOut()
 
 float WavePart::gain(unsigned pos, float def)
 {
-//NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-	//float convertValue = (((def - -0.999f) * (1.0f - 0.0f)) / (0.999f - -0.999f)) + 0.0f;
 	float val = def;
-	//TODO: use srcOffset to get the gain for the part at this point is its in
-	//a curve range.
 	unsigned p_spos = frame();
 	//unsigned p_epos = p_spos + lenFrame();
 	unsigned offset = pos-p_spos;
 	long fadeInWidth = m_fadeIn->width();
 	long fadeOutWidth = m_fadeOut->width();
-	//long fadeInPos = p_spos+fadeInWidth;
-	//if(offset < 1001)
-	//	printf("WavePart::gain offset:%u pos:%u part_start:%u fadeInWidth:%ld, convertedValue:%f\n", offset, pos, p_spos, fadeInWidth, convertValue);
-	if(fadeInWidth > 0 && offset < fadeInWidth)//fadeInPos <= long(pos))
-	{//Process fadeIn gain//a * t + b;
-		val = def;//convertValue;
+	if(fadeInWidth > 0 && offset < fadeInWidth)
+	{
+		val = def;
 		float v = (float(offset) / float(fadeInWidth));
-		//float  calced = calculateGain(m_fadeIn, v);
-		val *= v;//calced;
-		//if(int(offset) < 1001)
-		//	printf("WavePart::gain fadeIn def:%f calced:%f v:%f offset:%u val:%f\n", def, calced, v, offset, val);
+		val *= v;
 	}
-	//long fadeOutPos = p_epos-fadeOutWidth;
-	if(fadeOutWidth > 0 && offset >= (lenFrame() - fadeOutWidth))//long(pos) >= fadeOutPos)
+	if(fadeOutWidth > 0 && offset >= (lenFrame() - fadeOutWidth))
 	{//process fadeOut gain
 		float v = (float(offset - (lenFrame() - fadeOutWidth))	/ float(fadeOutWidth));
 		val = def;
-		val *= (v - 1.0f);//calculateGain(m_fadeOut, v);
-		//printf("WavePart::gain fadeOut def:%f val:%f v:%f\n", def, val, v);
+		val *= (v - 1.0f);
 	}
 	if(val < -0.999f)
 		val = -0.999f;
 	else if(val > 0.999f)
 		val = 0.999f;
 	return val;
-}
-
-/**
- * This function was developed from the qtractorClipFadeFunctor.cpp 
- * Great work Rui and thanks.
- */
-float WavePart::calculateGain(FadeCurve* curve, float base)
-{
-	float a = curve->start();
-	float b = curve->end();
-	switch(curve->mode())
-	{
-		case FadeCurve::Linear:
-		{
-			return a * base + b;
-		}
-		case FadeCurve::InQuad:
-		{//Quadratic
-			return a * (base * base) + b;
-		}
-		break;
-		case FadeCurve::OutQuad:
-		{
-			return a * (base * (2.0f - base)) + b;
-		}
-		break;
-		case FadeCurve::InOutQuad:
-		{
-			base *= 2.0f;
-			if (base < 1.0f) {
-				return 0.5f * a * (base * base) + b;
-			} else {
-				base -= 1.0f;
-				return 0.5f * a * (1.0f - (base * (base - 2.0f))) + b;
-			}
-		}
-		break;
-		case FadeCurve::InCubic:
-		{
-			return a * (base * base * base) + b;
-		}
-		break;
-		case FadeCurve::OutCubic:
-		{
-			base -= 1.0f;
-			return a * ((base * base * base) + 1.0f) + b;
-		}
-		break;
-		case FadeCurve::InOutCubic:
-		{
-			base *= 2.0f;
-			if (base < 1.0f) {
-				return 0.5f * a * (base * base * base) + b;
-			} else {
-				base -= 2.0f;
-				return 0.5f * a * ((base * base * base) + 2.0f) + b;
-			}
-		}
-		break;
-		default:
-		break;
-	}
-	return 0.0f;
 }
 
 //---------------------------------------------------------

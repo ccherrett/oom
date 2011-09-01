@@ -69,6 +69,31 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 			if (pos >= p_epos)
 				continue;
 
+			int index = sortedByZValue.indexOf(wp);/*{{{*/
+			QList<Part*> topList = sortedByZValue.mid(index);
+			if(!topList.isEmpty())
+			{
+				QList<unsigned> *fadeInList = part->fadeInList();
+				QList<unsigned> *fadeOutList = part->fadeOutList();
+				fadeInList->clear();
+				fadeOutList->clear();
+				foreach(Part *topPart, topList)
+				{
+					unsigned tp_spos = topPart->frame();
+					unsigned tp_epos = tp_spos + topPart->lenFrame();
+					if((topPart == wp) || tp_spos > p_epos || tp_epos < p_spos)
+						continue;
+					if(tp_spos > p_spos)
+					{
+						fadeOutList->append(tp_spos);
+					}
+					if(tp_epos < p_epos)
+					{
+						fadeInList->append(tp_epos);
+					}
+				}
+			}/*}}}*/
+
 			//we now only support a single event per wave part so no need for iteration
 			//EventList* events = part->events();
 			iEvent ie = part->events()->begin();

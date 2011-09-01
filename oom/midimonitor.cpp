@@ -211,8 +211,8 @@ void MidiMonitor::msgStartLearning(int port)/*{{{*/
 
 void MidiMonitor::processMsg1(const void* m)/*{{{*/
 {
-	if(m_editing)
-		return;
+	//if(m_editing)
+	//	return;
 	const MonitorMsg* msg = (MonitorMsg*)m;
 	int type = msg->id;
 	switch(type)

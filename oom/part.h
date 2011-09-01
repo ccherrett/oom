@@ -232,6 +232,9 @@ class WavePart : public Part
     AudioConvertMap _converters;
 	FadeCurve *m_fadeIn;
 	FadeCurve *m_fadeOut;
+	//Used to keep track of layered automatic fades
+	QList<unsigned> m_fadeInList;
+	QList<unsigned> m_fadeOutList;
 
 public:
     WavePart(WaveTrack* t);
@@ -255,12 +258,19 @@ public:
 	{
 		return m_fadeOut;
 	}
+	QList<unsigned>* fadeInList()
+	{
+		return &m_fadeInList;
+	}
+	QList<unsigned>* fadeOutList()
+	{
+		return &m_fadeOutList;
+	}
 
 	void createFadeIn();
 	void createFadeOut();
 	
 	float gain(unsigned, float def);
-	float calculateGain(FadeCurve*, float);
 
     virtual void dump(int n = 0) const;
 
