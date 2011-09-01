@@ -74,28 +74,30 @@ void HeaderList::songChanged(int flags)/*{{{*/
 		}
 		wantCleanup = false;
 	}
-	if (flags == -1 || (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/)))
-	{
-		updateTrackList(true);
-	}
-	if(flags &SC_VIEW_CHANGED)
-	{
-		//printf("SC_VIEW_CHANGED\n");
-		updateTrackList(true);
-	}
-	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
-	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
 	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED | SC_CHANNELS))
 	{
-		if(!song->invalid && !m_headers.isEmpty())
+		/*if(!song->invalid && !m_headers.isEmpty())
 		{
 			foreach(TrackHeader* header, m_headers)
 			{
 				header->songChanged(flags);
 			}
-		}
-		//	emit updateHeader(flags);
+		}*/
+		emit updateHeader(flags);
 	}
+	if (flags == -1 || (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/)))
+	{
+		updateTrackList(true);
+		return;
+	}
+	if(flags &SC_VIEW_CHANGED)
+	{
+		//printf("SC_VIEW_CHANGED\n");
+		updateTrackList(true);
+		return;
+	}
+	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
+	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
 }/*}}}*/
 
 void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
@@ -170,7 +172,7 @@ void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 					TrackHeader* header = new TrackHeader(track, this);
 					header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 					//header->setFixedHeight(track->height());
-					//connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
+					connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
 					connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
 					connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
 					m_layout->insertWidget(m_headers.size(), header);
@@ -573,7 +575,7 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 				foreach(TrackHeader* head, m_headers)
 				{
 					head->stopProcessing();
-					disconnect(this, SIGNAL(updateHeader(int)), head, SLOT(songChanged(int)));
+					//disconnect(this, SIGNAL(updateHeader(int)), head, SLOT(songChanged(int)));
 				}
 			}
 			audio->msgMoveTrack(sTrack, dTrack);

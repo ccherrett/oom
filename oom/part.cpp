@@ -808,7 +808,7 @@ float WavePart::gain(unsigned pos, float def)
 	//TODO: use srcOffset to get the gain for the part at this point is its in
 	//a curve range.
 	unsigned p_spos = frame();
-	unsigned p_epos = p_spos + lenFrame();
+	//unsigned p_epos = p_spos + lenFrame();
 	unsigned offset = pos-p_spos;
 	long fadeInWidth = m_fadeIn->width();
 	long fadeOutWidth = m_fadeOut->width();
@@ -819,15 +819,10 @@ float WavePart::gain(unsigned pos, float def)
 	{//Process fadeIn gain//a * t + b;
 		val = def;//convertValue;
 		float v = (float(offset) / float(fadeInWidth));
-		float  calced = calculateGain(m_fadeIn, v);
+		//float  calced = calculateGain(m_fadeIn, v);
 		val *= v;//calced;
-		if(val < -0.999f)
-			val = -0.999f;
-		else if(val > 0.999f)
-			val = 0.999f;
 		//if(int(offset) < 1001)
 		//	printf("WavePart::gain fadeIn def:%f calced:%f v:%f offset:%u val:%f\n", def, calced, v, offset, val);
-		//val = (((val - 0.0f) * (0.999 - -0.999)) / (1.0f - 0.0f)) + -0.999;
 	}
 	//long fadeOutPos = p_epos-fadeOutWidth;
 	if(fadeOutWidth > 0 && offset >= (lenFrame() - fadeOutWidth))//long(pos) >= fadeOutPos)
@@ -835,13 +830,12 @@ float WavePart::gain(unsigned pos, float def)
 		float v = (float(offset - (lenFrame() - fadeOutWidth))	/ float(fadeOutWidth));
 		val = def;
 		val *= (v - 1.0f);//calculateGain(m_fadeOut, v);
-		if(val < -0.999f)
-			val = -0.999f;
-		else if(val > 0.999f)
-			val = 0.999f;
-		//val = (((val - 0.0f) * (0.999 - -0.999)) / (1.0f - 0.0f)) + -0.999;
 		//printf("WavePart::gain fadeOut def:%f val:%f v:%f\n", def, val, v);
 	}
+	if(val < -0.999f)
+		val = -0.999f;
+	else if(val > 0.999f)
+		val = 0.999f;
 	return val;
 }
 

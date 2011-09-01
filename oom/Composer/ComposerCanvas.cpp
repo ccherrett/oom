@@ -1431,6 +1431,7 @@ void ComposerCanvas::mouseMove(QMouseEvent* event)
 					{
 						m_selectedCurve->setWidth(currFrame-pstart);
 					}
+					//printf("FadeIn Width: %ld\n", long(m_selectedCurve->width()));
 				}
 				break;
 				case FadeCurve::FadeOut:
@@ -3061,6 +3062,8 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 	p.setPen(greenPen);
 	FadeCurve* fadeIn = wp->fadeIn();
 	FadeCurve* fadeOut = wp->fadeOut();
+	//printf("FadeIn width:%ld\n", long(fadeIn->width()));
+	//printf("FadeOut width:%ld\n", long(fadeOut->width()));
 	if(fadeIn)
 	{
 		long pstart = tempomap.frame2tick(wp->frame());
