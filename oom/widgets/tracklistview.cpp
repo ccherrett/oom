@@ -59,6 +59,8 @@ TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 	m_btnRefresh = new QToolButton(this);
 	m_btnRefresh->setAutoRaise(true);
 	m_btnRefresh->setIcon(*up_arrowIconSet3);
+	m_btnRefresh->setIconSize(QSize(25, 25));
+	m_btnRefresh->setFixedSize(QSize(25, 25));
 
 	m_buttonBox->addWidget(m_chkWorkingView);
 	QSpacerItem* hSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -68,8 +70,8 @@ TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 
 	m_layout->addLayout(m_buttonBox);
 
-	populateTable();
-	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	//populateTable();
+	//connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
 	connect(m_selmodel, SIGNAL(currentRowChanged(const QModelIndex, const QModelIndex)), this, SLOT(selectionChanged(const QModelIndex, const QModelIndex)));
 	connect(m_chkWorkingView, SIGNAL(stateChanged(int)), this, SLOT(displayRoleChanged(int)));
@@ -87,6 +89,7 @@ TrackListView::~TrackListView()
 void TrackListView::showEvent(QShowEvent*)
 {
 	printf("TrackListView::showEvent\n");
+	populateTable();
 }
 
 void TrackListView::snapToPartChanged(int state)/*{{{*/
@@ -121,6 +124,7 @@ void TrackListView::songChanged(int flags)/*{{{*/
 
 void TrackListView::populateTable()/*{{{*/
 {
+	printf("TrackListView::populateTable\n");
 	m_model->clear();
 	for(iTrack i = song->artracks()->begin(); i != song->artracks()->end(); ++i)
 	{
@@ -286,7 +290,10 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 				switch(selection)
 				{
 					case 1:
+					{
 						oom->composer->addCanvasPart(track);
+						populateTable();//update check state
+					}
 					break;
 					case 2:
 					{
@@ -305,6 +312,7 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 						if(npart)
 						{
 							audio->msgRemovePart(npart);
+							populateTable();//update check state
 							scrollPos = pos;
 							/*if(row < m_model->rowCount())
 							{
@@ -326,6 +334,7 @@ void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
 						{
 							track->setDefaultPartColor(curColorIndex);
 						}
+						populateTable();//update check state
 						break;
 					}
 				}

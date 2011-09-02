@@ -93,7 +93,7 @@ public slots:
 	void songChanged(int);
 	void stopProcessing();
 	void startProcessing();
-	void setSelected(bool);
+	void setSelected(bool, bool force = false);
 
 protected:
     enum

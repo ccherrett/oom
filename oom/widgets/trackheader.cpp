@@ -159,7 +159,7 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 
 	if(m_pan)
 		m_pan->setAcceptDrops(false);
-	setSelected(m_track->selected());
+	setSelected(m_track->selected(), true);
 	if(m_track->height() < MIN_TRACKHEIGHT)
 	{
 		setFixedHeight(MIN_TRACKHEIGHT);
@@ -173,6 +173,17 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 		m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 	else
 		m_btnAutomation->setIcon(*automation_trackIconSet3);
+	
+	if(type == Track::AUDIO_BUSS || type == Track::AUDIO_INPUT || type == Track::AUDIO_AUX)
+	{
+		m_btnRecord->setIcon(QIcon(*input_indicator_OffIcon));
+		m_btnRecord->setToolTip("");
+	}
+	else
+	{
+		m_btnRecord->setIcon(*record_trackIconSet3);
+		m_btnRecord->setToolTip(tr("Record"));
+	}
 
 	m_btnRecord->blockSignals(true);
 	m_btnRecord->setChecked(m_track->recordFlag());
@@ -227,8 +238,9 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 
 //Public slots
 
-void TrackHeader::setSelected(bool sel)/*{{{*/
+void TrackHeader::setSelected(bool sel, bool force)/*{{{*/
 {
+	bool oldsel = m_selected;
 	if(!m_track)
 	{
 		m_selected = false;
@@ -239,8 +251,8 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 		if(m_track->selected() != sel)
 			m_track->setSelected(sel);
 	}
-	//if(!m_editing)// && m_processEvents)
-	//{
+	if((m_selected != oldsel) || force)
+	{
 		if(m_selected)
 		{
 			bool usePixmap = false;
@@ -290,7 +302,7 @@ void TrackHeader::setSelected(bool sel)/*{{{*/
 			m_colorLine->setStyleSheet(lineStyleTemplate.arg(g_trackColorListLine.value(m_track->type()).name()));
 			//m_strip->setStyleSheet("QFrame {background-color: blue;}");
 		}
-	//}
+	}
 }/*}}}*/
 
 void TrackHeader::songChanged(int flags)/*{{{*/
@@ -301,10 +313,14 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 	if(!m_track->isMidiTrack())
 	{
 		if (flags & SC_CHANNELS)
+		{
+			//printf("TrackHeader::songChanged SC_CHANNELS\n");
 			updateChannels();
+		}
 
 		if (flags & SC_CONFIG)
 		{
+			//printf("TrackHeader::songChanged SC_CONFIG\n");
 			if(m_slider)
 				m_slider->setRange(config.minSlider - 0.1, 10.0);
 
@@ -316,37 +332,7 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 		}
 	}
 
-	if (flags & SC_MUTE)
-	{
-		//printf("TrackHeader::songChanged SC_MUTE\n");
-		m_btnMute->blockSignals(true);
-		m_btnMute->setChecked(m_track->mute());
-		m_btnMute->blockSignals(false);
-	}
-	if (flags & SC_SOLO)
-	{
-		//printf("TrackHeader::songChanged SC_SOLO\n");
-		m_btnSolo->blockSignals(true);
-		m_btnSolo->setChecked(m_track->solo());
-		m_btnSolo->blockSignals(false);
-	}
-	if (flags & SC_RECFLAG)
-	{
-		//printf("TrackHeader::songChanged SC_RECFLAG\n");
-		m_btnRecord->blockSignals(true);
-		m_btnRecord->setChecked(m_track->recordFlag());
-		m_btnRecord->blockSignals(false);
-	}
-	if (flags & SC_MIDI_TRACK_PROP)
-	{
-		//printf("TrackHeader::songChanged SC_MIDI_TRACK_PROP\n");
-	}
-	if (flags & SC_SELECTION)
-	{
-		//printf("TrackHeader::songChanged SC_SELECTION\n");
-		setSelected(m_track->selected());
-	}
-	if (flags & SC_TRACK_MODIFIED)
+	if (flags & SC_TRACK_MODIFIED)/*{{{*/
 	{
 		//printf("TrackHeader::songChanged SC_TRACK_MODIFIED updating all\n");
 		m_btnRecord->blockSignals(true);
@@ -388,6 +374,37 @@ void TrackHeader::songChanged(int flags)/*{{{*/
 		{
 			setFixedHeight(m_track->height());
 		}
+		return;
+	}/*}}}*/
+	if (flags & SC_MUTE)
+	{
+		//printf("TrackHeader::songChanged SC_MUTE\n");
+		m_btnMute->blockSignals(true);
+		m_btnMute->setChecked(m_track->mute());
+		m_btnMute->blockSignals(false);
+	}
+	if (flags & SC_SOLO)
+	{
+		//printf("TrackHeader::songChanged SC_SOLO\n");
+		m_btnSolo->blockSignals(true);
+		m_btnSolo->setChecked(m_track->solo());
+		m_btnSolo->blockSignals(false);
+	}
+	if (flags & SC_RECFLAG)
+	{
+		//printf("TrackHeader::songChanged SC_RECFLAG\n");
+		m_btnRecord->blockSignals(true);
+		m_btnRecord->setChecked(m_track->recordFlag());
+		m_btnRecord->blockSignals(false);
+	}
+	if (flags & SC_MIDI_TRACK_PROP)
+	{
+		//printf("TrackHeader::songChanged SC_MIDI_TRACK_PROP\n");
+	}
+	if (flags & SC_SELECTION)
+	{
+		//printf("TrackHeader::songChanged SC_SELECTION\n");
+		setSelected(m_track->selected());
 	}
 }/*}}}*/
 
@@ -1848,7 +1865,7 @@ void TrackHeader::updateSelection(bool shift)/*{{{*/
 {
 	if(!m_track)
 		return;
-	printf("TrackHeader::updateSelection - shift; %d\n", shift);
+	//printf("TrackHeader::updateSelection - shift; %d\n", shift);
 	if (!shift)
 	{
 		song->deselectTracks();

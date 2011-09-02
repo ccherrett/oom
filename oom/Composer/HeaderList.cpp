@@ -74,7 +74,7 @@ void HeaderList::songChanged(int flags)/*{{{*/
 		}
 		wantCleanup = false;
 	}
-	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_MIDI_TRACK_PROP | SC_SELECTION | SC_TRACK_MODIFIED | SC_CHANNELS))
+	if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_SELECTION | SC_TRACK_MODIFIED | SC_CHANNELS))
 	{
 		/*if(!song->invalid && !m_headers.isEmpty())
 		{
