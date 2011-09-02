@@ -808,6 +808,22 @@ float WavePart::gain(unsigned pos, float def)
 	unsigned offset = pos-p_spos;
 	long fadeInWidth = m_fadeIn->width();
 	long fadeOutWidth = m_fadeOut->width();
+	/*//Calculate auto fade first
+	long autoWidth = 512;
+	if(!m_fadeOutList.isEmpty())
+	{
+		foreach(unsigned framePos, m_fadeOutList)
+		{
+			unsigned start = framePos - autoWidth;
+			if(pos > start && pos < framePos)
+			{//Add auto fadeOut
+				//
+			}
+		}
+	}
+	if(!m_fadeInList.isEmpty())
+	{
+	}*/
 	if(fadeInWidth > 0 && offset < fadeInWidth)
 	{
 		val = def;

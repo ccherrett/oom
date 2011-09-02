@@ -21,10 +21,11 @@ class QItemSelectionModel;
 class QString;
 class QVBoxLayout;
 class QHBoxLayout;
-class QButtonGroup;
+class QToolButton;
 class QCheckBox;
 class QPoint;
 class QStringList;
+class QShowEvent;
 
 class Part;
 class PartList;
@@ -42,7 +43,7 @@ class TrackListView : public QFrame
 	QHBoxLayout* m_buttonBox;
 	AbstractMidiEditor* m_editor;
 	QList<QString> m_selected;
-	QButtonGroup* m_buttons;
+	QToolButton* m_btnRefresh;;
 	QCheckBox* m_chkWorkingView;
 	QCheckBox* m_chkSnapToPart;
 	int m_displayRole;
@@ -61,6 +62,9 @@ private slots:
 	void updateCheck(PartList*, bool);
 	void updateCheck();
 	void snapToPartChanged(int);
+
+protected:
+	virtual void showEvent(QShowEvent*);
 
 public slots:
 	void toggleTrackPart(QStandardItem*);

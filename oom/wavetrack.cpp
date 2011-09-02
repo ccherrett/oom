@@ -85,11 +85,15 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 						continue;
 					if(tp_spos > p_spos)
 					{
-						fadeOutList->append(tp_spos);
+						//XXX:Make these QHash and make the width of the autofade 
+						//the same as the fadeIn/fadeOut of the part of top.
+						if(fadeOutList->isEmpty() || !fadeOutList->contains(tp_spos))
+							fadeOutList->append(tp_spos);
 					}
 					if(tp_epos < p_epos)
 					{
-						fadeInList->append(tp_epos);
+						if(fadeInList->isEmpty() || !fadeOutList->contains(tp_epos))
+							fadeInList->append(tp_epos);
 					}
 				}
 			}/*}}}*/

@@ -18,6 +18,7 @@
 #include "Composer.h"
 #include "event.h"
 #include "traverso_shared/TConfig.h"
+#include "icons.h"
 
 TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 : QFrame(parent)
@@ -55,10 +56,15 @@ TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 	bool snap = tconfig().get_property("PerformerEdit", "snaptopart", true).toBool();
 	m_chkSnapToPart->setChecked(snap);
 
+	m_btnRefresh = new QToolButton(this);
+	m_btnRefresh->setAutoRaise(true);
+	m_btnRefresh->setIcon(*up_arrowIconSet3);
+
 	m_buttonBox->addWidget(m_chkWorkingView);
 	QSpacerItem* hSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	m_buttonBox->addItem(hSpacer);
 	m_buttonBox->addWidget(m_chkSnapToPart);
+	m_buttonBox->addWidget(m_btnRefresh);
 
 	m_layout->addLayout(m_buttonBox);
 
@@ -69,12 +75,18 @@ TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 	connect(m_chkWorkingView, SIGNAL(stateChanged(int)), this, SLOT(displayRoleChanged(int)));
 	connect(m_chkSnapToPart, SIGNAL(stateChanged(int)), this, SLOT(snapToPartChanged(int)));
 	connect(m_table, SIGNAL(customContextMenuRequested(QPoint)), SLOT(contextPopupMenu(QPoint)));
+	connect(m_btnRefresh, SIGNAL(clicked()), this, SLOT(populateTable()));
 }
 
 TrackListView::~TrackListView()
 {
 	tconfig().set_property("PerformerEdit", "snaptopart", m_chkSnapToPart->isChecked());
 	tconfig().save();
+}
+
+void TrackListView::showEvent(QShowEvent*)
+{
+	printf("TrackListView::showEvent\n");
 }
 
 void TrackListView::snapToPartChanged(int state)/*{{{*/

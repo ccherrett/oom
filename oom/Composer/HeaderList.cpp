@@ -85,17 +85,18 @@ void HeaderList::songChanged(int flags)/*{{{*/
 		}*/
 		emit updateHeader(flags);
 	}
-	if (flags == -1 || (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/)))
+	//if (flags == -1 || (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/)))
+	if (!song->invalid && (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_VIEW_CHANGED )))
 	{
 		updateTrackList(true);
 		return;
 	}
-	if(flags &SC_VIEW_CHANGED)
+	/*if(!song->invalid && (flags &SC_VIEW_CHANGED))
 	{
 		//printf("SC_VIEW_CHANGED\n");
 		updateTrackList(true);
 		return;
-	}
+	}*/
 	//if (flags & (SC_MUTE | SC_SOLO | SC_RECFLAG | SC_TRACK_INSERTED
 	//		| SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_ROUTE | SC_CHANNELS | SC_MIDI_TRACK_PROP | SC_VIEW_CHANGED))
 }/*}}}*/
