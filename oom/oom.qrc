@@ -404,6 +404,9 @@
 		<file>images/vu_new_on.png</file>
 		<file>images/vu_new_over.png</file>
 		<file>images/vu_new_off.png</file>
+		<file>images/refresh_new_on.png</file>
+		<file>images/refresh_new_over.png</file>
+		<file>images/refresh_new_off.png</file>
 	</qresource>
 </RCC>
 

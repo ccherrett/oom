@@ -311,6 +311,11 @@ extern QIcon* vuIconOff;
 extern QIcon* vuIconOver;
 extern QIcon* vuIconSet3;
 
+extern QIcon* refreshIconOn;
+extern QIcon* refreshIconOff;
+extern QIcon* refreshIconOver;
+extern QIcon* refreshIconSet3;
+
 extern QIcon* speakerIconOn;
 extern QIcon* speakerIconOff;
 extern QIcon* speakerIconOver;

@@ -521,6 +521,11 @@ QPixmap* vuIconOff;
 QPixmap* vuIconOver;
 QIcon*   vuIconSet3;
 
+QPixmap* refreshIconOn;
+QPixmap* refreshIconOff;
+QPixmap* refreshIconOver;
+QIcon*   refreshIconSet3;
+
 QIcon* mixer_resizeIconSet3;
 QIcon* mixer_inputIconSet3;
 QIcon* mixer_outputIconSet3;
@@ -1212,6 +1217,13 @@ void initIcons()
       vuIconSet3->addPixmap(*vuIconOn, QIcon::Normal, QIcon::On);
       vuIconSet3->addPixmap(*vuIconOff, QIcon::Normal, QIcon::Off);
       vuIconSet3->addPixmap(*vuIconOver, QIcon::Active);
+	  
+	  refreshIconOn = new MPIXMAP(":/images/refresh_new_on.png", NULL);
+      refreshIconOff= new MPIXMAP(":/images/refresh_new_off.png", NULL);
+      refreshIconOver= new MPIXMAP(":/images/refresh_new_over.png", NULL);
+	  refreshIconSet3         = new QIcon();
+      refreshIconSet3->addPixmap(*refreshIconOff, QIcon::Normal, QIcon::Off);
+      refreshIconSet3->addPixmap(*refreshIconOver, QIcon::Active);
 	  
 	  speakerIconOn = new MPIXMAP(":/images/icons/speaker_new_on.png", NULL);
       speakerIconOff= new MPIXMAP(":/images/icons/speaker_new_off.png", NULL);
