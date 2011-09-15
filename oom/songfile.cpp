@@ -336,6 +336,20 @@ Part* readXmlPart(Xml& xml, Track* track, bool doClone, bool toTrack)
 					npart->setRightClip((unsigned)xml.parseInt());
 				else if(tag == "leftClip")
 					npart->setLeftClip((unsigned)xml.parseInt());
+				else if (tag == "fadeIn")
+				{
+					if (npart) {
+						WavePart* wp = (WavePart*) npart;
+						wp->fadeIn()->setWidth((long)xml.parseInt());
+					}
+				}
+				else if (tag == "fadeOut")
+				{
+					if (npart) {
+						WavePart* wp = (WavePart*) npart;
+						wp->fadeOut()->setWidth((long)xml.parseInt());
+					}
+				}
 				else if (tag == "event")
 				{
 					// If a new non-clone part was created, accept the events...
@@ -495,6 +509,12 @@ void Part::write(int level, Xml& xml, bool isCopy, bool forceWavePaths) const
 	xml.intTag(level, "zIndex", m_zIndex);
 	xml.intTag(level, "rightClip", m_rightClip);
 	xml.intTag(level, "leftClip", m_leftClip);
+	if (wave)
+	{
+		WavePart* wp = (WavePart*) this;
+		xml.intTag(level, "fadeIn", wp->fadeIn()->width());
+		xml.intTag(level, "fadeOut", wp->fadeOut()->width());
+	}
 	if (_mute)
 		xml.intTag(level, "mute", _mute);
 	if (dumpEvents)
