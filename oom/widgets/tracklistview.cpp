@@ -58,7 +58,7 @@ TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 
 	m_btnRefresh = new QToolButton(this);
 	m_btnRefresh->setAutoRaise(true);
-	m_btnRefresh->setIcon(*up_arrowIconSet3);
+	m_btnRefresh->setIcon(*refreshIconSet3);
 	m_btnRefresh->setIconSize(QSize(25, 25));
 	m_btnRefresh->setFixedSize(QSize(25, 25));
 

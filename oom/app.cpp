@@ -1391,8 +1391,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//-------------------------------------------------------------
 
 	menu_functions = menuBar()->addMenu(tr("&Midi"));
-	song->populateScriptMenu(menuScriptPlugins, this);
-	menu_functions->addMenu(menuScriptPlugins);
+	//song->populateScriptMenu(menuScriptPlugins, this);
+	//menu_functions->addMenu(menuScriptPlugins);
 	menu_functions->addAction(midiEditInstAction);
 	//menu_functions->addMenu(midiInputPlugins);
 	//midiInputPlugins->addAction(midiTrpAction);

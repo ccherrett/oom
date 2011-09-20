@@ -824,17 +824,19 @@ float WavePart::gain(unsigned pos, float def)
 	if(!m_fadeInList.isEmpty())
 	{
 	}*/
+
 	if(fadeInWidth > 0 && offset < fadeInWidth)
 	{
 		val = def;
 		float v = (float(offset) / float(fadeInWidth));
 		val *= v;
 	}
+
 	if(fadeOutWidth > 0 && offset >= (lenFrame() - fadeOutWidth))
 	{//process fadeOut gain
 		float v = (float(offset - (lenFrame() - fadeOutWidth))	/ float(fadeOutWidth));
 		val = def;
-		val *= (v - 1.0f);
+		val *= (1.0f - v);
 	}
 	if(val < -0.999f)
 		val = -0.999f;
