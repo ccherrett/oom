@@ -14,7 +14,7 @@ FadeCurve::FadeCurve(CurveType type, CurveMode mode, WavePart* p, QObject* paren
 	m_mode = mode;
 	m_part = p;
 	m_active = false;
-	m_width = 512;
+	m_width = 0;
 }
 
 FadeCurve::~FadeCurve()
