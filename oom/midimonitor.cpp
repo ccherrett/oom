@@ -373,13 +373,14 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										mdata.channel = track->outChannel();
 										mdata.controller = ctl;
 										mdata.value = msg->mevent.dataB();
-										if(track && track->recordFlag())
+										if(track && track->recordFlag() && audio->isPlaying())
 										{
 											unsigned tick = song->cpos();
 											Event event(Controller);
 											event.setTick(tick);
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
+											//XXX: Buffer this event instead of adding now
 											audio->msgAddEventCheck(track, event);
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())

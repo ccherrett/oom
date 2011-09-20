@@ -580,6 +580,7 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 				}
 			}
 			audio->msgMoveTrack(sTrack, dTrack);
+			//song->update(SC_TRACK_INSERTED);
 			updateTrackList(true);
 		}
 		

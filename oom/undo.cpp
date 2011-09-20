@@ -31,7 +31,8 @@ const char* UndoOp::typeName()
 		"AddEvent", "DeleteEvent", "ModifyEvent",
 		"AddTempo", "DeleteTempo", "AddSig", "DeleteSig",
 		"SwapTrack", "ModifyClip",
-		"AddTrackView", "DeleteTrackView", "ModifyTrackView"
+		"AddTrackView", "DeleteTrackView", "ModifyTrackView",
+		"AddAutomation", "DeleteAutomation", "ModifyAutomation"
 	};
 	return name[type];
 }
@@ -77,6 +78,9 @@ void UndoOp::dump()
 		case AddTrackView:
 		case ModifyTrackView:
 		case DeleteTrackView:
+		case AddAutomation:
+		case DeleteAutomation:
+		case ModifyAutomation:
 			break;
 	}
 }
@@ -299,71 +303,8 @@ void Song::doUndo2()
 				updateFlags |= SC_TRACK_MODIFIED;
 			}
 				break;
-
-				/*
-				switch(i->nTrack->type())
-				{
-					  case Track::AUDIO_OUTPUT:
-							  {
-							  AudioOutput* ao = (AudioOutput*)i->nTrack;
-							  for(int ch = 0; ch < ao->channels(); ++ch)
-								ao->setJackPort(ch, 0);
-							  }
-							break;
-					  case Track::AUDIO_INPUT:
-							  {
-							  AudioInput* ai = (AudioInput*)i->nTrack;
-							  for(int ch = 0; ch < ai->channels(); ++ch)
-								ai->setJackPort(ch, 0);
-							  }
-							break;
-					  default:
-							break;
-				}
-				if(!i->nTrack->isMidiTrack())
-				  ((AudioTrack*)i->nTrack)->clearEfxList();
-
-				//delete i->oTrack;
-				//i->oTrack = track;
-                        
-				// Remove the track. removeTrack2 takes care of unchaining the new track.
-				removeTrack2(i->nTrack);
-                        
-				// Connect and register ports.
-				switch(i->oTrack->type())
-				{
-				  case Track::AUDIO_OUTPUT:
-					  {
-					  AudioOutput* ao = (AudioOutput*)i->oTrack;
-					  ao->setName(ao->name());
-					  }
-					break;
-				  case Track::AUDIO_INPUT:
-					  {
-					  AudioInput* ai = (AudioInput*)i->oTrack;
-					  ai->setName(ai->name());
-					  }
-					break;
-				  default:
-					break;
-				}
-
-				// Insert the old track.
-				insertTrack2(i->oTrack, i->trackno);
-				// Chain the old track parts. (removeTrack2, above, takes care of unchaining the new track).
-				chainTrackParts(i->oTrack, true);
-                        
-				// Update solo states, since the user may have changed soloing on other tracks.
-				updateSoloStates();
-
-				updateFlags |= SC_TRACK_MODIFIED;
-				}
-				break;
-				 */
-
 			case UndoOp::SwapTrack:
 			{
-				updateFlags |= SC_TRACK_MODIFIED;
 				if(viewselected)
 				{
 					Track* track = _tracks[i->a];
@@ -454,6 +395,9 @@ void Song::doUndo2()
 			case UndoOp::AddTrackView:
 			case UndoOp::ModifyTrackView:
 			case UndoOp::DeleteTrackView:
+			case UndoOp::AddAutomation:
+			case UndoOp::DeleteAutomation:
+			case UndoOp::ModifyAutomation:
 				break;
 		}
 	}
@@ -545,69 +489,6 @@ void Song::doRedo2()
 				updateFlags |= SC_TRACK_MODIFIED;
 			}
 				break;
-
-				/*
-				// Prevent delete i->oTrack from crashing.
-				switch(i->oTrack->type())
-				{
-					  case Track::AUDIO_OUTPUT:
-							  {
-							  AudioOutput* ao = (AudioOutput*)i->oTrack;
-							  for(int ch = 0; ch < ao->channels(); ++ch)
-								ao->setJackPort(ch, 0);
-							  }
-							break;
-					  case Track::AUDIO_INPUT:
-							  {
-							  AudioInput* ai = (AudioInput*)i->oTrack;
-							  for(int ch = 0; ch < ai->channels(); ++ch)
-								ai->setJackPort(ch, 0);
-							  }
-							break;
-					  default:
-							break;
-				}
-				if(!i->oTrack->isMidiTrack())
-				  ((AudioTrack*)i->oTrack)->clearEfxList();
-
-				//delete i->oTrack;
-				//i->oTrack = track;
-
-				// Remove the track. removeTrack2 takes care of unchaining the old track.
-				removeTrack2(i->oTrack);
-                        
-				// Connect and register ports.
-				switch(i->nTrack->type())
-				{
-				  case Track::AUDIO_OUTPUT:
-					  {
-					  AudioOutput* ao = (AudioOutput*)i->nTrack;
-					  ao->setName(ao->name());
-					  }
-					break;
-				  case Track::AUDIO_INPUT:
-					  {
-					  AudioInput* ai = (AudioInput*)i->nTrack;
-					  ai->setName(ai->name());
-					  }
-					break;
-				  default:
-					break;
-				}
-
-				// Insert the new track.
-				insertTrack2(i->nTrack, i->trackno);
-				// Chain the new track parts. (removeTrack2, above, takes care of unchaining the old track).
-				chainTrackParts(i->nTrack, true);
-                        
-				// Update solo states, since the user may have changed soloing on other tracks.
-				updateSoloStates();
-
-				updateFlags |= SC_TRACK_MODIFIED;
-				}
-				break;
-				 */
-
 			case UndoOp::SwapTrack:
 			{
 				Track* track = _tracks[i->a];
@@ -620,14 +501,12 @@ void Song::doRedo2()
 				addPart(i->oPart);
 				updateFlags |= SC_PART_INSERTED;
 				i->oPart->events()->incARef(1);
-				//i->oPart->chainClone();
 				chainClone(i->oPart);
 				break;
 			case UndoOp::DeletePart:
 				removePart(i->oPart);
 				updateFlags |= SC_PART_REMOVED;
 				i->oPart->events()->incARef(-1);
-				//i->oPart->unchainClone();
 				unchainClone(i->oPart);
 				break;
 			case UndoOp::ModifyPart:
@@ -636,7 +515,6 @@ void Song::doRedo2()
 				changePart(i->nPart, i->oPart);
 				i->oPart->events()->incARef(1);
 				i->nPart->events()->incARef(-1);
-				//i->nPart->replaceClone(i->oPart);
 				replaceClone(i->nPart, i->oPart);
 				if (i->doCtrls)
 					addPortCtrlEvents(i->oPart, i->doClones);
@@ -688,6 +566,9 @@ void Song::doRedo2()
 			case UndoOp::AddTrackView:
 			case UndoOp::ModifyTrackView:
 			case UndoOp::DeleteTrackView:
+			case UndoOp::AddAutomation:
+			case UndoOp::DeleteAutomation:
+			case UndoOp::ModifyAutomation:
 				break;
 		}
 	}

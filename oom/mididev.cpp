@@ -172,6 +172,7 @@ void MidiDevice::monitorEvent(const MidiRecordEvent& event)/*{{{*/
 			resetNRPNCache(chan);
 			MidiRecordEvent ev(event);
 			ev.setPort(_port);
+			//printf("Event data part:%d channel:%d value:%d\n", ev.port(), chan, ev.dataB());
 			midiMonitor->msgSendMidiInputEvent(ev);
 		}
 	}
