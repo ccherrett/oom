@@ -3071,6 +3071,7 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 		long partx = mapx(pstart);
 		long fpos = tempomap.frame2tick(wp->frame()+fadeIn->width());
 		long fadex = mapx(fpos);
+		
 		if(fadeIn->width() > 0)
 		{
 			int fiy = pr.top();
@@ -3098,8 +3099,10 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			p.setBrush(fadeColor);
 			p.drawPolygon(fadeInCurve);
 		}
+
 		int lpos = fadex-3;
 		QRect picker((lpos < partx) ? partx : lpos, pr.top(), 6, 6);
+		p.setBrush(waveFill);
 		p.drawRect(picker);
 	}
 	if(fadeOut)
@@ -3110,6 +3113,7 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 		fpos = tempomap.frame2tick(fpos);
 		long fadex = mapx(fpos);
 		long endx = mapx(pend);
+
 		if(fadeOut->width() > 0)
 		{
 			int fiy = pr.top();
@@ -3131,10 +3135,12 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			p.setBrush(fadeColor);
 			p.drawPolygon(fadeOutCurve);
 		}
+		
 		int rpos = fadex-3;
 		if((rpos + 6) > endx)
 			rpos = (endx - 6);
 		QRect picker(rpos, pr.top(), 6, 6);
+		p.setBrush(waveFill);
 		p.drawRect(picker);
 	}
 	p.restore();
