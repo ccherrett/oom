@@ -39,7 +39,8 @@ struct UndoOp
         SwapTrack,
         ModifyClip,
         ModifyMarker,
-        AddTrackView, DeleteTrackView, ModifyTrackView
+        AddTrackView, DeleteTrackView, ModifyTrackView,
+		AddAutomation, DeleteAutomation, ModifyAutomation
     };
     UndoType type;
 
