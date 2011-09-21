@@ -1284,6 +1284,7 @@ void Song::cmdResizePartLeft(Track* track, Part* oPart, unsigned int len, unsign
 				{
 					nPart = (WavePart*)p2;
 					nPart->setSelected(true);
+					nPart->setColorIndex(oPart->colorIndex());
 				}
 				else
 					return;
