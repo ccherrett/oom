@@ -37,6 +37,10 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 : QDialog(parent)
 {
 	setupUi(this);
+	groupBox13->hide();
+	vstInPlaceTextLabel->hide();
+	vstInPlaceCheckBox->hide();
+	startUpBox->hide();
 	startSongGroup = new QButtonGroup(this);
 	startSongGroup->addButton(startLastButton, 0);
 	startSongGroup->addButton(startEmptyButton, 1);

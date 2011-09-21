@@ -1647,6 +1647,7 @@ QCheckBox {
      border: 1px solid #e2e5e5;
      selection-background-color: #93a7b2;
 	 background-color: #d0d0d0;
+	 color: #000000;
  }
 
 QHeaderView#header {

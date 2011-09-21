@@ -56,12 +56,12 @@ AudioMixer::AudioMixer(const QString& title, QWidget* parent)
 	m_btnAux = new QPushButton(m_mixerDock);
 	m_btnAux->setToolTip(tr("Show/hide Effects Rack"));
 	m_btnAux->setShortcut(shortcuts[SHRT_TOGGLE_RACK].key);
-	m_btnAux->setMaximumSize(QSize(22,18));
+	m_btnAux->setMaximumSize(QSize(20,16));
 	m_btnAux->setObjectName("m_btnAux");
 	m_btnAux->setCheckable(true);
 	m_btnAux->setChecked(true);
-	m_btnAux->setIcon(*expandIcon);
-	m_btnAux->setIconSize(expandIcon->size());
+	m_btnAux->setIcon(*expandIconSet3);
+	m_btnAux->setIconSize(QSize(22,18));
 
 	m_cmbRows = new QComboBox(m_mixerDock);
 	for(int i = 1; i < 6; i++)

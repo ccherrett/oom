@@ -183,14 +183,15 @@ const QStringList image_file_pattern =
 
 const QStringList part_file_pattern =  
       QT_TRANSLATE_NOOP("@default", 
-      QString("part Files (*.mpt *.mpt.gz *.mpt.bz2);;") +
+      //QString("part Files (*.mpt *.mpt.gz *.mpt.bz2);;") +
+      QString("part Files (*.mpt);;") +
       QString("All Files (*)")).split(";;");
 
 const QStringList part_file_save_pattern =  
       QT_TRANSLATE_NOOP("@default", 
       QString("part Files (*.mpt);;") +
-      QString("gzip compressed part Files (*.mpt.gz);;") +
-      QString("bzip2 compressed part Files (*.mpt.bz2);;") +
+      //QString("gzip compressed part Files (*.mpt.gz);;") +
+      //QString("bzip2 compressed part Files (*.mpt.bz2);;") +
       QString("All Files (*)")).split(";;");
 
 const QStringList preset_file_pattern =  
