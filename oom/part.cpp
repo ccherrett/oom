@@ -1361,6 +1361,8 @@ void Track::splitPart(Part* part, int tickpos, Part*& p1, Part*& p2)
 	EventList* de1 = p1->events();
 	EventList* de2 = p2->events();
 
+	p1->setColorIndex(part->colorIndex());
+	p2->setColorIndex(part->colorIndex());
 	if (type() == WAVE)
 	{
 		int ps = part->frame();
@@ -1458,6 +1460,7 @@ void Song::changePart(Part* oPart, Part* nPart)
 	oTrack->parts()->remove(oPart);
 	nTrack->parts()->add(nPart);
 	nPart->setZIndex(oPart->getZIndex());
+	nPart->setColorIndex(oPart->colorIndex());
 
 	// adjust song len:
 	unsigned epos = nPart->tick() + nPart->lenTick();
