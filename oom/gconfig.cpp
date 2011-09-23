@@ -139,6 +139,7 @@ GlobalConfigValues config = {
 		QColor(175,235,255), // ccherrett
 		QColor(255,195,0),   // Jus'maican a DAW
 		QColor(179,203,232), // A Stone
+		QColor(255,255,255), // The Driving Force
 		QColor(255,198,250)  // Wendy Cherrett//}}}
 	},
 	{
@@ -252,6 +253,7 @@ GlobalConfigValues config = {
 		QColor(1,53,70),   // ccherrett
 		QColor(24,61,22),  // Jus'maican a DAW
 		QColor(21,37,56),  // A Stone
+		QColor(155,0,0),   // The Driving Force
 		QColor(77,77,77)   // Wendy Cherrett//}}}
 	},
 	{
@@ -365,6 +367,7 @@ GlobalConfigValues config = {
 		QColor(63,156,187),  // ccherrett
 		QColor(112,95,36),   // Jus'maican a DAW
 		QColor(88,117,152),  // A Stone
+		QColor(104,104,104), // The Driving Force
 		QColor(192,72,182)   // Wendy Cherrett//}}}
 	},
 	{
@@ -478,6 +481,7 @@ GlobalConfigValues config = {
 		QColor(10,25,30),  // ccherrett
 		QColor(18,29,17),  // Jus'maican a DAW
 		QColor(16,20,26),  // A Stone
+		QColor(67,25,25),  // The Driving Force
 		QColor(43,43,43)   // Wendy Cherrett 
 		//}}}
 	},
@@ -592,6 +596,7 @@ GlobalConfigValues config = {
 		QString("ccherrett"),
 		QString("Jus'maican a DAW"),
 		QString("A Stone"),
+		QString("The Driving Force"),
 		QString("Wendy Cherrett")//}}}
 	}
 ,
