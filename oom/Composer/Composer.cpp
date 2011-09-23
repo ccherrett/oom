@@ -938,7 +938,7 @@ void Composer::genTrackInfo(QWidget*)
 	infoScroll->setWidgetResizable(true);
 	_rmdock = new RouteMapDock(this);
 	_commentdock = new CommentDock(this);
-	_rtabs->addTab(_tvdock, tr("   Views   "));
+	_rtabs->addTab(_tvdock, tr("   EPIC Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
 	_rtabs->addTab(midiConductor, tr("   Conductor   "));
 	//_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));

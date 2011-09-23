@@ -575,7 +575,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	m_trackListView = new TrackListView(this ,this);
 
-	m_tabs->addTab(midiConductor, tr("   The Conductor   "));
+	m_tabs->addTab(midiConductor, tr("   Conductor   "));
 	m_tabs->addTab(m_trackListView, tr("   Track List   "));
 	m_tabs->addTab(info, tr("   Note Info   "));
 	//hsplitter->addWidget(midiConductor);
