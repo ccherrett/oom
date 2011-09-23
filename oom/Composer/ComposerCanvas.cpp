@@ -311,6 +311,7 @@ ComposerCanvas::ComposerCanvas(int* r, QWidget* parent, int sx, int sy)
 	setMouseTracking(true);
 	_drag = DRAG_OFF;
 	curColorIndex = 0;
+	automation.currentCtrlList = 0;
 	automation.currentCtrlVal = 0;
 	automation.controllerState = doNothing;
 	automation.moveController = false;
