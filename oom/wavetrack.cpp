@@ -35,6 +35,15 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 	for (int i = 0; i < channels(); ++i)
 		memset(bp[i], 0, samples * sizeof (float));
 
+
+//	FadeCurve crossFadeIn(FadeCurve::FadeIn, FadeCurve::Linear, 0);
+//	crossFadeIn.setWidth(44100*10);
+//	crossFadeIn.setFrame(44100 * 4);
+
+//	FadeCurve crossFadeOut(FadeCurve::FadeOut, FadeCurve::Linear, 0);
+//	crossFadeOut.setWidth(44100*1);
+//	crossFadeOut.setFrame(44100 * 2);
+
 	// p3.3.29
 	// Process only if track is not off.
 	if (!off())
@@ -54,6 +63,8 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 		foreach(Part* wp, sortedByZValue)
 		{
 			WavePart* part = (WavePart*) wp;
+//			part->setCrossFadeIn(&crossFadeIn);
+//			part->setCrossFadeOut(&crossFadeOut);
 			//printf("Part name: %s\n", part->name().toUtf8().constData());
 
 			if (part->mute())
@@ -68,35 +79,6 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 			}
 			if (pos >= p_epos)
 				continue;
-
-			int index = sortedByZValue.indexOf(wp);/*{{{*/
-			QList<Part*> topList = sortedByZValue.mid(index);
-			if(!topList.isEmpty())
-			{
-				QList<unsigned> *fadeInList = part->fadeInList();
-				QList<unsigned> *fadeOutList = part->fadeOutList();
-				fadeInList->clear();
-				fadeOutList->clear();
-				foreach(Part *topPart, topList)
-				{
-					unsigned tp_spos = topPart->frame();
-					unsigned tp_epos = tp_spos + topPart->lenFrame();
-					if((topPart == wp) || tp_spos > p_epos || tp_epos < p_spos)
-						continue;
-					if(tp_spos > p_spos)
-					{
-						//XXX:Make these QHash and make the width of the autofade 
-						//the same as the fadeIn/fadeOut of the part of top.
-						if(fadeOutList->isEmpty() || !fadeOutList->contains(tp_spos))
-							fadeOutList->append(tp_spos);
-					}
-					if(tp_epos < p_epos)
-					{
-						if(fadeInList->isEmpty() || !fadeOutList->contains(tp_epos))
-							fadeInList->append(tp_epos);
-					}
-				}
-			}/*}}}*/
 
 			//we now only support a single event per wave part so no need for iteration
 			//EventList* events = part->events();
@@ -136,7 +118,7 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 					//not left to right we can overwrite as we always want to hear the part on top
 					//Set false here to mix all layers togather, maybe we should make this a user
 					//setting.
-	//printf("WaveTrack::fetchData %s samples:%u pos:%u pstart:%u srcOffset:%u\n", name().toLatin1().constData(), samples, pos, p_spos, srcOffset);
+					//printf("WaveTrack::fetchData %s samples:%u pos:%u pstart:%u srcOffset:%u\n", name().toLatin1().constData(), samples, pos, p_spos, srcOffset);
 					event.readAudio(part, srcOffset, bpp, channels(), nn, doSeek, true);
 				}
 			}

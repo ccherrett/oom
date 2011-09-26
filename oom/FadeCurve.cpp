@@ -15,6 +15,7 @@ FadeCurve::FadeCurve(CurveType type, CurveMode mode, WavePart* p, QObject* paren
 	m_part = p;
 	m_active = false;
 	m_width = 0;
+	m_frame = 0;
 }
 
 FadeCurve::~FadeCurve()
@@ -37,7 +38,7 @@ void FadeCurve::setActive(bool act)
 
 void FadeCurve::setWidth(long width)
 {
-	if(width > m_part->lenFrame())
+	if(m_part && width > m_part->lenFrame())
 	{
 		m_width = m_part->lenFrame();
 		return;
@@ -48,6 +49,11 @@ void FadeCurve::setWidth(long width)
 		return;
 	}
 	m_width = width;
+
+	if (m_part && m_type == FadeOut)
+	{
+		setFrame(m_part->lenFrame() - m_width);
+	}
 }
 
 long FadeCurve::width()

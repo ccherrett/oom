@@ -760,6 +760,7 @@ WavePart::WavePart(WaveTrack* t)
 	setType(FRAMES);
 	m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
 	m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
+	m_crossFadeIn = m_crossFadeOut = 0;
 }
 
 WavePart::WavePart(WaveTrack* t, EventList* ev)
@@ -768,6 +769,7 @@ WavePart::WavePart(WaveTrack* t, EventList* ev)
 	setType(FRAMES);
 	m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
 	m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
+	m_crossFadeIn = m_crossFadeOut = 0;
 }
 
 //---------------------------------------------------------
@@ -786,6 +788,7 @@ WavePart::WavePart(const WavePart& p) : Part(p)
 	m_fadeIn->setPart(this);
 	m_fadeOut = p.m_fadeOut;
 	m_fadeOut->setPart(this);
+	m_crossFadeIn = m_crossFadeOut = 0;
 }
 
 void WavePart::createFadeIn()
@@ -800,49 +803,78 @@ void WavePart::createFadeOut()
 		m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
 }
 
-float WavePart::gain(unsigned pos, float def)
+void WavePart::setCrossFadeIn(FadeCurve *fade)
 {
-	float val = def;
-	unsigned p_spos = frame();
-	//unsigned p_epos = p_spos + lenFrame();
-	unsigned offset = pos-p_spos;
-	long fadeInWidth = m_fadeIn->width();
-	long fadeOutWidth = m_fadeOut->width();
-	/*//Calculate auto fade first
-	long autoWidth = 512;
-	if(!m_fadeOutList.isEmpty())
+	m_crossFadeIn = fade;
+}
+
+void WavePart::setCrossFadeOut(FadeCurve *fade)
+{
+	m_crossFadeOut = fade;
+}
+
+float WavePart::gain(unsigned pos)
+{
+	float gainValue;
+
+	QList<FadeCurve*> fadeIns;
+	fadeIns << m_fadeIn;
+	if (m_crossFadeIn)
 	{
-		foreach(unsigned framePos, m_fadeOutList)
+		fadeIns << m_crossFadeIn;
+	}
+
+	QList<FadeCurve*> fadeOuts;
+	fadeOuts << m_fadeOut;
+
+	if (m_crossFadeOut)
+	{
+		fadeOuts << m_crossFadeOut;
+	}
+
+	gainValue = getFadeInValue(pos, fadeIns);
+	gainValue *= getFadeOutValue(pos, fadeOuts);
+
+	return gainValue;
+}
+
+float WavePart::getFadeOutValue(unsigned pos, QList<FadeCurve *> fades)
+{
+	float gain = 1.0f;
+
+	foreach(FadeCurve* fadeOut, fades)
+	{
+		unsigned posToPart = pos - frame();
+		unsigned fadeStartPos = fadeOut->getFrame();
+		unsigned fadeEndPos = fadeStartPos + fadeOut->width();
+
+		if (posToPart > fadeStartPos && posToPart < fadeEndPos && fadeOut->width() > 0)
 		{
-			unsigned start = framePos - autoWidth;
-			if(pos > start && pos < framePos)
-			{//Add auto fadeOut
-				//
-			}
+			float factor = float(posToPart - fadeStartPos) / fadeOut->width();
+			gain *= (1.0f - factor);
 		}
 	}
-	if(!m_fadeInList.isEmpty())
-	{
-	}*/
 
-	if(fadeInWidth > 0 && offset < fadeInWidth)
+	return gain;
+}
+
+
+float WavePart::getFadeInValue(unsigned pos, QList<FadeCurve *> fades)
+{
+	float gain = 1.0f;
+
+	foreach(FadeCurve* fadeIn, fades)
 	{
-		val = def;
-		float v = (float(offset) / float(fadeInWidth));
-		val *= v;
+		unsigned offset = pos - frame() - fadeIn->getFrame();
+		long fadeInWidth = fadeIn->width();
+
+		if(fadeInWidth > 0 && offset < fadeInWidth)
+		{
+			gain *= (float(offset) / float(fadeInWidth));
+		}
 	}
 
-	if(fadeOutWidth > 0 && offset >= (lenFrame() - fadeOutWidth))
-	{//process fadeOut gain
-		float v = (float(offset - (lenFrame() - fadeOutWidth))	/ float(fadeOutWidth));
-		val = def;
-		val *= (1.0f - v);
-	}
-	if(val < -0.999f)
-		val = -0.999f;
-	else if(val > 0.999f)
-		val = 0.999f;
-	return val;
+	return gain;
 }
 
 //---------------------------------------------------------

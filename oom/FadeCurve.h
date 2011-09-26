@@ -52,6 +52,14 @@ public:
 	{
 		m_part = part;
 	}
+	void setFrame(unsigned frame)
+	{
+		m_frame = frame;
+	}
+	unsigned getFrame()
+	{
+		return m_frame;
+	}
 
 public slots:
 	void setActive(bool);
@@ -62,6 +70,7 @@ private:
 	WavePart* m_part;
 	bool m_active;
 	long m_width;
+	unsigned m_frame;	// start position (frame) relative to wave part start position (frame)
 
 signals:
 	void stateChanged();
