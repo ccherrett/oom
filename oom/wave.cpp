@@ -512,6 +512,7 @@ size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwr
 	unsigned startPos = offset;
 	if(part)
 	{
+		// Turn on/off Fade In/Out processing
 		procFade = true;
 		startPos += part->frame();
 	}
@@ -519,33 +520,42 @@ size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwr
 	int dstChannels = sfinfo.channels;
 	if (srcChannels == dstChannels)
 	{
-		if (overwrite)
-			for (size_t i = 0; i < rn; ++i, ++startPos)
+		for (size_t i = 0; i < rn; ++i, ++startPos)
+		{
+			for (int ch = 0; ch < srcChannels; ++ch)
 			{
-				for (int ch = 0; ch < srcChannels; ++ch)
+				float gain = procFade ? part->gain(startPos) : 1.0f;
+				if (overwrite)
 				{
-					//float tmp = *src++;
-					//printf("Sample value %f\n", tmp);
-					//*(dst[ch] + i) = tmp;
-					*(dst[ch] + i) = procFade ? part->gain(startPos, *src++) : *src++;
+					*(dst[ch] + i) = (gain * (*src++));
+				}
+				else
+				{
+					*(dst[ch] + i) += (gain * (*src++));
 				}
 			}
-		else
-			for (size_t i = 0; i < rn; ++i, ++startPos)
-			{
-				for (int ch = 0; ch < srcChannels; ++ch)
-					*(dst[ch] + i) += procFade ? part->gain(startPos, *src++) : *src++;
-			}
+		}
 	}
+	// TODO convert these to the way gain and overwrite is handled above
 	else if ((srcChannels == 1) && (dstChannels == 2))
 	{
 		// stereo to mono
 		if (overwrite)
+		{
 			for (size_t i = 0; i < rn; ++i)
-				*(dst[0] + i) = procFade ? part->gain(startPos, (src[i + i] + src[i + i + 1])) : (src[i + i] + src[i + i + 1]);
+			{
+				float gain = procFade ? part->gain(startPos) : 1.0f;
+				*(dst[0] + i) = gain * (src[i + i] + src[i + i + 1]);
+			}
+		}
 		else
+		{
 			for (size_t i = 0; i < rn; ++i)
-				*(dst[0] + i) += procFade ? part->gain(startPos, (src[i + i] + src[i + i + 1])) : src[i + i] + src[i + i + 1];
+			{
+				float gain = procFade ? part->gain(startPos) : 1.0f;
+				*(dst[0] + i) += gain * (src[i + i] + src[i + i + 1]);
+			}
+		}
 	}
 	else if ((srcChannels == 2) && (dstChannels == 1))
 	{
@@ -553,14 +563,16 @@ size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwr
 		if (overwrite)
 			for (size_t i = 0; i < rn; ++i)
 			{
-				float data = procFade ? part->gain(startPos, *src++) : *src++;
+				float gain = procFade ? part->gain(startPos) : 1.0f;
+				float data = gain * (*src++);
 				*(dst[0] + i) = data;
 				*(dst[1] + i) = data;
 			}
 		else
 			for (size_t i = 0; i < rn; ++i)
 			{
-				float data = procFade ? part->gain(startPos, *src++) : *src++;
+				float gain = procFade ? part->gain(startPos) : 1.0f;
+				float data = gain * (*src++);
 				*(dst[0] + i) += data;
 				*(dst[1] + i) += data;
 			}
