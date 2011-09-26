@@ -571,15 +571,16 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 			int dTrack = song->visibletracks()->index(t);
 			//We are about to repopulate the whole list so lets disconnect all the signals here
 			//This will prevent race condition crashing from event firing when widget is dying
-			if(!m_headers.isEmpty() && index < m_headers.size())
+			/*if(!m_headers.isEmpty() && index < m_headers.size())
 			{
 				foreach(TrackHeader* head, m_headers)
 				{
 					head->stopProcessing();
 					//disconnect(this, SIGNAL(updateHeader(int)), head, SLOT(songChanged(int)));
 				}
-			}
+			}*/
 			audio->msgMoveTrack(sTrack, dTrack);
+			//song->update(SC_TRACK_INSERTED);
 			updateTrackList(true);
 		}
 		

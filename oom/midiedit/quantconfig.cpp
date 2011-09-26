@@ -43,7 +43,7 @@ QuantConfig::QuantConfig(int s, int l, bool lenFlag)
 	sb1->setValue(s);
 	layout->addWidget(sb1, 0, 1);
 
-	QLabel* l2 = new QLabel(tr("Don�t Quantize"));
+	QLabel* l2 = new QLabel(tr("Do Not Quantize"));
 	layout->addWidget(l2, 1, 0);
 	QSpinBox* sb2 = new QSpinBox;
 	sb2->setMinimum(0);

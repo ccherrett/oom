@@ -33,6 +33,11 @@ class MidiPort;
 class CCInfo;
 
 class Track;
+struct MonitorLog
+{
+	unsigned pos;
+	int value;
+};
 struct MidiAssignData {/*{{{*/
 	Track* track;
 	QHash<int, CCInfo*> midimap;
@@ -468,6 +473,7 @@ class MidiTrack : public Track
 
     EventList* _events; // tmp Events during midi import
     MPEventList* _mpevents; // tmp Events druring recording
+	QHash<int, QList<MonitorLog> > m_monitorBuffer;
 
 public:
     MidiTrack();
@@ -488,6 +494,16 @@ public:
     int compression;
 
 	int getTransposition();
+	QList<MonitorLog> getMonitorBuffer(int ctrl)
+	{
+		if(m_monitorBuffer.isEmpty() || !m_monitorBuffer.contains(ctrl))
+		{
+			QList<MonitorLog> list;
+			m_monitorBuffer.insert(ctrl, list);
+		}
+		QList<MonitorLog> list1 = m_monitorBuffer.value(ctrl);
+		return list1;
+	}
 
     virtual bool setRecordFlag1(bool f, bool monitor = false);
     /*{

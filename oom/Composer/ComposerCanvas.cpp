@@ -311,6 +311,7 @@ ComposerCanvas::ComposerCanvas(int* r, QWidget* parent, int sx, int sy)
 	setMouseTracking(true);
 	_drag = DRAG_OFF;
 	curColorIndex = 0;
+	automation.currentCtrlList = 0;
 	automation.currentCtrlVal = 0;
 	automation.controllerState = doNothing;
 	automation.moveController = false;
@@ -2612,6 +2613,7 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			waveFill = QColor(config.partWaveColorsAutomation[i]);
 	}
 
+
 	QRect rr = p.worldMatrix().mapRect(bb);
 	QRect pr = p.worldMatrix().mapRect(_pr);
 
@@ -3055,7 +3057,7 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			}
 		}
 	}/*}}}*/
-	QColor fadeColor(green);
+	QColor fadeColor(config.partColors[i]);
 	fadeColor.setAlpha(120);
 	QPen greenPen(fadeColor);
 	greenPen.setCosmetic(true);
@@ -3070,40 +3072,38 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 		long partx = mapx(pstart);
 		long fpos = tempomap.frame2tick(wp->frame()+fadeIn->width());
 		long fadex = mapx(fpos);
+		
 		if(fadeIn->width() > 0)
 		{
 			int fiy = pr.top();
 			int fix = partx;
 			int fiw = int(fadex);
 			int fih = pr.bottom();
-			QPolygon fadeInCurve;
-			/*QPolygon fadeInCurve(5);
-			const int w2 = (fiw >> 1);
-			const int w4 = (fiw >> 2);
+			//QPolygon fadeInCurve;
+			QPolygon fadeInCurve(5);
+			//const int w2 = (fiw >> 1);
+			//const int w4 = (fiw >> 2);
 			fadeInCurve.setPoint(0, fix, fiy);
 			fadeInCurve.setPoint(1, fix, fih);
-			switch(fadeIn->mode())
-			{
-				case FadeCurve::Linear:
-				{
-					//fadeInCurve.setPoint(2, fix, fih);
-					//fadeInCurve.setPoint(3, fix, fih);
-					fadeInCurve.setPoint(2, fix + w2, fih);
-					fadeInCurve.setPoint(3, fix + fiw, fiy);
-				}
-				break;
-			}
-			fadeInCurve.setPoint(4, fix + fiw, fiy);*/
-			fadeInCurve << QPoint(partx, pr.bottom()) << QPoint(fadex, pr.top());
+			//switch(fadeIn->mode())
+			//{
+				//case FadeCurve::Linear:
+				//{
+					fadeInCurve.setPoint(2, fix, fih);
+					fadeInCurve.setPoint(3, fix, fih);
+					//fadeInCurve.setPoint(2, fix + w2, fih);
+					//fadeInCurve.setPoint(3, fix + fiw, fiy);
+				//}
+				//break;
+			//}
+			fadeInCurve.setPoint(4, fiw, fiy);
+			p.setBrush(fadeColor);
 			p.drawPolygon(fadeInCurve);
-			//QPainterPath path;
-			//path.moveTo(fadeInCurve.at(0));
-			//path.lineTo(fadeInCurve.at(1));
-			//path.cubicTo(fadeInCurve.at(2), fadeInCurve.at(3), fadeInCurve.at(4));
-			//path.lineTo(fadeInCurve.at(0));
-			//p.drawPath(path);
 		}
-		QRect picker(fadex-3, pr.top(), 6, 6);
+
+		int lpos = fadex-3;
+		QRect picker((lpos < partx) ? partx : lpos, pr.top(), 6, 6);
+		p.setBrush(waveFill);
 		p.drawRect(picker);
 	}
 	if(fadeOut)
@@ -3114,13 +3114,34 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 		fpos = tempomap.frame2tick(fpos);
 		long fadex = mapx(fpos);
 		long endx = mapx(pend);
+
 		if(fadeOut->width() > 0)
 		{
-			QPolygon fadeOutCurve;
-			fadeOutCurve << QPoint(endx, pr.bottom()) << QPoint(fadex, pr.top());
+			int fiy = pr.top();
+			int fix = endx;
+			int fiw = int(fadex);
+			int fih = pr.bottom();
+			QPolygon fadeOutCurve(5);
+			//const int w2 = (fiw >> 1);
+			//const int w4 = (fiw >> 2);
+
+			fadeOutCurve.setPoint(0, fix, fiy);
+			fadeOutCurve.setPoint(1, fix, fih);
+			fadeOutCurve.setPoint(2, fix, fih);
+			fadeOutCurve.setPoint(3, fix, fih);
+			fadeOutCurve.setPoint(4, fiw, fiy);
+
+			//QPolygon fadeOutCurve;
+			//fadeOutCurve << QPoint(endx, pr.bottom()) << QPoint(fadex, pr.top());
+			p.setBrush(fadeColor);
 			p.drawPolygon(fadeOutCurve);
 		}
-		QRect picker(fadex-3, pr.top(), 6, 6);
+		
+		int rpos = fadex-3;
+		if((rpos + 6) > endx)
+			rpos = (endx - 6);
+		QRect picker(rpos, pr.top(), 6, 6);
+		p.setBrush(waveFill);
 		p.drawRect(picker);
 	}
 	p.restore();

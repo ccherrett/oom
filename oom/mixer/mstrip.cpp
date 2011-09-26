@@ -70,7 +70,7 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	chorusSend = CTRL_VAL_UNKNOWN;
 	reverbSend = CTRL_VAL_UNKNOWN;
 
-	addKnob(KNOB_VAR_SEND, tr("VariationSend"), tr("Variantion"), SLOT(setVariSend(double)), false);
+	addKnob(KNOB_VAR_SEND, tr("VariationSend"), tr("Variation"), SLOT(setVariSend(double)), false);
 	addKnob(KNOB_REV_SEND, tr("ReverbSend"), tr("Reverb"), SLOT(setReverbSend(double)), false);
 	addKnob(KNOB_CHO_SEND, tr("ChorusSend"), tr("Chorus"), SLOT(setChorusSend(double)), false);
 
