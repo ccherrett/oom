@@ -14,6 +14,7 @@
 class QCloseEvent;
 class QAction;
 class QMenu;
+class QProcess;
 
 class OOStudio :public QDialog ,public Ui::OOStudioBase
 {
@@ -30,16 +31,27 @@ private:
 	QAction* quitAction;
 	QSystemTrayIcon* trayIcon;
 	QMenu* trayMenu;
-	void createDialog();
+	QProcess* m_jackProcess;
+	QProcess* m_lsProcess;
+	QProcess* m_oomProcess;
 	void createTrayIcon();
+	void runJack();
+	void runCommads();
+	void runPostCommads();
+	void runOOM();
 
 protected:
 	void closeEvent(QCloseEvent*);
 
 private slots:
 	void iconActivated(QSystemTrayIcon::ActivationReason);
-	void toggleCreate();
-	void cancelCreate();
+	void resetCreate();
+	void loadSession();
+	void createSession();
+	void browseLocation();
+	void browseLSCP();
+	void browse(int);
+	void addCommand();
+	void deleteCommand();
 };
-
 #endif
