@@ -32,6 +32,13 @@ QT4_WRAP_CPP ( studio_mocs
 endif(LSCP_SUPPORT)
 
 ##
+## Resource files
+##
+QT4_ADD_RESOURCES (studio_qrc_files 
+		  studio.qrc
+		  )
+
+##
 ## List of source files to compile
 ##
 file (GLOB studio_source_files
@@ -46,11 +53,22 @@ file (GLOB studio_source_files
 endif(LSCP_SUPPORT)
 
 ##
+## UI files
+##
+file (GLOB studio_ui_files
+	OOStudioBase.ui
+	)
+
+QT4_WRAP_UI (studio_ui_headers ${studio_ui_files})
+
+##
 ## Define target
 ##
 add_executable ( oostudio
+      ${studio_ui_headers}
       ${studio_source_files}
       ${studio_mocs}
+      ${studio_qrc_files}
       )
 
 ##
@@ -59,6 +77,7 @@ add_executable ( oostudio
 set (FILES_TO_TRANSLATE
       ${FILES_TO_TRANSLATE}
       ${studio_source_files}
+      ${studio_ui_files}
       CACHE INTERNAL ""
       )
 

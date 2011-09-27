@@ -9,12 +9,13 @@
 
 #include <QDialog>
 #include <QSystemTrayIcon>
+#include "ui_OOStudioBase.h"
 
 class QCloseEvent;
 class QAction;
 class QMenu;
 
-class OOStudio :public QDialog
+class OOStudio :public QDialog ,public Ui::OOStudioBase
 {
 	Q_OBJECT
 
@@ -37,6 +38,8 @@ protected:
 
 private slots:
 	void iconActivated(QSystemTrayIcon::ActivationReason);
+	void toggleCreate();
+	void cancelCreate();
 };
 
 #endif

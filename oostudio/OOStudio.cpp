@@ -9,16 +9,29 @@
 
 OOStudio::OOStudio()
 {
+	setupUi(this);
 	createTrayIcon();
 
-	QVBoxLayout* layout = new QVBoxLayout;
-	setLayout(layout);
-
 	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+	m_groupCreate->setVisible(false);
+	connect(m_btnCreateSession, SIGNAL(clicked()), this, SLOT(toggleCreate()));
+	connect(m_btnCancelCreate, SIGNAL(clicked()), this, SLOT(cancelCreate()));
 
 	trayIcon->show();
 	setWindowTitle(tr("OOMIDI: Studio"));
-	resize(400, 300);
+	//resize(400, 300);
+}
+
+void OOStudio::toggleCreate()
+{
+	m_groupSession->setVisible(false);
+	m_groupCreate->setVisible(true);
+}
+
+void OOStudio::cancelCreate()
+{
+	m_groupSession->setVisible(true);
+	m_groupCreate->setVisible(false);
 }
 
 void OOStudio::setVisible(bool visible)
@@ -55,6 +68,8 @@ void OOStudio::createTrayIcon()/*{{{*/
 
 	trayIcon = new QSystemTrayIcon(this);
 	trayIcon->setContextMenu(trayMenu);
+	QIcon icon(":/images/oom_icon.png");
+	trayIcon->setIcon(icon);
 }/*}}}*/
 
 void OOStudio::closeEvent(QCloseEvent* ev)/*{{{*/
