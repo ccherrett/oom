@@ -117,7 +117,6 @@ public:
     {
         return end().frame();
     }
-    void setPos(const Pos&);
 };
 
 #endif

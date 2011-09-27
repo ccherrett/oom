@@ -534,8 +534,3 @@ unsigned Event::endFrame() const
 	return ev->end().frame();
 }
 
-void Event::setPos(const Pos& p)
-{
-	ev->setPos(p);
-}
-

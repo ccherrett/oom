@@ -9,6 +9,7 @@
 #include "track.h"
 #include "event.h"
 #include "audio.h"
+#include "FadeCurve.h"
 #include "wave.h"
 #include "xml.h"
 #include "song.h"
@@ -33,16 +34,10 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 
 	// reset buffer to zero
 	for (int i = 0; i < channels(); ++i)
+	{
 		memset(bp[i], 0, samples * sizeof (float));
+	}
 
-
-//	FadeCurve crossFadeIn(FadeCurve::FadeIn, FadeCurve::Linear, 0);
-//	crossFadeIn.setWidth(44100*10);
-//	crossFadeIn.setFrame(44100 * 4);
-
-//	FadeCurve crossFadeOut(FadeCurve::FadeOut, FadeCurve::Linear, 0);
-//	crossFadeOut.setWidth(44100*1);
-//	crossFadeOut.setFrame(44100 * 2);
 
 	// p3.3.29
 	// Process only if track is not off.
@@ -63,9 +58,6 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 		foreach(Part* wp, sortedByZValue)
 		{
 			WavePart* part = (WavePart*) wp;
-//			part->setCrossFadeIn(&crossFadeIn);
-//			part->setCrossFadeOut(&crossFadeOut);
-			//printf("Part name: %s\n", part->name().toUtf8().constData());
 
 			if (part->mute())
 				continue;
@@ -78,7 +70,9 @@ void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSee
 				//break;
 			}
 			if (pos >= p_epos)
+			{
 				continue;
+			}
 
 			//we now only support a single event per wave part so no need for iteration
 			//EventList* events = part->events();
@@ -190,6 +184,7 @@ void WaveTrack::read(Xml& xml)
 				if (tag == "wavetrack")
 				{
 					mapRackPluginsToControllers();
+					calculateCrossFades();
 					return;
 				}
 			default:
@@ -352,3 +347,41 @@ void WaveTrack::setChannels(int n)
 	}
 }
 
+static const int CROSSFADE_WIDTH = 8192;
+
+void WaveTrack::calculateCrossFades()
+{
+	QList<WavePart*> sortedByZValue;
+	for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+	{
+		WavePart* wp = (WavePart*)ip->second;
+		wp->crossFadeIn()->setWidth(0);
+		wp->crossFadeOut()->setWidth(0);
+		sortedByZValue.append(wp);
+	}
+
+	qSort(sortedByZValue.begin(), sortedByZValue.end(), Part::smallerZValue);
+
+	foreach(WavePart* wp, sortedByZValue)
+	{
+		foreach(WavePart* partWithHigherZindex, sortedByZValue)
+		{
+			if (partWithHigherZindex->getZIndex() > wp->getZIndex() &&
+			    partWithHigherZindex->frame() > wp->frame() &&
+			    partWithHigherZindex->endFrame() < wp->endFrame())
+			{
+				unsigned bottomPartFadeInStart = partWithHigherZindex->endFrame() - wp->frame() - CROSSFADE_WIDTH;
+				unsigned bottomPartFadeOutStart = partWithHigherZindex->frame() - wp->frame();
+
+				wp->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+				wp->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
+				wp->crossFadeIn()->setFrame(bottomPartFadeInStart);
+				wp->crossFadeOut()->setFrame(bottomPartFadeOutStart);
+
+				partWithHigherZindex->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+				partWithHigherZindex->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
+			}
+		}
+	}
+
+}

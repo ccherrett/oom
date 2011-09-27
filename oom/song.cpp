@@ -2132,7 +2132,9 @@ void Song::cmdRemovePart(Part* part)
 //   cmdChangePart
 //---------------------------------------------------------
 
-void Song::cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClones)
+void Song::
+
+cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClones)
 {
 	//printf("Song::cmdChangePart before changePart oldPart:%p events:%p refs:%d Arefs:%d sn:%d newPart:%p events:%p refs:%d Arefs:%d sn:%d\n", oldPart, oldPart->events(), oldPart->events()->refCount(), oldPart->events()->arefCount(), oldPart->sn(), newPart, newPart->events(), newPart->events()->refCount(), newPart->events()->arefCount(), newPart->sn());
 

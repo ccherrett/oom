@@ -1141,6 +1141,8 @@ public:
 	{
 		return _input;
 	}
+
+	void calculateCrossFades();
 };
 
 //---------------------------------------------------------

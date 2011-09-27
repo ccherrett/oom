@@ -506,6 +506,7 @@ size_t SndFile::read(int srcChannels, float** dst, size_t n, unsigned offset, bo
 
 size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwrite, float *buffer, unsigned offset, WavePart* part)
 {
+//	if (part->getZIndex() > 0) return 0;
 	size_t rn = sf_readf_float(sf, buffer, n);
 	//TODO: Apply fadein/fadeout curve to signal comming from file
 	bool procFade = false;
@@ -525,7 +526,7 @@ size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwr
 			for (int ch = 0; ch < srcChannels; ++ch)
 			{
 				float gain = procFade ? part->gain(startPos) : 1.0f;
-				if (overwrite)
+				if (useOverwrite(startPos, part, overwrite))
 				{
 					*(dst[ch] + i) = (gain * (*src++));
 				}
@@ -540,42 +541,37 @@ size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwr
 	else if ((srcChannels == 1) && (dstChannels == 2))
 	{
 		// stereo to mono
-		if (overwrite)
+		for (size_t i = 0; i < rn; ++i)
 		{
-			for (size_t i = 0; i < rn; ++i)
+			float gain = procFade ? part->gain(startPos) : 1.0f;
+			if (useOverwrite(startPos, part, overwrite))
 			{
-				float gain = procFade ? part->gain(startPos) : 1.0f;
 				*(dst[0] + i) = gain * (src[i + i] + src[i + i + 1]);
 			}
-		}
-		else
-		{
-			for (size_t i = 0; i < rn; ++i)
-			{
-				float gain = procFade ? part->gain(startPos) : 1.0f;
+			else {
 				*(dst[0] + i) += gain * (src[i + i] + src[i + i + 1]);
+
 			}
 		}
 	}
 	else if ((srcChannels == 2) && (dstChannels == 1))
 	{
 		// mono to stereo
-		if (overwrite)
-			for (size_t i = 0; i < rn; ++i)
+		for (size_t i = 0; i < rn; ++i)
+		{
+			float gain = procFade ? part->gain(startPos) : 1.0f;
+			float data = gain * (*src++);
+			if (useOverwrite(startPos, part, overwrite))
 			{
-				float gain = procFade ? part->gain(startPos) : 1.0f;
-				float data = gain * (*src++);
 				*(dst[0] + i) = data;
 				*(dst[1] + i) = data;
 			}
-		else
-			for (size_t i = 0; i < rn; ++i)
+			else
 			{
-				float gain = procFade ? part->gain(startPos) : 1.0f;
-				float data = gain * (*src++);
 				*(dst[0] + i) += data;
 				*(dst[1] + i) += data;
 			}
+		}
 	}
 	else
 	{
@@ -587,6 +583,27 @@ size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwr
 
 }
 
+bool SndFile::useOverwrite(unsigned pos, WavePart *part, bool overwrite)
+{
+	return overwrite;
+	FadeCurve* crossFadeIn = part->crossFadeIn();
+	FadeCurve* crossFadeOut = part->crossFadeOut();
+
+	unsigned posToPart = pos - part->frame();
+
+	if (posToPart >= crossFadeIn->getFrame() && posToPart <= (crossFadeIn->getFrame() + crossFadeIn->width()))
+	{
+		printf("applying cross fade in for part %s\n", part->name().toAscii().data());
+		return true;
+	}
+
+	if (posToPart >= crossFadeOut->getFrame() && posToPart <= (crossFadeOut->getFrame() + crossFadeIn->width()))
+	{
+		printf("applying cross fade out for part %s\n", part->name().toAscii().data());
+		return true;
+	}
+
+}
 
 //---------------------------------------------------------
 //   write
