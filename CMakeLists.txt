@@ -434,13 +434,13 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${OOMidi_INSTALL_NAME}")
 
   # Don't pack the binary tree and the subversion directories
-  SET(CPACK_SOURCE_IGNORE_FILES "/\\\\.svn/;${CMAKE_BINARY_DIR}/*")
+  SET(CPACK_SOURCE_IGNORE_FILES "/\\\\.git/;/\\\\.gitignore;${CMAKE_BINARY_DIR}/*")
 
   SET(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 
   SET(CPACK_PACKAGE_FILE_NAME "${CPACK_SOURCE_PACKAGE_FILE_NAME}-${CPACK_SYSTEM_NAME}")
-  SET(CPACK_STRIP_FILES "bin/oomidi;bin/grepmidi")
-  SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "grepmidi" "grepmidi")
+  SET(CPACK_STRIP_FILES "bin/oomidi;bin/grepmidi;bin/oostudio")
+  SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "grepmidi" "grepmidi" "oostudio" "oostudio")
   INCLUDE(CPack)
 ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 
@@ -453,7 +453,7 @@ set(CMAKE_CXX_FLAGS_DEBUG   "-g -DQT_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}")
 #subdirs(al lib grepmidi plugins oom share demos synti )
 # NOTE: share/ directory needs to be at the end so that the translations
 #       are scanned before coming to share/locale
-subdirs(al awl grepmidi man plugins oom synti packaging utils demos share)
+subdirs(al awl grepmidi man plugins oom synti packaging utils demos share oostudio)
 
 ## Install doc files
 file (GLOB doc_files
