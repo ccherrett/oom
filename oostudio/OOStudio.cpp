@@ -13,9 +13,8 @@ OOStudio::OOStudio()
 	createTrayIcon();
 
 	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
-	m_groupCreate->setVisible(false);
-	connect(m_btnCreateSession, SIGNAL(clicked()), this, SLOT(toggleCreate()));
-	connect(m_btnCancelCreate, SIGNAL(clicked()), this, SLOT(cancelCreate()));
+	//connect(m_btnCreateSession, SIGNAL(clicked()), this, SLOT(toggleCreate()));
+	//connect(m_btnCancelCreate, SIGNAL(clicked()), this, SLOT(cancelCreate()));
 
 	trayIcon->show();
 	setWindowTitle(tr("OOMIDI: Studio"));

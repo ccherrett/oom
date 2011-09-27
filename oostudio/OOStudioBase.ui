@@ -27,9 +27,9 @@
      </property>
      <widget class="QWidget" name="m_tabSessions">
       <attribute name="title">
-       <string>Sessions</string>
+       <string>Open</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,1">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -60,14 +60,7 @@
             <item>
              <widget class="QPushButton" name="m_btnLoadSession">
               <property name="text">
-               <string>Load Session</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="m_btnCreateSession">
-              <property name="text">
-               <string>Create Session</string>
+               <string>Open Session</string>
               </property>
              </widget>
             </item>
@@ -76,6 +69,13 @@
          </layout>
         </widget>
        </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Create New</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
         <widget class="QGroupBox" name="m_groupCreate">
          <property name="title">
@@ -115,6 +115,45 @@
            </layout>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_9">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Location:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_6"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="text">
+               <string>Browse</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
             <property name="spacing">
              <number>0</number>
@@ -134,7 +173,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Create From:</string>
+               <string>Template:</string>
               </property>
              </widget>
             </item>
@@ -255,14 +294,14 @@
             <item>
              <widget class="QPushButton" name="m_btnDoCreate">
               <property name="text">
-               <string>Create</string>
+               <string>Create New</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="m_btnCancelCreate">
+             <widget class="QPushButton" name="m_btnClearCreate">
               <property name="text">
-               <string>Cancel</string>
+               <string>Clear</string>
               </property>
              </widget>
             </item>
