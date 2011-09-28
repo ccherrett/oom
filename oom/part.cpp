@@ -730,7 +730,13 @@ void Part::setZIndex(int i)
 {
 	m_zIndex = i;
 	if(_track)
+	{
 		_track->setMaxZIndex(i);
+		if (_track->type() == Track::WAVE)
+		{
+			((WaveTrack*)_track)->calculateCrossFades();
+		}
+	}
 }
 
 bool Part::smallerZValue(Part* first, Part* second)
