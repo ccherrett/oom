@@ -347,7 +347,7 @@ void WaveTrack::setChannels(int n)
 	}
 }
 
-static const int CROSSFADE_WIDTH = 8192;
+static const int CROSSFADE_WIDTH = 256;
 
 void WaveTrack::calculateCrossFades()
 {

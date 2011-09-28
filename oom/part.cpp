@@ -833,7 +833,7 @@ float WavePart::getFadeOutValue(unsigned pos, QList<FadeCurve *> fades)
 		unsigned fadeStartPos = fadeOut->getFrame();
 		unsigned fadeEndPos = fadeStartPos + fadeOut->width();
 
-		if (posToPart >= fadeStartPos && posToPart < fadeEndPos && fadeOut->width() > 0)
+		if (posToPart >= fadeStartPos && posToPart <= fadeEndPos && fadeOut->width() > 0)
 		{
 			float factor = float(posToPart - fadeStartPos) / fadeOut->width();
 			gain *= (1.0f - factor);
@@ -1495,6 +1495,7 @@ void Song::changePart(Part* oPart, Part* nPart)
 	{
 		((WaveTrack*)nTrack)->calculateCrossFades();
 	}
+
 }
 
 //---------------------------------------------------------

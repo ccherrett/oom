@@ -585,7 +585,6 @@ size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwr
 
 bool SndFile::useOverwrite(unsigned pos, WavePart *part, bool overwrite)
 {
-	return overwrite;
 	FadeCurve* crossFadeIn = part->crossFadeIn();
 	FadeCurve* crossFadeOut = part->crossFadeOut();
 
@@ -593,16 +592,15 @@ bool SndFile::useOverwrite(unsigned pos, WavePart *part, bool overwrite)
 
 	if (posToPart >= crossFadeIn->getFrame() && posToPart <= (crossFadeIn->getFrame() + crossFadeIn->width()))
 	{
-		printf("applying cross fade in for part %s\n", part->name().toAscii().data());
-		return true;
+		return false;
 	}
 
 	if (posToPart >= crossFadeOut->getFrame() && posToPart <= (crossFadeOut->getFrame() + crossFadeIn->width()))
 	{
-		printf("applying cross fade out for part %s\n", part->name().toAscii().data());
-		return true;
+		return false;
 	}
 
+	return overwrite;
 }
 
 //---------------------------------------------------------
