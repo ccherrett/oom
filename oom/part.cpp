@@ -1497,8 +1497,22 @@ void Song::changePart(Part* oPart, Part* nPart)
 	{
 		((WaveTrack*)oTrack)->calculateCrossFades();
 	}
-	if (nTrack->type() == Track::WAVE && nTrack != oTrack)
+	if (nTrack->type() == Track::WAVE)
 	{
+		for (iPart ip = nTrack->parts()->begin(); ip != nTrack->parts()->end(); ++ip)
+		{
+			WavePart* wp = (WavePart*)ip->second;
+			if (wp == nPart)
+			{
+				continue;
+			}
+			if (nPart->frame() >= wp->frame() && nPart->endFrame() <= wp->endFrame())
+			{
+				nPart->setZIndex(wp->getZIndex() + 1);
+				wp->setZIndex(0);
+			}
+		}
+
 		((WaveTrack*)nTrack)->calculateCrossFades();
 	}
 
