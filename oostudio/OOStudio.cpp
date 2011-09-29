@@ -438,6 +438,12 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			else
 				m_jackProcess->start(jackCmd, args);
 			bool rv = m_jackProcess->waitForStarted();
+			if(rv && m_jackProcess->state() == QProcess::Running)
+			{
+				rv = true;
+			}
+			else
+				rv = false;
 			printf("%s\n", rv ? "Complete" : "FAILED");
 			return rv;
 		}
@@ -818,7 +824,15 @@ void OOStudio::createSession()
 					else
 					{
 						m_sessionModel->appendRow(rowData);
-						loadSession(newSession);
+						if(QMessageBox::question(
+							this,
+							tr("Open Session"),
+							tr("Would you like to open this session now?"),
+							QMessageBox::Ok, QMessageBox::No
+						) == QMessageBox::Ok)
+						{
+							loadSession(newSession);
+						}
 						//Not a template so load it now and minimize;
 					}
 					updateHeaders();
