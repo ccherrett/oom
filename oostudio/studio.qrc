@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/">
+	<file>style.qss</file>
     <file>images/oom_icon.png</file>
  </qresource>
  </RCC>

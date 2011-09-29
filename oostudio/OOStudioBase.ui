@@ -30,7 +30,7 @@
      </property>
      <widget class="QWidget" name="m_tabSessions">
       <attribute name="title">
-       <string>Open</string>
+       <string>    Open   </string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
        <property name="spacing">
@@ -237,7 +237,7 @@
      </widget>
      <widget class="QWidget" name="m_tabNew">
       <attribute name="title">
-       <string>Create New</string>
+       <string>    Create New    </string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
@@ -255,7 +255,7 @@
              <enum>QFormLayout::ExpandingFieldsGrow</enum>
             </property>
             <property name="verticalSpacing">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="topMargin">
              <number>0</number>
@@ -450,8 +450,11 @@
             <layout class="QVBoxLayout" name="verticalLayout_9">
              <item>
               <layout class="QFormLayout" name="formLayout">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::ExpandingFieldsGrow</enum>
+               </property>
                <property name="verticalSpacing">
-                <number>0</number>
+                <number>4</number>
                </property>
                <property name="topMargin">
                 <number>0</number>
@@ -717,7 +720,7 @@
      </widget>
      <widget class="QWidget" name="m_tabStatus">
       <attribute name="title">
-       <string>Status</string>
+       <string>    Status    </string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>

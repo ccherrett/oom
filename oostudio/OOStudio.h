@@ -101,6 +101,7 @@ private:
 	bool loadLSCP(OOSession*);
 	QString getValidName(QString);
 	QString convertPath(QString);
+	void doSessionDelete(OOSession*);
 
 protected:
 	void closeEvent(QCloseEvent*);
@@ -121,6 +122,8 @@ private slots:
 	void clearLogger();
 	void shutdown();
 	void importSession();
+	void deleteTemplate();
+	void deleteSession();
 	//Process Listeners
 	void processJackMessages();
 	void processJackErrors();

@@ -35,6 +35,15 @@ OOStudio::OOStudio()
 	m_current = 0;
 	m_incleanup = false;
 	createTrayIcon();
+	QString style(":/style.qss");
+	QFile cf(style);
+	if (cf.open(QIODevice::ReadOnly))
+	{
+		QByteArray ss = cf.readAll();
+		QString sheet(QString::fromUtf8(ss.data()));
+		qApp->setStyleSheet(sheet);
+		cf.close();
+	}
 
 	m_cmbTemplate->addItem("Default", "Default");
 	m_cmbLSCPMode->addItem("Default", "Default");
@@ -128,6 +137,8 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnAddCommand, SIGNAL(clicked()), this, SLOT(addCommand()));
 	connect(m_btnDeleteCommand, SIGNAL(clicked()), this, SLOT(deleteCommand()));
 	connect(m_btnClearLog, SIGNAL(clicked()), this, SLOT(clearLogger()));
+	connect(m_btnDeleteTemplate, SIGNAL(clicked()), this, SLOT(deleteTemplate()));
+	connect(m_btnDeleteSession, SIGNAL(clicked()), this, SLOT(deleteSession()));
 	connect(m_cmbTemplate, SIGNAL(currentIndexChanged(int)), this, SLOT(templateSelectionChanged(int)));
 }/*}}}*/
 
@@ -206,7 +217,7 @@ void OOStudio::importSession()/*{{{*/
 	browse(3);
 }/*}}}*/
 
-QString OOStudio::getValidName(QString name)
+QString OOStudio::getValidName(QString name)/*{{{*/
 {
 	QString base("_Copy");
 	int i = 1;
@@ -217,7 +228,7 @@ QString OOStudio::getValidName(QString name)
 		++i;
 	}
 	return newName;
-}
+}/*}}}*/
 
 void OOStudio::browse(int form)/*{{{*/
 {
@@ -382,6 +393,7 @@ void OOStudio::cleanupProcessList()/*{{{*/
 		m_jackProcess->waitForFinished();
 		m_jackProcess = 0;
 	}
+	m_current = 0;
 	m_incleanup = false;
 }/*}}}*/
 
@@ -663,12 +675,12 @@ void OOStudio::loadTemplateClicked()/*{{{*/
 	}
 }/*}}}*/
 
-bool OOStudio::checkOOM()
+bool OOStudio::checkOOM()/*{{{*/
 {
 	return (m_oomProcess && m_oomProcess->state() == QProcess::Running);
-}
+}/*}}}*/
 
-QString OOStudio::convertPath(QString path)
+QString OOStudio::convertPath(QString path)/*{{{*/
 {
 	if(!path.startsWith("~"))
 		return path;
@@ -678,6 +690,93 @@ QString OOStudio::convertPath(QString path)
 		return path.replace(0, 1, QDir::homePath());
 	}
 	return path;
+}/*}}}*/
+
+void OOStudio::doSessionDelete(OOSession* session)
+{
+	if(session)
+	{
+		QFileInfo fi(session->path);
+		QDir dir = fi.dir();
+		if(QFile::remove(session->path) &&
+			QFile::remove(session->lscpPath) &&
+			QFile::remove(session->songfile))
+		{
+			dir.rmdir(dir.absolutePath());
+		}
+	}
+}
+
+void OOStudio::deleteTemplate()
+{
+	if(m_templateSelectModel && m_templateSelectModel->hasSelection())/*{{{*/
+	{
+		QModelIndexList	selected = m_templateSelectModel->selectedRows(0);
+		if(selected.size())
+		{
+			QModelIndex index = selected.at(0);
+			QStandardItem* item = m_templateModel->itemFromIndex(index);
+			if(item)
+			{
+				QString msg(tr("WARNING: You are about to delete template \n%1 \nNOTE: This will remove all the files on disk for this session\nAre you sure you want to do this ?"));
+				if(QMessageBox::question(
+					this,
+					tr("Delete Template"),
+					msg.arg(item->text()),
+					QMessageBox::Ok, QMessageBox::Cancel
+				) == QMessageBox::Ok)
+				{
+					OOSession* session = m_sessionMap.take(item->text());
+					if(session)
+					{
+						if(m_current && session->name == m_current->name)
+						{
+							cleanupProcessList();
+						}
+						doSessionDelete(session);
+						saveSettings();
+						populateSessions();
+					}
+				}
+			}
+		}
+	}/*}}}*/
+}
+
+void OOStudio::deleteSession()
+{
+	if(m_sessionSelectModel && m_sessionSelectModel->hasSelection())/*{{{*/
+	{
+		QModelIndexList	selected = m_sessionSelectModel->selectedRows(0);
+		if(selected.size())
+		{
+			QModelIndex index = selected.at(0);
+			QStandardItem* item = m_sessionModel->itemFromIndex(index);
+			if(item)
+			{
+				QString msg(tr("You are about to delete session \n%1 \nThis will remove all the files on disk for this session\nAre you sure you want to do this ?"));
+				if(QMessageBox::question(
+					this,
+					tr("Delete Session"),
+					msg.arg(item->text()),
+					QMessageBox::Ok, QMessageBox::Cancel
+				) == QMessageBox::Ok)
+				{
+					OOSession* session = m_sessionMap.take(item->text());
+					if(session)
+					{
+						if(m_current && session->name == m_current->name)
+						{
+							cleanupProcessList();
+						}
+						doSessionDelete(session);
+						saveSettings();
+						populateSessions();
+					}
+				}
+			}
+		}
+	}/*}}}*/
 }
 
 void OOStudio::loadSession(OOSession* session)
@@ -729,15 +828,39 @@ void OOStudio::loadSession(OOSession* session)
 					if(runOOM(session))
 					{
 						runCommands(session, true);
+						m_current = session;
 						hide();
 					}
+					else
+					{
+						cleanupProcessList();
+						QString msg(tr("Failed to run OOMidi"));
+						msg.append("\nCommand:\n").append(OOM_INSTALL_BIN).append(" ").append(session->songfile);
+						QMessageBox::critical(this, tr("Create Failed"), msg);
+					}
+				}
+				else
+				{
+					cleanupProcessList();
+					QString msg(tr("Failed to load LSCP file into linuxsample"));
+					msg.append("\nFile:\n").append(session->lscpPath);
+					QMessageBox::critical(this, tr("Create Failed"), msg);
 				}
 			}
 			else
 			{
 				m_current = 0;
-				//TODO: report error and shutdown everything we started
+				cleanupProcessList();
+				QString msg(tr("Failed to start to linuxsample server"));
+				msg.append("\nCommand:\n").append(session->lscommand);
+				QMessageBox::critical(this, tr("Create Failed"), msg);
 			}
+		}
+		else
+		{
+			QString msg(tr("Failed to start to jackd server"));
+			msg.append("\nCommand:\n").append(session->jackcommand);
+			QMessageBox::critical(this, tr("Jackd Failed"), msg);
 		}
 	}
 }
@@ -765,7 +888,7 @@ bool OOStudio::validateCreate()/*{{{*/
 	return true;
 }/*}}}*/
 
-void OOStudio::createSession()
+void OOStudio::createSession()/*{{{*/
 {
 	if(validateCreate())
 	{
@@ -787,22 +910,25 @@ void OOStudio::createSession()
 		{
 			QString newPath(basedir.absolutePath());
 			newPath.append(QDir::separator()).append(basename);
+			QString filename(newPath+".oos");
+			QString songfile(newPath+".oom");
+			QString lscpfile(newPath+".lscp");
 
 			QString strSong = convertPath(m_txtOOMPath->text());
-			bool oomok = QFile::copy(strSong, newPath+".oom");
-			bool lscpok = QFile::copy(convertPath(m_txtLSCP->text()), newPath+".lscp");
+			bool oomok = QFile::copy(strSong, songfile);
+			bool lscpok = QFile::copy(convertPath(m_txtLSCP->text()), lscpfile);
 			if(oomok && lscpok)
 			{
 				QDomElement esong = doc.createElement("songfile");
 				root.appendChild(esong);
-				esong.setAttribute("path", newPath+".oom");
-				newSession->songfile = newPath+".oom";
+				esong.setAttribute("path", songfile);
+				newSession->songfile = songfile;
 
 				QDomElement lscp = doc.createElement("lscpfile");
 				root.appendChild(lscp);
-				lscp.setAttribute("path", newPath+".lscp");
+				lscp.setAttribute("path", lscpfile);
 				lscp.setAttribute("mode", m_cmbLSCPMode->currentIndex());
-				newSession->lscpPath = newPath+".lscp";
+				newSession->lscpPath = lscpfile;
 				newSession->lscpMode = m_cmbLSCPMode->currentIndex();
 
 				QDomElement jack = doc.createElement("jackd");
@@ -832,7 +958,6 @@ void OOStudio::createSession()
 					newSession->commands << item->text();
 				}
 				//QString xml = doc.toString();
-				QString filename(newPath+".oos");
 				QFile xmlfile(filename);
 				if(xmlfile.open(QIODevice::WriteOnly) )
 				{
@@ -869,13 +994,43 @@ void OOStudio::createSession()
 					saveSettings();
 					resetCreate();
 				}
+				else
+				{
+					QString msg(tr("Failed to open file for writing"));
+					if(oomok)
+					{
+						basedir.remove(songfile);
+					}
+						
+					if(lscpok)
+					{
+						basedir.remove(lscpfile);
+					}
+					msg.append("\n").append(filename);
+					basedir.rmdir(newPath);
+					QMessageBox::critical(this, tr("Create Failed"), msg);
+				}
 			}
 			else
 			{//Failed run cleanup
+				QString msg;
+				if(oomok)
+				{
+					basedir.remove(songfile);
+					msg = tr("Failed to copy LSCP file");
+				}
+					
+				if(lscpok)
+				{
+					basedir.remove(lscpfile);
+					msg = tr("Failed to copy OOMidi song file");
+				}
+				basedir.rmdir(newPath);
+				QMessageBox::critical(this, tr("Create Failed"), msg);
 			}
 		}
 	}
-}
+}/*}}}*/
 
 void OOStudio::templateSelectionChanged(int index)/*{{{*/
 {
@@ -1017,7 +1172,7 @@ void OOStudio::iconActivated(QSystemTrayIcon::ActivationReason reason)/*{{{*/
 	}
 }/*}}}*/
 
-void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)
+void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)/*{{{*/
 {
 	if(!m_incleanup)
 	{
@@ -1038,7 +1193,7 @@ void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)
 		}
 	}
 	qDebug() << "OOMidi exited with error code: " << code;
-}
+}/*}}}*/
 
 void OOStudio::processJackMessages()/*{{{*/
 {
