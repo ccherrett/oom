@@ -21,6 +21,7 @@
 #include "ui_OOStudioBase.h"
 
 class QCloseEvent;
+class QResizeEvent;
 class QAction;
 class QMenu;
 class QStandardItemModel;
@@ -61,6 +62,7 @@ private:
 	QAction* minimizeAction;
 	QAction* restoreAction;
 	QAction* quitAction;
+	QAction* importAction;
 	QSystemTrayIcon* trayIcon;
 	QMenu* trayMenu;
 	QProcess* m_jackProcess;
@@ -105,6 +107,7 @@ private:
 
 protected:
 	void closeEvent(QCloseEvent*);
+	void resizeEvent(QResizeEvent*);
 
 private slots:
 	void iconActivated(QSystemTrayIcon::ActivationReason);
@@ -124,7 +127,7 @@ private slots:
 	void importSession();
 	void deleteTemplate();
 	void deleteSession();
-	void stopCurrentSession();
+	bool stopCurrentSession();
 	//Process Listeners
 	void processJackMessages();
 	void processJackErrors();

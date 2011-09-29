@@ -24,6 +24,67 @@
     <number>0</number>
    </property>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_12">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QToolButton" name="m_btnImport">
+       <property name="toolTip">
+        <string>Import existing session or session template</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="m_btnExit">
+       <property name="toolTip">
+        <string>Exit OOStudio</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QTabWidget" name="m_tabWidget">
      <property name="currentIndex">
       <number>0</number>
@@ -32,52 +93,20 @@
       <attribute name="title">
        <string>    Open   </string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
        <property name="spacing">
         <number>0</number>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <property name="topMargin">
+        <widget class="QTabWidget" name="m_sessionBox">
+         <property name="tabPosition">
+          <enum>QTabWidget::North</enum>
+         </property>
+         <property name="currentIndex">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QPushButton" name="m_btnImport">
-           <property name="toolTip">
-            <string>Import existing session or session template</string>
-           </property>
-           <property name="text">
-            <string>Import Session or Template</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QToolBox" name="m_sessionBox">
-         <widget class="QWidget" name="m_groupSessionPage1">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>532</width>
-            <height>397</height>
-           </rect>
-          </property>
-          <attribute name="label">
+         <widget class="QWidget" name="m_sessionBoxPage1" native="true">
+          <attribute name="title">
            <string>Sessions</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -151,16 +180,8 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="page">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>532</width>
-            <height>397</height>
-           </rect>
-          </property>
-          <attribute name="label">
+         <widget class="QWidget" name="m_sessionBoxPage2" native="true">
+          <attribute name="title">
            <string>Templates</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -787,6 +808,9 @@
             </property>
             <property name="textElideMode">
              <enum>Qt::ElideNone</enum>
+            </property>
+            <property name="verticalScrollMode">
+             <enum>QAbstractItemView::ScrollPerItem</enum>
             </property>
             <property name="cornerButtonEnabled">
              <bool>false</bool>
