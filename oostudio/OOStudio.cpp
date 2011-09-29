@@ -353,7 +353,7 @@ void OOStudio::cleanupProcessList()/*{{{*/
 {
 	printf("Shutting down processes\n");
 	m_incleanup = false;
-	if(m_oomProcess && m_oomProcess->state() == QProcess::Running)
+	if(checkOOM())
 	{
 		m_oomProcess->terminate();
 		m_oomProcess->waitForFinished();
@@ -479,6 +479,7 @@ bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
 				printf("FAILED\n");
 				return false;
 			}
+			sleep(1);
 			int retry = 0;
 			bool rv = pingLinuxsampler(session);
 			while(!rv && retry < 5)
@@ -667,6 +668,18 @@ bool OOStudio::checkOOM()
 	return (m_oomProcess && m_oomProcess->state() == QProcess::Running);
 }
 
+QString OOStudio::convertPath(QString path)
+{
+	if(!path.startsWith("~"))
+		return path;
+	
+	if(path.startsWith("~/"))
+	{
+		return path.replace(0, 1, QDir::homePath());
+	}
+	return path;
+}
+
 void OOStudio::loadSession(OOSession* session)
 {
 	if(session)
@@ -760,7 +773,7 @@ void OOStudio::createSession()
 		QDomDocument doc("OOStudioSession");
 		QDomElement root = doc.createElement("OOStudioSession");
 		doc.appendChild(root);
-		QString basepath = m_txtLocation->text();
+		QString basepath = convertPath(m_txtLocation->text());
 		QString basename = m_txtName->text();
 		basename = basename.simplified().replace(" ", "_");
 		OOSession* newSession = new OOSession;
@@ -775,9 +788,9 @@ void OOStudio::createSession()
 			QString newPath(basedir.absolutePath());
 			newPath.append(QDir::separator()).append(basename);
 
-			QString strSong = m_txtOOMPath->text();
+			QString strSong = convertPath(m_txtOOMPath->text());
 			bool oomok = QFile::copy(strSong, newPath+".oom");
-			bool lscpok = QFile::copy(m_txtLSCP->text(), newPath+".lscp");
+			bool lscpok = QFile::copy(convertPath(m_txtLSCP->text()), newPath+".lscp");
 			if(oomok && lscpok)
 			{
 				QDomElement esong = doc.createElement("songfile");

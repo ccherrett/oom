@@ -100,6 +100,7 @@ private:
 	bool pingLinuxsampler(OOSession*);
 	bool loadLSCP(OOSession*);
 	QString getValidName(QString);
+	QString convertPath(QString);
 
 protected:
 	void closeEvent(QCloseEvent*);
