@@ -191,6 +191,7 @@ public:
     virtual void write(int, Xml&, bool isCopy = false, bool forceWavePaths = false) const;
 
     virtual void dump(int n = 0) const;
+
 };
 
 //---------------------------------------------------------
@@ -235,6 +236,8 @@ class WavePart : public Part
 	FadeCurve *m_crossFadeIn;
 	FadeCurve *m_crossFadeOut;
 
+	void init();
+
 public:
     WavePart(WaveTrack* t);
     WavePart(WaveTrack* t, EventList* ev);
@@ -257,13 +260,9 @@ public:
 	{
 		return m_fadeOut;
 	}
+	FadeCurve* crossFadeIn() { return m_crossFadeIn;}
+	FadeCurve* crossFadeOut() { return m_crossFadeOut;}
 
-	void createFadeIn();
-	void createFadeOut();
-
-	void setCrossFadeIn(FadeCurve* fade);
-	void setCrossFadeOut(FadeCurve* fade);
-	
 	float gain(unsigned);
 	float getFadeOutValue(unsigned pos, QList<FadeCurve*> fades);
 	float getFadeInValue(unsigned pos, QList<FadeCurve*> fades);

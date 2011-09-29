@@ -63,6 +63,7 @@ class SndFile
     bool openFlag;
     bool writeFlag;
     size_t readInternal(int srcChannels, float** dst, size_t n, bool overwrite, float *buffer, unsigned offset, WavePart* part = 0);
+    bool useOverwrite(unsigned pos, WavePart* part, bool overwrite);
 
 protected:
     int refCount;

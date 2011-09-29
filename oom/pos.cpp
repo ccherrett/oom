@@ -518,22 +518,6 @@ Pos PosLen::end() const
 	return pos;
 }
 
-//---------------------------------------------------------
-//   setPos
-//---------------------------------------------------------
-
-void PosLen::setPos(const Pos& pos)
-{
-	switch (pos.type())
-	{
-		case FRAMES:
-			setFrame(pos.frame());
-			break;
-		case TICKS:
-			setTick(pos.tick());
-			break;
-	}
-}
 
 //---------------------------------------------------------
 //   mbt

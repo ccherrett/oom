@@ -730,7 +730,13 @@ void Part::setZIndex(int i)
 {
 	m_zIndex = i;
 	if(_track)
+	{
 		_track->setMaxZIndex(i);
+		if (_track->type() == Track::WAVE)
+		{
+			((WaveTrack*)_track)->calculateCrossFades();
+		}
+	}
 }
 
 bool Part::smallerZValue(Part* first, Part* second)
@@ -758,18 +764,14 @@ WavePart::WavePart(WaveTrack* t)
 : Part(t)
 {
 	setType(FRAMES);
-	m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
-	m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
-	m_crossFadeIn = m_crossFadeOut = 0;
+	init();
 }
 
 WavePart::WavePart(WaveTrack* t, EventList* ev)
 : Part(t, ev)
 {
 	setType(FRAMES);
-	m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
-	m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
-	m_crossFadeIn = m_crossFadeOut = 0;
+	init();
 }
 
 //---------------------------------------------------------
@@ -788,29 +790,18 @@ WavePart::WavePart(const WavePart& p) : Part(p)
 	m_fadeIn->setPart(this);
 	m_fadeOut = p.m_fadeOut;
 	m_fadeOut->setPart(this);
-	m_crossFadeIn = m_crossFadeOut = 0;
+	m_crossFadeIn = p.m_crossFadeIn;
+	m_crossFadeIn->setPart(this);
+	m_crossFadeOut = p.m_crossFadeOut;
+	m_crossFadeOut->setPart(this);
 }
 
-void WavePart::createFadeIn()
+void WavePart::init()
 {
-	if(!m_fadeIn)
-		m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
-}
-
-void WavePart::createFadeOut()
-{
-	if(!m_fadeOut)
-		m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
-}
-
-void WavePart::setCrossFadeIn(FadeCurve *fade)
-{
-	m_crossFadeIn = fade;
-}
-
-void WavePart::setCrossFadeOut(FadeCurve *fade)
-{
-	m_crossFadeOut = fade;
+	m_fadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
+	m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
+	m_crossFadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
+	m_crossFadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
 }
 
 float WavePart::gain(unsigned pos)
@@ -819,7 +810,7 @@ float WavePart::gain(unsigned pos)
 
 	QList<FadeCurve*> fadeIns;
 	fadeIns << m_fadeIn;
-	if (m_crossFadeIn)
+	if (m_crossFadeIn && m_crossFadeIn->width())
 	{
 		fadeIns << m_crossFadeIn;
 	}
@@ -827,7 +818,7 @@ float WavePart::gain(unsigned pos)
 	QList<FadeCurve*> fadeOuts;
 	fadeOuts << m_fadeOut;
 
-	if (m_crossFadeOut)
+	if (m_crossFadeOut && m_crossFadeOut->width())
 	{
 		fadeOuts << m_crossFadeOut;
 	}
@@ -848,7 +839,7 @@ float WavePart::getFadeOutValue(unsigned pos, QList<FadeCurve *> fades)
 		unsigned fadeStartPos = fadeOut->getFrame();
 		unsigned fadeEndPos = fadeStartPos + fadeOut->width();
 
-		if (posToPart > fadeStartPos && posToPart < fadeEndPos && fadeOut->width() > 0)
+		if (posToPart >= fadeStartPos && posToPart <= fadeEndPos && fadeOut->width() > 0)
 		{
 			float factor = float(posToPart - fadeStartPos) / fadeOut->width();
 			gain *= (1.0f - factor);
@@ -865,12 +856,14 @@ float WavePart::getFadeInValue(unsigned pos, QList<FadeCurve *> fades)
 
 	foreach(FadeCurve* fadeIn, fades)
 	{
-		unsigned offset = pos - frame() - fadeIn->getFrame();
-		long fadeInWidth = fadeIn->width();
+		unsigned posToPart = pos - frame();
+		unsigned fadeStartPos = fadeIn->getFrame();
+		unsigned fadeEndPos = fadeStartPos + fadeIn->width();
 
-		if(fadeInWidth > 0 && offset < fadeInWidth)
+		if (posToPart >= fadeStartPos && posToPart < fadeEndPos && fadeIn->width() > 0)
 		{
-			gain *= (float(offset) / float(fadeInWidth));
+			float factor = float(posToPart - fadeStartPos) / fadeIn->width();
+			gain *= factor;
 		}
 	}
 
@@ -1498,6 +1491,31 @@ void Song::changePart(Part* oPart, Part* nPart)
 	unsigned epos = nPart->tick() + nPart->lenTick();
 	if (epos > len())
 		_len = epos;
+
+
+	if (oTrack->type() == Track::WAVE)
+	{
+		((WaveTrack*)oTrack)->calculateCrossFades();
+	}
+	if (nTrack->type() == Track::WAVE)
+	{
+		for (iPart ip = nTrack->parts()->begin(); ip != nTrack->parts()->end(); ++ip)
+		{
+			WavePart* wp = (WavePart*)ip->second;
+			if (wp == nPart)
+			{
+				continue;
+			}
+			if (nPart->frame() >= wp->frame() && nPart->endFrame() <= wp->endFrame())
+			{
+				nPart->setZIndex(wp->getZIndex() + 1);
+				wp->setZIndex(0);
+			}
+		}
+
+		((WaveTrack*)nTrack)->calculateCrossFades();
+	}
+
 }
 
 //---------------------------------------------------------
