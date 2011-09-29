@@ -124,6 +124,7 @@ private slots:
 	void importSession();
 	void deleteTemplate();
 	void deleteSession();
+	void stopCurrentSession();
 	//Process Listeners
 	void processJackMessages();
 	void processJackErrors();

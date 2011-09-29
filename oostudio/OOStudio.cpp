@@ -17,6 +17,7 @@ static const char* LS_HOSTNAME  = "localhost";
 static const int   LS_PORT      = 8888;
 static const char* LS_COMMAND   = "linuxsampler";
 static const char* JACK_COMMAND = "/usr/bin/jackd -r -t2000 -dalsa -dhw:0 -r48000 -p512 -n3 -Xraw -P";
+static const char* NO_PROC_TEXT = "No Running Session";
 
 lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event*/, const char * /*pchData*/, int /*cchData*/, void* pvData )
 {
@@ -67,6 +68,8 @@ OOStudio::OOStudio()
 	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
 	resize(size);
 	populateSessions();
+	m_lblRunning->setText(QString(NO_PROC_TEXT));
+	m_btnStopSession->setEnabled(false);
 
 #ifdef OOM_INSTALL_BIN
 	//qDebug() << OOM_INSTALL_BIN;
@@ -139,6 +142,7 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnClearLog, SIGNAL(clicked()), this, SLOT(clearLogger()));
 	connect(m_btnDeleteTemplate, SIGNAL(clicked()), this, SLOT(deleteTemplate()));
 	connect(m_btnDeleteSession, SIGNAL(clicked()), this, SLOT(deleteSession()));
+	connect(m_btnStopSession, SIGNAL(clicked()), this, SLOT(stopCurrentSession()));
 	connect(m_cmbTemplate, SIGNAL(currentIndexChanged(int)), this, SLOT(templateSelectionChanged(int)));
 }/*}}}*/
 
@@ -393,6 +397,8 @@ void OOStudio::cleanupProcessList()/*{{{*/
 		m_jackProcess->waitForFinished();
 		m_jackProcess = 0;
 	}
+	m_lblRunning->setText(QString(NO_PROC_TEXT));
+	m_btnStopSession->setEnabled(false);
 	m_current = 0;
 	m_incleanup = false;
 }/*}}}*/
@@ -745,7 +751,7 @@ void OOStudio::deleteTemplate()
 
 void OOStudio::deleteSession()
 {
-	if(m_sessionSelectModel && m_sessionSelectModel->hasSelection())/*{{{*/
+	if(m_sessionSelectModel && m_sessionSelectModel->hasSelection())
 	{
 		QModelIndexList	selected = m_sessionSelectModel->selectedRows(0);
 		if(selected.size())
@@ -776,7 +782,26 @@ void OOStudio::deleteSession()
 				}
 			}
 		}
-	}/*}}}*/
+	}
+}
+
+void OOStudio::stopCurrentSession()
+{
+	if(m_current)
+	{
+		if(checkOOM())
+		{
+			if(QMessageBox::question(
+				this,
+				tr("Stop Session"),
+				tr("There appears to be a running session of oom. \nStopping this session will cause any changes to the current song to be lost\n(Recommended)  Save your current song in oomidi then click Ok.\nAre you sure you want to do this ?"),
+				QMessageBox::Ok, QMessageBox::Cancel
+			) == QMessageBox::Ok)
+			{
+				cleanupProcessList();
+			}
+		}
+	}
 }
 
 void OOStudio::loadSession(OOSession* session)
@@ -829,6 +854,9 @@ void OOStudio::loadSession(OOSession* session)
 					{
 						runCommands(session, true);
 						m_current = session;
+						m_lblRunning->setText(session->name);
+						m_btnStopSession->setEnabled(true);
+						m_tabWidget->setCurrentIndex(2);
 						hide();
 					}
 					else
