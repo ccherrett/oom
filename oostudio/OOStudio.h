@@ -59,7 +59,9 @@ private:
 	QProcess* m_lsProcess;
 	QProcess* m_oomProcess;
 	QStandardItemModel* m_sessionModel;
+	QItemSelectionModel* m_sessionSelectModel;
 	QStandardItemModel* m_templateModel;
+	QItemSelectionModel* m_templateSelectModel;
 	QStandardItemModel* m_commandModel;
 	QStandardItemModel* m_loggerModel;
 	QStringList m_sessionlabels;
@@ -89,7 +91,8 @@ protected:
 private slots:
 	void iconActivated(QSystemTrayIcon::ActivationReason);
 	void resetCreate(bool fromClear = true);
-	void loadSession();
+	void loadSessionClicked();
+	void loadTemplateClicked();
 	void createSession();
 	void browseLocation();
 	void browseLSCP();

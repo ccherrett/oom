@@ -46,8 +46,14 @@ OOStudio::OOStudio()
 	m_loggerTable->setModel(m_loggerModel);
 	m_loggerModel->setHorizontalHeaderLabels(m_loglabels);
 
+	m_sessionSelectModel = new QItemSelectionModel(m_sessionModel);
+	m_templateSelectModel = new QItemSelectionModel(m_templateModel);
+	m_sessionTable->setSelectionModel(m_sessionSelectModel);
+	m_templateTable->setSelectionModel(m_templateSelectModel);
+
 	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
-	connect(m_btnLoadSession, SIGNAL(clicked()), this, SLOT(loadSession()));
+	connect(m_btnLoadSession, SIGNAL(clicked()), this, SLOT(loadSessionClicked()));
+	connect(m_btnLoadTemplate, SIGNAL(clicked()), this, SLOT(loadTemplateClicked()));
 	connect(m_btnClearCreate, SIGNAL(clicked()), this, SLOT(resetCreate()));
 	connect(m_btnDoCreate, SIGNAL(clicked()), this, SLOT(createSession()));
 	connect(m_btnImport, SIGNAL(clicked()), this, SLOT(importSession()));
@@ -214,6 +220,7 @@ void OOStudio::browse(int form)/*{{{*/
 					}
 					updateHeaders();
 					m_sessionMap[session->name] = session;
+					saveSettings();
 					//TODO: message to tell what type was imported
 				}
 				else
@@ -367,12 +374,63 @@ void OOStudio::runPostCommads()
 {
 }
 
-void OOStudio::loadSession()
+void OOStudio::loadSessionClicked()/*{{{*/
 {
-}
+	if(m_sessionSelectModel && m_sessionSelectModel->hasSelection())
+	{
+		QModelIndexList	selected = m_sessionSelectModel->selectedRows(0);
+		if(selected.size())
+		{
+			QModelIndex index = selected.at(0);
+			QStandardItem* item = m_sessionModel->itemFromIndex(index);
+			if(item)
+			{
+				OOSession* session = m_sessionMap.value(item->text());
+				if(session)
+				{
+					loadSession(session);
+				}
+			}
+		}
+	}
+}/*}}}*/
 
-void OOStudio::loadSession(OOSession*)
+void OOStudio::loadTemplateClicked()/*{{{*/
 {
+	if(m_templateSelectModel && m_templateSelectModel->hasSelection())
+	{
+		QModelIndexList	selected = m_templateSelectModel->selectedRows(0);
+		if(selected.size())
+		{
+			QModelIndex index = selected.at(0);
+			QStandardItem* item = m_templateModel->itemFromIndex(index);
+			if(item)
+			{
+				OOSession* session = m_sessionMap.value(item->text());
+				if(session)
+				{
+					if(QMessageBox::warning(
+						this,
+						tr("Open Template"),
+						tr("You are about to open a template session \nAre you sure you want to do this "),
+						QMessageBox::Ok, QMessageBox::Cancel
+					) == QMessageBox::Ok)
+					{
+						loadSession(session);
+					}
+				}
+			}
+		}
+	}
+}/*}}}*/
+
+void OOStudio::loadSession(OOSession* session)
+{
+	if(session)
+	{
+		printf("OOStudio::loadSession : name: %s\n", session->name.toUtf8().constData());
+		printf("OOStudio::loadSession : path: %s\n", session->path.toUtf8().constData());
+	}
 }
 
 bool OOStudio::validateCreate()/*{{{*/
@@ -475,6 +533,7 @@ void OOStudio::createSession()
 						//Not a template so load it now and minimize;
 					}
 					updateHeaders();
+					saveSettings();
 					resetCreate();
 				}
 			}
