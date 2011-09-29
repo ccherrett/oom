@@ -1,6 +1,30 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/">
 	<file>style.qss</file>
-    <file>images/oom_icon.png</file>
+	<file>images/oom_icon.png</file>
+	<file>images/checkbox_checked.png</file>
+	<file>images/checkbox_checked_hover.png</file>
+	<file>images/checkbox_checked_pressed.png</file>
+	<file>images/checkbox_unchecked.png</file>
+	<file>images/checkbox_unchecked_hover.png</file>
+	<file>images/checkbox_unchecked_pressed.png</file>
+	<file>images/radiobutton_checked.png</file>
+	<file>images/radiobutton_checked_hover.png</file>
+	<file>images/radiobutton_checked_pressed.png</file>
+	<file>images/radiobutton_unchecked.png</file>
+	<file>images/radiobutton_unchecked_hover.png</file>
+	<file>images/radiobutton_unchecked_pressed.png</file>
+	<file>images/up_arrow.png</file>
+    <file>images/up_arrow_disabled.png</file>
+    <file>images/down_arrow.png</file>
+    <file>images/down_arrow_disabled.png</file>
+	<file>images/spinup.png</file>
+	<file>images/spinup_off.png</file>
+	<file>images/spinup_hover.png</file>
+	<file>images/spinup_pressed.png</file>
+	<file>images/spindown.png</file>
+	<file>images/spindown_off.png</file>
+	<file>images/spindown_hover.png</file>
+	<file>images/spindown_pressed.png</file>
  </qresource>
  </RCC>
