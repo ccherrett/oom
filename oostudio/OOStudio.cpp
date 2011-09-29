@@ -365,12 +365,6 @@ void OOStudio::cleanupProcessList()/*{{{*/
 		m_lsProcess->waitForFinished();
 		m_lsProcess = 0;
 	}
-	if(m_jackProcess && m_jackProcess->state() == QProcess::Running)
-	{
-		m_jackProcess->kill();
-		m_jackProcess->waitForFinished();
-		m_jackProcess = 0;
-	}
 	QList<long> keys = m_procMap.keys();
 	foreach(long key, keys)
 	{
@@ -381,6 +375,12 @@ void OOStudio::cleanupProcessList()/*{{{*/
 			p->waitForFinished();
 			delete p;
 		}
+	}
+	if(m_jackProcess && m_jackProcess->state() == QProcess::Running)
+	{
+		m_jackProcess->kill();
+		m_jackProcess->waitForFinished();
+		m_jackProcess = 0;
 	}
 	m_incleanup = false;
 }/*}}}*/
@@ -496,30 +496,30 @@ bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
 	return false;
 }/*}}}*/
 
-bool OOStudio::pingLinuxsampler(OOSession* session)
+bool OOStudio::pingLinuxsampler(OOSession* session)/*{{{*/
 {
 	if(session)
 	{
 		lscp_client_t* client = ::lscp_client_create(session->lshostname.toUtf8().constData(), session->lsport, client_callback, this);
 		if(client == NULL)
 			return false;
-		printf("Query LS info: ");
+		//printf("Query LS info: ");
 		lscp_server_info_t* info = lscp_get_server_info(client);
 		if(info == NULL)
 		{
-			printf("FAILED!!\n");
+			//printf("FAILED!!\n");
 			return false;
 		}
 		else
 		{
-			printf("Description: %s, Version: %s, Protocol Version: %s\n", info->description, info->version, info->protocol_version);
+			//printf("Description: %s, Version: %s, Protocol Version: %s\n", info->description, info->version, info->protocol_version);
 			return true;
 		}
 	}
 	return true;
-}
+}/*}}}*/
 
-bool OOStudio::loadLSCP(OOSession* session)
+bool OOStudio::loadLSCP(OOSession* session)/*{{{*/
 {
 	if(session)
 	{
@@ -561,7 +561,7 @@ bool OOStudio::loadLSCP(OOSession* session)
 		return true;
 	}
 	return false;
-}
+}/*}}}*/
 
 void OOStudio::runCommands(OOSession* session, bool post)/*{{{*/
 {
@@ -662,12 +662,29 @@ void OOStudio::loadTemplateClicked()/*{{{*/
 	}
 }/*}}}*/
 
+bool OOStudio::checkOOM()
+{
+	return (m_oomProcess && m_oomProcess->state() == QProcess::Running);
+}
+
 void OOStudio::loadSession(OOSession* session)
 {
 	if(session)
 	{
 		printf("OOStudio::loadSession : name: %s\n", session->name.toUtf8().constData());
 		printf("OOStudio::loadSession : path: %s\n", session->path.toUtf8().constData());
+		if(checkOOM())
+		{
+			if(QMessageBox::warning(
+				this,
+				tr("Running Session"),
+				tr("There appears to be a running session of oom. \nLoading a new session will cause any changes to the current song to be lost\n(Recommended)  Save your current song in oomidi then click Ok.\nAre you sure you want to do this ?"),
+				QMessageBox::Ok, QMessageBox::Cancel
+			) != QMessageBox::Ok)
+			{
+				return;
+			}
+		}
 		cleanupProcessList();
 		if(runJack(session))
 		{

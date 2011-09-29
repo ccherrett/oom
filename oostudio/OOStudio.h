@@ -88,6 +88,7 @@ private:
 	bool runLinuxsampler(OOSession*);
 	void runCommands(OOSession*, bool post = false);
 	bool runOOM(OOSession*);
+	bool checkOOM();
 	void populateSessions();
 	void processMessages(int, QString, QProcess*);
 	void cleanupProcessList();
