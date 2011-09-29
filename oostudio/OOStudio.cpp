@@ -5,11 +5,26 @@
 //===========================================================
 
 #include "OOStudio.h"
+#include "OOProcess.h"
+#include "config.h"
 #include <QtGui>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNodeList>
 #include <QDomNode>
+
+static const char* LS_HOSTNAME  = "localhost";
+static const int   LS_PORT      = 8888;
+static const char* LS_COMMAND   = "linuxsampler";
+static const char* JACK_COMMAND = "/usr/bin/jackd -r -t2000 -dalsa -dhw:0 -r48000 -p512 -n3 -Xraw -P";
+
+lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event*/, const char * /*pchData*/, int /*cchData*/, void* pvData )
+{
+	OOStudio* lsc = (OOStudio*)pvData;
+	if(lsc == NULL)
+		return LSCP_FAILED;
+	return LSCP_OK;
+}
 
 OOStudio::OOStudio()
 {
@@ -17,6 +32,8 @@ OOStudio::OOStudio()
 	m_oomProcess = 0;
 	m_jackProcess = 0;
 	m_lsProcess = 0;
+	m_current = 0;
+	m_incleanup = false;
 	createTrayIcon();
 
 	m_cmbTemplate->addItem("Default", "Default");
@@ -30,6 +47,51 @@ OOStudio::OOStudio()
 	m_commandlabels = (QStringList() << "Command" );
 	m_loglabels = (QStringList() << "Command" << "Log" );
 
+	m_txtLSPort->setValidator(new QIntValidator());
+	createModels();
+	createConnections();
+	//runJack();
+
+	trayIcon->show();
+	setWindowTitle(tr("OOMIDI: Studio"));
+	QSettings settings("OOMidi", "OOStudio");
+	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
+	resize(size);
+	populateSessions();
+
+#ifdef OOM_INSTALL_BIN
+	//qDebug() << OOM_INSTALL_BIN;
+	//qDebug() << LIBDIR;
+	printf("Found install path: %s\n", OOM_INSTALL_BIN);
+#endif
+}
+
+void OOStudio::createTrayIcon()/*{{{*/
+{
+	minimizeAction = new QAction(tr("Mi&nimize"), this);
+	connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
+	maximizeAction = new QAction(tr("Ma&ximize"), this);
+	connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
+	restoreAction = new QAction(tr("&Restore"), this);
+	connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
+	quitAction = new QAction(tr("&Quit"), this);
+	connect(quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
+
+	trayMenu = new QMenu(this);
+	trayMenu->addAction(minimizeAction);
+	trayMenu->addAction(maximizeAction);
+	trayMenu->addAction(restoreAction);
+	trayMenu->addSeparator();
+	trayMenu->addAction(quitAction);
+
+	trayIcon = new QSystemTrayIcon(this);
+	trayIcon->setContextMenu(trayMenu);
+	QIcon icon(":/images/oom_icon.png");
+	trayIcon->setIcon(icon);
+}/*}}}*/
+
+void OOStudio::createModels()/*{{{*/
+{
 	m_sessionModel = new QStandardItemModel(m_sessionTable);
 	m_sessionTable->setModel(m_sessionModel);
 	m_sessionModel->setHorizontalHeaderLabels(m_sessionlabels);
@@ -50,7 +112,10 @@ OOStudio::OOStudio()
 	m_templateSelectModel = new QItemSelectionModel(m_templateModel);
 	m_sessionTable->setSelectionModel(m_sessionSelectModel);
 	m_templateTable->setSelectionModel(m_templateSelectModel);
+}/*}}}*/
 
+void OOStudio::createConnections()/*{{{*/
+{
 	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 	connect(m_btnLoadSession, SIGNAL(clicked()), this, SLOT(loadSessionClicked()));
 	connect(m_btnLoadTemplate, SIGNAL(clicked()), this, SLOT(loadTemplateClicked()));
@@ -64,17 +129,9 @@ OOStudio::OOStudio()
 	connect(m_btnDeleteCommand, SIGNAL(clicked()), this, SLOT(deleteCommand()));
 	connect(m_btnClearLog, SIGNAL(clicked()), this, SLOT(clearLogger()));
 	connect(m_cmbTemplate, SIGNAL(currentIndexChanged(int)), this, SLOT(templateSelectionChanged(int)));
-	//runJack();
+}/*}}}*/
 
-	trayIcon->show();
-	setWindowTitle(tr("OOMIDI: Studio"));
-	QSettings settings("OOMidi", "OOStudio");
-	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
-	resize(size);
-	populateSessions();
-}
-
-void OOStudio::updateHeaders()
+void OOStudio::updateHeaders()/*{{{*/
 {
 	m_sessionModel->setHorizontalHeaderLabels(m_sessionlabels);
 	
@@ -83,7 +140,7 @@ void OOStudio::updateHeaders()
 	m_commandModel->setHorizontalHeaderLabels(m_commandlabels);
 
 	m_loggerModel->setHorizontalHeaderLabels(m_loglabels);
-}
+}/*}}}*/
 
 void OOStudio::populateSessions()/*{{{*/
 {
@@ -149,6 +206,19 @@ void OOStudio::importSession()/*{{{*/
 	browse(3);
 }/*}}}*/
 
+QString OOStudio::getValidName(QString name)
+{
+	QString base("_Copy");
+	int i = 1;
+	QString newName(name.append(base));
+	while(m_sessionMap.contains(newName))
+	{
+		newName = name.append(base).append(QString::number(i));
+		++i;
+	}
+	return newName;
+}
+
 void OOStudio::browse(int form)/*{{{*/
 {
 	switch(form)
@@ -203,6 +273,10 @@ void OOStudio::browse(int form)/*{{{*/
 				OOSession* session = readSession(filename);
 				if(session)
 				{
+					if(m_sessionMap.contains(session->name))
+					{
+						session->name = getValidName(session->name);
+					}
 					QStandardItem* name = new QStandardItem(session->name);
 					QStandardItem* path = new QStandardItem(session->path);
 					QList<QStandardItem*> rowData;
@@ -255,7 +329,6 @@ void OOStudio::deleteCommand()/*{{{*/
 	}
 }/*}}}*/
 
-
 void OOStudio::resetCreate(bool fromClear)/*{{{*/
 {
 	m_txtLSCP->setText("");
@@ -267,29 +340,54 @@ void OOStudio::resetCreate(bool fromClear)/*{{{*/
 		m_txtLocation->setText("");
 		m_cmbTemplate->setCurrentIndex(0);
 	}
+	m_txtLSHost->setText(LS_HOSTNAME);
+	m_txtLSPort->setText(QString::number(LS_PORT));
+	m_txtLSCommand->setText(LS_COMMAND);
+	m_txtJackCommand->setText(JACK_COMMAND);
 	m_cmbLSCPMode->setCurrentIndex(0);
 	m_commandModel->clear();
 	updateHeaders();
 }/*}}}*/
 
-void OOStudio::shutdown()/*{{{*/
+void OOStudio::cleanupProcessList()/*{{{*/
 {
 	printf("Shutting down processes\n");
+	m_incleanup = false;
 	if(m_oomProcess && m_oomProcess->state() == QProcess::Running)
 	{
 		m_oomProcess->terminate();
 		m_oomProcess->waitForFinished();
+		m_oomProcess = 0;
 	}
 	if(m_lsProcess && m_lsProcess->state() == QProcess::Running)
 	{
 		m_lsProcess->terminate();
 		m_lsProcess->waitForFinished();
+		m_lsProcess = 0;
 	}
 	if(m_jackProcess && m_jackProcess->state() == QProcess::Running)
 	{
-		m_jackProcess->terminate();
+		m_jackProcess->kill();
 		m_jackProcess->waitForFinished();
+		m_jackProcess = 0;
 	}
+	QList<long> keys = m_procMap.keys();
+	foreach(long key, keys)
+	{
+		OOProcess* p = m_procMap.take(key);
+		if(p)
+		{
+			p->terminate();
+			p->waitForFinished();
+			delete p;
+		}
+	}
+	m_incleanup = false;
+}/*}}}*/
+
+void OOStudio::shutdown()/*{{{*/
+{
+	cleanupProcessList();
 	saveSettings();
 	qApp->quit();
 }/*}}}*/
@@ -322,57 +420,191 @@ void OOStudio::saveSettings()/*{{{*/
 	settings.sync();
 }/*}}}*/
 
-void OOStudio::runJack()/*{{{*/
+bool OOStudio::runJack(OOSession* session)/*{{{*/
 {
-	if(m_chkStartJack->isChecked())
+	if(session)
 	{
-		m_jackProcess = new QProcess(this);
-		connect(m_jackProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processJackMessages()));
-		connect(m_jackProcess, SIGNAL(readyReadStandardError()), this, SLOT(processJackErrors()));
-		QString jackCmd = m_txtJackCommand->text();
-		QStringList args = jackCmd.split(" ");
-		jackCmd = args.takeFirst();
-		if(args.isEmpty())
-			m_jackProcess->start(jackCmd);
-		else
-			m_jackProcess->start(jackCmd, args);
-		if(m_jackProcess->waitForStarted())
+		if(session->loadJack)
 		{
-			if(m_chkStartLS->isChecked())
+			printf("Launching jackd ");
+			m_jackProcess = new QProcess(this);
+			connect(m_jackProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processJackMessages()));
+			connect(m_jackProcess, SIGNAL(readyReadStandardError()), this, SLOT(processJackErrors()));
+			QString jackCmd = session->jackcommand;
+			QStringList args = jackCmd.split(" ");
+			jackCmd = args.takeFirst();
+			if(args.isEmpty())
+				m_jackProcess->start(jackCmd);
+			else
+				m_jackProcess->start(jackCmd, args);
+			bool rv = m_jackProcess->waitForStarted();
+			printf("%s\n", rv ? "Complete" : "FAILED");
+			return rv;
+		}
+		else
+			return true;
+	}
+	return false;
+}/*}}}*/
+
+bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
+{
+	if(session)
+	{
+		if(session->loadls)
+		{
+			printf("Launching linuxsampler ");
+			m_lsProcess = new QProcess(this);
+			connect(m_lsProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processLSMessages()));
+			connect(m_lsProcess, SIGNAL(readyReadStandardError()), this, SLOT(processLSErrors()));
+			QString lscmd = session->lscommand;
+			QStringList lsargs = lscmd.split(" ");
+			lscmd = lsargs.takeFirst();
+			if(lsargs.isEmpty())
 			{
-				m_lsProcess = new QProcess(this);
-				connect(m_lsProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processLSMessages()));
-				connect(m_lsProcess, SIGNAL(readyReadStandardError()), this, SLOT(processLSErrors()));
-				QString lscmd = m_txtLSCommand->text();
-				QStringList lsargs = lscmd.split(" ");
-				if(lsargs.isEmpty())
+				m_lsProcess->start(lscmd);
+			}
+			else
+			{
+				m_lsProcess->start(lscmd, lsargs);
+			}
+			if(!m_lsProcess->waitForStarted())
+			{
+				printf("FAILED\n");
+				return false;
+			}
+			int retry = 0;
+			bool rv = pingLinuxsampler(session);
+			while(!rv && retry < 5)
+			{
+				sleep(1);
+				rv = pingLinuxsampler(session);
+				++retry;
+			}
+			printf("%s\n", rv ? "Complete" : "FAILED");
+			return rv;
+		}
+		else
+			return true; //You did not want it loaded here so all is good
+	}
+	return false;
+}/*}}}*/
+
+bool OOStudio::pingLinuxsampler(OOSession* session)
+{
+	if(session)
+	{
+		lscp_client_t* client = ::lscp_client_create(session->lshostname.toUtf8().constData(), session->lsport, client_callback, this);
+		if(client == NULL)
+			return false;
+		printf("Query LS info: ");
+		lscp_server_info_t* info = lscp_get_server_info(client);
+		if(info == NULL)
+		{
+			printf("FAILED!!\n");
+			return false;
+		}
+		else
+		{
+			printf("Description: %s, Version: %s, Protocol Version: %s\n", info->description, info->version, info->protocol_version);
+			return true;
+		}
+	}
+	return true;
+}
+
+bool OOStudio::loadLSCP(OOSession* session)
+{
+	if(session)
+	{
+		printf("Loading LSCP ");
+		lscp_client_t* client = ::lscp_client_create(session->lshostname.toUtf8().constData(), session->lsport, client_callback, this);
+		if(client == NULL)
+			return false;
+		QFile lsfile(session->lscpPath);
+		if(!lsfile.open(QIODevice::ReadOnly))
+		{
+			//TODO:We need to error here
+			lscp_client_destroy(client);
+			printf("FAILED to open file\n");
+			return false;
+		}
+		QTextStream in(&lsfile);
+		QString command = in.readLine();
+		while(!command.isNull())
+		{
+			if(!command.startsWith("#") && !command.isEmpty())
+			{
+				QString cmd = command.append("\r\n");
+				::lscp_client_query(client, cmd.toUtf8().constData());
+				//return true;
+				/*if(::lscp_client_query(client, cmd.toUtf8().constData()) != LSCP_OK)
 				{
-					m_lsProcess->start(lscmd);
-				}
-				else
-				{
-					lscmd = lsargs.takeFirst();
-					m_lsProcess->start(lscmd, lsargs);
-				}
+					lsfile.close();
+					lscp_client_destroy(client);
+					printf("FAILED to perform query\n");
+					printf("%s\n", command.toUtf8().constData());
+					return false;
+				}*/
+			}
+			command = in.readLine();
+		}
+		lsfile.close();
+		lscp_client_destroy(client);
+		printf("Complete\n");
+		return true;
+	}
+	return false;
+}
+
+void OOStudio::runCommands(OOSession* session, bool post)/*{{{*/
+{
+	if(session)
+	{
+		QStringList commands = post ? session->postCommands : session->commands;
+		foreach(QString command, commands)
+		{
+			QString cmd = session->lscommand;
+			QStringList args = cmd.split(" ");
+			cmd = args.takeFirst();
+			OOProcess* process = new OOProcess(cmd, this);
+			connect(process, SIGNAL(readyReadStandardOutput(QString, long)), this, SLOT(processCustomMessages(QString, long)));
+			connect(process, SIGNAL(readyReadStandardError(QString, long)), this, SLOT(processCustomErrors(QString, long)));
+			if(args.isEmpty())
+			{
+				process->start(cmd);
+			}
+			else
+			{
+				process->start(cmd, args);
+			}
+			if(process->waitForStarted())
+			{
+				long pid = process->pid();
+				m_procMap[pid] = process;
 			}
 		}
 	}
 }/*}}}*/
 
-void OOStudio::runCommads()
+bool OOStudio::runOOM(OOSession* session)/*{{{*/
 {
-}
-
-void OOStudio::runOOM()
-{
-	m_oomProcess = new QProcess(this);
-	connect(m_oomProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processOOMMessages()));
-	connect(m_oomProcess, SIGNAL(readyReadStandardError()), this, SLOT(processOOMErrors()));
-}
-
-void OOStudio::runPostCommads()
-{
-}
+	if(session)
+	{
+		printf("Loading OOMidi ");
+		m_oomProcess = new QProcess(this);
+		connect(m_oomProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processOOMMessages()));
+		connect(m_oomProcess, SIGNAL(readyReadStandardError()), this, SLOT(processOOMErrors()));
+		connect(m_oomProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processOOMExit(int, QProcess::ExitStatus)));
+		QStringList args;
+		args << session->songfile;
+		m_oomProcess->start(QString(OOM_INSTALL_BIN), args);
+		bool rv = m_oomProcess->waitForStarted();
+		printf("%s\n", rv ? "Complete" : "FAILED");
+		return rv;
+	}
+	return false;
+}/*}}}*/
 
 void OOStudio::loadSessionClicked()/*{{{*/
 {
@@ -430,17 +662,70 @@ void OOStudio::loadSession(OOSession* session)
 	{
 		printf("OOStudio::loadSession : name: %s\n", session->name.toUtf8().constData());
 		printf("OOStudio::loadSession : path: %s\n", session->path.toUtf8().constData());
+		cleanupProcessList();
+		if(runJack(session))
+		{
+			int retry = 0;
+			bool lsrunning = runLinuxsampler(session);
+			while(!lsrunning && retry < 5)
+			{
+				if(m_lsProcess)
+				{
+					m_lsProcess->kill();
+					m_lsProcess = 0;
+				}
+				lsrunning = runLinuxsampler(session);
+				++retry;
+			}
+			if(lsrunning)
+			{
+				retry = 0;
+				bool lscpLoaded = loadLSCP(session);
+				while(!lscpLoaded && retry < 5)
+				{
+					sleep(1);
+					lscpLoaded = loadLSCP(session);
+					++retry;
+				}
+				if(lscpLoaded)
+				{
+					runCommands(session);
+					if(runOOM(session))
+					{
+						runCommands(session, true);
+						hide();
+					}
+				}
+			}
+			else
+			{
+				m_current = 0;
+				//TODO: report error and shutdown everything we started
+			}
+		}
 	}
 }
 
 bool OOStudio::validateCreate()/*{{{*/
 {
 	if(m_txtName->text().isEmpty() || m_txtLocation->text().isEmpty() ||
-		m_txtOOMPath->text().isEmpty() || m_txtLSCP->text().isEmpty())
+		m_txtOOMPath->text().isEmpty() || m_txtLSCP->text().isEmpty() ||
+		m_txtLSHost->text().isEmpty() || m_txtLSPort->text().isEmpty())
 		return false;
 	if((m_chkStartJack->isChecked() && m_txtJackCommand->text().isEmpty()) || 
 		(m_chkStartLS->isChecked() && m_txtLSCommand->text().isEmpty()))
 		return false;
+	if(m_sessionMap.contains(m_txtName->text()))
+	{
+		QMessageBox::warning(
+			this,
+			tr("Dubplate Name"),
+			tr("There is already a session with the name you selected\nPlease change the name and try again")
+			);
+		m_txtName->setText(getValidName(m_txtName->text()));
+		m_txtName->setFocus(Qt::OtherFocusReason);
+		return false;
+	}
 	return true;
 }/*}}}*/
 
@@ -495,8 +780,12 @@ void OOStudio::createSession()
 				root.appendChild(lsnode);
 				lsnode.setAttribute("path", m_txtLSCommand->text());
 				lsnode.setAttribute("checked", m_chkStartLS->isChecked());
+				lsnode.setAttribute("hostname", m_txtLSHost->text());
+				lsnode.setAttribute("port", m_txtLSPort->text());
 				newSession->loadls = m_chkStartLS->isChecked();
 				newSession->lscommand = m_txtLSCommand->text();
+				newSession->lshostname = m_txtLSHost->text();
+				newSession->lsport = m_txtLSPort->text().toInt();
 
 				for(int i= 0; i < m_commandModel->rowCount(); ++i)
 				{
@@ -575,6 +864,8 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 			m_txtJackCommand->setText(session->jackcommand);
 			m_chkStartLS->setChecked(session->loadls);
 			m_txtLSCommand->setText(session->lscommand);
+			m_txtLSHost->setText(session->lshostname);
+			m_txtLSPort->setText(QString::number(session->lsport));
 			m_cmbLSCPMode->setCurrentIndex(session->lscpMode);
 			m_txtLSCP->setText(session->lscpPath);
 			m_txtOOMPath->setText(session->songfile);
@@ -629,6 +920,8 @@ OOSession* OOStudio::readSession(QString filename)/*{{{*/
 			QDomElement ls = lls.at(i).toElement();
 			session->loadls = ls.attribute("checked").toInt();
 			session->lscommand = ls.attribute("path");
+			session->lshostname = ls.attribute("hostname", "localhost");
+			session->lsport = ls.attribute("port", "8888").toInt();
 		}
 
 		QDomNodeList llscp = root.elementsByTagName("lscpfile");
@@ -657,30 +950,6 @@ void OOStudio::setVisible(bool visible)/*{{{*/
 	QDialog::setVisible(visible);
 }/*}}}*/
 
-void OOStudio::createTrayIcon()/*{{{*/
-{
-	minimizeAction = new QAction(tr("Mi&nimize"), this);
-	connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
-	maximizeAction = new QAction(tr("Ma&ximize"), this);
-	connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
-	restoreAction = new QAction(tr("&Restore"), this);
-	connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
-	quitAction = new QAction(tr("&Quit"), this);
-	connect(quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
-
-	trayMenu = new QMenu(this);
-	trayMenu->addAction(minimizeAction);
-	trayMenu->addAction(maximizeAction);
-	trayMenu->addAction(restoreAction);
-	trayMenu->addSeparator();
-	trayMenu->addAction(quitAction);
-
-	trayIcon = new QSystemTrayIcon(this);
-	trayIcon->setContextMenu(trayMenu);
-	QIcon icon(":/images/oom_icon.png");
-	trayIcon->setIcon(icon);
-}/*}}}*/
-
 void OOStudio::closeEvent(QCloseEvent* ev)/*{{{*/
 {
 	if(trayIcon->isVisible())
@@ -703,6 +972,29 @@ void OOStudio::iconActivated(QSystemTrayIcon::ActivationReason reason)/*{{{*/
     		;
 	}
 }/*}}}*/
+
+void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)
+{
+	if(!m_incleanup)
+	{
+		switch(status)
+		{
+			case QProcess::NormalExit:
+			{
+				restoreAction->trigger();
+				cleanupProcessList();
+			}
+			break;
+			case QProcess::CrashExit:
+			{
+				cleanupProcessList();
+				restoreAction->trigger();
+			}
+			break;
+		}
+	}
+	qDebug() << "OOMidi exited with error code: " << code;
+}
 
 void OOStudio::processJackMessages()/*{{{*/
 {
@@ -734,25 +1026,20 @@ void OOStudio::processOOMErrors()/*{{{*/
 	processMessages(1, tr("OOMidi"), m_oomProcess);
 }/*}}}*/
 
-void OOStudio::processCustomMessages()/*{{{*/
+void OOStudio::processCustomMessages(QString name, long pid)/*{{{*/
 {
-	QString messages = QString::fromUtf8(m_jackProcess->readAllStandardOutput().constData());
-	QList<QStandardItem*> rowData;
-	QStandardItem* command = new QStandardItem(tr("Custon"));
-	QStandardItem* log = new QStandardItem(messages);
-	rowData << command << log;
-	m_loggerModel->appendRow(rowData);
+	if(!m_procMap.isEmpty() && m_procMap.contains(pid))
+	{
+		processMessages(0, name, m_procMap.value(pid));
+	}
 }/*}}}*/
 
-void OOStudio::processCustomErrors()/*{{{*/
+void OOStudio::processCustomErrors(QString name, long pid)/*{{{*/
 {
-	QString messages = QString::fromUtf8(m_jackProcess->readAllStandardError().constData());
-	QList<QStandardItem*> rowData;
-	QStandardItem* command = new QStandardItem(tr("Custom"));
-	command->setBackground(QColor(119, 62, 62));
-	QStandardItem* log = new QStandardItem(messages);
-	rowData << command << log;
-	m_loggerModel->appendRow(rowData);
+	if(!m_procMap.isEmpty() && m_procMap.contains(pid))
+	{
+		processMessages(1, name, m_procMap.value(pid));
+	}
 }/*}}}*/
 
 void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/

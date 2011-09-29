@@ -37,5 +37,6 @@
 #define DOCDIR           "${OOMidi_DOC_DIR}"
 #define SHAREDIR         "${OOMidi_SHARE_DIR}"
 #define LIBDIR           "${OOMidi_LIB_DIR}"
+#define OOM_INSTALL_BIN  "${OOMidi_INSTALL_PATH}"
 #define MIDI_FIFO_SIZE	${OOM_MIDI_FIFO_SIZE}
 #define MIDI_REC_FIFO_SIZE ${OOM_MIDI_REC_FIFO_SIZE}

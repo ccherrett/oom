@@ -7,22 +7,27 @@
 #ifndef OOSTUDIO_H
 #define OOSTUDIO_H
 
+#include <lscp/client.h>
+#include <lscp/device.h>
+#include <lscp/socket.h>
+
 #include <QDialog>
 #include <QSystemTrayIcon>
 #include <QList>
 #include <QHash>
 #include <QMap>
 #include <QStringList>
+#include <QProcess>
 #include "ui_OOStudioBase.h"
 
 class QCloseEvent;
 class QAction;
 class QMenu;
-class QProcess;
 class QStandardItemModel;
 class QStandardItem;
 class QItemSelectionModel;
 class QSettings;
+class OOProcess;
 
 struct OOSession
 {
@@ -38,6 +43,8 @@ struct OOSession
 	QString lscpPath;
 	int lscpMode;
 	QString songfile;
+	QString lshostname;
+	int lsport;
 };
 
 class OOStudio :public QDialog ,public Ui::OOStudioBase
@@ -49,6 +56,7 @@ public:
 	void setVisible(bool);
 
 private:
+	bool m_incleanup;
 	QAction* maximizeAction;
 	QAction* minimizeAction;
 	QAction* restoreAction;
@@ -70,20 +78,27 @@ private:
 	QStringList m_loglabels;
 	QList<QProcess*> m_procList;
 	QMap<QString, OOSession*> m_sessionMap;
-	QHash<long, QString> m_procMap;
+	QHash<long, OOProcess*> m_procMap;
+	OOSession* m_current;
 
 	void createTrayIcon();
-	void runJack();
-	void runCommads();
-	void runPostCommads();
-	void runOOM();
+	void createConnections();
+	void createModels();
+	bool runJack(OOSession*);
+	bool runLinuxsampler(OOSession*);
+	void runCommands(OOSession*, bool post = false);
+	bool runOOM(OOSession*);
 	void populateSessions();
 	void processMessages(int, QString, QProcess*);
+	void cleanupProcessList();
 	bool validateCreate();
 	OOSession* readSession(QString);
 	void saveSettings();
 	void loadSession(OOSession*);
 	void updateHeaders();
+	bool pingLinuxsampler(OOSession*);
+	bool loadLSCP(OOSession*);
+	QString getValidName(QString);
 
 protected:
 	void closeEvent(QCloseEvent*);
@@ -111,7 +126,8 @@ private slots:
 	void processLSErrors();
 	void processOOMMessages();
 	void processOOMErrors();
-	void processCustomMessages();
-	void processCustomErrors();
+	void processCustomMessages(QString, long);
+	void processCustomErrors(QString, long);
+	void processOOMExit(int, QProcess::ExitStatus);
 };
 #endif

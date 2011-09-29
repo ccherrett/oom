@@ -80,6 +80,7 @@ SET(OOMidi_VERSION       "2011.1")
 SET(OOMidi_VERSION_FULL  "2011.1")
 SET(OOMidi_INSTALL_NAME  "oom-2011.1")
 SET(OOMidi_EXEC_NAME     "oomidi")
+SET(OOMidi_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/bin/${OOMidi_EXEC_NAME}")
 
 ## The library where we will install the shared components:
 SET(OOMidi_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/modules)
