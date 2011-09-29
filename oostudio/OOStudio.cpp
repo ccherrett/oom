@@ -208,7 +208,10 @@ void OOStudio::populateSessions()/*{{{*/
 			{
 				m_sessionModel->appendRow(rowData);
 			}
-			m_sessionMap[session->name] = session;
+			if(!m_sessionMap.contains(session->name))
+				m_sessionMap[session->name] = session;
+			else
+				delete session;
 		}
 	}
 	updateHeaders();
@@ -606,14 +609,16 @@ bool OOStudio::loadLSCP(OOSession* session)/*{{{*/
 	return false;
 }/*}}}*/
 
-void OOStudio::runCommands(OOSession* session, bool post)/*{{{*/
+void OOStudio::runCommands(OOSession* session, bool )/*{{{*/
 {
 	if(session)
 	{
-		QStringList commands = post ? session->postCommands : session->commands;
+		//QStringList commands = post ? session->postCommands : session->commands;
+		QStringList commands = session->commands;
 		foreach(QString command, commands)
 		{
-			QString cmd = session->lscommand;
+			qDebug() << "Running command: " << command;
+			QString cmd(command);
 			QStringList args = cmd.split(" ");
 			cmd = args.takeFirst();
 			OOProcess* process = new OOProcess(cmd, this);
@@ -809,7 +814,7 @@ void OOStudio::deleteSession()/*{{{*/
 	}
 }/*}}}*/
 
-bool OOStudio::stopCurrentSession()
+bool OOStudio::stopCurrentSession()/*{{{*/
 {
 	if(m_current)
 	{
@@ -832,7 +837,7 @@ bool OOStudio::stopCurrentSession()
 		}
 	}
 	return true;
-}
+}/*}}}*/
 
 void OOStudio::loadSession(OOSession* session)
 {
@@ -882,7 +887,7 @@ void OOStudio::loadSession(OOSession* session)
 					runCommands(session);
 					if(runOOM(session))
 					{
-						runCommands(session, true);
+						//runCommands(session, true);
 						m_current = session;
 						m_lblRunning->setText(session->name);
 						m_btnStopSession->setEnabled(true);
@@ -1048,8 +1053,8 @@ void OOStudio::createSession()/*{{{*/
 						}
 						//Not a template so load it now and minimize;
 					}
-					updateHeaders();
 					saveSettings();
+					populateSessions();
 					resetCreate();
 				}
 				else
@@ -1126,6 +1131,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 			m_cmbLSCPMode->setCurrentIndex(session->lscpMode);
 			m_txtLSCP->setText(session->lscpPath);
 			m_txtOOMPath->setText(session->songfile);
+			m_txtName->setFocus(Qt::OtherFocusReason);
 			updateHeaders();
 		}
 	}
@@ -1314,6 +1320,8 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 			case 0: //Output
 			{
 				QString messages = QString::fromUtf8(p->readAllStandardOutput().constData());
+				if(messages.isEmpty())
+					return;
 				QList<QStandardItem*> rowData;
 				QStandardItem* command = new QStandardItem(name);
 				QStandardItem* log = new QStandardItem(messages);
@@ -1327,6 +1335,8 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 			case 1: //Error
 			{
 				QString messages = QString::fromUtf8(p->readAllStandardError().constData());
+				if(messages.isEmpty())
+					return;
 				QList<QStandardItem*> rowData;
 				QStandardItem* command = new QStandardItem(name);
 				command->setBackground(QColor(99, 36, 36));
