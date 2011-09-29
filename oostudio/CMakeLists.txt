@@ -22,6 +22,7 @@
 ## Expand Qt macros in source files
 ##
 QT4_WRAP_CPP ( studio_mocs
+	OOProcess.h
       )
 
 if(LSCP_SUPPORT)
@@ -42,9 +43,10 @@ QT4_ADD_RESOURCES (studio_qrc_files
 ## List of source files to compile
 ##
 file (GLOB studio_source_files
-      OOStudio.cpp
-	  main.cpp
-      )
+	OOProcess.cpp
+    OOStudio.cpp
+	main.cpp
+    )
 
 if(LSCP_SUPPORT)
 file (GLOB studio_source_files
