@@ -1499,6 +1499,8 @@ void Song::changePart(Part* oPart, Part* nPart)
 	}
 	if (nTrack->type() == Track::WAVE)
 	{
+		int highestZValueBelowNPart = -1;
+
 		for (iPart ip = nTrack->parts()->begin(); ip != nTrack->parts()->end(); ++ip)
 		{
 			WavePart* wp = (WavePart*)ip->second;
@@ -1508,9 +1510,20 @@ void Song::changePart(Part* oPart, Part* nPart)
 			}
 			if (nPart->frame() >= wp->frame() && nPart->endFrame() <= wp->endFrame())
 			{
-				nPart->setZIndex(wp->getZIndex() + 1);
-				wp->setZIndex(0);
+				if (wp->getZIndex() > highestZValueBelowNPart)
+				{
+					highestZValueBelowNPart = wp->getZIndex();
+				}
 			}
+		}
+
+		if (highestZValueBelowNPart == -1)
+		{
+			nPart->setZIndex(0);
+		}
+		else
+		{
+			nPart->setZIndex(highestZValueBelowNPart + 1);
 		}
 
 		((WaveTrack*)nTrack)->calculateCrossFades();
