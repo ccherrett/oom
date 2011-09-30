@@ -166,6 +166,7 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnDeleteSession, SIGNAL(clicked()), this, SLOT(deleteSession()));
 	connect(m_btnStopSession, SIGNAL(clicked()), this, SLOT(stopCurrentSession()));
 	connect(m_cmbTemplate, SIGNAL(currentIndexChanged(int)), this, SLOT(templateSelectionChanged(int)));
+	connect(m_cmbTemplate, SIGNAL(activated(int)), this, SLOT(templateSelectionChanged(int)));
 	connect(m_cmbEditMode, SIGNAL(currentIndexChanged(int)), this, SLOT(editModeChanged(int)));
 }/*}}}*/
 
@@ -433,6 +434,7 @@ void OOStudio::resetCreate(bool fromClear)/*{{{*/
 	m_txtJackCommand->setText(JACK_COMMAND);
 	m_cmbLSCPMode->setCurrentIndex(0);
 	m_commandModel->clear();
+	m_chkTemplate->setChecked(false);
 	updateHeaders();
 }/*}}}*/
 
@@ -1172,7 +1174,7 @@ void OOStudio::updateSession()/*{{{*/
 		OOSession* oldSession = m_sessionMap.value(basename);
 		
 		newSession->name = oldSession->name;
-		newSession->istemplate = oldSession->istemplate;
+		newSession->istemplate = istemplate;
 		
 		root.setAttribute("istemplate", istemplate);
 		root.setAttribute("name", basename);
@@ -1356,6 +1358,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 				QFileInfo fi(session->path);
 				m_txtLocation->setText(fi.dir().absolutePath());
 				m_txtName->setText(session->name);
+				m_chkTemplate->setChecked(session->istemplate);
 			}
 			else
 			{
