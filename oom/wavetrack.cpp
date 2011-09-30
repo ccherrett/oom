@@ -387,6 +387,8 @@ void WaveTrack::calculateCrossFades()
 
 				topPart->fadeIn()->setWidth(0);
 				topPart->fadeOut()->setWidth(0);
+				topPart->setHasCrossFadeForPartialOverlapLeft(false);
+				topPart->setHasCrossFadeForPartialOverlapRight(false);
 
 				// this one no longer can have partial overlap, remove from list
 				// so partial overlap detection won't have to deal with this part anymore.
