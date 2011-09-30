@@ -1147,6 +1147,8 @@ public:
 	bool leftEdgeOnTopOfPartBelow(WavePart* topPart, WavePart* bottomPart);
 	bool rightEdgeOnTopOfPartBelow(WavePart* topPart, WavePart* bottomPart);
 	bool leftAndRightEdgeOnTopOfPartBelow(WavePart* topPart, WavePart* bottomPart);
+	QList<WavePart*> partsBelowLeftEdge(WavePart* part);
+	QList<WavePart*> partsBelowRightEdge(WavePart* part);
 };
 
 //---------------------------------------------------------

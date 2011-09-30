@@ -592,7 +592,7 @@ bool SndFile::useOverwrite(unsigned pos, WavePart *part, bool overwrite)
 
 	unsigned posToPart = pos - part->frame();
 
-	if (part->hasCrossFadeForPartialOverlap())
+	if (part->hasCrossFadeForPartialOverlapLeft() || part->hasCrossFadeForPartialOverlapRight())
 	{
 		if (posToPart >= fadeIn->getFrame() && posToPart <= (fadeIn->getFrame() + fadeIn->width()))
 		{
