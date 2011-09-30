@@ -91,7 +91,7 @@ private:
 	void runCommands(OOSession*, bool post = false);
 	bool runOOM(OOSession*);
 	bool checkOOM();
-	void populateSessions();
+	void populateSessions(bool usehash = false);
 	void processMessages(int, QString, QProcess*);
 	void cleanupProcessList();
 	bool validateCreate();
@@ -115,6 +115,7 @@ private slots:
 	void loadSessionClicked();
 	void loadTemplateClicked();
 	void createSession();
+	void updateSession();
 	void browseLocation();
 	void browseLSCP();
 	void browseOOM();
@@ -128,6 +129,7 @@ private slots:
 	void deleteTemplate();
 	void deleteSession();
 	bool stopCurrentSession();
+	void editModeChanged(int);
 	//Process Listeners
 	void processJackMessages();
 	void processJackErrors();

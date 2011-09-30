@@ -38,5 +38,6 @@
 #define SHAREDIR         "${OOMidi_SHARE_DIR}"
 #define LIBDIR           "${OOMidi_LIB_DIR}"
 #define OOM_INSTALL_BIN  "${OOMidi_INSTALL_PATH}"
+#define OOM_DEFAULT_TEMPLATE "${OOMidi_SHARE_DIR}/templates/oomidi-template.oos"
 #define MIDI_FIFO_SIZE	${OOM_MIDI_FIFO_SIZE}
 #define MIDI_REC_FIFO_SIZE ${OOM_MIDI_REC_FIFO_SIZE}

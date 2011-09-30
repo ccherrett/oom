@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<oom version="1.0">
+  <MidiInstrument name="percussion">
+    <PatchGroup name="percussion">
+      <Patch name="tympani" hbank="0" lbank="0" prog="0" />
+      <Patch name="bassdrum-snare" hbank="0" lbank="0" prog="1" />
+      <Patch name="cymbals-tamtam" hbank="0" lbank="0" prog="2" />
+      <Patch name="triangle" hbank="0" lbank="0" prog="3" />
+      <Patch name="chimes" hbank="0" lbank="0" prog="4" />
+      <Patch name="conga" hbank="0" lbank="0" prog="5" />
+      <Patch name="glockenspiel" hbank="0" lbank="0" prog="6" />
+      <Patch name="xylophone" hbank="0" lbank="0" prog="7" />
+      <Patch name="various" hbank="0" lbank="0" prog="8" />
+    </PatchGroup>
+    <Controller name="Modulation" l="1" init="0" />
+    <Controller name="Expression" l="11" init="0" />
+    <Controller name="Program" type="Program" init="0x0" />
+  </MidiInstrument>
+</oom>

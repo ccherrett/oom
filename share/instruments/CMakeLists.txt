@@ -23,6 +23,7 @@ file (GLOB instruments_files
 	gm.idf
 	gs.idf
 	xg.idf
+	*-sonatina.idf
 	)
 
 install( FILES ${instruments_files}
