@@ -587,18 +587,36 @@ bool SndFile::useOverwrite(unsigned pos, WavePart *part, bool overwrite)
 {
 	FadeCurve* crossFadeIn = part->crossFadeIn();
 	FadeCurve* crossFadeOut = part->crossFadeOut();
+	FadeCurve* fadeIn = part->fadeIn();
+	FadeCurve* fadeOut = part->fadeOut();
 
 	unsigned posToPart = pos - part->frame();
 
-	if (posToPart >= crossFadeIn->getFrame() && posToPart <= (crossFadeIn->getFrame() + crossFadeIn->width()))
+	if (part->hasCrossFadeForPartialOverlapLeft() || part->hasCrossFadeForPartialOverlapRight())
 	{
-		return false;
+		if (posToPart >= fadeIn->getFrame() && posToPart <= (fadeIn->getFrame() + fadeIn->width()))
+		{
+			return false;
+		}
+
+		if (posToPart >= fadeOut->getFrame() && posToPart <= (fadeOut->getFrame() + fadeOut->width()))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		if (posToPart >= crossFadeIn->getFrame() && posToPart <= (crossFadeIn->getFrame() + crossFadeIn->width()))
+		{
+			return false;
+		}
+
+		if (posToPart >= crossFadeOut->getFrame() && posToPart <= (crossFadeOut->getFrame() + crossFadeOut->width()))
+		{
+			return false;
+		}
 	}
 
-	if (posToPart >= crossFadeOut->getFrame() && posToPart <= (crossFadeOut->getFrame() + crossFadeIn->width()))
-	{
-		return false;
-	}
 
 	return overwrite;
 }

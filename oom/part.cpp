@@ -794,6 +794,8 @@ WavePart::WavePart(const WavePart& p) : Part(p)
 	m_crossFadeIn->setPart(this);
 	m_crossFadeOut = p.m_crossFadeOut;
 	m_crossFadeOut->setPart(this);
+	m_hasCrossFadeForPartialOverlapLeft = p.m_hasCrossFadeForPartialOverlapLeft;
+	m_hasCrossFadeForPartialOverlapRight = p.m_hasCrossFadeForPartialOverlapRight;
 }
 
 void WavePart::init()
@@ -802,6 +804,8 @@ void WavePart::init()
 	m_fadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
 	m_crossFadeIn = new FadeCurve(FadeCurve::FadeIn, FadeCurve::Linear, this);
 	m_crossFadeOut = new FadeCurve(FadeCurve::FadeOut, FadeCurve::Linear, this);
+	m_hasCrossFadeForPartialOverlapLeft = false;
+	m_hasCrossFadeForPartialOverlapRight = false;
 }
 
 float WavePart::gain(unsigned pos)

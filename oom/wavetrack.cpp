@@ -25,6 +25,10 @@
 //    called from prefetch thread
 //---------------------------------------------------------
 
+
+// should be moved to global config.
+bool useAutoCrossFades = true;
+
 void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSeek)
 {
 	// Added by Tim. p3.3.17
@@ -362,34 +366,161 @@ void WaveTrack::calculateCrossFades()
 
 	qSort(sortedByZValue.begin(), sortedByZValue.end(), Part::smallerZValue);
 
-	foreach(WavePart* wp, sortedByZValue)
+	foreach(WavePart* bottomPart, sortedByZValue)
 	{
-		foreach(WavePart* partWithHigherZindex, sortedByZValue)
+		foreach(WavePart* topPart, sortedByZValue)
 		{
-			if (partWithHigherZindex->getZIndex() > wp->getZIndex() &&
-			    partWithHigherZindex->frame() > wp->frame() &&
-			    partWithHigherZindex->frame() < wp->endFrame())
+			if (topPart->getZIndex() > bottomPart->getZIndex() && leftAndRightEdgeOnTopOfPartBelow(topPart, bottomPart))
 			{
-				unsigned bottomPartFadeOutStart = partWithHigherZindex->frame() - wp->frame();
+				unsigned bottomPartFadeOutStart = topPart->frame() - bottomPart->frame();
 
-				wp->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
-				wp->crossFadeOut()->setFrame(bottomPartFadeOutStart);
+				bottomPart->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
+				bottomPart->crossFadeOut()->setFrame(bottomPartFadeOutStart);
 
-				partWithHigherZindex->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
-			}
+				topPart->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+				unsigned bottomPartFadeInStart = topPart->endFrame() - bottomPart->frame() - CROSSFADE_WIDTH;
 
-			if (partWithHigherZindex->getZIndex() > wp->getZIndex() &&
-			    partWithHigherZindex->endFrame() > wp->frame() &&
-			    partWithHigherZindex->endFrame() < wp->endFrame())
-			{
-				unsigned bottomPartFadeInStart = partWithHigherZindex->endFrame() - wp->frame() - CROSSFADE_WIDTH;
+				bottomPart->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+				bottomPart->crossFadeIn()->setFrame(bottomPartFadeInStart);
 
-				wp->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
-				wp->crossFadeIn()->setFrame(bottomPartFadeInStart);
+				topPart->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
 
-				partWithHigherZindex->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
+				topPart->fadeIn()->setWidth(0);
+				topPart->fadeOut()->setWidth(0);
+
+				// this one no longer can have partial overlap, remove from list
+				// so partial overlap detection won't have to deal with this part anymore.
+				sortedByZValue.removeAll(topPart);
 			}
 		}
 	}
 
+
+	if (useAutoCrossFades)
+	{
+		foreach(WavePart* topPart, sortedByZValue)
+		{
+			QList<WavePart*> list;
+			list = partsBelowLeftEdge(topPart);
+			if (list.size())
+			{
+				foreach(WavePart* bottomPart, list)
+				{
+					unsigned overlapWidth = bottomPart->endFrame() - topPart->frame();
+
+					bottomPart->fadeOut()->setWidth(overlapWidth);
+					topPart->fadeIn()->setWidth(overlapWidth);
+					topPart->setHasCrossFadeForPartialOverlapLeft(true);
+
+				}
+			}
+			else if (topPart->hasCrossFadeForPartialOverlapLeft())
+			{
+				topPart->setHasCrossFadeForPartialOverlapLeft(false);
+				topPart->fadeIn()->setWidth(0);
+			}
+
+
+			list = partsBelowRightEdge(topPart);
+			if (list.size())
+			{
+				foreach(WavePart* bottomPart, list)
+				{
+					unsigned overlapWidth = topPart->endFrame() - bottomPart->frame();
+
+					bottomPart->fadeIn()->setWidth(overlapWidth);
+					topPart->fadeOut()->setWidth(overlapWidth);
+					topPart->setHasCrossFadeForPartialOverlapRight(true);
+
+				}
+			}
+			else if (topPart->hasCrossFadeForPartialOverlapRight())
+			{
+				topPart->setHasCrossFadeForPartialOverlapRight(false);
+				topPart->fadeOut()->setWidth(0);
+			}
+		}
+	}
+}
+
+
+bool WaveTrack::leftEdgeOnTopOfPartBelow(WavePart *topPart, WavePart* bottomPart)
+{
+	if (topPart == bottomPart)
+	{
+		return false;
+	}
+
+	if (topPart->frame() > bottomPart->frame() &&
+	    topPart->frame() < bottomPart->endFrame())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool WaveTrack::rightEdgeOnTopOfPartBelow(WavePart *topPart, WavePart* bottomPart)
+{
+	if (topPart == bottomPart)
+	{
+		return false;
+	}
+
+	if (topPart->endFrame() > bottomPart->frame() &&
+	    topPart->endFrame() < bottomPart->endFrame())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+QList<WavePart*> WaveTrack::partsBelowLeftEdge(WavePart *part)
+{
+	QList<WavePart*> list;
+	for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+	{
+		WavePart* wp = (WavePart*)ip->second;
+		if (wp == part)
+		{
+			continue;
+		}
+		if (leftEdgeOnTopOfPartBelow(part, wp))
+		{
+			list.append(wp);
+		}
+	}
+
+	return list;
+}
+
+
+QList<WavePart*> WaveTrack::partsBelowRightEdge(WavePart *part)
+{
+	QList<WavePart*> list;
+	for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+	{
+		WavePart* wp = (WavePart*)ip->second;
+		if (wp == part)
+		{
+			continue;
+		}
+		if (rightEdgeOnTopOfPartBelow(part, wp))
+		{
+			list.append(wp);
+		}
+	}
+
+	return list;
+}
+
+bool WaveTrack::leftAndRightEdgeOnTopOfPartBelow(WavePart * topPart, WavePart* bottomPart)
+{
+	if (leftEdgeOnTopOfPartBelow(topPart, bottomPart) && rightEdgeOnTopOfPartBelow(topPart, bottomPart))
+	{
+		return true;
+	}
+
+	return false;
 }
