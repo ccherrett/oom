@@ -20,6 +20,7 @@ static const char* LS_COMMAND   = "linuxsampler";
 static const char* JACK_COMMAND = "/usr/bin/jackd -r -t2000 -dalsa -dhw:0 -r48000 -p512 -n3 -Xraw -P";
 static const char* NO_PROC_TEXT = "No Running Session";
 static const char* OOM_TEMPLATE_NAME = "OOMidi_Orchestral_Template";
+static const char* MAP_STRING = "MAP MIDI_INSTRUMENT";
 
 lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event*/, const char * /*pchData*/, int /*cchData*/, void* pvData )
 {
@@ -49,10 +50,11 @@ OOStudio::OOStudio()
 		cf.close();
 	}
 
-	m_cmbLSCPMode->addItem("Default", "Default");
-	m_cmbLSCPMode->addItem("ON_DEMAND", "ON_DEMAND");
-	m_cmbLSCPMode->addItem("ON_DEMAND_HOLD", "ON_DEMAND_HOLD");
-	m_cmbLSCPMode->addItem("PERSISTENT", "PERSISTENT");
+	m_lscpLabels = (QStringList() << "Default" << "ON_DEMAND" << "ON_DEMAND_HOLD" << "PERSISTENT");
+	m_cmbLSCPMode->addItems(m_lscpLabels);
+	//m_cmbLSCPMode->addItem("ON_DEMAND", "ON_DEMAND");
+	//m_cmbLSCPMode->addItem("ON_DEMAND_HOLD", "ON_DEMAND_HOLD");
+	//m_cmbLSCPMode->addItem("PERSISTENT", "PERSISTENT");
 	
 	m_cmbEditMode->addItem("Create");
 	m_cmbEditMode->addItem("Update");
@@ -640,6 +642,17 @@ bool OOStudio::loadLSCP(OOSession* session)/*{{{*/
 			if(!command.startsWith("#") && !command.isEmpty())
 			{
 				QString cmd = command.append("\r\n");
+				if(session->lscpMode && cmd.startsWith(QString(MAP_STRING)))
+				{
+					QString rep(m_lscpLabels.at(session->lscpMode));
+					int count = 0;
+					foreach(QString str, m_lscpLabels)
+					{
+						if(count && str != rep)
+							cmd.replace(str, rep);
+						++count;
+					}
+				}
 				::lscp_client_query(client, cmd.toUtf8().constData());
 				//return true;
 				/*if(::lscp_client_query(client, cmd.toUtf8().constData()) != LSCP_OK)

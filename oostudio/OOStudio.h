@@ -78,6 +78,7 @@ private:
 	QStringList m_templatelabels;
 	QStringList m_commandlabels;
 	QStringList m_loglabels;
+	QStringList m_lscpLabels;
 	QList<QProcess*> m_procList;
 	QMap<QString, OOSession*> m_sessionMap;
 	QHash<long, OOProcess*> m_procMap;
