@@ -12,6 +12,7 @@
 #include <QDomElement>
 #include <QDomNodeList>
 #include <QDomNode>
+#include <QIcon>
 
 static const char* LS_HOSTNAME  = "localhost";
 static const int   LS_PORT      = 8888;
@@ -35,6 +36,7 @@ OOStudio::OOStudio()
 	m_lsProcess = 0;
 	m_current = 0;
 	m_incleanup = false;
+	m_chkAfterOOM->hide();
 	createTrayIcon();
 	QString style(":/style.qss");
 	QFile cf(style);
@@ -55,7 +57,7 @@ OOStudio::OOStudio()
 	m_sessionlabels = (QStringList() << "Name" << "Path" );
 	m_templatelabels = (QStringList() << "Name" << "Path" );
 	m_commandlabels = (QStringList() << "Command" );
-	m_loglabels = (QStringList() << "Command" << "Log" );
+	m_loglabels = (QStringList() << "Command" << "Level" << "Log" );
 
 	m_txtLSPort->setValidator(new QIntValidator());
 	createModels();
@@ -81,13 +83,25 @@ OOStudio::OOStudio()
 void OOStudio::createTrayIcon()/*{{{*/
 {
 	minimizeAction = new QAction(tr("Mi&nimize"), this);
-	connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
 	maximizeAction = new QAction(tr("Ma&ximize"), this);
-	connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
 	restoreAction = new QAction(tr("&Restore"), this);
-	connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
 	quitAction = new QAction(tr("&Quit"), this);
-	connect(quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
+	importAction = new QAction(tr("Import existing sessions and session templates"), this);
+
+	QIcon exitIcon;
+	exitIcon.addPixmap(QPixmap(":/images/garbage_new_on.png"), QIcon::Normal, QIcon::On);
+	exitIcon.addPixmap(QPixmap(":/images/garbage_new_off.png"), QIcon::Normal, QIcon::Off);
+	exitIcon.addPixmap(QPixmap(":/images/garbage_new_over.png"), QIcon::Active);
+	quitAction->setIcon(exitIcon);
+	m_btnExit->setDefaultAction(quitAction);
+
+	QIcon importIcon;
+	importIcon.addPixmap(QPixmap(":/images/plus_new_on.png"), QIcon::Normal, QIcon::On);
+	importIcon.addPixmap(QPixmap(":/images/plus_new_off.png"), QIcon::Normal, QIcon::Off);
+	importIcon.addPixmap(QPixmap(":/images/plus_new_over.png"), QIcon::Active);
+	importAction->setIcon(importIcon);
+	m_btnImport->setDefaultAction(importAction);
+
 
 	trayMenu = new QMenu(this);
 	trayMenu->addAction(minimizeAction);
@@ -128,12 +142,16 @@ void OOStudio::createModels()/*{{{*/
 
 void OOStudio::createConnections()/*{{{*/
 {
+	connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
+	connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
+	connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
+	connect(importAction, SIGNAL(triggered()), this, SLOT(importSession()));
+	connect(quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
 	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 	connect(m_btnLoadSession, SIGNAL(clicked()), this, SLOT(loadSessionClicked()));
 	connect(m_btnLoadTemplate, SIGNAL(clicked()), this, SLOT(loadTemplateClicked()));
 	connect(m_btnClearCreate, SIGNAL(clicked()), this, SLOT(resetCreate()));
 	connect(m_btnDoCreate, SIGNAL(clicked()), this, SLOT(createSession()));
-	connect(m_btnImport, SIGNAL(clicked()), this, SLOT(importSession()));
 	connect(m_btnBrowsePath, SIGNAL(clicked()), this, SLOT(browseLocation()));
 	connect(m_btnBrowseLSCP, SIGNAL(clicked()), this, SLOT(browseLSCP()));
 	connect(m_btnBrowseOOM, SIGNAL(clicked()), this, SLOT(browseOOM()));
@@ -155,6 +173,7 @@ void OOStudio::updateHeaders()/*{{{*/
 	m_commandModel->setHorizontalHeaderLabels(m_commandlabels);
 
 	m_loggerModel->setHorizontalHeaderLabels(m_loglabels);
+	m_loggerTable->setColumnWidth(1, 60);
 }/*}}}*/
 
 void OOStudio::populateSessions()/*{{{*/
@@ -189,7 +208,10 @@ void OOStudio::populateSessions()/*{{{*/
 			{
 				m_sessionModel->appendRow(rowData);
 			}
-			m_sessionMap[session->name] = session;
+			if(!m_sessionMap.contains(session->name))
+				m_sessionMap[session->name] = session;
+			else
+				delete session;
 		}
 	}
 	updateHeaders();
@@ -307,9 +329,11 @@ void OOStudio::browse(int form)/*{{{*/
 						m_sessionModel->appendRow(rowData);
 						m_sessionBox->setCurrentIndex(0);
 					}
+					m_tabWidget->setCurrentIndex(0);
 					updateHeaders();
 					m_sessionMap[session->name] = session;
 					saveSettings();
+					populateSessions();
 					//TODO: message to tell what type was imported
 				}
 				else
@@ -405,9 +429,12 @@ void OOStudio::cleanupProcessList()/*{{{*/
 
 void OOStudio::shutdown()/*{{{*/
 {
-	cleanupProcessList();
-	saveSettings();
-	qApp->quit();
+	if(stopCurrentSession())
+	{
+		//cleanupProcessList();
+		saveSettings();
+		qApp->quit();
+	}
 }/*}}}*/
 
 void OOStudio::saveSettings()/*{{{*/
@@ -582,14 +609,16 @@ bool OOStudio::loadLSCP(OOSession* session)/*{{{*/
 	return false;
 }/*}}}*/
 
-void OOStudio::runCommands(OOSession* session, bool post)/*{{{*/
+void OOStudio::runCommands(OOSession* session, bool )/*{{{*/
 {
 	if(session)
 	{
-		QStringList commands = post ? session->postCommands : session->commands;
+		//QStringList commands = post ? session->postCommands : session->commands;
+		QStringList commands = session->commands;
 		foreach(QString command, commands)
 		{
-			QString cmd = session->lscommand;
+			qDebug() << "Running command: " << command;
+			QString cmd(command);
 			QStringList args = cmd.split(" ");
 			cmd = args.takeFirst();
 			OOProcess* process = new OOProcess(cmd, this);
@@ -698,7 +727,7 @@ QString OOStudio::convertPath(QString path)/*{{{*/
 	return path;
 }/*}}}*/
 
-void OOStudio::doSessionDelete(OOSession* session)
+void OOStudio::doSessionDelete(OOSession* session)/*{{{*/
 {
 	if(session)
 	{
@@ -711,11 +740,11 @@ void OOStudio::doSessionDelete(OOSession* session)
 			dir.rmdir(dir.absolutePath());
 		}
 	}
-}
+}/*}}}*/
 
-void OOStudio::deleteTemplate()
+void OOStudio::deleteTemplate()/*{{{*/
 {
-	if(m_templateSelectModel && m_templateSelectModel->hasSelection())/*{{{*/
+	if(m_templateSelectModel && m_templateSelectModel->hasSelection())
 	{
 		QModelIndexList	selected = m_templateSelectModel->selectedRows(0);
 		if(selected.size())
@@ -746,10 +775,10 @@ void OOStudio::deleteTemplate()
 				}
 			}
 		}
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
-void OOStudio::deleteSession()
+void OOStudio::deleteSession()/*{{{*/
 {
 	if(m_sessionSelectModel && m_sessionSelectModel->hasSelection())
 	{
@@ -783,9 +812,9 @@ void OOStudio::deleteSession()
 			}
 		}
 	}
-}
+}/*}}}*/
 
-void OOStudio::stopCurrentSession()
+bool OOStudio::stopCurrentSession()/*{{{*/
 {
 	if(m_current)
 	{
@@ -799,10 +828,16 @@ void OOStudio::stopCurrentSession()
 			) == QMessageBox::Ok)
 			{
 				cleanupProcessList();
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
 	}
-}
+	return true;
+}/*}}}*/
 
 void OOStudio::loadSession(OOSession* session)
 {
@@ -852,7 +887,7 @@ void OOStudio::loadSession(OOSession* session)
 					runCommands(session);
 					if(runOOM(session))
 					{
-						runCommands(session, true);
+						//runCommands(session, true);
 						m_current = session;
 						m_lblRunning->setText(session->name);
 						m_btnStopSession->setEnabled(true);
@@ -1018,8 +1053,8 @@ void OOStudio::createSession()/*{{{*/
 						}
 						//Not a template so load it now and minimize;
 					}
-					updateHeaders();
 					saveSettings();
+					populateSessions();
 					resetCreate();
 				}
 				else
@@ -1096,6 +1131,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 			m_cmbLSCPMode->setCurrentIndex(session->lscpMode);
 			m_txtLSCP->setText(session->lscpPath);
 			m_txtOOMPath->setText(session->songfile);
+			m_txtName->setFocus(Qt::OtherFocusReason);
 			updateHeaders();
 		}
 	}
@@ -1185,6 +1221,12 @@ void OOStudio::closeEvent(QCloseEvent* ev)/*{{{*/
 		ev->ignore();
 	}
 }/*}}}*/
+
+void OOStudio::resizeEvent(QResizeEvent* evt)
+{
+	QDialog::resizeEvent(evt);
+	m_loggerTable->resizeRowsToContents();
+}
 
 void OOStudio::iconActivated(QSystemTrayIcon::ActivationReason reason)/*{{{*/
 {
@@ -1278,23 +1320,31 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 			case 0: //Output
 			{
 				QString messages = QString::fromUtf8(p->readAllStandardOutput().constData());
+				if(messages.isEmpty())
+					return;
 				QList<QStandardItem*> rowData;
 				QStandardItem* command = new QStandardItem(name);
 				QStandardItem* log = new QStandardItem(messages);
-				rowData << command << log;
+				QStandardItem* level = new QStandardItem("INFO");
+				rowData << command << level << log;
 				m_loggerModel->appendRow(rowData);
+				m_loggerTable->resizeRowsToContents();
 				updateHeaders();
 			}
 			break;
 			case 1: //Error
 			{
 				QString messages = QString::fromUtf8(p->readAllStandardError().constData());
+				if(messages.isEmpty())
+					return;
 				QList<QStandardItem*> rowData;
 				QStandardItem* command = new QStandardItem(name);
-				command->setBackground(QColor(119, 62, 62));
+				command->setBackground(QColor(99, 36, 36));
 				QStandardItem* log = new QStandardItem(messages);
-				rowData << command << log;
+				QStandardItem* level = new QStandardItem("ERROR");
+				rowData << command << level << log;
 				m_loggerModel->appendRow(rowData);
+				m_loggerTable->resizeRowsToContents();
 				updateHeaders();
 			}
 			break;
