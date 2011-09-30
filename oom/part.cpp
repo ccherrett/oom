@@ -1484,7 +1484,6 @@ void Song::changePart(Part* oPart, Part* nPart)
 
 	oTrack->parts()->remove(oPart);
 	nTrack->parts()->add(nPart);
-	nPart->setZIndex(oPart->getZIndex());
 	nPart->setColorIndex(oPart->colorIndex());
 
 	// adjust song len:
@@ -1493,7 +1492,7 @@ void Song::changePart(Part* oPart, Part* nPart)
 		_len = epos;
 
 
-	if (oTrack->type() == Track::WAVE)
+	if (oTrack->type() == Track::WAVE && oTrack != nTrack)
 	{
 		((WaveTrack*)oTrack)->calculateCrossFades();
 	}
@@ -1508,7 +1507,8 @@ void Song::changePart(Part* oPart, Part* nPart)
 			{
 				continue;
 			}
-			if (nPart->frame() >= wp->frame() && nPart->endFrame() <= wp->endFrame())
+			if ((nPart->frame() >= wp->frame() && nPart->frame() <= wp->endFrame()) ||
+			    (nPart->endFrame() >= wp->frame() && nPart->endFrame() <= wp->endFrame()) )
 			{
 				if (wp->getZIndex() > highestZValueBelowNPart)
 				{
@@ -1525,10 +1525,7 @@ void Song::changePart(Part* oPart, Part* nPart)
 		{
 			nPart->setZIndex(highestZValueBelowNPart + 1);
 		}
-
-		((WaveTrack*)nTrack)->calculateCrossFades();
 	}
-
 }
 
 //---------------------------------------------------------

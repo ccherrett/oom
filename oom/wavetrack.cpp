@@ -368,17 +368,25 @@ void WaveTrack::calculateCrossFades()
 		{
 			if (partWithHigherZindex->getZIndex() > wp->getZIndex() &&
 			    partWithHigherZindex->frame() > wp->frame() &&
-			    partWithHigherZindex->endFrame() < wp->endFrame())
+			    partWithHigherZindex->frame() < wp->endFrame())
 			{
-				unsigned bottomPartFadeInStart = partWithHigherZindex->endFrame() - wp->frame() - CROSSFADE_WIDTH;
 				unsigned bottomPartFadeOutStart = partWithHigherZindex->frame() - wp->frame();
 
-				wp->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
 				wp->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
-				wp->crossFadeIn()->setFrame(bottomPartFadeInStart);
 				wp->crossFadeOut()->setFrame(bottomPartFadeOutStart);
 
 				partWithHigherZindex->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+			}
+
+			if (partWithHigherZindex->getZIndex() > wp->getZIndex() &&
+			    partWithHigherZindex->endFrame() > wp->frame() &&
+			    partWithHigherZindex->endFrame() < wp->endFrame())
+			{
+				unsigned bottomPartFadeInStart = partWithHigherZindex->endFrame() - wp->frame() - CROSSFADE_WIDTH;
+
+				wp->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+				wp->crossFadeIn()->setFrame(bottomPartFadeInStart);
+
 				partWithHigherZindex->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
 			}
 		}
