@@ -19,6 +19,7 @@ static const int   LS_PORT      = 8888;
 static const char* LS_COMMAND   = "linuxsampler";
 static const char* JACK_COMMAND = "/usr/bin/jackd -r -t2000 -dalsa -dhw:0 -r48000 -p512 -n3 -Xraw -P";
 static const char* NO_PROC_TEXT = "No Running Session";
+static const char* OOM_TEMPLATE_NAME = "OOMidi_Orchestral_Template";
 
 lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event*/, const char * /*pchData*/, int /*cchData*/, void* pvData )
 {
@@ -48,12 +49,14 @@ OOStudio::OOStudio()
 		cf.close();
 	}
 
-	m_cmbTemplate->addItem("Default", "Default");
 	m_cmbLSCPMode->addItem("Default", "Default");
 	m_cmbLSCPMode->addItem("ON_DEMAND", "ON_DEMAND");
 	m_cmbLSCPMode->addItem("ON_DEMAND_HOLD", "ON_DEMAND_HOLD");
 	m_cmbLSCPMode->addItem("PERSISTENT", "PERSISTENT");
 	
+	m_cmbEditMode->addItem("Create");
+	m_cmbEditMode->addItem("Update");
+
 	m_sessionlabels = (QStringList() << "Name" << "Path" );
 	m_templatelabels = (QStringList() << "Name" << "Path" );
 	m_commandlabels = (QStringList() << "Command" );
@@ -152,6 +155,7 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnLoadTemplate, SIGNAL(clicked()), this, SLOT(loadTemplateClicked()));
 	connect(m_btnClearCreate, SIGNAL(clicked()), this, SLOT(resetCreate()));
 	connect(m_btnDoCreate, SIGNAL(clicked()), this, SLOT(createSession()));
+	connect(m_btnUpdate, SIGNAL(clicked()), this, SLOT(updateSession()));
 	connect(m_btnBrowsePath, SIGNAL(clicked()), this, SLOT(browseLocation()));
 	connect(m_btnBrowseLSCP, SIGNAL(clicked()), this, SLOT(browseLSCP()));
 	connect(m_btnBrowseOOM, SIGNAL(clicked()), this, SLOT(browseOOM()));
@@ -162,6 +166,8 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnDeleteSession, SIGNAL(clicked()), this, SLOT(deleteSession()));
 	connect(m_btnStopSession, SIGNAL(clicked()), this, SLOT(stopCurrentSession()));
 	connect(m_cmbTemplate, SIGNAL(currentIndexChanged(int)), this, SLOT(templateSelectionChanged(int)));
+	connect(m_cmbTemplate, SIGNAL(activated(int)), this, SLOT(templateSelectionChanged(int)));
+	connect(m_cmbEditMode, SIGNAL(currentIndexChanged(int)), this, SLOT(editModeChanged(int)));
 }/*}}}*/
 
 void OOStudio::updateHeaders()/*{{{*/
@@ -176,44 +182,85 @@ void OOStudio::updateHeaders()/*{{{*/
 	m_loggerTable->setColumnWidth(1, 60);
 }/*}}}*/
 
-void OOStudio::populateSessions()/*{{{*/
+void OOStudio::populateSessions(bool usehash)/*{{{*/
 {
 	m_sessionModel->clear();
 	m_templateModel->clear();
-	while(m_cmbTemplate->count() > 1)
+	while(m_cmbTemplate->count() > 0)
 	{
 		m_cmbTemplate->removeItem((m_cmbTemplate->count()-1));
 	}
-	QSettings settings("OOMidi", "OOStudio");
-	int sess = settings.beginReadArray("Sessions");
-	printf("OOStudio::populateSession: sessions: %d\n", sess);
-	for(int i = 0; i < sess; ++i)
+
+	OOSession* session = readSession(QString(OOM_DEFAULT_TEMPLATE));
+	if(session)
 	{
-		settings.setArrayIndex(i);
-		printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
-		OOSession* session = readSession(settings.value("path").toString());
-		if(session)
+		QString tag("T: ");
+		tag.append(QString(OOM_TEMPLATE_NAME));
+		m_cmbTemplate->addItem(tag, QString(OOM_TEMPLATE_NAME));
+		m_sessionMap[session->name] = session;
+	}
+	int sess = 0;
+	if(usehash)
+	{
+		printf("OOStudio::populateSession: sessions: %d\n", m_sessionMap.count());
+		QMap<QString, OOSession*>::const_iterator iter = m_sessionMap.constBegin();
+		while (iter != m_sessionMap.constEnd())
 		{
-			printf("Found valid session\n");
-			QStandardItem* name = new QStandardItem(session->name);
-			QStandardItem* path = new QStandardItem(session->path);
-			QList<QStandardItem*> rowData;
-			rowData << name << path;
-			if(session->istemplate)
+			OOSession* session = iter.value();
+			if(session && session->name != QString(OOM_TEMPLATE_NAME))
 			{
-				m_templateModel->appendRow(rowData);
-				m_cmbTemplate->addItem(name->text(), path->text());
+				printf("Processing session %s \n", session->name.toUtf8().constData());
+				QStandardItem* name = new QStandardItem(session->name);
+				QStandardItem* path = new QStandardItem(session->path);
+				QList<QStandardItem*> rowData;
+				rowData << name << path;
+				if(session->istemplate)
+				{
+					m_templateModel->appendRow(rowData);
+					m_cmbTemplate->addItem("T: "+name->text(), name->text());
+				}
+				else
+				{
+					m_sessionModel->appendRow(rowData);
+					m_cmbTemplate->addItem("S: "+name->text(), name->text());
+				}
 			}
-			else
-			{
-				m_sessionModel->appendRow(rowData);
-			}
-			if(!m_sessionMap.contains(session->name))
-				m_sessionMap[session->name] = session;
-			else
-				delete session;
+			++iter;
 		}
 	}
+	else
+	{
+		QSettings settings("OOMidi", "OOStudio");
+		sess = settings.beginReadArray("Sessions");
+		printf("OOStudio::populateSession: sessions: %d\n", sess);
+
+		for(int i = 0; i < sess; ++i)
+		{
+			settings.setArrayIndex(i);
+			printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
+			OOSession* session = readSession(settings.value("path").toString());
+			if(session)
+			{
+				printf("Found valid session\n");
+				QStandardItem* name = new QStandardItem(session->name);
+				QStandardItem* path = new QStandardItem(session->path);
+				QList<QStandardItem*> rowData;
+				rowData << name << path;
+				if(session->istemplate)
+				{
+					m_templateModel->appendRow(rowData);
+					m_cmbTemplate->addItem("T: "+name->text(), name->text());
+				}
+				else
+				{
+					m_sessionModel->appendRow(rowData);
+					m_cmbTemplate->addItem("S: "+name->text(), name->text());
+				}
+				m_sessionMap[session->name] = session;
+			}
+		}
+	}
+
 	updateHeaders();
 }/*}}}*/
 
@@ -333,7 +380,7 @@ void OOStudio::browse(int form)/*{{{*/
 					updateHeaders();
 					m_sessionMap[session->name] = session;
 					saveSettings();
-					populateSessions();
+					populateSessions(true);
 					//TODO: message to tell what type was imported
 				}
 				else
@@ -354,6 +401,8 @@ void OOStudio::addCommand()/*{{{*/
 	item->setCheckable(true);
 	m_commandModel->appendRow(item);
 	updateHeaders();
+	m_txtCommand->setText("");
+	m_txtCommand->setFocus(Qt::OtherFocusReason);
 }/*}}}*/
 
 void OOStudio::deleteCommand()/*{{{*/
@@ -385,6 +434,7 @@ void OOStudio::resetCreate(bool fromClear)/*{{{*/
 	m_txtJackCommand->setText(JACK_COMMAND);
 	m_cmbLSCPMode->setCurrentIndex(0);
 	m_commandModel->clear();
+	m_chkTemplate->setChecked(false);
 	updateHeaders();
 }/*}}}*/
 
@@ -447,15 +497,17 @@ void OOStudio::saveSettings()/*{{{*/
 		settings.beginWriteArray("Sessions");
 		while (i != m_sessionMap.constEnd())
 		{
-			settings.setArrayIndex(id);
 			OOSession* session = i.value();
-			if(session)
+			if(session && session->name != QString(OOM_TEMPLATE_NAME))
 			{
+				settings.setArrayIndex(id);
+				
 				settings.setValue("name", i.key());
 				settings.setValue("path", session->path);
+				
+				++id;
 			}
 			++i;
-			++id;
 		}
 		settings.endArray();
 	}
@@ -770,7 +822,7 @@ void OOStudio::deleteTemplate()/*{{{*/
 						}
 						doSessionDelete(session);
 						saveSettings();
-						populateSessions();
+						populateSessions(true);
 					}
 				}
 			}
@@ -806,7 +858,7 @@ void OOStudio::deleteSession()/*{{{*/
 						}
 						doSessionDelete(session);
 						saveSettings();
-						populateSessions();
+						populateSessions(true);
 					}
 				}
 			}
@@ -937,7 +989,7 @@ bool OOStudio::validateCreate()/*{{{*/
 	if((m_chkStartJack->isChecked() && m_txtJackCommand->text().isEmpty()) || 
 		(m_chkStartLS->isChecked() && m_txtLSCommand->text().isEmpty()))
 		return false;
-	if(m_sessionMap.contains(m_txtName->text()))
+	if(m_sessionMap.contains(m_txtName->text()) && m_cmbEditMode->currentIndex() == 0)
 	{
 		QMessageBox::warning(
 			this,
@@ -1042,10 +1094,11 @@ void OOStudio::createSession()/*{{{*/
 					else
 					{
 						m_sessionModel->appendRow(rowData);
+						QString msg = QObject::tr("Successfully Create Session:\n\t%1 \nWould you like to open this session now?");
 						if(QMessageBox::question(
 							this,
 							tr("Open Session"),
-							tr("Would you like to open this session now?"),
+							msg.arg(basename),
 							QMessageBox::Ok, QMessageBox::No
 						) == QMessageBox::Ok)
 						{
@@ -1054,7 +1107,7 @@ void OOStudio::createSession()/*{{{*/
 						//Not a template so load it now and minimize;
 					}
 					saveSettings();
-					populateSessions();
+					populateSessions(true);
 					resetCreate();
 				}
 				else
@@ -1093,15 +1146,205 @@ void OOStudio::createSession()/*{{{*/
 			}
 		}
 	}
+	else
+	{
+		//TODO: Add error message here
+		QMessageBox::information(
+			this,
+			tr("Invalid Form"),
+			tr("All required information has not been provided, please correct the problem and click \"Create New\" again?"),
+			QMessageBox::Ok);
+	}
+}/*}}}*/
+
+void OOStudio::updateSession()/*{{{*/
+{
+	if(validateCreate())
+	{
+		bool istemplate = m_chkTemplate->isChecked();
+		QDomDocument doc("OOStudioSession");
+		QDomElement root = doc.createElement("OOStudioSession");
+		doc.appendChild(root);
+		
+		QString basepath = convertPath(m_txtLocation->text());
+		QString basename = m_txtName->text();
+		basename = basename.simplified().replace(" ", "_");
+		
+		OOSession* newSession = new OOSession;
+		OOSession* oldSession = m_sessionMap.value(basename);
+		
+		newSession->name = oldSession->name;
+		newSession->istemplate = istemplate;
+		
+		root.setAttribute("istemplate", istemplate);
+		root.setAttribute("name", basename);
+
+		QString destPath(basepath);
+		destPath.append(QDir::separator()).append(basename);
+		qDebug() << "destPath: " << destPath << "basepath: " << basepath;
+		QDir basedir(basepath);
+		if(basedir.exists())
+		{
+			QString newPath(basedir.absolutePath());
+			newPath.append(QDir::separator()).append(basename);
+			QString filename(newPath+".oos");
+			QString songfile(newPath+".oom");
+			QString lscpfile(newPath+".lscp");
+
+			QString strSong = convertPath(m_txtOOMPath->text());
+			QString strLSCP = convertPath(m_txtLSCP->text());
+			bool oomok = false;
+			if(oldSession->songfile == songfile)
+			{
+				oomok = true;
+			}
+			else
+			{
+				if(QFile::exists(songfile))
+				{
+					if(QFile::exists(strSong))
+					{
+						QFile::remove(songfile);
+					}
+				}
+				oomok = QFile::copy(strSong, songfile);
+			}
+			bool lscpok = false;
+			if(oldSession->lscpPath == strLSCP)
+			{
+				lscpok = true;
+			}
+			else
+			{
+				if(QFile::exists(lscpfile))
+				{
+					if(QFile::exists(strLSCP))
+					{
+						QFile::remove(lscpfile);
+					}
+				}
+				lscpok = QFile::copy(convertPath(strLSCP), lscpfile);
+			}
+			if(oomok && lscpok)
+			{
+				QDomElement esong = doc.createElement("songfile");
+				root.appendChild(esong);
+				esong.setAttribute("path", songfile);
+				newSession->songfile = songfile;
+
+				QDomElement lscp = doc.createElement("lscpfile");
+				root.appendChild(lscp);
+				lscp.setAttribute("path", lscpfile);
+				lscp.setAttribute("mode", m_cmbLSCPMode->currentIndex());
+				newSession->lscpPath = lscpfile;
+				newSession->lscpMode = m_cmbLSCPMode->currentIndex();
+
+				QDomElement jack = doc.createElement("jackd");
+				root.appendChild(jack);
+				jack.setAttribute("path", m_txtJackCommand->text());
+				jack.setAttribute("checked", m_chkStartJack->isChecked());
+				newSession->loadJack = m_chkStartJack->isChecked();
+				newSession->jackcommand = m_txtJackCommand->text();
+
+				QDomElement lsnode = doc.createElement("linuxsampler");
+				root.appendChild(lsnode);
+				lsnode.setAttribute("path", m_txtLSCommand->text());
+				lsnode.setAttribute("checked", m_chkStartLS->isChecked());
+				lsnode.setAttribute("hostname", m_txtLSHost->text());
+				lsnode.setAttribute("port", m_txtLSPort->text());
+				newSession->loadls = m_chkStartLS->isChecked();
+				newSession->lscommand = m_txtLSCommand->text();
+				newSession->lshostname = m_txtLSHost->text();
+				newSession->lsport = m_txtLSPort->text().toInt();
+
+				for(int i= 0; i < m_commandModel->rowCount(); ++i)
+				{
+					QStandardItem* item = m_commandModel->item(i);
+					QDomElement cmd = doc.createElement("command");
+					root.appendChild(cmd);
+					cmd.setAttribute("path", item->text());
+					newSession->commands << item->text();
+				}
+				//QString xml = doc.toString();
+				//TODO: Do we need to first delete the file here?
+				if(QFile::exists(filename))
+				{
+					QFile::remove(filename);
+				}
+				QFile xmlfile(filename);
+				if(xmlfile.open(QIODevice::WriteOnly) )
+				{
+					QTextStream ts( &xmlfile );
+					ts << doc.toString();
+
+					xmlfile.close();
+					//TODO: Write out the session to settings and update table
+					newSession->path = filename;
+					m_sessionMap[basename] = newSession;
+					saveSettings();
+					populateSessions(true);
+					resetCreate();
+					QString msg = QObject::tr("Successfully Updated Session: \n\t%1");
+					QMessageBox::information(
+						this, 
+						tr("Success"),
+						msg.arg(basename)
+						);
+				}
+				else
+				{
+					QString msg(tr("Failed to open file for writing"));
+				/*	if(oomok)
+					{
+						basedir.remove(songfile);
+					}
+						
+					if(lscpok)
+					{
+						basedir.remove(lscpfile);
+					}*/
+					msg.append("\n").append(filename);
+					//basedir.rmdir(newPath);
+					QMessageBox::critical(this, tr("Create Failed"), msg);
+				}
+			}
+			else
+			{//Failed run cleanup
+				QString msg;
+				if(oomok)
+				{
+					basedir.remove(songfile);
+					msg = tr("Failed to copy LSCP file");
+				}
+					
+				if(lscpok)
+				{
+					basedir.remove(lscpfile);
+					msg = tr("Failed to copy OOMidi song file");
+				}
+				basedir.rmdir(newPath);
+				QMessageBox::critical(this, tr("Create Failed"), msg);
+			}
+		}
+	}
+	else
+	{
+		//TODO: Add error message here
+		QMessageBox::information(
+			this,
+			tr("Invalid Form"),
+			tr("All required information has not been provided, please correct the problem and click \"Create New\" again?"),
+			QMessageBox::Ok);
+	}
 }/*}}}*/
 
 void OOStudio::templateSelectionChanged(int index)/*{{{*/
 {
-	QString tpath = m_cmbTemplate->itemText(index);
+	QString tpath = m_cmbTemplate->itemData(index).toString();
 	printf("OOStudio::templateSelectionChanged index: %d, name: %s sessions:%d\n", index, tpath.toUtf8().constData(), m_sessionMap.size());
-	if(index == 0)
+	if(index == 0 && m_cmbEditMode->currentIndex() == 1)
 	{
-		resetCreate(false);
+		resetCreate();
 		return;
 	}
 	//Copy the values from the other template into this
@@ -1110,6 +1353,21 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 		OOSession* session = m_sessionMap.value(tpath);
 		if(session)
 		{
+			if(m_cmbEditMode->currentIndex() == 1)
+			{
+				QFileInfo fi(session->path);
+				m_txtLocation->setText(fi.dir().absolutePath());
+				m_txtName->setText(session->name);
+				m_chkTemplate->setChecked(session->istemplate);
+			}
+			else
+			{
+				if(m_txtName->text().isEmpty())
+				{
+					m_txtName->setText(getValidName(session->name));
+				}
+			}
+			m_commandModel->clear();
 			for(int i = 0; i < session->commands.size(); ++i)
 			{
 				QStandardItem* item = new QStandardItem(session->commands.at(i));
@@ -1136,6 +1394,27 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 		}
 	}
 }/*}}}*/
+
+void OOStudio::editModeChanged(int index)
+{
+	resetCreate();
+	if(index)
+	{
+		m_txtName->setEnabled(false);
+		m_txtLocation->setEnabled(false);
+		m_btnBrowsePath->setEnabled(false);
+		m_btnDoCreate->setEnabled(false);
+		m_btnUpdate->setEnabled(true);
+	}
+	else
+	{
+		m_txtName->setEnabled(true);
+		m_txtLocation->setEnabled(true);
+		m_btnBrowsePath->setEnabled(true);
+		m_btnDoCreate->setEnabled(true);
+		m_btnUpdate->setEnabled(false);
+	}
+}
 
 OOSession* OOStudio::readSession(QString filename)/*{{{*/
 {

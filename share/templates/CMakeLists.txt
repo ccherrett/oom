@@ -4,6 +4,7 @@
 #  $Id:$
 #
 #  Copyright (C) 2002-2006 by Werner Schweer and others
+#  Copyright (C) 2011 by Andrew Williams and Christopher Cherrett
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2.
@@ -18,9 +19,20 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #=============================================================================
 
-file (GLOB templates_files *.oom)
+file (GLOB templates_files 
+	default.oom
+	oomidi-template.oom
+	oomidi-template.lscp
+	)
+
+configure_file (
+      oomidi-template.oos.in
+      ${PROJECT_BINARY_DIR}/oomidi-template.oos
+      )
+
 
 install( FILES ${templates_files}
+	${PROJECT_BINARY_DIR}/oomidi-template.oos
       DESTINATION ${OOMidi_SHARE_DIR}/templates
       )
 

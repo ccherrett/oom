@@ -284,7 +284,7 @@
             <property name="topMargin">
              <number>0</number>
             </property>
-            <item row="1" column="0">
+            <item row="2" column="0">
              <widget class="QLabel" name="label_3">
               <property name="minimumSize">
                <size>
@@ -306,10 +306,10 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
+            <item row="2" column="1">
              <widget class="QLineEdit" name="m_txtName"/>
             </item>
-            <item row="2" column="0">
+            <item row="3" column="0">
              <widget class="QLabel" name="label_9">
               <property name="minimumSize">
                <size>
@@ -328,7 +328,7 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
+            <item row="3" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_10">
               <property name="spacing">
                <number>-1</number>
@@ -348,7 +348,7 @@
               </item>
              </layout>
             </item>
-            <item row="5" column="0">
+            <item row="6" column="0">
              <widget class="QLabel" name="label">
               <property name="minimumSize">
                <size>
@@ -370,7 +370,51 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="0">
+            <item row="6" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <property name="spacing">
+               <number>-1</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLineEdit" name="m_txtLSCP"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="m_btnBrowseLSCP">
+                <property name="text">
+                 <string>Browse</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>OOM file:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLineEdit" name="m_txtOOMPath"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="m_btnBrowseOOM">
+                <property name="text">
+                 <string>Browse</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="7" column="0">
              <widget class="QLabel" name="label_4">
               <property name="minimumSize">
                <size>
@@ -392,52 +436,8 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="1">
+            <item row="7" column="1">
              <widget class="QComboBox" name="m_cmbLSCPMode"/>
-            </item>
-            <item row="5" column="1">
-             <layout class="QHBoxLayout" name="horizontalLayout_11">
-              <property name="spacing">
-               <number>-1</number>
-              </property>
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QLineEdit" name="m_txtLSCP"/>
-              </item>
-              <item>
-               <widget class="QPushButton" name="m_btnBrowseLSCP">
-                <property name="text">
-                 <string>Browse</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>OOM file:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QLineEdit" name="m_txtOOMPath"/>
-              </item>
-              <item>
-               <widget class="QPushButton" name="m_btnBrowseOOM">
-                <property name="text">
-                 <string>Browse</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_2">
@@ -462,7 +462,37 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="m_cmbTemplate"/>
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QComboBox" name="m_cmbTemplate"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string> Edit Mode:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="m_cmbEditMode"/>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
@@ -725,6 +755,16 @@
              <widget class="QPushButton" name="m_btnDoCreate">
               <property name="text">
                <string>Create New</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="m_btnUpdate">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Update</string>
               </property>
              </widget>
             </item>
