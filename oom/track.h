@@ -1143,6 +1143,10 @@ public:
 	}
 
 	void calculateCrossFades();
+
+	bool leftEdgeOnTopOfPartBelow(WavePart* topPart, WavePart* bottomPart);
+	bool rightEdgeOnTopOfPartBelow(WavePart* topPart, WavePart* bottomPart);
+	bool leftAndRightEdgeOnTopOfPartBelow(WavePart* topPart, WavePart* bottomPart);
 };
 
 //---------------------------------------------------------

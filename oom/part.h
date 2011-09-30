@@ -235,6 +235,7 @@ class WavePart : public Part
 	FadeCurve *m_fadeOut;
 	FadeCurve *m_crossFadeIn;
 	FadeCurve *m_crossFadeOut;
+	bool m_hasCrossFadeForPartialOverlap;
 
 	void init();
 
@@ -266,6 +267,9 @@ public:
 	float gain(unsigned);
 	float getFadeOutValue(unsigned pos, QList<FadeCurve*> fades);
 	float getFadeInValue(unsigned pos, QList<FadeCurve*> fades);
+	void setHasCrossFadeForPartialOverlap(bool crossFade) {m_hasCrossFadeForPartialOverlap = crossFade;}
+	bool hasCrossFadeForPartialOverlap() const {return m_hasCrossFadeForPartialOverlap;}
+
 
     virtual void dump(int n = 0) const;
 

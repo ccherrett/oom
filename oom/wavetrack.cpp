@@ -357,39 +357,84 @@ void WaveTrack::calculateCrossFades()
 		WavePart* wp = (WavePart*)ip->second;
 		wp->crossFadeIn()->setWidth(0);
 		wp->crossFadeOut()->setWidth(0);
+		wp->setHasCrossFadeForPartialOverlap(false);
 		sortedByZValue.append(wp);
 	}
 
 	qSort(sortedByZValue.begin(), sortedByZValue.end(), Part::smallerZValue);
 
-	foreach(WavePart* wp, sortedByZValue)
+	foreach(WavePart* bottomPart, sortedByZValue)
 	{
-		foreach(WavePart* partWithHigherZindex, sortedByZValue)
+		foreach(WavePart* topPart, sortedByZValue)
 		{
-			if (partWithHigherZindex->getZIndex() > wp->getZIndex() &&
-			    partWithHigherZindex->frame() > wp->frame() &&
-			    partWithHigherZindex->frame() < wp->endFrame())
+			if (topPart->getZIndex() > bottomPart->getZIndex() && leftAndRightEdgeOnTopOfPartBelow(topPart, bottomPart))
 			{
-				unsigned bottomPartFadeOutStart = partWithHigherZindex->frame() - wp->frame();
+				unsigned bottomPartFadeOutStart = topPart->frame() - bottomPart->frame();
 
-				wp->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
-				wp->crossFadeOut()->setFrame(bottomPartFadeOutStart);
+				bottomPart->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
+				bottomPart->crossFadeOut()->setFrame(bottomPartFadeOutStart);
 
-				partWithHigherZindex->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+				topPart->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+				unsigned bottomPartFadeInStart = topPart->endFrame() - bottomPart->frame() - CROSSFADE_WIDTH;
+
+				bottomPart->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
+				bottomPart->crossFadeIn()->setFrame(bottomPartFadeInStart);
+
+				topPart->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
 			}
-
-			if (partWithHigherZindex->getZIndex() > wp->getZIndex() &&
-			    partWithHigherZindex->endFrame() > wp->frame() &&
-			    partWithHigherZindex->endFrame() < wp->endFrame())
+			else
 			{
-				unsigned bottomPartFadeInStart = partWithHigherZindex->endFrame() - wp->frame() - CROSSFADE_WIDTH;
+				if (leftEdgeOnTopOfPartBelow(topPart, bottomPart))
+				{
+					unsigned overlapWidth = bottomPart->endFrame() - topPart->frame();
 
-				wp->crossFadeIn()->setWidth(CROSSFADE_WIDTH);
-				wp->crossFadeIn()->setFrame(bottomPartFadeInStart);
+					bottomPart->fadeOut()->setWidth(overlapWidth);
+					topPart->fadeIn()->setWidth(overlapWidth);
+					topPart->setHasCrossFadeForPartialOverlap(true);
+				}
 
-				partWithHigherZindex->crossFadeOut()->setWidth(CROSSFADE_WIDTH);
+				else if (rightEdgeOnTopOfPartBelow(topPart, bottomPart))
+				{
+					unsigned overlapWidth = topPart->endFrame() - bottomPart->frame();
+
+					bottomPart->fadeIn()->setWidth(overlapWidth);
+					topPart->fadeOut()->setWidth(overlapWidth);
+					topPart->setHasCrossFadeForPartialOverlap(true);
+				}
 			}
 		}
 	}
+}
 
+
+bool WaveTrack::leftEdgeOnTopOfPartBelow(WavePart *topPart, WavePart* bottomPart)
+{
+	if (topPart->frame() > bottomPart->frame() &&
+	    topPart->frame() < bottomPart->endFrame())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool WaveTrack::rightEdgeOnTopOfPartBelow(WavePart *topPart, WavePart* bottomPart)
+{
+	if (topPart->endFrame() > bottomPart->frame() &&
+	    topPart->endFrame() < bottomPart->endFrame())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool WaveTrack::leftAndRightEdgeOnTopOfPartBelow(WavePart * topPart, WavePart* bottomPart)
+{
+	if (leftEdgeOnTopOfPartBelow(topPart, bottomPart) && rightEdgeOnTopOfPartBelow(topPart, bottomPart))
+	{
+		return true;
+	}
+
+	return false;
 }
