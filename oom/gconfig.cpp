@@ -708,6 +708,7 @@ GlobalConfigValues config = {
 	5, //LSCP client retries
 	1,  //LSCP client timeout
 	0, //Default audio raster index
-	1 //Default midi raster index
+	1, //Default midi raster index
+	true //Use auto crossfades
 };
 

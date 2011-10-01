@@ -27,7 +27,7 @@
 
 
 // should be moved to global config.
-bool useAutoCrossFades = true;
+//bool useAutoCrossFades = true;
 
 void WaveTrack::fetchData(unsigned pos, unsigned samples, float** bp, bool doSeek)
 {
@@ -398,7 +398,7 @@ void WaveTrack::calculateCrossFades()
 	}
 
 
-	if (useAutoCrossFades)
+	if (config.useAutoCrossFades)
 	{
 		foreach(WavePart* topPart, sortedByZValue)
 		{

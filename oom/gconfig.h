@@ -154,6 +154,7 @@ struct GlobalConfigValues
 	int lsClientTimeout;
 	int audioRaster;
 	int midiRaster;
+	bool useAutoCrossFades;
 };
 
 extern GlobalConfigValues config;

@@ -143,6 +143,8 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	oldStyleStopCheckBox->setChecked(config.useOldStyleStopShortCut);
 	moveArmedCheckBox->setChecked(config.moveArmedCheckBox);
 	projectSaveCheckBox->setChecked(config.useProjectSaveDialog);
+	
+	m_chkAutofade->setChecked(config.useAutoCrossFades);
 
 	//updateSettings();    // TESTING
 
@@ -333,6 +335,7 @@ void GlobalSettingsConfig::apply()
 	config.useOldStyleStopShortCut = oldStyleStopCheckBox->isChecked();
 	config.moveArmedCheckBox = moveArmedCheckBox->isChecked();
 	config.useProjectSaveDialog = projectSaveCheckBox->isChecked();
+	config.useAutoCrossFades = m_chkAutofade->isChecked();
 	//oom->showMixer1(config.mixer1Visible);
 	//oom->showMixer2(config.mixer2Visible);
 
