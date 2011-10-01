@@ -36,13 +36,7 @@ and the work that has gone into it. Great stuff Mark, and thanks.
 
 http://www.famfamfam.com/lab/icons/silk/
 
-,-----------------------------------------------------------------.
-| NOTICE                                                          |
-|-----------------------------------------------------------------|
-| Some parts of OOMidi code are EXPERIMENTAL, and may well result |
-| in a CRASH, and who knows what other ill effects.               |
-| RUN THIS SOFTWARE AT YOUR OWN RISK.                             |
-`-----------------------------------------------------------------'
+
 
   =============================
       Requirements
@@ -56,20 +50,19 @@ http://www.famfamfam.com/lab/icons/silk/
         ftp://ftp.trolltech.com/qt/source
         OOMidi does _not_ compile with older versions
 
-      - gcc >= 4.x.x
+      - gcc >= 4.4.x
 
       - libsndfile >= 1.0.1
         http://www.mega-nerd.com/libsndfile/
 
-      - libsamplerate
+      - libsamplerate >=0.1.7  http://www.mega-nerd.com/SRC/
 
-      - JACK >= 0.118.0
+      - JACK >= 0.121.0.0
           http://jackaudio.org/download
 
       Optional:
 
-      - fluidsynth >= 1.0.3 (formerly known as iiwusynth) from
-        http://savannah.nongnu.org/download/fluid
+      - fluidsynth >= 1.0.3 http://savannah.nongnu.org/download/fluid
 
       - OSC (Open Sound Control) 
       - DSSI (Disposable Soft Synth Interface) with support for DSSI vst plugins.
@@ -77,14 +70,17 @@ http://www.famfamfam.com/lab/icons/silk/
 
       - LASH Audio Session Handler
 
+      - For LV2. The latest Lilv, sord, and serd libraries. http://www.drobilla.net/
+
+
 PLEASE NOTE: We do not use Lash at openoctave, and have not tested it with OOM2.
-Your mileage may vary, and we hope you are successful if you wish to use Lash,
-but we are working towards using jack-session as our session protocol.
-Jack-session is not implemented yet, but is on our long list of intended features. 
+Your mileage may vary, and we hope you are successful if you wish to use Lash. 
       
       - ConTeXt (for building documentation, by default the build
                script tries to build documentation, can be
                disabled by setting ENABLE_DOCUMENTATION to OFF)
+
+      - 
 
   =============================
       Compiling:
@@ -93,10 +89,11 @@ Jack-session is not implemented yet, but is on our long list of intended feature
       - Download source from git://github.com/ccherrett/oom.git
 
       - Command line to unpack source:
-            tar xvofz oom-x.y.z.tar.gz 
-         where x.y.z is the version number.
-        Or just use a graphical de-compressor to unpack it somewhere.  
+            
+        tar xvofz oomidi-2011.1.tar.gz
 
+       Or just use a graphical de-compressor to unpack it somewhere. 
+ 
       - To compile OOMidi, run the following commands from the 
          top level directory where the source code was unpacked
          (the directory where THIS README FILE is): 
@@ -125,47 +122,29 @@ Jack-session is not implemented yet, but is on our long list of intended feature
       running OOMidi
   =============================
 
-      OOMidi is a realtime program which requires special rights to
-      work poperly.
-      Recommended setup:
-
-      - check if you are running a sufficiently new linux kernel > 2.6.x
+       Recommended setup:
 
       - create an "audio" group if it does not already exists
         and put yourself into this group
-
-      - make sure you can acces the realtime clock (RTC)
-            chmod 660 /dev/rtc
-            chgrp audio /dev/rtc
 
       - for newer kernels with the portable rtc interface
             chmod 660 /dev/rtc0
             chgrp audio /dev/rtc0
 	
-	  - create a udev rule for the permissions in this file: /etc/udev/rules.d/85-hwclock.rules
+      - create a udev rule for the permissions in this file: /etc/udev/rules.d/85-hwclock.rules
 	  		KERNEL=="rtc0", GROUP:="audio"
 
 NOTE: Alsa now uses the HPET timer, and adds a symlink for RTC based applications.
 
-      - make sure OOMidi can set the rtc clock:
-            echo 8192 > /proc/sys/dev/rtc/max-user-freq
-            inspect with:
-            cat /proc/sys/dev/rtc/max-user-freq
-
-      - for newer kernels there is a new portable rtc interface that is configured
-        via the /sys filesystem.
+      
             echo 2048 >/sys/class/rtc/rtc0/max_user_freq
             echo 2048 >/proc/sys/dev/hpet/max-user-freq
-			inspect with:
-			cat /sys/class/rtc/rtc0/max_user_freq
-			cat /proc/sys/dev/hpet/max-user-freq
+			
+               inspect with:
+	    cat /sys/class/rtc/rtc0/max_user_freq
+	    cat /proc/sys/dev/hpet/max-user-freq
 
-      - for OOMidi to gain RT priviledges load the "realtime-lsm"
-        modul; the modul should be configured to give all "audio"
-        group members realtime priviledges
-
-NOTE: the realtime-lsm module is depreciated in later kernel versions.
-
+      
       - some distros do not load the alsa sequencer module by default.
         if necessary, load the alsa sequencer module with:
             /sbin/modprobe snd-seq
@@ -184,19 +163,6 @@ For Gentoo users: When building your kernel, Gentoo recommends you build alsa di
 In our testing, this has proved more stable than building alsa as modules. 
 
 
-  =============================
-      known bugs
-  =============================
-
-The DSSI plugins are installed and stored on your system by you, the users. Some behave well, some not quite so well.
-These plugins are a challenge so far:
-
-Less trivialsynth
-Trivial synth.
-
-
-
-      - many
 
 ====================================================================
 Let us know whether OOMidi works for you !!!
