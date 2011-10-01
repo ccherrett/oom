@@ -5,6 +5,8 @@
 //
 //  (C) Copyright 2011 Andrew Williams and Christopher Cherrett 
 //  	(info@openoctave.org)
+//  Some functions in this file are
+//  Copyright (C) 2005-2011, rncbc aka Rui Nuno Capela. All rights reserved.
 //=========================================================
 
 #include "plugin.h"
@@ -279,13 +281,13 @@ public:
 		return m_configs; 
 	}
 
-	void setConfig(const QString& sKey, const QString& sValue)
+	void setConfig(const QString& key, const QString& value)
 	{
-		m_configs[sKey] = sValue;
+		m_configs[key] = value;
 	}
-	const QString& config(const QString& sKey)
+	const QString& config(const QString& key)
 	{
-		return m_configs[sKey];
+		return m_configs[key];
 	}
 
 
@@ -310,12 +312,6 @@ public:
 	void realizeConfigs();
 	void freezeConfigs();
 	void releaseConfigs();
-
-
-	//void freezeValues();
-	//void releaseValues();
-
-	//void realizeValues();
 
 	void setValues(const Values& values)
 	{

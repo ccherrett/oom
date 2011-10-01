@@ -540,7 +540,7 @@
                <item row="1" column="1">
                 <widget class="QLineEdit" name="m_txtJackCommand">
                  <property name="text">
-                  <string notr="true">/usr/bin/jackd -r -t2000 -dalsa -dhw:0 -r48000 -p512 -n3 -Xraw -P</string>
+                  <string notr="true">/usr/bin/jackd -R -P89 -p2048 -t5000 -M512 -dalsa -dhw:0 -r44100 -p512 -n2</string>
                  </property>
                 </widget>
                </item>

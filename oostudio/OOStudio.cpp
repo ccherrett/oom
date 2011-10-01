@@ -17,8 +17,8 @@
 static const char* LS_HOSTNAME  = "localhost";
 static const int   LS_PORT      = 8888;
 static const char* LS_COMMAND   = "linuxsampler";
-static const char* JACK_COMMAND = "/usr/bin/jackd -r -t2000 -dalsa -dhw:0 -r48000 -p512 -n3 -Xraw -P";
-static const char* NO_PROC_TEXT = "No Running Session";
+static const char* JACK_COMMAND = "/usr/bin/jackd -R -P89 -p2048 -t5000 -M512 -dalsa -dhw:0 -r44100 -p512 -n2";
+static const QString NO_PROC_TEXT(QObject::tr("No Running Session"));
 static const char* OOM_TEMPLATE_NAME = "OOMidi_Orchestral_Template";
 static const char* MAP_STRING = "MAP MIDI_INSTRUMENT";
 
@@ -188,11 +188,12 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 {
 	m_sessionModel->clear();
 	m_templateModel->clear();
-	while(m_cmbTemplate->count() > 0)
+	while(m_cmbTemplate->count())
 	{
 		m_cmbTemplate->removeItem((m_cmbTemplate->count()-1));
 	}
 
+	m_cmbTemplate->addItem(tr("Select Template"));
 	OOSession* session = readSession(QString(OOM_DEFAULT_TEMPLATE));
 	if(session)
 	{
@@ -1355,11 +1356,12 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 {
 	QString tpath = m_cmbTemplate->itemData(index).toString();
 	printf("OOStudio::templateSelectionChanged index: %d, name: %s sessions:%d\n", index, tpath.toUtf8().constData(), m_sessionMap.size());
-	if(index == 0 && m_cmbEditMode->currentIndex() == 1)
+	if(!index || (index == 1 && m_cmbEditMode->currentIndex() == 1))
 	{
 		resetCreate();
 		return;
 	}
+	
 	//Copy the values from the other template into this
 	if(!m_sessionMap.isEmpty() && m_sessionMap.contains(tpath))
 	{

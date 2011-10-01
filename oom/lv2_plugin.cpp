@@ -5,6 +5,8 @@
 //
 //  (C) Copyright 2011 Andrew Williams and Christopher Cherrett 
 //  	(info@openoctave.org)
+//  Some functions in this file are
+//  Copyright (C) 2005-2011, rncbc aka Rui Nuno Capela. All rights reserved.
 //=========================================================
 
 #include "lv2_plugin.h"
