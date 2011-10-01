@@ -524,7 +524,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	{
 		return false;
 	}
-	printf("ComposerCanvas::moveItem ntrack: %d  tracks->size(): %d\n",ntrack,(int)tracks->size());
+	//printf("ComposerCanvas::moveItem ntrack: %d  tracks->size(): %d\n",ntrack,(int)tracks->size());
 	if (ntrack >= tracks->size())
 	{
 		ntrack = tracks->size();
@@ -540,7 +540,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		else
 			printf("ComposerCanvas::moveItem failed to create new track\n");
 		
-		printf("ComposerCanvas::moveItem new track type: %d\n",newTrack->type());
+		//printf("ComposerCanvas::moveItem new track type: %d\n",newTrack->type());
 
 		emit tracklistChanged();
 	}
@@ -551,7 +551,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	//not making it into the undo system or something like that
 	Track* dtrack = tracks->index(ntrack);
 	
-	printf("ComposerCanvas::moveItem track type is: %d\n",dtrack->type());
+	//printf("ComposerCanvas::moveItem track type is: %d\n",dtrack->type());
 
 	if (dtrack->type() != type)
 	{
@@ -559,7 +559,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 				tr("Cannot copy/move/clone to different Track-Type"));
 		return false;
 	}
-	printf("ComposerCanvas::moveItem did not crash\n");
+	//printf("ComposerCanvas::moveItem did not crash\n");
 
 	Part* dpart;
 	bool clone = (t == MOVE_CLONE || (t == MOVE_COPY && spart->events()->arefCount() > 1));
@@ -1250,13 +1250,13 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 				Track* track = p->track();
 				if(track && track->type() == Track::WAVE)
 				{
-					int x = pt.x();
-					int y = pt.y();
+					//int x = pt.x();
+					//int y = pt.y();
 					int tracktop = track2Y(track)-ypos;
 					WavePart* part = (WavePart*)p;
 					long pstart = part->frame();
 					long pend = pstart+part->lenFrame();
-					long currFrame = tempomap.tick2frame(pt.x());
+					//long currFrame = tempomap.tick2frame(pt.x());
 					QPoint click(currX, currY);
 					FadeCurve* fadeIn = part->fadeIn();
 					FadeCurve* fadeOut = part->fadeOut();
@@ -3066,6 +3066,7 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 	FadeCurve* fadeOut = wp->fadeOut();
 	//printf("FadeIn width:%ld\n", long(fadeIn->width()));
 	//printf("FadeOut width:%ld\n", long(fadeOut->width()));
+	p.setRenderHint(QPainter::Antialiasing, true);
 	if(fadeIn)
 	{
 		long pstart = tempomap.frame2tick(wp->frame());
@@ -3144,6 +3145,7 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 		p.setBrush(waveFill);
 		p.drawRect(picker);
 	}
+	p.setRenderHint(QPainter::Antialiasing, false);
 	p.restore();
 }
 //---------------------------------------------------------

@@ -106,7 +106,8 @@ void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 	if(m_lockupdate)
 		return;
 	m_lockupdate = true;
-	printf("HeaderList::updateTrackList\n");
+	if(debugMsg)
+		printf("HeaderList::updateTrackList\n");
 	TrackList* l = song->visibletracks();
 	//Attempt to prevent widget destruction recreation cycle and just set 
 	//the track on the header instead. I will also try to never recreate 
@@ -301,10 +302,12 @@ TrackList HeaderList::getRecEnabledTracks()/*{{{*/
 
 void HeaderList::updateSelection(Track* t, bool shift)/*{{{*/
 {
-	printf("HeaderList::updateSelection Before track check\n");
+	if(debugMsg)
+		printf("HeaderList::updateSelection Before track check\n");
 	if(t)
 	{
-		printf("HeaderList::updateSelection\n");
+		if(debugMsg)
+			printf("HeaderList::updateSelection\n");
 		if (!shift)
 		{
 			song->deselectTracks();
