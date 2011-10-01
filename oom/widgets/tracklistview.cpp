@@ -88,7 +88,6 @@ TrackListView::~TrackListView()
 
 void TrackListView::showEvent(QShowEvent*)
 {
-	printf("TrackListView::showEvent\n");
 	populateTable();
 }
 
@@ -116,7 +115,7 @@ void TrackListView::songChanged(int flags)/*{{{*/
 {
 	if(flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED /*| SC_PART_COLOR_MODIFIED*/))
 	{
-		//if(debugMsg)
+		if(debugMsg)
 			printf("TrackListView::songChanged\n");
 		populateTable();
 	}
@@ -124,7 +123,8 @@ void TrackListView::songChanged(int flags)/*{{{*/
 
 void TrackListView::populateTable()/*{{{*/
 {
-	printf("TrackListView::populateTable\n");
+	if(debugMsg)
+		printf("TrackListView::populateTable\n");
 	m_model->clear();
 	for(iTrack i = song->artracks()->begin(); i != song->artracks()->end(); ++i)
 	{
