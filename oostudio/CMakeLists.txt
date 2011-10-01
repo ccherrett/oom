@@ -23,14 +23,8 @@
 ##
 QT4_WRAP_CPP ( studio_mocs
 	OOProcess.h
-      )
-
-if(LSCP_SUPPORT)
-QT4_WRAP_CPP ( studio_mocs
 	OOStudio.h
-	${studio_mocs}
       )
-endif(LSCP_SUPPORT)
 
 ##
 ## Resource files
@@ -48,11 +42,9 @@ file (GLOB studio_source_files
 	main.cpp
     )
 
-if(LSCP_SUPPORT)
 file (GLOB studio_source_files
 	${studio_source_files}
 )
-endif(LSCP_SUPPORT)
 
 ##
 ## UI files
@@ -92,9 +84,7 @@ target_link_libraries ( oostudio
       icons
       )
 
-if(LSCP_SUPPORT)
-      target_link_libraries(oostudio ${LSCP_LIBRARIES})
-endif(LSCP_SUPPORT)
+target_link_libraries(oostudio ${LSCP_LIBRARIES})
 
 ##
 ## Install location
