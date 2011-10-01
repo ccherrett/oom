@@ -338,11 +338,11 @@ void OOStudio::browse(int form)/*{{{*/
 		case 2: //OOM file path
 		{
 			QString basedir(SHAREDIR);
-			basedir.append(QDir::separator()).append("templates")
+			basedir.append(QDir::separator()).append("templates");
 			QString filename = QFileDialog::getOpenFileName(
 				this,
 				tr("Open OOM File"),
-				basedir
+				basedir,
 				tr("OOM Song Files (*.oom);;All Files (*.*)"));
 			if(!filename.isNull())
 			{
