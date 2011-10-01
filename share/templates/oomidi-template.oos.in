@@ -2,6 +2,6 @@
 <OOStudioSession istemplate="1" name="OOMidi_Orchestral_Template">
  <songfile path="${OOMidi_SHARE_DIR}/templates/oomidi-template.oom"/>
  <lscpfile mode="0" path="${OOMidi_SHARE_DIR}/templates/oomidi-template.lscp"/>
- <jackd path="/usr/bin/jackd -r -t2000 -dalsa -dhw:0 -r48000 -p512 -n3 -Xraw -P" checked="1"/>
+ <jackd path="/usr/bin/jackd -R -P89 -p2048 -t5000 -M512 -dalsa -dhw:0 -r44100 -p512 -n2" checked="1"/>
  <linuxsampler port="8888" path="linuxsampler" hostname="localhost" checked="1"/>
 </OOStudioSession>
