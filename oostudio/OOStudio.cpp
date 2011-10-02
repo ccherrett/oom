@@ -233,7 +233,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 {
 	m_sessionModel->clear();
 	m_templateModel->clear();
-	while(m_cmbTemplate->count() < 2)
+	while(m_cmbTemplate->count() > 2)
 	{
 		m_cmbTemplate->removeItem((m_cmbTemplate->count()-1));
 	}
