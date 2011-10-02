@@ -616,6 +616,7 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			else
 				m_jackProcess->start(jackCmd, args);
 			bool rv = m_jackProcess->waitForStarted(150000);
+			rv = m_jackProcess->waitForReadyRead();
 			while(m_jackProcess->state() == QProcess::Starting && m_jackProcess->state() != QProcess::NotRunning)
 			{
 				printf("Waiting for jack process to start\n");
