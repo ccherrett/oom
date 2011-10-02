@@ -1039,7 +1039,7 @@ bool OOStudio::stopCurrentSession()/*{{{*/
 	return true;
 }/*}}}*/
 
-void OOStudio::loadSession(OOSession* session)
+void OOStudio::loadSession(OOSession* session)/*{{{*/
 {
 	if(session)
 	{
@@ -1131,7 +1131,7 @@ void OOStudio::loadSession(OOSession* session)
 			QMessageBox::critical(this, tr("Jackd Failed"), msg);
 		}
 	}
-}
+}/*}}}*/
 
 bool OOStudio::validateCreate()/*{{{*/
 {
@@ -1635,7 +1635,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 	}
 }/*}}}*/
 
-void OOStudio::editModeChanged(int index)
+void OOStudio::editModeChanged(int index)/*{{{*/
 {
 	resetCreate();
 	if(index)
@@ -1654,7 +1654,7 @@ void OOStudio::editModeChanged(int index)
 		m_btnDoCreate->setEnabled(true);
 		m_btnUpdate->setEnabled(false);
 	}
-}
+}/*}}}*/
 
 OOSession* OOStudio::readSession(QString filename)/*{{{*/
 {
