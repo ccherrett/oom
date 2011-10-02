@@ -1414,7 +1414,7 @@ void Pipeline::showNativeGui(int idx, bool flag)
 {
 #ifdef LV2_SUPPORT
 	PluginI* p = (*this)[idx];
-	bool islv2 = (p->type() == 2)
+	bool islv2 = (p->type() == 2);
 	if(islv2)
 	{
 		LV2PluginI* lvp = (LV2Plugin*)p;
