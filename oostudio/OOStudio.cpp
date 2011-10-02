@@ -613,7 +613,7 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 				m_jackProcess->start(jackCmd);
 			else
 				m_jackProcess->start(jackCmd, args);
-			bool rv = m_jackProcess->waitForStarted(50000);
+			bool rv = m_jackProcess->waitForStarted(150000);
 			rv = (m_jackProcess->state() == QProcess::Running);
 			if(rv && m_jackProcess->state() == QProcess::Running)
 			{
