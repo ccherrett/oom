@@ -1050,6 +1050,7 @@ void OOStudio::loadSession(OOSession* session)
 		if(runJack(session))
 		{
 			int retry = 0;
+			bool usels = session->loadls;
 			bool lsrunning = runLinuxsampler(session);
 			while(!lsrunning && retry < 5)
 			{
@@ -1064,12 +1065,16 @@ void OOStudio::loadSession(OOSession* session)
 			if(lsrunning)
 			{
 				retry = 0;
-				bool lscpLoaded = loadLSCP(session);
-				while(!lscpLoaded && retry < 5)
+				bool lscpLoaded = true;
+				if(usels)
 				{
-					sleep(1);
 					lscpLoaded = loadLSCP(session);
-					++retry;
+					while(!lscpLoaded && retry < 5)
+					{
+						sleep(1);
+						lscpLoaded = loadLSCP(session);
+						++retry;
+					}
 				}
 				if(lscpLoaded)
 				{
