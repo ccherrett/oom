@@ -606,6 +606,8 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			m_jackProcess = new QProcess(this);
 			connect(m_jackProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processJackMessages()));
 			connect(m_jackProcess, SIGNAL(readyReadStandardError()), this, SLOT(processJackErrors()));
+			connect(m_jackProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processJackExit(int, QProcess::ExitStatus)));
+			connect(m_jackProcess, SIGNAL(error(QProcess::ProcessError )), this, SLOT(processJackError(QProcess::ProcessError)));
 			QString jackCmd = session->jackcommand;
 			QStringList args = jackCmd.split(" ");
 			jackCmd = args.takeFirst();
@@ -614,7 +616,6 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			else
 				m_jackProcess->start(jackCmd, args);
 			bool rv = m_jackProcess->waitForStarted(150000);
-			rv = (m_jackProcess->state() == QProcess::Running);
 			if(rv && m_jackProcess->state() == QProcess::Running)
 			{
 				rv = true;
@@ -1773,6 +1774,37 @@ void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)/*{{{*/
 	}
 	qDebug() << "OOMidi exited with error code: " << code;
 }/*}}}*/
+
+void OOStudio::processJackExit(int code, QProcess::ExitStatus status)/*{{{*/
+{
+	if(m_current)
+	{
+		switch(status)
+		{
+			case QProcess::NormalExit:
+			{
+				printf("Jack exited normally\n");
+				//restoreAction->trigger();
+				//cleanupProcessList();
+			}
+			break;
+			case QProcess::CrashExit:
+			{
+				printf("Jack exited with crash\n");
+				//cleanupProcessList();
+				//restoreAction->trigger();
+			}
+			break;
+		}
+	}
+	qDebug() << "Jack exited with error code: " << code;
+}/*}}}*/
+
+void OOStudio::processJackExecError(QProcess::ProcessError error)
+{
+	printf("Jack process error recieved: %d\n", error);
+}
+
 
 void OOStudio::processJackMessages()/*{{{*/
 {

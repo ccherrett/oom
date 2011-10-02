@@ -139,6 +139,8 @@ private slots:
 	void sessionDoubleClicked(QModelIndex);
 	void templateDoubleClicked(QModelIndex);
 	//Process Listeners
+	void processJackExit(int, QProcess::ExitStatus);
+	void processJackExecError(QProcess::ProcessError);
 	void processJackMessages();
 	void processJackErrors();
 	void processLSMessages();
