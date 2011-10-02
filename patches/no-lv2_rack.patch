@@ -1,0 +1,39 @@
+Only in oom-2011.1.patched: build
+diff -ru oom-2011.1/oom/audiotrack.cpp oom-2011.1.patched/oom/audiotrack.cpp
+--- oom-2011.1/oom/audiotrack.cpp	2011-08-25 20:52:55.000000000 +0200
++++ oom-2011.1.patched/oom/audiotrack.cpp	2011-10-01 13:15:21.000000000 +0200
+@@ -993,6 +993,7 @@
+ 		else
+ 			printf("can't load plugin - plugin rack is already full\n");
+ 	}
++	#ifdef LV2_SUPPORT
+ 	else if(tag == "lv2plugin")
+ 	{
+ 		//printf("AudioTrack::readProperties found lv2plugin tag\n");
+@@ -1018,6 +1019,7 @@
+ 		else
+ 			printf("can't load plugin - plugin rack is already full\n");
+ 	}
++	#endif
+ 	else if (tag == "auxSend")
+ 		readAuxSend(xml);
+ 	else if (tag == "prefader")
+diff -ru oom-2011.1/oom/mixer/rack.cpp oom-2011.1.patched/oom/mixer/rack.cpp
+--- oom-2011.1/oom/mixer/rack.cpp	2011-07-08 00:04:16.000000000 +0200
++++ oom-2011.1.patched/oom/mixer/rack.cpp	2011-10-01 13:12:21.000000000 +0200
+@@ -680,6 +680,7 @@
+ 						return;
+ 					}
+ 				}/*}}}*/
++				#ifdef LV2_SUPPORT
+ 				else if (tag == "lv2plugin")/*{{{*/
+ 				{
+ 					LV2PluginI* plugi = new LV2PluginI();
+@@ -696,6 +697,7 @@
+ 						return;
+ 					}
+ 				}/*}}}*/
++				#endif
+ 				else if (tag == "oom" || tag == "muse")
+ 					break;
+ 				else

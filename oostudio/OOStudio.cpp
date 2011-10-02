@@ -6,6 +6,7 @@
 
 #include "OOStudio.h"
 #include "OOProcess.h"
+#include "OOClient.h"
 #include "config.h"
 #include <QtGui>
 #include <QDomDocument>
@@ -19,6 +20,8 @@ static const int   LS_PORT      = 8888;
 static const char* LS_COMMAND   = "linuxsampler";
 static const char* JACK_COMMAND = "/usr/bin/jackd -R -P89 -p2048 -t5000 -M512 -dalsa -dhw:0 -r44100 -p512 -n2";
 static const QString NO_PROC_TEXT(QObject::tr("No Running Session"));
+static const QString DEFAULT_OOM = QString(SHAREDIR).append("/templates/default.oom");
+static const QString DEFAULT_LSCP = QString(SHAREDIR).append("/templates/default.lscp");
 static const char* OOM_TEMPLATE_NAME = "OOMidi_Orchestral_Template";
 static const char* MAP_STRING = "MAP MIDI_INSTRUMENT";
 
@@ -41,20 +44,10 @@ OOStudio::OOStudio()
 	m_chkAfterOOM->hide();
 	createTrayIcon();
 	QString style(":/style.qss");
-	QFile cf(style);
-	if (cf.open(QIODevice::ReadOnly))
-	{
-		QByteArray ss = cf.readAll();
-		QString sheet(QString::fromUtf8(ss.data()));
-		qApp->setStyleSheet(sheet);
-		cf.close();
-	}
+	loadStyle(style);
 
 	m_lscpLabels = (QStringList() << "Default" << "ON_DEMAND" << "ON_DEMAND_HOLD" << "PERSISTENT");
 	m_cmbLSCPMode->addItems(m_lscpLabels);
-	//m_cmbLSCPMode->addItem("ON_DEMAND", "ON_DEMAND");
-	//m_cmbLSCPMode->addItem("ON_DEMAND_HOLD", "ON_DEMAND_HOLD");
-	//m_cmbLSCPMode->addItem("PERSISTENT", "PERSISTENT");
 	
 	m_cmbEditMode->addItem("Create");
 	m_cmbEditMode->addItem("Update");
@@ -67,13 +60,13 @@ OOStudio::OOStudio()
 	m_txtLSPort->setValidator(new QIntValidator());
 	createModels();
 	createConnections();
-	//runJack();
 
 	trayIcon->show();
 	setWindowTitle(tr("OOMIDI: Studio"));
 	QSettings settings("OOMidi", "OOStudio");
 	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
 	resize(size);
+	m_restoreSize = size;
 	populateSessions();
 	m_lblRunning->setText(QString(NO_PROC_TEXT));
 	m_btnStopSession->setEnabled(false);
@@ -107,6 +100,27 @@ void OOStudio::createTrayIcon()/*{{{*/
 	importAction->setIcon(importIcon);
 	m_btnImport->setDefaultAction(importAction);
 
+	QIcon minimizeIcon;
+	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_on.png"), QIcon::Normal, QIcon::On);
+	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_off.png"), QIcon::Normal, QIcon::Off);
+	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_over.png"), QIcon::Active);
+	minimizeAction->setIcon(minimizeIcon);
+	m_btnMinimize->setDefaultAction(minimizeAction);
+
+	QIcon maximizeIcon;
+	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_on.png"), QIcon::Normal, QIcon::On);
+	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_off.png"), QIcon::Normal, QIcon::Off);
+	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_over.png"), QIcon::Active);
+	maximizeAction->setIcon(maximizeIcon);
+	m_btnMaximize->setDefaultAction(maximizeAction);
+
+	m_btnRestore->hide();
+	QIcon restoreIcon;
+	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_on.png"), QIcon::Normal, QIcon::On);
+	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_off.png"), QIcon::Normal, QIcon::Off);
+	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_over.png"), QIcon::Active);
+	restoreAction->setIcon(restoreIcon);
+	//m_btnRestore->setDefaultAction(restoreAction);*/
 
 	trayMenu = new QMenu(this);
 	trayMenu->addAction(minimizeAction);
@@ -143,7 +157,32 @@ void OOStudio::createModels()/*{{{*/
 	m_templateSelectModel = new QItemSelectionModel(m_templateModel);
 	m_sessionTable->setSelectionModel(m_sessionSelectModel);
 	m_templateTable->setSelectionModel(m_templateSelectModel);
+
+	m_cmbTemplate->addItem(tr("Select Template"));
+	OOSession* session = readSession(QString(OOM_DEFAULT_TEMPLATE));
+	if(session)
+	{
+		QString tag("T: ");
+		tag.append(QString(OOM_TEMPLATE_NAME));
+		m_cmbTemplate->addItem(tag, QString(OOM_TEMPLATE_NAME));
+		m_sessionMap[session->name] = session;
+	}
+
+	m_txtOOMPath->setText(DEFAULT_OOM);
+	m_txtLSCP->setText(DEFAULT_LSCP);
 }/*}}}*/
+
+void OOStudio::loadStyle(QString style)
+{
+	QFile cf(style);
+	if (cf.open(QIODevice::ReadOnly))
+	{
+		QByteArray ss = cf.readAll();
+		QString sheet(QString::fromUtf8(ss.data()));
+		qApp->setStyleSheet(sheet);
+		cf.close();
+	}
+}
 
 void OOStudio::createConnections()/*{{{*/
 {
@@ -152,7 +191,9 @@ void OOStudio::createConnections()/*{{{*/
 	connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
 	connect(importAction, SIGNAL(triggered()), this, SLOT(importSession()));
 	connect(quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
+
 	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+	
 	connect(m_btnLoadSession, SIGNAL(clicked()), this, SLOT(loadSessionClicked()));
 	connect(m_btnLoadTemplate, SIGNAL(clicked()), this, SLOT(loadTemplateClicked()));
 	connect(m_btnClearCreate, SIGNAL(clicked()), this, SLOT(resetCreate()));
@@ -166,10 +207,14 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnClearLog, SIGNAL(clicked()), this, SLOT(clearLogger()));
 	connect(m_btnDeleteTemplate, SIGNAL(clicked()), this, SLOT(deleteTemplate()));
 	connect(m_btnDeleteSession, SIGNAL(clicked()), this, SLOT(deleteSession()));
-	connect(m_btnStopSession, SIGNAL(clicked()), this, SLOT(stopCurrentSession()));
+	//connect(m_btnStopSession, SIGNAL(clicked()), this, SLOT(stopCurrentSession()));
+	connect(m_btnStopSession, SIGNAL(clicked()), this, SLOT(cleanupProcessList()));
 	connect(m_cmbTemplate, SIGNAL(currentIndexChanged(int)), this, SLOT(templateSelectionChanged(int)));
 	connect(m_cmbTemplate, SIGNAL(activated(int)), this, SLOT(templateSelectionChanged(int)));
 	connect(m_cmbEditMode, SIGNAL(currentIndexChanged(int)), this, SLOT(editModeChanged(int)));
+
+	connect(m_sessionTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(sessionDoubleClicked(QModelIndex)));
+	connect(m_templateTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(templateDoubleClicked(QModelIndex)));
 }/*}}}*/
 
 void OOStudio::updateHeaders()/*{{{*/
@@ -188,20 +233,11 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 {
 	m_sessionModel->clear();
 	m_templateModel->clear();
-	while(m_cmbTemplate->count())
+	while(m_cmbTemplate->count() < 2)
 	{
 		m_cmbTemplate->removeItem((m_cmbTemplate->count()-1));
 	}
 
-	m_cmbTemplate->addItem(tr("Select Template"));
-	OOSession* session = readSession(QString(OOM_DEFAULT_TEMPLATE));
-	if(session)
-	{
-		QString tag("T: ");
-		tag.append(QString(OOM_TEMPLATE_NAME));
-		m_cmbTemplate->addItem(tag, QString(OOM_TEMPLATE_NAME));
-		m_sessionMap[session->name] = session;
-	}
 	int sess = 0;
 	if(usehash)
 	{
@@ -424,8 +460,10 @@ void OOStudio::deleteCommand()/*{{{*/
 
 void OOStudio::resetCreate(bool fromClear)/*{{{*/
 {
-	m_txtLSCP->setText("");
-	m_txtOOMPath->setText("");
+	//m_txtLSCP->setText("");
+	//m_txtOOMPath->setText("");
+	m_txtOOMPath->setText(DEFAULT_OOM);
+	m_txtLSCP->setText(DEFAULT_LSCP);
 	m_txtCommand->setText("");
 	if(fromClear)
 	{
@@ -445,12 +483,16 @@ void OOStudio::resetCreate(bool fromClear)/*{{{*/
 
 void OOStudio::cleanupProcessList()/*{{{*/
 {
-	printf("Shutting down processes\n");
+	printf("OOStudio::cleanupProcessList\n");
 	m_incleanup = false;
+	OOClient* oomclient = 0;
 	if(checkOOM())
 	{
-		m_oomProcess->terminate();
-		m_oomProcess->waitForFinished();
+		oomclient = new OOClient("127.0.0.1", 8415, this);
+		oomclient->callShutdown();
+		//oomRemoteShutdown();
+		//m_oomProcess->terminate();
+		m_oomProcess->waitForFinished(500000);
 		m_oomProcess = 0;
 	}
 	if(m_lsProcess && m_lsProcess->state() == QProcess::Running)
@@ -479,17 +521,19 @@ void OOStudio::cleanupProcessList()/*{{{*/
 	m_lblRunning->setText(QString(NO_PROC_TEXT));
 	m_btnStopSession->setEnabled(false);
 	m_current = 0;
+	if(oomclient)
+		delete oomclient;
 	m_incleanup = false;
 }/*}}}*/
 
 void OOStudio::shutdown()/*{{{*/
 {
-	if(stopCurrentSession())
-	{
-		//cleanupProcessList();
+	//if(stopCurrentSession())
+	//{
+		cleanupProcessList();
 		saveSettings();
 		qApp->quit();
-	}
+	//}
 }/*}}}*/
 
 void OOStudio::saveSettings()/*{{{*/
@@ -728,6 +772,48 @@ bool OOStudio::runOOM(OOSession* session)/*{{{*/
 	return false;
 }/*}}}*/
 
+void OOStudio::sessionDoubleClicked(QModelIndex index)/*{{{*/
+{
+	printf("OOStudio::sessionDoubleClicked - row: %d\n", index.row());
+	if(index.isValid())
+	{
+		QStandardItem* item = m_sessionModel->item(index.row());
+		if(item)
+		{
+			OOSession* session = m_sessionMap.value(item->text());
+			if(session)
+			{
+				loadSession(session);
+			}
+		}
+	}
+}/*}}}*/
+
+void OOStudio::templateDoubleClicked(QModelIndex index)/*{{{*/
+{
+	printf("OOStudio::templateDoubleClicked - row: %d\n", index.row());
+	if(index.isValid())
+	{
+		QStandardItem* item = m_templateModel->item(index.row());
+		if(item)
+		{
+			OOSession* session = m_sessionMap.value(item->text());
+			if(session)
+			{
+				if(QMessageBox::warning(
+					this,
+					tr("Open Template"),
+					tr("You are about to open a template session \nAre you sure you want to do this "),
+					QMessageBox::Ok, QMessageBox::Cancel
+				) == QMessageBox::Ok)
+				{
+					loadSession(session);
+				}
+			}
+		}
+	}
+}/*}}}*/
+
 void OOStudio::loadSessionClicked()/*{{{*/
 {
 	if(m_sessionSelectModel && m_sessionSelectModel->hasSelection())
@@ -882,6 +968,11 @@ void OOStudio::deleteSession()/*{{{*/
 	}
 }/*}}}*/
 
+void OOStudio::oomRemoteShutdown()
+{
+	printf("OOStudio::oomRemoteShutdown\n");
+}
+
 bool OOStudio::stopCurrentSession()/*{{{*/
 {
 	if(m_current)
@@ -960,7 +1051,7 @@ void OOStudio::loadSession(OOSession* session)
 						m_lblRunning->setText(session->name);
 						m_btnStopSession->setEnabled(true);
 						m_tabWidget->setCurrentIndex(2);
-						hide();
+						//hide();
 					}
 					else
 					{
@@ -998,25 +1089,109 @@ void OOStudio::loadSession(OOSession* session)
 
 bool OOStudio::validateCreate()/*{{{*/
 {
-	if(m_txtName->text().isEmpty() || m_txtLocation->text().isEmpty() ||
-		m_txtOOMPath->text().isEmpty() || m_txtLSCP->text().isEmpty() ||
-		m_txtLSHost->text().isEmpty() || m_txtLSPort->text().isEmpty())
-		return false;
-	if((m_chkStartJack->isChecked() && m_txtJackCommand->text().isEmpty()) || 
-		(m_chkStartLS->isChecked() && m_txtLSCommand->text().isEmpty()))
-		return false;
-	if(m_sessionMap.contains(m_txtName->text()) && m_cmbEditMode->currentIndex() == 0)
+	bool rv = true;
+	QString error(tr("You must provide the %1 for your new session\n"
+			"Please enter the %1 and try again"));
+	QString chkerror(tr("%1 field is checked which requires %2 \n"
+			"Please enter a %2 and try again"));
+	if(m_txtName->text().isEmpty())
 	{
 		QMessageBox::warning(
 			this,
-			tr("Dubplate Name"),
-			tr("There is already a session with the name you selected\nPlease change the name and try again")
+			tr("Missing Field"),
+			error.arg("Name")
 			);
-		m_txtName->setText(getValidName(m_txtName->text()));
 		m_txtName->setFocus(Qt::OtherFocusReason);
-		return false;
+		rv = false;
 	}
-	return true;
+	else if (m_txtLocation->text().isEmpty())
+	{
+		QMessageBox::warning(
+			this,
+			tr("Missing Field"),
+			error.arg("Location")
+			);
+		m_txtLocation->setFocus(Qt::OtherFocusReason);
+		rv = false;
+	}
+	else if (m_txtOOMPath->text().isEmpty())
+	{
+		QMessageBox::warning(
+			this,
+			tr("Missing Field"),
+			error.arg("OOM Path")
+			);
+		m_txtOOMPath->setFocus(Qt::OtherFocusReason);
+		rv = false;
+	}
+	else if((m_chkStartJack->isChecked() && m_txtJackCommand->text().isEmpty()))
+	{
+		QMessageBox::warning(
+			this,
+			tr("Missing Field"),
+			chkerror.arg("Start Jack").arg("Jack command")
+			);
+		m_txtJackCommand->setFocus(Qt::OtherFocusReason);
+		rv = false;
+	}
+	else
+	{
+		if(m_sessionMap.contains(m_txtName->text()) && m_cmbEditMode->currentIndex() == 0)
+		{
+			QMessageBox::warning(
+				this,
+				tr("Dubplate Name"),
+				tr("There is already a session with the name you selected\nPlease change the name and try again")
+				);
+			m_txtName->setText(getValidName(m_txtName->text()));
+			m_txtName->setFocus(Qt::OtherFocusReason);
+			rv = false;
+		}
+	}
+	if(m_chkStartLS->isChecked() && rv)
+	{
+		if (m_txtLSHost->text().isEmpty())
+		{
+			QMessageBox::warning(
+				this,
+				tr("Missing Field"),
+				chkerror.arg("Start linuxsampler").arg("Linuxsampler host")
+				);
+			m_txtLSHost->setFocus(Qt::OtherFocusReason);
+			rv = false;
+		}
+		else if(m_txtLSPort->text().isEmpty())
+		{
+			QMessageBox::warning(
+				this,
+				tr("Missing Field"),
+				chkerror.arg("Start Linuxsampler").arg("Linuxsampler port")
+				);
+			m_txtLSPort->setFocus(Qt::OtherFocusReason);
+			rv = false;
+		}
+		else if(m_txtLSCommand->text().isEmpty())
+		{
+			QMessageBox::warning(
+				this,
+				tr("Missing Field"),
+				chkerror.arg("Start Linuxsampler").arg("Linuxsampler command")
+				);
+			m_txtLSCommand->setFocus(Qt::OtherFocusReason);
+			rv = false;
+		}
+		else if(m_txtLSCP->text().isEmpty())
+		{
+			QMessageBox::warning(
+				this,
+				tr("Missing Field"),
+				chkerror.arg("Start Linuxsampler").arg("Linuxsampler command")
+				);
+			m_txtLSCP->setFocus(Qt::OtherFocusReason);
+			rv = false;
+		}
+	}
+	return rv;
 }/*}}}*/
 
 void OOStudio::createSession()/*{{{*/
@@ -1161,15 +1336,6 @@ void OOStudio::createSession()/*{{{*/
 				QMessageBox::critical(this, tr("Create Failed"), msg);
 			}
 		}
-	}
-	else
-	{
-		//TODO: Add error message here
-		QMessageBox::information(
-			this,
-			tr("Invalid Form"),
-			tr("All required information has not been provided, please correct the problem and click \"Create New\" again?"),
-			QMessageBox::Ok);
 	}
 }/*}}}*/
 
@@ -1540,7 +1706,7 @@ void OOStudio::iconActivated(QSystemTrayIcon::ActivationReason reason)/*{{{*/
 
 void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)/*{{{*/
 {
-	if(!m_incleanup)
+	if(m_current)
 	{
 		switch(status)
 		{

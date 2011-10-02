@@ -36,5 +36,14 @@
 	<file>images/plus_new_on.png</file>
 	<file>images/plus_new_over.png</file>
 	<file>images/plus_new_off.png</file>
+    <file>images/down_arrow.png</file>
+	<file>images/down_arrow_new_over.png</file>
+	<file>images/down_arrow_new_off.png</file>
+	<file>images/up_arrow_new_on.png</file>
+	<file>images/up_arrow_new_over.png</file>
+	<file>images/up_arrow_new_off.png</file>
+	<file>images/refresh_new_on.png</file>
+	<file>images/refresh_new_over.png</file>
+	<file>images/refresh_new_off.png</file>
  </qresource>
  </RCC>

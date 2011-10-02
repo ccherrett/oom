@@ -682,6 +682,7 @@ void EffectRack::initPlugin(Xml xml, int idx)
 				}/*}}}*/
 				else if (tag == "lv2plugin")/*{{{*/
 				{
+			#ifdef LV2_SUPPORT
 					LV2PluginI* plugi = new LV2PluginI();
 					if (plugi->readConfiguration(xml, false))
 					{
@@ -695,6 +696,9 @@ void EffectRack::initPlugin(Xml xml, int idx)
 						song->update(SC_RACK);
 						return;
 					}
+			#else
+					xml.skip(tag);
+			#endif
 				}/*}}}*/
 				else if (tag == "oom" || tag == "muse")
 					break;

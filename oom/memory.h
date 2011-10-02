@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <map>
+#include <stddef.h>
 
 // most of the following code is based on examples
 // from Bjarne Stroustrup: "Die C++ Programmiersprache"

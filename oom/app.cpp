@@ -769,6 +769,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	routingPopupMenu = 0;
 	routingDialog = 0;
 	firstrun = true;
+	m_externalCall = false;
 	//routingPopupView      = 0;
 	g_trackColorListLine.insert(Track::AUDIO_INPUT, QColor(189,122,214));
 	g_trackColorListLine.insert(Track::MIDI, QColor(1,230,238));
@@ -2442,8 +2443,9 @@ void OOMidi::connectDefaultSongPorts()
 //   quitDoc
 //---------------------------------------------------------
 
-void OOMidi::quitDoc()
+void OOMidi::quitDoc(bool external)
 {
+	m_externalCall = external;
 	close();
 }
 
@@ -2464,22 +2466,37 @@ void OOMidi::closeEvent(QCloseEvent* event)
 	if (song->dirty)
 	{
 		int n = 0;
-		n = QMessageBox::warning(this, appName,
-				tr("The current Project contains unsaved data\n"
-				"Save Current Project?"),
-				tr("&Save"), tr("&Don't Save"), tr("&Cancel"), 0, 2);
-		if (n == 0)
+		if(m_externalCall)
 		{
-			if (!save()) // dont quit if save failed
+			n = QMessageBox::warning(this, appName,
+					tr("A Remote shutdown sequence was called\n"
+					"However the current Project contains unsaved data\n"
+					"Save Current Project?"),
+					tr("&Save"), tr("&Don't Save"), 0, 1);
+			if (n == 0)
+			{
+				save();
+			}
+		}
+		else
+		{
+			n = QMessageBox::warning(this, appName,
+					tr("The current Project contains unsaved data\n"
+					"Save Current Project?"),
+					tr("&Save"), tr("&Don't Save"), tr("&Cancel"), 0, 2);
+			if (n == 0)
+			{
+				if (!save()) // dont quit if save failed
+				{
+					event->ignore();
+					return;
+				}
+			}
+			else if (n == 2)
 			{
 				event->ignore();
 				return;
 			}
-		}
-		else if (n == 2)
-		{
-			event->ignore();
-			return;
 		}
 	}
 	seqStop();

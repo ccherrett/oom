@@ -21,6 +21,7 @@
 
 file (GLOB templates_files 
 	default.oom
+	default.lscp
 	oomidi-template.oom
 	oomidi-template.lscp
 	)

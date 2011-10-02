@@ -27,8 +27,10 @@ class QMenu;
 class QStandardItemModel;
 class QStandardItem;
 class QItemSelectionModel;
+class QModelIndex;
 class QSettings;
 class OOProcess;
+class QSize;
 
 struct OOSession
 {
@@ -83,7 +85,9 @@ private:
 	QMap<QString, OOSession*> m_sessionMap;
 	QHash<long, OOProcess*> m_procMap;
 	OOSession* m_current;
+	QSize m_restoreSize;
 
+	void loadStyle(QString);
 	void createTrayIcon();
 	void createConnections();
 	void createModels();
@@ -94,7 +98,6 @@ private:
 	bool checkOOM();
 	void populateSessions(bool usehash = false);
 	void processMessages(int, QString, QProcess*);
-	void cleanupProcessList();
 	bool validateCreate();
 	OOSession* readSession(QString);
 	void saveSettings();
@@ -111,6 +114,7 @@ protected:
 	void resizeEvent(QResizeEvent*);
 
 private slots:
+	void cleanupProcessList();
 	void iconActivated(QSystemTrayIcon::ActivationReason);
 	void resetCreate(bool fromClear = true);
 	void loadSessionClicked();
@@ -131,6 +135,9 @@ private slots:
 	void deleteSession();
 	bool stopCurrentSession();
 	void editModeChanged(int);
+	void oomRemoteShutdown();
+	void sessionDoubleClicked(QModelIndex);
+	void templateDoubleClicked(QModelIndex);
 	//Process Listeners
 	void processJackMessages();
 	void processJackErrors();

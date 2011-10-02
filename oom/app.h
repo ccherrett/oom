@@ -210,6 +210,7 @@ class OOMidi : public QMainWindow
 	MixerDock *m_mixerWidget;
 	QDockWidget *m_mixerDock;
 	QMessageBox *pipelineBox;
+	bool m_externalCall;
 
     bool readMidi(FILE*);
     void read(Xml& xml, bool skipConfig);
@@ -261,7 +262,6 @@ private slots:
     //void runPythonScript();
     void loadProject();
     void configGlobalSettings();
-    void quitDoc();
     void about();
     void aboutQt();
     void startHelpBrowser();
@@ -348,6 +348,7 @@ private slots:
 
 
 public slots:
+    void quitDoc(bool ext = false);
     bool save();
     bool saveAs();
     void bounceToFile(AudioOutput* ao = 0);

@@ -21,6 +21,7 @@ void OOMCommandServer::incomingConnection(int socket)
 	connect(thread, SIGNAL(saveSongAs()), SLOT(saveAsTriggered()));
 	connect(thread, SIGNAL(pipelineStateChanged(int)), oom, SLOT(pipelineStateChanged(int)));
 	connect(thread, SIGNAL(reloadRoutes()), oom, SLOT(connectDefaultSongPorts()));
+	connect(thread, SIGNAL(saveAndExit(bool)), oom, SLOT(quitDoc(bool)));
 	
 	thread->start();
 }

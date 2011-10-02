@@ -39,6 +39,7 @@ OOMClientThread::OOMClientThread(int sock, QObject* parent)
 	cmdStrList.insert("pipeline_started", PIPELINE_STARTED);
 	cmdStrList.insert("current_song", CURRENT_SONG);
 	cmdStrList.insert("current_song_file", CURRENT_SONG_FILE);
+	cmdStrList.insert("save_and_exit", SAVE_AND_EXIT);
 }
 
 void OOMClientThread::run()
@@ -152,6 +153,13 @@ void OOMClientThread::run()
 			case SAVE_SONG_AS:
 				rv.append("Song SaveAs called\n");
 				emit saveSongAs();
+			break;
+			case SAVE_AND_EXIT:
+			{
+				printf("Save and Exit Call requested in command server\n");
+				emit saveAndExit(true);
+				rv.append("OK").append("\n");
+			}
 			break;
 			case CURRENT_SONG:
 				rv.append(oomProject);

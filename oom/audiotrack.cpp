@@ -995,6 +995,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 	}
 	else if(tag == "lv2plugin")
 	{
+#ifdef LV2_SUPPORT
 		//printf("AudioTrack::readProperties found lv2plugin tag\n");
 		int rackpos;
 		for (rackpos = 0; rackpos < PipelineDepth; ++rackpos)
@@ -1017,6 +1018,9 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		}
 		else
 			printf("can't load plugin - plugin rack is already full\n");
+#else
+		xml.skip(tag);
+#endif
 	}
 	else if (tag == "auxSend")
 		readAuxSend(xml);

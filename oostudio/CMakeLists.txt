@@ -24,6 +24,7 @@
 QT4_WRAP_CPP ( studio_mocs
 	OOProcess.h
 	OOStudio.h
+	OOClient.h
       )
 
 ##
@@ -39,6 +40,7 @@ QT4_ADD_RESOURCES (studio_qrc_files
 file (GLOB studio_source_files
 	OOProcess.cpp
     OOStudio.cpp
+	OOClient.cpp
 	main.cpp
     )
 
