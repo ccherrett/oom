@@ -243,12 +243,12 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 	{
 		printf("OOStudio::populateSession: sessions: %d\n", m_sessionMap.count());
 		QMap<QString, OOSession*>::const_iterator iter = m_sessionMap.constBegin();
-		while (iter != m_sessionMap.constEnd())
+		while (iter != m_sessionMap.constEnd())/*{{{*/
 		{
 			OOSession* session = iter.value();
 			if(session && session->name != QString(OOM_TEMPLATE_NAME))
 			{
-				printf("Processing session %s \n", session->name.toUtf8().constData());
+				//printf("Processing session %s \n", session->name.toUtf8().constData());
 				QStandardItem* name = new QStandardItem(session->name);
 				QStandardItem* path = new QStandardItem(session->path);
 				QList<QStandardItem*> rowData;
@@ -258,14 +258,28 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					m_templateModel->appendRow(rowData);
 					m_cmbTemplate->addItem("T: "+name->text(), name->text());
 				}
-				else
+			}
+			++iter;
+		}/*}}}*/
+		iter = m_sessionMap.constBegin();
+		while (iter != m_sessionMap.constEnd())/*{{{*/
+		{
+			OOSession* session = iter.value();
+			if(session && session->name != QString(OOM_TEMPLATE_NAME))
+			{
+				//printf("Processing session %s \n", session->name.toUtf8().constData());
+				QStandardItem* name = new QStandardItem(session->name);
+				QStandardItem* path = new QStandardItem(session->path);
+				QList<QStandardItem*> rowData;
+				rowData << name << path;
+				if(!session->istemplate)
 				{
 					m_sessionModel->appendRow(rowData);
 					m_cmbTemplate->addItem("S: "+name->text(), name->text());
 				}
 			}
 			++iter;
-		}
+		}/*}}}*/
 	}
 	else
 	{
@@ -273,7 +287,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 		sess = settings.beginReadArray("Sessions");
 		printf("OOStudio::populateSession: sessions: %d\n", sess);
 
-		for(int i = 0; i < sess; ++i)
+		for(int i = 0; i < sess; ++i)/*{{{*/
 		{
 			settings.setArrayIndex(i);
 			printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
@@ -289,15 +303,31 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				{
 					m_templateModel->appendRow(rowData);
 					m_cmbTemplate->addItem("T: "+name->text(), name->text());
+					m_sessionMap[session->name] = session;
 				}
-				else
+			}
+		}/*}}}*/
+
+		for(int i = 0; i < sess; ++i)/*{{{*/
+		{
+			settings.setArrayIndex(i);
+			printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
+			OOSession* session = readSession(settings.value("path").toString());
+			if(session)
+			{
+				//printf("Found valid session\n");
+				QStandardItem* name = new QStandardItem(session->name);
+				QStandardItem* path = new QStandardItem(session->path);
+				QList<QStandardItem*> rowData;
+				rowData << name << path;
+				if(!session->istemplate)
 				{
 					m_sessionModel->appendRow(rowData);
 					m_cmbTemplate->addItem("S: "+name->text(), name->text());
+					m_sessionMap[session->name] = session;
 				}
-				m_sessionMap[session->name] = session;
 			}
-		}
+		}/*}}}*/
 	}
 
 	updateHeaders();
@@ -1004,7 +1034,7 @@ void OOStudio::loadSession(OOSession* session)
 	{
 		printf("OOStudio::loadSession : name: %s\n", session->name.toUtf8().constData());
 		printf("OOStudio::loadSession : path: %s\n", session->path.toUtf8().constData());
-		if(checkOOM())
+		/*if(checkOOM())
 		{
 			if(QMessageBox::warning(
 				this,
@@ -1015,7 +1045,7 @@ void OOStudio::loadSession(OOSession* session)
 			{
 				return;
 			}
-		}
+		}*/
 		cleanupProcessList();
 		if(runJack(session))
 		{
