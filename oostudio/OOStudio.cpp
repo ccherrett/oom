@@ -607,7 +607,7 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			connect(m_jackProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processJackMessages()));
 			connect(m_jackProcess, SIGNAL(readyReadStandardError()), this, SLOT(processJackErrors()));
 			connect(m_jackProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processJackExit(int, QProcess::ExitStatus)));
-			connect(m_jackProcess, SIGNAL(error(QProcess::ProcessError )), this, SLOT(processJackError(QProcess::ProcessError)));
+			connect(m_jackProcess, SIGNAL(error(QProcess::ProcessError )), this, SLOT(processJackExecError(QProcess::ProcessError)));
 			QString jackCmd = session->jackcommand;
 			QStringList args = jackCmd.split(" ");
 			jackCmd = args.takeFirst();
