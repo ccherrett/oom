@@ -1371,6 +1371,17 @@ void OOStudio::createSession()/*{{{*/
 				QMessageBox::critical(this, tr("Create Failed"), msg);
 			}
 		}
+		else
+		{
+			QMessageBox::critical(
+				this,
+				tr("Create Directory Failed"),
+				tr("There was a problem creating your session directory\n"
+				"Please make sure there are not directories or files under\n"
+				"the location with the same name as your session name."),
+				QMessageBox::Ok
+			);
+		}
 	}
 }/*}}}*/
 
