@@ -82,7 +82,7 @@ QString oomProject;
 QString oomProjectFile;
 QString oomProjectInitPath("./");
 QString configPath = QString(getenv("HOME")) + QString("/.config/OOMidi");
-QString configName = configPath + QString("/OOMidi.cfg");
+QString configName = configPath + QString("/OOMidi-").append(VERSION).append(".cfg");
 QString routePath = configPath + QString("/routes");
 QString oomInstruments;
 QString oomUserInstruments;
