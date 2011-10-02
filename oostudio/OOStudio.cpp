@@ -675,7 +675,7 @@ bool OOStudio::pingJack()
 
 		rv = true;
 	}
-	client = NULL;
+	//client = NULL;
 	return rv;
 }
 
@@ -1168,11 +1168,11 @@ void OOStudio::loadSession(OOSession* session)/*{{{*/
 			QString msg(tr("Failed to start to jackd server"));
 			msg.append("\nwith Command:\n").append(session->jackcommand);
 			QMessageBox::critical(this, tr("Jackd Failed"), msg);
-			if(m_jackProcess)
+			/*if(m_jackProcess)
 			{
 				delete m_jackProcess;
 				m_jackProcess = 0;
-			}
+			}*/
 		}
 	}
 }/*}}}*/
