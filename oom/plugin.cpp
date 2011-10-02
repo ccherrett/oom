@@ -1417,7 +1417,7 @@ void Pipeline::showNativeGui(int idx, bool flag)
 	bool islv2 = (p->type() == 2);
 	if(islv2)
 	{
-		LV2PluginI* lvp = (LV2Plugin*)p;
+		LV2PluginI* lvp = (LV2PluginI*)p;
 		if(lvp)
 			lvp->showNativeGui(flag);
 	}
