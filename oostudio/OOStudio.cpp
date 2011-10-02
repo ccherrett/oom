@@ -14,6 +14,8 @@
 #include <QDomNodeList>
 #include <QDomNode>
 #include <QIcon>
+#include <jack/jack.h>
+
 
 static const char* LS_HOSTNAME  = "localhost";
 static const int   LS_PORT      = 8888;
@@ -62,12 +64,12 @@ OOStudio::OOStudio()
 	createModels();
 	createConnections();
 
-	trayIcon->show();
+	m_trayIcon->show();
 	setWindowTitle(tr("OOMIDI: Studio"));
 	QSettings settings("OOMidi", "OOStudio");
 	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
 	resize(size);
-	m_restoreSize = size;
+	m_restoreSize = saveGeometry();
 	populateSessions();
 	m_lblRunning->setText(QString(NO_PROC_TEXT));
 	m_btnStopSession->setEnabled(false);
@@ -81,59 +83,59 @@ OOStudio::OOStudio()
 
 void OOStudio::createTrayIcon()/*{{{*/
 {
-	minimizeAction = new QAction(tr("Mi&nimize"), this);
-	maximizeAction = new QAction(tr("Ma&ximize"), this);
-	restoreAction = new QAction(tr("&Restore"), this);
-	quitAction = new QAction(tr("&Quit"), this);
-	importAction = new QAction(tr("Import existing sessions and session templates"), this);
+	m_minimizeAction = new QAction(tr("Mi&nimize"), this);
+	m_maximizeAction = new QAction(tr("Ma&ximize"), this);
+	m_restoreAction = new QAction(tr("&Restore"), this);
+	m_quitAction = new QAction(tr("&Quit"), this);
+	m_importAction = new QAction(tr("Import existing sessions and session templates"), this);
 
 	QIcon exitIcon;
 	exitIcon.addPixmap(QPixmap(":/images/garbage_new_on.png"), QIcon::Normal, QIcon::On);
 	exitIcon.addPixmap(QPixmap(":/images/garbage_new_off.png"), QIcon::Normal, QIcon::Off);
 	exitIcon.addPixmap(QPixmap(":/images/garbage_new_over.png"), QIcon::Active);
-	quitAction->setIcon(exitIcon);
-	m_btnExit->setDefaultAction(quitAction);
+	m_quitAction->setIcon(exitIcon);
+	m_btnExit->setDefaultAction(m_quitAction);
 
 	QIcon importIcon;
 	importIcon.addPixmap(QPixmap(":/images/plus_new_on.png"), QIcon::Normal, QIcon::On);
 	importIcon.addPixmap(QPixmap(":/images/plus_new_off.png"), QIcon::Normal, QIcon::Off);
 	importIcon.addPixmap(QPixmap(":/images/plus_new_over.png"), QIcon::Active);
-	importAction->setIcon(importIcon);
-	m_btnImport->setDefaultAction(importAction);
+	m_importAction->setIcon(importIcon);
+	m_btnImport->setDefaultAction(m_importAction);
 
 	QIcon minimizeIcon;
 	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_on.png"), QIcon::Normal, QIcon::On);
 	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_off.png"), QIcon::Normal, QIcon::Off);
 	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_over.png"), QIcon::Active);
-	minimizeAction->setIcon(minimizeIcon);
-	m_btnMinimize->setDefaultAction(minimizeAction);
+	m_minimizeAction->setIcon(minimizeIcon);
+	m_btnMinimize->setDefaultAction(m_minimizeAction);
 
 	QIcon maximizeIcon;
 	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_on.png"), QIcon::Normal, QIcon::On);
 	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_off.png"), QIcon::Normal, QIcon::Off);
 	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_over.png"), QIcon::Active);
-	maximizeAction->setIcon(maximizeIcon);
-	m_btnMaximize->setDefaultAction(maximizeAction);
+	m_maximizeAction->setIcon(maximizeIcon);
+	m_btnMaximize->setDefaultAction(m_maximizeAction);
 
 	m_btnRestore->hide();
 	QIcon restoreIcon;
 	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_on.png"), QIcon::Normal, QIcon::On);
 	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_off.png"), QIcon::Normal, QIcon::Off);
 	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_over.png"), QIcon::Active);
-	restoreAction->setIcon(restoreIcon);
-	//m_btnRestore->setDefaultAction(restoreAction);*/
+	m_restoreAction->setIcon(restoreIcon);
+	//m_btnRestore->setDefaultAction(m_restoreAction);*/
 
-	trayMenu = new QMenu(this);
-	trayMenu->addAction(minimizeAction);
-	trayMenu->addAction(maximizeAction);
-	trayMenu->addAction(restoreAction);
-	trayMenu->addSeparator();
-	trayMenu->addAction(quitAction);
+	m_trayMenu = new QMenu(this);
+	m_trayMenu->addAction(m_minimizeAction);
+	m_trayMenu->addAction(m_maximizeAction);
+	m_trayMenu->addAction(m_restoreAction);
+	m_trayMenu->addSeparator();
+	m_trayMenu->addAction(m_quitAction);
 
-	trayIcon = new QSystemTrayIcon(this);
-	trayIcon->setContextMenu(trayMenu);
+	m_trayIcon = new QSystemTrayIcon(this);
+	m_trayIcon->setContextMenu(m_trayMenu);
 	QIcon icon(":/images/oom_icon.png");
-	trayIcon->setIcon(icon);
+	m_trayIcon->setIcon(icon);
 }/*}}}*/
 
 void OOStudio::createModels()/*{{{*/
@@ -194,13 +196,14 @@ void OOStudio::loadStyle(QString style)
 
 void OOStudio::createConnections()/*{{{*/
 {
-	connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
-	connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
-	connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
-	connect(importAction, SIGNAL(triggered()), this, SLOT(importSession()));
-	connect(quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
+	connect(m_minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
+	connect(m_maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
+	connect(m_restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
+	//connect(m_restoreAction, SIGNAL(triggered()), this, SLOT(showNormalImpl()));
+	connect(m_importAction, SIGNAL(triggered()), this, SLOT(importSession()));
+	connect(m_quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
 
-	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+	connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 	
 	connect(m_btnLoadSession, SIGNAL(clicked()), this, SLOT(loadSessionClicked()));
 	connect(m_btnLoadTemplate, SIGNAL(clicked()), this, SLOT(loadTemplateClicked()));
@@ -224,6 +227,13 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_sessionTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(sessionDoubleClicked(QModelIndex)));
 	connect(m_templateTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(templateDoubleClicked(QModelIndex)));
 }/*}}}*/
+
+void OOStudio::showNormalImpl()
+{
+	showNormal();
+	restoreGeometry(m_restoreSize);
+	//resize(m_restoreSize);
+}
 
 void OOStudio::updateHeaders()/*{{{*/
 {
@@ -524,19 +534,21 @@ void OOStudio::cleanupProcessList()/*{{{*/
 	printf("OOStudio::cleanupProcessList\n");
 	m_incleanup = false;
 	OOClient* oomclient = 0;
-	if(checkOOM())
+	if(m_oomProcess /*checkOOM()*/)
 	{
 		oomclient = new OOClient("127.0.0.1", 8415, this);
 		oomclient->callShutdown();
 		//oomRemoteShutdown();
 		//m_oomProcess->terminate();
 		m_oomProcess->waitForFinished(500000);
+		delete m_oomProcess;
 		m_oomProcess = 0;
 	}
-	if(m_lsProcess && m_lsProcess->state() == QProcess::Running)
+	if(m_lsProcess/* && m_lsProcess->state() == QProcess::Running*/)
 	{
 		m_lsProcess->terminate();
 		m_lsProcess->waitForFinished();
+		delete m_lsProcess;
 		m_lsProcess = 0;
 	}
 	QList<long> keys = m_procMap.keys();
@@ -550,10 +562,11 @@ void OOStudio::cleanupProcessList()/*{{{*/
 			delete p;
 		}
 	}
-	if(m_jackProcess && m_jackProcess->state() == QProcess::Running)
+	if(m_jackProcess/* && m_jackProcess->state() == QProcess::Running*/)
 	{
 		m_jackProcess->kill();
 		m_jackProcess->waitForFinished();
+		delete m_jackProcess;
 		m_jackProcess = 0;
 	}
 	m_lblRunning->setText(QString(NO_PROC_TEXT));
@@ -610,7 +623,7 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 	{
 		if(session->loadJack)
 		{
-			printf("Launching jackd ");
+			printf("Launching jackd: ");
 			m_jackProcess = new QProcess(this);
 			connect(m_jackProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processJackMessages()));
 			connect(m_jackProcess, SIGNAL(readyReadStandardError()), this, SLOT(processJackErrors()));
@@ -623,15 +636,20 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 				m_jackProcess->start(jackCmd);
 			else
 				m_jackProcess->start(jackCmd, args);
-			bool rv = m_jackProcess->waitForStarted(150000);
+			m_jackProcess->waitForStarted(50000);
+			/*bool rv = m_jackProcess->waitForStarted(150000);
 			rv = (m_jackProcess->state() == QProcess::Running);
 			if(rv && m_jackProcess->state() == QProcess::Running)
 			{
 				rv = true;
 			}
 			else
+			{
+				m_jackProcess->close();
 				rv = false;
-			printf("%s\n", rv ? "Complete" : "FAILED");
+			}*/
+			bool rv = pingJack();
+			printf("%s\n", rv ? " Complete" : " FAILED");
 			return rv;
 		}
 		else
@@ -639,6 +657,27 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 	}
 	return false;
 }/*}}}*/
+
+bool OOStudio::pingJack()
+{
+	bool rv = true;
+	jack_status_t status;
+	jack_client_t *client;
+	if((client = jack_client_open("OOStudio_Check", JackNullOption, &status, NULL)) == 0)
+	{
+		printf("jack server not running?");
+		rv = false;
+	}
+
+	if(client && status == JackServerStarted)
+	{
+		jack_client_close(client);
+
+		rv = true;
+	}
+	client = NULL;
+	return rv;
+}
 
 bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
 {
@@ -1127,8 +1166,13 @@ void OOStudio::loadSession(OOSession* session)/*{{{*/
 		else
 		{
 			QString msg(tr("Failed to start to jackd server"));
-			msg.append("\nCommand:\n").append(session->jackcommand);
+			msg.append("\nwith Command:\n").append(session->jackcommand);
 			QMessageBox::critical(this, tr("Jackd Failed"), msg);
+			if(m_jackProcess)
+			{
+				delete m_jackProcess;
+				m_jackProcess = 0;
+			}
 		}
 	}
 }/*}}}*/
@@ -1726,15 +1770,15 @@ OOSession* OOStudio::readSession(QString filename)/*{{{*/
 
 void OOStudio::setVisible(bool visible)/*{{{*/
 {
-	minimizeAction->setEnabled(visible);
-	maximizeAction->setEnabled(!isMaximized());
-	restoreAction->setEnabled(isMaximized() || !visible);
+	m_minimizeAction->setEnabled(visible);
+	m_maximizeAction->setEnabled(!isMaximized());
+	m_restoreAction->setEnabled(isMaximized() || !visible);
 	QDialog::setVisible(visible);
 }/*}}}*/
 
 void OOStudio::closeEvent(QCloseEvent* ev)/*{{{*/
 {
-	if(trayIcon->isVisible())
+	if(m_trayIcon->isVisible())
 	{
 		hide();
 		ev->ignore();
@@ -1769,14 +1813,14 @@ void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)/*{{{*/
 		{
 			case QProcess::NormalExit:
 			{
-				restoreAction->trigger();
+				m_restoreAction->trigger();
 				cleanupProcessList();
 			}
 			break;
 			case QProcess::CrashExit:
 			{
 				cleanupProcessList();
-				restoreAction->trigger();
+				m_restoreAction->trigger();
 			}
 			break;
 		}
@@ -1793,7 +1837,7 @@ void OOStudio::processJackExit(int code, QProcess::ExitStatus status)/*{{{*/
 			case QProcess::NormalExit:
 			{
 				printf("Jack exited normally\n");
-				//restoreAction->trigger();
+				//m_restoreAction->trigger();
 				//cleanupProcessList();
 			}
 			break;
@@ -1801,7 +1845,7 @@ void OOStudio::processJackExit(int code, QProcess::ExitStatus status)/*{{{*/
 			{
 				printf("Jack exited with crash\n");
 				//cleanupProcessList();
-				//restoreAction->trigger();
+				//m_restoreAction->trigger();
 			}
 			break;
 		}

@@ -57,6 +57,7 @@ file (GLOB studio_ui_files
 
 QT4_WRAP_UI (studio_ui_headers ${studio_ui_files})
 
+
 ##
 ## Define target
 ##
@@ -83,10 +84,10 @@ set (FILES_TO_TRANSLATE
 target_link_libraries ( oostudio
       ${QT_LIBRARIES}
 	  ${QT_QTNETWORK_LIBRARY}
-      icons
+	  ${LSCP_LIBRARIES}
+      ${JACK_LIBRARIES}
       )
 
-target_link_libraries(oostudio ${LSCP_LIBRARIES})
 
 ##
 ## Install location

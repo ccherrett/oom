@@ -30,6 +30,7 @@ class QItemSelectionModel;
 class QModelIndex;
 class QSettings;
 class OOProcess;
+class QByteArray;
 class QSize;
 
 struct OOSession
@@ -60,13 +61,13 @@ public:
 
 private:
 	bool m_incleanup;
-	QAction* maximizeAction;
-	QAction* minimizeAction;
-	QAction* restoreAction;
-	QAction* quitAction;
-	QAction* importAction;
-	QSystemTrayIcon* trayIcon;
-	QMenu* trayMenu;
+	QAction* m_maximizeAction;
+	QAction* m_minimizeAction;
+	QAction* m_restoreAction;
+	QAction* m_quitAction;
+	QAction* m_importAction;
+	QSystemTrayIcon* m_trayIcon;
+	QMenu* m_trayMenu;
 	QProcess* m_jackProcess;
 	QProcess* m_lsProcess;
 	QProcess* m_oomProcess;
@@ -85,13 +86,14 @@ private:
 	QMap<QString, OOSession*> m_sessionMap;
 	QHash<long, OOProcess*> m_procMap;
 	OOSession* m_current;
-	QSize m_restoreSize;
+	QByteArray m_restoreSize;
 
 	void loadStyle(QString);
 	void createTrayIcon();
 	void createConnections();
 	void createModels();
 	bool runJack(OOSession*);
+	bool pingJack();
 	bool runLinuxsampler(OOSession*);
 	void runCommands(OOSession*, bool post = false);
 	bool runOOM(OOSession*);
@@ -109,6 +111,8 @@ private:
 	QString convertPath(QString);
 	void doSessionDelete(OOSession*);
 
+public slots:
+	void showNormalImpl();
 protected:
 	void closeEvent(QCloseEvent*);
 	void resizeEvent(QResizeEvent*);
