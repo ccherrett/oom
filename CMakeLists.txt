@@ -213,7 +213,7 @@ include_directories(${JACK_INCLUDE_DIRS})
 ## find if jack is jack2
 ##
 
-PKG_CHECK_MODULES(JACK2 jack>=1.95)
+PKG_CHECK_MODULES(JACK2 jack>=1.9.5)
 if (JACK2_FOUND)
 	set(JACK2_SUPPORT ON)
 else (JACK2_FOUND)

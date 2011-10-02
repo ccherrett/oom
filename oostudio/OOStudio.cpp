@@ -21,7 +21,8 @@ static const char* LS_COMMAND   = "linuxsampler";
 static const char* JACK_COMMAND = "/usr/bin/jackd -R -P89 -p2048 -t5000 -M512 -dalsa -dhw:0 -r44100 -p512 -n2";
 static const QString NO_PROC_TEXT(QObject::tr("No Running Session"));
 static const QString DEFAULT_OOM = QString(SHAREDIR).append("/templates/default.oom");
-static const QString DEFAULT_LSCP = QString(SHAREDIR).append("/templates/default.lscp");
+static const QString DEFAULT_LSCP = QString(SHAREDIR).append(QDir::separator()).append("templates").append(QDir::separator()).append("default.lscp");
+static const QString TEMPLATE_DIR = QString(QDir::homePath()).append(QDir::separator()).append("oomidi_sessions");
 static const char* OOM_TEMPLATE_NAME = "OOMidi_Orchestral_Template";
 static const char* MAP_STRING = "MAP MIDI_INSTRUMENT";
 
@@ -170,6 +171,13 @@ void OOStudio::createModels()/*{{{*/
 
 	m_txtOOMPath->setText(DEFAULT_OOM);
 	m_txtLSCP->setText(DEFAULT_LSCP);
+	m_txtLocation->setText(TEMPLATE_DIR);
+
+	QDir sessionDir(TEMPLATE_DIR);
+	if(!sessionDir.exists(TEMPLATE_DIR))
+	{
+		sessionDir.mkpath(TEMPLATE_DIR);
+	}
 }/*}}}*/
 
 void OOStudio::loadStyle(QString style)
@@ -243,7 +251,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 	{
 		printf("OOStudio::populateSession: sessions: %d\n", m_sessionMap.count());
 		QMap<QString, OOSession*>::const_iterator iter = m_sessionMap.constBegin();
-		while (iter != m_sessionMap.constEnd())/*{{{*/
+		while (iter != m_sessionMap.constEnd())
 		{
 			OOSession* session = iter.value();
 			if(session && session->name != QString(OOM_TEMPLATE_NAME))
@@ -260,9 +268,9 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				}
 			}
 			++iter;
-		}/*}}}*/
+		}
 		iter = m_sessionMap.constBegin();
-		while (iter != m_sessionMap.constEnd())/*{{{*/
+		while (iter != m_sessionMap.constEnd())
 		{
 			OOSession* session = iter.value();
 			if(session && session->name != QString(OOM_TEMPLATE_NAME))
@@ -279,7 +287,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				}
 			}
 			++iter;
-		}/*}}}*/
+		}
 	}
 	else
 	{
@@ -287,7 +295,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 		sess = settings.beginReadArray("Sessions");
 		printf("OOStudio::populateSession: sessions: %d\n", sess);
 
-		for(int i = 0; i < sess; ++i)/*{{{*/
+		for(int i = 0; i < sess; ++i)
 		{
 			settings.setArrayIndex(i);
 			printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
@@ -306,9 +314,9 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					m_sessionMap[session->name] = session;
 				}
 			}
-		}/*}}}*/
+		}
 
-		for(int i = 0; i < sess; ++i)/*{{{*/
+		for(int i = 0; i < sess; ++i)
 		{
 			settings.setArrayIndex(i);
 			printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
@@ -327,7 +335,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					m_sessionMap[session->name] = session;
 				}
 			}
-		}/*}}}*/
+		}
 	}
 
 	updateHeaders();
@@ -381,7 +389,7 @@ void OOStudio::browse(int form)/*{{{*/
 			QString dirname = QFileDialog::getExistingDirectory(
 				this,
 				tr("Select a Directory"),
-				QDir::currentPath());
+				TEMPLATE_DIR);
 			if(!dirname.isNull())
 			{
 				m_txtLocation->setText(dirname);
@@ -498,9 +506,9 @@ void OOStudio::resetCreate(bool fromClear)/*{{{*/
 	if(fromClear)
 	{
 		m_txtName->setText("");
-		m_txtLocation->setText("");
 		m_cmbTemplate->setCurrentIndex(0);
 	}
+	m_txtLocation->setText(TEMPLATE_DIR);
 	m_txtLSHost->setText(LS_HOSTNAME);
 	m_txtLSPort->setText(QString::number(LS_PORT));
 	m_txtLSCommand->setText(LS_COMMAND);
@@ -616,12 +624,6 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			else
 				m_jackProcess->start(jackCmd, args);
 			bool rv = m_jackProcess->waitForStarted(150000);
-			rv = m_jackProcess->waitForReadyRead();
-			while(m_jackProcess->state() == QProcess::Starting && m_jackProcess->state() != QProcess::NotRunning)
-			{
-				printf("Waiting for jack process to start\n");
-				sleep(1);
-			}
 			rv = (m_jackProcess->state() == QProcess::Running);
 			if(rv && m_jackProcess->state() == QProcess::Running)
 			{
