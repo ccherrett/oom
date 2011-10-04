@@ -255,7 +255,9 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 #if defined(OSC_SUPPORT) || defined(LV2_SUPPORT)
 	showNativeGuiAction->setEnabled(true);
 #else
+	printf("Disabling show Native\n");
 	showNativeGuiAction->setEnabled(false);
+	showNativeGuiAction->hide();
 #endif
 
 	if (pipe->empty(idx))
@@ -313,7 +315,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 			if(oldPlugin)
 			{
 		#ifdef LV2_SUPPORT
-				if(oldPlugin->type() == 2)
+				if(oldPlugin->type() == 1)
 				{
 					LV2PluginI* lp = (LV2PluginI*)oldPlugin;
 					delete lp;
@@ -339,6 +341,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 		}
 		case SHOW_NATIVE:
 		{
+			printf("Show native GUI called\n");
 			bool flag = !pipe->nativeGuiVisible(idx);
 			pipe->showNativeGui(idx, flag);
 			break;
@@ -386,8 +389,13 @@ void EffectRack::doubleClicked(QListWidgetItem* it)
 	}
 	if (pipe)
 	{
-		bool flag = !pipe->guiVisible(idx);
-		pipe->showGui(idx, flag);
+#if defined(OSC_SUPPORT) || defined(LV2_SUPPORT)
+			bool flag = !pipe->nativeGuiVisible(idx);
+			pipe->showNativeGui(idx, flag);
+#else
+			bool flag = !pipe->guiVisible(idx);
+			pipe->showGui(idx, flag);
+#endif
 	}
 }
 
@@ -418,7 +426,7 @@ void EffectRack::savePreset(int idx)
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
 		#ifdef LV2_SUPPORT
-			if((*pipe)[idx]->type() == 2)
+			if((*pipe)[idx]->type() == 1)
 			{
 				printf("Saving LV2 preset\n");
 				LV2PluginI* lp = (LV2PluginI*)(*pipe)[idx];
@@ -476,7 +484,7 @@ void EffectRack::startDrag(int idx)
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
 		#ifdef LV2_SUPPORT
-			if((*pipe)[idx]->type() == 2)
+			if((*pipe)[idx]->type() == 1)
 			{
 				LV2PluginI* lp = (LV2PluginI*)(*pipe)[idx];
 				if(lp)

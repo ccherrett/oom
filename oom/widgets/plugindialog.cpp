@@ -27,7 +27,7 @@ QStringList PluginDialog::sortItems = QStringList();
 PluginDialog::PluginDialog(QWidget* parent)
 : QDialog(parent)
 {
-	m_display_type = 2; //Default to LV2
+	m_display_type = 1; //Default to LV2
 
 	setWindowTitle(tr("OOMidi: select plugin"));
 	QVBoxLayout* vbox = new QVBoxLayout(this);
@@ -158,9 +158,9 @@ PluginDialog::PluginDialog(QWidget* parent)
 
 	m_cmbType = new QComboBox(this);
 	m_cmbType->addItem("LADSPA");
-	m_cmbType->addItem("DSSI");
+	//m_cmbType->addItem("DSSI");
 	m_cmbType->addItem("LV2");
-	m_cmbType->setCurrentIndex(2);
+	m_cmbType->setCurrentIndex(1);
 	panelbox->addWidget(m_cmbType);
 	panelbox->addWidget(sortLabel);
 	panelbox->addWidget(sortBox);
@@ -191,7 +191,7 @@ PluginDialog::PluginDialog(QWidget* parent)
 void PluginDialog::showEvent(QShowEvent*)
 {
 	QRect geo = tconfig().get_property("PluginDialog", "geometry", QRect(0,0,800, 600)).toRect();
-	int type = tconfig().get_property("PluginDialog", "plugin_type", 2).toInt();
+	int type = tconfig().get_property("PluginDialog", "plugin_type", 1).toInt();
 	selectedPlugType = tconfig().get_property("PluginDialog", "channel_type", 0).toInt();
 	m_cmbType->setCurrentIndex(type);
 	setGeometry(geo);

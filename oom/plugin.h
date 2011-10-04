@@ -63,8 +63,8 @@ public:
 
 enum PluginType {
 	LADSPA = 0,
-	DSSI,
-	LV2
+	LV2 = 1,
+	DSSI = 2
 };
 
 typedef int PluginHint;
@@ -564,7 +564,7 @@ public:
 
     const char* paramName(int i)
     {
-		if(m_type == 2)
+		if(m_type == LV2)
         	return controls[i].name.c_str();
 		else
 			return _plugin->portName(controls[i].idx);

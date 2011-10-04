@@ -144,6 +144,30 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	_resetProgram = false;
 	m_globalState = false;
 	m_eventPart = 0;
+	
+	//Hide nonsense
+	textLabel1->hide();
+	recordButton->hide();
+	iHBank->hide();
+	iLBank->hide();
+	TextLabel4->hide();
+	TextLabel5->hide();
+	iLautst->hide();
+	iPan->hide();
+	iVerz->hide();
+	iLen->hide();
+	iKompr->hide();
+	iAnschl->hide();
+	iProgram->hide();
+	progRecButton->hide();
+	volRecButton->hide();
+	panRecButton->hide();
+	TextLabel10->hide();
+	TextLabel11->hide();
+	TextLabel12->hide();
+	TextLabel13->hide();
+
+	
 	_matrix = new QList<int>;
 	_tableModel = new ProgramChangeTableModel(this);
 	tableView = new ProgramChangeTable(this);
@@ -364,6 +388,7 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 	bool adv = tconfig().get_property("Conductor", "advanced", false).toBool();
 	chkAdvanced->setChecked(adv);
+	iRButton->setIcon(*connectIconSet3);
 }
 
 Conductor::~Conductor()

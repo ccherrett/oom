@@ -1351,7 +1351,7 @@ bool Pipeline::isDssiPlugin(int idx) const
 	if (p)
 	{
 #ifdef LV2_SUPPORT
-		if(p->type() == 2)
+		if(p->type() == LV2)
 		{
 			//LV2PluginI* lp = (LV2PluginI*)p;
 			//FIXME: For now this just check to enable native gui support, so we return true for lv2
@@ -1375,7 +1375,7 @@ void Pipeline::showGui(int idx, bool flag)
 	if (p)
 	{
 #ifdef LV2_SUPPORT
-		if(p->type() == 2)
+		if(p->type() == LV2)
 		{
 			LV2PluginI* lp = (LV2PluginI*)p;
 			lp->showGui(flag);
@@ -1398,7 +1398,7 @@ void Pipeline::showNativeGui(int idx, bool flag)
 	bool islv2 = false;
 	PluginI* p = (*this)[idx];
 #ifdef LV2_SUPPORT
-	islv2 = (p->type() == 2);
+	islv2 = (p->type() == LV2);
 	if(islv2)
 	{
 		LV2PluginI* lvp = (LV2PluginI*)p;
@@ -1414,7 +1414,7 @@ void Pipeline::showNativeGui(int idx, bool flag)
 {
 #ifdef LV2_SUPPORT
 	PluginI* p = (*this)[idx];
-	bool islv2 = (p->type() == 2);
+	bool islv2 = (p->type() == LV2);
 	if(islv2)
 	{
 		LV2PluginI* lvp = (LV2PluginI*)p;
@@ -1435,7 +1435,7 @@ void Pipeline::deleteGui(int idx)
 		return;
 	PluginI* p = (*this)[idx];
 #ifdef LV2_SUPPORT
-	if(p && p->type() == 2)
+	if(p && p->type() == LV2)
 	{
 		LV2PluginI* lp = (LV2PluginI*)p;
 		if(lp)
@@ -1489,7 +1489,7 @@ void Pipeline::updateNativeGui()
 	for (iPluginI i = begin(); i != end(); ++i)
 	{
 		PluginI* p = (PluginI*)*i;
-		if(p && p->type() == 2)
+		if(p && p->type() == LV2)
 		{
 			LV2PluginI* lp = (LV2PluginI*)p;
 			if(lp)
@@ -1512,7 +1512,7 @@ void Pipeline::apply(int ports, unsigned long nframes, float** buffer1)/*{{{*/
 	{
 		PluginI* p = *ip;
 #ifdef LV2_SUPPORT
-		if(p && p->type() == 2)
+		if(p && p->type() == LV2)
 		{
 			LV2PluginI* lp = (LV2PluginI*)p;/*{{{*/
 			if (lp && lp->on())
@@ -1604,7 +1604,7 @@ PluginI::PluginI()
 
 PluginI::~PluginI()
 {
-	if (_plugin && m_type != 2)
+	if (_plugin && m_type != LV2)
 	{
 		deactivate();
 		_plugin->incReferences(-1);
@@ -1958,6 +1958,8 @@ void PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 
 void PluginI::deactivate()
 {
+	if(m_type == LV2)
+		return;
 	for (int i = 0; i < instances; ++i)
 	{
 		_plugin->deactivate(handle[i]);

@@ -189,9 +189,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-115</y>
          <width>188</width>
-         <height>520</height>
+         <height>475</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1336,21 +1336,30 @@
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>24</width>
-                     <height>24</height>
+                     <width>25</width>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>24</width>
-                     <height>24</height>
+                     <width>25</width>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="toolTip">
-                    <string>input routing</string>
+                    <string>Input Routing</string>
                    </property>
                    <property name="text">
-                    <string>In</string>
+                    <string/>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>25</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="autoRaise">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1392,19 +1401,6 @@
                 </layout>
                </item>
               </layout>
-             </item>
-             <item>
-              <spacer name="verticalSpacer">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </widget>

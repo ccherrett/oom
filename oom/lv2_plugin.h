@@ -250,7 +250,7 @@ private:
 
 public:
 	LV2PluginI();
-	virtual ~LV2PluginI();
+	~LV2PluginI();
 	LV2Plugin* plugin() {
 		return m_plugin;
 	}

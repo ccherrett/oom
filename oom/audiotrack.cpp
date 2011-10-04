@@ -197,7 +197,7 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)/*{{{*/
 				removeController(id);
 			}
 #ifdef LV2_SUPPORT
-			if(oldPlugin->type() == 2)
+			if(oldPlugin->type() == LV2)
 			{
 				LV2PluginI* plug = (LV2PluginI*)oldPlugin;
 				if(plug)
@@ -225,7 +225,7 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)/*{{{*/
 			float min, max;
 #ifdef LV2_SUPPORT
 			//printf("AudioTrack::addPlugin %d\n", plugin->type());
-			if(plugin->type() == 2)
+			if(plugin->type() == LV2)
 			{
 				LV2PluginI* plug = (LV2PluginI*)plugin;
 				if(plug)
@@ -879,7 +879,7 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 		if (*ip)
 		{
 	#ifdef LV2_SUPPORT
-			if((*ip)->type() == 2)
+			if((*ip)->type() == LV2)
 			{
 				LV2PluginI* lp = (LV2PluginI*)*ip;
 					lp->writeConfiguration(level, xml);
@@ -1109,7 +1109,7 @@ void AudioTrack::showPendingPluginNativeGuis()
 		if (p->isShowNativeGuiPending())
 		{
 	#ifdef LV2_SUPPORT
-			if(p->type() == 2)
+			if(p->type() == LV2)
 			{
 				LV2PluginI* lp = (LV2PluginI*)p;
 				if(lp)
@@ -1143,7 +1143,7 @@ void AudioTrack::mapRackPluginsToControllers()
 				continue;
 
 		#ifdef LV2_SUPPORT
-			if(p->type() == 2)
+			if(p->type() == LV2)
 			{
 				LV2PluginI* lp = (LV2PluginI*)p;
 				if (i != idx)
@@ -1222,7 +1222,7 @@ void AudioTrack::mapRackPluginsToControllers()
 				l->setMode(CtrlList::INTERPOLATE);
 			l->setCurVal(p->param(i));
 		#ifdef LV2_SUPPORT
-			if(p->type() == 2)
+			if(p->type() == LV2)
 			{
 				LV2PluginI* lp = (LV2PluginI*)p;
 				if(lp)
