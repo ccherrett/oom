@@ -741,7 +741,7 @@ CItem* ComposerCanvas::addPartAtCursor(Track* track)
 		case Track::DRUM:
 			pa = new MidiPart((MidiTrack*) track);
 			pa->setTick(pos);
-			pa->setLenTick(0);
+			pa->setLenTick(8000);
 			break;
 		case Track::WAVE:
 			//pa = new WavePart((WaveTrack*) track);

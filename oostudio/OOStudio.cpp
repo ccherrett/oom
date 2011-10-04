@@ -68,7 +68,7 @@ OOStudio::OOStudio()
 	createConnections();
 
 	m_trayIcon->show();
-	setWindowTitle(tr("OOMIDI: Studio"));
+	setWindowTitle(QString(tr("OOMidi: Studio")).append("-").append(VERSION));
 	QSettings settings("OOMidi", "OOStudio");
 	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
 	resize(size);
@@ -80,8 +80,13 @@ OOStudio::OOStudio()
 #ifdef OOM_INSTALL_BIN
 	//qDebug() << OOM_INSTALL_BIN;
 	//qDebug() << LIBDIR;
-	printf("Found install path: %s\n", OOM_INSTALL_BIN);
+	qDebug() << "Found install path: " << OOM_INSTALL_BIN;
 #endif
+}
+
+void OOStudio::showMessage(QString msg)
+{
+	statusbar->showMessage(msg, 2000);
 }
 
 void OOStudio::createTrayIcon()/*{{{*/
@@ -237,6 +242,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				//printf("Processing session %s \n", session->name.toUtf8().constData());
 				QStandardItem* name = new QStandardItem(session->name);
 				QStandardItem* path = new QStandardItem(session->path);
+				path->setToolTip(session->path);
 				QList<QStandardItem*> rowData;
 				rowData << name << path;
 				if(session->istemplate)
@@ -272,18 +278,27 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 	{
 		QSettings settings("OOMidi", "OOStudio");
 		sess = settings.beginReadArray("Sessions");
-		printf("OOStudio::populateSession: sessions: %d\n", sess);
+		QString msg("OOStudio::populateSession: sessions: ");
+		msg.append(QString::number(sess));
+		qDebug() << msg;
+		//printf("OOStudio::populateSession: sessions: %d\n", sess);
+		showMessage(msg);
 
 		for(int i = 0; i < sess; ++i)
 		{
 			settings.setArrayIndex(i);
-			printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
+			msg = QString("Processing template ");
+			msg.append(settings.value("name").toString());
+			qDebug() << msg;
+			showMessage(msg);
+			//printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
 			OOSession* session = readSession(settings.value("path").toString());
 			if(session)
 			{
-				printf("Found valid session\n");
+				//printf("Found valid session\n");
 				QStandardItem* name = new QStandardItem(session->name);
 				QStandardItem* path = new QStandardItem(session->path);
+				path->setToolTip(session->path);
 				QList<QStandardItem*> rowData;
 				rowData << name << path;
 				if(session->istemplate)
@@ -298,7 +313,10 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 		for(int i = 0; i < sess; ++i)
 		{
 			settings.setArrayIndex(i);
-			printf("Processing session %s \n", settings.value("name").toString().toUtf8().constData());
+			msg = QString("Processing session ");
+			msg.append(settings.value("name").toString());
+			qDebug() << msg;
+			showMessage(msg);
 			OOSession* session = readSession(settings.value("path").toString());
 			if(session)
 			{
@@ -606,6 +624,7 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 	{
 		if(session->loadJack)
 		{
+			showMessage("Launching jackd");
 			printf("Launching jackd: ");
 			m_jackProcess = new QProcess(this);
 			connect(m_jackProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processJackMessages()));
@@ -633,6 +652,8 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			}*/
 			bool rv = pingJack();
 			printf("%s\n", rv ? " Complete" : " FAILED");
+			showMessage(rv ? "Launching jackd Complete" : "Launching jackd FAILED");
+			showMessage("Launching jackd");
 			m_jackRunning = rv;
 			return rv;
 		}
@@ -648,18 +669,69 @@ bool OOStudio::pingJack()/*{{{*/
 	jack_status_t status;
 	jack_client_t *client;
 	int retry = 0;
-	while((client = jack_client_open("OOStudio_Check", JackNoStartServer, &status, NULL)) == 0 && retry < 3)
+	sleep(1);
+	while((client = jack_client_open("OOStudio", JackNoStartServer, &status, NULL)) == 0 && retry < 3)
 	{
 		rv = false;
 		++retry;
 		sleep(1);
 	}
 	
-	if(client)// && status == JackServerStarted)
+	if(client != 0)
 	{
+		switch(status)
+		{
+			case JackServerStarted:
+				printf(" Server Startup");
+				rv = true;
+			break;
+			case JackFailure:
+				printf(" General Failure");
+				rv = false;
+			break;
+			case JackServerError:
+				printf(" Server Error");
+				rv = false;
+			case JackClientZombie:
+			break;
+			case JackServerFailed:
+				printf(" Server Failed");
+				rv = false;
+			break;
+			case JackNoSuchClient:
+				printf(" No Such Client");
+				rv = false;
+			break;
+			case JackInitFailure:
+				printf(" Init Failure");
+				rv = false;
+			break;
+			case JackNameNotUnique:
+				printf(" Name Not Unique");
+				rv = false;
+			break;
+			case JackInvalidOption:
+				printf(" Invalid Option");
+				rv = false;
+			break;
+			case JackLoadFailure:
+				printf(" Load Failure");
+				rv = false;
+			break;
+			case JackVersionError:
+				printf(" Version Error");
+				rv = false;
+			break;
+			case JackBackendError:
+				printf(" Backend Error");
+				rv = false;
+			break;
+			default:
+				rv = true;
+			break;
+		}
+		//printf(" %d", status);
 		jack_client_close(client);
-
-		rv = true;
 	}
 	else
 	{
@@ -675,6 +747,7 @@ bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
 	{
 		if(session->loadls)
 		{
+			showMessage("Launching linuxsampler... ");
 			printf("Launching linuxsampler ");
 			m_lsProcess = new QProcess(this);
 			connect(m_lsProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processLSMessages()));
@@ -692,6 +765,7 @@ bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
 			}
 			if(!m_lsProcess->waitForStarted())
 			{
+				showMessage("LinuxSampler startup FAILED");
 				printf("FAILED\n");
 				return false;
 			}
@@ -705,6 +779,7 @@ bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
 				++retry;
 			}
 			printf("%s\n", rv ? "Complete" : "FAILED");
+			showMessage(rv ? "Launching linuxsampler Complete" : "Launching linuxsampler FAILED");
 			m_lsRunning = rv;
 			return rv;
 		}
@@ -741,6 +816,7 @@ bool OOStudio::loadLSCP(OOSession* session)/*{{{*/
 {
 	if(session)
 	{
+		showMessage("Loading LSCP File into linuxsampler engine");
 		printf("Loading LSCP ");
 		lscp_client_t* client = ::lscp_client_create(session->lshostname.toUtf8().constData(), session->lsport, client_callback, this);
 		if(client == NULL)
@@ -828,6 +904,7 @@ bool OOStudio::runOOM(OOSession* session)/*{{{*/
 {
 	if(session)
 	{
+		showMessage("Loading OOMidi...");
 		printf("Loading OOMidi ");
 		m_oomProcess = new QProcess(this);
 		connect(m_oomProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processOOMMessages()));
@@ -838,6 +915,7 @@ bool OOStudio::runOOM(OOSession* session)/*{{{*/
 		m_oomProcess->start(QString(OOM_INSTALL_BIN), args);
 		bool rv = m_oomProcess->waitForStarted();
 		printf("%s\n", rv ? "Complete" : "FAILED");
+		showMessage(rv ? "Loading OOMidi Complete" : "Loading OOMidi FAILED");
 		m_oomRunning = rv;
 		return rv;
 	}
@@ -846,7 +924,7 @@ bool OOStudio::runOOM(OOSession* session)/*{{{*/
 
 void OOStudio::sessionDoubleClicked(QModelIndex index)/*{{{*/
 {
-	printf("OOStudio::sessionDoubleClicked - row: %d\n", index.row());
+	//printf("OOStudio::sessionDoubleClicked - row: %d\n", index.row());
 	if(index.isValid())
 	{
 		QStandardItem* item = m_sessionModel->item(index.row());
@@ -863,7 +941,7 @@ void OOStudio::sessionDoubleClicked(QModelIndex index)/*{{{*/
 
 void OOStudio::templateDoubleClicked(QModelIndex index)/*{{{*/
 {
-	printf("OOStudio::templateDoubleClicked - row: %d\n", index.row());
+	//printf("OOStudio::templateDoubleClicked - row: %d\n", index.row());
 	if(index.isValid())
 	{
 		QStandardItem* item = m_templateModel->item(index.row());
@@ -1069,6 +1147,7 @@ void OOStudio::loadSession(OOSession* session)/*{{{*/
 {
 	if(session)
 	{
+		showMessage("OOStudio::loadSession :"+session->name);
 		printf("OOStudio::loadSession : name: %s\n", session->name.toUtf8().constData());
 		printf("OOStudio::loadSession : path: %s\n", session->path.toUtf8().constData());
 		/*if(checkOOM())
@@ -1356,6 +1435,7 @@ void OOStudio::createSession()/*{{{*/
 					npath->setToolTip(filename);
 					QList<QStandardItem*> rowData;
 					rowData << nitem << npath;
+					showMessage("Successfully Created Session: "+basename);
 					if(istemplate)
 					{
 						m_templateModel->appendRow(rowData);
@@ -1364,7 +1444,7 @@ void OOStudio::createSession()/*{{{*/
 					{
 						//Not a template so load it now and minimize;
 						m_sessionModel->appendRow(rowData);
-						QString msg = QObject::tr("Successfully Create Session:\n\t%1 \nWould you like to open this session now?");
+						QString msg = QObject::tr("Successfully Created Session:\n\t%1 \nWould you like to open this session now?");
 						if(QMessageBox::question(
 							this,
 							tr("Open Session"),
@@ -1612,7 +1692,7 @@ void OOStudio::updateSession()/*{{{*/
 void OOStudio::templateSelectionChanged(int index)/*{{{*/
 {
 	QString tpath = m_cmbTemplate->itemData(index).toString();
-	printf("OOStudio::templateSelectionChanged index: %d, name: %s sessions:%d\n", index, tpath.toUtf8().constData(), m_sessionMap.size());
+	//printf("OOStudio::templateSelectionChanged index: %d, name: %s sessions:%d\n", index, tpath.toUtf8().constData(), m_sessionMap.size());
 	if(!index || (index == 1 && m_cmbEditMode->currentIndex() == 1))
 	{
 		resetCreate();

@@ -660,6 +660,7 @@ QLabel::disabled
 
 QSplitter::handle{
 background-color: #2f2f2f;
+width: 2px;
 }
 
 QFrame, QWidget#CCEditBase { 

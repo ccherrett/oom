@@ -9,8 +9,8 @@ OOClient::OOClient(QString host, quint16 port, QObject* parent)
 {
 	connect(&m_client, SIGNAL(connected()), this, SLOT(clientConnect()));
 	connect(&m_client, SIGNAL(disconnect()), this, SLOT(clientDisconnect()));
-	connect(&m_client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorHandler(QAbstractSocket::SocketError)));
-	connect(&m_client, SIGNAL(hostFound()), this, SLOT(hostFound()));
+	//connect(&m_client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorHandler(QAbstractSocket::SocketError)));
+	//connect(&m_client, SIGNAL(hostFound()), this, SLOT(hostFound()));
 }
 
 OOClient::~OOClient()
@@ -46,7 +46,7 @@ void OOClient::connectClient()
 
 void OOClient::errorHandler(QAbstractSocket::SocketError type)
 {
-	printf("An ERROR has occurred: %d\n", type);
+	//printf("An ERROR has occurred: %d\n", type);
 }
 
 void OOClient::callShutdown()

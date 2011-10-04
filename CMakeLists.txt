@@ -74,11 +74,11 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 # The OOMidi version number.
 SET(OOMidi_VERSION_MAJOR 2011)
-SET(OOMidi_VERSION_MINOR 2)
+SET(OOMidi_VERSION_MINOR 3)
 SET(OOMidi_VERSION_PATCH 0)
-SET(OOMidi_VERSION       "2011.2")
-SET(OOMidi_VERSION_FULL  "2011.2")
-SET(OOMidi_INSTALL_NAME  "oom-2011.2")
+SET(OOMidi_VERSION       "2011.3")
+SET(OOMidi_VERSION_FULL  "2011.3")
+SET(OOMidi_INSTALL_NAME  "oom-2011.3")
 SET(OOMidi_EXEC_NAME     "oomidi")
 SET(OOMidi_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/bin/${OOMidi_EXEC_NAME}")
 
@@ -224,51 +224,51 @@ endif (JACK2_FOUND)
 ## find LASH 
 ##
 
-if (ENABLE_LASH)
-      PKG_CHECK_MODULES(LASH lash-1.0>=0.2)
-      if (LASH_FOUND)
-            include_directories(${LASH_INCLUDE_DIRS})
-            set(HAVE_LASH ON)
-      endif (LASH_FOUND)           
-	  #else (ENABLE_LASH)
-	  #      message("LASH disabled")
-endif (ENABLE_LASH)
-
-##
-## check for liblo >= 0.23
-##
-
-if (ENABLE_OSC)
-      PKG_CHECK_MODULES(LIBLO liblo>=0.23)
-      if (LIBLO_FOUND)
-            include_directories(${LIBLO_INCLUDE_DIRS})
-            set(OSC_SUPPORT ON)
-      endif (LIBLO_FOUND)
-	  #else (ENABLE_OSC)
-	  #      message("OSC disabled")
-endif (ENABLE_OSC)
-
-##
-## check for dssi >= 0.9.0
-##
-
-if (ENABLE_DSSI)
-      PKG_CHECK_MODULES(DSSI dssi>=0.9.0)
-      if (DSSI_FOUND)
-            include_directories(${DSSI_INCLUDE_DIRS})
-            set(DSSI_SUPPORT ON)
-      endif (DSSI_FOUND)
-	  #else (ENABLE_DSSI)
-	  #      message("DSSI disabled")
-endif (ENABLE_DSSI)
-
-if (ENABLE_VST)
-      message("VST support enabled")
-      set (VST_SUPPORT TRUE)
-else (ENABLE_VST)
-	#      message("VST support disabled")
-      set (VST_SUPPORT FALSE)
-endif (ENABLE_VST)
+#if (ENABLE_LASH)
+#      PKG_CHECK_MODULES(LASH lash-1.0>=0.2)
+#      if (LASH_FOUND)
+#            include_directories(${LASH_INCLUDE_DIRS})
+#            set(HAVE_LASH ON)
+#      endif (LASH_FOUND)           
+#	  #else (ENABLE_LASH)
+#	  #      message("LASH disabled")
+#endif (ENABLE_LASH)
+#
+###
+### check for liblo >= 0.23
+###
+#
+#if (ENABLE_OSC)
+#      PKG_CHECK_MODULES(LIBLO liblo>=0.23)
+#      if (LIBLO_FOUND)
+#            include_directories(${LIBLO_INCLUDE_DIRS})
+#            set(OSC_SUPPORT ON)
+#      endif (LIBLO_FOUND)
+#	  #else (ENABLE_OSC)
+#	  #      message("OSC disabled")
+#endif (ENABLE_OSC)
+#
+###
+### check for dssi >= 0.9.0
+###
+#
+#if (ENABLE_DSSI)
+#      PKG_CHECK_MODULES(DSSI dssi>=0.9.0)
+#      if (DSSI_FOUND)
+#            include_directories(${DSSI_INCLUDE_DIRS})
+#            set(DSSI_SUPPORT ON)
+#      endif (DSSI_FOUND)
+#	  #else (ENABLE_DSSI)
+#	  #      message("DSSI disabled")
+#endif (ENABLE_DSSI)
+#
+#if (ENABLE_VST)
+#      message("VST support enabled")
+#      set (VST_SUPPORT TRUE)
+#else (ENABLE_VST)
+#	#      message("VST support disabled")
+#      set (VST_SUPPORT FALSE)
+#endif (ENABLE_VST)
 
 #if (ENABLE_LSCP)
       PKG_CHECK_MODULES(LSCP REQUIRED lscp)
@@ -349,27 +349,27 @@ SET (USE_SSE false)
 ## check for fluidsynth
 ##
 
-if ( ENABLE_FLUID )
-      # Be careful with naming here since we have two shared synth libraries
-      #  to be built later, named 'fluidsynth' and 'fluid' !
-      PKG_CHECK_MODULES(FLUIDSYN fluidsynth>=0.9.0)
-      if (FLUIDSYN_FOUND)
-            include_directories(${FLUIDSYN_INCLUDE_DIRS})
-            set(HAVE_FLUIDSYNTH ON)
-            # message("FLUIDSYN_LIBRARIES " ${FLUIDSYN_LIBRARIES} )          # "fluidsynth"
-            # message("FLUIDSYN_LDFLAGS " ${FLUIDSYN_LDFLAGS} )              # "-lfluidsynth"
-            # message("FLUIDSYN_LDFLAGS_OTHER " ${FLUIDSYN_LDFLAGS_OTHER} )  # empty
-            # message("FLUIDSYN_INCLUDE_DIRS " ${FLUIDSYN_INCLUDE_DIRS} )    # empty
-            # message("FLUIDSYN_CFLAGS " ${FLUIDSYN_CFLAGS} )                # empty
-            # message("FLUIDSYN_CFLAGS_OTHER " ${FLUIDSYN_CFLAGS_OTHER} )    # empty
-      endif (FLUIDSYN_FOUND)
-else ( ENABLE_FLUID )
-      message("Fluidsynth disabled")
-endif ( ENABLE_FLUID )
+#if ( ENABLE_FLUID )
+#      # Be careful with naming here since we have two shared synth libraries
+#      #  to be built later, named 'fluidsynth' and 'fluid' !
+#      PKG_CHECK_MODULES(FLUIDSYN fluidsynth>=0.9.0)
+#      if (FLUIDSYN_FOUND)
+#            include_directories(${FLUIDSYN_INCLUDE_DIRS})
+#            set(HAVE_FLUIDSYNTH ON)
+#            # message("FLUIDSYN_LIBRARIES " ${FLUIDSYN_LIBRARIES} )          # "fluidsynth"
+#            # message("FLUIDSYN_LDFLAGS " ${FLUIDSYN_LDFLAGS} )              # "-lfluidsynth"
+#            # message("FLUIDSYN_LDFLAGS_OTHER " ${FLUIDSYN_LDFLAGS_OTHER} )  # empty
+#            # message("FLUIDSYN_INCLUDE_DIRS " ${FLUIDSYN_INCLUDE_DIRS} )    # empty
+#            # message("FLUIDSYN_CFLAGS " ${FLUIDSYN_CFLAGS} )                # empty
+#            # message("FLUIDSYN_CFLAGS_OTHER " ${FLUIDSYN_CFLAGS_OTHER} )    # empty
+#      endif (FLUIDSYN_FOUND)
+#else ( ENABLE_FLUID )
+#      message("Fluidsynth disabled")
+#endif ( ENABLE_FLUID )
 
-if ( ENABLE_EXPERIMENTAL )
-      set(CMAKE_CXX_FLAGS -DBUILD_EXPERIMENTAL ${CMAKE_CXX_FLAGS})
-endif ( ENABLE_EXPERIMENTAL )
+#if ( ENABLE_EXPERIMENTAL )
+#      set(CMAKE_CXX_FLAGS -DBUILD_EXPERIMENTAL ${CMAKE_CXX_FLAGS})
+#endif ( ENABLE_EXPERIMENTAL )
 
 #
 # produce config.h file

@@ -807,7 +807,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	g_trackDragImageList.insert(Track::AUDIO_AUX, *dragAuxIcon);
 	g_trackDragImageList.insert(Track::AUDIO_SOFTSYNTH, *dragAudioIcon);
 
-	appName = QString("The Composer - OOMidi     ");
+	appName = QString("The Composer - OOMidi-").append(VERSION).append("     ");
 	setWindowTitle(appName);
 
 	qRegisterMetaType<CCInfo>("CCInfo");
@@ -1912,7 +1912,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	if (!songTemplate)
 	{
 		addProject(project.absoluteFilePath());
-		setWindowTitle(QString("The Composer - OOMidi:     ") + project.completeBaseName() + QString("     "));
+		setWindowTitle(QString("The Composer - OOMidi-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
 	}
 	song->dirty = false;
 
@@ -2004,7 +2004,7 @@ void OOMidi::setUntitledProject()
 	project.setFile(name);
 	oomProjectFile = project.filePath();
 	//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
-	setWindowTitle(QString("The Composer - OOMidi:     ") + project.completeBaseName() + QString("     "));
+	setWindowTitle(QString("The Composer - OOMidi-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
 }
 
 //---------------------------------------------------------
@@ -3604,7 +3604,7 @@ bool OOMidi::saveAs()
 			project.setFile(name);
 			oomProjectFile = project.filePath();
 			//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
-			setWindowTitle(QString("The Composer - OOMidi:     ") + project.completeBaseName() + QString("     "));
+			setWindowTitle(QString("The Composer - OOMidi-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
 			addProject(name);
 		}
 		else
@@ -5194,7 +5194,7 @@ OOMidi::lash_idle_cb()
 				{
 					project.setFile(ss.toAscii());
 					//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
-					setWindowTitle(QString("The Composer - OOMidi:     ") + project.completeBaseName()  + QString("     "));
+					setWindowTitle(QString("The Composer - OOMidi-").append(VERSION).append(":     ") + project.completeBaseName()  + QString("     "));
 					addProject(ss.toAscii());
 					oomProject = QFileInfo(ss.toAscii()).absolutePath();
 					oomProjectFile = QFileInfo(ss.toAscii()).filePath();
