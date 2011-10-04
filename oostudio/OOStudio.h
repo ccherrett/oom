@@ -12,6 +12,7 @@
 #include <lscp/socket.h>
 
 #include <QDialog>
+#include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QList>
 #include <QHash>
@@ -51,21 +52,19 @@ struct OOSession
 	int lsport;
 };
 
-class OOStudio :public QDialog ,public Ui::OOStudioBase
+class OOStudio :public QMainWindow ,public Ui::OOStudioBase
 {
 	Q_OBJECT
 
 public:
 	OOStudio();
-	void setVisible(bool);
 
 private:
 	bool m_incleanup;
-	QAction* m_maximizeAction;
-	QAction* m_minimizeAction;
-	QAction* m_restoreAction;
+	bool m_jackRunning;
+	bool m_oomRunning;
+	bool m_lsRunning;
 	QAction* m_quitAction;
-	QAction* m_importAction;
 	QSystemTrayIcon* m_trayIcon;
 	QMenu* m_trayMenu;
 	QProcess* m_jackProcess;
@@ -111,8 +110,6 @@ private:
 	QString convertPath(QString);
 	void doSessionDelete(OOSession*);
 
-public slots:
-	void showNormalImpl();
 protected:
 	void closeEvent(QCloseEvent*);
 	void resizeEvent(QResizeEvent*);
@@ -139,9 +136,9 @@ private slots:
 	void deleteSession();
 	bool stopCurrentSession();
 	void editModeChanged(int);
-	void oomRemoteShutdown();
 	void sessionDoubleClicked(QModelIndex);
 	void templateDoubleClicked(QModelIndex);
+	void currentTopTabChanged(int);
 	//Process Listeners
 	void processJackExit(int, QProcess::ExitStatus);
 	void processJackExecError(QProcess::ProcessError);

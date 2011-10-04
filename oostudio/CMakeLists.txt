@@ -53,6 +53,7 @@ file (GLOB studio_source_files
 ##
 file (GLOB studio_ui_files
 	OOStudioBase.ui
+	OOStudioBase2.ui
 	)
 
 QT4_WRAP_UI (studio_ui_headers ${studio_ui_files})

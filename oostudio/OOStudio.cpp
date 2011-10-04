@@ -44,6 +44,9 @@ OOStudio::OOStudio()
 	m_lsProcess = 0;
 	m_current = 0;
 	m_incleanup = false;
+	m_jackRunning = false;
+	m_oomRunning = false;
+	m_lsRunning = false;
 	m_chkAfterOOM->hide();
 	createTrayIcon();
 	QString style(":/style.qss");
@@ -83,53 +86,22 @@ OOStudio::OOStudio()
 
 void OOStudio::createTrayIcon()/*{{{*/
 {
-	m_minimizeAction = new QAction(tr("Mi&nimize"), this);
-	m_maximizeAction = new QAction(tr("Ma&ximize"), this);
-	m_restoreAction = new QAction(tr("&Restore"), this);
 	m_quitAction = new QAction(tr("&Quit"), this);
-	m_importAction = new QAction(tr("Import existing sessions and session templates"), this);
 
 	QIcon exitIcon;
 	exitIcon.addPixmap(QPixmap(":/images/garbage_new_on.png"), QIcon::Normal, QIcon::On);
 	exitIcon.addPixmap(QPixmap(":/images/garbage_new_off.png"), QIcon::Normal, QIcon::Off);
 	exitIcon.addPixmap(QPixmap(":/images/garbage_new_over.png"), QIcon::Active);
+	actionQuit->setIcon(exitIcon);
 	m_quitAction->setIcon(exitIcon);
-	m_btnExit->setDefaultAction(m_quitAction);
 
 	QIcon importIcon;
 	importIcon.addPixmap(QPixmap(":/images/plus_new_on.png"), QIcon::Normal, QIcon::On);
 	importIcon.addPixmap(QPixmap(":/images/plus_new_off.png"), QIcon::Normal, QIcon::Off);
 	importIcon.addPixmap(QPixmap(":/images/plus_new_over.png"), QIcon::Active);
-	m_importAction->setIcon(importIcon);
-	m_btnImport->setDefaultAction(m_importAction);
-
-	QIcon minimizeIcon;
-	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_on.png"), QIcon::Normal, QIcon::On);
-	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_off.png"), QIcon::Normal, QIcon::Off);
-	minimizeIcon.addPixmap(QPixmap(":/images/down_arrow_new_over.png"), QIcon::Active);
-	m_minimizeAction->setIcon(minimizeIcon);
-	m_btnMinimize->setDefaultAction(m_minimizeAction);
-
-	QIcon maximizeIcon;
-	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_on.png"), QIcon::Normal, QIcon::On);
-	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_off.png"), QIcon::Normal, QIcon::Off);
-	maximizeIcon.addPixmap(QPixmap(":/images/up_arrow_new_over.png"), QIcon::Active);
-	m_maximizeAction->setIcon(maximizeIcon);
-	m_btnMaximize->setDefaultAction(m_maximizeAction);
-
-	m_btnRestore->hide();
-	QIcon restoreIcon;
-	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_on.png"), QIcon::Normal, QIcon::On);
-	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_off.png"), QIcon::Normal, QIcon::Off);
-	restoreIcon.addPixmap(QPixmap(":/images/refresh_new_over.png"), QIcon::Active);
-	m_restoreAction->setIcon(restoreIcon);
-	//m_btnRestore->setDefaultAction(m_restoreAction);*/
+	action_Import_Session->setIcon(importIcon);
 
 	m_trayMenu = new QMenu(this);
-	m_trayMenu->addAction(m_minimizeAction);
-	m_trayMenu->addAction(m_maximizeAction);
-	m_trayMenu->addAction(m_restoreAction);
-	m_trayMenu->addSeparator();
 	m_trayMenu->addAction(m_quitAction);
 
 	m_trayIcon = new QSystemTrayIcon(this);
@@ -180,9 +152,10 @@ void OOStudio::createModels()/*{{{*/
 	{
 		sessionDir.mkpath(TEMPLATE_DIR);
 	}
+
 }/*}}}*/
 
-void OOStudio::loadStyle(QString style)
+void OOStudio::loadStyle(QString style)/*{{{*/
 {
 	QFile cf(style);
 	if (cf.open(QIODevice::ReadOnly))
@@ -192,15 +165,12 @@ void OOStudio::loadStyle(QString style)
 		qApp->setStyleSheet(sheet);
 		cf.close();
 	}
-}
+}/*}}}*/
 
 void OOStudio::createConnections()/*{{{*/
 {
-	connect(m_minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
-	connect(m_maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
-	connect(m_restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
-	//connect(m_restoreAction, SIGNAL(triggered()), this, SLOT(showNormalImpl()));
-	connect(m_importAction, SIGNAL(triggered()), this, SLOT(importSession()));
+	connect(action_Import_Session, SIGNAL(triggered()), this, SLOT(importSession()));
+	connect(actionQuit, SIGNAL(triggered()), this, SLOT(shutdown()));
 	connect(m_quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
 
 	connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
@@ -226,14 +196,9 @@ void OOStudio::createConnections()/*{{{*/
 
 	connect(m_sessionTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(sessionDoubleClicked(QModelIndex)));
 	connect(m_templateTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(templateDoubleClicked(QModelIndex)));
-}/*}}}*/
 
-void OOStudio::showNormalImpl()
-{
-	showNormal();
-	restoreGeometry(m_restoreSize);
-	//resize(m_restoreSize);
-}
+	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTopTabChanged(int)));
+}/*}}}*/
 
 void OOStudio::updateHeaders()/*{{{*/
 {
@@ -241,6 +206,9 @@ void OOStudio::updateHeaders()/*{{{*/
 	
 	m_templateModel->setHorizontalHeaderLabels(m_templatelabels);
 	
+	m_sessionTable->setColumnWidth(0, 200);
+	m_templateTable->setColumnWidth(0, 200);
+
 	m_commandModel->setHorizontalHeaderLabels(m_commandlabels);
 
 	m_loggerModel->setHorizontalHeaderLabels(m_loglabels);
@@ -288,6 +256,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				//printf("Processing session %s \n", session->name.toUtf8().constData());
 				QStandardItem* name = new QStandardItem(session->name);
 				QStandardItem* path = new QStandardItem(session->path);
+				path->setToolTip(session->path);
 				QList<QStandardItem*> rowData;
 				rowData << name << path;
 				if(!session->istemplate)
@@ -336,6 +305,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				//printf("Found valid session\n");
 				QStandardItem* name = new QStandardItem(session->name);
 				QStandardItem* path = new QStandardItem(session->path);
+				path->setToolTip(session->path);
 				QList<QStandardItem*> rowData;
 				rowData << name << path;
 				if(!session->istemplate)
@@ -375,6 +345,15 @@ void OOStudio::browseOOM()/*{{{*/
 void OOStudio::importSession()/*{{{*/
 {
 	browse(3);
+}/*}}}*/
+
+void OOStudio::currentTopTabChanged(int tab)/*{{{*/
+{
+	if(tab == 2)
+	{
+		m_loggerTable->resizeRowsToContents();
+		m_loggerTable->scrollToBottom();
+	}
 }/*}}}*/
 
 QString OOStudio::getValidName(QString name)/*{{{*/
@@ -452,6 +431,7 @@ void OOStudio::browse(int form)/*{{{*/
 					}
 					QStandardItem* name = new QStandardItem(session->name);
 					QStandardItem* path = new QStandardItem(session->path);
+					path->setToolTip(session->path);
 					QList<QStandardItem*> rowData;
 					rowData << name << path;
 					if(session->istemplate)
@@ -534,7 +514,7 @@ void OOStudio::cleanupProcessList()/*{{{*/
 	printf("OOStudio::cleanupProcessList\n");
 	m_incleanup = false;
 	OOClient* oomclient = 0;
-	if(m_oomProcess /*checkOOM()*/)
+	if(m_oomProcess && m_oomRunning/*checkOOM()*/)
 	{
 		oomclient = new OOClient("127.0.0.1", 8415, this);
 		oomclient->callShutdown();
@@ -543,13 +523,15 @@ void OOStudio::cleanupProcessList()/*{{{*/
 		m_oomProcess->waitForFinished(500000);
 		delete m_oomProcess;
 		m_oomProcess = 0;
+		m_oomRunning = false;
 	}
-	if(m_lsProcess/* && m_lsProcess->state() == QProcess::Running*/)
+	if(m_lsProcess && m_lsRunning/* && m_lsProcess->state() == QProcess::Running*/)
 	{
 		m_lsProcess->terminate();
 		m_lsProcess->waitForFinished();
 		delete m_lsProcess;
 		m_lsProcess = 0;
+		m_lsRunning = false;
 	}
 	QList<long> keys = m_procMap.keys();
 	foreach(long key, keys)
@@ -562,12 +544,13 @@ void OOStudio::cleanupProcessList()/*{{{*/
 			delete p;
 		}
 	}
-	if(m_jackProcess/* && m_jackProcess->state() == QProcess::Running*/)
+	if(m_jackProcess && m_jackRunning/* && m_jackProcess->state() == QProcess::Running*/)
 	{
 		m_jackProcess->kill();
 		m_jackProcess->waitForFinished();
 		delete m_jackProcess;
 		m_jackProcess = 0;
+		m_jackRunning = false;
 	}
 	m_lblRunning->setText(QString(NO_PROC_TEXT));
 	m_btnStopSession->setEnabled(false);
@@ -627,8 +610,8 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			m_jackProcess = new QProcess(this);
 			connect(m_jackProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processJackMessages()));
 			connect(m_jackProcess, SIGNAL(readyReadStandardError()), this, SLOT(processJackErrors()));
-			connect(m_jackProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processJackExit(int, QProcess::ExitStatus)));
-			connect(m_jackProcess, SIGNAL(error(QProcess::ProcessError )), this, SLOT(processJackExecError(QProcess::ProcessError)));
+			//connect(m_jackProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processJackExit(int, QProcess::ExitStatus)));
+			//connect(m_jackProcess, SIGNAL(error(QProcess::ProcessError )), this, SLOT(processJackExecError(QProcess::ProcessError)));
 			QString jackCmd = session->jackcommand;
 			QStringList args = jackCmd.split(" ");
 			jackCmd = args.takeFirst();
@@ -650,6 +633,7 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 			}*/
 			bool rv = pingJack();
 			printf("%s\n", rv ? " Complete" : " FAILED");
+			m_jackRunning = rv;
 			return rv;
 		}
 		else
@@ -658,26 +642,32 @@ bool OOStudio::runJack(OOSession* session)/*{{{*/
 	return false;
 }/*}}}*/
 
-bool OOStudio::pingJack()
+bool OOStudio::pingJack()/*{{{*/
 {
 	bool rv = true;
 	jack_status_t status;
 	jack_client_t *client;
-	if((client = jack_client_open("OOStudio_Check", JackNullOption, &status, NULL)) == 0)
+	int retry = 0;
+	while((client = jack_client_open("OOStudio_Check", JackNoStartServer, &status, NULL)) == 0 && retry < 3)
 	{
-		printf("jack server not running?");
 		rv = false;
+		++retry;
+		sleep(1);
 	}
-
-	if(client && status == JackServerStarted)
+	
+	if(client)// && status == JackServerStarted)
 	{
 		jack_client_close(client);
 
 		rv = true;
 	}
-	//client = NULL;
+	else
+	{
+		printf("jack server not running?");
+	}
+	client = NULL;
 	return rv;
-}
+}/*}}}*/
 
 bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
 {
@@ -715,6 +705,7 @@ bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
 				++retry;
 			}
 			printf("%s\n", rv ? "Complete" : "FAILED");
+			m_lsRunning = rv;
 			return rv;
 		}
 		else
@@ -847,6 +838,7 @@ bool OOStudio::runOOM(OOSession* session)/*{{{*/
 		m_oomProcess->start(QString(OOM_INSTALL_BIN), args);
 		bool rv = m_oomProcess->waitForStarted();
 		printf("%s\n", rv ? "Complete" : "FAILED");
+		m_oomRunning = rv;
 		return rv;
 	}
 	return false;
@@ -1048,11 +1040,6 @@ void OOStudio::deleteSession()/*{{{*/
 	}
 }/*}}}*/
 
-void OOStudio::oomRemoteShutdown()
-{
-	printf("OOStudio::oomRemoteShutdown\n");
-}
-
 bool OOStudio::stopCurrentSession()/*{{{*/
 {
 	if(m_current)
@@ -1168,11 +1155,11 @@ void OOStudio::loadSession(OOSession* session)/*{{{*/
 			QString msg(tr("Failed to start to jackd server"));
 			msg.append("\nwith Command:\n").append(session->jackcommand);
 			QMessageBox::critical(this, tr("Jackd Failed"), msg);
-			/*if(m_jackProcess)
+			if(m_jackProcess)
 			{
 				delete m_jackProcess;
 				m_jackProcess = 0;
-			}*/
+			}
 		}
 	}
 }/*}}}*/
@@ -1366,6 +1353,7 @@ void OOStudio::createSession()/*{{{*/
 					m_sessionMap[basename] = newSession;
 					QStandardItem* nitem = new QStandardItem(basename);
 					QStandardItem* npath = new QStandardItem(filename);
+					npath->setToolTip(filename);
 					QList<QStandardItem*> rowData;
 					rowData << nitem << npath;
 					if(istemplate)
@@ -1374,6 +1362,7 @@ void OOStudio::createSession()/*{{{*/
 					}
 					else
 					{
+						//Not a template so load it now and minimize;
 						m_sessionModel->appendRow(rowData);
 						QString msg = QObject::tr("Successfully Create Session:\n\t%1 \nWould you like to open this session now?");
 						if(QMessageBox::question(
@@ -1385,7 +1374,6 @@ void OOStudio::createSession()/*{{{*/
 						{
 							loadSession(newSession);
 						}
-						//Not a template so load it now and minimize;
 					}
 					saveSettings();
 					populateSessions(true);
@@ -1768,14 +1756,6 @@ OOSession* OOStudio::readSession(QString filename)/*{{{*/
 	return 0;
 }/*}}}*/
 
-void OOStudio::setVisible(bool visible)/*{{{*/
-{
-	m_minimizeAction->setEnabled(visible);
-	m_maximizeAction->setEnabled(!isMaximized());
-	m_restoreAction->setEnabled(isMaximized() || !visible);
-	QDialog::setVisible(visible);
-}/*}}}*/
-
 void OOStudio::closeEvent(QCloseEvent* ev)/*{{{*/
 {
 	if(m_trayIcon->isVisible())
@@ -1787,7 +1767,7 @@ void OOStudio::closeEvent(QCloseEvent* ev)/*{{{*/
 
 void OOStudio::resizeEvent(QResizeEvent* evt)
 {
-	QDialog::resizeEvent(evt);
+	QMainWindow::resizeEvent(evt);
 	m_loggerTable->resizeRowsToContents();
 }
 
@@ -1807,20 +1787,20 @@ void OOStudio::iconActivated(QSystemTrayIcon::ActivationReason reason)/*{{{*/
 
 void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)/*{{{*/
 {
-	if(m_current)
+	if(!m_incleanup)
 	{
 		switch(status)
 		{
 			case QProcess::NormalExit:
 			{
-				m_restoreAction->trigger();
 				cleanupProcessList();
+				showNormal();
 			}
 			break;
 			case QProcess::CrashExit:
 			{
 				cleanupProcessList();
-				m_restoreAction->trigger();
+				showNormal();
 			}
 			break;
 		}
@@ -1861,32 +1841,112 @@ void OOStudio::processJackExecError(QProcess::ProcessError error)
 
 void OOStudio::processJackMessages()/*{{{*/
 {
-	processMessages(0, tr("Jackd"), m_jackProcess);
+	
+	QString messages = QString::fromUtf8(m_jackProcess->readAllStandardOutput().constData());
+	if(messages.isEmpty())
+		return;
+	QList<QStandardItem*> rowData;
+	QStandardItem* command = new QStandardItem("Jackd");
+	QStandardItem* log = new QStandardItem(messages);
+	QStandardItem* level = new QStandardItem("INFO");
+	rowData << command << level << log;
+	m_loggerModel->appendRow(rowData);
+	updateHeaders();
+	m_loggerTable->resizeRowsToContents();
+	m_loggerTable->scrollToBottom();
+	
+	//processMessages(0, tr("Jackd"), m_jackProcess);
 }/*}}}*/
 
 void OOStudio::processJackErrors()/*{{{*/
 {
-	processMessages(1, tr("Jackd"), m_jackProcess);
+	QString messages = QString::fromUtf8(m_jackProcess->readAllStandardError().constData());
+	if(messages.isEmpty())
+		return;
+	QList<QStandardItem*> rowData;
+	QStandardItem* command = new QStandardItem("Jackd");
+	command->setBackground(QColor(99, 36, 36));
+	QStandardItem* log = new QStandardItem(messages);
+	QStandardItem* level = new QStandardItem("ERROR");
+	rowData << command << level << log;
+	m_loggerModel->appendRow(rowData);
+	updateHeaders();
+	m_loggerTable->resizeRowsToContents();
+	m_loggerTable->scrollToBottom();
+
+	//processMessages(1, tr("Jackd"), m_jackProcess);
 }/*}}}*/
 
 void OOStudio::processLSMessages()/*{{{*/
 {
-	processMessages(0, tr("LinuxSampler"), m_lsProcess);
+	QString messages = QString::fromUtf8(m_lsProcess->readAllStandardOutput().constData());
+	if(messages.isEmpty())
+		return;
+	QList<QStandardItem*> rowData;
+	QStandardItem* command = new QStandardItem("LinuxSampler");
+	QStandardItem* log = new QStandardItem(messages);
+	QStandardItem* level = new QStandardItem("INFO");
+	rowData << command << level << log;
+	m_loggerModel->appendRow(rowData);
+	updateHeaders();
+	m_loggerTable->resizeRowsToContents();
+	m_loggerTable->scrollToBottom();
+	
+	//processMessages(0, tr("LinuxSampler"), m_lsProcess);
 }/*}}}*/
 
 void OOStudio::processLSErrors()/*{{{*/
 {
-	processMessages(1, tr("LinuxSampler"), m_lsProcess);
+	QString messages = QString::fromUtf8(m_lsProcess->readAllStandardError().constData());
+	if(messages.isEmpty())
+		return;
+	QList<QStandardItem*> rowData;
+	QStandardItem* command = new QStandardItem("LinuxSampler");
+	command->setBackground(QColor(99, 36, 36));
+	QStandardItem* log = new QStandardItem(messages);
+	QStandardItem* level = new QStandardItem("ERROR");
+	rowData << command << level << log;
+	m_loggerModel->appendRow(rowData);
+	updateHeaders();
+	m_loggerTable->resizeRowsToContents();
+	m_loggerTable->scrollToBottom();
+	//processMessages(1, tr("LinuxSampler"), m_lsProcess);
 }/*}}}*/
 
 void OOStudio::processOOMMessages()/*{{{*/
 {
-	processMessages(0, tr("OOMidi"), m_oomProcess);
+	QString messages = QString::fromUtf8(m_oomProcess->readAllStandardOutput().constData());
+	if(messages.isEmpty())
+		return;
+	QList<QStandardItem*> rowData;
+	QStandardItem* command = new QStandardItem("OOMidi");
+	QStandardItem* log = new QStandardItem(messages);
+	QStandardItem* level = new QStandardItem("INFO");
+	rowData << command << level << log;
+	m_loggerModel->appendRow(rowData);
+	updateHeaders();
+	m_loggerTable->resizeRowsToContents();
+	m_loggerTable->scrollToBottom();
+	
+	//processMessages(0, tr("OOMidi"), m_oomProcess);
 }/*}}}*/
 
 void OOStudio::processOOMErrors()/*{{{*/
 {
-	processMessages(1, tr("OOMidi"), m_oomProcess);
+	QString messages = QString::fromUtf8(m_oomProcess->readAllStandardError().constData());
+	if(messages.isEmpty())
+		return;
+	QList<QStandardItem*> rowData;
+	QStandardItem* command = new QStandardItem("OOMidi");
+	command->setBackground(QColor(99, 36, 36));
+	QStandardItem* log = new QStandardItem(messages);
+	QStandardItem* level = new QStandardItem("ERROR");
+	rowData << command << level << log;
+	m_loggerModel->appendRow(rowData);
+	updateHeaders();
+	m_loggerTable->resizeRowsToContents();
+	m_loggerTable->scrollToBottom();
+	//processMessages(1, tr("OOMidi"), m_oomProcess);
 }/*}}}*/
 
 void OOStudio::processCustomMessages(QString name, long pid)/*{{{*/
@@ -1912,7 +1972,7 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 		switch(type)
 		{
 			case 0: //Output
-			{
+			{/*{{{*/
 				QString messages = QString::fromUtf8(p->readAllStandardOutput().constData());
 				if(messages.isEmpty())
 					return;
@@ -1922,12 +1982,13 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 				QStandardItem* level = new QStandardItem("INFO");
 				rowData << command << level << log;
 				m_loggerModel->appendRow(rowData);
-				m_loggerTable->resizeRowsToContents();
 				updateHeaders();
-			}
+				m_loggerTable->resizeRowsToContents();
+				m_loggerTable->scrollToBottom();
+			}/*}}}*/
 			break;
 			case 1: //Error
-			{
+			{/*{{{*/
 				QString messages = QString::fromUtf8(p->readAllStandardError().constData());
 				if(messages.isEmpty())
 					return;
@@ -1938,9 +1999,10 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 				QStandardItem* level = new QStandardItem("ERROR");
 				rowData << command << level << log;
 				m_loggerModel->appendRow(rowData);
-				m_loggerTable->resizeRowsToContents();
 				updateHeaders();
-			}
+				m_loggerTable->resizeRowsToContents();
+				m_loggerTable->scrollToBottom();
+			}/*}}}*/
 			break;
 		}
 	}
