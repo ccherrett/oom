@@ -146,6 +146,7 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	m_eventPart = 0;
 	
 	//Hide nonsense
+	frame->hide();
 	textLabel1->hide();
 	recordButton->hide();
 	iHBank->hide();
@@ -167,7 +168,7 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	TextLabel12->hide();
 	TextLabel13->hide();
 
-	iOutputChannel->setPrefix("Chan: ");	
+	//iOutputChannel->setPrefix("Chan: ");	
 	_matrix = new QList<int>;
 	_tableModel = new ProgramChangeTableModel(this);
 	tableView = new ProgramChangeTable(this);
@@ -336,7 +337,7 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	connect(patchList, SIGNAL( doubleClicked(const QModelIndex&) ), this, SLOT(patchDoubleClicked(const QModelIndex&) ) );
 	connect(patchList, SIGNAL( clicked(const QModelIndex&) ), this, SLOT(patchClicked(const QModelIndex&) ) );
 	//connect(_patchSelModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), SLOT(patchSelectionChanged(QItemSelection, QItemSelection)));
-	connect(chkAdvanced, SIGNAL(stateChanged(int)), SLOT(toggleAdvanced(int)));
+	//connect(chkAdvanced, SIGNAL(stateChanged(int)), SLOT(toggleAdvanced(int)));
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(deleteSelectedPatches(bool)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(movePatchUp(bool)));
 	connect(btnDown, SIGNAL(clicked(bool)), SLOT(movePatchDown(bool)));
@@ -386,14 +387,14 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
 
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
-	bool adv = tconfig().get_property("Conductor", "advanced", false).toBool();
-	chkAdvanced->setChecked(adv);
+	//bool adv = tconfig().get_property("Conductor", "advanced", false).toBool();
+	//chkAdvanced->setChecked(adv);
 	iRButton->setIcon(*connectIconSet3);
 }
 
 Conductor::~Conductor()
 {
-	tconfig().set_property("Conductor", "advanced", chkAdvanced->isChecked());
+	//tconfig().set_property("Conductor", "advanced", chkAdvanced->isChecked());
 }
 
 //---------------------------------------------------------
