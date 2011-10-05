@@ -1,0 +1,10 @@
+.git
+.gitignore
+.*.swo
+.*.swp
+debug_build.sh
+mpevent_files.txt
+build/
+build-debug/
+oomfiles/makedist.sh
+oomfiles/excludes
