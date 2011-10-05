@@ -198,10 +198,10 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	iChanDetectLabel->setPixmap(*darkRedLedIcon);
 
 	QIcon recEchoIconSet;
-	recEchoIconSet.addPixmap(*midiThruOnIcon, QIcon::Normal, QIcon::On);
-	recEchoIconSet.addPixmap(*midiThruOffIcon, QIcon::Normal, QIcon::Off);
-	recEchoButton->setIcon(recEchoIconSet);
-	recEchoButton->setIconSize(midiThruOnIcon->size());
+	//recEchoIconSet.addPixmap(*midiThruOnIcon, QIcon::Normal, QIcon::On);
+	//recEchoIconSet.addPixmap(*midiThruOffIcon, QIcon::Normal, QIcon::Off);
+	recEchoButton->setIcon(*midiInIconSet3);
+	recEchoButton->setIconSize(QSize(25,25));
 
 	// OOMidi-2: AlignCenter and WordBreak are set in the ui(3) file, but not supported by QLabel. Turn them on here.
 	trackNameLabel->setAlignment(Qt::AlignCenter);

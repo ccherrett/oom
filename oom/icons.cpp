@@ -387,6 +387,11 @@ QPixmap* transport_muteIconOff;
 QPixmap* transport_muteIconOver;
 QIcon* muteIconSet3;
 
+QPixmap* midiInIconOn;
+QPixmap* midiInIconOff;
+QPixmap* midiInIconOver;
+QIcon* midiInIconSet3;
+
 QPixmap* transport_recordIconOn;
 QPixmap* transport_recordIconOff;
 QPixmap* transport_recordIconOver;
@@ -1001,6 +1006,14 @@ void initIcons()
       muteIconSet3->addPixmap(*transport_muteIconOn, QIcon::Normal, QIcon::On);
       muteIconSet3->addPixmap(*transport_muteIconOff, QIcon::Normal, QIcon::Off);
       muteIconSet3->addPixmap(*transport_muteIconOver, QIcon::Active);
+      
+	  midiInIconOn = new MPIXMAP(":/images/icons/midiin_new_on.png", NULL);
+      midiInIconOff= new MPIXMAP(":/images/icons/midiin_new_off.png", NULL);
+      midiInIconOver= new MPIXMAP(":/images/icons/midiin_new_over.png", NULL);
+	  midiInIconSet3         = new QIcon();
+      midiInIconSet3->addPixmap(*midiInIconOn, QIcon::Normal, QIcon::On);
+      midiInIconSet3->addPixmap(*midiInIconOff, QIcon::Normal, QIcon::Off);
+      midiInIconSet3->addPixmap(*midiInIconOver, QIcon::Active);
      /* 
 	  muteIconOn = new MPIXMAP(":/images/icons/mixer-mute_on.png", NULL);
       muteIconOff= new MPIXMAP(":/images/icons/mixer-mute.png", NULL);
