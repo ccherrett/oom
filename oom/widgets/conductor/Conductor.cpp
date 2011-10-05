@@ -167,7 +167,7 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	TextLabel12->hide();
 	TextLabel13->hide();
 
-	
+	iOutputChannel->setPrefix("Chan: ");	
 	_matrix = new QList<int>;
 	_tableModel = new ProgramChangeTableModel(this);
 	tableView = new ProgramChangeTable(this);
