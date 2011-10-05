@@ -383,6 +383,9 @@
 		<file>images/connect_new_on.png</file>
 		<file>images/connect_new_over.png</file>
 		<file>images/connect_new_off.png</file>
+		<file>images/input_new_on.png</file>
+		<file>images/input_new_over.png</file>
+		<file>images/input_new_off.png</file>
 		<file>images/load_new_on.png</file>
 		<file>images/load_new_over.png</file>
 		<file>images/load_new_off.png</file>

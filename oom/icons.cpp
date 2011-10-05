@@ -587,6 +587,11 @@ QPixmap* connect_OffIcon;
 QPixmap* connect_OverIcon;
 QIcon*   connectIconSet3;
 
+QPixmap* input_OnIcon;
+QPixmap* input_OffIcon;
+QPixmap* input_OverIcon;
+QIcon*   inputIconSet3;
+
 QPixmap* load_OnIcon;
 QPixmap* load_OffIcon;
 QPixmap* load_OverIcon;
@@ -1418,6 +1423,14 @@ void initIcons()
       connectIconSet3->addPixmap(*connect_OnIcon, QIcon::Normal, QIcon::On);
       connectIconSet3->addPixmap(*connect_OffIcon, QIcon::Normal, QIcon::Off);
       connectIconSet3->addPixmap(*connect_OverIcon, QIcon::Active);
+	  
+      input_OnIcon= new MPIXMAP(":/images/input_new_on.png", NULL);
+      input_OffIcon= new MPIXMAP(":/images/input_new_off.png", NULL);
+      input_OverIcon= new MPIXMAP(":/images/input_new_over.png", NULL);
+	  inputIconSet3         = new QIcon();
+      inputIconSet3->addPixmap(*input_OnIcon, QIcon::Normal, QIcon::On);
+      inputIconSet3->addPixmap(*input_OffIcon, QIcon::Normal, QIcon::Off);
+      inputIconSet3->addPixmap(*input_OverIcon, QIcon::Active);
 	  
       load_OnIcon= new MPIXMAP(":/images/load_new_on.png", NULL);
       load_OffIcon= new MPIXMAP(":/images/load_new_off.png", NULL);

@@ -320,7 +320,7 @@ void MidiAssignDialog::btnAddController()/*{{{*/
 			rowData.append(control);
 			m_ccmodel->appendRow(rowData);
 			m_ccEdit->setRowHeight(m_ccmodel->rowCount()-1, 50);
-			//TODO: dirty the song here to force save
+			song->dirty = true;
 		}
 	}
 	updateCCTableHeader();
@@ -345,7 +345,7 @@ void MidiAssignDialog::btnDeleteController()/*{{{*/
 				midiMonitor->msgDeleteTrackController(info);
 				data->midimap.remove(control);
 				m_ccmodel->takeRow(i);
-				//TODO: dirty the song here to force save
+				song->dirty = true;
 			}
 		}
 	}
@@ -514,7 +514,7 @@ void MidiAssignDialog::midiPresetChanged(QStandardItem* item)/*{{{*/
 		{
 			int id = num->text().toInt();
 			m_selectport->addPreset(id, item->text());
-		//TODO: Call song->dirty = true;
+			song->dirty = true;
 		}
 	}
 }/*}}}*/
@@ -587,7 +587,7 @@ void MidiAssignDialog::btnAddMidiPreset()/*{{{*/
 		m_selectport->addPreset(id, sysex);
 		m_presetmodel->appendRow(rowData);
 		updateMPTableHeader();
-		//TODO: Call song->dirty = true;
+		song->dirty = true;
 	}
 }/*}}}*/
 
@@ -605,7 +605,7 @@ void MidiAssignDialog::btnDeleteMidiPresets()/*{{{*/
 			m_selectport->removePreset(num->text().toInt());
 			m_presetmodel->takeRow(i);
 			del = true;
-			//TODO: Call song dirty
+			song->dirty = true;
 		}
 	}
 	if(del)

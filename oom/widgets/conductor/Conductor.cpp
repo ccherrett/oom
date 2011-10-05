@@ -389,7 +389,7 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 	//bool adv = tconfig().get_property("Conductor", "advanced", false).toBool();
 	//chkAdvanced->setChecked(adv);
-	iRButton->setIcon(*connectIconSet3);
+	iRButton->setIcon(*inputIconSet3);
 }
 
 Conductor::~Conductor()

@@ -501,6 +501,11 @@ extern QPixmap* connect_OffIcon;
 extern QPixmap* connect_OverIcon;
 extern QIcon*   connectIconSet3;
 
+extern QPixmap* input_OnIcon;
+extern QPixmap* input_OffIcon;
+extern QPixmap* input_OverIcon;
+extern QIcon*   inputIconSet3;
+
 extern QPixmap* load_OnIcon;
 extern QPixmap* load_OffIcon;
 extern QPixmap* load_OverIcon;

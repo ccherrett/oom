@@ -161,7 +161,7 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 #ifdef LV2_SUPPORT
 		if(plugin->type() == LV2)
 		{
-			printf("LV2 Plugin select for rack\n");
+			//printf("LV2 Plugin select for rack\n");
 			LV2PluginI* lplugi = new LV2PluginI();
 			if (!lplugi->initPluginInstance(plugin, track->channels()))
 			{
@@ -178,6 +178,7 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 				track->efxPipe()->insert(0, idx);
 			}
 			audio->msgAddPlugin(track, idx, lplugi);
+			song->dirty = true;
 		}
 		else
 #endif
@@ -193,6 +194,7 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 			if (replace)
 				audio->msgAddPlugin(track, idx, 0);
 			audio->msgAddPlugin(track, idx, plugi);
+			song->dirty = true;
 		}
 		updateContents();
 	}
@@ -325,6 +327,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 					delete oldPlugin;
 			}*/
 			epipe->insert(0, idx);
+			song->dirty = true;
 			break;
 		}
 		case BYPASS:
