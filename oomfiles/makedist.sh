@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+#set -x
 DESTDIR=~/music/OOMidi-release/
 OOMBASE="oom-"
 SRCDIR=~/workspace/git-projects/oom/
