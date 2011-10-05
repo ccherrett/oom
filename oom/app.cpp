@@ -1039,7 +1039,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	viewTransportAction->setCheckable(true);
 	viewBigtimeAction = new QAction(QIcon(*view_bigtime_windowIcon), tr("Bigtime Window"), this);
 	viewBigtimeAction->setCheckable(true);
-	viewMixerAAction = new QAction(QIcon(*mixerSIcon), tr("Mixer A"), this);
+	viewMixerAAction = new QAction(QIcon(*mixerSIcon), tr("Mixer"), this);
 	viewMixerAAction->setCheckable(true);
 	//viewMixerBAction = new QAction(QIcon(*mixerSIcon), tr("Mixer B"), this);
 	//viewMixerBAction->setCheckable(true);
