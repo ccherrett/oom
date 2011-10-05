@@ -172,6 +172,11 @@ extern QIcon* transport_muteIconOff;
 extern QIcon* transport_muteIconOver;
 extern QIcon* muteIconSet3;
 
+extern QIcon* midiInIconOn;
+extern QIcon* midiInIconOff;
+extern QIcon* midiInIconOver;
+extern QIcon* midiInIconSet3;
+
 extern QPixmap* muteIconOn;
 extern QPixmap* muteIconOff;
 extern QPixmap* muteIconOver;
