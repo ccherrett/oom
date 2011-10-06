@@ -259,7 +259,6 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 #else
 	printf("Disabling show Native\n");
 	showNativeGuiAction->setEnabled(false);
-	showNativeGuiAction->hide();
 #endif
 
 	if (pipe->empty(idx))
