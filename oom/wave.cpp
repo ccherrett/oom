@@ -585,6 +585,9 @@ size_t SndFile::readInternal(int srcChannels, float** dst, size_t n, bool overwr
 
 bool SndFile::useOverwrite(unsigned pos, WavePart *part, bool overwrite)
 {
+	if(!part)
+		return overwrite;
+
 	FadeCurve* crossFadeIn = part->crossFadeIn();
 	FadeCurve* crossFadeOut = part->crossFadeOut();
 	FadeCurve* fadeIn = part->fadeIn();
