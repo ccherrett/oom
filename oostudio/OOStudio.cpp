@@ -144,7 +144,7 @@ void OOStudio::createModels()/*{{{*/
 	if(session)
 	{
 		QString tag("T: ");
-		tag.append(QString(OOM_TEMPLATE_NAME));
+		tag.append(QString(OOM_TEMPLATE_NAME)).append(tr(" (Sonatina only)"));
 		m_cmbTemplate->addItem(tag, QString(OOM_TEMPLATE_NAME));
 		m_sessionMap[session->name] = session;
 	}
