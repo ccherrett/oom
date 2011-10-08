@@ -542,7 +542,7 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 {
 	start = event->pos();
 	Tool activeTool = tool;
-	bool shift = event->modifiers() & Qt::ShiftModifier;
+	//bool shift = event->modifiers() & Qt::ShiftModifier;
 
 	int xpos = start.x();
 	int ypos = start.y();
@@ -556,7 +556,7 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 			break;
 
 		case PencilTool:
-			if (shift)
+			//if (shift)
 			{
 				if (type != MidiController::Velo)
 				{
@@ -565,12 +565,12 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 					newVal(xpos, xpos, ypos);
 				}
 			}
-			else
+			/*else
 			{
 				drag = DRAG_RESIZE;
 				song->startUndo();
 				changeVal(xpos, xpos, ypos);
-			}
+			}*/
 			break;
 
 		case RubberTool:
@@ -587,10 +587,10 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 			{
 				line2x = xpos;
 				line2y = ypos;
-				if (shift)
+				//if (shift)
 					newValRamp(line1x, line1y, line2x, line2y);
-				else
-					changeValRamp(line1x, line1y, line2x, line2y);
+				//else
+				//	changeValRamp(line1x, line1y, line2x, line2y);
 				drawLineMode = false;
 			}
 			else
@@ -1508,7 +1508,8 @@ void CtrlCanvas::drawOverlay(QPainter& p, const QRect&)
 		p.setFont(config.fonts[3]);
 		//p.setPen(Qt::black);
 		//p.setPen(Qt::black);
-        p.drawText(width() / 2 - 100, height() / 2 - 10, "Use shift + pencil or line tool to draw new events");
+        p.drawText(width() / 2 - 100, height() / 2 - 10, "Use pencil or line tool to draw new events");
+        //p.drawText(width() / 2 - 100, height() / 2 - 10, "Use shift + pencil or line tool to draw new events");
 		//p.drawText(2 , y * 2, "Use shift + pencil or line tool to draw new events");
 	}
 }
