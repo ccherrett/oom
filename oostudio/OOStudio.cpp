@@ -22,10 +22,11 @@ static const int   LS_PORT      = 8888;
 static const char* LS_COMMAND   = "linuxsampler";
 static const char* JACK_COMMAND = "/usr/bin/jackd -R -P89 -p2048 -t5000 -M512 -dalsa -dhw:0 -r44100 -p512 -n2";
 static const QString NO_PROC_TEXT(QObject::tr("No Running Session"));
-static const QString DEFAULT_OOM = QString(SHAREDIR).append("/templates/default.oom");
+static const QString DEFAULT_OOM = QString(SHAREDIR).append(QDir::separator()).append("templates").append(QDir::separator()).append("default.oom");
 static const QString DEFAULT_LSCP = QString(SHAREDIR).append(QDir::separator()).append("templates").append(QDir::separator()).append("default.lscp");
 static const QString TEMPLATE_DIR = QString(QDir::homePath()).append(QDir::separator()).append("oomidi_sessions");
 static const char* OOM_TEMPLATE_NAME = "OOMidi_Orchestral_Template";
+static const char* OOM_EXT_TEMPLATE_NAME = "OOMidi_Orchestral_Extended_Template";
 static const char* MAP_STRING = "MAP MIDI_INSTRUMENT";
 
 lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event*/, const char * /*pchData*/, int /*cchData*/, void* pvData )
@@ -148,6 +149,15 @@ void OOStudio::createModels()/*{{{*/
 		m_sessionMap[session->name] = session;
 	}
 
+	session = readSession(QString(OOM_EXT_DEFAULT_TEMPLATE));
+	if(session)
+	{
+		QString tag("T: ");
+		tag.append(QString(OOM_EXT_TEMPLATE_NAME));
+		m_cmbTemplate->addItem(tag, QString(OOM_EXT_TEMPLATE_NAME));
+		m_sessionMap[session->name] = session;
+	}
+
 	m_txtOOMPath->setText(DEFAULT_OOM);
 	m_txtLSCP->setText(DEFAULT_LSCP);
 	m_txtLocation->setText(TEMPLATE_DIR);
@@ -224,7 +234,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 {
 	m_sessionModel->clear();
 	m_templateModel->clear();
-	while(m_cmbTemplate->count() > 2)
+	while(m_cmbTemplate->count() > 3)
 	{
 		m_cmbTemplate->removeItem((m_cmbTemplate->count()-1));
 	}
@@ -237,7 +247,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 		while (iter != m_sessionMap.constEnd())
 		{
 			OOSession* session = iter.value();
-			if(session && session->name != QString(OOM_TEMPLATE_NAME))
+			if(session && session->name != QString(OOM_TEMPLATE_NAME) && session->name != QString(OOM_EXT_TEMPLATE_NAME))
 			{
 				//printf("Processing session %s \n", session->name.toUtf8().constData());
 				QStandardItem* name = new QStandardItem(session->name);
@@ -257,7 +267,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 		while (iter != m_sessionMap.constEnd())
 		{
 			OOSession* session = iter.value();
-			if(session && session->name != QString(OOM_TEMPLATE_NAME))
+			if(session && session->name != QString(OOM_TEMPLATE_NAME) && session->name != QString(OOM_EXT_TEMPLATE_NAME))
 			{
 				//printf("Processing session %s \n", session->name.toUtf8().constData());
 				QStandardItem* name = new QStandardItem(session->name);
@@ -599,7 +609,7 @@ void OOStudio::saveSettings()/*{{{*/
 		while (i != m_sessionMap.constEnd())
 		{
 			OOSession* session = i.value();
-			if(session && session->name != QString(OOM_TEMPLATE_NAME))
+			if(session && session->name != QString(OOM_TEMPLATE_NAME) && session->name != QString(OOM_EXT_TEMPLATE_NAME))
 			{
 				settings.setArrayIndex(id);
 				
@@ -1693,7 +1703,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 {
 	QString tpath = m_cmbTemplate->itemData(index).toString();
 	//printf("OOStudio::templateSelectionChanged index: %d, name: %s sessions:%d\n", index, tpath.toUtf8().constData(), m_sessionMap.size());
-	if(!index || (index == 1 && m_cmbEditMode->currentIndex() == 1))
+	if(!index || (index <= 2 && m_cmbEditMode->currentIndex() == 1))
 	{
 		resetCreate();
 		return;

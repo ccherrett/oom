@@ -12,5 +12,5 @@ if [ -z "$VERSION" ]; then
 else
 	mkdir -p "${DESTDIR}"
 	echo "Syncing distro"
-	rsync -av --progress --delete-excluded --exclude-from=${OOMEXCLUDES} ${SRCDIR} ${CMD}
+	rsync -av --progress --delete --delete-excluded --exclude-from=${OOMEXCLUDES} ${SRCDIR} ${CMD}
 fi

@@ -4,6 +4,7 @@
 .*.swp
 debug_build.sh
 mpevent_files.txt
+demos/
 build/
 build-debug/
 oomfiles/makedist.sh
