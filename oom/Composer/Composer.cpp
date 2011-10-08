@@ -471,6 +471,7 @@ void Composer::configChanged()
 void Composer::songlenChanged(int n)
 {
 	int newLen = AL::sigmap.bar2tick(n, 0, 0);
+	//printf("New Song Length: %d - %d \n", n, newLen);
 	song->setLen(newLen);
 }
 //---------------------------------------------------------

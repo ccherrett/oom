@@ -1489,7 +1489,7 @@ void Song::setChannelMute(int channel, bool val)
 
 void Song::initLen()
 {
-	_len = AL::sigmap.bar2tick(40, 0, 0); // default song len
+	_len = AL::sigmap.bar2tick(264, 0, 0); // default song len
 	for (iTrack t = _tracks.begin(); t != _tracks.end(); ++t)
 	{
 		MidiTrack* track = dynamic_cast<MidiTrack*> (*t);
@@ -2285,7 +2285,7 @@ void Song::clear(bool signal)
 	_cycleMode = CYCLE_NORMAL;
 	_click = false;
 	_quantize = false;
-	_len = 0; // song len in ticks
+	_len = 405504; // song len in ticks
 	_follow = JUMP;
 	// _tempo      = 500000;      // default tempo 120
 	dirty = false;
