@@ -564,6 +564,12 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 					song->startUndo();
 					newVal(xpos, xpos, ypos);
 				}
+				else
+				{
+					drag = DRAG_RESIZE;
+					song->startUndo();
+					changeVal(xpos, xpos, ypos);
+				}
 			}
 			/*else
 			{
