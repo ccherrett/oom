@@ -46,6 +46,11 @@ static QString trackHeaderStyle = "QFrame#TrackHeader { border-bottom: 1px solid
 static QString trackHeaderStyleSelected = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #171717; }";
 static QString lineStyleTemplate = "QFrame { border: 0px; background-color: %1; }";
 
+static const int TRACK_HEIGHT_3 = 100;
+static const int TRACK_HEIGHT_4 = 180;
+static const int TRACK_HEIGHT_5 = 320;
+static const int TRACK_HEIGHT_6 = 640;
+
 TrackHeader::TrackHeader(Track* t, QWidget* parent)
 : QFrame(parent)
 {
@@ -578,7 +583,38 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	selectAllAction->setData(4);
 	selectAllAction->setShortcut(shortcuts[SHRT_SEL_ALL_TRACK].key);
 
-	QMenu* trackHeightsMenu = p->addMenu(tr("Track Height"));
+	QString currentTrackHeightString = tr("Track Height") + ": ";
+	if (m_track->height() == DEFAULT_TRACKHEIGHT)
+	{
+		currentTrackHeightString += tr("Default");
+	}
+	if (m_track->height() == MIN_TRACKHEIGHT)
+	{
+		currentTrackHeightString += tr("Compact");
+	}
+	if (m_track->height() == TRACK_HEIGHT_3)
+	{
+		currentTrackHeightString += tr("Height 3");
+	}
+	if (m_track->height() == TRACK_HEIGHT_4)
+	{
+		currentTrackHeightString += tr("Height 4");
+	}
+	if (m_track->height() == TRACK_HEIGHT_5)
+	{
+		currentTrackHeightString += tr("Height 5");
+	}
+	if (m_track->height() == TRACK_HEIGHT_6)
+	{
+		currentTrackHeightString += tr("Height 6");
+	}
+	if (m_track->height() == oom->composer->getCanvas()->height())
+	{
+		currentTrackHeightString += tr("Full Screen");
+	}
+
+	QMenu* trackHeightsMenu = p->addMenu(currentTrackHeightString);
+
 	trackHeightsMenu->addAction(tr("Compact"))->setData(7);
 	trackHeightsMenu->addAction(tr("Default"))->setData(6);
 	trackHeightsMenu->addAction("3")->setData(8);
@@ -836,11 +872,11 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			{
 				if (multipleSelectedTracks)
 				{
-					song->setTrackHeights(selectedTracksList, 100);
+					song->setTrackHeights(selectedTracksList, TRACK_HEIGHT_3);
 				}
 				else
 				{
-					m_track->setHeight(100);
+					m_track->setHeight(TRACK_HEIGHT_3);
 					song->update(SC_TRACK_MODIFIED);
 				}
 				break;
@@ -849,11 +885,11 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			{
 				if (multipleSelectedTracks)
 				{
-					song->setTrackHeights(selectedTracksList, 180);
+					song->setTrackHeights(selectedTracksList, TRACK_HEIGHT_4);
 				}
 				else
 				{
-					m_track->setHeight(180);
+					m_track->setHeight(TRACK_HEIGHT_4);
 					song->update(SC_TRACK_MODIFIED);
 				}
 				break;
@@ -862,11 +898,11 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			{
 				if (multipleSelectedTracks)
 				{
-					song->setTrackHeights(selectedTracksList, 320);
+					song->setTrackHeights(selectedTracksList, TRACK_HEIGHT_5);
 				}
 				else
 				{
-					m_track->setHeight(320);
+					m_track->setHeight(TRACK_HEIGHT_5);
 					song->update(SC_TRACK_MODIFIED);
 				}
 				break;
@@ -875,11 +911,11 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			{
 				if (multipleSelectedTracks)
 				{
-					song->setTrackHeights(selectedTracksList, 640);
+					song->setTrackHeights(selectedTracksList, TRACK_HEIGHT_6);
 				}
 				else
 				{
-					m_track->setHeight(640);
+					m_track->setHeight(TRACK_HEIGHT_6);
 					song->update(SC_TRACK_MODIFIED);
 				}
 				break;
