@@ -2409,7 +2409,7 @@ void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		
 	}
 	p.drawRect(QRect(r.x(), r.y(), r.width(), mp ? r.height()-2 : r.height()-1));
-	if (part->mute())
+	if (part->mute() || part->track()->mute())
 	{
 		//QColor c(Qt::white);
 		//c.setAlpha(config.globalAlphaBlend);
