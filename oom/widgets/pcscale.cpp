@@ -297,9 +297,13 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 			update();
 
 			_pc.event = nevent;
+			_pc.event.setTick(x);
 
 			_pc.state = movingController;
 			_pc.valid = true;
+
+			emit drawSelectedProgram(_pc.event.tick(), true);
+
 			return;
 		}
 		//We did not find a program change so just set song position
@@ -762,7 +766,17 @@ void PCScale::pdraw(QPainter& p, const QRect& r)/*{{{*/
 
 	foreach(Event pcevt, pcEvents)
 	{
-		int xp = mapx(pcevt.tick() + curPart->tick());
+		int xp;
+		// if the event == _pc.event then there is no need to add the part.tick() value
+		// since it wasn't substracted yet.
+		if (_pc.valid && pcevt == _pc.event)
+		{
+			xp = mapx(pcevt.tick());
+		}
+		else
+		{
+			xp = mapx(pcevt.tick() + curPart->tick());
+		}
 		if (xp > x + w)
 		{
 			//printf("Its dying from greater than bar size\n");
