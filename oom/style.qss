@@ -247,7 +247,7 @@ QTableView#tblAutoTable, QTableView#tblTrackView, QTableView#routeList, TrackVie
 	padding: 0px;
 	font-size: 14px;
 }
-QTableView#tblAutoTable::focus, QTableView#tblTrackView::focus, QTableView#routeList::focus
+QTableView#tblAutoTable::focus, QTableView#tblTrackView::focus, QTableView#routeList::focus, QTableView#TrackListView::focus 
 {
 	border: 2px solid #f3ce69;
 }
