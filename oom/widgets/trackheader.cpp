@@ -594,19 +594,19 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	}
 	if (m_track->height() == TRACK_HEIGHT_3)
 	{
-		currentTrackHeightString += tr("Height 3");
+		currentTrackHeightString += tr("3");
 	}
 	if (m_track->height() == TRACK_HEIGHT_4)
 	{
-		currentTrackHeightString += tr("Height 4");
+		currentTrackHeightString += tr("4");
 	}
 	if (m_track->height() == TRACK_HEIGHT_5)
 	{
-		currentTrackHeightString += tr("Height 5");
+		currentTrackHeightString += tr("5");
 	}
 	if (m_track->height() == TRACK_HEIGHT_6)
 	{
-		currentTrackHeightString += tr("Height 6");
+		currentTrackHeightString += tr("6");
 	}
 	if (m_track->height() == oom->composer->getCanvas()->height())
 	{
