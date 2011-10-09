@@ -408,11 +408,14 @@ void WaveTrack::calculateCrossFades()
 			{
 				foreach(WavePart* bottomPart, list)
 				{
-					unsigned overlapWidth = bottomPart->endFrame() - topPart->frame();
+					if (! (leftAndRightEdgeOnTopOfPartBelow(topPart, bottomPart)))
+					{
+						unsigned overlapWidth = bottomPart->endFrame() - topPart->frame();
 
-					bottomPart->fadeOut()->setWidth(overlapWidth);
-					topPart->fadeIn()->setWidth(overlapWidth);
-					topPart->setHasCrossFadeForPartialOverlapLeft(true);
+						bottomPart->fadeOut()->setWidth(overlapWidth);
+						topPart->fadeIn()->setWidth(overlapWidth);
+						topPart->setHasCrossFadeForPartialOverlapLeft(true);
+					}
 
 				}
 			}
@@ -428,12 +431,14 @@ void WaveTrack::calculateCrossFades()
 			{
 				foreach(WavePart* bottomPart, list)
 				{
-					unsigned overlapWidth = topPart->endFrame() - bottomPart->frame();
+					if (! (leftAndRightEdgeOnTopOfPartBelow(topPart, bottomPart)))
+					{
+						unsigned overlapWidth = topPart->endFrame() - bottomPart->frame();
 
-					bottomPart->fadeIn()->setWidth(overlapWidth);
-					topPart->fadeOut()->setWidth(overlapWidth);
-					topPart->setHasCrossFadeForPartialOverlapRight(true);
-
+						bottomPart->fadeIn()->setWidth(overlapWidth);
+						topPart->fadeOut()->setWidth(overlapWidth);
+						topPart->setHasCrossFadeForPartialOverlapRight(true);
+					}
 				}
 			}
 			else if (topPart->hasCrossFadeForPartialOverlapRight())
