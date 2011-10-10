@@ -3624,7 +3624,6 @@ void Song::updateTrackViews1()
 	bool customview = false;
 	bool workview = false;
 	bool commentview = false;
-	disarmAllTracks();
 	TrackView* wv = findAutoTrackView("Working View");
 	TrackView* cv = findAutoTrackView("Comment View");
 	if(wv && wv->selected())
@@ -3796,6 +3795,7 @@ void Song::updateTrackViews1()
 	}
 	//end = omp_get_wtime();
 	//printf("Song::updateTrackViews1() took %f seconds to run\n", end-start);
+	disarmAllTracks();
 	if(!invalid)
 		emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }

@@ -71,7 +71,7 @@ TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 	m_layout->addLayout(m_buttonBox);
 
 	//populateTable();
-	//connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
 	connect(m_selmodel, SIGNAL(currentRowChanged(const QModelIndex, const QModelIndex)), this, SLOT(selectionChanged(const QModelIndex, const QModelIndex)));
 	connect(m_chkWorkingView, SIGNAL(stateChanged(int)), this, SLOT(displayRoleChanged(int)));

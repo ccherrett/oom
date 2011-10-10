@@ -779,7 +779,10 @@ bool Song::msgRemoveParts()
 	do
 	{
 		loop = false;
-		TrackList* tl = song->tracks();
+		//TrackList* tl = song->tracks();
+		//TODO: Check if this is used outside of the canvas part delete and fix them
+		//since we should not be deleting parts we cant see.
+		TrackList* tl = visibletracks();
 
 		for (iTrack it = tl->begin(); it != tl->end(); ++it)
 		{
@@ -805,6 +808,11 @@ bool Song::msgRemoveParts()
 				break;
 		}
 	} while (loop);
+	if(partSelected)
+	{
+		song->dirty = true;
+		updateTrackViews1();
+	}
 	return partSelected;
 }
 

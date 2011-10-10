@@ -165,14 +165,18 @@ void MixerView::updateTrackList()/*{{{*/
 	bool workview = false;
 	bool commentview = false;
 	
-	TrackView* wv = song->findAutoTrackView("Working View");
-	TrackView* cv = song->findAutoTrackView("Comment View");
-	if(wv && wv->selected())
+	QStandardItem *witem = _autoTableModel->item(0);
+	QStandardItem *citem = _autoTableModel->item(5);
+	//TrackView* wv = song->findAutoTrackView("Working View");
+	//TrackView* cv = song->findAutoTrackView("Comment View");
+	//if(wv && wv->selected())
+	if(witem && witem->checkState() == Qt::Checked)
 	{
 		workview = true;
 		viewselected = true;
 	}
-	if(cv && cv->selected())
+	//if(cv && cv->selected())
+	if(citem && citem->checkState() == Qt::Checked)
 	{
 		commentview = true;
 		viewselected = true;

@@ -231,6 +231,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 					if(track)
 					{
 						oom->composer->addCanvasPart(track);
+						song->updateTrackViews1();
 					}
 				}
 				delete p;

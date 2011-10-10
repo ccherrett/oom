@@ -576,7 +576,9 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	if(m_track->name() != "Master")
 	{
 		p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
+		p->addSeparator();
 		p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
+		p->addSeparator();
 	}
 	
 	QAction* selectAllAction = p->addAction(tr("Select All Tracks"));
@@ -682,21 +684,29 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		switch (n)
 		{
 			case 0: // delete track
-				if (multipleSelectedTracks)
+			{
+				QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
+				if(QMessageBox::question(this, 
+					tr("Delete Track"),
+					msg.arg(multipleSelectedTracks ? "all selected tracks" : m_track->name()),
+					QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
 				{
-					song->startUndo();
-					audio->msgRemoveTracks();
-					song->endUndo(SC_TRACK_REMOVED);
-					song->updateSoloStates();
+					if (multipleSelectedTracks)
+					{
+						song->startUndo();
+						audio->msgRemoveTracks();
+						song->endUndo(SC_TRACK_REMOVED);
+						song->updateSoloStates();
+					}
+					else
+					{
+						if(m_track->name() == "Master")
+							break;
+						song->removeTrack0(m_track);
+						audio->msgUpdateSoloStates();
+					}
 				}
-				else
-				{
-					if(m_track->name() == "Master")
-						break;
-					song->removeTrack0(m_track);
-					audio->msgUpdateSoloStates();
-				}
-
+			}
 			break;
 
 			case 1: // Import audio file
