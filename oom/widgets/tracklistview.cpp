@@ -113,7 +113,7 @@ void TrackListView::displayRoleChanged(int role)/*{{{*/
 
 void TrackListView::songChanged(int flags)/*{{{*/
 {
-	if(flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED /*| SC_PART_COLOR_MODIFIED*/))
+	if(flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_MODIFIED/*| SC_PART_COLOR_MODIFIED*/))
 	{
 		if(debugMsg)
 			printf("TrackListView::songChanged\n");

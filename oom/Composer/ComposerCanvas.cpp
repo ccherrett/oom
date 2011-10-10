@@ -380,6 +380,7 @@ void ComposerCanvas::returnPressed()
 		newPart->setName(lineEditor->text());
 		// Indicate do undo, and do port controller values but not clone parts.
 		audio->msgChangePart(oldPart, newPart, true, true, false);
+		song->update(SC_PART_MODIFIED);
 	}
 	editMode = false;
 }
@@ -577,6 +578,11 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		// It also gives the new part a new serial number.
 		dpart = dtrack->newPart(spart, clone);
 
+	if(track->name() != dtrack->name() && dpart->name().contains(track->name()))
+	{
+		QString name = dpart->name();
+		dpart->setName(name.replace(track->name(), dtrack->name()));
+	}
 	dpart->setTick(dtick);
 	dpart->setLeftClip(spart->leftClip());
 	dpart->setRightClip(spart->rightClip());
@@ -925,7 +931,7 @@ QMenu* ComposerCanvas::genItemPopup(CItem* item)/*{{{*/
 
 	partPopup->addSeparator();
 	int rc = npart->part()->events()->arefCount();
-	QString st = QString(tr("s&elect "));
+	QString st = QString(tr("S&elect "));
 	if (rc > 1)
 		st += (QString().setNum(rc) + QString(" "));
 	st += QString(tr("clones"));
@@ -934,18 +940,18 @@ QMenu* ComposerCanvas::genItemPopup(CItem* item)/*{{{*/
 
 	partPopup->addSeparator();
 	
-	QAction *act_rename = partPopup->addAction(tr("rename"));
+	QAction *act_rename = partPopup->addAction(tr("Rename"));
 	act_rename->setData(0);
 
 
 
-	QAction *act_delete = partPopup->addAction(QIcon(*deleteIcon), tr("delete")); // ddskrjo added QIcon to all
+	QAction *act_delete = partPopup->addAction(QIcon(*deleteIcon), tr("Delete")); // ddskrjo added QIcon to all
 	act_delete->setData(1);
-	QAction *act_split = partPopup->addAction(QIcon(*cutIcon), tr("split"));
+	QAction *act_split = partPopup->addAction(QIcon(*cutIcon), tr("Split"));
 	act_split->setData(2);
-	QAction *act_glue = partPopup->addAction(QIcon(*glueIcon), tr("glue"));
+	QAction *act_glue = partPopup->addAction(QIcon(*glueIcon), tr("Glue"));
 	act_glue->setData(3);
-	QAction *act_declone = partPopup->addAction(tr("de-clone"));
+	QAction *act_declone = partPopup->addAction(tr("De-clone"));
 	act_declone->setData(15);
 
 	partPopup->addSeparator();
@@ -953,21 +959,21 @@ QMenu* ComposerCanvas::genItemPopup(CItem* item)/*{{{*/
 	{
 		case Track::MIDI:
 		{
-			QAction *act_performer = partPopup->addAction(QIcon(*pianoIconSet), tr("performer"));
+			QAction *act_performer = partPopup->addAction(QIcon(*pianoIconSet), tr("Performer"));
 			act_performer->setData(10);
-			QAction *act_mlist = partPopup->addAction(QIcon(*edit_listIcon), tr("list"));
+			QAction *act_mlist = partPopup->addAction(QIcon(*edit_listIcon), tr("List"));
 			act_mlist->setData(12);
-			QAction *act_mexport = partPopup->addAction(tr("export"));
+			QAction *act_mexport = partPopup->addAction(tr("Export"));
 			act_mexport->setData(16);
 		}
 			break;
 		case Track::DRUM:
 		{
-			QAction *act_dlist = partPopup->addAction(QIcon(*edit_listIcon), tr("list"));
+			QAction *act_dlist = partPopup->addAction(QIcon(*edit_listIcon), tr("List"));
 			act_dlist->setData(12);
-			QAction *act_drums = partPopup->addAction(QIcon(*edit_drummsIcon), tr("drums"));
+			QAction *act_drums = partPopup->addAction(QIcon(*edit_drummsIcon), tr("Drums"));
 			act_drums->setData(13);
-			QAction *act_dexport = partPopup->addAction(tr("export"));
+			QAction *act_dexport = partPopup->addAction(tr("Export"));
 			act_dexport->setData(16);
 		}
 			break;
@@ -976,9 +982,9 @@ QMenu* ComposerCanvas::genItemPopup(CItem* item)/*{{{*/
 // the wave editor is destructive, don't us it anymore!
 //			QAction *act_wedit = partPopup->addAction(QIcon(*edit_waveIcon), tr("wave edit"));
 //			act_wedit->setData(14);
-			QAction *act_wexport = partPopup->addAction(tr("export"));
+			QAction *act_wexport = partPopup->addAction(tr("Export"));
 			act_wexport->setData(16);
-			QAction *act_wfinfo = partPopup->addAction(tr("file info"));
+			QAction *act_wfinfo = partPopup->addAction(tr("File info"));
 			act_wfinfo->setData(17);
 		}
 			break;
