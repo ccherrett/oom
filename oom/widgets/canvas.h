@@ -96,6 +96,7 @@ protected:
 	int _selectedProgramPos;
 	bool _drawSelectedProgram;
 	bool _drawPartLines;
+	bool _drawPartEndLine;
 	bool m_PartZIndex;
 
     void setCursor();
@@ -233,6 +234,11 @@ public slots:
 	void setDrawPartLines(bool v) 
 	{
 		_drawPartLines = v;
+		update();
+	}
+	void setDrawPartEndLine(bool v) 
+	{
+		_drawPartEndLine = v;
 		update();
 	}
 

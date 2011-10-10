@@ -57,7 +57,8 @@ EventCanvas::EventCanvas(AbstractMidiEditor* pr, QWidget* parent, int sx, int sy
 	_curPart = (MidiPart*) (editor->parts()->begin()->second);
 	_curPartId = _curPart->sn();
 	bool pl = tconfig().get_property("PerformerEdit", "partLines", true).toBool();
-	_drawPartLines = pl;
+	_drawPartLines = true;
+	_drawPartEndLine = pl;
 	//setDrawPartLines(pl);
 }
 
