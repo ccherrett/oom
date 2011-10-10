@@ -413,6 +413,7 @@
 		<file>images/icons/midiin_new_on.png</file>
 		<file>images/icons/midiin_new_over.png</file>
 		<file>images/icons/midiin_new_off.png</file>
+		<file>images/icons/views_inputs.png</file>
 	</qresource>
 </RCC>
 
