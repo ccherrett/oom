@@ -112,6 +112,7 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 			{
 				chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
 				tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
+				tname->setIcon(*addtrack_audiooutputIcon);
 			}
 			rowData2.append(chk);
 			rowData2.append(tname);
