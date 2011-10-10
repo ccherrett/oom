@@ -4326,7 +4326,14 @@ void OOMidi::cmd(int cmd)
 				}
 				else
 				{
-					audio->msgRemoveTracks();
+					QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
+					if(QMessageBox::question(this, 
+						tr("Delete Track"),
+						msg.arg("all selected tracks"),
+						QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+					{
+						audio->msgRemoveTracks();
+					}
 				}
 				song->endUndo(SC_TRACK_REMOVED);
 

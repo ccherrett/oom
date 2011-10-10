@@ -641,7 +641,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	if (song->len() < (dpart->lenTick() + dpart->tick()))
 		song->setLen(dpart->lenTick() + dpart->tick());
 	//endUndo(t);
-	if(newdest)
+	if(newdest || track->parts()->empty())
 		song->updateTrackViews1();
 		//emit tracklistChanged();
 	return true;
