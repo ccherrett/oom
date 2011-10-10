@@ -70,6 +70,7 @@ Canvas::Canvas(QWidget* parent, int sx, int sy, const char* name)
 	_selectedProgramPos = -1;
 	_drawSelectedProgram = false;
 	_drawPartLines = false;
+	_drawPartEndLine = false;
 	connect(song, SIGNAL(posChanged(int, unsigned, bool)), this, SLOT(setPos(int, unsigned, bool)));
 }
 
@@ -424,7 +425,8 @@ void Canvas::draw(QPainter& p, const QRect& rect)/*{{{*/
 		//p.drawRect(QRect(_curPart->tick(), y, 10, y2));
 		//p.drawRect(QRect(_curPart->endTick(), y, 10, y2));
 		p.drawLine(_curPart->tick(), y, _curPart->tick(), y2);
-		p.drawLine(_curPart->endTick(), y, _curPart->endTick(), y2);
+		if(_drawPartEndLine)
+			p.drawLine(_curPart->endTick(), y, _curPart->endTick(), y2);
 	}
 	//QPen playbackPen(QColor(8,193,156), 1);
 	//p.setPen(playbackPen);
