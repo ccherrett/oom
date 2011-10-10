@@ -414,6 +414,9 @@
 		<file>images/icons/midiin_new_over.png</file>
 		<file>images/icons/midiin_new_off.png</file>
 		<file>images/icons/views_inputs.png</file>
+		<file>images/icons/views_outputs.png</file>
+		<file>images/icons/views_busses.png</file>
+		<file>images/icons/views_auxs.png</file>
 	</qresource>
 </RCC>
 
