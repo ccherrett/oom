@@ -526,6 +526,8 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		return false;
 	}
 	//printf("ComposerCanvas::moveItem ntrack: %d  tracks->size(): %d\n",ntrack,(int)tracks->size());
+	Track* dtrack = 0;
+	bool newdest = false;
 	if (ntrack >= tracks->size())
 	{
 		ntrack = tracks->size();
@@ -537,20 +539,24 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 			dt->setChannels(st->channels());
 		}
 		if(newTrack)
+		{
+			newdest = true;
+			dtrack = newTrack;
 			midiMonitor->msgAddMonitoredTrack(newTrack);
+		}
 		else
 			printf("ComposerCanvas::moveItem failed to create new track\n");
 		
 		//printf("ComposerCanvas::moveItem new track type: %d\n",newTrack->type());
 
-		emit tracklistChanged();
 	}
 	//FIXME: for some reason we are getting back an invalid track on this next call
 	//This is a bug caused by removing the track view update from the undo section of song I think
 	//the breakage happens in commit 4484dc5
 	//it looks like cloning a part is calling the endMsgCmd in song.cpp and the track is 
 	//not making it into the undo system or something like that
-	Track* dtrack = tracks->index(ntrack);
+	if(!dtrack)
+		dtrack = tracks->index(ntrack);
 	
 	//printf("ComposerCanvas::moveItem track type is: %d\n",dtrack->type());
 
@@ -635,6 +641,9 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	if (song->len() < (dpart->lenTick() + dpart->tick()))
 		song->setLen(dpart->lenTick() + dpart->tick());
 	//endUndo(t);
+	if(newdest)
+		song->updateTrackViews1();
+		//emit tracklistChanged();
 	return true;
 }
 
