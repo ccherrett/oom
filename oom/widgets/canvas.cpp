@@ -69,6 +69,7 @@ Canvas::Canvas(QWidget* parent, int sx, int sy, const char* name)
 	_curItem = NULL;
 	_selectedProgramPos = -1;
 	_drawSelectedProgram = false;
+	_drawPartLines = false;
 	connect(song, SIGNAL(posChanged(int, unsigned, bool)), this, SLOT(setPos(int, unsigned, bool)));
 }
 

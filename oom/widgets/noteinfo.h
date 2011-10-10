@@ -16,7 +16,7 @@ namespace Awl
 };
 
 class QSpinBox;
-
+class QCheckBox;
 ///class PosEdit;
 class PitchEdit;
 class Pos;
@@ -37,6 +37,7 @@ class NoteInfo : public QWidget
     QSpinBox* selVelOn;
     QSpinBox* selVelOff;
     QSpinBox* m_renderAlpha;
+	QCheckBox* m_partLines;
     bool deltaMode;
 	
 	void addTool(QString label, QWidget* tool);
@@ -58,6 +59,7 @@ private slots:
     void pitchChanged(int);
     void timeChanged(const Pos&);
 	void alphaChanged(int);
+	void partLinesChanged(bool);
 
 public slots:
     void setValue(ValType, int);
@@ -65,6 +67,7 @@ public slots:
 signals:
     void valueChanged(NoteInfo::ValType, int);
 	void alphaChanged();
+	void enablePartLines(bool);
 };
 #endif
 

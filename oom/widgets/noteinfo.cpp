@@ -58,6 +58,12 @@ NoteInfo::NoteInfo(QWidget* parent)
 	m_renderAlpha->setValue(alpha);
 
 	addTool(tr("BG Brightness"), m_renderAlpha);
+
+	m_partLines = new QCheckBox(this);
+	bool pl = tconfig().get_property("PerformerEdit", "partLines", true).toBool();
+	m_partLines->setChecked(pl);
+	addTool(tr("Part End Marker"), m_partLines);
+
 	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	m_layout->addItem(vSpacer);
 
@@ -67,6 +73,7 @@ NoteInfo::NoteInfo(QWidget* parent)
 	connect(selVelOff, SIGNAL(valueChanged(int)), SLOT(velOffChanged(int)));
 	connect(m_renderAlpha, SIGNAL(valueChanged(int)), SLOT(alphaChanged(int)));
 	connect(selTime, SIGNAL(valueChanged(const Pos&)), SLOT(timeChanged(const Pos&)));
+	connect(m_partLines, SIGNAL(toggled(bool)), SLOT(partLinesChanged(bool)));
 }
 
 void NoteInfo::addTool(QString label, QWidget *tool)
@@ -85,6 +92,12 @@ void NoteInfo::alphaChanged(int alpha)
 	tconfig().set_property("PerformerEdit", "renderalpha", alpha);
 	tconfig().save();
 	emit alphaChanged();
+}
+void NoteInfo::partLinesChanged(bool checked)
+{
+	tconfig().set_property("PerformerEdit", "partLines", m_partLines->isChecked());
+	tconfig().save();
+	emit enablePartLines(checked);
 }
 
 void NoteInfo::enableTools(bool state)
