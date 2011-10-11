@@ -559,17 +559,17 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 
 	//Add Track menu
 	QMenu* trackMenu = p->addMenu(tr("Add Track"));
-	QAction* midi = trackMenu->addAction(*addtrack_addmiditrackIcon, tr("Midi Track"));
+	QAction* midi = trackMenu->addAction(*addMidiIcon, tr("Midi Track"));
 	midi->setData(Track::MIDI+10000);
-	QAction* wave = trackMenu->addAction(*addtrack_wavetrackIcon, tr("Audio Track"));
+	QAction* wave = trackMenu->addAction(*addAudioIcon, tr("Audio Track"));
 	wave->setData(Track::WAVE+10000);
-	QAction* aoutput = trackMenu->addAction(*addtrack_audiooutputIcon, tr("Output"));
+	QAction* aoutput = trackMenu->addAction(*addOutputIcon, tr("Output"));
 	aoutput->setData(Track::AUDIO_OUTPUT+10000);
-	QAction* ainput = trackMenu->addAction(*addtrack_audioinputIcon, tr("Input"));
+	QAction* ainput = trackMenu->addAction(*addInputIcon, tr("Input"));
 	ainput->setData(Track::AUDIO_INPUT+10000);
-	QAction* agroup = trackMenu->addAction(*addtrack_audiogroupIcon, tr("Buss"));
+	QAction* agroup = trackMenu->addAction(*addBussIcon, tr("Buss"));
 	agroup->setData(Track::AUDIO_BUSS+10000);
-	QAction* aaux = trackMenu->addAction(*addtrack_auxsendIcon, tr("Aux Send"));
+	QAction* aaux = trackMenu->addAction(*addAuxIcon, tr("Aux Send"));
 	aaux->setData(Track::AUDIO_AUX+10000);
 
 

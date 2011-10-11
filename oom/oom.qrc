@@ -417,6 +417,14 @@
 		<file>images/icons/views_outputs.png</file>
 		<file>images/icons/views_busses.png</file>
 		<file>images/icons/views_auxs.png</file>
+		<file>images/icons/views_midi.png</file>
+		<file>images/icons/views_audio.png</file>
+		<file>images/icons/views_inputs_menu.png</file>
+		<file>images/icons/views_outputs_menu.png</file>
+		<file>images/icons/views_busses_menu.png</file>
+		<file>images/icons/views_auxs_menu.png</file>
+		<file>images/icons/views_midi_menu.png</file>
+		<file>images/icons/views_audio_menu.png</file>
 	</qresource>
 </RCC>
 

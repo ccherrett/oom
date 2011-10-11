@@ -624,17 +624,17 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 	if (button == Qt::RightButton)
 	{
 		QMenu* p = new QMenu;
-		QAction* midi = p->addAction(*addtrack_addmiditrackIcon, tr("Add Midi Track"));
+		QAction* midi = p->addAction(*addMidiIcon, tr("Add Midi Track"));
 		midi->setData(Track::MIDI);
-		QAction* wave = p->addAction(*addtrack_wavetrackIcon, tr("Add Audio Track"));
+		QAction* wave = p->addAction(*addAudioIcon, tr("Add Audio Track"));
 		wave->setData(Track::WAVE);
-		QAction* aoutput = p->addAction(*addtrack_audiooutputIcon, tr("Add Output"));
+		QAction* aoutput = p->addAction(*addOutputIcon, tr("Add Output"));
 		aoutput->setData(Track::AUDIO_OUTPUT);
-		QAction* agroup = p->addAction(*addtrack_audiogroupIcon, tr("Add Buss"));
+		QAction* agroup = p->addAction(*addBussIcon, tr("Add Buss"));
 		agroup->setData(Track::AUDIO_BUSS);
-		QAction* ainput = p->addAction(*addtrack_audioinputIcon, tr("Add Input"));
+		QAction* ainput = p->addAction(*addInputIcon, tr("Add Input"));
 		ainput->setData(Track::AUDIO_INPUT);
-		QAction* aaux = p->addAction(*addtrack_auxsendIcon, tr("Add Aux Send"));
+		QAction* aaux = p->addAction(*addAuxIcon, tr("Add Aux Send"));
 		aaux->setData(Track::AUDIO_AUX);
 
 		// Show the menu

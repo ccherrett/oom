@@ -364,6 +364,13 @@ extern QPixmap* mixerAudioSIcon;
 extern QPixmap* initSIcon;
 extern QPixmap* songInfoIcon;
 
+extern QPixmap* addMidiIcon;
+extern QPixmap* addBussIcon;
+extern QPixmap* addInputIcon;
+extern QPixmap* addOutputIcon;
+extern QPixmap* addAuxIcon;
+extern QPixmap* addAudioIcon;
+
 extern QPixmap* addtrack_addmiditrackIcon;
 extern QPixmap* addtrack_audiogroupIcon;
 extern QPixmap* addtrack_audioinputIcon;
