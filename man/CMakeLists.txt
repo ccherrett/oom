@@ -25,13 +25,13 @@ configure_file (
       oom.1.in
       ${PROJECT_BINARY_DIR}/man/${OOMidi_EXEC_NAME}.1
       )
-configure_file (
-      grepmidi.1.in
-      ${PROJECT_BINARY_DIR}/man/grepmidi.1
-      )
+  #configure_file (
+  #      grepmidi.1.in
+  #      ${PROJECT_BINARY_DIR}/man/grepmidi.1
+  #      )
 
 install( FILES 
       ${PROJECT_BINARY_DIR}/man/${OOMidi_EXEC_NAME}.1
-      ${PROJECT_BINARY_DIR}/man/grepmidi.1
+	  #      ${PROJECT_BINARY_DIR}/man/grepmidi.1
       DESTINATION ${SHARE_INSTALL_PREFIX}/man/man1/
       )

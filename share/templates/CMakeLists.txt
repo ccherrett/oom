@@ -30,18 +30,18 @@ file (GLOB templates_files
 
 configure_file (
       oomidi-template.oos.in
-      ${PROJECT_BINARY_DIR}/oomidi-template.oos
+      ${PROJECT_BINARY_DIR}/share/templates/oomidi-template.oos
       )
 
 configure_file (
       oomidi-extended-template.oos.in
-      ${PROJECT_BINARY_DIR}/oomidi-extended-template.oos
+      ${PROJECT_BINARY_DIR}/share/templates/oomidi-extended-template.oos
       )
 
 
 install( FILES ${templates_files} 
-	${PROJECT_BINARY_DIR}/oomidi-template.oos
-    ${PROJECT_BINARY_DIR}/oomidi-extended-template.oos
+	${PROJECT_BINARY_DIR}/share/templates/oomidi-template.oos
+    ${PROJECT_BINARY_DIR}/share/templates/oomidi-extended-template.oos
     DESTINATION ${OOMidi_SHARE_DIR}/templates
     )
 

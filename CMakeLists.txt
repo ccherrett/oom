@@ -440,8 +440,10 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   SET(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 
   SET(CPACK_PACKAGE_FILE_NAME "${CPACK_SOURCE_PACKAGE_FILE_NAME}-${CPACK_SYSTEM_NAME}")
-  SET(CPACK_STRIP_FILES "bin/oomidi;bin/grepmidi;bin/oostudio")
-  SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "grepmidi" "grepmidi" "oostudio" "oostudio")
+  #SET(CPACK_STRIP_FILES "bin/oomidi;bin/grepmidi;bin/oostudio")
+  SET(CPACK_STRIP_FILES "bin/oomidi;bin/oostudio")
+  #SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "grepmidi" "grepmidi" "oostudio" "oostudio")
+  SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "oostudio" "oostudio")
   INCLUDE(CPack)
 ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 
@@ -449,12 +451,10 @@ set(CMAKE_CXX_FLAGS         "-Wall -Wextra -Winvalid-pch -fexceptions ${CMAKE_CX
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -fomit-frame-pointer -ffast-math -fstrength-reduce ${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -DQT_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}")
 
-# subdirs(al awl grepmidi plugins midiplugins oom share synti)
-# subdirs(al lib grepmidi plugins xpm oom share doc synti utils)
-#subdirs(al lib grepmidi plugins oom share synti )
 # NOTE: share/ directory needs to be at the end so that the translations
 #       are scanned before coming to share/locale
-subdirs(al awl grepmidi man plugins oom synti packaging utils share oostudio)
+#subdirs(al awl grepmidi man plugins oom synti packaging utils share oostudio)
+subdirs(al awl man plugins oom synti packaging utils share oostudio)
 
 ## Install doc files
 file (GLOB doc_files
