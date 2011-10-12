@@ -158,7 +158,7 @@ file (GLOB icons_source_files
 ##
 ## Define target
 ##
-add_library ( core SHARED
+add_library ( core STATIC
       ${oom_qrc_files}
       ${oom_moc_headers}
       ${core_source_files}
@@ -166,7 +166,7 @@ add_library ( core SHARED
 add_executable ( oom
       ${main_source_files}
       )
-add_library ( icons SHARED
+add_library ( icons STATIC
       ${icons_source_files}
       )
 
@@ -299,8 +299,8 @@ target_link_libraries(icons
 install( TARGETS oom 
       RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/
       )
-install(TARGETS core icons
-      DESTINATION
-      ${OOMidi_MODULES_DIR}
-      )
+  #install(TARGETS core icons
+  #   DESTINATION
+  #   ${OOMidi_MODULES_DIR}
+  #   )
 

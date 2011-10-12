@@ -90,7 +90,7 @@ file (GLOB awl_source_files
 ##
 ## Define target
 ##
-add_library ( awl SHARED
+add_library ( awl STATIC
       ${awl_source_files}
       ${awl_mocs}
       )
@@ -123,7 +123,7 @@ target_link_libraries ( awl
 ##
 ## Install location
 ##
-install(TARGETS awl
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS awl
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )
 

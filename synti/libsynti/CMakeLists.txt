@@ -37,7 +37,7 @@ file (GLOB synti_source_files
 ##
 ## Define target
 ##
-add_library(synti SHARED
+add_library(synti STATIC
       ${PROJECT_BINARY_DIR}/all-pic.h.pch
       ${synti_source_files}
       )
@@ -65,6 +65,6 @@ set_target_properties( synti
 ##
 ## Install location
 ##
-install(TARGETS synti 
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS synti 
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

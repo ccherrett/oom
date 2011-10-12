@@ -272,6 +272,7 @@ int main(int argc, char* argv[])
 {
 
 	//      error = ErrorHandler::create(argv[0]);
+	Q_INIT_RESOURCE(oom);
 	ruid = getuid();
 	euid = geteuid();
 	undoSetuid();
@@ -321,7 +322,7 @@ int main(int argc, char* argv[])
 
 	if (config.useDenormalBias)
 		printf("Denormal protection enabled.\n");
-	// SHOW MUSE SPLASH SCREEN
+	// SHOW SPLASH SCREEN
 	if (config.showSplashScreen)
 	{
 		QPixmap splsh(oomGlobalShare + "/splash.png");

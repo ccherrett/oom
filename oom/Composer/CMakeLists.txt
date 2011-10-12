@@ -39,7 +39,7 @@ file (GLOB composer_source_files
 #
 # Define target
 #
-add_library ( Composer SHARED
+add_library ( Composer STATIC
       ${composer_source_files}
       ${composer_mocs}
       )
@@ -76,7 +76,7 @@ target_link_libraries ( Composer
 #
 # Install location
 #
-install(TARGETS Composer
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS Composer
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )
 

@@ -72,7 +72,7 @@ endif(LSCP_SUPPORT)
 ##
 ## Define target
 ##
-add_library ( instruments SHARED
+add_library ( instruments STATIC
    ${instruments_source_files}
    ${instruments_mocs}
    ${instruments_uis}
@@ -111,7 +111,7 @@ endif(LSCP_SUPPORT)
 ##
 ## Install location
 ##
-install(TARGETS instruments
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS instruments
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )
 

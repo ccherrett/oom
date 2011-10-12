@@ -49,7 +49,7 @@ endif(LSCP_SUPPORT)
 ##
 ## Define target
 ##
-add_library ( network SHARED
+add_library ( network STATIC
       ${network_source_files}
       ${network_mocs}
       )
@@ -88,6 +88,6 @@ endif(LSCP_SUPPORT)
 ##
 ## Install location
 ##
-install(TARGETS network
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS network
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

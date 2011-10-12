@@ -55,7 +55,7 @@ file (GLOB liste_source_files
 ##
 ## Define target
 ##
-add_library ( liste SHARED
+add_library ( liste STATIC
       ${liste_source_files}
       ${liste_mocs}
       ${liste_uis}
@@ -91,7 +91,7 @@ target_link_libraries ( liste
 ##
 ## Install location
 ##
-install(TARGETS liste
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS liste
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )
 

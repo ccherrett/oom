@@ -29,7 +29,7 @@ file (GLOB freeverb_source_files
 ##
 ## Define target
 ##
-add_library ( freeverb SHARED
+add_library ( freeverb STATIC
       ${freeverb_source_files}
       )
 
@@ -47,9 +47,9 @@ set_target_properties (freeverb
 ##
 ## Install location
 ##
-install( TARGETS freeverb
-      DESTINATION ${OOMidi_PLUGINS_DIR}
-      )
+#install( TARGETS freeverb
+#     DESTINATION ${OOMidi_PLUGINS_DIR}
+#     )
 install( FILES readme.txt
       DESTINATION ${OOMidi_DOC_DIR}/freeverb
       )

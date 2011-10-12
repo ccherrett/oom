@@ -57,7 +57,7 @@ file (GLOB midiedit_source_files
 ##
 ## Define target
 ##
-add_library ( midiedit SHARED
+add_library ( midiedit STATIC
       ${midiedit_source_files}
       ${midiedit_mocs}
       )
@@ -89,11 +89,12 @@ target_link_libraries ( midiedit
       icons
       widgets
       ctrl
+	  core
       )
 
 ##
 ## Install location
 ##
-install(TARGETS midiedit
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS midiedit
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

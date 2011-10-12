@@ -61,7 +61,7 @@ file (GLOB mplugins_source_files
 ##
 ## Define target
 ##
-add_library ( mplugins SHARED
+add_library ( mplugins STATIC
       ${mplugins_source_files}
       ${mplugins_mocs}
       ${mplugins_uis}
@@ -103,7 +103,7 @@ target_link_libraries( mplugins
 ##
 ## Install location
 ##
-install(TARGETS mplugins
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS mplugins
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )
 
