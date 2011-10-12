@@ -1002,6 +1002,7 @@ void Piano::draw(QPainter& p, const QRect& r)
       //p.setFontFamily("fixed-font");
       //p.setFont(font);
       p.setFont(QFont("fixed-font", 7));
+      p.setPen(Qt::black);
       // draw C notes
       for (int drawKey = 0; drawKey < 8;drawKey++) 
 	  {	
