@@ -62,6 +62,7 @@ target_link_libraries ( driver
       ${ALSA_LIBRARIES}
       ${JACK_LIBRARIES}
       ${QT_LIBRARIES}
+      pthread
       mplugins
       )
 
