@@ -7,12 +7,14 @@
 #include "OOStudio.h"
 #include "OOProcess.h"
 #include "OOClient.h"
+#include "OODownload.h"
 #include "config.h"
 #include <QtGui>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNodeList>
 #include <QDomNode>
+#include <QWebPage>
 #include <QIcon>
 #include <jack/jack.h>
 
@@ -83,11 +85,17 @@ OOStudio::OOStudio()
 	//qDebug() << LIBDIR;
 	qDebug() << "Found install path: " << OOM_INSTALL_BIN;
 #endif
+	m_webView->setUrl(QUrl("http://www.openoctave.org"));
 }
 
 void OOStudio::showMessage(QString msg)
 {
 	statusbar->showMessage(msg, 2000);
+}
+
+void OOStudio::showExternalLinks(const QUrl &url)
+{
+	QDesktopServices::openUrl(url);
 }
 
 void OOStudio::createTrayIcon()/*{{{*/
@@ -184,6 +192,8 @@ void OOStudio::loadStyle(QString style)/*{{{*/
 
 void OOStudio::createConnections()/*{{{*/
 {
+	m_webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+	connect(m_webView, SIGNAL(linkClicked(const QUrl&)), this, SLOT(showExternalLinks(const QUrl&)));
 	connect(action_Import_Session, SIGNAL(triggered()), this, SLOT(importSession()));
 	connect(actionQuit, SIGNAL(triggered()), this, SLOT(shutdown()));
 	connect(m_quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));

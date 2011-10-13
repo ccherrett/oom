@@ -25,6 +25,7 @@ QT4_WRAP_CPP ( studio_mocs
 	OOProcess.h
 	OOStudio.h
 	OOClient.h
+	OODownload.h
       )
 
 ##
@@ -41,6 +42,7 @@ file (GLOB studio_source_files
 	OOProcess.cpp
     OOStudio.cpp
 	OOClient.cpp
+	OODownload.cpp
 	main.cpp
     )
 
