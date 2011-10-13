@@ -15,6 +15,7 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QPaintEvent>
+#include <QDebug>
 
 // Don't use this, it was just for debugging. 
 // It's much slower than oom-1 no matter how hard I tried.
@@ -227,6 +228,8 @@ void View::resizeEvent(QResizeEvent* ev)
 	else
 		pm = pm.copy(QRect(QPoint(0, 0), ev->size()));
 	pmValid = false;
+#else
+	Q_UNUSED(ev)
 #endif
 }
 
