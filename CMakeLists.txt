@@ -460,18 +460,18 @@ subdirs(al awl man plugins oom synti packaging utils share oostudio)
 ## Install doc files
 file (GLOB doc_files
       AUTHORS
-      ChangeLog
       COPYING
-      NEWS
       README
-      README.de
-      README.effects-rack
-      README.instruments
-      README.ladspaguis
-      README.shortcuts
-      README.softsynth
-      README.translate
-      SECURITY
+	  #ChangeLog
+	  #NEWS
+	  #README.de
+	  #README.effects-rack
+	  #README.instruments
+	  #README.ladspaguis
+	  #README.shortcuts
+	  #README.softsynth
+	  #README.translate
+	  #SECURITY
       )
 INSTALL( FILES ${doc_files} DESTINATION ${OOMidi_DOC_DIR})
 

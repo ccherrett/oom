@@ -21,7 +21,7 @@
 # NOTE: locale/ directory needs to be at the end so that the translations
 #       are scanned before coming to share/locale
 subdirs(
-      drummaps
+	#drummaps
 	  #      html
       instruments
       plugins

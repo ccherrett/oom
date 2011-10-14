@@ -85,7 +85,8 @@ OOStudio::OOStudio()
 	//qDebug() << LIBDIR;
 	qDebug() << "Found install path: " << OOM_INSTALL_BIN;
 #endif
-	m_webView->setUrl(QUrl("http://www.openoctave.org"));
+	//m_webView->setUrl(QUrl("http://www.openoctave.org"));
+	m_webView->setUrl(QUrl("qrc:/oostudio.html"));
 }
 
 void OOStudio::showMessage(QString msg)
