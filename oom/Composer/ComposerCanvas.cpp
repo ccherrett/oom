@@ -3325,6 +3325,9 @@ void ComposerCanvas::copyAutomation()/*{{{*/
 	}
 }/*}}}*/
 
+#include "traverso_shared/AddRemoveCtrlValues.h"
+#include "traverso_shared/CommandGroup.h"
+
 void ComposerCanvas::pasteAutomation()/*{{{*/
 {
 	TrackList selectedTracks = song->getSelectedTracks();
@@ -3398,6 +3401,9 @@ void ComposerCanvas::pasteAutomation()/*{{{*/
 				}
 				if(cl)
 				{
+					QList<CtrlVal> valuesToAdd;
+					QList<CtrlVal> valuesToRemove;
+
 					if(partial)
 					{//Add nodes from PB forward
 						QDomNodeList nodeList = control.elementsByTagName("node");
@@ -3416,20 +3422,11 @@ void ComposerCanvas::pasteAutomation()/*{{{*/
 							int lframe = last.attribute("frame").toInt();
 							int range = lframe-fframe;
 							int endframe = spos+range;
-							QList<int> delList;
 							for (ciCtrl ic = cl->begin(); ic != cl->end(); ++ic)
 							{
 								if(ic->second.getFrame() > spos && ic->second.getFrame() < endframe)
 								{
-									delList.append(ic->second.getFrame());
-								}
-							}
-							//now safely delete the selected nodes
-							if(!delList.isEmpty())
-							{
-								foreach(int cv, delList)
-								{
-									cl->del(cv);
+									valuesToRemove.append(ic->second);
 								}
 							}
 						}
@@ -3450,7 +3447,7 @@ void ComposerCanvas::pasteAutomation()/*{{{*/
 								lastframe = frame;
 							}
 							double val = node.attribute("value").toDouble();
-							cl->add(frame, val);
+							valuesToAdd.append(CtrlVal(frame, val));
 						}
 					}
 					else
@@ -3466,9 +3463,17 @@ void ComposerCanvas::pasteAutomation()/*{{{*/
 							QDomElement node = nodeList.at(n).toElement();
 							int frame = node.attribute("frame").toInt();
 							double val = node.attribute("value").toDouble();
-							cl->add(frame, val);
+							valuesToAdd.append(CtrlVal(frame, val));
 						}
 					}
+
+					AddRemoveCtrlValues* addCommand = new AddRemoveCtrlValues(cl, valuesToAdd, "", OOMCommand::ADD);
+					AddRemoveCtrlValues* removeCommand = new AddRemoveCtrlValues(cl, valuesToRemove, "", OOMCommand::REMOVE);
+
+					CommandGroup* group = new CommandGroup(tr("Copy Automation Nodes"));
+					group->add_command(addCommand);
+					group->add_command(removeCommand);
+					CommandGroup::process_command(group);
 				}
 				//in the future we can support copying multiple lanes at once
 				break;
