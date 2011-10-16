@@ -229,9 +229,9 @@ QFrame#m_sonatinaBox, QFrame#m_maestroBox, QFrame#m_classicBox, QFrame#m_accoust
 }
 
 QLabel#m_lblSonatina, QLabel#label_14, QLabel#m_lblSSOTitle, QLabel#m_lblSSOState, 
-QLabel#m_lblMaestro, QLabel#label_15, QLabel#m_lblMaestroTitle, QLabel#m_lblMaestroState
-QLabel#m_lblClassic, QLabel#label_16, QLabel#m_lblClassicTitle, QLabel#m_lblClassicState
-QLabel#m_lblAccoustic, QLabel#label_17, QLabel#m_lblAccousticTitle, QLabel#m_lblAccousticState
+QLabel#m_lblMaestro, QLabel#label_15, QLabel#m_lblMaestroTitle, QLabel#m_lblMaestroState,
+QLabel#m_lblClassic, QLabel#label_16, QLabel#m_lblClassicTitle, QLabel#m_lblClassicState,
+QLabel#m_lblAccoustic, QLabel#label_17, QLabel#m_lblAccousticTitle, QLabel#m_lblAccousticState,
 QLabel#m_lblM7, QLabel#label_18, QLabel#m_lblM7Title, QLabel#m_lblM7State
 {
 	background-color:none;

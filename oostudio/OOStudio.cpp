@@ -272,6 +272,9 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_templateTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(templateDoubleClicked(QModelIndex)));
 
 	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTopTabChanged(int)));
+
+	connect(m_chk44, SIGNAL(toggled(bool)), this, SLOT(updateInstalledState()));
+	connect(m_chk48, SIGNAL(toggled(bool)), this, SLOT(updateInstalledState()));
 }/*}}}*/
 
 void OOStudio::updateHeaders()/*{{{*/
@@ -412,47 +415,73 @@ void OOStudio::updateInstalledState()
 {
 	QDir soundsDir(QDir::homePath().append(QDir::separator()).append(".sounds"));
 	QDir sso(SONATINA_PATH);
-	qDebug() << "SSO PATH: " << sso.path();
-	if(sso.exists() || soundsDir.exists(SONATINA_LOCAL_PATH))
+	//qDebug() << "SSO PATH: " << sso.path();
+	if(sso.exists() || soundsDir.exists(QString("sonatina").append(QDir::separator()).append(SONATINA_LOCAL_PATH)))
 	{
 		//SSO is installed
 		m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		m_btnDownloadSonatina->setEnabled(false);
 	}
 	else
 	{
 		m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+		m_btnDownloadSonatina->setEnabled(true);
 	}
 	if(soundsDir.exists(MAESTRO_PATH))
 	{
 		m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		m_btnDownloadMaestro->setEnabled(false);
 	}
 	else
 	{
 		m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+		m_btnDownloadMaestro->setEnabled(true);
 	}
 	if(soundsDir.exists(CLASSIC_PATH))
 	{
 		m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		m_btnDownloadClassic->setEnabled(false);
 	}
 	else
 	{
 		m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+		m_btnDownloadClassic->setEnabled(true);
 	}
 	if(soundsDir.exists(ACCOUSTIC_PATH))
 	{
 		m_lblAccousticState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		m_btnDownloadAccoustic->setEnabled(false);
 	}
 	else
 	{
 		m_lblAccousticState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+		m_btnDownloadAccoustic->setEnabled(true);
 	}
-	if(soundsDir.exists(M7IR44_PATH) || soundsDir.exists(M7IR48_PATH))
+	if(m_chk44->isChecked())
 	{
-		m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		if(soundsDir.exists(M7IR44_PATH))
+		{
+			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+			m_btnDownloadM7->setEnabled(false);
+		}
+		else
+		{
+			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+			m_btnDownloadM7->setEnabled(true);
+		}
 	}
 	else
 	{
-		m_lblM7State->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+		if(soundsDir.exists(M7IR48_PATH))
+		{
+			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+			m_btnDownloadM7->setEnabled(false);
+		}
+		else
+		{
+			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+			m_btnDownloadM7->setEnabled(true);
+		}
 	}
 }
 
