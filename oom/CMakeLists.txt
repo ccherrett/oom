@@ -66,6 +66,9 @@ QT4_WRAP_CPP ( oom_moc_headers
       transpose.h 
       value.h 
       traverso_shared/TConfig.h
+      traverso_shared/AddRemoveCtrlValues.h
+      traverso_shared/CommandGroup.h
+      traverso_shared/OOMCommand.h
 	  cthread.h
 	  cserver.h
 	  midimonitor.h
@@ -142,6 +145,9 @@ file (GLOB core_source_files
       wavetrack.cpp 
       xml.cpp
       traverso_shared/TConfig.cpp
+      traverso_shared/AddRemoveCtrlValues.cpp
+      traverso_shared/CommandGroup.cpp
+      traverso_shared/OOMCommand.cpp
 	  cthread.cpp
 	  cserver.cpp
 	  midimonitor.cpp
