@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="m_tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="m_tabSessions">
        <attribute name="title">
@@ -398,16 +398,29 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QComboBox" name="m_cmbTemplate"/>
+                <widget class="QComboBox" name="m_cmbTemplate">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QComboBox::AdjustToContents</enum>
+                 </property>
+                </widget>
                </item>
                <item>
                 <spacer name="horizontalSpacer_5">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::MinimumExpanding</enum>
+                 </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>40</width>
+                   <width>2</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -720,6 +733,11 @@
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
          <widget class="QGroupBox" name="groupBox_4">
+          <property name="font">
+           <font>
+            <family>Luxi Sans</family>
+           </font>
+          </property>
           <property name="title">
            <string>Currently Loaded Session</string>
           </property>
@@ -847,62 +865,489 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QGroupBox" name="m_webBox">
-          <property name="title">
-           <string>Available Sample libraries</string>
+         <widget class="QFrame" name="m_availableBox">
+          <property name="font">
+           <font>
+            <family>Luxi Sans</family>
+           </font>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_12">
-           <property name="leftMargin">
-            <number>6</number>
-           </property>
-           <property name="rightMargin">
-            <number>6</number>
-           </property>
-           <property name="bottomMargin">
-            <number>6</number>
+           <property name="spacing">
+            <number>20</number>
            </property>
            <item>
-            <widget class="QWebView" name="m_webView">
-             <property name="url">
-              <url>
-               <string>about:blank</string>
-              </url>
+            <widget class="QLabel" name="m_lblDownloadInfo">
+             <property name="text">
+              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Luxi Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Serif'; font-weight:600;&quot;&gt;Select the applicable libraries below and click the &amp;quot;Download&amp;quot; button&lt;/span&gt;&lt;span style=&quot; font-family:'Luxi Serif';&quot;&gt;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Luxi Serif';&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Serif'; font-weight:600;&quot;&gt;NOTE: &lt;/span&gt;&lt;span style=&quot; font-family:'Luxi Serif';&quot;&gt;By selecting to download any of the following libraries you have agree to accept the respective License agreements. You maintain all responsibility for your use of these libraries not the &lt;/span&gt;&lt;a href=&quot;http://www.openoctave.org&quot;&gt;&lt;span style=&quot; font-family:'Luxi Serif'; text-decoration: underline; color:#0000ff;&quot;&gt;OpenOctaveProject&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Luxi Serif';&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QScrollArea" name="m_downloadScrollAcrea">
+             <property name="font">
+              <font>
+               <family>Luxi Sans</family>
+              </font>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="QWidget" name="m_scrollAreaWidgetContents">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>497</width>
+                <height>1389</height>
+               </rect>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_13">
+               <property name="spacing">
+                <number>20</number>
+               </property>
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QFrame" name="m_sonatinaBox">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_14" stretch="0,0">
+                  <property name="topMargin">
+                   <number>20</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>20</number>
+                  </property>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_12">
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <spacer name="horizontalSpacer_9">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="m_lblSSOState">
+                      <property name="minimumSize">
+                       <size>
+                        <width>48</width>
+                        <height>56</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>48</width>
+                        <height>56</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>status</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="m_lblSSOTitle">
+                      <property name="minimumSize">
+                       <size>
+                        <width>334</width>
+                        <height>56</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>334</width>
+                        <height>56</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>TextLabel</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_10">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="m_lblSonatina">
+                    <property name="font">
+                     <font>
+                      <family>Fixed</family>
+                      <pointsize>11</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Fixed'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Luxi Serif'; font-size:10pt; font-weight:400;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;Copyright: Public Domain&lt;/span&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Luxi Serif';&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;License: &lt;a href=&quot;http://creativecommons.org/licenses/sampling+/1.0/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Creative Commons Sampling Plus 1.0&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Luxi Serif';&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Author Website: &lt;a href=&quot;http://sso.mattiaswestlund.net/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://sso.mattiaswestlund.net/&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Serif';&quot;&gt;Sonatina Symphonic Orchestra is a free orchestral sample library. While not as advanced or ambitious in scope as commercial offerings, SSO contains all the basic building blocks for creating real virtual orchestrations. It's primarily aimed at beginners, but also more experienced composers looking for something lightweight and/or portable might find it useful.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::RichText</enum>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="m_maestroBox">
+                 <property name="title">
+                  <string>Maestro Grand Piano v2</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,0">
+                  <property name="topMargin">
+                   <number>20</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>20</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="m_lblMaestroState">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="m_lblMaestro">
+                    <property name="font">
+                     <font>
+                      <family>Fixed</family>
+                      <pointsize>11</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Fixed'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Luxi Serif'; font-size:10pt; font-weight:400;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;Copyright: © 2003 Mats Helgesson&lt;/span&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Luxi Serif';&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;License: &lt;a href=&quot;http://download.linuxsampler.org/instruments/pianos/maestro_concert_grand_v2_license.txt&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Maestro Concert Grand v2 License&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Luxi Serif';&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Author Website: &lt;a href=&quot;http://www.linuxsampler.org/instruments.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.linuxsampler.org/instruments.html&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Serif';&quot;&gt;Maestro Concert Grand v2 is a big giga bank using 792 stereo samples of a concert piano, a Yamaha CF3 from the early 90s, It was chromatically sampled to maintain the tempered tuning. The samples were recorded with two Neumann KM84 microphones, disposed in X/Y, with 5 velocity layers, and weighs 932 MB ! The piano alone, without release samples, weighs 887 Mb and 440 samples. The release samples are 352 and weigh 45 MB. You can play with or without them. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::RichText</enum>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="m_classicBox">
+                 <property name="title">
+                  <string>Pettinhouse Classic Guitar FREE</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,0">
+                  <property name="topMargin">
+                   <number>20</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>20</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="m_lblClassicState">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="m_lblClassic">
+                    <property name="font">
+                     <font>
+                      <family>Fixed</family>
+                      <pointsize>11</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Fixed'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Luxi Serif'; font-size:10pt; font-weight:400;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Copyright: © 2006 Pettinhouse.com&lt;/span&gt;&lt;/li&gt;
+&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;License: &lt;a href=&quot;http://www.openoctave.org/oostudio_files/classic-license.txt&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b3d0b3;&quot;&gt;Non-commercial/non-distribution&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Author Website: &lt;a href=&quot;http://www.pettinhouse.com/html/classicfree.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b3d0b3;&quot;&gt;http://www.pettinhouse.com/html/classicfree.html&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The Pettinhouse Classic Guitar is an excellent product brought to you for FREE by the guys @ &lt;/span&gt;&lt;a href=&quot;http://www.pettinhouse.com&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline; color:#b3d0b3;&quot;&gt;pettinhouse.com&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; . &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please consider going there and donating if you find these useful. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::RichText</enum>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="m_accousticBox">
+                 <property name="title">
+                  <string>Pettinhouse Accoustic Guitar FREE</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="0,0">
+                  <property name="topMargin">
+                   <number>20</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>20</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="m_lblAccousticState">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="m_lblAccoustic">
+                    <property name="font">
+                     <font>
+                      <family>Fixed</family>
+                      <pointsize>11</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Fixed'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;Copyright: © 2006 Pettinhouse.com&lt;/span&gt;&lt;/li&gt;
+&lt;li style=&quot; font-size:11pt; font-weight:600;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;License: &lt;a href=&quot;http://www.openoctave.org/oostudio_files/accoustic-license.txt&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b3d0b3;&quot;&gt;Non-commercial/non-distribution&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li style=&quot; font-size:11pt; font-weight:600;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Author Website: &lt;a href=&quot;http://www.pettinhouse.com/html/acousticguitar_free.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b3d0b3;&quot;&gt;http://www.pettinhouse.com/html/acousticguitar_free.html&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;The Pettinhouse Accoustic Guitar is an excellent product brought to you for FREE by the guys @ &lt;/span&gt;&lt;a href=&quot;http://www.pettinhouse.com&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; text-decoration: underline; color:#b3d0b3;&quot;&gt;pettinhouse.com&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt; . &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;Please consider going there and donating if you find these useful. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::RichText</enum>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="m_m7Box">
+                 <property name="title">
+                  <string>Samplicity's Bricasti M7 IR</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="flat">
+                  <bool>false</bool>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0,0">
+                  <property name="topMargin">
+                   <number>20</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>20</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="m_lblM7State">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="m_lblM7">
+                    <property name="font">
+                     <font>
+                      <family>Fixed</family>
+                      <pointsize>11</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Fixed'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Luxi Serif'; font-size:10pt; font-weight:400;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;Copyright: Completely FREE&lt;/span&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Luxi Serif';&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;License: DonationWare - non-commercial&lt;/li&gt;
+&lt;li style=&quot; font-family:'Luxi Serif';&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Author Website: &lt;a href=&quot;http://www.samplicity.com/bricasti-m7-impulse-responses/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.samplicity.com/bricasti-m7-impulse-responses/&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Serif';&quot;&gt;Samplicity has created a new Impulse Response Library, using the immensely popular and highly acclaimed Bricasti M7 reverb unit. And again, Samplicity has created a very complete, accurate and excellently sounding set of impulse responses, all in True Stereo and in Mono-to-Stereo. This library surpasses all previously released Bricasti IRs in terms of signal-to-noise ratios and detailed and rich reverb tails. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::RichText</enum>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="m_dloadButtonBox">
+             <item>
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="m_btnDownload">
+               <property name="text">
+                <string>Download</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
           </layout>
          </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_12">
-          <item>
-           <widget class="QCheckBox" name="m_chkAccept">
-            <property name="text">
-             <string>Accept above licences</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="m_btnDownload">
-            <property name="text">
-             <string>Download</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </item>
        </layout>
       </widget>
@@ -951,13 +1396,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKit/QWebView</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

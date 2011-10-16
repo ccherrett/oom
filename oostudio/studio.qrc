@@ -3,6 +3,9 @@
 	<file>style.qss</file>
 	<file>oostudio.html</file>
 	<file>oostudio.xml</file>
+	<file>images/oostudio-installed.png</file>
+	<file>images/oostudio-not-installed.png</file>
+	<file>images/oostudio-download.png</file>
 	<file>images/oom_icon.png</file>
 	<file>images/checkbox_checked.png</file>
 	<file>images/checkbox_checked_hover.png</file>

@@ -19,6 +19,7 @@
 #include <QMap>
 #include <QStringList>
 #include <QProcess>
+#include <QQueue>
 #include "ui_OOStudioBase.h"
 
 class QCloseEvent;
@@ -34,6 +35,7 @@ class QSettings;
 class OOProcess;
 class QByteArray;
 class QSize;
+class QTimer;
 
 struct OOSession
 {
@@ -51,6 +53,13 @@ struct OOSession
 	QString songfile;
 	QString lshostname;
 	int lsport;
+};
+
+struct LogInfo
+{
+	QString name;
+	QString message;
+	QString codeString;
 };
 
 class OOStudio :public QMainWindow ,public Ui::OOStudioBase
@@ -87,6 +96,8 @@ private:
 	QHash<long, OOProcess*> m_procMap;
 	OOSession* m_current;
 	QByteArray m_restoreSize;
+	QQueue<LogInfo*> m_logQueue;
+	QTimer* m_heartBeat;
 
 	void loadStyle(QString);
 	void createTrayIcon();
@@ -111,12 +122,15 @@ private:
 	QString convertPath(QString);
 	void doSessionDelete(OOSession*);
 	void showMessage(QString);
+	void writeLog(LogInfo*);
 
 protected:
 	void closeEvent(QCloseEvent*);
 	void resizeEvent(QResizeEvent*);
 
 private slots:
+	void updateInstalledState();
+	void heartBeat();
 	void showExternalLinks(const QUrl &url);
 	void cleanupProcessList();
 	void iconActivated(QSystemTrayIcon::ActivationReason);

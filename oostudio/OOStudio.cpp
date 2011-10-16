@@ -30,6 +30,13 @@ static const QString TEMPLATE_DIR = QString(QDir::homePath()).append(QDir::separ
 static const char* OOM_TEMPLATE_NAME = "OOMidi_Orchestral_Template";
 static const char* OOM_EXT_TEMPLATE_NAME = "OOMidi_Orchestral_Extended_Template";
 static const char* MAP_STRING = "MAP MIDI_INSTRUMENT";
+static const QString SONATINA_PATH = QString(QDir::rootPath()).append("usr").append(QDir::separator()).append("share").append(QDir::separator()).append("sounds").append(QDir::separator()).append("sonatina").append(QDir::separator()).append("Sonatina Symphonic Orchestra");
+static const QString SONATINA_LOCAL_PATH("Sonatina Symphonic Orchestra");
+static const QString MAESTRO_PATH("maestro");
+static const QString CLASSIC_PATH("ClassicFREE");
+static const QString ACCOUSTIC_PATH("AccousticFREE");
+static const QString M7IR44_PATH("Samplicity M7 Main - 03 - Wave Quad files, 32 bit, 44.1 Khz, v1.1");
+static const QString M7IR48_PATH("Samplicity M7 Main - 03 - Wave Quad files, 32 bit, 48 Khz, v1.1");
 
 lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event*/, const char * /*pchData*/, int /*cchData*/, void* pvData )
 {
@@ -42,6 +49,7 @@ lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event
 OOStudio::OOStudio()
 {
 	setupUi(this);
+	m_scrollAreaWidgetContents->setStyleSheet("QWidget{ background-color: #525252; }");
 	m_oomProcess = 0;
 	m_jackProcess = 0;
 	m_lsProcess = 0;
@@ -54,6 +62,10 @@ OOStudio::OOStudio()
 	createTrayIcon();
 	QString style(":/style.qss");
 	loadStyle(style);
+
+	m_btnDownload->setIcon(QIcon(":/images/oostudio-download.png"));
+	QDir homeDir = QDir::home();
+	homeDir.mkdir(".sounds");
 
 	m_lscpLabels = (QStringList() << "Default" << "ON_DEMAND" << "ON_DEMAND_HOLD" << "PERSISTENT");
 	m_cmbLSCPMode->addItems(m_lscpLabels);
@@ -86,7 +98,21 @@ OOStudio::OOStudio()
 	qDebug() << "Found install path: " << OOM_INSTALL_BIN;
 #endif
 	//m_webView->setUrl(QUrl("http://www.openoctave.org"));
-	m_webView->setUrl(QUrl("qrc:/oostudio.html"));
+	//m_webView->setUrl(QUrl("qrc:/oostudio.html"));
+
+	m_heartBeat = new QTimer(this);
+	m_heartBeat->setObjectName("timer");
+	connect(m_heartBeat, SIGNAL(timeout()), this, SLOT(heartBeat()));
+	m_heartBeat->start(50);
+	updateInstalledState();
+}
+
+void OOStudio::heartBeat()
+{
+	while(!m_logQueue.isEmpty())
+	{
+		writeLog(m_logQueue.dequeue());
+	}
 }
 
 void OOStudio::showMessage(QString msg)
@@ -193,8 +219,8 @@ void OOStudio::loadStyle(QString style)/*{{{*/
 
 void OOStudio::createConnections()/*{{{*/
 {
-	m_webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-	connect(m_webView, SIGNAL(linkClicked(const QUrl&)), this, SLOT(showExternalLinks(const QUrl&)));
+	//m_webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+	//connect(m_webView, SIGNAL(linkClicked(const QUrl&)), this, SLOT(showExternalLinks(const QUrl&)));
 	connect(action_Import_Session, SIGNAL(triggered()), this, SLOT(importSession()));
 	connect(actionQuit, SIGNAL(triggered()), this, SLOT(shutdown()));
 	connect(m_quitAction, SIGNAL(triggered()), this, SLOT(shutdown()));
@@ -359,6 +385,54 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 
 	updateHeaders();
 }/*}}}*/
+
+void OOStudio::updateInstalledState()
+{
+	QDir soundsDir(QDir::homePath().append(QDir::separator()).append(".sounds"));
+	QDir sso(SONATINA_PATH);
+	qDebug() << "SSO PATH: " << sso.path();
+	if(sso.exists() || soundsDir.exists(SONATINA_LOCAL_PATH))
+	{
+		//SSO is installed
+		m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+	}
+	else
+	{
+		m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+	}
+	if(soundsDir.exists(MAESTRO_PATH))
+	{
+		m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+	}
+	else
+	{
+		m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+	}
+	if(soundsDir.exists(CLASSIC_PATH))
+	{
+		m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+	}
+	else
+	{
+		m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+	}
+	if(soundsDir.exists(ACCOUSTIC_PATH))
+	{
+		m_lblAccousticState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+	}
+	else
+	{
+		m_lblAccousticState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+	}
+	if(soundsDir.exists(M7IR44_PATH) || soundsDir.exists(M7IR48_PATH))
+	{
+		m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+	}
+	else
+	{
+		m_lblM7State->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
+	}
+}
 
 void OOStudio::clearLogger()/*{{{*/
 {
@@ -934,7 +1008,7 @@ bool OOStudio::runOOM(OOSession* session)/*{{{*/
 		QStringList args;
 		args << session->songfile;
 		m_oomProcess->start(QString(OOM_INSTALL_BIN), args);
-		bool rv = m_oomProcess->waitForStarted();
+		bool rv = m_oomProcess->waitForStarted(50000);
 		printf("%s\n", rv ? "Complete" : "FAILED");
 		showMessage(rv ? "Loading OOMidi Complete" : "Loading OOMidi FAILED");
 		m_oomRunning = rv;
@@ -1942,20 +2016,27 @@ void OOStudio::processJackExecError(QProcess::ProcessError error)
 
 void OOStudio::processJackMessages()/*{{{*/
 {
-	
-	QString messages = QString::fromUtf8(m_jackProcess->readAllStandardOutput().constData());
-	if(messages.isEmpty())
-		return;
-	QList<QStandardItem*> rowData;
-	QStandardItem* command = new QStandardItem("Jackd");
-	QStandardItem* log = new QStandardItem(messages);
-	QStandardItem* level = new QStandardItem("INFO");
-	rowData << command << level << log;
-	m_loggerModel->appendRow(rowData);
-	updateHeaders();
-	m_loggerTable->resizeRowsToContents();
-	m_loggerTable->scrollToBottom();
-	
+	while(m_jackProcess->canReadLine())
+	{
+		QString messages = QString::fromUtf8(m_jackProcess->readLine().constData());
+		messages = messages.trimmed().simplified();
+		if(messages.isEmpty())
+			continue;
+		LogInfo* info = new LogInfo;
+		info->name = QString("Jackd");
+		info->message = messages;
+		info->codeString = QString("INFO");
+		m_logQueue.enqueue(info);
+		//QList<QStandardItem*> rowData;
+		//QStandardItem* command = new QStandardItem("Jackd");
+		//QStandardItem* log = new QStandardItem(messages);
+		//QStandardItem* level = new QStandardItem("INFO");
+		//rowData << command << level << log;
+		//m_loggerModel->appendRow(rowData);
+		//updateHeaders();
+		//m_loggerTable->resizeRowsToContents();
+		//m_loggerTable->scrollToBottom();
+	}
 	//processMessages(0, tr("Jackd"), m_jackProcess);
 }/*}}}*/
 
@@ -1964,35 +2045,48 @@ void OOStudio::processJackErrors()/*{{{*/
 	QString messages = QString::fromUtf8(m_jackProcess->readAllStandardError().constData());
 	if(messages.isEmpty())
 		return;
-	QList<QStandardItem*> rowData;
-	QStandardItem* command = new QStandardItem("Jackd");
-	command->setBackground(QColor(99, 36, 36));
-	QStandardItem* log = new QStandardItem(messages);
-	QStandardItem* level = new QStandardItem("ERROR");
-	rowData << command << level << log;
-	m_loggerModel->appendRow(rowData);
-	updateHeaders();
-	m_loggerTable->resizeRowsToContents();
-	m_loggerTable->scrollToBottom();
+	LogInfo* info = new LogInfo;
+	info->name = QString("Jackd");
+	info->message = messages;
+	info->codeString = QString("ERROR");
+	m_logQueue.enqueue(info);
+	//QList<QStandardItem*> rowData;
+	//QStandardItem* command = new QStandardItem("Jackd");
+	//command->setBackground(QColor(99, 36, 36));
+	//QStandardItem* log = new QStandardItem(messages);
+	//QStandardItem* level = new QStandardItem("ERROR");
+	//rowData << command << level << log;
+	//m_loggerModel->appendRow(rowData);
+	//updateHeaders();
+	//m_loggerTable->resizeRowsToContents();
+	//m_loggerTable->scrollToBottom();
 
 	//processMessages(1, tr("Jackd"), m_jackProcess);
 }/*}}}*/
 
 void OOStudio::processLSMessages()/*{{{*/
 {
-	QString messages = QString::fromUtf8(m_lsProcess->readAllStandardOutput().constData());
-	if(messages.isEmpty())
-		return;
-	QList<QStandardItem*> rowData;
-	QStandardItem* command = new QStandardItem("LinuxSampler");
-	QStandardItem* log = new QStandardItem(messages);
-	QStandardItem* level = new QStandardItem("INFO");
-	rowData << command << level << log;
-	m_loggerModel->appendRow(rowData);
-	updateHeaders();
-	m_loggerTable->resizeRowsToContents();
-	m_loggerTable->scrollToBottom();
-	
+	while(m_lsProcess->canReadLine())
+	{
+		QString messages = QString::fromUtf8(m_lsProcess->readLine().constData());
+		messages = messages.trimmed().simplified();
+		if(messages.isEmpty())
+			continue;
+		LogInfo* info = new LogInfo;
+		info->name = QString("LinuxSampler");
+		info->message = messages;
+		info->codeString = QString("INFO");
+		m_logQueue.enqueue(info);
+		//QList<QStandardItem*> rowData;
+		//QStandardItem* command = new QStandardItem("LinuxSampler");
+		//QStandardItem* log = new QStandardItem(messages);
+		//QStandardItem* level = new QStandardItem("INFO");
+		//rowData << command << level << log;
+		//m_loggerModel->appendRow(rowData);
+		//updateHeaders();
+		//m_loggerTable->resizeRowsToContents();
+		//m_loggerTable->scrollToBottom();
+	}
 	//processMessages(0, tr("LinuxSampler"), m_lsProcess);
 }/*}}}*/
 
@@ -2001,34 +2095,47 @@ void OOStudio::processLSErrors()/*{{{*/
 	QString messages = QString::fromUtf8(m_lsProcess->readAllStandardError().constData());
 	if(messages.isEmpty())
 		return;
-	QList<QStandardItem*> rowData;
-	QStandardItem* command = new QStandardItem("LinuxSampler");
-	command->setBackground(QColor(99, 36, 36));
-	QStandardItem* log = new QStandardItem(messages);
-	QStandardItem* level = new QStandardItem("ERROR");
-	rowData << command << level << log;
-	m_loggerModel->appendRow(rowData);
-	updateHeaders();
-	m_loggerTable->resizeRowsToContents();
-	m_loggerTable->scrollToBottom();
+	LogInfo* info = new LogInfo;
+	info->name = QString("LinuxSampler");
+	info->message = messages;
+	info->codeString = QString("ERROR");
+	m_logQueue.enqueue(info);
+	//QList<QStandardItem*> rowData;
+	//QStandardItem* command = new QStandardItem("LinuxSampler");
+	//command->setBackground(QColor(99, 36, 36));
+	//QStandardItem* log = new QStandardItem(messages);
+	//QStandardItem* level = new QStandardItem("ERROR");
+	//rowData << command << level << log;
+	//m_loggerModel->appendRow(rowData);
+	//updateHeaders();
+	//m_loggerTable->resizeRowsToContents();
+	//m_loggerTable->scrollToBottom();
 	//processMessages(1, tr("LinuxSampler"), m_lsProcess);
 }/*}}}*/
 
 void OOStudio::processOOMMessages()/*{{{*/
 {
-	QString messages = QString::fromUtf8(m_oomProcess->readAllStandardOutput().constData());
-	if(messages.isEmpty())
-		return;
-	QList<QStandardItem*> rowData;
-	QStandardItem* command = new QStandardItem("OOMidi");
-	QStandardItem* log = new QStandardItem(messages);
-	QStandardItem* level = new QStandardItem("INFO");
-	rowData << command << level << log;
-	m_loggerModel->appendRow(rowData);
-	updateHeaders();
-	m_loggerTable->resizeRowsToContents();
-	m_loggerTable->scrollToBottom();
-	
+	while(m_oomProcess->canReadLine())
+	{
+		QString messages = QString::fromUtf8(m_oomProcess->readLine().constData());
+		messages = messages.trimmed().simplified();
+		if(messages.isEmpty())
+			continue;
+		LogInfo* info = new LogInfo;
+		info->name = QString("OOMidi");
+		info->message = messages;
+		info->codeString = QString("INFO");
+		m_logQueue.enqueue(info);
+		//QList<QStandardItem*> rowData;
+		//QStandardItem* command = new QStandardItem("OOMidi");
+		//QStandardItem* log = new QStandardItem(messages);
+		//QStandardItem* level = new QStandardItem("INFO");
+		//rowData << command << level << log;
+		//m_loggerModel->appendRow(rowData);
+		//updateHeaders();
+		//m_loggerTable->resizeRowsToContents();
+		//m_loggerTable->scrollToBottom();
+	}
 	//processMessages(0, tr("OOMidi"), m_oomProcess);
 }/*}}}*/
 
@@ -2037,16 +2144,21 @@ void OOStudio::processOOMErrors()/*{{{*/
 	QString messages = QString::fromUtf8(m_oomProcess->readAllStandardError().constData());
 	if(messages.isEmpty())
 		return;
-	QList<QStandardItem*> rowData;
-	QStandardItem* command = new QStandardItem("OOMidi");
-	command->setBackground(QColor(99, 36, 36));
-	QStandardItem* log = new QStandardItem(messages);
-	QStandardItem* level = new QStandardItem("ERROR");
-	rowData << command << level << log;
-	m_loggerModel->appendRow(rowData);
-	updateHeaders();
-	m_loggerTable->resizeRowsToContents();
-	m_loggerTable->scrollToBottom();
+	LogInfo* info = new LogInfo;
+	info->name = QString("OOMidi");
+	info->message = messages;
+	info->codeString = QString("ERROR");
+	m_logQueue.enqueue(info);
+	//QList<QStandardItem*> rowData;
+	//QStandardItem* command = new QStandardItem("OOMidi");
+	//command->setBackground(QColor(99, 36, 36));
+	//QStandardItem* log = new QStandardItem(messages);
+	//QStandardItem* level = new QStandardItem("ERROR");
+	//rowData << command << level << log;
+	//m_loggerModel->appendRow(rowData);
+	//updateHeaders();
+	//m_loggerTable->resizeRowsToContents();
+	//m_loggerTable->scrollToBottom();
 	//processMessages(1, tr("OOMidi"), m_oomProcess);
 }/*}}}*/
 
@@ -2074,18 +2186,27 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 		{
 			case 0: //Output
 			{/*{{{*/
-				QString messages = QString::fromUtf8(p->readAllStandardOutput().constData());
-				if(messages.isEmpty())
-					return;
-				QList<QStandardItem*> rowData;
-				QStandardItem* command = new QStandardItem(name);
-				QStandardItem* log = new QStandardItem(messages);
-				QStandardItem* level = new QStandardItem("INFO");
-				rowData << command << level << log;
-				m_loggerModel->appendRow(rowData);
-				updateHeaders();
-				m_loggerTable->resizeRowsToContents();
-				m_loggerTable->scrollToBottom();
+				while(p->canReadLine())
+				{
+					QString messages = QString::fromUtf8(p->readLine().constData());
+					messages = messages.trimmed().simplified();
+					if(messages.isEmpty())
+						continue;
+					LogInfo* info = new LogInfo;
+					info->name = name;
+					info->message = messages;
+					info->codeString = QString("INFO");
+					m_logQueue.enqueue(info);
+					//QList<QStandardItem*> rowData;
+					//QStandardItem* command = new QStandardItem(name);
+					//QStandardItem* log = new QStandardItem(messages);
+					//QStandardItem* level = new QStandardItem("INFO");
+					//rowData << command << level << log;
+					//m_loggerModel->appendRow(rowData);
+					//updateHeaders();
+					//m_loggerTable->resizeRowsToContents();
+					//m_loggerTable->scrollToBottom();
+				}
 			}/*}}}*/
 			break;
 			case 1: //Error
@@ -2093,18 +2214,43 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 				QString messages = QString::fromUtf8(p->readAllStandardError().constData());
 				if(messages.isEmpty())
 					return;
-				QList<QStandardItem*> rowData;
-				QStandardItem* command = new QStandardItem(name);
-				command->setBackground(QColor(99, 36, 36));
-				QStandardItem* log = new QStandardItem(messages);
-				QStandardItem* level = new QStandardItem("ERROR");
-				rowData << command << level << log;
-				m_loggerModel->appendRow(rowData);
-				updateHeaders();
-				m_loggerTable->resizeRowsToContents();
-				m_loggerTable->scrollToBottom();
+				LogInfo* info = new LogInfo;
+				info->name = name;
+				info->message = messages;
+				info->codeString = QString("ERROR");
+				m_logQueue.enqueue(info);
+				//QList<QStandardItem*> rowData;
+				//QStandardItem* command = new QStandardItem(name);
+				//command->setBackground(QColor(99, 36, 36));
+				//QStandardItem* log = new QStandardItem(messages);
+				//QStandardItem* level = new QStandardItem("ERROR");
+				//rowData << command << level << log;
+				//m_loggerModel->appendRow(rowData);
+				//updateHeaders();
+				//m_loggerTable->resizeRowsToContents();
+				//m_loggerTable->scrollToBottom();
 			}/*}}}*/
 			break;
 		}
 	}
 }/*}}}*/
+
+void OOStudio::writeLog(LogInfo* log)
+{
+	if(log)
+	{/*{{{*/
+		QString messages(log->message);
+		if(messages.isEmpty())
+			return;
+		QList<QStandardItem*> rowData;
+		QStandardItem* command = new QStandardItem(log->name);
+		//command->setBackground(QColor(99, 36, 36));
+		QStandardItem* logmsg = new QStandardItem(messages);
+		QStandardItem* level = new QStandardItem(log->codeString);
+		rowData << command << level << logmsg;
+		m_loggerModel->appendRow(rowData);
+		updateHeaders();
+		m_loggerTable->resizeRowsToContents();
+		m_loggerTable->scrollToBottom();
+	}/*}}}*/
+}
