@@ -141,11 +141,17 @@ void OOStudio::createTrayIcon()/*{{{*/
 	importIcon.addPixmap(QPixmap(":/images/plus_new_over.png"), QIcon::Active);
 	action_Import_Session->setIcon(importIcon);
 
+	QIcon downloadAllIcon;
+	downloadAllIcon.addPixmap(QPixmap(":/images/oostudio-download-all-on.png"), QIcon::Normal, QIcon::On);
+	downloadAllIcon.addPixmap(QPixmap(":/images/oostudio-download-all-off.png"), QIcon::Normal, QIcon::Off);
+	downloadAllIcon.addPixmap(QPixmap(":/images/oostudio-download-all-over.png"), QIcon::Active);
+	m_btnDownload->setIcon(downloadAllIcon);
+
 	QIcon downloadIcon;
 	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-on.png"), QIcon::Normal, QIcon::On);
 	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-off.png"), QIcon::Normal, QIcon::Off);
 	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-over.png"), QIcon::Active);
-	m_btnDownload->setIcon(downloadIcon);
+	m_btnDownloadSonatina->setIcon(downloadIcon);
 
 	m_lblSSOTitle->setPixmap(QPixmap(":/images/oostudio-sonatina.png"));
 	m_lblMaestroTitle->setPixmap(QPixmap(":/images/oostudio-maestro.png"));
