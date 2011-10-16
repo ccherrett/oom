@@ -32,6 +32,7 @@ class TrackViewDock : public QFrame, public Ui::TViewDockBase {
 	protected:
 		QStandardItemModel* _tableModel;
 		QStandardItemModel* _autoTableModel;
+		QList<QIcon> m_icons;
 
 		QList<int> getSelectedRows();
 		void updateTableHeader();

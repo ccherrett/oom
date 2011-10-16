@@ -651,6 +651,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
     connect(ctrl, SIGNAL(clicked()), SLOT(addCtrl()));
     connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
+    connect(info, SIGNAL(enablePartLines(bool)), canvas, SLOT(setDrawPartEndLine(bool)));
     connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
     connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
     connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));

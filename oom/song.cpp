@@ -2132,9 +2132,7 @@ void Song::cmdRemovePart(Part* part)
 //   cmdChangePart
 //---------------------------------------------------------
 
-void Song::
-
-cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClones)
+void Song::cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClones)
 {
 	//printf("Song::cmdChangePart before changePart oldPart:%p events:%p refs:%d Arefs:%d sn:%d newPart:%p events:%p refs:%d Arefs:%d sn:%d\n", oldPart, oldPart->events(), oldPart->events()->refCount(), oldPart->events()->arefCount(), oldPart->sn(), newPart, newPart->events(), newPart->events()->refCount(), newPart->events()->arefCount(), newPart->sn());
 
@@ -2160,6 +2158,7 @@ cmdChangePart(Part* oldPart, Part* newPart, bool doCtrls, bool doClones)
 	//printf("Song::cmdChangePart after repl/unchClone oldPart:%p events:%p refs:%d Arefs:%d sn:%d newPart:%p events:%p refs:%d Arefs:%d sn:%d\n", oldPart, oldPart->events(), oldPart->events()->refCount(), oldPart->events()->arefCount(), oldPart->sn(), newPart, newPart->events(), newPart->events()->refCount(), newPart->events()->arefCount(), newPart->sn());
 
 	updateFlags = SC_PART_MODIFIED;
+	//update(updateFlags);
 }
 
 //---------------------------------------------------------
@@ -3624,7 +3623,6 @@ void Song::updateTrackViews1()
 	bool customview = false;
 	bool workview = false;
 	bool commentview = false;
-	disarmAllTracks();
 	TrackView* wv = findAutoTrackView("Working View");
 	TrackView* cv = findAutoTrackView("Comment View");
 	if(wv && wv->selected())
@@ -3796,6 +3794,7 @@ void Song::updateTrackViews1()
 	}
 	//end = omp_get_wtime();
 	//printf("Song::updateTrackViews1() took %f seconds to run\n", end-start);
+	disarmAllTracks();
 	if(!invalid)
 		emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }

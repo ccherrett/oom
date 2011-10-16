@@ -41,7 +41,7 @@ file (GLOB master_source_files
 ##
 ## Define target
 ##
-add_library ( master SHARED
+add_library ( master STATIC
       ${master_source_files}
       ${master_mocs}
       )
@@ -76,6 +76,6 @@ target_link_libraries ( master
 ##
 ## Install location
 ##
-install(TARGETS master
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS master
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

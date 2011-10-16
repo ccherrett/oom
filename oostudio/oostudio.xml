@@ -1,0 +1,10 @@
+<!DOCTYPE OOStudioDownloader>
+<OOStudioDownloader>
+ <sonatina path="http://superb-dca2.dl.sourceforge.net/project/openoctave/libraries/sonatina1.tar.bz2" format="tbz2"/>
+ <classicfree path="http://www.pettinhouse.com/Free/ClassicFREE.rar" format="rar"/>
+ <accousticfree path="http://www.pettinhouse.com/Free/ACFree.rar" format="rar"/>
+ <maestrogrand path="http://hivelocity.dl.sourceforge.net/project/openoctave/libraries/maestro_concert_grand_v2.rar" format="rar"/>
+ <samplicity_quad48 path="http://www.samplicity.com/wp-content/plugins/download-monitor/download.php?id=4" format="zip"/>
+ <samplicity_quad44 path="http://www.samplicity.com/wp-content/plugins/download-monitor/download.php?id=3" format="zip"/>
+</OOStudioDownloader>
+

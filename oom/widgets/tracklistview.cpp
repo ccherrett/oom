@@ -71,7 +71,7 @@ TrackListView::TrackListView(AbstractMidiEditor* editor, QWidget* parent)
 	m_layout->addLayout(m_buttonBox);
 
 	//populateTable();
-	//connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
+	connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(m_model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(toggleTrackPart(QStandardItem*)));
 	connect(m_selmodel, SIGNAL(currentRowChanged(const QModelIndex, const QModelIndex)), this, SLOT(selectionChanged(const QModelIndex, const QModelIndex)));
 	connect(m_chkWorkingView, SIGNAL(stateChanged(int)), this, SLOT(displayRoleChanged(int)));
@@ -113,7 +113,7 @@ void TrackListView::displayRoleChanged(int role)/*{{{*/
 
 void TrackListView::songChanged(int flags)/*{{{*/
 {
-	if(flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED /*| SC_PART_COLOR_MODIFIED*/))
+	if(flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_TRACK_MODIFIED | SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_MODIFIED/*| SC_PART_COLOR_MODIFIED*/))
 	{
 		if(debugMsg)
 			printf("TrackListView::songChanged\n");

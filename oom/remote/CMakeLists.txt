@@ -28,7 +28,7 @@ file (GLOB remote_source_files
 ##
 ## Define target
 ##
-add_library(remote SHARED
+add_library(remote STATIC
       ${remote_source_files}
       ${PROJECT_BINARY_DIR}/all.h.pch
       )
@@ -53,6 +53,6 @@ set_source_files_properties(
 ##
 ## Install location
 ##
-install(TARGETS remote
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS remote
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

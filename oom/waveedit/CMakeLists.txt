@@ -47,7 +47,7 @@ file (GLOB waveedit_source_files
 ##
 ## Define target
 ##
-add_library ( waveedit SHARED
+add_library ( waveedit STATIC
       ${waveedit_source_files}
       ${waveedit_ui_headers}
       ${waveedit_mocs}
@@ -82,6 +82,6 @@ target_link_libraries( waveedit
 ##
 ## Install location
 ##
-install(TARGETS waveedit
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS waveedit
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

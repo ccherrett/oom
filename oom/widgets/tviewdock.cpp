@@ -33,6 +33,7 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	autoTable->installEventFilter(oom);
 	_tableModel = new QStandardItemModel(tableView);
 	_autoTableModel = new QStandardItemModel(autoTable);
+	m_icons << QIcon(":/images/icons/views_inputs.png") << QIcon(":/images/icons/views_outputs.png") << QIcon(":/images/icons/views_busses.png") << QIcon(":/images/icons/views_auxs.png");
 	tableView->setModel(_tableModel);
 	tableView->setObjectName("tblTrackView");
 	autoTable->setObjectName("tblAutoTable");
@@ -99,6 +100,7 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 		}
 		_autoTableModel->clear();
 		int index = 0;
+		int icon_index = 0;
 		QList<int> list;
 		list << Track::MIDI << Track::AUDIO_INPUT << Track::AUDIO_OUTPUT << Track::AUDIO_BUSS << Track::AUDIO_AUX << Track::WAVE;
 		for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++index, ++ait)
@@ -111,7 +113,9 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 			if((*ait)->viewName() != "Working View" && (*ait)->viewName() != "Comment View")
 			{
 				chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
-				tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
+				//tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
+				tname->setIcon(m_icons.at(icon_index));
+				++icon_index;
 			}
 			rowData2.append(chk);
 			rowData2.append(tname);
@@ -231,6 +235,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 					if(track)
 					{
 						oom->composer->addCanvasPart(track);
+						song->updateTrackViews1();
 					}
 				}
 				delete p;

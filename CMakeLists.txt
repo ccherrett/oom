@@ -69,7 +69,7 @@ endif(NOT DEFINED OOM_MIDI_REC_FIFO_SIZE)
 
 
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+#set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 # The OOMidi version number.
@@ -84,7 +84,7 @@ SET(OOMidi_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/bin/${OOMidi_EXEC_NAME}")
 
 ## The library where we will install the shared components:
 SET(OOMidi_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/modules)
-SET(CMAKE_INSTALL_RPATH ${OOMidi_MODULES_DIR})
+#SET(CMAKE_INSTALL_RPATH ${OOMidi_MODULES_DIR})
 
 ## Synthesizers directory
 SET(OOMidi_SYNTHI_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/synthi)
@@ -147,6 +147,7 @@ set(QT_MIN_VERSION "4.3.0")
 set(QT_USE_QTXML TRUE)
 set(QT_USE_QTDESIGNER TRUE)
 set(QT_USE_QTNSPLUGIN TRUE)
+SET (QT_USE_QTWEBKIT TRUE)
 
 find_package(Qt4)
 
@@ -440,8 +441,10 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   SET(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 
   SET(CPACK_PACKAGE_FILE_NAME "${CPACK_SOURCE_PACKAGE_FILE_NAME}-${CPACK_SYSTEM_NAME}")
-  SET(CPACK_STRIP_FILES "bin/oomidi;bin/grepmidi;bin/oostudio")
-  SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "grepmidi" "grepmidi" "oostudio" "oostudio")
+  #SET(CPACK_STRIP_FILES "bin/oomidi;bin/grepmidi;bin/oostudio")
+  SET(CPACK_STRIP_FILES "bin/oomidi;bin/oostudio")
+  #SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "grepmidi" "grepmidi" "oostudio" "oostudio")
+  SET(CPACK_PACKAGE_EXECUTABLES "oomidi" "OOMidi" "oostudio" "oostudio")
   INCLUDE(CPack)
 ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 
@@ -449,28 +452,26 @@ set(CMAKE_CXX_FLAGS         "-Wall -Wextra -Winvalid-pch -fexceptions ${CMAKE_CX
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -fomit-frame-pointer -ffast-math -fstrength-reduce ${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -DQT_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}")
 
-# subdirs(al awl grepmidi plugins midiplugins oom share synti)
-# subdirs(al lib grepmidi plugins xpm oom share doc synti utils)
-#subdirs(al lib grepmidi plugins oom share synti )
 # NOTE: share/ directory needs to be at the end so that the translations
 #       are scanned before coming to share/locale
-subdirs(al awl grepmidi man plugins oom synti packaging utils share oostudio)
+#subdirs(al awl grepmidi man plugins oom synti packaging utils share oostudio)
+subdirs(al awl man plugins oom synti packaging utils share oostudio)
 
 ## Install doc files
 file (GLOB doc_files
       AUTHORS
-      ChangeLog
       COPYING
-      NEWS
       README
-      README.de
-      README.effects-rack
-      README.instruments
-      README.ladspaguis
-      README.shortcuts
-      README.softsynth
-      README.translate
-      SECURITY
+	  #ChangeLog
+	  #NEWS
+	  #README.de
+	  #README.effects-rack
+	  #README.instruments
+	  #README.ladspaguis
+	  #README.shortcuts
+	  #README.softsynth
+	  #README.translate
+	  #SECURITY
       )
 INSTALL( FILES ${doc_files} DESTINATION ${OOMidi_DOC_DIR})
 

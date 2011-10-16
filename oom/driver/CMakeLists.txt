@@ -33,7 +33,7 @@ file (GLOB driver_source_files
 ##
 ## Define target
 ##
-add_library ( driver SHARED
+add_library ( driver STATIC
        # ${PROJECT_BINARY_DIR}/all.h.pch
        ${driver_source_files}
        )
@@ -62,12 +62,13 @@ target_link_libraries ( driver
       ${ALSA_LIBRARIES}
       ${JACK_LIBRARIES}
       ${QT_LIBRARIES}
+      pthread
       mplugins
       )
 
 ##
 ## Install location
 ##
-install(TARGETS driver
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS driver
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

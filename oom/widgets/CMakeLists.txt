@@ -258,7 +258,7 @@ file (GLOB widgets_source_files
 ##
 ## Define target
 ##
-add_library ( widgets SHARED 
+add_library ( widgets STATIC 
       ${widget_ui_headers}
       ${widget_mocs}
       ${widgets_source_files}
@@ -296,10 +296,10 @@ target_link_libraries ( widgets
 ##
 ## Install location
 ##
-install(TARGETS widgets
-      DESTINATION
-      ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS widgets
+#     DESTINATION
+#     ${OOMidi_MODULES_DIR}
+#     )
 
 
 

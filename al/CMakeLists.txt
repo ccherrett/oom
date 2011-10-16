@@ -40,7 +40,7 @@ endif (USE_SSE)
 ##
 ## Define target
 ##
-add_library(al SHARED
+add_library(al STATIC
       ${PROJECT_BINARY_DIR}/all.h.pch
       ${al_source_files}
       )
@@ -74,6 +74,6 @@ target_link_libraries ( al
 ##
 ## Install location
 ##
-install(TARGETS al 
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS al 
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

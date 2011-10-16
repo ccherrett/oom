@@ -1,6 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/">
 	<file>style.qss</file>
+	<file>oostudio.html</file>
+	<file>oostudio.xml</file>
 	<file>images/oom_icon.png</file>
 	<file>images/checkbox_checked.png</file>
 	<file>images/checkbox_checked_hover.png</file>
@@ -36,7 +38,6 @@
 	<file>images/plus_new_on.png</file>
 	<file>images/plus_new_over.png</file>
 	<file>images/plus_new_off.png</file>
-    <file>images/down_arrow.png</file>
 	<file>images/down_arrow_new_over.png</file>
 	<file>images/down_arrow_new_off.png</file>
 	<file>images/up_arrow_new_on.png</file>

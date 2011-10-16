@@ -36,134 +36,16 @@ and the work that has gone into it. Great stuff Mark, and thanks.
 
 http://www.famfamfam.com/lab/icons/silk/
 
+====================================================================
 
 
-  =============================
-      Requirements
-  =============================
+     
+ - See this URL for OOMidi requirements, compilation, and run details:
+
+        https://github.com/ccherrett/oom/wiki/Installing-OOM
+
       
-
-      - CMake >= 2.4 
-        http:/www.cmake.org/HTML/Download.html
-
-      - QT: Qt >= 4.6.0 
-        ftp://ftp.trolltech.com/qt/source
-        OOMidi does _not_ compile with older versions
-
-      - gcc >= 4.4.x
-
-      - libsndfile >= 1.0.1
-        http://www.mega-nerd.com/libsndfile/
-
-      - libsamplerate >=0.1.7  http://www.mega-nerd.com/SRC/
-
-      - JACK >= 0.121.0.0
-          http://jackaudio.org/download
-
-      Optional:
-
-      - fluidsynth >= 1.0.3 http://savannah.nongnu.org/download/fluid
-
-      - OSC (Open Sound Control) 
-      - DSSI (Disposable Soft Synth Interface) with support for DSSI vst plugins.
-        (Both recommended - DSSI alone will have no DSSI GUIs. OSC alone does nothing, for now.)
-
-      - LASH Audio Session Handler
-
-      - For LV2. The latest Lilv, sord, and serd libraries. http://www.drobilla.net/
-
-
-PLEASE NOTE: We do not use Lash at openoctave, and have not tested it with OOM2.
-Your mileage may vary, and we hope you are successful if you wish to use Lash. 
-      
-      - ConTeXt (for building documentation, by default the build
-               script tries to build documentation, can be
-               disabled by setting ENABLE_DOCUMENTATION to OFF)
-
-      - 
-
-  =============================
-      Compiling:
-  =============================
-
-      - Download source from git://github.com/ccherrett/oom.git
-
-      - Command line to unpack source:
-            
-        tar xvofz oomidi-2011.1.tar.gz
-
-       Or just use a graphical de-compressor to unpack it somewhere. 
  
-      - To compile OOMidi, run the following commands from the 
-         top level directory where the source code was unpacked
-         (the directory where THIS README FILE is): 
-        
-          # Create build directory. Choose any name like 'build'.
-              mkdir build                                      
-          # Enter build directory.
-              cd build                                         
-          
-          # Create make system in the build directory.
-          # Optional <Prefix> is the location to install OOMidi, default /usr/local.
-          # Build type can be blank (to reset a previous cached type to 'empty'), 
-          #  debug, release, RelWithDebInfo and MinSizeRel.
-          # If no CMAKE_BUILD_TYPE is given at all, cmake uses either the previous 
-          #  cached value, or else 'empty' (plain unoptimized).
-          # ('Release' type is recommended, otherwise it builds a plain unoptimized program.)
-              cmake -DCMAKE_BUILD_TYPE=release [-DCMAKE_INSTALL_PREFIX=<prefix>] ../
-          
-          # Compile oom
-              make                                             
-            
-      - Install OOMidi:
-              Run "make install"  (as root user)
-
-  =============================
-      running OOMidi
-  =============================
-
-       Recommended setup:
-
-      - create an "audio" group if it does not already exists
-        and put yourself into this group
-
-      - for newer kernels with the portable rtc interface
-            chmod 660 /dev/rtc0
-            chgrp audio /dev/rtc0
-	
-      - create a udev rule for the permissions in this file: /etc/udev/rules.d/85-hwclock.rules
-	  		KERNEL=="rtc0", GROUP:="audio"
-
-NOTE: Alsa now uses the HPET timer, and adds a symlink for RTC based applications.
-
-      
-            echo 2048 >/sys/class/rtc/rtc0/max_user_freq
-            echo 2048 >/proc/sys/dev/hpet/max-user-freq
-			
-               inspect with:
-	    cat /sys/class/rtc/rtc0/max_user_freq
-	    cat /proc/sys/dev/hpet/max-user-freq
-
-      
-      - some distros do not load the alsa sequencer module by default.
-        if necessary, load the alsa sequencer module with:
-            /sbin/modprobe snd-seq
-
-      - start qjackctl
-            - start JACK with qjackctl
-
-      - start OOMidi
-	       /usr/local/bin/oomidi
-
-      (JACK and all its clients (qjackctl & OOMidi) must run with the
-      same user id)
-
-
-For Gentoo users: When building your kernel, Gentoo recommends you build alsa directly into the kernel.
-In our testing, this has proved more stable than building alsa as modules. 
-
-
-
 ====================================================================
 Let us know whether OOMidi works for you !!!
 Have a look at the webpage http://www.openoctave.org for details.

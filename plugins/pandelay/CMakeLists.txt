@@ -30,7 +30,7 @@ file (GLOB pandelay_source_files
 ##
 ## Define target
 ##
-add_library ( pandelay SHARED
+add_library ( pandelay STATIC
       ${pandelay_source_files}
       )
 
@@ -48,6 +48,6 @@ set_target_properties (pandelay
 ##
 ## Install location
 ##
-install( TARGETS pandelay
-      DESTINATION ${OOMidi_PLUGINS_DIR}
-      )
+#install( TARGETS pandelay
+#     DESTINATION ${OOMidi_PLUGINS_DIR}
+#     )

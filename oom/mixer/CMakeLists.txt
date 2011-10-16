@@ -56,7 +56,7 @@ file (GLOB mixer_source_files
 ##
 ## Define target
 ##
-add_library ( mixer SHARED
+add_library ( mixer STATIC
       ${mixer_source_files}
       ${mixer_mocs}
       ${mixer_uis}
@@ -91,8 +91,8 @@ target_link_libraries ( mixer
 ##
 ## Install location
 ##
-install(TARGETS mixer
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS mixer
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )
 
 

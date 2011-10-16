@@ -42,7 +42,7 @@ file (GLOB ctrl_source_files
 ##
 ## Define target
 ##
-add_library ( ctrl SHARED
+add_library ( ctrl STATIC
       # configmidictrl.cpp
       # definemidictrl.cpp
       # ctrldialog.cpp
@@ -79,7 +79,7 @@ target_link_libraries ( ctrl
 ##
 ## Install location
 ##
-install(TARGETS ctrl
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS ctrl
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )
 

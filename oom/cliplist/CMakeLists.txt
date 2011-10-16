@@ -35,7 +35,7 @@ file (GLOB cliplist_source_files
 ##
 ## Define target
 ##
-add_library ( cliplist SHARED
+add_library ( cliplist STATIC
       ${cliplist_source_files}
       ${cliplist_mocs}
       )
@@ -69,8 +69,8 @@ target_link_libraries ( cliplist
 ##
 ## Install location
 ##
-install(TARGETS cliplist
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS cliplist
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )
 
 

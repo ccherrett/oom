@@ -559,24 +559,26 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 
 	//Add Track menu
 	QMenu* trackMenu = p->addMenu(tr("Add Track"));
-	QAction* midi = trackMenu->addAction(*addtrack_addmiditrackIcon, tr("Midi Track"));
+	QAction* midi = trackMenu->addAction(*addMidiIcon, tr("Midi Track"));
 	midi->setData(Track::MIDI+10000);
-	QAction* wave = trackMenu->addAction(*addtrack_wavetrackIcon, tr("Audio Track"));
+	QAction* wave = trackMenu->addAction(*addAudioIcon, tr("Audio Track"));
 	wave->setData(Track::WAVE+10000);
-	QAction* aoutput = trackMenu->addAction(*addtrack_audiooutputIcon, tr("Output"));
+	QAction* aoutput = trackMenu->addAction(*addOutputIcon, tr("Output"));
 	aoutput->setData(Track::AUDIO_OUTPUT+10000);
-	QAction* ainput = trackMenu->addAction(*addtrack_audioinputIcon, tr("Input"));
+	QAction* ainput = trackMenu->addAction(*addInputIcon, tr("Input"));
 	ainput->setData(Track::AUDIO_INPUT+10000);
-	QAction* agroup = trackMenu->addAction(*addtrack_audiogroupIcon, tr("Buss"));
+	QAction* agroup = trackMenu->addAction(*addBussIcon, tr("Buss"));
 	agroup->setData(Track::AUDIO_BUSS+10000);
-	QAction* aaux = trackMenu->addAction(*addtrack_auxsendIcon, tr("Aux Send"));
+	QAction* aaux = trackMenu->addAction(*addAuxIcon, tr("Aux Send"));
 	aaux->setData(Track::AUDIO_AUX+10000);
 
 
 	if(m_track->name() != "Master")
 	{
 		p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
+		p->addSeparator();
 		p->addAction(QIcon(*automation_clear_dataIcon), tr("Delete Track"))->setData(0);
+		p->addSeparator();
 	}
 	
 	QAction* selectAllAction = p->addAction(tr("Select All Tracks"));
@@ -682,21 +684,29 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		switch (n)
 		{
 			case 0: // delete track
-				if (multipleSelectedTracks)
+			{
+				QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
+				if(QMessageBox::question(this, 
+					tr("Delete Track"),
+					msg.arg(multipleSelectedTracks ? "all selected tracks" : m_track->name()),
+					QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
 				{
-					song->startUndo();
-					audio->msgRemoveTracks();
-					song->endUndo(SC_TRACK_REMOVED);
-					song->updateSoloStates();
+					if (multipleSelectedTracks)
+					{
+						song->startUndo();
+						audio->msgRemoveTracks();
+						song->endUndo(SC_TRACK_REMOVED);
+						song->updateSoloStates();
+					}
+					else
+					{
+						if(m_track->name() == "Master")
+							break;
+						song->removeTrack0(m_track);
+						audio->msgUpdateSoloStates();
+					}
 				}
-				else
-				{
-					if(m_track->name() == "Master")
-						break;
-					song->removeTrack0(m_track);
-					audio->msgUpdateSoloStates();
-				}
-
+			}
 			break;
 
 			case 1: // Import audio file

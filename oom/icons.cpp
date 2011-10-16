@@ -266,6 +266,13 @@ QPixmap* mixerAudioSIcon;
 QPixmap* initSIcon;
 QPixmap* songInfoIcon;
 
+QPixmap* addMidiIcon;
+QPixmap* addAudioIcon;
+QPixmap* addBussIcon;
+QPixmap* addOutputIcon;
+QPixmap* addInputIcon;
+QPixmap* addAuxIcon;
+
 QPixmap* exitIcon;
 QPixmap* exit1Icon;
 QPixmap* newmuteIcon;
@@ -1495,7 +1502,14 @@ void initIcons()
       initSIcon            = new MPIXMAP(initS_xpm, NULL);
       songInfoIcon         = new MPIXMAP(":/images/icons/initSong.png", NULL);
 
-      addtrack_addmiditrackIcon     = new MPIXMAP(addtrack_addmiditrack_xpm, NULL);
+      addMidiIcon     = new MPIXMAP(":/images/icons/views_midi_menu.png", NULL);
+      addBussIcon     = new MPIXMAP(":/images/icons/views_busses_menu.png", NULL);
+      addInputIcon    = new MPIXMAP(":/images/icons/views_inputs_menu.png", NULL);
+      addOutputIcon   = new MPIXMAP(":/images/icons/views_outputs_menu.png", NULL);
+      addAuxIcon      = new MPIXMAP(":/images/icons/views_auxs_menu.png", NULL);
+      addAudioIcon    = new MPIXMAP(":/images/icons/views_audio_menu.png", NULL);
+      
+	  addtrack_addmiditrackIcon     = new MPIXMAP(addtrack_addmiditrack_xpm, NULL);
       addtrack_audiogroupIcon       = new MPIXMAP(addtrack_audiogroup_xpm, NULL);
       addtrack_audioinputIcon       = new MPIXMAP(addtrack_audioinput_xpm, NULL);
       addtrack_audiooutputIcon      = new MPIXMAP(addtrack_audiooutput_xpm, NULL);

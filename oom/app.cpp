@@ -676,7 +676,7 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 {
 	QActionGroup* grp = new QActionGroup(addTrack);
 
-	QAction* midi = addTrack->addAction(QIcon(*addtrack_addmiditrackIcon),
+	QAction* midi = addTrack->addAction(QIcon(*addMidiIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Midi Track"));
 	midi->setData(Track::MIDI);
 	grp->addAction(midi);
@@ -685,23 +685,23 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 	drum->setData(Track::DRUM);
 	grp->addAction(drum);
 	*/
-	QAction* wave = addTrack->addAction(QIcon(*addtrack_wavetrackIcon),
+	QAction* wave = addTrack->addAction(QIcon(*addAudioIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Audio Track"));
 	wave->setData(Track::WAVE);
 	grp->addAction(wave);
-	QAction* aoutput = addTrack->addAction(QIcon(*addtrack_audiooutputIcon),
+	QAction* aoutput = addTrack->addAction(QIcon(*addOutputIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Audio Output"));
 	aoutput->setData(Track::AUDIO_OUTPUT);
 	grp->addAction(aoutput);
-	QAction* agroup = addTrack->addAction(QIcon(*addtrack_audiogroupIcon),
+	QAction* agroup = addTrack->addAction(QIcon(*addBussIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Audio Buss"));
 	agroup->setData(Track::AUDIO_BUSS);
 	grp->addAction(agroup);
-	QAction* ainput = addTrack->addAction(QIcon(*addtrack_audioinputIcon),
+	QAction* ainput = addTrack->addAction(QIcon(*addInputIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Audio Input"));
 	ainput->setData(Track::AUDIO_INPUT);
 	grp->addAction(ainput);
-	QAction* aaux = addTrack->addAction(QIcon(*addtrack_auxsendIcon),
+	QAction* aaux = addTrack->addAction(QIcon(*addAuxIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Aux Send"));
 	aaux->setData(Track::AUDIO_AUX);
 	grp->addAction(aaux);
@@ -4326,7 +4326,14 @@ void OOMidi::cmd(int cmd)
 				}
 				else
 				{
-					audio->msgRemoveTracks();
+					QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
+					if(QMessageBox::question(this, 
+						tr("Delete Track"),
+						msg.arg("all selected tracks"),
+						QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+					{
+						audio->msgRemoveTracks();
+					}
 				}
 				song->endUndo(SC_TRACK_REMOVED);
 

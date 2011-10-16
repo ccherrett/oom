@@ -36,7 +36,7 @@ file (GLOB marker_source_files
 ##
 ## Define target
 ##
-add_library ( marker SHARED
+add_library ( marker STATIC
       ${marker_source_files}
       # ${marker_ui_headers}
       ${marker_mocs}
@@ -71,6 +71,6 @@ target_link_libraries ( marker
 ##
 ## Install location
 ##
-install(TARGETS marker
-      DESTINATION ${OOMidi_MODULES_DIR}
-      )
+#install(TARGETS marker
+#     DESTINATION ${OOMidi_MODULES_DIR}
+#     )

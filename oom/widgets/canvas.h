@@ -96,6 +96,7 @@ protected:
 	int _selectedProgramPos;
 	bool _drawSelectedProgram;
 	bool _drawPartLines;
+	bool _drawPartEndLine;
 	bool m_PartZIndex;
 
     void setCursor();
@@ -230,6 +231,16 @@ public slots:
     void scrollTimerDone(void);
     void redirectedWheelEvent(QWheelEvent*);
 	void drawSelectedProgram(int, bool);
+	void setDrawPartLines(bool v) 
+	{
+		_drawPartLines = v;
+		update();
+	}
+	void setDrawPartEndLine(bool v) 
+	{
+		_drawPartEndLine = v;
+		update();
+	}
 
 signals:
     void followEvent(int);
@@ -263,7 +274,6 @@ public:
         _canvasTools = n;
     }
 	virtual bool isEventSelected(Event e);
-	void setDrawPartLines(bool v) { _drawPartLines = v; }
 	static bool smallerZValue(const CItem*, const CItem*);
 	static QIcon colorRect(const QColor& color, const QColor& color2, int width, int height, bool selected = false)//{{{
 	{

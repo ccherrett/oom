@@ -14,6 +14,7 @@ MixerView::MixerView(QWidget* parent)
 : TrackViewDock(parent)
 {
 	//m_tracklist = song->visibletracks();
+	//m_icons << QIcon(":/images/icons/views_inputs.png") << QIcon(":/images/icons/views_outputs.png") << QIcon(":/images/icons/views_busses.png") << QIcon(":/images/icons/views_auxs.png");
 	toggleButtons(false);
 	populateTable(-1, true);
 	//connect(song, SIGNAL(songChanged(int)), this, SLOT(populateTable(int)));
@@ -60,6 +61,7 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 		}
 		_autoTableModel->clear();
 		int index = 0;
+		int icon_index = 0;
 		QList<int> list;
 		list << Track::MIDI << Track::AUDIO_INPUT << Track::AUDIO_OUTPUT << Track::AUDIO_BUSS << Track::AUDIO_AUX << Track::WAVE;
 		for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++index,++ait)
@@ -82,7 +84,9 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 			if((*ait)->viewName() != "Working View" && (*ait)->viewName() != "Comment View")
 			{
 				chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
-				tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
+				//tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
+				tname->setIcon(m_icons.at(icon_index));
+				++icon_index;
 			}
 			rowData2.append(chk);
 			rowData2.append(tname);
@@ -165,14 +169,18 @@ void MixerView::updateTrackList()/*{{{*/
 	bool workview = false;
 	bool commentview = false;
 	
-	TrackView* wv = song->findAutoTrackView("Working View");
-	TrackView* cv = song->findAutoTrackView("Comment View");
-	if(wv && wv->selected())
+	QStandardItem *witem = _autoTableModel->item(0);
+	QStandardItem *citem = _autoTableModel->item(5);
+	//TrackView* wv = song->findAutoTrackView("Working View");
+	//TrackView* cv = song->findAutoTrackView("Comment View");
+	//if(wv && wv->selected())
+	if(witem && witem->checkState() == Qt::Checked)
 	{
 		workview = true;
 		viewselected = true;
 	}
-	if(cv && cv->selected())
+	//if(cv && cv->selected())
+	if(citem && citem->checkState() == Qt::Checked)
 	{
 		commentview = true;
 		viewselected = true;

@@ -25,6 +25,7 @@ class QCloseEvent;
 class QResizeEvent;
 class QAction;
 class QMenu;
+class QUrl;
 class QStandardItemModel;
 class QStandardItem;
 class QItemSelectionModel;
@@ -116,6 +117,7 @@ protected:
 	void resizeEvent(QResizeEvent*);
 
 private slots:
+	void showExternalLinks(const QUrl &url);
 	void cleanupProcessList();
 	void iconActivated(QSystemTrayIcon::ActivationReason);
 	void resetCreate(bool fromClear = true);

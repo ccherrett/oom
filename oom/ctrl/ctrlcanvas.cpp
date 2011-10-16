@@ -1185,6 +1185,8 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			//if((fg && e->part() != part) || (!fg && e->part() == part))
 			if (e->part() != part)
 				continue;
+			//FIXME: there  is a crash right here when using the line tool in the Velo lane
+			//We need to track this one down, there should be never a crash here.
 			int tick = mapx(e->event().tick() + e->part()->tick());
 			if (tick <= x)
 				continue;

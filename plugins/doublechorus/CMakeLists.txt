@@ -30,7 +30,7 @@ file (GLOB doublechorus_source_files
 ##
 ## Define target
 ##
-add_library ( doublechorus SHARED
+add_library ( doublechorus STATIC
       ${doublechorus_source_files}
       )
 
@@ -49,6 +49,6 @@ set_target_properties (doublechorus
 ##
 ## Install location
 ##
-install( TARGETS doublechorus
-      DESTINATION ${OOMidi_PLUGINS_DIR}
-      )
+#install( TARGETS doublechorus
+#     DESTINATION ${OOMidi_PLUGINS_DIR}
+#     )
