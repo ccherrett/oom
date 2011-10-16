@@ -11,17 +11,17 @@ QScrollArea
 	background-color: #525252;
 }
 
-QWidget
+/*QWidget
 {
 	background-color: #525252;
 }
 
 QSizeGrip {
 	background-color: #2f2f2f;
-	/*image: url(:/images/sizegrip.png);*/
+	image: url(:/images/sizegrip.png);
 	width: 16px;
 	height: 16px;
-}
+}*/
 
 QHeaderView
 {
@@ -213,6 +213,21 @@ QLabel#m_lblClassic
 QLabel#m_lblClassic::disabled 
 { 
 	color: #393941;
+}
+
+QFrame#m_sonatinaBox, QFrame#m_maestroBox
+{
+	color: #d0d4d0;
+	background-color: #1e1e1e;
+	border-radius: 12px;
+    border: 1px solid #4b4b4b;
+}
+
+QLabel#m_lblSonatina, QLabel#label_14, QLabel#m_lblSSOTitle, QLabel#m_lblSSOState, 
+QLabel#m_lblMaestro, QLabel#label_15, QLabel#m_lblMaestroTitle, QLabel#m_lblMaestroState
+{
+	background-color:none;
+	border:none;
 }
 
 QSplitter::handle{
