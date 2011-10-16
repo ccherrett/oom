@@ -49,7 +49,7 @@ lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event
 OOStudio::OOStudio()
 {
 	setupUi(this);
-	m_scrollAreaWidgetContents->setStyleSheet("QWidget#m_scrollAreaWidgetContents{ background-color: #525252; }");
+	//m_scrollAreaWidgetContents->setStyleSheet("QWidget#m_scrollAreaWidgetContents{ background-color: #525252; }");
 	m_oomProcess = 0;
 	m_jackProcess = 0;
 	m_lsProcess = 0;
@@ -154,6 +154,9 @@ void OOStudio::createTrayIcon()/*{{{*/
 	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-over.png"), QIcon::Active);
 	m_btnDownloadSonatina->setIcon(QIcon(downloadIcon));
 	m_btnDownloadMaestro->setIcon(QIcon(downloadIcon));
+	m_btnDownloadClassic->setIcon(QIcon(downloadIcon));
+	m_btnDownloadAccoustic->setIcon(QIcon(downloadIcon));
+	m_btnDownloadM7->setIcon(QIcon(downloadIcon));
 
 	m_lblSSOTitle->setPixmap(QPixmap(":/images/oostudio-sonatina.png"));
 	m_lblMaestroTitle->setPixmap(QPixmap(":/images/oostudio-maestro.png"));

@@ -10,6 +10,11 @@ QScrollArea
  	/*background-color: #2f2f2f;*/
 	background-color: #525252;
 }
+QWidget#m_tabDownloads
+{
+	background-color: #525252;
+}
+QWidget#m_scrollAreaWidgetContents{ background-color: #525252; }
 
 /*QWidget
 {
@@ -201,7 +206,7 @@ QLabel::disabled
 	color: #393941;
 }
 
-QLabel#m_lblClassic
+/*QLabel#m_lblClassic
 { 
 	border: 0px;
 	font-family: "fixed-width";
@@ -213,9 +218,9 @@ QLabel#m_lblClassic
 QLabel#m_lblClassic::disabled 
 { 
 	color: #393941;
-}
+}*/
 
-QFrame#m_sonatinaBox, QFrame#m_maestroBox
+QFrame#m_sonatinaBox, QFrame#m_maestroBox, QFrame#m_classicBox, QFrame#m_accousticBox, QFrame#m_m7Box
 {
 	color: #d0d4d0;
 	background-color: #1e1e1e;
@@ -225,6 +230,9 @@ QFrame#m_sonatinaBox, QFrame#m_maestroBox
 
 QLabel#m_lblSonatina, QLabel#label_14, QLabel#m_lblSSOTitle, QLabel#m_lblSSOState, 
 QLabel#m_lblMaestro, QLabel#label_15, QLabel#m_lblMaestroTitle, QLabel#m_lblMaestroState
+QLabel#m_lblClassic, QLabel#label_16, QLabel#m_lblClassicTitle, QLabel#m_lblClassicState
+QLabel#m_lblAccoustic, QLabel#label_17, QLabel#m_lblAccousticTitle, QLabel#m_lblAccousticState
+QLabel#m_lblM7, QLabel#label_18, QLabel#m_lblM7Title, QLabel#m_lblM7State
 {
 	background-color:none;
 	border:none;
