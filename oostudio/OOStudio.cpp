@@ -63,7 +63,6 @@ OOStudio::OOStudio()
 	QString style(":/style.qss");
 	loadStyle(style);
 
-	m_btnDownload->setIcon(QIcon(":/images/oostudio-download.png"));
 	QDir homeDir = QDir::home();
 	homeDir.mkdir(".sounds");
 
@@ -141,6 +140,18 @@ void OOStudio::createTrayIcon()/*{{{*/
 	importIcon.addPixmap(QPixmap(":/images/plus_new_off.png"), QIcon::Normal, QIcon::Off);
 	importIcon.addPixmap(QPixmap(":/images/plus_new_over.png"), QIcon::Active);
 	action_Import_Session->setIcon(importIcon);
+
+	QIcon downloadIcon;
+	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-on.png"), QIcon::Normal, QIcon::On);
+	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-off.png"), QIcon::Normal, QIcon::Off);
+	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-over.png"), QIcon::Active);
+	m_btnDownload->setIcon(downloadIcon);
+
+	m_lblSSOTitle->setPixmap(QPixmap(":/images/oostudio-sonatina.png"));
+	m_lblMaestroTitle->setPixmap(QPixmap(":/images/oostudio-maestro.png"));
+	m_lblClassicTitle->setPixmap(QPixmap(":/images/oostudio-classic_guitar.png"));
+	m_lblAccousticTitle->setPixmap(QPixmap(":/images/oostudio-accoustic_guitar.png"));
+	m_lblM7Title->setPixmap(QPixmap(":/images/oostudio-irs.png"));
 
 	m_trayMenu = new QMenu(this);
 	m_trayMenu->addAction(m_quitAction);
