@@ -43,6 +43,7 @@ int AddRemoveCtrlValues::do_action()
 
 int AddRemoveCtrlValues::undo_action()
 {
+	printf("undo action ctrl values\n");
 	if (m_type == ADD)
 	{
 		foreach(CtrlVal v, m_ctrlValues)

@@ -12,6 +12,8 @@
 #include "undo.h"
 #include "song.h"
 #include "globals.h"
+#include <QUndoStack>
+#include "traverso_shared/OOMCommand.h"
 
 // iundo points to last Undo() in Undo-list
 
@@ -46,6 +48,7 @@ void UndoOp::dump()
 	printf("UndoOp: %s\n   ", typeName());
 	switch (type)
 	{
+		case AddOOMCommand: break;
 		case AddTrack:
 		case DeleteTrack:
 			printf("%d %s\n", trackno, oTrack->name().toLatin1().constData());
@@ -182,6 +185,25 @@ void UndoList::clearDelete()
 	}
 
 	clear();
+}
+
+void Song::pushToHistoryStack(OOMCommand *cmd)
+{
+	startUndo();
+	m_undoStack->push(cmd);
+	undoOp(UndoOp::AddOOMCommand, cmd);
+	endUndo(SC_TRACK_MODIFIED);
+}
+
+void Song::undoFromQtUndoStack()
+{
+	m_undoStack->undo();
+}
+
+void Song::redoFromQtUndoStack()
+{
+	printf("redo from qt undo stack\n");
+	m_undoStack->redo();
 }
 
 //---------------------------------------------------------
@@ -414,6 +436,10 @@ void Song::doRedo2()
 	{
 		switch (i->type)
 		{
+			case  UndoOp::AddOOMCommand:
+			{
+				redoFromQtUndoStack();
+			}
 			case UndoOp::AddTrack:
 				insertTrack2(i->oTrack, i->trackno);
 				// Added by T356.
@@ -618,6 +644,14 @@ void Song::undoOp(UndoOp::UndoType type, Part* part)
 	addUndo(i);
 }
 
+void Song::undoOp(UndoOp::UndoType type, OOMCommand* cmd)
+{
+	UndoOp i;
+	i.type = type;
+	i.cmd = cmd;
+	addUndo(i);
+}
+
 //void Song::undoOp(UndoOp::UndoType type, Event& oev, Event& nev, Part* part)
 
 void Song::undoOp(UndoOp::UndoType type, Event& oev, Event& nev, Part* part, bool doCtrls, bool doClones)
@@ -725,12 +759,21 @@ void Song::addUndo(UndoOp& i)
 bool Song::doUndo1()
 {
 	if (undoList->empty())
+	{
+		printf("empty undo list\n");
 		return true;
+	}
 	Undo& u = undoList->back();
 	for (riUndoOp i = u.rbegin(); i != u.rend(); ++i)
 	{
 		switch (i->type)
 		{
+			case UndoOp::AddOOMCommand:
+			{
+				song->undoFromQtUndoStack();
+				redoList->push_back(u);
+				break;
+			}
 			case UndoOp::AddTrack:
 				removeTrack1(i->oTrack);
 				break;
@@ -816,12 +859,20 @@ void Song::doUndo3()
 bool Song::doRedo1()
 {
 	if (redoList->empty())
+	{
+		printf("redo list empty\n");
 		return true;
+	}
 	Undo& u = redoList->back();
 	for (iUndoOp i = u.begin(); i != u.end(); ++i)
 	{
 		switch (i->type)
 		{
+			case UndoOp::AddAutomation:
+			{
+				redoFromQtUndoStack();
+				break;
+			}
 			case UndoOp::AddTrack:
 				insertTrack1(i->oTrack, i->trackno);
 
@@ -848,6 +899,7 @@ bool Song::doRedo1()
 				SndFile::applyUndoFile(i->filename, i->tmpwavfile, i->startframe, i->endframe);
 				break;
 			default:
+				printf("Unkown UndoOp\n");
 				break;
 		}
 	}
