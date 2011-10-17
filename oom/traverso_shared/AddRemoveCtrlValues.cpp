@@ -12,12 +12,20 @@
 
 #include "ctrl.h"
 
-AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, QList<CtrlVal> ctrlValues, const QString &des, int type)
-	: OOMCommand(des)
+AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, QList<CtrlVal> ctrlValues, int type)
+	: OOMCommand(tr("Add Nodes"))
 	, m_cl(cl)
 	, m_ctrlValues(ctrlValues)
 	, m_type(type)
 {
+}
+
+AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, CtrlVal ctrlValue, int type)
+	: OOMCommand(tr("Add Node"))
+	, m_cl(cl)
+	, m_type(type)
+{
+	m_ctrlValues << ctrlValue;
 }
 
 int AddRemoveCtrlValues::do_action()

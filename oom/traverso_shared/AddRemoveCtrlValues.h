@@ -22,7 +22,11 @@ public:
 	AddRemoveCtrlValues(
 		CtrlList* cl,
 		QList<CtrlVal> ctrlValues,
-		const QString& des,
+		int type);
+
+	AddRemoveCtrlValues(
+		CtrlList* cl,
+		CtrlVal ctrlValues,
 		int type);
 
         int do_action();

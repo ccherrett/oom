@@ -57,6 +57,7 @@
 #include "traverso_shared/AddRemoveCtrlValues.h"
 #include "traverso_shared/CommandGroup.h"
 
+
 class CurveNodeSelection
 {
 private:
@@ -3342,8 +3343,6 @@ void ComposerCanvas::copyAutomation()/*{{{*/
 	}
 }/*}}}*/
 
-#include "traverso_shared/AddRemoveCtrlValues.h"
-#include "traverso_shared/CommandGroup.h"
 
 void ComposerCanvas::pasteAutomation()/*{{{*/
 {
@@ -3484,8 +3483,8 @@ void ComposerCanvas::pasteAutomation()/*{{{*/
 						}
 					}
 
-					AddRemoveCtrlValues* addCommand = new AddRemoveCtrlValues(cl, valuesToAdd, "", OOMCommand::ADD);
-					AddRemoveCtrlValues* removeCommand = new AddRemoveCtrlValues(cl, valuesToRemove, "", OOMCommand::REMOVE);
+					AddRemoveCtrlValues* addCommand = new AddRemoveCtrlValues(cl, valuesToAdd, OOMCommand::ADD);
+					AddRemoveCtrlValues* removeCommand = new AddRemoveCtrlValues(cl, valuesToRemove, OOMCommand::REMOVE);
 
 					CommandGroup* group = new CommandGroup(tr("Copy Automation Nodes"));
 					group->add_command(addCommand);
@@ -4913,7 +4912,8 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 			}/*}}}*/
 
 			//FIXME: Select the last inserted node
-			automation.currentCtrlList->add( currFrame, newValue);
+			AddRemoveCtrlValues* cmd = new AddRemoveCtrlValues(automation.currentCtrlList, CtrlVal(currFrame, newValue), AddRemoveCtrlValues::ADD);
+			song->pushToHistoryStack(cmd);
 			//CtrlVal cv = automation.currentCtrlList->cvalue(currFrame);
 			//_curveNodeSelection->addNodeToSelection(&cv);
 		}
