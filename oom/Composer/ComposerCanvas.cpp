@@ -54,6 +54,8 @@
 #include "midimonitor.h"
 #include "ctrl.h"
 #include "FadeCurve.h"
+#include "traverso_shared/AddRemoveCtrlValues.h"
+#include "traverso_shared/CommandGroup.h"
 
 class CurveNodeSelection
 {

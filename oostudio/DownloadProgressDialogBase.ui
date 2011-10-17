@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DownloadProgressDialogBase</class>
+ <widget class="QDialog" name="DownloadProgressDialogBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>618</width>
+    <height>324</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Luxi Sans</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>OOStudio: Download Progress</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTableView" name="m_statusTable"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="m_bottonBox">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QToolButton" name="m_btnClose">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>160</width>
+         <height>56</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

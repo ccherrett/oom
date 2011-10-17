@@ -71,6 +71,7 @@ target_link_libraries ( Composer
       awl
       mixer
       widgets
+	  core
       )
 
 #
