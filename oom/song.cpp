@@ -1915,7 +1915,6 @@ void Song::undo()
 
 void Song::redo()
 {
-	printf("redo\n");
 	updateFlags = 0;
 	if (doRedo1())
 		return;

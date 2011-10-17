@@ -202,7 +202,6 @@ void Song::undoFromQtUndoStack()
 
 void Song::redoFromQtUndoStack()
 {
-	printf("redo from qt undo stack\n");
 	m_undoStack->redo();
 }
 
@@ -439,6 +438,7 @@ void Song::doRedo2()
 			case  UndoOp::AddOOMCommand:
 			{
 				redoFromQtUndoStack();
+				break;
 			}
 			case UndoOp::AddTrack:
 				insertTrack2(i->oTrack, i->trackno);
@@ -771,7 +771,6 @@ bool Song::doUndo1()
 			case UndoOp::AddOOMCommand:
 			{
 				song->undoFromQtUndoStack();
-				redoList->push_back(u);
 				break;
 			}
 			case UndoOp::AddTrack:
@@ -899,7 +898,6 @@ bool Song::doRedo1()
 				SndFile::applyUndoFile(i->filename, i->tmpwavfile, i->startframe, i->endframe);
 				break;
 			default:
-				printf("Unkown UndoOp\n");
 				break;
 		}
 	}
