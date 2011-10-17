@@ -642,7 +642,7 @@ QCheckBox {
 	background-color: #525252;
  }
 
-QCheckBox#m_chkStartJack, QCheckBox#m_chkStartLS {
+QCheckBox#m_chkStartJack, QCheckBox#m_chkStartLS, QCheckBox#m_chkTemplate {
      spacing: 5px;
 	 font-family: "fixed-width";
 	 font-weight: bold;

@@ -86,7 +86,6 @@ OOStudio::OOStudio()
 	setWindowTitle(QString(tr("OOMidi: Studio")).append("-").append(VERSION));
 	QSettings settings("OOMidi", "OOStudio");
 	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
-	bool advanced = settings.value("OOStudio/advanced", 0).toBool();
 	resize(size);
 	m_restoreSize = saveGeometry();
 	populateSessions();
@@ -106,8 +105,9 @@ OOStudio::OOStudio()
 	connect(m_heartBeat, SIGNAL(timeout()), this, SLOT(heartBeat()));
 	m_heartBeat->start(50);
 	updateInstalledState();
-	//toggleAdvanced(false);
-	m_btnMore->setChecked(advanced);
+	//bool advanced = settings.value("OOStudio/advanced", 0).toBool();
+	toggleAdvanced(false);
+	//m_btnMore->setChecked(advanced);
 }
 
 void OOStudio::heartBeat()
@@ -152,7 +152,8 @@ void OOStudio::createTrayIcon()/*{{{*/
 	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-on.png"), QIcon::Normal, QIcon::On);
 	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-off.png"), QIcon::Normal, QIcon::Off);
 	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-on.png"), QIcon::Active);
-	m_btnClearLog->setIcon(clearIcon);
+	m_btnClearLog->setIcon(QIcon(clearIcon));
+	m_btnClearCreate->setIcon(QIcon(clearIcon));
 
 	QIcon newIcon;
 	newIcon.addPixmap(QPixmap(":/images/oostudio-new-small-on.png"), QIcon::Normal, QIcon::On);
