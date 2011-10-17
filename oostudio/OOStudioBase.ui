@@ -10,6 +10,11 @@
     <height>657</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Luxi Sans</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -2447,6 +2452,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QStatusBar" name="statusbar">
    <property name="enabled">
     <bool>true</bool>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
    </property>
   </widget>
   <action name="action_Import_Session">
