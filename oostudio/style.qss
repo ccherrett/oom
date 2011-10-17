@@ -62,7 +62,7 @@ QTableView
 {
 	background-color: #0a0a0a;
 	gridline-color:#343434;
-	alternate-background-color: #1b1b1b;
+	alternate-background-color: #101010;
 	selection-background-color: #2e2e2e;
 	color: #bbbfbb;
 	border: 2px solid #29292a;/*set for highlighting on focus*/
@@ -85,7 +85,7 @@ QTableView::item
 
 QTableView::item:selected
 {
-	background-color: #333333;
+	background-color: #202020;
 	border: none;
 }
 
