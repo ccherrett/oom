@@ -22,6 +22,9 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="m_tabWidget">
+      <property name="toolTip">
+       <string>Reset form</string>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -646,42 +649,35 @@
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0">
+                <item row="2" column="0">
                  <widget class="QLabel" name="label_6">
                   <property name="text">
                    <string>Jack command:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="m_txtJackCommand">
-                  <property name="text">
-                   <string notr="true">/usr/bin/jackd -R -P89 -p2048 -t5000 -M512 -dalsa -dhw:0 -r44100 -p512 -n2</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
+                <item row="6" column="0">
                  <widget class="QLabel" name="label_8">
                   <property name="text">
                    <string>LinuxSampler command:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="1">
+                <item row="6" column="1">
                  <widget class="QLineEdit" name="m_txtLSCommand">
                   <property name="text">
                    <string notr="true">linuxsampler</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="0">
+                <item row="4" column="0">
                  <widget class="QLabel" name="label_7">
                   <property name="text">
                    <string>Start LinuxSampler:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="1">
+                <item row="4" column="1">
                  <layout class="QHBoxLayout" name="horizontalLayout_7">
                   <property name="leftMargin">
                    <number>0</number>
@@ -748,6 +744,33 @@
                     </property>
                     <property name="text">
                      <string>8888</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="2" column="1">
+                 <layout class="QHBoxLayout" name="horizontalLayout_8">
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLineEdit" name="m_txtJackCommand">
+                    <property name="text">
+                     <string notr="true">/usr/bin/jackd -R -P89 -p2048 -t5000 -M512 -dalsa -dhw:0 -r44100 -p512 -n2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton">
+                    <property name="toolTip">
+                     <string>Set this jack command as your default for new sessions</string>
+                    </property>
+                    <property name="text">
+                     <string>Default</string>
                     </property>
                    </widget>
                   </item>
@@ -899,6 +922,9 @@
              </property>
              <item>
               <widget class="QToolButton" name="m_btnMore">
+               <property name="toolTip">
+                <string>Edit the more advanced features or your session.</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -931,6 +957,9 @@
              </item>
              <item>
               <widget class="QToolButton" name="m_btnDoCreate">
+               <property name="toolTip">
+                <string>Create new session</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -950,6 +979,9 @@
                <property name="enabled">
                 <bool>false</bool>
                </property>
+               <property name="toolTip">
+                <string>Update existing session</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -966,6 +998,9 @@
              </item>
              <item>
               <widget class="QToolButton" name="m_btnClearCreate">
+               <property name="toolTip">
+                <string>Reset</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -2379,9 +2414,21 @@ p, li { white-space: pre-wrap; }
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="m_btnStopSession">
+              <widget class="QToolButton" name="m_btnStopSession">
+               <property name="toolTip">
+                <string>Terminate the current running session</string>
+               </property>
                <property name="text">
-                <string>Stop Session</string>
+                <string/>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>100</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="autoRaise">
+                <bool>true</bool>
                </property>
               </widget>
              </item>

@@ -480,6 +480,8 @@ void OOStudio::toggleAdvanced(bool state)/*{{{*/
 	m_commandBox->setVisible(state);
 	m_customBox->setVisible(state);
 	m_txtLocation->setVisible(state);
+	m_chkTemplate->setVisible(state);
+	label_24->setVisible(state);
 	
 	//Turn off in advanced
 	m_lblBlurb->setVisible(!state);
