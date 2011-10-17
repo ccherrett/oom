@@ -195,6 +195,9 @@ void OOStudio::createModels()/*{{{*/
 	m_templateSelectModel = new QItemSelectionModel(m_templateModel);
 	m_sessionTable->setSelectionModel(m_sessionSelectModel);
 	m_templateTable->setSelectionModel(m_templateSelectModel);
+	
+	m_commandSelectModel = new QItemSelectionModel(m_commandModel);
+	m_commandTable->setSelectionModel(m_commandSelectModel);
 
 	m_cmbTemplate->addItem(tr("Select Template"));
 	OOSession* session = readSession(QString(OOM_DEFAULT_TEMPLATE));
@@ -258,6 +261,7 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnBrowseLSCP, SIGNAL(clicked()), this, SLOT(browseLSCP()));
 	connect(m_btnBrowseOOM, SIGNAL(clicked()), this, SLOT(browseOOM()));
 	connect(m_btnAddCommand, SIGNAL(clicked()), this, SLOT(addCommand()));
+	connect(m_txtCommand, SIGNAL(returnPressed()), this, SLOT(addCommand()));
 	connect(m_btnDeleteCommand, SIGNAL(clicked()), this, SLOT(deleteCommand()));
 	connect(m_btnClearLog, SIGNAL(clicked()), this, SLOT(clearLogger()));
 	connect(m_btnDeleteTemplate, SIGNAL(clicked()), this, SLOT(deleteTemplate()));
@@ -631,7 +635,8 @@ void OOStudio::addCommand()/*{{{*/
 	if(m_txtCommand->text().isEmpty())
 		return;
 	QStandardItem* item = new QStandardItem(m_txtCommand->text());
-	item->setCheckable(true);
+	//item->setCheckable(true);
+	//item->setForeground(QColor(187, 191, 187));
 	m_commandModel->appendRow(item);
 	updateHeaders();
 	m_txtCommand->setText("");
@@ -640,10 +645,25 @@ void OOStudio::addCommand()/*{{{*/
 
 void OOStudio::deleteCommand()/*{{{*/
 {
-	for(int i = 0; i < m_commandModel->rowCount(); ++i)
+	QList<int> del;
+	if(m_commandSelectModel && m_commandSelectModel->hasSelection())
 	{
-		QStandardItem* item = m_commandModel->item(i, 0);
-		if(item->checkState() == Qt::Checked)
+		QModelIndexList	selected = m_commandSelectModel->selectedRows(0);
+		if(selected.size())
+		{
+			foreach(QModelIndex index, selected)
+			{
+				QStandardItem* item = m_commandModel->itemFromIndex(index);
+				if(item)
+				{
+					del.append(item->row());
+				}
+			}
+		}
+	}
+	if(!del.isEmpty())
+	{
+		foreach(int i, del)
 		{
 			m_commandModel->takeRow(i);
 		}

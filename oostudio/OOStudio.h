@@ -82,6 +82,7 @@ private:
 	QProcess* m_oomProcess;
 	QStandardItemModel* m_sessionModel;
 	QItemSelectionModel* m_sessionSelectModel;
+	QItemSelectionModel* m_commandSelectModel;
 	QStandardItemModel* m_templateModel;
 	QItemSelectionModel* m_templateSelectModel;
 	QStandardItemModel* m_commandModel;
