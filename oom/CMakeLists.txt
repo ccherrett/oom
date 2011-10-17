@@ -153,6 +153,7 @@ file (GLOB core_source_files
 	  midimonitor.cpp
 	  ccinfo.cpp
 	  FadeCurve.cpp
+      lib_functions.cpp
       )
 file (GLOB main_source_files
       main.cpp

@@ -17,9 +17,6 @@
 #ifdef LILV_SUPPORT
 #include <lilv/lilv.h>
 #endif
-#ifdef SUIL_SUPPORT
-#include <suil/suil.h>
-#endif
 #ifdef SLV2_SUPPORT
 #include <slv2/slv2.h>
 #endif
@@ -214,11 +211,11 @@ private:
 	SLV2UI         m_slv2_ui;
 #else
 	QList<LilvInstance*> m_instance;
+    void* m_ui_lib;
+    LV2UI_Handle            m_uihandle;
+	const LV2UI_Descriptor* m_uidescriptor;
 #endif
-#ifdef SUIL_SUPPORT
-	QList<SuilInstance*> m_uinstance;
-	SuilHost* m_uihost;
-#endif
+
 	Configs m_configs;
 
 	ConfigTypes m_ctypes;

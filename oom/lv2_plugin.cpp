@@ -24,6 +24,7 @@
 #include "song.h"
 #include "audio.h"
 #include "utils.h"
+#include "lib_functions.h"
 
 #include "lv2_includes/lv2_event_helpers.h"
 #include "lv2_includes/lv2_event.h"
@@ -975,30 +976,29 @@ void LV2PluginI::heartBeat()/*{{{*/
 		}
 	}
 #else
-	if(m_uinstance.isEmpty())
+	if(!m_uidescriptor)
 		return;
 	//printf("LV2PluginI::heartBeat() LILV %d\n", controlOutPorts);
 	if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
 		LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
-	for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
-	{
-		if(controlsOut[j].tmpVal != controlsOut[j].val)
-		{
-			//printf("LV2PluginI::heartBeat() updating value\n");
-			if(!m_uinstance.isEmpty())
-			{
-				suil_instance_port_event(m_uinstance.at(0), controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+
+    if (m_uidescriptor->port_event)
+    {
+	   for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
+	   {
+    		if(controlsOut[j].tmpVal != controlsOut[j].val)
+		    {
+    			//printf("LV2PluginI::heartBeat() updating value\n");
+    			m_uidescriptor->port_event(m_uihandle, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
 				controlsOut[j].tmpVal = controlsOut[j].val;
-			}
-			else
-				return;
-		}
-	}
+		    }
+	   }
+    }
 #endif
 	unsigned long ctls = controlPorts;
 	for (unsigned long k = 0; k < ctls; ++k)
 	{
-		if(m_uinstance.isEmpty() || m_stop_process)
+		if(!m_uidescriptor || m_stop_process)
 			return;
 		if(controls[k].update)// || controls[k].lastGuiVal != controls[k].val))/*{{{*/
 		{
@@ -1018,9 +1018,9 @@ void LV2PluginI::heartBeat()/*{{{*/
 				}
 			}
 	#else
-			if(!m_uinstance.isEmpty() && !m_stop_process)
+			if(m_uidescriptor && !m_stop_process)
 			{
-				suil_instance_port_event(m_uinstance.at(0), controls[k].idx, sizeof(float), 0, &controls[k].tmpVal);
+				m_uidescriptor->port_event(m_uihandle, controls[k].idx, sizeof(float), 0, &controls[k].tmpVal);
 				controls[k].lastGuiVal = controls[k].val;
 				//printf("Setting port: %s value: %f\n", controls[k].name.c_str(), controls[k].tmpVal);
 				controls[k].update = false;
@@ -1174,11 +1174,7 @@ void LV2PluginI::showGui(bool flag)/*{{{*/
 }/*}}}*/
 
 static void lv2_ui_write(/*{{{*/
-#ifdef SLV2_SUPPORT
 			LV2UI_Controller controller,
-#else
-			SuilController controller, 
-#endif
 			uint32_t port_index,
 			uint32_t buffer_size,
 			uint32_t format,
@@ -1346,20 +1342,14 @@ void LV2PluginI::closeNativeGui(bool cleanup)/*{{{*/
 #else
 	if(m_ui_type == UITYPE_EXT || cleanup)
 	{
-		if(!m_uinstance.isEmpty())
+		if(m_uidescriptor)
 		{
-			SuilInstance* inst = m_uinstance.takeAt(0);
-			if(inst)
-			{
-				suil_instance_free(inst);
-			}
-			if(m_uihost)
-			{
-				suil_host_free(m_uihost);
-			}
+			m_uidescriptor->cleanup(m_uihandle);
+			m_uidescriptor = 0;
+            m_uihandle = 0;
+            lib_close(m_ui_lib);
 		}
 	}
-	m_uinstance.clear();
 #endif
 	m_lv2_ui_widget = NULL;
 }/*}}}*/
@@ -1502,7 +1492,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 	LilvNode* extui = lilv_new_uri(lv2world->world, LV2_EXTERNAL_UI_URI);
 	
 	const LilvUI* ui = NULL;
-	const LilvNode* ui_type = NULL;
+// 	const LilvNode* ui_type = NULL;
 	LilvUIs* uis = lilv_plugin_get_uis(m_plugin->getPlugin());
 	LILV_FOREACH(uis, u, uis) {
 		const LilvUI* this_ui = lilv_uis_get(uis, u);
@@ -1511,7 +1501,7 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 			printf("LV2PluginI::makeNativeGui() GUI type is extui\n");
 			ui = this_ui;
 			m_ui_type = UITYPE_EXT;
-			ui_type = extui;
+// 			ui_type = extui;
 			break;
 		}
 		if(lilv_ui_is_a(this_ui, gtkui))
@@ -1519,14 +1509,14 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 			printf("LV2PluginI::makeNativeGui() GUI type is gtk\n");
 			ui = this_ui;
 			m_ui_type = UITYPE_GTK2;
-			ui_type = gtkui;
+// 			ui_type = gtkui;
 			break;
 		}
 		if (lilv_ui_is_a(this_ui, qtui)) {
 			printf("LV2PluginI::makeNativeGui() GUI type is qtui\n");
 			ui = this_ui;
 			m_ui_type = UITYPE_QT4;
-			ui_type = qtui;
+// 			ui_type = qtui;
 			break;
 		}
 	}
@@ -1565,43 +1555,46 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 	}
 	m_ui_features[fcount] = NULL;
 
-	SuilHost*     ui_host     = NULL;
-	SuilInstance* ui_instance = NULL;
-	m_uinstance.clear();
 	if (ui) {
 		printf("LV2PluginI::makeNativeGui() Found ui for plugin\n");
-		ui_host = suil_host_new(lv2_ui_write, NULL, NULL, NULL);
+		m_ui_lib = lib_open(lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_binary_uri(ui))));
 		//const LV2_Feature* features = m_plugin->features();
-		if(ui_host)
+		if(m_ui_lib)
 		{
-			m_uihost = ui_host;
-			ui_instance = suil_instance_new( 
-										ui_host, 
-										this, 
-										lilv_node_as_uri(ui_type),
-										m_plugin->uri().toUtf8().constData(),
-										lilv_node_as_uri(lilv_ui_get_uri(ui)),
-										lilv_node_as_uri(ui_type),
-										lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_bundle_uri(ui))),
-										lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_binary_uri(ui))),
-										m_ui_features
-										);
-			if(ui_instance)
-			{	
-				m_lv2_ui_widget = suil_instance_get_widget(ui_instance);
-				m_uinstance.append(ui_instance);
+          const char* UiURI = lilv_node_as_uri(lilv_ui_get_uri(ui));
+          LV2UI_DescriptorFunction ui_descfn = (LV2UI_DescriptorFunction)lib_symbol(m_ui_lib, "lv2ui_descriptor");
+
+          uint32_t i = 0;
+          while ((m_uidescriptor = ui_descfn(i++))) {
+            if (strcmp(m_uidescriptor->URI, UiURI) == 0) {
+              break;
+            }
+          }
+
+          if (m_uidescriptor)
+          {
+            m_uihandle = m_uidescriptor->instantiate(m_uidescriptor,
+                                                    m_plugin->uri().toUtf8().constData(),
+                                                    lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_bundle_uri(ui))),
+                                                    lv2_ui_write,
+                                                    this,
+                                                    &m_lv2_ui_widget,
+                                                    m_ui_features);
+
+			if(m_uihandle)
+			{
 				if (m_ui_type == UITYPE_EXT && m_lv2_ui_widget)
 					LV2_EXTERNAL_UI_RUN((lv2_external_ui *) m_lv2_ui_widget);
 				printf("LV2PluginI::makeNativeGui() Suil gui instance created controlOutPorts:%d\n", controlOutPorts);
 				for(unsigned long j = 0; j < (unsigned)controlOutPorts; ++j)
 				{
 					//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
-					suil_instance_port_event(ui_instance, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
+					m_uidescriptor->port_event(m_uihandle, controlsOut[j].idx, sizeof(float), 0, &controlsOut[j].val);
 				}
 				for(unsigned long j = 0; j < (unsigned)controlPorts; ++j)
 				{
 					//printf("LV2PluginI::makeNativeGui(): controlOut val: %4.2f \n",controlsOut[j].val);
-					suil_instance_port_event(ui_instance, controls[j].idx, sizeof(float), 0, &controls[j].val);
+					m_uidescriptor->port_event(m_uihandle, controls[j].idx, sizeof(float), 0, &controls[j].val);
 				}
 				if(m_ui_type == UITYPE_GTK2)
 				{
@@ -1625,7 +1618,13 @@ void LV2PluginI::makeNativeGui()/*{{{*/
 						m_nativeui->setWindowTitle(QString(title.c_str()));
 					}
 				}
-			}
+              } else {
+                lib_close(m_ui_lib);
+                m_uidescriptor = 0;
+              }
+            } else {
+              lib_close(m_ui_lib);
+            }
 		}
 	}/*}}}*/
 #endif
