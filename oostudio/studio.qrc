@@ -22,6 +22,27 @@
 	<file>images/oostudio-delete-off.png</file>
 	<file>images/oostudio-delete-on.png</file>
 	<file>images/oostudio-delete-over.png</file>
+
+	<file>images/oostudio-more-small-off.png</file>
+	<file>images/oostudio-more-small-on.png</file>
+	<file>images/oostudio-more-small-over.png</file>
+
+	<file>images/oostudio-stop-small-off.png</file>
+	<file>images/oostudio-stop-small-on.png</file>
+	<file>images/oostudio-stop-small-over.png</file>
+	
+	<file>images/oostudio-clear-small-off.png</file>
+	<file>images/oostudio-clear-small-on.png</file>
+	<file>images/oostudio-clear-small-over.png</file>
+	
+	<file>images/oostudio-update-small-off.png</file>
+	<file>images/oostudio-update-small-on.png</file>
+	<file>images/oostudio-update-small-over.png</file>
+	<file>images/oostudio-new-small-off.png</file>
+	<file>images/oostudio-new-small-on.png</file>
+	<file>images/oostudio-new-small-over.png</file>
+	<file>images/oostudio-oop-icon.png</file>
+	
 	<file>images/oom_icon.png</file>
 	<file>images/checkbox_checked.png</file>
 	<file>images/checkbox_checked_hover.png</file>

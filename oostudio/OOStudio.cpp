@@ -86,6 +86,7 @@ OOStudio::OOStudio()
 	setWindowTitle(QString(tr("OOMidi: Studio")).append("-").append(VERSION));
 	QSettings settings("OOMidi", "OOStudio");
 	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
+	bool advanced = settings.value("OOStudio/advanced", 0).toBool();
 	resize(size);
 	m_restoreSize = saveGeometry();
 	populateSessions();
@@ -105,6 +106,8 @@ OOStudio::OOStudio()
 	connect(m_heartBeat, SIGNAL(timeout()), this, SLOT(heartBeat()));
 	m_heartBeat->start(50);
 	updateInstalledState();
+	//toggleAdvanced(false);
+	m_btnMore->setChecked(advanced);
 }
 
 void OOStudio::heartBeat()
@@ -127,6 +130,36 @@ void OOStudio::showExternalLinks(const QUrl &url)
 
 void OOStudio::createTrayIcon()/*{{{*/
 {
+	QIcon moreIcon;
+	moreIcon.addPixmap(QPixmap(":/images/oostudio-more-small-on.png"), QIcon::Normal, QIcon::On);
+	moreIcon.addPixmap(QPixmap(":/images/oostudio-more-small-off.png"), QIcon::Normal, QIcon::Off);
+	moreIcon.addPixmap(QPixmap(":/images/oostudio-more-small-on.png"), QIcon::Active);
+	m_btnMore->setIcon(moreIcon);
+
+	QIcon updateIcon;
+	updateIcon.addPixmap(QPixmap(":/images/oostudio-update-small-on.png"), QIcon::Normal, QIcon::On);
+	updateIcon.addPixmap(QPixmap(":/images/oostudio-update-small-off.png"), QIcon::Normal, QIcon::Off);
+	updateIcon.addPixmap(QPixmap(":/images/oostudio-update-small-on.png"), QIcon::Active);
+	m_btnUpdate->setIcon(updateIcon);
+
+	QIcon stopIcon;
+	stopIcon.addPixmap(QPixmap(":/images/oostudio-stop-small-on.png"), QIcon::Normal, QIcon::On);
+	stopIcon.addPixmap(QPixmap(":/images/oostudio-stop-small-off.png"), QIcon::Normal, QIcon::Off);
+	stopIcon.addPixmap(QPixmap(":/images/oostudio-stop-small-on.png"), QIcon::Active);
+	m_btnStopSession->setIcon(stopIcon);
+
+	QIcon clearIcon;
+	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-on.png"), QIcon::Normal, QIcon::On);
+	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-off.png"), QIcon::Normal, QIcon::Off);
+	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-on.png"), QIcon::Active);
+	m_btnClearLog->setIcon(clearIcon);
+
+	QIcon newIcon;
+	newIcon.addPixmap(QPixmap(":/images/oostudio-new-small-on.png"), QIcon::Normal, QIcon::On);
+	newIcon.addPixmap(QPixmap(":/images/oostudio-new-small-off.png"), QIcon::Normal, QIcon::Off);
+	newIcon.addPixmap(QPixmap(":/images/oostudio-new-small-on.png"), QIcon::Active);
+	m_btnDoCreate->setIcon(newIcon);
+
 	QIcon openIcon;
 	openIcon.addPixmap(QPixmap(":/images/oostudio-open-on.png"), QIcon::Normal, QIcon::On);
 	openIcon.addPixmap(QPixmap(":/images/oostudio-open-off.png"), QIcon::Normal, QIcon::Off);
@@ -286,6 +319,7 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_cmbTemplate, SIGNAL(currentIndexChanged(int)), this, SLOT(templateSelectionChanged(int)));
 	connect(m_cmbTemplate, SIGNAL(activated(int)), this, SLOT(templateSelectionChanged(int)));
 	connect(m_cmbEditMode, SIGNAL(currentIndexChanged(int)), this, SLOT(editModeChanged(int)));
+	connect(m_btnMore, SIGNAL(toggled(bool)), this, SLOT(toggleAdvanced(bool)));
 
 	connect(m_sessionTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(sessionDoubleClicked(QModelIndex)));
 	connect(m_templateTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(templateDoubleClicked(QModelIndex)));
@@ -428,6 +462,26 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 	}
 
 	updateHeaders();
+}/*}}}*/
+
+void OOStudio::toggleAdvanced(bool state)/*{{{*/
+{
+	label_9->setVisible(state);
+	label_10->setVisible(state);
+	label->setVisible(state);
+	label_4->setVisible(state);
+	m_cmbLSCPMode->setVisible(state);
+	m_txtLSCP->setVisible(state);
+	m_btnBrowseLSCP->setVisible(state);
+	m_btnBrowseOOM->setVisible(state);
+	m_btnBrowsePath->setVisible(state);
+	m_txtOOMPath->setVisible(state);
+	m_commandBox->setVisible(state);
+	m_customBox->setVisible(state);
+	m_txtLocation->setVisible(state);
+	
+	//Turn off in advanced
+	m_lblBlurb->setVisible(!state);
 }/*}}}*/
 
 void OOStudio::updateInstalledState()
@@ -795,6 +849,7 @@ void OOStudio::saveSettings()/*{{{*/
 	}
 	settings.beginGroup("OOStudio");
 	settings.setValue("size", size());
+	settings.setValue("advanced", m_btnMore->isChecked());
 	settings.endGroup();
 	settings.sync();
 }/*}}}*/
@@ -1382,7 +1437,7 @@ void OOStudio::loadSession(OOSession* session)/*{{{*/
 						m_current = session;
 						m_lblRunning->setText(session->name);
 						m_btnStopSession->setEnabled(true);
-						m_tabWidget->setCurrentIndex(2);
+						m_tabWidget->setCurrentIndex(3);
 						//hide();
 					}
 					else
@@ -1938,6 +1993,7 @@ void OOStudio::editModeChanged(int index)/*{{{*/
 		m_btnBrowsePath->setEnabled(false);
 		m_btnDoCreate->setEnabled(false);
 		m_btnUpdate->setEnabled(true);
+		m_btnMore->setChecked(true);
 	}
 	else
 	{
@@ -1946,6 +2002,7 @@ void OOStudio::editModeChanged(int index)/*{{{*/
 		m_btnBrowsePath->setEnabled(true);
 		m_btnDoCreate->setEnabled(true);
 		m_btnUpdate->setEnabled(false);
+		m_btnMore->setChecked(false);
 	}
 }/*}}}*/
 

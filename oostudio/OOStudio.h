@@ -130,6 +130,7 @@ protected:
 	void resizeEvent(QResizeEvent*);
 
 private slots:
+	void toggleAdvanced(bool);
 	void updateInstalledState();
 	void heartBeat();
 	void showExternalLinks(const QUrl &url);
