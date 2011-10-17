@@ -150,7 +150,7 @@ QLineEdit
 }
 QStatusBar
 {
-	 border-radius: 8px;
+	 border-radius: 0px;
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-color: #484848;
