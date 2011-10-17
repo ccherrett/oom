@@ -148,6 +148,15 @@ QLineEdit
 	 background-color: #1b1b1b;
 	 color: #b8b8b8;
 }
+QStatusBar
+{
+	 border-radius: 8px;
+     border-image: url(:/images/frame.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #1b1b1b;
+	 color: #b8b8b8;
+}
 
 
 QPushButton 
