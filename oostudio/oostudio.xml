@@ -1,9 +1,9 @@
 <!DOCTYPE OOStudioDownloader>
 <OOStudioDownloader>
- <sonatina path="http://superb-dca2.dl.sourceforge.net/project/openoctave/libraries/sonatina1.tar.bz2" format="1" homepage="http://sso.mattiaswestlund.net/"/>
+ <sonatina path="http://sourceforge.net/projects/openoctave/files/libraries/sonatina1.tar.bz2/download" format="1" homepage="http://sso.mattiaswestlund.net/"/>
  <classicfree path="http://www.pettinhouse.com/Free/ClassicFREE.rar" format="2" homepage="http://www.pettinhouse.com/html/classicfree.html"/>
  <accousticfree path="http://www.pettinhouse.com/Free/ACFree.rar" format="2" homepage="http://www.pettinhouse.com/html/acousticguitar_free.html"/>
- <maestrogrand path="http://hivelocity.dl.sourceforge.net/project/openoctave/libraries/maestro_concert_grand_v2.rar" format="2" homepage="http://sonimusicae.free.fr/matshelgesson-maestro-en.html"/>
+ <maestrogrand path="http://sourceforge.net/projects/openoctave/files/libraries/maestro_concert_grand_v2.rar/download" format="2" homepage="http://sonimusicae.free.fr/matshelgesson-maestro-en.html"/>
  <samplicity_quad48 path="http://www.samplicity.com/wp-content/plugins/download-monitor/download.php?id=4" format="3" homepage="http://www.samplicity.com/bricasti-m7-impulse-responses/"/>
  <samplicity_quad44 path="http://www.samplicity.com/wp-content/plugins/download-monitor/download.php?id=3" format="3" homepage="http://www.samplicity.com/bricasti-m7-impulse-responses/"/>
 </OOStudioDownloader>

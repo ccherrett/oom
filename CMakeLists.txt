@@ -323,21 +323,6 @@ if(LV2_SUPPORT)
 	endif(GTK2_FOUND)
 endif(LV2_SUPPORT)
 
-if(LV2_SUPPORT)
-    if (ENABLE_LV2UI)
-          PKG_CHECK_MODULES(SUIL suil-0)
-          if (SUIL_FOUND)
-              message("SUIL support enabled")
-              include_directories(${SUIL_INCLUDE_DIRS})
-              set (SUIL_SUPPORT TRUE)
-    	  else (SUIL_FOUND)
-              message("SUIL support disabled")
-              set (SUIL_SUPPORT FALSE)
-          endif (SUIL_FOUND)
-    endif (ENABLE_LV2UI)
-endif(LV2_SUPPORT)
-
-
 ##
 ## TODO
 ##
@@ -492,7 +477,6 @@ add_custom_target(uninstall
 summary_add("SLV2 support" SLV2_SUPPORT)
 summary_add("LILV support" LILV_SUPPORT)
 summary_add("LV2 support" LV2_SUPPORT)
-summary_add("SUIL support" SUIL_SUPPORT)
 summary_add("GTK2 GUI support" GTK2UI_SUPPORT)
 summary_add("LSCP support" LSCP_SUPPORT)
 #summary_add("Fluidsynth support" HAVE_FLUIDSYNTH)

@@ -278,10 +278,6 @@ if(LILV_SUPPORT)
       target_link_libraries(core ${LIBLILV_LIBRARIES})
 endif(LILV_SUPPORT)
 
-if(SUIL_SUPPORT)
-      target_link_libraries(core ${SUIL_LIBRARIES})
-endif(SUIL_SUPPORT)
-
 if(SLV2_SUPPORT)
 	target_link_libraries(core ${LIBSLV2_LIBRARIES})
 endif(SLV2_SUPPORT)
