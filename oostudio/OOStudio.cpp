@@ -127,6 +127,21 @@ void OOStudio::showExternalLinks(const QUrl &url)
 
 void OOStudio::createTrayIcon()/*{{{*/
 {
+	QIcon openIcon;
+	openIcon.addPixmap(QPixmap(":/images/oostudio-open-on.png"), QIcon::Normal, QIcon::On);
+	openIcon.addPixmap(QPixmap(":/images/oostudio-open-off.png"), QIcon::Normal, QIcon::Off);
+	openIcon.addPixmap(QPixmap(":/images/oostudio-open-over.png"), QIcon::Active);
+
+	QIcon deleteIcon;
+	deleteIcon.addPixmap(QPixmap(":/images/oostudio-delete-on.png"), QIcon::Normal, QIcon::On);
+	deleteIcon.addPixmap(QPixmap(":/images/oostudio-delete-off.png"), QIcon::Normal, QIcon::Off);
+	deleteIcon.addPixmap(QPixmap(":/images/oostudio-delete-over.png"), QIcon::Active);
+
+	m_btnDeleteSession->setIcon(QIcon(deleteIcon));
+	m_btnDeleteTemplate->setIcon(QIcon(deleteIcon));
+	m_btnLoadSession->setIcon(QIcon(openIcon));
+	m_btnLoadTemplate->setIcon(QIcon(openIcon));
+
 	m_quitAction = new QAction(tr("&Quit"), this);
 
 	QIcon exitIcon;

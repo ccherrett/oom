@@ -81,9 +81,18 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QPushButton" name="m_btnDeleteSession">
+               <widget class="QToolButton" name="m_btnDeleteSession">
                 <property name="text">
-                 <string>Delete Session</string>
+                 <string/>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>160</width>
+                  <height>56</height>
+                 </size>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -101,12 +110,21 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="m_btnLoadSession">
+               <widget class="QToolButton" name="m_btnLoadSession">
                 <property name="toolTip">
                  <string>Open oomidi with the selected session</string>
                 </property>
                 <property name="text">
-                 <string>Open Session</string>
+                 <string/>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>160</width>
+                  <height>56</height>
+                 </size>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -153,9 +171,18 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_9">
               <item>
-               <widget class="QPushButton" name="m_btnDeleteTemplate">
+               <widget class="QToolButton" name="m_btnDeleteTemplate">
                 <property name="text">
-                 <string>Delete Template</string>
+                 <string/>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>160</width>
+                  <height>56</height>
+                 </size>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -173,12 +200,21 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="m_btnLoadTemplate">
+               <widget class="QToolButton" name="m_btnLoadTemplate">
                 <property name="toolTip">
                  <string>Open oomidi with the selected session</string>
                 </property>
                 <property name="text">
-                 <string>Open Template</string>
+                 <string/>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>160</width>
+                  <height>56</height>
+                 </size>
+                </property>
+                <property name="autoRaise">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

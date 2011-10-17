@@ -16,6 +16,12 @@
 	<file>images/oostudio-download-all-off.png</file>
 	<file>images/oostudio-download-all-on.png</file>
 	<file>images/oostudio-download-all-over.png</file>
+	<file>images/oostudio-open-off.png</file>
+	<file>images/oostudio-open-on.png</file>
+	<file>images/oostudio-open-over.png</file>
+	<file>images/oostudio-delete-off.png</file>
+	<file>images/oostudio-delete-on.png</file>
+	<file>images/oostudio-delete-over.png</file>
 	<file>images/oom_icon.png</file>
 	<file>images/checkbox_checked.png</file>
 	<file>images/checkbox_checked_hover.png</file>
