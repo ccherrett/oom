@@ -26,6 +26,7 @@ class QAction;
 class QFont;
 class QMenu;
 class QMessageBox;
+class QUndoStack;
 
 class SynthI;
 struct MidiMsg;
@@ -42,6 +43,7 @@ class EventList;
 class MarkerList;
 class Marker;
 class SNode;
+class OOMCommand;
 
 class MidiPort;
 class MidiDevice;
@@ -146,6 +148,7 @@ private:
 
     UndoList* undoList;
     UndoList* redoList;
+    QUndoStack* m_undoStack;
     Pos pos[3];
     Pos _vcpos; // virtual CPOS (locate in progress)
     MarkerList* _markerList;
@@ -186,6 +189,9 @@ public:
     void putEvent(int pv);
     void endMsgCmd();
     void processMsg(AudioMsg* msg);
+    void pushToHistoryStack(OOMCommand* cmd);
+    void undoFromQtUndoStack();
+    void redoFromQtUndoStack();
 
     void setMType(MType t);
 
@@ -511,6 +517,7 @@ public:
     void undoOp(UndoOp::UndoType, int, Track*);
     void undoOp(UndoOp::UndoType, int, int, int = 0);
     void undoOp(UndoOp::UndoType, Part*);
+    void undoOp(UndoOp::UndoType, OOMCommand*);
     //void undoOp(UndoOp::UndoType, Event& nevent, Part*);
     void undoOp(UndoOp::UndoType, Event& nevent, Part*, bool doCtrls, bool doClones);
     //void undoOp(UndoOp::UndoType, Event& oevent, Event& nevent, Part*);

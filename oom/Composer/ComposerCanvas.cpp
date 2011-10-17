@@ -3490,7 +3490,8 @@ void ComposerCanvas::pasteAutomation()/*{{{*/
 					CommandGroup* group = new CommandGroup(tr("Copy Automation Nodes"));
 					group->add_command(addCommand);
 					group->add_command(removeCommand);
-					CommandGroup::process_command(group);
+
+					song->pushToHistoryStack(group);
 				}
 				//in the future we can support copying multiple lanes at once
 				break;

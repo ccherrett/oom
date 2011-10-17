@@ -20,6 +20,7 @@ class Track;
 class TEvent;
 class SigEvent;
 class Part;
+class OOMCommand;
 
 extern std::list<QString> temporaryWavFiles; //!< Used for storing all tmp-files, for cleanup on shutdown
 //---------------------------------------------------------
@@ -40,7 +41,8 @@ struct UndoOp
         ModifyClip,
         ModifyMarker,
         AddTrackView, DeleteTrackView, ModifyTrackView,
-		AddAutomation, DeleteAutomation, ModifyAutomation
+		AddAutomation, DeleteAutomation, ModifyAutomation,
+	    AddOOMCommand
     };
     UndoType type;
 
@@ -71,6 +73,11 @@ struct UndoOp
         {
             Part* part;
         };
+
+	struct
+	{
+		OOMCommand* cmd;
+	};
 
         struct
         {

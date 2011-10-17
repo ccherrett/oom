@@ -17,6 +17,7 @@
 #include <QPoint>
 #include <QSignalMapper>
 #include <QTextStream>
+#include <QUndoStack>
 
 #include "app.h"
 #include "driver/jackmidi.h"
@@ -47,6 +48,7 @@
 #include "mpevent.h"
 #include "midimonitor.h"
 #include "plugin.h"
+#include "traverso_shared/OOMCommand.h"
 //#include <omp.h>
 
 extern void clearMidiTransforms();
@@ -87,6 +89,7 @@ Song::Song(const char* name)
 	noteFifoRindex = 0;
 	undoList = new UndoList;
 	redoList = new UndoList;
+	m_undoStack = new QUndoStack(this);
 	_markerList = new MarkerList;
 	_globalPitchShift = 0;
 	jackErrorBox = 0;
@@ -2256,6 +2259,7 @@ void Song::clear(bool signal)
 	AL::sigmap.clear();
 	undoList->clearDelete();
 	redoList->clear();
+	m_undoStack->clear();
 	_markerList->clear();
 	pos[0].setTick(0);
 	pos[1].setTick(0);
