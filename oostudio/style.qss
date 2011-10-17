@@ -220,7 +220,8 @@ QLabel#m_lblClassic::disabled
 	color: #393941;
 }*/
 
-QFrame#m_sonatinaBox, QFrame#m_maestroBox, QFrame#m_classicBox, QFrame#m_accousticBox, QFrame#m_m7Box
+QFrame#m_sonatinaBox, QFrame#m_maestroBox, QFrame#m_classicBox, QFrame#m_accousticBox, QFrame#m_m7Box,
+QFrame#m_sessionInfoBox, QFrame#m_commandBox, QFrame#m_customBox, QFrame#m_logsBox, QFrame#m_sessionStatusBox
 {
 	color: #d0d4d0;
 	background-color: #1e1e1e;
@@ -232,7 +233,8 @@ QLabel#m_lblSonatina, QLabel#label_14, QLabel#m_lblSSOTitle, QLabel#m_lblSSOStat
 QLabel#m_lblMaestro, QLabel#label_15, QLabel#m_lblMaestroTitle, QLabel#m_lblMaestroState,
 QLabel#m_lblClassic, QLabel#label_16, QLabel#m_lblClassicTitle, QLabel#m_lblClassicState,
 QLabel#m_lblAccoustic, QLabel#label_17, QLabel#m_lblAccousticTitle, QLabel#m_lblAccousticState,
-QLabel#m_lblM7, QLabel#label_18, QLabel#m_lblM7Title, QLabel#m_lblM7State
+QLabel#m_lblM7, QLabel#label_18, QLabel#m_lblM7Title, QLabel#m_lblM7State, QLabel#label_19,
+QLabel#label_20, QLabel
 {
 	background-color:none;
 	border:none;
@@ -628,6 +630,15 @@ QCheckBox {
 	background-color: #525252;
  }
 
+QCheckBox#m_chkStartJack, QCheckBox#m_chkStartLS {
+     spacing: 5px;
+	 font-family: "fixed-width";
+	 font-weight: bold;
+	 font-size: 11px;
+	 color: #d0d4d0;
+	background-color: none;
+ }
+
 QGroupBox::indicator, QCheckBox::indicator {
      width: 13px;
      height: 13px;
@@ -721,10 +732,14 @@ QGroupBox::indicator:indeterminate:pressed, QCheckBox::indicator:indeterminate:p
      left: 1px;
  }
  QComboBox QAbstractItemView {
+	background-color: #1e1e1e;
+	gridline-color:#343434;
+	alternate-background-color: #1b1b1b;
+	selection-background-color: #2e2e2e;
      border: 1px solid #e2e5e5;
-     selection-background-color: #93a7b2;
-	 background-color: #d0d0d0;
-	 color: #000000;
+     /*selection-background-color: #93a7b2;
+	 background-color: #d0d0d0;*/
+	color: #bbbfbb;
  }
 
 
