@@ -1595,6 +1595,9 @@ p, li { white-space: pre-wrap; }
                             <height>56</height>
                            </size>
                           </property>
+                          <property name="autoRaise">
+                           <bool>true</bool>
+                          </property>
                          </widget>
                         </item>
                        </layout>
@@ -2026,6 +2029,9 @@ p, li { white-space: pre-wrap; }
                             <height>56</height>
                            </size>
                           </property>
+                          <property name="autoRaise">
+                           <bool>true</bool>
+                          </property>
                          </widget>
                         </item>
                        </layout>
@@ -2301,6 +2307,9 @@ p, li { white-space: pre-wrap; }
                             <width>160</width>
                             <height>56</height>
                            </size>
+                          </property>
+                          <property name="autoRaise">
+                           <bool>true</bool>
                           </property>
                          </widget>
                         </item>
