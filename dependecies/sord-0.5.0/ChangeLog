@@ -1,0 +1,23 @@
+sord (0.5.0) unstable; urgency=low
+
+  * Remove glib dependency
+  * Add function sord_contains for checking for a triple pattern
+  * Add function sord_write_iter for writing a queried range
+  * Fix Sord::Namespaces::qualify to no longer chop prefixes
+  * Add ability to build static library
+
+  -- David Robillard <d@drobilla.net>  Thu, 29 Sep 2011 00:00:00 -0400
+
+sord (0.4.2) unstable; urgency=low
+
+  * Fix compilation issues on some systems
+  * Fix build system Python 3 compatibility
+  * Bump Serd dependency to 0.4.0
+
+ -- David Robillard <d@drobilla.net>  Wed, 25 May 2011 19:00:00 -0400
+
+sord (0.4.0) unstable; urgency=low
+
+  * Initial release
+
+ -- David Robillard <d@drobilla.net>  Tue, 24 May 2011 23:00:00 -0400

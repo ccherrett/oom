@@ -1,0 +1,33 @@
+lilv (0.5.0) unstable; urgency=low
+
+  * Remove glib dependency
+  * Add lv2core as a pkg-config dependency (for lv2.h header include)
+  * Obey prefix when installing bash completion script
+  * Support integer minimum, maximum, and default port values in
+    lilv_plugin_get_port_ranges_float
+  * Add ability to build static library
+
+  -- David Robillard <d@drobilla.net>  Thu, 29 Sep 2011 00:00:00 -0400
+
+lilv (0.4.4) unstable; urgency=low
+
+  * Fix building python bindings
+  * Make free methods tolerate being called on NULL
+  * Remove lv2jack (replaced by jalv)
+  * Fix parsing extra plugin data files in other bundles
+  * Fix lilv_ui_is_supported when Lilv is built independently
+
+  -- David Robillard <d@drobilla.net>  Sat, 11 Jun 2011 11:20:11 -0400
+
+lilv (0.4.2) unstable; urgency=low
+
+  * Fix compilation issues on some systems
+  * Fix build system Python 3 compatibility
+
+ -- David Robillard <d@drobilla.net>  Wed, 25 May 2011 19:00:00 -0400
+
+lilv (0.4.0) unstable; urgency=low
+
+  * Initial version (forked from SLV2)
+
+ -- David Robillard <d@drobilla.net>  Tue, 24 May 2011 23:00:00 -0400
