@@ -15,6 +15,9 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     ui->graphicsView->setRenderHint(QPainter::TextAntialiasing, true);
 
     scene->rubberbandByTheme(theme);
+
+    // TEST
+    test_box = new CanvasBox(0, "test", PatchCanvas::ICON_APPLICATION, theme, scene);
 }
 
 CanvasTestApp::~CanvasTestApp()

@@ -3,8 +3,8 @@
 
 #include <QMainWindow>
 
-#include "patchscene.h"
-#include "theme.h"
+#include "patchcanvas.h"
+#include "canvasbox.h"
 
 namespace Ui {
     class CanvasTestApp;
@@ -22,6 +22,7 @@ private:
     Ui::CanvasTestApp *ui;
     PatchScene* scene;
     Theme* theme;
+    CanvasBox* test_box;
 };
 
 #endif // CANVASTESTAPP_H
