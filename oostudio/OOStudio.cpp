@@ -160,13 +160,13 @@ void OOStudio::createTrayIcon()/*{{{*/
 	QIcon downloadAllIcon;
 	downloadAllIcon.addPixmap(QPixmap(":/images/oostudio-download-all-on.png"), QIcon::Normal, QIcon::On);
 	downloadAllIcon.addPixmap(QPixmap(":/images/oostudio-download-all-off.png"), QIcon::Normal, QIcon::Off);
-	downloadAllIcon.addPixmap(QPixmap(":/images/oostudio-download-all-over.png"), QIcon::Active);
+	downloadAllIcon.addPixmap(QPixmap(":/images/oostudio-download-all-on.png"), QIcon::Active);
 	m_btnDownload->setIcon(downloadAllIcon);
 
 	QIcon downloadIcon;
 	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-on.png"), QIcon::Normal, QIcon::On);
 	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-off.png"), QIcon::Normal, QIcon::Off);
-	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-over.png"), QIcon::Active);
+	downloadIcon.addPixmap(QPixmap(":/images/oostudio-download-on.png"), QIcon::Active);
 	m_btnDownloadSonatina->setIcon(QIcon(downloadIcon));
 	m_btnDownloadMaestro->setIcon(QIcon(downloadIcon));
 	m_btnDownloadClassic->setIcon(QIcon(downloadIcon));
