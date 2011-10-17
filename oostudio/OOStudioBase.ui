@@ -23,7 +23,7 @@
     <item>
      <widget class="QTabWidget" name="m_tabWidget">
       <property name="toolTip">
-       <string>Reset form</string>
+       <string/>
       </property>
       <property name="currentIndex">
        <number>0</number>
@@ -999,7 +999,7 @@
              <item>
               <widget class="QToolButton" name="m_btnClearCreate">
                <property name="toolTip">
-                <string>Reset</string>
+                <string>Reset form</string>
                </property>
                <property name="text">
                 <string/>
