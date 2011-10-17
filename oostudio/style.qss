@@ -77,6 +77,7 @@ QTableView::focus
 
 QTableView::item
 {
+	padding-left: 10px;
 	padding-top: 4px;
 	padding-bottom: 4px;
 	border-bottom: 1px solid #343434;
