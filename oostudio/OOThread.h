@@ -35,6 +35,7 @@ signals:
 	void startupSuccess();
 	void startupFailed();
 	void logMessage(LogInfo*);
+	void processExit(int, QProcess::ExitStatus);
 
 protected:
 	PState m_state;
