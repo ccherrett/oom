@@ -75,17 +75,20 @@ void OOStudio::processCustomMessages(QString name, long pid)/*{{{*/
 	if(!m_procMap.isEmpty() && m_procMap.contains(pid))
 	{
 		OOProcess* process = m_procMap.value(pid);
-		while(process->canReadLine())
+		if(process)
 		{
-			QString messages = QString::fromUtf8(process->readLine().constData());
-			messages = messages.trimmed().simplified();
-			if(messages.isEmpty())
-				continue;
-			LogInfo* info = new LogInfo;
-			info->name = name;
-			info->message = messages;
-			info->codeString = QString("INFO");
-			emit logMessage(info);
+			while(process->canReadLine())
+			{
+				QString messages = QString::fromUtf8(process->readLine().constData());
+				messages = messages.trimmed().simplified();
+				if(messages.isEmpty())
+					continue;
+				LogInfo* info = new LogInfo;
+				info->name = name;
+				info->message = messages;
+				info->codeString = QString("INFO");
+				emit logMessage(info);
+			}
 		}
 	}
 }/*}}}*/
@@ -95,43 +98,16 @@ void OOStudio::processCustomErrors(QString name, long pid)/*{{{*/
 	if(!m_procMap.isEmpty() && m_procMap.contains(pid))
 	{
 		OOProcess* process = m_procMap.value(pid);
-		QString messages = QString::fromUtf8(process->readAllStandardError().constData());
-		if(messages.isEmpty())
-			return;
-		LogInfo* info = new LogInfo;
-		info->name = name;
-		info->message = messages;
-		info->codeString = QString("ERROR");
-		emit logMessage(info);
-	}
-}/*}}}*/
-
-void OOThread::processCustomMessages(int type)/*{{{*/
-{
-	if(m_process)
-	{
-		switch(type)
+		if(process)
 		{
-			case 0: //Output
-			{
-				while(m_process->canReadLine())
-				{
-					QString messages = QString::fromUtf8(m_process->readLine().constData());
-					messages = messages.trimmed().simplified();
-					if(messages.isEmpty())
-						continue;
-					LogInfo* info = new LogInfo;
-					info->name = name;
-					info->message = messages;
-					info->codeString = QString("INFO");
-					emit logMessage(info);
-				}
-			}
-			break;
-			case 1: //Error
-			{
-			}
-			break;
+			QString messages = QString::fromUtf8(process->readAllStandardError().constData());
+			if(messages.isEmpty())
+				return;
+			LogInfo* info = new LogInfo;
+			info->name = name;
+			info->message = messages;
+			info->codeString = QString("ERROR");
+			emit logMessage(info);
 		}
 	}
 }/*}}}*/
@@ -184,7 +160,25 @@ void OOThread::processMessagesByType(int type)/*{{{*/
 	}
 }/*}}}*/
 
-OOMProcessThread::OOMProcessThread()
+bool OOThread::programStarted()
+{
+	return m_state == ProcessRunning;
+}
+
+bool OOThread::programError()
+{
+	return m_state == ProcessError;
+}
+
+PState OOThread::programState()
+{
+	return  m_state;
+}
+
+OOMProcessThread::OOMProcessThread(OOSession* session, QObject* parent)
+: OOThread(session, parent),
+  m_state(ProcessNotRunning),
+  m_name("OOMidi"),
 {
 }
 

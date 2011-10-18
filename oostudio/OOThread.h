@@ -20,16 +20,21 @@ class OOThread : public QThread
 
 public:
 	OOThread(OOSession* s = 0, QObject* parent = 0);
+	enum PState{ProcessStarting, ProcessRunning, ProcessError, ProcessNotRunning}
 	void run();
+	bool programStarted();
+	bool programError();
+	PState programState();
 
 private slots:
 	void processMessages();
 	void processMessagesByType(int);
 	void processErrors();
+	void processCustomMessages(QString, long);
+	void processCustomErrors(QString, long);
 	
 public slots:
 	bool startJob();
-	enum PState{ProcessStarting, ProcessRunning, ProcessError, ProcessNotRunning}
 
 signals:
 	void startupSuccess();
