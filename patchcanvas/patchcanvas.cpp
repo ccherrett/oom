@@ -14,12 +14,12 @@ START_NAMESPACE_PATCHCANVAS
 Canvas canvas;
 
 options_t options = {
-    /* theme_name */         "", //getDefaultThemeName();
+    /* theme_name */         QString(Theme::getThemeName(Theme::getDefaultTheme())),
     /* bezier_lines */       true,
     /* antialiasing */       Qt::PartiallyChecked,
     /* auto_hide_groups */   true,
     /* connect_midi2outro */ false,
-    /* fancy_eyecandy */     false
+    /* fancy_eyecandy */     true
 };
 
 features_t features = {

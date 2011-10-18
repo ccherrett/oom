@@ -11,6 +11,8 @@
 
 START_NAMESPACE_PATCHCANVAS
 
+class CanvasBoxShadow;
+
 class CanvasBox : public QGraphicsItem
 {
 public:
@@ -49,6 +51,8 @@ private:
 
     QFont font_name;
     QFont font_port;
+
+    CanvasBoxShadow* shadow;
 
     //checkItemPos(self)
     //contextMenuEvent(self, event)

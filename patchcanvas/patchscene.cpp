@@ -3,6 +3,8 @@
 #include <QGraphicsView>
 #include <cmath>
 
+#include <cstdio>
+
 START_NAMESPACE_PATCHCANVAS
 
 extern Canvas canvas;
@@ -92,33 +94,43 @@ void PatchScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     if (fake_selection)
     {
-//      QList<QGraphicsItem*> items = items();
-//      if (len(items) > 0):
-//        for i in range(len(items)):
-//          if (items[i].isVisible() and type(items[i]) == CanvasBox):
-//            item_rect = items[i].sceneBoundingRect();
-//            if ( self.fake_rubberband.contains(QPointF(item_rect.x(), item_rect.y())) and
-//                 self.fake_rubberband.contains(QPointF(item_rect.x()+item_rect.width(), item_rect.y()+item_rect.height())) )
-//              items[i].setSelected(true);
+        QList<QGraphicsItem*> items_list = items();
+        if (items_list.count() > 0)
+        {
+            for (int i=0; i < items_list.count(); i++)
+            {
+                if (items_list[i]->isVisible() && items_list[i]->flags() == (QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable) /* CanvasBox */)
+                {
+                    QRectF item_rect = items_list[i]->sceneBoundingRect();
+                    if ( fake_rubberband->contains(QPointF(item_rect.x(), item_rect.y())) &&
+                         fake_rubberband->contains(QPointF(item_rect.x()+item_rect.width(), item_rect.y()+item_rect.height())) )
+                        items_list[i]->setSelected(true);
+                }
+            }
 
-        fake_rubberband->hide();
-        fake_rubberband->setRect(0, 0, 0, 0);
-        fake_selection = false;
+            fake_rubberband->hide();
+            fake_rubberband->setRect(0, 0, 0, 0);
+            fake_selection = false;
+        }
     }
     else
     {
-//        bool update = false;
-//      ret_items = [];
-        QList<QGraphicsItem*> items = selectedItems();
+        bool update = false;
+        QList<CanvasBox*> ret_items;
+        QList<QGraphicsItem*> items_list = selectedItems();
 
-        if (items.count() > 0)
+        if (items_list.count() > 0)
         {
-//        for i in range(len(items)):
-//          if (items[i].isVisible() and type(items[i]) == CanvasBox):
-//            items[i].checkItemPos()
-//            use_xy2 = True if (items[i].splitted and items[i].splitted_mode == PORT_MODE_INPUT) else False
+            for (int i=0; i < items_list.count(); i++)
+            {
+                if (items_list[i]->isVisible() && items_list[i]->flags() == (QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable) /* CanvasBox */)
+                {
+//            items_list[i].checkItemPos()
+//            use_xy2 = True if (items[i].splitted and items_list[i].splitted_mode == PORT_MODE_INPUT) else False
 //            ret_items.append((items[i].group_id, items[i].scenePos(), use_xy2))
-//            update = True
+                    update = true;
+                }
+            }
         }
 
 //      if (update)
