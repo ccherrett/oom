@@ -20,9 +20,9 @@ public:
 
 private:
     Ui::CanvasTestApp *ui;
+    PatchCanvas::Canvas* canvas;
     PatchScene* scene;
-    Theme* theme;
-    CanvasBox* test_box;
+    CanvasBox *box1, *box2, *box3;
 };
 
 #endif // CANVASTESTAPP_H

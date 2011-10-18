@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui svg
 
 TARGET = PatchCanvas
 TEMPLATE = app
@@ -15,24 +15,18 @@ SOURCES += main.cpp\
     patchscene.cpp \
     theme.cpp \
     canvasbox.cpp \
-    patchcanvas.cpp
+    patchcanvas.cpp \
+    canvasportglow.cpp \
+    canvasboxshadow.cpp \
+    canvasicon.cpp
 
 HEADERS  += canvastestapp.h \
     patchscene.h \
     theme.h \
     canvasbox.h \
-    patchcanvas.h
+    patchcanvas.h \
+    canvasportglow.h \
+    canvasboxshadow.h \
+    canvasicon.h
 
 FORMS    += canvastestapp.ui
-
-
-
-
-
-
-
-
-
-
-
-

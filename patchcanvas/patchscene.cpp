@@ -29,7 +29,8 @@ void PatchScene::keyPressEvent(QKeyEvent* event)
 
 void PatchScene::keyReleaseEvent(QKeyEvent* event)
 {
-    ctrl_down = false;
+    if (event->key() == Qt::Key_Control)
+        ctrl_down = false;
     QGraphicsScene::keyReleaseEvent(event);
 }
 

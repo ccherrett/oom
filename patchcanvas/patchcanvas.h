@@ -1,6 +1,9 @@
 #ifndef PATCHCANVAS_H
 #define PATCHCANVAS_H
 
+#include <QSettings>
+#include <QTimer>
+
 #include "patchscene.h"
 
 namespace PatchCanvas {
@@ -36,6 +39,53 @@ enum Icon {
     ICON_APPLICATION = 1,
     ICON_LADISH_ROOM = 2
 };
+
+// Canvas options
+struct options_t {
+    QString theme_name;
+    bool bezier_lines;
+    Qt::CheckState antialiasing;
+    bool auto_hide_groups;
+    bool connect_midi2outro;
+    bool fancy_eyecandy;
+};
+
+// Canvas features
+struct features_t {
+    bool group_rename;
+    bool port_rename;
+    bool handle_group_pos;
+};
+
+// Main Canvas object
+class Canvas {
+public:
+    Canvas();
+    ~Canvas();
+    void init(PatchScene* scene, void* callback, bool debug=false);
+
+    options_t options;
+    features_t features;
+
+    PatchScene* scene;
+    void* callback;
+    bool debug;
+    int last_z_value;
+    int last_group_id;
+    int last_connection_id;
+    Theme* theme;
+
+private:
+//    QPointF initial_pos;
+//    QList<> group_list;
+//    QList<> port_list;
+//    QList<> connection_list;
+//    QList<> postponed_groups;
+    QTimer postponed_timer;
+    QSettings* settings;
+//    QRectF size_rect;
+};
+
 }
 
 #endif // PATCHCANVAS_H
