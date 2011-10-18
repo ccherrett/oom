@@ -1,12 +1,17 @@
 #ifndef PATCHCANVAS_H
 #define PATCHCANVAS_H
 
+#include <QGraphicsScene>
 #include <QSettings>
 #include <QTimer>
 
-#include "patchscene.h"
+#include "theme.h"
 
-namespace PatchCanvas {
+#define START_NAMESPACE_PATCHCANVAS namespace PatchCanvas {
+#define END_NAMESPACE_PATCHCANVAS }
+
+START_NAMESPACE_PATCHCANVAS
+
 enum PortMode {
     PORT_MODE_NULL   = 0,
     PORT_MODE_INPUT  = 1,
@@ -40,6 +45,9 @@ enum Icon {
     ICON_LADISH_ROOM = 2
 };
 
+// Forward declarations
+class CanvasBox;
+
 // Canvas options
 struct options_t {
     QString theme_name;
@@ -57,35 +65,47 @@ struct features_t {
     bool handle_group_pos;
 };
 
+struct group_dict_t {
+    int id;
+    QString name;
+    bool split;
+    Icon icon;
+    CanvasBox* widgets[2];
+};
+
 // Main Canvas object
 class Canvas {
 public:
     Canvas();
     ~Canvas();
-    void init(PatchScene* scene, void* callback, bool debug=false);
 
-    options_t options;
-    features_t features;
-
-    PatchScene* scene;
+    QGraphicsScene* scene;
     void* callback;
     bool debug;
     int last_z_value;
     int last_group_id;
     int last_connection_id;
-    Theme* theme;
-
-private:
-//    QPointF initial_pos;
-//    QList<> group_list;
-//    QList<> port_list;
-//    QList<> connection_list;
-//    QList<> postponed_groups;
+    QPointF initial_pos;
+    QList<group_dict_t> group_list;
+    //    QList<> port_list;
+    //    QList<> connection_list;
+    QList<int> postponed_groups;
     QTimer postponed_timer;
     QSettings* settings;
-//    QRectF size_rect;
+    Theme* theme;
+    QRectF size_rect;
 };
 
-}
+// API starts here
+void init(QGraphicsScene* scene, void* callback, bool debug=false);
+void clear();
+
+void setInitialPos(int x, int y);
+void setCanvasSize(int x, int y, int width, int height);
+
+void addGroup(int group_id, const char* group_name, bool split=false, Icon icon=ICON_APPLICATION);
+void removeGroup(int group_id);
+
+END_NAMESPACE_PATCHCANVAS
 
 #endif // PATCHCANVAS_H

@@ -9,30 +9,24 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    canvas = new PatchCanvas::Canvas;
-
-    scene = new PatchScene();
+    scene = new PatchCanvas::PatchScene();
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing, true);
     ui->graphicsView->setRenderHint(QPainter::TextAntialiasing, true);
 
-    canvas->init(scene, 0, true);
+    PatchCanvas::init(scene, 0, true);
 
-    scene->rubberbandByTheme(canvas->theme);
+    scene->rubberbandByTheme();
 
     // TEST
-    printf("%s\n", canvas->theme->name.toStdString().data());
-    box1 = new CanvasBox(0, "box with long name on purpose", PatchCanvas::ICON_APPLICATION, scene, canvas);
-    box2 = new CanvasBox(1, "harware box", PatchCanvas::ICON_HARDWARE, scene, canvas);
-    box3 = new CanvasBox(2, "mplayer box", PatchCanvas::ICON_APPLICATION, scene, canvas);
+    PatchCanvas::addGroup(0, "group1");
+    PatchCanvas::addGroup(1, "group2");
 }
 
 CanvasTestApp::~CanvasTestApp()
 {
-    delete box1;
-    delete box2;
-    delete box3;
+    PatchCanvas::clear();
+
     delete scene;
-    delete canvas;
     delete ui;
 }

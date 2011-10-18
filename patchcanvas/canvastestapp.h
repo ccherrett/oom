@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "patchcanvas.h"
+#include "patchscene.h"
 #include "canvasbox.h"
 
 namespace Ui {
@@ -19,10 +20,8 @@ public:
     ~CanvasTestApp();
 
 private:
-    Ui::CanvasTestApp *ui;
-    PatchCanvas::Canvas* canvas;
-    PatchScene* scene;
-    CanvasBox *box1, *box2, *box3;
+    Ui::CanvasTestApp* ui;
+    PatchCanvas::PatchScene* scene;
 };
 
 #endif // CANVASTESTAPP_H

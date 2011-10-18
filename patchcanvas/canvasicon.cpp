@@ -2,16 +2,19 @@
 
 #include <cstdio>
 
-CanvasIcon::CanvasIcon(PatchCanvas::Icon icon, QString name, QGraphicsItem* parent, PatchCanvas::Canvas* canvas_) :
-    QGraphicsSvgItem(parent),
-    canvas(canvas_)
+START_NAMESPACE_PATCHCANVAS
+
+extern Canvas canvas;
+
+CanvasIcon::CanvasIcon(Icon icon, QString name, QGraphicsItem* parent) :
+    QGraphicsSvgItem(parent)
 {
     renderer = 0;
 
     setIcon(icon, name);
 
     colorFX = new QGraphicsColorizeEffect(this);
-    colorFX->setColor(canvas->theme->box_text.color());
+    colorFX->setColor(canvas.theme->box_text.color());
     setGraphicsEffect(colorFX);
 }
 
@@ -21,12 +24,12 @@ CanvasIcon::~CanvasIcon()
         delete renderer;
 }
 
-void CanvasIcon::setIcon(PatchCanvas::Icon icon, QString name)
+void CanvasIcon::setIcon(Icon icon, QString name)
 {
     name = name.toLower();
     QString icon_path;
 
-    if (icon == PatchCanvas::ICON_APPLICATION)
+    if (icon == ICON_APPLICATION)
     {
       size = QRectF(3, 2, 19, 18);
 
@@ -61,13 +64,13 @@ void CanvasIcon::setIcon(PatchCanvas::Icon icon, QString name)
         icon_path = ":/svg/pb_generic.svg";
       }
     }
-    else if (icon == PatchCanvas::ICON_HARDWARE)
+    else if (icon == ICON_HARDWARE)
     {
         size = QRectF(5, 2, 16, 16);
         icon_path = ":/svg/pb_hardware.svg";
 
     }
-    else if (icon == PatchCanvas::ICON_LADISH_ROOM)
+    else if (icon == ICON_LADISH_ROOM)
     {
         size = QRectF(5, 2, 16, 16);
         icon_path = ":/svg/pb_hardware.svg";
@@ -82,7 +85,7 @@ void CanvasIcon::setIcon(PatchCanvas::Icon icon, QString name)
     if (renderer)
         delete renderer;
 
-    renderer = new QSvgRenderer(icon_path, canvas->scene);
+    renderer = new QSvgRenderer(icon_path, canvas.scene);
     setSharedRenderer(renderer);
     update();
 }
@@ -103,3 +106,5 @@ void CanvasIcon::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     else
         QGraphicsSvgItem::paint(painter, option, widget);
 }
+
+END_NAMESPACE_PATCHCANVAS

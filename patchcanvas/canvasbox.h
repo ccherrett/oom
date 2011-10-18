@@ -2,20 +2,23 @@
 #define CANVASBOX_H
 
 #include <QGraphicsItem>
+#include <QGraphicsSceneMouseEvent>
 #include <QFont>
 #include <QPainter>
 
 #include "patchcanvas.h"
 #include "canvasicon.h"
 
+START_NAMESPACE_PATCHCANVAS
+
 class CanvasBox : public QGraphicsItem
 {
 public:
-    CanvasBox(int group_id, QString text, PatchCanvas::Icon icon, PatchScene* scene, PatchCanvas::Canvas* canvas);
+    CanvasBox(int group_id, QString text, Icon icon, QGraphicsScene* scene);
     ~CanvasBox();
 
-    void setIcon(PatchCanvas::Icon icon);
-    void setSplit(bool split, PatchCanvas::PortMode mode);
+    void setIcon(Icon icon);
+    void setSplit(bool split, PortMode mode=PORT_MODE_NULL);
     void setText(QString text);
 
     //makeItGlow(self, port_id, glow)
@@ -29,9 +32,9 @@ public:
     void resetLinesZValue();
     void repaintLines();
 
-private:
-    PatchCanvas::Canvas* canvas;
+    CanvasIcon* icon_svg;
 
+private:
     int group_id;
     QString text;
 
@@ -39,15 +42,13 @@ private:
     int box_height;
 
     bool splitted;
-    PatchCanvas::PortMode splitted_mode;
+    PortMode splitted_mode;
     bool forced_split;
     bool moving_cursor;
     bool mouse_down;
 
     QFont font_name;
     QFont font_port;
-
-    CanvasIcon* icon_svg;
 
     //checkItemPos(self)
     //contextMenuEvent(self, event)
@@ -60,5 +61,7 @@ private:
     QRectF boundingRect() const;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);    
 };
+
+END_NAMESPACE_PATCHCANVAS
 
 #endif // CANVASBOX_H
