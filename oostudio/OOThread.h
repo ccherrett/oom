@@ -9,9 +9,11 @@
 
 #include <QThread>
 #include <QHash>
+#include <QStringList>
+#include "OOProcess.h"
+#include "OOStructures.h"
 
 class QProcess;
-struct LogInfo;
 
 class OOThread : public QThread
 {
@@ -19,8 +21,16 @@ class OOThread : public QThread
 	QHash<long, OOProcess*> m_procMap;
 
 public:
-	OOThread(OOSession* s = 0, QObject* parent = 0);
-	enum PState{ProcessStarting, ProcessRunning, ProcessError, ProcessNotRunning}
+	enum PState{ProcessStarting, ProcessRunning, ProcessError, ProcessNotRunning, ProcessNotRequested};
+
+protected:
+	PState m_state;
+	QString m_name;
+	OOSession* m_session;
+	QProcess* m_process;
+
+public:
+	OOThread(OOSession* s = 0);
 	void run();
 	bool programStarted();
 	bool programError();
@@ -32,55 +42,45 @@ private slots:
 	void processErrors();
 	void processCustomMessages(QString, long);
 	void processCustomErrors(QString, long);
+	void relayExit(int, QProcess::ExitStatus);
 	
-public slots:
-	bool startJob();
-
 signals:
 	void startupSuccess();
 	void startupFailed();
 	void logMessage(LogInfo*);
-	void processExit(int, QProcess::ExitStatus);
+	void processExit(int);
 
-protected:
-	PState m_state;
-	QString m_name;
-	OOSession* m_session;
-	QProcess* m_process;
 };
 
 class OOMProcessThread : public OOThread
 {
 	Q_OBJECT
+
 public:
-	OOMProcessThread(QObject* parent = 0);
+	OOMProcessThread(OOSession* session);
 	void run();
-
-public slots:
-	virtual bool startJob();
-
 };
 
-class JackProcessThread : public QThread
-{
-	Q_OBJECT
-public:
-	JackProcessThread(QObject* parent = 0);
-	void run();
-
-public slots:
-	virtual bool startJob();
-};
-
-class LinuxSamplerThread : public QThread
+class JackProcessThread : public OOThread
 {
 	Q_OBJECT
 
+	bool pingJack();
+
 public:
-	LinuxSamplerThread(QObject* parent = 0);
+	JackProcessThread(OOSession* session);
+	void run();
+};
+
+class LinuxSamplerProcessThread : public OOThread
+{
+	Q_OBJECT
+	QStringList m_lscpLabels;
+	bool pingLinuxsampler();
+	bool loadLSCP();
+public:
+	LinuxSamplerProcessThread(OOSession* session);
 	void run();
 
-public slot:
-	virtual bool startJob();
 };
 #endif

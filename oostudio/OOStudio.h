@@ -36,31 +36,14 @@ class OOProcess;
 class QByteArray;
 class QSize;
 class QTimer;
+class OOThread;
+class OOMProcessThread;
+class JackProcessThread;
+class LinuxSamplerProcessThread;
 
-struct OOSession
-{
-	QString path;
-	QString name;
-	bool istemplate;
-	bool loadJack;
-	bool loadls;
-	QString jackcommand;
-	QString lscommand;
-	QStringList commands;
-	QStringList postCommands;
-	QString lscpPath;
-	int lscpMode;
-	QString songfile;
-	QString lshostname;
-	int lsport;
-};
+class OOSession;
+class LogInfo;
 
-struct LogInfo
-{
-	QString name;
-	QString message;
-	QString codeString;
-};
 
 class OOStudio :public QMainWindow ,public Ui::OOStudioBase
 {
@@ -71,15 +54,17 @@ public:
 
 private:
 	bool m_incleanup;
-	bool m_jackRunning;
-	bool m_oomRunning;
-	bool m_lsRunning;
+	bool m_loading;
+	
 	QAction* m_quitAction;
 	QSystemTrayIcon* m_trayIcon;
 	QMenu* m_trayMenu;
-	QProcess* m_jackProcess;
-	QProcess* m_lsProcess;
-	QProcess* m_oomProcess;
+	
+	OOThread* m_customThread;
+	OOMProcessThread* m_oomThread;
+	JackProcessThread* m_jackThread;
+	LinuxSamplerProcessThread* m_lsThread;
+
 	QStandardItemModel* m_sessionModel;
 	QItemSelectionModel* m_sessionSelectModel;
 	QItemSelectionModel* m_commandSelectModel;
@@ -87,14 +72,17 @@ private:
 	QItemSelectionModel* m_templateSelectModel;
 	QStandardItemModel* m_commandModel;
 	QStandardItemModel* m_loggerModel;
+	
 	QStringList m_sessionlabels;
 	QStringList m_templatelabels;
 	QStringList m_commandlabels;
 	QStringList m_loglabels;
 	QStringList m_lscpLabels;
+	
 	QList<QProcess*> m_procList;
 	QMap<QString, OOSession*> m_sessionMap;
 	QHash<long, OOProcess*> m_procMap;
+	
 	OOSession* m_current;
 	QByteArray m_restoreSize;
 	QQueue<LogInfo*> m_logQueue;
@@ -104,12 +92,6 @@ private:
 	void createTrayIcon();
 	void createConnections();
 	void createModels();
-	bool runJack(OOSession*);
-	bool pingJack();
-	bool runLinuxsampler(OOSession*);
-	void runCommands(OOSession*, bool post = false);
-	bool runOOM(OOSession*);
-	bool checkOOM();
 	void populateSessions(bool usehash = false);
 	void processMessages(int, QString, QProcess*);
 	bool validateCreate();
@@ -117,19 +99,27 @@ private:
 	void saveSettings();
 	void loadSession(OOSession*);
 	void updateHeaders();
-	bool pingLinuxsampler(OOSession*);
-	bool loadLSCP(OOSession*);
 	QString getValidName(QString);
 	QString convertPath(QString);
 	void doSessionDelete(OOSession*);
 	void showMessage(QString);
-	void writeLog(LogInfo*);
 
 protected:
 	void closeEvent(QCloseEvent*);
 	void resizeEvent(QResizeEvent*);
 
 private slots:
+	void linuxSamplerStarted();
+	void oomStarted();
+	void jackStarted();
+	void customStarted();
+	
+	void linuxSamplerFailed();
+	void oomFailed();
+	void jackFailed();
+	void customFailed();
+
+	void writeLog(LogInfo*);
 	void toggleAdvanced(bool);
 	void updateInstalledState();
 	void heartBeat();
@@ -159,16 +149,6 @@ private slots:
 	void templateDoubleClicked(QModelIndex);
 	void currentTopTabChanged(int);
 	//Process Listeners
-	void processJackExit(int, QProcess::ExitStatus);
-	void processJackExecError(QProcess::ProcessError);
-	void processJackMessages();
-	void processJackErrors();
-	void processLSMessages();
-	void processLSErrors();
-	void processOOMMessages();
-	void processOOMErrors();
-	void processCustomMessages(QString, long);
-	void processCustomErrors(QString, long);
-	void processOOMExit(int, QProcess::ExitStatus);
+	void processOOMExit(int);
 };
 #endif

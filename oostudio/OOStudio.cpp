@@ -6,6 +6,7 @@
 
 #include "OOStudio.h"
 #include "OOProcess.h"
+#include "OOThread.h"
 #include "OOClient.h"
 #include "OODownload.h"
 #include "config.h"
@@ -29,7 +30,6 @@ static const QString DEFAULT_LSCP = QString(SHAREDIR).append(QDir::separator()).
 static const QString TEMPLATE_DIR = QString(QDir::homePath()).append(QDir::separator()).append("oomidi_sessions");
 static const char* OOM_TEMPLATE_NAME = "OOMidi_Orchestral_Template";
 static const char* OOM_EXT_TEMPLATE_NAME = "OOMidi_Orchestral_Extended_Template";
-static const char* MAP_STRING = "MAP MIDI_INSTRUMENT";
 static const QString SONATINA_PATH = QString(QDir::rootPath()).append("usr").append(QDir::separator()).append("share").append(QDir::separator()).append("sounds").append(QDir::separator()).append("sonatina").append(QDir::separator()).append("Sonatina Symphonic Orchestra");
 static const QString SONATINA_LOCAL_PATH("Sonatina Symphonic Orchestra");
 static const QString MAESTRO_PATH("maestro");
@@ -50,14 +50,14 @@ OOStudio::OOStudio()
 {
 	setupUi(this);
 	//m_scrollAreaWidgetContents->setStyleSheet("QWidget#m_scrollAreaWidgetContents{ background-color: #525252; }");
-	m_oomProcess = 0;
-	m_jackProcess = 0;
-	m_lsProcess = 0;
+	m_lsThread = 0;
+	m_customThread = 0;
+	m_oomThread = 0;
+	m_jackThread = 0;
+	
 	m_current = 0;
 	m_incleanup = false;
-	m_jackRunning = false;
-	m_oomRunning = false;
-	m_lsRunning = false;
+	m_loading = false;
 	m_chkAfterOOM->hide();
 	createTrayIcon();
 	m_sonatinaBox->setObjectName("m_sonatinaBox");
@@ -100,10 +100,11 @@ OOStudio::OOStudio()
 	//m_webView->setUrl(QUrl("http://www.openoctave.org"));
 	//m_webView->setUrl(QUrl("qrc:/oostudio.html"));
 
-	m_heartBeat = new QTimer(this);
-	m_heartBeat->setObjectName("timer");
-	connect(m_heartBeat, SIGNAL(timeout()), this, SLOT(heartBeat()));
-	m_heartBeat->start(50);
+	m_heartBeat = 0;
+	//m_heartBeat = new QTimer(this);
+	//m_heartBeat->setObjectName("timer");
+	//connect(m_heartBeat, SIGNAL(timeout()), this, SLOT(heartBeat()));
+	//m_heartBeat->start(50);
 	updateInstalledState();
 	//bool advanced = settings.value("OOStudio/advanced", 0).toBool();
 	toggleAdvanced(false);
@@ -768,53 +769,163 @@ void OOStudio::resetCreate(bool fromClear)/*{{{*/
 void OOStudio::cleanupProcessList()/*{{{*/
 {
 	printf("OOStudio::cleanupProcessList\n");
-	m_incleanup = false;
-	OOClient* oomclient = 0;
-	if(m_oomProcess && m_oomRunning/*checkOOM()*/)
+	m_incleanup = true;
+	if(m_oomThread && m_oomThread->programStarted())
 	{
-		oomclient = new OOClient("127.0.0.1", 8415, this);
-		oomclient->callShutdown();
 		//oomRemoteShutdown();
-		//m_oomProcess->terminate();
-		m_oomProcess->waitForFinished(500000);
-		delete m_oomProcess;
-		m_oomProcess = 0;
-		m_oomRunning = false;
+		m_oomThread->quit();
+		m_oomThread->wait();
+		delete m_oomThread;
+		m_oomThread = 0;
+		qDebug() << "OOMidi Shudown Complete";
 	}
-	if(m_lsProcess && m_lsRunning/* && m_lsProcess->state() == QProcess::Running*/)
+	if(m_customThread && m_customThread->programStarted())
 	{
-		m_lsProcess->terminate();
-		m_lsProcess->waitForFinished();
-		delete m_lsProcess;
-		m_lsProcess = 0;
-		m_lsRunning = false;
+		m_customThread->quit();
+		m_customThread->wait();
+		delete m_customThread;
+		m_customThread = 0;
 	}
-	QList<long> keys = m_procMap.keys();
-	foreach(long key, keys)
+	if(m_lsThread && m_lsThread->programStarted())
 	{
-		OOProcess* p = m_procMap.take(key);
-		if(p)
-		{
-			p->terminate();
-			p->waitForFinished();
-			delete p;
-		}
+		m_lsThread->quit();
+		m_lsThread->wait();
+		delete m_lsThread;
+		m_lsThread = 0;
 	}
-	if(m_jackProcess && m_jackRunning/* && m_jackProcess->state() == QProcess::Running*/)
+	if(m_jackThread && m_jackThread->programStarted())
 	{
-		m_jackProcess->kill();
-		m_jackProcess->waitForFinished();
-		delete m_jackProcess;
-		m_jackProcess = 0;
-		m_jackRunning = false;
+		m_jackThread->quit();
+		m_jackThread->wait();
+		delete m_jackThread;
+		m_jackThread = 0;
 	}
 	m_lblRunning->setText(QString(NO_PROC_TEXT));
 	m_btnStopSession->setEnabled(false);
 	m_current = 0;
-	if(oomclient)
-		delete oomclient;
+	m_loading = false;
 	m_incleanup = false;
 }/*}}}*/
+
+void OOStudio::linuxSamplerStarted()
+{
+	m_customThread = new OOThread(m_current);
+	connect(m_customThread, SIGNAL(startupSuccess()), this, SLOT(customStarted()));
+	connect(m_customThread, SIGNAL(startupFailed()), this, SLOT(customFailed()));
+	m_customThread->start();
+}
+void OOStudio::oomStarted()
+{
+	m_lblRunning->setText(m_current->name);
+	m_btnStopSession->setEnabled(true);
+	m_tabWidget->setCurrentIndex(3);
+	m_loading = false;
+}
+void OOStudio::jackStarted()
+{
+	m_lsThread = new LinuxSamplerProcessThread(m_current);
+	connect(m_lsThread, SIGNAL(startupSuccess()), this, SLOT(linuxSamplerStarted()));
+	connect(m_lsThread, SIGNAL(startupFailed()), this, SLOT(linuxSamplerFailed()));
+	connect(m_lsThread, SIGNAL(logMessage(LogInfo*)), this, SLOT(writeLog(LogInfo*)));
+	m_lsThread->start();
+}
+void OOStudio::customStarted()
+{
+	m_oomThread = new OOMProcessThread(m_current);
+	connect(m_oomThread, SIGNAL(startupSuccess()), this, SLOT(oomStarted()));
+	connect(m_oomThread, SIGNAL(startupFailed()), this, SLOT(oomFailed()));
+	connect(m_oomThread, SIGNAL(processExit(int)), this, SLOT(processOOMExit(int)));
+	connect(m_oomThread, SIGNAL(logMessage(LogInfo*)), this, SLOT(writeLog(LogInfo*)));
+	m_oomThread->start();
+}
+
+void OOStudio::linuxSamplerFailed()
+{
+	//Cleanup jackd and self
+	printf("OOStudio::linuxSamplerFailed\n");
+	QString msg(tr("Failed to start to linuxsample server"));
+	msg.append("\nCommand:\n").append(m_current->lscommand);
+	QMessageBox::critical(this, tr("Create Failed"), msg);
+	
+	m_incleanup = false;
+	if(m_lsThread && m_lsThread->programStarted())
+	{
+		m_lsThread->quit();
+		m_lsThread->wait();
+		delete m_lsThread;
+		m_lsThread = 0;
+	}
+	if(m_jackThread && m_jackThread->programStarted())
+	{
+		m_jackThread->quit();
+		m_jackThread->wait();
+		delete m_jackThread;
+		m_jackThread = 0;
+	}
+	m_incleanup = false;
+	m_current = 0;
+}
+
+void OOStudio::oomFailed()
+{
+	//Cleanup everything
+	QString msg(tr("Failed to run OOMidi"));
+	msg.append("\nCommand:\n").append(OOM_INSTALL_BIN).append(" ").append(m_current->songfile);
+	QMessageBox::critical(this, tr("Create Failed"), msg);
+
+	cleanupProcessList();
+}
+
+void OOStudio::jackFailed()
+{
+	QString msg(tr("Failed to start to jackd server"));
+	msg.append("\nwith Command:\n").append(m_current->jackcommand);
+	QMessageBox::critical(this, tr("Jackd Failed"), msg);
+	//Cleanup self or nothing
+	if(m_jackThread)
+	{
+		m_jackThread->quit();
+		m_jackThread->wait();
+		delete m_jackThread;
+		m_jackThread = 0;
+	}
+	m_loading = false;
+	m_current = 0;
+}
+
+void OOStudio::customFailed()
+{
+	//Cleanup jackd, and ls
+	printf("OOStudio::cleanupProcessList\n");
+	QString msg(tr("Failed to start to custom command"));
+	QMessageBox::critical(this, tr("Create Failed"), msg);
+	
+	m_incleanup = false;
+	if(m_customThread && m_customThread->programStarted())
+	{
+		m_customThread->quit();
+		m_customThread->wait();
+		delete m_customThread;
+		m_customThread = 0;
+	}
+	if(m_lsThread && m_lsThread->programStarted())
+	{
+		m_lsThread->quit();
+		m_lsThread->wait();
+		delete m_lsThread;
+		m_lsThread = 0;
+	}
+	if(m_jackThread && m_jackThread->programStarted())
+	{
+		m_jackThread->quit();
+		m_jackThread->wait();
+		delete m_jackThread;
+		m_jackThread = 0;
+	}
+	m_current = 0;
+	m_loading = false;
+	m_incleanup = false;
+}
 
 void OOStudio::shutdown()/*{{{*/
 {
@@ -855,310 +966,6 @@ void OOStudio::saveSettings()/*{{{*/
 	settings.setValue("advanced", m_btnMore->isChecked());
 	settings.endGroup();
 	settings.sync();
-}/*}}}*/
-
-bool OOStudio::runJack(OOSession* session)/*{{{*/
-{
-	if(session)
-	{
-		if(session->loadJack)
-		{
-			showMessage("Launching jackd");
-			printf("Launching jackd: ");
-			m_jackProcess = new QProcess(this);
-			connect(m_jackProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processJackMessages()));
-			connect(m_jackProcess, SIGNAL(readyReadStandardError()), this, SLOT(processJackErrors()));
-			//connect(m_jackProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processJackExit(int, QProcess::ExitStatus)));
-			//connect(m_jackProcess, SIGNAL(error(QProcess::ProcessError )), this, SLOT(processJackExecError(QProcess::ProcessError)));
-			QString jackCmd = session->jackcommand;
-			QStringList args = jackCmd.split(" ");
-			jackCmd = args.takeFirst();
-			if(args.isEmpty())
-				m_jackProcess->start(jackCmd);
-			else
-				m_jackProcess->start(jackCmd, args);
-			m_jackProcess->waitForStarted(50000);
-			/*bool rv = m_jackProcess->waitForStarted(150000);
-			rv = (m_jackProcess->state() == QProcess::Running);
-			if(rv && m_jackProcess->state() == QProcess::Running)
-			{
-				rv = true;
-			}
-			else
-			{
-				m_jackProcess->close();
-				rv = false;
-			}*/
-			bool rv = pingJack();
-			printf("%s\n", rv ? " Complete" : " FAILED");
-			showMessage(rv ? "Launching jackd Complete" : "Launching jackd FAILED");
-			showMessage("Launching jackd");
-			m_jackRunning = rv;
-			return rv;
-		}
-		else
-			return true;
-	}
-	return false;
-}/*}}}*/
-
-bool OOStudio::pingJack()/*{{{*/
-{
-	bool rv = true;
-	jack_status_t status;
-	jack_client_t *client;
-	int retry = 0;
-	sleep(1);
-	while((client = jack_client_open("OOStudio", JackNoStartServer, &status, NULL)) == 0 && retry < 3)
-	{
-		rv = false;
-		++retry;
-		sleep(1);
-	}
-	
-	if(client != 0)
-	{
-		switch(status)
-		{
-			case JackServerStarted:
-				printf(" Server Startup");
-				rv = true;
-			break;
-			case JackFailure:
-				printf(" General Failure");
-				rv = false;
-			break;
-			case JackServerError:
-				printf(" Server Error");
-				rv = false;
-			case JackClientZombie:
-			break;
-			case JackServerFailed:
-				printf(" Server Failed");
-				rv = false;
-			break;
-			case JackNoSuchClient:
-				printf(" No Such Client");
-				rv = false;
-			break;
-			case JackInitFailure:
-				printf(" Init Failure");
-				rv = false;
-			break;
-			case JackNameNotUnique:
-				printf(" Name Not Unique");
-				rv = false;
-			break;
-			case JackInvalidOption:
-				printf(" Invalid Option");
-				rv = false;
-			break;
-			case JackLoadFailure:
-				printf(" Load Failure");
-				rv = false;
-			break;
-			case JackVersionError:
-				printf(" Version Error");
-				rv = false;
-			break;
-			case JackBackendError:
-				printf(" Backend Error");
-				rv = false;
-			break;
-			default:
-				rv = true;
-			break;
-		}
-		//printf(" %d", status);
-		jack_client_close(client);
-	}
-	else
-	{
-		printf("jack server not running?");
-	}
-	client = NULL;
-	return rv;
-}/*}}}*/
-
-bool OOStudio::runLinuxsampler(OOSession* session)/*{{{*/
-{
-	if(session)
-	{
-		if(session->loadls)
-		{
-			showMessage("Launching linuxsampler... ");
-			printf("Launching linuxsampler ");
-			m_lsProcess = new QProcess(this);
-			connect(m_lsProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processLSMessages()));
-			connect(m_lsProcess, SIGNAL(readyReadStandardError()), this, SLOT(processLSErrors()));
-			QString lscmd = session->lscommand;
-			QStringList lsargs = lscmd.split(" ");
-			lscmd = lsargs.takeFirst();
-			if(lsargs.isEmpty())
-			{
-				m_lsProcess->start(lscmd);
-			}
-			else
-			{
-				m_lsProcess->start(lscmd, lsargs);
-			}
-			if(!m_lsProcess->waitForStarted())
-			{
-				showMessage("LinuxSampler startup FAILED");
-				printf("FAILED\n");
-				return false;
-			}
-			sleep(1);
-			int retry = 0;
-			bool rv = pingLinuxsampler(session);
-			while(!rv && retry < 5)
-			{
-				sleep(1);
-				rv = pingLinuxsampler(session);
-				++retry;
-			}
-			printf("%s\n", rv ? "Complete" : "FAILED");
-			showMessage(rv ? "Launching linuxsampler Complete" : "Launching linuxsampler FAILED");
-			m_lsRunning = rv;
-			return rv;
-		}
-		else
-			return true; //You did not want it loaded here so all is good
-	}
-	return false;
-}/*}}}*/
-
-bool OOStudio::pingLinuxsampler(OOSession* session)/*{{{*/
-{
-	if(session)
-	{
-		lscp_client_t* client = ::lscp_client_create(session->lshostname.toUtf8().constData(), session->lsport, client_callback, this);
-		if(client == NULL)
-			return false;
-		//printf("Query LS info: ");
-		lscp_server_info_t* info = lscp_get_server_info(client);
-		if(info == NULL)
-		{
-			//printf("FAILED!!\n");
-			return false;
-		}
-		else
-		{
-			//printf("Description: %s, Version: %s, Protocol Version: %s\n", info->description, info->version, info->protocol_version);
-			return true;
-		}
-	}
-	return true;
-}/*}}}*/
-
-bool OOStudio::loadLSCP(OOSession* session)/*{{{*/
-{
-	if(session)
-	{
-		showMessage("Loading LSCP File into linuxsampler engine");
-		printf("Loading LSCP ");
-		lscp_client_t* client = ::lscp_client_create(session->lshostname.toUtf8().constData(), session->lsport, client_callback, this);
-		if(client == NULL)
-			return false;
-		QFile lsfile(session->lscpPath);
-		if(!lsfile.open(QIODevice::ReadOnly))
-		{
-			//TODO:We need to error here
-			lscp_client_destroy(client);
-			printf("FAILED to open file\n");
-			return false;
-		}
-		QTextStream in(&lsfile);
-		QString command = in.readLine();
-		while(!command.isNull())
-		{
-			if(!command.startsWith("#") && !command.isEmpty())
-			{
-				QString cmd = command.append("\r\n");
-				if(session->lscpMode && cmd.startsWith(QString(MAP_STRING)))
-				{
-					QString rep(m_lscpLabels.at(session->lscpMode));
-					int count = 0;
-					foreach(QString str, m_lscpLabels)
-					{
-						if(count && str != rep)
-							cmd.replace(str, rep);
-						++count;
-					}
-				}
-				::lscp_client_query(client, cmd.toUtf8().constData());
-				//return true;
-				/*if(::lscp_client_query(client, cmd.toUtf8().constData()) != LSCP_OK)
-				{
-					lsfile.close();
-					lscp_client_destroy(client);
-					printf("FAILED to perform query\n");
-					printf("%s\n", command.toUtf8().constData());
-					return false;
-				}*/
-			}
-			command = in.readLine();
-		}
-		lsfile.close();
-		lscp_client_destroy(client);
-		printf("Complete\n");
-		return true;
-	}
-	return false;
-}/*}}}*/
-
-void OOStudio::runCommands(OOSession* session, bool )/*{{{*/
-{
-	if(session)
-	{
-		//QStringList commands = post ? session->postCommands : session->commands;
-		QStringList commands = session->commands;
-		foreach(QString command, commands)
-		{
-			qDebug() << "Running command: " << command;
-			QString cmd(command);
-			QStringList args = cmd.split(" ");
-			cmd = args.takeFirst();
-			OOProcess* process = new OOProcess(cmd, this);
-			connect(process, SIGNAL(readyReadStandardOutput(QString, long)), this, SLOT(processCustomMessages(QString, long)));
-			connect(process, SIGNAL(readyReadStandardError(QString, long)), this, SLOT(processCustomErrors(QString, long)));
-			if(args.isEmpty())
-			{
-				process->start(cmd);
-			}
-			else
-			{
-				process->start(cmd, args);
-			}
-			if(process->waitForStarted())
-			{
-				long pid = process->pid();
-				m_procMap[pid] = process;
-			}
-		}
-	}
-}/*}}}*/
-
-bool OOStudio::runOOM(OOSession* session)/*{{{*/
-{
-	if(session)
-	{
-		showMessage("Loading OOMidi...");
-		printf("Loading OOMidi ");
-		m_oomProcess = new QProcess(this);
-		connect(m_oomProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processOOMMessages()));
-		connect(m_oomProcess, SIGNAL(readyReadStandardError()), this, SLOT(processOOMErrors()));
-		connect(m_oomProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processOOMExit(int, QProcess::ExitStatus)));
-		QStringList args;
-		args << session->songfile;
-		m_oomProcess->start(QString(OOM_INSTALL_BIN), args);
-		bool rv = m_oomProcess->waitForStarted(50000);
-		printf("%s\n", rv ? "Complete" : "FAILED");
-		showMessage(rv ? "Loading OOMidi Complete" : "Loading OOMidi FAILED");
-		m_oomRunning = rv;
-		return rv;
-	}
-	return false;
 }/*}}}*/
 
 void OOStudio::sessionDoubleClicked(QModelIndex index)/*{{{*/
@@ -1251,11 +1058,6 @@ void OOStudio::loadTemplateClicked()/*{{{*/
 			}
 		}
 	}
-}/*}}}*/
-
-bool OOStudio::checkOOM()/*{{{*/
-{
-	return (m_oomProcess && m_oomProcess->state() == QProcess::Running);
 }/*}}}*/
 
 QString OOStudio::convertPath(QString path)/*{{{*/
@@ -1361,22 +1163,19 @@ bool OOStudio::stopCurrentSession()/*{{{*/
 {
 	if(m_current)
 	{
-		if(checkOOM())
+		if(QMessageBox::question(
+			this,
+			tr("Stop Session"),
+			tr("There appears to be a running session of oom. \nStopping this session will cause any changes to the current song to be lost\n(Recommended)  Save your current song in oomidi then click Ok.\nAre you sure you want to do this ?"),
+			QMessageBox::Ok, QMessageBox::Cancel
+		) == QMessageBox::Ok)
 		{
-			if(QMessageBox::question(
-				this,
-				tr("Stop Session"),
-				tr("There appears to be a running session of oom. \nStopping this session will cause any changes to the current song to be lost\n(Recommended)  Save your current song in oomidi then click Ok.\nAre you sure you want to do this ?"),
-				QMessageBox::Ok, QMessageBox::Cancel
-			) == QMessageBox::Ok)
-			{
-				cleanupProcessList();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			cleanupProcessList();
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 	return true;
@@ -1384,101 +1183,25 @@ bool OOStudio::stopCurrentSession()/*{{{*/
 
 void OOStudio::loadSession(OOSession* session)/*{{{*/
 {
+	if(m_loading)
+	{
+		showMessage("WARNING: Already loading Session : "+m_current->name+" ... Please wait.");
+		return;
+	}
 	if(session)
 	{
 		showMessage("OOStudio::loadSession :"+session->name);
 		printf("OOStudio::loadSession : name: %s\n", session->name.toUtf8().constData());
 		printf("OOStudio::loadSession : path: %s\n", session->path.toUtf8().constData());
-		/*if(checkOOM())
-		{
-			if(QMessageBox::warning(
-				this,
-				tr("Running Session"),
-				tr("There appears to be a running session of oom. \nLoading a new session will cause any changes to the current song to be lost\n(Recommended)  Save your current song in oomidi then click Ok.\nAre you sure you want to do this ?"),
-				QMessageBox::Ok, QMessageBox::Cancel
-			) != QMessageBox::Ok)
-			{
-				return;
-			}
-		}*/
-		cleanupProcessList();
-		if(runJack(session))
-		{
-			int retry = 0;
-			bool usels = session->loadls;
-			bool lsrunning = runLinuxsampler(session);
-			while(!lsrunning && retry < 5)
-			{
-				if(m_lsProcess)
-				{
-					m_lsProcess->kill();
-					m_lsProcess = 0;
-				}
-				lsrunning = runLinuxsampler(session);
-				++retry;
-			}
-			if(lsrunning)
-			{
-				retry = 0;
-				bool lscpLoaded = true;
-				if(usels)
-				{
-					lscpLoaded = loadLSCP(session);
-					while(!lscpLoaded && retry < 5)
-					{
-						sleep(1);
-						lscpLoaded = loadLSCP(session);
-						++retry;
-					}
-				}
-				if(lscpLoaded)
-				{
-					runCommands(session);
-					if(runOOM(session))
-					{
-						//runCommands(session, true);
-						m_current = session;
-						m_lblRunning->setText(session->name);
-						m_btnStopSession->setEnabled(true);
-						m_tabWidget->setCurrentIndex(3);
-						//hide();
-					}
-					else
-					{
-						cleanupProcessList();
-						QString msg(tr("Failed to run OOMidi"));
-						msg.append("\nCommand:\n").append(OOM_INSTALL_BIN).append(" ").append(session->songfile);
-						QMessageBox::critical(this, tr("Create Failed"), msg);
-					}
-				}
-				else
-				{
-					cleanupProcessList();
-					QString msg(tr("Failed to load LSCP file into linuxsample"));
-					msg.append("\nFile:\n").append(session->lscpPath);
-					QMessageBox::critical(this, tr("Create Failed"), msg);
-				}
-			}
-			else
-			{
-				m_current = 0;
-				cleanupProcessList();
-				QString msg(tr("Failed to start to linuxsample server"));
-				msg.append("\nCommand:\n").append(session->lscommand);
-				QMessageBox::critical(this, tr("Create Failed"), msg);
-			}
-		}
-		else
-		{
-			QString msg(tr("Failed to start to jackd server"));
-			msg.append("\nwith Command:\n").append(session->jackcommand);
-			QMessageBox::critical(this, tr("Jackd Failed"), msg);
-			if(m_jackProcess)
-			{
-				delete m_jackProcess;
-				m_jackProcess = 0;
-			}
-		}
+		if(m_current)
+			cleanupProcessList();
+		m_current = session;
+		m_loading = true;
+		m_jackThread = new JackProcessThread(session);
+		connect(m_jackThread, SIGNAL(startupSuccess()), this, SLOT(jackStarted()));
+		connect(m_jackThread, SIGNAL(startupFailed()), this, SLOT(jackFailed()));
+		connect(m_jackThread, SIGNAL(logMessage(LogInfo*)), this, SLOT(writeLog(LogInfo*)));
+		m_jackThread->start();
 	}
 }/*}}}*/
 
@@ -2086,11 +1809,11 @@ void OOStudio::closeEvent(QCloseEvent* ev)/*{{{*/
 	}
 }/*}}}*/
 
-void OOStudio::resizeEvent(QResizeEvent* evt)
+void OOStudio::resizeEvent(QResizeEvent* evt)/*{{{*/
 {
 	QMainWindow::resizeEvent(evt);
 	m_loggerTable->resizeRowsToContents();
-}
+}/*}}}*/
 
 void OOStudio::iconActivated(QSystemTrayIcon::ActivationReason reason)/*{{{*/
 {
@@ -2106,276 +1829,24 @@ void OOStudio::iconActivated(QSystemTrayIcon::ActivationReason reason)/*{{{*/
 	}
 }/*}}}*/
 
-void OOStudio::processOOMExit(int code, QProcess::ExitStatus status)/*{{{*/
+void OOStudio::processOOMExit(int code)/*{{{*/
 {
 	if(!m_incleanup)
 	{
-		switch(status)
+		switch(code)
 		{
-			case QProcess::NormalExit:
+			case 0:
 			{
 				cleanupProcessList();
 				showNormal();
 			}
 			break;
-			case QProcess::CrashExit:
+			default:
 			{
+				qDebug() << "OOMidi exited with error code: " << code;
 				cleanupProcessList();
 				showNormal();
 			}
-			break;
-		}
-	}
-	qDebug() << "OOMidi exited with error code: " << code;
-}/*}}}*/
-
-void OOStudio::processJackExit(int code, QProcess::ExitStatus status)/*{{{*/
-{
-	if(m_current)
-	{
-		switch(status)
-		{
-			case QProcess::NormalExit:
-			{
-				printf("Jack exited normally\n");
-				//m_restoreAction->trigger();
-				//cleanupProcessList();
-			}
-			break;
-			case QProcess::CrashExit:
-			{
-				printf("Jack exited with crash\n");
-				//cleanupProcessList();
-				//m_restoreAction->trigger();
-			}
-			break;
-		}
-	}
-	qDebug() << "Jack exited with error code: " << code;
-}/*}}}*/
-
-void OOStudio::processJackExecError(QProcess::ProcessError error)
-{
-	printf("Jack process error recieved: %d\n", error);
-}
-
-
-void OOStudio::processJackMessages()/*{{{*/
-{
-	while(m_jackProcess->canReadLine())
-	{
-		QString messages = QString::fromUtf8(m_jackProcess->readLine().constData());
-		messages = messages.trimmed().simplified();
-		if(messages.isEmpty())
-			continue;
-		LogInfo* info = new LogInfo;
-		info->name = QString("Jackd");
-		info->message = messages;
-		info->codeString = QString("INFO");
-		m_logQueue.enqueue(info);
-		//QList<QStandardItem*> rowData;
-		//QStandardItem* command = new QStandardItem("Jackd");
-		//QStandardItem* log = new QStandardItem(messages);
-		//QStandardItem* level = new QStandardItem("INFO");
-		//rowData << command << level << log;
-		//m_loggerModel->appendRow(rowData);
-		//updateHeaders();
-		//m_loggerTable->resizeRowsToContents();
-		//m_loggerTable->scrollToBottom();
-	}
-	//processMessages(0, tr("Jackd"), m_jackProcess);
-}/*}}}*/
-
-void OOStudio::processJackErrors()/*{{{*/
-{
-	QString messages = QString::fromUtf8(m_jackProcess->readAllStandardError().constData());
-	if(messages.isEmpty())
-		return;
-	LogInfo* info = new LogInfo;
-	info->name = QString("Jackd");
-	info->message = messages;
-	info->codeString = QString("ERROR");
-	m_logQueue.enqueue(info);
-	//QList<QStandardItem*> rowData;
-	//QStandardItem* command = new QStandardItem("Jackd");
-	//command->setBackground(QColor(99, 36, 36));
-	//QStandardItem* log = new QStandardItem(messages);
-	//QStandardItem* level = new QStandardItem("ERROR");
-	//rowData << command << level << log;
-	//m_loggerModel->appendRow(rowData);
-	//updateHeaders();
-	//m_loggerTable->resizeRowsToContents();
-	//m_loggerTable->scrollToBottom();
-
-	//processMessages(1, tr("Jackd"), m_jackProcess);
-}/*}}}*/
-
-void OOStudio::processLSMessages()/*{{{*/
-{
-	while(m_lsProcess->canReadLine())
-	{
-		QString messages = QString::fromUtf8(m_lsProcess->readLine().constData());
-		messages = messages.trimmed().simplified();
-		if(messages.isEmpty())
-			continue;
-		LogInfo* info = new LogInfo;
-		info->name = QString("LinuxSampler");
-		info->message = messages;
-		info->codeString = QString("INFO");
-		m_logQueue.enqueue(info);
-		//QList<QStandardItem*> rowData;
-		//QStandardItem* command = new QStandardItem("LinuxSampler");
-		//QStandardItem* log = new QStandardItem(messages);
-		//QStandardItem* level = new QStandardItem("INFO");
-		//rowData << command << level << log;
-		//m_loggerModel->appendRow(rowData);
-		//updateHeaders();
-		//m_loggerTable->resizeRowsToContents();
-		//m_loggerTable->scrollToBottom();
-	}
-	//processMessages(0, tr("LinuxSampler"), m_lsProcess);
-}/*}}}*/
-
-void OOStudio::processLSErrors()/*{{{*/
-{
-	QString messages = QString::fromUtf8(m_lsProcess->readAllStandardError().constData());
-	if(messages.isEmpty())
-		return;
-	LogInfo* info = new LogInfo;
-	info->name = QString("LinuxSampler");
-	info->message = messages;
-	info->codeString = QString("ERROR");
-	m_logQueue.enqueue(info);
-	//QList<QStandardItem*> rowData;
-	//QStandardItem* command = new QStandardItem("LinuxSampler");
-	//command->setBackground(QColor(99, 36, 36));
-	//QStandardItem* log = new QStandardItem(messages);
-	//QStandardItem* level = new QStandardItem("ERROR");
-	//rowData << command << level << log;
-	//m_loggerModel->appendRow(rowData);
-	//updateHeaders();
-	//m_loggerTable->resizeRowsToContents();
-	//m_loggerTable->scrollToBottom();
-	//processMessages(1, tr("LinuxSampler"), m_lsProcess);
-}/*}}}*/
-
-void OOStudio::processOOMMessages()/*{{{*/
-{
-	while(m_oomProcess->canReadLine())
-	{
-		QString messages = QString::fromUtf8(m_oomProcess->readLine().constData());
-		messages = messages.trimmed().simplified();
-		if(messages.isEmpty())
-			continue;
-		LogInfo* info = new LogInfo;
-		info->name = QString("OOMidi");
-		info->message = messages;
-		info->codeString = QString("INFO");
-		m_logQueue.enqueue(info);
-		//QList<QStandardItem*> rowData;
-		//QStandardItem* command = new QStandardItem("OOMidi");
-		//QStandardItem* log = new QStandardItem(messages);
-		//QStandardItem* level = new QStandardItem("INFO");
-		//rowData << command << level << log;
-		//m_loggerModel->appendRow(rowData);
-		//updateHeaders();
-		//m_loggerTable->resizeRowsToContents();
-		//m_loggerTable->scrollToBottom();
-	}
-	//processMessages(0, tr("OOMidi"), m_oomProcess);
-}/*}}}*/
-
-void OOStudio::processOOMErrors()/*{{{*/
-{
-	QString messages = QString::fromUtf8(m_oomProcess->readAllStandardError().constData());
-	if(messages.isEmpty())
-		return;
-	LogInfo* info = new LogInfo;
-	info->name = QString("OOMidi");
-	info->message = messages;
-	info->codeString = QString("ERROR");
-	m_logQueue.enqueue(info);
-	//QList<QStandardItem*> rowData;
-	//QStandardItem* command = new QStandardItem("OOMidi");
-	//command->setBackground(QColor(99, 36, 36));
-	//QStandardItem* log = new QStandardItem(messages);
-	//QStandardItem* level = new QStandardItem("ERROR");
-	//rowData << command << level << log;
-	//m_loggerModel->appendRow(rowData);
-	//updateHeaders();
-	//m_loggerTable->resizeRowsToContents();
-	//m_loggerTable->scrollToBottom();
-	//processMessages(1, tr("OOMidi"), m_oomProcess);
-}/*}}}*/
-
-void OOStudio::processCustomMessages(QString name, long pid)/*{{{*/
-{
-	if(!m_procMap.isEmpty() && m_procMap.contains(pid))
-	{
-		processMessages(0, name, m_procMap.value(pid));
-	}
-}/*}}}*/
-
-void OOStudio::processCustomErrors(QString name, long pid)/*{{{*/
-{
-	if(!m_procMap.isEmpty() && m_procMap.contains(pid))
-	{
-		processMessages(1, name, m_procMap.value(pid));
-	}
-}/*}}}*/
-
-void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
-{
-	if(p)
-	{
-		switch(type)
-		{
-			case 0: //Output
-			{/*{{{*/
-				while(p->canReadLine())
-				{
-					QString messages = QString::fromUtf8(p->readLine().constData());
-					messages = messages.trimmed().simplified();
-					if(messages.isEmpty())
-						continue;
-					LogInfo* info = new LogInfo;
-					info->name = name;
-					info->message = messages;
-					info->codeString = QString("INFO");
-					m_logQueue.enqueue(info);
-					//QList<QStandardItem*> rowData;
-					//QStandardItem* command = new QStandardItem(name);
-					//QStandardItem* log = new QStandardItem(messages);
-					//QStandardItem* level = new QStandardItem("INFO");
-					//rowData << command << level << log;
-					//m_loggerModel->appendRow(rowData);
-					//updateHeaders();
-					//m_loggerTable->resizeRowsToContents();
-					//m_loggerTable->scrollToBottom();
-				}
-			}/*}}}*/
-			break;
-			case 1: //Error
-			{/*{{{*/
-				QString messages = QString::fromUtf8(p->readAllStandardError().constData());
-				if(messages.isEmpty())
-					return;
-				LogInfo* info = new LogInfo;
-				info->name = name;
-				info->message = messages;
-				info->codeString = QString("ERROR");
-				m_logQueue.enqueue(info);
-				//QList<QStandardItem*> rowData;
-				//QStandardItem* command = new QStandardItem(name);
-				//command->setBackground(QColor(99, 36, 36));
-				//QStandardItem* log = new QStandardItem(messages);
-				//QStandardItem* level = new QStandardItem("ERROR");
-				//rowData << command << level << log;
-				//m_loggerModel->appendRow(rowData);
-				//updateHeaders();
-				//m_loggerTable->resizeRowsToContents();
-				//m_loggerTable->scrollToBottom();
-			}/*}}}*/
 			break;
 		}
 	}
@@ -2384,7 +1855,7 @@ void OOStudio::processMessages(int type, QString name, QProcess* p)/*{{{*/
 void OOStudio::writeLog(LogInfo* log)
 {
 	if(log)
-	{/*{{{*/
+	{
 		QString messages(log->message);
 		if(messages.isEmpty())
 			return;
@@ -2398,5 +1869,5 @@ void OOStudio::writeLog(LogInfo* log)
 		updateHeaders();
 		m_loggerTable->resizeRowsToContents();
 		m_loggerTable->scrollToBottom();
-	}/*}}}*/
+	}
 }
