@@ -105,6 +105,7 @@ void setCanvasSize(int x, int y, int width, int height);
 
 void addGroup(int group_id, const char* group_name, bool split=false, Icon icon=ICON_APPLICATION);
 void removeGroup(int group_id);
+void renameGroup(int group_id, const char* new_name);
 
 END_NAMESPACE_PATCHCANVAS
 

@@ -265,4 +265,30 @@ void removeGroup(int group_id)
     printf("PatchCanvas::removeGroup - Unable to find group to remove\n");
 }
 
+void renameGroup(int group_id, const char* new_name)
+{
+    //if (canvas.debug)
+        //printf("PatchCanvas::renameGroup(%i, %s)\n", group_id, new_name);
+
+    for (int i=0; i < canvas.group_list.count(); i++)
+    {
+        if (canvas.group_list[i].id == group_id)
+        {
+            canvas.group_list[i].widgets[0]->setText(new_name);
+            canvas.group_list[i].name = QString(new_name);
+
+            if (canvas.group_list[i].split)
+            {
+                canvas.group_list[i].widgets[1]->setText(new_name);
+                canvas.group_list[i].name = QString(new_name);
+            }
+
+            //QTimer::singleShot(0, Canvas.scene, SLOT());
+            return;
+        }
+    }
+
+    printf("PatchCanvas::renameGroup - Unable to find group to rename\n");
+}
+
 END_NAMESPACE_PATCHCANVAS

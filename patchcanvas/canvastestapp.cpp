@@ -19,8 +19,10 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     scene->rubberbandByTheme();
 
     // TEST
-    PatchCanvas::addGroup(0, "group1");
-    PatchCanvas::addGroup(1, "group2");
+    PatchCanvas::addGroup(0, "Box with timer -> 0");
+
+    testTimerCount = 0;
+    testTimer = startTimer(100);
 }
 
 CanvasTestApp::~CanvasTestApp()
@@ -29,4 +31,14 @@ CanvasTestApp::~CanvasTestApp()
 
     delete scene;
     delete ui;
+}
+
+void CanvasTestApp::timerEvent(QTimerEvent* event)
+{
+    if (event->timerId() == testTimer)
+    {
+        testTimerCount++;
+        PatchCanvas::renameGroup(0, QString("Box with timer -> %1").arg(testTimerCount).toStdString().data());
+    }
+    QMainWindow::timerEvent(event);
 }
