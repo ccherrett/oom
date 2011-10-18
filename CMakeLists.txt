@@ -440,7 +440,7 @@ set(CMAKE_CXX_FLAGS_DEBUG   "-g -DQT_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}")
 # NOTE: share/ directory needs to be at the end so that the translations
 #       are scanned before coming to share/locale
 #subdirs(al awl grepmidi man plugins oom synti packaging utils share oostudio)
-subdirs(al awl man plugins oom synti packaging utils share oostudio)
+subdirs(al awl man plugins oom synti packaging utils share oostudio patchcanvas)
 
 ## Install doc files
 file (GLOB doc_files

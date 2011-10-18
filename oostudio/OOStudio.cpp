@@ -15,7 +15,6 @@
 #include <QDomElement>
 #include <QDomNodeList>
 #include <QDomNode>
-#include <QWebPage>
 #include <QIcon>
 #include <jack/jack.h>
 

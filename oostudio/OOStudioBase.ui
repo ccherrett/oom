@@ -923,7 +923,7 @@
              <item>
               <widget class="QToolButton" name="m_btnMore">
                <property name="toolTip">
-                <string>Edit the more advanced features or your session.</string>
+                <string>Edit the more advanced features of your session.</string>
                </property>
                <property name="text">
                 <string/>
