@@ -8,17 +8,17 @@
 
 #include "patchcanvas.h"
 
+START_NAMESPACE_PATCHCANVAS
+
 class CanvasIcon : public QGraphicsSvgItem
 {
 public:
-    CanvasIcon(PatchCanvas::Icon icon, QString name, QGraphicsItem* parent, PatchCanvas::Canvas* canvas);
+    CanvasIcon(Icon icon, QString name, QGraphicsItem* parent);
     ~CanvasIcon();
 
-    void setIcon(PatchCanvas::Icon icon, QString name);
+    void setIcon(Icon icon, QString name);
 
 private:
-    PatchCanvas::Canvas* canvas;
-
     QGraphicsColorizeEffect* colorFX;
     QSvgRenderer* renderer;
     QRectF size;
@@ -26,5 +26,7 @@ private:
     QRectF boundingRect() const;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 };
+
+END_NAMESPACE_PATCHCANVAS
 
 #endif // CANVASICON_H

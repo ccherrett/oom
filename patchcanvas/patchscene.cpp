@@ -3,6 +3,10 @@
 #include <QGraphicsView>
 #include <cmath>
 
+START_NAMESPACE_PATCHCANVAS
+
+extern Canvas canvas;
+
 PatchScene::PatchScene()
 {
     ctrl_down = false;
@@ -14,10 +18,10 @@ PatchScene::PatchScene()
     orig_point = QPointF(0, 0);
 }
 
-void PatchScene::rubberbandByTheme(Theme* theme)
+void PatchScene::rubberbandByTheme()
 {
-    fake_rubberband->setPen(theme->rubberband_pen);
-    fake_rubberband->setBrush(theme->rubberband_brush);
+    fake_rubberband->setPen(canvas.theme->rubberband_pen);
+    fake_rubberband->setBrush(canvas.theme->rubberband_brush);
 }
 
 void PatchScene::keyPressEvent(QKeyEvent* event)
@@ -124,3 +128,5 @@ void PatchScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     mouse_down = false;
     QGraphicsScene::mouseReleaseEvent(event);
 }
+
+END_NAMESPACE_PATCHCANVAS

@@ -7,15 +7,15 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
 
-#include "theme.h"
+#include "patchcanvas.h"
+
+START_NAMESPACE_PATCHCANVAS
 
 class PatchScene : public QGraphicsScene
 {
-    Q_OBJECT
-
 public:
     PatchScene();
-    void rubberbandByTheme(Theme* theme);
+    void rubberbandByTheme();
 
 private:
     bool ctrl_down;
@@ -31,5 +31,7 @@ private:
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 };
+
+END_NAMESPACE_PATCHCANVAS
 
 #endif // PATCHSCENE_H

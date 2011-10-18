@@ -2,9 +2,12 @@
 
 #include <QCursor>
 
-CanvasBox::CanvasBox(int group_id_, QString text_, PatchCanvas::Icon icon, PatchScene* scene, PatchCanvas::Canvas* canvas_) :
-    QGraphicsItem(0, scene),
-    canvas(canvas_)
+START_NAMESPACE_PATCHCANVAS
+
+extern Canvas canvas;
+
+CanvasBox::CanvasBox(int group_id_, QString text_, Icon icon, QGraphicsScene* scene) :
+    QGraphicsItem(0, scene)
 {
     // Save Variables, useful for later
     group_id = group_id_;
@@ -19,17 +22,17 @@ CanvasBox::CanvasBox(int group_id_, QString text_, PatchCanvas::Icon icon, Patch
 
 //    last_pos = None;
     splitted = false;
-    splitted_mode = PatchCanvas::PORT_MODE_NULL;
+    splitted_mode = PORT_MODE_NULL;
     forced_split = false;
     moving_cursor = false;
     mouse_down = false;
 
     // Set Font
-    font_name = QFont(canvas->theme->box_font_name, canvas->theme->box_font_size, canvas->theme->box_font_state);
-    font_port = QFont(canvas->theme->port_font_name, canvas->theme->port_font_size, canvas->theme->port_font_state);
+    font_name = QFont(canvas.theme->box_font_name, canvas.theme->box_font_size, canvas.theme->box_font_state);
+    font_port = QFont(canvas.theme->port_font_name, canvas.theme->port_font_size, canvas.theme->port_font_state);
 
     // Icon
-    icon_svg = new CanvasIcon(icon, text, this, canvas);
+    icon_svg = new CanvasIcon(icon, text, this);
 
     // ...
 
@@ -48,12 +51,12 @@ CanvasBox::~CanvasBox()
     delete icon_svg;
 }
 
-void CanvasBox::setIcon(PatchCanvas::Icon icon)
+void CanvasBox::setIcon(Icon icon)
 {
     icon_svg->setIcon(icon, text);
 }
 
-void CanvasBox::setSplit(bool split, PatchCanvas::PortMode mode)
+void CanvasBox::setSplit(bool split, PortMode mode)
 {
     splitted = split;
     splitted_mode = mode;
@@ -113,14 +116,14 @@ void CanvasBox::repaintLines()
 
 void CanvasBox::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    canvas->last_z_value += 1;
-    setZValue(canvas->last_z_value);
+    canvas.last_z_value += 1;
+    setZValue(canvas.last_z_value);
     resetLinesZValue();
     moving_cursor = false;
 
     if (event->button() == Qt::RightButton)
     {
-      canvas->scene->clearSelection();
+      canvas.scene->clearSelection();
       setSelected(true);
       mouse_down = false;
       event->accept();
@@ -182,13 +185,13 @@ void CanvasBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     repaintLines();
 
     if (isSelected())
-      painter->setPen(canvas->theme->box_pen_sel);
+      painter->setPen(canvas.theme->box_pen_sel);
     else
-      painter->setPen(canvas->theme->box_pen);
+      painter->setPen(canvas.theme->box_pen);
 
     QLinearGradient box_gradient(0, 0, 0, box_height);
-    box_gradient.setColorAt(0, canvas->theme->box_bg_1);
-    box_gradient.setColorAt(1, canvas->theme->box_bg_2);
+    box_gradient.setColorAt(0, canvas.theme->box_bg_1);
+    box_gradient.setColorAt(1, canvas.theme->box_bg_2);
 
     painter->setBrush(box_gradient);
     painter->drawRect(0, 0, box_width, box_height);
@@ -196,9 +199,11 @@ void CanvasBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     QPointF text_pos(25, 16);
 
     painter->setFont(font_name);
-    painter->setPen(canvas->theme->box_text);
+    painter->setPen(canvas.theme->box_text);
     painter->drawText(text_pos, text);
 
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
+
+END_NAMESPACE_PATCHCANVAS

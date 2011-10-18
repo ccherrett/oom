@@ -8,13 +8,21 @@
 
 class Theme
 {
-    enum ThemePortType {
-        THEME_PORT_SQUARE = 0,
+public:
+    enum PortType {
+        THEME_PORT_SQUARE  = 0,
         THEME_PORT_POLYGON = 1
     };
 
-public:
-    Theme();
+    enum List {
+        THEME_MODERN_DARK  = 0,
+        THEME_CLASSIC_DARK = 1,
+        THEME_MAX = 2
+    };
+
+    Theme(List id);
+    static List getDefaultTheme();
+    static QString getThemeName(List id);
 
     // Canvas
     QString name;
@@ -48,7 +56,7 @@ public:
     QString port_font_name;
     int port_font_size;
     QFont::Weight port_font_state;
-    ThemePortType port_mode;
+    PortType port_mode;
 
     // Lines
     QColor line_audio;
