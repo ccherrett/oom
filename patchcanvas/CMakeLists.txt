@@ -27,6 +27,9 @@ QT4_WRAP_CPP ( patchcanvas_mocs
     theme.h
     canvasbox.h
     patchcanvas.h
+	canvasboxshadow.h
+	canvasicon.h
+	canvasportglow.h
     )
 
 ##
@@ -46,6 +49,9 @@ file (GLOB patchcanvas_source_files
     theme.cpp
     canvasbox.cpp
     patchcanvas.cpp
+	canvasboxshadow.cpp
+	canvasicon.cpp
+	canvasportglow.cpp
     )
 
 file (GLOB patchcanvas_source_files
