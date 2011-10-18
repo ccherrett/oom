@@ -16,22 +16,25 @@
 #include <QIODevice>
 #include <QStringList>
 
+class DownloadPackage;
+
 class OODownload : public QObject
 {
 	Q_OBJECT
 
 	QNetworkAccessManager m_manager;
 	QList<QNetworkReply*> m_currentDownloads;
+	QList<DownloadPackage*> m_currentPackages;
 
 public:
 	OODownload(QObject* parent = 0);
-	void startDownload(const QUrl &url);
 	QString getFilename(const QUrl &url);
 	bool saveFile(QString name, QIODevice *data);
 
 public slots:
-	void executeBatch(QStringList);
+	void startDownload(DownloadPackage*);
 	void downloadComplete(QNetworkReply*);
+	void trackProgress(qint64 bytesReceived, qint64 bytesTotal);
 };
 
 #endif

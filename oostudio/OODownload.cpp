@@ -5,6 +5,7 @@
 //===========================================================
 
 #include "OODownload.h"
+#include "OOStructures.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -15,11 +16,17 @@ OODownload::OODownload(QObject* parent)
 	connect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadComplete(QNetworkReply*)));
 }
 
-void OODownload::startDownload(const QUrl &url)
+void OODownload::startDownload(DownloadPackage* pkg)
 {
-	QNetworkRequest request(url);
+	QNetworkRequest request(pkg->path);
 	QNetworkReply *reply = m_manager.get(request);
+	connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(trackProgress(qint64, qint64)));
 	m_currentDownloads.append(reply);
+	m_currentPackage.append(pkg);
+}
+
+void OODownload::trackProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
 }
 
 QString OODownload::getFilename(const QUrl &url)
@@ -59,15 +66,6 @@ bool OODownload::saveFile(QString name, QIODevice* data)
 	return true;
 }
 
-void OODownload::executeBatch(QStringList list)
-{
-	foreach(QString str, list)
-	{
-		QUrl url = QUrl::fromEncoded(str.toLocal8Bit());
-		startDownload(url);
-	}
-}
-
 void OODownload::downloadComplete(QNetworkReply* reply)
 {
 	QUrl url = reply->url();
@@ -82,16 +80,22 @@ void OODownload::downloadComplete(QNetworkReply* reply)
 	}
 	else
 	{
-		QString filename = getFilename(url);
-		if(saveFile(filename, reply))
+		int index = m_currentDownloads.indexOf(reply);
+		DownloadPackage* pkg = m_currentPackages.takeAt(index);
+		if(pkg)
 		{
-			//Add message to log
+			QString filename = pkg->filename; //getFilename(url);
+			if(saveFile(filename, reply))
+			{
+				//Add message to log
+				//TODO: fire extract thread
+			}
 		}
 	}
 	m_currentDownloads.removeAll(reply);
 	reply->deleteLater();
 	if(m_currentDownloads.isEmpty())
 	{
-		//Show messages
+		//TODO: Show messages no more downloads
 	}
 }

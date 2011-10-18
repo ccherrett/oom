@@ -1,4 +1,10 @@
-struct OOSession/*{{{*/
+//===========================================================
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
+//  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
+//===========================================================
+
+struct OOSession
 {
 	QString path;
 	QString name;
@@ -21,5 +27,15 @@ struct LogInfo
 	QString name;
 	QString message;
 	QString codeString;
-};/*}}}*/
+};
+
+struct DownloadPackage
+{
+	QString name;
+	QString filename;
+	int format;
+	QFileInfo install_path;
+	QUrl path;
+	QUrl homepage;
+};
 
