@@ -13,13 +13,25 @@ TEMPLATE = app
 SOURCES += main.cpp\
         canvastestapp.cpp \
     patchscene.cpp \
-    theme.cpp
+    theme.cpp \
+    canvasbox.cpp \
+    patchcanvas.cpp
 
 HEADERS  += canvastestapp.h \
     patchscene.h \
-    theme.h
+    theme.h \
+    canvasbox.h \
+    patchcanvas.h
 
 FORMS    += canvastestapp.ui
+
+
+
+
+
+
+
+
 
 
 

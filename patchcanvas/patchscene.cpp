@@ -1,5 +1,6 @@
 #include "patchscene.h"
 
+#include <QGraphicsView>
 #include <cmath>
 
 PatchScene::PatchScene()

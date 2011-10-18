@@ -5,7 +5,7 @@
 
 Theme::Theme()
 {
-#if 0 /* Modern Black theme */
+#if 1 /* Modern Black theme */
 
     // Name this theme
     name = "Modern Dark";
@@ -57,8 +57,8 @@ Theme::Theme()
     line_outro_sel = QColor(93+70,141+70,46+70);
     line_outro_glow = QColor(0,255,0);
 
-    rubberband_pen = QPen(QColor(206,207,208), 1, Qt::SolidLine),
-            rubberband_brush = QColor(76,77,78,100);
+    rubberband_pen = QPen(QColor(206,207,208), 1, Qt::SolidLine);
+    rubberband_brush = QColor(76,77,78,100);
 
 #else /* Classic Dark theme */
 
