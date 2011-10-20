@@ -10,6 +10,8 @@
 #include <QThread>
 #include <QHash>
 #include <QStringList>
+#include <QFileInfo>
+#include <QUrl>
 #include "OOProcess.h"
 #include "OOStructures.h"
 

@@ -148,6 +148,24 @@ QLineEdit
 	 background-color: #1b1b1b;
 	 color: #b8b8b8;
 }
+
+QProgressBar
+{
+	 border-radius: 8px;
+     border-image: url(:/images/frame.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #1b1b1b;
+	 text-align: center;
+	 color: #b8b8b8;
+}
+QProgressBar::chunk
+{
+	width: 20px;
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                  stop: 0 #414141, stop:0.1 #414141, stop: 1.0 #232323);
+}
+
 QStatusBar
 {
 	 border-radius: 0px;
@@ -233,7 +251,8 @@ QLabel#m_lblClassic::disabled
 }*/
 
 QFrame#m_sonatinaBox, QFrame#m_maestroBox, QFrame#m_classicBox, QFrame#m_accousticBox, QFrame#m_m7Box,
-QFrame#m_sessionInfoBox, QFrame#m_commandBox, QFrame#m_customBox, QFrame#m_logsBox, QFrame#m_sessionStatusBox
+QFrame#m_sessionInfoBox, QFrame#m_commandBox, QFrame#m_customBox, QFrame#m_logsBox, QFrame#m_sessionStatusBox,
+QFrame#m_progressBox
 {
 	color: #d0d4d0;
 	background-color: #1e1e1e;

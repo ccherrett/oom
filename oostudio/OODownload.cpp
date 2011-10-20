@@ -5,38 +5,61 @@
 //===========================================================
 
 #include "OODownload.h"
-#include "OOStructures.h"
 #include <QFile>
+#include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QDebug>
+#include "OOStructures.h"
+#include "config.h"
 
 OODownload::OODownload(QObject* parent)
 : QObject(parent)
 {
-	connect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadComplete(QNetworkReply*)));
+	connect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadFinished(QNetworkReply*)));
 }
 
 void OODownload::startDownload(DownloadPackage* pkg)
 {
 	QNetworkRequest request(pkg->path);
+	request.setRawHeader("User-Agent", "OOStudio "VERSION);
 	QNetworkReply *reply = m_manager.get(request);
-	connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(trackProgress(qint64, qint64)));
+	switch(pkg->type)
+	{
+		case Sonatina:
+			connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackSonatinaProgress(qint64, qint64)));
+		break;
+		case Maestro:
+			connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackMaestroProgress(qint64, qint64)));
+		break;
+		case ClassicGuitar:
+			connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackClassicProgress(qint64, qint64)));
+		break;
+		case AcousticGuitar:
+			connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackAcousticProgress(qint64, qint64)));
+		break;
+		case M7IR44:
+		case M7IR48:
+			connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackM7Progress(qint64, qint64)));
+		break;
+		default:
+			qDebug() << "OODownload::startDownload Unknown progress";
+		break;
+	}
 	m_currentDownloads.append(reply);
-	m_currentPackage.append(pkg);
+	m_currentPackages.append(pkg);
+	emit downloadStarted(pkg->type);
 }
 
 void OODownload::trackProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
+	Q_UNUSED(bytesReceived);
+	Q_UNUSED(bytesTotal);
 }
 
-QString OODownload::getFilename(const QUrl &url)
+QString OODownload::getFilename(const QString &name)
 {
-	QString path = url.path();
-	QString filename = QFileInfo(path).fileName();
-
-	if(filename.isEmpty())
-		filename = "oom-download";
-
+	QString filename(name);
 	if(QFile::exists(filename)) 
 	{
 		int i = 0;
@@ -48,47 +71,54 @@ QString OODownload::getFilename(const QUrl &url)
 	return filename;
 }
 
-bool OODownload::saveFile(QString name, QIODevice* data)
+bool OODownload::saveFile(DownloadPackage* pkg, QIODevice* data)
 {
-	QFile savefile(name);
+	QString temp = QDir::tempPath();
+	temp = temp.append(QDir::separator()).append(pkg->filename);
+	temp = getFilename(temp);
+	QFile savefile(temp);
 	if(!savefile.open(QIODevice::WriteOnly))
 	{
-		QString msg(tr("Unable to save file: %1\nErrors: %2"));
-		QMessageBox::critical(
-			0,
-			tr("File Save Error"),
-			msg.arg(name).arg(savefile.errorString())
-		);
+		qDebug() << "Failed to open file for writing: " << temp ;
+		emit downloadError(pkg->type, QString(savefile.errorString()));
 		return false;
 	}
-	savefile.write(data->readAll());
-	savefile.close();
-	return true;
-}
-
-void OODownload::downloadComplete(QNetworkReply* reply)
-{
-	QUrl url = reply->url();
-	if(reply->error())
+	if(!savefile.write(data->readAll()))
 	{
-		QString msg(tr("Download of %1 failed: \nErrors: %2"));
-		QMessageBox::critical(
-			0,
-			tr("Download Failed"),
-			msg.arg(url.toEncoded().constData()).arg(reply->errorString())
-		);
+		qDebug() << "Failed to write file: " << temp ;
+		emit downloadError(pkg->type, QString(savefile.errorString()));
 	}
 	else
 	{
-		int index = m_currentDownloads.indexOf(reply);
-		DownloadPackage* pkg = m_currentPackages.takeAt(index);
+		savefile.close();
+		//TODO: extract package and put it inplace
+		return true;
+	}
+	savefile.close();
+	return false;
+}
+
+void OODownload::downloadFinished(QNetworkReply* reply)
+{
+	QUrl url = reply->url();
+	int index = m_currentDownloads.indexOf(reply);
+	DownloadPackage* pkg = m_currentPackages.takeAt(index);
+	if(reply->error())
+	{
+		qDebug() << "OODownload::downloadFinished Download finished with error: " << pkg->name;
+		emit downloadError(pkg->type, QString(reply->errorString()));
+	}
+	else
+	{
 		if(pkg)
 		{
-			QString filename = pkg->filename; //getFilename(url);
-			if(saveFile(filename, reply))
+			//QString filename = pkg->filename; //getFilename(url);
+			if(saveFile(pkg, reply))
 			{
+				qDebug() << "OODownload::downloadFinished Download finished: " << pkg->name;
 				//Add message to log
 				//TODO: fire extract thread
+				emit downloadEnded(pkg->type);
 			}
 		}
 	}
@@ -96,6 +126,19 @@ void OODownload::downloadComplete(QNetworkReply* reply)
 	reply->deleteLater();
 	if(m_currentDownloads.isEmpty())
 	{
-		//TODO: Show messages no more downloads
+		emit downloadsComplete();
 	}
+}
+
+bool OODownload::isRunning(int id)
+{
+	SamplePack pack = (SamplePack)id;
+	foreach(DownloadPackage* pkg, m_currentPackages)
+	{
+		if(pkg->type == pack)
+		{
+			return true;
+		}
+	}
+	return false;
 }

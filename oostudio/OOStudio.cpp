@@ -35,7 +35,8 @@ static const QString MAESTRO_PATH("maestro");
 static const QString CLASSIC_PATH("ClassicFREE");
 static const QString ACCOUSTIC_PATH("AccousticFREE");
 static const QString M7IR44_PATH("Samplicity M7 Main - 03 - Wave Quad files, 32 bit, 44.1 Khz, v1.1");
-static const QString M7IR48_PATH("Samplicity M7 Main - 03 - Wave Quad files, 32 bit, 48 Khz, v1.1");
+static const QString M7IR48_PATH("Samplicity M7 Main - 04 - Wave Quad files, 32 bit, 48 Khz, v1.1");
+static const QString SOUNDS_DIR = QString(QDir::homePath()).append(QDir::separator()).append(".sounds").append(QDir::separator());
 
 lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event*/, const char * /*pchData*/, int /*cchData*/, void* pvData )
 {
@@ -54,6 +55,7 @@ OOStudio::OOStudio()
 	m_oomThread = 0;
 	m_jackThread = 0;
 	
+	m_downloader = 0;
 	m_current = 0;
 	m_incleanup = false;
 	m_loading = false;
@@ -104,7 +106,13 @@ OOStudio::OOStudio()
 	//m_heartBeat->setObjectName("timer");
 	//connect(m_heartBeat, SIGNAL(timeout()), this, SLOT(heartBeat()));
 	//m_heartBeat->start(50);
+	
+	//Hide all the progressBars
+	downloadEnded(ALL);
+	
+	populateDownloadMap();
 	updateInstalledState();
+	
 	//bool advanced = settings.value("OOStudio/advanced", 0).toBool();
 	toggleAdvanced(false);
 	//m_btnMore->setChecked(advanced);
@@ -112,10 +120,6 @@ OOStudio::OOStudio()
 
 void OOStudio::heartBeat()
 {
-	while(!m_logQueue.isEmpty())
-	{
-		writeLog(m_logQueue.dequeue());
-	}
 }
 
 void OOStudio::showMessage(QString msg)
@@ -327,8 +331,15 @@ void OOStudio::createConnections()/*{{{*/
 
 	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTopTabChanged(int)));
 
+	//Download Tab connections
 	connect(m_chk44, SIGNAL(toggled(bool)), this, SLOT(updateInstalledState()));
 	connect(m_chk48, SIGNAL(toggled(bool)), this, SLOT(updateInstalledState()));
+	connect(m_btnDownloadSonatina, SIGNAL(clicked()), this, SLOT(downloadSonatina()));
+	connect(m_btnDownloadMaestro, SIGNAL(clicked()), this, SLOT(downloadMaestro()));
+	connect(m_btnDownloadClassic, SIGNAL(clicked()), this, SLOT(downloadClassic()));
+	connect(m_btnDownloadAccoustic, SIGNAL(clicked()), this, SLOT(downloadAcoustic()));
+	connect(m_btnDownloadM7, SIGNAL(clicked()), this, SLOT(downloadM7()));
+	connect(m_btnDownload, SIGNAL(clicked()), this, SLOT(downloadAll()));
 }/*}}}*/
 
 void OOStudio::updateHeaders()/*{{{*/
@@ -487,46 +498,109 @@ void OOStudio::toggleAdvanced(bool state)/*{{{*/
 	m_lblBlurb->setVisible(!state);
 }/*}}}*/
 
+bool OOStudio::checkPackageInstall(int id)/*{{{*/
+{
+	QDir soundsDir(SOUNDS_DIR);
+	QDir templateDir(QString(TEMPLATE_DIR).append(QDir::separator()).append("libraries"));
+	if(!templateDir.exists())
+		templateDir.mkpath(QString(TEMPLATE_DIR).append(QDir::separator()).append("libraries"));
+	QDir sso(SONATINA_PATH);
+
+	bool retval = false;
+
+	SamplePack pack = (SamplePack)id;
+
+	switch(pack)
+	{
+		case Sonatina:
+		{
+			if(sso.exists() || soundsDir.exists(QString("sonatina").append(QDir::separator()).append(SONATINA_LOCAL_PATH)))
+			{
+				//SSO is installed
+				retval = true;
+			}
+		}
+		break;
+		case Maestro:
+		{
+			if(soundsDir.exists(MAESTRO_PATH))
+				retval = true;
+		}
+		break;
+		case ClassicGuitar:
+		{
+			if(soundsDir.exists(CLASSIC_PATH))
+				retval = true;
+		}
+		break;
+		case AcousticGuitar:
+		{
+			if(soundsDir.exists(ACCOUSTIC_PATH))
+				retval = true;
+		}
+		break;
+		case M7IR44:
+		{
+			if(templateDir.exists(M7IR44_PATH))
+				retval = true;
+		}
+		break;
+		case M7IR48:
+		{
+			if(templateDir.exists(M7IR48_PATH))
+				retval = true;
+		}
+		break;
+		case ALL:
+		{
+		}
+		break;
+	}
+	return retval;
+}/*}}}*/
+
 void OOStudio::updateInstalledState()
 {
-	QDir soundsDir(QDir::homePath().append(QDir::separator()).append(".sounds"));
-	QDir sso(SONATINA_PATH);
-	//qDebug() << "SSO PATH: " << sso.path();
-	if(sso.exists() || soundsDir.exists(QString("sonatina").append(QDir::separator()).append(SONATINA_LOCAL_PATH)))
+	int count = 0;
+	if(checkPackageInstall(Sonatina))
 	{
 		//SSO is installed
 		m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
 		m_btnDownloadSonatina->setEnabled(false);
+		++count;
 	}
 	else
 	{
 		m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 		m_btnDownloadSonatina->setEnabled(true);
 	}
-	if(soundsDir.exists(MAESTRO_PATH))
+	if(checkPackageInstall(Maestro))
 	{
 		m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
 		m_btnDownloadMaestro->setEnabled(false);
+		++count;
 	}
 	else
 	{
 		m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 		m_btnDownloadMaestro->setEnabled(true);
 	}
-	if(soundsDir.exists(CLASSIC_PATH))
+	if(checkPackageInstall(ClassicGuitar))
 	{
 		m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
 		m_btnDownloadClassic->setEnabled(false);
+		++count;
 	}
 	else
 	{
 		m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 		m_btnDownloadClassic->setEnabled(true);
 	}
-	if(soundsDir.exists(ACCOUSTIC_PATH))
+	if(checkPackageInstall(AcousticGuitar))
 	{
 		m_lblAccousticState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
 		m_btnDownloadAccoustic->setEnabled(false);
+		++count;
 	}
 	else
 	{
@@ -535,10 +609,11 @@ void OOStudio::updateInstalledState()
 	}
 	if(m_chk44->isChecked())
 	{
-		if(soundsDir.exists(M7IR44_PATH))
+		if(checkPackageInstall(M7IR44))
 		{
 			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
 			m_btnDownloadM7->setEnabled(false);
+			++count;
 		}
 		else
 		{
@@ -548,16 +623,25 @@ void OOStudio::updateInstalledState()
 	}
 	else
 	{
-		if(soundsDir.exists(M7IR48_PATH))
+		if(checkPackageInstall(M7IR48))
 		{
 			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
 			m_btnDownloadM7->setEnabled(false);
+			++count;
 		}
 		else
 		{
 			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 			m_btnDownloadM7->setEnabled(true);
 		}
+	}
+	if(count == 5)
+	{
+		m_btnDownload->setEnabled(false);
+	}
+	else
+	{
+		m_btnDownload->setEnabled(true);
 	}
 }
 
@@ -806,29 +890,32 @@ void OOStudio::cleanupProcessList()/*{{{*/
 	m_incleanup = false;
 }/*}}}*/
 
-void OOStudio::linuxSamplerStarted()
+void OOStudio::linuxSamplerStarted()/*{{{*/
 {
 	m_customThread = new OOThread(m_current);
 	connect(m_customThread, SIGNAL(startupSuccess()), this, SLOT(customStarted()));
 	connect(m_customThread, SIGNAL(startupFailed()), this, SLOT(customFailed()));
 	m_customThread->start();
-}
-void OOStudio::oomStarted()
+}/*}}}*/
+
+void OOStudio::oomStarted()/*{{{*/
 {
 	m_lblRunning->setText(m_current->name);
 	m_btnStopSession->setEnabled(true);
 	m_tabWidget->setCurrentIndex(3);
 	m_loading = false;
-}
-void OOStudio::jackStarted()
+}/*}}}*/
+
+void OOStudio::jackStarted()/*{{{*/
 {
 	m_lsThread = new LinuxSamplerProcessThread(m_current);
 	connect(m_lsThread, SIGNAL(startupSuccess()), this, SLOT(linuxSamplerStarted()));
 	connect(m_lsThread, SIGNAL(startupFailed()), this, SLOT(linuxSamplerFailed()));
 	connect(m_lsThread, SIGNAL(logMessage(LogInfo*)), this, SLOT(writeLog(LogInfo*)));
 	m_lsThread->start();
-}
-void OOStudio::customStarted()
+}/*}}}*/
+
+void OOStudio::customStarted()/*{{{*/
 {
 	m_oomThread = new OOMProcessThread(m_current);
 	connect(m_oomThread, SIGNAL(startupSuccess()), this, SLOT(oomStarted()));
@@ -836,9 +923,9 @@ void OOStudio::customStarted()
 	connect(m_oomThread, SIGNAL(processExit(int)), this, SLOT(processOOMExit(int)));
 	connect(m_oomThread, SIGNAL(logMessage(LogInfo*)), this, SLOT(writeLog(LogInfo*)));
 	m_oomThread->start();
-}
+}/*}}}*/
 
-void OOStudio::linuxSamplerFailed()
+void OOStudio::linuxSamplerFailed()/*{{{*/
 {
 	//Cleanup jackd and self
 	printf("OOStudio::linuxSamplerFailed\n");
@@ -863,9 +950,9 @@ void OOStudio::linuxSamplerFailed()
 	}
 	m_incleanup = false;
 	m_current = 0;
-}
+}/*}}}*/
 
-void OOStudio::oomFailed()
+void OOStudio::oomFailed()/*{{{*/
 {
 	//Cleanup everything
 	QString msg(tr("Failed to run OOMidi"));
@@ -873,9 +960,9 @@ void OOStudio::oomFailed()
 	QMessageBox::critical(this, tr("Create Failed"), msg);
 
 	cleanupProcessList();
-}
+}/*}}}*/
 
-void OOStudio::jackFailed()
+void OOStudio::jackFailed()/*{{{*/
 {
 	QString msg(tr("Failed to start to jackd server"));
 	msg.append("\nwith Command:\n").append(m_current->jackcommand);
@@ -890,9 +977,9 @@ void OOStudio::jackFailed()
 	}
 	m_loading = false;
 	m_current = 0;
-}
+}/*}}}*/
 
-void OOStudio::customFailed()
+void OOStudio::customFailed()/*{{{*/
 {
 	//Cleanup jackd, and ls
 	printf("OOStudio::cleanupProcessList\n");
@@ -924,7 +1011,7 @@ void OOStudio::customFailed()
 	m_current = 0;
 	m_loading = false;
 	m_incleanup = false;
-}
+}/*}}}*/
 
 void OOStudio::shutdown()/*{{{*/
 {
@@ -1851,7 +1938,7 @@ void OOStudio::processOOMExit(int code)/*{{{*/
 	}
 }/*}}}*/
 
-void OOStudio::writeLog(LogInfo* log)
+void OOStudio::writeLog(LogInfo* log)/*{{{*/
 {
 	if(log)
 	{
@@ -1860,13 +1947,578 @@ void OOStudio::writeLog(LogInfo* log)
 			return;
 		QList<QStandardItem*> rowData;
 		QStandardItem* command = new QStandardItem(log->name);
-		//command->setBackground(QColor(99, 36, 36));
 		QStandardItem* logmsg = new QStandardItem(messages);
 		QStandardItem* level = new QStandardItem(log->codeString);
+		if(log->codeString == "ERROR")
+		{
+			command->setForeground(QColor(99, 36, 36));
+			level->setForeground(QColor(99, 36, 36));
+		}
 		rowData << command << level << logmsg;
 		m_loggerModel->appendRow(rowData);
 		updateHeaders();
 		m_loggerTable->resizeRowsToContents();
 		m_loggerTable->scrollToBottom();
 	}
+}/*}}}*/
+
+
+void OOStudio::populateDownloadMap()/*{{{*/
+{
+	m_downloadMap.clear();
+	QList<DownloadPackage*> list;
+	QDomDocument temp("OOStudioDownloader");
+	QFile tempFile(":/oostudio.xml");
+	if(!tempFile.open(QIODevice::ReadOnly))
+	{
+		//TODO:We need to error here
+		return;
+	}
+	if(!temp.setContent(&tempFile))
+	{
+		//TODO:We need to error here
+		return;
+	}
+	//We now have a loaded file so we get the data from it.
+	QDomElement root = temp.documentElement();
+	if(!root.isNull())
+	{
+		QDomNodeList flist = root.elementsByTagName("sonatina");
+		for(int i = 0; i < flist.count(); ++i)
+		{
+			qDebug() << "Populating Sonatina DownloadPackage from xml";
+			DownloadPackage* sso = new DownloadPackage;
+			sso->name = QString("Sonatina Orchestra");
+		
+			QDomElement command = flist.at(i).toElement();
+			sso->type = (SamplePack)command.attribute("id").toInt();
+			sso->filename = command.attribute("filename");
+			sso->format = command.attribute("format").toInt();
+			sso->path = QUrl(command.attribute("path"));
+			sso->homepage = QUrl(command.attribute("homepage"));
+			sso->install_path = QFileInfo(QString(SOUNDS_DIR));
+			m_downloadMap[sso->type] = sso;
+		}
+		flist = root.elementsByTagName("maestro");
+		for(int i = 0; i < flist.count(); ++i)
+		{
+			qDebug() << "Populating Maestro Piano DownloadPackage from xml";
+			QDomElement command = flist.at(i).toElement();
+
+			DownloadPackage* maestro = new DownloadPackage;
+			maestro->name = QString("Maestro Piano");
+		
+			maestro->type = (SamplePack)command.attribute("id").toInt();
+			maestro->filename = command.attribute("filename");
+			maestro->format = command.attribute("format").toInt();
+			maestro->path = QUrl(command.attribute("path"));
+			maestro->homepage = QUrl(command.attribute("homepage"));
+			maestro->install_path = QFileInfo(QString(SOUNDS_DIR).append("maestro"));
+			m_downloadMap[maestro->type] = maestro;
+		}
+		flist = root.elementsByTagName("classicfree");
+		for(int i = 0; i < flist.count(); ++i)
+		{
+			qDebug() << "Populating Sonatina DownloadPackage from xml";
+			QDomElement command = flist.at(i).toElement();
+
+			DownloadPackage* classic = new DownloadPackage;
+			classic->name = QString("Classic Guitar");
+		
+			classic->type = (SamplePack)command.attribute("id").toInt();
+			classic->filename = command.attribute("filename");
+			classic->format = command.attribute("format").toInt();
+			classic->path = QUrl(command.attribute("path"));
+			classic->homepage = QUrl(command.attribute("homepage"));
+			classic->install_path = QFileInfo(QString(SOUNDS_DIR));
+			m_downloadMap[classic->type] = classic;
+		}
+		flist = root.elementsByTagName("acousticfree");
+		for(int i = 0; i < flist.count(); ++i)
+		{
+			qDebug() << "Populating Acoustic Guitar DownloadPackage from xml";
+			QDomElement command = flist.at(i).toElement();
+
+			DownloadPackage* acoustic = new DownloadPackage;
+			acoustic->name = QString("Acoustic Guitar");
+		
+			acoustic->type = (SamplePack)command.attribute("id").toInt();
+			acoustic->filename = command.attribute("filename");
+			acoustic->format = command.attribute("format").toInt();
+			acoustic->path = QUrl(command.attribute("path"));
+			acoustic->homepage = QUrl(command.attribute("homepage"));
+			acoustic->install_path = QFileInfo(QString(SOUNDS_DIR));
+			m_downloadMap[acoustic->type] = acoustic;
+		}
+		flist = root.elementsByTagName("m7ir");
+		for(int i = 0; i < flist.count(); ++i)
+		{
+			QDomElement command = flist.at(i).toElement();
+
+			DownloadPackage* m7ir = new DownloadPackage;
+			SamplePack id = (SamplePack)command.attribute("id").toInt();
+			if(id == M7IR44)
+			{
+				qDebug() << "Populating M7IR 44.1Khz DownloadPackage from xml";
+				m7ir->name = QString("M7 IR 44.1Khz");
+			}
+			else
+			{
+				qDebug() << "Populating M7IR 48Khz DownloadPackage from xml";
+				m7ir->name = QString("M7 IR 48Khz");
+			}
+
+			m7ir->type = id;
+			m7ir->filename = command.attribute("filename");
+			m7ir->format = command.attribute("format").toInt();
+			m7ir->path = QUrl(command.attribute("path"));
+			m7ir->homepage = QUrl(command.attribute("homepage"));
+			m7ir->install_path = QFileInfo(QString(TEMPLATE_DIR).append(QDir::separator()).append("libraries"));
+			m_downloadMap[m7ir->type] = m7ir;
+		}
+	}
+}/*}}}*/
+
+void OOStudio::downloadSonatina()
+{
+	download(Sonatina);
 }
+
+void OOStudio::downloadMaestro()
+{
+	download(Maestro);
+}
+
+void OOStudio::downloadClassic()
+{
+	download(ClassicGuitar);
+}
+
+void OOStudio::downloadAcoustic()
+{
+	download(AcousticGuitar);
+}
+
+void OOStudio::downloadM7()
+{
+	if(m_chk44->isChecked())
+	{
+		download(M7IR44);
+	}
+	else
+	{
+		download(M7IR48);
+	}
+}
+
+void OOStudio::downloadAll()
+{
+	download(ALL);
+}
+
+void OOStudio::download(int type)
+{
+	if(!m_downloader)
+	{
+		m_downloader = new OODownload(this);
+		connect(m_downloader, SIGNAL(downloadStarted(int)), this, SLOT(downloadStarted(int)));
+		connect(m_downloader, SIGNAL(downloadEnded(int)), this, SLOT(downloadEnded(int)));
+		connect(m_downloader, SIGNAL(downloadError(int, QString)), this, SLOT(downloadError(int, QString)));
+		connect(m_downloader, SIGNAL(downloadsComplete()), this, SLOT(downloadsComplete()));
+
+		connect(m_downloader, SIGNAL(trackSonatinaProgress(qint64, qint64)), this, SLOT(trackSonatinaProgress(qint64, qint64)));
+		connect(m_downloader, SIGNAL(trackMaestroProgress(qint64, qint64)), this, SLOT(trackMaestroProgress(qint64, qint64)));
+		connect(m_downloader, SIGNAL(trackClassicProgress(qint64, qint64)), this, SLOT(trackClassicProgress(qint64, qint64)));
+		connect(m_downloader, SIGNAL(trackAcousticProgress(qint64, qint64)), this, SLOT(trackAcousticProgress(qint64, qint64)));
+		connect(m_downloader, SIGNAL(trackM7Progress(qint64, qint64)), this, SLOT(trackM7Progress(qint64, qint64)));
+	}
+	SamplePack pack = (SamplePack)type;
+	switch(pack)
+	{
+		case Sonatina:
+		{
+			if(!checkPackageInstall(Sonatina))
+				m_downloader->startDownload(m_downloadMap.value(Sonatina));
+			m_btnDownloadSonatina->setEnabled(false);
+			qDebug() << "Sonatina download  requested";
+		}
+		break;
+		case Maestro:
+		{
+			qDebug() << "Maestro download  requested";
+			if(!checkPackageInstall(Maestro))
+				m_downloader->startDownload(m_downloadMap.value(Maestro));
+			m_btnDownloadMaestro->setEnabled(false);
+		}
+		break;
+		case ClassicGuitar:
+		{
+			qDebug() << "Classic download  requested";
+			if(!checkPackageInstall(ClassicGuitar))
+				m_downloader->startDownload(m_downloadMap.value(ClassicGuitar));
+			m_btnDownloadClassic->setEnabled(false);
+		}
+		break;
+		case AcousticGuitar:
+		{
+			qDebug() << "Acoustic download  requested";
+			if(!checkPackageInstall(AcousticGuitar))
+				m_downloader->startDownload(m_downloadMap.value(AcousticGuitar));
+			m_btnDownloadAccoustic->setEnabled(false);
+		}
+		break;
+		case M7IR44:
+		{
+			qDebug() << "M7 IR download  requested";
+			if(!checkPackageInstall(M7IR44))
+				m_downloader->startDownload(m_downloadMap.value(M7IR44));
+			m_btnDownloadM7->setEnabled(false);
+		}
+		break;
+		case M7IR48:
+		{
+			qDebug() << "M7 IR download  requested";
+			if(!checkPackageInstall(M7IR48))
+				m_downloader->startDownload(m_downloadMap.value(M7IR48));
+			m_btnDownloadM7->setEnabled(false);
+		}
+		break;
+		case ALL:
+		{
+			qDebug() << "Download all requested";
+			m_btnDownload->setEnabled(false);
+
+			if(!checkPackageInstall(Sonatina))
+			{
+				m_btnDownloadSonatina->setEnabled(false);
+				m_downloader->startDownload(m_downloadMap.value(Sonatina));
+			}
+			if(!checkPackageInstall(Maestro))
+			{
+				m_btnDownloadMaestro->setEnabled(false);
+				m_downloader->startDownload(m_downloadMap.value(Maestro));
+			}
+			if(!checkPackageInstall(ClassicGuitar))
+			{
+				m_btnDownloadClassic->setEnabled(false);
+				m_downloader->startDownload(m_downloadMap.value(ClassicGuitar));
+			}
+			if(!checkPackageInstall(AcousticGuitar))
+			{
+				m_btnDownloadAccoustic->setEnabled(false);
+				m_downloader->startDownload(m_downloadMap.value(AcousticGuitar));
+			}
+			if(m_chk44->isChecked())
+			{
+				if(!checkPackageInstall(M7IR44))
+				{
+					m_btnDownloadM7->setEnabled(false);
+					m_downloader->startDownload(m_downloadMap.value(M7IR44));
+				}
+			}
+			else
+			{
+				if(!checkPackageInstall(M7IR48))
+				{
+					m_btnDownloadM7->setEnabled(false);
+					m_downloader->startDownload(m_downloadMap.value(M7IR48));
+				}
+			}
+		}
+		break;
+	}
+}
+
+void OOStudio::downloadEnded(int type)
+{
+	SamplePack pack = (SamplePack)type;
+	switch(pack)
+	{
+		case Sonatina:
+		{
+			qDebug() << "Sonatina download complete";
+			//TODO: hide progress
+			label_25->setVisible(false);
+			m_progressSonatina->setVisible(false);
+			m_btnCancelSonatina->setVisible(false);
+		}
+		break;
+		case Maestro:
+		{
+			qDebug() << "Maestro download complete";
+			//TODO: hide progress
+			label_26->setVisible(false);
+			m_progressMaestro->setVisible(false);
+			m_btnCancelMaestro->setVisible(false);
+		}
+		break;
+		case ClassicGuitar:
+		{
+			qDebug() << "Classic download complete";
+			//TODO: hide progress
+			label_27->setVisible(false);
+			m_progressClassic->setVisible(false);
+			m_btnCancelClassic->setVisible(false);
+		}
+		break;
+		case AcousticGuitar:
+		{
+			qDebug() << "Acoustic download complete";
+			//TODO: hide progress
+			label_30->setVisible(false);
+			m_progressAcoustic->setVisible(false);
+			m_btnCancelAcoustic->setVisible(false);
+		}
+		break;
+		case M7IR44:
+		case M7IR48:
+		{
+			qDebug() << "M7 IR download complete";
+			//TODO: hide progress
+			label_31->setVisible(false);
+			m_progressM7->setVisible(false);
+			m_btnCancelM7->setVisible(false);
+		}
+		break;
+		case ALL:
+		{
+			label_25->setVisible(false);
+			m_progressSonatina->setVisible(false);
+			m_btnCancelSonatina->setVisible(false);
+
+			label_26->setVisible(false);
+			m_progressMaestro->setVisible(false);
+			m_btnCancelMaestro->setVisible(false);
+
+			label_27->setVisible(false);
+			m_progressClassic->setVisible(false);
+			m_btnCancelClassic->setVisible(false);
+
+			label_30->setVisible(false);
+			m_progressAcoustic->setVisible(false);
+			m_btnCancelAcoustic->setVisible(false);
+
+			label_31->setVisible(false);
+			m_progressM7->setVisible(false);
+			m_btnCancelM7->setVisible(false);
+
+			m_progressBox->setVisible(false);
+		}
+		break;
+	}
+}
+
+void OOStudio::downloadStarted(int type)
+{
+	m_progressBox->setVisible(true);
+
+	SamplePack pack = (SamplePack)type;
+	switch(pack)
+	{
+		case Sonatina:
+		{
+			qDebug() << "Sonatina download started";
+			//TODO: show progress
+			label_25->setVisible(true);
+			m_progressSonatina->setVisible(true);
+			//m_btnCancelSonatina->setVisible(true);
+			m_progressSonatina->setValue(0);
+		}
+		break;
+		case Maestro:
+		{
+			qDebug() << "Maestro download started";
+			//TODO: show progress
+			label_26->setVisible(true);
+			m_progressMaestro->setVisible(true);
+			//m_btnCancelMaestro->setVisible(true);
+			m_progressMaestro->setValue(0);
+		}
+		break;
+		case ClassicGuitar:
+		{
+			qDebug() << "Classic download started";
+			//TODO: show progress
+			label_27->setVisible(true);
+			m_progressClassic->setVisible(true);
+			//m_btnCancelClassic->setVisible(true);
+			m_progressClassic->setValue(0);
+		}
+		break;
+		case AcousticGuitar:
+		{
+			qDebug() << "Acoustic download started";
+			//TODO: show progress
+			label_30->setVisible(true);
+			m_progressAcoustic->setVisible(true);
+			//m_btnCancelAcoustic->setVisible(true);
+			m_progressAcoustic->setValue(0);
+		}
+		break;
+		case M7IR44:
+		case M7IR48:
+		{
+			qDebug() << "M7 IR download started";
+			//TODO: show progress
+			label_31->setVisible(true);
+			m_progressM7->setVisible(true);
+			//m_btnCancelM7->setVisible(true);
+			m_progressM7->setValue(0);
+
+		}
+		break;
+		case ALL:
+		break;
+	}
+}
+
+void OOStudio::downloadsComplete()
+{
+	//TODO: hide all progress
+	//label_25->setVisible(false);/*{{{*/
+	//m_progressSonatina->setVisible(false);
+	//m_btnCancelSonatina->setVisible(false);
+
+	//label_26->setVisible(false);
+	//m_progressMaestro->setVisible(false);
+	//m_btnCancelMaestro->setVisible(false);
+
+	//label_27->setVisible(false);
+	//m_progressClassic->setVisible(false);
+	//m_btnCancelClassic->setVisible(false);
+
+	//label_30->setVisible(false);
+	//m_progressAcoustic->setVisible(false);
+	//m_btnCancelAcoustic->setVisible(false);
+
+	//label_31->setVisible(false);
+	//m_progressM7->setVisible(false);
+	//m_btnCancelM7->setVisible(false);
+
+	qDebug() << "OOStudio::downloadsComplete";
+	m_progressBox->setVisible(false);/*}}}*/
+	updateInstalledState();
+}
+
+void OOStudio::downloadError(int type, const QString& error)
+{
+	QString msg(tr("Download of %1 failed: \nErrors: %2"));
+	SamplePack pack = (SamplePack)type;
+	switch(pack)
+	{
+		case Sonatina:
+		{
+			qDebug() << "Sonatina download Failed!!\n" << error;
+			label_25->setVisible(false);
+			m_progressSonatina->setVisible(false);
+			m_btnCancelSonatina->setVisible(false);
+			QMessageBox::critical(
+				this,
+				tr("Download Failed"),
+				msg.arg("Sonatina Symphonic Orchestra").arg(error)
+			);
+		}
+		break;
+		case Maestro:
+		{
+			qDebug() << "Maestro download Failed!!\n" << error;
+			label_26->setVisible(false);
+			m_progressMaestro->setVisible(false);
+			m_btnCancelMaestro->setVisible(false);
+			QMessageBox::critical(
+				this,
+				tr("Download Failed"),
+				msg.arg("Maestro Grand").arg(error)
+			);
+		}
+		break;
+		case ClassicGuitar:
+		{
+			qDebug() << "Classic download Failed!!\n" << error;
+			label_27->setVisible(false);
+			m_progressClassic->setVisible(false);
+			m_btnCancelClassic->setVisible(false);
+			QMessageBox::critical(
+				this,
+				tr("Download Failed"),
+				msg.arg("Classic Guitar").arg(error)
+			);
+		}
+		break;
+		case AcousticGuitar:
+		{
+			qDebug() << "Acoustic download Failed!!\n" << error;
+			label_30->setVisible(false);
+			m_progressAcoustic->setVisible(false);
+			m_btnCancelAcoustic->setVisible(false);
+			QMessageBox::critical(
+				this,
+				tr("Download Failed"),
+				msg.arg("Acoustic Guitar").arg(error)
+			);
+		}
+		break;
+		case M7IR44:
+		case M7IR48:
+		{
+			qDebug() << "M7 IR download Failed!!\n" << error;
+			label_31->setVisible(false);
+			m_progressM7->setVisible(false);
+			m_btnCancelM7->setVisible(false);
+			QMessageBox::critical(
+				this,
+				tr("Download Failed"),
+				msg.arg("Samplicity M7 IR").arg(error)
+			);
+		}
+		break;
+		case ALL:
+		break;
+	}
+}
+
+void OOStudio::trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
+	int max = bytesTotal;
+	int val = bytesReceived;
+	if(m_progressSonatina->maximum() < max)
+		m_progressSonatina->setMaximum(max);
+	m_progressSonatina->setValue(val);
+}
+
+void OOStudio::trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
+	int max = bytesTotal;
+	int val = bytesReceived;
+	if(m_progressMaestro->maximum() < max)
+		m_progressMaestro->setMaximum(max);
+	m_progressMaestro->setValue(val);
+}
+
+void OOStudio::trackClassicProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
+	int max = bytesTotal;
+	int val = bytesReceived;
+	if(m_progressClassic->maximum() < max)
+		m_progressClassic->setMaximum(max);
+	m_progressClassic->setValue(val);
+}
+
+void OOStudio::trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
+	int max = bytesTotal;
+	int val = bytesReceived;
+	if(m_progressAcoustic->maximum() < max)
+		m_progressAcoustic->setMaximum(max);
+	m_progressAcoustic->setValue(val);
+}
+
+void OOStudio::trackM7Progress(qint64 bytesReceived, qint64 bytesTotal)
+{
+	int max = bytesTotal;
+	int val = bytesReceived;
+	if(m_progressM7->maximum() < max)
+		m_progressM7->setMaximum(max);
+	m_progressM7->setValue(val);
+}
+

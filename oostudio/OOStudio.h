@@ -19,7 +19,6 @@
 #include <QMap>
 #include <QStringList>
 #include <QProcess>
-#include <QQueue>
 #include "ui_OOStudioBase.h"
 
 class QCloseEvent;
@@ -43,7 +42,8 @@ class LinuxSamplerProcessThread;
 
 class OOSession;
 class LogInfo;
-
+class OODownload;
+class DownloadPackage;
 
 class OOStudio :public QMainWindow ,public Ui::OOStudioBase
 {
@@ -65,6 +65,8 @@ private:
 	JackProcessThread* m_jackThread;
 	LinuxSamplerProcessThread* m_lsThread;
 
+	OODownload* m_downloader;
+
 	QStandardItemModel* m_sessionModel;
 	QItemSelectionModel* m_sessionSelectModel;
 	QItemSelectionModel* m_commandSelectModel;
@@ -79,13 +81,12 @@ private:
 	QStringList m_loglabels;
 	QStringList m_lscpLabels;
 	
-	QList<QProcess*> m_procList;
 	QMap<QString, OOSession*> m_sessionMap;
-	QHash<long, OOProcess*> m_procMap;
+	QHash<int, DownloadPackage*> m_downloadMap;
 	
 	OOSession* m_current;
 	QByteArray m_restoreSize;
-	QQueue<LogInfo*> m_logQueue;
+	
 	QTimer* m_heartBeat;
 
 	void loadStyle(QString);
@@ -103,6 +104,7 @@ private:
 	QString convertPath(QString);
 	void doSessionDelete(OOSession*);
 	void showMessage(QString);
+	bool checkPackageInstall(int);
 
 protected:
 	void closeEvent(QCloseEvent*);
@@ -118,6 +120,25 @@ private slots:
 	void oomFailed();
 	void jackFailed();
 	void customFailed();
+
+	void downloadSonatina();
+	void downloadMaestro();
+	void downloadClassic();
+	void downloadAcoustic();
+	void downloadM7();
+	void downloadAll();
+	void download(int);
+	void downloadEnded(int);
+	void downloadsComplete();
+	void downloadError(int, const QString&);
+	void downloadStarted(int);
+	void populateDownloadMap();
+
+	void trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal);
+	void trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal);
+	void trackClassicProgress(qint64 bytesReceived, qint64 bytesTotal);
+	void trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal);
+	void trackM7Progress(qint64 bytesReceived, qint64 bytesTotal);
 
 	void writeLog(LogInfo*);
 	void toggleAdvanced(bool);
