@@ -1,10 +1,12 @@
 #include "canvasbox.h"
+#include "canvasboxshadow.h"
 
 #include <QCursor>
 
 START_NAMESPACE_PATCHCANVAS
 
 extern Canvas canvas;
+extern options_t options;
 
 CanvasBox::CanvasBox(int group_id_, QString text_, Icon icon, QGraphicsScene* scene) :
     QGraphicsItem(0, scene)
@@ -34,20 +36,29 @@ CanvasBox::CanvasBox(int group_id_, QString text_, Icon icon, QGraphicsScene* sc
     // Icon
     icon_svg = new CanvasIcon(icon, text, this);
 
-    // ...
+    // Shadow
+    if (options.fancy_eyecandy)
+    {
+        shadow = new CanvasBoxShadow(toGraphicsObject());
+        shadow->setFakeParent(this);
+        setGraphicsEffect(shadow);
+    } else
+        shadow = 0;
 
     // Final touches
     setFlags(QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable);
 
     // Initial Paint
-    //if (options['auto_hide_groups'] or options['fancy_eyecandy']):
-    //setVisible(false); // Wait for at least 1 port
+    //if (options.auto_hide_groups || options.fancy_eyecandy)
+    //    setVisible(false); // Wait for at least 1 port
 
     relocateAll();
 }
 
 CanvasBox::~CanvasBox()
 {
+    if (shadow)
+        delete shadow;
     delete icon_svg;
 }
 
