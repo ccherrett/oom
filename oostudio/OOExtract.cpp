@@ -24,7 +24,9 @@ void OOExtract::readOutput()
 		QString message(m_process->readLine());
 		message = message.trimmed().simplified();
 		if(!message.isEmpty())
-			qDebug() << "OOExtract::readOutput" << message;
+		{
+			//qDebug() << "OOExtract::readOutput" << message;
+		}
 	}
 }
 
@@ -34,7 +36,9 @@ void OOExtract::readError()
 	QString message(m_process->readAllStandardError());
 	message = message.trimmed().simplified();
 	if(!message.isEmpty())
-		qDebug() << "OOExtract::readError" << message;
+	{
+		//qDebug() << "OOExtract::readError" << message;
+	}
 	/*if(m_process->state() == QProcess::Running)
 	{
 		qDebug() << "Attempting to terminate process";

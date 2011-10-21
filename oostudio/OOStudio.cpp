@@ -1802,6 +1802,38 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 		return;
 	}
 	
+	if(index && (index <= 2))
+	{
+		if(index == 1 && !checkPackageInstall(Sonatina))
+		{
+			//TODO: Show dialog 
+			QMessageBox::critical(this,
+			tr("Missing Libraries"),
+			tr("This template requires the Sonatina Symphonic Orchestral Library.\n"
+				"Install this library from the downloads tab."));
+			resetCreate();
+			m_tabWidget->setCurrentIndex(2);
+			return;
+		}
+		if(index == 2 && (!checkPackageInstall(Sonatina) || !checkPackageInstall(Maestro)
+				|| !checkPackageInstall(ClassicGuitar) || !checkPackageInstall(AcousticGuitar)))
+		{
+			resetCreate();
+			//TODO: Show dialog 
+			QMessageBox::critical(this,
+			tr("Missing Libraries"),
+			tr("This template requires the following sample libraries.\n\n"
+				" Required: Symphonic Orchestral Library\n"
+				" Required: Maestro Concert Grand\n"
+				" Required: Classical Guitar FREE\n"
+				" Required: Acoustic Guitar FREE\n"
+				" Recommended: Samplicity M7 Impulse Response\n\n"
+				"Install them from the downloads tab."));
+			m_tabWidget->setCurrentIndex(2);
+			return;
+		}
+	}
+	
 	//Copy the values from the other template into this
 	if(!m_sessionMap.isEmpty() && m_sessionMap.contains(tpath))
 	{
