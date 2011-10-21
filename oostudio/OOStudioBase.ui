@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>682</width>
-    <height>838</height>
+    <width>641</width>
+    <height>833</height>
    </rect>
   </property>
   <property name="font">
@@ -1134,9 +1134,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-1336</y>
-                <width>636</width>
-                <height>1836</height>
+                <y>-1096</y>
+                <width>595</width>
+                <height>1931</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -2181,8 +2181,8 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Copyright: Completely FREE&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;License: DonationWare - non-commercial&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://www.samplicity.com/bricasti-m7-impulse-responses/&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#b3d0b3;&quot;&gt;Author Website&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Download Size: &lt;span style=&quot; font-weight:600;&quot;&gt;@44.1Khz&lt;/span&gt; &lt;span style=&quot; font-weight:600;&quot;&gt;248MB - @48Khz 270MB&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Installed Size: &lt;span style=&quot; font-weight:600;&quot;&gt;@44.1Khz 268MB - @48Khz 291MB&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Download Size: &lt;span style=&quot; font-weight:600;&quot;&gt;270MB&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Installed Size: &lt;span style=&quot; font-weight:600;&quot;&gt;291MB&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                         </property>
                         <property name="openExternalLinks">
                          <bool>true</bool>
@@ -2331,8 +2331,17 @@ p, li { white-space: pre-wrap; }
              <property name="spacing">
               <number>0</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
               <number>20</number>
+             </property>
+             <property name="topMargin">
+              <number>10</number>
+             </property>
+             <property name="rightMargin">
+              <number>20</number>
+             </property>
+             <property name="bottomMargin">
+              <number>10</number>
              </property>
              <item>
               <widget class="QFrame" name="m_progressBox">
@@ -2394,6 +2403,15 @@ p, li { white-space: pre-wrap; }
                     <property name="text">
                      <string/>
                     </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -2442,6 +2460,15 @@ p, li { white-space: pre-wrap; }
                    <widget class="QToolButton" name="m_btnCancelMaestro">
                     <property name="text">
                      <string/>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -2492,6 +2519,15 @@ p, li { white-space: pre-wrap; }
                     <property name="text">
                      <string/>
                     </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -2541,6 +2577,15 @@ p, li { white-space: pre-wrap; }
                     <property name="text">
                      <string/>
                     </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -2589,6 +2634,15 @@ p, li { white-space: pre-wrap; }
                    <widget class="QToolButton" name="m_btnCancelM7">
                     <property name="text">
                      <string/>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -2895,7 +2949,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>682</width>
+     <width>641</width>
      <height>24</height>
     </rect>
    </property>

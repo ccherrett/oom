@@ -35,6 +35,7 @@ void OOThread::run()/*{{{*/
 		m_process = new QProcess();
 		connect(m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processMessages()));
 		connect(m_process, SIGNAL(readyReadStandardError()), this, SLOT(processErrors()));
+		qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 		connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SIGNAL(processExit(int)));
 
 		//QStringList commands = post ? session->postCommands : session->commands;

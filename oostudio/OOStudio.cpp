@@ -55,7 +55,7 @@ OOStudio::OOStudio()
 	m_oomThread = 0;
 	m_jackThread = 0;
 	
-	m_downloader = 0;
+	m_downloader = new OODownload(this);
 	m_current = 0;
 	m_incleanup = false;
 	m_loading = false;
@@ -150,8 +150,16 @@ void OOStudio::createTrayIcon()/*{{{*/
 	stopIcon.addPixmap(QPixmap(":/images/oostudio-stop-small-on.png"), QIcon::Normal, QIcon::On);
 	stopIcon.addPixmap(QPixmap(":/images/oostudio-stop-small-off.png"), QIcon::Normal, QIcon::Off);
 	stopIcon.addPixmap(QPixmap(":/images/oostudio-stop-small-on.png"), QIcon::Active);
-	m_btnStopSession->setIcon(stopIcon);
+	m_btnStopSession->setIcon(QIcon(stopIcon));
 
+	m_btnCancelSonatina->setIcon(QIcon(stopIcon));
+	m_btnCancelMaestro->setIcon(QIcon(stopIcon));
+	m_btnCancelClassic->setIcon(QIcon(stopIcon));
+	m_btnCancelAcoustic->setIcon(QIcon(stopIcon));
+	m_btnCancelM7->setIcon(QIcon(stopIcon));
+
+	qDebug() << "OOStudio::downloadsComplete";
+	m_progressBox->setVisible(false);
 	QIcon clearIcon;
 	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-on.png"), QIcon::Normal, QIcon::On);
 	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-off.png"), QIcon::Normal, QIcon::Off);
@@ -332,6 +340,20 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTopTabChanged(int)));
 
 	//Download Tab connections
+	connect(m_downloader, SIGNAL(downloadStarted(int)), this, SLOT(downloadStarted(int)));
+	connect(m_downloader, SIGNAL(downloadEnded(int)), this, SLOT(downloadEnded(int)));
+	connect(m_downloader, SIGNAL(downloadCanceled(int)), this, SLOT(downloadCanceled(int)));
+	connect(m_downloader, SIGNAL(downloadError(int, QString)), this, SLOT(downloadError(int, QString)));
+	connect(m_downloader, SIGNAL(downloadsComplete()), this, SLOT(downloadsComplete()));
+
+	connect(m_downloader, SIGNAL(trackSonatinaProgress(qint64, qint64)), this, SLOT(trackSonatinaProgress(qint64, qint64)));
+	connect(m_downloader, SIGNAL(trackMaestroProgress(qint64, qint64)), this, SLOT(trackMaestroProgress(qint64, qint64)));
+	connect(m_downloader, SIGNAL(trackClassicProgress(qint64, qint64)), this, SLOT(trackClassicProgress(qint64, qint64)));
+	connect(m_downloader, SIGNAL(trackAcousticProgress(qint64, qint64)), this, SLOT(trackAcousticProgress(qint64, qint64)));
+	connect(m_downloader, SIGNAL(trackM7Progress(qint64, qint64)), this, SLOT(trackM7Progress(qint64, qint64)));
+	
+	connect(this, SIGNAL(cancelDownload(int)), m_downloader, SLOT(cancelDownload(int)));
+
 	connect(m_chk44, SIGNAL(toggled(bool)), this, SLOT(updateInstalledState()));
 	connect(m_chk48, SIGNAL(toggled(bool)), this, SLOT(updateInstalledState()));
 	connect(m_btnDownloadSonatina, SIGNAL(clicked()), this, SLOT(downloadSonatina()));
@@ -340,6 +362,13 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnDownloadAccoustic, SIGNAL(clicked()), this, SLOT(downloadAcoustic()));
 	connect(m_btnDownloadM7, SIGNAL(clicked()), this, SLOT(downloadM7()));
 	connect(m_btnDownload, SIGNAL(clicked()), this, SLOT(downloadAll()));
+
+	connect(m_btnCancelSonatina, SIGNAL(clicked()), this, SLOT(cancelSonatina()));
+	connect(m_btnCancelMaestro, SIGNAL(clicked()), this, SLOT(cancelMaestro()));
+	connect(m_btnCancelClassic, SIGNAL(clicked()), this, SLOT(cancelClassic()));
+	connect(m_btnCancelAcoustic, SIGNAL(clicked()), this, SLOT(cancelAcoustic()));
+	connect(m_btnCancelM7, SIGNAL(clicked()), this, SLOT(cancelM7()));
+
 }/*}}}*/
 
 void OOStudio::updateHeaders()/*{{{*/
@@ -501,10 +530,13 @@ void OOStudio::toggleAdvanced(bool state)/*{{{*/
 bool OOStudio::checkPackageInstall(int id)/*{{{*/
 {
 	QDir soundsDir(SOUNDS_DIR);
+	if(!soundsDir.exists())
+		soundsDir.mkpath(SOUNDS_DIR);
 	QDir templateDir(QString(TEMPLATE_DIR).append(QDir::separator()).append("libraries"));
 	if(!templateDir.exists())
 		templateDir.mkpath(QString(TEMPLATE_DIR).append(QDir::separator()).append("libraries"));
 	QDir sso(SONATINA_PATH);
+	QDir ssoLocal(QString(SOUNDS_DIR).append(QDir::separator()).append("sonatina"));
 
 	bool retval = false;
 
@@ -514,7 +546,12 @@ bool OOStudio::checkPackageInstall(int id)/*{{{*/
 	{
 		case Sonatina:
 		{
-			if(sso.exists() || soundsDir.exists(QString("sonatina").append(QDir::separator()).append(SONATINA_LOCAL_PATH)))
+			if(sso.exists() && !ssoLocal.exists())
+			{
+				QFile::link(sso.absolutePath(), QString(SOUNDS_DIR).append(QDir::separator()).append("sonatina"));
+			}
+			if((sso.exists() || soundsDir.exists(QString("sonatina").append(QDir::separator()).append(SONATINA_LOCAL_PATH)))
+				|| m_downloader->isRunning(Sonatina))
 			{
 				//SSO is installed
 				retval = true;
@@ -523,31 +560,31 @@ bool OOStudio::checkPackageInstall(int id)/*{{{*/
 		break;
 		case Maestro:
 		{
-			if(soundsDir.exists(MAESTRO_PATH))
+			if(soundsDir.exists(MAESTRO_PATH) || m_downloader->isRunning(Maestro))
 				retval = true;
 		}
 		break;
 		case ClassicGuitar:
 		{
-			if(soundsDir.exists(CLASSIC_PATH))
+			if(soundsDir.exists(CLASSIC_PATH) || m_downloader->isRunning(ClassicGuitar))
 				retval = true;
 		}
 		break;
 		case AcousticGuitar:
 		{
-			if(soundsDir.exists(ACCOUSTIC_PATH))
+			if(soundsDir.exists(ACCOUSTIC_PATH) || m_downloader->isRunning(AcousticGuitar))
 				retval = true;
 		}
 		break;
 		case M7IR44:
 		{
-			if(templateDir.exists(M7IR44_PATH))
+			if(templateDir.exists(M7IR44_PATH) || m_downloader->isRunning(M7IR44))
 				retval = true;
 		}
 		break;
 		case M7IR48:
 		{
-			if(templateDir.exists(M7IR48_PATH))
+			if(templateDir.exists(M7IR48_PATH) || m_downloader->isRunning(M7IR48))
 				retval = true;
 		}
 		break;
@@ -2109,29 +2146,18 @@ void OOStudio::downloadM7()
 	{
 		download(M7IR48);
 	}
+	m_chk44->blockSignals(true);
+	m_chk48->blockSignals(true);
 }
 
 void OOStudio::downloadAll()
 {
+	m_btnDownload->setEnabled(false);
 	download(ALL);
 }
 
 void OOStudio::download(int type)
 {
-	if(!m_downloader)
-	{
-		m_downloader = new OODownload(this);
-		connect(m_downloader, SIGNAL(downloadStarted(int)), this, SLOT(downloadStarted(int)));
-		connect(m_downloader, SIGNAL(downloadEnded(int)), this, SLOT(downloadEnded(int)));
-		connect(m_downloader, SIGNAL(downloadError(int, QString)), this, SLOT(downloadError(int, QString)));
-		connect(m_downloader, SIGNAL(downloadsComplete()), this, SLOT(downloadsComplete()));
-
-		connect(m_downloader, SIGNAL(trackSonatinaProgress(qint64, qint64)), this, SLOT(trackSonatinaProgress(qint64, qint64)));
-		connect(m_downloader, SIGNAL(trackMaestroProgress(qint64, qint64)), this, SLOT(trackMaestroProgress(qint64, qint64)));
-		connect(m_downloader, SIGNAL(trackClassicProgress(qint64, qint64)), this, SLOT(trackClassicProgress(qint64, qint64)));
-		connect(m_downloader, SIGNAL(trackAcousticProgress(qint64, qint64)), this, SLOT(trackAcousticProgress(qint64, qint64)));
-		connect(m_downloader, SIGNAL(trackM7Progress(qint64, qint64)), this, SLOT(trackM7Progress(qint64, qint64)));
-	}
 	SamplePack pack = (SamplePack)type;
 	switch(pack)
 	{
@@ -2229,7 +2255,35 @@ void OOStudio::download(int type)
 	}
 }
 
-void OOStudio::downloadEnded(int type)
+void OOStudio::cancelSonatina()
+{
+	emit cancelDownload(Sonatina);
+}
+
+void OOStudio::cancelMaestro()
+{
+	emit cancelDownload(Maestro);
+}
+
+void OOStudio::cancelClassic()
+{
+	emit cancelDownload(ClassicGuitar);
+}
+
+void OOStudio::cancelAcoustic()
+{
+	emit cancelDownload(AcousticGuitar);
+}
+
+void OOStudio::cancelM7()
+{
+	if(m_chk44->isChecked())
+		emit cancelDownload(M7IR44);
+	else
+		emit cancelDownload(M7IR48);
+}
+
+void OOStudio::downloadEnded(int type)/*{{{*/
 {
 	SamplePack pack = (SamplePack)type;
 	switch(pack)
@@ -2278,6 +2332,8 @@ void OOStudio::downloadEnded(int type)
 			label_31->setVisible(false);
 			m_progressM7->setVisible(false);
 			m_btnCancelM7->setVisible(false);
+			m_chk44->blockSignals(false);
+			m_chk48->blockSignals(false);
 		}
 		break;
 		case ALL:
@@ -2306,7 +2362,88 @@ void OOStudio::downloadEnded(int type)
 		}
 		break;
 	}
-}
+}/*}}}*/
+
+void OOStudio::downloadCanceled(int type)/*{{{*/
+{
+	SamplePack pack = (SamplePack)type;
+	switch(pack)
+	{
+		case Sonatina:
+		{
+			qDebug() << "Sonatina download canceled";
+			//TODO: hide progress
+			label_25->setVisible(false);
+			m_progressSonatina->setVisible(false);
+			m_btnCancelSonatina->setVisible(false);
+		}
+		break;
+		case Maestro:
+		{
+			qDebug() << "Maestro download canceled";
+			//TODO: hide progress
+			label_26->setVisible(false);
+			m_progressMaestro->setVisible(false);
+			m_btnCancelMaestro->setVisible(false);
+		}
+		break;
+		case ClassicGuitar:
+		{
+			qDebug() << "Classic download canceled";
+			//TODO: hide progress
+			label_27->setVisible(false);
+			m_progressClassic->setVisible(false);
+			m_btnCancelClassic->setVisible(false);
+		}
+		break;
+		case AcousticGuitar:
+		{
+			qDebug() << "Acoustic download canceled";
+			//TODO: hide progress
+			label_30->setVisible(false);
+			m_progressAcoustic->setVisible(false);
+			m_btnCancelAcoustic->setVisible(false);
+		}
+		break;
+		case M7IR44:
+		case M7IR48:
+		{
+			qDebug() << "M7 IR download canceled";
+			//TODO: hide progress
+			label_31->setVisible(false);
+			m_progressM7->setVisible(false);
+			m_btnCancelM7->setVisible(false);
+			m_chk44->blockSignals(false);
+			m_chk48->blockSignals(false);
+		}
+		break;
+		case ALL:
+		{
+			label_25->setVisible(false);
+			m_progressSonatina->setVisible(false);
+			m_btnCancelSonatina->setVisible(false);
+
+			label_26->setVisible(false);
+			m_progressMaestro->setVisible(false);
+			m_btnCancelMaestro->setVisible(false);
+
+			label_27->setVisible(false);
+			m_progressClassic->setVisible(false);
+			m_btnCancelClassic->setVisible(false);
+
+			label_30->setVisible(false);
+			m_progressAcoustic->setVisible(false);
+			m_btnCancelAcoustic->setVisible(false);
+
+			label_31->setVisible(false);
+			m_progressM7->setVisible(false);
+			m_btnCancelM7->setVisible(false);
+
+			m_progressBox->setVisible(false);
+		}
+		break;
+	}
+}/*}}}*/
 
 void OOStudio::downloadStarted(int type)
 {
@@ -2321,7 +2458,7 @@ void OOStudio::downloadStarted(int type)
 			//TODO: show progress
 			label_25->setVisible(true);
 			m_progressSonatina->setVisible(true);
-			//m_btnCancelSonatina->setVisible(true);
+			m_btnCancelSonatina->setVisible(true);
 			m_progressSonatina->setValue(0);
 		}
 		break;
@@ -2331,7 +2468,7 @@ void OOStudio::downloadStarted(int type)
 			//TODO: show progress
 			label_26->setVisible(true);
 			m_progressMaestro->setVisible(true);
-			//m_btnCancelMaestro->setVisible(true);
+			m_btnCancelMaestro->setVisible(true);
 			m_progressMaestro->setValue(0);
 		}
 		break;
@@ -2341,7 +2478,7 @@ void OOStudio::downloadStarted(int type)
 			//TODO: show progress
 			label_27->setVisible(true);
 			m_progressClassic->setVisible(true);
-			//m_btnCancelClassic->setVisible(true);
+			m_btnCancelClassic->setVisible(true);
 			m_progressClassic->setValue(0);
 		}
 		break;
@@ -2351,7 +2488,7 @@ void OOStudio::downloadStarted(int type)
 			//TODO: show progress
 			label_30->setVisible(true);
 			m_progressAcoustic->setVisible(true);
-			//m_btnCancelAcoustic->setVisible(true);
+			m_btnCancelAcoustic->setVisible(true);
 			m_progressAcoustic->setValue(0);
 		}
 		break;
@@ -2362,7 +2499,7 @@ void OOStudio::downloadStarted(int type)
 			//TODO: show progress
 			label_31->setVisible(true);
 			m_progressM7->setVisible(true);
-			//m_btnCancelM7->setVisible(true);
+			m_btnCancelM7->setVisible(true);
 			m_progressM7->setValue(0);
 
 		}
@@ -2375,7 +2512,7 @@ void OOStudio::downloadStarted(int type)
 void OOStudio::downloadsComplete()
 {
 	//TODO: hide all progress
-	//label_25->setVisible(false);/*{{{*/
+	//label_25->setVisible(false);
 	//m_progressSonatina->setVisible(false);
 	//m_btnCancelSonatina->setVisible(false);
 
@@ -2396,7 +2533,7 @@ void OOStudio::downloadsComplete()
 	//m_btnCancelM7->setVisible(false);
 
 	qDebug() << "OOStudio::downloadsComplete";
-	m_progressBox->setVisible(false);/*}}}*/
+	m_progressBox->setVisible(false);
 	updateInstalledState();
 }
 
@@ -2470,6 +2607,8 @@ void OOStudio::downloadError(int type, const QString& error)
 				tr("Download Failed"),
 				msg.arg("Samplicity M7 IR").arg(error)
 			);
+			m_chk44->blockSignals(false);
+			m_chk48->blockSignals(false);
 		}
 		break;
 		case ALL:
@@ -2482,8 +2621,14 @@ void OOStudio::trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal)
 	int max = bytesTotal;
 	int val = bytesReceived;
 	if(m_progressSonatina->maximum() < max)
+	{
 		m_progressSonatina->setMaximum(max);
-	m_progressSonatina->setValue(val);
+		m_progressSonatina->setValue(val);
+	}
+	else if(val >= max)
+		m_progressSonatina->setMaximum(0);
+	else
+		m_progressSonatina->setValue(val);
 }
 
 void OOStudio::trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal)
@@ -2491,8 +2636,14 @@ void OOStudio::trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal)
 	int max = bytesTotal;
 	int val = bytesReceived;
 	if(m_progressMaestro->maximum() < max)
+	{
 		m_progressMaestro->setMaximum(max);
-	m_progressMaestro->setValue(val);
+		m_progressMaestro->setValue(val);
+	}
+	else if(val >= max)
+		m_progressMaestro->setMaximum(0);
+	else
+		m_progressMaestro->setValue(val);
 }
 
 void OOStudio::trackClassicProgress(qint64 bytesReceived, qint64 bytesTotal)
@@ -2500,8 +2651,14 @@ void OOStudio::trackClassicProgress(qint64 bytesReceived, qint64 bytesTotal)
 	int max = bytesTotal;
 	int val = bytesReceived;
 	if(m_progressClassic->maximum() < max)
+	{
 		m_progressClassic->setMaximum(max);
-	m_progressClassic->setValue(val);
+		m_progressClassic->setValue(val);
+	}
+	else if(val >= max)
+		m_progressClassic->setMaximum(0);
+	else
+		m_progressClassic->setValue(val);
 }
 
 void OOStudio::trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal)
@@ -2509,8 +2666,14 @@ void OOStudio::trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal)
 	int max = bytesTotal;
 	int val = bytesReceived;
 	if(m_progressAcoustic->maximum() < max)
+	{
 		m_progressAcoustic->setMaximum(max);
-	m_progressAcoustic->setValue(val);
+		m_progressAcoustic->setValue(val);
+	}
+	else if(val >= max)
+		m_progressAcoustic->setMaximum(0);
+	else
+		m_progressAcoustic->setValue(val);
 }
 
 void OOStudio::trackM7Progress(qint64 bytesReceived, qint64 bytesTotal)
@@ -2518,7 +2681,13 @@ void OOStudio::trackM7Progress(qint64 bytesReceived, qint64 bytesTotal)
 	int max = bytesTotal;
 	int val = bytesReceived;
 	if(m_progressM7->maximum() < max)
+	{
 		m_progressM7->setMaximum(max);
-	m_progressM7->setValue(val);
+		m_progressM7->setValue(val);
+	}
+	else if(val >= max)
+		m_progressM7->setMaximum(0);
+	else
+		m_progressM7->setValue(val);
 }
 

@@ -26,6 +26,8 @@ file (GLOB templates_files
 	oomidi-template.lscp
 	oomidi-extended-template.oom
 	oomidi-extended-template.lscp
+	Classical_Guitar.sfz
+	AcousticGuitar.sfz
 	)
 
 configure_file (

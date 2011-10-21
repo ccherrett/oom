@@ -9,6 +9,9 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QThread>
+
+class DownloadPackage;
 
 enum ExtractFormat {
 	TGZ = 0,
@@ -21,27 +24,28 @@ struct ExtractJob  {
 	QString fileName;
 	QString basePath;
 	ExtractFormat format;
+	int type;
 };
 
-class OOExtract : public QObject
+class OOExtract : public QThread
 {
 private:
 	Q_OBJECT
 	QProcess* m_process;
+	ExtractJob* m_job;
+	void run();
 
 private slots:
-	void finished(int, QProcess::ExitStatus);
+	void finished(int);
 	void readError();
 	void readOutput();
 
-public slots:
-	bool startExtract(ExtractJob* job);
-
 signals:
 	void extractComplete(int);
+	void extractFailed(int, QString);
 
 public:
-	OOExtract();
+	OOExtract(ExtractJob* job);
 };
 
 #endif

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<oom version="1.0">
+  <MidiInstrument name="classical-guitar">
+    <PatchGroup name="classical-guitar">
+      <Patch name="classical-guitar" hbank="0" lbank="0" prog="0" />
+    </PatchGroup>
+    <Controller name="Program" type="Program" init="0x0" />
+  </MidiInstrument>
+</oom>

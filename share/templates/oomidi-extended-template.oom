@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <oom version="2.0">
   <configuration>
-    <nextTrackPartColor>3</nextTrackPartColor>
+    <nextTrackPartColor>4</nextTrackPartColor>
     <midiInputDevice>0</midiInputDevice>
     <midiInputChannel>0</midiInputChannel>
     <midiRecordType>0</midiRecordType>
@@ -19,14 +19,14 @@
     <bigtimeVisible>0</bigtimeVisible>
     <transportVisible>0</transportVisible>
     <markerVisible>0</markerVisible>
-    <geometryMain x="-2" y="-2" w="1680" h="1000"></geometryMain>
+    <geometryMain x="0" y="0" w="1680" h="1000"></geometryMain>
     <geometryTransport x="0" y="0" w="100" h="30"></geometryTransport>
     <mixer1Visible>0</mixer1Visible>
     <composer>
-      <arsplit>240 1186 </arsplit>
+      <arsplit>240 1105 </arsplit>
       <xpos>0</xpos>
       <xmag>266</xmag>
-      <ypos>0</ypos>
+      <ypos>2710</ypos>
       </composer>
     <sequencer>
       <metronom>
@@ -55,6 +55,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>81</val>
             </controller>
           <controller id="10">
             </controller>
@@ -159,6 +160,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>81</val>
             </controller>
           <controller id="10">
             </controller>
@@ -263,6 +265,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>80</val>
             </controller>
           <controller id="10">
             </controller>
@@ -367,6 +370,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>80</val>
             </controller>
           <controller id="10">
             </controller>
@@ -471,6 +475,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>80</val>
             </controller>
           <controller id="10">
             </controller>
@@ -575,6 +580,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>82</val>
             </controller>
           <controller id="10">
             </controller>
@@ -685,6 +691,7 @@
           </channel>
         <channel idx="1">
           <controller id="7">
+            <val>82</val>
             </controller>
           <controller id="10">
             </controller>
@@ -795,6 +802,7 @@
           </channel>
         <channel idx="2">
           <controller id="7">
+            <val>82</val>
             </controller>
           <controller id="10">
             </controller>
@@ -905,6 +913,7 @@
           </channel>
         <channel idx="3">
           <controller id="7">
+            <val>82</val>
             </controller>
           <controller id="10">
             </controller>
@@ -991,6 +1000,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>81</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1101,6 +1111,7 @@
           </channel>
         <channel idx="1">
           <controller id="7">
+            <val>81</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1211,6 +1222,7 @@
           </channel>
         <channel idx="2">
           <controller id="7">
+            <val>79</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1303,6 +1315,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>80</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1413,6 +1426,7 @@
           </channel>
         <channel idx="1">
           <controller id="7">
+            <val>83</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1523,6 +1537,7 @@
           </channel>
         <channel idx="2">
           <controller id="7">
+            <val>83</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1615,6 +1630,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>81</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1725,6 +1741,7 @@
           </channel>
         <channel idx="1">
           <controller id="7">
+            <val>80</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1835,6 +1852,7 @@
           </channel>
         <channel idx="2">
           <controller id="7">
+            <val>77</val>
             </controller>
           <controller id="10">
             </controller>
@@ -1927,6 +1945,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>81</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2037,6 +2056,7 @@
           </channel>
         <channel idx="1">
           <controller id="7">
+            <val>82</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2135,6 +2155,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>85</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2245,6 +2266,7 @@
           </channel>
         <channel idx="1">
           <controller id="7">
+            <val>86</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2343,6 +2365,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>82</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2453,6 +2476,7 @@
           </channel>
         <channel idx="1">
           <controller id="7">
+            <val>83</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2563,6 +2587,7 @@
           </channel>
         <channel idx="2">
           <controller id="7">
+            <val>83</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2655,6 +2680,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>83</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2752,13 +2778,15 @@
         <patchSequence id="0" name="  Brass - Tuba Sustain" checked="0" />
         </midiport>
       <midiport idx="26">
-        <instrument>percussion</instrument>
-        <name>percussion</name>
+        <defaultOutChans>1</defaultOutChans>
+        <instrument>percussion-tympani</instrument>
+        <name>perc-tympani</name>
         <cacheNRPN>0</cacheNRPN>
         <type>1</type>
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>83</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2854,14 +2882,6 @@
             </controller>
           </channel>
         <patchSequence id="0" name="  tympani" checked="0" />
-        <patchSequence id="1" name="  bassdrum-snare" checked="0" />
-        <patchSequence id="2" name="  cymbals-tamtam" checked="0" />
-        <patchSequence id="3" name="  triangle" checked="0" />
-        <patchSequence id="4" name="  chimes" checked="0" />
-        <patchSequence id="5" name="  conga" checked="0" />
-        <patchSequence id="6" name="  glockenspiel" checked="0" />
-        <patchSequence id="7" name="  xylophone" checked="0" />
-        <patchSequence id="8" name="  various" checked="0" />
         </midiport>
       <midiport idx="27">
         <instrument>harp</instrument>
@@ -2871,6 +2891,7 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>82</val>
             </controller>
           <controller id="10">
             </controller>
@@ -2975,8 +2996,10 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>82</val>
             </controller>
           <controller id="10">
+            <val>66</val>
             </controller>
           </channel>
         <channel idx="1">
@@ -3072,13 +3095,15 @@
         <patchSequence id="0" name="  Keys - Grand Piano" checked="0" />
         </midiport>
       <midiport idx="29">
-        <instrument>choirs</instrument>
+        <defaultOutChans>1</defaultOutChans>
+        <instrument>choirs-male</instrument>
         <name>choirs</name>
         <cacheNRPN>0</cacheNRPN>
         <type>1</type>
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>83</val>
             </controller>
           <controller id="10">
             </controller>
@@ -3173,9 +3198,7 @@
           <controller id="10">
             </controller>
           </channel>
-        <patchSequence id="0" name="  Chorus - Male:    Chorus - Male" checked="0" />
-        <patchSequence id="256" name="  Chorus - Female:    Chorus - Female" checked="0" />
-        <patchSequence id="512" name="  Chorus - Mixed:    Chorus - Mixed" checked="0" />
+        <patchSequence id="0" name="  choirs-male" checked="0" />
         </midiport>
       <midiport idx="30">
         <instrument>solostrings</instrument>
@@ -3185,12 +3208,14 @@
         <openFlags>1</openFlags>
         <channel idx="0">
           <controller id="7">
+            <val>86</val>
             </controller>
           <controller id="10">
             </controller>
           </channel>
         <channel idx="1">
           <controller id="7">
+            <val>85</val>
             </controller>
           <controller id="10">
             </controller>
@@ -3283,8 +3308,1068 @@
         <patchSequence id="0" name="  Strings - Violin Solo:    Strings - Violin Solo" checked="0" />
         </midiport>
       <midiport idx="31">
-        <instrument>Guitar</instrument>
-        <name>classic-guitar</name>
+        <defaultOutChans>2</defaultOutChans>
+        <instrument>percussion-bassdrum-snare</instrument>
+        <name>perc-bassdrum</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            <val>82</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  bassdrum-snare" checked="0" />
+        </midiport>
+      <midiport idx="32">
+        <defaultOutChans>4</defaultOutChans>
+        <instrument>percussion-cymbals-tamtam</instrument>
+        <name>perc-cymbals</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            <val>80</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  cymbals" checked="0" />
+        </midiport>
+      <midiport idx="33">
+        <defaultOutChans>8</defaultOutChans>
+        <instrument>percussion-triangle</instrument>
+        <name>perc-triangle</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            <val>83</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  triangle" checked="0" />
+        </midiport>
+      <midiport idx="34">
+        <defaultOutChans>16</defaultOutChans>
+        <instrument>percussion-chimes</instrument>
+        <name>perc-chimes</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            <val>83</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  chimes" checked="0" />
+        </midiport>
+      <midiport idx="35">
+        <defaultOutChans>32</defaultOutChans>
+        <instrument>percussion-conga</instrument>
+        <name>perc-conga</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            <val>83</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  conga" checked="0" />
+        </midiport>
+      <midiport idx="36">
+        <defaultOutChans>64</defaultOutChans>
+        <instrument>percussion-glockenspiel</instrument>
+        <name>perc-glockenspiel</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            <val>83</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  glockenspiel" checked="0" />
+        </midiport>
+      <midiport idx="37">
+        <defaultOutChans>128</defaultOutChans>
+        <instrument>percussion-xylophone</instrument>
+        <name>perc-xylophone</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            <val>83</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  xylophone" checked="0" />
+        </midiport>
+      <midiport idx="38">
+        <defaultOutChans>256</defaultOutChans>
+        <instrument>percussion-various</instrument>
+        <name>perc-various</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            <val>83</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  various" checked="0" />
+        </midiport>
+      <midiport idx="39">
+        <defaultOutChans>2</defaultOutChans>
+        <instrument>choirs-female</instrument>
+        <name>choirs-female</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            <val>85</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  choirs-female" checked="0" />
+        </midiport>
+      <midiport idx="40">
+        <defaultOutChans>4</defaultOutChans>
+        <instrument>choirs-mixed</instrument>
+        <name>choirs-mixed</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            <val>85</val>
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  choirs-mixed" checked="0" />
+        </midiport>
+      <midiport idx="41">
+        <instrument>acoustic-guitar</instrument>
+        <name>acoustic-guitar</name>
         <cacheNRPN>0</cacheNRPN>
         <type>1</type>
         <openFlags>1</openFlags>
@@ -3384,11 +4469,115 @@
           <controller id="10">
             </controller>
           </channel>
-        <patchSequence id="2" name="  Classical_Guitar:    Classical_Guitar" checked="0" />
+        <patchSequence id="0" name="  acoustic-guitar" checked="0" />
         </midiport>
-      <midiport idx="32">
+      <midiport idx="42">
+        <instrument>classical-guitar</instrument>
+        <name>classical-guitar</name>
+        <cacheNRPN>0</cacheNRPN>
+        <type>1</type>
+        <openFlags>1</openFlags>
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <patchSequence id="0" name="  classical-guitar" checked="0" />
+        </midiport>
+      <midiport idx="43">
         <instrument>Piano</instrument>
-        <name>maestro-grand</name>
+        <name>maestro-piano</name>
         <cacheNRPN>0</cacheNRPN>
         <type>1</type>
         <openFlags>1</openFlags>
@@ -3490,6 +4679,104 @@
           </channel>
         <patchSequence id="0" name="  Maestro Concert Grand" checked="0" />
         </midiport>
+      <midiport idx="44">
+        <channel idx="0">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="1">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="2">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="3">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="4">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="5">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="6">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="7">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="8">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="9">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="10">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="11">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="12">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="13">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="14">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        <channel idx="15">
+          <controller id="7">
+            </controller>
+          <controller id="10">
+            </controller>
+          </channel>
+        </midiport>
       </sequencer>
     <performer>
       <quant>96</quant>
@@ -3528,7 +4815,7 @@
     <follow>1</follow>
     <miditrack>
       <name>1st-violins</name>
-      <record>1</record>
+      <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
       <off>0</off>
@@ -4255,7 +5542,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>tympani</name>
+      <name>perc-tympani</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4283,7 +5570,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>bassdrum-snare</name>
+      <name>perc-bassdrum-snare</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4298,7 +5585,7 @@
       <mixertab>0</mixertab>
       <partcolor>31</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>26</device>
+      <device>31</device>
       <channel>1</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4311,7 +5598,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>cymbals-tamtam</name>
+      <name>perc-cymbals-tamtam</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4326,7 +5613,7 @@
       <mixertab>0</mixertab>
       <partcolor>32</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>26</device>
+      <device>32</device>
       <channel>2</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4339,7 +5626,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>triangle</name>
+      <name>perc-triangle</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4354,7 +5641,7 @@
       <mixertab>0</mixertab>
       <partcolor>33</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>26</device>
+      <device>33</device>
       <channel>3</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4367,7 +5654,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>chimes</name>
+      <name>perc-chimes</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4382,7 +5669,7 @@
       <mixertab>0</mixertab>
       <partcolor>34</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>26</device>
+      <device>34</device>
       <channel>4</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4395,7 +5682,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>conga</name>
+      <name>perc-conga</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4410,7 +5697,7 @@
       <mixertab>0</mixertab>
       <partcolor>35</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>26</device>
+      <device>35</device>
       <channel>5</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4423,7 +5710,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>glockenspiel</name>
+      <name>perc-glockenspiel</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4438,7 +5725,7 @@
       <mixertab>0</mixertab>
       <partcolor>36</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>26</device>
+      <device>36</device>
       <channel>6</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4451,7 +5738,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>xylophone</name>
+      <name>perc-xylophone</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4466,7 +5753,7 @@
       <mixertab>0</mixertab>
       <partcolor>37</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>26</device>
+      <device>37</device>
       <channel>7</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4479,7 +5766,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>various</name>
+      <name>perc-various</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4494,7 +5781,7 @@
       <mixertab>0</mixertab>
       <partcolor>38</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>26</device>
+      <device>38</device>
       <channel>8</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4606,7 +5893,7 @@
       <mixertab>0</mixertab>
       <partcolor>43</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>29</device>
+      <device>39</device>
       <channel>1</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4634,7 +5921,7 @@
       <mixertab>0</mixertab>
       <partcolor>44</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>29</device>
+      <device>40</device>
       <channel>2</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4703,7 +5990,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>classical-guitar</name>
+      <name>acoustic-guitar</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4717,9 +6004,8 @@
       <collapsed>1</collapsed>
       <mixertab>0</mixertab>
       <partcolor>1</partcolor>
-      <selected>1</selected>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>31</device>
+      <device>41</device>
       <channel>0</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4732,7 +6018,7 @@
       <automation>1</automation>
       </miditrack>
     <miditrack>
-      <name>maestro-grand</name>
+      <name>classical-guitar</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -4747,7 +6033,36 @@
       <mixertab>0</mixertab>
       <partcolor>2</partcolor>
       <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
-      <device>32</device>
+      <device>42</device>
+      <channel>0</channel>
+      <locked>0</locked>
+      <echo>1</echo>
+      <transposition>0</transposition>
+      <transpose>0</transpose>
+      <velocity>0</velocity>
+      <delay>0</delay>
+      <len>100</len>
+      <compression>100</compression>
+      <automation>1</automation>
+      </miditrack>
+    <miditrack>
+      <name>maestro-piano</name>
+      <record>1</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>0</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>3</partcolor>
+      <selected>1</selected>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
+      <device>43</device>
       <channel>0</channel>
       <locked>0</locked>
       <echo>1</echo>
@@ -4778,8 +6093,8 @@
       <prefader>0</prefader>
       <sendMetronome>1</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <controller id="0" cur="0.420485" color="#ff5a00" visible="0">
+        0 0.420485,         
         </controller>
       <controller id="1" cur="0" color="#00db05" visible="0">
         0 0,         
@@ -4807,11 +6122,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.3" color="#00db05" visible="0">
+        0 -0.3,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -4836,11 +6152,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.04" color="#00db05" visible="0">
+        0 -0.04,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -4865,6 +6182,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -4894,11 +6212,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.12" color="#00db05" visible="0">
+        0 0.12,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -4923,6 +6242,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -4952,11 +6272,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.12" color="#00db05" visible="0">
+        0 -0.12,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -4981,11 +6302,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.04" color="#00db05" visible="0">
+        0 -0.04,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5010,11 +6332,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.02" color="#00db05" visible="0">
+        0 -0.02,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5039,11 +6362,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.2" color="#00db05" visible="0">
+        0 0.2,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5068,11 +6392,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.18" color="#00db05" visible="0">
+        0 -0.18,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5097,11 +6422,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.08" color="#00db05" visible="0">
+        0 0.08,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5126,11 +6452,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.14" color="#00db05" visible="0">
+        0 0.14,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5155,23 +6482,24 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.14" color="#00db05" visible="0">
+        0 0.14,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
         </controller>
       </AudioInput>
     <AudioInput>
-      <name>ls-percussion</name>
+      <name>ls-tympani</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
       <off>0</off>
-      <channels>2</channels>
+      <channels>1</channels>
       <height>78</height>
       <locked>0</locked>
       <reminder1>0</reminder1>
@@ -5184,6 +6512,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -5213,11 +6542,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.12" color="#00db05" visible="0">
+        0 -0.12,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5242,6 +6572,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -5253,7 +6584,7 @@
         </controller>
       </AudioInput>
     <AudioInput>
-      <name>ls-choirs</name>
+      <name>ls-choirs-male</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -5271,11 +6602,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="0.580698" color="#ff5a00" visible="0">
+        0 0.580698,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.25" color="#00db05" visible="0">
+        0 -0.25,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5300,6 +6632,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -5329,11 +6662,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0263051</auxSend>
+      <controller id="0" cur="0.580698" color="#ff5a00" visible="0">
+        0 0.580698,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.1" color="#00db05" visible="0">
+        0 -0.1,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5358,11 +6692,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0317797</auxSend>
+      <controller id="0" cur="0.580698" color="#ff5a00" visible="0">
+        0 0.580698,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.05" color="#00db05" visible="0">
+        0 -0.05,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5387,8 +6722,9 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0293157</auxSend>
+      <controller id="0" cur="0.682417" color="#ff5a00" visible="0">
+        0 0.682417,         
         </controller>
       <controller id="1" cur="0" color="#00db05" visible="0">
         0 0,         
@@ -5416,11 +6752,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0317797</auxSend>
+      <controller id="0" cur="0.739776" color="#ff5a00" visible="0">
+        0 0.739776,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.2" color="#00db05" visible="0">
+        0 0.2,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5445,8 +6782,9 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0195817</auxSend>
+      <controller id="0" cur="0.682417" color="#ff5a00" visible="0">
+        0 0.682417,         
         </controller>
       <controller id="1" cur="0" color="#00db05" visible="0">
         0 0,         
@@ -5474,11 +6812,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0601551</auxSend>
+      <controller id="0" cur="0.801955" color="#ff5a00" visible="0">
+        0 0.801955,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.15" color="#00db05" visible="0">
+        0 -0.15,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5503,11 +6842,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0641994</auxSend>
+      <controller id="0" cur="0.801955" color="#ff5a00" visible="0">
+        0 0.801955,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.1" color="#00db05" visible="0">
+        0 -0.1,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5532,11 +6872,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0559114</auxSend>
+      <controller id="0" cur="0.739776" color="#ff5a00" visible="0">
+        0 0.739776,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.05" color="#00db05" visible="0">
+        0 0.05,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5561,11 +6902,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0712279</auxSend>
+      <controller id="0" cur="0.739776" color="#ff5a00" visible="0">
+        0 0.739776,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.15" color="#00db05" visible="0">
+        0 0.15,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5590,11 +6932,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.123814</auxSend>
+      <controller id="0" cur="0.629506" color="#ff5a00" visible="0">
+        0 0.629506,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="-0.25" color="#00db05" visible="0">
+        0 -0.25,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5619,8 +6962,9 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.189698</auxSend>
+      <controller id="0" cur="0.682417" color="#ff5a00" visible="0">
+        0 0.682417,         
         </controller>
       <controller id="1" cur="0" color="#00db05" visible="0">
         0 0,         
@@ -5648,11 +6992,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.184226</auxSend>
+      <controller id="0" cur="0.682417" color="#ff5a00" visible="0">
+        0 0.682417,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.2" color="#00db05" visible="0">
+        0 0.2,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5677,11 +7022,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.206757</auxSend>
+      <controller id="0" cur="0.682417" color="#ff5a00" visible="0">
+        0 0.682417,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.35" color="#00db05" visible="0">
+        0 0.35,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5706,11 +7052,12 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0515763</auxSend>
+      <controller id="0" cur="0.682417" color="#ff5a00" visible="0">
+        0 0.682417,         
         </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        0 0,         
+      <controller id="1" cur="0.01" color="#00db05" visible="0">
+        0 0.01,         
         </controller>
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
@@ -5735,8 +7082,9 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0745522</auxSend>
+      <controller id="0" cur="0.420485" color="#ff5a00" visible="0">
+        0 0.420485,         
         </controller>
       <controller id="1" cur="0" color="#00db05" visible="0">
         0 0,         
@@ -5764,8 +7112,9 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.0844025</auxSend>
+      <controller id="0" cur="0.801955" color="#ff5a00" visible="0">
+        0 0.801955,         
         </controller>
       <controller id="1" cur="0" color="#00db05" visible="0">
         0 0,         
@@ -5793,8 +7142,9 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
+      <auxSend idx="0" pre="1">0.200005</auxSend>
+      <controller id="0" cur="0.801955" color="#ff5a00" visible="0">
+        0 0.801955,         
         </controller>
       <controller id="1" cur="0" color="#00db05" visible="0">
         0 0,         
@@ -5822,6 +7172,55 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0.130023</auxSend>
+      <controller id="0" cur="0.629506" color="#ff5a00" visible="0">
+        0 0.629506,         
+        </controller>
+      <controller id="1" cur="0" color="#00db05" visible="0">
+        0 0,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioBuss>
+    <AudioAux>
+      <name>Aux-reverb</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>2</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <lv2plugin uri="http://factorial.hu/plugins/lv2/ir" label="Reverb" channel="2">
+        <control name="Reverse IR" val="0.000000" />
+        <control name="Predelay" val="0.000000" />
+        <control name="Attack" val="100.000000" />
+        <control name="Attack time" val="0.000000" />
+        <control name="Envelope" val="100.000000" />
+        <control name="Length" val="100.000000" />
+        <control name="Stretch" val="100.000000" />
+        <control name="Stereo width in" val="100.000000" />
+        <control name="Stereo width IR" val="100.000000" />
+        <control name="Autogain" val="1.000000" />
+        <control name="Dry" val="1.000000" />
+        <control name="Dry gain" val="0.000000" />
+        <control name="Wet" val="1.000000" />
+        <control name="Wet gain" val="-10.000000" />
+        <control name="FileHash0" val="29023.000000" />
+        <control name="FileHash1" val="9568598.000000" />
+        <control name="FileHash2" val="11453226.000000" />
+        </lv2plugin>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -5831,7 +7230,386 @@
       <controller id="2" cur="0" color="#db0000" visible="0">
         0 0,         
         </controller>
-      </AudioBuss>
+      <controller id="4096" cur="0" color="#ff00fc" visible="0">
+        0 0,         
+        </controller>
+      <controller id="4097" cur="0" color="#ff0000" visible="0">
+        0 0,         
+        </controller>
+      <controller id="4098" cur="100" color="#ffd200" visible="0">
+        0 100,         
+        </controller>
+      <controller id="4099" cur="0" color="#0006ff" visible="0">
+        0 0,         
+        </controller>
+      <controller id="4100" cur="100" color="#00ff00" visible="0">
+        0 100,         
+        </controller>
+      <controller id="4101" cur="100" color="#7eff00" visible="0">
+        0 100,         
+        </controller>
+      <controller id="4102" cur="100" color="#ffae00" visible="0">
+        0 100,         
+        </controller>
+      <controller id="4103" cur="100" color="#00ff8a" visible="0">
+        0 100,         
+        </controller>
+      <controller id="4104" cur="100" color="#ff5a00" visible="0">
+        0 100,         
+        </controller>
+      <controller id="4105" cur="1" color="#00db05" visible="0">
+        0 1,         
+        </controller>
+      <controller id="4106" cur="1" color="#db0000" visible="0">
+        0 1,         
+        </controller>
+      <controller id="4107" cur="0" color="#00dbd8" visible="0">
+        0 0,         
+        </controller>
+      <controller id="4108" cur="1" color="#dbd300" visible="0">
+        0 1,         
+        </controller>
+      <controller id="4109" cur="-10" color="#000fdb" visible="0">
+        0 -10,         
+        </controller>
+      <controller id="4110" cur="29023" color="#00db5d" visible="0">
+        0 29023,         
+        </controller>
+      <controller id="4111" cur="9.5686e+06" color="#db5d00" visible="0">
+        0 9.5686e+06,         
+        </controller>
+      <controller id="4112" cur="1.14532e+07" color="#00db48" visible="0">
+        0 1.14532e+07,         
+        </controller>
+      </AudioAux>
+    <AudioInput>
+      <name>ls-bassdrum-snare</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="-0.22" color="#00db05" visible="0">
+        0 -0.22,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-cymbals-tamtam</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="-0.16" color="#00db05" visible="0">
+        0 -0.16,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-triangle</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="0.08" color="#00db05" visible="0">
+        0 0.08,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-chimes</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="0.16" color="#00db05" visible="0">
+        0 0.16,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-conga</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="0.16" color="#00db05" visible="0">
+        0 0.16,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-glockenspiel</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="-0.1" color="#00db05" visible="0">
+        0 -0.1,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-xylophone</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="0.1" color="#00db05" visible="0">
+        0 0.1,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-percussion-various</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="-0.28" color="#00db05" visible="0">
+        0 -0.28,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-choirs-female</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>2</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="0.629506" color="#ff5a00" visible="0">
+        0 0.629506,         
+        </controller>
+      <controller id="1" cur="0.2" color="#00db05" visible="0">
+        0 0.2,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-choirs-mixed</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>2</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="0.629506" color="#ff5a00" visible="0">
+        0 0.629506,         
+        </controller>
+      <controller id="1" cur="0" color="#00db05" visible="0">
+        0 0,         
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        0 0,         
+        </controller>
+      </AudioInput>
+    <AudioInput>
+      <name>ls-acoustic-guitar</name>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>1</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+        </controller>
+      <controller id="1" cur="0" color="#00db05" visible="0">
+        </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+        </controller>
+      </AudioInput>
     <AudioInput>
       <name>ls-classical-guitar</name>
       <record>0</record>
@@ -5851,6 +7629,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -5860,7 +7639,7 @@
         </controller>
       </AudioInput>
     <AudioInput>
-      <name>ls-maestro-grand</name>
+      <name>ls-maestro-piano</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -5878,6 +7657,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -5887,7 +7667,7 @@
         </controller>
       </AudioInput>
     <AudioBuss>
-      <name>Buss-classical-guitar</name>
+      <name>Buss-guitars</name>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -5905,33 +7685,7 @@
       <prefader>0</prefader>
       <sendMetronome>0</sendMetronome>
       <automation>0</automation>
-      <controller id="0" cur="1" color="#ff5a00" visible="0">
-        0 1,         
-        </controller>
-      <controller id="1" cur="0" color="#00db05" visible="0">
-        </controller>
-      <controller id="2" cur="0" color="#db0000" visible="0">
-        </controller>
-      </AudioBuss>
-    <AudioBuss>
-      <name>Buss-maestro-grand</name>
-      <record>0</record>
-      <mute>0</mute>
-      <solo>0</solo>
-      <off>0</off>
-      <channels>2</channels>
-      <height>78</height>
-      <locked>0</locked>
-      <reminder1>0</reminder1>
-      <reminder2>0</reminder2>
-      <reminder3>0</reminder3>
-      <collapsed>1</collapsed>
-      <mixertab>0</mixertab>
-      <partcolor>1</partcolor>
-      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:262150:-1:0:0 0:0:10:-1:0:0 0:0:262151:-1:0:0 " />
-      <prefader>0</prefader>
-      <sendMetronome>0</sendMetronome>
-      <automation>0</automation>
+      <auxSend idx="0" pre="1">0</auxSend>
       <controller id="0" cur="1" color="#ff5a00" visible="0">
         0 1,         
         </controller>
@@ -5949,6 +7703,7 @@
       <vtrack>violas</vtrack>
       <vtrack>cellos</vtrack>
       <vtrack>basses</vtrack>
+      <vtrack>solo-violin</vtrack>
       <vtrack>solo-cello</vtrack>
       <tracksettings>
       <trackname>1st-violins</trackname>
@@ -5982,14 +7737,14 @@
       <trackname>solo-cello</trackname>
       <pname>Select Patch</pname>
       <program>0</program>
-      <rec>0</rec>
+      <rec>1</rec>
       <transpose>0</transpose>
       </tracksettings>
       <tracksettings>
       <trackname>solo-violin</trackname>
       <pname>Select Patch</pname>
       <program>0</program>
-      <rec>1</rec>
+      <rec>0</rec>
       <transpose>0</transpose>
       </tracksettings>
       <tracksettings>
@@ -6174,54 +7929,82 @@
       <name>percussion</name>
       <selected>0</selected>
       <record>0</record>
-      <vtrack>tympani</vtrack>
-      <vtrack>bassdrum-snare</vtrack>
-      <vtrack>cymbals-tamtam</vtrack>
-      <vtrack>triangle</vtrack>
-      <vtrack>chimes</vtrack>
-      <vtrack>conga</vtrack>
-      <vtrack>glockenspiel</vtrack>
-      <vtrack>xylophone</vtrack>
-      <vtrack>various</vtrack>
+      <vtrack>perc-tympani</vtrack>
+      <vtrack>perc-bassdrum-snare</vtrack>
+      <vtrack>perc-cymbals-tamtam</vtrack>
+      <vtrack>perc-triangle</vtrack>
+      <vtrack>perc-chimes</vtrack>
+      <vtrack>perc-conga</vtrack>
+      <vtrack>perc-glockenspiel</vtrack>
+      <vtrack>perc-xylophone</vtrack>
+      <vtrack>perc-various</vtrack>
       <vtrack>harp</vtrack>
       <vtrack>piano</vtrack>
       <tracksettings>
-      <trackname>bassdrum-snare</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
-      <trackname>chimes</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
-      <trackname>conga</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
-      <trackname>cymbals-tamtam</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
-      <trackname>glockenspiel</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
       <trackname>harp</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>1</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-bassdrum-snare</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-chimes</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-conga</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-cymbals-tamtam</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-glockenspiel</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-triangle</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-tympani</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-various</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>perc-xylophone</trackname>
       <pname>Select Patch</pname>
       <program>0</program>
       <rec>1</rec>
@@ -6232,34 +8015,6 @@
       <pname>Select Patch</pname>
       <program>0</program>
       <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
-      <trackname>triangle</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
-      <trackname>tympani</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
-      <trackname>various</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>0</rec>
-      <transpose>0</transpose>
-      </tracksettings>
-      <tracksettings>
-      <trackname>xylophone</trackname>
-      <pname>Select Patch</pname>
-      <program>0</program>
-      <rec>1</rec>
       <transpose>0</transpose>
       </tracksettings>
       </trackview>
@@ -6298,7 +8053,7 @@
       <record>1</record>
       <comment>This is an Epic strings example view. The 1st Violins are transposed up 1 octave during recording, and the Basses are transposed down 1 octave during recording.
 
-When recording has stopped, the Epic transpose feature is disabled so the tracks don&amp;amp;amp;amp;amp;apos;t treanspose again, during normal playback.</comment>
+When recording has stopped, the Epic transpose feature is disabled so the tracks don&amp;amp;amp;amp;amp;amp;amp;amp;amp;apos;t treanspose again, during normal playback.</comment>
       <vtrack>1st-violins</vtrack>
       <vtrack>2nd-violins</vtrack>
       <vtrack>violas</vtrack>
@@ -6341,10 +8096,55 @@ When recording has stopped, the Epic transpose feature is disabled so the tracks
       </tracksettings>
       </trackview>
     <trackview>
+      <name>Epic Strings Marcatos</name>
+      <selected>0</selected>
+      <record>1</record>
+      <vtrack>1st-violins</vtrack>
+      <vtrack>2nd-violins</vtrack>
+      <vtrack>violas</vtrack>
+      <vtrack>cellos</vtrack>
+      <vtrack>basses</vtrack>
+      <tracksettings>
+      <trackname>1st-violins</trackname>
+      <pname>Strings - 1st Violins Staccato</pname>
+      <program>1</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>2nd-violins</trackname>
+      <pname>Strings - 2nd Violins Staccato</pname>
+      <program>1</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>basses</trackname>
+      <pname>Strings - Basses Staccato</pname>
+      <program>1</program>
+      <rec>0</rec>
+      <transpose>-12</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>cellos</trackname>
+      <pname>Strings - Celli Staccato</pname>
+      <program>1</program>
+      <rec>1</rec>
+      <transpose>-12</transpose>
+      </tracksettings>
+      <tracksettings>
+      <trackname>violas</trackname>
+      <pname>Select Patch</pname>
+      <program>0</program>
+      <rec>0</rec>
+      <transpose>0</transpose>
+      </tracksettings>
+      </trackview>
+    <trackview>
       <name>Epic brass</name>
       <selected>0</selected>
       <record>1</record>
-      <comment>This is an Epic Brass example view. As an example for the transpose feature, we&amp;amp;amp;amp;amp;apos;ve put the trumpets up 1 octave.</comment>
+      <comment>This is an Epic Brass example view. As an example for the transpose feature, we&amp;amp;amp;amp;amp;amp;amp;amp;amp;apos;ve put the trumpets up 1 octave.</comment>
       <vtrack>horns</vtrack>
       <vtrack>trumpets</vtrack>
       <vtrack>trombones</vtrack>
@@ -6404,7 +8204,7 @@ When recording has stopped, the Epic transpose feature is disabled so the tracks
       <name>Epic everything!</name>
       <selected>0</selected>
       <record>1</record>
-      <comment>This Epic example view incoporates the Strings, Brass sections, and Choirs for that.....&amp;amp;amp;amp;amp;quot;awesome&amp;amp;amp;amp;amp;quot; sound.
+      <comment>This Epic example view incoporates the Strings, Brass sections, and Choirs for that.....&amp;amp;amp;amp;amp;amp;amp;amp;amp;quot;awesome&amp;amp;amp;amp;amp;amp;amp;amp;amp;quot; sound.
 
 
 Yes, we do have a sense of humour...</comment>
@@ -6610,15 +8410,11 @@ Yes, we do have a sense of humour...</comment>
       <dest name="Buss-tuba"/>
       </Route>
     <Route channel="0">
-      <source type="1" name="LinuxSampler:13-percussion-audio-left"/>
-      <dest name="ls-percussion"/>
-      </Route>
-    <Route channel="1">
-      <source type="1" name="LinuxSampler:14-percussion-audio-right"/>
-      <dest name="ls-percussion"/>
+      <source type="1" name="LinuxSampler:13-percussion-audio-tympani"/>
+      <dest name="ls-tympani"/>
       </Route>
     <Route channel="0" channels="2">
-      <source name="ls-percussion"/>
+      <source name="ls-tympani"/>
       <dest name="Buss-percussion"/>
       </Route>
     <Route channel="0">
@@ -6638,15 +8434,15 @@ Yes, we do have a sense of humour...</comment>
       <dest name="Buss-piano"/>
       </Route>
     <Route channel="0">
-      <source type="1" name="LinuxSampler:17-choirs-audio-left"/>
-      <dest name="ls-choirs"/>
+      <source type="1" name="LinuxSampler:17-choirs-audio-male-left"/>
+      <dest name="ls-choirs-male"/>
       </Route>
     <Route channel="1">
-      <source type="1" name="LinuxSampler:18-choirs-audio-right"/>
-      <dest name="ls-choirs"/>
+      <source type="1" name="LinuxSampler:18-choirs-audio-male-right"/>
+      <dest name="ls-choirs-male"/>
       </Route>
     <Route channel="0" channels="2">
-      <source name="ls-choirs"/>
+      <source name="ls-choirs-male"/>
       <dest name="Buss-choirs"/>
       </Route>
     <Route channel="0">
@@ -6729,32 +8525,128 @@ Yes, we do have a sense of humour...</comment>
       <source name="Buss-solo-strings"/>
       <dest name="Master"/>
       </Route>
-    <Route channel="0">
-      <source type="1" name="LinuxSampler:20-classic-guitar"/>
-      <dest name="ls-classical-guitar"/>
-      </Route>
-    <Route channel="0" channels="2">
-      <source name="ls-classical-guitar"/>
-      <dest name="Buss-classical-guitar"/>
-      </Route>
-    <Route channel="0">
-      <source type="1" name="LinuxSampler:21-maestro-piano-left"/>
-      <dest name="ls-maestro-grand"/>
-      </Route>
-    <Route channel="1">
-      <source type="1" name="LinuxSampler:22-maestro-piano-right"/>
-      <dest name="ls-maestro-grand"/>
-      </Route>
-    <Route channel="0" channels="2">
-      <source name="ls-maestro-grand"/>
-      <dest name="Buss-maestro-grand"/>
-      </Route>
     <Route>
-      <source name="Buss-classical-guitar"/>
+      <source name="Aux-reverb"/>
       <dest name="Master"/>
       </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:14-percussion-audio-bassdrum-snare"/>
+      <dest name="ls-bassdrum-snare"/>
+      </Route>
+    <Route channel="0" channels="2">
+      <source name="ls-bassdrum-snare"/>
+      <dest name="Buss-percussion"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:20-percussion-audio-cymbals-tamtam"/>
+      <dest name="ls-cymbals-tamtam"/>
+      </Route>
+    <Route channel="0" channels="2">
+      <source name="ls-cymbals-tamtam"/>
+      <dest name="Buss-percussion"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:21-percussion-audio-triangle"/>
+      <dest name="ls-triangle"/>
+      </Route>
+    <Route channel="0" channels="2">
+      <source name="ls-triangle"/>
+      <dest name="Buss-percussion"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:22-percussion-audio-chimes"/>
+      <dest name="ls-chimes"/>
+      </Route>
+    <Route channel="0" channels="2">
+      <source name="ls-chimes"/>
+      <dest name="Buss-percussion"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:23-percussion-audio-conga"/>
+      <dest name="ls-conga"/>
+      </Route>
+    <Route channel="0" channels="2">
+      <source name="ls-conga"/>
+      <dest name="Buss-percussion"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:24-percussion-audio-glockenspiel"/>
+      <dest name="ls-glockenspiel"/>
+      </Route>
+    <Route channel="0" channels="2">
+      <source name="ls-glockenspiel"/>
+      <dest name="Buss-percussion"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:25-percussion-audio-xylophone"/>
+      <dest name="ls-xylophone"/>
+      </Route>
+    <Route channel="0" channels="2">
+      <source name="ls-xylophone"/>
+      <dest name="Buss-percussion"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:26-percussion-audio-various"/>
+      <dest name="ls-percussion-various"/>
+      </Route>
+    <Route channel="0" channels="2">
+      <source name="ls-percussion-various"/>
+      <dest name="Buss-percussion"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:27-choirs-audio-female-left"/>
+      <dest name="ls-choirs-female"/>
+      </Route>
+    <Route channel="1">
+      <source type="1" name="LinuxSampler:28-choirs-audio-female-right"/>
+      <dest name="ls-choirs-female"/>
+      </Route>
     <Route>
-      <source name="Buss-maestro-grand"/>
+      <source name="ls-choirs-female"/>
+      <dest name="Buss-choirs"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:29-choirs-audio-mixed-left"/>
+      <dest name="ls-choirs-mixed"/>
+      </Route>
+    <Route channel="1">
+      <source type="1" name="LinuxSampler:30-choirs-audio-mixed-right"/>
+      <dest name="ls-choirs-mixed"/>
+      </Route>
+    <Route>
+      <source name="ls-choirs-mixed"/>
+      <dest name="Buss-choirs"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:31-acoustic-guitar-audio"/>
+      <dest name="ls-acoustic-guitar"/>
+      </Route>
+    <Route>
+      <source name="ls-acoustic-guitar"/>
+      <dest name="Buss-guitars"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:32-classical-guitar-audio"/>
+      <dest name="ls-classical-guitar"/>
+      </Route>
+    <Route>
+      <source name="ls-classical-guitar"/>
+      <dest name="Buss-guitars"/>
+      </Route>
+    <Route channel="0">
+      <source type="1" name="LinuxSampler:33-maestro-piano-audio-left"/>
+      <dest name="ls-maestro-piano"/>
+      </Route>
+    <Route channel="1">
+      <source type="1" name="LinuxSampler:34-maestro-piano-audio-right"/>
+      <dest name="ls-maestro-piano"/>
+      </Route>
+    <Route>
+      <source name="ls-maestro-piano"/>
+      <dest name="Buss-piano"/>
+      </Route>
+    <Route>
+      <source name="Buss-guitars"/>
       <dest name="Master"/>
       </Route>
     <Route>
@@ -6862,7 +8754,7 @@ Yes, we do have a sense of humour...</comment>
       <dest type="1" name="LinuxSampler:12-tuba"/>
       </Route>
     <Route>
-      <source devtype="1" name="percussion"/>
+      <source devtype="1" name="perc-tympani"/>
       <dest type="1" name="LinuxSampler:13-percussion"/>
       </Route>
     <Route>
@@ -6882,12 +8774,392 @@ Yes, we do have a sense of humour...</comment>
       <dest type="1" name="LinuxSampler:17-solostrings"/>
       </Route>
     <Route>
-      <source devtype="1" name="classic-guitar"/>
-      <dest type="1" name="LinuxSampler:18-classic-guitar"/>
+      <source devtype="1" name="perc-bassdrum"/>
+      <dest type="1" name="LinuxSampler:13-percussion"/>
       </Route>
     <Route>
-      <source devtype="1" name="maestro-grand"/>
-      <dest type="1" name="LinuxSampler:19-maestro-piano"/>
+      <source devtype="1" name="perc-cymbals"/>
+      <dest type="1" name="LinuxSampler:13-percussion"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="perc-triangle"/>
+      <dest type="1" name="LinuxSampler:13-percussion"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="perc-chimes"/>
+      <dest type="1" name="LinuxSampler:13-percussion"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="perc-conga"/>
+      <dest type="1" name="LinuxSampler:13-percussion"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="perc-glockenspiel"/>
+      <dest type="1" name="LinuxSampler:13-percussion"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="perc-xylophone"/>
+      <dest type="1" name="LinuxSampler:13-percussion"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="perc-various"/>
+      <dest type="1" name="LinuxSampler:13-percussion"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="choirs-female"/>
+      <dest type="1" name="LinuxSampler:16-choirs"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="choirs-mixed"/>
+      <dest type="1" name="LinuxSampler:16-choirs"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="acoustic-guitar"/>
+      <dest type="1" name="LinuxSampler:18-acoustic-guitar"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="classical-guitar"/>
+      <dest type="1" name="LinuxSampler:19-classical-guitar"/>
+      </Route>
+    <Route>
+      <source devtype="1" name="maestro-piano"/>
+      <dest type="1" name="LinuxSampler:20-maestro-piano"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="1st-violins"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="2nd-violins"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="violas"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="cellos"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="basses"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="piccolo"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="flute"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="flutes"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="alto-flute"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="oboe"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="oboes"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="coranglais"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="clarinet"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="clarinets"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="bass-clarinet"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="bassoon"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="bassoons"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="contrabassoon"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="horn"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="horns"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="trumpet"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="trumpets"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="trombone"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="trombones"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="bass-trombone"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="tuba"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-tympani"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-bassdrum-snare"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-cymbals-tamtam"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-triangle"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-chimes"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-conga"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-glockenspiel"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-xylophone"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="perc-various"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="harp"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="piano"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="choirs-male"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="choirs-female"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="choirs-mixed"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="solo-cello"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="31"/>
+      <dest name="solo-violin"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="1st-violins"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="2nd-violins"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="violas"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="cellos"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="basses"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="piccolo"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="flute"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="flutes"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="alto-flute"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="oboe"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="oboes"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="coranglais"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="clarinet"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="clarinets"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="bass-clarinet"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="bassoon"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="bassoons"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="contrabassoon"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="horn"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="horns"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="trumpet"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="trumpets"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="trombone"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="trombones"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="bass-trombone"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="tuba"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-tympani"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-bassdrum-snare"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-cymbals-tamtam"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-triangle"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-chimes"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-conga"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-glockenspiel"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-xylophone"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="perc-various"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="harp"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="piano"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="choirs-male"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="choirs-female"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="choirs-mixed"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="solo-cello"/>
+      </Route>
+    <Route channelMask="1">
+      <source mport="39"/>
+      <dest name="solo-violin"/>
       </Route>
     <tempolist fix="500000">
       <tempo at="21474837">

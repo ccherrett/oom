@@ -129,10 +129,17 @@ private slots:
 	void downloadAll();
 	void download(int);
 	void downloadEnded(int);
+	void downloadCanceled(int);
 	void downloadsComplete();
 	void downloadError(int, const QString&);
 	void downloadStarted(int);
 	void populateDownloadMap();
+
+	void cancelSonatina();
+	void cancelMaestro();
+	void cancelClassic();
+	void cancelAcoustic();
+	void cancelM7();
 
 	void trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal);
 	void trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal);
@@ -171,5 +178,8 @@ private slots:
 	void currentTopTabChanged(int);
 	//Process Listeners
 	void processOOMExit(int);
+
+signals:
+	void cancelDownload(int);
 };
 #endif

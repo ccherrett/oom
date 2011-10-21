@@ -9,6 +9,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QMap>
 #include <QUrl>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -16,6 +17,7 @@
 #include <QIODevice>
 #include <QStringList>
 
+class ExtractJob;
 class DownloadPackage;
 
 class OODownload : public QObject
@@ -23,23 +25,31 @@ class OODownload : public QObject
 	Q_OBJECT
 
 	QNetworkAccessManager m_manager;
-	QList<QNetworkReply*> m_currentDownloads;
-	QList<DownloadPackage*> m_currentPackages;
+	//QList<QNetworkReply*> m_currentDownloads;
+	QMap<int, ExtractJob*> m_currentJobs;
+	QMap<int, QNetworkReply*> m_currentDownloads;
+	QMap<int, DownloadPackage*> m_currentPackages;
+	void cleanup(int);
 
 public:
 	OODownload(QObject* parent = 0);
 	QString getFilename(const QString &url);
-	bool saveFile(DownloadPackage* pkg, QIODevice *data);
+	bool processDownload(DownloadPackage* pkg, QIODevice *data);
 	bool isRunning(int);
+	bool isExtracting(int);
 
 public slots:
 	void startDownload(DownloadPackage*);
 	void downloadFinished(QNetworkReply*);
 	void trackProgress(qint64 bytesReceived, qint64 bytesTotal);
+	void cancelDownload(int);
+	void extractComplete(int);
+	void extractFailed(int, const QString&);
 
 signals:
 	void downloadStarted(int);
 	void downloadEnded(int);
+	void downloadCanceled(int);
 	void downloadsComplete();
 	void downloadError(int, QString);
 	void fileSaveError(int, const QString&);
