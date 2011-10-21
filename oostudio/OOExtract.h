@@ -9,7 +9,7 @@
 
 #include <QObject>
 #include <QProcess>
-#include <QThread>
+#include <QRunnable>
 
 class DownloadPackage;
 
@@ -27,7 +27,7 @@ struct ExtractJob  {
 	int type;
 };
 
-class OOExtract : public QThread
+class OOExtract : public QObject, public QRunnable
 {
 private:
 	Q_OBJECT

@@ -19,6 +19,8 @@ lscp_status_t lscp_client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*
 }
 
 static const char* MAP_STRING = "MAP MIDI_INSTRUMENT";
+static const char* SOUND_PATH = "@@OOM_SOUNDS@@";
+static const QString SOUNDS_DIR = QString(QDir::homePath()).append(QDir::separator()).append(".sounds");
 
 OOThread::OOThread(OOSession* session)
 : m_state(ProcessNotRunning),
@@ -566,6 +568,10 @@ bool LinuxSamplerProcessThread::loadLSCP()/*{{{*/
 							cmd.replace(str, rep);
 						++count;
 					}
+				}
+				if(cmd.contains(QString(SOUND_PATH)))
+				{
+					cmd = cmd.replace(QString(SOUND_PATH), SOUNDS_DIR);
 				}
 				::lscp_client_query(client, cmd.toUtf8().constData());
 				//return true;

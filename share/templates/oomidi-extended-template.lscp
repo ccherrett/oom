@@ -125,125 +125,125 @@ SET AUDIO_OUTPUT_CHANNEL_PARAMETER 0 34 JACK_BINDINGS=NONE
 
 REMOVE MIDI_INSTRUMENT_MAP ALL
 ADD MIDI_INSTRUMENT_MAP '1stviolins'
-MAP MIDI_INSTRUMENT NON_MODAL 0 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 1st Violins Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 0 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 1st Violins Staccato'
-MAP MIDI_INSTRUMENT NON_MODAL 0 0 2 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 1st Violins Pizzicato'
+MAP MIDI_INSTRUMENT NON_MODAL 0 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 1st Violins Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 0 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 1st Violins Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 0 0 2 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 1st Violins Pizzicato'
 ADD MIDI_INSTRUMENT_MAP '2ndviolins'
-MAP MIDI_INSTRUMENT NON_MODAL 1 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x202nd\x20Violins\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 2nd Violins Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 1 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x202nd\x20Violins\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 2nd Violins Staccato'
-MAP MIDI_INSTRUMENT NON_MODAL 1 0 2 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x202nd\x20Violins\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 2nd Violins Pizzicato'
+MAP MIDI_INSTRUMENT NON_MODAL 1 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x202nd\x20Violins\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 2nd Violins Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 1 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x202nd\x20Violins\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 2nd Violins Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 1 0 2 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x202nd\x20Violins\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - 2nd Violins Pizzicato'
 ADD MIDI_INSTRUMENT_MAP 'violas'
-MAP MIDI_INSTRUMENT NON_MODAL 2 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violas\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Violas Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 2 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violas\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Violas Pizzicato'
+MAP MIDI_INSTRUMENT NON_MODAL 2 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violas\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Violas Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 2 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violas\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Violas Pizzicato'
 ADD MIDI_INSTRUMENT_MAP 'cellos'
-MAP MIDI_INSTRUMENT NON_MODAL 3 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Celli Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 3 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Celli Staccato'
-MAP MIDI_INSTRUMENT NON_MODAL 3 0 2 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Celli Pizzicato'
+MAP MIDI_INSTRUMENT NON_MODAL 3 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Celli Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 3 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Celli Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 3 0 2 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Celli Pizzicato'
 ADD MIDI_INSTRUMENT_MAP 'basses'
-MAP MIDI_INSTRUMENT NON_MODAL 4 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Basses\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Basses Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 4 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Basses\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Basses Staccato'
-MAP MIDI_INSTRUMENT NON_MODAL 4 0 2 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Basses\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Basses Pizzicato'
+MAP MIDI_INSTRUMENT NON_MODAL 4 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Basses\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Basses Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 4 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Basses\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Basses Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 4 0 2 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Basses\x20Pizzicato.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Basses Pizzicato'
 ADD MIDI_INSTRUMENT_MAP 'piccolo'
-MAP MIDI_INSTRUMENT NON_MODAL 5 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Piccolo\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Piccolo Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 5 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Piccolo\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Piccolo Solo'
 ADD MIDI_INSTRUMENT_MAP 'flute'
-MAP MIDI_INSTRUMENT NON_MODAL 6 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flute\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Flute Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 6 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flute\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Flute Solo'
 ADD MIDI_INSTRUMENT_MAP 'flutes'
-MAP MIDI_INSTRUMENT NON_MODAL 7 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flutes\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Flutes Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 7 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flutes\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Flutes Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 7 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flutes\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Flutes Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 7 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flutes\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Flutes Staccato'
 ADD MIDI_INSTRUMENT_MAP 'altoflute'
-MAP MIDI_INSTRUMENT NON_MODAL 8 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Alto\x20Flute\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Alto Flute Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 8 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Alto\x20Flute\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Alto Flute Solo'
 ADD MIDI_INSTRUMENT_MAP 'oboe'
-MAP MIDI_INSTRUMENT NON_MODAL 9 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Oboe\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Oboe Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 9 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Oboe\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Oboe Solo'
 ADD MIDI_INSTRUMENT_MAP 'oboes'
-MAP MIDI_INSTRUMENT NON_MODAL 10 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Oboes\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Oboes Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 10 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Oboes\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Oboes Sustain'
 ADD MIDI_INSTRUMENT_MAP 'coranglais'
-MAP MIDI_INSTRUMENT NON_MODAL 11 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Cor\x20Anglais\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Cor Anglais Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 11 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Cor\x20Anglais\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Cor Anglais Solo'
 ADD MIDI_INSTRUMENT_MAP 'clarinet'
-MAP MIDI_INSTRUMENT NON_MODAL 12 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Clarinet\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Clarinet Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 12 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Clarinet\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Clarinet Solo'
 ADD MIDI_INSTRUMENT_MAP 'clarinets'
-MAP MIDI_INSTRUMENT NON_MODAL 13 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Clarinets\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Clarinets Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 13 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Clarinets\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Clarinets Sustain'
 ADD MIDI_INSTRUMENT_MAP 'bassclarinet'
-MAP MIDI_INSTRUMENT NON_MODAL 14 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bass\x20Clarinet\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Bass Clarinet Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 14 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bass\x20Clarinet\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Bass Clarinet Solo'
 ADD MIDI_INSTRUMENT_MAP 'bassoon'
-MAP MIDI_INSTRUMENT NON_MODAL 15 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bassoon\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Bassoon Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 15 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bassoon\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Bassoon Solo'
 ADD MIDI_INSTRUMENT_MAP 'bassoons'
-MAP MIDI_INSTRUMENT NON_MODAL 16 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bassoons\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Bassoons Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 16 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bassoons\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Bassoons Sustain'
 ADD MIDI_INSTRUMENT_MAP 'contrabassoon'
-MAP MIDI_INSTRUMENT NON_MODAL 17 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Contrabassoon\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Contrabassoon Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 17 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Contrabassoon\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Woodwinds - Contrabassoon Solo'
 ADD MIDI_INSTRUMENT_MAP 'horn'
-MAP MIDI_INSTRUMENT NON_MODAL 18 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horn\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Horn Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 18 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horn\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Horn Solo'
 ADD MIDI_INSTRUMENT_MAP 'horns'
-MAP MIDI_INSTRUMENT NON_MODAL 19 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horns\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Horns Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 19 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horns\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Horns Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 19 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horns\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Horns Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 19 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horns\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Horns Staccato'
 ADD MIDI_INSTRUMENT_MAP 'trumpet'
-MAP MIDI_INSTRUMENT NON_MODAL 20 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpet\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trumpet Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 20 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpet\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trumpet Solo'
 ADD MIDI_INSTRUMENT_MAP 'trumpets'
-MAP MIDI_INSTRUMENT NON_MODAL 21 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpets\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trumpets Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 21 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpets\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trumpets Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 21 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpets\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trumpets Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 21 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpets\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trumpets Staccato'
 ADD MIDI_INSTRUMENT_MAP 'trombone'
-MAP MIDI_INSTRUMENT NON_MODAL 22 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tenor\x20Trombone\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Tenor Trombone Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 22 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tenor\x20Trombone\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Tenor Trombone Solo'
 ADD MIDI_INSTRUMENT_MAP 'trombones'
-MAP MIDI_INSTRUMENT NON_MODAL 23 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trombones\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trombones Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 23 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trombones\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trombones Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 23 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trombones\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trombones Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 23 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trombones\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Trombones Staccato'
 ADD MIDI_INSTRUMENT_MAP 'basstrombone'
-MAP MIDI_INSTRUMENT NON_MODAL 24 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Bass\x20Trombone\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Bass Trombone Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 24 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Bass\x20Trombone\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Bass Trombone Solo'
 ADD MIDI_INSTRUMENT_MAP 'tuba'
-MAP MIDI_INSTRUMENT NON_MODAL 25 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Tuba Sustain'
-MAP MIDI_INSTRUMENT NON_MODAL 25 0 1 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Tuba Staccato'
+MAP MIDI_INSTRUMENT NON_MODAL 25 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Sustain.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Tuba Sustain'
+MAP MIDI_INSTRUMENT NON_MODAL 25 0 1 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Staccato.sfz' 0 1.0 ON_DEMAND_HOLD 'Brass - Tuba Staccato'
 ADD MIDI_INSTRUMENT_MAP 'percussion'
-MAP MIDI_INSTRUMENT NON_MODAL 26 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20All\x20Percussion.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - All Percussion'
-MAP MIDI_INSTRUMENT NON_MODAL 26 1 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Timpani.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Timpani'
-MAP MIDI_INSTRUMENT NON_MODAL 26 2 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Bass\x20Drum\x20&\x20Snare.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Bass Drum & Snare'
-MAP MIDI_INSTRUMENT NON_MODAL 26 3 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Cymbals\x20&\x20Tamtam.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Cymbals & Tamtam'
-MAP MIDI_INSTRUMENT NON_MODAL 26 4 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Triangle.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Triangle'
-MAP MIDI_INSTRUMENT NON_MODAL 26 5 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Chimes.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Chimes'
-MAP MIDI_INSTRUMENT NON_MODAL 26 6 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Conga.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Conga'
-MAP MIDI_INSTRUMENT NON_MODAL 26 7 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Glockenspiel.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Glockenspiel'
-MAP MIDI_INSTRUMENT NON_MODAL 26 8 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Xylophone.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Xylophone'
-MAP MIDI_INSTRUMENT NON_MODAL 26 9 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Various.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Various'
+MAP MIDI_INSTRUMENT NON_MODAL 26 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20All\x20Percussion.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - All Percussion'
+MAP MIDI_INSTRUMENT NON_MODAL 26 1 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Timpani.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Timpani'
+MAP MIDI_INSTRUMENT NON_MODAL 26 2 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Bass\x20Drum\x20&\x20Snare.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Bass Drum & Snare'
+MAP MIDI_INSTRUMENT NON_MODAL 26 3 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Cymbals\x20&\x20Tamtam.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Cymbals & Tamtam'
+MAP MIDI_INSTRUMENT NON_MODAL 26 4 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Triangle.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Triangle'
+MAP MIDI_INSTRUMENT NON_MODAL 26 5 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Chimes.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Chimes'
+MAP MIDI_INSTRUMENT NON_MODAL 26 6 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Conga.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Conga'
+MAP MIDI_INSTRUMENT NON_MODAL 26 7 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Glockenspiel.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Glockenspiel'
+MAP MIDI_INSTRUMENT NON_MODAL 26 8 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Xylophone.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Xylophone'
+MAP MIDI_INSTRUMENT NON_MODAL 26 9 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Various.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Various'
 ADD MIDI_INSTRUMENT_MAP 'harp'
-MAP MIDI_INSTRUMENT NON_MODAL 27 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Concert\x20Harp.sfz' 0 1.0 ON_DEMAND_HOLD 'Concert Harp'
+MAP MIDI_INSTRUMENT NON_MODAL 27 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Concert\x20Harp.sfz' 0 1.0 ON_DEMAND_HOLD 'Concert Harp'
 ADD MIDI_INSTRUMENT_MAP 'piano'
-MAP MIDI_INSTRUMENT NON_MODAL 28 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Keys\x20-\x20Grand\x20Piano.sfz' 0 1.0 ON_DEMAND_HOLD 'Keys - Grand Piano'
+MAP MIDI_INSTRUMENT NON_MODAL 28 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Keys\x20-\x20Grand\x20Piano.sfz' 0 1.0 ON_DEMAND_HOLD 'Keys - Grand Piano'
 ADD MIDI_INSTRUMENT_MAP 'choirs-male'
-MAP MIDI_INSTRUMENT NON_MODAL 29 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Male.sfz' 0 1.0 ON_DEMAND_HOLD 'Chorus - Male'
+MAP MIDI_INSTRUMENT NON_MODAL 29 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Male.sfz' 0 1.0 ON_DEMAND_HOLD 'Chorus - Male'
 ADD MIDI_INSTRUMENT_MAP 'solostrings'
-MAP MIDI_INSTRUMENT NON_MODAL 30 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violin\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Violin Solo'
-MAP MIDI_INSTRUMENT NON_MODAL 30 1 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Cello\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Cello Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 30 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violin\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Violin Solo'
+MAP MIDI_INSTRUMENT NON_MODAL 30 1 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Cello\x20Solo.sfz' 0 1.0 ON_DEMAND_HOLD 'Strings - Cello Solo'
 ADD MIDI_INSTRUMENT_MAP 'percussion-tympani'
-MAP MIDI_INSTRUMENT NON_MODAL 31 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Timpani.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Timpani'
+MAP MIDI_INSTRUMENT NON_MODAL 31 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Timpani.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Timpani'
 ADD MIDI_INSTRUMENT_MAP 'percussion-bassdrum-snare'
-MAP MIDI_INSTRUMENT NON_MODAL 32 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Bass\x20Drum\x20&\x20Snare.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Bass Drum & Snare'
+MAP MIDI_INSTRUMENT NON_MODAL 32 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Bass\x20Drum\x20&\x20Snare.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Bass Drum & Snare'
 ADD MIDI_INSTRUMENT_MAP 'percussion-cymbals-tamtam'
-MAP MIDI_INSTRUMENT NON_MODAL 33 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Cymbals\x20&\x20Tamtam.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Cymbals & Tamtam'
+MAP MIDI_INSTRUMENT NON_MODAL 33 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Cymbals\x20&\x20Tamtam.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Cymbals & Tamtam'
 ADD MIDI_INSTRUMENT_MAP 'percussion-triangle'
-MAP MIDI_INSTRUMENT NON_MODAL 34 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Triangle.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Triangle'
+MAP MIDI_INSTRUMENT NON_MODAL 34 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Triangle.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Triangle'
 ADD MIDI_INSTRUMENT_MAP 'percussion-chimes'
-MAP MIDI_INSTRUMENT NON_MODAL 35 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Chimes.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Chimes'
+MAP MIDI_INSTRUMENT NON_MODAL 35 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Chimes.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Chimes'
 ADD MIDI_INSTRUMENT_MAP 'percussion-conga'
-MAP MIDI_INSTRUMENT NON_MODAL 36 0 0 GIG '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Conga.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Conga'
+MAP MIDI_INSTRUMENT NON_MODAL 36 0 0 GIG '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Conga.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Conga'
 ADD MIDI_INSTRUMENT_MAP 'percussion-glockenspiel'
-MAP MIDI_INSTRUMENT NON_MODAL 37 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Glockenspiel.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Glockenspiel'
+MAP MIDI_INSTRUMENT NON_MODAL 37 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Glockenspiel.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Glockenspiel'
 ADD MIDI_INSTRUMENT_MAP 'percussion-xylophone'
-MAP MIDI_INSTRUMENT NON_MODAL 38 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Xylophone.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Xylophone'
+MAP MIDI_INSTRUMENT NON_MODAL 38 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Xylophone.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Xylophone'
 ADD MIDI_INSTRUMENT_MAP 'percussion-various'
-MAP MIDI_INSTRUMENT NON_MODAL 39 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Various.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Various'
+MAP MIDI_INSTRUMENT NON_MODAL 39 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Various.sfz' 0 1.0 ON_DEMAND_HOLD 'Percussion - Various'
 ADD MIDI_INSTRUMENT_MAP 'choirs-female'
-MAP MIDI_INSTRUMENT NON_MODAL 40 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Female.sfz' 0 1.0 ON_DEMAND_HOLD 'Chorus - Female'
+MAP MIDI_INSTRUMENT NON_MODAL 40 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Female.sfz' 0 1.0 ON_DEMAND_HOLD 'Chorus - Female'
 ADD MIDI_INSTRUMENT_MAP 'choirs-mixed'
-MAP MIDI_INSTRUMENT NON_MODAL 41 0 0 SFZ '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Mixed.sfz' 0 1.0 ON_DEMAND_HOLD 'Chorus - Mixed'
+MAP MIDI_INSTRUMENT NON_MODAL 41 0 0 SFZ '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Mixed.sfz' 0 1.0 ON_DEMAND_HOLD 'Chorus - Mixed'
 ADD MIDI_INSTRUMENT_MAP 'classical-guitar'
-MAP MIDI_INSTRUMENT NON_MODAL 42 0 0 SFZ '/usr/share/sounds/ClassicFREE/ClassicGuitar\x20Samples/Classical_Guitar.sfz' 0 1.0 ON_DEMAND_HOLD 'Classical_Guitar'
+MAP MIDI_INSTRUMENT NON_MODAL 42 0 0 SFZ '@@OOM_SOUNDS@@/ClassicFREE/ClassicGuitar\x20Samples/Classical_Guitar.sfz' 0 1.0 ON_DEMAND_HOLD 'Classical_Guitar'
 ADD MIDI_INSTRUMENT_MAP 'acoustic-guitar'
-MAP MIDI_INSTRUMENT NON_MODAL 43 0 0 SFZ '/usr/share/sounds/AcousticGuitarFREE/AcousticGuitarFREE\x20Samples/AcousticGuitar.sfz' 0 1.0 ON_DEMAND_HOLD 'AcousticGuitar'
+MAP MIDI_INSTRUMENT NON_MODAL 43 0 0 SFZ '@@OOM_SOUNDS@@/AcousticGuitarFREE/AcousticGuitarFREE\x20Samples/AcousticGuitar.sfz' 0 1.0 ON_DEMAND_HOLD 'AcousticGuitar'
 ADD MIDI_INSTRUMENT_MAP 'maestro-piano'
-MAP MIDI_INSTRUMENT NON_MODAL 44 0 0 GIG '/usr/share/sounds/maestro/maestro_concert_grand_v2.gig' 0 1.0 ON_DEMAND_HOLD 'Maestro Concert Grand'
-MAP MIDI_INSTRUMENT NON_MODAL 44 0 1 GIG '/usr/share/sounds/maestro/maestro_concert_grand_v2.gig' 1 1.0 ON_DEMAND_HOLD 'MCG Sustains + Releases'
-MAP MIDI_INSTRUMENT NON_MODAL 44 0 2 GIG '/usr/share/sounds/maestro/maestro_concert_grand_v2.gig' 2 1.0 ON_DEMAND_HOLD 'Maestro Conc. Grand B'
-MAP MIDI_INSTRUMENT NON_MODAL 44 0 3 GIG '/usr/share/sounds/maestro/maestro_concert_grand_v2.gig' 3 1.0 ON_DEMAND_HOLD 'MCG B Sus + Release'
-MAP MIDI_INSTRUMENT NON_MODAL 44 0 4 GIG '/usr/share/sounds/maestro/maestro_concert_grand_v2.gig' 4 1.0 ON_DEMAND_HOLD 'Effects'
-MAP MIDI_INSTRUMENT NON_MODAL 44 0 5 GIG '/usr/share/sounds/maestro/maestro_concert_grand_v2.gig' 5 1.0 ON_DEMAND_HOLD 'mcg_key_release'
-MAP MIDI_INSTRUMENT NON_MODAL 44 0 6 GIG '/usr/share/sounds/maestro/maestro_concert_grand_v2.gig' 6 1.0 ON_DEMAND_HOLD 'mcg_key_release only'
+MAP MIDI_INSTRUMENT NON_MODAL 44 0 0 GIG '@@OOM_SOUNDS@@/maestro/maestro_concert_grand_v2.gig' 0 1.0 ON_DEMAND_HOLD 'Maestro Concert Grand'
+MAP MIDI_INSTRUMENT NON_MODAL 44 0 1 GIG '@@OOM_SOUNDS@@/maestro/maestro_concert_grand_v2.gig' 1 1.0 ON_DEMAND_HOLD 'MCG Sustains + Releases'
+MAP MIDI_INSTRUMENT NON_MODAL 44 0 2 GIG '@@OOM_SOUNDS@@/maestro/maestro_concert_grand_v2.gig' 2 1.0 ON_DEMAND_HOLD 'Maestro Conc. Grand B'
+MAP MIDI_INSTRUMENT NON_MODAL 44 0 3 GIG '@@OOM_SOUNDS@@/maestro/maestro_concert_grand_v2.gig' 3 1.0 ON_DEMAND_HOLD 'MCG B Sus + Release'
+MAP MIDI_INSTRUMENT NON_MODAL 44 0 4 GIG '@@OOM_SOUNDS@@/maestro/maestro_concert_grand_v2.gig' 4 1.0 ON_DEMAND_HOLD 'Effects'
+MAP MIDI_INSTRUMENT NON_MODAL 44 0 5 GIG '@@OOM_SOUNDS@@/maestro/maestro_concert_grand_v2.gig' 5 1.0 ON_DEMAND_HOLD 'mcg_key_release'
+MAP MIDI_INSTRUMENT NON_MODAL 44 0 6 GIG '@@OOM_SOUNDS@@/maestro/maestro_concert_grand_v2.gig' 6 1.0 ON_DEMAND_HOLD 'mcg_key_release only'
 
 ADD CHANNEL
 SET CHANNEL MIDI_INPUT_DEVICE 0 0
@@ -254,7 +254,7 @@ SET CHANNEL VOLUME 0 1.0
 SET CHANNEL MIDI_INSTRUMENT_MAP 0 0
 SET CHANNEL AUDIO_OUTPUT_DEVICE 0 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 0 1 0
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Sustain.sfz' 0 0
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Sustain.sfz' 0 0
 
 
 ADD CHANNEL
@@ -266,7 +266,7 @@ SET CHANNEL VOLUME 1 1.0
 SET CHANNEL MIDI_INSTRUMENT_MAP 1 1
 SET CHANNEL AUDIO_OUTPUT_DEVICE 1 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 1 0 1
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x202nd\x20Violins\x20Sustain.sfz' 0 1
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x202nd\x20Violins\x20Sustain.sfz' 0 1
 
 
 ADD CHANNEL
@@ -279,7 +279,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 2 2
 SET CHANNEL AUDIO_OUTPUT_DEVICE 2 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 2 0 2
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 2 1 2
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violas\x20Sustain.sfz' 0 2
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violas\x20Sustain.sfz' 0 2
 
 
 ADD CHANNEL
@@ -292,7 +292,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 3 3
 SET CHANNEL AUDIO_OUTPUT_DEVICE 3 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 3 0 3
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 3 1 3
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Sustain.sfz' 0 3
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Sustain.sfz' 0 3
 
 
 ADD CHANNEL
@@ -305,7 +305,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 4 4
 SET CHANNEL AUDIO_OUTPUT_DEVICE 4 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 4 0 4
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 4 1 4
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Basses\x20Sustain.sfz' 0 4
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Basses\x20Sustain.sfz' 0 4
 
 
 ADD CHANNEL
@@ -318,7 +318,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 5 5
 SET CHANNEL AUDIO_OUTPUT_DEVICE 5 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 5 0 5
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 5 1 5
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Piccolo\x20Solo.sfz' 0 5
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Piccolo\x20Solo.sfz' 0 5
 
 
 ADD CHANNEL
@@ -331,7 +331,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 6 6
 SET CHANNEL AUDIO_OUTPUT_DEVICE 6 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 6 0 5
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 6 1 5
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flute\x20Solo.sfz' 0 6
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flute\x20Solo.sfz' 0 6
 
 
 ADD CHANNEL
@@ -344,7 +344,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 7 7
 SET CHANNEL AUDIO_OUTPUT_DEVICE 7 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 7 0 5
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 7 1 5
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flutes\x20Sustain.sfz' 0 7
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Flutes\x20Sustain.sfz' 0 7
 
 
 ADD CHANNEL
@@ -357,7 +357,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 8 8
 SET CHANNEL AUDIO_OUTPUT_DEVICE 8 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 8 0 5
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 8 1 5
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Alto\x20Flute\x20Solo.sfz' 0 8
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Alto\x20Flute\x20Solo.sfz' 0 8
 
 
 ADD CHANNEL
@@ -370,7 +370,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 9 9
 SET CHANNEL AUDIO_OUTPUT_DEVICE 9 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 9 0 6
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 9 1 6
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Oboe\x20Solo.sfz' 0 9
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Oboe\x20Solo.sfz' 0 9
 
 
 ADD CHANNEL
@@ -383,7 +383,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 10 10
 SET CHANNEL AUDIO_OUTPUT_DEVICE 10 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 10 0 6
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 10 1 6
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Oboes\x20Sustain.sfz' 0 10
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Oboes\x20Sustain.sfz' 0 10
 
 
 ADD CHANNEL
@@ -396,7 +396,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 11 11
 SET CHANNEL AUDIO_OUTPUT_DEVICE 11 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 11 0 6
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 11 1 6
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Cor\x20Anglais\x20Solo.sfz' 0 11
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Cor\x20Anglais\x20Solo.sfz' 0 11
 
 
 ADD CHANNEL
@@ -409,7 +409,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 12 12
 SET CHANNEL AUDIO_OUTPUT_DEVICE 12 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 12 0 7
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 12 1 7
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Clarinet\x20Solo.sfz' 0 12
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Clarinet\x20Solo.sfz' 0 12
 
 
 ADD CHANNEL
@@ -422,7 +422,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 13 13
 SET CHANNEL AUDIO_OUTPUT_DEVICE 13 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 13 0 7
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 13 1 7
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Clarinets\x20Sustain.sfz' 0 13
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Clarinets\x20Sustain.sfz' 0 13
 
 
 ADD CHANNEL
@@ -435,7 +435,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 14 14
 SET CHANNEL AUDIO_OUTPUT_DEVICE 14 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 14 0 7
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 14 1 7
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bass\x20Clarinet\x20Solo.sfz' 0 14
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bass\x20Clarinet\x20Solo.sfz' 0 14
 
 
 ADD CHANNEL
@@ -448,7 +448,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 15 15
 SET CHANNEL AUDIO_OUTPUT_DEVICE 15 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 15 0 8
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 15 1 8
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bassoon\x20Solo.sfz' 0 15
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bassoon\x20Solo.sfz' 0 15
 
 
 ADD CHANNEL
@@ -461,7 +461,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 16 16
 SET CHANNEL AUDIO_OUTPUT_DEVICE 16 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 16 0 8
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 16 1 8
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bassoons\x20Sustain.sfz' 0 16
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bassoons\x20Sustain.sfz' 0 16
 
 
 ADD CHANNEL
@@ -474,7 +474,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 17 17
 SET CHANNEL AUDIO_OUTPUT_DEVICE 17 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 17 0 8
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 17 1 8
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Contrabassoon\x20Solo.sfz' 0 17
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Contrabassoon\x20Solo.sfz' 0 17
 
 
 ADD CHANNEL
@@ -487,7 +487,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 18 18
 SET CHANNEL AUDIO_OUTPUT_DEVICE 18 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 18 0 9
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 18 1 9
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horn\x20Solo.sfz' 0 18
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horn\x20Solo.sfz' 0 18
 
 
 ADD CHANNEL
@@ -500,7 +500,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 19 19
 SET CHANNEL AUDIO_OUTPUT_DEVICE 19 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 19 0 9
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 19 1 9
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horns\x20Sustain.sfz' 0 19
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Horns\x20Sustain.sfz' 0 19
 
 
 ADD CHANNEL
@@ -513,7 +513,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 20 20
 SET CHANNEL AUDIO_OUTPUT_DEVICE 20 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 20 0 10
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 20 1 10
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpet\x20Solo.sfz' 0 20
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpet\x20Solo.sfz' 0 20
 
 
 ADD CHANNEL
@@ -526,7 +526,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 21 21
 SET CHANNEL AUDIO_OUTPUT_DEVICE 21 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 21 0 10
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 21 1 10
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpets\x20Sustain.sfz' 0 21
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trumpets\x20Sustain.sfz' 0 21
 
 
 ADD CHANNEL
@@ -539,7 +539,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 22 22
 SET CHANNEL AUDIO_OUTPUT_DEVICE 22 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 22 0 11
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 22 1 11
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tenor\x20Trombone\x20Solo.sfz' 0 22
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tenor\x20Trombone\x20Solo.sfz' 0 22
 
 
 ADD CHANNEL
@@ -552,7 +552,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 23 23
 SET CHANNEL AUDIO_OUTPUT_DEVICE 23 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 23 0 11
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 23 1 11
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trombones\x20Sustain.sfz' 0 23
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Trombones\x20Sustain.sfz' 0 23
 
 
 ADD CHANNEL
@@ -565,7 +565,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 24 24
 SET CHANNEL AUDIO_OUTPUT_DEVICE 24 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 24 0 11
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 24 1 11
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Bass\x20Trombone\x20Solo.sfz' 0 24
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Bass\x20Trombone\x20Solo.sfz' 0 24
 
 
 ADD CHANNEL
@@ -578,7 +578,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 25 25
 SET CHANNEL AUDIO_OUTPUT_DEVICE 25 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 25 0 12
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 25 1 12
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Sustain.sfz' 0 25
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Sustain.sfz' 0 25
 
 
 ADD CHANNEL
@@ -591,7 +591,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 26 31
 SET CHANNEL AUDIO_OUTPUT_DEVICE 26 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 26 0 13
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 26 1 13
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Timpani.sfz' 0 26
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Timpani.sfz' 0 26
 
 
 ADD CHANNEL
@@ -604,7 +604,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 27 32
 SET CHANNEL AUDIO_OUTPUT_DEVICE 27 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 27 0 14
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 27 1 14
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Bass\x20Drum\x20&\x20Snare.sfz' 0 27
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Bass\x20Drum\x20&\x20Snare.sfz' 0 27
 
 
 ADD CHANNEL
@@ -617,7 +617,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 28 33
 SET CHANNEL AUDIO_OUTPUT_DEVICE 28 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 28 0 20
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 28 1 20
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Cymbals\x20&\x20Tamtam.sfz' 0 28
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Cymbals\x20&\x20Tamtam.sfz' 0 28
 
 
 ADD CHANNEL
@@ -630,7 +630,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 29 34
 SET CHANNEL AUDIO_OUTPUT_DEVICE 29 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 29 0 21
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 29 1 21
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Triangle.sfz' 0 29
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Triangle.sfz' 0 29
 
 
 ADD CHANNEL
@@ -643,7 +643,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 30 35
 SET CHANNEL AUDIO_OUTPUT_DEVICE 30 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 30 0 22
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 30 1 22
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Chimes.sfz' 0 30
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Chimes.sfz' 0 30
 
 
 ADD CHANNEL
@@ -656,7 +656,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 31 36
 SET CHANNEL AUDIO_OUTPUT_DEVICE 31 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 31 0 23
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 31 1 23
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Conga.sfz' 0 31
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Conga.sfz' 0 31
 
 
 ADD CHANNEL
@@ -669,7 +669,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 32 37
 SET CHANNEL AUDIO_OUTPUT_DEVICE 32 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 32 0 24
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 32 1 24
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Glockenspiel.sfz' 0 32
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Glockenspiel.sfz' 0 32
 
 
 ADD CHANNEL
@@ -682,7 +682,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 33 38
 SET CHANNEL AUDIO_OUTPUT_DEVICE 33 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 33 0 25
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 33 1 25
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Xylophone.sfz' 0 33
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Xylophone.sfz' 0 33
 
 
 ADD CHANNEL
@@ -695,7 +695,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 34 39
 SET CHANNEL AUDIO_OUTPUT_DEVICE 34 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 34 0 26
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 34 1 26
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Various.sfz' 0 34
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Percussion\x20-\x20Various.sfz' 0 34
 
 
 ADD CHANNEL
@@ -720,7 +720,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 36 27
 SET CHANNEL AUDIO_OUTPUT_DEVICE 36 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 36 0 15
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 36 1 15
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Concert\x20Harp.sfz' 0 36
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Concert\x20Harp.sfz' 0 36
 
 
 ADD CHANNEL
@@ -733,7 +733,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 37 28
 SET CHANNEL AUDIO_OUTPUT_DEVICE 37 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 37 0 16
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 37 1 16
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Keys\x20-\x20Grand\x20Piano.sfz' 0 37
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Keys\x20-\x20Grand\x20Piano.sfz' 0 37
 
 
 ADD CHANNEL
@@ -746,7 +746,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 38 29
 SET CHANNEL AUDIO_OUTPUT_DEVICE 38 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 38 0 17
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 38 1 18
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Male.sfz' 0 38
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Male.sfz' 0 38
 
 
 ADD CHANNEL
@@ -759,7 +759,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 39 40
 SET CHANNEL AUDIO_OUTPUT_DEVICE 39 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 39 0 27
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 39 1 28
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Female.sfz' 0 39
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Female.sfz' 0 39
 
 
 ADD CHANNEL
@@ -772,7 +772,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 40 41
 SET CHANNEL AUDIO_OUTPUT_DEVICE 40 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 40 0 29
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 40 1 30
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Mixed.sfz' 0 40
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Mixed.sfz' 0 40
 
 
 ADD CHANNEL
@@ -785,7 +785,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 41 30
 SET CHANNEL AUDIO_OUTPUT_DEVICE 41 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 41 0 19
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 41 1 19
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violin\x20Solo.sfz' 0 41
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Violin\x20Solo.sfz' 0 41
 
 
 ADD CHANNEL
@@ -798,7 +798,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 42 30
 SET CHANNEL AUDIO_OUTPUT_DEVICE 42 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 42 0 19
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 42 1 19
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Cello\x20Solo.sfz' 0 42
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Cello\x20Solo.sfz' 0 42
 
 
 ADD CHANNEL
@@ -811,7 +811,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 43 43
 SET CHANNEL AUDIO_OUTPUT_DEVICE 43 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 43 0 31
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 43 1 31
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/AcousticGuitarFREE/AcousticGuitarFREE\x20Samples/AcousticGuitar.sfz' 0 43
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/AcousticGuitarFREE/AcousticGuitarFREE\x20Samples/AcousticGuitar.sfz' 0 43
 
 
 ADD CHANNEL
@@ -824,7 +824,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 44 42
 SET CHANNEL AUDIO_OUTPUT_DEVICE 44 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 44 0 32
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 44 1 32
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/ClassicFREE/ClassicGuitar\x20Samples/Classical_Guitar.sfz' 0 44
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/ClassicFREE/ClassicGuitar\x20Samples/Classical_Guitar.sfz' 0 44
 
 
 ADD CHANNEL
@@ -837,7 +837,7 @@ SET CHANNEL MIDI_INSTRUMENT_MAP 45 44
 SET CHANNEL AUDIO_OUTPUT_DEVICE 45 0
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 45 0 33
 SET CHANNEL AUDIO_OUTPUT_CHANNEL 45 1 34
-LOAD INSTRUMENT NON_MODAL '/usr/share/sounds/maestro/maestro_concert_grand_v2.gig' 0 45
+LOAD INSTRUMENT NON_MODAL '@@OOM_SOUNDS@@/maestro/maestro_concert_grand_v2.gig' 0 45
 
 
 #jsampler.fantasia: [channel]

@@ -602,7 +602,10 @@ void OOStudio::updateInstalledState()
 	if(checkPackageInstall(Sonatina))
 	{
 		//SSO is installed
-		m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		if(!m_downloader->isRunning(Sonatina))
+			m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		else
+			m_lblSSOState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 		m_btnDownloadSonatina->setEnabled(false);
 		++count;
 	}
@@ -613,7 +616,10 @@ void OOStudio::updateInstalledState()
 	}
 	if(checkPackageInstall(Maestro))
 	{
-		m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		if(!m_downloader->isRunning(Maestro))
+			m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		else
+			m_lblMaestroState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 		m_btnDownloadMaestro->setEnabled(false);
 		++count;
 	}
@@ -624,7 +630,10 @@ void OOStudio::updateInstalledState()
 	}
 	if(checkPackageInstall(ClassicGuitar))
 	{
-		m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		if(!m_downloader->isRunning(ClassicGuitar))
+			m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		else
+			m_lblClassicState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 		m_btnDownloadClassic->setEnabled(false);
 		++count;
 	}
@@ -635,7 +644,10 @@ void OOStudio::updateInstalledState()
 	}
 	if(checkPackageInstall(AcousticGuitar))
 	{
-		m_lblAccousticState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		if(!m_downloader->isRunning(AcousticGuitar))
+			m_lblAccousticState->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+		else
+			m_lblAccousticState->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 		m_btnDownloadAccoustic->setEnabled(false);
 		++count;
 	}
@@ -648,7 +660,10 @@ void OOStudio::updateInstalledState()
 	{
 		if(checkPackageInstall(M7IR44))
 		{
-			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+			if(!m_downloader->isRunning(M7IR44))
+				m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+			else
+				m_lblM7State->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 			m_btnDownloadM7->setEnabled(false);
 			++count;
 		}
@@ -662,7 +677,10 @@ void OOStudio::updateInstalledState()
 	{
 		if(checkPackageInstall(M7IR48))
 		{
-			m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+			if(!m_downloader->isRunning(M7IR48))
+				m_lblM7State->setPixmap(QPixmap(":/images/oostudio-installed.png"));
+			else
+				m_lblM7State->setPixmap(QPixmap(":/images/oostudio-not-installed.png"));
 			m_btnDownloadM7->setEnabled(false);
 			++count;
 		}
@@ -2362,6 +2380,7 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		}
 		break;
 	}
+	updateInstalledState();
 }/*}}}*/
 
 void OOStudio::downloadCanceled(int type)/*{{{*/
