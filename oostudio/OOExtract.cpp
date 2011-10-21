@@ -53,7 +53,7 @@ void OOExtract::finished(int code)
 		emit extractFailed(m_job->type, QString("Extracting Error"));
 	else
 		emit extractComplete(m_job->type);
-	//quit();
+	quit();
 }
 
 void OOExtract::run()
@@ -98,8 +98,8 @@ void OOExtract::run()
 		break;
 	}
 	m_process->start(cmd, params);
-	m_process->waitForFinished(-1);
-	//exec();
+	//m_process->waitForFinished(-1);
+	exec();
 	/*if(!m_process->waitForFinished(-1))
 	{
 		qDebug() << "Extraction of " << m_job->fileName << "failed to start";

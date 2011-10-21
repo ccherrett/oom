@@ -548,7 +548,7 @@ bool OOStudio::checkPackageInstall(int id)/*{{{*/
 		{
 			if(sso.exists() && !ssoLocal.exists())
 			{
-				QFile::link(sso.absolutePath(), QString(SOUNDS_DIR).append(QDir::separator()).append("sonatina"));
+				QFile::link(QFileInfo(sso.absolutePath()).absolutePath(), QString(SOUNDS_DIR).append(QDir::separator()).append("sonatina"));
 			}
 			if((sso.exists() || soundsDir.exists(QString("sonatina").append(QDir::separator()).append(SONATINA_LOCAL_PATH)))
 				|| m_downloader->isRunning(Sonatina))

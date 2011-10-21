@@ -103,8 +103,8 @@ bool OODownload::processDownload(DownloadPackage* pkg, QIODevice* data)
 		OOExtract* extract = new OOExtract(job);
 		connect(extract, SIGNAL(extractComplete(int)), this, SLOT(extractComplete(int)));
 		connect(extract, SIGNAL(extractFailed(int, QString)), this, SLOT(extractFailed(int, QString)));
-		//extract->start();
-		QThreadPool::globalInstance()->start(extract);
+		extract->start();
+		//QThreadPool::globalInstance()->start(extract);
 		return true;
 	}
 	savefile.close();
