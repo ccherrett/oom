@@ -2202,12 +2202,23 @@ void OOStudio::downloadM7()
 
 void OOStudio::downloadAll()
 {
-	m_btnDownload->setEnabled(false);
+	m_btnDownload->blockSignals(true);
 	download(ALL);
 }
 
 void OOStudio::download(int type)
 {
+	if(QMessageBox::question(this,
+		tr("License Agreement"),
+		tr("By selecting to download any of the following libraries you have read and agreed to accept the respective License agreements."
+		"\nYou maintain all responsibility for your use of these libraries not the OpenOctaveProject."
+		"\n\nDo you Agree?"),
+		QMessageBox::Ok, QMessageBox::Cancel) != QMessageBox::Ok)
+	{
+		m_chk44->blockSignals(false);
+		m_chk48->blockSignals(false);
+		return;
+	}
 	SamplePack pack = (SamplePack)type;
 	switch(pack)
 	{
@@ -2263,6 +2274,7 @@ void OOStudio::download(int type)
 		{
 			qDebug() << "Download all requested";
 			m_btnDownload->setEnabled(false);
+			m_btnDownload->blockSignals(false);
 
 			if(!checkPackageInstall(Sonatina))
 			{
