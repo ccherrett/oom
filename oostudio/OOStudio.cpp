@@ -2225,7 +2225,11 @@ void OOStudio::download(int type)
 		case Sonatina:
 		{
 			if(!checkPackageInstall(Sonatina))
+			{
+				DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(Sonatina));
+				QDesktopServices::openUrl(pkg->homepage);
+			}
 			m_btnDownloadSonatina->setEnabled(false);
 			qDebug() << "Sonatina download  requested";
 		}
@@ -2234,7 +2238,11 @@ void OOStudio::download(int type)
 		{
 			qDebug() << "Maestro download  requested";
 			if(!checkPackageInstall(Maestro))
+			{
+				DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(Maestro));
+				QDesktopServices::openUrl(pkg->homepage);
+			}
 			m_btnDownloadMaestro->setEnabled(false);
 		}
 		break;
@@ -2242,7 +2250,11 @@ void OOStudio::download(int type)
 		{
 			qDebug() << "Classic download  requested";
 			if(!checkPackageInstall(ClassicGuitar))
+			{
+				DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(ClassicGuitar));
+				QDesktopServices::openUrl(pkg->homepage);
+			}
 			m_btnDownloadClassic->setEnabled(false);
 		}
 		break;
@@ -2250,7 +2262,11 @@ void OOStudio::download(int type)
 		{
 			qDebug() << "Acoustic download  requested";
 			if(!checkPackageInstall(AcousticGuitar))
+			{
+				DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(AcousticGuitar));
+				QDesktopServices::openUrl(pkg->homepage);
+			}
 			m_btnDownloadAccoustic->setEnabled(false);
 		}
 		break;
@@ -2258,7 +2274,11 @@ void OOStudio::download(int type)
 		{
 			qDebug() << "M7 IR download  requested";
 			if(!checkPackageInstall(M7IR44))
+			{
+				DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(M7IR44));
+				QDesktopServices::openUrl(pkg->homepage);
+			}
 			m_btnDownloadM7->setEnabled(false);
 		}
 		break;
@@ -2266,7 +2286,11 @@ void OOStudio::download(int type)
 		{
 			qDebug() << "M7 IR download  requested";
 			if(!checkPackageInstall(M7IR48))
+			{
+				DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(M7IR48));
+				QDesktopServices::openUrl(pkg->homepage);
+			}
 			m_btnDownloadM7->setEnabled(false);
 		}
 		break;
@@ -2278,38 +2302,50 @@ void OOStudio::download(int type)
 
 			if(!checkPackageInstall(Sonatina))
 			{
+				DownloadPackage* pkg = m_downloadMap.value(Sonatina);
 				m_btnDownloadSonatina->setEnabled(false);
-				m_downloader->startDownload(m_downloadMap.value(Sonatina));
+				m_downloader->startDownload(pkg);
+				QDesktopServices::openUrl(pkg->homepage);
 			}
 			if(!checkPackageInstall(Maestro))
 			{
+				DownloadPackage* pkg = m_downloadMap.value(Maestro);
 				m_btnDownloadMaestro->setEnabled(false);
-				m_downloader->startDownload(m_downloadMap.value(Maestro));
+				m_downloader->startDownload(pkg);
+				QDesktopServices::openUrl(pkg->homepage);
 			}
 			if(!checkPackageInstall(ClassicGuitar))
 			{
+				DownloadPackage* pkg = m_downloadMap.value(ClassicGuitar);
 				m_btnDownloadClassic->setEnabled(false);
-				m_downloader->startDownload(m_downloadMap.value(ClassicGuitar));
+				m_downloader->startDownload(pkg);
+				QDesktopServices::openUrl(pkg->homepage);
 			}
 			if(!checkPackageInstall(AcousticGuitar))
 			{
+				DownloadPackage* pkg = m_downloadMap.value(AcousticGuitar);
 				m_btnDownloadAccoustic->setEnabled(false);
-				m_downloader->startDownload(m_downloadMap.value(AcousticGuitar));
+				m_downloader->startDownload(pkg);
+				QDesktopServices::openUrl(pkg->homepage);
 			}
 			if(m_chk44->isChecked())
 			{
 				if(!checkPackageInstall(M7IR44))
 				{
+					DownloadPackage* pkg = m_downloadMap.value(M7IR44);
 					m_btnDownloadM7->setEnabled(false);
-					m_downloader->startDownload(m_downloadMap.value(M7IR44));
+					m_downloader->startDownload(pkg);
+					QDesktopServices::openUrl(pkg->homepage);
 				}
 			}
 			else
 			{
 				if(!checkPackageInstall(M7IR48))
 				{
+					DownloadPackage* pkg = m_downloadMap.value(M7IR48);
 					m_btnDownloadM7->setEnabled(false);
-					m_downloader->startDownload(m_downloadMap.value(M7IR48));
+					m_downloader->startDownload(pkg);
+					QDesktopServices::openUrl(pkg->homepage);
 				}
 			}
 		}
