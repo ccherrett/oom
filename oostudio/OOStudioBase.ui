@@ -30,7 +30,7 @@
       </property>
       <widget class="QWidget" name="m_tabSessions">
        <attribute name="title">
-        <string>    Open   </string>
+        <string>Open Session</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
         <property name="spacing">
@@ -336,7 +336,7 @@
       </widget>
       <widget class="QWidget" name="m_tabNew">
        <attribute name="title">
-        <string>    Create New    </string>
+        <string>New Session</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_8">
         <property name="leftMargin">
@@ -1311,7 +1311,7 @@
       </widget>
       <widget class="QWidget" name="m_tabDownloads">
        <attribute name="title">
-        <string>Downloads</string>
+        <string>Download Sample Libraries</string>
        </attribute>
        <attribute name="toolTip">
         <string>Download templates  and sample libraries</string>
