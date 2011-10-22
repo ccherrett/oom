@@ -150,6 +150,11 @@ void OOStudio::showExternalLinks(const QUrl &url)
 
 void OOStudio::createTrayIcon()/*{{{*/
 {
+	QIcon oomIco(":/images/oostudio-oop-icon.png");
+	QSize iconSize(471, 78);
+	m_lblLogoSession->setPixmap(oomIco.pixmap(iconSize));
+	m_lblLogoTemplate->setPixmap(oomIco.pixmap(iconSize));
+
 	QIcon moreIcon;
 	moreIcon.addPixmap(QPixmap(":/images/oostudio-more-small-on.png"), QIcon::Normal, QIcon::On);
 	moreIcon.addPixmap(QPixmap(":/images/oostudio-more-small-off.png"), QIcon::Normal, QIcon::Off);
@@ -407,6 +412,8 @@ void OOStudio::updateHeaders()/*{{{*/
 
 void OOStudio::populateSessions(bool usehash)/*{{{*/
 {
+	QIcon oomIco(":/images/oostudio-oop-icon.png");
+	QSize iconSize(150, 78);
 	m_sessionModel->clear();
 	m_templateModel->clear();
 	while(m_cmbTemplate->count() > 3)
@@ -429,6 +436,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				{
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
 					name->setData(session->name, SessionNameRole);
+					name->setIcon(oomIco.pixmap(iconSize));
 					//QStandardItem* path = new QStandardItem(session->path);
 					//path->setToolTip(session->path);
 					//QList<QStandardItem*> rowData;
@@ -451,6 +459,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					//QStandardItem* name = new QStandardItem(session->name);
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
 					name->setData(session->name, SessionNameRole);
+					name->setIcon(oomIco.pixmap(iconSize));
 					//QStandardItem* path = new QStandardItem(session->path);
 					//path->setToolTip(session->path);
 					//QList<QStandardItem*> rowData;
@@ -489,6 +498,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					//QStandardItem* name = new QStandardItem(session->name);
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
 					name->setData(session->name, SessionNameRole);
+					name->setIcon(oomIco.pixmap(iconSize));
 					//QStandardItem* path = new QStandardItem(session->path);
 					//path->setToolTip(session->path);
 					//QList<QStandardItem*> rowData;
@@ -515,6 +525,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				{
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
 					name->setData(session->name, SessionNameRole);
+					name->setIcon(oomIco.pixmap(iconSize));
 					//QStandardItem* name = new QStandardItem(session->name);
 					//QStandardItem* path = new QStandardItem(session->path);
 					//path->setToolTip(session->path);

@@ -252,7 +252,7 @@ QLabel#m_lblClassic::disabled
 
 QFrame#m_sonatinaBox, QFrame#m_maestroBox, QFrame#m_classicBox, QFrame#m_accousticBox, QFrame#m_m7Box,
 QFrame#m_sessionInfoBox, QFrame#m_commandBox, QFrame#m_customBox, QFrame#m_logsBox, QFrame#m_sessionStatusBox,
-QFrame#m_progressBox
+QFrame#m_progressBox, QFrame#frame_2
 {
 	color: #d0d4d0;
 	background-color: #1e1e1e;
