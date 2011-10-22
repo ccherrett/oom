@@ -72,7 +72,7 @@ QTableView
 }
 QTableView::focus
 {
-	border: 2px solid #f3ce69;
+	/*border: 2px solid #f3ce69;*/
 }
 
 QTableView::item
