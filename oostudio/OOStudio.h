@@ -85,6 +85,7 @@ private:
 	
 	QMap<QString, OOSession*> m_sessionMap;
 	QHash<int, DownloadPackage*> m_downloadMap;
+	QList<int> m_progress;
 	
 	OOSession* m_current;
 	QByteArray m_restoreSize;
@@ -142,6 +143,12 @@ private slots:
 	void cancelClassic();
 	void cancelAcoustic();
 	void cancelM7();
+
+	void donateSonatina();
+	void donateMaestro();
+	void donateClassic();
+	void donateAcoustic();
+	void donateM7();
 
 	void trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal);
 	void trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal);

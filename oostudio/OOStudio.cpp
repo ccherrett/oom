@@ -155,6 +155,16 @@ void OOStudio::createTrayIcon()/*{{{*/
 	QSize iconSize(471, 78);
 	m_lblLogoSession->setPixmap(oomIco.pixmap(iconSize));
 
+	QIcon donateIcon;
+	donateIcon.addPixmap(QPixmap(":/images/oostudio-donate-on.png"), QIcon::Normal, QIcon::On);
+	donateIcon.addPixmap(QPixmap(":/images/oostudio-donate-off.png"), QIcon::Normal, QIcon::Off);
+	donateIcon.addPixmap(QPixmap(":/images/oostudio-donate-on.png"), QIcon::Active);
+	m_btnDonateSonatina->setIcon(QIcon(donateIcon));
+	m_btnDonateMaestro->setIcon(QIcon(donateIcon));
+	m_btnDonateClassic->setIcon(QIcon(donateIcon));
+	m_btnDonateAcoustic->setIcon(QIcon(donateIcon));
+	m_btnDonateM7->setIcon(QIcon(donateIcon));
+
 	QIcon moreIcon;
 	moreIcon.addPixmap(QPixmap(":/images/oostudio-more-small-on.png"), QIcon::Normal, QIcon::On);
 	moreIcon.addPixmap(QPixmap(":/images/oostudio-more-small-off.png"), QIcon::Normal, QIcon::Off);
@@ -392,6 +402,11 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_btnCancelAcoustic, SIGNAL(clicked()), this, SLOT(cancelAcoustic()));
 	connect(m_btnCancelM7, SIGNAL(clicked()), this, SLOT(cancelM7()));
 
+	connect(m_btnDonateSonatina, SIGNAL(clicked()), this, SLOT(donateSonatina()));
+	connect(m_btnDonateMaestro, SIGNAL(clicked()), this, SLOT(donateMaestro()));
+	connect(m_btnDonateClassic, SIGNAL(clicked()), this, SLOT(donateClassic()));
+	connect(m_btnDonateAcoustic, SIGNAL(clicked()), this, SLOT(donateAcoustic()));
+	connect(m_btnDonateM7, SIGNAL(clicked()), this, SLOT(donateM7()));
 }/*}}}*/
 
 void OOStudio::updateHeaders()/*{{{*/
@@ -415,6 +430,7 @@ void OOStudio::updateHeaders()/*{{{*/
 void OOStudio::populateSessions(bool usehash)/*{{{*/
 {
 	QIcon oomIco(":/images/oostudio_session_icon.png");
+	QIcon oomIcoTemplate(":/images/oostudio_session_icon_template.png");
 	m_sessionModel->clear();
 	m_templateModel->clear();
 	while(m_cmbTemplate->count() > 3)
@@ -443,7 +459,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					}
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
-					name->setIcon(QIcon(oomIco));
+					name->setIcon(QIcon(oomIcoTemplate));
 					m_templateModel->appendRow(name);
 					m_cmbTemplate->addItem("T: "+session->name, session->name);
 				}
@@ -507,7 +523,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					}
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
-					name->setIcon(QIcon(oomIco));
+					name->setIcon(QIcon(oomIcoTemplate));
 					m_templateModel->appendRow(name);
 					m_cmbTemplate->addItem("T: "+session->name, session->name);
 					m_sessionMap[session->name] = session;
@@ -944,7 +960,9 @@ void OOStudio::resetCreate(bool fromClear)/*{{{*/
 	m_txtLSHost->setText(LS_HOSTNAME);
 	m_txtLSPort->setText(QString::number(LS_PORT));
 	m_txtLSCommand->setText(LS_COMMAND);
-	m_txtJackCommand->setText(JACK_COMMAND);
+	QSettings settings("OOMidi", "OOStudio");
+	QString jackCmd = settings.value("OOStudio/jackCommand", JACK_COMMAND).toString();
+	m_txtJackCommand->setText(jackCmd);
 	m_cmbLSCPMode->setCurrentIndex(0);
 	m_commandModel->clear();
 	m_chkTemplate->setChecked(false);
@@ -2302,9 +2320,9 @@ void OOStudio::download(int type)
 		{
 			if(!checkPackageInstall(Sonatina))
 			{
-				DownloadPackage* pkg = m_downloadMap.value(type);
+				//DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(Sonatina));
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			m_btnDownloadSonatina->setEnabled(false);
 			qDebug() << "Sonatina download  requested";
@@ -2315,9 +2333,9 @@ void OOStudio::download(int type)
 			qDebug() << "Maestro download  requested";
 			if(!checkPackageInstall(Maestro))
 			{
-				DownloadPackage* pkg = m_downloadMap.value(type);
+				//DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(Maestro));
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			m_btnDownloadMaestro->setEnabled(false);
 		}
@@ -2327,9 +2345,9 @@ void OOStudio::download(int type)
 			qDebug() << "Classic download  requested";
 			if(!checkPackageInstall(ClassicGuitar))
 			{
-				DownloadPackage* pkg = m_downloadMap.value(type);
+				//DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(ClassicGuitar));
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			m_btnDownloadClassic->setEnabled(false);
 		}
@@ -2339,9 +2357,9 @@ void OOStudio::download(int type)
 			qDebug() << "Acoustic download  requested";
 			if(!checkPackageInstall(AcousticGuitar))
 			{
-				DownloadPackage* pkg = m_downloadMap.value(type);
+				//DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(AcousticGuitar));
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			m_btnDownloadAccoustic->setEnabled(false);
 		}
@@ -2351,9 +2369,9 @@ void OOStudio::download(int type)
 			qDebug() << "M7 IR download  requested";
 			if(!checkPackageInstall(M7IR44))
 			{
-				DownloadPackage* pkg = m_downloadMap.value(type);
+				//DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(M7IR44));
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			m_btnDownloadM7->setEnabled(false);
 		}
@@ -2363,9 +2381,9 @@ void OOStudio::download(int type)
 			qDebug() << "M7 IR download  requested";
 			if(!checkPackageInstall(M7IR48))
 			{
-				DownloadPackage* pkg = m_downloadMap.value(type);
+				//DownloadPackage* pkg = m_downloadMap.value(type);
 				m_downloader->startDownload(m_downloadMap.value(M7IR48));
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			m_btnDownloadM7->setEnabled(false);
 		}
@@ -2381,28 +2399,28 @@ void OOStudio::download(int type)
 				DownloadPackage* pkg = m_downloadMap.value(Sonatina);
 				m_btnDownloadSonatina->setEnabled(false);
 				m_downloader->startDownload(pkg);
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			if(!checkPackageInstall(Maestro))
 			{
 				DownloadPackage* pkg = m_downloadMap.value(Maestro);
 				m_btnDownloadMaestro->setEnabled(false);
 				m_downloader->startDownload(pkg);
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			if(!checkPackageInstall(ClassicGuitar))
 			{
 				DownloadPackage* pkg = m_downloadMap.value(ClassicGuitar);
 				m_btnDownloadClassic->setEnabled(false);
 				m_downloader->startDownload(pkg);
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			if(!checkPackageInstall(AcousticGuitar))
 			{
 				DownloadPackage* pkg = m_downloadMap.value(AcousticGuitar);
 				m_btnDownloadAccoustic->setEnabled(false);
 				m_downloader->startDownload(pkg);
-				QDesktopServices::openUrl(pkg->homepage);
+				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			if(m_chk44->isChecked())
 			{
@@ -2411,7 +2429,7 @@ void OOStudio::download(int type)
 					DownloadPackage* pkg = m_downloadMap.value(M7IR44);
 					m_btnDownloadM7->setEnabled(false);
 					m_downloader->startDownload(pkg);
-					QDesktopServices::openUrl(pkg->homepage);
+					//QDesktopServices::openUrl(pkg->homepage);
 				}
 			}
 			else
@@ -2421,7 +2439,7 @@ void OOStudio::download(int type)
 					DownloadPackage* pkg = m_downloadMap.value(M7IR48);
 					m_btnDownloadM7->setEnabled(false);
 					m_downloader->startDownload(pkg);
-					QDesktopServices::openUrl(pkg->homepage);
+					//QDesktopServices::openUrl(pkg->homepage);
 				}
 			}
 		}
@@ -2431,30 +2449,100 @@ void OOStudio::download(int type)
 
 void OOStudio::cancelSonatina()
 {
-	emit cancelDownload(Sonatina);
+	if(m_downloader->isRunning(Sonatina) && !m_downloader->isExtracting(Sonatina))
+	{
+		emit cancelDownload(Sonatina);
+	}
+	else
+	{
+		label_25->setVisible(false);
+		m_btnCancelSonatina->setVisible(false);
+		m_btnDonateSonatina->setVisible(false);
+		if(m_progress.contains(Sonatina))
+			m_progress.takeAt(m_progress.indexOf(Sonatina));
+		if(!m_progress.count())
+			m_progressBox->hide();
+	}
 }
 
 void OOStudio::cancelMaestro()
 {
-	emit cancelDownload(Maestro);
+	if(m_downloader->isRunning(Maestro) && !m_downloader->isExtracting(Maestro))
+	{
+		emit cancelDownload(Maestro);
+	}
+	else
+	{
+		label_26->setVisible(false);
+		m_btnCancelMaestro->setVisible(false);
+		m_btnDonateMaestro->setVisible(false);
+		if(m_progress.contains(Maestro))
+			m_progress.takeAt(m_progress.indexOf(Maestro));
+		if(!m_progress.count())
+			m_progressBox->hide();
+	}
 }
 
 void OOStudio::cancelClassic()
 {
-	emit cancelDownload(ClassicGuitar);
+	if(m_downloader->isRunning(ClassicGuitar) && !m_downloader->isExtracting(ClassicGuitar))
+	{
+		emit cancelDownload(ClassicGuitar);
+	}
+	else
+	{
+		label_27->setVisible(false);
+		m_btnCancelClassic->setVisible(false);
+		m_btnDonateClassic->setVisible(false);
+		if(m_progress.contains(ClassicGuitar))
+			m_progress.takeAt(m_progress.indexOf(ClassicGuitar));
+		if(!m_progress.count())
+			m_progressBox->hide();
+	}
 }
 
 void OOStudio::cancelAcoustic()
 {
-	emit cancelDownload(AcousticGuitar);
+	if(m_downloader->isRunning(AcousticGuitar) && !m_downloader->isExtracting(AcousticGuitar))
+	{
+		emit cancelDownload(AcousticGuitar);
+	}
+	else
+	{
+		label_30->setVisible(false);
+		m_btnCancelAcoustic->setVisible(false);
+		m_btnDonateAcoustic->setVisible(false);
+		if(m_progress.contains(AcousticGuitar))
+			m_progress.takeAt(m_progress.indexOf(AcousticGuitar));
+		if(!m_progress.count())
+			m_progressBox->hide();
+	}
 }
 
 void OOStudio::cancelM7()
 {
-	if(m_chk44->isChecked())
-		emit cancelDownload(M7IR44);
+	if((m_downloader->isRunning(M7IR44) && !m_downloader->isExtracting(M7IR44))
+		||(m_downloader->isRunning(M7IR48) && !m_downloader->isExtracting(M7IR48)))
+	{
+		if(m_chk44->isChecked())
+			emit cancelDownload(M7IR44);
+		else
+			emit cancelDownload(M7IR48);
+	}
 	else
-		emit cancelDownload(M7IR48);
+	{
+		label_31->setVisible(false);
+		m_btnCancelM7->setVisible(false);
+		m_btnDonateM7->setVisible(false);
+		
+		if(m_progress.contains(M7IR44))
+			m_progress.takeAt(m_progress.indexOf(M7IR44));
+		else if(m_progress.contains(M7IR48))
+			m_progress.takeAt(m_progress.indexOf(M7IR48));
+		if(!m_progress.count())
+			m_progressBox->hide();
+			
+	}
 }
 
 void OOStudio::downloadEnded(int type)/*{{{*/
@@ -2466,36 +2554,40 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		{
 			qDebug() << "Sonatina download complete";
 			//TODO: hide progress
-			label_25->setVisible(false);
 			m_progressSonatina->setVisible(false);
-			m_btnCancelSonatina->setVisible(false);
+			m_btnDonateSonatina->setVisible(true);
+			//label_25->setVisible(false);
+			//m_btnCancelSonatina->setVisible(false);
 		}
 		break;
 		case Maestro:
 		{
 			qDebug() << "Maestro download complete";
 			//TODO: hide progress
-			label_26->setVisible(false);
 			m_progressMaestro->setVisible(false);
-			m_btnCancelMaestro->setVisible(false);
+			m_btnDonateMaestro->setVisible(true);
+			//label_26->setVisible(false);
+			//m_btnCancelMaestro->setVisible(false);
 		}
 		break;
 		case ClassicGuitar:
 		{
 			qDebug() << "Classic download complete";
 			//TODO: hide progress
-			label_27->setVisible(false);
 			m_progressClassic->setVisible(false);
-			m_btnCancelClassic->setVisible(false);
+			m_btnDonateClassic->setVisible(true);
+			//label_27->setVisible(false);
+			//m_btnCancelClassic->setVisible(false);
 		}
 		break;
 		case AcousticGuitar:
 		{
 			qDebug() << "Acoustic download complete";
 			//TODO: hide progress
-			label_30->setVisible(false);
 			m_progressAcoustic->setVisible(false);
-			m_btnCancelAcoustic->setVisible(false);
+			m_btnDonateAcoustic->setVisible(true);
+			//label_30->setVisible(false);
+			//m_btnCancelAcoustic->setVisible(false);
 		}
 		break;
 		case M7IR44:
@@ -2503,9 +2595,10 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		{
 			qDebug() << "M7 IR download complete";
 			//TODO: hide progress
-			label_31->setVisible(false);
 			m_progressM7->setVisible(false);
-			m_btnCancelM7->setVisible(false);
+			m_btnDonateM7->setVisible(true);
+			//label_31->setVisible(false);
+			//m_btnCancelM7->setVisible(false);
 			m_chk44->blockSignals(false);
 			m_chk48->blockSignals(false);
 		}
@@ -2515,22 +2608,27 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 			label_25->setVisible(false);
 			m_progressSonatina->setVisible(false);
 			m_btnCancelSonatina->setVisible(false);
+			m_btnDonateSonatina->setVisible(false);
 
 			label_26->setVisible(false);
 			m_progressMaestro->setVisible(false);
 			m_btnCancelMaestro->setVisible(false);
+			m_btnDonateMaestro->setVisible(false);
 
 			label_27->setVisible(false);
 			m_progressClassic->setVisible(false);
 			m_btnCancelClassic->setVisible(false);
+			m_btnDonateClassic->setVisible(false);
 
 			label_30->setVisible(false);
 			m_progressAcoustic->setVisible(false);
 			m_btnCancelAcoustic->setVisible(false);
+			m_btnDonateAcoustic->setVisible(false);
 
 			label_31->setVisible(false);
 			m_progressM7->setVisible(false);
 			m_btnCancelM7->setVisible(false);
+			m_btnDonateM7->setVisible(false);
 
 			m_progressBox->setVisible(false);
 		}
@@ -2618,11 +2716,14 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 		}
 		break;
 	}
+	if(m_progress.contains(type))
+		m_progress.takeAt(m_progress.indexOf(type));
 }/*}}}*/
 
 void OOStudio::downloadStarted(int type)
 {
 	m_progressBox->setVisible(true);
+	m_progress.append(type);
 
 	SamplePack pack = (SamplePack)type;
 	switch(pack)
@@ -2708,7 +2809,8 @@ void OOStudio::downloadsComplete()
 	//m_btnCancelM7->setVisible(false);
 
 	qDebug() << "OOStudio::downloadsComplete";
-	m_progressBox->setVisible(false);
+	if(!m_progress.count())
+		m_progressBox->setVisible(false);
 	updateInstalledState();
 }
 
@@ -2789,6 +2891,8 @@ void OOStudio::downloadError(int type, const QString& error)
 		case ALL:
 		break;
 	}
+	if(m_progress.contains(type))
+		m_progress.takeAt(m_progress.indexOf(type));
 }
 
 void OOStudio::trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal)
@@ -2866,3 +2970,42 @@ void OOStudio::trackM7Progress(qint64 bytesReceived, qint64 bytesTotal)
 		m_progressM7->setValue(val);
 }
 
+void OOStudio::donateSonatina()
+{
+	cancelSonatina();
+	DownloadPackage* pkg = m_downloadMap.value(Sonatina);
+	if(pkg)
+		QDesktopServices::openUrl(pkg->homepage);
+}
+
+void OOStudio::donateMaestro()
+{
+	cancelMaestro();
+	DownloadPackage* pkg = m_downloadMap.value(Maestro);
+	if(pkg)
+		QDesktopServices::openUrl(pkg->homepage);
+}
+
+void OOStudio::donateClassic()
+{
+	cancelClassic();
+	DownloadPackage* pkg = m_downloadMap.value(ClassicGuitar);
+	if(pkg)
+		QDesktopServices::openUrl(pkg->homepage);
+}
+
+void OOStudio::donateAcoustic()
+{
+	cancelAcoustic();
+	DownloadPackage* pkg = m_downloadMap.value(AcousticGuitar);
+	if(pkg)
+		QDesktopServices::openUrl(pkg->homepage);
+}
+
+void OOStudio::donateM7()
+{
+	cancelM7();
+	DownloadPackage* pkg = m_downloadMap.value(M7IR44);
+	if(pkg)
+		QDesktopServices::openUrl(pkg->homepage);
+}

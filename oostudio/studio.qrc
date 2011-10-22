@@ -39,9 +39,15 @@
 	<file>images/oostudio-update-small-off.png</file>
 	<file>images/oostudio-update-small-on.png</file>
 	<file>images/oostudio-update-small-over.png</file>
+	
 	<file>images/oostudio-new-small-off.png</file>
 	<file>images/oostudio-new-small-on.png</file>
 	<file>images/oostudio-new-small-over.png</file>
+
+	<file>images/oostudio-donate-off.png</file>
+	<file>images/oostudio-donate-on.png</file>
+	<file>images/oostudio-donate-over.png</file>
+
 	<file>images/oostudio-oop-icon.png</file>
 	
 	<file>images/oom_icon.png</file>
@@ -89,5 +95,6 @@
 	<file>images/refresh_new_off.png</file>
 
 	<file>images/oostudio_session_icon.png</file>
+	<file>images/oostudio_session_icon_template.png</file>
  </qresource>
  </RCC>
