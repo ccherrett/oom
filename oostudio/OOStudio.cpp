@@ -38,6 +38,8 @@ static const QString M7IR44_PATH("Samplicity M7 Main - 03 - Wave Quad files, 32 
 static const QString M7IR48_PATH("Samplicity M7 Main - 04 - Wave Quad files, 32 bit, 48 Khz, v1.1");
 static const QString SOUNDS_DIR = QString(QDir::homePath()).append(QDir::separator()).append(".sounds").append(QDir::separator());
 
+#define SessionNameRole Qt::UserRole+5
+
 lscp_status_t client_callback ( lscp_client_t* /*_client*/, lscp_event_t /*event*/, const char * /*pchData*/, int /*cchData*/, void* pvData )
 {
 	OOStudio* lsc = (OOStudio*)pvData;
@@ -74,8 +76,8 @@ OOStudio::OOStudio()
 	m_cmbEditMode->addItem("Create");
 	m_cmbEditMode->addItem("Update");
 
-	m_sessionlabels = (QStringList() << "Name" << "Path" );
-	m_templatelabels = (QStringList() << "Name" << "Path" );
+	m_sessionlabels = (QStringList() << tr("Sessions") );
+	m_templatelabels = (QStringList() << tr("Templates"));
 	m_commandlabels = (QStringList() << "Command" );
 	m_loglabels = (QStringList() << "Command" << "Level" << "Log" );
 
@@ -89,6 +91,20 @@ OOStudio::OOStudio()
 	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
 	resize(size);
 	m_restoreSize = saveGeometry();
+
+	//TODO: Make this translateable
+	QFile sestemp(":/html/session.html");
+	if(sestemp.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QTextStream in(&sestemp);
+		m_sessionTemplate = in.readAll();
+		sestemp.close();
+	}
+	else
+	{
+		qDebug() << "Failed to load session table template from resource";
+	}
+
 	populateSessions();
 	m_lblRunning->setText(QString(NO_PROC_TEXT));
 	m_btnStopSession->setEnabled(false);
@@ -338,6 +354,7 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_templateTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(templateDoubleClicked(QModelIndex)));
 
 	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTopTabChanged(int)));
+	connect(m_sessionBox, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
 	//Download Tab connections
 	connect(m_downloader, SIGNAL(downloadStarted(int)), this, SLOT(downloadStarted(int)));
@@ -377,8 +394,10 @@ void OOStudio::updateHeaders()/*{{{*/
 	
 	m_templateModel->setHorizontalHeaderLabels(m_templatelabels);
 	
-	m_sessionTable->setColumnWidth(0, 200);
-	m_templateTable->setColumnWidth(0, 200);
+	//m_sessionTable->setColumnWidth(0, 200);
+	//m_templateTable->setColumnWidth(0, 200);
+	m_sessionTable->resizeRowsToContents();
+	m_templateTable->resizeRowsToContents();
 
 	m_commandModel->setHorizontalHeaderLabels(m_commandlabels);
 
@@ -406,15 +425,16 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 			if(session && session->name != QString(OOM_TEMPLATE_NAME) && session->name != QString(OOM_EXT_TEMPLATE_NAME))
 			{
 				//printf("Processing session %s \n", session->name.toUtf8().constData());
-				QStandardItem* name = new QStandardItem(session->name);
-				QStandardItem* path = new QStandardItem(session->path);
-				path->setToolTip(session->path);
-				QList<QStandardItem*> rowData;
-				rowData << name << path;
 				if(session->istemplate)
 				{
-					m_templateModel->appendRow(rowData);
-					m_cmbTemplate->addItem("T: "+name->text(), name->text());
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
+					name->setData(session->name, SessionNameRole);
+					//QStandardItem* path = new QStandardItem(session->path);
+					//path->setToolTip(session->path);
+					//QList<QStandardItem*> rowData;
+					//rowData << name << path;
+					m_templateModel->appendRow(name);
+					m_cmbTemplate->addItem("T: "+session->name, session->name);
 				}
 			}
 			++iter;
@@ -426,15 +446,17 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 			if(session && session->name != QString(OOM_TEMPLATE_NAME) && session->name != QString(OOM_EXT_TEMPLATE_NAME))
 			{
 				//printf("Processing session %s \n", session->name.toUtf8().constData());
-				QStandardItem* name = new QStandardItem(session->name);
-				QStandardItem* path = new QStandardItem(session->path);
-				path->setToolTip(session->path);
-				QList<QStandardItem*> rowData;
-				rowData << name << path;
 				if(!session->istemplate)
 				{
-					m_sessionModel->appendRow(rowData);
-					m_cmbTemplate->addItem("S: "+name->text(), name->text());
+					//QStandardItem* name = new QStandardItem(session->name);
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
+					name->setData(session->name, SessionNameRole);
+					//QStandardItem* path = new QStandardItem(session->path);
+					//path->setToolTip(session->path);
+					//QList<QStandardItem*> rowData;
+					//rowData << name << path;
+					m_sessionModel->appendRow(name);
+					m_cmbTemplate->addItem("S: "+session->name, session->name);
 				}
 			}
 			++iter;
@@ -462,15 +484,17 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 			if(session)
 			{
 				//printf("Found valid session\n");
-				QStandardItem* name = new QStandardItem(session->name);
-				QStandardItem* path = new QStandardItem(session->path);
-				path->setToolTip(session->path);
-				QList<QStandardItem*> rowData;
-				rowData << name << path;
 				if(session->istemplate)
 				{
-					m_templateModel->appendRow(rowData);
-					m_cmbTemplate->addItem("T: "+name->text(), name->text());
+					//QStandardItem* name = new QStandardItem(session->name);
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
+					name->setData(session->name, SessionNameRole);
+					//QStandardItem* path = new QStandardItem(session->path);
+					//path->setToolTip(session->path);
+					//QList<QStandardItem*> rowData;
+					//rowData << name << path;
+					m_templateModel->appendRow(name);
+					m_cmbTemplate->addItem("T: "+session->name, session->name);
 					m_sessionMap[session->name] = session;
 				}
 			}
@@ -487,15 +511,17 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 			if(session)
 			{
 				//printf("Found valid session\n");
-				QStandardItem* name = new QStandardItem(session->name);
-				QStandardItem* path = new QStandardItem(session->path);
-				path->setToolTip(session->path);
-				QList<QStandardItem*> rowData;
-				rowData << name << path;
 				if(!session->istemplate)
 				{
-					m_sessionModel->appendRow(rowData);
-					m_cmbTemplate->addItem("S: "+name->text(), name->text());
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
+					name->setData(session->name, SessionNameRole);
+					//QStandardItem* name = new QStandardItem(session->name);
+					//QStandardItem* path = new QStandardItem(session->path);
+					//path->setToolTip(session->path);
+					//QList<QStandardItem*> rowData;
+					//rowData << name << path;
+					m_sessionModel->appendRow(name);
+					m_cmbTemplate->addItem("S: "+session->name, session->name);
 					m_sessionMap[session->name] = session;
 				}
 			}
@@ -524,7 +550,7 @@ void OOStudio::toggleAdvanced(bool state)/*{{{*/
 	label_24->setVisible(state);
 	
 	//Turn off in advanced
-	m_lblBlurb->setVisible(!state);
+	//m_lblBlurb->setVisible(!state);
 }/*}}}*/
 
 bool OOStudio::checkPackageInstall(int id)/*{{{*/
@@ -728,10 +754,22 @@ void OOStudio::importSession()/*{{{*/
 
 void OOStudio::currentTopTabChanged(int tab)/*{{{*/
 {
-	if(tab == 2)
+	if(tab == 3)
 	{
 		m_loggerTable->resizeRowsToContents();
 		m_loggerTable->scrollToBottom();
+	}
+}/*}}}*/
+
+void OOStudio::currentTabChanged(int tab)/*{{{*/
+{
+	if(tab == 0)
+	{
+		m_sessionTable->resizeRowsToContents();
+	}
+	else
+	{
+		m_templateTable->resizeRowsToContents();
 	}
 }/*}}}*/
 
@@ -808,20 +846,12 @@ void OOStudio::browse(int form)/*{{{*/
 					{
 						session->name = getValidName(session->name);
 					}
-					QStandardItem* name = new QStandardItem(session->name);
-					QStandardItem* path = new QStandardItem(session->path);
-					path->setToolTip(session->path);
-					QList<QStandardItem*> rowData;
-					rowData << name << path;
 					if(session->istemplate)
 					{
-						m_templateModel->appendRow(rowData);
-						m_cmbTemplate->addItem(name->text(), path->text());
 						m_sessionBox->setCurrentIndex(1);
 					}
 					else
 					{
-						m_sessionModel->appendRow(rowData);
 						m_sessionBox->setCurrentIndex(0);
 					}
 					m_tabWidget->setCurrentIndex(0);
@@ -1117,7 +1147,7 @@ void OOStudio::sessionDoubleClicked(QModelIndex index)/*{{{*/
 		QStandardItem* item = m_sessionModel->item(index.row());
 		if(item)
 		{
-			OOSession* session = m_sessionMap.value(item->text());
+			OOSession* session = m_sessionMap.value(item->data(SessionNameRole).toString());
 			if(session)
 			{
 				loadSession(session);
@@ -1134,7 +1164,7 @@ void OOStudio::templateDoubleClicked(QModelIndex index)/*{{{*/
 		QStandardItem* item = m_templateModel->item(index.row());
 		if(item)
 		{
-			OOSession* session = m_sessionMap.value(item->text());
+			OOSession* session = m_sessionMap.value(item->data(SessionNameRole).toString());
 			if(session)
 			{
 				if(QMessageBox::warning(
@@ -1162,7 +1192,7 @@ void OOStudio::loadSessionClicked()/*{{{*/
 			QStandardItem* item = m_sessionModel->itemFromIndex(index);
 			if(item)
 			{
-				OOSession* session = m_sessionMap.value(item->text());
+				OOSession* session = m_sessionMap.value(item->data(SessionNameRole).toString());
 				if(session)
 				{
 					loadSession(session);
@@ -1183,7 +1213,7 @@ void OOStudio::loadTemplateClicked()/*{{{*/
 			QStandardItem* item = m_templateModel->itemFromIndex(index);
 			if(item)
 			{
-				OOSession* session = m_sessionMap.value(item->text());
+				OOSession* session = m_sessionMap.value(item->data(SessionNameRole).toString());
 				if(session)
 				{
 					if(QMessageBox::warning(
@@ -1243,11 +1273,11 @@ void OOStudio::deleteTemplate()/*{{{*/
 				if(QMessageBox::question(
 					this,
 					tr("Delete Template"),
-					msg.arg(item->text()),
+					msg.arg(item->data(SessionNameRole).toString()),
 					QMessageBox::Ok, QMessageBox::Cancel
 				) == QMessageBox::Ok)
 				{
-					OOSession* session = m_sessionMap.take(item->text());
+					OOSession* session = m_sessionMap.take(item->data(SessionNameRole).toString());
 					if(session)
 					{
 						if(m_current && session->name == m_current->name)
@@ -1279,11 +1309,11 @@ void OOStudio::deleteSession()/*{{{*/
 				if(QMessageBox::question(
 					this,
 					tr("Delete Session"),
-					msg.arg(item->text()),
+					msg.arg(item->data(SessionNameRole).toString()),
 					QMessageBox::Ok, QMessageBox::Cancel
 				) == QMessageBox::Ok)
 				{
-					OOSession* session = m_sessionMap.take(item->text());
+					OOSession* session = m_sessionMap.take(item->data(SessionNameRole).toString());
 					if(session)
 					{
 						if(m_current && session->name == m_current->name)
@@ -1533,20 +1563,10 @@ void OOStudio::createSession()/*{{{*/
 					//TODO: Write out the session to settings and update table
 					newSession->path = filename;
 					m_sessionMap[basename] = newSession;
-					QStandardItem* nitem = new QStandardItem(basename);
-					QStandardItem* npath = new QStandardItem(filename);
-					npath->setToolTip(filename);
-					QList<QStandardItem*> rowData;
-					rowData << nitem << npath;
 					showMessage("Successfully Created Session: "+basename);
-					if(istemplate)
-					{
-						m_templateModel->appendRow(rowData);
-					}
-					else
+					if(!istemplate)
 					{
 						//Not a template so load it now and minimize;
-						m_sessionModel->appendRow(rowData);
 						QString msg = QObject::tr("Successfully Created Session:\n\t%1 \nWould you like to open this session now?");
 						if(QMessageBox::question(
 							this,
@@ -1986,6 +2006,8 @@ void OOStudio::resizeEvent(QResizeEvent* evt)/*{{{*/
 {
 	QMainWindow::resizeEvent(evt);
 	m_loggerTable->resizeRowsToContents();
+	m_sessionTable->resizeRowsToContents();
+	m_templateTable->resizeRowsToContents();
 }/*}}}*/
 
 void OOStudio::iconActivated(QSystemTrayIcon::ActivationReason reason)/*{{{*/

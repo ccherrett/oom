@@ -80,6 +80,8 @@ private:
 	QStringList m_commandlabels;
 	QStringList m_loglabels;
 	QStringList m_lscpLabels;
+
+	QString m_sessionTemplate;
 	
 	QMap<QString, OOSession*> m_sessionMap;
 	QHash<int, DownloadPackage*> m_downloadMap;
@@ -176,6 +178,7 @@ private slots:
 	void sessionDoubleClicked(QModelIndex);
 	void templateDoubleClicked(QModelIndex);
 	void currentTopTabChanged(int);
+	void currentTabChanged(int);
 	//Process Listeners
 	void processOOMExit(int);
 

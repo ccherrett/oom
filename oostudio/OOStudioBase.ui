@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>641</width>
-    <height>833</height>
+    <width>625</width>
+    <height>878</height>
    </rect>
   </property>
   <property name="font">
@@ -69,6 +69,9 @@
               <property name="textElideMode">
                <enum>Qt::ElideNone</enum>
               </property>
+              <property name="showGrid">
+               <bool>false</bool>
+              </property>
               <property name="cornerButtonEnabled">
                <bool>false</bool>
               </property>
@@ -78,11 +81,23 @@
               <attribute name="verticalHeaderVisible">
                <bool>false</bool>
               </attribute>
+              <attribute name="verticalHeaderDefaultSectionSize">
+               <number>60</number>
+              </attribute>
+              <attribute name="verticalHeaderMinimumSectionSize">
+               <number>60</number>
+              </attribute>
               <attribute name="verticalHeaderVisible">
                <bool>false</bool>
               </attribute>
+              <attribute name="verticalHeaderDefaultSectionSize">
+               <number>60</number>
+              </attribute>
               <attribute name="horizontalHeaderStretchLastSection">
                <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderMinimumSectionSize">
+               <number>60</number>
               </attribute>
              </widget>
             </item>
@@ -159,6 +174,9 @@
               <property name="selectionBehavior">
                <enum>QAbstractItemView::SelectRows</enum>
               </property>
+              <property name="showGrid">
+               <bool>false</bool>
+              </property>
               <property name="cornerButtonEnabled">
                <bool>false</bool>
               </property>
@@ -168,11 +186,23 @@
               <attribute name="verticalHeaderVisible">
                <bool>false</bool>
               </attribute>
+              <attribute name="verticalHeaderDefaultSectionSize">
+               <number>60</number>
+              </attribute>
+              <attribute name="verticalHeaderMinimumSectionSize">
+               <number>60</number>
+              </attribute>
               <attribute name="verticalHeaderVisible">
                <bool>false</bool>
               </attribute>
+              <attribute name="verticalHeaderDefaultSectionSize">
+               <number>60</number>
+              </attribute>
               <attribute name="horizontalHeaderStretchLastSection">
                <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderMinimumSectionSize">
+               <number>60</number>
               </attribute>
              </widget>
             </item>
@@ -283,6 +313,9 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_24">
+              <property name="spacing">
+               <number>2</number>
+              </property>
               <property name="leftMargin">
                <number>20</number>
               </property>
@@ -313,27 +346,33 @@
                </widget>
               </item>
               <item>
-               <layout class="QFormLayout" name="formLayout_2">
-                <property name="fieldGrowthPolicy">
-                 <enum>QFormLayout::ExpandingFieldsGrow</enum>
-                </property>
-                <property name="verticalSpacing">
-                 <number>2</number>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <property name="spacing">
+                 <number>8</number>
                 </property>
                 <property name="topMargin">
                  <number>0</number>
                 </property>
-                <item row="0" column="0">
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <item>
                  <widget class="QLabel" name="label_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>114</width>
                     <height>16</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>16777215</width>
+                    <width>114</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -345,63 +384,72 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="1">
-                 <layout class="QHBoxLayout" name="horizontalLayout_6">
-                  <property name="rightMargin">
-                   <number>0</number>
+                <item>
+                 <widget class="QComboBox" name="m_cmbTemplate">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
                   </property>
-                  <item>
-                   <widget class="QComboBox" name="m_cmbTemplate">
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="sizeAdjustPolicy">
-                     <enum>QComboBox::AdjustToContents</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_5">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::MinimumExpanding</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>2</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_13">
-                    <property name="text">
-                     <string> Edit Mode:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="m_cmbEditMode"/>
-                  </item>
-                 </layout>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QComboBox::AdjustToContents</enum>
+                  </property>
+                 </widget>
                 </item>
-                <item row="2" column="0">
+                <item>
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::MinimumExpanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>2</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string> Edit Mode:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="m_cmbEditMode"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_34">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <item>
                  <widget class="QLabel" name="label_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>114</width>
                     <height>14</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>16777215</width>
+                    <width>114</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -413,83 +461,126 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="1">
+                <item>
                  <widget class="QLineEdit" name="m_txtName"/>
                 </item>
-                <item row="3" column="0">
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_10">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <item>
                  <widget class="QLabel" name="label_9">
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>114</width>
                     <height>16</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>16777215</width>
+                    <width>114</width>
                     <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
                    <string>Location:</string>
                   </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
                  </widget>
                 </item>
-                <item row="3" column="1">
-                 <layout class="QHBoxLayout" name="horizontalLayout_10">
-                  <property name="spacing">
-                   <number>-1</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLineEdit" name="m_txtLocation"/>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="m_btnBrowsePath">
-                    <property name="text">
-                     <string>Browse</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                <item>
+                 <widget class="QLineEdit" name="m_txtLocation"/>
                 </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="label_10">
+                <item>
+                 <widget class="QPushButton" name="m_btnBrowsePath">
                   <property name="text">
-                   <string>OOM file:</string>
+                   <string>Browse</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="1">
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
-                  <property name="leftMargin">
-                   <number>0</number>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_10">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
                   </property>
-                  <item>
-                   <widget class="QLineEdit" name="m_txtOOMPath"/>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="m_btnBrowseOOM">
-                    <property name="text">
-                     <string>Browse</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="label">
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>114</width>
                     <height>16</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>16777215</width>
+                    <width>114</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>OOM file:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="m_txtOOMPath"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="m_btnBrowseOOM">
+                  <property name="text">
+                   <string>Browse</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,1,0,0,0">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>114</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>114</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -501,27 +592,10 @@
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="1">
-                 <layout class="QHBoxLayout" name="horizontalLayout_11">
-                  <property name="spacing">
-                   <number>-1</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QLineEdit" name="m_txtLSCP"/>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="m_btnBrowseLSCP">
-                    <property name="text">
-                     <string>Browse</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                <item>
+                 <widget class="QLineEdit" name="m_txtLSCP"/>
                 </item>
-                <item row="7" column="0">
+                <item>
                  <widget class="QLabel" name="label_4">
                   <property name="minimumSize">
                    <size>
@@ -536,24 +610,65 @@
                    </size>
                   </property>
                   <property name="text">
-                   <string> LSCP Mode:</string>
+                   <string>Mode:</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
-                <item row="7" column="1">
+                <item>
                  <widget class="QComboBox" name="m_cmbLSCPMode"/>
                 </item>
-                <item row="8" column="0">
-                 <widget class="QLabel" name="label_24">
+                <item>
+                 <widget class="QPushButton" name="m_btnBrowseLSCP">
                   <property name="text">
-                   <string>Make Template:</string>
+                   <string>Browse</string>
                   </property>
                  </widget>
                 </item>
-                <item row="8" column="1">
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_38">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="topMargin">
+                 <number>4</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>4</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_24">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>114</width>
+                    <height>11</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>114</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Make Template:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QCheckBox" name="m_chkTemplate">
                   <property name="toolTip">
                    <string>Save the created session as a Template</string>
@@ -566,14 +681,58 @@
                </layout>
               </item>
               <item>
-               <widget class="QLabel" name="m_lblBlurb">
-                <property name="text">
-                 <string/>
+               <layout class="QHBoxLayout" name="horizontalLayout_37">
+                <property name="spacing">
+                 <number>8</number>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
+                <property name="leftMargin">
+                 <number>0</number>
                 </property>
-               </widget>
+                <item>
+                 <widget class="QLabel" name="label_28">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>114</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>114</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Notes:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QTextEdit" name="m_txtNotes">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>60</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -627,7 +786,7 @@
                  <enum>QFormLayout::ExpandingFieldsGrow</enum>
                 </property>
                 <property name="verticalSpacing">
-                 <number>4</number>
+                 <number>0</number>
                 </property>
                 <property name="topMargin">
                  <number>0</number>
@@ -1135,8 +1294,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>595</width>
-                <height>1912</height>
+                <width>579</width>
+                <height>1969</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -2949,7 +3108,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>641</width>
+     <width>625</width>
      <height>24</height>
     </rect>
    </property>
