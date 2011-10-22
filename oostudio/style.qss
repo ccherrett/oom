@@ -145,7 +145,7 @@ QLineEdit
      border-image: url(:/images/frame.png) 4;
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #1b1b1b;
+	 background-color: #121212; /*#1b1b1b;*/
 	 color: #b8b8b8;
 }
 
@@ -392,7 +392,7 @@ QMainWindow, QMenu, QSplitter, QDialog, QTabWidget, QMessageBox, QScrollArea
 
 QTextEdit
 {
-	background-color: #1e1e1e;
+	background-color: #0a0a0a;
 	border: 1px solid #29292a;
 	border-radius: 6px;
 	padding: 8px;
