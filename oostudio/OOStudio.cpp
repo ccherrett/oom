@@ -153,7 +153,6 @@ void OOStudio::createTrayIcon()/*{{{*/
 	QIcon oomIco(":/images/oostudio-oop-icon.png");
 	QSize iconSize(471, 78);
 	m_lblLogoSession->setPixmap(oomIco.pixmap(iconSize));
-	m_lblLogoTemplate->setPixmap(oomIco.pixmap(iconSize));
 
 	QIcon moreIcon;
 	moreIcon.addPixmap(QPixmap(":/images/oostudio-more-small-on.png"), QIcon::Normal, QIcon::On);
