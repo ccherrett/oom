@@ -2449,7 +2449,7 @@ void OOStudio::download(int type)
 
 void OOStudio::cancelSonatina()
 {
-	if(m_downloader->isRunning(Sonatina) && !m_downloader->isExtracting(Sonatina))
+	if(m_downloader->isRunning(Sonatina) || m_downloader->isExtracting(Sonatina))
 	{
 		emit cancelDownload(Sonatina);
 	}
@@ -2467,7 +2467,7 @@ void OOStudio::cancelSonatina()
 
 void OOStudio::cancelMaestro()
 {
-	if(m_downloader->isRunning(Maestro) && !m_downloader->isExtracting(Maestro))
+	if(m_downloader->isRunning(Maestro) || m_downloader->isExtracting(Maestro))
 	{
 		emit cancelDownload(Maestro);
 	}
@@ -2485,7 +2485,7 @@ void OOStudio::cancelMaestro()
 
 void OOStudio::cancelClassic()
 {
-	if(m_downloader->isRunning(ClassicGuitar) && !m_downloader->isExtracting(ClassicGuitar))
+	if(m_downloader->isRunning(ClassicGuitar) || m_downloader->isExtracting(ClassicGuitar))
 	{
 		emit cancelDownload(ClassicGuitar);
 	}
@@ -2503,7 +2503,7 @@ void OOStudio::cancelClassic()
 
 void OOStudio::cancelAcoustic()
 {
-	if(m_downloader->isRunning(AcousticGuitar) && !m_downloader->isExtracting(AcousticGuitar))
+	if(m_downloader->isRunning(AcousticGuitar) || m_downloader->isExtracting(AcousticGuitar))
 	{
 		emit cancelDownload(AcousticGuitar);
 	}
@@ -2521,8 +2521,8 @@ void OOStudio::cancelAcoustic()
 
 void OOStudio::cancelM7()
 {
-	if((m_downloader->isRunning(M7IR44) && !m_downloader->isExtracting(M7IR44))
-		||(m_downloader->isRunning(M7IR48) && !m_downloader->isExtracting(M7IR48)))
+	if((m_downloader->isRunning(M7IR44) || m_downloader->isExtracting(M7IR44))
+		||(m_downloader->isRunning(M7IR48) || m_downloader->isExtracting(M7IR48)))
 	{
 		if(m_chk44->isChecked())
 			emit cancelDownload(M7IR44);
