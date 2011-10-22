@@ -149,6 +149,7 @@ private slots:
 	void trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal);
 	void trackM7Progress(qint64 bytesReceived, qint64 bytesTotal);
 
+	void setDefaultJackCommand();
 	void writeLog(LogInfo*);
 	void toggleAdvanced(bool);
 	void updateInstalledState();

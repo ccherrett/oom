@@ -18,6 +18,7 @@ struct OOSession
 	QStringList commands;
 	QStringList postCommands;
 	QString lscpPath;
+	QString notes;
 	int lscpMode;
 	QString songfile;
 	QString lshostname;

@@ -8,6 +8,7 @@
 #include "OOClient.h"
 #include <QProcess>
 #include <QFileInfo>
+#include <QTextStream>
 #include <QDebug>
 #include <jack/jack.h>
 #include <lscp/client.h>
@@ -129,14 +130,25 @@ void OOThread::processCustomErrors(QString name, long pid)/*{{{*/
 		OOProcess* process = m_procMap.value(pid);
 		if(process)
 		{
-			QString messages = QString::fromUtf8(process->readAllStandardError().constData());
-			if(messages.isEmpty())
-				return;
-			LogInfo* info = new LogInfo;
-			info->name = name;
-			info->message = messages;
-			info->codeString = QString("ERROR");
-			emit logMessage(info);
+			QByteArray ba = process->readAllStandardError();
+			QTextStream in(&ba);
+			QString messages = in.readLine();
+			QString lastMsg("");
+			while(!messages.isNull())
+			{
+				if(messages.isEmpty() || messages == lastMsg)
+				{	
+					messages = in.readLine();
+					continue;
+				}
+				LogInfo* info = new LogInfo;
+				info->name = name;
+				info->message = messages;
+				info->codeString = QString("ERROR");
+				emit logMessage(info);
+				lastMsg = messages;
+				messages = in.readLine();
+			}
 		}
 	}
 }/*}}}*/
@@ -175,14 +187,25 @@ void OOThread::processMessagesByType(int type)/*{{{*/
 			break;
 			case 1: //Error
 			{
-				QString messages = QString::fromUtf8(m_process->readAllStandardError().constData());
-				if(messages.isEmpty())
-					return;
-				LogInfo* info = new LogInfo;
-				info->name = m_name;
-				info->message = messages;
-				info->codeString = QString("ERROR");
-				emit logMessage(info);
+				QByteArray ba = m_process->readAllStandardError();
+				QTextStream in(&ba);
+				QString messages = in.readLine();
+				QString lastMsg("");
+				while(!messages.isNull())
+				{
+					if(messages.isEmpty() || messages == lastMsg)
+					{
+						messages = in.readLine();
+						continue;
+					}
+					LogInfo* info = new LogInfo;
+					info->name = m_name;
+					info->message = messages;
+					info->codeString = QString("ERROR");
+					emit logMessage(info);
+					lastMsg = messages;
+					messages = in.readLine();
+				}
 			}
 			break;
 		}

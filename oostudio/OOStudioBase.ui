@@ -994,7 +994,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="pushButton">
+                   <widget class="QPushButton" name="m_btnDefault">
                     <property name="toolTip">
                      <string>Set this jack command as your default for new sessions</string>
                     </property>

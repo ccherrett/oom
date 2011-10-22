@@ -11,6 +11,7 @@
 #include "OODownload.h"
 #include "config.h"
 #include <QtGui>
+#include <QDateTime>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNodeList>
@@ -353,6 +354,7 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_cmbTemplate, SIGNAL(activated(int)), this, SLOT(templateSelectionChanged(int)));
 	connect(m_cmbEditMode, SIGNAL(currentIndexChanged(int)), this, SLOT(editModeChanged(int)));
 	connect(m_btnMore, SIGNAL(toggled(bool)), this, SLOT(toggleAdvanced(bool)));
+	connect(m_btnDefault, SIGNAL(clicked()), this, SLOT(setDefaultJackCommand()));
 
 	connect(m_sessionTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(sessionDoubleClicked(QModelIndex)));
 	connect(m_templateTable, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(templateDoubleClicked(QModelIndex)));
@@ -406,7 +408,8 @@ void OOStudio::updateHeaders()/*{{{*/
 	m_commandModel->setHorizontalHeaderLabels(m_commandlabels);
 
 	m_loggerModel->setHorizontalHeaderLabels(m_loglabels);
-	m_loggerTable->setColumnWidth(1, 60);
+	m_loggerTable->setColumnWidth(0, 110);
+	m_loggerTable->setColumnWidth(1, 70);
 }/*}}}*/
 
 void OOStudio::populateSessions(bool usehash)/*{{{*/
@@ -433,13 +436,15 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				//printf("Processing session %s \n", session->name.toUtf8().constData());
 				if(session->istemplate)
 				{
-					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
+					QFileInfo finfo(session->path);
+					QDateTime cdate(QDate::currentDate());
+					if(finfo.exists())
+					{
+						cdate = finfo.created();
+					}
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
 					name->setIcon(oomIco.pixmap(iconSize));
-					//QStandardItem* path = new QStandardItem(session->path);
-					//path->setToolTip(session->path);
-					//QList<QStandardItem*> rowData;
-					//rowData << name << path;
 					m_templateModel->appendRow(name);
 					m_cmbTemplate->addItem("T: "+session->name, session->name);
 				}
@@ -455,14 +460,15 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				//printf("Processing session %s \n", session->name.toUtf8().constData());
 				if(!session->istemplate)
 				{
-					//QStandardItem* name = new QStandardItem(session->name);
-					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
+					QFileInfo finfo(session->path);
+					QDateTime cdate(QDate::currentDate());
+					if(finfo.exists())
+					{
+						cdate = finfo.created();
+					}
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
 					name->setIcon(oomIco.pixmap(iconSize));
-					//QStandardItem* path = new QStandardItem(session->path);
-					//path->setToolTip(session->path);
-					//QList<QStandardItem*> rowData;
-					//rowData << name << path;
 					m_sessionModel->appendRow(name);
 					m_cmbTemplate->addItem("S: "+session->name, session->name);
 				}
@@ -494,14 +500,15 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				//printf("Found valid session\n");
 				if(session->istemplate)
 				{
-					//QStandardItem* name = new QStandardItem(session->name);
-					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
+					QFileInfo finfo(session->path);
+					QDateTime cdate(QDate::currentDate());
+					if(finfo.exists())
+					{
+						cdate = finfo.created();
+					}
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
 					name->setIcon(oomIco.pixmap(iconSize));
-					//QStandardItem* path = new QStandardItem(session->path);
-					//path->setToolTip(session->path);
-					//QList<QStandardItem*> rowData;
-					//rowData << name << path;
 					m_templateModel->appendRow(name);
 					m_cmbTemplate->addItem("T: "+session->name, session->name);
 					m_sessionMap[session->name] = session;
@@ -522,14 +529,15 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 				//printf("Found valid session\n");
 				if(!session->istemplate)
 				{
-					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg("The Date here").arg("Some Notes here"));
+					QFileInfo finfo(session->path);
+					QDateTime cdate(QDate::currentDate());
+					if(finfo.exists())
+					{
+						cdate = finfo.created();
+					}
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
 					name->setIcon(oomIco.pixmap(iconSize));
-					//QStandardItem* name = new QStandardItem(session->name);
-					//QStandardItem* path = new QStandardItem(session->path);
-					//path->setToolTip(session->path);
-					//QList<QStandardItem*> rowData;
-					//rowData << name << path;
 					m_sessionModel->appendRow(name);
 					m_cmbTemplate->addItem("S: "+session->name, session->name);
 					m_sessionMap[session->name] = session;
@@ -1518,6 +1526,7 @@ void OOStudio::createSession()/*{{{*/
 			QString filename(newPath+".oos");
 			QString songfile(newPath+".oom");
 			QString lscpfile(newPath+".lscp");
+			QString notes(m_txtNotes->toPlainText());
 
 			QString strSong = convertPath(m_txtOOMPath->text());
 			bool oomok = QFile::copy(strSong, songfile);
@@ -1553,6 +1562,11 @@ void OOStudio::createSession()/*{{{*/
 				newSession->lscommand = m_txtLSCommand->text();
 				newSession->lshostname = m_txtLSHost->text();
 				newSession->lsport = m_txtLSPort->text().toInt();
+
+				QDomElement notenode = doc.createElement("notes");
+				root.appendChild(notenode);
+				notenode.setAttribute("text", notes);
+				newSession->notes = notes;
 
 				for(int i= 0; i < m_commandModel->rowCount(); ++i)
 				{
@@ -1674,6 +1688,7 @@ void OOStudio::updateSession()/*{{{*/
 			QString filename(newPath+".oos");
 			QString songfile(newPath+".oom");
 			QString lscpfile(newPath+".lscp");
+			QString notes(m_txtNotes->toPlainText());
 
 			QString strSong = convertPath(m_txtOOMPath->text());
 			QString strLSCP = convertPath(m_txtLSCP->text());
@@ -1740,6 +1755,11 @@ void OOStudio::updateSession()/*{{{*/
 				newSession->lscommand = m_txtLSCommand->text();
 				newSession->lshostname = m_txtLSHost->text();
 				newSession->lsport = m_txtLSPort->text().toInt();
+
+				QDomElement notenode = doc.createElement("notes");
+				root.appendChild(notenode);
+				notenode.setAttribute("text", notes);
+				newSession->notes = notes;
 
 				for(int i= 0; i < m_commandModel->rowCount(); ++i)
 				{
@@ -1822,6 +1842,15 @@ void OOStudio::updateSession()/*{{{*/
 	}
 }/*}}}*/
 
+void OOStudio::setDefaultJackCommand()
+{
+	QSettings settings("OOMidi", "OOStudio");
+	settings.beginGroup("OOStudio");
+	settings.setValue("jackCommand", m_txtJackCommand->text());
+	settings.endGroup();
+	settings.sync();
+}
+
 void OOStudio::templateSelectionChanged(int index)/*{{{*/
 {
 	QString tpath = m_cmbTemplate->itemData(index).toString();
@@ -1870,15 +1899,20 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 		OOSession* session = m_sessionMap.value(tpath);
 		if(session)
 		{
+			QSettings settings("OOMidi", "OOStudio");
+			QString jackCmd = settings.value("OOStudio/jackCommand", session->jackcommand).toString();
+
 			if(m_cmbEditMode->currentIndex() == 1)
 			{
 				QFileInfo fi(session->path);
 				m_txtLocation->setText(fi.dir().absolutePath());
 				m_txtName->setText(session->name);
 				m_chkTemplate->setChecked(session->istemplate);
+				m_txtJackCommand->setText(session->jackcommand);
 			}
 			else
 			{
+				m_txtJackCommand->setText(jackCmd);
 				if(m_txtName->text().isEmpty())
 				{
 					m_txtName->setText(getValidName(session->name));
@@ -1898,7 +1932,6 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 				m_commandModel->appendRow(item);
 			}
 			m_chkStartJack->setChecked(session->loadJack);
-			m_txtJackCommand->setText(session->jackcommand);
 			m_chkStartLS->setChecked(session->loadls);
 			m_txtLSCommand->setText(session->lscommand);
 			m_txtLSHost->setText(session->lshostname);
@@ -1906,6 +1939,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 			m_cmbLSCPMode->setCurrentIndex(session->lscpMode);
 			m_txtLSCP->setText(session->lscpPath);
 			m_txtOOMPath->setText(session->songfile);
+			m_txtNotes->setText(session->notes);
 			m_txtName->setFocus(Qt::OtherFocusReason);
 			updateHeaders();
 		}
@@ -1997,6 +2031,17 @@ OOSession* OOStudio::readSession(QString filename)/*{{{*/
 		{
 			QDomElement song = lsong.at(i).toElement();
 			session->songfile = song.attribute("path");
+		}
+		
+		QDomNodeList lnotes = root.elementsByTagName("notes");
+		//Backwards compat
+		if(!lnotes.count())
+			session->notes = "";
+		
+		for(int i = 0; i < lsong.count(); ++i)
+		{
+			QDomElement notes = lnotes.at(i).toElement();
+			session->notes = notes.attribute("text");
 		}
 		return session;
 	}
