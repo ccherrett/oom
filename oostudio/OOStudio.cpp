@@ -414,8 +414,7 @@ void OOStudio::updateHeaders()/*{{{*/
 
 void OOStudio::populateSessions(bool usehash)/*{{{*/
 {
-	QIcon oomIco(":/images/oostudio-oop-icon.png");
-	QSize iconSize(150, 78);
+	QIcon oomIco(":/images/oostudio_session_icon.png");
 	m_sessionModel->clear();
 	m_templateModel->clear();
 	while(m_cmbTemplate->count() > 3)
@@ -444,7 +443,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					}
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
-					name->setIcon(oomIco.pixmap(iconSize));
+					name->setIcon(QIcon(oomIco));
 					m_templateModel->appendRow(name);
 					m_cmbTemplate->addItem("T: "+session->name, session->name);
 				}
@@ -468,7 +467,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					}
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
-					name->setIcon(oomIco.pixmap(iconSize));
+					name->setIcon(QIcon(oomIco));
 					m_sessionModel->appendRow(name);
 					m_cmbTemplate->addItem("S: "+session->name, session->name);
 				}
@@ -508,7 +507,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					}
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
-					name->setIcon(oomIco.pixmap(iconSize));
+					name->setIcon(QIcon(oomIco));
 					m_templateModel->appendRow(name);
 					m_cmbTemplate->addItem("T: "+session->name, session->name);
 					m_sessionMap[session->name] = session;
@@ -537,7 +536,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					}
 					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
-					name->setIcon(oomIco.pixmap(iconSize));
+					name->setIcon(QIcon(oomIco));
 					m_sessionModel->appendRow(name);
 					m_cmbTemplate->addItem("S: "+session->name, session->name);
 					m_sessionMap[session->name] = session;
