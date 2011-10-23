@@ -15,6 +15,7 @@ QWidget#m_tabDownloads
 	background-color: #525252;
 }
 QWidget#m_scrollAreaWidgetContents{ background-color: #525252; }
+QWidget#scrollAreaWidgetContents{ background-color: #525252; }
 
 /*QWidget
 {

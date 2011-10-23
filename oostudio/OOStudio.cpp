@@ -190,7 +190,7 @@ void OOStudio::createTrayIcon()/*{{{*/
 	m_btnCancelM7->setIcon(QIcon(stopIcon));
 
 	qDebug() << "OOStudio::downloadsComplete";
-	m_progressBox->setVisible(false);
+	//m_progressBox->setVisible(false);
 	QIcon clearIcon;
 	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-on.png"), QIcon::Normal, QIcon::On);
 	clearIcon.addPixmap(QPixmap(":/images/oostudio-clear-small-off.png"), QIcon::Normal, QIcon::Off);
@@ -2492,6 +2492,7 @@ void OOStudio::cancelSonatina()
 	else
 	{
 		label_25->setVisible(false);
+		m_progressSonatina->setVisible(false);
 		m_btnCancelSonatina->setVisible(false);
 		m_btnDonateSonatina->setVisible(false);
 		if(m_progress.contains(Sonatina))
@@ -2510,6 +2511,7 @@ void OOStudio::cancelMaestro()
 	else
 	{
 		label_26->setVisible(false);
+		m_progressMaestro->setVisible(false);
 		m_btnCancelMaestro->setVisible(false);
 		m_btnDonateMaestro->setVisible(false);
 		if(m_progress.contains(Maestro))
@@ -2528,6 +2530,7 @@ void OOStudio::cancelClassic()
 	else
 	{
 		label_27->setVisible(false);
+		m_progressClassic->setVisible(false);
 		m_btnCancelClassic->setVisible(false);
 		m_btnDonateClassic->setVisible(false);
 		if(m_progress.contains(ClassicGuitar))
@@ -2546,6 +2549,7 @@ void OOStudio::cancelAcoustic()
 	else
 	{
 		label_30->setVisible(false);
+		m_progressAcoustic->setVisible(false);
 		m_btnCancelAcoustic->setVisible(false);
 		m_btnDonateAcoustic->setVisible(false);
 		if(m_progress.contains(AcousticGuitar))
@@ -2568,6 +2572,7 @@ void OOStudio::cancelM7()
 	else
 	{
 		label_31->setVisible(false);
+		m_progressM7->setVisible(false);
 		m_btnCancelM7->setVisible(false);
 		m_btnDonateM7->setVisible(false);
 		
@@ -2589,8 +2594,8 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		case Sonatina:
 		{
 			showMessage(tr("Sonatina download complete"));
-			m_progressSonatina->setVisible(false);
-			m_btnDonateSonatina->setVisible(true);
+			//m_progressSonatina->setVisible(false);
+			//m_btnDonateSonatina->setVisible(false);
 			//label_25->setVisible(false);
 			//m_btnCancelSonatina->setVisible(false);
 		}
@@ -2598,8 +2603,8 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		case Maestro:
 		{
 			showMessage(tr("Maestro download complete"));
-			m_progressMaestro->setVisible(false);
-			m_btnDonateMaestro->setVisible(true);
+			//m_progressMaestro->setVisible(false);
+			//m_btnDonateMaestro->setVisible(false);
 			//label_26->setVisible(false);
 			//m_btnCancelMaestro->setVisible(false);
 		}
@@ -2607,8 +2612,8 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		case ClassicGuitar:
 		{
 			showMessage(tr("Classical Guitar download complete"));
-			m_progressClassic->setVisible(false);
-			m_btnDonateClassic->setVisible(true);
+			//m_progressClassic->setVisible(false);
+			//m_btnDonateClassic->setVisible(false);
 			//label_27->setVisible(false);
 			//m_btnCancelClassic->setVisible(false);
 		}
@@ -2616,8 +2621,8 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		case AcousticGuitar:
 		{
 			showMessage(tr("Acoustic Guitar download complete"));
-			m_progressAcoustic->setVisible(false);
-			m_btnDonateAcoustic->setVisible(true);
+			//m_progressAcoustic->setVisible(false);
+			//m_btnDonateAcoustic->setVisible(false);
 			//label_30->setVisible(false);
 			//m_btnCancelAcoustic->setVisible(false);
 		}
@@ -2626,15 +2631,15 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		case M7IR48:
 		{
 			showMessage(tr("M7 IR download complete"));
-			m_progressM7->setVisible(false);
-			m_btnDonateM7->setVisible(true);
+			//m_progressM7->setVisible(false);
+			//m_btnDonateM7->setVisible(false);
 			//label_31->setVisible(false);
 			//m_btnCancelM7->setVisible(false);
 			m_chk44->blockSignals(false);
 			m_chk48->blockSignals(false);
 		}
 		break;
-		case ALL:
+		case ALL: //Special case only used to hide all at startup
 		{
 			label_25->setVisible(false);
 			m_progressSonatina->setVisible(false);
@@ -2679,6 +2684,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 			label_25->setVisible(false);
 			m_progressSonatina->setVisible(false);
 			m_btnCancelSonatina->setVisible(false);
+			m_btnDonateSonatina->setVisible(false);
 		}
 		break;
 		case Maestro:
@@ -2687,6 +2693,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 			label_26->setVisible(false);
 			m_progressMaestro->setVisible(false);
 			m_btnCancelMaestro->setVisible(false);
+			m_btnDonateMaestro->setVisible(false);
 		}
 		break;
 		case ClassicGuitar:
@@ -2695,6 +2702,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 			label_27->setVisible(false);
 			m_progressClassic->setVisible(false);
 			m_btnCancelClassic->setVisible(false);
+			m_btnDonateClassic->setVisible(false);
 		}
 		break;
 		case AcousticGuitar:
@@ -2703,6 +2711,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 			label_30->setVisible(false);
 			m_progressAcoustic->setVisible(false);
 			m_btnCancelAcoustic->setVisible(false);
+			m_btnDonateAcoustic->setVisible(false);
 		}
 		break;
 		case M7IR44:
@@ -2714,6 +2723,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 			m_btnCancelM7->setVisible(false);
 			m_chk44->blockSignals(false);
 			m_chk48->blockSignals(false);
+			m_btnDonateM7->setVisible(false);
 		}
 		break;
 		case ALL:
@@ -2721,22 +2731,27 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 			label_25->setVisible(false);
 			m_progressSonatina->setVisible(false);
 			m_btnCancelSonatina->setVisible(false);
+			m_btnDonateSonatina->setVisible(false);
 
 			label_26->setVisible(false);
 			m_progressMaestro->setVisible(false);
 			m_btnCancelMaestro->setVisible(false);
+			m_btnDonateMaestro->setVisible(false);
 
 			label_27->setVisible(false);
 			m_progressClassic->setVisible(false);
 			m_btnCancelClassic->setVisible(false);
+			m_btnDonateClassic->setVisible(false);
 
 			label_30->setVisible(false);
 			m_progressAcoustic->setVisible(false);
 			m_btnCancelAcoustic->setVisible(false);
+			m_btnDonateAcoustic->setVisible(false);
 
 			label_31->setVisible(false);
 			m_progressM7->setVisible(false);
 			m_btnCancelM7->setVisible(false);
+			m_btnDonateM7->setVisible(false);
 
 			m_progressBox->setVisible(false);
 		}
@@ -2746,7 +2761,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 		m_progress.takeAt(m_progress.indexOf(type));
 }/*}}}*/
 
-void OOStudio::downloadStarted(int type)
+void OOStudio::downloadStarted(int type)/*{{{*/
 {
 	m_progressBox->setVisible(true);
 	m_progress.append(type);
@@ -2761,6 +2776,7 @@ void OOStudio::downloadStarted(int type)
 			m_progressSonatina->setVisible(true);
 			m_btnCancelSonatina->setVisible(true);
 			m_progressSonatina->setValue(0);
+			m_btnDonateSonatina->setVisible(true);
 		}
 		break;
 		case Maestro:
@@ -2770,6 +2786,7 @@ void OOStudio::downloadStarted(int type)
 			m_progressMaestro->setVisible(true);
 			m_btnCancelMaestro->setVisible(true);
 			m_progressMaestro->setValue(0);
+			m_btnDonateMaestro->setVisible(true);
 		}
 		break;
 		case ClassicGuitar:
@@ -2779,6 +2796,7 @@ void OOStudio::downloadStarted(int type)
 			m_progressClassic->setVisible(true);
 			m_btnCancelClassic->setVisible(true);
 			m_progressClassic->setValue(0);
+			m_btnDonateClassic->setVisible(true);
 		}
 		break;
 		case AcousticGuitar:
@@ -2788,6 +2806,7 @@ void OOStudio::downloadStarted(int type)
 			m_progressAcoustic->setVisible(true);
 			m_btnCancelAcoustic->setVisible(true);
 			m_progressAcoustic->setValue(0);
+			m_btnDonateAcoustic->setVisible(true);
 		}
 		break;
 		case M7IR44:
@@ -2798,15 +2817,15 @@ void OOStudio::downloadStarted(int type)
 			m_progressM7->setVisible(true);
 			m_btnCancelM7->setVisible(true);
 			m_progressM7->setValue(0);
-
+			m_btnDonateM7->setVisible(true);
 		}
 		break;
 		case ALL:
 		break;
 	}
-}
+}/*}}}*/
 
-void OOStudio::downloadsComplete()
+void OOStudio::downloadsComplete()/*{{{*/
 {
 	//label_25->setVisible(false);
 	//m_progressSonatina->setVisible(false);
@@ -2832,9 +2851,9 @@ void OOStudio::downloadsComplete()
 	if(!m_progress.count())
 		m_progressBox->setVisible(false);
 	updateInstalledState();
-}
+}/*}}}*/
 
-void OOStudio::downloadError(int type, const QString& error)
+void OOStudio::downloadError(int type, const QString& error)/*{{{*/
 {
 	QString msg(tr("Download of %1 failed: \nErrors: %2"));
 	SamplePack pack = (SamplePack)type;
@@ -2846,6 +2865,7 @@ void OOStudio::downloadError(int type, const QString& error)
 			label_25->setVisible(false);
 			m_progressSonatina->setVisible(false);
 			m_btnCancelSonatina->setVisible(false);
+			m_btnDonateSonatina->setVisible(false);
 			QMessageBox::critical(
 				this,
 				tr("Download Failed"),
@@ -2859,6 +2879,7 @@ void OOStudio::downloadError(int type, const QString& error)
 			label_26->setVisible(false);
 			m_progressMaestro->setVisible(false);
 			m_btnCancelMaestro->setVisible(false);
+			m_btnDonateMaestro->setVisible(false);
 			QMessageBox::critical(
 				this,
 				tr("Download Failed"),
@@ -2872,6 +2893,7 @@ void OOStudio::downloadError(int type, const QString& error)
 			label_27->setVisible(false);
 			m_progressClassic->setVisible(false);
 			m_btnCancelClassic->setVisible(false);
+			m_btnDonateClassic->setVisible(false);
 			QMessageBox::critical(
 				this,
 				tr("Download Failed"),
@@ -2885,6 +2907,7 @@ void OOStudio::downloadError(int type, const QString& error)
 			label_30->setVisible(false);
 			m_progressAcoustic->setVisible(false);
 			m_btnCancelAcoustic->setVisible(false);
+			m_btnDonateAcoustic->setVisible(false);
 			QMessageBox::critical(
 				this,
 				tr("Download Failed"),
@@ -2899,6 +2922,7 @@ void OOStudio::downloadError(int type, const QString& error)
 			label_31->setVisible(false);
 			m_progressM7->setVisible(false);
 			m_btnCancelM7->setVisible(false);
+			m_btnDonateM7->setVisible(false);
 			QMessageBox::critical(
 				this,
 				tr("Download Failed"),
@@ -2913,9 +2937,9 @@ void OOStudio::downloadError(int type, const QString& error)
 	}
 	if(m_progress.contains(type))
 		m_progress.takeAt(m_progress.indexOf(type));
-}
+}/*}}}*/
 
-void OOStudio::trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal)
+void OOStudio::trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal)/*{{{*/
 {
 	int max = bytesTotal;
 	int val = bytesReceived;
@@ -2928,9 +2952,9 @@ void OOStudio::trackSonatinaProgress(qint64 bytesReceived, qint64 bytesTotal)
 		m_progressSonatina->setMaximum(0);
 	else
 		m_progressSonatina->setValue(val);
-}
+}/*}}}*/
 
-void OOStudio::trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal)
+void OOStudio::trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal)/*{{{*/
 {
 	int max = bytesTotal;
 	int val = bytesReceived;
@@ -2943,9 +2967,9 @@ void OOStudio::trackMaestroProgress(qint64 bytesReceived, qint64 bytesTotal)
 		m_progressMaestro->setMaximum(0);
 	else
 		m_progressMaestro->setValue(val);
-}
+}/*}}}*/
 
-void OOStudio::trackClassicProgress(qint64 bytesReceived, qint64 bytesTotal)
+void OOStudio::trackClassicProgress(qint64 bytesReceived, qint64 bytesTotal)/*{{{*/
 {
 	int max = bytesTotal;
 	int val = bytesReceived;
@@ -2958,9 +2982,9 @@ void OOStudio::trackClassicProgress(qint64 bytesReceived, qint64 bytesTotal)
 		m_progressClassic->setMaximum(0);
 	else
 		m_progressClassic->setValue(val);
-}
+}/*}}}*/
 
-void OOStudio::trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal)
+void OOStudio::trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal)/*{{{*/
 {
 	int max = bytesTotal;
 	int val = bytesReceived;
@@ -2973,9 +2997,9 @@ void OOStudio::trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal)
 		m_progressAcoustic->setMaximum(0);
 	else
 		m_progressAcoustic->setValue(val);
-}
+}/*}}}*/
 
-void OOStudio::trackM7Progress(qint64 bytesReceived, qint64 bytesTotal)
+void OOStudio::trackM7Progress(qint64 bytesReceived, qint64 bytesTotal)/*{{{*/
 {
 	int max = bytesTotal;
 	int val = bytesReceived;
@@ -2988,11 +3012,14 @@ void OOStudio::trackM7Progress(qint64 bytesReceived, qint64 bytesTotal)
 		m_progressM7->setMaximum(0);
 	else
 		m_progressM7->setValue(val);
-}
+}/*}}}*/
 
 void OOStudio::donateSonatina()
 {
-	cancelSonatina();
+	if(!m_downloader->isRunning(Sonatina) && !m_downloader->isExtracting(Sonatina))
+	{
+		cancelSonatina();
+	}
 	DownloadPackage* pkg = m_downloadMap.value(Sonatina);
 	if(pkg)
 		showExternalLinks(pkg->homepage);
@@ -3000,7 +3027,10 @@ void OOStudio::donateSonatina()
 
 void OOStudio::donateMaestro()
 {
-	cancelMaestro();
+	if(!m_downloader->isRunning(Maestro) && !m_downloader->isExtracting(Maestro))
+	{
+		cancelMaestro();
+	}
 	DownloadPackage* pkg = m_downloadMap.value(Maestro);
 	if(pkg)
 		showExternalLinks(pkg->homepage);
@@ -3008,7 +3038,10 @@ void OOStudio::donateMaestro()
 
 void OOStudio::donateClassic()
 {
-	cancelClassic();
+	if(!m_downloader->isRunning(ClassicGuitar) && !m_downloader->isExtracting(ClassicGuitar))
+	{
+		cancelClassic();
+	}
 	DownloadPackage* pkg = m_downloadMap.value(ClassicGuitar);
 	if(pkg)
 		showExternalLinks(pkg->homepage);
@@ -3016,7 +3049,10 @@ void OOStudio::donateClassic()
 
 void OOStudio::donateAcoustic()
 {
-	cancelAcoustic();
+	if(!m_downloader->isRunning(AcousticGuitar) && !m_downloader->isExtracting(AcousticGuitar))
+	{
+		cancelAcoustic();
+	}
 	DownloadPackage* pkg = m_downloadMap.value(AcousticGuitar);
 	if(pkg)
 		showExternalLinks(pkg->homepage);
@@ -3024,7 +3060,11 @@ void OOStudio::donateAcoustic()
 
 void OOStudio::donateM7()
 {
-	cancelM7();
+	if((!m_downloader->isRunning(M7IR44) && !m_downloader->isExtracting(M7IR44))
+		&&(!m_downloader->isRunning(M7IR48) && !m_downloader->isExtracting(M7IR48)))
+	{
+		cancelM7();
+	}
 	DownloadPackage* pkg = m_downloadMap.value(M7IR44);
 	if(pkg)
 		showExternalLinks(pkg->homepage);
