@@ -34,7 +34,7 @@ static const QString SONATINA_PATH = QString(QDir::rootPath()).append("usr").app
 static const QString SONATINA_LOCAL_PATH("Sonatina Symphonic Orchestra");
 static const QString MAESTRO_PATH("maestro");
 static const QString CLASSIC_PATH("ClassicFREE");
-static const QString ACCOUSTIC_PATH("AccousticFREE");
+static const QString ACCOUSTIC_PATH("AcousticGuitarFREE");
 static const QString M7IR44_PATH("Samplicity M7 Main - 03 - Wave Quad files, 32 bit, 44.1 Khz, v1.1");
 static const QString M7IR48_PATH("Samplicity M7 Main - 04 - Wave Quad files, 32 bit, 48 Khz, v1.1");
 static const QString SOUNDS_DIR = QString(QDir::homePath()).append(QDir::separator()).append(".sounds").append(QDir::separator());

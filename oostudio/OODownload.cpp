@@ -221,7 +221,7 @@ void OODownload::extractComplete(int id)
 		QString sfz(SHAREDIR);
 		sfz = sfz.append(QDir::separator()).append("templates").append(QDir::separator()).append("AcousticGuitar.sfz");
 		QString dest(pkg->install_path.absoluteFilePath());
-		dest = dest.append(QDir::separator()).append("AcousticFREE").append(QDir::separator()).append("AcousticGuitar Samples").append(QDir::separator()).append("AcousticGuitar.sfz");
+		dest = dest.append(QDir::separator()).append("AcousticGuitarFREE").append(QDir::separator()).append("AcousticGuitarFREE Samples").append(QDir::separator()).append("AcousticGuitar.sfz");
 		QFile::copy(sfz, dest);
 	}
 	cleanup(id);
