@@ -2598,6 +2598,9 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 			//m_btnDonateSonatina->setVisible(false);
 			//label_25->setVisible(false);
 			//m_btnCancelSonatina->setVisible(false);
+			//
+			m_progressSonatina->setMaximum(100);
+			m_progressSonatina->setValue(100);
 		}
 		break;
 		case Maestro:
@@ -2607,6 +2610,8 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 			//m_btnDonateMaestro->setVisible(false);
 			//label_26->setVisible(false);
 			//m_btnCancelMaestro->setVisible(false);
+			m_progressMaestro->setMaximum(100);
+			m_progressMaestro->setValue(100);
 		}
 		break;
 		case ClassicGuitar:
@@ -2616,6 +2621,8 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 			//m_btnDonateClassic->setVisible(false);
 			//label_27->setVisible(false);
 			//m_btnCancelClassic->setVisible(false);
+			m_progressClassic->setMaximum(100);
+			m_progressClassic->setValue(100);
 		}
 		break;
 		case AcousticGuitar:
@@ -2625,6 +2632,8 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 			//m_btnDonateAcoustic->setVisible(false);
 			//label_30->setVisible(false);
 			//m_btnCancelAcoustic->setVisible(false);
+			m_progressAcoustic->setMaximum(100);
+			m_progressAcoustic->setValue(100);
 		}
 		break;
 		case M7IR44:
@@ -2637,6 +2646,8 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 			//m_btnCancelM7->setVisible(false);
 			m_chk44->blockSignals(false);
 			m_chk48->blockSignals(false);
+			m_progressM7->setMaximum(100);
+			m_progressM7->setValue(100);
 		}
 		break;
 		case ALL: //Special case only used to hide all at startup
