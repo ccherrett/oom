@@ -38,7 +38,6 @@ static const QString ACCOUSTIC_PATH("AccousticFREE");
 static const QString M7IR44_PATH("Samplicity M7 Main - 03 - Wave Quad files, 32 bit, 44.1 Khz, v1.1");
 static const QString M7IR48_PATH("Samplicity M7 Main - 04 - Wave Quad files, 32 bit, 48 Khz, v1.1");
 static const QString SOUNDS_DIR = QString(QDir::homePath()).append(QDir::separator()).append(".sounds").append(QDir::separator());
-static const QString CREATE_FROM(QObject::tr("Created from %1: %2"));
 
 #define SessionNameRole Qt::UserRole+5
 
@@ -458,7 +457,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					{
 						cdate = finfo.created();
 					}
-					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->fromTemplate ? tr("Template") : tr("Session")).arg(session->createdFrom).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
 					name->setIcon(QIcon(oomIcoTemplate));
 					m_templateModel->appendRow(name);
@@ -482,7 +481,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					{
 						cdate = finfo.created();
 					}
-					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->fromTemplate ? tr("Template") : tr("Session")).arg(session->createdFrom).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
 					name->setIcon(QIcon(oomIco));
 					m_sessionModel->appendRow(name);
@@ -522,7 +521,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					{
 						cdate = finfo.created();
 					}
-					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->fromTemplate ? tr("Template") : tr("Session")).arg(session->createdFrom).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
 					name->setIcon(QIcon(oomIcoTemplate));
 					m_templateModel->appendRow(name);
@@ -551,7 +550,7 @@ void OOStudio::populateSessions(bool usehash)/*{{{*/
 					{
 						cdate = finfo.created();
 					}
-					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->notes));
+					QStandardItem* name = new QStandardItem(m_sessionTemplate.arg(session->name).arg(cdate.toString()).arg(session->fromTemplate ? tr("Template") : tr("Session")).arg(session->createdFrom).arg(session->notes));
 					name->setData(session->name, SessionNameRole);
 					name->setIcon(QIcon(oomIco));
 					m_sessionModel->appendRow(name);
@@ -656,7 +655,7 @@ bool OOStudio::checkPackageInstall(int id)/*{{{*/
 	return retval;
 }/*}}}*/
 
-void OOStudio::updateInstalledState()
+void OOStudio::updateInstalledState()/*{{{*/
 {
 	int count = 0;
 	if(checkPackageInstall(Sonatina))
@@ -758,7 +757,7 @@ void OOStudio::updateInstalledState()
 	{
 		m_btnDownload->setEnabled(true);
 	}
-}
+}/*}}}*/
 
 void OOStudio::clearLogger()/*{{{*/
 {
@@ -809,13 +808,19 @@ void OOStudio::currentTabChanged(int tab)/*{{{*/
 
 QString OOStudio::getValidName(QString name)/*{{{*/
 {
-	QString base("_Copy");
-	int i = 1;
-	QString newName(name.append(base));
-	while(m_sessionMap.contains(newName))
+	QString newName(name);
+	if(m_sessionMap.contains(newName)) 
 	{
-		newName = name.append(base).append(QString::number(i));
-		++i;
+		int i = 1;
+		int index = newName.lastIndexOf(QRegExp("_Copy*"));
+		if(index > 0)
+		{
+			newName = newName.remove(index, newName.size());
+		}
+		newName += "_Copy";
+		while (m_sessionMap.contains(newName + QString::number(i)))
+			++i;
+		newName += QString::number(i);
 	}
 	return newName;
 }/*}}}*/
@@ -893,7 +898,6 @@ void OOStudio::browse(int form)/*{{{*/
 					m_sessionMap[session->name] = session;
 					saveSettings();
 					populateSessions(true);
-					//TODO: message to tell what type was imported
 				}
 				else
 				{
@@ -1525,6 +1529,18 @@ void OOStudio::createSession()/*{{{*/
 	if(validateCreate())
 	{
 		bool istemplate = m_chkTemplate->isChecked();
+		bool fromtemplate = false;
+		QString createdFrom(tr("Default"));
+		if(m_cmbTemplate->currentIndex())
+		{
+			QString tpath = m_cmbTemplate->itemData(m_cmbTemplate->currentIndex()).toString();
+			OOSession* oldSession = m_sessionMap.value(tpath);
+			if(oldSession)
+			{
+				fromtemplate = oldSession->istemplate;
+				createdFrom = oldSession->name;
+			}
+		}
 		QDomDocument doc("OOStudioSession");
 		QDomElement root = doc.createElement("OOStudioSession");
 		doc.appendChild(root);
@@ -1534,8 +1550,12 @@ void OOStudio::createSession()/*{{{*/
 		OOSession* newSession = new OOSession;
 		newSession->name = basename;
 		newSession->istemplate = istemplate;
+		newSession->createdFrom = createdFrom;
+		newSession->fromTemplate = fromtemplate;
 		root.setAttribute("istemplate", istemplate);
 		root.setAttribute("name", basename);
+		root.setAttribute("fromtemplate", fromtemplate);
+		root.setAttribute("createdfrom", createdFrom);
 
 		QDir basedir(basepath);
 		if(basedir.exists() && basedir.mkdir(basename) && basedir.cd(basename))
@@ -1603,7 +1623,6 @@ void OOStudio::createSession()/*{{{*/
 					ts << doc.toString();
 
 					xmlfile.close();
-					//TODO: Write out the session to settings and update table
 					newSession->path = filename;
 					m_sessionMap[basename] = newSession;
 					showMessage("Successfully Created Session: "+basename);
@@ -1622,8 +1641,8 @@ void OOStudio::createSession()/*{{{*/
 						}
 					}
 					saveSettings();
-					populateSessions(true);
 					resetCreate();
+					populateSessions(true);
 				}
 				else
 				{
@@ -1689,12 +1708,18 @@ void OOStudio::updateSession()/*{{{*/
 		
 		OOSession* newSession = new OOSession;
 		OOSession* oldSession = m_sessionMap.value(basename);
+		bool fromtemplate = oldSession->fromTemplate;
+		QString createdFrom(oldSession->createdFrom);
 		
 		newSession->name = oldSession->name;
 		newSession->istemplate = istemplate;
+		newSession->fromTemplate = fromtemplate;
+		newSession->createdFrom = createdFrom;
 		
 		root.setAttribute("istemplate", istemplate);
 		root.setAttribute("name", basename);
+		root.setAttribute("fromtemplate", fromtemplate);
+		root.setAttribute("createdfrom", createdFrom);
 
 		QString destPath(basepath);
 		destPath.append(QDir::separator()).append(basename);
@@ -1801,12 +1826,12 @@ void OOStudio::updateSession()/*{{{*/
 					ts << doc.toString();
 
 					xmlfile.close();
-					//TODO: Write out the session to settings and update table
+					//Write out the session to settings and update table
 					newSession->path = filename;
 					m_sessionMap[basename] = newSession;
 					saveSettings();
-					populateSessions(true);
 					resetCreate();
+					populateSessions(true);
 					QString msg = QObject::tr("Successfully Updated Session: \n\t%1");
 					QMessageBox::information(
 						this, 
@@ -1828,7 +1853,7 @@ void OOStudio::updateSession()/*{{{*/
 					}*/
 					msg.append("\n").append(filename);
 					//basedir.rmdir(newPath);
-					QMessageBox::critical(this, tr("Create Failed"), msg);
+					QMessageBox::critical(this, tr("Update Failed"), msg);
 				}
 			}
 			else
@@ -1846,13 +1871,12 @@ void OOStudio::updateSession()/*{{{*/
 					msg = tr("Failed to copy OOMidi song file");
 				}
 				basedir.rmdir(newPath);
-				QMessageBox::critical(this, tr("Create Failed"), msg);
+				QMessageBox::critical(this, tr("Update Failed"), msg);
 			}
 		}
 	}
 	else
 	{
-		//TODO: Add error message here
 		QMessageBox::information(
 			this,
 			tr("Invalid Form"),
@@ -1884,11 +1908,12 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 	{
 		if(index == 1 && !checkPackageInstall(Sonatina))
 		{
-			//TODO: Show dialog 
 			QMessageBox::critical(this,
-			tr("Missing Libraries"),
-			tr("This template requires the Sonatina Symphonic Orchestral Library.\n"
-				"Install this library from the downloads tab."));
+				tr("Missing Libraries"),
+				tr("This template requires the following sample libraries.\n\n"
+					" Required: Symphonic Orchestral Library\n"
+					" Recommended: Samplicity M7 Impulse Response\n\n"
+					"Install them from the downloads tab."));
 			resetCreate();
 			m_tabWidget->setCurrentIndex(2);
 			return;
@@ -1896,17 +1921,16 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 		if(index == 2 && (!checkPackageInstall(Sonatina) || !checkPackageInstall(Maestro)
 				|| !checkPackageInstall(ClassicGuitar) || !checkPackageInstall(AcousticGuitar)))
 		{
-			resetCreate();
-			//TODO: Show dialog 
 			QMessageBox::critical(this,
-			tr("Missing Libraries"),
-			tr("This template requires the following sample libraries.\n\n"
-				" Required: Symphonic Orchestral Library\n"
-				" Required: Maestro Concert Grand\n"
-				" Required: Classical Guitar FREE\n"
-				" Required: Acoustic Guitar FREE\n"
-				" Recommended: Samplicity M7 Impulse Response\n\n"
-				"Install them from the downloads tab."));
+				tr("Missing Libraries"),
+				tr("This template requires the following sample libraries.\n\n"
+					" Required: Symphonic Orchestral Library\n"
+					" Required: Maestro Concert Grand\n"
+					" Required: Classical Guitar FREE\n"
+					" Required: Acoustic Guitar FREE\n"
+					" Recommended: Samplicity M7 Impulse Response\n\n"
+					"Install them from the downloads tab."));
+			resetCreate();
 			m_tabWidget->setCurrentIndex(2);
 			return;
 		}
@@ -1928,16 +1952,11 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 				m_txtName->setText(session->name);
 				m_chkTemplate->setChecked(session->istemplate);
 				m_txtJackCommand->setText(session->jackcommand);
-				m_txtNotes->setText(session->notes);
 			}
 			else
 			{
 				m_txtJackCommand->setText(jackCmd);
-				if(m_txtName->text().isEmpty())
-				{
-					m_txtName->setText(getValidName(session->name));
-				}
-				m_txtNotes->setText(CREATE_FROM.arg(session->istemplate ? tr("Template") : tr("Session")).arg(session->name));
+				m_txtName->setText(getValidName(session->name));
 			}
 			m_commandModel->clear();
 			for(int i = 0; i < session->commands.size(); ++i)
@@ -1960,6 +1979,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 			m_cmbLSCPMode->setCurrentIndex(session->lscpMode);
 			m_txtLSCP->setText(session->lscpPath);
 			m_txtOOMPath->setText(session->songfile);
+			m_txtNotes->setText(session->notes);
 			m_txtName->setFocus(Qt::OtherFocusReason);
 			updateHeaders();
 		}
@@ -1994,14 +2014,28 @@ OOSession* OOStudio::readSession(QString filename)/*{{{*/
 	OOSession* session = 0;
 	QDomDocument temp("OOStudioSession");
 	QFile tempFile(filename);
+	if(!tempFile.exists())
+	{
+		QString msg(tr("The session file:\n %1 \nwas not found"));
+		QMessageBox::critical(this,
+			tr("File Not Found"),
+			msg.arg(filename));
+		return 0;
+	}
 	if(!tempFile.open(QIODevice::ReadOnly))
 	{
-		//TODO:We need to error here
+		QString msg(tr("Failed to open session file:\n %1 \n%2"));
+		QMessageBox::critical(this,
+			tr("File Open Error"),
+			msg.arg(filename).arg(tempFile.errorString()));
 		return session;
 	}
 	if(!temp.setContent(&tempFile))
 	{
-		//TODO:We need to error here
+		QString msg(tr("Failed to parse xml structure for session file:\n %1"));
+		QMessageBox::critical(this,
+			tr("File Parsing Error"),
+			msg.arg(filename));
 		return session;
 	}
 	//We now have a loaded file so we get the data from it.
@@ -2012,6 +2046,8 @@ OOSession* OOStudio::readSession(QString filename)/*{{{*/
 		session->name = root.attribute("name");
 		session->istemplate = root.attribute("istemplate").toInt();
 		session->path = filename;
+		session->fromTemplate = root.attribute("fromtemplate", "1").toInt();
+		session->createdFrom = root.attribute("createdfrom", tr("Default"));
 		QDomNodeList flist = root.elementsByTagName("command");
 		for(int i = 0; i < flist.count(); ++i)
 		{
@@ -2321,6 +2357,7 @@ void OOStudio::download(int type)
 	{
 		case Sonatina:
 		{
+			showMessage(tr("Sonatina download  requested"));
 			if(!checkPackageInstall(Sonatina))
 			{
 				//DownloadPackage* pkg = m_downloadMap.value(type);
@@ -2328,12 +2365,11 @@ void OOStudio::download(int type)
 				//QDesktopServices::openUrl(pkg->homepage);
 			}
 			m_btnDownloadSonatina->setEnabled(false);
-			qDebug() << "Sonatina download  requested";
 		}
 		break;
 		case Maestro:
 		{
-			qDebug() << "Maestro download  requested";
+			showMessage(tr("Maestro download  requested"));
 			if(!checkPackageInstall(Maestro))
 			{
 				//DownloadPackage* pkg = m_downloadMap.value(type);
@@ -2345,7 +2381,7 @@ void OOStudio::download(int type)
 		break;
 		case ClassicGuitar:
 		{
-			qDebug() << "Classic download  requested";
+			showMessage(tr("Classical Guitar download  requested"));
 			if(!checkPackageInstall(ClassicGuitar))
 			{
 				//DownloadPackage* pkg = m_downloadMap.value(type);
@@ -2357,7 +2393,7 @@ void OOStudio::download(int type)
 		break;
 		case AcousticGuitar:
 		{
-			qDebug() << "Acoustic download  requested";
+			showMessage(tr("Acoustic Guitar download  requested"));
 			if(!checkPackageInstall(AcousticGuitar))
 			{
 				//DownloadPackage* pkg = m_downloadMap.value(type);
@@ -2369,7 +2405,7 @@ void OOStudio::download(int type)
 		break;
 		case M7IR44:
 		{
-			qDebug() << "M7 IR download  requested";
+			showMessage(tr("M7 44.1Khz IR download  requested"));
 			if(!checkPackageInstall(M7IR44))
 			{
 				//DownloadPackage* pkg = m_downloadMap.value(type);
@@ -2381,7 +2417,7 @@ void OOStudio::download(int type)
 		break;
 		case M7IR48:
 		{
-			qDebug() << "M7 IR download  requested";
+			showMessage(tr("M7 48Khz IR download  requested"));
 			if(!checkPackageInstall(M7IR48))
 			{
 				//DownloadPackage* pkg = m_downloadMap.value(type);
@@ -2393,7 +2429,7 @@ void OOStudio::download(int type)
 		break;
 		case ALL:
 		{
-			qDebug() << "Download all requested";
+			showMessage(tr("Download all requested"));
 			m_btnDownload->setEnabled(false);
 			m_btnDownload->blockSignals(false);
 
@@ -2527,7 +2563,7 @@ void OOStudio::cancelM7()
 	if((m_downloader->isRunning(M7IR44) || m_downloader->isExtracting(M7IR44))
 		||(m_downloader->isRunning(M7IR48) || m_downloader->isExtracting(M7IR48)))
 	{
-		if(m_chk44->isChecked())
+		if(m_downloader->isRunning(M7IR44))
 			emit cancelDownload(M7IR44);
 		else
 			emit cancelDownload(M7IR48);
@@ -2555,8 +2591,7 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 	{
 		case Sonatina:
 		{
-			qDebug() << "Sonatina download complete";
-			//TODO: hide progress
+			showMessage(tr("Sonatina download complete"));
 			m_progressSonatina->setVisible(false);
 			m_btnDonateSonatina->setVisible(true);
 			//label_25->setVisible(false);
@@ -2565,8 +2600,7 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		break;
 		case Maestro:
 		{
-			qDebug() << "Maestro download complete";
-			//TODO: hide progress
+			showMessage(tr("Maestro download complete"));
 			m_progressMaestro->setVisible(false);
 			m_btnDonateMaestro->setVisible(true);
 			//label_26->setVisible(false);
@@ -2575,8 +2609,7 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		break;
 		case ClassicGuitar:
 		{
-			qDebug() << "Classic download complete";
-			//TODO: hide progress
+			showMessage(tr("Classical Guitar download complete"));
 			m_progressClassic->setVisible(false);
 			m_btnDonateClassic->setVisible(true);
 			//label_27->setVisible(false);
@@ -2585,8 +2618,7 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		break;
 		case AcousticGuitar:
 		{
-			qDebug() << "Acoustic download complete";
-			//TODO: hide progress
+			showMessage(tr("Acoustic Guitar download complete"));
 			m_progressAcoustic->setVisible(false);
 			m_btnDonateAcoustic->setVisible(true);
 			//label_30->setVisible(false);
@@ -2596,8 +2628,7 @@ void OOStudio::downloadEnded(int type)/*{{{*/
 		case M7IR44:
 		case M7IR48:
 		{
-			qDebug() << "M7 IR download complete";
-			//TODO: hide progress
+			showMessage(tr("M7 IR download complete"));
 			m_progressM7->setVisible(false);
 			m_btnDonateM7->setVisible(true);
 			//label_31->setVisible(false);
@@ -2647,8 +2678,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 	{
 		case Sonatina:
 		{
-			qDebug() << "Sonatina download canceled";
-			//TODO: hide progress
+			showMessage(tr("Sonatina download canceled"));
 			label_25->setVisible(false);
 			m_progressSonatina->setVisible(false);
 			m_btnCancelSonatina->setVisible(false);
@@ -2656,8 +2686,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 		break;
 		case Maestro:
 		{
-			qDebug() << "Maestro download canceled";
-			//TODO: hide progress
+			showMessage(tr("Maestro download canceled"));
 			label_26->setVisible(false);
 			m_progressMaestro->setVisible(false);
 			m_btnCancelMaestro->setVisible(false);
@@ -2665,8 +2694,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 		break;
 		case ClassicGuitar:
 		{
-			qDebug() << "Classic download canceled";
-			//TODO: hide progress
+			showMessage(tr("Classical Guitar download canceled"));
 			label_27->setVisible(false);
 			m_progressClassic->setVisible(false);
 			m_btnCancelClassic->setVisible(false);
@@ -2674,8 +2702,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 		break;
 		case AcousticGuitar:
 		{
-			qDebug() << "Acoustic download canceled";
-			//TODO: hide progress
+			showMessage(tr("Acoustic Guitar download canceled"));
 			label_30->setVisible(false);
 			m_progressAcoustic->setVisible(false);
 			m_btnCancelAcoustic->setVisible(false);
@@ -2684,8 +2711,7 @@ void OOStudio::downloadCanceled(int type)/*{{{*/
 		case M7IR44:
 		case M7IR48:
 		{
-			qDebug() << "M7 IR download canceled";
-			//TODO: hide progress
+			showMessage(tr("M7 IR download canceled"));
 			label_31->setVisible(false);
 			m_progressM7->setVisible(false);
 			m_btnCancelM7->setVisible(false);
@@ -2733,8 +2759,7 @@ void OOStudio::downloadStarted(int type)
 	{
 		case Sonatina:
 		{
-			qDebug() << "Sonatina download started";
-			//TODO: show progress
+			showMessage(tr("Sonatina download started"));
 			label_25->setVisible(true);
 			m_progressSonatina->setVisible(true);
 			m_btnCancelSonatina->setVisible(true);
@@ -2743,8 +2768,7 @@ void OOStudio::downloadStarted(int type)
 		break;
 		case Maestro:
 		{
-			qDebug() << "Maestro download started";
-			//TODO: show progress
+			showMessage(tr("Maestro download started"));
 			label_26->setVisible(true);
 			m_progressMaestro->setVisible(true);
 			m_btnCancelMaestro->setVisible(true);
@@ -2753,8 +2777,7 @@ void OOStudio::downloadStarted(int type)
 		break;
 		case ClassicGuitar:
 		{
-			qDebug() << "Classic download started";
-			//TODO: show progress
+			showMessage(tr("Classical Guitar download started"));
 			label_27->setVisible(true);
 			m_progressClassic->setVisible(true);
 			m_btnCancelClassic->setVisible(true);
@@ -2763,8 +2786,7 @@ void OOStudio::downloadStarted(int type)
 		break;
 		case AcousticGuitar:
 		{
-			qDebug() << "Acoustic download started";
-			//TODO: show progress
+			showMessage(tr("Acoustic Guitar download started"));
 			label_30->setVisible(true);
 			m_progressAcoustic->setVisible(true);
 			m_btnCancelAcoustic->setVisible(true);
@@ -2774,8 +2796,7 @@ void OOStudio::downloadStarted(int type)
 		case M7IR44:
 		case M7IR48:
 		{
-			qDebug() << "M7 IR download started";
-			//TODO: show progress
+			showMessage(tr("M7 IR download started"));
 			label_31->setVisible(true);
 			m_progressM7->setVisible(true);
 			m_btnCancelM7->setVisible(true);
@@ -2790,7 +2811,6 @@ void OOStudio::downloadStarted(int type)
 
 void OOStudio::downloadsComplete()
 {
-	//TODO: hide all progress
 	//label_25->setVisible(false);
 	//m_progressSonatina->setVisible(false);
 	//m_btnCancelSonatina->setVisible(false);
@@ -2825,7 +2845,7 @@ void OOStudio::downloadError(int type, const QString& error)
 	{
 		case Sonatina:
 		{
-			qDebug() << "Sonatina download Failed!!\n" << error;
+			showMessage(QString(tr("Sonatina download Failed!! ")).append(error));
 			label_25->setVisible(false);
 			m_progressSonatina->setVisible(false);
 			m_btnCancelSonatina->setVisible(false);
@@ -2838,7 +2858,7 @@ void OOStudio::downloadError(int type, const QString& error)
 		break;
 		case Maestro:
 		{
-			qDebug() << "Maestro download Failed!!\n" << error;
+			showMessage(QString(tr("Maestro download Failed!! ")).append(error));
 			label_26->setVisible(false);
 			m_progressMaestro->setVisible(false);
 			m_btnCancelMaestro->setVisible(false);
@@ -2851,7 +2871,7 @@ void OOStudio::downloadError(int type, const QString& error)
 		break;
 		case ClassicGuitar:
 		{
-			qDebug() << "Classic download Failed!!\n" << error;
+			showMessage(QString(tr("Classic download Failed!! ")).append(error));
 			label_27->setVisible(false);
 			m_progressClassic->setVisible(false);
 			m_btnCancelClassic->setVisible(false);
@@ -2864,7 +2884,7 @@ void OOStudio::downloadError(int type, const QString& error)
 		break;
 		case AcousticGuitar:
 		{
-			qDebug() << "Acoustic download Failed!!\n" << error;
+			showMessage(QString(tr("Acoustic download Failed!! ")).append(error));
 			label_30->setVisible(false);
 			m_progressAcoustic->setVisible(false);
 			m_btnCancelAcoustic->setVisible(false);
@@ -2878,7 +2898,7 @@ void OOStudio::downloadError(int type, const QString& error)
 		case M7IR44:
 		case M7IR48:
 		{
-			qDebug() << "M7 IR download Failed!!\n" << error;
+			showMessage(QString(tr("M7 IR download Failed!! ")).append(error));
 			label_31->setVisible(false);
 			m_progressM7->setVisible(false);
 			m_btnCancelM7->setVisible(false);
@@ -2978,7 +2998,7 @@ void OOStudio::donateSonatina()
 	cancelSonatina();
 	DownloadPackage* pkg = m_downloadMap.value(Sonatina);
 	if(pkg)
-		QDesktopServices::openUrl(pkg->homepage);
+		showExternalLinks(pkg->homepage);
 }
 
 void OOStudio::donateMaestro()
@@ -2986,7 +3006,7 @@ void OOStudio::donateMaestro()
 	cancelMaestro();
 	DownloadPackage* pkg = m_downloadMap.value(Maestro);
 	if(pkg)
-		QDesktopServices::openUrl(pkg->homepage);
+		showExternalLinks(pkg->homepage);
 }
 
 void OOStudio::donateClassic()
@@ -2994,7 +3014,7 @@ void OOStudio::donateClassic()
 	cancelClassic();
 	DownloadPackage* pkg = m_downloadMap.value(ClassicGuitar);
 	if(pkg)
-		QDesktopServices::openUrl(pkg->homepage);
+		showExternalLinks(pkg->homepage);
 }
 
 void OOStudio::donateAcoustic()
@@ -3002,7 +3022,7 @@ void OOStudio::donateAcoustic()
 	cancelAcoustic();
 	DownloadPackage* pkg = m_downloadMap.value(AcousticGuitar);
 	if(pkg)
-		QDesktopServices::openUrl(pkg->homepage);
+		showExternalLinks(pkg->homepage);
 }
 
 void OOStudio::donateM7()
@@ -3010,5 +3030,5 @@ void OOStudio::donateM7()
 	cancelM7();
 	DownloadPackage* pkg = m_downloadMap.value(M7IR44);
 	if(pkg)
-		QDesktopServices::openUrl(pkg->homepage);
+		showExternalLinks(pkg->homepage);
 }

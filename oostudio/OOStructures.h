@@ -11,6 +11,7 @@ struct OOSession
 	QString path;
 	QString name;
 	bool istemplate;
+	bool fromTemplate;
 	bool loadJack;
 	bool loadls;
 	QString jackcommand;
@@ -19,6 +20,7 @@ struct OOSession
 	QStringList postCommands;
 	QString lscpPath;
 	QString notes;
+	QString createdFrom;
 	int lscpMode;
 	QString songfile;
 	QString lshostname;
