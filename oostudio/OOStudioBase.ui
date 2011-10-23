@@ -416,7 +416,7 @@
                </widget>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,1,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,1,0,0,0">
                 <property name="spacing">
                  <number>8</number>
                 </property>
@@ -458,7 +458,7 @@
                  <widget class="QComboBox" name="m_cmbTemplate">
                   <property name="maximumSize">
                    <size>
-                    <width>400</width>
+                    <width>16777215</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -466,6 +466,22 @@
                    <enum>QComboBox::AdjustToMinimumContentsLength</enum>
                   </property>
                  </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::MinimumExpanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>2</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                 <item>
                  <widget class="QLabel" name="label_13">
@@ -1360,9 +1376,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>0</y>
+                <y>-312</y>
                 <width>579</width>
-                <height>1969</height>
+                <height>2183</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -1586,8 +1602,10 @@ p, li { white-space: pre-wrap; }
                        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Fixed'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Sans';&quot;&gt;Sonatina Symphonic Orchestra is a free orchestral sample library. While not as advanced or ambitious in scope as commercial offerings, SSO contains all the basic building blocks for creating real virtual orchestrations. It's primarily aimed at beginners, but also more experienced composers looking for something lightweight and/or portable might find it useful.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Luxi Sans'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Sonatina Symphonic Orchestra is a free orchestral sample library. While not as advanced or ambitious in scope as commercial offerings, SSO contains all the basic building blocks for creating real virtual orchestrations. It's primarily aimed at beginners, but also more experienced composers looking for something lightweight and/or portable might find it useful.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Please consider going to the author website and donating if you find these useful. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="textFormat">
                        <enum>Qt::RichText</enum>
@@ -1813,8 +1831,9 @@ p, li { white-space: pre-wrap; }
                        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Fixed'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Sans';&quot;&gt;Maestro Concert Grand v2 is a big giga bank using 792 stereo samples of a concert piano, a Yamaha CF3 from the early 90s, It was chromatically sampled to maintain the tempered tuning. The samples were recorded with two Neumann KM84 microphones, disposed in X/Y, with 5 velocity layers, and weighs 932 MB ! The piano alone, without release samples, weighs 887 Mb and 440 samples. The release samples are 352 and weigh 45 MB. You can play with or without them. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Luxi Sans'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maestro Concert Grand v2 is a big giga bank using 792 stereo samples of a concert piano, a Yamaha CF3 from the early 90s, It was chromatically sampled to maintain the tempered tuning. The samples were recorded with two Neumann KM84 microphones, disposed in X/Y, with 5 velocity layers, and weighs 932 MB ! The piano alone, without release samples, weighs 887 Mb and 440 samples. The release samples are 352 and weigh 45 MB. You can play with or without them. &lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Please consider going to the author website and donating if you find these useful. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="textFormat">
                        <enum>Qt::RichText</enum>
@@ -2036,7 +2055,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Luxi Sans'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The Pettinhouse Classical Guitar is an excellent product brought to you for FREE by the guys @ &lt;a href=&quot;http://www.pettinhouse.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b3d0b3;&quot;&gt;pettinhouse.com&lt;/span&gt;&lt;/a&gt; . &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Please consider going there and donating if you find these useful. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Please consider going to the author website and donating if you find these useful. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="textFormat">
                        <enum>Qt::RichText</enum>
@@ -2249,7 +2268,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Luxi Sans'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The Pettinhouse Acoustic Guitar is an excellent product brought to you for FREE by the guys @ &lt;a href=&quot;http://www.pettinhouse.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#b3d0b3;&quot;&gt;pettinhouse.com&lt;/span&gt;&lt;/a&gt; . &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Please consider going there and donating if you find these useful. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Please consider going to the author website and donating if you find these useful. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="textFormat">
                        <enum>Qt::RichText</enum>
@@ -2527,7 +2546,8 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Fixed'; font-size:11pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Sans';&quot;&gt;Samplicity has created a new Impulse Response Library, using the immensely popular and highly acclaimed Bricasti M7 reverb unit. And again, Samplicity has created a very complete, accurate and excellently sounding set of impulse responses, all in True Stereo and in Mono-to-Stereo. This library surpasses all previously released Bricasti IRs in terms of signal-to-noise ratios and detailed and rich reverb tails. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Sans';&quot;&gt;Samplicity has created a new Impulse Response Library, using the immensely popular and highly acclaimed Bricasti M7 reverb unit. And again, Samplicity has created a very complete, accurate and excellently sounding set of impulse responses, all in True Stereo and in Mono-to-Stereo. This library surpasses all previously released Bricasti IRs in terms of signal-to-noise ratios and detailed and rich reverb tails. &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Luxi Sans';&quot;&gt;Please consider going to the author website and donating if you find these useful. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="textFormat">
                        <enum>Qt::RichText</enum>
@@ -2641,6 +2661,22 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                   <item>
+                   <spacer name="horizontalSpacer_24">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::MinimumExpanding</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>2</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
                    <widget class="QToolButton" name="m_btnCancelSonatina">
                     <property name="text">
                      <string/>
@@ -2713,6 +2749,22 @@ p, li { white-space: pre-wrap; }
                      <number>24</number>
                     </property>
                    </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_25">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::MinimumExpanding</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>2</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
                   <item>
                    <widget class="QToolButton" name="m_btnCancelMaestro">
@@ -2789,6 +2841,22 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                   <item>
+                   <spacer name="horizontalSpacer_28">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::MinimumExpanding</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>2</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
                    <widget class="QToolButton" name="m_btnCancelClassic">
                     <property name="text">
                      <string/>
@@ -2863,6 +2931,22 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                   <item>
+                   <spacer name="horizontalSpacer_26">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::MinimumExpanding</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>2</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
                    <widget class="QToolButton" name="m_btnCancelAcoustic">
                     <property name="text">
                      <string/>
@@ -2935,6 +3019,22 @@ p, li { white-space: pre-wrap; }
                      <number>24</number>
                     </property>
                    </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_27">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::MinimumExpanding</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>2</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
                   <item>
                    <widget class="QToolButton" name="m_btnCancelM7">

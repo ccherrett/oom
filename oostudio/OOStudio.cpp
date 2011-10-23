@@ -87,14 +87,14 @@ OOStudio::OOStudio()
 	createConnections();
 
 	m_trayIcon->show();
-	setWindowTitle(QString(tr("OOMidi: Studio")).append("-").append(VERSION));
+	setWindowTitle(QString(tr("OOStudio")).append("-").append(VERSION));
 	QSettings settings("OOMidi", "OOStudio");
 	QSize size = settings.value("OOStudio/size", QSize(548, 526)).toSize();
 	resize(size);
 	m_restoreSize = saveGeometry();
 
 	//TODO: Make this translateable
-	QFile sestemp(":/html/session.html");
+	QFile sestemp(":/html/session.tmpl");
 	if(sestemp.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
 		QTextStream in(&sestemp);
@@ -914,7 +914,6 @@ void OOStudio::addCommand()/*{{{*/
 	if(m_txtCommand->text().isEmpty())
 		return;
 	QStandardItem* item = new QStandardItem(m_txtCommand->text());
-	//item->setCheckable(true);
 	//item->setForeground(QColor(187, 191, 187));
 	m_commandModel->appendRow(item);
 	updateHeaders();
@@ -1962,13 +1961,11 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 			for(int i = 0; i < session->commands.size(); ++i)
 			{
 				QStandardItem* item = new QStandardItem(session->commands.at(i));
-				item->setCheckable(true);
 				m_commandModel->appendRow(item);
 			}
 			for(int i = 0; i < session->postCommands.size(); ++i)
 			{
 				QStandardItem* item = new QStandardItem(session->postCommands.at(i));
-				item->setCheckable(true);
 				m_commandModel->appendRow(item);
 			}
 			m_chkStartJack->setChecked(session->loadJack);

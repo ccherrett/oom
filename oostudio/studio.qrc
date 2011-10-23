@@ -2,7 +2,7 @@
  <qresource prefix="/">
 	<file>style.qss</file>
 	<file>oostudio.html</file>
-	<file>html/session.html</file>
+	<file>html/session.tmpl</file>
 	<file>oostudio.xml</file>
 	<file>images/oostudio-accoustic_guitar.png</file>
 	<file>images/oostudio-classic_guitar.png</file>

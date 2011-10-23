@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>543</width>
-    <height>518</height>
+    <height>574</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -555,6 +555,13 @@ Shorter periods are desirable.</string>
        <property name="margin">
         <number>11</number>
        </property>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Default Input Device (Keyboards)</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QGroupBox" name="GroupBox2">
          <property name="title">

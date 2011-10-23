@@ -79,6 +79,7 @@ MasterEdit::MasterEdit()
 : AbstractMidiEditor(0, _rasterInit, 0)
 {
 	setWindowTitle(tr("OOMidi: Tempo Editor"));
+	setWindowIcon(*oomIcon);
 	_raster = 0; // measure
 	//setMinimumSize(400, 300);
 	//resize(500, 350);
