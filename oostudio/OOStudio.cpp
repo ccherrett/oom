@@ -38,6 +38,7 @@ static const QString ACCOUSTIC_PATH("AccousticFREE");
 static const QString M7IR44_PATH("Samplicity M7 Main - 03 - Wave Quad files, 32 bit, 44.1 Khz, v1.1");
 static const QString M7IR48_PATH("Samplicity M7 Main - 04 - Wave Quad files, 32 bit, 48 Khz, v1.1");
 static const QString SOUNDS_DIR = QString(QDir::homePath()).append(QDir::separator()).append(".sounds").append(QDir::separator());
+static const QString CREATE_FROM(QObject::tr("Created from %1: %2"));
 
 #define SessionNameRole Qt::UserRole+5
 
@@ -966,6 +967,7 @@ void OOStudio::resetCreate(bool fromClear)/*{{{*/
 	m_cmbLSCPMode->setCurrentIndex(0);
 	m_commandModel->clear();
 	m_chkTemplate->setChecked(false);
+	m_txtNotes->setText("");
 	updateHeaders();
 }/*}}}*/
 
@@ -1926,6 +1928,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 				m_txtName->setText(session->name);
 				m_chkTemplate->setChecked(session->istemplate);
 				m_txtJackCommand->setText(session->jackcommand);
+				m_txtNotes->setText(session->notes);
 			}
 			else
 			{
@@ -1934,6 +1937,7 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 				{
 					m_txtName->setText(getValidName(session->name));
 				}
+				m_txtNotes->setText(CREATE_FROM.arg(session->istemplate ? tr("Template") : tr("Session")).arg(session->name));
 			}
 			m_commandModel->clear();
 			for(int i = 0; i < session->commands.size(); ++i)
@@ -1956,7 +1960,6 @@ void OOStudio::templateSelectionChanged(int index)/*{{{*/
 			m_cmbLSCPMode->setCurrentIndex(session->lscpMode);
 			m_txtLSCP->setText(session->lscpPath);
 			m_txtOOMPath->setText(session->songfile);
-			m_txtNotes->setText(session->notes);
 			m_txtName->setFocus(Qt::OtherFocusReason);
 			updateHeaders();
 		}

@@ -3015,7 +3015,7 @@ p, li { white-space: pre-wrap; }
       </widget>
       <widget class="QWidget" name="m_tabStatus">
        <attribute name="title">
-        <string>    Status    </string>
+        <string>Status</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <property name="spacing">
