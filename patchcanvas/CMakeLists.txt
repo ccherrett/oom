@@ -70,7 +70,7 @@ file (GLOB patchcanvas_source_files
 ##
 ## Define target
 ##
-add_executable ( patchcanvas
+add_library ( patchcanvas STATIC
       ${patchcanvas_ui_headers}
       ${patchcanvas_source_files}
       ${patchcanvas_mocs}
