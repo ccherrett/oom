@@ -1,10 +1,8 @@
 #ifndef CANVASPORTGLOW_H
 #define CANVASPORTGLOW_H
 
-#include <QGraphicsDropShadowEffect>
-
 #include "patchcanvas.h"
-#include "canvasbox.h"
+#include <QGraphicsDropShadowEffect>
 
 START_NAMESPACE_PATCHCANVAS
 

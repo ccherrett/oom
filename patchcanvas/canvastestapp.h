@@ -5,7 +5,6 @@
 
 #include "patchcanvas.h"
 #include "patchscene.h"
-#include "canvasbox.h"
 
 namespace Ui {
     class CanvasTestApp;

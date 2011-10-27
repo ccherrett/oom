@@ -1,18 +1,20 @@
 #ifndef CANVASBOXSHADOW_H
 #define CANVASBOXSHADOW_H
 
+#include "patchcanvas.h"
 #include <QGraphicsDropShadowEffect>
 
-#include "patchcanvas.h"
-#include "canvasbox.h"
-
 START_NAMESPACE_PATCHCANVAS
+
+class CanvasBox;
 
 class CanvasBoxShadow : public QGraphicsDropShadowEffect
 {
 public:
     CanvasBoxShadow(QObject* parent);
     void setFakeParent(CanvasBox* fake_parent);
+
+protected:
     void draw(QPainter* painter);
 
 private:

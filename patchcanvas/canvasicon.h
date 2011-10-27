@@ -1,12 +1,11 @@
 #ifndef CANVASICON_H
 #define CANVASICON_H
 
-#include <QGraphicsSvgItem>
-#include <QGraphicsColorizeEffect>
-#include <QPainter>
-#include <QSvgRenderer>
-
 #include "patchcanvas.h"
+#include <QGraphicsSvgItem>
+#include <QPainter>
+#include <QGraphicsColorizeEffect>
+#include <QSvgRenderer>
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -17,6 +16,8 @@ public:
     ~CanvasIcon();
 
     void setIcon(Icon icon, QString name);
+
+    int type() const;
 
 private:
     QGraphicsColorizeEffect* colorFX;

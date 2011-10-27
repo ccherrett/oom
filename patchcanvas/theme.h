@@ -21,8 +21,6 @@ public:
     };
 
     Theme(List id);
-    static List getDefaultTheme();
-    static QString getThemeName(List id);
 
     // Canvas
     QString name;
@@ -70,6 +68,9 @@ public:
     QColor line_outro_glow;
     QPen rubberband_pen;
     QColor rubberband_brush;
+
+    static List getDefaultTheme();
+    static QString getThemeName(List id);
 };
 
 #endif // THEME_H

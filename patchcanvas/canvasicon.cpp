@@ -22,6 +22,7 @@ CanvasIcon::~CanvasIcon()
 {
     if (renderer)
         delete renderer;
+    delete colorFX;
 }
 
 void CanvasIcon::setIcon(Icon icon, QString name)
@@ -88,6 +89,11 @@ void CanvasIcon::setIcon(Icon icon, QString name)
     renderer = new QSvgRenderer(icon_path, canvas.scene);
     setSharedRenderer(renderer);
     update();
+}
+
+int CanvasIcon::type() const
+{
+    return CanvasIconType;
 }
 
 QRectF CanvasIcon::boundingRect() const

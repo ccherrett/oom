@@ -1,9 +1,9 @@
 #include "patchscene.h"
 
-#include <QGraphicsView>
 #include <cmath>
-
 #include <cstdio>
+
+#include <QGraphicsView>
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -99,7 +99,7 @@ void PatchScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
         {
             for (int i=0; i < items_list.count(); i++)
             {
-                if (items_list[i]->isVisible() && items_list[i]->flags() == (QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable) /* CanvasBox */)
+                if (items_list[i]->isVisible() && items_list[i]->type() == CanvasBoxType)
                 {
                     QRectF item_rect = items_list[i]->sceneBoundingRect();
                     if ( fake_rubberband->contains(QPointF(item_rect.x(), item_rect.y())) &&
@@ -116,16 +116,17 @@ void PatchScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     else
     {
         bool update = false;
-        QList<CanvasBox*> ret_items;
+        QList<QGraphicsItem*> ret_items;
         QList<QGraphicsItem*> items_list = selectedItems();
 
         if (items_list.count() > 0)
         {
             for (int i=0; i < items_list.count(); i++)
             {
-                if (items_list[i]->isVisible() && items_list[i]->flags() == (QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable) /* CanvasBox */)
+                if (items_list[i]->isVisible() && items_list[i]->type() == CanvasBoxType)
                 {
-//            items_list[i].checkItemPos()
+                    //CanvasBox* cbox = (CanvasBox*)items_list[i];
+                    //cbox->checkItemPos();
 //            use_xy2 = True if (items[i].splitted and items_list[i].splitted_mode == PORT_MODE_INPUT) else False
 //            ret_items.append((items[i].group_id, items[i].scenePos(), use_xy2))
                     update = true;

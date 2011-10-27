@@ -1,4 +1,5 @@
 #include "canvasboxshadow.h"
+#include "canvasbox.h"
 
 START_NAMESPACE_PATCHCANVAS
 
