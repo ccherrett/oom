@@ -1,13 +1,14 @@
 #ifndef PATCHCANVAS_H
 #define PATCHCANVAS_H
 
-#include <QGraphicsItem>
-#include <QGraphicsScene>
-#include <QSettings>
-#include <QTimer>
-
 #include "theme.h"
 #include "patchcanvas-api.h"
+
+#include <QGraphicsItem>
+#include <QGraphicsScene>
+
+class QSettings;
+class QTimer;
 
 class TimerObject : public QObject {
     Q_OBJECT

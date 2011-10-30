@@ -1,13 +1,14 @@
 #ifndef PATCHSCENE_H
 #define PATCHSCENE_H
 
-#include <QGraphicsScene>
-#include <QGraphicsRectItem>
-#include <QKeyEvent>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsSceneWheelEvent>
-
 #include "patchcanvas.h"
+
+#include <QGraphicsScene>
+
+class QKeyEvent;
+class QGraphicsRectItem;
+class QGraphicsSceneMouseEvent;
+class QGraphicsSceneWheelEvent;
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -20,6 +21,7 @@ public:
 private:
     bool ctrl_down;
     bool mouse_down;
+    bool mmouse_down;
     bool fake_selection;
     QGraphicsRectItem* fake_rubberband;
     QPointF orig_point;

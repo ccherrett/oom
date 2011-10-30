@@ -1,34 +1,21 @@
 #include "canvasbezierlinemov.h"
 #include "canvasport.h"
 
-#include <cstdio>
-
 START_NAMESPACE_PATCHCANVAS
 
 extern Canvas canvas;
 extern options_t options;
 
-CanvasBezierLineMov::CanvasBezierLineMov(QGraphicsItem* parent) :
+CanvasBezierLineMov::CanvasBezierLineMov(PortMode port_mode, PortType port_type, QGraphicsItem* parent) :
     QGraphicsPathItem(parent, canvas.scene)
 {
-    port_mode = PORT_MODE_NULL;
-    port_type = PORT_TYPE_NULL;
+    port_mode = port_mode;
+    port_type = port_type;
 
     // Port position doesn't change while moving around line
     item_x = parentItem()->scenePos().x();
     item_y = parentItem()->scenePos().y();
     item_width = ((CanvasPort*)parentItem())->getPortWidth(); // FIXME
-}
-
-void CanvasBezierLineMov::setPortMode(PortMode port_mode_)
-{
-    port_mode = port_mode_;
-    update();
-}
-
-void CanvasBezierLineMov::setPortType(PortType port_type_)
-{
-    port_type = port_type_;
 
     QPen pen;
 
@@ -40,12 +27,11 @@ void CanvasBezierLineMov::setPortType(PortType port_type_)
       pen = QPen(canvas.theme->line_outro, 2);
     else
     {
-      printf("Error: Invalid Port Type!\n");
+      qWarning("Error: Invalid Port Type!");
       return;
     }
 
-    QColor color(0,0,0);
-    color.setAlpha(0);
+    QColor color(0,0,0,0);
     setBrush(color);
     setPen(pen);
     update();

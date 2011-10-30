@@ -2,7 +2,7 @@
 #include "canvasport.h"
 #include "canvasportglow.h"
 
-#include <cstdio>
+#include <QPainter>
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -33,32 +33,9 @@ CanvasBezierLine::~CanvasBezierLine()
         delete glow;
 }
 
-void CanvasBezierLine::enableGlow(bool yesno)
+bool CanvasBezierLine::isLocked()
 {
-    if (locked) return;
-    if (options.fancy_eyecandy)
-    {
-        if (yesno)
-        {
-            glow = new CanvasPortGlow(toGraphicsObject());
-            glow->setPortType(port_type1);
-        }
-        else
-        {
-            if (glow)
-                delete glow;
-            glow = 0;
-        }
-    }
-
-    updateLineGradient(yesno);
-}
-
-void CanvasBezierLine::setPortType(PortType port_type1_, PortType port_type2_)
-{
-    port_type1 = port_type1_;
-    port_type2 = port_type2_;
-    updateLineGradient();
+    return locked;
 }
 
 void CanvasBezierLine::setLocked(bool yesno)
@@ -66,9 +43,26 @@ void CanvasBezierLine::setLocked(bool yesno)
     locked = yesno;
 }
 
-bool CanvasBezierLine::isLocked()
+void CanvasBezierLine::enableGlow(bool yesno)
 {
-    return locked;
+    if (locked) return;
+    if (options.fancy_eyecandy)
+    {
+        if (yesno)
+        {
+            glow = new CanvasPortGlow(port_type1, toGraphicsObject());
+            setGraphicsEffect(glow);
+        }
+        else
+        {
+            setGraphicsEffect(0);
+            if (glow)
+                delete glow;
+            glow = 0;
+        }
+    }
+
+    updateLineGradient(yesno);
 }
 
 void CanvasBezierLine::updateLinePos()
@@ -121,7 +115,7 @@ void CanvasBezierLine::updateLineGradient(bool selected)
         port_gradient.setColorAt(pos1, selected ? canvas.theme->line_outro_sel : canvas.theme->line_outro);
     else
     {
-        printf("Error: Invalid Port1 Type!\n");
+        qWarning("Error: Invalid Port1 Type!");
         return;
     }
 
@@ -133,7 +127,7 @@ void CanvasBezierLine::updateLineGradient(bool selected)
         port_gradient.setColorAt(pos2, selected ? canvas.theme->line_outro_sel : canvas.theme->line_outro);
     else
     {
-        printf("Error: Invalid Port2 Type!\n");
+        qWarning("Error: Invalid Port2 Type!");
         return;
     }
 

@@ -4,6 +4,8 @@
 #include "canvasfadeanimation.h"
 
 #include <cstdio>
+#include <QSettings>
+#include <QTimer>
 
 #ifndef PATCHCANVAS_ORGANISATION_NAME
 #define PATCHCANVAS_ORGANISATION_NAME "PatchCanvas"

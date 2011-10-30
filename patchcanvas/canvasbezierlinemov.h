@@ -10,10 +10,8 @@ START_NAMESPACE_PATCHCANVAS
 class CanvasBezierLineMov : public QGraphicsPathItem
 {
 public:
-    CanvasBezierLineMov(QGraphicsItem* parent);
+    CanvasBezierLineMov(PortMode port_mode, PortType port_type, QGraphicsItem* parent);
 
-    void setPortMode(PortMode port_mode);
-    void setPortType(PortType port_type);
     void updateLinePos(QPointF scenePos);
 
     int type() const;

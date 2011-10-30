@@ -82,6 +82,7 @@ void setGroupIcon(int group_id, Icon icon);
 void addPort(int group_id, int port_id, QString port_name, PortMode port_mode, PortType port_type);
 void removePort(int port_id);
 void renamePort(int port_id, QString new_port_name);
+
 void connectPorts(int connection_id, int port_out_id, int port_in_id);
 void disconnectPorts(int connection_id);
 

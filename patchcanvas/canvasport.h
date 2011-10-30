@@ -2,9 +2,11 @@
 #define CANVASPORT_H
 
 #include "patchcanvas.h"
+
 #include <QGraphicsItem>
-#include <QGraphicsSceneMouseEvent>
-#include <QPainter>
+
+class QGraphicsSceneMouseEvent;
+class QPainter;
 
 START_NAMESPACE_PATCHCANVAS
 

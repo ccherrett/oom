@@ -2,6 +2,7 @@
 #define CANVASPORTGLOW_H
 
 #include "patchcanvas.h"
+
 #include <QGraphicsDropShadowEffect>
 
 START_NAMESPACE_PATCHCANVAS
@@ -9,8 +10,7 @@ START_NAMESPACE_PATCHCANVAS
 class CanvasPortGlow : public QGraphicsDropShadowEffect
 {
 public:
-    CanvasPortGlow(QObject* parent);
-    void setPortType(PortType port_type);
+    CanvasPortGlow(PortType port_type, QObject* parent);
 };
 
 END_NAMESPACE_PATCHCANVAS
