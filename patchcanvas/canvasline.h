@@ -2,8 +2,10 @@
 #define CANVASLINE_H
 
 #include "patchcanvas.h"
+
 #include <QGraphicsLineItem>
-#include <QPainter>
+
+class QPainter;
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -16,11 +18,10 @@ public:
     CanvasLine(CanvasPort* item1, CanvasPort* item2, QGraphicsItem* parent);
     ~CanvasLine();
 
-    void enableGlow(bool yesno);
-    void setPortType(PortType port_type1, PortType port_type2);
-
-    void setLocked(bool yesno);
     bool isLocked();
+    void setLocked(bool yesno);
+
+    void enableGlow(bool yesno);
 
     void updateLinePos();
     void updateLineGradient(bool selected=false);

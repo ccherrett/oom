@@ -2,7 +2,7 @@
 #include "canvasport.h"
 #include "canvasportglow.h"
 
-#include <cstdio>
+#include <QPainter>
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -32,6 +32,16 @@ CanvasLine::~CanvasLine()
         delete glow;
 }
 
+bool CanvasLine::isLocked()
+{
+    return locked;
+}
+
+void CanvasLine::setLocked(bool yesno)
+{
+    locked = yesno;
+}
+
 void CanvasLine::enableGlow(bool yesno)
 {
     if (locked) return;
@@ -39,11 +49,12 @@ void CanvasLine::enableGlow(bool yesno)
     {
         if (yesno)
         {
-            glow = new CanvasPortGlow(toGraphicsObject());
-            glow->setPortType(port_type1);
+            glow = new CanvasPortGlow(port_type1, toGraphicsObject());
+            setGraphicsEffect(glow);
         }
         else
         {
+            setGraphicsEffect(0);
             if (glow)
                 delete glow;
             glow = 0;
@@ -53,22 +64,6 @@ void CanvasLine::enableGlow(bool yesno)
     updateLineGradient(yesno);
 }
 
-void CanvasLine::setPortType(PortType port_type1_, PortType port_type2_)
-{
-    port_type1 = port_type1_;
-    port_type2 = port_type2_;
-    updateLineGradient();
-}
-
-void CanvasLine::setLocked(bool yesno)
-{
-    locked = yesno;
-}
-
-bool CanvasLine::isLocked()
-{
-    return locked;
-}
 void CanvasLine::updateLinePos()
 {
     if (item1->getPortMode() == PORT_MODE_OUTPUT)
@@ -106,7 +101,7 @@ void CanvasLine::updateLineGradient(bool selected)
         port_gradient.setColorAt(pos1, selected ? canvas.theme->line_outro_sel : canvas.theme->line_outro);
     else
     {
-        printf("Error: Invalid Port1 Type!\n");
+        qWarning("Error: Invalid Port1 Type!");
         return;
     }
 
@@ -118,7 +113,7 @@ void CanvasLine::updateLineGradient(bool selected)
         port_gradient.setColorAt(pos2, selected ? canvas.theme->line_outro_sel : canvas.theme->line_outro);
     else
     {
-        printf("Error: Invalid Port2 Type!\n");
+        qWarning("Error: Invalid Port2 Type!");
         return;
     }
 

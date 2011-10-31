@@ -4,8 +4,10 @@
 #include "canvasbezierline.h"
 #include "canvasbezierlinemov.h"
 
-#include <cstdio>
 #include <QCursor>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+#include <QTimer>
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -147,17 +149,13 @@ void CanvasPort::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
         {
             if (options.bezier_lines)
             {
-                CanvasBezierLineMov* new_mov_line = new CanvasBezierLineMov(this);
-                new_mov_line->setPortMode(port_mode);
-                new_mov_line->setPortType(port_type);
+                CanvasBezierLineMov* new_mov_line = new CanvasBezierLineMov(port_mode, port_type, this);
                 new_mov_line->setZValue(canvas.last_z_value);
                 mov_line = new_mov_line;
             }
             else
             {
-                CanvasLineMov* new_mov_line = new CanvasLineMov(this);
-                new_mov_line->setPortMode(port_mode);
-                new_mov_line->setPortType(port_type);
+                CanvasLineMov* new_mov_line = new CanvasLineMov(port_mode, port_type, this);
                 new_mov_line->setZValue(canvas.last_z_value);
                 mov_line = new_mov_line;
             }
@@ -306,7 +304,7 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         }
         else
         {
-            printf("Invalid THEME_PORT mode\n");
+            qWarning("Invalid THEME_PORT mode");
             return;
         }
     }
@@ -332,13 +330,13 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         }
         else
         {
-            printf("Invalid THEME_PORT mode\n");
+            qWarning("Invalid THEME_PORT mode");
             return;
         }
     }
     else
     {
-        printf("Error: Invalid Port Mode!\n");
+        qWarning("Error: Invalid Port Mode!");
         return;
     }
 
@@ -362,7 +360,7 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     }
     else
     {
-        printf("Error: Invalid Port Type!\n");
+        qWarning("Error: Invalid Port Type!");
         return;
     }
 

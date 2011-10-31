@@ -1,5 +1,7 @@
 #include "canvasfadeanimation.h"
 
+#include <QGraphicsItem>
+
 START_NAMESPACE_PATCHCANVAS
 
 CanvasFadeAnimation::CanvasFadeAnimation(QGraphicsItem* item, bool show, QObject* parent) :

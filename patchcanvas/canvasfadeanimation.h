@@ -2,8 +2,10 @@
 #define CANVASFADEANIMATION_H
 
 #include "patchcanvas.h"
+
 #include <QAbstractAnimation>
-#include <QGraphicsItem>
+
+class QGraphicsItem;
 
 START_NAMESPACE_PATCHCANVAS
 

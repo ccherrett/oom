@@ -1,6 +1,8 @@
 #include "canvasicon.h"
 
-#include <cstdio>
+#include <QPainter>
+#include <QGraphicsColorizeEffect>
+#include <QSvgRenderer>
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -79,7 +81,7 @@ void CanvasIcon::setIcon(Icon icon, QString name)
     else
     {
       size = QRectF(0, 0, 0, 0);
-      printf("PatchCanvas::CanvasIcon->setIcon() - Unsupported Icon requested\n");
+      qWarning("PatchCanvas::CanvasIcon->setIcon() - Unsupported Icon requested");
       return;
     }
 

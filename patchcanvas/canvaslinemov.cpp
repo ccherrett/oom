@@ -1,34 +1,23 @@
 #include "canvaslinemov.h"
 #include "canvasport.h"
 
-#include <cstdio>
+#include <QPainter>
 
 START_NAMESPACE_PATCHCANVAS
 
 extern Canvas canvas;
 extern options_t options;
 
-CanvasLineMov::CanvasLineMov(QGraphicsItem* parent) :
+CanvasLineMov::CanvasLineMov(PortMode port_mode, PortType port_type, QGraphicsItem* parent) :
     QGraphicsLineItem(parent, canvas.scene)
 {
-    port_mode = PORT_MODE_NULL;
-    port_type = PORT_TYPE_NULL;
+    port_mode = port_mode;
+    port_type = port_type;
 
     // Port position doesn't change while moving around line
     item_x = parentItem()->scenePos().x();
     item_y = parentItem()->scenePos().y();
     item_width = ((CanvasPort*)parentItem())->getPortWidth();
-}
-
-void CanvasLineMov::setPortMode(PortMode port_mode_)
-{
-    port_mode = port_mode_;
-    update();
-}
-
-void CanvasLineMov::setPortType(PortType port_type_)
-{
-    port_type = port_type_;
 
     QPen pen;
 
@@ -40,7 +29,7 @@ void CanvasLineMov::setPortType(PortType port_type_)
       pen = QPen(canvas.theme->line_outro, 2);
     else
     {
-      printf("Error: Invalid Port Type!\n");
+      qWarning("Error: Invalid Port Type!");
       return;
     }
 

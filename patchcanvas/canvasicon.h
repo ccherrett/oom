@@ -2,10 +2,12 @@
 #define CANVASICON_H
 
 #include "patchcanvas.h"
+
 #include <QGraphicsSvgItem>
-#include <QPainter>
-#include <QGraphicsColorizeEffect>
-#include <QSvgRenderer>
+
+class QPainter;
+class QGraphicsColorizeEffect;
+class QSvgRenderer;
 
 START_NAMESPACE_PATCHCANVAS
 
