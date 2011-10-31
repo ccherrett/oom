@@ -51,7 +51,15 @@ AudioMixer::AudioMixer(const QString& title, QWidget* parent)
 	m_mixerDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::LeftDockWidgetArea, m_mixerDock);
 	m_mixerView = new MixerView(this);
-	m_mixerDock->setWidget(m_mixerView);
+	QWidget* dockWidget = new QWidget(this);
+	QVBoxLayout* dockLayout = new QVBoxLayout(dockWidget);
+	dockLayout->setContentsMargins(0,0,0,0);
+	QLabel* logoLabel = new QLabel(dockWidget);
+	logoLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	logoLabel->setPixmap(QPixmap(":/images/icons/oomidi_icon_the_mixer.png"));
+	dockLayout->addWidget(logoLabel);
+	dockLayout->addWidget(m_mixerView);
+	m_mixerDock->setWidget(dockWidget);
 	
 	m_btnAux = new QPushButton(m_mixerDock);
 	m_btnAux->setToolTip(tr("Show/hide Effects Rack"));

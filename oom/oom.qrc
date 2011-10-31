@@ -425,6 +425,10 @@
 		<file>images/icons/views_auxs_menu.png</file>
 		<file>images/icons/views_midi_menu.png</file>
 		<file>images/icons/views_audio_menu.png</file>
+
+		<file>images/icons/oomidi_icon_the_composer.png</file>
+		<file>images/icons/oomidi_icon_the_mixer.png</file>
+		<file>images/icons/oomidi_icon_the_performer.png</file>
 	</qresource>
 </RCC>
 
