@@ -115,7 +115,15 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	//_rtabs->setMinimumSize(QSize(200, 150));
 	_rtabs->setMinimumWidth(250);
 	connect(_rtabs, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
-	oom->resourceDock()->setWidget(_rtabs);
+	QWidget* dockWidget = new QWidget(this);
+	QVBoxLayout* dockLayout = new QVBoxLayout(dockWidget);
+	dockLayout->setContentsMargins(0,0,0,0);
+	QLabel* logoLabel = new QLabel(dockWidget);
+	logoLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	logoLabel->setPixmap(QPixmap(":/images/oomidi_icon_the_composer.png"));
+	dockLayout->addWidget(logoLabel);
+	dockLayout->addWidget(_rtabs);
+	oom->resourceDock()->setWidget(dockWidget);
 	connect(oom->resourceDock(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(resourceDockAreaChanged(Qt::DockWidgetArea)));
 
 
