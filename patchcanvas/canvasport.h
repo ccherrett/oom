@@ -4,7 +4,9 @@
 #include "patchcanvas.h"
 
 #include <QGraphicsItem>
+#include <QMetaType>
 
+class QGraphicsSceneContextMenuEvent;
 class QGraphicsSceneMouseEvent;
 class QPainter;
 
@@ -14,11 +16,14 @@ class CanvasPort : public QGraphicsItem
 {
 public:
     CanvasPort(int port_id, QString port_name, PortMode port_mode, PortType port_type, QGraphicsItem* parent);
+    CanvasPort() {}
+    ~CanvasPort() {}
 
     int getPortId();
     PortMode getPortMode();
     PortType getPortType();
     QString getPortName();
+    QString getFullPortName();
     int getPortWidth();
     int getPortHeight();
 
@@ -26,7 +31,6 @@ public:
     void setPortType(PortType port_type);
     void setPortName(QString port_name);
     void setPortWidth(int port_width);
-    void setPortHeight(int port_height);
 
     int type() const;
 
@@ -50,6 +54,8 @@ private:
     void mousePressEvent(QGraphicsSceneMouseEvent* event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
+    void contextMenuDisconnect(int port_idx);
 
     QRectF boundingRect() const;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);

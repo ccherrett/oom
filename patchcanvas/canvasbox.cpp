@@ -144,7 +144,7 @@ void CanvasBox::removeLine(int connection_id)
     printf("PatchCanvas::CanvasBox->removeLine() - Unable to find line to remove\n");
 }
 
-port_dict_t CanvasBox::addPort(int port_id, QString port_name, PortMode port_mode, PortType port_type)
+CanvasPort* CanvasBox::addPort(int port_id, QString port_name, PortMode port_mode, PortType port_type)
 {
     if (port_list.count() == 0)
     {
@@ -167,7 +167,7 @@ port_dict_t CanvasBox::addPort(int port_id, QString port_name, PortMode port_mod
     port_list_ids.append(port_id);
     relocateAll();
 
-    return port_dict;
+    return new_widget;
 }
 
 void CanvasBox::removePort(int port_id)

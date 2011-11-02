@@ -40,7 +40,7 @@ public:
     void addLine(QGraphicsItem* line, int connection_id);
     void removeLine(int connection_id);
 
-    port_dict_t addPort(int port_id, QString port_name, PortMode port_mode, PortType port_type);
+    CanvasPort* addPort(int port_id, QString port_name, PortMode port_mode, PortType port_type);
     void removePort(int port_id);
     void renamePort(int port_id, QString new_port_name);
 

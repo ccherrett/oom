@@ -1,9 +1,11 @@
 #include "patchcanvas.h"
 
 #include "canvasbox.h"
+#include "canvasport.h"
+#include "canvasline.h"
+#include "canvasbezierline.h"
 #include "canvasfadeanimation.h"
 
-#include <cstdio>
 #include <QSettings>
 #include <QTimer>
 
@@ -20,24 +22,24 @@ void TimerObject::CanvasPostponedGroups()
 
 START_NAMESPACE_PATCHCANVAS
 
-/* Global objects */
-Canvas canvas;
+        /* Global objects */
+        Canvas canvas;
 
 options_t options = {
     /* theme_name */         Theme::getThemeName(Theme::getDefaultTheme()),
-    /* bezier_lines */       true,
-    /* antialiasing */       Qt::PartiallyChecked,
-    /* auto_hide_groups */   true,
-    /* connect_midi2outro */ false,
-    /* fancy_eyecandy */     true
-};
+                             /* bezier_lines */       true,
+                                                      /* antialiasing */       Qt::PartiallyChecked,
+                                                                               /* auto_hide_groups */   true,
+                                                                                                        /* connect_midi2outro */ false,
+                                                                                                                                 /* fancy_eyecandy */     true
+                                                                                                                                                      };
 
 features_t features = {
     /* group_rename */     true,
-    /* port_rename */      true,
-    /* handle_group_pos */ false
+                           /* port_rename */      true,
+                                                  /* handle_group_pos */ false
 
-};
+                                                                     };
 
 /* contructor and destructor */
 Canvas::Canvas()
@@ -81,10 +83,10 @@ void set_features(features_t* new_features)
     features.handle_group_pos = new_features->handle_group_pos;
 }
 
-void init(QGraphicsScene* scene, void* callback, bool debug)
+void init(QGraphicsScene* scene, Callback callback, bool debug)
 {
     if (debug)
-        printf("PatchCanvas::init(%p, %p, %s)\n", scene, callback, bool2str(debug));
+        qDebug("PatchCanvas::init(%p, %p, %s)", scene, callback, bool2str(debug));
 
     canvas.scene = scene;
     canvas.callback = callback;
@@ -126,9 +128,8 @@ void init(QGraphicsScene* scene, void* callback, bool debug)
 void clear()
 {
     if (canvas.debug)
-        printf("PatchCanvas::clear()\n");
+        qDebug("PatchCanvas::clear()");
 
-#if 0
     int i;
 
     for (i=0; i < canvas.connection_list.count();)
@@ -147,7 +148,6 @@ void clear()
         }
         //delete canvas.animation_list[i].animation;
     }
-#endif
 
     canvas.last_z_value = 0;
     canvas.last_group_id = 0;
@@ -163,7 +163,7 @@ void clear()
 void setInitialPos(int x, int y)
 {
     if (canvas.debug)
-        printf("PatchCanvas::setInitialPos(%i, %i)\n", x, y);
+        qDebug("PatchCanvas::setInitialPos(%i, %i)", x, y);
 
     canvas.initial_pos = QPointF(x, y);
 }
@@ -171,7 +171,7 @@ void setInitialPos(int x, int y)
 void setCanvasSize(int x, int y, int width, int height)
 {
     if (canvas.debug)
-        printf("PatchCanvas::setCanvasSize(%i, %i, %i, %i)\n", x, y, width, height);
+        qDebug("PatchCanvas::setCanvasSize(%i, %i, %i, %i)", x, y, width, height);
 
     canvas.size_rect = QRectF(x, y, width, height);
 }
@@ -179,7 +179,7 @@ void setCanvasSize(int x, int y, int width, int height)
 void addGroup(int group_id, QString group_name, bool split, Icon icon)
 {
     if (canvas.debug)
-        printf("PatchCanvas::addGroup(%i, %s, %s, %i)\n", group_id, group_name.toStdString().data(), bool2str(split), icon);
+        qDebug("PatchCanvas::addGroup(%i, %s, %s, %i)", group_id, group_name.toStdString().data(), bool2str(split), icon);
 
     CanvasBox* group_box = new CanvasBox(group_id, group_name, icon);
 
@@ -217,19 +217,19 @@ void addGroup(int group_id, QString group_name, bool split, Icon icon)
     }
     else
     {
-        bool horizontal;
-
-        if (group_name == "Hardware Capture" || group_name == "Hardware Playback" || group_name == "Capture" || group_name == "Playback")
-            horizontal = true;
-        else
-            horizontal = false;
-
         group_box->setSplit(false);
 
         if (features.handle_group_pos)
             group_box->setPos(canvas.settings->value(QString("CanvasPositions/%s").arg(group_name), CanvasGetNewGroupPos()).toPointF());
         else
+        {
+            bool horizontal;
+            if (group_name == "Hardware Capture" || group_name == "Hardware Playback" || group_name == "Capture" || group_name == "Playback")
+                horizontal = true;
+            else
+                horizontal = false;
             group_box->setPos(CanvasGetNewGroupPos(horizontal));
+        }
     }
 
     if (!options.auto_hide_groups && options.fancy_eyecandy)
@@ -246,7 +246,7 @@ void addGroup(int group_id, QString group_name, bool split, Icon icon)
 void removeGroup(int group_id)
 {
     if (canvas.debug)
-        printf("PatchCanvas::removeGroup(%i)\n", group_id);
+        qDebug("PatchCanvas::removeGroup(%i)", group_id);
 
     for (int i=0; i < canvas.group_list.count(); i++)
     {
@@ -258,7 +258,7 @@ void removeGroup(int group_id)
             if (item->getPortCount() > 0)
             {
                 if (canvas.debug)
-                    printf("PatchCanvas::removeGroup - This group still has ports, postpone it's removal\n");
+                    qDebug("PatchCanvas::removeGroup - This group still has ports, postpone it's removal");
                 canvas.postponed_groups.append(group_id);
                 QTimer::singleShot(100, canvas.postponed_timer, SIGNAL(CanvasPostponedGroups()));
                 return;
@@ -274,7 +274,7 @@ void removeGroup(int group_id)
                 }
 
                 if (options.fancy_eyecandy && s_item->isVisible())
-                  ItemFX(s_item, false);
+                    ItemFX(s_item, false);
                 else
                 {
                     item->removeIconFromScene();
@@ -289,7 +289,7 @@ void removeGroup(int group_id)
             }
 
             if (options.fancy_eyecandy && item->isVisible())
-              ItemFX(item, false);
+                ItemFX(item, false);
             else
             {
                 item->removeIconFromScene();
@@ -304,13 +304,13 @@ void removeGroup(int group_id)
         }
     }
 
-    printf("PatchCanvas::removeGroup - Unable to find group to remove\n");
+    qDebug("PatchCanvas::removeGroup - Unable to find group to remove");
 }
 
 void renameGroup(int group_id, QString new_name)
 {
     if (canvas.debug)
-        printf("PatchCanvas::renameGroup(%i, %s)\n", group_id, new_name.toStdString().data());
+        qDebug("PatchCanvas::renameGroup(%i, %s)", group_id, new_name.toStdString().data());
 
     for (int i=0; i < canvas.group_list.count(); i++)
     {
@@ -330,13 +330,13 @@ void renameGroup(int group_id, QString new_name)
         }
     }
 
-    printf("PatchCanvas::renameGroup - Unable to find group to rename\n");
+    qDebug("PatchCanvas::renameGroup - Unable to find group to rename");
 }
 
 void splitGroup(int group_id)
 {
     if (canvas.debug)
-        printf("PatchCanvas::splitGroup(%i)\n", group_id);
+        qDebug("PatchCanvas::splitGroup(%i)", group_id);
 
     int i;
     CanvasBox* item = 0;
@@ -360,7 +360,7 @@ void splitGroup(int group_id)
 
     if (!item)
     {
-        printf("PatchCanvas::splitGroup - Unable to find group to split\n");
+        qDebug("PatchCanvas::splitGroup - Unable to find group to split");
         return;
     }
 
@@ -368,21 +368,21 @@ void splitGroup(int group_id)
 
     for (i=0; i < port_list.count(); i++)
     {
-      port_dict_t port_dict;
-      port_dict.port_id   = port_list[i].port_id;
-      port_dict.port_name = port_list[i].port_name;
-      port_dict.port_mode = port_list[i].port_mode;
-      port_dict.port_type = port_list[i].port_type;
-      port_dict.widget    = 0;
+        port_dict_t port_dict;
+        port_dict.port_id   = port_list[i].port_id;
+        port_dict.port_name = port_list[i].port_name;
+        port_dict.port_mode = port_list[i].port_mode;
+        port_dict.port_type = port_list[i].port_type;
+        port_dict.widget    = 0;
 
-      ports_data.append(port_dict);
-      ports_list_ids.append(port_dict.port_id);
+        ports_data.append(port_dict);
+        ports_list_ids.append(port_dict.port_id);
     }
 
     for (i=0; i < canvas.connection_list.count(); i++)
     {
-      if (ports_list_ids.contains(canvas.connection_list[i].port_out_id) || ports_list_ids.contains(canvas.connection_list[i].port_in_id))
-          conns_data.append(canvas.connection_list[i]);
+        if (ports_list_ids.contains(canvas.connection_list[i].port_out_id) || ports_list_ids.contains(canvas.connection_list[i].port_in_id))
+            conns_data.append(canvas.connection_list[i]);
     }
 
     // Step 2 - Remove Item and Children
@@ -401,7 +401,7 @@ void splitGroup(int group_id)
         addPort(group_id, ports_data[i].port_id, ports_data[i].port_name, ports_data[i].port_mode, ports_data[i].port_type);
 
     for (i=0; i < conns_data.count(); i++)
-      connectPorts(conns_data[i].connection_id, conns_data[i].port_out_id, conns_data[i].port_in_id);
+        connectPorts(conns_data[i].connection_id, conns_data[i].port_out_id, conns_data[i].port_in_id);
 
     QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
 }
@@ -409,7 +409,7 @@ void splitGroup(int group_id)
 void joinGroup(int group_id)
 {
     if (canvas.debug)
-        printf("PatchCanvas::joinGroup(%i)\n", group_id);
+        qDebug("PatchCanvas::joinGroup(%i)", group_id);
 
     int i;
     CanvasBox* item = 0;
@@ -435,7 +435,7 @@ void joinGroup(int group_id)
 
     if (!item || !s_item)
     {
-        printf("PatchCanvas::joinGroup - Unable to find groups to join\n");
+        qDebug("PatchCanvas::joinGroup - Unable to find groups to join");
         return;
     }
 
@@ -444,36 +444,36 @@ void joinGroup(int group_id)
 
     for (i=0; i < port_list.count(); i++)
     {
-      port_dict_t port_dict;
-      port_dict.port_id   = port_list[i].port_id;
-      port_dict.port_name = port_list[i].port_name;
-      port_dict.port_mode = port_list[i].port_mode;
-      port_dict.port_type = port_list[i].port_type;
-      port_dict.widget    = 0;
+        port_dict_t port_dict;
+        port_dict.port_id   = port_list[i].port_id;
+        port_dict.port_name = port_list[i].port_name;
+        port_dict.port_mode = port_list[i].port_mode;
+        port_dict.port_type = port_list[i].port_type;
+        port_dict.widget    = 0;
 
-      ports_data.append(port_dict);
-      ports_list_ids.append(port_dict.port_id);
+        ports_data.append(port_dict);
+        ports_list_ids.append(port_dict.port_id);
     }
 
     port_list = s_item->getPortList();
 
     for (i=0; i < port_list.count(); i++)
     {
-      port_dict_t port_dict;
-      port_dict.port_id   = port_list[i].port_id;
-      port_dict.port_name = port_list[i].port_name;
-      port_dict.port_mode = port_list[i].port_mode;
-      port_dict.port_type = port_list[i].port_type;
-      port_dict.widget    = 0;
+        port_dict_t port_dict;
+        port_dict.port_id   = port_list[i].port_id;
+        port_dict.port_name = port_list[i].port_name;
+        port_dict.port_mode = port_list[i].port_mode;
+        port_dict.port_type = port_list[i].port_type;
+        port_dict.widget    = 0;
 
-      ports_data.append(port_dict);
-      ports_list_ids.append(port_dict.port_id);
+        ports_data.append(port_dict);
+        ports_list_ids.append(port_dict.port_id);
     }
 
     for (i=0; i < canvas.connection_list.count(); i++)
     {
-      if (ports_list_ids.contains(canvas.connection_list[i].port_out_id) || ports_list_ids.contains(canvas.connection_list[i].port_in_id))
-          conns_data.append(canvas.connection_list[i]);
+        if (ports_list_ids.contains(canvas.connection_list[i].port_out_id) || ports_list_ids.contains(canvas.connection_list[i].port_in_id))
+            conns_data.append(canvas.connection_list[i]);
     }
 
     // Step 2 - Remove Item and Children
@@ -492,7 +492,7 @@ void joinGroup(int group_id)
         addPort(group_id, ports_data[i].port_id, ports_data[i].port_name, ports_data[i].port_mode, ports_data[i].port_type);
 
     for (i=0; i < conns_data.count(); i++)
-      connectPorts(conns_data[i].connection_id, conns_data[i].port_out_id, conns_data[i].port_in_id);
+        connectPorts(conns_data[i].connection_id, conns_data[i].port_out_id, conns_data[i].port_in_id);
 
     QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
 }
@@ -500,103 +500,195 @@ void joinGroup(int group_id)
 void setGroupPos(int group_id, int group_pos_x, int group_pos_y, int group_pos_xs, int group_pos_ys)
 {
     if (canvas.debug)
-      printf("PatchCanvas::setGroupPos(%i, %i, %i, %i, %i)\n", group_id, group_pos_x, group_pos_y, group_pos_xs, group_pos_ys);
-
-    bool check = false;
+        qDebug("PatchCanvas::setGroupPos(%i, %i, %i, %i, %i)", group_id, group_pos_x, group_pos_y, group_pos_xs, group_pos_ys);
 
     for (int i=0; i < canvas.group_list.count(); i++)
     {
-      if (group_id == canvas.group_list[i].group_id)
-      {
-        canvas.group_list[i].widgets[0]->setPos(group_pos_x, group_pos_y);
+        if (group_id == canvas.group_list[i].group_id)
+        {
+            canvas.group_list[i].widgets[0]->setPos(group_pos_x, group_pos_y);
+            canvas.group_list[i].widgets[0]->relocateAll();
 
-        if (canvas.group_list[i].split)
-          canvas.group_list[i].widgets[1]->setPos(group_pos_xs, group_pos_ys);
+            if (canvas.group_list[i].split)
+            {
+                canvas.group_list[i].widgets[1]->setPos(group_pos_xs, group_pos_ys);
+                canvas.group_list[i].widgets[1]->relocateAll();
+            }
 
-        QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
-        break;
-      }
+            QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
+            return;
+        }
     }
 
-    printf("PatchCanvas::setGroupPos - Unable to find group to reposition\n");
+    qDebug("PatchCanvas::setGroupPos - Unable to find group to reposition");
 }
 
 void setGroupIcon(int group_id, Icon icon)
 {
     if (canvas.debug)
-      printf("PatchCanvas::setGroupIcon(%i, %i)\n", group_id, icon);
+        qDebug("PatchCanvas::setGroupIcon(%i, %i)", group_id, icon);
 
     for (int i=0; i < canvas.group_list.count(); i++)
     {
-      if (group_id == canvas.group_list[i].group_id)
-      {
-        canvas.group_list[i].icon = icon;
-        canvas.group_list[i].widgets[0]->setIcon(icon);
+        if (group_id == canvas.group_list[i].group_id)
+        {
+            canvas.group_list[i].icon = icon;
+            canvas.group_list[i].widgets[0]->setIcon(icon);
 
-        if (canvas.group_list[i].split)
-          canvas.group_list[i].widgets[1]->setIcon(icon);
+            if (canvas.group_list[i].split)
+                canvas.group_list[i].widgets[1]->setIcon(icon);
 
-        QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
-        break;
-      }
+            QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
+            return;
+        }
     }
 
-    printf("PatchCanvas::setGroupIcon - Unable to find group to change icon\n");
+    qDebug("PatchCanvas::setGroupIcon - Unable to find group to change icon");
 }
 
 void addPort(int group_id, int port_id, QString port_name, PortMode port_mode, PortType port_type)
 {
     if (canvas.debug)
-      printf("PatchCanvas::addPort(%i, %i, %s, %i, %i)\n", group_id, port_id, port_name.toStdString().data(), port_mode, port_type);
+        qDebug("PatchCanvas::addPort(%i, %i, %s, %i, %i)", group_id, port_id, port_name.toStdString().data(), port_mode, port_type);
 
-    port_dict_t new_port;
+    CanvasPort* port_widget = 0;
 
     for (int i=0; i < canvas.group_list.count(); i++)
     {
-      if (group_id == canvas.group_list[i].group_id)
-      {
-          if (canvas.group_list[i].split)
-          {
-              int n_widget;
-              if (canvas.group_list[i].widgets[0]->getSplittedMode() == port_mode)
-                  n_widget = 0;
-              else
-                  n_widget = 1;
-              new_port = canvas.group_list[i].widgets[n_widget]->addPort(port_id, port_name, port_mode, port_type);
-          }
-          else
-              new_port = canvas.group_list[i].widgets[0]->addPort(port_id, port_name, port_mode, port_type);
-
-          break;
-      }
+        if (group_id == canvas.group_list[i].group_id)
+        {
+            if (canvas.group_list[i].split)
+            {
+                int n_widget = (canvas.group_list[i].widgets[0]->getSplittedMode() == port_mode) ? 0 : 1;
+                port_widget = canvas.group_list[i].widgets[n_widget]->addPort(port_id, port_name, port_mode, port_type);
+            }
+            else
+                port_widget = canvas.group_list[i].widgets[0]->addPort(port_id, port_name, port_mode, port_type);
+            break;
+        }
     }
 
-    if (!new_port.widget)
+    if (!port_widget)
     {
-        printf("PatchCanvas::addPort - Unable to find parent group\n");
+        qDebug("PatchCanvas::addPort() - Unable to find parent group");
         return;
     }
 
-    //if (options.fancy_eyecandy)
-    //  ItemFX(new_port.widget, true);
+    if (options.fancy_eyecandy)
+        ItemFX(port_widget, true);
 
-    canvas.port_list.append(new_port);
+    port_dict_t port_dict;
+    port_dict.port_id   = port_id;
+    port_dict.port_name = port_name;
+    port_dict.port_mode = port_mode;
+    port_dict.port_type = port_type;
+    port_dict.widget    = port_widget;
+    canvas.port_list.append(port_dict);
 
     QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
 }
 
 void removePort(int port_id)
 {
+    if (canvas.debug)
+        qDebug("PatchCanvas::removePort(%i)", port_id);
 
+    for (int i=0; i < canvas.port_list.count(); i++)
+    {
+        if (port_id == canvas.port_list[i].port_id)
+        {
+            CanvasPort* item = canvas.port_list[i].widget;
+            ((CanvasBox*)item->parentItem())->removePort(port_id);
+            if (options.fancy_eyecandy)
+                ItemFX(item, false, true);
+            else
+                canvas.scene->removeItem(item);
+            canvas.port_list.takeAt(i);
+
+            QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
+            return;
+        }
+    }
+
+    qDebug("PatchCanvas::removePort() - Unable to find port to remove");
 }
 
 void renamePort(int port_id, QString new_port_name)
 {
+    if (canvas.debug)
+        qDebug("PatchCanvas::renamePort(%i, %s)", port_id, new_port_name.toStdString().data());
 
+    for (int i=0; i < canvas.port_list.count(); i++)
+    {
+        if (port_id == canvas.port_list[i].port_id)
+        {
+            canvas.port_list[i].widget->setPortName(new_port_name);
+            ((CanvasBox*)canvas.port_list[i].widget->parentItem())->renamePort(port_id, new_port_name);
+
+            QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
+            return;
+        }
+    }
+
+    qDebug("PatchCanvas::renamePort() - Unable to find port to rename");
 }
 
 void connectPorts(int connection_id, int port_out_id, int port_in_id)
 {
+    if (canvas.debug)
+        qDebug("PatchCanvas::connectPorts(%i, %i, %i)", connection_id, port_out_id, port_in_id);
+
+    CanvasPort* port_out = 0;
+    CanvasPort* port_in  = 0;
+    CanvasBox* port_out_parent = 0;
+    CanvasBox* port_in_parent  = 0;
+
+    for (int i=0; i < canvas.port_list.count(); i++)
+    {
+        if (port_out_id == canvas.port_list[i].port_id)
+        {
+            port_out = canvas.port_list[i].widget;
+            port_out_parent = (CanvasBox*)port_out->parentItem();
+        }
+        else if (port_in_id == canvas.port_list[i].port_id)
+        {
+            port_in = canvas.port_list[i].widget;
+            port_in_parent = (CanvasBox*)port_in->parentItem();
+        }
+    }
+
+    if (!port_out || !port_in)
+    {
+        qDebug("PatchCanvas::connectPorts() - Unable to find ports to connect");
+        return;
+    }
+
+    connection_dict_t connection_dict;
+    connection_dict.connection_id = connection_id;
+    connection_dict.port_out_id = port_out_id;
+    connection_dict.port_in_id = port_in_id;
+
+    if (options.bezier_lines)
+      connection_dict.widget = new CanvasBezierLine(port_out, port_in, 0);
+    else
+      connection_dict.widget = new CanvasLine(port_out, port_in, 0);
+
+    port_out_parent->addLine(connection_dict.widget, connection_id);
+    port_in_parent->addLine(connection_dict.widget, connection_id);
+
+    canvas.last_z_value+=1;
+    port_out_parent->setZValue(canvas.last_z_value);
+    port_in_parent->setZValue(canvas.last_z_value);
+
+    canvas.last_z_value+=1;
+    connection_dict.widget->setZValue(canvas.last_z_value);
+
+    canvas.connection_list.append(connection_dict);
+
+    if (options.fancy_eyecandy)
+        ItemFX(connection_dict.widget, true);
+
+    QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
 
 }
 
@@ -615,7 +707,7 @@ void Arrange()
 QPointF CanvasGetNewGroupPos(bool horizontal)
 {
     if (canvas.debug)
-      printf("PatchCanvas::CanvasGetNewGroupPos(%s)\n", bool2str(horizontal));
+        qDebug("PatchCanvas::CanvasGetNewGroupPos(%s)", bool2str(horizontal));
 
     QPointF new_pos(canvas.initial_pos.x(), canvas.initial_pos.y());
     QList<QGraphicsItem*> items = canvas.scene->items();
@@ -648,31 +740,31 @@ QPointF CanvasGetNewGroupPos(bool horizontal)
 void CanvasPostponedGroups()
 {
     if (canvas.debug)
-        printf("PatchCanvas::CanvasPostponedGroups()\n");
+        qDebug("PatchCanvas::CanvasPostponedGroups()");
 
     for (int i=0; i < canvas.postponed_groups.count(); i++)
     {
-      int group_id = canvas.postponed_groups[i];
+        int group_id = canvas.postponed_groups[i];
 
-      for (int j=0; j < canvas.group_list.count(); j++)
-      {
-        if (canvas.group_list[j].group_id == group_id)
+        for (int j=0; j < canvas.group_list.count(); j++)
         {
-          CanvasBox* item = canvas.group_list[j].widgets[0];
-          CanvasBox* s_item = 0;
+            if (canvas.group_list[j].group_id == group_id)
+            {
+                CanvasBox* item = canvas.group_list[j].widgets[0];
+                CanvasBox* s_item = 0;
 
-          if (canvas.group_list[j].split)
-            s_item = canvas.group_list[j].widgets[1];
+                if (canvas.group_list[j].split)
+                    s_item = canvas.group_list[j].widgets[1];
 
-          if (item->getPortCount() == 0 && (!s_item || s_item->getPortCount() == 0))
-          {
-              removeGroup(group_id);
-              canvas.postponed_groups.takeAt(i);
-          }
+                if (item->getPortCount() == 0 && (!s_item || s_item->getPortCount() == 0))
+                {
+                    removeGroup(group_id);
+                    canvas.postponed_groups.takeAt(i);
+                }
 
-          break;
+                break;
+            }
         }
-      }
     }
 
     if (canvas.postponed_groups.count() > 0)

@@ -1,21 +1,26 @@
 #include "canvasport.h"
+#include "canvasbox.h"
 #include "canvasline.h"
 #include "canvaslinemov.h"
 #include "canvasbezierline.h"
 #include "canvasbezierlinemov.h"
 
 #include <QCursor>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QInputDialog>
+#include <QMenu>
 #include <QPainter>
 #include <QTimer>
 
 START_NAMESPACE_PATCHCANVAS
 
-extern Canvas canvas;
+        extern Canvas canvas;
 extern options_t options;
+extern features_t features;
 
 CanvasPort::CanvasPort(int port_id_, QString port_name_, PortMode port_mode_, PortType port_type_, QGraphicsItem* parent) :
-    QGraphicsItem(parent, canvas.scene)
+        QGraphicsItem(parent, canvas.scene)
 {  
     // Save Variables, useful for later
     port_id   = port_id_;
@@ -28,11 +33,11 @@ CanvasPort::CanvasPort(int port_id_, QString port_name_, PortMode port_mode_, Po
     port_height = 15;
     port_font   = QFont(canvas.theme->port_font_name, canvas.theme->port_font_size, canvas.theme->port_font_state);
 
-    mov_line = 0;
+    mov_line   = 0;
     hover_item = 0;
     last_selected_state = false;
 
-    mouse_down = false;
+    mouse_down    = false;
     moving_cursor = false;
 
     setFlags(QGraphicsItem::ItemIsSelectable);
@@ -56,6 +61,11 @@ PortType CanvasPort::getPortType()
 QString CanvasPort::getPortName()
 {
     return port_name;
+}
+
+QString CanvasPort::getFullPortName()
+{
+    return ((CanvasBox*)parentItem())->getText()+":"+port_name;
 }
 
 int CanvasPort::getPortWidth()
@@ -98,15 +108,6 @@ void CanvasPort::setPortWidth(int port_width_)
     update();
 }
 
-void CanvasPort::setPortHeight(int port_height_)
-{
-    if (port_height_ < port_height)
-        QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
-
-    port_height = port_height_;
-    update();
-}
-
 int CanvasPort::type() const
 {
     return CanvasPortType;
@@ -119,6 +120,7 @@ void CanvasPort::mousePressEvent(QGraphicsSceneMouseEvent* event)
     else
         mouse_down = false;
 
+    hover_item = 0;
     moving_cursor = false;
 
     QGraphicsItem::mousePressEvent(event);
@@ -186,10 +188,10 @@ void CanvasPort::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
         if (item)
         {
             if (item->getPortMode() != port_mode &&
-                    (item->getPortType() == port_type || (options.connect_midi2outro &&
-                                                          ((item->getPortType() == PORT_TYPE_MIDI  && port_type == PORT_TYPE_OUTRO) ||
-                                                           (item->getPortType() == PORT_TYPE_OUTRO && port_type == PORT_TYPE_MIDI))
-                                                          )))
+                (item->getPortType() == port_type || (options.connect_midi2outro &&
+                                                      ((item->getPortType() == PORT_TYPE_MIDI  && port_type == PORT_TYPE_OUTRO) ||
+                                                       (item->getPortType() == PORT_TYPE_OUTRO && port_type == PORT_TYPE_MIDI))
+                                                      )))
             {
                 item->setSelected(true);
                 hover_item = item;
@@ -231,7 +233,6 @@ void CanvasPort::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
             }
         }
 
-
         if (hover_item)
         {
             bool check = false;
@@ -240,8 +241,8 @@ void CanvasPort::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
                 if ( (canvas.connection_list[i].port_out_id == port_id && canvas.connection_list[i].port_in_id == hover_item->getPortId()) ||
                      (canvas.connection_list[i].port_out_id == hover_item->getPortId() && canvas.connection_list[i].port_in_id == port_id) )
                 {
-                    //if (canvas.callback)
-                        //canvas.callback(ACTION_PORTS_DISCONNECT, canvas.connection_list[i].connection_id);
+                    if (canvas.callback)
+                        canvas.callback(ACTION_PORTS_DISCONNECT, canvas.connection_list[i].connection_id, 0, "");
                     check = true;
                     break;
                 }
@@ -249,25 +250,90 @@ void CanvasPort::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
             if (!check)
             {
-                //source_port_name = self.parentItem().text+":"+self.port_name;
-                //target_port_name = self.hover_item.parentItem().text+":"+self.hover_item.getPortName();
-                //if (self.port_mode == PORT_MODE_OUTPUT):
-                //  canvas.callback(ACTION_PORTS_CONNECT, self.port_id, source_port_name, self.hover_item.port_id, target_port_name)
-                //else:
-                //  canvas.callback(ACTION_PORTS_CONNECT, self.hover_item.port_id, target_port_name, self.port_id, source_port_name)
+                if (port_mode == PORT_MODE_OUTPUT)
+                    canvas.callback(ACTION_PORTS_CONNECT, port_id, hover_item->getPortId(), "");
+                else
+                    canvas.callback(ACTION_PORTS_CONNECT, hover_item->getPortId(), port_id, "");
             }
 
-          canvas.scene->clearSelection();
+            canvas.scene->clearSelection();
         }
     }
 
     if (moving_cursor)
         setCursor(QCursor(Qt::ArrowCursor));
 
+    hover_item = 0;
     mouse_down = false;
     moving_cursor = false;
 
     QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    canvas.scene->clearSelection();
+    setSelected(true);
+
+    QMenu menu;
+
+    QList<int> port_list; // = canvas.callback(ACTION_REQUEST_PORT_CONNECTION_LIST, port_id, ((CanvasBox*)parentItem())->text+":"+port_name);
+    QMenu discMenu("Disconnect", &menu);
+    if (port_list.count() > 0)
+    {
+        for (int i=0; i < port_list.count(); i++)
+        {
+            //QAction* act_x_disc = discMenu.addAction(port_list[i][1]);
+            //QObject::connect(act_x_disc, SIGNAL(triggered()), SLOT(contextMenuDisconnect()));
+        }
+    }
+    else
+    {
+        QAction* act_x_disc = discMenu.addAction("No connections");
+        act_x_disc->setEnabled(false);
+    }
+
+    menu.addMenu(&discMenu);
+    QAction* act_x_disc_all = menu.addAction("Disconnect &All");
+    /*QAction* act_x_sep_1 =*/ menu.addSeparator();
+                               QAction* act_x_info = menu.addAction("Get &Info");
+                               QAction* act_x_rename = menu.addAction("&Rename");
+
+                               if (!features.port_rename)
+                                   act_x_rename->setVisible(false);
+
+                               QAction* act_selected = menu.exec(event->screenPos());
+
+                               //if (act_selected == act_x_info)
+                               //  canvas.callback(ACTION_PORT_INFO, port_id);
+
+                               /*else*/ if (act_selected == act_x_rename)
+                               {
+                                            bool ok_check;
+                                            QString new_name = QInputDialog::getText(0, "Rename Port", "New name:", QLineEdit::Normal, port_name, &ok_check);
+                                            if (ok_check and !new_name.isEmpty())
+                                            {
+                                                //if (canvas.callback)
+                                                //    canvas.callback(ACTION_PORT_RENAME, port_id, new_name);
+                                            }
+                                        }
+                                        //else if (act_selected == act_x_disc_all)
+                                        //    canvas.callback(ACTION_PORT_DISCONNECT_ALL, port_id, ((CanvasBox*)parentItem().text)+":"+port_name);
+
+                                        event->accept();
+                                    }
+
+void CanvasPort::contextMenuDisconnect(int port_idx)
+{
+    for (int i=0; i < canvas.connection_list.count(); i++)
+    {
+        if ( (canvas.connection_list[i].port_in_id == port_id and canvas.connection_list[i].port_out_id == port_idx) ||
+             (canvas.connection_list[i].port_out_id == port_id and canvas.connection_list[i].port_in_id == port_idx) )
+        {
+            //canvas.callback(ACTION_PORTS_DISCONNECT, canvas.connection_list[i].connection_id);
+            break;
+        }
+    }
 }
 
 QRectF CanvasPort::boundingRect() const

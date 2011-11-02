@@ -32,6 +32,8 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     PatchCanvas::addPort(1, 7, "Some Random Port 2", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_OUTRO);
     PatchCanvas::addPort(1, 8, "An input", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO);
 
+    PatchCanvas::connectPorts(0, 3, 8);
+
     testTimerCount = 0;
     testTimer = startTimer(300);
 }

@@ -74,7 +74,7 @@ public:
     ~Canvas();
 
     QGraphicsScene* scene;
-    void* callback;
+    Callback callback;
     bool debug;
     long last_z_value;
     int last_group_id;

@@ -9,6 +9,8 @@ QT       += core gui svg
 TARGET = PatchCanvas
 TEMPLATE = app
 
+#CONFIG = debug
+
 
 SOURCES += main.cpp\
         canvastestapp.cpp \
@@ -43,20 +45,3 @@ HEADERS  += canvastestapp.h \
     canvasbezierlinemov.h
 
 FORMS    += canvastestapp.ui
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

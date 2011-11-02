@@ -25,18 +25,18 @@ enum PortType {
 };
 
 enum CallbackAction {
-    ACTION_PORT_DISCONNECT_ALL  = 0,
-    ACTION_PORT_RENAME          = 1,
-    ACTION_PORT_INFO            = 2,
-    ACTION_PORTS_CONNECT        = 3,
-    ACTION_PORTS_DISCONNECT     = 4,
-    ACTION_GROUP_DISCONNECT_ALL = 5,
-    ACTION_GROUP_RENAME         = 6,
-    ACTION_GROUP_INFO           = 7,
-    ACTION_GROUP_SPLIT          = 8,
-    ACTION_GROUP_JOIN           = 9,
-    ACTION_REQUEST_PORT_CONNECTION_LIST  = 10,
-    ACTION_REQUEST_GROUP_CONNECTION_LIST = 11
+    ACTION_PORT_DISCONNECT_ALL  = 0, // port_id, N, port_name
+    ACTION_PORT_RENAME          = 1, // port_id, N, new_name
+    ACTION_PORT_INFO            = 2, // port_id, N, N
+    ACTION_PORTS_CONNECT        = 3, // out_id, in_id, N
+    ACTION_PORTS_DISCONNECT     = 4, // conn_id, N, N
+    ACTION_GROUP_DISCONNECT_ALL = 5, // group_id, N, group_name
+    ACTION_GROUP_RENAME         = 6, // group_id, N, new_name
+    ACTION_GROUP_INFO           = 7, // (unused)
+    ACTION_GROUP_SPLIT          = 8, // group_id, N, N
+    ACTION_GROUP_JOIN           = 9, // group_id, N, N
+    ACTION_REQUEST_PORT_CONNECTION_LIST  = 10, // port_id, N, N
+    ACTION_REQUEST_GROUP_CONNECTION_LIST = 11  // group_id, port_flags, group_name
 };
 
 enum Icon {
@@ -62,10 +62,12 @@ struct features_t {
     bool handle_group_pos;
 };
 
+typedef void (*Callback) (CallbackAction action, int value1, int value2, QString value_str);
+
 // API starts here
 void set_options(options_t* options);
 void set_features(features_t* features);
-void init(QGraphicsScene* scene, void* callback, bool debug=false);
+void init(QGraphicsScene* scene, Callback callback, bool debug=false);
 void clear();
 
 void setInitialPos(int x, int y);
