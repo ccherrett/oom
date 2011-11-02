@@ -14,6 +14,14 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     ui->graphicsView->setRenderHint(QPainter::Antialiasing, true);
     ui->graphicsView->setRenderHint(QPainter::TextAntialiasing, true);
 
+    PatchCanvas::options_t options;
+    options.antialiasing = Qt::Checked;
+    options.auto_hide_groups = false;
+    options.bezier_lines = false;
+    options.connect_midi2outro = false;
+    options.fancy_eyecandy = false;
+    options.theme_name = Theme::getThemeName(Theme::getDefaultTheme());
+
     PatchCanvas::init(scene, 0, true);
 
     scene->rubberbandByTheme();

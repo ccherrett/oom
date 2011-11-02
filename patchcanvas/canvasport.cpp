@@ -241,8 +241,7 @@ void CanvasPort::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
                 if ( (canvas.connection_list[i].port_out_id == port_id && canvas.connection_list[i].port_in_id == hover_item->getPortId()) ||
                      (canvas.connection_list[i].port_out_id == hover_item->getPortId() && canvas.connection_list[i].port_in_id == port_id) )
                 {
-                    if (canvas.callback)
-                        canvas.callback(ACTION_PORTS_DISCONNECT, canvas.connection_list[i].connection_id, 0, "");
+                    canvas.callback(ACTION_PORTS_DISCONNECT, canvas.connection_list[i].connection_id, 0, "");
                     check = true;
                     break;
                 }
@@ -313,8 +312,7 @@ void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
                                             QString new_name = QInputDialog::getText(0, "Rename Port", "New name:", QLineEdit::Normal, port_name, &ok_check);
                                             if (ok_check and !new_name.isEmpty())
                                             {
-                                                //if (canvas.callback)
-                                                //    canvas.callback(ACTION_PORT_RENAME, port_id, new_name);
+                                                //canvas.callback(ACTION_PORT_RENAME, port_id, new_name);
                                             }
                                         }
                                         //else if (act_selected == act_x_disc_all)

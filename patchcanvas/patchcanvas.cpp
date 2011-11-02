@@ -22,24 +22,23 @@ void TimerObject::CanvasPostponedGroups()
 
 START_NAMESPACE_PATCHCANVAS
 
-        /* Global objects */
-        Canvas canvas;
+/* Global objects */
+Canvas canvas;
 
 options_t options = {
     /* theme_name */         Theme::getThemeName(Theme::getDefaultTheme()),
-                             /* bezier_lines */       true,
-                                                      /* antialiasing */       Qt::PartiallyChecked,
-                                                                               /* auto_hide_groups */   true,
-                                                                                                        /* connect_midi2outro */ false,
-                                                                                                                                 /* fancy_eyecandy */     true
-                                                                                                                                                      };
+    /* bezier_lines */       true,
+    /* antialiasing */       Qt::PartiallyChecked,
+    /* auto_hide_groups */   true,
+    /* connect_midi2outro */ false,
+    /* fancy_eyecandy */     true
+};
 
 features_t features = {
     /* group_rename */     true,
-                           /* port_rename */      true,
-                                                  /* handle_group_pos */ false
-
-                                                                     };
+    /* port_rename */      true,
+    /* handle_group_pos */ false
+};
 
 /* contructor and destructor */
 Canvas::Canvas()
@@ -87,6 +86,12 @@ void init(QGraphicsScene* scene, Callback callback, bool debug)
 {
     if (debug)
         qDebug("PatchCanvas::init(%p, %p, %s)", scene, callback, bool2str(debug));
+
+    if (!callback)
+    {
+        qFatal("PatchCanvas::init() - fatal error: callback not set");
+        return;
+    }
 
     canvas.scene = scene;
     canvas.callback = callback;
@@ -669,9 +674,9 @@ void connectPorts(int connection_id, int port_out_id, int port_in_id)
     connection_dict.port_in_id = port_in_id;
 
     if (options.bezier_lines)
-      connection_dict.widget = new CanvasBezierLine(port_out, port_in, 0);
+        connection_dict.widget = new CanvasBezierLine(port_out, port_in, 0);
     else
-      connection_dict.widget = new CanvasLine(port_out, port_in, 0);
+        connection_dict.widget = new CanvasLine(port_out, port_in, 0);
 
     port_out_parent->addLine(connection_dict.widget, connection_id);
     port_in_parent->addLine(connection_dict.widget, connection_id);
@@ -694,7 +699,74 @@ void connectPorts(int connection_id, int port_out_id, int port_in_id)
 
 void disconnectPorts(int connection_id)
 {
+    if (canvas.debug)
+      qDebug("PatchCanvas::disconnectPorts(%i)", connection_id);
 
+    int port_1_id, port_2_id;
+    QGraphicsItem* line = 0;
+    QGraphicsItem* item1 = 0;
+    QGraphicsItem* item2 = 0;
+
+    for (int i=0; i < canvas.connection_list.count(); i++)
+    {
+        if (canvas.connection_list[i].connection_id == connection_id)
+        {
+            port_1_id = canvas.connection_list[i].port_out_id;
+            port_2_id = canvas.connection_list[i].port_in_id;
+            line = canvas.connection_list[i].widget;
+            canvas.connection_list.takeAt(i);
+            break;
+        }
+    }
+
+    if (!line)
+    {
+        qDebug("PatchCanvas::disconnectPorts - Unable to find connection ports");
+        return;
+    }
+
+    for (int i=0; i < canvas.port_list.count(); i++)
+    {
+        if (canvas.port_list[i].port_id == port_1_id)
+        {
+            item1 = canvas.port_list[i].widget;
+            break;
+        }
+    }
+
+    if (!item1)
+    {
+        qDebug("PatchCanvas::disconnectPorts - Unable to find output port");
+        return;
+    }
+
+    for (int i=0; i < canvas.port_list.count(); i++)
+    {
+        if (canvas.port_list[i].port_id == port_2_id)
+        {
+            item2 = canvas.port_list[i].widget;
+            break;
+        }
+    }
+
+    if (!item2)
+    {
+        qDebug("PatchCanvas::disconnectPorts - Unable to find input port");
+        return;
+    }
+
+    ((CanvasBox*)item1->parentItem())->removeLine(connection_id);
+    ((CanvasBox*)item2->parentItem())->removeLine(connection_id);
+
+    if (options.fancy_eyecandy)
+        ItemFX(line, false, true);
+    else
+    {
+        canvas.scene->removeItem(line);
+        delete line;
+    }
+
+    QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
 }
 
 void Arrange()
