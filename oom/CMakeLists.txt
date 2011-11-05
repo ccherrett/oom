@@ -198,6 +198,7 @@ include_directories (
       remote
       waveedit
       widgets
+	  ${OOMIDI_LV2_INCLUDES}
       )
 
 # Make sure to include the uic generated headers paths.
@@ -274,9 +275,15 @@ if(OSC_SUPPORT)
       target_link_libraries(core ${LIBLO_LIBRARIES})
 endif(OSC_SUPPORT)
 
-if(LILV_SUPPORT)
-      target_link_libraries(core ${LIBLILV_LIBRARIES})
-endif(LILV_SUPPORT)
+if (ENABLE_LILV_STATIC)
+	if(LILV_SUPPORT)
+	      target_link_libraries(core ${OOMIDI_DEPS_LIB})
+	endif(LILV_SUPPORT)
+else (ENABLE_LILV_STATIC)
+	if(LILV_SUPPORT)
+	      target_link_libraries(core ${LIBLILV_LIBRARIES})
+	endif(LILV_SUPPORT)
+endif (ENABLE_LILV_STATIC)
 
 if(SLV2_SUPPORT)
 	target_link_libraries(core ${LIBSLV2_LIBRARIES})

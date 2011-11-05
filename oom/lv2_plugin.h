@@ -15,16 +15,20 @@
 #define _OOM_LV2_PLUGIN_H_
 #define OOM_LV2_MIDI_EVENT_ID 1
 #ifdef LILV_SUPPORT
+#ifdef LILV_STATIC
+#include "lilv.h"
+#else
 #include <lilv/lilv.h>
+#endif
 #endif
 #ifdef SLV2_SUPPORT
 #include <slv2/slv2.h>
 #endif
-#include "lv2_includes/lv2_data_access.h"
-#include "lv2_includes/lv2_ui.h"
-#include "lv2_includes/lv2_files.h"
-#include "lv2_includes/lv2_persist.h"
-#include "lv2_includes/lv2_external_ui.h"
+#include "lv2_data_access.h"
+#include "lv2_ui.h"
+#include "lv2_files.h"
+#include "lv2_persist.h"
+#include "lv2_external_ui.h"
 #include <QHash>
 #include <QList>
 #include <QObject>

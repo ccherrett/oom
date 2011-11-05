@@ -24,6 +24,7 @@
 #cmakedefine VST_SUPPORT
 #cmakedefine LV2_SUPPORT
 #cmakedefine LILV_SUPPORT
+#cmakedefine LILV_STATIC
 #cmakedefine SUIL_SUPPORT
 #cmakedefine SLV2_SUPPORT
 #cmakedefine LSCP_SUPPORT

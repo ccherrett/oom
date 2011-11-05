@@ -17,6 +17,7 @@ cd serd-$SERD_VERSION
 ./waf configure --prefix=../build --no-utils --static
 ./waf build
 ./waf install
+cp build/*.a ..
 cd ..
 
 # Compile sord
@@ -25,6 +26,7 @@ cd sord-$SORD_VERSION
 ./waf configure --prefix=../build --static
 ./waf build
 ./waf install
+cp build/*.a ..
 cd ..
 
 # Compile lilv

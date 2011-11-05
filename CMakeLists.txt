@@ -81,6 +81,9 @@ SET(OOMidi_VERSION_FULL  "${OOMidi_VERSION}")
 SET(OOMidi_INSTALL_NAME  "oom-${OOMidi_VERSION}")
 SET(OOMidi_EXEC_NAME     "oomidi")
 SET(OOMidi_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/bin/${OOMidi_EXEC_NAME}")
+SET(OOMIDI_DEPS_DIR "${PROJECT_SOURCE_DIR}/dependencies")
+SET(OOMIDI_DEPS_LIB ${OOMIDI_DEPS_DIR}/libserd-0.a ${OOMIDI_DEPS_DIR}/libsord-0.a ${OOMIDI_DEPS_DIR}/liblilv-0.a)
+SET(OOMIDI_LV2_INCLUDES "${PROJECT_SOURCE_DIR}/oom/lv2_includes")
 
 ## The library where we will install the shared components:
 SET(OOMidi_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/modules)
@@ -125,6 +128,7 @@ option ( UPDATE_TRANSLATIONS "Update source translation share/locale/*.ts files
          (WARNING: This will modify the .ts files in the source tree!!)"                     OFF)
 option ( ENABLE_LSCP         "enable lscp client"                                            ON)
 option ( ENABLE_LV2         "enable LV2 plugin support"                                      ON)
+option ( ENABLE_LILV_STATIC "enable static LILV linking"	OFF)
 option ( ENABLE_LV2UI       "enable LV2 plugin UI support"                                   ON)
 
 ##
@@ -223,6 +227,11 @@ else (JACK2_FOUND)
 endif (JACK2_FOUND)
 
 ##
+## Set the internal  lv2_include path
+##
+include_directories(${OOMIDI_LV2_INCLUDES})
+
+##
 ## find LASH 
 ##
 
@@ -284,19 +293,29 @@ endif (JACK2_FOUND)
 	  #      set (LSCP_SUPPORT FALSE)
 	  #endif (ENABLE_LSCP)
 
-if (ENABLE_LV2)
-      PKG_CHECK_MODULES(LIBLILV lilv-0>=0.4.4)
-      if (LIBLILV_FOUND)
-          message("LILV support enabled")
-          include_directories(${LIBLILV_INCLUDE_DIRS})
-          set (LILV_SUPPORT TRUE)
-          set (LV2_SUPPORT TRUE)
-	  else (LIBLILV_FOUND)
-          message("LILV support disabled")
-          set (LILV_SUPPORT FALSE)
-          set (LV2_SUPPORT FALSE)
-      endif (LIBLILV_FOUND)
-endif (ENABLE_LV2)
+if (ENABLE_LILV_STATIC)
+	if (ENABLE_LV2)
+	    message("LILV internal static build enabled")
+	    include_directories(${OOMIDI_DEPS_DIR})
+	    set (LILV_SUPPORT TRUE)
+	    set (LILV_STATIC TRUE)
+	    set (LV2_SUPPORT TRUE)
+	endif (ENABLE_LV2)
+else (ENABLE_LILV_STATIC)
+	if (ENABLE_LV2)
+	      PKG_CHECK_MODULES(LIBLILV lilv-0>=0.4.4)
+	      if (LIBLILV_FOUND)
+	          message("LILV support enabled")
+	          include_directories(${LIBLILV_INCLUDE_DIRS})
+	          set (LILV_SUPPORT TRUE)
+	          set (LV2_SUPPORT TRUE)
+		  else (LIBLILV_FOUND)
+	          message("LILV support disabled")
+	          set (LILV_SUPPORT FALSE)
+	          set (LV2_SUPPORT FALSE)
+	      endif (LIBLILV_FOUND)
+	endif (ENABLE_LV2)
+endif (ENABLE_LILV_STATIC)
 
 if (ENABLE_LV2)
   if(!LILV_SUPPORT)
@@ -412,7 +431,7 @@ IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   ENDIF(EXISTS "${CMAKE_ROOT}/Modules/InstallRequiredSystemLibraries.cmake")
 
   SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OOMidi is a virtual audio studio environment")
-  SET(CPACK_PACKAGE_VENDOR "Werner Schweer and others")
+  SET(CPACK_PACKAGE_VENDOR "The Open Octave Project and others")
   SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
   SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
   SET(CPACK_PACKAGE_VERSION_MAJOR "${OOMidi_VERSION_MAJOR}")
@@ -478,6 +497,7 @@ add_custom_target(uninstall
 summary_add("SLV2 support" SLV2_SUPPORT)
 summary_add("LILV support" LILV_SUPPORT)
 summary_add("LV2 support" LV2_SUPPORT)
+summary_add("LILV static" ENABLE_LILV_STATIC)
 summary_add("GTK2 GUI support" GTK2UI_SUPPORT)
 summary_add("LSCP support" LSCP_SUPPORT)
 #summary_add("Fluidsynth support" HAVE_FLUIDSYNTH)
