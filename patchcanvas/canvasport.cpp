@@ -294,32 +294,33 @@ void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
     menu.addMenu(&discMenu);
     QAction* act_x_disc_all = menu.addAction("Disconnect &All");
-    /*QAction* act_x_sep_1 =*/ menu.addSeparator();
-                               QAction* act_x_info = menu.addAction("Get &Info");
-                               QAction* act_x_rename = menu.addAction("&Rename");
+    /*QAction* act_x_sep_1 =*/
+    menu.addSeparator();
+    QAction* act_x_info = menu.addAction("Get &Info");
+    QAction* act_x_rename = menu.addAction("&Rename");
 
-                               if (!features.port_rename)
-                                   act_x_rename->setVisible(false);
+    if (!features.port_rename)
+        act_x_rename->setVisible(false);
 
-                               QAction* act_selected = menu.exec(event->screenPos());
+    QAction* act_selected = menu.exec(event->screenPos());
 
-                               //if (act_selected == act_x_info)
-                               //  canvas.callback(ACTION_PORT_INFO, port_id);
+    if (act_selected == act_x_info)
+        canvas.callback(ACTION_PORT_INFO, port_id, 0, getFullPortName());
 
-                               /*else*/ if (act_selected == act_x_rename)
-                               {
-                                            bool ok_check;
-                                            QString new_name = QInputDialog::getText(0, "Rename Port", "New name:", QLineEdit::Normal, port_name, &ok_check);
-                                            if (ok_check and !new_name.isEmpty())
-                                            {
-                                                //canvas.callback(ACTION_PORT_RENAME, port_id, new_name);
-                                            }
-                                        }
-                                        //else if (act_selected == act_x_disc_all)
-                                        //    canvas.callback(ACTION_PORT_DISCONNECT_ALL, port_id, ((CanvasBox*)parentItem().text)+":"+port_name);
+    else if (act_selected == act_x_rename)
+    {
+        bool ok_check;
+        QString new_name = QInputDialog::getText(0, "Rename Port", "New name:", QLineEdit::Normal, port_name, &ok_check);
+        if (ok_check and !new_name.isEmpty())
+        {
+            canvas.callback(ACTION_PORT_RENAME, port_id, 0, new_name);
+        }
+    }
+    else if (act_selected == act_x_disc_all)
+        canvas.callback(ACTION_PORT_DISCONNECT_ALL, port_id, 0, getFullPortName());
 
-                                        event->accept();
-                                    }
+    event->accept();
+}
 
 void CanvasPort::contextMenuDisconnect(int port_idx)
 {
@@ -328,7 +329,7 @@ void CanvasPort::contextMenuDisconnect(int port_idx)
         if ( (canvas.connection_list[i].port_in_id == port_id and canvas.connection_list[i].port_out_id == port_idx) ||
              (canvas.connection_list[i].port_out_id == port_id and canvas.connection_list[i].port_in_id == port_idx) )
         {
-            //canvas.callback(ACTION_PORTS_DISCONNECT, canvas.connection_list[i].connection_id);
+            canvas.callback(ACTION_PORTS_DISCONNECT, canvas.connection_list[i].connection_id, 0, "");
             break;
         }
     }
@@ -368,7 +369,7 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         }
         else
         {
-            qWarning("Invalid THEME_PORT mode");
+            qCritical("Invalid THEME_PORT mode");
             return;
         }
     }
@@ -394,13 +395,13 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         }
         else
         {
-            qWarning("Invalid THEME_PORT mode");
+            qCritical("Invalid THEME_PORT mode");
             return;
         }
     }
     else
     {
-        qWarning("Error: Invalid Port Mode!");
+        qCritical("Error: Invalid Port Mode!");
         return;
     }
 
@@ -424,7 +425,7 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     }
     else
     {
-        qWarning("Error: Invalid Port Type!");
+        qCritical("Error: Invalid Port Type!");
         return;
     }
 
@@ -443,8 +444,8 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     painter->setFont(port_font);
     painter->drawText(text_pos, port_name);
 
-    //if (isSelected() != last_selected_state)
-    //  parentItem()->makeItGlow(port_id, isSelected());
+    if (isSelected() != last_selected_state)
+      ((CanvasBox*)parentItem())->makeItGlow(port_id, isSelected());
 
     last_selected_state = isSelected();
 

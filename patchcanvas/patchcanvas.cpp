@@ -5,6 +5,7 @@
 #include "canvasline.h"
 #include "canvasbezierline.h"
 #include "canvasfadeanimation.h"
+#include "patchscene.h"
 
 #include <QSettings>
 #include <QTimer>
@@ -82,7 +83,7 @@ void set_features(features_t* new_features)
     features.handle_group_pos = new_features->handle_group_pos;
 }
 
-void init(QGraphicsScene* scene, Callback callback, bool debug)
+void init(PatchScene* scene, Callback callback, bool debug)
 {
     if (debug)
         qDebug("PatchCanvas::init(%p, %p, %s)", scene, callback, bool2str(debug));
@@ -125,7 +126,7 @@ void init(QGraphicsScene* scene, Callback callback, bool debug)
     if (!canvas.theme)
         canvas.theme = new Theme(Theme::getDefaultTheme());
 
-    canvas.scene->rubberbandByTheme();
+    ((PatchScene*)canvas.scene)->rubberbandByTheme();
     canvas.size_rect = QRectF();
 
     canvas.scene->setBackgroundBrush(canvas.theme->canvas_bg);

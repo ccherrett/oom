@@ -4,12 +4,13 @@
 #include <Qt>
 #include <QString>
 
-class QGraphicsScene;
 
 #define START_NAMESPACE_PATCHCANVAS namespace PatchCanvas {
 #define END_NAMESPACE_PATCHCANVAS }
 
 START_NAMESPACE_PATCHCANVAS
+
+class PatchScene;
 
 enum PortMode {
     PORT_MODE_NULL   = 0,
@@ -67,7 +68,7 @@ typedef void (*Callback) (CallbackAction action, int value1, int value2, QString
 // API starts here
 void set_options(options_t* options);
 void set_features(features_t* features);
-void init(QGraphicsScene* scene, Callback callback, bool debug=false);
+void init(PatchScene* scene, Callback callback, bool debug=false);
 void clear();
 
 void setInitialPos(int x, int y);
