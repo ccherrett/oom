@@ -13,7 +13,8 @@ START_NAMESPACE_PATCHCANVAS
 
 extern Canvas canvas;
 
-PatchScene::PatchScene()
+PatchScene::PatchScene(QObject* parent) :
+        QGraphicsScene(parent)
 {
     ctrl_down = false;
     mouse_down = false;

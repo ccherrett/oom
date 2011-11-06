@@ -21,9 +21,6 @@ public:
 private:
     Ui::CanvasTestApp* ui;
     PatchCanvas::PatchScene* scene;
-    int testTimer, testTimerCount;
-
-    void timerEvent(QTimerEvent* event);
 };
 
 #endif // CANVASTESTAPP_H

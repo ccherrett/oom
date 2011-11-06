@@ -17,7 +17,7 @@ TimerObject::TimerObject() {}
 
 void TimerObject::CanvasPostponedGroups()
 {
-    //PatchCanvas::CanvasPostponedGroups();
+    PatchCanvas::CanvasPostponedGroups();
 }
 
 START_NAMESPACE_PATCHCANVAS
@@ -125,6 +125,7 @@ void init(QGraphicsScene* scene, Callback callback, bool debug)
     if (!canvas.theme)
         canvas.theme = new Theme(Theme::getDefaultTheme());
 
+    canvas.scene->rubberbandByTheme();
     canvas.size_rect = QRectF();
 
     canvas.scene->setBackgroundBrush(canvas.theme->canvas_bg);
@@ -309,7 +310,7 @@ void removeGroup(int group_id)
         }
     }
 
-    qDebug("PatchCanvas::removeGroup - Unable to find group to remove");
+    qCritical("PatchCanvas::removeGroup - Unable to find group to remove");
 }
 
 void renameGroup(int group_id, QString new_name)
@@ -335,7 +336,7 @@ void renameGroup(int group_id, QString new_name)
         }
     }
 
-    qDebug("PatchCanvas::renameGroup - Unable to find group to rename");
+    qCritical("PatchCanvas::renameGroup - Unable to find group to rename");
 }
 
 void splitGroup(int group_id)
@@ -365,7 +366,7 @@ void splitGroup(int group_id)
 
     if (!item)
     {
-        qDebug("PatchCanvas::splitGroup - Unable to find group to split");
+        qCritical("PatchCanvas::splitGroup - Unable to find group to split");
         return;
     }
 
@@ -440,7 +441,7 @@ void joinGroup(int group_id)
 
     if (!item || !s_item)
     {
-        qDebug("PatchCanvas::joinGroup - Unable to find groups to join");
+        qCritical("PatchCanvas::joinGroup - Unable to find groups to join");
         return;
     }
 
@@ -525,7 +526,7 @@ void setGroupPos(int group_id, int group_pos_x, int group_pos_y, int group_pos_x
         }
     }
 
-    qDebug("PatchCanvas::setGroupPos - Unable to find group to reposition");
+    qCritical("PatchCanvas::setGroupPos - Unable to find group to reposition");
 }
 
 void setGroupIcon(int group_id, Icon icon)
@@ -548,7 +549,7 @@ void setGroupIcon(int group_id, Icon icon)
         }
     }
 
-    qDebug("PatchCanvas::setGroupIcon - Unable to find group to change icon");
+    qCritical("PatchCanvas::setGroupIcon - Unable to find group to change icon");
 }
 
 void addPort(int group_id, int port_id, QString port_name, PortMode port_mode, PortType port_type)
@@ -575,7 +576,7 @@ void addPort(int group_id, int port_id, QString port_name, PortMode port_mode, P
 
     if (!port_widget)
     {
-        qDebug("PatchCanvas::addPort() - Unable to find parent group");
+        qCritical("PatchCanvas::addPort() - Unable to find parent group");
         return;
     }
 
@@ -615,7 +616,7 @@ void removePort(int port_id)
         }
     }
 
-    qDebug("PatchCanvas::removePort() - Unable to find port to remove");
+    qCritical("PatchCanvas::removePort() - Unable to find port to remove");
 }
 
 void renamePort(int port_id, QString new_port_name)
@@ -635,7 +636,7 @@ void renamePort(int port_id, QString new_port_name)
         }
     }
 
-    qDebug("PatchCanvas::renamePort() - Unable to find port to rename");
+    qCritical("PatchCanvas::renamePort() - Unable to find port to rename");
 }
 
 void connectPorts(int connection_id, int port_out_id, int port_in_id)
@@ -664,7 +665,7 @@ void connectPorts(int connection_id, int port_out_id, int port_in_id)
 
     if (!port_out || !port_in)
     {
-        qDebug("PatchCanvas::connectPorts() - Unable to find ports to connect");
+        qCritical("PatchCanvas::connectPorts() - Unable to find ports to connect");
         return;
     }
 
@@ -721,7 +722,7 @@ void disconnectPorts(int connection_id)
 
     if (!line)
     {
-        qDebug("PatchCanvas::disconnectPorts - Unable to find connection ports");
+        qCritical("PatchCanvas::disconnectPorts - Unable to find connection ports");
         return;
     }
 
@@ -736,7 +737,7 @@ void disconnectPorts(int connection_id)
 
     if (!item1)
     {
-        qDebug("PatchCanvas::disconnectPorts - Unable to find output port");
+        qCritical("PatchCanvas::disconnectPorts - Unable to find output port");
         return;
     }
 
@@ -751,7 +752,7 @@ void disconnectPorts(int connection_id)
 
     if (!item2)
     {
-        qDebug("PatchCanvas::disconnectPorts - Unable to find input port");
+        qCritical("PatchCanvas::disconnectPorts - Unable to find input port");
         return;
     }
 

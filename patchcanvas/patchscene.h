@@ -15,7 +15,7 @@ START_NAMESPACE_PATCHCANVAS
 class PatchScene : public QGraphicsScene
 {
 public:
-    PatchScene();
+    PatchScene(QObject* parent = 0);
     void rubberbandByTheme();
 
 private:
