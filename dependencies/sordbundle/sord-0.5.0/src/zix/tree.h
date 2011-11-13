@@ -46,68 +46,68 @@ typedef struct ZixTreeNodeImpl ZixTreeIter;
    Create a new (empty) tree.
 */
 ZixTree*
-zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data);
+sord_zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data);
 
 /**
    Free @a t.
 */
 void
-zix_tree_free(ZixTree* t);
+sord_zix_tree_free(ZixTree* t);
 
 /**
    Insert the element @a e into @a t and point @a ti at the new element.
 */
 ZixStatus
-zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti);
+sord_zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti);
 
 /**
    Remove the item pointed at by @a ti from @a t.
 */
 ZixStatus
-zix_tree_remove(ZixTree* t, ZixTreeIter* ti);
+sord_zix_tree_remove(ZixTree* t, ZixTreeIter* ti);
 
 /**
    Set @a ti to an element equal to @a e in @a t.
    If no such item exists, @a ti is set to NULL.
 */
 ZixStatus
-zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti);
+sord_zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti);
 
 /**
    Return the data associated with the given tree item.
 */
 void*
-zix_tree_get(ZixTreeIter* ti);
+sord_zix_tree_get(ZixTreeIter* ti);
 
 /**
    Return an iterator to the first (smallest) element in @a t.
 */
 ZixTreeIter*
-zix_tree_begin(ZixTree* t);
+sord_zix_tree_begin(ZixTree* t);
 
 /**
    Return an iterator the the element one past the last element in @a t.
 */
 ZixTreeIter*
-zix_tree_end(ZixTree* t);
+sord_zix_tree_end(ZixTree* t);
 
 /**
    Return true iff @a i is an iterator to the end of its tree.
 */
 bool
-zix_tree_iter_is_end(ZixTreeIter* i);
+sord_zix_tree_iter_is_end(ZixTreeIter* i);
 
 /**
    Return an iterator that points to the element one past @a i.
 */
 ZixTreeIter*
-zix_tree_iter_next(ZixTreeIter* i);
+sord_zix_tree_iter_next(ZixTreeIter* i);
 
 /**
    Return an iterator that points to the element one before @a i.
 */
 ZixTreeIter*
-zix_tree_iter_prev(ZixTreeIter* i);
+sord_zix_tree_iter_prev(ZixTreeIter* i);
 
 /**
    @}

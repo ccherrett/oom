@@ -1,0 +1,440 @@
+diff -uNr sord-0.5.0/src/sord.c sord-0.5.0-oom/src/sord.c
+--- sord-0.5.0/src/sord.c	2011-09-28 19:58:31.000000000 -0500
++++ sord-0.5.0-oom/src/sord.c	2011-11-12 14:02:08.000000000 -0500
+@@ -294,18 +294,18 @@
+ sord_iter_forward(SordIter* iter)
+ {
+ 	if (!iter->skip_graphs) {
+-		iter->cur = zix_tree_iter_next(iter->cur);
+-		return zix_tree_iter_is_end(iter->cur);
++		iter->cur = sord_zix_tree_iter_next(iter->cur);
++		return sord_zix_tree_iter_is_end(iter->cur);
+ 	}
+ 
+-	SordNode** key = (SordNode**)zix_tree_get(iter->cur);
++	SordNode** key = (SordNode**)sord_zix_tree_get(iter->cur);
+ 	const SordQuad initial = { key[0], key[1], key[2], key[3] };
+ 	while (true) {
+-		iter->cur = zix_tree_iter_next(iter->cur);
+-		if (zix_tree_iter_is_end(iter->cur))
++		iter->cur = sord_zix_tree_iter_next(iter->cur);
++		if (sord_zix_tree_iter_is_end(iter->cur))
+ 			return true;
+ 
+-		key = (SordNode**)zix_tree_get(iter->cur);
++		key = (SordNode**)sord_zix_tree_get(iter->cur);
+ 		for (int i = 0; i < 3; ++i)
+ 			if (key[i] != initial[i])
+ 				return false;
+@@ -321,9 +321,9 @@
+ sord_iter_seek_match(SordIter* iter)
+ {
+ 	for (iter->end = true;
+-	     !zix_tree_iter_is_end(iter->cur);
++	     !sord_zix_tree_iter_is_end(iter->cur);
+ 	     sord_iter_forward(iter)) {
+-		const SordNode** const key = (const SordNode**)zix_tree_get(iter->cur);
++		const SordNode** const key = (const SordNode**)sord_zix_tree_get(iter->cur);
+ 		if (sord_quad_match_inline(key, iter->pat))
+ 			return (iter->end = false);
+ 	}
+@@ -342,7 +342,7 @@
+ 		return true;
+ 
+ 	do {
+-		const SordNode** key = (const SordNode**)zix_tree_get(iter->cur);
++		const SordNode** key = (const SordNode**)sord_zix_tree_get(iter->cur);
+ 
+ 		if (sord_quad_match_inline(key, iter->pat))
+ 			return false;  // Found match
+@@ -382,7 +382,7 @@
+ 	case SINGLE:
+ 	case RANGE:
+ 		assert(
+-			sord_quad_match_inline((const SordNode**)zix_tree_get(iter->cur),
++			sord_quad_match_inline((const SordNode**)sord_zix_tree_get(iter->cur),
+ 			                       iter->pat));
+ 		break;
+ 	case FILTER_RANGE:
+@@ -412,7 +412,7 @@
+ void
+ sord_iter_get(const SordIter* iter, SordQuad id)
+ {
+-	SordNode** key = (SordNode**)zix_tree_get(iter->cur);
++	SordNode** key = (SordNode**)sord_zix_tree_get(iter->cur);
+ 	for (int i = 0; i < TUP_LEN; ++i) {
+ 		id[i] = key[i];
+ 	}
+@@ -438,7 +438,7 @@
+ 		case RANGE:
+ 			SORD_ITER_LOG("%p range next\n", (void*)iter);
+ 			// At the end if the MSNs no longer match
+-			key = (const SordNode**)zix_tree_get(iter->cur);
++			key = (const SordNode**)sord_zix_tree_get(iter->cur);
+ 			assert(key);
+ 			for (int i = 0; i < iter->n_prefix; ++i) {
+ 				const int idx = iter->ordering[i];
+@@ -587,10 +587,10 @@
+ 		const int* const g_ordering = orderings[i + (NUM_ORDERS / 2)];
+ 
+ 		if (indices & (1 << i)) {
+-			sord->indices[i] = zix_tree_new(
++			sord->indices[i] = sord_zix_tree_new(
+ 				false, sord_quad_compare, (void*)ordering);
+ 			if (graphs) {
+-				sord->indices[i + (NUM_ORDERS / 2)] = zix_tree_new(
++				sord->indices[i + (NUM_ORDERS / 2)] = sord_zix_tree_new(
+ 					false, sord_quad_compare, (void*)g_ordering);
+ 			} else {
+ 				sord->indices[i + (NUM_ORDERS / 2)] = NULL;
+@@ -602,7 +602,7 @@
+ 	}
+ 
+ 	if (!sord->indices[DEFAULT_ORDER]) {
+-		sord->indices[DEFAULT_ORDER] = zix_tree_new(
++		sord->indices[DEFAULT_ORDER] = sord_zix_tree_new(
+ 			false, sord_quad_compare, (void*)orderings[DEFAULT_ORDER]);
+ 	}
+ 
+@@ -676,16 +676,16 @@
+ 	sord_iter_free(i);
+ 
+ 	// Free quads
+-	for (ZixTreeIter* i = zix_tree_begin(sord->indices[DEFAULT_ORDER]);
+-	     !zix_tree_iter_is_end(i);
+-	     i = zix_tree_iter_next(i)) {
+-		free(zix_tree_get(i));
++	for (ZixTreeIter* i = sord_zix_tree_begin(sord->indices[DEFAULT_ORDER]);
++	     !sord_zix_tree_iter_is_end(i);
++	     i = sord_zix_tree_iter_next(i)) {
++		free(sord_zix_tree_get(i));
+ 	}
+ 
+ 	// Free indices
+ 	for (unsigned i = 0; i < NUM_ORDERS; ++i)
+ 		if (sord->indices[i])
+-			zix_tree_free(sord->indices[i]);
++			sord_zix_tree_free(sord->indices[i]);
+ 
+ 	free(sord);
+ }
+@@ -714,7 +714,7 @@
+ 	if (sord_num_quads(sord) == 0) {
+ 		return NULL;
+ 	} else {
+-		ZixTreeIter* cur = zix_tree_begin(sord->indices[DEFAULT_ORDER]);
++		ZixTreeIter* cur = sord_zix_tree_begin(sord->indices[DEFAULT_ORDER]);
+ 		SordQuad pat = { 0, 0, 0, 0 };
+ 		return sord_iter_new(sord, cur, pat, DEFAULT_ORDER, ALL, 0);
+ 	}
+@@ -724,7 +724,7 @@
+ index_search(ZixTree* db, const SordQuad search_key)
+ {
+ 	ZixTreeIter* iter = NULL;
+-	zix_tree_find(db, (void*)search_key, &iter);
++	sord_zix_tree_find(db, (void*)search_key, &iter);
+ 	return iter;
+ }
+ 
+@@ -732,18 +732,18 @@
+ index_lower_bound(ZixTree* db, const SordQuad search_key)
+ {
+ 	ZixTreeIter* iter = NULL;
+-	zix_tree_find(db, (void*)search_key, &iter);
++	sord_zix_tree_find(db, (void*)search_key, &iter);
+ 	if (!iter) {
+ 		return NULL;
+ 	}
+ 
+ 	ZixTreeIter* prev = NULL;
+-	while ((prev = zix_tree_iter_prev(iter))) {
++	while ((prev = sord_zix_tree_iter_prev(iter))) {
+ 		if (!prev) {
+ 			return iter;
+ 		}
+ 
+-		const SordNode** const key = (const SordNode**)zix_tree_get(prev);
++		const SordNode** const key = (const SordNode**)sord_zix_tree_get(prev);
+ 		if (!sord_quad_match_inline(key, search_key)) {
+ 			return iter;
+ 		}
+@@ -773,11 +773,11 @@
+ 
+ 	ZixTree* const     db  = sord->indices[index_order];
+ 	ZixTreeIter* const cur = index_lower_bound(db, pat);
+-	if (zix_tree_iter_is_end(cur)) {
++	if (sord_zix_tree_iter_is_end(cur)) {
+ 		SORD_FIND_LOG("No match found\n");
+ 		return NULL;
+ 	}
+-	const SordNode** const key = (const SordNode**)zix_tree_get(cur);
++	const SordNode** const key = (const SordNode**)sord_zix_tree_get(cur);
+ 	if (!key || ( (mode == RANGE || mode == SINGLE)
+ 	              && !sord_quad_match_inline(pat, key) )) {
+ 		SORD_FIND_LOG("No match found\n");
+@@ -1098,7 +1098,7 @@
+ static inline bool
+ sord_add_to_index(SordModel* sord, const SordNode** tup, SordOrder order)
+ {
+-	return !zix_tree_insert(sord->indices[order], tup, NULL);
++	return !sord_zix_tree_insert(sord->indices[order], tup, NULL);
+ }
+ 
+ bool
+@@ -1127,7 +1127,7 @@
+ 		sord_add_quad_ref(sord, tup[i], i);
+ 
+ 	++sord->n_quads;
+-	//assert(sord->n_quads == (size_t)zix_tree_get_length(sord->indices[SPO]));
++	//assert(sord->n_quads == (size_t)sord_zix_tree_get_length(sord->indices[SPO]));
+ 	return true;
+ }
+ 
+@@ -1140,11 +1140,11 @@
+ 	for (unsigned i = 0; i < NUM_ORDERS; ++i) {
+ 		if (sord->indices[i]) {
+ 			ZixTreeIter* const cur = index_search(sord->indices[i], tup);
+-			if (!zix_tree_iter_is_end(cur)) {
++			if (!sord_zix_tree_iter_is_end(cur)) {
+ 				if (!quad) {
+-					quad = zix_tree_get(cur);
++					quad = sord_zix_tree_get(cur);
+ 				}
+-				zix_tree_remove(sord->indices[i], cur);
++				sord_zix_tree_remove(sord->indices[i], cur);
+ 			} else {
+ 				assert(i == 0);  // Assuming index coherency
+ 				return;  // Quad not found, do nothing
+diff -uNr sord-0.5.0/src/zix/tree.c sord-0.5.0-oom/src/zix/tree.c
+--- sord-0.5.0/src/zix/tree.c	2011-09-28 15:04:15.000000000 -0500
++++ sord-0.5.0-oom/src/zix/tree.c	2011-11-12 14:00:25.000000000 -0500
+@@ -46,7 +46,7 @@
+ 
+ ZIX_API
+ ZixTree*
+-zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data)
++sord_zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data)
+ {
+ 	ZixTree* t = malloc(sizeof(ZixTree));
+ 	t->root             = NULL;
+@@ -57,20 +57,20 @@
+ }
+ 
+ static void
+-zix_tree_free_rec(ZixTreeNode* n)
++sord_zix_tree_free_rec(ZixTreeNode* n)
+ {
+ 	if (n) {
+-		zix_tree_free_rec(n->left);
+-		zix_tree_free_rec(n->right);
++		sord_zix_tree_free_rec(n->left);
++		sord_zix_tree_free_rec(n->right);
+ 		free(n);
+ 	}
+ }
+ 
+ ZIX_API
+ void
+-zix_tree_free(ZixTree* t)
++sord_zix_tree_free(ZixTree* t)
+ {
+-	zix_tree_free_rec(t->root);
++	sord_zix_tree_free_rec(t->root);
+ 
+ 	free(t);
+ }
+@@ -232,7 +232,7 @@
+ }
+ 
+ static ZixTreeNode*
+-zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
++sord_zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
+ {
+ 	*height_change = 0;
+ 	const bool is_root = !node->parent;
+@@ -263,7 +263,7 @@
+ 
+ ZIX_API
+ ZixStatus
+-zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
++sord_zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
+ {
+ 	int          cmp = 0;
+ 	ZixTreeNode* n   = t->root;
+@@ -327,13 +327,13 @@
+ 		for (ZixTreeNode* i = p; i && i->parent; i = i->parent) {
+ 			if (i == i->parent->left) {
+ 				if (--i->parent->balance == -2) {
+-					zix_tree_rebalance(t, i->parent, &height_change);
++					sord_zix_tree_rebalance(t, i->parent, &height_change);
+ 					break;
+ 				}
+ 			} else {
+ 				assert(i == i->parent->right);
+ 				if (++i->parent->balance == 2) {
+-					zix_tree_rebalance(t, i->parent, &height_change);
++					sord_zix_tree_rebalance(t, i->parent, &height_change);
+ 					break;
+ 				}
+ 			}
+@@ -349,7 +349,7 @@
+ 
+ ZIX_API
+ ZixStatus
+-zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
++sord_zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
+ {
+ 	ZixTreeNode* const n          = ti;
+ 	ZixTreeNode**      pp         = NULL;  // parent pointer
+@@ -465,7 +465,7 @@
+ 		}
+ 
+ 		assert(i != n);
+-		i = zix_tree_rebalance(t, i, &height_change);
++		i = sord_zix_tree_rebalance(t, i, &height_change);
+ 		if (i->balance == 0) {
+ 			height_change = -1;
+ 		}
+@@ -487,7 +487,7 @@
+ 
+ ZIX_API
+ ZixStatus
+-zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
++sord_zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
+ {
+ 	ZixTreeNode* n = t->root;
+ 	while (n) {
+@@ -507,14 +507,14 @@
+ 
+ ZIX_API
+ void*
+-zix_tree_get(ZixTreeIter* ti)
++sord_zix_tree_get(ZixTreeIter* ti)
+ {
+ 	return ti->data;
+ }
+ 
+ ZIX_API
+ ZixTreeIter*
+-zix_tree_begin(ZixTree* t)
++sord_zix_tree_begin(ZixTree* t)
+ {
+ 	if (!t->root) {
+ 		return NULL;
+@@ -529,21 +529,21 @@
+ 
+ ZIX_API
+ ZixTreeIter*
+-zix_tree_end(ZixTree* t)
++sord_zix_tree_end(ZixTree* t)
+ {
+ 	return NULL;
+ }
+ 
+ ZIX_API
+ bool
+-zix_tree_iter_is_end(ZixTreeIter* i)
++sord_zix_tree_iter_is_end(ZixTreeIter* i)
+ {
+ 	return !i;
+ }
+ 
+ ZIX_API
+ ZixTreeIter*
+-zix_tree_iter_next(ZixTreeIter* i)
++sord_zix_tree_iter_next(ZixTreeIter* i)
+ {
+ 	if (!i) {
+ 		return NULL;
+@@ -567,7 +567,7 @@
+ 
+ ZIX_API
+ ZixTreeIter*
+-zix_tree_iter_prev(ZixTreeIter* i)
++sord_zix_tree_iter_prev(ZixTreeIter* i)
+ {
+ 	if (!i) {
+ 		return NULL;
+diff -uNr sord-0.5.0/src/zix/tree.h sord-0.5.0-oom/src/zix/tree.h
+--- sord-0.5.0/src/zix/tree.h	2011-09-28 15:01:14.000000000 -0500
++++ sord-0.5.0-oom/src/zix/tree.h	2011-11-12 14:08:22.000000000 -0500
+@@ -46,68 +46,68 @@
+    Create a new (empty) tree.
+ */
+ ZixTree*
+-zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data);
++sord_zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data);
+ 
+ /**
+    Free @a t.
+ */
+ void
+-zix_tree_free(ZixTree* t);
++sord_zix_tree_free(ZixTree* t);
+ 
+ /**
+    Insert the element @a e into @a t and point @a ti at the new element.
+ */
+ ZixStatus
+-zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti);
++sord_zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti);
+ 
+ /**
+    Remove the item pointed at by @a ti from @a t.
+ */
+ ZixStatus
+-zix_tree_remove(ZixTree* t, ZixTreeIter* ti);
++sord_zix_tree_remove(ZixTree* t, ZixTreeIter* ti);
+ 
+ /**
+    Set @a ti to an element equal to @a e in @a t.
+    If no such item exists, @a ti is set to NULL.
+ */
+ ZixStatus
+-zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti);
++sord_zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti);
+ 
+ /**
+    Return the data associated with the given tree item.
+ */
+ void*
+-zix_tree_get(ZixTreeIter* ti);
++sord_zix_tree_get(ZixTreeIter* ti);
+ 
+ /**
+    Return an iterator to the first (smallest) element in @a t.
+ */
+ ZixTreeIter*
+-zix_tree_begin(ZixTree* t);
++sord_zix_tree_begin(ZixTree* t);
+ 
+ /**
+    Return an iterator the the element one past the last element in @a t.
+ */
+ ZixTreeIter*
+-zix_tree_end(ZixTree* t);
++sord_zix_tree_end(ZixTree* t);
+ 
+ /**
+    Return true iff @a i is an iterator to the end of its tree.
+ */
+ bool
+-zix_tree_iter_is_end(ZixTreeIter* i);
++sord_zix_tree_iter_is_end(ZixTreeIter* i);
+ 
+ /**
+    Return an iterator that points to the element one past @a i.
+ */
+ ZixTreeIter*
+-zix_tree_iter_next(ZixTreeIter* i);
++sord_zix_tree_iter_next(ZixTreeIter* i);
+ 
+ /**
+    Return an iterator that points to the element one before @a i.
+ */
+ ZixTreeIter*
+-zix_tree_iter_prev(ZixTreeIter* i);
++sord_zix_tree_iter_prev(ZixTreeIter* i);
+ 
+ /**
+    @}

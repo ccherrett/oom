@@ -46,7 +46,7 @@ struct ZixTreeNodeImpl {
 
 ZIX_API
 ZixTree*
-zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data)
+sord_zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data)
 {
 	ZixTree* t = malloc(sizeof(ZixTree));
 	t->root             = NULL;
@@ -57,20 +57,20 @@ zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data)
 }
 
 static void
-zix_tree_free_rec(ZixTreeNode* n)
+sord_zix_tree_free_rec(ZixTreeNode* n)
 {
 	if (n) {
-		zix_tree_free_rec(n->left);
-		zix_tree_free_rec(n->right);
+		sord_zix_tree_free_rec(n->left);
+		sord_zix_tree_free_rec(n->right);
 		free(n);
 	}
 }
 
 ZIX_API
 void
-zix_tree_free(ZixTree* t)
+sord_zix_tree_free(ZixTree* t)
 {
-	zix_tree_free_rec(t->root);
+	sord_zix_tree_free_rec(t->root);
 
 	free(t);
 }
@@ -232,7 +232,7 @@ rotate_right_left(ZixTreeNode* p, int* height_change)
 }
 
 static ZixTreeNode*
-zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
+sord_zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
 {
 	*height_change = 0;
 	const bool is_root = !node->parent;
@@ -263,7 +263,7 @@ zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
 
 ZIX_API
 ZixStatus
-zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
+sord_zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
 {
 	int          cmp = 0;
 	ZixTreeNode* n   = t->root;
@@ -327,13 +327,13 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
 		for (ZixTreeNode* i = p; i && i->parent; i = i->parent) {
 			if (i == i->parent->left) {
 				if (--i->parent->balance == -2) {
-					zix_tree_rebalance(t, i->parent, &height_change);
+					sord_zix_tree_rebalance(t, i->parent, &height_change);
 					break;
 				}
 			} else {
 				assert(i == i->parent->right);
 				if (++i->parent->balance == 2) {
-					zix_tree_rebalance(t, i->parent, &height_change);
+					sord_zix_tree_rebalance(t, i->parent, &height_change);
 					break;
 				}
 			}
@@ -349,7 +349,7 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
 
 ZIX_API
 ZixStatus
-zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
+sord_zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 {
 	ZixTreeNode* const n          = ti;
 	ZixTreeNode**      pp         = NULL;  // parent pointer
@@ -465,7 +465,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 		}
 
 		assert(i != n);
-		i = zix_tree_rebalance(t, i, &height_change);
+		i = sord_zix_tree_rebalance(t, i, &height_change);
 		if (i->balance == 0) {
 			height_change = -1;
 		}
@@ -487,7 +487,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 
 ZIX_API
 ZixStatus
-zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
+sord_zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
 {
 	ZixTreeNode* n = t->root;
 	while (n) {
@@ -507,14 +507,14 @@ zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
 
 ZIX_API
 void*
-zix_tree_get(ZixTreeIter* ti)
+sord_zix_tree_get(ZixTreeIter* ti)
 {
 	return ti->data;
 }
 
 ZIX_API
 ZixTreeIter*
-zix_tree_begin(ZixTree* t)
+sord_zix_tree_begin(ZixTree* t)
 {
 	if (!t->root) {
 		return NULL;
@@ -529,21 +529,21 @@ zix_tree_begin(ZixTree* t)
 
 ZIX_API
 ZixTreeIter*
-zix_tree_end(ZixTree* t)
+sord_zix_tree_end(ZixTree* t)
 {
 	return NULL;
 }
 
 ZIX_API
 bool
-zix_tree_iter_is_end(ZixTreeIter* i)
+sord_zix_tree_iter_is_end(ZixTreeIter* i)
 {
 	return !i;
 }
 
 ZIX_API
 ZixTreeIter*
-zix_tree_iter_next(ZixTreeIter* i)
+sord_zix_tree_iter_next(ZixTreeIter* i)
 {
 	if (!i) {
 		return NULL;
@@ -567,7 +567,7 @@ zix_tree_iter_next(ZixTreeIter* i)
 
 ZIX_API
 ZixTreeIter*
-zix_tree_iter_prev(ZixTreeIter* i)
+sord_zix_tree_iter_prev(ZixTreeIter* i)
 {
 	if (!i) {
 		return NULL;

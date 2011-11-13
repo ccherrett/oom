@@ -1,0 +1,18 @@
+diff -uNr lilv-0.5.0/src/world.c lilv-0.5.0-oom/src/world.c
+--- lilv-0.5.0/src/world.c	2011-09-28 20:09:49.000000000 -0500
++++ lilv-0.5.0-oom/src/world.c	2011-11-12 21:17:28.000000000 -0500
+@@ -22,11 +22,13 @@
+ #include <string.h>
+ 
+ #include <dirent.h>
++
++#include "lilv_internal.h"
++
+ #ifdef HAVE_WORDEXP
+ #include <wordexp.h>
+ #endif
+ 
+-#include "lilv_internal.h"
+ 
+ LILV_API
+ LilvWorld*

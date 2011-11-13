@@ -16,7 +16,7 @@
 #define OOM_LV2_MIDI_EVENT_ID 1
 #ifdef LILV_SUPPORT
 #ifdef LILV_STATIC
-#include "lilv.h"
+#include "lilv/lilv.h"
 #else
 #include <lilv/lilv.h>
 #endif

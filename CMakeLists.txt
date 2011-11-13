@@ -18,6 +18,7 @@
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #=============================================================================
 
+include(CheckIncludeFiles)
 include(FindPkgConfig)
 include(cmake/Summary.cmake)
 include(cmake/TargetDoc.cmake)
@@ -82,7 +83,6 @@ SET(OOMidi_INSTALL_NAME  "oom-${OOMidi_VERSION}")
 SET(OOMidi_EXEC_NAME     "oomidi")
 SET(OOMidi_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/bin/${OOMidi_EXEC_NAME}")
 SET(OOMIDI_DEPS_DIR "${PROJECT_SOURCE_DIR}/dependencies")
-SET(OOMIDI_DEPS_LIB ${OOMIDI_DEPS_DIR}/libserd-0.a ${OOMIDI_DEPS_DIR}/libsord-0.a ${OOMIDI_DEPS_DIR}/liblilv-0.a)
 SET(OOMIDI_LV2_INCLUDES "${PROJECT_SOURCE_DIR}/oom/lv2_includes")
 
 ## The library where we will install the shared components:
@@ -128,7 +128,7 @@ option ( UPDATE_TRANSLATIONS "Update source translation share/locale/*.ts files
          (WARNING: This will modify the .ts files in the source tree!!)"                     OFF)
 option ( ENABLE_LSCP         "enable lscp client"                                            ON)
 option ( ENABLE_LV2         "enable LV2 plugin support"                                      ON)
-option ( ENABLE_LILV_STATIC "enable static LILV linking"	OFF)
+option ( ENABLE_LILV_STATIC "enable static LILV linking"									 ON)
 option ( ENABLE_LV2UI       "enable LV2 plugin UI support"                                   ON)
 
 ##
@@ -136,10 +136,22 @@ option ( ENABLE_LV2UI       "enable LV2 plugin UI support"                      
 ##
 if (APPLE)
 	message("OS X found.")
+	set(OOMidi_PATH_SEPARATOR ":")
+	set(OOMidi_DIR_SEPARATOR "/")
+	set(OOMidi_DEFAULT_LV2_PATH
+		"~/Library/Audio/Plug-Ins/LV2:~/.lv2:/usr/local/lib/lv2:/usr/lib/lv2:/Library/Audio/Plug-Ins/LV2")
 else (APPLE)
 	if (UNIX)
 		message("Unix (probably linux) found")
+		set(OOMidi_PATH_SEPARATOR ":")
+		set(OOMidi_DIR_SEPARATOR "/")
+		set(OOMidi_DEFAULT_LV2_PATH "~/.lv2:/usr/local/lib/lv2:/usr/lib/lv2")
 	endif(UNIX)
+	if(WIN32)
+		set(OOMidi_PATH_SEPARATOR ";")
+		set(OOMidi_DIR_SEPARATOR "/")
+		set(OOMidi_DEFAULT_LV2_PATH "%APPDATA%\\\\LV2;%PROGRAMFILES%\\\\LV2")
+	endif(WIN32)
 
 endif (APPLE)
 
@@ -231,6 +243,8 @@ endif (JACK2_FOUND)
 ##
 include_directories(${OOMIDI_LV2_INCLUDES})
 
+CHECK_INCLUDE_FILES (wordexp.h HAVE_WORDEXP)
+
 ##
 ## find LASH 
 ##
@@ -296,9 +310,10 @@ include_directories(${OOMIDI_LV2_INCLUDES})
 if (ENABLE_LILV_STATIC)
 	if (ENABLE_LV2)
 	    message("LILV internal static build enabled")
-	    include_directories(${OOMIDI_DEPS_DIR})
+		#include_directories(${OOMIDI_DEPS_DIR})
 	    set (LILV_SUPPORT TRUE)
 	    set (LILV_STATIC TRUE)
+	    set (LILV_DEPS "dependencies")
 	    set (LV2_SUPPORT TRUE)
 	endif (ENABLE_LV2)
 else (ENABLE_LILV_STATIC)
@@ -456,11 +471,13 @@ ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
 set(CMAKE_CXX_FLAGS         "-Wall -Wextra -Winvalid-pch -fexceptions ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -fomit-frame-pointer -ffast-math -fstrength-reduce ${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -DQT_DEBUG ${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_C_FLAGS         "${CMAKE_CXX_FLAGS} -std=c99 -fvisibility=hidden")
 
 # NOTE: share/ directory needs to be at the end so that the translations
 #       are scanned before coming to share/locale
 #subdirs(al awl grepmidi man plugins oom synti packaging utils share oostudio)
-subdirs(al awl man plugins oom synti packaging utils share oostudio patchcanvas)
+
+subdirs(al awl man plugins ${LILV_DEPS} oom synti packaging utils share oostudio patchcanvas)
 
 ## Install doc files
 file (GLOB doc_files

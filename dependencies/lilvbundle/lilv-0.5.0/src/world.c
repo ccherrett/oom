@@ -22,11 +22,13 @@
 #include <string.h>
 
 #include <dirent.h>
+
+#include "lilv_internal.h"
+
 #ifdef HAVE_WORDEXP
 #include <wordexp.h>
 #endif
 
-#include "lilv_internal.h"
 
 LILV_API
 LilvWorld*

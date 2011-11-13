@@ -277,7 +277,7 @@ endif(OSC_SUPPORT)
 
 if (ENABLE_LILV_STATIC)
 	if(LILV_SUPPORT)
-	      target_link_libraries(core ${OOMIDI_DEPS_LIB})
+	      target_link_libraries(core lilv_bundle)
 	endif(LILV_SUPPORT)
 else (ENABLE_LILV_STATIC)
 	if(LILV_SUPPORT)
