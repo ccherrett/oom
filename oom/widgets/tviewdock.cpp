@@ -234,7 +234,10 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 					Track* track = song->findTrack(tname);
 					if(track)
 					{
-						oom->composer->addCanvasPart(track);
+						if(track->type() == Track::WAVE)
+							oom->importWave(track);
+						else
+							oom->composer->addCanvasPart(track);
 						song->updateTrackViews1();
 					}
 				}

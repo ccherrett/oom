@@ -1,4 +1,3 @@
-#=============================================================================
 #  OOMidi
 #  OpenOctave Midi and Audio Editor
 #  $Id:$
@@ -511,10 +510,10 @@ add_custom_target(uninstall
 #summary_add("OSC (Liblo) support" OSC_SUPPORT)
 #summary_add("DSSI support" DSSI_SUPPORT)
 #summary_add("VST support" VST_SUPPORT)
-summary_add("SLV2 support" SLV2_SUPPORT)
-summary_add("LILV support" LILV_SUPPORT)
 summary_add("LV2 support" LV2_SUPPORT)
+summary_add("LILV support" LILV_SUPPORT)
 summary_add("LILV static" ENABLE_LILV_STATIC)
+summary_add("SLV2 support" SLV2_SUPPORT)
 summary_add("GTK2 GUI support" GTK2UI_SUPPORT)
 summary_add("LSCP support" LSCP_SUPPORT)
 #summary_add("Fluidsynth support" HAVE_FLUIDSYNTH)
