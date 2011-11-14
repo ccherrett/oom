@@ -137,6 +137,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	m_tabs->setMinimumWidth(250);
 	//connect(m_rtabs, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
 	QWidget* dockWidget = new QWidget(this);
+	dockWidget->setMinimumWidth(250);
 	QVBoxLayout* dockLayout = new QVBoxLayout(dockWidget);
 	dockLayout->setContentsMargins(0,0,0,0);
 	QLabel* logoLabel = new QLabel(dockWidget);
@@ -787,6 +788,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	addCtrl(); //Velocity
 	CtrlEdit* modctrl = addCtrl();
 	modctrl->setType(QString("Modulation"));
+	restoreState(tconfig().get_property("PerformerEdit", "windowstate", "").toByteArray());
 	/*if (!modctrl->setType(QString("Modulation")))
 	{
 		modctrl->hide();
@@ -999,6 +1001,7 @@ Performer::~Performer()
 	tconfig().set_property("PerformerEdit", "ypos", vscroll->pos());
 	tconfig().set_property("PerformerEdit", "colormode", colorMode);
 	tconfig().set_property("PerformerEdit", "showcomments", canvas->showComments());
+	tconfig().set_property("PerformerEdit", "windowstate", saveState());
 	//tconfig().set_property("PerformerEdit", "showghostpart", noteAlphaAction->isChecked());
 	//printf("Canvas show comments: %d\n", canvas->showComments());
     tconfig().save();
