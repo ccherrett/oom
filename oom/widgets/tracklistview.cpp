@@ -125,6 +125,11 @@ void TrackListView::populateTable()/*{{{*/
 {
 	if(debugMsg)
 		printf("TrackListView::populateTable\n");
+	QScrollBar *bar = m_table->verticalScrollBar();
+	int barPos = 0;
+	if(bar)
+		barPos = bar->sliderPosition();
+
 	m_model->clear();
 	for(iTrack i = song->artracks()->begin(); i != song->artracks()->end(); ++i)
 	{
@@ -199,20 +204,9 @@ void TrackListView::populateTable()/*{{{*/
 	if(m_selectedIndex < m_model->rowCount())
 	{
 		m_table->selectRow(m_selectedIndex);
-		QStandardItem* item = m_model->item(m_selectedIndex, 1);
-		if(item)
-		{
-			//m_table->scrollTo(item->index(), QAbstractItemView::EnsureVisible);
-			//m_table->scrollTo(item->index(), QAbstractItemView::PositionAtTop);
-			//m_table->scrollTo(item->index(), QAbstractItemView::PositionAtBottom);
-			m_table->scrollTo(item->index(), QAbstractItemView::PositionAtCenter);
-		}
 	}
-	else
-	{
-		QModelIndex rowIndex = m_table->indexAt(scrollPos);
-		m_table->scrollTo(rowIndex, QAbstractItemView::PositionAtTop);
-	}
+	if(bar)
+		bar->setSliderPosition(barPos);
 }/*}}}*/
 
 void TrackListView::contextPopupMenu(QPoint pos)/*{{{*/
