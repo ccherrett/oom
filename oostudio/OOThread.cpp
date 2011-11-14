@@ -503,20 +503,33 @@ void LinuxSamplerProcessThread::run()/*{{{*/
 			if(rv)
 			{
 				retry = 0;
-				while(!loadLSCP() && retry < 6)
+				rv = loadLSCP();
+				//while(!loadLSCP() && retry < 6)
+				while(!rv && retry < 5)
 				{
 					sleep(1);
+					rv = loadLSCP();
 					++retry;
 				}
-				m_state = ProcessRunning;
-				emit startupSuccess();
-				exec();
-				if(m_process->state() == QProcess::Running)
+				if(rv)
+				{
+					m_state = ProcessRunning;
+					emit startupSuccess();
+					exec();
+					if(m_process->state() == QProcess::Running)
+					{
+						m_process->terminate();
+						m_process->waitForFinished();
+					}
+					m_state = ProcessNotRunning;
+				}
+				else
 				{
 					m_process->terminate();
 					m_process->waitForFinished();
+					m_state = ProcessError;
+					emit startupFailed();
 				}
-				m_state = ProcessNotRunning;
 			}
 			else
 			{
@@ -561,6 +574,9 @@ bool LinuxSamplerProcessThread::loadLSCP()/*{{{*/
 {
 	if(m_session)
 	{
+		QString audioStr("SET AUDIO_OUTPUT_CHANNEL_PARAMETER");
+		QString startStr("SET MIDI_INPUT_PORT_PARAMETER");
+		QString endStr("JACK_BINDINGS=NONE");
 		//showMessage("Loading LSCP File into linuxsampler engine");
 		printf("Loading LSCP ");
 		lscp_client_t* client = ::lscp_client_create(m_session->lshostname.toUtf8().constData(), m_session->lsport, lscp_client_callback, NULL);
@@ -576,9 +592,14 @@ bool LinuxSamplerProcessThread::loadLSCP()/*{{{*/
 		}
 		QTextStream in(&lsfile);
 		QString command = in.readLine();
+		bool skip = false;
 		while(!command.isNull())
 		{
-			if(!command.startsWith("#") && !command.isEmpty())
+			if((command.startsWith(audioStr) && command.endsWith(endStr)) || (command.startsWith(audioStr) && command.endsWith(endStr)))
+			{
+				skip = true;
+			}
+			if(!command.startsWith("#") && !command.isEmpty() && !skip)
 			{
 				QString cmd = command.append("\r\n");
 				if(m_session->lscpMode && cmd.startsWith(QString(MAP_STRING)))
@@ -596,18 +617,31 @@ bool LinuxSamplerProcessThread::loadLSCP()/*{{{*/
 				{
 					cmd = cmd.replace(QString(SOUND_PATH), SOUNDS_DIR);
 				}
-				::lscp_client_query(client, cmd.toUtf8().constData());
+				//::lscp_client_query(client, cmd.toUtf8().constData());
 				//return true;
-				/*if(::lscp_client_query(client, cmd.toUtf8().constData()) != LSCP_OK)
+				if(::lscp_client_query(client, cmd.toUtf8().constData()) != LSCP_OK)
 				{
-					lsfile.close();
-					lscp_client_destroy(client);
-					printf("FAILED to perform query\n");
-					printf("%s\n", command.toUtf8().constData());
-					return false;
-				}*/
+					//Try once more to run the same command
+					sleep(1);
+					if(::lscp_client_query(client, cmd.toUtf8().constData()) != LSCP_OK)
+					{
+						lsfile.close();
+						lscp_client_destroy(client);
+						printf("FAILED to perform query\n");
+						printf("%s\n", command.toUtf8().constData());
+						return false;
+						QString error("FAILED to perform query: ");
+						error.append(command);
+						LogInfo* info = new LogInfo;
+						info->name = "OOStudio";
+						info->message = error;
+						info->codeString = QString("ERROR");
+						emit logMessage(info);
+					}
+				}
 			}
 			command = in.readLine();
+			skip = false;
 		}
 		lsfile.close();
 		lscp_client_destroy(client);

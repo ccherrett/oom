@@ -131,8 +131,11 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 		updateTableHeader();
 		tableView->resizeRowsToContents();
 		autoTable->resizeRowsToContents();
-		if(bar)
-			bar->setSliderPosition(barPos);
+		//if(bar)
+		//{
+		//	qDebug() << "Setting ScrollBar position to: " << barPos;
+		//	bar->setSliderPosition(barPos);
+		//}
 	}
 }/*}}}*/
 

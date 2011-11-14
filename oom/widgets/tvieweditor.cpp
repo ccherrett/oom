@@ -391,8 +391,12 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 		_selected->setComment(txtComment->toPlainText());
 		song->dirty = true;
 		song->updateTrackViews1();
+		/*if(_addmode)
+			song->update(VIEW_ADDED);
+		else
+			song->update(VIEW_CHANGED);*/
 		btnApply->setEnabled(false);
-		//reset();
+		reset();
 	}
 }/*}}}*/
 
