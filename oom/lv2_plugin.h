@@ -21,9 +21,6 @@
 #include <lilv/lilv.h>
 #endif
 #endif
-#ifdef SLV2_SUPPORT
-#include <slv2/slv2.h>
-#endif
 #include "lv2_data_access.h"
 #include "lv2_ui.h"
 #include "lv2_files.h"
@@ -82,27 +79,6 @@ public:
 };/*}}}*/
 
 struct LV2World {/*{{{*/
-#ifdef SLV2_SUPPORT
-	SLV2World world;
-	SLV2Plugins plugins;
-	SLV2Instance instance;
-	SLV2Value input_class;
-	SLV2Value output_class;
-	SLV2Value control_class;
-	SLV2Value event_class;
-	SLV2Value audio_class;
-	SLV2Value midi_class;
-	SLV2Value opt_class;
-	SLV2Value qtui_class;
-	SLV2Value gtkui_class;
-	SLV2Value in_place_broken;
-	SLV2Value toggle_prop;
-	SLV2Value integer_prop;
-	SLV2Value logarithmic_prop;
-	SLV2Value samplerate_prop;
-	SLV2Value units_prop;
-	SLV2Value persist_prop;
-#else
 	LilvWorld* world;
 	const LilvPlugins* plugins;
 	LilvInstance* instance;
@@ -122,7 +98,6 @@ struct LV2World {/*{{{*/
 	LilvNode* samplerate_prop;
 	LilvNode* units_prop;
 	LilvNode* persist_prop;
-#endif
 };/*}}}*/
 
 
@@ -132,22 +107,14 @@ protected:
 	void init(const char* uri);
 
 private:
-#ifdef SLV2_SUPPORT
-	SLV2Plugin m_plugin;
-#else
 	LilvPlugin* m_plugin;
-#endif
 	bool m_config;
 	int controlInputs;
 	int controlOutputs;
 
 public:
 	LV2Plugin(const char* uri);
-#ifdef SLV2_SUPPORT
-	SLV2Plugin getPlugin();
-#else
 	const LilvPlugin* getPlugin();
-#endif
 	
 	bool configSupport()
 	{
@@ -208,17 +175,10 @@ private:
 #ifdef GTK2UI_SUPPORT
 	struct _GtkWidget *m_gtkWindow;
 #endif
-#ifdef SLV2_SUPPORT
-	QList<SLV2Instance> m_instance;
-	SLV2UIInstance m_slv2_ui_instance;
-	SLV2UIs        m_slv2_uis;
-	SLV2UI         m_slv2_ui;
-#else
 	QList<LilvInstance*> m_instance;
     void* m_ui_lib;
     LV2UI_Handle            m_uihandle;
 	const LV2UI_Descriptor* m_uidescriptor;
-#endif
 
 	Configs m_configs;
 
@@ -259,11 +219,7 @@ public:
 	{
 		m_stop_process = f;
 	}
-#ifdef SLV2_SUPPORT
-	SLV2Instance instantiatelv2();
-#else
 	LilvInstance* instantiatelv2();
-#endif
 	const LV2UI_Descriptor *lv2_ui_descriptor() const;
 	LV2UI_Handle lv2_ui_handle() const;
 	LV2_Handle lv2_handle(unsigned short );

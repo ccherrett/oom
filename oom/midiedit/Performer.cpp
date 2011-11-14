@@ -417,6 +417,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	posLabel = new PosLabel(0, "pos");
 	posLabel->setFixedHeight(25);
 	posLabel->setObjectName("Cursor");
+	cursorBar->setObjectName("CursorBar");
 	cursorBar->addWidget(posLabel);
 
 	pitchLabel = new PitchLabel(0);
@@ -442,6 +443,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	tools22 = new EditToolBar(this, performerTools);
 	//tools22->setVisible(false);
     tools2 = new QToolBar(tr("Edit Tools"));
+	tools2->setObjectName("PREditToolBar");
 	tools2->setIconSize(QSize(29, 25));
 	addToolBar(Qt::BottomToolBarArea, tools2);
 	tools2->setFloatable(false);
