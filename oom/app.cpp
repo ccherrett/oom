@@ -1471,6 +1471,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	m_mixerWidget = new MixerDock(m_mixerDock);
 	m_mixerWidget->setObjectName("MixerDock");
 	connect(m_mixerDock, SIGNAL(visibilityChanged(bool)), m_mixerWidget, SLOT(updateConnections(bool)));
+	connect(song, SIGNAL(composerViewChanged()), m_mixerWidget, SLOT(composerViewChanged()));
 	m_mixerDock->setVisible(false);
 	m_mixerDock->setWidget(m_mixerWidget);
 

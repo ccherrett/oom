@@ -77,6 +77,7 @@ public slots:
 	void toggleAuxRack(bool);
 	void generateVUColorMenu();
 	void updateConnections(bool);
+	void composerViewChanged();
 	
 protected:
     void addStrip(Track*, int);

@@ -361,6 +361,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	connect(canvas, SIGNAL(startEditor(PartList*, int)), SIGNAL(startEditor(PartList*, int)));
 
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+	connect(song, SIGNAL(composerViewChanged()), SLOT(composerViewChanged()));
     connect(song, SIGNAL(punchinChanged(bool)), canvas, SLOT(update()));
     connect(song, SIGNAL(punchoutChanged(bool)), canvas, SLOT(update()));
     connect(song, SIGNAL(loopChanged(bool)), canvas, SLOT(update()));
@@ -482,6 +483,37 @@ void Composer::songlenChanged(int n)
 	//printf("New Song Length: %d - %d \n", n, newLen);
 	song->setLen(newLen);
 }
+
+void Composer::composerViewChanged()
+{
+	updateAll();
+	canvas->trackViewChanged();
+	updateConductor(SC_VIEW_CHANGED);
+}
+
+void Composer::updateAll()
+{
+	unsigned endTick = song->len();
+	int offset = AL::sigmap.ticksMeasure(endTick);
+	hscroll->setRange(-offset, endTick + offset); //DEBUG
+	canvas->setOrigin(-offset, 0);
+	time->setOrigin(-offset, 0);
+
+	int bar, beat;
+	unsigned tick;
+	AL::sigmap.tickValues(endTick, &bar, &beat, &tick);
+	if (tick || beat)
+		++bar;
+	lenEntry->blockSignals(true);
+	lenEntry->setValue(bar);
+	lenEntry->blockSignals(false);
+
+
+	trackSelectionChanged();
+	canvas->partsChanged();
+	typeBox->setCurrentIndex(int(song->mtype()));
+}
+
 //---------------------------------------------------------
 //   songChanged
 //---------------------------------------------------------
@@ -491,58 +523,19 @@ void Composer::songChanged(int type)
 	// Is it simply a midi controller value adjustment? Forget it.
 	if (type != SC_MIDI_CONTROLLER)
 	{
-		unsigned endTick = song->len();
-		int offset = AL::sigmap.ticksMeasure(endTick);
-		hscroll->setRange(-offset, endTick + offset); //DEBUG
-		canvas->setOrigin(-offset, 0);
-		time->setOrigin(-offset, 0);
-
-		int bar, beat;
-		unsigned tick;
-		AL::sigmap.tickValues(endTick, &bar, &beat, &tick);
-		if (tick || beat)
-			++bar;
-		lenEntry->blockSignals(true);
-		lenEntry->setValue(bar);
-		lenEntry->blockSignals(false);
-
-		if (type & SC_SONG_TYPE) // p4.0.7 Tim.
+		updateAll();
+		if (type & (SC_TRACK_REMOVED | SC_VIEW_CHANGED))
+		{
+			canvas->trackViewChanged();
+		}
+		
+		if (type & SC_SONG_TYPE) 
 			setMode(song->mtype());
-
-		trackSelectionChanged();
-		canvas->partsChanged();
-		typeBox->setCurrentIndex(int(song->mtype()));
+	
 		if (type & SC_SIG)
 			time->redraw();
 		if (type & SC_TEMPO)
 			setGlobalTempo(tempomap.globalTempo());
-
-		if (type & (SC_TRACK_REMOVED | SC_VIEW_CHANGED))
-		{
-			canvas->trackViewChanged();
-			/*AudioStrip* w = (AudioStrip*) _lastStrip;//(midiConductor->getWidget(2));
-			//AudioStrip* w = (AudioStrip*)(midiConductor->widget(2));
-			if (w)
-			{
-				Track* t = w->getTrack();
-				if (t)
-				{
-					TrackList* tl;
-					if(!song->viewselected)
-						tl = song->tracks();
-					else
-						tl = song->visibletracks();
-					iTrack it = tl->find(t);
-					if (it == tl->end())
-					{
-						delete w;
-						//midiConductor->addWidget(0, 2);
-						//midiConductor->insertWidget(2, 0);
-						selected = 0;
-					}
-				}
-			}*/
-		}
 		if(type & SC_VIEW_CHANGED)
 		{//Scroll to top
 			//canvas->setYPos(0);

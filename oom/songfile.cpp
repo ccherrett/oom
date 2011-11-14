@@ -1040,8 +1040,10 @@ void Song::read(Xml& xml)
 			case Xml::TagEnd:
 				if (tag == "song")
 				{
-					//Call oom->updateTrackView() to update the track view menu
+					//Call song->updateTrackViews1() to update the canvas and headers
 					updateTrackViews1();
+					//Call to update the track view menu
+					update(SC_VIEW_CHANGED);
 					return;
 				}
 			default:

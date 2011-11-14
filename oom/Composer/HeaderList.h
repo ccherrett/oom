@@ -55,6 +55,7 @@ protected:
 private slots:
     void songChanged(int flags);
 	void updateSelection(Track*, bool);
+	void composerViewChanged();
 
 signals:
     void selectionChanged(Track*);

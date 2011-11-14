@@ -31,7 +31,7 @@ void MixerView::addButton(QWidget* btn)
 
 void MixerView::populateTable(int flag, bool startup)/*{{{*/
 {
-	if(flag & (SC_VIEW_DELETED | SC_VIEW_ADDED) || flag == -1)
+	if(flag & (SC_VIEW_CHANGED | SC_VIEW_DELETED | SC_VIEW_ADDED) || flag == -1)
 	{
 		//m_selectList.clear();
 		TrackViewList* tviews = song->trackviews();

@@ -114,6 +114,8 @@ private slots:
 	void splitterMoved(int, int);
 	void resourceDockAreaChanged(Qt::DockWidgetArea);
 	void currentTabChanged(int);
+	void composerViewChanged();
+	void updateAll();
 
 signals:
     void redirectWheelEvent(QWheelEvent*);

@@ -484,6 +484,11 @@ void MixerDock::configChanged()
 	songChanged(SC_CONFIG);
 }
 
+void MixerDock::composerViewChanged()
+{
+	updateMixer(UPDATE_ALL);
+}
+
 //---------------------------------------------------------
 //   songChanged
 //---------------------------------------------------------
@@ -501,11 +506,11 @@ void MixerDock::songChanged(int flags)/*{{{*/
 		//printf("MixerDock::songChanged -1 fired\n");
 		action = UPDATE_ALL;
 	}
-	else if(flags & SC_VIEW_CHANGED)
+	/*else if(flags & SC_VIEW_CHANGED)
 	{
 		//printf("SC_VIEW_CHANGED fired\n");
 		action = UPDATE_ALL;
-	}
+	}*/
 	else if (flags & SC_TRACK_REMOVED)
 		action = STRIP_REMOVED;
 	else if (flags & SC_TRACK_INSERTED)

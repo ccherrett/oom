@@ -58,6 +58,12 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 	setFocusPolicy(Qt::StrongFocus);
 
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+	connect(song, SIGNAL(composerViewChanged()), SLOT(composerViewChanged()));
+}
+
+void HeaderList::composerViewChanged()
+{
+	updateTrackList(true);
 }
 
 void HeaderList::songChanged(int flags)/*{{{*/
@@ -85,15 +91,8 @@ void HeaderList::songChanged(int flags)/*{{{*/
 		}*/
 		emit updateHeader(flags);
 	}
-	//if (flags == -1 || (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED /*| SC_TRACK_MODIFIED*/)))
-	if (!song->invalid && (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_VIEW_CHANGED )))
+	/*if (!song->invalid && (flags & (SC_TRACK_INSERTED | SC_TRACK_REMOVED | SC_VIEW_CHANGED )))
 	{
-		updateTrackList(true);
-		return;
-	}
-	/*if(!song->invalid && (flags &SC_VIEW_CHANGED))
-	{
-		//printf("SC_VIEW_CHANGED\n");
 		updateTrackList(true);
 		return;
 	}*/

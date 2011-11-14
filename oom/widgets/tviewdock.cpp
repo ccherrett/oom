@@ -81,10 +81,6 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 {
 	if(flag & (SC_VIEW_CHANGED | SC_VIEW_DELETED | SC_VIEW_ADDED) || flag == -1)
 	{
-		QScrollBar *bar = tableView->verticalScrollBar();
-		int barPos = 0;
-		if(bar)
-			barPos = bar->sliderPosition();
 		//printf("TrackViewDock::populateTable(int flag) fired\n");
 		TrackViewList* tviews = song->trackviews();
 		_tableModel->clear();

@@ -391,10 +391,10 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 		_selected->setComment(txtComment->toPlainText());
 		song->dirty = true;
 		song->updateTrackViews1();
-		/*if(_addmode)
-			song->update(VIEW_ADDED);
+		if(_addmode)
+			song->update(SC_VIEW_ADDED);
 		else
-			song->update(VIEW_CHANGED);*/
+			song->update(SC_VIEW_CHANGED);
 		btnApply->setEnabled(false);
 		reset();
 	}
@@ -489,6 +489,7 @@ void TrackViewEditor::btnDeleteClicked(bool)/*{{{*/
 		song->trackviews()->erase(_selected);
 		song->dirty = true;
 		song->updateTrackViews1();
+		song->update(SC_VIEW_DELETED);
 		reset();
 	}
 }/*}}}*/

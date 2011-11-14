@@ -1451,6 +1451,10 @@ void Song::update(int flags)
 		//printf("Song::update firing updateTrackViews\n");
 		updateTrackViews1();
 	}
+	/*if(flags & SC_VIEW_CHANGED)
+	{
+		emit composerViewChanged();
+	}*/
 	if(!invalid)
 		emit songChanged(flags);
 	--level;
@@ -3800,7 +3804,8 @@ void Song::updateTrackViews1()
 	//printf("Song::updateTrackViews1() took %f seconds to run\n", end-start);
 	disarmAllTracks();
 	if(!invalid)
-		emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
+		emit composerViewChanged();
+		//emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
 
 //---------------------------------------------------------
