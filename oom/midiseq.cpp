@@ -384,34 +384,33 @@ void MidiSeq::updatePollFd()
 	//  midi ports
 	//---------------------------------------------------
 
-	if(midiDevices.size() > 0)
+	for (iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
 	{
-		for (iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
+		if(*imd == NULL)
+			continue;
+		MidiDevice* dev = *imd;
+		int port = dev->midiPort();
+		const QString name = dev->name();
+		if (port == -1)
+			continue;
+		if ((dev->rwFlags() & 0x2) || (extSyncFlag.value()
+				//&& (rxSyncPort == port || rxSyncPort == -1))) {
+				//&& (dev->syncInfo().MCIn()))) {
+				&& (midiPorts[port].syncInfo().MCIn())))
 		{
-			MidiDevice* dev = *imd;
-			int port = dev->midiPort();
-			const QString name = dev->name();
-			if (port == -1)
-				continue;
-			if ((dev->rwFlags() & 0x2) || (extSyncFlag.value()
-					//&& (rxSyncPort == port || rxSyncPort == -1))) {
-					//&& (dev->syncInfo().MCIn()))) {
-					&& (midiPorts[port].syncInfo().MCIn())))
+			if (dev->selectRfd() < 0)
 			{
-				if (dev->selectRfd() < 0)
-				{
-					//fprintf(stderr, "WARNING: read-file-descriptor for {%s} is negative\n", name.toLatin1());
-				}
-				addPollFd(dev->selectRfd(), POLLIN, ::midiRead, this, dev);
+				//fprintf(stderr, "WARNING: read-file-descriptor for {%s} is negative\n", name.toLatin1());
 			}
-			if (dev->bytesToWrite())
+			addPollFd(dev->selectRfd(), POLLIN, ::midiRead, this, dev);
+		}
+		if (dev->bytesToWrite())
+		{
+			if (dev->selectWfd() < 0)
 			{
-				if (dev->selectWfd() < 0)
-				{
-					//fprintf(stderr, "WARNING: write-file-descriptor for {%s} is negative\n", name.toLatin1());
-				}
-				addPollFd(dev->selectWfd(), POLLOUT, ::midiWrite, this, dev);
+				//fprintf(stderr, "WARNING: write-file-descriptor for {%s} is negative\n", name.toLatin1());
 			}
+			addPollFd(dev->selectWfd(), POLLOUT, ::midiWrite, this, dev);
 		}
 	}
 	// special handling for alsa midi:
