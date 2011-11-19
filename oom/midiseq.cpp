@@ -386,6 +386,8 @@ void MidiSeq::updatePollFd()
 
 	for (iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
 	{
+		if(*imd == NULL)
+			continue;
 		MidiDevice* dev = *imd;
 		int port = dev->midiPort();
 		const QString name = dev->name();
