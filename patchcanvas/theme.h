@@ -38,18 +38,22 @@ public:
     QFont::Weight box_font_state;
 
     // Ports
-    QPen port_audio_pen;
-    QPen port_audio_pen_sel;
-    QPen port_midi_pen;
-    QPen port_midi_pen_sel;
-    QPen port_outro_pen;
-    QPen port_outro_pen_sel;
-    QColor port_audio_bg;
-    QColor port_audio_bg_sel;
-    QColor port_midi_bg;
-    QColor port_midi_bg_sel;
-    QColor port_outro_bg;
-    QColor port_outro_bg_sel;
+    QPen port_audio_jack_pen;
+    QPen port_audio_jack_pen_sel;
+    QPen port_midi_jack_pen;
+    QPen port_midi_jack_pen_sel;
+    QPen port_midi_a2j_pen;
+    QPen port_midi_a2j_pen_sel;
+    QPen port_midi_alsa_pen;
+    QPen port_midi_alsa_pen_sel;
+    QColor port_audio_jack_bg;
+    QColor port_audio_jack_bg_sel;
+    QColor port_midi_jack_bg;
+    QColor port_midi_jack_bg_sel;
+    QColor port_midi_a2j_bg;
+    QColor port_midi_a2j_bg_sel;
+    QColor port_midi_alsa_bg;
+    QColor port_midi_alsa_bg_sel;
     QPen port_text;
     QString port_font_name;
     int port_font_size;
@@ -57,15 +61,18 @@ public:
     PortType port_mode;
 
     // Lines
-    QColor line_audio;
-    QColor line_audio_sel;
-    QColor line_audio_glow;
-    QColor line_midi;
-    QColor line_midi_sel;
-    QColor line_midi_glow;
-    QColor line_outro;
-    QColor line_outro_sel;
-    QColor line_outro_glow;
+    QColor line_audio_jack;
+    QColor line_audio_jack_sel;
+    QColor line_audio_jack_glow;
+    QColor line_midi_jack;
+    QColor line_midi_jack_sel;
+    QColor line_midi_jack_glow;
+    QColor line_midi_a2j;
+    QColor line_midi_a2j_sel;
+    QColor line_midi_a2j_glow;
+    QColor line_midi_alsa;
+    QColor line_midi_alsa_sel;
+    QColor line_midi_alsa_glow;
     QPen rubberband_pen;
     QColor rubberband_brush;
 

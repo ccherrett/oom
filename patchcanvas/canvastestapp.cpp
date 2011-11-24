@@ -3,6 +3,8 @@
 
 #include <cstdio>
 
+static int last_connection_id = 0;
+
 static void canvas_callback(PatchCanvas::CallbackAction action, int value1, int value2, QString value_str)
 {
     printf("--------------------------- Callback called %i|%i|%i|%s\n", action, value1, value2, value_str.toStdString().data());
@@ -12,8 +14,10 @@ static void canvas_callback(PatchCanvas::CallbackAction action, int value1, int 
     switch (action)
     {
     case PatchCanvas::ACTION_PORTS_CONNECT:
+        PatchCanvas::connectPorts(last_connection_id++, value1, value2);
         break;
     case PatchCanvas::ACTION_PORTS_DISCONNECT:
+        PatchCanvas::disconnectPorts(value1);
         break;
     case PatchCanvas::ACTION_GROUP_DISCONNECT_ALL:
         break;
@@ -24,10 +28,6 @@ static void canvas_callback(PatchCanvas::CallbackAction action, int value1, int 
     case PatchCanvas::ACTION_GROUP_JOIN:
         group_id = value1;
         PatchCanvas::joinGroup(group_id);
-        break;
-    case PatchCanvas::ACTION_REQUEST_PORT_CONNECTION_LIST:
-        break;
-    case PatchCanvas::ACTION_REQUEST_GROUP_CONNECTION_LIST:
         break;
     default:
         break;
@@ -48,8 +48,7 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     PatchCanvas::options_t options;
     options.antialiasing = Qt::Checked;
     options.auto_hide_groups = false;
-    options.bezier_lines = false;
-    options.connect_midi2outro = false;
+    options.bezier_lines = true;
     options.fancy_eyecandy = false;
     options.theme_name = Theme::getThemeName(Theme::getDefaultTheme());
 
@@ -60,19 +59,24 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
 
     // TEST
     PatchCanvas::addGroup(0, "Box with timer, splitted", true);
-    PatchCanvas::addPort(0, 0, "AudioInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO);
-    PatchCanvas::addPort(0, 1, "MidiInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_MIDI);
-    PatchCanvas::addPort(0, 2, "OutroInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_OUTRO);
-    PatchCanvas::addPort(0, 3, "AudioOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_AUDIO);
-    PatchCanvas::addPort(0, 4, "MidiOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI);
-    PatchCanvas::addPort(0, 5, "OutroOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_OUTRO);
+    PatchCanvas::addPort(0, 0, "AudioJackInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);
+    PatchCanvas::addPort(0, 1, "AudioJackOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);
+
+    PatchCanvas::addPort(0, 2, "MidiJackInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_MIDI_JACK);
+    PatchCanvas::addPort(0, 3, "MidiJackOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_JACK);
+
+    PatchCanvas::addPort(0, 4, "MidiA2JInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_MIDI_A2J);
+    PatchCanvas::addPort(0, 5, "MidiA2JOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_A2J);
+
+    PatchCanvas::addPort(0, 6, "MidiAlsaInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
+    PatchCanvas::addPort(0, 7, "MidiAlsaOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
 
     PatchCanvas::addGroup(1, "Simple box", false);
-    PatchCanvas::addPort(1, 6, "Some Random Port 1", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_OUTRO);
-    PatchCanvas::addPort(1, 7, "Some Random Port 2", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_OUTRO);
-    PatchCanvas::addPort(1, 8, "An input", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO);
+    PatchCanvas::addPort(1, 8, "Some Random Port 1", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_JACK);
+    PatchCanvas::addPort(1, 9, "Some Random Port 2", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
+    PatchCanvas::addPort(1, 10, "An input", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);
 
-    PatchCanvas::connectPorts(0, 3, 8);
+    PatchCanvas::connectPorts(11, 1, 10);
 }
 
 CanvasTestApp::~CanvasTestApp()

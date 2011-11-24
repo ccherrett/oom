@@ -5,7 +5,6 @@
 #include "canvasbezierline.h"
 #include "canvasport.h"
 
-#include <cstdio>
 #include <QCursor>
 #include <QFontMetrics>
 
@@ -14,12 +13,12 @@ START_NAMESPACE_PATCHCANVAS
 extern Canvas canvas;
 extern options_t options;
 
-CanvasBox::CanvasBox(int group_id_, QString text_, Icon icon, QGraphicsItem* parent) :
+CanvasBox::CanvasBox(int group_id_, QString group_name_, Icon icon, QGraphicsItem* parent) :
     QGraphicsItem(parent, canvas.scene)
 {
     // Save Variables, useful for later
     group_id = group_id_;
-    text = text_;
+    group_name = group_name_;
 
     // Base Variables
     box_width  = 50;
@@ -31,16 +30,16 @@ CanvasBox::CanvasBox(int group_id_, QString text_, Icon icon, QGraphicsItem* par
     last_pos = QPointF();
     splitted = false;
     splitted_mode = PORT_MODE_NULL;
-    forced_split = false;
+    forced_split  = false;
     moving_cursor = false;
-    mouse_down = false;
+    mouse_down    = false;
 
     // Set Font
     font_name = QFont(canvas.theme->box_font_name, canvas.theme->box_font_size, canvas.theme->box_font_state);
     font_port = QFont(canvas.theme->port_font_name, canvas.theme->port_font_size, canvas.theme->port_font_state);
 
     // Icon
-    icon_svg = new CanvasIcon(icon, text, this);
+    icon_svg = new CanvasIcon(icon, group_name, this);
 
     // Shadow
     if (options.fancy_eyecandy)
@@ -54,11 +53,11 @@ CanvasBox::CanvasBox(int group_id_, QString text_, Icon icon, QGraphicsItem* par
     // Final touches
     setFlags(QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable);
 
-    // Initial Paint
-    //if (options.auto_hide_groups || options.fancy_eyecandy)
-    //    setVisible(false); // Wait for at least 1 port
+    // Wait for at least 1 port
+    if (options.auto_hide_groups || options.fancy_eyecandy)
+        setVisible(false);
 
-    relocateAll();
+    updatePositions();
 }
 
 CanvasBox::~CanvasBox()
@@ -68,9 +67,14 @@ CanvasBox::~CanvasBox()
     delete icon_svg;
 }
 
-QString CanvasBox::getText()
+int CanvasBox::getGroupId()
 {
-    return text;
+    return group_id;
+}
+
+QString CanvasBox::getGroupName()
+{
+    return group_name;
 }
 
 bool CanvasBox::isSplitted()
@@ -83,19 +87,19 @@ PortMode CanvasBox::getSplittedMode()
     return splitted_mode;
 }
 
-QList<port_dict_t> CanvasBox::getPortList()
-{
-    return port_list;
-}
-
 int CanvasBox::getPortCount()
 {
-    return port_list.count();
+    return port_list_ids.count();
+}
+
+QList<int> CanvasBox::getPortList()
+{
+    return port_list_ids;
 }
 
 void CanvasBox::setIcon(Icon icon)
 {
-    icon_svg->setIcon(icon, text);
+    icon_svg->setIcon(icon, group_name);
 }
 
 void CanvasBox::setSplit(bool split, PortMode mode)
@@ -104,10 +108,10 @@ void CanvasBox::setSplit(bool split, PortMode mode)
     splitted_mode = mode;
 }
 
-void CanvasBox::setText(QString text_)
+void CanvasBox::setGroupName(QString group_name_)
 {
-    text = text_;
-    relocateAll();
+    group_name = group_name_;
+    updatePositions();
 }
 
 void CanvasBox::makeItGlow(int port_id, bool yesno)
@@ -117,20 +121,20 @@ void CanvasBox::makeItGlow(int port_id, bool yesno)
         if (canvas.connection_list[i].port_out_id == port_id || canvas.connection_list[i].port_in_id == port_id)
         {
             if (options.bezier_lines)
-                ((CanvasBezierLine*)canvas.connection_list[i].widget)->enableGlow(yesno);
+                ((CanvasBezierLine*)canvas.connection_list[i].widget)->setLineSelected(yesno);
             else
-                ((CanvasLine*)canvas.connection_list[i].widget)->enableGlow(yesno);
+                ((CanvasLine*)canvas.connection_list[i].widget)->setLineSelected(yesno);
         }
     }
 }
 
-void CanvasBox::addLine(QGraphicsItem* line, int connection_id)
+void CanvasBox::addLineFromGroup(QGraphicsItem* line, int connection_id)
 {
     cb_line_t new_cbline = { line, connection_id };
     connection_lines.append(new_cbline);
 }
 
-void CanvasBox::removeLine(int connection_id)
+void CanvasBox::removeLineFromGroup(int connection_id)
 {
     for (int i=0; i < connection_lines.count(); i++)
     {
@@ -141,10 +145,10 @@ void CanvasBox::removeLine(int connection_id)
         }
     }
 
-    printf("PatchCanvas::CanvasBox->removeLine() - Unable to find line to remove\n");
+    qCritical("PatchCanvas::CanvasBox->removeLineFromGroup() - Unable to find line to remove");
 }
 
-CanvasPort* CanvasBox::addPort(int port_id, QString port_name, PortMode port_mode, PortType port_type)
+CanvasPort* CanvasBox::addPortFromGroup(int port_id, QString port_name, PortMode port_mode, PortType port_type)
 {
     if (port_list.count() == 0)
     {
@@ -165,12 +169,12 @@ CanvasPort* CanvasBox::addPort(int port_id, QString port_name, PortMode port_mod
 
     port_list.append(port_dict);
     port_list_ids.append(port_id);
-    relocateAll();
+    updatePositions();
 
     return new_widget;
 }
 
-void CanvasBox::removePort(int port_id)
+void CanvasBox::removePortFromGroup(int port_id)
 {
     for (int i=0; i < port_list.count(); i++)
     {
@@ -185,16 +189,16 @@ void CanvasBox::removePort(int port_id)
 
     if (port_list_ids.contains(port_id))
     {
-        printf("PatchCanvas::CanvasBox->removePort()) - Unable to find port to remove\n");
+        qCritical("PatchCanvas::CanvasBox->removePort()) - Unable to find port to remove");
         return;
     }
 
-    relocateAll();
+    updatePositions();
 
     if (port_list.count() == 0 && isVisible())
     {
         if (canvas.debug and options.auto_hide_groups)
-            printf("PatchCanvas::CanvasBox->removePort() - This group has no more ports, hide it\n");
+            qDebug("PatchCanvas::CanvasBox->removePort() - This group has no more ports, hide it");
         if (options.fancy_eyecandy)
             ItemFX(this, false, false);
         else if (options.auto_hide_groups)
@@ -202,7 +206,7 @@ void CanvasBox::removePort(int port_id)
     }
 }
 
-void CanvasBox::renamePort(int port_id, QString new_port_name)
+void CanvasBox::renamePortFromGroup(int port_id, QString new_port_name)
 {
     for (int i=0; i < port_list.count(); i++)
     {
@@ -213,7 +217,26 @@ void CanvasBox::renamePort(int port_id, QString new_port_name)
         }
     }
 
-    relocateAll();
+    updatePositions();
+}
+
+void CanvasBox::checkItemPos()
+{
+    if (!canvas.size_rect.isNull())
+    {
+        QPointF pos = scenePos();
+        if (!canvas.size_rect.contains(pos))
+        {
+            if (pos.x() < canvas.size_rect.x())
+                setPos(canvas.size_rect.x(), pos.y());
+            else if (pos.y() < canvas.size_rect.y())
+                setPos(pos.x(), canvas.size_rect.y());
+            else if (pos.x() > canvas.size_rect.width())
+                setPos(canvas.size_rect.width(), pos.y());
+            else if (pos.y() > canvas.size_rect.height())
+                setPos(pos.x(), canvas.size_rect.height());
+        }
+    }
 }
 
 void CanvasBox::removeIconFromScene()
@@ -221,7 +244,7 @@ void CanvasBox::removeIconFromScene()
     canvas.scene->removeItem(icon_svg);
 }
 
-void CanvasBox::relocateAll()
+void CanvasBox::updatePositions()
 {
     prepareGeometryChange();
 
@@ -229,15 +252,17 @@ void CanvasBox::relocateAll()
     int max_in_height  = 24;
     int max_out_width  = 0;
     int max_out_height = 24;
-    bool have_audio_in, have_audio_out, have_midi_in, have_midi_out, have_outro_in,  have_outro_out;
-    have_audio_in = have_audio_out = have_midi_in = have_midi_out = have_outro_in = have_outro_out = false;
+    bool have_audio_jack_in, have_audio_jack_out, have_midi_jack_in, have_midi_jack_out;
+    bool have_midi_a2j_in,  have_midi_a2j_out, have_midi_alsa_in,  have_midi_alsa_out;
+    have_audio_jack_in = have_audio_jack_out = have_midi_jack_in = have_midi_jack_out = false;
+    have_midi_a2j_in = have_midi_a2j_out = have_midi_alsa_in = have_midi_alsa_out = false;
 
     // reset box size
     box_width  = 50;
     box_height = 25;
 
     // Check Text Name size
-    int app_name_size = QFontMetrics(font_name).width(text)+30;
+    int app_name_size = QFontMetrics(font_name).width(group_name)+30;
     if (app_name_size > box_width)
         box_width = app_name_size;
 
@@ -252,19 +277,24 @@ void CanvasBox::relocateAll()
             if (size > max_in_width)
                 max_in_width = size;
 
-            if (port_list[i].port_type == PORT_TYPE_AUDIO && !have_audio_in)
+            if (port_list[i].port_type == PORT_TYPE_AUDIO_JACK && !have_audio_jack_in)
             {
-                have_audio_in = true;
+                have_audio_jack_in = true;
                 max_in_height += 2;
             }
-            else if (port_list[i].port_type == PORT_TYPE_MIDI && !have_midi_in)
+            else if (port_list[i].port_type == PORT_TYPE_MIDI_JACK && !have_midi_jack_in)
             {
-                have_midi_in = true;
+                have_midi_jack_in = true;
                 max_in_height += 2;
             }
-            else if (port_list[i].port_type == PORT_TYPE_OUTRO && !have_outro_in)
+            else if (port_list[i].port_type == PORT_TYPE_MIDI_A2J && !have_midi_a2j_in)
             {
-                have_outro_in = true;
+                have_midi_a2j_in = true;
+                max_in_height += 2;
+            }
+            else if (port_list[i].port_type == PORT_TYPE_MIDI_ALSA && !have_midi_alsa_in)
+            {
+                have_midi_alsa_in = true;
                 max_in_height += 2;
             }
         }
@@ -276,19 +306,24 @@ void CanvasBox::relocateAll()
             if (size > max_out_width)
                 max_out_width = size;
 
-            if (port_list[i].port_type == PORT_TYPE_AUDIO && !have_audio_out)
+            if (port_list[i].port_type == PORT_TYPE_AUDIO_JACK && !have_audio_jack_out)
             {
-                have_audio_out = true;
+                have_audio_jack_out = true;
                 max_out_height += 2;
             }
-            else if (port_list[i].port_type == PORT_TYPE_MIDI && !have_midi_out)
+            else if (port_list[i].port_type == PORT_TYPE_MIDI_JACK && !have_midi_jack_out)
             {
-                have_midi_out = true;
+                have_midi_jack_out = true;
                 max_out_height += 2;
             }
-            else if (port_list[i].port_type == PORT_TYPE_OUTRO && !have_outro_out)
+            else if (port_list[i].port_type == PORT_TYPE_MIDI_A2J && !have_midi_a2j_out)
             {
-                have_outro_out = true;
+                have_midi_a2j_out = true;
+                max_out_height += 2;
+            }
+            else if (port_list[i].port_type == PORT_TYPE_MIDI_ALSA && !have_midi_alsa_out)
+            {
+                have_midi_alsa_out = true;
                 max_out_height += 2;
             }
         }
@@ -312,10 +347,10 @@ void CanvasBox::relocateAll()
     PortType last_in_type  = PORT_TYPE_NULL;
     PortType last_out_type = PORT_TYPE_NULL;
 
-    // Re-position ports, AUDIO
+    // Re-position ports, AUDIO_JACK
     for (int i=0; i < port_list.count(); i++)
     {
-        if (port_list[i].port_mode == PORT_MODE_INPUT && port_list[i].port_type == PORT_TYPE_AUDIO)
+        if (port_list[i].port_mode == PORT_MODE_INPUT && port_list[i].port_type == PORT_TYPE_AUDIO_JACK)
         {
             port_list[i].widget->setPos(QPointF(1, last_in_pos));
             port_list[i].widget->setPortWidth(max_in_width);
@@ -323,7 +358,7 @@ void CanvasBox::relocateAll()
             last_in_pos += 18;
             last_in_type = port_list[i].port_type;
         }
-        else if (port_list[i].port_mode == PORT_MODE_OUTPUT && port_list[i].port_type == PORT_TYPE_AUDIO)
+        else if (port_list[i].port_mode == PORT_MODE_OUTPUT && port_list[i].port_type == PORT_TYPE_AUDIO_JACK)
         {
             port_list[i].widget->setPos(QPointF(box_width-max_out_width-13, last_out_pos));
             port_list[i].widget->setPortWidth(max_out_width);
@@ -333,10 +368,10 @@ void CanvasBox::relocateAll()
         }
     }
 
-    // Re-position ports, MIDI
+    // Re-position ports, MIDI_JACK
     for (int i=0; i < port_list.count(); i++)
     {
-        if (port_list[i].port_mode == PORT_MODE_INPUT && port_list[i].port_type == PORT_TYPE_MIDI)
+        if (port_list[i].port_mode == PORT_MODE_INPUT && port_list[i].port_type == PORT_TYPE_MIDI_JACK)
         {
             if (last_in_type != PORT_TYPE_NULL && port_list[i].port_type != last_in_type)
                 last_in_pos += 2;
@@ -347,7 +382,7 @@ void CanvasBox::relocateAll()
             last_in_pos += 18;
             last_in_type = port_list[i].port_type;
         }
-        else if (port_list[i].port_mode == PORT_MODE_OUTPUT && port_list[i].port_type == PORT_TYPE_MIDI)
+        else if (port_list[i].port_mode == PORT_MODE_OUTPUT && port_list[i].port_type == PORT_TYPE_MIDI_JACK)
         {
             if (last_out_type != PORT_TYPE_NULL && port_list[i].port_type != last_out_type)
                 last_out_pos += 2;
@@ -360,10 +395,10 @@ void CanvasBox::relocateAll()
         }
     }
 
-    // Re-position ports, Outro
+    // Re-position ports, MIDI_A2J
     for (int i=0; i < port_list.count(); i++)
     {
-        if (port_list[i].port_mode == PORT_MODE_INPUT && port_list[i].port_type == PORT_TYPE_OUTRO)
+        if (port_list[i].port_mode == PORT_MODE_INPUT && port_list[i].port_type == PORT_TYPE_MIDI_A2J)
         {
             if (last_in_type != PORT_TYPE_NULL && port_list[i].port_type != last_in_type)
                 last_in_pos += 2;
@@ -374,7 +409,34 @@ void CanvasBox::relocateAll()
             last_in_pos += 18;
             last_in_type = port_list[i].port_type;
         }
-        else if (port_list[i].port_mode == PORT_MODE_OUTPUT && port_list[i].port_type == PORT_TYPE_OUTRO)
+        else if (port_list[i].port_mode == PORT_MODE_OUTPUT && port_list[i].port_type == PORT_TYPE_MIDI_A2J)
+        {
+            if (last_out_type != PORT_TYPE_NULL && port_list[i].port_type != last_out_type)
+                last_out_pos += 2;
+
+            port_list[i].widget->setPos(QPointF(box_width-max_out_width-13, last_out_pos));
+            port_list[i].widget->setPortWidth(max_out_width);
+
+            last_out_pos += 18;
+            last_out_type = port_list[i].port_type;
+        }
+    }
+
+    // Re-position ports, MIDI_ALSA
+    for (int i=0; i < port_list.count(); i++)
+    {
+        if (port_list[i].port_mode == PORT_MODE_INPUT && port_list[i].port_type == PORT_TYPE_MIDI_ALSA)
+        {
+            if (last_in_type != PORT_TYPE_NULL && port_list[i].port_type != last_in_type)
+                last_in_pos += 2;
+
+            port_list[i].widget->setPos(QPointF(1, last_in_pos));
+            port_list[i].widget->setPortWidth(max_in_width);
+
+            last_in_pos += 18;
+            last_in_type = port_list[i].port_type;
+        }
+        else if (port_list[i].port_mode == PORT_MODE_OUTPUT && port_list[i].port_type == PORT_TYPE_MIDI_ALSA)
         {
             if (last_out_type != PORT_TYPE_NULL && port_list[i].port_type != last_out_type)
                 last_out_pos += 2;
@@ -425,25 +487,6 @@ void CanvasBox::repaintLines()
     last_pos = pos();
 }
 
-void CanvasBox::checkItemPos()
-{
-    if (!canvas.size_rect.isNull())
-    {
-        QPointF pos = scenePos();
-        if (!canvas.size_rect.contains(pos))
-        {
-            if (pos.x() < canvas.size_rect.x())
-                setPos(canvas.size_rect.x(), pos.y());
-            else if (pos.y() < canvas.size_rect.y())
-                setPos(pos.x(), canvas.size_rect.y());
-            else if (pos.x() > canvas.size_rect.width())
-                setPos(canvas.size_rect.width(), pos.y());
-            else if (pos.y() > canvas.size_rect.height())
-                setPos(pos.x(), canvas.size_rect.height());
-        }
-    }
-}
-
 int CanvasBox::type() const
 {
     return CanvasBoxType;
@@ -465,25 +508,24 @@ void CanvasBox::mousePressEvent(QGraphicsSceneMouseEvent* event)
         setSelected(true);
         mouse_down = false;
         event->accept();
+        return;
     }
-    else if (event->button() == Qt::LeftButton) // FIXME - there's a bug laying around here, this code fixes it:
+    else if (event->button() == Qt::LeftButton)
     {
         if (sceneBoundingRect().contains(event->scenePos()))
-        {
             mouse_down = true;
-            QGraphicsItem::mousePressEvent(event);
-        }
         else
         {
+            // Fixes a weird Qt behaviour with right-click mouseMove
             mouse_down = false;
             event->ignore();
+            return;
         }
     }
     else
-    {
         mouse_down = false;
-        QGraphicsItem::mousePressEvent(event);
-    }
+
+    QGraphicsItem::mousePressEvent(event);
 }
 
 void CanvasBox::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
@@ -495,17 +537,15 @@ void CanvasBox::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
             setCursor(QCursor(Qt::SizeAllCursor));
             moving_cursor = true;
         }
-        QGraphicsItem::mouseMoveEvent(event);
+        repaintLines();
     }
-    else
-        event->accept();
+    QGraphicsItem::mouseMoveEvent(event);
 }
 
 void CanvasBox::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     if (moving_cursor)
         setCursor(QCursor(Qt::ArrowCursor));
-
     mouse_down = false;
     moving_cursor = false;
     QGraphicsItem::mouseReleaseEvent(event);
@@ -519,8 +559,6 @@ QRectF CanvasBox::boundingRect() const
 void CanvasBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     painter->setRenderHint(QPainter::Antialiasing, false);
-
-    repaintLines();
 
     if (isSelected())
         painter->setPen(canvas.theme->box_pen_sel);
@@ -538,7 +576,7 @@ void CanvasBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
     painter->setFont(font_name);
     painter->setPen(canvas.theme->box_text);
-    painter->drawText(text_pos, text);
+    painter->drawText(text_pos, group_name);
 
     Q_UNUSED(option);
     Q_UNUSED(widget);

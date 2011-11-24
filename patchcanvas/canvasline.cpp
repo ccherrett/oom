@@ -17,11 +17,10 @@ CanvasLine::CanvasLine(CanvasPort* item1_, CanvasPort* item2_, QGraphicsItem* pa
 
     item1 = item1_;
     item2 = item2_;
-    port_type1 = item1->getPortType();
-    port_type2 = item2->getPortType();
 
     glow = 0;
     locked = false;
+    line_selected = false;
 
     updateLinePos();
 }
@@ -42,14 +41,19 @@ void CanvasLine::setLocked(bool yesno)
     locked = yesno;
 }
 
-void CanvasLine::enableGlow(bool yesno)
+bool CanvasLine::isLineSelected()
+{
+    return line_selected;
+}
+
+void CanvasLine::setLineSelected(bool yesno)
 {
     if (locked) return;
     if (options.fancy_eyecandy)
     {
         if (yesno)
         {
-            glow = new CanvasPortGlow(port_type1, toGraphicsObject());
+            glow = new CanvasPortGlow(item1->getPortType(), toGraphicsObject());
             setGraphicsEffect(glow);
         }
         else
@@ -62,6 +66,7 @@ void CanvasLine::enableGlow(bool yesno)
     }
 
     updateLineGradient(yesno);
+    line_selected = true;
 }
 
 void CanvasLine::updateLinePos()
@@ -70,7 +75,9 @@ void CanvasLine::updateLinePos()
     {
         QLineF line(item1->scenePos().x() + item1->getPortWidth()+12, item1->scenePos().y()+7.5, item2->scenePos().x(), item2->scenePos().y()+7.5);
         setLine(line);
-        updateLineGradient();
+
+        line_selected = false;
+        updateLineGradient(line_selected);
     }
 }
 
@@ -91,31 +98,27 @@ void CanvasLine::updateLineGradient(bool selected)
         pos2 = 0;
     }
 
+    PortType port_type1 = item1->getPortType();
+    PortType port_type2 = item2->getPortType();
     QLinearGradient port_gradient(0, pos_top, 0, pos_bot);
 
-    if (port_type1 == PORT_TYPE_AUDIO)
-        port_gradient.setColorAt(pos1, selected ? canvas.theme->line_audio_sel : canvas.theme->line_audio);
-    else if (port_type1 == PORT_TYPE_MIDI)
-        port_gradient.setColorAt(pos1, selected ? canvas.theme->line_midi_sel : canvas.theme->line_midi);
-    else if (port_type1 == PORT_TYPE_OUTRO)
-        port_gradient.setColorAt(pos1, selected ? canvas.theme->line_outro_sel : canvas.theme->line_outro);
-    else
-    {
-        qWarning("Error: Invalid Port1 Type!");
-        return;
-    }
+    if (port_type1 == PORT_TYPE_AUDIO_JACK)
+        port_gradient.setColorAt(pos1, selected ? canvas.theme->line_audio_jack_sel : canvas.theme->line_audio_jack);
+    else if (port_type1 == PORT_TYPE_MIDI_JACK)
+        port_gradient.setColorAt(pos1, selected ? canvas.theme->line_midi_jack_sel : canvas.theme->line_midi_jack);
+    else if (port_type1 == PORT_TYPE_MIDI_A2J)
+        port_gradient.setColorAt(pos1, selected ? canvas.theme->line_midi_a2j_sel : canvas.theme->line_midi_a2j);
+    else if (port_type1 == PORT_TYPE_MIDI_ALSA)
+        port_gradient.setColorAt(pos1, selected ? canvas.theme->line_midi_alsa_sel : canvas.theme->line_midi_alsa);
 
-    if (port_type2 == PORT_TYPE_AUDIO)
-        port_gradient.setColorAt(pos2, selected ? canvas.theme->line_audio_sel : canvas.theme->line_audio);
-    else if (port_type2 == PORT_TYPE_MIDI)
-        port_gradient.setColorAt(pos2, selected ? canvas.theme->line_midi_sel : canvas.theme->line_midi);
-    else if (port_type2 == PORT_TYPE_OUTRO)
-        port_gradient.setColorAt(pos2, selected ? canvas.theme->line_outro_sel : canvas.theme->line_outro);
-    else
-    {
-        qWarning("Error: Invalid Port2 Type!");
-        return;
-    }
+    if (port_type2 == PORT_TYPE_AUDIO_JACK)
+        port_gradient.setColorAt(pos2, selected ? canvas.theme->line_audio_jack_sel : canvas.theme->line_audio_jack);
+    else if (port_type2 == PORT_TYPE_MIDI_JACK)
+        port_gradient.setColorAt(pos2, selected ? canvas.theme->line_midi_jack_sel : canvas.theme->line_midi_jack);
+    else if (port_type2 == PORT_TYPE_MIDI_A2J)
+        port_gradient.setColorAt(pos2, selected ? canvas.theme->line_midi_a2j_sel : canvas.theme->line_midi_a2j);
+    else if (port_type2 == PORT_TYPE_MIDI_ALSA)
+        port_gradient.setColorAt(pos2, selected ? canvas.theme->line_midi_alsa_sel : canvas.theme->line_midi_alsa);
 
     setPen(QPen(port_gradient, 2));
 }

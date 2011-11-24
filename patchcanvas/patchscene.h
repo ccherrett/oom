@@ -1,9 +1,9 @@
 #ifndef PATCHSCENE_H
 #define PATCHSCENE_H
 
-#include "patchcanvas.h"
-
 #include <QGraphicsScene>
+
+#include "patchcanvas-api.h"
 
 class QKeyEvent;
 class QGraphicsRectItem;
@@ -21,7 +21,6 @@ public:
 private:
     bool ctrl_down;
     bool mouse_down;
-    bool mmouse_down;
     bool fake_selection;
     QGraphicsRectItem* fake_rubberband;
     QPointF orig_point;

@@ -21,8 +21,8 @@ void CanvasBoxShadow::setFakeParent(CanvasBox* fake_parent_)
 
 void CanvasBoxShadow::draw(QPainter* painter)
 {
-    //if (fake_parent)
-    //    fake_parent->repaintLines();
+    if (fake_parent)
+        fake_parent->repaintLines();
     return QGraphicsDropShadowEffect::draw(painter);
 }
 

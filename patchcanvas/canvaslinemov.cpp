@@ -8,11 +8,11 @@ START_NAMESPACE_PATCHCANVAS
 extern Canvas canvas;
 extern options_t options;
 
-CanvasLineMov::CanvasLineMov(PortMode port_mode, PortType port_type, QGraphicsItem* parent) :
+CanvasLineMov::CanvasLineMov(PortMode port_mode_, PortType port_type_, QGraphicsItem* parent) :
     QGraphicsLineItem(parent, canvas.scene)
 {
-    port_mode = port_mode;
-    port_type = port_type;
+    port_mode = port_mode_;
+    port_type = port_type_;
 
     // Port position doesn't change while moving around line
     item_x = parentItem()->scenePos().x();
@@ -21,17 +21,14 @@ CanvasLineMov::CanvasLineMov(PortMode port_mode, PortType port_type, QGraphicsIt
 
     QPen pen;
 
-    if (port_type == PORT_TYPE_AUDIO)
-      pen = QPen(canvas.theme->line_audio, 2);
-    else if (port_type == PORT_TYPE_MIDI)
-      pen = QPen(canvas.theme->line_midi, 2);
-    else if (port_type == PORT_TYPE_OUTRO)
-      pen = QPen(canvas.theme->line_outro, 2);
-    else
-    {
-      qWarning("Error: Invalid Port Type!");
-      return;
-    }
+    if (port_type == PORT_TYPE_AUDIO_JACK)
+      pen = QPen(canvas.theme->line_audio_jack, 2);
+    else if (port_type == PORT_TYPE_MIDI_JACK)
+      pen = QPen(canvas.theme->line_midi_jack, 2);
+    else if (port_type == PORT_TYPE_MIDI_A2J)
+      pen = QPen(canvas.theme->line_midi_a2j, 2);
+    else if (port_type == PORT_TYPE_MIDI_ALSA)
+      pen = QPen(canvas.theme->line_midi_alsa, 2);
 
     setPen(pen);
     update();

@@ -1,7 +1,8 @@
 #include "patchscene.h"
+#include "patchcanvas.h"
+#include "canvasbox.h"
 
 #include <cmath>
-#include <cstdio>
 
 #include <QKeyEvent>
 #include <QGraphicsView>
@@ -16,10 +17,9 @@ extern Canvas canvas;
 PatchScene::PatchScene(QObject* parent) :
         QGraphicsScene(parent)
 {
-    ctrl_down = false;
+    ctrl_down  = false;
     mouse_down = false;
-    mmouse_down = false;
-    fake_selection = false;
+    fake_selection  = false;
     fake_rubberband = addRect(QRectF(0, 0, 0, 0));
     fake_rubberband->setZValue(-1);
     fake_rubberband->hide();
@@ -53,32 +53,22 @@ void PatchScene::wheelEvent(QGraphicsSceneWheelEvent* event)
         double factor = pow(1.41, (event->delta()/240.0));
         QGraphicsView* const view = views().at(0);
         view->scale(factor, factor);
-        event->accept();
     }
-    else
-        QGraphicsScene::wheelEvent(event);
+    QGraphicsScene::wheelEvent(event);
 }
 
 void PatchScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton)
-        mouse_down = true;
-    else
-        mouse_down = false;
-
-    if (event->button() == Qt::MidButton)
-        mmouse_down = true;
-    else
-        mmouse_down = false;
-
+//    if (event->button() == Qt::LeftButton)
+//        mouse_down = true;
+//    else
+//        mouse_down = false;
     QGraphicsScene::mousePressEvent(event);
 }
 
 void PatchScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    if (selectedItems().count() > 0)
-        return QGraphicsScene::mouseMoveEvent(event);
-    else if (mouse_down)
+    if (mouse_down)
     {
         if (!fake_selection)
         {
@@ -97,13 +87,8 @@ void PatchScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
         else y = pos.y();
 
         fake_rubberband->setRect(x, y, abs(pos.x()-orig_point.x()), abs(pos.y()-orig_point.y()));
-        event->accept();
     }
-    else if (mmouse_down)
-    {
-
-        event->accept();
-    }
+    QGraphicsScene::mouseMoveEvent(event);
 }
 
 void PatchScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -131,31 +116,20 @@ void PatchScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     }
     else
     {
-        bool update = false;
-        QList<QGraphicsItem*> ret_items;
         QList<QGraphicsItem*> items_list = selectedItems();
 
-        if (items_list.count() > 0)
+        for (int i=0; i < items_list.count(); i++)
         {
-            for (int i=0; i < items_list.count(); i++)
+            if (items_list[i]->isVisible() && items_list[i]->type() == CanvasBoxType)
             {
-                if (items_list[i]->isVisible() && items_list[i]->type() == CanvasBoxType)
-                {
-                    //CanvasBox* cbox = (CanvasBox*)items_list[i];
-                    //cbox->checkItemPos();
-                    //            use_xy2 = True if (items[i].splitted and items_list[i].splitted_mode == PORT_MODE_INPUT) else False
-                    //            ret_items.append((items[i].group_id, items[i].scenePos(), use_xy2))
-                    update = true;
-                }
+                CanvasBox* cbox = (CanvasBox*)items_list[i];
+                cbox->checkItemPos();
+                //emit(SIGNAL(sceneGroupMoved(int, PortMode, QPointF)), cbox->getGroupId(), cbox->getSplittedMode(), cbox->scenePos());
             }
         }
-
-        //      if (update)
-        //        emit(SIGNAL("sceneItemsMoved"), ret_items);
     }
 
     mouse_down = false;
-    mmouse_down = false;
     QGraphicsScene::mouseReleaseEvent(event);
 }
 
