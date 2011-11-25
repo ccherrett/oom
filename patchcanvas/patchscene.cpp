@@ -18,7 +18,8 @@ PatchScene::PatchScene(QObject* parent) :
         QGraphicsScene(parent)
 {
     ctrl_down  = false;
-    mouse_down = false;
+    mouse_down_init  = false;
+    mouse_rubberband = false;
     fake_selection  = false;
     fake_rubberband = addRect(QRectF(0, 0, 0, 0));
     fake_rubberband->setZValue(-1);
@@ -59,16 +60,23 @@ void PatchScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 
 void PatchScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-//    if (event->button() == Qt::LeftButton)
-//        mouse_down = true;
-//    else
-//        mouse_down = false;
+    if (event->button() == Qt::LeftButton)
+        mouse_down_init = true;
+    else
+        mouse_down_init = false;
+    mouse_rubberband = false;
     QGraphicsScene::mousePressEvent(event);
 }
 
 void PatchScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    if (mouse_down)
+    if (mouse_down_init)
+    {
+        mouse_rubberband = (selectedItems().count() == 0);
+        mouse_down_init = false;
+    }
+
+    if (mouse_rubberband)
     {
         if (!fake_selection)
         {
@@ -87,8 +95,10 @@ void PatchScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
         else y = pos.y();
 
         fake_rubberband->setRect(x, y, abs(pos.x()-orig_point.x()), abs(pos.y()-orig_point.y()));
-    }
-    QGraphicsScene::mouseMoveEvent(event);
+
+        event->accept();
+    } else
+        QGraphicsScene::mouseMoveEvent(event);
 }
 
 void PatchScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -129,7 +139,8 @@ void PatchScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
         }
     }
 
-    mouse_down = false;
+    mouse_down_init = false;
+    mouse_rubberband = false;
     QGraphicsScene::mouseReleaseEvent(event);
 }
 

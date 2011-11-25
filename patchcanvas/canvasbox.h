@@ -43,7 +43,6 @@ public:
 
     CanvasPort* addPortFromGroup(int port_id, QString port_name, PortMode port_mode, PortType port_type);
     void removePortFromGroup(int port_id);
-    void renamePortFromGroup(int port_id, QString new_port_name);
 
     void checkItemPos();
     void removeIconFromScene();
@@ -61,7 +60,6 @@ private:
     int box_width;
     int box_height;
 
-    QList<port_dict_t> port_list;
     QList<int> port_list_ids;
     QList<cb_line_t> connection_lines;
 

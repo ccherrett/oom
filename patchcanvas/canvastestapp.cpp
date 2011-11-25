@@ -58,7 +58,7 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     scene->rubberbandByTheme();
 
     // TEST
-    PatchCanvas::addGroup(0, "Box with timer, splitted", true);
+    PatchCanvas::addGroup(0, "Box with timer, splitted", PatchCanvas::SPLIT_YES);
     PatchCanvas::addPort(0, 0, "AudioJackInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);
     PatchCanvas::addPort(0, 1, "AudioJackOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);
 
@@ -71,7 +71,7 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     PatchCanvas::addPort(0, 6, "MidiAlsaInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
     PatchCanvas::addPort(0, 7, "MidiAlsaOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
 
-    PatchCanvas::addGroup(1, "Simple box", false);
+    PatchCanvas::addGroup(1, "Simple box", PatchCanvas::SPLIT_NO);
     PatchCanvas::addPort(1, 8, "Some Random Port 1", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_JACK);
     PatchCanvas::addPort(1, 9, "Some Random Port 2", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
     PatchCanvas::addPort(1, 10, "An input", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);

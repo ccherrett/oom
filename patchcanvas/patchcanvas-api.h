@@ -44,6 +44,12 @@ enum Icon {
     ICON_LADISH_ROOM = 2
 };
 
+enum SplitOption {
+    SPLIT_UNDEF = 0,
+    SPLIT_NO    = 1,
+    SPLIT_YES   = 2
+};
+
 // Canvas options
 struct options_t {
     QString theme_name;
@@ -71,9 +77,9 @@ void clear();
 void setInitialPos(int x, int y);
 void setCanvasSize(int x, int y, int width, int height);
 
-void addGroup(int group_id, QString group_name, bool split=false, Icon icon=ICON_APPLICATION);
+void addGroup(int group_id, QString group_name, SplitOption split=SPLIT_UNDEF, Icon icon=ICON_APPLICATION);
 void removeGroup(int group_id);
-void renameGroup(int group_id, QString new_name);
+void renameGroup(int group_id, QString new_group_name);
 void splitGroup(int group_id);
 void joinGroup(int group_id);
 void setGroupPos(int group_id, int group_pos_x, int group_pos_y);

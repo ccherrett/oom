@@ -23,7 +23,6 @@ CanvasBox::CanvasBox(int group_id_, QString group_name_, Icon icon, QGraphicsIte
     // Base Variables
     box_width  = 50;
     box_height = 25;
-    port_list.clear();
     port_list_ids.clear();
     connection_lines.clear();
 
@@ -128,9 +127,11 @@ void CanvasBox::makeItGlow(int port_id, bool yesno)
     }
 }
 
-void CanvasBox::addLineFromGroup(QGraphicsItem* line, int connection_id)
+void CanvasBox::addLineFromGroup(QGraphicsItem* line_, int connection_id_)
 {
-    cb_line_t new_cbline = { line, connection_id };
+    cb_line_t new_cbline;
+    new_cbline.line = line_;
+    new_cbline.connection_id = connection_id_;
     connection_lines.append(new_cbline);
 }
 
@@ -150,7 +151,7 @@ void CanvasBox::removeLineFromGroup(int connection_id)
 
 CanvasPort* CanvasBox::addPortFromGroup(int port_id, QString port_name, PortMode port_mode, PortType port_type)
 {
-    if (port_list.count() == 0)
+    if (port_list_ids.count() == 0)
     {
         if (options.fancy_eyecandy)
             ItemFX(this, true);
@@ -161,27 +162,24 @@ CanvasPort* CanvasBox::addPortFromGroup(int port_id, QString port_name, PortMode
     CanvasPort* new_widget = new CanvasPort(port_id, port_name, port_mode, port_type, this);
 
     port_dict_t port_dict;
+    port_dict.group_id  = group_id;
     port_dict.port_id   = port_id;
     port_dict.port_name = port_name;
     port_dict.port_mode = port_mode;
     port_dict.port_type = port_type;
     port_dict.widget    = new_widget;
 
-    port_list.append(port_dict);
     port_list_ids.append(port_id);
-    updatePositions();
 
     return new_widget;
 }
 
 void CanvasBox::removePortFromGroup(int port_id)
 {
-    for (int i=0; i < port_list.count(); i++)
+    for (int i=0; i < port_list_ids.count(); i++)
     {
-        if (port_list[i].port_id == port_id)
+        if (port_list_ids[i] == port_id)
         {
-            delete port_list[i].widget;
-            port_list.takeAt(i);
             port_list_ids.takeAt(i);
             break;
         }
@@ -195,7 +193,7 @@ void CanvasBox::removePortFromGroup(int port_id)
 
     updatePositions();
 
-    if (port_list.count() == 0 && isVisible())
+    if (port_list_ids.count() == 0 && isVisible())
     {
         if (canvas.debug and options.auto_hide_groups)
             qDebug("PatchCanvas::CanvasBox->removePort() - This group has no more ports, hide it");
@@ -204,20 +202,6 @@ void CanvasBox::removePortFromGroup(int port_id)
         else if (options.auto_hide_groups)
             setVisible(false);
     }
-}
-
-void CanvasBox::renamePortFromGroup(int port_id, QString new_port_name)
-{
-    for (int i=0; i < port_list.count(); i++)
-    {
-        if (port_list[i].port_id == port_id)
-        {
-            port_list[i].port_name = new_port_name;
-            break;
-        }
-    }
-
-    updatePositions();
 }
 
 void CanvasBox::checkItemPos()
@@ -265,6 +249,14 @@ void CanvasBox::updatePositions()
     int app_name_size = QFontMetrics(font_name).width(group_name)+30;
     if (app_name_size > box_width)
         box_width = app_name_size;
+
+    // Get Port List
+    QList<port_dict_t> port_list;
+    for (int i=0; i < canvas.port_list.count(); i++)
+    {
+        if (port_list_ids.contains(canvas.port_list[i].port_id))
+            port_list.append(canvas.port_list[i]);
+    }
 
     // Get Max Box Width/Height
     for (int i=0; i < port_list.count(); i++)

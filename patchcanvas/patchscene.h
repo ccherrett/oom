@@ -20,7 +20,8 @@ public:
 
 private:
     bool ctrl_down;
-    bool mouse_down;
+    bool mouse_down_init;
+    bool mouse_rubberband;
     bool fake_selection;
     QGraphicsRectItem* fake_rubberband;
     QPointF orig_point;
