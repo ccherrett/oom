@@ -1,9 +1,5 @@
 #include "theme.h"
 
-#include <cstdlib>
-#include <cstring>
-
-// TODO - midi_a2j colors
 
 Theme::Theme(List id)
 {
@@ -30,18 +26,22 @@ Theme::Theme(List id)
 
         // Ports
         port_audio_jack_pen = QPen(QColor(63,90,126), 1);
-        port_audio_jack_pen_sel = QPen(QColor(93,120,156), 1);
+        port_audio_jack_pen_sel = QPen(QColor(63+30,90+30,126+30), 1);
         port_midi_jack_pen = QPen(QColor(159,44,42), 1);
-        port_midi_jack_pen_sel = QPen(QColor(189,74,72), 1);
+        port_midi_jack_pen_sel = QPen(QColor(159+30,44+30,42+30), 1);
+        port_midi_a2j_pen = QPen(QColor(137,76,43), 1);
+        port_midi_a2j_pen_sel = QPen(QColor(137+30,76+30,43+30), 1);
         port_midi_alsa_pen = QPen(QColor(93,141,46), 1);
-        port_midi_alsa_pen_sel = QPen(QColor(123,171,76), 1);
+        port_midi_alsa_pen_sel = QPen(QColor(93+30,141+30,46+30), 1);
 
         port_audio_jack_bg = QColor(35,61,99);
-        port_audio_jack_bg_sel = QColor(85,111,149);
+        port_audio_jack_bg_sel = QColor(35+50,61+50,99+50);
         port_midi_jack_bg = QColor(120,15,16);
         port_midi_jack_bg_sel = QColor(170,65,66);
+        port_midi_a2j_bg = QColor(101,47,16);
+        port_midi_a2j_bg_sel = QColor(101+50,47+50,16+50);
         port_midi_alsa_bg = QColor(64,112,18);
-        port_midi_alsa_bg_sel = QColor(114,162,68);
+        port_midi_alsa_bg_sel = QColor(64+50,112+50,18+50);
 
         port_text = QPen(QColor(250,250,250), 0);
         port_font_name = "Deja Vu Sans";
@@ -56,6 +56,9 @@ Theme::Theme(List id)
         line_midi_jack = QColor(159,44,42);
         line_midi_jack_sel = QColor(159+70,44+70,42+70);
         line_midi_jack_glow = QColor(255,0,0);
+        line_midi_a2j = QColor(137,76,43);
+        line_midi_a2j_sel = QColor(137+70,76+70,43+70);
+        line_midi_a2j_glow = QColor(170,85,0);
         line_midi_alsa = QColor(93,141,46);
         line_midi_alsa_sel = QColor(93+70,141+70,46+70);
         line_midi_alsa_glow = QColor(0,255,0);
@@ -88,6 +91,8 @@ Theme::Theme(List id)
         port_audio_jack_pen_sel = QPen(QColor(255,0,0), 0);
         port_midi_jack_pen = QPen(QColor(120,15,16), 0);
         port_midi_jack_pen_sel = QPen(QColor(255,0,0), 0);
+        port_midi_a2j_pen = QPen(QColor(101,47,17), 0);
+        port_midi_a2j_pen_sel = QPen(QColor(255,0,0), 0);
         port_midi_alsa_pen = QPen(QColor(63,112,19), 0);
         port_midi_alsa_pen_sel = QPen(QColor(255,0,0), 0);
 
@@ -95,6 +100,8 @@ Theme::Theme(List id)
         port_audio_jack_bg_sel = QColor(255,0,0);
         port_midi_jack_bg = QColor(120,15,16);
         port_midi_jack_bg_sel = QColor(255,0,0);
+        port_midi_a2j_bg = QColor(101,47,17);
+        port_midi_a2j_bg_sel = QColor(255,0,0);
         port_midi_alsa_bg = QColor(63,112,19);
         port_midi_alsa_bg_sel = QColor(255,0,0);
 
@@ -111,6 +118,9 @@ Theme::Theme(List id)
         line_midi_jack = QColor(139,32,32);
         line_midi_jack_sel = QColor(255,0,0);
         line_midi_jack_glow = QColor(255,0,0);
+        line_midi_a2j = QColor(120,65,33);
+        line_midi_a2j_sel = QColor(255,0,0);
+        line_midi_a2j_glow = QColor(255,0,0);
         line_midi_alsa = QColor(81,130,36);
         line_midi_alsa_sel = QColor(255,0,0);
         line_midi_alsa_glow = QColor(255,0,0);
@@ -127,7 +137,6 @@ Theme::Theme(List id)
 Theme::List Theme::getDefaultTheme()
 {
     return THEME_MODERN_DARK;
-    //return THEME_CLASSIC_DARK;
 }
 
 QString Theme::getThemeName(Theme::List id)
