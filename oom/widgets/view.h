@@ -25,12 +25,12 @@ class QResizeEvent;
 
 class View : public QWidget
 {
+    Q_OBJECT
     QPixmap pm; // for double buffering
     bool pmValid;
     QPixmap bgPixmap; // background Pixmap
     QBrush brush;
     bool _virt;
-    Q_OBJECT
 
 protected:
     int xorg;
