@@ -2,6 +2,8 @@
 #include "ui_canvastestapp.h"
 
 #include <QMessageBox>
+#include <QSettings>
+#include <QVariant>
 
 #include <jack/jack.h>
 
@@ -197,7 +199,7 @@ void port_connect_callback(jack_port_id_t port_a, jack_port_id_t port_b, int con
 
 void canvas_callback(PatchCanvas::CallbackAction action, int value1, int value2, QString value_str)
 {
-    qDebug("--------------------------- Callback called %i|%i|%i|%s\n", action, value1, value2, value_str.toStdString().data());
+    qDebug("--------------------------- Callback called %i|%i|%i|%s", action, value1, value2, value_str.toStdString().data());
 
     switch (action)
     {
@@ -211,7 +213,14 @@ void canvas_callback(PatchCanvas::CallbackAction action, int value1, int value2,
         jack_connect(jack_client, get_full_port_name(value1).toStdString().data(), get_full_port_name(value2).toStdString().data());
         break;
     case PatchCanvas::ACTION_PORTS_DISCONNECT:
-        jack_disconnect(jack_client, get_full_port_name(value1).toStdString().data(), get_full_port_name(value2).toStdString().data());
+        for (int i=0; i < used_connections.count(); i++)
+        {
+            if (used_connections[i].id == value1)
+            {
+                jack_disconnect(jack_client, get_full_port_name(used_connections[i].port_out).toStdString().data(), get_full_port_name(used_connections[i].port_in).toStdString().data());
+                break;
+            }
+        }
         break;
     case PatchCanvas::ACTION_GROUP_INFO:
         QMessageBox::information(main_gui, "group info dialog", "dummy text here");
@@ -235,6 +244,9 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     ui(new Ui::CanvasTestApp)
 {
     ui->setupUi(this);
+
+    settings = new QSettings("PatchCanvas", "Canvas-test-app");
+    restoreGeometry(settings->value("Geometry").toByteArray());
 
     main_gui = this;
     used_group_names.clear();
@@ -356,13 +368,21 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     }
 }
 
-CanvasTestApp::~CanvasTestApp()
+void CanvasTestApp::closeEvent(QCloseEvent* event)
 {
     jack_deactivate(jack_client);
     jack_client_close(jack_client);
 
     PatchCanvas::clear();
 
+    settings->setValue("Geometry", QVariant(saveGeometry()));
+
+    QMainWindow::closeEvent(event);
+}
+
+CanvasTestApp::~CanvasTestApp()
+{
+    delete settings;
     delete scene;
     delete ui;
 }
