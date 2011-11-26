@@ -15,7 +15,7 @@
 
 START_NAMESPACE_PATCHCANVAS
 
-        extern Canvas canvas;
+extern Canvas canvas;
 extern options_t options;
 extern features_t features;
 
@@ -204,9 +204,11 @@ void CanvasPort::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
             ((CanvasBezierLineMov*)mov_line)->updateLinePos(event->scenePos());
         else
             ((CanvasLineMov*)mov_line)->updateLinePos(event->scenePos());
-    }
 
-    QGraphicsItem::mouseMoveEvent(event);
+        event->accept();
+
+    } else
+        QGraphicsItem::mouseMoveEvent(event);
 }
 
 void CanvasPort::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -282,8 +284,7 @@ void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
         for (int i=0; i < port_con_list.count(); i++)
         {
             int port_con_id = CanvasGetConnectedPort(port_con_list[i], port_id);
-            QString port_con_name = CanvasGetPortName(port_con_id);
-            QAction* act_x_disc = discMenu.addAction(port_con_name);
+            QAction* act_x_disc = discMenu.addAction(CanvasGetPortName(port_con_id));
             act_x_disc->setData(port_con_list[i]);
             QObject::connect(act_x_disc, SIGNAL(triggered()), canvas.qobject, SLOT(PortContextMenuDisconnect()));
         }
@@ -296,19 +297,30 @@ void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
     menu.addMenu(&discMenu);
     QAction* act_x_disc_all = menu.addAction("Disconnect &All");
-    /*QAction* act_x_sep_1 =*/
-    menu.addSeparator();
-    QAction* act_x_info = menu.addAction("Get &Info");
-    QAction* act_x_rename = menu.addAction("&Rename");
+    QAction* act_x_sep_1    = menu.addSeparator();
+    QAction* act_x_info     = menu.addAction("Get &Info");
+    QAction* act_x_rename   = menu.addAction("&Rename");
+
+    if (!features.port_info)
+        act_x_info->setVisible(false);
 
     if (!features.port_rename)
         act_x_rename->setVisible(false);
 
+    if (!features.port_info && !features.port_rename)
+        act_x_sep_1->setVisible(false);
+
     QAction* act_selected = menu.exec(event->screenPos());
 
-    if (act_selected == act_x_info)
+    if (act_selected == act_x_disc_all)
+    {
+        for (int i=0; i < port_con_list.count(); i++)
+            canvas.callback(ACTION_PORTS_DISCONNECT, port_con_list[i], 0, "");
+    }
+    else if (act_selected == act_x_info)
+    {
         canvas.callback(ACTION_PORT_INFO, port_id, 0, "");
-
+    }
     else if (act_selected == act_x_rename)
     {
         bool ok_check;
@@ -318,8 +330,6 @@ void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
             canvas.callback(ACTION_PORT_RENAME, port_id, 0, new_name);
         }
     }
-    else if (act_selected == act_x_disc_all)
-        canvas.callback(ACTION_PORT_DISCONNECT_ALL, port_id, 0, "");
 
     event->accept();
 }
@@ -358,7 +368,7 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         }
         else
         {
-            qCritical("Invalid THEME_PORT mode");
+            qCritical("CanvasPort::paint() - Invalid Theme Port mode");
             return;
         }
     }
@@ -384,13 +394,13 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         }
         else
         {
-            qCritical("Invalid THEME_PORT mode");
+            qCritical("CanvasPort::paint() - Invalid Theme Port mode");
             return;
         }
     }
     else
     {
-        qCritical("Error: Invalid Port Mode!");
+        qCritical("CanvasPort::paint() - Invalid Port Mode");
         return;
     }
 
@@ -419,7 +429,7 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     }
     else
     {
-        qCritical("Error: Invalid Port Type!");
+        qCritical("CanvasPort::paint() - Invalid Port Type");
         return;
     }
 

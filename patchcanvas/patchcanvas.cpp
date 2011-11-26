@@ -63,7 +63,9 @@ options_t options = {
 };
 
 features_t features = {
+    /* group_info */       false,
     /* group_rename */     true,
+    /* port_info */        false,
     /* port_rename */      true,
     /* handle_group_pos */ false
 };
@@ -88,7 +90,9 @@ void set_options(options_t* new_options)
 void set_features(features_t* new_features)
 {
     if (canvas.initiated) return;
+    features.group_info       = new_features->group_info;
     features.group_rename     = new_features->group_rename;
+    features.port_info        = new_features->port_info;
     features.port_rename      = new_features->port_rename;
     features.handle_group_pos = new_features->handle_group_pos;
 }
@@ -907,7 +911,16 @@ QString CanvasGetPortName(int port_id)
     for (int i=0; i<canvas.port_list.count(); i++)
     {
         if (canvas.port_list[i].port_id == port_id)
-            return canvas.port_list[i].port_name;
+        {
+            int group_id = canvas.port_list[i].group_id;
+            for (int j=0; j<canvas.group_list.count(); j++)
+            {
+                if (canvas.group_list[j].group_id == group_id)
+                    return canvas.group_list[j].group_name + ":" + canvas.port_list[i].port_name;
+
+            }
+            break;
+        }
     }
 
     qCritical("PatchCanvas::CanvasGetPortName() - unable to find port");

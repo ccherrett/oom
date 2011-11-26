@@ -495,24 +495,85 @@ void CanvasBox::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
     QMenu menu;
     QMenu discMenu("Disconnect", &menu);
 
+    QList<int> port_con_list;
+    QList<int> port_con_list_ids;
+
+    for (int i=0; i < port_list_ids.count(); i++)
+    {
+        QList<int> tmp_port_con_list = CanvasGetPortConnectionList(port_list_ids[i]);
+        for (int j=0; j < tmp_port_con_list.count(); j++)
+        {
+            if (!port_con_list.contains(tmp_port_con_list[j]))
+            {
+                port_con_list.append(tmp_port_con_list[j]);
+                port_con_list_ids.append(port_list_ids[i]);
+            }
+        }
+    }
+
+    if (port_con_list.count() > 0)
+    {
+        for (int i=0; i < port_con_list.count(); i++)
+        {
+            int port_con_id = CanvasGetConnectedPort(port_con_list[i], port_con_list_ids[i]);
+            QAction* act_x_disc = discMenu.addAction(CanvasGetPortName(port_con_id));
+            act_x_disc->setData(port_con_list[i]);
+            QObject::connect(act_x_disc, SIGNAL(triggered()), canvas.qobject, SLOT(PortContextMenuDisconnect()));
+        }
+    }
+    else
+    {
+        QAction* act_x_disc = discMenu.addAction("No connections");
+        act_x_disc->setEnabled(false);
+    }
+
     menu.addMenu(&discMenu);
-    QAction* act_x_disc_all = menu.addAction("Disconnect &All");
-    QAction* act_x_sep_1 = menu.addSeparator();
-    QAction* act_x_rename = menu.addAction("&Rename");
-    QAction* act_x_sep_2 = menu.addSeparator();
+    QAction* act_x_disc_all   = menu.addAction("Disconnect &All");
+    QAction* act_x_sep1       = menu.addSeparator();
+    QAction* act_x_info       = menu.addAction("&Info");
+    QAction* act_x_rename     = menu.addAction("&Rename");
+    QAction* act_x_sep2       = menu.addSeparator();
     QAction* act_x_split_join = menu.addAction(splitted ? "Join" : "Split");
 
+    if (!features.group_info)
+        act_x_info->setVisible(false);
+
     if (!features.group_rename)
-    {
-        act_x_sep_1->setVisible(false);
         act_x_rename->setVisible(false);
+
+    if (!features.group_info && !features.group_rename)
+        act_x_sep1->setVisible(false);
+
+    bool haveIns, haveOuts;
+    haveIns = haveOuts = false;
+    for (int i=0; i < canvas.port_list.count(); i++)
+    {
+        if (port_list_ids.contains(canvas.port_list[i].port_id))
+        {
+            if (canvas.port_list[i].port_mode == PORT_MODE_INPUT)
+                haveIns = true;
+            else if (canvas.port_list[i].port_mode == PORT_MODE_OUTPUT)
+                haveOuts = true;
+        }
+    }
+
+    if (!splitted && !(haveIns && haveOuts))
+    {
+        act_x_sep2->setVisible(false);
+        act_x_split_join->setVisible(false);
     }
 
     QAction* act_selected = menu.exec(event->screenPos());
 
     if (act_selected == act_x_disc_all)
-        0;
-
+    {
+        for (int i=0; i < port_con_list.count(); i++)
+            canvas.callback(ACTION_PORTS_DISCONNECT, port_con_list[i], 0, "");
+    }
+    else if (act_selected == act_x_info)
+    {
+        canvas.callback(ACTION_GROUP_INFO, group_id, 0, "");
+    }
     else if (act_selected == act_x_rename)
     {
         bool ok_check;

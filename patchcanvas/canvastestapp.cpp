@@ -254,8 +254,10 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     options.theme_name = Theme::getThemeName(Theme::getDefaultTheme());
 
     PatchCanvas::features_t features;
-    features.group_rename = false;
-    features.port_rename = false;
+    features.group_info       = false;
+    features.group_rename     = false;
+    features.port_info        = false;
+    features.port_rename      = false;
     features.handle_group_pos = true;
 
     PatchCanvas::set_options(&options);

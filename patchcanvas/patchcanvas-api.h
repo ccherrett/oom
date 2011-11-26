@@ -61,7 +61,9 @@ struct options_t {
 
 // Canvas features
 struct features_t {
+    bool group_info;
     bool group_rename;
+    bool port_info;
     bool port_rename;
     bool handle_group_pos;
 };
