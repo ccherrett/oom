@@ -62,6 +62,32 @@ int get_port_id(QString full_port_name)
     return -1;
 }
 
+QString get_full_port_name(int port_id)
+{
+    int group_id = -1;
+    QString group_name;
+    QString port_name;
+
+    for (int i=0; i < used_port_names.count(); i++)
+    {
+        if (used_port_names[i].port_id == port_id)
+        {
+            group_id = used_port_names[i].group_id;
+            port_name = used_port_names[i].name;
+        }
+    }
+
+    for (int i=0; i < used_group_names.count(); i++)
+    {
+        if (used_group_names[i].id == group_id)
+        {
+            group_name = used_group_names[i].name;
+        }
+    }
+
+    return group_name+":"+port_name;
+}
+
 void client_register_callback(const char* name, int register_, void *arg)
 {
     QString qname(name);
@@ -179,21 +205,19 @@ void canvas_callback(PatchCanvas::CallbackAction action, int value1, int value2,
         QMessageBox::information(main_gui, "port info dialog", "dummy text here");
         break;
     case PatchCanvas::ACTION_PORT_RENAME:
-        //PatchCanvas::renamePort(value1, value_str);
+        // Unused
         break;
     case PatchCanvas::ACTION_PORTS_CONNECT:
-        jack_connect(jack_client, jack_port_name(jack_port_by_id(jack_client, value1)), jack_port_name(jack_port_by_id(jack_client, value2)));
-        //PatchCanvas::connectPorts(last_connection_id++, value1, value2);
+        jack_connect(jack_client, get_full_port_name(value1).toStdString().data(), get_full_port_name(value2).toStdString().data());
         break;
     case PatchCanvas::ACTION_PORTS_DISCONNECT:
-        jack_disconnect(jack_client, jack_port_name(jack_port_by_id(jack_client, value1)), jack_port_name(jack_port_by_id(jack_client, value2)));
-        //PatchCanvas::disconnectPorts(value1);
+        jack_disconnect(jack_client, get_full_port_name(value1).toStdString().data(), get_full_port_name(value2).toStdString().data());
         break;
     case PatchCanvas::ACTION_GROUP_INFO:
         QMessageBox::information(main_gui, "group info dialog", "dummy text here");
         break;
     case PatchCanvas::ACTION_GROUP_RENAME:
-        //PatchCanvas::renameGroup(value1, value_str);
+        // Unused
         break;
     case PatchCanvas::ACTION_GROUP_SPLIT:
         PatchCanvas::splitGroup(value1);
