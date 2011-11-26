@@ -45,3 +45,5 @@ HEADERS  += canvastestapp.h \
     canvasbezierlinemov.h
 
 FORMS    += canvastestapp.ui
+
+LIBS += -ljack

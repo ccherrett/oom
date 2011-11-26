@@ -6,12 +6,18 @@
 #include "canvasport.h"
 
 #include <QCursor>
+#include <QInputDialog>
 #include <QFontMetrics>
+#include <QMenu>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
 
 START_NAMESPACE_PATCHCANVAS
 
 extern Canvas canvas;
 extern options_t options;
+extern features_t features;
 
 CanvasBox::CanvasBox(int group_id_, QString group_name_, Icon icon, QGraphicsItem* parent) :
     QGraphicsItem(parent, canvas.scene)
@@ -484,8 +490,49 @@ int CanvasBox::type() const
     return CanvasBoxType;
 }
 
-//contextMenuEvent(self, event)
-//contextMenuDisconnect(self, port_id)
+void CanvasBox::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    QMenu menu;
+    QMenu discMenu("Disconnect", &menu);
+
+    menu.addMenu(&discMenu);
+    QAction* act_x_disc_all = menu.addAction("Disconnect &All");
+    QAction* act_x_sep_1 = menu.addSeparator();
+    QAction* act_x_rename = menu.addAction("&Rename");
+    QAction* act_x_sep_2 = menu.addSeparator();
+    QAction* act_x_split_join = menu.addAction(splitted ? "Join" : "Split");
+
+    if (!features.group_rename)
+    {
+        act_x_sep_1->setVisible(false);
+        act_x_rename->setVisible(false);
+    }
+
+    QAction* act_selected = menu.exec(event->screenPos());
+
+    if (act_selected == act_x_disc_all)
+        0;
+
+    else if (act_selected == act_x_rename)
+    {
+        bool ok_check;
+        QString new_name = QInputDialog::getText(0, "Rename Group", "New name:", QLineEdit::Normal, group_name, &ok_check);
+        if (ok_check and !new_name.isEmpty())
+        {
+            canvas.callback(ACTION_GROUP_RENAME, group_id, 0, new_name);
+        }
+    }
+    else if (act_selected == act_x_split_join)
+    {
+        if (splitted)
+            canvas.callback(ACTION_GROUP_JOIN, group_id, 0, "");
+        else
+            canvas.callback(ACTION_GROUP_SPLIT, group_id, 0, "");
+
+    }
+
+    event->accept();
+}
 
 void CanvasBox::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {

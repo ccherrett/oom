@@ -4,9 +4,11 @@
 #include "patchcanvas.h"
 #include "canvasicon.h"
 #include <QGraphicsItem>
-#include <QGraphicsSceneMouseEvent>
 #include <QFont>
-#include <QPainter>
+
+class QGraphicsSceneContextMenuEvent;
+class QGraphicsSceneMouseEvent;
+class QPainter;
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -77,9 +79,7 @@ private:
     CanvasIcon* icon_svg;
     CanvasBoxShadow* shadow;
 
-    //contextMenuEvent(self, event)
-    //contextMenuDisconnect(self, port_id)
-
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
     void mousePressEvent(QGraphicsSceneMouseEvent* event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);

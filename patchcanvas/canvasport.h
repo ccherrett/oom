@@ -4,7 +4,6 @@
 #include "patchcanvas.h"
 
 #include <QGraphicsItem>
-#include <QMetaType>
 
 class QGraphicsSceneContextMenuEvent;
 class QGraphicsSceneMouseEvent;

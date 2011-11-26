@@ -1,33 +1,205 @@
 #include "canvastestapp.h"
 #include "ui_canvastestapp.h"
 
-#include <cstdio>
+#include <QMessageBox>
 
+#include <jack/jack.h>
+
+struct group_name_to_id_t {
+    int id;
+    QString name;
+};
+
+struct port_name_to_id_t {
+    int group_id;
+    int port_id;
+    QString name;
+};
+
+struct connection_to_id_t {
+    int id;
+    int port_out;
+    int port_in;
+};
+
+static int last_group_id = 0;
+static int last_port_id = 0;
 static int last_connection_id = 0;
 
-static void canvas_callback(PatchCanvas::CallbackAction action, int value1, int value2, QString value_str)
-{
-    printf("--------------------------- Callback called %i|%i|%i|%s\n", action, value1, value2, value_str.toStdString().data());
+static CanvasTestApp* main_gui = 0;
+static jack_client_t* jack_client = 0;
 
-    int group_id;
+static QList<group_name_to_id_t> used_group_names;
+static QList<port_name_to_id_t>  used_port_names;
+static QList<connection_to_id_t> used_connections;
+
+int get_group_id(QString group_name)
+{
+    for (int i=0; i < used_group_names.count(); i++)
+    {
+        if (used_group_names[i].name == group_name)
+        {
+            return used_group_names[i].id;
+        }
+    }
+    return -1;
+}
+
+int get_port_id(QString full_port_name)
+{
+    QString group_name = full_port_name.split(":").at(0);
+    QString port_name = full_port_name.replace(group_name+":", "");
+    int group_id = get_group_id(group_name);
+
+    for (int i=0; i < used_port_names.count(); i++)
+    {
+        if (used_port_names[i].group_id == group_id && used_port_names[i].name == port_name)
+        {
+            return used_port_names[i].port_id;
+        }
+    }
+
+    return -1;
+}
+
+void client_register_callback(const char* name, int register_, void *arg)
+{
+    QString qname(name);
+
+    if (register_)
+    {
+        group_name_to_id_t group_name_to_id;
+        group_name_to_id.id = last_group_id;
+        group_name_to_id.name = qname;
+        used_group_names.append(group_name_to_id);
+        PatchCanvas::addGroup(last_group_id, qname);
+        last_group_id++;
+    }
+    else
+    {
+        for (int i=0; i < used_group_names.count(); i++)
+        {
+            if (used_group_names[i].name == qname)
+            {
+                PatchCanvas::removeGroup(used_group_names[i].id);
+                used_group_names.takeAt(i);
+                break;
+            }
+        }
+    }
+    Q_UNUSED(arg);
+}
+
+void port_register_callback(jack_port_id_t port_id_jack, int register_, void *arg)
+{
+    jack_port_t* jack_port = jack_port_by_id(jack_client, port_id_jack);
+
+    QString full_name(jack_port_name(jack_port));
+    QString group_name = full_name.split(":").at(0);
+    QString port_name = full_name.replace(group_name+":", "");
+    int group_id = get_group_id(group_name);
+
+    if (register_)
+    {
+        PatchCanvas::PortMode port_mode;
+        PatchCanvas::PortType port_type;
+
+        if (jack_port_flags(jack_port) & JackPortIsInput)
+            port_mode = PatchCanvas::PORT_MODE_INPUT;
+        else
+            port_mode = PatchCanvas::PORT_MODE_OUTPUT;
+
+        if (strcmp(jack_port_type(jack_port), JACK_DEFAULT_AUDIO_TYPE) == 0)
+            port_type = PatchCanvas::PORT_TYPE_AUDIO_JACK;
+        else
+            port_type = PatchCanvas::PORT_TYPE_MIDI_JACK;
+
+        port_name_to_id_t port_name_to_id;
+        port_name_to_id.group_id = group_id;
+        port_name_to_id.port_id = last_port_id;
+        port_name_to_id.name = port_name;
+        used_port_names.append(port_name_to_id);
+        PatchCanvas::addPort(group_id, last_port_id, port_name, port_mode, port_type);
+        last_port_id++;
+    }
+    else
+    {
+        for (int i=0; i < used_port_names.count(); i++)
+        {
+            if (used_port_names[i].group_id == group_id && used_port_names[i].name == port_name)
+            {
+                PatchCanvas::removePort(used_port_names[i].port_id);
+                used_port_names.takeAt(i);
+                break;
+            }
+        }
+    }
+    Q_UNUSED(arg);
+}
+
+void port_connect_callback(jack_port_id_t port_a, jack_port_id_t port_b, int connect, void* arg)
+{
+    jack_port_t* jack_port_a = jack_port_by_id(jack_client, port_a);
+    jack_port_t* jack_port_b = jack_port_by_id(jack_client, port_b);
+    int port_id_a = get_port_id(QString(jack_port_name(jack_port_a)));
+    int port_id_b = get_port_id(QString(jack_port_name(jack_port_b)));
+
+    if (connect)
+    {
+        connection_to_id_t connection;
+        connection.id = last_connection_id;
+        connection.port_out = port_id_a;
+        connection.port_in = port_id_b;
+        used_connections.append(connection);
+        PatchCanvas::connectPorts(last_connection_id, port_id_a, port_id_b);
+        last_connection_id++;
+    }
+    else
+    {
+        for (int i=0; i < used_connections.count(); i++)
+        {
+            if (used_connections[i].port_out == port_id_a && used_connections[i].port_in == port_id_b)
+            {
+                PatchCanvas::disconnectPorts(used_connections[i].id);
+                used_connections.takeAt(i);
+                break;
+            }
+        }
+    }
+    Q_UNUSED(arg);
+}
+
+void canvas_callback(PatchCanvas::CallbackAction action, int value1, int value2, QString value_str)
+{
+    qDebug("--------------------------- Callback called %i|%i|%i|%s\n", action, value1, value2, value_str.toStdString().data());
 
     switch (action)
     {
+    case PatchCanvas::ACTION_PORT_INFO:
+        QMessageBox::information(main_gui, "port info dialog", "dummy text here");
+        break;
+    case PatchCanvas::ACTION_PORT_RENAME:
+        //PatchCanvas::renamePort(value1, value_str);
+        break;
     case PatchCanvas::ACTION_PORTS_CONNECT:
-        PatchCanvas::connectPorts(last_connection_id++, value1, value2);
+        jack_connect(jack_client, jack_port_name(jack_port_by_id(jack_client, value1)), jack_port_name(jack_port_by_id(jack_client, value2)));
+        //PatchCanvas::connectPorts(last_connection_id++, value1, value2);
         break;
     case PatchCanvas::ACTION_PORTS_DISCONNECT:
-        PatchCanvas::disconnectPorts(value1);
+        jack_disconnect(jack_client, jack_port_name(jack_port_by_id(jack_client, value1)), jack_port_name(jack_port_by_id(jack_client, value2)));
+        //PatchCanvas::disconnectPorts(value1);
         break;
-    case PatchCanvas::ACTION_GROUP_DISCONNECT_ALL:
+    case PatchCanvas::ACTION_GROUP_INFO:
+        QMessageBox::information(main_gui, "group info dialog", "dummy text here");
+        break;
+    case PatchCanvas::ACTION_GROUP_RENAME:
+        //PatchCanvas::renameGroup(value1, value_str);
         break;
     case PatchCanvas::ACTION_GROUP_SPLIT:
-        group_id = value1;
-        PatchCanvas::splitGroup(group_id);
+        PatchCanvas::splitGroup(value1);
         break;
     case PatchCanvas::ACTION_GROUP_JOIN:
-        group_id = value1;
-        PatchCanvas::joinGroup(group_id);
+        PatchCanvas::joinGroup(value1);
         break;
     default:
         break;
@@ -39,6 +211,11 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     ui(new Ui::CanvasTestApp)
 {
     ui->setupUi(this);
+
+    main_gui = this;
+    used_group_names.clear();
+    used_port_names.clear();
+    used_connections.clear();
 
     scene = new PatchCanvas::PatchScene(this);
     ui->graphicsView->setScene(scene);
@@ -52,35 +229,112 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     options.fancy_eyecandy = false;
     options.theme_name = Theme::getThemeName(Theme::getDefaultTheme());
 
+    PatchCanvas::features_t features;
+    features.group_rename = false;
+    features.port_rename = false;
+    features.handle_group_pos = true;
+
     PatchCanvas::set_options(&options);
+    PatchCanvas::set_features(&features);
     PatchCanvas::init(scene, canvas_callback, true);
 
-    scene->rubberbandByTheme();
+    jack_client = jack_client_open("canvas-test-app", JackNullOption, 0);
+    jack_set_client_registration_callback(jack_client, client_register_callback, 0);
+    jack_set_port_registration_callback(jack_client, port_register_callback, 0);
+    jack_set_port_connect_callback(jack_client, port_connect_callback, 0);
+    jack_activate(jack_client);
 
-    // TEST
-    PatchCanvas::addGroup(0, "Box with timer, splitted", PatchCanvas::SPLIT_YES);
-    PatchCanvas::addPort(0, 0, "AudioJackInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);
-    PatchCanvas::addPort(0, 1, "AudioJackOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);
+    // query initial jack ports
+    QList<QString> parsed_groups;
+    const char** ports = jack_get_ports(jack_client, 0, 0, 0);
+    if (ports) {
+        for (int i=0; ports[i]; i++) {
+            QString full_name(ports[i]);
+            QString group_name = full_name.split(":").at(0);
+            QString port_name = full_name.replace(group_name+":", "");
+            int group_id = -1;
 
-    PatchCanvas::addPort(0, 2, "MidiJackInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_MIDI_JACK);
-    PatchCanvas::addPort(0, 3, "MidiJackOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_JACK);
+            if (parsed_groups.contains(group_name))
+            {
+                group_id = get_group_id(group_name);
+            }
+            else
+            {
+                group_id = last_group_id;
 
-    PatchCanvas::addPort(0, 4, "MidiA2JInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_MIDI_A2J);
-    PatchCanvas::addPort(0, 5, "MidiA2JOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_A2J);
+                group_name_to_id_t group_name_to_id;
+                group_name_to_id.id = group_id;
+                group_name_to_id.name = group_name;
+                used_group_names.append(group_name_to_id);
 
-    PatchCanvas::addPort(0, 6, "MidiAlsaInputPort", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
-    PatchCanvas::addPort(0, 7, "MidiAlsaOutputPort", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
+                parsed_groups.append(group_name);
+                PatchCanvas::addGroup(group_id, group_name);
+                last_group_id++;
+            }
 
-    PatchCanvas::addGroup(1, "Simple box", PatchCanvas::SPLIT_NO);
-    PatchCanvas::addPort(1, 8, "Some Random Port 1", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_JACK);
-    PatchCanvas::addPort(1, 9, "Some Random Port 2", PatchCanvas::PORT_MODE_OUTPUT, PatchCanvas::PORT_TYPE_MIDI_ALSA);
-    PatchCanvas::addPort(1, 10, "An input", PatchCanvas::PORT_MODE_INPUT, PatchCanvas::PORT_TYPE_AUDIO_JACK);
+            PatchCanvas::PortMode port_mode;
+            PatchCanvas::PortType port_type;
+            jack_port_t* jack_port = jack_port_by_name(jack_client, ports[i]);
 
-    PatchCanvas::connectPorts(11, 1, 10);
+            if (jack_port_flags(jack_port) & JackPortIsInput)
+                port_mode = PatchCanvas::PORT_MODE_INPUT;
+            else
+                port_mode = PatchCanvas::PORT_MODE_OUTPUT;
+
+            if (strcmp(jack_port_type(jack_port), JACK_DEFAULT_AUDIO_TYPE) == 0)
+                port_type = PatchCanvas::PORT_TYPE_AUDIO_JACK;
+            else
+                port_type = PatchCanvas::PORT_TYPE_MIDI_JACK;
+
+            port_name_to_id_t port_name_to_id;
+            port_name_to_id.group_id = group_id;
+            port_name_to_id.port_id = last_port_id;
+            port_name_to_id.name = port_name;
+            used_port_names.append(port_name_to_id);
+            PatchCanvas::addPort(group_id, last_port_id, port_name, port_mode, port_type);
+            last_port_id++;
+        }
+
+        jack_free(ports);
+    }
+
+    // query connections, after all ports are in place
+    ports = jack_get_ports(jack_client, 0, 0, JackPortIsOutput);
+    if (ports) {
+        for (int i=0; ports[i]; i++) {
+            QString this_full_name(ports[i]);
+            int this_port_id = get_port_id(this_full_name);
+
+            jack_port_t* jack_port = jack_port_by_name(jack_client, ports[i]);
+            const char** connections = jack_port_get_connections(jack_port);
+
+            if (connections) {
+                for (int j=0; connections[j]; j++) {
+                    QString target_full_name(connections[j]);
+                    int target_port_id = get_port_id(target_full_name);
+
+                    connection_to_id_t connection;
+                    connection.id = last_connection_id;
+                    connection.port_out = this_port_id;
+                    connection.port_in = target_port_id;
+                    used_connections.append(connection);
+                    PatchCanvas::connectPorts(last_connection_id, this_port_id, target_port_id);
+                    last_connection_id++;
+                }
+
+                jack_free(connections);
+            }
+        }
+
+        jack_free(ports);
+    }
 }
 
 CanvasTestApp::~CanvasTestApp()
 {
+    jack_deactivate(jack_client);
+    jack_client_close(jack_client);
+
     PatchCanvas::clear();
 
     delete scene;
