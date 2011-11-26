@@ -38,20 +38,17 @@ public:
     void setSplit(bool split, PortMode mode=PORT_MODE_NULL);
     void setGroupName(QString group_name);
 
-    void makeItGlow(int port_id, bool yesno);
-
-    void addLineFromGroup(QGraphicsItem* line, int connection_id);
-    void removeLineFromGroup(int connection_id);
-
     CanvasPort* addPortFromGroup(int port_id, QString port_name, PortMode port_mode, PortType port_type);
     void removePortFromGroup(int port_id);
+    void addLineFromGroup(QGraphicsItem* line, int connection_id);
+    void removeLineFromGroup(int connection_id);
 
     void checkItemPos();
     void removeIconFromScene();
 
     void updatePositions();
+    void repaintLines(bool forced=false);
     void resetLinesZValue();
-    void repaintLines();
 
     int type() const;
 

@@ -449,7 +449,18 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     painter->drawText(text_pos, port_name);
 
     if (isSelected() != last_selected_state)
-      ((CanvasBox*)parentItem())->makeItGlow(port_id, isSelected());
+    {
+        for (int i=0; i < canvas.connection_list.count(); i++)
+        {
+            if (canvas.connection_list[i].port_out_id == port_id || canvas.connection_list[i].port_in_id == port_id)
+            {
+                if (options.bezier_lines)
+                    ((CanvasBezierLine*)canvas.connection_list[i].widget)->setLineSelected(isSelected());
+                else
+                    ((CanvasLine*)canvas.connection_list[i].widget)->setLineSelected(isSelected());
+            }
+        }
+    }
 
     last_selected_state = isSelected();
 

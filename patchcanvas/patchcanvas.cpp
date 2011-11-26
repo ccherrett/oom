@@ -572,12 +572,10 @@ void setGroupPos(int group_id, int group_pos_x, int group_pos_y, int group_pos_x
         if (canvas.group_list[i].group_id == group_id)
         {
             canvas.group_list[i].widgets[0]->setPos(group_pos_x, group_pos_y);
-            canvas.group_list[i].widgets[0]->repaintLines();
 
             if (canvas.group_list[i].split)
             {
                 canvas.group_list[i].widgets[1]->setPos(group_pos_xs, group_pos_ys);
-                canvas.group_list[i].widgets[1]->repaintLines();
             }
 
             QTimer::singleShot(0, canvas.scene, SIGNAL(update()));

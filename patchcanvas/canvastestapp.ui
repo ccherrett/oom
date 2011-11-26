@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>813</width>
-    <height>648</height>
+    <width>811</width>
+    <height>646</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,40 +25,6 @@
      <widget class="QGraphicsView" name="graphicsView"/>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>813</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menu_File">
-    <property name="title">
-     <string>&amp;File</string>
-    </property>
-    <addaction name="action_Quit"/>
-   </widget>
-   <widget class="QMenu" name="menu_Canvas">
-    <property name="title">
-     <string>&amp;Canvas</string>
-    </property>
-    <addaction name="action_Arrange"/>
-    <addaction name="separator"/>
-    <addaction name="action_Refresh"/>
-    <addaction name="separator"/>
-    <addaction name="actionZoom_Fit"/>
-    <addaction name="actionZoom_In"/>
-    <addaction name="actionZoom_Out"/>
-    <addaction name="actionZoom_100"/>
-    <addaction name="separator"/>
-    <addaction name="action_Print"/>
-    <addaction name="action_Save_Image"/>
-   </widget>
-   <addaction name="menu_File"/>
-   <addaction name="menu_Canvas"/>
   </widget>
   <action name="action_Quit">
    <property name="text">

@@ -26,16 +26,14 @@ enum PortType {
 };
 
 enum CallbackAction {
-    ACTION_PORT_DISCONNECT_ALL  = 0, // port_id, N, N
-    ACTION_PORT_RENAME          = 1, // port_id, N, new_name
-    ACTION_PORT_INFO            = 2, // port_id, N, N
-    ACTION_PORTS_CONNECT        = 3, // out_id, in_id, N
-    ACTION_PORTS_DISCONNECT     = 4, // conn_id, N, N
-    ACTION_GROUP_DISCONNECT_ALL = 5, // group_id, N, N
-    ACTION_GROUP_RENAME         = 6, // group_id, N, new_name
-    ACTION_GROUP_INFO           = 7, // group_id, N, N
-    ACTION_GROUP_SPLIT          = 8, // group_id, N, N
-    ACTION_GROUP_JOIN           = 9  // group_id, N, N
+    ACTION_GROUP_INFO       = 0, // group_id, N, N
+    ACTION_GROUP_RENAME     = 1, // group_id, N, new_name
+    ACTION_GROUP_SPLIT      = 2, // group_id, N, N
+    ACTION_GROUP_JOIN       = 3, // group_id, N, N
+    ACTION_PORT_INFO        = 4, // port_id, N, N
+    ACTION_PORT_RENAME      = 5, // port_id, N, new_name
+    ACTION_PORTS_CONNECT    = 6, // out_id, in_id, N
+    ACTION_PORTS_DISCONNECT = 7  // conn_id, N, N
 };
 
 enum Icon {

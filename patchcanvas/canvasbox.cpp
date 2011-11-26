@@ -12,6 +12,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QTimer>
 
 START_NAMESPACE_PATCHCANVAS
 
@@ -119,42 +120,6 @@ void CanvasBox::setGroupName(QString group_name_)
     updatePositions();
 }
 
-void CanvasBox::makeItGlow(int port_id, bool yesno)
-{
-    for (int i=0; i < canvas.connection_list.count(); i++)
-    {
-        if (canvas.connection_list[i].port_out_id == port_id || canvas.connection_list[i].port_in_id == port_id)
-        {
-            if (options.bezier_lines)
-                ((CanvasBezierLine*)canvas.connection_list[i].widget)->setLineSelected(yesno);
-            else
-                ((CanvasLine*)canvas.connection_list[i].widget)->setLineSelected(yesno);
-        }
-    }
-}
-
-void CanvasBox::addLineFromGroup(QGraphicsItem* line_, int connection_id_)
-{
-    cb_line_t new_cbline;
-    new_cbline.line = line_;
-    new_cbline.connection_id = connection_id_;
-    connection_lines.append(new_cbline);
-}
-
-void CanvasBox::removeLineFromGroup(int connection_id)
-{
-    for (int i=0; i < connection_lines.count(); i++)
-    {
-        if (connection_lines[i].connection_id == connection_id)
-        {
-            connection_lines.takeAt(i);
-            return;
-        }
-    }
-
-    qCritical("PatchCanvas::CanvasBox->removeLineFromGroup() - Unable to find line to remove");
-}
-
 CanvasPort* CanvasBox::addPortFromGroup(int port_id, QString port_name, PortMode port_mode, PortType port_type)
 {
     if (port_list_ids.count() == 0)
@@ -193,21 +158,42 @@ void CanvasBox::removePortFromGroup(int port_id)
 
     if (port_list_ids.contains(port_id))
     {
-        qCritical("PatchCanvas::CanvasBox->removePort()) - Unable to find port to remove");
+        qCritical("PatchCanvas::CanvasBox->removePort() - Unable to find port to remove");
         return;
     }
 
-    updatePositions();
+    if (port_list_ids.count() > 0)
+        updatePositions();
 
-    if (port_list_ids.count() == 0 && isVisible())
+    else if (isVisible())
     {
-        if (canvas.debug and options.auto_hide_groups)
-            qDebug("PatchCanvas::CanvasBox->removePort() - This group has no more ports, hide it");
         if (options.fancy_eyecandy)
             ItemFX(this, false, false);
         else if (options.auto_hide_groups)
             setVisible(false);
     }
+}
+
+void CanvasBox::addLineFromGroup(QGraphicsItem* line_, int connection_id_)
+{
+    cb_line_t new_cbline;
+    new_cbline.line = line_;
+    new_cbline.connection_id = connection_id_;
+    connection_lines.append(new_cbline);
+}
+
+void CanvasBox::removeLineFromGroup(int connection_id)
+{
+    for (int i=0; i < connection_lines.count(); i++)
+    {
+        if (connection_lines[i].connection_id == connection_id)
+        {
+            connection_lines.takeAt(i);
+            return;
+        }
+    }
+
+    qCritical("PatchCanvas::CanvasBox->removeLineFromGroup() - Unable to find line to remove");
 }
 
 void CanvasBox::checkItemPos()
@@ -447,12 +433,24 @@ void CanvasBox::updatePositions()
         }
     }
 
-    for (int i=0; i < connection_lines.count(); i++)
+    repaintLines(true);
+    update();
+}
+
+void CanvasBox::repaintLines(bool forced)
+{
+    if (pos() != last_pos || forced)
     {
-        //QTimer::singleShot(0, connection_lines[i].line->toGraphicsObject(), SIGNAL(updateLinePos()));
+      for (int i=0; i < connection_lines.count(); i++)
+      {
+          if (options.bezier_lines)
+              ((CanvasBezierLine*)connection_lines[i].line)->updateLinePos();
+          else
+              ((CanvasLine*)connection_lines[i].line)->updateLinePos();
+      }
     }
 
-    update();
+    last_pos = pos();
 }
 
 void CanvasBox::resetLinesZValue()
@@ -467,22 +465,6 @@ void CanvasBox::resetLinesZValue()
 
         canvas.connection_list[i].widget->setZValue(z_value);
     }
-}
-
-void CanvasBox::repaintLines()
-{
-    if (pos() != last_pos)
-    {
-      for (int i=0; i < connection_lines.count(); i++)
-      {
-          if (options.bezier_lines)
-              ((CanvasBezierLine*)connection_lines[i].line)->updateLinePos();
-          else
-              ((CanvasLine*)connection_lines[i].line)->updateLinePos();
-      }
-    }
-
-    last_pos = pos();
 }
 
 int CanvasBox::type() const
@@ -677,6 +659,8 @@ void CanvasBox::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->setFont(font_name);
     painter->setPen(canvas.theme->box_text);
     painter->drawText(text_pos, group_name);
+
+    repaintLines();
 
     Q_UNUSED(option);
     Q_UNUSED(widget);
