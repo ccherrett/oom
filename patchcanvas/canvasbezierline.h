@@ -21,20 +21,20 @@ public:
     bool isLocked();
     void setLocked(bool yesno);
 
-    void enableGlow(bool yesno);
+    bool isLineSelected();
+    void setLineSelected(bool yesno);
 
     void updateLinePos();
-    void updateLineGradient(bool selected=false);
+    void updateLineGradient(bool selected);
 
     int type() const;
 
 private:
     CanvasPort* item1;
     CanvasPort* item2;
-    PortType port_type1;
-    PortType port_type2;
     CanvasPortGlow* glow;
     bool locked;
+    bool line_selected;
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 };

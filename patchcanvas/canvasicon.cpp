@@ -12,7 +12,6 @@ CanvasIcon::CanvasIcon(Icon icon, QString name, QGraphicsItem* parent) :
     QGraphicsSvgItem(parent)
 {
     renderer = 0;
-
     setIcon(icon, name);
 
     colorFX = new QGraphicsColorizeEffect(this);
@@ -81,7 +80,7 @@ void CanvasIcon::setIcon(Icon icon, QString name)
     else
     {
       size = QRectF(0, 0, 0, 0);
-      qWarning("PatchCanvas::CanvasIcon->setIcon() - Unsupported Icon requested");
+      qCritical("PatchCanvas::CanvasIcon->setIcon() - Unsupported Icon requested");
       return;
     }
 

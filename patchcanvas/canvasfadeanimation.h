@@ -12,7 +12,7 @@ START_NAMESPACE_PATCHCANVAS
 class CanvasFadeAnimation : public QAbstractAnimation
 {
 public:
-    CanvasFadeAnimation(QGraphicsItem* item, bool show, QObject* parent);
+    CanvasFadeAnimation(QGraphicsItem* item, bool show, QObject* parent=0);
 
     void setDuration(int time);
     int duration() const;

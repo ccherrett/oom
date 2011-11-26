@@ -10,14 +10,15 @@
 class QSettings;
 class QTimer;
 
-class TimerObject : public QObject {
+class CanvasObject : public QObject {
     Q_OBJECT
 
 public:
-    TimerObject();
+    CanvasObject(QObject* parent=0);
 
 public slots:
     void CanvasPostponedGroups();
+    void PortContextMenuDisconnect();
 };
 
 START_NAMESPACE_PATCHCANVAS
@@ -48,6 +49,7 @@ struct group_dict_t {
 };
 
 struct port_dict_t {
+    int group_id;
     int port_id;
     QString port_name;
     PortMode port_mode;
@@ -76,7 +78,7 @@ public:
     QGraphicsScene* scene;
     Callback callback;
     bool debug;
-    long last_z_value;
+    unsigned long last_z_value;
     int last_group_id;
     int last_connection_id;
     QPointF initial_pos;
@@ -85,14 +87,26 @@ public:
     QList<connection_dict_t> connection_list;
     QList<animation_dict_t> animation_list;
     QList<int> postponed_groups;
-    TimerObject* postponed_timer;
+    CanvasObject* qobject;
     QSettings* settings;
     Theme* theme;
     QRectF size_rect;
+    bool initiated;
 };
 
+QString CanvasGetGroupName(int group_id);
+int CanvasGetGroupPortCount(int group_id);
 QPointF CanvasGetNewGroupPos(bool horizontal=false);
+//QList<int> CanvasGetGroupConnectionList(int group_id);
+
+QString CanvasGetPortName(int port_id);
+QList<int> CanvasGetPortConnectionList(int port_id);
+
+int CanvasGetConnectedPort(int connection_id, int port_id);
+
 void CanvasPostponedGroups();
+void CanvasCallback(CallbackAction action, int value1, int value2, QString value_str);
+
 void ItemFX(QGraphicsItem* item, bool show, bool destroy=true);
 void RemoveItemFX(QGraphicsItem* item);
 

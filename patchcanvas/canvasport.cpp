@@ -15,7 +15,7 @@
 
 START_NAMESPACE_PATCHCANVAS
 
-        extern Canvas canvas;
+extern Canvas canvas;
 extern options_t options;
 extern features_t features;
 
@@ -65,7 +65,7 @@ QString CanvasPort::getPortName()
 
 QString CanvasPort::getFullPortName()
 {
-    return ((CanvasBox*)parentItem())->getText()+":"+port_name;
+    return ((CanvasBox*)parentItem())->getGroupName()+":"+port_name;
 }
 
 int CanvasPort::getPortWidth()
@@ -162,8 +162,9 @@ void CanvasPort::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
                 mov_line = new_mov_line;
             }
 
-            parentItem()->setZValue(canvas.last_z_value+1);
-            canvas.last_z_value += 2;
+            canvas.last_z_value += 1;
+            parentItem()->setZValue(canvas.last_z_value);
+            canvas.last_z_value += 1;
         }
 
         CanvasPort* item = 0;
@@ -187,11 +188,8 @@ void CanvasPort::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
         if (item)
         {
-            if (item->getPortMode() != port_mode &&
-                (item->getPortType() == port_type || (options.connect_midi2outro &&
-                                                      ((item->getPortType() == PORT_TYPE_MIDI  && port_type == PORT_TYPE_OUTRO) ||
-                                                       (item->getPortType() == PORT_TYPE_OUTRO && port_type == PORT_TYPE_MIDI))
-                                                      )))
+            bool a2j_connection = (item->getPortType() == PORT_TYPE_MIDI_JACK && port_type == PORT_TYPE_MIDI_A2J) || (item->getPortType() == PORT_TYPE_MIDI_A2J && port_type == PORT_TYPE_MIDI_JACK);
+            if (item->getPortMode() != port_mode && (item->getPortType() == port_type || a2j_connection))
             {
                 item->setSelected(true);
                 hover_item = item;
@@ -206,9 +204,11 @@ void CanvasPort::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
             ((CanvasBezierLineMov*)mov_line)->updateLinePos(event->scenePos());
         else
             ((CanvasLineMov*)mov_line)->updateLinePos(event->scenePos());
-    }
 
-    QGraphicsItem::mouseMoveEvent(event);
+        event->accept();
+
+    } else
+        QGraphicsItem::mouseMoveEvent(event);
 }
 
 void CanvasPort::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -275,15 +275,18 @@ void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
     setSelected(true);
 
     QMenu menu;
-
-    QList<int> port_list; // = canvas.callback(ACTION_REQUEST_PORT_CONNECTION_LIST, port_id, ((CanvasBox*)parentItem())->text+":"+port_name);
     QMenu discMenu("Disconnect", &menu);
-    if (port_list.count() > 0)
+
+    QList<int> port_con_list = CanvasGetPortConnectionList(port_id);
+
+    if (port_con_list.count() > 0)
     {
-        for (int i=0; i < port_list.count(); i++)
+        for (int i=0; i < port_con_list.count(); i++)
         {
-            //QAction* act_x_disc = discMenu.addAction(port_list[i][1]);
-            //QObject::connect(act_x_disc, SIGNAL(triggered()), SLOT(contextMenuDisconnect()));
+            int port_con_id = CanvasGetConnectedPort(port_con_list[i], port_id);
+            QAction* act_x_disc = discMenu.addAction(CanvasGetPortName(port_con_id));
+            act_x_disc->setData(port_con_list[i]);
+            QObject::connect(act_x_disc, SIGNAL(triggered()), canvas.qobject, SLOT(PortContextMenuDisconnect()));
         }
     }
     else
@@ -294,19 +297,30 @@ void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
     menu.addMenu(&discMenu);
     QAction* act_x_disc_all = menu.addAction("Disconnect &All");
-    /*QAction* act_x_sep_1 =*/
-    menu.addSeparator();
-    QAction* act_x_info = menu.addAction("Get &Info");
-    QAction* act_x_rename = menu.addAction("&Rename");
+    QAction* act_x_sep_1    = menu.addSeparator();
+    QAction* act_x_info     = menu.addAction("Get &Info");
+    QAction* act_x_rename   = menu.addAction("&Rename");
+
+    if (!features.port_info)
+        act_x_info->setVisible(false);
 
     if (!features.port_rename)
         act_x_rename->setVisible(false);
 
+    if (!features.port_info && !features.port_rename)
+        act_x_sep_1->setVisible(false);
+
     QAction* act_selected = menu.exec(event->screenPos());
 
-    if (act_selected == act_x_info)
-        canvas.callback(ACTION_PORT_INFO, port_id, 0, getFullPortName());
-
+    if (act_selected == act_x_disc_all)
+    {
+        for (int i=0; i < port_con_list.count(); i++)
+            canvas.callback(ACTION_PORTS_DISCONNECT, port_con_list[i], 0, "");
+    }
+    else if (act_selected == act_x_info)
+    {
+        canvas.callback(ACTION_PORT_INFO, port_id, 0, "");
+    }
     else if (act_selected == act_x_rename)
     {
         bool ok_check;
@@ -316,23 +330,8 @@ void CanvasPort::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
             canvas.callback(ACTION_PORT_RENAME, port_id, 0, new_name);
         }
     }
-    else if (act_selected == act_x_disc_all)
-        canvas.callback(ACTION_PORT_DISCONNECT_ALL, port_id, 0, getFullPortName());
 
     event->accept();
-}
-
-void CanvasPort::contextMenuDisconnect(int port_idx)
-{
-    for (int i=0; i < canvas.connection_list.count(); i++)
-    {
-        if ( (canvas.connection_list[i].port_in_id == port_id and canvas.connection_list[i].port_out_id == port_idx) ||
-             (canvas.connection_list[i].port_out_id == port_id and canvas.connection_list[i].port_in_id == port_idx) )
-        {
-            canvas.callback(ACTION_PORTS_DISCONNECT, canvas.connection_list[i].connection_id, 0, "");
-            break;
-        }
-    }
 }
 
 QRectF CanvasPort::boundingRect() const
@@ -369,7 +368,7 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         }
         else
         {
-            qCritical("Invalid THEME_PORT mode");
+            qCritical("CanvasPort::paint() - Invalid Theme Port mode");
             return;
         }
     }
@@ -395,37 +394,42 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
         }
         else
         {
-            qCritical("Invalid THEME_PORT mode");
+            qCritical("CanvasPort::paint() - Invalid Theme Port mode");
             return;
         }
     }
     else
     {
-        qCritical("Error: Invalid Port Mode!");
+        qCritical("CanvasPort::paint() - Invalid Port Mode");
         return;
     }
 
     QColor poly_color;
     QPen poly_pen;
 
-    if (port_type == PORT_TYPE_AUDIO)
+    if (port_type == PORT_TYPE_AUDIO_JACK)
     {
-        poly_color = isSelected() ? canvas.theme->port_audio_bg_sel : canvas.theme->port_audio_bg;
-        poly_pen = isSelected() ? canvas.theme->port_audio_pen_sel : canvas.theme->port_audio_pen;
+        poly_color = isSelected() ? canvas.theme->port_audio_jack_bg_sel : canvas.theme->port_audio_jack_bg;
+        poly_pen = isSelected() ? canvas.theme->port_audio_jack_pen_sel : canvas.theme->port_audio_jack_pen;
     }
-    else if (port_type == PORT_TYPE_MIDI)
+    else if (port_type == PORT_TYPE_MIDI_JACK)
     {
-        poly_color = isSelected() ? canvas.theme->port_midi_bg_sel : canvas.theme->port_midi_bg;
-        poly_pen = isSelected() ? canvas.theme->port_midi_pen_sel : canvas.theme->port_midi_pen;
+        poly_color = isSelected() ? canvas.theme->port_midi_jack_bg_sel : canvas.theme->port_midi_jack_bg;
+        poly_pen = isSelected() ? canvas.theme->port_midi_jack_pen_sel : canvas.theme->port_midi_jack_pen;
     }
-    else if (port_type == PORT_TYPE_OUTRO)
+    else if (port_type == PORT_TYPE_MIDI_A2J)
     {
-        poly_color = isSelected() ? canvas.theme->port_outro_bg_sel : canvas.theme->port_outro_bg;
-        poly_pen = isSelected() ? canvas.theme->port_outro_pen_sel : canvas.theme->port_outro_pen;
+        poly_color = isSelected() ? canvas.theme->port_midi_a2j_bg_sel : canvas.theme->port_midi_a2j_bg;
+        poly_pen = isSelected() ? canvas.theme->port_midi_a2j_pen_sel : canvas.theme->port_midi_a2j_pen;
+    }
+    else if (port_type == PORT_TYPE_MIDI_ALSA)
+    {
+        poly_color = isSelected() ? canvas.theme->port_midi_alsa_bg_sel : canvas.theme->port_midi_alsa_bg;
+        poly_pen = isSelected() ? canvas.theme->port_midi_alsa_pen_sel : canvas.theme->port_midi_alsa_pen;
     }
     else
     {
-        qCritical("Error: Invalid Port Type!");
+        qCritical("CanvasPort::paint() - Invalid Port Type");
         return;
     }
 
@@ -445,7 +449,18 @@ void CanvasPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     painter->drawText(text_pos, port_name);
 
     if (isSelected() != last_selected_state)
-      ((CanvasBox*)parentItem())->makeItGlow(port_id, isSelected());
+    {
+        for (int i=0; i < canvas.connection_list.count(); i++)
+        {
+            if (canvas.connection_list[i].port_out_id == port_id || canvas.connection_list[i].port_in_id == port_id)
+            {
+                if (options.bezier_lines)
+                    ((CanvasBezierLine*)canvas.connection_list[i].widget)->setLineSelected(isSelected());
+                else
+                    ((CanvasLine*)canvas.connection_list[i].widget)->setLineSelected(isSelected());
+            }
+        }
+    }
 
     last_selected_state = isSelected();
 

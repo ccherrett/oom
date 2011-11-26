@@ -4,7 +4,6 @@
 #include <Qt>
 #include <QString>
 
-
 #define START_NAMESPACE_PATCHCANVAS namespace PatchCanvas {
 #define END_NAMESPACE_PATCHCANVAS }
 
@@ -19,25 +18,22 @@ enum PortMode {
 };
 
 enum PortType {
-    PORT_TYPE_NULL  = 0,
-    PORT_TYPE_AUDIO = 1,
-    PORT_TYPE_MIDI  = 2,
-    PORT_TYPE_OUTRO = 3
+    PORT_TYPE_NULL       = 0,
+    PORT_TYPE_AUDIO_JACK = 1,
+    PORT_TYPE_MIDI_JACK  = 2,
+    PORT_TYPE_MIDI_A2J   = 3,
+    PORT_TYPE_MIDI_ALSA  = 4
 };
 
 enum CallbackAction {
-    ACTION_PORT_DISCONNECT_ALL  = 0, // port_id, N, port_name
-    ACTION_PORT_RENAME          = 1, // port_id, N, new_name
-    ACTION_PORT_INFO            = 2, // port_id, N, N
-    ACTION_PORTS_CONNECT        = 3, // out_id, in_id, N
-    ACTION_PORTS_DISCONNECT     = 4, // conn_id, N, N
-    ACTION_GROUP_DISCONNECT_ALL = 5, // group_id, N, group_name
-    ACTION_GROUP_RENAME         = 6, // group_id, N, new_name
-    ACTION_GROUP_INFO           = 7, // (unused)
-    ACTION_GROUP_SPLIT          = 8, // group_id, N, N
-    ACTION_GROUP_JOIN           = 9, // group_id, N, N
-    ACTION_REQUEST_PORT_CONNECTION_LIST  = 10, // port_id, N, N
-    ACTION_REQUEST_GROUP_CONNECTION_LIST = 11  // group_id, port_flags, group_name
+    ACTION_GROUP_INFO       = 0, // group_id, N, N
+    ACTION_GROUP_RENAME     = 1, // group_id, N, new_name
+    ACTION_GROUP_SPLIT      = 2, // group_id, N, N
+    ACTION_GROUP_JOIN       = 3, // group_id, N, N
+    ACTION_PORT_INFO        = 4, // port_id, N, N
+    ACTION_PORT_RENAME      = 5, // port_id, N, new_name
+    ACTION_PORTS_CONNECT    = 6, // out_id, in_id, N
+    ACTION_PORTS_DISCONNECT = 7  // conn_id, N, N
 };
 
 enum Icon {
@@ -46,19 +42,26 @@ enum Icon {
     ICON_LADISH_ROOM = 2
 };
 
+enum SplitOption {
+    SPLIT_UNDEF = 0,
+    SPLIT_NO    = 1,
+    SPLIT_YES   = 2
+};
+
 // Canvas options
 struct options_t {
     QString theme_name;
     bool bezier_lines;
     Qt::CheckState antialiasing;
     bool auto_hide_groups;
-    bool connect_midi2outro;
     bool fancy_eyecandy;
 };
 
 // Canvas features
 struct features_t {
+    bool group_info;
     bool group_rename;
+    bool port_info;
     bool port_rename;
     bool handle_group_pos;
 };
@@ -74,11 +77,12 @@ void clear();
 void setInitialPos(int x, int y);
 void setCanvasSize(int x, int y, int width, int height);
 
-void addGroup(int group_id, QString group_name, bool split=false, Icon icon=ICON_APPLICATION);
+void addGroup(int group_id, QString group_name, SplitOption split=SPLIT_UNDEF, Icon icon=ICON_APPLICATION);
 void removeGroup(int group_id);
-void renameGroup(int group_id, QString new_name);
+void renameGroup(int group_id, QString new_group_name);
 void splitGroup(int group_id);
 void joinGroup(int group_id);
+void setGroupPos(int group_id, int group_pos_x, int group_pos_y);
 void setGroupPos(int group_id, int group_pos_x, int group_pos_y, int group_pos_xs, int group_pos_ys);
 void setGroupIcon(int group_id, Icon icon);
 

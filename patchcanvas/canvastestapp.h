@@ -10,6 +10,8 @@ namespace Ui {
     class CanvasTestApp;
 }
 
+class QSettings;
+
 class CanvasTestApp : public QMainWindow
 {
     Q_OBJECT
@@ -21,6 +23,9 @@ public:
 private:
     Ui::CanvasTestApp* ui;
     PatchCanvas::PatchScene* scene;
+    QSettings* settings;
+
+    void closeEvent(QCloseEvent* event);
 };
 
 #endif // CANVASTESTAPP_H
