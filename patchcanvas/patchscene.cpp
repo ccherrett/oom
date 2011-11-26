@@ -33,11 +33,116 @@ void PatchScene::rubberbandByTheme()
     fake_rubberband->setBrush(canvas.theme->rubberband_brush);
 }
 
+void PatchScene::fixScaleFactor()
+{
+    QGraphicsView* const view = views().at(0);
+    qreal scale = view->transform().m11();
+    if (scale > 3.0)
+    {
+      view->resetTransform();
+      view->scale(3.0, 3.0);
+    }
+    else if (scale < 0.3)
+    {
+      view->resetTransform();
+      view->scale(0.3, 0.3);
+    }
+}
+
+void PatchScene::zoom_fit()
+{
+#define qreal_null -0xfffe
+    qreal min_x, min_y, max_x, max_y;
+    min_x = min_y = max_x = max_y = qreal_null;
+    QList<QGraphicsItem*> items_list = items();
+
+    if (items_list.count() > 0)
+    {
+        for (int i=0; i < items_list.count(); i++)
+        {
+            if (items_list[i]->isVisible() and items_list[i]->type() == CanvasBoxType)
+            {
+                QPointF pos = items_list[i]->scenePos();
+                QRectF rect = items_list[i]->boundingRect();
+
+                if (min_x == qreal_null)
+                    min_x = pos.x();
+                else if (pos.x() < min_x)
+                    min_x = pos.x();
+
+                if (min_y == qreal_null)
+                    min_y = pos.y();
+                else if (pos.y() < min_y)
+                    min_y = pos.y();
+
+                if (max_x == qreal_null)
+                    max_x = pos.x()+rect.width();
+                else if (pos.x()+rect.width() > max_x)
+                    max_x = pos.x()+rect.width();
+
+                if (max_y == qreal_null)
+                    max_y = pos.y()+rect.height();
+                else if (pos.y()+rect.height() > max_y)
+                    max_y = pos.y()+rect.height();
+            }
+        }
+
+        views().at(0)->fitInView(min_x, min_y, abs(max_x-min_x), abs(max_y-min_y), Qt::KeepAspectRatio);
+        fixScaleFactor();
+    }
+}
+
+void PatchScene::zoom_in()
+{
+    QGraphicsView* const view = views().at(0);
+    if (view->transform().m11() < 3.0)
+        view->scale(1.2, 1.2);
+}
+
+void PatchScene::zoom_out()
+{
+    QGraphicsView* const view = views().at(0);
+    if (view->transform().m11() > 0.3)
+        view->scale(0.8, 0.8);
+}
+void PatchScene::zoom_reset()
+{
+    QGraphicsView* const view = views().at(0);
+    view->resetTransform();
+}
 void PatchScene::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Control)
         ctrl_down = true;
-    QGraphicsScene::keyPressEvent(event);
+
+    if (event->key() == Qt::Key_Home)
+    {
+        zoom_fit();
+        event->accept();
+    }
+
+    else if (ctrl_down)
+    {
+        if (event->key() == Qt::Key_Plus)
+        {
+            zoom_in();
+            event->accept();
+        }
+        else if (event->key() == Qt::Key_Minus)
+        {
+            zoom_out();
+            event->accept();
+        }
+        else if (event->key() == Qt::Key_1)
+        {
+            zoom_reset();
+            event->accept();
+        }
+        else
+            QGraphicsScene::keyPressEvent(event);
+    }
+    else
+        QGraphicsScene::keyPressEvent(event);
 }
 
 void PatchScene::keyReleaseEvent(QKeyEvent* event)
@@ -52,24 +157,10 @@ void PatchScene::wheelEvent(QGraphicsSceneWheelEvent* event)
     if (ctrl_down)
     {
         QGraphicsView* const view = views().at(0);
-        if (view)
-        {
-            double factor = pow(1.41, (event->delta()/240.0));
-            view->scale(factor, factor);
+        double factor = pow(1.41, (event->delta()/240.0));
+        view->scale(factor, factor);
 
-            qreal scale = view->transform().m11();
-            if (scale > 3.0)
-            {
-              view->resetTransform();
-              view->scale(3.0, 3.0);
-            }
-            else if (scale < 0.3)
-            {
-              view->resetTransform();
-              view->scale(0.3, 0.3);
-            }
-        }
-
+        fixScaleFactor();
         event->accept();
 
     } else

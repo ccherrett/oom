@@ -17,6 +17,11 @@ class PatchScene : public QGraphicsScene
 public:
     PatchScene(QObject* parent = 0);
     void rubberbandByTheme();
+    void fixScaleFactor();
+    void zoom_fit();
+    void zoom_in();
+    void zoom_out();
+    void zoom_reset();
 
 private:
     bool ctrl_down;
