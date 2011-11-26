@@ -51,11 +51,29 @@ void PatchScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
     if (ctrl_down)
     {
-        double factor = pow(1.41, (event->delta()/240.0));
         QGraphicsView* const view = views().at(0);
-        view->scale(factor, factor);
-    }
-    QGraphicsScene::wheelEvent(event);
+        if (view)
+        {
+            double factor = pow(1.41, (event->delta()/240.0));
+            view->scale(factor, factor);
+
+            qreal scale = view->transform().m11();
+            if (scale > 3.0)
+            {
+              view->resetTransform();
+              view->scale(3.0, 3.0);
+            }
+            else if (scale < 0.3)
+            {
+              view->resetTransform();
+              view->scale(0.3, 0.3);
+            }
+        }
+
+        event->accept();
+
+    } else
+        QGraphicsScene::wheelEvent(event);
 }
 
 void PatchScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
