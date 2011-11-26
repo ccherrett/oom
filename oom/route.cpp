@@ -29,6 +29,7 @@ const QString ROUTE_MIDIPORT_NAME_PREFIX = "OOMidi MidiPort ";
 //   Route
 //---------------------------------------------------------
 
+//Jack Type Route
 Route::Route(void* t, int ch)
 {
 	jackPort = t;
@@ -39,6 +40,7 @@ Route::Route(void* t, int ch)
 	type = JACK_ROUTE;
 }
 
+//Track to Track Route
 Route::Route(Track* t, int ch, int chans)
 {
 	track = t;
@@ -49,6 +51,7 @@ Route::Route(Track* t, int ch, int chans)
 	type = TRACK_ROUTE;
 }
 
+//Midi Device Route
 Route::Route(MidiDevice* d, int ch)
 {
 	device = d;
@@ -59,6 +62,7 @@ Route::Route(MidiDevice* d, int ch)
 	type = MIDI_DEVICE_ROUTE;
 }
 
+//Midi Port Route
 Route::Route(int port, int ch) // p3.3.49
 {
 	track = 0;
@@ -69,6 +73,8 @@ Route::Route(int port, int ch) // p3.3.49
 	type = MIDI_PORT_ROUTE;
 }
 
+//Route From settings
+//Used mostly for restoring routes from the xml file
 Route::Route(const QString& s, bool dst, int ch, int rtype)
 {
 	Route node(name2route(s, dst, rtype));
@@ -100,6 +106,8 @@ Route::Route(const QString& s, bool dst, int ch, int rtype)
 	}
 }
 
+//Default Track to Track Route
+//This creates a Null route that must be configured to be used
 Route::Route()
 {
 	track = 0;
@@ -116,6 +124,9 @@ Route::Route()
 
 void addRoute(Route src, Route dst)
 {
+//TODO: Add hooks to update the patchcanvas on success
+//This should be conditionally checked so we dont update if the canvas is what made the connection
+
 #ifdef ROUTE_DEBUG
 	fprintf(stderr, "addRoute:\n");
 #endif
@@ -419,6 +430,8 @@ void addRoute(Route src, Route dst)
 
 void removeRoute(Route src, Route dst)
 {
+//TODO: Add hooks to update the patchcanvas on success
+//This should be conditionally checked so we dont update if the canvas is what made the connection
 	if (src.type == Route::JACK_ROUTE)
 	{
 		if (!dst.isValid())
