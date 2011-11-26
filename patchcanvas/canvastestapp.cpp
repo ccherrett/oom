@@ -265,7 +265,7 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     options.antialiasing = Qt::Checked;
     options.auto_hide_groups = false;
     options.bezier_lines = true;
-    options.fancy_eyecandy = false;
+    options.fancy_eyecandy = true;
     options.theme_name = Theme::getThemeName(Theme::getDefaultTheme());
 
     PatchCanvas::features_t features;
