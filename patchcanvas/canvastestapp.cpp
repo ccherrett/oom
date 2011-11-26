@@ -255,13 +255,13 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
 
     scene = new PatchCanvas::PatchScene(this);
     ui->graphicsView->setScene(scene);
-    ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
-    ui->graphicsView->setRenderHint(QPainter::TextAntialiasing, false);
+    ui->graphicsView->setRenderHint(QPainter::Antialiasing, true);
+    ui->graphicsView->setRenderHint(QPainter::TextAntialiasing, true);
 
     PatchCanvas::options_t options;
-    options.antialiasing = Qt::Unchecked;
+    options.antialiasing = Qt::Checked;
     options.auto_hide_groups = false;
-    options.bezier_lines = false;
+    options.bezier_lines = true;
     options.fancy_eyecandy = false;
     options.theme_name = Theme::getThemeName(Theme::getDefaultTheme());
 
