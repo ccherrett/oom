@@ -455,7 +455,7 @@ void CanvasBox::repaintLines(bool forced)
 
 void CanvasBox::resetLinesZValue()
 {
-    for (int i=0; i < connection_lines.count(); i++)
+    for (int i=0; i < canvas.connection_list.count(); i++)
     {
         int z_value;
         if (port_list_ids.contains(canvas.connection_list[i].port_out_id) && port_list_ids.contains(canvas.connection_list[i].port_in_id))
