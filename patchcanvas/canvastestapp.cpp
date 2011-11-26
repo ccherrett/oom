@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QVariant>
+#include <QGLWidget>
 
 #include <jack/jack.h>
 
@@ -257,6 +258,8 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing, true);
     ui->graphicsView->setRenderHint(QPainter::TextAntialiasing, true);
+
+    ui->graphicsView->setViewport(new QGLWidget(ui->graphicsView));
 
     PatchCanvas::options_t options;
     options.antialiasing = Qt::Checked;
