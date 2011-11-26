@@ -42,10 +42,10 @@ void PatchScene::fixScaleFactor()
       view->resetTransform();
       view->scale(3.0, 3.0);
     }
-    else if (scale < 0.3)
+    else if (scale < 0.2)
     {
       view->resetTransform();
-      view->scale(0.3, 0.3);
+      view->scale(0.2, 0.2);
     }
 }
 
@@ -102,7 +102,7 @@ void PatchScene::zoom_in()
 void PatchScene::zoom_out()
 {
     QGraphicsView* const view = views().at(0);
-    if (view->transform().m11() > 0.3)
+    if (view->transform().m11() > 0.2)
         view->scale(0.8, 0.8);
 }
 void PatchScene::zoom_reset()
