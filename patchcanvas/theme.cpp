@@ -51,17 +51,17 @@ Theme::Theme(List id)
 
         // Lines
         line_audio_jack = QColor(63,90,126);
-        line_audio_jack_sel = QColor(63+70,90+70,126+70);
-        line_audio_jack_glow = QColor(0,0,255);
+        line_audio_jack_sel = QColor(63+70,90+90,126+90);
+        line_audio_jack_glow = QColor(100,100,200);
         line_midi_jack = QColor(159,44,42);
-        line_midi_jack_sel = QColor(159+70,44+70,42+70);
-        line_midi_jack_glow = QColor(255,0,0);
+        line_midi_jack_sel = QColor(159+90,44+90,42+90);
+        line_midi_jack_glow = QColor(200,100,100);
         line_midi_a2j = QColor(137,76,43);
-        line_midi_a2j_sel = QColor(137+70,76+70,43+70);
-        line_midi_a2j_glow = QColor(170,85,0);
+        line_midi_a2j_sel = QColor(137+90,76+90,43+90);
+        line_midi_a2j_glow = QColor(166,133,133);
         line_midi_alsa = QColor(93,141,46);
-        line_midi_alsa_sel = QColor(93+70,141+70,46+70);
-        line_midi_alsa_glow = QColor(0,255,0);
+        line_midi_alsa_sel = QColor(93+90,141+90,46+90);
+        line_midi_alsa_glow = QColor(100,200,100);
 
         rubberband_pen = QPen(QColor(206,207,208), 1, Qt::SolidLine);
         rubberband_brush = QColor(76,77,78,100);

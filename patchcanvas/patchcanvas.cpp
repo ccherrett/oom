@@ -178,13 +178,15 @@ void clear()
     for (i=0; i < canvas.connection_list.count(); i++)
         tmp_connection_list.append(canvas.connection_list[i].connection_id);
 
-    for (i=0; i < canvas.animation_list.count(); i++) {
-        if (canvas.animation_list[i].animation->state() == QAbstractAnimation::Running) {
-            canvas.animation_list[i].animation->stop();
+    //for (i=0; i < canvas.animation_list.count(); i++) {
+        //if (canvas.animation_list[i].animation->state() == QAbstractAnimation::Running) {
+            //canvas.animation_list[i].animation->stop();
             //RemoveItemFX(canvas.animation_list[i].item);
-        }
+        //}
         //delete canvas.animation_list[i].animation;
-    }
+    //}
+
+    canvas.animation_list.clear();
 
     for (i=0; i < tmp_connection_list.count(); i++)
         disconnectPorts(tmp_connection_list[i]);
@@ -202,7 +204,6 @@ void clear()
     canvas.group_list.clear();
     canvas.port_list.clear();
     canvas.connection_list.clear();
-    canvas.animation_list.clear();
     canvas.postponed_groups.clear();
 
     canvas.initiated = false;
