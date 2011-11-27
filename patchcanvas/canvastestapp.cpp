@@ -258,6 +258,7 @@ CanvasTestApp::CanvasTestApp(QWidget *parent) :
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing, true);
     ui->graphicsView->setRenderHint(QPainter::TextAntialiasing, true);
+    ui->graphicsView->setRenderHint(QPainter::HighQualityAntialiasing, true);
 
     ui->graphicsView->setViewport(new QGLWidget(ui->graphicsView));
 
