@@ -12,24 +12,23 @@ extern options_t options;
 CanvasBezierLine::CanvasBezierLine(CanvasPort* item1_, CanvasPort* item2_, QGraphicsItem* parent) :
     QGraphicsPathItem(parent, canvas.scene)
 {
-    if (options.fancy_eyecandy)
-        setOpacity(0);
+    //if (options.fancy_eyecandy)
+        //setOpacity(0);
 
     item1 = item1_;
     item2 = item2_;
 
-    glow = 0;
     locked = false;
     line_selected = false;
 
     setBrush(QColor(0,0,0,0));
+    setGraphicsEffect(0);
     updateLinePos();
 }
 
 CanvasBezierLine::~CanvasBezierLine()
 {
-    if (glow)
-        delete glow;
+    setGraphicsEffect(0);
 }
 
 bool CanvasBezierLine::isLocked()
@@ -53,17 +52,9 @@ void CanvasBezierLine::setLineSelected(bool yesno)
     if (options.fancy_eyecandy)
     {
         if (yesno)
-        {
-            glow = new CanvasPortGlow(item1->getPortType(), toGraphicsObject());
-            setGraphicsEffect(glow);
-        }
+            setGraphicsEffect(new CanvasPortGlow(item1->getPortType(), toGraphicsObject()));
         else
-        {
             setGraphicsEffect(0);
-            if (glow)
-                delete glow;
-            glow = 0;
-        }
     }
 
     updateLineGradient(yesno);

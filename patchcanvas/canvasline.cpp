@@ -12,23 +12,22 @@ extern options_t options;
 CanvasLine::CanvasLine(CanvasPort* item1_, CanvasPort* item2_, QGraphicsItem* parent) :
     QGraphicsLineItem(parent, canvas.scene)
 {
-    if (options.fancy_eyecandy)
-        setOpacity(0);
+    //if (options.fancy_eyecandy)
+        //setOpacity(0);
 
     item1 = item1_;
     item2 = item2_;
 
-    glow = 0;
     locked = false;
     line_selected = false;
 
+    setGraphicsEffect(0);
     updateLinePos();
 }
 
 CanvasLine::~CanvasLine()
 {
-    if (glow)
-        delete glow;
+    setGraphicsEffect(0);
 }
 
 bool CanvasLine::isLocked()
@@ -52,17 +51,9 @@ void CanvasLine::setLineSelected(bool yesno)
     if (options.fancy_eyecandy)
     {
         if (yesno)
-        {
-            glow = new CanvasPortGlow(item1->getPortType(), toGraphicsObject());
-            setGraphicsEffect(glow);
-        }
+            setGraphicsEffect(new CanvasPortGlow(item1->getPortType(), toGraphicsObject()));
         else
-        {
             setGraphicsEffect(0);
-            if (glow)
-                delete glow;
-            glow = 0;
-        }
     }
 
     updateLineGradient(yesno);

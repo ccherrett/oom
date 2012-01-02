@@ -178,13 +178,15 @@ void clear()
     for (i=0; i < canvas.connection_list.count(); i++)
         tmp_connection_list.append(canvas.connection_list[i].connection_id);
 
-    for (i=0; i < canvas.animation_list.count(); i++) {
-        if (canvas.animation_list[i].animation->state() == QAbstractAnimation::Running) {
-            canvas.animation_list[i].animation->stop();
-            RemoveItemFX(canvas.animation_list[i].item);
-        }
-        delete canvas.animation_list[i].animation;
-    }
+    //for (i=0; i < canvas.animation_list.count(); i++) {
+        //if (canvas.animation_list[i].animation->state() == QAbstractAnimation::Running) {
+            //canvas.animation_list[i].animation->stop();
+            //RemoveItemFX(canvas.animation_list[i].item);
+        //}
+        //delete canvas.animation_list[i].animation;
+    //}
+
+    canvas.animation_list.clear();
 
     for (i=0; i < tmp_connection_list.count(); i++)
         disconnectPorts(tmp_connection_list[i]);
@@ -202,7 +204,6 @@ void clear()
     canvas.group_list.clear();
     canvas.port_list.clear();
     canvas.connection_list.clear();
-    canvas.animation_list.clear();
     canvas.postponed_groups.clear();
 
     canvas.initiated = false;
@@ -265,8 +266,8 @@ void addGroup(int group_id, QString group_name, SplitOption split, Icon icon)
         else
             group_sbox->setPos(CanvasGetNewGroupPos(true));
 
-        if (!options.auto_hide_groups && options.fancy_eyecandy)
-            ItemFX(group_sbox, true);
+        //if (!options.auto_hide_groups && options.fancy_eyecandy)
+            //ItemFX(group_sbox, true);
 
         canvas.last_z_value += 1;
         group_sbox->setZValue(canvas.last_z_value);
@@ -285,8 +286,8 @@ void addGroup(int group_id, QString group_name, SplitOption split, Icon icon)
         }
     }
 
-    if (!options.auto_hide_groups && options.fancy_eyecandy)
-        ItemFX(group_box, true);
+    //if (!options.auto_hide_groups && options.fancy_eyecandy)
+        //ItemFX(group_box, true);
 
     canvas.last_z_value += 1;
     group_box->setZValue(canvas.last_z_value);
@@ -327,9 +328,9 @@ void removeGroup(int group_id)
                     canvas.settings->setValue(QString("CanvasPositions/%1_s").arg(group_name), SPLIT_YES);
                 }
 
-                if (options.fancy_eyecandy && s_item->isVisible())
-                    ItemFX(s_item, false);
-                else
+                //if (options.fancy_eyecandy && s_item->isVisible())
+                    //ItemFX(s_item, false);
+                //else
                 {
                     item->removeIconFromScene();
                     canvas.scene->removeItem(s_item);
@@ -345,9 +346,9 @@ void removeGroup(int group_id)
                 }
             }
 
-            if (options.fancy_eyecandy && item->isVisible())
-                ItemFX(item, false);
-            else
+            //if (options.fancy_eyecandy && item->isVisible())
+                //ItemFX(item, false);
+            //else
             {
                 item->removeIconFromScene();
                 canvas.scene->removeItem(item);
@@ -636,8 +637,8 @@ void addPort(int group_id, int port_id, QString port_name, PortMode port_mode, P
         return;
     }
 
-    if (options.fancy_eyecandy)
-        ItemFX(port_widget, true);
+    //if (options.fancy_eyecandy)
+        //ItemFX(port_widget, true);
 
     port_dict_t port_dict;
     port_dict.group_id  = group_id;
@@ -664,9 +665,9 @@ void removePort(int port_id)
         {
             CanvasPort* item = canvas.port_list[i].widget;
             ((CanvasBox*)item->parentItem())->removePortFromGroup(port_id);
-            if (options.fancy_eyecandy)
-                ItemFX(item, false, true);
-            else {
+            //if (options.fancy_eyecandy)
+                //ItemFX(item, false, true);
+            /*else*/ {
                 canvas.scene->removeItem(item);
                 delete item;
             }
@@ -753,8 +754,8 @@ void connectPorts(int connection_id, int port_out_id, int port_in_id)
 
     canvas.connection_list.append(connection_dict);
 
-    if (options.fancy_eyecandy)
-        ItemFX(connection_dict.widget, true);
+    //if (options.fancy_eyecandy)
+        //ItemFX(connection_dict.widget, true);
 
     QTimer::singleShot(0, canvas.scene, SIGNAL(update()));
 }
@@ -820,9 +821,9 @@ void disconnectPorts(int connection_id)
     ((CanvasBox*)item1->parentItem())->removeLineFromGroup(connection_id);
     ((CanvasBox*)item2->parentItem())->removeLineFromGroup(connection_id);
 
-    if (options.fancy_eyecandy)
-        ItemFX(line, false, true);
-    else
+    //if (options.fancy_eyecandy)
+        //ItemFX(line, false, true);
+    //else
     {
         canvas.scene->removeItem(line);
         delete line;

@@ -60,8 +60,8 @@ CanvasBox::CanvasBox(int group_id_, QString group_name_, Icon icon, QGraphicsIte
     setFlags(QGraphicsItem::ItemIsMovable|QGraphicsItem::ItemIsSelectable);
 
     // Wait for at least 1 port
-    if (options.auto_hide_groups || options.fancy_eyecandy)
-        setVisible(false);
+    //if (options.auto_hide_groups || options.fancy_eyecandy)
+    //    setVisible(false);
 
     updatePositions();
 }
@@ -124,8 +124,8 @@ CanvasPort* CanvasBox::addPortFromGroup(int port_id, QString port_name, PortMode
 {
     if (port_list_ids.count() == 0)
     {
-        if (options.fancy_eyecandy)
-            ItemFX(this, true);
+        //if (options.fancy_eyecandy)
+            //ItemFX(this, true);
         if (options.auto_hide_groups)
             setVisible(true);
     }
@@ -167,9 +167,9 @@ void CanvasBox::removePortFromGroup(int port_id)
 
     else if (isVisible())
     {
-        if (options.fancy_eyecandy)
-            ItemFX(this, false, false);
-        else if (options.auto_hide_groups)
+        //if (options.fancy_eyecandy)
+            //ItemFX(this, false, false);
+        /*else*/ if (options.auto_hide_groups)
             setVisible(false);
     }
 }

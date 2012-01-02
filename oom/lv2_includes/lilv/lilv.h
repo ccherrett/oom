@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "lv2/lv2plug.in/ns/lv2core/lv2.h"
+#include "lv2.h"
 
 #ifdef LILV_SHARED
 #    ifdef __WIN32__
