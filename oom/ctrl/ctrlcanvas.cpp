@@ -926,7 +926,7 @@ void CtrlCanvas::changeVal(int x1, int x2, int y)
 				Event newEvent = event.clone();
 				newEvent.setVelo(newval);
 				// Indicate no undo, and do not do port controller values and clone parts.
-				audio->msgChangeEvent(event, newEvent, curPart, false, false, false);
+                audio->msgChangeEvent(event, newEvent, curPart, false, false, false);
 				ev->setEvent(newEvent);
 				changed = true;
 			}
@@ -955,7 +955,7 @@ void CtrlCanvas::changeVal(int x1, int x2, int y)
 					newEvent.setB(nval);
 					// Indicate no undo, and do port controller values and clone parts.
 					//audio->msgChangeEvent(event, newEvent, part, false);
-					audio->msgChangeEvent(event, newEvent, curPart, false, true, true);
+                    audio->msgChangeEvent(event, newEvent, curPart, false, true, true);
 					ev->setEvent(newEvent);
 					changed = true;
 				}
@@ -1033,16 +1033,16 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 			ev->setVal(nval);
 			if ((event.dataB() != nval))
 			{
-				Event newEvent = event.clone();
-				newEvent.setB(nval);
+                Event newEvent = event.clone();
+                newEvent.setB(nval);
 				// Added by Tim. p3.3.6
 				//printf("CtrlCanvas::newVal change xx1:%d xx2:%d len:%d\n", xx1, xx2, curPart->lenTick());
 
 				// Indicate no undo, and do port controller values and clone parts.
 				//audio->msgChangeEvent(event, newEvent, ev->part(), false);
-				audio->msgChangeEvent(event, newEvent, curPart, false, true, true);
+                audio->msgChangeEvent(event, newEvent, curPart, false, true, true, false);
 
-				ev->setEvent(newEvent);
+                ev->setEvent(newEvent);
 				song_changed = true;
 			}
 		}
@@ -1053,8 +1053,8 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 			//printf("CtrlCanvas::newVal delete xx1:%d xx2:%d len:%d\n", xx1, xx2, curPart->lenTick());
 
 			// Indicate no undo, and do port controller values and clone parts.
-			//audio->msgDeleteEvent(event, ev->part(), false);
-			audio->msgDeleteEvent(event, curPart, false, true, true);
+            //audio->msgDeleteEvent(event, ev->part(), false);
+            audio->msgDeleteEvent(event, curPart, false, true, true, false);
 
 			song_changed = true;
 		}
@@ -1086,7 +1086,7 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 
 			// Indicate no undo, and do port controller values and clone parts.
 			//audio->msgAddEvent(event, curPart, false);
-			audio->msgAddEvent(event, curPart, false, true, true);
+            audio->msgAddEvent(event, curPart, false, true, true, false);
 
 			song_changed = true;
 		}
@@ -1130,7 +1130,7 @@ void CtrlCanvas::deleteVal(int x1, int x2, int)
 		{
 			// Indicate no undo, and do port controller values and clone parts.
 			//audio->msgDeleteEvent(event, ev->part(), false);
-			audio->msgDeleteEvent(event, curPart, false, true, true);
+            audio->msgDeleteEvent(event, curPart, false, true, true);
 			song_changed = true;
 		}
 	}

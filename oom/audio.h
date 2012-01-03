@@ -238,12 +238,12 @@ public:
     //void msgChangePart(Part* oldPart, Part* newPart, bool u = true);
     void msgChangePart(Part* oldPart, Part* newPart, bool u = true, bool doCtrls = true, bool doClones = false);
     //void msgAddEvent(Event&, Part*, bool u = true);
-    void msgAddEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
+    void msgAddEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false, bool waitRead = true);
     void msgAddEventCheck(Track*, Event&, bool u = true, bool doCtrls = true, bool doClones = false);
     //void msgDeleteEvent(Event&, Part*, bool u = true);
-    void msgDeleteEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
+    void msgDeleteEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false, bool waitRead = true);
     //void msgChangeEvent(Event&, Event&, Part*, bool u = true);
-    void msgChangeEvent(Event&, Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false);
+    void msgChangeEvent(Event&, Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false, bool waitRead = true);
     void msgScanAlsaMidiPorts();
     void msgAddTempo(int tick, int tempo, bool doUndoFlag = true);
     void msgSetTempo(int tick, int tempo, bool doUndoFlag = true);
@@ -256,7 +256,7 @@ public:
     void msgShowInstrumentGui(MidiInstrument*, bool);
     void msgPanic();
     void sendMsg(AudioMsg*);
-    bool sendMessage(AudioMsg* m, bool doUndo);
+    bool sendMessage(AudioMsg* m, bool doUndo, bool waitRead = true);
     void msgRemoveRoute(Route, Route);
     void msgRemoveRoute1(Route, Route);
     void msgRemoveRoutes(Route, Route); // p3.3.55
