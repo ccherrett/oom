@@ -120,6 +120,7 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 	pos[1] = 0;
 	pos[2] = 0;
 	noEvents = false;
+    _redraw_now = false;
 
 	ctrl = &veloList;
 	_controller = &veloCtrl;
@@ -146,6 +147,10 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 
 	connect(editor, SIGNAL(curDrumInstrumentChanged(int)), SLOT(setCurDrumInstrument(int)));
 	updateItems();
+
+    connect(&redraw_timer, SIGNAL(timeout()), this, SLOT(redraw_run()));
+    redraw_timer.setInterval(config.guiRefresh);
+    redraw_timer.start();
 }
 
 //---------------------------------------------------------
@@ -319,6 +324,23 @@ void CtrlCanvas::setController(int num)
 	updateItems();
 }
 
+//---------------------------------------------------------
+//   redraw - TESTING
+//---------------------------------------------------------
+
+void CtrlCanvas::redraw()
+{
+    _redraw_now = true;
+}
+
+void CtrlCanvas::redraw_run()
+{
+    if (_redraw_now)
+    {
+        _redraw_now = false;
+        View::redraw();
+    }
+}
 
 //---------------------------------------------------------
 //   setCurTrackAndPart
@@ -383,7 +405,7 @@ void CtrlCanvas::songChanged(int type)
 		//return;
 	}
 
-	updateItems();
+    updateItems();
 
 }
 
@@ -471,12 +493,12 @@ void CtrlCanvas::updateItems()
 {
 	items.clearDelete();
 
-	if (!editor->parts()->empty())
+    if (!editor->parts()->empty())
 	{
 		MidiPart* cPart = static_cast<MidiPart*>(editor->curCanvasPart());
-		QList<Event> selEvents = editor->getSelectedEvents();
+        QList<Event> selEvents = editor->getSelectedEvents();
 		for (iPart p = editor->parts()->begin(); p != editor->parts()->end(); ++p)
-		{
+        {
 			Event last;
 			CEvent* lastce = 0;
 
@@ -488,16 +510,16 @@ void CtrlCanvas::updateItems()
 			unsigned len = part->lenTick();
 			bool isPart = (cPart && cPart == part);
 			if(multiPartSelectionAction && multiPartSelectionAction->isChecked())
-				isPart = true;
+                isPart = true;
 
 
 			for (iEvent i = el->begin(); i != el->end(); ++i)
-			{
+            {
 				Event e = i->second;
 				// Added by T356. Do not add events which are past the end of the part.
 				if (e.tick() >= len)
 					break;
-				bool sel = (isPart && (!selEvents.isEmpty() && selEvents.contains(e)));//false;//(isPart && editor->isEventSelected(e));
+                bool sel = (isPart && (!selEvents.isEmpty() && selEvents.contains(e)));//false;//(isPart && editor->isEventSelected(e));
 
 				if (_cnum == CTRL_VELOCITY && e.type() == Note)
 				{
@@ -531,7 +553,7 @@ void CtrlCanvas::updateItems()
 	}
 
 
-	redraw();
+    redraw();
 }
 
 //---------------------------------------------------------

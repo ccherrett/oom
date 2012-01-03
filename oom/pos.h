@@ -23,28 +23,25 @@ class QString;
 class Pos
 {
 public:
-
     enum TType
     {
         TICKS, FRAMES
     };
 
-private:
-    TType _type;
-    mutable int sn;
-    mutable unsigned _tick;
-    mutable unsigned _frame;
-
-public:
     Pos();
     Pos(const Pos&);
     Pos(int, int, int);
     Pos(int, int, int, int);
     Pos(unsigned, bool ticks = true);
     Pos(const QString&);
-    void dump(int n = 0) const;
-    void mbt(int*, int*, int*) const;
-    void msf(int*, int*, int*, int*) const;
+
+    static bool isValid(int m, int b, int t);
+    static bool isValid(int, int, int, int);
+
+    bool isValid() const
+    {
+        return true;
+    }
 
     void invalidSn()
     {
@@ -55,7 +52,21 @@ public:
     {
         return _type;
     }
+
     void setType(TType t);
+
+    unsigned tick() const;
+    unsigned frame() const;
+    void setTick(unsigned);
+    void setFrame(unsigned);
+
+    void write(int level, Xml&, const char*) const;
+    void read(Xml& xml, const char*);
+
+    void mbt(int*, int*, int*) const;
+    void msf(int*, int*, int*, int*) const;
+
+    void dump(int n = 0) const;
 
     Pos & operator+=(Pos a);
     Pos & operator+=(int a);
@@ -69,20 +80,11 @@ public:
     friend Pos operator+(Pos a, Pos b);
     friend Pos operator+(Pos a, int b);
 
-    unsigned tick() const;
-    unsigned frame() const;
-    void setTick(unsigned);
-    void setFrame(unsigned);
-
-    void write(int level, Xml&, const char*) const;
-    void read(Xml& xml, const char*);
-
-    bool isValid() const
-    {
-        return true;
-    }
-    static bool isValid(int m, int b, int t);
-    static bool isValid(int, int, int, int);
+private:
+    TType _type;
+    mutable int sn;
+    mutable unsigned _tick;
+    mutable unsigned _frame;
 };
 
 //---------------------------------------------------------
@@ -91,21 +93,10 @@ public:
 
 class PosLen : public Pos
 {
-    mutable unsigned _lenTick;
-    mutable unsigned _lenFrame;
-    mutable int sn;
-
 public:
     PosLen();
     PosLen(const PosLen&);
-    void dump(int n = 0) const;
 
-    void write(int level, Xml&, const char*) const;
-    void read(Xml& xml, const char*);
-    void setLenTick(unsigned);
-    void setLenFrame(unsigned);
-    unsigned lenTick() const;
-    unsigned lenFrame() const;
     Pos end() const;
 
     unsigned endTick() const
@@ -117,6 +108,21 @@ public:
     {
         return end().frame();
     }
+
+    void write(int level, Xml&, const char*) const;
+    void read(Xml& xml, const char*);
+
+    void setLenTick(unsigned);
+    void setLenFrame(unsigned);
+    unsigned lenTick() const;
+    unsigned lenFrame() const;
+
+    void dump(int n = 0) const;
+
+private:
+    mutable unsigned _lenTick;
+    mutable unsigned _lenFrame;
+    mutable int sn;
 };
 
 #endif

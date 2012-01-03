@@ -56,142 +56,27 @@ Xml::Xml(const char* buf)
 }
 
 //---------------------------------------------------------
-//   next
+//   xmlString
 //---------------------------------------------------------
 
-void Xml::next()
+QString Xml::xmlString(const char* s)
 {
-	if (*bufptr == 0)
-	{
-		if (f == 0 || fgets(lbuffer, 512, f) == 0)
-		{
-			c = EOF;
-			return;
-		}
-		bufptr = lbuffer;
-	}
-	c = *bufptr++;
-	if (c == '\n')
-	{
-		++_line;
-		_col = -1;
-	}
-	++_col;
+    return Xml::xmlString(QString(s));
 }
 
 //---------------------------------------------------------
-//   nextc
-//    get next non space character
+//   xmlString
 //---------------------------------------------------------
 
-void Xml::nextc()
+QString Xml::xmlString(const QString& ss)
 {
-	next();
-	while (c == ' ' || c == '\t' || c == '\n')
-		next();
-}
-
-//---------------------------------------------------------
-//   token
-//    read token into _s2
-//---------------------------------------------------------
-
-void Xml::token(int cc)
-{
-	char buffer[512];
-	int i = 0;
-	for (; i < 511;)
-	{
-		if (c == ' ' || c == '\t' || c == cc || c == '\n' || c == EOF)
-			break;
-		buffer[i++] = c;
-		next();
-	}
-	buffer[i] = 0;
-	_s2 = buffer; // deep copy !?
-}
-
-//---------------------------------------------------------
-//   stoken
-//    read string token into _s2
-//---------------------------------------------------------
-
-void Xml::stoken()
-{
-	char buffer[1024 * 4];
-	int i = 0;
-	buffer[i] = c;
-	++i;
-	next();
-	for (; i < 1024 * 4 - 1;)
-	{
-		if (c == '"')
-		{
-			buffer[i++] = c;
-			next();
-			break;
-		}
-		if (c == '&')
-		{
-			char entity[6];
-			int k = 0;
-			for (; k < 6; ++k)
-			{
-				next();
-				if (c == EOF)
-					break;
-				else if (c == ';')
-				{
-					entity[k] = 0;
-					if (strcmp(entity, "quot") == 0)
-						c = '"';
-					else if (strcmp(entity, "amp") == 0)
-						c = '&';
-					else if (strcmp(entity, "lt") == 0)
-						c = '<';
-					else if (strcmp(entity, "gt") == 0)
-						c = '>';
-					else if (strcmp(entity, "apos") == 0)
-						c = '\\';
-					else
-						entity[k] = c;
-					break;
-				}
-				else
-					entity[k] = c;
-			}
-			if (c == EOF || k == 6)
-			{
-				// dump entity
-				int n = 0;
-				buffer[i++] = '&';
-				for (; (i < 511) && (n < k); ++i, ++n)
-					buffer[i] = entity[n];
-			}
-			else
-				buffer[i++] = c;
-		}
-		else if (c != EOF)
-			buffer[i++] = c;
-		if (c == EOF)
-			break;
-		next();
-	}
-	buffer[i] = 0;
-	_s2 = buffer;
-}
-
-//---------------------------------------------------------
-//   strip
-//    strip `"` from string
-//---------------------------------------------------------
-
-QString Xml::strip(const QString& s)
-{
-	int l = s.length();
-	if (l >= 2 && s[0] == '"')
-		return s.mid(1, l - 2);
-	return s;
+    QString s(ss);
+    s.replace('&', "&amp;");
+    s.replace('<', "&lt;");
+    s.replace('>', "&gt;");
+    s.replace('\'', "&apos;");
+    s.replace('"', "&quot;");
+    return s;
 }
 
 //---------------------------------------------------------
@@ -618,12 +503,6 @@ void Xml::etag(int level, const char* format, ...)
 	putc('\n', f);
 }
 
-void Xml::putLevel(int n)
-{
-	for (int i = 0; i < n * 2; ++i)
-		putc(' ', f);
-}
-
 void Xml::intTag(int level, const char* name, int val)
 {
 	putLevel(level);
@@ -749,38 +628,159 @@ void Xml::skip(const QString& etag)
 	}
 }
 
-//---------------------------------------------------------
-//   xmlString
-//---------------------------------------------------------
-
-QString Xml::xmlString(const char* s)
-{
-	return Xml::xmlString(QString(s));
-}
-
-//---------------------------------------------------------
-//   xmlString
-//---------------------------------------------------------
-
-QString Xml::xmlString(const QString& ss)
-{
-	QString s(ss);
-	s.replace('&', "&amp;");
-	s.replace('<', "&lt;");
-	s.replace('>', "&gt;");
-	s.replace('\'', "&apos;");
-	s.replace('"', "&quot;");
-	return s;
-}
-
 void Xml::dump(QString &dump)
 {
-	if (f == 0)
-		return;
-	fpos_t pos;
-	fgetpos(f, &pos);
-	rewind(f);
-	while (fgets(lbuffer, 512, f) != 0)
-		dump.append(lbuffer);
-	fsetpos(f, &pos);
+    if (f == 0)
+        return;
+    fpos_t pos;
+    fgetpos(f, &pos);
+    rewind(f);
+    while (fgets(lbuffer, 512, f) != 0)
+        dump.append(lbuffer);
+    fsetpos(f, &pos);
+}
+
+//---------------------------------------------------------
+//   next
+//---------------------------------------------------------
+
+void Xml::next()
+{
+    if (*bufptr == 0)
+    {
+        if (f == 0 || fgets(lbuffer, 512, f) == 0)
+        {
+            c = EOF;
+            return;
+        }
+        bufptr = lbuffer;
+    }
+    c = *bufptr++;
+    if (c == '\n')
+    {
+        ++_line;
+        _col = -1;
+    }
+    ++_col;
+}
+
+//---------------------------------------------------------
+//   nextc
+//    get next non space character
+//---------------------------------------------------------
+
+void Xml::nextc()
+{
+    next();
+    while (c == ' ' || c == '\t' || c == '\n')
+        next();
+}
+
+//---------------------------------------------------------
+//   token
+//    read token into _s2
+//---------------------------------------------------------
+
+void Xml::token(int cc)
+{
+    char buffer[512];
+    int i = 0;
+    for (; i < 511;)
+    {
+        if (c == ' ' || c == '\t' || c == cc || c == '\n' || c == EOF)
+            break;
+        buffer[i++] = c;
+        next();
+    }
+    buffer[i] = 0;
+    _s2 = buffer; // deep copy !?
+}
+
+//---------------------------------------------------------
+//   stoken
+//    read string token into _s2
+//---------------------------------------------------------
+
+void Xml::stoken()
+{
+    char buffer[1024 * 4];
+    int i = 0;
+    buffer[i] = c;
+    ++i;
+    next();
+    for (; i < 1024 * 4 - 1;)
+    {
+        if (c == '"')
+        {
+            buffer[i++] = c;
+            next();
+            break;
+        }
+        if (c == '&')
+        {
+            char entity[6];
+            int k = 0;
+            for (; k < 6; ++k)
+            {
+                next();
+                if (c == EOF)
+                    break;
+                else if (c == ';')
+                {
+                    entity[k] = 0;
+                    if (strcmp(entity, "quot") == 0)
+                        c = '"';
+                    else if (strcmp(entity, "amp") == 0)
+                        c = '&';
+                    else if (strcmp(entity, "lt") == 0)
+                        c = '<';
+                    else if (strcmp(entity, "gt") == 0)
+                        c = '>';
+                    else if (strcmp(entity, "apos") == 0)
+                        c = '\\';
+                    else
+                        entity[k] = c;
+                    break;
+                }
+                else
+                    entity[k] = c;
+            }
+            if (c == EOF || k == 6)
+            {
+                // dump entity
+                int n = 0;
+                buffer[i++] = '&';
+                for (; (i < 511) && (n < k); ++i, ++n)
+                    buffer[i] = entity[n];
+            }
+            else
+                buffer[i++] = c;
+        }
+        else if (c != EOF)
+            buffer[i++] = c;
+        if (c == EOF)
+            break;
+        next();
+    }
+    buffer[i] = 0;
+    _s2 = buffer;
+}
+
+//---------------------------------------------------------
+//   strip
+//    strip `"` from string
+//---------------------------------------------------------
+
+QString Xml::strip(const QString& s)
+{
+    int l = s.length();
+    if (l >= 2 && s[0] == '"')
+        return s.mid(1, l - 2);
+    return s;
+}
+
+void Xml::putLevel(int n)
+{
+    for (int i = 0; i < n * 2; ++i)
+        putc(' ', f);
 }
