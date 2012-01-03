@@ -120,7 +120,6 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 	pos[1] = 0;
 	pos[2] = 0;
 	noEvents = false;
-    _redraw_now = false;
 
 	ctrl = &veloList;
 	_controller = &veloCtrl;
@@ -147,10 +146,6 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 
 	connect(editor, SIGNAL(curDrumInstrumentChanged(int)), SLOT(setCurDrumInstrument(int)));
 	updateItems();
-
-    connect(&redraw_timer, SIGNAL(timeout()), this, SLOT(redraw_run()));
-    redraw_timer.setInterval(config.guiRefresh);
-    redraw_timer.start();
 }
 
 //---------------------------------------------------------
@@ -322,24 +317,6 @@ void CtrlCanvas::setController(int num)
 {
 	setMidiController(num);
 	updateItems();
-}
-
-//---------------------------------------------------------
-//   redraw - TESTING
-//---------------------------------------------------------
-
-void CtrlCanvas::redraw()
-{
-    _redraw_now = true;
-}
-
-void CtrlCanvas::redraw_run()
-{
-    if (_redraw_now)
-    {
-        _redraw_now = false;
-        View::redraw();
-    }
 }
 
 //---------------------------------------------------------

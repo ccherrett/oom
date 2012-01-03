@@ -134,9 +134,6 @@ class CtrlCanvas : public View
     int line2y;
     bool drawLineMode;
     bool noEvents;
-    bool _redraw_now;
-
-    QTimer redraw_timer;
 
     void viewMousePressEvent(QMouseEvent* event);
     void viewMouseMoveEvent(QMouseEvent*);
@@ -197,13 +194,11 @@ protected:
 private slots:
     void songChanged(int type);
     void setCurDrumInstrument(int);
-    void redraw_run();
 
 public slots:
     void setTool(int t);
     void setPos(int, unsigned, bool adjustScrollbar);
     void setController(int ctrl);
-    void redraw();
 
 signals:
     void followEvent(int);
