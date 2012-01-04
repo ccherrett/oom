@@ -145,7 +145,7 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 	//printf("CtrlCanvas::CtrlCanvas curDrumInstrument:%d\n", curDrumInstrument);
 
 	connect(editor, SIGNAL(curDrumInstrumentChanged(int)), SLOT(setCurDrumInstrument(int)));
-	updateItems();
+    updateItems();
 }
 
 //---------------------------------------------------------

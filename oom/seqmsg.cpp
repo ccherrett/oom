@@ -856,7 +856,7 @@ void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls,
     sendMessage(&msg, doUndoFlag, waitRead);
 }/*}}}*/
 
-void Audio::msgAddEventCheck(Track* track, Event& e, bool doUndoFlag, bool doCtrls, bool doClones)/*{{{*/
+void Audio::msgAddEventCheck(Track* track, Event& e, bool doUndoFlag, bool doCtrls, bool doClones, bool waitRead)/*{{{*/
 {
 	AudioMsg msg;
 	msg.id = SEQM_ADD_EVENT_CHECK;
@@ -864,7 +864,7 @@ void Audio::msgAddEventCheck(Track* track, Event& e, bool doUndoFlag, bool doCtr
 	msg.ev1 = e;
 	msg.a = doCtrls;
 	msg.b = doClones;
-    sendMessage(&msg, doUndoFlag);
+    sendMessage(&msg, doUndoFlag, waitRead);
 }/*}}}*/
 
 //---------------------------------------------------------

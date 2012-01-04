@@ -239,7 +239,7 @@ public:
     void msgChangePart(Part* oldPart, Part* newPart, bool u = true, bool doCtrls = true, bool doClones = false);
     //void msgAddEvent(Event&, Part*, bool u = true);
     void msgAddEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false, bool waitRead = true);
-    void msgAddEventCheck(Track*, Event&, bool u = true, bool doCtrls = true, bool doClones = false);
+    void msgAddEventCheck(Track*, Event&, bool u = true, bool doCtrls = true, bool doClones = false, bool waitRead = true);
     //void msgDeleteEvent(Event&, Part*, bool u = true);
     void msgDeleteEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false, bool waitRead = true);
     //void msgChangeEvent(Event&, Event&, Part*, bool u = true);
