@@ -39,9 +39,14 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
 	m_learning = false;
 	m_learnport = -1;
 
+    lastVolTick = -1;
+    lastVolValue = 0;
+
     updateNow = false;
     updateNowTimer.setInterval(config.guiRefresh);
     connect(&updateNowTimer, SIGNAL(timeout()), this, SLOT(updateSongNow()));
+
+    connect(song, SIGNAL(playChanged(bool)), this, SLOT(songPlayChanged()));
 
 	int filedes[2]; // 0 - reading   1 - writing/*{{{*/
 	if (pipe(filedes) == -1)
@@ -87,6 +92,11 @@ void MidiMonitor::updateSongNow()
         song->update(SC_EVENT_INSERTED);
     }
     updateNowTimer.stop();
+}
+
+void MidiMonitor::songPlayChanged()
+{
+    lastVolTick = -1;
 }
 
 void MidiMonitor::start(int priority)/*{{{*/
@@ -400,13 +410,34 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										if(track && track->recordFlag() && audio->isPlaying())
 										{
 											unsigned tick = song->cpos();
+
+                                            // TESTING
+                                            if (lastVolTick >= 0 && tick > lastVolTick /*&& tick - lastVolTick < 50*/) // smooth lines between 50 ticks difference
+                                            {
+                                                int adding, steps = tick - lastVolTick;
+                                                //qWarning("Smooth ticks attempt %i / %li @ %i", tick, lastVolTick, steps);
+
+                                                for (int i=1; i <= steps; i++) {
+                                                    adding = (mdata.value-lastVolValue)*i/steps;
+                                                    Event event(Controller);
+                                                    event.setTick(lastVolTick+i);
+                                                    event.setA(mdata.controller);
+                                                    event.setB(lastVolValue + adding);
+                                                    audio->msgAddEventCheck(track, event, false, false, false, false);
+                                                    //qWarning("V %i/%i @ %i", lastVolValue + adding, mdata.value, adding);
+                                                }
+                                            }
+
 											Event event(Controller);
 											event.setTick(tick);
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
 											//XXX: Buffer this event instead of adding now
-                                            audio->msgAddEventCheck(track, event, false);
+                                            audio->msgAddEventCheck(track, event, false, true, false, false);
                                             updateLater();
+                                            qWarning("Test tick %i / %li", tick, lastVolTick);
+                                            lastVolTick = tick;
+                                            lastVolValue = mdata.value;
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
@@ -460,7 +491,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 											event.setTick(tick);
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
-                                            audio->msgAddEventCheck(track, event, false);
+                                            audio->msgAddEventCheck(track, event, false, true, false, false);
                                             updateLater();
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
@@ -544,7 +575,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 											event.setTick(tick);
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
-                                            audio->msgAddEventCheck(track, event, false);
+                                            audio->msgAddEventCheck(track, event, false, true, false, false);
                                             updateLater();
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
