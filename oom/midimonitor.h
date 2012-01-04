@@ -8,6 +8,7 @@
 #include <QHash>
 #include <QMultiHash>
 #include <QList>
+#include <QTimer>
 
 class Track;
 class MidiAssignData;
@@ -73,6 +74,9 @@ class MidiMonitor : public Thread
 	bool m_learning;
 	int m_learnport;
 
+    bool updateNow;
+    QTimer updateNowTimer;
+
 	QMultiHash<int, QString> m_inputports;
 	QMultiHash<int, QString> m_outputports;
 	QHash<QString, MidiAssignData*> m_assignments; //list of managed assignments
@@ -85,6 +89,7 @@ class MidiMonitor : public Thread
 	virtual void processMsg1(const void*);
 	void addMonitoredTrack(Track*);
 	void deleteMonitoredTrack(Track*);
+    void updateLater();
 
 public:
 	MidiMonitor(const char* name);
@@ -137,8 +142,12 @@ public:
 	bool isManagedController(int);
 
 	void populateList();
+
 signals:
 	void playMidiEvent(MidiPlayEvent*);
+
+private slots:
+    void updateSongNow();
 };
 
 extern MidiMonitor *midiMonitor;

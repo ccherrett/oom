@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "midimonitor.h"
 #include "ccinfo.h"
+#include "gconfig.h"
 
 MidiMonitor* midiMonitor;
 
@@ -37,6 +38,10 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
 	m_editing = true;
 	m_learning = false;
 	m_learnport = -1;
+
+    updateNow = false;
+    updateNowTimer.setInterval(config.guiRefresh);
+    connect(&updateNowTimer, SIGNAL(timeout()), this, SLOT(updateSongNow()));
 
 	int filedes[2]; // 0 - reading   1 - writing/*{{{*/
 	if (pipe(filedes) == -1)
@@ -63,6 +68,25 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
 MidiMonitor::~MidiMonitor()
 {
 	//flush all our list and delete anything that will hang the program
+}
+
+void MidiMonitor::updateLater()
+{
+    if (updateNowTimer.isActive() == false)
+    {
+        updateNow = true;
+        updateNowTimer.start();
+    }
+}
+
+void MidiMonitor::updateSongNow()
+{
+    if (updateNow)
+    {
+        updateNow = false;
+        song->update(SC_EVENT_INSERTED);
+    }
+    updateNowTimer.stop();
 }
 
 void MidiMonitor::start(int priority)/*{{{*/
@@ -381,7 +405,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
 											//XXX: Buffer this event instead of adding now
-											audio->msgAddEventCheck(track, event);
+                                            audio->msgAddEventCheck(track, event, false);
+                                            updateLater();
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
@@ -435,7 +460,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 											event.setTick(tick);
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
-											audio->msgAddEventCheck(track, event);
+                                            audio->msgAddEventCheck(track, event, false);
+                                            updateLater();
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
@@ -518,7 +544,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 											event.setTick(tick);
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
-											audio->msgAddEventCheck(track, event);
+                                            audio->msgAddEventCheck(track, event, false);
+                                            updateLater();
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
