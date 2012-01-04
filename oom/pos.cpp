@@ -94,6 +94,20 @@ Pos::Pos(int min, int sec, int frame, int subframe)
 }
 
 //---------------------------------------------------------
+//   isValid
+//---------------------------------------------------------
+
+bool Pos::isValid(int, int, int)
+{
+    return true;
+}
+
+bool Pos::isValid(int, int, int, int)
+{
+    return true;
+}
+
+//---------------------------------------------------------
 //   setType
 //---------------------------------------------------------
 
@@ -113,97 +127,6 @@ void Pos::setType(TType t)
 		_tick = tempomap.frame2tick(_frame, _tick, &sn);
 	}
 	_type = t;
-}
-
-//---------------------------------------------------------
-//   operator+=
-//---------------------------------------------------------
-
-Pos& Pos::operator+=(Pos a)
-{
-	switch (_type)
-	{
-		case FRAMES:
-			_frame += a.frame();
-			break;
-		case TICKS:
-			_tick += a.tick();
-			break;
-	}
-	sn = -1; // invalidate cached values
-	return *this;
-}
-
-//---------------------------------------------------------
-//   operator+=
-//---------------------------------------------------------
-
-Pos& Pos::operator+=(int a)
-{
-	switch (_type)
-	{
-		case FRAMES:
-			_frame += a;
-			break;
-		case TICKS:
-			_tick += a;
-			break;
-	}
-	sn = -1; // invalidate cached values
-	return *this;
-}
-
-Pos operator+(Pos a, int b)
-{
-	Pos c;
-	c.setType(a.type());
-	return c += b;
-}
-
-Pos operator+(Pos a, Pos b)
-{
-	Pos c = a;
-	return c += b;
-}
-
-bool Pos::operator>=(const Pos& s) const
-{
-	if (_type == FRAMES)
-		return _frame >= s.frame();
-	else
-		return _tick >= s.tick();
-}
-
-bool Pos::operator>(const Pos& s) const
-{
-	if (_type == FRAMES)
-		return _frame > s.frame();
-	else
-		return _tick > s.tick();
-}
-
-bool Pos::operator<(const Pos& s) const
-{
-	if (_type == FRAMES)
-		return _frame < s.frame();
-	else
-		return _tick < s.tick();
-}
-
-bool Pos::operator<=(const Pos& s) const
-{
-	if (_type == FRAMES)
-		return _frame <= s.frame();
-	else
-		return _tick <= s.tick();
-}
-
-bool Pos::operator==(const Pos& s) const
-{
-	if (_type == FRAMES)
-		return _frame == s.frame();
-	else
-		return _tick == s.tick();
 }
 
 //---------------------------------------------------------
@@ -305,7 +228,7 @@ void Pos::read(Xml& xml, const char* name)
 					_type = FRAMES;
 				}
 				else if (tag == "sample")
-				{ // obsolete
+                { // obsolete
 					_frame = xml.s2().toInt();
 					_type = FRAMES;
 				}
@@ -320,6 +243,149 @@ void Pos::read(Xml& xml, const char* name)
 				break;
 		}
 	}
+}
+
+//---------------------------------------------------------
+//   mbt
+//---------------------------------------------------------
+
+void Pos::mbt(int* bar, int* beat, int* tk) const
+{
+    AL::sigmap.tickValues(tick(), bar, beat, (unsigned*) tk);
+}
+
+//---------------------------------------------------------
+//   msf
+//---------------------------------------------------------
+
+void Pos::msf(int* min, int* sec, int* fr, int* subFrame) const
+{
+    double time = double(frame()) / double(sampleRate);
+    *min = int(time) / 60;
+    *sec = int(time) % 60;
+    double rest = time - (*min * 60 + *sec);
+    switch (mtcType)
+    {
+        case 0: // 24 frames sec
+            rest *= 24;
+            break;
+        case 1: // 25
+            rest *= 25;
+            break;
+        case 2: // 30 drop frame
+            rest *= 30;
+            break;
+        case 3: // 30 non drop frame
+            rest *= 30;
+            break;
+    }
+    *fr = int(rest);
+    *subFrame = int((rest - *fr)*100);
+}
+
+//---------------------------------------------------------
+//   dump
+//---------------------------------------------------------
+
+void Pos::dump(int /*n*/) const
+{
+    printf("Pos(%s, sn=%d, ", type() == FRAMES ? "Frames" : "Ticks", sn);
+    switch (type())
+    {
+        case FRAMES:
+            printf("samples=%d)", _frame);
+            break;
+        case TICKS:
+            printf("ticks=%d)", _tick);
+            break;
+    }
+}
+
+//---------------------------------------------------------
+//   operators
+//---------------------------------------------------------
+
+Pos& Pos::operator+=(Pos a)
+{
+    switch (_type)
+    {
+        case FRAMES:
+            _frame += a.frame();
+            break;
+        case TICKS:
+            _tick += a.tick();
+            break;
+    }
+    sn = -1; // invalidate cached values
+    return *this;
+}
+
+Pos& Pos::operator+=(int a)
+{
+    switch (_type)
+    {
+        case FRAMES:
+            _frame += a;
+            break;
+        case TICKS:
+            _tick += a;
+            break;
+    }
+    sn = -1; // invalidate cached values
+    return *this;
+}
+
+Pos operator+(Pos a, int b)
+{
+    Pos c;
+    c.setType(a.type());
+    return c += b;
+}
+
+Pos operator+(Pos a, Pos b)
+{
+    Pos c = a;
+    return c += b;
+}
+
+bool Pos::operator>=(const Pos& s) const
+{
+    if (_type == FRAMES)
+        return _frame >= s.frame();
+    else
+        return _tick >= s.tick();
+}
+
+bool Pos::operator>(const Pos& s) const
+{
+    if (_type == FRAMES)
+        return _frame > s.frame();
+    else
+        return _tick > s.tick();
+}
+
+bool Pos::operator<(const Pos& s) const
+{
+    if (_type == FRAMES)
+        return _frame < s.frame();
+    else
+        return _tick < s.tick();
+}
+
+bool Pos::operator<=(const Pos& s) const
+{
+    if (_type == FRAMES)
+        return _frame <= s.frame();
+    else
+        return _tick <= s.tick();
+}
+
+bool Pos::operator==(const Pos& s) const
+{
+    if (_type == FRAMES)
+        return _frame == s.frame();
+    else
+        return _tick == s.tick();
 }
 
 //---------------------------------------------------------
@@ -342,37 +408,25 @@ PosLen::PosLen(const PosLen& p)
 }
 
 //---------------------------------------------------------
-//   dump
+//   end
 //---------------------------------------------------------
 
-void PosLen::dump(int n) const
+Pos PosLen::end() const
 {
-	Pos::dump(n);
-	printf("  Len(");
-	switch (type())
-	{
-		case FRAMES:
-			printf("samples=%d)\n", _lenFrame);
-			break;
-		case TICKS:
-			printf("ticks=%d)\n", _lenTick);
-			break;
-	}
+    Pos pos(*this);
+    pos.invalidSn();
+    switch (type())
+    {
+        case FRAMES:
+            pos.setFrame(pos.frame() + _lenFrame);
+            break;
+        case TICKS:
+            pos.setTick(pos.tick() + _lenTick);
+            break;
+    }
+    return pos;
 }
 
-void Pos::dump(int /*n*/) const
-{
-	printf("Pos(%s, sn=%d, ", type() == FRAMES ? "Frames" : "Ticks", sn);
-	switch (type())
-	{
-		case FRAMES:
-			printf("samples=%d)", _frame);
-			break;
-		case TICKS:
-			printf("ticks=%d)", _tick);
-			break;
-	}
-}
 
 //---------------------------------------------------------
 //   write
@@ -380,18 +434,18 @@ void Pos::dump(int /*n*/) const
 
 void PosLen::write(int level, Xml& xml, const char* name) const
 {
-	xml.nput(level++, "<%s ", name);
+    xml.nput(level++, "<%s ", name);
 
-	switch (type())
-	{
-		case TICKS:
-			xml.nput("tick=\"%d\" len=\"%d\"", tick(), _lenTick);
-			break;
-		case FRAMES:
-			xml.nput("sample=\"%d\" len=\"%d\"", frame(), _lenFrame);
-			break;
-	}
-	xml.put(" />", name);
+    switch (type())
+    {
+        case TICKS:
+            xml.nput("tick=\"%d\" len=\"%d\"", tick(), _lenTick);
+            break;
+        case FRAMES:
+            xml.nput("sample=\"%d\" len=\"%d\"", frame(), _lenFrame);
+            break;
+    }
+    xml.put(" />", name);
 }
 
 //---------------------------------------------------------
@@ -400,56 +454,56 @@ void PosLen::write(int level, Xml& xml, const char* name) const
 
 void PosLen::read(Xml& xml, const char* name)
 {
-	sn = -1;
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return;
+    sn = -1;
+    for (;;)
+    {
+        Xml::Token token = xml.parse();
+        const QString& tag = xml.s1();
+        switch (token)
+        {
+            case Xml::Error:
+            case Xml::End:
+                return;
 
-			case Xml::TagStart:
-				xml.unknown(name);
-				break;
+            case Xml::TagStart:
+                xml.unknown(name);
+                break;
 
-			case Xml::Attribut:
-				if (tag == "tick")
-				{
-					setType(TICKS);
-					setTick(xml.s2().toInt());
-				}
-				else if (tag == "sample")
-				{
-					setType(FRAMES);
-					setFrame(xml.s2().toInt());
-				}
-				else if (tag == "len")
-				{
-					int n = xml.s2().toInt();
-					switch (type())
-					{
-						case TICKS:
-							setLenTick(n);
-							break;
-						case FRAMES:
-							setLenFrame(n);
-							break;
-					}
-				}
-				else
-					xml.unknown(name);
-				break;
+            case Xml::Attribut:
+                if (tag == "tick")
+                {
+                    setType(TICKS);
+                    setTick(xml.s2().toInt());
+                }
+                else if (tag == "sample")
+                {
+                    setType(FRAMES);
+                    setFrame(xml.s2().toInt());
+                }
+                else if (tag == "len")
+                {
+                    int n = xml.s2().toInt();
+                    switch (type())
+                    {
+                        case TICKS:
+                            setLenTick(n);
+                            break;
+                        case FRAMES:
+                            setLenFrame(n);
+                            break;
+                    }
+                }
+                else
+                    xml.unknown(name);
+                break;
 
-			case Xml::TagEnd:
-				if (tag == name)
-					return;
-			default:
-				break;
-		}
-	}
+            case Xml::TagEnd:
+                if (tag == name)
+                    return;
+            default:
+                break;
+        }
+    }
 }
 
 //---------------------------------------------------------
@@ -499,79 +553,20 @@ unsigned PosLen::lenFrame() const
 }
 
 //---------------------------------------------------------
-//   end
+//   dump
 //---------------------------------------------------------
 
-Pos PosLen::end() const
+void PosLen::dump(int n) const
 {
-	Pos pos(*this);
-	pos.invalidSn();
-	switch (type())
-	{
-		case FRAMES:
-			pos.setFrame(pos.frame() + _lenFrame);
-			break;
-		case TICKS:
-			pos.setTick(pos.tick() + _lenTick);
-			break;
-	}
-	return pos;
+    Pos::dump(n);
+    printf("  Len(");
+    switch (type())
+    {
+        case FRAMES:
+            printf("samples=%d)\n", _lenFrame);
+            break;
+        case TICKS:
+            printf("ticks=%d)\n", _lenTick);
+            break;
+    }
 }
-
-
-//---------------------------------------------------------
-//   mbt
-//---------------------------------------------------------
-
-void Pos::mbt(int* bar, int* beat, int* tk) const
-{
-	AL::sigmap.tickValues(tick(), bar, beat, (unsigned*) tk);
-}
-
-//---------------------------------------------------------
-//   msf
-//---------------------------------------------------------
-
-void Pos::msf(int* min, int* sec, int* fr, int* subFrame) const
-{
-	double time = double(frame()) / double(sampleRate);
-	*min = int(time) / 60;
-	*sec = int(time) % 60;
-	double rest = time - (*min * 60 + *sec);
-	switch (mtcType)
-	{
-		case 0: // 24 frames sec
-			rest *= 24;
-			break;
-		case 1: // 25
-			rest *= 25;
-			break;
-		case 2: // 30 drop frame
-			rest *= 30;
-			break;
-		case 3: // 30 non drop frame
-			rest *= 30;
-			break;
-	}
-	*fr = int(rest);
-	*subFrame = int((rest - *fr)*100);
-}
-
-//---------------------------------------------------------
-//   isValid
-//---------------------------------------------------------
-
-bool Pos::isValid(int, int, int)
-{
-	return true;
-}
-
-//---------------------------------------------------------
-//   isValid
-//---------------------------------------------------------
-
-bool Pos::isValid(int, int, int, int)
-{
-	return true;
-}
-

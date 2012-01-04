@@ -24,34 +24,18 @@ class QWidget;
 
 class Xml
 {
-    FILE* f;
-    int _line;
-    int _col;
-    QString _s1, _s2, _tag;
-    int level;
-    bool inTag;
-    bool inComment;
-    int _minorVersion;
-    int _majorVersion;
-
-    int c; // current char
-    char lbuffer[512];
-    const char* bufptr;
-
-    void next();
-    void nextc();
-    void token(int);
-    void stoken();
-    QString strip(const QString& s);
-    void putLevel(int n);
-
 public:
-
     enum Token
     {
         Error, TagStart, TagEnd, Flag,
         Proc, Text, Attribut, End
     };
+
+    Xml(FILE*);
+    Xml(const char*);
+
+    static QString xmlString(const char*);
+    static QString xmlString(const QString&);
 
     int majorVersion() const
     {
@@ -68,26 +52,18 @@ public:
         _minorVersion = min;
         _majorVersion = maj;
     }
-    Xml(FILE*);
-    Xml(const char*);
-    Token parse();
-    QString parse(const QString&);
-    QString parse1();
-    int parseInt();
-    unsigned int parseUInt();
-    float parseFloat();
-    double parseDouble();
-    void unknown(const char*);
 
+    // current line
     int line() const
     {
         return _line;
-    } // current line
+    }
 
+    // current col
     int col() const
     {
         return _col;
-    } // current col
+    }
 
     const QString& s1()
     {
@@ -98,7 +74,15 @@ public:
     {
         return _s2;
     }
-    void dump(QString &dump);
+
+    Token parse();
+    QString parse(const QString&);
+    QString parse1();
+    int parseInt();
+    unsigned int parseUInt();
+    float parseFloat();
+    double parseDouble();
+    void unknown(const char*);
 
     void header();
     void put(const char* format, ...);
@@ -116,12 +100,34 @@ public:
     void colorTag(int level, const char* name, const QColor& color);
     void geometryTag(int level, const char* name, const QWidget* g);
     void qrectTag(int level, const char* name, const QRect& r);
-    static QString xmlString(const QString&);
-    static QString xmlString(const char*);
 
     void skip(const QString& tag);
+    void dump(QString &dump);
+
+private:
+    void next();
+    void nextc();
+    void token(int);
+    void stoken();
+    QString strip(const QString& s);
+    void putLevel(int n);
+
+    FILE* f;
+    int _line;
+    int _col;
+    QString _s1, _s2, _tag;
+    int level;
+    bool inTag;
+    bool inComment;
+    int _minorVersion;
+    int _majorVersion;
+
+    int c; // current char
+    char lbuffer[512];
+    const char* bufptr;
 };
 
 extern QRect readGeometry(Xml&, const QString&);
+
 #endif
 

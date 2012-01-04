@@ -10,6 +10,7 @@
 
 #include <list>
 
+#include <QTimer>
 
 #include "view.h"
 #include "toolbars/tools.h"

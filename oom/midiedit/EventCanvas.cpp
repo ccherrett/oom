@@ -48,8 +48,8 @@ EventCanvas::EventCanvas(AbstractMidiEditor* pr, QWidget* parent, int sx, int sy
 	m_showcomments = false;
 	curVelo = 70;
 
-	//setBg(QColor(226, 229, 229));//this was the old ligh color we are moving to dark now
-	setBg(QColor(63,63,63));
+    //setBg(QColor(226, 229, 229));//this was the old ligh color we are moving to dark now
+    setBg(QColor(63,63,63));
 	setAcceptDrops(true);
 	setFocusPolicy(Qt::StrongFocus);
 	setMouseTracking(true);
@@ -59,7 +59,7 @@ EventCanvas::EventCanvas(AbstractMidiEditor* pr, QWidget* parent, int sx, int sy
 	bool pl = tconfig().get_property("PerformerEdit", "partLines", true).toBool();
 	_drawPartLines = true;
 	_drawPartEndLine = pl;
-	//setDrawPartLines(pl);
+    //setDrawPartLines(pl);
 }
 
 //---------------------------------------------------------
@@ -85,7 +85,7 @@ QString EventCanvas::getCaption() const
 void EventCanvas::leaveEvent(QEvent*)
 {
 	emit pitchChanged(-1);
-	emit timeChanged(MAXINT);
+    emit timeChanged(MAXINT);
 }
 
 //---------------------------------------------------------
@@ -94,7 +94,7 @@ void EventCanvas::leaveEvent(QEvent*)
 
 void EventCanvas::enterEvent(QEvent*)
 {
-	emit enterCanvas();
+    emit enterCanvas();
 }
 
 //---------------------------------------------------------
@@ -139,7 +139,7 @@ void EventCanvas::mouseMove(QMouseEvent* event)
 {
 	emit pitchChanged(y2pitch(event->pos().y()));
 	int x = event->pos().x();
-	emit timeChanged(editor->rasterVal(x));
+    emit timeChanged(editor->rasterVal(x));
 }
 
 //---------------------------------------------------------
@@ -148,7 +148,7 @@ void EventCanvas::mouseMove(QMouseEvent* event)
 
 void EventCanvas::updateSelection()
 {
-	song->update(SC_SELECTION);
+    song->update(SC_SELECTION);
 }
 
 //---------------------------------------------------------

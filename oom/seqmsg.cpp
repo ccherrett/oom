@@ -39,7 +39,7 @@ void Audio::sendMsg(AudioMsg* m)
 		//DEBUG:
 		msg = m;
 		// wait for next audio "process" call to finish operation
-		int no = -1;
+        int no = -1;
 		int rv = read(fromThreadFdr, &no, sizeof (int));
 		if (rv != sizeof (int))
 			perror("Audio: read pipe failed");
@@ -63,13 +63,19 @@ void Audio::sendMsg(AudioMsg* m)
 //    wait until request is processed
 //---------------------------------------------------------
 
-bool Audio::sendMessage(AudioMsg* m, bool doUndo)
+bool Audio::sendMessage(AudioMsg* m, bool doUndo, bool waitRead)
 {
 	if (doUndo)
 		song->startUndo();
-	sendMsg(m);
+
+    if (waitRead)
+        sendMsg(m);
+    else
+        processMsg(m);
+
 	if (doUndo)
 		song->endUndo(0); // song->endMsgCmd();
+
 	return false;
 }
 
@@ -839,7 +845,7 @@ void Audio::msgChangePart(Part* oldPart, Part* newPart, bool doUndoFlag, bool do
 
 //void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag)
 
-void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls, bool doClones)/*{{{*/
+void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls, bool doClones, bool waitRead)/*{{{*/
 {
 	AudioMsg msg;
 	msg.id = SEQM_ADD_EVENT;
@@ -847,7 +853,7 @@ void Audio::msgAddEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls,
 	msg.p2 = part;
 	msg.a = doCtrls;
 	msg.b = doClones;
-	sendMessage(&msg, doUndoFlag);
+    sendMessage(&msg, doUndoFlag, waitRead);
 }/*}}}*/
 
 void Audio::msgAddEventCheck(Track* track, Event& e, bool doUndoFlag, bool doCtrls, bool doClones)/*{{{*/
@@ -858,7 +864,7 @@ void Audio::msgAddEventCheck(Track* track, Event& e, bool doUndoFlag, bool doCtr
 	msg.ev1 = e;
 	msg.a = doCtrls;
 	msg.b = doClones;
-	sendMessage(&msg, doUndoFlag);
+    sendMessage(&msg, doUndoFlag);
 }/*}}}*/
 
 //---------------------------------------------------------
@@ -867,7 +873,7 @@ void Audio::msgAddEventCheck(Track* track, Event& e, bool doUndoFlag, bool doCtr
 
 //void Audio::msgDeleteEvent(Event& event, Part* part, bool doUndoFlag)
 
-void Audio::msgDeleteEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls, bool doClones)
+void Audio::msgDeleteEvent(Event& event, Part* part, bool doUndoFlag, bool doCtrls, bool doClones, bool waitRead)
 {
 	AudioMsg msg;
 	msg.id = SEQM_REMOVE_EVENT;
@@ -875,7 +881,7 @@ void Audio::msgDeleteEvent(Event& event, Part* part, bool doUndoFlag, bool doCtr
 	msg.p2 = part;
 	msg.a = doCtrls;
 	msg.b = doClones;
-	sendMessage(&msg, doUndoFlag);
+    sendMessage(&msg, doUndoFlag, waitRead);
 }
 
 //---------------------------------------------------------
@@ -884,7 +890,7 @@ void Audio::msgDeleteEvent(Event& event, Part* part, bool doUndoFlag, bool doCtr
 
 //void Audio::msgChangeEvent(Event& oe, Event& ne, Part* part, bool doUndoFlag)
 
-void Audio::msgChangeEvent(Event& oe, Event& ne, Part* part, bool doUndoFlag, bool doCtrls, bool doClones)
+void Audio::msgChangeEvent(Event& oe, Event& ne, Part* part, bool doUndoFlag, bool doCtrls, bool doClones, bool waitRead)
 {
 	AudioMsg msg;
 	msg.id = SEQM_CHANGE_EVENT;
@@ -893,7 +899,7 @@ void Audio::msgChangeEvent(Event& oe, Event& ne, Part* part, bool doUndoFlag, bo
 	msg.p3 = part;
 	msg.a = doCtrls;
 	msg.b = doClones;
-	sendMessage(&msg, doUndoFlag);
+    sendMessage(&msg, doUndoFlag, waitRead);
 }
 
 //---------------------------------------------------------

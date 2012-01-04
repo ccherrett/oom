@@ -147,7 +147,7 @@ void OOMClientThread::run()
 				emit reloadRoutes();//oom->connectDefaultSongPorts();
 			break;
 			case SAVE_SONG:
-				rv.append("Songe Save Called\n");
+                rv.append("Song Save Called\n");
 				emit saveSong();
 			break;
 			case SAVE_SONG_AS:
