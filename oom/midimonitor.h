@@ -77,9 +77,6 @@ class MidiMonitor : public Thread
     bool updateNow;
     QTimer updateNowTimer;
 
-    long lastVolTick;
-    int lastVolValue;
-
 	QMultiHash<int, QString> m_inputports;
 	QMultiHash<int, QString> m_outputports;
 	QHash<QString, MidiAssignData*> m_assignments; //list of managed assignments
@@ -150,7 +147,6 @@ signals:
 	void playMidiEvent(MidiPlayEvent*);
 
 private slots:
-    void songPlayChanged();
     void updateSongNow();
 };
 
