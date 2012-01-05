@@ -7,6 +7,8 @@
 
 #include "gcombo.h"
 
+#include <QWheelEvent>
+
 //---------------------------------------------------------
 //   GridCombo 
 //---------------------------------------------------------
@@ -29,4 +31,9 @@ void GridCombo::setCurrentIndex(int i)
 		setModelColumn(c);
 	if (currentIndex() != r)
 		QComboBox::setCurrentIndex(r);
+}
+
+void GridCombo::wheelEvent(QWheelEvent* e)
+{
+    e->accept();
 }

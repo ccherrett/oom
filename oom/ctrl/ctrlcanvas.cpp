@@ -823,17 +823,17 @@ void CtrlCanvas::viewMouseMoveEvent(QMouseEvent* event)
 			lasso.setRect(start.x(), start.y(), dist.x(), dist.y());
 			redraw();
 			break;
-		case DRAG_RESIZE:
+        case DRAG_RESIZE:
 			changeVal(start.x(), pos.x(), pos.y());
 			start = pos;
 			break;
 
-		case DRAG_NEW:
+        case DRAG_NEW:
 			newVal(start.x(), pos.x(), pos.y());
 			start = pos;
 			break;
 
-		case DRAG_DELETE:
+        case DRAG_DELETE:
 			deleteVal(start.x(), pos.x(), pos.y());
 			start = pos;
 			break;
@@ -978,14 +978,14 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 	int xx1 = editor->rasterVal1(x1);
 	int xx2 = editor->rasterVal2(x2);
 	int newval = computeVal(_controller, y, height());
-	int type = _controller->num();
+    int type = _controller->num();
 
 	bool found = false;
 	bool song_changed = false;
 
 	int lastpv = CTRL_VAL_UNKNOWN;
 	if (ctrl)
-		lastpv = ctrl->hwVal();
+        lastpv = ctrl->hwVal();
 
 	for (ciCEvent i = items.begin(); i != items.end(); ++i)
 	{
@@ -997,34 +997,34 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 		Event event = ev->event();
 		if (event.empty())
 			continue;
-		int ax = event.tick() + partTick;
+        int ax = event.tick() + partTick;
 
-		if (ax < xx1)
-			continue;
-		if (ax >= xx2)
-			break;
+        if (ax < xx1)
+            continue;
+        if (ax >= xx2)
+            break;
 
 		// Added by T356. Do not add events which are past the end of the part.
 		//if(event.tick() >= curPart->lenTick())
 		//  break;
 
-		int nval = newval;
-		if (type == CTRL_PROGRAM)
-		{
-			if (event.dataB() == CTRL_VAL_UNKNOWN)
-			{
-				if (lastpv == CTRL_VAL_UNKNOWN)
-				{
-					--nval;
-					if (song->mtype() == MT_GM)
-						nval |= 0xffff00;
-				}
-				else
-					nval = (lastpv & 0xffff00) | (nval - 1);
-			}
-			else
-				nval = (event.dataB() & 0xffff00) | (nval - 1);
-		}
+        int nval = newval;
+        if (type == CTRL_PROGRAM)
+        {
+            if (event.dataB() == CTRL_VAL_UNKNOWN)
+            {
+                if (lastpv == CTRL_VAL_UNKNOWN)
+                {
+                    --nval;
+                    if (song->mtype() == MT_GM)
+                        nval |= 0xffff00;
+                }
+                else
+                    nval = (lastpv & 0xffff00) | (nval - 1);
+            }
+            else
+                nval = (event.dataB() & 0xffff00) | (nval - 1);
+        }
 
 		if (ax == xx1)
 		{
@@ -1046,7 +1046,7 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 				song_changed = true;
 			}
 		}
-		else if (ax < xx2)
+        else if (ax < xx2)
 		{
 			// delete event
 			// Added by Tim. p3.3.6
@@ -1057,7 +1057,7 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
             audio->msgDeleteEvent(event, curPart, false, true, true, false);
 
 			song_changed = true;
-		}
+        }
 	}
 	if (!found)
 	{
