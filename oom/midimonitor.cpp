@@ -134,7 +134,7 @@ void MidiMonitor::deletePreviousMidiInEvents(MidiTrack* track, int controller, u
 {
     LastMidiInMessage* lastMsg = getLastMidiInMessage(track->outPort(), track->outChannel(), controller);
 
-    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 1536)
+    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
     {
         PartList* pl = track->parts();
 
