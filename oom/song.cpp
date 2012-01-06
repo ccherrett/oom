@@ -2478,7 +2478,7 @@ void Song::processMonitorMessage(const void* m)
 					}
 				}
 				else
-				{*/
+                {*/
 					MidiPlayEvent ev(0, mdata->port, mdata->channel, ME_CONTROLLER, mdata->controller, mdata->value, mdata->track);
 					ev.setEventSource(MonitorSource);
 					midiPorts[ev.port()].sendEvent(ev);

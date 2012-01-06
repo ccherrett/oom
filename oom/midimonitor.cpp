@@ -39,6 +39,11 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
 	m_learning = false;
 	m_learnport = -1;
 
+    lastVolTick = 0;
+    lastVolValue = -1;
+
+    connect(song, SIGNAL(playChanged(bool)), this, SLOT(songPlayChanged()));
+
     updateNow = false;
     updateNowTimer.setInterval(config.guiRefresh);
     connect(&updateNowTimer, SIGNAL(timeout()), this, SLOT(updateSongNow()));
@@ -87,6 +92,12 @@ void MidiMonitor::updateSongNow()
         song->update(SC_EVENT_INSERTED);
     }
     updateNowTimer.stop();
+}
+
+void MidiMonitor::songPlayChanged()
+{
+    lastVolTick = 0;
+    lastVolValue = -1;
 }
 
 void MidiMonitor::start(int priority)/*{{{*/
@@ -397,9 +408,63 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										mdata.channel = track->outChannel();
 										mdata.controller = ctl;
 										mdata.value = msg->mevent.dataB();
+
 										if(track && track->recordFlag() && audio->isPlaying())
 										{
-											unsigned tick = song->cpos();
+                                            unsigned lastTick, tick = song->cpos();
+
+                                            // TODO - find lastTick for this event channel/port
+                                            lastTick = lastVolTick;
+
+                                            // Delete old events if appropriate
+                                            if (lastTick > 0 && lastTick < tick)
+                                            {
+                                                PartList* pl = track->parts();
+
+                                                if (pl && pl->empty() == false)
+                                                {
+                                                    Part* part = pl->findAtTick(lastTick);
+
+                                                    if (part)
+                                                    {
+                                                        QList<unsigned> ticksToReplace;
+                                                        const EventList* el = part->cevents();
+
+                                                        for (ciEvent ce = el->begin(); ce != el->end(); ++ce)
+                                                        {
+                                                            const Event& ev = ce->second;
+
+                                                            if (ev.type() == Controller)
+                                                                ticksToReplace.append(ev.tick());
+                                                        }
+
+                                                        unsigned iTick, lenTick = part->lenTick();
+
+                                                        for (int i=0; i < ticksToReplace.count(); i++)
+                                                        {
+                                                            iTick = ticksToReplace.at(i);
+
+                                                            if (iTick < lastTick)
+                                                                continue;
+                                                            if (iTick > tick)
+                                                                continue;
+                                                            if (iTick > lenTick)
+                                                                continue;
+
+                                                            Event eventN(Controller);
+                                                            eventN.setTick(iTick);
+                                                            eventN.setA(mdata.controller);
+                                                            eventN.setB(lastVolValue);
+                                                            audio->msgAddEventCheck(track, eventN, false, true, false, false);
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            // TODO - set last tick and value for this channel/port
+                                            lastVolTick = tick;
+                                            lastVolValue = mdata.value;
+
 											Event event(Controller);
 											event.setTick(tick);
 											event.setA(mdata.controller);
@@ -407,6 +472,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 											//XXX: Buffer this event instead of adding now
                                             audio->msgAddEventCheck(track, event, false, true, false, false);
                                             updateLater();
+
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{

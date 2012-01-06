@@ -323,9 +323,9 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	hbox3->addWidget(toList);
 	controlsBox->addLayout(hbox3);
 
-	connect(rasterLabel, SIGNAL(activated(int)), SLOT(_rasterChanged(int)));
-	connect(quantLabel, SIGNAL(activated(int)), SLOT(_quantChanged(int)));
-	connect(toList, SIGNAL(activated(int)), SIGNAL(toChanged(int)));
+    connect(rasterLabel, SIGNAL(activated(int)), SLOT(_rasterChanged(int)));
+    connect(quantLabel, SIGNAL(activated(int)), SLOT(_quantChanged(int)));
+    connect(toList, SIGNAL(activated(int)), SIGNAL(toChanged(int)));
 	//end tb1
 
 	connect(tableView, SIGNAL(rowOrderChanged()), SLOT(rebuildMatrix()));

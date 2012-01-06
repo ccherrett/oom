@@ -985,7 +985,7 @@ void Performer::setTime(unsigned tick)
 	if (tick != MAXINT)
 		posLabel->setValue(tick);
 	time->setPos(3, tick, false);
-	pcbar->setPos(3, tick, false);
+    pcbar->setPos(3, tick, false);
 }
 
 //---------------------------------------------------------
@@ -1316,6 +1316,10 @@ void Performer::setRaster(int val)
 	AbstractMidiEditor::setRaster(val);
 	canvas->redrawGrid();
 	canvas->setFocus(); // give back focus after kb input
+
+    // falkTX. force update of control canvas
+    // FIXME - there should be a better way to do this..
+    song->update(0);
 }
 
 //---------------------------------------------------------

@@ -12,6 +12,7 @@
 #include <QComboBox>
 
 class QString;
+class QWheelEvent;
 
 
 //---------------------------------------------------------
@@ -34,6 +35,9 @@ public:
 		QComboBox::setModel(v->model());
 		QComboBox::setView(v);
     }
+
+protected:
+    void wheelEvent(QWheelEvent* e);
 };
 
 #endif
