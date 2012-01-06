@@ -985,7 +985,7 @@ void Performer::setTime(unsigned tick)
 	if (tick != MAXINT)
 		posLabel->setValue(tick);
 	time->setPos(3, tick, false);
-	pcbar->setPos(3, tick, false);
+    pcbar->setPos(3, tick, false);
 }
 
 //---------------------------------------------------------

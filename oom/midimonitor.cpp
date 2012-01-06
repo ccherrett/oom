@@ -39,6 +39,11 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
 	m_learning = false;
 	m_learnport = -1;
 
+    lastVolTick = 0;
+    lastVolValue = -1;
+
+    connect(song, SIGNAL(playChanged(bool)), this, SLOT(songPlayChanged()));
+
     updateNow = false;
     updateNowTimer.setInterval(config.guiRefresh);
     connect(&updateNowTimer, SIGNAL(timeout()), this, SLOT(updateSongNow()));
@@ -87,6 +92,12 @@ void MidiMonitor::updateSongNow()
         song->update(SC_EVENT_INSERTED);
     }
     updateNowTimer.stop();
+}
+
+void MidiMonitor::songPlayChanged()
+{
+    lastVolTick = 0;
+    lastVolValue = -1;
 }
 
 void MidiMonitor::start(int priority)/*{{{*/
@@ -400,6 +411,49 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										if(track && track->recordFlag() && audio->isPlaying())
 										{
 											unsigned tick = song->cpos();
+
+                                            // Delete old events if appropriate
+                                            if (lastVolTick > 0 && lastVolTick < tick)
+                                            {
+                                                PartList* pl = track->parts();
+
+                                                if (pl && pl->empty() == false)
+                                                {
+                                                    Part* part = pl->findAtTick(lastVolTick);
+
+                                                    if (part && part->events()->empty() == false)
+                                                    {
+                                                        // FIXME!! - Doing this line below will make oom crash randomly in the future
+                                                        for (iEvent e = part->events()->begin(); e != part->events()->end(); ++e)
+                                                        {
+                                                            Event ev = e->second;
+
+                                                            if (ev.type() != Controller)
+                                                                continue;
+                                                            if (ev.tick() <= lastVolTick)
+                                                                continue;
+                                                            if (ev.tick() > tick)
+                                                                continue;
+
+                                                            Event eventN(Controller);
+                                                            eventN.setTick(ev.tick());
+                                                            eventN.setA(mdata.controller);
+                                                            eventN.setB(lastVolValue);
+
+                                                            audio->msgDeleteEvent(ev, part, false, true, false, false);
+                                                            audio->msgAddEventCheck(track, eventN, false, true, false, false);
+
+                                                            //Event newEvent = ev.clone();
+                                                            //newEvent.setB(lastVolValue);
+                                                            //audio->msgChangeEvent(ev, newEvent, part, false, true, false, false);
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            lastVolTick = tick;
+                                            lastVolValue = mdata.value;
+
 											Event event(Controller);
 											event.setTick(tick);
 											event.setA(mdata.controller);
@@ -407,6 +461,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 											//XXX: Buffer this event instead of adding now
                                             audio->msgAddEventCheck(track, event, false, true, false, false);
                                             updateLater();
+
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{

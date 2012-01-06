@@ -74,6 +74,9 @@ class MidiMonitor : public Thread
 	bool m_learning;
 	int m_learnport;
 
+    unsigned lastVolTick;
+    int lastVolValue;
+
     bool updateNow;
     QTimer updateNowTimer;
 
@@ -148,6 +151,7 @@ signals:
 
 private slots:
     void updateSongNow();
+    void songPlayChanged();
 };
 
 extern MidiMonitor *midiMonitor;

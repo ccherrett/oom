@@ -679,12 +679,12 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 	QAction* midi = addTrack->addAction(QIcon(*addMidiIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Midi Track"));
 	midi->setData(Track::MIDI);
-	grp->addAction(midi);
-	/*QAction* drum = addTrack->addAction(QIcon(*addtrack_drumtrackIcon),
+    grp->addAction(midi);
+    /*QAction* drum = addTrack->addAction(QIcon(*addtrack_drumtrackIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Drum Track"));
 	drum->setData(Track::DRUM);
 	grp->addAction(drum);
-	*/
+    */
 	QAction* wave = addTrack->addAction(QIcon(*addAudioIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Audio Track"));
 	wave->setData(Track::WAVE);
