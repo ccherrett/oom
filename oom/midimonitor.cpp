@@ -747,7 +747,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     unsigned tick = song->cpos();
                     LastMidiInMessage* lastMsg = getLastMidiInMessage(data->port, data->channel, info->assignedControl());
 
-                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 96)
                         return;
 
 					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mevent.dataB());
@@ -779,7 +779,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     unsigned tick = song->cpos();
                     LastMidiInMessage* lastMsg = getLastMidiInMessage(data->port, data->channel, info->assignedControl());
 
-                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 96)
                         return;
 
 					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mval);
