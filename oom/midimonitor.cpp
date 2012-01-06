@@ -742,6 +742,14 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 					//	return;
 					//printf("Sending midivalue from audio track: %d\n", msg->mval);
 					//TODO: Check if feedback is required before bothering with this
+
+                    // Check if we should ignore this event
+                    unsigned tick = song->cpos();
+                    LastMidiInMessage* lastMsg = getLastMidiInMessage(data->port, data->channel, info->assignedControl());
+
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
+                        return;
+
 					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mevent.dataB());
 					ev.setEventSource(MonitorSource);
 					midiPorts[ev.port()].device()->putEvent(ev);
@@ -766,6 +774,14 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 					//	return;
 					//printf("Sending midivalue from audio track: %d\n", msg->mval);
 					//TODO: Check if feedback is required before bothering with this
+
+                    // Check if we should ignore this event
+                    unsigned tick = song->cpos();
+                    LastMidiInMessage* lastMsg = getLastMidiInMessage(data->port, data->channel, info->assignedControl());
+
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
+                        return;
+
 					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mval);
 					ev.setEventSource(MonitorSource);
 					midiPorts[ev.port()].device()->putEvent(ev);
