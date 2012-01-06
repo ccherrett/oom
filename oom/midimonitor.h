@@ -11,6 +11,7 @@
 #include <QTimer>
 
 class Track;
+class MidiTrack;
 class MidiAssignData;
 class QString;
 class CCInfo;
@@ -47,6 +48,7 @@ struct MonitorData
 	int msb;
 	int lsb;
 };
+
 //This container holds all the types that can be handled
 //by thread this monitor
 struct MonitorMsg : public ThreadMsg
@@ -62,6 +64,15 @@ struct MonitorMsg : public ThreadMsg
 	CCInfo* info;
 };
 
+struct LastMidiInMessage
+{
+    int port;
+    int channel;
+    int controller;
+    int lastValue;
+    unsigned lastTick;
+};
+
 class MidiMonitor : public Thread 
 {
 	Q_OBJECT
@@ -74,8 +85,7 @@ class MidiMonitor : public Thread
 	bool m_learning;
 	int m_learnport;
 
-    unsigned lastVolTick;
-    int lastVolValue;
+    QList<LastMidiInMessage> m_lastMidiInMessages;
 
     bool updateNow;
     QTimer updateNowTimer;
@@ -93,6 +103,11 @@ class MidiMonitor : public Thread
 	void addMonitoredTrack(Track*);
     void deleteMonitoredTrack(Track*);
     void updateLater();
+
+    LastMidiInMessage* getLastMidiInMessage(int port, int channel, int controller);
+    void setLastMidiInMessage(int port, int channel, int controller, int value, unsigned tick);
+
+    void deletePreviousMidiInEvents(MidiTrack* track, int controller, unsigned tick);
 
 public:
 	MidiMonitor(const char* name);

@@ -39,9 +39,6 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
 	m_learning = false;
 	m_learnport = -1;
 
-    lastVolTick = 0;
-    lastVolValue = -1;
-
     connect(song, SIGNAL(playChanged(bool)), this, SLOT(songPlayChanged()));
 
     updateNow = false;
@@ -96,8 +93,90 @@ void MidiMonitor::updateSongNow()
 
 void MidiMonitor::songPlayChanged()
 {
-    lastVolTick = 0;
-    lastVolValue = -1;
+    m_lastMidiInMessages.clear();
+}
+
+LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int port, int channel, int controller)
+{
+    for (int i=0; i < m_lastMidiInMessages.count(); i++)
+    {
+        LastMidiInMessage* msg = &m_lastMidiInMessages[i];
+        if (msg->port == port && msg->channel == channel && msg->controller == controller)
+            return msg;
+    }
+    return 0;
+}
+
+void MidiMonitor::setLastMidiInMessage(int port, int channel, int controller, int value, unsigned tick)
+{
+    for (int i=0; i < m_lastMidiInMessages.count(); i++)
+    {
+        LastMidiInMessage* msg = &m_lastMidiInMessages[i];
+        if (msg->port == port && msg->channel == channel && msg->controller == controller)
+        {
+            msg->lastValue = value;
+            msg->lastTick = tick;
+            return;
+        }
+    }
+
+    LastMidiInMessage newMsg;
+    newMsg.channel = channel;
+    newMsg.port = port;
+    newMsg.controller = controller;
+    newMsg.lastValue = value;
+    newMsg.lastTick = tick;
+
+    m_lastMidiInMessages.append(newMsg);
+}
+
+void MidiMonitor::deletePreviousMidiInEvents(MidiTrack* track, int controller, unsigned tick)
+{
+    LastMidiInMessage* lastMsg = getLastMidiInMessage(track->outPort(), track->outChannel(), controller);
+
+    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
+    {
+        PartList* pl = track->parts();
+
+        if (pl && pl->empty() == false)
+        {
+            Part* part = pl->findAtTick(lastMsg->lastTick);
+
+            if (part)
+            {
+                QList<unsigned> ticksToReplace;
+                const EventList* el = part->cevents();
+
+                for (ciEvent ce = el->begin(); ce != el->end(); ++ce)
+                {
+                    const Event& ev = ce->second;
+
+                    if (ev.type() == Controller && ev.dataA() == controller)
+                        ticksToReplace.append(ev.tick());
+                }
+
+                unsigned iTick, lenTick = part->lenTick();
+
+                for (int i=0; i < ticksToReplace.count(); i++)
+                {
+                    iTick = ticksToReplace.at(i);
+
+                    if (iTick < lastMsg->lastTick)
+                        continue;
+                    if (iTick > tick)
+                        continue;
+                    if (iTick > lenTick)
+                        continue;
+
+                    Event event(Controller);
+                    event.setTick(iTick);
+                    event.setA(controller);
+                    event.setB(lastMsg->lastValue);
+                    audio->msgAddEventCheck(track, event, false, true, false, false);
+                }
+            }
+        }
+    }
 }
 
 void MidiMonitor::start(int priority)/*{{{*/
@@ -411,59 +490,10 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 
 										if(track && track->recordFlag() && audio->isPlaying())
 										{
-                                            unsigned lastTick, tick = song->cpos();
+                                            unsigned tick = song->cpos();
 
-                                            // TODO - find lastTick for this event channel/port
-                                            lastTick = lastVolTick;
-
-                                            // Delete old events if appropriate
-                                            if (lastTick > 0 && lastTick < tick)
-                                            {
-                                                PartList* pl = track->parts();
-
-                                                if (pl && pl->empty() == false)
-                                                {
-                                                    Part* part = pl->findAtTick(lastTick);
-
-                                                    if (part)
-                                                    {
-                                                        QList<unsigned> ticksToReplace;
-                                                        const EventList* el = part->cevents();
-
-                                                        for (ciEvent ce = el->begin(); ce != el->end(); ++ce)
-                                                        {
-                                                            const Event& ev = ce->second;
-
-                                                            if (ev.type() == Controller)
-                                                                ticksToReplace.append(ev.tick());
-                                                        }
-
-                                                        unsigned iTick, lenTick = part->lenTick();
-
-                                                        for (int i=0; i < ticksToReplace.count(); i++)
-                                                        {
-                                                            iTick = ticksToReplace.at(i);
-
-                                                            if (iTick < lastTick)
-                                                                continue;
-                                                            if (iTick > tick)
-                                                                continue;
-                                                            if (iTick > lenTick)
-                                                                continue;
-
-                                                            Event eventN(Controller);
-                                                            eventN.setTick(iTick);
-                                                            eventN.setA(mdata.controller);
-                                                            eventN.setB(lastVolValue);
-                                                            audio->msgAddEventCheck(track, eventN, false, true, false, false);
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            // TODO - set last tick and value for this channel/port
-                                            lastVolTick = tick;
-                                            lastVolValue = mdata.value;
+                                            // Check for previous events to delete
+                                            deletePreviousMidiInEvents(track, ctl, tick);
 
 											Event event(Controller);
 											event.setTick(tick);
@@ -471,6 +501,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 											event.setB(mdata.value);
 											//XXX: Buffer this event instead of adding now
                                             audio->msgAddEventCheck(track, event, false, true, false, false);
+
+                                            setLastMidiInMessage(track->outPort(), track->outChannel(), mdata.controller, mdata.value, tick);
                                             updateLater();
 
 											/*PartList* pl = track->parts();
@@ -522,12 +554,19 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										if(track && track->recordFlag())
 										{
 											unsigned tick = song->cpos();
+
+                                            // Check for previous events to delete
+                                            deletePreviousMidiInEvents(track, ctl, tick);
+
 											Event event(Controller);
 											event.setTick(tick);
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
                                             audio->msgAddEventCheck(track, event, false, true, false, false);
+
+                                            setLastMidiInMessage(track->outPort(), track->outChannel(), mdata.controller, mdata.value, tick);
                                             updateLater();
+
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
@@ -606,12 +645,19 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 										if(track && track->recordFlag())
 										{
 											unsigned tick = song->cpos();
+
+                                            // Check for previous events to delete
+                                            deletePreviousMidiInEvents(track, ctl, tick);
+
 											Event event(Controller);
 											event.setTick(tick);
 											event.setA(mdata.controller);
 											event.setB(mdata.value);
                                             audio->msgAddEventCheck(track, event, false, true, false, false);
+
+                                            setLastMidiInMessage(track->outPort(), track->outChannel(), mdata.controller, mdata.value, tick);
                                             updateLater();
+
 											/*PartList* pl = track->parts();
 											if(pl && !pl->empty())
 											{
