@@ -96,6 +96,17 @@ void MidiMonitor::songPlayChanged()
     m_lastMidiInMessages.clear();
 }
 
+LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int channel, int controller)
+{
+    for (int i=0; i < m_lastMidiInMessages.count(); i++)
+    {
+        LastMidiInMessage* msg = &m_lastMidiInMessages[i];
+        if (msg->channel == channel && msg->controller == controller)
+            return msg;
+    }
+    return 0;
+}
+
 LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int port, int channel, int controller)
 {
     for (int i=0; i < m_lastMidiInMessages.count(); i++)
@@ -109,6 +120,8 @@ LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int port, int channel, int 
 
 void MidiMonitor::setLastMidiInMessage(int port, int channel, int controller, int value, unsigned tick)
 {
+    qWarning("setLastMidiInMessage(%i, %i, %i, %i, %i)", port, channel, controller, value, tick);
+
     for (int i=0; i < m_lastMidiInMessages.count(); i++)
     {
         LastMidiInMessage* msg = &m_lastMidiInMessages[i];
@@ -745,9 +758,9 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 
                     // Check if we should ignore this event
                     unsigned tick = song->cpos();
-                    LastMidiInMessage* lastMsg = getLastMidiInMessage(data->port, data->channel, info->assignedControl());
+                    LastMidiInMessage* lastMsg = getLastMidiInMessage(data->channel, info->assignedControl());
 
-                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 96)
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
                         return;
 
 					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mevent.dataB());
@@ -777,9 +790,9 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 
                     // Check if we should ignore this event
                     unsigned tick = song->cpos();
-                    LastMidiInMessage* lastMsg = getLastMidiInMessage(data->port, data->channel, info->assignedControl());
+                    LastMidiInMessage* lastMsg = getLastMidiInMessage(data->channel, info->assignedControl());
 
-                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 96)
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
                         return;
 
 					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mval);
