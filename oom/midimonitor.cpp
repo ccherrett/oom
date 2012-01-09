@@ -86,10 +86,16 @@ void MidiMonitor::updateSongNow()
     if (updateNow)
     {
         updateNow = false;
+        unsigned tick = song->cpos();
 
         for (int i=0; i < m_lastFeedbackMessages.count(); i++)
         {
             LastFeedbackMessage* msg = &m_lastFeedbackMessages[i];
+
+            LastMidiInMessage* lastMsg = getLastMidiInMessage(msg->controller);
+            if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && tick - lastMsg->lastTick < 384)
+                continue;
+
             MidiPlayEvent ev(0, msg->port, msg->channel, ME_CONTROLLER, msg->controller, msg->value);
             ev.setEventSource(MonitorSource);
             midiPorts[ev.port()].device()->putEvent(ev);
@@ -823,7 +829,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     else
                         qWarning("MONITOR_MIDI_OUT_EVENT: No lastMsg @%i", tick);
 
-                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick /*&& tick - lastMsg->lastTick < 384*/)
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && tick - lastMsg->lastTick < 384)
                     {
                         qWarning("MONITOR_MIDI_OUT_EVENT: NOT feedback --------------------------------------------------------------");
                         return;
@@ -864,7 +870,7 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     else
                         qWarning("MONITOR_MIDI_OUT: No lastMsg @%i", tick);
 
-                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick /*&& tick - lastMsg->lastTick < 384*/)
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && tick - lastMsg->lastTick < 384)
                     {
                         qWarning("MONITOR_MIDI_OUT: NOT feedback");
                         return;
