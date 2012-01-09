@@ -93,15 +93,20 @@ void MidiMonitor::updateSongNow()
 
 void MidiMonitor::songPlayChanged()
 {
+    qWarning("songPlayChanged()");
     m_lastMidiInMessages.clear();
 }
 
-LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int channel, int controller)
+LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int controller)
 {
+    qWarning("getLastMidiInMessage(%i) / %i", controller, m_lastMidiInMessages.count());
     for (int i=0; i < m_lastMidiInMessages.count(); i++)
     {
         LastMidiInMessage* msg = &m_lastMidiInMessages[i];
-        if (msg->channel == channel && msg->controller == controller)
+
+        qWarning("getLastMidiInMessage(%i) vs (%i)", controller, msg->controller);
+
+        if (msg->controller == controller)
             return msg;
     }
     return 0;
@@ -109,9 +114,13 @@ LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int channel, int controller
 
 LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int port, int channel, int controller)
 {
+    qWarning("getLastMidiInMessage(%i, %i, %i) / %i", port, channel, controller, m_lastMidiInMessages.count());
     for (int i=0; i < m_lastMidiInMessages.count(); i++)
     {
         LastMidiInMessage* msg = &m_lastMidiInMessages[i];
+
+        qWarning("getLastMidiInMessage(%i, %i, %i) vs (%i, %i, %i)", port, channel, controller, msg->port, msg->channel, msg->controller);
+
         if (msg->port == port && msg->channel == channel && msg->controller == controller)
             return msg;
     }
@@ -145,6 +154,7 @@ void MidiMonitor::setLastMidiInMessage(int port, int channel, int controller, in
 
 void MidiMonitor::deletePreviousMidiInEvents(MidiTrack* track, int controller, unsigned tick)
 {
+    qWarning("deletePreviousMidiInEvents(%p, %i, %i)", track, controller, tick);
     LastMidiInMessage* lastMsg = getLastMidiInMessage(track->outPort(), track->outChannel(), controller);
 
     if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
@@ -342,6 +352,9 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 	//	return;
 	const MonitorMsg* msg = (MonitorMsg*)m;
 	int type = msg->id;
+
+    qWarning("MidiMonitor::processMsg1 - %p %i", msg, type);
+
 	switch(type)
 	{
 		case MONITOR_MIDI_IN:	//Used to process incomming midi going to midi tracks/controllers
@@ -758,10 +771,20 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 
                     // Check if we should ignore this event
                     unsigned tick = song->cpos();
-                    LastMidiInMessage* lastMsg = getLastMidiInMessage(data->channel, info->assignedControl());
+                    LastMidiInMessage* lastMsg = getLastMidiInMessage(info->controller());
 
-                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
+                    if (lastMsg)
+                        qWarning("MONITOR_MIDI_OUT_EVENT: with lastMsg - %i vs %i -> %i", tick, lastMsg->lastTick, tick - lastMsg->lastTick);
+                    else
+                        qWarning("MONITOR_MIDI_OUT_EVENT: No lastMsg @%i", tick);
+
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick /*&& tick - lastMsg->lastTick < 384*/)
+                    {
+                        qWarning("MONITOR_MIDI_OUT_EVENT: NOT feedback --------------------------------------------------------------");
                         return;
+                    }
+                    else
+                        qWarning("MONITOR_MIDI_OUT_EVENT: WITH feedback");
 
 					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mevent.dataB());
 					ev.setEventSource(MonitorSource);
@@ -790,10 +813,20 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 
                     // Check if we should ignore this event
                     unsigned tick = song->cpos();
-                    LastMidiInMessage* lastMsg = getLastMidiInMessage(data->channel, info->assignedControl());
+                    LastMidiInMessage* lastMsg = getLastMidiInMessage(info->controller());
 
-                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick < tick && tick - lastMsg->lastTick < 384)
+                    if (lastMsg)
+                        qWarning("MONITOR_MIDI_OUT: %i vs %i -> %i", tick, lastMsg->lastTick, tick - lastMsg->lastTick);
+                    else
+                        qWarning("MONITOR_MIDI_OUT: No lastMsg @%i", tick);
+
+                    if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick /*&& tick - lastMsg->lastTick < 384*/)
+                    {
+                        qWarning("MONITOR_MIDI_OUT: NOT feedback");
                         return;
+                    }
+                    else
+                        qWarning("MONITOR_MIDI_OUT: WITH feedback");
 
 					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mval);
 					ev.setEventSource(MonitorSource);

@@ -104,7 +104,7 @@ class MidiMonitor : public Thread
     void deleteMonitoredTrack(Track*);
     void updateLater();
 
-    LastMidiInMessage* getLastMidiInMessage(int channel, int controller);
+    LastMidiInMessage* getLastMidiInMessage(int controller);
     LastMidiInMessage* getLastMidiInMessage(int port, int channel, int controller);
     void setLastMidiInMessage(int port, int channel, int controller, int value, unsigned tick);
 
