@@ -42,7 +42,7 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
     connect(song, SIGNAL(playChanged(bool)), this, SLOT(songPlayChanged()));
 
     updateNow = false;
-    updateNowTimer.setInterval(50);
+    updateNowTimer.setInterval(500);
     connect(&updateNowTimer, SIGNAL(timeout()), this, SLOT(updateSongNow()));
 
 	int filedes[2]; // 0 - reading   1 - writing/*{{{*/
