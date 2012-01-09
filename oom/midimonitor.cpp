@@ -42,7 +42,7 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
     connect(song, SIGNAL(playChanged(bool)), this, SLOT(songPlayChanged()));
 
     updateNow = false;
-    updateNowTimer.setInterval(config.guiRefresh);
+    updateNowTimer.setInterval(50);
     connect(&updateNowTimer, SIGNAL(timeout()), this, SLOT(updateSongNow()));
 
 	int filedes[2]; // 0 - reading   1 - writing/*{{{*/
@@ -86,6 +86,15 @@ void MidiMonitor::updateSongNow()
     if (updateNow)
     {
         updateNow = false;
+
+        for (int i=0; i < m_lastFeedbackMessages.count(); i++)
+        {
+            LastFeedbackMessage* msg = &m_lastFeedbackMessages[i];
+            MidiPlayEvent ev(0, msg->port, msg->channel, ME_CONTROLLER, msg->controller, msg->value);
+            ev.setEventSource(MonitorSource);
+            midiPorts[ev.port()].device()->putEvent(ev);
+        }
+
         song->update(SC_EVENT_INSERTED);
     }
     updateNowTimer.stop();
@@ -95,6 +104,7 @@ void MidiMonitor::songPlayChanged()
 {
     qWarning("songPlayChanged()");
     m_lastMidiInMessages.clear();
+    m_lastFeedbackMessages.clear();
 }
 
 LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int controller)
@@ -200,6 +210,41 @@ void MidiMonitor::deletePreviousMidiInEvents(MidiTrack* track, int controller, u
             }
         }
     }
+}
+
+LastFeedbackMessage* MidiMonitor::getLastFeedbackMessage(int port, int channel, int controller)
+{
+    qWarning("getLastFeedbackMessage(%i, %i, %i) / %i", port, channel, controller, m_lastFeedbackMessages.count());
+    for (int i=0; i < m_lastFeedbackMessages.count(); i++)
+    {
+        LastFeedbackMessage* msg = &m_lastFeedbackMessages[i];
+        if (msg->port == port && msg->channel == channel && msg->controller == controller)
+            return msg;
+    }
+    return 0;
+}
+
+void MidiMonitor::setLastFeedbackMessage(int port, int channel, int controller, int value)
+{
+    qWarning("setLastFeedbackMessage(%i, %i, %i, %i)", port, channel, controller, value);
+
+    for (int i=0; i < m_lastFeedbackMessages.count(); i++)
+    {
+        LastFeedbackMessage* msg = &m_lastFeedbackMessages[i];
+        if (msg->port == port && msg->channel == channel && msg->controller == controller)
+        {
+            msg->value = value;
+            return;
+        }
+    }
+
+    LastFeedbackMessage newMsg;
+    newMsg.channel = channel;
+    newMsg.port = port;
+    newMsg.controller = controller;
+    newMsg.value = value;
+
+    m_lastFeedbackMessages.append(newMsg);
 }
 
 void MidiMonitor::start(int priority)/*{{{*/
@@ -786,9 +831,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     else
                         qWarning("MONITOR_MIDI_OUT_EVENT: WITH feedback");
 
-					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mevent.dataB());
-					ev.setEventSource(MonitorSource);
-					midiPorts[ev.port()].device()->putEvent(ev);
+                    setLastFeedbackMessage(info->port(), info->channel(), info->assignedControl(), msg->mevent.dataB());
+                    updateLater();
 				}
 			}/*}}}*/
 		}
@@ -828,9 +872,8 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     else
                         qWarning("MONITOR_MIDI_OUT: WITH feedback");
 
-					MidiPlayEvent ev(0, info->port(), info->channel(), ME_CONTROLLER, info->assignedControl(), msg->mval);
-					ev.setEventSource(MonitorSource);
-					midiPorts[ev.port()].device()->putEvent(ev);
+                    setLastFeedbackMessage(info->port(), info->channel(), info->assignedControl(), msg->mevent.dataB());
+                    updateLater();
 				}
 			}/*}}}*/
 		break;

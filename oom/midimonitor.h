@@ -73,6 +73,14 @@ struct LastMidiInMessage
     unsigned lastTick;
 };
 
+struct LastFeedbackMessage
+{
+    int port;
+    int channel;
+    int controller;
+    int value;
+};
+
 class MidiMonitor : public Thread 
 {
 	Q_OBJECT
@@ -86,6 +94,7 @@ class MidiMonitor : public Thread
 	int m_learnport;
 
     QList<LastMidiInMessage> m_lastMidiInMessages;
+    QList<LastFeedbackMessage> m_lastFeedbackMessages;
 
     bool updateNow;
     QTimer updateNowTimer;
@@ -107,8 +116,10 @@ class MidiMonitor : public Thread
     LastMidiInMessage* getLastMidiInMessage(int controller);
     LastMidiInMessage* getLastMidiInMessage(int port, int channel, int controller);
     void setLastMidiInMessage(int port, int channel, int controller, int value, unsigned tick);
-
     void deletePreviousMidiInEvents(MidiTrack* track, int controller, unsigned tick);
+
+    LastFeedbackMessage* getLastFeedbackMessage(int port, int channel, int controller);
+    void setLastFeedbackMessage(int port, int channel, int controller, int value);
 
 public:
 	MidiMonitor(const char* name);
