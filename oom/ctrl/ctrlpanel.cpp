@@ -18,6 +18,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QString>
+#include <QComboBox>
 
 #include <math.h>
 
@@ -55,12 +56,12 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	QHBoxLayout* bbox = new QHBoxLayout;
 	bbox->setSpacing(0);
 	vbox->addLayout(bbox);
-	vbox->addStretch();
+	//vbox->addStretch();
 	QHBoxLayout* kbox = new QHBoxLayout;
 	QHBoxLayout* dbox = new QHBoxLayout;
 	vbox->addLayout(kbox);
 	vbox->addLayout(dbox);
-	vbox->addStretch();
+	//vbox->addStretch();
 	vbox->setContentsMargins(0, 0, 0, 0);
 	bbox->setContentsMargins(0, 0, 0, 0);
 	kbox->setContentsMargins(0, 0, 0, 0);
@@ -137,6 +138,15 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	dbox->addWidget(_dl);
 	dbox->addStretch();
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
+	_cmbMode = new QComboBox(this);
+	_cmbMode->setObjectName("cmbModeSelect");
+	_cmbMode->addItem("READ", 0);
+	_cmbMode->addItem("WRITE", 1);
+	_cmbMode->addItem("TOUCH", 2);
+	_cmbMode->addItem("AUDITION", 3);
+	vbox->addStretch();
+	vbox->addWidget(_cmbMode);
+	vbox->addStretch();
 	inHeartBeat = false;
 	setLayout(vbox);
 }

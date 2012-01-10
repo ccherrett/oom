@@ -21,6 +21,7 @@ class Knob;
 class DoubleLabel;
 class MidiPort;
 class MidiTrack;
+class QComboBox;
 
 //---------------------------------------------------------
 //   CtrlPanel
@@ -41,6 +42,7 @@ class CtrlPanel : public QWidget
     Knob* _knob;
     DoubleLabel* _dl;
     int _val;
+	QComboBox* _cmbMode;
 
 
 signals:
