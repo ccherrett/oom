@@ -103,6 +103,7 @@ class MidiMonitor : public Thread
     QList<LastMidiInMessage> m_lastMidiInMessages;
     QList<LastFeedbackMessage> m_lastFeedbackMessages;
     FeedbackMode m_feedbackMode;
+    unsigned m_feedbackTimeout;
 
     bool updateNow;
     QTimer updateNowTimer;

@@ -54,10 +54,15 @@ public:
 };
 
 enum PluginType {
-	LADSPA = 0,
-	LV2 = 1,
-	DSSI = 2
+    PLUGIN_LADSPA = 0,
+    PLUGIN_LV2    = 1,
+    PLUGIN_VST    = 2
 };
+
+// delete later
+#define LADSPA 0
+#define DSSI 2
+#define LV2 1
 
 typedef int PluginHint;
 #define Toggle 0x4
