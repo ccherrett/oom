@@ -86,10 +86,10 @@ void MidiMonitor::setFeedbackMode(FeedbackMode mode)
         break;
     case FEEDBACK_MODE_WRITE:
     case FEEDBACK_MODE_TOUCH:
-        updateNowTimer.setInterval(50);
+        updateNowTimer.setInterval(300);
         break;
     case FEEDBACK_MODE_AUDITION:
-        updateNowTimer.setInterval(50);
+        updateNowTimer.setInterval(300);
         if (updateNowTimer.isActive() == false)
             updateNowTimer.start();
         break;
@@ -852,11 +852,11 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     else
                     {
                         // Check if we should ignore this event
-                        unsigned tick = song->cpos();
-                        LastMidiInMessage* lastMsg = getLastMidiInMessage(info->controller());
+                        //unsigned tick = song->cpos();
+                        //LastMidiInMessage* lastMsg = getLastMidiInMessage(info->controller());
 
-                        if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && (m_feedbackMode == FEEDBACK_MODE_WRITE || tick - lastMsg->lastTick < 384))
-                            return;
+                        //if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && (m_feedbackMode == FEEDBACK_MODE_WRITE || tick - lastMsg->lastTick < 384))
+                        //    return;
 
                         setLastFeedbackMessage(info->port(), info->channel(), info->assignedControl(), msg->mevent.dataB());
                         updateLater();
@@ -892,11 +892,11 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     else
                     {
                         // Check if we should ignore this event
-                        unsigned tick = song->cpos();
-                        LastMidiInMessage* lastMsg = getLastMidiInMessage(info->controller());
+                        //unsigned tick = song->cpos();
+                        //LastMidiInMessage* lastMsg = getLastMidiInMessage(info->controller());
 
-                        if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && (m_feedbackMode == FEEDBACK_MODE_WRITE || tick - lastMsg->lastTick < 384))
-                            return;
+                        //if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && (m_feedbackMode == FEEDBACK_MODE_WRITE || tick - lastMsg->lastTick < 384))
+                        //    return;
 
                         setLastFeedbackMessage(info->port(), info->channel(), info->assignedControl(), msg->mevent.dataB());
                         updateLater();
