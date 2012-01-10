@@ -109,8 +109,6 @@ void MidiMonitor::updateSongNow()
 {
     if (updateNow || m_feedbackMode == FEEDBACK_MODE_AUDITION)
     {
-        updateNow = false;
-
         if (m_feedbackMode != FEEDBACK_MODE_READ)
         {
             unsigned tick = song->cpos();
@@ -137,7 +135,10 @@ void MidiMonitor::updateSongNow()
             }
         }
 
-        song->update(SC_EVENT_INSERTED);
+        if (updateNow)
+            song->update(SC_EVENT_INSERTED);
+
+        updateNow = false;
     }
 
     if (m_feedbackMode != FEEDBACK_MODE_AUDITION)
