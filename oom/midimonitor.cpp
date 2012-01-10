@@ -86,8 +86,12 @@ void MidiMonitor::setFeedbackMode(FeedbackMode mode)
         break;
     case FEEDBACK_MODE_WRITE:
     case FEEDBACK_MODE_TOUCH:
+        updateNowTimer.setInterval(50);
+        break;
     case FEEDBACK_MODE_AUDITION:
         updateNowTimer.setInterval(50);
+        if (updateNowTimer.isActive() == false)
+            updateNowTimer.start();
         break;
     }
 }
@@ -127,7 +131,20 @@ void MidiMonitor::updateSongNow()
 
         song->update(SC_EVENT_INSERTED);
     }
-    updateNowTimer.stop();
+
+    if (m_feedbackMode == FEEDBACK_MODE_AUDITION)
+    {
+        unsigned tick = song->cpos();
+
+        LastMidiInMessage* lastMsg = getLastMidiInMessage(msg->controller);
+        if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && tick - lastMsg->lastTick < 384)
+        {
+            song->stopRolling();
+            updateNowTimer.stop();
+        }
+    }
+    else
+        updateNowTimer.stop();
 }
 
 void MidiMonitor::songPlayChanged()
