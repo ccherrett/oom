@@ -107,7 +107,7 @@ void MidiMonitor::updateLater()
 
 void MidiMonitor::updateSongNow()
 {
-    if (updateNow)
+    if (updateNow || m_feedbackMode == FEEDBACK_MODE_AUDITION)
     {
         updateNow = false;
 
@@ -121,7 +121,15 @@ void MidiMonitor::updateSongNow()
 
                 LastMidiInMessage* lastMsg = getLastMidiInMessage(msg->controller);
                 if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && (m_feedbackMode == FEEDBACK_MODE_WRITE || tick - lastMsg->lastTick < 384))
-                    continue;
+                {
+                    if (m_feedbackMode == FEEDBACK_MODE_AUDITION)
+                    {
+                        song->stopRolling();
+                        updateNowTimer.stop();
+                    }
+                    else
+                        continue;
+                }
 
                 MidiPlayEvent ev(0, msg->port, msg->channel, ME_CONTROLLER, msg->controller, msg->value);
                 ev.setEventSource(MonitorSource);
@@ -132,18 +140,7 @@ void MidiMonitor::updateSongNow()
         song->update(SC_EVENT_INSERTED);
     }
 
-    if (m_feedbackMode == FEEDBACK_MODE_AUDITION)
-    {
-        unsigned tick = song->cpos();
-
-        LastMidiInMessage* lastMsg = getLastMidiInMessage(msg->controller);
-        if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && tick - lastMsg->lastTick < 384)
-        {
-            song->stopRolling();
-            updateNowTimer.stop();
-        }
-    }
-    else
+    if (m_feedbackMode != FEEDBACK_MODE_AUDITION)
         updateNowTimer.stop();
 }
 
