@@ -96,7 +96,7 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	_track = 0;
 	_ctrl = 0;
 	_val = CTRL_VAL_UNKNOWN;
-	_dnum = -1;
+    _dnum = -1;
 
 	_knob = new Knob;
 	//_knob->setFixedWidth(25);
@@ -121,11 +121,20 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	_dl->setEnabled(false);
 	_dl->hide();
 
+    _cmbMode = new QComboBox(this);
+    _cmbMode->setObjectName("cmbModeSelect");
+    _cmbMode->addItem("READ", FEEDBACK_MODE_READ);
+    _cmbMode->addItem("WRITE", FEEDBACK_MODE_WRITE);
+    _cmbMode->addItem("TOUCH", FEEDBACK_MODE_TOUCH);
+    _cmbMode->addItem("AUDITION", FEEDBACK_MODE_AUDITION);
+
 	connect(_knob, SIGNAL(sliderMoved(double, int)), SLOT(ctrlChanged(double)));
 	connect(_knob, SIGNAL(sliderRightClicked(const QPoint&, int)), SLOT(ctrlRightClicked(const QPoint&, int)));
 	//connect(_knob, SIGNAL(sliderReleased(int)), SLOT(ctrlReleased(int)));
 	connect(_dl, SIGNAL(valueChanged(double, int)), SLOT(ctrlChanged(double)));
 	connect(_dl, SIGNAL(doubleClicked(int)), SLOT(labelDoubleClicked()));
+    connect(_cmbMode, SIGNAL(currentIndexChanged(int)), SLOT(feedbackModeChanged(int)));
+    connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 
 	bbox->addStretch();
 	bbox->addWidget(selCtrl);
@@ -137,19 +146,14 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	dbox->addStretch();
 	dbox->addWidget(_dl);
 	dbox->addStretch();
-	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
-	_cmbMode = new QComboBox(this);
-	_cmbMode->setObjectName("cmbModeSelect");
-	_cmbMode->addItem("READ", 0);
-	_cmbMode->addItem("WRITE", 1);
-	_cmbMode->addItem("TOUCH", 2);
-	_cmbMode->addItem("AUDITION", 3);
-	vbox->addStretch();
+    vbox->addStretch();
 	vbox->addWidget(_cmbMode);
 	vbox->addStretch();
-	inHeartBeat = false;
-	setLayout(vbox);
+    setLayout(vbox);
+
+    inHeartBeat = false;
 }
+
 //---------------------------------------------------------
 //   heartBeat
 //---------------------------------------------------------
@@ -795,3 +799,13 @@ void CtrlPanel::ctrlReleased(int id)
   //  _knob->selectFaceColor(false);
 }
  */
+
+//---------------------------------------------------------
+//   feedbackModeChanged
+//---------------------------------------------------------
+
+void CtrlPanel::feedbackModeChanged(int value)
+{
+    // index matches FeedbackMode values
+    midiMonitor->setFeedbackMode(static_cast<FeedbackMode>(value));
+}

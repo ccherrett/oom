@@ -42,7 +42,7 @@ class CtrlPanel : public QWidget
     Knob* _knob;
     DoubleLabel* _dl;
     int _val;
-	QComboBox* _cmbMode;
+    QComboBox* _cmbMode;
 
 
 signals:
@@ -54,6 +54,7 @@ private slots:
     void labelDoubleClicked();
     void ctrlRightClicked(const QPoint& p, int id);
     //void ctrlReleased(int id);
+    void feedbackModeChanged(int value);
 
 protected slots:
     virtual void heartBeat();

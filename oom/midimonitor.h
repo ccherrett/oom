@@ -31,6 +31,13 @@ enum {
 	MONITOR_SEND_PRESET
 };
 
+enum FeedbackMode {
+    FEEDBACK_MODE_READ = 0,
+    FEEDBACK_MODE_WRITE,
+    FEEDBACK_MODE_TOUCH,
+    FEEDBACK_MODE_AUDITION
+};
+
 enum MonitorDataType {
 	MIDI_LEARN = 0,
 	MIDI_LEARN_NRPN,
@@ -95,6 +102,7 @@ class MidiMonitor : public Thread
 
     QList<LastMidiInMessage> m_lastMidiInMessages;
     QList<LastFeedbackMessage> m_lastFeedbackMessages;
+    FeedbackMode m_feedbackMode;
 
     bool updateNow;
     QTimer updateNowTimer;
@@ -126,6 +134,8 @@ public:
 	~MidiMonitor();
 
 	virtual void start(int);
+
+    void setFeedbackMode(FeedbackMode mode);
 
 	void msgSendMidiInputEvent(MEvent&);
 	void msgSendMidiOutputEvent(Track*,  int ctl, int val);
