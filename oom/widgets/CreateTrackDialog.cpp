@@ -81,10 +81,10 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 				if (!md)
 					continue;
 
-				if ((md->rwFlags() & 2))
+				if ((md->openFlags() & 2))
 					cmbInput->addItem(md->name(), i);
 
-				if((md->rwFlags() & 1))
+				if((md->openFlags() & 1))
 					cmbOutput->addItem(md->name(), i);
 
 				//Add global menu toggle

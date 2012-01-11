@@ -2869,7 +2869,8 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 			if (!md)
 				continue;
 
-			if (!(md->rwFlags() & (dst ? 1 : 2)))
+			//if (!(md->rwFlags() & (dst ? 1 : 2)))
+			if (!(md->openFlags() & (dst ? 1 : 2)))
 				continue;
 
 			//printf("OOMidi::prepareRoutingPopupMenu adding submenu portnum:%d\n", i);
