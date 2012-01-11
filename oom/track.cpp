@@ -370,19 +370,38 @@ void Track::setDefaultName()
 			base = QString("Synth");
 			break;
 	};/*}}}*/
-	base += " ";
-	for (int i = 1; true; ++i)
+	setName(getValidName(base, true));
+}
+
+QString Track::getValidName(QString base, bool dname)
+{
+	QString rv;
+	if(!dname)
 	{
-		QString n;
-		n.setNum(i);
-		QString s = base + n;
-		Track* track = song->findTrack(s);
-		if (track == 0)
+		Track* track = song->findTrack(base);
+		if(!track)
+			rv = base;
+	}
+	else
+	{
+		base += " ";
+	}
+	if(rv != base)
+	{
+		for (int i = 1; true; ++i)
 		{
-			setName(s);
-			break;
+			QString n;
+			n.setNum(i);
+			QString s = base + n;
+			Track* track = song->findTrack(s);
+			if (track == 0)
+			{
+				rv = s;
+				break;
+			}
 		}
 	}
+	return rv;
 }
 
 void Track::deselectParts()

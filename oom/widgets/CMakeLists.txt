@@ -112,6 +112,7 @@ QT4_WRAP_CPP (widget_mocs
 	  ccedit.h
 	  plugingui.h
 	  plugindialog.h
+	  CreateTrackDialog.h
       )
 
 ##
@@ -152,6 +153,7 @@ file (GLOB widgets_ui_files
 	  routemapbase.ui
 	  midiassignbase.ui
 	  cceditbase.ui
+	  createtrackbase.ui
       )
 QT4_WRAP_UI (widget_ui_headers ${widgets_ui_files})
 
@@ -253,6 +255,7 @@ file (GLOB widgets_source_files
 	  ccedit.cpp
 	  plugingui.cpp
 	  plugindialog.cpp
+	  CreateTrackDialog.cpp
       )
 
 ##

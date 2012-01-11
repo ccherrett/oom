@@ -2744,7 +2744,6 @@ void OOMidi::updateRouteMenus(Track* track, QObject* master)
 
 void OOMidi::routingPopupMenuActivated(Track* track, int n)
 {
-	//if(!track || (track != gRoutingPopupMenuMaster))
 	if (!track)
 		return;
 
@@ -2755,7 +2754,6 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 		if (pup->actions().isEmpty())
 			return;
 
-		//MidiTrack* t = (MidiTrack*)track;
 		RouteList* rl = gIsOutRoutingPopupMenu ? track->outRoutes() : track->inRoutes();
 
 		if (n == -1)
@@ -2796,18 +2794,14 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 			iRoute iir = rl->begin();
 			for (; iir != rl->end(); ++iir)
 			{
-				//if(*iir == (dst ? bRoute : aRoute))
-				//if(*iir == aRoute)
 				if (iir->type == Route::MIDI_PORT_ROUTE && iir->midiPort == mdidx) // p3.3.50 Is there already a route to this port?
 				{
 					chmask = iir->channel; // p3.3.50 Grab the channel mask.
 					break;
 				}
 			}
-			//if (iir != rl->end())
 			if ((chmask & chbit) == chbit) // p3.3.50 Is the channel's bit(s) set?
 			{
-				// disconnect
 				if (gIsOutRoutingPopupMenu)
 					audio->msgRemoveRoute(bRoute, aRoute);
 				else
@@ -2826,233 +2820,6 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 		audio->msgUpdateSoloStates();
 		song->update(SC_ROUTE);
 	}
-	else
-	{
-		// TODO: Try to move code from AudioStrip::routingPopupMenuActivated into here.
-
-		/*
-		PopupMenu* pup = getRoutingPopupMenu();
-
-		printf("OOMidi::routingPopupMenuActivated audio n:%d count:%d\n", n, pup->count());
-
-		if(pup->count() == 0)
-		  return;
-
-		AudioTrack* t = (AudioTrack*)track;
-		RouteList* rl = gIsOutRoutingPopupMenu ? t->outRoutes() : t->inRoutes();
-
-		//QPoint ppt = QCursor::pos();
-
-		if(n == -1)
-		{
-		  //printf("OOMidi::routingPopupMenuActivated audio n = -1 deleting popup...\n");
-		  printf("OOMidi::routingPopupMenuActivated audio n = -1\n");
-		  ///delete pup;
-		  ///pup = 0;
-		  return;
-		}
-		else
-		//if(n == 0)
-		//{
-		  //printf("OOMidi::routingPopupMenuActivated audio n = 0 = tearOffHandle\n");
-		  //oR->setDown(false);
-		//  return;
-		//}
-		//else
-		{
-			if(gIsOutRoutingPopupMenu)
-			{
-			  QString s(pup->text(n));
-
-			  //printf("AudioStrip::routingPopupMenuActivated audio text:%s\n", s.toLatin1().constData());
-
-			  if(track->type() == Track::AUDIO_OUTPUT)
-			  {
-				///delete orpup;
-
-				int chan = n & 0xf;
-
-				//Route srcRoute(t, -1);
-				//Route srcRoute(t, chan, chans);
-				//Route srcRoute(t, chan, 1);
-				Route srcRoute(t, chan);
-
-				//Route dstRoute(s, true, -1);
-				Route dstRoute(s, true, -1, Route::JACK_ROUTE);
-				//Route dstRoute(s, true, 0, Route::JACK_ROUTE);
-
-				//srcRoute.channel = dstRoute.channel = chan;
-				dstRoute.channel = chan;
-				//dstRoute.channels = 1;
-
-				// check if route src->dst exists:
-				iRoute irl = rl->begin();
-				for (; irl != rl->end(); ++irl) {
-					  if (*irl == dstRoute)
-							break;
-					  }
-				if (irl != rl->end()) {
-					  // disconnect if route exists
-					  audio->msgRemoveRoute(srcRoute, dstRoute);
-					  }
-				else {
-					  // connect if route does not exist
-					  audio->msgAddRoute(srcRoute, dstRoute);
-					  }
-				audio->msgUpdateSoloStates();
-				song->update(SC_ROUTE);
-
-				// p3.3.47
-				//pup->popup(ppt, 0);
-
-				//oR->setDown(false);
-				return;
-
-				// p3.3.46
-				///goto _redisplay;
-			  }
-
-			  iRouteMenuMap imm = gRoutingMenuMap.find(n);
-			  if(imm == gRoutingMenuMap.end())
-			  {
-				///delete orpup;
-				//oR->setDown(false);     // orpup->exec() catches mouse release event
-				return;
-			  }
-
-			  //int chan = n >> 16;
-			  //int chans = (chan >> 15) + 1; // Bit 31 MSB: Mono or stereo.
-			  //chan &= 0xffff;
-			  //int chan = imm->second.channel;
-			  //int chans = imm->second.channels;
-
-			  //Route srcRoute(t, -1);
-			  //srcRoute.remoteChannel = chan;
-			  //Route srcRoute(t, chan, chans);
-			  Route srcRoute(t, imm->second.channel, imm->second.channels);
-			  //Route srcRoute(t, imm->second.channel);
-			  srcRoute.remoteChannel = imm->second.remoteChannel;
-
-			  //Route dstRoute(s, true, -1);
-			  //Route dstRoute(s, true, -1, Route::TRACK_ROUTE);
-			  Route &dstRoute = imm->second;
-
-			  // check if route src->dst exists:
-			  iRoute irl = rl->begin();
-			  for (; irl != rl->end(); ++irl) {
-					if (*irl == dstRoute)
-						  break;
-					}
-			  if (irl != rl->end()) {
-					// disconnect if route exists
-					audio->msgRemoveRoute(srcRoute, dstRoute);
-					}
-			  else {
-					// connect if route does not exist
-					audio->msgAddRoute(srcRoute, dstRoute);
-					}
-			  audio->msgUpdateSoloStates();
-			  song->update(SC_ROUTE);
-
-			  // p3.3.46
-			  //oR->setDown(false);
-			  ///goto _redisplay;
-
-			  // p3.3.47
-			  //pup->popup(ppt, 0);
-			}
-			else
-			{
-			  QString s(pup->text(n));
-
-			  if(track->type() == Track::AUDIO_INPUT)
-			  {
-				///delete pup;
-				int chan = n & 0xf;
-
-				Route srcRoute(s, false, -1, Route::JACK_ROUTE);
-				Route dstRoute(t, chan);
-
-				srcRoute.channel = chan;
-
-				iRoute irl = rl->begin();
-				for(; irl != rl->end(); ++irl)
-				{
-				  if(*irl == srcRoute)
-					break;
-				}
-				if(irl != rl->end())
-				  // disconnect
-				  audio->msgRemoveRoute(srcRoute, dstRoute);
-				else
-				  // connect
-				  audio->msgAddRoute(srcRoute, dstRoute);
-
-				audio->msgUpdateSoloStates();
-				song->update(SC_ROUTE);
-				//iR->setDown(false);     // pup->exec() catches mouse release event
-				return;
-
-				// p3.3.46
-				///goto _redisplay;
-			  }
-
-			  iRouteMenuMap imm = gRoutingMenuMap.find(n);
-			  if(imm == gRoutingMenuMap.end())
-			  {
-				//delete pup;
-				//iR->setDown(false);     // pup->exec() catches mouse release event
-				return;
-			  }
-
-			  //int chan = n >> 16;
-			  //int chans = (chan >> 15) + 1; // Bit 31 MSB: Mono or stereo.
-			  //chan &= 0xffff;
-			  //int chan = imm->second.channel;
-			  //int chans = imm->second.channels;
-
-			  //Route srcRoute(s, false, -1);
-			  //Route srcRoute(s, false, -1, Route::TRACK_ROUTE);
-			  Route &srcRoute = imm->second;
-
-			  //Route dstRoute(t, -1);
-			  //Route dstRoute(t, chan, chans);
-			  Route dstRoute(t, imm->second.channel, imm->second.channels);
-			  //Route dstRoute(t, imm->second.channel);
-			  dstRoute.remoteChannel = imm->second.remoteChannel;
-
-			  iRoute irl = rl->begin();
-			  for (; irl != rl->end(); ++irl) {
-					if (*irl == srcRoute)
-						  break;
-					}
-			  if (irl != rl->end()) {
-					// disconnect
-					audio->msgRemoveRoute(srcRoute, dstRoute);
-					}
-			  else {
-					// connect
-					audio->msgAddRoute(srcRoute, dstRoute);
-					}
-			  audio->msgUpdateSoloStates();
-			  song->update(SC_ROUTE);
-
-			  // p3.3.46
-			  //iR->setDown(false);
-			  ///goto _redisplay;
-
-
-
-
-			}
-
-		}
-		 */
-
-	}
-	//else
-	//{
-	//}
 }
 
 //---------------------------------------------------------
@@ -3061,11 +2828,6 @@ void OOMidi::routingPopupMenuActivated(Track* track, int n)
 
 void OOMidi::routingPopupMenuAboutToHide()
 {
-	// Hmm, can't do this? Sub-menus stay open with this. Re-arranged, testing... Nope.
-	//PopupMenu* pup = oom->getRoutingPopupMenu();
-	//pup->disconnect();
-	//pup->clear();
-
 	gRoutingMenuMap.clear();
 	gRoutingPopupMenuMaster = 0;
 }
@@ -3079,30 +2841,15 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 	if (!track)
 		return 0;
 
-	//QPoint ppt = QCursor::pos();
-
 	if (track->isMidiTrack())
 	{
 
-		//QPoint ppt = parent->rect().bottomLeft();
-
-		//if(dst)
-		//{
-		// TODO
-
-		//}
-		//else
-		//{
 		RouteList* rl = dst ? track->outRoutes() : track->inRoutes();
-		//Route dst(track, -1);
 
 		PopupMenu* pup = getRoutingPopupMenu();
 		pup->disconnect();
-		//connect(pup, SIGNAL(activated(int)), SLOT(routingPopupMenuActivated(int)));
-		//connect(pup, SIGNAL(aboutToHide()), SLOT(routingPopupMenuAboutToHide()));
 
 		int gid = 0;
-		//int n;
 		QAction* act = 0;
 
 		// Routes can't be re-read until the message sent from msgAddRoute1()
@@ -3113,8 +2860,6 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 		gRoutingMenuMap.clear();
 		gid = 0;
 
-		//MidiInPortList* tl = song->midiInPorts();
-		//for(iMidiInPort i = tl->begin();i != tl->end(); ++i)
 		for (int i = 0; i < MIDI_PORTS; ++i)
 		{
 			//MidiInPort* track = *i;
@@ -3129,16 +2874,8 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 
 			//printf("OOMidi::prepareRoutingPopupMenu adding submenu portnum:%d\n", i);
 
-			//QMenu* m = menu->addMenu(track->name());
-			//QPopupMenu* subp = new QPopupMenu(parent);
-			//PopupMenu* subp = new PopupMenu(this);
-			//PopupMenu* subp = new PopupMenu();
 			PopupMenu* subp = new PopupMenu(pup);
 			subp->setTitle(md->name());
-
-			// OOMidi-2: Check this - needed with QMenu? Help says no. No - verified, it actually causes double triggers!
-			//connect(subp, SIGNAL(triggered(QAction*)), pup, SIGNAL(triggered(QAction*)));
-			//connect(subp, SIGNAL(aboutToHide()), pup, SIGNAL(aboutToHide()));
 
 			int chanmask = 0;
 			// p3.3.50 To reduce number of routes required, from one per channel to just one containing a channel mask.
@@ -3155,8 +2892,6 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 
 			for (int ch = 0; ch < MIDI_CHANNELS; ++ch)
 			{
-				//QAction* a = m->addAction(QString("Channel %1").arg(ch+1));
-				//subp->insertItem(QT_TRANSLATE_NOOP("@default", QString("Channel %1").arg(ch+1)), i * MIDI_CHANNELS + ch);
 				gid = i * MIDI_CHANNELS + ch;
 
 				//printf("OOMidi::prepareRoutingPopupMenu inserting gid:%d\n", gid);
@@ -3164,29 +2899,12 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 				act = subp->addAction(QString("Channel %1").arg(ch + 1));
 				act->setCheckable(true);
 				act->setData(gid);
-				//a->setCheckable(true);
-				//Route src(track, ch, RouteNode::TRACK);
-				//Route src(md, ch);
-				//Route r = Route(src, dst);
-				//a->setData(QVariant::fromValue(r));
-				//a->setChecked(rl->indexOf(r) != -1);
 
-				//Route srcRoute(md, ch);
-				//Route srcRoute(i, ch);     // p3.3.49 New: Midi port route.
 				int chbit = 1 << ch;
 				Route srcRoute(i, chbit); // p3.3.50 In accordance with new channel mask, use the bit position.
 
 				gRoutingMenuMap.insert(pRouteMenuMap(gid, srcRoute));
 
-				//for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)   // p3.3.50 Removed.
-				//{
-				//if(*ir == dst)
-				//  if(*ir == srcRoute)
-				//  {
-				//    subp->setItemChecked(id, true);
-				//    break;
-				//  }
-				//}
 				if (chanmask & chbit) // p3.3.50 Is the channel already set? Show item check mark.
 					act->setChecked(true);
 			}
@@ -3202,7 +2920,6 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 				gRoutingMenuMap.insert(pRouteMenuMap(gid, myRoute));
 			}
 
-			//subp->insertItem(QString("Toggle all"), 1000+i);
 			// p3.3.50 One route with all channel bits set.
 			gid = MIDI_PORTS * MIDI_CHANNELS + i; // Make sure each 'toggle' item gets a unique id.
 			act = subp->addAction(QString("Toggle all"));
@@ -3214,46 +2931,11 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 			pup->addMenu(subp);
 		}
 
-		/*
-		QPopupMenu* pup = new QPopupMenu(iR);
-		pup->setCheckable(true);
-		//MidiTrack* t = (MidiTrack*)track;
-		RouteList* irl = track->inRoutes();
-
-		MidiTrack* t = (MidiTrack*)track;
-		int gid = 0;
-		for (int i = 0; i < channel; ++i)
-		{
-			  char buffer[128];
-			  snprintf(buffer, 128, "%s %d", tr("Channel").toLatin1().constData(), i+1);
-			  MenuTitleItem* titel = new MenuTitleItem(QString(buffer));
-			  pup->insertItem(titel);
-
-			  if (!checkAudioDevice()) return;
-			  std::list<QString> ol = audioDevice->outputPorts();
-			  for (std::list<QString>::iterator ip = ol.begin(); ip != ol.end(); ++ip) {
-					int id = pup->insertItem(*ip, (gid * 16) + i);
-					Route dst(*ip, true, i);
-					++gid;
-					for (iRoute ir = irl->begin(); ir != irl->end(); ++ir) {
-						  if (*ir == dst) {
-								pup->setItemChecked(id, true);
-								break;
-								}
-						  }
-					}
-			  if (i+1 != channel)
-					pup->addSeparator();
-		}
-		 */
 
 		if (pup->actions().isEmpty())
 		{
 			gRoutingPopupMenuMaster = 0;
-			//pup->clear();
-			//pup->disconnect();
 			gRoutingMenuMap.clear();
-			//oR->setDown(false);
 			return 0;
 		}
 
@@ -3264,296 +2946,6 @@ PopupMenu* OOMidi::prepareRoutingPopupMenu(Track* track, bool dst)
 	return 0;
 }
 
-#if 0
-//---------------------------------------------------------
-//   getRoutingPopupView
-//---------------------------------------------------------
-
-PopupView* OOMidi::getRoutingPopupView()
-{
-	if (!routingPopupView)
-		//routingPopupView = new PopupView(this);
-		routingPopupView = new PopupView();
-	return routingPopupView;
-}
-
-//---------------------------------------------------------
-//   routingPopupViewActivated
-//---------------------------------------------------------
-
-void OOMidi::routingPopupViewActivated(Track* track, int n)
-{
-	//if(!track || (track != gRoutingPopupMenuMaster))
-	if (!track)
-		return;
-
-	if (track->isMidiTrack())
-	{
-		PopupView* pup = getRoutingPopupView();
-
-		//printf("OOMidi::routingPopupMenuActivated midi n:%d count:%d\n", n, pup->count());
-
-		if (pup->model()->rowCount() == 0)
-			return;
-
-		//MidiTrack* t = (MidiTrack*)track;
-		RouteList* rl = gIsOutRoutingPopupMenu ? track->outRoutes() : track->inRoutes();
-
-		if (n == -1)
-			return;
-
-		iRouteMenuMap imm = gRoutingMenuMap.find(n);
-		if (imm == gRoutingMenuMap.end())
-			return;
-		if (imm->second.type != Route::MIDI_PORT_ROUTE)
-			return;
-		Route &aRoute = imm->second;
-		int chbit = aRoute.channel;
-		Route bRoute(track, chbit);
-		int mdidx = aRoute.midiPort;
-
-		MidiPort* mp = &midiPorts[mdidx];
-		MidiDevice* md = mp->device();
-		if (!md)
-			return;
-
-		//if(!(md->rwFlags() & 2))
-		if (!(md->rwFlags() & (gIsOutRoutingPopupMenu ? 1 : 2)))
-			return;
-
-		int chmask = 0;
-		iRoute iir = rl->begin();
-		for (; iir != rl->end(); ++iir)
-		{
-			//if(*iir == (dst ? bRoute : aRoute))
-			//if(*iir == aRoute)
-			if (iir->type == Route::MIDI_PORT_ROUTE && iir->midiPort == mdidx) // p3.3.50 Is there already a route to this port?
-			{
-				chmask = iir->channel; // p3.3.50 Grab the channel mask.
-				break;
-			}
-		}
-		//if (iir != rl->end())
-		if ((chmask & chbit) == chbit) // p3.3.50 Is the channel's bit(s) set?
-		{
-			// disconnect
-			if (gIsOutRoutingPopupMenu)
-				audio->msgRemoveRoute(bRoute, aRoute);
-			else
-				audio->msgRemoveRoute(aRoute, bRoute);
-		}
-		else
-		{
-			// connect
-			if (gIsOutRoutingPopupMenu)
-				audio->msgAddRoute(bRoute, aRoute);
-			else
-				audio->msgAddRoute(aRoute, bRoute);
-		}
-
-		audio->msgUpdateSoloStates();
-		song->update(SC_ROUTE);
-	}
-	else
-	{
-		// TODO: Try to move code from AudioStrip::routingPopupMenuActivated into here.
-	}
-	//else
-	//{
-	//}
-}
-
-//---------------------------------------------------------
-//   prepareRoutingPopupView
-//---------------------------------------------------------
-
-PopupView* OOMidi::prepareRoutingPopupView(Track* track, bool dst)
-{
-	if (!track)
-		return 0;
-
-	//QPoint ppt = QCursor::pos();
-
-	if (track->isMidiTrack())
-	{
-
-		//QPoint ppt = parent->rect().bottomLeft();
-
-		//if(dst)
-		//{
-		// TODO
-
-		//}
-		//else
-		//{
-		RouteList* rl = dst ? track->outRoutes() : track->inRoutes();
-		//Route dst(track, -1);
-
-		///QPopupMenu* pup = new QPopupMenu(parent);
-
-		PopupView* pup = getRoutingPopupView();
-		pup->disconnect();
-		//connect(pup, SIGNAL(activated(int)), SLOT(routingPopupMenuActivated(int)));
-		//connect(pup, SIGNAL(aboutToHide()), SLOT(routingPopupMenuAboutToHide()));
-
-		///pup->setCheckable(true);
-
-		int gid = 0;
-		//int n;
-
-		// Routes can't be re-read until the message sent from msgAddRoute1()
-		//  has had time to be sent and actually affected the routes.
-		///_redisplay:
-
-		pup->clear();
-		gRoutingMenuMap.clear();
-		gid = 0;
-
-		//MidiInPortList* tl = song->midiInPorts();
-		//for(iMidiInPort i = tl->begin();i != tl->end(); ++i)
-		for (int i = 0; i < MIDI_PORTS; ++i)
-		{
-			//MidiInPort* track = *i;
-			// NOTE: Could possibly list all devices, bypassing ports, but no, let's stick with ports.
-			MidiPort* mp = &midiPorts[i];
-			MidiDevice* md = mp->device();
-			if (!md)
-				continue;
-
-			if (!(md->rwFlags() & (dst ? 1 : 2)))
-				continue;
-
-			//printf("OOMidi::prepareRoutingPopupMenu adding submenu portnum:%d\n", i);
-
-			//QMenu* m = menu->addMenu(track->name());
-			//QPopupMenu* subp = new QPopupMenu(parent);
-			//PopupMenu* subp = new PopupMenu(this);
-			QStandardItem* subp = new QStandardItem(QT_TRANSLATE_NOOP("@default", md->name()));
-			///        connect(subp, SIGNAL(activated(int)), pup, SIGNAL(activated(int)));
-			//connect(subp, SIGNAL(aboutToHide()), pup, SIGNAL(aboutToHide()));
-
-			int chanmask = 0;
-			// p3.3.50 To reduce number of routes required, from one per channel to just one containing a channel mask.
-			// Look for the first route to this midi port. There should always be only a single route for each midi port, now.
-			for (iRoute ir = rl->begin(); ir != rl->end(); ++ir)
-			{
-				if (ir->type == Route::MIDI_PORT_ROUTE && ir->midiPort == i)
-				{
-					// We have a route to the midi port. Grab the channel mask.
-					chanmask = ir->channel;
-					break;
-				}
-			}
-
-			for (int ch = 0; ch < MIDI_CHANNELS; ++ch)
-			{
-				//QAction* a = m->addAction(QString("Channel %1").arg(ch+1));
-				//subp->insertItem(QT_TRANSLATE_NOOP("@default", QString("Channel %1").arg(ch+1)), i * MIDI_CHANNELS + ch);
-				gid = i * MIDI_CHANNELS + ch;
-
-				//printf("OOMidi::prepareRoutingPopupMenu inserting gid:%d\n", gid);
-
-				///          subp->insertItem(QString("Channel %1").arg(ch+1), gid);
-				QStandardItem* sti = new QStandardItem(QString("Channel %1").arg(ch + 1));
-				sti->setCheckable(true);
-				sti->setData(gid);
-				subp->appendRow(sti);
-
-				//a->setCheckable(true);
-				//Route src(track, ch, RouteNode::TRACK);
-				//Route src(md, ch);
-				//Route r = Route(src, dst);
-				//a->setData(QVariant::fromValue(r));
-				//a->setChecked(rl->indexOf(r) != -1);
-
-				//Route srcRoute(md, ch);
-				//Route srcRoute(i, ch);     // p3.3.49 New: Midi port route.
-				int chbit = 1 << ch;
-				Route srcRoute(i, chbit); // p3.3.50 In accordance with new channel mask, use the bit position.
-
-				gRoutingMenuMap.insert(pRouteMenuMap(gid, srcRoute));
-
-				//for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)   // p3.3.50 Removed.
-				//{
-				//if(*ir == dst)
-				//  if(*ir == srcRoute)
-				//  {
-				//    subp->setItemChecked(id, true);
-				//    break;
-				//  }
-				//}
-				if (chanmask & chbit) // p3.3.50 Is the channel already set? Show item check mark.
-					///            subp->setItemChecked(gid, true);
-					sti->setCheckState(Qt::Checked);
-			}
-			//subp->insertItem(QString("Toggle all"), 1000+i);
-			// p3.3.50 One route with all channel bits set.
-			gid = MIDI_PORTS * MIDI_CHANNELS + i; // Make sure each 'toggle' item gets a unique id.
-			///        subp->insertItem(QString("Toggle all"), gid);
-			QStandardItem* sti = new QStandardItem(QString("Toggle all"));
-			sti->setData(gid);
-			subp->appendRow(sti);
-
-			Route togRoute(i, (1 << MIDI_CHANNELS) - 1); // Set all channel bits.
-			gRoutingMenuMap.insert(pRouteMenuMap(gid, togRoute));
-
-			///        pup->insertItem(QT_TRANSLATE_NOOP("@default", md->name()), subp);
-			pup->model()->appendRow(subp);
-			pup->updateView();
-		}
-
-		/*
-		QPopupMenu* pup = new QPopupMenu(iR);
-		pup->setCheckable(true);
-		//MidiTrack* t = (MidiTrack*)track;
-		RouteList* irl = track->inRoutes();
-
-		MidiTrack* t = (MidiTrack*)track;
-		int gid = 0;
-		for (int i = 0; i < channel; ++i)
-		{
-			  char buffer[128];
-			  snprintf(buffer, 128, "%s %d", tr("Channel").toLatin1().constData(), i+1);
-			  MenuTitleItem* titel = new MenuTitleItem(QString(buffer));
-			  pup->insertItem(titel);
-
-			  if (!checkAudioDevice()) return;
-			  std::list<QString> ol = audioDevice->outputPorts();
-			  for (std::list<QString>::iterator ip = ol.begin(); ip != ol.end(); ++ip) {
-					int id = pup->insertItem(*ip, (gid * 16) + i);
-					Route dst(*ip, true, i);
-					++gid;
-					for (iRoute ir = irl->begin(); ir != irl->end(); ++ir) {
-						  if (*ir == dst) {
-								pup->setItemChecked(id, true);
-								break;
-								}
-						  }
-					}
-			  if (i+1 != channel)
-					pup->addSeparator();
-		}
-		 */
-
-		///      if(pup->count() == 0)
-		if (pup->model()->rowCount() == 0)
-		{
-			///delete pup;
-			gRoutingPopupMenuMaster = 0;
-			//pup->clear();
-			//pup->disconnect();
-			gRoutingMenuMap.clear();
-			//oR->setDown(false);
-			return 0;
-		}
-
-		gIsOutRoutingPopupMenu = dst;
-		return pup;
-	}
-
-	return 0;
-}
-#endif
 
 //---------------------------------------------------------
 //   saveAs

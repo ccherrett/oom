@@ -392,30 +392,188 @@ Track* Song::addTrack(int t)/*{{{*/
 	OutputList* ol = song->outputs();
 	if (!ol->empty())
 	{
-		AudioOutput* ao = ol->front(); //FIXME: THIS IS WHERE IT GETS THE FIRST OUTPUT BUSS AND CONNECTS TO IT BELOW
-		switch (type)
+		AudioOutput* ao = 0; //ol->front(); //FIXME: THIS IS WHERE IT GETS THE FIRST OUTPUT BUSS AND CONNECTS TO IT BELOW
+		for(iAudioOutput io = ol->begin(); io != ol->end(); io++)
 		{
-				//case Track::MIDI:
-				//case Track::DRUM:
-				//case Track::AUDIO_OUTPUT:
-				//      break;
+			if((*io)->name() == "Master")
+			{
+				ao = *io;
+				break;
+			}
+		}
+		if(ao)
+		{
+			switch (type)
+			{
+				case Track::WAVE:
+				case Track::AUDIO_AUX:
+					audio->msgAddRoute(Route((AudioTrack*) track, -1), Route(ao, -1));
+					updateFlags |= SC_ROUTE;
+					break;
+					// p3.3.38 It should actually never get here now, but just in case.
+				case Track::AUDIO_SOFTSYNTH:
+					audio->msgAddRoute(Route((AudioTrack*) track, 0, ((AudioTrack*) track)->channels()), Route(ao, 0, ((AudioTrack*) track)->channels()));
+					updateFlags |= SC_ROUTE;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	audio->msgUpdateSoloStates();
+	updateTrackViews1();
+	return track;
+}/*}}}*/
 
-			case Track::WAVE:
-				//case Track::AUDIO_BUSS:  // Removed by Tim.
-			case Track::AUDIO_AUX:
-				//case Track::AUDIO_INPUT:  // Removed by Tim.
-				// p3.3.38
-				//case Track::AUDIO_SOFTSYNTH:
-				audio->msgAddRoute(Route((AudioTrack*) track, -1), Route(ao, -1));
+Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{{{*/
+{
+	Track::TrackType type = (Track::TrackType) t;
+	Track* track = 0;
+	int lastAuxIdx = _auxs.size();
+	switch (type)
+	{
+		case Track::MIDI:
+			track = new MidiTrack();
+			track->setType(Track::MIDI);
+			
+			if(config.partColorNames[lastTrackPartColorIndex].contains("menu:", Qt::CaseSensitive))
+				lastTrackPartColorIndex ++;
+			
+			track->setDefaultPartColor(lastTrackPartColorIndex);
+			lastTrackPartColorIndex ++;
+			
+			if(lastTrackPartColorIndex == NUM_PARTCOLORS)
+				lastTrackPartColorIndex = 1;
+
+			break;
+		case Track::DRUM:
+			track = new MidiTrack();
+			track->setType(Track::DRUM);
+			((MidiTrack*) track)->setOutChannel(9);
+			break;
+		case Track::WAVE:
+			track = new WaveTrack();
+			
+			if(config.partColorNames[lastTrackPartColorIndex].contains("menu:", Qt::CaseSensitive))
+				lastTrackPartColorIndex ++;
+			
+			track->setDefaultPartColor(lastTrackPartColorIndex);
+			lastTrackPartColorIndex ++;
+			
+			if(lastTrackPartColorIndex == NUM_PARTCOLORS)
+				lastTrackPartColorIndex = 1;
+			
+			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			break;
+		case Track::AUDIO_OUTPUT:
+			track = new AudioOutput();
+			break;
+		case Track::AUDIO_BUSS:
+			track = new AudioBuss();
+			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			break;
+		case Track::AUDIO_AUX:
+			track = new AudioAux();
+			break;
+		case Track::AUDIO_INPUT:
+			track = new AudioInput();
+			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			break;
+		case Track::AUDIO_SOFTSYNTH:
+			printf("not implemented: Song::addTrack(SOFTSYNTH)\n");
+			// ((AudioTrack*)track)->addAuxSend(lastAuxIdx);
+			break;
+		default:
+			printf("Song::addTrack() illegal type %d\n", type);
+			abort();
+	}
+	track->setName(track->getValidName(name));
+	track->setHeight(DEFAULT_TRACKHEIGHT);
+	insertTrack1(track, pos);
+	msgInsertTrack(track, pos, true);
+	insertTrack3(track, pos);
+
+	// Add default track <-> midiport routes.
+	if (track->isMidiTrack())
+	{
+		MidiTrack* mt = (MidiTrack*) track;
+		int c, cbi, ch;
+		bool defOutFound = false; /// TODO: Remove this when multiple out routes supported.
+		for (int i = 0; i < MIDI_PORTS; ++i)
+		{
+			MidiPort* mp = &midiPorts[i];
+
+			c = mp->defaultInChannels();
+			if (c)
+			{
+				audio->msgAddRoute(Route(i, c), Route(track, c));
 				updateFlags |= SC_ROUTE;
-				break;
-				// p3.3.38 It should actually never get here now, but just in case.
-			case Track::AUDIO_SOFTSYNTH:
-				audio->msgAddRoute(Route((AudioTrack*) track, 0, ((AudioTrack*) track)->channels()), Route(ao, 0, ((AudioTrack*) track)->channels()));
-				updateFlags |= SC_ROUTE;
-				break;
-			default:
-				break;
+			}
+
+			if (!defOutFound) ///
+			{
+				c = mp->defaultOutChannels();
+				if (c)
+				{
+
+					/// TODO: Switch when multiple out routes supported.
+#if 0
+					audio->msgAddRoute(Route(track, c), Route(i, c));
+					updateFlags |= SC_ROUTE;
+#else 
+					for (ch = 0; ch < MIDI_CHANNELS; ++ch)
+					{
+						cbi = 1 << ch;
+						if (c & cbi)
+						{
+							defOutFound = true;
+							mt->setOutPort(i);
+							mt->setOutChannel(ch);
+							updateFlags |= SC_ROUTE;
+							break;
+						}
+					}
+#endif
+				}
+			}
+		}
+	}
+
+	//
+	//  add default route to master
+	//
+	if(connectMaster)
+	{
+		OutputList* ol = song->outputs();
+		if (!ol->empty())
+		{
+			AudioOutput* ao = 0; //ol->front(); //FIXME: THIS IS WHERE IT GETS THE FIRST OUTPUT BUSS AND CONNECTS TO IT BELOW
+			for(iAudioOutput io = ol->begin(); io != ol->end(); io++)
+			{
+				if((*io)->name() == "Master")
+				{
+					ao = *io;
+					break;
+				}
+			}
+			if(ao)
+			{
+				switch (type)
+				{
+					case Track::WAVE:
+					case Track::AUDIO_AUX:
+						audio->msgAddRoute(Route((AudioTrack*) track, -1), Route(ao, -1));
+						updateFlags |= SC_ROUTE;
+						break;
+						// p3.3.38 It should actually never get here now, but just in case.
+					case Track::AUDIO_SOFTSYNTH:
+						audio->msgAddRoute(Route((AudioTrack*) track, 0, ((AudioTrack*) track)->channels()), Route(ao, 0, ((AudioTrack*) track)->channels()));
+						updateFlags |= SC_ROUTE;
+						break;
+					default:
+						break;
+				}
+			}
 		}
 	}
 	audio->msgUpdateSoloStates();

@@ -608,6 +608,7 @@ public slots:
 	void playMonitorEvent(int fd);
 	void processMonitorMessage(const void*);
     Track* addTrack(int);
+	Track* addTrackByName(QString name, int t, int pos, bool connectMaster);
     Track* addNewTrack(QAction* action);
     TrackView* addNewTrackView();
     QString getScriptPath(int id, bool delivered);

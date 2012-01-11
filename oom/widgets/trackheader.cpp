@@ -40,6 +40,7 @@
 #include "trackheader.h"
 #include "slider.h"
 #include "mixer/meter.h"
+#include "CreateTrackDialog.h"
 
 static QString styletemplate = "QLineEdit { border-width:1px; border-radius: 0px; border-image: url(:/images/frame.png) 4; border-top-color: #1f1f22; border-bottom-color: #505050; color: #%1; background-color: #%2; font-family: fixed-width; font-weight: bold; font-size: 15px; padding-left: 15px; }";
 static QString trackHeaderStyle = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #2e2e2e; }";
@@ -987,9 +988,30 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 				m_track->setDefaultPartColor(curColorIndex);
 				break;
 			}
-			case Track::MIDI+10000 ... Track::AUDIO_AUX+10000:
-			{
-				Track* t = song->addTrack((Track::TrackType)n-10000);
+			case Track::MIDI+10000 ... Track::AUDIO_AUX+10000:/*{{{*/
+			{//Insert before
+				int mypos = song->tracks()->index(m_track);
+				CreateTrackDialog *ctdialog = new CreateTrackDialog((n-10000), mypos, this);
+				ctdialog->open();
+			
+				/*Track* t = song->addTrack((Track::TrackType)n-10000);
+
+				if (t)
+				{
+					midiMonitor->msgAddMonitoredTrack(t);
+					song->deselectTracks();
+					t->setSelected(true);
+
+					emit selectionChanged(t);
+					emit trackInserted(n-10000);
+
+					song->updateTrackViews1();
+				}*/
+				break;
+			}/*}}}*/
+			case Track::MIDI+12000 ... Track::AUDIO_AUX+12000:/*{{{*/
+			{//Insert after
+				Track* t = song->addTrack((Track::TrackType)n-12000);
 
 				if (t)
 				{
@@ -1003,7 +1025,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					song->updateTrackViews1();
 				}
 				break;
-			}
+			}/*}}}*/
 			default:
 				printf("action %d\n", n);
 			break;

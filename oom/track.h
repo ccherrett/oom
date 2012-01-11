@@ -435,6 +435,7 @@ public:
 
     bool readProperty(Xml& xml, const QString& tag);
     void setDefaultName();
+	QString getValidName(QString name, bool isdefault = false);
 
     int channels() const
     {

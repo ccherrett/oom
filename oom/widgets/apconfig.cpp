@@ -359,17 +359,13 @@ void AudioPortConfig::trackSelectionChanged()
 							case Track::AUDIO_OUTPUT:
 							case Track::AUDIO_BUSS:
 							case Track::WAVE:
-								//for (int channel = 0; channel < track->channels(); ++channel)
-								//{
-									newDstList->addItem(Route(track, -1).name());
-								//}
+								newDstList->addItem(Route(track, -1).name());
 							break;
 							default:
 							break;
 						}
 					}
 					insertOutputs();
-					//newSrcList->addItem(Route(track, -1).name());
 				break;
 				case Track::WAVE:
 					for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
@@ -381,17 +377,11 @@ void AudioPortConfig::trackSelectionChanged()
 							continue; //You cant connect a track to itself
 						if(track->type() == Track::AUDIO_INPUT)
 						{
-							//for (int channel = 0; channel < track->channels(); ++channel)
-							//{
-								newSrcList->addItem(Route(track, -1).name());
-							//}
+							newSrcList->addItem(Route(track, -1).name());
 						}
 						else if(track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_BUSS)
 						{
-							//for (int channel = 0; channel < track->channels(); ++channel)
-							//{
-								newDstList->addItem(Route(track, -1).name());
-							//}
+							newDstList->addItem(Route(track, -1).name());
 						}
 					}
 				break;
