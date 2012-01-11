@@ -17,7 +17,8 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	int m_insertType;
 	int m_insertPosition;
 	
-	void populateInputs();
+	void importInputs();
+	void importOutputs();
 
 private slots:
 	void addTrack();

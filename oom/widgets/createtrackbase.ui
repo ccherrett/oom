@@ -75,10 +75,13 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="duplicatesEnabled">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="txtChannel">
+      <widget class="QSpinBox" name="txtInChannel">
        <property name="prefix">
         <string>Chan </string>
        </property>
@@ -108,6 +111,19 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="txtOutChannel">
+       <property name="prefix">
+        <string>Chan </string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>16</number>
        </property>
       </widget>
      </item>

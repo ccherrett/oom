@@ -63,9 +63,9 @@ void CreateTrackDialog::inputSelected(int pos)
 //Populate input combo based on type
 void CreateTrackDialog::showEvent(QShowEvent*)
 {
-	qWarning("Inside CreateTrackDialog::showEvent");
-	QString stype(QString::number(m_insertType));
-	qWarning(stype.toUtf8().constData());
+	qWarning("Inside CreateTrackDialog::showEvent trackType: %i, position: %i", m_insertType, m_insertPosition);
+	while(cmbInput->count())
+		cmbInput->removeItem(cmbInput->count()-1);
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch(type)
 	{
@@ -73,8 +73,6 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 		case Track::DRUM:
 		{
 			qWarning("Midi track type");
-			while(cmbInput->count())
-				cmbInput->removeItem(cmbInput->count()-1);
 			for (int i = 0; i < MIDI_PORTS; ++i)
 			{
 				MidiPort* mp = &midiPorts[i];
@@ -83,10 +81,11 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 				if (!md)
 					continue;
 
-				if (!(md->rwFlags() & 2))
-					continue;
+				if ((md->rwFlags() & 2))
+					cmbInput->addItem(md->name(), i);
 
-				cmbInput->addItem(md->name(), i);
+				if((md->rwFlags() & 1))
+					cmbOutput->addItem(md->name(), i);
 
 				//Add global menu toggle
 				//int ch1bit = 1 << 0;
@@ -101,30 +100,108 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 		case Track::WAVE:
 		{
 			qWarning("Audio Track Type");
-			txtChannel->hide();
-			while(cmbInput->count())
-				cmbInput->removeItem(cmbInput->count()-1);
-			if (checkAudioDevice()) 
+			txtInChannel->setVisible(false);
+			txtOutChannel->setVisible(false);
+
+			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 			{
-				std::list<QString> sl = audioDevice->outputPorts();
-				for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-					cmbInput->addItem(*i);
+				if((*t)->isMidiTrack())
+					continue;
+				AudioTrack* track = (AudioTrack*) (*t);
+				if(track->type() == Track::AUDIO_OUTPUT || track->type() == Track::AUDIO_BUSS)
+				{
+					cmbOutput->addItem(Route(track, -1).name());
 				}
 			}
-
+			importOutputs();
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
 			}
 		}
 		break;
 		case Track::AUDIO_OUTPUT:
+		{
+			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
+			{
+				if((*t)->isMidiTrack())
+					continue;
+				AudioTrack* track = (AudioTrack*) (*t);
+				Route r(track, -1);
+				cmbInput->addItem(r.name());
+			}
+
+			importInputs();
+		}
+		break;
 		case Track::AUDIO_INPUT:
+		{
+			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
+			{
+				if((*t)->isMidiTrack())
+					continue;
+				AudioTrack* track = (AudioTrack*) (*t);
+				switch(track->type())
+				{
+					case Track::AUDIO_OUTPUT:
+					case Track::AUDIO_BUSS:
+					case Track::WAVE:
+						cmbOutput->addItem(Route(track, -1).name());
+					break;
+					default:
+					break;
+				}
+			}
+			importOutputs();
+		}
+		break;
 		case Track::AUDIO_BUSS:
+		{
+			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
+			{
+				if((*t)->isMidiTrack())
+					continue;
+				AudioTrack* track = (AudioTrack*) (*t);
+				if(track->type() == Track::AUDIO_INPUT || track->type() == Track::WAVE || track->type() == Track::AUDIO_SOFTSYNTH)
+				{
+					cmbInput->addItem(Route(track, -1).name());
+				}
+				else if(track->type() == Track::AUDIO_OUTPUT)
+				{
+					cmbOutput->addItem(Route(track, -1).name());
+				}
+			}
+		}
+		break;
 		case Track::AUDIO_AUX:
 		case Track::AUDIO_SOFTSYNTH:
-			//cmbInput->setVisible(false);
-			//label_2->setVisible(false);
-			txtChannel->setVisible(false);
+			cmbInput->setVisible(false);
+			cmbOutput->setVisible(false);
+			label_2->setVisible(false);
+			label_3->setVisible(false);
+			txtInChannel->setVisible(false);
+			txtOutChannel->setVisible(false);
 		break;
+	}
+}
+
+void CreateTrackDialog::importOutputs()
+{
+	if (checkAudioDevice()) 
+	{
+		std::list<QString> sl = audioDevice->outputPorts();
+		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
+			cmbInput->addItem(*i);
+		}
+	}
+}
+
+void CreateTrackDialog::importInputs()
+{
+	if (checkAudioDevice()) 
+	{
+		std::list<QString> sl = audioDevice->inputPorts();
+		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
+			cmbOutput->addItem(*i);
+		}
 	}
 }
