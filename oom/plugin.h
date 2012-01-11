@@ -15,7 +15,6 @@
 #include <QFileInfo>
 #include <QUiLoader>
 
-#include "ladspa.h"
 #include "globals.h"
 #include "globaldefs.h"
 #include "ctrl.h"
@@ -24,14 +23,7 @@
 
 #include "config.h"
 
-#ifdef OSC_SUPPORT
-//class OscIF;
-#include "osc.h"
-#endif
-
-#ifdef DSSI_SUPPORT
-#include <dssi.h>
-#endif
+#include "ladspa.h"
 
 class QAbstractButton;
 class QComboBox;
@@ -62,10 +54,15 @@ public:
 };
 
 enum PluginType {
-	LADSPA = 0,
-	LV2 = 1,
-	DSSI = 2
+    PLUGIN_LADSPA = 0,
+    PLUGIN_LV2    = 1,
+    PLUGIN_VST    = 2
 };
+
+// delete later
+#define LADSPA 0
+#define DSSI 2
+#define LV2 1
 
 typedef int PluginHint;
 #define Toggle 0x4

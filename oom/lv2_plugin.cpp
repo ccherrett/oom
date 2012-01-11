@@ -288,7 +288,7 @@ void initLV2()/*{{{*/
 
 
 LV2Plugin::LV2Plugin(const char* uri)
-: Plugin(LV2, uri)
+: Plugin((PluginType)LV2, uri)
 {
 	controlInputs = 0;
 	controlOutputs = 0;

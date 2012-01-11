@@ -39,12 +39,14 @@ MidiMonitor::MidiMonitor(const char* name) : Thread(name)
 	m_learning = false;
 	m_learnport = -1;
     m_feedbackMode = FEEDBACK_MODE_READ;
-
-    connect(song, SIGNAL(playChanged(bool)), this, SLOT(songPlayChanged()));
+    m_feedbackTimeout = 0;
 
     updateNow = false;
     updateNowTimer.setInterval(50);
+    updateNowTimer.start();
+
     connect(&updateNowTimer, SIGNAL(timeout()), this, SLOT(updateSongNow()));
+    connect(song, SIGNAL(playChanged(bool)), this, SLOT(songPlayChanged()));
 
 	int filedes[2]; // 0 - reading   1 - writing/*{{{*/
 	if (pipe(filedes) == -1)
@@ -78,71 +80,75 @@ void MidiMonitor::setFeedbackMode(FeedbackMode mode)
     qWarning("Feedback mode changed %i", mode);
 
     m_feedbackMode = mode;
-
-    switch(mode)
-    {
-    case FEEDBACK_MODE_READ:
-        updateNowTimer.setInterval(50);
-        break;
-    case FEEDBACK_MODE_WRITE:
-    case FEEDBACK_MODE_TOUCH:
-        updateNowTimer.setInterval(50);
-        break;
-    case FEEDBACK_MODE_AUDITION:
-        updateNowTimer.setInterval(50);
-        if (updateNowTimer.isActive() == false)
-            updateNowTimer.start();
-        break;
-    }
 }
 
 void MidiMonitor::updateLater()
 {
-    if (updateNowTimer.isActive() == false)
-    {
-        updateNow = true;
-        updateNowTimer.start();
-    }
+    updateNow = true;
 }
 
 void MidiMonitor::updateSongNow()
 {
-    if (updateNow || m_feedbackMode == FEEDBACK_MODE_AUDITION)
+    bool updateEvents;
+
+    if (m_feedback)
     {
-        if (m_feedbackMode != FEEDBACK_MODE_READ)
+        switch(m_feedbackMode)
         {
-            unsigned tick = song->cpos();
-
-            for (int i=0; i < m_lastFeedbackMessages.count(); i++)
+        case FEEDBACK_MODE_READ:
+            updateEvents = false;
+            break;
+        case FEEDBACK_MODE_WRITE:
+        case FEEDBACK_MODE_TOUCH:
+        case FEEDBACK_MODE_AUDITION:
+            m_feedbackTimeout += 1;
+            if (m_feedbackTimeout == 6) // 6x50ms = 300ms
             {
-                LastFeedbackMessage* msg = &m_lastFeedbackMessages[i];
-
-                LastMidiInMessage* lastMsg = getLastMidiInMessage(msg->controller);
-                if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && (m_feedbackMode == FEEDBACK_MODE_WRITE || tick - lastMsg->lastTick < 384))
-                {
-                    if (m_feedbackMode == FEEDBACK_MODE_AUDITION)
-                    {
-                        song->stopRolling();
-                        updateNowTimer.stop();
-                    }
-                    else
-                        continue;
-                }
-
-                MidiPlayEvent ev(0, msg->port, msg->channel, ME_CONTROLLER, msg->controller, msg->value);
-                ev.setEventSource(MonitorSource);
-                midiPorts[ev.port()].device()->putEvent(ev);
+                m_feedbackTimeout = 0;
+                updateEvents = true;
             }
+            break;
         }
+    }
+    else
+        updateEvents = true;
 
-        if (updateNow)
-            song->update(SC_EVENT_INSERTED);
+    if (updateEvents)
+    {
+        unsigned tick = song->cpos();
 
-        updateNow = false;
+        qWarning("Audition test - %i", m_lastFeedbackMessages.count());
+
+        for (int i=0; i < m_lastFeedbackMessages.count(); i++)
+        {
+            LastFeedbackMessage* msg = &m_lastFeedbackMessages[i];
+
+            LastMidiInMessage* lastMsg = getLastMidiInMessage(msg->controller);
+            if (lastMsg && lastMsg->lastTick <= tick && ((m_feedback && m_feedbackMode == FEEDBACK_MODE_WRITE) || tick - lastMsg->lastTick < 384))
+            {
+                if (m_feedback && m_feedbackMode == FEEDBACK_MODE_AUDITION)
+                {
+                    qWarning("Audition stop!");
+                    song->stopRolling();
+                    song->setPos(Song::CPOS, Pos(lastMsg->lastTick, true), true, true, true);
+                }
+                else
+                    continue;
+            }
+
+            qWarning("Audition continue");
+
+            MidiPlayEvent ev(0, msg->port, msg->channel, ME_CONTROLLER, msg->controller, msg->value);
+            ev.setEventSource(MonitorSource);
+            midiPorts[ev.port()].device()->putEvent(ev);
+        }
     }
 
-    if (m_feedbackMode != FEEDBACK_MODE_AUDITION)
-        updateNowTimer.stop();
+    if (updateNow)
+    {
+        updateNow = false;
+        song->update(SC_EVENT_INSERTED);
+    }
 }
 
 void MidiMonitor::songPlayChanged()
@@ -150,6 +156,7 @@ void MidiMonitor::songPlayChanged()
     qWarning("songPlayChanged()");
     m_lastMidiInMessages.clear();
     m_lastFeedbackMessages.clear();
+    m_feedbackTimeout = 0;
 }
 
 LastMidiInMessage* MidiMonitor::getLastMidiInMessage(int controller)
@@ -259,6 +266,8 @@ LastFeedbackMessage* MidiMonitor::getLastFeedbackMessage(int port, int channel, 
 
 void MidiMonitor::setLastFeedbackMessage(int port, int channel, int controller, int value)
 {
+    qWarning("setLastFeedbackMessage();");
+
     for (int i=0; i < m_lastFeedbackMessages.count(); i++)
     {
         LastFeedbackMessage* msg = &m_lastFeedbackMessages[i];
@@ -518,6 +527,9 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
 			}
 			if(isManagedInputPort(msg->mevent.port()))
 			{
+                if (m_feedback && m_feedbackMode == FEEDBACK_MODE_READ)
+                    return;
+
 				//printf("MidiMonitor::processMsg1() Processing Midi Input\n");
 				QMultiHash<int, CCInfo*>::iterator iter = m_midimap.find(msg->mevent.dataA());
 				while(iter != m_midimap.end())
@@ -851,13 +863,6 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     }
                     else
                     {
-                        // Check if we should ignore this event
-                        unsigned tick = song->cpos();
-                        LastMidiInMessage* lastMsg = getLastMidiInMessage(info->controller());
-
-                        if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && (m_feedbackMode == FEEDBACK_MODE_WRITE || tick - lastMsg->lastTick < 384))
-                            return;
-
                         setLastFeedbackMessage(info->port(), info->channel(), info->assignedControl(), msg->mevent.dataB());
                         updateLater();
                     }
@@ -891,13 +896,6 @@ void MidiMonitor::processMsg1(const void* m)/*{{{*/
                     }
                     else
                     {
-                        // Check if we should ignore this event
-                        unsigned tick = song->cpos();
-                        LastMidiInMessage* lastMsg = getLastMidiInMessage(info->controller());
-
-                        if (lastMsg && lastMsg->lastTick > 0 && lastMsg->lastTick <= tick && (m_feedbackMode == FEEDBACK_MODE_WRITE || tick - lastMsg->lastTick < 384))
-                            return;
-
                         setLastFeedbackMessage(info->port(), info->channel(), info->assignedControl(), msg->mevent.dataB());
                         updateLater();
                     }
