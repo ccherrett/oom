@@ -63,7 +63,7 @@ void CreateTrackDialog::inputSelected(int pos)
 //Populate input combo based on type
 void CreateTrackDialog::showEvent(QShowEvent*)
 {
-	qWarning("Inside CreateTrackDialog::showEvent trackType: %i, position: %i", m_insertType, m_insertPosition);
+	qDebug("Inside CreateTrackDialog::showEvent trackType: %i, position: %i", m_insertType, m_insertPosition);
 	while(cmbInput->count())
 		cmbInput->removeItem(cmbInput->count()-1);
 	Track::TrackType type = (Track::TrackType)m_insertType;
@@ -72,7 +72,7 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 		case Track::MIDI:
 		case Track::DRUM:
 		{
-			qWarning("Midi track type");
+			qDebug("Midi track type");
 			for (int i = 0; i < MIDI_PORTS; ++i)
 			{
 				MidiPort* mp = &midiPorts[i];
@@ -99,7 +99,7 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 		break;
 		case Track::WAVE:
 		{
-			qWarning("Audio Track Type");
+			qDebug("Audio Track Type");
 			txtInChannel->setVisible(false);
 			txtOutChannel->setVisible(false);
 
