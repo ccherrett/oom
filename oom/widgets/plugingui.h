@@ -18,7 +18,7 @@ class QComboBox;
 class QRadioButton;
 class QScrollArea;
 class QToolButton;
-class PluginIBase;
+class Plugin;
 
 class Xml;
 class Slider;
@@ -37,8 +37,9 @@ struct GuiParam/*{{{*/
     {
         GUI_SLIDER, GUI_SWITCH
     };
+
     int type;
-    int hint;
+    int hints;
 
     DoubleLabel* label;
     QWidget* actuator; // Slider or Toggle Button (SWITCH)
@@ -67,7 +68,7 @@ class PluginGui : public QMainWindow/*{{{*/
 {
     Q_OBJECT
 
-    PluginIBase* plugin; // plugin instance
+    Plugin* plugin; // plugin instance
 
     GuiParam* params;
     int nobj; // number of widgets in gw
@@ -99,7 +100,7 @@ protected slots:
     virtual void heartBeat();
 
 public:
-    PluginGui(PluginIBase*);
+    PluginGui(Plugin*);
 
     ~PluginGui();
     void setOn(bool);

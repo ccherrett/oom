@@ -28,9 +28,6 @@
 #include "gconfig.h"
 #include "globals.h"
 #include "plugin.h"
-#ifdef LV2_SUPPORT
-#include "lv2_plugin.h"
-#endif
 #include "filedialog.h"
 #include "plugindialog.h"
 #include "plugingui.h"
@@ -51,7 +48,7 @@ public:
 	void setBackgroundColor(const QBrush& brush)
 	{
 		setBackground(brush);
-	};
+    }
 };
 
 RackSlot::~RackSlot()
@@ -157,8 +154,9 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 	Plugin* plugin = PluginDialog::getPlugin(this);
 	if (plugin)
 	{
-		PluginI* plugi = new PluginI();
-#ifdef LV2_SUPPORT
+        // FIXME!!! create plugin by type
+        LadspaPlugin* plugi = new LadspaPlugin();
+#if 0 //def LV2_SUPPORT
 		if(plugin->type() == LV2)
 		{
 			//printf("LV2 Plugin select for rack\n");
@@ -183,7 +181,8 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 		else
 #endif
 		{
-			if (!plugi->initPluginInstance(plugin, track->channels()))
+#if 0
+            if (!plugi->initPluginInstance(plugin, track->channels()))
 			{
 				printf("cannot instantiate plugin <%s>\n",
 						plugin->name().toLatin1().constData());
@@ -195,6 +194,7 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 				audio->msgAddPlugin(track, idx, 0);
 			audio->msgAddPlugin(track, idx, plugi);
 			song->dirty = true;
+#endif
 		}
 		updateContents();
 	}
@@ -216,7 +216,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 	if (pipe)
 	{
 		name = pipe->name(idx);
-		mute = pipe->isOn(idx);
+        mute = pipe->isActive(idx);
 	}
 
 	//enum { NEW, CHANGE, UP, DOWN, REMOVE, BYPASS, SHOW, SAVE };
@@ -250,7 +250,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 	showGuiAction->setCheckable(true);
 	showNativeGuiAction->setCheckable(true);
 
-	bypassAction->setChecked(!pipe->isOn(idx));
+    bypassAction->setChecked(pipe->isActive(idx) == false);
 	showGuiAction->setChecked(pipe->guiVisible(idx));
 	showNativeGuiAction->setChecked(pipe->nativeGuiVisible(idx));
 
@@ -279,8 +279,8 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 			upAction->setEnabled(true);
 		if (idx == (PipelineDepth - 1))
 			downAction->setEnabled(false);
-		if (!pipe->isDssiPlugin(idx))
-			showNativeGuiAction->setEnabled(false);
+        //if (!pipe->isDssiPlugin(idx))
+        //	showNativeGuiAction->setEnabled(false);
 	}
 
 	QPoint pt = QCursor::pos();
@@ -331,8 +331,8 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 		}
 		case BYPASS:
 		{
-			bool flag = !pipe->isOn(idx);
-			pipe->setOn(idx, flag);
+            bool flag = !pipe->isActive(idx);
+            pipe->setActive(idx, flag);
 			break;
 		}
 		case SHOW:
@@ -427,7 +427,7 @@ void EffectRack::savePreset(int idx)
 		{
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
-		#ifdef LV2_SUPPORT
+        #if 0 //def LV2_SUPPORT
 			if((*pipe)[idx]->type() == 1)
 			{
 				printf("Saving LV2 preset\n");
@@ -485,7 +485,7 @@ void EffectRack::startDrag(int idx)
 		{
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
-		#ifdef LV2_SUPPORT
+        #if 0 //def LV2_SUPPORT
 			if((*pipe)[idx]->type() == 1)
 			{
 				LV2PluginI* lp = (LV2PluginI*)(*pipe)[idx];
@@ -630,8 +630,8 @@ void EffectRack::mousePressEvent(QMouseEvent *event)
 	else if (event->button() & Qt::MidButton)
 	{
 		int idx = row(itemAt(event->pos()));
-		bool flag = !track->efxPipe()->isOn(idx);
-		track->efxPipe()->setOn(idx, flag);
+        bool flag = !track->efxPipe()->isActive(idx);
+        track->efxPipe()->setActive(idx, flag);
 		updateContents();
 	}
 
@@ -676,7 +676,8 @@ void EffectRack::initPlugin(Xml xml, int idx)
 			case Xml::TagStart:
 				if (tag == "plugin")/*{{{*/
 				{
-					PluginI* plugi = new PluginI();
+                    // FIXME
+                    LadspaPlugin* plugi = new LadspaPlugin();
 					if (plugi->readConfiguration(xml, false))
 					{
 						printf("cannot instantiate plugin\n");
@@ -692,7 +693,7 @@ void EffectRack::initPlugin(Xml xml, int idx)
 				}/*}}}*/
 				else if (tag == "lv2plugin")/*{{{*/
 				{
-			#ifdef LV2_SUPPORT
+            #if 0 //def LV2_SUPPORT
 					LV2PluginI* plugi = new LV2PluginI();
 					if (plugi->readConfiguration(xml, false))
 					{

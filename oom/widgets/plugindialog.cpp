@@ -9,9 +9,6 @@
 
 #include <QtGui>
 #include "plugin.h"
-#ifdef LV2_SUPPORT
-#include "lv2_plugin.h"
-#endif
 #include "config.h"
 #include "plugindialog.h"
 #include "traverso_shared/TConfig.h"
@@ -288,8 +285,8 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 	pList->clear();
 	for (iPlugin i = plugins.begin(); i != plugins.end(); ++i)
 	{
-		int ai = i->inports();
-		int ao = i->outports();
+        int ai = i->getAudioInputCount();
+        int ao = i->getAudioOutputCount();
 		//int ci = i->controlInPorts();
 		//int co = i->controlOutPorts();
 		bool addFlag = false;
@@ -329,7 +326,7 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 		{
 			QTreeWidgetItem* item = new QTreeWidgetItem;
 			item->setText(0, stereo ? "True" : "False");
-			item->setData(0, Qt::UserRole, i->lib());
+            item->setData(0, Qt::UserRole, i->filename());
 			item->setText(1, i->label());
 			item->setText(2, i->name());
 			QString tip(i->name());
@@ -355,8 +352,8 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 	pList->clear();
 	for (iPlugin i = plugins.begin(); i != plugins.end(); ++i)
 	{
-		int ai = i->inports();
-		int ao = i->outports();
+        int ai = i->getAudioInputCount();
+        int ao = i->getAudioOutputCount();
 		//int ci = i->controlInPorts();
 		//int co = i->controlOutPorts();
 
@@ -378,7 +375,7 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 		{
 			QTreeWidgetItem* item = new QTreeWidgetItem;
 			item->setText(0, stereo ? "True" : "False"); //i->lib()
-			item->setData(0, Qt::UserRole, i->lib());
+            item->setData(0, Qt::UserRole, i->filename());
 			item->setText(1, i->label());
 			item->setText(2, i->name());
 			QString tip(i->name());

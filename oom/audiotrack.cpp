@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <map>
 
+#include <QFile>
 #include <QMessageBox>
 
 #include "track.h"
@@ -24,9 +25,6 @@
 #include "mididev.h"
 #include "midiport.h"
 #include "midimonitor.h"
-#ifdef LV2_SUPPORT
-#include "lv2_plugin.h"
-#endif
 
 
 //---------------------------------------------------------
@@ -165,13 +163,13 @@ Part* AudioTrack::newPart(Part*, bool /*clone*/)
 	return 0;
 }
 
-void AudioTrack::idlePlugin(PluginI* plugin)
+void AudioTrack::idlePlugin(Plugin* plugin)
 {
 	if(plugin)
 	{
 		audio->process(1);
 		for(int i = 0; i < 7; ++i)
-			plugin->apply(1);
+            plugin->process(1);
 	}
 }
 
@@ -179,24 +177,24 @@ void AudioTrack::idlePlugin(PluginI* plugin)
 //   addPlugin
 //---------------------------------------------------------
 
-void AudioTrack::addPlugin(PluginI* plugin, int idx)/*{{{*/
+void AudioTrack::addPlugin(Plugin* plugin, int idx)/*{{{*/
 {
 	printf("AudioTrack::addPlugin(%p, %d) \n", plugin, idx);
 	if (plugin == 0)
 	{
-		PluginI* oldPlugin = (*_efxPipe)[idx];
+        Plugin* oldPlugin = (*_efxPipe)[idx];
 		if (oldPlugin)
 		{
-			oldPlugin->setID(-1);
+            oldPlugin->setId(-1);
 			oldPlugin->setTrack(0);
 
-			int controller = oldPlugin->parameters();
-			for (int i = 0; i < controller; ++i)
+            uint32_t controller = oldPlugin->getParameterCount();
+            for (uint32_t i = 0; i < controller; ++i)
 			{
 				int id = genACnum(idx, i);
 				removeController(id);
 			}
-#ifdef LV2_SUPPORT
+#if 0 //def LV2_SUPPORT
 			if(oldPlugin->type() == LV2)
 			{
 				LV2PluginI* plug = (LV2PluginI*)oldPlugin;
@@ -214,16 +212,16 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)/*{{{*/
 	if (plugin)
 	{
 		efxPipe()->insert(plugin, idx);
-		plugin->setID(idx);
+        plugin->setId(idx);
 		plugin->setTrack(this);
 
-		int controller = plugin->parameters();
-		for (int i = 0; i < controller; ++i)
+        uint32_t controller = plugin->getParameterCount();
+        for (uint32_t i = 0; i < controller; ++i)
 		{
 			int id = genACnum(idx, i);
-			const char* name = plugin->paramName(i);
-			float min, max;
-#ifdef LV2_SUPPORT
+            const char* name = plugin->getParameterName(i).toStdString().data();
+            double min, max;
+#if 0 //def LV2_SUPPORT
 			//printf("AudioTrack::addPlugin %d\n", plugin->type());
 			if(plugin->type() == LV2)
 			{
@@ -247,19 +245,30 @@ void AudioTrack::addPlugin(PluginI* plugin, int idx)/*{{{*/
 			else
 #endif
 			{
-				plugin->range(i, &min, &max);
+                ParameterPort* cport = plugin->getParameter(i);
+                if (cport)
+                {
+                    min = cport->ranges.min;
+                    max = cport->ranges.max;
+                }
+                else
+                {
+                    min = 0.0;
+                    max = 1.0;
+                }
+
 				CtrlValueType t = plugin->valueType();
 				CtrlList* cl = new CtrlList(id);
 				cl->setRange(min, max);
 				cl->setName(QString(name));
 				cl->setPluginName(plugin->name());
 				cl->setValueType(t);
-				Port* cport = plugin->getControlPort(i);
-				if (cport->toggle)
+
+                if (cport && cport->hints & PARAMETER_IS_TOGGLED)
 					cl->setMode(CtrlList::DISCRETE);
 				else
 					cl->setMode(CtrlList::INTERPOLATE);
-				cl->setCurVal(plugin->param(i));
+                cl->setCurVal(plugin->getParameterValue(i));
 				addController(cl);
 			}
 		}
@@ -878,7 +887,7 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 	{
 		if (*ip)
 		{
-	#ifdef LV2_SUPPORT
+    #if 0 //def LV2_SUPPORT
 			if((*ip)->type() == LV2)
 			{
 				LV2PluginI* lp = (LV2PluginI*)*ip;
@@ -982,9 +991,10 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		}
 		if (rackpos < PipelineDepth)
 		{
-			PluginI* pi = new PluginI();
+            // FIXME
+            LadspaPlugin* pi = new LadspaPlugin();
 			pi->setTrack(this);
-			pi->setID(rackpos);
+            pi->setId(rackpos);
 			if (pi->readConfiguration(xml, false))
 				delete pi;
 			else
@@ -995,7 +1005,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 	}
 	else if(tag == "lv2plugin")
 	{
-#ifdef LV2_SUPPORT
+#if 0 //def LV2_SUPPORT
 		//printf("AudioTrack::readProperties found lv2plugin tag\n");
 		int rackpos;
 		for (rackpos = 0; rackpos < PipelineDepth; ++rackpos)
@@ -1046,14 +1056,14 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		//  controls would all be set to zero.
 		// But we will allow for the (unintended, useless) possibility of a controller
 		//  with no matching plugin control.
-		PluginI* p = 0;
+        Plugin* p = 0;
 		bool ctlfound = false;
 		int m = l->id() & AC_PLUGIN_CTL_ID_MASK;
 		int n = (l->id() >> AC_PLUGIN_CTL_BASE_POW) - 1;
 		if (n >= 0 && n < PipelineDepth)
 		{
 			p = (*_efxPipe)[n];
-			if (p && m < p->parameters())
+            if (p && m < p->getParameterCount())
 				ctlfound = true;
 		}
 
@@ -1078,10 +1088,9 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 
 		if (ctlfound)
 		{
-			l->setCurVal(p->param(m));
-			Port* cport = p->getControlPort(m);
-			//LADSPA_PortRangeHint range = p->range(m);
-			if (cport->toggle)
+            l->setCurVal(p->getParameterValue(m));
+            ParameterPort* cport = p->getParameter(m);
+            if (cport && cport->hints & PARAMETER_IS_TOGGLED)
 				l->setMode(CtrlList::DISCRETE);
 			else
 				l->setMode(CtrlList::INTERPOLATE);
@@ -1102,13 +1111,14 @@ void AudioTrack::showPendingPluginNativeGuis()
 {
 	for (int idx = 0; idx < PipelineDepth; ++idx)
 	{
-		PluginI* p = (*_efxPipe)[idx];
+        Plugin* p = (*_efxPipe)[idx];
 		if (!p)
 			continue;
 
+#if 0
 		if (p->isShowNativeGuiPending())
 		{
-	#ifdef LV2_SUPPORT
+    #if 0 //def LV2_SUPPORT
 			if(p->type() == LV2)
 			{
 				LV2PluginI* lp = (LV2PluginI*)p;
@@ -1119,6 +1129,7 @@ void AudioTrack::showPendingPluginNativeGuis()
 	#endif
 				p->showNativeGui(true);
 		}
+#endif
 	}
 }
 
@@ -1138,11 +1149,11 @@ void AudioTrack::mapRackPluginsToControllers()
 		// We found some controllers with that index. Now iterate the plugin rack...
 		for (int i = idx; i >= 0; i--)
 		{
-			PluginI* p = (*_efxPipe)[i];
+            Plugin* p = (*_efxPipe)[i];
 			if (!p)
 				continue;
 
-		#ifdef LV2_SUPPORT
+        #if 0 //def LV2_SUPPORT
 			if(p->type() == LV2)
 			{
 				LV2PluginI* lp = (LV2PluginI*)p;
@@ -1165,7 +1176,7 @@ void AudioTrack::mapRackPluginsToControllers()
 					(*_efxPipe)[i] = 0;
 					(*_efxPipe)[idx] = p;
 				}
-				p->setID(idx);
+                p->setId(idx);
 
 				// It is now safe to update the controllers.
 				p->updateControllers();
@@ -1182,14 +1193,14 @@ void AudioTrack::mapRackPluginsToControllers()
 	//  controller sections, so this will allow more tolerance of them.
 	for (int idx = 0; idx < PipelineDepth; idx++)
 	{
-		PluginI* p = (*_efxPipe)[idx];
+        Plugin* p = (*_efxPipe)[idx];
 		if (!p)
 			continue;
 
 		if (p->id() != idx)
-			p->setID(idx);
+            p->setId(idx);
 
-		int j = p->parameters();
+        int j = p->getParameterCount();
 
 		for (int i = 0; i < j; i++)
 		{
@@ -1207,21 +1218,32 @@ void AudioTrack::mapRackPluginsToControllers()
 
 			// Force all of these now, even though they may have already been set. With a pre-
 			//  0.9pre1 oom file with broken controller sections they may not be set correct.
-			float min, max;
-			p->range(i, &min, &max);
+            ParameterPort* cport = p->getParameter(i);
+
+            double min, max;
+            if (cport)
+            {
+                min = cport->ranges.min;
+                max = cport->ranges.min;
+            }
+            else
+            {
+                min = 0.0;
+                max = 1.0;
+            }
+
 			CtrlValueType t = p->valueType();
 			l->setRange(min, max);
-			l->setName(QString(p->paramName(i)));
+            l->setName(p->getParameterName(i));
 			l->setPluginName(p->name());
 			l->setValueType(t);
-			Port* cport = p->getControlPort(i);
-			//LADSPA_PortRangeHint rh = p->range(i);
-			if (cport->toggle)
+
+            if (cport && cport->hints & PARAMETER_IS_TOGGLED)
 				l->setMode(CtrlList::DISCRETE);
 			else
 				l->setMode(CtrlList::INTERPOLATE);
-			l->setCurVal(p->param(i));
-		#ifdef LV2_SUPPORT
+            l->setCurVal(p->getParameterValue(i));
+        #if 0 //def LV2_SUPPORT
 			if(p->type() == LV2)
 			{
 				LV2PluginI* lp = (LV2PluginI*)p;
@@ -1232,7 +1254,7 @@ void AudioTrack::mapRackPluginsToControllers()
 			}
 			else
 		#endif
-				l->setDefault(p->defaultValue(i));
+                l->setDefault(p->getParameterDefaultValue(i));
 		}
 	}
 
@@ -1250,12 +1272,12 @@ void AudioTrack::mapRackPluginsToControllers()
 				continue;
 			int param = id & AC_PLUGIN_CTL_ID_MASK;
 			int idx = (id >> AC_PLUGIN_CTL_BASE_POW) - 1;
-			PluginI* p = (*_efxPipe)[idx];
+            Plugin* p = (*_efxPipe)[idx];
 			// If there's no plugin at that rack position, or the param is out of range of
 			//  the number of controls in the plugin, then it's a stray controller. Delete it.
 			// Future: Leave room for possible bypass controller at AC_PLUGIN_CTL_ID_MASK -1.
 			//if(!p || (param >= p->parameters() && (param != AC_PLUGIN_CTL_ID_MASK -1)))
-			if (!p || (param >= p->parameters()))
+            if (!p || (param >= p->getParameterCount()))
 			{
 				_controller.erase(id);
 

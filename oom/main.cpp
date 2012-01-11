@@ -518,14 +518,15 @@ int main(int argc, char* argv[])
 
 	if (loadPlugins)
 		initPlugins();
-#ifdef LV2_SUPPORT
+#if 0 //def LV2_SUPPORT
 	initLV2();
-#endif
+
 	if (loadVST)
 		initVST();
 
 	if (loadDSSI)
 		initDSSI();
+#endif
 
 	// p3.3.39
 	initOSC();

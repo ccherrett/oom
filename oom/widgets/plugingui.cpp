@@ -68,7 +68,7 @@ const char* presetBypassText = "Click this button to bypass effect unit";
 //   PluginGui
 //---------------------------------------------------------
 
-PluginGui::PluginGui(PluginIBase* p)
+PluginGui::PluginGui(Plugin* p)
 : QMainWindow(0)
 {
 	gw = 0;
@@ -91,7 +91,7 @@ PluginGui::PluginGui(PluginIBase* p)
 
 	onOff = new QAction(QIcon(*exitIconS), tr("bypass plugin"), this);
 	onOff->setCheckable(true);
-	onOff->setChecked(plugin->on());
+    onOff->setChecked(plugin->active());
 	onOff->setToolTip(tr("bypass plugin"));
 	connect(onOff, SIGNAL(toggled(bool)), SLOT(bypassToggled(bool)));
 	tools->addAction(onOff);
@@ -103,261 +103,123 @@ PluginGui::PluginGui(PluginIBase* p)
 	onOff->setWhatsThis(tr(presetBypassText));
 	fileSave->setWhatsThis(tr(presetSaveText));
 
-	QString id;
-	id.setNum(plugin->pluginID());
-	QString name(oomGlobalShare + QString("/plugins/") + id + QString(".ui"));
-	QFile uifile(name);
-	if (uifile.exists())
-	{
-		//
-		// construct GUI from *.ui file
-		//
-		PluginLoader loader;
-		QFile file(uifile.fileName());
-		file.open(QFile::ReadOnly);
-		mw = loader.load(&file, this);
-		file.close();
-		setCentralWidget(mw);
+    //mw = new QWidget(this);
+    //setCentralWidget(mw);
+    // p3.4.43
+    view = new QScrollArea;
+    view->setWidgetResizable(true);
+    setCentralWidget(view);
+    //view->setVScrollBarMode(QScrollView::AlwaysOff);
 
-		QObjectList l = mw->children();
-		QObject *obj;
+    mw = new QWidget;
+    mw->setObjectName("PluginGuiBase");
+    QGridLayout* grid = new QGridLayout;
+    grid->setSpacing(2);
 
-		nobj = 0;
-		QList<QObject*>::iterator it;
-		for (it = l.begin(); it != l.end(); ++it)
-		{
-			obj = *it;
-			QByteArray ba = obj->objectName().toLatin1();
-			const char* name = ba.constData();
-			if (*name != 'P')
-				continue;
-			int parameter = -1;
-			sscanf(name, "P%d", &parameter);
-			if (parameter == -1)
-				continue;
-			++nobj;
-		}
-		it = l.begin();
-		gw = new GuiWidgets[nobj];
-		nobj = 0;
-		QSignalMapper* mapper = new QSignalMapper(this);
-		connect(mapper, SIGNAL(mapped(int)), SLOT(guiParamChanged(int)));
+    mw->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 
-		QSignalMapper* mapperPressed = new QSignalMapper(this);
-		QSignalMapper* mapperReleased = new QSignalMapper(this);
-		connect(mapperPressed, SIGNAL(mapped(int)), SLOT(guiParamPressed(int)));
-		connect(mapperReleased, SIGNAL(mapped(int)), SLOT(guiParamReleased(int)));
+    uint32_t n = plugin->getParameterCount();
+    params = new GuiParam[n];
 
-		for (it = l.begin(); it != l.end(); ++it)
-		{
-			obj = *it;
-			QByteArray ba = obj->objectName().toLatin1();
-			const char* name = ba.constData();
-			if (*name != 'P')
-				continue;
-			int parameter = -1;
-			sscanf(name, "P%d", &parameter);
-			if (parameter == -1)
-				continue;
+    //int style       = Slider::BgTrough | Slider::BgSlot;
+    QFontMetrics fm = fontMetrics();
+    int h = fm.height() + 4;
 
-			mapper->setMapping(obj, nobj);
-			mapperPressed->setMapping(obj, nobj);
-			mapperReleased->setMapping(obj, nobj);
+    for (uint32_t i = 0; i < n; i++)
+    {
+        QLabel* label = 0;
+        ParameterPort* paramPort = plugin->getParameter(i);
 
-			gw[nobj].widget = (QWidget*) obj;
-			gw[nobj].param = parameter;
-			gw[nobj].type = -1;
+//        double lower = paramPort->min;
+//        double upper = paramPort->max;
+//        double dlower = lower;
+//        double dupper = upper;
+//        double val = paramPort->value;
+//        double dval = val;
 
-			if (strcmp(obj->metaObject()->className(), "Slider") == 0)
-			{
-				gw[nobj].type = GuiWidgets::SLIDER;
-				((Slider*) obj)->setId(nobj);
-				((Slider*) obj)->setCursorHoming(true);
-				for (int i = 0; i < nobj; i++)
-				{
-					if (gw[i].type == GuiWidgets::DOUBLE_LABEL && gw[i].param == parameter)
-						((DoubleLabel*) gw[i].widget)->setSlider((Slider*) obj);
-				}
-				connect(obj, SIGNAL(sliderMoved(double, int)), mapper, SLOT(map()));
-				connect(obj, SIGNAL(sliderPressed(int)), SLOT(guiSliderPressed(int)));
-				connect(obj, SIGNAL(sliderReleased(int)), SLOT(guiSliderReleased(int)));
-				connect(obj, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(guiSliderRightClicked(const QPoint &, int)));
-			}
-			else if (strcmp(obj->metaObject()->className(), "DoubleLabel") == 0)
-			{
-				gw[nobj].type = GuiWidgets::DOUBLE_LABEL;
-				((DoubleLabel*) obj)->setId(nobj);
-				for (int i = 0; i < nobj; i++)
-				{
-					if (gw[i].type == GuiWidgets::SLIDER && gw[i].param == parameter)
-					{
-						((DoubleLabel*) obj)->setSlider((Slider*) gw[i].widget);
-						break;
-					}
-				}
-				connect(obj, SIGNAL(valueChanged(double, int)), mapper, SLOT(map()));
-			}
-			else if (strcmp(obj->metaObject()->className(), "QCheckBox") == 0)
-			{
-				gw[nobj].type = GuiWidgets::QCHECKBOX;
-				connect(obj, SIGNAL(toggled(bool)), mapper, SLOT(map()));
-				connect(obj, SIGNAL(pressed()), mapperPressed, SLOT(map()));
-				connect(obj, SIGNAL(released()), mapperReleased, SLOT(map()));
-			}
-			else if (strcmp(obj->metaObject()->className(), "QComboBox") == 0)
-			{
-				gw[nobj].type = GuiWidgets::QCOMBOBOX;
-				connect(obj, SIGNAL(activated(int)), mapper, SLOT(map()));
-			}
-			else
-			{
-				printf("unknown widget class %s\n", obj->metaObject()->className());
-				continue;
-			}
-			++nobj;
-		}
-		updateValues(); // otherwise the GUI won't have valid data
-	}
-	else
-	{
-		//mw = new QWidget(this);
-		//setCentralWidget(mw);
-		// p3.4.43
-		view = new QScrollArea;
-		view->setWidgetResizable(true);
-		setCentralWidget(view);
-		//view->setVScrollBarMode(QScrollView::AlwaysOff);
+        params[i].hints = paramPort->hints;
 
-		mw = new QWidget;
-		mw->setObjectName("PluginGuiBase");
-		QGridLayout* grid = new QGridLayout;
-		grid->setSpacing(2);
+        if (paramPort->hints & PARAMETER_IS_TOGGLED)
+        {
+            CheckBox* cb = new CheckBox(mw, i, "param");
+            cb->setId(i);
+            cb->setText(QString(plugin->getParameterName(i)));
+            cb->setChecked(paramPort->value > 0.5);
+            cb->setFixedHeight(h);
 
-		mw->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+            params[i].type = GuiParam::GUI_SWITCH;
+            params[i].actuator = cb;
+        }
+        else
+        {
+            //label = new QLabel(QString(plugin->getParameterName(i)), 0);
+            params[i].type = GuiParam::GUI_SLIDER;
+            params[i].label = new DoubleLabel(paramPort->value, paramPort->ranges.min, paramPort->ranges.max, this); // NOTE - parent was 0
+            params[i].label->setFrame(true);
+            params[i].label->setPrecision(2);
+            params[i].label->setId(i);
 
-		int n = plugin->parameters();
-		params = new GuiParam[n];
+            //params[i].label->setContentsMargins(2, 2, 2, 2);
+            //params[i].label->setFixedHeight(h);
 
-		//int style       = Slider::BgTrough | Slider::BgSlot;
-		QFontMetrics fm = fontMetrics();
-		int h = fm.height() + 4;
+            Slider* s = new Slider(0, "param", Qt::Horizontal,
+                                   Slider::None); //, style);
 
-		for (int i = 0; i < n; ++i)
-		{
-			QLabel* label = 0;
-			Port* cport = plugin->getControlPort(i);
-			double lower = 0.0; // default values
-			double upper = 1.0;
-			double dlower = lower;
-			double dupper = upper;
-			double val = plugin->param(i);
-			double dval = val;
-			params[i].hint = 0;//range.HintDescriptor;
+            s->setCursorHoming(true);
+            s->setId(i);
+            //s->setFixedHeight(h);
+            //s->setRange(dlower, dupper); FIXME ???
 
-			/*if (LADSPA_IS_HINT_BOUNDED_BELOW(range.HintDescriptor))
-			{
-				dlower = lower = range.LowerBound;
-			}
-			if (LADSPA_IS_HINT_BOUNDED_ABOVE(range.HintDescriptor))
-			{
-				dupper = upper = range.UpperBound;
-			}*/
-			if (cport->samplerate)
-			{
-				params[i].hint |= SampleRate;
-				lower *= sampleRate;
-				upper *= sampleRate;
-				dlower = lower;
-				dupper = upper;
-			}
-			if (cport->logarithmic)
-			{
-				params[i].hint |= Logarithmic;
-				if (lower == 0.0)
-					lower = 0.001;
-				dlower = fast_log10(lower)*20.0;
-				dupper = fast_log10(upper)*20.0;
-				dval = fast_log10(val) * 20.0;
-			}
-			if (cport->toggle)
-			{
-				params[i].hint |= Toggle;
-				params[i].type = GuiParam::GUI_SWITCH;
-				CheckBox* cb = new CheckBox(mw, i, "param");
-				cb->setId(i);
-				cb->setText(QString(plugin->paramName(i)));
-				cb->setChecked(plugin->param(i) != 0.0);
-				cb->setFixedHeight(h);
-				params[i].actuator = cb;
-			}
-			else
-			{
-				label = new QLabel(QString(plugin->paramName(i)), 0);
-				params[i].type = GuiParam::GUI_SLIDER;
-				params[i].label = new DoubleLabel(val, lower, upper, 0);
-				params[i].label->setFrame(true);
-				params[i].label->setPrecision(2);
-				params[i].label->setId(i);
+            if (paramPort->hints & PARAMETER_IS_INTEGER)
+                s->setStep(1.0);
 
-				//params[i].label->setContentsMargins(2, 2, 2, 2);
-				//params[i].label->setFixedHeight(h);
+            s->setValue(paramPort->value);
 
-				Slider* s = new Slider(0, "param", Qt::Horizontal,
-						Slider::None); //, style);
+            params[i].actuator = s;
+            params[i].label->setSlider((Slider*) params[i].actuator);
+        }
 
-				s->setCursorHoming(true);
-				s->setId(i);
-				//s->setFixedHeight(h);
-				s->setRange(dlower, dupper);
-				if (cport->isInt)
-				{
-					params[i].hint |= Integer;
-					s->setStep(1.0);
-				}
-				s->setValue(dval);
-				params[i].actuator = s;
-				params[i].label->setSlider((Slider*) params[i].actuator);
-			}
-			//params[i].actuator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
-			params[i].actuator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
-			if (params[i].type == GuiParam::GUI_SLIDER)
-			{
-				//label->setFixedHeight(20);
-				//label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
-				label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
-				//params[i].label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
-				params[i].label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
-				grid->addWidget(label, i, 0);
-				grid->addWidget(params[i].label, i, 1);
-				grid->addWidget(params[i].actuator, i, 2);
-			}
-			else if (params[i].type == GuiParam::GUI_SWITCH)
-			{
-				//grid->addMultiCellWidget(params[i].actuator, i, i, 0, 2);
-				grid->addWidget(params[i].actuator, i, 0, 1, 3);
-			}
-			if (params[i].type == GuiParam::GUI_SLIDER)
-			{
-				connect(params[i].actuator, SIGNAL(sliderMoved(double, int)), SLOT(sliderChanged(double, int)));
-				connect(params[i].label, SIGNAL(valueChanged(double, int)), SLOT(labelChanged(double, int)));
-				connect(params[i].actuator, SIGNAL(sliderPressed(int)), SLOT(ctrlPressed(int)));
-				connect(params[i].actuator, SIGNAL(sliderReleased(int)), SLOT(ctrlReleased(int)));
-				connect(params[i].actuator, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(ctrlRightClicked(const QPoint &, int)));
-			}
-			else if (params[i].type == GuiParam::GUI_SWITCH)
-			{
-				connect(params[i].actuator, SIGNAL(checkboxPressed(int)), SLOT(ctrlPressed(int)));
-				connect(params[i].actuator, SIGNAL(checkboxReleased(int)), SLOT(ctrlReleased(int)));
-				connect(params[i].actuator, SIGNAL(checkboxRightClicked(const QPoint &, int)), SLOT(ctrlRightClicked(const QPoint &, int)));
-			}
-		}
-		// p3.3.43
-		resize(280, height());
+        //params[i].actuator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
+        params[i].actuator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
+        if (params[i].type == GuiParam::GUI_SLIDER)
+        {
+            //label->setFixedHeight(20);
+            //label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
+            label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
+            //params[i].label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
+            params[i].label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
+            grid->addWidget(label, i, 0);
+            grid->addWidget(params[i].label, i, 1);
+            grid->addWidget(params[i].actuator, i, 2);
+        }
+        else if (params[i].type == GuiParam::GUI_SWITCH)
+        {
+            //grid->addMultiCellWidget(params[i].actuator, i, i, 0, 2);
+            grid->addWidget(params[i].actuator, i, 0, 1, 3);
+        }
+        if (params[i].type == GuiParam::GUI_SLIDER)
+        {
+            connect(params[i].actuator, SIGNAL(sliderMoved(double, int)), SLOT(sliderChanged(double, int)));
+            connect(params[i].label, SIGNAL(valueChanged(double, int)), SLOT(labelChanged(double, int)));
+            connect(params[i].actuator, SIGNAL(sliderPressed(int)), SLOT(ctrlPressed(int)));
+            connect(params[i].actuator, SIGNAL(sliderReleased(int)), SLOT(ctrlReleased(int)));
+            connect(params[i].actuator, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(ctrlRightClicked(const QPoint &, int)));
+        }
+        else if (params[i].type == GuiParam::GUI_SWITCH)
+        {
+            connect(params[i].actuator, SIGNAL(checkboxPressed(int)), SLOT(ctrlPressed(int)));
+            connect(params[i].actuator, SIGNAL(checkboxReleased(int)), SLOT(ctrlReleased(int)));
+            connect(params[i].actuator, SIGNAL(checkboxRightClicked(const QPoint &, int)), SLOT(ctrlRightClicked(const QPoint &, int)));
+        }
+    }
 
-		grid->setColumnStretch(2, 10);
-		mw->setLayout(grid);
-		view->setWidget(mw);
-	}
+    // p3.3.43
+    resize(280, height());
+
+    grid->setColumnStretch(2, 10);
+    mw->setLayout(grid);
+    view->setWidget(mw);
+
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 }
 
@@ -406,11 +268,11 @@ void PluginGui::ctrlPressed(int param)/*{{{*/
 	if (params[param].type == GuiParam::GUI_SLIDER)
 	{
 		double val = ((Slider*) params[param].actuator)->value();
-		if (params[param].hint & Logarithmic)
+        if (params[param].hints & PARAMETER_IS_LOGARITHMIC)
 			val = pow(10.0, val / 20.0);
-		else if (params[param].hint & Integer)
+        else if (params[param].hints & PARAMETER_IS_INTEGER)
 			val = rint(val);
-		plugin->setParam(param, val);
+        plugin->setParameterValue(param, val);
 		((DoubleLabel*) params[param].label)->setValue(val);
 
 		// p3.3.43
@@ -427,7 +289,7 @@ void PluginGui::ctrlPressed(int param)/*{{{*/
 	else if (params[param].type == GuiParam::GUI_SWITCH)
 	{
 		double val = (double) ((CheckBox*) params[param].actuator)->isChecked();
-		plugin->setParam(param, val);
+        plugin->setParameterValue(param, val);
 
 		// p3.3.43
 		//audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
@@ -467,9 +329,9 @@ void PluginGui::ctrlReleased(int param)/*{{{*/
 	if (params[param].type == GuiParam::GUI_SLIDER)
 	{
 		double val = ((Slider*) params[param].actuator)->value();
-		if (params[param].hint & Logarithmic)
+        if (params[param].hints & PARAMETER_IS_LOGARITHMIC)
 			val = pow(10.0, val / 20.0);
-		else if (params[param].hint & Integer)
+        else if (params[param].hints & PARAMETER_IS_INTEGER)
 			val = rint(val);
 		track->stopAutoRecord(id, val);
 	}
@@ -507,13 +369,13 @@ void PluginGui::sliderChanged(double val, int param)/*{{{*/
 	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
 		plugin->enableController(param, false);
 
-	if (params[param].hint & Logarithmic)
+    if (params[param].hints & PARAMETER_IS_LOGARITHMIC)
 		val = pow(10.0, val / 20.0);
-	else if (params[param].hint & Integer)
+    else if (params[param].hints & PARAMETER_IS_INTEGER)
 		val = rint(val);
-	if (plugin->param(param) != val)
+    if (plugin->getParameterValue(param) != val)
 	{
-		plugin->setParam(param, val);
+        plugin->setParameterValue(param, val);
 		((DoubleLabel*) params[param].label)->setValue(val);
 	}
 
@@ -549,13 +411,13 @@ void PluginGui::labelChanged(double val, int param)/*{{{*/
 		plugin->enableController(param, false);
 
 	double dval = val;
-	if (params[param].hint & Logarithmic)
+    if (params[param].hints & PARAMETER_IS_LOGARITHMIC)
 		dval = fast_log10(val) * 20.0;
-	else if (params[param].hint & Integer)
+    else if (params[param].hints & PARAMETER_IS_INTEGER)
 		dval = rint(val);
-	if (plugin->param(param) != val)
+    if (plugin->getParameterValue(param) != val)
 	{
-		plugin->setParam(param, val);
+        plugin->setParameterValue(param, val);
 		((Slider*) params[param].actuator)->setValue(dval);
 	}
 
@@ -585,7 +447,7 @@ void PluginGui::load()/*{{{*/
 {
 	QString s("presets/plugins/");
 	//s += plugin->plugin()->label();
-	s += plugin->pluginLabel();
+    s += plugin->label();
 	s += "/";
 
 	QString fn = getOpenFileName(s, preset_file_pattern,
@@ -653,7 +515,7 @@ void PluginGui::save()/*{{{*/
 {
 	QString s("presets/plugins/");
 	//s += plugin->plugin()->label();
-	s += plugin->pluginLabel();
+    s += plugin->label();
 	s += "/";
 
 	//QString fn = getSaveFileName(s, preset_file_pattern, this,
@@ -683,7 +545,7 @@ void PluginGui::save()/*{{{*/
 
 void PluginGui::bypassToggled(bool val)/*{{{*/
 {
-	plugin->setOn(val);
+    plugin->setActive(val);
 	song->update(SC_ROUTE);
 }/*}}}*/
 
@@ -705,17 +567,17 @@ void PluginGui::setOn(bool val)/*{{{*/
 void PluginGui::updateValues()/*{{{*/
 {
 	if (params)
-	{
-		for (int i = 0; i < plugin->parameters(); ++i)
+    {
+        for (uint32_t i = 0; i < plugin->getParameterCount(); ++i)
 		{
 			GuiParam* gp = &params[i];
 			if (gp->type == GuiParam::GUI_SLIDER)
 			{
-				double lv = plugin->param(i);
+                double lv = plugin->getParameterValue(i);
 				double sv = lv;
-				if (params[i].hint & Logarithmic)
+                if (params[i].hints & PARAMETER_IS_LOGARITHMIC)
 					sv = fast_log10(lv) * 20.0;
-				else if (params[i].hint & Integer)
+                else if (params[i].hints & PARAMETER_IS_INTEGER)
 				{
 					sv = rint(lv);
 					lv = sv;
@@ -725,7 +587,7 @@ void PluginGui::updateValues()/*{{{*/
 			}
 			else if (gp->type == GuiParam::GUI_SWITCH)
 			{
-				((CheckBox*) (gp->actuator))->setChecked(int(plugin->param(i)));
+                ((CheckBox*) (gp->actuator))->setChecked(int(plugin->getParameterValue(i)));
 			}
 		}
 	}
@@ -736,7 +598,7 @@ void PluginGui::updateValues()/*{{{*/
 			QWidget* widget = gw[i].widget;
 			int type = gw[i].type;
 			int param = gw[i].param;
-			double val = plugin->param(param);
+            double val = plugin->getParameterValue(param);
 			switch (type)
 			{
 				case GuiWidgets::SLIDER:
@@ -769,7 +631,7 @@ void PluginGui::updateControls()/*{{{*/
 		return;
 	if (params)
 	{
-		for (int i = 0; i < plugin->parameters(); ++i)
+        for (uint32_t i = 0; i < plugin->getParameterCount(); ++i)
 		{
 			GuiParam* gp = &params[i];
 			if (gp->type == GuiParam::GUI_SLIDER)
@@ -778,9 +640,9 @@ void PluginGui::updateControls()/*{{{*/
 				{
 					double lv = plugin->track()->pluginCtrlVal(genACnum(plugin->id(), i));
 					double sv = lv;
-					if (params[i].hint & Logarithmic)
+                    if (params[i].hints & PARAMETER_IS_LOGARITHMIC)
 						sv = fast_log10(lv) * 20.0;
-					else if (params[i].hint & Integer)
+                    else if (params[i].hints & PARAMETER_IS_INTEGER)
 					{
 						sv = rint(lv);
 						lv = sv;
@@ -969,7 +831,7 @@ void PluginGui::guiParamChanged(int idx)/*{{{*/
 		}
 		//}
 	}
-	plugin->setParam(param, val);
+    plugin->setParameterValue(param, val);
 }/*}}}*/
 
 //---------------------------------------------------------
@@ -1082,7 +944,7 @@ void PluginGui::guiSliderPressed(int idx)/*{{{*/
 	id = genACnum(id, param);
 
 	double val = ((Slider*) w)->value();
-	plugin->setParam(param, val);
+    plugin->setParameterValue(param, val);
 
 	//audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
 	// p3.3.43

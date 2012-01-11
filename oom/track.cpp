@@ -527,13 +527,14 @@ void Track::clearRecAutomation(bool clearList)
 
 	AudioTrack *t = (AudioTrack*)this;
 	Pipeline *pl = t->efxPipe();
-	PluginI *p;
-	for (iPluginI i = pl->begin(); i != pl->end(); ++i)
+    Plugin *p;
+    for (iPluginI i = pl->begin(); i != pl->end(); ++i)
 	{
 		p = *i;
 		if (!p)
 			continue;
-		p->enableAllControllers(true);
+        // TODO
+        //p->enableAllControllers(true);
 	}
 
 	if (clearList)

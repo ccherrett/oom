@@ -24,7 +24,6 @@ class QCloseEvent;
 
 class AudioTrack;
 class PluginGui;
-class PluginI;
 class Plugin;
 
 //---------------------------------------------------------

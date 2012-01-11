@@ -27,7 +27,7 @@ class Xml;
 class SndFile;
 class MPEventList;
 class SynthI;
-class PluginI;
+class Plugin;
 class MidiAssignData;
 class MidiPort;
 class CCInfo;
@@ -759,8 +759,8 @@ public:
     }
     void deleteAllEfxGuis();
     void clearEfxList();
-    void addPlugin(PluginI* plugin, int idx);
-    void idlePlugin(PluginI* plugin);
+    void addPlugin(Plugin* plugin, int idx);
+    void idlePlugin(Plugin* plugin);
 
     double pluginCtrlVal(int ctlID) const;
     void setPluginCtrlVal(int param, double val);

@@ -217,7 +217,7 @@ void Audio::msgAddRoute1(Route src, Route dst)
 //   msgAddPlugin
 //---------------------------------------------------------
 
-void Audio::msgAddPlugin(AudioTrack* node, int idx, PluginI* plugin)
+void Audio::msgAddPlugin(AudioTrack* node, int idx, Plugin* plugin)
 {
 	AudioMsg msg;
 	msg.id = AUDIO_ADDPLUGIN;
@@ -227,7 +227,7 @@ void Audio::msgAddPlugin(AudioTrack* node, int idx, PluginI* plugin)
 	sendMsg(&msg);
 }
 
-void Audio::msgIdlePlugin(AudioTrack* node, PluginI* plugin)
+void Audio::msgIdlePlugin(AudioTrack* node, Plugin* plugin)
 {
 	AudioMsg msg;
 	msg.id = AUDIO_IDLEPLUGIN;

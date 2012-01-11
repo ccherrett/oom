@@ -55,30 +55,408 @@
 #include "plugingui.h"
 #include "plugindialog.h"
 
-#ifdef LV2_SUPPORT
-#include "lv2_plugin.h"
-#endif
-
-// Turn on debugging messages.
-//#define PLUGIN_DEBUGIN 
-
 PluginList plugins;
 
 /*
 static const char* preset_file_pattern[] = {
-	  QT_TRANSLATE_NOOP("@default", "Presets (*.pre *.pre.gz *.pre.bz2)"),
-	  QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-	  0
-	  };
+      QT_TRANSLATE_NOOP("@default", "Presets (*.pre *.pre.gz *.pre.bz2)"),
+      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
+      0
+      };
 
 static const char* preset_file_save_pattern[] = {
-	  QT_TRANSLATE_NOOP("@default", "Presets (*.pre)"),
-	  QT_TRANSLATE_NOOP("@default", "gzip compressed presets (*.pre.gz)"),
-	  QT_TRANSLATE_NOOP("@default", "bzip2 compressed presets (*.pre.bz2)"),
-	  QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-	  0
-	  };
+      QT_TRANSLATE_NOOP("@default", "Presets (*.pre)"),
+      QT_TRANSLATE_NOOP("@default", "gzip compressed presets (*.pre.gz)"),
+      QT_TRANSLATE_NOOP("@default", "bzip2 compressed presets (*.pre.bz2)"),
+      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
+      0
+      };
  */
+
+//---------------------------------------------------------
+//   Pipeline
+//---------------------------------------------------------
+
+Pipeline::Pipeline()
+: std::vector<Plugin*>()
+{
+    // Added by Tim. p3.3.15
+    for (int i = 0; i < MAX_CHANNELS; ++i)
+        posix_memalign((void**) (buffer + i), 16, sizeof (float) * segmentSize);
+
+    for (int i = 0; i < PipelineDepth; ++i)
+        push_back(0);
+}
+
+//---------------------------------------------------------
+//   ~Pipeline
+//---------------------------------------------------------
+
+Pipeline::~Pipeline()
+{
+    removeAll();
+    for (int i = 0; i < MAX_CHANNELS; ++i)
+        ::free(buffer[i]);
+}
+
+//---------------------------------------------------------
+//   setChannels
+//---------------------------------------------------------
+
+void Pipeline::setChannels(int n)
+{
+    // TODO
+    //for (int i = 0; i < PipelineDepth; ++i)
+    //    if ((*this)[i])
+    //        (*this)[i]->setChannels(n);
+}
+
+//---------------------------------------------------------
+//   insert
+//    give ownership of object plugin to Pipeline
+//---------------------------------------------------------
+
+void Pipeline::insert(Plugin* plugin, int index)
+{
+    remove(index);
+    (*this)[index] = plugin;
+}
+
+//---------------------------------------------------------
+//   remove
+//---------------------------------------------------------
+
+void Pipeline::remove(int index)
+{
+    Plugin* plugin = (*this)[index];
+    if (plugin)
+        delete plugin;
+    (*this)[index] = 0;
+}
+
+//---------------------------------------------------------
+//   removeAll
+//---------------------------------------------------------
+
+void Pipeline::removeAll()
+{
+    for (int i = 0; i < PipelineDepth; ++i)
+        remove(i);
+}
+
+//---------------------------------------------------------
+//   isOn
+//---------------------------------------------------------
+
+bool Pipeline::isActive(int idx) const
+{
+    Plugin* p = (*this)[idx];
+    if (p)
+        return p->active();
+    return false;
+}
+
+//---------------------------------------------------------
+//   setOn
+//---------------------------------------------------------
+
+void Pipeline::setActive(int idx, bool flag)
+{
+    Plugin* p = (*this)[idx];
+    if (p)
+    {
+        p->setActive(flag);
+        // TODO
+        //if (p->gui())
+        //    p->gui()->setOn(flag);
+    }
+}
+
+//---------------------------------------------------------
+//   label
+//---------------------------------------------------------
+
+QString Pipeline::label(int idx) const
+{
+    Plugin* p = (*this)[idx];
+    if (p)
+        return p->label();
+    return QString("");
+}
+
+//---------------------------------------------------------
+//   name
+//---------------------------------------------------------
+
+QString Pipeline::name(int idx) const
+{
+    Plugin* p = (*this)[idx];
+    if (p)
+        return p->name();
+    return QString("empty");
+}
+
+//---------------------------------------------------------
+//   empty
+//---------------------------------------------------------
+
+bool Pipeline::empty(int idx) const
+{
+    Plugin* p = (*this)[idx];
+    return p == 0;
+}
+
+//---------------------------------------------------------
+//   move
+//---------------------------------------------------------
+
+void Pipeline::move(int idx, bool up)
+{
+    Plugin* p1 = (*this)[idx];
+    if (up)
+    {
+        (*this)[idx] = (*this)[idx - 1];
+
+        if ((*this)[idx])
+            (*this)[idx]->setId(idx);
+
+        (*this)[idx - 1] = p1;
+
+        if (p1)
+        {
+            p1->setId(idx - 1);
+            if (p1->track())
+                audio->msgSwapControllerIDX(p1->track(), idx, idx - 1);
+        }
+    }
+    else
+    {
+        (*this)[idx] = (*this)[idx + 1];
+
+        if ((*this)[idx])
+            (*this)[idx]->setId(idx);
+
+        (*this)[idx + 1] = p1;
+
+        if (p1)
+        {
+            p1->setId(idx + 1);
+            if (p1->track())
+                audio->msgSwapControllerIDX(p1->track(), idx, idx + 1);
+        }
+    }
+}
+
+//---------------------------------------------------------
+//   showGui
+//---------------------------------------------------------
+
+void Pipeline::showGui(int idx, bool flag)
+{
+    Plugin* p = (*this)[idx];
+    if (p)
+    {
+#if 0 //def LV2_SUPPORT
+        if(p->type() == LV2)
+        {
+            LV2PluginI* lp = (LV2PluginI*)p;
+            lp->showGui(flag);
+        }
+        else
+#endif
+        {
+            // TODO
+            //p->showGui(flag);
+        }
+    }
+}
+
+//---------------------------------------------------------
+//   showNativeGui
+//---------------------------------------------------------
+
+#ifdef OSC_SUPPORT
+void Pipeline::showNativeGui(int idx, bool flag)
+{
+    bool islv2 = false;
+    PluginI* p = (*this)[idx];
+#ifdef LV2_SUPPORT
+    islv2 = (p->type() == LV2);
+    if(islv2)
+    {
+        LV2PluginI* lvp = (LV2PluginI*)p;
+        if(lvp)
+            lvp->showNativeGui(flag);
+    }
+#endif
+    if (p && !islv2)
+        p->oscIF().oscShowGui(flag);
+}
+#else
+void Pipeline::showNativeGui(int idx, bool flag)
+{
+#if 0 //def LV2_SUPPORT
+    PluginI* p = (*this)[idx];
+    bool islv2 = (p->type() == LV2);
+    if(islv2)
+    {
+        LV2PluginI* lvp = (LV2PluginI*)p;
+        if(lvp)
+            lvp->showNativeGui(flag);
+    }
+#endif
+}
+#endif
+
+//---------------------------------------------------------
+//   deleteGui
+//---------------------------------------------------------
+
+void Pipeline::deleteGui(int idx)
+{
+    if (idx >= PipelineDepth)
+        return;
+    Plugin* p = (*this)[idx];
+#if 0 //def LV2_SUPPORT
+    if(p && p->type() == LV2)
+    {
+        LV2PluginI* lp = (LV2PluginI*)p;
+        if(lp)
+            lp->deleteGui();
+    }
+    else
+#endif
+    {
+        // TODO
+        //if (p)
+            //p->deleteGui();
+    }
+}
+
+//---------------------------------------------------------
+//   deleteAllGuis
+//---------------------------------------------------------
+
+void Pipeline::deleteAllGuis()
+{
+    for (int i = 0; i < PipelineDepth; i++)
+        deleteGui(i);
+}
+
+//---------------------------------------------------------
+//   guiVisible
+//---------------------------------------------------------
+
+bool Pipeline::guiVisible(int idx)
+{
+    Plugin* p = (*this)[idx];
+    // TODO
+    //if (p)
+    //    return p->guiVisible();
+    return false;
+}
+
+//---------------------------------------------------------
+//   nativeGuiVisible
+//---------------------------------------------------------
+
+bool Pipeline::nativeGuiVisible(int idx)
+{
+    Plugin* p = (*this)[idx];
+    // TODO
+    //if (p)
+    //    return p->nativeGuiVisible();
+    return false;
+}
+
+void Pipeline::updateNativeGui()
+{
+#if 0 //def LV2_SUPPORT/*{{{*/
+    for (iPluginI i = begin(); i != end(); ++i)
+    {
+        PluginI* p = (PluginI*)*i;
+        if(p && p->type() == LV2)
+        {
+            LV2PluginI* lp = (LV2PluginI*)p;
+            if(lp)
+                lp->heartBeat();
+        }
+    }
+#endif/*}}}*/
+}
+//---------------------------------------------------------
+//   apply
+//---------------------------------------------------------
+
+void Pipeline::apply(int ports, uint32_t nframes, float** buffer1)/*{{{*/
+{
+    //fprintf(stderr, "Pipeline::apply data: nframes:%ld %e %e %e %e\n", nframes, buffer1[0][0], buffer1[0][1], buffer1[0][2], buffer1[0][3]);
+
+    bool swap = false;
+
+    for (iPluginI ip = begin(); ip != end(); ++ip)
+    {
+        Plugin* p = *ip;
+#if 0 //def LV2_SUPPORT
+        if(p && p->type() == LV2)
+        {
+            LV2PluginI* lp = (LV2PluginI*)p;/*{{{*/
+            if (lp && lp->on())
+            {
+                if (lp->inPlaceCapable())
+                {
+                    if (swap)
+                        lp->connect(ports, buffer, buffer);
+                    else
+                        lp->connect(ports, buffer1, buffer1);
+                }
+                else
+                {
+                    if (swap)
+                        lp->connect(ports, buffer, buffer1);
+                    else
+                        lp->connect(ports, buffer1, buffer);
+                    swap = !swap;
+                }
+                lp->apply(nframes);
+            }/*}}}*/
+        }
+        else
+#endif
+        {
+            if (p && p->active())
+            {
+                if (p->hints() & PLUGIN_IS_IN_PLACE_BROKEN)
+                {
+                    // TODO
+                    //if (swap)
+                    //    p->connect(ports, buffer, buffer);
+                    //else
+                    //    p->connect(ports, buffer1, buffer1);
+                }
+                else
+                {
+                    // TODO
+                    //if (swap)
+                    //    p->connect(ports, buffer, buffer1);
+                    //else
+                    //    p->connect(ports, buffer1, buffer);
+                    swap = !swap;
+                }
+                p->process(nframes);
+            }
+        }
+    }
+    if (swap)
+    {
+        for (int i = 0; i < ports; ++i)
+            AL::dsp->cpy(buffer1[i], buffer[i], nframes);
+    }
+
+    // p3.3.41
+    //fprintf(stderr, "Pipeline::apply after data: nframes:%ld %e %e %e %e\n", nframes, buffer1[0][0], buffer1[0][1], buffer1[0][2], buffer1[0][3]);
+
+}/*}}}*/
 
 //---------------------------------------------------------
 //   ladspa2MidiControlValues
@@ -96,7 +474,8 @@ bool ladspa2MidiControlValues(const LADSPA_Descriptor* plugin, int port, int ctl
 
 	//ladspaControlRange(plugin, port, &fmin, &fmax);
 
-	bool hasdef = ladspaDefaultValue(plugin, port, &fdef);
+    // TODO
+    bool hasdef = false; //ladspaDefaultValue(plugin, port, &fdef);
 	//bool isint = desc & LADSPA_HINT_INTEGER;
 	MidiController::ControllerType t = midiControllerType(ctlnum);
 
@@ -581,6 +960,7 @@ void ladspaControlRange(const LADSPA_Descriptor* plugin, int i, float* min, floa
 		*max = 1.0;
 }/*}}}*/
 
+#if 0
 //---------------------------------------------------------
 //   Plugin
 //---------------------------------------------------------
@@ -595,7 +975,7 @@ Plugin::Plugin(PluginType t, const char*)
 	m_type = t;
 	switch(m_type)
 	{
-		case LV2:
+        case PLUGIN_LV2:
 			plugin = NULL;
 			ladspa = NULL;
 			_handle = 0;
@@ -610,16 +990,7 @@ Plugin::Plugin(PluginType t, const char*)
 
 void Plugin::initLadspa(QFileInfo* f, const LADSPA_Descriptor* d, bool isDssi)/*{{{*/
 {
-	_isDssi = isDssi;
-	if(isDssi)
-	{
-        m_type = (PluginType)DSSI;
-	}
-	else
-        m_type = (PluginType)LADSPA;
-#ifdef DSSI_SUPPORT
-	dssi_descr = NULL;
-#endif
+    m_type = PLUGIN_LADSPA;
 
 	fi = *f;
 	plugin = NULL;
@@ -627,11 +998,11 @@ void Plugin::initLadspa(QFileInfo* f, const LADSPA_Descriptor* d, bool isDssi)/*
 	_handle = 0;
 	_references = 0;
 	_instNo = 0;
-	_label = QString(d->Label);
-	_name = QString(d->Name);
-	_uniqueID = d->UniqueID;
-	_maker = QString(d->Maker);
-	_copyright = QString(d->Copyright);
+    m_label = QString(d->Label);
+    m_name = QString(d->Name);
+    m_uniqueId = d->UniqueID;
+    m_maker = QString(d->Maker);
+    m_copyright = QString(d->Copyright);
 
 	_portCount = d->PortCount;
 	//_portDescriptors = 0;
@@ -666,7 +1037,7 @@ void Plugin::initLadspa(QFileInfo* f, const LADSPA_Descriptor* d, bool isDssi)/*
 		}
 	}
 
-	_inPlaceCapable = !LADSPA_IS_INPLACE_BROKEN(d->Properties);
+    //_inPlaceCapable = !LADSPA_IS_INPLACE_BROKEN(d->Properties);
 
 	// By T356. Blacklist vst plugins in-place configurable for now. At one point they
 	//   were working with in-place here, but not now, and RJ also reported they weren't working.
@@ -688,15 +1059,9 @@ void Plugin::initLadspa(QFileInfo* f, const LADSPA_Descriptor* d, bool isDssi)/*
 	//  EnsembleLite (EnsLite VST) has the flag set, but it is a vst synth and is not involved here!
 	// Yet many (all?) ladspa vst effect plugins exhibit this problem.
 	// Changed by Tim. p3.3.14
-	if ((_inports != _outports) || (fi.completeBaseName() == QString("dssi-vst") && !config.vstInPlace))
-		_inPlaceCapable = false;
+    //if ((_inports != _outports) || (fi.completeBaseName() == QString("dssi-vst") && !config.vstInPlace))
+    //	_inPlaceCapable = false;
 }/*}}}*/
-
-Plugin::~Plugin()
-{
-	//if(_portDescriptors)
-	//  delete[] _portDescriptors;
-}
 
 //---------------------------------------------------------
 //   incReferences
@@ -794,16 +1159,10 @@ int Plugin::incReferences(int val)/*{{{*/
 
 					QString label(descr->Label);
 					//if(label == _name)
-					if (label == _label)
+                    if (label == m_label)
 					{
-						_isDssi = false;
 						ladspa = ladspadf;
 						plugin = descr;
-
-#ifdef DSSI_SUPPORT
-						dssi_descr = NULL;
-#endif
-
 						break;
 					}
 				}
@@ -813,10 +1172,10 @@ int Plugin::incReferences(int val)/*{{{*/
 		if (plugin != NULL)
 		{
 			//_instNo     = 0;
-			_name = QString(plugin->Name);
-			_uniqueID = plugin->UniqueID;
-			_maker = QString(plugin->Maker);
-			_copyright = QString(plugin->Copyright);
+            m_name = QString(plugin->Name);
+            m_uniqueId = plugin->UniqueID;
+            m_maker = QString(plugin->Maker);
+            m_copyright = QString(plugin->Copyright);
 
 			//if(_portDescriptors)
 			//  delete[] _portDescriptors;
@@ -860,11 +1219,11 @@ int Plugin::incReferences(int val)/*{{{*/
 				}
 			}
 
-			_inPlaceCapable = !LADSPA_IS_INPLACE_BROKEN(plugin->Properties);
+            //_inPlaceCapable = !LADSPA_IS_INPLACE_BROKEN(plugin->Properties);
 
 			// Blacklist vst plugins in-place configurable for now.
-			if ((_inports != _outports) || (fi.completeBaseName() == QString("dssi-vst") && !config.vstInPlace))
-				_inPlaceCapable = false;
+            //if ((_inports != _outports) || (fi.completeBaseName() == QString("dssi-vst") && !config.vstInPlace))
+            //	_inPlaceCapable = false;
 		}
 	}
 
@@ -964,6 +1323,7 @@ const char* Plugin::portName(unsigned long i)
 {
     return plugin ? plugin->PortNames[i] : 0;
 }
+#endif
 
 //---------------------------------------------------------
 //   loadPluginLib
@@ -1055,7 +1415,8 @@ static void loadPluginLib(QFileInfo* fi)
 			//plugins.add(fi, ladspa, descr, !inPlaceBroken);
 			if (debugMsg)
 				fprintf(stderr, "loadPluginLib: adding ladspa plugin:%s name:%s label:%s\n", fi->filePath().toLatin1().constData(), descr->Name, descr->Label);
-			plugins.add(fi, descr);
+            //plugins.add(fi, descr);
+            // TODO
 		}
 	}
 
@@ -1154,422 +1515,7 @@ void initPlugins()
 	//Now we do the LV2
 }
 
-//---------------------------------------------------------
-//   find
-//---------------------------------------------------------
-
-Plugin* PluginList::find(const QString& file, const QString& name)
-{
-	for (iPlugin i = begin(); i != end(); ++i)
-	{
-		if ((file == i->lib()) && (name == i->label()))
-			return &*i;
-	}
-	//printf("Plugin <%s> not found\n", name.ascii());
-	return 0;
-}
-
-//---------------------------------------------------------
-//   Pipeline
-//---------------------------------------------------------
-
-Pipeline::Pipeline()
-: std::vector<PluginI*>()
-{
-	// Added by Tim. p3.3.15
-	for (int i = 0; i < MAX_CHANNELS; ++i)
-		posix_memalign((void**) (buffer + i), 16, sizeof (float) * segmentSize);
-
-	for (int i = 0; i < PipelineDepth; ++i)
-		push_back(0);
-}
-
-//---------------------------------------------------------
-//   ~Pipeline
-//---------------------------------------------------------
-
-Pipeline::~Pipeline()
-{
-	removeAll();
-	for (int i = 0; i < MAX_CHANNELS; ++i)
-		::free(buffer[i]);
-}
-
-//---------------------------------------------------------
-//   setChannels
-//---------------------------------------------------------
-
-void Pipeline::setChannels(int n)
-{
-	for (int i = 0; i < PipelineDepth; ++i)
-		if ((*this)[i])
-			(*this)[i]->setChannels(n);
-}
-
-//---------------------------------------------------------
-//   insert
-//    give ownership of object plugin to Pipeline
-//---------------------------------------------------------
-
-void Pipeline::insert(PluginI* plugin, int index)
-{
-	remove(index);
-	(*this)[index] = plugin;
-}
-
-//---------------------------------------------------------
-//   remove
-//---------------------------------------------------------
-
-void Pipeline::remove(int index)
-{
-	PluginI* plugin = (*this)[index];
-	if (plugin)
-		delete plugin;
-	(*this)[index] = 0;
-}
-
-//---------------------------------------------------------
-//   removeAll
-//---------------------------------------------------------
-
-void Pipeline::removeAll()
-{
-	for (int i = 0; i < PipelineDepth; ++i)
-		remove(i);
-}
-
-//---------------------------------------------------------
-//   isOn
-//---------------------------------------------------------
-
-bool Pipeline::isOn(int idx) const
-{
-	PluginI* p = (*this)[idx];
-	if (p)
-		return p->on();
-	return false;
-}
-
-//---------------------------------------------------------
-//   setOn
-//---------------------------------------------------------
-
-void Pipeline::setOn(int idx, bool flag)
-{
-	PluginI* p = (*this)[idx];
-	if (p)
-	{
-		p->setOn(flag);
-		if (p->gui())
-			p->gui()->setOn(flag);
-	}
-}
-
-//---------------------------------------------------------
-//   label
-//---------------------------------------------------------
-
-QString Pipeline::label(int idx) const
-{
-	PluginI* p = (*this)[idx];
-	if (p)
-		return p->label();
-	return QString("");
-}
-
-//---------------------------------------------------------
-//   name
-//---------------------------------------------------------
-
-QString Pipeline::name(int idx) const
-{
-	PluginI* p = (*this)[idx];
-	if (p)
-		return p->name();
-	return QString("empty");
-}
-
-//---------------------------------------------------------
-//   empty
-//---------------------------------------------------------
-
-bool Pipeline::empty(int idx) const
-{
-	PluginI* p = (*this)[idx];
-	return p == 0;
-}
-
-//---------------------------------------------------------
-//   move
-//---------------------------------------------------------
-
-void Pipeline::move(int idx, bool up)
-{
-	PluginI* p1 = (*this)[idx];
-	if (up)
-	{
-		(*this)[idx] = (*this)[idx - 1];
-
-		if ((*this)[idx])
-			(*this)[idx]->setID(idx);
-
-		(*this)[idx - 1] = p1;
-
-		if (p1)
-		{
-			p1->setID(idx - 1);
-			if (p1->track())
-				audio->msgSwapControllerIDX(p1->track(), idx, idx - 1);
-		}
-	}
-	else
-	{
-		(*this)[idx] = (*this)[idx + 1];
-
-		if ((*this)[idx])
-			(*this)[idx]->setID(idx);
-
-		(*this)[idx + 1] = p1;
-
-		if (p1)
-		{
-			p1->setID(idx + 1);
-			if (p1->track())
-				audio->msgSwapControllerIDX(p1->track(), idx, idx + 1);
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   isDssiPlugin
-//---------------------------------------------------------
-
-bool Pipeline::isDssiPlugin(int idx) const
-{
-	PluginI* p = (*this)[idx];
-	if (p)
-	{
-#ifdef LV2_SUPPORT
-		if(p->type() == LV2)
-		{
-			//LV2PluginI* lp = (LV2PluginI*)p;
-			//FIXME: For now this just check to enable native gui support, so we return true for lv2
-			return true;
-		}
-		else
-#endif
-			return p->isDssiPlugin();
-	}
-
-	return false;
-}
-
-//---------------------------------------------------------
-//   showGui
-//---------------------------------------------------------
-
-void Pipeline::showGui(int idx, bool flag)
-{
-	PluginI* p = (*this)[idx];
-	if (p)
-	{
-#ifdef LV2_SUPPORT
-		if(p->type() == LV2)
-		{
-			LV2PluginI* lp = (LV2PluginI*)p;
-			lp->showGui(flag);
-		}
-		else
-#endif
-		{
-			p->showGui(flag);
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   showNativeGui
-//---------------------------------------------------------
-
-#ifdef OSC_SUPPORT
-void Pipeline::showNativeGui(int idx, bool flag)
-{
-	bool islv2 = false;
-	PluginI* p = (*this)[idx];
-#ifdef LV2_SUPPORT
-	islv2 = (p->type() == LV2);
-	if(islv2)
-	{
-		LV2PluginI* lvp = (LV2PluginI*)p;
-		if(lvp)
-			lvp->showNativeGui(flag);
-	}
-#endif
-	if (p && !islv2)
-		p->oscIF().oscShowGui(flag);
-}
-#else
-void Pipeline::showNativeGui(int idx, bool flag)
-{
-#ifdef LV2_SUPPORT
-	PluginI* p = (*this)[idx];
-	bool islv2 = (p->type() == LV2);
-	if(islv2)
-	{
-		LV2PluginI* lvp = (LV2PluginI*)p;
-		if(lvp)
-			lvp->showNativeGui(flag);
-	}
-#endif
-}
-#endif      
-
-//---------------------------------------------------------
-//   deleteGui
-//---------------------------------------------------------
-
-void Pipeline::deleteGui(int idx)
-{
-	if (idx >= PipelineDepth)
-		return;
-	PluginI* p = (*this)[idx];
-#ifdef LV2_SUPPORT
-	if(p && p->type() == LV2)
-	{
-		LV2PluginI* lp = (LV2PluginI*)p;
-		if(lp)
-			lp->deleteGui();
-	}
-	else
-#endif
-	{
-		if (p)
-			p->deleteGui();
-	}
-}
-
-//---------------------------------------------------------
-//   deleteAllGuis
-//---------------------------------------------------------
-
-void Pipeline::deleteAllGuis()
-{
-	for (int i = 0; i < PipelineDepth; i++)
-		deleteGui(i);
-}
-
-//---------------------------------------------------------
-//   guiVisible
-//---------------------------------------------------------
-
-bool Pipeline::guiVisible(int idx)
-{
-	PluginI* p = (*this)[idx];
-	if (p)
-		return p->guiVisible();
-	return false;
-}
-
-//---------------------------------------------------------
-//   nativeGuiVisible
-//---------------------------------------------------------
-
-bool Pipeline::nativeGuiVisible(int idx)
-{
-	PluginI* p = (*this)[idx];
-	if (p)
-		return p->nativeGuiVisible();
-	return false;
-}
-
-void Pipeline::updateNativeGui()
-{
-#ifdef LV2_SUPPORT/*{{{*/
-	for (iPluginI i = begin(); i != end(); ++i)
-	{
-		PluginI* p = (PluginI*)*i;
-		if(p && p->type() == LV2)
-		{
-			LV2PluginI* lp = (LV2PluginI*)p;
-			if(lp)
-				lp->heartBeat();
-		}
-	}
-#endif/*}}}*/
-}
-//---------------------------------------------------------
-//   apply
-//---------------------------------------------------------
-
-void Pipeline::apply(int ports, unsigned long nframes, float** buffer1)/*{{{*/
-{
-	//fprintf(stderr, "Pipeline::apply data: nframes:%ld %e %e %e %e\n", nframes, buffer1[0][0], buffer1[0][1], buffer1[0][2], buffer1[0][3]);
-
-	bool swap = false;
-
-	for (iPluginI ip = begin(); ip != end(); ++ip)
-	{
-		PluginI* p = *ip;
-#ifdef LV2_SUPPORT
-		if(p && p->type() == LV2)
-		{
-			LV2PluginI* lp = (LV2PluginI*)p;/*{{{*/
-			if (lp && lp->on())
-			{
-				if (lp->inPlaceCapable())
-				{
-					if (swap)
-						lp->connect(ports, buffer, buffer);
-					else
-						lp->connect(ports, buffer1, buffer1);
-				}
-				else
-				{
-					if (swap)
-						lp->connect(ports, buffer, buffer1);
-					else
-						lp->connect(ports, buffer1, buffer);
-					swap = !swap;
-				}
-				lp->apply(nframes);
-			}/*}}}*/
-		}
-		else
-#endif
-		{
-			if (p && p->on())
-			{
-				if (p->inPlaceCapable())
-				{
-					if (swap)
-						p->connect(ports, buffer, buffer);
-					else
-						p->connect(ports, buffer1, buffer1);
-				}
-				else
-				{
-					if (swap)
-						p->connect(ports, buffer, buffer1);
-					else
-						p->connect(ports, buffer1, buffer);
-					swap = !swap;
-				}
-				p->apply(nframes);
-			}
-		}
-	}
-	if (swap)
-	{
-		for (int i = 0; i < ports; ++i)
-			AL::dsp->cpy(buffer1[i], buffer[i], nframes);
-	}
-
-	// p3.3.41
-	//fprintf(stderr, "Pipeline::apply after data: nframes:%ld %e %e %e %e\n", nframes, buffer1[0][0], buffer1[0][1], buffer1[0][2], buffer1[0][3]);
-
-}/*}}}*/
-
+#if 0
 //---------------------------------------------------------
 //   PluginI
 //---------------------------------------------------------
@@ -1591,7 +1537,7 @@ void PluginI::init()
 
 PluginI::PluginI()
 {
-	m_type = LADSPA;
+    m_type = PLUGIN_LADSPA;
 	_id = -1;
 	_track = 0;
 
@@ -1604,7 +1550,7 @@ PluginI::PluginI()
 
 PluginI::~PluginI()
 {
-	if (_plugin && m_type != LV2)
+    if (_plugin && m_type != PLUGIN_LV2)
 	{
 		deactivate();
 		_plugin->incReferences(-1);
@@ -1958,7 +1904,7 @@ void PluginI::connect(int ports, float** src, float** dst)/*{{{*/
 
 void PluginI::deactivate()
 {
-	if(m_type == LV2)
+    if(m_type == PLUGIN_LV2)
 		return;
 	for (int i = 0; i < instances; ++i)
 	{
@@ -2415,6 +2361,7 @@ void PluginI::apply(int n)/*{{{*/
 		_plugin->apply(handle[i], n);
 	}
 }/*}}}*/
+#endif
 
 //---------------------------------------------------------
 //   oscConfigure
@@ -2600,6 +2547,7 @@ int PluginI::oscControl(unsigned long port, float value)/*{{{*/
 //   PluginLoader
 //---------------------------------------------------------
 
+#if 0
 QWidget* PluginLoader::createWidget(const QString & className, QWidget * parent, const QString & name)
 {
 	if (className == QString("DoubleLabel"))
@@ -2609,3 +2557,4 @@ QWidget* PluginLoader::createWidget(const QString & className, QWidget * parent,
 
 	return QUiLoader::createWidget(className, parent, name);
 };
+#endif

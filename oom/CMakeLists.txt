@@ -59,7 +59,6 @@ QT4_WRAP_CPP ( oom_moc_headers
       AbstractMidiEditor.h 
       miditransform.h 
       plugin.h 
-	  lv2_plugin.h
       song.h 
 	  thread.h
       transport.h 
