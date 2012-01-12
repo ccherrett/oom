@@ -16,7 +16,7 @@
 #include "event.h"
 
 class SndFile;
-class Plugin;
+class BasePlugin;
 class SynthI;
 class MidiDevice;
 class AudioDevice;
@@ -96,7 +96,7 @@ struct AudioMsg : public ThreadMsg
     int ival;
     int iival;
     double dval;
-    Plugin* plugin;
+    BasePlugin* plugin;
     SynthI* synth;
     Part* spart;
     Part* dpart;
@@ -263,8 +263,8 @@ public:
     void msgRemoveRoutes1(Route, Route); // p3.3.55
     void msgAddRoute(Route, Route);
     void msgAddRoute1(Route, Route);
-    void msgAddPlugin(AudioTrack*, int idx, Plugin* plugin);
-    void msgIdlePlugin(AudioTrack*, Plugin* plugin);
+    void msgAddPlugin(AudioTrack*, int idx, BasePlugin* plugin);
+    void msgIdlePlugin(AudioTrack*, BasePlugin* plugin);
     void msgSetMute(AudioTrack*, bool val);
     void msgSetVolume(AudioTrack*, double val);
     void msgSetPan(AudioTrack*, double val);

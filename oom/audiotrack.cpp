@@ -163,7 +163,7 @@ Part* AudioTrack::newPart(Part*, bool /*clone*/)
 	return 0;
 }
 
-void AudioTrack::idlePlugin(Plugin* plugin)
+void AudioTrack::idlePlugin(BasePlugin* plugin)
 {
 	if(plugin)
 	{
@@ -177,12 +177,12 @@ void AudioTrack::idlePlugin(Plugin* plugin)
 //   addPlugin
 //---------------------------------------------------------
 
-void AudioTrack::addPlugin(Plugin* plugin, int idx)/*{{{*/
+void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
 {
 	printf("AudioTrack::addPlugin(%p, %d) \n", plugin, idx);
 	if (plugin == 0)
 	{
-        Plugin* oldPlugin = (*_efxPipe)[idx];
+        BasePlugin* oldPlugin = (*_efxPipe)[idx];
 		if (oldPlugin)
 		{
             oldPlugin->setId(-1);
@@ -1056,14 +1056,14 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 		//  controls would all be set to zero.
 		// But we will allow for the (unintended, useless) possibility of a controller
 		//  with no matching plugin control.
-        Plugin* p = 0;
+        BasePlugin* p = 0;
 		bool ctlfound = false;
 		int m = l->id() & AC_PLUGIN_CTL_ID_MASK;
 		int n = (l->id() >> AC_PLUGIN_CTL_BASE_POW) - 1;
 		if (n >= 0 && n < PipelineDepth)
 		{
 			p = (*_efxPipe)[n];
-            if (p && m < p->getParameterCount())
+            if (p && m < (int)p->getParameterCount())
 				ctlfound = true;
 		}
 
@@ -1111,7 +1111,7 @@ void AudioTrack::showPendingPluginNativeGuis()
 {
 	for (int idx = 0; idx < PipelineDepth; ++idx)
 	{
-        Plugin* p = (*_efxPipe)[idx];
+        BasePlugin* p = (*_efxPipe)[idx];
 		if (!p)
 			continue;
 
@@ -1149,7 +1149,7 @@ void AudioTrack::mapRackPluginsToControllers()
 		// We found some controllers with that index. Now iterate the plugin rack...
 		for (int i = idx; i >= 0; i--)
 		{
-            Plugin* p = (*_efxPipe)[i];
+            BasePlugin* p = (*_efxPipe)[i];
 			if (!p)
 				continue;
 
@@ -1193,7 +1193,7 @@ void AudioTrack::mapRackPluginsToControllers()
 	//  controller sections, so this will allow more tolerance of them.
 	for (int idx = 0; idx < PipelineDepth; idx++)
 	{
-        Plugin* p = (*_efxPipe)[idx];
+        BasePlugin* p = (*_efxPipe)[idx];
 		if (!p)
 			continue;
 
@@ -1272,12 +1272,12 @@ void AudioTrack::mapRackPluginsToControllers()
 				continue;
 			int param = id & AC_PLUGIN_CTL_ID_MASK;
 			int idx = (id >> AC_PLUGIN_CTL_BASE_POW) - 1;
-            Plugin* p = (*_efxPipe)[idx];
+            BasePlugin* p = (*_efxPipe)[idx];
 			// If there's no plugin at that rack position, or the param is out of range of
 			//  the number of controls in the plugin, then it's a stray controller. Delete it.
 			// Future: Leave room for possible bypass controller at AC_PLUGIN_CTL_ID_MASK -1.
 			//if(!p || (param >= p->parameters() && (param != AC_PLUGIN_CTL_ID_MASK -1)))
-            if (!p || (param >= p->getParameterCount()))
+            if (!p || (param >= (int)p->getParameterCount()))
 			{
 				_controller.erase(id);
 

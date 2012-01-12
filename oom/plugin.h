@@ -10,9 +10,6 @@
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
 
-//#include <vector>
-
-//#include <QFileInfo>
 //#include <QUiLoader>
 
 //#include "globaldefs.h"
@@ -31,7 +28,6 @@
 //class Slider;
 //class DoubleLabel;
 //class MidiController;
-//class PluginGui;
 
 #if defined(__WIN32__) || defined(__WIN64__)
 #include <windows.h>
@@ -47,20 +43,41 @@
 #include "audio.h"
 #include "ctrl.h"
 #include "globals.h"
+#include "lib_functions.h"
 
-#include <ladspa.h>
+// ladspa includes
+#include "ladspa.h"
 
-#include <stdint.h>
+// lv2 includes
+#include "lv2.h"
+#include "lv2_ui.h"
+
+#ifdef LILV_STATIC
+#include "lilv/lilv.h"
+#else
+#include <lilv/lilv.h>
+#endif
+
+// vst includes
+#include "pluginterfaces/vst2.x/aeffectx.h"
+
 #include <list>
+#include <vector>
+#include <stdint.h>
+
+#include <QFileInfo>
 
 class AudioTrack;
+class PluginI;
+class PluginGui;
 class Xml;
 
 // plugin hints
-const unsigned int PLUGIN_HAS_GUI            = 0x1;
-const unsigned int PLUGIN_IS_SYNTH           = 0x2;
-const unsigned int PLUGIN_IS_IN_PLACE_BROKEN = 0x4;
-const unsigned int PLUGIN_USES_CHUNKS        = 0x8;
+const unsigned int PLUGIN_IS_SYNTH            = 0x01;
+const unsigned int PLUGIN_IS_FX               = 0x02; // requires at least 1 audio port in and out
+const unsigned int PLUGIN_HAS_NATIVE_GUI      = 0x04;
+const unsigned int PLUGIN_HAS_IN_PLACE_BROKEN = 0x08;
+const unsigned int PLUGIN_USES_CHUNKS         = 0x10;
 
 // parameter hints
 const unsigned int PARAMETER_IS_ENABLED        = 0x01;
@@ -119,17 +136,17 @@ public:
     }
 
     ParameterType type;
+    unsigned int hints;
     int32_t rindex;
-    int32_t hints;
     double value;
 
     struct {
         double def;
-        float min;
-        float max;
-        float step;
-        float step_small;
-        float step_large;
+        double min;
+        double max;
+        double step;
+        double step_small;
+        double step_large;
     } ranges;
 
     bool enCtrl;
@@ -140,31 +157,37 @@ public:
 //   Plugin
 //---------------------------------------------------------
 
-class Plugin
+class BasePlugin
 {
 public:
-    Plugin()
+    BasePlugin()
     {
         m_type = PLUGIN_NONE;
         m_hints = 0;
         m_uniqueId = 0;
 
         m_active = false;
-        m_active_before = false;
+        m_activeBefore = false;
 
-        m_audioInputCount = 0;
-        m_audioOutputCount = 0;
         m_paramCount = 0;
         m_params = 0;
 
         m_id = -1;
         m_track = 0;
+        m_gui = 0;
 
         _lib = 0;
     }
 
-    ~Plugin()
+    ~BasePlugin()
     {
+        deleteGui();
+
+        if (m_paramCount > 0)
+            delete[] m_params;
+
+        if (_lib)
+            lib_close(_lib);
     }
 
     PluginType type() const
@@ -197,15 +220,9 @@ public:
         return m_copyright;
     }
 
-    QString filename(bool complete = true) const
+    QString filename() const
     {
-        if (m_type == PLUGIN_LV2)
-            return m_filename;
-        else if (complete)
-            return m_filename;
-        else
-            // TODO
-            return m_filename;
+        return m_filename;
     }
 
     long uniqueId() const
@@ -228,14 +245,9 @@ public:
         return m_track;
     }
 
-    uint32_t getAudioInputCount()
+    PluginGui* gui()
     {
-        return m_audioInputCount;
-    }
-
-    uint32_t getAudioOutputCount()
-    {
-        return m_audioOutputCount;
+        return m_gui;
     }
 
     uint32_t getParameterCount()
@@ -334,20 +346,29 @@ public:
         m_track = track;
     }
 
-    virtual bool readConfiguration(Xml& xml, bool readPreset = false);
-    virtual void writeConfiguration(int level, Xml& xml);
+    void makeGui();
+    void deleteGui();
+    void showGui(bool yesno);
+    bool guiVisible();
 
-    virtual QString getParameterName(uint32_t index);
-    virtual void setNativeParameterValue(uint32_t index, double value);
+    // TODO - bool hasNativeGui, etc
 
-    virtual void reload();
-    virtual void reload_programs(bool init);
-    virtual void process(uint32_t frames);
-    virtual void buffer_size_changed(uint32_t bufferSize);
+    virtual QString getParameterName(uint32_t index) = 0;
+    virtual void setNativeParameterValue(uint32_t index, double value) = 0;
+
+    virtual bool init(QString filename, QString label) = 0;
+    virtual void reload() = 0;
+    virtual void reloadPrograms(bool init) = 0;
+
+    virtual void process(uint32_t frames) = 0;
+    virtual void bufferSizeChanged(uint32_t bufferSize) = 0;
+
+    virtual bool readConfiguration(Xml& xml, bool readPreset = false) = 0;
+    virtual void writeConfiguration(int level, Xml& xml) = 0;
 
 protected:
 	PluginType m_type;
-    int32_t m_hints;
+    unsigned int m_hints;
 
     QString m_name;
     QString m_label;
@@ -357,10 +378,7 @@ protected:
     long m_uniqueId;
 
     bool m_active;
-    bool m_active_before;
-
-    uint32_t m_audioInputCount;
-    uint32_t m_audioOutputCount;
+    bool m_activeBefore;
 
     uint32_t m_paramCount;
     ParameterPort* m_params;
@@ -368,7 +386,8 @@ protected:
     int m_id;
     AudioTrack* m_track;
 
-private:
+    PluginGui* m_gui;
+
     void* _lib;
 
 #if 0
@@ -515,110 +534,40 @@ public:
         return _controlOutPorts;
     }
 #endif
-
-    bool lib_open(const char* filename)
-    {
-#ifdef __WINDOWS__
-        _lib = LoadLibraryA(filename);
-#else
-        _lib = dlopen(filename, RTLD_NOW);
-#endif
-        return bool(_lib);
-    }
-
-    bool lib_close()
-    {
-        if (_lib)
-#ifdef __WINDOWS__
-            return FreeLibrary((HMODULE)_lib) != 0;
-#else
-            return dlclose(_lib) != 0;
-#endif
-        else
-            return false;
-    }
-
-    void* lib_symbol(const char* symbol)
-    {
-        if (_lib)
-#ifdef __WINDOWS__
-            return (void*)GetProcAddress((HMODULE)_lib, symbol);
-#else
-            return dlsym(_lib, symbol);
-#endif
-        else
-            return 0; //nullptr;
-    }
-
-    const char* lib_error()
-    {
-#ifdef __WINDOWS__
-        return "Unknown error";
-#else
-        return dlerror();
-#endif
-    }
 };
 
 //---------------------------------------------------------
 //   LADSPA Plugin
 //---------------------------------------------------------
 
-class LadspaPlugin : public Plugin
+class LadspaPlugin : public BasePlugin
 {
 public:
-    LadspaPlugin()
-    {
-        handle = 0;
-        descriptor = 0;
-    }
+    LadspaPlugin();
+    ~LadspaPlugin();
 
-    LadspaPlugin(LadspaPlugin* plugin)
-    {
-    }
+    static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
 
-    QString getParameterName(uint32_t index)
-    {
-        if (index < m_paramCount)
-            return QString("");
-        else
-            return QString("");
-    }
+    bool init(QString filename, QString label);
+    void reload();
+    void reloadPrograms(bool init);
 
-    void setNativeParameterValue(uint32_t index, double value)
-    {
+    QString getParameterName(uint32_t index);
+    void setNativeParameterValue(uint32_t index, double value);
 
-    }
+    void connect(int ports, float** src, float** dst);
 
-    void reload()
-    {
+    void process(uint32_t frames);
+    void bufferSizeChanged(uint32_t bufferSize);
 
-    }
-
-    void reload_programs(bool init)
-    {
-
-    }
-
-    void process(uint32_t frames)
-    {
-    }
-
-    void buffer_size_changed(uint32_t bufferSize)
-    {
-    }
-
-    bool readConfiguration(Xml& xml, bool readPreset)
-    {
-
-    }
-
-    void writeConfiguration(int level, Xml& xml)
-    {
-
-    }
+    bool readConfiguration(Xml& xml, bool readPreset);
+    void writeConfiguration(int level, Xml& xml);
 
 protected:
+    float* m_paramsBuffer;
+    std::vector<unsigned long> m_audioInIndexes;
+    std::vector<unsigned long> m_audioOutIndexes;
+
     LADSPA_Handle handle;
     const LADSPA_Descriptor* descriptor;
 };
@@ -627,168 +576,215 @@ protected:
 //   LV2 Plugin
 //---------------------------------------------------------
 
-class Lv2Plugin : public Plugin
+class Lv2Plugin : public BasePlugin
 {
 public:
-    Lv2Plugin()
-    {
-    }
+    Lv2Plugin();
+    ~Lv2Plugin();
 
-    Lv2Plugin(Lv2Plugin* plugin)
-    {
-    }
+    static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
 
-    QString getParameterName(uint32_t index)
-    {
-        if (index < m_paramCount)
-            return QString("");
-        else
-            return QString("");
-    }
+    bool init(QString filename, QString label);
+    void reload();
+    void reloadPrograms(bool init);
 
-    void setNativeParameterValue(uint32_t index, double value)
-    {
+    QString getParameterName(uint32_t index);
+    void setNativeParameterValue(uint32_t index, double value);
 
-    }
+    void process(uint32_t frames);
+    void bufferSizeChanged(uint32_t bufferSize);
 
-    void reload()
-    {
+    bool readConfiguration(Xml& xml, bool readPreset);
+    void writeConfiguration(int level, Xml& xml);
 
-    }
+    uint32_t getCustomURIId(const char* uri);
+    const char* getCustomURIString(int uri_id);
 
-    void reload_programs(bool init)
-    {
+private:
+    float* m_paramsBuffer;
+    std::vector<unsigned long> m_audioInIndexes;
+    std::vector<unsigned long> m_audioOutIndexes;
+    QList<const char*> m_customURIs;
 
-    }
+    struct {
+        LV2UI_Handle handle;
+        LV2UI_Widget widget;
+        const LV2UI_Descriptor* descriptor;
+        void* _lib;
+    } ui;
 
-    void process(uint32_t frames)
-    {
-    }
+    LV2_Handle handle;
+    const LV2_Descriptor* descriptor;
+    LV2_Feature* features[11]; //lv2_feature_count+1
 
-    void buffer_size_changed(uint32_t bufferSize)
-    {
-    }
-
-    bool readConfiguration(Xml& xml, bool readPreset)
-    {
-
-    }
-
-    void writeConfiguration(int level, Xml& xml)
-    {
-
-    }
+    const LilvPlugin* lplug;
 };
 
 //---------------------------------------------------------
 //   VST Plugin
 //---------------------------------------------------------
+#define MAX_VST_EVENTS 512
 
-class VstPlugin : public Plugin
+typedef AEffect* (*VST_Function)(audioMasterCallback);
+
+intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
+
+class VstPlugin : public BasePlugin
 {
 public:
-    VstPlugin()
-    {
-        //effect = 0;
-        events.numEvents = 0;
-        events.reserved  = 0;
-        is_oldsdk = false;
-    }
+    VstPlugin();
+    ~VstPlugin();
 
-    VstPlugin(VstPlugin* plugin)
-    {
-    }
+    static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
 
-    QString getParameterName(uint32_t index)
-    {
-        if (index < m_paramCount)
-            return QString("");
-        else
-            return QString("");
-    }
+    bool init(QString filename, QString label);
+    void reload();
+    void reloadPrograms(bool init);
 
-    void setNativeParameterValue(uint32_t index, double value)
-    {
+    QString getParameterName(uint32_t index);
+    void setNativeParameterValue(uint32_t index, double value);
 
-    }
+    void process(uint32_t frames);
+    void bufferSizeChanged(uint32_t bufferSize);
 
-    void reload()
-    {
-
-    }
-
-    void reload_programs(bool init)
-    {
-
-    }
-
-    void process(uint32_t frames)
-    {
-    }
-
-    void buffer_size_changed(uint32_t bufferSize)
-    {
-    }
-
-    bool readConfiguration(Xml& xml, bool readPreset)
-    {
-
-    }
-
-    void writeConfiguration(int level, Xml& xml)
-    {
-
-    }
+    bool readConfiguration(Xml& xml, bool readPreset);
+    void writeConfiguration(int level, Xml& xml);
 
 protected:
-    //AEffect* effect;
+    AEffect* effect;
     struct {
         int32_t numEvents;
         intptr_t reserved;
-        //VstEvent* events[MAX_MIDI_BUFFER];
+        VstEvent* data[MAX_VST_EVENTS];
     } events;
-    //VstMidiEvent midi_events[MAX_MIDI_BUFFER];
-    bool is_oldsdk;
+    VstMidiEvent midiEvents[MAX_VST_EVENTS];
+    bool isOldSdk;
 };
+
+//---------------------------------------------------------
+//   PluginI, simple class for itenerator list
+//---------------------------------------------------------
+
+class PluginI
+{
+public:
+    PluginI(PluginType type, const QString& filename, const QString& label, const void* nativeHandle)
+    {
+        m_type = type;
+        m_hints = 0;
+        m_filename = QString(filename);
+        m_label = QString(label);
+        m_audioInputCount = 0;
+        m_audioOutputCount = 0;
+
+        if (type == PLUGIN_LADSPA)
+        {
+            LadspaPlugin::initPluginI(this, filename, label, nativeHandle);
+        }
+        else if (type == PLUGIN_LV2)
+        {
+            Lv2Plugin::initPluginI(this, filename, label, nativeHandle);
+        }
+        else if (type == PLUGIN_VST)
+        {
+            VstPlugin::initPluginI(this, filename, label, nativeHandle);
+        }
+    }
+
+    PluginType type()
+    {
+        return m_type;
+    }
+
+    unsigned int hints()
+    {
+        return m_hints;
+    }
+
+    QString filename(bool complete = true)
+    {
+        if (m_type == PLUGIN_LV2 || complete)
+            return m_filename;
+        else
+        {
+            QFileInfo fi(m_filename);
+            return fi.completeBaseName();
+        }
+    }
+
+    QString name()
+    {
+        return m_name;
+    }
+
+    QString label()
+    {
+        return m_label;
+    }
+
+    QString maker()
+    {
+        return m_maker;
+    }
+
+    uint32_t getAudioInputCount()
+    {
+        return m_audioInputCount;
+    }
+
+    uint32_t getAudioOutputCount()
+    {
+        return m_audioOutputCount;
+    }
+
+    // needs public access for xPlugin::initPluginI()
+    unsigned int m_hints;
+    QString m_name;
+    QString m_maker;
+    uint32_t m_audioInputCount;
+    uint32_t m_audioOutputCount;
+
+private:
+    PluginType m_type;
+    QString m_filename; // uri for LV2
+    QString m_label;
+};
+
+typedef std::list<PluginI>::iterator iPlugin;
 
 //---------------------------------------------------------
 //   PluginList
 //---------------------------------------------------------
 
-typedef std::list<Plugin>::iterator iPlugin;
-
-class PluginList : public std::list<Plugin>
+class PluginList : public std::list<PluginI>
 {
 public:
     PluginList()
     {
     }
 
-    void add(LadspaPlugin* plugin)
+    void add(PluginType type, QString filename, QString label, const void* nativeHandle)
     {
-        push_back(LadspaPlugin(plugin));
+        push_back(PluginI(type, filename, label, nativeHandle));
     }
 
-    void add(Lv2Plugin* plugin)
-    {
-        push_back(Lv2Plugin(plugin));
-    }
-
-    void add(VstPlugin* plugin)
-    {
-        push_back(VstPlugin(plugin));
-    }
-
-    Plugin* find(const QString& filename, const QString& label)
+    PluginI* find(const QString& baseFilename, const QString& label)
     {
         for (iPlugin i = begin(); i != end(); ++i)
         {
-            if ((i->filename() == filename) && (i->label() == label))
+            if ((i->filename(false) == baseFilename) && (i->label() == label))
                 return &*i;
         }
         return 0;
     }
 };
+
+//---------------------------------------------------------
+//   Set error for last loaded plugin
+//---------------------------------------------------------
+
+const char* get_last_error();
+void set_last_error(const char* error);
 
 //---------------------------------------------------------
 //   Pipeline
@@ -797,13 +793,13 @@ public:
 
 const int PipelineDepth = 100;
 
-class Pipeline : public std::vector<Plugin*>
+class Pipeline : public std::vector<BasePlugin*>
 {
 public:
     Pipeline();
     ~Pipeline();
 
-    void insert(Plugin* plugin, int index);
+    void insert(BasePlugin* plugin, int index);
     void remove(int index);
     void removeAll();
 
@@ -815,17 +811,18 @@ public:
     QString label(int idx) const;
     QString name(int idx) const;
 
+    bool empty(int idx) const;
+    void move(int idx, bool up);
+    void apply(int ports, uint32_t nframes, float** buffer);
+
     void showGui(int, bool);
     void showNativeGui(int, bool);
     void deleteGui(int idx);
     void deleteAllGuis();
     bool guiVisible(int);
+    bool hasNativeGui();
     bool nativeGuiVisible(int);
     void updateNativeGui();
-
-    void apply(int ports, uint32_t nframes, float** buffer);
-    void move(int idx, bool up);
-    bool empty(int idx) const;
 
 private:
     float* buffer[MAX_CHANNELS];
@@ -1129,9 +1126,7 @@ public:
 	}
 };/*}}}*/
 
-
-extern void initPlugins();
-//extern void initLV2();
+extern void initPlugins(bool ladspa, bool lv2, bool vst);
 
 extern bool ladspaDefaultValue(const LADSPA_Descriptor* plugin, int port, float* val);
 extern void ladspaControlRange(const LADSPA_Descriptor* plugin, int i, float* min, float* max);

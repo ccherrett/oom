@@ -51,9 +51,14 @@
 #include "audio.h"
 #include "al/dsp.h"
 
+#include "lib_functions.h"
+
 #include "config.h"
 #include "plugingui.h"
 #include "plugindialog.h"
+
+// debug plugin scan
+#define PLUGIN_DEBUGIN
 
 PluginList plugins;
 
@@ -74,11 +79,96 @@ static const char* preset_file_save_pattern[] = {
  */
 
 //---------------------------------------------------------
+//   Set error for last loaded plugin
+//---------------------------------------------------------
+
+static const char* last_error = 0;
+
+const char* get_last_error()
+{
+    return last_error;
+}
+
+void set_last_error(const char* error)
+{
+    if (last_error)
+        free((void*)last_error);
+
+    last_error = strdup(error);
+}
+
+//---------------------------------------------------------
+//   makeGui
+//---------------------------------------------------------
+
+void BasePlugin::makeGui()
+{
+    m_gui = new PluginGui(this);
+}
+
+//---------------------------------------------------------
+//   deleteGui
+//---------------------------------------------------------
+
+void BasePlugin::deleteGui()
+{
+    if (m_gui)
+    {
+        delete m_gui;
+        m_gui = 0;
+    }
+}
+
+//---------------------------------------------------------
+//   showGui
+//---------------------------------------------------------
+
+//void BasePlugin::showGui()
+//{
+//    if (! m_gui)
+//    {
+//        qDebug("PluginI::showGui() before makeGui\n");
+//        makeGui();
+//        qDebug("PluginI::showGui() after makeGui\n");
+//    }
+
+//    if (m_gui->isVisible())
+//        m_gui->hide();
+//    else
+//        m_gui->show();
+//}
+
+void BasePlugin::showGui(bool yesno)
+{
+    if (yesno)
+    {
+        if (! m_gui)
+            makeGui();
+
+        m_gui->show();
+    }
+    else
+    {
+        if (m_gui)
+            m_gui->hide();
+    }
+}
+
+//---------------------------------------------------------
+//   guiVisible
+//---------------------------------------------------------
+
+bool BasePlugin::guiVisible()
+{
+    return (m_gui && m_gui->isVisible());
+}
+
+//---------------------------------------------------------
 //   Pipeline
 //---------------------------------------------------------
 
 Pipeline::Pipeline()
-: std::vector<Plugin*>()
+: std::vector<BasePlugin*>()
 {
     // Added by Tim. p3.3.15
     for (int i = 0; i < MAX_CHANNELS; ++i)
@@ -100,23 +190,11 @@ Pipeline::~Pipeline()
 }
 
 //---------------------------------------------------------
-//   setChannels
-//---------------------------------------------------------
-
-void Pipeline::setChannels(int n)
-{
-    // TODO
-    //for (int i = 0; i < PipelineDepth; ++i)
-    //    if ((*this)[i])
-    //        (*this)[i]->setChannels(n);
-}
-
-//---------------------------------------------------------
 //   insert
 //    give ownership of object plugin to Pipeline
 //---------------------------------------------------------
 
-void Pipeline::insert(Plugin* plugin, int index)
+void Pipeline::insert(BasePlugin* plugin, int index)
 {
     remove(index);
     (*this)[index] = plugin;
@@ -128,9 +206,27 @@ void Pipeline::insert(Plugin* plugin, int index)
 
 void Pipeline::remove(int index)
 {
-    Plugin* plugin = (*this)[index];
+    BasePlugin* plugin = (*this)[index];
+
     if (plugin)
-        delete plugin;
+    {
+        // Delete the appropriate class
+        switch(plugin->type())
+        {
+        case PLUGIN_LADSPA:
+            delete (LadspaPlugin*)plugin;
+            break;
+        case PLUGIN_LV2:
+            delete (Lv2Plugin*)plugin;
+            break;
+        case PLUGIN_VST:
+            delete (VstPlugin*)plugin;
+            break;
+        default:
+            break;
+        }
+    }
+
     (*this)[index] = 0;
 }
 
@@ -145,31 +241,43 @@ void Pipeline::removeAll()
 }
 
 //---------------------------------------------------------
-//   isOn
+//   isActive
 //---------------------------------------------------------
 
 bool Pipeline::isActive(int idx) const
 {
-    Plugin* p = (*this)[idx];
+    BasePlugin* p = (*this)[idx];
     if (p)
         return p->active();
     return false;
 }
 
 //---------------------------------------------------------
-//   setOn
+//   setActive
 //---------------------------------------------------------
 
 void Pipeline::setActive(int idx, bool flag)
 {
-    Plugin* p = (*this)[idx];
+    BasePlugin* p = (*this)[idx];
     if (p)
     {
         p->setActive(flag);
-        // TODO
-        //if (p->gui())
-        //    p->gui()->setOn(flag);
+
+        if (p->gui())
+            p->gui()->setOn(flag);
     }
+}
+
+//---------------------------------------------------------
+//   setChannels
+//---------------------------------------------------------
+
+void Pipeline::setChannels(int n)
+{
+    // TODO
+    //for (int i = 0; i < PipelineDepth; ++i)
+    //    if ((*this)[i])
+    //        (*this)[i]->setChannels(n);
 }
 
 //---------------------------------------------------------
@@ -178,7 +286,7 @@ void Pipeline::setActive(int idx, bool flag)
 
 QString Pipeline::label(int idx) const
 {
-    Plugin* p = (*this)[idx];
+    BasePlugin* p = (*this)[idx];
     if (p)
         return p->label();
     return QString("");
@@ -190,7 +298,7 @@ QString Pipeline::label(int idx) const
 
 QString Pipeline::name(int idx) const
 {
-    Plugin* p = (*this)[idx];
+    BasePlugin* p = (*this)[idx];
     if (p)
         return p->name();
     return QString("empty");
@@ -202,7 +310,7 @@ QString Pipeline::name(int idx) const
 
 bool Pipeline::empty(int idx) const
 {
-    Plugin* p = (*this)[idx];
+    BasePlugin* p = (*this)[idx];
     return p == 0;
 }
 
@@ -212,7 +320,7 @@ bool Pipeline::empty(int idx) const
 
 void Pipeline::move(int idx, bool up)
 {
-    Plugin* p1 = (*this)[idx];
+    BasePlugin* p1 = (*this)[idx];
     if (up)
     {
         (*this)[idx] = (*this)[idx - 1];
@@ -248,51 +356,76 @@ void Pipeline::move(int idx, bool up)
 }
 
 //---------------------------------------------------------
+//   apply
+//---------------------------------------------------------
+
+void Pipeline::apply(int ports, uint32_t nframes, float** buffer1)
+{
+    //fprintf(stderr, "Pipeline::apply data: nframes:%ld %e %e %e %e\n", nframes, buffer1[0][0], buffer1[0][1], buffer1[0][2], buffer1[0][3]);
+
+    bool swap = false;
+
+    for (iPluginI ip = begin(); ip != end(); ++ip)
+    {
+        BasePlugin* p = *ip;
+        if (p)
+        {
+            if (p->type() == PLUGIN_LADSPA)
+            {
+                LadspaPlugin* ladp = (LadspaPlugin*)p;
+
+                if (ladp->hints() & PLUGIN_HAS_IN_PLACE_BROKEN)
+                {
+                    if (swap)
+                        ladp->connect(ports, buffer, buffer1);
+                    else
+                        ladp->connect(ports, buffer1, buffer);
+                    swap = !swap;
+                }
+                else
+                {
+                    if (swap)
+                        ladp->connect(ports, buffer, buffer);
+                    else
+                        ladp->connect(ports, buffer1, buffer1);
+                }
+                ladp->process(nframes);
+            }
+            else if (p->type() == PLUGIN_LV2)
+            {
+            }
+            else if (p->type() == PLUGIN_VST)
+            {
+            }
+        }
+    }
+
+    if (swap)
+    {
+        for (int i = 0; i < ports; ++i)
+            AL::dsp->cpy(buffer1[i], buffer[i], nframes);
+    }
+
+    // p3.3.41
+    //fprintf(stderr, "Pipeline::apply after data: nframes:%ld %e %e %e %e\n", nframes, buffer1[0][0], buffer1[0][1], buffer1[0][2], buffer1[0][3]);
+}
+
+//---------------------------------------------------------
 //   showGui
 //---------------------------------------------------------
 
 void Pipeline::showGui(int idx, bool flag)
 {
-    Plugin* p = (*this)[idx];
+    BasePlugin* p = (*this)[idx];
+
     if (p)
-    {
-#if 0 //def LV2_SUPPORT
-        if(p->type() == LV2)
-        {
-            LV2PluginI* lp = (LV2PluginI*)p;
-            lp->showGui(flag);
-        }
-        else
-#endif
-        {
-            // TODO
-            //p->showGui(flag);
-        }
-    }
+        p->showGui(flag);
 }
 
 //---------------------------------------------------------
 //   showNativeGui
 //---------------------------------------------------------
 
-#ifdef OSC_SUPPORT
-void Pipeline::showNativeGui(int idx, bool flag)
-{
-    bool islv2 = false;
-    PluginI* p = (*this)[idx];
-#ifdef LV2_SUPPORT
-    islv2 = (p->type() == LV2);
-    if(islv2)
-    {
-        LV2PluginI* lvp = (LV2PluginI*)p;
-        if(lvp)
-            lvp->showNativeGui(flag);
-    }
-#endif
-    if (p && !islv2)
-        p->oscIF().oscShowGui(flag);
-}
-#else
 void Pipeline::showNativeGui(int idx, bool flag)
 {
 #if 0 //def LV2_SUPPORT
@@ -306,7 +439,6 @@ void Pipeline::showNativeGui(int idx, bool flag)
     }
 #endif
 }
-#endif
 
 //---------------------------------------------------------
 //   deleteGui
@@ -316,21 +448,11 @@ void Pipeline::deleteGui(int idx)
 {
     if (idx >= PipelineDepth)
         return;
-    Plugin* p = (*this)[idx];
-#if 0 //def LV2_SUPPORT
-    if(p && p->type() == LV2)
-    {
-        LV2PluginI* lp = (LV2PluginI*)p;
-        if(lp)
-            lp->deleteGui();
-    }
-    else
-#endif
-    {
-        // TODO
-        //if (p)
-            //p->deleteGui();
-    }
+
+    BasePlugin* p = (*this)[idx];
+
+    if (p)
+        p->deleteGui();
 }
 
 //---------------------------------------------------------
@@ -349,11 +471,27 @@ void Pipeline::deleteAllGuis()
 
 bool Pipeline::guiVisible(int idx)
 {
-    Plugin* p = (*this)[idx];
+    BasePlugin* p = (*this)[idx];
+
+    if (p)
+        return p->guiVisible();
+    else
+        return false;
+}
+
+//---------------------------------------------------------
+//   hasNativeGui
+//---------------------------------------------------------
+
+bool Pipeline::hasNativeGui()
+{
     // TODO
+    //BasePlugin* p = (*this)[idx];
+
     //if (p)
-    //    return p->guiVisible();
-    return false;
+    //    return p->hasNativeGui();
+    //else
+        return false;
 }
 
 //---------------------------------------------------------
@@ -362,7 +500,7 @@ bool Pipeline::guiVisible(int idx)
 
 bool Pipeline::nativeGuiVisible(int idx)
 {
-    Plugin* p = (*this)[idx];
+    BasePlugin* p = (*this)[idx];
     // TODO
     //if (p)
     //    return p->nativeGuiVisible();
@@ -384,581 +522,6 @@ void Pipeline::updateNativeGui()
     }
 #endif/*}}}*/
 }
-//---------------------------------------------------------
-//   apply
-//---------------------------------------------------------
-
-void Pipeline::apply(int ports, uint32_t nframes, float** buffer1)/*{{{*/
-{
-    //fprintf(stderr, "Pipeline::apply data: nframes:%ld %e %e %e %e\n", nframes, buffer1[0][0], buffer1[0][1], buffer1[0][2], buffer1[0][3]);
-
-    bool swap = false;
-
-    for (iPluginI ip = begin(); ip != end(); ++ip)
-    {
-        Plugin* p = *ip;
-#if 0 //def LV2_SUPPORT
-        if(p && p->type() == LV2)
-        {
-            LV2PluginI* lp = (LV2PluginI*)p;/*{{{*/
-            if (lp && lp->on())
-            {
-                if (lp->inPlaceCapable())
-                {
-                    if (swap)
-                        lp->connect(ports, buffer, buffer);
-                    else
-                        lp->connect(ports, buffer1, buffer1);
-                }
-                else
-                {
-                    if (swap)
-                        lp->connect(ports, buffer, buffer1);
-                    else
-                        lp->connect(ports, buffer1, buffer);
-                    swap = !swap;
-                }
-                lp->apply(nframes);
-            }/*}}}*/
-        }
-        else
-#endif
-        {
-            if (p && p->active())
-            {
-                if (p->hints() & PLUGIN_IS_IN_PLACE_BROKEN)
-                {
-                    // TODO
-                    //if (swap)
-                    //    p->connect(ports, buffer, buffer);
-                    //else
-                    //    p->connect(ports, buffer1, buffer1);
-                }
-                else
-                {
-                    // TODO
-                    //if (swap)
-                    //    p->connect(ports, buffer, buffer1);
-                    //else
-                    //    p->connect(ports, buffer1, buffer);
-                    swap = !swap;
-                }
-                p->process(nframes);
-            }
-        }
-    }
-    if (swap)
-    {
-        for (int i = 0; i < ports; ++i)
-            AL::dsp->cpy(buffer1[i], buffer[i], nframes);
-    }
-
-    // p3.3.41
-    //fprintf(stderr, "Pipeline::apply after data: nframes:%ld %e %e %e %e\n", nframes, buffer1[0][0], buffer1[0][1], buffer1[0][2], buffer1[0][3]);
-
-}/*}}}*/
-
-//---------------------------------------------------------
-//   ladspa2MidiControlValues
-//---------------------------------------------------------
-
-bool ladspa2MidiControlValues(const LADSPA_Descriptor* plugin, int port, int ctlnum, int* min, int* max, int* def)/*{{{*/
-{
-	LADSPA_PortRangeHint range = plugin->PortRangeHints[port];
-	LADSPA_PortRangeHintDescriptor desc = range.HintDescriptor;
-
-	float fmin, fmax, fdef;
-	int imin, imax;
-	float frng;
-	//int idef;
-
-	//ladspaControlRange(plugin, port, &fmin, &fmax);
-
-    // TODO
-    bool hasdef = false; //ladspaDefaultValue(plugin, port, &fdef);
-	//bool isint = desc & LADSPA_HINT_INTEGER;
-	MidiController::ControllerType t = midiControllerType(ctlnum);
-
-#ifdef PLUGIN_DEBUGIN 
-	printf("ladspa2MidiControlValues: ctlnum:%d ladspa port:%d has default?:%d default:%f\n", ctlnum, port, hasdef, fdef);
-#endif
-
-	if (desc & LADSPA_HINT_TOGGLED)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("ladspa2MidiControlValues: has LADSPA_HINT_TOGGLED\n");
-#endif
-
-		*min = 0;
-		*max = 1;
-		*def = (int) lrint(fdef);
-		return hasdef;
-	}
-
-	float m = 1.0;
-	if (desc & LADSPA_HINT_SAMPLE_RATE)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("ladspa2MidiControlValues: has LADSPA_HINT_SAMPLE_RATE\n");
-#endif
-
-		m = float(sampleRate);
-	}
-
-	if (desc & LADSPA_HINT_BOUNDED_BELOW)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("ladspa2MidiControlValues: has LADSPA_HINT_BOUNDED_BELOW\n");
-#endif
-
-		fmin = range.LowerBound * m;
-	}
-	else
-		fmin = 0.0;
-
-	if (desc & LADSPA_HINT_BOUNDED_ABOVE)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("ladspa2MidiControlValues: has LADSPA_HINT_BOUNDED_ABOVE\n");
-#endif
-
-		fmax = range.UpperBound * m;
-	}
-	else
-		fmax = 1.0;
-
-	frng = fmax - fmin;
-	imin = lrint(fmin);
-	imax = lrint(fmax);
-	//irng = imax - imin;
-
-	int ctlmn = 0;
-	int ctlmx = 127;
-
-#ifdef PLUGIN_DEBUGIN 
-	printf("ladspa2MidiControlValues: port min:%f max:%f \n", fmin, fmax);
-#endif
-
-	//bool isneg = (fmin < 0.0);
-	bool isneg = (imin < 0);
-	int bias = 0;
-	switch (t)
-	{
-		case MidiController::RPN:
-		case MidiController::NRPN:
-		case MidiController::Controller7:
-			if (isneg)
-			{
-				ctlmn = -64;
-				ctlmx = 63;
-				bias = -64;
-			}
-			else
-			{
-				ctlmn = 0;
-				ctlmx = 127;
-			}
-			break;
-		case MidiController::Controller14:
-		case MidiController::RPN14:
-		case MidiController::NRPN14:
-			if (isneg)
-			{
-				ctlmn = -8192;
-				ctlmx = 8191;
-				bias = -8192;
-			}
-			else
-			{
-				ctlmn = 0;
-				ctlmx = 16383;
-			}
-			break;
-		case MidiController::Program:
-			ctlmn = 0;
-			//ctlmx = 0xffffff;
-			ctlmx = 0x3fff; // FIXME: Really should not happen or be allowed. What to do here...
-			break;
-		case MidiController::Pitch:
-			ctlmn = -8192;
-			ctlmx = 8191;
-			break;
-		case MidiController::Velo: // cannot happen
-		default:
-			break;
-	}
-	//int ctlrng = ctlmx - ctlmn;
-	float fctlrng = float(ctlmx - ctlmn);
-
-	// Is it an integer control?
-	if (desc & LADSPA_HINT_INTEGER)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("ladspa2MidiControlValues: has LADSPA_HINT_INTEGER\n");
-#endif
-
-		// If the upper or lower limit is beyond the controller limits, just scale the whole range to fit.
-		// We could get fancy by scaling only the negative or positive domain, or each one separately, but no...
-		//if((imin < ctlmn) || (imax > ctlmx))
-		//{
-		//  float scl = float(irng) / float(fctlrng);
-		//  if((ctlmn - imin) > (ctlmx - imax))
-		//    scl = float(ctlmn - imin);
-		//  else
-		//    scl = float(ctlmx - imax);
-		//}
-		// No, instead just clip the limits. ie fit the range into clipped space.
-		if (imin < ctlmn)
-			imin = ctlmn;
-		if (imax > ctlmx)
-			imax = ctlmx;
-
-		*min = imin;
-		*max = imax;
-
-		//int idef = (int)lrint(fdef);
-		//if(idef < ctlmn)
-		//  idef = ctlmn;
-		//if(idef > ctlmx)
-		//  idef = ctlmx;
-		//*def = idef;
-
-		*def = (int) lrint(fdef);
-
-		return hasdef;
-	}
-
-	// It's a floating point control, just use wide open maximum range.
-	*min = ctlmn;
-	*max = ctlmx;
-
-	// Orcan: commented out next 2 lines to suppress compiler warning:
-	//float fbias = (fmin + fmax) / 2.0;
-	//float normbias = fbias / frng;
-	float normdef = fdef / frng;
-	fdef = normdef * fctlrng;
-
-	// FIXME: TODO: Incorrect... Fix this somewhat more trivial stuff later....
-
-	*def = (int) lrint(fdef) + bias;
-
-#ifdef PLUGIN_DEBUGIN 
-	printf("ladspa2MidiControlValues: setting default:%d\n", *def);
-#endif
-
-	return hasdef;
-}/*}}}*/
-
-//---------------------------------------------------------
-//   midi2LadspaValue
-//---------------------------------------------------------
-
-float midi2LadspaValue(const LADSPA_Descriptor* plugin, int port, int ctlnum, int val)/*{{{*/
-{
-	LADSPA_PortRangeHint range = plugin->PortRangeHints[port];
-	LADSPA_PortRangeHintDescriptor desc = range.HintDescriptor;
-
-	float fmin, fmax;
-	int imin;
-	//int imax;
-	float frng;
-	//int idef;
-
-	//ladspaControlRange(plugin, port, &fmin, &fmax);
-
-	//bool hasdef = ladspaDefaultValue(plugin, port, &fdef);
-	//bool isint = desc & LADSPA_HINT_INTEGER;
-	MidiController::ControllerType t = midiControllerType(ctlnum);
-
-#ifdef PLUGIN_DEBUGIN 
-	printf("midi2LadspaValue: ctlnum:%d ladspa port:%d val:%d\n", ctlnum, port, val);
-#endif
-
-	float m = 1.0;
-	if (desc & LADSPA_HINT_SAMPLE_RATE)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("midi2LadspaValue: has LADSPA_HINT_SAMPLE_RATE\n");
-#endif
-
-		m = float(sampleRate);
-	}
-
-	if (desc & LADSPA_HINT_BOUNDED_BELOW)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("midi2LadspaValue: has LADSPA_HINT_BOUNDED_BELOW\n");
-#endif
-
-		fmin = range.LowerBound * m;
-	}
-	else
-		fmin = 0.0;
-
-	if (desc & LADSPA_HINT_BOUNDED_ABOVE)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("midi2LadspaValue: has LADSPA_HINT_BOUNDED_ABOVE\n");
-#endif
-
-		fmax = range.UpperBound * m;
-	}
-	else
-		fmax = 1.0;
-
-	frng = fmax - fmin;
-	imin = lrint(fmin);
-	//imax = lrint(fmax);
-	//irng = imax - imin;
-
-	if (desc & LADSPA_HINT_TOGGLED)
-	{
-#ifdef PLUGIN_DEBUGIN 
-		printf("midi2LadspaValue: has LADSPA_HINT_TOGGLED\n");
-#endif
-
-		if (val > 0)
-			return fmax;
-		else
-			return fmin;
-	}
-
-	int ctlmn = 0;
-	int ctlmx = 127;
-
-#ifdef PLUGIN_DEBUGIN 
-	printf("midi2LadspaValue: port min:%f max:%f \n", fmin, fmax);
-#endif
-
-	//bool isneg = (fmin < 0.0);
-	bool isneg = (imin < 0);
-	int bval = val;
-	int cval = val;
-	switch (t)
-	{
-		case MidiController::RPN:
-		case MidiController::NRPN:
-		case MidiController::Controller7:
-			if (isneg)
-			{
-				ctlmn = -64;
-				ctlmx = 63;
-				bval -= 64;
-				cval -= 64;
-			}
-			else
-			{
-				ctlmn = 0;
-				ctlmx = 127;
-				cval -= 64;
-			}
-			break;
-		case MidiController::Controller14:
-		case MidiController::RPN14:
-		case MidiController::NRPN14:
-			if (isneg)
-			{
-				ctlmn = -8192;
-				ctlmx = 8191;
-				bval -= 8192;
-				cval -= 8192;
-			}
-			else
-			{
-				ctlmn = 0;
-				ctlmx = 16383;
-				cval -= 8192;
-			}
-			break;
-		case MidiController::Program:
-			ctlmn = 0;
-			ctlmx = 0xffffff;
-			break;
-		case MidiController::Pitch:
-			ctlmn = -8192;
-			ctlmx = 8191;
-			break;
-		case MidiController::Velo: // cannot happen
-		default:
-			break;
-	}
-	int ctlrng = ctlmx - ctlmn;
-	float fctlrng = float(ctlmx - ctlmn);
-
-	// Is it an integer control?
-	if (desc & LADSPA_HINT_INTEGER)
-	{
-		float ret = float(cval);
-		if (ret < fmin)
-			ret = fmin;
-		if (ret > fmax)
-			ret = fmax;
-#ifdef PLUGIN_DEBUGIN 
-		printf("midi2LadspaValue: has LADSPA_HINT_INTEGER returning:%f\n", ret);
-#endif
-
-		return ret;
-	}
-
-	// Avoid divide-by-zero error below.
-	if (ctlrng == 0)
-		return 0.0;
-
-	// It's a floating point control, just use wide open maximum range.
-	float normval = float(bval) / fctlrng;
-	//float fbias = (fmin + fmax) / 2.0;
-	//float normfbias = fbias / frng;
-	//float ret = (normdef + normbias) * fctlrng;
-	//float normdef = fdef / frng;
-
-	float ret = normval * frng + fmin;
-
-#ifdef PLUGIN_DEBUGIN 
-	printf("midi2LadspaValue: float returning:%f\n", ret);
-#endif
-
-	return ret;
-}/*}}}*/
-
-
-// Works but not needed.
-/*
-//---------------------------------------------------------
-//   ladspa2MidiController
-//---------------------------------------------------------
-
-MidiController* ladspa2MidiController(const LADSPA_Descriptor* plugin, int port, int ctlnum)
-{
-  int min, max, def;
-  
-  if(!ladspa2MidiControlValues(plugin, port, ctlnum, &min, &max, &def))
-	return 0;
-  
-  MidiController* mc = new MidiController(QString(plugin->PortNames[port]), ctlnum, min, max, def);
-  
-  return mc;
-}
- */
-
-//----------------------------------------------------------------------------------
-//   defaultValue
-//   If no default ladspa value found, still sets *def to 1.0, but returns false.
-//---------------------------------------------------------------------------------
-
-//float ladspaDefaultValue(const LADSPA_Descriptor* plugin, int k)
-
-bool ladspaDefaultValue(const LADSPA_Descriptor* plugin, int port, float* val)/*{{{*/
-{
-	LADSPA_PortRangeHint range = plugin->PortRangeHints[port];
-	LADSPA_PortRangeHintDescriptor rh = range.HintDescriptor;
-	//      bool isLog = LADSPA_IS_HINT_LOGARITHMIC(rh);
-	//double val = 1.0;
-	float m = (rh & LADSPA_HINT_SAMPLE_RATE) ? float(sampleRate) : 1.0f;
-	if (LADSPA_IS_HINT_DEFAULT_MINIMUM(rh))
-	{
-		*val = range.LowerBound * m;
-		return true;
-	}
-	else if (LADSPA_IS_HINT_DEFAULT_LOW(rh))
-	{
-		if (LADSPA_IS_HINT_LOGARITHMIC(rh))
-		{
-			*val = exp(fast_log10(range.LowerBound * m) * .75 +
-					log(range.UpperBound * m) * .25);
-			return true;
-		}
-		else
-		{
-			*val = range.LowerBound * .75 * m + range.UpperBound * .25 * m;
-			return true;
-		}
-	}
-	else if (LADSPA_IS_HINT_DEFAULT_MIDDLE(rh))
-	{
-		if (LADSPA_IS_HINT_LOGARITHMIC(rh))
-		{
-			*val = exp(log(range.LowerBound * m) * .5 +
-					log10(range.UpperBound * m) * .5);
-			return true;
-		}
-		else
-		{
-			*val = range.LowerBound * .5 * m + range.UpperBound * .5 * m;
-			return true;
-		}
-	}
-	else if (LADSPA_IS_HINT_DEFAULT_HIGH(rh))
-	{
-		if (LADSPA_IS_HINT_LOGARITHMIC(rh))
-		{
-			*val = exp(log(range.LowerBound * m) * .25 +
-					log(range.UpperBound * m) * .75);
-			return true;
-		}
-		else
-		{
-			*val = range.LowerBound * .25 * m + range.UpperBound * .75 * m;
-			return true;
-		}
-	}
-	else if (LADSPA_IS_HINT_DEFAULT_MAXIMUM(rh))
-	{
-		*val = range.UpperBound*m;
-		return true;
-	}
-	else if (LADSPA_IS_HINT_DEFAULT_0(rh))
-	{
-		*val = 0.0;
-		return true;
-	}
-	else if (LADSPA_IS_HINT_DEFAULT_1(rh))
-	{
-		*val = 1.0;
-		return true;
-	}
-	else if (LADSPA_IS_HINT_DEFAULT_100(rh))
-	{
-		*val = 100.0;
-		return true;
-	}
-	else if (LADSPA_IS_HINT_DEFAULT_440(rh))
-	{
-		*val = 440.0;
-		return true;
-	}
-
-	// No default found. Set return value to 1.0, but return false.
-	*val = 1.0;
-	return false;
-}/*}}}*/
-
-//---------------------------------------------------------
-//   ladspaControlRange
-//---------------------------------------------------------
-
-void ladspaControlRange(const LADSPA_Descriptor* plugin, int i, float* min, float* max)/*{{{*/
-{
-	LADSPA_PortRangeHint range = plugin->PortRangeHints[i];
-	LADSPA_PortRangeHintDescriptor desc = range.HintDescriptor;
-	if (desc & LADSPA_HINT_TOGGLED)
-	{
-		*min = 0.0;
-		*max = 1.0;
-		return;
-	}
-	float m = 1.0;
-	if (desc & LADSPA_HINT_SAMPLE_RATE)
-		m = float(sampleRate);
-
-	if (desc & LADSPA_HINT_BOUNDED_BELOW)
-		*min = range.LowerBound * m;
-	else
-		*min = 0.0;
-	if (desc & LADSPA_HINT_BOUNDED_ABOVE)
-		*max = range.UpperBound * m;
-	else
-		*max = 1.0;
-}/*}}}*/
 
 #if 0
 //---------------------------------------------------------
@@ -1329,9 +892,12 @@ const char* Plugin::portName(unsigned long i)
 //   loadPluginLib
 //---------------------------------------------------------
 
-static void loadPluginLib(QFileInfo* fi)
+static void loadPluginLib(QFileInfo* fi, const PluginType t)
 {
-	void* handle = dlopen(fi->filePath().toAscii().constData(), RTLD_NOW);
+    if (debugMsg)
+        qWarning("looking up %s", fi->filePath().toAscii().constData());
+
+    void* handle = lib_open(fi->filePath().toAscii().constData());
 	if (handle == 0)
 	{
 		fprintf(stderr, "dlopen(%s) failed: %s\n",
@@ -1339,46 +905,9 @@ static void loadPluginLib(QFileInfo* fi)
 		return;
 	}
 
-#ifdef DSSI_SUPPORT
-	DSSI_Descriptor_Function dssi = (DSSI_Descriptor_Function) dlsym(handle, "dssi_descriptor");
-	if (dssi)
+    if (t == PLUGIN_LADSPA)
 	{
-		const DSSI_Descriptor* descr;
-		for (int i = 0;; ++i)
-		{
-			descr = dssi(i);
-			if (descr == 0)
-				break;
-
-			// Listing effect plugins only while excluding synths:
-			// Do exactly what dssi-vst.cpp does for listing ladspa plugins.
-			if (!descr->run_synth &&
-					!descr->run_synth_adding &&
-					!descr->run_multiple_synths &&
-					!descr->run_multiple_synths_adding)
-			{
-				// Make sure it doesn't already exist.
-				if (plugins.find(fi->completeBaseName(), QString(descr->LADSPA_Plugin->Label)) != 0)
-					continue;
-
-#ifdef PLUGIN_DEBUGIN 
-				fprintf(stderr, "loadPluginLib: dssi effect name:%s inPlaceBroken:%d\n", descr->LADSPA_Plugin->Name, LADSPA_IS_INPLACE_BROKEN(descr->LADSPA_Plugin->Properties));
-#endif
-
-				//LADSPA_Properties properties = descr->LADSPA_Plugin->Properties;
-				//bool inPlaceBroken = LADSPA_IS_INPLACE_BROKEN(properties);
-				//plugins.add(fi, descr, !inPlaceBroken);
-				if (debugMsg)
-					fprintf(stderr, "loadPluginLib: adding dssi effect plugin:%s name:%s label:%s\n", fi->filePath().toLatin1().constData(), descr->LADSPA_Plugin->Name, descr->LADSPA_Plugin->Label);
-
-				plugins.add(fi, descr->LADSPA_Plugin, true);
-			}
-		}
-	}
-	else
-#endif
-	{
-		LADSPA_Descriptor_Function ladspa = (LADSPA_Descriptor_Function) dlsym(handle, "ladspa_descriptor");
+        LADSPA_Descriptor_Function ladspa = (LADSPA_Descriptor_Function) lib_symbol(handle, "ladspa_descriptor");
 		if (!ladspa)
 		{
 			const char *txt = dlerror();
@@ -1391,7 +920,7 @@ static void loadPluginLib(QFileInfo* fi)
 						fi->filePath().toAscii().constData(),
 						txt);
 			}
-			dlclose(handle);
+            lib_close(handle);
 			return;
 		}
 
@@ -1406,113 +935,161 @@ static void loadPluginLib(QFileInfo* fi)
 			if (plugins.find(fi->completeBaseName(), QString(descr->Label)) != 0)
 				continue;
 
-#ifdef PLUGIN_DEBUGIN 
+#ifdef PLUGIN_DEBUGIN
 			fprintf(stderr, "loadPluginLib: ladspa effect name:%s inPlaceBroken:%d\n", descr->Name, LADSPA_IS_INPLACE_BROKEN(descr->Properties));
 #endif
-
-			//LADSPA_Properties properties = descr->Properties;
-			//bool inPlaceBroken = LADSPA_IS_INPLACE_BROKEN(properties);
-			//plugins.add(fi, ladspa, descr, !inPlaceBroken);
-			if (debugMsg)
-				fprintf(stderr, "loadPluginLib: adding ladspa plugin:%s name:%s label:%s\n", fi->filePath().toLatin1().constData(), descr->Name, descr->Label);
-            //plugins.add(fi, descr);
-            // TODO
+            plugins.add(PLUGIN_LADSPA, fi->absoluteFilePath(), QString(descr->Label), descr);
 		}
 	}
+    else if (t == PLUGIN_VST)
+    {
+        VST_Function vstfn = (VST_Function) lib_symbol(handle, "VSTPluginMain");
 
-	dlclose(handle);
+        if (! vstfn)
+        {
+            vstfn = (VST_Function) lib_symbol(handle, "main");
+
+    #ifdef TARGET_API_MAC_CARBON
+            if (! vstfn)
+                vstfn = (VST_Function)lib_symbol(lib_handle, "main_macho");
+    #endif
+        }
+
+        if (! vstfn)
+        {
+            const char *txt = dlerror();
+            if (txt)
+            {
+                fprintf(stderr,
+                        "Unable to find vst entry function in plugin "
+                        "library file \"%s\": %s.\n"
+                        "Are you sure this is a VST plugin file?\n",
+                        fi->filePath().toAscii().constData(),
+                        txt);
+            }
+            lib_close(handle);
+            return;
+        }
+
+        AEffect* effect = vstfn(VstHostCallback);
+
+        if (effect)
+        {
+            QString PluginLabel = fi->baseName();
+
+            char buf_str[255] = { 0 };
+            effect->dispatcher(effect, effOpen, 0, 0, 0, 0.0f);
+            effect->dispatcher(effect, effGetProductString, 0, 0, buf_str, 0.0f);
+
+            if (buf_str[0] != 0)
+                PluginLabel = QString(buf_str);
+
+            // Make sure it doesn't already exist.
+            if (plugins.find(fi->completeBaseName(), QString(PluginLabel)) == 0)
+            {
+                plugins.add(PLUGIN_VST, fi->absoluteFilePath(), PluginLabel, effect);
+            }
+
+            effect->dispatcher(effect, effClose, 0, 0, 0, 0.0f);
+        }
+    }
+
+    lib_close(handle);
 }
 
 //---------------------------------------------------------
 //   loadPluginDir
 //---------------------------------------------------------
 
-static void loadPluginDir(const QString& s)
+static void loadPluginDir(const QString& s, const PluginType t)
 {
-	if (debugMsg)
-		printf("scan ladspa plugin dir <%s>\n", s.toLatin1().constData());
-	QDir pluginDir(s, QString("*.so")); // ddskrjo
-	if (pluginDir.exists())
-	{
-		QFileInfoList list = pluginDir.entryInfoList();
-		QFileInfoList::iterator it = list.begin();
-		while (it != list.end())
-		{
-			loadPluginLib(&*it);
-			++it;
-		}
-	}
+    if (debugMsg)
+        qWarning("scan plugin dir <%s>\n", s.toLatin1().constData());
+
+#ifdef __WINDOWS__
+    QDir pluginDir(s, QString("*.dll"));
+#else
+    QDir pluginDir(s, QString("*.so"));
+#endif
+
+    if (pluginDir.exists())
+    {
+        QFileInfoList list = pluginDir.entryInfoList();
+        QFileInfoList::iterator it = list.begin();
+        while (it != list.end())
+        {
+            // Disable known broken plugins that may crash oom on startup
+            QStringList blacklist;
+            blacklist.append("dssi-vst.so");
+            blacklist.append("liteon_biquad-vst.so");
+            blacklist.append("liteon_biquad-vst_64bit.so");
+            blacklist.append("fx_blur-vst.so");
+            blacklist.append("fx_blur-vst_64bit.so");
+            blacklist.append("Scrubby_64bit.so");
+            blacklist.append("Skidder_64bit.so");
+            blacklist.append("libwormhole2_64bit.so");
+            blacklist.append("vexvst.so");
+
+            if (blacklist.contains( ((QFileInfo*)&*it)->baseName()) )
+                continue;
+
+            loadPluginLib(&*it, t);
+            ++it;
+        }
+    }
 }
 
 //---------------------------------------------------------
 //   initPlugins
 //---------------------------------------------------------
 
-void initPlugins()
+void initLV2();
+
+void initPlugins(bool ladspa, bool lv2, bool vst)
 {
-	loadPluginDir(oomGlobalLib + QString("/plugins"));
+    //loadPluginDir(oomGlobalLib + QString("/plugins"), PLUGIN_LADSPA); // FIXME?
 
-	const char* p = 0;
+    // LADSPA
+    if (ladspa)
+    {
+        fprintf(stderr, "Looking up LADSPA plugins...\n");
 
-	// Take care of DSSI plugins first...
-#ifdef DSSI_SUPPORT
-	const char* dssiPath = getenv("DSSI_PATH");
-	if (dssiPath == 0)
-		dssiPath = "/usr/local/lib64/dssi:/usr/lib64/dssi:/usr/local/lib/dssi:/usr/lib/dssi";
-	p = dssiPath;
-	while (*p != '\0')
-	{
-		const char* pe = p;
-		while (*pe != ':' && *pe != '\0')
-			pe++;
-
-		int n = pe - p;
-		if (n)
-		{
-			char* buffer = new char[n + 1];
-			strncpy(buffer, p, n);
-			buffer[n] = '\0';
-			loadPluginDir(QString(buffer));
-			delete[] buffer;
-		}
-		p = pe;
-		if (*p == ':')
-			p++;
-	}
+#ifdef __WINDOWS__
+        // TODO - look for ladspa in known locations
+#else
+        const char* ladspaPath = getenv("LADSPA_PATH");
+        if (ladspaPath == 0)
+            ladspaPath = "/usr/local/lib64/ladspa:/usr/lib64/ladspa:/usr/local/lib/ladspa:/usr/lib/ladspa";
+        QStringList ladspaPathList = QString(ladspaPath).split(":");
 #endif
 
-	// Now do LADSPA plugins...
-	const char* ladspaPath = getenv("LADSPA_PATH");
-	if (ladspaPath == 0)
-		ladspaPath = "/usr/local/lib64/ladspa:/usr/lib64/ladspa:/usr/local/lib/ladspa:/usr/lib/ladspa";
-	p = ladspaPath;
+        for (int i=0; i < ladspaPathList.count(); i++)
+            loadPluginDir(ladspaPathList[i], PLUGIN_LADSPA);
+    }
 
-	if (debugMsg)
-		fprintf(stderr, "loadPluginDir: ladspa path:%s\n", ladspaPath);
+    if (lv2)
+    {
+        fprintf(stderr, "Looking up LV2 plugins...\n");
+        initLV2();
+    }
 
-	while (*p != '\0')
-	{
-		const char* pe = p;
-		while (*pe != ':' && *pe != '\0')
-			pe++;
+    if (vst)
+    {
+        // TODO
+        fprintf(stderr, "Looking up VST plugins...\n");
 
-		int n = pe - p;
-		if (n)
-		{
-			char* buffer = new char[n + 1];
-			strncpy(buffer, p, n);
-			buffer[n] = '\0';
-			if (debugMsg)
-				fprintf(stderr, "loadPluginDir: loading ladspa dir:%s\n", buffer);
+#ifdef __WINDOWS__
+        // TODO - look for vst in known locations
+#else
+        const char* vstPath = getenv("VST_PATH");
+        if (vstPath == 0)
+            vstPath = "/usr/local/lib64/vst:/usr/lib64/vst:/usr/local/lib/vst:/usr/lib/vst";
+        QStringList vstPathList = QString(vstPath).split(":");
+#endif
 
-			loadPluginDir(QString(buffer));
-			delete[] buffer;
-		}
-		p = pe;
-		if (*p == ':')
-			p++;
-	}
-	//Now we do the LV2
+        for (int i=0; i < vstPathList.count(); i++)
+            loadPluginDir(vstPathList[i], PLUGIN_VST);
+    }
 }
 
 #if 0
@@ -2156,55 +1733,6 @@ bool PluginI::readConfiguration(Xml& xml, bool readPreset)/*{{{*/
 }/*}}}*/
 
 //---------------------------------------------------------
-//   showGui
-//---------------------------------------------------------
-
-void PluginI::showGui()
-{
-	if (_plugin)
-	{
-		if (!_gui)
-		{
-			printf("PluginI::showGui() before makeGui\n");
-			makeGui();
-			printf("PluginI::showGui() after makeGui\n");
-		}
-		if (_gui->isVisible())
-			_gui->hide();
-		else
-			_gui->show();
-	}
-}
-
-void PluginI::showGui(bool flag)
-{
-	if (_plugin)
-	{
-		if (flag)
-		{
-			if (!_gui)
-				makeGui();
-			if (_gui)
-				_gui->show();
-		}
-		else
-		{
-			if (_gui)
-				_gui->hide();
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   guiVisible
-//---------------------------------------------------------
-
-bool PluginI::guiVisible()
-{
-	return _gui && _gui->isVisible();
-}
-
-//---------------------------------------------------------
 //   showNativeGui
 //---------------------------------------------------------
 
@@ -2247,28 +1775,6 @@ bool PluginI::nativeGuiVisible()
 #endif    
 
 	return false;
-}
-
-//---------------------------------------------------------
-//   makeGui
-//---------------------------------------------------------
-
-void PluginI::makeGui()
-{
-	_gui = new PluginGui(this);
-}
-
-//---------------------------------------------------------
-//   deleteGui
-//---------------------------------------------------------
-
-void PluginI::deleteGui()
-{
-	if (_gui)
-	{
-		delete _gui;
-		_gui = 0;
-	}
 }
 
 //---------------------------------------------------------
@@ -2361,200 +1867,4 @@ void PluginI::apply(int n)/*{{{*/
 		_plugin->apply(handle[i], n);
 	}
 }/*}}}*/
-#endif
-
-//---------------------------------------------------------
-//   oscConfigure
-//---------------------------------------------------------
-
-#ifdef OSC_SUPPORT
-
-int Plugin::oscConfigure(LADSPA_Handle handle, const char* key, const char* value)/*{{{*/
-{
-#ifdef PLUGIN_DEBUGIN 
-	printf("Plugin::oscConfigure effect plugin label:%s key:%s value:%s\n", plugin->Label, key, value);
-#endif
-
-#ifdef DSSI_SUPPORT
-	if (!dssi_descr || !dssi_descr->configure)
-		return 0;
-
-	if (!strncmp(key, DSSI_RESERVED_CONFIGURE_PREFIX,
-			strlen(DSSI_RESERVED_CONFIGURE_PREFIX)))
-	{
-		fprintf(stderr, "Plugin::oscConfigure OSC: UI for plugin '%s' attempted to use reserved configure key \"%s\", ignoring\n",
-				plugin->Label, key);
-
-		return 0;
-	}
-
-	char* message = dssi_descr->configure(handle, key, value);
-	if (message)
-	{
-		printf("Plugin::oscConfigure on configure '%s' '%s', plugin '%s' returned error '%s'\n",
-				key, value, plugin->Label, message);
-
-		free(message);
-	}
-
-#endif // DSSI_SUPPORT
-
-	return 0;
-}/*}}}*/
-
-//---------------------------------------------------------
-//   oscConfigure
-//---------------------------------------------------------
-
-int PluginI::oscConfigure(const char *key, const char *value)/*{{{*/
-{
-	if (!_plugin)
-		return 0;
-
-#ifdef PLUGIN_DEBUGIN 
-	printf("PluginI::oscConfigure effect plugin name:%s label:%s key:%s value:%s\n", _name.toLatin1().constData(), _label.toLatin1().constData(), key, value);
-#endif
-
-#ifdef DSSI_SUPPORT
-	// FIXME: Don't think this is right, should probably do as example shows below.
-	for (int i = 0; i < instances; ++i)
-		_plugin->oscConfigure(handle[i], key, value);
-
-	// also call back on UIs for plugins other than the one
-	// that requested this:
-	// if (n != instance->number && instances[n].uiTarget) {
-	//      lo_send(instances[n].uiTarget,
-	//      instances[n].ui_osc_configure_path, "ss", key, value);
-	//      }
-
-	// configure invalidates bank and program information, so
-	//  we should do this again now:
-	//queryPrograms();
-#endif // DSSI_SUPPORT
-
-	return 0;
-}/*}}}*/
-
-//---------------------------------------------------------
-//   oscUpdate
-//---------------------------------------------------------
-
-int PluginI::oscUpdate()
-{
-#ifdef DSSI_SUPPORT
-	// Send project directory.
-	_oscif.oscSendConfigure(DSSI_PROJECT_DIRECTORY_KEY, oomProject.toLatin1().constData()); // song->projectPath()
-#endif
-	return 0;
-}
-
-//---------------------------------------------------------
-//   oscControl
-//---------------------------------------------------------
-
-int PluginI::oscControl(unsigned long port, float value)/*{{{*/
-{
-#ifdef PLUGIN_DEBUGIN  
-	printf("PluginI::oscControl received oscControl port:%ld val:%f\n", port, value);
-#endif
-
-	// Convert from DSSI port number to control input port index.
-	unsigned long cport = _plugin->port2InCtrl(port);
-
-	if ((int) cport == -1)
-	{
-		fprintf(stderr, "PluginI::oscControl: port number:%ld is not a control input\n", port);
-		return 0;
-	}
-
-	// (From DSSI module).
-	// p3.3.39 Set the DSSI control input port's value.
-	// Observations: With a native DSSI synth like LessTrivialSynth, the native GUI's controls do not change the sound at all
-	//  ie. they don't update the DSSI control port values themselves.
-	// Hence in response to the call to this oscControl, sent by the native GUI, it is required to that here.
-	///  controls[cport].val = value;
-	// DSSI-VST synths however, unlike DSSI synths, DO change their OWN sound in response to their gui controls.
-	// AND this function is called !
-	// Despite the descrepency we are STILL required to update the DSSI control port values here
-	//  because dssi-vst is WAITING FOR A RESPONSE! (A CHANGE in the control port value).
-	// It will output something like "...4 events expected..." and count that number down as 4 actual control port value CHANGES
-	//  are done here in response. Normally it says "...0 events expected..." when OOMidi is the one doing the DSSI control changes.
-	// TODO: May need FIFOs on each control(!) so that the control changes get sent one per process cycle!
-	// Observed countdown not actually going to zero upon string of changes.
-	// Try this ...
-	OscControlFifo* cfifo = _oscif.oscFifo(cport);
-	if (cfifo)
-	{
-		OscControlValue cv;
-		//cv.idx = cport;
-		cv.value = value;
-		cv.frame = audio->timestamp();
-		if (cfifo->put(cv))
-		{
-			fprintf(stderr, "PluginI::oscControl: fifo overflow: in control number:%ld\n", cport);
-		}
-	}
-
-	// Record automation:
-	// Take care of this immediately, because we don't want the silly delay associated with
-	//  processing the fifo one-at-a-time in the apply().
-	// NOTE: Ahh crap! We don't receive control events until the user RELEASES a control !
-	// So the events all arrive at once when the user releases a control.
-	// That makes this pretty useless... But what the heck...
-	if (_track && _id != -1)
-	{
-		int id = genACnum(_id, cport);
-		AutomationType at = _track->automationType();
-
-		// TODO: Taken from our native gui control handlers.
-		// This may need modification or may cause problems -
-		//  we don't have the luxury of access to the dssi gui controls !
-		if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-			enableController(cport, false);
-
-		_track->recordAutomation(id, value);
-	}
-
-#if 0
-	int port = argv[0]->i;
-	LADSPA_Data value = argv[1]->f;
-
-	if (port < 0 || port > instance->plugin->descriptor->LADSPA_Plugin->PortCount)
-	{
-		fprintf(stderr, "OOMidi: OSC: %s port number (%d) is out of range\n",
-				instance->friendly_name, port);
-		return 0;
-	}
-	if (instance->pluginPortControlInNumbers[port] == -1)
-	{
-		fprintf(stderr, "OOMidi: OSC: %s port %d is not a control in\n",
-				instance->friendly_name, port);
-		return 0;
-	}
-	pluginControlIns[instance->pluginPortControlInNumbers[port]] = value;
-	if (verbose)
-	{
-		printf("OOMidi: OSC: %s port %d = %f\n",
-				instance->friendly_name, port, value);
-	}
-#endif
-	return 0;
-}/*}}}*/
-
-#endif // OSC_SUPPORT
-
-//---------------------------------------------------------
-//   PluginLoader
-//---------------------------------------------------------
-
-#if 0
-QWidget* PluginLoader::createWidget(const QString & className, QWidget * parent, const QString & name)
-{
-	if (className == QString("DoubleLabel"))
-		return new DoubleLabel(parent, name.toLatin1().constData());
-	if (className == QString("Slider"))
-		return new Slider(parent, name.toLatin1().constData(), Qt::Horizontal);
-
-	return QUiLoader::createWidget(className, parent, name);
-};
 #endif

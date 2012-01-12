@@ -18,7 +18,7 @@ class QComboBox;
 class QRadioButton;
 class QScrollArea;
 class QToolButton;
-class Plugin;
+class BasePlugin;
 
 class Xml;
 class Slider;
@@ -68,7 +68,7 @@ class PluginGui : public QMainWindow/*{{{*/
 {
     Q_OBJECT
 
-    Plugin* plugin; // plugin instance
+    BasePlugin* plugin; // plugin instance
 
     GuiParam* params;
     int nobj; // number of widgets in gw
@@ -100,7 +100,7 @@ protected slots:
     virtual void heartBeat();
 
 public:
-    PluginGui(Plugin*);
+    PluginGui(BasePlugin*);
 
     ~PluginGui();
     void setOn(bool);

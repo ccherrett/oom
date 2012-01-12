@@ -68,7 +68,7 @@ const char* presetBypassText = "Click this button to bypass effect unit";
 //   PluginGui
 //---------------------------------------------------------
 
-PluginGui::PluginGui(Plugin* p)
+PluginGui::PluginGui(BasePlugin* p)
 : QMainWindow(0)
 {
 	gw = 0;
@@ -152,7 +152,7 @@ PluginGui::PluginGui(Plugin* p)
         }
         else
         {
-            //label = new QLabel(QString(plugin->getParameterName(i)), 0);
+            label = new QLabel(QString(plugin->getParameterName(i)), 0);
             params[i].type = GuiParam::GUI_SLIDER;
             params[i].label = new DoubleLabel(paramPort->value, paramPort->ranges.min, paramPort->ranges.max, this); // NOTE - parent was 0
             params[i].label->setFrame(true);
@@ -624,7 +624,7 @@ void PluginGui::updateValues()/*{{{*/
 
 void PluginGui::updateControls()/*{{{*/
 {
-	if (!automation || !plugin->track() || plugin->id() == -1)
+    if (!automation || !plugin->track() || plugin->id() == -1)
 		return;
 	AutomationType at = plugin->track()->automationType();
 	if (at == AUTO_OFF)

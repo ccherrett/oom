@@ -91,7 +91,6 @@ file (GLOB core_source_files
       cobject.cpp
       conf.cpp
       ctrl.cpp
-      dssihost.cpp 
       event.cpp
       eventlist.cpp 
       exportmidi.cpp 
@@ -117,7 +116,9 @@ file (GLOB core_source_files
       osc.cpp
       part.cpp
       plugin.cpp
-	  lv2_plugin.cpp
+      plugin_ladspa.cpp
+      plugin_lv2.cpp
+      plugin_vst.cpp
       pos.cpp
       route.cpp
       seqmsg.cpp 
@@ -138,7 +139,6 @@ file (GLOB core_source_files
       utils.cpp 
       undo.cpp
       value.cpp
-      vst.cpp
       wave.cpp
       waveevent.cpp 
       wavetrack.cpp 

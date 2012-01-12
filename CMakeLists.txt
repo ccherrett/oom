@@ -82,7 +82,7 @@ SET(OOMidi_INSTALL_NAME  "oom-${OOMidi_VERSION}")
 SET(OOMidi_EXEC_NAME     "oomidi")
 SET(OOMidi_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/bin/${OOMidi_EXEC_NAME}")
 SET(OOMIDI_DEPS_DIR "${PROJECT_SOURCE_DIR}/dependencies")
-SET(OOMIDI_LV2_INCLUDES "${PROJECT_SOURCE_DIR}/oom/lv2_includes")
+SET(OOMIDI_LV2_INCLUDES "${PROJECT_SOURCE_DIR}/oom/plugin_includes")
 
 ## The library where we will install the shared components:
 SET(OOMidi_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/modules)

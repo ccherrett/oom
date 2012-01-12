@@ -117,7 +117,7 @@ void MidiMonitor::updateSongNow()
     {
         unsigned tick = song->cpos();
 
-        qWarning("Audition test - %i", m_lastFeedbackMessages.count());
+        //qWarning("Audition test - %i", m_lastFeedbackMessages.count());
 
         for (int i=0; i < m_lastFeedbackMessages.count(); i++)
         {

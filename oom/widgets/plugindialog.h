@@ -10,6 +10,8 @@
 #ifndef _PLUGIN_DIALOG_H_
 #define _PLUGIN_DIALOG_H_
 
+#include "plugin.h"
+
 #include <QDialog>
 
 class QAbstractButton;
@@ -24,7 +26,7 @@ class QCloseEvent;
 
 class AudioTrack;
 class PluginGui;
-class Plugin;
+class PluginI;
 
 //---------------------------------------------------------
 //   PluginDialog
@@ -46,12 +48,12 @@ class PluginDialog : public QDialog
     QRadioButton* onlySM;
     QPushButton *okB;
 	QComboBox* m_cmbType;
-	int m_display_type;
+    PluginType m_display_type;
 
 public:
     PluginDialog(QWidget* parent = 0);
-    static Plugin* getPlugin(QWidget* parent);
-    Plugin* value();
+    static PluginI* getPlugin(QWidget* parent);
+    PluginI* value();
     void accept();
 
 public slots:
