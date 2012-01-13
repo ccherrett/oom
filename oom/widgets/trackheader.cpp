@@ -560,9 +560,9 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 
 	//Add Track menu
 	QAction* beforeTrack = p->addAction(tr("Add Track Before"));
-	beforeTrack->setData(12000);
+	beforeTrack->setData(10000);
 	QAction* afterTrack = p->addAction(tr("Add Track After"));
-	afterTrack->setData(10000);
+	afterTrack->setData(12000);
 	/*QMenu* beforeTrackMenu = p->addMenu(tr("Add Track Before"));
 	QAction* midi = beforeTrackMenu->addAction(*addMidiIcon, tr("Midi Track"));
 	midi->setData(Track::MIDI+10000);
@@ -1010,7 +1010,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			case 10000:
 			{//Insert before
 				int mypos = song->tracks()->index(m_track);
-				CreateTrackDialog *ctdialog = new CreateTrackDialog(Track::MIDI, mypos, this);
+				CreateTrackDialog *ctdialog = new CreateTrackDialog(Track::MIDI, --mypos, this);
 				connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
 				ctdialog->exec();
 			
