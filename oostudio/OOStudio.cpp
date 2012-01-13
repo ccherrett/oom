@@ -1027,7 +1027,6 @@ void OOStudio::oomStarted()/*{{{*/
 {
 	m_lblRunning->setText(m_current->name);
 	m_btnStopSession->setEnabled(true);
-	m_tabWidget->setCurrentIndex(3);
 	m_loading = false;
 }/*}}}*/
 
@@ -1413,6 +1412,7 @@ void OOStudio::loadSession(OOSession* session)/*{{{*/
 		connect(m_jackThread, SIGNAL(startupFailed()), this, SLOT(jackFailed()));
 		connect(m_jackThread, SIGNAL(logMessage(LogInfo*)), this, SLOT(writeLog(LogInfo*)));
 		m_jackThread->start();
+		m_tabWidget->setCurrentIndex(3);
 	}
 }/*}}}*/
 

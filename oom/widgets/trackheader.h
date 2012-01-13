@@ -94,6 +94,7 @@ public slots:
 	void stopProcessing();
 	void startProcessing();
 	void setSelected(bool, bool force = false);
+	void newTrackAdded(QString);
 
 protected:
     enum

@@ -16,16 +16,34 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 
 	int m_insertType;
 	int m_insertPosition;
+	bool m_createMidiInputDevice;
+	bool m_createMidiOutputDevice;
+	int m_midiInPort;
+	int m_midiOutPort;
+	bool m_createTrackOnly;
+	int m_showJackAliases;
 	
 	void importInputs();
 	void importOutputs();
+	void setTitleText();
+	void populateInputList();
+	void populateOutputList();
+	void populateNewInputList();
+	void populateNewOutputList();
+	void populateInstrumentList();
+	void hideMidiElements();
+	int getFreeMidiPort();
 
 private slots:
 	void addTrack();
-	void inputSelected(int);
+	void updateInputSelected(bool);
+	void updateOutputSelected(bool);
 
 protected:
 	virtual void showEvent(QShowEvent*);
+
+signals:
+	void trackAdded(QString);
 
 public:
 	CreateTrackDialog(int type, int pos, QWidget* parent = 0);

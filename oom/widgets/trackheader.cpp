@@ -559,19 +559,33 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		p->addAction(tr("Import Audio File"))->setData(1);
 
 	//Add Track menu
-	QMenu* trackMenu = p->addMenu(tr("Add Track"));
-	QAction* midi = trackMenu->addAction(*addMidiIcon, tr("Midi Track"));
+	QMenu* beforeTrackMenu = p->addMenu(tr("Add Track Before"));
+	QAction* midi = beforeTrackMenu->addAction(*addMidiIcon, tr("Midi Track"));
 	midi->setData(Track::MIDI+10000);
-	QAction* wave = trackMenu->addAction(*addAudioIcon, tr("Audio Track"));
+	QAction* wave = beforeTrackMenu->addAction(*addAudioIcon, tr("Audio Track"));
 	wave->setData(Track::WAVE+10000);
-	QAction* aoutput = trackMenu->addAction(*addOutputIcon, tr("Output"));
+	QAction* aoutput = beforeTrackMenu->addAction(*addOutputIcon, tr("Output"));
 	aoutput->setData(Track::AUDIO_OUTPUT+10000);
-	QAction* ainput = trackMenu->addAction(*addInputIcon, tr("Input"));
+	QAction* ainput = beforeTrackMenu->addAction(*addInputIcon, tr("Input"));
 	ainput->setData(Track::AUDIO_INPUT+10000);
-	QAction* agroup = trackMenu->addAction(*addBussIcon, tr("Buss"));
+	QAction* agroup = beforeTrackMenu->addAction(*addBussIcon, tr("Buss"));
 	agroup->setData(Track::AUDIO_BUSS+10000);
-	QAction* aaux = trackMenu->addAction(*addAuxIcon, tr("Aux Send"));
+	QAction* aaux = beforeTrackMenu->addAction(*addAuxIcon, tr("Aux Send"));
 	aaux->setData(Track::AUDIO_AUX+10000);
+
+	QMenu* afterTrackMenu = p->addMenu(tr("Add Track After"));
+	QAction* amidi = afterTrackMenu->addAction(*addMidiIcon, tr("Midi Track"));
+	amidi->setData(Track::MIDI+12000);
+	QAction* awave = afterTrackMenu->addAction(*addAudioIcon, tr("Audio Track"));
+	awave->setData(Track::WAVE+12000);
+	QAction* aaoutput = afterTrackMenu->addAction(*addOutputIcon, tr("Output"));
+	aaoutput->setData(Track::AUDIO_OUTPUT+10000);
+	QAction* aainput = afterTrackMenu->addAction(*addInputIcon, tr("Input"));
+	aainput->setData(Track::AUDIO_INPUT+12000);
+	QAction* aagroup = afterTrackMenu->addAction(*addBussIcon, tr("Buss"));
+	aagroup->setData(Track::AUDIO_BUSS+12000);
+	QAction* aaaux = afterTrackMenu->addAction(*addAuxIcon, tr("Aux Send"));
+	aaaux->setData(Track::AUDIO_AUX+12000);
 
 
 	if(m_track->name() != "Master")
@@ -988,11 +1002,12 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 				m_track->setDefaultPartColor(curColorIndex);
 				break;
 			}
-			case Track::MIDI+10000 ... Track::AUDIO_AUX+10000:/*{{{*/
+			case Track::MIDI+10000 ... Track::AUDIO_AUX+10000:
 			{//Insert before
 				int mypos = song->tracks()->index(m_track);
 				CreateTrackDialog *ctdialog = new CreateTrackDialog((n-10000), mypos, this);
-				ctdialog->open();
+				connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
+				ctdialog->exec();
 			
 				/*Track* t = song->addTrack((Track::TrackType)n-10000);
 
@@ -1008,24 +1023,15 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					song->updateTrackViews1();
 				}*/
 				break;
-			}/*}}}*/
-			case Track::MIDI+12000 ... Track::AUDIO_AUX+12000:/*{{{*/
+			}
+			case Track::MIDI+12000 ... Track::AUDIO_AUX+12000:
 			{//Insert after
-				Track* t = song->addTrack((Track::TrackType)n-12000);
-
-				if (t)
-				{
-					midiMonitor->msgAddMonitoredTrack(t);
-					song->deselectTracks();
-					t->setSelected(true);
-
-					emit selectionChanged(t);
-					emit trackInserted(n-10000);
-
-					song->updateTrackViews1();
-				}
+				int mypos = song->tracks()->index(m_track);
+				CreateTrackDialog *ctdialog = new CreateTrackDialog((n-12000), ++mypos, this);
+				connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
+				ctdialog->exec();
 				break;
-			}/*}}}*/
+			}
 			default:
 				printf("action %d\n", n);
 			break;
@@ -1034,6 +1040,17 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	delete trackHeightsMenu;
 	delete p;
 }/*}}}*/
+
+void TrackHeader::newTrackAdded(QString name)
+{
+	Track* t = song->findTrack(name);
+	if(t)
+	{
+		emit selectionChanged(t);
+		emit trackInserted(t->type());
+		song->updateTrackViews1();
+	}
+}
 
 void TrackHeader::generateAutomationMenu()/*{{{*/
 {
