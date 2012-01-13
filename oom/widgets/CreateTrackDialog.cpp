@@ -31,6 +31,7 @@ m_insertPosition(pos)
 	setupUi(this);
 	m_createMidiInputDevice = false;
 	m_createMidiOutputDevice = false;
+	m_midiSameIO = false;
 	m_createTrackOnly = false;
 	m_showJackAliases = -1;
 	m_midiInPort = -1;
@@ -52,6 +53,7 @@ m_insertPosition(pos)
 
 	connect(btnNewInput, SIGNAL(toggled(bool)), this, SLOT(updateInputSelected(bool)));
 	connect(btnNewOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
+	connect(chkMonitor, SIGNAL(toggled(bool)), this, SLOT(monitorChecked(bool)));
 	connect(cmbType, SIGNAL(currentIndexChanged(int)), this, SLOT(trackTypeChanged(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 }
@@ -65,6 +67,7 @@ void CreateTrackDialog::addTrack()
 	int inputIndex = cmbInput->currentIndex();
 	int outputIndex = cmbOutput->currentIndex();
 	int instrumentIndex = cmbInstrument->currentIndex();
+	int monitorIndex = cmbMonitor->currentIndex();
 
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch(type)
@@ -79,7 +82,7 @@ void CreateTrackDialog::addTrack()
 			{
 				MidiTrack* mtrack = (MidiTrack*)track;
 				//Process Input connections
-				if(inputIndex >= 0)
+				if(inputIndex >= 0 && !chkInput->isChecked())
 				{
 					MidiPort* inport = 0;
 					MidiDevice* indev = 0;
@@ -155,7 +158,7 @@ void CreateTrackDialog::addTrack()
 				}
 				
 				//Process Output connections
-				if(outputIndex >= 0)
+				if(outputIndex >= 0 && !chkOutput->isChecked())
 				{
 					MidiPort* outport= 0;
 					MidiDevice* outdev = 0;
@@ -220,17 +223,25 @@ void CreateTrackDialog::addTrack()
 						--outChan;
 						mtrack->setOutChanAndUpdate(outChan);
 						audio->msgIdle(false);
-						QString instrumentName = cmbInstrument->itemText(instrumentIndex);
-						for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+						if(m_createMidiOutputDevice)
 						{
-							if ((*i)->iname() == instrumentName)
+							QString instrumentName = cmbInstrument->itemText(instrumentIndex);
+							for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 							{
-								outport->setInstrument(*i);
-								break;
+								if ((*i)->iname() == instrumentName)
+								{
+									outport->setInstrument(*i);
+									break;
+								}
 							}
 						}
 						song->update(SC_MIDI_TRACK_PROP);
 					}
+				}
+
+				if(monitorIndex >= 0 && chkMonitor->isChecked())
+				{
+					createMonitorInputTracks(track->name());
 				}
 
 				midiMonitor->msgAddMonitoredTrack(track);
@@ -242,12 +253,237 @@ void CreateTrackDialog::addTrack()
 		break;
 		case Track::WAVE:
 		{
+			Track* track =  song->addTrackByName(txtName->text(), Track::WAVE, m_insertPosition, chkOutput->isChecked());
+			if(track)
+			{
+				if(inputIndex >= 0 && !chkInput->isChecked())
+				{
+					QString inputName = QString("Input-").append(track->name());
+					QString selectedInput = cmbInput->itemText(inputIndex);
+					bool addNewRoute = cmbInput->itemData(inputIndex).toBool();
+					Track* input = 0;
+					if(addNewRoute)
+						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
+					else
+						input = song->findTrack(selectedInput);
+					if(input)
+					{
+						if(addNewRoute)
+						{
+							input->setMute(false);
+							//Connect jack port to Input track
+							Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
+							Route dstRoute(input, 0);
+							srcRoute.channel = 0;
+							
+							Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
+							srcRoute2.channel = 1;
+							Route dstRoute2(input, 1);
+
+							audio->msgAddRoute(srcRoute, dstRoute);
+							audio->msgAddRoute(srcRoute2, dstRoute2);
+
+							audio->msgUpdateSoloStates();
+							song->update(SC_ROUTE);
+						}
+						
+						//Connect input track to audio track
+						Route srcRoute(input->name(), true, -1);
+						Route dstRoute(track, 0, track->channels());
+
+						audio->msgAddRoute(srcRoute, dstRoute);
+
+						audio->msgUpdateSoloStates();
+						song->update(SC_ROUTE);
+					}
+				}
+				if(outputIndex >= 0 && !chkOutput->isChecked())
+				{
+					//Route to the Output or Buss
+					QString selectedOutput = cmbOutput->itemText(outputIndex);
+					Route srcRoute(track, 0, track->channels());
+					Route dstRoute(selectedOutput, true, -1);
+
+					audio->msgAddRoute(srcRoute, dstRoute);
+					audio->msgUpdateSoloStates();
+					song->update(SC_ROUTE);
+				}
+				midiMonitor->msgAddMonitoredTrack(track);
+				song->deselectTracks();
+				track->setSelected(true);
+				emit trackAdded(track->name());
+			}
 		}
 		break;
 		case Track::AUDIO_OUTPUT:
+		{
+			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_OUTPUT, -1, false);
+			if(track)
+			{
+				if(inputIndex >= 0 && !chkInput->isChecked())
+				{
+					QString selectedInput = cmbInput->itemText(inputIndex);
+					Route dstRoute(track, 0, track->channels());
+					Route srcRoute(selectedInput, true, -1);
+
+					audio->msgAddRoute(srcRoute, dstRoute);
+
+					audio->msgUpdateSoloStates();
+					song->update(SC_ROUTE);
+				}
+
+				if(outputIndex >= 0 && !chkOutput->isChecked())
+				{
+					QString jackPlayback("system:playback");
+					QString selectedOutput = cmbOutput->itemText(outputIndex);
+					bool systemOutput = false;
+					if(selectedOutput.startsWith(jackPlayback))
+					{
+						systemOutput = true;
+					
+						//Route channel 1
+						Route srcRoute(track, 0);
+						Route dstRoute(QString(jackPlayback).append("_1"), true, -1, Route::JACK_ROUTE);
+						dstRoute.channel = 0;
+
+						audio->msgAddRoute(srcRoute, dstRoute);
+
+						//Route channel 2
+						Route srcRoute2(track, 1);
+						Route dstRoute2(QString(jackPlayback).append("_2"), true, -1, Route::JACK_ROUTE);
+						dstRoute2.channel = 1;
+						
+						audio->msgAddRoute(srcRoute2, dstRoute2);
+					}
+					else
+					{
+						//Route channel 1
+						Route srcRoute(track, 0);
+						Route dstRoute(selectedOutput, true, -1, Route::JACK_ROUTE);
+						dstRoute.channel = 0;
+
+						audio->msgAddRoute(srcRoute, dstRoute);
+
+						//Route channel 2
+						Route srcRoute2(track, 1);
+						Route dstRoute2(selectedOutput, true, -1, Route::JACK_ROUTE);
+						dstRoute2.channel = 1;
+
+						audio->msgAddRoute(srcRoute2, dstRoute2);
+					}
+
+					audio->msgUpdateSoloStates();
+					song->update(SC_ROUTE);
+				}
+				midiMonitor->msgAddMonitoredTrack(track);
+				song->deselectTracks();
+				track->setSelected(true);
+				emit trackAdded(track->name());
+			}
+		}
+		break;
 		case Track::AUDIO_INPUT:
+		{
+			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_INPUT, -1, false);
+			if(track)
+			{
+				track->setMute(false);
+				if(inputIndex >= 0 && !chkInput->isChecked())
+				{
+					QString selectedInput = cmbInput->itemText(inputIndex);
+
+					QString jackCapture("system:capture");
+					if(selectedInput.startsWith(jackCapture))
+					{
+						Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
+						Route dstRoute(track, 0);
+						srcRoute.channel = 0;
+						audio->msgAddRoute(srcRoute, dstRoute);
+
+						Route srcRoute2(QString(jackCapture).append("_2"), false, -1, Route::JACK_ROUTE);
+						Route dstRoute2(track, 1);
+						srcRoute2.channel = 1;
+						audio->msgAddRoute(srcRoute2, dstRoute2);
+					}
+					else
+					{
+						Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
+						Route dstRoute(track, 0);
+						srcRoute.channel = 0;
+						audio->msgAddRoute(srcRoute, dstRoute);
+
+						Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
+						Route dstRoute2(track, 1);
+						srcRoute2.channel = 1;
+						audio->msgAddRoute(srcRoute2, dstRoute2);
+					}
+
+					audio->msgUpdateSoloStates();
+					song->update(SC_ROUTE);
+				}
+				if(outputIndex >= 0 && !chkOutput->isChecked())
+				{
+					QString selectedOutput = cmbOutput->itemText(outputIndex);
+
+					Route srcRoute(track, 0, track->channels());
+					Route dstRoute(selectedOutput, true, -1);
+
+					audio->msgAddRoute(srcRoute, dstRoute);
+					audio->msgUpdateSoloStates();
+					song->update(SC_ROUTE);
+				}
+				midiMonitor->msgAddMonitoredTrack(track);
+				song->deselectTracks();
+				track->setSelected(true);
+				emit trackAdded(track->name());
+			}
+		}
+		break;
 		case Track::AUDIO_BUSS:
+		{
+			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_BUSS, -1, false);
+			if(track)
+			{
+				if(inputIndex >= 0 && !chkInput->isChecked())
+				{
+					QString selectedInput = cmbInput->itemText(inputIndex);
+					Route srcRoute(selectedInput, true, -1);
+					Route dstRoute(track, 0, track->channels());
+
+					audio->msgAddRoute(srcRoute, dstRoute);
+
+					audio->msgUpdateSoloStates();
+					song->update(SC_ROUTE);
+				}
+				if(outputIndex >= 0 && !chkOutput->isChecked())
+				{
+					QString selectedOutput = cmbOutput->itemText(outputIndex);
+					Route srcRoute(track, 0, track->channels());
+					Route dstRoute(selectedOutput, true, -1);
+
+					audio->msgAddRoute(srcRoute, dstRoute);
+					audio->msgUpdateSoloStates();
+					song->update(SC_ROUTE);
+				}
+				midiMonitor->msgAddMonitoredTrack(track);
+				song->deselectTracks();
+				track->setSelected(true);
+				emit trackAdded(track->name());
+			}
+		}
+		break;
 		case Track::AUDIO_AUX:
+		{
+			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_AUX, -1, false);
+			if(track)
+			{
+				midiMonitor->msgAddMonitoredTrack(track);
+				song->deselectTracks();
+				track->setSelected(true);
+				emit trackAdded(track->name());
+			}
+		}
+		break;
 		case Track::AUDIO_SOFTSYNTH:
 		{
 			//Just add the track type and rename it
@@ -295,6 +531,90 @@ void CreateTrackDialog::trackTypeChanged(int type)
 	populateInputList();
 	populateOutputList();
 	populateInstrumentList();
+}
+
+void CreateTrackDialog::monitorChecked(bool checked)
+{
+	cmbMonitor->setEnabled(checked);
+}
+
+void CreateTrackDialog::createMonitorInputTracks(QString name)
+{
+	int monitorIndex = cmbMonitor->currentIndex();
+
+	QString inputName = QString("In-").append(name);
+	QString bussName = QString("Buss-").append(name);
+	QString audioName = QString("A-").append(name);
+	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
+	Track* buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
+	Track* audiot = song->addTrackByName(audioName, Track::WAVE, -1, false);
+	if(input && buss && audiot)
+	{
+		input->setMute(false);
+		QString selectedInput = cmbMonitor->itemText(monitorIndex);
+		
+		//Route world to input
+		QString jackCapture("system:capture");
+		if(selectedInput.startsWith(jackCapture))
+		{
+			Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
+			Route dstRoute(input, 0);
+			srcRoute.channel = 0;
+			audio->msgAddRoute(srcRoute, dstRoute);
+
+			Route srcRoute2(QString(jackCapture).append("_2"), false, -1, Route::JACK_ROUTE);
+			Route dstRoute2(input, 1);
+			srcRoute2.channel = 1;
+			audio->msgAddRoute(srcRoute2, dstRoute2);
+		}
+		else
+		{
+			Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
+			Route dstRoute(input, 0);
+			srcRoute.channel = 0;
+			audio->msgAddRoute(srcRoute, dstRoute);
+
+			Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
+			Route dstRoute2(input, 1);
+			srcRoute2.channel = 1;
+			audio->msgAddRoute(srcRoute2, dstRoute2);
+		}
+
+		//Route input to buss
+		audio->msgUpdateSoloStates();
+		song->update(SC_ROUTE);
+		
+		Route srcRoute(input, 0, input->channels());
+		Route dstRoute(buss->name(), true, -1);
+
+		audio->msgAddRoute(srcRoute, dstRoute);
+
+		//Route input to audio
+		Route srcRoute2(input, 0, input->channels());
+		Route dstRoute2(audiot->name(), true, -1);
+		
+		audio->msgAddRoute(srcRoute2, dstRoute2);
+
+		//Route audio to master
+		Track* master = song->findTrack("Master");
+		if(master)
+		{
+			//Route buss track to master
+			Route srcRoute3(buss, 0, buss->channels());
+			Route dstRoute3(master->name(), true, -1);
+		
+			audio->msgAddRoute(srcRoute3, dstRoute3);
+
+			//Route audio track to master
+			Route srcRoute4(audiot, 0, audiot->channels());
+			Route dstRoute4(master->name(), true, -1);
+		
+			audio->msgAddRoute(srcRoute4, dstRoute4);
+		}
+
+		audio->msgUpdateSoloStates();
+		song->update(SC_ROUTE);
+	}
 }
 
 void CreateTrackDialog::setTitleText()/*{{{*/
@@ -378,9 +698,14 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		case Track::WAVE:
 		{
 			hideMidiElements();
+			for(iTrack it = song->inputs()->begin(); it != song->inputs()->end(); ++it)
+			{
+				cmbInput->addItem((*it)->name(), 0);
+			}
 			importOutputs();
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
+				chkInput->setChecked(true);
 			}
 		}
 		break;
@@ -557,7 +882,7 @@ void CreateTrackDialog::importOutputs()/*{{{*/
 	{
 		std::list<QString> sl = audioDevice->outputPorts();
 		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			cmbInput->addItem(*i);
+			cmbInput->addItem(*i, 1);
 		}
 	}
 }/*}}}*/
@@ -568,10 +893,23 @@ void CreateTrackDialog::importInputs()/*{{{*/
 	{
 		std::list<QString> sl = audioDevice->inputPorts();
 		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			cmbOutput->addItem(*i);
+			cmbOutput->addItem(*i, 1);
 		}
 	}
 }/*}}}*/
+
+void CreateTrackDialog::populateMonitorList()
+{
+	while(cmbMonitor->count())
+		cmbMonitor->removeItem(cmbMonitor->count()-1);
+	if (checkAudioDevice()) 
+	{
+		std::list<QString> sl = audioDevice->outputPorts();
+		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
+			cmbMonitor->addItem(*i, 1);
+		}
+	}
+}
 
 void CreateTrackDialog::populateNewInputList()/*{{{*/
 {
@@ -608,7 +946,7 @@ void CreateTrackDialog::populateNewOutputList()/*{{{*/
 	}
 }/*}}}*/
 
-void CreateTrackDialog::populateInstrumentList()
+void CreateTrackDialog::populateInstrumentList()/*{{{*/
 {
 	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 	{
@@ -620,7 +958,7 @@ void CreateTrackDialog::populateInstrumentList()
 	int gm = cmbInstrument->findText("GM");
 	if(gm >= 0)
 		cmbInstrument->setCurrentIndex(gm);
-}
+}/*}}}*/
 
 int CreateTrackDialog::getFreeMidiPort()/*{{{*/
 {
@@ -649,6 +987,7 @@ void CreateTrackDialog::hideMidiElements()/*{{{*/
 	lblInstrument->setVisible(false);
 	cmbInstrument->setVisible(false);
 	chkMonitor->setVisible(false);
+	cmbMonitor->setVisible(false);
 	setMaximumHeight(150);
 	resize(width(), 150);
 }/*}}}*/
@@ -662,6 +1001,7 @@ void CreateTrackDialog::showAllElements()/*{{{*/
 	lblInstrument->setVisible(true);
 	cmbInstrument->setVisible(true);
 	chkMonitor->setVisible(true);
+	cmbMonitor->setVisible(true);
 	cmbInput->setVisible(true);
 	lblInput->setVisible(true);
 	cmbOutput->setVisible(true);
@@ -677,5 +1017,6 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 	populateInputList();
 	populateOutputList();
 	populateInstrumentList();
+	populateMonitorList();
 }
 

@@ -165,6 +165,7 @@ void AudioPortConfig::addRoute()/*{{{*/
 				break;
 		}
 
+		qDebug("Add Route for Input track: src: %s, dst: %s", srcItem->text().toUtf8().constData(), _selected->name().toUtf8().constData());
 		Route srcRoute(srcItem->text(), false, -1, Route::JACK_ROUTE);
 		Route dstRoute(_selected, chan);
 
@@ -179,18 +180,14 @@ void AudioPortConfig::addRoute()/*{{{*/
 		return;
 	}
 
+		qDebug("Add using lower code: src: %s, dst: %s", _selected->name().toUtf8().constData(), srcItem->text().toUtf8().constData());
 		Route dstRoute(_selected, chan, _selected->channels());
 		Route srcRoute(srcItem->text(), true, -1);
-		//dstRoute.channel = chan;
-		//Route &srcRoute = imm->second;
-
-		//Route dstRoute(t, imm->second.channel, imm->second.channels);
-		//dstRoute.remoteChannel = imm->second.remoteChannel;
 
 		audio->msgAddRoute(srcRoute, dstRoute);
 		audio->msgUpdateSoloStates();
 		song->update(SC_ROUTE);
-		//new QTreeWidgetItem(routeList, QStringList() << srcItem->text() << tItem->text());
+		
 		connectButton->setEnabled(false);
 	/*
 	audio->msgAddRoute(Route(srcItem->text(), false, -1), Route(dstItem->text(), true, -1));
