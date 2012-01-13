@@ -41,8 +41,18 @@ m_insertPosition(pos)
 	btnNewInput->setIcon(*plusIconSet3);
 	btnNewOutput->setIcon(*plusIconSet3);
 
+	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
+	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
+	cmbType->addItem(*addOutputIcon, tr("Output"), Track::AUDIO_OUTPUT);
+	cmbType->addItem(*addInputIcon, tr("Input"), Track::AUDIO_INPUT);
+	cmbType->addItem(*addBussIcon, tr("Buss"), Track::AUDIO_BUSS);
+	cmbType->addItem(*addAuxIcon, tr("Aux Send"), Track::AUDIO_AUX);
+	int row = cmbType->findData(m_insertType);
+	cmbType->setCurrentIndex(row);
+
 	connect(btnNewInput, SIGNAL(toggled(bool)), this, SLOT(updateInputSelected(bool)));
 	connect(btnNewOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
+	connect(cmbType, SIGNAL(currentIndexChanged(int)), this, SLOT(trackTypeChanged(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 }
 
@@ -277,9 +287,19 @@ void CreateTrackDialog::updateOutputSelected(bool raw)
 	}
 }
 
+//Track type combo slot
+void CreateTrackDialog::trackTypeChanged(int type)
+{
+	m_insertType = cmbType->itemData(type).toInt();
+	showAllElements();
+	populateInputList();
+	populateOutputList();
+	populateInstrumentList();
+}
+
 void CreateTrackDialog::setTitleText()/*{{{*/
 {
-	QString trackLabel(tr("Create new %1 track"));
+	/*QString trackLabel(tr("Create new %1 track"));
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch(type)
 	{
@@ -319,7 +339,7 @@ void CreateTrackDialog::setTitleText()/*{{{*/
 			lblType->setText(trackLabel.arg(tr("Synth")));
 		}
 		break;
-	}
+	}*/
 }/*}}}*/
 
 //Populate input combo based on type
@@ -369,7 +389,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			hideMidiElements();
 			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 			{
-				if((*t)->isMidiTrack())
+				if((*t)->isMidiTrack() || (*t)->type() == Track::AUDIO_OUTPUT)
 					continue;
 				AudioTrack* track = (AudioTrack*) (*t);
 				Route r(track, -1);
@@ -378,6 +398,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
+				chkInput->setChecked(true);
 			}
 		}
 		break;
@@ -387,6 +408,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			importOutputs();
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
+				chkInput->setChecked(true);
 			}
 		}
 		break;
@@ -405,6 +427,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			}
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
+				chkInput->setChecked(true);
 			}
 		}
 		break;
@@ -412,9 +435,11 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		case Track::AUDIO_SOFTSYNTH:
 			hideMidiElements();
 			setMaximumHeight(100);
+			resize(width(), 100);
 			cmbInput->setVisible(false);
 			lblInput->setVisible(false);
 			txtInChannel->setVisible(false);
+			chkInput->setVisible(false);
 		break;
 	}
 }/*}}}*/
@@ -466,6 +491,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			}
 			if (!cmbOutput->count())
 			{
+				chkOutput->setChecked(true);
 			}
 		}
 		break;
@@ -474,6 +500,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			importInputs();
 			if (!cmbOutput->count())
 			{
+				chkOutput->setChecked(true);
 			}
 		}
 		break;
@@ -497,6 +524,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			}
 			if (!cmbOutput->count())
 			{
+				chkOutput->setChecked(true);
 			}
 		}
 		break;
@@ -509,6 +537,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			}
 			if (!cmbOutput->count())
 			{
+				chkOutput->setChecked(true);
 			}
 		}
 		break;
@@ -517,6 +546,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			cmbOutput->setVisible(false);
 			lblOutput->setVisible(false);
 			txtOutChannel->setVisible(false);
+			chkOutput->setVisible(false);
 		break;
 	}
 }/*}}}*/
@@ -610,7 +640,7 @@ int CreateTrackDialog::getFreeMidiPort()/*{{{*/
 	return rv;
 }/*}}}*/
 
-void CreateTrackDialog::hideMidiElements()
+void CreateTrackDialog::hideMidiElements()/*{{{*/
 {
 	txtInChannel->setVisible(false);
 	btnNewInput->setVisible(false);
@@ -618,19 +648,34 @@ void CreateTrackDialog::hideMidiElements()
 	btnNewOutput->setVisible(false);
 	lblInstrument->setVisible(false);
 	cmbInstrument->setVisible(false);
+	chkMonitor->setVisible(false);
 	setMaximumHeight(150);
-}
+	resize(width(), 150);
+}/*}}}*/
+
+void CreateTrackDialog::showAllElements()/*{{{*/
+{
+	txtInChannel->setVisible(true);
+	btnNewInput->setVisible(true);
+	txtOutChannel->setVisible(true);
+	btnNewOutput->setVisible(true);
+	lblInstrument->setVisible(true);
+	cmbInstrument->setVisible(true);
+	chkMonitor->setVisible(true);
+	cmbInput->setVisible(true);
+	lblInput->setVisible(true);
+	cmbOutput->setVisible(true);
+	lblOutput->setVisible(true);
+	setMaximumHeight(200);
+	resize(width(), 200);
+}/*}}}*/
 
 void CreateTrackDialog::showEvent(QShowEvent*)
 {
 	qDebug("Inside CreateTrackDialog::showEvent trackType: %i, position: %i", m_insertType, m_insertPosition);
-	setTitleText();
+	//setTitleText();
 	populateInputList();
 	populateOutputList();
 	populateInstrumentList();
-	/*Track::TrackType type = (Track::TrackType)m_insertType;
-	if(type != Track::MIDI)
-	{
-	}*/
 }
 

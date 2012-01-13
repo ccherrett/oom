@@ -32,12 +32,14 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	void populateNewOutputList();
 	void populateInstrumentList();
 	void hideMidiElements();
+	void showAllElements();
 	int getFreeMidiPort();
 
 private slots:
 	void addTrack();
 	void updateInputSelected(bool);
 	void updateOutputSelected(bool);
+	void trackTypeChanged(int);
 
 protected:
 	virtual void showEvent(QShowEvent*);
@@ -46,7 +48,7 @@ signals:
 	void trackAdded(QString);
 
 public:
-	CreateTrackDialog(int type, int pos, QWidget* parent = 0);
+	CreateTrackDialog(int type = 0, int pos = -1, QWidget* parent = 0);
 	~CreateTrackDialog(){}
 };
 
