@@ -1516,6 +1516,45 @@ QSlider::handle:vertical
 	 color: #d0d4d0;
  }
 
+QGroupBox::indicator, QCheckBox::indicator {
+     width: 13px;
+     height: 13px;
+	 background-color: white;
+   	 border-radius: 3px;
+ }
+
+QGroupBox::indicator:unchecked, QCheckBox::indicator:unchecked {
+     image: url(:/images/checkbox_unchecked.png);
+ }
+
+QGroupBox::indicator:unchecked:hover, QCheckBox::indicator:unchecked:hover {
+     image: url(:/images/checkbox_unchecked_hover.png);
+ }
+
+QGroupBox::indicator:unchecked:pressed, QCheckBox::indicator:unchecked:pressed {
+     image: url(:/images/checkbox_unchecked_pressed.png);
+ }
+
+QGroupBox::indicator:checked, QCheckBox::indicator:checked {
+     image: url(:/images/checkbox_checked.png);
+ }
+
+QGroupBox::indicator:checked:hover, QCheckBox::indicator:checked:hover {
+     image: url(:/images/checkbox_checked_hover.png);
+ }
+
+QGroupBox::indicator:checked:pressed, QCheckBox::indicator:checked:pressed {
+     image: url(:/images/checkbox_checked_pressed.png);
+ }
+
+QGroupBox::indicator:indeterminate:hover, QCheckBox::indicator:indeterminate:hover {
+     image: url(:/images/checkbox_indeterminate_hover.png);
+ }
+
+QGroupBox::indicator:indeterminate:pressed, QCheckBox::indicator:indeterminate:pressed {
+     image: url(:/images/checkbox_indeterminate_pressed.png);
+ }
+
 QRadioButton {
      spacing: 5px;
 	 font-family: "fixed-width";

@@ -53,7 +53,6 @@ m_insertPosition(pos)
 
 	connect(btnNewInput, SIGNAL(toggled(bool)), this, SLOT(updateInputSelected(bool)));
 	connect(btnNewOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
-	connect(chkMonitor, SIGNAL(toggled(bool)), this, SLOT(monitorChecked(bool)));
 	connect(cmbType, SIGNAL(currentIndexChanged(int)), this, SLOT(trackTypeChanged(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 }
@@ -86,6 +85,7 @@ void CreateTrackDialog::addTrack()
 				{
 					MidiPort* inport = 0;
 					MidiDevice* indev = 0;
+					QString inputDevName(QString("I-").append(track->name()));
 					if(m_createMidiInputDevice)
 					{
 						m_midiInPort = getFreeMidiPort();
@@ -104,7 +104,7 @@ void CreateTrackDialog::addTrack()
 						}
 						else if(devtype == MidiDevice::JACK_MIDI)
 						{
-							indev = MidiJackDevice::createJackMidiDevice(devname, 3);
+							indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
 							if(indev)
 							{
 								qDebug("Created MIDI input device: JACK_MIDI");
@@ -162,6 +162,7 @@ void CreateTrackDialog::addTrack()
 				{
 					MidiPort* outport= 0;
 					MidiDevice* outdev = 0;
+					QString outputDevName(QString("O-").append(track->name()));
 					if(m_createMidiOutputDevice)
 					{
 						m_midiOutPort = getFreeMidiPort();
@@ -180,7 +181,7 @@ void CreateTrackDialog::addTrack()
 						}
 						else if(devtype == MidiDevice::JACK_MIDI)
 						{
-							outdev = MidiJackDevice::createJackMidiDevice(devname, 3);
+							outdev = MidiJackDevice::createJackMidiDevice(outputDevName, 3);
 							if(outdev)
 							{
 								int openFlags = 0;
@@ -239,7 +240,7 @@ void CreateTrackDialog::addTrack()
 					}
 				}
 
-				if(monitorIndex >= 0 && chkMonitor->isChecked())
+				if(monitorIndex >= 0 && midiBox->isChecked())
 				{
 					createMonitorInputTracks(track->name());
 				}
@@ -541,14 +542,20 @@ void CreateTrackDialog::monitorChecked(bool checked)
 void CreateTrackDialog::createMonitorInputTracks(QString name)
 {
 	int monitorIndex = cmbMonitor->currentIndex();
+	int bussIndex = cmbBuss->currentIndex();
+	bool newBuss = cmbBuss->itemData(bussIndex).toBool();
 
-	QString inputName = QString("In-").append(name);
-	QString bussName = QString("Buss-").append(name);
-	QString audioName = QString("A-").append(name);
+	QString inputName = QString("I-").append(name);
+	QString bussName = QString("B-").append(name);
+	//QString audioName = QString("A-").append(name);
 	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
-	Track* buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
-	Track* audiot = song->addTrackByName(audioName, Track::WAVE, -1, false);
-	if(input && buss && audiot)
+	Track* buss = 0;
+	if(newBuss)
+		buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
+	else
+		buss = song->findTrack(cmbBuss->itemText(bussIndex));
+	//Track* audiot = song->addTrackByName(audioName, Track::WAVE, -1, false);
+	if(input && buss/* && audiot*/)
 	{
 		input->setMute(false);
 		QString selectedInput = cmbMonitor->itemText(monitorIndex);
@@ -590,10 +597,10 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 		audio->msgAddRoute(srcRoute, dstRoute);
 
 		//Route input to audio
-		Route srcRoute2(input, 0, input->channels());
+		/*Route srcRoute2(input, 0, input->channels());
 		Route dstRoute2(audiot->name(), true, -1);
 		
-		audio->msgAddRoute(srcRoute2, dstRoute2);
+		audio->msgAddRoute(srcRoute2, dstRoute2);*/
 
 		//Route audio to master
 		Track* master = song->findTrack("Master");
@@ -606,10 +613,10 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 			audio->msgAddRoute(srcRoute3, dstRoute3);
 
 			//Route audio track to master
-			Route srcRoute4(audiot, 0, audiot->channels());
+			/*Route srcRoute4(audiot, 0, audiot->channels());
 			Route dstRoute4(master->name(), true, -1);
 		
-			audio->msgAddRoute(srcRoute4, dstRoute4);
+			audio->msgAddRoute(srcRoute4, dstRoute4);*/
 		}
 
 		audio->msgUpdateSoloStates();
@@ -691,6 +698,9 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 
 			if (!cmbInput->count())
 			{
+				btnNewInput->blockSignals(true);
+				btnNewInput->setChecked(true);
+				btnNewInput->blockSignals(false);
 				populateNewInputList();
 			}
 		}
@@ -760,7 +770,8 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		case Track::AUDIO_SOFTSYNTH:
 			hideMidiElements();
 			setMaximumHeight(100);
-			resize(width(), 100);
+			//resize(width(), 100);
+			updateGeometry();
 			cmbInput->setVisible(false);
 			lblInput->setVisible(false);
 			txtInChannel->setVisible(false);
@@ -797,6 +808,9 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 
 			if (!cmbOutput->count())
 			{
+				btnNewOutput->blockSignals(true);
+				btnNewOutput->setChecked(true);
+				btnNewOutput->blockSignals(false);
 				populateNewOutputList();
 			}
 		}
@@ -911,6 +925,17 @@ void CreateTrackDialog::populateMonitorList()
 	}
 }
 
+void CreateTrackDialog::populateBussList()
+{
+	while(cmbBuss->count())
+		cmbBuss->removeItem(cmbBuss->count()-1);
+	cmbBuss->addItem(tr("Add New Buss"), 1);
+	for(iTrack it = song->groups()->begin(); it != song->groups()->end(); ++it)
+	{
+		cmbBuss->addItem((*it)->name(), 0);
+	}
+}
+
 void CreateTrackDialog::populateNewInputList()/*{{{*/
 {
 	while(cmbInput->count())
@@ -986,10 +1011,11 @@ void CreateTrackDialog::hideMidiElements()/*{{{*/
 	btnNewOutput->setVisible(false);
 	lblInstrument->setVisible(false);
 	cmbInstrument->setVisible(false);
-	chkMonitor->setVisible(false);
 	cmbMonitor->setVisible(false);
-	setMaximumHeight(150);
-	resize(width(), 150);
+	midiBox->setVisible(false);
+	setMaximumHeight(160);
+	//resize(width(), 160);
+	updateGeometry();
 }/*}}}*/
 
 void CreateTrackDialog::showAllElements()/*{{{*/
@@ -1000,14 +1026,17 @@ void CreateTrackDialog::showAllElements()/*{{{*/
 	btnNewOutput->setVisible(true);
 	lblInstrument->setVisible(true);
 	cmbInstrument->setVisible(true);
-	chkMonitor->setVisible(true);
 	cmbMonitor->setVisible(true);
 	cmbInput->setVisible(true);
 	lblInput->setVisible(true);
 	cmbOutput->setVisible(true);
 	lblOutput->setVisible(true);
-	setMaximumHeight(200);
-	resize(width(), 200);
+	midiBox->setVisible(true);
+	setMaximumHeight(260);
+	chkInput->setVisible(true);
+	chkOutput->setVisible(true);
+	resize(width(), 260);
+	updateGeometry();
 }/*}}}*/
 
 void CreateTrackDialog::showEvent(QShowEvent*)
@@ -1018,5 +1047,6 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 	populateOutputList();
 	populateInstrumentList();
 	populateMonitorList();
+	populateBussList();
 }
 

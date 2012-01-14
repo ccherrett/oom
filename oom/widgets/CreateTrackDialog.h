@@ -33,6 +33,7 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	void populateNewOutputList();
 	void populateInstrumentList();
 	void populateMonitorList();
+	void populateBussList();
 	void hideMidiElements();
 	void showAllElements();
 	int getFreeMidiPort();
