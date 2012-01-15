@@ -9,6 +9,7 @@
 #define __PLUGIN_LADSPA_H__
 
 #include "plugin.h"
+#include "plugingui.h"
 #include "song.h"
 
 #include <math.h>
@@ -414,26 +415,52 @@ void LadspaPlugin::updateNativeGui()
 {
 }
 
-void LadspaPlugin::connect(int ports, float** src, float** dst)
+void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
 {
-    // FIXME - this is just a test and assumes we're using 2x2 fx plugin
-    unsigned long pin, pout;
-
-    for (int i=0; i < ports; i++)
+    if (descriptor && _enabled)
     {
-        pin  = m_audioInIndexes.at(i);
-        pout = m_audioOutIndexes.at(i);
-        descriptor->connect_port(handle, pin, src[i]);
-        descriptor->connect_port(handle, pout, dst[i]);
-    }
-}
-
-void LadspaPlugin::process(uint32_t frames)
-{
-    if (descriptor)
-    {
+        _proc_lock.lock();
         if (m_active)
         {
+            // connect ports
+            int ains  = m_audioInIndexes.size();
+            int aouts = m_audioOutIndexes.size();
+            bool need_buffer_copy  = false;
+            bool need_extra_buffer = false;
+            uint32_t pin, pout;
+
+            if (ains == aouts)
+            {
+                if (aouts <= m_channels)
+                {
+                    for (int i=0; i < ains; i++)
+                    {
+                        pin  = m_audioInIndexes.at(i);
+                        pout = m_audioOutIndexes.at(i);
+                        descriptor->connect_port(handle, pin, src[i]);
+                        descriptor->connect_port(handle, pout, dst[i]);
+                        need_buffer_copy = true;
+                    }
+                }
+                else
+                {
+                    for (int i=0; i < m_channels ; i++)
+                    {
+                        pin  = m_audioInIndexes.at(i);
+                        pout = m_audioOutIndexes.at(i);
+                        descriptor->connect_port(handle, pin, src[i]);
+                        descriptor->connect_port(handle, pout, dst[i]);
+                        need_extra_buffer = true;
+                    }
+                }
+            }
+            else
+            {
+                // cannot proccess
+                _proc_lock.unlock();
+                return;
+            }
+
             // Process automation
             qWarning("Automation TEST %p %i %i", m_track, m_track->automationType(), m_id);
             if (/*automation &&*/ m_track /*&& m_track->automationType() != AUTO_OFF*/ && m_id != -1)
@@ -456,16 +483,45 @@ void LadspaPlugin::process(uint32_t frames)
             else
                 qWarning("Automation Fail");
 
+            // activate if needed
             if (m_activeBefore == false)
             {
                 if (descriptor->activate)
                     descriptor->activate(handle);
             }
 
-            descriptor->run(handle, frames);
+            // process
+            if (need_extra_buffer)
+            {
+                if (m_hints & PLUGIN_HAS_IN_PLACE_BROKEN)
+                {
+                    // cannot proccess
+                    _proc_lock.unlock();
+                    return;
+                }
+
+                float extra_buffer[frames];
+                memset(extra_buffer, 0, sizeof(float)*frames);
+
+                for (int i=m_channels; i < ains ; i++)
+                {
+                    descriptor->connect_port(handle, m_audioInIndexes.at(i), extra_buffer);
+                    descriptor->connect_port(handle, m_audioOutIndexes.at(i), extra_buffer);
+                }
+            }
+            else
+            {
+                descriptor->run(handle, frames);
+
+                if (need_buffer_copy)
+                {
+                    for (int i=ains; i < m_channels ; i++)
+                        memcpy(dst[i], dst[i-1], sizeof(float)*frames);
+                }
+            }
         }
         else
-        {
+        {   // not active
             if (m_activeBefore)
             {
                 if (descriptor->deactivate)
@@ -473,6 +529,7 @@ void LadspaPlugin::process(uint32_t frames)
             }
         }
         m_activeBefore = m_active;
+        _proc_lock.unlock();
     }
 }
 
@@ -483,515 +540,208 @@ void LadspaPlugin::bufferSizeChanged(uint32_t)
 
 bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)
 {
-    return false;
+    QString new_filename;
+    QString new_label;
+
+    if (readPreset == false)
+        m_channels = 1;
+
+    for (;;)
+    {
+        Xml::Token token(xml.parse());
+        const QString& tag(xml.s1());
+
+        switch (token)
+        {
+            case Xml::Error:
+            case Xml::End:
+                return true;
+
+            case Xml::TagStart:
+                if (readPreset == false && ! _lib)
+                {
+                    QFileInfo fi(new_filename);
+
+                    if (fi.exists() == false)
+                    {
+                        PluginI* plugi = plugins.find(fi.completeBaseName(), new_label);
+                        if (plugi)
+                            new_filename = plugi->filename();
+                    }
+
+                    if (init(new_filename, new_label))
+                    {
+                        xml.parse1();
+                        break;
+                    }
+                    else
+                        return true;
+                }
+
+                if (tag == "control")
+                {
+                    loadControl(xml);
+                }
+                else if (tag == "active")
+                {
+                    if (readPreset == false)
+                        m_active = xml.parseInt();
+                }
+                else if (tag == "gui")
+                {
+                    bool yesno = xml.parseInt();
+
+                    if (yesno)
+                    {
+                        if (! m_gui)
+                            m_gui = new PluginGui(this);
+                        m_gui->show();
+                    }
+                }
+                else if (tag == "geometry")
+                {
+                    QRect r(readGeometry(xml, tag));
+                    if (m_gui)
+                    {
+                        m_gui->resize(r.size());
+                        m_gui->move(r.topLeft());
+                    }
+                }
+                else
+                    xml.unknown("LadspaPlugin");
+
+                break;
+
+            case Xml::Attribut:
+                if (tag == "filename")
+                {
+                    if (readPreset == false)
+                        new_filename = xml.s2();
+                }
+                else if (tag == "label")
+                {
+                    QString s = xml.s2();
+
+                    if (readPreset)
+                    {
+                        if (s != m_label)
+                        {
+                            printf("Error: Wrong preset label %s. Label must be %s\n",
+                                    s.toUtf8().constData(), m_label.toUtf8().constData());
+                            return true;
+                        }
+                    }
+                    else
+                        new_label = s;
+                }
+                else if (tag == "channels")
+                {
+                    if (readPreset == false)
+                        m_channels = xml.s2().toInt();
+                }
+                break;
+
+            case Xml::TagEnd:
+                if (tag == "LadspaPlugin")
+                {
+                    if (! _lib)
+                        return true;
+
+                    if (m_gui)
+                        m_gui->updateValues();
+
+                    return false;
+                }
+                return true;
+
+            default:
+                break;
+        }
+    }
+    return true;
 }
 
 void LadspaPlugin::writeConfiguration(int level, Xml& xml)
 {
+    xml.tag(level++, "LadspaPlugin filename=\"%s\" label=\"%s\" channels=\"%d\"",
+            Xml::xmlString(m_filename).toLatin1().constData(), Xml::xmlString(m_label).toLatin1().constData(), m_channels);
+
+    for (uint32_t i = 0; i < m_paramCount; i++)
+    {
+        double value = m_params[i].value;
+        if (m_params[i].hints & PARAMETER_USES_SAMPLERATE)
+            value /= sampleRate;
+
+        QString s("control rindex=\"%1\" val=\"%2\" /");
+        xml.tag(level, s.arg(m_params[i].rindex).arg(value, 0, 'f', 6).toLatin1().constData());
+    }
+
+    xml.intTag(level, "active", m_active);
+
+    if (m_gui)
+    {
+        xml.intTag(level, "gui", 1);
+        xml.geometryTag(level, "geometry", m_gui);
+    }
+
+    xml.tag(level--, "/LadspaPlugin");
+}
+
+bool LadspaPlugin::loadControl(Xml& xml)
+{
+    int32_t idx = -1;
+    double val = 0.0;
+
+    for (;;)
+    {
+        Xml::Token token = xml.parse();
+        const QString& tag = xml.s1();
+
+        switch (token)
+        {
+        case Xml::Error:
+        case Xml::End:
+            return true;
+
+        case Xml::TagStart:
+            xml.unknown("LadspaPlugin::control");
+            break;
+
+        case Xml::Attribut:
+            if (tag == "rindex")
+                idx = xml.s2().toInt();
+            else if (tag == "val")
+                val = xml.s2().toDouble();
+            break;
+
+        case Xml::TagEnd:
+            if (tag == "control" && idx >= 0)
+                return setControl(idx, val);
+            return true;
+
+        default:
+            break;
+        }
+    }
+    return true;
+}
+
+bool LadspaPlugin::setControl(int32_t idx, double value)
+{
+    if (idx < (int32_t)descriptor->PortCount)
+    {
+        for (uint32_t i = 0; i < m_paramCount; i++)
+        {
+            if (m_params[i].rindex == idx)
+            {
+                if (m_params[i].hints & PARAMETER_USES_SAMPLERATE)
+                    value *= sampleRate;
+                m_params[i].value = m_params[i].tmpValue = m_paramsBuffer[i] = value;
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 #endif // __PLUGIN_LADSPA_H__
-
-#if 0
-//----------------------------------------------------------------------------------
-//   defaultValue
-//   If no default ladspa value found, still sets *def to 1.0, but returns false.
-//---------------------------------------------------------------------------------
-
-//float ladspaDefaultValue(const LADSPA_Descriptor* plugin, int k)
-
-bool ladspaDefaultValue(const LADSPA_Descriptor* plugin, int port, float* val)/*{{{*/
-{
-    LADSPA_PortRangeHint range = plugin->PortRangeHints[port];
-    LADSPA_PortRangeHintDescriptor rh = range.HintDescriptor;
-    //      bool isLog = LADSPA_IS_HINT_LOGARITHMIC(rh);
-    //double val = 1.0;
-    float m = (rh & LADSPA_HINT_SAMPLE_RATE) ? float(sampleRate) : 1.0f;
-    if (LADSPA_IS_HINT_DEFAULT_MINIMUM(rh))
-    {
-        *val = range.LowerBound * m;
-        return true;
-    }
-    else if (LADSPA_IS_HINT_DEFAULT_LOW(rh))
-    {
-        if (LADSPA_IS_HINT_LOGARITHMIC(rh))
-        {
-            *val = exp(fast_log10(range.LowerBound * m) * .75 +
-                    log(range.UpperBound * m) * .25);
-            return true;
-        }
-        else
-        {
-            *val = range.LowerBound * .75 * m + range.UpperBound * .25 * m;
-            return true;
-        }
-    }
-    else if (LADSPA_IS_HINT_DEFAULT_MIDDLE(rh))
-    {
-        if (LADSPA_IS_HINT_LOGARITHMIC(rh))
-        {
-            *val = exp(log(range.LowerBound * m) * .5 +
-                    log10(range.UpperBound * m) * .5);
-            return true;
-        }
-        else
-        {
-            *val = range.LowerBound * .5 * m + range.UpperBound * .5 * m;
-            return true;
-        }
-    }
-    else if (LADSPA_IS_HINT_DEFAULT_HIGH(rh))
-    {
-        if (LADSPA_IS_HINT_LOGARITHMIC(rh))
-        {
-            *val = exp(log(range.LowerBound * m) * .25 +
-                    log(range.UpperBound * m) * .75);
-            return true;
-        }
-        else
-        {
-            *val = range.LowerBound * .25 * m + range.UpperBound * .75 * m;
-            return true;
-        }
-    }
-    else if (LADSPA_IS_HINT_DEFAULT_MAXIMUM(rh))
-    {
-        *val = range.UpperBound*m;
-        return true;
-    }
-    else if (LADSPA_IS_HINT_DEFAULT_0(rh))
-    {
-        *val = 0.0;
-        return true;
-    }
-    else if (LADSPA_IS_HINT_DEFAULT_1(rh))
-    {
-        *val = 1.0;
-        return true;
-    }
-    else if (LADSPA_IS_HINT_DEFAULT_100(rh))
-    {
-        *val = 100.0;
-        return true;
-    }
-    else if (LADSPA_IS_HINT_DEFAULT_440(rh))
-    {
-        *val = 440.0;
-        return true;
-    }
-
-    // No default found. Set return value to 1.0, but return false.
-    *val = 1.0;
-    return false;
-}/*}}}*/
-
-//---------------------------------------------------------
-//   ladspaControlRange
-//---------------------------------------------------------
-
-void ladspaControlRange(const LADSPA_Descriptor* plugin, int i, float* min, float* max)/*{{{*/
-{
-    LADSPA_PortRangeHint range = plugin->PortRangeHints[i];
-    LADSPA_PortRangeHintDescriptor desc = range.HintDescriptor;
-    if (desc & LADSPA_HINT_TOGGLED)
-    {
-        *min = 0.0;
-        *max = 1.0;
-        return;
-    }
-    float m = 1.0;
-    if (desc & LADSPA_HINT_SAMPLE_RATE)
-        m = float(sampleRate);
-
-    if (desc & LADSPA_HINT_BOUNDED_BELOW)
-        *min = range.LowerBound * m;
-    else
-        *min = 0.0;
-    if (desc & LADSPA_HINT_BOUNDED_ABOVE)
-        *max = range.UpperBound * m;
-    else
-        *max = 1.0;
-}/*}}}*/
-
-//---------------------------------------------------------
-//   ladspa2MidiControlValues
-//---------------------------------------------------------
-
-bool ladspa2MidiControlValues(const LADSPA_Descriptor* plugin, int port, int ctlnum, int* min, int* max, int* def)/*{{{*/
-{
-    LADSPA_PortRangeHint range = plugin->PortRangeHints[port];
-    LADSPA_PortRangeHintDescriptor desc = range.HintDescriptor;
-
-    float fmin, fmax, fdef;
-    int imin, imax;
-    float frng;
-    //int idef;
-
-    //ladspaControlRange(plugin, port, &fmin, &fmax);
-
-    // TODO
-    bool hasdef = false; //ladspaDefaultValue(plugin, port, &fdef);
-    //bool isint = desc & LADSPA_HINT_INTEGER;
-    MidiController::ControllerType t = midiControllerType(ctlnum);
-
-#ifdef PLUGIN_DEBUGIN
-    printf("ladspa2MidiControlValues: ctlnum:%d ladspa port:%d has default?:%d default:%f\n", ctlnum, port, hasdef, fdef);
-#endif
-
-    if (desc & LADSPA_HINT_TOGGLED)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("ladspa2MidiControlValues: has LADSPA_HINT_TOGGLED\n");
-#endif
-
-        *min = 0;
-        *max = 1;
-        *def = (int) lrint(fdef);
-        return hasdef;
-    }
-
-    float m = 1.0;
-    if (desc & LADSPA_HINT_SAMPLE_RATE)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("ladspa2MidiControlValues: has LADSPA_HINT_SAMPLE_RATE\n");
-#endif
-
-        m = float(sampleRate);
-    }
-
-    if (desc & LADSPA_HINT_BOUNDED_BELOW)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("ladspa2MidiControlValues: has LADSPA_HINT_BOUNDED_BELOW\n");
-#endif
-
-        fmin = range.LowerBound * m;
-    }
-    else
-        fmin = 0.0;
-
-    if (desc & LADSPA_HINT_BOUNDED_ABOVE)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("ladspa2MidiControlValues: has LADSPA_HINT_BOUNDED_ABOVE\n");
-#endif
-
-        fmax = range.UpperBound * m;
-    }
-    else
-        fmax = 1.0;
-
-    frng = fmax - fmin;
-    imin = lrint(fmin);
-    imax = lrint(fmax);
-    //irng = imax - imin;
-
-    int ctlmn = 0;
-    int ctlmx = 127;
-
-#ifdef PLUGIN_DEBUGIN
-    printf("ladspa2MidiControlValues: port min:%f max:%f \n", fmin, fmax);
-#endif
-
-    //bool isneg = (fmin < 0.0);
-    bool isneg = (imin < 0);
-    int bias = 0;
-    switch (t)
-    {
-        case MidiController::RPN:
-        case MidiController::NRPN:
-        case MidiController::Controller7:
-            if (isneg)
-            {
-                ctlmn = -64;
-                ctlmx = 63;
-                bias = -64;
-            }
-            else
-            {
-                ctlmn = 0;
-                ctlmx = 127;
-            }
-            break;
-        case MidiController::Controller14:
-        case MidiController::RPN14:
-        case MidiController::NRPN14:
-            if (isneg)
-            {
-                ctlmn = -8192;
-                ctlmx = 8191;
-                bias = -8192;
-            }
-            else
-            {
-                ctlmn = 0;
-                ctlmx = 16383;
-            }
-            break;
-        case MidiController::Program:
-            ctlmn = 0;
-            //ctlmx = 0xffffff;
-            ctlmx = 0x3fff; // FIXME: Really should not happen or be allowed. What to do here...
-            break;
-        case MidiController::Pitch:
-            ctlmn = -8192;
-            ctlmx = 8191;
-            break;
-        case MidiController::Velo: // cannot happen
-        default:
-            break;
-    }
-    //int ctlrng = ctlmx - ctlmn;
-    float fctlrng = float(ctlmx - ctlmn);
-
-    // Is it an integer control?
-    if (desc & LADSPA_HINT_INTEGER)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("ladspa2MidiControlValues: has LADSPA_HINT_INTEGER\n");
-#endif
-
-        // If the upper or lower limit is beyond the controller limits, just scale the whole range to fit.
-        // We could get fancy by scaling only the negative or positive domain, or each one separately, but no...
-        //if((imin < ctlmn) || (imax > ctlmx))
-        //{
-        //  float scl = float(irng) / float(fctlrng);
-        //  if((ctlmn - imin) > (ctlmx - imax))
-        //    scl = float(ctlmn - imin);
-        //  else
-        //    scl = float(ctlmx - imax);
-        //}
-        // No, instead just clip the limits. ie fit the range into clipped space.
-        if (imin < ctlmn)
-            imin = ctlmn;
-        if (imax > ctlmx)
-            imax = ctlmx;
-
-        *min = imin;
-        *max = imax;
-
-        //int idef = (int)lrint(fdef);
-        //if(idef < ctlmn)
-        //  idef = ctlmn;
-        //if(idef > ctlmx)
-        //  idef = ctlmx;
-        //*def = idef;
-
-        *def = (int) lrint(fdef);
-
-        return hasdef;
-    }
-
-    // It's a floating point control, just use wide open maximum range.
-    *min = ctlmn;
-    *max = ctlmx;
-
-    // Orcan: commented out next 2 lines to suppress compiler warning:
-    //float fbias = (fmin + fmax) / 2.0;
-    //float normbias = fbias / frng;
-    float normdef = fdef / frng;
-    fdef = normdef * fctlrng;
-
-    // FIXME: TODO: Incorrect... Fix this somewhat more trivial stuff later....
-
-    *def = (int) lrint(fdef) + bias;
-
-#ifdef PLUGIN_DEBUGIN
-    printf("ladspa2MidiControlValues: setting default:%d\n", *def);
-#endif
-
-    return hasdef;
-}/*}}}*/
-
-//---------------------------------------------------------
-//   midi2LadspaValue
-//---------------------------------------------------------
-
-float midi2LadspaValue(const LADSPA_Descriptor* plugin, int port, int ctlnum, int val)/*{{{*/
-{
-    LADSPA_PortRangeHint range = plugin->PortRangeHints[port];
-    LADSPA_PortRangeHintDescriptor desc = range.HintDescriptor;
-
-    float fmin, fmax;
-    int imin;
-    //int imax;
-    float frng;
-    //int idef;
-
-    //ladspaControlRange(plugin, port, &fmin, &fmax);
-
-    //bool hasdef = ladspaDefaultValue(plugin, port, &fdef);
-    //bool isint = desc & LADSPA_HINT_INTEGER;
-    MidiController::ControllerType t = midiControllerType(ctlnum);
-
-#ifdef PLUGIN_DEBUGIN
-    printf("midi2LadspaValue: ctlnum:%d ladspa port:%d val:%d\n", ctlnum, port, val);
-#endif
-
-    float m = 1.0;
-    if (desc & LADSPA_HINT_SAMPLE_RATE)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("midi2LadspaValue: has LADSPA_HINT_SAMPLE_RATE\n");
-#endif
-
-        m = float(sampleRate);
-    }
-
-    if (desc & LADSPA_HINT_BOUNDED_BELOW)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("midi2LadspaValue: has LADSPA_HINT_BOUNDED_BELOW\n");
-#endif
-
-        fmin = range.LowerBound * m;
-    }
-    else
-        fmin = 0.0;
-
-    if (desc & LADSPA_HINT_BOUNDED_ABOVE)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("midi2LadspaValue: has LADSPA_HINT_BOUNDED_ABOVE\n");
-#endif
-
-        fmax = range.UpperBound * m;
-    }
-    else
-        fmax = 1.0;
-
-    frng = fmax - fmin;
-    imin = lrint(fmin);
-    //imax = lrint(fmax);
-    //irng = imax - imin;
-
-    if (desc & LADSPA_HINT_TOGGLED)
-    {
-#ifdef PLUGIN_DEBUGIN
-        printf("midi2LadspaValue: has LADSPA_HINT_TOGGLED\n");
-#endif
-
-        if (val > 0)
-            return fmax;
-        else
-            return fmin;
-    }
-
-    int ctlmn = 0;
-    int ctlmx = 127;
-
-#ifdef PLUGIN_DEBUGIN
-    printf("midi2LadspaValue: port min:%f max:%f \n", fmin, fmax);
-#endif
-
-    //bool isneg = (fmin < 0.0);
-    bool isneg = (imin < 0);
-    int bval = val;
-    int cval = val;
-    switch (t)
-    {
-        case MidiController::RPN:
-        case MidiController::NRPN:
-        case MidiController::Controller7:
-            if (isneg)
-            {
-                ctlmn = -64;
-                ctlmx = 63;
-                bval -= 64;
-                cval -= 64;
-            }
-            else
-            {
-                ctlmn = 0;
-                ctlmx = 127;
-                cval -= 64;
-            }
-            break;
-        case MidiController::Controller14:
-        case MidiController::RPN14:
-        case MidiController::NRPN14:
-            if (isneg)
-            {
-                ctlmn = -8192;
-                ctlmx = 8191;
-                bval -= 8192;
-                cval -= 8192;
-            }
-            else
-            {
-                ctlmn = 0;
-                ctlmx = 16383;
-                cval -= 8192;
-            }
-            break;
-        case MidiController::Program:
-            ctlmn = 0;
-            ctlmx = 0xffffff;
-            break;
-        case MidiController::Pitch:
-            ctlmn = -8192;
-            ctlmx = 8191;
-            break;
-        case MidiController::Velo: // cannot happen
-        default:
-            break;
-    }
-    int ctlrng = ctlmx - ctlmn;
-    float fctlrng = float(ctlmx - ctlmn);
-
-    // Is it an integer control?
-    if (desc & LADSPA_HINT_INTEGER)
-    {
-        float ret = float(cval);
-        if (ret < fmin)
-            ret = fmin;
-        if (ret > fmax)
-            ret = fmax;
-#ifdef PLUGIN_DEBUGIN
-        printf("midi2LadspaValue: has LADSPA_HINT_INTEGER returning:%f\n", ret);
-#endif
-
-        return ret;
-    }
-
-    // Avoid divide-by-zero error below.
-    if (ctlrng == 0)
-        return 0.0;
-
-    // It's a floating point control, just use wide open maximum range.
-    float normval = float(bval) / fctlrng;
-    //float fbias = (fmin + fmax) / 2.0;
-    //float normfbias = fbias / frng;
-    //float ret = (normdef + normbias) * fctlrng;
-    //float normdef = fdef / frng;
-
-    float ret = normval * frng + fmin;
-
-#ifdef PLUGIN_DEBUGIN
-    printf("midi2LadspaValue: float returning:%f\n", ret);
-#endif
-
-    return ret;
-}/*}}}*/
-
-
-// Works but not needed.
-/*
-//---------------------------------------------------------
-//   ladspa2MidiController
-//---------------------------------------------------------
-
-MidiController* ladspa2MidiController(const LADSPA_Descriptor* plugin, int port, int ctlnum)
-{
-  int min, max, def;
-
-  if(!ladspa2MidiControlValues(plugin, port, ctlnum, &min, &max, &def))
-    return 0;
-
-  MidiController* mc = new MidiController(QString(plugin->PortNames[port]), ctlnum, min, max, def);
-
-  return mc;
-}
- */
-#endif

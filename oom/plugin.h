@@ -30,6 +30,7 @@
 #include <vector>
 #include <stdint.h>
 #include <QFileInfo>
+#include <QMutex>
 
 // ladspa includes
 #include "ladspa.h"
@@ -162,6 +163,7 @@ public:
         m_track = 0;
         m_gui = 0;
 
+        _enabled = true;
         _lib = 0;
     }
 
@@ -350,6 +352,13 @@ public:
         m_track = track;
     }
 
+    void aboutToRemove()
+    {
+        _proc_lock.lock();
+        _enabled = false;
+        _proc_lock.unlock();
+    }
+
     void makeGui();
     void deleteGui();
     void showGui(bool yesno);
@@ -367,7 +376,7 @@ public:
     virtual void reload() = 0;
     virtual void reloadPrograms(bool init) = 0;
 
-    virtual void process(uint32_t frames) = 0;
+    virtual void process(uint32_t frames, float** src, float** dst) = 0;
     virtual void bufferSizeChanged(uint32_t bufferSize) = 0;
 
     virtual bool readConfiguration(Xml& xml, bool readPreset = false) = 0;
@@ -395,7 +404,9 @@ protected:
     AudioTrack* m_track;
     PluginGui* m_gui;
 
+    bool _enabled;
     void* _lib;
+    QMutex _proc_lock;
 };
 
 //---------------------------------------------------------
@@ -422,13 +433,14 @@ public:
     bool nativeGuiVisible();
     void updateNativeGui();
 
-    void connect(int ports, float** src, float** dst);
-
-    void process(uint32_t frames);
+    void process(uint32_t frames, float** src, float** dst);
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);
     void writeConfiguration(int level, Xml& xml);
+
+    bool loadControl(Xml& xml);
+    bool setControl(int32_t idx, double value);
 
 protected:
     float* m_paramsBuffer;
@@ -468,6 +480,9 @@ public:
     QString getParameterName(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
 
+    uint32_t getCustomURIId(const char* uri);
+    const char* getCustomURIString(int uri_id);
+
     bool hasNativeGui();
     void showNativeGui(bool yesno);
     bool nativeGuiVisible();
@@ -475,18 +490,17 @@ public:
     void closeNativeGui(bool destroyed = false);
     void updateUIPorts(bool onlyOutput = false);
 
-    void connect(int ports, float** src, float** dst);
     void ui_resize(int width, int height);
     void ui_write_function(uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer);
 
-    void process(uint32_t frames);
+    void process(uint32_t frames, float** src, float** dst);
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);
     void writeConfiguration(int level, Xml& xml);
 
-    uint32_t getCustomURIId(const char* uri);
-    const char* getCustomURIString(int uri_id);
+    bool loadControl(Xml& xml);
+    bool setControl(QString symbol, double value);
 
 private:
     float* m_paramsBuffer;
@@ -542,7 +556,7 @@ public:
     QString getParameterName(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
 
-    void process(uint32_t frames);
+    void process(uint32_t frames, float** src, float** dst);
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);

@@ -164,6 +164,7 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
                 if (replace)
                     audio->msgAddPlugin(track, idx, 0);
                 audio->msgAddPlugin(track, idx, ladplug);
+                ladplug->setChannels(track->channels());
                 ladplug->setActive(true);
                 song->dirty = true;
             }
@@ -187,6 +188,7 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
                     // track->efxPipe()->insert(0, idx); was set on lv2 only
                 }
                 audio->msgAddPlugin(track, idx, lv2plug);
+                lv2plug->setChannels(track->channels());
                 lv2plug->setActive(true);
                 song->dirty = true;
             }
@@ -206,6 +208,7 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
                 if (replace)
                     audio->msgAddPlugin(track, idx, 0);
                 audio->msgAddPlugin(track, idx, vstplug);
+                vstplug->setChannels(track->channels());
                 vstplug->setActive(true);
                 song->dirty = true;
             }
@@ -327,8 +330,11 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 		}
 		case REMOVE:
 		{
-			audio->msgAddPlugin(track, idx, 0);
 			Pipeline* epipe = track->efxPipe();
+            BasePlugin* oldPlugin = (*epipe)[idx];
+            oldPlugin->aboutToRemove();
+
+            qCritical("Plugin to remove now and here");
 			/*PluginI* oldPlugin = (*epipe)[idx];
 			if(oldPlugin)
 			{
@@ -342,6 +348,8 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 		#endif
 					delete oldPlugin;
 			}*/
+
+            audio->msgAddPlugin(track, idx, 0);
 			epipe->insert(0, idx);
 			song->dirty = true;
 			break;
@@ -681,11 +689,13 @@ void EffectRack::initPlugin(Xml xml, int idx)
                     LadspaPlugin* ladplug = new LadspaPlugin();
                     if (ladplug->readConfiguration(xml, false))
                     {
+                        qWarning("Loaded Ladspa plugin FAILED");
                         printf("cannot instantiate plugin\n");
                         delete ladplug;
                     }
                     else
                     {
+                        qWarning("Loaded Ladspa plugin SUCCESS");
                         //printf("instantiated!\n");
                         audio->msgAddPlugin(track, idx, ladplug);
                         song->update(SC_RACK);

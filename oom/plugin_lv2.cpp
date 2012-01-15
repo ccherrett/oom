@@ -10,7 +10,7 @@
 
 #include "plugin.h"
 #include "plugingui.h"
-#include "lib_functions.h"
+#include "song.h"
 
 #include "lv2_data_access.h"
 #include "lv2_event.h"
@@ -556,9 +556,12 @@ void Lv2Plugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
 
 bool Lv2Plugin::init(QString filename, QString label)
 {
-    LilvNode* pluginURI = lilv_new_uri(lv2world->world, filename.toAscii().constData());
-    lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
-    lilv_node_free(pluginURI);
+    if (!lplug)
+    {
+        LilvNode* pluginURI = lilv_new_uri(lv2world->world, filename.toAscii().constData());
+        lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
+        lilv_node_free(pluginURI);
+    }
 
     if (lplug)
     {
@@ -1085,6 +1088,30 @@ void Lv2Plugin::setNativeParameterValue(uint32_t index, double value)
         m_paramsBuffer[index] = value;
 }
 
+uint32_t Lv2Plugin::getCustomURIId(const char *uri)
+{
+    qDebug("Lv2Plugin::getCustomURIId(%s)", uri);
+
+    for (int i=0; i < m_customURIs.count(); i++)
+    {
+        if (m_customURIs[i] && strcmp(m_customURIs[i], uri) == 0)
+            return i;
+    }
+
+    m_customURIs.append(strdup(uri));
+    return m_customURIs.count()-1;
+}
+
+const char* Lv2Plugin::getCustomURIString(int uri_id)
+{
+    qDebug("Lv2Plugin::getCustomURIString(%i)", uri_id);
+
+    if (uri_id < m_customURIs.count())
+        return m_customURIs.at(uri_id);
+    else
+        return 0;
+}
+
 bool Lv2Plugin::hasNativeGui()
 {
     return (m_hints & PLUGIN_HAS_NATIVE_GUI);
@@ -1238,20 +1265,6 @@ void Lv2Plugin::closeNativeGui(bool destroyed)
     ui.visible = false;
 }
 
-void Lv2Plugin::connect(int ports, float** src, float** dst)
-{
-    // FIXME - this is just a test and assumes we're using 2x2 fx plugin
-    uint32_t pin, pout;
-
-    for (int i=0; i < ports; i++)
-    {
-        pin  = m_audioInIndexes.at(i);
-        pout = m_audioOutIndexes.at(i);
-        descriptor->connect_port(handle, pin, src[i]);
-        descriptor->connect_port(handle, pout, dst[i]);
-    }
-}
-
 void Lv2Plugin::ui_resize(int width, int height)
 {
     // We need to postpone this to the main event thread (send a signal to resize the UI?)
@@ -1307,21 +1320,92 @@ void Lv2Plugin::ui_write_function(uint32_t port_index, uint32_t buffer_size, uin
     // handle more formats later, not used in plugins currently
 }
 
-void Lv2Plugin::process(uint32_t frames)
+void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
 {
-    if (descriptor)
+    if (descriptor && _enabled)
     {
+        _proc_lock.lock();
         if (m_active)
         {
-            if (!m_activeBefore)
+            // connect ports
+            int ains  = m_audioInIndexes.size();
+            int aouts = m_audioOutIndexes.size();
+            bool need_buffer_copy  = false;
+            bool need_extra_buffer = false;
+            uint32_t pin, pout;
+
+            if (ains == aouts)
+            {
+                if (aouts <= m_channels)
+                {
+                    for (int i=0; i < ains; i++)
+                    {
+                        pin  = m_audioInIndexes.at(i);
+                        pout = m_audioOutIndexes.at(i);
+                        descriptor->connect_port(handle, pin, src[i]);
+                        descriptor->connect_port(handle, pout, dst[i]);
+                        need_buffer_copy = true;
+                    }
+                }
+                else
+                {
+                    for (int i=0; i < m_channels ; i++)
+                    {
+                        pin  = m_audioInIndexes.at(i);
+                        pout = m_audioOutIndexes.at(i);
+                        descriptor->connect_port(handle, pin, src[i]);
+                        descriptor->connect_port(handle, pout, dst[i]);
+                        need_extra_buffer = true;
+                    }
+                }
+            }
+            else
+            {
+                // cannot proccess
+                _proc_lock.unlock();
+                return;
+            }
+
+            // activate if needed
+            if (m_activeBefore == false)
             {
                 if (descriptor->activate)
                     descriptor->activate(handle);
             }
-            descriptor->run(handle, frames);
+
+            // process
+            if (need_extra_buffer)
+            {
+                if (m_hints & PLUGIN_HAS_IN_PLACE_BROKEN)
+                {
+                    // cannot proccess
+                    _proc_lock.unlock();
+                    return;
+                }
+
+                float extra_buffer[frames];
+                memset(extra_buffer, 0, sizeof(float)*frames);
+
+                for (int i=m_channels; i < ains ; i++)
+                {
+                    descriptor->connect_port(handle, m_audioInIndexes.at(i), extra_buffer);
+                    descriptor->connect_port(handle, m_audioOutIndexes.at(i), extra_buffer);
+                }
+            }
+            else
+            {
+                descriptor->run(handle, frames);
+
+                if (need_buffer_copy)
+                {
+                    for (int i=ains; i < m_channels ; i++)
+                        memcpy(dst[i], dst[i-1], sizeof(float)*frames);
+                }
+            }
         }
         else
         {
+            // not active
             if (m_activeBefore)
             {
                 if (descriptor->deactivate)
@@ -1329,6 +1413,7 @@ void Lv2Plugin::process(uint32_t frames)
             }
         }
         m_activeBefore = m_active;
+        _proc_lock.unlock();
     }
 }
 
@@ -1338,35 +1423,191 @@ void Lv2Plugin::bufferSizeChanged(uint32_t)
 
 bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
 {
-    return false;
+    QString new_uri;
+    QString new_label;
+
+    if (readPreset == false)
+        m_channels = 1;
+
+    for (;;)
+    {
+        Xml::Token token(xml.parse());
+        const QString& tag(xml.s1());
+
+        switch (token)
+        {
+            case Xml::Error:
+            case Xml::End:
+                return true;
+
+            case Xml::TagStart:
+                if (readPreset == false && ! _lib)
+                {
+                    LilvNode* pluginURI = lilv_new_uri(lv2world->world, new_uri.toAscii().constData());
+                    lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
+                    lilv_node_free(pluginURI);
+
+                    new_label = QString(lilv_node_as_string(lilv_plugin_get_name(lplug)));
+
+                    if (init(new_uri, new_label))
+                    {
+                        xml.parse1();
+                        break;
+                    }
+                    else
+                        return true;
+                }
+
+                if (tag == "control")
+                {
+                    loadControl(xml);
+                }
+                else if (tag == "active")
+                {
+                    if (readPreset == false)
+                        m_active = xml.parseInt();
+                }
+                else if (tag == "gui")
+                {
+                    bool yesno = xml.parseInt();
+
+                    if (yesno)
+                    {
+                        if (! m_gui)
+                            m_gui = new PluginGui(this);
+                        m_gui->show();
+                    }
+                }
+                else if (tag == "geometry")
+                {
+                    QRect r(readGeometry(xml, tag));
+                    if (m_gui)
+                    {
+                        m_gui->resize(r.size());
+                        m_gui->move(r.topLeft());
+                    }
+                }
+                else
+                    xml.unknown("Lv2Plugin");
+
+                break;
+
+            case Xml::Attribut:
+                if (tag == "uri")
+                {
+                    if (readPreset == false)
+                        new_uri = xml.s2();
+                }
+                else if (tag == "channels")
+                {
+                    if (readPreset == false)
+                        m_channels = xml.s2().toInt();
+                }
+                break;
+
+            case Xml::TagEnd:
+                if (tag == "Lv2Plugin")
+                {
+                    if (! _lib)
+                        return true;
+
+                    if (m_gui)
+                        m_gui->updateValues();
+
+                    return false;
+                }
+                return true;
+
+            default:
+                break;
+        }
+    }
+    return true;
 }
 
 void Lv2Plugin::writeConfiguration(int level, Xml& xml)
 {
-}
+    xml.tag(level++, "Lv2Plugin uri=\"%s\" channels=\"%d\"",
+            Xml::xmlString(m_filename).toLatin1().constData(), m_channels);
 
-uint32_t Lv2Plugin::getCustomURIId(const char *uri)
-{
-    qDebug("Lv2Plugin::getCustomURIId(%s)", uri);
-
-    for (int i=0; i < m_customURIs.count(); i++)
+    for (uint32_t i = 0; i < m_paramCount; i++)
     {
-        if (m_customURIs[i] && strcmp(m_customURIs[i], uri) == 0)
-            return i;
+        double value = m_params[i].value;
+        if (m_params[i].hints & PARAMETER_USES_SAMPLERATE)
+            value /= sampleRate;
+
+        QString s("control symbol=\"%1\" val=\"%2\" /");
+        const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[i].rindex);
+        xml.tag(level, s.arg(lilv_node_as_string(lilv_port_get_symbol(lplug, port))).arg(value, 0, 'f', 6).toLatin1().constData());
     }
 
-    m_customURIs.append(strdup(uri));
-    return m_customURIs.count()-1;
+    // TODO - save state
+
+    xml.intTag(level, "active", m_active);
+
+    if (m_gui)
+    {
+        xml.intTag(level, "gui", 1);
+        xml.geometryTag(level, "geometry", m_gui);
+    }
+
+    xml.tag(level--, "/Lv2Plugin");
 }
 
-const char* Lv2Plugin::getCustomURIString(int uri_id)
+bool Lv2Plugin::loadControl(Xml& xml)
 {
-    qDebug("Lv2Plugin::getCustomURIString(%i)", uri_id);
+    QString symbol;
+    double val = 0.0;
 
-    if (uri_id < m_customURIs.count())
-        return m_customURIs.at(uri_id);
-    else
-        return 0;
+    for (;;)
+    {
+        Xml::Token token = xml.parse();
+        const QString& tag = xml.s1();
+
+        switch (token)
+        {
+        case Xml::Error:
+        case Xml::End:
+            return true;
+
+        case Xml::TagStart:
+            xml.unknown("Lv2Plugin::control");
+            break;
+
+        case Xml::Attribut:
+            if (tag == "symbol")
+                symbol = xml.s2();
+            else if (tag == "val")
+                val = xml.s2().toDouble();
+            break;
+
+        case Xml::TagEnd:
+            if (tag == "control" && symbol.isEmpty() == false && lplug)
+                return setControl(symbol, val);
+            return true;
+
+        default:
+            break;
+        }
+    }
+    return true;
+}
+
+bool Lv2Plugin::setControl(QString symbol, double value)
+{
+    const LilvPort* port;
+    for (uint32_t i = 0; i < m_paramCount; i++)
+    {
+        port = lilv_plugin_get_port_by_index(lplug, m_params[i].rindex);
+        if (QString(lilv_node_as_string(lilv_port_get_symbol(lplug, port))) == symbol)
+        {
+            if (m_params[i].hints & PARAMETER_USES_SAMPLERATE)
+                value *= sampleRate;
+            m_params[i].value = m_params[i].tmpValue = m_paramsBuffer[i] = value;
+            return false;
+        }
+    }
+    return true;
 }
 
 #endif // __PLUGIN_LV2_H__

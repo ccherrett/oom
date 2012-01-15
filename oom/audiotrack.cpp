@@ -168,8 +168,9 @@ void AudioTrack::idlePlugin(BasePlugin* plugin)
 	if(plugin)
 	{
 		audio->process(1);
-		for(int i = 0; i < 7; ++i)
-			plugin->process(1);
+        // falkTX, TODO
+        //for(int i = 0; i < 7; ++i)
+        //    plugin->process(1, 0, 0);
 	}
 }
 
@@ -211,22 +212,22 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
             //else
 #endif
             // Delete the appropriate class
-            qWarning("delete oldPlgin commented here before");
+//            qWarning("delete oldPlgin commented here before");
 
-            switch (oldPlugin->type())
-            {
-            case PLUGIN_LADSPA:
-                delete (LadspaPlugin*)oldPlugin;
-                break;
-            case PLUGIN_LV2:
-                delete (Lv2Plugin*)oldPlugin;
-                break;
-            case PLUGIN_VST:
-                delete (VstPlugin*)oldPlugin;
-                break;
-            default:
-                break;
-            }
+//            switch (oldPlugin->type())
+//            {
+//            case PLUGIN_LADSPA:
+//                delete (LadspaPlugin*)oldPlugin;
+//                break;
+//            case PLUGIN_LV2:
+//                delete (Lv2Plugin*)oldPlugin;
+//                break;
+//            case PLUGIN_VST:
+//                delete (VstPlugin*)oldPlugin;
+//                break;
+//            default:
+//                break;
+//            }
         }
     }
 
@@ -1053,9 +1054,12 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
         if (n >= 0 && n < PipelineDepth)
         {
             p = (*_efxPipe)[n];
-            ParameterPort* cport = p->getParameter(m);
-            if (cport && cport->type == PARAMETER_INPUT && (cport->hints & PARAMETER_IS_AUTOMABLE) > 0)
-                ctlfound = true;
+            if (p)
+            {
+                ParameterPort* cport = p->getParameter(m);
+                if (cport && cport->type == PARAMETER_INPUT && (cport->hints & PARAMETER_IS_AUTOMABLE) > 0)
+                    ctlfound = true;
+            }
         }
 
         iCtrlList icl = _controller.find(l->id());

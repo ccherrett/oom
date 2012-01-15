@@ -160,7 +160,7 @@ void VstPlugin::updateNativeGui()
 {
 }
 
-void VstPlugin::process(uint32_t frames)
+void VstPlugin::process(uint32_t frames, float** src, float** dst)
 {
 }
 
