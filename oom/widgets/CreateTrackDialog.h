@@ -11,25 +11,33 @@
 #include <QMap>
 
 class QShowEvent;
+class QSize;
 
 class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	Q_OBJECT
 
+	int m_height;
+	int m_width;
+
 	int m_insertType;
 	int m_insertPosition;
+	
 	bool m_createMidiInputDevice;
 	bool m_createMidiOutputDevice;
 	bool m_midiSameIO;
+	
 	int m_midiInPort;
 	int m_midiOutPort;
+	
 	bool m_createTrackOnly;
 	int m_showJackAliases;
+	
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;
 	
 	void importInputs();
 	void importOutputs();
-	void setTitleText();
+
 	void populateInputList();
 	void populateOutputList();
 	void populateNewInputList();
@@ -37,20 +45,23 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	void populateInstrumentList();
 	void populateMonitorList();
 	void populateBussList();
-	void hideMidiElements();
-	void showAllElements();
+	
+	void updateVisibleElements();
+	
 	int getFreeMidiPort();
+	
 	void createMonitorInputTracks(QString);
 
 private slots:
 	void addTrack();
 	void updateInputSelected(bool);
 	void updateOutputSelected(bool);
+	void updateBussSelected(bool);
 	void trackTypeChanged(int);
-	void monitorChecked(bool);
 
 protected:
 	virtual void showEvent(QShowEvent*);
+	//virtual QSize sizeHint();
 
 signals:
 	void trackAdded(QString);
