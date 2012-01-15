@@ -349,7 +349,7 @@ static const char* oom_lv2_urid_unmap(LV2_URID_Map_Handle handle, LV2_URID urid)
 // ----------------- Event Feature ---------------------------------------------------
 static uint32_t oom_lv2_event_ref(LV2_Event_Callback_Data data, LV2_Event* event)
 {
-    qDebug("Lv2AudioPlugin::carla_lv2_event_ref(%p, %p)", data, event);
+    qDebug("oom_lv2_event_ref(%p, %p)", data, event);
 
     // TODO
     return 0;
@@ -357,7 +357,7 @@ static uint32_t oom_lv2_event_ref(LV2_Event_Callback_Data data, LV2_Event* event
 
 static uint32_t oom_lv2_event_unref(LV2_Event_Callback_Data data, LV2_Event* event)
 {
-    qDebug("Lv2AudioPlugin::carla_lv2_event_unref(%p, %p)", data, event);
+    qDebug("oom_lv2_event_unref(%p, %p)", data, event);
 
     // TODO
     return 0;
