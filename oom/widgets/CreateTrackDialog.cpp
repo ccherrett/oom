@@ -31,11 +31,17 @@ m_insertPosition(pos)
 	setupUi(this);
 	m_createMidiInputDevice = false;
 	m_createMidiOutputDevice = false;
+	
 	m_midiSameIO = false;
 	m_createTrackOnly = false;
 	m_showJackAliases = -1;
+	
 	m_midiInPort = -1;
 	m_midiOutPort = -1;
+
+	m_height = 260;
+	m_width = 450;
+
 	txtInChannel->setValue(1);
 	txtOutChannel->setValue(1);
 	
@@ -45,11 +51,13 @@ m_insertPosition(pos)
 	cmbType->addItem(*addInputIcon, tr("Input"), Track::AUDIO_INPUT);
 	cmbType->addItem(*addBussIcon, tr("Buss"), Track::AUDIO_BUSS);
 	cmbType->addItem(*addAuxIcon, tr("Aux Send"), Track::AUDIO_AUX);
+	
 	int row = cmbType->findData(m_insertType);
 	cmbType->setCurrentIndex(row);
 
 	connect(chkInput, SIGNAL(toggled(bool)), this, SLOT(updateInputSelected(bool)));
 	connect(chkOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
+	connect(chkBuss, SIGNAL(toggled(bool)), this, SLOT(updateBussSelected(bool)));
 	connect(cmbType, SIGNAL(currentIndexChanged(int)), this, SLOT(trackTypeChanged(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 }
@@ -508,7 +516,7 @@ void CreateTrackDialog::addTrack()
 }
 
 //Input raw slot
-void CreateTrackDialog::updateInputSelected(bool raw)
+void CreateTrackDialog::updateInputSelected(bool raw)/*{{{*/
 {
 	if(raw)
 	{
@@ -522,10 +530,10 @@ void CreateTrackDialog::updateInputSelected(bool raw)
 		lblInput->setEnabled(true);
 		txtInChannel->setEnabled(true);
 	}
-}
+}/*}}}*/
 
 //Output raw slot
-void CreateTrackDialog::updateOutputSelected(bool raw)
+void CreateTrackDialog::updateOutputSelected(bool raw)/*{{{*/
 {
 	if(raw)
 	{
@@ -539,15 +547,27 @@ void CreateTrackDialog::updateOutputSelected(bool raw)
 		lblOutput->setEnabled(true);
 		txtOutChannel->setEnabled(true);
 	}
-}
+}/*}}}*/
+
+void CreateTrackDialog::updateBussSelected(bool raw)/*{{{*/
+{
+	if(raw)
+	{
+		cmbBuss->setEnabled(false);
+		lblBuss->setEnabled(false);
+	}
+	else
+	{
+		cmbBuss->setEnabled(true);
+		lblBuss->setEnabled(true);
+	}
+}/*}}}*/
 
 //Track type combo slot
 void CreateTrackDialog::trackTypeChanged(int type)
 {
 	m_insertType = cmbType->itemData(type).toInt();
-	chkInput->setChecked(false);
-	chkOutput->setChecked(false);
-	showAllElements();
+	updateVisibleElements();
 	populateInputList();
 	populateOutputList();
 	populateInstrumentList();
@@ -555,12 +575,7 @@ void CreateTrackDialog::trackTypeChanged(int type)
 	populateBussList();
 }
 
-void CreateTrackDialog::monitorChecked(bool checked)
-{
-	cmbMonitor->setEnabled(checked);
-}
-
-void CreateTrackDialog::createMonitorInputTracks(QString name)
+void CreateTrackDialog::createMonitorInputTracks(QString name)/*{{{*/
 {
 	int monitorIndex = cmbMonitor->currentIndex();
 	int bussIndex = cmbBuss->currentIndex();
@@ -571,12 +586,15 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 	//QString audioName = QString("A-").append(name);
 	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
 	Track* buss = 0;
-	if(newBuss)
-		buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
-	else
-		buss = song->findTrack(cmbBuss->itemText(bussIndex));
+	if(!chkBuss->isChecked())
+	{
+		if(newBuss)
+			buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
+		else
+			buss = song->findTrack(cmbBuss->itemText(bussIndex));
+	}
 	//Track* audiot = song->addTrackByName(audioName, Track::WAVE, -1, false);
-	if(input && buss/* && audiot*/)
+	if(input/* && audiot*/)
 	{
 		input->setMute(false);
 		QString selectedInput = cmbMonitor->itemText(monitorIndex);
@@ -585,11 +603,13 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 		QString jackCapture("system:capture");
 		if(selectedInput.startsWith(jackCapture))
 		{
+			//Route channel 1
 			Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
 			Route dstRoute(input, 0);
 			srcRoute.channel = 0;
 			audio->msgAddRoute(srcRoute, dstRoute);
 
+			//Route channel 2
 			Route srcRoute2(QString(jackCapture).append("_2"), false, -1, Route::JACK_ROUTE);
 			Route dstRoute2(input, 1);
 			srcRoute2.channel = 1;
@@ -597,11 +617,13 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 		}
 		else
 		{
+			//Route channel 1
 			Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
 			Route dstRoute(input, 0);
 			srcRoute.channel = 0;
 			audio->msgAddRoute(srcRoute, dstRoute);
 
+			//Route channel 2
 			Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
 			Route dstRoute2(input, 1);
 			srcRoute2.channel = 1;
@@ -612,10 +634,13 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 		audio->msgUpdateSoloStates();
 		song->update(SC_ROUTE);
 		
-		Route srcRoute(input, 0, input->channels());
-		Route dstRoute(buss->name(), true, -1);
+		if(!chkBuss->isChecked() && buss)
+		{
+			Route srcRoute(input, 0, input->channels());
+			Route dstRoute(buss->name(), true, -1);
 
-		audio->msgAddRoute(srcRoute, dstRoute);
+			audio->msgAddRoute(srcRoute, dstRoute);
+		}
 
 		//Route input to audio
 		/*Route srcRoute2(input, 0, input->channels());
@@ -628,10 +653,20 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 		if(master)
 		{
 			//Route buss track to master
-			Route srcRoute3(buss, 0, buss->channels());
-			Route dstRoute3(master->name(), true, -1);
+			if(!chkBuss->isChecked() && buss)
+			{
+				Route srcRoute3(buss, 0, buss->channels());
+				Route dstRoute3(master->name(), true, -1);
 		
-			audio->msgAddRoute(srcRoute3, dstRoute3);
+				audio->msgAddRoute(srcRoute3, dstRoute3);
+			}
+			else
+			{//Route input directly to Master
+				Route srcRoute3(input, 0, input->channels());
+				Route dstRoute3(master->name(), true, -1);
+		
+				audio->msgAddRoute(srcRoute3, dstRoute3);
+			}
 
 			//Route audio track to master
 			/*Route srcRoute4(audiot, 0, audiot->channels());
@@ -643,51 +678,6 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 		audio->msgUpdateSoloStates();
 		song->update(SC_ROUTE);
 	}
-}
-
-void CreateTrackDialog::setTitleText()/*{{{*/
-{
-	/*QString trackLabel(tr("Create new %1 track"));
-	Track::TrackType type = (Track::TrackType)m_insertType;
-	switch(type)
-	{
-		case Track::MIDI:
-		case Track::DRUM:
-		{
-			lblType->setText(trackLabel.arg(tr("MIDI")));
-		}
-		break;
-		case Track::WAVE:
-		{
-			lblType->setText(trackLabel.arg(tr("Audio")));
-		}
-		break;
-		case Track::AUDIO_OUTPUT:
-		{
-			lblType->setText(trackLabel.arg(tr("Output")));
-		}
-		break;
-		case Track::AUDIO_INPUT:
-		{
-			lblType->setText(trackLabel.arg(tr("Input")));
-		}
-		break;
-		case Track::AUDIO_BUSS:
-		{
-			lblType->setText(trackLabel.arg(tr("Buss")));
-		}
-		break;
-		case Track::AUDIO_AUX:
-		{
-			lblType->setText(trackLabel.arg(tr("Aux")));
-		}
-		break;
-		case Track::AUDIO_SOFTSYNTH:
-		{
-			lblType->setText(trackLabel.arg(tr("Synth")));
-		}
-		break;
-	}*/
 }/*}}}*/
 
 //Populate input combo based on type
@@ -731,7 +721,6 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		break;
 		case Track::WAVE:
 		{
-			hideMidiElements();
 			for(iTrack it = song->inputs()->begin(); it != song->inputs()->end(); ++it)
 			{
 				cmbInput->addItem((*it)->name(), 0);
@@ -745,7 +734,6 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		break;
 		case Track::AUDIO_OUTPUT:
 		{
-			hideMidiElements();
 			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 			{
 				if((*t)->isMidiTrack() || (*t)->type() == Track::AUDIO_OUTPUT)
@@ -763,7 +751,6 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		break;
 		case Track::AUDIO_INPUT:
 		{
-			hideMidiElements();
 			importOutputs();
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
@@ -773,7 +760,6 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		break;
 		case Track::AUDIO_BUSS:
 		{
-			hideMidiElements();
 			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 			{
 				if((*t)->isMidiTrack())
@@ -792,14 +778,6 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		break;
 		case Track::AUDIO_AUX:
 		case Track::AUDIO_SOFTSYNTH:
-			hideMidiElements();
-			setMaximumHeight(100);
-			//resize(width(), 100);
-			updateGeometry();
-			cmbInput->setVisible(false);
-			lblInput->setVisible(false);
-			txtInChannel->setVisible(false);
-			chkInput->setVisible(false);
 		break;
 	}
 }/*}}}*/
@@ -844,7 +822,6 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 		break;
 		case Track::WAVE:
 		{
-
 			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 			{
 				if((*t)->isMidiTrack())
@@ -909,10 +886,6 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 		break;
 		case Track::AUDIO_AUX:
 		case Track::AUDIO_SOFTSYNTH:
-			cmbOutput->setVisible(false);
-			lblOutput->setVisible(false);
-			txtOutChannel->setVisible(false);
-			chkOutput->setVisible(false);
 		break;
 	}
 }/*}}}*/
@@ -939,7 +912,7 @@ void CreateTrackDialog::importInputs()/*{{{*/
 	}
 }/*}}}*/
 
-void CreateTrackDialog::populateMonitorList()
+void CreateTrackDialog::populateMonitorList()/*{{{*/
 {
 	while(cmbMonitor->count())
 		cmbMonitor->removeItem(cmbMonitor->count()-1);
@@ -950,9 +923,9 @@ void CreateTrackDialog::populateMonitorList()
 			cmbMonitor->addItem(*i, 1);
 		}
 	}
-}
+}/*}}}*/
 
-void CreateTrackDialog::populateBussList()
+void CreateTrackDialog::populateBussList()/*{{{*/
 {
 	while(cmbBuss->count())
 		cmbBuss->removeItem(cmbBuss->count()-1);
@@ -961,7 +934,7 @@ void CreateTrackDialog::populateBussList()
 	{
 		cmbBuss->addItem((*it)->name(), 0);
 	}
-}
+}/*}}}*/
 
 void CreateTrackDialog::populateNewInputList()/*{{{*/
 {
@@ -1030,42 +1003,153 @@ int CreateTrackDialog::getFreeMidiPort()/*{{{*/
 	return rv;
 }/*}}}*/
 
-void CreateTrackDialog::hideMidiElements()/*{{{*/
+void CreateTrackDialog::updateVisibleElements()/*{{{*/
 {
-	txtInChannel->setVisible(false);
-	txtOutChannel->setVisible(false);
-	lblInstrument->setVisible(false);
-	cmbInstrument->setVisible(false);
-	cmbMonitor->setVisible(false);
-	midiBox->setVisible(false);
-	setMaximumHeight(160);
-	//resize(width(), 160);
-	updateGeometry();
-}/*}}}*/
+	chkInput->setChecked(false);
+	chkOutput->setChecked(false);
+	chkBuss->setChecked(false);
 
-void CreateTrackDialog::showAllElements()/*{{{*/
-{
-	txtInChannel->setVisible(true);
-	txtOutChannel->setVisible(true);
-	lblInstrument->setVisible(true);
-	cmbInstrument->setVisible(true);
-	cmbMonitor->setVisible(true);
-	cmbInput->setVisible(true);
-	lblInput->setVisible(true);
-	cmbOutput->setVisible(true);
-	lblOutput->setVisible(true);
-	midiBox->setVisible(true);
-	setMaximumHeight(260);
-	chkInput->setVisible(true);
-	chkOutput->setVisible(true);
-	resize(width(), 260);
+	Track::TrackType type = (Track::TrackType)m_insertType;
+	switch (type)
+	{
+		case Track::MIDI:
+		case Track::DRUM:
+		{
+			txtInChannel->setVisible(true);
+			txtOutChannel->setVisible(true);
+			lblInstrument->setVisible(true);
+			cmbInstrument->setVisible(true);
+			cmbMonitor->setVisible(true);
+			cmbInput->setVisible(true);
+			lblInput->setVisible(true);
+			chkInput->setVisible(true);
+			cmbOutput->setVisible(true);
+			lblOutput->setVisible(true);
+			chkOutput->setVisible(true);
+			midiBox->setVisible(true);
+
+			m_height = 260;
+			m_width = width();
+		}
+		break;
+		case Track::AUDIO_OUTPUT:
+		{
+			txtInChannel->setVisible(false);
+			txtOutChannel->setVisible(false);
+			lblInstrument->setVisible(false);
+			cmbInstrument->setVisible(false);
+			cmbMonitor->setVisible(false);
+			midiBox->setVisible(false);
+
+			cmbInput->setVisible(true);
+			lblInput->setVisible(true);
+			chkInput->setVisible(true);
+			cmbOutput->setVisible(true);
+			lblOutput->setVisible(true);
+			chkOutput->setVisible(true);
+			
+			m_height = 160;
+			m_width = width();
+		}
+		break;
+		case Track::AUDIO_INPUT:
+		{
+			txtInChannel->setVisible(false);
+			txtOutChannel->setVisible(false);
+			lblInstrument->setVisible(false);
+			cmbInstrument->setVisible(false);
+			cmbMonitor->setVisible(false);
+			midiBox->setVisible(false);
+
+			cmbInput->setVisible(true);
+			lblInput->setVisible(true);
+			chkInput->setVisible(true);
+			cmbOutput->setVisible(true);
+			lblOutput->setVisible(true);
+			chkOutput->setVisible(true);
+			
+			m_height = 160;
+			m_width = width();
+		}
+		break;
+		case Track::WAVE:
+		{
+			txtInChannel->setVisible(false);
+			txtOutChannel->setVisible(false);
+			lblInstrument->setVisible(false);
+			cmbInstrument->setVisible(false);
+			cmbMonitor->setVisible(false);
+			midiBox->setVisible(false);
+
+			cmbInput->setVisible(true);
+			lblInput->setVisible(true);
+			chkInput->setVisible(true);
+			cmbOutput->setVisible(true);
+			lblOutput->setVisible(true);
+			chkOutput->setVisible(true);
+			
+			m_height = 160;
+			m_width = width();
+		}
+		break;
+		case Track::AUDIO_BUSS:
+		{
+			txtInChannel->setVisible(false);
+			txtOutChannel->setVisible(false);
+			lblInstrument->setVisible(false);
+			cmbInstrument->setVisible(false);
+			cmbMonitor->setVisible(false);
+			midiBox->setVisible(false);
+
+			cmbInput->setVisible(true);
+			lblInput->setVisible(true);
+			chkInput->setVisible(true);
+			cmbOutput->setVisible(true);
+			lblOutput->setVisible(true);
+			chkOutput->setVisible(true);
+			
+			m_height = 160;
+			m_width = width();
+		}
+		break;
+		case Track::AUDIO_AUX:
+		{
+			txtInChannel->setVisible(false);
+			txtOutChannel->setVisible(false);
+			lblInstrument->setVisible(false);
+			cmbInstrument->setVisible(false);
+			cmbMonitor->setVisible(false);
+			
+			midiBox->setVisible(false);
+			
+			cmbInput->setVisible(false);
+			lblInput->setVisible(false);
+			txtInChannel->setVisible(false);
+			chkInput->setVisible(false);
+
+			cmbOutput->setVisible(false);
+			lblOutput->setVisible(false);
+			txtOutChannel->setVisible(false);
+			chkOutput->setVisible(false);
+			
+			m_height = 100;
+			m_width = width();
+		}
+		case Track::AUDIO_SOFTSYNTH:
+		{
+		}
+		break;
+		default:
+		break;
+	}
+	setFixedHeight(m_height);
 	updateGeometry();
 }/*}}}*/
 
 void CreateTrackDialog::showEvent(QShowEvent*)
 {
 	qDebug("Inside CreateTrackDialog::showEvent trackType: %i, position: %i", m_insertType, m_insertPosition);
-	//setTitleText();
+	updateVisibleElements();
 	populateInputList();
 	populateOutputList();
 	populateInstrumentList();
@@ -1073,3 +1157,8 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 	populateBussList();
 }
 
+/*QSize CreateTrackDialog::sizeHint()
+{
+	return QSize(m_width, m_height);
+	//return QSize(450, 100);
+}*/

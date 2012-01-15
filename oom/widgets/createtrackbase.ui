@@ -254,7 +254,7 @@ This is required for tracks connected to LinuxSampler , if not previously config
        <number>0</number>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="lblMonitor">
         <property name="text">
          <string>Audio Input</string>
         </property>
@@ -271,24 +271,38 @@ This is required for tracks connected to LinuxSampler , if not previously config
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="lblBuss">
         <property name="text">
          <string>Audio Buss</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="cmbBuss">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-        <property name="insertPolicy">
-         <enum>QComboBox::InsertAlphabetically</enum>
-        </property>
-       </widget>
+        <item>
+         <widget class="QComboBox" name="cmbBuss">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkBuss">
+          <property name="toolTip">
+           <string>Skip Creating/Using route to Buss</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
