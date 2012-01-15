@@ -11,99 +11,63 @@
 #define _PLUGINGUI_H_
 
 #include <QMainWindow>
-#include <QUiLoader>
 
-class QAbstractButton;
-class QComboBox;
-class QRadioButton;
-class QScrollArea;
-class QToolButton;
-class PluginIBase;
-
-class Xml;
-class Slider;
+class QAction;
+class BasePlugin;
 class DoubleLabel;
-class AudioTrack;
-class MidiController;
-class PluginGui;
+class QScrollArea;
 
 //---------------------------------------------------------
 //   GuiParam
 //---------------------------------------------------------
 
-struct GuiParam/*{{{*/
-{
-    enum
-    {
-        GUI_SLIDER, GUI_SWITCH
-    };
+struct GuiParam {
+    enum { GUI_NULL, GUI_SLIDER, GUI_SWITCH };
     int type;
-    int hint;
-
+    int hints;
     DoubleLabel* label;
     QWidget* actuator; // Slider or Toggle Button (SWITCH)
-};/*}}}*/
-
-//---------------------------------------------------------
-//   GuiWidgets
-//---------------------------------------------------------
-
-struct GuiWidgets/*{{{*/
-{
-    enum
-    {
-        SLIDER, DOUBLE_LABEL, QCHECKBOX, QCOMBOBOX
-    };
-    QWidget* widget;
-    int type;
-    int param;
-};/*}}}*/
-
+};
 
 //---------------------------------------------------------
 //   PluginGui
 //---------------------------------------------------------
-class PluginGui : public QMainWindow/*{{{*/
+class PluginGui : public QMainWindow
 {
     Q_OBJECT
 
-    PluginIBase* plugin; // plugin instance
+public:
+    PluginGui(BasePlugin*);
+    ~PluginGui();
 
-    GuiParam* params;
-    int nobj; // number of widgets in gw
-    GuiWidgets* gw;
+    void setActive(bool);
+    void setParameterValue(int index, double value);
+    void updateValues();
 
-    QAction* onOff;
+protected slots:
+    void heartBeat();
+
+private:
+    BasePlugin* const plugin;
+
     QWidget* mw; // main widget
     QScrollArea* view;
 
-    virtual void updateControls();
+    QAction* pluginBypass;
+    GuiParam* params;
+
+    void updateControls();
 
 private slots:
-    virtual void load();
-    virtual void save();
-    virtual void bypassToggled(bool);
-    virtual void sliderChanged(double, int);
-    virtual void labelChanged(double, int);
-    virtual void guiParamChanged(int);
-    virtual void ctrlPressed(int);
-    virtual void ctrlReleased(int);
-    virtual void guiParamPressed(int);
-    virtual void guiParamReleased(int);
-    virtual void guiSliderPressed(int);
-    virtual void guiSliderReleased(int);
-    virtual void ctrlRightClicked(const QPoint &, int);
-    virtual void guiSliderRightClicked(const QPoint &, int);
-
-protected slots:
-    virtual void heartBeat();
-
-public:
-    PluginGui(PluginIBase*);
-
-    ~PluginGui();
-    void setOn(bool);
-    virtual void updateValues();
-};/*}}}*/
+    void load();
+    void save();
+    void reset();
+    void bypassToggled(bool);
+    void sliderChanged(double, int);
+    void labelChanged(double, int);
+    void ctrlPressed(int);
+    void ctrlReleased(int);
+    void ctrlRightClicked(const QPoint &, int);
+};
 
 #endif

@@ -228,15 +228,6 @@ HEADERS = \
 ./oom/device.h \
 ./oom/cthread.h \
 ./oom/cserver.h \
-./plugins/freeverb/denormals.h \
-./plugins/freeverb/comb.h \
-./plugins/freeverb/tuning.h \
-./plugins/freeverb/revmodel.h \
-./plugins/freeverb/allpass.h \
-./plugins/doublechorus/simplechorusmodel.h \
-./plugins/doublechorus/doublechorusmodel.h \
-./plugins/pandelay/ladspapandelay.h \
-./plugins/pandelay/pandelaymodel.h \
 ./config.h \
 ./synti/deicsonze/newpreset.h \
 ./synti/deicsonze/deicsonze.h \
@@ -373,6 +364,9 @@ SOURCES =  \
 ./oom/confmport.cpp \
 ./oom/transpose.cpp \
 ./oom/plugin.cpp \
+./oom/plugin_ladspa.cpp \
+./oom/plugin_lv2.cpp \
+./oom/plugin_vst.cpp \
 ./oom/importmidi.cpp \
 ./oom/widgets/slider.non-libtool.cpp \
 ./oom/widgets/moc_bigtime.cpp \
@@ -533,7 +527,6 @@ SOURCES =  \
 ./oom/globals.cpp \
 ./oom/route.cpp \
 ./oom/transport.cpp \
-./oom/moc_plugin.cpp \
 ./oom/part.cpp \
 ./oom/audio.cpp \
 ./oom/mixer/panknob.cpp \

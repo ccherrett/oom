@@ -122,18 +122,26 @@ void MidiMonitor::updateSongNow()
         for (int i=0; i < m_lastFeedbackMessages.count(); i++)
         {
             LastFeedbackMessage* msg = &m_lastFeedbackMessages[i];
-
             LastMidiInMessage* lastMsg = getLastMidiInMessage(msg->controller);
-            if (lastMsg && lastMsg->lastTick <= tick && ((m_feedback && m_feedbackMode == FEEDBACK_MODE_WRITE) || tick - lastMsg->lastTick < 384))
+
+            if (lastMsg)
             {
+                // ignore message if in write mode
+                if (m_feedback && m_feedbackMode == FEEDBACK_MODE_WRITE)
+                    continue;
+
+                // ignore message if last midi-in was less than 384 ticks ago
+                if (lastMsg->lastTick <= tick && tick - lastMsg->lastTick < 384)
+                    continue;
+
+                // if message > 384 ticks and audition is on, stop playback
                 if (m_feedback && m_feedbackMode == FEEDBACK_MODE_AUDITION)
                 {
                     qWarning("Audition stop!");
                     song->stopRolling();
                     song->setPos(Song::CPOS, Pos(lastMsg->lastTick, true), true, true, true);
+                    break;
                 }
-                else
-                    continue;
             }
 
             qWarning("Audition continue");

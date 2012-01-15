@@ -82,7 +82,7 @@ SET(OOMidi_INSTALL_NAME  "oom-${OOMidi_VERSION}")
 SET(OOMidi_EXEC_NAME     "oomidi")
 SET(OOMidi_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/bin/${OOMidi_EXEC_NAME}")
 SET(OOMIDI_DEPS_DIR "${PROJECT_SOURCE_DIR}/dependencies")
-SET(OOMIDI_LV2_INCLUDES "${PROJECT_SOURCE_DIR}/oom/lv2_includes")
+SET(OOMIDI_PLUGIN_INCLUDES "${PROJECT_SOURCE_DIR}/oom/plugin_includes")
 
 ## The library where we will install the shared components:
 SET(OOMidi_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/modules)
@@ -92,7 +92,7 @@ SET(OOMidi_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/modules)
 SET(OOMidi_SYNTHI_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/synthi)
 
 ## Plugins directory
-SET(OOMidi_PLUGINS_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/plugins)
+#SET(OOMidi_PLUGINS_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/plugins)
 
 ## Top documentation dir
 IF(NOT DEFINED OOMidi_DOC_DIR)
@@ -238,9 +238,9 @@ else (JACK2_FOUND)
 endif (JACK2_FOUND)
 
 ##
-## Set the internal  lv2_include path
+## Set the plugin headers path
 ##
-include_directories(${OOMIDI_LV2_INCLUDES})
+include_directories(${OOMIDI_PLUGIN_INCLUDES})
 
 CHECK_INCLUDE_FILES (wordexp.h HAVE_WORDEXP)
 
@@ -459,7 +459,7 @@ set(CMAKE_C_FLAGS         "${CMAKE_CXX_FLAGS} -std=c99 -fvisibility=hidden")
 #       are scanned before coming to share/locale
 #subdirs(al awl grepmidi man plugins oom synti packaging utils share oostudio)
 
-subdirs(al awl man plugins ${LILV_DEPS} oom synti packaging utils share oostudio patchcanvas)
+subdirs(al awl man ${LILV_DEPS} oom synti packaging utils share oostudio patchcanvas)
 
 ## Install doc files
 file (GLOB doc_files

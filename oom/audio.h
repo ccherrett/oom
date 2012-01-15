@@ -16,7 +16,7 @@
 #include "event.h"
 
 class SndFile;
-class PluginI;
+class BasePlugin;
 class SynthI;
 class MidiDevice;
 class AudioDevice;
@@ -96,7 +96,7 @@ struct AudioMsg : public ThreadMsg
     int ival;
     int iival;
     double dval;
-    PluginI* plugin;
+    BasePlugin* plugin;
     SynthI* synth;
     Part* spart;
     Part* dpart;
@@ -263,8 +263,8 @@ public:
     void msgRemoveRoutes1(Route, Route); // p3.3.55
     void msgAddRoute(Route, Route);
     void msgAddRoute1(Route, Route);
-    void msgAddPlugin(AudioTrack*, int idx, PluginI* plugin);
-    void msgIdlePlugin(AudioTrack*, PluginI* plugin);
+    void msgAddPlugin(AudioTrack*, int idx, BasePlugin* plugin);
+    void msgIdlePlugin(AudioTrack*, BasePlugin* plugin);
     void msgSetMute(AudioTrack*, bool val);
     void msgSetVolume(AudioTrack*, double val);
     void msgSetPan(AudioTrack*, double val);
@@ -282,7 +282,7 @@ public:
     void msgResetMidiDevices();
     void msgIdle(bool);
     void msgBounce();
-    //void msgSetPluginCtrlVal(PluginI* /*plugin*/, int /*param*/, double /*val*/);
+    //void msgSetPluginCtrlVal(BasePlugin* /*plugin*/, int /*param*/, double /*val*/);
     void msgSetPluginCtrlVal(AudioTrack*, int /*param*/, double /*val*/);
     void msgSwapControllerIDX(AudioTrack*, int, int);
     void msgClearControllerEvents(AudioTrack*, int);
@@ -301,7 +301,7 @@ public:
     void msgSetSendMetronome(AudioTrack*, bool);
 
     void msgPlayMidiEvent(const MidiPlayEvent* event);
-	void msgPreloadCtrl();
+    void msgPreloadCtrl();
     void rescanAlsaPorts();
 
     void midiPortsChanged();
@@ -339,7 +339,7 @@ public:
     void processMidi();
     unsigned curFrame() const;
     void recordStop();
-	void preloadControllers();
+    void preloadControllers();
 
     bool freewheel() const
     {
