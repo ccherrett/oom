@@ -300,7 +300,7 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 
         if (ai != ao)
             // we can only safely process if inputs match outputs (of fx, not synth plugins)
-            return;
+            continue;
 
 		bool addFlag = false;
 		bool stereo = false;
@@ -372,7 +372,7 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 
         if (ai != ao)
             // we can only safely process if inputs match outputs (of fx, not synth plugins)
-            return;
+            continue;
 
 		bool addFlag = false;
 		bool stereo = false;
