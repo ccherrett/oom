@@ -2,5 +2,6 @@
 *.swo
 build/
 build-debug/
+oom/plugin_includes/pluginterfaces/
 .svn/
 .directory

@@ -546,7 +546,7 @@ void Track::clearRecAutomation(bool clearList)
 
 	AudioTrack *t = (AudioTrack*)this;
 	Pipeline *pl = t->efxPipe();
-	PluginI *p;
+	BasePlugin *p;
 	for (iPluginI i = pl->begin(); i != pl->end(); ++i)
 	{
 		p = *i;
