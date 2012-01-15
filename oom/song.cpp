@@ -1873,7 +1873,7 @@ void Song::beat()
 	for (ciSynthI is = _synthIs.begin(); is != _synthIs.end(); ++is)
 		(*is)->guiHeartBeat();
 	
-	//Update LV2 native guis
+	//Update native guis
 	for(ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
 	{
 		if((*i)->isMidiTrack())
@@ -1881,7 +1881,7 @@ void Song::beat()
 		AudioTrack* t = (AudioTrack*)*i;
 		if(t)
 		{
-			t->efxPipe()->updateNativeGui();
+			t->efxPipe()->updateGuis();
 		}
 	}
 

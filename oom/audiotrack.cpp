@@ -185,48 +185,47 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
         BasePlugin* oldPlugin = (*_efxPipe)[idx];
         if (oldPlugin)
         {
-                oldPlugin->setId(-1);
-                oldPlugin->setTrack(0);
+            oldPlugin->setId(-1);
+            oldPlugin->setTrack(0);
 
-                uint32_t paramCount = oldPlugin->getParameterCount();
-                for (uint32_t i = 0; i < paramCount; i++)
-                {
-                    ParameterPort* paramPort = oldPlugin->getParameter(i);
-                    if (! paramPort || paramPort->type != PARAMETER_INPUT || (paramPort->hints & PARAMETER_IS_AUTOMABLE) == 0)
-                        continue;
+            uint32_t paramCount = oldPlugin->getParameterCount();
+            for (uint32_t i = 0; i < paramCount; i++)
+            {
+                ParameterPort* paramPort = oldPlugin->getParameter(i);
+                if (! paramPort || paramPort->type != PARAMETER_INPUT || (paramPort->hints & PARAMETER_IS_AUTOMABLE) == 0)
+                    continue;
 
-                    int id = genACnum(idx, i);
-                    removeController(id);
-                }
+                int id = genACnum(idx, i);
+                removeController(id);
+            }
 
 #if 0 //def LV2_SUPPORT
-                if(oldPlugin->type() == LV2)
-                {
-                        LV2PluginI* plug = (LV2PluginI*)oldPlugin;
-                        if(plug)
-                                plug->setStop(true);
-                        //if(plug)
-                        //      delete plug;
-                }
-                //else
+            if(oldPlugin->type() == LV2)
+            {
+                    LV2PluginI* plug = (LV2PluginI*)oldPlugin;
+                    if(plug)
+                            plug->setStop(true);
+                    //if(plug)
+                    //      delete plug;
+            }
+            //else
 #endif
-                // Delete the appropriate class
-                qWarning("delete oldPlgin commented here before");
+            // Delete the appropriate class
+            qWarning("delete oldPlgin commented here before");
 
-                switch(oldPlugin->type())
-                {
-                case PLUGIN_LADSPA:
-                    delete (LadspaPlugin*)oldPlugin;
-                    break;
-                case PLUGIN_LV2:
-                    delete (Lv2Plugin*)oldPlugin;
-                    break;
-                case PLUGIN_VST:
-                    delete (VstPlugin*)oldPlugin;
-                    break;
-                default:
-                    break;
-                }
+            switch (oldPlugin->type())
+            {
+            case PLUGIN_LADSPA:
+                delete (LadspaPlugin*)oldPlugin;
+                break;
+            case PLUGIN_LV2:
+                delete (Lv2Plugin*)oldPlugin;
+                break;
+            case PLUGIN_VST:
+                delete (VstPlugin*)oldPlugin;
+                break;
+            default:
+                break;
             }
         }
     }
@@ -1101,6 +1100,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 
 void AudioTrack::showPendingPluginNativeGuis()
 {
+#if 0
 	for (int idx = 0; idx < PipelineDepth; ++idx)
 	{
 		BasePlugin* p = (*_efxPipe)[idx];
@@ -1112,6 +1112,7 @@ void AudioTrack::showPendingPluginNativeGuis()
 			p->showNativeGui(true);
 		}
 	}
+#endif
 }
 
 //---------------------------------------------------------
@@ -1140,7 +1141,7 @@ void AudioTrack::mapRackPluginsToControllers()
 				(*_efxPipe)[i] = 0;
 				(*_efxPipe)[idx] = p;
 			}
-			p->setID(idx);
+			p->setId(idx);
 
 			// It is now safe to update the controllers.
 			p->updateControllers();

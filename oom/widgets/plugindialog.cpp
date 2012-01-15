@@ -8,7 +8,6 @@
 //=========================================================
 
 #include <QtGui>
-#include "plugin.h"
 #include "config.h"
 #include "plugindialog.h"
 #include "traverso_shared/TConfig.h"
@@ -24,7 +23,7 @@ QStringList PluginDialog::sortItems = QStringList();
 PluginDialog::PluginDialog(QWidget* parent)
 : QDialog(parent)
 {
-	m_display_type = 1; //Default to LV2
+	m_display_type = PLUGIN_LV2;
 
 	setWindowTitle(tr("OOMidi: select plugin"));
 	QVBoxLayout* vbox = new QVBoxLayout(this);
@@ -155,8 +154,8 @@ PluginDialog::PluginDialog(QWidget* parent)
 
 	m_cmbType = new QComboBox(this);
 	m_cmbType->addItem("LADSPA");
-	//m_cmbType->addItem("DSSI");
 	m_cmbType->addItem("LV2");
+        m_cmbType->addItem("VST");
 	m_cmbType->setCurrentIndex(1);
 	panelbox->addWidget(m_cmbType);
 	panelbox->addWidget(sortLabel);
@@ -208,7 +207,7 @@ void PluginDialog::hideEvent(QHideEvent* e)
 	if(!e->spontaneous())
 	{
 		tconfig().set_property("PluginDialog", "geometry", geometry());
-		tconfig().set_property("PluginDialog", "plugin_type", m_display_type);
+		tconfig().set_property("PluginDialog", "plugin_type", m_cmbType->currentIndex());
 		tconfig().set_property("PluginDialog", "channel_type", selectedPlugType);
 		tconfig().save();
 	}
@@ -227,7 +226,7 @@ void PluginDialog::enableOkB()
 //   value
 //---------------------------------------------------------
 
-Plugin* PluginDialog::value()/*{{{*/
+PluginI* PluginDialog::value()/*{{{*/
 {
 	QTreeWidgetItem* item = pList->currentItem();
 	if (item)
@@ -257,7 +256,13 @@ void PluginDialog::accept()/*{{{*/
 
 void PluginDialog::typeChanged(int index)
 {
-	m_display_type = index;
+    if (index == 0)
+        m_display_type = PLUGIN_LADSPA;
+    else if (index == 1)
+        m_display_type = PLUGIN_LV2;
+    else if (index == 2)
+        m_display_type = PLUGIN_VST;
+
 	if (!sortBox->currentText().isEmpty())
 		fillPlugs(sortBox->currentText());
 	else
@@ -285,8 +290,11 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 	pList->clear();
 	for (iPlugin i = plugins.begin(); i != plugins.end(); ++i)
 	{
-		int ai = i->inports();
-		int ao = i->outports();
+                if ((i->hints() & PLUGIN_IS_FX) == 0)
+                    continue;
+
+		int ai = i->getAudioInputCount();
+		int ao = i->getAudioOutputCount();
 		//int ci = i->controlInPorts();
 		//int co = i->controlOutPorts();
 		bool addFlag = false;
@@ -326,7 +334,7 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 		{
 			QTreeWidgetItem* item = new QTreeWidgetItem;
 			item->setText(0, stereo ? "True" : "False");
-			item->setData(0, Qt::UserRole, i->lib());
+			item->setData(0, Qt::UserRole, i->filename(false));
 			item->setText(1, i->label());
 			item->setText(2, i->name());
 			QString tip(i->name());
@@ -352,8 +360,8 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 	pList->clear();
 	for (iPlugin i = plugins.begin(); i != plugins.end(); ++i)
 	{
-		int ai = i->inports();
-		int ao = i->outports();
+		int ai = i->getAudioInputCount();
+		int ao = i->getAudioOutputCount();
 		//int ci = i->controlInPorts();
 		//int co = i->controlOutPorts();
 
@@ -375,7 +383,7 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 		{
 			QTreeWidgetItem* item = new QTreeWidgetItem;
 			item->setText(0, stereo ? "True" : "False"); //i->lib()
-			item->setData(0, Qt::UserRole, i->lib());
+			item->setData(0, Qt::UserRole, i->filename(false));
 			item->setText(1, i->label());
 			item->setText(2, i->name());
 			QString tip(i->name());
@@ -398,7 +406,7 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 //   getPlugin
 //---------------------------------------------------------
 
-Plugin* PluginDialog::getPlugin(QWidget* parent)/*{{{*/
+PluginI* PluginDialog::getPlugin(QWidget* parent)/*{{{*/
 {
 	PluginDialog* dialog = new PluginDialog(parent);
 	if (dialog->exec())

@@ -5,360 +5,238 @@
 //
 //  (C) Copyright 2000 Werner Schweer (ws@seh.de)
 //  (C) Copyright 2011 Andrew Williams and Christopher Cherrett
+//  (C) Copyright 2012 Filipe Coelho
 //=========================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <dlfcn.h>
-#include <cmath>
-#include <math.h>
+#include "plugingui.h"
 
-#include <QButtonGroup>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QDir>
-#include <QFile>
+#include <QAction>
 #include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
 #include <QLabel>
-#include <QMainWindow>
+#include <QMenuBar>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QRadioButton>
-#include <QSignalMapper>
-#include <QSizePolicy>
 #include <QScrollArea>
 #include <QTimer>
-#include <QToolBar>
-#include <QToolButton>
-#include <QTreeWidget>
-#include <QVBoxLayout>
-#include <QWhatsThis>
 
-#include "globals.h"
-#include "gconfig.h"
-#include "filedialog.h"
-#include "slider.h"
-#include "midictrl.h"
-#include "plugin.h"
-#include "plugingui.h"
-#include "xml.h"
-#include "icons.h"
-#include "song.h"
-#include "doublelabel.h"
-#include "fastlog.h"
+#include <math.h>
+
 #include "checkbox.h"
+#include "doublelabel.h"
+#include "slider.h"
 
-#include "audio.h"
-#include "al/dsp.h"
+#include "filedialog.h"
+#include "globals.h"
+#include "icons.h"
+#include "plugin.h"
+#include "song.h"
 
-#include "config.h"
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <dlfcn.h>
+//#include <cmath>
 
-// TODO: We need to use .qrc files to use icons in WhatsThis bubbles. See Qt 
-// Resource System in Qt documentation - ORCAN
-//const char* presetOpenText = "<img source=\"fileopen\"> "
-//      "Click this button to load a saved <em>preset</em>.";
-const char* presetOpenText = "Click this button to load a saved <em>preset</em>.";
-const char* presetSaveText = "Click this button to save curent parameter "
-		"settings as a <em>preset</em>.  You will be prompted for a file name.";
-const char* presetBypassText = "Click this button to bypass effect unit";
+//#include <QButtonGroup>
+//#include <QCheckBox>
+//#include <QComboBox>
+//#include <QDir>
+//#include <QFile>
+//#include <QGroupBox>
+//#include <QHBoxLayout>
+//#include <QMainWindow>
+//#include <QPushButton>
+//#include <QRadioButton>
+//#include <QSignalMapper>
+//#include <QSizePolicy>
+//#include <QTreeWidget>
+//#include <QVBoxLayout>
+
+//#include "gconfig.h"
+//#include "midictrl.h"
+//#include "xml.h"
+//#include "fastlog.h"
+//#include "audio.h"
+//#include "al/dsp.h"
+//#include "config.h"
 
 //---------------------------------------------------------
 //   PluginGui
 //---------------------------------------------------------
 
-PluginGui::PluginGui(PluginIBase* p)
-: QMainWindow(0)
+PluginGui::PluginGui(BasePlugin* p)
+: QMainWindow(0),
+  plugin(p)
 {
-	gw = 0;
-	params = 0;
-	plugin = p;
-	setWindowTitle(plugin->name());
-	setObjectName("PluginGui");
+    setWindowTitle(plugin->name());
+    setWindowIcon(*oomIcon);
+    setObjectName("PluginGui");
 
-	QToolBar* tools = addToolBar(tr("File Buttons"));
+    // menu bar
+    QMenuBar* menuBar = new QMenuBar(this);
+    setMenuBar(menuBar);
 
-	QAction* fileOpen = new QAction(QIcon(*openIconS), tr("Load Preset"), this);
-	connect(fileOpen, SIGNAL(triggered()), this, SLOT(load()));
-	tools->addAction(fileOpen);
+    // file menu --------------------------------------------
+    QMenu* fileMenu = new QMenu(tr("File"), menuBar);
 
-	QAction* fileSave = new QAction(QIcon(*saveIconS), tr("Save Preset"), this);
-	connect(fileSave, SIGNAL(triggered()), this, SLOT(save()));
-	tools->addAction(fileSave);
+    QAction* fileOpen = new QAction(QIcon(*openIconS), tr("Load State..."), menuBar);
+    connect(fileOpen, SIGNAL(triggered()), this, SLOT(load()));
+    fileMenu->addAction(fileOpen);
 
-	tools->addAction(QWhatsThis::createAction(this));
+    QAction* fileSave = new QAction(QIcon(*saveIcon), tr("Save State..."), menuBar);
+    connect(fileSave, SIGNAL(triggered()), this, SLOT(save()));
+    fileMenu->addAction(fileSave);
 
-	onOff = new QAction(QIcon(*exitIconS), tr("bypass plugin"), this);
-	onOff->setCheckable(true);
-	onOff->setChecked(plugin->on());
-	onOff->setToolTip(tr("bypass plugin"));
-	connect(onOff, SIGNAL(toggled(bool)), SLOT(bypassToggled(bool)));
-	tools->addAction(onOff);
+    fileMenu->addSeparator();
 
-	// TODO: We need to use .qrc files to use icons in WhatsThis bubbles. See Qt
-	// Resource System in Qt documentation - ORCAN
-	//Q3MimeSourceFactory::defaultFactory()->setPixmap(QString("fileopen"), *openIcon );
-	fileOpen->setWhatsThis(tr(presetOpenText));
-	onOff->setWhatsThis(tr(presetBypassText));
-	fileSave->setWhatsThis(tr(presetSaveText));
+    QAction* fileReset = new QAction(tr("Reset to Default State"), menuBar);
+    connect(fileReset, SIGNAL(triggered()), this, SLOT(reset()));
+    fileMenu->addAction(fileReset);
 
-	QString id;
-	id.setNum(plugin->pluginID());
-	QString name(oomGlobalShare + QString("/plugins/") + id + QString(".ui"));
-	QFile uifile(name);
-	if (uifile.exists())
-	{
-		//
-		// construct GUI from *.ui file
-		//
-		PluginLoader loader;
-		QFile file(uifile.fileName());
-		file.open(QFile::ReadOnly);
-		mw = loader.load(&file, this);
-		file.close();
-		setCentralWidget(mw);
+    // plugin menu --------------------------------------------
+    QMenu* pluginMenu = new QMenu(tr("Plugin"), menuBar);
 
-		QObjectList l = mw->children();
-		QObject *obj;
+    pluginBypass = new QAction(tr("Bypass"), menuBar);
+    pluginBypass->setCheckable(true);
+    pluginBypass->setChecked(plugin->active() == false);
+    connect(pluginBypass, SIGNAL(triggered(bool)), SLOT(bypassToggled(bool)));
+    pluginMenu->addAction(pluginBypass);
 
-		nobj = 0;
-		QList<QObject*>::iterator it;
-		for (it = l.begin(); it != l.end(); ++it)
-		{
-			obj = *it;
-			QByteArray ba = obj->objectName().toLatin1();
-			const char* name = ba.constData();
-			if (*name != 'P')
-				continue;
-			int parameter = -1;
-			sscanf(name, "P%d", &parameter);
-			if (parameter == -1)
-				continue;
-			++nobj;
-		}
-		it = l.begin();
-		gw = new GuiWidgets[nobj];
-		nobj = 0;
-		QSignalMapper* mapper = new QSignalMapper(this);
-		connect(mapper, SIGNAL(mapped(int)), SLOT(guiParamChanged(int)));
+    pluginMenu->addSeparator();
 
-		QSignalMapper* mapperPressed = new QSignalMapper(this);
-		QSignalMapper* mapperReleased = new QSignalMapper(this);
-		connect(mapperPressed, SIGNAL(mapped(int)), SLOT(guiParamPressed(int)));
-		connect(mapperReleased, SIGNAL(mapped(int)), SLOT(guiParamReleased(int)));
+    //QAction* pluginInfo = new QAction(tr("Show Information"), menuBar);
+    //connect(pluginInfo, SIGNAL(triggered()), this, SLOT(showPluginInfo()));
+    //pluginMenu->addAction(pluginInfo);
 
-		for (it = l.begin(); it != l.end(); ++it)
-		{
-			obj = *it;
-			QByteArray ba = obj->objectName().toLatin1();
-			const char* name = ba.constData();
-			if (*name != 'P')
-				continue;
-			int parameter = -1;
-			sscanf(name, "P%d", &parameter);
-			if (parameter == -1)
-				continue;
+    // preset menu --------------------------------------------
+    QMenu* presetMenu = new QMenu(tr("Presets"), menuBar);
 
-			mapper->setMapping(obj, nobj);
-			mapperPressed->setMapping(obj, nobj);
-			mapperReleased->setMapping(obj, nobj);
+    if (true)
+    {
+        QAction* presetNone = new QAction(QIcon(*openIconS), tr("(none)"), menuBar);
+        presetNone->setEnabled(false);
+        presetMenu->addAction(presetNone);
+    }
 
-			gw[nobj].widget = (QWidget*) obj;
-			gw[nobj].param = parameter;
-			gw[nobj].type = -1;
+    // show menu
+    menuBar->addMenu(fileMenu);
+    menuBar->addMenu(pluginMenu);
+    menuBar->addMenu(presetMenu);
+    menuBar->show();
 
-			if (strcmp(obj->metaObject()->className(), "Slider") == 0)
-			{
-				gw[nobj].type = GuiWidgets::SLIDER;
-				((Slider*) obj)->setId(nobj);
-				((Slider*) obj)->setCursorHoming(true);
-				for (int i = 0; i < nobj; i++)
-				{
-					if (gw[i].type == GuiWidgets::DOUBLE_LABEL && gw[i].param == parameter)
-						((DoubleLabel*) gw[i].widget)->setSlider((Slider*) obj);
-				}
-				connect(obj, SIGNAL(sliderMoved(double, int)), mapper, SLOT(map()));
-				connect(obj, SIGNAL(sliderPressed(int)), SLOT(guiSliderPressed(int)));
-				connect(obj, SIGNAL(sliderReleased(int)), SLOT(guiSliderReleased(int)));
-				connect(obj, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(guiSliderRightClicked(const QPoint &, int)));
-			}
-			else if (strcmp(obj->metaObject()->className(), "DoubleLabel") == 0)
-			{
-				gw[nobj].type = GuiWidgets::DOUBLE_LABEL;
-				((DoubleLabel*) obj)->setId(nobj);
-				for (int i = 0; i < nobj; i++)
-				{
-					if (gw[i].type == GuiWidgets::SLIDER && gw[i].param == parameter)
-					{
-						((DoubleLabel*) obj)->setSlider((Slider*) gw[i].widget);
-						break;
-					}
-				}
-				connect(obj, SIGNAL(valueChanged(double, int)), mapper, SLOT(map()));
-			}
-			else if (strcmp(obj->metaObject()->className(), "QCheckBox") == 0)
-			{
-				gw[nobj].type = GuiWidgets::QCHECKBOX;
-				connect(obj, SIGNAL(toggled(bool)), mapper, SLOT(map()));
-				connect(obj, SIGNAL(pressed()), mapperPressed, SLOT(map()));
-				connect(obj, SIGNAL(released()), mapperReleased, SLOT(map()));
-			}
-			else if (strcmp(obj->metaObject()->className(), "QComboBox") == 0)
-			{
-				gw[nobj].type = GuiWidgets::QCOMBOBOX;
-				connect(obj, SIGNAL(activated(int)), mapper, SLOT(map()));
-			}
-			else
-			{
-				printf("unknown widget class %s\n", obj->metaObject()->className());
-				continue;
-			}
-			++nobj;
-		}
-		updateValues(); // otherwise the GUI won't have valid data
-	}
-	else
-	{
-		//mw = new QWidget(this);
-		//setCentralWidget(mw);
-		// p3.4.43
-		view = new QScrollArea;
-		view->setWidgetResizable(true);
-		setCentralWidget(view);
-		//view->setVScrollBarMode(QScrollView::AlwaysOff);
+    mw = new QWidget;
+    mw->setObjectName("PluginGuiBase");
+    mw->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 
-		mw = new QWidget;
-		mw->setObjectName("PluginGuiBase");
-		QGridLayout* grid = new QGridLayout;
-		grid->setSpacing(2);
+    view = new QScrollArea(this);
+    view->setWidget(mw);
+    view->setWidgetResizable(true);
+    setCentralWidget(view);
+    //view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-		mw->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    QGridLayout* grid = new QGridLayout(mw);
+    grid->setColumnStretch(2, 10);
+    grid->setSpacing(2);
 
-		int n = plugin->parameters();
-		params = new GuiParam[n];
+    uint32_t n = plugin->getParameterCount();
+    if (n > 0)
+        params = new GuiParam[n];
+    else
+        params = 0;
 
-		//int style       = Slider::BgTrough | Slider::BgSlot;
-		QFontMetrics fm = fontMetrics();
-		int h = fm.height() + 4;
+    int wHeight = fontMetrics().height() + 8;
 
-		for (int i = 0; i < n; ++i)
-		{
-			QLabel* label = 0;
-			Port* cport = plugin->getControlPort(i);
-			double lower = 0.0; // default values
-			double upper = 1.0;
-			double dlower = lower;
-			double dupper = upper;
-			double val = plugin->param(i);
-			double dval = val;
-			params[i].hint = 0;//range.HintDescriptor;
+    for (uint32_t i = 0; i < n; i++)
+    {
+        ParameterPort* paramPort = plugin->getParameter(i);
+        if (! paramPort || paramPort->type != PARAMETER_INPUT)
+        {
+            params[i].type = GuiParam::GUI_NULL;
+            continue;
+        }
 
-			/*if (LADSPA_IS_HINT_BOUNDED_BELOW(range.HintDescriptor))
-			{
-				dlower = lower = range.LowerBound;
-			}
-			if (LADSPA_IS_HINT_BOUNDED_ABOVE(range.HintDescriptor))
-			{
-				dupper = upper = range.UpperBound;
-			}*/
-			if (cport->samplerate)
-			{
-				params[i].hint |= SampleRate;
-				lower *= sampleRate;
-				upper *= sampleRate;
-				dlower = lower;
-				dupper = upper;
-			}
-			if (cport->logarithmic)
-			{
-				params[i].hint |= Logarithmic;
-				if (lower == 0.0)
-					lower = 0.001;
-				dlower = fast_log10(lower)*20.0;
-				dupper = fast_log10(upper)*20.0;
-				dval = fast_log10(val) * 20.0;
-			}
-			if (cport->toggle)
-			{
-				params[i].hint |= Toggle;
-				params[i].type = GuiParam::GUI_SWITCH;
-				CheckBox* cb = new CheckBox(mw, i, "param");
-				cb->setId(i);
-				cb->setText(QString(plugin->paramName(i)));
-				cb->setChecked(plugin->param(i) != 0.0);
-				cb->setFixedHeight(h);
-				params[i].actuator = cb;
-			}
-			else
-			{
-				label = new QLabel(QString(plugin->paramName(i)), 0);
-				params[i].type = GuiParam::GUI_SLIDER;
-				params[i].label = new DoubleLabel(val, lower, upper, 0);
-				params[i].label->setFrame(true);
-				params[i].label->setPrecision(2);
-				params[i].label->setId(i);
+        params[i].hints = paramPort->hints;
 
-				//params[i].label->setContentsMargins(2, 2, 2, 2);
-				//params[i].label->setFixedHeight(h);
+        QLabel* label = 0;
 
-				Slider* s = new Slider(0, "param", Qt::Horizontal,
-						Slider::None); //, style);
+        if (paramPort->hints & PARAMETER_IS_TOGGLED)
+        {
+            CheckBox* cb = new CheckBox(mw, i, "param");
+            cb->setId(i);
+            cb->setText(plugin->getParameterName(i));
+            cb->setChecked(paramPort->value > 0.5);
+            cb->setFixedHeight(wHeight);
 
-				s->setCursorHoming(true);
-				s->setId(i);
-				//s->setFixedHeight(h);
-				s->setRange(dlower, dupper);
-				if (cport->isInt)
-				{
-					params[i].hint |= Integer;
-					s->setStep(1.0);
-				}
-				s->setValue(dval);
-				params[i].actuator = s;
-				params[i].label->setSlider((Slider*) params[i].actuator);
-			}
-			//params[i].actuator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
-			params[i].actuator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
-			if (params[i].type == GuiParam::GUI_SLIDER)
-			{
-				//label->setFixedHeight(20);
-				//label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
-				label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
-				//params[i].label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
-				params[i].label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
-				grid->addWidget(label, i, 0);
-				grid->addWidget(params[i].label, i, 1);
-				grid->addWidget(params[i].actuator, i, 2);
-			}
-			else if (params[i].type == GuiParam::GUI_SWITCH)
-			{
-				//grid->addMultiCellWidget(params[i].actuator, i, i, 0, 2);
-				grid->addWidget(params[i].actuator, i, 0, 1, 3);
-			}
-			if (params[i].type == GuiParam::GUI_SLIDER)
-			{
-				connect(params[i].actuator, SIGNAL(sliderMoved(double, int)), SLOT(sliderChanged(double, int)));
-				connect(params[i].label, SIGNAL(valueChanged(double, int)), SLOT(labelChanged(double, int)));
-				connect(params[i].actuator, SIGNAL(sliderPressed(int)), SLOT(ctrlPressed(int)));
-				connect(params[i].actuator, SIGNAL(sliderReleased(int)), SLOT(ctrlReleased(int)));
-				connect(params[i].actuator, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(ctrlRightClicked(const QPoint &, int)));
-			}
-			else if (params[i].type == GuiParam::GUI_SWITCH)
-			{
-				connect(params[i].actuator, SIGNAL(checkboxPressed(int)), SLOT(ctrlPressed(int)));
-				connect(params[i].actuator, SIGNAL(checkboxReleased(int)), SLOT(ctrlReleased(int)));
-				connect(params[i].actuator, SIGNAL(checkboxRightClicked(const QPoint &, int)), SLOT(ctrlRightClicked(const QPoint &, int)));
-			}
-		}
-		// p3.3.43
-		resize(280, height());
+            params[i].type  = GuiParam::GUI_SWITCH;
+            params[i].label = 0;
+            params[i].actuator = cb;
+        }
+        else
+        {
+            label = new QLabel(QString(plugin->getParameterName(i)), 0);
+            params[i].type  = GuiParam::GUI_SLIDER;
+            params[i].label = new DoubleLabel(paramPort->value, paramPort->ranges.min, paramPort->ranges.max, this); // NOTE - parent was 0
+            params[i].label->setFrame(true);
+            params[i].label->setPrecision(2);
+            params[i].label->setId(i);
 
-		grid->setColumnStretch(2, 10);
-		mw->setLayout(grid);
-		view->setWidget(mw);
-	}
-	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
+            params[i].label->setContentsMargins(2, 2, 2, 2);
+            params[i].label->setFixedHeight(wHeight);
+
+            // make room for bigger values
+            if (paramPort->ranges.min <= -10000 || paramPort->ranges.max > 10000)
+                params[i].label->setMinimumWidth(70);
+            else if (paramPort->ranges.min <= -1000 || paramPort->ranges.max > 1000)
+                params[i].label->setMinimumWidth(60);
+            else if (paramPort->ranges.min <= -100 || paramPort->ranges.max > 100)
+                params[i].label->setMinimumWidth(55);
+            else if (paramPort->ranges.min <= -10 || paramPort->ranges.max > 10)
+                params[i].label->setMinimumWidth(50);
+
+            Slider* s = new Slider(mw, "param", Qt::Horizontal, Slider::None, Slider::BgSlot, QColor(127, 125, 32));
+
+            s->setCursorHoming(true);
+            s->setId(i);
+            s->setFixedHeight(wHeight);
+            s->setRange(paramPort->ranges.min, paramPort->ranges.max, paramPort->ranges.step);
+            s->setValue(paramPort->value);
+
+            params[i].actuator = s;
+            params[i].label->setSlider((Slider*) params[i].actuator);
+        }
+
+        //params[i].actuator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
+        params[i].actuator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
+
+        if (params[i].type == GuiParam::GUI_SWITCH)
+        {
+            grid->addWidget(params[i].actuator, i, 0, 1, 3);
+
+            connect(params[i].actuator, SIGNAL(checkboxPressed(int)), SLOT(ctrlPressed(int)));
+            connect(params[i].actuator, SIGNAL(checkboxReleased(int)), SLOT(ctrlReleased(int)));
+            connect(params[i].actuator, SIGNAL(checkboxRightClicked(const QPoint &, int)), SLOT(ctrlRightClicked(const QPoint &, int)));
+        }
+        else if (params[i].type == GuiParam::GUI_SLIDER)
+        {
+            label->setFixedHeight(20);
+            //label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
+            label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
+            ///params[i].label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum));
+            params[i].label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed));
+            grid->addWidget(label, i, 0);
+            grid->addWidget(params[i].label, i, 1);
+            grid->addWidget(params[i].actuator, i, 2);
+
+            connect(params[i].actuator, SIGNAL(sliderMoved(double, int)), SLOT(sliderChanged(double, int)));
+            connect(params[i].label, SIGNAL(valueChanged(double, int)), SLOT(labelChanged(double, int)));
+            connect(params[i].actuator, SIGNAL(sliderPressed(int)), SLOT(ctrlPressed(int)));
+            connect(params[i].actuator, SIGNAL(sliderReleased(int)), SLOT(ctrlReleased(int)));
+            connect(params[i].actuator, SIGNAL(sliderRightClicked(const QPoint &, int)), SLOT(ctrlRightClicked(const QPoint &, int)));
+        }
+    }
+
+    adjustSize();
+    resize(350, height());
+
+    connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 }
 
 //---------------------------------------------------------
@@ -367,11 +245,10 @@ PluginGui::PluginGui(PluginIBase* p)
 
 PluginGui::~PluginGui()
 {
-	if (gw)
-		delete[] gw;
-	if (params)
-		delete[] params;
+    if (params)
+        delete[] params;
 }
+
 
 //---------------------------------------------------------
 //   heartBeat
@@ -379,160 +256,310 @@ PluginGui::~PluginGui()
 
 void PluginGui::heartBeat()
 {
-	updateControls();
+    updateControls();
 }
 
 //---------------------------------------------------------
-//   ctrlPressed
+//   setActive
 //---------------------------------------------------------
 
-void PluginGui::ctrlPressed(int param)/*{{{*/
+void PluginGui::setActive(bool yesno)
 {
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
-
-	if (at != AUTO_OFF)
-		plugin->enableController(param, false);
-
-	int id = plugin->id();
-
-	if (id == -1)
-		return;
-
-	id = genACnum(id, param);
-
-	if (params[param].type == GuiParam::GUI_SLIDER)
-	{
-		double val = ((Slider*) params[param].actuator)->value();
-		if (params[param].hint & Logarithmic)
-			val = pow(10.0, val / 20.0);
-		else if (params[param].hint & Integer)
-			val = rint(val);
-		plugin->setParam(param, val);
-		((DoubleLabel*) params[param].label)->setValue(val);
-
-		// p3.3.43
-		//audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
-
-		if (track)
-		{
-			// p3.3.43
-			audio->msgSetPluginCtrlVal(track, id, val);
-
-			track->startAutoRecord(id, val);
-		}
-	}
-	else if (params[param].type == GuiParam::GUI_SWITCH)
-	{
-		double val = (double) ((CheckBox*) params[param].actuator)->isChecked();
-		plugin->setParam(param, val);
-
-		// p3.3.43
-		//audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
-
-		if (track)
-		{
-			// p3.3.43
-			audio->msgSetPluginCtrlVal(track, id, val);
-
-			track->startAutoRecord(id, val);
-		}
-	}
-}/*}}}*/
+    pluginBypass->blockSignals(true);
+    pluginBypass->setChecked(yesno);
+    pluginBypass->blockSignals(false);
+}
 
 //---------------------------------------------------------
-//   ctrlReleased
+//   updateValues
 //---------------------------------------------------------
 
-void PluginGui::ctrlReleased(int param)/*{{{*/
+void PluginGui::updateValues()
 {
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
-
-	// Special for switch - don't enable controller until transport stopped.
-	if (at != AUTO_WRITE && ((params[param].type != GuiParam::GUI_SWITCH
-			|| !audio->isPlaying()
-			|| at != AUTO_TOUCH) || (!audio->isPlaying() && at == AUTO_TOUCH)))
-		plugin->enableController(param, true);
-
-	int id = plugin->id();
-	if (!track || id == -1)
-		return;
-	id = genACnum(id, param);
-
-	if (params[param].type == GuiParam::GUI_SLIDER)
-	{
-		double val = ((Slider*) params[param].actuator)->value();
-		if (params[param].hint & Logarithmic)
-			val = pow(10.0, val / 20.0);
-		else if (params[param].hint & Integer)
-			val = rint(val);
-		track->stopAutoRecord(id, val);
-	}
-	//else if(params[param].type == GuiParam::GUI_SWITCH)
-	//{
-	//double val = (double)((CheckBox*)params[param].actuator)->isChecked();
-	// No concept of 'untouching' a checkbox. Remain 'touched' until stop.
-	//plugin->track()->stopAutoRecord(genACnum(plugin->id(), param), val);
-	//}
-}/*}}}*/
+    for (uint32_t i = 0; i < plugin->getParameterCount(); i++)
+    {
+        GuiParam* gp = &params[i];
+        double value = plugin->getParameterValue(i);
+        if (gp->type == GuiParam::GUI_SLIDER)
+        {
+//            double sv = lv;
+//            if (params[i].hints & PARAMETER_IS_LOGARITHMIC)
+//                sv = fast_log10(lv) * 20.0;
+//            else if (params[i].hints & PARAMETER_IS_INTEGER)
+//            {
+//                sv = rint(lv);
+//                lv = sv;
+//            }
+            gp->label->setValue(value);
+            ((Slider*) (gp->actuator))->setValue(value);
+        }
+        else if (gp->type == GuiParam::GUI_SWITCH)
+        {
+            ((CheckBox*) (gp->actuator))->setChecked(value > 0.5);
+        }
+    }
+}
 
 //---------------------------------------------------------
-//   ctrlRightClicked
+//   setParameterValue
 //---------------------------------------------------------
 
-void PluginGui::ctrlRightClicked(const QPoint &p, int param)/*{{{*/
+void PluginGui::setParameterValue(int index, double value)
 {
-	int id = plugin->id();
-	if (id != -1)
-		//song->execAutomationCtlPopup((AudioTrack*)plugin->track(), p, genACnum(id, param));
-		song->execAutomationCtlPopup(plugin->track(), p, genACnum(id, param));
-}/*}}}*/
+    GuiParam* gp = &params[index];
+    if (gp)
+    {
+        if (gp->type == GuiParam::GUI_SLIDER)
+        {
+            gp->label->setValue(value);
+            ((Slider*) (gp->actuator))->setValue(value);
+        }
+        else if (gp->type == GuiParam::GUI_SWITCH)
+        {
+            ((CheckBox*) (gp->actuator))->setChecked(value > 0.5);
+        }
+    }
+}
+
+//---------------------------------------------------------
+//   updateControls
+//---------------------------------------------------------
+
+void PluginGui::updateControls()
+{
+    if (!automation || !plugin->track() || plugin->id() == -1)
+        return;
+
+    AutomationType at = plugin->track()->automationType();
+    if (at == AUTO_OFF)
+        return;
+
+    for (uint32_t i = 0; i < plugin->getParameterCount(); i++)
+    {
+        GuiParam* gp = &params[i];
+
+        if (gp->type == GuiParam::GUI_SLIDER)
+        {
+            if (plugin->controllerEnabled(i) && plugin->controllerEnabled2(i))
+            {
+                double lv = plugin->track()->pluginCtrlVal(genACnum(plugin->id(), i));
+                double sv = lv;
+                //if (params[i].hints & PARAMETER_IS_LOGARITHMIC)
+                //    sv = fast_log10(lv) * 20.0;
+                //else if (params[i].hints & PARAMETER_IS_INTEGER)
+                //{
+                //    sv = rint(lv);
+                //    lv = sv;
+                //}
+                if (((Slider*) (gp->actuator))->value() != sv)
+                {
+                    gp->label->blockSignals(true);
+                    ((Slider*) (gp->actuator))->blockSignals(true);
+                    ((Slider*) (gp->actuator))->setValue(sv);
+                    gp->label->setValue(lv);
+                    ((Slider*) (gp->actuator))->blockSignals(false);
+                    gp->label->blockSignals(false);
+                }
+            }
+
+        }
+        else if (gp->type == GuiParam::GUI_SWITCH)
+        {
+            if (plugin->controllerEnabled(i) && plugin->controllerEnabled2(i))
+            {
+                bool v = (int) plugin->track()->pluginCtrlVal(genACnum(plugin->id(), i));
+                if (((CheckBox*) (gp->actuator))->isChecked() != v)
+                {
+                    //printf("PluginGui::updateControls switch\n");
+
+                    ((CheckBox*) (gp->actuator))->blockSignals(true);
+                    ((CheckBox*) (gp->actuator))->setChecked(v);
+                    ((CheckBox*) (gp->actuator))->blockSignals(false);
+                }
+            }
+        }
+    }
+}
+//---------------------------------------------------------
+//   load
+//---------------------------------------------------------
+
+void PluginGui::load()
+{
+    QString s("presets/plugins/");
+    //s += plugin->plugin()->label();
+    s += plugin->label();
+    s += "/";
+
+    QString fn = getOpenFileName(s, preset_file_pattern,
+                                 this, tr("OOMidi: load preset"), 0);
+    if (fn.isEmpty())
+        return;
+    bool popenFlag;
+    FILE* f = fileOpen(this, fn, QString(".pre"), "r", popenFlag, true);
+    if (f == 0)
+        return;
+
+    Xml xml(f);
+    int mode = 0;
+    for (;;)
+    {
+        Xml::Token token = xml.parse();
+        QString tag = xml.s1();
+        switch (token)
+        {
+        case Xml::Error:
+        case Xml::End:
+            return;
+        case Xml::TagStart:
+            if (mode == 0 && (tag == "oom" || tag == "muse"))
+                mode = 1;
+            else if (mode == 1 && tag == "plugin")
+            {
+
+                if (plugin->readConfiguration(xml, true))
+                {
+                    QMessageBox::critical(this, QString("OOMidi"),
+                                          tr("Error reading preset. Might not be right type for this plugin"));
+                    goto ende;
+                }
+
+                mode = 0;
+            }
+            else
+                xml.unknown("PluginGui");
+            break;
+        case Xml::Attribut:
+            break;
+        case Xml::TagEnd:
+            if (!mode && (tag == "oom" || tag == "muse"))
+            {
+                plugin->updateControllers();
+                goto ende;
+            }
+        default:
+            break;
+        }
+    }
+ende:
+    if (popenFlag)
+        pclose(f);
+    else
+        fclose(f);
+}
+
+//---------------------------------------------------------
+//   save
+//---------------------------------------------------------
+
+void PluginGui::save()
+{
+    QString s("presets/plugins/");
+    //s += plugin->plugin()->label();
+    s += plugin->label();
+    s += "/";
+
+    //QString fn = getSaveFileName(s, preset_file_pattern, this,
+    QString fn = getSaveFileName(s, preset_file_save_pattern, this,
+                                 tr("OOMidi: save preset"));
+    if (fn.isEmpty())
+        return;
+    bool popenFlag;
+    FILE* f = fileOpen(this, fn, QString(".pre"), "w", popenFlag, false, true);
+    if (f == 0)
+        return;
+    Xml xml(f);
+    xml.header();
+    xml.tag(0, "oom version=\"1.0\"");
+    plugin->writeConfiguration(1, xml);
+    xml.tag(1, "/oom");
+
+    if (popenFlag)
+        pclose(f);
+    else
+        fclose(f);
+}
+
+//---------------------------------------------------------
+//   reset
+//---------------------------------------------------------
+
+void PluginGui::reset()
+{
+    for (uint32_t i = 0; i < plugin->getParameterCount(); i++)
+    {
+        ParameterPort* paramPort = plugin->getParameter(i);
+        if (! paramPort || paramPort->type != PARAMETER_INPUT)
+            continue;
+
+        double value = paramPort->ranges.def;
+        plugin->setParameterValue(i, value);
+
+        if (params[i].type == GuiParam::GUI_SLIDER)
+        {
+            if (params[i].hints & PARAMETER_IS_INTEGER)
+                value = rint(value);
+            ((DoubleLabel*) params[i].label)->setValue(value);
+            ((Slider*) params[i].actuator)->setValue(value);
+        }
+        else if (params[i].type == GuiParam::GUI_SWITCH)
+        {
+            ((CheckBox*) params[i].actuator)->setChecked(value > 0.5);
+        }
+    }
+}
+
+//---------------------------------------------------------
+//   bypassToggled
+//---------------------------------------------------------
+
+void PluginGui::bypassToggled(bool val)
+{
+    plugin->setActive(!val);
+    song->update(SC_ROUTE);
+}
 
 //---------------------------------------------------------
 //   sliderChanged
 //---------------------------------------------------------
 
-void PluginGui::sliderChanged(double val, int param)/*{{{*/
+void PluginGui::sliderChanged(double val, int param)
 {
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
+    AutomationType at = AUTO_OFF;
+    AudioTrack* track = plugin->track();
+    if (track)
+        at = track->automationType();
 
-	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		plugin->enableController(param, false);
+    if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+        plugin->enableController(param, false);
 
-	if (params[param].hint & Logarithmic)
-		val = pow(10.0, val / 20.0);
-	else if (params[param].hint & Integer)
-		val = rint(val);
-	if (plugin->param(param) != val)
-	{
-		plugin->setParam(param, val);
-		((DoubleLabel*) params[param].label)->setValue(val);
-	}
+    //if (params[param].hints & PARAMETER_IS_LOGARITHMIC)
+    //    val = pow(10.0, val / 20.0);
+    //else
+    if (params[param].hints & PARAMETER_IS_INTEGER)
+        val = rint(val);
 
-	int id = plugin->id();
-	if (id == -1)
-		return;
-	id = genACnum(id, param);
+    if (plugin->getParameterValue(param) != val)
+    {
+        plugin->setParameterValue(param, val);
+        ((DoubleLabel*) params[param].label)->setValue(val);
+    }
 
-	// p3.3.43
-	//audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
+    int id = plugin->id();
+    if (id == -1)
+        return;
+    id = genACnum(id, param);
 
-	if (track)
-	{
-		// p3.3.43
-		audio->msgSetPluginCtrlVal(track, id, val);
+    // p3.3.43
+    //audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
 
-		track->recordAutomation(id, val);
-	}
-}/*}}}*/
+    if (track)
+    {
+        // p3.3.43
+        audio->msgSetPluginCtrlVal(track, id, val);
+        track->recordAutomation(id, val);
+    }
+}
 
 //---------------------------------------------------------
 //   labelChanged
@@ -540,618 +567,153 @@ void PluginGui::sliderChanged(double val, int param)/*{{{*/
 
 void PluginGui::labelChanged(double val, int param)/*{{{*/
 {
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
+    AutomationType at = AUTO_OFF;
+    AudioTrack* track = plugin->track();
+    if (track)
+        at = track->automationType();
 
-	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		plugin->enableController(param, false);
+    if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+        plugin->enableController(param, false);
 
-	double dval = val;
-	if (params[param].hint & Logarithmic)
-		dval = fast_log10(val) * 20.0;
-	else if (params[param].hint & Integer)
-		dval = rint(val);
-	if (plugin->param(param) != val)
-	{
-		plugin->setParam(param, val);
-		((Slider*) params[param].actuator)->setValue(dval);
-	}
+    double dval = val;
+    //if (params[param].hints & PARAMETER_IS_LOGARITHMIC)
+    //    dval = fast_log10(val) * 20.0;
+    //else
+    if (params[param].hints & PARAMETER_IS_INTEGER)
+        dval = rint(val);
 
-	int id = plugin->id();
-	if (id == -1)
-		return;
+    if (plugin->getParameterValue(param) != val)
+    {
+        plugin->setParameterValue(param, val);
+        ((Slider*) params[param].actuator)->setValue(dval);
+    }
 
-	id = genACnum(id, param);
+    int id = plugin->id();
+    if (id == -1)
+        return;
 
-	// p3.3.43
-	//audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
+    id = genACnum(id, param);
 
-	if (track)
-	{
-		// p3.3.43
-		audio->msgSetPluginCtrlVal(track, id, val);
+    // p3.3.43
+    //audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
 
-		track->startAutoRecord(id, val);
-	}
+    if (track)
+    {
+        // p3.3.43
+        audio->msgSetPluginCtrlVal(track, id, val);
+        track->startAutoRecord(id, val);
+    }
 }/*}}}*/
 
 //---------------------------------------------------------
-//   load
+//   ctrlPressed
 //---------------------------------------------------------
 
-void PluginGui::load()/*{{{*/
+void PluginGui::ctrlPressed(int param)
 {
-	QString s("presets/plugins/");
-	//s += plugin->plugin()->label();
-	s += plugin->pluginLabel();
-	s += "/";
+    AutomationType at = AUTO_OFF;
+    AudioTrack* track = plugin->track();
+    if (track)
+        at = track->automationType();
 
-	QString fn = getOpenFileName(s, preset_file_pattern,
-			this, tr("OOMidi: load preset"), 0);
-	if (fn.isEmpty())
-		return;
-	bool popenFlag;
-	FILE* f = fileOpen(this, fn, QString(".pre"), "r", popenFlag, true);
-	if (f == 0)
-		return;
+    if (at != AUTO_OFF)
+        plugin->enableController(param, false);
 
-	Xml xml(f);
-	int mode = 0;
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		QString tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return;
-			case Xml::TagStart:
-				if (mode == 0 && (tag == "oom" || tag == "muse"))
-					mode = 1;
-				else if (mode == 1 && tag == "plugin")
-				{
+    int id = plugin->id();
 
-					if (plugin->readConfiguration(xml, true))
-					{
-						QMessageBox::critical(this, QString("OOMidi"),
-								tr("Error reading preset. Might not be right type for this plugin"));
-						goto ende;
-					}
+    if (id == -1)
+        return;
 
-					mode = 0;
-				}
-				else
-					xml.unknown("PluginGui");
-				break;
-			case Xml::Attribut:
-				break;
-			case Xml::TagEnd:
-				if (!mode && (tag == "oom" || tag == "muse"))
-				{
-					plugin->updateControllers();
-					goto ende;
-				}
-			default:
-				break;
-		}
-	}
-ende:
-	if (popenFlag)
-		pclose(f);
-	else
-		fclose(f);
-}/*}}}*/
+    id = genACnum(id, param);
+
+    if (params[param].type == GuiParam::GUI_SLIDER)
+    {
+        double val = ((Slider*) params[param].actuator)->value();
+        //if (params[param].hints & PARAMETER_IS_LOGARITHMIC)
+        //    val = pow(10.0, val / 20.0);
+        //else
+        if (params[param].hints & PARAMETER_IS_INTEGER)
+            val = rint(val);
+        plugin->setParameterValue(param, val);
+        ((DoubleLabel*) params[param].label)->setValue(val);
+
+        // p3.3.43
+        //audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
+
+        if (track)
+        {
+            // p3.3.43
+            audio->msgSetPluginCtrlVal(track, id, val);
+            track->startAutoRecord(id, val);
+        }
+    }
+    else if (params[param].type == GuiParam::GUI_SWITCH)
+    {
+        double val = (double) ((CheckBox*) params[param].actuator)->isChecked();
+        plugin->setParameterValue(param, val);
+
+        // p3.3.43
+        //audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
+
+        if (track)
+        {
+            // p3.3.43
+            audio->msgSetPluginCtrlVal(track, id, val);
+            track->startAutoRecord(id, val);
+        }
+    }
+}
 
 //---------------------------------------------------------
-//   save
+//   ctrlReleased
 //---------------------------------------------------------
 
-void PluginGui::save()/*{{{*/
+void PluginGui::ctrlReleased(int param)
 {
-	QString s("presets/plugins/");
-	//s += plugin->plugin()->label();
-	s += plugin->pluginLabel();
-	s += "/";
+    qWarning("Ctrl released");
 
-	//QString fn = getSaveFileName(s, preset_file_pattern, this,
-	QString fn = getSaveFileName(s, preset_file_save_pattern, this,
-			tr("OOMidi: save preset"));
-	if (fn.isEmpty())
-		return;
-	bool popenFlag;
-	FILE* f = fileOpen(this, fn, QString(".pre"), "w", popenFlag, false, true);
-	if (f == 0)
-		return;
-	Xml xml(f);
-	xml.header();
-	xml.tag(0, "oom version=\"1.0\"");
-	plugin->writeConfiguration(1, xml);
-	xml.tag(1, "/oom");
+    AutomationType at = AUTO_OFF;
+    AudioTrack* track = plugin->track();
+    if (track)
+        at = track->automationType();
 
-	if (popenFlag)
-		pclose(f);
-	else
-		fclose(f);
-}/*}}}*/
+    // Special for switch - don't enable controller until transport stopped.
+    if (at != AUTO_WRITE && ((params[param].type != GuiParam::GUI_SWITCH
+                              || !audio->isPlaying()
+                              || at != AUTO_TOUCH) || (!audio->isPlaying() && at == AUTO_TOUCH)))
+        plugin->enableController(param, true);
+
+    int id = plugin->id();
+    if (!track || id == -1)
+        return;
+    id = genACnum(id, param);
+
+    if (params[param].type == GuiParam::GUI_SLIDER)
+    {
+        double val = ((Slider*) params[param].actuator)->value();
+        //if (params[param].hints & PARAMETER_IS_LOGARITHMIC)
+        //    val = pow(10.0, val / 20.0);
+        //else
+        if (params[param].hints & PARAMETER_IS_INTEGER)
+            val = rint(val);
+        track->stopAutoRecord(id, val);
+    }
+    //else if(params[param].type == GuiParam::GUI_SWITCH)
+    //{
+    //double val = (double)((CheckBox*)params[param].actuator)->isChecked();
+    // No concept of 'untouching' a checkbox. Remain 'touched' until stop.
+    //plugin->track()->stopAutoRecord(genACnum(plugin->id(), param), val);
+    //}
+}
 
 //---------------------------------------------------------
-//   bypassToggled
+//   ctrlRightClicked
 //---------------------------------------------------------
 
-void PluginGui::bypassToggled(bool val)/*{{{*/
+void PluginGui::ctrlRightClicked(const QPoint &p, int param)
 {
-	plugin->setOn(val);
-	song->update(SC_ROUTE);
-}/*}}}*/
-
-//---------------------------------------------------------
-//   songChanged
-//---------------------------------------------------------
-
-void PluginGui::setOn(bool val)/*{{{*/
-{
-	onOff->blockSignals(true);
-	onOff->setChecked(val);
-	onOff->blockSignals(false);
-}/*}}}*/
-
-//---------------------------------------------------------
-//   updateValues
-//---------------------------------------------------------
-
-void PluginGui::updateValues()/*{{{*/
-{
-	if (params)
-	{
-		for (int i = 0; i < plugin->parameters(); ++i)
-		{
-			GuiParam* gp = &params[i];
-			if (gp->type == GuiParam::GUI_SLIDER)
-			{
-				double lv = plugin->param(i);
-				double sv = lv;
-				if (params[i].hint & Logarithmic)
-					sv = fast_log10(lv) * 20.0;
-				else if (params[i].hint & Integer)
-				{
-					sv = rint(lv);
-					lv = sv;
-				}
-				gp->label->setValue(lv);
-				((Slider*) (gp->actuator))->setValue(sv);
-			}
-			else if (gp->type == GuiParam::GUI_SWITCH)
-			{
-				((CheckBox*) (gp->actuator))->setChecked(int(plugin->param(i)));
-			}
-		}
-	}
-	else if (gw)
-	{
-		for (int i = 0; i < nobj; ++i)
-		{
-			QWidget* widget = gw[i].widget;
-			int type = gw[i].type;
-			int param = gw[i].param;
-			double val = plugin->param(param);
-			switch (type)
-			{
-				case GuiWidgets::SLIDER:
-					((Slider*) widget)->setValue(val);
-					break;
-				case GuiWidgets::DOUBLE_LABEL:
-					((DoubleLabel*) widget)->setValue(val);
-					break;
-				case GuiWidgets::QCHECKBOX:
-					((QCheckBox*) widget)->setChecked(int(val));
-					break;
-				case GuiWidgets::QCOMBOBOX:
-					((QComboBox*) widget)->setCurrentIndex(int(val));
-					break;
-			}
-		}
-	}
-}/*}}}*/
-
-//---------------------------------------------------------
-//   updateControls
-//---------------------------------------------------------
-
-void PluginGui::updateControls()/*{{{*/
-{
-	if (!automation || !plugin->track() || plugin->id() == -1)
-		return;
-	AutomationType at = plugin->track()->automationType();
-	if (at == AUTO_OFF)
-		return;
-	if (params)
-	{
-		for (int i = 0; i < plugin->parameters(); ++i)
-		{
-			GuiParam* gp = &params[i];
-			if (gp->type == GuiParam::GUI_SLIDER)
-			{
-				if (plugin->controllerEnabled(i) && plugin->controllerEnabled2(i))
-				{
-					double lv = plugin->track()->pluginCtrlVal(genACnum(plugin->id(), i));
-					double sv = lv;
-					if (params[i].hint & Logarithmic)
-						sv = fast_log10(lv) * 20.0;
-					else if (params[i].hint & Integer)
-					{
-						sv = rint(lv);
-						lv = sv;
-					}
-					if (((Slider*) (gp->actuator))->value() != sv)
-					{
-						//printf("PluginGui::updateControls slider\n");
-
-						gp->label->blockSignals(true);
-						((Slider*) (gp->actuator))->blockSignals(true);
-						((Slider*) (gp->actuator))->setValue(sv);
-						gp->label->setValue(lv);
-						((Slider*) (gp->actuator))->blockSignals(false);
-						gp->label->blockSignals(false);
-					}
-				}
-
-			}
-			else if (gp->type == GuiParam::GUI_SWITCH)
-			{
-				if (plugin->controllerEnabled(i) && plugin->controllerEnabled2(i))
-				{
-					bool v = (int) plugin->track()->pluginCtrlVal(genACnum(plugin->id(), i));
-					if (((CheckBox*) (gp->actuator))->isChecked() != v)
-					{
-						//printf("PluginGui::updateControls switch\n");
-
-						((CheckBox*) (gp->actuator))->blockSignals(true);
-						((CheckBox*) (gp->actuator))->setChecked(v);
-						((CheckBox*) (gp->actuator))->blockSignals(false);
-					}
-				}
-			}
-		}
-	}
-	else if (gw)
-	{
-		for (int i = 0; i < nobj; ++i)
-		{
-			QWidget* widget = gw[i].widget;
-			int type = gw[i].type;
-			int param = gw[i].param;
-			switch (type)
-			{
-				case GuiWidgets::SLIDER:
-					if (plugin->controllerEnabled(param) && plugin->controllerEnabled2(param))
-					{
-						double v = plugin->track()->pluginCtrlVal(genACnum(plugin->id(), param));
-						if (((Slider*) widget)->value() != v)
-						{
-							//printf("PluginGui::updateControls slider\n");
-
-							((Slider*) widget)->blockSignals(true);
-							((Slider*) widget)->setValue(v);
-							((Slider*) widget)->blockSignals(false);
-						}
-					}
-					break;
-				case GuiWidgets::DOUBLE_LABEL:
-					if (plugin->controllerEnabled(param) && plugin->controllerEnabled2(param))
-					{
-						double v = plugin->track()->pluginCtrlVal(genACnum(plugin->id(), param));
-						if (((DoubleLabel*) widget)->value() != v)
-						{
-							//printf("PluginGui::updateControls label\n");
-
-							((DoubleLabel*) widget)->blockSignals(true);
-							((DoubleLabel*) widget)->setValue(v);
-							((DoubleLabel*) widget)->blockSignals(false);
-						}
-					}
-					break;
-				case GuiWidgets::QCHECKBOX:
-					if (plugin->controllerEnabled(param) && plugin->controllerEnabled2(param))
-					{
-						bool b = (bool) plugin->track()->pluginCtrlVal(genACnum(plugin->id(), param));
-						if (((QCheckBox*) widget)->isChecked() != b)
-						{
-							//printf("PluginGui::updateControls checkbox\n");
-
-							((QCheckBox*) widget)->blockSignals(true);
-							((QCheckBox*) widget)->setChecked(b);
-							((QCheckBox*) widget)->blockSignals(false);
-						}
-					}
-					break;
-				case GuiWidgets::QCOMBOBOX:
-					if (plugin->controllerEnabled(param) && plugin->controllerEnabled2(param))
-					{
-						int n = (int) plugin->track()->pluginCtrlVal(genACnum(plugin->id(), param));
-						if (((QComboBox*) widget)->currentIndex() != n)
-						{
-							//printf("PluginGui::updateControls combobox\n");
-
-							((QComboBox*) widget)->blockSignals(true);
-							((QComboBox*) widget)->setCurrentIndex(n);
-							((QComboBox*) widget)->blockSignals(false);
-						}
-					}
-					break;
-			}
-		}
-	}
-}/*}}}*/
-
-//---------------------------------------------------------
-//   guiParamChanged
-//---------------------------------------------------------
-
-void PluginGui::guiParamChanged(int idx)/*{{{*/
-{
-	QWidget* w = gw[idx].widget;
-	int param = gw[idx].param;
-	int type = gw[idx].type;
-
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
-
-	if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-		plugin->enableController(param, false);
-
-	double val = 0.0;
-	switch (type)
-	{
-		case GuiWidgets::SLIDER:
-			val = ((Slider*) w)->value();
-			break;
-		case GuiWidgets::DOUBLE_LABEL:
-			val = ((DoubleLabel*) w)->value();
-			break;
-		case GuiWidgets::QCHECKBOX:
-			val = double(((QCheckBox*) w)->isChecked());
-			break;
-		case GuiWidgets::QCOMBOBOX:
-			val = double(((QComboBox*) w)->currentIndex());
-			break;
-	}
-
-	for (int i = 0; i < nobj; ++i)
-	{
-		QWidget* widget = gw[i].widget;
-		if (widget == w || param != gw[i].param)
-			continue;
-		int type = gw[i].type;
-		switch (type)
-		{
-			case GuiWidgets::SLIDER:
-				((Slider*) widget)->setValue(val);
-				break;
-			case GuiWidgets::DOUBLE_LABEL:
-				((DoubleLabel*) widget)->setValue(val);
-				break;
-			case GuiWidgets::QCHECKBOX:
-				((QCheckBox*) widget)->setChecked(int(val));
-				break;
-			case GuiWidgets::QCOMBOBOX:
-				((QComboBox*) widget)->setCurrentIndex(int(val));
-				break;
-		}
-	}
-
-	int id = plugin->id();
-	if (track && id != -1)
-	{
-		id = genACnum(id, param);
-
-		// p3.3.43
-		//audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
-
-		//if(track)
-		//{
-		// p3.3.43
-		audio->msgSetPluginCtrlVal(track, id, val);
-
-		switch (type)
-		{
-			case GuiWidgets::DOUBLE_LABEL:
-			case GuiWidgets::QCHECKBOX:
-				track->startAutoRecord(id, val);
-				break;
-			default:
-				track->recordAutomation(id, val);
-				break;
-		}
-		//}
-	}
-	plugin->setParam(param, val);
-}/*}}}*/
-
-//---------------------------------------------------------
-//   guiParamPressed
-//---------------------------------------------------------
-
-void PluginGui::guiParamPressed(int idx)/*{{{*/
-{
-	int param = gw[idx].param;
-
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
-
-	if (at != AUTO_OFF)
-		plugin->enableController(param, false);
-
-	int id = plugin->id();
-	if (!track || id == -1)
-		return;
-
-	id = genACnum(id, param);
-
-	// NOTE: For this to be of any use, the freeverb gui 2142.ui
-	//  would have to be used, and changed to use CheckBox and ComboBox
-	//  instead of QCheckBox and QComboBox, since both of those would
-	//  need customization (Ex. QCheckBox doesn't check on click).
-	/*
-	switch(type) {
-		  case GuiWidgets::QCHECKBOX:
-				  double val = (double)((CheckBox*)w)->isChecked();
-				  track->startAutoRecord(id, val);
-				break;
-		  case GuiWidgets::QCOMBOBOX:
-				  double val = (double)((ComboBox*)w)->currentIndex();
-				  track->startAutoRecord(id, val);
-				break;
-		  }
-	 */
-}/*}}}*/
-
-//---------------------------------------------------------
-//   guiParamReleased
-//---------------------------------------------------------
-
-void PluginGui::guiParamReleased(int idx)/*{{{*/
-{
-	int param = gw[idx].param;
-	int type = gw[idx].type;
-
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
-
-	// Special for switch - don't enable controller until transport stopped.
-	if (at != AUTO_WRITE && (type != GuiWidgets::QCHECKBOX
-			|| !audio->isPlaying()
-			|| at != AUTO_TOUCH))
-		plugin->enableController(param, true);
-
-	int id = plugin->id();
-
-	if (!track || id == -1)
-		return;
-
-	id = genACnum(id, param);
-
-	// NOTE: For this to be of any use, the freeverb gui 2142.ui
-	//  would have to be used, and changed to use CheckBox and ComboBox
-	//  instead of QCheckBox and QComboBox, since both of those would
-	//  need customization (Ex. QCheckBox doesn't check on click).
-	/*
-	switch(type) {
-		  case GuiWidgets::QCHECKBOX:
-				  double val = (double)((CheckBox*)w)->isChecked();
-				  track->stopAutoRecord(id, param);
-				break;
-		  case GuiWidgets::QCOMBOBOX:
-				  double val = (double)((ComboBox*)w)->currentIndex();
-				  track->stopAutoRecord(id, param);
-				break;
-		  }
-	 */
-}/*}}}*/
-
-//---------------------------------------------------------
-//   guiSliderPressed
-//---------------------------------------------------------
-
-void PluginGui::guiSliderPressed(int idx)/*{{{*/
-{
-	int param = gw[idx].param;
-	QWidget *w = gw[idx].widget;
-
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
-
-	int id = plugin->id();
-
-	if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-		plugin->enableController(param, false);
-
-	if (!track || id == -1)
-		return;
-
-	id = genACnum(id, param);
-
-	double val = ((Slider*) w)->value();
-	plugin->setParam(param, val);
-
-	//audio->msgSetPluginCtrlVal(((PluginI*)plugin), id, val);
-	// p3.3.43
-	audio->msgSetPluginCtrlVal(track, id, val);
-
-	track->startAutoRecord(id, val);
-
-	// Needed so that paging a slider updates a label or other buddy control.
-	for (int i = 0; i < nobj; ++i)
-	{
-		QWidget* widget = gw[i].widget;
-		if (widget == w || param != gw[i].param)
-			continue;
-		int type = gw[i].type;
-		switch (type)
-		{
-			case GuiWidgets::SLIDER:
-				((Slider*) widget)->setValue(val);
-				break;
-			case GuiWidgets::DOUBLE_LABEL:
-				((DoubleLabel*) widget)->setValue(val);
-				break;
-			case GuiWidgets::QCHECKBOX:
-				((QCheckBox*) widget)->setChecked(int(val));
-				break;
-			case GuiWidgets::QCOMBOBOX:
-				((QComboBox*) widget)->setCurrentIndex(int(val));
-				break;
-		}
-	}
-}/*}}}*/
-
-//---------------------------------------------------------
-//   guiSliderReleased
-//---------------------------------------------------------
-
-void PluginGui::guiSliderReleased(int idx)/*{{{*/
-{
-	int param = gw[idx].param;
-	QWidget *w = gw[idx].widget;
-
-	AutomationType at = AUTO_OFF;
-	AudioTrack* track = plugin->track();
-	if (track)
-		at = track->automationType();
-
-	if (at != AUTO_WRITE || (!audio->isPlaying() && at == AUTO_TOUCH))
-		plugin->enableController(param, true);
-
-	int id = plugin->id();
-
-	if (!track || id == -1)
-		return;
-
-	id = genACnum(id, param);
-
-	double val = ((Slider*) w)->value();
-	track->stopAutoRecord(id, val);
-}/*}}}*/
-
-//---------------------------------------------------------
-//   guiSliderRightClicked
-//---------------------------------------------------------
-
-void PluginGui::guiSliderRightClicked(const QPoint &p, int idx)/*{{{*/
-{
-	int param = gw[idx].param;
-	int id = plugin->id();
-	if (id != -1)
-		//song->execAutomationCtlPopup((AudioTrack*)plugin->track(), p, genACnum(id, param));
-		song->execAutomationCtlPopup(plugin->track(), p, genACnum(id, param));
-}/*}}}*/
+    int id = plugin->id();
+    if (id != -1)
+        //song->execAutomationCtlPopup((AudioTrack*)plugin->track(), p, genACnum(id, param));
+        song->execAutomationCtlPopup(plugin->track(), p, genACnum(id, param));
+}

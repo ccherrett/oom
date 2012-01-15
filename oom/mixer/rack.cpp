@@ -48,7 +48,7 @@ public:
 	void setBackgroundColor(const QBrush& brush)
 	{
 		setBackground(brush);
-	};
+	}
 };
 
 RackSlot::~RackSlot()
@@ -151,50 +151,74 @@ QSize EffectRack::sizeHint() const
 
 void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 {
-	Plugin* plugin = PluginDialog::getPlugin(this);
-	if (plugin)
-	{
-		PluginI* plugi = new PluginI();
-#ifdef LV2_SUPPORT
-		if(plugin->type() == LV2)
-		{
-			//printf("LV2 Plugin select for rack\n");
-			LV2PluginI* lplugi = new LV2PluginI();
-			if (!lplugi->initPluginInstance(plugin, track->channels()))
-			{
-				printf("cannot instantiate lv2 plugin <%s>\n",
-						plugin->name().toLatin1().constData());
-				delete plugi;
-				return;
-			}
-			int idx = row(it);
-			if (replace)
-			{
-				audio->msgAddPlugin(track, idx, 0);
-				//Do this part from the GUI context so user interfaces can be properly deleted
-				track->efxPipe()->insert(0, idx);
-			}
-			audio->msgAddPlugin(track, idx, lplugi);
-			song->dirty = true;
-		}
-		else
-#endif
-		{
-			if (!plugi->initPluginInstance(plugin, track->channels()))
-			{
-				printf("cannot instantiate plugin <%s>\n",
-						plugin->name().toLatin1().constData());
-				delete plugi;
-				return;
-			}
-			int idx = row(it);
-			if (replace)
-				audio->msgAddPlugin(track, idx, 0);
-			audio->msgAddPlugin(track, idx, plugi);
-			song->dirty = true;
-		}
-		updateContents();
-	}
+    PluginI* plugi = PluginDialog::getPlugin(this);
+    if (plugi)
+    {
+        // TODO - verify if channels match using track->channels()
+        if (plugi->type() == PLUGIN_LADSPA)
+        {
+            LadspaPlugin* ladplug = new LadspaPlugin();
+            if (ladplug->init(plugi->filename(), plugi->label()))
+            {
+                int idx = row(it);
+                if (replace)
+                    audio->msgAddPlugin(track, idx, 0);
+                audio->msgAddPlugin(track, idx, ladplug);
+                ladplug->setActive(true);
+                song->dirty = true;
+            }
+            else
+            {
+                QMessageBox::warning(this, tr("Failed to load plugin"), tr("Plugin '%1'' failed to initialize properly, error was:\n%2").arg(plugi->name()).arg(get_last_error()));
+                delete ladplug;
+                return;
+            }
+        }
+        else if (plugi->type() == PLUGIN_LV2)
+        {
+            Lv2Plugin* lv2plug = new Lv2Plugin();
+            if (lv2plug->init(plugi->filename(), plugi->label()))
+            {
+                int idx = row(it);
+                if (replace)
+                {
+                    audio->msgAddPlugin(track, idx, 0);
+                    //Do this part from the GUI context so user interfaces can be properly deleted
+                    // track->efxPipe()->insert(0, idx); was set on lv2 only
+                }
+                audio->msgAddPlugin(track, idx, lv2plug);
+                lv2plug->setActive(true);
+                song->dirty = true;
+            }
+            else
+            {
+                QMessageBox::warning(this, tr("Failed to load plugin"), tr("Plugin '%1'' failed to initialize properly, error was:\n%2").arg(plugi->name()).arg(get_last_error()));
+                delete lv2plug;
+                return;
+            }
+        }
+        else if (plugi->type() == PLUGIN_VST)
+        {
+            VstPlugin* vstplug = new VstPlugin();
+            if (vstplug->init(plugi->filename(), plugi->label()))
+            {
+                int idx = row(it);
+                if (replace)
+                    audio->msgAddPlugin(track, idx, 0);
+                audio->msgAddPlugin(track, idx, vstplug);
+                vstplug->setActive(true);
+                song->dirty = true;
+            }
+            else
+            {
+                QMessageBox::warning(this, tr("Failed to load plugin"), tr("Plugin '%1'' failed to initialize properly, error was:\n%2").arg(plugi->name()).arg(get_last_error()));
+                delete vstplug;
+                return;
+            }
+        }
+
+        updateContents();
+    }
 }
 
 //---------------------------------------------------------
@@ -206,14 +230,17 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 	if (it == 0 || track == 0)
 		return;
 	RackSlot* curitem = (RackSlot*) it;
+
 	int idx = row(curitem);
 	QString name;
-	bool mute;
+	bool mute = false;
+        bool nativeGui = false;
 	Pipeline* pipe = track->efxPipe();
 	if (pipe)
 	{
 		name = pipe->name(idx);
-		mute = pipe->isOn(idx);
+		mute = (pipe->isActive(idx) == false);
+                nativeGui = pipe->hasNativeGui(idx);
 	}
 
 	//enum { NEW, CHANGE, UP, DOWN, REMOVE, BYPASS, SHOW, SAVE };
@@ -247,16 +274,11 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 	showGuiAction->setCheckable(true);
 	showNativeGuiAction->setCheckable(true);
 
-	bypassAction->setChecked(!pipe->isOn(idx));
+	bypassAction->setChecked(mute);
 	showGuiAction->setChecked(pipe->guiVisible(idx));
-	showNativeGuiAction->setChecked(pipe->nativeGuiVisible(idx));
-
-#if defined(OSC_SUPPORT) || defined(LV2_SUPPORT)
-	showNativeGuiAction->setEnabled(true);
-#else
-	printf("Disabling show Native\n");
-	showNativeGuiAction->setEnabled(false);
-#endif
+        showNativeGuiAction->setEnabled(nativeGui);
+        if (nativeGui)
+            showNativeGuiAction->setChecked(pipe->nativeGuiVisible(idx));
 
 	if (pipe->empty(idx))
 	{
@@ -276,8 +298,6 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 			upAction->setEnabled(true);
 		if (idx == (PipelineDepth - 1))
 			downAction->setEnabled(false);
-		if (!pipe->isDssiPlugin(idx))
-			showNativeGuiAction->setEnabled(false);
 	}
 
 	QPoint pt = QCursor::pos();
@@ -328,8 +348,8 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 		}
 		case BYPASS:
 		{
-			bool flag = !pipe->isOn(idx);
-			pipe->setOn(idx, flag);
+			bool flag = !pipe->isActive(idx);
+			pipe->setActive(idx, flag);
 			break;
 		}
 		case SHOW:
@@ -386,16 +406,20 @@ void EffectRack::doubleClicked(QListWidgetItem* it)
 		choosePlugin(it);
 		return;
 	}
-	if (pipe)
-	{
-#if defined(OSC_SUPPORT) || defined(LV2_SUPPORT)
-			bool flag = !pipe->nativeGuiVisible(idx);
-			pipe->showNativeGui(idx, flag);
-#else
-			bool flag = !pipe->guiVisible(idx);
-			pipe->showGui(idx, flag);
-#endif
-	}
+
+        if (pipe)
+        {
+            if (pipe->hasNativeGui(idx))
+            {
+                bool flag = !pipe->nativeGuiVisible(idx);
+                pipe->showNativeGui(idx, flag);
+            }
+            else
+            {
+                bool flag = !pipe->guiVisible(idx);
+                pipe->showGui(idx, flag);
+            }
+        }
 }
 
 void EffectRack::savePreset(int idx)
@@ -424,17 +448,7 @@ void EffectRack::savePreset(int idx)
 		{
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
-		#ifdef LV2_SUPPORT
-			if((*pipe)[idx]->type() == 1)
-			{
-				printf("Saving LV2 preset\n");
-				LV2PluginI* lp = (LV2PluginI*)(*pipe)[idx];
-				if(lp)
-					lp->writeConfiguration(1, xml);
-			}
-			else
-		#endif
-				(*pipe)[idx]->writeConfiguration(1, xml);
+			(*pipe)[idx]->writeConfiguration(1, xml);
 			xml.tag(0, "/oom");
 		}
 		else
@@ -482,16 +496,7 @@ void EffectRack::startDrag(int idx)
 		{
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
-		#ifdef LV2_SUPPORT
-			if((*pipe)[idx]->type() == 1)
-			{
-				LV2PluginI* lp = (LV2PluginI*)(*pipe)[idx];
-				if(lp)
-					lp->writeConfiguration(1, xml);
-			}
-			else
-		#endif
-				(*pipe)[idx]->writeConfiguration(1, xml);
+			(*pipe)[idx]->writeConfiguration(1, xml);
 			xml.tag(0, "/oom");
 		}
 		else
@@ -627,8 +632,8 @@ void EffectRack::mousePressEvent(QMouseEvent *event)
 	else if (event->button() & Qt::MidButton)
 	{
 		int idx = row(itemAt(event->pos()));
-		bool flag = !track->efxPipe()->isOn(idx);
-		track->efxPipe()->setOn(idx, flag);
+		bool flag = !track->efxPipe()->isActive(idx);
+		track->efxPipe()->setActive(idx, flag);
 		updateContents();
 	}
 
@@ -661,65 +666,77 @@ void EffectRack::mouseMoveEvent(QMouseEvent *event)
 
 void EffectRack::initPlugin(Xml xml, int idx)
 {
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		QString tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return;
-			case Xml::TagStart:
-				if (tag == "plugin")/*{{{*/
-				{
-					PluginI* plugi = new PluginI();
-					if (plugi->readConfiguration(xml, false))
-					{
-						printf("cannot instantiate plugin\n");
-						delete plugi;
-					}
-					else
-					{
-						//printf("instantiated!\n");
-						audio->msgAddPlugin(track, idx, plugi);
-						song->update(SC_RACK);
-						return;
-					}
-				}/*}}}*/
-				else if (tag == "lv2plugin")/*{{{*/
-				{
-			#ifdef LV2_SUPPORT
-					LV2PluginI* plugi = new LV2PluginI();
-					if (plugi->readConfiguration(xml, false))
-					{
-						printf("cannot instantiate plugin\n");
-						delete plugi;
-					}
-					else
-					{
-						//printf("instantiated!\n");
-						audio->msgAddPlugin(track, idx, plugi);
-						song->update(SC_RACK);
-						return;
-					}
-			#else
-					xml.skip(tag);
-			#endif
-				}/*}}}*/
-				else if (tag == "oom" || tag == "muse")
-					break;
-				else
-					xml.unknown("EffectRack");
-				break;
-			case Xml::Attribut:
-				break;
-			case Xml::TagEnd:
-				if (tag == "oom" || tag == "muse")
-					return;
-			default:
-				break;
-		}
-	}
+    for (;;)
+    {
+        Xml::Token token = xml.parse();
+        QString tag = xml.s1();
+        switch (token)
+        {
+            case Xml::Error:
+            case Xml::End:
+                return;
+            case Xml::TagStart:
+                if (tag == "LadspaPlugin")
+                {
+                    LadspaPlugin* ladplug = new LadspaPlugin();
+                    if (ladplug->readConfiguration(xml, false))
+                    {
+                        printf("cannot instantiate plugin\n");
+                        delete ladplug;
+                    }
+                    else
+                    {
+                        //printf("instantiated!\n");
+                        audio->msgAddPlugin(track, idx, ladplug);
+                        song->update(SC_RACK);
+                        return;
+                    }
+                }
+                else if (tag == "Lv2Plugin")
+                {
+                    Lv2Plugin* lv2plug = new Lv2Plugin();
+                    if (lv2plug->readConfiguration(xml, false))
+                    {
+                        printf("cannot instantiate plugin\n");
+                        delete lv2plug;
+                    }
+                    else
+                    {
+                        //printf("instantiated!\n");
+                        audio->msgAddPlugin(track, idx, lv2plug);
+                        song->update(SC_RACK);
+                        return;
+                    }
+                }
+                else if (tag == "VstPlugin")
+                {
+                    VstPlugin* vstplug = new VstPlugin();
+                    if (vstplug->readConfiguration(xml, false))
+                    {
+                        printf("cannot instantiate plugin\n");
+                        delete vstplug;
+                    }
+                    else
+                    {
+                        //printf("instantiated!\n");
+                        audio->msgAddPlugin(track, idx, vstplug);
+                        song->update(SC_RACK);
+                        return;
+                    }
+                }
+                else if (tag == "oom" || tag == "muse")
+                    break;
+                else
+                    xml.unknown("EffectRack");
+                break;
+            case Xml::Attribut:
+                break;
+            case Xml::TagEnd:
+                if (tag == "oom" || tag == "muse")
+                    return;
+            default:
+                break;
+        }
+    }
 }
 
