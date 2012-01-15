@@ -553,6 +553,7 @@ public:
     void showNativeGui(bool yesno);
     bool nativeGuiVisible();
     void updateNativeGui();
+    void resizeNativeGui(int width, int height);
 
     QString getParameterName(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
@@ -565,7 +566,12 @@ public:
     bool readConfiguration(Xml& xml, bool readPreset);
     void writeConfiguration(int level, Xml& xml);
 
+    bool loadParameter(Xml& xml);
+
 protected:
+    QWidget* m_nativeGui;
+    bool isOldSdk;
+
     AEffect* effect;
     struct {
         int32_t numEvents;
@@ -573,7 +579,6 @@ protected:
         VstEvent* data[MAX_VST_EVENTS];
     } events;
     VstMidiEvent midiEvents[MAX_VST_EVENTS];
-    bool isOldSdk;
 };
 
 //---------------------------------------------------------

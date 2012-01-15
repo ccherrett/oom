@@ -352,9 +352,10 @@ bool initJackAudio()
 	return true;
 }
 
-static int bufsize_callback(jack_nframes_t n, void*)
+static int bufsize_callback(jack_nframes_t bufsize, void*)
 {
-	printf("JACK: buffersize changed %d\n", n);
+    printf("JACK: buffersize changed %d\n", bufsize);
+    audio->msgSetSegSize(bufsize, sampleRate);
 	return 0;
 }
 

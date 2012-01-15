@@ -91,6 +91,7 @@ EffectRack::EffectRack(QWidget* parent, AudioTrack* t)
 	connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
 			this, SLOT(doubleClicked(QListWidgetItem*)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
+    connect(song, SIGNAL(segmentSizeChanged(int)), SLOT(segmentSizeChanged(int)));
 
 	setSpacing(0);
 	//QPalette qpal;
@@ -129,6 +130,22 @@ void EffectRack::songChanged(int typ)
 	{
 		updateContents();
 	}
+}
+
+//---------------------------------------------------------
+//   segmentSizeChanged
+//---------------------------------------------------------
+
+void EffectRack::segmentSizeChanged(int size)
+{
+    Pipeline* pipe = track->efxPipe();
+    for (int i = 0; i < PipelineDepth; ++i)
+    {
+        if ((*pipe)[i])
+        {
+            (*pipe)[i]->bufferSizeChanged(size);
+        }
+    }
 }
 
 //---------------------------------------------------------
@@ -332,6 +349,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 		{
 			Pipeline* epipe = track->efxPipe();
             BasePlugin* oldPlugin = (*epipe)[idx];
+            oldPlugin->setActive(false);
             oldPlugin->aboutToRemove();
 
             qCritical("Plugin to remove now and here");
