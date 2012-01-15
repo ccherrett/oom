@@ -9,9 +9,6 @@
 
 #include <QtGui>
 #include "plugin.h"
-#ifdef LV2_SUPPORT
-#include "lv2_plugin.h"
-#endif
 #include "config.h"
 #include "plugindialog.h"
 #include "traverso_shared/TConfig.h"
