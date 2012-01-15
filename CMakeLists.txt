@@ -92,7 +92,7 @@ SET(OOMidi_MODULES_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/modules)
 SET(OOMidi_SYNTHI_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/synthi)
 
 ## Plugins directory
-SET(OOMidi_PLUGINS_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/plugins)
+#SET(OOMidi_PLUGINS_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME}/plugins)
 
 ## Top documentation dir
 IF(NOT DEFINED OOMidi_DOC_DIR)
@@ -459,7 +459,7 @@ set(CMAKE_C_FLAGS         "${CMAKE_CXX_FLAGS} -std=c99 -fvisibility=hidden")
 #       are scanned before coming to share/locale
 #subdirs(al awl grepmidi man plugins oom synti packaging utils share oostudio)
 
-subdirs(al awl man plugins ${LILV_DEPS} oom synti packaging utils share oostudio patchcanvas)
+subdirs(al awl man ${LILV_DEPS} oom synti packaging utils share oostudio patchcanvas)
 
 ## Install doc files
 file (GLOB doc_files
