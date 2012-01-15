@@ -30,34 +30,6 @@
 #include "plugin.h"
 #include "song.h"
 
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <dlfcn.h>
-//#include <cmath>
-
-//#include <QButtonGroup>
-//#include <QCheckBox>
-//#include <QComboBox>
-//#include <QDir>
-//#include <QFile>
-//#include <QGroupBox>
-//#include <QHBoxLayout>
-//#include <QMainWindow>
-//#include <QPushButton>
-//#include <QRadioButton>
-//#include <QSignalMapper>
-//#include <QSizePolicy>
-//#include <QTreeWidget>
-//#include <QVBoxLayout>
-
-//#include "gconfig.h"
-//#include "midictrl.h"
-//#include "xml.h"
-//#include "fastlog.h"
-//#include "audio.h"
-//#include "al/dsp.h"
-//#include "config.h"
-
 //---------------------------------------------------------
 //   PluginGui
 //---------------------------------------------------------
@@ -266,7 +238,7 @@ void PluginGui::heartBeat()
 void PluginGui::setActive(bool yesno)
 {
     pluginBypass->blockSignals(true);
-    pluginBypass->setChecked(yesno);
+    pluginBypass->setChecked(!yesno);
     pluginBypass->blockSignals(false);
 }
 

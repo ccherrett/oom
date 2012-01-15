@@ -297,11 +297,16 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 		int ao = i->getAudioOutputCount();
 		//int ci = i->controlInPorts();
 		//int co = i->controlOutPorts();
+
+        if (ai != ao)
+            // we can only safely process if inputs match outputs (of fx, not synth plugins)
+            continue;
+
 		bool addFlag = false;
 		bool stereo = false;
 		if ((ai == 1 || ai == 2) && ao == 2)
 			stereo = true;
-		else if(ai == 1 && ao == 1)
+        else if (ai == 1 && ao == 1)
 			stereo = false;
 
 		switch (nbr)
@@ -365,8 +370,11 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 		//int ci = i->controlInPorts();
 		//int co = i->controlOutPorts();
 
-		bool addFlag = false;
+        if (ai != ao)
+            // we can only safely process if inputs match outputs (of fx, not synth plugins)
+            continue;
 
+		bool addFlag = false;
 		bool stereo = false;
 		if ((ai == 1 || ai == 2) && ao == 2)
 			stereo = true;

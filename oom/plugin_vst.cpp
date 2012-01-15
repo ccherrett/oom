@@ -9,6 +9,10 @@
 #define __PLUGIN_VST_H__
 
 #include "plugin.h"
+#include "plugingui.h"
+#include "song.h"
+
+#include <math.h>
 
 #ifndef kVstVersion
 #define kVstVersion 2400
@@ -22,7 +26,7 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
         return kVstVersion;
 
     case audioMasterGetSampleRate:
-        return 44100;
+        return sampleRate;
 
     case audioMasterGetBlockSize:
         return 512;
@@ -107,7 +111,7 @@ void VstPlugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
 
     if (effect->flags & effFlagsIsSynth)
         plugi->m_hints |= PLUGIN_IS_SYNTH;
-    else if (plugi->m_audioInputCount > 1 && plugi->m_audioOutputCount > 1)
+    else if (plugi->m_audioInputCount >= 1 && plugi->m_audioOutputCount >= 1)
         plugi->m_hints |= PLUGIN_IS_FX;
 
     if (effect->flags & effFlagsHasEditor)
@@ -160,7 +164,7 @@ void VstPlugin::updateNativeGui()
 {
 }
 
-void VstPlugin::process(uint32_t frames)
+void VstPlugin::process(uint32_t frames, float** src, float** dst)
 {
 }
 

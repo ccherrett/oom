@@ -58,7 +58,7 @@
 #include "plugindialog.h"
 
 // debug plugin scan
-#define PLUGIN_DEBUGIN
+//#define PLUGIN_DEBUGIN
 
 PluginList plugins;
 
@@ -354,50 +354,22 @@ void Pipeline::apply(int ports, uint32_t nframes, float** buffer1)
         BasePlugin* p = *ip;
         if (p)
         {
-            if (p->type() == PLUGIN_LADSPA)
-            {
-                LadspaPlugin* ladp = (LadspaPlugin*)p;
+            p->setChannels(ports);
 
-                if (ladp->hints() & PLUGIN_HAS_IN_PLACE_BROKEN)
-                {
-                    if (swap)
-                        ladp->connect(ports, buffer, buffer1);
-                    else
-                        ladp->connect(ports, buffer1, buffer);
-                    swap = !swap;
-                }
-                else
-                {
-                    if (swap)
-                        ladp->connect(ports, buffer, buffer);
-                    else
-                        ladp->connect(ports, buffer1, buffer1);
-                }
-                ladp->process(nframes);
-            }
-            else if (p->type() == PLUGIN_LV2)
+            if (p->hints() & PLUGIN_HAS_IN_PLACE_BROKEN)
             {
-                Lv2Plugin* lv2p = (Lv2Plugin*)p;
-
-                if (lv2p->hints() & PLUGIN_HAS_IN_PLACE_BROKEN)
-                {
-                    if (swap)
-                        lv2p->connect(ports, buffer, buffer1);
-                    else
-                        lv2p->connect(ports, buffer1, buffer);
-                    swap = !swap;
-                }
+                if (swap)
+                    p->process(nframes, buffer, buffer1);
                 else
-                {
-                    if (swap)
-                        lv2p->connect(ports, buffer, buffer);
-                    else
-                        lv2p->connect(ports, buffer1, buffer1);
-                }
-                lv2p->process(nframes);
+                    p->process(nframes, buffer1, buffer);
+                swap = !swap;
             }
-            else if (p->type() == PLUGIN_VST)
+            else
             {
+                if (swap)
+                    p->process(nframes, buffer, buffer);
+                else
+                    p->process(nframes, buffer1, buffer1);
             }
         }
     }
