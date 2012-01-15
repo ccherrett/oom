@@ -209,9 +209,5 @@ extern QHash<int, QColor> g_trackColorList;
 extern QHash<int, QColor> g_trackColorListSelected;
 extern QHash<int, QPixmap> g_trackDragImageList;
 extern int vuColorStrip;
-#ifdef LV2_SUPPORT
-struct LV2World;
-extern LV2World* lv2world;
-#endif
 #endif
 

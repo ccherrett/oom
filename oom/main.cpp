@@ -33,13 +33,12 @@ extern void initIcons();
 extern bool initJackAudio();
 extern void initMidiController();
 extern void initMetronome();
-extern void initOSC();
-extern void initVST();
-extern void initPlugins();
+extern void initPlugins(bool ladspa, bool lv2, bool vst);
 extern void initShortCuts();
-extern void initDSSI();
-extern void initLV2();
 extern void readConfiguration();
+
+// used for plugins
+void set_last_error(const char* error);
 
 static QString locale_override;
 
@@ -516,19 +515,15 @@ int main(int argc, char* argv[])
 		hIsB = false;
 	}
 
-	if (loadPlugins)
-		initPlugins();
-#ifdef LV2_SUPPORT
-	initLV2();
-#endif
-	if (loadVST)
-		initVST();
+        // TODO, parse from command-line
+        bool ladspa, lv2, vst;
+        ladspa = lv2 = vst = true;
 
-	if (loadDSSI)
-		initDSSI();
+        if (loadPlugins)
+            initPlugins(ladspa, lv2, vst);
 
 	// p3.3.39
-	initOSC();
+	//initOSC();
 
 	initIcons();
 
