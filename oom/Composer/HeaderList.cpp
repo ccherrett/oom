@@ -34,6 +34,7 @@
 #include "midimonitor.h"
 #include "ComposerCanvas.h"
 #include "trackheader.h"
+#include "CreateTrackDialog.h"
 
 
 HeaderList::HeaderList(QWidget* parent, const char* name)
@@ -619,7 +620,7 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 {
 	int button = ev->button();
 
-	Track* t = 0;
+	//Track* t = 0;
 	if (button == Qt::RightButton)
 	{
 		QMenu* p = new QMenu;
@@ -679,10 +680,13 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 				}
 				else
 				{
-					t = song->addTrack((Track::TrackType)n);
+				//	t = song->addTrack((Track::TrackType)n);
+					CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1, this);
+					connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
+					ctdialog->exec();
 				}
 
-				if (t)
+				/*if (t)
 				{
 					midiMonitor->msgAddMonitoredTrack(t);
 					song->deselectTracks();
@@ -691,7 +695,7 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 					emit selectionChanged(t);
 					emit trackInserted(n);
 					song->updateTrackViews1();
-				}
+				}*/
 			}
 		}
 		if(p)
@@ -710,5 +714,16 @@ void HeaderList::wheelEvent(QWheelEvent* ev)/*{{{*/
 /*void HeaderList::resizeEvent(QResizeEvent*)
 {
 }*/
+
+void HeaderList::newTrackAdded(QString name)
+{
+	Track* t = song->findTrack(name);
+	if(t)
+	{
+		emit selectionChanged(t);
+		emit trackInserted(t->type());
+		song->updateTrackViews1();
+	}
+}
 
 

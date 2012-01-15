@@ -49,6 +49,7 @@
 #include "midimonitor.h"
 #include "plugin.h"
 #include "traverso_shared/OOMCommand.h"
+#include "CreateTrackDialog.h"
 //#include <omp.h>
 
 extern void clearMidiTransforms();
@@ -212,7 +213,7 @@ Track* Song::addNewTrack(QAction* action)
 		return 0;
 
 	// Synth sub-menu id?
-	if (n >= MENU_ADD_SYNTH_ID_BASE)
+	/*if (n >= MENU_ADD_SYNTH_ID_BASE)
 	{
 		n -= MENU_ADD_SYNTH_ID_BASE;
 		if (n < (int) synthis.size())
@@ -264,8 +265,24 @@ Track* Song::addNewTrack(QAction* action)
 		update(SC_SELECTION);
 		return t;
 	}
+	*/
+	CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1);
+	connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
+	ctdialog->exec();
+
+	return 0;
 }
 
+
+void Song::newTrackAdded(QString name)
+{
+	Track* t = findTrack(name);
+	if(t)
+	{
+		updateTrackViews1();
+		update(SC_SELECTION);
+	}
+}
 
 //---------------------------------------------------------
 //    addTrack

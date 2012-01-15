@@ -618,6 +618,7 @@ public slots:
 	void updateTrackViews1();
 	void closeJackBox();
 	void toggleFeedback(bool);
+	void newTrackAdded(QString);
 
 signals:
 	void replayChanged(bool, unsigned);

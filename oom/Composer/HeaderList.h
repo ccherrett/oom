@@ -56,6 +56,7 @@ private slots:
     void songChanged(int flags);
 	void updateSelection(Track*, bool);
 	void composerViewChanged();
+	void newTrackAdded(QString);
 
 signals:
     void selectionChanged(Track*);
