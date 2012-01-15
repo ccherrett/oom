@@ -41,6 +41,7 @@ private slots:
     void menuRequested(QListWidgetItem*);
     void doubleClicked(QListWidgetItem*);
     void songChanged(int);
+    void segmentSizeChanged(int);
     void updateContents();
 
 protected:

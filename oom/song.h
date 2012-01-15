@@ -619,6 +619,7 @@ public slots:
 	void closeJackBox();
 	void toggleFeedback(bool);
 	void newTrackAdded(QString);
+    void updateSegmentSize();
 
 signals:
 	void replayChanged(bool, unsigned);
@@ -640,6 +641,7 @@ signals:
 	void trackViewAdded();
 	void trackViewDeleted();
 	void composerViewChanged();
+    void segmentSizeChanged(int);
 };
 
 extern Song* song;

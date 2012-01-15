@@ -727,6 +727,8 @@ void Audio::processMsg(AudioMsg* msg)
 		case AUDIO_SET_SEG_SIZE:
 			segmentSize = msg->ival;
 			sampleRate = msg->iival;
+            song->updateSegmentSize();
+
 #if 0 //TODO
 			audioOutput.segmentSizeChanged();
 			for (int i = 0; i < mixerGroups; ++i)

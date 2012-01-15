@@ -4693,3 +4693,8 @@ void Song::toggleFeedback(bool f)
 {	
 	midiMonitor->msgToggleFeedback(f);
 }
+
+void Song::updateSegmentSize()
+{
+    emit segmentSizeChanged(segmentSize);
+}

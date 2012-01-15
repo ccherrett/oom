@@ -934,7 +934,7 @@ static void loadPluginLib(QFileInfo* fi, const PluginType t)
 
         AEffect* effect = vstfn(VstHostCallback);
 
-        if (effect)
+        if (effect && (effect->flags & effFlagsCanReplacing) > 0)
         {
             QString PluginLabel = fi->baseName();
 
