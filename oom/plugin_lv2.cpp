@@ -542,7 +542,7 @@ void Lv2Plugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
 
     if (strcmp(lv2Class, "Instrument") == 0)
         plugi->m_hints |= PLUGIN_IS_SYNTH;
-    else if (plugi->m_audioInputCount > 1 && plugi->m_audioOutputCount > 1)
+    else if (plugi->m_audioInputCount >= 1 && plugi->m_audioOutputCount >= 1)
         plugi->m_hints |= PLUGIN_IS_FX;
 
     if (lilv_plugin_has_feature(lv2plug, lv2world->inPlaceBroken))

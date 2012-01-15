@@ -59,7 +59,7 @@ void LadspaPlugin::initPluginI(PluginI* plugi, const QString& filename, const QS
     if (LADSPA_IS_INPLACE_BROKEN(descr->Properties))
         plugi->m_hints |= PLUGIN_HAS_IN_PLACE_BROKEN;
 
-    if (plugi->m_audioInputCount > 1 && plugi->m_audioOutputCount > 1)
+    if (plugi->m_audioInputCount >= 1 && plugi->m_audioOutputCount >= 1)
         plugi->m_hints |= PLUGIN_IS_FX;
 
     Q_UNUSED(filename);
