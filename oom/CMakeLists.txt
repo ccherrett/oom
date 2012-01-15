@@ -24,19 +24,19 @@ include_directories(
       ${CMAKE_CURRENT_BINARY_DIR}
       )
 
-set (SubDirs 
-      Composer 
-      cliplist 
+set (SubDirs
+      Composer
+      cliplist
       ctrl
       driver
       instruments
       liste
-	  network
+      network
       marker
       master
       midiedit
       mixer
-      mplugins      
+      mplugins
       waveedit
       widgets
       )
@@ -53,27 +53,25 @@ subdirs (${SubDirs})
 ## Expand Qt macros in source files
 ##
 QT4_WRAP_CPP ( oom_moc_headers
-      app.h 
-      cobject.h 
-      conf.h 
-      AbstractMidiEditor.h 
-      miditransform.h 
-      plugin.h 
-	  lv2_plugin.h
-      song.h 
-	  thread.h
-      transport.h 
-      transpose.h 
-      value.h 
+      app.h
+      cobject.h
+      conf.h
+      AbstractMidiEditor.h
+      miditransform.h
+      song.h
+      thread.h
+      transport.h
+      transpose.h
+      value.h
       traverso_shared/TConfig.h
       traverso_shared/AddRemoveCtrlValues.h
       traverso_shared/CommandGroup.h
       traverso_shared/OOMCommand.h
-	  cthread.h
-	  cserver.h
-	  midimonitor.h
-	  ccinfo.h
-	  FadeCurve.h
+      cthread.h
+      cserver.h
+      midimonitor.h
+      ccinfo.h
+      FadeCurve.h
       )
 
 ##
@@ -92,23 +90,22 @@ file (GLOB core_source_files
       cobject.cpp
       conf.cpp
       ctrl.cpp
-      dssihost.cpp 
       event.cpp
-      eventlist.cpp 
-      exportmidi.cpp 
-      gconfig.cpp 
+      eventlist.cpp
+      exportmidi.cpp
+      gconfig.cpp
       globals.cpp
-      help.cpp 
+      help.cpp
       helper.cpp
-      importmidi.cpp 
+      importmidi.cpp
       key.cpp
-      memory.cpp 
+      memory.cpp
       midi.cpp
       midictrl.cpp
-      mididev.cpp 
+      mididev.cpp
       AbstractMidiEditor.cpp
-      midievent.cpp 
-      midifile.cpp 
+      midievent.cpp
+      midifile.cpp
       midiport.cpp
       midiseq.cpp
       miditransform.cpp
@@ -118,41 +115,42 @@ file (GLOB core_source_files
       osc.cpp
       part.cpp
       plugin.cpp
-	  lv2_plugin.cpp
+      plugin_ladspa.cpp
+      plugin_lv2.cpp
+      plugin_vst.cpp
       pos.cpp
       route.cpp
-      seqmsg.cpp 
-      shortcuts.cpp 
+      seqmsg.cpp
+      shortcuts.cpp
       sig.cpp
       song.cpp
-      songfile.cpp 
+      songfile.cpp
       stringparam.cpp
       sync.cpp
-      synth.cpp  
+      synth.cpp
       tempo.cpp
       thread.cpp
-      ticksynth.cpp 
+      ticksynth.cpp
       track.cpp
-	  trackview.cpp
+      trackview.cpp
       transport.cpp
       transpose.cpp
-      utils.cpp 
+      utils.cpp
       undo.cpp
       value.cpp
-      vst.cpp
       wave.cpp
-      waveevent.cpp 
-      wavetrack.cpp 
+      waveevent.cpp
+      wavetrack.cpp
       xml.cpp
       traverso_shared/TConfig.cpp
       traverso_shared/AddRemoveCtrlValues.cpp
       traverso_shared/CommandGroup.cpp
       traverso_shared/OOMCommand.cpp
-	  cthread.cpp
-	  cserver.cpp
-	  midimonitor.cpp
-	  ccinfo.cpp
-	  FadeCurve.cpp
+      cthread.cpp
+      cserver.cpp
+      midimonitor.cpp
+      ccinfo.cpp
+      FadeCurve.cpp
       lib_functions.cpp
       )
 file (GLOB main_source_files
@@ -198,7 +196,7 @@ include_directories (
       remote
       waveedit
       widgets
-	  ${OOMIDI_LV2_INCLUDES}
+      ${OOMIDI_LV2_INCLUDES}
       )
 
 # Make sure to include the uic generated headers paths.
@@ -223,8 +221,8 @@ set_target_properties( core
       # PROPERTIES COMPILE_FLAGS "-Imidiedit -Icomposer -Iliste -Iwidgets -Imixer -Idriver -Iwaveedit -Implugins -Iinstruments -Iremote ${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h "
       # PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -DINSTPREFIX='\"${CMAKE_INSTALL_PREFIX}\"' -DINSTLIBDIR='\"${LIBRARY_OUTPUT_DIRECTORY}\"' -include ${PROJECT_BINARY_DIR}/all.h "
       #PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC"
-	  PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC -fopenmp"
-	  LINK_FLAGS "-fopenmp"
+      PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC -fopenmp"
+      LINK_FLAGS "-fopenmp"
       OUTPUT_NAME oom_core
       )
 set_target_properties( oom
@@ -238,8 +236,8 @@ set_target_properties( icons
 ## Linkage
 ##
 target_link_libraries(core
-      al      
-      Composer 
+      al
+      Composer
       awl
       cliplist
       ctrl
@@ -247,18 +245,17 @@ target_link_libraries(core
       icons
       instruments
       liste
-	  network
+      network
       marker
       master
       midiedit
       mixer
       mplugins
-	  synti       
+      synti
       waveedit
-      widgets 
-      
+      widgets
       ${QT_LIBRARIES}
-	  ${QT_QTNETWORK_LIBRARY}
+      ${QT_QTNETWORK_LIBRARY}
       ${SNDFILE_LIBRARIES}
       ${SAMPLERATE_LIBRARIES}
       ${UUID_LIBRARIES}
@@ -276,32 +273,28 @@ if(OSC_SUPPORT)
 endif(OSC_SUPPORT)
 
 if (ENABLE_LILV_STATIC)
-	if(LILV_SUPPORT)
-	      target_link_libraries(core lilv_bundle)
-	endif(LILV_SUPPORT)
+        if(LILV_SUPPORT)
+              target_link_libraries(core lilv_bundle)
+        endif(LILV_SUPPORT)
 else (ENABLE_LILV_STATIC)
-	if(LILV_SUPPORT)
-	      target_link_libraries(core ${LIBLILV_LIBRARIES})
-	endif(LILV_SUPPORT)
+        if(LILV_SUPPORT)
+              target_link_libraries(core ${LIBLILV_LIBRARIES})
+        endif(LILV_SUPPORT)
 endif (ENABLE_LILV_STATIC)
 
-if(SLV2_SUPPORT)
-	target_link_libraries(core ${LIBSLV2_LIBRARIES})
-endif(SLV2_SUPPORT)
-
 if(GTK2UI_SUPPORT)
-	target_link_libraries(core ${GTK2_LIBRARIES})
+        target_link_libraries(core ${GTK2_LIBRARIES})
 endif(GTK2UI_SUPPORT)
 
 target_link_libraries(oom
       midiedit
       core
-      )	
+      )
 
 target_link_libraries(icons
       ${QT_LIBRARIES}
-	  ${QT_QTNETWORK_LIBRARY}
-      )	
+      ${QT_QTNETWORK_LIBRARY}
+      )
 
 ##
 ## Install location
