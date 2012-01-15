@@ -46,6 +46,7 @@
 #endif
 
 // vst includes
+#define VST_FORCE_DEPRECATED 0
 #include "pluginterfaces/vst2.x/aeffectx.h"
 
 class AudioTrack;
@@ -555,6 +556,8 @@ public:
 
     QString getParameterName(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
+
+    intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
     void process(uint32_t frames, float** src, float** dst);
     void bufferSizeChanged(uint32_t bufferSize);

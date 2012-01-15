@@ -20,13 +20,62 @@
 
 intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
 {
+    VstPlugin* plugin = (effect && effect->user) ? (VstPlugin*)effect->user : 0;
+
     switch (opcode)
     {
+    case audioMasterAutomate:
+        if (plugin)
+        {
+            plugin->setParameterValue(index, opt);
+            if (plugin->gui())
+                plugin->gui()->setParameterValue(index, opt);
+        }
+        return 1; // FIXME?
+
     case audioMasterVersion:
         return kVstVersion;
 
+    case audioMasterIdle:
+        if (effect)
+            effect->dispatcher(effect, effEditIdle, 0, 0, 0, 0.0f);
+        return 1; // FIXME?
+
+    case audioMasterGetTime:
+        // TODO
+        return 0;
+
+    case audioMasterTempoAt:
+        // Deprecated in VST SDK 2.4
+        // TODO
+        return 0;
+
     case audioMasterGetSampleRate:
         return sampleRate;
+
+    case audioMasterGetNumAutomatableParameters:
+        // Deprecated in VST SDK 2.4
+        // TODO
+        return 0;
+
+    case audioMasterIOChanged:
+        if (plugin)
+        {
+            if (plugin->active())
+            {
+                plugin->dispatcher(effStopProcess, 0, 0, 0, 0.0f);
+                plugin->dispatcher(effMainsChanged, 0, 0, 0, 0.0f);
+            }
+
+            plugin->reload();
+
+            if (plugin->active())
+            {
+                plugin->dispatcher(effMainsChanged, 0, 1, 0, 0.0f);
+                plugin->dispatcher(effStartProcess, 0, 0, 0, 0.0f);
+            }
+        }
+        return 1;
 
     case audioMasterGetBlockSize:
         return 512;
@@ -162,6 +211,11 @@ bool VstPlugin::nativeGuiVisible()
 
 void VstPlugin::updateNativeGui()
 {
+}
+
+intptr_t VstPlugin::dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
+{
+    return effect->dispatcher(effect, opcode, index, value, ptr, opt);
 }
 
 void VstPlugin::process(uint32_t frames, float** src, float** dst)
