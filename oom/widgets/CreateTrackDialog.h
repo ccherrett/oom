@@ -8,6 +8,7 @@
 #define _OOM_CREATE_TRACKS_DIALOG_
 
 #include "ui_createtrackbase.h"
+#include <QMap>
 
 class QShowEvent;
 
@@ -23,6 +24,8 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	int m_midiOutPort;
 	bool m_createTrackOnly;
 	int m_showJackAliases;
+	QMap<int, QString> m_currentMidiInputList;
+	QMap<int, QString> m_currentMidiOutputList;
 	
 	void importInputs();
 	void importOutputs();

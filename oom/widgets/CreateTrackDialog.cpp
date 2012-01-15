@@ -39,9 +39,6 @@ m_insertPosition(pos)
 	txtInChannel->setValue(1);
 	txtOutChannel->setValue(1);
 	
-	btnNewInput->setIcon(*plusIconSet3);
-	btnNewOutput->setIcon(*plusIconSet3);
-
 	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
 	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
 	cmbType->addItem(*addOutputIcon, tr("Output"), Track::AUDIO_OUTPUT);
@@ -51,8 +48,8 @@ m_insertPosition(pos)
 	int row = cmbType->findData(m_insertType);
 	cmbType->setCurrentIndex(row);
 
-	connect(btnNewInput, SIGNAL(toggled(bool)), this, SLOT(updateInputSelected(bool)));
-	connect(btnNewOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
+	connect(chkInput, SIGNAL(toggled(bool)), this, SLOT(updateInputSelected(bool)));
+	connect(chkOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
 	connect(cmbType, SIGNAL(currentIndexChanged(int)), this, SLOT(trackTypeChanged(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 }
@@ -83,6 +80,15 @@ void CreateTrackDialog::addTrack()
 				//Process Input connections
 				if(inputIndex >= 0 && !chkInput->isChecked())
 				{
+					QString devname = cmbInput->itemText(inputIndex);
+					if(m_currentMidiInputList.isEmpty())
+					{
+						m_createMidiInputDevice = true;
+					}
+					else
+					{
+						m_createMidiInputDevice = !(m_currentMidiInputList.contains(inputIndex) && m_currentMidiInputList.value(inputIndex) == devname);
+					}
 					MidiPort* inport = 0;
 					MidiDevice* indev = 0;
 					QString inputDevName(QString("I-").append(track->name()));
@@ -92,7 +98,6 @@ void CreateTrackDialog::addTrack()
 						qDebug("m_createMidiInputDevice is set: %i", m_midiInPort);
 						inport = &midiPorts[m_midiInPort];
 						int devtype = cmbInput->itemData(inputIndex).toInt();
-						QString devname = cmbInput->itemText(inputIndex);
 						if(devtype == MidiDevice::ALSA_MIDI)
 						{
 							indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
@@ -162,6 +167,15 @@ void CreateTrackDialog::addTrack()
 				{
 					MidiPort* outport= 0;
 					MidiDevice* outdev = 0;
+					QString devname = cmbOutput->itemText(outputIndex);
+					if(m_currentMidiOutputList.isEmpty())
+					{
+						m_createMidiOutputDevice = true;
+					}
+					else
+					{
+						m_createMidiOutputDevice = !(m_currentMidiOutputList.contains(outputIndex) && m_currentMidiOutputList.value(outputIndex) == devname);
+					}
 					QString outputDevName(QString("O-").append(track->name()));
 					if(m_createMidiOutputDevice)
 					{
@@ -169,7 +183,6 @@ void CreateTrackDialog::addTrack()
 						qDebug("m_createMidiOutputDevice is set: %i", m_midiOutPort);
 						outport = &midiPorts[m_midiOutPort];
 						int devtype = cmbOutput->itemData(outputIndex).toInt();
-						QString devname = cmbOutput->itemText(outputIndex);
 						if(devtype == MidiDevice::ALSA_MIDI)
 						{
 							outdev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
@@ -259,7 +272,7 @@ void CreateTrackDialog::addTrack()
 			{
 				if(inputIndex >= 0 && !chkInput->isChecked())
 				{
-					QString inputName = QString("Input-").append(track->name());
+					QString inputName = QString("i").append(track->name());
 					QString selectedInput = cmbInput->itemText(inputIndex);
 					bool addNewRoute = cmbInput->itemData(inputIndex).toBool();
 					Track* input = 0;
@@ -499,13 +512,15 @@ void CreateTrackDialog::updateInputSelected(bool raw)
 {
 	if(raw)
 	{
-		populateNewInputList();
-		m_createMidiInputDevice = true;
+		cmbInput->setEnabled(false);
+		lblInput->setEnabled(false);
+		txtInChannel->setEnabled(false);
 	}
 	else
 	{
-		populateInputList();
-		m_createMidiInputDevice = false;
+		cmbInput->setEnabled(true);
+		lblInput->setEnabled(true);
+		txtInChannel->setEnabled(true);
 	}
 }
 
@@ -514,13 +529,15 @@ void CreateTrackDialog::updateOutputSelected(bool raw)
 {
 	if(raw)
 	{
-		populateNewOutputList();
-		m_createMidiOutputDevice = true;
+		cmbOutput->setEnabled(false);
+		lblOutput->setEnabled(false);
+		txtOutChannel->setEnabled(false);
 	}
 	else
 	{
-		populateOutputList();
-		m_createMidiOutputDevice = false;
+		cmbOutput->setEnabled(true);
+		lblOutput->setEnabled(true);
+		txtOutChannel->setEnabled(true);
 	}
 }
 
@@ -528,10 +545,14 @@ void CreateTrackDialog::updateOutputSelected(bool raw)
 void CreateTrackDialog::trackTypeChanged(int type)
 {
 	m_insertType = cmbType->itemData(type).toInt();
+	chkInput->setChecked(false);
+	chkOutput->setChecked(false);
 	showAllElements();
 	populateInputList();
 	populateOutputList();
 	populateInstrumentList();
+	populateMonitorList();
+	populateBussList();
 }
 
 void CreateTrackDialog::monitorChecked(bool checked)
@@ -545,8 +566,8 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)
 	int bussIndex = cmbBuss->currentIndex();
 	bool newBuss = cmbBuss->itemData(bussIndex).toBool();
 
-	QString inputName = QString("I-").append(name);
-	QString bussName = QString("B-").append(name);
+	QString inputName = QString("i").append(name);
+	QString bussName = QString("B").append(name);
 	//QString audioName = QString("A-").append(name);
 	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
 	Track* buss = 0;
@@ -680,6 +701,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		case Track::MIDI:
 		case Track::DRUM:
 		{
+			m_currentMidiInputList.clear();
 			for (int i = 0; i < MIDI_PORTS; ++i)
 			{
 				MidiPort* mp = &midiPorts[i];
@@ -689,19 +711,21 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 					continue;
 
 				if ((md->openFlags() & 2))
-					cmbInput->addItem(md->name(), i);
-
-				//Add global menu toggle
-				//int ch1bit = 1 << 0;
-				//Route myRoute(i, ch1bit);
+				{
+					QString mdname(md->name());
+					if(md->deviceType() == MidiDevice::ALSA_MIDI)
+					{
+						mdname = QString("(OOMidi) ").append(mdname);
+					}
+					cmbInput->addItem(mdname, i);
+					m_currentMidiInputList.insert(cmbInput->count()-1, mdname);
+				}
 			}
+			populateNewInputList();
 
 			if (!cmbInput->count())
 			{
-				btnNewInput->blockSignals(true);
-				btnNewInput->setChecked(true);
-				btnNewInput->blockSignals(false);
-				populateNewInputList();
+				chkInput->setChecked(true);
 			}
 		}
 		break;
@@ -790,6 +814,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 		case Track::MIDI:
 		case Track::DRUM:
 		{
+			m_currentMidiOutputList.clear();
 			for (int i = 0; i < MIDI_PORTS; ++i)
 			{
 				MidiPort* mp = &midiPorts[i];
@@ -799,19 +824,21 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 					continue;
 
 				if((md->openFlags() & 1))
-					cmbOutput->addItem(md->name(), i);
-
-				//Add global menu toggle
-				//int ch1bit = 1 << 0;
-				//Route myRoute(i, ch1bit);
+				{
+					QString mdname(md->name());
+					if(md->deviceType() == MidiDevice::ALSA_MIDI)
+					{
+						mdname = QString("(OOMidi) ").append(mdname);
+					}
+					cmbOutput->addItem(mdname, i);
+					m_currentMidiOutputList.insert(cmbOutput->count()-1, mdname);
+				}
 			}
 
+			populateNewOutputList();
 			if (!cmbOutput->count())
 			{
-				btnNewOutput->blockSignals(true);
-				btnNewOutput->setChecked(true);
-				btnNewOutput->blockSignals(false);
-				populateNewOutputList();
+				chkOutput->setChecked(true);
 			}
 		}
 		break;
@@ -938,9 +965,9 @@ void CreateTrackDialog::populateBussList()
 
 void CreateTrackDialog::populateNewInputList()/*{{{*/
 {
-	while(cmbInput->count())
-		cmbInput->removeItem(cmbInput->count()-1);
-	m_createMidiInputDevice = true;
+	//while(cmbInput->count())
+	//	cmbInput->removeItem(cmbInput->count()-1);
+	//m_createMidiInputDevice = true;
 	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
 	{
 		if ((*i)->deviceType() == MidiDevice::ALSA_MIDI)
@@ -959,9 +986,9 @@ void CreateTrackDialog::populateNewInputList()/*{{{*/
 
 void CreateTrackDialog::populateNewOutputList()/*{{{*/
 {
-	while(cmbOutput->count())
-		cmbOutput->removeItem(cmbOutput->count()-1);
-	m_createMidiOutputDevice = true;
+	//while(cmbOutput->count())
+	//	cmbOutput->removeItem(cmbOutput->count()-1);
+	//m_createMidiOutputDevice = true;
 	if(audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
 		return;
 	std::list<QString> sl = audioDevice->inputPorts(true, m_showJackAliases);
@@ -1006,9 +1033,7 @@ int CreateTrackDialog::getFreeMidiPort()/*{{{*/
 void CreateTrackDialog::hideMidiElements()/*{{{*/
 {
 	txtInChannel->setVisible(false);
-	btnNewInput->setVisible(false);
 	txtOutChannel->setVisible(false);
-	btnNewOutput->setVisible(false);
 	lblInstrument->setVisible(false);
 	cmbInstrument->setVisible(false);
 	cmbMonitor->setVisible(false);
@@ -1021,9 +1046,7 @@ void CreateTrackDialog::hideMidiElements()/*{{{*/
 void CreateTrackDialog::showAllElements()/*{{{*/
 {
 	txtInChannel->setVisible(true);
-	btnNewInput->setVisible(true);
 	txtOutChannel->setVisible(true);
-	btnNewOutput->setVisible(true);
 	lblInstrument->setVisible(true);
 	cmbInstrument->setVisible(true);
 	cmbMonitor->setVisible(true);

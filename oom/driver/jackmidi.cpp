@@ -81,6 +81,19 @@ MidiDevice* MidiJackDevice::createJackMidiDevice(QString name, int rwflags) // p
 				break;
 		}
 	}//FIXME: If name is supplied it should also be checked against the existing devices
+	else if(midiDevices.find(name))
+	{
+		QString base = QString(name).append("-");
+		QString s = QString(base).append(QString::number(ni));;
+		for(; ni < 65536; ++ni)
+		{
+			if(!midiDevices.find(s))
+			{
+				name = s;
+				break;
+			}
+		}
+	}
 	if (ni >= 65536)
 	{
 		fprintf(stderr, "OOMidi: createJackMidiDevice failed! Can't find an unused midi device name 'jack-midi-[0-65535]'.\n");
