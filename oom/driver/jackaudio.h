@@ -118,6 +118,11 @@ public:
 
     virtual int setMaster(bool f);
 
+    jack_client_t* getJackClient()
+    {
+        return _client;
+    }
+
     //static bool jackStarted;
 };
 

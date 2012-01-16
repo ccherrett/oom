@@ -10,6 +10,7 @@
 
 #include "plugin.h"
 #include "plugingui.h"
+#include "jackaudio.h"
 #include "song.h"
 
 #include "lv2_data_access.h"
@@ -37,7 +38,7 @@ static void oom_lv2_gtk_window_destroyed(void*, void* data)
 #define LV2_NS_UI    "http://lv2plug.in/ns/extensions/ui#"
 
 // define extra URIs not yet in lilv
-#define LILV_URI_TIME_EVENT   "http://lv2plug.in/ns/ext/time#TimeEvent"
+#define LILV_URI_TIME_EVENT   "http://lv2plug.in/ns/ext/time#Position"
 
 // static max values
 const unsigned int MAX_EVENT_BUFFER = 0x7FFF; // 32767
@@ -1607,41 +1608,49 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
                 {
                     if (time_done == false)
                     {
-                        //jack_position_t pos;
-                        //jack_transport_state_t state = jack_transport_query(jack_client, &pos);
-
                         oom_lv2_time_pos.frame = 0;
                         oom_lv2_time_pos.flags = 0;
+                        oom_lv2_time_pos.state = LV2_TIME_STOPPED;
                         oom_lv2_time_pos.bar   = 0;
                         oom_lv2_time_pos.beat  = 0;
                         oom_lv2_time_pos.tick  = 0;
                         oom_lv2_time_pos.beats_per_bar    = 0;
                         oom_lv2_time_pos.beat_type        = 0;
                         oom_lv2_time_pos.ticks_per_beat   = 0;
-                        oom_lv2_time_pos.beats_per_minute = 0.0;
+                        oom_lv2_time_pos.beats_per_minute = 120.0;
 
-                        //if (state == JackTransportRolling)
-                        //    oom_lv2_time_pos.state = LV2_TIME_ROLLING;
-                        //else
-                        //    oom_lv2_time_pos.state = LV2_TIME_STOPPED;
+                        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+                        {
+                            jack_client_t* client = ((JackAudioDevice*)audioDevice)->getJackClient();
+                            if (client)
+                            {
+                                jack_position_t pos;
+                                jack_transport_state_t state = jack_transport_query(client, &pos);
 
-                        //if (pos.unique_1 == pos.unique_2)
-                        //{
-                        //    oom_lv2_time_pos.frame = pos.frame;
+                                if (state == JackTransportRolling)
+                                    oom_lv2_time_pos.state = LV2_TIME_ROLLING;
+                                else
+                                    oom_lv2_time_pos.state = LV2_TIME_STOPPED;
 
-                            //if (pos.valid & JackPositionBBT)
-                            //{
-                                //oom_lv2_time_pos.bar  = pos.bar;
-                                //oom_lv2_time_pos.beat = pos.beat;
-                                //oom_lv2_time_pos.tick = pos.tick;
-                                //oom_lv2_time_pos.beats_per_bar    = pos.beats_per_bar;
-                                //oom_lv2_time_pos.beat_type        = pos.beat_type;
-                                //oom_lv2_time_pos.ticks_per_beat   = pos.ticks_per_beat;
-                                //oom_lv2_time_pos.beats_per_minute = pos.beats_per_minute;
+                                if (pos.unique_1 == pos.unique_2)
+                                {
+                                    oom_lv2_time_pos.frame = pos.frame;
 
-                                //oom_lv2_time_pos.flags |= LV2_TIME_HAS_BBT;
-                            //}
-                        //}
+                                    if (pos.valid & JackPositionBBT)
+                                    {
+                                        oom_lv2_time_pos.bar  = pos.bar;
+                                        oom_lv2_time_pos.beat = pos.beat;
+                                        oom_lv2_time_pos.tick = pos.tick;
+                                        oom_lv2_time_pos.beats_per_bar    = pos.beats_per_bar;
+                                        oom_lv2_time_pos.beat_type        = pos.beat_type;
+                                        oom_lv2_time_pos.ticks_per_beat   = pos.ticks_per_beat;
+                                        oom_lv2_time_pos.beats_per_minute = pos.beats_per_minute;
+
+                                        oom_lv2_time_pos.flags |= LV2_TIME_HAS_BBT;
+                                    }
+                                }
+                            }
+                        }
                         time_done = true;
                     }
 
