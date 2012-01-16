@@ -266,7 +266,7 @@ Track* Song::addNewTrack(QAction* action)
 		return t;
 	}
 	*/
-	CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1);
+	CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1, oom);
 	connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
 	ctdialog->exec();
 

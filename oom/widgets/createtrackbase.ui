@@ -40,6 +40,9 @@
      <property name="fieldGrowthPolicy">
       <enum>QFormLayout::ExpandingFieldsGrow</enum>
      </property>
+     <property name="labelAlignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
      <property name="verticalSpacing">
       <number>0</number>
      </property>
@@ -88,25 +91,6 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="txtName"/>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="lblInput">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>40</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Input</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="1">
       <layout class="QHBoxLayout" name="inputLayout">
        <item>
@@ -141,36 +125,7 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="chkInput">
-         <property name="toolTip">
-          <string>Skip Input routing</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
       </layout>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="lblOutput">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>40</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Output</string>
-       </property>
-      </widget>
      </item>
      <item row="3" column="1">
       <layout class="QHBoxLayout" name="outputLayout">
@@ -203,16 +158,6 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="chkOutput">
-         <property name="toolTip">
-          <string>Skip Output routing</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item row="4" column="0">
@@ -235,6 +180,26 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="chkOutput">
+       <property name="toolTip">
+        <string>Skip Output routing</string>
+       </property>
+       <property name="text">
+        <string>Output</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="chkInput">
+       <property name="toolTip">
+        <string>Skip Input routing</string>
+       </property>
+       <property name="text">
+        <string>Input</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -250,6 +215,9 @@ This is required for tracks connected to LinuxSampler , if not previously config
       <bool>true</bool>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
+      <property name="labelAlignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
       <property name="verticalSpacing">
        <number>0</number>
       </property>
@@ -270,13 +238,6 @@ This is required for tracks connected to LinuxSampler , if not previously config
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lblBuss">
-        <property name="text">
-         <string>Audio Buss</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="rightMargin">
@@ -292,17 +253,17 @@ This is required for tracks connected to LinuxSampler , if not previously config
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QCheckBox" name="chkBuss">
-          <property name="toolTip">
-           <string>Skip Creating/Using route to Buss</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
        </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="chkBuss">
+        <property name="toolTip">
+         <string>Skip Creating/Using route to Buss</string>
+        </property>
+        <property name="text">
+         <string>Audio Buss</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
