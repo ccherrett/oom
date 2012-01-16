@@ -133,8 +133,11 @@ VstPlugin::VstPlugin()
 {
     m_type = PLUGIN_VST;
 
-    m_nativeGui = 0;
     isOldSdk = false;
+
+    ui.width = 0;
+    ui.height = 0;
+    ui.widget = 0;
 
     effect = 0;
     events.numEvents = 0;
@@ -151,10 +154,10 @@ VstPlugin::~VstPlugin()
 {
     if (effect)
     {
-        if (m_nativeGui)
+        if (ui.widget)
         {
             effect->dispatcher(effect, effEditClose, 0, 0, 0, 0.0f);
-            delete m_nativeGui;
+            delete ui.widget;
         }
 
         if (m_activeBefore)
@@ -417,11 +420,11 @@ bool VstPlugin::hasNativeGui()
 void VstPlugin::showNativeGui(bool yesno)
 {
     // Initialize UI if needed
-    if (! m_nativeGui)
+    if (! ui.widget)
     {
-        m_nativeGui = new QWidget();
+        ui.widget = new QWidget();
         // TODO - set X11 Display as 'value'
-        if (effect->dispatcher(effect, effEditOpen, 0, 0, (void*)m_nativeGui->winId(), 0.0f) == 1)
+        if (effect->dispatcher(effect, effEditOpen, 0, 0, (void*)ui.widget->winId(), 0.0f) == 1)
         {
 #ifndef ERect
             struct ERect {
@@ -438,7 +441,7 @@ void VstPlugin::showNativeGui(bool yesno)
             {
                 int width  = vst_rect->right  - vst_rect->left;
                 int height = vst_rect->bottom - vst_rect->top;
-                m_nativeGui->setFixedSize(width, height);
+                ui.widget->setFixedSize(width, height);
             }
         }
         else
@@ -449,25 +452,34 @@ void VstPlugin::showNativeGui(bool yesno)
         }
     }
 
-    m_nativeGui->setVisible(yesno);
+    ui.widget->setVisible(yesno);
 }
 
 bool VstPlugin::nativeGuiVisible()
 {
-    if (m_nativeGui)
-        return m_nativeGui->isVisible();
+    if (ui.widget)
+        return ui.widget->isVisible();
     return false;
 }
 
 void VstPlugin::updateNativeGui()
 {
+    if (ui.widget)
+    {
+        if (ui.width > 0 && ui.height > 0)
+            ui.widget->setFixedSize(ui.width, ui.height);
+        ui.width = 0;
+        ui.height = 0;
+    }
+
     effect->dispatcher(effect, effIdle, 0, 0, 0, 0.0f);
 }
 
 void VstPlugin::resizeNativeGui(int width, int height)
 {
-    if (m_nativeGui)
-        m_nativeGui->setFixedSize(width, height);
+    // We need to postpone this to the main event thread
+    ui.width = width;
+    ui.height = height;
 }
 
 intptr_t VstPlugin::dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)

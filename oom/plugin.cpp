@@ -1008,9 +1008,7 @@ void initLV2();
 
 void initPlugins(bool ladspa, bool lv2, bool vst)
 {
-    //loadPluginDir(oomGlobalLib + QString("/plugins"), PLUGIN_LADSPA); // FIXME?
-
-    //lv2 = vst = false;
+    //ladspa = vst = false;
 
     // LADSPA
     if (ladspa)
