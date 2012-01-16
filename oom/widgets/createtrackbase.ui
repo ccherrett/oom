@@ -73,6 +73,9 @@
      <property name="text">
       <string>Input</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="2" column="1">
@@ -114,6 +117,9 @@
      </property>
      <property name="text">
       <string>Output</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -206,6 +212,9 @@ This is required for tracks connected to LinuxSampler , if not previously config
         </property>
         <property name="text">
          <string>Audio Buss</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

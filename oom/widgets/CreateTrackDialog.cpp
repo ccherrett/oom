@@ -171,7 +171,7 @@ void CreateTrackDialog::addTrack()
 				}
 				
 				//Process Output connections
-				if(outputIndex >= 0 && !chkOutput->isChecked())
+				if(outputIndex >= 0 && chkOutput->isChecked())
 				{
 					MidiPort* outport= 0;
 					MidiDevice* outdev = 0;
@@ -275,10 +275,10 @@ void CreateTrackDialog::addTrack()
 		break;
 		case Track::WAVE:
 		{
-			Track* track =  song->addTrackByName(txtName->text(), Track::WAVE, m_insertPosition, chkOutput->isChecked());
+			Track* track =  song->addTrackByName(txtName->text(), Track::WAVE, m_insertPosition, !chkOutput->isChecked());
 			if(track)
 			{
-				if(inputIndex >= 0 && !chkInput->isChecked())
+				if(inputIndex >= 0 && chkInput->isChecked())
 				{
 					QString inputName = QString("i").append(track->name());
 					QString selectedInput = cmbInput->itemText(inputIndex);
@@ -319,7 +319,7 @@ void CreateTrackDialog::addTrack()
 						song->update(SC_ROUTE);
 					}
 				}
-				if(outputIndex >= 0 && !chkOutput->isChecked())
+				if(outputIndex >= 0 && chkOutput->isChecked())
 				{
 					//Route to the Output or Buss
 					QString selectedOutput = cmbOutput->itemText(outputIndex);
@@ -342,7 +342,7 @@ void CreateTrackDialog::addTrack()
 			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_OUTPUT, -1, false);
 			if(track)
 			{
-				if(inputIndex >= 0 && !chkInput->isChecked())
+				if(inputIndex >= 0 && chkInput->isChecked())
 				{
 					QString selectedInput = cmbInput->itemText(inputIndex);
 					Route dstRoute(track, 0, track->channels());
@@ -354,7 +354,7 @@ void CreateTrackDialog::addTrack()
 					song->update(SC_ROUTE);
 				}
 
-				if(outputIndex >= 0 && !chkOutput->isChecked())
+				if(outputIndex >= 0 && chkOutput->isChecked())
 				{
 					QString jackPlayback("system:playback");
 					QString selectedOutput = cmbOutput->itemText(outputIndex);
@@ -410,7 +410,7 @@ void CreateTrackDialog::addTrack()
 			if(track)
 			{
 				track->setMute(false);
-				if(inputIndex >= 0 && !chkInput->isChecked())
+				if(inputIndex >= 0 && chkInput->isChecked())
 				{
 					QString selectedInput = cmbInput->itemText(inputIndex);
 
@@ -443,7 +443,7 @@ void CreateTrackDialog::addTrack()
 					audio->msgUpdateSoloStates();
 					song->update(SC_ROUTE);
 				}
-				if(outputIndex >= 0 && !chkOutput->isChecked())
+				if(outputIndex >= 0 && chkOutput->isChecked())
 				{
 					QString selectedOutput = cmbOutput->itemText(outputIndex);
 
@@ -466,7 +466,7 @@ void CreateTrackDialog::addTrack()
 			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_BUSS, -1, false);
 			if(track)
 			{
-				if(inputIndex >= 0 && !chkInput->isChecked())
+				if(inputIndex >= 0 && chkInput->isChecked())
 				{
 					QString selectedInput = cmbInput->itemText(inputIndex);
 					Route srcRoute(selectedInput, true, -1);
@@ -477,7 +477,7 @@ void CreateTrackDialog::addTrack()
 					audio->msgUpdateSoloStates();
 					song->update(SC_ROUTE);
 				}
-				if(outputIndex >= 0 && !chkOutput->isChecked())
+				if(outputIndex >= 0 && chkOutput->isChecked())
 				{
 					QString selectedOutput = cmbOutput->itemText(outputIndex);
 					Route srcRoute(track, 0, track->channels());
@@ -518,43 +518,20 @@ void CreateTrackDialog::addTrack()
 //Input raw slot
 void CreateTrackDialog::updateInputSelected(bool raw)/*{{{*/
 {
-	if(raw)
-	{
-		cmbInput->setEnabled(false);
-		txtInChannel->setEnabled(false);
-	}
-	else
-	{
-		cmbInput->setEnabled(true);
-		txtInChannel->setEnabled(true);
-	}
+	cmbInput->setEnabled(raw);
+	txtInChannel->setEnabled(raw);
 }/*}}}*/
 
 //Output raw slot
 void CreateTrackDialog::updateOutputSelected(bool raw)/*{{{*/
 {
-	if(raw)
-	{
-		cmbOutput->setEnabled(false);
-		txtOutChannel->setEnabled(false);
-	}
-	else
-	{
-		cmbOutput->setEnabled(true);
-		txtOutChannel->setEnabled(true);
-	}
+	cmbOutput->setEnabled(raw);
+	txtOutChannel->setEnabled(raw);
 }/*}}}*/
 
 void CreateTrackDialog::updateBussSelected(bool raw)/*{{{*/
 {
-	if(raw)
-	{
-		cmbBuss->setEnabled(false);
-	}
-	else
-	{
-		cmbBuss->setEnabled(true);
-	}
+	cmbBuss->setEnabled(raw);
 }/*}}}*/
 
 //Track type combo slot
@@ -580,7 +557,7 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)/*{{{*/
 	//QString audioName = QString("A-").append(name);
 	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
 	Track* buss = 0;
-	if(!chkBuss->isChecked())
+	if(chkBuss->isChecked())
 	{
 		if(newBuss)
 			buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
@@ -628,7 +605,7 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)/*{{{*/
 		audio->msgUpdateSoloStates();
 		song->update(SC_ROUTE);
 		
-		if(!chkBuss->isChecked() && buss)
+		if(chkBuss->isChecked() && buss)
 		{
 			Route srcRoute(input, 0, input->channels());
 			Route dstRoute(buss->name(), true, -1);
@@ -647,7 +624,7 @@ void CreateTrackDialog::createMonitorInputTracks(QString name)/*{{{*/
 		if(master)
 		{
 			//Route buss track to master
-			if(!chkBuss->isChecked() && buss)
+			if(chkBuss->isChecked() && buss)
 			{
 				Route srcRoute3(buss, 0, buss->channels());
 				Route dstRoute3(master->name(), true, -1);
@@ -709,7 +686,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 
 			if (!cmbInput->count())
 			{
-				chkInput->setChecked(true);
+				chkInput->setChecked(false);
 				chkInput->setEnabled(false);
 			}
 		}
@@ -723,7 +700,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			importOutputs();
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
-				chkInput->setChecked(true);
+				chkInput->setChecked(false);
 				chkInput->setEnabled(false);
 			}
 		}
@@ -741,7 +718,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
-				chkInput->setChecked(true);
+				chkInput->setChecked(false);
 				chkInput->setEnabled(false);
 			}
 		}
@@ -751,7 +728,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			importOutputs();
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
-				chkInput->setChecked(true);
+				chkInput->setChecked(false);
 				chkInput->setEnabled(false);
 			}
 		}
@@ -770,7 +747,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			}
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
-				chkInput->setChecked(true);
+				chkInput->setChecked(false);
 				chkInput->setEnabled(false);
 			}
 		}
@@ -815,7 +792,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			populateNewOutputList();
 			if (!cmbOutput->count())
 			{
-				chkOutput->setChecked(true);
+				chkOutput->setChecked(false);
 				chkOutput->setEnabled(false);
 			}
 		}
@@ -834,7 +811,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			}
 			if (!cmbOutput->count())
 			{
-				chkOutput->setChecked(true);
+				chkOutput->setChecked(false);
 				chkOutput->setEnabled(false);
 			}
 		}
@@ -844,7 +821,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			importInputs();
 			if (!cmbOutput->count())
 			{
-				chkOutput->setChecked(true);
+				chkOutput->setChecked(false);
 				chkOutput->setEnabled(false);
 			}
 		}
@@ -869,7 +846,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			}
 			if (!cmbOutput->count())
 			{
-				chkOutput->setChecked(true);
+				chkOutput->setChecked(false);
 				chkOutput->setEnabled(false);
 			}
 		}
@@ -883,7 +860,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			}
 			if (!cmbOutput->count())
 			{
-				chkOutput->setChecked(true);
+				chkOutput->setChecked(false);
 				chkOutput->setEnabled(false);
 			}
 		}
@@ -1011,9 +988,9 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 {
 	chkInput->setEnabled(true);
 	chkOutput->setEnabled(true);
-	chkInput->setChecked(false);
-	chkOutput->setChecked(false);
-	chkBuss->setChecked(false);
+	chkInput->setChecked(true);
+	chkOutput->setChecked(true);
+	chkBuss->setChecked(true);
 
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch (type)
