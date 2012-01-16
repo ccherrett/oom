@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>438</width>
-    <height>287</height>
+    <width>441</width>
+    <height>291</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,25 +23,52 @@
    <bool>false</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Track Type</string>
+   <item row="0" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="leftMargin">
+      <number>0</number>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="cmbType">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QComboBox::AdjustToContents</enum>
-     </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Track Type</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cmbType">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnMyInput">
+       <property name="text">
+        <string>My Inputs</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="lblName">
@@ -68,7 +95,7 @@
    <item row="2" column="0">
     <widget class="QCheckBox" name="chkInput">
      <property name="toolTip">
-      <string>Skip Input routing</string>
+      <string>Create Input routing</string>
      </property>
      <property name="text">
       <string>Input</string>
@@ -92,28 +119,25 @@
     </widget>
    </item>
    <item row="2" column="2">
-    <widget class="QSpinBox" name="txtInChannel">
-     <property name="specialValueText">
-      <string>All</string>
+    <widget class="QComboBox" name="cmbInChannel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="prefix">
-      <string>Chan </string>
-     </property>
-     <property name="minimum">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <number>16</number>
-     </property>
-     <property name="value">
-      <number>0</number>
+     <property name="maximumSize">
+      <size>
+       <width>60</width>
+       <height>16777215</height>
+      </size>
      </property>
     </widget>
    </item>
    <item row="3" column="0">
     <widget class="QCheckBox" name="chkOutput">
      <property name="toolTip">
-      <string>Skip Output routing</string>
+      <string>Create Output routing</string>
      </property>
      <property name="text">
       <string>Output</string>
@@ -134,21 +158,18 @@
     </widget>
    </item>
    <item row="3" column="2">
-    <widget class="QSpinBox" name="txtOutChannel">
-     <property name="specialValueText">
-      <string/>
+    <widget class="QComboBox" name="cmbOutChannel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="prefix">
-      <string>Chan </string>
-     </property>
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>16</number>
-     </property>
-     <property name="value">
-      <number>1</number>
+     <property name="maximumSize">
+      <size>
+       <width>60</width>
+       <height>16777215</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -208,7 +229,7 @@ This is required for tracks connected to LinuxSampler , if not previously config
       <item row="1" column="0">
        <widget class="QCheckBox" name="chkBuss">
         <property name="toolTip">
-         <string>Skip Creating/Using route to Buss</string>
+         <string>Route audio to Buss then Master</string>
         </property>
         <property name="text">
          <string>Audio Buss</string>
@@ -261,13 +282,6 @@ This is required for tracks connected to LinuxSampler , if not previously config
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="0" column="2">
-    <widget class="QPushButton" name="btnMyInput">
-     <property name="text">
-      <string>My Inputs</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

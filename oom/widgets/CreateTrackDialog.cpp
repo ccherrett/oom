@@ -42,15 +42,28 @@ m_insertPosition(pos)
     m_height = 290;
 	m_width = 450;
 
-	txtInChannel->setValue(1);
-	txtOutChannel->setValue(1);
-	
+	m_allChannelBit = (1 << MIDI_CHANNELS) - 1;
+
 	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
 	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
 	cmbType->addItem(*addOutputIcon, tr("Output"), Track::AUDIO_OUTPUT);
 	cmbType->addItem(*addInputIcon, tr("Input"), Track::AUDIO_INPUT);
 	cmbType->addItem(*addBussIcon, tr("Buss"), Track::AUDIO_BUSS);
 	cmbType->addItem(*addAuxIcon, tr("Aux Send"), Track::AUDIO_AUX);
+
+	cmbInChannel->addItem(tr("All"), m_allChannelBit);
+	for(int i = 0; i < 16; ++i)
+	{
+		cmbInChannel->addItem(QString(tr("Chan ")).append(QString::number(i+1)), 1 << i);
+	}
+	cmbInChannel->setCurrentIndex(1);
+	
+	//cmbOutChannel->addItem(tr("All"), m_allChannelBit);
+	for(int i = 0; i < 16; ++i)
+	{
+		cmbOutChannel->addItem(QString(tr("Chan ")).append(QString::number(i+1)), i);
+	}
+	cmbOutChannel->setCurrentIndex(0);
 	
 	int row = cmbType->findData(m_insertType);
 	cmbType->setCurrentIndex(row);
@@ -72,6 +85,8 @@ void CreateTrackDialog::addTrack()
 	int outputIndex = cmbOutput->currentIndex();
 	int instrumentIndex = cmbInstrument->currentIndex();
 	int monitorIndex = cmbMonitor->currentIndex();
+	int inChanIndex = cmbInChannel->currentIndex();
+	int outChanIndex = cmbOutChannel->currentIndex();
 
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch(type)
@@ -79,14 +94,13 @@ void CreateTrackDialog::addTrack()
 		case Track::MIDI:
 		case Track::DRUM:
 		{
-			int toggleAllBit = (1 << MIDI_CHANNELS) - 1;
 
 			Track* track =  song->addTrackByName(txtName->text(), Track::MIDI, m_insertPosition, false);
 			if(track)
 			{
 				MidiTrack* mtrack = (MidiTrack*)track;
 				//Process Input connections
-				if(inputIndex >= 0 && !chkInput->isChecked())
+				if(inputIndex >= 0 && chkInput->isChecked())
 				{
 					QString devname = cmbInput->itemText(inputIndex);
 					if(m_currentMidiInputList.isEmpty())
@@ -112,6 +126,9 @@ void CreateTrackDialog::addTrack()
 							if(indev)
 							{
 								qDebug("Found MIDI input device: ALSA_MIDI");
+								int openFlags = 0;
+								openFlags ^= 0x2;
+								indev->setOpenFlags(openFlags);
 								midiSeq->msgSetMidiDevice(inport, indev);
 							}
 						}
@@ -150,16 +167,7 @@ void CreateTrackDialog::addTrack()
 					if(inport && indev)
 					{
 						qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
-						int chanbit = 1 << 0;
-						int inChan = txtInChannel->value();
-						if(!inChan)
-						{
-							chanbit = toggleAllBit;
-						}
-						else
-						{
-							chanbit = 1 << (inChan - 1);
-						}
+						int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
 						Route srcRoute(m_midiInPort, chanbit);
 						Route dstRoute(track, chanbit);
 
@@ -197,6 +205,9 @@ void CreateTrackDialog::addTrack()
 							if(outdev)
 							{
 								qDebug("Found MIDI output device: ALSA_MIDI");
+								int openFlags = 0;
+								openFlags ^= 0x1;
+								outdev->setOpenFlags(openFlags);
 								midiSeq->msgSetMidiDevice(outport, outdev);
 							}
 						}
@@ -205,9 +216,9 @@ void CreateTrackDialog::addTrack()
 							outdev = MidiJackDevice::createJackMidiDevice(outputDevName, 3);
 							if(outdev)
 							{
+								qDebug("Created MIDI output device: JACK_MIDI");
 								int openFlags = 0;
 								openFlags ^= 0x1;
-								qDebug("Created MIDI output device: JACK_MIDI");
 								outdev->setOpenFlags(openFlags);
 								midiSeq->msgSetMidiDevice(outport, outdev);
 								oom->changeConfig(true);
@@ -241,8 +252,7 @@ void CreateTrackDialog::addTrack()
 						qDebug("MIDI output port and MIDI devices found, Adding final output routing");
 						audio->msgIdle(true);
 						mtrack->setOutPortAndUpdate(m_midiOutPort);
-						int outChan = txtOutChannel->value();
-						--outChan;
+						int outChan = cmbOutChannel->itemData(outChanIndex).toInt();
 						mtrack->setOutChanAndUpdate(outChan);
 						audio->msgIdle(false);
 						if(m_createMidiOutputDevice)
@@ -519,14 +529,14 @@ void CreateTrackDialog::addTrack()
 void CreateTrackDialog::updateInputSelected(bool raw)/*{{{*/
 {
 	cmbInput->setEnabled(raw);
-	txtInChannel->setEnabled(raw);
+	cmbInChannel->setEnabled(raw);
 }/*}}}*/
 
 //Output raw slot
 void CreateTrackDialog::updateOutputSelected(bool raw)/*{{{*/
 {
 	cmbOutput->setEnabled(raw);
-	txtOutChannel->setEnabled(raw);
+	cmbOutChannel->setEnabled(raw);
 }/*}}}*/
 
 void CreateTrackDialog::updateBussSelected(bool raw)/*{{{*/
@@ -998,8 +1008,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 		case Track::MIDI:
 		case Track::DRUM:
 		{
-			txtInChannel->setVisible(true);
-			txtOutChannel->setVisible(true);
+			cmbInChannel->setVisible(true);
+			cmbOutChannel->setVisible(true);
 			lblInstrument->setVisible(true);
 			cmbInstrument->setVisible(true);
 			cmbMonitor->setVisible(true);
@@ -1015,8 +1025,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 		break;
 		case Track::AUDIO_OUTPUT:
 		{
-			txtInChannel->setVisible(false);
-			txtOutChannel->setVisible(false);
+			cmbInChannel->setVisible(false);
+			cmbOutChannel->setVisible(false);
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
@@ -1033,8 +1043,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 		break;
 		case Track::AUDIO_INPUT:
 		{
-			txtInChannel->setVisible(false);
-			txtOutChannel->setVisible(false);
+			cmbInChannel->setVisible(false);
+			cmbOutChannel->setVisible(false);
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
@@ -1051,8 +1061,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 		break;
 		case Track::WAVE:
 		{
-			txtInChannel->setVisible(false);
-			txtOutChannel->setVisible(false);
+			cmbInChannel->setVisible(false);
+			cmbOutChannel->setVisible(false);
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
@@ -1069,8 +1079,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 		break;
 		case Track::AUDIO_BUSS:
 		{
-			txtInChannel->setVisible(false);
-			txtOutChannel->setVisible(false);
+			cmbInChannel->setVisible(false);
+			cmbOutChannel->setVisible(false);
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
@@ -1087,8 +1097,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 		break;
 		case Track::AUDIO_AUX:
 		{
-			txtInChannel->setVisible(false);
-			txtOutChannel->setVisible(false);
+			cmbInChannel->setVisible(false);
+			cmbOutChannel->setVisible(false);
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
@@ -1096,11 +1106,9 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			midiBox->setVisible(false);
 			
 			cmbInput->setVisible(false);
-			txtInChannel->setVisible(false);
 			chkInput->setVisible(false);
 
 			cmbOutput->setVisible(false);
-			txtOutChannel->setVisible(false);
 			chkOutput->setVisible(false);
 			
 			m_height = 100;

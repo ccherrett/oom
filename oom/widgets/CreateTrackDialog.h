@@ -26,6 +26,8 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	bool m_createMidiOutputDevice;
 	bool m_midiSameIO;
 	
+	int m_allChannelBit;
+
 	int m_midiInPort;
 	int m_midiOutPort;
 	
