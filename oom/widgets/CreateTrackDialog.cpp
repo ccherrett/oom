@@ -521,13 +521,11 @@ void CreateTrackDialog::updateInputSelected(bool raw)/*{{{*/
 	if(raw)
 	{
 		cmbInput->setEnabled(false);
-		lblInput->setEnabled(false);
 		txtInChannel->setEnabled(false);
 	}
 	else
 	{
 		cmbInput->setEnabled(true);
-		lblInput->setEnabled(true);
 		txtInChannel->setEnabled(true);
 	}
 }/*}}}*/
@@ -538,13 +536,11 @@ void CreateTrackDialog::updateOutputSelected(bool raw)/*{{{*/
 	if(raw)
 	{
 		cmbOutput->setEnabled(false);
-		lblOutput->setEnabled(false);
 		txtOutChannel->setEnabled(false);
 	}
 	else
 	{
 		cmbOutput->setEnabled(true);
-		lblOutput->setEnabled(true);
 		txtOutChannel->setEnabled(true);
 	}
 }/*}}}*/
@@ -554,12 +550,10 @@ void CreateTrackDialog::updateBussSelected(bool raw)/*{{{*/
 	if(raw)
 	{
 		cmbBuss->setEnabled(false);
-		lblBuss->setEnabled(false);
 	}
 	else
 	{
 		cmbBuss->setEnabled(true);
-		lblBuss->setEnabled(true);
 	}
 }/*}}}*/
 
@@ -716,6 +710,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			if (!cmbInput->count())
 			{
 				chkInput->setChecked(true);
+				chkInput->setEnabled(false);
 			}
 		}
 		break;
@@ -729,6 +724,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
 				chkInput->setChecked(true);
+				chkInput->setEnabled(false);
 			}
 		}
 		break;
@@ -746,6 +742,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
 				chkInput->setChecked(true);
+				chkInput->setEnabled(false);
 			}
 		}
 		break;
@@ -755,6 +752,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
 				chkInput->setChecked(true);
+				chkInput->setEnabled(false);
 			}
 		}
 		break;
@@ -773,6 +771,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 			if (!cmbInput->count())
 			{//TODO: Not sure what we could do here except notify the user
 				chkInput->setChecked(true);
+				chkInput->setEnabled(false);
 			}
 		}
 		break;
@@ -817,6 +816,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			if (!cmbOutput->count())
 			{
 				chkOutput->setChecked(true);
+				chkOutput->setEnabled(false);
 			}
 		}
 		break;
@@ -835,6 +835,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			if (!cmbOutput->count())
 			{
 				chkOutput->setChecked(true);
+				chkOutput->setEnabled(false);
 			}
 		}
 		break;
@@ -844,6 +845,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			if (!cmbOutput->count())
 			{
 				chkOutput->setChecked(true);
+				chkOutput->setEnabled(false);
 			}
 		}
 		break;
@@ -868,6 +870,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			if (!cmbOutput->count())
 			{
 				chkOutput->setChecked(true);
+				chkOutput->setEnabled(false);
 			}
 		}
 		break;
@@ -881,6 +884,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 			if (!cmbOutput->count())
 			{
 				chkOutput->setChecked(true);
+				chkOutput->setEnabled(false);
 			}
 		}
 		break;
@@ -1005,6 +1009,8 @@ int CreateTrackDialog::getFreeMidiPort()/*{{{*/
 
 void CreateTrackDialog::updateVisibleElements()/*{{{*/
 {
+	chkInput->setEnabled(true);
+	chkOutput->setEnabled(true);
 	chkInput->setChecked(false);
 	chkOutput->setChecked(false);
 	chkBuss->setChecked(false);
@@ -1021,10 +1027,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbInstrument->setVisible(true);
 			cmbMonitor->setVisible(true);
 			cmbInput->setVisible(true);
-			lblInput->setVisible(true);
 			chkInput->setVisible(true);
 			cmbOutput->setVisible(true);
-			lblOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			midiBox->setVisible(true);
 
@@ -1042,10 +1046,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			midiBox->setVisible(false);
 
 			cmbInput->setVisible(true);
-			lblInput->setVisible(true);
 			chkInput->setVisible(true);
 			cmbOutput->setVisible(true);
-			lblOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			
 			m_height = 160;
@@ -1062,10 +1064,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			midiBox->setVisible(false);
 
 			cmbInput->setVisible(true);
-			lblInput->setVisible(true);
 			chkInput->setVisible(true);
 			cmbOutput->setVisible(true);
-			lblOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			
 			m_height = 160;
@@ -1082,10 +1082,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			midiBox->setVisible(false);
 
 			cmbInput->setVisible(true);
-			lblInput->setVisible(true);
 			chkInput->setVisible(true);
 			cmbOutput->setVisible(true);
-			lblOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			
 			m_height = 160;
@@ -1102,10 +1100,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			midiBox->setVisible(false);
 
 			cmbInput->setVisible(true);
-			lblInput->setVisible(true);
 			chkInput->setVisible(true);
 			cmbOutput->setVisible(true);
-			lblOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			
 			m_height = 160;
@@ -1123,12 +1119,10 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			midiBox->setVisible(false);
 			
 			cmbInput->setVisible(false);
-			lblInput->setVisible(false);
 			txtInChannel->setVisible(false);
 			chkInput->setVisible(false);
 
 			cmbOutput->setVisible(false);
-			lblOutput->setVisible(false);
 			txtOutChannel->setVisible(false);
 			chkOutput->setVisible(false);
 			
