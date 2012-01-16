@@ -59,7 +59,6 @@ const unsigned int PLUGIN_IS_SYNTH            = 0x01;
 const unsigned int PLUGIN_IS_FX               = 0x02; // requires at least 1 audio port in and out
 const unsigned int PLUGIN_HAS_NATIVE_GUI      = 0x04;
 const unsigned int PLUGIN_HAS_IN_PLACE_BROKEN = 0x08;
-const unsigned int PLUGIN_USES_CHUNKS         = 0x10;
 
 // parameter hints
 const unsigned int PARAMETER_IS_ENABLED        = 0x01;

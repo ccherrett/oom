@@ -195,9 +195,6 @@ void VstPlugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
     if (effect->flags & effFlagsHasEditor)
         plugi->m_hints |= PLUGIN_HAS_NATIVE_GUI;
 
-    if (effect->flags & effFlagsProgramChunks)
-        plugi->m_hints |= PLUGIN_USES_CHUNKS;
-
     Q_UNUSED(filename);
 }
 
@@ -574,6 +571,11 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
                 {
                     loadParameter(xml);
                 }
+                else if (tag == "chunk")
+                {
+                    QByteArray chunk = QByteArray::fromBase64(xml.parse1().toUtf8().constData());
+                    effect->dispatcher(effect, effSetChunk, 1 /* Preset */, chunk.size(), chunk.data(), 0.0f);
+                }
                 else if (tag == "active")
                 {
                     if (readPreset == false)
@@ -666,6 +668,20 @@ void VstPlugin::writeConfiguration(int level, Xml& xml)
 
         QString s("parameter index=\"%1\" val=\"%2\" /");
         xml.tag(level, s.arg(m_params[i].rindex).arg(value, 0, 'f', 6).toLatin1().constData());
+    }
+
+    if (effect->flags & effFlagsProgramChunks)
+    {
+        void* data = 0;
+        intptr_t data_size = effect->dispatcher(effect, effGetChunk, 1 /* Preset */, 0, &data, 0.0f);
+
+        if (data && data_size >= 4)
+        {
+            QByteArray qchunk((const char*)data, data_size);
+            const char* chunk = strdup(qchunk.toBase64().data());
+            xml.strTag(level, "chunk", chunk);
+            free((void*)chunk);
+        }
     }
 
     xml.intTag(level, "active", m_active);
