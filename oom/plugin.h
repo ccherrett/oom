@@ -517,6 +517,7 @@ public:
     void writeConfiguration(int level, Xml& xml);
 
     bool loadControl(Xml& xml);
+    bool loadState(Xml& xml);
     bool setControl(QString symbol, double value);
 
 private:
@@ -530,6 +531,8 @@ private:
     struct {
         UiType type;
         bool visible;
+        int width;
+        int height;
         void* nativeWidget;
         LV2UI_Handle handle;
         LV2UI_Widget widget;
@@ -586,8 +589,12 @@ public:
     bool loadParameter(Xml& xml);
 
 protected:
-    QWidget* m_nativeGui;
     bool isOldSdk;
+    struct {
+        int width;
+        int height;
+        QWidget* widget;
+    } ui;
 
     AEffect* effect;
     struct {

@@ -517,6 +517,8 @@ Lv2Plugin::Lv2Plugin()
 
     ui.type = UI_NONE;
     ui.visible = false;
+    ui.width = 0;
+    ui.height = 0;
     ui.nativeWidget = 0;
     ui.handle = 0;
     ui.widget = 0;
@@ -1004,17 +1006,8 @@ void Lv2Plugin::reload()
     if (lilv_plugin_has_feature(lplug, lv2world->inPlaceBroken))
         m_hints |= PLUGIN_HAS_IN_PLACE_BROKEN;
 
-#if 1
     if (lilv_plugin_has_extension_data(lplug, lv2world->stateInterface) && descriptor->extension_data)
-#else
-    if (descriptor->extension_data)
-#endif
-    {
-        qWarning("Plugin has extensionData");
         m_hints |= PLUGIN_HAS_EXTENSION_STATE;
-    }
-    else
-        qWarning("Plugin has NOT extensionData");
 
     // allocate data
     if (params > 0)
@@ -1288,6 +1281,9 @@ void Lv2Plugin::showNativeGui(bool yesno)
                 g_signal_connect(G_OBJECT(hostWidget), "destroy", G_CALLBACK(oom_lv2_gtk_window_destroyed), this);
 
                 ui.nativeWidget = hostWidget;
+
+                if (ui.width > 0 && ui.height > 0)
+                    gtk_window_resize(GTK_WINDOW(hostWidget), ui.width, ui.height);
 #endif
             }
             else if (ui.type == UI_QT4)
@@ -1296,11 +1292,17 @@ void Lv2Plugin::showNativeGui(bool yesno)
                 pluginWidget->adjustSize();
                 pluginWidget->setAttribute(Qt::WA_DeleteOnClose);
                 pluginWidget->setWindowTitle(m_name);
+
+                if (ui.width > 0 && ui.height > 0)
+                    pluginWidget->resize(ui.width, ui.height);
             }
             else if (ui.type == UI_X11)
             {
                 QWidget* hostWidget = (QWidget*)ui.nativeWidget;
                 hostWidget->setWindowTitle(m_name);
+
+                if (ui.width > 0 && ui.height > 0)
+                    hostWidget->setFixedSize(ui.width, ui.height);
             }
         }
         else
@@ -1377,8 +1379,38 @@ void Lv2Plugin::updateNativeGui()
     {
         updateUIPorts(true);
 
-        if (ui.type == UI_EXTERNAL)
+        switch (ui.type)
+        {
+        case UI_GTK2:
+            if (ui.nativeWidget)
+            {
+                if (ui.width > 0 && ui.height > 0)
+                    gtk_window_resize(GTK_WINDOW((GtkWidget*)ui.nativeWidget), ui.width, ui.height);
+            }
+            break;
+        case UI_QT4:
+            if (ui.widget)
+            {
+                if (ui.width > 0 && ui.height > 0)
+                    ((QWidget*)ui.widget)->resize(ui.width, ui.height);
+            }
+            break;
+        case UI_X11:
+            if (ui.nativeWidget)
+            {
+                if (ui.width > 0 && ui.height > 0)
+                    ((QWidget*)ui.nativeWidget)->setFixedSize(ui.width, ui.height);
+            }
+            break;
+        case UI_EXTERNAL:
             LV2_EXTERNAL_UI_RUN((lv2_external_ui*)ui.widget);
+            break;
+        default:
+            break;
+        }
+
+        ui.width = 0;
+        ui.height = 0;
     }
 }
 
@@ -1417,27 +1449,9 @@ void Lv2Plugin::closeNativeGui(bool destroyed)
 
 void Lv2Plugin::ui_resize(int width, int height)
 {
-    // We need to postpone this to the main event thread (send a signal to resize the UI?)
-    if (ui.handle)
-    {
-        switch (ui.type)
-        {
-        case UI_GTK2:
-            if (ui.nativeWidget)
-                gtk_window_resize(GTK_WINDOW((GtkWidget*)ui.nativeWidget), width, height);
-            break;
-        case UI_QT4:
-            if (ui.widget)
-                ((QWidget*)ui.widget)->resize(width, height);
-            break;
-        case UI_X11:
-            if (ui.nativeWidget)
-                ((QWidget*)ui.nativeWidget)->resize(width, height);
-            break;
-        default:
-            break;
-        }
-    }
+    // We need to postpone this to the main event thread
+    ui.width = width;
+    ui.height = height;
 }
 
 void Lv2Plugin::ui_write_function(uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer)
@@ -1612,6 +1626,10 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
                 {
                     loadControl(xml);
                 }
+                else if (tag == "state")
+                {
+                    loadState(xml);
+                }
                 else if (tag == "active")
                 {
                     if (readPreset == false)
@@ -1701,8 +1719,10 @@ void Lv2Plugin::writeConfiguration(int level, Xml& xml)
 
             for (int i=0; i < m_lv2States.count(); i++)
             {
-                QString s("state type=\"%1\" key=\"%2\" value=\"%3\" /");
-                xml.tag(level, s.arg(m_lv2States[i].type).arg(m_lv2States[i].key).arg(m_lv2States[i].value).toUtf8().constData());
+                QString s("state type=\"%1\" key=\"%2\">%3</state");
+                QString key   = QString(m_lv2States[i].key).replace("&", "&amp;").replace("<","&lt;").replace(">","&gt;").replace("\\","&apos;").replace("\"","&quot;");
+                QString value = QString(m_lv2States[i].value).replace("&", "&amp;").replace("<","&lt;").replace(">","&gt;").replace("\\","&apos;").replace("\"","&quot;");
+                xml.tag(level, s.arg(m_lv2States[i].type).arg(key).arg(value).toUtf8().constData());
             }
         }
     }
@@ -1748,6 +1768,65 @@ bool Lv2Plugin::loadControl(Xml& xml)
         case Xml::TagEnd:
             if (tag == "control" && symbol.isEmpty() == false && lplug)
                 return setControl(symbol, val);
+            return true;
+
+        default:
+            break;
+        }
+    }
+    return true;
+}
+
+bool Lv2Plugin::loadState(Xml& xml)
+{
+    Lv2StateType type = STATE_NULL;
+    QString key;
+    QString value;
+
+    for (;;)
+    {
+        Xml::Token token = xml.parse();
+        const QString& tag = xml.s1();
+
+        switch (token)
+        {
+        case Xml::Error:
+        case Xml::End:
+            return true;
+
+        case Xml::TagStart:
+            xml.unknown("Lv2Plugin::state");
+            break;
+
+        case Xml::Attribut:
+            if (tag == "type")
+                type = (Lv2StateType)xml.s2().toInt();
+            else if (tag == "key")
+                key = xml.s2();
+            break;
+
+        case Xml::Text:
+            value = tag;
+            break;
+
+        case Xml::TagEnd:
+            if (tag == "state" && type != STATE_NULL && key.isEmpty() == false && value.isEmpty() == false)
+            {
+                if ((m_hints & PLUGIN_HAS_EXTENSION_STATE) > 0 && descriptor->extension_data)
+                {
+                    QString key_   = key.replace("&amp;", "&").replace("&lt;","<").replace("&gt;",">").replace("&apos;","\\").replace("&quot;","\"");
+                    QString value_ = value.replace("&amp;", "&").replace("&lt;","<").replace("&gt;",">").replace("&apos;","\\").replace("&quot;","\"");
+                    saveState(type, key_.toUtf8().constData(), value_.toUtf8().constData());
+
+                    LV2_State_Interface* state = (LV2_State_Interface*)descriptor->extension_data(LV2_STATE_INTERFACE_URI);
+
+                    if (state)
+                    {
+                        state->restore(handle, oom_lv2_state_retrieve, this, 0, features);
+                        return false;
+                    }
+                }
+            }
             return true;
 
         default:
