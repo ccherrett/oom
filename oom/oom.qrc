@@ -6,9 +6,11 @@
 		<file>images/frame.png</file>
 		<file>images/frame_clipping.png</file>
 		<file>images/checkbox_checked.png</file>
+                <file>images/checkbox_checked_disabled.png</file>
 		<file>images/checkbox_checked_hover.png</file>
 		<file>images/checkbox_checked_pressed.png</file>
 		<file>images/checkbox_unchecked.png</file>
+                <file>images/checkbox_unchecked_disabled.png</file>
 		<file>images/checkbox_unchecked_hover.png</file>
 		<file>images/checkbox_unchecked_pressed.png</file>
 		<file>images/radiobutton_checked.png</file>

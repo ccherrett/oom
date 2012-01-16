@@ -653,8 +653,8 @@ QLabel
 	font-size: 11px;
 	color: #d0d4d0;
 }
-QLabel::disabled 
-{ 
+
+QCheckBox::disabled, QComboBox::disabled, QLabel::disabled, QMenu::disabled, QPushButton::disabled {
 	color: #393941;
 }
 
@@ -678,7 +678,7 @@ background-color: #525252;
 }
 
 
-MidiRack, EffectRack  { 
+MidiRack, EffectRack  {
 	background-color: #141414;
 	gridline-color:#343434;
 	alternate-background-color: #1b1b1b;
@@ -1619,6 +1619,10 @@ QCheckBox {
      image: url(:/images/checkbox_unchecked_pressed.png);
  }
 
+ QCheckBox::indicator:unchecked:disabled {
+     image: url(:/images/checkbox_unchecked_disabled.png);
+ }
+
  QCheckBox::indicator:checked {
      image: url(:/images/checkbox_checked.png);
  }
@@ -1631,6 +1635,12 @@ QCheckBox {
      image: url(:/images/checkbox_checked_pressed.png);
  }
 
+ QCheckBox::indicator:checked:disabled {
+     image: url(:/images/checkbox_checked_disabled.png);
+ }
+
+/*
+ - These images are not available
  QCheckBox::indicator:indeterminate:hover {
      image: url(:/images/checkbox_indeterminate_hover.png);
  }
@@ -1638,6 +1648,8 @@ QCheckBox {
  QCheckBox::indicator:indeterminate:pressed {
      image: url(:/images/checkbox_indeterminate_pressed.png);
  }
+ */
+
  QComboBox {
      border: 1px solid #393941;
      border-radius: 3px;
@@ -1692,6 +1704,11 @@ QCheckBox {
      top: 1px;
      left: 1px;
  }
+
+ QComboBox::down-arrow:disabled {
+     image: url(:/images/down_arrow_disabled.png) 1;
+ }
+
  QComboBox QAbstractItemView {
      border: 1px solid #e2e5e5;
      selection-background-color: #93a7b2;

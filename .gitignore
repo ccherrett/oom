@@ -3,5 +3,6 @@
 build/
 build-debug/
 oom/plugin_includes/pluginterfaces/
+CMakeLists.txt.user
 .svn/
 .directory

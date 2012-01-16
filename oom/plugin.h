@@ -10,21 +10,15 @@
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
 
-//#include "globaldefs.h"
-
-//#include "stringparam.h"
-
-//#include "config.h"
+#include "audio.h"
+#include "ctrl.h"
+#include "globals.h"
+#include "lib_functions.h"
 
 #ifndef __WINDOWS__
 #undef __cdecl
 #define __cdecl
 #endif
-
-#include "audio.h"
-#include "ctrl.h"
-#include "globals.h"
-#include "lib_functions.h"
 
 #include <list>
 #include <vector>
