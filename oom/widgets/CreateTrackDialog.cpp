@@ -39,7 +39,7 @@ m_insertPosition(pos)
 	m_midiInPort = -1;
 	m_midiOutPort = -1;
 
-	m_height = 260;
+    m_height = 290;
 	m_width = 450;
 
 	txtInChannel->setValue(1);
@@ -1032,7 +1032,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			chkOutput->setVisible(true);
 			midiBox->setVisible(true);
 
-			m_height = 260;
+            m_height = 290;
 			m_width = width();
 		}
 		break;

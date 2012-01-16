@@ -363,6 +363,61 @@ static uint32_t oom_lv2_event_unref(LV2_Event_Callback_Data data, LV2_Event* eve
     return 0;
 }
 
+// ----------------- State Feature ---------------------------------------------------
+static int oom_lv2_state_store(LV2_State_Handle handle, uint32_t key, const void* value, size_t size, uint32_t type, uint32_t flags)
+{
+    qDebug("oom_lv2_state_store(%p, %i, %p, %lu, %i, %i)", handle, key, value, size, type, flags);
+
+    if (handle)
+    {
+        Lv2Plugin* plugin = (Lv2Plugin*)handle;
+        const char* uri_key = plugin->getCustomURIString(key);
+
+        if (uri_key > 0 && (flags & LV2_STATE_IS_POD) > 0)
+        {
+            qDebug("oom_lv2_state_store(%p, %i, %p, %lu, %i, %i) - Got uri_key and flags", handle, key, value, size, type, flags);
+
+            int dtype;
+
+            if (type == OOM_URI_MAP_ID_ATOM_STRING)
+                dtype = 0;  // string
+            else if (type >= OOM_URI_MAP_ID_COUNT)
+                dtype = 1;  // binary
+            else
+                dtype = -1; // invalid
+
+            if (value && dtype != -1)
+            {
+                if (dtype == 0)
+                {
+                    // string
+                    plugin->saveState(uri_key, (const char*)value);
+                }
+                else
+                {   // binary
+                    QByteArray chunk((const char*)value, size);
+                    plugin->saveState(uri_key, chunk.toBase64().data());
+                }
+
+                return 0;
+            }
+            else
+                qCritical("oom_lv2_state_store(%p, %i, %p, %lu, %i, %i) - Invalid data", handle, key, value, size, type, flags);
+        }
+        else
+            qWarning("oom_lv2_state_store(%p, %i, %p, %lu, %i, %i) - Invalid attributes", handle, key, value, size, type, flags);
+    }
+    else
+        qCritical("oom_lv2_state_store(%p, %i, %p, %lu, %i, %i) - Invalid handle", handle, key, value, size, type, flags);
+
+    return 1;
+}
+
+static const void* oom_lv2_state_retrieve(LV2_State_Handle handle, uint32_t key, size_t* size, uint32_t* type, uint32_t* flags)
+{
+    qDebug("oom_lv2_state_retrieve(%p, %i, %p, %p, %p)", handle, key, size, type, flags);
+}
+
 // ----------------- External UI Feature ---------------------------------------------
 static void oom_lv2_external_ui_closed(LV2UI_Controller controller)
 {
@@ -1112,6 +1167,11 @@ const char* Lv2Plugin::getCustomURIString(int uri_id)
         return 0;
 }
 
+void Lv2Plugin::saveState(const char* uri_key, const char* value)
+{
+
+}
+
 bool Lv2Plugin::hasNativeGui()
 {
     return (m_hints & PLUGIN_HAS_NATIVE_GUI);
@@ -1541,7 +1601,15 @@ void Lv2Plugin::writeConfiguration(int level, Xml& xml)
         xml.tag(level, s.arg(lilv_node_as_string(lilv_port_get_symbol(lplug, port))).arg(value, 0, 'f', 6).toLatin1().constData());
     }
 
-    // TODO - save state
+    if ((m_hints & PLUGIN_HAS_EXTENSION_STATE) > 0 && descriptor->extension_data)
+    {
+        LV2_State_Interface* state = (LV2_State_Interface*)descriptor->extension_data(LV2_STATE_INTERFACE_URI);
+
+        if (state)
+        {
+            state->save(handle, oom_lv2_state_store, this, 0, features);
+        }
+    }
 
     xml.intTag(level, "active", m_active);
 

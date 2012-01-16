@@ -457,6 +457,11 @@ protected:
 
 //class LV2ControlFifo;
 
+struct Lv2State {
+    const char* key;
+    const char* value;
+};
+
 class Lv2Plugin : public BasePlugin
 {
 public:    
@@ -483,6 +488,8 @@ public:
     uint32_t getCustomURIId(const char* uri);
     const char* getCustomURIString(int uri_id);
 
+    void saveState(const char* uri_key, const char* value);
+
     bool hasNativeGui();
     void showNativeGui(bool yesno);
     bool nativeGuiVisible();
@@ -507,6 +514,7 @@ private:
     std::vector<unsigned long> m_audioInIndexes;
     std::vector<unsigned long> m_audioOutIndexes;
     QList<const char*> m_customURIs;
+    QList<Lv2State> m_lv2States;
     //LV2ControlFifo* m_controlFifo;
 
     struct {
