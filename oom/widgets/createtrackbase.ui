@@ -253,6 +253,13 @@ This is required for tracks connected to LinuxSampler , if not previously config
      </item>
     </layout>
    </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="btnMyInput">
+     <property name="text">
+      <string>My Inputs</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
