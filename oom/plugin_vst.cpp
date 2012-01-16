@@ -145,8 +145,8 @@ VstPlugin::VstPlugin()
 
     for (int i=0; i<MAX_VST_EVENTS; i++)
     {
-        events.data[i] = 0;
         memset(&midiEvents[i], 0, sizeof(VstMidiEvent));
+        events.data[i] = (VstEvent*)&midiEvents[i];
     }
 }
 
@@ -505,6 +505,30 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst)
             {
                 effect->dispatcher(effect, effMainsChanged, 0, 1, 0, 0.0f);
                 effect->dispatcher(effect, effStartProcess, 0, 0, 0, 0.0f);
+            }
+
+            uint32_t midiEventCount = 0;
+            if (false)
+            {
+                // TODO - get events
+                VstMidiEvent* midiEvent = &midiEvents[midiEventCount];
+                memset(midiEvent, 0, sizeof(VstMidiEvent));
+
+                midiEvent->type = kVstMidiType;
+                midiEvent->byteSize = sizeof(VstMidiEvent);
+                midiEvent->midiData[0] = 0x90;
+                midiEvent->midiData[1] = 64;
+                midiEvent->midiData[2] = 100;
+
+                midiEventCount += 1;
+            }
+
+            // VST Events
+            if (midiEventCount > 0)
+            {
+                events.numEvents = midiEventCount;
+                events.reserved = 0;
+                effect->dispatcher(effect, effProcessEvents, 0, 0, &events, 0.0f);
             }
 
             effect->processReplacing(effect, src, dst, frames);
