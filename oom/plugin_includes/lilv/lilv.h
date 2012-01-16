@@ -786,6 +786,14 @@ LilvNodes*
 lilv_plugin_get_optional_features(const LilvPlugin* p);
 
 /**
+   Return whether or not a plugin provides a specific extension data.
+*/
+LILV_API
+bool
+lilv_plugin_has_extension_data(const LilvPlugin* p,
+                               const LilvNode*   uri);
+
+/**
    Get the number of ports on this plugin.
 */
 LILV_API
