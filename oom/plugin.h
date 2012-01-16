@@ -31,6 +31,7 @@
 
 // lv2 includes
 #include "lv2.h"
+#include "lv2_event.h"
 #include "lv2_ui.h"
 
 #ifdef LILV_STATIC
@@ -476,6 +477,11 @@ public:
         const char* value;
     };
 
+    struct Lv2Event {
+        uint32_t types;
+        LV2_Event_Buffer* buffer;
+    };
+
     Lv2Plugin();
     ~Lv2Plugin();
 
@@ -518,6 +524,7 @@ private:
     float* m_paramsBuffer;
     std::vector<unsigned long> m_audioInIndexes;
     std::vector<unsigned long> m_audioOutIndexes;
+    std::vector<Lv2Event> m_eventsIn;
     QList<const char*> m_customURIs;
     QList<Lv2State> m_lv2States;
     //LV2ControlFifo* m_controlFifo;

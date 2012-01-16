@@ -13,7 +13,6 @@
 #include "song.h"
 
 #include "lv2_data_access.h"
-#include "lv2_event.h"
 #include "lv2_event_helpers.h"
 #include "lv2_external_ui.h"
 #include "lv2_instance_access.h"
@@ -65,7 +64,7 @@ const uint16_t OOM_URI_MAP_ID_COUNT           = 4;
 // extra plugin hints
 const unsigned int PLUGIN_HAS_EXTENSION_STATE = 0x100;
 
-//static LV2_Time_Position oom_lv2_time_pos = { 0, 0, LV2_TIME_STOPPED, 0, 0, 0, 0, 0, 0, 0.0 };
+static LV2_Time_Position oom_lv2_time_pos = { 0, 0, LV2_TIME_STOPPED, 0, 0, 0, 0, 0, 0, 0.0 };
 
 struct LV2World {
     LilvWorld* world;
@@ -611,8 +610,12 @@ Lv2Plugin::~Lv2Plugin()
     if (m_paramCount > 0)
         delete[] m_paramsBuffer;
 
+    for (size_t i=0; i < m_eventsIn.size(); i++)
+        free(m_eventsIn[i].buffer);
+
     m_audioInIndexes.clear();
     m_audioOutIndexes.clear();
+    m_eventsIn.clear();
 }
 
 void Lv2Plugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
@@ -961,8 +964,12 @@ void Lv2Plugin::reload()
         delete[] m_paramsBuffer;
     }
 
+    for (size_t i=0; i < m_eventsIn.size(); i++)
+        free(m_eventsIn[i].buffer);
+
     m_audioInIndexes.clear();
     m_audioOutIndexes.clear();
+    m_eventsIn.clear();
 
     // reset
     m_hints  = 0;
@@ -971,8 +978,8 @@ void Lv2Plugin::reload()
     m_paramCount   = 0;
 
     // query new data
-    uint32_t ains, aouts, params, j;
-    ains = aouts = params = 0;
+    uint32_t ains, aouts, evins, params, j;
+    ains = aouts = evins = params = 0;
 
     uint32_t portCount = lilv_plugin_get_num_ports(lplug);
     for (uint32_t i = 0; i < portCount; i++)
@@ -990,6 +997,8 @@ void Lv2Plugin::reload()
             }
             else if (lilv_port_is_a(lplug, port, lv2world->portControl))
                 params += 1;
+            else if (lilv_port_is_a(lplug, port, lv2world->portEvent))
+                evins += 1;
         }
     }
 
@@ -1023,6 +1032,7 @@ void Lv2Plugin::reload()
 
         if (port)
         {
+            // --- Audio Port
             if (lilv_port_is_a(lplug, port, lv2world->portAudio))
             {
                 if(lilv_port_is_a(lplug, port, lv2world->portInput))
@@ -1036,6 +1046,7 @@ void Lv2Plugin::reload()
                 else
                     qWarning("WARNING - Got a broken Port (Audio, but not input or output)");
             }
+            // --- Control Port
             else if (lilv_port_is_a(lplug, port, lv2world->portControl))
             {
                 j = m_paramCount++;
@@ -1171,6 +1182,28 @@ void Lv2Plugin::reload()
                 m_params[j].value = m_paramsBuffer[j] = def;
 
                 descriptor->connect_port(handle, i, &m_paramsBuffer[j]);
+            }
+            // --- Event Port
+            else if (lilv_port_is_a(lplug, port, lv2world->portEvent))
+            {
+                Lv2Event newEvent;
+                newEvent.types  = 0;
+                newEvent.buffer = lv2_event_buffer_new(MAX_EVENT_BUFFER, LV2_EVENT_AUDIO_STAMP);
+
+                if (lilv_port_is_a(lplug, port, lv2world->portInput))
+                {
+                    // we only support input events, but since plugins need
+                    // to connect_port(), we still create an (unused) buffer for them
+                    if (lilv_port_supports_event(lplug, port, lv2world->portEventMidi))
+                        newEvent.types |= OOM_URI_MAP_ID_EVENT_MIDI;
+
+                    if (lilv_port_supports_event(lplug, port, lv2world->portEventTime))
+                        newEvent.types |= OOM_URI_MAP_ID_EVENT_TIME;
+                }
+
+                descriptor->connect_port(handle, i, newEvent.buffer);
+
+                m_eventsIn.push_back(newEvent);
             }
         }
     }

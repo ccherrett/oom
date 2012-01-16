@@ -655,7 +655,7 @@ QLabel
 }
 
 QCheckBox::disabled, QComboBox::disabled, QLabel::disabled, QMenu::disabled, QPushButton::disabled {
-	color: #393941;
+        color: #29292E;
 }
 
 QSplitter::handle{
