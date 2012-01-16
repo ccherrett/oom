@@ -457,11 +457,6 @@ protected:
 
 //class LV2ControlFifo;
 
-struct Lv2State {
-    const char* key;
-    const char* value;
-};
-
 class Lv2Plugin : public BasePlugin
 {
 public:    
@@ -471,6 +466,20 @@ public:
         UI_QT4,
         UI_X11,
         UI_EXTERNAL
+    };
+
+    // NOTE - need to preserve this enum order
+    // to be backwards compatible
+    enum Lv2StateType {
+        STATE_NULL   = 0,
+        STATE_STRING = 1,
+        STATE_BLOB   = 2
+    };
+
+    struct Lv2State {
+        Lv2StateType type;
+        const char* key;
+        const char* value;
     };
 
     Lv2Plugin();
@@ -488,7 +497,8 @@ public:
     uint32_t getCustomURIId(const char* uri);
     const char* getCustomURIString(int uri_id);
 
-    void saveState(const char* uri_key, const char* value);
+    void saveState(Lv2StateType type, const char* uri_key, const char* value);
+    Lv2State* getState(const char* uri_key);
 
     bool hasNativeGui();
     void showNativeGui(bool yesno);

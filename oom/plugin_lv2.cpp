@@ -85,6 +85,8 @@ struct LV2World {
     LilvNode* portEventMidi;
     LilvNode* portEventTime;
 
+    LilvNode* stateInterface;
+
     LilvNode* uiGtk2;
     LilvNode* uiQt4;
     LilvNode* uiX11;
@@ -122,6 +124,8 @@ void initLV2()
     lv2world->portEvent     = lilv_new_uri(lv2world->world, LILV_URI_EVENT_PORT);
     lv2world->portEventMidi = lilv_new_uri(lv2world->world, LILV_URI_MIDI_EVENT);
     lv2world->portEventTime = lilv_new_uri(lv2world->world, LILV_URI_TIME_EVENT);
+
+    lv2world->stateInterface = lilv_new_uri(lv2world->world, LV2_STATE_INTERFACE_URI);
 
     lv2world->uiGtk2 = lilv_new_uri(lv2world->world, LV2_NS_UI "GtkUI");
     lv2world->uiQt4  = lilv_new_uri(lv2world->world, LV2_NS_UI "Qt4UI");
@@ -375,28 +379,25 @@ static int oom_lv2_state_store(LV2_State_Handle handle, uint32_t key, const void
 
         if (uri_key > 0 && (flags & LV2_STATE_IS_POD) > 0)
         {
-            qDebug("oom_lv2_state_store(%p, %i, %p, %lu, %i, %i) - Got uri_key and flags", handle, key, value, size, type, flags);
-
-            int dtype;
+            Lv2Plugin::Lv2StateType dtype;
 
             if (type == OOM_URI_MAP_ID_ATOM_STRING)
-                dtype = 0;  // string
+                dtype = Lv2Plugin::STATE_STRING;
             else if (type >= OOM_URI_MAP_ID_COUNT)
-                dtype = 1;  // binary
+                dtype = Lv2Plugin::STATE_BLOB;
             else
-                dtype = -1; // invalid
+                dtype = Lv2Plugin::STATE_NULL;
 
-            if (value && dtype != -1)
+            if (value && dtype != Lv2Plugin::STATE_NULL)
             {
-                if (dtype == 0)
+                if (dtype == Lv2Plugin::STATE_STRING)
                 {
-                    // string
-                    plugin->saveState(uri_key, (const char*)value);
+                    plugin->saveState(Lv2Plugin::STATE_STRING, uri_key, (const char*)value);
                 }
                 else
-                {   // binary
+                {
                     QByteArray chunk((const char*)value, size);
-                    plugin->saveState(uri_key, chunk.toBase64().data());
+                    plugin->saveState(Lv2Plugin::STATE_BLOB, uri_key, chunk.toBase64().data());
                 }
 
                 return 0;
@@ -416,6 +417,49 @@ static int oom_lv2_state_store(LV2_State_Handle handle, uint32_t key, const void
 static const void* oom_lv2_state_retrieve(LV2_State_Handle handle, uint32_t key, size_t* size, uint32_t* type, uint32_t* flags)
 {
     qDebug("oom_lv2_state_retrieve(%p, %i, %p, %p, %p)", handle, key, size, type, flags);
+
+    if (handle)
+    {
+        Lv2Plugin* plugin = (Lv2Plugin*)handle;
+        const char* uri_key = plugin->getCustomURIString(key);
+
+        if (uri_key)
+        {
+            Lv2Plugin::Lv2State* state = plugin->getState(uri_key);
+
+            if (state)
+            {
+                *size  = 0;
+                *type  = 0;
+                *flags = 0;
+
+                if (state->type == Lv2Plugin::STATE_STRING)
+                {
+                    *type = OOM_URI_MAP_ID_ATOM_STRING;
+                    return state->value;
+                }
+                else if (state->type == Lv2Plugin::STATE_BLOB)
+                {
+                    static QByteArray chunk;
+                    chunk = QByteArray::fromBase64(state->value);
+
+                    *size = chunk.size();
+                    *type = key;
+                    return chunk.data();
+                }
+                else
+                    qCritical("oom_lv2_state_retrieve(%p, %i, %p, %p, %p) - Invalid key type", handle, key, size, type, flags);
+            }
+            else
+                qCritical("oom_lv2_state_retrieve(%p, %i, %p, %p, %p) - Invalid key", handle, key, size, type, flags);
+        }
+        else
+            qCritical("oom_lv2_state_retrieve(%p, %i, %p, %p, %p) - Failed to find key", handle, key, size, type, flags);
+    }
+    else
+        qCritical("oom_lv2_state_retrieve(%p, %i, %p, %p, %p) - Invalid handle", handle, key, size, type, flags);
+
+    return 0;
 }
 
 // ----------------- External UI Feature ---------------------------------------------
@@ -532,6 +576,14 @@ Lv2Plugin::~Lv2Plugin()
     }
 
     m_customURIs.clear();
+
+    for (int i=0; i < m_lv2States.count(); i++)
+    {
+        free((void*)m_lv2States[i].key);
+        free((void*)m_lv2States[i].value);
+    }
+
+    m_lv2States.clear();
 
     if (handle && descriptor->deactivate && m_activeBefore)
         descriptor->deactivate(handle);
@@ -952,6 +1004,18 @@ void Lv2Plugin::reload()
     if (lilv_plugin_has_feature(lplug, lv2world->inPlaceBroken))
         m_hints |= PLUGIN_HAS_IN_PLACE_BROKEN;
 
+#if 1
+    if (lilv_plugin_has_extension_data(lplug, lv2world->stateInterface) && descriptor->extension_data)
+#else
+    if (descriptor->extension_data)
+#endif
+    {
+        qWarning("Plugin has extensionData");
+        m_hints |= PLUGIN_HAS_EXTENSION_STATE;
+    }
+    else
+        qWarning("Plugin has NOT extensionData");
+
     // allocate data
     if (params > 0)
     {
@@ -1167,9 +1231,35 @@ const char* Lv2Plugin::getCustomURIString(int uri_id)
         return 0;
 }
 
-void Lv2Plugin::saveState(const char* uri_key, const char* value)
+void Lv2Plugin::saveState(Lv2StateType type, const char* uri_key, const char* value)
 {
+    for (int i=0; i < m_lv2States.count(); i++)
+    {
+        if (strcmp(uri_key, m_lv2States[i].key) == 0)
+        {
+            free((void*)m_lv2States[i].value);
+            m_lv2States[i].value = strdup(value);
+            return;
+        }
+    }
 
+    Lv2State state;
+    state.type  = type;
+    state.key   = strdup(uri_key);
+    state.value = strdup(value);
+    m_lv2States.append(state);
+}
+
+Lv2Plugin::Lv2State* Lv2Plugin::getState(const char* uri_key)
+{
+    for (int i=0; i < m_lv2States.count(); i++)
+    {
+        if (strcmp(uri_key, m_lv2States[i].key) == 0)
+        {
+            return &m_lv2States[i];
+        }
+    }
+    return 0;
 }
 
 bool Lv2Plugin::hasNativeGui()
@@ -1598,7 +1688,7 @@ void Lv2Plugin::writeConfiguration(int level, Xml& xml)
 
         QString s("control symbol=\"%1\" val=\"%2\" /");
         const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[i].rindex);
-        xml.tag(level, s.arg(lilv_node_as_string(lilv_port_get_symbol(lplug, port))).arg(value, 0, 'f', 6).toLatin1().constData());
+        xml.tag(level, s.arg(lilv_node_as_string(lilv_port_get_symbol(lplug, port))).arg(value, 0, 'f', 6).toUtf8().constData());
     }
 
     if ((m_hints & PLUGIN_HAS_EXTENSION_STATE) > 0 && descriptor->extension_data)
@@ -1608,6 +1698,12 @@ void Lv2Plugin::writeConfiguration(int level, Xml& xml)
         if (state)
         {
             state->save(handle, oom_lv2_state_store, this, 0, features);
+
+            for (int i=0; i < m_lv2States.count(); i++)
+            {
+                QString s("state type=\"%1\" key=\"%2\" value=\"%3\" /");
+                xml.tag(level, s.arg(m_lv2States[i].type).arg(m_lv2States[i].key).arg(m_lv2States[i].value).toUtf8().constData());
+            }
         }
     }
 
