@@ -85,7 +85,7 @@ set_target_properties( lilv_bundle
 ## Linkage
 ##
 target_link_libraries ( lilv_bundle
-	sord_bundle
+        sord_bundle
     dl
     )
 

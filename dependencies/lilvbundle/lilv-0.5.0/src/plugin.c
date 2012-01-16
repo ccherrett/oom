@@ -647,6 +647,35 @@ lilv_plugin_get_required_features(const LilvPlugin* p)
 }
 
 LILV_API
+bool
+lilv_plugin_has_extension_data(const LilvPlugin* p,
+                               const LilvNode*   uri)
+{
+    if (!lilv_node_is_uri(uri)) {
+        LILV_ERRORF("Extension data `%s' is not a URI\n", uri->str_val);
+        return false;
+    }
+
+    SordNode* lv2_extensionData_val = sord_new_uri(
+        p->world->world, (const uint8_t*)LILV_NS_LV2 "extensionData");
+
+    SordIter* iter = lilv_world_query_internal(
+        p->world,
+        p->plugin_uri->val.uri_val,
+        lv2_extensionData_val,
+        uri->val.uri_val);
+
+    sord_node_free(p->world->world, lv2_extensionData_val);
+
+    if (iter) {
+        sord_iter_free(iter);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+LILV_API
 const LilvPort*
 lilv_plugin_get_port_by_index(const LilvPlugin* p,
                               uint32_t          index)
