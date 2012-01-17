@@ -24,6 +24,7 @@
 #include "driver/alsamidi.h"
 #include "song.h"
 #include "track.h"
+#include "synthtrack.h"
 #include "undo.h"
 #include "key.h"
 #include "globals.h"
@@ -498,8 +499,7 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{
 			break;
 		case Track::AUDIO_SOFTSYNTH:
             // falkTX, FIXME
-            track = new MidiTrack();
-            track->setType(Track::AUDIO_SOFTSYNTH);
+            track = new SynthTrack();
 			break;
 		default:
 			printf("Song::addTrack() illegal type %d\n", type);
@@ -1888,8 +1888,8 @@ void Song::beat()
 		setPos(0, tick, true, false, true);
 
 	// p3.3.40 Update synth native guis at the heartbeat rate.
-	for (ciSynthI is = _synthIs.begin(); is != _synthIs.end(); ++is)
-		(*is)->guiHeartBeat();
+    //for (ciSynthI is = _synthIs.begin(); is != _synthIs.end(); ++is)
+    //	(*is)->guiHeartBeat();
 	
 	//Update native guis
 	for(ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
@@ -2399,7 +2399,7 @@ void Song::clear(bool signal)
 		midiPorts[i].setMidiDevice(0);
 	}
 
-	_synthIs.clearDelete();
+    //_synthIs.clearDelete();
 
 	// p3.3.45 Make sure to delete Jack midi devices, and remove all ALSA midi device routes...
 	// Otherwise really nasty things happen when loading another song when one is already loaded.
@@ -2521,9 +2521,9 @@ void Song::cleanupForQuit()
 		printf("deleting _auxs\n");
 	_auxs.clearDelete(); // aux sends
 
-	if (debugMsg)
-		printf("deleting _synthIs\n");
-	_synthIs.clearDelete(); // each ~SynthI() -> deactivate3() -> ~SynthIF()
+    //if (debugMsg)
+    //	printf("deleting _synthIs\n");
+    //_synthIs.clearDelete(); // each ~SynthI() -> deactivate3() -> ~SynthIF()
 
 	tempomap.clear();
 	AL::sigmap.clear();
@@ -4326,10 +4326,10 @@ void Song::removeTrack2(Track* track)
 			break;
 		case Track::AUDIO_SOFTSYNTH:
 		{
-			SynthI* s = (SynthI*) track;
-			s->deactivate2();
-			_synthIs.erase(track);
-			_artracks.erase(track);
+            //SynthI* s = (SynthI*) track;
+            //s->deactivate2();
+            //_synthIs.erase(track);
+            //_artracks.erase(track);
 		}
 			break;
 	}

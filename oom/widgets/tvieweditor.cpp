@@ -314,12 +314,12 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			}
 			break;
 		case 6:
-			for (ciTrack t = song->syntis()->begin(); t != song->syntis()->end(); ++t)
-			{
+            //for (ciTrack t = song->syntis()->begin(); t != song->syntis()->end(); ++t)
+            //{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
-					stracks << (*t)->name();
-			}
+            //		stracks << (*t)->name();
+            //}
 			break;
 		case 7:
 			for (ciTrack t = song->waves()->begin(); t != song->waves()->end(); ++t)

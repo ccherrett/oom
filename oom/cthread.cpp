@@ -113,11 +113,11 @@ void OOMClientThread::run()
 				}
 			break;
 			case SHOW_SYNTHS:
-				rv.append("show synths\n");
-				for(ciTrack ci = song->syntis()->begin(); ci != song->syntis()->end(); ++ci)
-				{
-					rv.append((*ci)->name()+"\n");
-				}
+                //rv.append("show synths\n");
+                //for(ciTrack ci = song->syntis()->begin(); ci != song->syntis()->end(); ++ci)
+                //{
+                //	rv.append((*ci)->name()+"\n");
+                //}
 			break;
 			case SHOW_AUXES:
 				rv.append("show auxes\n");
