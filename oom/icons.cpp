@@ -272,6 +272,7 @@ QPixmap* addBussIcon;
 QPixmap* addOutputIcon;
 QPixmap* addInputIcon;
 QPixmap* addAuxIcon;
+QPixmap* addSynthIcon;
 
 QPixmap* exitIcon;
 QPixmap* exit1Icon;
@@ -1508,6 +1509,7 @@ void initIcons()
       addOutputIcon   = new MPIXMAP(":/images/icons/views_outputs_menu.png", NULL);
       addAuxIcon      = new MPIXMAP(":/images/icons/views_auxs_menu.png", NULL);
       addAudioIcon    = new MPIXMAP(":/images/icons/views_audio_menu.png", NULL);
+      addSynthIcon    = new MPIXMAP(":/images/icons/views_synth_menu.png", NULL);
       
 	  addtrack_addmiditrackIcon     = new MPIXMAP(addtrack_addmiditrack_xpm, NULL);
       addtrack_audiogroupIcon       = new MPIXMAP(addtrack_audiogroup_xpm, NULL);

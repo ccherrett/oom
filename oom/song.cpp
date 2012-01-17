@@ -497,8 +497,9 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{
 			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
 			break;
 		case Track::AUDIO_SOFTSYNTH:
-			printf("not implemented: Song::addTrack(SOFTSYNTH)\n");
-			// ((AudioTrack*)track)->addAuxSend(lastAuxIdx);
+            // falkTX, FIXME
+            track = new MidiTrack();
+            track->setType(Track::AUDIO_SOFTSYNTH);
 			break;
 		default:
 			printf("Song::addTrack() illegal type %d\n", type);
@@ -4007,12 +4008,12 @@ void Song::insertTrack1(Track* track, int /*idx*/)
 	{
 		case Track::AUDIO_SOFTSYNTH:
 		{
-			SynthI* s = (SynthI*) track;
-			Synth* sy = s->synth();
-			if (!s->isActivated())
-			{
-				s->initInstance(sy, s->name());
-			}
+            //SynthI* s = (SynthI*) track;
+            //Synth* sy = s->synth();
+            //if (!s->isActivated())
+            //{
+            //	s->initInstance(sy, s->name());
+            //}
 		}
 			break;
 		default:
@@ -4070,12 +4071,12 @@ void Song::insertTrack2(Track* track, int idx)
 			break;
 		case Track::AUDIO_SOFTSYNTH:
 		{
-			SynthI* s = (SynthI*) track;
-			midiDevices.add(s);
-			midiInstruments.push_back(s);
-			_synthIs.push_back(s);
-			ia = _artracks.index2iterator(idx);
-			_artracks.insert(ia, track);
+            //SynthI* s = (SynthI*) track;
+            //midiDevices.add(s);
+            //midiInstruments.push_back(s);
+            //_synthIs.push_back(s);
+            //ia = _artracks.index2iterator(idx);
+            //_artracks.insert(ia, track);
 		}
 			break;
 		default:

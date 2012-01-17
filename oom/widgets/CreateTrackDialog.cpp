@@ -46,6 +46,7 @@ m_insertPosition(pos)
 
 	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
 	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
+    cmbType->addItem(*addSynthIcon, tr("Synth"), Track::AUDIO_SOFTSYNTH);
 	cmbType->addItem(*addOutputIcon, tr("Output"), Track::AUDIO_OUTPUT);
 	cmbType->addItem(*addInputIcon, tr("Input"), Track::AUDIO_INPUT);
 	cmbType->addItem(*addBussIcon, tr("Buss"), Track::AUDIO_BUSS);
@@ -519,6 +520,14 @@ void CreateTrackDialog::addTrack()
 		case Track::AUDIO_SOFTSYNTH:
 		{
 			//Just add the track type and rename it
+            Track* track = song->addTrackByName(txtName->text(), Track::MIDI, -1, false);
+            if(track)
+            {
+                midiMonitor->msgAddMonitoredTrack(track);
+                song->deselectTracks();
+                track->setSelected(true);
+                emit trackAdded(track->name());
+            }
 		}
 		break;
 	}
