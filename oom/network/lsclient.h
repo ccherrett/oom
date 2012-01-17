@@ -93,6 +93,10 @@ class LSClient : public QObject
 	Q_OBJECT
 
 public:
+	enum SamplerEngine {
+		GIG = 0, SFZ, SF2
+	};
+
 	LSClient(const char* host = "localhost", int port = 8888, QObject *parent = 0);
 	~LSClient();
 	void stopClient();
@@ -105,6 +109,10 @@ public:
 	MidiInstrumentList* getInstruments(QList<int>);
 	MidiInstrument* getInstrument(int);
 	MidiInstrument* getInstrument(QString);
+
+	bool loadInstrument(MidiInstrument*);
+	bool unloadInstrument(MidiInstrument*);
+	
 	QMap<int, QString> listInstruments();
 	QString getValidInstrumentName(QString nameBase);
 	QString getMapName(int);
@@ -125,6 +133,8 @@ private:
 	LSCPKeymap _getKeyMapping(QString, int, int);
 	QString _stripAscii(QString);
 	bool _loadInstrumentFile(const char*, int, int);
+	bool isNumber(const char*);
+	int findMidiMap(const char*);
 
 protected:
 	void customEvent(QEvent*);

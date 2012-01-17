@@ -259,8 +259,7 @@ void initMidiInstruments()
 
 MidiInstrument* registerMidiInstrument(const QString& name)
 {
-	for (iMidiInstrument i = midiInstruments.begin();
-			i != midiInstruments.end(); ++i)
+	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 	{
 		if ((*i)->iname() == name)
 			return *i;
@@ -274,8 +273,7 @@ MidiInstrument* registerMidiInstrument(const QString& name)
 
 void removeMidiInstrument(const QString& name)
 {
-	for (iMidiInstrument i = midiInstruments.begin();
-			i != midiInstruments.end(); ++i)
+	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 	{
 		if ((*i)->iname() == name)
 		{
@@ -287,8 +285,7 @@ void removeMidiInstrument(const QString& name)
 
 void removeMidiInstrument(const MidiInstrument* instr)
 {
-	for (iMidiInstrument i = midiInstruments.begin();
-			i != midiInstruments.end(); ++i)
+	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 	{
 		if (*i == instr)
 		{
@@ -310,6 +307,7 @@ void MidiInstrument::init()
 	_midiReset = new EventList();
 	_midiState = new EventList();
 	_controller = new MidiControllerList;
+	m_oomInstrument = false;
 
 	// add some default controller to controller list
 	// this controllers are always available for all instruments
@@ -362,37 +360,6 @@ MidiInstrument::~MidiInstrument()
 	if (_initScript)
 		delete _initScript;
 }
-
-/*
-//---------------------------------------------------------
-//   uniqueCopy
-//---------------------------------------------------------
-
-MidiInstrument& MidiInstrument::uniqueCopy(const MidiInstrument& ins)
-{
-  _initScript = 0;
-  _midiInit  = new EventList();
-  _midiReset = new EventList();
-  _midiState = new EventList();
-  //---------------------------------------------------------
-  // TODO: Copy the init script, and the lists. 
-  //---------------------------------------------------------
-  _controller = new MidiControllerList(*(ins._controller));
-    
-  // Assignment
-  pg = ins.pg;
-  
-  _name = ins._name;
-  _filePath = ins._filePath;
-    
-  // Hmm, dirty, yes? But init sets it to false...
-  //_dirty = ins._dirty;
-  //_dirty = false;
-  _dirty = true;
-  
-  return *this;
-}
- */
 
 //---------------------------------------------------------
 //   assign
@@ -452,6 +419,10 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 			np->keys = pp->keys;
 			np->keyswitches = pp->keyswitches;
 			np->comments = pp->comments;
+			np->loadmode = pp->loadmode;
+			np->filename = pp->filename;
+			np->engine = pp->engine;
+			np->volume = pp->volume;
 			npg->patches.push_back(np);
 		}
 	}
@@ -459,6 +430,7 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 	_name = ins._name;
 	_filePath = ins._filePath;
 	m_keymaps = ins.m_keymaps;
+	m_oomInstrument = ins.m_oomInstrument;
 
 	// Hmm, dirty, yes? But init sets it to false...
 	//_dirty = ins._dirty;

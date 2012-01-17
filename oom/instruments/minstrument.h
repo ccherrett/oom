@@ -23,6 +23,7 @@ class EventList;
 class MidiControllerList;
 class QString;
 
+
 //---------------------------------------------------------
 //   Patch
 //---------------------------------------------------------
@@ -33,6 +34,10 @@ struct Patch
     signed char hbank, lbank, prog;
 	QList<int> keys, keyswitches;
     QString name;
+	int loadmode;
+	char* engine;
+	char* filename;
+	float volume;
     bool drum;
 	QHash<int, QString> comments;
     void read(Xml&);
@@ -98,6 +103,7 @@ class MidiInstrument
 	QHash<int, KeyMap*> m_keymaps;
     bool _dirty;
     int _nullvalue;
+	bool m_oomInstrument;
 
     void init();
 
@@ -162,7 +168,16 @@ public:
 		return &m_keymaps;
 	}
 
-    //MidiInstrument& uniqueCopy(const MidiInstrument&);
+	bool isOOMInstrument()
+	{
+		return m_oomInstrument;
+	}
+
+	void setOOMInstrument(bool val)
+	{
+		m_oomInstrument = val;
+	}
+
     // Assign will 'delete' all existing patches and groups from the instrument.
     MidiInstrument& assign(const MidiInstrument&);
 
