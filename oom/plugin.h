@@ -524,7 +524,7 @@ private:
     float* m_paramsBuffer;
     std::vector<unsigned long> m_audioInIndexes;
     std::vector<unsigned long> m_audioOutIndexes;
-    std::vector<Lv2Event> m_eventsIn;
+    std::vector<Lv2Event> m_events;
     QList<const char*> m_customURIs;
     QList<Lv2State> m_lv2States;
     //LV2ControlFifo* m_controlFifo;

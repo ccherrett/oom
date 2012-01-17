@@ -167,7 +167,7 @@ static void timebase_callback(jack_transport_state_t /* state */,
 		int /* new_pos */,
 		void*)
 {
-	//printf("Jack timebase_callback pos->frame:%u audio->tickPos:%d song->cpos:%d\n", pos->frame, audio->tickPos(), song->cpos());
+    //printf("Jack timebase_callback pos->frame:%u audio->tickPos:%d song->cpos:%d\n", pos->frame, audio->tickPos(), song->cpos());
 
 	Pos p(extSyncFlag.value() ? audio->tickPos() : pos->frame, extSyncFlag.value() ? true : false);
 
@@ -183,8 +183,8 @@ static void timebase_callback(jack_transport_state_t /* state */,
 	pos->beat_type = n;
 	pos->ticks_per_beat = 24;
 
-	int tempo = tempomap.tempo(p.tick());
-	pos->beats_per_minute = (60000000.0 / tempo) * tempomap.globalTempo() / 100.0;
+    int tempo = tempomap.tempo(p.tick());
+    pos->beats_per_minute = (60000000.0 / tempo) * tempomap.globalTempo() / 100.0;
 }
 
 //---------------------------------------------------------

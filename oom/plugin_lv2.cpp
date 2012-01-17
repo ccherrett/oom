@@ -10,6 +10,7 @@
 
 #include "plugin.h"
 #include "plugingui.h"
+#include "jackaudio.h"
 #include "song.h"
 
 #include "lv2_data_access.h"
@@ -37,7 +38,7 @@ static void oom_lv2_gtk_window_destroyed(void*, void* data)
 #define LV2_NS_UI    "http://lv2plug.in/ns/extensions/ui#"
 
 // define extra URIs not yet in lilv
-#define LILV_URI_TIME_EVENT   "http://lv2plug.in/ns/ext/time#TimeEvent"
+#define LILV_URI_TIME_EVENT   "http://lv2plug.in/ns/ext/time#Position"
 
 // static max values
 const unsigned int MAX_EVENT_BUFFER = 0x7FFF; // 32767
@@ -610,12 +611,12 @@ Lv2Plugin::~Lv2Plugin()
     if (m_paramCount > 0)
         delete[] m_paramsBuffer;
 
-    for (size_t i=0; i < m_eventsIn.size(); i++)
-        free(m_eventsIn[i].buffer);
+    for (size_t i=0; i < m_events.size(); i++)
+        free(m_events[i].buffer);
 
     m_audioInIndexes.clear();
     m_audioOutIndexes.clear();
-    m_eventsIn.clear();
+    m_events.clear();
 }
 
 void Lv2Plugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
@@ -964,12 +965,12 @@ void Lv2Plugin::reload()
         delete[] m_paramsBuffer;
     }
 
-    for (size_t i=0; i < m_eventsIn.size(); i++)
-        free(m_eventsIn[i].buffer);
+    for (size_t i=0; i < m_events.size(); i++)
+        free(m_events[i].buffer);
 
     m_audioInIndexes.clear();
     m_audioOutIndexes.clear();
-    m_eventsIn.clear();
+    m_events.clear();
 
     // reset
     m_hints  = 0;
@@ -1203,7 +1204,7 @@ void Lv2Plugin::reload()
 
                 descriptor->connect_port(handle, i, newEvent.buffer);
 
-                m_eventsIn.push_back(newEvent);
+                m_events.push_back(newEvent);
             }
         }
     }
@@ -1524,6 +1525,16 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
         _proc_lock.lock();
         if (m_active)
         {
+            // TODO - cleanup this a bit when synth works
+
+            // init events
+            LV2_Event_Iterator ev_iters[m_events.size()];
+            for (size_t i = 0; i < m_events.size(); i++)
+            {
+                lv2_event_buffer_reset(m_events[i].buffer, LV2_EVENT_AUDIO_STAMP, (uint8_t*)(m_events[i].buffer + 1));
+                lv2_event_begin(&ev_iters[i], m_events[i].buffer);
+            }
+
             // connect ports
             int ains  = m_audioInIndexes.size();
             int aouts = m_audioOutIndexes.size();
@@ -1531,6 +1542,7 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
             bool need_extra_buffer = false;
             uint32_t pin, pout;
 
+            // FX plugin
             if (ains == aouts)
             {
                 if (aouts <= m_channels)
@@ -1563,11 +1575,87 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
                 return;
             }
 
+            for (size_t i = 0; i < m_events.size(); i++)
+            {
+                if (m_events[i].types & OOM_URI_MAP_ID_EVENT_MIDI)
+                {
+                    if (false) // TODO - get events
+                    {
+                        uint8_t* midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
+
+                        if (midi_event)
+                        {
+                            midi_event[0] = 0x90;
+                            midi_event[1] = 64;
+                            midi_event[2] = 100;
+                        }
+                    }
+                }
+            }
+
             // activate if needed
             if (m_activeBefore == false)
             {
                 if (descriptor->activate)
                     descriptor->activate(handle);
+            }
+
+            // time event
+            bool time_done = false;
+            for (size_t i = 0; i < m_events.size(); i++)
+            {
+                if (m_events[i].types & OOM_URI_MAP_ID_EVENT_TIME)
+                {
+                    if (time_done == false)
+                    {
+                        oom_lv2_time_pos.frame = 0;
+                        oom_lv2_time_pos.flags = 0;
+                        oom_lv2_time_pos.state = LV2_TIME_STOPPED;
+                        oom_lv2_time_pos.bar   = 0;
+                        oom_lv2_time_pos.beat  = 0;
+                        oom_lv2_time_pos.tick  = 0;
+                        oom_lv2_time_pos.beats_per_bar    = 0;
+                        oom_lv2_time_pos.beat_type        = 0;
+                        oom_lv2_time_pos.ticks_per_beat   = 0;
+                        oom_lv2_time_pos.beats_per_minute = 120.0;
+
+                        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+                        {
+                            jack_client_t* client = ((JackAudioDevice*)audioDevice)->getJackClient();
+                            if (client)
+                            {
+                                jack_position_t pos;
+                                jack_transport_state_t state = jack_transport_query(client, &pos);
+
+                                if (state == JackTransportRolling)
+                                    oom_lv2_time_pos.state = LV2_TIME_ROLLING;
+                                else
+                                    oom_lv2_time_pos.state = LV2_TIME_STOPPED;
+
+                                if (pos.unique_1 == pos.unique_2)
+                                {
+                                    oom_lv2_time_pos.frame = pos.frame;
+
+                                    if (pos.valid & JackPositionBBT)
+                                    {
+                                        oom_lv2_time_pos.bar  = pos.bar;
+                                        oom_lv2_time_pos.beat = pos.beat;
+                                        oom_lv2_time_pos.tick = pos.tick;
+                                        oom_lv2_time_pos.beats_per_bar    = pos.beats_per_bar;
+                                        oom_lv2_time_pos.beat_type        = pos.beat_type;
+                                        oom_lv2_time_pos.ticks_per_beat   = pos.ticks_per_beat;
+                                        oom_lv2_time_pos.beats_per_minute = pos.beats_per_minute;
+
+                                        oom_lv2_time_pos.flags |= LV2_TIME_HAS_BBT;
+                                    }
+                                }
+                            }
+                        }
+                        time_done = true;
+                    }
+
+                    lv2_event_write(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_TIME, sizeof(LV2_Time_Position), (uint8_t*)&oom_lv2_time_pos);
+                }
             }
 
             // process

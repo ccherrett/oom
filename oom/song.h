@@ -144,7 +144,7 @@ private:
     OutputList _outputs; // audio output ports
     GroupList _groups; // mixer groups
     AuxList _auxs; // aux sends
-    SynthIList _synthIs;
+    //SynthIList _synthIs;
 
     UndoList* undoList;
     UndoList* redoList;
@@ -445,9 +445,9 @@ public:
         return &_auxs;
     }
 
-    SynthIList* syntis() {
-        return &_synthIs;
-    }
+    //SynthIList* syntis() {
+    //    return &_synthIs;
+    //}
 
     void cmdRemoveTrack(Track* track);
     void removeTrack0(Track* track);

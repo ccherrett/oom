@@ -10,6 +10,7 @@
 
 #include "plugin.h"
 #include "plugingui.h"
+#include "jackaudio.h"
 #include "song.h"
 
 #include <math.h>
@@ -42,12 +43,55 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
         return 1; // FIXME?
 
     case audioMasterGetTime:
-        // TODO
+        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+        {
+            jack_client_t* client = ((JackAudioDevice*)audioDevice)->getJackClient();
+            if (client)
+            {
+                static VstTimeInfo timeInfo;
+                memset(&timeInfo, 0, sizeof(VstTimeInfo));
+
+                static jack_transport_state_t jack_state;
+                static jack_position_t jack_pos;
+                jack_state = jack_transport_query(client, &jack_pos);
+
+                if (jack_state == JackTransportRolling)
+                    timeInfo.flags |= kVstTransportChanged|kVstTransportPlaying;
+                else
+                    timeInfo.flags |= kVstTransportChanged;
+
+                if (jack_pos.unique_1 == jack_pos.unique_2)
+                {
+                    timeInfo.samplePos  = jack_pos.frame;
+                    timeInfo.sampleRate = jack_pos.frame_rate;
+
+                    if (jack_pos.valid & JackPositionBBT)
+                    {
+                        // Tempo
+                        timeInfo.tempo = jack_pos.beats_per_minute;
+                        timeInfo.timeSigNumerator = jack_pos.beats_per_bar;
+                        timeInfo.timeSigDenominator = jack_pos.beat_type;
+                        timeInfo.flags |= kVstTempoValid|kVstTimeSigValid;
+
+                        // Position
+                        double dPos = timeInfo.samplePos / timeInfo.sampleRate;
+                        timeInfo.nanoSeconds = dPos * 1000.0;
+                        timeInfo.flags |= kVstNanosValid;
+
+                        // Position
+                        timeInfo.barStartPos = 0;
+                        timeInfo.ppqPos = dPos * timeInfo.tempo / 60.0;
+                        timeInfo.flags |= kVstBarsValid|kVstPpqPosValid;
+                    }
+                }
+                return (intptr_t)&timeInfo;
+            }
+        }
         return 0;
 
     case audioMasterTempoAt:
         // Deprecated in VST SDK 2.4
-        // TODO
+        // TODO - return BPM at a specific song pos
         return 0;
 
     case audioMasterGetNumAutomatableParameters:
@@ -145,8 +189,8 @@ VstPlugin::VstPlugin()
 
     for (int i=0; i<MAX_VST_EVENTS; i++)
     {
-        events.data[i] = 0;
         memset(&midiEvents[i], 0, sizeof(VstMidiEvent));
+        events.data[i] = (VstEvent*)&midiEvents[i];
     }
 }
 
@@ -505,6 +549,30 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst)
             {
                 effect->dispatcher(effect, effMainsChanged, 0, 1, 0, 0.0f);
                 effect->dispatcher(effect, effStartProcess, 0, 0, 0, 0.0f);
+            }
+
+            uint32_t midiEventCount = 0;
+            if (false)
+            {
+                // TODO - get events
+                VstMidiEvent* midiEvent = &midiEvents[midiEventCount];
+                memset(midiEvent, 0, sizeof(VstMidiEvent));
+
+                midiEvent->type = kVstMidiType;
+                midiEvent->byteSize = sizeof(VstMidiEvent);
+                midiEvent->midiData[0] = 0x90;
+                midiEvent->midiData[1] = 64;
+                midiEvent->midiData[2] = 100;
+
+                midiEventCount += 1;
+            }
+
+            // VST Events
+            if (midiEventCount > 0)
+            {
+                events.numEvents = midiEventCount;
+                events.reserved = 0;
+                effect->dispatcher(effect, effProcessEvents, 0, 0, &events, 0.0f);
             }
 
             effect->processReplacing(effect, src, dst, frames);

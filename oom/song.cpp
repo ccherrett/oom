@@ -24,6 +24,7 @@
 #include "driver/alsamidi.h"
 #include "song.h"
 #include "track.h"
+#include "synthtrack.h"
 #include "undo.h"
 #include "key.h"
 #include "globals.h"
@@ -497,8 +498,8 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{
 			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
 			break;
 		case Track::AUDIO_SOFTSYNTH:
-			printf("not implemented: Song::addTrack(SOFTSYNTH)\n");
-			// ((AudioTrack*)track)->addAuxSend(lastAuxIdx);
+            // falkTX, FIXME
+            track = new SynthTrack();
 			break;
 		default:
 			printf("Song::addTrack() illegal type %d\n", type);
@@ -1887,8 +1888,8 @@ void Song::beat()
 		setPos(0, tick, true, false, true);
 
 	// p3.3.40 Update synth native guis at the heartbeat rate.
-	for (ciSynthI is = _synthIs.begin(); is != _synthIs.end(); ++is)
-		(*is)->guiHeartBeat();
+    //for (ciSynthI is = _synthIs.begin(); is != _synthIs.end(); ++is)
+    //	(*is)->guiHeartBeat();
 	
 	//Update native guis
 	for(ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
@@ -2398,7 +2399,7 @@ void Song::clear(bool signal)
 		midiPorts[i].setMidiDevice(0);
 	}
 
-	_synthIs.clearDelete();
+    //_synthIs.clearDelete();
 
 	// p3.3.45 Make sure to delete Jack midi devices, and remove all ALSA midi device routes...
 	// Otherwise really nasty things happen when loading another song when one is already loaded.
@@ -2520,9 +2521,9 @@ void Song::cleanupForQuit()
 		printf("deleting _auxs\n");
 	_auxs.clearDelete(); // aux sends
 
-	if (debugMsg)
-		printf("deleting _synthIs\n");
-	_synthIs.clearDelete(); // each ~SynthI() -> deactivate3() -> ~SynthIF()
+    //if (debugMsg)
+    //	printf("deleting _synthIs\n");
+    //_synthIs.clearDelete(); // each ~SynthI() -> deactivate3() -> ~SynthIF()
 
 	tempomap.clear();
 	AL::sigmap.clear();
@@ -4007,12 +4008,12 @@ void Song::insertTrack1(Track* track, int /*idx*/)
 	{
 		case Track::AUDIO_SOFTSYNTH:
 		{
-			SynthI* s = (SynthI*) track;
-			Synth* sy = s->synth();
-			if (!s->isActivated())
-			{
-				s->initInstance(sy, s->name());
-			}
+            //SynthI* s = (SynthI*) track;
+            //Synth* sy = s->synth();
+            //if (!s->isActivated())
+            //{
+            //	s->initInstance(sy, s->name());
+            //}
 		}
 			break;
 		default:
@@ -4070,12 +4071,12 @@ void Song::insertTrack2(Track* track, int idx)
 			break;
 		case Track::AUDIO_SOFTSYNTH:
 		{
-			SynthI* s = (SynthI*) track;
-			midiDevices.add(s);
-			midiInstruments.push_back(s);
-			_synthIs.push_back(s);
-			ia = _artracks.index2iterator(idx);
-			_artracks.insert(ia, track);
+            //SynthI* s = (SynthI*) track;
+            //midiDevices.add(s);
+            //midiInstruments.push_back(s);
+            //_synthIs.push_back(s);
+            //ia = _artracks.index2iterator(idx);
+            //_artracks.insert(ia, track);
 		}
 			break;
 		default:
@@ -4325,10 +4326,10 @@ void Song::removeTrack2(Track* track)
 			break;
 		case Track::AUDIO_SOFTSYNTH:
 		{
-			SynthI* s = (SynthI*) track;
-			s->deactivate2();
-			_synthIs.erase(track);
-			_artracks.erase(track);
+            //SynthI* s = (SynthI*) track;
+            //s->deactivate2();
+            //_synthIs.erase(track);
+            //_artracks.erase(track);
 		}
 			break;
 	}

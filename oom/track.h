@@ -26,7 +26,7 @@ class Pipeline;
 class Xml;
 class SndFile;
 class MPEventList;
-class SynthI;
+//class SynthI;
 class BasePlugin;
 class MidiAssignData;
 class MidiPort;
@@ -1371,9 +1371,9 @@ typedef tracklist<AudioAux*>::iterator iAudioAux;
 typedef tracklist<AudioAux*>::const_iterator ciAudioAux;
 typedef tracklist<AudioAux*> AuxList;
 
-typedef tracklist<SynthI*>::iterator iSynthI;
-typedef tracklist<SynthI*>::const_iterator ciSynthI;
-typedef tracklist<SynthI*> SynthIList;
+//typedef tracklist<SynthI*>::iterator iSynthI;
+//typedef tracklist<SynthI*>::const_iterator ciSynthI;
+//typedef tracklist<SynthI*> SynthIList;
 
 extern void addPortCtrlEvents(MidiTrack* t);
 extern void removePortCtrlEvents(MidiTrack* t);

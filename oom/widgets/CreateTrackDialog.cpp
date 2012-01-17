@@ -21,6 +21,7 @@
 #include "driver/alsamidi.h"
 #include "icons.h"
 #include "midimonitor.h"
+#include "plugin.h"
 
 
 CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent)
@@ -46,6 +47,7 @@ m_insertPosition(pos)
 
 	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
 	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
+    cmbType->addItem(*addSynthIcon, tr("Synth"), Track::AUDIO_SOFTSYNTH);
 	cmbType->addItem(*addOutputIcon, tr("Output"), Track::AUDIO_OUTPUT);
 	cmbType->addItem(*addInputIcon, tr("Input"), Track::AUDIO_INPUT);
 	cmbType->addItem(*addBussIcon, tr("Buss"), Track::AUDIO_BUSS);
@@ -519,6 +521,14 @@ void CreateTrackDialog::addTrack()
 		case Track::AUDIO_SOFTSYNTH:
 		{
 			//Just add the track type and rename it
+            Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_SOFTSYNTH, -1, false);
+            if(track)
+            {
+                midiMonitor->msgAddMonitoredTrack(track);
+                song->deselectTracks();
+                track->setSelected(true);
+                emit trackAdded(track->name());
+            }
 		}
 		break;
 	}
@@ -964,16 +974,29 @@ void CreateTrackDialog::populateNewOutputList()/*{{{*/
 
 void CreateTrackDialog::populateInstrumentList()/*{{{*/
 {
-	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
-	{
-		SynthI* si = dynamic_cast<SynthI*> (*i);
-		if (!si)
-			cmbInstrument->addItem((*i)->iname());
-	}
-	//Default to the GM instrument
-	int gm = cmbInstrument->findText("GM");
-	if(gm >= 0)
-		cmbInstrument->setCurrentIndex(gm);
+    cmbInstrument->clear();
+
+    if (m_insertType == Track::MIDI)
+    {
+        for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+        {
+            //SynthI* si = dynamic_cast<SynthI*> (*i);
+            //if (!si)
+                cmbInstrument->addItem((*i)->iname());
+        }
+        //Default to the GM instrument
+        int gm = cmbInstrument->findText("GM");
+        if(gm >= 0)
+            cmbInstrument->setCurrentIndex(gm);
+    }
+    else if (m_insertType == Track::AUDIO_SOFTSYNTH)
+    {
+        for (iPlugin i = plugins.begin(); i != plugins.end(); ++i)
+        {
+            if (i->hints() & PLUGIN_IS_SYNTH)
+                cmbInstrument->addItem(i->name());
+        }
+    }
 }/*}}}*/
 
 int CreateTrackDialog::getFreeMidiPort()/*{{{*/
@@ -1116,6 +1139,22 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 		}
 		case Track::AUDIO_SOFTSYNTH:
 		{
+            cmbInChannel->setVisible(false);
+            cmbOutChannel->setVisible(false);
+            lblInstrument->setVisible(true);
+            cmbInstrument->setVisible(true);
+            cmbMonitor->setVisible(false);
+
+            midiBox->setVisible(false);
+
+            cmbInput->setVisible(false);
+            chkInput->setVisible(false);
+
+            cmbOutput->setVisible(false);
+            chkOutput->setVisible(false);
+
+            m_height = 130;
+            m_width = width();
 		}
 		break;
 		default:
