@@ -51,7 +51,6 @@ m_insertPosition(pos)
 
 	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
 	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
-    cmbType->addItem(*addSynthIcon, tr("Synth"), Track::AUDIO_SOFTSYNTH);
 	cmbType->addItem(*addOutputIcon, tr("Output"), Track::AUDIO_OUTPUT);
 	cmbType->addItem(*addInputIcon, tr("Input"), Track::AUDIO_INPUT);
 	cmbType->addItem(*addBussIcon, tr("Buss"), Track::AUDIO_BUSS);
@@ -524,18 +523,10 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		}
 		break;
 		case Track::AUDIO_SOFTSYNTH:
-		{
+        {
 			//Just add the track type and rename it
-            Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_SOFTSYNTH, -1, false);
-            if(track)
-            {
-                midiMonitor->msgAddMonitoredTrack(track);
-                song->deselectTracks();
-                track->setSelected(true);
-                emit trackAdded(track->name());
-            }
-		}
-		break;
+        }
+        break;
 	}
 	if(m_lsClient && m_clientStarted)
 	{
@@ -1038,14 +1029,6 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
         if(gm >= 0)
             cmbInstrument->setCurrentIndex(gm);
     }
-    else if (m_insertType == Track::AUDIO_SOFTSYNTH)
-    {
-        for (iPlugin i = plugins.begin(); i != plugins.end(); ++i)
-        {
-            if (i->hints() & PLUGIN_IS_SYNTH)
-                cmbInstrument->addItem(i->name());
-        }
-    }
 }/*}}}*/
 
 int CreateTrackDialog::getFreeMidiPort()/*{{{*/
@@ -1186,26 +1169,6 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			m_height = 100;
 			m_width = width();
 		}
-		case Track::AUDIO_SOFTSYNTH:
-		{
-            cmbInChannel->setVisible(false);
-            cmbOutChannel->setVisible(false);
-            lblInstrument->setVisible(true);
-            cmbInstrument->setVisible(true);
-            cmbMonitor->setVisible(false);
-
-            midiBox->setVisible(false);
-
-            cmbInput->setVisible(false);
-            chkInput->setVisible(false);
-
-            cmbOutput->setVisible(false);
-            chkOutput->setVisible(false);
-
-            m_height = 130;
-            m_width = width();
-		}
-		break;
 		default:
 		break;
 	}
