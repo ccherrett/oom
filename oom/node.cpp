@@ -238,9 +238,10 @@ void MidiTrack::updateSoloStates(bool noDec)
 
         if (outPort() >= 0)
         {
-                MidiDevice *md = midiPorts[outPort()].device();
-                if (md && md->isSynti())
-                        ((SynthI*) md)->updateInternalSoloStates();
+#warning TODO
+                //MidiDevice *md = midiPorts[outPort()].device();
+                //if (md && md->isSynthPlugin())
+                        //((SynthPluginDevice*) md)->updateInternalSoloStates();
         }
 }
 

@@ -1051,6 +1051,16 @@ void initPlugins(bool ladspa, bool lv2, bool vst)
         for (int i=0; i < vstPathList.count(); i++)
             loadPluginDir(vstPathList[i], PLUGIN_VST);
     }
+
+    // Add the synth plugins to the midi-device list
+    for (iPlugin i = plugins.begin(); i != plugins.end(); ++i)
+    {
+        if (i->hints() & PLUGIN_IS_SYNTH)
+        {
+            SynthPluginDevice* dev = new SynthPluginDevice(i->type(), i->filename(true), i->name(), i->label());
+            midiDevices.add(dev);
+        }
+    }
 }
 
 #if 0

@@ -2558,7 +2558,7 @@ void Song::cleanupForQuit()
 	for (iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
 	{
 		// Since Syntis are midi devices, there's no need to delete them below.
-		if ((*imd)->isSynti())
+        if ((*imd)->isSynthPlugin())
 			continue;
 		delete (*imd);
 	}

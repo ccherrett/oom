@@ -712,7 +712,7 @@ void MidiSeq::processTimerTick()
 		//if(mjd)
 		if (md->deviceType() == MidiDevice::JACK_MIDI)
 			continue;
-		if (md->isSynti()) // syntis are handled by audio thread
+        if (md->isSynthPlugin()) // synths are handled by audio thread
 			continue;
 		int port = md->midiPort();
 		MidiPort* mp = port != -1 ? &midiPorts[port] : 0;

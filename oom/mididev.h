@@ -153,7 +153,7 @@ public:
         _rwFlags = val;
     }
 
-    virtual bool isSynti() const {
+    virtual bool isSynthPlugin() const {
         return false;
     }
 

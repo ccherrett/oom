@@ -19,7 +19,7 @@
 #include "globals.h"
 #include "gconfig.h"
 #include "mpevent.h"
-#include "synth.h"
+#include "plugin.h"
 #include "app.h"
 #include "song.h"
 #include "network/lsclient.h"
@@ -108,7 +108,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 {
 	if (_device)
 	{
-		if (_device->isSynti())
+        if (_device->isSynthPlugin())
 			_instrument = genericMidiInstrument;
 		_device->setPort(-1);
 		_device->close();
@@ -120,7 +120,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 			MidiPort* mp = &midiPorts[i];
 			if (mp->device() == dev)
 			{
-				if (dev->isSynti())
+                if (dev->isSynthPlugin())
 					mp->setInstrument(genericMidiInstrument);
 				// move device
 				_state = mp->state();
@@ -129,9 +129,9 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 			}
 		}
 		_device = dev;
-		if (_device->isSynti())
+        if (_device->isSynthPlugin())
 		{
-			SynthI* s = (SynthI*) _device;
+            SynthPluginDevice* s = (SynthPluginDevice*) _device;
 			_instrument = s;
 		}
 		_state = _device->open();

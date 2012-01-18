@@ -15,6 +15,9 @@
 #include "globals.h"
 #include "lib_functions.h"
 
+#include "mididev.h"
+#include "instruments/minstrument.h"
+
 #ifndef __WINDOWS__
 #undef __cdecl
 #define __cdecl
@@ -604,6 +607,123 @@ protected:
         VstEvent* data[MAX_VST_EVENTS];
     } events;
     VstMidiEvent midiEvents[MAX_VST_EVENTS];
+};
+
+//---------------------------------------------------------
+//   SynthPluginDevice
+//---------------------------------------------------------
+
+class SynthPluginDevice :
+        public MidiDevice,
+        public MidiInstrument
+{
+public:
+    SynthPluginDevice(PluginType type, QString filename, QString name, QString label)
+    {
+        m_type = type;
+        m_filename = filename;
+        m_label = label;
+        m_plugin = 0;
+
+        m_name = name;
+
+        switch (type)
+        {
+        case PLUGIN_LV2:
+            m_name += " [LV2]";
+            break;
+        case PLUGIN_VST:
+            m_name += " [VST]";
+            break;
+        default:
+            break;
+        }
+
+        MidiDevice::setName(m_name);
+        MidiInstrument::setIName(m_name);
+    }
+
+    ~SynthPluginDevice()
+    {
+    }
+
+    virtual int deviceType()
+    {
+        return MidiDevice::SYNTH_MIDI;
+    }
+
+    virtual QString open()
+    {
+        qWarning("SynthPluginDevice::open()");
+
+        // Make it behave like a regular midi device.
+        _readEnable = false;
+        _writeEnable = (_openFlags & 0x01);
+
+        return QString("OK");
+    }
+
+    virtual void close()
+    {
+        qWarning("SynthPluginDevice::close()");
+
+        _readEnable = false;
+        _writeEnable = false;
+
+        if (m_plugin)
+            delete m_plugin;
+        m_plugin = 0;
+    }
+
+    virtual bool isSynthPlugin() const
+    {
+        return true;
+    }
+
+    const QString& name() const
+    {
+        return m_name;
+    }
+
+    void setName(const QString& s)
+    {
+        m_name = s;
+        MidiDevice::setName(s);
+    }
+
+    QString filename()
+    {
+        return m_filename;
+    }
+
+    QString label()
+    {
+        return m_label;
+    }
+
+    MidiPlayEvent receiveEvent()
+    {
+        return MidiPlayEvent() ;//_sif->receiveEvent();
+    }
+
+    int eventsPending() const
+    {
+        return 0; //_sif->eventsPending();
+    }
+
+protected:
+    virtual bool putMidiEvent(const MidiPlayEvent&)
+    {
+        qWarning("SynthPluginDevice::putMidiEvent()");
+        return true;
+    }
+
+private:
+    PluginType m_type;
+    QString m_filename;
+    QString m_name;
+    QString m_label;
+    BasePlugin* m_plugin;
 };
 
 //---------------------------------------------------------
