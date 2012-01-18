@@ -44,6 +44,7 @@ LSCPImport::LSCPImport(QWidget* parent) :QDialog(parent)
 	txtPort->setValue(config.lsClientPort);
 	txtRetry->setValue(config.lsClientRetry);
 	txtTimeout->setValue(config.lsClientTimeout);
+	chkBankAsNumber->setChecked(config.lsClientBankAsNumber);
 	//connect(btnConnect, SIGNAL(clicked(bool)), SLOT(btnConnectClicked(bool)));
 	connect(btnList, SIGNAL(clicked(bool)), SLOT(btnListClicked(bool)));
 	connect(btnSelectAll, SIGNAL(clicked(bool)), SLOT(btnSelectAllClicked(bool)));
@@ -54,6 +55,7 @@ LSCPImport::LSCPImport(QWidget* parent) :QDialog(parent)
 	connect(txtRetry, SIGNAL(valueChanged(int)), SLOT(retryValueChanged(int)));
 	connect(txtTimeout, SIGNAL(valueChanged(int)), SLOT(timeoutValueChanged(int)));
 	connect(txtHost, SIGNAL(editingFinished()), SLOT(hostValueChanged()));
+	connect(chkBankAsNumber, SIGNAL(toggled(bool)), SLOT(bankAsNumberChecked(bool)));
 	updateTableHeader();
 }
 
@@ -77,6 +79,11 @@ void LSCPImport::hostValueChanged()
 	config.lsClientHost = txtHost->text();
 }
 
+void LSCPImport::bankAsNumberChecked(bool val)
+{
+	config.lsClientBankAsNumber = val;
+}
+
 void LSCPImport::btnListClicked(bool)
 {
 	_mapModel->clear();
@@ -90,6 +97,7 @@ void LSCPImport::btnListClicked(bool)
 		m_import_client = new LSClient(host.toUtf8().constData(), port);
 	m_import_client->setRetry(config.lsClientRetry);
 	m_import_client->setTimeout(config.lsClientTimeout);
+	m_import_client->setBankAsNumber(config.lsClientBankAsNumber);
 	if(!m_import_client->startClient())
 	{
 		QString str = QString("Linuxsampler LSCP server connection failed while connecting to: %1 on port %2").arg(host).arg(port);

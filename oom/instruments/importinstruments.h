@@ -37,6 +37,7 @@ private slots:
 	void timeoutValueChanged(int);
 	void hostValueChanged();
 	void appendInstrument(int);
+	void bankAsNumberChecked(bool);
 
 signals:
 	void instrumentsImported();

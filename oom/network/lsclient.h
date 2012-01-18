@@ -104,6 +104,7 @@ public:
 	void startThread();
 	void setTimeout(int t){ _timeout = t; }
 	void setRetry(int r){ _retries = r; }
+	void setBankAsNumber(bool v) { _useBankNumber = v; }
 	void mapInstrument(int);
 	int getError();
 	MidiInstrumentList* getInstruments(QList<int>);
@@ -129,6 +130,7 @@ private:
 	bool _abort;
 	int _retries;
 	int _timeout;
+	bool _useBankNumber;
 	LSCPChannelInfo _lastInfo;
 	LSCPKeymap _getKeyMapping(QString, int, int);
 	QString _stripAscii(QString);

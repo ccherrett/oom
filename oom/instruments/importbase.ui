@@ -149,6 +149,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="chkBankAsNumber">
+       <property name="text">
+        <string>Use Bank # as PatchGroup name</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

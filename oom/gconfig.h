@@ -152,6 +152,7 @@ struct GlobalConfigValues
 	QString lsClientHost;
 	int lsClientRetry;
 	int lsClientTimeout;
+	bool lsClientBankAsNumber;
 	int audioRaster;
 	int midiRaster;
 	bool useAutoCrossFades;

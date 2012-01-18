@@ -707,6 +707,7 @@ GlobalConfigValues config = {
 	QString("localhost"), //LSCP default hostname
 	5, //LSCP client retries
 	1,  //LSCP client timeout
+	true, //LSCP client use bank name as patch group name
 	0, //Default audio raster index
 	1, //Default midi raster index
 	true //Use auto crossfades

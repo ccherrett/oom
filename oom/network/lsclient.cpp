@@ -29,6 +29,7 @@ LSClient::LSClient(const char* host, int p, QObject* parent) : QObject(parent)
 	_client = NULL;
 	_retries = 5;
 	_timeout = 1;
+	_useBankNumber = true;
 }
 
 LSClient::~LSClient()
@@ -523,6 +524,7 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 							QString ifname(insInfo->instrument_file);
 							QFileInfo finfo(ifname);
 							QString fname = _stripAscii(finfo.baseName()).simplified();
+							QString bname(QString(tr("Bank ")).append(QString::number(instr[in].bank)));
 							PatchGroup *pg = 0;
 							for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
 							{
@@ -535,7 +537,10 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 							if(!pg)
 							{
 								pg = new PatchGroup();
-								pg->name = fname;
+								if(_useBankNumber)
+									pg->name = bname;
+								else
+									pg->name = fname;
 								pg->id = instr[in].bank;
 								pgl->push_back(pg);
 							}
@@ -645,7 +650,7 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 			aparams[1].key = (char*)"ACTIVE";
 			aparams[1].value = (char*)"true";
 			aparams[2].key = (char*)"CHANNELS";
-			aparams[2].value = (char*)"35";
+			aparams[2].value = (char*)"1";
 			aparams[3].key = (char*)"SAMPLERATE";
 			aparams[3].value = (char*)"48000";
 			aparams[4].key = NULL;
@@ -759,7 +764,7 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 					{
 						qDebug("Increasing Audio device channel count");
 						audioChannel = mapCount;
-						/*char pCount[QString::number(mapCount+1).size()+1];
+						char pCount[QString::number(mapCount+1).size()+1];
 						strcpy(pCount, QString::number(mapCount+1).toLocal8Bit().constData());
 						lscp_param_t c;
 						c.key = sChannels;
@@ -767,12 +772,12 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 						if(lscp_set_audio_device_param(_client, adevId, &c) == LSCP_OK)
 						{
 							qDebug("Sucessfully increased count");
-							audioChannel = mapCount;
+							//audioChannel = mapCount;
 						}
 						else
 						{
 							qDebug("Failed");
-						}*/
+						}
 					}
 					else
 					{

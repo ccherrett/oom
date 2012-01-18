@@ -77,7 +77,8 @@ m_insertPosition(pos)
 	connect(chkOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
 	connect(chkBuss, SIGNAL(toggled(bool)), this, SLOT(updateBussSelected(bool)));
 	connect(cmbType, SIGNAL(currentIndexChanged(int)), this, SLOT(trackTypeChanged(int)));
-	connect(cmbInstrument, SIGNAL(currentIndexChanged(int)), this, SLOT(updateInstrument(int)));
+	//connect(cmbInstrument, SIGNAL(currentIndexChanged(int)), this, SLOT(updateInstrument(int)));
+	connect(cmbInstrument, SIGNAL(activated(int)), this, SLOT(updateInstrument(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 }
 
