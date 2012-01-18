@@ -117,10 +117,8 @@ public:
         return _instrument;
     }
 
-    void setInstrument(MidiInstrument* i)
-    {
-        _instrument = i;
-    }
+    void setInstrument(MidiInstrument* i);
+
     MidiController* midiController(int num) const;
     MidiCtrlValList* addManagedController(int channel, int ctrl);
     void tryCtrlInitVal(int chan, int ctl, int val);

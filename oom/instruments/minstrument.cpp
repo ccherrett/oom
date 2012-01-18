@@ -573,6 +573,22 @@ void Patch::read(Xml& xml)/*{{{*/
 						}
 					}
 				}
+				else if(tag == "engine")
+				{
+					engine = xml.s2();
+				}
+				else if(tag == "filename")
+				{
+					filename = xml.s2();
+				}
+				else if(tag == "loadmode")
+				{
+					loadmode = xml.s2().toInt();
+				}
+				else if(tag == "volume")
+				{
+					volume = xml.s2().toFloat();
+				}
 				break;
 			case Xml::TagEnd:
 				if (tag == "Patch")
@@ -603,6 +619,15 @@ void Patch::write(int level, Xml& xml)/*{{{*/
 
 	if (drum)
 		xml.nput(" drum=\"%d\"", int(drum));
+	
+	if(!QString(filename).isEmpty())
+		xml.nput(" filename=\"%s\"", Xml::xmlString(filename).toLatin1().constData());
+	if(!QString(engine).isEmpty())
+		xml.nput(" engine=\"%s\"", Xml::xmlString(engine).toLatin1().constData());
+	if(loadmode != -1)
+		xml.nput(" loadmode=\"%d\"", loadmode);
+	xml.nput(" volume=\"%f\"", volume);
+
 	if(!keys.isEmpty())
 	{
 		QString keyString;
@@ -799,6 +824,8 @@ void MidiInstrument::read(Xml& xml)
 				{
 					_nullvalue = xml.s2().toInt(&ok, base);
 				}
+				else if(tag == "oomInstrument")
+					m_oomInstrument = xml.s2().toInt();
 				break;
 			case Xml::TagEnd:
 				if (tag == "MidiInstrument")
@@ -818,7 +845,7 @@ void MidiInstrument::write(int level, Xml& xml)
 	xml.header();
 	xml.tag(level, "oom version=\"1.0\"");
 	level++;
-	xml.nput(level, "<MidiInstrument name=\"%s\"", Xml::xmlString(iname()).toLatin1().constData());
+	xml.nput(level, "<MidiInstrument name=\"%s\" oomInstrument=\"%d\"", Xml::xmlString(iname()).toLatin1().constData(), m_oomInstrument);
 
 	if (_nullvalue != -1)
 	{

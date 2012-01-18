@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <oom version="1.0">
-  <MidiInstrument name="bassclarinet">
+  <MidiInstrument name="bassclarinet" oomInstrument="1">
     <PatchGroup name="Woodwinds - Bass Clarinet Solo">
-      <Patch name="Woodwinds - Bass Clarinet Solo" hbank="0" lbank="0" prog="0" keys="38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74" />
+      <Patch name="Woodwinds - Bass Clarinet Solo" hbank="0" lbank="0" prog="0" engine="SFZ", loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Woodwinds\x20-\x20Bass\x20Clarinet\x20Solo.sfz" keys="38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74" />
     </PatchGroup>
     <Controller name="Modulation" l="1" init="0" />
     <Controller name="Expression" l="11" init="0" />

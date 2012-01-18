@@ -17,10 +17,12 @@
 #include "minstrument.h"
 #include "xml.h"
 #include "globals.h"
+#include "gconfig.h"
 #include "mpevent.h"
 #include "synth.h"
 #include "app.h"
 #include "song.h"
+#include "network/lsclient.h"
 
 //#ifdef DSSI_SUPPORT
 //#include "dssihost.h"
@@ -243,6 +245,24 @@ void MidiPort::tryCtrlInitVal(int chan, int ctl, int val)
 	//setHwCtrlState(chan, ctl, CTRL_VAL_UNKNOWN);
 	setHwCtrlStates(chan, ctl, CTRL_VAL_UNKNOWN, val);
 }
+
+//---------------------------------------------------------
+//   setInstument
+//---------------------------------------------------------
+
+void MidiPort::setInstrument(MidiInstrument* i)
+{
+	_instrument = i;
+	if(i && i->isOOMInstrument())
+	{
+		LSClient *lsClient = new LSClient(config.lsClientHost.toUtf8().constData(), config.lsClientPort);
+		if(lsClient->startClient())
+		{
+			lsClient->loadInstrument(i);
+		}
+	}
+}
+
 
 //---------------------------------------------------------
 //   sendGmInitValues

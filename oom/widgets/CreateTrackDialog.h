@@ -12,6 +12,7 @@
 
 class QShowEvent;
 class QSize;
+class LSClient;
 
 class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	Q_OBJECT
@@ -37,6 +38,9 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;
 	
+	LSClient* m_lsClient;
+	bool m_clientStarted;
+
 	void importInputs();
 	void importOutputs();
 
@@ -59,6 +63,7 @@ private slots:
 	void updateInputSelected(bool);
 	void updateOutputSelected(bool);
 	void updateBussSelected(bool);
+	void updateInstrument(int);
 	void trackTypeChanged(int);
 
 protected:

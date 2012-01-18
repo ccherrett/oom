@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <oom version="1.0">
-  <MidiInstrument name="cellos">
+  <MidiInstrument name="cellos" oomInstrument="1">
     <PatchGroup name="Strings - Celli Sustain">
-      <Patch name="Strings - Celli Sustain" hbank="0" lbank="0" prog="0" keys="36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127" />
-      <Patch name="Strings - Celli Staccato" hbank="0" lbank="0" prog="1" keys="36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72" />
-      <Patch name="Strings - Celli Pizzicato" hbank="0" lbank="0" prog="2" keys="36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72" />
+      <Patch name="Strings - Celli Sustain" hbank="0" lbank="0" prog="0" engine="SFZ", loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Sustain.sfz" keys="36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127" />
+      <Patch name="Strings - Celli Staccato" hbank="0" lbank="0" prog="1" engine="SFZ", loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Staccato.sfz" keys="36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72" />
+      <Patch name="Strings - Celli Pizzicato" hbank="0" lbank="0" prog="2" engine="SFZ", loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x20Celli\x20Pizzicato.sfz" keys="36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72" />
     </PatchGroup>
     <Controller name="Modulation" l="1" init="0" />
     <Controller name="Expression" l="11" init="0" />

@@ -19,6 +19,7 @@
 #include "driver/jackaudio.h"
 #include "driver/jackmidi.h"
 #include "driver/alsamidi.h"
+#include "network/lsclient.h"
 #include "icons.h"
 #include "midimonitor.h"
 #include "plugin.h"
@@ -39,6 +40,9 @@ m_insertPosition(pos)
 	
 	m_midiInPort = -1;
 	m_midiOutPort = -1;
+
+	m_lsClient = 0;
+	m_clientStarted = false;
 
     m_height = 290;
 	m_width = 450;
@@ -74,11 +78,12 @@ m_insertPosition(pos)
 	connect(chkOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
 	connect(chkBuss, SIGNAL(toggled(bool)), this, SLOT(updateBussSelected(bool)));
 	connect(cmbType, SIGNAL(currentIndexChanged(int)), this, SLOT(trackTypeChanged(int)));
+	connect(cmbInstrument, SIGNAL(currentIndexChanged(int)), this, SLOT(updateInstrument(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 }
 
 //Add button slot
-void CreateTrackDialog::addTrack()
+void CreateTrackDialog::addTrack()/*{{{*/
 {
 	if(txtName->text().isEmpty())
 		return;
@@ -532,7 +537,51 @@ void CreateTrackDialog::addTrack()
 		}
 		break;
 	}
-	done(1);
+	if(m_lsClient && m_clientStarted)
+	{
+		m_lsClient->stopClient();
+	}
+	done(0);
+}/*}}}*/
+
+void CreateTrackDialog::updateInstrument(int index)
+{
+	QString instrumentName = cmbInstrument->itemText(index);
+	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+	{
+		if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
+		{
+			if(!m_lsClient)
+			{
+				m_lsClient = new LSClient(config.lsClientHost.toUtf8().constData(), config.lsClientPort);
+				m_clientStarted = m_lsClient->startClient();
+			}
+			else if(!m_clientStarted)
+			{
+				m_clientStarted = m_lsClient->startClient();
+			}
+			if(m_clientStarted)
+			{
+				qDebug("Loadin`g Instrument to LinuxSampler");
+				if(m_lsClient->loadInstrument(*i))
+				{
+					qDebug("Instrument Loaded");
+					QString prefix("LinuxSampler:");
+					QString postfix("-audio");
+					QString audio(QString(prefix).append(instrumentName).append(postfix));
+					QString midi(QString(prefix).append(instrumentName));
+					//reload input/output list and select the coresponding ports respectively
+					updateVisibleElements();
+					//populateInputList();
+					populateOutputList();
+					populateMonitorList();
+					cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
+					cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
+				}
+			}
+			break;
+		}
+	}
 }
 
 //Input raw slot

@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <oom version="1.0">
-  <MidiInstrument name="choirs">
+  <MidiInstrument name="choirs" oomInstrument="1">
     <PatchGroup name="Chorus - Male">
-      <Patch name="Chorus - Male" hbank="0" lbank="0" prog="0" keys="43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66" />
+      <Patch name="Chorus - Male" hbank="0" lbank="0" prog="0" engine="SFZ", loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Male.sfz" keys="43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66" />
     </PatchGroup>
     <PatchGroup name="Chorus - Female">
-      <Patch name="Chorus - Female" hbank="0" lbank="1" prog="0" keys="67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84" />
+      <Patch name="Chorus - Female" hbank="0" lbank="1" prog="0" engine="SFZ", loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Female.sfz" keys="67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84" />
     </PatchGroup>
     <PatchGroup name="Chorus - Mixed">
-      <Patch name="Chorus - Mixed" hbank="0" lbank="2" prog="0" keys="43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84" />
+      <Patch name="Chorus - Mixed" hbank="0" lbank="2" prog="0" engine="SFZ", loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Chorus\x20-\x20Mixed.sfz" keys="43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84" />
     </PatchGroup>
     <Controller name="Modulation" l="1" init="0" />
     <Controller name="Expression" l="11" init="0" />

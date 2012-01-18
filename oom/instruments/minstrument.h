@@ -35,8 +35,8 @@ struct Patch
 	QList<int> keys, keyswitches;
     QString name;
 	int loadmode;
-	char* engine;
-	char* filename;
+	QString engine;
+	QString filename;
 	float volume;
     bool drum;
 	QHash<int, QString> comments;

@@ -133,7 +133,7 @@ private:
 	LSCPKeymap _getKeyMapping(QString, int, int);
 	QString _stripAscii(QString);
 	bool _loadInstrumentFile(const char*, int, int);
-	bool isNumber(const char*);
+	bool isFreePort(const char*);
 	int findMidiMap(const char*);
 
 protected:
