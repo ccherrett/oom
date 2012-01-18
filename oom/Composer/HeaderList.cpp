@@ -628,8 +628,6 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 		midi->setData(Track::MIDI);
 		QAction* wave = p->addAction(*addAudioIcon, tr("Add Audio Track"));
 		wave->setData(Track::WAVE);
-        QAction* synth = p->addAction(*addSynthIcon, tr("Add Synth Track"));
-        synth->setData(Track::AUDIO_SOFTSYNTH);
 		QAction* aoutput = p->addAction(*addOutputIcon, tr("Add Output"));
 		aoutput->setData(Track::AUDIO_OUTPUT);
 		QAction* agroup = p->addAction(*addBussIcon, tr("Add Buss"));
@@ -647,7 +645,7 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 		{
 			int n = act->data().toInt();
 			// Valid item?
-            if (n >= 0) // && ((Track::TrackType)n != Track::AUDIO_SOFTSYNTH)
+            if (n >= 0 && ((Track::TrackType)n != Track::AUDIO_SOFTSYNTH))
 			{
 #if 0
 				// Synth sub-menu id?

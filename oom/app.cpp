@@ -503,10 +503,10 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 	wave->setData(Track::WAVE);
 	grp->addAction(wave);
 
-    QAction* synth = addTrack->addAction(QIcon(*addSynthIcon),
-            QT_TRANSLATE_NOOP("@default", "Add Synth Track"));
-    synth->setData(Track::AUDIO_SOFTSYNTH);
-    grp->addAction(synth);
+    //QAction* synth = addTrack->addAction(QIcon(*addSynthIcon),
+    //        QT_TRANSLATE_NOOP("@default", "Add Synth Track"));
+    //synth->setData(Track::AUDIO_SOFTSYNTH);
+    //grp->addAction(synth);
 
 	QAction* aoutput = addTrack->addAction(QIcon(*addOutputIcon),
 			QT_TRANSLATE_NOOP("@default", "Add Audio Output"));

@@ -24,7 +24,6 @@
 #include "driver/alsamidi.h"
 #include "song.h"
 #include "track.h"
-#include "synthtrack.h"
 #include "undo.h"
 #include "key.h"
 #include "globals.h"
@@ -498,8 +497,6 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{
 			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
 			break;
 		case Track::AUDIO_SOFTSYNTH:
-            // falkTX, FIXME
-            track = new SynthTrack();
 			break;
 		default:
 			printf("Song::addTrack() illegal type %d\n", type);

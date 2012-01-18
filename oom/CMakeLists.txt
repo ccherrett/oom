@@ -128,7 +128,6 @@ file (GLOB core_source_files
       stringparam.cpp
       sync.cpp
       synth.cpp
-      synthtrack.cpp
       tempo.cpp
       thread.cpp
       ticksynth.cpp
