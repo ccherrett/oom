@@ -27,6 +27,8 @@ LadspaPlugin::LadspaPlugin()
 
 LadspaPlugin::~LadspaPlugin()
 {
+    aboutToRemove();
+
     if (handle && descriptor->deactivate && m_activeBefore)
         descriptor->deactivate(handle);
 

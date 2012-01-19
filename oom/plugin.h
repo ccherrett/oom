@@ -535,6 +535,8 @@ public:
     bool setControl(QString symbol, double value);
 
 private:
+    uint32_t m_ainsCount;
+    uint32_t m_aoutsCount;
     float* m_paramsBuffer;
     std::vector<unsigned long> m_audioInIndexes;
     std::vector<unsigned long> m_audioOutIndexes;
@@ -547,12 +549,13 @@ private:
         bool visible;
         int width;
         int height;
+        void* lib;
         void* nativeWidget;
+
         LV2UI_Handle handle;
         LV2UI_Widget widget;
         const LV2UI_Descriptor* descriptor;
         QString bundlePath;
-        void* _lib;
     } ui;
 
     LV2_Handle handle;

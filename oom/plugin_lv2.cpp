@@ -11,7 +11,8 @@
 #include "plugin.h"
 #include "plugingui.h"
 #include "jackaudio.h"
-#include "song.h"
+#include "track.h"
+#include "xml.h"
 
 #include "lv2_data_access.h"
 #include "lv2_event_helpers.h"
@@ -93,11 +94,8 @@ struct LV2World {
     LilvNode* uiExternal;
     LilvNode* uiExternalOld;
 
-//    LilvNode* logarithmic_prop;
-//    LilvNode* units_prop;
-//    LilvNode* persist_prop;
+    // todo - logarithmic and unit
 
-    //LilvInstance* instance;
     const LilvPlugins* plugins;
 };
 
@@ -132,9 +130,6 @@ void initLV2()
     lv2world->uiX11  = lilv_new_uri(lv2world->world, LV2_NS_UI "X11UI");
     lv2world->uiExternal    = lilv_new_uri(lv2world->world, LV2_EXTERNAL_UI_URI);
     lv2world->uiExternalOld = lilv_new_uri(lv2world->world, LV2_EXTERNAL_UI_DEPRECATED_URI);
-
-//    lv2world->logarithmic_prop = lilv_new_uri(lv2world->world, "http://lv2plug.in/ns/dev/extportinfo#logarithmic");
-//    lv2world->persist_prop = lilv_new_uri(lv2world->world,  LV2_PERSIST_URI);
 
     lv2world->plugins = lilv_world_get_all_plugins(lv2world->world);
 
@@ -200,84 +195,6 @@ bool isLV2FeatureSupported(const char* uri)
     else
         return false;
 }
-
-// ----------------- LV2 Fifo -------------------------------------------------------
-#if 0
-#define LV2_FIFO_SIZE 1024
-
-struct LV2Data
-{
-    uint32_t frame;
-    unsigned time;
-    float value;
-};
-
-class LV2ControlFifo
-{
-    LV2ControlFifo()
-    {
-        clear();
-    }
-
-    ~LV2ControlFifo()
-    {
-    }
-
-    bool isEmpty() const
-    {
-        return size == 0;
-    }
-
-    void clear()
-    {
-        size = index = rindex = 0;
-    }
-
-    int getSize() const
-    {
-        return size;
-    }
-
-    bool put(const LV2Data& event)
-    {
-        if (size < LV2_FIFO_SIZE)
-        {
-            fifo[index] = event;
-            index = (index + 1) % LV2_FIFO_SIZE;
-            ++size;
-            return true;
-        }
-        return false;
-    }
-
-    LV2Data get()
-    {
-        LV2Data event(fifo[rindex]);
-        rindex = (rindex + 1) % LV2_FIFO_SIZE;
-        --size;
-        return event;
-    }
-
-    const LV2Data& peek(uint32_t n)
-    {
-        uint32_t idx = (rindex + n) % LV2_FIFO_SIZE;
-        return fifo[idx];
-
-    }
-
-    void remove()
-    {
-        rindex = (rindex + 1) % LV2_FIFO_SIZE;
-        --size;
-    }
-
-private:
-    LV2Data fifo[LV2_FIFO_SIZE];
-    volatile int size;
-    uint32_t index;
-    uint32_t rindex;
-};
-#endif
 
 // ----------------- URI-Map Feature -------------------------------------------------
 static uint32_t oom_lv2_uri_to_id(LV2_URI_Map_Callback_Data data, const char* map, const char* uri)
@@ -505,6 +422,8 @@ Lv2Plugin::Lv2Plugin()
     : BasePlugin()
 {
     m_type = PLUGIN_LV2;
+    m_ainsCount  = 0;
+    m_aoutsCount = 0;
     m_paramsBuffer = 0;
 
     m_customURIs.clear();
@@ -513,18 +432,19 @@ Lv2Plugin::Lv2Plugin()
     for (uint16_t i=0; i < OOM_URI_MAP_ID_COUNT; i++)
         m_customURIs.append(0);
 
-    handle = 0;
-    descriptor = 0;
-
     ui.type = UI_NONE;
     ui.visible = false;
     ui.width = 0;
     ui.height = 0;
+    ui.lib = 0;
+
     ui.nativeWidget = 0;
     ui.handle = 0;
     ui.widget = 0;
     ui.descriptor = 0;
-    ui._lib = 0;
+
+    handle = 0;
+    descriptor = 0;
 
     for (uint16_t i=0; i < lv2_feature_count+1; i++)
         features[i] = 0;
@@ -534,10 +454,12 @@ Lv2Plugin::Lv2Plugin()
 
 Lv2Plugin::~Lv2Plugin()
 {
+    aboutToRemove();
+
     // close UI
     if (m_hints & PLUGIN_HAS_NATIVE_GUI)
     {
-        if (ui.handle && ui.descriptor && ui.descriptor->cleanup)
+        if (ui.handle && ui.descriptor->cleanup)
             ui.descriptor->cleanup(ui.handle);
 
         switch (ui.type)
@@ -549,7 +471,8 @@ Lv2Plugin::~Lv2Plugin()
             break;
 #endif
         case UI_X11:
-            delete (QWidget*)ui.nativeWidget;
+            if (ui.nativeWidget)
+                delete (QWidget*)ui.nativeWidget;
             break;
         case UI_EXTERNAL:
             //if (ui.handle && ui.widget)
@@ -568,8 +491,8 @@ Lv2Plugin::~Lv2Plugin()
         if (features[lv2_feature_id_external_ui] && features[lv2_feature_id_external_ui]->data)
             delete (lv2_external_ui_host*)features[lv2_feature_id_external_ui]->data;
 
-        if (ui._lib)
-            lib_close(ui._lib);
+        if (ui.lib)
+            lib_close(ui.lib);
     }
 
     for (int i=0; i < m_customURIs.count(); i++)
@@ -656,7 +579,8 @@ void Lv2Plugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
 
     if (strcmp(lv2Class, "Instrument") == 0)
         plugi->m_hints |= PLUGIN_IS_SYNTH;
-    else if (plugi->m_audioInputCount >= 1 && plugi->m_audioOutputCount >= 1)
+    else if (plugi->m_audioInputCount == plugi->m_audioOutputCount && plugi->m_audioOutputCount >= 1)
+        // we can only process plugins that have the same number of input/output audio ports
         plugi->m_hints |= PLUGIN_IS_FX;
 
     if (lilv_plugin_has_feature(lv2plug, lv2world->inPlaceBroken))
@@ -847,11 +771,11 @@ bool Lv2Plugin::init(QString filename, QString label)
                             // Use proper UI now
                             if (uiFinal)
                             {
-                                ui._lib = lib_open(lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_binary_uri(uiFinal))));
+                                ui.lib = lib_open(lilv_uri_to_path(lilv_node_as_uri(lilv_ui_get_binary_uri(uiFinal))));
 
-                                if (ui._lib)
+                                if (ui.lib)
                                 {
-                                    LV2UI_DescriptorFunction ui_descfn = (LV2UI_DescriptorFunction) lib_symbol(ui._lib, "lv2ui_descriptor");
+                                    LV2UI_DescriptorFunction ui_descfn = (LV2UI_DescriptorFunction) lib_symbol(ui.lib, "lv2ui_descriptor");
 
                                     if (ui_descfn)
                                     {
@@ -920,10 +844,10 @@ bool Lv2Plugin::init(QString filename, QString label)
                                             // wait for showNativeGui() to init UI
                                         }
                                         else
-                                            lib_close(ui._lib);
+                                            lib_close(ui.lib);
                                     }
                                     else
-                                        lib_close(ui._lib);
+                                        lib_close(ui.lib);
                                 }
                             } // iFinal
 
@@ -959,11 +883,37 @@ bool Lv2Plugin::init(QString filename, QString label)
 
 void Lv2Plugin::reload()
 {
+    // safely disable plugin during reload
+    m_proc_lock.lock();
+    m_enabled = false;
+    m_proc_lock.unlock();
+
+    // use global client to create/delete synth audio ports
+    jack_client_t* jclient = 0;
+    if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+        jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
+
     // delete old data
     if (m_paramCount > 0)
     {
         delete[] m_params;
         delete[] m_paramsBuffer;
+    }
+
+    if (m_ainsCount > 0)
+    {
+        for (uint32_t i=0; i < m_ainsCount; i++)
+            jack_port_unregister(jclient, m_ports_in[i]);
+
+        delete[] m_ports_in;
+    }
+
+    if (m_aoutsCount > 0)
+    {
+        for (uint32_t i=0; i < m_ainsCount; i++)
+            jack_port_unregister(jclient, m_ports_out[i]);
+
+        delete[] m_ports_out;
     }
 
     for (size_t i=0; i < m_events.size(); i++)
@@ -976,8 +926,10 @@ void Lv2Plugin::reload()
     // reset
     m_hints  = 0;
     m_params = 0;
+    m_ainsCount  = 0;
+    m_aoutsCount = 0;
+    m_paramCount = 0;
     m_paramsBuffer = 0;
-    m_paramCount   = 0;
 
     // query new data
     uint32_t ains, aouts, evins, params, j;
@@ -1011,7 +963,7 @@ void Lv2Plugin::reload()
 
     if (strcmp(lv2Class, "Instrument") == 0)
         m_hints |= PLUGIN_IS_SYNTH;
-    else if (ains > 1 && aouts > 1)
+    else if (ains == aouts && aouts > 1)
         m_hints |= PLUGIN_IS_FX;
 
     if (lilv_plugin_has_feature(lplug, lv2world->inPlaceBroken))
@@ -1027,6 +979,16 @@ void Lv2Plugin::reload()
         m_paramsBuffer = new float[params];
     }
 
+    if (m_hints & PLUGIN_IS_SYNTH)
+    {
+        // synths output directly to jack
+        if (ains > 0)
+            m_ports_in = new jack_port_t* [ains];
+
+        if (aouts > 0)
+            m_ports_out = new jack_port_t* [aouts];
+    }
+
     // fill in all the data
     for (uint32_t i = 0; i < portCount; i++)
     {
@@ -1040,10 +1002,24 @@ void Lv2Plugin::reload()
                 if(lilv_port_is_a(lplug, port, lv2world->portInput))
                 {
                     m_audioInIndexes.push_back(i);
+
+                    if (m_hints & PLUGIN_IS_SYNTH)
+                    {
+                        j = m_ainsCount++;
+                        QString port_name = m_name + ":" + lilv_node_as_string(lilv_port_get_name(lplug, port));
+                        m_ports_in[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+                    }
                 }
                 else if(lilv_port_is_a(lplug, port, lv2world->portOutput))
                 {
                     m_audioOutIndexes.push_back(i);
+
+                    if (m_hints & PLUGIN_IS_SYNTH)
+                    {
+                        j = m_aoutsCount++;
+                        QString port_name = m_name + ":" + lilv_node_as_string(lilv_port_get_name(lplug, port));
+                        m_ports_out[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+                    }
                 }
                 else
                     qWarning("WARNING - Got a broken Port (Audio, but not input or output)");
@@ -1146,7 +1122,9 @@ void Lv2Plugin::reload()
                 {
                     m_params[j].type = PARAMETER_INPUT;
                     m_params[j].hints |= PARAMETER_IS_ENABLED;
-                    //m_params[j].hints |= PARAMETER_IS_AUTOMABLE;
+
+                    // todo - check for non-automable uris (expensive, notOnGui, etc)
+                    m_params[j].hints |= PARAMETER_IS_AUTOMABLE;
                 }
                 else if (lilv_port_is_a(lplug, port, lv2world->portOutput))
                 {
@@ -1194,7 +1172,7 @@ void Lv2Plugin::reload()
 
                 if (lilv_port_is_a(lplug, port, lv2world->portInput))
                 {
-                    // we only support input events, but since plugins need
+                    // we only support input events, but since FX plugins need
                     // to connect_port(), we still create an (unused) buffer for them
                     if (lilv_port_supports_event(lplug, port, lv2world->portEventMidi))
                         newEvent.types |= OOM_URI_MAP_ID_EVENT_MIDI;
@@ -1211,6 +1189,11 @@ void Lv2Plugin::reload()
     }
 
     reloadPrograms(true);
+
+    // enable it again
+    m_proc_lock.lock();
+    m_enabled = true;
+    m_proc_lock.unlock();
 }
 
 void Lv2Plugin::reloadPrograms(bool /*init*/)
@@ -1231,7 +1214,7 @@ QString Lv2Plugin::getParameterName(uint32_t index)
 
 void Lv2Plugin::setNativeParameterValue(uint32_t index, double value)
 {
-    if (descriptor && index < m_paramCount)
+    if (index < m_paramCount)
         m_paramsBuffer[index] = value;
 }
 
@@ -1283,9 +1266,7 @@ Lv2Plugin::Lv2State* Lv2Plugin::getState(const char* uri_key)
     for (int i=0; i < m_lv2States.count(); i++)
     {
         if (strcmp(uri_key, m_lv2States[i].key) == 0)
-        {
             return &m_lv2States[i];
-        }
     }
     return 0;
 }
@@ -1343,6 +1324,8 @@ void Lv2Plugin::showNativeGui(bool yesno)
         else
         {
             // UI failed to initialize
+            // fixme - is this enough?
+            m_hints -= PLUGIN_HAS_NATIVE_GUI;
             return;
         }
     }
