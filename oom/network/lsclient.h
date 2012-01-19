@@ -113,9 +113,11 @@ public:
 
 	bool loadInstrument(MidiInstrument*);
 	bool unloadInstrument(MidiInstrument*);
+	int findMidiMap(const char*);
 	
 	int createMidiInputDevice(char* name, const char* type = "JACK", int ports = 1);
 	int createAudioOutputDevice(char* name, const char* type = "JACK", int ports = 1, int iSrate = 48000);
+	bool createInstrumentChannel(const char* name, const char* engine, const char* filename, int map);
 	QMap<int, QString> listInstruments();
 	QString getValidInstrumentName(QString nameBase);
 	QString getMapName(int);
@@ -138,7 +140,6 @@ private:
 	QString _stripAscii(QString);
 	bool _loadInstrumentFile(const char*, int, int);
 	bool isFreePort(const char*);
-	int findMidiMap(const char*);
 
 protected:
 	void customEvent(QEvent*);

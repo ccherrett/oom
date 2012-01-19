@@ -130,6 +130,8 @@ public:
         _name = txt;
     }
 
+	Patch* getDefaultPatch();
+
 	KeyMap* newKeyMap(int key)
 	{
 		if(m_keymaps.contains(key))

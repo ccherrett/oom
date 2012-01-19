@@ -440,6 +440,30 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 	return *this;
 }
 
+Patch* MidiInstrument::getDefaultPatch()
+{
+	Patch* rv = 0;
+	if(m_oomInstrument)
+	{
+		for (ciPatchGroup g = pg.begin(); g != pg.end(); ++g)
+		{
+			PatchGroup* pgp = *g;
+			const PatchList& pl = pgp->patches;
+			for (ciPatch p = pl.begin(); p != pl.end(); ++p)
+			{
+				if(!(*p)->filename.isEmpty() && (*p)->loadmode >= 0 && !(*p)->engine.isEmpty())
+				{
+					rv = (*p);
+					break;
+				}
+			}
+			if(rv)
+				break;
+		}
+	}
+	return rv;
+}
+
 //---------------------------------------------------------
 //   reset
 //    send note off to all channels

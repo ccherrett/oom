@@ -65,6 +65,7 @@ private slots:
 	void updateBussSelected(bool);
 	void updateInstrument(int);
 	void trackTypeChanged(int);
+	void trackNameEdited();
 
 protected:
 	virtual void showEvent(QShowEvent*);

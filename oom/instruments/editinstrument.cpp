@@ -194,7 +194,7 @@ void EditInstrument::browseFilenameClicked()
 			this,
 			tr("Open Sample File"),
 			QDir::currentPath(),
-			tr("Supported Files (*.gig,*.sfz,*.sf2);;All Files (*.*)"));
+			tr("Supported Files (*.gig *.sfz *.sf2);;All Files (*.*)"));
 		if(!filename.isNull())
 		{
 			txtFilename->setText(filename);
@@ -2718,12 +2718,12 @@ void EditInstrument::updatePatch(MidiInstrument* instrument, Patch* p)
 //	if(p->keys.size() != keyslist.size())
 //	{
 		p->keys = keyslist;
-		instrument->setDirty(true);
+//		instrument->setDirty(true);
 //	}
 //	if(p->keyswitches.size() != keyswitchlist.size())
 //	{
 		p->keyswitches = keyswitchlist;
-		instrument->setDirty(true);
+//		instrument->setDirty(true);
 //	}
 	
 	QString engine = cmbEngine->itemText(cmbEngine->currentIndex());

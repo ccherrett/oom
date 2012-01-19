@@ -365,6 +365,9 @@ p, li { white-space: pre-wrap; }
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QComboBox::AdjustToContents</enum>
+                  </property>
                  </widget>
                 </item>
                 <item row="9" column="0">
@@ -464,7 +467,7 @@ p, li { white-space: pre-wrap; }
                 <enum>QLayout::SetDefaultConstraint</enum>
                </property>
                <item>
-                <widget class="QToolButton" name="patchDelete">
+                <widget class="QPushButton" name="patchDelete">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -483,7 +486,7 @@ p, li { white-space: pre-wrap; }
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="patchNew">
+                <widget class="QPushButton" name="patchNew">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -502,7 +505,7 @@ p, li { white-space: pre-wrap; }
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="patchNewGroup">
+                <widget class="QPushButton" name="patchNewGroup">
                  <property name="toolTip">
                   <string>New group</string>
                  </property>
@@ -613,6 +616,13 @@ handled like normal controllers.</string>
            </widget>
            <widget class="QWidget" name="layout17">
             <layout class="QVBoxLayout">
+             <item>
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Current Controllers:</string>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QTreeWidget" name="viewController">
                <property name="toolTip">
@@ -1244,7 +1254,7 @@ Caution! Watch out for controllers such as
              <item>
               <layout class="QHBoxLayout">
                <item>
-                <widget class="QToolButton" name="addController">
+                <widget class="QPushButton" name="addController">
                  <property name="toolTip">
                   <string>Add common controller</string>
                  </property>
@@ -1257,7 +1267,7 @@ Caution! Watch out for controllers such as
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="deleteController">
+                <widget class="QPushButton" name="deleteController">
                  <property name="toolTip">
                   <string>Delete controller</string>
                  </property>
@@ -1270,7 +1280,7 @@ Caution! Watch out for controllers such as
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="newController">
+                <widget class="QPushButton" name="newController">
                  <property name="toolTip">
                   <string>Create a new controller</string>
                  </property>
@@ -1464,7 +1474,7 @@ Typically, set to 127/127, or an unused
              <item>
               <layout class="QHBoxLayout">
                <item>
-                <widget class="QToolButton" name="deleteSysex">
+                <widget class="QPushButton" name="deleteSysex">
                  <property name="text">
                   <string>&amp;Delete</string>
                  </property>
@@ -1474,7 +1484,7 @@ Typically, set to 127/127, or an unused
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="newSysex">
+                <widget class="QPushButton" name="newSysex">
                  <property name="text">
                   <string>New SysE&amp;x</string>
                  </property>

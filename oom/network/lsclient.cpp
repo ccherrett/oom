@@ -529,7 +529,7 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 							QString ifname(insInfo->instrument_file);
 							QFileInfo finfo(ifname);
 							QString fname = _stripAscii(finfo.baseName()).simplified();
-							QString bname(QString(tr("Bank ")).append(QString::number(instr[in].bank)));
+							QString bname(QString(tr("Bank ")).append(QString::number(instr[in].bank+1)));
 							PatchGroup *pg = 0;
 							for(iPatchGroup pi = pgl->begin(); pi != pgl->end(); ++pi)
 							{
@@ -595,64 +595,323 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 	return 0;
 }/*}}}*/
 
-int LSClient::findMidiMap(const char* name)
+int LSClient::findMidiMap(const char* name)/*{{{*/
 {
-	QString sname(name);
-	QMap<int, QString> mapList = listInstruments();
-	QMapIterator<int, QString> iter(mapList);
-	while(iter.hasNext())
+	int rv = -1;
+	if(_client != NULL)
 	{
-		iter.next();
-		if(iter.value() == sname)
-			return iter.key();
+		QString sname(name);
+		QMap<int, QString> mapList = listInstruments();
+		QMapIterator<int, QString> iter(mapList);
+		while(iter.hasNext())
+		{
+			iter.next();
+			if(iter.value() == sname)
+			{
+				rv = iter.key();
+				break;
+			}
+		}
 	}
-	return -1;
-}
+	return rv;
+}/*}}}*/
 
-int LSClient::createAudioOutputDevice(char* name, const char* type, int ports, int iSrate)
+int LSClient::createAudioOutputDevice(char* name, const char* type, int ports, int iSrate)/*{{{*/
 {
-	QString sport = QString::number(ports);
-	char cports[sport.size()+1];
-	strcpy(cports, sport.toUtf8().constData());
-	
-	QString srate = QString::number(iSrate);
-	char crate[srate.size()+1];
-	strcpy(crate, srate.toUtf8().constData());
+	int rv = -1;
+	if(_client != NULL)
+	{
+		QString sport = QString::number(ports);
+		char cports[sport.size()+1];
+		strcpy(cports, sport.toUtf8().constData());
+		
+		QString srate = QString::number(iSrate);
+		char crate[srate.size()+1];
+		strcpy(crate, srate.toUtf8().constData());
 
-	lscp_param_t *aparams = new lscp_param_t[5];
-	aparams[0].key = sName;
-	aparams[0].value = name;
-	aparams[1].key = (char*)"ACTIVE";
-	aparams[1].value = (char*)"true";
-	aparams[2].key = sChannels;
-	aparams[2].value = cports;
-	aparams[3].key = sSampleRate;
-	aparams[3].value = crate;
-	aparams[4].key = NULL;
-	aparams[4].value = NULL;
-	
-	return ::lscp_create_audio_device(_client, type, aparams);
-}
+		lscp_param_t *aparams = new lscp_param_t[5];
+		aparams[0].key = sName;
+		aparams[0].value = name;
+		aparams[1].key = (char*)"ACTIVE";
+		aparams[1].value = (char*)"true";
+		aparams[2].key = sChannels;
+		aparams[2].value = cports;
+		aparams[3].key = sSampleRate;
+		aparams[3].value = crate;
+		aparams[4].key = NULL;
+		aparams[4].value = NULL;
+		
+		rv = ::lscp_create_audio_device(_client, type, aparams);
+	}
+	return rv;
+}/*}}}*/
 
-int LSClient::createMidiInputDevice(char* name, const char* type, int ports)
+int LSClient::createMidiInputDevice(char* name, const char* type, int ports)/*{{{*/
 {
-	QString sport = QString::number(ports);
-	char cports[sport.size()+1];
-	strcpy(cports, sport.toUtf8().constData());
-	
-	lscp_param_t* params = new lscp_param_t[3];
-	params[0].key = sName;
-	params[0].value = name;
-	params[1].key = sPorts;
-	params[1].value = cports;
-	params[2].key = NULL;
-	params[2].value = NULL;
-	
-	return ::lscp_create_midi_device(_client, type, params); 
+	int rv = -1;
+	if(_client != NULL)
+	{
+		QString sport = QString::number(ports);
+		char cports[sport.size()+1];
+		strcpy(cports, sport.toUtf8().constData());
+		
+		lscp_param_t* params = new lscp_param_t[3];
+		params[0].key = sName;
+		params[0].value = name;
+		params[1].key = sPorts;
+		params[1].value = cports;
+		params[2].key = NULL;
+		params[2].value = NULL;
+		
+		rv = ::lscp_create_midi_device(_client, type, params); 
+	}
+	return rv;
+}/*}}}*/
+
+bool LSClient::createInstrumentChannel(const char* name, const char* engine, const char* filename, int map)
+{
+	bool rv = false;
+	if(_client != NULL)
+	{
+		qDebug("LSClient::createInstrumentChannel: name: %s, engine: %s,  filename: %s, map: %d", name, engine, filename, map);
+		//configure audio device port for instrument
+		//Find the first unconfigure channels and use them
+		char midiPortName[strlen(name)+1];
+		strcpy(midiPortName, name);
+		char audioChannelName[QString(name).append("-audio").size()+1];
+		strcpy(audioChannelName, QString(name).append("-audio").toLocal8Bit().constData());
+		int midiPort = -1;
+		int audioChannel = -1;
+
+		lscp_device_info_t* mDevInfo = ::lscp_get_midi_device_info(_client, 0);
+		if(mDevInfo)
+		{
+			lscp_param_t* mDevParams = mDevInfo->params;
+			for(int i = 0; mDevParams && mDevParams[i].key && mDevParams[i].value; ++i)
+			{
+				qDebug("Midi Device Param: key: %s, value: %s", mDevParams[i].key, mDevParams[i].value);
+				if(strcmp(mDevParams[i].key, sPorts) == 0)
+				{
+					qDebug("Found MIDI port count");
+					midiPort = atoi(mDevParams[i].value);
+					break;
+				}
+			}
+		}
+
+		if(midiPort)
+		{
+			bool firstrun = false;
+			if(midiPort == 1)
+			{//Check if its configured
+				lscp_device_port_info_t* portInfo = ::lscp_get_midi_port_info(_client, 0, 0);
+				if(portInfo)
+				{
+					lscp_param_t* mPortParams = portInfo->params;
+					for(int i = 0; mPortParams && mPortParams[i].key && mPortParams[i].value; ++i)
+					{
+						if(strcmp(mPortParams[i].key, sName) == 0)
+						{
+							if(strcmp(mPortParams[i].value, "midi_in_0") == 0)
+							{
+								midiPort  = 0;
+								firstrun = true;
+							}
+							break;
+						}
+					}
+				}
+			}
+			if(!firstrun)
+			{
+				qDebug("Increasing MIDI Device Port count");
+				char pCount[QString::number(midiPort+1).size()+1];
+				strcpy(pCount, QString::number(midiPort+1).toLocal8Bit().constData());
+				lscp_param_t p;
+				p.key = sPorts;
+				p.value = pCount;
+				if(lscp_set_midi_device_param(_client, 0, &p))
+				{
+					qDebug("Sucessfullt increased port count");
+				}
+				else
+				{//find a free channel
+					qDebug("Failed");
+				}
+			}
+		}
+		//set port name
+		if(midiPort != -1)
+		{
+			lscp_param_t portName;
+			portName.key = sName;
+			portName.value = midiPortName;
+			if(lscp_set_midi_port_param(_client, 0, midiPort, &portName) != LSCP_OK)
+			{
+				qDebug("Failed to renamed midi port");
+			}
+		}
+
+		//Prepare audio device chanell
+		lscp_device_info_t* aDevInfo = ::lscp_get_audio_device_info(_client, 0);
+		if(aDevInfo)
+		{
+			lscp_param_t* aDevParams = aDevInfo->params;
+			for(int i = 0; aDevParams && aDevParams[i].key && aDevParams[i].value; ++i)
+			{
+				qDebug("Audio Device Param: key: %s, value: %s", aDevParams[i].key, aDevParams[i].value);
+				if(strcmp(aDevParams[i].key, sChannels) == 0)
+				{
+					qDebug("Found Audio channel count");
+					audioChannel = atoi(aDevParams[i].value);
+					break;
+				}
+			}
+		}
+		if(audioChannel)
+		{
+			bool firstrun = false;
+			if(audioChannel == 1)
+			{//Check if its configured
+				lscp_device_port_info_t* portInfo = ::lscp_get_audio_channel_info(_client, 0, 0);
+				if(portInfo)
+				{
+					lscp_param_t* aPortParams = portInfo->params;
+					for(int i = 0; aPortParams && aPortParams[i].key && aPortParams[i].value; ++i)
+					{
+						if(strcmp(aPortParams[i].key, sName) == 0)
+						{
+							if(strcmp(aPortParams[i].value, "0") == 0)
+							{
+								audioChannel  = 0;
+								firstrun = true;
+							}
+							break;
+						}
+					}
+				}
+			}
+			if(!firstrun)
+			{
+				qDebug("Increasing Audio device channel count");
+				char pCount[QString::number(audioChannel+1).size()+1];
+				strcpy(pCount, QString::number(audioChannel+1).toLocal8Bit().constData());
+				lscp_param_t c;
+				c.key = sChannels;
+				c.value = pCount;
+				if(lscp_set_audio_device_param(_client, 0, &c) == LSCP_OK)
+				{
+					qDebug("Sucessfully increased count");
+				}
+				else
+				{
+					qDebug("Failed");
+				}
+			}
+		}
+		if(audioChannel != -1)
+		{
+			lscp_param_t chanName;
+			chanName.key = sName;
+			chanName.value = audioChannelName;
+			if(lscp_set_audio_channel_param(_client, 0, audioChannel, &chanName) != LSCP_OK)
+			{
+				qDebug("Failed to set Audio channel name");
+			}
+		}
+		qDebug("LSClient::createInstrumentChannel: midiPort: %d, audioChanel: %d", midiPort, audioChannel);
+		
+		if(midiPort != -1 && audioChannel != -1)
+		{
+			qDebug("Creating LinuxSampler Channel");
+			//Create Channels and load default map
+			//ADD CHANNEL
+			//LOAD ENGINE SFZ 0
+			int chan = ::lscp_add_channel(_client);
+			char cEngine[strlen(engine)+1];
+			strcpy(cEngine, engine);
+			if(chan >= 0)
+			{
+				qDebug("Created LinuxSampler Channel: %d", chan);
+				qDebug("Loading Channel engine: %s", cEngine);
+				if(lscp_load_engine(_client, cEngine, chan) == LSCP_OK)
+				{
+					//Setup midi side of channel
+					//SET CHANNEL MIDI_INPUT_DEVICE 0 0
+					//SET CHANNEL MIDI_INPUT_PORT 0 0
+					//SET CHANNEL MIDI_INPUT_CHANNEL 0 ALL
+					//SET CHANNEL MIDI_INSTRUMENT_MAP 0 0
+					if(lscp_set_channel_midi_device(_client, chan, 0) != LSCP_OK)
+					{
+						qDebug("Failed to set channel MIDI input device");
+					}
+					if(lscp_set_channel_midi_port(_client, chan, midiPort) != LSCP_OK)
+					{
+						qDebug("Failed to set channel MIDI port");
+					}
+					if(lscp_set_channel_midi_channel(_client, chan, LSCP_MIDI_CHANNEL_ALL) != LSCP_OK)
+					{
+						qDebug("Failed to set channel MIDI channels");
+					}
+					if(lscp_set_channel_midi_map(_client, chan, map) != LSCP_OK)
+					{
+						qDebug("Failed to set channel MIDI instrument map");
+					}
+					//Set channel default volume
+					//SET CHANNEL VOLUME 0 1.0
+					if(lscp_set_channel_volume(_client, chan, 1.0) != LSCP_OK)
+					{
+						qDebug("Failed to set channel volume");
+					}
+					//SET CHANNEL AUDIO_OUTPUT_DEVICE 0 0
+					//SET CHANNEL AUDIO_OUTPUT_CHANNEL 0 1 0
+					//Setup audio side of channel
+					if(lscp_set_channel_audio_device(_client, chan, 0) != LSCP_OK)
+					{
+						qDebug("Failed to set channel AUDIO output device");
+					}
+					if(lscp_set_channel_audio_channel(_client, chan, 0, chan) != LSCP_OK)
+					{
+						qDebug("Failed to set channel AUDIO output channel 1");
+					}
+					if(lscp_set_channel_audio_channel(_client, chan, 1, chan) != LSCP_OK)
+					{
+						qDebug("Failed to set channel AUDIO output channel 2");
+					}
+					QString file(filename);
+					if(file.contains(QString(SOUND_PATH)))
+					{
+						file = file.replace(QString(SOUND_PATH), SOUNDS_DIR);
+					}
+					char cFile[file.size()+1];
+					strcpy(cFile, file.toUtf8().constData());
+					if(lscp_load_instrument_non_modal(_client, cFile, 0, chan) != LSCP_OK)
+					{
+						qDebug("Failed to load default sample into channel");
+					}
+					rv = true;
+				}
+				else
+				{
+					rv = false;
+				}
+			}
+			else
+			{
+				rv = false;
+			}
+		}
+		else
+		{
+			rv = false;
+		}
+	}
+	return rv;
 }
 
 bool LSClient::loadInstrument(MidiInstrument* instrument)
 {
+	bool rv = false;
 	if(_client != NULL && instrument && instrument->isOOMInstrument())
 	{
 		int mapCount = ::lscp_get_midi_instrument_maps(_client);
@@ -695,7 +954,7 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 				map = ::lscp_add_midi_instrument_map(_client, instrument->iname().toUtf8().constData());
 				if(map >= 0)
 				{
-					PatchGroupList *pgl = instrument->groups();
+					PatchGroupList *pgl = instrument->groups();/*{{{*/
 					for(iPatchGroup ipg = pgl->begin(); ipg != pgl->end(); ++ipg)
 					{
 						const PatchList& patches = (*ipg)->patches;
@@ -731,164 +990,13 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 							}
 							++index;
 						}
-					}
-					//configure audio device port for instrument/*{{{*/
-					//Find the first unconfigure channels and use them
-					char midiPortName[instrument->iname().size()+1];
-					strcpy(midiPortName, instrument->iname().toLocal8Bit().constData());
-					char audioChannelName[QString(instrument->iname()).append("-audio").size()+1];
-					strcpy(audioChannelName, QString(instrument->iname()).append("-audio").toLocal8Bit().constData());
-					int midiPort = -1;
-					int audioChannel = -1;
-
-					if(mapCount)
-					{
-						qDebug("Increasing MIDI Device Port count");
-						char pCount[QString::number(mapCount+1).size()+1];
-						strcpy(pCount, QString::number(mapCount+1).toLocal8Bit().constData());
-						lscp_param_t p;
-						p.key = sPorts;
-						p.value = pCount;
-						if(lscp_set_midi_device_param(_client, mdevId, &p))
-						{
-							qDebug("Sucessfullt increased port count");
-							midiPort = mapCount;
-						}
-						else
-						{//find a free channel
-							qDebug("Failed");
-							midiPort = mapCount;
-						}
-					}
-					else
-					{
-						midiPort = mapCount;
-					}
-					//set port name
-					if(midiPort != -1)
-					{
-						lscp_param_t portName;
-						portName.key = sName;
-						portName.value = midiPortName;
-						qDebug("mdevId: %d, midiPort: %d", mdevId, midiPort);
-						if(lscp_set_midi_port_param(_client, mdevId, midiPort, &portName) != LSCP_OK)
-						{
-							qDebug("Failed to renamed midi port");
-						}
-					}
-					else
-					{
-					}
-
-					if(mapCount)
-					{
-						qDebug("Increasing Audio device channel count");
-						audioChannel = mapCount;
-						char pCount[QString::number(mapCount+1).size()+1];
-						strcpy(pCount, QString::number(mapCount+1).toLocal8Bit().constData());
-						lscp_param_t c;
-						c.key = sChannels;
-						c.value = pCount;
-						if(lscp_set_audio_device_param(_client, adevId, &c) == LSCP_OK)
-						{
-							qDebug("Sucessfully increased count");
-							//audioChannel = mapCount;
-						}
-						else
-						{
-							qDebug("Failed");
-						}
-					}
-					else
-					{
-						audioChannel = mapCount;
-					}
-					if(audioChannel != -1)
-					{
-						lscp_param_t chanName;
-						chanName.key = sName;
-						chanName.value = audioChannelName;
-						if(lscp_set_audio_channel_param(_client, adevId, audioChannel, &chanName) != LSCP_OK)
-						{
-							qDebug("Failed to set Audio channel name");
-						}
-					}
-					
-					if(midiPort != -1 && audioChannel != -1)
-					{
-						qDebug("Creating LinuxSampler Channel");
-						//Create Channels and load default map
-						//ADD CHANNEL
-						//LOAD ENGINE SFZ 0
-						int chan = ::lscp_add_channel(_client);
-						char cEngine[channelEngine.size()+1];
-						strcpy(cEngine, channelEngine.toLocal8Bit().constData());
-						if(chan >= 0)
-						{
-							qDebug("Created LinuxSampler Channel: %d", chan);
-							qDebug("Loading Channel engine: %s", cEngine);
-							if(lscp_load_engine(_client, cEngine, chan) == LSCP_OK)
-							{
-								//Setup midi side of channel
-								//SET CHANNEL MIDI_INPUT_DEVICE 0 0
-								//SET CHANNEL MIDI_INPUT_PORT 0 0
-								//SET CHANNEL MIDI_INPUT_CHANNEL 0 ALL
-								//SET CHANNEL MIDI_INSTRUMENT_MAP 0 0
-								if(lscp_set_channel_midi_device(_client, chan, mdevId) != LSCP_OK)
-								{
-									qDebug("Failed to set channel MIDI input device");
-								}
-								if(lscp_set_channel_midi_port(_client, chan, midiPort) != LSCP_OK)
-								{
-									qDebug("Failed to set channel MIDI port");
-								}
-								if(lscp_set_channel_midi_channel(_client, chan, LSCP_MIDI_CHANNEL_ALL) != LSCP_OK)
-								{
-									qDebug("Failed to set channel MIDI channels");
-								}
-								if(lscp_set_channel_midi_map(_client, chan, map) != LSCP_OK)
-								{
-									qDebug("Failed to set channel MIDI instrument map");
-								}
-								//Set channel default volume
-								//SET CHANNEL VOLUME 0 1.0
-								if(lscp_set_channel_volume(_client, chan, 1.0) != LSCP_OK)
-								{
-									qDebug("Failed to set channel volume");
-								}
-								//SET CHANNEL AUDIO_OUTPUT_DEVICE 0 0
-								//SET CHANNEL AUDIO_OUTPUT_CHANNEL 0 1 0
-								//Setup audio side of channel
-								if(lscp_set_channel_audio_device(_client, chan, adevId) != LSCP_OK)
-								{
-									qDebug("Failed to set channel AUDIO output device");
-								}
-								if(lscp_set_channel_audio_channel(_client, chan, 0, chan) != LSCP_OK)
-								{
-									qDebug("Failed to set channel AUDIO output channel 1");
-								}
-								if(lscp_set_channel_audio_channel(_client, chan, 1, chan) != LSCP_OK)
-								{
-									qDebug("Failed to set channel AUDIO output channel 2");
-								}
-								if(!channelFile.isEmpty())
-								{
-									char cFile[channelFile.size()+1];
-									strcpy(cFile, channelFile.toLocal8Bit().constData());
-									if(lscp_load_instrument_non_modal(_client, cFile, 0, chan) != LSCP_OK)
-									{
-										qDebug("Failed to load default sample into channel");
-									}
-								}
-							}
-						}
 					}/*}}}*/
 				}
 			}//END if(map)
-			return true;
+			rv = true;
 		}
 	}
-	return false;
+	return rv;
 }
 
 bool LSClient::isFreePort(const char* val)

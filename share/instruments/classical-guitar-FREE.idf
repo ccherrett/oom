@@ -2,7 +2,7 @@
 <oom version="1.0">
   <MidiInstrument name="classical-guitar" oomInstrument="1">
     <PatchGroup name="classical-guitar">
-      <Patch name="classical-guitar" hbank="0" lbank="0" prog="0" engine="SFZ", loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/ClassicFREE/ClassicGuitar\x20Samples/Classical_Guitar.sfz" keys="40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76" />
+      <Patch name="classical-guitar" hbank="0" lbank="0" prog="0" engine="SFZ" loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/ClassicFREE/ClassicGuitar\x20Samples/Classical_Guitar.sfz" keys="40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76" />
     </PatchGroup>
     <Controller name="Program" type="Program" init="0x0" />
   </MidiInstrument>

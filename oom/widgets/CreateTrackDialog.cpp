@@ -80,6 +80,7 @@ m_insertPosition(pos)
 	//connect(cmbInstrument, SIGNAL(currentIndexChanged(int)), this, SLOT(updateInstrument(int)));
 	connect(cmbInstrument, SIGNAL(activated(int)), this, SLOT(updateInstrument(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
+	connect(txtName, SIGNAL(textEdited(QString)), this, SLOT(trackNameEdited()));
 }
 
 //Add button slot
@@ -539,6 +540,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
 void CreateTrackDialog::updateInstrument(int index)
 {
 	QString instrumentName = cmbInstrument->itemText(index);
+	QString trackName = txtName->text();
 	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 	{
 		if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
@@ -550,25 +552,38 @@ void CreateTrackDialog::updateInstrument(int index)
 			}
 			else if(!m_clientStarted)
 			{
+				m_lsClient = new LSClient(config.lsClientHost.toUtf8().constData(), config.lsClientPort);
 				m_clientStarted = m_lsClient->startClient();
 			}
 			if(m_clientStarted)
 			{
-				qDebug("Loadin`g Instrument to LinuxSampler");
+				qDebug("Loading Instrument to LinuxSampler");
 				if(m_lsClient->loadInstrument(*i))
 				{
-					qDebug("Instrument Loaded");
-					QString prefix("LinuxSampler:");
-					QString postfix("-audio");
-					QString audio(QString(prefix).append(instrumentName).append(postfix));
-					QString midi(QString(prefix).append(instrumentName));
-					//reload input/output list and select the coresponding ports respectively
-					updateVisibleElements();
-					//populateInputList();
-					populateOutputList();
-					populateMonitorList();
-					cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
-					cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
+					qDebug("Instrument Map Loaded");
+					if(chkAutoCreate->isChecked())
+					{
+						int map = m_lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+						Patch* p = (*i)->getDefaultPatch();
+						if(p && map >= 0)
+						{
+							if(m_lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), map))
+							{
+								qDebug("Create Channel for track");
+								QString prefix("LinuxSampler:");
+								QString postfix("-audio");
+								QString audio(QString(prefix).append(trackName).append(postfix));
+								QString midi(QString(prefix).append(trackName));
+								//reload input/output list and select the coresponding ports respectively
+								updateVisibleElements();
+								//populateInputList();
+								populateOutputList();
+								populateMonitorList();
+								cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
+								cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
+							}
+						}
+					}
 				}
 			}
 			break;
@@ -605,6 +620,15 @@ void CreateTrackDialog::trackTypeChanged(int type)
 	populateInstrumentList();
 	populateMonitorList();
 	populateBussList();
+}
+
+void CreateTrackDialog::trackNameEdited()
+{
+	Track::TrackType type = (Track::TrackType)m_insertType;
+	if(type == Track::MIDI)
+	{
+		cmbInstrument->setEnabled(!txtName->text().isEmpty());
+	}
 }
 
 void CreateTrackDialog::createMonitorInputTracks(QString name)/*{{{*/
@@ -1057,6 +1081,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 	chkInput->setChecked(true);
 	chkOutput->setChecked(true);
 	chkBuss->setChecked(true);
+	chkAutoCreate->setChecked(true);
 
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch (type)
@@ -1068,12 +1093,15 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbOutChannel->setVisible(true);
 			lblInstrument->setVisible(true);
 			cmbInstrument->setVisible(true);
+			cmbInstrument->setEnabled(true);
 			cmbMonitor->setVisible(true);
 			cmbInput->setVisible(true);
 			chkInput->setVisible(true);
 			cmbOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			midiBox->setVisible(true);
+			chkAutoCreate->setVisible(true);
+			trackNameEdited();
 
             m_height = 290;
 			m_width = width();
@@ -1087,6 +1115,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
 			midiBox->setVisible(false);
+			chkAutoCreate->setVisible(false);
 
 			cmbInput->setVisible(true);
 			chkInput->setVisible(true);
@@ -1105,6 +1134,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
 			midiBox->setVisible(false);
+			chkAutoCreate->setVisible(false);
 
 			cmbInput->setVisible(true);
 			chkInput->setVisible(true);
@@ -1123,6 +1153,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
 			midiBox->setVisible(false);
+			chkAutoCreate->setVisible(false);
 
 			cmbInput->setVisible(true);
 			chkInput->setVisible(true);
@@ -1141,6 +1172,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
 			midiBox->setVisible(false);
+			chkAutoCreate->setVisible(false);
 
 			cmbInput->setVisible(true);
 			chkInput->setVisible(true);
@@ -1158,6 +1190,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
+			chkAutoCreate->setVisible(false);
 			
 			midiBox->setVisible(false);
 			
