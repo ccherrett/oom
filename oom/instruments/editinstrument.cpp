@@ -1147,6 +1147,7 @@ void EditInstrument::patchChanged()
 		txtFilename->setEnabled(false);
 		txtVolume->setEnabled(false);
 		btnBrowse->setEnabled(false);
+		txtIndex->setEnabled(false);
 		txtKeys->setEnabled(false);
 		txtKeySwitches->setEnabled(false);
 		return;
@@ -1171,6 +1172,7 @@ void EditInstrument::patchChanged()
 		txtFilename->setEnabled(true);
 		txtVolume->setEnabled(true);
 		btnBrowse->setEnabled(true);
+		txtIndex->setEnabled(true);
 
 		int hb = ((p->hbank + 1) & 0xff);
 		int lb = ((p->lbank + 1) & 0xff);
@@ -1207,6 +1209,7 @@ void EditInstrument::patchChanged()
 		cmbLoadMode->setCurrentIndex(p->loadmode);
 		txtFilename->setText(p->filename);
 		txtVolume->setValue(p->volume);
+		txtIndex->setValue(p->index);
 		//printf("Number of switches: %d\n", p->keys.size());
 		//printf("Loading keys %s\n", kb.toUtf8().constData());
 		//printf("Loading key switches %s\n", ks.toUtf8().constData());
@@ -1229,6 +1232,7 @@ void EditInstrument::patchChanged()
 		txtFilename->setEnabled(false);
 		txtVolume->setEnabled(false);
 		btnBrowse->setEnabled(false);
+		txtIndex->setEnabled(false);
 	}
 }
 
@@ -2240,6 +2244,7 @@ void EditInstrument::newPatchClicked()
 	patch->drum = false;
 	patch->volume = 1.0;
 	patch->loadmode = -1;
+	patch->index = -1;
 
 	if (selpatch)
 	{
@@ -2254,6 +2259,7 @@ void EditInstrument::newPatchClicked()
 		patch->engine = selpatch->engine;
 		patch->filename = selpatch->filename;
 		patch->volume = selpatch->volume;
+		patch->index = selpatch->index;
 	}
 
 	bool found = false;
@@ -2730,6 +2736,7 @@ void EditInstrument::updatePatch(MidiInstrument* instrument, Patch* p)
 	QString filename = txtFilename->text();
 	int loadmode = cmbLoadMode->currentIndex();
 	float volume = txtVolume->value();
+	int index = txtIndex->value();
 	if(p->engine != engine)
 	{
 		p->engine = engine;
@@ -2748,6 +2755,11 @@ void EditInstrument::updatePatch(MidiInstrument* instrument, Patch* p)
 	if(p->volume != volume)
 	{
 		p->volume = volume;
+		instrument->setDirty(true);
+	}
+	if(p->index != index)
+	{
+		p->index = index;
 		instrument->setDirty(true);
 	}
 }

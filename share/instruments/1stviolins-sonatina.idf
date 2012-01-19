@@ -2,9 +2,9 @@
 <oom version="1.0">
   <MidiInstrument name="1stviolins" oomInstrument="1">
     <PatchGroup name="Strings - 1st Violins Sustain">
-      <Patch name="Strings - 1st Violins Sustain" hbank="0" lbank="0" prog="0" engine="SFZ" loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Sustain.sfz" keys="55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96" />
-      <Patch name="Strings - 1st Violins Staccato" hbank="0" lbank="0" prog="1" engine="SFZ" loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Staccato.sfz" keys="55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96" />
-      <Patch name="Strings - 1st Violins Pizzicato" hbank="0" lbank="0" prog="2" engine="SFZ" loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Pizzicato.sfz" keys="55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96" />
+      <Patch name="Strings - 1st Violins Sustain" hbank="0" lbank="0" prog="0" engine="SFZ" loadmode="2" index="0" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Sustain.sfz" keys="55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96" />
+      <Patch name="Strings - 1st Violins Staccato" hbank="0" lbank="0" prog="1" engine="SFZ" loadmode="2" index="0" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Staccato.sfz" keys="55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96" />
+      <Patch name="Strings - 1st Violins Pizzicato" hbank="0" lbank="0" prog="2" engine="SFZ" loadmode="2" index="0" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Strings\x20-\x201st\x20Violins\x20Pizzicato.sfz" keys="55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96" />
     </PatchGroup>
     <Controller name="Modulation" l="1" init="0" />
     <Controller name="Expression" l="11" init="0" />

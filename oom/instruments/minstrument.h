@@ -37,6 +37,7 @@ struct Patch
 	int loadmode;
 	QString engine;
 	QString filename;
+	int index;
 	float volume;
     bool drum;
 	QHash<int, QString> comments;

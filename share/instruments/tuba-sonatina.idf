@@ -2,8 +2,8 @@
 <oom version="1.0">
   <MidiInstrument name="tuba" oomInstrument="1">
     <PatchGroup name="Brass - Tuba Sustain">
-      <Patch name="Brass - Tuba Sustain" hbank="0" lbank="0" prog="0" engine="SFZ" loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Sustain.sfz" keys="28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62" />
-      <Patch name="Brass - Tuba Staccato" hbank="0" lbank="0" prog="1" engine="SFZ" loadmode="2" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Staccato.sfz" keys="28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62" />
+      <Patch name="Brass - Tuba Sustain" hbank="0" lbank="0" prog="0" engine="SFZ" loadmode="2" index="0" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Sustain.sfz" keys="28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62" />
+      <Patch name="Brass - Tuba Staccato" hbank="0" lbank="0" prog="1" engine="SFZ" loadmode="2" index="0" volume="1.0" filename="@@OOM_SOUNDS@@/sonatina/Sonatina\x20Symphonic\x20Orchestra/Brass\x20-\x20Tuba\x20Staccato.sfz" keys="28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62" />
     </PatchGroup>
     <Controller name="Modulation" l="1" init="0" />
     <Controller name="Expression" l="11" init="0" />

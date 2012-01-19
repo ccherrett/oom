@@ -117,7 +117,7 @@ public:
 	
 	int createMidiInputDevice(char* name, const char* type = "JACK", int ports = 1);
 	int createAudioOutputDevice(char* name, const char* type = "JACK", int ports = 1, int iSrate = 48000);
-	bool createInstrumentChannel(const char* name, const char* engine, const char* filename, int map);
+	bool createInstrumentChannel(const char* name, const char* engine, const char* filename, int index, int map);
 	QMap<int, QString> listInstruments();
 	QString getValidInstrumentName(QString nameBase);
 	QString getMapName(int);

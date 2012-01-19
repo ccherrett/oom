@@ -567,7 +567,7 @@ void CreateTrackDialog::updateInstrument(int index)
 						Patch* p = (*i)->getDefaultPatch();
 						if(p && map >= 0)
 						{
-							if(m_lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), map))
+							if(m_lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
 							{
 								qDebug("Create Channel for track");
 								QString prefix("LinuxSampler:");

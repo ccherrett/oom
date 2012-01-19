@@ -423,6 +423,7 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 			np->filename = pp->filename;
 			np->engine = pp->engine;
 			np->volume = pp->volume;
+			np->index = pp->index;
 			npg->patches.push_back(np);
 		}
 	}
@@ -541,6 +542,9 @@ void Patch::read(Xml& xml)/*{{{*/
 	drum = false;
 	keys.clear();
 	keyswitches.clear();
+	loadmode = -1;
+	index = -1;
+	volume = 1.0;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -613,6 +617,10 @@ void Patch::read(Xml& xml)/*{{{*/
 				{
 					volume = xml.s2().toFloat();
 				}
+				else if(tag == "index")
+				{
+					index = xml.s2().toInt();
+				}
 				break;
 			case Xml::TagEnd:
 				if (tag == "Patch")
@@ -650,6 +658,8 @@ void Patch::write(int level, Xml& xml)/*{{{*/
 		xml.nput(" engine=\"%s\"", Xml::xmlString(engine).toLatin1().constData());
 	if(loadmode != -1)
 		xml.nput(" loadmode=\"%d\"", loadmode);
+	if(index != -1)
+		xml.nput(" index=\"%d\"", index);
 	xml.nput(" volume=\"%f\"", volume);
 
 	if(!keys.isEmpty())

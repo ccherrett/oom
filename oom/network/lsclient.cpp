@@ -573,6 +573,7 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 							patch->filename = QString(insInfo->instrument_file);
 							patch->loadmode = (int)insInfo->load_mode;
 							patch->volume = insInfo->volume;
+							patch->index = insInfo->instrument_nr;
 							if(lscp_load_engine(_client, insInfo->engine_name, chan) == LSCP_OK)
 							{
 								LSCPKeymap kmap = _getKeyMapping(QString(insInfo->instrument_file), insInfo->instrument_nr, chan);
@@ -668,7 +669,7 @@ int LSClient::createMidiInputDevice(char* name, const char* type, int ports)/*{{
 	return rv;
 }/*}}}*/
 
-bool LSClient::createInstrumentChannel(const char* name, const char* engine, const char* filename, int map)
+bool LSClient::createInstrumentChannel(const char* name, const char* engine, const char* filename, int index, int map)
 {
 	bool rv = false;
 	if(_client != NULL)
@@ -870,11 +871,11 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 					{
 						qDebug("Failed to set channel AUDIO output device");
 					}
-					if(lscp_set_channel_audio_channel(_client, chan, 0, chan) != LSCP_OK)
+					if(lscp_set_channel_audio_channel(_client, chan, 0, audioChannel) != LSCP_OK)
 					{
 						qDebug("Failed to set channel AUDIO output channel 1");
 					}
-					if(lscp_set_channel_audio_channel(_client, chan, 1, chan) != LSCP_OK)
+					if(lscp_set_channel_audio_channel(_client, chan, 1, audioChannel) != LSCP_OK)
 					{
 						qDebug("Failed to set channel AUDIO output channel 2");
 					}
@@ -885,7 +886,7 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 					}
 					char cFile[file.size()+1];
 					strcpy(cFile, file.toUtf8().constData());
-					if(lscp_load_instrument_non_modal(_client, cFile, 0, chan) != LSCP_OK)
+					if(lscp_load_instrument_non_modal(_client, cFile, index, chan) != LSCP_OK)
 					{
 						qDebug("Failed to load default sample into channel");
 					}
@@ -972,7 +973,7 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 								filename = filename.replace(QString(SOUND_PATH), SOUNDS_DIR);
 							}
 							qDebug("Loading patch: %s, engine: %s, filename: %s", p->name.toUtf8().constData(), p->engine.toUtf8().constData(), filename.toUtf8().constData());
-							if(::lscp_map_midi_instrument(_client, ins, p->engine.toUtf8().constData(), filename.toUtf8().constData(), index, p->volume, (lscp_load_mode_t)p->loadmode, p->name.toUtf8().constData()) == LSCP_OK)
+							if(::lscp_map_midi_instrument(_client, ins, p->engine.toUtf8().constData(), filename.toUtf8().constData(), p->index, p->volume, (lscp_load_mode_t)p->loadmode, p->name.toUtf8().constData()) == LSCP_OK)
 							{//
 								qDebug("Loaded");
 								//Select the first instrument to load into the channel
