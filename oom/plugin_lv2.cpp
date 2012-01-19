@@ -453,6 +453,8 @@ Lv2Plugin::Lv2Plugin()
 
 Lv2Plugin::~Lv2Plugin()
 {
+    qWarning("~Lv2Plugin() ---- --------------------------------------------");
+
     aboutToRemove();
 
     // close UI
@@ -597,7 +599,7 @@ void Lv2Plugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
     const LilvNode* lilvClassLabel = lilv_plugin_class_get_label(lilvClass);
     const char* lv2Class = lilv_node_as_string(lilvClassLabel);
 
-    if (strcmp(lv2Class, "Instrument") == 0)
+    if (strcmp(lv2Class, "Instrument") == 0 && plugi->m_audioInputCount > 0)
         plugi->m_hints |= PLUGIN_IS_SYNTH;
     else if (plugi->m_audioInputCount == plugi->m_audioOutputCount && plugi->m_audioOutputCount >= 1)
         // we can only process plugins that have the same number of input/output audio ports
@@ -981,7 +983,7 @@ void Lv2Plugin::reload()
     const LilvNode* lilvClassLabel = lilv_plugin_class_get_label(lilvClass);
     const char* lv2Class = lilv_node_as_string(lilvClassLabel);
 
-    if (strcmp(lv2Class, "Instrument") == 0)
+    if (strcmp(lv2Class, "Instrument") == 0 && aouts > 0)
         m_hints |= PLUGIN_IS_SYNTH;
     else if (ains == aouts && aouts > 1)
         m_hints |= PLUGIN_IS_FX;
@@ -1611,17 +1613,6 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                             midi_event[2] = ev->dataB();
                             break;
                         }
-
-                        //if ()
-                            //break;
-
-                        //uint8_t* midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, ev->len());
-                        //if (midi_event)
-                        //{
-                        //    midi_event[0] = ev->dataA();
-                        //    midi_event[1] = 64;
-                        //    midi_event[2] = 100;
-                        //}
                     }
                     eventList->erase(eventList->begin(), ev);
 

@@ -235,7 +235,7 @@ void VstPlugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
     if (buf_str[0] != 0)
         plugi->m_maker = QString(buf_str);
 
-    if (effect->flags & effFlagsIsSynth)
+    if (effect->flags & effFlagsIsSynth && plugi->m_audioInputCount > 0)
         plugi->m_hints |= PLUGIN_IS_SYNTH;
     else if (plugi->m_audioInputCount >= 1 && plugi->m_audioOutputCount >= 1)
         plugi->m_hints |= PLUGIN_IS_FX;
@@ -336,7 +336,7 @@ void VstPlugin::reload()
     // query new data
     m_paramCount = effect->numParams;
 
-    if (effect->flags & effFlagsIsSynth)
+    if (effect->flags & effFlagsIsSynth && effect->numOutputs > 0)
         m_hints |= PLUGIN_IS_SYNTH;
     else if (effect->numInputs > 1 && effect->numOutputs > 1)
         m_hints |= PLUGIN_IS_FX;

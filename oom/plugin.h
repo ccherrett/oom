@@ -175,6 +175,8 @@ public:
 
     ~BasePlugin()
     {
+        qWarning("~BasePlugin() --------------------------------------------");
+
         deleteGui();
 
         if (m_ainsCount > 0)
@@ -373,16 +375,19 @@ public:
 
     void process_synth(MPEventList* eventList)
     {
-        jack_default_audio_sample_t* ains_buffer[m_ainsCount];
-        jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
+        if (m_aoutsCount > 0)
+        {
+            jack_default_audio_sample_t* ains_buffer[m_ainsCount];
+            jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
 
-        for (uint32_t i=0; i < m_ainsCount; i++)
-            ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_in[i], segmentSize);
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_in[i], segmentSize);
 
-        for (uint32_t i=0; i < m_aoutsCount; i++)
-            aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_out[i], segmentSize);
+            for (uint32_t i=0; i < m_aoutsCount; i++)
+                aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_out[i], segmentSize);
 
-        process(segmentSize, ains_buffer, aouts_buffer, eventList);
+            process(segmentSize, ains_buffer, aouts_buffer, eventList);
+        }
     }
 
     void makeGui();

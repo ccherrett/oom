@@ -229,7 +229,25 @@ void SynthPluginDevice::close()
     _writeEnable = false;
 
     if (m_plugin)
-        delete m_plugin;
+    {
+        m_plugin->aboutToRemove();
+
+        // Delete the appropriate class
+        switch(m_plugin->type())
+        {
+        case PLUGIN_LADSPA:
+            delete (LadspaPlugin*)m_plugin;
+            break;
+        case PLUGIN_LV2:
+            delete (Lv2Plugin*)m_plugin;
+            break;
+        case PLUGIN_VST:
+            delete (VstPlugin*)m_plugin;
+            break;
+        default:
+            break;
+        }
+    }
 
     m_plugin = 0;
 }
@@ -260,11 +278,12 @@ void SynthPluginDevice::processMidi()
 {
     if (m_plugin)
     {
-        //if (_writeEnable)
-        //{
+        if (_writeEnable)
+        {
             MPEventList* eventList = playEvents();
-            m_plugin->process_synth(eventList);
-        //}
+            if (m_plugin)
+                m_plugin->process_synth(eventList);
+        }
         //qWarning("SynthPluginDevice::processMidi()");
     }
 }
@@ -375,6 +394,8 @@ void Pipeline::remove(int index)
 
     if (plugin)
     {
+        plugin->aboutToRemove();
+
         // Delete the appropriate class
         switch(plugin->type())
         {
