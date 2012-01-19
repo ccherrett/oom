@@ -208,12 +208,13 @@ QString SynthPluginDevice::open()
 
             if (m_plugin->init(m_filename, m_label))
             {
-
+                m_plugin->setActive(true);
+                return QString("OK2");
             }
         }
     }
 
-    return QString("OK");
+    return QString("Fail");
 }
 
 //---------------------------------------------------------
@@ -259,6 +260,11 @@ void SynthPluginDevice::processMidi()
 {
     if (m_plugin)
     {
+        //if (_writeEnable)
+        //{
+            MPEventList* eventList = playEvents();
+            m_plugin->process_synth(eventList);
+        //}
         //qWarning("SynthPluginDevice::processMidi()");
     }
 }
@@ -318,6 +324,7 @@ MidiPlayEvent SynthPluginDevice::receiveEvent()
 
 int SynthPluginDevice::eventsPending() const
 {
+    //qWarning("SynthPluginDevice::eventsPending()");
     return 0; //_sif->eventsPending();
 }
 
@@ -532,17 +539,17 @@ void Pipeline::apply(int ports, uint32_t nframes, float** buffer1)
             if (p->hints() & PLUGIN_HAS_IN_PLACE_BROKEN)
             {
                 if (swap)
-                    p->process(nframes, buffer, buffer1);
+                    p->process(nframes, buffer, buffer1, 0);
                 else
-                    p->process(nframes, buffer1, buffer);
+                    p->process(nframes, buffer1, buffer, 0);
                 swap = !swap;
             }
             else
             {
                 if (swap)
-                    p->process(nframes, buffer, buffer);
+                    p->process(nframes, buffer, buffer, 0);
                 else
-                    p->process(nframes, buffer1, buffer1);
+                    p->process(nframes, buffer1, buffer1, 0);
             }
         }
     }

@@ -430,7 +430,7 @@ void LadspaPlugin::updateNativeGui()
 {
 }
 
-void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
+void LadspaPlugin::process(uint32_t frames, float** src, float** dst, MPEventList*)
 {
     if (descriptor && m_enabled)
     {
@@ -546,11 +546,6 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
         // --------------------------
         m_proc_lock.unlock();
     }
-}
-
-void LadspaPlugin::process_synth()
-{
-    // LADSPA has no synth support
 }
 
 void LadspaPlugin::bufferSizeChanged(uint32_t)

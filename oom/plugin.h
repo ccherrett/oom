@@ -156,6 +156,8 @@ public:
         m_active = false;
         m_activeBefore = false;
 
+        m_ainsCount  = 0;
+        m_aoutsCount = 0;
         m_paramCount = 0;
         m_params = 0;
 
@@ -174,6 +176,12 @@ public:
     ~BasePlugin()
     {
         deleteGui();
+
+        if (m_ainsCount > 0)
+            delete[] m_ports_in;
+
+        if (m_aoutsCount > 0)
+            delete[] m_ports_out;
 
         if (m_paramCount > 0)
             delete[] m_params;
@@ -363,6 +371,20 @@ public:
         m_proc_lock.unlock();
     }
 
+    void process_synth(MPEventList* eventList)
+    {
+        jack_default_audio_sample_t* ains_buffer[m_ainsCount];
+        jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
+
+        for (uint32_t i=0; i < m_ainsCount; i++)
+            ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_in[i], segmentSize);
+
+        for (uint32_t i=0; i < m_aoutsCount; i++)
+            aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_out[i], segmentSize);
+
+        process(segmentSize, ains_buffer, aouts_buffer, eventList);
+    }
+
     void makeGui();
     void deleteGui();
     void showGui(bool yesno);
@@ -380,8 +402,7 @@ public:
     virtual void reload() = 0;
     virtual void reloadPrograms(bool init) = 0;
 
-    virtual void process(uint32_t frames, float** src, float** dst) = 0;
-    virtual void process_synth() = 0;
+    virtual void process(uint32_t frames, float** src, float** dst, MPEventList* eventList) = 0;
     virtual void bufferSizeChanged(uint32_t bufferSize) = 0;
 
     virtual bool readConfiguration(Xml& xml, bool readPreset = false) = 0;
@@ -414,6 +435,8 @@ protected:
     QMutex m_proc_lock;
 
     // synths only
+    uint32_t m_ainsCount;
+    uint32_t m_aoutsCount;
     jack_port_t** m_ports_in;
     jack_port_t** m_ports_out;
 };
@@ -442,8 +465,7 @@ public:
     bool nativeGuiVisible();
     void updateNativeGui();
 
-    void process(uint32_t frames, float** src, float** dst);
-    void process_synth();
+    void process(uint32_t frames, float** src, float** dst, MPEventList* eventList);
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);
@@ -523,8 +545,7 @@ public:
     void ui_resize(int width, int height);
     void ui_write_function(uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer);
 
-    void process(uint32_t frames, float** src, float** dst);
-    void process_synth();
+    void process(uint32_t frames, float** src, float** dst, MPEventList* eventList);
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);
@@ -535,8 +556,6 @@ public:
     bool setControl(QString symbol, double value);
 
 private:
-    uint32_t m_ainsCount;
-    uint32_t m_aoutsCount;
     float* m_paramsBuffer;
     std::vector<unsigned long> m_audioInIndexes;
     std::vector<unsigned long> m_audioOutIndexes;
@@ -597,8 +616,7 @@ public:
 
     intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
-    void process(uint32_t frames, float** src, float** dst);
-    void process_synth();
+    void process(uint32_t frames, float** src, float** dst, MPEventList* eventList);
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);

@@ -10,6 +10,7 @@
 
 #include "plugin.h"
 #include "plugingui.h"
+#include "midi.h"
 #include "jackaudio.h"
 #include "track.h"
 #include "xml.h"
@@ -422,8 +423,6 @@ Lv2Plugin::Lv2Plugin()
     : BasePlugin()
 {
     m_type = PLUGIN_LV2;
-    m_ainsCount  = 0;
-    m_aoutsCount = 0;
     m_paramsBuffer = 0;
 
     m_customURIs.clear();
@@ -532,6 +531,27 @@ Lv2Plugin::~Lv2Plugin()
     for (uint16_t i=0; i<lv2_feature_count && features[i]; i++)
         delete features[i];
 
+    // use global client to delete synth audio ports
+    if (m_hints & PLUGIN_IS_SYNTH)
+    {
+        jack_client_t* jclient = 0;
+        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+            jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
+
+        if (m_ainsCount > 0)
+        {
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                jack_port_unregister(jclient, m_ports_in[i]);
+        }
+
+        if (m_aoutsCount > 0)
+        {
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                jack_port_unregister(jclient, m_ports_out[i]);
+        }
+    }
+
+    // delete old data
     if (m_paramCount > 0)
         delete[] m_paramsBuffer;
 
@@ -1502,15 +1522,15 @@ void Lv2Plugin::ui_write_function(uint32_t port_index, uint32_t buffer_size, uin
     // handle more formats later, not used in plugins currently
 }
 
-void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
+void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* eventList)
 {
     if (descriptor && m_enabled)
     {
         m_proc_lock.lock();
+        // --------------------------
+
         if (m_active)
         {
-            // TODO - cleanup this a bit when synth works
-
             // init events
             LV2_Event_Iterator ev_iters[m_events.size()];
             for (size_t i = 0; i < m_events.size(); i++)
@@ -1524,55 +1544,106 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
             int aouts = m_audioOutIndexes.size();
             bool need_buffer_copy  = false;
             bool need_extra_buffer = false;
-            uint32_t pin, pout;
 
-            // FX plugin
-            if (ains == aouts)
+            if (m_hints & PLUGIN_IS_FX)
             {
-                if (aouts <= m_channels)
+                // synths already have connected ports
+                if (ains == aouts)
                 {
-                    for (int i=0; i < ains; i++)
+                    int max = m_channels;
+                    uint32_t pin, pout;
+
+                    if (aouts < m_channels)
+                    {
+                        max = aouts;
+                        need_buffer_copy = true;
+                    }
+                    else if (aouts > m_channels)
+                    {
+                        need_extra_buffer = true;
+                    }
+
+                    for (int i=0; i < max; i++)
                     {
                         pin  = m_audioInIndexes.at(i);
                         pout = m_audioOutIndexes.at(i);
                         descriptor->connect_port(handle, pin, src[i]);
                         descriptor->connect_port(handle, pout, dst[i]);
-                        need_buffer_copy = true;
                     }
                 }
                 else
                 {
-                    for (int i=0; i < m_channels ; i++)
-                    {
-                        pin  = m_audioInIndexes.at(i);
-                        pout = m_audioOutIndexes.at(i);
-                        descriptor->connect_port(handle, pin, src[i]);
-                        descriptor->connect_port(handle, pout, dst[i]);
-                        need_extra_buffer = true;
-                    }
+                    // cannot proccess
+                    m_proc_lock.unlock();
+                    return;
                 }
             }
-            else
+            else if (m_hints & PLUGIN_IS_SYNTH)
             {
-                // cannot proccess
-                m_proc_lock.unlock();
-                return;
+                for (uint32_t i=0; i < m_ainsCount; i++)
+                    descriptor->connect_port(handle, m_audioInIndexes.at(i), src[i]);
+
+                for (uint32_t i=0; i < m_aoutsCount; i++)
+                    descriptor->connect_port(handle, m_audioOutIndexes.at(i), dst[i]);
             }
 
             for (size_t i = 0; i < m_events.size(); i++)
             {
                 if (m_events[i].types & OOM_URI_MAP_ID_EVENT_MIDI)
                 {
-                    if (false) // TODO - get events
+                    iMPEvent ev = eventList->begin();
+                    for (; ev != eventList->end(); ++ev)
                     {
-                        uint8_t* midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
+                        qWarning("Has event -> %i | %i | %i : 0x%02X 0x%02X 0x%02X", ev->channel(), ev->len(), ev->time(), ev->type(), ev->dataA(), ev->dataB());
+                        uint8_t* midi_event;
 
-                        if (midi_event)
+                        switch (ev->type())
                         {
-                            midi_event[0] = 0x90;
-                            midi_event[1] = 64;
-                            midi_event[2] = 100;
+                        case ME_NOTEOFF:
+                            midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 2);
+                            midi_event[0] = ME_NOTEOFF + ev->channel();
+                            midi_event[1] = ev->dataA();
+                            break;
+                        case ME_NOTEON:
+                            midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
+                            midi_event[0] = ME_NOTEON + ev->channel();
+                            midi_event[1] = ev->dataA();
+                            midi_event[2] = ev->dataB();
+                            break;
                         }
+
+                        //if ()
+                            //break;
+
+                        //uint8_t* midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, ev->len());
+                        //if (midi_event)
+                        //{
+                        //    midi_event[0] = ev->dataA();
+                        //    midi_event[1] = 64;
+                        //    midi_event[2] = 100;
+                        //}
+                    }
+                    eventList->erase(eventList->begin(), ev);
+
+                    // we only care about 1 midi synth port
+                    break;
+                }
+            }
+
+            // Process automation
+            if (m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
+            {
+                for (uint32_t i = 0; i < m_paramCount; i++)
+                {
+                    if (m_params[i].enCtrl && m_params[i].en2Ctrl)
+                    {
+                        m_params[i].tmpValue = m_track->pluginCtrlVal(genACnum(m_id, i));
+                    }
+
+                    if (m_params[i].value != m_params[i].tmpValue)
+                    {
+                        m_params[i].value = m_paramsBuffer[i] = m_params[i].tmpValue;
+                        m_params[i].update = true;
                     }
                 }
             }
@@ -1655,11 +1726,13 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
                 float extra_buffer[frames];
                 memset(extra_buffer, 0, sizeof(float)*frames);
 
-                for (int i=m_channels; i < ains ; i++)
+                for (int i=m_channels; i < aouts ; i++)
                 {
                     descriptor->connect_port(handle, m_audioInIndexes.at(i), extra_buffer);
                     descriptor->connect_port(handle, m_audioOutIndexes.at(i), extra_buffer);
                 }
+
+                descriptor->run(handle, frames);
             }
             else
             {
@@ -1681,13 +1754,12 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
                     descriptor->deactivate(handle);
             }
         }
+
         m_activeBefore = m_active;
+
+        // --------------------------
         m_proc_lock.unlock();
     }
-}
-
-void Lv2Plugin::process_synth()
-{
 }
 
 void Lv2Plugin::bufferSizeChanged(uint32_t)

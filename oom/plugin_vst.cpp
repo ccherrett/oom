@@ -532,7 +532,7 @@ intptr_t VstPlugin::dispatcher(int32_t opcode, int32_t index, intptr_t value, vo
     return effect->dispatcher(effect, opcode, index, value, ptr, opt);
 }
 
-void VstPlugin::process(uint32_t frames, float** src, float** dst)
+void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* eventList)
 {
     if (effect && m_enabled)
     {
@@ -589,10 +589,6 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst)
         m_activeBefore = m_active;
         m_proc_lock.unlock();
     }
-}
-
-void VstPlugin::process_synth()
-{
 }
 
 void VstPlugin::bufferSizeChanged(uint32_t bsize)
