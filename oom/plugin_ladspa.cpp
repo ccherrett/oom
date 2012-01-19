@@ -10,11 +10,13 @@
 
 #include "plugin.h"
 #include "plugingui.h"
-#include "song.h"
+#include "track.h"
+#include "xml.h"
 
 #include <math.h>
 
 LadspaPlugin::LadspaPlugin()
+    : BasePlugin()
 {
     m_type = PLUGIN_LADSPA;
     m_paramsBuffer = 0;
@@ -59,7 +61,8 @@ void LadspaPlugin::initPluginI(PluginI* plugi, const QString& filename, const QS
     if (LADSPA_IS_INPLACE_BROKEN(descr->Properties))
         plugi->m_hints |= PLUGIN_HAS_IN_PLACE_BROKEN;
 
-    if (plugi->m_audioInputCount >= 1 && plugi->m_audioOutputCount >= 1)
+    if (plugi->m_audioInputCount == plugi->m_audioOutputCount && plugi->m_audioOutputCount >= 1)
+        // we can only process plugins that have the same number of input/output audio ports
         plugi->m_hints |= PLUGIN_IS_FX;
 
     Q_UNUSED(filename);
@@ -68,16 +71,16 @@ void LadspaPlugin::initPluginI(PluginI* plugi, const QString& filename, const QS
 
 bool LadspaPlugin::init(QString filename, QString label)
 {
-    _lib = lib_open(filename.toAscii().constData());
+    m_lib = lib_open(filename.toUtf8().constData());
 
-    if (_lib)
+    if (m_lib)
     {
-        LADSPA_Descriptor_Function descfn = (LADSPA_Descriptor_Function) lib_symbol(_lib, "ladspa_descriptor");
+        LADSPA_Descriptor_Function descfn = (LADSPA_Descriptor_Function) lib_symbol(m_lib, "ladspa_descriptor");
 
         if (descfn)
         {
             unsigned long i = 0;
-            const char* c_label = strdup(label.toStdString().data());
+            const char* c_label = strdup(label.toUtf8().constData());
 
             while ((descriptor = descfn(i++)))
             {
@@ -128,6 +131,11 @@ bool LadspaPlugin::init(QString filename, QString label)
 
 void LadspaPlugin::reload()
 {
+    // safely disable plugin during reload
+    m_proc_lock.lock();
+    m_enabled = false;
+    m_proc_lock.unlock();
+
     // delete old data
     if (m_paramCount > 0)
     {
@@ -168,7 +176,7 @@ void LadspaPlugin::reload()
     if (LADSPA_IS_INPLACE_BROKEN(descriptor->Properties))
         m_hints |= PLUGIN_HAS_IN_PLACE_BROKEN;
 
-    if (ains > 1 && aouts > 1)
+    if (ains == aouts && aouts > 1)
         m_hints |= PLUGIN_IS_FX;
 
     // allocate data
@@ -376,6 +384,11 @@ void LadspaPlugin::reload()
             descriptor->connect_port(handle, i, 0);
         }
     }
+
+    // enable it again
+    m_proc_lock.lock();
+    m_enabled = true;
+    m_proc_lock.unlock();
 }
 
 void LadspaPlugin::reloadPrograms(bool)
@@ -393,7 +406,7 @@ QString LadspaPlugin::getParameterName(uint32_t index)
 
 void LadspaPlugin::setNativeParameterValue(uint32_t index, double value)
 {
-    if (descriptor && index < m_paramCount)
+    if (index < m_paramCount)
         m_paramsBuffer[index] = value;
 }
 
@@ -417,9 +430,11 @@ void LadspaPlugin::updateNativeGui()
 
 void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
 {
-    if (descriptor && _enabled)
+    if (descriptor && m_enabled)
     {
-        _proc_lock.lock();
+        m_proc_lock.lock();
+        // --------------------------
+
         if (m_active)
         {
             // connect ports
@@ -431,39 +446,35 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
 
             if (ains == aouts)
             {
-                if (aouts <= m_channels)
+                int max = m_channels;
+
+                if (aouts < m_channels)
                 {
-                    for (int i=0; i < ains; i++)
-                    {
-                        pin  = m_audioInIndexes.at(i);
-                        pout = m_audioOutIndexes.at(i);
-                        descriptor->connect_port(handle, pin, src[i]);
-                        descriptor->connect_port(handle, pout, dst[i]);
-                        need_buffer_copy = true;
-                    }
+                    max = aouts;
+                    need_buffer_copy = true;
                 }
-                else
+                else if (aouts > m_channels)
                 {
-                    for (int i=0; i < m_channels ; i++)
-                    {
-                        pin  = m_audioInIndexes.at(i);
-                        pout = m_audioOutIndexes.at(i);
-                        descriptor->connect_port(handle, pin, src[i]);
-                        descriptor->connect_port(handle, pout, dst[i]);
-                        need_extra_buffer = true;
-                    }
+                    need_extra_buffer = true;
+                }
+
+                for (int i=0; i < max; i++)
+                {
+                    pin  = m_audioInIndexes.at(i);
+                    pout = m_audioOutIndexes.at(i);
+                    descriptor->connect_port(handle, pin, src[i]);
+                    descriptor->connect_port(handle, pout, dst[i]);
                 }
             }
             else
             {
-                // cannot proccess
-                _proc_lock.unlock();
+                // cannot proccess (this should not happen)
+                m_proc_lock.unlock();
                 return;
             }
 
             // Process automation
-            qWarning("Automation TEST %p %i %i", m_track, m_track->automationType(), m_id);
-            if (/*automation &&*/ m_track /*&& m_track->automationType() != AUTO_OFF*/ && m_id != -1)
+            if (m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
             {
                 for (uint32_t i = 0; i < m_paramCount; i++)
                 {
@@ -474,14 +485,11 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
 
                     if (m_params[i].value != m_params[i].tmpValue)
                     {
-                        qWarning("Automation Success 444 --------------------------------------------------------------------------------");
                         m_params[i].value = m_paramsBuffer[i] = m_params[i].tmpValue;
                         m_params[i].update = true;
                     }
                 }
             }
-            else
-                qWarning("Automation Fail");
 
             // activate if needed
             if (m_activeBefore == false)
@@ -496,18 +504,20 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
                 if (m_hints & PLUGIN_HAS_IN_PLACE_BROKEN)
                 {
                     // cannot proccess
-                    _proc_lock.unlock();
+                    m_proc_lock.unlock();
                     return;
                 }
 
                 float extra_buffer[frames];
                 memset(extra_buffer, 0, sizeof(float)*frames);
 
-                for (int i=m_channels; i < ains ; i++)
+                for (int i=m_channels; i < aouts ; i++)
                 {
                     descriptor->connect_port(handle, m_audioInIndexes.at(i), extra_buffer);
                     descriptor->connect_port(handle, m_audioOutIndexes.at(i), extra_buffer);
                 }
+
+                descriptor->run(handle, frames);
             }
             else
             {
@@ -515,7 +525,7 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
 
                 if (need_buffer_copy)
                 {
-                    for (int i=ains; i < m_channels ; i++)
+                    for (int i=aouts; i < m_channels ; i++)
                         memcpy(dst[i], dst[i-1], sizeof(float)*frames);
                 }
             }
@@ -528,9 +538,17 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst)
                     descriptor->deactivate(handle);
             }
         }
+
         m_activeBefore = m_active;
-        _proc_lock.unlock();
+
+        // --------------------------
+        m_proc_lock.unlock();
     }
+}
+
+void LadspaPlugin::process_synth()
+{
+    // LADSPA has no synth support
 }
 
 void LadspaPlugin::bufferSizeChanged(uint32_t)
@@ -558,7 +576,7 @@ bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)
                 return true;
 
             case Xml::TagStart:
-                if (readPreset == false && ! _lib)
+                if (readPreset == false && !m_lib)
                 {
                     QFileInfo fi(new_filename);
 
@@ -590,13 +608,7 @@ bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)
                 else if (tag == "gui")
                 {
                     bool yesno = xml.parseInt();
-
-                    if (yesno)
-                    {
-                        if (! m_gui)
-                            m_gui = new PluginGui(this);
-                        m_gui->show();
-                    }
+                    showGui(yesno);
                 }
                 else if (tag == "geometry")
                 {
@@ -644,13 +656,12 @@ bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)
             case Xml::TagEnd:
                 if (tag == "LadspaPlugin")
                 {
-                    if (! _lib)
-                        return true;
-
-                    if (m_gui)
-                        m_gui->updateValues();
-
-                    return false;
+                    if (m_lib)
+                    {
+                        if (m_gui)
+                            m_gui->updateValues();
+                        return false;
+                    }
                 }
                 return true;
 
@@ -664,7 +675,7 @@ bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)
 void LadspaPlugin::writeConfiguration(int level, Xml& xml)
 {
     xml.tag(level++, "LadspaPlugin filename=\"%s\" label=\"%s\" channels=\"%d\"",
-            Xml::xmlString(m_filename).toLatin1().constData(), Xml::xmlString(m_label).toLatin1().constData(), m_channels);
+            Xml::xmlString(m_filename).toUtf8().constData(), Xml::xmlString(m_label).toUtf8().constData(), m_channels);
 
     for (uint32_t i = 0; i < m_paramCount; i++)
     {

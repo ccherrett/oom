@@ -427,7 +427,6 @@ ende:
 void PluginGui::save()
 {
     QString s("presets/plugins/");
-    //s += plugin->plugin()->label();
     s += plugin->label();
     s += "/";
 
@@ -642,8 +641,6 @@ void PluginGui::ctrlPressed(int param)
 
 void PluginGui::ctrlReleased(int param)
 {
-    qWarning("Ctrl released");
-
     AutomationType at = AUTO_OFF;
     AudioTrack* track = plugin->track();
     if (track)
@@ -686,6 +683,5 @@ void PluginGui::ctrlRightClicked(const QPoint &p, int param)
 {
     int id = plugin->id();
     if (id != -1)
-        //song->execAutomationCtlPopup((AudioTrack*)plugin->track(), p, genACnum(id, param));
         song->execAutomationCtlPopup(plugin->track(), p, genACnum(id, param));
 }

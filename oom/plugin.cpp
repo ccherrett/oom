@@ -49,6 +49,7 @@
 #include "checkbox.h"
 
 #include "audio.h"
+#include "jackaudio.h"
 #include "al/dsp.h"
 
 #include "lib_functions.h"
@@ -146,6 +147,178 @@ void BasePlugin::showGui(bool yesno)
 bool BasePlugin::guiVisible()
 {
     return (m_gui && m_gui->isVisible());
+}
+
+//---------------------------------------------------------
+//   SynthPluginDevice
+//---------------------------------------------------------
+
+SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString name, QString label)
+    : MidiDevice(),
+      MidiInstrument()
+{
+    m_type = type;
+    m_filename = filename;
+    m_label = label;
+    m_plugin = 0;
+
+    m_name = name;
+
+    switch (type)
+    {
+    case PLUGIN_LV2:
+        m_name += " [LV2]";
+        break;
+    case PLUGIN_VST:
+        m_name += " [VST]";
+        break;
+    default:
+        break;
+    }
+
+    MidiDevice::setName(m_name);
+    MidiInstrument::setIName(m_name);
+}
+
+SynthPluginDevice::~SynthPluginDevice()
+{
+}
+
+//---------------------------------------------------------
+//   open, init plugin
+//---------------------------------------------------------
+
+QString SynthPluginDevice::open()
+{
+    qWarning("SynthPluginDevice::open()");
+
+    // Make it behave like a regular midi device.
+    _readEnable = false;
+    _writeEnable = (_openFlags & 0x01);
+
+    if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+    {
+        jack_client_t* client = ((JackAudioDevice*)audioDevice)->getJackClient();
+        if (client)
+        {
+            if (m_type == PLUGIN_LV2)
+                m_plugin = new Lv2Plugin();
+            else if (m_type == PLUGIN_VST)
+                m_plugin = new VstPlugin();
+
+            if (m_plugin->init(m_filename, m_label))
+            {
+
+            }
+        }
+    }
+
+    return QString("OK");
+}
+
+//---------------------------------------------------------
+//   close, delete plugin
+//---------------------------------------------------------
+
+void SynthPluginDevice::close()
+{
+    qWarning("SynthPluginDevice::close()");
+
+    _readEnable = false;
+    _writeEnable = false;
+
+    if (m_plugin)
+        delete m_plugin;
+
+    m_plugin = 0;
+}
+
+//---------------------------------------------------------
+//   setName
+//---------------------------------------------------------
+
+void SynthPluginDevice::setName(const QString& s)
+{
+    m_name = s;
+    MidiDevice::setName(s);
+}
+
+//---------------------------------------------------------
+//   Midi processing (inside jack process callback)
+//---------------------------------------------------------
+
+void SynthPluginDevice::collectMidiEvents()
+{
+    if (m_plugin)
+    {
+        //qWarning("SynthPluginDevice::collectMidiEvents()");
+    }
+}
+
+void SynthPluginDevice::processMidi()
+{
+    if (m_plugin)
+    {
+        //qWarning("SynthPluginDevice::processMidi()");
+    }
+}
+
+//---------------------------------------------------------
+//   GUI Stuff
+//---------------------------------------------------------
+
+bool SynthPluginDevice::guiVisible() const
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::guiVisible()");
+        if (m_plugin->hasNativeGui())
+            return m_plugin->nativeGuiVisible();
+        else
+            return m_plugin->guiVisible();
+    }
+    return false;
+}
+
+void SynthPluginDevice::showGui(bool yesno)
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::showGui()");
+        if (m_plugin->hasNativeGui())
+            m_plugin->showNativeGui(yesno);
+        else
+            m_plugin->showGui(yesno);
+    }
+}
+
+bool SynthPluginDevice::hasGui() const
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::hasGui()");
+        return true; // use built-in UI for gui-less plugins
+    }
+    return false;
+}
+
+//---------------------------------------------------------
+//   receiveEvent
+//---------------------------------------------------------
+
+MidiPlayEvent SynthPluginDevice::receiveEvent()
+{
+    qWarning("SynthPluginDevice::receiveEvent()");
+    return MidiPlayEvent() ;//_sif->receiveEvent();
+}
+
+//---------------------------------------------------------
+//   eventsPending
+//---------------------------------------------------------
+
+int SynthPluginDevice::eventsPending() const
+{
+    return 0; //_sif->eventsPending();
 }
 
 //---------------------------------------------------------

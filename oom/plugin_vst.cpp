@@ -174,6 +174,7 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
 }
 
 VstPlugin::VstPlugin()
+    : BasePlugin()
 {
     m_type = PLUGIN_VST;
 
@@ -247,19 +248,19 @@ void VstPlugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
 
 bool VstPlugin::init(QString filename, QString label)
 {
-    _lib = lib_open(filename.toAscii().constData());
+    m_lib = lib_open(filename.toAscii().constData());
 
-    if (_lib)
+    if (m_lib)
     {
-        VST_Function vstfn = (VST_Function) lib_symbol(_lib, "VSTPluginMain");
+        VST_Function vstfn = (VST_Function) lib_symbol(m_lib, "VSTPluginMain");
 
         if (! vstfn)
         {
-            vstfn = (VST_Function) lib_symbol(_lib, "main");
+            vstfn = (VST_Function) lib_symbol(m_lib, "main");
 
 #ifdef TARGET_API_MAC_CARBON
             if (! vstfn)
-                vstfn = (VST_Function)lib_symbol(_lib, "main_macho");
+                vstfn = (VST_Function)lib_symbol(m_lib, "main_macho");
 #endif
         }
 
@@ -533,15 +534,15 @@ intptr_t VstPlugin::dispatcher(int32_t opcode, int32_t index, intptr_t value, vo
 
 void VstPlugin::process(uint32_t frames, float** src, float** dst)
 {
-    if (effect && _enabled)
+    if (effect && m_enabled)
     {
-        _proc_lock.lock();
+        m_proc_lock.lock();
         if (m_active)
         {
             if (effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels)
             {
                 // cannot proccess
-                _proc_lock.unlock();
+                m_proc_lock.unlock();
                 return;
             }
 
@@ -586,8 +587,12 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst)
             }
         }
         m_activeBefore = m_active;
-        _proc_lock.unlock();
+        m_proc_lock.unlock();
     }
+}
+
+void VstPlugin::process_synth()
+{
 }
 
 void VstPlugin::bufferSizeChanged(uint32_t bsize)
@@ -627,7 +632,7 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
                 return true;
 
             case Xml::TagStart:
-                if (readPreset == false && ! _lib)
+                if (readPreset == false && !m_lib)
                 {
                     QFileInfo fi(new_filename);
 
@@ -718,13 +723,12 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
             case Xml::TagEnd:
                 if (tag == "VstPlugin")
                 {
-                    if (! _lib)
-                        return true;
-
-                    if (m_gui)
-                        m_gui->updateValues();
-
-                    return false;
+                    if (m_lib)
+                    {
+                        if (m_gui)
+                            m_gui->updateValues();
+                        return false;
+                    }
                 }
                 return true;
 

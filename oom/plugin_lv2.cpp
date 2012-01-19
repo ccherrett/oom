@@ -502,6 +502,7 @@ static void oom_lv2_ui_write_function(LV2UI_Controller controller, uint32_t port
 }
 
 Lv2Plugin::Lv2Plugin()
+    : BasePlugin()
 {
     m_type = PLUGIN_LV2;
     m_paramsBuffer = 0;
@@ -678,11 +679,11 @@ bool Lv2Plugin::init(QString filename, QString label)
 
     if (lplug)
     {
-        _lib = lib_open(lilv_uri_to_path(lilv_node_as_uri(lilv_plugin_get_library_uri(lplug))));
+        m_lib = lib_open(lilv_uri_to_path(lilv_node_as_uri(lilv_plugin_get_library_uri(lplug))));
 
-        if (_lib)
+        if (m_lib)
         {
-            LV2_Descriptor_Function descfn = (LV2_Descriptor_Function) lib_symbol(_lib, "lv2_descriptor");
+            LV2_Descriptor_Function descfn = (LV2_Descriptor_Function) lib_symbol(m_lib, "lv2_descriptor");
 
             if (descfn)
             {
@@ -1520,9 +1521,9 @@ void Lv2Plugin::ui_write_function(uint32_t port_index, uint32_t buffer_size, uin
 
 void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
 {
-    if (descriptor && _enabled)
+    if (descriptor && m_enabled)
     {
-        _proc_lock.lock();
+        m_proc_lock.lock();
         if (m_active)
         {
             // TODO - cleanup this a bit when synth works
@@ -1571,7 +1572,7 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
             else
             {
                 // cannot proccess
-                _proc_lock.unlock();
+                m_proc_lock.unlock();
                 return;
             }
 
@@ -1664,7 +1665,7 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
                 if (m_hints & PLUGIN_HAS_IN_PLACE_BROKEN)
                 {
                     // cannot proccess
-                    _proc_lock.unlock();
+                    m_proc_lock.unlock();
                     return;
                 }
 
@@ -1698,8 +1699,12 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst)
             }
         }
         m_activeBefore = m_active;
-        _proc_lock.unlock();
+        m_proc_lock.unlock();
     }
+}
+
+void Lv2Plugin::process_synth()
+{
 }
 
 void Lv2Plugin::bufferSizeChanged(uint32_t)
@@ -1726,7 +1731,7 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
                 return true;
 
             case Xml::TagStart:
-                if (readPreset == false && ! _lib)
+                if (readPreset == false && !m_lib)
                 {
                     LilvNode* pluginURI = lilv_new_uri(lv2world->world, new_uri.toAscii().constData());
                     lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
@@ -1797,13 +1802,12 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
             case Xml::TagEnd:
                 if (tag == "Lv2Plugin")
                 {
-                    if (! _lib)
-                        return true;
-
-                    if (m_gui)
-                        m_gui->updateValues();
-
-                    return false;
+                    if (m_lib)
+                    {
+                        if (m_gui)
+                            m_gui->updateValues();
+                        return false;
+                    }
                 }
                 return true;
 

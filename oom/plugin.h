@@ -29,6 +29,9 @@
 #include <QFileInfo>
 #include <QMutex>
 
+// needed for synths
+#include <jack/jack.h>
+
 // ladspa includes
 #include "ladspa.h"
 
@@ -96,12 +99,12 @@ public:
         value  = 0.0;
         tmpValue = 0.0;
 
-        ranges.def = 0.0f;
-        ranges.min = 0.0f;
-        ranges.max = 1.0f;
-        ranges.step = 0.001f;
-        ranges.step_small = 0.0001f;
-        ranges.step_large = 0.1f;
+        ranges.def = 0.0;
+        ranges.min = 0.0;
+        ranges.max = 1.0;
+        ranges.step = 0.001;
+        ranges.step_small = 0.0001;
+        ranges.step_large = 0.1;
 
         enCtrl  = true;
         en2Ctrl = true;
@@ -161,8 +164,11 @@ public:
         m_track = 0;
         m_gui = 0;
 
-        _enabled = true;
-        _lib = 0;
+        m_enabled = true;
+        m_lib = 0;
+
+        m_ports_in = 0;
+        m_ports_out = 0;
     }
 
     ~BasePlugin()
@@ -172,8 +178,8 @@ public:
         if (m_paramCount > 0)
             delete[] m_params;
 
-        if (_lib)
-            lib_close(_lib);
+        if (m_lib)
+            lib_close(m_lib);
     }
 
     PluginType type() const
@@ -352,9 +358,9 @@ public:
 
     void aboutToRemove()
     {
-        _proc_lock.lock();
-        _enabled = false;
-        _proc_lock.unlock();
+        m_proc_lock.lock();
+        m_enabled = false;
+        m_proc_lock.unlock();
     }
 
     void makeGui();
@@ -375,6 +381,7 @@ public:
     virtual void reloadPrograms(bool init) = 0;
 
     virtual void process(uint32_t frames, float** src, float** dst) = 0;
+    virtual void process_synth() = 0;
     virtual void bufferSizeChanged(uint32_t bufferSize) = 0;
 
     virtual bool readConfiguration(Xml& xml, bool readPreset = false) = 0;
@@ -402,9 +409,13 @@ protected:
     AudioTrack* m_track;
     PluginGui* m_gui;
 
-    bool _enabled;
-    void* _lib;
-    QMutex _proc_lock;
+    bool m_enabled;
+    void* m_lib;
+    QMutex m_proc_lock;
+
+    // synths only
+    jack_port_t** m_ports_in;
+    jack_port_t** m_ports_out;
 };
 
 //---------------------------------------------------------
@@ -432,6 +443,7 @@ public:
     void updateNativeGui();
 
     void process(uint32_t frames, float** src, float** dst);
+    void process_synth();
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);
@@ -453,8 +465,6 @@ protected:
 //   LV2 Plugin
 //---------------------------------------------------------
 
-//class LV2ControlFifo;
-
 class Lv2Plugin : public BasePlugin
 {
 public:    
@@ -466,7 +476,7 @@ public:
         UI_EXTERNAL
     };
 
-    // NOTE - need to preserve this enum order
+    // NOTE - we need to preserve this enum order
     // to be backwards compatible
     enum Lv2StateType {
         STATE_NULL   = 0,
@@ -514,6 +524,7 @@ public:
     void ui_write_function(uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer);
 
     void process(uint32_t frames, float** src, float** dst);
+    void process_synth();
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);
@@ -530,7 +541,6 @@ private:
     std::vector<Lv2Event> m_events;
     QList<const char*> m_customURIs;
     QList<Lv2State> m_lv2States;
-    //LV2ControlFifo* m_controlFifo;
 
     struct {
         UiType type;
@@ -585,6 +595,7 @@ public:
     intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
     void process(uint32_t frames, float** src, float** dst);
+    void process_synth();
     void bufferSizeChanged(uint32_t bufferSize);
 
     bool readConfiguration(Xml& xml, bool readPreset);
@@ -618,61 +629,12 @@ class SynthPluginDevice :
         public MidiInstrument
 {
 public:
-    SynthPluginDevice(PluginType type, QString filename, QString name, QString label)
-    {
-        m_type = type;
-        m_filename = filename;
-        m_label = label;
-        m_plugin = 0;
-
-        m_name = name;
-
-        switch (type)
-        {
-        case PLUGIN_LV2:
-            m_name += " [LV2]";
-            break;
-        case PLUGIN_VST:
-            m_name += " [VST]";
-            break;
-        default:
-            break;
-        }
-
-        MidiDevice::setName(m_name);
-        MidiInstrument::setIName(m_name);
-    }
-
-    ~SynthPluginDevice()
-    {
-    }
+    SynthPluginDevice(PluginType type, QString filename, QString name, QString label);
+    ~SynthPluginDevice();
 
     virtual int deviceType()
     {
         return MidiDevice::SYNTH_MIDI;
-    }
-
-    virtual QString open()
-    {
-        qWarning("SynthPluginDevice::open()");
-
-        // Make it behave like a regular midi device.
-        _readEnable = false;
-        _writeEnable = (_openFlags & 0x01);
-
-        return QString("OK");
-    }
-
-    virtual void close()
-    {
-        qWarning("SynthPluginDevice::close()");
-
-        _readEnable = false;
-        _writeEnable = false;
-
-        if (m_plugin)
-            delete m_plugin;
-        m_plugin = 0;
     }
 
     virtual bool isSynthPlugin() const
@@ -685,12 +647,6 @@ public:
         return m_name;
     }
 
-    void setName(const QString& s)
-    {
-        m_name = s;
-        MidiDevice::setName(s);
-    }
-
     QString filename()
     {
         return m_filename;
@@ -701,15 +657,18 @@ public:
         return m_label;
     }
 
-    MidiPlayEvent receiveEvent()
-    {
-        return MidiPlayEvent() ;//_sif->receiveEvent();
-    }
+    virtual QString open();
+    virtual void close();
+    virtual void setName(const QString& s);
 
-    int eventsPending() const
-    {
-        return 0; //_sif->eventsPending();
-    }
+    virtual void collectMidiEvents();
+    virtual void processMidi();
+    virtual bool guiVisible() const;
+    virtual void showGui(bool yesno);
+    virtual bool hasGui() const;
+
+    MidiPlayEvent receiveEvent();
+    int eventsPending() const;
 
 protected:
     virtual bool putMidiEvent(const MidiPlayEvent&)
