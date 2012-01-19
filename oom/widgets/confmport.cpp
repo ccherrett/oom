@@ -750,7 +750,7 @@ _redisplay:
 
 		case DEVCOL_INSTR:
 		{
-			if (dev && dev->isSynti())
+            if (dev && dev->isSynthPlugin())
 				//break;
 				return;
 			if (instrPopup == 0)
@@ -999,7 +999,7 @@ void MPConfig::songChanged(int flags)
 		{
 			itemgui->setIcon(QIcon(QPixmap()));
 		}
-		if (!(dev && dev->isSynti()))
+        if (!(dev && dev->isSynthPlugin()))
 			iteminstr->setIcon(QIcon(*buttondownIcon));
 		itemname->setIcon(QIcon(*buttondownIcon));
 

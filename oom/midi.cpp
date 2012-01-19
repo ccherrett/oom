@@ -22,6 +22,7 @@
 #include "midiport.h"
 #include "midictrl.h"
 #include "audio.h"
+#include "plugin.h"
 #include "mididev.h"
 #include "driver/alsamidi.h"
 #include "driver/jackmidi.h"
@@ -1028,14 +1029,14 @@ void Audio::processMidi()
 		MidiDevice* md = *id;
 
 		// klumsy hack for synti devices:
-		if (md->isSynti())
+        if (md->isSynthPlugin())
 		{
-			SynthI* s = (SynthI*) md;
-			while (s->eventsPending())
-			{
-				MidiRecordEvent ev = s->receiveEvent();
-				md->recordEvent(ev);
-			}
+            SynthPluginDevice* s = (SynthPluginDevice*) md;
+            while (s->eventsPending())
+            {
+                MidiRecordEvent ev = s->receiveEvent();
+                md->recordEvent(ev);
+            }
 		}
 
 		md->collectMidiEvents();
@@ -1111,7 +1112,7 @@ void Audio::processMidi()
 
 							// dont't echo controller changes back to software
 							// synthesizer:
-							if (!dev->isSynti() && md && track->recEcho())
+                            if (!dev->isSynthPlugin() && md && track->recEcho())
 								playEvents->add(event);
 
 							// If syncing externally the event time is already in units of ticks, set above.
@@ -1222,7 +1223,7 @@ void Audio::processMidi()
 							// dont't echo controller changes back to software
 							// synthesizer:
 
-							if (!dev->isSynti())
+                            if (!dev->isSynthPlugin())
 							{
 								//printf("444444444444444444444444444444444444444444444444444444\n");
 								//Check if we're outputting to another port than default:
