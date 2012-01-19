@@ -114,6 +114,8 @@ public:
 	bool loadInstrument(MidiInstrument*);
 	bool unloadInstrument(MidiInstrument*);
 	
+	int createMidiInputDevice(char* name, const char* type = "JACK", int ports = 1);
+	int createAudioOutputDevice(char* name, const char* type = "JACK", int ports = 1, int iSrate = 48000);
 	QMap<int, QString> listInstruments();
 	QString getValidInstrumentName(QString nameBase);
 	QString getMapName(int);

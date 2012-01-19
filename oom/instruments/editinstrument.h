@@ -92,6 +92,12 @@ private slots:
     //void newSysexClicked();
     void ctrlNullParamHChanged(int);
     void ctrlNullParamLChanged(int);
+	void autoLoadChecked(bool);
+	void volumeChanged(double);
+	void engineChanged(int);
+	void loadmodeChanged(int);
+	void patchFilenameChanged();
+	void browseFilenameClicked();
 #ifdef LSCP_SUPPORT
 	void btnImportClicked(bool);
 #endif

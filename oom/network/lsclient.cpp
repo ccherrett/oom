@@ -20,6 +20,11 @@
 
 static const char* SOUND_PATH = "@@OOM_SOUNDS@@";
 static const QString SOUNDS_DIR = QString(QDir::homePath()).append(QDir::separator()).append(".sounds");
+static char sChannels[9] = "CHANNELS";
+static char sPorts[6] = "PORTS";
+static char sDevName[13] = "LinuxSampler";
+static char sName[5] = "NAME";
+static char sSampleRate[11] = "SAMPLERATE";
 
 LSClient::LSClient(const char* host, int p, QObject* parent) : QObject(parent)
 {
@@ -604,6 +609,48 @@ int LSClient::findMidiMap(const char* name)
 	return -1;
 }
 
+int LSClient::createAudioOutputDevice(char* name, const char* type, int ports, int iSrate)
+{
+	QString sport = QString::number(ports);
+	char cports[sport.size()+1];
+	strcpy(cports, sport.toUtf8().constData());
+	
+	QString srate = QString::number(iSrate);
+	char crate[srate.size()+1];
+	strcpy(crate, srate.toUtf8().constData());
+
+	lscp_param_t *aparams = new lscp_param_t[5];
+	aparams[0].key = sName;
+	aparams[0].value = name;
+	aparams[1].key = (char*)"ACTIVE";
+	aparams[1].value = (char*)"true";
+	aparams[2].key = sChannels;
+	aparams[2].value = cports;
+	aparams[3].key = sSampleRate;
+	aparams[3].value = crate;
+	aparams[4].key = NULL;
+	aparams[4].value = NULL;
+	
+	return ::lscp_create_audio_device(_client, type, aparams);
+}
+
+int LSClient::createMidiInputDevice(char* name, const char* type, int ports)
+{
+	QString sport = QString::number(ports);
+	char cports[sport.size()+1];
+	strcpy(cports, sport.toUtf8().constData());
+	
+	lscp_param_t* params = new lscp_param_t[3];
+	params[0].key = sName;
+	params[0].value = name;
+	params[1].key = sPorts;
+	params[1].value = cports;
+	params[2].key = NULL;
+	params[2].value = NULL;
+	
+	return ::lscp_create_midi_device(_client, type, params); 
+}
+
 bool LSClient::loadInstrument(MidiInstrument* instrument)
 {
 	if(_client != NULL && instrument && instrument->isOOMInstrument())
@@ -613,28 +660,12 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 		int mdevId = 0;
 		int adev = ::lscp_get_audio_devices(_client);
 		int adevId = 0;
-		char sChannels[9] = "CHANNELS";
-		char sPorts[6] = "PORTS";
-		char sDevName[13] = "LinuxSampler";
-		char sName[5] = "NAME";
 		qDebug("Client connected ready to load instrument, mdev: %d, adev: %d", mdev, adev);
 		if(!mapCount)
 		{// Create a midi input device
 			//CREATE MIDI_INPUT_DEVICE JACK NAME='LinuxSampler'
 			qDebug("No MIDI device found creating one");
-			lscp_param_t* params = new lscp_param_t[2];
-			
-			params[0].key = sName;
-			params[0].value = sDevName;
-			
-			//params[1].key = sPorts;
-			//params[1].value = (char*)"35";
-
-			params[1].key = NULL;
-			params[1].value = NULL;
-			
-			mdevId = ::lscp_create_midi_device(_client, "JACK", params); 
-		
+			mdevId = createMidiInputDevice(sDevName, "JACK", 1);	
 			//SET MIDI_INPUT_DEVICE_PARAMETER 0 PORTS=21
 			if(mdevId >= 0)
 			{
@@ -644,18 +675,7 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 			//Create an audio output device
 			//CREATE AUDIO_OUTPUT_DEVICE JACK ACTIVE=true CHANNELS=35 SAMPLERATE=48000 NAME='LinuxSampler'
 			qDebug("No Audio device found creating one");
-			lscp_param_t *aparams = new lscp_param_t[5];
-			aparams[0].key = sName;
-			aparams[0].value = sDevName;
-			aparams[1].key = (char*)"ACTIVE";
-			aparams[1].value = (char*)"true";
-			aparams[2].key = (char*)"CHANNELS";
-			aparams[2].value = (char*)"1";
-			aparams[3].key = (char*)"SAMPLERATE";
-			aparams[3].value = (char*)"48000";
-			aparams[4].key = NULL;
-			aparams[4].value = NULL;
-			adevId = ::lscp_create_audio_device(_client, "JACK", aparams);
+			adevId = createAudioOutputDevice(sDevName, "JACK", 1, 48000);
 			if(adevId >= 0)
 			{
 				qDebug("Created audio channel with id: %d", adevId);

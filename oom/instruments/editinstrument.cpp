@@ -49,7 +49,15 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	viewController->setSelectionMode(QAbstractItemView::SingleSelection);
 	toolBar->addAction(QWhatsThis::createAction(this));
 	Help->addAction(QWhatsThis::createAction(this));
+	
+	cmbEngine->addItem("GIG");
+	cmbEngine->addItem("SFZ");
+	cmbEngine->addItem("SF2");
 
+	cmbLoadMode->addItem("DEFAULT");
+	cmbLoadMode->addItem("ON_DEMAND");
+	cmbLoadMode->addItem("ON_DEMAND_HOLD");
+	cmbLoadMode->addItem("PERSISTENT");
 
 	populateInstruments();
 	connect(instrumentList, SIGNAL(itemSelectionChanged()), SLOT(instrumentChanged()));
@@ -87,6 +95,10 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	connect(nullParamSpinBoxL, SIGNAL(valueChanged(int)), SLOT(ctrlNullParamLChanged(int)));
 
 	connect(tabWidget3, SIGNAL(currentChanged(QWidget*)), SLOT(tabChanged(QWidget*)));
+
+	connect(btnBrowse, SIGNAL(clicked()), SLOT(browseFilenameClicked()));
+	connect(chkAutoload, SIGNAL(toggled(bool)), SLOT(autoLoadChecked(bool)));
+	
 	//disable this until we find LSCP_SUPPORT
 	btnImport->setEnabled(false);
 #ifdef LSCP_SUPPORT
@@ -146,6 +158,51 @@ void EditInstrument::btnImportClicked(bool)
 	import->show();
 }
 #endif
+
+void EditInstrument::autoLoadChecked(bool)
+{
+	QListWidgetItem* item = instrumentList->currentItem();
+	if(item)
+	{
+		workingInstrument.setOOMInstrument(chkAutoload->isChecked());
+		workingInstrument.setDirty(true);
+	}
+}
+
+void EditInstrument::volumeChanged(double)
+{
+}
+
+void EditInstrument::engineChanged(int)
+{
+}
+
+void EditInstrument::loadmodeChanged(int)
+{
+}
+
+void EditInstrument::patchFilenameChanged()
+{
+}
+
+void EditInstrument::browseFilenameClicked()
+{
+	QListWidgetItem* item = instrumentList->currentItem();
+	if(item)
+	{
+		QString filename = QFileDialog::getOpenFileName(
+			this,
+			tr("Open Sample File"),
+			QDir::currentPath(),
+			tr("Supported Files (*.gig,*.sfz,*.sf2);;All Files (*.*)"));
+		if(!filename.isNull())
+		{
+			txtFilename->setText(filename);
+			workingInstrument.setDirty(true);
+		}
+	}
+}
+
 //---------------------------------------------------------
 //   helpWhatsThis
 //---------------------------------------------------------
@@ -246,7 +303,7 @@ void EditInstrument::fileOpen()
 //   fileSave
 //---------------------------------------------------------
 
-void EditInstrument::fileSave()
+void EditInstrument::fileSave()/*{{{*/
 {
 	//if (instrument->filePath().isEmpty())
 	if (workingInstrument.filePath().isEmpty())
@@ -295,13 +352,13 @@ void EditInstrument::fileSave()
 
 	if (fileSave(&workingInstrument, workingInstrument.filePath()))
 		workingInstrument.setDirty(false);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   fileSave
 //---------------------------------------------------------
 
-bool EditInstrument::fileSave(MidiInstrument* instrument, const QString& name)
+bool EditInstrument::fileSave(MidiInstrument* instrument, const QString& name)/*{{{*/
 {
 	FILE* f = fopen(name.toAscii().constData(), "w");
 	if (f == 0)
@@ -343,13 +400,13 @@ bool EditInstrument::fileSave(MidiInstrument* instrument, const QString& name)
 		return false;
 	}
 	return true;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   saveAs
 //---------------------------------------------------------
 
-void EditInstrument::saveAs()
+void EditInstrument::saveAs()/*{{{*/
 {
 	// Allow these to update...
 	instrumentNameReturn();
@@ -417,13 +474,13 @@ void EditInstrument::saveAs()
 
 	if (fileSave(&workingInstrument, s))
 		workingInstrument.setDirty(false);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   fileSaveAs
 //---------------------------------------------------------
 
-void EditInstrument::fileSaveAs()
+void EditInstrument::fileSaveAs()/*{{{*/
 {
 	// Is this a new unsaved instrument? Just do a normal save.
 	if (workingInstrument.filePath().isEmpty())
@@ -648,7 +705,7 @@ void EditInstrument::fileSaveAs()
 
 	if (fileSave(&workingInstrument, sfn))
 		workingInstrument.setDirty(false);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   fileExit
@@ -716,7 +773,7 @@ void EditInstrument::closeEvent(QCloseEvent* ev)
 //   changeInstrument
 //---------------------------------------------------------
 
-void EditInstrument::changeInstrument()
+void EditInstrument::changeInstrument()/*{{{*/
 {
 	QListWidgetItem* sel = instrumentList->currentItem();
 
@@ -729,6 +786,10 @@ void EditInstrument::changeInstrument()
 	workingInstrument.assign(*((MidiInstrument*) sel->data(Qt::UserRole).value<void*>()));
 
 	workingInstrument.setDirty(false);
+
+	chkAutoload->blockSignals(true);
+	chkAutoload->setChecked(workingInstrument.isOOMInstrument());
+	chkAutoload->blockSignals(false);
 
 	// populate patch list
 	patchView->blockSignals(true);
@@ -830,13 +891,13 @@ void EditInstrument::changeInstrument()
 	}
 
 	controllerChanged();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   instrumentChanged
 //---------------------------------------------------------
 
-void EditInstrument::instrumentChanged()
+void EditInstrument::instrumentChanged()/*{{{*/
 {
 	QListWidgetItem* sel = instrumentList->currentItem();
 
@@ -868,7 +929,7 @@ void EditInstrument::instrumentChanged()
 	}
 	workingInstrument.setDirty(false);
 	changeInstrument();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   instrumentNameReturn
@@ -945,7 +1006,7 @@ void EditInstrument::deleteInstrument(QListWidgetItem* item)
 //    so that 'Program' default values and text are current in controller tab. 
 //---------------------------------------------------------
 
-void EditInstrument::tabChanged(QWidget* w)
+void EditInstrument::tabChanged(QWidget* w)/*{{{*/
 {
 	if (!w)
 		return;
@@ -981,7 +1042,7 @@ void EditInstrument::tabChanged(QWidget* w)
 		if (type == MidiController::Program)
 			setDefaultPatchName(getDefaultPatchNumber());
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   patchNameReturn
@@ -1081,6 +1142,11 @@ void EditInstrument::patchChanged()
 		checkBoxGM->setEnabled(false);
 		checkBoxGS->setEnabled(false);
 		checkBoxXG->setEnabled(false);
+		cmbEngine->setEnabled(false);
+		cmbLoadMode->setEnabled(false);
+		txtFilename->setEnabled(false);
+		txtVolume->setEnabled(false);
+		btnBrowse->setEnabled(false);
 		txtKeys->setEnabled(false);
 		txtKeySwitches->setEnabled(false);
 		return;
@@ -1100,6 +1166,11 @@ void EditInstrument::patchChanged()
 		checkBoxXG->setEnabled(true);
 		txtKeys->setEnabled(true);
 		txtKeySwitches->setEnabled(true);
+		cmbEngine->setEnabled(true);
+		cmbLoadMode->setEnabled(true);
+		txtFilename->setEnabled(true);
+		txtVolume->setEnabled(true);
+		btnBrowse->setEnabled(true);
 
 		int hb = ((p->hbank + 1) & 0xff);
 		int lb = ((p->lbank + 1) & 0xff);
@@ -1125,6 +1196,17 @@ void EditInstrument::patchChanged()
 		}
 		QString ks = stmp.join(", ");
 		txtKeySwitches->setText(ks);
+
+		int engine = 0;//gig default
+		if(p->engine == "SFZ")
+			engine = 1;
+		else if(p->engine == "SF2")
+			engine = 2;
+			
+		cmbEngine->setCurrentIndex(engine);
+		cmbLoadMode->setCurrentIndex(p->loadmode);
+		txtFilename->setText(p->filename);
+		txtVolume->setValue(p->volume);
 		//printf("Number of switches: %d\n", p->keys.size());
 		//printf("Loading keys %s\n", kb.toUtf8().constData());
 		//printf("Loading key switches %s\n", ks.toUtf8().constData());
@@ -1142,6 +1224,11 @@ void EditInstrument::patchChanged()
 		checkBoxXG->setEnabled(false);
 		txtKeys->setEnabled(false);
 		txtKeySwitches->setEnabled(false);
+		cmbEngine->setEnabled(false);
+		cmbLoadMode->setEnabled(false);
+		txtFilename->setEnabled(false);
+		txtVolume->setEnabled(false);
+		btnBrowse->setEnabled(false);
 	}
 }
 
@@ -2151,6 +2238,8 @@ void EditInstrument::newPatchClicked()
 	patch->prog = prg;
 	patch->typ = -1;
 	patch->drum = false;
+	patch->volume = 1.0;
+	patch->loadmode = -1;
 
 	if (selpatch)
 	{
@@ -2161,6 +2250,10 @@ void EditInstrument::newPatchClicked()
 		patch->drum = selpatch->drum;
 		patch->keys = selpatch->keys;
 		patch->keyswitches = selpatch->keyswitches;
+		patch->loadmode = selpatch->loadmode;
+		patch->engine = selpatch->engine;
+		patch->filename = selpatch->filename;
+		patch->volume = selpatch->volume;
 	}
 
 	bool found = false;
@@ -2243,6 +2336,11 @@ void EditInstrument::newPatchClicked()
 	checkBoxGM->setEnabled(true);
 	checkBoxGS->setEnabled(true);
 	checkBoxXG->setEnabled(true);
+	cmbEngine->setEnabled(true);
+	cmbLoadMode->setEnabled(true);
+	txtFilename->setEnabled(true);
+	txtVolume->setEnabled(true);
+	btnBrowse->setEnabled(true);
 	txtKeys->setEnabled(true);
 	txtKeySwitches->setEnabled(true);
 
@@ -2318,6 +2416,11 @@ void EditInstrument::newGroupClicked()
 	checkBoxXG->setEnabled(false);
 	txtKeys->setEnabled(false);
 	txtKeySwitches->setEnabled(false);
+	cmbEngine->setEnabled(false);
+	cmbLoadMode->setEnabled(false);
+	txtFilename->setEnabled(false);
+	txtVolume->setEnabled(false);
+	btnBrowse->setEnabled(false);
 
 	workingInstrument.setDirty(true);
 }
@@ -2593,6 +2696,8 @@ void EditInstrument::updatePatch(MidiInstrument* instrument, Patch* p)
 		p->typ = value;
 		instrument->setDirty(true);
 	}
+
+
 	QList<int> keyslist;
 	QList<int> keyswitchlist;
 
@@ -2610,8 +2715,41 @@ void EditInstrument::updatePatch(MidiInstrument* instrument, Patch* p)
 		int val = (*it).trimmed().toInt();
 		keyswitchlist.append(val);
 	}
-	p->keys = keyslist;
-	p->keyswitches = keyswitchlist;
+//	if(p->keys.size() != keyslist.size())
+//	{
+		p->keys = keyslist;
+		instrument->setDirty(true);
+//	}
+//	if(p->keyswitches.size() != keyswitchlist.size())
+//	{
+		p->keyswitches = keyswitchlist;
+		instrument->setDirty(true);
+//	}
+	
+	QString engine = cmbEngine->itemText(cmbEngine->currentIndex());
+	QString filename = txtFilename->text();
+	int loadmode = cmbLoadMode->currentIndex();
+	float volume = txtVolume->value();
+	if(p->engine != engine)
+	{
+		p->engine = engine;
+		instrument->setDirty(true);
+	}
+	if(p->filename != filename)
+	{
+		p->filename = filename;
+		instrument->setDirty(true);
+	}
+	if(p->loadmode != loadmode)
+	{
+		p->loadmode = loadmode;
+		instrument->setDirty(true);
+	}
+	if(p->volume != volume)
+	{
+		p->volume = volume;
+		instrument->setDirty(true);
+	}
 }
 
 //---------------------------------------------------------

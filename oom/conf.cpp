@@ -1063,6 +1063,26 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 					config.useProjectSaveDialog = xml.parseInt();
 				else if (tag == "useAutoCrossFades")
 					config.useAutoCrossFades = xml.parseInt();
+				else if(tag == "lsClientHost")
+				{
+					config.lsClientHost = xml.parse1();
+				}
+				else if(tag == "lsClientPort")
+				{
+					config.lsClientPort = xml.parseInt();;
+				}
+				else if(tag == "lsClientTimeout")
+				{
+					config.lsClientTimeout = xml.parseInt();
+				}
+				else if(tag == "lsClientRetry")
+				{
+					config.lsClientRetry = xml.parseInt();
+				}
+				else if(tag == "lsClientBankAsNumber")
+				{
+					config.lsClientBankAsNumber = xml.parseInt();
+				}
 				else
 					xml.unknown("configuration");
 				break;
@@ -1365,6 +1385,13 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.strTag(level, "externalWavEditor", config.externalWavEditor);
 	xml.intTag(level, "useOldStyleStopShortCut", config.useOldStyleStopShortCut);
 	xml.intTag(level, "moveArmedCheckBox", config.moveArmedCheckBox);
+	
+	xml.strTag(level, "lsClientHost", config.lsClientHost);
+	xml.intTag(level, "lsClientPort", config.lsClientPort);
+	xml.intTag(level, "lsClientTimeout", config.lsClientTimeout);
+	xml.intTag(level, "lsClientRetry", config.lsClientRetry);
+	xml.intTag(level, "lsClientBankAsNumber", config.lsClientBankAsNumber);
+	
 	xml.intTag(level, "vuColorStrip", vuColorStrip);
 
 	/*for (int i = 0; i < NUM_FONTS; ++i)
