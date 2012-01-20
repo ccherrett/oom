@@ -57,7 +57,7 @@ class Xml;
 
 // plugin hints
 const unsigned int PLUGIN_IS_SYNTH            = 0x01;
-const unsigned int PLUGIN_IS_FX               = 0x02; // requires at least 1 audio port in and out
+const unsigned int PLUGIN_IS_FX               = 0x02;
 const unsigned int PLUGIN_HAS_NATIVE_GUI      = 0x04;
 const unsigned int PLUGIN_HAS_IN_PLACE_BROKEN = 0x08;
 
@@ -166,7 +166,7 @@ public:
         m_track = 0;
         m_gui = 0;
 
-        m_enabled = true;
+        m_enabled = false; // wait for a reload() call
         m_lib = 0;
 
         m_ports_in = 0;
@@ -175,6 +175,8 @@ public:
 
     ~BasePlugin()
     {
+        qWarning("~BasePlugin() --------------------------------------------");
+
         deleteGui();
 
         if (m_ainsCount > 0)
@@ -373,16 +375,19 @@ public:
 
     void process_synth(MPEventList* eventList)
     {
-        jack_default_audio_sample_t* ains_buffer[m_ainsCount];
-        jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
+        if (m_enabled && m_aoutsCount > 0)
+        {
+            jack_default_audio_sample_t* ains_buffer[m_ainsCount];
+            jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
 
-        for (uint32_t i=0; i < m_ainsCount; i++)
-            ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_in[i], segmentSize);
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_in[i], segmentSize);
 
-        for (uint32_t i=0; i < m_aoutsCount; i++)
-            aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_out[i], segmentSize);
+            for (uint32_t i=0; i < m_aoutsCount; i++)
+                aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_out[i], segmentSize);
 
-        process(segmentSize, ains_buffer, aouts_buffer, eventList);
+            process(segmentSize, ains_buffer, aouts_buffer, eventList);
+        }
     }
 
     void makeGui();
@@ -678,6 +683,12 @@ public:
         return m_label;
     }
 
+    void updateNativeGui()
+    {
+        if (m_plugin)
+            m_plugin->updateNativeGui();
+    }
+
     virtual QString open();
     virtual void close();
     virtual void setName(const QString& s);
@@ -687,6 +698,7 @@ public:
     virtual bool guiVisible() const;
     virtual void showGui(bool yesno);
     virtual bool hasGui() const;
+    virtual void writeToGui(const MidiPlayEvent&);
 
     MidiPlayEvent receiveEvent();
     int eventsPending() const;

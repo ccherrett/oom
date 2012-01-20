@@ -213,6 +213,26 @@ VstPlugin::~VstPlugin()
 
         effect->dispatcher(effect, effClose, 0, 0, 0, 0.0f);
     }
+
+    // use global client to delete synth audio ports
+    if (m_hints & PLUGIN_IS_SYNTH)
+    {
+        jack_client_t* jclient = 0;
+        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+            jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
+
+        if (m_ainsCount > 0)
+        {
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                jack_port_unregister(jclient, m_ports_in[i]);
+        }
+
+        if (m_aoutsCount > 0)
+        {
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                jack_port_unregister(jclient, m_ports_out[i]);
+        }
+    }
 }
 
 void VstPlugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
@@ -235,7 +255,7 @@ void VstPlugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
     if (buf_str[0] != 0)
         plugi->m_maker = QString(buf_str);
 
-    if (effect->flags & effFlagsIsSynth)
+    if ((effect->flags & effFlagsIsSynth) > 0 && plugi->m_audioOutputCount > 0)
         plugi->m_hints |= PLUGIN_IS_SYNTH;
     else if (plugi->m_audioInputCount >= 1 && plugi->m_audioOutputCount >= 1)
         plugi->m_hints |= PLUGIN_IS_FX;
@@ -324,19 +344,49 @@ bool VstPlugin::init(QString filename, QString label)
 
 void VstPlugin::reload()
 {
+    // safely disable plugin during reload
+    m_proc_lock.lock();
+    m_enabled = false;
+    m_proc_lock.unlock();
+
+    // use global client to create/delete synth audio ports
+    jack_client_t* jclient = 0;
+    if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+        jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
+
     // delete old data
     if (m_paramCount > 0)
         delete[] m_params;
 
+    if (m_ainsCount > 0)
+    {
+        for (uint32_t i=0; i < m_ainsCount; i++)
+            jack_port_unregister(jclient, m_ports_in[i]);
+
+        delete[] m_ports_in;
+    }
+
+    if (m_aoutsCount > 0)
+    {
+        for (uint32_t i=0; i < m_ainsCount; i++)
+            jack_port_unregister(jclient, m_ports_out[i]);
+
+        delete[] m_ports_out;
+    }
+
     // reset
     m_hints  = 0;
     m_params = 0;
-    m_paramCount   = 0;
+    m_ainsCount  = 0;
+    m_aoutsCount = 0;
+    m_paramCount = 0;
 
     // query new data
+    m_ainsCount  = effect->numInputs;
+    m_aoutsCount = effect->numOutputs;
     m_paramCount = effect->numParams;
 
-    if (effect->flags & effFlagsIsSynth)
+    if (effect->flags & effFlagsIsSynth && effect->numOutputs > 0)
         m_hints |= PLUGIN_IS_SYNTH;
     else if (effect->numInputs > 1 && effect->numOutputs > 1)
         m_hints |= PLUGIN_IS_FX;
@@ -344,6 +394,32 @@ void VstPlugin::reload()
     // allocate data
     if (m_paramCount > 0)
         m_params = new ParameterPort[m_paramCount];
+
+    if (m_hints & PLUGIN_IS_SYNTH)
+    {
+        // synths output directly to jack
+        if (m_ainsCount > 0)
+        {
+            m_ports_in = new jack_port_t* [m_ainsCount];
+
+            for (uint32_t j=0; j<m_ainsCount; j++)
+            {
+                QString port_name = m_name + ":input_" + QString::number(j+1);
+                m_ports_in[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+            }
+        }
+
+        if (m_aoutsCount > 0)
+        {
+            m_ports_out = new jack_port_t* [m_aoutsCount];
+
+            for (uint32_t j=0; j<m_aoutsCount; j++)
+            {
+                QString port_name = m_name + ":output_" + QString::number(j+1);
+                m_ports_out[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+            }
+        }
+    }
 
     for (uint32_t j=0; j<m_paramCount; j++)
     {
@@ -436,6 +512,13 @@ void VstPlugin::reload()
         if (isOldSdk || effect->dispatcher(effect, effCanBeAutomated, j, 0, 0, 0.0f) == 1)
             m_params[j].hints |= PARAMETER_IS_AUTOMABLE;
     }
+
+    reloadPrograms(true);
+
+    // enable it again
+    m_proc_lock.lock();
+    m_enabled = true;
+    m_proc_lock.unlock();
 }
 
 void VstPlugin::reloadPrograms(bool)
@@ -537,43 +620,71 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
     if (effect && m_enabled)
     {
         m_proc_lock.lock();
+        // --------------------------
+
         if (m_active)
         {
-            if (effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels)
+            if ((m_hints & PLUGIN_IS_SYNTH) == 0 && (effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels))
             {
                 // cannot proccess
                 m_proc_lock.unlock();
                 return;
             }
 
+            // activate if needed
             if (m_activeBefore == false)
             {
                 effect->dispatcher(effect, effMainsChanged, 0, 1, 0, 0.0f);
                 effect->dispatcher(effect, effStartProcess, 0, 0, 0, 0.0f);
             }
 
-            uint32_t midiEventCount = 0;
-            if (false)
+            // Process MIDI events
+            if (eventList)
             {
-                // TODO - get events
-                VstMidiEvent* midiEvent = &midiEvents[midiEventCount];
-                memset(midiEvent, 0, sizeof(VstMidiEvent));
+                uint32_t midiEventCount = 0;
 
-                midiEvent->type = kVstMidiType;
-                midiEvent->byteSize = sizeof(VstMidiEvent);
-                midiEvent->midiData[0] = 0x90;
-                midiEvent->midiData[1] = 64;
-                midiEvent->midiData[2] = 100;
+                iMPEvent ev = eventList->begin();
+                for (; ev != eventList->end(); ++ev)
+                {
+                    qWarning("Has event -> %i | %i | %i : 0x%02X 0x%02X 0x%02X", ev->channel(), ev->len(), ev->time(), ev->type(), ev->dataA(), ev->dataB());
+                    VstMidiEvent* midiEvent = &midiEvents[midiEventCount];
+                    memset(midiEvent, 0, sizeof(VstMidiEvent));
 
-                midiEventCount += 1;
+                    midiEvent->type = kVstMidiType;
+                    midiEvent->byteSize = sizeof(VstMidiEvent);
+                    midiEvent->midiData[0] = ev->type() + ev->channel();
+                    midiEvent->midiData[1] = ev->dataA();
+                    midiEvent->midiData[2] = ev->dataB();
+
+                    midiEventCount += 1;
+                }
+                eventList->erase(eventList->begin(), ev);
+
+                // VST Events
+                if (midiEventCount > 0)
+                {
+                    events.numEvents = midiEventCount;
+                    events.reserved = 0;
+                    effect->dispatcher(effect, effProcessEvents, 0, 0, &events, 0.0f);
+                }
             }
 
-            // VST Events
-            if (midiEventCount > 0)
+            // Process automation
+            if (m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
             {
-                events.numEvents = midiEventCount;
-                events.reserved = 0;
-                effect->dispatcher(effect, effProcessEvents, 0, 0, &events, 0.0f);
+                for (uint32_t i = 0; i < m_paramCount; i++)
+                {
+                    if (m_params[i].enCtrl && m_params[i].en2Ctrl)
+                    {
+                        m_params[i].tmpValue = m_track->pluginCtrlVal(genACnum(m_id, i));
+                    }
+
+                    if (m_params[i].value != m_params[i].tmpValue)
+                    {
+                        m_params[i].value = m_params[i].tmpValue;
+                        effect->setParameter(effect, i, m_params[i].value);
+                    }
+                }
             }
 
             effect->processReplacing(effect, src, dst, frames);
@@ -586,7 +697,10 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                 effect->dispatcher(effect, effMainsChanged, 0, 0, 0, 0.0f);
             }
         }
+
         m_activeBefore = m_active;
+
+        // --------------------------
         m_proc_lock.unlock();
     }
 }

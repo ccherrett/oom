@@ -229,7 +229,25 @@ void SynthPluginDevice::close()
     _writeEnable = false;
 
     if (m_plugin)
-        delete m_plugin;
+    {
+        m_plugin->aboutToRemove();
+
+        // Delete the appropriate class
+        switch(m_plugin->type())
+        {
+        case PLUGIN_LADSPA:
+            delete (LadspaPlugin*)m_plugin;
+            break;
+        case PLUGIN_LV2:
+            delete (Lv2Plugin*)m_plugin;
+            break;
+        case PLUGIN_VST:
+            delete (VstPlugin*)m_plugin;
+            break;
+        default:
+            break;
+        }
+    }
 
     m_plugin = 0;
 }
@@ -258,13 +276,11 @@ void SynthPluginDevice::collectMidiEvents()
 
 void SynthPluginDevice::processMidi()
 {
-    if (m_plugin)
+    if (_writeEnable && m_plugin)
     {
-        //if (_writeEnable)
-        //{
-            MPEventList* eventList = playEvents();
+        MPEventList* eventList = playEvents();
+        if (m_plugin)
             m_plugin->process_synth(eventList);
-        //}
         //qWarning("SynthPluginDevice::processMidi()");
     }
 }
@@ -306,6 +322,15 @@ bool SynthPluginDevice::hasGui() const
         return true; // use built-in UI for gui-less plugins
     }
     return false;
+}
+
+void SynthPluginDevice::writeToGui(const MidiPlayEvent& ev)
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::writeToGui(%i);", ev.type());
+        //m_plugin->updateNativeGui();
+    }
 }
 
 //---------------------------------------------------------
@@ -375,6 +400,8 @@ void Pipeline::remove(int index)
 
     if (plugin)
     {
+        plugin->aboutToRemove();
+
         // Delete the appropriate class
         switch(plugin->type())
         {

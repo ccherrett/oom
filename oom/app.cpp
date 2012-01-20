@@ -345,6 +345,15 @@ void OOMidi::seqStop()
 	audioPrefetch->stop(true);
 	if (realTimeScheduling && watchdogThread)
 		pthread_cancel(watchdogThread);
+
+    // close opened synths
+    for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+    {
+        MidiDevice* md = *i;
+        if (md && md->deviceType() == MidiDevice::SYNTH_MIDI)
+            // can be safely closed even if not active
+            md->close();
+    }
 }
 
 //---------------------------------------------------------
