@@ -708,6 +708,9 @@ GlobalConfigValues config = {
 	5, //LSCP client retries
 	1,  //LSCP client timeout
 	true, //LSCP client use bank name as patch group name
+	true, //LSCP client auto start
+	false, //Reset LS on client start
+	false, //Reset LS on song start
 	0, //Default audio raster index
 	1, //Default midi raster index
 	true //Use auto crossfades

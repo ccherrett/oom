@@ -1083,6 +1083,18 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				{
 					config.lsClientBankAsNumber = xml.parseInt();
 				}
+				else if(tag == "lsClientAutoStart")
+				{
+					config.lsClientAutoStart = xml.parseInt();
+				}
+				else if(tag == "lsClientResetOnStart")
+				{
+					config.lsClientResetOnStart = xml.parseInt();
+				}
+				else if(tag == "lsClientResetOnSongStart")
+				{
+					config.lsClientResetOnSongStart = xml.parseInt();
+				}
 				else
 					xml.unknown("configuration");
 				break;
@@ -1391,6 +1403,9 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.intTag(level, "lsClientTimeout", config.lsClientTimeout);
 	xml.intTag(level, "lsClientRetry", config.lsClientRetry);
 	xml.intTag(level, "lsClientBankAsNumber", config.lsClientBankAsNumber);
+	xml.intTag(level, "lsClientAutoStart", config.lsClientAutoStart);
+	xml.intTag(level, "lsClientResetOnStart", config.lsClientResetOnStart);
+	xml.intTag(level, "lsClientResetOnSongStart", config.lsClientResetOnSongStart);
 	
 	xml.intTag(level, "vuColorStrip", vuColorStrip);
 

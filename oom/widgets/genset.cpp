@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QRect>
 #include <QShowEvent>
+#include <QMessageBox>
 
 #include "genset.h"
 #include "app.h"
@@ -40,7 +41,9 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	groupBox13->hide();
 	vstInPlaceTextLabel->hide();
 	vstInPlaceCheckBox->hide();
-	startUpBox->hide();
+	showDidYouKnow->hide();
+	showSplash->hide();
+	//startUpBox->hide();
 	startSongGroup = new QButtonGroup(this);
 	startSongGroup->addButton(startLastButton, 0);
 	startSongGroup->addButton(startEmptyButton, 1);
@@ -100,43 +103,6 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	startSongEntry->setText(config.startSong);
 	startSongGroup->button(config.startMode)->setChecked(true);
 
-	//showTransport->setChecked(config.transportVisible);
-	//showBigtime->setChecked(config.bigTimeVisible);
-	//showMixer->setChecked(config.mixer1Visible);
-	//showMixer2->setChecked(config.mixer2Visible);
-
-	/*composerX->setValue(config.geometryMain.x());
-	composerY->setValue(config.geometryMain.y());
-	composerW->setValue(config.geometryMain.width());
-	composerH->setValue(config.geometryMain.height());
-
-	transportX->setValue(config.geometryTransport.x());
-	transportY->setValue(config.geometryTransport.y());
-
-	bigtimeX->setValue(config.geometryBigTime.x());
-	bigtimeY->setValue(config.geometryBigTime.y());
-	bigtimeW->setValue(config.geometryBigTime.width());
-	bigtimeH->setValue(config.geometryBigTime.height());*/
-
-	//mixerX->setValue(config.geometryMixer.x());
-	//mixerY->setValue(config.geometryMixer.y());
-	//mixerW->setValue(config.geometryMixer.width());
-	//mixerH->setValue(config.geometryMixer.height());
-	/*mixerX->setValue(config.mixer1.geometry.x());
-	mixerY->setValue(config.mixer1.geometry.y());
-	mixerW->setValue(config.mixer1.geometry.width());
-	mixerH->setValue(config.mixer1.geometry.height());
-	mixer2X->setValue(config.mixer2.geometry.x());
-	mixer2Y->setValue(config.mixer2.geometry.y());
-	mixer2W->setValue(config.mixer2.geometry.width());
-	mixer2H->setValue(config.mixer2.geometry.height());*/
-
-	//setMixerCurrent->setEnabled(oom->mixer1Window());
-	//setMixer2Current->setEnabled(oom->mixer2Window());
-
-	//setBigtimeCurrent->setEnabled(oom->bigtimeWindow());
-	//setTransportCurrent->setEnabled(oom->transportWindow());
-
 	showSplash->setChecked(config.showSplashScreen);
 	showDidYouKnow->setChecked(config.showDidYouKnow);
 	externalWavEditorSelect->setText(config.externalWavEditor);
@@ -145,14 +111,17 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	projectSaveCheckBox->setChecked(config.useProjectSaveDialog);
 	
 	m_chkAutofade->setChecked(config.useAutoCrossFades);
-
-	//updateSettings();    // TESTING
+	chkStartLSClient->setChecked(config.lsClientAutoStart);
+	btnStartLSClient->setEnabled(!lsClientStarted);
+	btnResetLSNow->setEnabled(lsClientStarted);
+	chkResetLSOnStartup->setChecked(config.lsClientResetOnStart);
+	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
 
 	connect(applyButton, SIGNAL(clicked()), SLOT(apply()));
 	connect(okButton, SIGNAL(clicked()), SLOT(ok()));
 	connect(cancelButton, SIGNAL(clicked()), SLOT(cancel()));
-	//connect(setMixerCurrent, SIGNAL(clicked()), SLOT(mixerCurrent()));
-	//connect(setMixer2Current, SIGNAL(clicked()), SLOT(mixer2Current()));
+	connect(btnStartLSClient, SIGNAL(clicked()), SLOT(startLSClientNow()));
+	connect(btnResetLSNow, SIGNAL(clicked()), SLOT(resetLSNow()));
 	//connect(setBigtimeCurrent, SIGNAL(clicked()), SLOT(bigtimeCurrent()));
 	//connect(setComposerCurrent, SIGNAL(clicked()), SLOT(composerCurrent()));
 	//connect(setTransportCurrent, SIGNAL(clicked()), SLOT(transportCurrent()));
@@ -206,50 +175,10 @@ void GlobalSettingsConfig::updateSettings()
 	vstInPlaceCheckBox->setChecked(config.vstInPlace);
 	dummyAudioRate->setValue(config.dummyAudioSampleRate);
 
-	//DummyAudioDevice* dad = dynamic_cast<DummyAudioDevice*>(audioDevice);
-	//dummyAudioRealRate->setText(dad ? QString().setNum(sampleRate) : "---");
 	dummyAudioRealRate->setText(QString().setNum(sampleRate));
 
 	startSongEntry->setText(config.startSong);
 	startSongGroup->button(config.startMode)->setChecked(true);
-
-	//showTransport->setChecked(config.transportVisible);
-	//showBigtime->setChecked(config.bigTimeVisible);
-	//showMixer->setChecked(config.mixer1Visible);
-	//showMixer2->setChecked(config.mixer2Visible);
-
-	/*composerX->setValue(config.geometryMain.x());
-	composerY->setValue(config.geometryMain.y());
-	composerW->setValue(config.geometryMain.width());
-	composerH->setValue(config.geometryMain.height());
-
-	transportX->setValue(config.geometryTransport.x());
-	transportY->setValue(config.geometryTransport.y());
-
-	bigtimeX->setValue(config.geometryBigTime.x());
-	bigtimeY->setValue(config.geometryBigTime.y());
-	bigtimeW->setValue(config.geometryBigTime.width());
-	bigtimeH->setValue(config.geometryBigTime.height());*/
-
-	//mixerX->setValue(config.geometryMixer.x());
-	//mixerY->setValue(config.geometryMixer.y());
-	//mixerW->setValue(config.geometryMixer.width());
-	//mixerH->setValue(config.geometryMixer.height());
-	/*mixerX->setValue(config.mixer1.geometry.x());
-	mixerY->setValue(config.mixer1.geometry.y());
-	mixerW->setValue(config.mixer1.geometry.width());
-	mixerH->setValue(config.mixer1.geometry.height());
-	mixer2X->setValue(config.mixer2.geometry.x());
-	mixer2Y->setValue(config.mixer2.geometry.y());
-	mixer2W->setValue(config.mixer2.geometry.width());
-	mixer2H->setValue(config.mixer2.geometry.height());*/
-
-	//setMixerCurrent->setEnabled(oom->mixerWindow());
-	//setMixerCurrent->setEnabled(oom->mixer1Window());
-	//setMixer2Current->setEnabled(oom->mixer2Window());
-
-	//setBigtimeCurrent->setEnabled(oom->bigtimeWindow());
-	//setTransportCurrent->setEnabled(oom->transportWindow());
 
 	showSplash->setChecked(config.showSplashScreen);
 	showDidYouKnow->setChecked(config.showDidYouKnow);
@@ -257,6 +186,12 @@ void GlobalSettingsConfig::updateSettings()
 	oldStyleStopCheckBox->setChecked(config.useOldStyleStopShortCut);
 	moveArmedCheckBox->setChecked(config.moveArmedCheckBox);
 	projectSaveCheckBox->setChecked(config.useProjectSaveDialog);
+	chkStartLSClient->setChecked(config.lsClientAutoStart);
+	btnStartLSClient->setEnabled(!lsClientStarted);
+	btnResetLSNow->setEnabled(lsClientStarted);
+	chkResetLSOnStartup->setChecked(config.lsClientResetOnStart);
+	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
+	//TODO: Set icon for status of lsClient
 }
 
 //---------------------------------------------------------
@@ -267,6 +202,58 @@ void GlobalSettingsConfig::showEvent(QShowEvent* e)
 {
 	QDialog::showEvent(e);
 	//updateSettings();     // TESTING
+}
+
+void GlobalSettingsConfig::startLSClientNow()
+{
+	if(!lsClient)
+	{
+		lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+		lsClientStarted = lsClient->startClient();
+		if(config.lsClientResetOnStart && lsClientStarted)
+		{
+			lsClient->resetSampler();
+		}
+	}
+	else
+	{
+		lsClientStarted = lsClient->startClient();
+		if(config.lsClientResetOnStart && lsClientStarted)
+		{
+			lsClient->resetSampler();
+		}
+	}
+	btnStartLSClient->setEnabled(!lsClientStarted);
+	btnResetLSNow->setEnabled(lsClientStarted);
+}
+
+void GlobalSettingsConfig::resetLSNow()
+{
+	if(QMessageBox::critical(this,
+			tr("Reset LinuxSampler?"),
+			tr("This action will cause LinuxSampler to reset."
+				"Deleting all MIDI Mappings, Devices and any Audio channels created in JACK"
+			),
+			QMessageBox::Ok|QMessageBox::Cancel,
+			QMessageBox::Cancel) == QMessageBox::Ok)
+	{
+		if(!lsClient)
+		{
+			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+			lsClientStarted = lsClient->startClient();
+			if(config.lsClientResetOnStart && lsClientStarted)
+			{
+				lsClient->resetSampler();
+			}
+			//Update the start button
+			btnStartLSClient->setEnabled(!lsClientStarted);
+		}
+		if(lsClientStarted)
+		{
+			lsClient->resetSampler();
+			btnResetLSNow->setEnabled(lsClientStarted);
+		}
+	}
 }
 
 //---------------------------------------------------------
@@ -296,39 +283,6 @@ void GlobalSettingsConfig::apply()
 	div = guiDivisionSelect->currentIndex();
 	config.guiDivision = divisions[div];
 
-	//config.transportVisible = showTransport->isChecked();
-	//config.bigTimeVisible = showBigtime->isChecked();
-	//config.mixer1Visible = showMixer->isChecked();
-	//config.mixer2Visible = showMixer2->isChecked();
-
-	//config.geometryMain.setX(composerX->value());
-	//config.geometryMain.setY(composerY->value());
-	//config.geometryMain.setWidth(composerW->value());
-	//config.geometryMain.setHeight(composerH->value());
-
-	//config.geometryTransport.setX(transportX->value());
-	//config.geometryTransport.setY(transportY->value());
-	//config.geometryTransport.setWidth(0);
-	//config.geometryTransport.setHeight(0);
-
-	//config.geometryBigTime.setX(bigtimeX->value());
-	//config.geometryBigTime.setY(bigtimeY->value());
-	//config.geometryBigTime.setWidth(bigtimeW->value());
-	//config.geometryBigTime.setHeight(bigtimeH->value());
-
-	//config.geometryMixer.setX(mixerX->value());
-	//config.geometryMixer.setY(mixerY->value());
-	//config.geometryMixer.setWidth(mixerW->value());
-	//config.geometryMixer.setHeight(mixerH->value());
-	//config.mixer1.geometry.setX(mixerX->value());
-	//config.mixer1.geometry.setY(mixerY->value());
-	//config.mixer1.geometry.setWidth(mixerW->value());
-	//config.mixer1.geometry.setHeight(mixerH->value());
-	//config.mixer2.geometry.setX(mixer2X->value());
-	//config.mixer2.geometry.setY(mixer2Y->value());
-	//config.mixer2.geometry.setWidth(mixer2W->value());
-	//config.mixer2.geometry.setHeight(mixer2H->value());
-
 	config.showSplashScreen = showSplash->isChecked();
 	config.showDidYouKnow = showDidYouKnow->isChecked();
 	config.externalWavEditor = externalWavEditorSelect->text();
@@ -336,44 +290,11 @@ void GlobalSettingsConfig::apply()
 	config.moveArmedCheckBox = moveArmedCheckBox->isChecked();
 	config.useProjectSaveDialog = projectSaveCheckBox->isChecked();
 	config.useAutoCrossFades = m_chkAutofade->isChecked();
-	//oom->showMixer1(config.mixer1Visible);
-	//oom->showMixer2(config.mixer2Visible);
-
-	//oom->showBigtime(config.bigTimeVisible);
-	//oom->showTransport(config.transportVisible);
-	/*QWidget* w = oom->transportWindow();
-	if (w)
-	{
-		w->resize(config.geometryTransport.size());
-		w->move(config.geometryTransport.topLeft());
-	}
-	//w = oom->mixerWindow();
-	//if (w) {
-	//      w->resize(config.geometryMixer.size());
-	//      w->move(config.geometryMixer.topLeft());
-	//      }
-	w = oom->mixer1Window();
-	if (w)
-	{
-		w->resize(config.mixer1.geometry.size());
-		w->move(config.mixer1.geometry.topLeft());
-	}
-	w = oom->mixer2Window();
-	if (w)
-	{
-		w->resize(config.mixer2.geometry.size());
-		w->move(config.mixer2.geometry.topLeft());
-	}
-	w = oom->bigtimeWindow();
-	if (w)
-	{
-		w->resize(config.geometryBigTime.size());
-		w->move(config.geometryBigTime.topLeft());
-	}*/
-	//oom->resize(config.geometryMain.size());
-	//oom->move(config.geometryMain.topLeft());
+	config.lsClientAutoStart = chkStartLSClient->isChecked();
 
 	oomUserInstruments = config.userInstrumentsDir;
+	config.lsClientResetOnStart = chkResetLSOnStartup->isChecked();
+	config.lsClientResetOnSongStart = chkResetLSOnSongLoad->isChecked();
 
 	oom->setHeartBeat(); // set guiRefresh
 	midiSeq->msgSetRtc(); // set midi tick rate
@@ -399,81 +320,6 @@ void GlobalSettingsConfig::cancel()
 	close();
 }
 
-//---------------------------------------------------------
-//   mixerCurrent
-//---------------------------------------------------------
-/*
-void GlobalSettingsConfig::mixerCurrent()
-{
-	QWidget* w = oom->mixer1Window();
-	if (!w)
-		return;
-	QRect r(w->frameGeometry());
-	mixerX->setValue(r.x());
-	mixerY->setValue(r.y());
-	mixerW->setValue(r.width());
-	mixerH->setValue(r.height());
-}
-
-//---------------------------------------------------------
-//   mixer2Current
-//---------------------------------------------------------
-
-void GlobalSettingsConfig::mixer2Current()
-{
-	QWidget* w = oom->mixer2Window();
-	if (!w)
-		return;
-	QRect r(w->frameGeometry());
-	mixer2X->setValue(r.x());
-	mixer2Y->setValue(r.y());
-	mixer2W->setValue(r.width());
-	mixer2H->setValue(r.height());
-}
-
-//---------------------------------------------------------
-//   bigtimeCurrent
-//---------------------------------------------------------
-
-void GlobalSettingsConfig::bigtimeCurrent()
-{
-	QWidget* w = oom->bigtimeWindow();
-	if (!w)
-		return;
-	QRect r(w->frameGeometry());
-	bigtimeX->setValue(r.x());
-	bigtimeY->setValue(r.y());
-	bigtimeW->setValue(r.width());
-	bigtimeH->setValue(r.height());
-}
-
-//---------------------------------------------------------
-//   composerCurrent
-//---------------------------------------------------------
-
-void GlobalSettingsConfig::composerCurrent()
-{
-	QRect r(oom->frameGeometry());
-	composerX->setValue(r.x());
-	composerY->setValue(r.y());
-	composerW->setValue(r.width());
-	composerH->setValue(r.height());
-}
-
-//---------------------------------------------------------
-//   transportCurrent
-//---------------------------------------------------------
-
-void GlobalSettingsConfig::transportCurrent()
-{
-	QWidget* w = oom->transportWindow();
-	if (!w)
-		return;
-	QRect r(w->frameGeometry());
-	transportX->setValue(r.x());
-	transportY->setValue(r.y());
-}
-*/
 void GlobalSettingsConfig::selectInstrumentsPath()
 {
 	QString dir = QFileDialog::getExistingDirectory(this,

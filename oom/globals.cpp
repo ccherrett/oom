@@ -20,6 +20,7 @@
 
 #include "globals.h"
 #include "config.h"
+#include "network/lsclient.h"
 
 int recFileNumber = 1;
 
@@ -302,6 +303,8 @@ QHash<int, QColor> g_trackColorList;
 QHash<int, QColor> g_trackColorListSelected;
 QHash<int, QPixmap> g_trackDragImageList;
 int vuColorStrip = 0; //default vuColor is gradient
+bool lsClientStarted = false;
+LSClient* lsClient = 0;
 
 //---------------------------------------------------------
 //   doSetuid

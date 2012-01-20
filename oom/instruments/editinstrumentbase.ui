@@ -432,6 +432,9 @@ p, li { white-space: pre-wrap; }
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimum">
+                   <number>-1</number>
+                  </property>
                  </widget>
                 </item>
                 <item row="11" column="1">

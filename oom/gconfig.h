@@ -153,6 +153,9 @@ struct GlobalConfigValues
 	int lsClientRetry;
 	int lsClientTimeout;
 	bool lsClientBankAsNumber;
+	bool lsClientAutoStart;
+	bool lsClientResetOnStart;
+	bool lsClientResetOnSongStart;
 	int audioRaster;
 	int midiRaster;
 	bool useAutoCrossFades;

@@ -26,11 +26,8 @@ private slots:
     void apply();
     void ok();
     void cancel();
-    //void mixerCurrent();
-    //void mixer2Current();
-    //void bigtimeCurrent();
-    //void composerCurrent();
-    //void transportCurrent();
+	void startLSClientNow();
+	void resetLSNow();
     void selectInstrumentsPath();
     void defaultInstrumentsPath();
 

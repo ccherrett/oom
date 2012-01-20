@@ -89,7 +89,7 @@ static void getCapabilities()
 
 static void printVersion(const char* prog)
 {
-	fprintf(stderr, "%s: OpenOctave Midi and Audio Editor; Version %s, (svn revision %s)\n", prog, VERSION, SVNVERSION);
+	fprintf(stderr, "%s: OpenOctave Midi and Audio Editor; Version %s\n", prog, VERSION);
 }
 
 bool g_ladish_l1_save_requested = false;
@@ -336,6 +336,15 @@ int main(int argc, char* argv[])
 			oom_splash->connect(stimer, SIGNAL(timeout()), oom_splash, SLOT(close()));
 			stimer->setSingleShot(true);
 			stimer->start(6000);
+		}
+	}
+	if(config.lsClientAutoStart)
+	{
+		lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+		lsClientStarted = lsClient->startClient();
+		if(config.lsClientResetOnStart && lsClientStarted)
+		{
+			lsClient->resetSampler();
 		}
 	}
 

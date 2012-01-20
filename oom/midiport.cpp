@@ -255,8 +255,16 @@ void MidiPort::setInstrument(MidiInstrument* i)
 	_instrument = i;
 	if(i && i->isOOMInstrument())
 	{
-		LSClient *lsClient = new LSClient(config.lsClientHost.toUtf8().constData(), config.lsClientPort);
-		if(lsClient->startClient())
+		if(!lsClient)
+		{
+			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+			lsClientStarted = lsClient->startClient();
+			if(config.lsClientResetOnStart && lsClientStarted)
+			{
+				lsClient->resetSampler();
+			}
+		}
+		if(lsClientStarted)
 		{
 			lsClient->loadInstrument(i);
 		}

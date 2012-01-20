@@ -97,7 +97,7 @@ public:
 		GIG = 0, SFZ, SF2
 	};
 
-	LSClient(const char* host = "localhost", int port = 8888, QObject *parent = 0);
+	LSClient(QString host = "localhost", int port = 8888, QObject *parent = 0);
 	~LSClient();
 	void stopClient();
 	bool startClient();
@@ -123,13 +123,14 @@ public:
 	QString getMapName(int);
 	bool resetSampler();
 	bool loadSamplerCommand(QString);
+	void removeLastChannel();
 	
 private:
 	const LSCPChannelInfo getKeyBindings(lscp_channel_info_t*);
 	bool compare(const LSCPChannelInfo, const LSCPChannelInfo);
 
 	lscp_client_t* _client;
-	const char* _hostname;
+	QString _hostname;
 	int _port;
 	bool _abort;
 	int _retries;

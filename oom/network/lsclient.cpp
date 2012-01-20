@@ -26,7 +26,7 @@ static char sDevName[13] = "LinuxSampler";
 static char sName[5] = "NAME";
 static char sSampleRate[11] = "SAMPLERATE";
 
-LSClient::LSClient(const char* host, int p, QObject* parent) : QObject(parent)
+LSClient::LSClient(QString host, int p, QObject* parent) : QObject(parent)
 {
 	_hostname = host;
 	_port = p;
@@ -101,7 +101,8 @@ bool LSClient::startClient()/*{{{*/
 {
 	if(_client != NULL)
 		::lscp_client_destroy(_client);
-	_client = ::lscp_client_create(_hostname, _port, client_callback, this);
+	qDebug("LSClient::startClient: hostname: %s, port: %d", _hostname.toUtf8().constData(),  _port);
+	_client = ::lscp_client_create(_hostname.toUtf8().constData(), _port, client_callback, this);
 	if(_client != NULL)
 	{
 		printf("Initialized LSCP client connection\n");
@@ -113,7 +114,7 @@ bool LSClient::startClient()/*{{{*/
 	else
 	{
 		qDebug("Failed to Initialize LSCP client connection, retrying");
-		_client = ::lscp_client_create(_hostname, _port, client_callback, this);
+		_client = ::lscp_client_create(_hostname.toUtf8().constData(), _port, client_callback, this);
 		_lastInfo.valid = false;
 		if(_client != NULL)
 			qDebug("Retry sucessfull");
@@ -669,7 +670,7 @@ int LSClient::createMidiInputDevice(char* name, const char* type, int ports)/*{{
 	return rv;
 }/*}}}*/
 
-bool LSClient::createInstrumentChannel(const char* name, const char* engine, const char* filename, int index, int map)
+bool LSClient::createInstrumentChannel(const char* name, const char* engine, const char* filename, int index, int map)/*{{{*/
 {
 	bool rv = false;
 	if(_client != NULL)
@@ -731,7 +732,7 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 				lscp_param_t p;
 				p.key = sPorts;
 				p.value = pCount;
-				if(lscp_set_midi_device_param(_client, 0, &p))
+				if(lscp_set_midi_device_param(_client, 0, &p) == LSCP_OK)
 				{
 					qDebug("Sucessfullt increased port count");
 				}
@@ -908,9 +909,9 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 		}
 	}
 	return rv;
-}
+}/*}}}*/
 
-bool LSClient::loadInstrument(MidiInstrument* instrument)
+bool LSClient::loadInstrument(MidiInstrument* instrument)/*{{{*/
 {
 	bool rv = false;
 	if(_client != NULL && instrument && instrument->isOOMInstrument())
@@ -998,6 +999,59 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)
 		}
 	}
 	return rv;
+}/*}}}*/
+
+//Used by the add track mechanism to flush stuff created with the 
+//Instrument combo box
+void LSClient::removeLastChannel()
+{
+	if(_client != NULL)
+	{
+		int channelCount = ::lscp_get_channels(_client);
+		if(channelCount)
+		{
+			int chan = channelCount-1;
+			//Remove the last one created
+			if(lscp_remove_channel(_client, chan) == LSCP_OK)
+			{
+				//Reduce the MIDI and audio device port and channel count or rename if 0
+				if(chan)
+				{
+					char mpCount[QString::number(chan).size()+1];
+					strcpy(mpCount, QString::number(chan).toLocal8Bit().constData());
+					lscp_param_t p;
+					p.key = sPorts;
+					p.value = mpCount;
+					if(lscp_set_midi_device_param(_client, 0, &p) != LSCP_OK)
+						qDebug("Failed to reduce MIDI device port count");
+					
+					char apCount[QString::number(chan).size()+1];
+					strcpy(apCount, QString::number(chan).toLocal8Bit().constData());
+					lscp_param_t c;
+					c.key = sChannels;
+					c.value = apCount;
+					if(lscp_set_audio_device_param(_client, 0, &c) != LSCP_OK)
+						qDebug("Failed to reduce audio device channel count");
+				}
+				else
+				{//Just rename the first ports
+					//TODO: maybe we should just reset the sample here instead
+					//resetSampler();
+					lscp_param_t portName;
+					portName.key = sName;
+					portName.value = (char*)"midi_in_0";
+					if(lscp_set_midi_port_param(_client, 0, chan, &portName) != LSCP_OK)
+						qDebug("Failed to rename midi port");
+					
+					lscp_param_t chanName;
+					chanName.key = sName;
+					chanName.value = (char*)"0";
+					if(lscp_set_audio_channel_param(_client, 0, chan, &chanName) != LSCP_OK)
+						qDebug("Faled to rename audio channel");
+				}
+			}
+		}
+	}
 }
 
 bool LSClient::isFreePort(const char* val)
@@ -1063,6 +1117,10 @@ void LSClient::startThread()
 bool LSClient::resetSampler()
 {
 	bool rv = false;
+	if(_client != NULL)
+	{
+		rv = (lscp_reset_sampler(_client) == LSCP_OK);
+	}
 	return rv;
 }
 

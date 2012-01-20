@@ -9,10 +9,10 @@
 
 #include "ui_createtrackbase.h"
 #include <QMap>
+#include "TrackManager.h"
 
 class QShowEvent;
 class QSize;
-class LSClient;
 
 class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	Q_OBJECT
@@ -22,6 +22,7 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 
 	int m_insertType;
 	int m_insertPosition;
+	bool m_templateMode;
 	
 	bool m_createMidiInputDevice;
 	bool m_createMidiOutputDevice;
@@ -34,12 +35,12 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	
 	bool m_createTrackOnly;
 	int m_showJackAliases;
+	bool m_instrumentLoaded;
 	
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;
-	
-	LSClient* m_lsClient;
-	bool m_clientStarted;
+
+	OOVirtualTrack *m_lastTrack;
 
 	void importInputs();
 	void importOutputs();
@@ -56,10 +57,11 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	
 	int getFreeMidiPort();
 	
-	void createMonitorInputTracks(QString);
+	void cleanup();
 
 private slots:
 	void addTrack();
+	void cancelSelected();
 	void updateInputSelected(bool);
 	void updateOutputSelected(bool);
 	void updateBussSelected(bool);
@@ -73,10 +75,12 @@ protected:
 
 signals:
 	void trackAdded(QString);
+	void trackReady(bool);
 
 public:
-	CreateTrackDialog(int type = 0, int pos = -1, QWidget* parent = 0);
+	CreateTrackDialog(int type = 0, int pos = -1, QWidget* parent = 0, bool templateMode = false);
 	~CreateTrackDialog(){}
+	OOVirtualTrack* getLastTrack();
 };
 
 #endif

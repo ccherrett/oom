@@ -39,7 +39,6 @@ LSCPImport::LSCPImport(QWidget* parent) :QDialog(parent)
 	_mapModel = new QStandardItemModel(mapTable);
 	m_futureWatcher = 0;
 	mapTable->setModel(_mapModel);
-	m_import_client = 0;
 	txtHost->setText(config.lsClientHost);
 	txtPort->setValue(config.lsClientPort);
 	txtRetry->setValue(config.lsClientRetry);
@@ -93,21 +92,26 @@ void LSCPImport::btnListClicked(bool)
 	QString host = config.lsClientHost; //("localhost");
 	int port = config.lsClientPort; //8888;
 	//qDebug() << host;
-	if(!m_import_client)
-		m_import_client = new LSClient(host.toUtf8().constData(), port);
-	m_import_client->setRetry(config.lsClientRetry);
-	m_import_client->setTimeout(config.lsClientTimeout);
-	m_import_client->setBankAsNumber(config.lsClientBankAsNumber);
-	if(!m_import_client->startClient())
+	if(!lsClient)
+	{
+		lsClient = new LSClient(host, port);
+		lsClientStarted = lsClient->startClient();
+	}
+	else if(!lsClientStarted)
+	{
+		lsClientStarted = lsClient->startClient();
+	}
+	lsClient->setRetry(config.lsClientRetry);
+	lsClient->setTimeout(config.lsClientTimeout);
+	lsClient->setBankAsNumber(config.lsClientBankAsNumber);
+	if(!lsClientStarted)
 	{
 		QString str = QString("Linuxsampler LSCP server connection failed while connecting to: %1 on port %2").arg(host).arg(port);
 		QMessageBox::critical(this, tr("OOMidi: Server connection failed"), str);
-		delete m_import_client;
-		m_import_client = 0;
 	}
 	else
 	{
-		QMap<int, QString> instr = m_import_client->listInstruments();
+		QMap<int, QString> instr = lsClient->listInstruments();
 		if(!instr.isEmpty())
 		{
 			QList<int> keys = instr.keys();
@@ -132,21 +136,21 @@ void LSCPImport::btnListClicked(bool)
 		{
 			QMessageBox::information(this, tr("OOMidi: LSCP Client"), tr("No Instrument Maps found."));
 		}
-		m_import_client->stopClient();
-		delete m_import_client;
-		m_import_client = 0;
 	}
 }
 
 MidiInstrument* redirLookup(int i)/*{{{*/
 {
-	LSClient m_lsclient(config.lsClientHost.toUtf8().constData(), config.lsClientPort);
-	m_lsclient.setRetry(config.lsClientRetry);
-	m_lsclient.setTimeout(config.lsClientTimeout);
-	m_lsclient.startClient();
-	MidiInstrument* rv = m_lsclient.getInstrument(i);
-	m_lsclient.stopClient();
-//	delete m_lsclient;
+	MidiInstrument* rv = 0;
+	if(!lsClient)
+	{
+		lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+		lsClient->setRetry(config.lsClientRetry);
+		lsClient->setTimeout(config.lsClientTimeout);
+		lsClientStarted = lsClient->startClient();
+	}
+	if(lsClientStarted)
+		rv = lsClient->getInstrument(i);
 	
 	return rv;
 }/*}}}*/
@@ -183,33 +187,6 @@ void LSCPImport::btnImportClicked(bool)/*{{{*/
 		dialog.exec();
 
 		m_futureWatcher->waitForFinished();
-
-		/*MidiInstrumentList* instr = m_import_client->getInstruments(maps, txtRetry->value(), txtTimeout->value());
-		if(instr)
-		{
-			_mapModel->clear();
-			for(iMidiInstrument i = instr->begin(); i != instr->end(); ++i)
-			{
-				if ((*i)->filePath().isEmpty())
-					continue;
-				QList<QStandardItem*> rowData;
-				QStandardItem* chk = new QStandardItem(true);
-				chk->setCheckable(true);
-				chk->setCheckState(Qt::Unchecked);
-				rowData.append(chk);
-				QStandardItem* ins = new QStandardItem((*i)->iname());
-				ins->setEditable(true);
-				QVariant v = qVariantFromValue((void*) (*i));
-				ins->setData(v, Qt::UserRole);
-				ins->setEditable(false);
-				rowData.append(ins);
-				QStandardItem* fname = new QStandardItem((*i)->filePath());
-				fname->setEditable(true);
-				rowData.append(fname);
-				_mapModel->appendRow(rowData);
-			}
-			updateTableHeader();
-		}*/
 	}
 }/*}}}*/
 
@@ -333,12 +310,12 @@ void LSCPImport::btnCloseClicked(bool)
 void LSCPImport::closeEvent(QCloseEvent* e)
 {
 	//force disconnect on the client and quit
-	if(m_import_client)
+	/*if(lsClient)
 	{
-		m_import_client->stopClient();
-		delete m_import_client;
-		m_import_client = 0;
-	}
+		lsClient->stopClient();
+		delete lsClient;
+		lsClient = 0;
+	}*/
 	e->accept();
 }
 #endif

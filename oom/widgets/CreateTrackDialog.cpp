@@ -25,10 +25,11 @@
 #include "plugin.h"
 
 
-CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent)
+CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent, bool templateMode)
 : QDialog(parent),
 m_insertType(type),
-m_insertPosition(pos)
+m_insertPosition(pos),
+m_templateMode(templateMode)
 {
 	setupUi(this);
 	m_createMidiInputDevice = false;
@@ -36,18 +37,18 @@ m_insertPosition(pos)
 	
 	m_midiSameIO = false;
 	m_createTrackOnly = false;
+	m_instrumentLoaded = false;
 	m_showJackAliases = -1;
 	
 	m_midiInPort = -1;
 	m_midiOutPort = -1;
 
-	m_lsClient = 0;
-	m_clientStarted = false;
-
     m_height = 290;
 	m_width = 450;
 
 	m_allChannelBit = (1 << MIDI_CHANNELS) - 1;
+
+	m_lastTrack = 0;
 
 	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
 	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
@@ -81,6 +82,8 @@ m_insertPosition(pos)
 	connect(cmbInstrument, SIGNAL(activated(int)), this, SLOT(updateInstrument(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 	connect(txtName, SIGNAL(textEdited(QString)), this, SLOT(trackNameEdited()));
+	connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSelected()));
+	txtName->setFocus(Qt::OtherFocusReason);
 }
 
 //Add button slot
@@ -95,446 +98,212 @@ void CreateTrackDialog::addTrack()/*{{{*/
 	int monitorIndex = cmbMonitor->currentIndex();
 	int inChanIndex = cmbInChannel->currentIndex();
 	int outChanIndex = cmbOutChannel->currentIndex();
+	int bussIndex = cmbBuss->currentIndex();
+	bool valid = true;
 
+	OOVirtualTrack vtrack;
+	vtrack.name = txtName->text();
+	vtrack.type = m_insertType;
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch(type)
 	{
 		case Track::MIDI:
 		case Track::DRUM:
-		{
-
-			Track* track =  song->addTrackByName(txtName->text(), Track::MIDI, m_insertPosition, false);
-			if(track)
+		{/*{{{*/
+			vtrack.autoCreateInstrument = chkAutoCreate->isChecked();
+			//Process Input connections
+			if(inputIndex >= 0 && chkInput->isChecked())
 			{
-				MidiTrack* mtrack = (MidiTrack*)track;
-				//Process Input connections
-				if(inputIndex >= 0 && chkInput->isChecked())
+				vtrack.useInput = true;
+				QString devname = cmbInput->itemText(inputIndex);
+				int inDevType = cmbInput->itemData(inputIndex).toInt();
+				int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
+				if(m_currentMidiInputList.isEmpty())
 				{
-					QString devname = cmbInput->itemText(inputIndex);
-					if(m_currentMidiInputList.isEmpty())
-					{
-						m_createMidiInputDevice = true;
-					}
-					else
-					{
-						m_createMidiInputDevice = !(m_currentMidiInputList.contains(inputIndex) && m_currentMidiInputList.value(inputIndex) == devname);
-					}
-					MidiPort* inport = 0;
-					MidiDevice* indev = 0;
-					QString inputDevName(QString("I-").append(track->name()));
-					if(m_createMidiInputDevice)
-					{
-						m_midiInPort = getFreeMidiPort();
-						qDebug("m_createMidiInputDevice is set: %i", m_midiInPort);
-						inport = &midiPorts[m_midiInPort];
-						int devtype = cmbInput->itemData(inputIndex).toInt();
-						if(devtype == MidiDevice::ALSA_MIDI)
-						{
-							indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
-							if(indev)
-							{
-								qDebug("Found MIDI input device: ALSA_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x2;
-								indev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(inport, indev);
-							}
-						}
-						else if(devtype == MidiDevice::JACK_MIDI)
-						{
-							indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
-							if(indev)
-							{
-								qDebug("Created MIDI input device: JACK_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x2;
-								indev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(inport, indev);
-							}
-						}
-						if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
-						{
-							qDebug("MIDI input device configured, Adding input routes to MIDI port");
-							Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
-							Route dstRoute(indev, -1);
-
-							audio->msgAddRoute(srcRoute, dstRoute);
-
-							audio->msgUpdateSoloStates();
-							song->update(SC_ROUTE);
-						}
-					}
-					else
-					{
-						m_midiInPort = cmbInput->itemData(inputIndex).toInt();
-						qDebug("Using existing MIDI port: %i", m_midiInPort);
-						inport = &midiPorts[m_midiInPort];
-						if(inport)
-							indev = inport->device();
-					}
-					if(inport && indev)
-					{
-						qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
-						int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
-						Route srcRoute(m_midiInPort, chanbit);
-						Route dstRoute(track, chanbit);
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						audio->msgUpdateSoloStates();
-						song->update(SC_ROUTE);
-					}
+					m_createMidiInputDevice = true;
 				}
-				
-				//Process Output connections
-				if(outputIndex >= 0 && chkOutput->isChecked())
+				else
 				{
-					MidiPort* outport= 0;
-					MidiDevice* outdev = 0;
-					QString devname = cmbOutput->itemText(outputIndex);
-					if(m_currentMidiOutputList.isEmpty())
-					{
-						m_createMidiOutputDevice = true;
-					}
-					else
-					{
-						m_createMidiOutputDevice = !(m_currentMidiOutputList.contains(outputIndex) && m_currentMidiOutputList.value(outputIndex) == devname);
-					}
-					QString outputDevName(QString("O-").append(track->name()));
-					if(m_createMidiOutputDevice)
-					{
-						m_midiOutPort = getFreeMidiPort();
-						qDebug("m_createMidiOutputDevice is set: %i", m_midiOutPort);
-						outport = &midiPorts[m_midiOutPort];
-						int devtype = cmbOutput->itemData(outputIndex).toInt();
-						if(devtype == MidiDevice::ALSA_MIDI)
-						{
-							outdev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
-							if(outdev)
-							{
-								qDebug("Found MIDI output device: ALSA_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x1;
-								outdev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(outport, outdev);
-							}
-						}
-						else if(devtype == MidiDevice::JACK_MIDI)
-						{
-							outdev = MidiJackDevice::createJackMidiDevice(outputDevName, 3);
-							if(outdev)
-							{
-								qDebug("Created MIDI output device: JACK_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x1;
-								outdev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(outport, outdev);
-								oom->changeConfig(true);
-								song->update();
-							}
-						}
-						if(outdev && outdev->deviceType() == MidiDevice::JACK_MIDI)
-						{
-							qDebug("MIDI output device configured, Adding output routes to MIDI port");
-							Route srcRoute(outdev, -1);
-							Route dstRoute(devname, true, -1, Route::JACK_ROUTE);
-
-							qDebug("Device name from combo: %s, from dev: %s", devname.toUtf8().constData(), outdev->name().toUtf8().constData());
-
-							audio->msgAddRoute(srcRoute, dstRoute);
-
-							audio->msgUpdateSoloStates();
-							song->update(SC_ROUTE);
-						}
-					}
-					else
-					{
-						m_midiOutPort = cmbOutput->itemData(outputIndex).toInt();
-						qDebug("Using existing MIDI output port: %i", m_midiOutPort);
-						outport = &midiPorts[m_midiOutPort];
-						if(outport)
-							outdev = outport->device();
-					}
-					if(outport && outdev)
-					{
-						qDebug("MIDI output port and MIDI devices found, Adding final output routing");
-						audio->msgIdle(true);
-						mtrack->setOutPortAndUpdate(m_midiOutPort);
-						int outChan = cmbOutChannel->itemData(outChanIndex).toInt();
-						mtrack->setOutChanAndUpdate(outChan);
-						audio->msgIdle(false);
-						if(m_createMidiOutputDevice)
-						{
-							QString instrumentName = cmbInstrument->itemText(instrumentIndex);
-							for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
-							{
-								if ((*i)->iname() == instrumentName)
-								{
-									outport->setInstrument(*i);
-									break;
-								}
-							}
-						}
-						song->update(SC_MIDI_TRACK_PROP);
-					}
+					m_createMidiInputDevice = !(m_currentMidiInputList.contains(inputIndex) && m_currentMidiInputList.value(inputIndex) == devname);
 				}
-
-				if(monitorIndex >= 0 && midiBox->isChecked())
-				{
-					createMonitorInputTracks(track->name());
-				}
-
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
+				vtrack.createMidiInputDevice = m_createMidiInputDevice;
+				vtrack.inputConfig = qMakePair(inDevType, devname);
+				vtrack.inputChannel = chanbit;
 			}
-		}
+			
+			//Process Output connections
+			if(outputIndex >= 0 && chkOutput->isChecked())
+			{
+				vtrack.useOutput = true;
+				QString devname = cmbOutput->itemText(outputIndex);
+				int devtype = cmbOutput->itemData(outputIndex).toInt();
+				int outChan = cmbOutChannel->itemData(outChanIndex).toInt();
+				if(m_currentMidiOutputList.isEmpty())
+				{
+					m_createMidiOutputDevice = true;
+				}
+				else
+				{
+					m_createMidiOutputDevice = !(m_currentMidiOutputList.contains(outputIndex) && m_currentMidiOutputList.value(outputIndex) == devname);
+				}
+				vtrack.createMidiOutputDevice = m_createMidiOutputDevice;
+				vtrack.outputConfig = qMakePair(devtype, devname);
+				vtrack.outputChannel = outChan;
+				if(m_createMidiOutputDevice)
+				{
+					QString instrumentName = cmbInstrument->itemText(instrumentIndex);
+					vtrack.instrumentName = instrumentName;
+				}
+			}
+
+			if(monitorIndex >= 0 && midiBox->isChecked())
+			{
+				int iBuss = cmbBuss->itemData(bussIndex).toInt();
+				QString selectedInput = cmbMonitor->itemText(monitorIndex);
+				QString selectedBuss = cmbBuss->itemText(bussIndex);
+				vtrack.useMonitor = true;
+				vtrack.monitorConfig = qMakePair(0, selectedInput);
+				if(chkBuss->isChecked())
+				{
+					vtrack.useBuss = true;
+					vtrack.bussConfig = qMakePair(iBuss, selectedBuss);
+				}
+			}
+		}/*}}}*/
 		break;
 		case Track::WAVE:
 		{
-			Track* track =  song->addTrackByName(txtName->text(), Track::WAVE, m_insertPosition, !chkOutput->isChecked());
-			if(track)
+			if(inputIndex >= 0 && chkInput->isChecked())
 			{
-				if(inputIndex >= 0 && chkInput->isChecked())
-				{
-					QString inputName = QString("i").append(track->name());
-					QString selectedInput = cmbInput->itemText(inputIndex);
-					bool addNewRoute = cmbInput->itemData(inputIndex).toBool();
-					Track* input = 0;
-					if(addNewRoute)
-						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
-					else
-						input = song->findTrack(selectedInput);
-					if(input)
-					{
-						if(addNewRoute)
-						{
-							input->setMute(false);
-							//Connect jack port to Input track
-							Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
-							Route dstRoute(input, 0);
-							srcRoute.channel = 0;
-							
-							Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
-							srcRoute2.channel = 1;
-							Route dstRoute2(input, 1);
-
-							audio->msgAddRoute(srcRoute, dstRoute);
-							audio->msgAddRoute(srcRoute2, dstRoute2);
-
-							audio->msgUpdateSoloStates();
-							song->update(SC_ROUTE);
-						}
-						
-						//Connect input track to audio track
-						Route srcRoute(input->name(), true, -1);
-						Route dstRoute(track, 0, track->channels());
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						audio->msgUpdateSoloStates();
-						song->update(SC_ROUTE);
-					}
-				}
-				if(outputIndex >= 0 && chkOutput->isChecked())
-				{
-					//Route to the Output or Buss
-					QString selectedOutput = cmbOutput->itemText(outputIndex);
-					Route srcRoute(track, 0, track->channels());
-					Route dstRoute(selectedOutput, true, -1);
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
+				QString selectedInput = cmbInput->itemText(inputIndex);
+				int addNewRoute = cmbInput->itemData(inputIndex).toInt();
+				vtrack.useInput = true;
+				vtrack.inputConfig = qMakePair(addNewRoute, selectedInput);
+			}
+			if(outputIndex >= 0 && chkOutput->isChecked())
+			{
+				//Route to the Output or Buss
+				QString selectedOutput = cmbOutput->itemText(outputIndex);
+				vtrack.useOutput = true;
+				vtrack.outputConfig = qMakePair(0, selectedOutput);
 			}
 		}
 		break;
 		case Track::AUDIO_OUTPUT:
 		{
-			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_OUTPUT, -1, false);
-			if(track)
+			if(inputIndex >= 0 && chkInput->isChecked())
 			{
-				if(inputIndex >= 0 && chkInput->isChecked())
-				{
-					QString selectedInput = cmbInput->itemText(inputIndex);
-					Route dstRoute(track, 0, track->channels());
-					Route srcRoute(selectedInput, true, -1);
+				QString selectedInput = cmbInput->itemText(inputIndex);
+				vtrack.useInput = true;
+				vtrack.inputConfig = qMakePair(0, selectedInput);
+			}
 
-					audio->msgAddRoute(srcRoute, dstRoute);
-
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-
-				if(outputIndex >= 0 && chkOutput->isChecked())
-				{
-					QString jackPlayback("system:playback");
-					QString selectedOutput = cmbOutput->itemText(outputIndex);
-					bool systemOutput = false;
-					if(selectedOutput.startsWith(jackPlayback))
-					{
-						systemOutput = true;
-					
-						//Route channel 1
-						Route srcRoute(track, 0);
-						Route dstRoute(QString(jackPlayback).append("_1"), true, -1, Route::JACK_ROUTE);
-						dstRoute.channel = 0;
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						//Route channel 2
-						Route srcRoute2(track, 1);
-						Route dstRoute2(QString(jackPlayback).append("_2"), true, -1, Route::JACK_ROUTE);
-						dstRoute2.channel = 1;
-						
-						audio->msgAddRoute(srcRoute2, dstRoute2);
-					}
-					else
-					{
-						//Route channel 1
-						Route srcRoute(track, 0);
-						Route dstRoute(selectedOutput, true, -1, Route::JACK_ROUTE);
-						dstRoute.channel = 0;
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						//Route channel 2
-						Route srcRoute2(track, 1);
-						Route dstRoute2(selectedOutput, true, -1, Route::JACK_ROUTE);
-						dstRoute2.channel = 1;
-
-						audio->msgAddRoute(srcRoute2, dstRoute2);
-					}
-
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
+			if(outputIndex >= 0 && chkOutput->isChecked())
+			{
+				QString jackPlayback("system:playback");
+				QString selectedOutput = cmbOutput->itemText(outputIndex);
+				vtrack.useOutput = true;
+				vtrack.outputConfig = qMakePair(0, selectedOutput);
 			}
 		}
 		break;
 		case Track::AUDIO_INPUT:
 		{
-			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_INPUT, -1, false);
-			if(track)
+			if(inputIndex >= 0 && chkInput->isChecked())
 			{
-				track->setMute(false);
-				if(inputIndex >= 0 && chkInput->isChecked())
-				{
-					QString selectedInput = cmbInput->itemText(inputIndex);
-
-					QString jackCapture("system:capture");
-					if(selectedInput.startsWith(jackCapture))
-					{
-						Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
-						Route dstRoute(track, 0);
-						srcRoute.channel = 0;
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						Route srcRoute2(QString(jackCapture).append("_2"), false, -1, Route::JACK_ROUTE);
-						Route dstRoute2(track, 1);
-						srcRoute2.channel = 1;
-						audio->msgAddRoute(srcRoute2, dstRoute2);
-					}
-					else
-					{
-						Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
-						Route dstRoute(track, 0);
-						srcRoute.channel = 0;
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
-						Route dstRoute2(track, 1);
-						srcRoute2.channel = 1;
-						audio->msgAddRoute(srcRoute2, dstRoute2);
-					}
-
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				if(outputIndex >= 0 && chkOutput->isChecked())
-				{
-					QString selectedOutput = cmbOutput->itemText(outputIndex);
-
-					Route srcRoute(track, 0, track->channels());
-					Route dstRoute(selectedOutput, true, -1);
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
+				QString selectedInput = cmbInput->itemText(inputIndex);
+				vtrack.useInput = true;
+				vtrack.inputConfig = qMakePair(0, selectedInput);
+			}
+			if(outputIndex >= 0 && chkOutput->isChecked())
+			{
+				QString selectedOutput = cmbOutput->itemText(outputIndex);
+				vtrack.useOutput = true;
+				vtrack.outputConfig = qMakePair(0, selectedOutput);
 			}
 		}
 		break;
 		case Track::AUDIO_BUSS:
 		{
-			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_BUSS, -1, false);
-			if(track)
+			if(inputIndex >= 0 && chkInput->isChecked())
 			{
-				if(inputIndex >= 0 && chkInput->isChecked())
-				{
-					QString selectedInput = cmbInput->itemText(inputIndex);
-					Route srcRoute(selectedInput, true, -1);
-					Route dstRoute(track, 0, track->channels());
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				if(outputIndex >= 0 && chkOutput->isChecked())
-				{
-					QString selectedOutput = cmbOutput->itemText(outputIndex);
-					Route srcRoute(track, 0, track->channels());
-					Route dstRoute(selectedOutput, true, -1);
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
+				QString selectedInput = cmbInput->itemText(inputIndex);
+				vtrack.useInput = true;
+				vtrack.inputConfig = qMakePair(0, selectedInput);
+			}
+			if(outputIndex >= 0 && chkOutput->isChecked())
+			{
+				QString selectedOutput = cmbOutput->itemText(outputIndex);
+				vtrack.useOutput = true;
+				vtrack.outputConfig = qMakePair(0, selectedOutput);
 			}
 		}
 		break;
 		case Track::AUDIO_AUX:
-		{
-			Track* track = song->addTrackByName(txtName->text(), Track::AUDIO_AUX, -1, false);
-			if(track)
-			{
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
-			}
-		}
+			//Just add the track type and rename it
 		break;
 		case Track::AUDIO_SOFTSYNTH:
-        {
-			//Just add the track type and rename it
-        }
+			valid = false;
         break;
+		default:
+			valid = false;
 	}
-	if(m_lsClient && m_clientStarted)
+	if(valid)
 	{
-		m_lsClient->stopClient();
+		cleanup();
+		if(m_templateMode)
+		{
+			m_lastTrack = &vtrack;
+			emit trackReady(true);
+			hide();
+		}
+		else
+		{
+			OOTrackManager* tman = new OOTrackManager();
+			tman->setPosition(m_insertPosition);
+			connect(tman, SIGNAL(trackAdded(QString)), this, SIGNAL(trackAdded(QString)));
+			if(tman->addTrack(&vtrack))
+			{
+				qDebug("Sucessfully added track");
+				done(0);
+			}
+		}
 	}
-	done(0);
+}/*}}}*/
+
+OOVirtualTrack* CreateTrackDialog::getLastTrack()
+{
+	if(m_lastTrack)
+		return m_lastTrack;
+	else
+		return 0;
+}
+
+void CreateTrackDialog::cancelSelected()
+{
+	cleanup();
+	reject();
+}
+
+void CreateTrackDialog::cleanup()/*{{{*/
+{
+	if(m_instrumentLoaded)
+	{
+		if(!lsClient)
+		{
+			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+			lsClientStarted = lsClient->startClient();
+		}
+		else if(!lsClientStarted)
+		{
+			lsClientStarted = lsClient->startClient();
+		}
+		if(lsClientStarted)
+		{
+			lsClient->removeLastChannel();
+			m_instrumentLoaded = false;
+		}
+	}
 }/*}}}*/
 
 void CreateTrackDialog::updateInstrument(int index)
@@ -545,29 +314,36 @@ void CreateTrackDialog::updateInstrument(int index)
 	{
 		if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
 		{
-			if(!m_lsClient)
-			{
-				m_lsClient = new LSClient(config.lsClientHost.toUtf8().constData(), config.lsClientPort);
-				m_clientStarted = m_lsClient->startClient();
+			if(m_instrumentLoaded)
+			{//unload the last one
+				cleanup();
 			}
-			else if(!m_clientStarted)
+			if(!lsClient)
 			{
-				m_lsClient = new LSClient(config.lsClientHost.toUtf8().constData(), config.lsClientPort);
-				m_clientStarted = m_lsClient->startClient();
+				lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+				lsClientStarted = lsClient->startClient();
+				if(config.lsClientResetOnStart && lsClientStarted)
+				{
+					lsClient->resetSampler();
+				}
 			}
-			if(m_clientStarted)
+			else if(!lsClientStarted)
+			{
+				lsClientStarted = lsClient->startClient();
+			}
+			if(lsClientStarted)
 			{
 				qDebug("Loading Instrument to LinuxSampler");
-				if(m_lsClient->loadInstrument(*i))
+				if(lsClient->loadInstrument(*i))
 				{
 					qDebug("Instrument Map Loaded");
 					if(chkAutoCreate->isChecked())
 					{
-						int map = m_lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+						int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
 						Patch* p = (*i)->getDefaultPatch();
 						if(p && map >= 0)
 						{
-							if(m_lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+							if(lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
 							{
 								qDebug("Create Channel for track");
 								QString prefix("LinuxSampler:");
@@ -581,6 +357,7 @@ void CreateTrackDialog::updateInstrument(int index)
 								populateMonitorList();
 								cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
 								cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
+								m_instrumentLoaded = true;
 							}
 						}
 					}
@@ -627,114 +404,16 @@ void CreateTrackDialog::trackNameEdited()
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	if(type == Track::MIDI)
 	{
-		cmbInstrument->setEnabled(!txtName->text().isEmpty());
+		bool enabled = false;
+		if(!txtName->text().isEmpty())
+		{
+			Track* t = song->findTrack(txtName->text());
+			if(!t)
+				enabled = true;
+		}
+		cmbInstrument->setEnabled(enabled);
 	}
 }
-
-void CreateTrackDialog::createMonitorInputTracks(QString name)/*{{{*/
-{
-	int monitorIndex = cmbMonitor->currentIndex();
-	int bussIndex = cmbBuss->currentIndex();
-	bool newBuss = cmbBuss->itemData(bussIndex).toBool();
-
-	QString inputName = QString("i").append(name);
-	QString bussName = QString("B").append(name);
-	//QString audioName = QString("A-").append(name);
-	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
-	Track* buss = 0;
-	if(chkBuss->isChecked())
-	{
-		if(newBuss)
-			buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
-		else
-			buss = song->findTrack(cmbBuss->itemText(bussIndex));
-	}
-	//Track* audiot = song->addTrackByName(audioName, Track::WAVE, -1, false);
-	if(input/* && audiot*/)
-	{
-		input->setMute(false);
-		QString selectedInput = cmbMonitor->itemText(monitorIndex);
-		
-		//Route world to input
-		QString jackCapture("system:capture");
-		if(selectedInput.startsWith(jackCapture))
-		{
-			//Route channel 1
-			Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
-			Route dstRoute(input, 0);
-			srcRoute.channel = 0;
-			audio->msgAddRoute(srcRoute, dstRoute);
-
-			//Route channel 2
-			Route srcRoute2(QString(jackCapture).append("_2"), false, -1, Route::JACK_ROUTE);
-			Route dstRoute2(input, 1);
-			srcRoute2.channel = 1;
-			audio->msgAddRoute(srcRoute2, dstRoute2);
-		}
-		else
-		{
-			//Route channel 1
-			Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
-			Route dstRoute(input, 0);
-			srcRoute.channel = 0;
-			audio->msgAddRoute(srcRoute, dstRoute);
-
-			//Route channel 2
-			Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
-			Route dstRoute2(input, 1);
-			srcRoute2.channel = 1;
-			audio->msgAddRoute(srcRoute2, dstRoute2);
-		}
-
-		//Route input to buss
-		audio->msgUpdateSoloStates();
-		song->update(SC_ROUTE);
-		
-		if(chkBuss->isChecked() && buss)
-		{
-			Route srcRoute(input, 0, input->channels());
-			Route dstRoute(buss->name(), true, -1);
-
-			audio->msgAddRoute(srcRoute, dstRoute);
-		}
-
-		//Route input to audio
-		/*Route srcRoute2(input, 0, input->channels());
-		Route dstRoute2(audiot->name(), true, -1);
-		
-		audio->msgAddRoute(srcRoute2, dstRoute2);*/
-
-		//Route audio to master
-		Track* master = song->findTrack("Master");
-		if(master)
-		{
-			//Route buss track to master
-			if(chkBuss->isChecked() && buss)
-			{
-				Route srcRoute3(buss, 0, buss->channels());
-				Route dstRoute3(master->name(), true, -1);
-		
-				audio->msgAddRoute(srcRoute3, dstRoute3);
-			}
-			else
-			{//Route input directly to Master
-				Route srcRoute3(input, 0, input->channels());
-				Route dstRoute3(master->name(), true, -1);
-		
-				audio->msgAddRoute(srcRoute3, dstRoute3);
-			}
-
-			//Route audio track to master
-			/*Route srcRoute4(audiot, 0, audiot->channels());
-			Route dstRoute4(master->name(), true, -1);
-		
-			audio->msgAddRoute(srcRoute4, dstRoute4);*/
-		}
-
-		audio->msgUpdateSoloStates();
-		song->update(SC_ROUTE);
-	}
-}/*}}}*/
 
 //Populate input combo based on type
 void CreateTrackDialog::populateInputList()/*{{{*/
