@@ -276,14 +276,11 @@ void SynthPluginDevice::collectMidiEvents()
 
 void SynthPluginDevice::processMidi()
 {
-    if (m_plugin)
+    if (_writeEnable && m_plugin)
     {
-        if (_writeEnable)
-        {
-            MPEventList* eventList = playEvents();
-            if (m_plugin)
-                m_plugin->process_synth(eventList);
-        }
+        MPEventList* eventList = playEvents();
+        if (m_plugin)
+            m_plugin->process_synth(eventList);
         //qWarning("SynthPluginDevice::processMidi()");
     }
 }
@@ -325,6 +322,15 @@ bool SynthPluginDevice::hasGui() const
         return true; // use built-in UI for gui-less plugins
     }
     return false;
+}
+
+void SynthPluginDevice::writeToGui(const MidiPlayEvent& ev)
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::writeToGui(%i);", ev.type());
+        //m_plugin->updateNativeGui();
+    }
 }
 
 //---------------------------------------------------------

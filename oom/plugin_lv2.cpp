@@ -460,6 +460,8 @@ Lv2Plugin::~Lv2Plugin()
     // close UI
     if (m_hints & PLUGIN_HAS_NATIVE_GUI)
     {
+        qWarning("~Lv2Plugin() close GUI here");
+
         if (ui.handle && ui.descriptor->cleanup)
             ui.descriptor->cleanup(ui.handle);
 
@@ -599,7 +601,7 @@ void Lv2Plugin::initPluginI(PluginI* plugi, const QString& filename, const QStri
     const LilvNode* lilvClassLabel = lilv_plugin_class_get_label(lilvClass);
     const char* lv2Class = lilv_node_as_string(lilvClassLabel);
 
-    if (strcmp(lv2Class, "Instrument") == 0 && plugi->m_audioInputCount > 0)
+    if (strcmp(lv2Class, "Instrument") == 0 && plugi->m_audioOutputCount > 0)
         plugi->m_hints |= PLUGIN_IS_SYNTH;
     else if (plugi->m_audioInputCount == plugi->m_audioOutputCount && plugi->m_audioOutputCount >= 1)
         // we can only process plugins that have the same number of input/output audio ports
@@ -1300,6 +1302,8 @@ bool Lv2Plugin::hasNativeGui()
 
 void Lv2Plugin::showNativeGui(bool yesno)
 {
+    qWarning("showNativeGui(%i)", yesno);
+
     // Initialize UI if needed
     if (! ui.handle)
     {
@@ -1377,7 +1381,10 @@ void Lv2Plugin::showNativeGui(bool yesno)
         break;
     case UI_EXTERNAL:
         if (yesno)
+        {
             LV2_EXTERNAL_UI_SHOW((lv2_external_ui*)ui.widget);
+            LV2_EXTERNAL_UI_RUN((lv2_external_ui*)ui.widget);
+        }
         else
             closeNativeGui();
         break;
@@ -1589,35 +1596,46 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                     descriptor->connect_port(handle, m_audioOutIndexes.at(i), dst[i]);
             }
 
-            for (size_t i = 0; i < m_events.size(); i++)
+            // activate if needed
+            if (m_activeBefore == false)
             {
-                if (m_events[i].types & OOM_URI_MAP_ID_EVENT_MIDI)
+                if (descriptor->activate)
+                    descriptor->activate(handle);
+            }
+
+            // Process MIDI events
+            if (eventList)
+            {
+                for (size_t i = 0; i < m_events.size(); i++)
                 {
-                    iMPEvent ev = eventList->begin();
-                    for (; ev != eventList->end(); ++ev)
+                    if (m_events[i].types & OOM_URI_MAP_ID_EVENT_MIDI)
                     {
-                        qWarning("Has event -> %i | %i | %i : 0x%02X 0x%02X 0x%02X", ev->channel(), ev->len(), ev->time(), ev->type(), ev->dataA(), ev->dataB());
-                        uint8_t* midi_event;
-
-                        switch (ev->type())
+                        iMPEvent ev = eventList->begin();
+                        for (; ev != eventList->end(); ++ev)
                         {
-                        case ME_NOTEOFF:
-                            midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 2);
-                            midi_event[0] = ME_NOTEOFF + ev->channel();
-                            midi_event[1] = ev->dataA();
-                            break;
-                        case ME_NOTEON:
-                            midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
-                            midi_event[0] = ME_NOTEON + ev->channel();
-                            midi_event[1] = ev->dataA();
-                            midi_event[2] = ev->dataB();
-                            break;
-                        }
-                    }
-                    eventList->erase(eventList->begin(), ev);
+                            qWarning("Has event -> %i | %i | %i : 0x%02X 0x%02X 0x%02X", ev->channel(), ev->len(), ev->time(), ev->type(), ev->dataA(), ev->dataB());
+                            uint8_t* midi_event;
 
-                    // we only care about 1 midi synth port
-                    break;
+                            switch (ev->type())
+                            {
+                            case ME_NOTEOFF:
+                                midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 2);
+                                midi_event[0] = ME_NOTEOFF + ev->channel();
+                                midi_event[1] = ev->dataA();
+                                break;
+                            case ME_NOTEON:
+                                midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
+                                midi_event[0] = ME_NOTEON + ev->channel();
+                                midi_event[1] = ev->dataA();
+                                midi_event[2] = ev->dataB();
+                                break;
+                            }
+                        }
+                        eventList->erase(eventList->begin(), ev);
+
+                        // we only care about 1 midi synth port
+                        break;
+                    }
                 }
             }
 
@@ -1637,13 +1655,6 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                         m_params[i].update = true;
                     }
                 }
-            }
-
-            // activate if needed
-            if (m_activeBefore == false)
-            {
-                if (descriptor->activate)
-                    descriptor->activate(handle);
             }
 
             // time event

@@ -23,6 +23,7 @@
 #include "mididev.h"
 #include "midictrl.h"
 #include "audio.h"
+#include "plugin.h"
 #include "driver/alsamidi.h"
 #include "driver/jackmidi.h"
 #include "sync.h"
@@ -713,7 +714,10 @@ void MidiSeq::processTimerTick()
 		if (md->deviceType() == MidiDevice::JACK_MIDI)
 			continue;
         if (md->isSynthPlugin()) // synths are handled by audio thread
+        {
+            ((SynthPluginDevice*)md)->updateNativeGui();
 			continue;
+        }
 		int port = md->midiPort();
 		MidiPort* mp = port != -1 ? &midiPorts[port] : 0;
 		MPEventList* el = md->playEvents();

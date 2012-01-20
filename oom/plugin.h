@@ -166,7 +166,7 @@ public:
         m_track = 0;
         m_gui = 0;
 
-        m_enabled = true;
+        m_enabled = false; // wait for a reload() call
         m_lib = 0;
 
         m_ports_in = 0;
@@ -375,7 +375,7 @@ public:
 
     void process_synth(MPEventList* eventList)
     {
-        if (m_aoutsCount > 0)
+        if (m_enabled && m_aoutsCount > 0)
         {
             jack_default_audio_sample_t* ains_buffer[m_ainsCount];
             jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
@@ -683,6 +683,12 @@ public:
         return m_label;
     }
 
+    void updateNativeGui()
+    {
+        if (m_plugin)
+            m_plugin->updateNativeGui();
+    }
+
     virtual QString open();
     virtual void close();
     virtual void setName(const QString& s);
@@ -692,6 +698,7 @@ public:
     virtual bool guiVisible() const;
     virtual void showGui(bool yesno);
     virtual bool hasGui() const;
+    virtual void writeToGui(const MidiPlayEvent&);
 
     MidiPlayEvent receiveEvent();
     int eventsPending() const;

@@ -475,6 +475,13 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst, MPEventLis
                 return;
             }
 
+            // activate if needed
+            if (m_activeBefore == false)
+            {
+                if (descriptor->activate)
+                    descriptor->activate(handle);
+            }
+
             // Process automation
             if (m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
             {
@@ -491,13 +498,6 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst, MPEventLis
                         m_params[i].update = true;
                     }
                 }
-            }
-
-            // activate if needed
-            if (m_activeBefore == false)
-            {
-                if (descriptor->activate)
-                    descriptor->activate(handle);
             }
 
             // process
