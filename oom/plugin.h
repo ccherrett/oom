@@ -403,6 +403,9 @@ public:
     virtual QString getParameterName(uint32_t index) = 0;
     virtual void setNativeParameterValue(uint32_t index, double value) = 0;
 
+    virtual uint32_t getProgramCount() = 0;
+    virtual QString getProgramName(uint32_t index) = 0;
+
     virtual bool init(QString filename, QString label) = 0;
     virtual void reload() = 0;
     virtual void reloadPrograms(bool init) = 0;
@@ -464,6 +467,9 @@ public:
 
     QString getParameterName(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
+
+    uint32_t getProgramCount();
+    QString getProgramName(uint32_t index);
 
     bool hasNativeGui();
     void showNativeGui(bool yesno);
@@ -533,6 +539,9 @@ public:
 
     QString getParameterName(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
+
+    uint32_t getProgramCount();
+    QString getProgramName(uint32_t index);
 
     uint32_t getCustomURIId(const char* uri);
     const char* getCustomURIString(int uri_id);
@@ -619,6 +628,9 @@ public:
     QString getParameterName(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
 
+    uint32_t getProgramCount();
+    QString getProgramName(uint32_t index);
+
     intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
     void process(uint32_t frames, float** src, float** dst, MPEventList* eventList);
@@ -699,6 +711,9 @@ public:
     virtual void showGui(bool yesno);
     virtual bool hasGui() const;
     virtual void writeToGui(const MidiPlayEvent&);
+
+    void read(Xml&);
+    void write(int level, Xml&);
 
     MidiPlayEvent receiveEvent();
     int eventsPending() const;

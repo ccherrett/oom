@@ -540,6 +540,17 @@ void VstPlugin::setNativeParameterValue(uint32_t index, double value)
     effect->setParameter(effect, index, value);
 }
 
+uint32_t VstPlugin::getProgramCount()
+{
+    return 0;
+
+}
+
+QString VstPlugin::getProgramName(uint32_t index)
+{
+    return QString("");
+}
+
 bool VstPlugin::hasNativeGui()
 {
     return (m_hints & PLUGIN_HAS_NATIVE_GUI);
@@ -646,7 +657,6 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                 iMPEvent ev = eventList->begin();
                 for (; ev != eventList->end(); ++ev)
                 {
-                    qWarning("Has event -> %i | %i | %i : 0x%02X 0x%02X 0x%02X", ev->channel(), ev->len(), ev->time(), ev->type(), ev->dataA(), ev->dataB());
                     VstMidiEvent* midiEvent = &midiEvents[midiEventCount];
                     memset(midiEvent, 0, sizeof(VstMidiEvent));
 
