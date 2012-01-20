@@ -453,15 +453,11 @@ Lv2Plugin::Lv2Plugin()
 
 Lv2Plugin::~Lv2Plugin()
 {
-    qWarning("~Lv2Plugin() ---- --------------------------------------------");
-
     aboutToRemove();
 
     // close UI
     if (m_hints & PLUGIN_HAS_NATIVE_GUI)
     {
-        qWarning("~Lv2Plugin() close GUI here");
-
         if (ui.handle && ui.descriptor->cleanup)
             ui.descriptor->cleanup(ui.handle);
 
@@ -1242,6 +1238,21 @@ void Lv2Plugin::setNativeParameterValue(uint32_t index, double value)
         m_paramsBuffer[index] = value;
 }
 
+uint32_t Lv2Plugin::getProgramCount()
+{
+    return 0;
+
+}
+
+QString Lv2Plugin::getProgramName(uint32_t /*index*/)
+{
+    return QString("");
+}
+
+void Lv2Plugin::setProgram(uint32_t /*index*/)
+{
+}
+
 uint32_t Lv2Plugin::getCustomURIId(const char *uri)
 {
     qDebug("Lv2Plugin::getCustomURIId(%s)", uri);
@@ -1302,8 +1313,6 @@ bool Lv2Plugin::hasNativeGui()
 
 void Lv2Plugin::showNativeGui(bool yesno)
 {
-    qWarning("showNativeGui(%i)", yesno);
-
     // Initialize UI if needed
     if (! ui.handle)
     {
@@ -1613,7 +1622,7 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                         iMPEvent ev = eventList->begin();
                         for (; ev != eventList->end(); ++ev)
                         {
-                            qWarning("Has event -> %i | %i | %i : 0x%02X 0x%02X 0x%02X", ev->channel(), ev->len(), ev->time(), ev->type(), ev->dataA(), ev->dataB());
+                            //qWarning("Has event -> %i | %i | %i : 0x%02X 0x%02X 0x%02X", ev->channel(), ev->len(), ev->time(), ev->type(), ev->dataA(), ev->dataB());
                             uint8_t* midi_event;
 
                             switch (ev->type())

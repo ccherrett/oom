@@ -412,6 +412,21 @@ void LadspaPlugin::setNativeParameterValue(uint32_t index, double value)
         m_paramsBuffer[index] = value;
 }
 
+uint32_t LadspaPlugin::getProgramCount()
+{
+    return 0;
+
+}
+
+QString LadspaPlugin::getProgramName(uint32_t)
+{
+    return QString("");
+}
+
+void LadspaPlugin::setProgram(uint32_t)
+{
+}
+
 bool LadspaPlugin::hasNativeGui()
 {
     return false;

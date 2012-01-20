@@ -334,6 +334,29 @@ void SynthPluginDevice::writeToGui(const MidiPlayEvent& ev)
 }
 
 //---------------------------------------------------------
+//   XML Stuff
+//---------------------------------------------------------
+
+void SynthPluginDevice::read(Xml& xml)
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::read(XML)");
+        m_plugin->readConfiguration(xml, false);
+    }
+}
+
+void SynthPluginDevice::write(int level, Xml& xml)
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::write(XML)");
+        m_plugin->writeConfiguration(level, xml);
+    }
+}
+
+
+//---------------------------------------------------------
 //   receiveEvent
 //---------------------------------------------------------
 

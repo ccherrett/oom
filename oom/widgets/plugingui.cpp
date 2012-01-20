@@ -79,14 +79,8 @@ PluginGui::PluginGui(BasePlugin* p)
     //pluginMenu->addAction(pluginInfo);
 
     // preset menu --------------------------------------------
-    QMenu* presetMenu = new QMenu(tr("Presets"), menuBar);
-
-    if (true)
-    {
-        QAction* presetNone = new QAction(QIcon(*openIconS), tr("(none)"), menuBar);
-        presetNone->setEnabled(false);
-        presetMenu->addAction(presetNone);
-    }
+    presetMenu = new QMenu(tr("Presets"), menuBar);
+    connect(presetMenu, SIGNAL(aboutToShow()), SLOT(populatePresetMenu()));
 
     // show menu
     menuBar->addMenu(fileMenu);
@@ -684,4 +678,45 @@ void PluginGui::ctrlRightClicked(const QPoint &p, int param)
     int id = plugin->id();
     if (id != -1)
         song->execAutomationCtlPopup(plugin->track(), p, genACnum(id, param));
+}
+
+//---------------------------------------------------------
+//   populatePresetMenu
+//---------------------------------------------------------
+
+void PluginGui::populatePresetMenu()
+{
+    presetMenu->clear();
+
+    if (plugin && plugin->getProgramCount() > 0)
+    {
+        for (uint32_t i = 0; i < plugin->getProgramCount(); i++)
+        {
+            QAction* preset = new QAction(plugin->getProgramName(i), menuBar());
+            preset->setData(i);
+            connect(preset, SIGNAL(triggered()), SLOT(programSelected()));
+            presetMenu->addAction(preset);
+        }
+    }
+    else
+    {
+        QAction* presetNone = new QAction(tr("(none)"), menuBar());
+        presetNone->setEnabled(false);
+        presetMenu->addAction(presetNone);
+    }
+}
+
+void PluginGui::programSelected()
+{
+    if (!plugin)
+        return;
+
+    bool ok;
+    unsigned int program = ((QAction*)sender())->data().toInt(&ok);
+
+    if (ok)
+    {
+        plugin->setProgram(program);
+        updateValues();
+    }
 }
