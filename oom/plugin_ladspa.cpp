@@ -418,9 +418,13 @@ uint32_t LadspaPlugin::getProgramCount()
 
 }
 
-QString LadspaPlugin::getProgramName(uint32_t index)
+QString LadspaPlugin::getProgramName(uint32_t)
 {
     return QString("");
+}
+
+void LadspaPlugin::setProgram(uint32_t)
+{
 }
 
 bool LadspaPlugin::hasNativeGui()

@@ -1244,9 +1244,13 @@ uint32_t Lv2Plugin::getProgramCount()
 
 }
 
-QString Lv2Plugin::getProgramName(uint32_t index)
+QString Lv2Plugin::getProgramName(uint32_t /*index*/)
 {
     return QString("");
+}
+
+void Lv2Plugin::setProgram(uint32_t /*index*/)
+{
 }
 
 uint32_t Lv2Plugin::getCustomURIId(const char *uri)

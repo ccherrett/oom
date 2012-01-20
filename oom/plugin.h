@@ -405,6 +405,7 @@ public:
 
     virtual uint32_t getProgramCount() = 0;
     virtual QString getProgramName(uint32_t index) = 0;
+    virtual void setProgram(uint32_t index) = 0;
 
     virtual bool init(QString filename, QString label) = 0;
     virtual void reload() = 0;
@@ -470,6 +471,7 @@ public:
 
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
+    void setProgram(uint32_t index);
 
     bool hasNativeGui();
     void showNativeGui(bool yesno);
@@ -542,6 +544,7 @@ public:
 
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
+    void setProgram(uint32_t index);
 
     uint32_t getCustomURIId(const char* uri);
     const char* getCustomURIString(int uri_id);
@@ -630,6 +633,7 @@ public:
 
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
+    void setProgram(uint32_t index);
 
     intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
@@ -648,6 +652,8 @@ protected:
         int height;
         QWidget* widget;
     } ui;
+    int32_t m_currentProgram;
+    QStringList m_programNames;
 
     AEffect* effect;
     struct {

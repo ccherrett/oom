@@ -177,8 +177,8 @@ VstPlugin::VstPlugin()
     : BasePlugin()
 {
     m_type = PLUGIN_VST;
-
     isOldSdk = false;
+    m_currentProgram = -1;
 
     ui.width = 0;
     ui.height = 0;
@@ -523,7 +523,61 @@ void VstPlugin::reload()
 
 void VstPlugin::reloadPrograms(bool)
 {
-    // TODO
+    int32_t old_count = m_programNames.count();
+    m_programNames.clear();
+
+    // Update names
+    for (int32_t i=0; i < effect->numPrograms; i++)
+    {
+        char buf_str[255] = { 0 };
+        if (effect->dispatcher(effect, effGetProgramNameIndexed, i, 0, buf_str, 0.0f) != 1)
+        {
+            // program will be [re-]changed later
+            effect->dispatcher(effect, effSetProgram, 0, i, 0, 0.0f);
+            effect->dispatcher(effect, effGetProgramName, 0, 0, buf_str, 0.0f);
+        }
+        m_programNames.append(QString(buf_str));
+    }
+
+    // Check if current program is invalid
+    bool program_changed = false;
+    int32_t new_count = effect->numPrograms;
+
+    if (new_count == old_count+1)
+    {
+        // one program added, probably created by user
+        m_currentProgram = old_count;
+        program_changed = true;
+    }
+    else if (m_currentProgram >= (int32_t)new_count)
+    {
+        // current program > count
+        m_currentProgram = 0;
+        program_changed = true;
+    }
+    else if (m_currentProgram < 0 && new_count > 0)
+    {
+        // programs exist now, but not before
+        m_currentProgram = 0;
+        program_changed = true;
+    }
+    else if (m_currentProgram >= 0 && new_count == 0)
+    {
+        // programs existed before, but not anymore
+        m_currentProgram = -1;
+        program_changed = true;
+    }
+
+    if (program_changed)
+    {
+        setProgram(m_currentProgram);
+    }
+    else
+    {
+        // Program was changed during update, re-set it
+        if (m_currentProgram >= 0)
+            effect->dispatcher(effect, effSetProgram, 0, m_currentProgram, 0, 0.0f);
+    }
 }
 
 QString VstPlugin::getParameterName(uint32_t index)
@@ -542,13 +596,27 @@ void VstPlugin::setNativeParameterValue(uint32_t index, double value)
 
 uint32_t VstPlugin::getProgramCount()
 {
-    return 0;
-
+    return m_programNames.count();
 }
 
 QString VstPlugin::getProgramName(uint32_t index)
 {
+    if (index < (uint32_t)m_programNames.count())
+        return m_programNames.at(index);
     return QString("");
+}
+
+void VstPlugin::setProgram(uint32_t index)
+{
+    if (index < (uint32_t)m_programNames.count())
+    {
+        effect->dispatcher(effect, effSetProgram, 0, index, 0, 0.0f);
+
+        for (uint32_t i=0; i < m_paramCount; i++)
+            m_params[i].value = m_params[i].tmpValue = effect->getParameter(effect, i);
+
+        m_currentProgram = index;
+    }
 }
 
 bool VstPlugin::hasNativeGui()

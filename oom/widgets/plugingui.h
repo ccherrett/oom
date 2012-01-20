@@ -54,6 +54,7 @@ private:
     QScrollArea* view;
 
     QAction* pluginBypass;
+    QMenu* presetMenu;
     GuiParam* params;
 
     void updateControls();
@@ -68,6 +69,8 @@ private slots:
     void ctrlPressed(int);
     void ctrlReleased(int);
     void ctrlRightClicked(const QPoint &, int);
+    void populatePresetMenu();
+    void programSelected();
 };
 
 #endif
