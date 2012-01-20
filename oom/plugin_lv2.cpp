@@ -1638,6 +1638,17 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                                 midi_event[1] = ev->dataA();
                                 midi_event[2] = ev->dataB();
                                 break;
+                            case ME_CONTROLLER:
+                                if (ev->dataA() == 0x40001) // FIXME, what is 0x40001
+                                    setProgram(ev->dataB());
+                                else
+                                {
+                                    midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
+                                    midi_event[0] = ME_CONTROLLER + ev->channel();
+                                    midi_event[1] = ev->dataA();
+                                    midi_event[2] = ev->dataB();
+                                }
+                                break;
                             }
                         }
                         eventList->erase(eventList->begin(), ev);

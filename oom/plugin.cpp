@@ -35,6 +35,9 @@
 #include <QVBoxLayout>
 #include <QWhatsThis>
 
+#include <QStandardItem>
+#include <QStandardItemModel>
+
 #include "globals.h"
 #include "gconfig.h"
 #include "filedialog.h"
@@ -330,6 +333,84 @@ void SynthPluginDevice::writeToGui(const MidiPlayEvent& ev)
     {
         qWarning("SynthPluginDevice::writeToGui(%i);", ev.type());
         //m_plugin->updateNativeGui();
+    }
+}
+
+//---------------------------------------------------------
+//   Patch/Programs Stuff
+//---------------------------------------------------------
+
+void SynthPluginDevice::reset(int, MType)
+{
+    qWarning("SynthPluginDevice::reset");
+}
+
+QString SynthPluginDevice::getPatchName(int, int prog, MType, bool)
+{
+    qWarning("SynthPluginDevice::getPatchName()");
+
+    if (m_plugin)
+    {
+        if (prog < (int32_t)m_plugin->getProgramCount())
+            return m_plugin->getProgramName(prog);
+    }
+    return QString("");
+}
+
+Patch* SynthPluginDevice::getPatch(int, int prog, MType, bool)
+{
+#if 0
+    static Patch patch;
+    patch.typ   = 1; // 1 - GM  2 - GS  4 - XG
+    patch.hbank = 0;
+    patch.lbank = 0;
+    patch.prog  = prog;
+    patch.name  = m_plugin ? m_plugin->getProgramName(prog) : "";
+    patch.loadmode = 0; // ?
+    //QString engine;
+    //QString filename;
+    patch.index = prog;
+    patch.volume = 1.0f; // ?
+    patch.drum = false;
+    //patch.read = 0;
+    //patch.write = 0;
+    //void read(Xml&);
+    //void write(int level, Xml&);
+    return &patch;
+#endif
+
+    qWarning("SynthPluginDevice::getPatch(%i)", prog);
+    return 0;
+}
+
+void SynthPluginDevice::populatePatchPopup(QMenu*, int, MType, bool)
+{
+    qWarning("SynthPluginDevice::populatePatchPopup();");
+}
+
+void SynthPluginDevice::populatePatchModel(QStandardItemModel* model, int, MType, bool)
+{
+    qWarning("SynthPluginDevice::populatePatchModel();");
+    model->clear();
+
+    if (m_plugin)
+    {
+        QStandardItem* root = model->invisibleRootItem();
+
+        for (uint32_t i=0; i < m_plugin->getProgramCount(); i++)
+        {
+            QList<QStandardItem*> row;
+            QString strId = QString::number(i);
+            QStandardItem* idItem = new QStandardItem(strId);
+            QStandardItem* nItem = new QStandardItem(m_plugin->getProgramName(i));
+            nItem->setToolTip(m_plugin->getProgramName(i));
+            row.append(nItem);
+            row.append(idItem);
+            root->appendRow(row);
+            //QAction *act = menu->addAction(QString(mp->name));
+            //act->setData(id);
+            //mp = _mess->getPatchInfo(ch, mp);
+        }
     }
 }
 
