@@ -35,15 +35,15 @@
       <attribute name="title">
        <string>  Application  </string>
       </attribute>
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="gridLayout1">
        <item row="0" column="0">
         <widget class="QGroupBox" name="groupBox3">
          <property name="title">
           <string>Start OOMidi</string>
          </property>
-         <layout class="QGridLayout">
+         <layout class="QGridLayout" name="gridLayout2">
           <item row="0" column="0">
-           <layout class="QGridLayout">
+           <layout class="QGridLayout" name="gridLayout3">
             <item row="1" column="0">
              <spacer name="spacer7_2">
               <property name="orientation">
@@ -179,13 +179,13 @@
       <attribute name="title">
        <string>  Audio  </string>
       </attribute>
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="gridLayout4">
        <item row="0" column="0">
         <widget class="QGroupBox" name="GroupBox4">
          <property name="title">
           <string>Mixer</string>
          </property>
-         <layout class="QGridLayout">
+         <layout class="QGridLayout" name="gridLayout5">
           <property name="margin">
            <number>11</number>
           </property>
@@ -331,11 +331,11 @@
          <property name="title">
           <string>External Waveditor</string>
          </property>
-         <layout class="QGridLayout">
+         <layout class="QGridLayout" name="gridLayout6">
           <item row="0" column="0">
-           <layout class="QGridLayout">
+           <layout class="QGridLayout" name="gridLayout7">
             <item row="0" column="0">
-             <layout class="QHBoxLayout">
+             <layout class="QHBoxLayout" name="gridLayout8">
               <item>
                <widget class="QLabel" name="textLabel2_2">
                 <property name="sizePolicy">
@@ -405,7 +405,7 @@
          <property name="title">
           <string>Dummy Audio Driver (settings require restart)</string>
          </property>
-         <layout class="QGridLayout">
+         <layout class="QGridLayout" name="gridLayout9">
           <item row="0" column="0">
            <widget class="QLabel" name="dummyAudioRateLabel">
             <property name="text">
@@ -567,7 +567,7 @@ Shorter periods are desirable.</string>
          <property name="title">
           <string>Ticks</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout9">
+         <layout class="QGridLayout" name="gridLayout10">
           <item row="0" column="0">
            <widget class="QLabel" name="TextLabel3">
             <property name="text">
@@ -784,7 +784,7 @@ Shorter periods are desirable.</string>
          <property name="title">
           <string>Behavior</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout">
+         <layout class="QGridLayout" name="gridLayout11">
           <item row="0" column="0">
            <widget class="QLabel" name="TextLabel1">
             <property name="text">
