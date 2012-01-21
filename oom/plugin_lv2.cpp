@@ -10,6 +10,7 @@
 
 #include "plugin.h"
 #include "plugingui.h"
+#include "icons.h"
 #include "midi.h"
 #include "jackaudio.h"
 #include "track.h"
@@ -1320,6 +1321,16 @@ void Lv2Plugin::showNativeGui(bool yesno)
 
         if (ui.handle)
         {
+            QString title;
+            title += "OOMidi: ";
+            title += m_name;
+            title += " (GUI)";
+            if (m_track)
+            {
+                title += " - ";
+                title += m_track->name();
+            }
+
             if (ui.type == UI_GTK2)
             {
 #ifdef GTK2UI_SUPPORT
@@ -1327,7 +1338,7 @@ void Lv2Plugin::showNativeGui(bool yesno)
                 GtkWidget* pluginWidget = (GtkWidget*)ui.widget;
 
                 //gtk_window_set_resizable(GTK_WINDOW(hostWidget), 1);
-                gtk_window_set_title(GTK_WINDOW(hostWidget), m_name.toUtf8().constData());
+                gtk_window_set_title(GTK_WINDOW(hostWidget), title.toUtf8().constData());
                 gtk_container_add(GTK_CONTAINER(hostWidget), pluginWidget);
                 g_signal_connect(G_OBJECT(hostWidget), "destroy", G_CALLBACK(oom_lv2_gtk_window_destroyed), this);
 
@@ -1342,7 +1353,8 @@ void Lv2Plugin::showNativeGui(bool yesno)
                 QWidget* pluginWidget = (QWidget*)ui.widget;
                 pluginWidget->adjustSize();
                 pluginWidget->setAttribute(Qt::WA_DeleteOnClose);
-                pluginWidget->setWindowTitle(m_name);
+                pluginWidget->setWindowTitle(title);
+                pluginWidget->setWindowIcon(*oomIcon);
 
                 if (ui.width > 0 && ui.height > 0)
                     pluginWidget->resize(ui.width, ui.height);
@@ -1350,7 +1362,8 @@ void Lv2Plugin::showNativeGui(bool yesno)
             else if (ui.type == UI_X11)
             {
                 QWidget* hostWidget = (QWidget*)ui.nativeWidget;
-                hostWidget->setWindowTitle(m_name);
+                hostWidget->setWindowTitle(title);
+                hostWidget->setWindowIcon(*oomIcon);
 
                 if (ui.width > 0 && ui.height > 0)
                     hostWidget->setFixedSize(ui.width, ui.height);

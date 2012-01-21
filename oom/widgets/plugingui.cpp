@@ -38,7 +38,16 @@ PluginGui::PluginGui(BasePlugin* p)
 : QMainWindow(0),
   plugin(p)
 {
-    setWindowTitle(plugin->name());
+    QString title;
+    title += "OOMidi: ";
+    title += plugin->name();
+    if (plugin->track())
+    {
+        title += " - ";
+        title += plugin->track()->name();
+    }
+
+    setWindowTitle(title);
     setWindowIcon(*oomIcon);
     setObjectName("PluginGui");
 

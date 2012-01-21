@@ -10,6 +10,7 @@
 
 #include "plugin.h"
 #include "plugingui.h"
+#include "icons.h"
 #include "midi.h"
 #include "jackaudio.h"
 #include "track.h"
@@ -659,6 +660,19 @@ void VstPlugin::showNativeGui(bool yesno)
             m_hints -= PLUGIN_HAS_NATIVE_GUI;
             effect->dispatcher(effect, effEditClose, 0, 0, 0, 0.0f);
         }
+
+        QString title;
+        title += "OOMidi: ";
+        title += m_name;
+        title += " (GUI)";
+        if (m_track)
+        {
+            title += " - ";
+            title += m_track->name();
+        }
+
+        ui.widget->setWindowTitle(title);
+        ui.widget->setWindowIcon(*oomIcon);
     }
 
     ui.widget->setVisible(yesno);
