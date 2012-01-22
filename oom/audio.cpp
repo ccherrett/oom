@@ -675,7 +675,7 @@ void Audio::processMsg(AudioMsg* msg)
 			//TODO: hook this and send midi cc to bcf2000
 			break;
 		case SEQM_SET_AUX:
-			msg->snode->setAuxSend(msg->ival, msg->dval);
+			msg->snode->setAuxSend(msg->sid, msg->dval);
 			break;
 		case AUDIO_SET_PREFADER:
 			msg->snode->setPrefader(msg->ival);

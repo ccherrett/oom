@@ -43,49 +43,6 @@ ClonePart::ClonePart(const Part* p, int i)
 
 CloneList cloneList;
 
-/*
-//---------------------------------------------------------
-//   updateCloneList
-//---------------------------------------------------------
-
-void updateCloneList(Part* oPart, Part* nPart)
-{
-  for(iClone i = cloneList.begin(); i != cloneList.end(); ++i) 
-  {
-	if(i->cp == oPart)
-	{
-	  i->cp = nPart;
-	  break;
-	}
-  }
-}
-
-void updateCloneList(PartList* oParts, PartList* nParts)
-{
-  for(iPart ip = oParts->begin(); ip != oParts->end(); ++ip) 
-  {
-	for(iClone i = cloneList.begin(); i != cloneList.end(); ++i)
-	{
-	  if(i->cp == oPart)
-	  {
-		i->cp = nPart;
-		break;
-	  }
-	}
-  }
-}
-
-//---------------------------------------------------------
-//   clearClipboardAndCloneList
-//---------------------------------------------------------
-
-void clearClipboardAndCloneList()
-{
-  //QApplication::clipboard()->clear(QClipboard::Clipboard);
-  cloneList.clear();
-}
- */
-
 //---------------------------------------------------------
 //   NKey::write
 //---------------------------------------------------------
@@ -240,7 +197,6 @@ Part* readXmlPart(Xml& xml, Track* track, bool doClone, bool toTrack)
 
 								// If it's a regular paste (not paste clone), and the original part is
 								//  not a clone, defer so that a new copy is created in TagStart above.
-								//if(!doClone && i->cp->cevents()->arefCount() <= 1)
 								if (!doClone && !isclone)
 									break;
 
@@ -734,41 +690,6 @@ void OOMidi::readToplevels(Xml& xml)
 
 void OOMidi::readCtrl(Xml&, int /*prt*/, int /*channel*/)
 {
-#if 0
-	ChannelState* iState = midiPorts[prt].iState(channel);
-
-	int idx = 0;
-	int val = -1;
-
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return;
-			case Xml::TagStart:
-				xml.unknown("readCtrl");
-				break;
-			case Xml::Attribut:
-				if (xml.s1() == "idx")
-					idx = xml.s2().toInt();
-				else if (xml.s1() == "val")
-					val = xml.s2().toInt();
-				break;
-			case Xml::TagEnd:
-				if (xml.s1() == "ctrl")
-				{
-					iState->controller[idx] = val;
-					// printf("%d %d ctrl %d val %d\n", prt, channel, idx, val);
-					return;
-				}
-			default:
-				break;
-		}
-	}
-#endif
 }
 
 //---------------------------------------------------------
@@ -980,8 +901,9 @@ void Song::read(Xml& xml)
 				}
 				else if (tag == "SynthI")
 				{
-					SynthI* track = new SynthI();
-					track->read(xml);
+					xml.skip(tag);
+					//SynthI* track = new SynthI();
+					//track->read(xml);
 					// Done in SynthI::read()
 					// insertTrack(track,-1);
 					//track->showPendingPluginNativeGuis();
@@ -1042,6 +964,10 @@ void Song::read(Xml& xml)
 				{
 					//Call song->updateTrackViews1() to update the canvas and headers
 					updateTrackViews1();
+					if(gUpdateAuxes)
+					{
+						updateAuxIndex();
+					}
 					//Call to update the track view menu
 					update(SC_VIEW_CHANGED);
 					return;
@@ -1161,15 +1087,22 @@ void Song::write(int level, Xml& xml) const
 	CloneList copyCloneList = cloneList;
 	cloneList.clear();
 
-	// write Composer visible tracks first so we maintain sort order
-	//for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
-	//	(*i)->write(level, xml);
-
+	//Write the aux tracks first so they can be loaded first, We need them for available configuring
+	//audio tracks later
 	QList<QString> added;
-	for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
+	for (ciTrack i = _auxs.begin(); i != _auxs.end(); ++i)
 	{
 		(*i)->write(level, xml);
 		added.append((*i)->name());
+	}
+	// then write Composer visible tracks since the track view will maintain order for itself
+	for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
+	{
+		if(!added.contains((*i)->name()))
+		{
+			(*i)->write(level, xml);
+			added.append((*i)->name());
+		}
 	}
 
 	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
@@ -1201,23 +1134,12 @@ void Song::write(int level, Xml& xml) const
 	// write routing
 	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
 	{
-
-		// p3.3.38 Changed
-		//if ((*i)->isMidiTrack())
-		//      continue;
-		//WaveTrack* track = (WaveTrack*)(*i);
-		//track->writeRouting(level, xml);
-
 		(*i)->writeRouting(level, xml);
 	}
 
 	// Write midi device routing.
 	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
 	{
-		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(*i);
-		//if (!mjd)
-		//  continue;
-		//mjd->writeRouting(level, xml);
 		(*i)->writeRouting(level, xml);
 	}
 
@@ -1228,11 +1150,9 @@ void Song::write(int level, Xml& xml) const
 	}
 
 	tempomap.write(level, xml);
-	///sigmap.write(level, xml);
 	AL::sigmap.write(level, xml);
 	_markerList->write(level, xml);
 
-	//writeDrumMap(level, xml, false);
 	xml.tag(level, "/song");
 
 	// Restore backup of the clone list, to retain any 'copy' items,

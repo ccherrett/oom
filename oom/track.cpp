@@ -222,11 +222,13 @@ void Track::init()
 Track::Track(Track::TrackType t)
 {
 	_type = t;
+	m_id = create_id();
 	init();
 }
 
 Track::Track(const Track& t, bool cloneParts)
 {
+	m_id = t.m_id;
 	_partDefaultColor = t._partDefaultColor;
 	_activity = t._activity;
 	_lastActivity = t._lastActivity;
@@ -297,6 +299,7 @@ Track::Track(const Track& t, bool cloneParts)
 
 Track& Track::operator=(const Track& t)
 {
+	m_id = t.m_id;
 	_partDefaultColor = t._partDefaultColor;
 	_activity = t._activity;
 	_lastActivity = t._lastActivity;
@@ -812,6 +815,7 @@ void MidiTrack::setRecordFlag2(bool, bool)
 void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 {
 	xml.strTag(level, "name", _name);
+	xml.qint64Tag(level, "trackId", m_id);
 	if (!_comment.isEmpty())
 		xml.strTag(level, "comment", _comment);
 	xml.intTag(level, "record", _recordFlag);
@@ -859,6 +863,8 @@ bool Track::readProperties(Xml& xml, const QString& tag)/*{{{*/
 {
 	if (tag == "name")
 		_name = xml.parse1();
+	else if(tag == "trackId")
+		m_id = xml.parseLongLong();
 	else if (tag == "comment")
 		_comment = xml.parse1();
 	else if (tag == "record")
@@ -900,7 +906,9 @@ bool Track::readProperties(Xml& xml, const QString& tag)/*{{{*/
 	else if(tag == "MidiAssign")
 		m_midiassign.read(xml, (Track*)this);
 	else
+	{
 		return true;
+	}
 	return false;
 }/*}}}*/
 

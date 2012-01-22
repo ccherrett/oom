@@ -458,6 +458,8 @@ public:
     void changeTrack(Track* oldTrack, Track* newTrack);
     MidiTrack* findTrack(const Part* part) const;
     Track* findTrack(const QString& name) const;
+    Track* findTrackById(qint64 id) const;
+    Track* findTrackByIdAndType(qint64 id, int type) const;
     void swapTracks(int i1, int i2);
     void setChannelMute(int channel, bool flag);
     void setRecordFlag(Track*, bool, bool monitor = false);
@@ -478,6 +480,7 @@ public:
     int execMidiAutomationCtlPopup(MidiTrack*, MidiPart*, const QPoint&, int);
     void connectJackRoutes(AudioTrack* track, bool disconnect);
     void updateSoloStates();
+	void updateAuxIndex();
     //void chooseMidiRoutes(QButton* /*parent*/, MidiTrack* /*track*/, bool /*dst*/);
 
     // TrackView

@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <QCheckBox>
+#include <QHash>
 
 #include "strip.h"
 #include "route.h"
@@ -29,20 +30,20 @@ class AuxCheckBox : public QCheckBox
 {
 	Q_OBJECT
 	
-	int m_index;
+	qint64 m_index;
 
 public:
-	AuxCheckBox(QString label, int index, QWidget *parent = 0)
+	AuxCheckBox(QString label, qint64 index, QWidget *parent = 0)
 	:QCheckBox(label, parent)
 	{
 		m_index = index;
 		QObject::connect(this, SIGNAL(toggled(bool)), this, SLOT(checkToggled(bool)));
 	}
-	int index()
+	qint64 index()
 	{
 		return m_index;
 	}
-	void setIndex(int i)
+	void setIndex(qint64 i)
 	{
 		m_index = i;
 	}
@@ -54,7 +55,7 @@ private slots:
 	}
 
 signals:
-	void toggled(int, bool);
+	void toggled(qint64, bool);
 };
 
 //---------------------------------------------------------
@@ -72,21 +73,25 @@ class AudioStrip : public Strip
 
     Knob* pan;
     DoubleLabel* panl;
-
-    std::vector<Knob*> auxKnob;
-    std::vector<DoubleLabel*> auxLabel;
+	
+	QHash<int, qint64> auxIndexList;
+	QHash<qint64, Knob*> auxKnobList;
+	QHash<qint64, DoubleLabel*> auxLabelList;
+	QHash<qint64, QLabel*> auxNameLabelList;
 
     double volume;
     double panVal;
 
     QString slDefaultStyle;
 
-    Knob* addKnob(int, int, QString, DoubleLabel**);
+    Knob* addKnob(QString, DoubleLabel**);
+    Knob* addAuxKnob(qint64, QString, DoubleLabel**, QLabel**);
 
     void updateOffState();
     void updateVolume();
     void updatePan();
     void updateChannels();
+	void updateAuxNames();
 protected:
 	void trackChanged();
 
@@ -98,7 +103,7 @@ private slots:
     void oRoutePressed();
     void routingPopupMenuActivated(QAction*);
     void auxChanged(double, int);
-    void auxPreToggled(int, bool);
+    void auxPreToggled(qint64, bool);
     void volumeChanged(double);
     void volumePressed();
     void volumeReleased();
@@ -107,7 +112,7 @@ private slots:
     void panReleased();
     void volLabelChanged(double);
     void panLabelChanged(double);
-    void auxLabelChanged(double, unsigned int);
+    void auxLabelChanged(double, int);
     void volumeRightClicked(const QPoint &);
     void panRightClicked(const QPoint &);
     void playbackClipped();

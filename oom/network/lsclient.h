@@ -118,6 +118,8 @@ public:
 	int createMidiInputDevice(char* name, const char* type = "JACK", int ports = 1);
 	int createAudioOutputDevice(char* name, const char* type = "JACK", int ports = 1, int iSrate = 48000);
 	bool createInstrumentChannel(const char* name, const char* engine, const char* filename, int index, int map);
+	bool renameMidiPort(QString oldName, QString newName, int mdev = 0);
+	bool renameAudioChannel(QString oldName, QString newName, int adev = 0);
 	QMap<int, QString> listInstruments();
 	QString getValidInstrumentName(QString nameBase);
 	QString getMapName(int);

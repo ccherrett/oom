@@ -260,11 +260,9 @@ int string2bitmap(const QString& str)
 //---------------------------------------------------------
 //   string2u32bitmap
 //---------------------------------------------------------
-// Added by Tim. p3.3.8
 
 unsigned int string2u32bitmap(const QString& str)
 {
-	//int val = 0;
 	unsigned int val = 0;
 	QString ss = str.simplified();
 	QByteArray ba = ss.toLatin1();
@@ -274,16 +272,13 @@ unsigned int string2u32bitmap(const QString& str)
 	if (s == 0)
 		return 0;
 	if (strcmp(s, "all") == 0)
-		//return 0xffff;
 		return 0xffffffff;
 	if (strcmp(s, "none") == 0)
 		return 0;
 	// printf("str2bitmap: <%s> ", str.toLatin1);
 	int tval = 0;
-	//unsigned int tval   = 0;
 	bool range = false;
 	int sval = 0;
-	//unsigned int sval   = 0;
 	while (*s == ' ')
 		++s;
 	while (*s)
@@ -298,7 +293,6 @@ unsigned int string2u32bitmap(const QString& str)
 			if (range)
 			{
 				for (int i = sval - 1; i < tval; ++i)
-					//for (unsigned int i = sval-1; i < tval; ++i)
 					val |= (1U << i);
 				range = false;
 			}
@@ -319,14 +313,12 @@ unsigned int string2u32bitmap(const QString& str)
 	if (range && tval)
 	{
 		for (int i = sval - 1; i < tval; ++i)
-			//for (unsigned int i = sval-1; i < tval; ++i)
 			val |= (1U << i);
 	}
 	else if (tval)
 	{
 		val |= (1U << (tval - 1));
 	}
-	//return val & 0xffff;
 	return val;
 }
 
@@ -443,7 +435,12 @@ double midiToTrackPan(int val)
 	return v;
 }
 									
-/*qint64 genId( )
+//---------------------------------------------------------
+//	create_id()
+//	Create a new Unigue ID based on a random number and 
+//	the current Date and Time
+//---------------------------------------------------------
+qint64 create_id( )
 {
 	uint r = qrand();
 	QDateTime time = QDateTime::currentDateTime();
@@ -453,8 +450,19 @@ double midiToTrackPan(int val)
 	id += r;
 
 	return id;
-}*/
-							
+}
+
+//---------------------------------------------------------
+//	extract_date_time
+//	Extract the creation date from an ID
+//---------------------------------------------------------
+QDateTime extract_date_time(qint64 id)
+{
+	QDateTime time;
+	time.setTime_t(id / 1000000000);
+	return time;
+}
+
 //---------------------------------------------------------
 //   string2qhex
 //---------------------------------------------------------

@@ -293,7 +293,6 @@ Track* Song::addTrack(int t)/*{{{*/
 {
 	Track::TrackType type = (Track::TrackType) t;
 	Track* track = 0;
-	int lastAuxIdx = _auxs.size();
 	switch (type)
 	{
 		case Track::MIDI:
@@ -327,25 +326,25 @@ Track* Song::addTrack(int t)/*{{{*/
 			if(lastTrackPartColorIndex == NUM_PARTCOLORS)
 				lastTrackPartColorIndex = 1;
 			
-			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			((AudioTrack*) track)->addAuxSend();
 			break;
 		case Track::AUDIO_OUTPUT:
 			track = new AudioOutput();
 			break;
 		case Track::AUDIO_BUSS:
 			track = new AudioBuss();
-			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			((AudioTrack*) track)->addAuxSend();
 			break;
 		case Track::AUDIO_AUX:
 			track = new AudioAux();
 			break;
 		case Track::AUDIO_INPUT:
 			track = new AudioInput();
-			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			((AudioTrack*) track)->addAuxSend();
 			break;
 		case Track::AUDIO_SOFTSYNTH:
 			printf("not implemented: Song::addTrack(SOFTSYNTH)\n");
-			// ((AudioTrack*)track)->addAuxSend(lastAuxIdx);
+			// ((AudioTrack*)track)->addAuxSend();
 			break;
 		default:
 			printf("Song::addTrack() illegal type %d\n", type);
@@ -446,7 +445,6 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{
 {
 	Track::TrackType type = (Track::TrackType) t;
 	Track* track = 0;
-	int lastAuxIdx = _auxs.size();
 	switch (type)
 	{
 		case Track::MIDI:
@@ -480,21 +478,21 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{
 			if(lastTrackPartColorIndex == NUM_PARTCOLORS)
 				lastTrackPartColorIndex = 1;
 			
-			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			((AudioTrack*) track)->addAuxSend();
 			break;
 		case Track::AUDIO_OUTPUT:
 			track = new AudioOutput();
 			break;
 		case Track::AUDIO_BUSS:
 			track = new AudioBuss();
-			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			((AudioTrack*) track)->addAuxSend();
 			break;
 		case Track::AUDIO_AUX:
 			track = new AudioAux();
 			break;
 		case Track::AUDIO_INPUT:
 			track = new AudioInput();
-			((AudioTrack*) track)->addAuxSend(lastAuxIdx);
+			((AudioTrack*) track)->addAuxSend();
 			break;
 		case Track::AUDIO_SOFTSYNTH:
 			break;
@@ -1143,6 +1141,159 @@ Track* Song::findTrack(const QString& name) const
 	{
 		if ((*i)->name() == name)
 			return *i;
+	}
+	return 0;
+}
+
+//---------------------------------------------------------
+//   updateAuxIndex
+//   Update all respective tracks to use trackId for AUX
+//   vs the old index order
+//---------------------------------------------------------
+
+void Song::updateAuxIndex()
+{
+	qDebug("Song::updateAuxIndex: Auxes found in song with old index, auto updating");
+	for(ciTrack it = _tracks.begin(); it != _tracks.end(); ++it)
+	{
+		Track* track = *it;
+		Track::TrackType type = (Track::TrackType) track->type();
+		switch (type)
+		{
+			case Track::WAVE:
+			case Track::AUDIO_BUSS:
+			case Track::AUDIO_INPUT:
+			{	
+				//QList<int> repList;
+				QList<qint64> inList;
+				QHash<qint64, AuxInfo> *auxList = ((AudioTrack*) track)->auxSends();
+				QHash<qint64, AuxInfo>::const_iterator iter = auxList->constBegin();
+				while(iter != auxList->constEnd())
+				{
+					if(iter.key() < 1000)
+					{
+						inList.append(iter.key());
+					}
+					++iter;
+				}
+				if(!inList.isEmpty())
+				{
+					foreach(qint64 id, inList)
+					{
+						AuxInfo info = auxList->take(id);
+						int inId = (int)id;
+						AudioAux* at = (AudioAux*)_auxs[inId];
+						//AudioAux* a = (AudioAux*) ((*al)[k]);
+						if(at)
+						{
+							auxList->insert(at->id(), info);
+						}
+					}
+				}
+				((AudioTrack*) track)->addAuxSend();
+			}
+			break;
+			default:
+			break;
+		}
+	}
+	gUpdateAuxes = false;
+	update();
+	dirty = true;
+	//TODO: show dialog here to ask the user to save project
+	int n = QMessageBox::warning(oom, tr("OOMidi: Aux Auto Update"),
+			tr("This Project was found to be in an old format\n"
+			"It has been automaticly updated\n"
+			"Save Current Project?"),
+			tr("&Save"), tr("&Don't Save"), 0, 1);
+	if (n == 0)
+	{
+		oom->save();
+	}
+}
+
+//---------------------------------------------------------
+//   findTrackById
+//    find track by id
+//---------------------------------------------------------
+
+Track* Song::findTrackById(qint64 id) const
+{
+	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
+	{
+		if ((*i)->id() == id)
+			return *i;
+	}
+	return 0;
+}
+
+//---------------------------------------------------------
+//   findTrackByIdAndType
+//    find track by id and type
+//---------------------------------------------------------
+
+Track* Song::findTrackByIdAndType(qint64 id, int ttype) const
+{
+	Track::TrackType type = (Track::TrackType)ttype;
+	switch(type)
+	{
+		case Track::MIDI:
+		case Track::DRUM:
+		{/*{{{*/
+			for (ciTrack i = _midis.begin(); i != _midis.end(); ++i)
+			{
+				if ((*i)->id() == id)
+					return *i;
+			}
+		}/*}}}*/
+		break;
+		case Track::WAVE:
+		{
+			for (ciTrack i = _waves.begin(); i != _waves.end(); ++i)
+			{
+				if ((*i)->id() == id)
+					return *i;
+			}
+		}
+		break;
+		case Track::AUDIO_OUTPUT:
+		{
+			for (ciTrack i = _outputs.begin(); i != _outputs.end(); ++i)
+			{
+				if ((*i)->id() == id)
+					return *i;
+			}
+		}
+		break;
+		case Track::AUDIO_INPUT:
+		{
+			for (ciTrack i = _inputs.begin(); i != _inputs.end(); ++i)
+			{
+				if ((*i)->id() == id)
+					return *i;
+			}
+		}
+		break;
+		case Track::AUDIO_BUSS:
+		{
+			for (ciTrack i = _groups.begin(); i != _groups.end(); ++i)
+			{
+				if ((*i)->id() == id)
+					return *i;
+			}
+		}
+		break;
+		case Track::AUDIO_AUX:
+		{
+			for (ciTrack i = _auxs.begin(); i != _auxs.end(); ++i)
+			{
+				if ((*i)->id() == id)
+					return *i;
+			}
+		}
+		break;
+		case Track::AUDIO_SOFTSYNTH:
+        break;
 	}
 	return 0;
 }
@@ -4096,43 +4247,13 @@ void Song::insertTrack2(Track* track, int idx)
 	{
 		if ((*i)->isMidiTrack())
 			continue;
-		WaveTrack* wt = (WaveTrack*) * i;
+		//WaveTrack* wt = (WaveTrack*) * i;
+		AudioTrack* wt = (AudioTrack*) * i;
 		if (wt->hasAuxSend())
 		{
-			wt->addAuxSend(n);
+			wt->addAuxSend();
 		}
 	}
-
-	/*
-	//
-	//  add routes
-	//
-
-	if (track->isMidiTrack())
-		  return;
-	AudioTrack* at = (AudioTrack*)track;
-	Route src(at, -1);
-	if (at->type() == Track::AUDIO_OUTPUT) {
-		  const RouteList* rl = at->inRoutes();
-		  for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-				r->track->outRoutes()->push_back(src);
-		  }
-	else if (at->type() == Track::AUDIO_INPUT) {
-		  const RouteList* rl = at->outRoutes();
-		  for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-				r->track->inRoutes()->push_back(src);
-		  }
-	else {
-		  const RouteList* rl = at->inRoutes();
-		  for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-				r->track->outRoutes()->push_back(src);
-		  rl = at->outRoutes();
-		  for (ciRoute r = rl->begin(); r != rl->end(); ++r)
-				r->track->inRoutes()->push_back(src);
-		  }
-	 */
-
-	// p3.3.38
 
 	//
 	//  add routes

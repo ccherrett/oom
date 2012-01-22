@@ -120,40 +120,6 @@ const QStringList midi_file_pattern =
       QString("Karaoke (*.kar *.KAR *.kar.gz *.kar.bz2);;") +
       QString("All Files (*)")).split(";;");
 
-//FIXME: By T356 01/19/2010
-// If saving as a compressed file (gz or bz2),
-//  the file is a pipe, and pipes can't seek !
-// This results in a corrupted midi file from MidiFile::writeTrack(). 
-// So exporting compressed midi has simply been disabled here for now...
-/*
-const char* midi_file_save_pattern[] = {
-      "Midi (*.mid)",
-      "gzip compressed Midi (*.mid.gz)",
-      "bzip2 compressed Midi (*.mid.bz2)",
-      "Karaoke (*.kar)",
-      "gzip compressed karaoke (*.kar.gz)",
-      "bzip2 compressed karaoke (*.kar.bz2)",
-      "All Files (*)",
-      0
-      };
-QStringList midi_file_save_pattern =  
-      QStringList::split(";;", QT_TRANSLATE_NOOP("@default", 
-      QString("Midi (*.mid);;") +
-      QString("gzip compressed Midi (*.mid.gz);;") +
-      QString("bzip2 compressed Midi (*.mid.bz2);;") +
-      QString("Karaoke (*.kar);;") +
-      QString("gzip compressed karaoke (*.kar.gz);;") +
-      QString("bzip2 compressed karaoke (*.kar.bz2);;") +
-      QString("All Files (*)")) );
-*/
-/*
-const char* midi_file_save_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "Midi (*.mid)"),
-      QT_TRANSLATE_NOOP("@default", "Karaoke (*.kar)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-*/
 const QStringList midi_file_save_pattern =  
       QT_TRANSLATE_NOOP("@default", 
       QString("Midi (*.mid);;") +
@@ -191,8 +157,6 @@ const QStringList part_file_pattern =
 const QStringList part_file_save_pattern =  
       QT_TRANSLATE_NOOP("@default", 
       QString("part Files (*.mpt);;") +
-      //QString("gzip compressed part Files (*.mpt.gz);;") +
-      //QString("bzip2 compressed part Files (*.mpt.bz2);;") +
       QString("All Files (*)")).split(";;");
 
 const QStringList preset_file_pattern =  
@@ -225,7 +189,6 @@ const QStringList audio_file_pattern =
       QString("Binary (*.bin);;") +
       QString("All Files (*)")).split(";;");
 
-///Qt::ButtonState globalKeyState;
 Qt::KeyboardModifiers globalKeyState;
 
 // Midi Filter Parameter
@@ -259,7 +222,6 @@ QAction* noteAlphaAction;
 QAction* multiPartSelectionAction;
 QAction* masterEnableAction;
 
-//AudioMixer* audioMixer;
 OOMidi* oom;
 
 int preMeasures = 2;
@@ -305,6 +267,7 @@ QHash<int, QPixmap> g_trackDragImageList;
 int vuColorStrip = 0; //default vuColor is gradient
 bool lsClientStarted = false;
 LSClient* lsClient = 0;
+bool gUpdateAuxes = false;
 
 //---------------------------------------------------------
 //   doSetuid

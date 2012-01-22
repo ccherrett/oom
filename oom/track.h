@@ -11,6 +11,8 @@
 
 #include <QString>
 #include <QHash>
+#include <QPair>
+#include <QUuid>
 
 #include <vector>
 #include <algorithm>
@@ -26,7 +28,6 @@ class Pipeline;
 class Xml;
 class SndFile;
 class MPEventList;
-//class SynthI;
 class BasePlugin;
 class MidiAssignData;
 class MidiPort;
@@ -88,6 +89,7 @@ private:
 
 
 protected:
+	qint64 m_id;
     static unsigned int _soloRefCnt;
     static Track* _tmpSoloChainTrack;
     static bool _tmpSoloChainDoIns;
@@ -115,8 +117,6 @@ protected:
 
     int _activity;
     int _lastActivity;
-    //int _meter[MAX_CHANNELS];
-    //int _peak[MAX_CHANNELS];
     double _meter[MAX_CHANNELS];
     double _peak[MAX_CHANNELS];
 
@@ -133,7 +133,6 @@ protected:
 
 public:
     Track(TrackType);
-    //Track(const Track&);
     Track(const Track&, bool cloneParts);
 
     virtual ~Track()
@@ -190,6 +189,11 @@ public:
 
 	MidiAssignData* midiAssign() { return &m_midiassign; }
 
+	qint64 id()
+	{
+		return  m_id;
+	}
+
     int y() const;
 
     void setY(int n)
@@ -213,9 +217,6 @@ public:
     }
 
     void setSelected(bool f);
-    /*{
-        _selected = f;
-    }*/
 
 	void deselectParts();
 
@@ -334,7 +335,6 @@ public:
     virtual void write(int, Xml&) const = 0;
 
     virtual Track* newTrack() const = 0;
-    //virtual Track* clone() const    = 0;
     virtual Track* clone(bool CloneParts) const = 0;
 
     virtual bool setRecordFlag1(bool f, bool monitor = false) = 0;
@@ -419,8 +419,6 @@ public:
     }
     void resetPeaks();
     static void resetAllMeter();
-    //int meter(int ch) const  { return _meter[ch]; }
-    //int peak(int ch) const   { return _peak[ch]; }
 
     double meter(int ch) const
     {
@@ -435,7 +433,7 @@ public:
 
     bool readProperty(Xml& xml, const QString& tag);
     void setDefaultName();
-	QString getValidName(QString name, bool isdefault = false);
+	static QString getValidName(QString name, bool isdefault = false);
 
     int channels() const
     {
@@ -462,14 +460,8 @@ public:
 
 class MidiTrack : public Track
 {
-    //friend class AudioTrack;
-    //static unsigned int _soloRefCnt;
-
     int _outPort;
     int _outChannel;
-    //int _inPortMask;
-    ///unsigned int _inPortMask; // bitmask of accepted record ports
-    ///int _inChannelMask;     // bitmask of accepted record channels
     bool _recEcho; // For midi (and audio). Whether to echo incoming record events to output device.
 
     EventList* _events; // tmp Events during midi import
@@ -478,7 +470,6 @@ class MidiTrack : public Track
 
 public:
     MidiTrack();
-    //MidiTrack(const MidiTrack&);
     MidiTrack(const MidiTrack&, bool cloneParts);
     virtual ~MidiTrack();
 
@@ -486,7 +477,6 @@ public:
     virtual AutomationType automationType() const;
     virtual void setAutomationType(AutomationType);
 
-    // play parameter
 	bool transpose;
     int transposition;
     int velocity;
@@ -507,10 +497,6 @@ public:
 	}
 
     virtual bool setRecordFlag1(bool f, bool monitor = false);
-    /*{
-        _recordFlag = f;
-        return true;
-    }*/
 
     virtual void setRecordFlag2(bool, bool monitor = false);
 
@@ -531,7 +517,6 @@ public:
     {
         return new MidiTrack();
     }
-    //virtual MidiTrack* clone() const { return new MidiTrack(*this); }
 
     virtual MidiTrack* clone(bool cloneParts) const
     {
@@ -551,9 +536,6 @@ public:
     void setOutChanAndUpdate(int i);
     void setOutPortAndUpdate(int i);
 
-    //void setInPortMask(int i)       { _inPortMask = i; }
-    ///void setInPortMask(unsigned int i) { _inPortMask = i; }  // Obsolete
-    ///void setInChannelMask(int i)    { _inChannelMask = i; }  //
     // Backward compatibility: For reading old songs.
     void setInPortAndChannelMask(unsigned int /*portmask*/, int /*chanmask*/);
 
@@ -566,14 +548,11 @@ public:
     {
         return _outPort;
     }
-    //int inPortMask() const          { return _inPortMask;  }
-    ///unsigned int inPortMask() const { return _inPortMask;  }
 
     int outChannel() const
     {
         return _outChannel;
     }
-    ///int inChannelMask() const       { return _inChannelMask; }
 
     bool recEcho() const
     {
@@ -585,15 +564,14 @@ public:
     virtual void updateSoloStates(bool noDec);
     virtual void updateInternalSoloStates();
 
-    //bool soloMode() const           { return _soloRefCnt; }
-
     virtual bool canRecord() const
     {
         return true;
     }
 };
 
-typedef struct _AuxInfo
+typedef QPair<bool, double> AuxInfo;
+/*typedef struct _AuxInfo
 {
 	double value;
 	bool pre;
@@ -603,6 +581,7 @@ typedef struct _AuxInfo
 		pre = p;
 	}
 } AuxInfo;
+*/
 
 //---------------------------------------------------------
 //   AudioTrack
@@ -613,33 +592,25 @@ typedef struct _AuxInfo
 
 class AudioTrack : public Track
 {
-    //friend class MidiTrack;
-    //static unsigned int _soloRefCnt;
-
     bool _haveData;
 
     CtrlListList _controller;
     CtrlRecList _recEvents; // recorded automation events
 
     bool _prefader; // prefader metering
-    //std::vector<double> _auxSend;
-    std::vector<AuxInfo> _auxSend;
-	//Create a list of 
+	QHash<qint64, AuxInfo> _auxSend;
+	
     Pipeline* _efxPipe;
 
     AutomationType _automationType;
 
-    //RouteList _inRoutes;
-    //RouteList _outRoutes;
-
     bool _sendMetronome;
 
-    //void readRecfile(Xml& xml);
+	QHash<int, qint64> m_auxControlList;
     void readAuxSend(Xml& xml);
 
 protected:
     float** outBuffers;
-    //float* outBuffers[MAX_CHANNELS];
     int _totalOutChannels;
     int _totalInChannels;
 
@@ -651,9 +622,7 @@ protected:
 
 public:
     AudioTrack(TrackType t);
-    //AudioTrack(TrackType t, int num_out_bufs = MAX_CHANNELS);
 
-    //AudioTrack(const AudioTrack&);
     AudioTrack(const AudioTrack&, bool cloneParts);
     virtual ~AudioTrack();
 
@@ -665,6 +634,11 @@ public:
     {
         return _processed;
     }
+
+	QHash<int, qint64>* auxControlList()
+	{
+		return &m_auxControlList;
+	}
     //void setProcessed(bool v) { _processed = v; }
 
     void addController(CtrlList*);
@@ -677,7 +651,6 @@ public:
     void mapRackPluginsToControllers();
     void showPendingPluginNativeGuis();
 
-    //virtual AudioTrack* clone() const = 0;
     virtual AudioTrack* clone(bool cloneParts) const = 0;
     virtual Part* newPart(Part*p = 0, bool clone = false);
 
@@ -715,8 +688,6 @@ public:
     virtual void updateSoloStates(bool noDec);
     virtual void updateInternalSoloStates();
 
-    //bool soloMode() const               { return _soloRefCnt; }
-
     void putFifo(int channels, unsigned long n, float** bp);
 
     void record();
@@ -746,11 +717,15 @@ public:
     {
         return _prefader;
     }
-    double auxSend(int idx) const;
-    void setAuxSend(int idx, double v, bool monitor = false);
-    void addAuxSend(int n);
-	bool auxIsPrefader(int idx);
-	void setAuxPrefader(int idx, bool);
+	QHash<qint64, AuxInfo>* auxSends()
+	{
+		return &_auxSend;
+	}
+    double auxSend(qint64 idx) const;
+    void setAuxSend(qint64 idx, double v, bool monitor = false);
+    void addAuxSend();
+	bool auxIsPrefader(qint64 idx);
+	void setAuxPrefader(qint64 idx, bool);
 
     void setPrefader(bool val);
 
@@ -767,13 +742,6 @@ public:
     void setPluginCtrlVal(int param, double val);
 
     void readVolume(Xml& xml);
-    //void writeRouting(int, Xml&) const;
-
-    // routing
-    //RouteList* inRoutes()    { return &_inRoutes; }
-    //RouteList* outRoutes()   { return &_outRoutes; }
-    //bool noInRoute() const   { return _inRoutes.empty();  }
-    //bool noOutRoute() const  { return _outRoutes.empty(); }
 
     virtual void preProcessAlways()
     {
@@ -825,10 +793,8 @@ class AudioInput : public AudioTrack
 
 public:
     AudioInput();
-    //AudioInput(const AudioInput&);
     AudioInput(const AudioInput&, bool cloneParts);
     virtual ~AudioInput();
-    //AudioInput* clone() const { return new AudioInput(*this); }
 
     AudioInput* clone(bool cloneParts) const
     {
@@ -899,10 +865,8 @@ class AudioOutput : public AudioTrack
 
 public:
     AudioOutput();
-    //AudioOutput(const AudioOutput&);
     AudioOutput(const AudioOutput&, bool cloneParts);
     virtual ~AudioOutput();
-    //AudioOutput* clone() const { return new AudioOutput(*this); }
 
     AudioOutput* clone(bool cloneParts) const
     {
@@ -943,7 +907,6 @@ public:
         jackPorts[channel] = p;
     }
     virtual void setChannels(int n);
-    //      virtual bool isMute() const;
 
     void processInit(unsigned);
     void process(unsigned pos, unsigned offset, unsigned);
@@ -980,7 +943,6 @@ public:
     AudioBuss() : AudioTrack(AUDIO_BUSS)
     {
     }
-    //AudioBuss* clone() const { return new AudioBuss(*this); }
 
     AudioBuss* clone(bool /*cloneParts*/) const
     {
@@ -1033,7 +995,6 @@ class AudioAux : public AudioTrack
 
 public:
     AudioAux();
-    //AudioAux* clone() const { return new AudioAux(*this); }
 
     AudioAux* clone(bool /*cloneParts*/) const
     {
@@ -1077,13 +1038,10 @@ public:
     WaveTrack() : AudioTrack(Track::WAVE)
     {
     }
-    //WaveTrack(const WaveTrack& wt) : AudioTrack(wt) {}
 
     WaveTrack(const WaveTrack& wt, bool cloneParts) : AudioTrack(wt, cloneParts)
     {
     }
-
-    //virtual WaveTrack* clone() const    { return new WaveTrack(*this); }
 
     virtual WaveTrack* clone(bool cloneParts) const
     {
@@ -1099,7 +1057,6 @@ public:
     virtual void read(Xml&);
     virtual void write(int, Xml&) const;
 
-    //virtual void fetchData(unsigned pos, unsigned frames, float** bp);
     virtual void fetchData(unsigned pos, unsigned frames, float** bp, bool doSeek);
 
     virtual bool getData(unsigned, int ch, unsigned, float** bp);
@@ -1370,10 +1327,6 @@ typedef tracklist<AudioBuss*> GroupList;
 typedef tracklist<AudioAux*>::iterator iAudioAux;
 typedef tracklist<AudioAux*>::const_iterator ciAudioAux;
 typedef tracklist<AudioAux*> AuxList;
-
-//typedef tracklist<SynthI*>::iterator iSynthI;
-//typedef tracklist<SynthI*>::const_iterator ciSynthI;
-//typedef tracklist<SynthI*> SynthIList;
 
 extern void addPortCtrlEvents(MidiTrack* t);
 extern void removePortCtrlEvents(MidiTrack* t);

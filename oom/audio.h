@@ -88,6 +88,7 @@ extern const char* seqMsgList[]; // for debug
 struct AudioMsg : public ThreadMsg
 { // this should be an union
     int serialNo;
+	qint64 sid;
     SndFile* downmix;
     AudioTrack* snode;
     AudioTrack* dnode;
@@ -248,7 +249,7 @@ public:
     void msgAddTempo(int tick, int tempo, bool doUndoFlag = true);
     void msgSetTempo(int tick, int tempo, bool doUndoFlag = true);
     void msgUpdateSoloStates();
-    void msgSetAux(AudioTrack*, int, double);
+    void msgSetAux(AudioTrack*, qint64, double);
     void msgSetGlobalTempo(int val);
     void msgDeleteTempo(int tick, int tempo, bool doUndoFlag = true);
     void msgAddSig(int tick, int z, int n, bool doUndoFlag = true);

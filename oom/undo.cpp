@@ -148,6 +148,8 @@ void UndoList::clearDelete()
 							}
 							if (!i->oTrack->isMidiTrack())
 								((AudioTrack*) i->oTrack)->clearEfxList();
+							//FIXME: I suspect this is causing a double free error in the destructor 
+							//of AudioAux, testin just commenting for now and seeing the side effects
 							delete i->oTrack;
 
 							iUndo iu2 = iu;

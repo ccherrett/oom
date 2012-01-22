@@ -1036,8 +1036,8 @@ void LSClient::removeLastChannel()
 				else
 				{//Just rename the first ports
 					//TODO: maybe we should just reset the sample here instead
-					//resetSampler();
-					lscp_param_t portName;
+					resetSampler();
+					/*lscp_param_t portName;
 					portName.key = sName;
 					portName.value = (char*)"midi_in_0";
 					if(lscp_set_midi_port_param(_client, 0, chan, &portName) != LSCP_OK)
@@ -1048,10 +1048,133 @@ void LSClient::removeLastChannel()
 					chanName.value = (char*)"0";
 					if(lscp_set_audio_channel_param(_client, 0, chan, &chanName) != LSCP_OK)
 						qDebug("Faled to rename audio channel");
+					*/
 				}
 			}
 		}
 	}
+}
+
+bool LSClient::renameMidiPort(QString oldName, QString newName, int mdev)
+{
+	bool rv = false;
+	if(_client != NULL)
+	{
+		lscp_device_info_t* mDevInfo = ::lscp_get_midi_device_info(_client, mdev);
+		if(mDevInfo)
+		{
+			int midiPorts = -1;
+			lscp_param_t* mDevParams = mDevInfo->params;
+			for(int i = 0; mDevParams && mDevParams[i].key && mDevParams[i].value; ++i)
+			{
+				qDebug("Midi Device Param: key: %s, value: %s", mDevParams[i].key, mDevParams[i].value);
+				if(strcmp(mDevParams[i].key, sPorts) == 0)
+				{
+					qDebug("Found MIDI port count");
+					midiPorts = atoi(mDevParams[i].value);
+					break;
+				}
+			}
+			if(midiPorts)
+			{
+				int midiPort = -1;
+				for(int p = 0; p < midiPorts && midiPort == -1; ++p)
+				{
+					lscp_device_port_info_t* portInfo = ::lscp_get_midi_port_info(_client, mdev, p);
+					if(portInfo)
+					{
+						lscp_param_t* mPortParams = portInfo->params;
+						for(int i = 0; mPortParams && mPortParams[i].key && mPortParams[i].value; ++i)
+						{
+							if(strcmp(mPortParams[i].key, sName) == 0)
+							{
+								if(strcmp(mPortParams[i].value, oldName.toUtf8().constData()) == 0)
+								{
+									midiPort  = i;
+								}
+								break;
+							}
+						}
+					}
+				}
+				if(midiPort >= 0)
+				{
+					char pName[newName.size()+1];
+					strcpy(pName, newName.toLocal8Bit().constData());
+					lscp_param_t portName;
+					portName.key = sName;
+					portName.value = pName;
+					if(lscp_set_midi_port_param(_client, mdev, midiPort, &portName) == LSCP_OK)
+					{
+						qDebug("LSClient::renameMidiPort: Sucessfully renamed midi port");
+						rv = true;
+					}
+				}
+			}
+		}
+	}
+	return rv;
+}
+
+bool LSClient::renameAudioChannel(QString oldName, QString newName, int adev)
+{
+	bool rv = false;
+	if(_client != NULL)
+	{
+		lscp_device_info_t* aDevInfo = ::lscp_get_audio_device_info(_client, adev);/*{{{*/
+		if(aDevInfo)
+		{
+			int channelCount = -1;
+			lscp_param_t* aDevParams = aDevInfo->params;
+			for(int i = 0; aDevParams && aDevParams[i].key && aDevParams[i].value; ++i)
+			{
+				qDebug("Audio Device Param: key: %s, value: %s", aDevParams[i].key, aDevParams[i].value);
+				if(strcmp(aDevParams[i].key, sChannels) == 0)
+				{
+					qDebug("Found Audio channel count");
+					channelCount = atoi(aDevParams[i].value);
+					break;
+				}
+			}
+			if(channelCount)
+			{
+				int audioChannel = -1;
+				for(int a = 0; a < channelCount && audioChannel == -1; ++a)
+				{
+					lscp_device_port_info_t* portInfo = ::lscp_get_audio_channel_info(_client, adev, a);
+					if(portInfo)
+					{
+						lscp_param_t* aPortParams = portInfo->params;
+						for(int i = 0; aPortParams && aPortParams[i].key && aPortParams[i].value; ++i)
+						{
+							if(strcmp(aPortParams[i].key, sName) == 0)
+							{
+								if(strcmp(aPortParams[i].value, oldName.toUtf8().constData()) == 0)
+								{
+									audioChannel  = a;
+								}
+								break;
+							}
+						}
+					}
+				}
+				if(audioChannel >= 0)
+				{
+					char cName[newName.size()+1];
+					strcpy(cName, newName.toLocal8Bit().constData());
+					lscp_param_t chanName;
+					chanName.key = sName;
+					chanName.value = cName;
+					if(lscp_set_audio_channel_param(_client, adev, audioChannel, &chanName) == LSCP_OK)
+					{
+						rv = true;
+						qDebug("Sucessfullt renamed audio channel");
+					}
+				}
+			}
+		}/*}}}*/
+	}
+	return rv;
 }
 
 bool LSClient::isFreePort(const char* val)

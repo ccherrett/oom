@@ -82,6 +82,7 @@ public:
     unsigned int parseUInt();
     float parseFloat();
     double parseDouble();
+	qint64 parseLongLong();
     void unknown(const char*);
 
     void header();
@@ -94,6 +95,7 @@ public:
     void intTag(int level, const char* const name, int val);
     void uintTag(int level, const char* const name, unsigned int val);
     void doubleTag(int level, const char* const name, double val);
+    void qint64Tag(int level, const char* const name, qint64 val);
     void floatTag(int level, const char* const name, float val);
     void strTag(int level, const char* const name, const char* val);
     void strTag(int level, const char* const name, const QString& s);

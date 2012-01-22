@@ -1052,12 +1052,12 @@ void Audio::msgUpdateSoloStates()
 //   msgSetAux
 //---------------------------------------------------------
 
-void Audio::msgSetAux(AudioTrack* track, int idx, double val)
+void Audio::msgSetAux(AudioTrack* track, qint64 id, double val)
 {
 	AudioMsg msg;
 	msg.id = SEQM_SET_AUX;
 	msg.snode = track;
-	msg.ival = idx;
+	msg.sid = id;
 	msg.dval = val;
 	sendMessage(&msg, false);
 }

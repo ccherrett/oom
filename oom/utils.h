@@ -8,10 +8,12 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
+#include <Qt>
 class QFrame;
 class QString;
 class QWidget;
 class CItem;
+class QDateTime;
 
 
 extern QString bitmap2String(int bm);
@@ -36,7 +38,8 @@ extern int trackPanToMidi(double val);
 extern double midiToTrackPan(int val);
 extern QString string2hex(const unsigned char* data, int len);
 extern char* hex2string(const char* src, int& len, int& status);
-//extern qint64 genId();
+extern qint64 create_id();
+extern QDateTime extract_date_time(qint64 id);
 extern QString midiControlToString(int ctrl);
 extern int midiControlSortIndex(int ctrl);
 extern int calcNRPN7(int, int);

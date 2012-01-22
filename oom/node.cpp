@@ -443,48 +443,52 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 
 		if (hasAuxSend() && !isMute())
 		{
-			AuxList* al = song->auxs();
-			unsigned naux = al->size();
-			for (unsigned k = 0; k < naux; ++k)
+			QHashIterator<qint64, AuxInfo> iter(_auxSend);/*{{{*/
+			while (iter.hasNext())
 			{
-				float m = _auxSend[k].value;
-				bool preaux = _auxSend[k].pre;
-				if (m <= 0.0001) // optimize
-					continue;
-				AudioAux* a = (AudioAux*) ((*al)[k]);
-				float** dst = a->sendBuffer();
-				int auxChannels = a->channels();
-				if ((srcChans == 1 && auxChannels == 1) || srcChans == 2)
+				iter.next();
+				bool preaux = iter.value().first;
+				float m = iter.value().second;
+				Track* at = song->findTrackByIdAndType(iter.key(), Track::AUDIO_AUX);
+				if(at)
 				{
-					for (int ch = 0; ch < srcChans; ++ch)
+					if (m <= 0.0001) // optimize
+						continue;
+					AudioAux* a = (AudioAux*) at;
+					float** dst = a->sendBuffer();
+					int auxChannels = a->channels();
+					if ((srcChans == 1 && auxChannels == 1) || srcChans == 2)
 					{
-						float* db = dst[ch % a->channels()]; // no matter whether there's one or two dst buffers
-						float* sb = buffer[ch];
-						for (unsigned f = 0; f < nframes; ++f)
+						for (int ch = 0; ch < srcChans; ++ch)
 						{
-							if(preaux)
-								*db++ += (*sb++ * m);// * vol[ch]); // add to mix
-							else
-								*db++ += (*sb++ * m * vol[ch]); // add to mix
+							float* db = dst[ch % a->channels()]; // no matter whether there's one or two dst buffers
+							float* sb = buffer[ch];
+							for (unsigned f = 0; f < nframes; ++f)
+							{
+								if(preaux)
+									*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+								else
+									*db++ += (*sb++ * m * vol[ch]); // add to mix
+							}
+						}
+					}
+					else if (srcChans == 1 && auxChannels == 2) // copy mono to both channels
+					{
+						for (int ch = 0; ch < auxChannels; ++ch)
+						{
+							float* db = dst[ch % a->channels()];
+							float* sb = buffer[0];
+							for (unsigned f = 0; f < nframes; ++f)
+							{
+								if(preaux)
+									*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+								else
+									*db++ += (*sb++ * m * vol[ch]); // add to mix
+							}
 						}
 					}
 				}
-				else if (srcChans == 1 && auxChannels == 2) // copy mono to both channels
-				{
-					for (int ch = 0; ch < auxChannels; ++ch)
-					{
-						float* db = dst[ch % a->channels()];
-						float* sb = buffer[0];
-						for (unsigned f = 0; f < nframes; ++f)
-						{
-							if(preaux)
-								*db++ += (*sb++ * m);// * vol[ch]); // add to mix
-							else
-								*db++ += (*sb++ * m * vol[ch]); // add to mix
-						}
-					}
-				}
-			}
+			}/*}}}*/
 		}
 
 		//---------------------------------------------------
@@ -787,50 +791,52 @@ void AudioTrack::addData(unsigned pos, int dstChannels, int srcStartChan, int sr
 
 		if (hasAuxSend() && !isMute())
 		{
-			AuxList* al = song->auxs();
-			unsigned naux = al->size();
-			for (unsigned k = 0; k < naux; ++k)
+			QHashIterator<qint64, AuxInfo> iter(_auxSend);/*{{{*/
+			while (iter.hasNext())
 			{
-				float m = _auxSend[k].value;
-				bool preaux = _auxSend[k].pre;
-				if (m <= 0.0001) // optimize
-					continue;
-				AudioAux* a = (AudioAux*) ((*al)[k]);
-				float** dst = a->sendBuffer();
-				int auxChannels = a->channels();
-				if ((srcChans == 1 && auxChannels == 1) || srcChans == 2)
+				iter.next();
+				bool preaux = iter.value().first;
+				float m = iter.value().second;
+				Track* at = song->findTrackByIdAndType(iter.key(), Track::AUDIO_AUX);
+				if(at)
 				{
-					for (int ch = 0; ch < srcChans; ++ch)
+					if (m <= 0.0001) // optimize
+						continue;
+					AudioAux* a = (AudioAux*) at;
+					float** dst = a->sendBuffer();
+					int auxChannels = a->channels();
+					if ((srcChans == 1 && auxChannels == 1) || srcChans == 2)
 					{
-						float* db = dst[ch % a->channels()];
-						float* sb = buffer[ch];
-						for (unsigned f = 0; f < nframes; ++f)
+						for (int ch = 0; ch < srcChans; ++ch)
 						{
-							if(preaux)
-								*db++ += (*sb++ * m);// * vol[ch]); // add to mix
-							else
-								*db++ += (*sb++ * m * vol[ch]); // add to mix
-							//*db++ += (*sb++ * m);// * vol[ch]); // add to mix
+							float* db = dst[ch % a->channels()];
+							float* sb = buffer[ch];
+							for (unsigned f = 0; f < nframes; ++f)
+							{
+								if(preaux)
+									*db++ += (*sb++ * m); // dont add to mix
+								else
+									*db++ += (*sb++ * m * vol[ch]); // add to mix
+							}
+						}
+					}
+					else if (srcChans == 1 && auxChannels == 2)
+					{
+						for (int ch = 0; ch < auxChannels; ++ch)
+						{
+							float* db = dst[ch % a->channels()];
+							float* sb = buffer[0];
+							for (unsigned f = 0; f < nframes; ++f)
+							{
+								if(preaux)
+									*db++ += (*sb++ * m); // dont add to mix
+								else
+									*db++ += (*sb++ * m * vol[ch]); // add to mix
+							}
 						}
 					}
 				}
-				else if (srcChans == 1 && auxChannels == 2)
-				{
-					for (int ch = 0; ch < auxChannels; ++ch)
-					{
-						float* db = dst[ch % a->channels()];
-						float* sb = buffer[0];
-						for (unsigned f = 0; f < nframes; ++f)
-						{
-							if(preaux)
-								*db++ += (*sb++ * m);// * vol[ch]); // add to mix
-							else
-								*db++ += (*sb++ * m * vol[ch]); // add to mix
-							//*db++ += (*sb++ * m);// * vol[ch]); // add to mix
-						}
-					}
-				}
-			}
+			}/*}}}*/
 		}
 
 		//---------------------------------------------------

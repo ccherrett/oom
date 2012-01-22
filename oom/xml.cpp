@@ -406,6 +406,16 @@ double Xml::parseDouble()
 }
 
 //---------------------------------------------------------
+//   parseLongLong
+//---------------------------------------------------------
+
+qint64 Xml::parseLongLong()
+{
+	QString s(parse1().simplified());
+	return s.toLongLong();
+}
+
+//---------------------------------------------------------
 //   unknown
 //---------------------------------------------------------
 
@@ -523,6 +533,13 @@ void Xml::floatTag(int level, const char* name, float val)
 }
 
 void Xml::doubleTag(int level, const char* name, double val)
+{
+	putLevel(level);
+	QString s("<%1>%2</%3>\n");
+	fprintf(f, "%s", s.arg(name).arg(val).arg(name).toLatin1().constData());
+}
+
+void Xml::qint64Tag(int level, const char* name, qint64 val)
 {
 	putLevel(level);
 	QString s("<%1>%2</%3>\n");

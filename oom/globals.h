@@ -212,5 +212,6 @@ extern QHash<int, QPixmap> g_trackDragImageList;
 extern int vuColorStrip;
 extern bool lsClientStarted;
 extern LSClient* lsClient;
+extern bool gUpdateAuxes;
 #endif
 

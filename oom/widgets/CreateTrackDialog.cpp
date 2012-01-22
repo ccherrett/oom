@@ -310,60 +310,63 @@ void CreateTrackDialog::updateInstrument(int index)
 {
 	QString instrumentName = cmbInstrument->itemText(index);
 	QString trackName = txtName->text();
-	for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+	if(btnAdd->isEnabled())
 	{
-		if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
+		for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 		{
-			if(m_instrumentLoaded)
-			{//unload the last one
-				cleanup();
-			}
-			if(!lsClient)
+			if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
 			{
-				lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
-				lsClientStarted = lsClient->startClient();
-				if(config.lsClientResetOnStart && lsClientStarted)
-				{
-					lsClient->resetSampler();
+				if(m_instrumentLoaded)
+				{//unload the last one
+					cleanup();
 				}
-			}
-			else if(!lsClientStarted)
-			{
-				lsClientStarted = lsClient->startClient();
-			}
-			if(lsClientStarted)
-			{
-				qDebug("Loading Instrument to LinuxSampler");
-				if(lsClient->loadInstrument(*i))
+				if(!lsClient)
 				{
-					qDebug("Instrument Map Loaded");
-					if(chkAutoCreate->isChecked())
+					lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+					lsClientStarted = lsClient->startClient();
+					if(config.lsClientResetOnStart && lsClientStarted)
 					{
-						int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
-						Patch* p = (*i)->getDefaultPatch();
-						if(p && map >= 0)
+						lsClient->resetSampler();
+					}
+				}
+				else if(!lsClientStarted)
+				{
+					lsClientStarted = lsClient->startClient();
+				}
+				if(lsClientStarted)
+				{
+					qDebug("Loading Instrument to LinuxSampler");
+					if(lsClient->loadInstrument(*i))
+					{
+						qDebug("Instrument Map Loaded");
+						if(chkAutoCreate->isChecked())
 						{
-							if(lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+							int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+							Patch* p = (*i)->getDefaultPatch();
+							if(p && map >= 0)
 							{
-								qDebug("Create Channel for track");
-								QString prefix("LinuxSampler:");
-								QString postfix("-audio");
-								QString audio(QString(prefix).append(trackName).append(postfix));
-								QString midi(QString(prefix).append(trackName));
-								//reload input/output list and select the coresponding ports respectively
-								updateVisibleElements();
-								//populateInputList();
-								populateOutputList();
-								populateMonitorList();
-								cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
-								cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
-								m_instrumentLoaded = true;
+								if(lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+								{
+									qDebug("Create Channel for track");
+									QString prefix("LinuxSampler:");
+									QString postfix("-audio");
+									QString audio(QString(prefix).append(trackName).append(postfix));
+									QString midi(QString(prefix).append(trackName));
+									//reload input/output list and select the coresponding ports respectively
+									updateVisibleElements();
+									//populateInputList();
+									populateOutputList();
+									populateMonitorList();
+									cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
+									cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
+									m_instrumentLoaded = true;
+								}
 							}
 						}
 					}
 				}
+				break;
 			}
-			break;
 		}
 	}
 }
@@ -401,9 +404,9 @@ void CreateTrackDialog::trackTypeChanged(int type)
 
 void CreateTrackDialog::trackNameEdited()
 {
-	Track::TrackType type = (Track::TrackType)m_insertType;
-	if(type == Track::MIDI)
-	{
+	//Track::TrackType type = (Track::TrackType)m_insertType;
+	//if(type == Track::MIDI)
+	//{
 		bool enabled = false;
 		if(!txtName->text().isEmpty())
 		{
@@ -411,8 +414,9 @@ void CreateTrackDialog::trackNameEdited()
 			if(!t)
 				enabled = true;
 		}
-		cmbInstrument->setEnabled(enabled);
-	}
+		btnAdd->setEnabled(enabled);
+		//cmbInstrument->setEnabled(enabled);
+	//}
 }
 
 //Populate input combo based on type
@@ -761,6 +765,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 	chkOutput->setChecked(true);
 	chkBuss->setChecked(true);
 	chkAutoCreate->setChecked(true);
+	trackNameEdited();
 
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch (type)

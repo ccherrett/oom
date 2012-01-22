@@ -108,18 +108,6 @@ AudioTrack::AudioTrack(const AudioTrack& t, bool cloneParts)
 AudioTrack::~AudioTrack()
 {
 	delete _efxPipe;
-	//for (int i = 0; i < MAX_CHANNELS; ++i)
-	//      delete[] outBuffers[i];
-	//delete[] outBuffers;
-
-	// p3.3.15
-	//for(int i = 0; i < MAX_CHANNELS; ++i)
-	//{
-	//  if(outBuffers[i])
-	//    free(outBuffers[i]);
-	//}
-
-	// p3.3.38
 	int chans = _totalOutChannels;
 	// Number of allocated buffers is always MAX_CHANNELS or more, even if _totalOutChannels is less.
 	if (chans < MAX_CHANNELS)
@@ -268,15 +256,16 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
 //   addAuxSend
 //---------------------------------------------------------
 
-void AudioTrack::addAuxSend(int n)
+void AudioTrack::addAuxSend()
 {
-	int nn = _auxSend.size();
-	for (int i = nn; i < n; ++i)
+	for(ciTrack it = song->auxs()->begin(); it != song->auxs()->end(); ++it)
 	{
-		AuxInfo info(0.0, true);
-		_auxSend.push_back(info);
-		//_auxSend.push_back(0.0);
-		//_auxSend[i] = 0.0; //??
+		if(_auxSend.isEmpty() || !_auxSend.contains((*it)->id()))
+		{
+			//qDebug("Adding Aux send %s with ID: %lld", (*it)->name().toUtf8().constData(), (*it)->id());
+			AuxInfo info(true, 0.0);
+			_auxSend[(*it)->id()] = info;
+		}
 	}
 }
 
@@ -865,11 +854,19 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 	xml.intTag(level, "automation", int(automationType()));
 	if (hasAuxSend())
 	{
-		int naux = song->auxs()->size();
-		for (int idx = 0; idx < naux; ++idx)
+		QHashIterator<qint64, AuxInfo> iter(_auxSend);
+		while (iter.hasNext())
 		{
-			QString s("<auxSend idx=\"%1\" pre=\"%2\">%3</auxSend>\n");
-			xml.nput(level, s.arg(idx).arg(_auxSend[idx].pre).arg(_auxSend[idx].value).toAscii().constData());
+			iter.next();
+			Track* t = song->findTrackByIdAndType(iter.key(), Track::AUDIO_AUX);
+			//Write it out only if the AUX track still exists
+			if(t)
+			{
+				bool pre = iter.value().first;
+				double val = iter.value().second;
+				QString s("<auxSend trackId=\"%1\" pre=\"%2\">%3</auxSend>\n");
+				xml.nput(level, s.arg(iter.key()).arg(pre).arg(val).toAscii().constData());
+			}
 		}
 	}
 	for (ciPluginI ip = _efxPipe->begin(); ip != _efxPipe->end(); ++ip)
@@ -908,7 +905,7 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 
 void AudioTrack::readAuxSend(Xml& xml)
 {
-	unsigned idx = 0;
+	qint64 idx;
 	double val;
 	bool pre = true;
 	for (;;)
@@ -923,7 +920,14 @@ void AudioTrack::readAuxSend(Xml& xml)
 			case Xml::Attribut:
 			{
 				if (tag == "idx")
-					idx = xml.s2().toInt();
+				{//Backwards compatible
+					idx = xml.s2().toLongLong();
+					gUpdateAuxes = true;
+				}
+				else if(tag == "trackId")
+				{//New style trackId based
+					idx = xml.s2().toLongLong();
+				}
 				else if(tag == "pre")
 				{
 					pre = xml.s2().toInt();
@@ -936,16 +940,8 @@ void AudioTrack::readAuxSend(Xml& xml)
 			case Xml::TagEnd:
 				if (xml.s1() == "auxSend")
 				{
-					if (_auxSend.size() < idx + 1)
-					{
-						AuxInfo info(val, pre);
-						_auxSend.push_back(info);
-					}
-					else
-					{
-						_auxSend[idx].value = val;
-						_auxSend[idx].pre = pre;
-					}
+					AuxInfo info(pre, val);
+					_auxSend[idx] = info;
 					return;
 				}
 			default:
@@ -974,12 +970,12 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
                 pi->setTrack(this);
                 pi->setId(rackpos);
                 if (pi->readConfiguration(xml, false))
-                        delete pi;
+                   delete pi;
                 else
-                        (*_efxPipe)[rackpos] = pi;
+                   (*_efxPipe)[rackpos] = pi;
         }
         else
-                printf("can't load ladspa plugin - plugin rack is already full\n");
+           printf("can't load ladspa plugin - plugin rack is already full\n");
     }
     else if (tag == "Lv2Plugin")
     {
@@ -1031,10 +1027,6 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
         _sendMetronome = xml.parseInt();
     else if (tag == "automation")
         setAutomationType(AutomationType(xml.parseInt()));
-    // Removed by T356
-    // "recfile" tag not saved anymore
-    //else if (tag == "recfile")
-    //      readRecfile(xml);
     else if (tag == "controller")
     {
         CtrlList* l = new CtrlList();
@@ -1092,7 +1084,10 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
         }
     }
     else
-        return Track::readProperties(xml, tag);
+	{
+        bool rv = Track::readProperties(xml, tag);
+		return rv;
+	}
     return false;
 }
 
@@ -1499,11 +1494,13 @@ AudioAux::AudioAux()
 
 AudioAux::~AudioAux()
 {
-	for (int i = 0; i < MAX_CHANNELS; ++i)
+	//FIXME: We need to take a look at this, I want to run everything through valgrind
+	/*for (int i = 0; i < MAX_CHANNELS; ++i)
 	{
 		if (buffer[i])
 			free(buffer[i]);
-	}
+	}*/
+//	delete[] buffer;
 }
 
 //---------------------------------------------------------
@@ -1558,17 +1555,11 @@ void AudioAux::setChannels(int n)/*{{{*/
 {
 	if (n > channels())
 	{
-		// Changed by Tim. p3.3.15
-		//for (int i = channels(); i < n; ++i)
-		//      buffer[i] = new float[segmentSize];
 		for (int i = channels(); i < n; ++i)
 			posix_memalign((void**) (buffer + i), 16, sizeof (float) * segmentSize);
 	}
 	else if (n < channels())
 	{
-		// Changed by Tim. p3.3.15
-		//for (int i = n; i < channels(); ++i)
-		//      delete[] buffer[i];
 		for (int i = n; i < channels(); ++i)
 		{
 			if (buffer[i])
@@ -1670,30 +1661,29 @@ bool AudioTrack::prepareRecording()/*{{{*/
 	return true;
 }/*}}}*/
 
-double AudioTrack::auxSend(int idx) const
+double AudioTrack::auxSend(qint64 idx) const
 {
-	if (unsigned(idx) >= _auxSend.size())
+	if (_auxSend.isEmpty() || !_auxSend.contains(idx))
 	{
-		printf("%s auxSend: bad index: %d >= %zd\n",
-				name().toLatin1().constData(), idx, _auxSend.size());
+		//qDebug("%s auxSend: bad ID: %lld", name().toLatin1().constData(), idx);
 		return 0.0;
 	}
-	return _auxSend[idx].value;
+	return _auxSend[idx].second;
 }
 
-void AudioTrack::setAuxSend(int idx, double v, bool monitor)/*{{{*/
+void AudioTrack::setAuxSend(qint64 idx, double v, bool monitor)/*{{{*/
 {
-	if (unsigned(idx) >= _auxSend.size())
+	if (_auxSend.isEmpty() || !_auxSend.contains(idx))
 	{
-		printf("%s setAuxSend: bad index: %d >= %zd\n",
-				name().toLatin1().constData(), idx, _auxSend.size());
+		//qDebug("%s setAuxSend: bad ID: %lld", name().toLatin1().constData(), idx);
 		return;
 	}
-	_auxSend[idx].value = v;
+	AuxInfo info(_auxSend[idx].first, v);
+	_auxSend[idx] = info;
 	if(!monitor)
-	{
-		int ctl = -1;/*{{{*/
-		switch(idx)
+	{//TODO: FIXME: cort out how to get this working again, we need some ui elements in the mixer to assign the aux to a controller
+		//int ctl = -1;/*{{{*/
+		/*switch(idx)
 		{
 			case 0:
 				ctl = CTRL_AUX1;
@@ -1712,20 +1702,21 @@ void AudioTrack::setAuxSend(int idx, double v, bool monitor)/*{{{*/
 		{
 			//Send feedback
 			midiMonitor->msgSendAudioOutputEvent((Track*)this, ctl, v);
-		}/*}}}*/
+		}*//*}}}*/
 	}
 }/*}}}*/
 
-bool AudioTrack::auxIsPrefader(int idx)
+bool AudioTrack::auxIsPrefader(qint64 id)
 {
-	if (unsigned(idx) >= _auxSend.size())
+	if (_auxSend.isEmpty() || !_auxSend.contains(id))
 		return false;
-	return _auxSend[idx].pre;
+	return _auxSend[id].first;
 }
 
-void AudioTrack::setAuxPrefader(int idx, bool p)
+void AudioTrack::setAuxPrefader(qint64 id, bool p)
 {
-	if (unsigned(idx) >= _auxSend.size())
+	if (_auxSend.isEmpty() || !_auxSend.contains(id))
 		return;
-	_auxSend[idx].pre = p;
+	AuxInfo info(p, _auxSend[id].second);
+	_auxSend[id] = info;
 }

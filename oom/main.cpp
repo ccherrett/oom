@@ -605,6 +605,10 @@ int main(int argc, char* argv[])
 #ifdef LSCP_SUPPORT
 	//oom->stopLSCPClient();
 #endif
+	if(lsClient && lsClientStarted)
+	{
+		lsClient->stopClient();
+	}
 	oom->stopServer();
 	delete oom;
 	if (debugMsg)
