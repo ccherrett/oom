@@ -36,6 +36,7 @@ private:
 	CtrlList*		m_cl;
 	QList<CtrlVal>		m_ctrlValues;
 	int			m_type;
+	double m_startValue;
 };
 
 #endif // ADD_CTRL_VALUE_H

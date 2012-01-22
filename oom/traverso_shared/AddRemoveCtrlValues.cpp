@@ -18,6 +18,7 @@ AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, QList<CtrlVal> ctrlValues
 	, m_ctrlValues(ctrlValues)
 	, m_type(type)
 {
+	m_startValue = m_cl->value(0);
 }
 
 AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, CtrlVal ctrlValue, int type)
@@ -26,6 +27,7 @@ AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, CtrlVal ctrlValue, int ty
 	, m_type(type)
 {
 	m_ctrlValues << ctrlValue;
+	m_startValue = m_cl->value(0);
 }
 
 int AddRemoveCtrlValues::do_action()
@@ -41,8 +43,8 @@ int AddRemoveCtrlValues::do_action()
 	{
 		foreach(CtrlVal v, m_ctrlValues) {
 			m_cl->del(v.getFrame());
-
 		}
+		m_cl->add(0, m_startValue);
 	}
 
 
@@ -57,6 +59,7 @@ int AddRemoveCtrlValues::undo_action()
 		{
 			m_cl->del(v.getFrame());
 		}
+		m_cl->add(0, m_startValue);
 	}
 	else
 	{
@@ -66,5 +69,5 @@ int AddRemoveCtrlValues::undo_action()
 		}
 	}
 
-        return 1;
+	return 1;
 }
