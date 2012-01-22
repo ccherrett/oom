@@ -10,8 +10,11 @@
 
 #include "plugin.h"
 #include "plugingui.h"
+#include "icons.h"
+#include "midi.h"
 #include "jackaudio.h"
-#include "song.h"
+#include "track.h"
+#include "xml.h"
 
 #include <math.h>
 
@@ -657,6 +660,19 @@ void VstPlugin::showNativeGui(bool yesno)
             m_hints -= PLUGIN_HAS_NATIVE_GUI;
             effect->dispatcher(effect, effEditClose, 0, 0, 0, 0.0f);
         }
+
+        QString title;
+        title += "OOMidi: ";
+        title += m_name;
+        title += " (GUI)";
+        if (m_track)
+        {
+            title += " - ";
+            title += m_track->name();
+        }
+
+        ui.widget->setWindowTitle(title);
+        ui.widget->setWindowIcon(*oomIcon);
     }
 
     ui.widget->setVisible(yesno);
@@ -725,6 +741,12 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                 iMPEvent ev = eventList->begin();
                 for (; ev != eventList->end(); ++ev)
                 {
+                    if (ev->type() == ME_CONTROLLER && ev->dataA() == 0x40001) // FIXME, what is 0x40001
+                    {
+                        setProgram(ev->dataB());
+                        continue;
+                    }
+
                     VstMidiEvent* midiEvent = &midiEvents[midiEventCount];
                     memset(midiEvent, 0, sizeof(VstMidiEvent));
 
