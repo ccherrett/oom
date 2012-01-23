@@ -570,6 +570,9 @@ Lv2Plugin::~Lv2Plugin()
 void Lv2Plugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
 {
     LilvPlugin* lv2plug = (LilvPlugin*)nativeHandle;
+    plugi->m_hints = 0;
+    plugi->m_audioInputCount  = 0;
+    plugi->m_audioOutputCount = 0;
 
     uint32_t portCount = lilv_plugin_get_num_ports(lv2plug);
     for (uint32_t i = 0; i < portCount; i++)

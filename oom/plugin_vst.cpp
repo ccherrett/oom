@@ -243,8 +243,8 @@ VstPlugin::~VstPlugin()
 void VstPlugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
 {
     AEffect* effect = (AEffect*)nativeHandle;
-
-    plugi->m_audioInputCount = effect->numInputs;
+    plugi->m_hints = 0;
+    plugi->m_audioInputCount  = effect->numInputs;
     plugi->m_audioOutputCount = effect->numOutputs;
 
     char buf_str[255] = { 0 };

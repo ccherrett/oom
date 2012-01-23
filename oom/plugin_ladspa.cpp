@@ -47,6 +47,9 @@ LadspaPlugin::~LadspaPlugin()
 void LadspaPlugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
 {
     const LADSPA_Descriptor* descr = (LADSPA_Descriptor*)nativeHandle;
+    plugi->m_hints = 0;
+    plugi->m_audioInputCount  = 0;
+    plugi->m_audioOutputCount = 0;
 
     for (unsigned long i=0; i < descr->PortCount; i++)
     {
@@ -180,7 +183,7 @@ void LadspaPlugin::reload()
     if (LADSPA_IS_INPLACE_BROKEN(descriptor->Properties))
         m_hints |= PLUGIN_HAS_IN_PLACE_BROKEN;
 
-    if (ains == aouts && aouts > 1)
+    if (ains == aouts && aouts >= 1)
         m_hints |= PLUGIN_IS_FX;
 
     // allocate data
