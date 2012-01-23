@@ -1332,6 +1332,7 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 			if (event->modifiers() & Qt::ShiftModifier && event->button() & Qt::LeftButton && !automation.currentCtrlVal)
 			{
 				automation.moveController = true;
+				qDebug("Line: 1335: event->modifiers() & Qt::ShiftModifier && event->button() & Qt::LeftButton && !automation.currentCtrlVal");
 				return;
 			}
 			if (event->modifiers() & Qt::ControlModifier && event->button() & Qt::LeftButton)
@@ -1342,7 +1343,7 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 
 			if (automation.controllerState != doNothing)
 			{
-
+				qDebug("Line: 1346 automation.controllerState != doNothing");
 				automation.moveController=true;
 				if (automation.currentCtrlVal)
 				{
@@ -1372,6 +1373,11 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 				Track * t = y2Track(event->pos().y());
 				if(t)
 					selectAutomation(t, event->pos());
+				if(automation.currentCtrlList && automation.controllerState == doNothing)
+				{
+					//qDebug("Automation curve selected enable LASSO mode");
+					_drag = DRAG_LASSO_START;
+				}
 			}
 
 			if (automation.currentCtrlVal && event->modifiers() & Qt::ShiftModifier)
@@ -1406,13 +1412,95 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 //   viewMouseReleaseEvent
 //---------------------------------------------------------
 
-void ComposerCanvas::mouseRelease(const QPoint&)
+void ComposerCanvas::mouseRelease(const QPoint& pos)
 {
 	// clear all the automation parameters
-	automation.moveController=false;
-	automation.controllerState = doNothing;
-	automation.currentCtrlVal=0;
-	m_selectedCurve = 0;
+	if(_drag == DRAG_LASSO)
+	{
+		//qDebug("ComposerCanvas::mouseRelease lasso mode");
+		_drag = DRAG_OFF;
+		if(automation.currentCtrlList)
+		{
+			//qDebug("ComposerCanvas::mouseRelease found selected curve");
+			double top, bottom, min, max;
+			automation.currentCtrlList->range(&min,&max);/*{{{*/
+			double range = max - min;
+			//int left = tempomap.tick2frame(_lasso.left());
+			//int right = tempomap.tick2frame(_lasso.right());
+			int left = tempomap.tick2frame(_start.x());
+			int right = tempomap.tick2frame(pos.x());
+			int startY = _start.y();
+			int endY = pos.y();
+			int tempX, tempY;
+			
+			if(left > right)
+			{
+				tempX = left;
+				left = right;
+				right = tempX;
+			}
+			if(endY < startY)
+			{
+				tempY = startY;
+				startY = endY;
+				endY = tempY;
+			}
+
+			if(startY < automation.currentTrack->y())
+				startY = automation.currentTrack->y();
+			if(endY > (automation.currentTrack->y() + automation.currentTrack->height()))
+				endY = (automation.currentTrack->y() + automation.currentTrack->height());
+			
+			top = double(startY - track2Y(automation.currentTrack)) / automation.currentTrack->height();
+			bottom = double(endY - track2Y(automation.currentTrack)) / automation.currentTrack->height();
+			
+			if(top > max)
+				top = max;
+			if(bottom < min)
+				bottom = min;
+			//qDebug("ComposerCanvas::mouseRelease top: %f, bottom: %f, start: %d, end: %d\n", top, bottom, left, right);
+			//double relativeY = double(event->pos().y() - track2Y(automation.currentTrack)) / automation.currentTrack->height();
+
+			if (automation.currentCtrlList->id() == AC_VOLUME )
+			{
+				top = dbToVal(max) - top;
+				top = valToDb(top);
+				bottom = dbToVal(max) - bottom;
+				bottom = valToDb(bottom);
+			}
+			else
+			{
+				top = max - (top * range);
+				bottom = max - (bottom * range);
+			}
+			//qDebug("ComposerCanvas::mouseRelease top: %f, bottom: %f, start: %d, end: %d\n", top, bottom, left, right);
+			_curveNodeSelection->clearSelection();
+			iCtrl ic = automation.currentCtrlList->begin();
+			for (; ic !=automation.currentCtrlList->end(); ic++)
+			{
+				int frame = ic->second.getFrame();
+				double val = ic->second.val;
+				if(frame >= left && frame <= right && val >= bottom && val <= top)
+				{
+					CtrlVal &cv = ic->second;
+					automation.currentCtrlVal = &cv;
+					automation.controllerState = movingController;
+					//qDebug("ComposerCanvas::mouseRelease: Adding node at frame: %d, value: %f\n", cv.getFrame(),  cv.val);
+					_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
+				}
+			}
+		}
+		_lasso.setRect(-1, -1, -1, -1);
+		redraw();
+	}
+	else
+	{//process the lasso and select at node in range
+		automation.moveController=false;
+		automation.controllerState = doNothing;
+		automation.currentCtrlVal=0;
+		m_selectedCurve = 0;
+		_drag = DRAG_OFF;
+	}
 }
 
 //---------------------------------------------------------
@@ -1474,57 +1562,59 @@ void ComposerCanvas::mouseMove(QMouseEvent* event)
 			return;
 		}
 	}
-	processAutomationMovements(event);
-
-	emit timeChanged(AL::sigmap.raster(x, *_raster));
-
-	if (show_tip && _tool == AutomationTool && automation.currentCtrlList && !automation.moveController) 
+	if(_drag != DRAG_LASSO)
 	{
-		Track* t = y2Track(y);
-		if(t && !t->isMidiTrack())
-		{
-			CtrlListList *cll = ((AudioTrack*)t)->controller();
-			for(CtrlListList::iterator ic = cll->begin(); ic != cll->end(); ++ic)
-			{
-				CtrlList* cl = ic->second;
-				if(cl->selected())
-				{
-					QString dbString;
-					double min, max;
-					cl->range(&min,&max);
-					double range = max - min;
-					double relativeY = double(y - track2Y(t)) / t->height();
-					double newValue;
+		processAutomationMovements(event);
 
-					if(cl && cl->id() == AC_VOLUME)
+		if (show_tip && _tool == AutomationTool && automation.currentCtrlList && !automation.moveController) 
+		{
+			Track* t = y2Track(y);
+			if(t && !t->isMidiTrack())
+			{
+				CtrlListList *cll = ((AudioTrack*)t)->controller();
+				for(CtrlListList::iterator ic = cll->begin(); ic != cll->end(); ++ic)
+				{
+					CtrlList* cl = ic->second;
+					if(cl->selected())
 					{
-						newValue = dbToVal(max) - relativeY;
-						newValue = valToDb(newValue);
-						if (newValue < 0.0001f)
+						QString dbString;
+						double min, max;
+						cl->range(&min,&max);
+						double range = max - min;
+						double relativeY = double(y - track2Y(t)) / t->height();
+						double newValue;
+
+						if(cl && cl->id() == AC_VOLUME)
 						{
-							newValue = 0.0001f;
+							newValue = dbToVal(max) - relativeY;
+							newValue = valToDb(newValue);
+							if (newValue < 0.0001f)
+							{
+								newValue = 0.0001f;
+							}
+							newValue = 20.0f * log10 (newValue);
+							if(newValue < -60.0f)
+								newValue = -60.0f;
+							 dbString += QString::number (newValue, 'f', 2) + " dB";
 						}
-						newValue = 20.0f * log10 (newValue);
-						if(newValue < -60.0f)
-							newValue = -60.0f;
-						 dbString += QString::number (newValue, 'f', 2) + " dB";
+						else
+						{
+							newValue = max - (relativeY * range);
+							dbString += QString::number(newValue, 'f', 2);
+						}
+						if(cl->pluginName().isEmpty())
+							dbString.append("  "+cl->name());
+						else
+							dbString.append("  "+cl->name()).append(" : ").append(cl->pluginName());
+						QPoint cursorPos = QCursor::pos();
+						QToolTip::showText(cursorPos, dbString, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
+						break;
 					}
-					else
-					{
-						newValue = max - (relativeY * range);
-						dbString += QString::number(newValue, 'f', 2);
-					}
-					if(cl->pluginName().isEmpty())
-						dbString.append("  "+cl->name());
-					else
-						dbString.append("  "+cl->name()).append(" : ").append(cl->pluginName());
-					QPoint cursorPos = QCursor::pos();
-					QToolTip::showText(cursorPos, dbString, this, QRect(cursorPos.x(), cursorPos.y(), 2, 2));
-					break;
 				}
 			}
-		}
-	}//
+		}//
+	}
+	emit timeChanged(AL::sigmap.raster(x, *_raster));
 }
 
 //---------------------------------------------------------
@@ -2272,7 +2362,6 @@ void ComposerCanvas::keyPress(QKeyEvent* event)
 				if (_curveNodeSelection->size())
 				{
 					_curveNodeSelection->clearSelection();
-
 				}
 				else
 				{

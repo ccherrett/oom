@@ -2470,10 +2470,10 @@ void Song::clear(bool signal)
 	_groups.clearDelete(); // mixer groups
 	_auxs.clearDelete(); // aux sends
 
-	// p3.3.45 Clear all midi port devices.
+	//Clear all midi port devices.
 	for (int i = 0; i < MIDI_PORTS; ++i)
 	{
-		// p3.3.50 Since midi ports are not deleted, clear all midi port in/out routes. They point to non-existant tracks now.
+		//Since midi ports are not deleted, clear all midi port in/out routes. They point to non-existant tracks now.
 		midiPorts[i].inRoutes()->clear();
 		midiPorts[i].outRoutes()->clear();
 
@@ -2484,16 +2484,14 @@ void Song::clear(bool signal)
 		//of having it there between completely different songs.
 		midiPorts[i].patchSequences()->clear();
 
-		// p3.3.50 Reset this.
+		//Reset this.
 		midiPorts[i].setFoundInSongFile(false);
 
 		// This will also close the device.
 		midiPorts[i].setMidiDevice(0);
 	}
 
-    //_synthIs.clearDelete();
-
-	// p3.3.45 Make sure to delete Jack midi devices, and remove all ALSA midi device routes...
+	// Make sure to delete Jack midi devices, and remove all ALSA midi device routes...
 	// Otherwise really nasty things happen when loading another song when one is already loaded.
 	// The loop is a safe way to delete while iterating.
 	bool loop;

@@ -1376,12 +1376,15 @@ void Canvas::viewMouseReleaseEvent(QMouseEvent* event)/*{{{*/
 		break;
 
 	case DRAG_LASSO:
-		if (!shift)
-			deselectAll();
-		_lasso = _lasso.normalized();
-		selectLasso(shift);
-		updateSelection();
-		redrawFlag = true;
+		if(_tool != AutomationTool)
+		{
+			if (!shift)
+				deselectAll();
+			_lasso = _lasso.normalized();
+			selectLasso(shift);
+			updateSelection();
+			redrawFlag = true;
+		}
 		break;
 
 	case DRAG_DELETE:
@@ -1389,7 +1392,8 @@ void Canvas::viewMouseReleaseEvent(QMouseEvent* event)/*{{{*/
 	}
 	//printf("Canvas::viewMouseReleaseEvent setting drag to DRAG_OFF\n");
 
-	_drag = DRAG_OFF;
+	if(_tool != AutomationTool)
+		_drag = DRAG_OFF;
 	if (redrawFlag)
 		redraw();
 	setCursor();
