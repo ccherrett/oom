@@ -37,7 +37,6 @@ set (SubDirs
       midiedit
       mixer
       mplugins
-      waveedit
       widgets
       )
 
@@ -67,6 +66,7 @@ QT4_WRAP_CPP ( oom_moc_headers
       traverso_shared/AddRemoveCtrlValues.h
       traverso_shared/CommandGroup.h
       traverso_shared/OOMCommand.h
+	  AddRemoveTrackCommand.h
       cthread.h
       cserver.h
       midimonitor.h
@@ -146,6 +146,7 @@ file (GLOB core_source_files
       traverso_shared/AddRemoveCtrlValues.cpp
       traverso_shared/CommandGroup.cpp
       traverso_shared/OOMCommand.cpp
+	  AddRemoveTrackCommand.cpp
       cthread.cpp
       cserver.cpp
       midimonitor.cpp
@@ -194,7 +195,6 @@ include_directories (
       mixer
       mplugins
       remote
-      waveedit
       widgets
       ${OOMIDI_LV2_INCLUDES}
       )
@@ -209,7 +209,6 @@ include_directories(
       ${CMAKE_CURRENT_BINARY_DIR}/mixer
       ${CMAKE_CURRENT_BINARY_DIR}/mplugins 
       ${CMAKE_CURRENT_BINARY_DIR}/remote
-      ${CMAKE_CURRENT_BINARY_DIR}/waveedit
       ${CMAKE_CURRENT_BINARY_DIR}/widgets 
       )
 
@@ -217,9 +216,6 @@ include_directories(
 ## Compilation flags and target name
 ##
 set_target_properties( core
-      # PROPERTIES COMPILE_FLAGS "-include ${PROJECT_BINARY_DIR}/all.h"
-      # PROPERTIES COMPILE_FLAGS "-Imidiedit -Icomposer -Iliste -Iwidgets -Imixer -Idriver -Iwaveedit -Implugins -Iinstruments -Iremote ${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h "
-      # PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -DINSTPREFIX='\"${CMAKE_INSTALL_PREFIX}\"' -DINSTLIBDIR='\"${LIBRARY_OUTPUT_DIRECTORY}\"' -include ${PROJECT_BINARY_DIR}/all.h "
       #PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC"
       PROPERTIES COMPILE_FLAGS "${PYREM_CPP_FLAGS} -include ${PROJECT_BINARY_DIR}/all.h -fPIC -fopenmp"
       LINK_FLAGS "-fopenmp"
@@ -252,7 +248,6 @@ target_link_libraries(core
       mixer
       mplugins
       synti
-      waveedit
       widgets
       ${QT_LIBRARIES}
       ${QT_QTNETWORK_LIBRARY}

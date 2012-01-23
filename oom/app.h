@@ -32,6 +32,8 @@ class QToolButton;
 class QActionGroup;
 class QDockWidget;
 class QMessageBox;
+class QUndoStack;
+class QUndoView;
 
 class Part;
 class PartList;
@@ -210,6 +212,10 @@ class OOMidi : public QMainWindow
 	MixerDock *m_mixerWidget;
 	QDockWidget *m_mixerDock;
 	QMessageBox *pipelineBox;
+
+	QUndoStack* m_undoStack;
+	QUndoView* m_undoView;
+
 	bool m_externalCall;
 
     bool readMidi(FILE*);
@@ -381,6 +387,7 @@ public slots:
 #endif
 	void pipelineStateChanged(int);
 	void connectDefaultSongPorts();
+	void showUndoView();
 
 public:
     OOMidi(int argc, char** argv);

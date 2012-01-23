@@ -101,7 +101,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
 	int bussIndex = cmbBuss->currentIndex();
 	bool valid = true;
 
-	OOVirtualTrack vtrack;
+	VirtualTrack vtrack;
 	vtrack.name = txtName->text();
 	vtrack.type = m_insertType;
 	Track::TrackType type = (Track::TrackType)m_insertType;
@@ -259,7 +259,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		}
 		else
 		{
-			OOTrackManager* tman = new OOTrackManager();
+			TrackManager* tman = new TrackManager();
 			tman->setPosition(m_insertPosition);
 			connect(tman, SIGNAL(trackAdded(QString)), this, SIGNAL(trackAdded(QString)));
 			if(tman->addTrack(&vtrack))
@@ -271,7 +271,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
 	}
 }/*}}}*/
 
-OOVirtualTrack* CreateTrackDialog::getLastTrack()
+VirtualTrack* CreateTrackDialog::getLastTrack()
 {
 	if(m_lastTrack)
 		return m_lastTrack;

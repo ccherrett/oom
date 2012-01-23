@@ -21,6 +21,9 @@
 #include <QProgressDialog>
 #include <QSizeGrip>
 #include <QtGui>
+#include <QUndoStack>
+#include <QUndoView>
+
 
 #include "app.h"
 #include "master/lmaster.h"
@@ -58,7 +61,6 @@
 #include "ticksynth.h"
 #include "transport.h"
 #include "transpose.h"
-#include "waveedit.h"
 #include "widgets/projectcreateimpl.h"
 #include "ctrl/ctrledit.h"
 #include "midiassign.h"
@@ -644,7 +646,10 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	_resourceDock->setObjectName("dockResourceCenter");
 	addDockWidget(Qt::LeftDockWidgetArea, _resourceDock);
 
-	song = new Song("song");
+	m_undoStack = new QUndoStack(this);
+	m_undoView = 0;
+
+	song = new Song(m_undoStack, "song");
 	song->blockSignals(true);
 	heartBeatTimer = new QTimer(this);
 	heartBeatTimer->setObjectName("timer");
@@ -993,17 +998,13 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(editSignalMapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
 
 	connect(startPianoEditAction, SIGNAL(triggered()), SLOT(startPerformer()));
-	//connect(startDrumEditAction, SIGNAL(triggered()), SLOT(startDrumEditor()));
 	connect(startListEditAction, SIGNAL(triggered()), SLOT(startListEditor()));
-	//connect(startWaveEditAction, SIGNAL(triggered()), SLOT(startWaveEditor()));
 
 	connect(masterGraphicAction, SIGNAL(triggered()), SLOT(startMasterEditor()));
 	connect(masterListAction, SIGNAL(triggered()), SLOT(startLMasterEditor()));
 
 	connect(midiTransposeAction, SIGNAL(triggered()), SLOT(transpose()));
 	connect(midiTransformerAction, SIGNAL(triggered()), SLOT(startMidiTransformer()));
-
-	//connect(editSongInfoAction, SIGNAL(triggered()), SLOT(startSongInfo()));
 
 	//-------- View connections
 	connect(viewTransportAction, SIGNAL(toggled(bool)), SLOT(toggleTransport(bool)));
@@ -1191,8 +1192,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//midiEdit->addAction(midiTransposeAction);
 	//midiEdit->addAction(midiTransformerAction);
 
-	//menuEdit->addAction(editSongInfoAction);
-
 	//-------------------------------------------------------------
 	//    popup View
 	//-------------------------------------------------------------
@@ -1264,14 +1263,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	follow->addAction(dontFollowAction);
 	follow->addAction(followPageAction);
 	follow->addAction(followCtsAction);
-	//menuSettings->addAction(settingsMetronomeAction);
 	menuSettings->addSeparator();
-	//menuSettings->addAction(settingsMidiSyncAction);
 	menuSettings->addAction(settingsMidiIOAction);
 	menuSettings->addSeparator();
-	//menuSettings->addAction(settingsAppearanceAction);
-	//menuSettings->addSeparator();
-	//menuSettings->addAction(settingsMidiPortAction);
 	menuSettings->addAction(settingsMidiAssignAction);
 
 	//---------------------------------------------------
@@ -1428,14 +1422,16 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 OOMidi::~OOMidi()
 {
 	//printf("OOMidi::~OOMidi\n");
-	//if(transport)
-	//  delete transport;
 	tconfig().set_property("Interface", "size", size());
 	tconfig().set_property("Interface", "fullScreen", isFullScreen());
 	tconfig().set_property("Interface", "pos", pos());
 	tconfig().set_property("Interface", "windowstate", saveState());
     // Save the new global settings to the configuration file
     tconfig().save();
+}
+
+void OOMidi::showUndoView()
+{
 }
 
 /**
@@ -2844,9 +2840,6 @@ void OOMidi::startEditor(PartList* pl, int type)
 			break;
 		case 1: startListEditor(pl);
 			break;
-		case 3: //startDrumEditor(pl, true);
-			break;
-		//case 4: startWaveEditor(pl);
 		default:
 			break;
 	}
@@ -2863,8 +2856,6 @@ void OOMidi::startEditor(Track* t)
 		case Track::MIDI:
 		case Track::DRUM: startPerformer(); 
 			break;
-		//case Track::WAVE: startWaveEditor();
-		//	break;
 		default:
 			break;
 	}
@@ -3005,25 +2996,11 @@ void OOMidi::startDrumEditor(PartList*, bool)
 void OOMidi::startWaveEditor()
 {
 	return;
-	/*PartList* pl = song->getSelectedWaveParts();
-	if (pl->empty())
-	{
-		QMessageBox::critical(this, QString("OOMidi"), tr("Nothing to edit"));
-		return;
-	}
-	startWaveEditor(pl);*/
 }
 
 void OOMidi::startWaveEditor(PartList*)
 {
 	return;
-	/*
-	WaveEdit* waveEditor = new WaveEdit(pl);
-	waveEditor->show();
-	connect(oom, SIGNAL(configChanged()), waveEditor, SLOT(configChanged()));
-	toplevels.push_back(Toplevel(Toplevel::WAVE, (unsigned long) (waveEditor), waveEditor));
-	connect(waveEditor, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
-	*/
 }
 
 
@@ -3586,42 +3563,52 @@ void OOMidi::cmd(int cmd)
 		case CMD_SELECT_INVERT:
 		case CMD_SELECT_ILOOP:
 		case CMD_SELECT_OLOOP:
-			for (iTrack i = tracks->begin(); i != tracks->end(); ++i)
+		{
+			ComposerCanvas *canvas = composer->getCanvas();
+			if(canvas && canvas->tool() == AutomationTool)
 			{
-				PartList* parts = (*i)->parts();
-				for (iPart p = parts->begin(); p != parts->end(); ++p)
-				{
-					bool f = false;
-					int t1 = p->second->tick();
-					int t2 = t1 + p->second->lenTick();
-					bool inside =
-							((t1 >= l) && (t1 < r))
-							|| ((t2 > l) && (t2 < r))
-							|| ((t1 <= l) && (t2 > r));
-					switch (cmd)
-					{
-						case CMD_SELECT_INVERT:
-							f = !p->second->selected();
-							break;
-						case CMD_SELECT_NONE:
-							f = false;
-							break;
-						case CMD_SELECT_ALL:
-							f = true;
-							break;
-						case CMD_SELECT_ILOOP:
-							f = inside;
-							break;
-						case CMD_SELECT_OLOOP:
-							f = !inside;
-							break;
-					}
-					p->second->setSelected(f);
-				}
+				//printf("Automation copy\n");
+				composer->cmd(Composer::CMD_SELECT_ALL_AUTOMATION);
 			}
-			song->update();
-			break;
-
+			else
+			{
+				for (iTrack i = tracks->begin(); i != tracks->end(); ++i)
+				{
+					PartList* parts = (*i)->parts();
+					for (iPart p = parts->begin(); p != parts->end(); ++p)
+					{
+						bool f = false;
+						int t1 = p->second->tick();
+						int t2 = t1 + p->second->lenTick();
+						bool inside =
+								((t1 >= l) && (t1 < r))
+								|| ((t2 > l) && (t2 < r))
+								|| ((t1 <= l) && (t2 > r));
+						switch (cmd)
+						{
+							case CMD_SELECT_INVERT:
+								f = !p->second->selected();
+								break;
+							case CMD_SELECT_NONE:
+								f = false;
+								break;
+							case CMD_SELECT_ALL:
+								f = true;
+								break;
+							case CMD_SELECT_ILOOP:
+								f = inside;
+								break;
+							case CMD_SELECT_OLOOP:
+								f = !inside;
+								break;
+						}
+						p->second->setSelected(f);
+					}
+				}
+				song->update();
+			}
+		}
+		break;
 		case CMD_SELECT_PARTS:
 			for (iTrack i = tracks->begin(); i != tracks->end(); ++i)
 			{
@@ -3654,37 +3641,12 @@ void OOMidi::cmd(int cmd)
 
 void OOMidi::clipboardChanged()
 {
-	/*
-		  //Q3CString subtype("partlist");
-		  //QString subtype("partlist");
-		  QMimeSource* ms = QApplication::clipboard()->data(QClipboard::Clipboard);
-		  if (ms == 0)
-				return;
-		  bool flag = false;
-		  for (int i = 0; ms->format(i); ++i) {
-	// printf("Format <%s\n", ms->format(i));
-				if ((strncmp(ms->format(i), "text/midipartlist", 17) == 0)
-				   || (strncmp(ms->format(i), "text/wavepartlist", 17) == 0)
-				   // Added by T356. Support mixed .mpt files.
-				   || (strncmp(ms->format(i), "text/mixedpartlist", 18) == 0)) {
-					  flag = true;
-					  break;
-					  }
-				}
-	 */
-
 	bool flag = false;
 	if (QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-midipartlist")) ||
 			QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-wavepartlist")) ||
 			QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-mixedpartlist")) ||
 			QApplication::clipboard()->mimeData()->hasFormat(QString("text/x-oom-automationcurve")))
 		flag = true;
-
-	//bool flag = false;
-	//if(!QApplication::clipboard()->text(QString("x-oom-midipartlist"), QClipboard::Clipboard).isEmpty() ||
-	//   !QApplication::clipboard()->text(QString("x-oom-wavepartlist"), QClipboard::Clipboard).isEmpty() ||
-	//   !QApplication::clipboard()->text(QString("x-oom-mixedpartlist"), QClipboard::Clipboard).isEmpty())
-	//  flag = true;
 
 	editPasteAction->setEnabled(flag);
 	editInsertAction->setEnabled(flag);

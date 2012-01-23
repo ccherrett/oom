@@ -77,7 +77,7 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 			updatePollFd();
 			break;
 		case SEQM_ADD_TRACK:
-			song->insertTrack2(msg->track, msg->ival);
+			song->insertTrackRealtime(msg->track, msg->ival);
 			updatePollFd();
 			break;
 		case SEQM_REMOVE_TRACK:

@@ -616,10 +616,6 @@ SynthI* Song::createSynthI(const QString& sclass, const QString& label)
 	msgInsertTrack(si, -1, true); // add to instance list
 	//printf("Song::createSynthI after msgInsertTrack. Before insertTrack3...\n");
 
-	insertTrack3(si, -1);
-
-	//printf("Song::createSynthI after insertTrack3. Adding default routes...\n");
-
 	OutputList* ol = song->outputs();
 	// add default route to master (first audio output)
 	if (!ol->empty())
@@ -809,7 +805,7 @@ void SynthI::read(Xml& xml)
 						return;
 					if (initInstance(s, name()))
 						return;
-					song->insertTrack0(this, -1);
+					song->insertTrack(this, -1);
 					if (port != -1 && port < MIDI_PORTS)
 						midiPorts[port].setMidiDevice(this);
 

@@ -705,7 +705,6 @@ void Audio::msgRemoveTracks()
 			{
 				song->removeTrack1(tr);
 				msgRemoveTrack(tr, false);
-				song->removeTrack3(tr);
 				loop = true;
 				break;
 			}

@@ -798,6 +798,9 @@ void Composer::cmd(int cmd)
 		case CMD_PASTE_AUTOMATION_NODES:
 			ncmd = ComposerCanvas::CMD_PASTE_AUTOMATION_NODES;
 			break;
+		case CMD_SELECT_ALL_AUTOMATION:
+			ncmd = ComposerCanvas::CMD_SELECT_ALL_AUTOMATION;
+		break;
 		default:
 			return;
 	}
@@ -916,9 +919,6 @@ void Composer::controllerChanged(Track *t)
 
 void Composer::showTrackInfo(bool)
 {
-	//showTrackinfoFlag = flag;
-	//midiConductor->setVisible(flag);
-	//infoScroll->setVisible(flag);
 	updateConductor(-1);
 }
 

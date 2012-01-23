@@ -3237,28 +3237,43 @@ void ComposerCanvas::cmd(int cmd)
 			{
 				if (automation.currentCtrlList && _curveNodeSelection->size())
 				{
+					QList<CtrlVal> valuesToRemove;
+
 					QList<CtrlVal*> selectedNodes = _curveNodeSelection->getNodes();
 					foreach(CtrlVal* val, selectedNodes)
 					{
 						if (val->getFrame() != 0)
 						{
-							automation.currentCtrlList->del(val->getFrame());
+							valuesToRemove.append(CtrlVal(val->getFrame(), val->val));
+							//automation.currentCtrlList->del(val->getFrame());
 						}
 					}
+					AddRemoveCtrlValues* removeCommand = new AddRemoveCtrlValues(automation.currentCtrlList, valuesToRemove, OOMCommand::REMOVE);
+
+					CommandGroup* group = new CommandGroup(tr("Delete Automation Nodes"));
+					group->add_command(removeCommand);
+
+					song->pushToHistoryStack(group);
 					_curveNodeSelection->clearSelection();
 					redraw();
 					return;
 				}
 
-				if (automation.currentCtrlVal)
+				if (automation.currentCtrlVal && automation.currentCtrlList)
 				{
 					CtrlVal& firstCtrlVal = automation.currentCtrlList->begin()->second;
 					if (automation.currentCtrlVal->getFrame() != firstCtrlVal.getFrame())
 					{
-						automation.currentCtrlList->del(automation.currentCtrlVal->getFrame());
+						AddRemoveCtrlValues* removeCommand = new AddRemoveCtrlValues(automation.currentCtrlList, CtrlVal(automation.currentCtrlVal->getFrame(), automation.currentCtrlVal->val), OOMCommand::REMOVE);
+
+						CommandGroup* group = new CommandGroup(tr("Delete Automation Node"));
+						group->add_command(removeCommand);
+
+						song->pushToHistoryStack(group);
+						_curveNodeSelection->clearSelection();
+						//automation.currentCtrlList->del(automation.currentCtrlVal->getFrame());
 						redraw();
 					}
-
 				}
 			}
 			break;
@@ -3281,6 +3296,25 @@ void ComposerCanvas::cmd(int cmd)
 			}
 		}
 		break;
+		case CMD_SELECT_ALL_AUTOMATION:
+		{
+			if (_tool == AutomationTool)
+			{
+				if (automation.currentCtrlList)
+				{
+					iCtrl ic = automation.currentCtrlList->begin();
+					for (; ic !=automation.currentCtrlList->end(); ic++) {
+						CtrlVal &cv = ic->second;
+						automation.currentCtrlVal = &cv;
+						automation.controllerState = movingController;
+						_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
+					}
+					redraw();
+				}
+
+			}
+			break;
+		}
 	}
 }
 

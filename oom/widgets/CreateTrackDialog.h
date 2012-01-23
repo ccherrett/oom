@@ -40,7 +40,7 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;
 
-	OOVirtualTrack *m_lastTrack;
+	VirtualTrack *m_lastTrack;
 
 	void importInputs();
 	void importOutputs();
@@ -80,7 +80,7 @@ signals:
 public:
 	CreateTrackDialog(int type = 0, int pos = -1, QWidget* parent = 0, bool templateMode = false);
 	~CreateTrackDialog(){}
-	OOVirtualTrack* getLastTrack();
+	VirtualTrack* getLastTrack();
 };
 
 #endif

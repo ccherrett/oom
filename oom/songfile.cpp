@@ -655,12 +655,7 @@ void OOMidi::readToplevels(Xml& xml)
 				}
 				else if (tag == "waveedit")
 				{
-					if (!pl->empty())
-					{
-						startWaveEditor(pl);
-						//toplevels.back().cobject()->readStatus(xml);
-						pl = new PartList;
-					}
+					xml.skip(tag);
 				}
 				else if (tag == "cliplist")
 				{
@@ -853,21 +848,21 @@ void Song::read(Xml& xml)
 				{
 					MidiTrack* track = new MidiTrack();
 					track->read(xml);
-					insertTrack0(track, -1);
+					insertTrack(track, -1);
 				}
 				else if (tag == "drumtrack")
 				{
 					MidiTrack* track = new MidiTrack();
 					track->setType(Track::DRUM);
 					track->read(xml);
-					insertTrack0(track, -1);
+					insertTrack(track, -1);
 				}
 				else if (tag == "wavetrack")
 				{
 					WaveTrack* track = new WaveTrack();
 					track->read(xml);
-					insertTrack0(track, -1);
-					// Now that the track has been added to the lists in insertTrack2(),
+					insertTrack(track, -1);
+					// Now that the track has been added to the lists in insertTrackRealtime(),
 					//  OSC can find the track and its plugins, and start their native guis if required...
 					track->showPendingPluginNativeGuis();
 				}
@@ -875,28 +870,28 @@ void Song::read(Xml& xml)
 				{
 					AudioInput* track = new AudioInput();
 					track->read(xml);
-					insertTrack0(track, -1);
+					insertTrack(track, -1);
 					track->showPendingPluginNativeGuis();
 				}
 				else if (tag == "AudioOutput")
 				{
 					AudioOutput* track = new AudioOutput();
 					track->read(xml);
-					insertTrack0(track, -1);
+					insertTrack(track, -1);
 					track->showPendingPluginNativeGuis();
 				}
 				else if (tag == "AudioBuss" || tag == "AudioGroup")
 				{
 					AudioBuss* track = new AudioBuss();
 					track->read(xml);
-					insertTrack0(track, -1);
+					insertTrack(track, -1);
 					track->showPendingPluginNativeGuis();
 				}
 				else if (tag == "AudioAux")
 				{
 					AudioAux* track = new AudioAux();
 					track->read(xml);
-					insertTrack0(track, -1);
+					insertTrack(track, -1);
 					track->showPendingPluginNativeGuis();
 				}
 				else if (tag == "SynthI")

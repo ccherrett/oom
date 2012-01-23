@@ -30,7 +30,6 @@
 #include "driver/audiodev.h"
 #include "driver/jackmidi.h"
 #include "xml.h"
-#include "waveedit.h"
 #include "midi.h"
 //#include "midisyncimpl.h"
 //#include "midifilterimpl.h"
@@ -1010,7 +1009,6 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 					//MasterEdit::readConfiguration(xml);
 				else if (tag == "waveedit")
 					xml.skip(tag);
-					//WaveEdit::readConfiguration(xml);
 				else if (tag == "shortcuts")
 					readShortCuts(xml);
 				else if (tag == "division")

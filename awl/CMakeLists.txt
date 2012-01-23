@@ -22,69 +22,28 @@
 ## Expand Qt macros in source files
 ##
 QT4_WRAP_CPP (awl_mocs
-      aslider.h
-      # awlplugin.h
-      checkbox.h
-      combobox.h
-      drawbar.h
       floatentry.h
-      knob.h
-      midimeter.h
-      midimslider.h
-      midipanentry.h
-      midipanknob.h
-      midivolentry.h
-      mslider.h
-      panentry.h
-      panknob.h
       pitchedit.h
       pitchlabel.h
       posedit.h
-      # poslabel.h
       sigedit.h
-      slider.h
-      # tcanvas.h
       tempoedit.h
       tempolabel.h
-      volentry.h
-      volknob.h
-      volslider.h
       )
 
 ##
 ## List of source files to compile
 ##
 file (GLOB awl_source_files
-      aslider.cpp
       awl.cpp
-      # awlplugin.cpp
-      checkbox.cpp
-      combobox.cpp
-      drawbar.cpp
       floatentry.cpp
-      knob.cpp
-      # ltest.cpp
-      midimeter.cpp
-      midimslider.cpp
-      midipanentry.cpp
-      midipanknob.cpp
-      midivolentry.cpp
-      mslider.cpp
-      panentry.cpp
-      panknob.cpp
       pitchedit.cpp
       pitchlabel.cpp
       posedit.cpp
-      # poslabel.cpp
       sigedit.cpp
-      slider.cpp
-      # tcanvas.cpp
       tempoedit.cpp
       tempolabel.cpp
       utils.cpp
-      volentry.cpp
-      volknob.cpp
-      volslider.cpp
       )
 
 ##

@@ -28,13 +28,7 @@ include_directories(
    )
 
 set (SubDirs
-	  #deicsonze
-      # deicsonze2
       libsynti
-      # organ
-      # simpledrums
-	  #simpledrums2
-	  #vam
       )
 
 if (ENABLE_EXPERIMENTAL)

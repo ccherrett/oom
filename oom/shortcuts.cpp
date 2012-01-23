@@ -69,9 +69,7 @@ void initShortCuts()
 	//      defShrt(SHRT_DESEL_PARTS,           Qt::CTRL + Qt::Key_B, "Deselect all parts", ARRANG_SHRT, "deselect_parts");
 	defShrt(SHRT_SELECT_PRTSTRACK, Qt::CTRL + Qt::ALT + Qt::Key_P, "Edit: Select parts on track", ARRANG_SHRT, "select_parts_on_track");
 	defShrt(SHRT_OPEN_PIANO, Qt::Key_Return, "Open The Performer", ARRANG_SHRT, "open_performer");
-	//defShrt(SHRT_OPEN_DRUMS, Qt::CTRL + Qt::Key_D, "Open drumeditor", ARRANG_SHRT, "open_drumedit");
 	defShrt(SHRT_OPEN_LIST, Qt::CTRL + Qt::Key_L, "Open listeditor", ARRANG_SHRT, "open_listedit");
-	//defShrt(SHRT_OPEN_WAVE, 0, "Open waveeditor", ARRANG_SHRT, "open_waveedit");
 	defShrt(SHRT_OPEN_GRAPHIC_MASTER, Qt::CTRL + Qt::Key_T, "Open graphical mastertrack editor", ARRANG_SHRT, "open_graph_master");
 	defShrt(SHRT_OPEN_LIST_MASTER, Qt::CTRL + Qt::SHIFT + Qt::Key_T, "Open list mastertrack editor", ARRANG_SHRT, "open_list_master");
 	defShrt(SHRT_OPEN_MIDI_TRANSFORM, 0, "Open midi transformer", ARRANG_SHRT, "open_midi_transform");
@@ -163,39 +161,39 @@ void initShortCuts()
 
 	//-----------------------------------------------------------
 
-	defShrt(SHRT_SELECT_ALL, Qt::CTRL + Qt::Key_A, "Edit: Select all", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_all");
-	defShrt(SHRT_SELECT_NONE, Qt::CTRL + Qt::SHIFT + Qt::Key_A, "Edit: Select none", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_none");
+	defShrt(SHRT_SELECT_ALL, Qt::CTRL + Qt::Key_A, "Edit: Select all", ARRANG_SHRT + PROLL_SHRT, "sel_all");
+	defShrt(SHRT_SELECT_NONE, Qt::CTRL + Qt::SHIFT + Qt::Key_A, "Edit: Select none", ARRANG_SHRT + PROLL_SHRT, "sel_none");
 	defShrt(SHRT_SELECT_ALL_NODES, Qt::CTRL + Qt::ALT + Qt::Key_A, "Edit: Select all automation nodes", ARRANG_SHRT, "sel_all_nodes");
-	defShrt(SHRT_SELECT_INVERT, Qt::CTRL + Qt::Key_I, "Edit: Invert Selection", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_inv");
-	defShrt(SHRT_SELECT_ILOOP, Qt::ALT + Qt::Key_Y, "Edit: Select events/parts inside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_ins_loc");
-	defShrt(SHRT_SELECT_OLOOP, Qt::ALT + Qt::Key_U, "Edit: Select events/parts outside locators", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_out_loc");
-	defShrt(SHRT_SELECT_PREV_PART, Qt::CTRL + Qt::Key_Comma, "Edit: Select previous part", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_prv_prt");
-	defShrt(SHRT_SELECT_NEXT_PART, Qt::CTRL + Qt::Key_Period, "Edit: Select next part", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_nxt_prt");
-	defShrt(SHRT_SEL_LEFT, Qt::Key_Left, "Edit: Select nearest part/event to the left", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_left");
-	defShrt(SHRT_SEL_LEFT_ADD, Qt::Key_Left + Qt::SHIFT, "Edit: Add nearest part/event to the left to selection", PROLL_SHRT + DEDIT_SHRT, "sel_left_add");
-	defShrt(SHRT_SEL_RIGHT, Qt::Key_Right, "Edit: Select nearest part/event to the left", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "sel_right");
-	defShrt(SHRT_SEL_RIGHT_ADD, Qt::Key_Right + Qt::SHIFT, "Edit: Add nearest part/event to the right to selection", PROLL_SHRT + DEDIT_SHRT, "sel_right_add");
-	defShrt(SHRT_LOCATORS_TO_SELECTION, Qt::ALT + Qt::Key_P, "Edit: Set locators to selection", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "loc_to_sel");
-	defShrt(SHRT_INC_PITCH_OCTAVE, Qt::SHIFT + Qt::Key_Up, "Edit: Increase pitch by octave", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pitch_octave");
-	defShrt(SHRT_DEC_PITCH_OCTAVE, Qt::SHIFT + Qt::Key_Down, "Edit: Decrease pitch by octave", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pitch_octave");
-	defShrt(SHRT_INC_PITCH, Qt::ALT + Qt::Key_Up, "Edit: Increase pitch", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pitch");
-	defShrt(SHRT_DEC_PITCH, Qt::ALT + Qt::Key_Down, "Edit: Decrease pitch", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pitch");
-	defShrt(SHRT_INC_POS, Qt::ALT + Qt::Key_Right, "Edit: Increase event position", PROLL_SHRT + DEDIT_SHRT, "sel_inc_pos");
-	defShrt(SHRT_DEC_POS, Qt::ALT + Qt::Key_Left, "Edit: Decrease event position", PROLL_SHRT + DEDIT_SHRT, "sel_dec_pos");
-	defShrt(SHRT_ZOOM_IN, Qt::CTRL + Qt::Key_PageUp, "View: Zoom in", PROLL_SHRT + DEDIT_SHRT, "zoom_in");
-	defShrt(SHRT_ZOOM_OUT, Qt::CTRL + Qt::Key_PageDown, "View: Zoom out", PROLL_SHRT + DEDIT_SHRT, "zoom_out");
-	defShrt(SHRT_VZOOM_IN, Qt::CTRL + Qt::SHIFT + Qt::Key_PageUp, "View: Vertical Zoom in", PROLL_SHRT + DEDIT_SHRT, "vzoom_in");
-	defShrt(SHRT_VZOOM_OUT, Qt::CTRL + Qt::SHIFT + Qt::Key_PageDown, "View: Vertical Zoom out", PROLL_SHRT + DEDIT_SHRT, "vzoom_out");
-	defShrt(SHRT_GOTO_CPOS, Qt::CTRL + Qt::Key_J, "View: Goto Current Position", PROLL_SHRT + DEDIT_SHRT, "goto_cpos");
-	defShrt(SHRT_SCROLL_LEFT, Qt::Key_H, "View: Scroll left", PROLL_SHRT + DEDIT_SHRT, "scroll_left");
-	defShrt(SHRT_SCROLL_RIGHT, Qt::Key_L, "View: Scroll right", PROLL_SHRT + DEDIT_SHRT, "scroll_right");
-	defShrt(SHRT_SCROLL_UP, Qt::SHIFT + Qt::Key_PageUp, "View: Scroll up", PROLL_SHRT + DEDIT_SHRT, "scroll_up");
-	defShrt(SHRT_SCROLL_DOWN, Qt::SHIFT + Qt::Key_PageDown, "View: Scroll down", PROLL_SHRT + DEDIT_SHRT, "scroll_down");
+	defShrt(SHRT_SELECT_INVERT, Qt::CTRL + Qt::Key_I, "Edit: Invert Selection", ARRANG_SHRT + PROLL_SHRT, "sel_inv");
+	defShrt(SHRT_SELECT_ILOOP, Qt::ALT + Qt::Key_Y, "Edit: Select events/parts inside locators", ARRANG_SHRT + PROLL_SHRT, "sel_ins_loc");
+	defShrt(SHRT_SELECT_OLOOP, Qt::ALT + Qt::Key_U, "Edit: Select events/parts outside locators", ARRANG_SHRT + PROLL_SHRT, "sel_out_loc");
+	defShrt(SHRT_SELECT_PREV_PART, Qt::CTRL + Qt::Key_Comma, "Edit: Select previous part", ARRANG_SHRT + PROLL_SHRT, "sel_prv_prt");
+	defShrt(SHRT_SELECT_NEXT_PART, Qt::CTRL + Qt::Key_Period, "Edit: Select next part", ARRANG_SHRT + PROLL_SHRT, "sel_nxt_prt");
+	defShrt(SHRT_SEL_LEFT, Qt::Key_Left, "Edit: Select nearest part/event to the left", ARRANG_SHRT + PROLL_SHRT, "sel_left");
+	defShrt(SHRT_SEL_LEFT_ADD, Qt::Key_Left + Qt::SHIFT, "Edit: Add nearest part/event to the left to selection", PROLL_SHRT, "sel_left_add");
+	defShrt(SHRT_SEL_RIGHT, Qt::Key_Right, "Edit: Select nearest part/event to the left", ARRANG_SHRT + PROLL_SHRT, "sel_right");
+	defShrt(SHRT_SEL_RIGHT_ADD, Qt::Key_Right + Qt::SHIFT, "Edit: Add nearest part/event to the right to selection", PROLL_SHRT, "sel_right_add");
+	defShrt(SHRT_LOCATORS_TO_SELECTION, Qt::ALT + Qt::Key_P, "Edit: Set locators to selection", ARRANG_SHRT + PROLL_SHRT, "loc_to_sel");
+	defShrt(SHRT_INC_PITCH_OCTAVE, Qt::SHIFT + Qt::Key_Up, "Edit: Increase pitch by octave", PROLL_SHRT, "sel_inc_pitch_octave");
+	defShrt(SHRT_DEC_PITCH_OCTAVE, Qt::SHIFT + Qt::Key_Down, "Edit: Decrease pitch by octave", PROLL_SHRT, "sel_dec_pitch_octave");
+	defShrt(SHRT_INC_PITCH, Qt::ALT + Qt::Key_Up, "Edit: Increase pitch", PROLL_SHRT, "sel_inc_pitch");
+	defShrt(SHRT_DEC_PITCH, Qt::ALT + Qt::Key_Down, "Edit: Decrease pitch", PROLL_SHRT, "sel_dec_pitch");
+	defShrt(SHRT_INC_POS, Qt::ALT + Qt::Key_Right, "Edit: Increase event position", PROLL_SHRT, "sel_inc_pos");
+	defShrt(SHRT_DEC_POS, Qt::ALT + Qt::Key_Left, "Edit: Decrease event position", PROLL_SHRT, "sel_dec_pos");
+	defShrt(SHRT_ZOOM_IN, Qt::CTRL + Qt::Key_PageUp, "View: Zoom in", PROLL_SHRT, "zoom_in");
+	defShrt(SHRT_ZOOM_OUT, Qt::CTRL + Qt::Key_PageDown, "View: Zoom out", PROLL_SHRT, "zoom_out");
+	defShrt(SHRT_VZOOM_IN, Qt::CTRL + Qt::SHIFT + Qt::Key_PageUp, "View: Vertical Zoom in", PROLL_SHRT, "vzoom_in");
+	defShrt(SHRT_VZOOM_OUT, Qt::CTRL + Qt::SHIFT + Qt::Key_PageDown, "View: Vertical Zoom out", PROLL_SHRT, "vzoom_out");
+	defShrt(SHRT_GOTO_CPOS, Qt::CTRL + Qt::Key_J, "View: Goto Current Position", PROLL_SHRT, "goto_cpos");
+	defShrt(SHRT_SCROLL_LEFT, Qt::Key_H, "View: Scroll left", PROLL_SHRT, "scroll_left");
+	defShrt(SHRT_SCROLL_RIGHT, Qt::Key_L, "View: Scroll right", PROLL_SHRT, "scroll_right");
+	defShrt(SHRT_SCROLL_UP, Qt::SHIFT + Qt::Key_PageUp, "View: Scroll up", PROLL_SHRT, "scroll_up");
+	defShrt(SHRT_SCROLL_DOWN, Qt::SHIFT + Qt::Key_PageDown, "View: Scroll down", PROLL_SHRT, "scroll_down");
 	//-----------------------------------------------------------
 	//Drum:
 	//-----------------------------------------------------------
 
-	defShrt(SHRT_FIXED_LEN, Qt::ALT + Qt::Key_L, "Edit: Set Fixed Length on Midi Events", PROLL_SHRT + DEDIT_SHRT, "midi_fixed_len");
+	defShrt(SHRT_FIXED_LEN, Qt::ALT + Qt::Key_L, "Edit: Set Fixed Length on Midi Events", PROLL_SHRT, "midi_fixed_len");
 
 	//-----------------------------------------------------------
 	//Performer:
@@ -244,11 +242,11 @@ void initShortCuts()
 
 	// Shortcuts for tools
 	// global
-	defShrt(SHRT_TOOL_POINTER, Qt::Key_A, "Tool: Pointer", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "pointer_tool");
-	defShrt(SHRT_TOOL_PENCIL, Qt::Key_D, "Tool: Pencil", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "pencil_tool");
-	defShrt(SHRT_TOOL_RUBBER, Qt::Key_B, "Tool: Eraser", ARRANG_SHRT + PROLL_SHRT + DEDIT_SHRT, "eraser_tool");
+	defShrt(SHRT_TOOL_POINTER, Qt::Key_A, "Tool: Pointer", ARRANG_SHRT + PROLL_SHRT, "pointer_tool");
+	defShrt(SHRT_TOOL_PENCIL, Qt::Key_D, "Tool: Pencil", ARRANG_SHRT + PROLL_SHRT, "pencil_tool");
+	defShrt(SHRT_TOOL_RUBBER, Qt::Key_B, "Tool: Eraser", ARRANG_SHRT + PROLL_SHRT, "eraser_tool");
 	// Performer & drum editor
-	defShrt(SHRT_TOOL_LINEDRAW, Qt::Key_F, "Tool: Line Draw", PROLL_SHRT + DEDIT_SHRT, "line_draw_tool");
+	defShrt(SHRT_TOOL_LINEDRAW, Qt::Key_F, "Tool: Line Draw", PROLL_SHRT, "line_draw_tool");
 	// Composer
 	defShrt(SHRT_TOOL_SCISSORS, Qt::Key_J, "Tool: Scissor", ARRANG_SHRT, "scissor_tool");
 	defShrt(SHRT_TOOL_GLUE, Qt::Key_G, "Tool: Glue", ARRANG_SHRT, "glue_tool");
@@ -330,11 +328,8 @@ const shortcut_cg shortcut_category[SHRT_NUM_OF_CATEGORIES] = {
 	{ GLOBAL_SHRT, "Global"},
 	{ ARRANG_SHRT, "Composer"},
 	{ PROLL_SHRT, "Performer"},
-	{ DEDIT_SHRT, "Drumeditor"},
-	{ LEDIT_SHRT, "List editor"},
-	{ LMEDIT_SHRT, "List Mastertrack"},
-	//      { SCORE_SHRT,  "Score editor" },
-	//      { WAVE_SHRT,   "Wave editor" },
+	{ LEDIT_SHRT, "Event List Editor"},
+	{ LMEDIT_SHRT, "Tempo List Editor"},
 	{ ALL_SHRT, "All categories"}
 };
 

@@ -242,11 +242,11 @@ void Song::doUndo2()
 		switch (i->type)
 		{
 			case UndoOp::AddTrack:
-				removeTrack2(i->oTrack);
+				removeTrackRealtime(i->oTrack);
 				updateFlags |= SC_TRACK_REMOVED;
 				break;
 			case UndoOp::DeleteTrack:
-				insertTrack2(i->oTrack, i->trackno);
+				insertTrackRealtime(i->oTrack, i->trackno);
 				// Added by T356.
 				chainTrackParts(i->oTrack, true);
 
@@ -443,14 +443,14 @@ void Song::doRedo2()
 				break;
 			}
 			case UndoOp::AddTrack:
-				insertTrack2(i->oTrack, i->trackno);
+				insertTrackRealtime(i->oTrack, i->trackno);
 				// Added by T356.
 				chainTrackParts(i->oTrack, true);
 
 				updateFlags |= SC_TRACK_INSERTED;
 				break;
 			case UndoOp::DeleteTrack:
-				removeTrack2(i->oTrack);
+				removeTrackRealtime(i->oTrack);
 				updateFlags |= SC_TRACK_REMOVED;
 				break;
 			case UndoOp::ModifyTrack:
@@ -825,10 +825,8 @@ void Song::doUndo3()
 		switch (i->type)
 		{
 			case UndoOp::AddTrack:
-				removeTrack3(i->oTrack);
 				break;
 			case UndoOp::DeleteTrack:
-				insertTrack3(i->oTrack, i->trackno);
 				break;
 			case UndoOp::ModifyTrack:
 				// Not much choice but to do this - Tim.
@@ -919,10 +917,8 @@ void Song::doRedo3()
 		switch (i->type)
 		{
 			case UndoOp::AddTrack:
-				insertTrack3(i->oTrack, i->trackno);
 				break;
 			case UndoOp::DeleteTrack:
-				removeTrack3(i->oTrack);
 				break;
 			case UndoOp::ModifyTrack:
 				// Not much choice but to do this - Tim.

@@ -23,7 +23,7 @@ class OOMCommand : public QObject, public QUndoCommand
 public :
 	enum
 	{
-		ADD, REMOVE
+		ADD, REMOVE, MODIFY
 	};
 
 	OOMCommand(const QString& des = "No description set!");

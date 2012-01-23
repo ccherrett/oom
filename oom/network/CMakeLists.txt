@@ -22,7 +22,6 @@
 ## Expand Qt macros in source files
 ##
 QT4_WRAP_CPP ( network_mocs
-      samplertest.h
       )
 
 if(LSCP_SUPPORT)
@@ -36,7 +35,6 @@ endif(LSCP_SUPPORT)
 ## List of source files to compile
 ##
 file (GLOB network_source_files
-      samplertest.cpp
       )
 
 if(LSCP_SUPPORT)

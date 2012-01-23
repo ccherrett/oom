@@ -721,7 +721,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					{
 						if(m_track->name() == "Master")
 							break;
-						song->removeTrack0(m_track);
+						song->removeTrack(m_track);
 						audio->msgUpdateSoloStates();
 					}
 				}

@@ -25,7 +25,7 @@
 #include "plugin.h"
 
 
-OOTrackManager::OOTrackManager()
+TrackManager::TrackManager()
 {
 	m_insertPosition = -1;
 	m_midiInPort = -1;
@@ -34,13 +34,13 @@ OOTrackManager::OOTrackManager()
 	m_allChannelBit = (1 << MIDI_CHANNELS) - 1;
 }
 
-void OOTrackManager::setPosition(int v)
+void TrackManager::setPosition(int v)
 {
 	m_insertPosition = v;
 }
 
 //Add button slot
-bool OOTrackManager::addTrack(OOVirtualTrack* vtrack)/*{{{*/
+bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 {
 	bool rv = false;
 	if(!vtrack || vtrack->name.isEmpty())
@@ -481,7 +481,7 @@ bool OOTrackManager::addTrack(OOVirtualTrack* vtrack)/*{{{*/
 	return rv;
 }/*}}}*/
 
-bool OOTrackManager::loadInstrument(OOVirtualTrack *vtrack)
+bool TrackManager::loadInstrument(VirtualTrack *vtrack)
 {
 	bool rv = false;
 	Track::TrackType type = (Track::TrackType)vtrack->type;
@@ -546,7 +546,7 @@ bool OOTrackManager::loadInstrument(OOVirtualTrack *vtrack)
 	return rv;
 }
 
-void OOTrackManager::createMonitorInputTracks(OOVirtualTrack* vtrack)/*{{{*/
+void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 {
 	bool newBuss = vtrack->bussConfig.first;
 	QString name(vtrack->name);
@@ -651,7 +651,7 @@ void OOTrackManager::createMonitorInputTracks(OOVirtualTrack* vtrack)/*{{{*/
 }/*}}}*/
 
 
-/*void OOTrackManager::importOutputs()
+/*void TrackManager::importOutputs()
 {
 	if (checkAudioDevice()) 
 	{
@@ -662,7 +662,7 @@ void OOTrackManager::createMonitorInputTracks(OOVirtualTrack* vtrack)/*{{{*/
 	}
 }
 
-void OOTrackManager::importInputs()
+void TrackManager::importInputs()
 {
 	if (checkAudioDevice()) 
 	{
@@ -673,7 +673,7 @@ void OOTrackManager::importInputs()
 	}
 }
 
-void OOTrackManager::populateMonitorList()
+void TrackManager::populateMonitorList()
 {
 	while(cmbMonitor->count())
 		cmbMonitor->removeItem(cmbMonitor->count()-1);
@@ -686,7 +686,7 @@ void OOTrackManager::populateMonitorList()
 	}
 }
 
-void OOTrackManager::populateNewInputList()
+void TrackManager::populateNewInputList()
 {
 	//while(cmbInput->count())
 	//	cmbInput->removeItem(cmbInput->count()-1);
@@ -707,7 +707,7 @@ void OOTrackManager::populateNewInputList()
 	}
 }
 
-void OOTrackManager::populateNewOutputList()
+void TrackManager::populateNewOutputList()
 {
 	//while(cmbOutput->count())
 	//	cmbOutput->removeItem(cmbOutput->count()-1);
@@ -721,7 +721,7 @@ void OOTrackManager::populateNewOutputList()
 	}
 }*/
 
-int OOTrackManager::getFreeMidiPort()/*{{{*/
+int TrackManager::getFreeMidiPort()/*{{{*/
 {
 	int rv = -1;
 	for (int i = 0; i < MIDI_PORTS; ++i)

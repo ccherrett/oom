@@ -183,7 +183,7 @@ private:
 	QHash<int, QString> m_midiKeys;
 
 public:
-    Song(const char* name = 0);
+    Song(QUndoStack *stack, const char* name = 0);
     ~Song();
 
     void putEvent(int pv);
@@ -450,10 +450,9 @@ public:
     //}
 
     void cmdRemoveTrack(Track* track);
-    void removeTrack0(Track* track);
+    void removeTrack(Track* track);
     void removeTrack1(Track* track);
-    void removeTrack2(Track* track);
-    void removeTrack3(Track* track);
+    void removeTrackRealtime(Track* track);
     void removeMarkedTracks();
     void changeTrack(Track* oldTrack, Track* newTrack);
     MidiTrack* findTrack(const Part* part) const;
@@ -463,10 +462,9 @@ public:
     void swapTracks(int i1, int i2);
     void setChannelMute(int channel, bool flag);
     void setRecordFlag(Track*, bool, bool monitor = false);
-    void insertTrack0(Track*, int idx);
+    void insertTrack(Track*, int idx);
     void insertTrack1(Track*, int idx);
-    void insertTrack2(Track*, int idx);
-    void insertTrack3(Track*, int idx);
+    void insertTrackRealtime(Track*, int idx);
     void deselectTracks();
 	void deselectAllParts();
 	void disarmAllTracks();

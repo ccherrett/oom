@@ -222,11 +222,7 @@ bool OOMidi::importMidi(const QString name, bool merge)
 
 				processTrack(track);
 
-				// Added by T356. Send all controller values to the port's controller value list.
-				// No, done in song->insertTrack2() now.
-				//track->addPortCtrlEvents();
-
-				song->insertTrack0(track, -1);
+				song->insertTrack(track, -1);
 			}
 		}
 		if (first)
@@ -243,7 +239,7 @@ bool OOMidi::importMidi(const QString name, bool merge)
 			// Do SysexMeta. Don't do loops.
 			buildMidiEventList(mel, el, track, division, true, false);
 			processTrack(track);
-			song->insertTrack0(track, -1);
+			song->insertTrack(track, -1);
 		}
 	}
 

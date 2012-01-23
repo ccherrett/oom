@@ -80,7 +80,7 @@ class RoutingMenuItem : public QCustomMenuItem
 //   Song
 //---------------------------------------------------------
 
-Song::Song(const char* name)
+Song::Song(QUndoStack* stack, const char* name)
 : QObject(0)
 {
 	setObjectName(name);
@@ -90,7 +90,7 @@ Song::Song(const char* name)
 	noteFifoRindex = 0;
 	undoList = new UndoList;
 	redoList = new UndoList;
-	m_undoStack = new QUndoStack(this);
+	m_undoStack = stack; //new QUndoStack(this);
 	_markerList = new MarkerList;
 	_globalPitchShift = 0;
 	jackErrorBox = 0;
@@ -212,60 +212,6 @@ Track* Song::addNewTrack(QAction* action)
 	if (n < 0)
 		return 0;
 
-	// Synth sub-menu id?
-	/*if (n >= MENU_ADD_SYNTH_ID_BASE)
-	{
-		n -= MENU_ADD_SYNTH_ID_BASE;
-		if (n < (int) synthis.size())
-		{
-			//SynthI* si = createSynthI(synthis[n]->baseName());
-			//SynthI* si = createSynthI(synthis[n]->name());
-			SynthI* si = createSynthI(synthis[n]->baseName(), synthis[n]->name());
-			if (!si)
-				return 0;
-
-			// Add instance last in midi device list.
-			for (int i = 0; i < MIDI_PORTS; ++i)
-			{
-				MidiPort* port = &midiPorts[i];
-				MidiDevice* dev = port->device();
-				if (dev == 0)
-				{
-					midiSeq->msgSetMidiDevice(port, si);
-					oom->changeConfig(true); // save configuration file
-					deselectTracks();
-					si->setSelected(true);
-					updateTrackViews1();
-					update();
-					return si;
-				}
-			}
-			deselectTracks();
-			si->setSelected(true);
-			updateTrackViews1();
-			update(SC_SELECTION);
-			return si;
-		}
-		else
-			return 0;
-	}
-		// Normal track.
-	else
-	{
-		// Ignore AUDIO_SOFTSYNTH, now that we have it as the synth menu id, since addTrack doesn't like it.
-		if ((Track::TrackType)n == Track::AUDIO_SOFTSYNTH)
-			return 0;
-
-		Track* t = addTrack((Track::TrackType)n);
-		if(t)
-			midiMonitor->msgAddMonitoredTrack(t);
-		deselectTracks();
-		t->setSelected(true);
-		updateTrackViews1();
-		update(SC_SELECTION);
-		return t;
-	}
-	*/
 	CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1, oom);
 	connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
 	ctdialog->exec();
@@ -354,7 +300,6 @@ Track* Song::addTrack(int t)/*{{{*/
 	track->setHeight(DEFAULT_TRACKHEIGHT);
 	insertTrack1(track, -1);
 	msgInsertTrack(track, -1, true);
-	insertTrack3(track, -1);
 
 	// Add default track <-> midiport routes.
 	if (track->isMidiTrack())
@@ -504,7 +449,6 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{
 	track->setHeight(DEFAULT_TRACKHEIGHT);
 	insertTrack1(track, pos);
 	msgInsertTrack(track, pos, true);
-	insertTrack3(track, pos);
 
 	// Add default track <-> midiport routes.
 	if (track->isMidiTrack())
@@ -602,7 +546,7 @@ void Song::cmdRemoveTrack(Track* track)
 {
 	int idx = _tracks.index(track);
 	undoOp(UndoOp::DeleteTrack, idx, track);
-	removeTrack2(track);
+	removeTrackRealtime(track);
 	updateFlags |= SC_TRACK_REMOVED;
 }
 
@@ -620,7 +564,7 @@ void Song::removeMarkedTracks()
 		{
 			if ((*t)->selected())
 			{
-				removeTrack2(*t);
+				removeTrackRealtime(*t);
 				loop = true;
 				break;
 			}
@@ -4133,14 +4077,13 @@ void Song::updateTrackViews1()
 }
 
 //---------------------------------------------------------
-//   insertTrack0
+//   insertTrack
 //---------------------------------------------------------
 
-void Song::insertTrack0(Track* track, int idx)
+void Song::insertTrack(Track* track, int idx)
 {
 	insertTrack1(track, idx);
-	insertTrack2(track, idx); // audio->msgInsertTrack(track, idx, false);
-	insertTrack3(track, idx);
+	insertTrackRealtime(track, idx); // audio->msgInsertTrack(track, idx, false);
 }
 
 //---------------------------------------------------------
@@ -4173,13 +4116,13 @@ void Song::insertTrack1(Track* track, int /*idx*/)
 }
 
 //---------------------------------------------------------
-//   insertTrack2
+//   insertTrackRealtime
 //    realtime part
 //---------------------------------------------------------
 
-void Song::insertTrack2(Track* track, int idx)
+void Song::insertTrackRealtime(Track* track, int idx)
 {
-	//printf("Song::insertTrack2 track:%lx\n", track);
+	//printf("Song::insertTrackRealtime track:%lx\n", track);
 
 	int n;
 	iTrack ia;
@@ -4190,8 +4133,6 @@ void Song::insertTrack2(Track* track, int idx)
 			_midis.push_back((MidiTrack*) track);
 			ia = _artracks.index2iterator(idx);
 			_artracks.insert(ia, track);
-			// Added by T356.
-			//((MidiTrack*)track)->addPortCtrlEvents();
 			addPortCtrlEvents(((MidiTrack*) track));
 
 			break;
@@ -4217,16 +4158,6 @@ void Song::insertTrack2(Track* track, int idx)
 		case Track::AUDIO_INPUT:
 			_inputs.push_back((AudioInput*) track);
 			break;
-		case Track::AUDIO_SOFTSYNTH:
-		{
-            //SynthI* s = (SynthI*) track;
-            //midiDevices.add(s);
-            //midiInstruments.push_back(s);
-            //_synthIs.push_back(s);
-            //ia = _artracks.index2iterator(idx);
-            //_artracks.insert(ia, track);
-		}
-			break;
 		default:
 			fprintf(stderr, "unknown track type %d\n", track->type());
 			// abort();
@@ -4237,10 +4168,10 @@ void Song::insertTrack2(Track* track, int idx)
 	// initialize missing aux send
 	//
 	iTrack i = _tracks.index2iterator(idx);
-	//printf("Song::insertTrack2 inserting into _tracks...\n");
+	//printf("Song::insertTrackRealtime inserting into _tracks...\n");
 
 	_tracks.insert(i, track);
-	//printf("Song::insertTrack2 inserted\n");
+	//printf("Song::insertTrackRealtime inserted\n");
 
 	n = _auxs.size();
 	for (iTrack i = _tracks.begin(); i != _tracks.end(); ++i)
@@ -4264,9 +4195,6 @@ void Song::insertTrack2(Track* track, int idx)
 		const RouteList* rl = track->inRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//if(r->track == track)
-			//  r->track->outRoutes()->push_back(*r);
-			// p3.3.50
 			Route src(track, r->channel, r->channels);
 			src.remoteChannel = r->remoteChannel;
 			r->track->outRoutes()->push_back(src);
@@ -4277,27 +4205,24 @@ void Song::insertTrack2(Track* track, int idx)
 		const RouteList* rl = track->outRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//if(r->track == track)
-			//  r->track->inRoutes()->push_back(*r);
-			// p3.3.50
 			Route src(track, r->channel, r->channels);
 			src.remoteChannel = r->remoteChannel;
 			r->track->inRoutes()->push_back(src);
 		}
 	}
-	else if (track->isMidiTrack()) // p3.3.50
+	else if (track->isMidiTrack())
 	{
 		const RouteList* rl = track->inRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//printf("Song::insertTrack2 %s in route port:%d\n", track->name().toLatin1().constData(), r->midiPort);   // p3.3.50
+			//printf("Song::insertTrackRealtime %s in route port:%d\n", track->name().toLatin1().constData(), r->midiPort);
 			Route src(track, r->channel);
 			midiPorts[r->midiPort].outRoutes()->push_back(src);
 		}
 		rl = track->outRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//printf("Song::insertTrack2 %s out route port:%d\n", track->name().toLatin1().constData(), r->midiPort);  // p3.3.50
+			//printf("Song::insertTrackRealtime %s out route port:%d\n", track->name().toLatin1().constData(), r->midiPort);
 			Route src(track, r->channel);
 			midiPorts[r->midiPort].inRoutes()->push_back(src);
 		}
@@ -4307,9 +4232,6 @@ void Song::insertTrack2(Track* track, int idx)
 		const RouteList* rl = track->inRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//if(r->track == track)
-			//  r->track->outRoutes()->push_back(*r);
-			// p3.3.50
 			Route src(track, r->channel, r->channels);
 			src.remoteChannel = r->remoteChannel;
 			r->track->outRoutes()->push_back(src);
@@ -4317,47 +4239,24 @@ void Song::insertTrack2(Track* track, int idx)
 		rl = track->outRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//if(r->track == track)
-			//  r->track->inRoutes()->push_back(*r);
-			// p3.3.50
 			Route src(track, r->channel, r->channels);
 			src.remoteChannel = r->remoteChannel;
 			r->track->inRoutes()->push_back(src);
 		}
 	}
 
-	//printf("Song::insertTrack2 end of function\n");
+	//printf("Song::insertTrackRealtime end of function\n");
 
 }
 
 //---------------------------------------------------------
-//   insertTrack3
-//    non realtime part of insertTrack
+//   removeTrack
 //---------------------------------------------------------
 
-void Song::insertTrack3(Track* /*track*/, int /*idx*/)//prevent compiler warning: unused parameter
-{
-	//printf("Song::insertTrack3\n");
-
-	/*
-	switch(track->type()) {
-		  case Track::AUDIO_SOFTSYNTH:
-				break;
-		  default:
-				break;
-		  }
-	 */
-}
-
-//---------------------------------------------------------
-//   removeTrack0
-//---------------------------------------------------------
-
-void Song::removeTrack0(Track* track)
+void Song::removeTrack(Track* track)
 {
 	removeTrack1(track);
 	audio->msgRemoveTrack(track);
-	removeTrack3(track);
 	//delete track;
 	update(SC_TRACK_REMOVED);
 }
@@ -4389,34 +4288,25 @@ void Song::removeTrack1(Track* track)
 		case Track::AUDIO_INPUT:
 			connectJackRoutes((AudioTrack*) track, true);
 			break;
-		case Track::AUDIO_SOFTSYNTH:
-		{
-			SynthI* si = (SynthI*) track;
-			if (si->hasGui())
-				si->showGui(false);
-		}
-			break;
 		default:
 			break;
 	}
 }
 
 //---------------------------------------------------------
-//   removeTrack
+//   removeTrackRealtime
 //    called from RT context
 //---------------------------------------------------------
 
-void Song::removeTrack2(Track* track)
+void Song::removeTrackRealtime(Track* track)
 {
-	//printf("Song::removeTrack2 track:%s\n", track->name().toLatin1().constData());  // p3.3.50
+	//printf("Song::removeTrackRealtime track:%s\n", track->name().toLatin1().constData());
 	midiMonitor->msgDeleteMonitoredTrack(track);
 
 	switch (track->type())
 	{
 		case Track::MIDI:
 		case Track::DRUM:
-			// Added by T356.
-			//((MidiTrack*)track)->removePortCtrlEvents();
 			removePortCtrlEvents(((MidiTrack*) track));
 			unchainTrackParts(track, true);
 
@@ -4424,7 +4314,6 @@ void Song::removeTrack2(Track* track)
 			_artracks.erase(track);
 			break;
 		case Track::WAVE:
-			// Added by T356.
 			unchainTrackParts(track, true);
 
 			_waves.erase(track);
@@ -4464,7 +4353,6 @@ void Song::removeTrack2(Track* track)
 		}
 		tv = findTrackView(track);
 	}
-	//if(updateview || viewselected)
 	updateTrackViews1();
 
 
@@ -4492,19 +4380,19 @@ void Song::removeTrack2(Track* track)
 			r->track->inRoutes()->removeRoute(src);
 		}
 	}
-	else if (track->isMidiTrack()) // p3.3.50
+	else if (track->isMidiTrack())
 	{
 		const RouteList* rl = track->inRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//printf("Song::removeTrack2 %s in route port:%d\n", track->name().toLatin1().constData(), r->midiPort);   // p3.3.50
+			//printf("Song::removeTrackRealtime %s in route port:%d\n", track->name().toLatin1().constData(), r->midiPort);
 			Route src(track, r->channel);
 			midiPorts[r->midiPort].outRoutes()->removeRoute(src);
 		}
 		rl = track->outRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//printf("Song::removeTrack2 %s out route port:%d\n", track->name().toLatin1().constData(), r->midiPort);  // p3.3.50
+			//printf("Song::removeTrackRealtime %s out route port:%d\n", track->name().toLatin1().constData(), r->midiPort);  
 			Route src(track, r->channel);
 			midiPorts[r->midiPort].inRoutes()->removeRoute(src);
 		}
@@ -4514,10 +4402,7 @@ void Song::removeTrack2(Track* track)
 		const RouteList* rl = track->inRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//if(r->track == track)
-			//  r->track->outRoutes()->removeRoute(*r);
-			//printf("Song::removeTrack2 %s in route track:%s\n", track->name().toLatin1().constData(), r->track->name().toLatin1().constData());  // p3.3.50
-			// p3.3.50
+			//printf("Song::removeTrackRealtime %s in route track:%s\n", track->name().toLatin1().constData(), r->track->name().toLatin1().constData()); 
 			Route src(track, r->channel, r->channels);
 			src.remoteChannel = r->remoteChannel;
 			r->track->outRoutes()->removeRoute(src);
@@ -4525,37 +4410,13 @@ void Song::removeTrack2(Track* track)
 		rl = track->outRoutes();
 		for (ciRoute r = rl->begin(); r != rl->end(); ++r)
 		{
-			//if(r->track == track)
-			//  r->track->inRoutes()->removeRoute(*r);
-			//printf("Song::removeTrack2 %s out route track:%s\n", track->name().toLatin1().constData(), r->track->name().toLatin1().constData());  // p3.3.50
-			// p3.3.50
+			//printf("Song::removeTrackRealtime %s out route track:%s\n", track->name().toLatin1().constData(), r->track->name().toLatin1().constData()); 
 			Route src(track, r->channel, r->channels);
 			src.remoteChannel = r->remoteChannel;
 			r->track->inRoutes()->removeRoute(src);
 		}
 	}
 
-}
-
-//---------------------------------------------------------
-//   removeTrack3
-//    non realtime part of removeTrack
-//---------------------------------------------------------
-
-void Song::removeTrack3(Track* /*track*/)//prevent of compiler warning: unused parameter
-{
-	/*
-	switch(track->type()) {
-		  case Track::AUDIO_SOFTSYNTH:
-				{
-				SynthI* s = (SynthI*) track;
-				s->deactivate3();
-				}
-				break;
-		  default:
-				break;
-		  }
-	 */
 }
 
 //---------------------------------------------------------

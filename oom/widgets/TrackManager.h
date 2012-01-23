@@ -11,9 +11,9 @@
 #include <QString>
 #include <QPair>
 
-struct OOVirtualTrack {
+struct VirtualTrack {
 
-	OOVirtualTrack()
+	VirtualTrack()
 	{
 		type = -1;
 		useOutput = false;
@@ -45,7 +45,7 @@ struct OOVirtualTrack {
 	QPair<int, QString> bussConfig;
 };
 
-class OOTrackManager : public QObject{
+class TrackManager : public QObject{
 	Q_OBJECT
 
 	int m_insertPosition;
@@ -60,17 +60,20 @@ class OOTrackManager : public QObject{
 	
 	int getFreeMidiPort();
 	
-	void createMonitorInputTracks(OOVirtualTrack*);
-	bool loadInstrument(OOVirtualTrack*);
+	void createMonitorInputTracks(VirtualTrack*);
+	void removeMonitorInputTracks(VirtualTrack*);
+	bool loadInstrument(VirtualTrack*);
+	bool unloadInstrument(VirtualTrack*);
 
 signals:
 	void trackAdded(QString);
 
 public:
-	OOTrackManager();
-	~OOTrackManager(){}
+	TrackManager();
+	~TrackManager(){}
 	void setPosition(int);
-	bool addTrack(OOVirtualTrack*);
+	bool addTrack(VirtualTrack*);
+	bool removeTrack(VirtualTrack*);
 };
 
 #endif

@@ -22,7 +22,6 @@ class EventCanvas;
 class ScrollScale;
 class CtrlEdit;
 class MTScale;
-class WaveView;
 class Part;
 class WavePart;
 class Event;
@@ -44,7 +43,6 @@ protected:
     ScrollScale* vscroll;
     MTScale* time;
     EventCanvas* canvas;
-    WaveView* wview;
 
     std::list<CtrlEdit*> ctrlEditList;
     int _quant, _raster;
