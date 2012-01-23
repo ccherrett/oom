@@ -3428,22 +3428,16 @@ void ComposerCanvas::copyAutomation()/*{{{*/
 		control.setAttribute("color", cl->color().name());
 		control.setAttribute("visible", cl->isVisible());
 
-		if(song->punchin() && song->punchout())
+		if(_curveNodeSelection->size())
 		{
 			control.setAttribute("partial", true);
-			for (ciCtrl ic = cl->begin(); ic != cl->end(); ++ic)
+			QList<CtrlVal*> selectedNodes = _curveNodeSelection->getNodes();
+			foreach(CtrlVal* val, selectedNodes)
 			{
-				int frame = ic->second.getFrame();
-				int lpos = tempomap.tick2frame(song->lpos());
-				int rpos = tempomap.tick2frame(song->rpos());
-				//printf("Node frame: %d, punchin: %d, punchout: %d\n", frame, lpos, rpos);
-				if(frame >= lpos && frame <= rpos)
-				{
-					QDomElement node = doc.createElement("node");
-					control.appendChild(node);
-					node.setAttribute("frame", ic->second.getFrame());
-					node.setAttribute("value", ic->second.val);
-				}
+				QDomElement node = doc.createElement("node");
+				control.appendChild(node);
+				node.setAttribute("frame", val->getFrame());
+				node.setAttribute("value", val->val);
 			}
 		}
 		else
