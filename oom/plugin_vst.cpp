@@ -200,6 +200,8 @@ VstPlugin::VstPlugin()
 
 VstPlugin::~VstPlugin()
 {
+    qWarning("~VstPlugin() --------------------------------------------");
+
     if (effect)
     {
         if (ui.widget)

@@ -354,6 +354,7 @@ static const void* oom_lv2_state_retrieve(LV2_State_Handle handle, uint32_t key,
 
                 if (state->type == Lv2Plugin::STATE_STRING)
                 {
+                    *size = strlen(state->value);
                     *type = OOM_URI_MAP_ID_ATOM_STRING;
                     return state->value;
                 }
@@ -454,6 +455,8 @@ Lv2Plugin::Lv2Plugin()
 
 Lv2Plugin::~Lv2Plugin()
 {
+    qWarning("~Lv2Plugin() --------------------------------------------");
+
     aboutToRemove();
 
     // close UI

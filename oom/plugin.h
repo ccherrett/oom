@@ -485,7 +485,7 @@ public:
     void writeConfiguration(int level, Xml& xml);
 
     bool loadControl(Xml& xml);
-    bool setControl(int32_t idx, double value);
+    bool setControl(int32_t idx, QString oldName, double value);
 
 protected:
     float* m_paramsBuffer;
