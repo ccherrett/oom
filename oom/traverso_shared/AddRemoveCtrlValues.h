@@ -26,6 +26,12 @@ public:
 
 	AddRemoveCtrlValues(
 		CtrlList* cl,
+		QList<CtrlVal> ctrlValues,
+		QList<CtrlVal> newCtrlValues,
+		int type = MODIFY);
+
+	AddRemoveCtrlValues(
+		CtrlList* cl,
 		CtrlVal ctrlValues,
 		int type);
 
@@ -35,6 +41,7 @@ public:
 private:
 	CtrlList*		m_cl;
 	QList<CtrlVal>		m_ctrlValues;
+	QList<CtrlVal>		m_newCtrlValues;
 	int			m_type;
 	double m_startValue;
 };

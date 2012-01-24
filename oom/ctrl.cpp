@@ -232,7 +232,7 @@ void CtrlList::del(int frame)
 	iCtrl e = find(frame);
 	if (e == end())
 	{
-		printf("CtrlList::del(%d): not found\n", frame);
+		//printf("CtrlList::del(%d): not found\n", frame);
 		return;
 	}
 	erase(e);
@@ -271,7 +271,6 @@ void CtrlList::read(Xml& xml)
 			case Xml::Attribut:
 				if (tag == "id")
 				{
-					//_id = xml.s2().toInt();
 					_id = loc.toInt(xml.s2(), &ok);
 					if (!ok)
 					{
@@ -284,7 +283,6 @@ void CtrlList::read(Xml& xml)
 				}
 				else if (tag == "cur")
 				{
-					//_curVal = xml.s2().toDouble();
 					_curVal = loc.toDouble(xml.s2(), &ok);
 					if (!ok)
 						printf("CtrlList::read failed reading _curVal string: %s\n", xml.s2().toLatin1().constData());
@@ -302,34 +300,6 @@ void CtrlList::read(Xml& xml)
 				break;
 			case Xml::Text:
 			{
-				// Changed by Tim. Users in some locales reported corrupt reading,
-				//  because of the way floating point is represented (2,3456 not 2.3456).
-				/*
-				QByteArray ba = tag.toLatin1();
-				const char* s = ba;.constData();
-				int frame;
-				double val;
-
-				for (;;) {
-					  char* endp;
-					  while (*s == ' ' || *s == '\n')
-							++s;
-					  if (*s == 0)
-							break;
-					  frame = strtol(s, &endp, 10);
-					  s     = endp;
-					  while (*s == ' ' || *s == '\n')
-							++s;
-					  val = strtod(s, &endp);
-					  add(frame, val);
-					  s = endp;
-					  ++s;
-					  }
-				 */
-
-				// Added by Tim. p3.3.6
-				//printf("CtrlList::read tag:%s\n", tag.toLatin1().constData());
-
 				int len = tag.length();
 				int frame;
 				double val;
@@ -353,7 +323,6 @@ void CtrlList::read(Xml& xml)
 
 					// Works OK, but only because if current locale fails it falls back on 'C' locale.
 					// So, let's skip the fallback and force use of 'C' locale.
-					//frame = fs.toInt(&ok);
 					frame = loc.toInt(fs, &ok);
 					if (!ok)
 					{
@@ -383,7 +352,6 @@ void CtrlList::read(Xml& xml)
 						break;
 					}
 
-					// Added by Tim. p3.3.6
 					//printf("CtrlList::read i:%d len:%d fs:%s frame %d: vs:%s val %f \n", i, len, fs.toLatin1().constData(), frame, vs.toLatin1().constData(), val);
 
 					add(frame, val);
@@ -396,9 +364,6 @@ void CtrlList::read(Xml& xml)
 			case Xml::TagEnd:
 				if (xml.s1() == "controller")
 				{
-					// Added by Tim. p3.3.6
-					//printf("CtrlList::read _id:%d _curVal:%f\n", _id, _curVal);
-
 					return;
 				}
 			default:

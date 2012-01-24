@@ -148,7 +148,8 @@ public:
 	}
 
 	void move(int frameDiff, double valDiff, double min, double max, CtrlList* list, CtrlVal* lazySelectedCtrlVal, bool dBCalculation)
-	{
+	{//We need to make a copy of all the nodes in our internal list so we can operate on them without updating the CtrlList
+	//This way we can do the actions at once and provide undo.
 		if (lazySelectedCtrlVal)
 		{
 			addNodeToSelection(lazySelectedCtrlVal);
@@ -188,6 +189,7 @@ public:
 				double cvval = valToDb(newCtrlVal);
 				if (cvval < valToDb(min)) cvval = min;
 				if (cvval > max) cvval = max;
+				//Add undo
 				ctrlVal->val = cvval;
 			}
 		}
@@ -199,6 +201,7 @@ public:
 
 				if (cvval< min) cvval=min;
 				if (cvval>max) cvval=max;
+				//Add undo
 				ctrlVal->val = cvval;
 			}
 
@@ -260,10 +263,10 @@ public:
 			}
 		}
 
-		if (lazySelectedCtrlVal)
+		/*(if (lazySelectedCtrlVal)
 		{
 			removeNodeFromSelection(lazySelectedCtrlVal);
-		}
+		}*/
 
 		song->dirty = true;
 	}
@@ -892,7 +895,7 @@ QMenu* ComposerCanvas::genItemPopup(CItem* item)/*{{{*/
 	Track::TrackType trackType = npart->track()->type();
 
 	QMenu* partPopup = new QMenu(this);
-	QMenu* colorPopup = partPopup->addMenu(tr("Part Color"));/*{{{*/
+	QMenu* colorPopup = partPopup->addMenu(tr("Part Color"));
 
 	QMenu* colorSub; 
 	for (int i = 0; i < NUM_PARTCOLORS; ++i)
@@ -921,8 +924,8 @@ QMenu* ComposerCanvas::genItemPopup(CItem* item)/*{{{*/
 				act_color->setData(20 + i);
 			}
 		}	
-	}/*}}}*/
-	QString zvalue = QString::number(item->zValue(true));/*{{{*/
+	}
+	QString zvalue = QString::number(item->zValue(true));
 	QMenu* layerMenu = partPopup->addMenu(tr("Part Layers: ")+zvalue);
 	QAction *act_front = layerMenu->addAction(tr("Top"));
 	act_front->setData(4003);
@@ -931,7 +934,7 @@ QMenu* ComposerCanvas::genItemPopup(CItem* item)/*{{{*/
 	QAction *act_down = layerMenu->addAction(tr("Down"));
 	act_down->setData(4001);
 	QAction *act_back = layerMenu->addAction(tr("Bottom"));
-	act_back->setData(4000);/*}}}*/
+	act_back->setData(4000);
 
 	QAction *act_cut = partPopup->addAction(*editcutIconSet, tr("C&ut"));
 	act_cut->setData(4);
@@ -1332,7 +1335,6 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 			if (event->modifiers() & Qt::ShiftModifier && event->button() & Qt::LeftButton && !automation.currentCtrlVal)
 			{
 				automation.moveController = true;
-				qDebug("Line: 1335: event->modifiers() & Qt::ShiftModifier && event->button() & Qt::LeftButton && !automation.currentCtrlVal");
 				return;
 			}
 			if (event->modifiers() & Qt::ControlModifier && event->button() & Qt::LeftButton)
@@ -1343,7 +1345,6 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 
 			if (automation.controllerState != doNothing)
 			{
-				qDebug("Line: 1346 automation.controllerState != doNothing");
 				automation.moveController=true;
 				if (automation.currentCtrlVal)
 				{
@@ -1414,8 +1415,7 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 
 void ComposerCanvas::mouseRelease(const QPoint& pos)
 {
-	// clear all the automation parameters
-	if(_drag == DRAG_LASSO)
+	if(_drag == DRAG_LASSO && _tool == AutomationTool)
 	{
 		//qDebug("ComposerCanvas::mouseRelease lasso mode");
 		_drag = DRAG_OFF;
@@ -1423,7 +1423,7 @@ void ComposerCanvas::mouseRelease(const QPoint& pos)
 		{
 			//qDebug("ComposerCanvas::mouseRelease found selected curve");
 			double top, bottom, min, max;
-			automation.currentCtrlList->range(&min,&max);/*{{{*/
+			automation.currentCtrlList->range(&min,&max);
 			double range = max - min;
 			//int left = tempomap.tick2frame(_lasso.left());
 			//int right = tempomap.tick2frame(_lasso.right());
@@ -1495,9 +1495,79 @@ void ComposerCanvas::mouseRelease(const QPoint& pos)
 	}
 	else
 	{//process the lasso and select at node in range
-		automation.moveController=false;
+		if(automation.movingStarted)
+		{//m_automationMoveList
+			if (automation.currentCtrlList)
+			{
+				QList<CtrlVal> valuesToAdd;
+
+				QList<CtrlVal*> selectedNodes = _curveNodeSelection->getNodes();
+				foreach(CtrlVal* val, selectedNodes)
+				{
+					valuesToAdd.append(CtrlVal(val->getFrame(), val->val));
+				}
+				//Delete nodes from controller
+				QList<int> delList;
+				iCtrl ictl = automation.currentCtrlList->begin();
+				for (; ictl != automation.currentCtrlList->end(); ictl++)
+				{
+					int frame = ictl->second.getFrame();
+					foreach(CtrlVal val, valuesToAdd)
+					{
+						if(frame == val.getFrame())
+						{
+							delList.append(val.getFrame());
+							break;
+						}
+					}
+				}
+				//Clear the node selection list since it will contain invalid pointers after below
+				_curveNodeSelection->clearSelection();
+				//Delete the new moved nodes
+				foreach(int frame, delList)
+				{
+					automation.currentCtrlList->del(frame);
+				}
+				//Readd the old node positions 
+				foreach(CtrlVal v, m_automationMoveList)
+				{
+					automation.currentCtrlList->add(v.getFrame(), v.val);
+				}
+				//Let undo/redo do the job
+				AddRemoveCtrlValues* modifyCommand = new AddRemoveCtrlValues(automation.currentCtrlList, m_automationMoveList, valuesToAdd, OOMCommand::MODIFY);
+
+				CommandGroup* group = new CommandGroup(tr("Move Automation Nodes"));
+				group->add_command(modifyCommand);
+
+				song->pushToHistoryStack(group);
+
+				//Repopulate selection list
+				iCtrl ic = automation.currentCtrlList->begin();
+				for (; ic != automation.currentCtrlList->end(); ic++)
+				{
+					int frame = ic->second.getFrame();
+					double value = ic->second.val;
+					foreach(CtrlVal val, valuesToAdd)
+					{
+						if(frame == val.getFrame() && value == val.val)
+						{
+							CtrlVal &cv = ic->second;
+							automation.currentCtrlVal = &cv;
+							automation.controllerState = movingController;
+							//qDebug("ComposerCanvas::mouseRelease: Adding node at frame: %d, value: %f\n", cv.getFrame(),  cv.val);
+							_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
+							break;
+						}
+					}
+				}
+			}
+		}
+		// clear all the automation parameters
+		automation.moveController = false;
 		automation.controllerState = doNothing;
-		automation.currentCtrlVal=0;
+		automation.currentCtrlVal = 0;
+		automation.movingStarted = false;
+		m_automationMoveList.clear();
 		m_selectedCurve = 0;
 		_drag = DRAG_OFF;
 	}
@@ -3324,7 +3394,7 @@ void ComposerCanvas::cmd(int cmd)
 		{
 			if (_tool == AutomationTool)
 			{
-				if (automation.currentCtrlList && _curveNodeSelection->size())
+				if (automation.currentCtrlList && _curveNodeSelection->size())/*{{{*/
 				{
 					QList<CtrlVal> valuesToRemove;
 
@@ -3346,7 +3416,7 @@ void ComposerCanvas::cmd(int cmd)
 					_curveNodeSelection->clearSelection();
 					redraw();
 					return;
-				}
+				}/*}}}*/
 
 				if (automation.currentCtrlVal && automation.currentCtrlList)
 				{
@@ -4913,6 +4983,8 @@ void ComposerCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 		{
 			//printf("Selecting closest automation line\n");
 			automation.controllerState = doNothing;
+			if(automation.currentCtrlList)
+				automation.currentCtrlList->setSelected(false);
 			automation.currentCtrlList = cl;
 			automation.currentCtrlList->setSelected(true);
 			automation.currentTrack = t;
@@ -5013,7 +5085,7 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 
 		if (addNode)
 		{
-			automation.currentCtrlList->range(&min,&max);/*{{{*/
+			automation.currentCtrlList->range(&min,&max);
 			double range = max - min;
 			double newValue;
 			double relativeY = double(event->pos().y() - track2Y(automation.currentTrack)) / automation.currentTrack->height();
@@ -5026,7 +5098,7 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 			else
 			{
 				newValue = max - (relativeY * range);
-			}/*}}}*/
+			}
 
 			//FIXME: Select the last inserted node
 			AddRemoveCtrlValues* cmd = new AddRemoveCtrlValues(automation.currentCtrlList, CtrlVal(currFrame, newValue), AddRemoveCtrlValues::ADD);
@@ -5053,6 +5125,7 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 
 	int xDiff = (event->pos() - automation.mousePressPos).x();
 	int frameDiff = tempomap.tick2frame(abs(xDiff));
+	//qDebug("xDiff: %d, frameDiff: %d\n", xDiff, frameDiff);
 	if (xDiff < 0)
 	{
 		frameDiff *= -1;
@@ -5060,9 +5133,25 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 
 	double mouseYDiff = (automation.mousePressPos - event->pos()).y();
 	double valDiff = (mouseYDiff)/automation.currentTrack->height();
+	//qDebug("mouseYDiff: %f, valDiff: %f, xDiff: %d, frameDiff: %d\n", mouseYDiff, valDiff, xDiff, frameDiff);
 
 	automation.currentCtrlList->range(&min,&max);
 
+	//TODO: Duplicate the _curveNodeSelection list for undo purposes
+	if(!automation.movingStarted && automation.currentCtrlList)
+	{//Populate a list with the current values
+		m_automationMoveList.clear();
+		foreach(CtrlVal* v, _curveNodeSelection->getNodes()) {
+			//Add the new
+			m_automationMoveList.append(CtrlVal(v->getFrame(), v->val));
+		}
+		if(m_automationMoveList.isEmpty() && automation.currentCtrlVal)
+		{
+			m_automationMoveList.append(CtrlVal(automation.currentCtrlVal->getFrame(), automation.currentCtrlVal->val));
+			_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
+		}
+		automation.movingStarted = !m_automationMoveList.isEmpty();
+	}
 	if (automation.currentCtrlList->id() == AC_VOLUME )
 	{
 		_curveNodeSelection->move(frameDiff, valDiff, min, max, automation.currentCtrlList, automation.currentCtrlVal, true);

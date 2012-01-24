@@ -13,6 +13,7 @@
 #include "canvas.h"
 //#include "trackautomationview.h"
 #include <QHash>
+#include <QList>
 #include <QIcon>
 #include <QPixmap>
 #include <QRect>
@@ -64,6 +65,7 @@ struct AutomationObject {
 	CtrlList *currentCtrlList;
 	Track *currentTrack;
 	bool moveController;
+	bool movingStarted;
 	ControllerVals controllerState;
 	QPoint mousePressPos;
 };
@@ -98,6 +100,7 @@ class ComposerCanvas : public Canvas
 
     AutomationObject automation;
     CurveNodeSelection* _curveNodeSelection;
+	QList<CtrlVal> m_automationMoveList;
 	FadeCurve* m_selectedCurve;
 
 	CItemList getSelectedItems();

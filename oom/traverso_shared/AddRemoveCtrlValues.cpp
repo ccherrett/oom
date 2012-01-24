@@ -21,6 +21,16 @@ AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, QList<CtrlVal> ctrlValues
 	m_startValue = m_cl->value(0);
 }
 
+AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, QList<CtrlVal> ctrlValues, QList<CtrlVal> newCtrlValues, int type)
+	: OOMCommand(tr("Move Nodes"))
+	, m_cl(cl)
+	, m_ctrlValues(ctrlValues)
+	, m_newCtrlValues(newCtrlValues)
+	, m_type(type)
+{
+	m_startValue = m_cl->value(0);
+}
+
 AddRemoveCtrlValues::AddRemoveCtrlValues(CtrlList *cl, CtrlVal ctrlValue, int type)
 	: OOMCommand(tr("Add Node"))
 	, m_cl(cl)
@@ -39,12 +49,23 @@ int AddRemoveCtrlValues::do_action()
 			m_cl->add(v.getFrame(), v.val);
 		}
 	}
-	else
+	else if(m_type == REMOVE)
 	{
 		foreach(CtrlVal v, m_ctrlValues) {
 			m_cl->del(v.getFrame());
 		}
 		m_cl->add(0, m_startValue);
+	}
+	else
+	{
+		foreach(CtrlVal v, m_ctrlValues) {
+			//Delete the old
+			m_cl->del(v.getFrame());
+		}
+		foreach(CtrlVal v, m_newCtrlValues) {
+			//Add the new
+			m_cl->add(v.getFrame(), v.val);
+		}
 	}
 
 
@@ -61,10 +82,21 @@ int AddRemoveCtrlValues::undo_action()
 		}
 		m_cl->add(0, m_startValue);
 	}
-	else
+	else if(m_type == REMOVE)
 	{
 		foreach(CtrlVal v, m_ctrlValues)
 		{
+			m_cl->add(v.getFrame(), v.val);
+		}
+	}
+	else
+	{
+		foreach(CtrlVal v, m_newCtrlValues) {
+			//Delete the old
+			m_cl->del(v.getFrame());
+		}
+		foreach(CtrlVal v, m_ctrlValues) {
+			//Add the new
 			m_cl->add(v.getFrame(), v.val);
 		}
 	}
