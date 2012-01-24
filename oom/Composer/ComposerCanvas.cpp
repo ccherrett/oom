@@ -1506,8 +1506,10 @@ void ComposerCanvas::mouseRelease(const QPoint& pos)
 				{
 					valuesToAdd.append(CtrlVal(val->getFrame(), val->val));
 				}
+				bool singleSelect = false;
 				if(valuesToAdd.isEmpty() && automation.currentCtrlVal)
 				{//its a single node move
+					singleSelect = true;
 					valuesToAdd.append(CtrlVal(automation.currentCtrlVal->getFrame(), automation.currentCtrlVal->val));
 				}
 				//Delete nodes from controller
@@ -1546,21 +1548,24 @@ void ComposerCanvas::mouseRelease(const QPoint& pos)
 				song->pushToHistoryStack(group);
 
 				//Repopulate selection list
-				iCtrl ic = automation.currentCtrlList->begin();
-				for (; ic != automation.currentCtrlList->end(); ic++)
+				if(!singleSelect)
 				{
-					int frame = ic->second.getFrame();
-					double value = ic->second.val;
-					foreach(CtrlVal val, valuesToAdd)
+					iCtrl ic = automation.currentCtrlList->begin();
+					for (; ic != automation.currentCtrlList->end(); ic++)
 					{
-						if(frame == val.getFrame() && value == val.val)
+						int frame = ic->second.getFrame();
+						double value = ic->second.val;
+						foreach(CtrlVal val, valuesToAdd)
 						{
-							CtrlVal &cv = ic->second;
-							automation.currentCtrlVal = &cv;
-							automation.controllerState = movingController;
-							//qDebug("ComposerCanvas::mouseRelease: Adding node at frame: %d, value: %f\n", cv.getFrame(),  cv.val);
-							_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
-							break;
+							if(frame == val.getFrame() && value == val.val)
+							{
+								CtrlVal &cv = ic->second;
+								automation.currentCtrlVal = &cv;
+								automation.controllerState = movingController;
+								//qDebug("ComposerCanvas::mouseRelease: Adding node at frame: %d, value: %f\n", cv.getFrame(),  cv.val);
+								_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
+								break;
+							}
 						}
 					}
 				}
