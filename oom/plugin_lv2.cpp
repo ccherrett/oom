@@ -476,7 +476,7 @@ Lv2Plugin::~Lv2Plugin()
         {
 #ifdef GTK2UI_SUPPORT
         case UI_GTK2:
-            if (ui.nativeWidget)
+            if (ui.nativeWidget && GTK_IS_WIDGET(ui.nativeWidget))
                 gtk_widget_destroy((GtkWidget*)ui.nativeWidget);
             break;
 #endif
@@ -1330,6 +1330,9 @@ bool Lv2Plugin::hasNativeGui()
 
 void Lv2Plugin::showNativeGui(bool yesno)
 {
+    if (ui.visible == yesno)
+        return;
+
     // Initialize UI if needed
     if (! ui.handle)
     {
@@ -1397,7 +1400,7 @@ void Lv2Plugin::showNativeGui(bool yesno)
     if (yesno)
         updateUIPorts();
 
-    // Now show it
+    // Now show/hide it
     switch (ui.type)
     {
 #ifdef GTK2UI_SUPPORT
@@ -1460,10 +1463,10 @@ bool Lv2Plugin::nativeGuiVisible()
 
 void Lv2Plugin::updateNativeGui()
 {
+    updateUIPorts(true);
+
     if (nativeGuiVisible())
     {
-        updateUIPorts(true);
-
         switch (ui.type)
         {
         case UI_GTK2:
@@ -1501,14 +1504,23 @@ void Lv2Plugin::updateNativeGui()
 
 void Lv2Plugin::updateUIPorts(bool onlyOutput)
 {
-    if (ui.handle && ui.descriptor && ui.descriptor->port_event)
+    bool update_builtin = (m_gui && m_gui->isVisible());
+    bool update_native  = (ui.handle && ui.descriptor && ui.descriptor->port_event);
+
+    if (update_builtin || update_native)
     {
         for (uint32_t i = 0; i < m_paramCount; i++)
         {
             if (m_params[i].type == PARAMETER_OUTPUT || onlyOutput == false || m_params[i].update)
-                ui.descriptor->port_event(ui.handle, m_params[i].rindex, sizeof(float), 0, &m_paramsBuffer[i]);
+            {
+                if (update_builtin)
+                    m_gui->setParameterValue(i, m_params[i].value);
 
-            m_params[i].update = false;
+                if (update_native)
+                    ui.descriptor->port_event(ui.handle, m_params[i].rindex, sizeof(float), 0, &m_paramsBuffer[i]);
+
+                m_params[i].update = false;
+            }
         }
     }
 }
@@ -1559,10 +1571,9 @@ void Lv2Plugin::ui_write_function(uint32_t port_index, uint32_t buffer_size, uin
 
             if (param_id > -1 && m_params[param_id].type == PARAMETER_INPUT)
             {
+                // same as setParameteValue
                 m_params[param_id].value = m_params[param_id].tmpValue = m_paramsBuffer[param_id] = value;
-
-                if (m_gui)
-                    m_gui->setParameterValue(param_id, value);
+                m_params[param_id].update = true;
             }
         }
     }
@@ -1797,7 +1808,7 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
 
                 if (need_buffer_copy)
                 {
-                    for (int i=ains; i < m_channels ; i++)
+                    for (int i=aouts; i < m_channels ; i++)
                         memcpy(dst[i], dst[i-1], sizeof(float)*frames);
                 }
             }
@@ -1875,13 +1886,12 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
             else if (tag == "gui")
             {
                 bool yesno = xml.parseInt();
-
-                if (yesno)
-                {
-                    if (! m_gui)
-                        m_gui = new PluginGui(this);
-                    m_gui->show();
-                }
+                showGui(yesno);
+            }
+            else if (tag == "nativegui")
+            {
+                bool yesno = xml.parseInt();
+                showNativeGui(yesno);
             }
             else if (tag == "geometry")
             {
@@ -1900,8 +1910,19 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
         case Xml::Attribut:
             if (tag == "uri")
             {
-                if (readPreset == false)
-                    new_uri = xml.s2();
+                QString s = xml.s2();
+
+                if (readPreset)
+                {
+                    if (s != m_filename)
+                    {
+                        printf("Error: Wrong preset URI %s. URI must be %s\n",
+                               s.toUtf8().constData(), m_filename.toUtf8().constData());
+                        return true;
+                    }
+                }
+                else
+                    new_uri = s;
             }
             else if (tag == "channels" || tag == "channel")
             {
@@ -1965,10 +1986,15 @@ void Lv2Plugin::writeConfiguration(int level, Xml& xml)
 
     xml.intTag(level, "active", m_active);
 
-    if (m_gui)
+    if (guiVisible())
     {
         xml.intTag(level, "gui", 1);
         xml.geometryTag(level, "geometry", m_gui);
+    }
+
+    if (hasNativeGui() && nativeGuiVisible())
+    {
+        xml.intTag(level, "nativegui", 1);
     }
 
     xml.tag(level--, "/Lv2Plugin");

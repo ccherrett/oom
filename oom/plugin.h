@@ -232,6 +232,11 @@ public:
         return m_uniqueId;
     }
 
+    bool enabled()
+    {
+        return m_enabled;
+    }
+
     bool active()
     {
         return m_active;

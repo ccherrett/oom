@@ -32,8 +32,8 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
         if (plugin)
         {
             plugin->setParameterValue(index, opt);
-            if (plugin->gui())
-                plugin->gui()->setParameterValue(index, opt);
+            //if (plugin->gui())
+            //    plugin->gui()->setParameterValue(index, opt);
         }
         return 1; // FIXME?
 
@@ -631,7 +631,7 @@ bool VstPlugin::hasNativeGui()
 void VstPlugin::showNativeGui(bool yesno)
 {
     // Initialize UI if needed
-    if (! ui.widget)
+    if (! ui.widget && yesno)
     {
         ui.widget = new QWidget();
         // TODO - set X11 Display as 'value'
@@ -676,7 +676,8 @@ void VstPlugin::showNativeGui(bool yesno)
         ui.widget->setWindowIcon(*oomIcon);
     }
 
-    ui.widget->setVisible(yesno);
+    if (ui.widget)
+        ui.widget->setVisible(yesno);
 }
 
 bool VstPlugin::nativeGuiVisible()
@@ -694,6 +695,18 @@ void VstPlugin::updateNativeGui()
             ui.widget->setFixedSize(ui.width, ui.height);
         ui.width = 0;
         ui.height = 0;
+    }
+
+    if (m_gui && m_gui->isVisible())
+    {
+        for (uint32_t i=0; i < m_paramCount; i++)
+        {
+            if (m_params[i].update)
+            {
+                m_gui->setParameterValue(i, m_params[i].value);
+                m_params[i].update = false;
+            }
+        }
     }
 
     effect->dispatcher(effect, effIdle, 0, 0, 0, 0.0f);
@@ -720,7 +733,7 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
 
         if (m_active)
         {
-            if ((m_hints & PLUGIN_IS_SYNTH) == 0 && (effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels))
+            if ((m_hints & PLUGIN_IS_SYNTH) == 0 || effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels)
             {
                 // cannot proccess
                 m_proc_lock.unlock();
@@ -783,6 +796,7 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                     if (m_params[i].value != m_params[i].tmpValue)
                     {
                         m_params[i].value = m_params[i].tmpValue;
+                        m_params[i].update = true;
                         effect->setParameter(effect, i, m_params[i].value);
                     }
                 }
@@ -888,6 +902,11 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
                         m_gui->show();
                     }
                 }
+                else if (tag == "nativegui")
+                {
+                    bool yesno = xml.parseInt();
+                    showNativeGui(yesno);
+                }
                 else if (tag == "geometry")
                 {
                     QRect r(readGeometry(xml, tag));
@@ -981,10 +1000,15 @@ void VstPlugin::writeConfiguration(int level, Xml& xml)
 
     xml.intTag(level, "active", m_active);
 
-    if (m_gui)
+    if (guiVisible())
     {
         xml.intTag(level, "gui", 1);
         xml.geometryTag(level, "geometry", m_gui);
+    }
+
+    if (hasNativeGui() && nativeGuiVisible())
+    {
+        xml.intTag(level, "nativegui", 1);
     }
 
     xml.tag(level--, "/VstPlugin");

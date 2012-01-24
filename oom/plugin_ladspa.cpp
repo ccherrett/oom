@@ -706,7 +706,7 @@ void LadspaPlugin::writeConfiguration(int level, Xml& xml)
 
     xml.intTag(level, "active", m_active);
 
-    if (m_gui)
+    if (guiVisible())
     {
         xml.intTag(level, "gui", 1);
         xml.geometryTag(level, "geometry", m_gui);
