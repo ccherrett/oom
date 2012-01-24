@@ -202,6 +202,8 @@ VstPlugin::~VstPlugin()
 {
     qWarning("~VstPlugin() --------------------------------------------");
 
+    aboutToRemove();
+
     if (effect)
     {
         if (ui.widget)
@@ -229,13 +231,13 @@ VstPlugin::~VstPlugin()
         if (m_ainsCount > 0)
         {
             for (uint32_t i=0; i < m_ainsCount; i++)
-                jack_port_unregister(jclient, m_ports_in[i]);
+                jack_port_unregister(jclient, m_portsIn[i]);
         }
 
         if (m_aoutsCount > 0)
         {
-            for (uint32_t i=0; i < m_ainsCount; i++)
-                jack_port_unregister(jclient, m_ports_out[i]);
+            for (uint32_t i=0; i < m_aoutsCount; i++)
+                jack_port_unregister(jclient, m_portsOut[i]);
         }
     }
 }
@@ -366,25 +368,22 @@ void VstPlugin::reload()
     if (m_ainsCount > 0)
     {
         for (uint32_t i=0; i < m_ainsCount; i++)
-            jack_port_unregister(jclient, m_ports_in[i]);
+            jack_port_unregister(jclient, m_portsIn[i]);
 
-        delete[] m_ports_in;
+        delete[] m_portsIn;
     }
 
     if (m_aoutsCount > 0)
     {
-        for (uint32_t i=0; i < m_ainsCount; i++)
-            jack_port_unregister(jclient, m_ports_out[i]);
+        for (uint32_t i=0; i < m_aoutsCount; i++)
+            jack_port_unregister(jclient, m_portsOut[i]);
 
-        delete[] m_ports_out;
+        delete[] m_portsOut;
     }
 
     // reset
     m_hints  = 0;
     m_params = 0;
-    m_ainsCount  = 0;
-    m_aoutsCount = 0;
-    m_paramCount = 0;
 
     // query new data
     m_ainsCount  = effect->numInputs;
@@ -405,23 +404,23 @@ void VstPlugin::reload()
         // synths output directly to jack
         if (m_ainsCount > 0)
         {
-            m_ports_in = new jack_port_t* [m_ainsCount];
+            m_portsIn = new jack_port_t* [m_ainsCount];
 
             for (uint32_t j=0; j<m_ainsCount; j++)
             {
                 QString port_name = m_name + ":input_" + QString::number(j+1);
-                m_ports_in[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+                m_portsIn[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
             }
         }
 
         if (m_aoutsCount > 0)
         {
-            m_ports_out = new jack_port_t* [m_aoutsCount];
+            m_portsOut = new jack_port_t* [m_aoutsCount];
 
             for (uint32_t j=0; j<m_aoutsCount; j++)
             {
                 QString port_name = m_name + ":output_" + QString::number(j+1);
-                m_ports_out[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+                m_portsOut[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
             }
         }
     }

@@ -464,10 +464,10 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst, MPEventLis
             int aouts = m_audioOutIndexes.size();
             bool need_buffer_copy  = false;
             bool need_extra_buffer = false;
-            uint32_t pin, pout;
 
             if (ains == aouts)
             {
+                uint32_t pin, pout;
                 int max = m_channels;
 
                 if (aouts < m_channels)
@@ -759,7 +759,7 @@ bool LadspaPlugin::loadControl(Xml& xml)
 
 bool LadspaPlugin::setControl(int32_t idx, QString oldName, double value)
 {
-    if (idx == -1)
+    if (idx == -1 && oldName.isEmpty() == false)
     {
         for (unsigned long i; i < descriptor->PortCount; i++)
         {
@@ -770,6 +770,9 @@ bool LadspaPlugin::setControl(int32_t idx, QString oldName, double value)
             }
         }
     }
+
+    if (idx == -1)
+        return true;
 
     if (idx < (int32_t)descriptor->PortCount)
     {

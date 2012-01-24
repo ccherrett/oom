@@ -169,8 +169,8 @@ public:
         m_enabled = false; // wait for a reload() call
         m_lib = 0;
 
-        m_ports_in = 0;
-        m_ports_out = 0;
+        m_portsIn = 0;
+        m_portsOut = 0;
     }
 
     ~BasePlugin()
@@ -180,10 +180,10 @@ public:
         deleteGui();
 
         if (m_ainsCount > 0)
-            delete[] m_ports_in;
+            delete[] m_portsIn;
 
         if (m_aoutsCount > 0)
-            delete[] m_ports_out;
+            delete[] m_portsOut;
 
         if (m_paramCount > 0)
             delete[] m_params;
@@ -381,10 +381,10 @@ public:
             jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
 
             for (uint32_t i=0; i < m_ainsCount; i++)
-                ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_in[i], segmentSize);
+                ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_portsIn[i], segmentSize);
 
             for (uint32_t i=0; i < m_aoutsCount; i++)
-                aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_ports_out[i], segmentSize);
+                aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_portsOut[i], segmentSize);
 
             process(segmentSize, ains_buffer, aouts_buffer, eventList);
         }
@@ -446,8 +446,8 @@ protected:
     // synths only
     uint32_t m_ainsCount;
     uint32_t m_aoutsCount;
-    jack_port_t** m_ports_in;
-    jack_port_t** m_ports_out;
+    jack_port_t** m_portsIn;
+    jack_port_t** m_portsOut;
 };
 
 //---------------------------------------------------------
@@ -570,12 +570,12 @@ public:
 
     bool loadControl(Xml& xml);
     bool loadState(Xml& xml);
-    bool setControl(QString symbol, double value);
+    bool setControl(QString symbol, QString oldName, double value);
 
 private:
     float* m_paramsBuffer;
-    std::vector<unsigned long> m_audioInIndexes;
-    std::vector<unsigned long> m_audioOutIndexes;
+    std::vector<uint32_t> m_audioInIndexes;
+    std::vector<uint32_t> m_audioOutIndexes;
     std::vector<Lv2Event> m_events;
     QList<const char*> m_customURIs;
     QList<Lv2State> m_lv2States;
