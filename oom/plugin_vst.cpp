@@ -32,8 +32,8 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
         if (plugin)
         {
             plugin->setParameterValue(index, opt);
-            if (plugin->gui())
-                plugin->gui()->setParameterValue(index, opt);
+            //if (plugin->gui())
+            //    plugin->gui()->setParameterValue(index, opt);
         }
         return 1; // FIXME?
 
@@ -200,6 +200,10 @@ VstPlugin::VstPlugin()
 
 VstPlugin::~VstPlugin()
 {
+    qWarning("~VstPlugin() --------------------------------------------");
+
+    aboutToRemove();
+
     if (effect)
     {
         if (ui.widget)
@@ -227,13 +231,13 @@ VstPlugin::~VstPlugin()
         if (m_ainsCount > 0)
         {
             for (uint32_t i=0; i < m_ainsCount; i++)
-                jack_port_unregister(jclient, m_ports_in[i]);
+                jack_port_unregister(jclient, m_portsIn[i]);
         }
 
         if (m_aoutsCount > 0)
         {
-            for (uint32_t i=0; i < m_ainsCount; i++)
-                jack_port_unregister(jclient, m_ports_out[i]);
+            for (uint32_t i=0; i < m_aoutsCount; i++)
+                jack_port_unregister(jclient, m_portsOut[i]);
         }
     }
 }
@@ -241,8 +245,8 @@ VstPlugin::~VstPlugin()
 void VstPlugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
 {
     AEffect* effect = (AEffect*)nativeHandle;
-
-    plugi->m_audioInputCount = effect->numInputs;
+    plugi->m_hints = 0;
+    plugi->m_audioInputCount  = effect->numInputs;
     plugi->m_audioOutputCount = effect->numOutputs;
 
     char buf_str[255] = { 0 };
@@ -364,25 +368,22 @@ void VstPlugin::reload()
     if (m_ainsCount > 0)
     {
         for (uint32_t i=0; i < m_ainsCount; i++)
-            jack_port_unregister(jclient, m_ports_in[i]);
+            jack_port_unregister(jclient, m_portsIn[i]);
 
-        delete[] m_ports_in;
+        delete[] m_portsIn;
     }
 
     if (m_aoutsCount > 0)
     {
-        for (uint32_t i=0; i < m_ainsCount; i++)
-            jack_port_unregister(jclient, m_ports_out[i]);
+        for (uint32_t i=0; i < m_aoutsCount; i++)
+            jack_port_unregister(jclient, m_portsOut[i]);
 
-        delete[] m_ports_out;
+        delete[] m_portsOut;
     }
 
     // reset
     m_hints  = 0;
     m_params = 0;
-    m_ainsCount  = 0;
-    m_aoutsCount = 0;
-    m_paramCount = 0;
 
     // query new data
     m_ainsCount  = effect->numInputs;
@@ -403,23 +404,23 @@ void VstPlugin::reload()
         // synths output directly to jack
         if (m_ainsCount > 0)
         {
-            m_ports_in = new jack_port_t* [m_ainsCount];
+            m_portsIn = new jack_port_t* [m_ainsCount];
 
             for (uint32_t j=0; j<m_ainsCount; j++)
             {
                 QString port_name = m_name + ":input_" + QString::number(j+1);
-                m_ports_in[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+                m_portsIn[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
             }
         }
 
         if (m_aoutsCount > 0)
         {
-            m_ports_out = new jack_port_t* [m_aoutsCount];
+            m_portsOut = new jack_port_t* [m_aoutsCount];
 
             for (uint32_t j=0; j<m_aoutsCount; j++)
             {
                 QString port_name = m_name + ":output_" + QString::number(j+1);
-                m_ports_out[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+                m_portsOut[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
             }
         }
     }
@@ -630,7 +631,7 @@ bool VstPlugin::hasNativeGui()
 void VstPlugin::showNativeGui(bool yesno)
 {
     // Initialize UI if needed
-    if (! ui.widget)
+    if (! ui.widget && yesno)
     {
         ui.widget = new QWidget();
         // TODO - set X11 Display as 'value'
@@ -675,7 +676,8 @@ void VstPlugin::showNativeGui(bool yesno)
         ui.widget->setWindowIcon(*oomIcon);
     }
 
-    ui.widget->setVisible(yesno);
+    if (ui.widget)
+        ui.widget->setVisible(yesno);
 }
 
 bool VstPlugin::nativeGuiVisible()
@@ -693,6 +695,18 @@ void VstPlugin::updateNativeGui()
             ui.widget->setFixedSize(ui.width, ui.height);
         ui.width = 0;
         ui.height = 0;
+    }
+
+    if (m_gui && m_gui->isVisible())
+    {
+        for (uint32_t i=0; i < m_paramCount; i++)
+        {
+            if (m_params[i].update)
+            {
+                m_gui->setParameterValue(i, m_params[i].value);
+                m_params[i].update = false;
+            }
+        }
     }
 
     effect->dispatcher(effect, effIdle, 0, 0, 0, 0.0f);
@@ -719,7 +733,7 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
 
         if (m_active)
         {
-            if ((m_hints & PLUGIN_IS_SYNTH) == 0 && (effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels))
+            if ((m_hints & PLUGIN_IS_SYNTH) == 0 || effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels)
             {
                 // cannot proccess
                 m_proc_lock.unlock();
@@ -782,6 +796,7 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                     if (m_params[i].value != m_params[i].tmpValue)
                     {
                         m_params[i].value = m_params[i].tmpValue;
+                        m_params[i].update = true;
                         effect->setParameter(effect, i, m_params[i].value);
                     }
                 }
@@ -887,6 +902,11 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
                         m_gui->show();
                     }
                 }
+                else if (tag == "nativegui")
+                {
+                    bool yesno = xml.parseInt();
+                    showNativeGui(yesno);
+                }
                 else if (tag == "geometry")
                 {
                     QRect r(readGeometry(xml, tag));
@@ -980,10 +1000,15 @@ void VstPlugin::writeConfiguration(int level, Xml& xml)
 
     xml.intTag(level, "active", m_active);
 
-    if (m_gui)
+    if (guiVisible())
     {
         xml.intTag(level, "gui", 1);
         xml.geometryTag(level, "geometry", m_gui);
+    }
+
+    if (hasNativeGui() && nativeGuiVisible())
+    {
+        xml.intTag(level, "nativegui", 1);
     }
 
     xml.tag(level--, "/VstPlugin");

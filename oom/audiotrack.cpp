@@ -956,7 +956,7 @@ void AudioTrack::readAuxSend(Xml& xml)
 
 bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 {
-    if (tag == "LadspaPlugin")
+    if (tag == "LadspaPlugin" || tag == "plugin")
     {
         int rackpos;
         for (rackpos = 0; rackpos < PipelineDepth; ++rackpos)

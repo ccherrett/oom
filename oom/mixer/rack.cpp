@@ -702,19 +702,16 @@ void EffectRack::initPlugin(Xml xml, int idx)
             case Xml::End:
                 return;
             case Xml::TagStart:
-                if (tag == "LadspaPlugin")
+                if (tag == "LadspaPlugin" || tag == "plugin")
                 {
                     LadspaPlugin* ladplug = new LadspaPlugin();
                     if (ladplug->readConfiguration(xml, false))
                     {
-                        qWarning("Loaded Ladspa plugin FAILED");
                         printf("cannot instantiate plugin\n");
                         delete ladplug;
                     }
                     else
                     {
-                        qWarning("Loaded Ladspa plugin SUCCESS");
-                        //printf("instantiated!\n");
                         audio->msgAddPlugin(track, idx, ladplug);
                         song->update(SC_RACK);
                         return;
@@ -730,7 +727,6 @@ void EffectRack::initPlugin(Xml xml, int idx)
                     }
                     else
                     {
-                        //printf("instantiated!\n");
                         audio->msgAddPlugin(track, idx, lv2plug);
                         song->update(SC_RACK);
                         return;
@@ -746,7 +742,6 @@ void EffectRack::initPlugin(Xml xml, int idx)
                     }
                     else
                     {
-                        //printf("instantiated!\n");
                         audio->msgAddPlugin(track, idx, vstplug);
                         song->update(SC_RACK);
                         return;

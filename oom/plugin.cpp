@@ -663,7 +663,7 @@ void Pipeline::apply(int ports, uint32_t nframes, float** buffer1)
     for (iPluginI ip = begin(); ip != end(); ++ip)
     {
         BasePlugin* p = *ip;
-        if (p)
+        if (p && p->enabled())
         {
             p->setChannels(ports);
 

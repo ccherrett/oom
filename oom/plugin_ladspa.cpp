@@ -27,6 +27,8 @@ LadspaPlugin::LadspaPlugin()
 
 LadspaPlugin::~LadspaPlugin()
 {
+    qWarning("~LadspaPlugin() --------------------------------------------");
+
     aboutToRemove();
 
     if (handle && descriptor->deactivate && m_activeBefore)
@@ -45,6 +47,9 @@ LadspaPlugin::~LadspaPlugin()
 void LadspaPlugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
 {
     const LADSPA_Descriptor* descr = (LADSPA_Descriptor*)nativeHandle;
+    plugi->m_hints = 0;
+    plugi->m_audioInputCount  = 0;
+    plugi->m_audioOutputCount = 0;
 
     for (unsigned long i=0; i < descr->PortCount; i++)
     {
@@ -178,7 +183,7 @@ void LadspaPlugin::reload()
     if (LADSPA_IS_INPLACE_BROKEN(descriptor->Properties))
         m_hints |= PLUGIN_HAS_IN_PLACE_BROKEN;
 
-    if (ains == aouts && aouts > 1)
+    if (ains == aouts && aouts >= 1)
         m_hints |= PLUGIN_IS_FX;
 
     // allocate data
@@ -459,10 +464,10 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst, MPEventLis
             int aouts = m_audioOutIndexes.size();
             bool need_buffer_copy  = false;
             bool need_extra_buffer = false;
-            uint32_t pin, pout;
 
             if (ains == aouts)
             {
+                uint32_t pin, pout;
                 int max = m_channels;
 
                 if (aouts < m_channels)
@@ -583,102 +588,102 @@ bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)
 
         switch (token)
         {
-            case Xml::Error:
-            case Xml::End:
-                return true;
+        case Xml::Error:
+        case Xml::End:
+            return true;
 
-            case Xml::TagStart:
-                if (readPreset == false && !m_lib)
+        case Xml::TagStart:
+            if (readPreset == false && !m_lib)
+            {
+                QFileInfo fi(new_filename);
+
+                if (fi.exists() == false)
                 {
-                    QFileInfo fi(new_filename);
+                    PluginI* plugi = plugins.find(fi.completeBaseName(), new_label);
+                    if (plugi)
+                        new_filename = plugi->filename();
+                }
 
-                    if (fi.exists() == false)
-                    {
-                        PluginI* plugi = plugins.find(fi.completeBaseName(), new_label);
-                        if (plugi)
-                            new_filename = plugi->filename();
-                    }
+                if (init(new_filename, new_label))
+                {
+                    xml.parse1();
+                    break;
+                }
+                else
+                    return true;
+            }
 
-                    if (init(new_filename, new_label))
+            if (tag == "control")
+            {
+                loadControl(xml);
+            }
+            else if (tag == "active")
+            {
+                if (readPreset == false)
+                    m_active = xml.parseInt();
+            }
+            else if (tag == "gui")
+            {
+                bool yesno = xml.parseInt();
+                showGui(yesno);
+            }
+            else if (tag == "geometry")
+            {
+                QRect r(readGeometry(xml, tag));
+                if (m_gui)
+                {
+                    m_gui->resize(r.size());
+                    m_gui->move(r.topLeft());
+                }
+            }
+            else
+                xml.unknown("LadspaPlugin");
+
+            break;
+
+        case Xml::Attribut:
+            if (tag == "filename" || tag == "file")
+            {
+                if (readPreset == false)
+                    new_filename = xml.s2();
+            }
+            else if (tag == "label")
+            {
+                QString s = xml.s2();
+
+                if (readPreset)
+                {
+                    if (s != m_label)
                     {
-                        xml.parse1();
-                        break;
-                    }
-                    else
+                        printf("Error: Wrong preset label %s. Label must be %s\n",
+                               s.toUtf8().constData(), m_label.toUtf8().constData());
                         return true;
-                }
-
-                if (tag == "control")
-                {
-                    loadControl(xml);
-                }
-                else if (tag == "active")
-                {
-                    if (readPreset == false)
-                        m_active = xml.parseInt();
-                }
-                else if (tag == "gui")
-                {
-                    bool yesno = xml.parseInt();
-                    showGui(yesno);
-                }
-                else if (tag == "geometry")
-                {
-                    QRect r(readGeometry(xml, tag));
-                    if (m_gui)
-                    {
-                        m_gui->resize(r.size());
-                        m_gui->move(r.topLeft());
                     }
                 }
                 else
-                    xml.unknown("LadspaPlugin");
+                    new_label = s;
+            }
+            else if (tag == "channels" || tag == "channel")
+            {
+                if (readPreset == false)
+                    m_channels = xml.s2().toInt();
+            }
+            break;
 
-                break;
-
-            case Xml::Attribut:
-                if (tag == "filename")
+        case Xml::TagEnd:
+            if (tag == "LadspaPlugin" || tag == "plugin")
+            {
+                if (m_lib)
                 {
-                    if (readPreset == false)
-                        new_filename = xml.s2();
+                    if (m_gui)
+                        m_gui->updateValues();
+                    return false;
                 }
-                else if (tag == "label")
-                {
-                    QString s = xml.s2();
+            }
+            return true;
 
-                    if (readPreset)
-                    {
-                        if (s != m_label)
-                        {
-                            printf("Error: Wrong preset label %s. Label must be %s\n",
-                                    s.toUtf8().constData(), m_label.toUtf8().constData());
-                            return true;
-                        }
-                    }
-                    else
-                        new_label = s;
-                }
-                else if (tag == "channels")
-                {
-                    if (readPreset == false)
-                        m_channels = xml.s2().toInt();
-                }
-                break;
-
-            case Xml::TagEnd:
-                if (tag == "LadspaPlugin")
-                {
-                    if (m_lib)
-                    {
-                        if (m_gui)
-                            m_gui->updateValues();
-                        return false;
-                    }
-                }
-                return true;
-
-            default:
-                break;
+        default:
+            break;
         }
     }
     return true;
@@ -701,7 +706,7 @@ void LadspaPlugin::writeConfiguration(int level, Xml& xml)
 
     xml.intTag(level, "active", m_active);
 
-    if (m_gui)
+    if (guiVisible())
     {
         xml.intTag(level, "gui", 1);
         xml.geometryTag(level, "geometry", m_gui);
@@ -714,6 +719,7 @@ bool LadspaPlugin::loadControl(Xml& xml)
 {
     int32_t idx = -1;
     double val = 0.0;
+    QString oldName;
 
     for (;;)
     {
@@ -733,13 +739,15 @@ bool LadspaPlugin::loadControl(Xml& xml)
         case Xml::Attribut:
             if (tag == "rindex")
                 idx = xml.s2().toInt();
+            else if (tag == "name")
+                oldName = xml.s2();
             else if (tag == "val")
                 val = xml.s2().toDouble();
             break;
 
         case Xml::TagEnd:
             if (tag == "control" && idx >= 0)
-                return setControl(idx, val);
+                return setControl(idx, oldName, val);
             return true;
 
         default:
@@ -749,8 +757,23 @@ bool LadspaPlugin::loadControl(Xml& xml)
     return true;
 }
 
-bool LadspaPlugin::setControl(int32_t idx, double value)
+bool LadspaPlugin::setControl(int32_t idx, QString oldName, double value)
 {
+    if (idx == -1 && oldName.isEmpty() == false)
+    {
+        for (unsigned long i; i < descriptor->PortCount; i++)
+        {
+            if (QString(descriptor->PortNames[i]) == oldName)
+            {
+                idx = i;
+                break;
+            }
+        }
+    }
+
+    if (idx == -1)
+        return true;
+
     if (idx < (int32_t)descriptor->PortCount)
     {
         for (uint32_t i = 0; i < m_paramCount; i++)
