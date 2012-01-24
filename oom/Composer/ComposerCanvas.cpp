@@ -263,10 +263,10 @@ public:
 			}
 		}
 
-		/*(if (lazySelectedCtrlVal)
+		if (lazySelectedCtrlVal)
 		{
 			removeNodeFromSelection(lazySelectedCtrlVal);
-		}*/
+		}
 
 		song->dirty = true;
 	}
@@ -1505,6 +1505,10 @@ void ComposerCanvas::mouseRelease(const QPoint& pos)
 				foreach(CtrlVal* val, selectedNodes)
 				{
 					valuesToAdd.append(CtrlVal(val->getFrame(), val->val));
+				}
+				if(valuesToAdd.isEmpty() && automation.currentCtrlVal)
+				{//its a single node move
+					valuesToAdd.append(CtrlVal(automation.currentCtrlVal->getFrame(), automation.currentCtrlVal->val));
 				}
 				//Delete nodes from controller
 				QList<int> delList;
@@ -5148,7 +5152,7 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 		if(m_automationMoveList.isEmpty() && automation.currentCtrlVal)
 		{
 			m_automationMoveList.append(CtrlVal(automation.currentCtrlVal->getFrame(), automation.currentCtrlVal->val));
-			_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
+			//_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
 		}
 		automation.movingStarted = !m_automationMoveList.isEmpty();
 	}
