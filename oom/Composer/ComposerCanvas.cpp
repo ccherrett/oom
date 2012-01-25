@@ -4570,6 +4570,10 @@ void ComposerCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/
 		if (!cl->selected() || _tool != AutomationTool) {
 			curveColor.setAlpha(100);
 		}
+		/*if(_tool == AutomationTool && automation.currentCtrlList == cl)
+		{
+			curveColor = cl->color();
+		}*/
 		p.setPen(QPen(curveColor, 2, Qt::SolidLine));
 		p.setRenderHint(QPainter::Antialiasing, true);
 
@@ -4964,6 +4968,7 @@ void ComposerCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 	int currX = mapx(pointer.x());
 	QRect clickPoint(currX-5, currY-5, 10, 10);
 
+	bool foundIt = false;
 	CtrlListList* cll = ((AudioTrack*) t)->controller();
 	cll->deselectAll();
 	for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
@@ -4982,32 +4987,39 @@ void ComposerCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 		// to cross each other. This is so far the easiest selection we have had but 
 		// try not to crown your automation lanes with lots of overlapping lines.
 		// Maybe we can implement our own class to solve this issue one day. - Andrew
-		bool foundIt=false;
 		if (cpath.intersects(clickPoint))
 		{
 			foundIt=true;
 		}
 
-		if (foundIt)
+		if(foundIt && automation.currentCtrlList && automation.currentCtrlList == cl)
+		{//Do nothing
+			automation.currentCtrlList->setSelected(true);
+			break;
+		}
+		else if(foundIt)
 		{
+			if(automation.currentCtrlList && automation.currentCtrlList != cl)
+				automation.currentCtrlList->setSelected(false);
 			//printf("Selecting closest automation line\n");
 			automation.controllerState = doNothing;
-			if(automation.currentCtrlList)
-				automation.currentCtrlList->setSelected(false);
 			automation.currentCtrlList = cl;
 			automation.currentCtrlList->setSelected(true);
 			automation.currentTrack = t;
 			automation.currentCtrlVal = 0;
 			redraw();
-			return;
+			break;
 		}
 	}
 	// if there are no hits we default to clearing all the data
-	automation.controllerState = doNothing;
-	if (automation.currentCtrlVal)
+	if(!foundIt)
 	{
-		automation.currentCtrlVal = 0;
-		redraw();
+		automation.controllerState = doNothing;
+		if (automation.currentCtrlVal)
+		{
+			automation.currentCtrlVal = 0;
+			redraw();
+		}
 	}
 
 	setCursor();
@@ -5109,11 +5121,10 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 				newValue = max - (relativeY * range);
 			}
 
-			//FIXME: Select the last inserted node
-			AddRemoveCtrlValues* cmd = new AddRemoveCtrlValues(automation.currentCtrlList, CtrlVal(currFrame, newValue), AddRemoveCtrlValues::ADD);
-			song->pushToHistoryStack(cmd);
-			//CtrlVal cv = automation.currentCtrlList->cvalue(currFrame);
-			//_curveNodeSelection->addNodeToSelection(&cv);
+			AddRemoveCtrlValues* cmd = new AddRemoveCtrlValues(automation.currentCtrlList, CtrlVal(currFrame, newValue), OOMCommand::ADD);
+			CommandGroup* group = new CommandGroup(tr("Add Automation Node"));
+			group->add_command(cmd);
+			song->pushToHistoryStack(group);
 		}
 
 		QWidget::setCursor(Qt::BlankCursor);
@@ -5129,6 +5140,9 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 				break;
 			}
 		}
+		controllerChanged(automation.currentTrack);
+		//Add the node and return instead of processing further
+		return;
 	}
 
 
@@ -5146,7 +5160,7 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 
 	automation.currentCtrlList->range(&min,&max);
 
-	//TODO: Duplicate the _curveNodeSelection list for undo purposes
+	//Duplicate the _curveNodeSelection list for undo purposes
 	if(!automation.movingStarted && automation.currentCtrlList)
 	{//Populate a list with the current values
 		m_automationMoveList.clear();
@@ -5157,7 +5171,6 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 		if(m_automationMoveList.isEmpty() && automation.currentCtrlVal)
 		{
 			m_automationMoveList.append(CtrlVal(automation.currentCtrlVal->getFrame(), automation.currentCtrlVal->val));
-			//_curveNodeSelection->addNodeToSelection(automation.currentCtrlVal);
 		}
 		automation.movingStarted = !m_automationMoveList.isEmpty();
 	}
