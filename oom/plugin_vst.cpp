@@ -392,7 +392,7 @@ void VstPlugin::reload()
 
     if (effect->flags & effFlagsIsSynth && effect->numOutputs > 0)
         m_hints |= PLUGIN_IS_SYNTH;
-    else if (effect->numInputs > 1 && effect->numOutputs > 1)
+    else if (effect->numInputs > 1 && effect->numOutputs >= 1)
         m_hints |= PLUGIN_IS_FX;
 
     // allocate data

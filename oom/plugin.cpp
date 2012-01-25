@@ -266,6 +266,18 @@ void SynthPluginDevice::setName(const QString& s)
 }
 
 //---------------------------------------------------------
+//   writeRouting
+//---------------------------------------------------------
+
+void SynthPluginDevice::writeRouting(int, Xml&) const
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::writeRouting()");
+    }
+}
+
+//---------------------------------------------------------
 //   Midi processing (inside jack process callback)
 //---------------------------------------------------------
 

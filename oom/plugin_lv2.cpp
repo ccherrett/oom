@@ -1000,7 +1000,7 @@ void Lv2Plugin::reload()
 
     if (strcmp(lv2Class, "Instrument") == 0 && aouts > 0)
         m_hints |= PLUGIN_IS_SYNTH;
-    else if (ains == aouts && aouts > 1)
+    else if (ains == aouts && aouts >= 1)
         m_hints |= PLUGIN_IS_FX;
 
     if (lilv_plugin_has_feature(lplug, lv2world->inPlaceBroken))
@@ -1589,14 +1589,6 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
 
         if (m_active)
         {
-            // init events
-            LV2_Event_Iterator ev_iters[m_events.size()];
-            for (size_t i = 0; i < m_events.size(); i++)
-            {
-                lv2_event_buffer_reset(m_events[i].buffer, LV2_EVENT_AUDIO_STAMP, (uint8_t*)(m_events[i].buffer + 1));
-                lv2_event_begin(&ev_iters[i], m_events[i].buffer);
-            }
-
             // connect ports
             int ains  = m_audioInIndexes.size();
             int aouts = m_audioOutIndexes.size();
@@ -1649,6 +1641,14 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                 // cannot proccess
                 m_proc_lock.unlock();
                 return;
+            }
+
+            // init events
+            LV2_Event_Iterator ev_iters[m_events.size()];
+            for (size_t i = 0; i < m_events.size(); i++)
+            {
+                lv2_event_buffer_reset(m_events[i].buffer, LV2_EVENT_AUDIO_STAMP, (uint8_t*)(m_events[i].buffer + 1));
+                lv2_event_begin(&ev_iters[i], m_events[i].buffer);
             }
 
             // activate if needed

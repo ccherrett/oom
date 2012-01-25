@@ -716,6 +716,8 @@ public:
     virtual void close();
     virtual void setName(const QString& s);
 
+    virtual void writeRouting(int, Xml&) const;
+
     virtual void collectMidiEvents();
     virtual void processMidi();
     virtual bool guiVisible() const;
