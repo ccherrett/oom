@@ -48,6 +48,7 @@ int AddRemoveCtrlValues::do_action()
 		{
 			m_cl->add(v.getFrame(), v.val);
 		}
+		qDebug("Do ADD node");
 	}
 	else if(m_type == REMOVE)
 	{
@@ -55,6 +56,7 @@ int AddRemoveCtrlValues::do_action()
 			m_cl->del(v.getFrame());
 		}
 		m_cl->add(0, m_startValue);
+		qDebug("Do REMOVE node");
 	}
 	else
 	{
@@ -81,6 +83,7 @@ int AddRemoveCtrlValues::undo_action()
 			m_cl->del(v.getFrame());
 		}
 		m_cl->add(0, m_startValue);
+		qDebug("Undo ADD node");
 	}
 	else if(m_type == REMOVE)
 	{
@@ -88,6 +91,7 @@ int AddRemoveCtrlValues::undo_action()
 		{
 			m_cl->add(v.getFrame(), v.val);
 		}
+		qDebug("Undo REMOVE node");
 	}
 	else
 	{
