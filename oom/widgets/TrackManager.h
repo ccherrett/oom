@@ -68,14 +68,14 @@ class TrackManager : public QObject{
 	bool unloadInstrument(VirtualTrack*);
 
 signals:
-	void trackAdded(QString);
+	void trackAdded(qint64);
 
 public:
 	enum { LS_INSTRUMENT, SYNTH_INSTRUMENT, GM_INSTRUMENT};
 	TrackManager();
 	~TrackManager(){}
 	void setPosition(int);
-	bool addTrack(VirtualTrack*);
+	qint64 addTrack(VirtualTrack*);
 	bool removeTrack(VirtualTrack*);
 };
 

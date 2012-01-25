@@ -125,8 +125,10 @@ protected:
 
     bool _locked;
     bool _selected;
+	bool m_chainMaster;
 
 	MidiAssignData m_midiassign;
+	QList<qint64> m_audioChain;
     
 	bool readProperties(Xml& xml, const QString& tag);
     void writeProperties(int level, Xml& xml) const;

@@ -40,9 +40,9 @@ void TrackManager::setPosition(int v)
 }
 
 //Add button slot
-bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
+qint64 TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 {
-	bool rv = false;
+	qint64 rv = 0;
 	if(!vtrack || vtrack->name.isEmpty())
 		return rv;
 	
@@ -229,8 +229,8 @@ bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
 				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
+				emit trackAdded(track->id());
+				rv = track->id();
 			}
 		}
 		break;
@@ -294,8 +294,8 @@ bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
 				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
+				emit trackAdded(track->id());
+				rv = track->id();
 			}
 		}
 		break;
@@ -362,8 +362,8 @@ bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
 				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
+				emit trackAdded(track->id());
+				rv = track->id();
 			}
 		}
 		break;
@@ -420,8 +420,8 @@ bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
 				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
+				emit trackAdded(track->id());
+				rv = track->id();
 			}
 		}
 		break;
@@ -454,8 +454,8 @@ bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
 				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
+				emit trackAdded(track->id());
+				rv = track->id();
 			}
 		}
 		break;
@@ -467,8 +467,8 @@ bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
 				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
+				emit trackAdded(track->id());
+				rv = track->id();
 			}
 		}
 		break;

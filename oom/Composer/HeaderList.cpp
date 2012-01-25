@@ -684,7 +684,7 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 #endif
 				//	t = song->addTrack((Track::TrackType)n);
 					CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1, this);
-					connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
+					connect(ctdialog, SIGNAL(trackAdded(qint64)), this, SLOT(newTrackAdded(qint64)));
 					ctdialog->exec();
                 //}
 
@@ -717,9 +717,9 @@ void HeaderList::wheelEvent(QWheelEvent* ev)/*{{{*/
 {
 }*/
 
-void HeaderList::newTrackAdded(QString name)
+void HeaderList::newTrackAdded(qint64 id)
 {
-	Track* t = song->findTrack(name);
+	Track* t = song->findTrackById(id);
 	if(t)
 	{
 		emit selectionChanged(t);

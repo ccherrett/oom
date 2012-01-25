@@ -25,13 +25,31 @@
 #include "plugin.h"
 
 
-CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent, bool templateMode)
+CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent)
 : QDialog(parent),
 m_insertType(type),
 m_insertPosition(pos),
-m_templateMode(templateMode)
+m_templateMode(false)
+{
+	initDefaults();
+	m_vtrack = new VirtualTrack;
+}
+
+CreateTrackDialog::CreateTrackDialog(VirtualTrack** vt, int type, int pos, QWidget* parent)
+: QDialog(parent),
+m_insertType(type),
+m_insertPosition(pos),
+m_templateMode(true)
+{
+	initDefaults();
+	m_vtrack = new VirtualTrack;
+	*vt = m_vtrack;
+}
+
+void CreateTrackDialog::initDefaults()
 {
 	setupUi(this);
+
 	m_createMidiInputDevice = false;
 	m_createMidiOutputDevice = false;
 	
@@ -47,8 +65,6 @@ m_templateMode(templateMode)
 	m_width = 450;
 
 	m_allChannelBit = (1 << MIDI_CHANNELS) - 1;
-
-	m_lastTrack = 0;
 
 	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
 	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
@@ -101,20 +117,19 @@ void CreateTrackDialog::addTrack()/*{{{*/
 	int bussIndex = cmbBuss->currentIndex();
 	bool valid = true;
 
-	VirtualTrack vtrack;
-	vtrack.name = txtName->text();
-	vtrack.type = m_insertType;
+	m_vtrack->name = txtName->text();
+	m_vtrack->type = m_insertType;
 	Track::TrackType type = (Track::TrackType)m_insertType;
 	switch(type)
 	{
 		case Track::MIDI:
 		case Track::DRUM:
 		{/*{{{*/
-			vtrack.autoCreateInstrument = chkAutoCreate->isChecked();
+			m_vtrack->autoCreateInstrument = chkAutoCreate->isChecked();
 			//Process Input connections
 			if(inputIndex >= 0 && chkInput->isChecked())
 			{
-				vtrack.useInput = true;
+				m_vtrack->useInput = true;
 				QString devname = cmbInput->itemText(inputIndex);
 				int inDevType = cmbInput->itemData(inputIndex).toInt();
 				int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
@@ -126,15 +141,15 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				{
 					m_createMidiInputDevice = !(m_currentMidiInputList.contains(inputIndex) && m_currentMidiInputList.value(inputIndex) == devname);
 				}
-				vtrack.createMidiInputDevice = m_createMidiInputDevice;
-				vtrack.inputConfig = qMakePair(inDevType, devname);
-				vtrack.inputChannel = chanbit;
+				m_vtrack->createMidiInputDevice = m_createMidiInputDevice;
+				m_vtrack->inputConfig = qMakePair(inDevType, devname);
+				m_vtrack->inputChannel = chanbit;
 			}
 			
 			//Process Output connections
 			if(outputIndex >= 0 && chkOutput->isChecked())
 			{
-				vtrack.useOutput = true;
+				m_vtrack->useOutput = true;
 				QString devname = cmbOutput->itemText(outputIndex);
 				int devtype = cmbOutput->itemData(outputIndex).toInt();
 				int outChan = cmbOutChannel->itemData(outChanIndex).toInt();
@@ -146,14 +161,14 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				{
 					m_createMidiOutputDevice = !(m_currentMidiOutputList.contains(outputIndex) && m_currentMidiOutputList.value(outputIndex) == devname);
 				}
-				vtrack.createMidiOutputDevice = m_createMidiOutputDevice;
-				vtrack.outputConfig = qMakePair(devtype, devname);
-				vtrack.outputChannel = outChan;
+				m_vtrack->createMidiOutputDevice = m_createMidiOutputDevice;
+				m_vtrack->outputConfig = qMakePair(devtype, devname);
+				m_vtrack->outputChannel = outChan;
 				if(m_createMidiOutputDevice)
 				{
 					QString instrumentName = cmbInstrument->itemData(instrumentIndex, InstrumentNameRole).toString();
-					vtrack.instrumentType = cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
-					vtrack.instrumentName = instrumentName;
+					m_vtrack->instrumentType = cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
+					m_vtrack->instrumentName = instrumentName;
 				}
 			}
 
@@ -162,12 +177,12 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				int iBuss = cmbBuss->itemData(bussIndex).toInt();
 				QString selectedInput = cmbMonitor->itemText(monitorIndex);
 				QString selectedBuss = cmbBuss->itemText(bussIndex);
-				vtrack.useMonitor = true;
-				vtrack.monitorConfig = qMakePair(0, selectedInput);
+				m_vtrack->useMonitor = true;
+				m_vtrack->monitorConfig = qMakePair(0, selectedInput);
 				if(chkBuss->isChecked())
 				{
-					vtrack.useBuss = true;
-					vtrack.bussConfig = qMakePair(iBuss, selectedBuss);
+					m_vtrack->useBuss = true;
+					m_vtrack->bussConfig = qMakePair(iBuss, selectedBuss);
 				}
 			}
 		}/*}}}*/
@@ -178,15 +193,15 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			{
 				QString selectedInput = cmbInput->itemText(inputIndex);
 				int addNewRoute = cmbInput->itemData(inputIndex).toInt();
-				vtrack.useInput = true;
-				vtrack.inputConfig = qMakePair(addNewRoute, selectedInput);
+				m_vtrack->useInput = true;
+				m_vtrack->inputConfig = qMakePair(addNewRoute, selectedInput);
 			}
 			if(outputIndex >= 0 && chkOutput->isChecked())
 			{
 				//Route to the Output or Buss
 				QString selectedOutput = cmbOutput->itemText(outputIndex);
-				vtrack.useOutput = true;
-				vtrack.outputConfig = qMakePair(0, selectedOutput);
+				m_vtrack->useOutput = true;
+				m_vtrack->outputConfig = qMakePair(0, selectedOutput);
 			}
 		}
 		break;
@@ -195,16 +210,16 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			if(inputIndex >= 0 && chkInput->isChecked())
 			{
 				QString selectedInput = cmbInput->itemText(inputIndex);
-				vtrack.useInput = true;
-				vtrack.inputConfig = qMakePair(0, selectedInput);
+				m_vtrack->useInput = true;
+				m_vtrack->inputConfig = qMakePair(0, selectedInput);
 			}
 
 			if(outputIndex >= 0 && chkOutput->isChecked())
 			{
 				QString jackPlayback("system:playback");
 				QString selectedOutput = cmbOutput->itemText(outputIndex);
-				vtrack.useOutput = true;
-				vtrack.outputConfig = qMakePair(0, selectedOutput);
+				m_vtrack->useOutput = true;
+				m_vtrack->outputConfig = qMakePair(0, selectedOutput);
 			}
 		}
 		break;
@@ -213,14 +228,14 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			if(inputIndex >= 0 && chkInput->isChecked())
 			{
 				QString selectedInput = cmbInput->itemText(inputIndex);
-				vtrack.useInput = true;
-				vtrack.inputConfig = qMakePair(0, selectedInput);
+				m_vtrack->useInput = true;
+				m_vtrack->inputConfig = qMakePair(0, selectedInput);
 			}
 			if(outputIndex >= 0 && chkOutput->isChecked())
 			{
 				QString selectedOutput = cmbOutput->itemText(outputIndex);
-				vtrack.useOutput = true;
-				vtrack.outputConfig = qMakePair(0, selectedOutput);
+				m_vtrack->useOutput = true;
+				m_vtrack->outputConfig = qMakePair(0, selectedOutput);
 			}
 		}
 		break;
@@ -229,14 +244,14 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			if(inputIndex >= 0 && chkInput->isChecked())
 			{
 				QString selectedInput = cmbInput->itemText(inputIndex);
-				vtrack.useInput = true;
-				vtrack.inputConfig = qMakePair(0, selectedInput);
+				m_vtrack->useInput = true;
+				m_vtrack->inputConfig = qMakePair(0, selectedInput);
 			}
 			if(outputIndex >= 0 && chkOutput->isChecked())
 			{
 				QString selectedOutput = cmbOutput->itemText(outputIndex);
-				vtrack.useOutput = true;
-				vtrack.outputConfig = qMakePair(0, selectedOutput);
+				m_vtrack->useOutput = true;
+				m_vtrack->outputConfig = qMakePair(0, selectedOutput);
 			}
 		}
 		break;
@@ -254,30 +269,26 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		cleanup();
 		if(m_templateMode)
 		{
-			m_lastTrack = &vtrack;
-			emit trackReady(true);
-			hide();
+			//hide();
+			done(1);
 		}
 		else
 		{
 			TrackManager* tman = new TrackManager();
 			tman->setPosition(m_insertPosition);
-			connect(tman, SIGNAL(trackAdded(QString)), this, SIGNAL(trackAdded(QString)));
-			if(tman->addTrack(&vtrack))
+			connect(tman, SIGNAL(trackAdded(qint64)), this, SIGNAL(trackAdded(qint64)));
+			if(tman->addTrack(m_vtrack))
 			{
 				qDebug("Sucessfully added track");
-				done(0);
+				done(1);
 			}
 		}
 	}
 }/*}}}*/
 
-VirtualTrack* CreateTrackDialog::getLastTrack()
+void CreateTrackDialog::lockType(bool lock)
 {
-	if(m_lastTrack)
-		return m_lastTrack;
-	else
-		return 0;
+	cmbType->setEnabled(!lock);
 }
 
 void CreateTrackDialog::cancelSelected()

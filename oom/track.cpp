@@ -173,6 +173,7 @@ void Track::init()
 	_volumeEn2Ctrl = true;
 	_panEnCtrl = true;
 	_panEn2Ctrl = true;
+	m_chainMaster = false;
 
 	_selected = false;
 	_height = DEFAULT_TRACKHEIGHT;
@@ -229,6 +230,8 @@ Track::Track(Track::TrackType t)
 Track::Track(const Track& t, bool cloneParts)
 {
 	m_id = t.m_id;
+	m_chainMaster = t.m_chainMaster;
+	m_audioChain = t.m_audioChain;
 	_partDefaultColor = t._partDefaultColor;
 	_activity = t._activity;
 	_lastActivity = t._lastActivity;
@@ -300,6 +303,8 @@ Track::Track(const Track& t, bool cloneParts)
 Track& Track::operator=(const Track& t)
 {
 	m_id = t.m_id;
+	m_chainMaster = t.m_chainMaster;
+	m_audioChain = t.m_audioChain;
 	_partDefaultColor = t._partDefaultColor;
 	_activity = t._activity;
 	_lastActivity = t._lastActivity;
@@ -326,9 +331,6 @@ Track& Track::operator=(const Track& t)
 	m_maxZIndex = t.m_maxZIndex;
 
 	_parts = *(t.cparts());
-	// NOTE: Can't do this. See comments in copy constructor.
-	//for (iPart ip = _parts.begin(); ip != _parts.end(); ++ip)
-	//      ip->second->setTrack(this);
 
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 	{
@@ -833,7 +835,7 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 	xml.intTag(level, "partcolor", _partDefaultColor);
 	if (_selected)
 		xml.intTag(level, "selected", _selected);
-	xml.nput(level, "<MidiAssign port=\"%d\"", m_midiassign.port);/*{{{*/
+	xml.nput(level, "<MidiAssign port=\"%d\"", m_midiassign.port);
 	xml.nput(" channel=\"%d\"", m_midiassign.channel);
 	xml.nput(" enabled=\"%d\"", (int)m_midiassign.enabled);
 	xml.nput(" preset=\"%d\"", (int)m_midiassign.preset);
@@ -852,7 +854,22 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 		//assign.append(QString::number(iter.key())).append(":").append(QString::number(iter.value())).append(" ");
 	}
 	xml.nput(" midimap=\"%s\"", assign.toUtf8().constData());
-	xml.put(" />");/*}}}*/
+	xml.put(" />");
+	if(m_chainMaster)
+	{
+		xml.intTag(level, "chainMaster", m_chainMaster);
+		QString chaintracks;
+		QStringList ac;
+		if(m_audioChain.size())
+		{
+			foreach(qint64 id, m_audioChain)
+			{
+				ac.append(QString::number(id));
+			}
+			chaintracks = ac.join(",");
+			xml.strTag(level, "audioChain", chaintracks);
+		}
+	}
 }/*}}}*/
 
 //---------------------------------------------------------
@@ -861,6 +878,7 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 
 bool Track::readProperties(Xml& xml, const QString& tag)/*{{{*/
 {
+	m_audioChain.clear();
 	if (tag == "name")
 		_name = xml.parse1();
 	else if(tag == "trackId")
@@ -905,6 +923,18 @@ bool Track::readProperties(Xml& xml, const QString& tag)/*{{{*/
 		_partDefaultColor = xml.parseInt();
 	else if(tag == "MidiAssign")
 		m_midiassign.read(xml, (Track*)this);
+	else if(tag == "chainMaster")
+		m_chainMaster = xml.parseInt();
+	else if(tag == "audioChain")
+	{
+		QString ids = xml.parse1();
+		QStringList ac = ids.split(",");
+		foreach(QString id, ac)
+		{
+			qint64 tid = id.toLongLong();
+			m_audioChain.append(tid);
+		}
+	}
 	else
 	{
 		return true;

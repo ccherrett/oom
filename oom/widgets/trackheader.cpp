@@ -1011,7 +1011,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			{//Insert before
 				int mypos = song->tracks()->index(m_track);
 				CreateTrackDialog *ctdialog = new CreateTrackDialog(Track::MIDI, --mypos, this);
-				connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
+				connect(ctdialog, SIGNAL(trackAdded(qint64)), this, SLOT(newTrackAdded(qint64)));
 				ctdialog->exec();
 			
 				/*Track* t = song->addTrack((Track::TrackType)n-10000);
@@ -1047,9 +1047,9 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	delete p;
 }/*}}}*/
 
-void TrackHeader::newTrackAdded(QString name)
+void TrackHeader::newTrackAdded(qint64 id)
 {
-	Track* t = song->findTrack(name);
+	Track* t = song->findTrackById(id);
 	if(t)
 	{
 		emit selectionChanged(t);

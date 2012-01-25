@@ -56,6 +56,7 @@
 #include "FadeCurve.h"
 #include "traverso_shared/AddRemoveCtrlValues.h"
 #include "traverso_shared/CommandGroup.h"
+#include "CreateTrackDialog.h"
 
 
 class CurveNodeSelection
@@ -537,8 +538,17 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 	if (ntrack >= tracks->size())
 	{
 		ntrack = tracks->size();
-		Track* newTrack = song->addTrack(int(type));
-		if (type == Track::WAVE)
+		Track* newTrack = 0;// = song->addTrack(int(type));
+		VirtualTrack* vt;
+		CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, type, -1, this);
+		ctdialog->lockType(true);
+		if(ctdialog->exec() && vt)
+		{
+			TrackManager* tman = new TrackManager();
+			qint64 nid = tman->addTrack(vt);
+			newTrack = song->findTrackById(nid);
+		}
+		if (type == Track::WAVE && newTrack)
 		{
 			WaveTrack* st = (WaveTrack*) track;
 			WaveTrack* dt = (WaveTrack*) newTrack;
@@ -548,7 +558,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		{
 			newdest = true;
 			dtrack = newTrack;
-			midiMonitor->msgAddMonitoredTrack(newTrack);
+			//midiMonitor->msgAddMonitoredTrack(newTrack);
 		}
 		else
 			printf("ComposerCanvas::moveItem failed to create new track\n");
@@ -603,7 +613,6 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 
 	if (t == MOVE_MOVE)
 		item->setPart(dpart);
-	//if (!clone) {
 	if (t == MOVE_COPY && !clone)
 	{
 		//
@@ -633,11 +642,9 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		// These will increment ref count if not a clone, and will chain clones...
 		if (dtrack->type() == Track::WAVE)
 			// Indicate no undo, and do not do port controller values and clone parts.
-			//audio->msgChangePart((WavePart*)spart, (WavePart*)dpart,false);
 			audio->msgChangePart((WavePart*) spart, (WavePart*) dpart, false, false, false);
 		else
 			// Indicate no undo, and do port controller values but not clone parts.
-			//audio->msgChangePart(spart, dpart, false);
 			audio->msgChangePart(spart, dpart, false, true, false);
 
 		spart->setSelected(false);

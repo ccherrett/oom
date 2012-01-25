@@ -45,7 +45,7 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;
 
-	VirtualTrack *m_lastTrack;
+	VirtualTrack *m_vtrack;
 
 	void importInputs();
 	void importOutputs();
@@ -62,6 +62,7 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	
 	int getFreeMidiPort();
 	
+	void initDefaults();
 	void cleanup();
 
 private slots:
@@ -76,16 +77,15 @@ private slots:
 
 protected:
 	virtual void showEvent(QShowEvent*);
-	//virtual QSize sizeHint();
 
 signals:
-	void trackAdded(QString);
-	void trackReady(bool);
+	void trackAdded(qint64);
 
 public:
-	CreateTrackDialog(int type = 0, int pos = -1, QWidget* parent = 0, bool templateMode = false);
+	CreateTrackDialog(int type = 0, int pos = -1, QWidget* parent = 0);
+	CreateTrackDialog(VirtualTrack** vt, int type = 0, int pos = -1, QWidget* parent = 0);
 	~CreateTrackDialog(){}
-	VirtualTrack* getLastTrack();
+	void lockType(bool);
 };
 
 #endif
