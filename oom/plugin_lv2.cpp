@@ -1249,6 +1249,19 @@ QString Lv2Plugin::getParameterName(uint32_t index)
         return QString("");
 }
 
+QString Lv2Plugin::getParameterUnit(uint32_t index)
+{
+    if (lplug && index < m_paramCount)
+    {
+        const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
+        return QString("");
+        // TODO
+        //return QString(lilv_node_as_string(lilv_port_get_classes(lplug, port)));
+    }
+    else
+        return QString("");
+}
+
 void Lv2Plugin::setNativeParameterValue(uint32_t index, double value)
 {
     if (index < m_paramCount)
@@ -1265,6 +1278,7 @@ QString Lv2Plugin::getProgramName(uint32_t /*index*/)
 {
     return QString("");
 }
+
 
 void Lv2Plugin::setProgram(uint32_t /*index*/)
 {

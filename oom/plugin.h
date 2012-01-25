@@ -406,6 +406,7 @@ public:
     virtual void updateNativeGui() = 0;
 
     virtual QString getParameterName(uint32_t index) = 0;
+    virtual QString getParameterUnit(uint32_t index) = 0;
     virtual void setNativeParameterValue(uint32_t index, double value) = 0;
 
     virtual uint32_t getProgramCount() = 0;
@@ -476,6 +477,7 @@ public:
 
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
+    QString getParameterUnit(uint32_t index);
     void setProgram(uint32_t index);
 
     bool hasNativeGui();
@@ -549,6 +551,7 @@ public:
 
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
+    QString getParameterUnit(uint32_t index);
     void setProgram(uint32_t index);
 
     uint32_t getCustomURIId(const char* uri);
@@ -634,6 +637,7 @@ public:
     void resizeNativeGui(int width, int height);
 
     QString getParameterName(uint32_t index);
+    QString getParameterUnit(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
 
     uint32_t getProgramCount();
