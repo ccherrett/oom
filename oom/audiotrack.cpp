@@ -895,7 +895,7 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 		}
 		if (i)
 			xml.put(level, "");
-		xml.etag(level--, "controller");
+        xml.etag(--level, "controller");
 	}
 }
 
@@ -1304,7 +1304,7 @@ void AudioInput::write(int level, Xml& xml) const
 {
 	xml.tag(level++, "AudioInput");
 	AudioTrack::writeProperties(level, xml);
-	xml.etag(level, "AudioInput");
+    xml.etag(--level, "AudioInput");
 }
 
 //---------------------------------------------------------
@@ -1380,7 +1380,7 @@ void AudioOutput::write(int level, Xml& xml) const
 {
 	xml.tag(level++, "AudioOutput");
 	AudioTrack::writeProperties(level, xml);
-	xml.etag(level, "AudioOutput");
+    xml.etag(--level, "AudioOutput");
 }
 
 //---------------------------------------------------------
@@ -1425,7 +1425,7 @@ void AudioBuss::write(int level, Xml& xml) const
 {
 	xml.tag(level++, "AudioBuss");
 	AudioTrack::writeProperties(level, xml);
-	xml.etag(level, "AudioBuss");
+    xml.etag(--level, "AudioBuss");
 }
 
 //---------------------------------------------------------
@@ -1469,7 +1469,7 @@ void AudioAux::write(int level, Xml& xml) const
 {
 	xml.tag(level++, "AudioAux");
 	AudioTrack::writeProperties(level, xml);
-	xml.etag(level, "AudioAux");
+    xml.etag(--level, "AudioAux");
 }
 
 //---------------------------------------------------------

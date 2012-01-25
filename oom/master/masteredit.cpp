@@ -386,7 +386,7 @@ void MasterEdit::writeConfiguration(int level, Xml& xml)
 {
 	xml.tag(level++, "masteredit");
 	xml.intTag(level, "raster", _rasterInit);
-	xml.tag(level, "/masteredit");
+    xml.tag(--level, "/masteredit");
 }
 
 //---------------------------------------------------------

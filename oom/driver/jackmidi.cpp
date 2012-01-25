@@ -241,7 +241,7 @@ void MidiJackDevice::writeRouting(int level, Xml& xml) const
 
 				xml.tag(level, "dest devtype=\"%d\" name=\"%s\"/", MidiDevice::JACK_MIDI, Xml::xmlString(name()).toLatin1().constData());
 
-				xml.etag(level--, "Route");
+                xml.etag(--level, "Route");
 			}
 		}
 	}
@@ -269,7 +269,7 @@ void MidiJackDevice::writeRouting(int level, Xml& xml) const
 			xml.tag(level, s.toLatin1().constData());
 
 
-			xml.etag(level--, "Route");
+            xml.etag(--level, "Route");
 		}
 	}
 }

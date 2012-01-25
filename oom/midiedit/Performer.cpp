@@ -1292,7 +1292,7 @@ void Performer::writeConfiguration(int level, Xml& xml)
 	xml.intTag(level, "width", _widthInit);
 	xml.intTag(level, "height", _heightInit);
 	xml.intTag(level, "colormode", colorModeInit);
-	xml.etag(level, "performer");
+    xml.etag(--level, "performer");
 }
 
 //---------------------------------------------------------
@@ -1362,7 +1362,7 @@ void Performer::writeStatus(int level, Xml& xml) const
 	xml.intTag(level, "xmag", hscroll->mag());
 	xml.intTag(level, "ypos", vscroll->pos());
 	xml.intTag(level, "ymag", vscroll->mag());
-	xml.tag(level, "/performer");
+    xml.tag(--level, "/performer");
 }
 
 //---------------------------------------------------------

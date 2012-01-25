@@ -941,7 +941,7 @@ void Track::writeRouting(int level, Xml& xml) const/*{{{*/
 
 				xml.tag(level, "dest name=\"%s\"/", Xml::xmlString(name()).toLatin1().constData());
 
-				xml.etag(level--, "Route");
+                xml.etag(--level, "Route");
 			}
 		}
 	}
@@ -983,7 +983,7 @@ void Track::writeRouting(int level, Xml& xml) const/*{{{*/
 
 			xml.tag(level, s.toAscii().constData());
 
-			xml.etag(level--, "Route");
+            xml.etag(--level, "Route");
 		}
 	}
 }/*}}}*/
@@ -1019,7 +1019,7 @@ void MidiTrack::write(int level, Xml& xml) const/*{{{*/
 	const PartList* pl = cparts();
 	for (ciPart p = pl->begin(); p != pl->end(); ++p)
 		p->second->write(level, xml);
-	xml.etag(level, tag);
+    xml.etag(--level, tag);
 }/*}}}*/
 
 //---------------------------------------------------------

@@ -205,7 +205,7 @@ void MidiAlsaDevice::writeRouting(int level, Xml& xml) const
 			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 			xml.tag(level, s.toLatin1().constData());
 
-			xml.etag(level--, "Route");
+            xml.etag(--level, "Route");
 		}
 	}
 }

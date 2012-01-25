@@ -1148,7 +1148,7 @@ void Song::write(int level, Xml& xml) const
 	AL::sigmap.write(level, xml);
 	_markerList->write(level, xml);
 
-	xml.tag(level, "/song");
+    xml.tag(--level, "/song");
 
 	// Restore backup of the clone list, to retain any 'copy' items,
 	//  so that pasting works properly after.
@@ -1183,7 +1183,7 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 		//if((*ts).valid)
 			(*ts)->write(level, xml);
 	}
-	xml.put(level--, "</%s>", tag.c_str());
+    xml.put(--level, "</%s>", tag.c_str());
 }/*}}}*/
 
 void TrackSettings::write(int level, Xml& xml) const
@@ -1195,7 +1195,7 @@ void TrackSettings::write(int level, Xml& xml) const
 	xml.intTag(level, "program", program);
 	xml.intTag(level, "rec", rec);
 	xml.intTag(level, "transpose", transpose);
-	xml.put(level--, "</%s>", tag.c_str());
+    xml.put(--level, "</%s>", tag.c_str());
 }
 
 void TrackSettings::read(Xml& xml)
@@ -1277,6 +1277,6 @@ void OOMidi::write(Xml& xml) const
 		xml.tag(level--, "/toplevels");
 	}*/
 
-	xml.tag(level, "/oom");
+    xml.tag(--level, "/oom");
 }
 

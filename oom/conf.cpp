@@ -40,6 +40,7 @@
 #include "midiitransform.h"
 #include "synth.h"
 #include "audio.h"
+#include "plugin.h"
 #include "sync.h"
 #include "wave.h"
 #include "midiseq.h"
@@ -1208,7 +1209,7 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 	xml.intTag(level, "midiClickEnable", midiClickFlag);
 	xml.intTag(level, "audioClickEnable", audioClickFlag);
 	xml.floatTag(level, "audioClickVolume", audioClickVolume);
-	xml.tag(level--, "/metronom");
+    xml.tag(--level, "/metronom");
 
 	//xml.intTag(level, "rcEnable", rcEnable);
 	//xml.intTag(level, "rcStop", rcStopNote);
@@ -1276,6 +1277,16 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 				// openFlags was read before, but never written here.
 				//xml.intTag(level, "record", dev->rwFlags() & 0x2 ? 1 : 0);
 				xml.intTag(level, "openFlags", dev->openFlags());
+
+                // save state of synth plugin
+                if (dev->deviceType() == MidiDevice::SYNTH_MIDI)
+                {
+                    xml.tag(level++, "plugin");
+                    SynthPluginDevice* synth = (SynthPluginDevice*)dev;
+                    synth->write(level++, xml);
+                    level -= 2; // adjust indentation
+                    xml.tag(level, "/plugin");
+                }
 			}
 			mport->syncInfo().write(level, xml);
 			// write out registered controller for all channels
@@ -1295,12 +1306,12 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 						{
 							xml.tag(level++, "controller id=\"%d\"", i->second->num());
 							if (i->second->hwVal() != CTRL_VAL_UNKNOWN)
-								xml.intTag(level, "val", i->second->hwVal());
-							xml.etag(level--, "controller");
+                                xml.intTag(level, "val", i->second->hwVal());
+                            xml.etag(--level, "controller");
 						}
 					}
 				}
-				xml.etag(level--, "channel");
+                xml.etag(--level, "channel");
 			}
 			QList<PatchSequence*> *patchSequences = mport->patchSequences();
 			if (patchSequences && !patchSequences->isEmpty())
@@ -1322,10 +1333,10 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 					xml.put(level, "<midiPreset id=\"%d\" sysex=\"%s\"/>", iter.key(), iter.value().toLatin1().constData());
 				}
 			}
-			xml.etag(level--, "midiport");
+            xml.etag(--level, "midiport");
 		}
 	}
-	xml.tag(level, "/sequencer");
+    xml.tag(--level, "/sequencer");
 }
 
 //---------------------------------------------------------
@@ -1472,7 +1483,7 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	//WaveEdit::writeConfiguration(level, xml);
 
 	writeShortCuts(level, xml);
-	xml.etag(level, "configuration");
+    xml.etag(--level, "configuration");
 }
 
 //---------------------------------------------------------
@@ -1543,7 +1554,7 @@ void OOMidi::writeConfiguration(int level, Xml& xml) const
 
 	writeMidiTransforms(level, xml);
 	writeMidiInputTransforms(level, xml);
-	xml.etag(level, "configuration");
+    xml.etag(--level, "configuration");
 }
 
 //---------------------------------------------------------

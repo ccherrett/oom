@@ -1011,7 +1011,7 @@ void VstPlugin::writeConfiguration(int level, Xml& xml)
         xml.intTag(level, "nativegui", 1);
     }
 
-    xml.tag(level--, "/VstPlugin");
+    xml.tag(--level, "/VstPlugin");
 }
 
 bool VstPlugin::loadParameter(Xml& xml)

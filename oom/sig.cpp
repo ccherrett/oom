@@ -370,7 +370,7 @@ void SigList::write(int level, Xml& xml) const
 	xml.tag(level++, "siglist");
 	for (ciSigEvent i = begin(); i != end(); ++i)
 		i->second->write(level, xml, i->first);
-	xml.tag(level, "/siglist");
+    xml.tag(--level, "/siglist");
 }
 
 //---------------------------------------------------------

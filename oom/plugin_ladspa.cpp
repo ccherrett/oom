@@ -712,7 +712,7 @@ void LadspaPlugin::writeConfiguration(int level, Xml& xml)
         xml.geometryTag(level, "geometry", m_gui);
     }
 
-    xml.tag(level--, "/LadspaPlugin");
+    xml.tag(--level, "/LadspaPlugin");
 }
 
 bool LadspaPlugin::loadControl(Xml& xml)

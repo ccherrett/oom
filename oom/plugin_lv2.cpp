@@ -1997,7 +1997,7 @@ void Lv2Plugin::writeConfiguration(int level, Xml& xml)
         xml.intTag(level, "nativegui", 1);
     }
 
-    xml.tag(level--, "/Lv2Plugin");
+    xml.tag(--level, "/Lv2Plugin");
 }
 
 bool Lv2Plugin::loadControl(Xml& xml)

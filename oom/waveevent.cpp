@@ -152,7 +152,7 @@ void WaveEventBase::write(int level, Xml& xml, const Pos& offset, bool forcePath
 	}
 	else
 		xml.strTag(level, "file", f.path());
-	xml.etag(level, "event");
+    xml.etag(--level, "event");
 }
 
 void WaveEventBase::readAudio(WavePart* part, unsigned offset, float** buffer, int channel, int n, bool doSeek, bool overwrite)

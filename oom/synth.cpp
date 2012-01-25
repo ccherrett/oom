@@ -705,8 +705,8 @@ void MessSynthIF::write(int level, Xml& xml) const
 			xml.nput("%02x ", p[i] & 0xff);
 		}
 		xml.nput("\n");
-		xml.tag(level--, "/event");
-		xml.etag(level--, "midistate");
+        xml.tag(--level, "/event");
+        xml.etag(--level, "midistate");
 	}
 }
 

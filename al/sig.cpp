@@ -490,7 +490,7 @@ void SigList::write(Xml& xml) const
 		xml.tag(level++, "siglist");
 		for (ciSigEvent i = begin(); i != end(); ++i)
 			i->second->write(level, xml, i->first);
-		xml.tag(level, "/siglist");
+        xml.tag(--level, "/siglist");
 	}
 
 	//---------------------------------------------------------
@@ -581,7 +581,7 @@ void SigEvent::write(Xml& xml, int at) const
 		xml.intTag(level, "tick", tick);
 		xml.intTag(level, "nom", sig.z);
 		xml.intTag(level, "denom", sig.n);
-		xml.tag(level, "/sig");
+        xml.tag(--level, "/sig");
 	}
 
 	//---------------------------------------------------------

@@ -666,7 +666,7 @@ void Composer::writeStatus(int level, Xml& xml)
 	xml.intTag(level, "xpos", hscroll->pos());
 	xml.intTag(level, "xmag", hscroll->mag());
 	xml.intTag(level, "ypos", vscroll->value());
-	xml.etag(level, "composer");
+    xml.etag(--level, "composer");
 }
 
 //---------------------------------------------------------

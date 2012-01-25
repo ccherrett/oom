@@ -55,8 +55,8 @@ void TopWin::writeStatus(int level, Xml& xml) const
 			geometry().y(),
 			geometry().width(),
 			geometry().height());
-	xml.tag(level--, "/geometry");
-	xml.tag(level, "/topwin");
+    xml.tag(--level, "/geometry");
+    xml.tag(--level, "/topwin");
 }
 
 TopWin::TopWin(QWidget* parent, const char* name,
