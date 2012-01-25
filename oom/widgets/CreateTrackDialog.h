@@ -11,6 +11,11 @@
 #include <QMap>
 #include "TrackManager.h"
 
+#define InstrumentTypeRole Qt::UserRole+4
+#define InstrumentNameRole Qt::UserRole+5
+#define DeviceTypeRole Qt::UserRole+6
+#define DeviceNameRole Qt::UserRole+7
+
 class QShowEvent;
 class QSize;
 

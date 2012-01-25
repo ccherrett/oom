@@ -53,7 +53,8 @@ bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 		case Track::DRUM:
 		{
 			//Load up the instrument first
-			loadInstrument(vtrack);
+			if(vtrack->createMidiOutputDevice)
+				loadInstrument(vtrack);
 			Track* track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false);
 			if(track)
 			{
@@ -201,12 +202,18 @@ bool TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 						if(vtrack->createMidiOutputDevice)
 						{
 							QString instrumentName = vtrack->instrumentName;
-							for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+							if(vtrack->instrumentType == SYNTH_INSTRUMENT)
+							{//falkTx set midi port synth instrument here
+							}
+							else
 							{
-								if ((*i)->iname() == instrumentName)
+								for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 								{
-									outport->setInstrument(*i);
-									break;
+									if ((*i)->iname() == instrumentName)
+									{
+										outport->setInstrument(*i);
+										break;
+									}
 								}
 							}
 						}
@@ -917,58 +924,73 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 	{
 		QString instrumentName = vtrack->instrumentName;
 		QString trackName = vtrack->name;
-		for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+		switch(vtrack->instrumentType)
 		{
-			if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
+			case LS_INSTRUMENT:
 			{
-				if(!lsClient)
+				for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 				{
-					lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
-					lsClientStarted = lsClient->startClient();
-					if(config.lsClientResetOnStart && lsClientStarted)
+					if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
 					{
-						lsClient->resetSampler();
-					}
-				}
-				else if(!lsClientStarted)
-				{
-					lsClientStarted = lsClient->startClient();
-					if(config.lsClientResetOnStart && lsClientStarted)
-					{
-						lsClient->resetSampler();
-					}
-				}
-				if(lsClientStarted)
-				{
-					qDebug("Loading Instrument to LinuxSampler");
-					if(lsClient->loadInstrument(*i))
-					{
-						rv = true;
-						qDebug("Instrument Map Loaded");
-						if(vtrack->autoCreateInstrument)
+						if(!lsClient)
 						{
-							int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
-							Patch* p = (*i)->getDefaultPatch();
-							if(p && map >= 0)
+							lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+							lsClientStarted = lsClient->startClient();
+							if(config.lsClientResetOnStart && lsClientStarted)
 							{
-								if(lsClient->createInstrumentChannel(vtrack->name.toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+								lsClient->resetSampler();
+							}
+						}
+						else if(!lsClientStarted)
+						{
+							lsClientStarted = lsClient->startClient();
+							if(config.lsClientResetOnStart && lsClientStarted)
+							{
+								lsClient->resetSampler();
+							}
+						}
+						if(lsClientStarted)
+						{
+							qDebug("Loading Instrument to LinuxSampler");
+							if(lsClient->loadInstrument(*i))
+							{
+								rv = true;
+								qDebug("Instrument Map Loaded");
+								if(vtrack->autoCreateInstrument)
 								{
-									qDebug("Created Channel for track");
-									/*QString prefix("LinuxSampler:");
-									QString postfix("-audio");
-									QString audio(QString(prefix).append(trackName).append(postfix));
-									QString midi(QString(prefix).append(trackName));*/
-								}
-								else
-								{
-									rv = false;
+									int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+									Patch* p = (*i)->getDefaultPatch();
+									if(p && map >= 0)
+									{
+										if(lsClient->createInstrumentChannel(vtrack->name.toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+										{
+											qDebug("Created Channel for track");
+											/*QString prefix("LinuxSampler:");
+											QString postfix("-audio");
+											QString audio(QString(prefix).append(trackName).append(postfix));
+											QString midi(QString(prefix).append(trackName));*/
+										}
+										else
+										{
+											rv = false;
+										}
+									}
 								}
 							}
 						}
+						break;
 					}
 				}
-				break;
 			}
+			break;
+			case SYNTH_INSTRUMENT://SYNTH instrument, falkTx do your synth on the fly creation hooks here
+			{
+			}
+			break;
+			case GM_INSTRUMENT:  //Regular idf no linuxsampler
+			{
+			}
+			break;
 		}
 	}
 	return rv;

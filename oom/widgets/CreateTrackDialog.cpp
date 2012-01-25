@@ -151,7 +151,8 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				vtrack.outputChannel = outChan;
 				if(m_createMidiOutputDevice)
 				{
-					QString instrumentName = cmbInstrument->itemText(instrumentIndex);
+					QString instrumentName = cmbInstrument->itemData(instrumentIndex, InstrumentNameRole).toString();
+					vtrack.instrumentType = cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
 					vtrack.instrumentName = instrumentName;
 				}
 			}
@@ -289,45 +290,15 @@ void CreateTrackDialog::cleanup()/*{{{*/
 {
 	if(m_instrumentLoaded)
 	{
-		if(!lsClient)
+		int insType = cmbInstrument->itemData(cmbInstrument->currentIndex(), InstrumentTypeRole).toInt();
+		switch(insType)
 		{
-			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
-			lsClientStarted = lsClient->startClient();
-		}
-		else if(!lsClientStarted)
-		{
-			lsClientStarted = lsClient->startClient();
-		}
-		if(lsClientStarted)
-		{
-			lsClient->removeLastChannel();
-			m_instrumentLoaded = false;
-		}
-	}
-}/*}}}*/
-
-void CreateTrackDialog::updateInstrument(int index)
-{
-	QString instrumentName = cmbInstrument->itemText(index);
-	QString trackName = txtName->text();
-	if(btnAdd->isEnabled())
-	{
-		for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
-		{
-			if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
+			case TrackManager::LS_INSTRUMENT:
 			{
-				if(m_instrumentLoaded)
-				{//unload the last one
-					cleanup();
-				}
 				if(!lsClient)
 				{
 					lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
 					lsClientStarted = lsClient->startClient();
-					if(config.lsClientResetOnStart && lsClientStarted)
-					{
-						lsClient->resetSampler();
-					}
 				}
 				else if(!lsClientStarted)
 				{
@@ -335,38 +306,96 @@ void CreateTrackDialog::updateInstrument(int index)
 				}
 				if(lsClientStarted)
 				{
-					qDebug("Loading Instrument to LinuxSampler");
-					if(lsClient->loadInstrument(*i))
+					lsClient->removeLastChannel();
+					m_instrumentLoaded = false;
+				}
+			}
+			break;
+			case TrackManager::SYNTH_INSTRUMENT:
+			{//falkTx Do cleanup of any created devices here
+			}
+			break;
+			default:
+			break;
+		}
+	}
+}/*}}}*/
+
+void CreateTrackDialog::updateInstrument(int index)
+{
+	QString instrumentName = cmbInstrument->itemData(index, InstrumentNameRole).toString();
+	QString trackName = txtName->text();
+	if(btnAdd->isEnabled())
+	{
+		int insType = cmbInstrument->itemData(index, InstrumentTypeRole).toInt();
+		switch(insType)
+		{
+			case TrackManager::LS_INSTRUMENT:
+			{
+				for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+				{
+					if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
 					{
-						qDebug("Instrument Map Loaded");
-						if(chkAutoCreate->isChecked())
+						if(m_instrumentLoaded)
+						{//unload the last one
+							cleanup();
+						}
+						if(!lsClient)
 						{
-							int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
-							Patch* p = (*i)->getDefaultPatch();
-							if(p && map >= 0)
+							lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+							lsClientStarted = lsClient->startClient();
+							if(config.lsClientResetOnStart && lsClientStarted)
 							{
-								if(lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+								lsClient->resetSampler();
+							}
+						}
+						else if(!lsClientStarted)
+						{
+							lsClientStarted = lsClient->startClient();
+						}
+						if(lsClientStarted)
+						{
+							qDebug("Loading Instrument to LinuxSampler");
+							if(lsClient->loadInstrument(*i))
+							{
+								qDebug("Instrument Map Loaded");
+								if(chkAutoCreate->isChecked())
 								{
-									qDebug("Create Channel for track");
-									QString prefix("LinuxSampler:");
-									QString postfix("-audio");
-									QString audio(QString(prefix).append(trackName).append(postfix));
-									QString midi(QString(prefix).append(trackName));
-									//reload input/output list and select the coresponding ports respectively
-									updateVisibleElements();
-									//populateInputList();
-									populateOutputList();
-									populateMonitorList();
-									cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
-									cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
-									m_instrumentLoaded = true;
+									int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+									Patch* p = (*i)->getDefaultPatch();
+									if(p && map >= 0)
+									{
+										if(lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+										{
+											qDebug("Create Channel for track");
+											QString prefix("LinuxSampler:");
+											QString postfix("-audio");
+											QString audio(QString(prefix).append(trackName).append(postfix));
+											QString midi(QString(prefix).append(trackName));
+											//reload input/output list and select the coresponding ports respectively
+											updateVisibleElements();
+											//populateInputList();
+											populateOutputList();
+											populateMonitorList();
+											cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
+											cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
+											m_instrumentLoaded = true;
+										}
+									}
 								}
 							}
 						}
+						break;
 					}
 				}
-				break;
 			}
+			break;
+			case TrackManager::SYNTH_INSTRUMENT:
+			{//TODO: falkTx do your routines for selecting an instrument here
+			}
+			break;
+			default:
+			break;
 		}
 	}
 }
@@ -728,17 +757,33 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
     {
         for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
         {
-            cmbInstrument->addItem((*i)->iname());
+			if((*i)->isOOMInstrument())
+			{
+            	cmbInstrument->addItem(QString("(LS) ").append((*i)->iname()));
+				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), InstrumentNameRole);
+				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::LS_INSTRUMENT, InstrumentTypeRole);
+			}
+			else
+			{
+            	cmbInstrument->addItem(QString("(GM) ").append((*i)->iname()));
+				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), InstrumentNameRole);
+				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::GM_INSTRUMENT, InstrumentTypeRole);
+			}
         }
 
         for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
         {
             if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI)
-                cmbInstrument->addItem((*i)->name());
+			{
+            	cmbInstrument->addItem(QString("(SYNTH) ").append((*i)->name()));
+				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->name(), InstrumentNameRole);
+				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::SYNTH_INSTRUMENT, InstrumentTypeRole);
+                //cmbInstrument->addItem((*i)->name());
+			}
         }
 
         //Default to the GM instrument
-        int gm = cmbInstrument->findText("GM");
+        int gm = cmbInstrument->findText("(GM) GM");
         if (gm >= 0)
             cmbInstrument->setCurrentIndex(gm);
     }

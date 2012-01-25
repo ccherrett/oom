@@ -22,6 +22,7 @@ struct VirtualTrack {
 		useMonitor = false;
 		inputChannel = -1;
 		outputChannel = -1;
+		instrumentType = -1;
 		autoCreateInstrument = false;
 		createMidiInputDevice = false;
 		createMidiOutputDevice = false;
@@ -29,6 +30,7 @@ struct VirtualTrack {
 	int type;
 	QString name;
 	QString instrumentName;
+	int instrumentType;
 	bool autoCreateInstrument;
 	bool createMidiInputDevice;
 	bool createMidiOutputDevice;
@@ -69,6 +71,7 @@ signals:
 	void trackAdded(QString);
 
 public:
+	enum { LS_INSTRUMENT, SYNTH_INSTRUMENT, GM_INSTRUMENT};
 	TrackManager();
 	~TrackManager(){}
 	void setPosition(int);
