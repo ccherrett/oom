@@ -201,6 +201,9 @@ QString SynthPluginDevice::open()
 {
     qWarning("SynthPluginDevice::open()");
 
+    if (m_plugin)
+        return "OK-FIXME";
+
     // Make it behave like a regular midi device.
     _readEnable = false;
     _writeEnable = (_openFlags & 0x01);

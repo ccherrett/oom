@@ -310,6 +310,8 @@ static void readConfigMidiPort(Xml& xml)
 	int type = MidiDevice::ALSA_MIDI;
 	bool cachenrpn = false;
 
+    MidiDevice* dev = 0;
+
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -320,9 +322,16 @@ static void readConfigMidiPort(Xml& xml)
 		{
 			case Xml::TagStart:
 				if (tag == "name")
+                {
+                    qWarning("Got MIDI NAME ------------------------");
 					device = xml.parse1();
+                    dev = midiDevices.find(device);
+                }
 				else if (tag == "type")
+                {
+                    qWarning("Got MIDI TYPE ------------------------");
 					type = xml.parseInt();
+                }
 				else if (tag == "record")
 				{ // old
 					bool f = xml.parseInt();
@@ -361,6 +370,21 @@ static void readConfigMidiPort(Xml& xml)
 				{
 					cachenrpn = xml.parseInt();
 				}
+                else if (tag == "plugin")
+                {
+                    if (dev && type == MidiDevice::SYNTH_MIDI)
+                    {
+                        // create synth
+                        SynthPluginDevice* synth = (SynthPluginDevice*)dev;
+                        synth->open();
+                        // get into the plugin type
+                        xml.parse();
+                        // load state
+                        synth->read(xml);
+                    }
+                    else
+                        xml.parse1();
+                }
 				else
 					xml.unknown("MidiDevice");
 				break;
@@ -373,6 +397,7 @@ static void readConfigMidiPort(Xml& xml)
 			case Xml::TagEnd:
 				if (tag == "midiport")
 				{
+                    qWarning("Got MIDI PORT ------------------------");
 					//if (idx > MIDI_PORTS) {
 					if (idx < 0 || idx >= MIDI_PORTS)
 					{
@@ -381,18 +406,18 @@ static void readConfigMidiPort(Xml& xml)
 						idx = 0;
 					}
 
-					MidiDevice* dev = midiDevices.find(device);
+                    if (!dev)
+                    {
+                        if (type == MidiDevice::JACK_MIDI)
+                        {
+                            dev = MidiJackDevice::createJackMidiDevice(device); // p3.3.55
 
-					//if(debugMsg && !dev)
-					//  fprintf(stderr, "readConfigMidiPort: device not found %s\n", device.toLatin1().constData());
-
-					if (!dev && type == MidiDevice::JACK_MIDI)
-					{
-						if (debugMsg)
-							fprintf(stderr, "readConfigMidiPort: creating jack midi device %s\n", device.toLatin1().constData());
-						//dev = MidiJackDevice::createJackMidiDevice(device, openFlags);
-						dev = MidiJackDevice::createJackMidiDevice(device); // p3.3.55
-					}
+                            if (debugMsg)
+                                fprintf(stderr, "readConfigMidiPort: creating jack midi device %s\n", device.toLatin1().constData());
+                        }
+                        else
+                            dev = midiDevices.find(device);
+                    }
 
 					if (debugMsg && !dev)
 						fprintf(stderr, "readConfigMidiPort: device not found %s\n", device.toLatin1().constData());
