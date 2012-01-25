@@ -593,6 +593,15 @@ QString VstPlugin::getParameterName(uint32_t index)
     return QString("");
 }
 
+QString VstPlugin::getParameterUnit(uint32_t index)
+{
+    char buf_str[255] = { 0 };
+    effect->dispatcher(effect, effGetParamLabel, index, 0, buf_str, 0.0f);
+    if (buf_str[0] != 0)
+        return QString(buf_str);
+    return QString("");
+}
+
 void VstPlugin::setNativeParameterValue(uint32_t index, double value)
 {
     effect->setParameter(effect, index, value);

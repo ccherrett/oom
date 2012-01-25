@@ -411,6 +411,11 @@ QString LadspaPlugin::getParameterName(uint32_t index)
         return QString("");
 }
 
+QString LadspaPlugin::getParameterUnit(uint32_t)
+{
+    return QString("");
+}
+
 void LadspaPlugin::setNativeParameterValue(uint32_t index, double value)
 {
     if (index < m_paramCount)
