@@ -728,13 +728,18 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
     {
         for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
         {
-            //SynthI* si = dynamic_cast<SynthI*> (*i);
-            //if (!si)
-                cmbInstrument->addItem((*i)->iname());
+            cmbInstrument->addItem((*i)->iname());
         }
+
+        for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+        {
+            if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI)
+                cmbInstrument->addItem((*i)->name());
+        }
+
         //Default to the GM instrument
         int gm = cmbInstrument->findText("GM");
-        if(gm >= 0)
+        if (gm >= 0)
             cmbInstrument->setCurrentIndex(gm);
     }
 }/*}}}*/

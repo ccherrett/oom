@@ -268,11 +268,12 @@ void MPConfig::rbClicked(QTableWidgetItem* item)
 			if (dev == 0)
 				//break;
 				return;
-			if (port->hasGui())
-			{
-				port->instrument()->showGui(!port->guiVisible());
-				item->setIcon(port->guiVisible() ? QIcon(*dotIcon) : QIcon(*dothIcon));
-			}
+            // falkTX, we don't want this in the connections manager
+            //if (port->hasGui())
+            //{
+            //	port->instrument()->showGui(!port->guiVisible());
+            //	item->setIcon(port->guiVisible() ? QIcon(*dotIcon) : QIcon(*dothIcon));
+            //}
 			//break;
 			return;
 
@@ -991,14 +992,15 @@ void MPConfig::songChanged(int flags)
 			itemrec->setIcon(QIcon(QPixmap()));
 			itemplay->setIcon(QIcon(QPixmap()));
 		}
-		if (port->hasGui())
-		{
-			itemgui->setIcon(port->guiVisible() ? QIcon(*dotIcon) : QIcon(*dothIcon));
-		}
-		else
-		{
+        // falkTX, we don't want this in the connections manager
+        //if (port->hasGui())
+        //{
+        //	itemgui->setIcon(port->guiVisible() ? QIcon(*dotIcon) : QIcon(*dothIcon));
+        //}
+        //else
+        //{
 			itemgui->setIcon(QIcon(QPixmap()));
-		}
+        //}
         if (!(dev && dev->isSynthPlugin()))
 			iteminstr->setIcon(QIcon(*buttondownIcon));
 		itemname->setIcon(QIcon(*buttondownIcon));

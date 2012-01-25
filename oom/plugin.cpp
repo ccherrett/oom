@@ -160,6 +160,12 @@ SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString 
     : MidiDevice(),
       MidiInstrument()
 {
+    _rwFlags = 1;
+    _openFlags = 1;
+    _readEnable = false;
+    _writeEnable = false;
+    m_cachenrpn = false;
+
     m_type = type;
     m_filename = filename;
     m_label = label;
@@ -212,7 +218,7 @@ QString SynthPluginDevice::open()
             if (m_plugin->init(m_filename, m_label))
             {
                 m_plugin->setActive(true);
-                return QString("OK2");
+                return QString("OK");
             }
         }
     }
