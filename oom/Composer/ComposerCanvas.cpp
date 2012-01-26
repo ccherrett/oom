@@ -561,7 +561,10 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 			//midiMonitor->msgAddMonitoredTrack(newTrack);
 		}
 		else
+		{
 			printf("ComposerCanvas::moveItem failed to create new track\n");
+			return false;
+		}
 		
 		//printf("ComposerCanvas::moveItem new track type: %d\n",newTrack->type());
 
