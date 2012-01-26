@@ -15,6 +15,7 @@
 #include "app.h"
 #include "song.h"
 #include "audio.h"
+#include "plugin.h"
 #include "knob.h"
 #include "popupmenu.h"
 #include "globals.h"
@@ -650,25 +651,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 
 	if (m_track->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
 	{
-		SynthI* synth = (SynthI*) m_track;
-
-		QAction* sga = p->addAction(tr("Show Gui"));
-		sga->setData(2);
-		sga->setCheckable(true);
-		//printf("synth hasgui %d, gui visible %d\n",synth->hasGui(), synth->guiVisible());
-		sga->setEnabled(synth->hasGui());
-		sga->setChecked(synth->guiVisible());
-
-		// If it has a gui but we don't have OSC, disable the action.
-#ifndef OSC_SUPPORT
-#ifdef DSSI_SUPPORT
-		if (dynamic_cast<DssiSynthIF*> (synth->sif()))
-		{
-			sga->setChecked(false);
-			sga->setEnabled(false);
-		}
-#endif
-#endif
+        // now ignored
 	}
 	else if(m_track->isMidiTrack() && !multipleSelectedTracks)
 	{
@@ -681,19 +664,15 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		mact->setChecked(port->guiVisible());
 		mact->setData(3);
 
-		// If it has a gui but we don't have OSC, disable the action.
-#ifndef OSC_SUPPORT
-#ifdef DSSI_SUPPORT
-		MidiDevice* dev = port->device();
-		if (dev && dev->isSynti() && (dynamic_cast<DssiSynthIF*> (((SynthI*) dev)->sif())))
-		{
-			mact->setChecked(false);
-			mact->setEnabled(false);
-		}
-#endif
-#endif
-		//p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
-		//p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
+        if (port->device() && port->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        {
+            SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
+            QAction* mactn = p->addAction(tr("Show Native Gui"));
+            mactn->setCheckable(true);
+            mactn->setEnabled(synth->hasNativeGui());
+            mactn->setChecked(synth->nativeGuiVisible());
+            mactn->setData(16);
+        }
 	}
 
 	QAction* act = p->exec(QCursor::pos());
@@ -1000,6 +979,15 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 				//}
 				break;
 			}
+            case 16:
+            {
+                int oPort = ((MidiTrack*) m_track)->outPort();
+                MidiPort* port = &midiPorts[oPort];
+                SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
+                bool show = !synth->nativeGuiVisible();
+                audio->msgShowInstrumentNativeGui(port->instrument(), show);
+            }   
+            break;
 			case 20 ... NUM_PARTCOLORS + 20:
 			{
 				int curColorIndex = n - 20;
