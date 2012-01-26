@@ -695,6 +695,11 @@ public:
         return true;
     }
 
+    bool initiated()
+    {
+        return bool(m_plugin);
+    }
+
     const QString& name() const
     {
         return m_name;
@@ -710,10 +715,9 @@ public:
         return m_label;
     }
 
-    void updateNativeGui()
+    virtual bool hasGui() const
     {
-        if (m_plugin)
-            m_plugin->updateNativeGui();
+        return true;
     }
 
     virtual QString open();
@@ -724,10 +728,14 @@ public:
 
     virtual void collectMidiEvents();
     virtual void processMidi();
+
     virtual bool guiVisible() const;
     virtual void showGui(bool yesno);
-    virtual bool hasGui() const;
-    virtual void writeToGui(const MidiPlayEvent&);
+
+    bool hasNativeGui() const;
+    bool nativeGuiVisible();
+    void showNativeGui(bool yesno);
+    void updateNativeGui();
 
     virtual void reset(int, MType);
     virtual QString getPatchName(int, int, MType, bool);

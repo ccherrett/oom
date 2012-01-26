@@ -316,45 +316,40 @@ void SynthPluginDevice::processMidi()
 bool SynthPluginDevice::guiVisible() const
 {
     if (m_plugin)
-    {
-        qWarning("SynthPluginDevice::guiVisible()");
-        if (m_plugin->hasNativeGui())
-            return m_plugin->nativeGuiVisible();
-        else
-            return m_plugin->guiVisible();
-    }
+        return m_plugin->guiVisible();
     return false;
 }
 
 void SynthPluginDevice::showGui(bool yesno)
 {
     if (m_plugin)
-    {
-        qWarning("SynthPluginDevice::showGui()");
-        if (m_plugin->hasNativeGui())
-            m_plugin->showNativeGui(yesno);
-        else
-            m_plugin->showGui(yesno);
-    }
+        m_plugin->showGui(yesno);
 }
 
-bool SynthPluginDevice::hasGui() const
+bool SynthPluginDevice::hasNativeGui() const
 {
     if (m_plugin)
-    {
-        qWarning("SynthPluginDevice::hasGui()");
-        return true; // use built-in UI for gui-less plugins
-    }
+        return m_plugin->hasNativeGui();
     return false;
 }
 
-void SynthPluginDevice::writeToGui(const MidiPlayEvent& ev)
+bool SynthPluginDevice::nativeGuiVisible()
 {
     if (m_plugin)
-    {
-        qWarning("SynthPluginDevice::writeToGui(%i);", ev.type());
-        //m_plugin->updateNativeGui();
-    }
+        return m_plugin->nativeGuiVisible();
+    return false;
+}
+
+void SynthPluginDevice::showNativeGui(bool yesno)
+{
+    if (m_plugin && m_plugin->hasNativeGui())
+        m_plugin->showNativeGui(yesno);
+}
+
+void SynthPluginDevice::updateNativeGui()
+{
+    if (m_plugin && m_plugin->hasNativeGui())
+        return m_plugin->updateNativeGui();
 }
 
 //---------------------------------------------------------
