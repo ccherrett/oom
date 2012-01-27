@@ -173,7 +173,7 @@ SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString 
     m_plugin = 0;
 
     m_name = name;
-    
+
     // handle duplicate names properly
     if (m_name.contains(" [LV2]_") || m_name.contains(" [VST]_"))
     {

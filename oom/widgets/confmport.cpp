@@ -1020,6 +1020,7 @@ void MPConfig::songChanged(int flags)
 			itemgui->setIcon(QIcon(*dothIcon));
 			itemrec->setIcon(QIcon(QPixmap()));
 			itemplay->setIcon(QIcon(QPixmap()));
+            itemfb->setIcon(QIcon(QPixmap()));
 		}
         // falkTX, we don't want this in the connections manager
         //if (port->hasGui())
