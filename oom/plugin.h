@@ -733,6 +733,7 @@ public:
     virtual QString open();
     virtual void close();
     virtual void setName(const QString& s);
+    void setPluginName(const QString& s);
 
     virtual void writeRouting(int, Xml&) const;
 

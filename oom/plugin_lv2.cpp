@@ -142,6 +142,10 @@ void initLV2()
 
     lv2world->plugins = lilv_world_get_all_plugins(lv2world->world);
 
+    // Disable known plugins that we don't support yet
+    QStringList blacklist;
+    blacklist.append("TODO");
+    
     LILV_FOREACH(plugins, i, lv2world->plugins)
     {
         const LilvPlugin* p = lilv_plugins_get(lv2world->plugins, i);
@@ -154,10 +158,8 @@ void initLV2()
             lilv_node_free(name);
 
         // Make sure it doesn't already exist.
-        if (plugins.find(p_uri, p_name) == 0)
-        {
+        if (plugins.find(p_uri, p_name) == 0 && blacklist.contains(p_uri) == false)
             plugins.add(PLUGIN_LV2, p_uri, p_name, p);
-        }
     }
 }
 
@@ -1060,6 +1062,7 @@ void Lv2Plugin::reload()
                     {
                         j = m_ainsCount++;
                         QString port_name = m_name + ":" + lilv_node_as_string(lilv_port_get_name(lplug, port));
+                        //m_portsIn[j] = audioDevice->registerInPort(port_name.toUtf8().constData(), false);
                         m_portsIn[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
                     }
                 }
@@ -1071,6 +1074,7 @@ void Lv2Plugin::reload()
                     {
                         j = m_aoutsCount++;
                         QString port_name = m_name + ":" + lilv_node_as_string(lilv_port_get_name(lplug, port));
+                        //m_portsOut[j] = audioDevice->registerOutPort(port_name.toUtf8().constData(), false);
                         m_portsOut[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
                     }
                 }

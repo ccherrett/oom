@@ -290,6 +290,11 @@ void SynthPluginDevice::setName(const QString& s)
     MidiDevice::setName(s);
 }
 
+void SynthPluginDevice::setPluginName(const QString& s)
+{
+    m_name = s;
+}
+
 //---------------------------------------------------------
 //   writeRouting
 //---------------------------------------------------------

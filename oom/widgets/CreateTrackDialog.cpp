@@ -33,7 +33,7 @@ m_templateMode(false)
 {
 	initDefaults();
 	m_vtrack = new VirtualTrack;
-    m_lastSynth = 0;
+    //m_lastSynth = 0;
 }
 
 CreateTrackDialog::CreateTrackDialog(VirtualTrack** vt, int type, int pos, QWidget* parent)
@@ -44,7 +44,7 @@ m_templateMode(true)
 {
 	initDefaults();
 	m_vtrack = new VirtualTrack;
-    m_lastSynth = 0;
+    //m_lastSynth = 0;
 	*vt = m_vtrack;
 }
 
@@ -325,18 +325,22 @@ void CreateTrackDialog::cleanup()/*{{{*/
 			}
 			break;
 			case TrackManager::SYNTH_INSTRUMENT:
-			{//falkTx Do cleanup of any created devices here
-                qWarning("cleanup SYNTH test");
-                if (m_lastSynth)
+			{
+                if (m_instrumentLoaded)
                 {
-                    qWarning("cleanup SYNTH HERE");
-                    if (m_lastSynth->duplicated())
+#if 0
+                    if (m_lastSynth)
                     {
-                        midiDevices.remove(m_lastSynth);
-                        //delete m_lastSynth;
+                        if (m_lastSynth->duplicated())
+                        {
+                            midiDevices.remove(m_lastSynth);
+                            //delete m_lastSynth;
+                        }
+                        m_lastSynth->close();
+                        m_lastSynth = 0;
                     }
-                    m_lastSynth->close();
-                    m_lastSynth = 0;
+#endif
+                    m_instrumentLoaded = false;
                 }
 			}
 			break;
@@ -416,48 +420,45 @@ void CreateTrackDialog::updateInstrument(int index)
 			}
 			break;
 			case TrackManager::SYNTH_INSTRUMENT:
-			{//TODO: falkTx do your routines for selecting an instrument here
-                qWarning("TEST 1 - %s", instrumentName.toUtf8().constData());
-                
+			{
                 for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
                 {
                     if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
                     {
                         if(m_instrumentLoaded)
-						{//unload the last one
+						{   //unload the last one
 							cleanup();
 						}
-                        
+
                         if(chkAutoCreate->isChecked())
                         {
+#if 0
                             SynthPluginDevice* synth = (SynthPluginDevice*)(*i);
-                            BasePlugin* oldPlugin = synth->plugin();
-                            
+
                             // create a new synth device if needed
-                            if (oldPlugin)
+                            if (synth->plugin())
                             {
+                                qWarning("TEST 2b Create new synth for in duplicate mode");
+                                BasePlugin* oldPlugin = synth->plugin();
                                 synth = new SynthPluginDevice(oldPlugin->type(), oldPlugin->filename(), oldPlugin->name(), oldPlugin->label(), true);
                                 midiDevices.add(synth);
                             }
 
-                            synth->setName(trackName);
+                            synth->setPluginName(trackName);
                             synth->open();
                             BasePlugin* plugin = synth->plugin();
                             plugin->setActive(false); // we don't need it to do aynthing yet
-
-                            //reload input/output list and select the coresponding ports respectively
+#endif
                             updateVisibleElements();
-                            //populateInputList();
+                            populateInputList();
                             populateOutputList();
                             populateMonitorList();
 
-                            //cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
-                            //cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
+                            cmbMonitor->addItem(trackName+":(output-ports)");
+                            cmbMonitor->setCurrentIndex(cmbMonitor->count()-1);
 
-                            m_lastSynth = synth;
                             m_instrumentLoaded = true;
                         }
-                        qWarning("TEST 3 SUCESS");
                         break;
                     }
                 }
@@ -619,7 +620,10 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		}
 		break;
 		case Track::AUDIO_AUX:
+        break;
 		case Track::AUDIO_SOFTSYNTH:
+            chkInput->setChecked(false);
+            chkInput->setEnabled(false);
 		break;
 	}
 }/*}}}*/
@@ -732,7 +736,10 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 		}
 		break;
 		case Track::AUDIO_AUX:
+        break;
 		case Track::AUDIO_SOFTSYNTH:
+            chkOutput->setChecked(false);
+            chkOutput->setEnabled(false);
 		break;
 	}
 }/*}}}*/
