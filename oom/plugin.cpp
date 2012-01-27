@@ -364,7 +364,8 @@ void SynthPluginDevice::showNativeGui(bool yesno)
 
 void SynthPluginDevice::updateNativeGui()
 {
-    if (m_plugin && m_plugin->hasNativeGui())
+    if (m_plugin && m_plugin->active() && m_plugin->hasNativeGui())
+    //if (m_plugin && m_plugin->hasNativeGui())
         return m_plugin->updateNativeGui();
 }
 

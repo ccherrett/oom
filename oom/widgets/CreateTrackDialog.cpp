@@ -33,6 +33,7 @@ m_templateMode(false)
 {
 	initDefaults();
 	m_vtrack = new VirtualTrack;
+    m_lastSynth = 0;
 }
 
 CreateTrackDialog::CreateTrackDialog(VirtualTrack** vt, int type, int pos, QWidget* parent)
@@ -43,6 +44,7 @@ m_templateMode(true)
 {
 	initDefaults();
 	m_vtrack = new VirtualTrack;
+    m_lastSynth = 0;
 	*vt = m_vtrack;
 }
 
@@ -324,6 +326,18 @@ void CreateTrackDialog::cleanup()/*{{{*/
 			break;
 			case TrackManager::SYNTH_INSTRUMENT:
 			{//falkTx Do cleanup of any created devices here
+                qWarning("cleanup SYNTH test");
+                if (m_lastSynth)
+                {
+                    qWarning("cleanup SYNTH HERE");
+                    if (m_lastSynth->duplicated())
+                    {
+                        midiDevices.remove(m_lastSynth);
+                        //delete m_lastSynth;
+                    }
+                    m_lastSynth->close();
+                    m_lastSynth = 0;
+                }
 			}
 			break;
 			default:
@@ -403,6 +417,50 @@ void CreateTrackDialog::updateInstrument(int index)
 			break;
 			case TrackManager::SYNTH_INSTRUMENT:
 			{//TODO: falkTx do your routines for selecting an instrument here
+                qWarning("TEST 1 - %s", instrumentName.toUtf8().constData());
+                
+                for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+                {
+                    if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                    {
+                        if(m_instrumentLoaded)
+						{//unload the last one
+							cleanup();
+						}
+                        
+                        if(chkAutoCreate->isChecked())
+                        {
+                            SynthPluginDevice* synth = (SynthPluginDevice*)(*i);
+                            BasePlugin* oldPlugin = synth->plugin();
+                            
+                            // create a new synth device if needed
+                            if (oldPlugin)
+                            {
+                                synth = new SynthPluginDevice(oldPlugin->type(), oldPlugin->filename(), oldPlugin->name(), oldPlugin->label(), true);
+                                midiDevices.add(synth);
+                            }
+
+                            synth->setName(trackName);
+                            synth->open();
+                            BasePlugin* plugin = synth->plugin();
+                            plugin->setActive(false); // we don't need it to do aynthing yet
+
+                            //reload input/output list and select the coresponding ports respectively
+                            updateVisibleElements();
+                            //populateInputList();
+                            populateOutputList();
+                            populateMonitorList();
+
+                            //cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
+                            //cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
+
+                            m_lastSynth = synth;
+                            m_instrumentLoaded = true;
+                        }
+                        qWarning("TEST 3 SUCESS");
+                        break;
+                    }
+                }
 			}
 			break;
 			default:
