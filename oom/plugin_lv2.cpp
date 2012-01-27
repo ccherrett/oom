@@ -498,7 +498,11 @@ Lv2Plugin::~Lv2Plugin()
             delete (LV2_UI_Resize_Feature*)features[lv2_feature_id_ui_resize]->data;
 
         if (features[lv2_feature_id_external_ui] && features[lv2_feature_id_external_ui]->data)
+        {
+            const char* plugin_human_id = ((lv2_external_ui_host*)features[lv2_feature_id_external_ui]->data)->plugin_human_id;
+            free((void*)plugin_human_id);
             delete (lv2_external_ui_host*)features[lv2_feature_id_external_ui]->data;
+        }
 
         if (ui.lib)
             lib_close(ui.lib);
@@ -746,9 +750,11 @@ bool Lv2Plugin::init(QString filename, QString label)
                         if (handle)
                         {
                             // store information
-                            m_name  = label;
                             m_label = label;
                             m_filename = filename;
+                            
+                            if (m_name.isEmpty())
+                                m_name  = label;
 
                             LilvNode* lv2maker = lilv_plugin_get_author_name(lplug);
                             if (lv2maker)
@@ -836,6 +842,16 @@ bool Lv2Plugin::init(QString filename, QString label)
                                             // Create base widget for X11 UI parent
                                             if (ui.type == UI_X11)
                                                 ui.nativeWidget = new QWidget();
+                                            
+                                            QString title;
+                                            title += "OOMidi: ";
+                                            title += m_name;
+                                            title += " (GUI)";
+                                            if (m_track)
+                                            {
+                                                title += " - ";
+                                                title += m_track->name();
+                                            }
 
                                             // Initialize UI features
                                             LV2_Extension_Data_Feature* UI_Data_Feature = new LV2_Extension_Data_Feature;
@@ -847,7 +863,7 @@ bool Lv2Plugin::init(QString filename, QString label)
 
                                             lv2_external_ui_host* External_UI_Feature   = new lv2_external_ui_host;
                                             External_UI_Feature->ui_closed              = oom_lv2_external_ui_closed;
-                                            External_UI_Feature->plugin_human_id        = strdup(m_name.toAscii().constData());
+                                            External_UI_Feature->plugin_human_id        = strdup(title.toUtf8().constData());
 
                                             features[lv2_feature_id_data_access]           = new LV2_Feature;
                                             features[lv2_feature_id_data_access]->URI      = LV2_DATA_ACCESS_URI;
@@ -1253,7 +1269,7 @@ QString Lv2Plugin::getParameterUnit(uint32_t index)
 {
     if (lplug && index < m_paramCount)
     {
-        const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
+        //const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
         return QString("");
         // TODO
         //return QString(lilv_node_as_string(lilv_port_get_classes(lplug, port)));

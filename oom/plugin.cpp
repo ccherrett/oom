@@ -156,7 +156,7 @@ bool BasePlugin::guiVisible()
 //   SynthPluginDevice
 //---------------------------------------------------------
 
-SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString name, QString label)
+SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString name, QString label, bool duplicated)
     : MidiDevice(),
       MidiInstrument()
 {
@@ -169,20 +169,31 @@ SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString 
     m_type = type;
     m_filename = filename;
     m_label = label;
+    m_duplicated = duplicated;
     m_plugin = 0;
 
     m_name = name;
-
-    switch (type)
+    
+    // handle duplicate names properly
+    if (m_name.contains(" [LV2]_") || m_name.contains(" [VST]_"))
     {
-    case PLUGIN_LV2:
-        m_name += " [LV2]";
-        break;
-    case PLUGIN_VST:
-        m_name += " [VST]";
-        break;
-    default:
-        break;
+        m_name = m_name.split(" [LV2]_").at(0);
+        m_name = m_name.split(" [VST]_").at(0);
+    }
+
+    if (m_name.endsWith(" [LV2]") == false && m_name.endsWith(" [VST]") == false)
+    {
+        switch (type)
+        {
+        case PLUGIN_LV2:
+            m_name += " [LV2]";
+            break;
+        case PLUGIN_VST:
+            m_name += " [VST]";
+            break;
+        default:
+            break;
+        }
     }
 
     MidiDevice::setName(m_name);
@@ -191,6 +202,7 @@ SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString 
 
 SynthPluginDevice::~SynthPluginDevice()
 {
+    close();
 }
 
 //---------------------------------------------------------
@@ -218,10 +230,14 @@ QString SynthPluginDevice::open()
             else if (m_type == PLUGIN_VST)
                 m_plugin = new VstPlugin();
 
-            if (m_plugin->init(m_filename, m_label))
+            if (m_plugin)
             {
-                m_plugin->setActive(true);
-                return QString("OK");
+                m_plugin->setName(m_name);
+                if (m_plugin->init(m_filename, m_label))
+                {
+                    m_plugin->setActive(true);
+                    return QString("OK");
+                }
             }
         }
     }

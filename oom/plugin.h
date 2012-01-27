@@ -344,6 +344,11 @@ public:
     {
         m_active = active;
     }
+    
+    void setName(QString name)
+    {
+        m_name = name;
+    }
 
     void setParameterValue(uint32_t index, double value)
     {
@@ -682,7 +687,7 @@ class SynthPluginDevice :
         public MidiInstrument
 {
 public:
-    SynthPluginDevice(PluginType type, QString filename, QString name, QString label);
+    SynthPluginDevice(PluginType type, QString filename, QString name, QString label, bool duplicated = false);
     ~SynthPluginDevice();
 
     virtual int deviceType()
@@ -694,10 +699,15 @@ public:
     {
         return true;
     }
-
-    bool initiated()
+    
+    bool duplicated() const
     {
-        return bool(m_plugin);
+        return m_duplicated;
+    }
+
+    BasePlugin* plugin()
+    {
+        return m_plugin;
     }
 
     const QString& name() const
@@ -762,6 +772,7 @@ private:
     QString m_name;
     QString m_label;
     BasePlugin* m_plugin;
+    bool m_duplicated;
 };
 
 //---------------------------------------------------------

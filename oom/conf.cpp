@@ -374,6 +374,7 @@ static void readConfigMidiPort(Xml& xml)
                 {
                     if (dev && type == MidiDevice::SYNTH_MIDI)
                     {
+                        #warning TODO - create a new device if this is already open
                         // create synth
                         SynthPluginDevice* synth = (SynthPluginDevice*)dev;
                         synth->open();

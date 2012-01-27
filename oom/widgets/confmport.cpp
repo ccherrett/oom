@@ -29,16 +29,14 @@
 //#include "midifilterimpl.h"
 #include "ctrlcombo.h"
 #include "minstrument.h"
-#include "synth.h"
 #include "audio.h"
+#include "plugin.h"
 #include "midiseq.h"
 #include "driver/alsamidi.h"
 #include "driver/jackmidi.h"
 #include "audiodev.h"
 #include "menutitleitem.h"
 #include "utils.h"
-
-extern std::vector<Synth*> synthis;
 
 enum
 {
@@ -736,9 +734,38 @@ _redisplay:
 
 					sdev = midiDevices.find(act->text(), typ);
 					delete pup;
+                    
 					// Is it the current device? Reset it to <none>.
+                    // falkTX, handle synths properly here
 					if (sdev == dev)
+                    {
+                        if (typ == MidiDevice::SYNTH_MIDI)
+                        {
+                            SynthPluginDevice* synth = (SynthPluginDevice*)sdev;
+                            if (synth->duplicated())
+                            {
+                                midiDevices.remove(sdev);
+                                synth->close();
+                                //delete synth;
+                            }
+                        }
 						sdev = 0;
+                    }
+                    else
+                    {
+                        // create a new synth device if needed
+                        if (typ == MidiDevice::SYNTH_MIDI)
+                        {
+                            SynthPluginDevice* synth = (SynthPluginDevice*)sdev;
+                            BasePlugin* plugin = synth->plugin();
+
+                            if (plugin)
+                            {    
+                                sdev = new SynthPluginDevice(plugin->type(), plugin->filename(), plugin->name(), plugin->label(), true);
+                                midiDevices.add(sdev);
+                            }
+                        }
+                    }
 				}
 
 				midiSeq->msgSetMidiDevice(port, sdev);
@@ -765,9 +792,11 @@ _redisplay:
 				//  as an instrument to a non-synth device, we should not allow this.
 				// (One reason is that the 'show gui' column is then enabled, which
 				//  makes no sense for a non-synth device).
-				SynthI* si = dynamic_cast<SynthI*> (*i);
-				if (!si)
-					instrPopup->addAction((*i)->iname());
+                
+                // falkTX, already checked before (isSynthPlugin)
+				//SynthI* si = dynamic_cast<SynthI*> (*i);
+				//if (!si)
+                instrPopup->addAction((*i)->iname());
 			}
 
 			QAction* act = instrPopup->exec(ppt, 0);
