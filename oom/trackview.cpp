@@ -267,7 +267,6 @@ void TrackSettings::read(Xml& xml)/*{{{*/
 	program = -1;
 	rec = 0;
 	pname = QString("");
-	track = 0;
 	transpose = 0;
 	for (;;)
 	{
@@ -288,6 +287,7 @@ void TrackSettings::read(Xml& xml)/*{{{*/
 					Track *t = song->findTrack(xml.parse1());
 					if(t)
 						tid = t->id();
+					//TODO: Set the upgrade flag
 				}
 				else if(tag == "trackId")
 				{

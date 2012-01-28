@@ -18,7 +18,6 @@
 #include "key.h"
 #include "node.h"
 #include "globaldefs.h"
-#include "track.h"
 #include <QMap>
 
 class Xml;
@@ -30,7 +29,6 @@ struct TrackSettings {
 	QString pname;
 	int transpose;
 	bool rec;
-	Track* track;
 	qint64 tid;
 	VirtualTrack* vtrack;
 	virtual void write(int, Xml&) const;
@@ -45,7 +43,6 @@ class TrackView
 {
 	private:
 		QString _comment;
-		//TrackList _tracks;
 		QList<qint64> m_tracks;
 		QMap<qint64, TrackSettings*> _tSettings;
 		QMap<qint64, TrackSettings*> m_vtrackSettings;

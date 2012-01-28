@@ -653,6 +653,20 @@ void Audio::msgShowInstrumentGui(MidiInstrument* instr, bool val)
 }
 
 //---------------------------------------------------------
+//   msgShowInstrumentNativeGui
+//---------------------------------------------------------
+
+void Audio::msgShowInstrumentNativeGui(MidiInstrument* instr, bool val)
+{
+	((SynthPluginDevice*)instr)->showNativeGui(val);
+	AudioMsg msg;
+	msg.id = MIDI_SHOW_INSTR_NATIVE_GUI;
+	msg.p1 = instr;
+	msg.a = val;
+	sendMessage(&msg, false);
+}
+
+//---------------------------------------------------------
 //   msgAddTrack
 //---------------------------------------------------------
 

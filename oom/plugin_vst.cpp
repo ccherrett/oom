@@ -308,11 +308,15 @@ bool VstPlugin::init(QString filename, QString label)
 
                 // store information
                 char buf_str[255] = { 0 };
-                effect->dispatcher(effect, effGetEffectName, 0, 0, buf_str, 0.0f);
-                if (buf_str[0] != 0)
-                    m_name = QString(buf_str);
-                else
-                    m_name = label;
+                
+                if (m_name.isEmpty())
+                {
+                    effect->dispatcher(effect, effGetEffectName, 0, 0, buf_str, 0.0f);
+                    if (buf_str[0] != 0)
+                        m_name = QString(buf_str);
+                    else
+                        m_name = label;
+                }
 
                 buf_str[0] = 0;
                 effect->dispatcher(effect, effGetVendorString, 0, 0, buf_str, 0.0f);

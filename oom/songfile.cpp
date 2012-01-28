@@ -879,6 +879,10 @@ void Song::read(Xml& xml)
 					track->read(xml);
 					insertTrack(track, -1);
 					track->showPendingPluginNativeGuis();
+					if(!m_masterId && (track->name() == "Master" || track->name() == tr("Master")))
+					{
+						m_masterId = track->id();
+					}
 				}
 				else if (tag == "AudioBuss" || tag == "AudioGroup")
 				{

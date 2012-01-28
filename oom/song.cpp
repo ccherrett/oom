@@ -4,6 +4,7 @@
 //  $Id: song.cpp,v 1.59.2.52 2009/12/15 03:39:58 terminator356 Exp $
 //
 //  (C) Copyright 2000-2004 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011-2012 The Open Octave Project <info@openoctave.org>
 //=========================================================
 
 #include <unistd.h>
@@ -99,41 +100,50 @@ Song::Song(QUndoStack* stack, const char* name)
 	invalid = false;
 	_replay = false;
 	_replayPos = 0;
+	//Master track ID
+	m_masterId = 0;
 	//Create the AutoView
 	TrackView* wv = new TrackView();
-	wv->setViewName("Working View");
+	wv->setViewName(tr("Working View"));
 	wv->setSelected(false);
 	m_autoTrackViewIndex.append(wv->id());
 	_autotviews[wv->id()] = wv;
+	m_workingViewId = wv->id();
 	//TODO:Set working view ID for later use
 	TrackView* iv = new TrackView();
-	iv->setViewName("Inputs  View");
+	iv->setViewName(tr("Inputs  View"));
 	iv->setSelected(false);
 	_autotviews[iv->id()] = iv;
 	m_autoTrackViewIndex.append(iv->id());
+	m_inputViewId = iv->id();
 	//TODO:Set view ID for later use
 	TrackView* ov = new TrackView();
-	ov->setViewName("Outputs View");
+	ov->setViewName(tr("Outputs View"));
 	ov->setSelected(false);
 	_autotviews[ov->id()] = ov;
 	m_autoTrackViewIndex.append(ov->id());
+	m_outputViewId = ov->id();
 	//TODO:Set view ID for later use
 	TrackView* gv = new TrackView();
-	gv->setViewName("Buss View");
+	gv->setViewName(tr("Buss View"));
 	gv->setSelected(false);
 	_autotviews[gv->id()] = gv;
+	m_autoTrackViewIndex.append(gv->id());
+	m_bussViewId = gv->id();
 	//TODO:Set view ID for later use
 	TrackView* av = new TrackView();
-	av->setViewName("Aux View");
+	av->setViewName(tr("Aux View"));
 	av->setSelected(false);
 	_autotviews[av->id()] = av;
 	m_autoTrackViewIndex.append(av->id());
+	m_auxViewId = av->id();
 	//TODO:Set view ID for later use
 	TrackView* cv = new TrackView();
-	cv->setViewName("Comment View");
+	cv->setViewName(tr("Comment View"));
 	cv->setSelected(false);
 	_autotviews[cv->id()] = cv;
 	m_autoTrackViewIndex.append(cv->id());
+	m_commentViewId = cv->id();
 	//TODO:Set view ID for later use
 	QHash<int, QString> hash;
 
@@ -2473,6 +2483,8 @@ void Song::clear(bool signal)
 	m_tracks.clear();
 	m_trackIndex.clear();
 	m_composerTracks.clear();
+	m_trackViewIndex.clear();
+	m_composerTrackIndex.clear();
 	_tviews.clear();
 	_tracks.clear();
 	_artracks.clear();
@@ -2600,6 +2612,8 @@ void Song::cleanupForQuit()
 	m_tracks.clear();
 	m_trackIndex.clear();
 	m_composerTracks.clear();
+	m_trackViewIndex.clear();
+	m_composerTrackIndex.clear();
 	_tracks.clear();
 	_artracks.clear();
 	_viewtracks.clear();
@@ -3629,6 +3643,18 @@ TrackView* Song::findTrackViewById(qint64 id) const
 }
 
 //---------------------------------------------------------
+//   findTrackViewById
+//    find internal trackview by id
+//---------------------------------------------------------
+
+TrackView* Song::findAutoTrackViewById(qint64 id) const
+{
+	if(_autotviews.contains(id))
+		return _autotviews.value(id);
+	return 0;
+}
+
+//---------------------------------------------------------
 //   findAutoTrackView
 //    find track view by name
 //---------------------------------------------------------
@@ -3673,6 +3699,7 @@ void Song::updateTrackViews()
 	_viewtracks.clear();
 	m_trackIndex.clear();
 	m_composerTracks.clear();
+	m_viewTracks.clear();
 	//Create omnipresent Master track at top of all list.
 	Track* master = findTrack("Master");
 	if(master)
@@ -3686,8 +3713,8 @@ void Song::updateTrackViews()
 	bool customview = false;
 	bool workview = false;
 	bool commentview = false;
-	TrackView* wv = findAutoTrackView("Working View");
-	TrackView* cv = findAutoTrackView("Comment View");
+	TrackView* wv = _autotviews.value(m_workingViewId);
+	TrackView* cv = _autotviews.value(m_commentViewId);
 	if(wv && wv->selected())
 	{
 		workview = true;
@@ -3741,7 +3768,7 @@ void Song::updateTrackViews()
 	foreach(qint64 tvid, m_autoTrackViewIndex)
 	{
 		TrackView* ait = _autotviews.value(tvid);
-		if(customview && (ait && ait->viewName() == "Working View"))
+		if(customview && (ait && ait->id() == m_workingViewId))
 		{
 			qDebug("Song::updateTrackViews: skipping working View");
 			continue;
@@ -3749,113 +3776,27 @@ void Song::updateTrackViews()
 		if(ait && ait->selected())/*{{{*/
 		{
 			qDebug("Song::updateTrackViews: Selected View: %s", ait->viewName().toUtf8().constData());
-			QHashIterator<qint64, Track*> itr(m_tracks);
-			while(itr.hasNext())
+			viewselected = true;
+			QList<qint64> *atlist = ait->tracks();
+			for(int i = 0; i < atlist->size();  ++i)
 			{
-				itr.next();
-				Track* t = itr.value();
-				bool found = false;
-				t->setSelected(false);
-				if(t == master)
+				//itr.next();
+				Track* t = m_tracks.value(atlist->at(i));//itr.value();
+				if(t)
 				{
-					continue;
-				}
-				if(m_viewTracks.contains(t->id()))
-					found = true;
-				if(!found)
-				{
-					viewselected = true;
-					switch(t->type())/*{{{*/
+					t->setSelected(false);
+					if(t == master)
+						continue;
+					if(!m_viewTracks.contains(t->id()))
 					{
-						case Track::MIDI:
-						case Track::DRUM:
-						case Track::AUDIO_SOFTSYNTH:
-						case Track::WAVE:
-							if(ait->viewName() == "Working View")
-							{
-								if(t->parts()->empty())
-									break;
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							else if(ait->viewName() == "Comment View")
-							{
-								if(t->comment().isEmpty())
-									break;
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							break;
-						case Track::AUDIO_OUTPUT:
-							if(ait->viewName() == "Outputs View")
-							{
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							else if(ait->viewName() == "Comment View")
-							{
-								if(t->comment().isEmpty())
-									break;
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							break;
-						case Track::AUDIO_BUSS:
-							if(ait->viewName() == "Buss View")
-							{
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							else if(ait->viewName() == "Comment View")
-							{
-								if(t->comment().isEmpty())
-									break;
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							break;
-						case Track::AUDIO_AUX:
-							if(ait->viewName() == "Aux View")
-							{
-								_viewtracks.push_back(t);
-								m_viewTracks[t->id()] = t;
-								m_trackIndex.append(t->id());
-							}
-							else if(ait->viewName() == "Comment View")
-							{
-								if(t->comment().isEmpty())
-									break;
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							break;
-						case Track::AUDIO_INPUT:
-							if(ait->viewName() == "Inputs  View")
-							{
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							else if(ait->viewName() == "Comment View")
-							{
-								if(t->comment().isEmpty())
-									break;
-								_viewtracks.push_back(t);
-								m_viewTracks[itr.key()] = t;
-								m_trackIndex.append(t->id());
-							}
-							break;
-						default:
-							fprintf(stderr, "unknown track type %d\n", t->type());
-							break;
-					}/*}}}*/
+						if((t->type() == Track::MIDI || t->type() == Track::WAVE) && workview && t->parts()->empty())
+							continue;
+						if(t->comment().isEmpty() && commentview)
+							continue;
+						_viewtracks.push_back(t);
+						m_viewTracks[t->id()] = t;
+						m_trackIndex.append(t->id());
+					}
 				}
 			}
 		}/*}}}*/
@@ -3935,12 +3876,18 @@ void Song::insertTrackRealtime(Track* track, int idx)
 			ia = _artracks.index2iterator(idx);
 			_artracks.insert(ia, track);
 			addPortCtrlEvents(((MidiTrack*) track));
+			m_composerTracks[track->id()] = track;
+			m_composerTrackIndex.insert(idx, track->id());
+			_autotviews.value(m_workingViewId)->addTrack(track->id());
 
 			break;
 		case Track::WAVE:
 			_waves.push_back((WaveTrack*) track);
 			ia = _artracks.index2iterator(idx);
 			_artracks.insert(ia, track);
+			m_composerTracks[track->id()] = track;
+			m_composerTrackIndex.insert(idx, track->id());
+			_autotviews.value(m_workingViewId)->addTrack(track->id());
 			break;
 		case Track::AUDIO_OUTPUT:
 			_outputs.push_back((AudioOutput*) track);
@@ -3949,15 +3896,19 @@ void Song::insertTrackRealtime(Track* track, int idx)
 				audio->setMaster((AudioOutput*) track);
 			if (audio->audioMonitor() == 0)
 				audio->setMonitor((AudioOutput*) track);
+			_autotviews.value(m_outputViewId)->addTrack(track->id());
 			break;
 		case Track::AUDIO_BUSS:
 			_groups.push_back((AudioBuss*) track);
+			_autotviews.value(m_bussViewId)->addTrack(track->id());
 			break;
 		case Track::AUDIO_AUX:
 			_auxs.push_back((AudioAux*) track);
+			_autotviews.value(m_auxViewId)->addTrack(track->id());
 			break;
 		case Track::AUDIO_INPUT:
 			_inputs.push_back((AudioInput*) track);
+			_autotviews.value(m_inputViewId)->addTrack(track->id());
 			break;
 		default:
 			fprintf(stderr, "unknown track type %d\n", track->type());
@@ -3974,6 +3925,7 @@ void Song::insertTrackRealtime(Track* track, int idx)
 	_tracks.insert(i, track);
 	m_tracks[track->id()] = track;
 	m_trackIndex.insert(idx, track->id());
+	_autotviews.value(m_commentViewId)->addTrack(track->id());
 	//printf("Song::insertTrackRealtime inserted\n");
 
 	n = _auxs.size();
@@ -4115,24 +4067,32 @@ void Song::removeTrackRealtime(Track* track)
 
 			_midis.erase(track);
 			_artracks.erase(track);
+			m_composerTracks.erase(m_composerTracks.find(track->id()));
+			_autotviews.value(m_workingViewId)->removeTrack(track->id());
 			break;
 		case Track::WAVE:
 			unchainTrackParts(track, true);
 
 			_waves.erase(track);
 			_artracks.erase(track);
+			m_composerTracks.erase(m_composerTracks.find(track->id()));
+			_autotviews.value(m_workingViewId)->removeTrack(track->id());
 			break;
 		case Track::AUDIO_OUTPUT:
 			_outputs.erase(track);
+			_autotviews.value(m_outputViewId)->removeTrack(track->id());
 			break;
 		case Track::AUDIO_INPUT:
 			_inputs.erase(track);
+			_autotviews.value(m_inputViewId)->removeTrack(track->id());
 			break;
 		case Track::AUDIO_BUSS:
 			_groups.erase(track);
+			_autotviews.value(m_bussViewId)->removeTrack(track->id());
 			break;
 		case Track::AUDIO_AUX:
 			_auxs.erase(track);
+			_autotviews.value(m_auxViewId)->removeTrack(track->id());
 			break;
 		case Track::AUDIO_SOFTSYNTH:
 		{
@@ -4146,7 +4106,8 @@ void Song::removeTrackRealtime(Track* track)
 	_tracks.erase(track);
 	m_tracks.erase(m_tracks.find(track->id()));
 	m_trackIndex.removeAll(track->id());
-	TrackView* tv = findTrackViewById(track->id());
+	_autotviews.value(m_commentViewId)->removeTrack(track->id());
+	TrackView* tv = findTrackViewByTrackId(track->id());
 	bool updateview = false;
 	while(tv)
 	{
@@ -4468,7 +4429,6 @@ void Song::setTrackHeights(TrackList &list, int height)
         {
                 Track* tr = *t;
                 tr->setHeight(height);
-
         }
 
         song->update(SC_TRACK_MODIFIED);

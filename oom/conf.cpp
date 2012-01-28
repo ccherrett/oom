@@ -303,7 +303,7 @@ static void readConfigMidiPort(Xml& xml)
 	QList<QPair<int, QString> > presets;
 
 	int openFlags = 1;
-	bool thruFlag = false;
+	//bool thruFlag = false;
 	int dic = 0;
 	int doc = 0;
 	MidiSyncInfo tmpSi;
@@ -325,7 +325,8 @@ static void readConfigMidiPort(Xml& xml)
                 {
                     qWarning("Got MIDI NAME ------------------------");
 					device = xml.parse1();
-                    dev = midiDevices.find(device);
+                    if (!dev)
+                        dev = midiDevices.find(device);
                 }
 				else if (tag == "type")
                 {
@@ -348,10 +349,15 @@ static void readConfigMidiPort(Xml& xml)
 					tmpSi.read(xml);
 				else if (tag == "instrument")
 				{
+                    qWarning("Got MIDI INSTRUMENT ------------------------");
 					instrument = xml.parse1();
+                    if (instrument.endsWith(" [LV2]") || instrument.endsWith(" [VST]"))
+                        dev = midiDevices.find(instrument);
 				}
 				else if (tag == "midithru")
-					thruFlag = xml.parseInt(); // obsolete
+                    // obsolete
+					//thruFlag = xml.parseInt();
+                    0;
 				else if (tag == "channel")
 				{
 					readPortChannel(xml, idx);
@@ -374,12 +380,21 @@ static void readConfigMidiPort(Xml& xml)
                 {
                     if (dev && type == MidiDevice::SYNTH_MIDI)
                     {
-                        // create synth
                         SynthPluginDevice* synth = (SynthPluginDevice*)dev;
+                        BasePlugin* oldPlugin = synth->plugin();
+                        
+                        // create a new synth device if needed
+                        if (oldPlugin)
+                        {
+                            synth = new SynthPluginDevice(oldPlugin->type(), oldPlugin->filename(), oldPlugin->name(), oldPlugin->label(), true);
+                            dev = synth;
+                            midiDevices.add(dev);
+                        }
+
                         synth->open();
                         // get into the plugin type
                         xml.parse();
-                        // load state
+                        // now load state
                         synth->read(xml);
                     }
                     else
@@ -1306,8 +1321,8 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
                 // save state of synth plugin
                 if (dev->deviceType() == MidiDevice::SYNTH_MIDI)
                 {
-                    xml.tag(level++, "plugin");
                     SynthPluginDevice* synth = (SynthPluginDevice*)dev;
+                    xml.tag(level++, "plugin");
                     synth->write(level++, xml);
                     level -= 2; // adjust indentation
                     xml.tag(level, "/plugin");

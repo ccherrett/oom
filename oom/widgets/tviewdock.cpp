@@ -117,7 +117,7 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 				chk->setCheckState(v->selected() ? Qt::Checked : Qt::Unchecked);
 				QStandardItem *tname = new QStandardItem(v->viewName());
 				tname->setData(idlist->at(i));
-				if(v->viewName() != "Working View" && v->viewName() != "Comment View")
+				if(v->id() != song->workingViewId() && v->id() != song->commentViewId())
 				{
 					chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(i)))));
 					//tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));

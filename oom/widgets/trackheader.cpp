@@ -15,6 +15,7 @@
 #include "app.h"
 #include "song.h"
 #include "audio.h"
+#include "plugin.h"
 #include "knob.h"
 #include "popupmenu.h"
 #include "globals.h"
@@ -625,11 +626,15 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		int oPort = ((MidiTrack*) m_track)->outPort();
 		MidiPort* port = &midiPorts[oPort];
 
-		QAction* mact = p->addAction(tr("Show Gui"));
-		mact->setCheckable(true);
-		mact->setEnabled(port->hasGui());
-		mact->setChecked(port->guiVisible());
-		mact->setData(3);
+        if (port->device() && port->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        {
+            SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
+            QAction* mactn = p->addAction(tr("Show Native Gui"));
+            mactn->setCheckable(true);
+            mactn->setEnabled(synth->hasNativeGui());
+            mactn->setChecked(synth->nativeGuiVisible());
+            mactn->setData(16);
+        }
 	}
 
 	QAction* act = p->exec(QCursor::pos());
@@ -830,6 +835,15 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 				//}
 				break;
 			}
+            case 16:
+            {
+                int oPort = ((MidiTrack*) m_track)->outPort();
+                MidiPort* port = &midiPorts[oPort];
+                SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
+                bool show = !synth->nativeGuiVisible();
+                audio->msgShowInstrumentNativeGui(port->instrument(), show);
+            }   
+            break;
 			case 20 ... NUM_PARTCOLORS + 20:
 			{
 				int curColorIndex = n - 20;

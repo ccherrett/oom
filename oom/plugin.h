@@ -344,6 +344,11 @@ public:
     {
         m_active = active;
     }
+    
+    void setName(QString name)
+    {
+        m_name = name;
+    }
 
     void setParameterValue(uint32_t index, double value)
     {
@@ -682,7 +687,7 @@ class SynthPluginDevice :
         public MidiInstrument
 {
 public:
-    SynthPluginDevice(PluginType type, QString filename, QString name, QString label);
+    SynthPluginDevice(PluginType type, QString filename, QString name, QString label, bool duplicated = false);
     ~SynthPluginDevice();
 
     virtual int deviceType()
@@ -693,6 +698,16 @@ public:
     virtual bool isSynthPlugin() const
     {
         return true;
+    }
+    
+    bool duplicated() const
+    {
+        return m_duplicated;
+    }
+
+    BasePlugin* plugin()
+    {
+        return m_plugin;
     }
 
     const QString& name() const
@@ -710,24 +725,28 @@ public:
         return m_label;
     }
 
-    void updateNativeGui()
+    virtual bool hasGui() const
     {
-        if (m_plugin)
-            m_plugin->updateNativeGui();
+        return true;
     }
 
     virtual QString open();
     virtual void close();
     virtual void setName(const QString& s);
+    void setPluginName(const QString& s);
 
     virtual void writeRouting(int, Xml&) const;
 
     virtual void collectMidiEvents();
     virtual void processMidi();
+
     virtual bool guiVisible() const;
     virtual void showGui(bool yesno);
-    virtual bool hasGui() const;
-    virtual void writeToGui(const MidiPlayEvent&);
+
+    bool hasNativeGui() const;
+    bool nativeGuiVisible();
+    void showNativeGui(bool yesno);
+    void updateNativeGui();
 
     virtual void reset(int, MType);
     virtual QString getPatchName(int, int, MType, bool);
@@ -754,6 +773,7 @@ private:
     QString m_name;
     QString m_label;
     BasePlugin* m_plugin;
+    bool m_duplicated;
 };
 
 //---------------------------------------------------------

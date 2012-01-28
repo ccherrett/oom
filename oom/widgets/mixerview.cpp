@@ -196,11 +196,10 @@ void MixerView::updateTrackList()/*{{{*/
 		commentview = true;
 		viewselected = true;
 	}
-	//TODO: change this to use the Song::trackViewIndexList()
-	QHash<qint64, TrackView*>::const_iterator iter = song->trackviews()->constBegin();
-	while(iter != song->trackviews()->constEnd())
+	QList<qint64> *tidlist = song->trackViewIndexList();
+	for(int i = 0; i < tidlist->size(); ++i)
 	{
-		TrackView *view = iter.value();
+		TrackView *view = song->findTrackViewById(tidlist->at(i));
 		if(view)
 		{
 			if(m_selectList.contains(view->id()))
@@ -213,7 +212,6 @@ void MixerView::updateTrackList()/*{{{*/
 					{
 						bool found = false;
 						if(workview && track->parts()->empty()) {
-							++iter;
 							continue;
 						}
 						for (ciTrack i = m_tracklist.begin(); i != m_tracklist.end(); ++i)
@@ -234,17 +232,15 @@ void MixerView::updateTrackList()/*{{{*/
 				}
 			}
 		}
-		++iter;
 	}
-	iter = song->autoviews()->constBegin();
-	while(iter != song->autoviews()->constEnd())
+	tidlist = song->autoTrackViewIndexList();
+	for(int i = 0; i < tidlist->size(); ++i)
 	{
-		TrackView *view = iter.value();
+		TrackView *view = song->findAutoTrackViewById(tidlist->at(i));
 		if(view)
 		{
-			if(customview && view->viewName() == "Working View")
+			if(customview && view->id() == song->workingViewId())
 			{
-				++iter;
 				continue;
 			}
 			if(m_selectList.contains(view->id()))/*{{{*/
@@ -270,13 +266,13 @@ void MixerView::updateTrackList()/*{{{*/
 							case Track::DRUM:
 							case Track::AUDIO_SOFTSYNTH:
 							case Track::WAVE:
-								if(view->viewName() == "Working View")
+								if(view->id() == song->workingViewId())
 								{
 									if((*t)->parts()->empty())
 										break;
 									m_tracklist.push_back((*t));
 								}
-								else if(view->viewName() == "Comment View")
+								else if(view->id() == song->commentViewId())
 								{
 									if((*t)->comment().isEmpty())
 										break;
@@ -284,11 +280,11 @@ void MixerView::updateTrackList()/*{{{*/
 								}
 								break;
 							case Track::AUDIO_OUTPUT:
-								if(view->viewName() == "Outputs View" && (*t)->name() != "Master")
+								if(view->id() == song->outputViewId() && (*t)->id() != song->masterId())
 								{
 									m_tracklist.push_back((*t));
 								}
-								else if(view->viewName() == "Comment View" && (*t)->name() != "Master")
+								else if(view->id() == song->commentViewId() && (*t)->id() != song->masterId())
 								{
 									if((*t)->comment().isEmpty())
 										break;
@@ -296,11 +292,11 @@ void MixerView::updateTrackList()/*{{{*/
 								}
 								break;
 							case Track::AUDIO_BUSS:
-								if(view->viewName() == "Buss View")
+								if(view->id() == song->bussViewId())
 								{
 									m_tracklist.push_back((*t));
 								}
-								else if(view->viewName() == "Comment View")
+								else if(view->id() == song->commentViewId())
 								{
 									if((*t)->comment().isEmpty())
 										break;
@@ -308,11 +304,11 @@ void MixerView::updateTrackList()/*{{{*/
 								}
 								break;
 							case Track::AUDIO_AUX:
-								if(view->viewName() == "Aux View")
+								if(view->id() == song->auxViewId())
 								{
 									m_tracklist.push_back((*t));
 								}
-								else if(view->viewName() == "Comment View")
+								else if(view->id() == song->commentViewId())
 								{
 									if((*t)->comment().isEmpty())
 										break;
@@ -320,11 +316,11 @@ void MixerView::updateTrackList()/*{{{*/
 								}
 								break;
 							case Track::AUDIO_INPUT:
-								if(view->viewName() == "Inputs  View")
+								if(view->id() == song->inputViewId())
 								{
 									m_tracklist.push_back((*t));
 								}
-								else if(view->viewName() == "Comment View")
+								else if(view->id() == song->commentViewId())
 								{
 									if((*t)->comment().isEmpty())
 										break;
@@ -339,15 +335,14 @@ void MixerView::updateTrackList()/*{{{*/
 				}
 			}/*}}}*/
 		}
-		++iter;
 	}
 	if(!viewselected)
 	{
 		//Make the viewtracks the artracks
 		for(ciTrack it = song->artracks()->begin(); it != song->artracks()->end(); ++it)
 		{
-			if((*it)->name() != "Master")
-			m_tracklist.push_back((*it));
+			if((*it)->id() != song->masterId())
+				m_tracklist.push_back((*it));
 		}
 	}
 	emit trackListChanged(&m_tracklist);

@@ -105,12 +105,14 @@ bool LadspaPlugin::init(QString filename, QString label)
                 if (handle)
                 {
                     // store information
-                    m_name  = QString(descriptor->Name);
                     m_label = label;
                     m_maker = QString(descriptor->Maker);
                     m_copyright = QString(descriptor->Copyright);
                     m_filename = filename;
                     m_uniqueId = descriptor->UniqueID;
+                    
+                    if (m_name.isEmpty())
+                        m_name  = QString(descriptor->Name);                    
 
                     // reload port information
                     reload();

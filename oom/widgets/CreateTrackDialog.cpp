@@ -33,6 +33,7 @@ m_templateMode(false)
 {
 	initDefaults();
 	m_vtrack = new VirtualTrack;
+    //m_lastSynth = 0;
 }
 
 CreateTrackDialog::CreateTrackDialog(VirtualTrack** vt, int type, int pos, QWidget* parent)
@@ -43,6 +44,7 @@ m_templateMode(true)
 {
 	initDefaults();
 	m_vtrack = new VirtualTrack;
+    //m_lastSynth = 0;
 	*vt = m_vtrack;
 }
 
@@ -97,7 +99,7 @@ void CreateTrackDialog::initDefaults()
 	//connect(cmbInstrument, SIGNAL(currentIndexChanged(int)), this, SLOT(updateInstrument(int)));
 	connect(cmbInstrument, SIGNAL(activated(int)), this, SLOT(updateInstrument(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
-	connect(txtName, SIGNAL(textEdited(QString)), this, SLOT(trackNameEdited()));
+	connect(txtName, SIGNAL(editingFinished()/*textEdited(QString)*/), this, SLOT(trackNameEdited()));
 	connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSelected()));
 	txtName->setFocus(Qt::OtherFocusReason);
 }
@@ -323,7 +325,23 @@ void CreateTrackDialog::cleanup()/*{{{*/
 			}
 			break;
 			case TrackManager::SYNTH_INSTRUMENT:
-			{//falkTx Do cleanup of any created devices here
+			{
+                if (m_instrumentLoaded)
+                {
+#if 0
+                    if (m_lastSynth)
+                    {
+                        if (m_lastSynth->duplicated())
+                        {
+                            midiDevices.remove(m_lastSynth);
+                            //delete m_lastSynth;
+                        }
+                        m_lastSynth->close();
+                        m_lastSynth = 0;
+                    }
+#endif
+                    m_instrumentLoaded = false;
+                }
 			}
 			break;
 			default:
@@ -402,7 +420,48 @@ void CreateTrackDialog::updateInstrument(int index)
 			}
 			break;
 			case TrackManager::SYNTH_INSTRUMENT:
-			{//TODO: falkTx do your routines for selecting an instrument here
+			{
+                for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+                {
+                    if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                    {
+                        if(m_instrumentLoaded)
+						{   //unload the last one
+							cleanup();
+						}
+
+                        if(chkAutoCreate->isChecked())
+                        {
+#if 0
+                            SynthPluginDevice* synth = (SynthPluginDevice*)(*i);
+
+                            // create a new synth device if needed
+                            if (synth->plugin())
+                            {
+                                qWarning("TEST 2b Create new synth for in duplicate mode");
+                                BasePlugin* oldPlugin = synth->plugin();
+                                synth = new SynthPluginDevice(oldPlugin->type(), oldPlugin->filename(), oldPlugin->name(), oldPlugin->label(), true);
+                                midiDevices.add(synth);
+                            }
+
+                            synth->setPluginName(trackName);
+                            synth->open();
+                            BasePlugin* plugin = synth->plugin();
+                            plugin->setActive(false); // we don't need it to do aynthing yet
+#endif
+                            updateVisibleElements();
+                            populateInputList();
+                            populateOutputList();
+                            populateMonitorList();
+
+                            cmbMonitor->addItem(trackName+":(output-ports)");
+                            cmbMonitor->setCurrentIndex(cmbMonitor->count()-1);
+
+                            m_instrumentLoaded = true;
+                        }
+                        break;
+                    }
+                }
 			}
 			break;
 			default:
@@ -444,19 +503,20 @@ void CreateTrackDialog::trackTypeChanged(int type)
 
 void CreateTrackDialog::trackNameEdited()
 {
-	//Track::TrackType type = (Track::TrackType)m_insertType;
-	//if(type == Track::MIDI)
-	//{
-		bool enabled = false;
-		if(!txtName->text().isEmpty())
-		{
-			Track* t = song->findTrack(txtName->text());
-			if(!t)
-				enabled = true;
-		}
-		btnAdd->setEnabled(enabled);
-		//cmbInstrument->setEnabled(enabled);
-	//}
+	bool enabled = false;
+	if(!txtName->text().isEmpty())
+	{
+		Track* t = song->findTrack(txtName->text());
+		if(!t)
+			enabled = true;
+	}
+	btnAdd->setEnabled(enabled);
+	Track::TrackType type = (Track::TrackType)m_insertType;
+	if(type == Track::MIDI && m_instrumentLoaded && enabled)
+	{
+		cleanup();
+		updateInstrument(cmbInstrument->currentIndex());
+	}
 }
 
 //Populate input combo based on type
@@ -561,7 +621,10 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		}
 		break;
 		case Track::AUDIO_AUX:
+        break;
 		case Track::AUDIO_SOFTSYNTH:
+            chkInput->setChecked(false);
+            chkInput->setEnabled(false);
 		break;
 	}
 }/*}}}*/
@@ -674,7 +737,10 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 		}
 		break;
 		case Track::AUDIO_AUX:
+        break;
 		case Track::AUDIO_SOFTSYNTH:
+            chkOutput->setChecked(false);
+            chkOutput->setEnabled(false);
 		break;
 	}
 }/*}}}*/
@@ -766,6 +832,17 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
 
     if (m_insertType == Track::MIDI)
     {
+        // add GM first, then LS, then SYNTH
+        for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+        {
+			if((*i)->isOOMInstrument() == false)
+			{
+            	cmbInstrument->addItem(QString("(GM) ").append((*i)->iname()));
+				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), InstrumentNameRole);
+				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::GM_INSTRUMENT, InstrumentTypeRole);
+			}
+        }
+        
         for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
         {
 			if((*i)->isOOMInstrument())
@@ -774,22 +851,18 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
 				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), InstrumentNameRole);
 				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::LS_INSTRUMENT, InstrumentTypeRole);
 			}
-			else
-			{
-            	cmbInstrument->addItem(QString("(GM) ").append((*i)->iname()));
-				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), InstrumentNameRole);
-				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::GM_INSTRUMENT, InstrumentTypeRole);
-			}
         }
 
         for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
         {
             if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI)
 			{
-            	cmbInstrument->addItem(QString("(SYNTH) ").append((*i)->name()));
-				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->name(), InstrumentNameRole);
-				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::SYNTH_INSTRUMENT, InstrumentTypeRole);
-                //cmbInstrument->addItem((*i)->name());
+                if (((SynthPluginDevice*)(*i))->duplicated() == false)
+                {
+                    cmbInstrument->addItem(QString("(SYNTH) ").append((*i)->name()));
+                    cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->name(), InstrumentNameRole);
+                    cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::SYNTH_INSTRUMENT, InstrumentTypeRole);
+                }
 			}
         }
 

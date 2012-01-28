@@ -142,6 +142,10 @@ void initLV2()
 
     lv2world->plugins = lilv_world_get_all_plugins(lv2world->world);
 
+    // Disable known plugins that we don't support yet
+    QStringList blacklist;
+    blacklist.append("TODO");
+    
     LILV_FOREACH(plugins, i, lv2world->plugins)
     {
         const LilvPlugin* p = lilv_plugins_get(lv2world->plugins, i);
@@ -154,10 +158,8 @@ void initLV2()
             lilv_node_free(name);
 
         // Make sure it doesn't already exist.
-        if (plugins.find(p_uri, p_name) == 0)
-        {
+        if (plugins.find(p_uri, p_name) == 0 && blacklist.contains(p_uri) == false)
             plugins.add(PLUGIN_LV2, p_uri, p_name, p);
-        }
     }
 }
 
@@ -498,7 +500,11 @@ Lv2Plugin::~Lv2Plugin()
             delete (LV2_UI_Resize_Feature*)features[lv2_feature_id_ui_resize]->data;
 
         if (features[lv2_feature_id_external_ui] && features[lv2_feature_id_external_ui]->data)
+        {
+            const char* plugin_human_id = ((lv2_external_ui_host*)features[lv2_feature_id_external_ui]->data)->plugin_human_id;
+            free((void*)plugin_human_id);
             delete (lv2_external_ui_host*)features[lv2_feature_id_external_ui]->data;
+        }
 
         if (ui.lib)
             lib_close(ui.lib);
@@ -746,9 +752,11 @@ bool Lv2Plugin::init(QString filename, QString label)
                         if (handle)
                         {
                             // store information
-                            m_name  = label;
                             m_label = label;
                             m_filename = filename;
+                            
+                            if (m_name.isEmpty())
+                                m_name  = label;
 
                             LilvNode* lv2maker = lilv_plugin_get_author_name(lplug);
                             if (lv2maker)
@@ -836,6 +844,16 @@ bool Lv2Plugin::init(QString filename, QString label)
                                             // Create base widget for X11 UI parent
                                             if (ui.type == UI_X11)
                                                 ui.nativeWidget = new QWidget();
+                                            
+                                            QString title;
+                                            title += "OOMidi: ";
+                                            title += m_name;
+                                            title += " (GUI)";
+                                            if (m_track)
+                                            {
+                                                title += " - ";
+                                                title += m_track->name();
+                                            }
 
                                             // Initialize UI features
                                             LV2_Extension_Data_Feature* UI_Data_Feature = new LV2_Extension_Data_Feature;
@@ -847,7 +865,7 @@ bool Lv2Plugin::init(QString filename, QString label)
 
                                             lv2_external_ui_host* External_UI_Feature   = new lv2_external_ui_host;
                                             External_UI_Feature->ui_closed              = oom_lv2_external_ui_closed;
-                                            External_UI_Feature->plugin_human_id        = strdup(m_name.toAscii().constData());
+                                            External_UI_Feature->plugin_human_id        = strdup(title.toUtf8().constData());
 
                                             features[lv2_feature_id_data_access]           = new LV2_Feature;
                                             features[lv2_feature_id_data_access]->URI      = LV2_DATA_ACCESS_URI;
@@ -1044,6 +1062,7 @@ void Lv2Plugin::reload()
                     {
                         j = m_ainsCount++;
                         QString port_name = m_name + ":" + lilv_node_as_string(lilv_port_get_name(lplug, port));
+                        //m_portsIn[j] = audioDevice->registerInPort(port_name.toUtf8().constData(), false);
                         m_portsIn[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
                     }
                 }
@@ -1055,6 +1074,7 @@ void Lv2Plugin::reload()
                     {
                         j = m_aoutsCount++;
                         QString port_name = m_name + ":" + lilv_node_as_string(lilv_port_get_name(lplug, port));
+                        //m_portsOut[j] = audioDevice->registerOutPort(port_name.toUtf8().constData(), false);
                         m_portsOut[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
                     }
                 }
@@ -1253,7 +1273,7 @@ QString Lv2Plugin::getParameterUnit(uint32_t index)
 {
     if (lplug && index < m_paramCount)
     {
-        const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
+        //const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
         return QString("");
         // TODO
         //return QString(lilv_node_as_string(lilv_port_get_classes(lplug, port)));

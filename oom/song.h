@@ -1,9 +1,9 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//  $Id: song.h,v 1.35.2.25 2009/12/15 03:39:58 terminator356 Exp $
 //
 //  (C) Copyright 1999/2000 Werner Schweer (ws@seh.de)
+//  (C) Copyright 2011-2012 The Open Octave Project <info@openoctave.org>
 //=========================================================
 
 #ifndef __SONG_H__
@@ -136,9 +136,18 @@ private:
 	QHash<qint64, Track*> m_tracks; //New indexed list of tracks
 	QHash<qint64, Track*> m_composerTracks;
 	QHash<qint64, Track*> m_viewTracks;
+
+	qint64 m_workingViewId;
+	qint64 m_inputViewId;
+	qint64 m_outputViewId;
+	qint64 m_bussViewId;
+	qint64 m_auxViewId;
+	qint64 m_commentViewId;
+	qint64 m_masterId;
 	
 	//For maintaining the track order and track view order
 	QList<qint64> m_trackIndex;
+	QList<qint64> m_composerTrackIndex;
 	QList<qint64> m_trackViewIndex;
 	QList<qint64> m_autoTrackViewIndex;
     
@@ -524,7 +533,36 @@ public:
 	{
 		return m_trackIndex.isEmpty() ? -1 : m_trackIndex.indexOf(id);
 	}
+	qint64 workingViewId()
+	{
+		return m_workingViewId;
+	}
+	qint64 inputViewId()
+	{
+		return m_inputViewId;
+	}
+	qint64 outputViewId()
+	{
+		return m_outputViewId;
+	}
+	qint64 bussViewId()
+	{
+		return m_bussViewId;
+	}
+	qint64 commentViewId()
+	{
+		return m_commentViewId;
+	}
+	qint64 auxViewId()
+	{
+		return m_auxViewId;
+	}
+	qint64 masterId()
+	{
+		return m_masterId;
+	}
     TrackView* findAutoTrackView(const QString& name) const;
+    TrackView* findAutoTrackViewById(qint64) const;
     TrackView* findTrackViewById(qint64) const;
     TrackView* findTrackViewByTrackId(qint64);
     void insertTrackView(TrackView*, int idx);

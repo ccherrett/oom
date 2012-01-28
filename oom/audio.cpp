@@ -777,6 +777,7 @@ void Audio::processMsg(AudioMsg* msg)
 			alsaScanMidiPorts();
 			break;
 		case MIDI_SHOW_INSTR_GUI:
+        case MIDI_SHOW_INSTR_NATIVE_GUI:
 			midiSeq->msgUpdatePollFd();
 			break;
 		case SEQM_ADD_TEMPO:

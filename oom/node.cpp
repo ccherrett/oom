@@ -236,13 +236,14 @@ void MidiTrack::updateSoloStates(bool noDec)
         _tmpSoloChainNoDec = noDec;
 	updateSoloState();
 
+#if 0 // not required anymore since we create full synth audio ports
         if (outPort() >= 0)
         {
-#warning TODO
                 //MidiDevice *md = midiPorts[outPort()].device();
                 //if (md && md->isSynthPlugin())
                         //((SynthPluginDevice*) md)->updateInternalSoloStates();
         }
+#endif
 }
 
 //---------------------------------------------------------
