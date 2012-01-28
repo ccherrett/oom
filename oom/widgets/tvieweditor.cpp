@@ -60,10 +60,8 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	{
 		stracks << (*t)->name();
 	}
-	cmbViews->addItems(buildViewList());
+	buildViewList();
 	listAllTracks->setModel(new QStringListModel(stracks));
-	//QStringList sel;
-	//listSelectedTracks->setModel(new QStringListModel(sel));
 	
 	btnOk = buttonBox->button(QDialogButtonBox::Ok);
 	btnCancel = buttonBox->button(QDialogButtonBox::Cancel);
@@ -71,21 +69,16 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	btnApply->setEnabled(false);
 	btnCopy->setEnabled(false);
 
-	btnAdd = actionBox->button(QDialogButtonBox::Yes);
-	btnAdd->setText(tr("Add Track"));
 	btnUp->setIcon(*up_arrowIconSet3);
 	btnDown->setIcon(*down_arrowIconSet3);
-	//btnUp->setIconSize(upPCIcon->size());
-	//btnDown->setIconSize(downPCIcon->size());
+	btnRemove->setIcon(*garbageIconSet3);
+	btnAdd->setIcon(*plusIconSet3);
+	btnAddVirtual->setIcon(*plusIconSet3);
 
-	connect(btnAdd, SIGNAL(clicked(bool)), SLOT(btnAddTrack(bool)));
-	
-	btnRemove = actionBox->button(QDialogButtonBox::No);
-	btnRemove->setText(tr("Remove Track"));
-	btnRemove->setFocusPolicy(btnAdd->focusPolicy());
+	connect(btnAdd, SIGNAL(clicked()), SLOT(btnAddTrack()));
 	
 	txtName->setReadOnly(true);
-	connect(btnRemove, SIGNAL(clicked(bool)), SLOT(btnRemoveTrack(bool)));
+	connect(btnRemove, SIGNAL(clicked()), SLOT(btnRemoveTrack()));
 	connect(btnNew, SIGNAL(clicked(bool)), SLOT(btnNewClicked(bool)));
 
 	connect(cmbViews, SIGNAL(currentIndexChanged(int)), SLOT(cmbViewSelected(int)));
@@ -104,15 +97,15 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 }
 
 
-QStringList TrackViewEditor::buildViewList()
+void TrackViewEditor::buildViewList()
 {
-	QStringList tv;
-	tv.append(tr("Select Track View"));
-	for(ciTrackView ci = song->trackviews()->begin(); ci != song->trackviews()->end(); ++ci)
+	cmbViews->addItem(tr("Select Track View"), 0);
+	QHash<qint64, TrackView*>::const_iterator iter = song->trackviews()->constBegin();
+	while (iter != song->trackviews()->constEnd())
 	{
-		tv.append((*ci)->viewName());
+		cmbViews->addItem(iter.value()->viewName(), iter.value()->id());
+		++iter;
 	}
-	return tv;
 }
 
 //----------------------------------------------
@@ -193,8 +186,9 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 	btnDelete->setEnabled(true);
 	//Perform actions to populate list below based on selected view
 	QString sl = cmbViews->itemText(ind);
+	qint64 tvid = cmbViews->itemData(ind).toLongLong();
 	txtName->setText(sl);
-	TrackView* v = song->findTrackView(sl);
+	TrackView* v = song->findTrackViewById(tvid);
 	_editing = true;
 	if(v)
 	{
@@ -204,24 +198,25 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 		txtComment->blockSignals(false);
 		txtComment->moveCursor(QTextCursor::End);
 		bool hasSettings = !v->trackSettings()->isEmpty();
-		TrackList* l = v->tracks();
-		if(l)
-		{
-			//QStringList sl;
-			for(ciTrack ci = l->begin(); ci != l->end(); ++ci)
+		for(int i = 0; i < v->tracks()->size(); ++i)
+		{	
+			qint64 tid = v->tracks()->at(i);
+			Track* t = song->findTrackById(tid);
+			if(t)
 			{
-				QString trackname = (*ci)->name();
+				QString trackname = t->name();
 				QStandardItem* tname = new QStandardItem(trackname);
+				tname->setData(t->id());
 				tname->setEditable(false);
 				QString tp("0");
-				QString pname((*ci)->isMidiTrack() ? tr("Select Patch") : "-");
+				QString pname(t->isMidiTrack() ? tr("Select Patch") : "-");
 				int prog = 0;
 				//Check if there are settings
 				if(hasSettings)
 				{
-					if(v->hasSettings(trackname))
+					if(v->hasSettings(t->id()))
 					{
-						TrackSettings *tset = v->getTrackSettings(trackname);
+						TrackSettings *tset = v->getTrackSettings(t->id());
 						if(tset)
 						{
 							tp = QString::number(tset->transpose);
@@ -233,12 +228,12 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 
 				QStandardItem* transp = new QStandardItem(tp);
 				transp->setEditable(false);
-				if((*ci)->isMidiTrack())
+				if(t->isMidiTrack())
 					transp->setEditable(true);
 				QStandardItem* patch = new QStandardItem(pname);
 				patch->setData(prog, ProgramRole);
 				patch->setEditable(false);
-				if((*ci)->isMidiTrack())
+				if(t->isMidiTrack())
 					patch->setEditable(true);
 				QList<QStandardItem*> rowData;
 				rowData.append(tname);
@@ -340,15 +335,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 	{
 		_selected->setViewName(txtName->text());
 		//printf("after setviewname\n");
-		TrackList *tl = _selected->tracks();
-		if(tl)
-		{
-			tl->clear();
-		}
-		else
-		{
-			tl = new TrackList();
-		}
+		_selected->tracks()->clear();
 		_selected->trackSettings()->clear();
 		//Process all the tracks in the listSelectedTracks and add them to the TrackList
 		for(int row = 0; row < m_model->rowCount(); ++row)
@@ -356,10 +343,10 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 			QStandardItem* titem = m_model->item(row, 0);
 			if(titem)
 			{
-				Track *t = song->findTrack(titem->text());
+				Track *t = song->findTrackById(titem->data().toLongLong());
 				if(t)
 				{
-					_selected->addTrack(t);
+					_selected->addTrack(t->id());
 					if(t->isMidiTrack())
 					{
 						QStandardItem* trans = m_model->item(row, 1);
@@ -376,13 +363,9 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 							ts->pname = pname;
 							ts->program = prog;
 							ts->transpose = transpose;
-							ts->track = t;
-							_selected->addTrackSetting(ts->track->name(), ts);
+							ts->tid = t->id();
+							_selected->addTrackSetting(ts->tid, ts);
 						}
-						/*else if(_selected->hasSettings(titem->text()))
-						{
-							_selected->removeTrackSettings(titem->text());
-						}*/
 					}
 				}
 			}
@@ -390,7 +373,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 		_selected->setRecord(chkRecord->isChecked());
 		_selected->setComment(txtComment->toPlainText());
 		song->dirty = true;
-		song->updateTrackViews1();
+		song->updateTrackViews();
 		if(_addmode)
 			song->update(SC_VIEW_ADDED);
 		else
@@ -417,7 +400,7 @@ void TrackViewEditor::reset()/*{{{*/
 	if(mod)
 		mod->removeRows(0, mod->rowCount());
 	m_model->clear();
-	cmbViews->addItems(buildViewList());
+	buildViewList();
 	cmbViews->blockSignals(false);
 	txtComment->blockSignals(true);
 	txtComment->setText("");
@@ -440,8 +423,8 @@ void TrackViewEditor::btnCancelClicked(bool/* state*/)/*{{{*/
 	//printf("TrackViewEditor::btnCancelClicked()\n");
 	if(_addmode)
 	{//remove the trackview that was added to the song
-		TrackView* v = song->trackviews()->back();
-		song->trackviews()->erase(v);
+		TrackView* v = song->findTrackViewById(_selected->id());
+		song->removeTrackView(_selected->id());
 		delete v;
 	}
 	_addmode = false;
@@ -456,17 +439,16 @@ void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
 		TrackView* tv = song->addNewTrackView();
 		if(tv)
 		{
-			TrackList* tl = _selected->tracks();
-			for(ciTrack ci = tl->begin(); ci != tl->end(); ++ci)
+			for(int i = 0; i < _selected->tracks()->size(); ++i)
 			{
-				tv->addTrack((*ci));
+				tv->addTrack(_selected->tracks()->at(i));
 			}
 
-			QMap<QString, TrackSettings*>::ConstIterator ts;
+			QMap<qint64, TrackSettings*>::ConstIterator ts;
 			for(ts = _selected->trackSettings()->begin(); ts != _selected->trackSettings()->end(); ++ts)
 			{
 				//if((*ts).valid)
-					tv->addTrackSetting((*ts)->track->name(), (*ts));
+					tv->addTrackSetting((*ts)->tid, (*ts));
 			}
 			tv->setComment(_selected->comment());
 			tv->setViewName(tv->getValidName(_selected->viewName()));
@@ -483,19 +465,18 @@ void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
 
 void TrackViewEditor::btnDeleteClicked(bool)/*{{{*/
 {
-	if(_selected && song->findTrackView(_selected->viewName()))
+	if(_selected)
 	{
-		QString n = _selected->viewName();
-		song->trackviews()->erase(_selected);
+		song->removeTrackView(_selected->id());
 		song->dirty = true;
-		song->updateTrackViews1();
+		song->updateTrackViews();
 		song->update(SC_VIEW_DELETED);
 		reset();
 	}
 }/*}}}*/
 
 
-void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
+void TrackViewEditor::btnAddTrack()/*{{{*/
 {
 	//Perform actions to add action to right list and remove from left
 	//printf("Add button clicked\n");
@@ -522,6 +503,7 @@ void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 					if(items.isEmpty())
 					{
 						QStandardItem* tname = new QStandardItem(trk->name());
+						tname->setData(trk->id());
 						tname->setEditable(false);
 						QStandardItem* transp = new QStandardItem(QString::number(0));
 						transp->setEditable(false);
@@ -547,7 +529,7 @@ void TrackViewEditor::btnAddTrack(bool/* state*/)/*{{{*/
 	updateTableHeader();
 }/*}}}*/
 
-void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
+void TrackViewEditor::btnRemoveTrack()/*{{{*/
 {
 	//Perform action to remove track from the selectedTracks list
 	//printf("Remove button clicked\n");
@@ -565,11 +547,11 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 				int row = selrows[i];
 				QStandardItem* item = m_model->item(row);
 				QString val = item->text();
-				Track* trk = song->findTrack(val);
-				if (trk)
-				{
+				//Track* trk = song->findTrack(val);
+				//if (trk)
+				//{
 					del.append(row);
-				}
+				//}
 				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());
 			}
 			//Delete the list in reverse order so the listview maintains the propper state
@@ -587,6 +569,10 @@ void TrackViewEditor::btnRemoveTrack(bool/* state*/)/*{{{*/
 	}
 	updateTableHeader();
 }/*}}}*/
+
+void TrackViewEditor::btnAddVirtualTrack()
+{
+}
 
 void TrackViewEditor::btnUpClicked(bool)/*{{{*/
 {

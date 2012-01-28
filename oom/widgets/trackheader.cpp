@@ -563,34 +563,6 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	beforeTrack->setData(10000);
 	QAction* afterTrack = p->addAction(tr("Add Track After"));
 	afterTrack->setData(12000);
-	/*QMenu* beforeTrackMenu = p->addMenu(tr("Add Track Before"));
-	QAction* midi = beforeTrackMenu->addAction(*addMidiIcon, tr("Midi Track"));
-	midi->setData(Track::MIDI+10000);
-	QAction* wave = beforeTrackMenu->addAction(*addAudioIcon, tr("Audio Track"));
-	wave->setData(Track::WAVE+10000);
-	QAction* aoutput = beforeTrackMenu->addAction(*addOutputIcon, tr("Output"));
-	aoutput->setData(Track::AUDIO_OUTPUT+10000);
-	QAction* ainput = beforeTrackMenu->addAction(*addInputIcon, tr("Input"));
-	ainput->setData(Track::AUDIO_INPUT+10000);
-	QAction* agroup = beforeTrackMenu->addAction(*addBussIcon, tr("Buss"));
-	agroup->setData(Track::AUDIO_BUSS+10000);
-	QAction* aaux = beforeTrackMenu->addAction(*addAuxIcon, tr("Aux Send"));
-	aaux->setData(Track::AUDIO_AUX+10000);
-
-	QMenu* afterTrackMenu = p->addMenu(tr("Add Track After"));
-	QAction* amidi = afterTrackMenu->addAction(*addMidiIcon, tr("Midi Track"));
-	amidi->setData(Track::MIDI+12000);
-	QAction* awave = afterTrackMenu->addAction(*addAudioIcon, tr("Audio Track"));
-	awave->setData(Track::WAVE+12000);
-	QAction* aaoutput = afterTrackMenu->addAction(*addOutputIcon, tr("Output"));
-	aaoutput->setData(Track::AUDIO_OUTPUT+12000);
-	QAction* aainput = afterTrackMenu->addAction(*addInputIcon, tr("Input"));
-	aainput->setData(Track::AUDIO_INPUT+12000);
-	QAction* aagroup = afterTrackMenu->addAction(*addBussIcon, tr("Buss"));
-	aagroup->setData(Track::AUDIO_BUSS+12000);
-	QAction* aaaux = afterTrackMenu->addAction(*addAuxIcon, tr("Aux Send"));
-	aaaux->setData(Track::AUDIO_AUX+12000);*/
-
 
 	if(m_track->name() != "Master")
 	{
@@ -648,29 +620,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		trackHeightsMenu->addAction(tr("Fit Selection in View"))->setData(13);
 	}
 
-	if (m_track->type() == Track::AUDIO_SOFTSYNTH && !multipleSelectedTracks)
-	{
-		SynthI* synth = (SynthI*) m_track;
-
-		QAction* sga = p->addAction(tr("Show Gui"));
-		sga->setData(2);
-		sga->setCheckable(true);
-		//printf("synth hasgui %d, gui visible %d\n",synth->hasGui(), synth->guiVisible());
-		sga->setEnabled(synth->hasGui());
-		sga->setChecked(synth->guiVisible());
-
-		// If it has a gui but we don't have OSC, disable the action.
-#ifndef OSC_SUPPORT
-#ifdef DSSI_SUPPORT
-		if (dynamic_cast<DssiSynthIF*> (synth->sif()))
-		{
-			sga->setChecked(false);
-			sga->setEnabled(false);
-		}
-#endif
-#endif
-	}
-	else if(m_track->isMidiTrack() && !multipleSelectedTracks)
+	if(m_track->isMidiTrack() && !multipleSelectedTracks)
 	{
 		int oPort = ((MidiTrack*) m_track)->outPort();
 		MidiPort* port = &midiPorts[oPort];
@@ -680,20 +630,6 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		mact->setEnabled(port->hasGui());
 		mact->setChecked(port->guiVisible());
 		mact->setData(3);
-
-		// If it has a gui but we don't have OSC, disable the action.
-#ifndef OSC_SUPPORT
-#ifdef DSSI_SUPPORT
-		MidiDevice* dev = port->device();
-		if (dev && dev->isSynti() && (dynamic_cast<DssiSynthIF*> (((SynthI*) dev)->sif())))
-		{
-			mact->setChecked(false);
-			mact->setEnabled(false);
-		}
-#endif
-#endif
-		//p->addAction(QIcon(*addtrack_addmiditrackIcon), tr("Midi"))->setData(4);
-		//p->addAction(QIcon(*addtrack_drumtrackIcon), tr("Drum"))->setData(5);
 	}
 
 	QAction* act = p->exec(QCursor::pos());
@@ -735,9 +671,6 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 			break;
 			case 2:
 			{
-				SynthI* synth = (SynthI*) m_track;
-				bool show = !synth->guiVisible();
-				audio->msgShowInstrumentGui(synth, show);
 			}
 			break;
 			case 3:
@@ -763,113 +696,10 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					(*t)->setSelected(select);
 				}
 				song->update(SC_SELECTION);
-				/*if (m_track->type() == Track::DRUM)
-				{
-					//
-					//    Drum -> Midi
-					//
-					audio->msgIdle(true);
-					PartList* pl = m_track->parts();
-					MidiTrack* m = (MidiTrack*) m_track;
-					for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
-					{
-						EventList* el = ip->second->events();
-						for (iEvent ie = el->begin(); ie != el->end(); ++ie)
-						{
-							Event ev = ie->second;
-							if (ev.type() == Note)
-							{
-								int pitch = ev.pitch();
-								// Changed by T356.
-								// Tested: Notes were being mixed up switching back and forth between midi and drum.
-								//pitch = drumMap[pitch].anote;
-								pitch = drumMap[pitch].enote;
-
-								ev.setPitch(pitch);
-							}
-							else
-								if (ev.type() == Controller)
-							{
-								int ctl = ev.dataA();
-								// Is it a drum controller event, according to the track port's instrument?
-								MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
-								if (mc)
-									// Change the controller event's index into the drum map to an instrument note.
-									ev.setA((ctl & ~0xff) | drumMap[ctl & 0x7f].enote);
-							}
-
-						}
-					}
-					m_track->setType(Track::MIDI);
-					audio->msgIdle(false);
-				}*/
 			}
 			break;
 			case 5:
 			{
-				if (m_track->type() == Track::MIDI)
-				{
-					//
-					//    Midi -> Drum
-					//
-					bool change = QMessageBox::question(this, tr("Update drummap?"),
-							tr("Do you want to use same port and channel for all instruments in the drummap?"),
-							tr("&Yes"), tr("&No"), QString::null, 0, 1);
-
-					audio->msgIdle(true);
-					// Delete all port controller events.
-					//audio->msgChangeAllPortDrumCtrlEvents(false);
-					song->changeAllPortDrumCtrlEvents(false);
-
-					if (!change)
-					{
-						MidiTrack* m = (MidiTrack*) m_track;
-						for (int i = 0; i < DRUM_MAPSIZE; i++)
-						{
-							drumMap[i].channel = m->outChannel();
-							drumMap[i].port = m->outPort();
-						}
-					}
-
-					//audio->msgIdle(true);
-					PartList* pl = m_track->parts();
-					MidiTrack* m = (MidiTrack*) m_track;
-					for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
-					{
-						EventList* el = ip->second->events();
-						for (iEvent ie = el->begin(); ie != el->end(); ++ie)
-						{
-							Event ev = ie->second;
-							if (ev.type() == Note)
-							{
-								int pitch = ev.pitch();
-								pitch = drumInmap[pitch];
-								ev.setPitch(pitch);
-							}
-							else
-							{
-								if (ev.type() == Controller)
-								{
-									int ctl = ev.dataA();
-									// Is it a drum controller event, according to the track port's instrument?
-									MidiController *mc = midiPorts[m->outPort()].drumController(ctl);
-									if (mc)
-										// Change the controller event's instrument note to an index into the drum map.
-										ev.setA((ctl & ~0xff) | drumInmap[ctl & 0x7f]);
-								}
-
-							}
-
-						}
-					}
-					m_track->setType(Track::DRUM);
-
-					// Add all port controller events.
-					//audio->msgChangeAllPortDrumCtrlEvents(true);
-					song->changeAllPortDrumCtrlEvents(true);
-
-					audio->msgIdle(false);
-				}
 			}
 			case 6:
 			{
@@ -1006,7 +836,6 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 				m_track->setDefaultPartColor(curColorIndex);
 				break;
 			}
-			//case Track::MIDI+10000 ... Track::AUDIO_AUX+10000:
 			case 10000:
 			{//Insert before
 				int mypos = song->tracks()->index(m_track);
@@ -1014,22 +843,8 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 				connect(ctdialog, SIGNAL(trackAdded(qint64)), this, SLOT(newTrackAdded(qint64)));
 				ctdialog->exec();
 			
-				/*Track* t = song->addTrack((Track::TrackType)n-10000);
-
-				if (t)
-				{
-					midiMonitor->msgAddMonitoredTrack(t);
-					song->deselectTracks();
-					t->setSelected(true);
-
-					emit selectionChanged(t);
-					emit trackInserted(n-10000);
-
-					song->updateTrackViews1();
-				}*/
 				break;
 			}
-			//case Track::MIDI+12000 ... Track::AUDIO_AUX+12000:
 			case 12000:
 			{//Insert after
 				int mypos = song->tracks()->index(m_track);
@@ -1054,7 +869,7 @@ void TrackHeader::newTrackAdded(qint64 id)
 	{
 		emit selectionChanged(t);
 		emit trackInserted(t->type());
-		song->updateTrackViews1();
+		song->updateTrackViews();
 	}
 }
 
@@ -1665,6 +1480,14 @@ bool TrackHeader::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 		{
 			mousePressEvent(mEvent);
 			mode = NORMAL;
+		}
+	}
+	if(event->type() == QEvent::KeyPress)
+	{
+		QKeyEvent* kEvent = static_cast<QKeyEvent*>(event);
+		if((kEvent->key() == Qt::Key_Return || kEvent->key() == Qt::Key_Enter) && m_editing)
+		{
+			updateTrackName();
 		}
 	}
 	// standard event processing

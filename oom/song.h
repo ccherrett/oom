@@ -133,11 +133,22 @@ private:
 
     int updateFlags;
 
-    TrackList _tracks; // tracklist as seen by globally
+	QHash<qint64, Track*> m_tracks; //New indexed list of tracks
+	QHash<qint64, Track*> m_composerTracks;
+	QHash<qint64, Track*> m_viewTracks;
+	
+	//For maintaining the track order and track view order
+	QList<qint64> m_trackIndex;
+	QList<qint64> m_trackViewIndex;
+	QList<qint64> m_autoTrackViewIndex;
+    
+	TrackList _tracks; // tracklist as seen by globally
     TrackList _artracks; // tracklist as seen by Composer
+	
     TrackViewList _tviews; // trackviewlist as seen by Composer
 	TrackViewList _autotviews;
-    MidiTrackList _midis;
+    
+	MidiTrackList _midis;
     WaveTrackList _waves;
 	TrackList _viewtracks;
     InputList _inputs; // audio input ports
@@ -489,12 +500,36 @@ public:
     TrackViewList* autoviews() {
         return &_autotviews;
     }
+	QList<qint64>* autoTrackViewIndexList() 
+	{
+		return &m_autoTrackViewIndex;
+	}
+	int autoTrackViewIndex(qint64 id)
+	{
+		return m_autoTrackViewIndex.isEmpty() ? -1 : m_autoTrackViewIndex.indexOf(id);
+	}
+	QList<qint64>* trackViewIndexList() 
+	{
+		return &m_trackViewIndex;
+	}
+	int trackViewIndex(qint64 id)
+	{
+		return m_trackViewIndex.isEmpty() ? -1 : m_trackViewIndex.indexOf(id);
+	}
+	QList<qint64>* trackIndexList() 
+	{
+		return &m_trackIndex;
+	}
+	int trackIndex(qint64 id)
+	{
+		return m_trackIndex.isEmpty() ? -1 : m_trackIndex.indexOf(id);
+	}
     TrackView* findAutoTrackView(const QString& name) const;
-    TrackView* findTrackView(const QString& name) const;
-    TrackView* findTrackView(Track*);
+    TrackView* findTrackViewById(qint64) const;
+    TrackView* findTrackViewByTrackId(qint64);
     void insertTrackView(TrackView*, int idx);
-    void removeTrackView(TrackView*);
-    void cmdRemoveTrackView(TrackView*);
+    void removeTrackView(qint64);
+    void cmdRemoveTrackView(qint64);
     void msgInsertTrackView(TrackView*, int idx, bool u = true);
 
 	//midikeys
@@ -615,8 +650,7 @@ public slots:
     QString getScriptPath(int id, bool delivered);
     void populateScriptMenu(QMenu* menuPlugins, QObject* receiver);
     TrackView* addTrackView();
-	void updateTrackViews(QAction*);
-	void updateTrackViews1();
+	void updateTrackViews();
 	void closeJackBox();
 	void toggleFeedback(bool);
 	void newTrackAdded(QString);

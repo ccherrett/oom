@@ -52,12 +52,15 @@ QWidget* TrackViewMenu::createWidget(QWidget* parent)
 	w->setLayout(layout);
 	//list->setFixedHeight(300);
 	int r = 0;
-	for (iTrack it = m_trackview->tracks()->begin(); it != m_trackview->tracks()->end(); ++it)
+	for (; r < m_trackview->tracks()->size(); ++r)
 	{
-		if (((*it)->type() == Track::MIDI || (*it)->type() == Track::DRUM || (*it)->type() == Track::WAVE) && ((*it)->parts()->empty() || m_viewall))
+		Track *it = song->findTrackById(m_trackview->tracks()->at(r));
+		if(it)
 		{
-			list->insertItem(r, (*it)->name());
-			++r;
+			if((it->type() == Track::MIDI || it->type() == Track::DRUM || it->type() == Track::WAVE) && (it->parts()->empty() || m_viewall))
+			{
+				list->insertItem(r, it->name());
+			}
 		}
 	}
 	if(!r)

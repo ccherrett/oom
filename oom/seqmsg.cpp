@@ -816,7 +816,7 @@ bool Song::msgRemoveParts()
 	if(partSelected)
 	{
 		song->dirty = true;
-		updateTrackViews1();
+		updateTrackViews();
 	}
 	return partSelected;
 }

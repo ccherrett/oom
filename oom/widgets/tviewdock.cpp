@@ -37,18 +37,13 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	tableView->setModel(_tableModel);
 	tableView->setObjectName("tblTrackView");
 	autoTable->setObjectName("tblAutoTable");
-	//tableView->setShowGrid(true);
-	//autoTable->setShowGrid(true);
 	autoTable->setModel(_autoTableModel);
+	
 	btnUp->setIcon(QIcon(*up_arrowIconSet3));
-	//btnUp->setIconSize(QSize(25,25));
-	//btnUp->setFixedSize(QSize(25,25));
 	btnDown->setIcon(*down_arrowIconSet3);
 	btnDelete->setIcon(*garbageIconSet3);
-	//btnDelete->setIconSize(garbagePCIcon->size());
-	//btnDown->setIconSize(downPCIcon->size());
 	btnTV->setIcon(*plusIconSet3);
-	//btnTV->setIconSize(addTVIcon->size());
+
 	connect(btnDelete, SIGNAL(clicked(bool)), SLOT(btnDeleteClicked(bool)));
 	connect(btnUp, SIGNAL(clicked(bool)), SLOT(btnUpClicked(bool)));
 	connect(btnDown, SIGNAL(clicked(bool)), SLOT(btnDownClicked(bool)));
@@ -82,47 +77,60 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 	if(flag & (SC_VIEW_CHANGED | SC_VIEW_DELETED | SC_VIEW_ADDED) || flag == -1)
 	{
 		//printf("TrackViewDock::populateTable(int flag) fired\n");
-		TrackViewList* tviews = song->trackviews();
 		_tableModel->clear();
-		for(iTrackView it = tviews->begin(); it != tviews->end(); ++it)
+		QList<qint64> *idlist = song->trackViewIndexList();
+		TrackViewList* tvlist = song->trackviews();
+		for(int i = 0; i < idlist->size(); ++i)
 		{
-			QList<QStandardItem*> rowData;
-			QStandardItem *chk = new QStandardItem(true);
-			chk->setCheckable(true);
-			chk->setCheckState((*it)->selected() ? Qt::Checked : Qt::Unchecked);
-			QStandardItem *tname = new QStandardItem((*it)->viewName());
-			rowData.append(chk);
-			rowData.append(tname);
-			_tableModel->blockSignals(true);
-			_tableModel->insertRow(_tableModel->rowCount(), rowData);
-			_tableModel->blockSignals(false);
-			tableView->setRowHeight(_tableModel->rowCount(), 25);
+			qint64 tvid = idlist->at(i);
+			TrackView* tv = tvlist->value(tvid);
+			if(tv)
+			{
+				QList<QStandardItem*> rowData;
+				QStandardItem *chk = new QStandardItem(true);
+				chk->setCheckable(true);
+				chk->setCheckState(tv->selected() ? Qt::Checked : Qt::Unchecked);
+				QStandardItem *tname = new QStandardItem(tv->viewName());
+				tname->setData(tv->id());
+				rowData.append(chk);
+				rowData.append(tname);
+				_tableModel->blockSignals(true);
+				_tableModel->insertRow(_tableModel->rowCount(), rowData);
+				_tableModel->blockSignals(false);
+				tableView->setRowHeight(_tableModel->rowCount(), 25);
+			}
 		}
 		_autoTableModel->clear();
-		int index = 0;
 		int icon_index = 0;
 		QList<int> list;
 		list << Track::MIDI << Track::AUDIO_INPUT << Track::AUDIO_OUTPUT << Track::AUDIO_BUSS << Track::AUDIO_AUX << Track::WAVE;
-		for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++index, ++ait)
+		idlist = song->autoTrackViewIndexList();
+		tvlist = song->autoviews();
+		for(int i = 0; i < idlist->size(); ++i)
 		{
-			QList<QStandardItem*> rowData2;
-			QStandardItem *chk = new QStandardItem(true);
-			chk->setCheckable(true);
-			chk->setCheckState((*ait)->selected() ? Qt::Checked : Qt::Unchecked);
-			QStandardItem *tname = new QStandardItem((*ait)->viewName());
-			if((*ait)->viewName() != "Working View" && (*ait)->viewName() != "Comment View")
+			TrackView* v = tvlist->value(idlist->at(i));;
+			if(v)
 			{
-				chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
-				//tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
-				tname->setIcon(m_icons.at(icon_index));
-				++icon_index;
+				QList<QStandardItem*> rowData2;
+				QStandardItem *chk = new QStandardItem(true);
+				chk->setCheckable(true);
+				chk->setCheckState(v->selected() ? Qt::Checked : Qt::Unchecked);
+				QStandardItem *tname = new QStandardItem(v->viewName());
+				tname->setData(idlist->at(i));
+				if(v->viewName() != "Working View" && v->viewName() != "Comment View")
+				{
+					chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(i)))));
+					//tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
+					tname->setIcon(m_icons.at(icon_index));
+					++icon_index;
+				}
+				rowData2.append(chk);
+				rowData2.append(tname);
+				_autoTableModel->blockSignals(true);
+				_autoTableModel->insertRow(_autoTableModel->rowCount(), rowData2);
+				_autoTableModel->blockSignals(false);
+				autoTable->setRowHeight(_autoTableModel->rowCount(), 25);
 			}
-			rowData2.append(chk);
-			rowData2.append(tname);
-			_autoTableModel->blockSignals(true);
-			_autoTableModel->insertRow(_autoTableModel->rowCount(), rowData2);
-			_autoTableModel->blockSignals(false);
-			autoTable->setRowHeight(_autoTableModel->rowCount(), 25);
 		}
 		updateTableHeader();
 		tableView->resizeRowsToContents();
@@ -144,11 +152,11 @@ void TrackViewDock::trackviewChanged(QStandardItem *item)/*{{{*/
 		QStandardItem *chk = _tableModel->item(row, 0);
 		if(tname)
 		{
-			TrackView* tv = song->findTrackView(tname->text());
+			TrackView* tv = song->findTrackViewById(tname->data().toLongLong());
 			if(tv)
 			{
-				tv->setSelected((chk->checkState() == Qt::Checked) ? true : false);
-				song->updateTrackViews1();
+				tv->setSelected(chk->checkState() == Qt::Checked);
+				song->updateTrackViews();
 			}
 		}
 	}
@@ -163,11 +171,13 @@ void TrackViewDock::autoTrackviewChanged(QStandardItem *item)/*{{{*/
 		QStandardItem *chk = _autoTableModel->item(row, 0);
 		if(tname)
 		{
-			TrackView* tv = song->findAutoTrackView(tname->text());
+			TrackViewList* tvlist = song->autoviews();
+			TrackView* tv = tvlist->value(tname->data().toLongLong());//song->findAutoTrackView(tname->text());
 			if(tv)
 			{
-				tv->setSelected((chk->checkState() == Qt::Checked) ? true : false);
-				song->updateTrackViews1();
+				qDebug("TrackViewDock::autoTrackviewChanged found track view: %s", tname->text().toUtf8().constData());
+				tv->setSelected(chk->checkState() == Qt::Checked);
+				song->updateTrackViews();
 			}
 		}
 	}
@@ -189,11 +199,11 @@ void TrackViewDock::updateTrackView(int table, QStandardItem *item)/*{{{*/
 			if(table)
 				tv = song->findAutoTrackView(tname->text());
 			else
-				tv = song->findTrackView(tname->text());
+				tv = song->findTrackViewById(tname->data().toLongLong());
 			if(tv)
 			{
 				tv->setSelected((item->checkState() == Qt::Checked) ? true : false);
-				song->updateTrackViews1();
+				song->updateTrackViews();
 			}
 		}
 	}
@@ -225,7 +235,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 		QStandardItem* tvcol = _tableModel->item(item->row(), 1);
 		if(tvcol)
 		{
-			TrackView *tv = song->findTrackView(tvcol->text());
+			TrackView *tv = song->findTrackViewById(tvcol->data().toLongLong());
 			if(tv)
 			{
 				QMenu* p = new QMenu(this);
@@ -243,7 +253,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 							oom->importWave(track);
 						else
 							oom->composer->addCanvasPart(track);
-						song->updateTrackViews1();
+						song->updateTrackViews();
 					}
 				}
 				delete p;
@@ -265,12 +275,12 @@ void TrackViewDock::btnUpClicked(bool)/*{{{*/
 		QStandardItem* txt = item.at(1);
 		if(txt)
 		{
-			QString tname = txt->text();
-			TrackView* tv = song->findTrackView(tname);
+			qint64 tid = txt->data().toLongLong();
+			TrackView* tv = song->findTrackViewById(tid);
 			if(tv)
 			{
 				TrackViewList* tvl = song->trackviews();
-				tvl->erase(tv);
+				tvl->remove(tv->id());
 				song->insertTrackView(tv, row);
 			}
 		}
@@ -293,12 +303,11 @@ void TrackViewDock::btnDownClicked(bool)/*{{{*/
 		QStandardItem* txt = item.at(1);
 		if(txt)
 		{
-			QString tname = txt->text();
-			TrackView* tv = song->findTrackView(tname);
+			//QString tname = txt->text();
+			TrackView* tv = song->findTrackViewById(txt->data().toLongLong());
 			if(tv)
 			{
-				TrackViewList* tvl = song->trackviews();
-				tvl->erase(tv);
+				song->removeTrackView(tv->id());
 				song->insertTrackView(tv, row);
 			}
 		}
@@ -320,7 +329,7 @@ void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 			QStandardItem *item = _tableModel->item(r, 1);
 			if(item)
 			{
-				TrackView* tv = song->findTrackView(item->text());
+				TrackView* tv = song->findTrackViewById(item->data().toLongLong());
 				if(tv)
 				{
 					dlist.append(tv);
@@ -331,7 +340,7 @@ void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 		{
 			for (int d = 0; d < dlist.size(); ++d)
 			{
-				song->removeTrackView(dlist.at(d));
+				song->removeTrackView(dlist.at(d)->id());
 			}
 		}
 	}

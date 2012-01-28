@@ -613,6 +613,7 @@ void HeaderList::keyPressEvent(QKeyEvent* e)/*{{{*/
 			return;
 		}
 	}
+	//printf("HeaderList::keyPressEvent emitting signal keyPressExt(%p)\n", e);
 	emit keyPressExt(e); //redirect keypress events to main app
 }/*}}}*/
 
@@ -696,7 +697,7 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 
 					emit selectionChanged(t);
 					emit trackInserted(n);
-					song->updateTrackViews1();
+					song->updateTrackViews();
 				}*/
 			}
 		}
@@ -724,7 +725,7 @@ void HeaderList::newTrackAdded(qint64 id)
 	{
 		emit selectionChanged(t);
 		emit trackInserted(t->type());
-		song->updateTrackViews1();
+		song->updateTrackViews();
 	}
 }
 

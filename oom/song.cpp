@@ -103,27 +103,38 @@ Song::Song(QUndoStack* stack, const char* name)
 	TrackView* wv = new TrackView();
 	wv->setViewName("Working View");
 	wv->setSelected(false);
-	_autotviews.push_back(wv);
+	m_autoTrackViewIndex.append(wv->id());
+	_autotviews[wv->id()] = wv;
+	//TODO:Set working view ID for later use
 	TrackView* iv = new TrackView();
 	iv->setViewName("Inputs  View");
 	iv->setSelected(false);
-	_autotviews.push_back(iv);
+	_autotviews[iv->id()] = iv;
+	m_autoTrackViewIndex.append(iv->id());
+	//TODO:Set view ID for later use
 	TrackView* ov = new TrackView();
 	ov->setViewName("Outputs View");
 	ov->setSelected(false);
-	_autotviews.push_back(ov);
+	_autotviews[ov->id()] = ov;
+	m_autoTrackViewIndex.append(ov->id());
+	//TODO:Set view ID for later use
 	TrackView* gv = new TrackView();
 	gv->setViewName("Buss View");
 	gv->setSelected(false);
-	_autotviews.push_back(gv);
+	_autotviews[gv->id()] = gv;
+	//TODO:Set view ID for later use
 	TrackView* av = new TrackView();
 	av->setViewName("Aux View");
 	av->setSelected(false);
-	_autotviews.push_back(av);
+	_autotviews[av->id()] = av;
+	m_autoTrackViewIndex.append(av->id());
+	//TODO:Set view ID for later use
 	TrackView* cv = new TrackView();
 	cv->setViewName("Comment View");
 	cv->setSelected(false);
-	_autotviews.push_back(cv);
+	_autotviews[cv->id()] = cv;
+	m_autoTrackViewIndex.append(cv->id());
+	//TODO:Set view ID for later use
 	QHash<int, QString> hash;
 
 	QStringList map;
@@ -225,7 +236,7 @@ void Song::newTrackAdded(QString name)
 	Track* t = findTrack(name);
 	if(t)
 	{
-		updateTrackViews1();
+		updateTrackViews();
 		update(SC_SELECTION);
 	}
 }
@@ -382,7 +393,7 @@ Track* Song::addTrack(int t)/*{{{*/
 		}
 	}
 	audio->msgUpdateSoloStates();
-	updateTrackViews1();
+	updateTrackViews();
 	return track;
 }/*}}}*/
 
@@ -534,7 +545,7 @@ Track* Song::addTrackByName(QString name, int t, int pos, bool connectMaster)/*{
 		}
 	}
 	audio->msgUpdateSoloStates();
-	updateTrackViews1();
+	updateTrackViews();
 	return track;
 }/*}}}*/
 
@@ -1717,7 +1728,7 @@ void Song::update(int flags)
 	if(flags & (SC_TRACK_REMOVED | SC_TRACK_INSERTED/* | SC_TRACK_MODIFIED*/))
 	{
 		//printf("Song::update firing updateTrackViews\n");
-		updateTrackViews1();
+		updateTrackViews();
 	}
 	/*if(flags & SC_VIEW_CHANGED)
 	{
@@ -2149,8 +2160,8 @@ void Song::endMsgCmd()
 		{
 			//NOTE: This call was causing our mixer to update repeatedly, removed for now
 			//keep an eye out for trackviews not updating after a undo/redo operation
-			//printf("Song::endMsgCmd() calling updateTrackViews1()\n");
-			//updateTrackViews1();
+			//printf("Song::endMsgCmd() calling updateTrackViews()\n");
+			//updateTrackViews();
 		}
 		if(!invalid)
 			emit songChanged(updateFlags);
@@ -2175,7 +2186,7 @@ void Song::undo()
 		audio->msgUpdateSoloStates();
 
 	if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
-		updateTrackViews1();
+		updateTrackViews();
 
 	if(!invalid)
 		emit songChanged(updateFlags);
@@ -2199,7 +2210,7 @@ void Song::redo()
 		audio->msgUpdateSoloStates();
 
 	if(updateFlags && (SC_TRACK_REMOVED | SC_TRACK_INSERTED | SC_TRACK_MODIFIED))
-		updateTrackViews1();
+		updateTrackViews();
 	if(!invalid)
 		emit songChanged(updateFlags);
 }
@@ -2459,6 +2470,9 @@ void Song::clear(bool signal)
 
 	bounceTrack = 0;
 
+	m_tracks.clear();
+	m_trackIndex.clear();
+	m_composerTracks.clear();
 	_tviews.clear();
 	_tracks.clear();
 	_artracks.clear();
@@ -2583,6 +2597,9 @@ void Song::cleanupForQuit()
 	if (debugMsg)
 		printf("OOMidi: Song::cleanupForQuit...\n");
 
+	m_tracks.clear();
+	m_trackIndex.clear();
+	m_composerTracks.clear();
 	_tracks.clear();
 	_artracks.clear();
 	_viewtracks.clear();
@@ -3535,220 +3552,6 @@ void Song::connectJackRoutes(AudioTrack* track, bool disconnect)
 	}
 }
 
-/*
-//---------------------------------------------------------
-//   chooseMidiRoutes
-//---------------------------------------------------------
-
-void Song::chooseMidiRoutes(QButton* parent, MidiTrack* track, bool dst)
-{
-  if(!track)
-	return;
-    
-  //if(!track->isMidiTrack())
-  //  return;
-  
-  QPoint ppt = QCursor::pos();
-  //QPoint ppt = parent->rect().bottomLeft();
-    
-  //if(dst)
-  //{
-	// TODO
-    
-  //}
-  //else
-  //{
-	RouteList* rl = dst ? track->outRoutes() : track->inRoutes();
-	//Route dst(track, -1);
-  
-	QPopupMenu* pup = new QPopupMenu(parent);
-	pup->setCheckable(true);
-    
-	int gid = 0;
-	int n;
-    
-  // FIXME:
-  // Routes can't be re-read until the message sent from msgAddRoute1() 
-  //  has had time to be sent and actually affected the routes.
-  ///_redisplay:
-    
-	pup->clear();
-	gid = 0;
-    
-	//MidiInPortList* tl = song->midiInPorts();
-	//for(iMidiInPort i = tl->begin();i != tl->end(); ++i)
-	for(int i = 0; i < MIDI_PORTS; ++i)
-	{
-	  //MidiInPort* track = *i;
-	  // NOTE: Could possibly list all devices, bypassing ports, but no, let's stick wth ports.
-	  MidiPort* mp = &midiPorts[i];
-	  MidiDevice* md = mp->device();
-	  if(!md)
-		continue;
-      
-	  if(!(md->rwFlags() & (dst ? 1 : 2)))
-		continue;
-        
-	  //printf("MidiStrip::iRoutePressed adding submenu portnum:%d\n", i);
-      
-	  //QMenu* m = menu->addMenu(track->name());
-	  QPopupMenu* subp = new QPopupMenu(parent);
-      
-	  for(int ch = 0; ch < MIDI_CHANNELS; ++ch)
-	  {
-		//QAction* a = m->addAction(QString("Channel %1").arg(ch+1));
-		//subp->insertItem(QT_TRANSLATE_NOOP("@default", QString("Channel %1").arg(ch+1)), i * MIDI_CHANNELS + ch);
-		gid = i * MIDI_CHANNELS + ch;
-        
-		//printf("MidiStrip::iRoutePressed inserting gid:%d\n", gid);
-        
-		subp->insertItem(QString("Channel %1").arg(ch+1), gid);
-		//a->setCheckable(true);
-		//Route src(track, ch, RouteNode::TRACK);
-		//Route src(md, ch);
-		//Route r = Route(src, dst);
-		//a->setData(QVariant::fromValue(r));
-		//a->setChecked(rl->indexOf(r) != -1);
-		Route srcRoute(md, ch);
-		for(iRoute ir = rl->begin(); ir != rl->end(); ++ir)
-		{
-		  //if(*ir == dst)
-		  if(*ir == srcRoute)
-		  {
-			subp->setItemChecked(gid, true);
-			break;
-		  }
-		}
-	  }
-	  pup->insertItem(QT_TRANSLATE_NOOP("@default", md->name()), subp);
-	}
-        
-//    QPopupMenu* pup = new QPopupMenu(iR);
-//    pup->setCheckable(true);
-	//MidiTrack* t = (MidiTrack*)track;
-//    RouteList* irl = track->inRoutes();
-
-//    MidiTrack* t = (MidiTrack*)track;
-//    int gid = 0;
-//    for (int i = 0; i < channel; ++i) 
-//    {
-//          char buffer[128];
-//          snprintf(buffer, 128, "%s %d", tr("Channel").toLatin1().constData(), i+1);
-//          MenuTitleItem* titel = new MenuTitleItem(QString(buffer));
-//          pup->insertItem(titel);
-
-//          if (!checkAudioDevice()) return;
-//          std::list<QString> ol = audioDevice->outputPorts();
-//          for (std::list<QString>::iterator ip = ol.begin(); ip != ol.end(); ++ip) {
-//                int id = pup->insertItem(*ip, (gid * 16) + i);
-//                Route dst(*ip, true, i);
-//                ++gid;
-//                for (iRoute ir = irl->begin(); ir != irl->end(); ++ir) {
-//                      if (*ir == dst) {
-//                            pup->setItemChecked(id, true);
-//                            break;
-//                            }
-//                      }
-//                }
-//          if (i+1 != channel)
-//                pup->insertSeparator();
-//    }
-    
-	if(pup->count() == 0)
-	{
-	  delete pup;
-	  return;
-	}
-    
-	//n = pup->exec(QCursor::pos());
-	n = pup->exec(ppt);
-	///delete pup;
-	if (n != -1)
-	{
-		  int mdidx = n / MIDI_CHANNELS;
-		  int ch = n % MIDI_CHANNELS;
-          
-		  //if(debugMsg)
-			//printf("Song::chooseMidiRoutes mdidx:%d ch:%d\n", mdidx, ch);
-            
-		  MidiPort* mp = &midiPorts[mdidx];
-		  MidiDevice* md = mp->device();
-		  if(!md)
-		  {
-			delete pup;
-			return;
-		  }
-          
-		  //if(!(md->rwFlags() & 2))
-		  if(!(md->rwFlags() & (dst ? 1 : 2)))
-		  {
-			delete pup;
-			return;
-		  }
-          
-		  //QString s(pup->text(n));
-		  //QT_TRANSLATE_NOOP("@default", md->name())
-          
-		  //Route srcRoute(s, false, -1);
-		  Route aRoute(md, ch);
-		  //Route srcRoute(md, -1);
-		  //Route dstRoute(track, -1);
-		  Route bRoute(track, ch);
-
-		  //if (track->type() == Track::AUDIO_INPUT)
-		  //      srcRoute.channel = dstRoute.channel = n & 0xf;
-		  iRoute iir = rl->begin();
-		  for (; iir != rl->end(); ++iir)
-		  {
-			//if(*iir == (dst ? bRoute : aRoute))
-			if(*iir == aRoute)
-				  break;
-		  }
-		  if (iir != rl->end())
-		  {
-			// disconnect
-			if(dst)
-			{
-			  //printf("Song::chooseMidiRoutes removing route src track name: %s dst device name: %s\n", track->name().toLatin1().constData(), md->name().toLatin1().constData());
-			  audio->msgRemoveRoute(bRoute, aRoute);
-			}
-			else
-			{
-			  //printf("Song::chooseMidiRoutes removing route src device name: %s dst track name: %s\n", md->name().toLatin1().constData(), track->name().toLatin1().constData());
-			  audio->msgRemoveRoute(aRoute, bRoute);
-			}
-		  }
-		  else
-		  {
-			// connect
-			if(dst)
-			{
-			  //printf("Song::chooseMidiRoutes adding route src track name: %s dst device name: %s\n", track->name().toLatin1().constData(), md->name().toLatin1().constData());
-			  audio->msgAddRoute(bRoute, aRoute);
-			}
-			else
-			{
-			  //printf("Song::chooseMidiRoutes adding route src device name: %s dst track name: %s\n", md->name().toLatin1().constData(), track->name().toLatin1().constData());
-			  audio->msgAddRoute(aRoute, bRoute);
-			}
-		  }
-          
-		  //printf("Song::chooseMidiRoutes calling msgUpdateSoloStates\n");
-		  audio->msgUpdateSoloStates();
-		  //printf("Song::chooseMidiRoutes calling song->update\n");
-		  song->update(SC_ROUTE);
-          
-		  // p3.3.46
-		  ///goto _redisplay;
-	}
-	delete pup;
-	parent->setDown(false);     // pup->exec() catches mouse release event
-	//printf("Song::chooseMidiRoutes end\n");
-    
-  //}  
-}
- */
-
 //---------------------------------------------------------
 // insertTrackView
 //    add a new trackview for the Composer
@@ -3756,20 +3559,20 @@ void Song::chooseMidiRoutes(QButton* parent, MidiTrack* track, bool dst)
 
 void Song::insertTrackView(TrackView* tv, int idx)
 {
-	iTrackView i = _tviews.index2iterator(idx);
-	_tviews.insert(i, tv);
-	updateTrackViews1();
+	_tviews[tv->id()] = tv;
+	m_trackViewIndex.insert(idx, tv->id());
+	//TODO: This should not be called update(SC_VIEW_ADDED) instead
+	updateTrackViews();
 }
 
 //---------------------------------------------------------
 //   cmdRemoveTrackView
 //---------------------------------------------------------
 
-void Song::cmdRemoveTrackView(TrackView* tv)
+void Song::cmdRemoveTrackView(qint64 id)
 {
-	//int idx = _tviews.index(tv);
 	//undoOp(UndoOp::DeleteTrackView, idx, tv);
-	removeTrackView(tv);
+	removeTrackView(id);
 	updateFlags |= SC_TRACKVIEW_REMOVED;
 }
 
@@ -3778,11 +3581,12 @@ void Song::cmdRemoveTrackView(TrackView* tv)
 //    add a new trackview for the Composer
 //---------------------------------------------------------
 
-void Song::removeTrackView(TrackView* tv)
+void Song::removeTrackView(qint64 id)
 {
-	_tviews.erase(tv);
+	_tviews.erase(_tviews.find(id));
+	m_trackViewIndex.removeAll(id);
 	update(SC_TRACKVIEW_REMOVED);
-	updateTrackViews1();
+	updateTrackViews();
 }
 
 //---------------------------------------------------------
@@ -3805,7 +3609,8 @@ TrackView* Song::addTrackView()/*{{{*/
 {
 	TrackView* tv = new TrackView();
 	tv->setDefaultName();
-	_tviews.push_back(tv);
+	_tviews[tv->id()] = tv;
+	m_trackViewIndex.append(tv->id());
 	//msgInsertTrackView(tv, -1, true);
 
 	return tv;
@@ -3816,13 +3621,10 @@ TrackView* Song::addTrackView()/*{{{*/
 //    find track view by name
 //---------------------------------------------------------
 
-TrackView* Song::findTrackView(const QString& name) const
+TrackView* Song::findTrackViewById(qint64 id) const
 {
-	for (ciTrackView i = _tviews.begin(); i != _tviews.end(); ++i)
-	{
-		if ((*i)->viewName() == name)
-			return *i;
-	}
+	if(_tviews.contains(id))
+		return _tviews.value(id);
 	return 0;
 }
 
@@ -3833,34 +3635,31 @@ TrackView* Song::findTrackView(const QString& name) const
 
 TrackView* Song::findAutoTrackView(const QString& name) const
 {
-	for (ciTrackView i = _autotviews.begin(); i != _autotviews.end(); ++i)
-	{
-		if ((*i)->viewName() == name)
-			return *i;
+	QHashIterator<qint64, TrackView*> iter(_autotviews);
+	while(iter.hasNext())
+	{	
+		iter.next();
+		if (iter.value()->viewName() == name)
+			return iter.value();
 	}
 	return 0;
 }
 
 
 //---------------------------------------------------------
-//   findTrackView
-//    find track view by name
+//   findTrackViewByTrackId
+//    find track view by track ID
 //---------------------------------------------------------
 
-TrackView* Song::findTrackView(Track* t)
+TrackView* Song::findTrackViewByTrackId(qint64 tid)
 {
-	for (ciTrackView i = _tviews.begin(); i != _tviews.end(); ++i)
-	{
-		TrackList* list = (*i)->tracks();
-		for(ciTrack ci = list->begin(); ci != list->end(); ++ci)
-		{
-			if((*ci)->name() == t->name())
-			{
-				TrackView* tv = dynamic_cast<TrackView*> (*i);
-				if(tv)
-					return tv;
-			}
-		}
+	QHashIterator<qint64, TrackView*> iter(_tviews);
+	while(iter.hasNext())
+	{	
+		iter.next();
+		QList<qint64> *list = iter.value()->tracks();
+		if(list->contains(tid))
+			return iter.value();
 	}
 	return 0;
 }
@@ -3868,31 +3667,21 @@ TrackView* Song::findTrackView(Track* t)
 //---------------------------------------------------------
 // updateTrackViews
 //---------------------------------------------------------
-void Song::updateTrackViews(QAction* act)
+void Song::updateTrackViews()
 {
-	TrackView* tv = findTrackView(act->text());
-	if(tv)
-	{
-		//printf("Song::updateTrackViews(QAction* act) \n");
-		tv->setSelected(act->isChecked());
-		song->dirty = true;
-		updateTrackViews1();
-	}
-}
-
-//---------------------------------------------------------
-// updateTrackViews
-//---------------------------------------------------------
-void Song::updateTrackViews1()
-{
-	//printf("Song::updateTrackViews1()\n");
-	//double start,end;
-	//start = omp_get_wtime();
+	//printf("Song::updateTrackViews()\n");
 	_viewtracks.clear();
+	m_trackIndex.clear();
+	m_composerTracks.clear();
 	//Create omnipresent Master track at top of all list.
 	Track* master = findTrack("Master");
 	if(master)
+	{
 		_viewtracks.push_back(master);
+		m_composerTracks[master->id()] = master;
+		m_viewTracks[master->id()] = master;
+		m_trackIndex.insert(0, master->id());
+	}
 	viewselected = false;
 	bool customview = false;
 	bool workview = false;
@@ -3909,77 +3698,74 @@ void Song::updateTrackViews1()
 		commentview = true;
 		viewselected = true;
 	}
-	//iTrackView it;
-	//TrackList* tl;
-	int vsize = (int)_tviews.size();
-//#pragma omp parallel for
-	//for(it = _tviews.begin(); it != _tviews.end(); ++it)
-	for(int p = 0; p < vsize; ++p)
+	foreach(qint64 tvid, m_trackViewIndex)
 	{
-		TrackView* it = _tviews[p];
-		if(it->selected())
+		TrackView* it = _tviews.value(tvid);
+		if(it && it->selected())
 		{
-			TrackList* tl = it->tracks();
-			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
+			QList<qint64> *tlist = it->tracks();
+			for(int i = 0; i < tlist->size(); ++i)
 			{
-				bool found = false;
-				(*t)->setSelected(false);
-				if((workview && (*t)->parts()->empty()) || (*t) == master) {
-					continue;
-				}
-				//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
-				for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
+				qint64 tid  = tlist->at(i);
+				Track *t = findTrackById(tid);
+				if(t)
 				{
-					if ((*i)->name() == (*t)->name())
+					bool found = false;
+					t->setSelected(false);
+					if((workview && t->parts()->empty()) || t == master) {
+						continue;
+					}
+					//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
+					if(m_viewTracks.contains(tid))
 					{
 						found = true;
 						//Make sure to record arm the ones that were in other views as well
-						(*t)->setRecordFlag1(it->record());
-						(*t)->setRecordFlag2(it->record());
-						break;
+						t->setRecordFlag1(it->record());
+						t->setRecordFlag2(it->record());
 					}
-				}
-				if(!found)
-				{
-					_viewtracks.push_back((*t));
-					(*t)->setRecordFlag1(it->record());
-					(*t)->setRecordFlag2(it->record());
-					customview = true;
-					viewselected = true;
+					if(!found)
+					{
+						_viewtracks.push_back(t);
+						m_viewTracks[tid] = t;
+						t->setRecordFlag1(it->record());
+						t->setRecordFlag2(it->record());
+						m_trackIndex.append(it->id());
+						customview = true;
+						viewselected = true;
+					}
 				}
 			}
 		}
 	}
 	
-	int asize = (int)_autotviews.size();
-//#pragma omp parallel for
-	//for(iTrackView ait = _autotviews.begin(); ait != _autotviews.end(); ++ait)
-	for(int p = 0; p < asize; ++p)
+	foreach(qint64 tvid, m_autoTrackViewIndex)
 	{
-		TrackView* ait = _autotviews[p];
-		if(customview && ait->viewName() == "Working View")
-			continue;
-		if(ait->selected())/*{{{*/
+		TrackView* ait = _autotviews.value(tvid);
+		if(customview && (ait && ait->viewName() == "Working View"))
 		{
-			TrackList* tl = tracks();
-			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
+			qDebug("Song::updateTrackViews: skipping working View");
+			continue;
+		}
+		if(ait && ait->selected())/*{{{*/
+		{
+			qDebug("Song::updateTrackViews: Selected View: %s", ait->viewName().toUtf8().constData());
+			QHashIterator<qint64, Track*> itr(m_tracks);
+			while(itr.hasNext())
 			{
+				itr.next();
+				Track* t = itr.value();
 				bool found = false;
-				(*t)->setSelected(false);
-				if((*t) == master)
-					continue;
-				for (ciTrack i = _viewtracks.begin(); i != _viewtracks.end(); ++i)
+				t->setSelected(false);
+				if(t == master)
 				{
-					if ((*i)->name() == (*t)->name())
-					{
-						found = true;
-						break;
-					}
+					continue;
 				}
+				if(m_viewTracks.contains(t->id()))
+					found = true;
 				if(!found)
 				{
 					viewselected = true;
-					switch((*t)->type())/*{{{*/
+					switch(t->type())/*{{{*/
 					{
 						case Track::MIDI:
 						case Track::DRUM:
@@ -3987,67 +3773,87 @@ void Song::updateTrackViews1()
 						case Track::WAVE:
 							if(ait->viewName() == "Working View")
 							{
-								if((*t)->parts()->empty())
+								if(t->parts()->empty())
 									break;
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							else if(ait->viewName() == "Comment View")
 							{
-								if((*t)->comment().isEmpty())
+								if(t->comment().isEmpty())
 									break;
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							break;
 						case Track::AUDIO_OUTPUT:
 							if(ait->viewName() == "Outputs View")
 							{
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							else if(ait->viewName() == "Comment View")
 							{
-								if((*t)->comment().isEmpty())
+								if(t->comment().isEmpty())
 									break;
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							break;
 						case Track::AUDIO_BUSS:
 							if(ait->viewName() == "Buss View")
 							{
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							else if(ait->viewName() == "Comment View")
 							{
-								if((*t)->comment().isEmpty())
+								if(t->comment().isEmpty())
 									break;
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							break;
 						case Track::AUDIO_AUX:
 							if(ait->viewName() == "Aux View")
 							{
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[t->id()] = t;
+								m_trackIndex.append(t->id());
 							}
 							else if(ait->viewName() == "Comment View")
 							{
-								if((*t)->comment().isEmpty())
+								if(t->comment().isEmpty())
 									break;
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							break;
 						case Track::AUDIO_INPUT:
 							if(ait->viewName() == "Inputs  View")
 							{
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							else if(ait->viewName() == "Comment View")
 							{
-								if((*t)->comment().isEmpty())
+								if(t->comment().isEmpty())
 									break;
-								_viewtracks.push_back((*t));
+								_viewtracks.push_back(t);
+								m_viewTracks[itr.key()] = t;
+								m_trackIndex.append(t->id());
 							}
 							break;
 						default:
-							fprintf(stderr, "unknown track type %d\n", (*t)->type());
+							fprintf(stderr, "unknown track type %d\n", t->type());
 							break;
 					}/*}}}*/
 				}
@@ -4060,18 +3866,15 @@ void Song::updateTrackViews1()
 		//Make the viewtracks the artracks
 		for(ciTrack it = _artracks.begin(); it != _artracks.end(); ++it)
 		{
-			//if((*it)->isMidiTrack() || (*it)->type() == Track::WAVE || (*it)->type() == Track::AUDIO_SOFTSYNTH)
-			//{
-				_viewtracks.push_back((*it));
-			//}
+			_viewtracks.push_back((*it));
+			m_viewTracks[(*it)->id()] = (*it);
+			m_trackIndex.append((*it)->id());
 		}
 	}
-	//end = omp_get_wtime();
-	//printf("Song::updateTrackViews1() took %f seconds to run\n", end-start);
+	//printf("Song::updateTrackViews() took %f seconds to run\n", end-start);
 	disarmAllTracks();
 	if(!invalid)
 		emit composerViewChanged();
-		//emit songChanged(SC_VIEW_CHANGED);//We will use this for now but I think we need to define a new one SC_VIEW_CHANGED ?
 }
 
 //---------------------------------------------------------
@@ -4169,6 +3972,8 @@ void Song::insertTrackRealtime(Track* track, int idx)
 	//printf("Song::insertTrackRealtime inserting into _tracks...\n");
 
 	_tracks.insert(i, track);
+	m_tracks[track->id()] = track;
+	m_trackIndex.insert(idx, track->id());
 	//printf("Song::insertTrackRealtime inserted\n");
 
 	n = _auxs.size();
@@ -4339,19 +4144,21 @@ void Song::removeTrackRealtime(Track* track)
 			break;
 	}
 	_tracks.erase(track);
-	TrackView* tv = findTrackView(track);
+	m_tracks.erase(m_tracks.find(track->id()));
+	m_trackIndex.removeAll(track->id());
+	TrackView* tv = findTrackViewById(track->id());
 	bool updateview = false;
 	while(tv)
 	{
 		updateview = true;
-		TrackList* tvl = tv->tracks();
+		QList<qint64> *tvl = tv->tracks();
 		if(tvl)
 		{
-			tvl->erase(track);
+			tvl->removeAll(track->id());
 		}
-		tv = findTrackView(track);
+		tv = findTrackViewById(track->id());
 	}
-	updateTrackViews1();
+	updateTrackViews();
 
 
 	//

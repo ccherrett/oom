@@ -33,67 +33,78 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 {
 	if(flag & (SC_VIEW_CHANGED | SC_VIEW_DELETED | SC_VIEW_ADDED) || flag == -1)
 	{
-		//m_selectList.clear();
-		TrackViewList* tviews = song->trackviews();
 		_tableModel->clear();
-		for(iTrackView it = tviews->begin(); it != tviews->end(); ++it)
+		QList<qint64> *idlist = song->trackViewIndexList();
+		TrackViewList* tvlist = song->trackviews();
+		for(int i = 0; i < idlist->size(); ++i)
 		{
-			QList<QStandardItem*> rowData;
-			QStandardItem *chk = new QStandardItem(true);
-			chk->setCheckable(true);
-			if(startup)
+			qint64 tvid = idlist->at(i);
+			TrackView* view = tvlist->value(tvid);
+			if(view)
 			{
-				chk->setCheckState((*it)->selected() ? Qt::Checked : Qt::Unchecked);
-				if((*it)->selected())
-					m_selectList.append((*it)->viewName());
+				QList<QStandardItem*> rowData;
+				QStandardItem *chk = new QStandardItem(true);
+				chk->setCheckable(true);
+				if(startup)
+				{
+					chk->setCheckState(view->selected() ? Qt::Checked : Qt::Unchecked);
+					if(view->selected())
+						m_selectList.append(view->id());
+				}
+				else
+				{
+					chk->setCheckState(m_selectList.contains(view->id()) ? Qt::Checked : Qt::Unchecked);
+				}
+				QStandardItem *tname = new QStandardItem(view->viewName());
+				tname->setData(view->id());
+				rowData.append(chk);
+				rowData.append(tname);
+				_tableModel->blockSignals(true);
+				_tableModel->insertRow(_tableModel->rowCount(), rowData);
+				_tableModel->blockSignals(false);
+				tableView->setRowHeight(_tableModel->rowCount(), 25);
 			}
-			else
-			{
-				chk->setCheckState(m_selectList.contains((*it)->viewName()) ? Qt::Checked : Qt::Unchecked);
-			}
-			QStandardItem *tname = new QStandardItem((*it)->viewName());
-			rowData.append(chk);
-			rowData.append(tname);
-			_tableModel->blockSignals(true);
-			_tableModel->insertRow(_tableModel->rowCount(), rowData);
-			_tableModel->blockSignals(false);
-			tableView->setRowHeight(_tableModel->rowCount(), 25);
 		}
 		_autoTableModel->clear();
-		int index = 0;
 		int icon_index = 0;
 		QList<int> list;
 		list << Track::MIDI << Track::AUDIO_INPUT << Track::AUDIO_OUTPUT << Track::AUDIO_BUSS << Track::AUDIO_AUX << Track::WAVE;
-		for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++index,++ait)
+		idlist = song->autoTrackViewIndexList();
+		tvlist = song->autoviews();
+		for(int i = 0; i < idlist->size(); ++i)
 		{
-			QList<QStandardItem*> rowData2;
-			QStandardItem *chk = new QStandardItem(true);
-			chk->setCheckable(true);
-			if(startup)
+			qint64 tvid = idlist->at(i);
+			TrackView* view = tvlist->value(tvid);
+			if(view)
 			{
-				chk->setCheckState((*ait)->selected() ? Qt::Checked : Qt::Unchecked);
-				if((*ait)->selected())
-					m_selectList.append((*ait)->viewName());
+				QList<QStandardItem*> rowData2;
+				QStandardItem *chk = new QStandardItem(true);
+				chk->setCheckable(true);
+				if(startup)
+				{
+					chk->setCheckState(view->selected() ? Qt::Checked : Qt::Unchecked);
+					if(view->selected())
+						m_selectList.append(view->id());
+				}
+				else
+				{
+					chk->setCheckState(m_selectList.contains(view->id()) ? Qt::Checked : Qt::Unchecked);
+				}
+				QStandardItem *tname = new QStandardItem(view->viewName());
+				tname->setData(view->id());
+				if(view->viewName() != "Working View" && view->viewName() != "Comment View")
+				{
+					chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(i)))));
+					tname->setIcon(m_icons.at(icon_index));
+					++icon_index;
+				}
+				rowData2.append(chk);
+				rowData2.append(tname);
+				_autoTableModel->blockSignals(true);
+				_autoTableModel->insertRow(_autoTableModel->rowCount(), rowData2);
+				_autoTableModel->blockSignals(false);
+				autoTable->setRowHeight(_autoTableModel->rowCount(), 25);
 			}
-			else
-			{
-				chk->setCheckState(m_selectList.contains((*ait)->viewName()) ? Qt::Checked : Qt::Unchecked);
-			}
-			//chk->setCheckState((*ait)->selected() ? Qt::Checked : Qt::Unchecked);
-			QStandardItem *tname = new QStandardItem((*ait)->viewName());
-			if((*ait)->viewName() != "Working View" && (*ait)->viewName() != "Comment View")
-			{
-				chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
-				//tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
-				tname->setIcon(m_icons.at(icon_index));
-				++icon_index;
-			}
-			rowData2.append(chk);
-			rowData2.append(tname);
-			_autoTableModel->blockSignals(true);
-			_autoTableModel->insertRow(_autoTableModel->rowCount(), rowData2);
-			_autoTableModel->blockSignals(false);
-			autoTable->setRowHeight(_autoTableModel->rowCount(), 25);
 		}
 		updateTrackList();
 		updateTableHeader();
@@ -111,18 +122,18 @@ void MixerView::trackviewChanged(QStandardItem *item)/*{{{*/
 		QStandardItem *chk = _tableModel->item(row, 0);
 		if(tname)
 		{
-			TrackView* tv = song->findTrackView(tname->text());
+			TrackView* tv = song->findTrackViewById(tname->data().toLongLong());
 			if(tv)
 			{
 				if(chk->checkState() == Qt::Checked)
 				{
-					if(!m_selectList.contains(tv->viewName()))
-						m_selectList.append(tv->viewName());
+					if(!m_selectList.contains(tv->id()))
+						m_selectList.append(tv->id());
 				}
 				else
 				{
-					if(m_selectList.contains(tv->viewName()))
-						m_selectList.removeAt(m_selectList.indexOf(tv->viewName()));
+					if(m_selectList.contains(tv->id()))
+						m_selectList.removeAt(m_selectList.indexOf(tv->id()));
 				}
 				updateTrackList();
 			}
@@ -145,13 +156,13 @@ void MixerView::autoTrackviewChanged(QStandardItem *item)/*{{{*/
 				//printf("MixerView::autoTrackviewChanged: %s\n", tname->text().toLatin1().constData());
 				if(chk->checkState() == Qt::Checked)
 				{
-					if(!m_selectList.contains(tv->viewName()))
-						m_selectList.append(tv->viewName());
+					if(!m_selectList.contains(tv->id()))
+						m_selectList.append(tv->id());
 				}
 				else
 				{
-					if(m_selectList.contains(tv->viewName()))
-						m_selectList.removeAt(m_selectList.indexOf(tv->viewName()));
+					if(m_selectList.contains(tv->id()))
+						m_selectList.removeAt(m_selectList.indexOf(tv->id()));
 				}
 				updateTrackList();
 			}
@@ -185,129 +196,150 @@ void MixerView::updateTrackList()/*{{{*/
 		commentview = true;
 		viewselected = true;
 	}
-	for(iTrackView it = song->trackviews()->begin(); it != song->trackviews()->end(); ++it)
+	//TODO: change this to use the Song::trackViewIndexList()
+	QHash<qint64, TrackView*>::const_iterator iter = song->trackviews()->constBegin();
+	while(iter != song->trackviews()->constEnd())
 	{
-		if(m_selectList.contains((*it)->viewName()))
+		TrackView *view = iter.value();
+		if(view)
 		{
-			TrackList* tl = (*it)->tracks();
-			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
+			if(m_selectList.contains(view->id()))
 			{
-				bool found = false;
-				if(workview && (*t)->parts()->empty()) {
-					continue;
-				}
-				for (ciTrack i = m_tracklist.begin(); i != m_tracklist.end(); ++i)
+				QList<qint64> *tlist = view->tracks();
+				for(int t = 0; t < tlist->size(); ++t)
 				{
-					if ((*i)->name() == (*t)->name())
+					Track *track = song->findTrackById(tlist->at(t));
+					if(track)
 					{
-						found = true;
-						break;
+						bool found = false;
+						if(workview && track->parts()->empty()) {
+							++iter;
+							continue;
+						}
+						for (ciTrack i = m_tracklist.begin(); i != m_tracklist.end(); ++i)
+						{
+							if ((*i)->id() == track->id())
+							{
+								found = true;
+								break;
+							}
+						}
+						if(!found && track->name() != "Master")
+						{
+							m_tracklist.push_back(track);
+							customview = true;
+							viewselected = true;
+						}
 					}
-				}
-				if(!found && (*t)->name() != "Master")
-				{
-					m_tracklist.push_back((*t));
-					customview = true;
-					viewselected = true;
 				}
 			}
 		}
+		++iter;
 	}
-	for(iTrackView ait = song->autoviews()->begin(); ait != song->autoviews()->end(); ++ait)
+	iter = song->autoviews()->constBegin();
+	while(iter != song->autoviews()->constEnd())
 	{
-		if(customview && (*ait)->viewName() == "Working View")
-			continue;
-		if(m_selectList.contains((*ait)->viewName()))/*{{{*/
+		TrackView *view = iter.value();
+		if(view)
 		{
-			TrackList* tl = song->tracks();
-			for(ciTrack t = tl->begin(); t != tl->end(); ++t)
+			if(customview && view->viewName() == "Working View")
 			{
-				bool found = false;
-				for (ciTrack i = m_tracklist.begin(); i != m_tracklist.end(); ++i)
+				++iter;
+				continue;
+			}
+			if(m_selectList.contains(view->id()))/*{{{*/
+			{
+				TrackList* tl = song->tracks();
+				for(ciTrack t = tl->begin(); t != tl->end(); ++t)
 				{
-					if ((*i)->name() == (*t)->name())
+					bool found = false;
+					for (ciTrack i = m_tracklist.begin(); i != m_tracklist.end(); ++i)
 					{
-						found = true;
-						break;
+						if ((*i)->id() == (*t)->id())
+						{
+							found = true;
+							break;
+						}
+					}
+					if(!found)
+					{
+						viewselected = true;
+						switch((*t)->type())/*{{{*/
+						{
+							case Track::MIDI:
+							case Track::DRUM:
+							case Track::AUDIO_SOFTSYNTH:
+							case Track::WAVE:
+								if(view->viewName() == "Working View")
+								{
+									if((*t)->parts()->empty())
+										break;
+									m_tracklist.push_back((*t));
+								}
+								else if(view->viewName() == "Comment View")
+								{
+									if((*t)->comment().isEmpty())
+										break;
+									m_tracklist.push_back((*t));
+								}
+								break;
+							case Track::AUDIO_OUTPUT:
+								if(view->viewName() == "Outputs View" && (*t)->name() != "Master")
+								{
+									m_tracklist.push_back((*t));
+								}
+								else if(view->viewName() == "Comment View" && (*t)->name() != "Master")
+								{
+									if((*t)->comment().isEmpty())
+										break;
+									m_tracklist.push_back((*t));
+								}
+								break;
+							case Track::AUDIO_BUSS:
+								if(view->viewName() == "Buss View")
+								{
+									m_tracklist.push_back((*t));
+								}
+								else if(view->viewName() == "Comment View")
+								{
+									if((*t)->comment().isEmpty())
+										break;
+									m_tracklist.push_back((*t));
+								}
+								break;
+							case Track::AUDIO_AUX:
+								if(view->viewName() == "Aux View")
+								{
+									m_tracklist.push_back((*t));
+								}
+								else if(view->viewName() == "Comment View")
+								{
+									if((*t)->comment().isEmpty())
+										break;
+									m_tracklist.push_back((*t));
+								}
+								break;
+							case Track::AUDIO_INPUT:
+								if(view->viewName() == "Inputs  View")
+								{
+									m_tracklist.push_back((*t));
+								}
+								else if(view->viewName() == "Comment View")
+								{
+									if((*t)->comment().isEmpty())
+										break;
+									m_tracklist.push_back((*t));
+								}
+								break;
+							default:
+								fprintf(stderr, "unknown track type %d\n", (*t)->type());
+								return;
+						}/*}}}*/
 					}
 				}
-				if(!found)
-				{
-					viewselected = true;
-					switch((*t)->type())/*{{{*/
-					{
-						case Track::MIDI:
-						case Track::DRUM:
-						case Track::AUDIO_SOFTSYNTH:
-						case Track::WAVE:
-							if((*ait)->viewName() == "Working View")
-							{
-								if((*t)->parts()->empty())
-									break;
-								m_tracklist.push_back((*t));
-							}
-							else if((*ait)->viewName() == "Comment View")
-							{
-								if((*t)->comment().isEmpty())
-									break;
-								m_tracklist.push_back((*t));
-							}
-							break;
-						case Track::AUDIO_OUTPUT:
-							if((*ait)->viewName() == "Outputs View" && (*t)->name() != "Master")
-							{
-								m_tracklist.push_back((*t));
-							}
-							else if((*ait)->viewName() == "Comment View" && (*t)->name() != "Master")
-							{
-								if((*t)->comment().isEmpty())
-									break;
-								m_tracklist.push_back((*t));
-							}
-							break;
-						case Track::AUDIO_BUSS:
-							if((*ait)->viewName() == "Buss View")
-							{
-								m_tracklist.push_back((*t));
-							}
-							else if((*ait)->viewName() == "Comment View")
-							{
-								if((*t)->comment().isEmpty())
-									break;
-								m_tracklist.push_back((*t));
-							}
-							break;
-						case Track::AUDIO_AUX:
-							if((*ait)->viewName() == "Aux View")
-							{
-								m_tracklist.push_back((*t));
-							}
-							else if((*ait)->viewName() == "Comment View")
-							{
-								if((*t)->comment().isEmpty())
-									break;
-								m_tracklist.push_back((*t));
-							}
-							break;
-						case Track::AUDIO_INPUT:
-							if((*ait)->viewName() == "Inputs  View")
-							{
-								m_tracklist.push_back((*t));
-							}
-							else if((*ait)->viewName() == "Comment View")
-							{
-								if((*t)->comment().isEmpty())
-									break;
-								m_tracklist.push_back((*t));
-							}
-							break;
-						default:
-							fprintf(stderr, "unknown track type %d\n", (*t)->type());
-							return;
-					}/*}}}*/
-				}
-			}
-		}/*}}}*/
+			}/*}}}*/
+		}
+		++iter;
 	}
 	if(!viewselected)
 	{

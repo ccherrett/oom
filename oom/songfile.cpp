@@ -941,10 +941,16 @@ void Song::read(Xml& xml)
 					tv->read(xml);
 					if(tv->selected())
 					{
-						TrackList* tvl = tv->tracks();
-						for(ciTrack it = tvl->begin(); it != tvl->end(); ++it)
+						QList<qint64> *tlist = tv->tracks();
+						for(int i = 0;  i < tlist->size(); ++i)
 						{
-							_viewtracks.push_back((*it));
+							Track *it = findTrackById(tlist->at(i));
+							if(it)
+							{
+								_viewtracks.push_back(it);
+								m_viewTracks[it->id()] = it;
+								m_trackIndex.append(it->id());
+							}
 						}
 					}
 					insertTrackView(tv, -1);
@@ -957,8 +963,8 @@ void Song::read(Xml& xml)
 			case Xml::TagEnd:
 				if (tag == "song")
 				{
-					//Call song->updateTrackViews1() to update the canvas and headers
-					updateTrackViews1();
+					//Call song->updateTrackViews() to update the canvas and headers
+					updateTrackViews();
 					if(gUpdateAuxes)
 					{
 						updateAuxIndex();
@@ -1154,99 +1160,6 @@ void Song::write(int level, Xml& xml) const
 	//  so that pasting works properly after.
 	cloneList.clear();
 	cloneList = copyCloneList;
-}
-
-//---------------------------------------------------------
-//   TrackView::write
-//---------------------------------------------------------
-
-void TrackView::write(int level, Xml& xml) const /*{{{*/
-{
-	std::string tag = "trackview";
-
-	xml.put(level, "<%s>", tag.c_str());//, _name.toStdString().c_str(), _selected, _type);
-	level++;
-	xml.strTag(level, "name", _name);
-	xml.intTag(level, "selected", _selected);
-	xml.intTag(level, "record", _recState);
-	if(!_comment.isEmpty())
-		xml.strTag(level, "comment", Xml::xmlString(_comment).toUtf8().constData());
-
-	//for(iTrack* t = _tracks.begin(); t != _tracks.end(); ++t)
-	for (ciTrack t = _tracks.begin(); t != _tracks.end(); ++t)
-	{
-		xml.strTag(level, "vtrack", (*t)->name());
-	}
-	QMap<QString, TrackSettings*>::ConstIterator ts;
-	for(ts = _tSettings.begin(); ts != _tSettings.end(); ++ts)
-	{
-		//if((*ts).valid)
-			(*ts)->write(level, xml);
-	}
-    xml.put(--level, "</%s>", tag.c_str());
-}/*}}}*/
-
-void TrackSettings::write(int level, Xml& xml) const
-{
-	std::string tag = "tracksettings";
-	xml.put(level, "<%s>", tag.c_str());
-	xml.strTag(level, "trackname", track->name().toUtf8().constData());
-	xml.strTag(level, "pname", pname.toUtf8().constData());
-	xml.intTag(level, "program", program);
-	xml.intTag(level, "rec", rec);
-	xml.intTag(level, "transpose", transpose);
-    xml.put(--level, "</%s>", tag.c_str());
-}
-
-void TrackSettings::read(Xml& xml)
-{
-	program = -1;
-	rec = 0;
-	pname = QString("");
-	track = 0;
-	transpose = 0;
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return;
-			case Xml::TagStart:
-				if(tag == "pname")
-				{
-					pname = xml.parse1();
-				}
-				else if(tag == "trackname")
-				{
-					Track *t = song->findTrack(xml.parse1());
-					if(t)
-						track = t;
-				}
-				else if(tag == "rec")
-				{
-					rec = (bool)xml.parseInt();
-				}
-				else if(tag == "program")
-				{
-					program = (bool)xml.parseInt();
-				}
-				else if(tag == "transpose")
-				{
-					transpose = xml.parseInt();
-				}
-				break;
-			case Xml::Attribut:
-				break;
-			case Xml::TagEnd:
-				if(tag == "tracksettings")
-					return;
-			default:
-				break;
-		}
-	}
 }
 
 //---------------------------------------------------------
