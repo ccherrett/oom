@@ -380,16 +380,8 @@ static void readConfigMidiPort(Xml& xml)
                 {
                     if (dev && type == MidiDevice::SYNTH_MIDI)
                     {
-                        SynthPluginDevice* synth = (SynthPluginDevice*)dev;
-                        BasePlugin* oldPlugin = synth->plugin();
-                        
-                        // create a new synth device if needed
-                        if (oldPlugin)
-                        {
-                            synth = new SynthPluginDevice(oldPlugin->type(), oldPlugin->filename(), oldPlugin->name(), oldPlugin->label(), true);
-                            dev = synth;
-                            midiDevices.add(dev);
-                        }
+                        SynthPluginDevice* oldSynth = (SynthPluginDevice*)dev;
+                        SynthPluginDevice* synth = oldSynth->clone();
 
                         synth->open();
                         // get into the plugin type

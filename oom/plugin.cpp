@@ -296,6 +296,20 @@ void SynthPluginDevice::setPluginName(const QString& s)
 }
 
 //---------------------------------------------------------
+//   getAudioOutputPortName
+//---------------------------------------------------------
+
+QString SynthPluginDevice::getAudioOutputPortName(uint32_t index)
+{
+    if (m_plugin)
+    {
+        qWarning("SynthPluginDevice::getAudioOutputPortName()");
+        return m_plugin->getAudioOutputPortName(index);
+    }
+    return QString("");
+}
+
+//---------------------------------------------------------
 //   writeRouting
 //---------------------------------------------------------
 

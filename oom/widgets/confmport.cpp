@@ -756,14 +756,8 @@ _redisplay:
                         // create a new synth device if needed
                         if (typ == MidiDevice::SYNTH_MIDI)
                         {
-                            SynthPluginDevice* synth = (SynthPluginDevice*)sdev;
-                            BasePlugin* plugin = synth->plugin();
-
-                            if (plugin)
-                            {    
-                                sdev = new SynthPluginDevice(plugin->type(), plugin->filename(), plugin->name(), plugin->label(), true);
-                                midiDevices.add(sdev);
-                            }
+                            SynthPluginDevice* oldSynth = (SynthPluginDevice*)sdev;
+                            sdev = oldSynth->clone();
                         }
                     }
 				}

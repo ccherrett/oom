@@ -74,8 +74,9 @@ const unsigned int PARAMETER_USES_SAMPLERATE   = 0x80;
 enum PluginType {
     PLUGIN_NONE   = 0,
     PLUGIN_LADSPA = 1,
-    PLUGIN_LV2    = 2,
-    PLUGIN_VST    = 3
+    PLUGIN_DSSI   = 2,
+    PLUGIN_LV2    = 3,
+    PLUGIN_VST    = 4
 };
 
 enum ParameterType {
@@ -255,6 +256,14 @@ public:
     PluginGui* gui()
     {
         return m_gui;
+    }
+    
+    // needed for synth monitors
+    QString getAudioOutputPortName(uint32_t index)
+    {
+        if (index < m_aoutsCount)
+            return QString(jack_port_name(m_portsOut[index]));
+        return QString("");
     }
 
     uint32_t getParameterCount()
@@ -690,6 +699,13 @@ public:
     SynthPluginDevice(PluginType type, QString filename, QString name, QString label, bool duplicated = false);
     ~SynthPluginDevice();
 
+    SynthPluginDevice* clone()
+    {
+        SynthPluginDevice* synth = new SynthPluginDevice(m_type, m_filename, m_name, m_label, true);
+        midiDevices.add(synth);
+        return synth;
+    }
+
     virtual int deviceType()
     {
         return MidiDevice::SYNTH_MIDI;
@@ -734,6 +750,7 @@ public:
     virtual void close();
     virtual void setName(const QString& s);
     void setPluginName(const QString& s);
+    QString getAudioOutputPortName(uint32_t index);
 
     virtual void writeRouting(int, Xml&) const;
 

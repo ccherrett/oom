@@ -127,6 +127,37 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		case Track::MIDI:
 		case Track::DRUM:
 		{/*{{{*/
+            int instrumentType = cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
+            QString instrumentName = cmbInstrument->itemData(instrumentIndex, InstrumentNameRole).toString();
+            QString selectedInput;
+            
+            if (instrumentType == TrackManager::SYNTH_INSTRUMENT)
+            {
+                qWarning("Add Synth: %s", instrumentName.toUtf8().constData());
+
+                for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+                {
+                    qWarning("HERE 001");
+                    if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                    {
+                        qWarning("HERE 002");
+                        SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
+                        SynthPluginDevice* synth = oldSynth->clone();
+                        qWarning("HERE 003");
+
+                        synth->setPluginName(txtName->text());
+                        synth->open();
+                        
+                        if (cmbMonitor->itemText(monitorIndex) == txtName->text()+":(output-ports)")
+                        {
+                            selectedInput = synth->getAudioOutputPortName(0);
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+
 			m_vtrack->autoCreateInstrument = chkAutoCreate->isChecked();
 			//Process Input connections
 			if(inputIndex >= 0 && chkInput->isChecked())
@@ -168,8 +199,8 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				m_vtrack->outputChannel = outChan;
 				if(m_createMidiOutputDevice)
 				{
-					QString instrumentName = cmbInstrument->itemData(instrumentIndex, InstrumentNameRole).toString();
-					m_vtrack->instrumentType = cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
+					//QString instrumentName = cmbInstrument->itemData(instrumentIndex, InstrumentNameRole).toString();
+					m_vtrack->instrumentType = instrumentType; //cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
 					m_vtrack->instrumentName = instrumentName;
 				}
 			}
@@ -177,8 +208,9 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			if(monitorIndex >= 0 && midiBox->isChecked())
 			{
 				int iBuss = cmbBuss->itemData(bussIndex).toInt();
-				QString selectedInput = cmbMonitor->itemText(monitorIndex);
 				QString selectedBuss = cmbBuss->itemText(bussIndex);
+                if (selectedInput.isEmpty())
+                    selectedInput = cmbMonitor->itemText(monitorIndex);
 				m_vtrack->useMonitor = true;
 				m_vtrack->monitorConfig = qMakePair(0, selectedInput);
 				if(chkBuss->isChecked())
@@ -186,6 +218,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
 					m_vtrack->useBuss = true;
 					m_vtrack->bussConfig = qMakePair(iBuss, selectedBuss);
 				}
+                qWarning("TEST %s | %s", selectedInput.toUtf8().constData(), selectedBuss.toUtf8().constData());
 			}
 		}/*}}}*/
 		break;
@@ -434,6 +467,7 @@ void CreateTrackDialog::updateInstrument(int index)
                         {
 #if 0
                             SynthPluginDevice* synth = (SynthPluginDevice*)(*i);
+                            // this is now wrong
 
                             // create a new synth device if needed
                             if (synth->plugin())
