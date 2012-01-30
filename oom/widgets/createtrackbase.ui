@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>450</width>
-    <height>289</height>
+    <height>295</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -221,8 +221,7 @@
    <item row="5" column="0" colspan="2">
     <widget class="QGroupBox" name="midiBox">
      <property name="toolTip">
-      <string>Add Audio Input  tracks and Busses for monitoring output from LinuxSampler
-This is required for tracks connected to LinuxSampler , if not previously configured.</string>
+      <string/>
      </property>
      <property name="title">
       <string>Midi Audio Routing</string>

@@ -16,7 +16,7 @@ class QPoint;
 class MixerView : public TrackViewDock
 {
 	Q_OBJECT
-	QList<QString> m_selectList;
+	QList<qint64> m_selectList;
 	TrackList m_tracklist;
 
 	protected:

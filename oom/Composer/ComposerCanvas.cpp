@@ -658,7 +658,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		song->setLen(dpart->lenTick() + dpart->tick());
 	//endUndo(t);
 	if(newdest || track->parts()->empty())
-		song->updateTrackViews1();
+		song->updateTrackViews();
 		//emit tracklistChanged();
 	return true;
 }
@@ -1105,7 +1105,6 @@ void ComposerCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 			}
 			song->startUndo();
 			// Indicate no undo, and do port controller values but not clone parts.
-			//audio->msgChangePart(spart, dpart, false);
 			audio->msgChangePart(spart, dpart, false, true, false);
 			//printf("ComposerCanvas::itemPopup: #2 spart %s %p next:%s %p prev:%s %p\n", spart->name().toLatin1().constData(), spart, spart->nextClone()->name().toLatin1().constData(), spart->nextClone(), spart->prevClone()->name().toLatin1().constData(), spart->prevClone());
 			//printf("ComposerCanvas::itemPopup: #2 dpart %s %p next:%s %p prev:%s %p\n", dpart->name().toLatin1().constData(), dpart, dpart->nextClone()->name().toLatin1().constData(), dpart->nextClone(), dpart->prevClone()->name().toLatin1().constData(), dpart->prevClone());
@@ -1759,6 +1758,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)
 	{
 		if (key == Qt::Key_Return || key == Qt::Key_Enter)
 		{
+			//qDebug("ComposerCanvas::keyPress Qt::Key_Return pressed");
 			returnPressed();
 			return;
 		}
@@ -1769,6 +1769,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)
 			return;
 		}
 	}
+	//qDebug("ComposerCanvas::keyPress Not editing");
 
 	if (event->modifiers() & Qt::ShiftModifier)
 		key += Qt::SHIFT;

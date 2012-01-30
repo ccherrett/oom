@@ -35,17 +35,20 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	QItemSelectionModel *m_selmodel;
 
 	QStringList _trackTypes;
-	QPushButton* btnAdd;
-	QPushButton* btnRemove;
+	//QPushButton* btnAdd;
+	//QPushButton* btnRemove;
 	QPushButton* btnOk;
 	QPushButton* btnCancel;
 	QPushButton* btnApply;
 
+	void buildViewList();
+
 private slots:
 	void cmbViewSelected(int);
 	void cmbTypeSelected(int);
-	void btnAddTrack(bool);
-	void btnRemoveTrack(bool);
+	void btnAddTrack();
+	void btnAddVirtualTrack();
+	void btnRemoveTrack();
 	void btnNewClicked(bool);
 	void btnOkClicked(bool);
 	void btnApplyClicked(bool);
@@ -71,9 +74,6 @@ public:
 	QStringList trackTypes(){return _trackTypes;}
 	TrackViewList* views(){return _viewList;}
 
-
-private:
-	QStringList buildViewList();
 };
 
 #endif

@@ -1172,26 +1172,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	menuEdit->addSeparator();
 
-
-	//menuEdit->addMenu(midiEdit);
-#if 0  // TODO
-	midiEdit->insertItem(tr("Modify Gate Time"), this, SLOT(modifyGateTime()));
-	midiEdit->insertItem(tr("Modify Velocity"), this, SLOT(modifyVelocity()));
-	midiEdit->insertItem(tr("Crescendo"), this, SLOT(crescendo()));
-	midiEdit->insertItem(tr("Transpose"), this, SLOT(transpose()));
-	midiEdit->insertItem(tr("Thin Out"), this, SLOT(thinOut()));
-	midiEdit->insertItem(tr("Erase Event"), this, SLOT(eraseEvent()));
-	midiEdit->insertItem(tr("Note Shift"), this, SLOT(noteShift()));
-	midiEdit->insertItem(tr("Move Clock"), this, SLOT(moveClock()));
-	midiEdit->insertItem(tr("Copy Measure"), this, SLOT(copyMeasure()));
-	midiEdit->insertItem(tr("Erase Measure"), this, SLOT(eraseMeasure()));
-	midiEdit->insertItem(tr("Delete Measure"), this, SLOT(deleteMeasure()));
-	midiEdit->insertItem(tr("Create Measure"), this, SLOT(createMeasure()));
-	midiEdit->insertItem(tr("Mix Track"), this, SLOT(mixTrack()));
-#endif
-	//midiEdit->addAction(midiTransposeAction);
-	//midiEdit->addAction(midiTransformerAction);
-
 	//-------------------------------------------------------------
 	//    popup View
 	//-------------------------------------------------------------
@@ -3354,14 +3334,6 @@ void OOMidi::kbAccel(int key)
 	{
 		toggleMixer1(!viewMixerAAction->isChecked());
 	}
-	/*else if (key == shortcuts[SHRT_OPEN_MIXER2].key)
-	{
-		//toggleMixer2(!viewMixerBAction->isChecked());
-	}
-	else if(key == shortcuts[SHRT_OPEN_ROUTES].key)
-	{
-		toggleRoutes(true);//!viewRoutesAction->isChecked());
-	}*/
 	else if (key == shortcuts[SHRT_NEXT_MARKER].key)
 	{
 		if (markerView)
@@ -3378,71 +3350,6 @@ void OOMidi::kbAccel(int key)
 			printf("unknown kbAccel 0x%x\n", key);
 	}
 }
-
-//---------------------------------------------------------
-//   catchSignal
-//    only for debugging
-//---------------------------------------------------------
-
-#if 0
-
-static void catchSignal(int sig)
-{
-	if (debugMsg)
-		fprintf(stderr, "OOMidi: signal %d catched\n", sig);
-	if (sig == SIGSEGV)
-	{
-		fprintf(stderr, "OOMidi: segmentation fault\n");
-		abort();
-	}
-	if (sig == SIGCHLD)
-	{
-		M_DEBUG("caught SIGCHLD - child died\n");
-		int status;
-		int n = waitpid(-1, &status, WNOHANG);
-		if (n > 0)
-		{
-			fprintf(stderr, "SIGCHLD for unknown process %d received\n", n);
-		}
-	}
-}
-#endif
-
-#if 0
-//---------------------------------------------------------
-//   configPart
-//---------------------------------------------------------
-
-void OOMidi::configPart(int id)
-{
-	if (id < 3)
-	{
-		partConfig->setItemChecked(0, id == 0);
-		partConfig->setItemChecked(1, id == 1);
-		partConfig->setItemChecked(2, id == 2);
-		composer->setShowPartType(id);
-		for (int i = 3; i < 10; ++i)
-		{
-			partConfig->setItemEnabled(i, id == 2);
-		}
-	}
-	else
-	{
-		bool flag = !partConfig->isItemChecked(id);
-		partConfig->setItemChecked(id, flag);
-		int val = composer->showPartEvent();
-		if (flag)
-		{
-			val |= 1 << (id - 3);
-		}
-		else
-		{
-			val &= ~(1 << (id - 3));
-		}
-		composer->setShowPartEvent(val);
-	}
-}
-#endif
 
 //---------------------------------------------------------
 //   cmd
@@ -4156,21 +4063,6 @@ bool OOMidi::checkRegionNotNull()
 	return false;
 }
 
-#if 0
-//---------------------------------------------------------
-//   openAudioFileManagement
-//---------------------------------------------------------
-
-void OOMidi::openAudioFileManagement()
-{
-	if (!audioFileManager)
-	{
-		audioFileManager = new AudioFileManager(this, "audiofilemanager", false);
-		audioFileManager->show();
-	}
-	audioFileManager->setVisible(true);
-}
-#endif
 //---------------------------------------------------------
 //   bounceToTrack
 //---------------------------------------------------------

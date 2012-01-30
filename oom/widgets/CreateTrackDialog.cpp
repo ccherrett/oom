@@ -99,7 +99,7 @@ void CreateTrackDialog::initDefaults()
 	//connect(cmbInstrument, SIGNAL(currentIndexChanged(int)), this, SLOT(updateInstrument(int)));
 	connect(cmbInstrument, SIGNAL(activated(int)), this, SLOT(updateInstrument(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
-	connect(txtName, SIGNAL(textEdited(QString)), this, SLOT(trackNameEdited()));
+	connect(txtName, SIGNAL(editingFinished()/*textEdited(QString)*/), this, SLOT(trackNameEdited()));
 	connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSelected()));
 	txtName->setFocus(Qt::OtherFocusReason);
 }
@@ -537,19 +537,20 @@ void CreateTrackDialog::trackTypeChanged(int type)
 
 void CreateTrackDialog::trackNameEdited()
 {
-	//Track::TrackType type = (Track::TrackType)m_insertType;
-	//if(type == Track::MIDI)
-	//{
-		bool enabled = false;
-		if(!txtName->text().isEmpty())
-		{
-			Track* t = song->findTrack(txtName->text());
-			if(!t)
-				enabled = true;
-		}
-		btnAdd->setEnabled(enabled);
-		//cmbInstrument->setEnabled(enabled);
-	//}
+	bool enabled = false;
+	if(!txtName->text().isEmpty())
+	{
+		Track* t = song->findTrack(txtName->text());
+		if(!t)
+			enabled = true;
+	}
+	btnAdd->setEnabled(enabled);
+	Track::TrackType type = (Track::TrackType)m_insertType;
+	if(type == Track::MIDI && m_instrumentLoaded && enabled)
+	{
+		cleanup();
+		updateInstrument(cmbInstrument->currentIndex());
+	}
 }
 
 //Populate input combo based on type

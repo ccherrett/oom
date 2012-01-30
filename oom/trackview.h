@@ -18,10 +18,10 @@
 #include "key.h"
 #include "node.h"
 #include "globaldefs.h"
-#include "track.h"
 #include <QMap>
 
 class Xml;
+class VirtualTrack;
 
 struct TrackSettings {
 	bool valid;
@@ -29,7 +29,8 @@ struct TrackSettings {
 	QString pname;
 	int transpose;
 	bool rec;
-	Track* track;
+	qint64 tid;
+	VirtualTrack* vtrack;
 	virtual void write(int, Xml&) const;
 	virtual void read(Xml&);
 };
@@ -42,10 +43,11 @@ class TrackView
 {
 	private:
 		QString _comment;
-		TrackList _tracks;
-		QMap<QString, TrackSettings*> _tSettings;
+		QList<qint64> m_tracks;
+		QMap<qint64, TrackSettings*> _tSettings;
+		QMap<qint64, TrackSettings*> m_vtrackSettings;
 		bool _recState;
-
+		qint64 m_id;
 
 	protected:
 		QString _name;
@@ -57,6 +59,7 @@ class TrackView
 	public:
 		TrackView();
 		~TrackView();
+		qint64 id() { return m_id; }
 		QString getValidName(QString);
 		TrackView& operator=(const TrackView& g);
 		
@@ -71,32 +74,37 @@ class TrackView
 		const QString& viewName() const     { return _name; }
 		void setViewName(const QString& s)  { _name = s; }
 		void setDefaultName();
-		void addTrack(Track*);
-		void removeTrack(Track*);
-		TrackList* tracks() { return &_tracks; } 
+
+		void addTrack(qint64);
+		
+		void removeTrack(qint64);
+		
+		QList<qint64>* tracks() { return &m_tracks; }
+
 		bool record() { return _recState; }
 		void setRecord(bool f) { _recState = f; }
-		QMap<QString, TrackSettings*>* trackSettings() { return &_tSettings;}
-		void addTrackSetting(QString tname, TrackSettings* settings) {
-			_tSettings[tname] = settings;
+		QMap<qint64, TrackSettings*>* trackSettings() { return &_tSettings;}
+		QMap<qint64, TrackSettings*>* virtualTrackSettings() { return &m_vtrackSettings;}
+		void addTrackSetting(qint64 id, TrackSettings* settings) {
+			_tSettings[id] = settings;
 		}
-		void removeTrackSettings(QString name)
+		void removeTrackSettings(qint64 id)
 		{
-			if(hasSettings(name))
+			if(hasSettings(id))
 			{
-				_tSettings.erase(_tSettings.find(name));
+				_tSettings.erase(_tSettings.find(id));
 			}
 		}
-		bool hasSettings(QString tname)
+		bool hasSettings(qint64 tid)
 		{
-			return _tSettings.contains(tname);
+			return _tSettings.contains(tid);
 		}
-		TrackSettings* getTrackSettings(QString tname)
+		TrackSettings* getTrackSettings(qint64 id)
 		{
-			if(hasSettings(tname))
-				return _tSettings[tname];
+			if(hasSettings(id))
+				return _tSettings[id];
 			else
-				return new TrackSettings;
+				return 0;
 		}
 		virtual void write(int, Xml&) const;
 		void read(Xml&);
@@ -107,7 +115,9 @@ class TrackView
 //   TrackViewList
 //---------------------------------------------------------
 
-template<class T> class viewlist : public std::vector<TrackView*> {
+typedef QHash<qint64, TrackView*> TrackViewList;
+
+/*template<class T> class viewlist : public std::vector<TrackView*> {
       typedef std::vector<TrackView*> vlist;
 
    public:
@@ -196,9 +206,9 @@ template<class T> class viewlist : public std::vector<TrackView*> {
                   }
             }
       }
-};
+};*/
 
-typedef viewlist<TrackView*> TrackViewList;
+//typedef viewlist<TrackView*> TrackViewList;
 typedef TrackViewList::iterator iTrackView;
 typedef TrackViewList::const_iterator ciTrackView;
 
