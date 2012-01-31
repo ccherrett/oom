@@ -192,6 +192,11 @@ extern QIcon* transport_playIconOff;
 extern QIcon* transport_playIconOver;
 extern QIcon* playIconSet3;
 
+extern QIcon* transport_playIconRightOn;
+extern QIcon* transport_playIconRightOff;
+extern QIcon* transport_playIconRightOver;
+extern QIcon* playIconSetRight;
+
 extern QIcon* transport_startIconOn;
 extern QIcon* transport_startIconOff;
 extern QIcon* transport_startIconOver;

@@ -71,7 +71,7 @@ AudioClipList::AudioClipList(QWidget *parent)
 	
 	btnStop->setIcon(QIcon(*stopIconSet3));
 	
-	btnPlay->setIcon(QIcon(*playIconSet3));
+	btnPlay->setIcon(QIcon(*playIconSetRight));
 
 	connect(btnPlay, SIGNAL(clicked()), this, SLOT(playClicked()));
 	connect(btnStop, SIGNAL(clicked()), this, SLOT(stopClicked()));
@@ -83,6 +83,9 @@ AudioClipList::AudioClipList(QWidget *parent)
 	connect(m_fileList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(fileItemSelected(const QModelIndex&)));
 	connect(m_bookmarkList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(bookmarkItemSelected(const QModelIndex&)));
 
+	QList<int> sizes;
+	sizes << 30 << 250;
+	splitter->setSizes(sizes);
 	//setDir(QDir::currentPath());
 	setDir(oomProject);
 }

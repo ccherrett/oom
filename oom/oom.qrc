@@ -90,9 +90,15 @@
 		<file>images/icons/transport-play.png</file>
 		<file>images/icons/transport-play_off.png</file>
 		<file>images/icons/transport-play_over.png</file>
+		
 		<file>images/icons/transport-play_new_on.png</file>
 		<file>images/icons/transport-play_new_over.png</file>
 		<file>images/icons/transport-play_new_off.png</file>
+
+		<file>images/icons/transport-play_new_end_on.png</file>
+		<file>images/icons/transport-play_new_end_over.png</file>
+		<file>images/icons/transport-play_new_end_off.png</file>
+
 		<file>images/icons/transport-pointer-to-cursor.png</file>
 		<file>images/icons/transport-record.png</file>
 		<file>images/icons/transport-rewind.png</file>
