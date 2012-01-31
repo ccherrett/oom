@@ -445,6 +445,8 @@
 		<file>images/icons/clip-file.png</file>
 		<file>images/icons/clip-folder-bookmark.png</file>
 		<file>images/icons/clip-folder.png</file>
+		<file>images/icons/clip-folder-up.png</file>
+		<file>images/icons/clip-folder-refresh.png</file>
 		<file>images/icons/clip-new-folder.png</file>
 	</qresource>
 </RCC>
