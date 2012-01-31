@@ -219,8 +219,12 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)
 			QMenu *m = new QMenu(QString(tr("ClipList Menu")), this);
 			if(f.isDir())
 			{
-				QAction *add = m->addAction(QIcon(":/images/icons/clip-folder-bookmark.png"), QString(tr("Add To Bookmarks")));
-				add->setData(1);
+				//Not for the ..
+				if(item->row())
+				{
+					QAction *add = m->addAction(QIcon(":/images/icons/clip-folder-bookmark.png"), QString(tr("Add To Bookmarks")));
+					add->setData(1);
+				}
 			}
 			else
 			{
@@ -229,6 +233,8 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)
 				QAction* asnew = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Add to New Track"));
 				asnew->setData(3);
 			}
+			QAction* ref = m->addAction(QIcon(":/images/icons/clip-folder-refresh.png"), tr("Refresh"));
+			ref->setData(4);
 			QAction* act = m->exec(QCursor::pos());
 			if(act)
 			{
@@ -240,6 +246,9 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)
 						addBookmark(item->data().toString());
 						saveBookmarks();
 					}
+					break;
+					case 4:
+						setDir(m_currentPath);
 					break;
 					default:
 						qDebug("Not yet implemented!!");
