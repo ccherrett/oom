@@ -12,6 +12,7 @@
 #include "song.h"
 #include "icons.h"
 #include "traverso_shared/TConfig.h"
+#include "BookmarkList.h"
 
 #include <QDir>
 #include <QUrl>
@@ -21,6 +22,8 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QMimeData>
+#include <QMenu>
+#include <QAction>
 
 
 ClipListModel::ClipListModel(QObject* parent)
@@ -49,56 +52,6 @@ QMimeData *ClipListModel::mimeData(const QModelIndexList& indices) const
 	return mdata;
 }
 
-BookmarkListModel::BookmarkListModel(QObject *parent)
- : QStandardItemModel(parent)
-{
-}
-
-bool BookmarkListModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int col, const QModelIndex &parent)
-{
-	Q_UNUSED(parent);
-	if(action == Qt::IgnoreAction)
-		return true;
-
-	//Make sure we have urls as created by the fileList	
-	if(!data->hasUrls())
-	{
-		qDebug("Drop is not a URL");
-		return false;
-	}
-
-	//Single column for now
-	if(col > 0)
-		return false;
-	
-	int irow = row;
-	if(irow == 0)
-		irow = 1;
-
-	QString path = data->urls()[0].path(); 
-	QFileInfo f(path);
-	QList<QStandardItem*> items = findItems(f.fileName());
-	if(f.isDir() && items.isEmpty())
-	{
-		QStandardItem *it = new QStandardItem();
-		it->setText(f.fileName());
-		it->setData(path);
-		it->setIcon(QIcon(":/images/icons/clip-folder-bookmark.png"));
-		it->setDropEnabled(true);
-		if(row)
-			insertRow(irow, it);
-		else
-			appendRow(it);
-	}
-	return true;
-}
-
-/*Qt::ItemFlags BookmarkListModel::flags(const QModelIndex &index) const
-{
-	Qt::ItemFlags def = QStandardItemModel::flags(index);
-	return Qt::ItemIsDropEnabled | def;
-}*/
-
 AudioClipList::AudioClipList(QWidget *parent)
  : QFrame(parent)
 {
@@ -109,7 +62,9 @@ AudioClipList::AudioClipList(QWidget *parent)
 	m_bookmarkModel = new BookmarkListModel(this);
 	m_bookmarkList->setModel(m_bookmarkModel);
 	m_bookmarkList->setAcceptDrops(true);
-	m_bookmarkList->viewport()->setAcceptDrops(true);
+	//m_bookmarkList->viewport()->setAcceptDrops(true);
+	m_fileList->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_bookmarkList->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	m_listModel = new ClipListModel(this);
 	m_fileList->setModel(m_listModel);
@@ -132,10 +87,12 @@ AudioClipList::AudioClipList(QWidget *parent)
 	//connect(btnBookmark, SIGNAL(clicked()), this, SLOT(addBookmarkClicked()));
 
 	connect(m_fileList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(fileItemSelected(const QModelIndex&)));
+	connect(m_fileList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(fileItemContextMenu(const QPoint&)));
+
 	connect(m_bookmarkList, SIGNAL(clicked(const QModelIndex&)), this, SLOT(bookmarkItemSelected(const QModelIndex&)));
+	connect(m_bookmarkList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(bookmarkContextMenu(const QPoint&)));
 
 	QList<int> sizes;
-	sizes << 30 << 250;
 	QString str = tconfig().get_property("AudioClipList", "sizes", "30 250").toString();
 	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
 	foreach (QString s, sl)
@@ -183,10 +140,19 @@ void AudioClipList::loadBookmarks()
 	QStringList sl = str.split(QString(","), QString::SkipEmptyParts);
 	foreach (QString s, sl)
 	{
-		QFileInfo f(s);
+		addBookmark(s);
+	}
+}
+
+void AudioClipList::addBookmark(const QString &dir)
+{
+	QFileInfo f(dir);
+	QList<QStandardItem*> items = m_bookmarkModel->findItems(f.fileName());
+	if(f.isDir() && items.isEmpty())
+	{
 		QStandardItem *item = new QStandardItem();
 		item->setText(f.fileName());
-		item->setData(s);
+		item->setData(dir);
 		item->setDropEnabled(true);
 		item->setIcon(QIcon(":/images/icons/clip-folder-bookmark.png"));
 		m_bookmarkModel->appendRow(item);
@@ -195,7 +161,7 @@ void AudioClipList::loadBookmarks()
 
 void AudioClipList::setDir(const QString &path)
 {
-	QDir dir(path, ""/*m_filters*/, QDir::DirsFirst);
+	QDir dir(path, "", QDir::DirsFirst);
 	m_listModel->clear();
 	if(dir.isReadable())
 	{
@@ -232,13 +198,80 @@ void AudioClipList::setDir(const QString &path)
 		}
 		m_currentPath = newDir;
 		txtPath->setText(m_currentPath);
-		qDebug("Listed directory: %s", m_currentPath.toUtf8().constData());
+		//qDebug("Listed directory: %s", m_currentPath.toUtf8().constData());
 	}
 }
 
 bool AudioClipList::isSupported(const QString& suffix)
 {
 	return m_filters.contains(suffix);
+}
+
+void AudioClipList::fileItemContextMenu(const QPoint& pos)
+{
+	QModelIndex index = m_fileList->indexAt(pos);
+	if(index.isValid())
+	{
+		QStandardItem* item = m_listModel->itemFromIndex(index);
+		if(item)
+		{
+			QFileInfo f(item->data().toString());
+			QMenu *m = new QMenu(QString(tr("ClipList Menu")), this);
+			if(f.isDir())
+			{
+				QAction *add = m->addAction(QIcon(":/images/icons/clip-folder-bookmark.png"), QString(tr("Add To Bookmarks")));
+				add->setData(1);
+			}
+			else
+			{
+				QAction* add = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Add to Selected Track"));
+				add->setData(2);
+				QAction* asnew = m->addAction(QIcon(":/images/icons/clip-file-audio.png"), tr("Add to New Track"));
+				asnew->setData(3);
+			}
+			QAction* act = m->exec(QCursor::pos());
+			if(act)
+			{
+				int data = act->data().toInt();
+				switch(data)
+				{
+					case 1:
+					{
+						addBookmark(item->data().toString());
+						saveBookmarks();
+					}
+					break;
+					default:
+						qDebug("Not yet implemented!!");
+					break;
+				}
+			}
+		}
+	}
+}
+
+void AudioClipList::bookmarkContextMenu(const QPoint& pos)
+{
+	QModelIndex index = m_bookmarkList->indexAt(pos);
+	if(index.isValid())
+	{
+		QStandardItem* item = m_bookmarkModel->itemFromIndex(index);
+		if(item)
+		{
+			QMenu *m = new QMenu(QString(tr("Bookmarks Menu")), this);
+			QAction *del = m->addAction(QIcon(":/images/icons/clip-folder-bookmark.png"), QString(tr("Remove ")).append(item->text()));
+			del->setData(1);
+			QAction* act = m->exec(QCursor::pos());
+			if(act)
+			{
+				int data = act->data().toInt();
+				if(data == 1)
+				{
+					m_bookmarkModel->removeRow(item->row());
+				}
+			}
+		}
+	}
 }
 
 void AudioClipList::fileItemSelected(const QModelIndex& index)

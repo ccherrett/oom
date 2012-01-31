@@ -13,11 +13,11 @@
 #include <QStringList>
 #include <QModelIndex>
 #include <QModelIndexList>
-#include <QFileSystemModel>
 #include <QStandardItemModel>
 
 class QListView;
 class QMimeData;
+class QPoint;
 
 //Model for the file list
 class ClipListModel : public QStandardItemModel
@@ -28,14 +28,6 @@ public:
 	virtual QMimeData* mimeData(const QModelIndexList&) const;
 };
 
-//Model for the bookmark list
-class BookmarkListModel : public QStandardItemModel
-{
-public:
-	BookmarkListModel(QObject* parent = 0);
-	virtual bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int col, const QModelIndex &parent);
-//	virtual Qt::ItemFlags flags(const QModelIndex&) const;
-};
 
 class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	Q_OBJECT
@@ -49,6 +41,7 @@ class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	bool isSupported(const QString&);
 	void loadBookmarks();
 	void saveBookmarks();
+	void addBookmark(const QString&);
 
 private slots:
 	void playClicked();
@@ -58,7 +51,9 @@ private slots:
 	void rewindClicked();
 	//void addBookmarkClicked();
 	void fileItemSelected(const QModelIndex&);
+	void fileItemContextMenu(const QPoint&);
 	void bookmarkItemSelected(const QModelIndex&);
+	void bookmarkContextMenu(const QPoint&);
 
 //public slots:
 public:

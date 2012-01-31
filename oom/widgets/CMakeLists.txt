@@ -114,6 +114,7 @@ QT4_WRAP_CPP (widget_mocs
 	  plugindialog.h
 	  TrackManager.h
 	  CreateTrackDialog.h
+	  BookmarkList.h
 	  AudioClipList.h
       )
 
@@ -260,6 +261,7 @@ file (GLOB widgets_source_files
 	  plugindialog.cpp
 	  TrackManager.cpp
 	  CreateTrackDialog.cpp
+	  BookmarkList.cpp
 	  AudioClipList.cpp
       )
 
