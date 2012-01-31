@@ -55,7 +55,7 @@ QHeaderView#trackHeaders
  	background-color: #2f2f2f;
  }
 /*Trackview editor styles*/
-TrackViewEditor QListView, TrackViewEditor QTextField, QTableView
+TrackViewEditor QListView, TrackViewEditor QTextField, QTableView, AudioClipList QListView
 {
 	border: 1px solid #29292a;
 	border-radius: 6px;
@@ -67,11 +67,11 @@ TrackViewEditor QListView, TrackViewEditor QTextField, QTableView
 	color: #bbbfbb;
 }
 
-TrackViewEditor QListView::item
+TrackViewEditor QListView::item, AudioClipList QListView::item
 {
 	border-bottom: 1px solid #343434;
 }
-TrackViewEditor QListView::item::selected
+TrackViewEditor QListView::item::selected, AudioClipList QListView::item::selected
 {
 	background-color: #0a0a0a;
 }
@@ -153,7 +153,7 @@ QTreeView::item
 	border-bottom: 1px solid #343434;
 }
 
-Conductor QTreeView/*{{{*/
+Conductor QTreeView,  AudioClipList QTreeView/*{{{*/
 {
 	background-color: #1e1e1e;
 	gridline-color:#343434;
@@ -171,7 +171,7 @@ Conductor QTreeView::focus
 	border: 2px solid #f3ce69;
 }/*}}}*/
 
-Conductor QTreeView QHeaderView::section
+Conductor QTreeView QHeaderView::section, AudioClipList QTreeView QHeaderView::section
 {
 	text-align: left;
 	border: 0px solid black;
@@ -185,25 +185,25 @@ Conductor QTreeView QHeaderView::section
 	font-size: 11px;
 }
 
-Conductor QTreeView::item
+Conductor QTreeView::item, AudioClipList QTreeView::item
 {
 	padding-top: 3px;
 	padding-bottom: 3px;
 	border-bottom: 1px solid #343434;
 }
 
-Conductor QTreeView::item:selected
+Conductor QTreeView::item:selected, AudioClipList QTreeView::item:selected
 {
 	background-color: #0a0a0a;
 	border: none;
 }
 
-Conductor QTreeView::item:selected:active
+Conductor QTreeView::item:selected:active,  AudioClipList QTreeView::item:selected:active
 {
 	border: none;
 }
 
-Conductor QTreeView::item:selected:!active
+Conductor QTreeView::item:selected:!active, AudioClipList QTreeView::item:selected:!active
 {
 	border: none;
 }

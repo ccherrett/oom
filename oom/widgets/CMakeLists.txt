@@ -114,6 +114,7 @@ QT4_WRAP_CPP (widget_mocs
 	  plugindialog.h
 	  TrackManager.h
 	  CreateTrackDialog.h
+	  AudioClipList.h
       )
 
 ##
@@ -155,6 +156,7 @@ file (GLOB widgets_ui_files
 	  midiassignbase.ui
 	  cceditbase.ui
 	  createtrackbase.ui
+	  AudioClipListBase.ui
       )
 QT4_WRAP_UI (widget_ui_headers ${widgets_ui_files})
 
@@ -258,6 +260,7 @@ file (GLOB widgets_source_files
 	  plugindialog.cpp
 	  TrackManager.cpp
 	  CreateTrackDialog.cpp
+	  AudioClipList.cpp
       )
 
 ##

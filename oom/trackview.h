@@ -1,7 +1,6 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//  $Id: $
 //
 //  (C) Copyright 2010 Andrew Williams and Christopher Cherrett
 //=========================================================
@@ -117,100 +116,8 @@ class TrackView
 
 typedef QHash<qint64, TrackView*> TrackViewList;
 
-/*template<class T> class viewlist : public std::vector<TrackView*> {
-      typedef std::vector<TrackView*> vlist;
-
-   public:
-      class iterator : public vlist::iterator {
-         public:
-            iterator() : vlist::iterator() {}
-            iterator(vlist::iterator i) : vlist::iterator(i) {}
-
-            T operator*() {
-                  return (T)(**((vlist::iterator*)this));
-            }
-            iterator operator++(int) {
-                  return iterator ((*(vlist::iterator*)this).operator++(0));
-            }
-            iterator& operator++() {
-                  return (iterator&) ((*(vlist::iterator*)this).operator++());
-            }
-      };
-
-      class const_iterator : public vlist::const_iterator {
-         public:
-            const_iterator() : vlist::const_iterator() {}
-            const_iterator(vlist::const_iterator i) : vlist::const_iterator(i) {}
-            const_iterator(vlist::iterator i) : vlist::const_iterator(i) {}
-
-            const T operator*() const {
-                  return (T)(**((vlist::const_iterator*)this));
-            }
-      };
-
-      class reverse_iterator : public vlist::reverse_iterator {
-         public:
-            reverse_iterator() : vlist::reverse_iterator() {}
-            reverse_iterator(vlist::reverse_iterator i) : vlist::reverse_iterator(i) {}
-
-            T operator*() {
-                  return (T)(**((vlist::reverse_iterator*)this));
-            }
-      };
-
-      viewlist() : vlist() {}
-      virtual ~viewlist() {}
-
-      void push_back(T v)             { vlist::push_back(v); }
-      iterator begin()                { return vlist::begin(); }
-      iterator end()                  { return vlist::end(); }
-      const_iterator begin() const    { return vlist::begin(); }
-      const_iterator end() const      { return vlist::end(); }
-      reverse_iterator rbegin()       { return vlist::rbegin(); }
-      reverse_iterator rend()         { return vlist::rend(); }
-      T& back() const                 { return (T&)(vlist::back()); }
-      T& front() const                { return (T&)(vlist::front()); }
-      iterator find(const TrackView* t)       {
-            return std::find(begin(), end(), t);
-      }
-      const_iterator find(const TrackView* t) const {
-            return std::find(begin(), end(), t);
-      }
-      unsigned index(const TrackView* t) const {
-            unsigned n = 0;
-            for (vlist::const_iterator i = begin(); i != end(); ++i, ++n) {
-                  if (*i == t)
-                        return n;
-            }
-            return -1;
-      }
-      T index(int k) const           { return (*this)[k]; }
-      iterator index2iterator(int k) {
-            if ((unsigned)k >= size())
-                  return end();
-            return begin() + k;
-      }
-      void erase(TrackView* t)           { vlist::erase(find(t)); }
-
-      void clearDelete() {
-            for (vlist::iterator i = begin(); i != end(); ++i)
-                  delete *i;
-            vlist::clear();
-      }
-      void erase(vlist::iterator i) { vlist::erase(i); }
-      void replace(TrackView* ot, TrackView* nt) {
-            for (vlist::iterator i = begin(); i != end(); ++i) {
-                  if (*i == ot) {
-                        *i = nt;
-                        return;
-                  }
-            }
-      }
-};*/
-
-//typedef viewlist<TrackView*> TrackViewList;
-typedef TrackViewList::iterator iTrackView;
-typedef TrackViewList::const_iterator ciTrackView;
+typedef QHash<qint64, TrackView*>::iterator iTrackView;
+typedef QHash<qint64, TrackView*>::const_iterator ciTrackView;
 
 #endif
 

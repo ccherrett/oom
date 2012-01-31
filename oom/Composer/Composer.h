@@ -39,7 +39,7 @@ class AudioStrip;
 class Strip;
 class SpinBox;
 class TrackViewDock;
-class RouteMapDock;
+class AudioClipList;
 class CommentDock;
 class CItem;
 class HeaderList;
@@ -84,7 +84,7 @@ class Composer : public QWidget
 	QTabWidget* _rtabs;
 	Strip* _lastStrip;
 	TrackViewDock* _tvdock;
-	RouteMapDock* _rmdock;
+	AudioClipList* m_clipList;
 	CommentDock* _commentdock;
 	QWidget *central;
 	QVBoxLayout *mlayout;
