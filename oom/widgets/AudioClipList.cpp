@@ -99,22 +99,31 @@ void AudioClipList::setDir(const QString &path)
 		QStringList entries = dir.entryList();
 		foreach(QString entry, entries)
 		{
+			if(entry == ".")
+				continue;
 		//qDebug("Listing file: %s", entry.toUtf8().constData());
 			QStandardItem* item = new QStandardItem(entry);
 			QString fullPath = QString(newDir).append(sep).append(entry);
 			item->setData(fullPath);
+			bool skip = false;
 			if(QFileInfo(fullPath).isDir())
 			{//Set dir icon
-				item->setText(QString("D: ").append(entry));
-				if(entry != ".")
-					m_listModel->appendRow(item);
+				if(m_listModel->rowCount())
+				{
+					item->setIcon(QIcon(":/images/icons/clip-folder.png"));
+				}
+				else
+				{
+					item->setIcon(QIcon(":/images/icons/clip-folder.png"));
+				}
 			}
 			else
 			{//Set file icon
-				item->setText(QString("F: ").append(entry));
-				if(isSupported(QFileInfo(fullPath).suffix()))
-					m_listModel->appendRow(item);
+				item->setIcon(QIcon(":/images/icons/clip-file-audio.png"));
+				skip = !isSupported(QFileInfo(fullPath).suffix());
 			}
+			if(!skip)
+				m_listModel->appendRow(item);
 		}
 		m_currentPath = newDir;
 	}
