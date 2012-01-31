@@ -4176,7 +4176,6 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 	if (event->mimeData()->hasFormat("text/partlist"))
 		type = 1;
 	else
-		//if(event->mimeData()->hasFormat("text/uri-list"))
 		if (event->mimeData()->hasUrls())
 		type = 2;
 	else

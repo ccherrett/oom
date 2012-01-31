@@ -82,7 +82,7 @@ void TrackViewMenu::updateData(QListWidgetItem *item)
 		//printf("Triggering Menu Action\n");
 		setData(item->text());
 		
-		//FIXME: This is a seriously brutal HACK but its the only way it can get it done
+		//FIXME: This is a seriously brutal HACK but its the only way I can get it to dismiss the menu
 		QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
 		QCoreApplication::postEvent(this->parent(), e);
 

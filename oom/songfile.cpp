@@ -809,6 +809,10 @@ void Song::read(Xml& xml)
 			case Xml::TagStart:
 				if (tag == "master")
 					setMasterFlag(xml.parseInt());
+				else if(tag == "masterTrackId")
+				{
+					m_masterId = xml.parseLongLong();
+				}
 				else if (tag == "info")
 					songInfoStr = xml.parse1();
 				else if (tag == "associatedRoute")
@@ -1066,6 +1070,7 @@ void Song::write(int level, Xml& xml) const
 {
 	xml.tag(level++, "song");
 	xml.strTag(level, "info", songInfoStr);
+	xml.qint64Tag(level, "masterTrackId", m_masterId);
 	xml.strTag(level, "associatedRoute", associatedRoute);
 	xml.intTag(level, "automation", automation);
 	xml.intTag(level, "cpos", song->cpos());

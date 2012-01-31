@@ -66,6 +66,7 @@
 #include "shortcuts.h"
 #include "mixerdock.h"
 #include "toolbars/tools.h"
+#include "AudioClipList.h"
 
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96
@@ -938,14 +939,13 @@ void Composer::genTrackInfo(QWidget*)
 	_tvdock = new TrackViewDock(this);
 	//infoScroll->setWidget(midiConductor);
 	infoScroll->setWidgetResizable(true);
-	_rmdock = new RouteMapDock(this);
+	m_clipList = new AudioClipList(this);
 	_commentdock = new CommentDock(this);
 	_rtabs->addTab(_tvdock, tr("   EPIC Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
 	_rtabs->addTab(midiConductor, tr("   Conductor   "));
-	//_rtabs->addTab(infoScroll, tr("   Patch Sequencer   "));
+	_rtabs->addTab(m_clipList, tr("  Clips  "));
 	_rtabs->addTab(_commentdock, tr("  Comments  "));
-	_rtabs->addTab(_rmdock, tr("  Routes  "));
 
 	central = new QWidget(this);
 	central->setObjectName("dockMixerCenter");
