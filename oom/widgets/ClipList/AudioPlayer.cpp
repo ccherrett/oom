@@ -1,0 +1,264 @@
+//=========================================================
+//  OOMidi
+//  OpenOctave Midi and Audio Editor
+//
+//  (C) Copyright 2010 Andrew Williams and Christopher Cherrett
+//
+//  Based sndfile-jackplay.c
+//  Copyright (c) 2007-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+//  Copyright (C) 2007 Jonatan Liljedahl <lijon@kymatica.com>
+//=========================================================
+
+#include "AudioPlayer.h"
+
+#include <math.h>
+#include <stdio.h>
+#include <errno.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <jack/ringbuffer.h>
+
+//Define pthread lock types
+pthread_mutex_t disk_thread_lock = PTHREAD_MUTEX_INITIALIZER ;
+pthread_cond_t data_ready = PTHREAD_COND_INITIALIZER ;
+
+static jack_ringbuffer_t *ringbuf ;
+static jack_port_t **output_port ;
+static jack_default_audio_sample_t ** outs ;
+const size_t sample_size = sizeof (jack_default_audio_sample_t);
+
+AudioPlayer::AudioPlayer()
+{
+	m_client = 0;
+	m_isPlaying = false;
+}
+
+AudioPlayer::~AudioPlayer()
+{//Clean up jack client
+	stop();
+}
+
+int AudioPlayer::process(jack_nframes_t nframes, void * arg)
+{
+	thread_info_t *info = (thread_info_t *) arg ;
+	jack_default_audio_sample_t buf [info->channels] ;
+	unsigned i, n ;
+
+	if (!info->can_process)
+		return 0 ;
+
+	for (n = 0 ; n < info->channels ; n++)
+		outs [n] = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port [n], nframes) ;
+
+	for (i = 0 ; i < nframes ; i++)
+	{	
+		size_t read_cnt ;
+
+		/* Read one frame of audio. */
+		read_cnt = jack_ringbuffer_read (ringbuf, (char*)buf, sample_size*info->channels) ;
+		if (read_cnt == 0 && info->read_done)
+		{	/* File is done, so stop the main loop. */
+			info->play_done = 1 ;
+			return 0 ;
+		}
+
+		/* Update play-position counter. */
+		info->pos += read_cnt / (sample_size*info->channels) ;
+
+		/* Output each channel of the frame. */
+		for (n = 0 ; n < info->channels ; n++)
+			outs [n][i] = buf [n] ;
+	}
+
+	/* Wake up the disk thread to read more data. */
+	if (pthread_mutex_trylock (&disk_thread_lock) == 0)
+	{	pthread_cond_signal (&data_ready) ;
+		pthread_mutex_unlock (&disk_thread_lock) ;
+	}
+
+	return 0 ;
+}
+
+void* AudioPlayer::read_file(void* arg)
+{
+	thread_info_t *info = (thread_info_t *) arg ;
+	sf_count_t buf_avail, read_frames ;
+	jack_ringbuffer_data_t vec [2] ;
+	size_t bytes_per_frame = sample_size*info->channels ;
+
+	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, NULL) ;
+	pthread_mutex_lock (&disk_thread_lock) ;
+
+	while (1)
+	{	jack_ringbuffer_get_write_vector (ringbuf, vec) ;
+
+		read_frames = 0 ;
+
+		if (vec [0].len)
+		{	/* Fill the first part of the ringbuffer. */
+			buf_avail = vec [0].len / bytes_per_frame ;
+			read_frames = sf_readf_float (info->sndfile, (float *) vec [0].buf, buf_avail) ;
+			if (vec [1].len)
+			{	/* Fill the second part of the ringbuffer? */
+				buf_avail = vec [1].len / bytes_per_frame ;
+				read_frames += sf_readf_float (info->sndfile, (float *) vec [1].buf, buf_avail) ;
+				} ;
+			} ;
+
+		if (read_frames == 0)
+			break ; /* end of file? */
+
+		jack_ringbuffer_write_advance (ringbuf, read_frames * bytes_per_frame) ;
+
+		/* Tell process that we've filled the ringbuffer. */
+		info->can_process = 1 ;
+
+		/* Wait for the process thread to wake us up. */
+		pthread_cond_wait (&data_ready, &disk_thread_lock) ;
+		} ;
+
+	/* Tell that we're done reading the file. */
+	info->read_done = 1 ;
+	pthread_mutex_unlock (&disk_thread_lock) ;
+
+	return 0 ;
+}
+
+static void jack_shutdown (void *arg)
+{	(void) arg ;
+	fprintf (stderr, "ClipList jack_shutdown\n");
+}
+
+void AudioPlayer::print_time(jack_nframes_t pos)
+{
+	float sec = pos / (1.0 * m_srate) ;
+	int min = sec / 60.0 ;
+	fprintf (stderr, "%02d:%05.2f", min, fmod (sec, 60.0)) ;
+	QString time;
+	time.sprintf("%02d:%05.2f", min, fmod(sec, 60.0));
+	emit timeChanged(time);
+}
+
+void AudioPlayer::play(const QString &file)
+{
+	SNDFILE *sndfile ;
+	SF_INFO sndfileinfo ;
+	int i;
+
+	if (file.isEmpty())
+	{	
+		fprintf (stderr, "no soundfile given\n") ;
+		return;
+	}
+	// create jack client
+	jack_status_t status;
+	m_client = jack_client_open("OOMidi_ClipList", JackNoStartServer, &status);
+	if (!m_client)
+	{
+		fprintf (stderr, "Jack server not running?\n") ;
+		return ;
+	}
+	
+	m_srate = jack_get_sample_rate (m_client) ;
+
+	/* Open the soundfile. */
+	sndfileinfo.format = 0 ;
+	sndfile = sf_open (file.toUtf8().constData(), SFM_READ, &sndfileinfo) ;
+	if (sndfile == NULL)
+	{	
+		//TODO: emit error signals
+		fprintf (stderr, "Could not open soundfile '%s'\n", file.toUtf8().constData()) ;
+		return;
+	}
+
+	fprintf (stderr, "Channels    : %d\nSample rate : %d Hz\nDuration    : ", sndfileinfo.channels, sndfileinfo.samplerate) ;
+
+	print_time (sndfileinfo.frames) ;
+	fprintf (stderr, "\n") ;
+
+	if (sndfileinfo.samplerate != m_srate)
+		fprintf (stderr, "Warning: samplerate of soundfile (%d Hz) does not match jack server (%d Hz).\n", sndfileinfo.samplerate, m_srate) ;
+
+	/* Init the thread info struct. */
+	memset (&info, 0, sizeof (info)) ;
+	info.can_process = 0 ;
+	info.read_done = 0 ;
+	info.play_done = 0 ;
+	info.sndfile = sndfile ;
+	info.channels = sndfileinfo.channels ;
+	info.client = m_client ;
+	info.pos = 0 ;
+
+	/* Set up callbacks. */
+	jack_set_process_callback (m_client, AudioPlayer::process, &info) ;
+	jack_on_shutdown (m_client, jack_shutdown, 0);
+
+	/* Allocate output ports. */
+	output_port = (jack_port_t**)calloc (sndfileinfo.channels, sizeof (jack_port_t *)) ;
+	outs = (jack_default_audio_sample_t**)calloc(sndfileinfo.channels, sizeof (jack_default_audio_sample_t *)) ;
+	for (i = 0 ; i < sndfileinfo.channels ; i++)
+	{	
+		char name [16] ;
+
+		snprintf (name, sizeof (name), "out_%d", i + 1) ;
+		output_port [i] = jack_port_register (m_client, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0) ;
+	}
+
+	/* Allocate and clear ringbuffer. */
+	ringbuf = jack_ringbuffer_create (sizeof (jack_default_audio_sample_t) * RB_SIZE) ;
+	memset (ringbuf->buf, 0, ringbuf->size) ;
+
+	/* Activate client. */
+	if (jack_activate (m_client))
+	{
+		fprintf (stderr, "Cannot activate client.\n") ;
+		return ;
+	}
+
+	/* Auto connect all channels. */
+	for (i = 0 ; i < sndfileinfo.channels ; i++)
+	{	
+		char name [64] ;
+
+		snprintf (name, sizeof (name), "system:playback_%d", i + 1) ;
+
+		if (jack_connect (m_client, jack_port_name (output_port [i]), name))
+			fprintf (stderr, "Cannot connect output port %d (%s).\n", i, name) ;
+	}
+
+	/* Start the disk thread. */
+	pthread_create (&info.thread_id, NULL, AudioPlayer::read_file, &info);
+	
+	m_isPlaying = true;
+
+	/* Sit in a loop, displaying the current play position. */
+	while (!info.play_done)
+	{	fprintf (stderr, "\r-> ") ;
+		print_time (info.pos) ;
+		fflush (stdout) ;
+		usleep (50000) ;
+		//TODO: check for status changes like seek and update the info
+	}
+
+	m_isPlaying = false;
+
+	/* Clean up. */
+	jack_client_close (m_client) ;
+	jack_ringbuffer_free (ringbuf) ;
+	sf_close (sndfile) ;
+	free (outs) ;
+	free (output_port) ;
+	emit playbackStopped(true);
+}
+
+bool AudioPlayer::isPlaying()
+{
+	return m_isPlaying;
+}
+
+void AudioPlayer::stop()
+{
+	info.play_done = 1;
+}

@@ -84,8 +84,7 @@ void BookmarkList::dropEvent(QDropEvent *event)
 	const QMimeData* data = event->mimeData();
 	if(data->hasUrls())
 	{
-		qDebug("Drop is a URL");
-
+		//TODO: Add insert to the dropped row, except row 0
 		QStandardItemModel* mod = (QStandardItemModel*)model();
 		QString path = data->urls()[0].path(); 
 		QFileInfo f(path);
