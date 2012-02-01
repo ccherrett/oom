@@ -240,16 +240,19 @@ VstPlugin::~VstPlugin()
         if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
             jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
 
-        if (m_ainsCount > 0)
+        if (jclient)
         {
-            for (uint32_t i=0; i < m_ainsCount; i++)
-                jack_port_unregister(jclient, m_portsIn[i]);
-        }
+            if (m_ainsCount > 0)
+            {
+                for (uint32_t i=0; i < m_ainsCount; i++)
+                    jack_port_unregister(jclient, m_portsIn[i]);
+            }
 
-        if (m_aoutsCount > 0)
-        {
-            for (uint32_t i=0; i < m_aoutsCount; i++)
-                jack_port_unregister(jclient, m_portsOut[i]);
+            if (m_aoutsCount > 0)
+            {
+                for (uint32_t i=0; i < m_aoutsCount; i++)
+                    jack_port_unregister(jclient, m_portsOut[i]);
+            }
         }
     }
 }
@@ -383,16 +386,22 @@ void VstPlugin::reload()
 
     if (m_ainsCount > 0)
     {
-        for (uint32_t i=0; i < m_ainsCount; i++)
-            jack_port_unregister(jclient, m_portsIn[i]);
+        if (jclient)
+        {
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                jack_port_unregister(jclient, m_portsIn[i]);
+        }
 
         delete[] m_portsIn;
     }
 
     if (m_aoutsCount > 0)
     {
-        for (uint32_t i=0; i < m_aoutsCount; i++)
-            jack_port_unregister(jclient, m_portsOut[i]);
+        if (jclient)
+        {
+            for (uint32_t i=0; i < m_aoutsCount; i++)
+                jack_port_unregister(jclient, m_portsOut[i]);
+        }
 
         delete[] m_portsOut;
     }
@@ -425,7 +434,10 @@ void VstPlugin::reload()
             for (uint32_t j=0; j<m_ainsCount; j++)
             {
                 QString port_name = m_name + ":input_" + QString::number(j+1);
-                m_portsIn[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+                if (jclient)
+                    m_portsIn[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+                else
+                    m_portsIn[j] = 0;
             }
         }
 
@@ -436,7 +448,10 @@ void VstPlugin::reload()
             for (uint32_t j=0; j<m_aoutsCount; j++)
             {
                 QString port_name = m_name + ":output_" + QString::number(j+1);
-                m_portsOut[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+                if (jclient)
+                    m_portsOut[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+                else
+                    m_portsOut[j] = 0;
             }
         }
     }

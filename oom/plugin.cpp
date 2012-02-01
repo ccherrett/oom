@@ -220,25 +220,21 @@ QString SynthPluginDevice::open()
     _readEnable = false;
     _writeEnable = (_openFlags & 0x01);
 
-    if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+    if (m_type == PLUGIN_LV2)
+        m_plugin = new Lv2Plugin();
+    else if (m_type == PLUGIN_VST)
+        m_plugin = new VstPlugin();
+    
+    if (m_plugin)
     {
-        jack_client_t* client = ((JackAudioDevice*)audioDevice)->getJackClient();
-        if (client)
+        m_plugin->setName(m_name);
+        if (m_plugin->init(m_filename, m_label))
         {
-            if (m_type == PLUGIN_LV2)
-                m_plugin = new Lv2Plugin();
-            else if (m_type == PLUGIN_VST)
-                m_plugin = new VstPlugin();
-
-            if (m_plugin)
-            {
-                m_plugin->setName(m_name);
-                if (m_plugin->init(m_filename, m_label))
-                {
-                    m_plugin->setActive(true);
-                    return QString("OK");
-                }
-            }
+            // disable plugin if jack is not running
+            if (!audioDevice || audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
+                m_plugin->aboutToRemove();
+            m_plugin->setActive(true);
+            return QString("OK");
         }
     }
 

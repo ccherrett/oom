@@ -901,8 +901,11 @@ void TrackHeader::newTrackAdded(qint64 id)
 
 void TrackHeader::generateAutomationMenu()/*{{{*/
 {
-	if(!m_track || m_track->isMidiTrack() || !m_processEvents)
+	if(!m_track || (m_track->isMidiTrack() && m_track->wantsAutomation() == false) || !m_processEvents)
 		return;
+    if (m_track->wantsAutomation())
+        // TODO
+        return;
 	QMenu* p = new QMenu(this);
 	p->disconnect();
 	p->clear();
