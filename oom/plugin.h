@@ -696,7 +696,7 @@ public:
     bool loadParameter(Xml& xml);
     
     // used to check if 'user' handle is valid
-    int sanityCheck;
+    unsigned int sanityCheck;
 
 protected:
     bool isOldSdk;
