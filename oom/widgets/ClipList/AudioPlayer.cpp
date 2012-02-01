@@ -208,8 +208,8 @@ bool AudioPlayer::startClient()
 		jack_on_shutdown (m_client, jack_shutdown, 0);
 
 		//Default to two channels and we will just fill one if mono file
-		output_port = (jack_port_t**)calloc (2, sizeof (jack_port_t *)) ;
-		outs = (jack_default_audio_sample_t**)calloc(2, sizeof (jack_default_audio_sample_t *)) ;
+		output_port = (jack_port_t**)calloc (channels, sizeof (jack_port_t *)) ;
+		outs = (jack_default_audio_sample_t**)calloc(channels, sizeof (jack_default_audio_sample_t *)) ;
 		for (int i = 0 ; i < channels ; i++)
 		{	
 			char name [16] ;
@@ -232,7 +232,7 @@ bool AudioPlayer::startClient()
 		}
 
 		/* Auto connect all channels. */
-		for (int i = 0 ; i < channels ; i++)/*{{{*/
+		for (int i = 0 ; i < channels ; i++)
 		{	
 			char name [64] ;
 
@@ -249,7 +249,7 @@ bool AudioPlayer::startClient()
                 if(jack_connect (m_client, jack_port_name (output_port [i]), name))
                     fprintf (stderr, "Cannot connect output port %d (%s).\n", i, name) ;
             }
-		}/*}}}*/
+		}
 		return true;
 	}
 	else
