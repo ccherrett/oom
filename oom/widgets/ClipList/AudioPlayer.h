@@ -58,9 +58,11 @@ signals:
 	void timeChanged(const QString&);
 	void playbackStopped(bool);
 	void nowPlaying(const QString&);
+	void readyForPlay();
 
 public slots:
 	void stop();
+	void check();
 	void setVolume(double value);
 
 public:

@@ -173,6 +173,16 @@ void AudioPlayer::stopClient()
 		free (outs) ;
 		free (output_port) ;
 		m_client = 0;
+		emit readyForPlay();
+	}
+}
+
+//Make sure the client is dead and fire the ready signal
+void AudioPlayer::check()
+{
+	if(!m_client)
+	{
+		emit readyForPlay();
 	}
 }
 

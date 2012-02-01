@@ -40,6 +40,7 @@ class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	QStringList m_filters;
 	QString m_currentPath;
 	QString m_currentSong;
+	QList<QString> m_playlist;
 
 	bool isSupported(const QString&);
 	void loadBookmarks();
@@ -63,6 +64,7 @@ private slots:
 	void bookmarkContextMenu(const QPoint&);
 	void updateTime(const QString&);
 	void updateNowPlaying(const QString&);
+	void playNextFile();
 
 public slots:
 	void refresh();

@@ -113,6 +113,7 @@ AudioClipList::AudioClipList(QWidget *parent)
 	connect(&player, SIGNAL(playbackStopped(bool)), this, SLOT(stopClicked(bool)));
 	connect(&player, SIGNAL(timeChanged(const QString&)), this, SLOT(updateTime(const QString&)));
 	connect(&player, SIGNAL(nowPlaying(const QString&)), this, SLOT(updateNowPlaying(const QString&)));
+	connect(&player, SIGNAL(readyForPlay()), this, SLOT(playNextFile()));
 	connect(this, SIGNAL(stopPlayback()), &player, SLOT(stop()));
 	connect(m_slider, SIGNAL(sliderMoved(double, int)), &player, SLOT(setVolume(double)));
 
@@ -450,6 +451,15 @@ static void doPlay(const QString& file)
 	player.play(file);
 }
 
+void AudioClipList::playNextFile()
+{
+	if(m_playlist.size())
+	{
+		m_currentSong = m_playlist.takeFirst();
+		QFuture<void> pl = run(doPlay, m_currentSong);
+	}
+}
+
 void AudioClipList::playClicked(bool state)
 {
 	//qDebug("AudioClipList::playClicked: state: %d", state);
@@ -466,33 +476,40 @@ void AudioClipList::playClicked(bool state)
 				QFileInfo info(item->data().toString());
 				if(!info.isDir() && !info.suffix().endsWith("mpt"))
 				{
+					m_playlist.append(info.filePath());
 					if(player.isPlaying())
 						player.stop();
-					m_currentSong = info.filePath();
-					QFuture<void> pl = run(doPlay, info.filePath());
+					else
+						player.check();
 					error_free = true;
 				}
 				else if(!m_currentSong.isEmpty())
 				{
+					m_playlist.append(info.filePath());
 					if(player.isPlaying())
 						player.stop();
-					QFuture<void> pl = run(doPlay, m_currentSong);
+					else
+						player.check();
 					error_free = true;
 				}
 			}
 			else if(!m_currentSong.isEmpty())
 			{
+				m_playlist.append(m_currentSong);
 				if(player.isPlaying())
 					player.stop();
-				QFuture<void> pl = run(doPlay, m_currentSong);
+				else
+					player.check();
 				error_free = true;
 			}
 		}
 		else if(!m_currentSong.isEmpty())
 		{
+			m_playlist.append(m_currentSong);
 			if(player.isPlaying())
 				player.stop();
-			QFuture<void> pl = run(doPlay, m_currentSong);
+			else
+				player.check();
 			error_free = true;
 		}
 		else
@@ -525,6 +542,7 @@ void AudioClipList::stopClicked(bool state)
 		btnPlay->blockSignals(true);
 		btnPlay->setChecked(!state);
 		btnPlay->blockSignals(false);
+		m_playlist.clear();
 		emit stopPlayback();//Make player stop
 		updateLabels();
 		//timeLabel->setVisible(false);
