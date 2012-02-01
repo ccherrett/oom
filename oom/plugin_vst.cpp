@@ -207,8 +207,6 @@ VstPlugin::VstPlugin()
 
 VstPlugin::~VstPlugin()
 {
-    qWarning("~VstPlugin() --------------------------------------------");
-
     sanityCheck = 0;
     aboutToRemove();
 
@@ -652,10 +650,8 @@ void VstPlugin::setProgram(uint32_t index)
 
 void VstPlugin::updateCurrentProgram()
 {
-    qWarning("updateCurrentProgram()");
     if (m_currentProgram >= 0 && m_programNames.size() > 0)
     {
-        qWarning("updateCurrentProgram() - Doing it!");
         char buf_str[255] = { 0 };
 
         if (effect->dispatcher(effect, effGetProgramNameIndexed, m_currentProgram, 0, buf_str, 0.0f) != 1)
@@ -663,8 +659,8 @@ void VstPlugin::updateCurrentProgram()
 
         if (buf_str[0] != 0)
         {
-            qWarning("updateCurrentProgram() - DONE!\n%s | %s", m_programNames[m_currentProgram].toUtf8().constData(), buf_str);
             m_programNames[m_currentProgram] = QString(buf_str);
+            // TODO - tell oom to update preset names
         }
     }
 }

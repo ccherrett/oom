@@ -133,8 +133,6 @@ void CreateTrackDialog::addTrack()/*{{{*/
             
             if (instrumentType == TrackManager::SYNTH_INSTRUMENT)
             {
-                qWarning("Add Synth: %s", instrumentName.toUtf8().constData());
-                
                 int portIdx = -1;
                 for (int i = 0; i < MIDI_PORTS; i++)
                 {
@@ -149,16 +147,11 @@ void CreateTrackDialog::addTrack()/*{{{*/
                 {
                     for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
                     {
-                        qWarning("HERE 001");
                         if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
                         {
-                            qWarning("HERE 002");
                             QString devName = txtName->text();
                             SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
                             SynthPluginDevice* synth = oldSynth->clone(devName);
-                            qWarning("HERE 003 --------------");
-
-                            //synth->setPluginName(txtName->text());
                             synth->open();
 
                             if (cmbMonitor->itemText(monitorIndex) == txtName->text()+":(output-ports)")
@@ -243,7 +236,6 @@ void CreateTrackDialog::addTrack()/*{{{*/
 					m_vtrack->useBuss = true;
 					m_vtrack->bussConfig = qMakePair(iBuss, selectedBuss);
 				}
-                qWarning("TEST %s | %s", selectedInput.toUtf8().constData(), selectedBuss.toUtf8().constData());
 			}
 		}/*}}}*/
 		break;
@@ -414,6 +406,13 @@ void CreateTrackDialog::updateInstrument(int index)
 	QString trackName = txtName->text();
 	if(btnAdd->isEnabled())
 	{
+        chkInput->setEnabled(true);
+        cmbInput->setEnabled(true);
+        cmbInChannel->setEnabled(true);
+        chkOutput->setEnabled(true);
+        cmbOutput->setEnabled(true);
+        cmbOutChannel->setEnabled(true);
+
 		int insType = cmbInstrument->itemData(index, InstrumentTypeRole).toInt();
 		switch(insType)
 		{
@@ -490,28 +489,12 @@ void CreateTrackDialog::updateInstrument(int index)
 
                         if(chkAutoCreate->isChecked())
                         {
-#if 0
-                            SynthPluginDevice* synth = (SynthPluginDevice*)(*i);
-                            // this is now wrong
-
-                            // create a new synth device if needed
-                            if (synth->plugin())
-                            {
-                                qWarning("TEST 2b Create new synth for in duplicate mode");
-                                BasePlugin* oldPlugin = synth->plugin();
-                                synth = new SynthPluginDevice(oldPlugin->type(), oldPlugin->filename(), oldPlugin->name(), oldPlugin->label(), true);
-                                midiDevices.add(synth);
-                            }
-
-                            synth->setPluginName(trackName);
-                            synth->open();
-                            BasePlugin* plugin = synth->plugin();
-                            plugin->setActive(false); // we don't need it to do aynthing yet
-#endif
                             updateVisibleElements();
-                            populateInputList();
-                            populateOutputList();
                             populateMonitorList();
+                            chkInput->setChecked(false);
+                            chkInput->setEnabled(false);
+                            chkOutput->setChecked(false);
+                            chkOutput->setEnabled(false);
 
                             cmbMonitor->addItem(trackName+":(output-ports)");
                             cmbMonitor->setCurrentIndex(cmbMonitor->count()-1);

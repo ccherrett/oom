@@ -1731,7 +1731,6 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                         iMPEvent ev = eventList->begin();
                         for (; ev != eventList->end(); ++ev)
                         {
-                            //qWarning("Has event -> %i | %i | %i : 0x%02X 0x%02X 0x%02X", ev->channel(), ev->len(), ev->time(), ev->type(), ev->dataA(), ev->dataB());
                             uint8_t* midi_event;
 
                             switch (ev->type())

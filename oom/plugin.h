@@ -175,8 +175,6 @@ public:
 
     ~BasePlugin()
     {
-        qWarning("~BasePlugin() --------------------------------------------");
-        
         deleteGui();
 
         m_type = PLUGIN_NONE;
@@ -814,7 +812,7 @@ public:
 protected:
     virtual bool putMidiEvent(const MidiPlayEvent&)
     {
-        qWarning("SynthPluginDevice::putMidiEvent()");
+        //qWarning("SynthPluginDevice::putMidiEvent()");
         return true;
     }
 
