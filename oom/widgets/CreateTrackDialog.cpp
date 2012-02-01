@@ -156,16 +156,20 @@ void CreateTrackDialog::addTrack()/*{{{*/
 
                             midiSeq->msgSetMidiDevice(&midiPorts[portIdx], synth);
 
-                            if (cmbMonitor->itemText(monitorIndex) == txtName->text()+":(output-ports)")
-                            {
+                            //if (cmbMonitor->itemText(monitorIndex) == txtName->text()+":(output-ports)")
+                            //{
                                 selectedInput  = synth->getAudioOutputPortName(0);
                                 selectedInput2 = synth->getAudioOutputPortName(1);
-                            }
+                            //}
 
                             m_vtrack->useOutput = true;
                             m_vtrack->createMidiOutputDevice = false;
                             m_vtrack->outputConfig = qMakePair(portIdx, devName);
                             m_vtrack->outputChannel = 0;
+
+                            m_vtrack->useMonitor = true;
+                            m_vtrack->monitorConfig  = qMakePair(0, selectedInput);
+                            m_vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
 
                             break;
                         }
@@ -489,8 +493,8 @@ void CreateTrackDialog::updateInstrument(int index)
 							cleanup();
 						}
 
-                        if(chkAutoCreate->isChecked())
-                        {
+                        //if(chkAutoCreate->isChecked())
+                        //{
                             updateVisibleElements();
                             populateMonitorList();
                             chkInput->setChecked(false);
@@ -500,11 +504,11 @@ void CreateTrackDialog::updateInstrument(int index)
                             midiBox->setChecked(false);
                             midiBox->setEnabled(false);
 
-                            cmbMonitor->addItem(trackName+":(output-ports)");
-                            cmbMonitor->setCurrentIndex(cmbMonitor->count()-1);
+                            //cmbMonitor->addItem(trackName+":(output-ports)");
+                            //cmbMonitor->setCurrentIndex(cmbMonitor->count()-1);
 
                             m_instrumentLoaded = true;
-                        }
+                        //}
                         break;
                     }
                 }
