@@ -55,7 +55,7 @@ QLabel#songLabel
      border-image: url(:/images/frame_top.png) 4;
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #1b1b1b;
+	 background-color: #080808;
 	 color: #b8b8b8;
 }
 
@@ -67,7 +67,7 @@ QLabel#timeLabel, QLabel#lengthLabel
      border-image: url(:/images/frame_bottom.png) 4;
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #1b1b1b;
+	 background-color: #080808;
 	 color: #b8b8b8;
 }
 
