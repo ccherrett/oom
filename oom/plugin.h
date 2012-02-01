@@ -74,9 +74,8 @@ const unsigned int PARAMETER_USES_SAMPLERATE   = 0x80;
 enum PluginType {
     PLUGIN_NONE   = 0,
     PLUGIN_LADSPA = 1,
-    PLUGIN_DSSI   = 2,
-    PLUGIN_LV2    = 3,
-    PLUGIN_VST    = 4
+    PLUGIN_LV2    = 2,
+    PLUGIN_VST    = 3
 };
 
 enum ParameterType {
@@ -95,10 +94,9 @@ public:
     ParameterPort()
     {
         type   = PARAMETER_UNKNOWN;
-        rindex = 0;
         hints  = 0;
-        value  = 0.0;
-        tmpValue = 0.0;
+        rindex = 0;
+        value  = tmpValue = 0.0;
 
         ranges.def = 0.0;
         ranges.min = 0.0;
@@ -157,8 +155,6 @@ public:
         m_active = false;
         m_activeBefore = false;
 
-        m_ainsCount  = 0;
-        m_aoutsCount = 0;
         m_paramCount = 0;
         m_params = 0;
 
@@ -170,27 +166,55 @@ public:
         m_enabled = false; // wait for a reload() call
         m_lib = 0;
 
+        // synths only
+        m_ainsCount  = 0;
+        m_aoutsCount = 0;
         m_portsIn = 0;
         m_portsOut = 0;
     }
 
     ~BasePlugin()
     {
-        qWarning("~BasePlugin() --------------------------------------------");
-
         deleteGui();
 
-        if (m_ainsCount > 0)
-            delete[] m_portsIn;
+        m_type = PLUGIN_NONE;
+        m_hints = 0;
+        m_uniqueId = 0;
 
-        if (m_aoutsCount > 0)
-            delete[] m_portsOut;
+        m_active = false;
+        m_activeBefore = false;
+
+        m_id = -1;
+        m_channels = 0;
+        m_track = 0;
 
         if (m_paramCount > 0)
+        {
             delete[] m_params;
+            m_paramCount = 0;
+            m_params = 0;
+        }
 
         if (m_lib)
+        {
             lib_close(m_lib);
+            m_lib = 0;
+        }
+        
+        // synths only
+        if (m_ainsCount > 0)
+        {
+            delete[] m_portsIn;
+            m_ainsCount = 0;
+            m_portsIn = 0;
+        }
+
+        if (m_aoutsCount > 0)
+        {
+            delete[] m_portsOut;
+            m_aoutsCount = 0;
+            m_portsOut = 0;
+        }
     }
 
     PluginType type() const
@@ -233,11 +257,6 @@ public:
         return m_uniqueId;
     }
 
-    bool enabled()
-    {
-        return m_enabled;
-    }
-
     bool active()
     {
         return m_active;
@@ -257,7 +276,12 @@ public:
     {
         return m_gui;
     }
-    
+
+    bool enabled()
+    {
+        return m_enabled;
+    }
+
     // needed for synth monitors
     QString getAudioOutputPortName(uint32_t index)
     {
@@ -271,7 +295,7 @@ public:
         return m_paramCount;
     }
 
-    ParameterPort* getParameter(uint32_t index)
+    ParameterPort* getParameterPort(uint32_t index)
     {
         if (index < m_paramCount)
             return &m_params[index];
@@ -487,11 +511,11 @@ public:
     void reloadPrograms(bool init);
 
     QString getParameterName(uint32_t index);
+    QString getParameterUnit(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
 
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
-    QString getParameterUnit(uint32_t index);
     void setProgram(uint32_t index);
 
     bool hasNativeGui();
@@ -524,7 +548,7 @@ protected:
 class Lv2Plugin : public BasePlugin
 {
 public:    
-    enum UiType {
+    enum Lv2UiType {
         UI_NONE,
         UI_GTK2,
         UI_QT4,
@@ -561,13 +585,13 @@ public:
     void reloadPrograms(bool init);
 
     QString getParameterName(uint32_t index);
+    QString getParameterUnit(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
 
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
-    QString getParameterUnit(uint32_t index);
     void setProgram(uint32_t index);
-
+    
     uint32_t getCustomURIId(const char* uri);
     const char* getCustomURIString(int uri_id);
 
@@ -578,8 +602,9 @@ public:
     void showNativeGui(bool yesno);
     bool nativeGuiVisible();
     void updateNativeGui();
+
     void closeNativeGui(bool destroyed = false);
-    void updateUIPorts(bool onlyOutput = false);
+    void updateGuiPorts(bool onlyOutput = false);
 
     void ui_resize(int width, int height);
     void ui_write_function(uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer);
@@ -602,23 +627,22 @@ private:
     QList<const char*> m_customURIs;
     QList<Lv2State> m_lv2States;
 
+    LV2_Handle handle;
+    const LV2_Descriptor* descriptor;
+    LV2_Feature* features[11]; //lv2_feature_count+1
+    
     struct {
-        UiType type;
+        Lv2UiType type;
         bool visible;
         int width;
         int height;
         void* lib;
         void* nativeWidget;
-
         LV2UI_Handle handle;
         LV2UI_Widget widget;
         const LV2UI_Descriptor* descriptor;
         QString bundlePath;
     } ui;
-
-    LV2_Handle handle;
-    const LV2_Descriptor* descriptor;
-    LV2_Feature* features[11]; //lv2_feature_count+1
 
     const LilvPlugin* lplug;
 };
@@ -626,7 +650,9 @@ private:
 //---------------------------------------------------------
 //   VST Plugin
 //---------------------------------------------------------
-#define MAX_VST_EVENTS 512
+
+#define MAX_VST_EVENTS   512
+#define VST_SANITY_CHECK 0xdeadbeef
 
 typedef AEffect* (*VST_Function)(audioMasterCallback);
 
@@ -639,6 +665,8 @@ public:
     ~VstPlugin();
 
     static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
+    
+    intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
     bool init(QString filename, QString label);
     void reload();
@@ -657,8 +685,7 @@ public:
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
     void setProgram(uint32_t index);
-
-    intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
+    void updateCurrentProgram();
 
     void process(uint32_t frames, float** src, float** dst, MPEventList* eventList);
     void bufferSizeChanged(uint32_t bufferSize);
@@ -667,17 +694,12 @@ public:
     void writeConfiguration(int level, Xml& xml);
 
     bool loadParameter(Xml& xml);
+    
+    // used to check if 'user' handle is valid
+    int sanityCheck;
 
 protected:
     bool isOldSdk;
-    struct {
-        int width;
-        int height;
-        QWidget* widget;
-    } ui;
-    int32_t m_currentProgram;
-    QStringList m_programNames;
-
     AEffect* effect;
     struct {
         int32_t numEvents;
@@ -685,6 +707,15 @@ protected:
         VstEvent* data[MAX_VST_EVENTS];
     } events;
     VstMidiEvent midiEvents[MAX_VST_EVENTS];
+
+    int32_t m_currentProgram;
+    QStringList m_programNames;
+
+    struct {
+        int width;
+        int height;
+        QWidget* widget;
+    } ui;
 };
 
 //---------------------------------------------------------
@@ -699,9 +730,10 @@ public:
     SynthPluginDevice(PluginType type, QString filename, QString name, QString label, bool duplicated = false);
     ~SynthPluginDevice();
 
-    SynthPluginDevice* clone()
+    SynthPluginDevice* clone(QString newName = QString(""))
     {
         SynthPluginDevice* synth = new SynthPluginDevice(m_type, m_filename, m_name, m_label, true);
+        synth->setName(newName.isEmpty() ? name() : newName);
         midiDevices.add(synth);
         return synth;
     }
@@ -780,7 +812,7 @@ public:
 protected:
     virtual bool putMidiEvent(const MidiPlayEvent&)
     {
-        qWarning("SynthPluginDevice::putMidiEvent()");
+        //qWarning("SynthPluginDevice::putMidiEvent()");
         return true;
     }
 

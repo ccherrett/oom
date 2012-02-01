@@ -126,6 +126,8 @@ protected:
     bool _locked;
     bool _selected;
 	bool m_chainMaster;
+    
+    bool _wantsAutomation;
 
 	MidiAssignData m_midiassign;
 	QList<qint64> m_audioChain;
@@ -454,6 +456,16 @@ public:
     }
     virtual AutomationType automationType() const = 0;
     virtual void setAutomationType(AutomationType t) = 0;
+    
+    bool wantsAutomation()
+    {
+        return _wantsAutomation;
+    }
+    
+    void setWantsAutomation(bool yesno)
+    {
+        _wantsAutomation = yesno;
+    }
 };
 
 //---------------------------------------------------------
@@ -531,10 +543,7 @@ public:
         _outChannel = i;
     }
 
-    void setOutPort(int i)
-    {
-        _outPort = i;
-    }
+    void setOutPort(int i);
     void setOutChanAndUpdate(int i);
     void setOutPortAndUpdate(int i);
 

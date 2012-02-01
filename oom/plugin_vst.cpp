@@ -22,20 +22,18 @@
 #define kVstVersion 2400
 #endif
 
+// FIXME - check return values
+
 intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
 {
-    VstPlugin* plugin = (effect && effect->user) ? (VstPlugin*)effect->user : 0;
+    VstPlugin* plugin = (effect && effect->user && ((VstPlugin*)effect->user)->sanityCheck == VST_SANITY_CHECK) ? (VstPlugin*)effect->user : 0;
 
     switch (opcode)
     {
     case audioMasterAutomate:
         if (plugin)
-        {
             plugin->setParameterValue(index, opt);
-            //if (plugin->gui())
-            //    plugin->gui()->setParameterValue(index, opt);
-        }
-        return 1; // FIXME?
+        return 1;
 
     case audioMasterVersion:
         return kVstVersion;
@@ -43,7 +41,7 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
     case audioMasterIdle:
         if (effect)
             effect->dispatcher(effect, effEditIdle, 0, 0, 0, 0.0f);
-        return 1; // FIXME?
+        return 1;
 
     case audioMasterGetTime:
         if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
@@ -97,11 +95,6 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
         // TODO - return BPM at a specific song pos
         return 0;
 
-    case audioMasterGetNumAutomatableParameters:
-        // Deprecated in VST SDK 2.4
-        // TODO
-        return 0;
-
     case audioMasterIOChanged:
         if (plugin)
         {
@@ -136,6 +129,10 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
 
     case audioMasterGetBlockSize:
         return segmentSize;
+        
+    case audioMasterWillReplaceOrAccumulate:
+        // Deprecated in VST SDK 2.4
+        return 1; // replace, FIXME
 
     case audioMasterGetVendorString:
         if (ptr) strcpy((char*)ptr, "OpenOctave");
@@ -170,6 +167,14 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
 
     case audioMasterGetLanguage:
         return kVstLangEnglish;
+        
+    case audioMasterUpdateDisplay:
+        if (plugin)
+        {
+            // Update current program name
+            plugin->updateCurrentProgram();
+        }
+        return 1;
 
     default:
         return 0;
@@ -196,12 +201,13 @@ VstPlugin::VstPlugin()
         memset(&midiEvents[i], 0, sizeof(VstMidiEvent));
         events.data[i] = (VstEvent*)&midiEvents[i];
     }
+
+    sanityCheck = VST_SANITY_CHECK;
 }
 
 VstPlugin::~VstPlugin()
 {
-    qWarning("~VstPlugin() --------------------------------------------");
-
+    sanityCheck = 0;
     aboutToRemove();
 
     if (effect)
@@ -211,6 +217,10 @@ VstPlugin::~VstPlugin()
             effect->dispatcher(effect, effEditClose, 0, 0, 0, 0.0f);
             delete ui.widget;
         }
+        
+        ui.widget = 0;
+        ui.width  = 0;
+        ui.height = 0;
 
         if (m_activeBefore)
         {
@@ -219,6 +229,8 @@ VstPlugin::~VstPlugin()
         }
 
         effect->dispatcher(effect, effClose, 0, 0, 0, 0.0f);
+
+        effect = 0;
     }
 
     // use global client to delete synth audio ports
@@ -394,7 +406,7 @@ void VstPlugin::reload()
     m_aoutsCount = effect->numOutputs;
     m_paramCount = effect->numParams;
 
-    if (effect->flags & effFlagsIsSynth && effect->numOutputs > 0)
+    if (effect->flags & effFlagsIsSynth && effect->numOutputs >= 1)
         m_hints |= PLUGIN_IS_SYNTH;
     else if (effect->numInputs > 1 && effect->numOutputs >= 1)
         m_hints |= PLUGIN_IS_FX;
@@ -636,6 +648,23 @@ void VstPlugin::setProgram(uint32_t index)
     }
 }
 
+void VstPlugin::updateCurrentProgram()
+{
+    if (m_currentProgram >= 0 && m_programNames.size() > 0)
+    {
+        char buf_str[255] = { 0 };
+
+        if (effect->dispatcher(effect, effGetProgramNameIndexed, m_currentProgram, 0, buf_str, 0.0f) != 1)
+            effect->dispatcher(effect, effGetProgramName, 0, 0, buf_str, 0.0f);
+
+        if (buf_str[0] != 0)
+        {
+            m_programNames[m_currentProgram] = QString(buf_str);
+            // TODO - tell oom to update preset names
+        }
+    }
+}
+
 bool VstPlugin::hasNativeGui()
 {
     return (m_hints & PLUGIN_HAS_NATIVE_GUI);
@@ -746,7 +775,7 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
 
         if (m_active)
         {
-            if ((m_hints & PLUGIN_IS_SYNTH) == 0 || effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels)
+            if ((m_hints & PLUGIN_IS_SYNTH) == 0 && (effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels))
             {
                 // cannot proccess
                 m_proc_lock.unlock();

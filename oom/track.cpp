@@ -174,6 +174,7 @@ void Track::init()
 	_panEnCtrl = true;
 	_panEn2Ctrl = true;
 	m_chainMaster = false;
+    _wantsAutomation = false;
 
 	_selected = false;
 	_height = DEFAULT_TRACKHEIGHT;
@@ -261,6 +262,7 @@ Track::Track(const Track& t, bool cloneParts)
 	_reminder1 = t._reminder1;
 	_reminder2 = t._reminder2;
 	_reminder3 = t._reminder3;
+    _wantsAutomation = t._wantsAutomation;
 
 	if (cloneParts)
 	{
@@ -329,6 +331,7 @@ Track& Track::operator=(const Track& t)
 	_locked = t.locked();
 	_collapsed = t._collapsed;
 	m_maxZIndex = t.m_maxZIndex;
+    _wantsAutomation = t._wantsAutomation;
 
 	_parts = *(t.cparts());
 
@@ -657,6 +660,18 @@ int MidiTrack::getTransposition()
 }
 
 //---------------------------------------------------------
+//   setOutPort
+//---------------------------------------------------------
+
+void MidiTrack::setOutPort(int i)
+{
+    _outPort = i;
+
+    if (i >= 0 && i < MIDI_PORTS)
+        _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
+}
+
+//---------------------------------------------------------
 //   setOutChanAndUpdate
 //---------------------------------------------------------
 
@@ -676,6 +691,9 @@ void MidiTrack::setOutChanAndUpdate(int i)
 
 void MidiTrack::setOutPortAndUpdate(int i)
 {
+    if (i >= 0 && i < MIDI_PORTS)
+        _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
+
 	if (_outPort == i)
 		return;
 

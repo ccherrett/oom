@@ -211,10 +211,10 @@ SynthPluginDevice::~SynthPluginDevice()
 
 QString SynthPluginDevice::open()
 {
-    qWarning("SynthPluginDevice::open()");
+    qWarning("SynthPluginDevice::open() -> %s", name().toUtf8().constData());
 
     if (m_plugin)
-        return "OK-FIXME";
+        return QString("OK");
 
     // Make it behave like a regular midi device.
     _readEnable = false;

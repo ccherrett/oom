@@ -323,18 +323,16 @@ static void readConfigMidiPort(Xml& xml)
 			case Xml::TagStart:
 				if (tag == "name")
                 {
-                    qWarning("Got MIDI NAME ------------------------");
 					device = xml.parse1();
                     if (!dev)
                         dev = midiDevices.find(device);
                 }
 				else if (tag == "type")
                 {
-                    qWarning("Got MIDI TYPE ------------------------");
 					type = xml.parseInt();
                 }
 				else if (tag == "record")
-				{ // old
+				{   // old
 					bool f = xml.parseInt();
 					if (f)
 						openFlags |= 2;
@@ -349,8 +347,8 @@ static void readConfigMidiPort(Xml& xml)
 					tmpSi.read(xml);
 				else if (tag == "instrument")
 				{
-                    qWarning("Got MIDI INSTRUMENT ------------------------");
 					instrument = xml.parse1();
+
                     if (instrument.endsWith(" [LV2]") || instrument.endsWith(" [VST]"))
                         dev = midiDevices.find(instrument);
 				}
@@ -381,13 +379,15 @@ static void readConfigMidiPort(Xml& xml)
                     if (dev && type == MidiDevice::SYNTH_MIDI)
                     {
                         SynthPluginDevice* oldSynth = (SynthPluginDevice*)dev;
-                        SynthPluginDevice* synth = oldSynth->clone();
-
+                        SynthPluginDevice* synth = oldSynth->clone(device);
                         synth->open();
+
                         // get into the plugin type
                         xml.parse();
                         // now load state
                         synth->read(xml);
+
+                        dev = synth;
                     }
                     else
                         xml.parse1();
@@ -404,7 +404,6 @@ static void readConfigMidiPort(Xml& xml)
 			case Xml::TagEnd:
 				if (tag == "midiport")
 				{
-                    qWarning("Got MIDI PORT ------------------------");
 					//if (idx > MIDI_PORTS) {
 					if (idx < 0 || idx >= MIDI_PORTS)
 					{

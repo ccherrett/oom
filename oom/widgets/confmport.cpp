@@ -757,7 +757,8 @@ _redisplay:
                         if (typ == MidiDevice::SYNTH_MIDI)
                         {
                             SynthPluginDevice* oldSynth = (SynthPluginDevice*)sdev;
-                            sdev = oldSynth->clone();
+                            if (oldSynth->duplicated() == false)
+                                sdev = oldSynth->clone();
                         }
                     }
 				}
