@@ -230,6 +230,15 @@ bool AudioPlayer::startClient()
 
 			if(jack_connect (m_client, jack_port_name (output_port [i]), name))
 				fprintf (stderr, "Cannot connect output port %d (%s).\n", i, name) ;
+
+            // connect mono files to playback_2
+            if (channels == 1)
+            {
+                snprintf (name, sizeof (name), "system:playback_%d", i + 2) ;
+
+                if(jack_connect (m_client, jack_port_name (output_port [i]), name))
+                    fprintf (stderr, "Cannot connect output port %d (%s).\n", i, name) ;
+            }
 		}/*}}}*/
 		return true;
 	}
