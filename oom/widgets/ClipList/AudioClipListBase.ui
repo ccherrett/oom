@@ -169,6 +169,9 @@
         <property name="text">
          <string/>
         </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>

@@ -421,9 +421,13 @@ void AudioClipList::updateNowPlaying(const QString& val)
 {
 	QStringList values = val.split(",");
 	if(values.size())
-	{
+	{	
 		QFileInfo info(values[0]);
-		songLabel->setText(info.fileName());
+		QFont font = songLabel->font();
+		int w = songLabel->width();
+		QFontMetrics fm(font);
+		songLabel->setText(fm.elidedText(info.fileName(), Qt::ElideRight, w));
+		//songLabel->setText(info.fileName());
 		songLabel->setToolTip(info.filePath());
 		lengthLabel->setText(values[1]);
 	}
@@ -443,8 +447,25 @@ void AudioClipList::updateLabels()
 		songLabel->setToolTip("");
 		lengthLabel->setText("00:00:00");
 	}
-	timeLabel->setText("00:00:00");
+	else
+	{
+		QFileInfo info(m_currentSong);
+		QFont font = songLabel->font();
+		int w = songLabel->width();
+		QFontMetrics fm(font);
+		songLabel->setText(fm.elidedText(info.fileName(), Qt::ElideRight, w));
+	}
+	if(!player.isPlaying())
+		timeLabel->setText("00:00:00");
 }
+
+void AudioClipList::resizeEvent(QResizeEvent* event)
+{
+	QFrame::resizeEvent(event);
+	if(!m_currentSong.isEmpty())
+		updateLabels();
+}
+
 using namespace QtConcurrent;
 static void doPlay(const QString& file)
 {

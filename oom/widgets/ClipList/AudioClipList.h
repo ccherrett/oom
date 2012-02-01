@@ -18,8 +18,10 @@
 class QListView;
 class QMimeData;
 class QPoint;
+class QResizeEvent;
 class AudioPlayer;
 class Slider;
+
 
 //Model for the file list
 class ClipListModel : public QStandardItemModel
@@ -47,6 +49,9 @@ class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	void saveBookmarks();
 	void addBookmark(const QString&);
 	void updateLabels();
+
+protected:
+	virtual void resizeEvent(QResizeEvent*);
 
 signals:
 	void stopPlayback();
