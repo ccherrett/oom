@@ -47,12 +47,24 @@ QFrame#m_playerFrame
     border: 1px solid #4b4b4b;
 }
 
-QLabel#timeLabel, QLabel#lengthLabel, QLabel#songLabel
+QLabel#songLabel
 {
 	/*background-color:none;
 	border:none;*/
 	 border-radius: 0px;
-     border-image: url(:/images/frame.png) 4;
+     border-image: url(:/images/frame_top.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #1b1b1b;
+	 color: #b8b8b8;
+}
+
+QLabel#timeLabel, QLabel#lengthLabel
+{
+	/*background-color:none;
+	border:none;*/
+	 border-radius: 0px;
+     border-image: url(:/images/frame_bottom.png) 4;
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #1b1b1b;

@@ -4175,8 +4175,7 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 
 	if (event->mimeData()->hasFormat("text/partlist"))
 		type = 1;
-	else
-		if (event->mimeData()->hasUrls())
+	else if (event->mimeData()->hasUrls())
 		type = 2;
 	else
 	{
@@ -4229,6 +4228,7 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 				track = tracks->index(trackNo);
 			else
 			{//Create the track
+		    	event->acceptProposedAction();
 				Track::TrackType t = Track::MIDI;
 				if(text.endsWith(".wav", Qt::CaseInsensitive) || text.endsWith(".ogg", Qt::CaseInsensitive))
 					t = Track::WAVE;

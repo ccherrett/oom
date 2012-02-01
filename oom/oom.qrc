@@ -4,6 +4,8 @@
 		<file>style.qss</file>
 		<file>images/crosshair.png</file>
 		<file>images/frame.png</file>
+		<file>images/frame_top.png</file>
+		<file>images/frame_bottom.png</file>
 		<file>images/frame_clipping.png</file>
 		<file>images/checkbox_checked.png</file>
                 <file>images/checkbox_checked_disabled.png</file>

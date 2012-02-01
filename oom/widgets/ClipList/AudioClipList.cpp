@@ -464,7 +464,7 @@ void AudioClipList::playClicked(bool state)
 			if(item)
 			{
 				QFileInfo info(item->data().toString());
-				if(!info.isDir())
+				if(!info.isDir() && !info.suffix().endsWith("mpt"))
 				{
 					if(player.isPlaying())
 						player.stop();

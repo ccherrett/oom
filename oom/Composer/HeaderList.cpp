@@ -617,6 +617,7 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 		{
 			// Multiple urls not supported here. Grab the first one.
 			QString text = event->mimeData()->urls()[0].path();
+		    event->acceptProposedAction();
 
 			if (text.endsWith(".wav", Qt::CaseInsensitive) ||
 					text.endsWith(".ogg", Qt::CaseInsensitive) ||
@@ -653,7 +654,6 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 					}
 				}
 			}
-		    event->acceptProposedAction();
 		}
 		else
 	    	event->ignore();
