@@ -528,6 +528,13 @@ void HeaderList::dragEnterEvent(QDragEnterEvent *event)/*{{{*/
 		    event->ignore();
 		}
 	}
+	else if(event->mimeData()->hasUrls())
+	{
+		if(!children().contains(event->source()))
+			event->accept();
+		else
+	    	event->ignore();
+	}
 	else
 	{
 	    event->ignore();
@@ -547,6 +554,13 @@ void HeaderList::dragMoveEvent(QDragMoveEvent *event)/*{{{*/
 		{
 		    event->ignore();
 		}
+	}
+	else if(event->mimeData()->hasUrls())
+	{
+		if(!children().contains(event->source()))
+			event->accept();
+		else
+	    	event->ignore();
 	}
 	else
 	{
@@ -596,6 +610,53 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 		{
 		    event->acceptProposedAction();
 		}
+	}
+	else if(event->mimeData()->hasUrls())
+	{
+		if(!children().contains(event->source()))
+		{
+			// Multiple urls not supported here. Grab the first one.
+			QString text = event->mimeData()->urls()[0].path();
+
+			if (text.endsWith(".wav", Qt::CaseInsensitive) ||
+					text.endsWith(".ogg", Qt::CaseInsensitive) ||
+					text.endsWith(".mpt", Qt::CaseInsensitive))
+			{
+				Track* track = y2Track(event->pos().y() + ypos);
+				if (!track)
+				{//Create the track
+					Track::TrackType t = Track::MIDI;
+					if(text.endsWith(".wav", Qt::CaseInsensitive) || text.endsWith(".ogg", Qt::CaseInsensitive))
+						t = Track::WAVE;
+					VirtualTrack* vt;
+					CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
+					ctdialog->lockType(true);
+					if(ctdialog->exec() && vt)
+					{
+						TrackManager* tman = new TrackManager();
+						qint64 nid = tman->addTrack(vt);
+						track = song->findTrackById(nid);
+					}
+				}
+				
+				if (track)
+				{
+					if (track->type() == Track::WAVE &&
+							(text.endsWith(".wav", Qt::CaseInsensitive) ||
+							(text.endsWith(".ogg", Qt::CaseInsensitive))))
+					{
+						oom->importWaveToTrack(text, song->cpos(), track);
+					}
+					else if ((track->isMidiTrack() || track->type() == Track::WAVE) && text.endsWith(".mpt", Qt::CaseInsensitive))
+					{//Who saves a wave part as anything but a wave file?
+						oom->importPartToTrack(text, song->cpos(), track);
+					}
+				}
+			}
+		    event->acceptProposedAction();
+		}
+		else
+	    	event->ignore();
 	}
 	else
 	{
@@ -648,57 +709,9 @@ void HeaderList::mousePressEvent(QMouseEvent* ev) //{{{
 			// Valid item?
             if (n >= 0 && ((Track::TrackType)n != Track::AUDIO_SOFTSYNTH))
 			{
-#if 0
-				// Synth sub-menu id?
-				if (n >= MENU_ADD_SYNTH_ID_BASE)
-				{
-					/*n -= MENU_ADD_SYNTH_ID_BASE;
-					//if(n < synthis.size())
-					//  t = song->createSynthI(synthis[n]->baseName());
-					//if((n - MENU_ADD_SYNTH_ID_BASE) < (int)synthis.size())
-					if (n < (int) synthis.size())
-					{
-						//t = song->createSynthI(synp->text(n));
-						//t = song->createSynthI(synthis[n]->name());
-						t = song->createSynthI(synthis[n]->baseName(), synthis[n]->name());
-
-						if (t)
-						{
-							// Add instance last in midi device list.
-							for (int i = 0; i < MIDI_PORTS; ++i)
-							{
-								MidiPort* port = &midiPorts[i];
-								MidiDevice* dev = port->device();
-								if (dev == 0)
-								{
-									midiSeq->msgSetMidiDevice(port, (SynthI*) t);
-									oom->changeConfig(true); // save configuration file
-									song->update();
-									break;
-								}
-							}
-						}
-					}*/
-				}
-				else
-				{
-#endif
-				//	t = song->addTrack((Track::TrackType)n);
-					CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1, this);
-					connect(ctdialog, SIGNAL(trackAdded(qint64)), this, SLOT(newTrackAdded(qint64)));
-					ctdialog->exec();
-                //}
-
-				/*if (t)
-				{
-					midiMonitor->msgAddMonitoredTrack(t);
-					song->deselectTracks();
-					t->setSelected(true);
-
-					emit selectionChanged(t);
-					emit trackInserted(n);
-					song->updateTrackViews();
-				}*/
+				CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1, this);
+				connect(ctdialog, SIGNAL(trackAdded(qint64)), this, SLOT(newTrackAdded(qint64)));
+				ctdialog->exec();
 			}
 		}
 		if(p)

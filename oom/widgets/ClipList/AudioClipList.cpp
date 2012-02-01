@@ -92,8 +92,9 @@ AudioClipList::AudioClipList(QWidget *parent)
 	
 	btnPlay->setIcon(QIcon(*playIconSetRight));
 
-	QColor sliderBgColor = g_trackColorList.value(3);
-	m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, true);
+	//QColor sliderBgColor = g_trackColorList.value(3);
+	QColor sliderBgColor = g_trackColorListSelected.value(3);
+	m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, false);
 	m_slider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	m_slider->setCursorHoming(true);
 	m_slider->setRange(config.minSlider - 0.1, 10.0);
