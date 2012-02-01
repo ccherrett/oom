@@ -203,7 +203,8 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 						{
 							QString instrumentName = vtrack->instrumentName;
 							if(vtrack->instrumentType == SYNTH_INSTRUMENT)
-							{//falkTx set midi port synth instrument here
+							{
+                                mtrack->setWantsAutomation(true);
 							}
 							else
 							{

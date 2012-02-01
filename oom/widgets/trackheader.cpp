@@ -176,7 +176,7 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 	{
 		setFixedHeight(m_track->height());
 	}
-	if(m_track->isMidiTrack())
+    if(m_track->isMidiTrack() && m_track->wantsAutomation() == false)
 		m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 	else
 		m_btnAutomation->setIcon(*automation_trackIconSet3);
@@ -485,13 +485,19 @@ void TrackHeader::heartBeat()/*{{{*/
 				if (m_midiDetect)
 				{
 					m_midiDetect = false;
-					m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
+                    if (m_track->wantsAutomation())
+                        m_btnAutomation->setIcon(*automation_trackIconSet3);
+                    else
+                        m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 				}
 			}
 		}
 		else
 		{
-			m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
+            if (m_track->wantsAutomation())
+                m_btnAutomation->setIcon(*automation_trackIconSet3);
+            else
+                m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 		}
 	}
 	else
@@ -629,6 +635,12 @@ void TrackHeader::generatePopupMenu()/*{{{*/
         if (port->device() && port->device()->deviceType() == MidiDevice::SYNTH_MIDI)
         {
             SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
+            
+            QAction* mact = p->addAction(tr("Show Gui"));
+            mact->setCheckable(true);
+            mact->setChecked(synth->guiVisible());
+            mact->setData(3);
+
             QAction* mactn = p->addAction(tr("Show Native Gui"));
             mactn->setCheckable(true);
             mactn->setEnabled(synth->hasNativeGui());
