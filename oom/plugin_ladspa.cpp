@@ -27,8 +27,6 @@ LadspaPlugin::LadspaPlugin()
 
 LadspaPlugin::~LadspaPlugin()
 {
-    qWarning("~LadspaPlugin() --------------------------------------------");
-
     aboutToRemove();
 
     if (handle && descriptor->deactivate && m_activeBefore)
@@ -37,14 +35,20 @@ LadspaPlugin::~LadspaPlugin()
     if (handle && descriptor->cleanup)
         descriptor->cleanup(handle);
 
+    handle = 0;
+    descriptor = 0;
+
     if (m_paramCount > 0)
+    {
         delete[] m_paramsBuffer;
+        m_paramsBuffer = 0;
+    }
 
     m_audioInIndexes.clear();
     m_audioOutIndexes.clear();
 }
 
-void LadspaPlugin::initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle)
+void LadspaPlugin::initPluginI(PluginI* plugi, const QString&, const QString&, const void* nativeHandle)
 {
     const LADSPA_Descriptor* descr = (LADSPA_Descriptor*)nativeHandle;
     plugi->m_hints = 0;
@@ -71,9 +75,6 @@ void LadspaPlugin::initPluginI(PluginI* plugi, const QString& filename, const QS
     if (plugi->m_audioInputCount == plugi->m_audioOutputCount && plugi->m_audioOutputCount >= 1)
         // we can only process plugins that have the same number of input/output audio ports
         plugi->m_hints |= PLUGIN_IS_FX;
-
-    Q_UNUSED(filename);
-    Q_UNUSED(label);
 }
 
 bool LadspaPlugin::init(QString filename, QString label)
@@ -158,8 +159,8 @@ void LadspaPlugin::reload()
     // reset
     m_hints  = 0;
     m_params = 0;
-    m_paramsBuffer = 0;
     m_paramCount   = 0;
+    m_paramsBuffer = 0;
 
     // query new data
     uint32_t ains, aouts, params, j;
@@ -191,8 +192,8 @@ void LadspaPlugin::reload()
     // allocate data
     if (params > 0)
     {
-        m_params = new ParameterPort[params];
-        m_paramsBuffer = new float[params];
+        m_params = new ParameterPort [params];
+        m_paramsBuffer = new float [params];
     }
 
     // fill in all the data
@@ -307,7 +308,7 @@ void LadspaPlugin::reload()
                 max = min + 0.1;
             }
 
-            // hints
+            // parameter hints
             if (LADSPA_IS_HINT_SAMPLE_RATE(PortHint.HintDescriptor))
             {
                 min *= sampleRate;
@@ -325,7 +326,7 @@ void LadspaPlugin::reload()
             {
                 step = 1.0;
                 step_small = 1.0;
-                step_large = 10.0;
+                step_large = (max - min > 10.0) ? 10.0 : 1.0;
                 m_params[j].hints |= PARAMETER_IS_INTEGER;
             }
             else if (LADSPA_IS_HINT_TOGGLED(PortHint.HintDescriptor))
@@ -374,9 +375,9 @@ void LadspaPlugin::reload()
                 qWarning("WARNING - Got a broken Port (Control, but not input or output)");
             }
 
+            m_params[j].ranges.def = def;
             m_params[j].ranges.min = min;
             m_params[j].ranges.max = max;
-            m_params[j].ranges.def = def;
             m_params[j].ranges.step = step;
             m_params[j].ranges.step_small = step_small;
             m_params[j].ranges.step_large = step_large;
@@ -402,15 +403,14 @@ void LadspaPlugin::reload()
 
 void LadspaPlugin::reloadPrograms(bool)
 {
-    // LADSPA has no program support
+    // LADSPA has no programs support
 }
 
 QString LadspaPlugin::getParameterName(uint32_t index)
 {
-    if (descriptor && index < m_paramCount)
+    if (index < m_paramCount && descriptor)
         return QString(descriptor->PortNames[m_params[index].rindex]);
-    else
-        return QString("");
+    return QString("");
 }
 
 QString LadspaPlugin::getParameterUnit(uint32_t)
@@ -427,7 +427,6 @@ void LadspaPlugin::setNativeParameterValue(uint32_t index, double value)
 uint32_t LadspaPlugin::getProgramCount()
 {
     return 0;
-
 }
 
 QString LadspaPlugin::getProgramName(uint32_t)
@@ -577,7 +576,7 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst, MPEventLis
 
 void LadspaPlugin::bufferSizeChanged(uint32_t)
 {
-    // note needed
+    // not needed
 }
 
 bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)

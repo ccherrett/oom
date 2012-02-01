@@ -44,6 +44,7 @@ struct VirtualTrack {
 	QPair<int, QString> outputConfig;
 	QPair<int, QString> instrumentConfig;
 	QPair<int, QString> monitorConfig;
+    QPair<int, QString> monitorConfig2;
 	QPair<int, QString> bussConfig;
 };
 

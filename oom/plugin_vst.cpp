@@ -22,6 +22,8 @@
 #define kVstVersion 2400
 #endif
 
+// FIXME - check return values
+
 intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
 {
     VstPlugin* plugin = (effect && effect->user) ? (VstPlugin*)effect->user : 0;
@@ -30,12 +32,8 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
     {
     case audioMasterAutomate:
         if (plugin)
-        {
             plugin->setParameterValue(index, opt);
-            //if (plugin->gui())
-            //    plugin->gui()->setParameterValue(index, opt);
-        }
-        return 1; // FIXME?
+        return 1;
 
     case audioMasterVersion:
         return kVstVersion;
@@ -43,7 +41,7 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
     case audioMasterIdle:
         if (effect)
             effect->dispatcher(effect, effEditIdle, 0, 0, 0, 0.0f);
-        return 1; // FIXME?
+        return 1;
 
     case audioMasterGetTime:
         if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
@@ -211,6 +209,10 @@ VstPlugin::~VstPlugin()
             effect->dispatcher(effect, effEditClose, 0, 0, 0, 0.0f);
             delete ui.widget;
         }
+        
+        ui.widget = 0;
+        ui.width  = 0;
+        ui.height = 0;
 
         if (m_activeBefore)
         {
@@ -219,6 +221,8 @@ VstPlugin::~VstPlugin()
         }
 
         effect->dispatcher(effect, effClose, 0, 0, 0, 0.0f);
+
+        effect = 0;
     }
 
     // use global client to delete synth audio ports

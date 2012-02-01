@@ -1080,7 +1080,13 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 	{
 		input->setMute(false);
 		QString selectedInput = vtrack->monitorConfig.second;
-		
+        QString selectedInput2;
+
+        if (vtrack->monitorConfig2.second.isEmpty())
+            selectedInput2 = selectedInput;
+        else
+            selectedInput2 = vtrack->monitorConfig2.second;
+
 		//Route world to input
 		QString jackCapture("system:capture");
 		if(selectedInput.startsWith(jackCapture))
@@ -1106,7 +1112,7 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 			audio->msgAddRoute(srcRoute, dstRoute);
 
 			//Route channel 2
-			Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
+			Route srcRoute2(selectedInput2, false, -1, Route::JACK_ROUTE);
 			Route dstRoute2(input, 1);
 			srcRoute2.channel = 1;
 			audio->msgAddRoute(srcRoute2, dstRoute2);

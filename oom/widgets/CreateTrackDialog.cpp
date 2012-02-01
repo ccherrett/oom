@@ -129,31 +129,53 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		{/*{{{*/
             int instrumentType = cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
             QString instrumentName = cmbInstrument->itemData(instrumentIndex, InstrumentNameRole).toString();
-            QString selectedInput;
+            QString selectedInput, selectedInput2;
             
             if (instrumentType == TrackManager::SYNTH_INSTRUMENT)
             {
                 qWarning("Add Synth: %s", instrumentName.toUtf8().constData());
-
-                for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+                
+                int portIdx = -1;
+                for (int i = 0; i < MIDI_PORTS; i++)
                 {
-                    qWarning("HERE 001");
-                    if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                    if (!midiPorts[i].device())
                     {
-                        qWarning("HERE 002");
-                        SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
-                        SynthPluginDevice* synth = oldSynth->clone();
-                        qWarning("HERE 003");
-
-                        synth->setPluginName(txtName->text());
-                        synth->open();
-                        
-                        if (cmbMonitor->itemText(monitorIndex) == txtName->text()+":(output-ports)")
-                        {
-                            selectedInput = synth->getAudioOutputPortName(0);
-                        }
-                        
+                        portIdx = i;
                         break;
+                    }
+                }
+                
+                if (portIdx >= 0)
+                {
+                    for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+                    {
+                        qWarning("HERE 001");
+                        if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                        {
+                            qWarning("HERE 002");
+                            QString devName = txtName->text();
+                            SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
+                            SynthPluginDevice* synth = oldSynth->clone(devName);
+                            qWarning("HERE 003 --------------");
+
+                            //synth->setPluginName(txtName->text());
+                            synth->open();
+
+                            if (cmbMonitor->itemText(monitorIndex) == txtName->text()+":(output-ports)")
+                            {
+                                selectedInput  = synth->getAudioOutputPortName(0);
+                                selectedInput2 = synth->getAudioOutputPortName(1);
+                            }
+
+                            midiSeq->msgSetMidiDevice(&midiPorts[portIdx], synth);
+                            
+                            m_vtrack->useOutput = true;
+                            m_vtrack->createMidiOutputDevice = false;
+                            m_vtrack->outputConfig = qMakePair(portIdx, devName);
+                            m_vtrack->outputChannel = 1;
+
+                            break;
+                        }
                     }
                 }
             }
@@ -211,8 +233,11 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				QString selectedBuss = cmbBuss->itemText(bussIndex);
                 if (selectedInput.isEmpty())
                     selectedInput = cmbMonitor->itemText(monitorIndex);
+                if (selectedInput2.isEmpty())
+                    selectedInput2 = selectedInput;
 				m_vtrack->useMonitor = true;
-				m_vtrack->monitorConfig = qMakePair(0, selectedInput);
+				m_vtrack->monitorConfig  = qMakePair(0, selectedInput);
+                m_vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
 				if(chkBuss->isChecked())
 				{
 					m_vtrack->useBuss = true;

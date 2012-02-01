@@ -180,7 +180,7 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
             uint32_t paramCount = oldPlugin->getParameterCount();
             for (uint32_t i = 0; i < paramCount; i++)
             {
-                ParameterPort* paramPort = oldPlugin->getParameter(i);
+                ParameterPort* paramPort = oldPlugin->getParameterPort(i);
                 if (! paramPort || paramPort->type != PARAMETER_INPUT || (paramPort->hints & PARAMETER_IS_AUTOMABLE) == 0)
                     continue;
 
@@ -228,7 +228,7 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
         uint32_t paramCount = plugin->getParameterCount();
         for (uint32_t i = 0; i < paramCount; i++)
         {
-            ParameterPort* paramPort = plugin->getParameter(i);
+            ParameterPort* paramPort = plugin->getParameterPort(i);
             if (! paramPort || paramPort->type != PARAMETER_INPUT || (paramPort->hints & PARAMETER_IS_AUTOMABLE) == 0)
                 continue;
 
@@ -1048,7 +1048,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
             p = (*_efxPipe)[n];
             if (p)
             {
-                ParameterPort* cport = p->getParameter(m);
+                ParameterPort* cport = p->getParameterPort(m);
                 if (cport && cport->type == PARAMETER_INPUT && (cport->hints & PARAMETER_IS_AUTOMABLE) > 0)
                     ctlfound = true;
             }
@@ -1076,7 +1076,7 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
         if (ctlfound)
         {
             l->setCurVal(p->getParameterValue(m));
-            ParameterPort* cport = p->getParameter(m);
+            ParameterPort* cport = p->getParameterPort(m);
             if (cport && cport->hints & PARAMETER_IS_TOGGLED)
                 l->setMode(CtrlList::DISCRETE);
             else
@@ -1166,7 +1166,7 @@ void AudioTrack::mapRackPluginsToControllers()
 		uint32_t portCount = p->getParameterCount();
 		for (uint32_t i = 0; i < portCount; i++)
 		{
-                        ParameterPort* paramPort = p->getParameter(i);
+                        ParameterPort* paramPort = p->getParameterPort(i);
                         if (! paramPort || paramPort->type != PARAMETER_INPUT || (paramPort->hints & PARAMETER_IS_AUTOMABLE) == 0)
                             continue;
 

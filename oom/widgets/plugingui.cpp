@@ -121,7 +121,7 @@ PluginGui::PluginGui(BasePlugin* p)
 
     for (uint32_t i = 0; i < n; i++)
     {
-        ParameterPort* paramPort = plugin->getParameter(i);
+        ParameterPort* paramPort = plugin->getParameterPort(i);
         if (! paramPort || paramPort->type != PARAMETER_INPUT)
         {
             params[i].type = GuiParam::GUI_NULL;
@@ -462,7 +462,7 @@ void PluginGui::reset()
 {
     for (uint32_t i = 0; i < plugin->getParameterCount(); i++)
     {
-        ParameterPort* paramPort = plugin->getParameter(i);
+        ParameterPort* paramPort = plugin->getParameterPort(i);
         if (! paramPort || paramPort->type != PARAMETER_INPUT)
             continue;
 
