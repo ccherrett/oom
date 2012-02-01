@@ -413,6 +413,11 @@ void Composer::currentTabChanged(int tab)
 			midiConductor->update();
 		}
 	}
+	else if(tab == 3)
+	{
+		if(m_clipList)
+			m_clipList->refresh();
+	}
 }
 
 //---------------------------------------------------------

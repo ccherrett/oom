@@ -438,6 +438,17 @@ public:
             return &_viewtracks;
     }
 
+	QList<qint64> selectedTracks()
+	{
+		QList<qint64> list;
+		foreach(Track* t, m_viewTracks)
+		{
+			if(t->selected())
+				list.append(t->id());
+		}
+		return list;
+	}
+
     TrackList getSelectedTracks();
     void setTrackHeights(TrackList& list, int height);
 

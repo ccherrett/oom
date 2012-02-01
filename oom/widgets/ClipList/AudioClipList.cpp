@@ -11,9 +11,17 @@
 #include "config.h"
 #include "globals.h"
 #include "gconfig.h"
+#include "app.h"
 #include "song.h"
 #include "icons.h"
+#include "track.h"
 #include "traverso_shared/TConfig.h"
+#include "slider.h"
+#include "mixer/meter.h"
+#include "CreateTrackDialog.h"
+
+#include <fastlog.h>
+#include <math.h>
 
 #include <QDir>
 #include <QUrl>
@@ -61,7 +69,7 @@ AudioClipList::AudioClipList(QWidget *parent)
 {
 	setupUi(this);
 	
-	m_filters << "wav" << "ogg";
+	m_filters << "wav" << "ogg" << "mpt";
 
 	m_bookmarkModel = new BookmarkListModel(this);
 	m_bookmarkList->setModel(m_bookmarkModel);
@@ -84,15 +92,28 @@ AudioClipList::AudioClipList(QWidget *parent)
 	
 	btnPlay->setIcon(QIcon(*playIconSetRight));
 
+	QColor sliderBgColor = g_trackColorList.value(3);
+	m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, true);
+	m_slider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	m_slider->setCursorHoming(true);
+	m_slider->setRange(config.minSlider - 0.1, 10.0);
+	m_slider->setFixedHeight(15);
+	m_slider->setFont(config.fonts[1]);
+	m_slider->setIgnoreWheel(true);
+	playerLayout->insertWidget(2, m_slider);
+
 	connect(btnPlay, SIGNAL(toggled(bool)), this, SLOT(playClicked(bool)));
 	connect(btnStop, SIGNAL(toggled(bool)), this, SLOT(stopClicked(bool)));
 	connect(btnRewind, SIGNAL(clicked()), this, SLOT(rewindClicked()));
 	connect(btnForward, SIGNAL(clicked()), this, SLOT(forwardClicked()));
 	connect(btnHome, SIGNAL(clicked()), this, SLOT(homeClicked()));
 	//connect(btnBookmark, SIGNAL(clicked()), this, SLOT(addBookmarkClicked()));
+
 	connect(&player, SIGNAL(playbackStopped(bool)), this, SLOT(stopClicked(bool)));
 	connect(&player, SIGNAL(timeChanged(const QString&)), this, SLOT(updateTime(const QString&)));
+	connect(&player, SIGNAL(nowPlaying(const QString&)), this, SLOT(updateNowPlaying(const QString&)));
 	connect(this, SIGNAL(stopPlayback()), &player, SLOT(stop()));
+	connect(m_slider, SIGNAL(sliderMoved(double, int)), &player, SLOT(setVolume(double)));
 
 	connect(m_fileList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(fileItemSelected(const QModelIndex&)));
 	connect(m_fileList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(fileItemContextMenu(const QPoint&)));
@@ -109,9 +130,14 @@ AudioClipList::AudioClipList(QWidget *parent)
 		sizes.append(val);
 	}
 	splitter->setSizes(sizes);
+	double volume = tconfig().get_property("AudioClipList", "volume", fast_log10(0.60*20.0)).toDouble();
+	//m_slider->setValue(fast_log10(0.60*20.0));
+	m_slider->setValue(volume);
+	player.setVolume(volume);
 	loadBookmarks();
 	//setDir(QDir::currentPath());
 	setDir(oomProject);
+	updateLabels();
 }
 
 AudioClipList::~AudioClipList()
@@ -123,7 +149,9 @@ AudioClipList::~AudioClipList()
 		out << QString::number(s);
 	}
 	tconfig().set_property("AudioClipList", "sizes", out.join(" "));
+	tconfig().set_property("AudioClipList", "volume", m_slider->value());
 	saveBookmarks();
+	player.stop();
 }
 
 void AudioClipList::saveBookmarks()
@@ -143,6 +171,7 @@ void AudioClipList::saveBookmarks()
 
 void AudioClipList::loadBookmarks()
 {
+	m_bookmarkModel->clear();
 	QString defDir = QDir::homePath();
 	QString str = tconfig().get_property("AudioClipList", "bookmarks", defDir).toString();
 	QStringList sl = str.split(QString(","), QString::SkipEmptyParts);
@@ -210,6 +239,15 @@ void AudioClipList::setDir(const QString &path)
 	}
 }
 
+void AudioClipList::refresh()
+{
+	if(m_currentPath.isEmpty())
+		setDir(oomProject);
+	else
+		setDir(m_currentPath);
+	loadBookmarks();
+}
+
 bool AudioClipList::isSupported(const QString& suffix)
 {
 	return m_filters.contains(suffix);
@@ -253,6 +291,55 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)
 					{
 						addBookmark(item->data().toString());
 						saveBookmarks();
+					}
+					break;
+					case 2:
+					{
+						QList<qint64> selectedTracks = song->selectedTracks();
+						if(selectedTracks.size() == 1)
+						{//FIXME:If its greater we could present the user with a list to choose from
+							Track* track = song->findTrackById(selectedTracks.at(0));
+							QString text(f.filePath());
+							if(track)
+							{
+								if (track->type() == Track::WAVE &&
+										(f.suffix().endsWith("wav", Qt::CaseInsensitive) ||
+										(f.suffix().endsWith("ogg", Qt::CaseInsensitive))))
+								{
+									oom->importWaveToTrack(text, song->cpos(), track);
+								}
+								else if ((track->isMidiTrack() || track->type() == Track::WAVE) && f.suffix().endsWith("mpt", Qt::CaseInsensitive))
+								{//Who saves a wave part as anything but a wave file?
+									oom->importPartToTrack(text, song->cpos(), track);
+								}
+							}
+						}
+					}
+					break;
+					case 3:
+					{
+						Track *track = 0;
+
+						Track::TrackType t = Track::MIDI;
+						if(f.suffix().endsWith("wav", Qt::CaseInsensitive) || f.suffix().endsWith("ogg", Qt::CaseInsensitive))
+							t = Track::WAVE;
+						VirtualTrack* vt;
+						CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
+						ctdialog->lockType(true);
+						if(ctdialog->exec() && vt)
+						{
+							TrackManager* tman = new TrackManager();
+							qint64 nid = tman->addTrack(vt);
+							track = song->findTrackById(nid);
+						}
+						if(track)
+						{
+							QString text(f.filePath());
+							if(track->type() == Track::WAVE)
+								oom->importWaveToTrack(text, song->cpos(), track);
+							else
+								oom->importPartToTrack(text, song->cpos(), track);
+						}
 					}
 					break;
 					case 4:
@@ -300,6 +387,13 @@ void AudioClipList::fileItemSelected(const QModelIndex& index)
 		{
 			setDir(item->data().toString());
 		}
+		else
+		{
+			playClicked(true);
+			btnPlay->blockSignals(true);
+			btnPlay->setChecked(true);
+			btnPlay->blockSignals(false);
+		}
 	}
 }
 
@@ -317,10 +411,38 @@ void AudioClipList::bookmarkItemSelected(const QModelIndex& index)
 
 void AudioClipList::updateTime(const QString& time)
 {
-	timeLabel->setVisible(true);
+	//timeLabel->setVisible(true);
 	timeLabel->setText(time);
 }
 
+void AudioClipList::updateNowPlaying(const QString& val)
+{
+	QStringList values = val.split(",");
+	if(values.size())
+	{
+		QFileInfo info(values[0]);
+		songLabel->setText(info.fileName());
+		songLabel->setToolTip(info.filePath());
+		lengthLabel->setText(values[1]);
+	}
+	else
+	{
+		songLabel->setText(tr("Unknown"));
+		songLabel->setToolTip("");
+		lengthLabel->setText("00:00:00");
+	}
+}
+
+void AudioClipList::updateLabels()
+{
+	if(m_currentSong.isEmpty())
+	{
+		songLabel->setText(tr("<None>"));
+		songLabel->setToolTip("");
+		lengthLabel->setText("00:00:00");
+	}
+	timeLabel->setText("00:00:00");
+}
 using namespace QtConcurrent;
 static void doPlay(const QString& file)
 {
@@ -329,14 +451,11 @@ static void doPlay(const QString& file)
 
 void AudioClipList::playClicked(bool state)
 {
-	qDebug("AudioClipList::playClicked: state: %d", state);
+	//qDebug("AudioClipList::playClicked: state: %d", state);
 
 	if(state)
 	{
-		btnStop->blockSignals(true);
-		btnStop->setChecked(!state);
-		btnStop->blockSignals(false);
-
+		bool error_free = false;
 		QModelIndex index = m_fileList->currentIndex();
 		if(index.isValid())
 		{
@@ -348,27 +467,66 @@ void AudioClipList::playClicked(bool state)
 				{
 					if(player.isPlaying())
 						player.stop();
+					m_currentSong = info.filePath();
 					QFuture<void> pl = run(doPlay, info.filePath());
+					error_free = true;
+				}
+				else if(!m_currentSong.isEmpty())
+				{
+					if(player.isPlaying())
+						player.stop();
+					QFuture<void> pl = run(doPlay, m_currentSong);
+					error_free = true;
 				}
 			}
+			else if(!m_currentSong.isEmpty())
+			{
+				if(player.isPlaying())
+					player.stop();
+				QFuture<void> pl = run(doPlay, m_currentSong);
+				error_free = true;
+			}
 		}
+		else if(!m_currentSong.isEmpty())
+		{
+			if(player.isPlaying())
+				player.stop();
+			QFuture<void> pl = run(doPlay, m_currentSong);
+			error_free = true;
+		}
+		else
+		{
+			btnPlay->blockSignals(true);
+			btnPlay->setChecked(false);
+			btnPlay->blockSignals(false);
+		}
+		if(error_free)
+		{
+			btnStop->blockSignals(true);
+			btnStop->setChecked(!state);
+			btnStop->blockSignals(false);
+		}
+	}
+	else
+	{
+		btnStop->setChecked(!state);
 	}
 }
 
 void AudioClipList::stopClicked(bool state)
 {
-	qDebug("AudioClipList::stopClicked:state: %d", state);
+	//qDebug("AudioClipList::stopClicked:state: %d", state);
 	btnStop->blockSignals(true);
 	btnStop->setChecked(true);
 	btnStop->blockSignals(false);
-	//TODO: Stop playback is playing
 	if(state)
 	{
 		btnPlay->blockSignals(true);
 		btnPlay->setChecked(!state);
 		btnPlay->blockSignals(false);
 		emit stopPlayback();//Make player stop
-		timeLabel->setVisible(false);
+		updateLabels();
+		//timeLabel->setVisible(false);
 	}
 }
 

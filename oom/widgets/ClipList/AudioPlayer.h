@@ -1,8 +1,12 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//
+//  
 //  (C) Copyright 2010 Andrew Williams and Christopher Cherrett
+//
+//  Based sndfile-jackplay.c
+//  Copyright (c) 2007-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+//  Copyright (C) 2007 Jonatan Liljedahl <lijon@kymatica.com>
 //=========================================================
 
 #ifndef _OOM_AUDIO_CLIP_PLAYER_
@@ -24,8 +28,10 @@ typedef struct _thread_info
 	jack_client_t *client ;
 	unsigned int channels ;
 	volatile int can_process ;
+	volatile int can_read;
 	volatile int read_done ;
 	volatile int play_done ;
+	volatile float volume;
 } thread_info_t ;
 							
 
@@ -46,13 +52,16 @@ class AudioPlayer : public QObject
 	void print_time(jack_nframes_t);
 	//Start jack client;
 	bool startClient();
+	void stopClient();
 
 signals:
 	void timeChanged(const QString&);
 	void playbackStopped(bool);
+	void nowPlaying(const QString&);
 
 public slots:
 	void stop();
+	void setVolume(double value);
 
 public:
 	AudioPlayer();

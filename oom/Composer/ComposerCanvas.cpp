@@ -4227,6 +4227,22 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 			Track* track = 0;
 			if (trackNo < tracks->size())
 				track = tracks->index(trackNo);
+			else
+			{//Create the track
+				Track::TrackType t = Track::MIDI;
+				if(text.endsWith(".wav", Qt::CaseInsensitive) || text.endsWith(".ogg", Qt::CaseInsensitive))
+					t = Track::WAVE;
+				VirtualTrack* vt;
+				CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
+				ctdialog->lockType(true);
+				if(ctdialog->exec() && vt)
+				{
+					TrackManager* tman = new TrackManager();
+					qint64 nid = tman->addTrack(vt);
+					track = song->findTrackById(nid);
+				}
+			}
+			
 			if (track)
 			{
 				if (track->type() == Track::WAVE &&
@@ -4236,9 +4252,8 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 					unsigned tick = x;
 					oom->importWaveToTrack(text, tick, track);
 				}
-					// Changed by T356. Support mixed .mpt files.
 				else if ((track->isMidiTrack() || track->type() == Track::WAVE) && text.endsWith(".mpt", Qt::CaseInsensitive))
-				{
+				{//Who saves a wave part as anything but a wave file?
 					unsigned tick = x;
 					oom->importPartToTrack(text, tick, track);
 				}

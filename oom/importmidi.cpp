@@ -531,47 +531,6 @@ void OOMidi::importPart()
 
 void OOMidi::importPartToTrack(QString& filename, unsigned tick, Track* track)
 {
-	// Changed by T356
-	/*
-	bool popenFlag = false;
-	FILE* fp = fileOpen(this, filename, ".mpt", "r", popenFlag, false, false);
-
-	if(fp)
-	{
-	  MidiPart* importedPart = new MidiPart((MidiTrack*)track);
-	  Xml tmpXml = Xml(fp);
-
-	  Xml::Token token = tmpXml.parse();
-	  const QString& tag = tmpXml.s1();
-	  if (token == Xml::TagStart && tag == "part")
-	  {
-		// Make a backup of the current clone list, to retain any 'copy' items,
-		//  so that pasting works properly after.
-		CloneList copyCloneList = cloneList;
-		// Clear the clone list to prevent any dangerous associations with
-		//  current non-original parts.
-		cloneList.clear();
-
-		importedPart->read(tmpXml);
-		importedPart->setTick(tick);
-          
-		// Restore backup of the clone list, to retain any 'copy' items,
-		//  so that pasting works properly after.
-		cloneList.clear();
-		cloneList = copyCloneList;
-          
-		audio->msgAddPart(importedPart);
-	  }
-	  else
-	  {
-		printf("Unknown tag: %s\n", tag.toLatin1().constData());
-	  }
-	  fclose(fp);
-	}
-	return;
-	 */
-
-
 	bool popenFlag = false;
 	FILE* fp = fileOpen(this, filename, ".mpt", "r", popenFlag, false, false);
 

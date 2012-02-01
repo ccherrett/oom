@@ -39,6 +39,26 @@ QHeaderView#trackHeaders
 	background-color: #525252;
 }
 
+QFrame#m_playerFrame
+{
+	color: #d0d4d0;
+	background-color: #1e1e1e;
+	border-radius: 12px;
+    border: 1px solid #4b4b4b;
+}
+
+QLabel#timeLabel, QLabel#lengthLabel, QLabel#songLabel
+{
+	/*background-color:none;
+	border:none;*/
+	 border-radius: 0px;
+     border-image: url(:/images/frame.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #1b1b1b;
+	 color: #b8b8b8;
+}
+
  QWidget#WaveView
  {
  	background-color: black;

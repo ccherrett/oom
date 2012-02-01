@@ -14,12 +14,12 @@
 #include <QModelIndex>
 #include <QModelIndexList>
 #include <QStandardItemModel>
-#include <QFutureWatcher>
 
 class QListView;
 class QMimeData;
 class QPoint;
 class AudioPlayer;
+class Slider;
 
 //Model for the file list
 class ClipListModel : public QStandardItemModel
@@ -34,16 +34,18 @@ public:
 class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	Q_OBJECT
 	
-	//QFileSystemModel *m_listModel;
 	ClipListModel *m_listModel;
 	BookmarkListModel *m_bookmarkModel;
+	Slider* m_slider;
 	QStringList m_filters;
 	QString m_currentPath;
+	QString m_currentSong;
 
 	bool isSupported(const QString&);
 	void loadBookmarks();
 	void saveBookmarks();
 	void addBookmark(const QString&);
+	void updateLabels();
 
 signals:
 	void stopPlayback();
@@ -60,8 +62,11 @@ private slots:
 	void bookmarkItemSelected(const QModelIndex&);
 	void bookmarkContextMenu(const QPoint&);
 	void updateTime(const QString&);
+	void updateNowPlaying(const QString&);
 
-//public slots:
+public slots:
+	void refresh();
+
 public:
 	AudioClipList(QWidget *parent = 0);
 	~AudioClipList();
