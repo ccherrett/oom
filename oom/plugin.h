@@ -652,7 +652,9 @@ private:
 //---------------------------------------------------------
 //   VST Plugin
 //---------------------------------------------------------
-#define MAX_VST_EVENTS 512
+
+#define MAX_VST_EVENTS   512
+#define VST_SANITY_CHECK 0xdeadbeef
 
 typedef AEffect* (*VST_Function)(audioMasterCallback);
 
@@ -685,6 +687,7 @@ public:
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
     void setProgram(uint32_t index);
+    void updateCurrentProgram();
 
     void process(uint32_t frames, float** src, float** dst, MPEventList* eventList);
     void bufferSizeChanged(uint32_t bufferSize);
@@ -693,6 +696,9 @@ public:
     void writeConfiguration(int level, Xml& xml);
 
     bool loadParameter(Xml& xml);
+    
+    // used to check if 'user' handle is valid
+    int sanityCheck;
 
 protected:
     bool isOldSdk;

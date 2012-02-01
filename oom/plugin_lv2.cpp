@@ -1659,14 +1659,21 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
             bool need_buffer_copy  = false;
             bool need_extra_buffer = false;
 
-            if (m_hints & PLUGIN_IS_FX)
+            if (m_hints & PLUGIN_IS_SYNTH)
             {
-                // synths already have connected ports
+                for (uint32_t i=0; i < m_ainsCount; i++)
+                    descriptor->connect_port(handle, m_audioInIndexes.at(i), src[i]);
+                
+                for (uint32_t i=0; i < m_aoutsCount; i++)
+                    descriptor->connect_port(handle, m_audioOutIndexes.at(i), dst[i]);
+            }
+            else if (m_hints & PLUGIN_IS_FX)
+            {
                 if (ains == aouts)
                 {
                     uint32_t pin, pout;
                     int max = m_channels;
-
+                    
                     if (aouts < m_channels)
                     {
                         max = aouts;
@@ -1676,7 +1683,7 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                     {
                         need_extra_buffer = true;
                     }
-
+                    
                     for (int i=0; i < max; i++)
                     {
                         pin  = m_audioInIndexes.at(i);
@@ -1691,14 +1698,6 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                     m_proc_lock.unlock();
                     return;
                 }
-            }
-            else if (m_hints & PLUGIN_IS_SYNTH)
-            {
-                for (uint32_t i=0; i < m_ainsCount; i++)
-                    descriptor->connect_port(handle, m_audioInIndexes.at(i), src[i]);
-
-                for (uint32_t i=0; i < m_aoutsCount; i++)
-                    descriptor->connect_port(handle, m_audioOutIndexes.at(i), dst[i]);
             }
             else
             {

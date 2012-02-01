@@ -26,7 +26,7 @@
 
 intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
 {
-    VstPlugin* plugin = (effect && effect->user) ? (VstPlugin*)effect->user : 0;
+    VstPlugin* plugin = (effect && effect->user && ((VstPlugin*)effect->user)->sanityCheck == VST_SANITY_CHECK) ? (VstPlugin*)effect->user : 0;
 
     switch (opcode)
     {
@@ -95,11 +95,6 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
         // TODO - return BPM at a specific song pos
         return 0;
 
-    case audioMasterGetNumAutomatableParameters:
-        // Deprecated in VST SDK 2.4
-        // TODO
-        return 0;
-
     case audioMasterIOChanged:
         if (plugin)
         {
@@ -134,6 +129,10 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
 
     case audioMasterGetBlockSize:
         return segmentSize;
+        
+    case audioMasterWillReplaceOrAccumulate:
+        // Deprecated in VST SDK 2.4
+        return 1; // replace, FIXME
 
     case audioMasterGetVendorString:
         if (ptr) strcpy((char*)ptr, "OpenOctave");
@@ -168,6 +167,14 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
 
     case audioMasterGetLanguage:
         return kVstLangEnglish;
+        
+    case audioMasterUpdateDisplay:
+        if (plugin)
+        {
+            // Update current program name
+            plugin->updateCurrentProgram();
+        }
+        return 1;
 
     default:
         return 0;
@@ -194,12 +201,15 @@ VstPlugin::VstPlugin()
         memset(&midiEvents[i], 0, sizeof(VstMidiEvent));
         events.data[i] = (VstEvent*)&midiEvents[i];
     }
+
+    sanityCheck = VST_SANITY_CHECK;
 }
 
 VstPlugin::~VstPlugin()
 {
     qWarning("~VstPlugin() --------------------------------------------");
 
+    sanityCheck = 0;
     aboutToRemove();
 
     if (effect)
@@ -398,7 +408,7 @@ void VstPlugin::reload()
     m_aoutsCount = effect->numOutputs;
     m_paramCount = effect->numParams;
 
-    if (effect->flags & effFlagsIsSynth && effect->numOutputs > 0)
+    if (effect->flags & effFlagsIsSynth && effect->numOutputs >= 1)
         m_hints |= PLUGIN_IS_SYNTH;
     else if (effect->numInputs > 1 && effect->numOutputs >= 1)
         m_hints |= PLUGIN_IS_FX;
@@ -640,6 +650,25 @@ void VstPlugin::setProgram(uint32_t index)
     }
 }
 
+void VstPlugin::updateCurrentProgram()
+{
+    qWarning("updateCurrentProgram()");
+    if (m_currentProgram >= 0 && m_programNames.size() > 0)
+    {
+        qWarning("updateCurrentProgram() - Doing it!");
+        char buf_str[255] = { 0 };
+
+        if (effect->dispatcher(effect, effGetProgramNameIndexed, m_currentProgram, 0, buf_str, 0.0f) != 1)
+            effect->dispatcher(effect, effGetProgramName, 0, 0, buf_str, 0.0f);
+
+        if (buf_str[0] != 0)
+        {
+            qWarning("updateCurrentProgram() - DONE!\n%s | %s", m_programNames[m_currentProgram].toUtf8().constData(), buf_str);
+            m_programNames[m_currentProgram] = QString(buf_str);
+        }
+    }
+}
+
 bool VstPlugin::hasNativeGui()
 {
     return (m_hints & PLUGIN_HAS_NATIVE_GUI);
@@ -750,7 +779,7 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
 
         if (m_active)
         {
-            if ((m_hints & PLUGIN_IS_SYNTH) == 0 || effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels)
+            if ((m_hints & PLUGIN_IS_SYNTH) == 0 && (effect->numInputs != effect->numOutputs || effect->numOutputs != m_channels))
             {
                 // cannot proccess
                 m_proc_lock.unlock();
