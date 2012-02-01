@@ -66,7 +66,7 @@
 #include "shortcuts.h"
 #include "mixerdock.h"
 #include "toolbars/tools.h"
-#include "AudioClipList.h"
+#include "ClipList/AudioClipList.h"
 
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96

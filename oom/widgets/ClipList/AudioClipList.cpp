@@ -6,13 +6,14 @@
 //=========================================================
 
 #include "AudioClipList.h"
+#include "BookmarkList.h"
+#include "AudioPlayer.h"
 #include "config.h"
 #include "globals.h"
 #include "gconfig.h"
 #include "song.h"
 #include "icons.h"
 #include "traverso_shared/TConfig.h"
-#include "BookmarkList.h"
 
 #include <QDir>
 #include <QUrl>
@@ -24,6 +25,7 @@
 #include <QMimeData>
 #include <QMenu>
 #include <QAction>
+#include <QtGui>
 
 
 ClipListModel::ClipListModel(QObject* parent)
@@ -52,6 +54,8 @@ QMimeData *ClipListModel::mimeData(const QModelIndexList& indices) const
 	return mdata;
 }
 
+static AudioPlayer player;
+
 AudioClipList::AudioClipList(QWidget *parent)
  : QFrame(parent)
 {
@@ -76,15 +80,19 @@ AudioClipList::AudioClipList(QWidget *parent)
 	btnForward->setIcon(QIcon(*forwardIconSet3));
 	
 	btnStop->setIcon(QIcon(*stopIconSet3));
+	//btnStop->setChecked(true);
 	
 	btnPlay->setIcon(QIcon(*playIconSetRight));
 
-	connect(btnPlay, SIGNAL(clicked()), this, SLOT(playClicked()));
-	connect(btnStop, SIGNAL(clicked()), this, SLOT(stopClicked()));
+	connect(btnPlay, SIGNAL(toggled(bool)), this, SLOT(playClicked(bool)));
+	connect(btnStop, SIGNAL(toggled(bool)), this, SLOT(stopClicked(bool)));
 	connect(btnRewind, SIGNAL(clicked()), this, SLOT(rewindClicked()));
 	connect(btnForward, SIGNAL(clicked()), this, SLOT(forwardClicked()));
 	connect(btnHome, SIGNAL(clicked()), this, SLOT(homeClicked()));
 	//connect(btnBookmark, SIGNAL(clicked()), this, SLOT(addBookmarkClicked()));
+	connect(&player, SIGNAL(playbackStopped(bool)), this, SLOT(stopClicked(bool)));
+	connect(&player, SIGNAL(timeChanged(const QString&)), this, SLOT(updateTime(const QString&)));
+	connect(this, SIGNAL(stopPlayback()), &player, SLOT(stop()));
 
 	connect(m_fileList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(fileItemSelected(const QModelIndex&)));
 	connect(m_fileList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(fileItemContextMenu(const QPoint&)));
@@ -262,7 +270,7 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)
 void AudioClipList::bookmarkContextMenu(const QPoint& pos)
 {
 	QModelIndex index = m_bookmarkList->indexAt(pos);
-	if(index.isValid())
+	if(index.isValid() && index.row())//Dont remove the Home bookmark
 	{
 		QStandardItem* item = m_bookmarkModel->itemFromIndex(index);
 		if(item)
@@ -307,14 +315,61 @@ void AudioClipList::bookmarkItemSelected(const QModelIndex& index)
 	}
 }
 
-void AudioClipList::playClicked()
+void AudioClipList::updateTime(const QString& time)
 {
-	qDebug("AudioClipList::playClicked");
+	timeLabel->setVisible(true);
+	timeLabel->setText(time);
 }
 
-void AudioClipList::stopClicked()
+using namespace QtConcurrent;
+static void doPlay(const QString& file)
 {
-	qDebug("AudioClipList::stopClicked");
+	player.play(file);
+}
+
+void AudioClipList::playClicked(bool state)
+{
+	qDebug("AudioClipList::playClicked: state: %d", state);
+
+	if(state)
+	{
+		btnStop->blockSignals(true);
+		btnStop->setChecked(!state);
+		btnStop->blockSignals(false);
+
+		QModelIndex index = m_fileList->currentIndex();
+		if(index.isValid())
+		{
+			QStandardItem* item = m_listModel->itemFromIndex(index);
+			if(item)
+			{
+				QFileInfo info(item->data().toString());
+				if(!info.isDir())
+				{
+					if(player.isPlaying())
+						player.stop();
+					QFuture<void> pl = run(doPlay, info.filePath());
+				}
+			}
+		}
+	}
+}
+
+void AudioClipList::stopClicked(bool state)
+{
+	qDebug("AudioClipList::stopClicked:state: %d", state);
+	btnStop->blockSignals(true);
+	btnStop->setChecked(true);
+	btnStop->blockSignals(false);
+	//TODO: Stop playback is playing
+	if(state)
+	{
+		btnPlay->blockSignals(true);
+		btnPlay->setChecked(!state);
+		btnPlay->blockSignals(false);
+		emit stopPlayback();//Make player stop
+		timeLabel->setVisible(false);
+	}
 }
 
 void AudioClipList::homeClicked()

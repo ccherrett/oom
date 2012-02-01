@@ -141,6 +141,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="timeLabel">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <property name="spacing">
       <number>0</number>
@@ -277,6 +287,12 @@
          <height>25</height>
         </size>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
        <property name="autoRaise">
         <bool>true</bool>
        </property>
@@ -308,6 +324,9 @@
          <height>25</height>
         </size>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
        <property name="autoRaise">
         <bool>true</bool>
        </property>
@@ -334,7 +353,7 @@
   <customwidget>
    <class>BookmarkList</class>
    <extends>QListView</extends>
-   <header location="global">BookmarkList.h</header>
+   <header location="global">ClipList/BookmarkList.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
