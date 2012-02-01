@@ -154,18 +154,18 @@ void CreateTrackDialog::addTrack()/*{{{*/
                             SynthPluginDevice* synth = oldSynth->clone(devName);
                             synth->open();
 
+                            midiSeq->msgSetMidiDevice(&midiPorts[portIdx], synth);
+
                             if (cmbMonitor->itemText(monitorIndex) == txtName->text()+":(output-ports)")
                             {
                                 selectedInput  = synth->getAudioOutputPortName(0);
                                 selectedInput2 = synth->getAudioOutputPortName(1);
                             }
 
-                            midiSeq->msgSetMidiDevice(&midiPorts[portIdx], synth);
-                            
                             m_vtrack->useOutput = true;
                             m_vtrack->createMidiOutputDevice = false;
                             m_vtrack->outputConfig = qMakePair(portIdx, devName);
-                            m_vtrack->outputChannel = 1;
+                            m_vtrack->outputChannel = 0;
 
                             break;
                         }
@@ -412,6 +412,8 @@ void CreateTrackDialog::updateInstrument(int index)
         chkOutput->setEnabled(true);
         cmbOutput->setEnabled(true);
         cmbOutChannel->setEnabled(true);
+        midiBox->setChecked(true);
+        midiBox->setEnabled(true);
 
 		int insType = cmbInstrument->itemData(index, InstrumentTypeRole).toInt();
 		switch(insType)
@@ -495,6 +497,8 @@ void CreateTrackDialog::updateInstrument(int index)
                             chkInput->setEnabled(false);
                             chkOutput->setChecked(false);
                             chkOutput->setEnabled(false);
+                            midiBox->setChecked(false);
+                            midiBox->setEnabled(false);
 
                             cmbMonitor->addItem(trackName+":(output-ports)");
                             cmbMonitor->setCurrentIndex(cmbMonitor->count()-1);
