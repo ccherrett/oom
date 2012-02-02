@@ -979,7 +979,7 @@ bool OOMidi::importWaveToTrack(QString& name, unsigned tick, Track* track)
 		return true;
 	}
 	int samples = f->samples();
-	if ((unsigned) sampleRate != f->samplerate())
+	/*if ((unsigned) sampleRate != f->samplerate())
 	{
 		if (QMessageBox::question(this, tr("Import Audio file"),
 				tr("This wave file has a samplerate of %1,\n"
@@ -993,7 +993,7 @@ bool OOMidi::importWaveToTrack(QString& name, unsigned tick, Track* track)
 				delete f;
 			return true;
 		}
-	}
+	}*/
 	track->setChannels(f->channels());
 
 	WavePart* part = new WavePart((WaveTrack *) track);
@@ -1017,184 +1017,6 @@ bool OOMidi::importWaveToTrack(QString& name, unsigned tick, Track* track)
 		song->setLen(endTick);
 	return false;
 }
-#if 0
-//---------------------------------------------------------
-//   Clip
-//---------------------------------------------------------
-
-ClipBase::ClipBase(const SndFileR& file, int start, int l)
-: f(file)
-{
-	refCount = 0;
-	for (int i = 1; true; ++i)
-	{
-		_name.sprintf("%s.%d", f.basename().toLatin1().constData(), i);
-		ciClip ic = waveClips->begin();
-		for (; ic != waveClips->end(); ++ic)
-		{
-			if ((*ic)->name() == _name)
-				break;
-		}
-		if (ic == waveClips->end())
-			break;
-		// try another name
-	}
-	_spos = start;
-	len = l;
-	deleted = false;
-	lrefs = 0;
-	waveClips->add(this);
-}
-
-//---------------------------------------------------------
-//   read
-//---------------------------------------------------------
-
-void ClipBase::read(unsigned srcOffset, float** buffer, int channel, unsigned n)
-{
-	if (f.isNull())
-		return;
-	f.seek(srcOffset + _spos, 0);
-	f.read(channel, buffer, n);
-}
-
-ClipBase::~ClipBase()
-{
-	waveClips->remove(this);
-}
-
-//---------------------------------------------------------
-//   ClipList::write(level, xml)
-//---------------------------------------------------------
-
-void ClipList::write(int level, Xml& xml) const
-{
-	for (ciClip i = begin(); i != end(); ++i)
-	{
-		ClipBase* clip = *i;
-		// only write visible clips
-		if (clip->references())
-			(*i)->write(level, xml);
-	}
-}
-
-//---------------------------------------------------------
-//   ClipBase::write(level, xml)
-//---------------------------------------------------------
-
-void ClipBase::write(int level, Xml& xml) const
-{
-	xml.tag(level++, "clip");
-	QString path = f.dirPath();
-
-	//
-	// waves in the project dirctory are stored
-	// with relative path name, others with absolute path
-	//
-	if (path == oomProject)
-		xml.strTag(level, "file", f.name());
-	else
-		xml.strTag(level, "file", f.path());
-
-	xml.strTag(level, "name", _name);
-	xml.intTag(level, "tick", _spos);
-	xml.intTag(level, "len", len);
-	xml.etag(level, "clip");
-}
-
-//---------------------------------------------------------
-//   ClipBase::read
-//---------------------------------------------------------
-
-ClipBase* readClip(Xml& xml)
-{
-	SndFile* f = 0;
-	QString name;
-	unsigned spos = 0;
-	int len = 0;
-
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return 0;
-			case Xml::TagStart:
-				if (tag == "file")
-					f = getWave(xml.parse1(), false);
-				else if (tag == "name")
-					name = xml.parse1();
-				else if (tag == "tick")
-					spos = xml.parseInt();
-				else if (tag == "len")
-					len = xml.parseInt();
-				else
-					xml.unknown("Clip");
-				break;
-			case Xml::TagEnd:
-				if (tag == "clip")
-				{
-					if (!f)
-						printf("clip: file not found\n");
-					ClipBase* clip = new ClipBase(f, spos, len);
-					clip->setName(name);
-					return clip;
-				}
-			default:
-				break;
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   search
-//---------------------------------------------------------
-
-Clip ClipList::search(const QString& name) const
-{
-	for (ciClip i = begin(); i != end(); ++i)
-		if ((*i)->name() == name)
-			return Clip(*i);
-	fprintf(stderr, "ClipList: clip <%s> not found\n",
-			name.toLatin1().constData());
-	return Clip();
-}
-
-//---------------------------------------------------------
-//   remove
-//---------------------------------------------------------
-
-void ClipList::remove(ClipBase* clip)
-{
-	for (iClip i = begin(); i != end(); ++i)
-	{
-		if (*i == clip)
-		{
-			erase(i);
-			return;
-		}
-	}
-	printf("ClipList:remove: clip not found\n");
-}
-
-//---------------------------------------------------------
-//   idx
-//---------------------------------------------------------
-
-int ClipList::idx(const Clip& clip) const
-{
-	int n = 0;
-	for (ciClip i = begin(); i != end(); ++i, ++n)
-	{
-		if (clip == *i)
-			return n;
-	}
-	return -1;
-}
-#endif
 
 //---------------------------------------------------------
 //   cmdAddRecordedWave
