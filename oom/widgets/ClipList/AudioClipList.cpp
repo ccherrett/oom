@@ -207,25 +207,27 @@ void AudioClipList::setDir(const QString &path)
 		QString newDir = dir.canonicalPath();
 		QString sep = dir.separator();
 		QStringList entries = dir.entryList();
+		
+		QStandardItem* up = new QStandardItem("..");
+		QString fullPath = QString(newDir).append(sep).append("..");
+		up->setData(fullPath);
+		up->setIcon(QIcon(":/images/icons/clip-folder-up.png"));
+		m_listModel->appendRow(up);
+
 		foreach(QString entry, entries)
 		{
-			if(entry == ".")
+			if(entry == "." || entry == "..")
 				continue;
-		//qDebug("Listing file: %s", entry.toUtf8().constData());
+			
+			//qDebug("Listing file: %s", entry.toUtf8().constData());
+			
 			QStandardItem* item = new QStandardItem(entry);
-			QString fullPath = QString(newDir).append(sep).append(entry);
+			fullPath = QString(newDir).append(sep).append(entry);
 			item->setData(fullPath);
 			bool skip = false;
 			if(QFileInfo(fullPath).isDir())
 			{//Set dir icon
-				if(m_listModel->rowCount())
-				{
-					item->setIcon(QIcon(":/images/icons/clip-folder.png"));
-				}
-				else
-				{
-					item->setIcon(QIcon(":/images/icons/clip-folder-up.png"));
-				}
+				item->setIcon(QIcon(":/images/icons/clip-folder.png"));
 			}
 			else
 			{//Set file icon
@@ -428,7 +430,7 @@ void AudioClipList::updateTime(const QString& time)
 
 void AudioClipList::updateNowPlaying(const QString& val)
 {
-	QStringList values = val.split(",");
+	QStringList values = val.split("@--,--@");
 	if(values.size())
 	{	
 		QFileInfo info(values[0]);
