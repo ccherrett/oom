@@ -110,7 +110,7 @@ AudioClipList::AudioClipList(QWidget *parent)
 	connect(btnHome, SIGNAL(clicked()), this, SLOT(homeClicked()));
 	//connect(btnBookmark, SIGNAL(clicked()), this, SLOT(addBookmarkClicked()));
 
-	connect(&player, SIGNAL(playbackStopped(bool)), this, SLOT(stopClicked(bool)));
+	connect(&player, SIGNAL(playbackStopped(bool)), this, SLOT(stopSlotCalled(bool)));
 	connect(&player, SIGNAL(timeChanged(const QString&)), this, SLOT(updateTime(const QString&)));
 	connect(&player, SIGNAL(nowPlaying(const QString&)), this, SLOT(updateNowPlaying(const QString&)));
 	connect(&player, SIGNAL(readyForPlay()), this, SLOT(playNextFile()));
@@ -392,9 +392,6 @@ void AudioClipList::fileItemSelected(const QModelIndex& index)
 		else
 		{
 			playClicked(true);
-			btnPlay->blockSignals(true);
-			btnPlay->setChecked(true);
-			btnPlay->blockSignals(false);
 		}
 	}
 }
@@ -415,6 +412,18 @@ void AudioClipList::updateTime(const QString& time)
 {
 	//timeLabel->setVisible(true);
 	timeLabel->setText(time);
+	if(btnStop->isChecked())
+	{
+		btnStop->blockSignals(true);
+		btnStop->setChecked(false);
+		btnStop->blockSignals(false);
+	}
+	if(!btnPlay->isChecked())
+	{
+		btnPlay->blockSignals(true);
+		btnPlay->setChecked(true);
+		btnPlay->blockSignals(false);
+	}
 }
 
 void AudioClipList::updateNowPlaying(const QString& val)
@@ -455,8 +464,7 @@ void AudioClipList::updateLabels()
 		QFontMetrics fm(font);
 		songLabel->setText(fm.elidedText(info.fileName(), Qt::ElideRight, w));
 	}
-	if(!player.isPlaying())
-		timeLabel->setText("00:00:00");
+	timeLabel->setText("00:00:00");
 }
 
 void AudioClipList::resizeEvent(QResizeEvent* event)
@@ -478,6 +486,12 @@ void AudioClipList::playNextFile()
 	{
 		m_currentSong = m_playlist.takeFirst();
 		QFuture<void> pl = run(doPlay, m_currentSong);
+		btnPlay->blockSignals(true);
+		btnPlay->setChecked(true);
+		btnPlay->blockSignals(false);
+		btnStop->blockSignals(true);
+		btnStop->setChecked(false);
+		btnStop->blockSignals(false);
 	}
 }
 
@@ -552,12 +566,19 @@ void AudioClipList::playClicked(bool state)
 	}
 }
 
-void AudioClipList::stopClicked(bool state)
+void AudioClipList::stopSlotCalled(bool)
 {
-	//qDebug("AudioClipList::stopClicked:state: %d", state);
 	btnStop->blockSignals(true);
 	btnStop->setChecked(true);
 	btnStop->blockSignals(false);
+
+	btnPlay->blockSignals(true);
+	btnPlay->setChecked(false);
+	btnPlay->blockSignals(false);
+}
+
+void AudioClipList::stopClicked(bool state)
+{
 	if(state)
 	{
 		btnPlay->blockSignals(true);
@@ -566,7 +587,6 @@ void AudioClipList::stopClicked(bool state)
 		m_playlist.clear();
 		emit stopPlayback();//Make player stop
 		updateLabels();
-		//timeLabel->setVisible(false);
 	}
 }
 

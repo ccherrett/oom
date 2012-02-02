@@ -70,7 +70,7 @@ private slots:
 	void updateTime(const QString&);
 	void updateNowPlaying(const QString&);
 	void playNextFile();
-
+	void stopSlotCalled(bool); 
 public slots:
 	void refresh();
 
