@@ -1022,8 +1022,6 @@ bool OOMidi::importWaveToTrack(QString& name, unsigned tick, Track* track)
 //   cmdAddRecordedWave
 //---------------------------------------------------------
 
-//void Song::cmdAddRecordedWave(WaveTrack* track, const Pos& s, const Pos& e)
-
 void Song::cmdAddRecordedWave(WaveTrack* track, Pos s, Pos e)
 {
 	if (debugMsg)
