@@ -41,10 +41,11 @@ QHeaderView#trackHeaders
 
 QFrame#m_playerFrame
 {
-	color: #d0d4d0;
-	background-color: #1e1e1e;
+	color: #d6dfd6;
+	 color: #848884;
+	background-color: #414141;
 	border-radius: 12px;
-    border: 1px solid #4b4b4b;
+    border: 1px solid #1e1e1e;
 }
 
 QLabel#songLabel
@@ -52,23 +53,49 @@ QLabel#songLabel
 	/*background-color:none;
 	border:none;*/
 	 border-radius: 0px;
-     border-image: url(:/images/frame_top.png) 4;
+	border-top: 18px;
+	border-bottom: 18px;
+	border-left: 1px;/*2px solid #1e1e1e;*/
+	border-right: 0px;
+	border-image: url(:/images/frame_top.png) 4;
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #080808;
-	 color: #b8b8b8;
+	 color: #d6dfd6;
+	 color: #848884;
 }
 
-QLabel#timeLabel, QLabel#lengthLabel
+QLabel#timeLabel
 {
 	/*background-color:none;
 	border:none;*/
 	 border-radius: 0px;
-     border-image: url(:/images/frame_bottom.png) 4;
+	border-top: 18px;
+	border-bottom: 18px;
+	border-left: 1px;/*2px solid #1e1e1e;*/
+	border-right: 0px;
+	border-image: url(:/images/frame_bottom_left.png) 4;
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #080808;
-	 color: #b8b8b8;
+	 color: #d6dfd6;
+	 color: #848884;
+}
+
+QLabel#lengthLabel
+{
+	/*background-color:none;
+	border:none;*/
+	 border-radius: 0px;
+	border-top: 18px;
+	border-bottom: 18px;
+	border-left: 1px;/*2px solid #1e1e1e;*/
+	border-right: 0px;
+	border-image: url(:/images/frame_bottom_right.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #080808;
+	 color: #848884;
 }
 
  QWidget#WaveView

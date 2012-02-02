@@ -6,6 +6,8 @@
 		<file>images/frame.png</file>
 		<file>images/frame_top.png</file>
 		<file>images/frame_bottom.png</file>
+		<file>images/frame_bottom_left.png</file>
+		<file>images/frame_bottom_right.png</file>
 		<file>images/frame_clipping.png</file>
 		<file>images/checkbox_checked.png</file>
                 <file>images/checkbox_checked_disabled.png</file>
@@ -100,6 +102,10 @@
 		<file>images/icons/transport-play_new_end_on.png</file>
 		<file>images/icons/transport-play_new_end_over.png</file>
 		<file>images/icons/transport-play_new_end_off.png</file>
+		
+		<file>images/icons/transport-stop_new_end_on.png</file>
+		<file>images/icons/transport-stop_new_end_over.png</file>
+		<file>images/icons/transport-stop_new_end_off.png</file>
 
 		<file>images/icons/transport-pointer-to-cursor.png</file>
 		<file>images/icons/transport-record.png</file>

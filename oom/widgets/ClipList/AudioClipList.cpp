@@ -81,13 +81,13 @@ AudioClipList::AudioClipList(QWidget *parent)
 	m_listModel = new ClipListModel(this);
 	m_fileList->setModel(m_listModel);
 
-	btnHome->setIcon(QIcon(*startIconSet3));
+	//btnHome->setIcon(QIcon(*startIconSet3));
 	
-	btnRewind->setIcon(QIcon(*rewindIconSet3));
+	//btnRewind->setIcon(QIcon(*rewindIconSet3));
 	
-	btnForward->setIcon(QIcon(*forwardIconSet3));
+	//btnForward->setIcon(QIcon(*forwardIconSet3));
 	
-	btnStop->setIcon(QIcon(*stopIconSet3));
+	btnStop->setIcon(QIcon(*stopIconSetLeft));
 	//btnStop->setChecked(true);
 	
 	btnPlay->setIcon(QIcon(*playIconSetRight));
@@ -105,9 +105,9 @@ AudioClipList::AudioClipList(QWidget *parent)
 
 	connect(btnPlay, SIGNAL(toggled(bool)), this, SLOT(playClicked(bool)));
 	connect(btnStop, SIGNAL(toggled(bool)), this, SLOT(stopClicked(bool)));
-	connect(btnRewind, SIGNAL(clicked()), this, SLOT(rewindClicked()));
-	connect(btnForward, SIGNAL(clicked()), this, SLOT(forwardClicked()));
-	connect(btnHome, SIGNAL(clicked()), this, SLOT(homeClicked()));
+	//connect(btnRewind, SIGNAL(clicked()), this, SLOT(rewindClicked()));
+	//connect(btnForward, SIGNAL(clicked()), this, SLOT(forwardClicked()));
+	//connect(btnHome, SIGNAL(clicked()), this, SLOT(homeClicked()));
 	//connect(btnBookmark, SIGNAL(clicked()), this, SLOT(addBookmarkClicked()));
 
 	connect(&player, SIGNAL(playbackStopped(bool)), this, SLOT(stopSlotCalled(bool)));

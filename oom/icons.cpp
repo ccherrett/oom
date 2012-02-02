@@ -415,6 +415,11 @@ QPixmap* transport_playIconRightOff;
 QPixmap* transport_playIconRightOver;
 QIcon* playIconSetRight;
 
+QPixmap* transport_stopIconLeftOn;
+QPixmap* transport_stopIconLeftOff;
+QPixmap* transport_stopIconLeftOver;
+QIcon* stopIconSetLeft;
+
 QPixmap* transport_startIconOn;
 QPixmap* transport_startIconOff;
 QPixmap* transport_startIconOver;
@@ -1066,6 +1071,14 @@ void initIcons()
       playIconSetRight->addPixmap(*transport_playIconRightOn, QIcon::Normal, QIcon::On);
       playIconSetRight->addPixmap(*transport_playIconRightOff, QIcon::Normal, QIcon::Off);
       playIconSetRight->addPixmap(*transport_playIconRightOver, QIcon::Active);
+	  
+	  transport_stopIconLeftOn = new MPIXMAP(":/images/icons/transport-stop_new_end_on.png", NULL);
+      transport_stopIconLeftOff= new MPIXMAP(":/images/icons/transport-stop_new_end_off.png", NULL);
+      transport_stopIconLeftOver= new MPIXMAP(":/images/icons/transport-stop_new_end_over.png", NULL);
+	  stopIconSetLeft         = new QIcon();
+      stopIconSetLeft->addPixmap(*transport_stopIconLeftOn, QIcon::Normal, QIcon::On);
+      stopIconSetLeft->addPixmap(*transport_stopIconLeftOff, QIcon::Normal, QIcon::Off);
+      stopIconSetLeft->addPixmap(*transport_stopIconLeftOver, QIcon::Active);
 	  
       transport_startIconOff= new MPIXMAP(":/images/icons/transport-rewind-end_new_off.png", NULL);
       transport_startIconOver= new MPIXMAP(":/images/icons/transport-rewind-end_new_over.png", NULL);
