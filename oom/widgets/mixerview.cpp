@@ -17,6 +17,7 @@ MixerView::MixerView(QWidget* parent)
 	//m_icons << QIcon(":/images/icons/views_inputs.png") << QIcon(":/images/icons/views_outputs.png") << QIcon(":/images/icons/views_busses.png") << QIcon(":/images/icons/views_auxs.png");
 	toggleButtons(false);
 	populateTable(-1, true);
+	m_tabWidget->removeTab(1);
 	//connect(song, SIGNAL(songChanged(int)), this, SLOT(populateTable(int)));
 }
 
@@ -42,8 +43,7 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 			TrackView* view = tvlist->value(tvid);
 			if(view)
 			{
-				QList<QStandardItem*> rowData;
-				QStandardItem *chk = new QStandardItem(true);
+				QStandardItem *chk = new QStandardItem(view->viewName());
 				chk->setCheckable(true);
 				if(startup)
 				{
@@ -55,12 +55,9 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 				{
 					chk->setCheckState(m_selectList.contains(view->id()) ? Qt::Checked : Qt::Unchecked);
 				}
-				QStandardItem *tname = new QStandardItem(view->viewName());
-				tname->setData(view->id());
-				rowData.append(chk);
-				rowData.append(tname);
+				chk->setData(view->id());
 				_tableModel->blockSignals(true);
-				_tableModel->insertRow(_tableModel->rowCount(), rowData);
+				_tableModel->insertRow(_tableModel->rowCount(), chk);
 				_tableModel->blockSignals(false);
 				tableView->setRowHeight(_tableModel->rowCount(), 25);
 			}
@@ -77,8 +74,7 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 			TrackView* view = tvlist->value(tvid);
 			if(view)
 			{
-				QList<QStandardItem*> rowData2;
-				QStandardItem *chk = new QStandardItem(true);
+				QStandardItem *chk = new QStandardItem(view->viewName());
 				chk->setCheckable(true);
 				if(startup)
 				{
@@ -90,18 +86,15 @@ void MixerView::populateTable(int flag, bool startup)/*{{{*/
 				{
 					chk->setCheckState(m_selectList.contains(view->id()) ? Qt::Checked : Qt::Unchecked);
 				}
-				QStandardItem *tname = new QStandardItem(view->viewName());
-				tname->setData(view->id());
-				if(view->viewName() != "Working View" && view->viewName() != "Comment View")
+				chk->setData(view->id());
+				if(view->id() != song->workingViewId() && view->id() != song->commentViewId())
 				{
-					chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(i)))));
-					tname->setIcon(m_icons.at(icon_index));
+					//chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(i)))));
+					chk->setIcon(m_icons.at(icon_index));
 					++icon_index;
 				}
-				rowData2.append(chk);
-				rowData2.append(tname);
 				_autoTableModel->blockSignals(true);
-				_autoTableModel->insertRow(_autoTableModel->rowCount(), rowData2);
+				_autoTableModel->insertRow(_autoTableModel->rowCount(), chk);
 				_autoTableModel->blockSignals(false);
 				autoTable->setRowHeight(_autoTableModel->rowCount(), 25);
 			}
@@ -117,26 +110,20 @@ void MixerView::trackviewChanged(QStandardItem *item)/*{{{*/
 {
 	if(item)
 	{
-		int row = item->row();
-		QStandardItem *tname = _tableModel->item(row, 1);
-		QStandardItem *chk = _tableModel->item(row, 0);
-		if(tname)
+		TrackView* tv = song->findTrackViewById(item->data().toLongLong());
+		if(tv)
 		{
-			TrackView* tv = song->findTrackViewById(tname->data().toLongLong());
-			if(tv)
+			if(item->checkState() == Qt::Checked)
 			{
-				if(chk->checkState() == Qt::Checked)
-				{
-					if(!m_selectList.contains(tv->id()))
-						m_selectList.append(tv->id());
-				}
-				else
-				{
-					if(m_selectList.contains(tv->id()))
-						m_selectList.removeAt(m_selectList.indexOf(tv->id()));
-				}
-				updateTrackList();
+				if(!m_selectList.contains(tv->id()))
+					m_selectList.append(tv->id());
 			}
+			else
+			{
+				if(m_selectList.contains(tv->id()))
+					m_selectList.removeAt(m_selectList.indexOf(tv->id()));
+			}
+			updateTrackList();
 		}
 	}
 }/*}}}*/
@@ -145,27 +132,21 @@ void MixerView::autoTrackviewChanged(QStandardItem *item)/*{{{*/
 {
 	if(item)
 	{
-		int row = item->row();
-		QStandardItem *tname = _autoTableModel->item(row, 1);
-		QStandardItem *chk = _autoTableModel->item(row, 0);
-		if(tname)
+		TrackView* tv = song->findAutoTrackView(item->text());
+		if(tv)
 		{
-			TrackView* tv = song->findAutoTrackView(tname->text());
-			if(tv)
+			//printf("MixerView::autoTrackviewChanged: %s\n", tname->text().toLatin1().constData());
+			if(item->checkState() == Qt::Checked)
 			{
-				//printf("MixerView::autoTrackviewChanged: %s\n", tname->text().toLatin1().constData());
-				if(chk->checkState() == Qt::Checked)
-				{
-					if(!m_selectList.contains(tv->id()))
-						m_selectList.append(tv->id());
-				}
-				else
-				{
-					if(m_selectList.contains(tv->id()))
-						m_selectList.removeAt(m_selectList.indexOf(tv->id()));
-				}
-				updateTrackList();
+				if(!m_selectList.contains(tv->id()))
+					m_selectList.append(tv->id());
 			}
+			else
+			{
+				if(m_selectList.contains(tv->id()))
+					m_selectList.removeAt(m_selectList.indexOf(tv->id()));
+			}
+			updateTrackList();
 		}
 	}
 }/*}}}*/

@@ -412,11 +412,25 @@ void Composer::currentTabChanged(int tab)
 			//printf("PatchSequencer Tab clicked\n");
 			midiConductor->update();
 		}
+		if(m_clipList)
+		{
+			m_clipList->setActive(false);
+		}
 	}
 	else if(tab == 3)
 	{
 		if(m_clipList)
+		{
+			m_clipList->setActive(true);
 			m_clipList->refresh();
+		}
+	}
+	else
+	{
+		if(m_clipList)
+		{
+			m_clipList->setActive(false);
+		}
 	}
 }
 
@@ -945,6 +959,9 @@ void Composer::genTrackInfo(QWidget*)
 	//infoScroll->setWidget(midiConductor);
 	infoScroll->setWidgetResizable(true);
 	m_clipList = new AudioClipList(this);
+	//Set to true if this is the first cliplist viewable tab
+	//When false the directory watcher will not constantly update the view
+	m_clipList->setActive(false);
 	_commentdock = new CommentDock(this);
 	_rtabs->addTab(_tvdock, tr("   EPIC Views   "));
 	_rtabs->addTab(mixerScroll, tr("   Mixer   "));

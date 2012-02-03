@@ -15,8 +15,7 @@ ProgramChangeTable::ProgramChangeTable(QWidget *parent) : QTableView(parent)
 	setAcceptDrops(true);
 	setCornerButtonEnabled(false);
 	verticalHeader()->hide();
-	//horizontalHeader()->hide();
-	setAutoFillBackground(true);
+	//setAutoFillBackground(true);
 	setTextElideMode(Qt::ElideNone);
 	setSelectionBehavior(QAbstractItemView::SelectRows);
 	setAlternatingRowColors(true);

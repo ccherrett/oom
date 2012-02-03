@@ -21,6 +21,7 @@ class QPoint;
 class QResizeEvent;
 class AudioPlayer;
 class Slider;
+class QFileSystemWatcher;
 
 
 //Model for the file list
@@ -43,6 +44,8 @@ class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	QString m_currentPath;
 	QString m_currentSong;
 	QList<QString> m_playlist;
+	QFileSystemWatcher* m_watcher;
+	bool m_active;
 
 	bool isSupported(const QString&);
 	void loadBookmarks();
@@ -71,13 +74,22 @@ private slots:
 	void updateNowPlaying(const QString&);
 	void playNextFile();
 	void stopSlotCalled(bool); 
+
 public slots:
 	void refresh();
+	void setActive(bool v)
+	{
+		m_active = v;
+	}
 
 public:
 	AudioClipList(QWidget *parent = 0);
 	~AudioClipList();
 	void setDir(const QString& path);
+	bool active()
+	{
+		return m_active;
+	}
 };
 
 #endif

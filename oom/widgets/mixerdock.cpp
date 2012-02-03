@@ -538,4 +538,22 @@ void MixerDock::songChanged(int flags)/*{{{*/
 			masterStrip->songChanged(flags);
 		}
 	}
+	if((flags & SC_SELECTION) && m_mode == DOCKED)
+	{
+		QList<qint64> selected = song->selectedTracks();
+		if(selected.size())
+		{
+			qint64 id = selected.at(0);
+			StripList::iterator si = stripList.begin();
+			for (; si != stripList.end(); ++si)
+			{
+				Track* t = (*si)->getTrack();
+				if(t->id() == id)
+				{
+					view->ensureWidgetVisible(*si);
+					break;
+				}
+			}
+		}
+	}
 }/*}}}*/

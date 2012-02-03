@@ -46,6 +46,7 @@ CommentDock::~CommentDock()
 		out << QString::number(s);
 	}
 	tconfig().set_property("CommentDock", "sizes", out.join(" "));
+	tconfig().save();
 }
 
 //---------------------------------------------------------

@@ -70,6 +70,8 @@ AudioClipList::AudioClipList(QWidget *parent)
 	setupUi(this);
 	
 	m_filters << "wav" << "ogg" << "mpt";
+	m_watcher = new QFileSystemWatcher(this);
+	m_active = true;
 
 	m_bookmarkModel = new BookmarkListModel(this);
 	m_bookmarkList->setModel(m_bookmarkModel);
@@ -123,6 +125,8 @@ AudioClipList::AudioClipList(QWidget *parent)
 	connect(m_bookmarkList, SIGNAL(clicked(const QModelIndex&)), this, SLOT(bookmarkItemSelected(const QModelIndex&)));
 	connect(m_bookmarkList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(bookmarkContextMenu(const QPoint&)));
 
+	connect(m_watcher, SIGNAL(directoryChanged(const QString)), this, SLOT(refresh()));
+
 	QList<int> sizes;
 	QString str = tconfig().get_property("AudioClipList", "sizes", "30 250").toString();
 	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
@@ -153,6 +157,7 @@ AudioClipList::~AudioClipList()
 	tconfig().set_property("AudioClipList", "sizes", out.join(" "));
 	tconfig().set_property("AudioClipList", "volume", m_slider->value());
 	saveBookmarks();
+	tconfig().save();
 	player.stop();
 }
 
@@ -200,11 +205,13 @@ void AudioClipList::addBookmark(const QString &dir)
 
 void AudioClipList::setDir(const QString &path)
 {
-	QDir dir(path, "", QDir::DirsFirst);
+	QDir dir(path, "*", QDir::DirsFirst|QDir::LocaleAware, QDir::AllEntries | QDir::Readable|QDir::NoDotAndDotDot);
 	m_listModel->clear();
 	if(dir.isReadable())
 	{
 		QString newDir = dir.canonicalPath();
+		if(!m_currentPath.isEmpty())
+			m_watcher->removePath(m_currentPath);
 		QString sep = dir.separator();
 		QStringList entries = dir.entryList();
 		
@@ -216,9 +223,6 @@ void AudioClipList::setDir(const QString &path)
 
 		foreach(QString entry, entries)
 		{
-			if(entry == "." || entry == "..")
-				continue;
-			
 			//qDebug("Listing file: %s", entry.toUtf8().constData());
 			
 			QStandardItem* item = new QStandardItem(entry);
@@ -238,6 +242,7 @@ void AudioClipList::setDir(const QString &path)
 				m_listModel->appendRow(item);
 		}
 		m_currentPath = newDir;
+		m_watcher->addPath(m_currentPath);
 		txtPath->setText(m_currentPath);
 		//qDebug("Listed directory: %s", m_currentPath.toUtf8().constData());
 	}
@@ -245,10 +250,18 @@ void AudioClipList::setDir(const QString &path)
 
 void AudioClipList::refresh()
 {
+	if(!m_active)
+		return;
 	if(m_currentPath.isEmpty())
 		setDir(oomProject);
 	else
-		setDir(m_currentPath);
+	{
+		QFileInfo i(m_currentPath);
+		if(i.exists())
+			setDir(m_currentPath);
+		else
+			setDir(oomProject);
+	}
 	loadBookmarks();
 }
 

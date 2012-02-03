@@ -180,7 +180,7 @@ Conductor QTableView, QTableView#mapTable
 	selection-background-color: #2e2e2e;
 	color: #bbbfbb;
 	border: 2px solid #29292a;
-	border-radius: 0px;
+	border-radius: 6px;
 	padding: 0px;
 	font-size: 14px;
 }
@@ -245,8 +245,8 @@ Conductor QTreeView,  AudioClipList QTreeView/*{{{*/
 	selection-background-color: #2e2e2e;
 	color: #bbbfbb;
 	border: 2px solid #29292a;
-	border-radius: 0px;
-	padding: 0px;
+	border-radius: 6px;
+	padding-bottom: 16px;
 	font-size: 14px;
 	/*selection-background-color:red;*//*this can be used to change the selection background color*/
 }
@@ -255,7 +255,7 @@ Conductor QTreeView::focus
 	border: 2px solid #f3ce69;
 }/*}}}*/
 
-Conductor QTreeView QHeaderView::section, AudioClipList QTreeView QHeaderView::section
+Conductor QTreeView QHeaderView::section
 {
 	text-align: left;
 	border: 0px solid black;
@@ -269,25 +269,25 @@ Conductor QTreeView QHeaderView::section, AudioClipList QTreeView QHeaderView::s
 	font-size: 11px;
 }
 
-Conductor QTreeView::item, AudioClipList QTreeView::item
+Conductor QTreeView::item
 {
 	padding-top: 3px;
 	padding-bottom: 3px;
 	border-bottom: 1px solid #343434;
 }
 
-Conductor QTreeView::item:selected, AudioClipList QTreeView::item:selected
+Conductor QTreeView::item:selected
 {
 	background-color: #0a0a0a;
 	border: none;
 }
 
-Conductor QTreeView::item:selected:active,  AudioClipList QTreeView::item:selected:active
+Conductor QTreeView::item:selected:active
 {
 	border: none;
 }
 
-Conductor QTreeView::item:selected:!active, AudioClipList QTreeView::item:selected:!active
+Conductor QTreeView::item:selected:!active
 {
 	border: none;
 }
@@ -319,7 +319,7 @@ QHeaderView::section
 	font-size: 11px;
 }
 /*{{{*/
-QTableView#tblAutoTable, QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#optionsTable, MidiAssignDialog QTableView
+QTableView#tblAutoTable, QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#optionsTable, MidiAssignDialog QTableView, TrackViewDock QTableView
 {
 	background-color: #1e1e1e;
 	gridline-color:#343434;
@@ -327,34 +327,34 @@ QTableView#tblAutoTable, QTableView#tblTrackView, QTableView#routeList, TrackVie
 	selection-background-color: #2e2e2e;
 	color: #bbbfbb;
 	border: 2px solid #29292a;/*set for highlighting on focus*/
-	border-radius: 0px;
+	border-radius: 6px;
 	padding: 0px;
 	font-size: 14px;
 }
-QTableView#tblAutoTable::focus, QTableView#tblTrackView::focus, QTableView#routeList::focus, QTableView#TrackListView::focus 
+QTableView#tblAutoTable::focus, QTableView#tblTrackView::focus, QTableView#routeList::focus, QTableView#TrackListView::focus , TrackViewDock QTableView::focus
 {
 	border: 2px solid #f3ce69;
 }
 
-QTableView#tblAutoTable::item, QTableView#tblTrackView::item, QTableView#routeList::item,TrackViewEditor  QTableView#optionsTable::item, MidiAssignDialog QTableView::item
+QTableView#tblAutoTable::item, QTableView#tblTrackView::item, QTableView#routeList::item,TrackViewEditor  QTableView#optionsTable::item, MidiAssignDialog QTableView::item, TrackViewDock QTableView::item
 {
 	padding-top: 4px;
 	padding-bottom: 4px;
 	border-bottom: 1px solid #343434;
 }
 
-QTableView#tblAutoTable::item:selected, QTableView#tblTrackView::item:selected, QTableView#routeList::item:selected, TrackViewEditor QTableView#optionsTable::item:selected, MidiAssignDialog QTableView::item:selected
+QTableView#tblAutoTable::item:selected, QTableView#tblTrackView::item:selected, QTableView#routeList::item:selected, TrackViewEditor QTableView#optionsTable::item:selected, MidiAssignDialog QTableView::item:selected, TrackViewDock QTableView::item:selected
 {
 	background-color: #0a0a0a;
 	border: none;
 }
 
-QTableView#tblAutoTable::item:selected:active, QTableView#tblTrackView::item:selected:active, QTableView#routeList::item:selected:active, TrackViewEditor QTableView#optionsTable::item:selected:active, MidiAssignDialog QTableView::item:selected:active
+QTableView#tblAutoTable::item:selected:active, QTableView#tblTrackView::item:selected:active, QTableView#routeList::item:selected:active, TrackViewEditor QTableView#optionsTable::item:selected:active, MidiAssignDialog QTableView::item:selected:active, TrackViewDock QTableView::item:selected:active
 {
 	border: none;
 }
 
-QTableView#tblAutoTable::item:selected:!active, QTableView#tblTrackView::item:selected:!active, QTableView#routeList::item:selected:!active, TrackViewEditor QTableView#optionsTable::item:selected:!active, MidiAssignDialog QTableView::item:selected:!active, QTableView#TrackListView::item:selected:!active
+QTableView#tblAutoTable::item:selected:!active, QTableView#tblTrackView::item:selected:!active, QTableView#routeList::item:selected:!active, TrackViewEditor QTableView#optionsTable::item:selected:!active, MidiAssignDialog QTableView::item:selected:!active, QTableView#TrackListView::item:selected:!active, TrackViewDock QTableView::item:selected:!active
 {
 	border: none;
 }
@@ -368,7 +368,7 @@ QTableView#TrackListView
 	gridline-color:#343434;
 	color: #bbbfbb;
 	border: 2px solid #29292a;/*set for highlighting on focus*/
-	border-radius: 0px;
+	border-radius: 6px;
 	padding: 0px;
 	font-size: 14px;
 	
@@ -389,7 +389,7 @@ QListWidget
 	selection-background-color: #2e2e2e;
 	color: #bbbfbb;
 	border: 1px solid #29292a;
-	border-radius: 0px;
+	border-radius: 6px;
 	padding: 0px;
 	font-size: 14px;
 }
@@ -427,7 +427,7 @@ QTableView#autoTable
 	selection-background-color: #2e2e2e;
 	color: #bbbfbb;
 	border: 2px solid #29292a;
-	border-radius: 0px;
+	border-radius: 6px;
 	padding: 0px;
 	font-size: 14px;
 }
