@@ -949,30 +949,53 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
 	{
 		int id = act1->data().toInt();/*{{{*/
 
-		CtrlListList* cll = ((AudioTrack*)m_track)->controller();
-		for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+		AudioTrack* atrack = 0;
+    	if (m_track->isMidiTrack())
+    	{
+    	    MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
+    	    if (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+    	    {
+    	        SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
+    	        if (synth->audioTrack())
+    	            atrack = (AudioTrack*)synth->audioTrack();
+    	        else
+    	            return;
+    	    }
+    	    else
+    	        return;
+    	}
+		else
 		{
-			CtrlList *cl = icll->second;
-			if (id == cl->id()) 
-			{
-				cl->setVisible(!cl->isVisible());
-				if(cl->id() == AC_PAN)
-				{
-					AutomationType at = ((AudioTrack*) m_track)->automationType();
-					if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-						((AudioTrack*) m_track)->enablePanController(false);
-				
-					double panVal = ((AudioTrack*) m_track)->pan();
-					audio->msgSetPan(((AudioTrack*) m_track), panVal);
-					((AudioTrack*) m_track)->startAutoRecord(AC_PAN, panVal);
+			atrack = (AudioTrack*)m_track;
+		}
 
-					if (((AudioTrack*) m_track)->automationType() != AUTO_WRITE)
-						((AudioTrack*) m_track)->enablePanController(true);
-					((AudioTrack*) m_track)->stopAutoRecord(AC_PAN, panVal);
+		if(atrack)
+		{
+			CtrlListList* cll = atrack->controller();
+			for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+			{
+				CtrlList *cl = icll->second;
+				if (id == cl->id()) 
+				{
+					cl->setVisible(!cl->isVisible());
+					if(cl->id() == AC_PAN)
+					{
+						AutomationType at = atrack->automationType();
+						if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
+							atrack->enablePanController(false);
+					
+						double panVal = atrack->pan();
+						audio->msgSetPan(atrack, panVal);
+						atrack->startAutoRecord(AC_PAN, panVal);
+
+						if (atrack->automationType() != AUTO_WRITE)
+							atrack->enablePanController(true);
+						atrack->stopAutoRecord(AC_PAN, panVal);
+					}
 				}
 			}
+			song->update(SC_TRACK_MODIFIED);/*}}}*/
 		}
-		song->update(SC_TRACK_MODIFIED);/*}}}*/
 	}
 
 	delete p;
