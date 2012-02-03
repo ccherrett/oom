@@ -16,9 +16,9 @@
 #include "song.h"
 #include <QtGui>
 
-InstrumentTree::InstrumentTree(QWidget* parent, MidiTrack* t, bool popup) : QTreeView(parent)
+InstrumentTree::InstrumentTree(QWidget* parent, MidiInstrument* i, bool popup) : QTreeView(parent)
 {
-	m_track = t;
+	m_instrument = i;
 	m_popup = popup;
 	_patchModel = new QStandardItemModel(0, 2, this);
 	_patchSelModel = new QItemSelectionModel(_patchModel);
@@ -35,17 +35,12 @@ InstrumentTree::InstrumentTree(QWidget* parent, MidiTrack* t, bool popup) : QTre
 
 void InstrumentTree::updateModel()
 {
-	if(!m_track)
+	if(!m_instrument)
 	{
 		_patchModel->clear();
 		return;
 	}
-	//printf("InstrumentTree::updateModel() trackName: %s\n",m_track->name().toUtf8().constData());
-	int channel = m_track->outChannel();
-	int port = m_track->outPort();
-	MidiInstrument* instr = midiPorts[port].instrument();
-	if(instr)
-		instr->populatePatchModel(_patchModel, channel, song->mtype(), m_track->type() == Track::DRUM);
+	m_instrument->populatePatchModel(_patchModel, 0, song->mtype(), false);
 	updateHeader();
 }
 
@@ -62,7 +57,7 @@ void InstrumentTree::updateHeader()/*{{{*/
 
 void InstrumentTree::patchDoubleClicked(QModelIndex index)/*{{{*/
 {
-	if(!m_track)
+	if(!m_instrument)
 		return;
 	QStandardItem* nItem = _patchModel->itemFromIndex(index);
 
@@ -103,7 +98,7 @@ void InstrumentTree::patchDoubleClicked(QModelIndex index)/*{{{*/
 
 void InstrumentTree::patchClicked(QModelIndex index)/*{{{*/
 {
-	if(!m_track)
+	if(!m_instrument)
 		return;
 	QStandardItem* nItem = _patchModel->itemFromIndex(index);
 

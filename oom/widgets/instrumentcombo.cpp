@@ -9,6 +9,7 @@
 #include "instrumentcombo.h"
 #include "instrumenttree.h"
 #include "instrumentmenu.h"
+#include "minstrument.h"
 #include "track.h"
 #include "song.h"
 #include "midiport.h"
@@ -17,9 +18,9 @@
 #include "midi.h"
 #include <QtGui>
 
-InstrumentCombo::InstrumentCombo(QWidget *parent, MidiTrack* track, int prog, QString pname) : QComboBox(parent)
+InstrumentCombo::InstrumentCombo(QWidget *parent, MidiInstrument* instrument, int prog, QString pname) : QComboBox(parent)
 {
-	m_track = track;
+	m_instrument = instrument;
 	tree = 0;
 	m_program = prog;
 	m_name = pname;
@@ -34,8 +35,8 @@ void InstrumentCombo::mousePressEvent(QMouseEvent*)
 	QMenu *p = new QMenu(this);
 	if(!tree)
 	{
-	//printf("InstrumentCombo::mousePressEvent() trackName: %s\n",m_track->name().toUtf8().constData());
-		tree = new InstrumentMenu(p, m_track);
+	//printf("InstrumentCombo::mousePressEvent() instrumentName: %s\n",m_instrument->name().toUtf8().constData());
+		tree = new InstrumentMenu(p, m_instrument);
 		connect(tree, SIGNAL(patchSelected(int, QString)), this, SLOT(updateValue(int, QString)));
 		connect(tree, SIGNAL(patchSelected(int, QString)), this, SIGNAL(patchSelected(int, QString)));
 	}

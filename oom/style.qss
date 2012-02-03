@@ -1323,7 +1323,7 @@ InstrumentTree/*{{{*/
 	selection-background-color: #2e2e2e;
 	color: #bbbfbb;
 	border: 2px solid #29292a;
-	border-radius: 0px;
+	border-radius: 6px;
 	padding: 0px;
 	font-size: 11x;
 	/*selection-background-color:red;*//*this can be used to change the selection background color*/

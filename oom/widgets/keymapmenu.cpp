@@ -17,6 +17,7 @@
 #include "track.h"
 #include "instrumenttree.h"
 #include "minstrument.h"
+#include "midiport.h"
 #include "globals.h"
 #include "icons.h"
 #include "song.h"
@@ -69,7 +70,10 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	
 	layout->addLayout(hbox);
 	
-	m_tree = new InstrumentTree(w, m_track);
+	int outPort = ((MidiTrack*)m_track)->outPort();
+	MidiInstrument* instr = midiPorts[outPort].instrument();
+	
+	m_tree = new InstrumentTree(w, instr);
 	//m_tree->setObjectName("KeyMapMenuList");
 	QString style = "InstrumentTree { background-color: #1e1e1e; selection-background-color: #2e2e2e; gridline-color:#343434; border: 2px solid #211f23; border-radius: 0px; padding: 0px; color: #bbbfbb; font-size: 11x; alternate-background-color: #1b1b1b; }";
 	m_tree->setStyleSheet(style);

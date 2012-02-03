@@ -13,7 +13,7 @@
 #include <QObject>
 
 class InstrumentTree;
-class MidiTrack;
+class MidiInstrument;
 class QString;
 class QTextEdit;
 class QLineEdit;
@@ -25,12 +25,12 @@ class InstrumentMenu : public QWidgetAction
 
 private:
 	InstrumentTree *m_tree;
-	MidiTrack *m_track;
+	MidiInstrument *m_instrument;
 	int m_program;
 	QString m_name;
 
 public:
-	InstrumentMenu(QMenu* parent, MidiTrack *track);
+	InstrumentMenu(QMenu* parent, MidiInstrument *instr);
 	virtual QWidget* createWidget(QWidget* parent = 0);
 
 	int getProgram() { return m_program; }

@@ -1,7 +1,6 @@
 //=========================================================
 //  OOMidi
 //  OpenOctave Midi and Audio Editor
-//  $Id: $
 //
 //  (C) Copyright 2011 Andrew Williams and Christopher Cherrett
 //=========================================================
@@ -18,21 +17,22 @@
 #include <QSize>
 
 class MidiTrack;
+class MidiInstrument;
 class InstrumentTree : public QTreeView
 {
 	Q_OBJECT
-	MidiTrack* m_track;
+	MidiInstrument* m_instrument;
 	bool m_popup;
 	QStandardItemModel *_patchModel;
 	QItemSelectionModel *_patchSelModel;
 
 public:
-	InstrumentTree(QWidget* parent = 0, MidiTrack* track = 0, bool popup = false);
-	void setTrack(MidiTrack* t) { 
-		m_track = t;
+	InstrumentTree(QWidget* parent = 0, MidiInstrument* instr = 0, bool popup = false);
+	void setInstrument(MidiInstrument* t) { 
+		m_instrument = t;
 		updateModel();
 	}
-	MidiTrack* track() { return m_track; }
+	MidiInstrument* instrument() { return m_instrument; }
 private:
 	void updateModel();
 	void updateHeader();

@@ -41,7 +41,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	setupUi(this);
 	_selected = 0;
 //MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_BUSS,AUDIO_AUX
-	_trackTypes = (QStringList() << "All Types" << "Outputs" << "Inputs" << "Auxs" << "Busses" << "Midi Tracks" << "Soft Synth" << "Audio Tracks"); //new QStringList();
+	_trackTypes = (QStringList() << "All Types" << "Outputs" << "Inputs" << "Auxs" << "Busses" << "Midi Tracks" << "Audio Tracks"); //new QStringList();
 	_editing = false;
 	_addmode = false;
 	InstrumentDelegate* pdelegate = new InstrumentDelegate(this);
@@ -51,17 +51,14 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, TrackViewList*) : QDialog(pare
 	optionsTable->setModel(m_model);
 	optionsTable->setItemDelegateForColumn(1, tdelegate);
 	optionsTable->setItemDelegateForColumn(2, pdelegate);
+	m_allmodel = new QStandardItemModel(this);
+	m_allselmodel = new QItemSelectionModel(m_allmodel);
 	updateTableHeader();
 	//Populate trackTypes and pass it to cmbTypes 
 	cmbType->addItems(_trackTypes);
-	QStringList stracks;
-	//Output is the first in the list and will be displayed by default.
-	for (ciTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
-	{
-		stracks << (*t)->name();
-	}
+	cmbTypeSelected(0);
 	buildViewList();
-	listAllTracks->setModel(new QStringListModel(stracks));
+	listAllTracks->setModel(m_allmodel);
 	
 	btnOk = buttonBox->button(QDialogButtonBox::Ok);
 	btnCancel = buttonBox->button(QDialogButtonBox::Cancel);
@@ -206,7 +203,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 			{
 				QString trackname = t->name();
 				QStandardItem* tname = new QStandardItem(trackname);
-				tname->setData(t->id());
+				tname->setData(t->id(), TrackIdRole);
 				tname->setEditable(false);
 				QString tp("0");
 				QString pname(t->isMidiTrack() ? tr("Select Patch") : "-");
@@ -234,7 +231,12 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 				patch->setData(prog, ProgramRole);
 				patch->setEditable(false);
 				if(t->isMidiTrack())
+				{
+					int outPort = ((MidiTrack*)t)->outPort();
+					MidiInstrument* instr = midiPorts[outPort].instrument();
+					patch->setData(instr->iname(), InstrumentNameRole);
 					patch->setEditable(true);
+				}
 				QList<QStandardItem*> rowData;
 				rowData.append(tname);
 				rowData.append(transp);
@@ -255,17 +257,18 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 	//Perform actions to populate list below based on selected type
 	//We need to repopulate and filter the allTrackList
 	//"Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Soft_Synth"
-	//if(!_editing)
-	//	cmbViews->setCurrentIndex(0);
-	QStringList stracks;
+	m_allmodel->clear();
 	switch (type)
-	{/*{{{*/
+	{
 		case 0:
 			for (ciTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
-					stracks << (*t)->name();
+				QStandardItem *item = new QStandardItem((*t)->name());
+				item->setData((*t)->id());
+				item->setEditable(false);
+				m_allmodel->appendRow(item);
 			}
 			break;
 		case 1:
@@ -273,7 +276,10 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
-					stracks << (*t)->name();
+				QStandardItem *item = new QStandardItem((*t)->name());
+				item->setData((*t)->id());
+				item->setEditable(false);
+				m_allmodel->appendRow(item);
 			}
 			break;
 		case 2:
@@ -281,7 +287,10 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
-					stracks << (*t)->name();
+				QStandardItem *item = new QStandardItem((*t)->name());
+				item->setData((*t)->id());
+				item->setEditable(false);
+				m_allmodel->appendRow(item);
 			}
 			break;
 		case 3:
@@ -289,7 +298,10 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
-					stracks << (*t)->name();
+				QStandardItem *item = new QStandardItem((*t)->name());
+				item->setData((*t)->id());
+				item->setEditable(false);
+				m_allmodel->appendRow(item);
 			}
 			break;
 		case 4:
@@ -297,7 +309,10 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
-					stracks << (*t)->name();
+				QStandardItem *item = new QStandardItem((*t)->name());
+				item->setData((*t)->id());
+				item->setEditable(false);
+				m_allmodel->appendRow(item);
 			}
 			break;
 		case 5:
@@ -305,27 +320,24 @@ void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
-					stracks << (*t)->name();
+				QStandardItem *item = new QStandardItem((*t)->name());
+				item->setData((*t)->id());
+				item->setEditable(false);
+				m_allmodel->appendRow(item);
 			}
 			break;
 		case 6:
-            //for (ciTrack t = song->syntis()->begin(); t != song->syntis()->end(); ++t)
-            //{
-				//This should be checked against track in other views
-				//if(song->findTrackView((*t)) == 0)
-            //		stracks << (*t)->name();
-            //}
-			break;
-		case 7:
 			for (ciTrack t = song->waves()->begin(); t != song->waves()->end(); ++t)
 			{
 				//This should be checked against track in other views
 				//if(song->findTrackView((*t)) == 0)
-					stracks << (*t)->name();
+				QStandardItem *item = new QStandardItem((*t)->name());
+				item->setData((*t)->id());
+				item->setEditable(false);
+				m_allmodel->appendRow(item);
 			}
 			break;
-	}/*}}}*/
-	listAllTracks->setModel(new QStringListModel(stracks));
+	}
 }/*}}}*/
 
 void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
@@ -343,7 +355,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 			QStandardItem* titem = m_model->item(row, 0);
 			if(titem)
 			{
-				Track *t = song->findTrackById(titem->data().toLongLong());
+				Track *t = song->findTrackById(titem->data(TrackIdRole).toLongLong());
 				if(t)
 				{
 					_selected->addTrack(t->id());
@@ -485,7 +497,7 @@ void TrackViewEditor::btnAddTrack()/*{{{*/
 		btnApply->setEnabled(true);
 		_editing = true;
 		QItemSelectionModel* model = listAllTracks->selectionModel();
-		QAbstractItemModel* lat = listAllTracks->model(); 
+		//QAbstractItemModel* lat = listAllTracks->model(); 
 		if (model->hasSelection())
 		{
 			QModelIndexList sel = model->selectedRows(0);
@@ -493,33 +505,44 @@ void TrackViewEditor::btnAddTrack()/*{{{*/
 			for (id = sel.constBegin(); id != sel.constEnd(); ++id)
 			{
 				//We have to index we will get the row.
-				QVariant v = lat->data((*id));
-				QString val = v.toString();
-				Track* trk = song->findTrack(val);
-				if (trk)
+				QStandardItem *item = m_allmodel->itemFromIndex((*id));
+				if(item)
 				{
-				//	printf("Adding Track from row: %d\n", row);
-					QList<QStandardItem *> items = m_model->findItems(val);
-					if(items.isEmpty())
+					//QVariant v = lat->data((*id));
+					//QString val = v.toString();
+					qint64 tid = item->data().toLongLong();
+					Track* trk = song->findTrackById(tid);
+					if (trk)
 					{
-						QStandardItem* tname = new QStandardItem(trk->name());
-						tname->setData(trk->id());
-						tname->setEditable(false);
-						QStandardItem* transp = new QStandardItem(QString::number(0));
-						transp->setEditable(false);
-						if(trk->isMidiTrack())
-							transp->setEditable(true);
-						QStandardItem* patch = new QStandardItem(trk->isMidiTrack() ? tr("Select Patch") : "-");
-						patch->setData(0, ProgramRole);
-						patch->setEditable(false);
-						if(trk->isMidiTrack())
-							patch->setEditable(true);
-						QList<QStandardItem*> rowData;
-						rowData.append(tname);
-						rowData.append(transp);
-						rowData.append(patch);
-						m_model->appendRow(rowData);
-						optionsTable->selectRow((m_model->rowCount()-1));
+					//	printf("Adding Track from row: %d\n", row);
+						QList<QStandardItem *> items = m_model->findItems(item->text());
+						if(items.isEmpty())
+						{
+							QStandardItem* tname = new QStandardItem(trk->name());
+							tname->setData(trk->id(), TrackIdRole);
+							tname->setData(0, TrackSourceRole);
+							tname->setEditable(false);
+							QStandardItem* transp = new QStandardItem(QString::number(0));
+							transp->setEditable(false);
+							if(trk->isMidiTrack())
+								transp->setEditable(true);
+							QStandardItem* patch = new QStandardItem(trk->isMidiTrack() ? tr("Select Patch") : "-");
+							patch->setData(0, ProgramRole);
+							patch->setEditable(false);
+							if(trk->isMidiTrack())
+							{
+								int outPort = ((MidiTrack*)trk)->outPort();
+								MidiInstrument* instr = midiPorts[outPort].instrument();
+								patch->setData(instr->iname(), InstrumentNameRole);
+								patch->setEditable(true);
+							}
+							QList<QStandardItem*> rowData;
+							rowData.append(tname);
+							rowData.append(transp);
+							rowData.append(patch);
+							m_model->appendRow(rowData);
+							optionsTable->selectRow((m_model->rowCount()-1));
+						}
 					}
 				}
 				//printf("Found Track %s at index %d with type %d\n", val, row, trk->type());

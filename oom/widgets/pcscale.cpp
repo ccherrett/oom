@@ -270,11 +270,16 @@ void PCScale::viewMousePressEvent(QMouseEvent* event)
 			del->setCheckable(true);
 			connect(del, SIGNAL(triggered(bool)), this, SLOT(deleteProgramChangeClicked(bool)));
 			del->setData(2);
-			QMenu* menu2 = new QMenu(tr("Change Patch"), this);
-			InstrumentMenu *imenu = new InstrumentMenu(menu2, (MidiTrack*)_pc.part->track());
-			menu2->addAction(imenu);
-			connect(imenu, SIGNAL(patchSelected(int, QString)), this, SLOT(changeProgramChangeClicked(int, QString)));
-			menu->addMenu(menu2);
+			int outPort = ((MidiTrack*)_pc.part->track())->outPort();
+			MidiInstrument* instr = midiPorts[outPort].instrument();
+			if(instr)
+			{
+				QMenu* menu2 = new QMenu(tr("Change Patch"), this);
+				InstrumentMenu *imenu = new InstrumentMenu(menu2, instr);
+				menu2->addAction(imenu);
+				connect(imenu, SIGNAL(patchSelected(int, QString)), this, SLOT(changeProgramChangeClicked(int, QString)));
+				menu->addMenu(menu2);
+			}
 			menu->exec(event->globalPos(), 0);
 		}
 	}

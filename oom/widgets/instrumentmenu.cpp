@@ -27,20 +27,20 @@
 #include "config.h"
 #include "instrumentmenu.h"
 
-InstrumentMenu::InstrumentMenu(QMenu* parent, MidiTrack *track) : QWidgetAction(parent)
+InstrumentMenu::InstrumentMenu(QMenu* parent, MidiInstrument *instr) : QWidgetAction(parent)
 {
-	m_track = track;
+	m_instrument = instr;
 }
 
 QWidget* InstrumentMenu::createWidget(QWidget* parent)
 {
-	if(!m_track)
+	if(!m_instrument)
 		return 0;
 
 	QVBoxLayout* layout = new QVBoxLayout();
 	QWidget* w = new QWidget(parent);
 	w->setFixedHeight(350);
-	QString title(m_track->name());
+	QString title(m_instrument->iname());
 	QLabel* plabel = new QLabel(title);
 	plabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 	plabel->setObjectName("KeyMapMenuLabel");
@@ -52,7 +52,7 @@ QWidget* InstrumentMenu::createWidget(QWidget* parent)
 	QPushButton *btnClose = new QPushButton(tr("Dismiss"));
 	connect(btnClose, SIGNAL(clicked()), this, SLOT(doClose()));
 
-	m_tree = new InstrumentTree(w, m_track);
+	m_tree = new InstrumentTree(w, m_instrument);
 	m_tree->setObjectName("InstrumentMenuList");
 	//QString style = "InstrumentTree { background-color: #d8dbe8; border: 2px solid #29292a; border-radius: 0px; padding: 0px; color: #303033; font-size: 11x; alternate-background-color: #bec0cf; }";
 	QString style = "InstrumentTree { background-color: #1e1e1e; selection-background-color: #2e2e2e; gridline-color:#343434; border: 2px solid #211f23; border-radius: 0px; padding: 0px; color: #bbbfbb; font-size: 11x; alternate-background-color: #1b1b1b; }";

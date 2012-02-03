@@ -14,7 +14,7 @@
 #include <QEvent>
 #include <QObject>
 
-class MidiTrack;
+class MidiInstrument;
 class QString;
 class InstrumentMenu;
 
@@ -26,9 +26,9 @@ class InstrumentCombo : public QComboBox
 	QString m_name;
     bool eventFilter(QObject *obj, QEvent *event);
 public:
-	InstrumentCombo(QWidget *parent = 0, MidiTrack *track = 0, int prog = 0, QString pname = "Select Patch");
-	void setTrack(MidiTrack* track) { m_track = track; }
-	MidiTrack* track() { return m_track; }
+	InstrumentCombo(QWidget *parent = 0, MidiInstrument *instr = 0, int prog = 0, QString pname = "Select Patch");
+	void setInstrument(MidiInstrument* instrument) { m_instrument = instrument; }
+	MidiInstrument* instrument() { return m_instrument; }
 
 	int getProgram() { return m_program; }
 	void setProgram(int prog);
@@ -36,7 +36,7 @@ public:
 	QString getProgramName() { return m_name; }
 
 private:
-	MidiTrack* m_track;
+	MidiInstrument* m_instrument;
 	
 protected:
 	virtual void mousePressEvent(QMouseEvent*);

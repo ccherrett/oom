@@ -24,6 +24,9 @@ class QStandardItemModel;
 class QStandardItem;
 class QItemSelectionModel;
 
+
+enum TrackSourceType { EXISTING = 0, VIRTUAL};
+
 class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase 
 {
 	Q_OBJECT
@@ -33,6 +36,8 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	bool _addmode;
 	QStandardItemModel *m_model;
 	QItemSelectionModel *m_selmodel;
+	QStandardItemModel *m_allmodel;
+	QItemSelectionModel *m_allselmodel;
 
 	QStringList _trackTypes;
 	//QPushButton* btnAdd;

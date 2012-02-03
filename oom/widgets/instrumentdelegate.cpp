@@ -10,6 +10,7 @@
 #include <QAbstractItemModel>
 #include "instrumentdelegate.h"
 #include "instrumentcombo.h"
+#include "minstrument.h"
 #include "track.h"
 #include "song.h"
 
@@ -26,17 +27,23 @@ QWidget *InstrumentDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 		const QAbstractItemModel* mod = index.model();
 		if(mod)
 		{
-			//MidiTrack* track = dynamic_cast<MidiTrack*>(mod->data(trackfield, InstrumentRole));
-			QString tname = mod->data(trackfield, Qt::DisplayRole).toString();
-			Track* t = song->findTrack(tname);
-			if(t && t->isMidiTrack())
+			//QString tname = mod->data(trackfield, Qt::DisplayRole).toString();
+			int prog = mod->data(index, ProgramRole).toInt();
+			QString instrName = mod->data(index, InstrumentNameRole).toString();
+			QString pname = mod->data(index, Qt::DisplayRole).toString();
+			MidiInstrument* instr = 0;
+			for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)/*{{{*/
 			{
-				int prog = mod->data(index, ProgramRole).toInt();
-				QString pname = mod->data(index, Qt::DisplayRole).toString();
-				InstrumentCombo *m_editor = new InstrumentCombo(parent, (MidiTrack*)t, prog, pname);
+				if ((*i)->iname() == instrName)
+				{
+					instr = *i;
+					break;
+				}
+			}/*}}}*/
+			if(instr)
+			{
+				InstrumentCombo *m_editor = new InstrumentCombo(parent, instr, prog, pname);
 				m_editor->updateValue(prog, pname);
-				//m_editor->setProgram(prog);
-				//m_editor->setProgramName(pname);
 				return m_editor;
 			}
 		}
