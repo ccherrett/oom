@@ -53,7 +53,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 		case Track::DRUM:
 		{
 			//Load up the instrument first
-			if(vtrack->createMidiOutputDevice)
+			if(vtrack->autoCreateInstrument)
 				loadInstrument(vtrack);
 			Track* track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false);
 			if(track)
@@ -323,7 +323,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
 					QString selectedOutput = vtrack->outputConfig.second;
 					bool systemOutput = false;
 					if(selectedOutput.startsWith(jackPlayback))
-					{
+					{//FIXME: Change this to support more than two system playback devices
 						systemOutput = true;
 					
 						//Route channel 1
@@ -986,6 +986,34 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 			break;
 			case SYNTH_INSTRUMENT://SYNTH instrument, falkTx do your synth on the fly creation hooks here
 			{
+                int portIdx = getFreeMidiPort();
+                
+                if (portIdx >= 0)
+                {
+                    for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+                    {
+                        if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                        {
+							QString devName(QString("O-").append(vtrack->name));
+                            SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
+                            SynthPluginDevice* synth = oldSynth->clone(devName);
+                            synth->open();
+
+                            midiSeq->msgSetMidiDevice(&midiPorts[portIdx], synth);
+
+                            QString selectedInput  = synth->getAudioOutputPortName(0);
+                            QString selectedInput2 = synth->getAudioOutputPortName(1);
+
+							m_midiOutPort = portIdx;
+							qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
+							vtrack->outputConfig = qMakePair(portIdx, devName);
+                            vtrack->monitorConfig  = qMakePair(0, selectedInput);
+                            vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
+
+                            break;
+                        }
+                    }
+                }
 			}
 			break;
 			case GM_INSTRUMENT:  //Regular idf no linuxsampler
@@ -1087,11 +1115,12 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
             selectedInput2 = selectedInput;
         else
             selectedInput2 = vtrack->monitorConfig2.second;
+		qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
 
 		//Route world to input
 		QString jackCapture("system:capture");
 		if(selectedInput.startsWith(jackCapture))
-		{
+		{//FIXME: Change this to support  more than 2 capture devices
 			//Route channel 1
 			Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
 			Route dstRoute(input, 0);

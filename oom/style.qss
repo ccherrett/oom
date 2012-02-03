@@ -43,7 +43,8 @@ QFrame#m_playerFrame
 {
 	color: #d6dfd6;
 	 color: #848884;
-	background-color: #414141;
+	/*background-color: #414141;*/
+	background-color: #313131;
 	border-radius: 12px;
     border: 1px solid #1e1e1e;
 }

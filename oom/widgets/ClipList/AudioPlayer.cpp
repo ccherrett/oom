@@ -318,7 +318,7 @@ void AudioPlayer::play(const QString &file)
 
 	QStringList list;
 	list << file << time;
-	emit nowPlaying(list.join(","));
+	emit nowPlaying(list.join("@--,--@"));
 
 	/* Sit in a loop, displaying the current play position. */
 	while (!info.play_done)

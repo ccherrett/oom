@@ -133,46 +133,17 @@ void CreateTrackDialog::addTrack()/*{{{*/
             
             if (instrumentType == TrackManager::SYNTH_INSTRUMENT)
             {
-                int portIdx = -1;
-                for (int i = 0; i < MIDI_PORTS; i++)
+                for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
                 {
-                    if (!midiPorts[i].device())
+                    if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
                     {
-                        portIdx = i;
+						m_vtrack->instrumentType = instrumentType;
+						m_vtrack->instrumentName = instrumentName;
+
+                        m_vtrack->useOutput = true;
+                        m_vtrack->createMidiOutputDevice = false;
+                        m_vtrack->useMonitor = true;
                         break;
-                    }
-                }
-                
-                if (portIdx >= 0)
-                {
-                    for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
-                    {
-                        if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
-                        {
-                            QString devName = txtName->text();
-                            SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
-                            SynthPluginDevice* synth = oldSynth->clone(devName);
-                            synth->open();
-
-                            midiSeq->msgSetMidiDevice(&midiPorts[portIdx], synth);
-
-                            //if (cmbMonitor->itemText(monitorIndex) == txtName->text()+":(output-ports)")
-                            //{
-                                selectedInput  = synth->getAudioOutputPortName(0);
-                                selectedInput2 = synth->getAudioOutputPortName(1);
-                            //}
-
-                            m_vtrack->useOutput = true;
-                            m_vtrack->createMidiOutputDevice = false;
-                            m_vtrack->outputConfig = qMakePair(portIdx, devName);
-                            m_vtrack->outputChannel = 0;
-
-                            m_vtrack->useMonitor = true;
-                            m_vtrack->monitorConfig  = qMakePair(0, selectedInput);
-                            m_vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
-
-                            break;
-                        }
                     }
                 }
             }
@@ -493,22 +464,16 @@ void CreateTrackDialog::updateInstrument(int index)
 							cleanup();
 						}
 
-                        //if(chkAutoCreate->isChecked())
-                        //{
-                            updateVisibleElements();
-                            populateMonitorList();
-                            chkInput->setChecked(false);
-                            chkInput->setEnabled(false);
-                            chkOutput->setChecked(false);
-                            chkOutput->setEnabled(false);
-                            midiBox->setChecked(false);
-                            midiBox->setEnabled(false);
+                        updateVisibleElements();
+                        populateMonitorList();
+                        chkInput->setChecked(true);
+                        chkInput->setEnabled(true);
+                        chkOutput->setChecked(false);
+                        chkOutput->setEnabled(false);
+                        midiBox->setChecked(false);
+                        midiBox->setEnabled(false);
 
-                            //cmbMonitor->addItem(trackName+":(output-ports)");
-                            //cmbMonitor->setCurrentIndex(cmbMonitor->count()-1);
-
-                            m_instrumentLoaded = true;
-                        //}
+                        m_instrumentLoaded = true;
                         break;
                     }
                 }
