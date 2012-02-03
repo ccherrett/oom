@@ -36,6 +36,7 @@ typedef struct pnode
 
 class MidiPort
 {
+	qint64 m_portId;
     MidiCtrlValListList* _controller;
     MidiDevice* _device;
     QString _state; // result of device open
@@ -68,6 +69,16 @@ public:
     {
         return _controller;
     }
+	qint64 id()
+	{
+		return m_portId;
+	}
+	//FIXME: To be removed when MidiPort::read is implemented
+	void setPortId(qint64 id)
+	{
+		if(id)
+			m_portId = id;
+	}
     int getCtrl(int ch, int tick, int ctrl) const;
     int getCtrl(int ch, int tick, int ctrl, Part* part) const;
     // Removed by T356.
@@ -238,6 +249,7 @@ public:
 };
 
 extern MidiPort midiPorts[MIDI_PORTS];
+extern QHash<qint64, MidiPort*> oomMidiPorts;
 extern void initMidiPorts();
 
 class QMenu;

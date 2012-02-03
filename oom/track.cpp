@@ -671,6 +671,17 @@ void MidiTrack::setOutPort(int i)
         _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
 }
 
+void MidiTrack::setOutPortId(qint64 i)
+{
+    _outPortId = i;
+
+    if (oomMidiPorts.contains(i))
+	{
+		MidiPort* mp = oomMidiPorts.value(i);
+		_wantsAutomation = (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI);
+	}
+}
+
 //---------------------------------------------------------
 //   setOutChanAndUpdate
 //---------------------------------------------------------
@@ -689,7 +700,7 @@ void MidiTrack::setOutChanAndUpdate(int i)
 //   setOutPortAndUpdate
 //---------------------------------------------------------
 
-void MidiTrack::setOutPortAndUpdate(int i)
+void MidiTrack::setOutPortAndUpdate(int i)/*{{{*/
 {
     if (i >= 0 && i < MIDI_PORTS)
         _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
@@ -700,7 +711,23 @@ void MidiTrack::setOutPortAndUpdate(int i)
 	removePortCtrlEvents(this);
 	_outPort = i;
 	addPortCtrlEvents(this);
-}
+}/*}}}*/
+
+void MidiTrack::setOutPortIdAndUpdate(qint64 i)/*{{{*/
+{
+    if (oomMidiPorts.contains(i))
+	{
+		MidiPort* mp = oomMidiPorts.value(i);
+		_wantsAutomation = (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI);
+	}
+
+	if (_outPortId == i)
+		return;
+
+	removePortCtrlEvents(this);
+	_outPortId = i;
+	addPortCtrlEvents(this);
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setInPortAndChannelMask

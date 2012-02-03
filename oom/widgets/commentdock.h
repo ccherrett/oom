@@ -32,6 +32,7 @@ private slots:
 
 public:
     CommentDock(QWidget* parent = 0, Track* t = 0);
+    ~CommentDock();
 	void setTrack(Track* t) 
 	{ 
 		m_track = t; 

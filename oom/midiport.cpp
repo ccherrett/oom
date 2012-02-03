@@ -22,6 +22,7 @@
 #include "plugin.h"
 #include "app.h"
 #include "song.h"
+#include "utils.h"
 #include "network/lsclient.h"
 
 //#ifdef DSSI_SUPPORT
@@ -29,6 +30,7 @@
 //#endif
 
 MidiPort midiPorts[MIDI_PORTS];
+QHash<qint64, MidiPort*> oomMidiPorts;
 
 //---------------------------------------------------------
 //   initMidiPorts
@@ -36,6 +38,8 @@ MidiPort midiPorts[MIDI_PORTS];
 
 void initMidiPorts()
 {
+	//TODO: Remove the need for this code
+	//We should populate the oomMidiPort hash with ports as we create them
 	for (int i = 0; i < MIDI_PORTS; ++i)
 	{
 		MidiPort* port = &midiPorts[i];
@@ -59,6 +63,7 @@ MidiPort::MidiPort()
 	_controller = new MidiCtrlValListList();
 	_foundInSongFile = false;
 	_patchSequences = QList<PatchSequence*>();
+	m_portId = create_id();
 
 	//
 	// create minimum set of managed controllers
@@ -911,7 +916,7 @@ void MidiPort::writeRouting(int level, Xml& xml) const
 				s += QString(QT_TRANSLATE_NOOP("@default", " channelMask=\"%1\"")).arg(r->channel); // Use new channel mask.
 			xml.tag(level++, s.toLatin1().constData());
 
-			xml.tag(level, "source mport=\"%d\"/", portno());
+			xml.tag(level, "source mport=\"%d\" mportId=\"%s\"/", portno(), QString::number(m_portId).toUtf8().constData());
 
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));

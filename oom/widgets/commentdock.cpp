@@ -8,6 +8,7 @@
 #include "commentdock.h"
 #include "song.h"
 #include "track.h"
+#include "traverso_shared/TConfig.h"
 
 #include <QWidget>
 
@@ -25,6 +26,26 @@ CommentDock::CommentDock(QWidget* parent, Track* t)
 	connect(songComment, SIGNAL(textChanged()), this, SLOT(songCommentChanged()));
 	updateComments();
     commentDockSplitter->setChildrenCollapsible(false);
+	QList<int> sizes;
+	QString str = tconfig().get_property("CommentDock", "sizes", "30 250").toString();
+	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
+	foreach (QString s, sl)
+	{
+		int val = s.toInt();
+		sizes.append(val);
+	}
+	commentDockSplitter->setSizes(sizes);
+}
+
+CommentDock::~CommentDock()
+{
+	QList<int> sizes = commentDockSplitter->sizes();
+	QStringList out;
+	foreach(int s, sizes)
+	{
+		out << QString::number(s);
+	}
+	tconfig().set_property("CommentDock", "sizes", out.join(" "));
 }
 
 //---------------------------------------------------------

@@ -577,7 +577,7 @@ Part* OOMidi::readPart(Xml& xml)
 //   readToplevels
 //---------------------------------------------------------
 
-void OOMidi::readToplevels(Xml& xml)
+void OOMidi::readToplevels(Xml& xml)/*{{{*/
 {
 	printf("OOMidi::readToplevels\n");
 	PartList* pl = new PartList;
@@ -677,7 +677,7 @@ void OOMidi::readToplevels(Xml& xml)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   readCtrl
@@ -743,6 +743,7 @@ void OOMidi::readMidichannel(Xml& xml, int prt)
 void OOMidi::readMidiport(Xml& xml)
 {
 	int port = 0;
+	qint64 portId = -1;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -764,6 +765,10 @@ void OOMidi::readMidiport(Xml& xml)
 				if (tag == "port")
 				{
 					port = xml.s2().toInt();
+				}
+				else if(tag == "portId")
+				{
+					portId = xml.s2().toLongLong();
 				}
 				break;
 			case Xml::TagEnd:

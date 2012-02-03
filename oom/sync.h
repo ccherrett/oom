@@ -12,15 +12,14 @@
 #include "mtc.h"
 #include "value.h"
 #include "globaldefs.h"
+#include <Qt>
 
 class Xml;
-//class MidiDevice;
-
-//class MidiSyncPort
 
 class MidiSyncInfo {
 private:
     int _port;
+	qint64 _portId;
 
     int _idOut;
     int _idIn;
@@ -37,7 +36,6 @@ private:
     int _recMTCtype;
 
     bool _recRewOnStart;
-    //bool _sendContNotStart;
 
     double _lastClkTime;
     double _lastTickTime;
@@ -70,6 +68,14 @@ public:
 
     void setPort(const int p) {
         _port = p;
+    }
+
+    qint64 portId() const {
+        return _portId;
+    }
+
+    void setPortId(const qint64 p) {
+        _portId = p;
     }
 
     int idOut() const {
@@ -150,8 +156,6 @@ public:
     void setRecRewOnStart(const bool v) {
         _recRewOnStart = v;
     }
-    //bool sendContNotStart() const           { return _sendContNotStart; }
-    //void setSendContNotStart(const bool v)  { _sendContNotStart = v; }
 
     bool MCSyncDetect() const {
         return _clockDetect;
@@ -194,28 +198,14 @@ public:
 
     bool isDefault() const;
     void read(Xml& xml);
-    //void write(int level, Xml& xml, MidiDevice* md);
     void write(int level, Xml& xml);
 };
 
-//extern MidiSync midiSyncPorts[MIDI_PORTS];
-
 extern bool debugSync;
-
-//extern int rxSyncPort;
-//extern int txSyncPort;
-//extern int rxDeviceId;
-//extern int txDeviceId;
 
 extern int mtcType;
 extern MTC mtcOffset;
 extern BValue extSyncFlag;
-//extern bool genMTCSync;       // output MTC Sync
-//extern bool genMCSync;        // output MidiClock Sync
-//extern bool genMMC;           // output Midi Machine Control
-//extern bool acceptMTC;
-//extern bool acceptMC;
-//extern bool acceptMMC;
 extern int volatile curMidiSyncInPort;
 extern BValue useJackTransport;
 extern bool volatile jackTransportMaster;

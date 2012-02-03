@@ -16,10 +16,8 @@
 #include "transport.h"
 #include "icons.h"
 #include "globals.h"
-//#include "drumedit.h"
 #include "Performer.h"
 #include "master/masteredit.h"
-///#include "transport.h"
 #include "bigtime.h"
 #include "Composer.h"
 #include "conf.h"
@@ -31,8 +29,6 @@
 #include "driver/jackmidi.h"
 #include "xml.h"
 #include "midi.h"
-//#include "midisyncimpl.h"
-//#include "midifilterimpl.h"
 #include "shortcuts.h"
 #include "midictrl.h"
 #include "ctrlcombo.h"
@@ -288,22 +284,15 @@ static void readPortChannel(Xml& xml, int midiPort)
 static void readConfigMidiPort(Xml& xml)
 {
 	int idx = 0;
+	qint64 id = -1;
 	QString device;
 
-	//QString instrument;
-	// Changed by Tim.
-	//QString instrument("generic midi");
-	// Let's be bold. New users have been confused by generic midi not enabling any patches and controllers.
-	// I had said this may cause HW problems by sending out GM sysEx when really the HW might not be GM.
-	// But this really needs to be done, one way or another.
-	// FIXME: TODO: Make this user-configurable!
 	QString instrument("GM");
 
 	QList<PatchSequence*> patchSequences;
 	QList<QPair<int, QString> > presets;
 
 	int openFlags = 1;
-	//bool thruFlag = false;
 	int dic = 0;
 	int doc = 0;
 	MidiSyncInfo tmpSi;
@@ -400,6 +389,10 @@ static void readConfigMidiPort(Xml& xml)
 				{
 					idx = xml.s2().toInt();
 				}
+				else if(tag == "portId")
+				{//New style
+					id = xml.s2().toLongLong();
+				}
 				break;
 			case Xml::TagEnd:
 				if (tag == "midiport")
@@ -429,13 +422,16 @@ static void readConfigMidiPort(Xml& xml)
 						fprintf(stderr, "readConfigMidiPort: device not found %s\n", device.toLatin1().constData());
 
 					MidiPort* mp = &midiPorts[idx];
+					//FIXME: This is very bad to do but I have no choice for now until we make MidiPort read its own stuff
+					if(id)
+						mp->setPortId(id);
 
-					mp->setInstrument(registerMidiInstrument(instrument)); // By Tim.
+					mp->setInstrument(registerMidiInstrument(instrument));
 					mp->setDefaultInChannels(dic);
 					mp->setDefaultOutChannels(doc);
 
 					mp->syncInfo().copyParams(tmpSi);
-					// p3.3.50 Indicate the port was found in the song file, even if no device is assigned to it.
+					//Indicate the port was found in the song file, even if no device is assigned to it.
 					mp->setFoundInSongFile(true);
 
 					if (!patchSequences.isEmpty())
@@ -1282,7 +1278,7 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 			MidiDevice* dev = mport->device();
 			if (!used && !dev)
 				continue;
-			xml.tag(level++, "midiport idx=\"%d\"", i);
+			xml.tag(level++, "midiport idx=\"%d\" portId=\"%s\"", i, QString::number(mport->id()).toUtf8().constData());
 
 			if (mport->defaultInChannels())
 				xml.intTag(level, "defaultInChans", mport->defaultInChannels());

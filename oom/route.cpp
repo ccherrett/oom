@@ -63,10 +63,21 @@ Route::Route(MidiDevice* d, int ch)
 }
 
 //Midi Port Route
-Route::Route(int port, int ch) // p3.3.49
+Route::Route(int port, int ch)
 {
 	track = 0;
 	midiPort = port;
+	channel = ch;
+	channels = -1;
+	remoteChannel = -1;
+	type = MIDI_PORT_ROUTE;
+}
+
+Route::Route(qint64 port, int ch)
+{
+	track = 0;
+	midiPortId = port;
+	midiPort = -1;
 	channel = ch;
 	channels = -1;
 	remoteChannel = -1;
@@ -956,7 +967,7 @@ void Route::read(Xml& xml)
 {
 	QString s;
 	int dtype = MidiDevice::ALSA_MIDI;
-	int port = -1; // p3.3.49
+	int port = -1;
 	unsigned char rtype = Route::TRACK_ROUTE;
 
 	for (;;)
@@ -974,20 +985,21 @@ void Route::read(Xml& xml)
 #endif
 				if (tag == "type")
 					rtype = xml.s2().toInt();
-				else
-					if (tag == "devtype")
+				else if (tag == "devtype")
 				{
 					dtype = xml.s2().toInt();
 					rtype = Route::MIDI_DEVICE_ROUTE;
 				}
-				else
-					if (tag == "name")
+				else if (tag == "name")
 					s = xml.s2();
-				else
-					if (tag == "mport") // p3.3.49
+				else if (tag == "mport") // p3.3.49
 				{
 					port = xml.s2().toInt();
 					rtype = Route::MIDI_PORT_ROUTE;
+				}
+				else if(tag == "mportId")
+				{
+					midiPortId  = xml.s2().toLongLong();
 				}
 				else
 					printf("Route::read(): unknown attribute:%s\n", tag.toLatin1().constData());
@@ -1006,8 +1018,7 @@ void Route::read(Xml& xml)
 					else
 						printf("Route::read(): midi port <%d> out of range\n", port);
 				}
-				else
-					if (!s.isEmpty())
+				else if (!s.isEmpty())
 				{
 					if (rtype == TRACK_ROUTE)
 					{
@@ -1152,7 +1163,7 @@ void Song::readRoute(Xml& xml)
 						if (sroute.type == Route::MIDI_DEVICE_ROUTE && droute.type == Route::TRACK_ROUTE)
 						{
 							if (sroute.device->midiPort() >= 0 && sroute.device->midiPort() < MIDI_PORTS
-									&& ch >= 0 && ch < MIDI_CHANNELS) // p3.3.50
+									&& ch >= 0 && ch < MIDI_CHANNELS)
 							{
 								sroute.midiPort = sroute.device->midiPort();
 								sroute.device = 0;

@@ -39,6 +39,30 @@ QHeaderView#trackHeaders
 	background-color: #525252;
 }
 
+QLabel#lblType, QLabel#lblTrack, QLabel#lblProp, QLabel#lblComments, QLabel#lblName, QLabel#lblGroup
+{
+	background-color:none;
+	border:none;
+}
+
+QFrame#propertyFrame, QFrame#trackListFrame, QFrame#commentFrame, QFrame#viewsFrame
+{
+	color: #d0d4d0;
+	/*background-color: #1e1e1e;*/
+	background-color: #313131;
+	border-radius: 12px;
+    border: 0px;/* solid #4b4b4b;*/
+}
+
+QFrame#addButtonFrame, QFrame#propLabelFrame, QFrame#trackLabelFrame
+{
+	color: #d0d4d0;
+	/*background-color: #1e1e1e;*/
+	background-color: #313131;
+	border-radius: 0px;
+    border: 0px;
+}
+
 QFrame#m_playerFrame
 {
 	color: #d6dfd6;

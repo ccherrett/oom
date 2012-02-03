@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <map>
+#include <Qt>
 
 #include "globaldefs.h"
 
@@ -39,11 +40,10 @@ struct Route
     };
 
     int midiPort; // p3.3.49 Midi port number. Best not to put this in the union to avoid problems?
-
-    //snd_seq_addr_t alsaAdr;
+	qint64 midiPortId;
 
     // Starting source channel (of the owner of this route). Normally zero for mono or stereo tracks, higher for multi-channel tracks.
-    // p3.3.50 NOTICE: channel is now a bit-wise channel mask, for MidiPort <-> MidiTrack routes.
+    // NOTICE: channel is now a bit-wise channel mask, for MidiPort <-> MidiTrack routes.
     // This saves many routes: Instead of one route per channel as before, there can now be only one single route with a channel mask,
     //  for each MidiPort <-> MidiTrack combination.
     int channel;
@@ -60,7 +60,8 @@ struct Route
     Route(void* t, int ch = -1);
     Route(Track* t, int ch = -1, int chans = -1);
     Route(MidiDevice* d, int ch);
-    Route(int port, int ch); // p3.3.49
+    Route(int port, int ch);
+    Route(qint64 port, int ch);
     Route(const QString&, bool dst, int ch, int rtype = -1);
     Route();
 

@@ -475,6 +475,7 @@ public:
 class MidiTrack : public Track
 {
     int _outPort;
+	qint64 _outPortId;
     int _outChannel;
     bool _recEcho; // For midi (and audio). Whether to echo incoming record events to output device.
 
@@ -544,8 +545,10 @@ public:
     }
 
     void setOutPort(int i);
+    void setOutPortId(qint64 i);
     void setOutChanAndUpdate(int i);
     void setOutPortAndUpdate(int i);
+    void setOutPortIdAndUpdate(qint64 i);
 
     // Backward compatibility: For reading old songs.
     void setInPortAndChannelMask(unsigned int /*portmask*/, int /*chanmask*/);
@@ -559,6 +562,11 @@ public:
     {
         return _outPort;
     }
+
+	qint64 outPortId() const
+	{
+		return _outPortId;
+	}
 
     int outChannel() const
     {
