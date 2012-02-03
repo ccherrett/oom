@@ -777,6 +777,11 @@ public:
     {
         return true;
     }
+    
+    AudioTrack* audioTrack() const
+    {
+        return m_audioTrack;
+    }
 
     virtual QString open();
     virtual void close();
@@ -823,6 +828,7 @@ private:
     QString m_label;
     BasePlugin* m_plugin;
     bool m_duplicated;
+    AudioTrack* m_audioTrack;
 };
 
 //---------------------------------------------------------

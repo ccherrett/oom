@@ -903,26 +903,44 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
 {
 	if(!m_track || (m_track->isMidiTrack() && m_track->wantsAutomation() == false) || !m_processEvents)
 		return;
-    if (m_track->wantsAutomation())
-        // TODO
-        return;
+
 	QMenu* p = new QMenu(this);
 	p->disconnect();
 	p->clear();
 	p->setTitle(tr("Viewable automation"));
-	CtrlListList* cll = ((AudioTrack*) m_track)->controller();
-	QAction* act = 0;
-	for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
-	{
-		CtrlList *cl = icll->second;
-		if (cl->dontShow())
-			continue;
-		QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
-		act = p->addAction(name);
-		act->setCheckable(true);
-		act->setChecked(cl->isVisible());
-		act->setData(cl->id());
-	}
+
+    CtrlListList* cll;
+    if (m_track->isMidiTrack() && m_track->wantsAutomation())
+    {
+        MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
+        if (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        {
+            SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
+            if (synth->audioTrack())
+                cll = synth->audioTrack()->controller();
+            else
+                return;
+        }
+        else
+            return;
+    }
+    else
+    {
+        cll = ((AudioTrack*) m_track)->controller();
+    }
+
+    QAction* act = 0;
+    for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+    {
+        CtrlList *cl = icll->second;
+        if (cl->dontShow())
+            continue;
+        QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
+        act = p->addAction(name);
+        act->setCheckable(true);
+        act->setChecked(cl->isVisible());
+        act->setData(cl->id());
+    }
 	//connect(p, SIGNAL(triggered(QAction*)), SLOT(changeAutomation(QAction*)));
 	
 	QAction* act1 = p->exec(QCursor::pos());
