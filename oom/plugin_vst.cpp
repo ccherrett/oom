@@ -202,7 +202,7 @@ VstPlugin::VstPlugin()
         events.data[i] = (VstEvent*)&midiEvents[i];
     }
 
-    sanityCheck = VST_SANITY_CHECK;
+    sanityCheck = 0;
 }
 
 VstPlugin::~VstPlugin()
@@ -312,6 +312,7 @@ bool VstPlugin::init(QString filename, QString label)
 
             if (effect && (effect->flags & effFlagsCanReplacing) > 0)
             {
+                sanityCheck = VST_SANITY_CHECK;
                 effect->dispatcher(effect, effOpen, 0, 0, 0, 0.0f);
                 effect->dispatcher(effect, effSetSampleRate, 0, 0, 0, sampleRate);
                 effect->dispatcher(effect, effSetBlockSize, 0, segmentSize, 0, 0.0f);

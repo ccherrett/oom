@@ -53,6 +53,7 @@
 
 #include "audio.h"
 #include "jackaudio.h"
+#include "track.h"
 #include "al/dsp.h"
 
 #include "lib_functions.h"
@@ -153,6 +154,41 @@ bool BasePlugin::guiVisible()
 }
 
 //---------------------------------------------------------
+//   SynthPluginTrack - dummy track used for automation
+//---------------------------------------------------------
+
+class SynthPluginTrack : public AudioTrack
+{
+public:
+    SynthPluginTrack()
+        : AudioTrack(AUDIO_SOFTSYNTH)
+    {
+    }
+
+    ~SynthPluginTrack()
+    {
+    }
+
+    SynthPluginTrack* clone(bool /*cloneParts*/) const
+    {
+        return new SynthPluginTrack(*this);
+    }    
+
+    virtual SynthPluginTrack* newTrack() const
+    {
+        return new SynthPluginTrack();
+    }
+
+    virtual void read(Xml&)
+    {
+    }
+
+    virtual void write(int, Xml&) const
+    {
+    }
+};
+
+//---------------------------------------------------------
 //   SynthPluginDevice
 //---------------------------------------------------------
 
@@ -171,6 +207,7 @@ SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString 
     m_label = label;
     m_duplicated = duplicated;
     m_plugin = 0;
+    m_audioTrack = 0;
 
     m_name = name;
 
@@ -233,6 +270,10 @@ QString SynthPluginDevice::open()
             // disable plugin if jack is not running
             if (!audioDevice || audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
                 m_plugin->aboutToRemove();
+            
+            m_audioTrack = new SynthPluginTrack();
+            m_plugin->setTrack(m_audioTrack);
+            
             m_plugin->setActive(true);
             return QString("OK");
         }
@@ -255,6 +296,7 @@ void SynthPluginDevice::close()
     if (m_plugin)
     {
         m_plugin->aboutToRemove();
+        m_plugin->setTrack(0);
 
         // Delete the appropriate class
         switch(m_plugin->type())
@@ -271,9 +313,11 @@ void SynthPluginDevice::close()
         default:
             break;
         }
+        m_plugin = 0;
     }
 
-    m_plugin = 0;
+    if (m_audioTrack)
+        delete m_audioTrack;
 }
 
 //---------------------------------------------------------
