@@ -81,7 +81,6 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	_raster = 0; // measure
 	selected = 0;
 	setMinimumSize(600, 50);
-	showTrackinfoFlag = true;
 
 	cursVal = MAXINT;
 
@@ -268,13 +267,8 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	epolicy.setVerticalStretch(100);
 	editor->setSizePolicy(epolicy);
 
-	infoScroll = new QScrollArea;
-	infoScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	infoScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	infoScroll->setMinimumWidth(100);
-
 	// Do this now that the list is available.
-	genTrackInfo(listScroll);
+	createDockMembers();
 
 	if(_tvdock)
 	{
@@ -364,7 +358,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	configChanged(); // set configuration values
 	if (canvas->part())
 		midiConductor->setTrack(canvas->part()->track());
-	showTrackInfo(showTrackinfoFlag);
+	updateConductor(-1);
 
 	// Take care of some tabbies!
 	setTabOrder(tempo200, m_trackheader);
@@ -671,10 +665,7 @@ void Composer::resourceDockAreaChanged(Qt::DockWidgetArea area)
 void Composer::writeStatus(int level, Xml& xml)
 {
 	xml.tag(level++, "composer");
-	//xml.intTag(level, "info", ib->isChecked());
 	split->writeStatus(level, xml);
-	//list->writeStatus(level, xml, "list");
-
 	xml.intTag(level, "xpos", hscroll->pos());
 	xml.intTag(level, "xmag", hscroll->mag());
 	xml.intTag(level, "ypos", vscroll->value());
@@ -699,16 +690,13 @@ void Composer::readStatus(Xml& xml)
 				return;
 			case Xml::TagStart:
 				if (tag == "info")
-					showTrackinfoFlag = xml.parseInt();
+					xml.skip(tag);
 				else if(tag == "split") //backwards compat
 					xml.skip(tag);
-					//split->readStatus(xml);
 				else if (tag == split->objectName())
 					xml.skip(tag);
-					//split->readStatus(xml);
 				else if (tag == "list")
 					xml.skip(tag);
-					//list->readStatus(xml, "list");
 				else if (tag == "xmag")
 					hscroll->setMag(xml.parseInt());
 				else if (tag == "xpos")
@@ -724,7 +712,6 @@ void Composer::readStatus(Xml& xml)
 			case Xml::TagEnd:
 				if (tag == "composer")
 				{
-					//ib->setChecked(showTrackinfoFlag);
 					//printf("Composer::readStatus() leaving end tag\n");
 					return;
 				}
@@ -885,16 +872,6 @@ void Composer::verticalScrollSetYpos(unsigned ypos)
 }
 
 //---------------------------------------------------------
-//   midiConductorScroll
-//---------------------------------------------------------
-
-void Composer::trackInfoScroll(int)
-{
-	//if (midiConductor->visibleWidget())
-	//	midiConductor->visibleWidget()->move(0, -y);
-}
-
-//---------------------------------------------------------
 //   clear
 //---------------------------------------------------------
 
@@ -920,19 +897,10 @@ void Composer::controllerChanged(Track *t)
 }
 
 //---------------------------------------------------------
-//   showTrackInfo
+//  createDockMembers
 //---------------------------------------------------------
 
-void Composer::showTrackInfo(bool)
-{
-	updateConductor(-1);
-}
-
-//---------------------------------------------------------
-//   genTrackInfo
-//---------------------------------------------------------
-
-void Composer::genTrackInfo(QWidget*)
+void Composer::createDockMembers()
 {
 	midiConductor = new Conductor(this);
 	foreach(QObject* obj, oom->resourceDock()->children())
@@ -942,7 +910,6 @@ void Composer::genTrackInfo(QWidget*)
 	midiConductor->groupBox->hide();
 
 	_tvdock = new TrackViewDock(this);
-	infoScroll->setWidgetResizable(true);
 	m_clipList = new AudioClipList(this);
 	//Set to true if this is the first cliplist viewable tab
 	//When false the directory watcher will not constantly update the view
@@ -962,20 +929,15 @@ void Composer::genTrackInfo(QWidget*)
 void Composer::updateConductor(int flags)
 {
 	_commentdock->setTrack(selected);
-	if (!showTrackinfoFlag)
-	{
-		switchInfo(-1);
-		return;
-	}
 	if (selected == 0)
 	{
+		updateTabs();
 		return;
-		//switchInfo(0);
 	}
 	if (selected->isMidiTrack())
 	{
 		if ((flags & SC_SELECTION) || (flags & SC_TRACK_REMOVED))
-			switchInfo(2);
+			updateTabs();
 		// If a new part was selected, and only if it's different.
 		if ((flags & SC_SELECTION) && midiConductor->track() != selected)
 			// Set a new track and do a complete update.
@@ -987,15 +949,15 @@ void Composer::updateConductor(int flags)
 	else
 	{
 		if ((flags & SC_SELECTION) || (flags & SC_TRACK_REMOVED))
-			switchInfo(2);
+			updateTabs();
 	}
 }
 
 //---------------------------------------------------------
-//   switchInfo
+//   updateTabs
 //---------------------------------------------------------
 
-void Composer::switchInfo(int)/*{{{*/
+void Composer::updateTabs()/*{{{*/
 {
     midiConductor->update();
 	if(selected)
@@ -1007,11 +969,13 @@ void Composer::switchInfo(int)/*{{{*/
 		else
 		{
 			_rtabs->setTabEnabled(1, false);
+			_rtabs->setCurrentIndex(0);
 		}
 	}
 	else
 	{
-		 _rtabs->setTabEnabled(1, false);
+		_rtabs->setTabEnabled(1, false);
+		_rtabs->setCurrentIndex(0);
 	}
 }/*}}}*/
 

@@ -60,18 +60,14 @@ class Composer : public QWidget
 	HeaderList* m_trackheader;
     MTScale* time;
     SpinBox* lenEntry;
-    bool showTrackinfoFlag;
     Conductor* midiConductor;
-	QScrollArea *infoScroll;
 	QScrollArea *listScroll;
-	QScrollArea *mixerScroll;
 	EditToolBar *edittools;
 
     Track* selected;
 
     LabelCombo* typeBox;
     QToolButton* ib;
-    int trackInfoType;
     Splitter* split;
     int songType;
     PosLabel* cursorPos;
@@ -85,17 +81,13 @@ class Composer : public QWidget
 	QVBoxLayout *mlayout;
 
     unsigned cursVal;
-    void genTrackInfo(QWidget* parent);
-    void genMidiTrackInfo();
-    void genWaveTrackInfo();
-    void switchInfo(int);
+    void createDockMembers();
+    void updateTabs();
     bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
     void songlenChanged(int);
-    void showTrackInfo(bool);
     void trackSelectionChanged();
-    void trackInfoScroll(int);
     void songChanged(int);
     void modeChange(int);
     void setTime(unsigned);

@@ -643,7 +643,12 @@ int LSClient::createAudioOutputDevice(char* name, const char* type, int ports, i
 		aparams[4].key = NULL;
 		aparams[4].value = NULL;
 		
-		rv = ::lscp_create_audio_device(_client, type, aparams);
+		if(_client)
+			rv = ::lscp_create_audio_device(_client, type, aparams);
+		else if(startClient())
+		{
+			rv = ::lscp_create_audio_device(_client, type, aparams);
+		}
 	}
 	return rv;
 }/*}}}*/

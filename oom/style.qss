@@ -245,7 +245,7 @@ Conductor QTableView QHeaderView::section
 {
 	text-align: left;
 	border: 0px solid black;
-	border-radius: 6px;
+	border-radius: 0px;
 	padding: 5px;
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.3 #5c5c5c, stop:1 #5c5c5c);
 	color: #d6dfd6;

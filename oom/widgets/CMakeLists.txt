@@ -112,7 +112,6 @@ QT4_WRAP_CPP (widget_mocs
 	  ccedit.h
 	  plugingui.h
 	  plugindialog.h
-	  TrackManager.h
 	  CreateTrackDialog.h
 	  ClipList/BookmarkList.h
 	  ClipList/AudioClipList.h
@@ -260,7 +259,6 @@ file (GLOB widgets_source_files
 	  ccedit.cpp
 	  plugingui.cpp
 	  plugindialog.cpp
-	  TrackManager.cpp
 	  CreateTrackDialog.cpp
 	  ClipList/BookmarkList.cpp
 	  ClipList/AudioClipList.cpp
