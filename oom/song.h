@@ -156,6 +156,7 @@ private:
 	
     TrackViewList _tviews; // trackviewlist as seen by Composer
 	TrackViewList _autotviews;
+	TrackViewList m_instrumentTemplates;
     
 	MidiTrackList _midis;
     WaveTrackList _waves;
@@ -520,6 +521,10 @@ public:
     TrackViewList* autoviews() {
         return &_autotviews;
     }
+	TrackViewList* instrumentTemplates()
+	{
+		return &m_instrumentTemplates;
+	}
 	QList<qint64>* autoTrackViewIndexList() 
 	{
 		return &m_autoTrackViewIndex;
@@ -572,14 +577,27 @@ public:
 	{
 		return m_masterId;
 	}
-    TrackView* findAutoTrackView(const QString& name) const;
+
+    TrackView* addNewTrackView();
+    TrackView* addTrackView();
+    
+	TrackView* findAutoTrackView(const QString& name) const;
     TrackView* findAutoTrackViewById(qint64) const;
-    TrackView* findTrackViewById(qint64) const;
+    
+	TrackView* findTrackViewById(qint64) const;
     TrackView* findTrackViewByTrackId(qint64);
-    void insertTrackView(TrackView*, int idx);
+    
+	void insertTrackView(TrackView*, int idx);
     void removeTrackView(qint64);
     void cmdRemoveTrackView(qint64);
     void msgInsertTrackView(TrackView*, int idx, bool u = true);
+
+	TrackView* addInstrumentTemplate();
+	TrackView* findInstrumentTemplateById(qint64 id) const;
+    
+    void insertInstrumentTemplate(TrackView*, int idx);
+    void removeInstrumentTemplate(qint64);
+    void cmdRemoveInstrumentTemplate(qint64);
 
 	//midikeys
 	QString key2note(int key)
@@ -695,10 +713,8 @@ public slots:
     Track* addTrack(int);
 	Track* addTrackByName(QString name, int t, int pos, bool connectMaster);
     Track* addNewTrack(QAction* action);
-    TrackView* addNewTrackView();
     QString getScriptPath(int id, bool delivered);
     void populateScriptMenu(QMenu* menuPlugins, QObject* receiver);
-    TrackView* addTrackView();
 	void updateTrackViews();
 	void closeJackBox();
 	void toggleFeedback(bool);

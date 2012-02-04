@@ -33,11 +33,13 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	autoTable->installEventFilter(oom);
 	_tableModel = new QStandardItemModel(tableView);
 	_autoTableModel = new QStandardItemModel(autoTable);
+	_templateModel = new QStandardItemModel(templateView);
 	m_icons << QIcon(":/images/icons/views_inputs.png") << QIcon(":/images/icons/views_outputs.png") << QIcon(":/images/icons/views_busses.png") << QIcon(":/images/icons/views_auxs.png");
 	tableView->setModel(_tableModel);
 	tableView->setObjectName("tblTrackView");
 	autoTable->setObjectName("tblAutoTable");
 	autoTable->setModel(_autoTableModel);
+	templateView->setModel(_templateModel);
 	
 	btnUp->setIcon(QIcon(*up_arrowIconSet3));
 	btnDown->setIcon(*down_arrowIconSet3);
@@ -361,25 +363,19 @@ QList<int> TrackViewDock::getSelectedRows()/*{{{*/
 
 void TrackViewDock::updateTableHeader()/*{{{*/
 {
-	//QStandardItem* hstat = new QStandardItem(true);
-	//hstat->setCheckable(true);
-	//hstat->setCheckState(Qt::Unchecked);
 	QStandardItem* hpatch = new QStandardItem(tr("Custom Views"));
-	//_tableModel->setHorizontalHeaderItem(0, hstat);
 	_tableModel->setHorizontalHeaderItem(0, hpatch);
-	//tableView->setColumnWidth(0, 20);
 	tableView->horizontalHeader()->setStretchLastSection(true);
 	tableView->verticalHeader()->hide();
 
-	//QStandardItem* ahstat = new QStandardItem(true);
-	//ahstat->setCheckable(true);
-	//ahstat->setCheckState(Qt::Unchecked);
 	QStandardItem* ahpatch = new QStandardItem(tr("Views"));
-	//_autoTableModel->setHorizontalHeaderItem(0, ahstat);
 	_autoTableModel->setHorizontalHeaderItem(0, ahpatch);
-	//autoTable->setColumnWidth(0, 20);
 	autoTable->horizontalHeader()->setStretchLastSection(true);
 	autoTable->verticalHeader()->hide();
+
+	_templateModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Templates")));
+	templateView->verticalHeader()->hide();
+	templateView->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/
 
 void TrackViewDock::selectStaticView(int n)

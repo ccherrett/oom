@@ -75,7 +75,7 @@
    <item>
     <widget class="QTabWidget" name="m_tabWidget">
      <property name="toolTip">
-      <string>Custom Views</string>
+      <string/>
      </property>
      <property name="currentIndex">
       <number>0</number>
@@ -157,6 +157,9 @@
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string> Templates </string>
+      </attribute>
+      <attribute name="toolTip">
+       <string>Global Instrument Templates</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="margin">

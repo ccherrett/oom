@@ -75,7 +75,7 @@ QWidget* KeyMapMenu::createWidget(QWidget* parent)
 	
 	m_tree = new InstrumentTree(w, instr);
 	//m_tree->setObjectName("KeyMapMenuList");
-	QString style = "InstrumentTree { background-color: #1e1e1e; selection-background-color: #2e2e2e; gridline-color:#343434; border: 2px solid #211f23; border-radius: 0px; padding: 0px; color: #bbbfbb; font-size: 11x; alternate-background-color: #1b1b1b; }";
+	QString style = "InstrumentTree { background-color: #1e1e1e; selection-background-color: #2e2e2e; gridline-color:#343434; border: 2px solid #211f23; border-radius: 6px; padding: 0px; color: #bbbfbb; font-size: 11x; alternate-background-color: #1b1b1b; }";
 	m_tree->setStyleSheet(style);
 	m_tree->setAlternatingRowColors(true);
 	m_tree->setEditTriggers(QAbstractItemView::NoEditTriggers);

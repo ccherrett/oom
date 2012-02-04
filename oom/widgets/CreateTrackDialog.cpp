@@ -127,8 +127,8 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		case Track::MIDI:
 		case Track::DRUM:
 		{/*{{{*/
-            int instrumentType = cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
-            QString instrumentName = cmbInstrument->itemData(instrumentIndex, InstrumentNameRole).toString();
+            int instrumentType = cmbInstrument->itemData(instrumentIndex, CTDInstrumentTypeRole).toInt();
+            QString instrumentName = cmbInstrument->itemData(instrumentIndex, CTDInstrumentNameRole).toString();
             QString selectedInput, selectedInput2;
             
             if (instrumentType == TrackManager::SYNTH_INSTRUMENT)
@@ -189,8 +189,8 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				m_vtrack->outputChannel = outChan;
 				if(m_createMidiOutputDevice)
 				{
-					//QString instrumentName = cmbInstrument->itemData(instrumentIndex, InstrumentNameRole).toString();
-					m_vtrack->instrumentType = instrumentType; //cmbInstrument->itemData(instrumentIndex, InstrumentTypeRole).toInt();
+					//QString instrumentName = cmbInstrument->itemData(instrumentIndex, CTDInstrumentNameRole).toString();
+					m_vtrack->instrumentType = instrumentType; //cmbInstrument->itemData(instrumentIndex, CTDInstrumentTypeRole).toInt();
 					m_vtrack->instrumentName = instrumentName;
 				}
 			}
@@ -328,7 +328,7 @@ void CreateTrackDialog::cleanup()/*{{{*/
 {
 	if(m_instrumentLoaded)
 	{
-		int insType = cmbInstrument->itemData(cmbInstrument->currentIndex(), InstrumentTypeRole).toInt();
+		int insType = cmbInstrument->itemData(cmbInstrument->currentIndex(), CTDInstrumentTypeRole).toInt();
 		switch(insType)
 		{
 			case TrackManager::LS_INSTRUMENT:
@@ -377,7 +377,7 @@ void CreateTrackDialog::cleanup()/*{{{*/
 
 void CreateTrackDialog::updateInstrument(int index)
 {
-	QString instrumentName = cmbInstrument->itemData(index, InstrumentNameRole).toString();
+	QString instrumentName = cmbInstrument->itemData(index, CTDInstrumentNameRole).toString();
 	QString trackName = txtName->text();
 	if(btnAdd->isEnabled())
 	{
@@ -390,7 +390,7 @@ void CreateTrackDialog::updateInstrument(int index)
         midiBox->setChecked(true);
         midiBox->setEnabled(true);
 
-		int insType = cmbInstrument->itemData(index, InstrumentTypeRole).toInt();
+		int insType = cmbInstrument->itemData(index, CTDInstrumentTypeRole).toInt();
 		switch(insType)
 		{
 			case TrackManager::LS_INSTRUMENT:
@@ -853,8 +853,8 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
 			if((*i)->isOOMInstrument() == false)
 			{
             	cmbInstrument->addItem(QString("(GM) ").append((*i)->iname()));
-				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), InstrumentNameRole);
-				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::GM_INSTRUMENT, InstrumentTypeRole);
+				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), CTDInstrumentNameRole);
+				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::GM_INSTRUMENT, CTDInstrumentTypeRole);
 			}
         }
         
@@ -863,8 +863,8 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
 			if((*i)->isOOMInstrument())
 			{
             	cmbInstrument->addItem(QString("(LS) ").append((*i)->iname()));
-				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), InstrumentNameRole);
-				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::LS_INSTRUMENT, InstrumentTypeRole);
+				cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->iname(), CTDInstrumentNameRole);
+				cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::LS_INSTRUMENT, CTDInstrumentTypeRole);
 			}
         }
 
@@ -875,8 +875,8 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
                 if (((SynthPluginDevice*)(*i))->duplicated() == false)
                 {
                     cmbInstrument->addItem(QString("(SYNTH) ").append((*i)->name()));
-                    cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->name(), InstrumentNameRole);
-                    cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::SYNTH_INSTRUMENT, InstrumentTypeRole);
+                    cmbInstrument->setItemData(cmbInstrument->count()-1, (*i)->name(), CTDInstrumentNameRole);
+                    cmbInstrument->setItemData(cmbInstrument->count()-1, TrackManager::SYNTH_INSTRUMENT, CTDInstrumentTypeRole);
                 }
 			}
         }

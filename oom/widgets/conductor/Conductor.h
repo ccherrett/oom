@@ -12,6 +12,8 @@
 #include "pctable.h"
 #include <QToolBar>
 
+#define ConductorPatchIdRole Qt::UserRole+2
+
 class QToolButton;
 class QTableWidget;
 class QComboBox;

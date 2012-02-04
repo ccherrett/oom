@@ -29,7 +29,6 @@ struct TrackSettings {
 	int transpose;
 	bool rec;
 	qint64 tid;
-	VirtualTrack* vtrack;
 	virtual void write(int, Xml&) const;
 	virtual void read(Xml&);
 };
@@ -45,6 +44,7 @@ class TrackView
 		QList<qint64> m_tracks;
 		QMap<qint64, TrackSettings*> _tSettings;
 		QMap<qint64, TrackSettings*> m_vtrackSettings;
+		QMap<qint64, VirtualTrack*> m_vtracks;
 		bool _recState;
 		qint64 m_id;
 
@@ -84,7 +84,7 @@ class TrackView
 		void setRecord(bool f) { _recState = f; }
 		QMap<qint64, TrackSettings*>* trackSettings() { return &_tSettings;}
 		QMap<qint64, TrackSettings*>* virtualTrackSettings() { return &m_vtrackSettings;}
-		void addTrackSetting(qint64 id, TrackSettings* settings) {
+		void addTrackSetting(qint64 id, TrackSettings* settings) {/*{{{*/
 			_tSettings[id] = settings;
 		}
 		void removeTrackSettings(qint64 id)
@@ -104,7 +104,37 @@ class TrackView
 				return _tSettings[id];
 			else
 				return 0;
+		}/*}}}*/
+
+		QMap<qint64, VirtualTrack*> *virtualTracks()
+		{
+			return &m_vtracks;
 		}
+
+		void addVirtualTrack(VirtualTrack*);
+		void removeVirtualTrack(qint64 id);
+
+		void addVirtualTrackSetting(qint64 id, TrackSettings* settings) {/*{{{*/
+			m_vtrackSettings[id] = settings;
+		}
+		void removeVirtualTrackSettings(qint64 id)
+		{
+			if(hasVirtualTrackSettings(id))
+			{
+				m_vtrackSettings.erase(m_vtrackSettings.find(id));
+			}
+		}
+		bool hasVirtualTrackSettings(qint64 tid)
+		{
+			return m_vtrackSettings.contains(tid);
+		}
+		TrackSettings* getVirtualTrackSettings(qint64 id)
+		{
+			if(hasVirtualTrackSettings(id))
+				return m_vtrackSettings[id];
+			else
+				return 0;
+		}/*}}}*/
 		virtual void write(int, Xml&) const;
 		void read(Xml&);
 };

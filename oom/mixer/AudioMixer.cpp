@@ -48,7 +48,8 @@ AudioMixer::AudioMixer(const QString& title, QWidget* parent)
 	dockBox->setSpacing(2);*/
 
 	QDockWidget* m_mixerDock = new QDockWidget(tr("Mixer Views"), this);
-	m_mixerDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	m_mixerDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+	m_mixerDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 	addDockWidget(Qt::LeftDockWidgetArea, m_mixerDock);
 	m_mixerView = new MixerView(this);
 	QWidget* dockWidget = new QWidget(this);

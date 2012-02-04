@@ -74,6 +74,18 @@ void TrackView::removeTrack(qint64 id)
 	//This needs to fire something so the gui gets updated
 }
 
+
+void TrackView::addVirtualTrack(VirtualTrack* vt)
+{
+	if(vt)
+		m_vtracks[vt->id] = vt;
+}
+
+void TrackView::removeVirtualTrack(qint64 tvid)
+{
+	m_vtracks.erase(m_vtracks.find(tvid));
+}
+
 void TrackView::setSelected(bool f)
 {
 	_selected = f;

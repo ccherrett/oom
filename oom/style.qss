@@ -189,20 +189,6 @@ Conductor QTableView::focus, QTableView#mapTable::focus
 	border: 2px solid #f3ce69;
 }
 
-Conductor QTableView QHeaderView::section
-{
-	text-align: left;
-	border: 0px solid black;
-	border-radius: 0px;
-	padding: 5px;
-	/*background-color: #936b9c;*/
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.3 #5c5c5c, stop:1 #5c5c5c);
-	color: #d6dfd6;
-	font-family: "fixed-width";
-	font-weight: bold;
-	font-size: 11px;
-}
-
 Conductor QTableView::item
 {
 	padding-top: 8px;
@@ -255,11 +241,39 @@ Conductor QTreeView::focus
 	border: 2px solid #f3ce69;
 }/*}}}*/
 
+Conductor QTableView QHeaderView::section
+{
+	text-align: left;
+	border: 0px solid black;
+	border-radius: 6px;
+	padding: 5px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.3 #5c5c5c, stop:1 #5c5c5c);
+	color: #d6dfd6;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 11px;
+}
+
+Conductor QTableView QHeaderView::section:last
+{
+	border-top-right-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+Conductor QTableView QHeaderView::section:first
+{
+	border-top-left-radius: 6px;
+	border-bottom-left-radius: 6px;
+}
+Conductor QTableView QHeaderView::section:only-one
+{
+	border-radius: 6px;
+}
+/*{{{*/
 Conductor QTreeView QHeaderView::section
 {
 	text-align: left;
 	border: 0px solid black;
-	border-radius: 0px;
+	border-radius: 6px;
 	padding: 5px;
 	/*background-color: #936b9c;*/
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:0.1 #808080, stop:0.3 #5c5c5c, stop:1 #5c5c5c);
@@ -269,6 +283,20 @@ Conductor QTreeView QHeaderView::section
 	font-size: 11px;
 }
 
+Conductor QTreeView QHeaderView::section:last
+{
+	border-top-right-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+Conductor QTreeView QHeaderView::section:first
+{
+	border-top-left-radius: 6px;
+	border-bottom-left-radius: 6px;
+}
+Conductor QTreeView QHeaderView::section:only-one
+{
+	border-radius: 6px;
+}
 Conductor QTreeView::item
 {
 	padding-top: 3px;
@@ -300,7 +328,7 @@ QHeaderView
 	selection-background-color: #2e2e2e;
 	color: #bbbfbb;
 	border: 1px solid #29292a;
-	border-radius: 0px;
+	border-radius: 3px;
 	padding: 0px;
 	font-size: 12px;
 }
@@ -308,7 +336,7 @@ QHeaderView
 QHeaderView::section
 {
 	text-align: left;
-	border: 0px solid black;
+	border: 0px;
 	border-radius: 0px;
 	padding: 5px;
 	/*background-color: #936b9c;*/
@@ -318,7 +346,24 @@ QHeaderView::section
 	font-weight: bold;
 	font-size: 11px;
 }
-/*{{{*/
+QHeaderView::section:last
+{
+	border-top-right-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+QHeaderView::section:first
+{
+	border-top-left-radius: 6px;
+	border-bottom-left-radius: 6px;
+}
+QHeaderView::section:middle
+{
+	border-radius: 0px;
+}
+QHeaderView::section:only-one
+{
+	border-radius: 6px;
+}
 QTableView#tblAutoTable, QTableView#tblTrackView, QTableView#routeList, TrackViewEditor QTableView#optionsTable, MidiAssignDialog QTableView, TrackViewDock QTableView
 {
 	background-color: #1e1e1e;
@@ -1807,6 +1852,7 @@ QHeaderView#header {
 	 border-right: 0;
 	 background-color: #1b1b1b;
 	 color: #b8b8b8;
+	 border-radius: 0px;
 	 /*color: #76ac01;*/
  }
 

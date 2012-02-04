@@ -10,11 +10,13 @@
 #include <QMap>
 #include <QString>
 #include <QPair>
+#include "utils.h"
 
 struct VirtualTrack {
 
 	VirtualTrack()
 	{
+		id = create_id();
 		type = -1;
 		useOutput = false;
 		useInput = false;
@@ -27,6 +29,7 @@ struct VirtualTrack {
 		createMidiInputDevice = false;
 		createMidiOutputDevice = false;
 	}
+	qint64 id;
 	int type;
 	QString name;
 	QString instrumentName;

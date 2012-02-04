@@ -20,8 +20,8 @@
 #include "song.h"
 #include "shortcuts.h"
 
-#include "astrip.h"
-#include "mstrip.h"
+#include "mixer/astrip.h"
+#include "mixer/mstrip.h"
 #include "apconfig.h"
 #include "track.h"
 
@@ -538,7 +538,7 @@ void MixerDock::songChanged(int flags)/*{{{*/
 			masterStrip->songChanged(flags);
 		}
 	}
-	if((flags & SC_SELECTION) && m_mode == DOCKED)
+	if((flags & SC_SELECTION))
 	{
 		QList<qint64> selected = song->selectedTracks();
 		if(selected.size())

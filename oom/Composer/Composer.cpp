@@ -54,9 +54,6 @@
 #include "midictrl.h"
 #include "mpevent.h"
 #include "gconfig.h"
-#include "mixer/astrip.h"
-#include "mixer/mstrip.h"
-#include "mixer/strip.h"
 #include "spinbox.h"
 #include "tvieweditor.h"
 #include "traverso_shared/TConfig.h"
@@ -82,7 +79,6 @@ Composer::Composer(QMainWindow* parent, const char* name)
 {
 	setObjectName(name);
 	_raster = 0; // measure
-	_lastStrip = 0;
 	selected = 0;
 	setMinimumSize(600, 50);
 	showTrackinfoFlag = true;
@@ -272,20 +268,10 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	epolicy.setVerticalStretch(100);
 	editor->setSizePolicy(epolicy);
 
-
-	//---------------------------------------------------
-	//    Track Info
-	//---------------------------------------------------
-
 	infoScroll = new QScrollArea;
 	infoScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	infoScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	infoScroll->setMinimumWidth(100);
-
-	mixerScroll = new QScrollArea;
-	mixerScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	mixerScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	mixerScroll->setMinimumWidth(100);
 
 	// Do this now that the list is available.
 	genTrackInfo(listScroll);
@@ -405,32 +391,38 @@ Composer::~Composer()
 
 void Composer::currentTabChanged(int tab)
 {
-	if(tab == 2) //patch sequencer
+	switch(tab)
 	{
-		if(midiConductor)
+		case 1: //patch sequencer
 		{
-			//printf("PatchSequencer Tab clicked\n");
-			midiConductor->update();
+			if(midiConductor)
+			{
+				//printf("PatchSequencer Tab clicked\n");
+				midiConductor->update();
+			}
+			if(m_clipList)
+			{
+				m_clipList->setActive(false);
+			}
 		}
-		if(m_clipList)
+		break;
+		case 2: //Clip List
 		{
-			m_clipList->setActive(false);
+			if(m_clipList)
+			{
+				m_clipList->setActive(true);
+				m_clipList->refresh();
+			}
 		}
-	}
-	else if(tab == 3)
-	{
-		if(m_clipList)
+		break;
+		default:
 		{
-			m_clipList->setActive(true);
-			m_clipList->refresh();
+			if(m_clipList)
+			{
+				m_clipList->setActive(false);
+			}
 		}
-	}
-	else
-	{
-		if(m_clipList)
-		{
-			m_clipList->setActive(false);
-		}
+		break;
 	}
 }
 
@@ -910,12 +902,6 @@ void Composer::clear()
 {
 	selected = 0;
 	midiConductor->setTrack(0);
-	foreach(Strip* strip, m_strips)
-	{
-		delete strip;
-	}
-	m_strips.clear();
-	_lastStrip = 0;
 	if (canvas)
 	{
 		canvas->setCurrentPart(0);
@@ -956,7 +942,6 @@ void Composer::genTrackInfo(QWidget*)
 	midiConductor->groupBox->hide();
 
 	_tvdock = new TrackViewDock(this);
-	//infoScroll->setWidget(midiConductor);
 	infoScroll->setWidgetResizable(true);
 	m_clipList = new AudioClipList(this);
 	//Set to true if this is the first cliplist viewable tab
@@ -964,21 +949,10 @@ void Composer::genTrackInfo(QWidget*)
 	m_clipList->setActive(false);
 	_commentdock = new CommentDock(this);
 	_rtabs->addTab(_tvdock, tr("   EPIC Views   "));
-	_rtabs->addTab(mixerScroll, tr("   Mixer   "));
 	_rtabs->addTab(midiConductor, tr("   Conductor   "));
 	_rtabs->addTab(m_clipList, tr("  Clips  "));
 	_rtabs->addTab(_commentdock, tr("  Comments  "));
 
-	central = new QWidget(this);
-	central->setObjectName("dockMixerCenter");
-	mlayout = new QVBoxLayout();
-	central->setLayout(mlayout);
-	mlayout->setSpacing(0);
-	mlayout->setContentsMargins(0, 0, 0, 0);
-	mlayout->setSpacing(0);
-	mlayout->setAlignment(Qt::AlignHCenter);
-	mixerScroll->setWidget(central);
-	mixerScroll->setWidgetResizable(true);
 }
 
 //---------------------------------------------------------
@@ -1021,93 +995,23 @@ void Composer::updateConductor(int flags)
 //   switchInfo
 //---------------------------------------------------------
 
-void Composer::switchInfo(int n)/*{{{*/
+void Composer::switchInfo(int)/*{{{*/
 {
-	bool chview = false;
-        midiConductor->update();
-	if(selected && n == 2)
+    midiConductor->update();
+	if(selected)
 	{
-		Strip* w = 0;
-
-		QLayoutItem* item = mlayout->takeAt(0);
-		if(item) {
-			Strip* strip = (Strip*)item->widget();
-			if(strip && (strip->getTrack()->isMidiTrack() && !selected->isMidiTrack() && _rtabs->currentIndex() == 2))
-				chview = true;
-			m_strips.removeAll(strip);
-			delete item;
-		}
-		if(_lastStrip)
-		{
-			m_strips.removeAll(_lastStrip);
-			delete _lastStrip;
-			_lastStrip = 0;
-		}
 		if(selected->isMidiTrack())
 		{
 			_rtabs->setTabEnabled(1, true);
-			_rtabs->setTabEnabled(2, true);
-			//_rtabs->setCurrentIndex(2);
-			w = new MidiStrip(central, (MidiTrack*) selected);
 		}
 		else
 		{
-			_rtabs->setTabEnabled(2, false);
-			_rtabs->setTabEnabled(1, true);
-			if(chview)
-				_rtabs->setCurrentIndex(1);
-			w = new AudioStrip(central, (AudioTrack*) selected);
-		}
-		switch (selected->type())//{{{
-		{
-			case Track::AUDIO_OUTPUT:
-			    w->setObjectName("MixerAudioOutStrip");
-			    break;
-			case Track::AUDIO_BUSS:
-			    w->setObjectName("MixerAudioBussStrip");
-			    break;
-			case Track::AUDIO_AUX:
-			    w->setObjectName("MixerAuxStrip");
-			    break;
-			case Track::WAVE:
-			    w->setObjectName("MixerWaveStrip");
-			    break;
-			case Track::AUDIO_INPUT:
-			    w->setObjectName("MixerAudioInStrip");
-			    break;
-			case Track::AUDIO_SOFTSYNTH:
-			    w->setObjectName("MixerSynthStrip");
-			    break;
-			case Track::MIDI:
-			{
-			    w->setObjectName("MidiTrackStrip");
-				break;
-			}
-			case Track::DRUM:
-			{
-			    w->setObjectName("MidiDrumTrackStrip");
-				break;
-			}
-			break;
-		}//}}}
-		if (w)
-		{
-			connect(song, SIGNAL(songChanged(int)), w, SLOT(songChanged(int)));
-			if(!selected->isMidiTrack())
-				connect(oom, SIGNAL(configChanged()), w, SLOT(configChanged()));
-			mlayout->addWidget(w);
-			m_strips.append(w);
-			w->show();
-			_lastStrip = w;
+			_rtabs->setTabEnabled(1, false);
 		}
 	}
 	else
 	{
-		printf("Composer::switchInfo(int %d)\n", n);
-		 _rtabs->setTabEnabled(2, false);
 		 _rtabs->setTabEnabled(1, false);
-		 _rtabs->setTabEnabled(0, true);
-		 _rtabs->setCurrentIndex(0);
 	}
 }/*}}}*/
 

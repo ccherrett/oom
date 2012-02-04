@@ -12,7 +12,6 @@
 
 #include "AbstractMidiEditor.h"
 #include "ComposerCanvas.h"
-//#include "trackautomationview.h"
 
 class QAction;
 class QCheckBox;
@@ -35,8 +34,6 @@ class Splitter;
 class LabelCombo;
 class PosLabel;
 class Conductor;
-class AudioStrip;
-class Strip;
 class SpinBox;
 class TrackViewDock;
 class AudioClipList;
@@ -68,7 +65,6 @@ class Composer : public QWidget
 	QScrollArea *infoScroll;
 	QScrollArea *listScroll;
 	QScrollArea *mixerScroll;
-    AudioStrip* waveTrackInfo;
 	EditToolBar *edittools;
 
     Track* selected;
@@ -82,13 +78,11 @@ class Composer : public QWidget
     SpinBox* globalTempoSpinBox;
     SpinBox* globalPitchSpinBox;
 	QTabWidget* _rtabs;
-	Strip* _lastStrip;
 	TrackViewDock* _tvdock;
 	AudioClipList* m_clipList;
 	CommentDock* _commentdock;
 	QWidget *central;
 	QVBoxLayout *mlayout;
-    QList<Strip* > m_strips;
 
     unsigned cursVal;
     void genTrackInfo(QWidget* parent);

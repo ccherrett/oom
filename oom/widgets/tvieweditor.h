@@ -11,6 +11,7 @@
 
 #include "ui_trackvieweditorbase.h"
 #include <QList>
+#include <QHash>
 #include <QStringList>
 #include <QObject>
 #include "trackview.h"
@@ -23,6 +24,7 @@ class QPushButton;
 class QStandardItemModel;
 class QStandardItem;
 class QItemSelectionModel;
+class VirtualTrack;
 
 
 enum TrackSourceType { EXISTING = 0, VIRTUAL};
@@ -34,17 +36,18 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	TrackView* _selected;
 	bool _editing;
 	bool _addmode;
+	bool m_templateMode;
 	QStandardItemModel *m_model;
 	QItemSelectionModel *m_selmodel;
 	QStandardItemModel *m_allmodel;
 	QItemSelectionModel *m_allselmodel;
 
 	QStringList _trackTypes;
-	//QPushButton* btnAdd;
-	//QPushButton* btnRemove;
 	QPushButton* btnOk;
 	QPushButton* btnCancel;
 	QPushButton* btnApply;
+
+	QHash<qint64, VirtualTrack*> m_vtrackList;
 
 	void buildViewList();
 
@@ -71,7 +74,7 @@ private slots:
     QList<int> getSelectedRows();
 
 public:
-	TrackViewEditor(QWidget*, TrackViewList* = 0);
+	TrackViewEditor(QWidget*, bool temp = false);
 	void setSelected(TrackView*);
 	TrackView* selectedView( ) { return _selected; }
 	void setTypes(QStringList);

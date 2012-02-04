@@ -1251,79 +1251,6 @@ void Conductor::iPanChanged(int val)
 void Conductor::instrPopup()
 {
 	return;
-	/*
-	if (!selected)
-		return;
-	MidiTrack* track = (MidiTrack*) selected;
-	int channel = track->outChannel();
-	int port = track->outPort();
-	MidiInstrument* instr = midiPorts[port].instrument();
-	QMenu* pup = new QMenu;
-	///instr->populatePatchPopup(pop, channel, song->mtype(), track->type() == Track::DRUM);
-	instr->populatePatchPopup(pup, channel, song->mtype(), track->type() == Track::DRUM);
-
-	///if(pop->actions().count() == 0)
-	///  return;
-	if (pup->actions().count() == 0)
-	{
-		delete pup;
-		return;
-	}
-
-	QAction *act = pup->exec(iPatch->mapToGlobal(QPoint(10, 5)));
-	if (act)
-	{
-		//int rv = act->data().toInt();
-		QVariant _data = act->data();
-		QStringList lst = _data.toStringList();
-		if (!lst.isEmpty())
-		{
-			QString str = lst.at(0);
-			QString pg = ""; //lst.at(1);
-			int rv = str.toInt();
-
-			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, rv);
-			audio->msgPlayMidiEvent(&ev);
-
-			//At this point we add the event to the list.
-			if (lst.size() > 1)
-			{
-				pg = lst.at(1);
-			}
-			if (!pg.isEmpty())
-				pg = pg + ": \n  ";
-			QString label = "  " + pg + act->text();
-
-			QList<QStandardItem*> rowData;
-			QStandardItem* chk = new QStandardItem(true);
-			chk->setCheckable(true);
-			chk->setCheckState(Qt::Unchecked);
-			chk->setToolTip(tr("Add to patch sequence"));
-
-			QStandardItem* patch = new QStandardItem(label);
-			patch->setToolTip(label);
-			patch->setEditable(false);
-			rowData.append(new QStandardItem(str));
-			rowData.append(chk);
-			rowData.append(patch);
-
-			int row = _tableModel->rowCount();
-			_selectedIndex = row;
-			_useMatrix = false;
-			_tableModel->insertRow(row, rowData);
-			tableView->setRowHeight(row, 50);
-			tableView->resizeRowsToContents();
-			updateConductor(-1);
-			updateTableHeader();
-			//_selModel->blockSignals(true);
-			//printf("Calling selectedRow after insert\n");
-			//tableView->selectRow(row);
-			//_selModel->blockSignals(false);
-		}
-	}
-
-	delete pup;
-	*/
 }
 
 //---------------------------------------------------------
@@ -1917,7 +1844,7 @@ void Conductor::rebuildMatrix()
 				for (int i = row; i < _tableModel->rowCount(); ++i)
 				{
 					//PatchSequence *ps = list->at(i);
-					QStandardItem *item = _tableModel->item(i, 1);
+					QStandardItem *item = _tableModel->item(i);
 					if (item && item->checkState() == Qt::Checked)
 					{
 						_matrix->append(item->row());
@@ -1925,7 +1852,7 @@ void Conductor::rebuildMatrix()
 				}
 				for(int i = 0; i < row; ++i)
 				{
-					QStandardItem *item = _tableModel->item(i, 1);
+					QStandardItem *item = _tableModel->item(i);
 					if (item && item->checkState() == Qt::Checked)
 					{
 						_matrix->append(item->row());
@@ -2023,8 +1950,8 @@ void Conductor::insertMatrixEvent(Part* curPart, unsigned tick)
 		}
 		else
 			row = _matrix->at(0);
-		QStandardItem* item = _tableModel->item(row, 0);
-		int id = item->text().toInt();
+		QStandardItem* item = _tableModel->item(row);
+		int id = item->data(ConductorPatchIdRole).toInt();
 		if(curPart->lenTick() <= song->cpos())
 		{
 			curPart->setLenTick(tick);
@@ -2052,8 +1979,8 @@ void Conductor::insertMatrixEvent(Part* curPart, unsigned tick)
 		//printf("Adding Program Change for row: %d\n", row);
 		if (row != -1 && row < _tableModel->rowCount())
 		{
-			QStandardItem* item = _tableModel->item(row, 0);
-			int id = item->text().toInt();
+			QStandardItem* item = _tableModel->item(row);
+			int id = item->data(ConductorPatchIdRole).toInt();
 			if(curPart->lenTick() <= song->cpos())
 			{
 				curPart->setLenTick(tick);
@@ -2090,29 +2017,17 @@ void Conductor::populateMatrix()
 			for (int i = 0; i < ps->size(); ++i)
 			{
 				//printf("Conductor::populateMatrix() found preset: %d\n", i);
-				QList<QStandardItem*> rowData;
 				PatchSequence* p = ps->at(i);
-				QStandardItem *id = new QStandardItem(QString::number(p->id));
-				id->setEditable(false);
+				
 				QStandardItem *patch = new QStandardItem(p->name);
 				patch->setToolTip(p->name);
+				patch->setData(p->id, ConductorPatchIdRole);
 				patch->setEditable(false);
-				QStandardItem *chk = new QStandardItem(p->selected);
-				chk->setEditable(false);
-				chk->setCheckable(true);
-				if (p->selected)
-				{
-					//_useMatrix = true;
-					chk->setCheckState(Qt::Checked);
-				}
-				else
-					chk->setCheckState(Qt::Unchecked);
-				chk->setToolTip(tr("Add to patch sequence"));
-				rowData.append(id);
-				rowData.append(chk);
-				rowData.append(patch);
+				patch->setCheckable(true);
+				patch->setCheckState(p->selected ? Qt::Checked : Qt::Unchecked);
+				
 				_tableModel->blockSignals(true);
-				_tableModel->insertRow(_tableModel->rowCount(), rowData);
+				_tableModel->insertRow(_tableModel->rowCount(), patch);
 				_tableModel->blockSignals(false);
 				_tableModel->emit_layoutChanged();
 				tableView->setRowHeight(_tableModel->rowCount(), 50);
@@ -2190,17 +2105,13 @@ void Conductor::movePatchDown(bool)
 			return;
 		int row = (id + 1);
 		QList<QStandardItem*> item = _tableModel->takeRow(id);
-		QStandardItem* txt = item.at(2);
-		txt->setEditable(false);
+		foreach(QStandardItem* i, item)
+			i->setEditable(false);
 		_selectedIndex = row;
 		_tableModel->insertRow(row, item);
 		tableView->setRowHeight(row, 50);
 		tableView->resizeRowsToContents();
-		tableView->setColumnWidth(1, 20);
-		tableView->setColumnWidth(0, 1);
-		//_selModel->blockSignals(true);
 		tableView->selectRow(row);
-		//_selModel->blockSignals(false);
 	}
 }
 
@@ -2214,32 +2125,20 @@ void Conductor::movePatchUp(bool)
 			return;
 		int row = (id - 1);
 		QList<QStandardItem*> item = _tableModel->takeRow(id);
-		QStandardItem* txt = item.at(2);
-		txt->setEditable(false);
+		foreach(QStandardItem* i, item)
+			i->setEditable(false);
 		_selectedIndex = row;
 		_tableModel->insertRow(row, item);
 		tableView->setRowHeight(row, 50);
 		tableView->resizeRowsToContents();
-		tableView->setColumnWidth(1, 20);
-		tableView->setColumnWidth(0, 1);
-		//_selModel->blockSignals(true);
 		tableView->selectRow(row);
-		//_selModel->blockSignals(false);
 	}
 }
 
 void Conductor::updateTableHeader()/*{{{*/
 {
-	QStandardItem* hid = new QStandardItem(tr("I"));
-	QStandardItem* hstat = new QStandardItem(true);
-	hstat->setCheckable(true);
-	hstat->setCheckState(Qt::Unchecked);
 	QStandardItem* hpatch = new QStandardItem(tr("Patch"));
-	_tableModel->setHorizontalHeaderItem(0, hid);
-	_tableModel->setHorizontalHeaderItem(1, hstat);
-	_tableModel->setHorizontalHeaderItem(2, hpatch);
-	tableView->setColumnWidth(1, 20);
-	tableView->setColumnHidden(0, true);
+	_tableModel->setHorizontalHeaderItem(0, hpatch);
 	tableView->horizontalHeader()->setStretchLastSection(true);
 
 	//update the patchList headers as well
@@ -2264,17 +2163,13 @@ void Conductor::patchSequenceInserted(QModelIndex /*index*/, int start, int end)
 	{
 		for (int i = start; i <= end; ++i)
 		{
-			QStandardItem* id = _tableModel->item(i, 0);
-			QStandardItem* chk = _tableModel->item(i, 1);
-			QStandardItem* patch = _tableModel->item(i, 2);
+			QStandardItem* patch = _tableModel->item(i);
 			PatchSequence* ps = new PatchSequence();
-			if (id && chk && patch)
+			if (patch)
 			{
-				ps->id = id->text().toInt();
+				ps->id = patch->data(ConductorPatchIdRole).toInt();
 				ps->name = patch->text();
-				ps->selected = false;
-				if (chk->checkState() == Qt::Checked)
-					ps->selected = true;
+				ps->selected = (patch->checkState() == Qt::Checked);
 				mp->insertPatchSequence(i, ps);
 				_selectedIndex = i;
 				tableView->selectRow(i);
@@ -2337,20 +2232,13 @@ void Conductor::matrixSelectionChanged(QItemSelection sel, QItemSelection)
 		return;
 	QModelIndex inx = ind.at(0);
 	int row = inx.row();
-	QStandardItem* item = _tableModel->item(row, 1);
+	QStandardItem* item = _tableModel->item(row);
 	if(item)
 	{
 		_selectedIndex = row;
-		if(item->checkState() == Qt::Checked)
-		{
-			_useMatrix = true;
-			rebuildMatrix();
-		}
-		else
-		{
-			_useMatrix = false;
-			rebuildMatrix();
-		}
+		
+		_useMatrix = (item->checkState() == Qt::Checked);
+		rebuildMatrix();
 	}
 }
 
@@ -2361,40 +2249,21 @@ void Conductor::clonePatchSequence()
 	{
 		int start = rows.at(0);
 		int row = (start + 1);
-		QStandardItem* iid = _tableModel->item(start, 0);
-		QStandardItem* ichk = _tableModel->item(start, 1);
-		QStandardItem* iname = _tableModel->item(start, 2);
-		if(iid && ichk && iname)
+		QStandardItem* iname = _tableModel->item(start);
+		if(iname)
 		{
-			QList<QStandardItem*> item;
+			QStandardItem* item = new QStandardItem(iname->text());
+			item->setData(iname->data(), ConductorPatchIdRole);
+			item->setToolTip(iname->toolTip());
+			item->setCheckable(true);
+			item->setEditable(false);
+			item->setCheckState(iname->checkState());
 
-			QStandardItem* id = new QStandardItem();
-			id->setText(iid->text());
-			//id->setToolTip(iid->toolTip());
-
-			QStandardItem* chk = new QStandardItem();
-			chk->setEditable(ichk->isEditable());
-			chk->setCheckable(ichk->isCheckable());
-			chk->setCheckState(ichk->checkState());
-
-
-			QStandardItem* name = new QStandardItem();
-			name->setEditable(iname->isEditable());
-			name->setText(iname->text());
-			name->setToolTip(iname->toolTip());
-
-			item.append(id);
-			item.append(chk);
-			item.append(name);
 			_selectedIndex = row;
 			_tableModel->insertRow(row, item);
 			tableView->setRowHeight(row, 50);
 			tableView->resizeRowsToContents();
-			tableView->setColumnWidth(1, 20);
-			tableView->setColumnWidth(0, 1);
-			//_selModel->blockSignals(true);
 			tableView->selectRow(row);
-			//_selModel->blockSignals(false);
 		}
 	}
 }
@@ -2456,23 +2325,18 @@ void Conductor::patchDoubleClicked(QModelIndex index)/*{{{*/
 				pg = pg + ": \n  ";
 			QString label = "  " + pg + name;
 
-			QList<QStandardItem*> rowData;
-			QStandardItem* chk = new QStandardItem(true);
-			chk->setCheckable(true);
-			chk->setCheckState(Qt::Unchecked);
-			chk->setToolTip(tr("Add to patch sequence"));
 
 			QStandardItem* patch = new QStandardItem(label);
+			patch->setData(idItem->text(), ConductorPatchIdRole);
 			patch->setToolTip(label);
 			patch->setEditable(false);
-			rowData.append(new QStandardItem(idItem->text()));
-			rowData.append(chk);
-			rowData.append(patch);
+			patch->setCheckable(true);
+			patch->setCheckState(Qt::Unchecked);
 
 			int trow = _tableModel->rowCount();
 			_selectedIndex = trow;
 			_useMatrix = false;
-			_tableModel->insertRow(trow, rowData);
+			_tableModel->insertRow(trow, patch);
 			tableView->setRowHeight(trow, 50);
 			tableView->resizeRowsToContents();
 			updateConductor(-1);
@@ -2529,23 +2393,19 @@ void Conductor::patchSequenceClicked(QModelIndex index)/*{{{*/
 {
 	if(!selected)
 		return;
-	QStandardItem* nItem = _tableModel->itemFromIndex(index);
+	QStandardItem* item = _tableModel->itemFromIndex(index);
 
-	if(nItem)
+	if(item)
 	{
-		QStandardItem* item = _tableModel->item(nItem->row(), 0);
-		if(item)
+		int id = item->data(ConductorPatchIdRole).toInt();
+		if (id >= 0)
 		{
-			int id = item->text().toInt();
-			if (id >= 0)
-			{
-				MidiTrack* track = (MidiTrack*) selected;
-				int channel = track->outChannel();
-				int port = track->outPort();
+			MidiTrack* track = (MidiTrack*) selected;
+			int channel = track->outChannel();
+			int port = track->outPort();
 
-				MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id, selected);
-				audio->msgPlayMidiEvent(&ev);
-			}
+			MidiPlayEvent ev(0, port, channel, ME_CONTROLLER, CTRL_PROGRAM, id, selected);
+			audio->msgPlayMidiEvent(&ev);
 		}
 	}
 }/*}}}*/
