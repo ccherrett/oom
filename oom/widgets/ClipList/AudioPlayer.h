@@ -46,6 +46,7 @@ class AudioPlayer : public QObject
 
 	bool m_isPlaying;
 	bool m_seeking;
+	float m_oldVolume;
 
 	//Process the audio file
 	static int process (jack_nframes_t nframes, void * arg);
@@ -65,6 +66,7 @@ signals:
 
 private slots:
 	void stopSeek();
+	void restoreVolume();
 
 public slots:
 	void stop();

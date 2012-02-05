@@ -558,11 +558,11 @@ void AudioClipList::playClicked(bool state)/*{{{*/
 				if(!info.isDir() && !info.suffix().endsWith("mpt"))
 				{
 					m_playlist.append(info.filePath());
-					/*if(m_currentSong != info.filePath() && !player.isPlaying())
+					if(m_currentSong != info.filePath())
 					{
-						m_seekSlider->setValue(pos);
+						m_seekSlider->setValue(0);
 						player.seek(0);
-					}*/
+					}
 					if(player.isPlaying())
 						player.stop();
 					else

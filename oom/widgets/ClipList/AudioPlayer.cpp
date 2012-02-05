@@ -44,6 +44,7 @@ AudioPlayer::AudioPlayer()
 	info.volume = 0.60;
 	info.can_process = 0 ;
 	info.can_read = 0 ;
+	m_oldVolume = 0.60;
 }
 
 AudioPlayer::~AudioPlayer()
@@ -180,10 +181,20 @@ void AudioPlayer::setVolume(double val)
 	info.volume = vol;
 }
 
+void AudioPlayer::restoreVolume()
+{
+	if(m_oldVolume)
+	{
+		info.volume = m_oldVolume;
+		m_oldVolume = 0.0;
+	}
+}
+
 void AudioPlayer::stopSeek()
 {
-	//qDebug("AudioPlayer::stopSeek");
+	qDebug("AudioPlayer::stopSeek: m_oldVolume: %f", m_oldVolume);
 	m_seeking = false;
+	QTimer::singleShot(500, this, SLOT(restoreVolume()));
 }
 
 void AudioPlayer::seek(int val)/*{{{*/
@@ -192,6 +203,9 @@ void AudioPlayer::seek(int val)/*{{{*/
 	bool was_seeking = m_seeking;
 	m_seeking = true;
 	info.seek = val;
+	if(!m_oldVolume)
+		m_oldVolume = info.volume;
+	info.volume = 0.0;
 	sf_count_t frames = 0;
 	if(info.sndfile && m_isPlaying)
 	{
