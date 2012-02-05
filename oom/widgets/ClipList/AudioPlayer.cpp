@@ -192,9 +192,10 @@ void AudioPlayer::seek(int val)/*{{{*/
 	bool was_seeking = m_seeking;
 	m_seeking = true;
 	info.seek = val;
+	sf_count_t frames = 0;
 	if(info.sndfile && m_isPlaying)
 	{
-		sf_seek(info.sndfile, val, SEEK_SET);
+		frames = sf_seek(info.sndfile, val, SEEK_SET);
 	}
 
 	if(!was_seeking)

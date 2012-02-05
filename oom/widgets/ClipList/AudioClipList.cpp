@@ -103,18 +103,19 @@ AudioClipList::AudioClipList(QWidget *parent)
 	m_slider->setFixedWidth(20);
 	m_slider->setFont(config.fonts[1]);
 	m_slider->setIgnoreWheel(false);
+	m_slider->setToolTip(tr("Volume"));
 	playerLayout->insertWidget(1, m_slider);
 
-	/*QColor seekSliderBgColor = g_trackColorList.value(5);
-	m_seekSlider = new Slider(this, "seek", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, false);
+	QColor seekSliderBgColor = g_trackColorList.value(5);
+	m_seekSlider = new Slider(this, "seek", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, true);
 	m_seekSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	m_seekSlider->setCursorHoming(true);
-	m_seekSlider->setRange(config.minSlider - 0.1, 10.0);
+	m_seekSlider->setRange(0.0, 99, 1.0, 10.0);
+	m_seekSlider->setValue(0.0);
 	m_seekSlider->setFixedHeight(15);
 	m_seekSlider->setFont(config.fonts[1]);
-	m_seekSlider->setIgnoreWheel(true);
-	m_seekSlider->setValue(0.0);
-	controlBox->insertWidget(2, m_seekSlider);*/
+	m_seekSlider->setIgnoreWheel(false);
+	controlBox->insertWidget(2, m_seekSlider);
 
 	connect(btnPlay, SIGNAL(toggled(bool)), this, SLOT(playClicked(bool)));
 	connect(btnStop, SIGNAL(toggled(bool)), this, SLOT(stopClicked(bool)));
@@ -130,7 +131,8 @@ AudioClipList::AudioClipList(QWidget *parent)
 	connect(&player, SIGNAL(readyForPlay()), this, SLOT(playNextFile()));
 	connect(this, SIGNAL(stopPlayback()), &player, SLOT(stop()));
 	connect(m_slider, SIGNAL(sliderMoved(double, int)), &player, SLOT(setVolume(double)));
-	connect(m_seekSlider, SIGNAL(sliderMoved(int)), &player, SLOT(seek(int)));
+	connect(m_seekSlider, SIGNAL(sliderMoved(int, int)), &player, SLOT(seek(int)));
+	connect(m_seekSlider, SIGNAL(sliderMoved(int, int)), this, SLOT(offlineSeek(int)));
 
 	connect(m_fileList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(fileItemSelected(const QModelIndex&)));
 	connect(m_fileList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(fileItemContextMenu(const QPoint&)));
@@ -436,6 +438,14 @@ void AudioClipList::bookmarkItemSelected(const QModelIndex& index)
 	}
 }
 
+void AudioClipList::offlineSeek(int pos)
+{
+	if(!player.isPlaying() && !m_currentSong.isEmpty())
+	{
+		timeLabel->setText(player.calcTimeString(pos));
+	}
+}
+
 void AudioClipList::updateTime(const QString& time)
 {
 	//timeLabel->setVisible(true);
@@ -474,7 +484,7 @@ void AudioClipList::updateNowPlaying(const QString& val, int samples)
 		//songLabel->setText(info.fileName());
 		songLabel->setToolTip(info.filePath());
 		lengthLabel->setText(values[1]);
-		m_seekSlider->setRange(0, samples);
+		m_seekSlider->setRange(0, samples, 1.0, 10.0);
 	}
 	else
 	{

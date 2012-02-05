@@ -40,7 +40,7 @@ class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	ClipListModel *m_listModel;
 	BookmarkListModel *m_bookmarkModel;
 	Slider* m_slider;
-	//Slider* m_seekSlider;
+	Slider* m_seekSlider;
 	QStringList m_filters;
 	QString m_currentPath;
 	QString m_currentSong;
@@ -78,6 +78,7 @@ private slots:
 	void updateNowPlaying(const QString&, int samples);
 	void playNextFile();
 	void stopSlotCalled(bool); 
+	void offlineSeek(int);
 
 public slots:
 	void refresh();

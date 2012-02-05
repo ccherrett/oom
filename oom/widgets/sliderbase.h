@@ -78,6 +78,7 @@ signals:
     void sliderPressed(int id);
     void sliderReleased(int id);
     void sliderMoved(double value, int id);
+    void sliderMoved(int value, int id);
     void sliderRightClicked(const QPoint &p, int id);
 
 public:

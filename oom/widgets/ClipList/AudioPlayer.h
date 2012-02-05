@@ -52,7 +52,6 @@ class AudioPlayer : public QObject
 	//Read audio file from disk
 	static void* read_file(void* arg);
 	void printTime();
-	QString calcTimeString(int);
 	//Start jack client;
 	bool startClient();
 	void stopClient();
@@ -78,5 +77,6 @@ public:
 	~AudioPlayer();
 	void play(const QString& filename);
 	bool isPlaying();
+	QString calcTimeString(int);
 };
 #endif

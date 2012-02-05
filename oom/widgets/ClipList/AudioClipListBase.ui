@@ -191,7 +191,7 @@
            <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>4</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QLabel" name="timeLabel">
@@ -214,37 +214,6 @@
            </widget>
           </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QSlider" name="m_seekSlider">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>15</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>15</height>
-           </size>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="invertedAppearance">
-           <bool>false</bool>
-          </property>
-          <property name="invertedControls">
-           <bool>false</bool>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::NoTicks</enum>
-          </property>
-          <property name="tickInterval">
-           <number>100</number>
-          </property>
-         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="buttonBox">

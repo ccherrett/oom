@@ -101,6 +101,7 @@ void SliderBase::wheelEvent(QWheelEvent *e)
 		setValue(value() - inc);
 
 	emit sliderMoved(value(), _id);
+	emit sliderMoved((int)value(), _id);
 }
 
 
@@ -169,6 +170,7 @@ void SliderBase::mousePressEvent(QMouseEvent *e)
 			d_mouseOffset = 0;
 			DoubleRange::incPages(d_direction);
 			emit sliderMoved(value(), _id);
+			emit sliderMoved((int)value(), _id);
 			d_tmrID = startTimer(qwtMax(250, 2 * d_updTime));
 			break;
 
@@ -383,7 +385,10 @@ void SliderBase::mouseMoveEvent(QMouseEvent *e)
 			d_time.start();
 		}
 		if (value() != prevValue())
+		{
 			emit sliderMoved(value(), _id);
+			emit sliderMoved((int)value(), _id);
+		}
 	}
 
 }
@@ -434,7 +439,10 @@ void SliderBase::timerEvent(QTimerEvent*)
 			DoubleRange::incPages(d_direction);
 
 			if (value() != prevValue())
+			{
 				emit sliderMoved(value(), _id);
+				emit sliderMoved((int)value(), _id);
+			}
 
 			if (!d_timerTick)
 			{
@@ -446,7 +454,9 @@ void SliderBase::timerEvent(QTimerEvent*)
 			DoubleRange::fitValue(value() + double(d_direction) * inc);
 
 			if (value() != prevValue())
+			{
 				emit sliderMoved(value(), _id);
+			}
 
 			if (!d_timerTick)
 			{
@@ -615,6 +625,7 @@ void SliderBase::stepPages(int pages)
 {
 	DoubleRange::incPages(pages);
 	emit sliderMoved(value(), _id);
+	emit sliderMoved((int)value(), _id);
 }
 
 
