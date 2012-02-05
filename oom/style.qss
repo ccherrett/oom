@@ -1593,6 +1593,21 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
      background: none;
 }
 
+QSlider#m_seekSlider::groove:horizontal 
+{
+    border: 1px solid #393941;
+    height: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3f3f3f, stop:1 #0b0b0b);
+    margin: 2px 0;
+}
+QSlider#m_seekSlider::handle:horizontal 
+{
+    background: url(:/images/slider_thumb_small.png);/*qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b3b3b3, stop:1 #8e8e8e);*/
+    border: 0px solid #5c5c5c;
+    width: 8px;
+    margin: -1; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 3px;
+}
 QSlider::groove:horizontal 
 {
     border: 1px solid #393941;

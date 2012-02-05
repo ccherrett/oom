@@ -96,14 +96,25 @@ AudioClipList::AudioClipList(QWidget *parent)
 
 	//QColor sliderBgColor = g_trackColorList.value(3);
 	QColor sliderBgColor = g_trackColorListSelected.value(3);
-	m_slider = new Slider(this, "vol", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, false);
-	m_slider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	m_slider = new Slider(this, "vol", Qt::Vertical, Slider::None, Slider::BgSlot, sliderBgColor, false);
+	m_slider->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding));
 	m_slider->setCursorHoming(true);
 	m_slider->setRange(config.minSlider - 0.1, 10.0);
-	m_slider->setFixedHeight(15);
+	m_slider->setFixedWidth(20);
 	m_slider->setFont(config.fonts[1]);
-	m_slider->setIgnoreWheel(true);
-	playerLayout->insertWidget(2, m_slider);
+	m_slider->setIgnoreWheel(false);
+	playerLayout->insertWidget(1, m_slider);
+
+	/*QColor seekSliderBgColor = g_trackColorList.value(5);
+	m_seekSlider = new Slider(this, "seek", Qt::Horizontal, Slider::None, Slider::BgSlot, sliderBgColor, false);
+	m_seekSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	m_seekSlider->setCursorHoming(true);
+	m_seekSlider->setRange(config.minSlider - 0.1, 10.0);
+	m_seekSlider->setFixedHeight(15);
+	m_seekSlider->setFont(config.fonts[1]);
+	m_seekSlider->setIgnoreWheel(true);
+	m_seekSlider->setValue(0.0);
+	controlBox->insertWidget(2, m_seekSlider);*/
 
 	connect(btnPlay, SIGNAL(toggled(bool)), this, SLOT(playClicked(bool)));
 	connect(btnStop, SIGNAL(toggled(bool)), this, SLOT(stopClicked(bool)));
@@ -114,10 +125,12 @@ AudioClipList::AudioClipList(QWidget *parent)
 
 	connect(&player, SIGNAL(playbackStopped(bool)), this, SLOT(stopSlotCalled(bool)));
 	connect(&player, SIGNAL(timeChanged(const QString&)), this, SLOT(updateTime(const QString&)));
-	connect(&player, SIGNAL(nowPlaying(const QString&)), this, SLOT(updateNowPlaying(const QString&)));
+	connect(&player, SIGNAL(timeChanged(int)), this, SLOT(updateSlider(int)));
+	connect(&player, SIGNAL(nowPlaying(const QString&, int)), this, SLOT(updateNowPlaying(const QString&, int)));
 	connect(&player, SIGNAL(readyForPlay()), this, SLOT(playNextFile()));
 	connect(this, SIGNAL(stopPlayback()), &player, SLOT(stop()));
 	connect(m_slider, SIGNAL(sliderMoved(double, int)), &player, SLOT(setVolume(double)));
+	connect(m_seekSlider, SIGNAL(sliderMoved(int)), &player, SLOT(seek(int)));
 
 	connect(m_fileList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(fileItemSelected(const QModelIndex&)));
 	connect(m_fileList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(fileItemContextMenu(const QPoint&)));
@@ -176,7 +189,7 @@ void AudioClipList::saveBookmarks()
 		tconfig().set_property("AudioClipList", "bookmarks", out.join(","));
 }
 
-void AudioClipList::loadBookmarks()
+void AudioClipList::loadBookmarks()/*{{{*/
 {
 	m_bookmarkModel->clear();
 	QString defDir = QDir::homePath();
@@ -186,9 +199,9 @@ void AudioClipList::loadBookmarks()
 	{
 		addBookmark(s);
 	}
-}
+}/*}}}*/
 
-void AudioClipList::addBookmark(const QString &dir)
+void AudioClipList::addBookmark(const QString &dir)/*{{{*/
 {
 	QFileInfo f(dir);
 	QList<QStandardItem*> items = m_bookmarkModel->findItems(f.fileName());
@@ -201,9 +214,9 @@ void AudioClipList::addBookmark(const QString &dir)
 		item->setIcon(QIcon(":/images/icons/clip-folder-bookmark.png"));
 		m_bookmarkModel->appendRow(item);
 	}
-}
+}/*}}}*/
 
-void AudioClipList::setDir(const QString &path)
+void AudioClipList::setDir(const QString &path)/*{{{*/
 {
 	QDir dir(path, "*", QDir::DirsFirst|QDir::LocaleAware, QDir::AllEntries | QDir::Readable|QDir::NoDotAndDotDot);
 	m_listModel->clear();
@@ -246,9 +259,9 @@ void AudioClipList::setDir(const QString &path)
 		txtPath->setText(m_currentPath);
 		//qDebug("Listed directory: %s", m_currentPath.toUtf8().constData());
 	}
-}
+}/*}}}*/
 
-void AudioClipList::refresh()
+void AudioClipList::refresh()/*{{{*/
 {
 	if(!m_active)
 		return;
@@ -263,14 +276,14 @@ void AudioClipList::refresh()
 			setDir(oomProject);
 	}
 	loadBookmarks();
-}
+}/*}}}*/
 
 bool AudioClipList::isSupported(const QString& suffix)
 {
 	return m_filters.contains(suffix);
 }
 
-void AudioClipList::fileItemContextMenu(const QPoint& pos)
+void AudioClipList::fileItemContextMenu(const QPoint& pos)/*{{{*/
 {
 	QModelIndex index = m_fileList->indexAt(pos);
 	if(index.isValid())
@@ -369,9 +382,9 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)
 			}
 		}
 	}
-}
+}/*}}}*/
 
-void AudioClipList::bookmarkContextMenu(const QPoint& pos)
+void AudioClipList::bookmarkContextMenu(const QPoint& pos)/*{{{*/
 {
 	QModelIndex index = m_bookmarkList->indexAt(pos);
 	if(index.isValid() && index.row())//Dont remove the Home bookmark
@@ -393,7 +406,7 @@ void AudioClipList::bookmarkContextMenu(const QPoint& pos)
 			}
 		}
 	}
-}
+}/*}}}*/
 
 void AudioClipList::fileItemSelected(const QModelIndex& index)
 {
@@ -427,6 +440,7 @@ void AudioClipList::updateTime(const QString& time)
 {
 	//timeLabel->setVisible(true);
 	timeLabel->setText(time);
+
 	if(btnStop->isChecked())
 	{
 		btnStop->blockSignals(true);
@@ -441,8 +455,14 @@ void AudioClipList::updateTime(const QString& time)
 	}
 }
 
-void AudioClipList::updateNowPlaying(const QString& val)
+void AudioClipList::updateSlider(int pos)
 {
+	m_seekSlider->setValue(pos);
+}
+
+void AudioClipList::updateNowPlaying(const QString& val, int samples)
+{
+	//qDebug("AudioClipList::updateNowPlaying: samples: %d", samples);
 	QStringList values = val.split("@--,--@");
 	if(values.size())
 	{	
@@ -454,6 +474,7 @@ void AudioClipList::updateNowPlaying(const QString& val)
 		//songLabel->setText(info.fileName());
 		songLabel->setToolTip(info.filePath());
 		lengthLabel->setText(values[1]);
+		m_seekSlider->setRange(0, samples);
 	}
 	else
 	{
@@ -495,7 +516,7 @@ static void doPlay(const QString& file)
 	player.play(file);
 }
 
-void AudioClipList::playNextFile()
+void AudioClipList::playNextFile()/*{{{*/
 {
 	if(m_playlist.size())
 	{
@@ -508,9 +529,9 @@ void AudioClipList::playNextFile()
 		btnStop->setChecked(false);
 		btnStop->blockSignals(false);
 	}
-}
+}/*}}}*/
 
-void AudioClipList::playClicked(bool state)
+void AudioClipList::playClicked(bool state)/*{{{*/
 {
 	//qDebug("AudioClipList::playClicked: state: %d", state);
 
@@ -527,6 +548,11 @@ void AudioClipList::playClicked(bool state)
 				if(!info.isDir() && !info.suffix().endsWith("mpt"))
 				{
 					m_playlist.append(info.filePath());
+					/*if(m_currentSong != info.filePath() && !player.isPlaying())
+					{
+						m_seekSlider->setValue(pos);
+						player.seek(0);
+					}*/
 					if(player.isPlaying())
 						player.stop();
 					else
@@ -579,9 +605,9 @@ void AudioClipList::playClicked(bool state)
 	{
 		btnStop->setChecked(!state);
 	}
-}
+}/*}}}*/
 
-void AudioClipList::stopSlotCalled(bool)
+void AudioClipList::stopSlotCalled(bool)/*{{{*/
 {
 	btnStop->blockSignals(true);
 	btnStop->setChecked(true);
@@ -590,20 +616,35 @@ void AudioClipList::stopSlotCalled(bool)
 	btnPlay->blockSignals(true);
 	btnPlay->setChecked(false);
 	btnPlay->blockSignals(false);
-}
+}/*}}}*/
 
-void AudioClipList::stopClicked(bool state)
+void AudioClipList::stopClicked(bool state)/*{{{*/
 {
 	if(state)
 	{
-		btnPlay->blockSignals(true);
-		btnPlay->setChecked(!state);
-		btnPlay->blockSignals(false);
-		m_playlist.clear();
-		emit stopPlayback();//Make player stop
-		updateLabels();
+		if(player.isPlaying())
+		{
+			btnPlay->blockSignals(true);
+			btnPlay->setChecked(!state);
+			btnPlay->blockSignals(false);
+			m_playlist.clear();
+			emit stopPlayback();//Make player stop
+			updateLabels();
+		}
+		else
+		{
+			btnStop->blockSignals(true);
+			btnStop->setChecked(true);
+			btnStop->blockSignals(false);
+		}
 	}
-}
+	else
+	{
+		btnStop->blockSignals(true);
+		btnStop->setChecked(true);
+		btnStop->blockSignals(false);
+	}
+}/*}}}*/
 
 void AudioClipList::homeClicked()
 {
@@ -619,9 +660,4 @@ void AudioClipList::forwardClicked()
 {
 	qDebug("AudioClipList::forwardClicked");
 }
-
-/*void AudioClipList::addBookmarkClicked()
-{
-	qDebug("AudioClipList::addBookmarkClicked");
-}*/
 

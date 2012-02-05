@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include <QStringList>
+#include <QTimer>
 
 #include <jack/ringbuffer.h>
 
@@ -38,6 +39,7 @@ AudioPlayer::AudioPlayer()
 {
 	m_client = 0;
 	m_isPlaying = false;
+	m_seeking = false;
 	memset (&info, 0, sizeof (info)) ;
 	info.volume = 0.60;
 	info.can_process = 0 ;
@@ -67,23 +69,23 @@ int AudioPlayer::process(jack_nframes_t nframes, void * arg)
 	{	
 		size_t read_cnt ;
 
-		/* Read one frame of audio. */
+		// Read one frame of audio. 
 		read_cnt = jack_ringbuffer_read (ringbuf, (char*)buf, sample_size*info->channels) ;
 		if (read_cnt == 0 && info->read_done)
-		{	/* File is done, so stop the main loop. */
+		{	// File is done, so stop the main loop. 
 			info->play_done = 1 ;
 			return 0 ;
 		}
 
-		/* Update play-position counter. */
+		// Update play-position counter. 
 		info->pos += read_cnt / (sample_size*info->channels) ;
 
-		/* Output each channel of the frame. */
+		// Output each channel of the frame. 
 		for (n = 0 ; n < info->channels ; n++)
 			outs [n][i] = buf[n] * info->volume;
 	}
 
-	/* Wake up the disk thread to read more data. */
+	// Wake up the disk thread to read more data. 
 	if (pthread_mutex_trylock (&disk_thread_lock) == 0)
 	{	pthread_cond_signal (&data_ready) ;
 		pthread_mutex_unlock (&disk_thread_lock) ;
@@ -108,29 +110,29 @@ void* AudioPlayer::read_file(void* arg)
 		read_frames = 0 ;
 
 		if (vec [0].len)
-		{	/* Fill the first part of the ringbuffer. */
+		{	// Fill the first part of the ringbuffer. 
 			buf_avail = vec [0].len / bytes_per_frame ;
 			read_frames = sf_readf_float (info->sndfile, (float *) vec [0].buf, buf_avail) ;
 			if (vec [1].len)
-			{	/* Fill the second part of the ringbuffer? */
+			{	// Fill the second part of the ringbuffer? 
 				buf_avail = vec [1].len / bytes_per_frame ;
 				read_frames += sf_readf_float (info->sndfile, (float *) vec [1].buf, buf_avail) ;
 			}
 		}
 
 		if (read_frames == 0)
-			break ; /* end of file? */
+			break ; // EOF or sndfile error
 
 		jack_ringbuffer_write_advance (ringbuf, read_frames * bytes_per_frame) ;
 
-		/* Tell process that we've filled the ringbuffer. */
+		// Tell process that we've filled the ringbuffer.
 		info->can_process = 1 ;
 
-		/* Wait for the process thread to wake us up. */
+		// Wait for the process thread to wake us up. 
 		pthread_cond_wait (&data_ready, &disk_thread_lock) ;
 	}
 
-	/* Tell that we're done reading the file. */
+	// Tell that we're done reading the file. 
 	info->read_done = 1 ;
 	pthread_mutex_unlock (&disk_thread_lock) ;
 
@@ -139,16 +141,30 @@ void* AudioPlayer::read_file(void* arg)
 
 static void jack_shutdown (void *arg)
 {	(void) arg ;
-	fprintf (stderr, "ClipList jack_shutdown\n");
+	//Do nothing for now
+	//fprintf (stderr, "ClipList jack_shutdown\n");
 }
 
-void AudioPlayer::print_time(jack_nframes_t pos)
+QString AudioPlayer::calcTimeString(int frames)
 {
-	float sec = pos / (1.0 * m_srate) ;
-	int min = sec / 60.0 ;
 	QString time;
+	float sec = frames / (1.0 * m_srate) ;
+	int min = sec / 60.0 ;
 	time.sprintf("%02d:%05.2f", min, fmod(sec, 60.0));
-	emit timeChanged(time);
+	return time;
+}
+
+void AudioPlayer::printTime()
+{
+	sf_count_t frames = 0;
+	if(info.sndfile)
+	{
+		frames = sf_seek (info.sndfile, 0, SEEK_CUR);
+		info.seek = frames;
+	}
+	if(!m_seeking)
+		emit timeChanged((int)frames);
+	emit timeChanged(calcTimeString((int)frames));
 }
 
 void AudioPlayer::setVolume(double val)
@@ -163,6 +179,27 @@ void AudioPlayer::setVolume(double val)
 		vol = pow(10.0, val / 20.0);
 	info.volume = vol;
 }
+
+void AudioPlayer::stopSeek()
+{
+	//qDebug("AudioPlayer::stopSeek");
+	m_seeking = false;
+}
+
+void AudioPlayer::seek(int val)/*{{{*/
+{
+	//qDebug("AudioPlayer::seek: val: %d", val);
+	bool was_seeking = m_seeking;
+	m_seeking = true;
+	info.seek = val;
+	if(info.sndfile && m_isPlaying)
+	{
+		sf_seek(info.sndfile, val, SEEK_SET);
+	}
+
+	if(!was_seeking)
+		QTimer::singleShot(1000, this, SLOT(stopSeek()));
+}/*}}}*/
 
 void AudioPlayer::stopClient()
 {
@@ -186,7 +223,7 @@ void AudioPlayer::check()
 	}
 }
 
-bool AudioPlayer::startClient()
+bool AudioPlayer::startClient()/*{{{*/
 {
 	// create jack client
 	if(!m_client)
@@ -203,7 +240,7 @@ bool AudioPlayer::startClient()
 		
 		m_srate = jack_get_sample_rate (m_client) ;
 
-		/* Set up callbacks. */
+		// Set up callbacks.
 		jack_set_process_callback (m_client, AudioPlayer::process, &info) ;
 		jack_on_shutdown (m_client, jack_shutdown, 0);
 
@@ -218,11 +255,11 @@ bool AudioPlayer::startClient()
 			output_port [i] = jack_port_register (m_client, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0) ;
 		}
 
-		/* Allocate and clear ringbuffer. */
+		// Allocate and clear ringbuffer.
 		ringbuf = jack_ringbuffer_create (sizeof (jack_default_audio_sample_t) * RB_SIZE) ;
 		memset (ringbuf->buf, 0, ringbuf->size) ;
 
-		/* Activate client. */
+		// Activate client. 
 		if (jack_activate (m_client))
 		{
 			fprintf (stderr, "Cannot activate client.\n") ;
@@ -231,7 +268,7 @@ bool AudioPlayer::startClient()
 			return false;
 		}
 
-		/* Auto connect all channels. */
+		// Auto connect all channels.
 		for (int i = 0 ; i < channels ; i++)
 		{	
 			char name [64] ;
@@ -256,21 +293,22 @@ bool AudioPlayer::startClient()
 	{
 		return true;
 	}
-}
+}/*}}}*/
 
-void AudioPlayer::play(const QString &file)
+void AudioPlayer::play(const QString &file)/*{{{*/
 {
 	SNDFILE *sndfile ;
 	SF_INFO sndfileinfo ;
 
 	if (file.isEmpty())
 	{	
-		fprintf (stderr, "no soundfile given\n") ;
+		fprintf (stderr, "no soundfile given\n");
+		//TODO: emit error signals
 		emit playbackStopped(true);
 		return;
 	}
 
-	/* Open the soundfile. */
+	// Open the soundfile.
 	sndfileinfo.format = 0 ;
 	sndfile = sf_open (file.toUtf8().constData(), SFM_READ, &sndfileinfo) ;
 	if (sndfile == NULL)
@@ -281,7 +319,7 @@ void AudioPlayer::play(const QString &file)
 		return;
 	}
 
-	/* Init the thread info struct. */
+	// Init the thread info struct.
 	info.can_process = 0 ;
 	info.read_done = 0 ;
 	info.play_done = 0 ;
@@ -289,53 +327,41 @@ void AudioPlayer::play(const QString &file)
 	info.channels = sndfileinfo.channels ;
 	info.client = m_client ;
 	info.pos = 0 ;
+	
+	if(info.seek && info.seek < sndfileinfo.frames)
+	{
+		//qDebug("Preseting seek point");
+		sf_seek(sndfile, info.seek, SEEK_CUR);
+		info.seek = 0;
+	}
 
 	if(!startClient())
 		return;
 		
-	float sec = sndfileinfo.frames / (1.0 * m_srate) ;
-	int min = sec / 60.0 ;
-	QString time;
-	time.sprintf("%02d:%05.2f", min, fmod(sec, 60.0));
-
-	fprintf (stderr, "Channels    : %d\nSample rate : %d Hz\nDuration    : ", sndfileinfo.channels, sndfileinfo.samplerate) ;
-	fprintf(stderr, "%s", time.toUtf8().constData());
-	fprintf (stderr, "\n") ;
-
-	if (sndfileinfo.samplerate != m_srate)
-		fprintf (stderr, "Warning: samplerate of soundfile (%d Hz) does not match jack server (%d Hz).\n", sndfileinfo.samplerate, m_srate) ;
-
-	/* Allocate and clear ringbuffer. */
-	//ringbuf = jack_ringbuffer_create (sizeof (jack_default_audio_sample_t) * RB_SIZE) ;
-	//memset (ringbuf->buf, 0, ringbuf->size) ;
-
-
-	/* Start the disk thread. */
+	// Start the disk thread. 
 	pthread_create (&info.thread_id, NULL, AudioPlayer::read_file, &info);
 	info.can_read = 1 ;
 	
 	m_isPlaying = true;
 
-	QStringList list;
-	list << file << time;
-	emit nowPlaying(list.join("@--,--@"));
+	emit nowPlaying(QString(file).append("@--,--@").append(calcTimeString((int)sndfileinfo.frames)), sndfileinfo.frames);
 
-	/* Sit in a loop, displaying the current play position. */
 	while (!info.play_done)
 	{	
-		print_time (info.pos) ;
+		printTime() ;
 		usleep (50000) ;
 	}
+	printTime();
 
 	m_isPlaying = false;
 
 	info.can_process = 0;
 	
-	/* Clean up. */
 	stopClient();
 	sf_close (sndfile) ;
+	info.sndfile = 0;
 	emit playbackStopped(true);
-}
+}/*}}}*/
 
 bool AudioPlayer::isPlaying()
 {

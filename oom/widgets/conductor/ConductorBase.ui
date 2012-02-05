@@ -32,6 +32,12 @@
    <enum>QFrame::Raised</enum>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <property name="spacing">
@@ -127,8 +133,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>248</width>
-        <height>424</height>
+        <width>250</width>
+        <height>430</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -193,7 +199,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="sizeConstraint">
             <enum>QLayout::SetMinAndMaxSize</enum>

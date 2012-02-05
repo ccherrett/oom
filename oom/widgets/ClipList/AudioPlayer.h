@@ -32,6 +32,7 @@ typedef struct _thread_info
 	volatile int read_done ;
 	volatile int play_done ;
 	volatile float volume;
+	volatile int seek;
 } thread_info_t ;
 							
 
@@ -39,31 +40,38 @@ class AudioPlayer : public QObject
 {
 	Q_OBJECT;
 
-	jack_client_t *m_client ;
-	thread_info_t info ;
+	jack_client_t *m_client;
+	thread_info_t info;
 	int m_srate;
 
 	bool m_isPlaying;
+	bool m_seeking;
 
 	//Process the audio file
 	static int process (jack_nframes_t nframes, void * arg);
 	//Read audio file from disk
 	static void* read_file(void* arg);
-	void print_time(jack_nframes_t);
+	void printTime();
+	QString calcTimeString(int);
 	//Start jack client;
 	bool startClient();
 	void stopClient();
 
 signals:
 	void timeChanged(const QString&);
+	void timeChanged(int);
 	void playbackStopped(bool);
-	void nowPlaying(const QString&);
+	void nowPlaying(const QString&, int samples);
 	void readyForPlay();
+
+private slots:
+	void stopSeek();
 
 public slots:
 	void stop();
 	void check();
 	void setVolume(double value);
+	void seek(int);
 
 public:
 	AudioPlayer();

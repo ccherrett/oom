@@ -40,6 +40,7 @@ class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	ClipListModel *m_listModel;
 	BookmarkListModel *m_bookmarkModel;
 	Slider* m_slider;
+	//Slider* m_seekSlider;
 	QStringList m_filters;
 	QString m_currentPath;
 	QString m_currentSong;
@@ -65,13 +66,16 @@ private slots:
 	void homeClicked();
 	void forwardClicked();
 	void rewindClicked();
-	//void addBookmarkClicked();
+
 	void fileItemSelected(const QModelIndex&);
 	void fileItemContextMenu(const QPoint&);
 	void bookmarkItemSelected(const QModelIndex&);
 	void bookmarkContextMenu(const QPoint&);
+	
 	void updateTime(const QString&);
-	void updateNowPlaying(const QString&);
+	void updateSlider(int);
+
+	void updateNowPlaying(const QString&, int samples);
 	void playNextFile();
 	void stopSlotCalled(bool); 
 
