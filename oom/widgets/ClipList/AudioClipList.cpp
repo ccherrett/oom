@@ -562,6 +562,7 @@ void AudioClipList::playClicked(bool state)/*{{{*/
 					{
 						m_seekSlider->setValue(0);
 						player.seek(0);
+						player.setVolume(m_slider->value());
 					}
 					if(player.isPlaying())
 						player.stop();
