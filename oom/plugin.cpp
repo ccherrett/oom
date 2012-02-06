@@ -274,9 +274,14 @@ QString SynthPluginDevice::open()
             m_audioTrack = new SynthPluginTrack();
             m_plugin->setTrack(m_audioTrack);
             audio->msgAddPlugin(m_audioTrack, 0, m_plugin);
-            
+
             m_plugin->setActive(true);
             return QString("OK");
+        }
+        else
+        {
+            m_audioTrack = 0;
+            m_plugin->setTrack(0);
         }
     }
 
@@ -296,8 +301,14 @@ void SynthPluginDevice::close()
 
     if (m_plugin)
     {
-        m_plugin->aboutToRemove();
+        if (m_audioTrack)
+        {
+            audio->msgAddPlugin(m_audioTrack, 0, 0);
+            delete m_audioTrack;
+        }
+
         m_plugin->setTrack(0);
+        m_plugin->aboutToRemove();
 
         // Delete the appropriate class
         switch(m_plugin->type())
@@ -315,12 +326,6 @@ void SynthPluginDevice::close()
             break;
         }
         m_plugin = 0;
-    }
-
-    if (m_audioTrack)
-    {
-        audio->msgAddPlugin(m_audioTrack, 0, 0);
-        delete m_audioTrack;
     }
 }
 
