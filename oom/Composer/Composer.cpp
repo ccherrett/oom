@@ -968,14 +968,16 @@ void Composer::updateTabs()/*{{{*/
 		}
 		else
 		{
+			if(_rtabs->currentIndex() == 1)
+				_rtabs->setCurrentIndex(0);
 			_rtabs->setTabEnabled(1, false);
-			_rtabs->setCurrentIndex(0);
 		}
 	}
 	else
 	{
+		if(_rtabs->currentIndex() == 1)
+			_rtabs->setCurrentIndex(0);
 		_rtabs->setTabEnabled(1, false);
-		_rtabs->setCurrentIndex(0);
 	}
 }/*}}}*/
 
