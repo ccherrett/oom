@@ -411,9 +411,9 @@ public:
 
     void aboutToRemove()
     {
-        m_proc_lock.lock();
+        bool blocked = m_proc_lock.tryLock();
         m_enabled = false;
-        m_proc_lock.unlock();
+        if (blocked) m_proc_lock.unlock();
     }
 
     void process_synth(MPEventList* eventList)
