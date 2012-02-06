@@ -747,7 +747,7 @@ public:
     {
         return true;
     }
-    
+
     bool duplicated() const
     {
         return m_duplicated;
@@ -817,7 +817,7 @@ public:
 protected:
     virtual bool putMidiEvent(const MidiPlayEvent&)
     {
-        //qWarning("SynthPluginDevice::putMidiEvent()");
+        qWarning("SynthPluginDevice::putMidiEvent()");
         return true;
     }
 

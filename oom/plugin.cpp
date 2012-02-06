@@ -273,6 +273,7 @@ QString SynthPluginDevice::open()
             
             m_audioTrack = new SynthPluginTrack();
             m_plugin->setTrack(m_audioTrack);
+            audio->msgAddPlugin(m_audioTrack, 0, m_plugin);
             
             m_plugin->setActive(true);
             return QString("OK");
@@ -317,7 +318,10 @@ void SynthPluginDevice::close()
     }
 
     if (m_audioTrack)
+    {
+        audio->msgAddPlugin(m_audioTrack, 0, 0);
         delete m_audioTrack;
+    }
 }
 
 //---------------------------------------------------------

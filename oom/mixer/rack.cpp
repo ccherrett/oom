@@ -143,7 +143,8 @@ void EffectRack::segmentSizeChanged(int size)
     {
         if ((*pipe)[i])
         {
-            (*pipe)[i]->bufferSizeChanged(size);
+            // FIXME - this needs to happen on the same call as jack-buffer-size change callback
+            //(*pipe)[i]->bufferSizeChanged(size);
         }
     }
 }
