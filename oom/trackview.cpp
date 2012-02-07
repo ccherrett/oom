@@ -367,13 +367,8 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 void TrackView::TrackSettings::write(int level, Xml& xml) const/*{{{*/
 {
 	std::string tag = "trackSettings";
-	xml.put(level, "<%s>", tag.c_str());
-	level++;
-	xml.strTag(level, "pname", pname.toUtf8().constData());
-	xml.intTag(level, "program", program);
-	xml.intTag(level, "rec", rec);
-	xml.intTag(level, "transpose", transpose);
-    xml.put(--level, "</%s>", tag.c_str());
+	xml.put(level, "<%s pname=\"%s\" program=\"%d\" rec=\"%d\" transpose=\"%d\" />",
+			tag.c_str(), Xml:xmlString(pname).toUtf8().constData(), program, rec, transpose);
 }/*}}}*/
 
 void TrackView::TrackSettings::read(Xml& xml)/*{{{*/
@@ -392,7 +387,8 @@ void TrackView::TrackSettings::read(Xml& xml)/*{{{*/
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if(tag == "pname")
+				//Backwards compat
+				if(tag == "pname")/*{{{*/
 				{
 					pname = xml.parse1();
 				}
@@ -418,9 +414,25 @@ void TrackView::TrackSettings::read(Xml& xml)/*{{{*/
 				else if(tag == "transpose")
 				{
 					transpose = xml.parseInt();
-				}
+				}/*}}}*/
 				break;
 			case Xml::Attribut:
+				if(tag == "pname")/*{{{*/
+				{
+					pname = xml.s2();
+				}
+				else if(tag == "rec")
+				{
+					rec = (bool)xml.s2().toInt();
+				}
+				else if(tag == "program")
+				{
+					program = (bool)xml.s2().toInt();
+				}
+				else if(tag == "transpose")
+				{
+					transpose = xml.s2().toInt();
+				}/*}}}*/
 				break;
 			case Xml::TagEnd:
 				if(tag == "trackSettings" || tag == "tracksettings")
