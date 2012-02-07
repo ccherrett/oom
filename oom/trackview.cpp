@@ -368,7 +368,7 @@ void TrackView::TrackSettings::write(int level, Xml& xml) const/*{{{*/
 {
 	std::string tag = "trackSettings";
 	xml.put(level, "<%s pname=\"%s\" program=\"%d\" rec=\"%d\" transpose=\"%d\" />",
-			tag.c_str(), Xml:xmlString(pname).toUtf8().constData(), program, rec, transpose);
+			tag.c_str(), Xml::xmlString(pname).toUtf8().constData(), program, rec, transpose);
 }/*}}}*/
 
 void TrackView::TrackSettings::read(Xml& xml)/*{{{*/
