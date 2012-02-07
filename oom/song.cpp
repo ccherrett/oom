@@ -3767,7 +3767,7 @@ void Song::updateTrackViews()
 		TrackView* it = _tviews.value(tvid);
 		if(it && it->selected())
 		{
-			qDebug("Song::updateTrackViews Found TrackView %s", it->viewName().toUtf8().constData());
+			//qDebug("Song::updateTrackViews Found TrackView %s", it->viewName().toUtf8().constData());
 			customview = true;
 			viewselected = true;
 			QList<qint64> *tlist = it->trackIndexList();
@@ -3780,10 +3780,10 @@ void Song::updateTrackViews()
 				TrackView::TrackViewTrack *tvt = tvlist->value(tid);
 				if(tvt)
 				{
-					qDebug("Song::updateTrackViews found TrackView::TrackViewTrack for view ~~~~~~~~~~~%lld", tid);
+					//qDebug("Song::updateTrackViews found TrackView::TrackViewTrack for view ~~~~~~~~~~~%lld", tid);
 					if(tvt->is_virtual)
 					{//Do nothing here, this is handled in TrackViewDock::updateTrackView
-						qDebug("Song::updateTrackViews found virtual track skipping here ~~~~~~~~~~~%lld", tvt->id);
+						//qDebug("Song::updateTrackViews found virtual track skipping here ~~~~~~~~~~~%lld", tvt->id);
 						continue;
 					}
 					else
@@ -3791,7 +3791,7 @@ void Song::updateTrackViews()
 						Track *t = findTrackById(tid);
 						if(t)
 						{
-							qDebug("Song::updateTrackViews found track in song ~~~~~~~~~~~ %s", t->name().toUtf8().constData());
+							//qDebug("Song::updateTrackViews found track in song ~~~~~~~~~~~ %s", t->name().toUtf8().constData());
 							bool found = false;
 							t->setSelected(false);
 							if(workview && t->parts()->empty()) {
@@ -3807,7 +3807,7 @@ void Song::updateTrackViews()
 							}
 							if(!found)
 							{
-								qDebug("Song::updateTrackViews adding track view ~~~~~~~~~~~ %s", t->name().toUtf8().constData());
+								//qDebug("Song::updateTrackViews adding track view ~~~~~~~~~~~ %s", t->name().toUtf8().constData());
 								_viewtracks.push_back(t);
 								m_viewTracks[tid] = t;
 								t->setRecordFlag1(it->record());
