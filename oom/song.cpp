@@ -3677,7 +3677,7 @@ void Song::removeInstrumentTemplate(qint64 id)
 
 TrackView* Song::addInstrumentTemplate()
 {
-	TrackView* tv = new TrackView();
+	TrackView* tv = new TrackView(true);
 	tv->setDefaultName();
 	m_instrumentTemplates[tv->id()] = tv;
 
@@ -3720,7 +3720,7 @@ TrackView* Song::findTrackViewByTrackId(qint64 tid)
 	while(iter.hasNext())
 	{	
 		iter.next();
-		QList<qint64> *list = iter.value()->tracks();
+		QList<qint64> *list = iter.value()->trackIndexList();
 		if(list->contains(tid))
 			return iter.value();
 	}
@@ -3767,35 +3767,54 @@ void Song::updateTrackViews()
 		TrackView* it = _tviews.value(tvid);
 		if(it && it->selected())
 		{
-			QList<qint64> *tlist = it->tracks();
-			for(int i = 0; i < tlist->size(); ++i)
+			qDebug("Song::updateTrackViews Found TrackView %s", it->viewName().toUtf8().constData());
+			customview = true;
+			viewselected = true;
+			QList<qint64> *tlist = it->trackIndexList();
+			QMap<qint64, TrackView::TrackViewTrack*> *tvlist = it->tracks();
+			for(int c = 0; c < tlist->size(); ++c)
 			{
-				qint64 tid  = tlist->at(i);
-				Track *t = findTrackById(tid);
-				if(t)
+				qint64 tid = tlist->at(c);
+				if(tid == m_masterId)
+					continue;
+				TrackView::TrackViewTrack *tvt = tvlist->value(tid);
+				if(tvt)
 				{
-					bool found = false;
-					t->setSelected(false);
-					if((workview && t->parts()->empty()) || t == master) {
+					qDebug("Song::updateTrackViews found TrackView::TrackViewTrack for view ~~~~~~~~~~~%lld", tid);
+					if(tvt->is_virtual)
+					{//Do nothing here, this is handled in TrackViewDock::updateTrackView
+						qDebug("Song::updateTrackViews found virtual track skipping here ~~~~~~~~~~~%lld", tvt->id);
 						continue;
 					}
-					//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
-					if(m_viewTracks.contains(tid))
+					else
 					{
-						found = true;
-						//Make sure to record arm the ones that were in other views as well
-						t->setRecordFlag1(it->record());
-						t->setRecordFlag2(it->record());
-					}
-					if(!found)
-					{
-						_viewtracks.push_back(t);
-						m_viewTracks[tid] = t;
-						t->setRecordFlag1(it->record());
-						t->setRecordFlag2(it->record());
-						m_trackIndex.append(it->id());
-						customview = true;
-						viewselected = true;
+						Track *t = findTrackById(tid);
+						if(t)
+						{
+							qDebug("Song::updateTrackViews found track in song ~~~~~~~~~~~ %s", t->name().toUtf8().constData());
+							bool found = false;
+							t->setSelected(false);
+							if(workview && t->parts()->empty()) {
+								continue;
+							}
+							//printf("Adding track to view %s\n", (*t)->name().toStdString().c_str());
+							if(m_viewTracks.contains(tid))
+							{
+								found = true;
+								//Make sure to record arm the ones that were in other views as well
+								t->setRecordFlag1(it->record());
+								t->setRecordFlag2(it->record());
+							}
+							if(!found)
+							{
+								qDebug("Song::updateTrackViews adding track view ~~~~~~~~~~~ %s", t->name().toUtf8().constData());
+								_viewtracks.push_back(t);
+								m_viewTracks[tid] = t;
+								t->setRecordFlag1(it->record());
+								t->setRecordFlag2(it->record());
+								m_trackIndex.append(it->id());
+							}
+						}
 					}
 				}
 			}
@@ -3807,32 +3826,37 @@ void Song::updateTrackViews()
 		TrackView* ait = _autotviews.value(tvid);
 		if(customview && (ait && ait->id() == m_workingViewId))
 		{
-			qDebug("Song::updateTrackViews: skipping working View");
+			//qDebug("Song::updateTrackViews: skipping working View");
 			continue;
 		}
 		if(ait && ait->selected())/*{{{*/
 		{
 			qDebug("Song::updateTrackViews: Selected View: %s", ait->viewName().toUtf8().constData());
 			viewselected = true;
-			QList<qint64> *atlist = ait->tracks();
-			for(int i = 0; i < atlist->size();  ++i)
+			QList<qint64> *tlist = ait->trackIndexList();
+			QMap<qint64, TrackView::TrackViewTrack*> *tvlist = ait->tracks();
+			for(int c = 0; c < tlist->size(); ++c)
 			{
-				//itr.next();
-				Track* t = m_tracks.value(atlist->at(i));//itr.value();
-				if(t)
-				{
-					t->setSelected(false);
-					if(t == master)
-						continue;
-					if(!m_viewTracks.contains(t->id()))
+				qint64 i = tlist->at(c);
+				TrackView::TrackViewTrack *tvt = tvlist->value(i);
+				if(tvt)
+				{//There will never be virtual tracks in these views
+					Track* t = m_tracks.value(tvt->id);
+					if(t)
 					{
-						if((t->type() == Track::MIDI || t->type() == Track::WAVE) && workview && t->parts()->empty())
+						t->setSelected(false);
+						if(t == master)
 							continue;
-						if(t->comment().isEmpty() && commentview)
-							continue;
-						_viewtracks.push_back(t);
-						m_viewTracks[t->id()] = t;
-						m_trackIndex.append(t->id());
+						if(!m_viewTracks.contains(t->id()))
+						{
+							if((t->type() == Track::MIDI || t->type() == Track::WAVE) && workview && t->parts()->empty())
+								continue;
+							if(t->comment().isEmpty() && commentview)
+								continue;
+							_viewtracks.push_back(t);
+							m_viewTracks[t->id()] = t;
+							m_trackIndex.append(t->id());
+						}
 					}
 				}
 			}
@@ -4149,12 +4173,8 @@ void Song::removeTrackRealtime(Track* track)
 	while(tv)
 	{
 		updateview = true;
-		QList<qint64> *tvl = tv->tracks();
-		if(tvl)
-		{
-			tvl->removeAll(track->id());
-		}
-		tv = findTrackViewById(track->id());
+		tv->removeTrack(track->id());
+		tv = findTrackViewByTrackId(track->id());
 	}
 	updateTrackViews();
 

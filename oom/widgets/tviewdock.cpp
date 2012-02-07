@@ -15,6 +15,7 @@
 #include "trackview.h"
 #include "tvieweditor.h"
 #include "Composer.h"
+#include "TrackManager.h"
 
 #include "icons.h"
 #include <QStandardItemModel>
@@ -55,6 +56,7 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	connect(_tableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(trackviewChanged(QStandardItem*)));
 	connect(_autoTableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(autoTrackviewChanged(QStandardItem*)));
 	connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(contextPopupMenu(QPoint)));
+	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
 	populateTable(-1);
 	//updateTableHeader();
@@ -88,7 +90,6 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 			TrackView* tv = tvlist->value(tvid);
 			if(tv)
 			{
-				//QList<QStandardItem*> rowData;
 				QStandardItem *chk = new QStandardItem(tv->viewName());
 				chk->setCheckable(true);
 				chk->setCheckState(tv->selected() ? Qt::Checked : Qt::Unchecked);
@@ -110,21 +111,15 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 			TrackView* v = tvlist->value(idlist->at(i));;
 			if(v)
 			{
-				//QList<QStandardItem*> rowData2;
 				QStandardItem *chk = new QStandardItem(v->viewName());
 				chk->setCheckable(true);
 				chk->setCheckState(v->selected() ? Qt::Checked : Qt::Unchecked);
-				//QStandardItem *tname = new QStandardItem(v->viewName());
 				chk->setData(v->id());
 				if(v->id() != song->workingViewId() && v->id() != song->commentViewId())
 				{
-					//chk->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(i)))));
-					//tname->setForeground(QBrush(QColor(g_trackColorListSelected.value(list.at(index)))));
 					chk->setIcon(m_icons.at(icon_index));
 					++icon_index;
 				}
-				//rowData2.append(chk);
-				//rowData2.append(tname);
 				_autoTableModel->blockSignals(true);
 				_autoTableModel->insertRow(_autoTableModel->rowCount(), chk);
 				_autoTableModel->blockSignals(false);
@@ -134,11 +129,6 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 		updateTableHeader();
 		tableView->resizeRowsToContents();
 		autoTable->resizeRowsToContents();
-		//if(bar)
-		//{
-		//	qDebug() << "Setting ScrollBar position to: " << barPos;
-		//	bar->setSliderPosition(barPos);
-		//}
 	}
 }/*}}}*/
 
@@ -146,18 +136,15 @@ void TrackViewDock::trackviewChanged(QStandardItem *item)/*{{{*/
 {
 	if(item)
 	{
-		/*int row = item->row();
-		QStandardItem *tname = _tableModel->item(row, 1);
-		QStandardItem *chk = _tableModel->item(row, 0);
-		if(tname)
-		{*/
-			TrackView* tv = song->findTrackViewById(item->data().toLongLong());
-			if(tv)
-			{
-				tv->setSelected(item->checkState() == Qt::Checked);
-				song->updateTrackViews();
-			}
-		//}
+		qint64 id = item->data().toLongLong();
+		//qDebug("TrackViewDock::trackviewChanged: id %lld", id);
+		TrackView* tv = song->findTrackViewById(id);
+		if(tv)
+		{
+			//qDebug("TrackViewDock::trackviewChanged: Found trackview %s", tv->viewName().toUtf8().constData());
+			tv->setSelected(item->checkState() == Qt::Checked);
+			song->updateTrackViews();
+		}
 	}
 }/*}}}*/
 
@@ -165,20 +152,14 @@ void TrackViewDock::autoTrackviewChanged(QStandardItem *item)/*{{{*/
 {
 	if(item)
 	{
-		//int row = item->row();
-		//QStandardItem *tname = _autoTableModel->item(row, 1);
-		//QStandardItem *chk = _autoTableModel->item(row, 0);
-		//if(tname)
-		//{
-			TrackViewList* tvlist = song->autoviews();
-			TrackView* tv = tvlist->value(item->data().toLongLong());//song->findAutoTrackView(tname->text());
-			if(tv)
-			{
-				qDebug("TrackViewDock::autoTrackviewChanged found track view: %s", item->text().toUtf8().constData());
-				tv->setSelected(item->checkState() == Qt::Checked);
-				song->updateTrackViews();
-			}
-		//}
+		TrackViewList* tvlist = song->autoviews();
+		TrackView* tv = tvlist->value(item->data().toLongLong());//song->findAutoTrackView(tname->text());
+		if(tv)
+		{
+			//qDebug("TrackViewDock::autoTrackviewChanged found track view: %s", item->text().toUtf8().constData());
+			tv->setSelected(item->checkState() == Qt::Checked);
+			song->updateTrackViews();
+		}
 	}
 }/*}}}*/
 
@@ -186,25 +167,17 @@ void TrackViewDock::updateTrackView(int table, QStandardItem *item)/*{{{*/
 {
 	if(item)
 	{
-		/*int row = item->row();
-		QStandardItem *tname;
+		TrackView* tv;
 		if(table)
-			tname = _autoTableModel->item(row, 1);
+			tv = song->findAutoTrackView(item->text());
 		else
-			tname = _tableModel->item(row, 1);
-		if(tname)
-		{*/
-			TrackView* tv;
-			if(table)
-				tv = song->findAutoTrackView(item->text());
-			else
-				tv = song->findTrackViewById(item->data().toLongLong());
-			if(tv)
-			{
-				tv->setSelected((item->checkState() == Qt::Checked) ? true : false);
-				song->updateTrackViews();
-			}
-		//}
+			tv = song->findTrackViewById(item->data().toLongLong());
+		if(tv)
+		{
+			tv->setSelected((item->checkState() == Qt::Checked) ? true : false);
+			//TODO: If checked and it has virtual track prompt the user to create them before calling updateTrackViews
+			song->updateTrackViews();
+		}
 	}
 }/*}}}*/
 
@@ -222,6 +195,33 @@ void TrackViewDock::btnTVClicked(bool)
 	tve->show();
 }
 
+void TrackViewDock::currentTabChanged(int index)
+{
+	switch(index)
+	{
+		case 0:
+		{
+			btnUp->setEnabled(true);
+			btnDown->setEnabled(true);
+			chkViewAll->setEnabled(true);
+			chkViewAll->setToolTip(tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:'Luxi Serif'; font-size:10pt; font-weight:400; font-style:normal;\">\n<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">View <span style=\" font-weight:600;\">all</span> available tracks in TrackView context menu.</p>\n<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Leave unchecked to view only the tracks that contain <span style=\" font-weight:600;\">no parts</span></p></body></html>"));
+			btnTV->setToolTip(tr("Create and Manage Views"));
+			btnDelete->setToolTip(tr("Delete Views"));
+		}
+		break;
+		case 1:
+		{
+			btnUp->setEnabled(false);
+			btnDown->setEnabled(false);
+			chkViewAll->setEnabled(false);
+			chkViewAll->setToolTip("");
+			btnTV->setToolTip(tr("Create and Manage Instrument Templates"));
+			btnDelete->setToolTip(tr("Delete Instrument Templates"));
+		}
+		break;
+	}
+}
+
 void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 {
 	QModelIndex index = tableView->indexAt(pos);
@@ -230,34 +230,56 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 	QStandardItem* item = _tableModel->itemFromIndex(index);
 	if(item)
 	{
-		//Make it works even if you rightclick on the checkbox
-		//QStandardItem* tvcol = _tableModel->item(item->row(), 1);
-		//if(tvcol)
-		//{
-			TrackView *tv = song->findTrackViewById(item->data().toLongLong());
-			if(tv)
-			{
-				QMenu* p = new QMenu(this);
-				TrackViewMenu *itemMenu = new TrackViewMenu(p, tv, (chkViewAll->checkState() == Qt::Checked));
-				p->addAction(itemMenu);
+		TrackView *tv = song->findTrackViewById(item->data().toLongLong());
+		if(tv)
+		{
+			QMenu* p = new QMenu(this);
+			TrackViewMenu *itemMenu = new TrackViewMenu(p, tv, (chkViewAll->checkState() == Qt::Checked));
+			p->addAction(itemMenu);
 
-				QAction* act = p->exec(QCursor::pos());
-				if (act)
+			QAction* act = p->exec(QCursor::pos());
+			if (act)
+			{
+				qint64 tid = act->data().toLongLong();
+				TrackView::TrackViewTrack *tvt = tv->tracks()->value(tid);
+				Track* track = song->findTrackById(tid);
+				if(track)
 				{
-					QString tname = act->data().toString();
-					Track* track = song->findTrack(tname);
-					if(track)
-					{
-						if(track->type() == Track::WAVE)
-							oom->importWave(track);
-						else
-							oom->composer->addCanvasPart(track);
-						song->updateTrackViews();
+					if(track->type() == Track::WAVE)
+						oom->importWave(track);
+					else
+						oom->composer->addCanvasPart(track);
+					song->updateTrackViews();
+				}
+				else
+				{//This must be a virtual track try and find it
+					VirtualTrack* vt = tv->virtualTracks()->value(tid);
+					if(vt)
+					{//Let create the real track and add a part to it
+						TrackManager *tman = new TrackManager();
+						qint64 id = tman->addTrack(vt);
+						if(id)
+						{//Copy any settings for that track, delete the virtual track and add the real track to the view
+							TrackView::TrackViewTrack *ntvl = new TrackView::TrackViewTrack(id);
+							ntvl->setSettingsCopy(tvt->settings);
+							tv->addTrack(ntvl);
+							Track* track = song->findTrackByIdAndType(id, vt->type);
+							if(track)
+							{
+								if(track->type() == Track::WAVE)
+									oom->importWave(track);
+								else
+									oom->composer->addCanvasPart(track);
+								song->updateTrackViews();
+							}
+							tv->removeVirtualTrack(tid);
+							tv->removeTrack(tvt);
+						}
 					}
 				}
-				delete p;
 			}
-		//}
+			delete p;
+		}
 	}
 }/*}}}*/
 
@@ -283,9 +305,7 @@ void TrackViewDock::btnUpClicked(bool)/*{{{*/
 				song->insertTrackView(tv, row);
 			}
 		}
-		//_selModel->blockSignals(true);
 		tableView->selectRow(row);
-		//_selModel->blockSignals(false);
 	}
 }/*}}}*/
 
@@ -302,7 +322,6 @@ void TrackViewDock::btnDownClicked(bool)/*{{{*/
 		QStandardItem* txt = item.at(0);
 		if(txt)
 		{
-			//QString tname = txt->text();
 			TrackView* tv = song->findTrackViewById(txt->data().toLongLong());
 			if(tv)
 			{
@@ -310,9 +329,7 @@ void TrackViewDock::btnDownClicked(bool)/*{{{*/
 				song->insertTrackView(tv, row);
 			}
 		}
-		//_selModel->blockSignals(true);
 		tableView->selectRow(row);
-		//_selModel->blockSignals(false);
 	}
 }/*}}}*/
 
@@ -322,6 +339,7 @@ void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 	if (!rows.isEmpty())
 	{
 		QList<TrackView*> dlist;
+		QStringList list;
 		foreach (int r, rows)
 		{
 			QStandardItem *item = _tableModel->item(r);
@@ -331,14 +349,22 @@ void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 				if(tv)
 				{
 					dlist.append(tv);
+					list.append(tv->viewName());
 				}
 			}
 		}
 		if (!dlist.isEmpty())
 		{
-			for (int d = 0; d < dlist.size(); ++d)
+			QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
+			if(QMessageBox::question(this, 
+				tr("Delete"),
+				msg.arg(list.join("\n")),
+				QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
 			{
-				song->removeTrackView(dlist.at(d)->id());
+				for (int d = 0; d < dlist.size(); ++d)
+				{
+					song->removeTrackView(dlist.at(d)->id());
+				}
 			}
 		}
 	}
@@ -378,7 +404,7 @@ void TrackViewDock::updateTableHeader()/*{{{*/
 	templateView->horizontalHeader()->setStretchLastSection(true);
 }/*}}}*/
 
-void TrackViewDock::selectStaticView(int n)
+void TrackViewDock::selectStaticView(int n)/*{{{*/
 {
 	Track::TrackType type = (Track::TrackType)n;
 	QStandardItem *item = 0;
@@ -403,4 +429,4 @@ void TrackViewDock::selectStaticView(int n)
 	{
 		item->setCheckState(Qt::Checked);
 	}
-}
+}/*}}}*/

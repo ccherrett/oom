@@ -18,11 +18,12 @@
 #include "track.h"
 #include "TrackManager.h"
 
-TrackView::TrackView()
+TrackView::TrackView(bool istemplate)
 {
+	m_id = create_id();
 	_selected = false;
 	_recState = false;
-	m_id = create_id();
+	m_template = istemplate;
 }
 
 TrackView::~TrackView()
@@ -40,7 +41,11 @@ QString TrackView::getValidName(QString text)
 {
 	QString spc(" ");
 	QString rv = text;
-	TrackViewList* tv = song->trackviews();
+	TrackViewList* tv;
+	if(m_template)
+		tv = song->instrumentTemplates();
+	else
+		tv = song->trackviews();
 	QHash<qint64, TrackView*>::const_iterator iter = tv->constBegin();
 	int c = 1;
 	while(iter != tv->constEnd())
@@ -64,13 +69,33 @@ QString TrackView::getValidName(QString text)
 
 void TrackView::addTrack(qint64 id)/*{{{*/
 {
-	m_tracks.append(id);
+	m_tracks[id] = new TrackView::TrackViewTrack(id);
+	m_tracksIndex.append(id);
 }/*}}}*/
+
+void TrackView::addTrack(TrackView::TrackViewTrack* t)
+{
+	m_tracks[t->id] = t;
+	m_tracksIndex.append(t->id);
+}
 
 void TrackView::removeTrack(qint64 id)
 {
-	if(!m_tracks.isEmpty() && m_tracks.contains(id))
-		m_tracks.removeAll(id); //There should NEVER be duplicate ids in the system on anything
+	if(m_tracks.contains(id))
+	{
+		m_tracks.erase(m_tracks.find(id));
+		m_tracksIndex.removeAll(id);
+	}
+	//This needs to fire something so the gui gets updated
+}
+
+void TrackView::removeTrack(TrackView::TrackViewTrack *t)
+{
+	if(t && m_tracks.contains(t->id))
+	{
+		m_tracks.erase(m_tracks.find(t->id));
+		m_tracksIndex.removeAll(t->id);
+	}
 	//This needs to fire something so the gui gets updated
 }
 
@@ -81,25 +106,53 @@ void TrackView::addVirtualTrack(VirtualTrack* vt)
 		m_vtracks[vt->id] = vt;
 }
 
+qint64 TrackView::addVirtualTrackCopy(VirtualTrack* vt)
+{
+	VirtualTrack* v = new VirtualTrack;
+//{{{
+	v->type = vt->type;
+	v->name = vt->name;
+	v->instrumentName = vt->instrumentName;
+	v->instrumentType = vt->instrumentType;
+	v->autoCreateInstrument = vt->autoCreateInstrument;
+	v->createMidiInputDevice = vt->createMidiInputDevice;
+	v->createMidiOutputDevice = vt->createMidiOutputDevice;
+	v->useInput = vt->useInput;
+	v->useOutput = vt->useOutput;
+	v->useMonitor = vt->useMonitor;
+	v->useBuss = vt->useBuss;
+	v->inputChannel = vt->inputChannel;
+	v->outputChannel = vt->outputChannel;
+	v->inputConfig = vt->inputConfig;
+	v->outputConfig = vt->outputConfig;
+	v->monitorConfig = vt->monitorConfig;
+    v->monitorConfig2 = vt->monitorConfig2;
+	v->bussConfig = vt->bussConfig;
+//}}}
+	m_vtracks[v->id] = v;
+	return v->id;
+}
+
 void TrackView::removeVirtualTrack(qint64 tvid)
 {
 	m_vtracks.erase(m_vtracks.find(tvid));
 }
 
 void TrackView::setSelected(bool f)
-{
+{//TODO: Add code to deal with selection when virtual tracks exists
 	_selected = f;
 	if(f)
 	{
-		foreach(qint64 id, m_tracks)/*{{{*/
+		foreach(qint64 id, m_tracksIndex)/*{{{*/
 		{
 			Track* it = song->findTrackById(id);
+			TrackViewTrack* tvt = m_tracks.value(id);
 			if(it)
 			{
-				if(it->isMidiTrack() && hasSettings(id))
+				if(it->isMidiTrack() && tvt->hasSettings() && !tvt->is_virtual)
 				{
 					MidiTrack* track = (MidiTrack*)it;
-					TrackSettings* tset = _tSettings[id];
+					TrackSettings* tset = tvt->settings;
 					if(tset)
 					{
 						if(tset->transpose != 0)
@@ -125,15 +178,16 @@ void TrackView::setSelected(bool f)
 	}
 	else
 	{
-		foreach(qint64 id, m_tracks)/*{{{*/
+		foreach(qint64 id, m_tracksIndex)/*{{{*/
 		{
 			Track* it = song->findTrackById(id);
+			TrackViewTrack* tvt = m_tracks.value(id);
 			if(it)
 			{
-				if(it->isMidiTrack() && hasSettings(id))
+				if(it->isMidiTrack() && tvt->hasSettings() && !tvt->is_virtual)
 				{
 					MidiTrack* track = (MidiTrack*) it;
-					TrackSettings* tset = _tSettings[id];
+					TrackSettings* tset = tvt->settings;
 					if(tset)
 					{
 						if(tset->transpose != 0)
@@ -152,6 +206,14 @@ void TrackView::setSelected(bool f)
 		}/*}}}*/
 	}
 }
+
+void TrackView::clear()
+{
+	m_tracks.clear();
+	m_tracksIndex.clear();
+	m_vtracks.clear();
+}
+
 //---------------------------------------------------------
 //   TrackView::read
 //---------------------------------------------------------
@@ -168,10 +230,22 @@ void TrackView::read(Xml& xml)/*{{{*/
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if (tag == "id")
+				if (tag == "id")/*{{{*/
 				{
 					m_id = xml.parseLongLong();
 				}
+				else if(tag == "selected")
+				{
+					_selected = (bool)xml.parseInt();
+				}
+				else if(tag == "template")
+				{
+					m_template = xml.parseInt();
+				}
+				else if(tag == "record")
+				{
+					_recState = (bool)xml.parseInt();
+				}/*}}}*/
 				else if(tag == "name")
 				{
 					_name = xml.parse1();
@@ -180,17 +254,23 @@ void TrackView::read(Xml& xml)/*{{{*/
 				{
 					_comment = xml.parse1();
 				}
-				else if(tag == "selected")
-				{
-					_selected = (bool)xml.parseInt();
+				else if(tag == "virtualTrack")
+				{//TODO: Virtual track read code;
+					//skip for now
+					VirtualTrack* vt = new VirtualTrack;
+					vt->read(xml);
+					m_vtracks[vt->id] = vt;
 				}
-				else if(tag == "record")
+				else if(tag == "trackViewTrack")
 				{
-					_recState = (bool)xml.parseInt();
+					TrackView::TrackViewTrack* tvt = new TrackView::TrackViewTrack;
+					tvt->read(xml);
+					addTrack(tvt);
 				}
 				else if (tag == "vtrack")
-				{
-					//Deal with old style
+				{//vtrack is being phased out
+					//Deal with old style, we still have an addTrack that will create a new object from id
+					//Later we add the settings to that object
 					bool ok;
 					QString stid = xml.parse1();
 					qint64 tid = stid.toLongLong(&ok);
@@ -210,14 +290,38 @@ void TrackView::read(Xml& xml)/*{{{*/
 					}
 				}
 				else if(tag == "tracksettings")
-				{
+				{//This tag should ONLY exist at this level in old files, so we convert them silently - Andrew
 					TrackSettings *ts = new TrackSettings;
 					ts->valid = true;
 					ts->read(xml);
-					_tSettings[ts->tid] = ts;
+					foreach(TrackViewTrack *t, m_tracks)
+					{
+						if(t->id == ts->tid)
+						{
+							t->settings = ts;
+							break;
+						}
+					}
+					//_tSettings[ts->tid] = ts;
 				}
 				break;
 			case Xml::Attribut:
+				if (tag == "id")
+				{
+					m_id = xml.s2().toLongLong();
+				}
+				else if(tag == "selected")
+				{
+					_selected = (bool)xml.s2().toInt();
+				}
+				else if(tag == "template")
+				{
+					m_template = xml.s2().toInt();
+				}
+				else if(tag == "record")
+				{
+					_recState = (bool)xml.s2().toInt();
+				}
 				break;
 			case Xml::TagEnd:
 				if(tag == "trackview")
@@ -240,33 +344,31 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 {
 	std::string tag = "trackview";
 
-	xml.put(level, "<%s>", tag.c_str());//, _name.toStdString().c_str(), _selected, _type);
+	xml.put(level, "<%s id=\"%lld\" record=\"%d\" selected=\"%d\" template=\"%d\">", tag.c_str(), m_id, _recState, _selected, m_template);
 	level++;
 	xml.strTag(level, "name", _name);
-	xml.intTag(level, "selected", _selected);
-	xml.intTag(level, "record", _recState);
 	if(!_comment.isEmpty())
 		xml.strTag(level, "comment", Xml::xmlString(_comment).toUtf8().constData());
 
-	//for(iTrack* t = _tracks.begin(); t != _tracks.end(); ++t)
-	foreach(qint64 id, m_tracks)
-	{
-		xml.qint64Tag(level, "vtrack", id);
-	}
-	QMapIterator<qint64, TrackSettings*> ts(_tSettings);
+	QMapIterator<qint64, VirtualTrack*> ts(m_vtracks);
 	while(ts.hasNext())
 	{
 		ts.next();
 		ts.value()->write(level, xml);
 	}
+	foreach(TrackView::TrackViewTrack *t, m_tracks)
+	{
+		t->write(level, xml);
+		//xml.qint64Tag(level, "vtrack", id);
+	}
     xml.put(--level, "</%s>", tag.c_str());
 }/*}}}*/
 
-void TrackSettings::write(int level, Xml& xml) const/*{{{*/
+void TrackView::TrackSettings::write(int level, Xml& xml) const/*{{{*/
 {
-	std::string tag = "tracksettings";
+	std::string tag = "trackSettings";
 	xml.put(level, "<%s>", tag.c_str());
-	xml.qint64Tag(level, "trackId", tid);
+	level++;
 	xml.strTag(level, "pname", pname.toUtf8().constData());
 	xml.intTag(level, "program", program);
 	xml.intTag(level, "rec", rec);
@@ -274,7 +376,7 @@ void TrackSettings::write(int level, Xml& xml) const/*{{{*/
     xml.put(--level, "</%s>", tag.c_str());
 }/*}}}*/
 
-void TrackSettings::read(Xml& xml)/*{{{*/
+void TrackView::TrackSettings::read(Xml& xml)/*{{{*/
 {
 	program = -1;
 	rec = 0;
@@ -303,7 +405,7 @@ void TrackSettings::read(Xml& xml)/*{{{*/
 				}
 				else if(tag == "trackId")
 				{
-					tid = xml.parse1().toLongLong();
+					tid = xml.parseLongLong();
 				}
 				else if(tag == "rec")
 				{
@@ -321,11 +423,70 @@ void TrackSettings::read(Xml& xml)/*{{{*/
 			case Xml::Attribut:
 				break;
 			case Xml::TagEnd:
-				if(tag == "tracksettings")
+				if(tag == "trackSettings" || tag == "tracksettings")
 					return;
 			default:
 				break;
 		}
 	}
 }/*}}}*/
+
+void TrackView::TrackViewTrack::setSettingsCopy(TrackView::TrackSettings* ts)
+{
+	if(ts)
+	{
+		settings = new TrackView::TrackSettings;
+		settings->pname = ts->pname;
+		settings->program = ts->program;
+		settings->rec = ts->rec;
+		settings->transpose = ts->transpose;
+	}
+}
+
+void TrackView::TrackViewTrack::write(int level, Xml& xml) const
+{
+	std::string tag = "trackViewTrack";
+	xml.put(level, "<%s trackId=\"%lld\" virtual=\"%d\">", tag.c_str(), id, is_virtual);
+	level++;
+	if(settings)
+		settings->write(level, xml);
+    xml.put(--level, "</%s>", tag.c_str());
+}
+
+void TrackView::TrackViewTrack::read(Xml& xml)
+{
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::TagStart:
+				if(tag == "trackSettings")
+				{
+					settings = new TrackSettings;
+					settings->read(xml);
+				}
+				break;
+			case Xml::Attribut:
+				if(tag == "trackId")
+				{
+					id = xml.s2().toLongLong();
+				}
+				else if(tag == "virtual")
+				{
+					is_virtual = xml.s2().toInt();
+				}
+				break;
+			case Xml::TagEnd:
+				if(tag == "trackViewTrack")
+					return;
+			default:
+				break;
+		}
+	}
+}
 

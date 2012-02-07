@@ -28,6 +28,7 @@ class TrackViewDock : public QFrame, public Ui::TViewDockBase {
 		void trackviewRemoved(QModelIndex, int, int);
 		void updateTrackView(int, QStandardItem*);
 		void contextPopupMenu(QPoint);
+		void currentTabChanged(int);
 	
 	protected:
 		QStandardItemModel* _tableModel;

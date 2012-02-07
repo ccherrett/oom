@@ -12,6 +12,8 @@
 #include <QPair>
 #include "utils.h"
 
+class Xml;
+
 struct VirtualTrack {
 
 	VirtualTrack()
@@ -49,6 +51,9 @@ struct VirtualTrack {
 	QPair<int, QString> monitorConfig;
     QPair<int, QString> monitorConfig2;
 	QPair<int, QString> bussConfig;
+	
+	void write(int level, Xml&) const;
+	void read(Xml&);
 };
 
 class TrackManager : public QObject{

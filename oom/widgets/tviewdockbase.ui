@@ -275,7 +275,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Create and manager track views</string>
+        <string>Create and Manage Views</string>
        </property>
        <property name="text">
         <string/>
@@ -344,6 +344,9 @@ p, li { white-space: pre-wrap; }
          <width>25</width>
          <height>25</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Delete Views</string>
        </property>
        <property name="text">
         <string/>

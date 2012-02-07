@@ -22,121 +22,113 @@
 class Xml;
 class VirtualTrack;
 
-struct TrackSettings {
-	bool valid;
-	int program;
-	QString pname;
-	int transpose;
-	bool rec;
-	qint64 tid;
-	virtual void write(int, Xml&) const;
-	virtual void read(Xml&);
-};
-
 //---------------------------------------------------------
 //   TrackView
 //---------------------------------------------------------
 
 class TrackView
 {
-	private:
-		QString _comment;
-		QList<qint64> m_tracks;
-		QMap<qint64, TrackSettings*> _tSettings;
-		QMap<qint64, TrackSettings*> m_vtrackSettings;
-		QMap<qint64, VirtualTrack*> m_vtracks;
-		bool _recState;
-		qint64 m_id;
-
-	protected:
-		QString _name;
-		
-		bool _selected;
-		bool readProperties(Xml& xml, const QString& tag);
-		void writeProperties(int level, Xml& xml) const;
-
-	public:
-		TrackView();
-		~TrackView();
-		qint64 id() { return m_id; }
-		QString getValidName(QString);
-		TrackView& operator=(const TrackView& g);
-		
-		static const char* _cname[];
-		
-		QString comment() const         { return _comment; }
-		void setComment(const QString& s) { _comment = s; }
-		
-		bool selected() const           { return _selected; }
-		void setSelected(bool f);
-		
-		const QString& viewName() const     { return _name; }
-		void setViewName(const QString& s)  { _name = s; }
-		void setDefaultName();
-
-		void addTrack(qint64);
-		
-		void removeTrack(qint64);
-		
-		QList<qint64>* tracks() { return &m_tracks; }
-
-		bool record() { return _recState; }
-		void setRecord(bool f) { _recState = f; }
-		QMap<qint64, TrackSettings*>* trackSettings() { return &_tSettings;}
-		QMap<qint64, TrackSettings*>* virtualTrackSettings() { return &m_vtrackSettings;}
-		void addTrackSetting(qint64 id, TrackSettings* settings) {/*{{{*/
-			_tSettings[id] = settings;
-		}
-		void removeTrackSettings(qint64 id)
-		{
-			if(hasSettings(id))
-			{
-				_tSettings.erase(_tSettings.find(id));
-			}
-		}
-		bool hasSettings(qint64 tid)
-		{
-			return _tSettings.contains(tid);
-		}
-		TrackSettings* getTrackSettings(qint64 id)
-		{
-			if(hasSettings(id))
-				return _tSettings[id];
-			else
-				return 0;
-		}/*}}}*/
-
-		QMap<qint64, VirtualTrack*> *virtualTracks()
-		{
-			return &m_vtracks;
-		}
-
-		void addVirtualTrack(VirtualTrack*);
-		void removeVirtualTrack(qint64 id);
-
-		void addVirtualTrackSetting(qint64 id, TrackSettings* settings) {/*{{{*/
-			m_vtrackSettings[id] = settings;
-		}
-		void removeVirtualTrackSettings(qint64 id)
-		{
-			if(hasVirtualTrackSettings(id))
-			{
-				m_vtrackSettings.erase(m_vtrackSettings.find(id));
-			}
-		}
-		bool hasVirtualTrackSettings(qint64 tid)
-		{
-			return m_vtrackSettings.contains(tid);
-		}
-		TrackSettings* getVirtualTrackSettings(qint64 id)
-		{
-			if(hasVirtualTrackSettings(id))
-				return m_vtrackSettings[id];
-			else
-				return 0;
-		}/*}}}*/
-		virtual void write(int, Xml&) const;
+public:
+	struct TrackSettings {
+		bool valid;
+		int program;
+		QString pname;
+		int transpose;
+		bool rec;
+		//Kept for migrating old files
+		qint64 tid;
+		void write(int, Xml&) const;
 		void read(Xml&);
+	};
+
+	struct TrackViewTrack {
+		TrackViewTrack()
+		{
+			settings = 0;
+			is_virtual = false;
+		}
+		TrackViewTrack(qint64 i)
+		{
+			id = i;
+			settings = 0;
+			is_virtual = false;
+		}
+		bool hasSettings()
+		{
+			return settings ? true : false; 
+		}
+		void setSettingsCopy(TrackSettings*);
+		qint64 id;
+		bool is_virtual;
+		TrackSettings *settings;
+		void write(int, Xml&) const;
+		void read(Xml&);
+	};
+private:
+	QString _comment;
+	QList<qint64> m_tracksIndex;
+	QMap<qint64, TrackViewTrack*> m_tracks;
+	QMap<qint64, VirtualTrack*> m_vtracks;
+	bool _recState;
+	qint64 m_id;
+	bool m_template;
+
+protected:
+	QString _name;
+	
+	bool _selected;
+	bool readProperties(Xml& xml, const QString& tag);
+	void writeProperties(int level, Xml& xml) const;
+
+public:
+
+	TrackView(bool istemplate = false);
+	~TrackView();
+	qint64 id() { return m_id; }
+	QString getValidName(QString);
+	TrackView& operator=(const TrackView& g);
+	
+	static const char* _cname[];
+	
+	QString comment() const         { return _comment; }
+	void setComment(const QString& s) { _comment = s; }
+	
+	bool selected() const           { return _selected; }
+	void setSelected(bool f);
+	
+	const QString& viewName() const     { return _name; }
+	void setViewName(const QString& s)  { _name = s; }
+	void setDefaultName();
+
+	void addTrack(qint64);
+	void addTrack(TrackViewTrack*);
+	
+	void removeTrack(qint64);
+	void removeTrack(TrackViewTrack*);
+	
+	QMap<qint64, TrackViewTrack*>* tracks() { return &m_tracks; }
+
+	QList<qint64> *trackIndexList()
+	{
+		return &m_tracksIndex;
+	}
+
+	bool record() { return _recState; }
+	void setRecord(bool f) { _recState = f; }
+
+	QMap<qint64, VirtualTrack*> *virtualTracks()
+	{
+		return &m_vtracks;
+	}
+
+	void addVirtualTrack(VirtualTrack*);
+	qint64 addVirtualTrackCopy(VirtualTrack*);
+	void removeVirtualTrack(qint64 id);
+
+	void clear();
+
+	virtual void write(int, Xml&) const;
+	void read(Xml&);
 };
 
 

@@ -24,6 +24,7 @@
 #include "gconfig.h"
 #include "config.h"
 #include "tviewmenu.h"
+#include "TrackManager.h"
 
 TrackViewMenu::TrackViewMenu(QMenu* parent, TrackView *t, bool v) : QWidgetAction(parent)
 {
@@ -50,28 +51,50 @@ QWidget* TrackViewMenu::createWidget(QWidget* parent)
 	list->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	layout->addWidget(list);
 	w->setLayout(layout);
-	//list->setFixedHeight(300);
-	int r = 0;
-	for (; r < m_trackview->tracks()->size(); ++r)
+	QList<qint64> *tidlist = m_trackview->trackIndexList();
+	QMap<qint64, TrackView::TrackViewTrack*> *tlist = m_trackview->tracks();
+	for(int i = 0; i < tidlist->size(); ++i)
 	{
-		Track *it = song->findTrackById(m_trackview->tracks()->at(r));
-		if(it)
+		qint64 tid = tidlist->at(i);
+		TrackView::TrackViewTrack* tvt = tlist->value(tid);
+		if(tvt)
 		{
-			if((it->type() == Track::MIDI || it->type() == Track::DRUM || it->type() == Track::WAVE) && (it->parts()->empty() || m_viewall))
+			if(tvt->is_virtual)
 			{
-				list->insertItem(r, it->name());
+				VirtualTrack* vt = m_trackview->virtualTracks()->value(tid);
+				if(vt)
+				{
+					if((vt->type == Track::MIDI || vt->type == Track::WAVE))
+					{
+						QListWidgetItem* item = new QListWidgetItem(QString(tr("Virtual: ")).append(vt->name));
+						item->setData(Qt::UserRole+3, vt->id);
+						list->addItem(item);
+					}
+				}
+			}
+			else
+			{
+				Track *it = song->findTrackById(tid);
+				if(it)
+				{
+					if((it->type() == Track::MIDI || it->type() == Track::WAVE) && (it->parts()->empty() || m_viewall))
+					{
+						QListWidgetItem* item = new QListWidgetItem(it->name());
+						item->setData(Qt::UserRole+3, it->id());
+						list->addItem(item);
+					}
+				}
 			}
 		}
 	}
-	if(!r)
+	if(!list->count())
 	{
-		list->insertItem(r, tr("<No Empty Tracks>"));
-		//list->setFixedHeight(60);
+		QListWidgetItem* item = new QListWidgetItem(tr("<No Empty Tracks>"));
+		item->setData(Qt::UserRole+3, -1);
+		list->addItem(item);
 		w->setFixedHeight(90);
 	}
 	connect(list, SIGNAL(itemPressed(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
-	//connect(list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
-	//connect(list, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(updateData(QListWidgetItem*)));
 	return w;//list;
 }
 
@@ -80,7 +103,7 @@ void TrackViewMenu::updateData(QListWidgetItem *item)
 	if(list && item)
 	{
 		//printf("Triggering Menu Action\n");
-		setData(item->text());
+		setData(item->data(Qt::UserRole+3));
 		
 		//FIXME: This is a seriously brutal HACK but its the only way I can get it to dismiss the menu
 		QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);

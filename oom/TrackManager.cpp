@@ -23,6 +23,7 @@
 #include "icons.h"
 #include "midimonitor.h"
 #include "plugin.h"
+#include "xml.h"
 
 
 TrackManager::TrackManager()
@@ -1293,77 +1294,6 @@ void TrackManager::removeMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 	*/
 }/*}}}*/
 
-
-/*void TrackManager::importOutputs()
-{
-	if (checkAudioDevice()) 
-	{
-		std::list<QString> sl = audioDevice->outputPorts();
-		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			cmbInput->addItem(*i, 1);
-		}
-	}
-}
-
-void TrackManager::importInputs()
-{
-	if (checkAudioDevice()) 
-	{
-		std::list<QString> sl = audioDevice->inputPorts();
-		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			cmbOutput->addItem(*i, 1);
-		}
-	}
-}
-
-void TrackManager::populateMonitorList()
-{
-	while(cmbMonitor->count())
-		cmbMonitor->removeItem(cmbMonitor->count()-1);
-	if (checkAudioDevice()) 
-	{
-		std::list<QString> sl = audioDevice->outputPorts();
-		for (std::list<QString>::iterator i = sl.begin(); i != sl.end(); ++i) {
-			cmbMonitor->addItem(*i, 1);
-		}
-	}
-}
-
-void TrackManager::populateNewInputList()
-{
-	//while(cmbInput->count())
-	//	cmbInput->removeItem(cmbInput->count()-1);
-	//m_createMidiInputDevice = true;
-	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
-	{
-		if ((*i)->deviceType() == MidiDevice::ALSA_MIDI)
-		{
-			cmbInput->addItem((*i)->name(), MidiDevice::ALSA_MIDI);
-		}
-	}
-	if(audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
-		return;
-	std::list<QString> sl = audioDevice->outputPorts(true, m_showJackAliases);
-	for (std::list<QString>::iterator ip = sl.begin(); ip != sl.end(); ++ip)
-	{
-		cmbInput->addItem(*ip, MidiDevice::JACK_MIDI);
-	}
-}
-
-void TrackManager::populateNewOutputList()
-{
-	//while(cmbOutput->count())
-	//	cmbOutput->removeItem(cmbOutput->count()-1);
-	//m_createMidiOutputDevice = true;
-	if(audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
-		return;
-	std::list<QString> sl = audioDevice->inputPorts(true, m_showJackAliases);
-	for (std::list<QString>::iterator ip = sl.begin(); ip != sl.end(); ++ip)
-	{
-		cmbOutput->addItem(*ip, MidiDevice::JACK_MIDI);
-	}
-}*/
-
 int TrackManager::getFreeMidiPort()/*{{{*/
 {
 	int rv = -1;
@@ -1382,4 +1312,181 @@ int TrackManager::getFreeMidiPort()/*{{{*/
 	return rv;
 }/*}}}*/
 
+void VirtualTrack::write(int level, Xml& xml) const
+{
+	QStringList tmplist;
+	std::string tag = "virtualTrack";
+	xml.put(level, "<%s id=\"%lld\">", tag.c_str(), id);
+	level++;
+	xml.intTag(level, "type", type);
+	xml.strTag(level, "name", name.toUtf8().constData());
+	xml.intTag(level, "useInput", useInput);
+	xml.intTag(level, "useOutput", useOutput);
+	if(!instrumentName.isEmpty() && type == Track::MIDI)/*{{{*/
+	{
+		xml.intTag(level, "autoCreateInstrument", autoCreateInstrument);
+		xml.intTag(level, "createMidiInputDevice", createMidiInputDevice);
+		xml.intTag(level, "createMidiOutputDevice", createMidiOutputDevice);
+		xml.strTag(level, "instrumentName", instrumentName.toUtf8().constData());
+		xml.intTag(level, "instrumentType", instrumentType);
+		xml.intTag(level, "useMonitor", useMonitor);
+		xml.intTag(level, "useBuss", useBuss);
+		xml.intTag(level, "inputChannel", inputChannel);
+		xml.intTag(level, "outputChannel", outputChannel);
+		if(useMonitor)
+		{
+			tmplist.clear();
+			tmplist << QString::number(monitorConfig.first) << monitorConfig.second;
+			xml.strTag(level, "monitorConfig", tmplist.join("@-:-@").toUtf8().constData());
+		}
+		if(useBuss)
+		{ 
+			tmplist.clear();
+			tmplist << QString::number(bussConfig.first) << bussConfig.second;
+			xml.strTag(level, "bussConfig", tmplist.join("@-:-@").toUtf8().constData());
+		}
+	}/*}}}*/
+	if(useInput)
+	{ 
+		tmplist.clear();
+		tmplist << QString::number(inputConfig.first) << inputConfig.second;
+		xml.strTag(level, "inputConfig", tmplist.join("@-:-@").toUtf8().constData());
+	}
+	if(useOutput)
+	{ 
+		tmplist.clear();
+		tmplist << QString::number(outputConfig.first) << outputConfig.second;
+		xml.strTag(level, "outputConfig", tmplist.join("@-:-@").toUtf8().constData());
+	}
+    xml.put(--level, "</%s>", tag.c_str());
+}
+
+/*{{{
+	qint64 id;
+	int type;
+	QString name;
+	QString instrumentName;
+	int instrumentType;
+	bool autoCreateInstrument;
+	bool createMidiInputDevice;
+	bool createMidiOutputDevice;
+	bool useInput;
+	bool useOutput;
+	bool useMonitor;
+	bool useBuss;
+	int inputChannel;
+	int outputChannel;
+	QPair<int, QString> inputConfig;
+	QPair<int, QString> outputConfig;
+	QPair<int, QString> instrumentConfig; //unused
+	QPair<int, QString> monitorConfig;
+    QPair<int, QString> monitorConfig2;
+	QPair<int, QString> bussConfig;
+}}}*/
+void VirtualTrack::read(Xml &xml)
+{
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::TagStart:
+				if(tag == "name")
+				{
+					name = xml.parse1();
+				}
+				else if(tag == "type")
+				{
+					type = xml.parseInt();
+				}
+				else if(tag == "instrumentName")
+				{
+					instrumentName = xml.parse1();
+				}
+				else if(tag == "instrumentType")
+				{
+					instrumentType = xml.parseInt();
+				}
+				else if(tag == "autoCreateInstrument")
+				{
+					autoCreateInstrument = xml.parseInt();
+				}
+				else if(tag == "createMidiInputDevice")
+				{
+					createMidiInputDevice = xml.parseInt();
+				}
+				else if(tag == "createMidiOutputDevice")
+				{
+					createMidiOutputDevice = xml.parseInt();
+				}
+				else if(tag == "useInput")
+				{
+					useInput = xml.parseInt();
+				}
+				else if(tag == "useOutput")
+				{
+					useOutput = xml.parseInt();
+				}
+				else if(tag == "useBuss")
+				{
+					useBuss = xml.parseInt();
+				}
+				else if(tag == "inputChannel")
+				{
+					inputChannel = xml.parseInt();
+				}
+				else if(tag == "outputChannel")
+				{
+					outputChannel = xml.parseInt();
+				}
+				else if(tag == "inputConfig")
+				{
+					QStringList list = xml.parse1().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						inputConfig = qMakePair(list[0].toInt(), list[1]);
+				}
+				else if(tag == "outputConfig")
+				{
+					QStringList list = xml.parse1().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						inputConfig = qMakePair(list[0].toInt(), list[1]);
+				}
+				else if(tag == "monitorConfig")
+				{
+					QStringList list = xml.parse1().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						monitorConfig = qMakePair(list[0].toInt(), list[1]);
+				}
+				else if(tag == "monitorConfig2")
+				{
+					QStringList list = xml.parse1().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						monitorConfig2 = qMakePair(list[0].toInt(), list[1]);
+				}
+				else if(tag == "bussConfig")
+				{
+					QStringList list = xml.parse1().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						bussConfig = qMakePair(list[0].toInt(), list[1]);
+				}
+				break;
+			case Xml::Attribut:
+				if(tag == "id")
+				{
+					qDebug("Found Virtual Track saved ID-----------------------------------");
+					id = xml.s2().toLongLong();
+				}
+				break;
+			case Xml::TagEnd:
+				if(tag == "virtualTrack")
+					return;
+			default:
+				break;
+		}
+	}
+}
 

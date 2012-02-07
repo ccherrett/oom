@@ -99,12 +99,25 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, bool templateMode) : QDialog(p
 
 void TrackViewEditor::buildViewList()
 {
-	cmbViews->addItem(tr("Select Track View"), 0);
-	QHash<qint64, TrackView*>::const_iterator iter = song->trackviews()->constBegin();
-	while (iter != song->trackviews()->constEnd())
+	TrackViewList *tvl = 0;
+	if(m_templateMode)
 	{
-		cmbViews->addItem(iter.value()->viewName(), iter.value()->id());
-		++iter;
+		cmbViews->addItem(tr("Select Instrument Template"), 0);
+		tvl = song->instrumentTemplates();
+	}
+	else
+	{
+		cmbViews->addItem(tr("Select Track View"), 0);
+		tvl = song->trackviews();
+	}
+	if(tvl && tvl->size())
+	{
+		ciTrackView iter = tvl->constBegin();
+		while (iter != tvl->constEnd())
+		{
+			cmbViews->addItem(iter.value()->viewName(), iter.value()->id());
+			++iter;
+		}
 	}
 }
 
@@ -191,117 +204,119 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 	QString sl = cmbViews->itemText(ind);
 	qint64 tvid = cmbViews->itemData(ind).toLongLong();
 	txtName->setText(sl);
-	TrackView* v = song->findTrackViewById(tvid);
+	TrackView* v = 0;
+	if(m_templateMode)
+		v = song->findInstrumentTemplateById(tvid);
+	else
+		v = song->findTrackViewById(tvid);
 	_editing = true;
 	if(v)
 	{
 		_selected = v;
+		QMap<qint64, VirtualTrack*> *vtracks = v->virtualTracks();
 		txtComment->blockSignals(true);
 		txtComment->setText(v->comment());
 		txtComment->blockSignals(false);
 		txtComment->moveCursor(QTextCursor::End);
-		bool hasSettings = !v->trackSettings()->isEmpty();/*{{{*/
-		for(int i = 0; i < v->tracks()->size(); ++i)
+		QList<qint64> *list = v->trackIndexList();
+		for(int p = 0; p < list->size(); ++p)
 		{	
-			qint64 tid = v->tracks()->at(i);
-			Track* t = song->findTrackById(tid);
-			if(t)
+			qint64 i = list->at(p);
+			TrackView::TrackViewTrack *tvt = v->tracks()->value(i);
+			if(tvt)
 			{
-				QString trackname = t->name();
-				QStandardItem* tname = new QStandardItem(trackname);
-				tname->setData(t->id(), TrackIdRole);
-				tname->setData(0, TrackSourceRole);
-				tname->setEditable(false);
-				QString tp("0");
-				QString pname(t->isMidiTrack() ? tr("Select Patch") : "-");
-				int prog = 0;
-				//Check if there are settings
-				if(hasSettings)
+				if(tvt->is_virtual)
 				{
-					if(v->hasSettings(t->id()))
+					VirtualTrack* t = vtracks->value(i);
+					if(t)
 					{
-						TrackSettings *tset = v->getTrackSettings(t->id());
-						if(tset)
+						QString trackname = t->name;
+						QStandardItem* tname = new QStandardItem(trackname);
+						tname->setData(t->id, TrackIdRole);
+						tname->setData(1, TrackSourceRole);
+						tname->setEditable(false);
+						QString tp("0");
+						QString pname(t->type == Track::MIDI ? tr("Select Patch") : "-");
+						int prog = 0;
+						//Check if there are settings
+						if(tvt->hasSettings())
 						{
-							tp = QString::number(tset->transpose);
-							pname = tset->pname;
-							prog = tset->program;
+							TrackView::TrackSettings *tset = tvt->settings;
+							if(tset)
+							{
+								tp = QString::number(tset->transpose);
+								pname = tset->pname;
+								prog = tset->program;
+							}
 						}
+
+						QStandardItem* transp = new QStandardItem(tp);
+						transp->setEditable(false);
+						if(t->type == Track::MIDI)
+							transp->setEditable(true);
+						QStandardItem* patch = new QStandardItem(pname);
+						patch->setData(prog, ProgramRole);
+						patch->setEditable(false);
+						if(t->type == Track::MIDI)
+						{
+							patch->setData(t->instrumentName, InstrumentNameRole);
+							patch->setEditable(true);
+						}
+						QList<QStandardItem*> rowData;
+						rowData.append(tname);
+						rowData.append(transp);
+						rowData.append(patch);
+						m_model->appendRow(rowData);
 					}
 				}
-
-				QStandardItem* transp = new QStandardItem(tp);
-				transp->setEditable(false);
-				if(t->isMidiTrack())
-					transp->setEditable(true);
-				QStandardItem* patch = new QStandardItem(pname);
-				patch->setData(prog, ProgramRole);
-				patch->setEditable(false);
-				if(t->isMidiTrack())
+				else
 				{
-					int outPort = ((MidiTrack*)t)->outPort();
-					MidiInstrument* instr = midiPorts[outPort].instrument();
-					patch->setData(instr->iname(), InstrumentNameRole);
-					patch->setEditable(true);
-				}
-				QList<QStandardItem*> rowData;
-				rowData.append(tname);
-				rowData.append(transp);
-				rowData.append(patch);
-				m_model->appendRow(rowData);
-			}
-		}/*}}}*/
-		bool hasVirtualSettings = !v->virtualTrackSettings()->isEmpty();/*{{{*/
-		QMap<qint64, VirtualTrack*> *vtracks = v->virtualTracks();
-		QMap<qint64, VirtualTrack*>::const_iterator iter = vtracks->constBegin();
-		while(iter != vtracks->constEnd())
-		{	
-			VirtualTrack* t = iter.value();
-			if(t)
-			{
-				QString trackname = t->name;
-				QStandardItem* tname = new QStandardItem(trackname);
-				tname->setData(t->id, TrackIdRole);
-				tname->setData(1, TrackSourceRole);
-				tname->setEditable(false);
-				QString tp("0");
-				QString pname(t->type == Track::MIDI ? tr("Select Patch") : "-");
-				int prog = 0;
-				//Check if there are settings
-				if(hasVirtualSettings)
-				{
-					if(v->hasVirtualTrackSettings(t->id))
+					Track* t = song->findTrackById(i);
+					if(t)
 					{
-						TrackSettings *tset = v->getVirtualTrackSettings(t->id);
-						if(tset)
+						QString trackname = t->name();
+						QStandardItem* tname = new QStandardItem(trackname);
+						tname->setData(t->id(), TrackIdRole);
+						tname->setData(0, TrackSourceRole);
+						tname->setEditable(false);
+						QString tp("0");
+						QString pname(t->isMidiTrack() ? tr("Select Patch") : "-");
+						int prog = 0;
+						//Check if there are settings
+						if(tvt->hasSettings())
 						{
-							tp = QString::number(tset->transpose);
-							pname = tset->pname;
-							prog = tset->program;
+							TrackView::TrackSettings *tset = tvt->settings;
+							if(tset)
+							{
+								tp = QString::number(tset->transpose);
+								pname = tset->pname;
+								prog = tset->program;
+							}
 						}
+
+						QStandardItem* transp = new QStandardItem(tp);
+						transp->setEditable(false);
+						if(t->isMidiTrack())
+							transp->setEditable(true);
+						QStandardItem* patch = new QStandardItem(pname);
+						patch->setData(prog, ProgramRole);
+						patch->setEditable(false);
+						if(t->isMidiTrack())
+						{
+							int outPort = ((MidiTrack*)t)->outPort();
+							MidiInstrument* instr = midiPorts[outPort].instrument();
+							patch->setData(instr->iname(), InstrumentNameRole);
+							patch->setEditable(true);
+						}
+						QList<QStandardItem*> rowData;
+						rowData.append(tname);
+						rowData.append(transp);
+						rowData.append(patch);
+						m_model->appendRow(rowData);
 					}
 				}
-
-				QStandardItem* transp = new QStandardItem(tp);
-				transp->setEditable(false);
-				if(t->type == Track::MIDI)
-					transp->setEditable(true);
-				QStandardItem* patch = new QStandardItem(pname);
-				patch->setData(prog, ProgramRole);
-				patch->setEditable(false);
-				if(t->type == Track::MIDI)
-				{
-					patch->setData(t->instrumentName, InstrumentNameRole);
-					patch->setEditable(true);
-				}
-				QList<QStandardItem*> rowData;
-				rowData.append(tname);
-				rowData.append(transp);
-				rowData.append(patch);
-				m_model->appendRow(rowData);
-				++iter;
 			}
-		}/*}}}*/
+		}
 		chkRecord->setChecked(v->record());
 	}
 	txtName->setReadOnly(false);
@@ -405,8 +420,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 	{
 		_selected->setViewName(txtName->text());
 		//printf("after setviewname\n");
-		_selected->tracks()->clear();
-		_selected->trackSettings()->clear();
+		_selected->clear();
 		//Process all the tracks in the listSelectedTracks and add them to the TrackList
 		for(int row = 0; row < m_model->rowCount(); ++row)
 		{
@@ -420,7 +434,11 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 					VirtualTrack *vt = m_vtrackList.value(tid);
 					if(vt)
 					{
+						//TODO: I question if these should not go into a global list so other templates can contain them too?
 						_selected->addVirtualTrack(vt);
+
+						TrackView::TrackViewTrack *tvt = new TrackView::TrackViewTrack(vt->id);
+						tvt->is_virtual = true;
 						if(vt->type  == Track::MIDI)
 						{
 							QStandardItem* trans = m_model->item(row, 1);
@@ -428,19 +446,17 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 							QStandardItem* patch = m_model->item(row, 2);
 							QString pname = patch->text();
 							int prog = patch->data(ProgramRole).toInt();
-							//printf("Track name: %s - Transpose: %d - Program: %d - Patch Name: %s\n", 
-							//	titem->text().toUtf8().constData(), transpose, prog, pname.toUtf8().constData());
 							if((transpose != 0) || prog >= 0)
 							{
 								//printf("Added TrackSettings for Track: %s\n", titem->text().toUtf8().constData());
-								TrackSettings *ts = new TrackSettings;
+								TrackView::TrackSettings *ts = new TrackView::TrackSettings;
 								ts->pname = pname;
 								ts->program = prog;
 								ts->transpose = transpose;
-								ts->tid = vt->id;
-								_selected->addVirtualTrackSetting(ts->tid, ts);
+								tvt->settings = ts;
 							}
 						}
+						_selected->addTrack(tvt);
 					}
 				}
 				else
@@ -448,7 +464,7 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 					Track *t = song->findTrackById(tid);
 					if(t)
 					{
-						_selected->addTrack(t->id());
+						TrackView::TrackViewTrack *tvt = new TrackView::TrackViewTrack(t->id());
 						if(t->isMidiTrack())
 						{
 							QStandardItem* trans = m_model->item(row, 1);
@@ -456,19 +472,17 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 							QStandardItem* patch = m_model->item(row, 2);
 							QString pname = patch->text();
 							int prog = patch->data(ProgramRole).toInt();
-							//printf("Track name: %s - Transpose: %d - Program: %d - Patch Name: %s\n", 
-							//	titem->text().toUtf8().constData(), transpose, prog, pname.toUtf8().constData());
 							if((transpose != 0) || prog >= 0)
 							{
 								//printf("Added TrackSettings for Track: %s\n", titem->text().toUtf8().constData());
-								TrackSettings *ts = new TrackSettings;
+								TrackView::TrackSettings *ts = new TrackView::TrackSettings;
 								ts->pname = pname;
 								ts->program = prog;
 								ts->transpose = transpose;
-								ts->tid = t->id();
-								_selected->addTrackSetting(ts->tid, ts);
+								tvt->settings = ts;
 							}
 						}
+						_selected->addTrack(tvt);
 					}
 				}
 			}
@@ -556,20 +570,32 @@ void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
 			song->addNewTrackView();
 		if(tv)
 		{
-			for(int i = 0; i < _selected->tracks()->size(); ++i)
+			QList<qint64> *list = _selected->trackIndexList();
+			for(int i = 0; i < list->size(); ++i)
 			{
-				tv->addTrack(_selected->tracks()->at(i));
+				qint64 id = list->at(i);
+				TrackView::TrackViewTrack *tvt = _selected->tracks()->value(id);
+				TrackView::TrackViewTrack *newtvt = new TrackView::TrackViewTrack();
+				if(tvt)
+				{
+					newtvt->setSettingsCopy(tvt->settings);
+					newtvt->is_virtual = tvt->is_virtual;
+					if(tvt->is_virtual)
+					{//Copy the associated virtual track and change the id
+						VirtualTrack* vt = _selected->virtualTracks()->value(id);
+						if(vt)
+						{
+							newtvt->id = tv->addVirtualTrackCopy(vt);
+						}
+					}
+					else
+					{//Its just a track id
+						newtvt->id = tvt->id;
+					}
+					tv->addTrack(newtvt);
+				}
 			}
 
-			QMap<qint64, TrackSettings*>::ConstIterator ts;
-			for(ts = _selected->trackSettings()->begin(); ts != _selected->trackSettings()->end(); ++ts)
-			{
-				tv->addTrackSetting((*ts)->tid, (*ts));
-			}
-			for(ts = _selected->virtualTrackSettings()->begin(); ts != _selected->virtualTrackSettings()->end(); ++ts)
-			{
-				tv->addVirtualTrackSetting((*ts)->tid, (*ts));
-			}
 			tv->setComment(_selected->comment());
 			tv->setViewName(tv->getValidName(_selected->viewName()));
 			tv->setRecord(_selected->record());
@@ -710,7 +736,7 @@ void TrackViewEditor::btnAddVirtualTrack()
 	if(ctdialog->exec() && vt)
 	{
 		m_vtrackList[vt->id] = vt;
-		QStandardItem* tname = new QStandardItem(vt->name);/*{{{*/
+		QStandardItem* tname = new QStandardItem(vt->name);
 		tname->setData(vt->id, TrackIdRole);
 		tname->setData(1, TrackSourceRole);
 		tname->setEditable(false);
@@ -732,7 +758,7 @@ void TrackViewEditor::btnAddVirtualTrack()
 		rowData.append(transp);
 		rowData.append(patch);
 		m_model->appendRow(rowData);
-		optionsTable->selectRow((m_model->rowCount()-1));/*}}}*/
+		optionsTable->selectRow((m_model->rowCount()-1));
 	}
 }
 

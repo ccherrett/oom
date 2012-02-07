@@ -954,15 +954,19 @@ void Song::read(Xml& xml)
 					tv->read(xml);
 					if(tv->selected())
 					{
-						QList<qint64> *tlist = tv->tracks();
+						QList<qint64> *tlist = tv->trackIndexList();
 						for(int i = 0;  i < tlist->size(); ++i)
 						{
-							Track *it = findTrackById(tlist->at(i));
-							if(it)
+							TrackView::TrackViewTrack *tvt = tv->tracks()->value(tlist->at(i));
+							if(tvt && !tvt->is_virtual)
 							{
-								_viewtracks.push_back(it);
-								m_viewTracks[it->id()] = it;
-								m_trackIndex.append(it->id());
+								Track *it = findTrackById(tvt->id);
+								if(it)
+								{
+									_viewtracks.push_back(it);
+									m_viewTracks[it->id()] = it;
+									m_trackIndex.append(it->id());
+								}
 							}
 						}
 					}

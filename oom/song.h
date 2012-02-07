@@ -150,6 +150,11 @@ private:
 	QList<qint64> m_composerTrackIndex;
 	QList<qint64> m_trackViewIndex;
 	QList<qint64> m_autoTrackViewIndex;
+
+	//This list forms a compatibility layer between the old name based
+	//track system and should be removed when all things use track ID
+	//At that time track will be able to have the same name without a problem
+	QStringList m_tracknames;
     
 	TrackList _tracks; // tracklist as seen by globally
     TrackList _artracks; // tracklist as seen by Composer
@@ -427,6 +432,10 @@ public:
     //   track manipulations
     //-----------------------------------------
 
+	QStringList *trackNames()
+	{
+		return &m_tracknames;
+	}
     TrackList* tracks() {
         return &_tracks;
     }

@@ -185,29 +185,42 @@ void MixerView::updateTrackList()/*{{{*/
 		{
 			if(m_selectList.contains(view->id()))
 			{
-				QList<qint64> *tlist = view->tracks();
-				for(int t = 0; t < tlist->size(); ++t)
+				QList<qint64> *tlist = view->trackIndexList();
+				QMap<qint64, TrackView::TrackViewTrack*> *tracks = view->tracks();
+				for(int p = 0; p < tlist->size(); ++p)
 				{
-					Track *track = song->findTrackById(tlist->at(t));
-					if(track)
+					qint64 id = tlist->at(p);
+					TrackView::TrackViewTrack *tvt = tracks->value(id);
+					if(tvt)
 					{
-						bool found = false;
-						if(workview && track->parts()->empty()) {
+						if(tvt->is_virtual)
+						{//Do nothing in Mixer for virtual tracks
 							continue;
 						}
-						for (ciTrack i = m_tracklist.begin(); i != m_tracklist.end(); ++i)
+						else
 						{
-							if ((*i)->id() == track->id())
+							Track *track = song->findTrackById(tvt->id);
+							if(track)
 							{
-								found = true;
-								break;
+								bool found = false;
+								if(workview && track->parts()->empty()) {
+									continue;
+								}
+								for (ciTrack i = m_tracklist.begin(); i != m_tracklist.end(); ++i)
+								{
+									if ((*i)->id() == track->id())
+									{
+										found = true;
+										break;
+									}
+								}
+								if(!found && track->name() != "Master")
+								{
+									m_tracklist.push_back(track);
+									customview = true;
+									viewselected = true;
+								}
 							}
-						}
-						if(!found && track->name() != "Master")
-						{
-							m_tracklist.push_back(track);
-							customview = true;
-							viewselected = true;
 						}
 					}
 				}
