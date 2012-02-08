@@ -151,7 +151,7 @@ void WaveTrack::write(int level, Xml& xml) const
 	const PartList* pl = cparts();
 	for (ciPart p = pl->begin(); p != pl->end(); ++p)
 		p->second->write(level, xml);
-	xml.etag(level, "wavetrack");
+	xml.etag(--level, "wavetrack");
 }
 
 //---------------------------------------------------------

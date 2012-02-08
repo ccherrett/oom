@@ -1657,9 +1657,19 @@ void ComposerCanvas::mouseMove(QMouseEvent* event)
 		if (show_tip && _tool == AutomationTool && automation.currentCtrlList && !automation.moveController) 
 		{
 			Track* t = y2Track(y);
-			if(t && !t->isMidiTrack())
+			if(t && !t->isMidiTrack() && !t->wantsAutomation())
 			{
-				CtrlListList *cll = ((AudioTrack*)t)->controller();
+				CtrlListList *cll;
+                if (t->isMidiTrack())
+                {
+                    AudioTrack* atrack = ((MidiTrack*)t)->getAutomationTrack();
+                    if (!atrack)
+                        return;
+                    cll = atrack->controller();
+                }
+                else
+                    cll = ((AudioTrack*)t)->controller();
+                
 				for(CtrlListList::iterator ic = cll->begin(); ic != cll->end(); ++ic)
 				{
 					CtrlList* cl = ic->second;
@@ -3566,7 +3576,7 @@ void ComposerCanvas::pasteAutomation()/*{{{*/
 		return;
 	}
 	iTrack itrack = selectedTracks.begin();
-	if((*itrack)->isMidiTrack())
+    if((*itrack)->isMidiTrack() && (*itrack)->wantsAutomation() == false)
 	{
 		if(debugMsg)
 			printf("Midi track cannot paste automation\n");
@@ -4388,6 +4398,7 @@ void ComposerCanvas::drawCanvas(QPainter& p, const QRect& rect)
 
 void ComposerCanvas::drawTopItem(QPainter& p, const QRect& rect)
 {
+    qWarning("ComposerCanvas::drawTopItem()");
 	int x = rect.x();
 	int y = rect.y();
 	int w = rect.width();
@@ -4402,19 +4413,35 @@ void ComposerCanvas::drawTopItem(QPainter& p, const QRect& rect)
 	show_tip = true;
 	int yy = 0;
 	int th;
-	for (iTrack it = tl->begin(); it != tl->end(); ++it) {
+	for (iTrack it = tl->begin(); it != tl->end(); ++it)
+    {
 		if (yy > y + h)
 			break;
 		Track* track = *it;
 		th = track->height();
-		if (!track->isMidiTrack()) { // draw automation
-			QRect r = rect & QRect(x, yy, w, track->height());
-			drawAutomation(p, r, (AudioTrack*)track);
-			p.setPen(baseColor);
-
-		}
-		yy += track->height();
-	}
+        
+        // draw automation
+		if (track->isMidiTrack())
+        {
+            if (track->wantsAutomation())
+            {
+                AudioTrack* atrack = ((MidiTrack*)track)->getAutomationTrack();
+                if (atrack)
+                {
+                    QRect r = rect & QRect(x, yy, w, track->height());
+                    drawAutomation(p, r, atrack);
+                    p.setPen(baseColor);
+                }
+            }
+        }
+        else
+        {
+            QRect r = rect & QRect(x, yy, w, track->height());
+            drawAutomation(p, r, (AudioTrack*)track);
+            p.setPen(baseColor);
+        }
+        yy += track->height();
+    }
 
 
 	QRect rr = p.worldMatrix().mapRect(rect);
@@ -4865,7 +4892,7 @@ void ComposerCanvas::drawTooltipText(QPainter& p, /*{{{*/
 void ComposerCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addNewCtrl)/*{{{*/
 {
 	int circumference = 5;
-	if (t->isMidiTrack())
+	if (t->isMidiTrack() && t->wantsAutomation() == false)
 	{
 		return;
 	}
@@ -4875,7 +4902,17 @@ void ComposerCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addN
 	int currX =  mapx(pointer.x());
 	int currY =  mapy(pointer.y());
 
-	CtrlListList* cll = ((AudioTrack*) t)->controller();
+	CtrlListList* cll;
+    if (t->isMidiTrack())
+    {
+        AudioTrack* atrack = ((MidiTrack*)t)->getAutomationTrack();
+        if (!atrack)
+            return;
+        cll = atrack->controller();
+    }
+    else
+        cll = ((AudioTrack*) t)->controller();
+
 	for(CtrlListList::iterator icll =cll->begin();icll!=cll->end();++icll)
 	{
 		//iCtrlList *icl = icll->second;
@@ -4982,7 +5019,7 @@ void ComposerCanvas::checkAutomation(Track * t, const QPoint &pointer, bool addN
 
 void ComposerCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 {
-	if (t->isMidiTrack())
+	if (t->isMidiTrack() && t->wantsAutomation() == false)
 	{
 		return;
 	}
@@ -4994,7 +5031,17 @@ void ComposerCanvas::selectAutomation(Track * t, const QPoint &pointer)/*{{{*/
 	QRect clickPoint(currX-5, currY-5, 10, 10);
 
 	bool foundIt = false;
-	CtrlListList* cll = ((AudioTrack*) t)->controller();
+	CtrlListList* cll;
+    if (t->isMidiTrack())
+    {
+        AudioTrack* atrack = ((MidiTrack*)t)->getAutomationTrack();
+        if (!atrack)
+            return;
+        cll = atrack->controller();
+    }
+    else
+        cll = ((AudioTrack*) t)->controller();
+
 	cll->deselectAll();
 	for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 	{

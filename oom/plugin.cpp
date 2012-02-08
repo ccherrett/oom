@@ -274,6 +274,8 @@ QString SynthPluginDevice::open()
             m_audioTrack = new SynthPluginTrack();
             m_plugin->setTrack(m_audioTrack);
             audio->msgAddPlugin(m_audioTrack, 0, m_plugin);
+            
+            m_audioTrack->mapRackPluginsToControllers();
 
             m_plugin->setActive(true);
             return QString("OK");
@@ -304,14 +306,14 @@ void SynthPluginDevice::close()
         if (m_audioTrack)
         {
             audio->msgAddPlugin(m_audioTrack, 0, 0);
-            delete m_audioTrack;
+            delete (SynthPluginTrack*)m_audioTrack;
         }
 
         m_plugin->setTrack(0);
         m_plugin->aboutToRemove();
 
         // Delete the appropriate class
-        switch(m_plugin->type())
+        switch (m_plugin->type())
         {
         case PLUGIN_LADSPA:
             delete (LadspaPlugin*)m_plugin;
@@ -436,7 +438,7 @@ void SynthPluginDevice::updateNativeGui()
     //if (m_plugin && m_plugin->hasNativeGui())
         return m_plugin->updateNativeGui();
 }
-
+ 
 //---------------------------------------------------------
 //   Patch/Programs Stuff
 //---------------------------------------------------------
@@ -534,6 +536,8 @@ void SynthPluginDevice::write(int level, Xml& xml)
     {
         qWarning("SynthPluginDevice::write(XML)");
         m_plugin->writeConfiguration(level, xml);
+        if (m_plugin->track())
+            m_plugin->track()->write(level, xml);
     }
 }
 

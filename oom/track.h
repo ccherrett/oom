@@ -472,6 +472,8 @@ public:
 //   MidiTrack
 //---------------------------------------------------------
 
+class AudioTrack;
+
 class MidiTrack : public Track
 {
     int _outPort;
@@ -587,6 +589,8 @@ public:
     {
         return true;
     }
+    
+    AudioTrack* getAutomationTrack();
 };
 
 typedef QPair<bool, double> AuxInfo;

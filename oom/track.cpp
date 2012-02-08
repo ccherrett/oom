@@ -769,6 +769,23 @@ void MidiTrack::setInPortAndChannelMask(unsigned int portmask, int chanmask)
 }
 
 //---------------------------------------------------------
+//   getAutomationTrack
+//---------------------------------------------------------
+
+AudioTrack* MidiTrack::getAutomationTrack()
+{
+    if (_outPort >= 0 && _outPort < MIDI_PORTS)
+    {
+        if (midiPorts[_outPort].device() && midiPorts[_outPort].device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        {
+            SynthPluginDevice* dev = (SynthPluginDevice*)midiPorts[_outPort].device();
+            return dev->audioTrack();
+        }
+    }
+    return 0;
+}
+
+//---------------------------------------------------------
 //   addPart
 //---------------------------------------------------------
 
