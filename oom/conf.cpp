@@ -1256,7 +1256,7 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 			MidiPort* mport = &midiPorts[i];
 			// Route check by Tim. Port can now be used for routing even if no device.
 			// Also, check for other non-defaults and save port, to preserve settings even if no device.
-			if (!mport->noInRoute() || !mport->noOutRoute() ||
+            if (!mport->noInRoute() || !mport->noOutRoute() || (mport->device() && mport->device()->isSynthPlugin()) ||
 					mport->defaultInChannels() || mport->defaultOutChannels() ||
 					(!mport->instrument()->iname().isEmpty() && mport->instrument()->iname() != "GM") ||
 					!mport->syncInfo().isDefault())

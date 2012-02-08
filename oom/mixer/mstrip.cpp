@@ -262,13 +262,23 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	autoType = new ComboBox(this);
 	autoType->setFont(config.fonts[1]);
 	//autoType->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	autoType->setAlignment(Qt::AlignCenter);
 	autoType->setEnabled(false);
+
+    autoType->insertItem(tr("Off"), AUTO_OFF);
+	autoType->insertItem(tr("Read"), AUTO_READ);
+	autoType->insertItem(tr("Touch"), AUTO_TOUCH);
+	autoType->insertItem(tr("Write"), AUTO_WRITE);
+	autoType->setCurrentItem(t->automationType());
+
 	QSizePolicy autoSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	autoSizePolicy.setHorizontalStretch(1);
 	autoSizePolicy.setVerticalStretch(0);
 	autoSizePolicy.setHeightForWidth(autoType->sizePolicy().hasHeightForWidth());
 	autoType->setSizePolicy(autoSizePolicy);
+    autoType->setAlignment(Qt::AlignCenter);
+    autoType->setMaximumSize(QSize(65,20));
+    autoType->setToolTip(tr("automation type"));
+	connect(autoType, SIGNAL(activated(int, int)), SLOT(setAutomationType(int, int)));
 	m_autoBox->addWidget(autoType);
 
 	connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
@@ -449,7 +459,7 @@ void MidiStrip::updateOffState()
 	//if (mute)
 		m_btnMute->setEnabled(val);
 	if (autoType)
-		autoType->setEnabled(val);
+		autoType->setEnabled(val && track->wantsAutomation());
 	if (hasIRoute)
 		m_btnIRoute->setEnabled(val);
 	// TODO: Disabled for now.

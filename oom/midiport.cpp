@@ -765,7 +765,7 @@ void MidiPort::deleteController(int ch, int tick, int ctrl, Part* part)
 
 MidiController* MidiPort::midiController(int num) const
 {
-	if (_instrument)
+	if (_instrument && _device && _device->deviceType() != MidiDevice::SYNTH_MIDI)
 	{
 		MidiControllerList* mcl = _instrument->controller();
 		for (iMidiController i = mcl->begin(); i != mcl->end(); ++i)

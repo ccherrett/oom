@@ -1630,6 +1630,9 @@ void Conductor::updateConductor(int flags)
 		iLBank->blockSignals(false);
 		iProgram->blockSignals(false);
 	}
+    
+    if (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        return;
 
 	MidiController* mc = mp->midiController(CTRL_VOLUME);
 	int mn = mc->minVal();
@@ -2276,10 +2279,12 @@ void Conductor::populatePatches()
 		return;
 	}
 	MidiTrack* track = (MidiTrack*)selected;
+    //if (track->wantsAutomation())
+    //    return;
 	int channel = track->outChannel();
 	int port = track->outPort();
 	MidiInstrument* instr = midiPorts[port].instrument();
-	instr->populatePatchModel(_patchModel, channel, song->mtype(), track->type() == Track::DRUM);
+    instr->populatePatchModel(_patchModel, channel, song->mtype(), track->type() == Track::DRUM);
 }
 
 void Conductor::patchDoubleClicked(QModelIndex index)/*{{{*/
