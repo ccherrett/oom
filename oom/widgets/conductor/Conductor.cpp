@@ -2284,7 +2284,8 @@ void Conductor::populatePatches()
 	int channel = track->outChannel();
 	int port = track->outPort();
 	MidiInstrument* instr = midiPorts[port].instrument();
-    instr->populatePatchModel(_patchModel, channel, song->mtype(), track->type() == Track::DRUM);
+    if (instr && _patchModel/* && instr != genericMidiInstrument*/)
+        instr->populatePatchModel(_patchModel, channel, song->mtype(), track->type() == Track::DRUM);
 }
 
 void Conductor::patchDoubleClicked(QModelIndex index)/*{{{*/

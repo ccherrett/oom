@@ -431,6 +431,15 @@ public:
 
             process(segmentSize, ains_buffer, aouts_buffer, eventList);
         }
+        else
+        {
+            if (eventList)
+            {
+                //iMPEvent ev = eventList->begin();
+                //eventList->erase(eventList->begin(), ev);
+                eventList->clear();
+            }
+        }
     }
 
     void makeGui();

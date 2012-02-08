@@ -262,13 +262,20 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	autoType = new ComboBox(this);
 	autoType->setFont(config.fonts[1]);
 	//autoType->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum));
-	autoType->setEnabled(false);
 
     autoType->insertItem(tr("Off"), AUTO_OFF);
 	autoType->insertItem(tr("Read"), AUTO_READ);
 	autoType->insertItem(tr("Touch"), AUTO_TOUCH);
 	autoType->insertItem(tr("Write"), AUTO_WRITE);
-	autoType->setCurrentItem(t->automationType());
+    
+    if (track && track->wantsAutomation())
+        autoType->setCurrentItem(t->automationType());
+    else
+    {
+        autoType->setCurrentItem(AUTO_OFF);
+        autoType->setText("");
+        autoType->setEnabled(false);
+    }
 
 	QSizePolicy autoSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	autoSizePolicy.setHorizontalStretch(1);
@@ -445,6 +452,7 @@ void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
 
 void MidiStrip::updateOffState()
 {
+    qWarning("MidiStrip::updateOffState()");
 	bool val = !track->off();
 	slider->setEnabled(val);
 	sl->setEnabled(val);
@@ -459,7 +467,10 @@ void MidiStrip::updateOffState()
 	//if (mute)
 		m_btnMute->setEnabled(val);
 	if (autoType)
-		autoType->setEnabled(val && track->wantsAutomation());
+    {
+		autoType->setEnabled(val);
+        autoType->setVisible(track->wantsAutomation());
+    }
 	if (hasIRoute)
 		m_btnIRoute->setEnabled(val);
 	// TODO: Disabled for now.

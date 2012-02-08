@@ -4402,7 +4402,6 @@ void ComposerCanvas::drawCanvas(QPainter& p, const QRect& rect)
 
 void ComposerCanvas::drawTopItem(QPainter& p, const QRect& rect)
 {
-    qWarning("ComposerCanvas::drawTopItem()");
 	int x = rect.x();
 	int y = rect.y();
 	int w = rect.width();
