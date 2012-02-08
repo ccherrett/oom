@@ -151,7 +151,7 @@ class ComposerCanvas : public Canvas
 	void drawMidiPart(QPainter&, const QRect& rect, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to, QColor c);
     Track* y2Track(int) const;
     void drawAudioTrack(QPainter& p, const QRect& r, AudioTrack* track);
-    void drawAutomation(QPainter& p, const QRect& r, AudioTrack* track);
+    void drawAutomation(QPainter& p, const QRect& r, AudioTrack* track, Track* rt=0);
     void drawTopItem(QPainter& p, const QRect& rect);
 	void drawTooltipText(QPainter& p, const QRect& rr, int height, double lazySelNodeVal, double lazySelNodePrevVal, int lazySelNodeFrame, bool paintAsDb, CtrlList*);
 

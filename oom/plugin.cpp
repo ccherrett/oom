@@ -178,6 +178,12 @@ public:
     {
         return new SynthPluginTrack();
     }
+    
+    void setId(qint64 /*id*/)
+    {
+        // FIXME - is this needed?
+        //m_id = id;
+    }
 
     virtual void read(Xml& xml)
     {
@@ -283,6 +289,16 @@ SynthPluginDevice::~SynthPluginDevice()
 }
 
 //---------------------------------------------------------
+//   setTrackId
+//---------------------------------------------------------
+
+void SynthPluginDevice::setTrackId(qint64 id)
+{
+    if (m_audioTrack)
+        ((SynthPluginTrack*)m_audioTrack)->setId(id);
+}
+
+//---------------------------------------------------------
 //   open, init plugin
 //---------------------------------------------------------
 
@@ -314,7 +330,7 @@ QString SynthPluginDevice::open()
             m_audioTrack = new SynthPluginTrack();
             m_plugin->setTrack(m_audioTrack);
             audio->msgAddPlugin(m_audioTrack, 0, m_plugin);
-            
+
             m_audioTrack->mapRackPluginsToControllers();
 
             m_plugin->setActive(true);

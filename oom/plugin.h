@@ -782,6 +782,8 @@ public:
     {
         return m_audioTrack;
     }
+    
+    void setTrackId(qint64 id);
 
     virtual QString open();
     virtual void close();

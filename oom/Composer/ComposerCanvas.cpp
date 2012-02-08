@@ -4429,7 +4429,7 @@ void ComposerCanvas::drawTopItem(QPainter& p, const QRect& rect)
                 if (atrack)
                 {
                     QRect r = rect & QRect(x, yy, w, track->height());
-                    drawAutomation(p, r, atrack);
+                    drawAutomation(p, r, atrack, track);
                     p.setPen(baseColor);
                 }
             }
@@ -4578,17 +4578,18 @@ double ComposerCanvas::getControlValue(CtrlList *cl, double val)
 //   drawAutomation
 //---------------------------------------------------------
 
-void ComposerCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t)/*{{{*/
+void ComposerCanvas::drawAutomation(QPainter& p, const QRect& r, AudioTrack *t, Track *rt)/*{{{*/
 {
 	//printf("ComposerCanvas::drawAutomation\n");
 	QRect tempRect = r;
-	tempRect.setBottom(track2Y(t) + t->height());
+    if (!rt) rt = t;
+	tempRect.setBottom(track2Y(rt) + rt->height());
 	QRect rr = p.worldMatrix().mapRect(tempRect);
 
 	p.save();
 	p.resetTransform();
 
-	int height = t->height() - 4; // limit height
+	int height = rt->height() - 4; // limit height
 	bool paintdBLines = false;
 	bool paintLines = false;
 	bool paintdBText = true;
