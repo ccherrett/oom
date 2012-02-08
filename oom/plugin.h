@@ -817,11 +817,7 @@ public:
     int eventsPending() const;
 
 protected:
-    virtual bool putMidiEvent(const MidiPlayEvent&)
-    {
-        qWarning("SynthPluginDevice::putMidiEvent()");
-        return true;
-    }
+    virtual bool putMidiEvent(const MidiPlayEvent&);
 
 private:
     PluginType m_type;

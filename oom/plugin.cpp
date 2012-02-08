@@ -624,6 +624,20 @@ int SynthPluginDevice::eventsPending() const
 }
 
 //---------------------------------------------------------
+//   putMidiEvent
+//---------------------------------------------------------
+
+bool SynthPluginDevice::putMidiEvent(const MidiPlayEvent& ev)
+{
+    if (_writeEnable)
+    {
+        MPEventList* pe = playEvents();
+        pe->add(ev);
+    }
+    return false;
+}
+
+//---------------------------------------------------------
 //   Pipeline
 //---------------------------------------------------------
 
