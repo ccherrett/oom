@@ -179,12 +179,52 @@ public:
         return new SynthPluginTrack();
     }
 
-    virtual void read(Xml&)
+    virtual void read(Xml& xml)
     {
+        qWarning("SynthPluginTrack::read(XML)");
+        
+        for (;;)
+        {
+            Xml::Token token = xml.parse();
+            const QString& tag = xml.s1();
+            switch (token)
+            {
+                case Xml::Error:
+                case Xml::End:
+                    return;
+                case Xml::TagStart:
+                    if (tag == "SynthPluginTrack")
+                    {
+                        continue;
+                    }
+                    else if (tag == "LadspaPlugin" || tag == "Lv2Plugin" || tag == "VstPlugin")
+                    {
+                        // we already loaded this before
+                        xml.parse1();
+                        continue;
+                    }
+                    if (AudioTrack::readProperties(xml, tag))
+                        xml.unknown("SynthPluginTrack");
+                    break;
+                case Xml::Attribut:
+                    break;
+                case Xml::TagEnd:
+                    if (tag == "SynthPluginTrack")
+                    {
+                        mapRackPluginsToControllers();
+                        return;
+                    }
+                default:
+                    break;
+            }
+        }
     }
 
-    virtual void write(int, Xml&) const
+    virtual void write(int level, Xml& xml) const
     {
+        xml.tag(level++, "SynthPluginTrack");
+        AudioTrack::writeProperties(level, xml);
+        xml.etag(--level, "SynthPluginTrack");
     }
 };
 
@@ -527,6 +567,8 @@ void SynthPluginDevice::read(Xml& xml)
     {
         qWarning("SynthPluginDevice::read(XML)");
         m_plugin->readConfiguration(xml, false);
+        if (m_audioTrack)
+            ((SynthPluginTrack*)m_audioTrack)->read(xml);
     }
 }
 
@@ -536,8 +578,11 @@ void SynthPluginDevice::write(int level, Xml& xml)
     {
         qWarning("SynthPluginDevice::write(XML)");
         m_plugin->writeConfiguration(level, xml);
-        if (m_plugin->track())
-            m_plugin->track()->write(level, xml);
+        if (m_audioTrack)
+        {
+            qWarning("SynthPluginDevice::write(XML) - write automation track data");
+            m_audioTrack->write(level, xml);
+        }
     }
 }
 
