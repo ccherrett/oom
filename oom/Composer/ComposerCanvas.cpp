@@ -1364,6 +1364,8 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 						automation.currentCtrlList->setSelected(true);
 					}
 					Track * t = y2Track(event->pos().y());
+                    if (t->isMidiTrack())
+                        t = ((MidiTrack*)t)->getAutomationTrack();
 					if (t) {
 						CtrlListList* cll = ((AudioTrack*) t)->controller();
 						for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
@@ -1381,6 +1383,8 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 			else
 			{
 				Track * t = y2Track(event->pos().y());
+                if (t->isMidiTrack())
+                    t = ((MidiTrack*)t)->getAutomationTrack();
 				if(t)
 					selectAutomation(t, event->pos());
 				if(automation.currentCtrlList && automation.controllerState == doNothing)
