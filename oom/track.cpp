@@ -865,6 +865,13 @@ void MidiTrack::setAutomationType(AutomationType t)
 {
 	MidiPort* port = &midiPorts[outPort()];
 	port->setAutomationType(outChannel(), t);
+
+    if (_wantsAutomation)
+    {
+        AudioTrack* atrack = getAutomationTrack();
+        if (atrack)
+            atrack->setAutomationType(t);
+    }
 }
 
 bool MidiTrack::setRecordFlag1(bool f, bool monitor)
