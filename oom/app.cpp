@@ -29,7 +29,6 @@
 #include "master/lmaster.h"
 #include "al/dsp.h"
 #include "AudioMixer.h"
-//#include "appearance.h"
 #include "Composer.h"
 #include "audio.h"
 #include "audiodev.h"
@@ -40,7 +39,6 @@
 #include "conf.h"
 #include "debug.h"
 #include "didyouknow.h"
-//#include "drumedit.h"
 #include "filedialog.h"
 #include "gatetime.h"
 #include "gconfig.h"
@@ -80,10 +78,6 @@
 #ifdef VST_SUPPORT
 #include "vst.h"
 #endif
-
-//#ifdef LSCP_SUPPORT
-//#include "network/lsclient.h"
-//#endif
 
 #include "traverso_shared/TConfig.h"
 
@@ -150,74 +144,6 @@ void microSleep(long msleep)
 		sleepOk = usleep(msleep);
 }
 
-// Removed p3.3.17
-/*
-//---------------------------------------------------------
-//   watchdog thread
-//---------------------------------------------------------
-
-static void* watchdog(void*)
-	  {
-	  doSetuid();
-
-	  struct sched_param rt_param;
-	  memset(&rt_param, 0, sizeof(rt_param));
-	  rt_param.sched_priority = sched_get_priority_max(SCHED_FIFO);
-	  int rv = pthread_setschedparam(pthread_self(), SCHED_FIFO, &rt_param);
-	  if (rv != 0)
-			perror("Set realtime scheduler");
-
-	  int policy;
-	  if (pthread_getschedparam(pthread_self(), &policy, &rt_param)!= 0) {
-			printf("Cannot get current client scheduler: %s\n", strerror(errno));
-			}
-	  if (policy != SCHED_FIFO)
-			printf("watchdog process %d _NOT_ running SCHED_FIFO\n", getpid());
-	  else if (debugMsg)
-			printf("watchdog set to SCHED_FIFO priority %d\n",
-			   sched_get_priority_max(SCHED_FIFO));
-
-	  undoSetuid();
-	  int fatal = 0;
-	  for (;;) {
-			watchAudio = 0;
-			watchMidi = 0;
-			static const int WD_TIMEOUT = 3;
-
-			// sleep can be interrpted by signals:
-			int to = WD_TIMEOUT;
-			while (to > 0)
-				  to = sleep(to);
-
-			bool timeout = false;
-			if (midiSeqRunning && watchMidi == 0)
-			{
-				  printf("midiSeqRunning = %i watchMidi %i\n", midiSeqRunning, watchMidi);
-				  timeout = true;
-			}
-			if (watchAudio == 0)
-				  timeout = true;
-			if (watchAudio > 500000)
-				  timeout = true;
-			if (timeout)
-				  ++fatal;
-			else
-				  fatal = 0;
-			if (fatal >= 3) {
-				  printf("WatchDog: fatal error, realtime task timeout\n");
-				  printf("   (%d,%d-%d) - stopping all services\n",
-					 watchMidi, watchAudio, fatal);
-				  break;
-				  }
-//            printf("wd %d %d %d\n", watchMidi, watchAudio, fatal);
-			}
-	  audio->stop(true);
-	  audioPrefetch->stop(true);
-	  printf("watchdog exit\n");
-	  exit(-1);
-	  }
- */
-
 //---------------------------------------------------------
 //   seqStart
 //---------------------------------------------------------
@@ -242,12 +168,10 @@ bool OOMidi::seqStart()
 	//
 	for (int i = 0; i < 60; ++i)
 	{
-		//if (audioState == AUDIO_START2)
 		if (audio->isRunning())
 			break;
 		sleep(1);
 	}
-	//if (audioState != AUDIO_START2) {
 	if (!audio->isRunning())
 	{
 		QMessageBox::critical(oom, tr("Failed to start audio!"),
@@ -548,8 +472,6 @@ QActionGroup* populateAddTrack(QMenu* addTrack)
 //   OOMidi
 //---------------------------------------------------------
 
-//OOMidi::OOMidi(int argc, char** argv) : QMainWindow(0, "mainwindow")
-
 OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 {
 
@@ -561,12 +483,8 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	QApplication::setFont(config.fonts[0]);
 	loadStyleSheetFile(config.styleSheetFile);
 
-	// By T356. For LADSPA plugins in plugin.cpp
-	// QWidgetFactory::addWidgetFactory( new PluginWidgetFactory ); ddskrjo
-
 	setIconSize(ICON_SIZE);
 	setFocusPolicy(Qt::WheelFocus);
-	//setFocusPolicy(Qt::NoFocus);
 	oom = this; // hack
 	clipListEdit = 0;
 	midiSyncConfig = 0;
@@ -584,9 +502,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	softSynthesizerConfig = 0;
 	midiTransformerDialog = 0;
 	shortcutConfig = 0;
-	//appearance = 0;
 	pipelineBox = 0;
-	//audioMixer            = 0;
 	mixer1 = 0;
 	mixer2 = 0;
 	watchdogThread = 0;
@@ -595,7 +511,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	routingDialog = 0;
 	firstrun = true;
 	m_externalCall = false;
-	//routingPopupView      = 0;
+
 	g_trackColorListLine.insert(Track::AUDIO_INPUT, QColor(189,122,214));
 	g_trackColorListLine.insert(Track::MIDI, QColor(1,230,238));
 	g_trackColorListLine.insert(Track::DRUM, QColor(1,230,238));
@@ -636,7 +552,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	setWindowTitle(appName);
 
 	qRegisterMetaType<CCInfo>("CCInfo");
-	//qRegisterMetaType<MPConfig>("MPConfig");
 	
 	editSignalMapper = new QSignalMapper(this);
 	midiPluginSignalMapper = new QSignalMapper(this);
@@ -657,7 +572,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 #ifdef LSCP_SUPPORT
 	lscpRestart = false;
-	//connect(heartBeatTimer, SIGNAL(timeout()), SLOT(checkLSCPClient()));
 #endif
 
 #ifdef ENABLE_PYTHON
@@ -710,7 +624,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	transportAction = new QActionGroup(this);
 	transportAction->setExclusive(false);
 
-	//repPlay->setIconSize(soloIconOn->size());
 	replayAction = new QAction(QIcon(*auditionIconSet3), tr("Toggle Audition Mode"), transportAction);
 	replayAction->setCheckable(true);
 	connect(replayAction, SIGNAL(toggled(bool)), song, SLOT(setReplay(bool)));
@@ -840,9 +753,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	
 
 	startPianoEditAction = new QAction(*pianoIconSet, tr("Performer"), this);
-	//startDrumEditAction = new QAction(QIcon(*edit_drummsIcon), tr("Drums"), this);
 	startListEditAction = new QAction(QIcon(*edit_listIcon), tr("List"), this);
-	startWaveEditAction = new QAction(QIcon(*edit_waveIcon), tr("Audio"), this);
 
 	master = new QMenu(tr("Tempo Editor"), this);
 	master->setIcon(QIcon(*edit_mastertrackIcon));
@@ -869,10 +780,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	viewBigtimeAction->setCheckable(true);
 	viewMixerAAction = new QAction(QIcon(*mixerSIcon), tr("Mixer"), this);
 	viewMixerAAction->setCheckable(true);
-	//viewMixerBAction = new QAction(QIcon(*mixerSIcon), tr("Mixer B"), this);
-	//viewMixerBAction->setCheckable(true);
-	//viewRoutesAction = new QAction(QIcon(*mixerSIcon), tr("Audio Routing Manager"), this);
-	//viewRoutesAction->setCheckable(true);
 	viewCliplistAction = new QAction(QIcon(*cliplistSIcon), tr("Cliplist"), this);
 	viewCliplistAction->setCheckable(true);
 	viewMarkerAction = new QAction(QIcon(*view_markerIcon), tr("Marker View"), this);
@@ -928,10 +835,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	followCtsAction->setCheckable(true);
 
 	settingsMetronomeAction = new QAction(QIcon(*settings_metronomeIcon), tr("Metronome"), this);
-	//settingsMidiSyncAction = new QAction(QIcon(*settings_midisyncIcon), tr("Midi Sync"), this);
 	settingsMidiIOAction = new QAction(QIcon(*settings_midifileexportIcon), tr("Midi File Import/Export"), this);
-	//settingsAppearanceAction = new QAction(QIcon(*settings_appearance_settingsIcon), tr("Appearance Settings"), this);
-	//settingsMidiPortAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Midi Ports Manager"), this);
 	settingsMidiAssignAction = new QAction(QIcon(*settings_midiport_softsynthsIcon), tr("Connections Manager"), this);
 
 	//-------- Help Actions
@@ -1010,8 +914,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(viewTransportAction, SIGNAL(toggled(bool)), SLOT(toggleTransport(bool)));
 	connect(viewBigtimeAction, SIGNAL(toggled(bool)), SLOT(toggleBigTime(bool)));
 	connect(viewMixerAAction, SIGNAL(toggled(bool)), SLOT(toggleMixer1(bool)));
-	//connect(viewMixerBAction, SIGNAL(toggled(bool)), SLOT(toggleMixer2(bool)));
-	//connect(viewRoutesAction, SIGNAL(toggled(bool)), SLOT(toggleRoutes(bool)));
 	connect(viewCliplistAction, SIGNAL(toggled(bool)), SLOT(startClipList(bool)));
 	connect(viewMarkerAction, SIGNAL(toggled(bool)), SLOT(toggleMarker(bool)));
 
@@ -1059,10 +961,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(settingsGlobalAction, SIGNAL(triggered()), SLOT(configGlobalSettings()));
 	connect(settingsShortcutsAction, SIGNAL(triggered()), SLOT(configShortCuts()));
 	connect(settingsMetronomeAction, SIGNAL(triggered()), SLOT(configMetronome()));
-	//connect(settingsMidiSyncAction, SIGNAL(triggered()), SLOT(configMidiSync()));
 	connect(settingsMidiIOAction, SIGNAL(triggered()), SLOT(configMidiFile()));
-	//connect(settingsAppearanceAction, SIGNAL(triggered()), SLOT(configAppearance()));
-	//connect(settingsMidiPortAction, SIGNAL(triggered()), SLOT(configMidiPorts()));
 	connect(settingsMidiAssignAction, SIGNAL(triggered()), SLOT(configMidiAssign()));
 
 	connect(dontFollowAction, SIGNAL(triggered()), followSignalMapper, SLOT(map()));
@@ -1078,7 +977,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//-------- Help connections
 	connect(helpManualAction, SIGNAL(triggered()), SLOT(startHelpBrowser()));
 	connect(helpHomepageAction, SIGNAL(triggered()), SLOT(startHomepageBrowser()));
-	//connect(helpReportAction, SIGNAL(triggered()), SLOT(startBugBrowser()));
 	connect(helpAboutAction, SIGNAL(triggered()), SLOT(about()));
 
 	//--------------------------------------------------
@@ -1194,21 +1092,12 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//-------------------------------------------------------------
 
 	menu_functions = menuBar()->addMenu(tr("&Midi"));
-	//song->populateScriptMenu(menuScriptPlugins, this);
-	//menu_functions->addMenu(menuScriptPlugins);
 	menu_functions->addAction(midiEditInstAction);
-	//menu_functions->addMenu(midiInputPlugins);
-	//midiInputPlugins->addAction(midiTrpAction);
-	//midiInputPlugins->addAction(midiInputTrfAction);
-	//midiInputPlugins->addAction(midiInputFilterAction);
-	//midiInputPlugins->addAction(midiRemoteAction);
 #ifdef BUILD_EXPERIMENTAL
 	midiInputPlugins->addAction(midiRhythmAction);
 #endif
 
 	menu_functions->addSeparator();
-	//menu_functions->addAction(midiResetInstAction);
-	//menu_functions->addAction(midiInitInstActions);
 	menu_functions->addAction(midiLocalOffAction);
 
 	//-------------------------------------------------------------
@@ -1221,16 +1110,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menu_audio->addSeparator();
 	menu_audio->addAction(audioRestartAction);
 
-
-	//-------------------------------------------------------------
-	//    popup Automation
-	//-------------------------------------------------------------
-
-	//menuAutomation = menuBar()->addMenu(tr("Automation"));
-	//menuAutomation->addAction(autoMixerAction);
-	//menuAutomation->addSeparator();
-	//menuAutomation->addAction(autoSnapshotAction);
-	//menuAutomation->addAction(autoClearAction);
 
 	//-------------------------------------------------------------
 	//    popup Settings
@@ -1394,6 +1273,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 		showMaximized();
 	}
 
+	readInstrumentTemplates();
 	song->update();
 
 	setCorner(Qt::BottomLeftCorner, Qt:: LeftDockWidgetArea);
@@ -1953,13 +1833,18 @@ bool OOMidi::save(const QString& name, bool overwriteWarn)
 				tr("OOMidi: Write File failed"), s);
 		popenFlag ? pclose(f) : fclose(f);
 		unlink(name.toLatin1().constData());
+		//FIXME: We should probably restore the backup file at this point as the saved file 
+		//has been found to be currupt, why force the user to make the restore, we already told them it failed
 		return false;
 	}
 	else
 	{
 		popenFlag ? pclose(f) : fclose(f);
+		//We should also use QDomDocument to parse the file like we do in openProject and verify after the fact that
+		//it did actually save a good file before returning true below
+		//Lets save config when the user saves to make sure everything is in sync on next launch
+		changeConfig(true);
 		song->dirty = false;
-		//saveRouteMapping(routePath + "/testing.orm", "This is a test");
 		return true;
 	}
 }
@@ -3694,24 +3579,6 @@ void OOMidi::mixTrack()
 }
 
 //---------------------------------------------------------
-//   configAppearance
-//---------------------------------------------------------
-/*
-void OOMidi::configAppearance()
-{
-	if (!appearance)
-		appearance = new Appearance(composer);
-	appearance->resetValues();
-	if (appearance->isVisible())
-	{
-		appearance->raise();
-		appearance->activateWindow();
-	}
-	else
-		appearance->show();
-}
-*/
-//---------------------------------------------------------
 //   loadTheme
 //---------------------------------------------------------
 
@@ -3749,7 +3616,7 @@ void OOMidi::loadStyleSheetFile(const QString& s)
 //   configChanged
 //    - called whenever configuration has changed
 //    - when configuration has changed by user, call with
-//      writeFlag=true to save configuration in ~/.OOMidi
+//      writeFlag=true to save configuration in ~/.config/OOMidi
 //---------------------------------------------------------
 
 void OOMidi::changeConfig(bool writeFlag)
@@ -4499,24 +4366,18 @@ void OOMidi::updateConfiguration()
 	editAllPartsAction->setShortcut(shortcuts[SHRT_SELECT_PRTSTRACK].key);
 
 	startPianoEditAction->setShortcut(shortcuts[SHRT_OPEN_PIANO].key);
-	//startDrumEditAction->setShortcut(shortcuts[SHRT_OPEN_DRUMS].key);
 	startListEditAction->setShortcut(shortcuts[SHRT_OPEN_LIST].key);
-	//startWaveEditAction->setShortcut(shortcuts[SHRT_OPEN_WAVE].key);
 
 	masterGraphicAction->setShortcut(shortcuts[SHRT_OPEN_GRAPHIC_MASTER].key);
 	masterListAction->setShortcut(shortcuts[SHRT_OPEN_LIST_MASTER].key);
 
 	midiTransposeAction->setShortcut(shortcuts[SHRT_TRANSPOSE].key);
 	midiTransformerAction->setShortcut(shortcuts[SHRT_OPEN_MIDI_TRANSFORM].key);
-	//editSongInfoAction has no acceleration
 
 	viewTransportAction->setShortcut(shortcuts[SHRT_OPEN_TRANSPORT].key);
 	viewBigtimeAction->setShortcut(shortcuts[SHRT_OPEN_BIGTIME].key);
 	viewMixerAAction->setShortcut(shortcuts[SHRT_OPEN_MIXER].key);
-	//viewMixerBAction->setShortcut(shortcuts[SHRT_OPEN_MIXER2].key);
-	//viewCliplistAction has no acceleration
 	viewMarkerAction->setShortcut(shortcuts[SHRT_OPEN_MARKER].key);
-	//viewRoutesAction->setShortcut(shortcuts[SHRT_OPEN_ROUTES].key);
 
 	strGlobalCutAction->setShortcut(shortcuts[SHRT_GLOBAL_CUT].key);
 	strGlobalInsertAction->setShortcut(shortcuts[SHRT_GLOBAL_INSERT].key);
@@ -4524,7 +4385,6 @@ void OOMidi::updateConfiguration()
 	strCopyRangeAction->setShortcut(shortcuts[SHRT_COPY_RANGE].key);
 	strCutEventsAction->setShortcut(shortcuts[SHRT_CUT_EVENTS].key);
 
-	// midiEditInstAction does not have acceleration
 	midiResetInstAction->setShortcut(shortcuts[SHRT_MIDI_RESET].key);
 	midiInitInstActions->setShortcut(shortcuts[SHRT_MIDI_INIT].key);
 	midiLocalOffAction->setShortcut(shortcuts[SHRT_MIDI_LOCAL_OFF].key);
@@ -4547,9 +4407,6 @@ void OOMidi::updateConfiguration()
 	settingsGlobalAction->setShortcut(shortcuts[SHRT_GLOBAL_CONFIG].key);
 	settingsShortcutsAction->setShortcut(shortcuts[SHRT_CONFIG_SHORTCUTS].key);
 	settingsMetronomeAction->setShortcut(shortcuts[SHRT_CONFIG_METRONOME].key);
-	//settingsMidiSyncAction->setShortcut(shortcuts[SHRT_CONFIG_MIDISYNC].key);
-	// settingsMidiIOAction does not have acceleration
-	//settingsAppearanceAction->setShortcut(shortcuts[SHRT_APPEARANCE_SETTINGS].key);
 	settingsMidiAssignAction->setShortcut(shortcuts[SHRT_CONFIG_MIDI_PORTS].key);
 
 
@@ -4559,11 +4416,6 @@ void OOMidi::updateConfiguration()
 
 	helpManualAction->setShortcut(shortcuts[SHRT_OPEN_HELP].key);
 
-	// Orcan: Old stuff, needs to be converted. These aren't used anywhere so I commented them out
-	//menuSettings->setAccel(shortcuts[SHRT_CONFIG_AUDIO_PORTS].key, menu_ids[CMD_CONFIG_AUDIO_PORTS]);
-	//menu_help->setAccel(menu_ids[CMD_START_WHATSTHIS], shortcuts[SHRT_START_WHATSTHIS].key);
-
-	// Just in case, but no, app kb handler takes care of these.
 	/*
 	loopAction->setShortcut(shortcuts[].key);
 	punchinAction->setShortcut(shortcuts[].key);
@@ -4777,5 +4629,43 @@ void OOMidi::execDeliveredScript(int id)
 void OOMidi::execUserScript(int id)
 {
 	song->executeScript(song->getScriptPath(id, false).toLatin1().constData(), song->getSelectedMidiParts(), 0, false); // TODO: get quant from composer
+}
+
+//---------------------------------------------------------
+// Instrument Template code
+//
+//---------------------------------------------------------
+
+void OOMidi::insertInstrumentTemplate(TrackView* tv, int idx)
+{
+	Q_UNUSED(idx);
+	m_instrumentTemplates.insert(tv->id(), tv);
+	emit instrumentTemplateAdded(tv->id());
+}
+
+void OOMidi::removeInstrumentTemplate(qint64 id)
+{
+	if(m_instrumentTemplates.contains(id))
+	{
+		m_instrumentTemplates.erase(m_instrumentTemplates.find(id));
+		emit instrumentTemplateRemoved(id);
+	}
+}
+
+TrackView* OOMidi::addInstrumentTemplate()
+{
+	TrackView* tv = new TrackView(true);
+	tv->setDefaultName();
+	m_instrumentTemplates.insert(tv->id(), tv);
+	emit instrumentTemplateAdded(tv->id());
+
+	return tv;
+}
+
+TrackView* OOMidi::findInstrumentTemplateById(qint64 id) const
+{
+	if(m_instrumentTemplates.contains(id))
+		return m_instrumentTemplates.value(id);
+	return 0;
 }
 

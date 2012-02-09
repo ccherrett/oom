@@ -28,7 +28,9 @@ class TrackViewDock : public QFrame, public Ui::TViewDockBase {
 		void trackviewRemoved(QModelIndex, int, int);
 		void updateTrackView(int, QStandardItem*);
 		void contextPopupMenu(QPoint);
+		void templateContextPopupMenu(QPoint);
 		void currentTabChanged(int);
+		void populateInstrumentTemplates();
 	
 	protected:
 		QStandardItemModel* _tableModel;
@@ -38,7 +40,7 @@ class TrackViewDock : public QFrame, public Ui::TViewDockBase {
 		
 		QList<QIcon> m_icons;
 
-		QList<int> getSelectedRows();
+		QList<int> getSelectedRows(int);
 		void updateTableHeader();
 	
 	public slots:

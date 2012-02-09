@@ -56,10 +56,12 @@ TrackViewDock::TrackViewDock(QWidget* parent) : QFrame(parent)
 	connect(_tableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(trackviewChanged(QStandardItem*)));
 	connect(_autoTableModel, SIGNAL(itemChanged(QStandardItem*)), SLOT(autoTrackviewChanged(QStandardItem*)));
 	connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(contextPopupMenu(QPoint)));
+	connect(templateView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(templateContextPopupMenu(QPoint)));
 	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(populateTable(int)));
+	connect(oom, SIGNAL(instrumentTemplateAdded(qint64)), this, SLOT(populateInstrumentTemplates()));
+	connect(oom, SIGNAL(instrumentTemplateRemoved(qint64)), this, SLOT(populateInstrumentTemplates()));
 	populateTable(-1);
-	//updateTableHeader();
 }
 
 TrackViewDock::~TrackViewDock()
@@ -130,7 +132,33 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 		tableView->resizeRowsToContents();
 		autoTable->resizeRowsToContents();
 	}
+	if(flag & (SC_CONFIG)|| flag == -1)
+		populateInstrumentTemplates();
 }/*}}}*/
+
+void TrackViewDock::populateInstrumentTemplates()
+{
+	qDebug("TrackViewDock::populateInstrumentTemplates------------");
+	_templateModel->clear();/*{{{*/
+	ciTrackView iter = oom->instrumentTemplates()->constBegin();
+	while(iter != oom->instrumentTemplates()->constEnd())
+	{
+		TrackView* tv = iter.value();
+		if(tv)
+		{
+			QStandardItem *item = new QStandardItem(tv->viewName());
+			item->setData(tv->id());
+			item->setEditable(false);
+			_templateModel->blockSignals(true);
+			_templateModel->appendRow(item);
+			_templateModel->blockSignals(false);
+			templateView->setRowHeight(_templateModel->rowCount(), 25);
+		}
+		iter++;
+	}/*}}}*/
+	updateTableHeader();
+	templateView->resizeRowsToContents();
+}
 
 void TrackViewDock::trackviewChanged(QStandardItem *item)/*{{{*/
 {
@@ -142,7 +170,57 @@ void TrackViewDock::trackviewChanged(QStandardItem *item)/*{{{*/
 		if(tv)
 		{
 			//qDebug("TrackViewDock::trackviewChanged: Found trackview %s", tv->viewName().toUtf8().constData());
-			tv->setSelected(item->checkState() == Qt::Checked);
+			bool selected = (item->checkState() == Qt::Checked);
+			if(selected && tv->virtualTracks()->size())
+			{
+				QStringList list;
+				ciVirtualTrack iter = tv->virtualTracks()->constBegin();
+				while(iter != tv->virtualTracks()->constEnd())
+				{
+					list.append(iter.value()->name);
+					++iter;
+				}
+				QString msg(tr("The View you selected contains Virtual Tracks.\n%1 \nWould you like to create them as real tracks now?"));/*{{{*/
+				if(QMessageBox::question(this, 
+					tr("Create Virtual Tracks"),
+					msg.arg(list.join("\n")),
+					QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+				{
+					QList<qint64> delList;
+					QList<qint64> *tidlist = tv->trackIndexList();
+					for(int i = 0; i < tidlist->size(); ++i)
+					{
+						qint64 tid = tidlist->at(i);
+						TrackView::TrackViewTrack *tvt = tv->tracks()->value(tid);
+						if(tvt && tvt->is_virtual)
+						{
+							VirtualTrack* vt = tv->virtualTracks()->value(tid);
+							if(vt)
+							{//Let create the real track and add a part to it
+								TrackManager *tman = new TrackManager();
+								qint64 id = tman->addTrack(vt);
+								if(id)
+								{//Copy any settings for that track, delete the virtual track and add the real track to the view
+									TrackView::TrackViewTrack *ntvl = new TrackView::TrackViewTrack(id);
+									ntvl->setSettingsCopy(tvt->settings);
+									tv->addTrack(ntvl);
+									Track* track = song->findTrackByIdAndType(id, vt->type);
+									if(track)
+									{
+										delList.append(tid);
+									}
+								}
+							}
+						}
+					}
+					foreach(qint64 id, delList)
+					{
+						tv->removeVirtualTrack(id);
+						tv->removeTrack(id);
+					}
+				}/*}}}*/
+			}
+			tv->setSelected(selected);
 			song->updateTrackViews();
 		}
 	}
@@ -191,11 +269,11 @@ void TrackViewDock::trackviewRemoved(QModelIndex, int, int)
 
 void TrackViewDock::btnTVClicked(bool)
 {
-	TrackViewEditor* tve = new TrackViewEditor(this);
+	TrackViewEditor* tve = new TrackViewEditor(this, m_tabWidget->currentIndex());
 	tve->show();
 }
 
-void TrackViewDock::currentTabChanged(int index)
+void TrackViewDock::currentTabChanged(int index)/*{{{*/
 {
 	switch(index)
 	{
@@ -220,7 +298,7 @@ void TrackViewDock::currentTabChanged(int index)
 		}
 		break;
 	}
-}
+}/*}}}*/
 
 void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 {
@@ -283,9 +361,163 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 	}
 }/*}}}*/
 
+void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
+{
+	qDebug("TrackViewDock::templateContextPopupMenu");
+	QModelIndex index = templateView->indexAt(pos);
+	if(!index.isValid())
+		return;
+	QStandardItem* item = _templateModel->itemFromIndex(index);
+	if(item)
+	{
+		TrackView *tview = oom->findInstrumentTemplateById(item->data().toLongLong());
+		if(tview)
+		{
+			QMenu* p = new QMenu(this);
+			QAction* add = p->addAction(tr("Add Template to Song"));
+			add->setData(0);
+			QAction* addEnable = p->addAction(tr("Add Template to Song selected"));
+			addEnable->setData(1);
+
+			QAction* act = p->exec(QCursor::pos());
+			if (act)
+			{
+				int mid = act->data().toInt();
+				switch(mid)
+				{
+					case 0:
+					{
+						qDebug("TrackViewDock::templateContextPopupMenu~~~~~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						TrackView* tv = new TrackView(false);
+						QList<qint64> *list = tview->trackIndexList();
+						for(int i = 0; i < list->size(); ++i)
+						{
+							qint64 id = list->at(i);
+							TrackView::TrackViewTrack *tvt = tview->tracks()->value(id);
+							TrackView::TrackViewTrack *newtvt = new TrackView::TrackViewTrack();
+							if(tvt)
+							{
+								newtvt->setSettingsCopy(tvt->settings);
+								newtvt->is_virtual = tvt->is_virtual;
+								if(tvt->is_virtual)
+								{//Copy the associated virtual track and change the id
+									VirtualTrack* vt = tview->virtualTracks()->value(id);
+									if(vt)
+									{
+										newtvt->id = tv->addVirtualTrackCopy(vt);
+									}
+								}
+								else
+								{//Its just a track id
+									newtvt->id = tvt->id;
+								}
+								tv->addTrack(newtvt);
+							}
+						}
+
+						tv->setComment(tview->comment());
+						tv->setViewName(tv->getValidName(tview->viewName()));
+						tv->setRecord(tview->record());
+						tv->setSelected(false);
+						song->insertTrackView(tv, -1);
+						song->updateTrackViews();
+						populateTable(-1);
+					}
+					break;
+					case 1:
+					{
+						TrackView* tv = new TrackView(false);
+						QList<qint64> *list = tview->trackIndexList();
+						for(int i = 0; i < list->size(); ++i)
+						{
+							qint64 id = list->at(i);
+							TrackView::TrackViewTrack *tvt = tview->tracks()->value(id);
+							TrackView::TrackViewTrack *newtvt = new TrackView::TrackViewTrack();
+							if(tvt)
+							{
+								newtvt->setSettingsCopy(tvt->settings);
+								newtvt->is_virtual = tvt->is_virtual;
+								if(tvt->is_virtual)
+								{//Copy the associated virtual track and change the id
+									VirtualTrack* vt = tview->virtualTracks()->value(id);
+									if(vt)
+									{
+										newtvt->id = tv->addVirtualTrackCopy(vt);
+									}
+								}
+								else
+								{//Its just a track id
+									newtvt->id = tvt->id;
+								}
+								tv->addTrack(newtvt);
+							}
+						}
+
+						tv->setComment(tview->comment());
+						tv->setViewName(tv->getValidName(tview->viewName()));
+						tv->setRecord(tview->record());
+						QStringList namelist;
+						ciVirtualTrack iter = tv->virtualTracks()->constBegin();
+						while(iter != tv->virtualTracks()->constEnd())
+						{
+							namelist.append(iter.value()->name);
+							++iter;
+						}
+						QString msg(tr("The View you selected contains Virtual Tracks.\n%1 \nWould you like to create them as real tracks now?"));/*{{{*/
+						if(QMessageBox::question(this, 
+							tr("Create Virtual Tracks"),
+							msg.arg(namelist.join("\n")),
+							QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+						{
+							QList<qint64> delList;
+							QList<qint64> *tidlist = tv->trackIndexList();
+							for(int i = 0; i < tidlist->size(); ++i)
+							{
+								qint64 tid = tidlist->at(i);
+								TrackView::TrackViewTrack *tvt = tv->tracks()->value(tid);
+								if(tvt && tvt->is_virtual)
+								{
+									VirtualTrack* vt = tv->virtualTracks()->value(tid);
+									if(vt)
+									{//Let create the real track and add a part to it
+										TrackManager *tman = new TrackManager();
+										qint64 id = tman->addTrack(vt);
+										if(id)
+										{//Copy any settings for that track, delete the virtual track and add the real track to the view
+											TrackView::TrackViewTrack *ntvl = new TrackView::TrackViewTrack(id);
+											ntvl->setSettingsCopy(tvt->settings);
+											tv->addTrack(ntvl);
+											Track* track = song->findTrackByIdAndType(id, vt->type);
+											if(track)
+											{
+												song->updateTrackViews();
+												delList.append(tid);
+											}
+										}
+									}
+								}
+							}
+							foreach(qint64 id, delList)
+							{
+								tv->removeVirtualTrack(id);
+								tv->removeTrack(id);
+							}
+						}/*}}}*/
+						tv->setSelected(true);
+						song->insertTrackView(tv, -1);
+						populateTable(-1);
+					}
+					break;
+				}
+			}
+			delete p;
+		}
+	}
+}/*}}}*/
+
 void TrackViewDock::btnUpClicked(bool)/*{{{*/
 {
-	QList<int> rows = getSelectedRows();
+	QList<int> rows = getSelectedRows(0);
 	if (!rows.isEmpty())
 	{
 		int id = rows.at(0);
@@ -311,7 +543,7 @@ void TrackViewDock::btnUpClicked(bool)/*{{{*/
 
 void TrackViewDock::btnDownClicked(bool)/*{{{*/
 {
-	QList<int> rows = getSelectedRows();
+	QList<int> rows = getSelectedRows(0);
 	if (!rows.isEmpty())
 	{
 		int id = rows.at(0);
@@ -335,45 +567,93 @@ void TrackViewDock::btnDownClicked(bool)/*{{{*/
 
 void TrackViewDock::btnDeleteClicked(bool)/*{{{*/
 {
-	QList<int> rows = getSelectedRows();
+	int tab = m_tabWidget->currentIndex();
+	QList<int> rows = getSelectedRows(tab);
+	QList<TrackView*> dlist;
+	QStringList list;
 	if (!rows.isEmpty())
 	{
-		QList<TrackView*> dlist;
-		QStringList list;
-		foreach (int r, rows)
+		switch(tab)
 		{
-			QStandardItem *item = _tableModel->item(r);
-			if(item)
+			case 0:
 			{
-				TrackView* tv = song->findTrackViewById(item->data().toLongLong());
-				if(tv)
+				foreach (int r, rows)
 				{
-					dlist.append(tv);
-					list.append(tv->viewName());
+					QStandardItem *item = _tableModel->item(r);
+					if(item)
+					{
+						TrackView* tv = song->findTrackViewById(item->data().toLongLong());
+						if(tv)
+						{
+							dlist.append(tv);
+							list.append(tv->viewName());
+						}
+					}
+				}
+				if (!dlist.isEmpty())
+				{
+					QString msg(tr("You are about to delete the following View(s) \n%1 \nAre you sure this is what you want?"));
+					if(QMessageBox::question(this, 
+						tr("Delete View(s)"),
+						msg.arg(list.join("\n")),
+						QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+					{
+						for (int d = 0; d < dlist.size(); ++d)
+						{
+							song->removeTrackView(dlist.at(d)->id());
+						}
+					}
 				}
 			}
-		}
-		if (!dlist.isEmpty())
-		{
-			QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
-			if(QMessageBox::question(this, 
-				tr("Delete"),
-				msg.arg(list.join("\n")),
-				QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+			break;
+			case 1:
 			{
-				for (int d = 0; d < dlist.size(); ++d)
+				foreach (int r, rows)
 				{
-					song->removeTrackView(dlist.at(d)->id());
+					QStandardItem *item = _templateModel->item(r);
+					if(item)
+					{
+						TrackView* tv = oom->findInstrumentTemplateById(item->data().toLongLong());
+						if(tv)
+						{
+							dlist.append(tv);
+							list.append(tv->viewName());
+						}
+					}
+				}
+				if (!dlist.isEmpty())
+				{
+					QString msg(tr("You are about to delete the follwing Instrument Template(s)\n%1 \nAre you sure this is what you want?"));
+					if(QMessageBox::question(this, 
+						tr("Delete Instrument Template(s)"),
+						msg.arg(list.join("\n")),
+						QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+					{
+						for (int d = 0; d < dlist.size(); ++d)
+						{
+							oom->removeInstrumentTemplate(dlist.at(d)->id());
+						}
+					}
+					oom->changeConfig(true);
 				}
 			}
+			break;
 		}
 	}
 }/*}}}*/
 
-QList<int> TrackViewDock::getSelectedRows()/*{{{*/
+QList<int> TrackViewDock::getSelectedRows(int tab)/*{{{*/
 {
 	QList<int> rv;
-	QItemSelectionModel* smodel = tableView->selectionModel();
+	QItemSelectionModel* smodel = 0;
+	if(tab)
+	{
+		 smodel = templateView->selectionModel();
+	}
+	else
+	{
+		 smodel = tableView->selectionModel();
+	}
 	if (smodel->hasSelection())
 	{
 		QModelIndexList indexes = smodel->selectedRows();

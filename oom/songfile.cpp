@@ -574,112 +574,6 @@ Part* OOMidi::readPart(Xml& xml)
 }
 
 //---------------------------------------------------------
-//   readToplevels
-//---------------------------------------------------------
-
-void OOMidi::readToplevels(Xml& xml)/*{{{*/
-{
-	printf("OOMidi::readToplevels\n");
-	PartList* pl = new PartList;
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return;
-			case Xml::TagStart:
-				if (tag == "part")
-				{
-					Part* part = readPart(xml);
-					if (part)
-					{
-						printf("Found part in track lists\n");
-						pl->add(part);
-					}
-				}
-                                else if (tag == "pianoroll" || tag == "performer")
-				{
-					// p3.3.34
-					// Do not open if there are no parts.
-					// Had bogus '-1' part index for list edit in oom file,
-					//  causing list edit to segfault on song load.
-					// Somehow that -1 was put there on write, because the
-					//  current part didn't exist anymore, so no index number
-					//  could be found for it on write. Watching... may be fixed.
-					// But for now be safe for all the top levels...
-					if (!pl->empty())
-					{
-
-						startPerformer(pl);
-						//FIXME: When started from here in a song loaded from the commandline
-						//closing the PR window segfaults OOM no doing it untill I trace this down
-						//toplevels.back().cobject()->readStatus(xml);
-						pl = new PartList;
-					}
-				}
-				else if (tag == "drumedit")
-				{
-					if (!pl->empty())
-					{
-						startDrumEditor(pl);
-						//toplevels.back().cobject()->readStatus(xml);
-						pl = new PartList;
-					}
-				}
-				else if (tag == "listeditor")
-				{
-					if (!pl->empty())
-					{
-						startListEditor(pl);
-						//toplevels.back().cobject()->readStatus(xml);
-						pl = new PartList;
-					}
-				}
-				else if (tag == "master")
-				{
-					startMasterEditor();
-					//toplevels.back().cobject()->readStatus(xml);
-				}
-				else if (tag == "lmaster")
-				{
-					startLMasterEditor();
-					//toplevels.back().cobject()->readStatus(xml);
-				}
-				else if (tag == "marker")
-				{
-					showMarker(true);
-					//toplevels.back().cobject()->readStatus(xml);
-				}
-				else if (tag == "waveedit")
-				{
-					xml.skip(tag);
-				}
-				else if (tag == "cliplist")
-				{
-					startClipList(true);
-					//toplevels.back().cobject()->readStatus(xml);
-				}
-				else
-					xml.unknown("OOMidi");
-				break;
-			case Xml::Attribut:
-				break;
-			case Xml::TagEnd:
-				if (tag == "toplevels")
-				{
-					delete pl;
-					return;
-				}
-			default:
-				break;
-		}
-	}
-}/*}}}*/
-
-//---------------------------------------------------------
 //   readCtrl
 //---------------------------------------------------------
 
@@ -907,15 +801,6 @@ void Song::read(Xml& xml)
 					insertTrack(track, -1);
 					track->showPendingPluginNativeGuis();
 				}
-				else if (tag == "SynthI")
-				{
-					xml.skip(tag);
-					//SynthI* track = new SynthI();
-					//track->read(xml);
-					// Done in SynthI::read()
-					// insertTrack(track,-1);
-					//track->showPendingPluginNativeGuis();
-				}
 				else if (tag == "Route")
 				{
 					readRoute(xml);
@@ -944,9 +829,6 @@ void Song::read(Xml& xml)
 					Pos p(pos, true);
 					setPos(Song::RPOS, p, false, false, false);
 				}
-				else if (tag == "drummap")
-					xml.skip(tag);
-					//readDrumMap(xml, false);
 				else if (tag == "trackview")
 				{//Read in our trackviews
 					//printf("Song::read() found track view\n");
@@ -973,7 +855,7 @@ void Song::read(Xml& xml)
 					insertTrackView(tv, -1);
 				}
 				else
-					xml.unknown("Song");
+					xml.skip(tag);
 				break;
 			case Xml::Attribut:
 				break;
@@ -1025,7 +907,6 @@ void OOMidi::read(Xml& xml, bool skipConfig)
 					break;
 				else if (tag == "configuration")
 					if (skipConfig)
-						//xml.skip(tag);
 						readConfiguration(xml, true /* only read sequencer settings */);
 					else
 						readConfiguration(xml, false);
@@ -1044,13 +925,6 @@ void OOMidi::read(Xml& xml, bool skipConfig)
 				}
 				else if (tag == "mplugin")
 					readStatusMidiInputTransformPlugin(xml);
-				else if (tag == "toplevels")
-				{
-					//We no longer want to start top level windows with oom
-					//Start with only the Composer and that's all.
-					xml.skip(tag);
-					//readToplevels(xml);
-				}
 				else
 					xml.unknown("oom");
 				break;

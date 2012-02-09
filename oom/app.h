@@ -16,6 +16,7 @@
 #ifdef LSCP_SUPPORT
 #include "network/lsclient.h"
 #endif
+#include "trackview.h"
 #include <QFileInfo>
 
 class QCloseEvent;
@@ -66,7 +67,6 @@ class MidiTrack;
 class MidiInstrument;
 class MidiPort;
 class ShortcutConfig;
-//class Appearance;
 class WaveTrack;
 class AudioOutput;
 class EditInstrument;
@@ -127,14 +127,13 @@ class OOMidi : public QMainWindow
     QAction *editInvertSelectionAction, *editInsideLoopAction, *editOutsideLoopAction, *editAllPartsAction;
     QAction *trackMidiAction, *trackDrumAction, *trackWaveAction, *trackAOutputAction, *trackAGroupAction;
     QAction *trackAInputAction, *trackAAuxAction;
-    QAction *startPianoEditAction, *startDrumEditAction, *startListEditAction, *startWaveEditAction;
+    QAction *startPianoEditAction, *startDrumEditAction, *startListEditAction;
     QAction *masterGraphicAction, *masterListAction;
     QAction *midiTransposeAction;
     QAction *midiTransformerAction;
-    //QAction *editSongInfoAction;
 
     // View Menu actions
-    QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, /*viewMixerBAction,*/ *viewCliplistAction, *viewMarkerAction;//, *viewRoutesAction;
+    QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, *viewCliplistAction, *viewMarkerAction;
 
     // Structure Menu actions
     QAction *strGlobalCutAction, *strGlobalInsertAction, *strGlobalSplitAction, *strCopyRangeAction, *strCutEventsAction;
@@ -153,8 +152,8 @@ class OOMidi : public QMainWindow
     QAction *autoMixerAction, *autoSnapshotAction, *autoClearAction;
 
     // Settings Menu Actions
-    QAction *settingsGlobalAction, *settingsShortcutsAction, *settingsMetronomeAction/*, *settingsMidiSyncAction*/;
-    QAction *settingsMidiIOAction, /*settingsAppearanceAction, *settingsMidiPortAction,*/ *settingsMidiAssignAction;
+    QAction *settingsGlobalAction, *settingsShortcutsAction, *settingsMetronomeAction;
+    QAction *settingsMidiIOAction, *settingsMidiAssignAction;
     QAction *dontFollowAction, *followPageAction, *followCtsAction;
 
     // Help Menu Actions
@@ -178,8 +177,6 @@ class OOMidi : public QMainWindow
 
     // Special 'stay-open' menu for routes.
     PopupMenu* routingPopupMenu;
-    //PopupView* routingPopupView;
-
 
     QMenu* follow;
     QMenu* midiInputPlugins;
@@ -218,6 +215,21 @@ class OOMidi : public QMainWindow
 
 	bool m_externalCall;
 
+    QSignalMapper *editSignalMapper;
+    QSignalMapper *midiPluginSignalMapper;
+    QSignalMapper *followSignalMapper;
+	OOMCommandServer server;
+#ifdef LSCP_SUPPORT
+	LSClient *lsclient;
+	bool lscpRestart;
+#endif
+	
+	//-------------------------------------------------------------
+	// Instrument Templates
+	//-------------------------------------------------------------
+	TrackViewList m_instrumentTemplates;
+
+
     bool readMidi(FILE*);
     void read(Xml& xml, bool skipConfig);
     void processTrack(MidiTrack* track);
@@ -246,15 +258,12 @@ class OOMidi : public QMainWindow
     virtual void keyPressEvent(QKeyEvent*); // p4.0.10 Tim.
     bool eventFilter(QObject *obj, QEvent *event);
 
-
-    QSignalMapper *editSignalMapper;
-    QSignalMapper *midiPluginSignalMapper;
-    QSignalMapper *followSignalMapper;
-	OOMCommandServer server;
-#ifdef LSCP_SUPPORT
-	LSClient *lsclient;
-	bool lscpRestart;
-#endif
+	//-------------------------------------------------------------
+	// Instrument Templates
+	//-------------------------------------------------------------
+	void writeInstrumentTemplates(int, Xml&) const;
+	void readInstrumentTemplates(Xml&);
+	void readInstrumentTemplates();
 
 signals:
     void configChanged();
@@ -263,6 +272,13 @@ signals:
 	void lscpStartListener();
 	void lscpStopListener();
 #endif
+	
+	//-------------------------------------------------------------
+	// Instrument Templates
+	//-------------------------------------------------------------
+
+	void instrumentTemplateAdded(qint64 id);
+	void instrumentTemplateRemoved(qint64 id);
 
 private slots:
     //void runPythonScript();
@@ -436,6 +452,20 @@ public:
 			return new QString();
 	}
 	QDockWidget* mixerDock() { return m_mixerDock; }
+
+	//-------------------------------------------------------------
+	// Instrument Templates
+	//-------------------------------------------------------------
+
+	TrackViewList* instrumentTemplates()
+	{
+		return &m_instrumentTemplates;
+	}
+
+	TrackView* addInstrumentTemplate();
+	TrackView* findInstrumentTemplateById(qint64 id) const;
+    void insertInstrumentTemplate(TrackView*, int idx);
+    void removeInstrumentTemplate(qint64);
 
 #ifdef HAVE_LASH
     void lash_idle_cb();

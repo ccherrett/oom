@@ -422,6 +422,8 @@ void Song::doUndo2()
 			case UndoOp::DeleteAutomation:
 			case UndoOp::ModifyAutomation:
 				break;
+			default:
+				break;
 		}
 	}
 }

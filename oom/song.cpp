@@ -3661,43 +3661,6 @@ TrackView* Song::findAutoTrackViewById(qint64 id) const
 }
 
 //---------------------------------------------------------
-// Instrument Template code
-//
-//---------------------------------------------------------
-
-void Song::insertInstrumentTemplate(TrackView* tv, int idx)
-{
-	Q_UNUSED(idx);
-	m_instrumentTemplates[tv->id()] = tv;
-	//TODO: This should not be called update(SC_VIEW_ADDED) instead
-	//updateTrackViews();
-}
-
-void Song::removeInstrumentTemplate(qint64 id)
-{
-	m_instrumentTemplates.erase(m_instrumentTemplates.find(id));
-	update(SC_TRACKVIEW_REMOVED);
-	//TODO: emit signal for only this
-	//updateTrackViews();
-}
-
-TrackView* Song::addInstrumentTemplate()
-{
-	TrackView* tv = new TrackView(true);
-	tv->setDefaultName();
-	m_instrumentTemplates[tv->id()] = tv;
-
-	return tv;
-}
-
-TrackView* Song::findInstrumentTemplateById(qint64 id) const
-{
-	if(m_instrumentTemplates.contains(id))
-		return m_instrumentTemplates.value(id);
-	return 0;
-}
-
-//---------------------------------------------------------
 //   findAutoTrackView
 //    find track view by name
 //---------------------------------------------------------

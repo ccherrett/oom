@@ -7,12 +7,15 @@
 //=========================================================
 
 #include "event.h"
+#include "app.h"
 #include "song.h"
 #include "audio.h"
 #include "midi.h"
 #include "midictrl.h"
 #include "xml.h"
 #include "utils.h"
+#include "globals.h"
+#include "gconfig.h"
 #include "globaldefs.h"
 #include "trackview.h"
 #include "track.h"
@@ -43,7 +46,7 @@ QString TrackView::getValidName(QString text)
 	QString rv = text;
 	TrackViewList* tv;
 	if(m_template)
-		tv = song->instrumentTemplates();
+		tv = oom->instrumentTemplates();
 	else
 		tv = song->trackviews();
 	QHash<qint64, TrackView*>::const_iterator iter = tv->constBegin();
@@ -230,7 +233,7 @@ void TrackView::read(Xml& xml)/*{{{*/
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if (tag == "id")/*{{{*/
+				if (tag == "id")
 				{
 					m_id = xml.parseLongLong();
 				}
@@ -245,7 +248,7 @@ void TrackView::read(Xml& xml)/*{{{*/
 				else if(tag == "record")
 				{
 					_recState = (bool)xml.parseInt();
-				}/*}}}*/
+				}
 				else if(tag == "name")
 				{
 					_name = xml.parse1();
@@ -324,7 +327,7 @@ void TrackView::read(Xml& xml)/*{{{*/
 				}
 				break;
 			case Xml::TagEnd:
-				if(tag == "trackview")
+				if(tag == "trackview" || tag == "instrumentTemplate")
 				{
 					//This calls an update on the track states that are a part of this view
 					setSelected(_selected);
@@ -342,7 +345,7 @@ void TrackView::read(Xml& xml)/*{{{*/
 
 void TrackView::write(int level, Xml& xml) const /*{{{*/
 {
-	std::string tag = "trackview";
+	std::string tag = m_template ? "instrumentTemplate" : "trackview";
 
 	xml.put(level, "<%s id=\"%lld\" record=\"%d\" selected=\"%d\" template=\"%d\">", tag.c_str(), m_id, _recState, _selected, m_template);
 	level++;
@@ -359,7 +362,6 @@ void TrackView::write(int level, Xml& xml) const /*{{{*/
 	foreach(TrackView::TrackViewTrack *t, m_tracks)
 	{
 		t->write(level, xml);
-		//xml.qint64Tag(level, "vtrack", id);
 	}
     xml.put(--level, "</%s>", tag.c_str());
 }/*}}}*/

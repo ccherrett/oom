@@ -1316,49 +1316,42 @@ void VirtualTrack::write(int level, Xml& xml) const
 {
 	QStringList tmplist;
 	std::string tag = "virtualTrack";
-	xml.put(level, "<%s id=\"%lld\">", tag.c_str(), id);
+	xml.nput(level, "<%s id=\"%lld\" ", tag.c_str(), id);
 	level++;
-	xml.intTag(level, "type", type);
-	xml.strTag(level, "name", name.toUtf8().constData());
-	xml.intTag(level, "useInput", useInput);
-	xml.intTag(level, "useOutput", useOutput);
+	xml.nput("type=\"%d\" name=\"%s\" useInput=\"%d\" useOutput=\"%d\" ", type, name.toUtf8().constData(), useInput, useOutput);
 	if(!instrumentName.isEmpty() && type == Track::MIDI)/*{{{*/
 	{
-		xml.intTag(level, "autoCreateInstrument", autoCreateInstrument);
-		xml.intTag(level, "createMidiInputDevice", createMidiInputDevice);
-		xml.intTag(level, "createMidiOutputDevice", createMidiOutputDevice);
-		xml.strTag(level, "instrumentName", instrumentName.toUtf8().constData());
-		xml.intTag(level, "instrumentType", instrumentType);
-		xml.intTag(level, "useMonitor", useMonitor);
-		xml.intTag(level, "useBuss", useBuss);
-		xml.intTag(level, "inputChannel", inputChannel);
-		xml.intTag(level, "outputChannel", outputChannel);
+		xml.nput("autoCreateInstrument=\"%d\" createMidiInputDevice=\"%d\" createMidiOutputDevice=\"%d\" ", 
+				autoCreateInstrument, createMidiInputDevice, createMidiOutputDevice);
+		xml.nput("instrumentName=\"%s\" instrumentType=\"%d\" useMonitor=\"%d\" useBuss=\"%d\" inputChannel=\"%d\" outputChannel=\"%d\" ", 
+				instrumentName.toUtf8().constData(), instrumentType, useMonitor, useBuss, inputChannel, outputChannel);
 		if(useMonitor)
 		{
 			tmplist.clear();
 			tmplist << QString::number(monitorConfig.first) << monitorConfig.second;
-			xml.strTag(level, "monitorConfig", tmplist.join("@-:-@").toUtf8().constData());
+			xml.nput("monitorConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
 		}
 		if(useBuss)
 		{ 
 			tmplist.clear();
 			tmplist << QString::number(bussConfig.first) << bussConfig.second;
-			xml.strTag(level, "bussConfig", tmplist.join("@-:-@").toUtf8().constData());
+			xml.nput("bussConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
 		}
 	}/*}}}*/
 	if(useInput)
 	{ 
 		tmplist.clear();
 		tmplist << QString::number(inputConfig.first) << inputConfig.second;
-		xml.strTag(level, "inputConfig", tmplist.join("@-:-@").toUtf8().constData());
+		xml.nput("inputConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
 	}
 	if(useOutput)
 	{ 
 		tmplist.clear();
 		tmplist << QString::number(outputConfig.first) << outputConfig.second;
-		xml.strTag(level, "outputConfig", tmplist.join("@-:-@").toUtf8().constData());
+		xml.nput("outputConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
 	}
-    xml.put(--level, "</%s>", tag.c_str());
+    xml.put("/>");
+	level--;
 }
 
 /*{{{
@@ -1395,90 +1388,93 @@ void VirtualTrack::read(Xml &xml)
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if(tag == "name")
+				break;
+			case Xml::Attribut:
+				if(tag == "id")
 				{
-					name = xml.parse1();
+					id = xml.s2().toLongLong();
+				}
+				else if(tag == "name")
+				{
+					name = xml.s2();
 				}
 				else if(tag == "type")
 				{
-					type = xml.parseInt();
+					type = xml.s2().toInt();
 				}
 				else if(tag == "instrumentName")
 				{
-					instrumentName = xml.parse1();
+					instrumentName = xml.s2();
 				}
 				else if(tag == "instrumentType")
 				{
-					instrumentType = xml.parseInt();
+					instrumentType = xml.s2().toInt();
 				}
 				else if(tag == "autoCreateInstrument")
 				{
-					autoCreateInstrument = xml.parseInt();
+					autoCreateInstrument = xml.s2().toInt();
 				}
 				else if(tag == "createMidiInputDevice")
 				{
-					createMidiInputDevice = xml.parseInt();
+					createMidiInputDevice = xml.s2().toInt();
 				}
 				else if(tag == "createMidiOutputDevice")
 				{
-					createMidiOutputDevice = xml.parseInt();
+					createMidiOutputDevice = xml.s2().toInt();
+				}
+				else if (tag == "useMonitor")
+				{
+					useMonitor = xml.s2().toInt();
 				}
 				else if(tag == "useInput")
 				{
-					useInput = xml.parseInt();
+					useInput = xml.s2().toInt();
 				}
 				else if(tag == "useOutput")
 				{
-					useOutput = xml.parseInt();
+					useOutput = xml.s2().toInt();
 				}
 				else if(tag == "useBuss")
 				{
-					useBuss = xml.parseInt();
+					useBuss = xml.s2().toInt();
 				}
 				else if(tag == "inputChannel")
 				{
-					inputChannel = xml.parseInt();
+					inputChannel = xml.s2().toInt();
 				}
 				else if(tag == "outputChannel")
 				{
-					outputChannel = xml.parseInt();
+					outputChannel = xml.s2().toInt();
 				}
 				else if(tag == "inputConfig")
 				{
-					QStringList list = xml.parse1().split("@-:-@");
+					QStringList list = xml.s2().split("@-:-@");
 					if(list.size() && list.size() == 2)
 						inputConfig = qMakePair(list[0].toInt(), list[1]);
 				}
 				else if(tag == "outputConfig")
 				{
-					QStringList list = xml.parse1().split("@-:-@");
+					QStringList list = xml.s2().split("@-:-@");
 					if(list.size() && list.size() == 2)
-						inputConfig = qMakePair(list[0].toInt(), list[1]);
+						outputConfig = qMakePair(list[0].toInt(), list[1]);
 				}
 				else if(tag == "monitorConfig")
 				{
-					QStringList list = xml.parse1().split("@-:-@");
+					QStringList list = xml.s2().split("@-:-@");
 					if(list.size() && list.size() == 2)
 						monitorConfig = qMakePair(list[0].toInt(), list[1]);
 				}
 				else if(tag == "monitorConfig2")
 				{
-					QStringList list = xml.parse1().split("@-:-@");
+					QStringList list = xml.s2().split("@-:-@");
 					if(list.size() && list.size() == 2)
 						monitorConfig2 = qMakePair(list[0].toInt(), list[1]);
 				}
 				else if(tag == "bussConfig")
 				{
-					QStringList list = xml.parse1().split("@-:-@");
+					QStringList list = xml.s2().split("@-:-@");
 					if(list.size() && list.size() == 2)
 						bussConfig = qMakePair(list[0].toInt(), list[1]);
-				}
-				break;
-			case Xml::Attribut:
-				if(tag == "id")
-				{
-					qDebug("Found Virtual Track saved ID-----------------------------------");
-					id = xml.s2().toLongLong();
 				}
 				break;
 			case Xml::TagEnd:

@@ -103,7 +103,7 @@ void TrackViewEditor::buildViewList()
 	if(m_templateMode)
 	{
 		cmbViews->addItem(tr("Select Instrument Template"), 0);
-		tvl = song->instrumentTemplates();
+		tvl = oom->instrumentTemplates();
 	}
 	else
 	{
@@ -168,7 +168,7 @@ void TrackViewEditor::btnNewClicked(bool)/*{{{*/
 {
 	reset();
 	if(m_templateMode)
-		_selected = song->addInstrumentTemplate();
+		_selected = oom->addInstrumentTemplate();
 	else
 		_selected = song->addNewTrackView();
 	if(_selected)
@@ -206,7 +206,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 	txtName->setText(sl);
 	TrackView* v = 0;
 	if(m_templateMode)
-		v = song->findInstrumentTemplateById(tvid);
+		v = oom->findInstrumentTemplateById(tvid);
 	else
 		v = song->findTrackViewById(tvid);
 	_editing = true;
@@ -267,6 +267,7 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 						rowData.append(transp);
 						rowData.append(patch);
 						m_model->appendRow(rowData);
+						m_vtrackList.insert(t->id, t);
 					}
 				}
 				else
@@ -489,13 +490,21 @@ void TrackViewEditor::btnApplyClicked(bool/* state*/)/*{{{*/
 		}
 		_selected->setRecord(chkRecord->isChecked());
 		_selected->setComment(txtComment->toPlainText());
-		song->dirty = true;
-		//TODO: Only do this when not in template mode
-		song->updateTrackViews();
-		if(_addmode)
-			song->update(SC_VIEW_ADDED);
+		if(m_templateMode)
+		{
+			oom->changeConfig(true);
+			song->update(SC_CONFIG);
+		}
 		else
-			song->update(SC_VIEW_CHANGED);
+		{
+			//Song is not dirty from adding/removing templates, they are at config level
+			song->dirty = true;
+			song->updateTrackViews();
+			if(_addmode)
+				song->update(SC_VIEW_ADDED);
+			else
+				song->update(SC_VIEW_CHANGED);
+		}
 		btnApply->setEnabled(false);
 		reset();
 	}
@@ -543,20 +552,22 @@ void TrackViewEditor::btnCancelClicked(bool/* state*/)/*{{{*/
 	{//remove the trackview that was added to the song
 		if(m_templateMode)
 		{
-			TrackView* v = song->findInstrumentTemplateById(_selected->id());
-			song->removeInstrumentTemplate(_selected->id());
+			TrackView* v = oom->findInstrumentTemplateById(_selected->id());
+			oom->removeInstrumentTemplate(_selected->id());
 			delete v;
+			oom->changeConfig(true);
+			song->update(SC_CONFIG);
 		}
 		else
 		{
 			TrackView* v = song->findTrackViewById(_selected->id());
 			song->removeTrackView(_selected->id());
 			delete v;
+			song->update(SC_VIEW_CHANGED);
 		}
 	}
 	_addmode = false;
 	_selected = 0;
-	song->update(SC_VIEW_CHANGED);
 }/*}}}*/
 
 void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
@@ -565,7 +576,7 @@ void TrackViewEditor::btnCopyClicked(bool)/*{{{*/
 	{
 		TrackView* tv = 0;
 		if(m_templateMode)
-			tv = song->addInstrumentTemplate();
+			tv = oom->addInstrumentTemplate();
 		else
 			song->addNewTrackView();
 		if(tv)
@@ -613,10 +624,19 @@ void TrackViewEditor::btnDeleteClicked(bool)/*{{{*/
 {
 	if(_selected)
 	{
-		song->removeTrackView(_selected->id());
-		song->dirty = true;
-		song->updateTrackViews();
-		song->update(SC_VIEW_DELETED);
+		if(m_templateMode)
+		{
+			oom->removeInstrumentTemplate(_selected->id());
+			oom->changeConfig(true);
+			song->update(SC_CONFIG);
+		}
+		else
+		{
+			song->removeTrackView(_selected->id());
+			song->dirty = true;
+			song->updateTrackViews();
+			song->update(SC_VIEW_DELETED);
+		}
 		reset();
 	}
 }/*}}}*/
