@@ -141,5 +141,7 @@ typedef QHash<qint64, TrackView*> TrackViewList;
 typedef QHash<qint64, TrackView*>::iterator iTrackView;
 typedef QHash<qint64, TrackView*>::const_iterator ciTrackView;
 
+typedef QMap<qint64, VirtualTrack*>::const_iterator ciVirtualTrack;
+
 #endif
 

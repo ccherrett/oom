@@ -499,11 +499,23 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 		{
 			//Create a channel
 			int chan = ::lscp_add_channel(_client);
-			if(chan >= 0 && lscp_load_engine(_client, "GIG", chan) == LSCP_OK)
+			if(chan >= 0/* && lscp_load_engine(_client, "GIG", chan) == LSCP_OK*/)
 			{
+				::lscp_load_engine(_client, "GIG", chan);
 				//Get audio channels
 				int adev =  ::lscp_get_audio_devices(_client);
-				if(adev != -1 && lscp_set_channel_audio_device(_client, chan, 0) == LSCP_OK)
+				int mdev = ::lscp_get_midi_devices(_client);
+				if(!adev)
+				{
+					//qDebug("LSClient::getInstrument: No Audio Device found~~~~~~~~~~~~~~~~Creating one");
+					createAudioOutputDevice(sDevName, "JACK", 1, 48000);
+				}
+				if(!mdev)
+				{
+					//qDebug("LSClient::getInstrument: No MIDI Device found~~~~~~~~~~~~~~~~Creating one");
+					createMidiInputDevice(sDevName, "JACK", 1);	
+				}
+				if(lscp_set_channel_audio_device(_client, chan, 0) == LSCP_OK)
 				{
 					QString mapName = getMapName(pMaps);
 					QString insName(getValidInstrumentName(mapName));
@@ -591,7 +603,19 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 					return midiInstr;
 					//instruments->push_back(midiInstr);
 				}//end load audio dev
+				else
+				{
+					//TODO: emit errorOccurrect(QString type);
+				}
+				//Flush the disk streams used by the channel created
+				::lscp_reset_channel(_client, chan);
+				//Finally remove the channel
+				::lscp_remove_channel(_client, chan);
 			}//end create channel
+			else
+			{
+				//TODO: emit errorOccurrect(QString type);
+			}
 		}//end maps
 	}
 	return 0;

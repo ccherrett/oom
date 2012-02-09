@@ -16,7 +16,6 @@
 #include "pos.h"
 #include "globaldefs.h"
 #include "tempo.h"
-///#include "sig.h"
 #include "al/sig.h"
 #include "undo.h"
 #include "track.h"
@@ -161,7 +160,6 @@ private:
 	
     TrackViewList _tviews; // trackviewlist as seen by Composer
 	TrackViewList _autotviews;
-	TrackViewList m_instrumentTemplates;
     
 	MidiTrackList _midis;
     WaveTrackList _waves;
@@ -530,10 +528,6 @@ public:
     TrackViewList* autoviews() {
         return &_autotviews;
     }
-	TrackViewList* instrumentTemplates()
-	{
-		return &m_instrumentTemplates;
-	}
 	QList<qint64>* autoTrackViewIndexList() 
 	{
 		return &m_autoTrackViewIndex;
@@ -600,13 +594,6 @@ public:
     void removeTrackView(qint64);
     void cmdRemoveTrackView(qint64);
     void msgInsertTrackView(TrackView*, int idx, bool u = true);
-
-	TrackView* addInstrumentTemplate();
-	TrackView* findInstrumentTemplateById(qint64 id) const;
-    
-    void insertInstrumentTemplate(TrackView*, int idx);
-    void removeInstrumentTemplate(qint64);
-    void cmdRemoveInstrumentTemplate(qint64);
 
 	//midikeys
 	QString key2note(int key)

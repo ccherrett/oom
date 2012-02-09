@@ -278,11 +278,11 @@ int main(int argc, char* argv[])
 	getCapabilities();
 	int noAudio = false;
 
-	oomUser = QString(getenv("HOME"));
+	oomUser = QDir::homePath();//QString(getenv("HOME"));
 	oomGlobalLib = QString(LIBDIR);
 	oomGlobalShare = QString(SHAREDIR);
 	oomProject = oomProjectInitPath; //getcwd(0, 0);
-	oomInstruments = oomGlobalShare + QString("/instruments");
+	oomInstruments = oomGlobalShare + QDir::separator() + QString("instruments");
 
 	// Create config dir if it doesn't exists
 	QDir cPath = QDir(configPath);
@@ -412,23 +412,6 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	/*
-	if(!config.styleSheetFile.isEmpty())
-	{
-	  if(debugMsg)
-		printf("loading style sheet <%s> \n", qPrintable(config.styleSheetFile));
-	  QFile cf(config.styleSheetFile);
-	  if (cf.open(QIODevice::ReadOnly)) {
-			QByteArray ss = cf.readAll();
-			QString sheet(QString::fromUtf8(ss.data()));
-			app.setStyleSheet(sheet);
-			cf.close();
-			}
-	  else
-			printf("loading style sheet <%s> failed\n", qPrintable(config.styleSheetFile));
-	}
-	 */
-
 	AL::initDsp();
 
 	if (debugMsg)
@@ -443,9 +426,6 @@ int main(int argc, char* argv[])
 	{
 		initDummyAudio();
 		realTimeScheduling = true;
-		//if (debugMode) {              // ??
-		//          realTimeScheduling = false;
-		//          }
 	}
 	else if (initJackAudio())
 	{
@@ -471,7 +451,6 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "no audio functions available\n");
 			fprintf(stderr, "*** experimental mode -- no play possible ***\n");
 			initDummyAudio();
-			//realTimeScheduling = audioDevice->isRealtime();
 		}
 		realTimeScheduling = true;
 	}
@@ -479,11 +458,7 @@ int main(int argc, char* argv[])
 		realTimeScheduling = audioDevice->isRealtime();
 
 	useJackTransport.setValue(true);
-	// setup the prefetch fifo length now that the segmentSize is known
-	// Changed by Tim. p3.3.17
-	// Changed to 4 *, JUST FOR TEST!!!
 	fifoLength = 131072 / segmentSize;
-	//fifoLength = (131072/segmentSize) * 4;
 
 
 	argc -= optind;
@@ -531,14 +506,9 @@ int main(int argc, char* argv[])
         if (loadPlugins)
             initPlugins(ladspa, lv2, vst);
 
-	// p3.3.39
-	//initOSC();
-
 	initIcons();
 
 	initMetronome();
-
-	//QApplication::clipboard()->setSelectionMode(false); ddskrjo obsolete even in Qt3
 
 	QApplication::addLibraryPath(oomGlobalLib + "/qtplugins");
 	if (debugMsg)
@@ -557,7 +527,6 @@ int main(int argc, char* argv[])
 	app.setOOMidi(oom);
 	oom->setWindowIcon(*oomIcon);
 
-	// Added by Tim. p3.3.22
 	if (!debugMode)
 	{
 		if (mlockall(MCL_CURRENT | MCL_FUTURE))
@@ -568,9 +537,6 @@ int main(int argc, char* argv[])
 	oom->seqStart();
 	//Finally launch the server on port 8415
 	oom->startServer();
-#ifdef LSCP_SUPPORT
-	//oom->startLSCPClient();
-#endif
 
 #ifdef HAVE_LASH
 	{
@@ -591,7 +557,6 @@ int main(int argc, char* argv[])
 		}
 	}
 #endif /* HAVE_LASH */
-	//QTimer::singleShot(100, oom, SLOT(showDidYouKnowDialog()));
 
 	// ladish L1
 	signal(SIGUSR1, ladish_l1_save);
@@ -602,9 +567,6 @@ int main(int argc, char* argv[])
 	int rv = app.exec();
 	if (debugMsg)
 		printf("app.exec() returned:%d\nDeleting main OOMidi object\n", rv);
-#ifdef LSCP_SUPPORT
-	//oom->stopLSCPClient();
-#endif
 	if(lsClient && lsClientStarted)
 	{
 		lsClient->stopClient();
