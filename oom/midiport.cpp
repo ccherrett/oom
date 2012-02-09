@@ -136,8 +136,9 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 		_device = dev;
         if (_device->isSynthPlugin())
 		{
-            SynthPluginDevice* s = (SynthPluginDevice*) _device;
-			_instrument = s;
+            //SynthPluginDevice* s = (SynthPluginDevice*) _device;
+			//_instrument = s;
+            _instrument = genericMidiInstrument;
 		}
 		_state = _device->open();
 		_device->setPort(portno());

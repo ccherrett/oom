@@ -239,8 +239,8 @@ public:
 //---------------------------------------------------------
 
 SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString name, QString label, bool duplicated)
-    : MidiDevice(),
-      MidiInstrument()
+    : MidiDevice()//,
+      //MidiInstrument()
 {
     _rwFlags = 1;
     _openFlags = 1;
@@ -280,7 +280,7 @@ SynthPluginDevice::SynthPluginDevice(PluginType type, QString filename, QString 
     }
 
     MidiDevice::setName(m_name);
-    MidiInstrument::setIName(m_name);
+    //MidiInstrument::setIName(m_name);
 }
 
 SynthPluginDevice::~SynthPluginDevice()
@@ -294,8 +294,8 @@ SynthPluginDevice::~SynthPluginDevice()
 
 void SynthPluginDevice::setTrackId(qint64 id)
 {
-    if (m_audioTrack)
-        ((SynthPluginTrack*)m_audioTrack)->setId(id);
+    //if (m_audioTrack)
+    //    ((SynthPluginTrack*)m_audioTrack)->setId(id);
 }
 
 //---------------------------------------------------------

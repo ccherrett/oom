@@ -640,14 +640,17 @@ void Strip::soloToggled(bool val)
 
 void Strip::setAutomationType(int t, int)
 {
-    track->setAutomationType(AutomationType(t));
-
-    if (track->isMidiTrack() && track->wantsAutomation())
+    if (track->isMidiTrack())
     {
-        AudioTrack* atrack = ((MidiTrack*)track)->getAutomationTrack();
-        if (atrack)
-            atrack->setAutomationType(AutomationType(t));
+        if (track->wantsAutomation())
+        {
+            AudioTrack* atrack = ((MidiTrack*)track)->getAutomationTrack();
+            if (atrack)
+                atrack->setAutomationType(AutomationType(t));
+        }
     }
+    else
+        track->setAutomationType(AutomationType(t));
 
 	song->update(SC_AUTOMATION);
 }
