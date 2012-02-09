@@ -75,7 +75,6 @@ PluginDialog::PluginDialog(QWidget* parent)
 	pList->setSelectionMode(QAbstractItemView::SingleSelection);
 	pList->setAlternatingRowColors(true);
 
-	fillPlugs(selectedPlugType);
 	layout->addWidget(pList);
 
 	//---------------------------------------------------
@@ -182,6 +181,8 @@ PluginDialog::PluginDialog(QWidget* parent)
 	connect(m_cmbType, SIGNAL(currentIndexChanged(int)), SLOT(typeChanged(int)));
 	sortBox->setFocus();
 	//resize(800, 600);
+    
+    fillPlugs(selectedPlugType);
 }
 
 void PluginDialog::showEvent(QShowEvent*)
@@ -288,10 +289,11 @@ void PluginDialog::fillPlugs(QAbstractButton* ab)/*{{{*/
 void PluginDialog::fillPlugs(int nbr)/*{{{*/
 {
 	pList->clear();
+    QString stringValue = sortBox->currentText().toLower();
 	for (iPlugin i = plugins.begin(); i != plugins.end(); ++i)
 	{
-                if ((i->hints() & PLUGIN_IS_FX) == 0)
-                    continue;
+        if ((i->hints() & PLUGIN_IS_FX) == 0)
+            continue;
 
 		int ai = i->getAudioInputCount();
 		int ao = i->getAudioOutputCount();
@@ -303,11 +305,17 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
             continue;
 
 		bool addFlag = false;
+        bool addFlagString = false;
 		bool stereo = false;
 		if ((ai == 1 || ai == 2) && ao == 2)
 			stereo = true;
         else if (ai == 1 && ao == 1)
 			stereo = false;
+        
+        if (i->label().toLower().contains(stringValue))
+			addFlagString = true;
+		else if (i->name().toLower().contains(stringValue))
+			addFlagString = true;
 
 		switch (nbr)
 		{
@@ -335,7 +343,7 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 		}
 		if(m_display_type != i->type())
 			addFlag = false;
-		if (addFlag)
+		if (addFlag && addFlagString)
 		{
 			QTreeWidgetItem* item = new QTreeWidgetItem;
 			item->setText(0, stereo ? "True" : "False");

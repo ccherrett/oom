@@ -458,6 +458,8 @@ public:
         }
     }
 
+    virtual void deleteMe() = 0;
+
     void makeGui();
     void deleteGui();
     void showGui(bool yesno);
@@ -530,6 +532,11 @@ public:
     ~LadspaPlugin();
 
     static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
+    
+    virtual void deleteMe()
+    {
+        delete this;
+    }
 
     bool init(QString filename, QString label);
     void reload();
@@ -604,6 +611,11 @@ public:
     ~Lv2Plugin();
 
     static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
+    
+    virtual void deleteMe()
+    {
+        delete this;
+    }
 
     bool init(QString filename, QString label);
     void reload();
@@ -691,6 +703,11 @@ public:
 
     static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
     
+    virtual void deleteMe()
+    {
+        delete this;
+    }
+
     intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
     bool init(QString filename, QString label);
