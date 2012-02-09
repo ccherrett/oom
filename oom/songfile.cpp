@@ -478,7 +478,7 @@ void Part::write(int level, Xml& xml, bool isCopy, bool forceWavePaths) const
 		for (ciEvent e = el->begin(); e != el->end(); ++e)
 			e->second.write(level, xml, *this, forceWavePaths);
 	}
-	xml.etag(level, "part");
+	xml.etag(--level, "part");
 }
 
 

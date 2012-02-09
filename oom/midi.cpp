@@ -757,7 +757,7 @@ void Audio::initDevices()
 		MidiInstrument* instr = port->instrument();
 		MidiDevice* md = port->device();
 
-		if (instr && md)
+		if (instr && md && md->isSynthPlugin() == false)
 		{
 			EventList* events = instr->midiInit();
 			if (events->empty())

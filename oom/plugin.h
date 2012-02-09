@@ -431,6 +431,15 @@ public:
 
             process(segmentSize, ains_buffer, aouts_buffer, eventList);
         }
+        else
+        {
+            if (eventList)
+            {
+                //iMPEvent ev = eventList->begin();
+                //eventList->erase(eventList->begin(), ev);
+                eventList->clear();
+            }
+        }
     }
 
     void makeGui();
@@ -782,6 +791,8 @@ public:
     {
         return m_audioTrack;
     }
+    
+    void setTrackId(qint64 id);
 
     virtual QString open();
     virtual void close();
@@ -815,11 +826,7 @@ public:
     int eventsPending() const;
 
 protected:
-    virtual bool putMidiEvent(const MidiPlayEvent&)
-    {
-        qWarning("SynthPluginDevice::putMidiEvent()");
-        return true;
-    }
+    virtual bool putMidiEvent(const MidiPlayEvent&);
 
 private:
     PluginType m_type;

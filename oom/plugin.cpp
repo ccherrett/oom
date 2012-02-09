@@ -178,13 +178,59 @@ public:
     {
         return new SynthPluginTrack();
     }
-
-    virtual void read(Xml&)
+    
+    void setId(qint64 /*id*/)
     {
+        // FIXME - is this needed?
+        //m_id = id;
     }
 
-    virtual void write(int, Xml&) const
+    virtual void read(Xml& xml)
     {
+        qWarning("SynthPluginTrack::read(XML)");
+        
+        for (;;)
+        {
+            Xml::Token token = xml.parse();
+            const QString& tag = xml.s1();
+            switch (token)
+            {
+                case Xml::Error:
+                case Xml::End:
+                    return;
+                case Xml::TagStart:
+                    if (tag == "SynthPluginTrack")
+                    {
+                        continue;
+                    }
+                    else if (tag == "LadspaPlugin" || tag == "Lv2Plugin" || tag == "VstPlugin")
+                    {
+                        // we already loaded this before
+                        xml.parse1();
+                        continue;
+                    }
+                    if (AudioTrack::readProperties(xml, tag))
+                        xml.unknown("SynthPluginTrack");
+                    break;
+                case Xml::Attribut:
+                    break;
+                case Xml::TagEnd:
+                    if (tag == "SynthPluginTrack")
+                    {
+                        mapRackPluginsToControllers();
+                        return;
+                    }
+                default:
+                    break;
+            }
+        }
+    }
+
+    virtual void write(int level, Xml& xml) const
+    {
+        xml.tag(level++, "SynthPluginTrack");
+        AudioTrack::writeProperties(level, xml);
+        xml.etag(--level, "SynthPluginTrack");
     }
 };
 
@@ -243,6 +289,16 @@ SynthPluginDevice::~SynthPluginDevice()
 }
 
 //---------------------------------------------------------
+//   setTrackId
+//---------------------------------------------------------
+
+void SynthPluginDevice::setTrackId(qint64 id)
+{
+    if (m_audioTrack)
+        ((SynthPluginTrack*)m_audioTrack)->setId(id);
+}
+
+//---------------------------------------------------------
 //   open, init plugin
 //---------------------------------------------------------
 
@@ -275,6 +331,8 @@ QString SynthPluginDevice::open()
             m_plugin->setTrack(m_audioTrack);
             audio->msgAddPlugin(m_audioTrack, 0, m_plugin);
 
+            m_audioTrack->mapRackPluginsToControllers();
+
             m_plugin->setActive(true);
             return QString("OK");
         }
@@ -304,14 +362,14 @@ void SynthPluginDevice::close()
         if (m_audioTrack)
         {
             audio->msgAddPlugin(m_audioTrack, 0, 0);
-            delete m_audioTrack;
+            delete (SynthPluginTrack*)m_audioTrack;
         }
 
         m_plugin->setTrack(0);
         m_plugin->aboutToRemove();
 
         // Delete the appropriate class
-        switch(m_plugin->type())
+        switch (m_plugin->type())
         {
         case PLUGIN_LADSPA:
             delete (LadspaPlugin*)m_plugin;
@@ -436,7 +494,7 @@ void SynthPluginDevice::updateNativeGui()
     //if (m_plugin && m_plugin->hasNativeGui())
         return m_plugin->updateNativeGui();
 }
-
+ 
 //---------------------------------------------------------
 //   Patch/Programs Stuff
 //---------------------------------------------------------
@@ -525,6 +583,8 @@ void SynthPluginDevice::read(Xml& xml)
     {
         qWarning("SynthPluginDevice::read(XML)");
         m_plugin->readConfiguration(xml, false);
+        if (m_audioTrack)
+            ((SynthPluginTrack*)m_audioTrack)->read(xml);
     }
 }
 
@@ -534,6 +594,11 @@ void SynthPluginDevice::write(int level, Xml& xml)
     {
         qWarning("SynthPluginDevice::write(XML)");
         m_plugin->writeConfiguration(level, xml);
+        if (m_audioTrack)
+        {
+            qWarning("SynthPluginDevice::write(XML) - write automation track data");
+            m_audioTrack->write(level, xml);
+        }
     }
 }
 
@@ -556,6 +621,20 @@ int SynthPluginDevice::eventsPending() const
 {
     //qWarning("SynthPluginDevice::eventsPending()");
     return 0; //_sif->eventsPending();
+}
+
+//---------------------------------------------------------
+//   putMidiEvent
+//---------------------------------------------------------
+
+bool SynthPluginDevice::putMidiEvent(const MidiPlayEvent& ev)
+{
+    if (_writeEnable)
+    {
+        MPEventList* pe = playEvents();
+        pe->add(ev);
+    }
+    return false;
 }
 
 //---------------------------------------------------------

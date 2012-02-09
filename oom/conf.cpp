@@ -939,13 +939,15 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 		//
 		for (int i = 0; i < MIDI_PORTS; ++i)
 		{
-			bool used = false;
 			MidiPort* mport = &midiPorts[i];
+            bool used = false;
+            bool isSynth = (mport->device() && mport->device()->isSynthPlugin());
+
 			// Route check by Tim. Port can now be used for routing even if no device.
 			// Also, check for other non-defaults and save port, to preserve settings even if no device.
-			if (!mport->noInRoute() || !mport->noOutRoute() ||
+            if (isSynth || !mport->noInRoute() || !mport->noOutRoute() ||
 					mport->defaultInChannels() || mport->defaultOutChannels() ||
-					(!mport->instrument()->iname().isEmpty() && mport->instrument()->iname() != "GM") ||
+					(mport->instrument() && !mport->instrument()->iname().isEmpty() && mport->instrument()->iname() != "GM") ||
 					!mport->syncInfo().isDefault())
 				used = true;
 			else
@@ -972,9 +974,12 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 			if (mport->defaultOutChannels())
 				xml.intTag(level, "defaultOutChans", mport->defaultOutChannels());
 
-			if (!mport->instrument()->iname().isEmpty() && // Tim.
+			if (/*isSynth == false &&*/
+                    mport->instrument() && !mport->instrument()->iname().isEmpty() && // Tim.
 					(mport->instrument()->iname() != "GM")) // FIXME: TODO: Make this user configurable.
+            {
 				xml.strTag(level, "instrument", mport->instrument()->iname());
+            }
 
 			if (dev)
 			{

@@ -2007,13 +2007,19 @@ void Song::beat()
 	//Update native guis
 	for(ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
 	{
+        AudioTrack* t = 0;
 		if((*i)->isMidiTrack())
-			continue;
-		AudioTrack* t = (AudioTrack*)*i;
-		if(t)
-		{
+        {
+            if ((*i)->wantsAutomation())
+                t = ((MidiTrack*)(*i))->getAutomationTrack();
+            else
+                continue;
+        }
+        else
+            t = (AudioTrack*)*i;
+
+		if (t)
 			t->efxPipe()->updateGuis();
-		}
 	}
 
 	while (noteFifoSize)

@@ -668,7 +668,11 @@ void MidiTrack::setOutPort(int i)
     _outPort = i;
 
     if (i >= 0 && i < MIDI_PORTS)
+    {
         _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
+        if (_wantsAutomation)
+            ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
+    }
 }
 
 void MidiTrack::setOutPortId(qint64 i)
@@ -679,6 +683,8 @@ void MidiTrack::setOutPortId(qint64 i)
 	{
 		MidiPort* mp = oomMidiPorts.value(i);
 		_wantsAutomation = (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI);
+        if (_wantsAutomation)
+            ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
 	}
 }
 
@@ -703,7 +709,11 @@ void MidiTrack::setOutChanAndUpdate(int i)
 void MidiTrack::setOutPortAndUpdate(int i)/*{{{*/
 {
     if (i >= 0 && i < MIDI_PORTS)
+    {
         _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
+        if (_wantsAutomation)
+            ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
+    }
 
 	if (_outPort == i)
 		return;
@@ -766,6 +776,23 @@ void MidiTrack::setInPortAndChannelMask(unsigned int portmask, int chanmask)
 		audio->msgUpdateSoloStates();
 		song->update(SC_ROUTE);
 	}
+}
+
+//---------------------------------------------------------
+//   getAutomationTrack
+//---------------------------------------------------------
+
+AudioTrack* MidiTrack::getAutomationTrack()
+{
+    if (_outPort >= 0 && _outPort < MIDI_PORTS)
+    {
+        if (midiPorts[_outPort].device() && midiPorts[_outPort].device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        {
+            SynthPluginDevice* dev = (SynthPluginDevice*)midiPorts[_outPort].device();
+            return dev->audioTrack();
+        }
+    }
+    return 0;
 }
 
 //---------------------------------------------------------
@@ -838,6 +865,13 @@ void MidiTrack::setAutomationType(AutomationType t)
 {
 	MidiPort* port = &midiPorts[outPort()];
 	port->setAutomationType(outChannel(), t);
+
+    if (_wantsAutomation)
+    {
+        AudioTrack* atrack = getAutomationTrack();
+        if (atrack)
+            atrack->setAutomationType(t);
+    }
 }
 
 bool MidiTrack::setRecordFlag1(bool f, bool monitor)

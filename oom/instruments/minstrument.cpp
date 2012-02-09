@@ -1109,6 +1109,7 @@ void MidiInstrument::populatePatchPopup(QMenu* menu, int chan, MType songType, b
 
 void MidiInstrument::populatePatchModel(QStandardItemModel* model, int chan, MType songType, bool drum)
 {
+    qWarning("MidiInstrument::populatePatchModel()");
 	model->clear();
 	int mask = 0;
 	bool drumchan = chan == 9;
