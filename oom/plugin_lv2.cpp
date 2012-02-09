@@ -27,6 +27,7 @@
 #include "lv2_uri_map.h"
 #include "lv2_urid.h"
 
+#include <math.h>
 #include <QWidget>
 
 #ifdef GTK2UI_SUPPORT
@@ -1647,9 +1648,26 @@ void Lv2Plugin::ui_write_function(uint32_t port_index, uint32_t buffer_size, uin
 
             if (param_id > -1 && m_params[param_id].type == PARAMETER_INPUT)
             {
+                if (m_params[param_id].hints & PARAMETER_IS_INTEGER)
+                    value = rint(value);
+
                 // same as setParameteValue
                 m_params[param_id].value = m_params[param_id].tmpValue = m_paramsBuffer[param_id] = value;
                 m_params[param_id].update = true;
+
+                // Record automation from plugin's native UI
+                if (m_track && m_id != -1)
+                {
+                    AutomationType at = m_track->automationType();
+
+                    if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+                        enableController(param_id, false);
+
+                    int id = genACnum(m_id, param_id);
+
+                    audio->msgSetPluginCtrlVal(m_track, id, value, false);
+                    m_track->recordAutomation(id, value);
+                }
             }
         }
     }

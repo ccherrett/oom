@@ -29,11 +29,11 @@
 //   sendMsg
 //---------------------------------------------------------
 
-void Audio::sendMsg(AudioMsg* m)
+void Audio::sendMsg(AudioMsg* m, bool waitRead)
 {
 	static int sno = 0;
 
-	if (_running)
+	if (_running && waitRead)
 	{
 		m->serialNo = sno++;
 		//DEBUG:
@@ -426,7 +426,7 @@ void Audio::msgSetChannels(AudioTrack* node, int n)
 //void Audio::msgSetPluginCtrlVal(PluginI* plugin, int param, double val)
 // p3.3.43
 
-void Audio::msgSetPluginCtrlVal(AudioTrack* track, int param, double val)
+void Audio::msgSetPluginCtrlVal(AudioTrack* track, int param, double val, bool waitRead)
 {
 	AudioMsg msg;
 
@@ -435,7 +435,7 @@ void Audio::msgSetPluginCtrlVal(AudioTrack* track, int param, double val)
 	msg.dval = val;
 	//msg.plugin = plugin;
 	msg.snode = track;
-	sendMsg(&msg);
+	sendMsg(&msg, waitRead);
 	//oom->composer->controllerChanged(track);
 }
 
