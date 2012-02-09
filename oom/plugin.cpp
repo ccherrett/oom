@@ -629,6 +629,7 @@ int SynthPluginDevice::eventsPending() const
 
 bool SynthPluginDevice::putMidiEvent(const MidiPlayEvent& ev)
 {
+    qWarning("---putMidiEvent()");
     if (_writeEnable)
     {
         MPEventList* pe = playEvents();

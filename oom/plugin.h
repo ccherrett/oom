@@ -47,8 +47,24 @@
 #endif
 
 // vst includes
+#ifdef USE_OFFICIAL_VSTSDK
 #define VST_FORCE_DEPRECATED 0
 #include "pluginterfaces/vst2.x/aeffectx.h"
+#else
+#include "vestige/aeffectx.h"
+// missing defines
+#define effFlagsProgramChunks (1 << 5)
+#define effGetParamLabel 6
+#define effGetChunk 23
+#define effSetChunk 24
+#define effCanBeAutomated 26
+#define effGetProgramNameIndexed 29
+#define effIdle 53
+#define effStartProcess 71
+#define effStopProcess 72
+#define effSetProcessPrecision 77
+#define kVstTransportChanged (1 << 0)
+#endif
 
 class AudioTrack;
 class PluginI;
