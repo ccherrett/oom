@@ -23,6 +23,7 @@
 #include "midimonitor.h"
 #include "plugin.h"
 #include "utils.h"
+#include "genset.h"
 
 
 CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent)
@@ -101,6 +102,7 @@ void CreateTrackDialog::initDefaults()
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
 	connect(txtName, SIGNAL(editingFinished()/*textEdited(QString)*/), this, SLOT(trackNameEdited()));
 	connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSelected()));
+	connect(btnMyInput, SIGNAL(clicked()), this, SLOT(showInputSettings()));
 	txtName->setFocus(Qt::OtherFocusReason);
 }
 
@@ -153,20 +155,27 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			if(inputIndex >= 0 && chkInput->isChecked())
 			{
 				m_vtrack->useInput = true;
-				QString devname = cmbInput->itemText(inputIndex);
-				int inDevType = cmbInput->itemData(inputIndex).toInt();
-				int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
-				if(m_currentMidiInputList.isEmpty())
+				if(inputIndex == 0)
 				{
-					m_createMidiInputDevice = true;
+					m_vtrack->useGlobalInputs = true;
 				}
 				else
 				{
-					m_createMidiInputDevice = !(m_currentMidiInputList.contains(inputIndex) && m_currentMidiInputList.value(inputIndex) == devname);
+					QString devname = cmbInput->itemText(inputIndex);
+					int inDevType = cmbInput->itemData(inputIndex).toInt();
+					int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
+					if(m_currentMidiInputList.isEmpty())
+					{
+						m_createMidiInputDevice = true;
+					}
+					else
+					{
+						m_createMidiInputDevice = !(m_currentMidiInputList.contains(inputIndex) && m_currentMidiInputList.value(inputIndex) == devname);
+					}
+					m_vtrack->createMidiInputDevice = m_createMidiInputDevice;
+					m_vtrack->inputConfig = qMakePair(inDevType, devname);
+					m_vtrack->inputChannel = chanbit;
 				}
-				m_vtrack->createMidiInputDevice = m_createMidiInputDevice;
-				m_vtrack->inputConfig = qMakePair(inDevType, devname);
-				m_vtrack->inputChannel = chanbit;
 			}
 			
 			//Process Output connections
@@ -322,6 +331,13 @@ void CreateTrackDialog::cancelSelected()
 	reject();
 }
 
+void CreateTrackDialog::showInputSettings()
+{
+	GlobalSettingsConfig* genSetConfig = new GlobalSettingsConfig(this);
+	genSetConfig->setCurrentTab(2);
+	genSetConfig->show();
+}
+
 void CreateTrackDialog::cleanup()/*{{{*/
 {
 	if(m_instrumentLoaded)
@@ -373,7 +389,7 @@ void CreateTrackDialog::cleanup()/*{{{*/
 	}
 }/*}}}*/
 
-void CreateTrackDialog::updateInstrument(int index)
+void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 {
 	QString instrumentName = cmbInstrument->itemData(index, CTDInstrumentNameRole).toString();
 	QString trackName = txtName->text();
@@ -481,7 +497,7 @@ void CreateTrackDialog::updateInstrument(int index)
 			break;
 		}
 	}
-}
+}/*}}}*/
 
 //Input raw slot
 void CreateTrackDialog::updateInputSelected(bool raw)/*{{{*/
@@ -544,6 +560,7 @@ void CreateTrackDialog::populateInputList()/*{{{*/
 		case Track::DRUM:
 		{
 			m_currentMidiInputList.clear();
+			cmbInput->addItem(tr("My Inputs"), 1025);
 			for (int i = 0; i < MIDI_PORTS; ++i)
 			{
 				MidiPort* mp = &midiPorts[i];
@@ -1032,10 +1049,11 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 	populateInstrumentList();
 	populateMonitorList();
 	populateBussList();
+	/*if(!gInputList.size())//TODO: popup a messagebox first telling them what is happening
+	{
+		GlobalSettingsConfig* genSetConfig = new GlobalSettingsConfig(this);
+		genSetConfig->setCurrentTab(2);
+		genSetConfig->show();
+	}*/
 }
 
-/*QSize CreateTrackDialog::sizeHint()
-{
-	return QSize(m_width, m_height);
-	//return QSize(450, 100);
-}*/

@@ -1071,17 +1071,6 @@ void OOMidi::write(Xml& xml) const
 
 	song->write(level, xml);
 
-	/*if (!toplevels.empty())
-	{
-		xml.tag(level++, "toplevels");
-		for (ciToplevel i = toplevels.begin(); i != toplevels.end(); ++i)
-		{
-			if (i->cobject()->isVisible())
-				i->cobject()->writeStatus(level, xml);
-		}
-		xml.tag(level--, "/toplevels");
-	}*/
-
     xml.tag(--level, "/oom");
 }
 

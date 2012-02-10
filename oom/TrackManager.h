@@ -25,6 +25,7 @@ struct VirtualTrack {
 	bool createMidiInputDevice;
 	bool createMidiOutputDevice;
 	bool useInput;
+	bool useGlobalInputs;
 	bool useOutput;
 	bool useMonitor;
 	bool useBuss;

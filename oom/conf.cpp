@@ -281,7 +281,7 @@ static void readPortChannel(Xml& xml, int midiPort)
 //   readConfigMidiPort
 //---------------------------------------------------------
 
-static void readConfigMidiPort(Xml& xml)
+static void readConfigMidiPort(Xml& xml)/*{{{*/
 {
 	int idx = 0;
 	qint64 id = -1;
@@ -458,13 +458,13 @@ static void readConfigMidiPort(Xml& xml)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   loadConfigMetronom
 //---------------------------------------------------------
 
-static void loadConfigMetronom(Xml& xml)
+static void loadConfigMetronom(Xml& xml)/*{{{*/
 {
 	for (;;)
 	{
@@ -517,7 +517,7 @@ static void loadConfigMetronom(Xml& xml)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   readSeqConfiguration
@@ -562,11 +562,81 @@ static void readSeqConfiguration(Xml& xml)
 	}
 }
 
+void readGlobalInputList(Xml& xml)/*{{{*/
+{
+	gInputList.clear();
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::TagStart:
+				if(tag == "globalInput")
+				{
+					readGlobalInput(xml);
+				}
+				break;
+			case Xml::Attribut:
+				break;
+			case Xml::TagEnd:
+				if(tag == "globalInputList")
+				{//Just return
+					return;
+				}
+			default:
+				break;
+		}
+	}
+}/*}}}*/
+
+void readGlobalInput(Xml& xml)/*{{{*/
+{
+	QString name;
+	int type;
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::TagStart:
+				break;
+			case Xml::Attribut:
+				if(tag == "deviceType")
+				{
+					type = xml.s2().toInt();
+				}
+				else if(tag == "deviceName")
+				{
+					name = xml.s2();
+				}
+				break;
+			case Xml::TagEnd:
+				if(tag == "globalInput")
+				{
+					qDebug("Adding My Input to list: Type: %d, Name: %s", type,  name.toUtf8().constData());
+					gInputList.append(qMakePair(type, name));
+					return;
+				}
+			default:
+				break;
+		}
+	}
+}/*}}}*/
+
+
 //---------------------------------------------------------
 //   readConfiguration
 //---------------------------------------------------------
 
-void readConfiguration(Xml& xml, bool readOnlySequencer)
+void readConfiguration(Xml& xml, bool readOnlySequencer)/*{{{*/
 {
 	for (;;)
 	{
@@ -810,10 +880,10 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				{
 					config.lsClientResetOnSongStart = xml.parseInt();
 				}
-				/*else if(tag == "instrumentTemplateList")
-				{//
-					oom->readInstrumentTemplates(xml);
-				}*/
+				else if(tag == "globalInputList")
+				{
+					readGlobalInputList(xml);
+				}
 				else
 					xml.skip(tag);
 				break;
@@ -841,13 +911,13 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   readConfiguration
 //---------------------------------------------------------
 
-bool readConfiguration()
+bool readConfiguration()/*{{{*/
 {
 	FILE* f = fopen(configName.toLatin1().constData(), "r");
 	if (f == 0)
@@ -901,13 +971,13 @@ bool readConfiguration()
 	}
 	fclose(f);
 	return true;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   writeSeqConfiguration
 //---------------------------------------------------------
 
-static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
+static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)/*{{{*/
 {
 	xml.tag(level++, "sequencer");
 
@@ -1049,7 +1119,7 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)
 		}
 	}
     xml.tag(--level, "/sequencer");
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   writeGlobalConfiguration
@@ -1125,6 +1195,20 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.intTag(level, "lsClientResetOnSongStart", config.lsClientResetOnSongStart);
 	
 	xml.intTag(level, "vuColorStrip", vuColorStrip);
+	if(gInputList.size())
+	{
+		std::string tag = "globalInputList";
+		xml.put(level, "<%s count=\"%d\">", tag.c_str(), gInputList.size());
+		level++;
+		for(int i = 0; i < gInputList.size(); ++i)
+		{
+			QPair<int, QString> in = gInputList.at(i);
+			xml.put(level, "<globalInput deviceType=\"%d\" deviceName=\"%s\" />", in.first, in.second.toUtf8().constData());
+		}
+		level--;
+		xml.put(level--, "</%s>", tag.c_str());
+		level++;
+	}
 
 	xml.intTag(level, "mtctype", mtcType);
 	xml.nput(level, "<mtcoffset>%02d:%02d:%02d:%02d:%02d</mtcoffset>\n",
@@ -1366,11 +1450,14 @@ void MidiFileConfig::cancelClicked()
 //   configGlobalSettings
 //---------------------------------------------------------
 
-void OOMidi::configGlobalSettings()
+void OOMidi::configGlobalSettings(int tab)
 {
 	if (!globalSettingsConfig)
-		globalSettingsConfig = new GlobalSettingsConfig();
-
+		globalSettingsConfig = new GlobalSettingsConfig(this);
+	else
+		globalSettingsConfig->populateInputs(); //Make sure the input list is refreshed on show
+	globalSettingsConfig->setCurrentTab(tab); //Set tab to current
+	
 	if (globalSettingsConfig->isVisible())
 	{
 		globalSettingsConfig->raise();

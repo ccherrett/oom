@@ -31,6 +31,7 @@ VirtualTrack::VirtualTrack()
 	type = -1;
 	useOutput = false;
 	useInput = false;
+	useGlobalInputs = false;
 	useBuss = false;
 	useMonitor = false;
 	inputChannel = -1;
@@ -47,7 +48,7 @@ void VirtualTrack::write(int level, Xml& xml) const/*{{{*/
 	std::string tag = "virtualTrack";
 	xml.nput(level, "<%s id=\"%lld\" ", tag.c_str(), id);
 	level++;
-	xml.nput("type=\"%d\" name=\"%s\" useInput=\"%d\" useOutput=\"%d\" ", type, name.toUtf8().constData(), useInput, useOutput);
+	xml.nput("type=\"%d\" useGlobalInputs=\"%d\" name=\"%s\" useInput=\"%d\" useOutput=\"%d\" ", type, useGlobalInputs, name.toUtf8().constData(), useInput, useOutput);
 	if(!instrumentName.isEmpty() && type == Track::MIDI)
 	{
 		xml.nput("autoCreateInstrument=\"%d\" createMidiInputDevice=\"%d\" createMidiOutputDevice=\"%d\" ", 
@@ -67,7 +68,7 @@ void VirtualTrack::write(int level, Xml& xml) const/*{{{*/
 			xml.nput("bussConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
 		}
 	}
-	if(useInput)
+	if(useInput && !useGlobalInputs)
 	{ 
 		tmplist.clear();
 		tmplist << QString::number(inputConfig.first) << inputConfig.second;
@@ -132,6 +133,10 @@ void VirtualTrack::read(Xml &xml)/*{{{*/
 				else if (tag == "useMonitor")
 				{
 					useMonitor = xml.s2().toInt();
+				}
+				else if(tag == "useGlobalInputs")
+				{
+					useGlobalInputs = xml.s2().toInt();
 				}
 				else if(tag == "useInput")
 				{
@@ -231,71 +236,100 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				//Process Input connections
 				if(vtrack->useInput)
 				{
-					QString devname = vtrack->inputConfig.second;
-					MidiPort* inport = 0;
-					MidiDevice* indev = 0;
-					QString inputDevName(QString("I-").append(track->name()));
-					if(vtrack->createMidiInputDevice)
+					if(vtrack->useGlobalInputs)
 					{
-						m_midiInPort = getFreeMidiPort();
-						qDebug("createMidiInputDevice is set: %i", m_midiInPort);
-						inport = &midiPorts[m_midiInPort];
-						int devtype = vtrack->inputConfig.first;
-						if(devtype == MidiDevice::ALSA_MIDI)
+						//Get the current port(s) linked with the global inputs
+						for(int i = 0; i < gInputListPorts.size(); ++i)
 						{
-							indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
-							if(indev)
+							MidiDevice* indev = 0;
+							m_midiInPort = gInputListPorts.at(i);
+							qDebug("Using global MIDI Input port: %i", m_midiInPort);
+
+							MidiPort* inport = &midiPorts[m_midiInPort];
+							if(inport)
+								indev = inport->device();
+							if(inport && indev)
 							{
-								qDebug("Found MIDI input device: ALSA_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x2;
-								indev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(inport, indev);
+								qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
+								int chanbit = vtrack->inputChannel;
+								Route srcRoute(m_midiInPort, chanbit);
+								Route dstRoute(track, chanbit);
+
+								audio->msgAddRoute(srcRoute, dstRoute);
+
+								audio->msgUpdateSoloStates();
+								song->update(SC_ROUTE);
 							}
 						}
-						else if(devtype == MidiDevice::JACK_MIDI)
+					}
+					else
+					{
+						QString devname = vtrack->inputConfig.second;
+						MidiPort* inport = 0;
+						MidiDevice* indev = 0;
+						QString inputDevName(QString("I-").append(track->name()));
+						if(vtrack->createMidiInputDevice)
 						{
-							indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
-							if(indev)
+							m_midiInPort = getFreeMidiPort();
+							qDebug("createMidiInputDevice is set: %i", m_midiInPort);
+							inport = &midiPorts[m_midiInPort];
+							int devtype = vtrack->inputConfig.first;
+							if(devtype == MidiDevice::ALSA_MIDI)
 							{
-								qDebug("Created MIDI input device: JACK_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x2;
-								indev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(inport, indev);
+								indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
+								if(indev)
+								{
+									qDebug("Found MIDI input device: ALSA_MIDI");
+									int openFlags = 0;
+									openFlags ^= 0x2;
+									indev->setOpenFlags(openFlags);
+									midiSeq->msgSetMidiDevice(inport, indev);
+								}
+							}
+							else if(devtype == MidiDevice::JACK_MIDI)
+							{
+								indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
+								if(indev)
+								{
+									qDebug("Created MIDI input device: JACK_MIDI");
+									int openFlags = 0;
+									openFlags ^= 0x2;
+									indev->setOpenFlags(openFlags);
+									midiSeq->msgSetMidiDevice(inport, indev);
+								}
+							}
+							if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
+							{
+								qDebug("MIDI input device configured, Adding input routes to MIDI port");
+								Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
+								Route dstRoute(indev, -1);
+
+								audio->msgAddRoute(srcRoute, dstRoute);
+
+								audio->msgUpdateSoloStates();
+								song->update(SC_ROUTE);
 							}
 						}
-						if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
+						else
 						{
-							qDebug("MIDI input device configured, Adding input routes to MIDI port");
-							Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
-							Route dstRoute(indev, -1);
+							m_midiInPort = vtrack->inputConfig.first;
+							qDebug("Using existing MIDI port: %i", m_midiInPort);
+							inport = &midiPorts[m_midiInPort];
+							if(inport)
+								indev = inport->device();
+						}
+						if(inport && indev)
+						{
+							qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
+							int chanbit = vtrack->inputChannel;
+							Route srcRoute(m_midiInPort, chanbit);
+							Route dstRoute(track, chanbit);
 
 							audio->msgAddRoute(srcRoute, dstRoute);
 
 							audio->msgUpdateSoloStates();
 							song->update(SC_ROUTE);
 						}
-					}
-					else
-					{
-						m_midiInPort = vtrack->inputConfig.first;
-						qDebug("Using existing MIDI port: %i", m_midiInPort);
-						inport = &midiPorts[m_midiInPort];
-						if(inport)
-							indev = inport->device();
-					}
-					if(inport && indev)
-					{
-						qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
-						int chanbit = vtrack->inputChannel;
-						Route srcRoute(m_midiInPort, chanbit);
-						Route dstRoute(track, chanbit);
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						audio->msgUpdateSoloStates();
-						song->update(SC_ROUTE);
 					}
 				}
 				

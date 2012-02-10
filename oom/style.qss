@@ -39,18 +39,34 @@ QHeaderView#trackHeaders
 	background-color: #525252;
 }
 
-QLabel#lblType, QLabel#lblTrack, QLabel#lblProp, QLabel#lblComments, QLabel#lblName, QLabel#lblGroup
+
+
+QLabel#lblType, QLabel#lblTrack, QLabel#lblProp, QLabel#lblComments, QLabel#lblName, QLabel#lblGroup,
+GlobalSettingsConfig QLabel
 {
 	background-color:none;
 	border:none;
 }
 
-QFrame#propertyFrame, QFrame#trackListFrame, QFrame#commentFrame, QFrame#viewsFrame
+QFrame#propertyFrame, QFrame#trackListFrame, QFrame#commentFrame, QFrame#viewsFrame,
+QFrame#guiSettingsFrame, QFrame#myInputsFrame, QFrame#tickFrame, QFrame#mixerSettingsFrame,
+QFrame#crossfadeSettingsFrame, QFrame#dummyAudioBussBox, QFrame#startUpBox, QFrame#startSongBox
 {
 	color: #d0d4d0;
 	/*background-color: #1e1e1e;*/
 	background-color: #313131;
 	border-radius: 12px;
+    border: 0px;/* solid #4b4b4b;*/
+}
+
+QFrame#launchLabelFrame, QFrame#mixerLabelFrame, QFrame#myInputLabelFrame, QFrame#behaviorLabelFrame,
+QFrame#songStartLabelFrame, QFrame#crossfadeLabelFrame, QFrame#dummyLabelFrame, QFrame#tickLabelFrame
+{
+	color: #d0d4d0;
+	/*background-color: #1e1e1e;*/
+	background-color: #313131;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
     border: 0px;/* solid #4b4b4b;*/
 }
 
@@ -139,7 +155,7 @@ QLabel#lengthLabel
  	background-color: #2f2f2f;
  }
 /*Trackview editor styles*/
-TrackViewEditor QListView, TrackViewEditor QTextField, QTableView, AudioClipList QListView
+TrackViewEditor QListView, TrackViewEditor QTextField, QTableView, AudioClipList QListView, GlobalSettingsConfig QListView
 {
 	border: 1px solid #29292a;
 	border-radius: 6px;
@@ -151,11 +167,11 @@ TrackViewEditor QListView, TrackViewEditor QTextField, QTableView, AudioClipList
 	color: #bbbfbb;
 }
 
-TrackViewEditor QListView::item, AudioClipList QListView::item
+TrackViewEditor QListView::item, AudioClipList QListView::item, GlobalSettingsConfig QListView::item
 {
 	border-bottom: 1px solid #343434;
 }
-TrackViewEditor QListView::item::selected, AudioClipList QListView::item::selected
+TrackViewEditor QListView::item::selected, AudioClipList QListView::item::selected, GlobalSettingsConfig QListView::item::selected
 {
 	background-color: #0a0a0a;
 }

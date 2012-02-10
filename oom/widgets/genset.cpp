@@ -12,11 +12,17 @@
 #include <QRect>
 #include <QShowEvent>
 #include <QMessageBox>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 #include "genset.h"
 #include "app.h"
 #include "gconfig.h"
 #include "midiseq.h"
+
+#include "mididev.h"
+#include "audio.h"
+#include "driver/jackaudio.h"
 #include "globals.h"
 #include "icons.h"
 
@@ -38,12 +44,7 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 : QDialog(parent)
 {
 	setupUi(this);
-	groupBox13->hide();
-	vstInPlaceTextLabel->hide();
-	vstInPlaceCheckBox->hide();
-	showDidYouKnow->hide();
-	showSplash->hide();
-	//startUpBox->hide();
+
 	startSongGroup = new QButtonGroup(this);
 	startSongGroup->addButton(startLastButton, 0);
 	startSongGroup->addButton(startEmptyButton, 1);
@@ -80,6 +81,11 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 			break;
 		}
 	}
+	
+	m_inputsModel = new QStandardItemModel(this);
+	inputView->setModel(m_inputsModel);
+	populateInputs();
+	btnRefreshInput->setIcon(QIcon(*refreshIconSet3));
 
 	userInstrumentsPath->setText(config.userInstrumentsDir);
 	selectInstrumentsDirButton->setIcon(*openIcon);
@@ -93,19 +99,13 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	freewheelCheckBox->setChecked(config.freewheelMode);
 	denormalCheckBox->setChecked(config.useDenormalBias);
 	outputLimiterCheckBox->setChecked(config.useOutputLimiter);
-	vstInPlaceCheckBox->setChecked(config.vstInPlace);
 	dummyAudioRate->setValue(config.dummyAudioSampleRate);
 
-	//DummyAudioDevice* dad = dynamic_cast<DummyAudioDevice*>(audioDevice);
-	//dummyAudioRealRate->setText(dad ? QString().setNum(sampleRate) : "---");
 	dummyAudioRealRate->setText(QString().setNum(sampleRate));
 
 	startSongEntry->setText(config.startSong);
 	startSongGroup->button(config.startMode)->setChecked(true);
 
-	showSplash->setChecked(config.showSplashScreen);
-	showDidYouKnow->setChecked(config.showDidYouKnow);
-	externalWavEditorSelect->setText(config.externalWavEditor);
 	oldStyleStopCheckBox->setChecked(config.useOldStyleStopShortCut);
 	moveArmedCheckBox->setChecked(config.moveArmedCheckBox);
 	projectSaveCheckBox->setChecked(config.useProjectSaveDialog);
@@ -122,10 +122,55 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	connect(cancelButton, SIGNAL(clicked()), SLOT(cancel()));
 	connect(btnStartLSClient, SIGNAL(clicked()), SLOT(startLSClientNow()));
 	connect(btnResetLSNow, SIGNAL(clicked()), SLOT(resetLSNow()));
-	//connect(setBigtimeCurrent, SIGNAL(clicked()), SLOT(bigtimeCurrent()));
-	//connect(setComposerCurrent, SIGNAL(clicked()), SLOT(composerCurrent()));
-	//connect(setTransportCurrent, SIGNAL(clicked()), SLOT(transportCurrent()));
+	connect(btnRefreshInput, SIGNAL(clicked()), this, SLOT(populateInputs()));
 }
+
+void GlobalSettingsConfig::populateInputs()/*{{{*/
+{
+	m_inputsModel->clear();
+	QStringList alsaList;
+	QStringList jackList;
+	if(gInputList.size())/*{{{*/
+	{
+		//Select the rows
+		for(int i = 0; i < gInputList.size(); ++i)
+		{
+			QPair<int, QString> input = gInputList.at(i);
+			if(input.first == MidiDevice::JACK_MIDI)
+				jackList.append(input.second);
+			else
+				alsaList.append(input.second);
+		}
+	}/*}}}*/
+	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+	{
+		if ((*i)->deviceType() == MidiDevice::ALSA_MIDI)
+		{
+			QStandardItem* item = new QStandardItem(QString((*i)->name()).append(" (ALSA)"));
+			item->setData((*i)->name(), Qt::UserRole+1);
+			item->setData(MidiDevice::ALSA_MIDI, Qt::UserRole+2);
+			item->setEditable(false);
+			item->setCheckable(true);
+			if(alsaList.contains((*i)->name()))
+				item->setCheckState(Qt::Checked);
+			m_inputsModel->appendRow(item);
+		}
+	}
+	if(audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
+		return;
+	std::list<QString> sl = audioDevice->outputPorts(true, false);//No aliases
+	for (std::list<QString>::iterator ip = sl.begin(); ip != sl.end(); ++ip)
+	{
+		QStandardItem* item = new QStandardItem(QString(*ip).append(" (JACK)"));
+		item->setData(*ip, Qt::UserRole+1);
+		item->setData(MidiDevice::JACK_MIDI, Qt::UserRole+2);
+		item->setEditable(false);
+		item->setCheckable(true);
+		if(jackList.contains(*ip))
+			item->setCheckState(Qt::Checked);
+		m_inputsModel->appendRow(item);
+	}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   updateSettings
@@ -172,7 +217,6 @@ void GlobalSettingsConfig::updateSettings()
 	freewheelCheckBox->setChecked(config.freewheelMode);
 	denormalCheckBox->setChecked(config.useDenormalBias);
 	outputLimiterCheckBox->setChecked(config.useOutputLimiter);
-	vstInPlaceCheckBox->setChecked(config.vstInPlace);
 	dummyAudioRate->setValue(config.dummyAudioSampleRate);
 
 	dummyAudioRealRate->setText(QString().setNum(sampleRate));
@@ -180,9 +224,6 @@ void GlobalSettingsConfig::updateSettings()
 	startSongEntry->setText(config.startSong);
 	startSongGroup->button(config.startMode)->setChecked(true);
 
-	showSplash->setChecked(config.showSplashScreen);
-	showDidYouKnow->setChecked(config.showDidYouKnow);
-	externalWavEditorSelect->setText(config.externalWavEditor);
 	oldStyleStopCheckBox->setChecked(config.useOldStyleStopShortCut);
 	moveArmedCheckBox->setChecked(config.moveArmedCheckBox);
 	projectSaveCheckBox->setChecked(config.useProjectSaveDialog);
@@ -191,6 +232,7 @@ void GlobalSettingsConfig::updateSettings()
 	btnResetLSNow->setEnabled(lsClientStarted);
 	chkResetLSOnStartup->setChecked(config.lsClientResetOnStart);
 	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
+	populateInputs();
 	//TODO: Set icon for status of lsClient
 }
 
@@ -269,7 +311,6 @@ void GlobalSettingsConfig::apply()
 	config.freewheelMode = freewheelCheckBox->isChecked();
 	config.useDenormalBias = denormalCheckBox->isChecked();
 	config.useOutputLimiter = outputLimiterCheckBox->isChecked();
-	config.vstInPlace = vstInPlaceCheckBox->isChecked();
 	config.rtcTicks = rtcResolutions[rtcticks];
 	config.userInstrumentsDir = userInstrumentsPath->text();
 	config.startSong = startSongEntry->text();
@@ -283,9 +324,6 @@ void GlobalSettingsConfig::apply()
 	div = guiDivisionSelect->currentIndex();
 	config.guiDivision = divisions[div];
 
-	config.showSplashScreen = showSplash->isChecked();
-	config.showDidYouKnow = showDidYouKnow->isChecked();
-	config.externalWavEditor = externalWavEditorSelect->text();
 	config.useOldStyleStopShortCut = oldStyleStopCheckBox->isChecked();
 	config.moveArmedCheckBox = moveArmedCheckBox->isChecked();
 	config.useProjectSaveDialog = projectSaveCheckBox->isChecked();
@@ -295,6 +333,16 @@ void GlobalSettingsConfig::apply()
 	oomUserInstruments = config.userInstrumentsDir;
 	config.lsClientResetOnStart = chkResetLSOnStartup->isChecked();
 	config.lsClientResetOnSongStart = chkResetLSOnSongLoad->isChecked();
+
+	gInputList.clear();
+	for(int i = 0; i < m_inputsModel->rowCount(); ++i)
+	{
+		QStandardItem* item = m_inputsModel->item(i);
+		if(item && item->checkState() == Qt::Checked)
+		{
+			gInputList.append(qMakePair(item->data(Qt::UserRole+2).toInt(), item->data(Qt::UserRole+1).toString()));
+		}
+	}
 
 	oom->setHeartBeat(); // set guiRefresh
 	midiSeq->msgSetRtc(); // set midi tick rate
@@ -332,4 +380,9 @@ void GlobalSettingsConfig::defaultInstrumentsPath()
 {
 	QString dir = configPath + "/instruments";
 	userInstrumentsPath->setText(dir);
+}
+
+void GlobalSettingsConfig::setCurrentTab(int tab)
+{
+	TabWidget2->setCurrentIndex(tab);
 }

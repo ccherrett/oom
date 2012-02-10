@@ -284,7 +284,6 @@ signals:
 private slots:
     //void runPythonScript();
     void loadProject();
-    void configGlobalSettings();
     void about();
     void aboutQt();
     void startHelpBrowser();
@@ -374,6 +373,7 @@ public slots:
     void quitDoc(bool ext = false);
     bool save();
     bool saveAs();
+    void configGlobalSettings(int tab = 0);
     void bounceToFile(AudioOutput* ao = 0);
     void closeEvent(QCloseEvent*e);
     void loadProjectFile(const QString&);
@@ -474,5 +474,6 @@ public:
 };
 
 extern void addProject(const QString& name);
+extern void initGlobalInputPorts();
 #endif
 

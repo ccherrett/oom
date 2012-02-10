@@ -199,5 +199,6 @@ extern LSClient* lsClient;
 extern bool gUpdateAuxes;
 extern TrackManager* trackManager;
 extern QList<QPair<int, QString> > gInputList;
+extern QList<int> gInputListPorts;
 #endif
 
