@@ -28,7 +28,6 @@
 #include "gconfig.h"
 #include "event.h"
 //#include "midiedit/drummap.h"
-//#include "synth.h"
 #include "config.h"
 #include "menulist.h"
 #include "midimonitor.h"

@@ -34,7 +34,6 @@
 #include "ctrlcombo.h"
 #include "genset.h"
 #include "midiitransform.h"
-#include "synth.h"
 #include "audio.h"
 #include "plugin.h"
 #include "sync.h"

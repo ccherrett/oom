@@ -770,8 +770,8 @@ protected:
 //---------------------------------------------------------
 
 class SynthPluginDevice :
-        public MidiDevice
-        //public MidiInstrument
+        public MidiDevice,
+        public MidiInstrument
 {
 public:
     SynthPluginDevice(PluginType type, QString filename, QString name, QString label, bool duplicated = false);

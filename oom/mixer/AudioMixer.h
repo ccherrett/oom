@@ -10,8 +10,10 @@
 
 #include <QMainWindow>
 #include "config.h"
-#include "synth.h"
 #include "node.h"
+#include "globals.h"
+#include "track.h"
+
 
 class QHBoxLayout;
 class QComboBox;

@@ -38,7 +38,6 @@
 #include "meter.h"
 #include "astrip.h"
 #include "track.h"
-#include "synth.h"
 //#include "route.h"
 #include "doublelabel.h"
 #include "rack.h"

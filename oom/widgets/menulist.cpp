@@ -23,7 +23,6 @@
 #include "instruments/minstrument.h"
 #include "app.h"
 #include "gconfig.h"
-#include "synth.h"
 #include "config.h"
 #include "menulist.h"
 

@@ -27,7 +27,6 @@
 #include "driver/alsamidi.h"
 #include "driver/jackmidi.h"
 #include "sync.h"
-#include "synth.h"
 #include "song.h"
 #include "gconfig.h"
 

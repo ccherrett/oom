@@ -52,7 +52,6 @@
 #include "plugin.h"
 #include "track.h"
 #include "song.h"
-#include "synth.h"
 //#include "audio.h"
 //#include "jackaudio.h"
 //#include "midi.h"

@@ -34,7 +34,6 @@
 #include "Composer.h"
 #include "event.h"
 #include "midiedit/drummap.h"
-#include "synth.h"
 #include "menulist.h"
 #include "midimonitor.h"
 #include "ComposerCanvas.h"

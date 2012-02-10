@@ -27,7 +27,6 @@
 #include "driver/alsamidi.h"
 #include "driver/jackmidi.h"
 #include "wave.h"
-#include "synth.h"
 #include "sync.h"
 #include "midiseq.h"
 #include "gconfig.h"

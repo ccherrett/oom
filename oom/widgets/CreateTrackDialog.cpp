@@ -13,7 +13,6 @@
 #include "mididev.h"
 #include "midiport.h"
 #include "minstrument.h"
-#include "synth.h"
 #include "audio.h"
 #include "midiseq.h"
 #include "driver/jackaudio.h"
