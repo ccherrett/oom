@@ -25,6 +25,7 @@
 
 #include <list>
 #include <vector>
+#include <math.h>
 #include <stdint.h>
 #include <QFileInfo>
 #include <QMutex>
@@ -403,6 +404,9 @@ public:
     {
         if (index < m_paramCount)
         {
+            if (m_params[index].hints & PARAMETER_IS_INTEGER)
+                value = rint(value);
+
             m_params[index].value    = value;
             m_params[index].tmpValue = value;
             m_params[index].update   = true;
@@ -723,6 +727,7 @@ public:
     QString getParameterName(uint32_t index);
     QString getParameterUnit(uint32_t index);
     void setNativeParameterValue(uint32_t index, double value);
+    void setAutomatedParameterValue(uint32_t index, double value);
 
     uint32_t getProgramCount();
     QString getProgramName(uint32_t index);
