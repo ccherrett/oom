@@ -103,6 +103,8 @@ EffectRack::EffectRack(QWidget* parent, AudioTrack* t)
 
 void EffectRack::updateContents()
 {
+    if (!track)
+        return;
 	for (int i = 0; i < PipelineDepth; ++i)
 	{
 		QString name = track->efxPipe()->name(i);
