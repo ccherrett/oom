@@ -41,7 +41,7 @@ PluginGui::PluginGui(BasePlugin* p)
     QString title;
     title += "OOMidi: ";
     title += plugin->name();
-    if (plugin->track())
+    if (plugin->track() && plugin->track()->name().isEmpty() == false)
     {
         title += " - ";
         title += plugin->track()->name();

@@ -111,6 +111,7 @@ bool MidiPort::hasGui() const
 
 void MidiPort::setMidiDevice(MidiDevice* dev)
 {
+    // close old device
 	if (_device)
 	{
         if (_device->isSynthPlugin())
@@ -118,6 +119,7 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 		_device->setPort(-1);
 		_device->close();
 	}
+    // set-up new device
 	if (dev)
 	{
 		for (int i = 0; i < MIDI_PORTS; ++i)
@@ -136,14 +138,15 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 		_device = dev;
         if (_device->isSynthPlugin())
 		{
-            //SynthPluginDevice* s = (SynthPluginDevice*) _device;
-			//_instrument = s;
-            _instrument = genericMidiInstrument;
+            SynthPluginDevice* s = (SynthPluginDevice*) _device;
+			_instrument = s;
+            //_instrument = genericMidiInstrument;
 		}
 		_state = _device->open();
 		_device->setPort(portno());
 	}
 	else
+        // dev is null, clear this device
 		clearDevice();
 }
 

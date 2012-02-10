@@ -869,11 +869,15 @@ void AudioTrack::writeProperties(int level, Xml& xml) const
 			}
 		}
 	}
-	for (ciPluginI ip = _efxPipe->begin(); ip != _efxPipe->end(); ++ip)
-	{
-		if (*ip)
-			(*ip)->writeConfiguration(level, xml);
-	}
+    if (_wantsAutomation == false)
+    {
+        // _wantsAutomation is only set on fake midi automation tracks. on those, we don't need to save the plugins (synth) config
+        for (ciPluginI ip = _efxPipe->begin(); ip != _efxPipe->end(); ++ip)
+        {
+            if (*ip)
+                (*ip)->writeConfiguration(level, xml);
+        }
+    }
 	for (ciCtrlList icl = _controller.begin(); icl != _controller.end(); ++icl)
 	{
 		const CtrlList* cl = icl->second;

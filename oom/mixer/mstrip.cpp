@@ -269,7 +269,13 @@ MidiStrip::MidiStrip(QWidget* parent, MidiTrack* t)
 	autoType->insertItem(tr("Write"), AUTO_WRITE);
     
     if (track && track->wantsAutomation())
-        autoType->setCurrentItem(t->automationType());
+    {
+        AudioTrack* atrack = ((MidiTrack*)track)->getAutomationTrack();
+        if (atrack)
+            autoType->setCurrentItem(atrack->automationType());
+        else
+            autoType->setCurrentItem(AUTO_OFF);
+    }
     else
     {
         autoType->setCurrentItem(AUTO_OFF);

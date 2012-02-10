@@ -332,6 +332,8 @@ QString SynthPluginDevice::open()
             audio->msgAddPlugin(m_audioTrack, 0, m_plugin);
 
             m_audioTrack->mapRackPluginsToControllers();
+            m_audioTrack->setName(m_name);
+            m_audioTrack->setWantsAutomation(true);
 
             m_plugin->setActive(true);
             return QString("OK");

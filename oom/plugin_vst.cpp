@@ -762,7 +762,7 @@ void VstPlugin::showNativeGui(bool yesno)
         title += "OOMidi: ";
         title += m_name;
         title += " (GUI)";
-        if (m_track)
+        if (m_track && m_track->name().isEmpty() == false)
         {
             title += " - ";
             title += m_track->name();

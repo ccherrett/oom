@@ -863,14 +863,16 @@ AutomationType MidiTrack::automationType() const
 
 void MidiTrack::setAutomationType(AutomationType t)
 {
-	MidiPort* port = &midiPorts[outPort()];
-	port->setAutomationType(outChannel(), t);
-
     if (_wantsAutomation)
     {
         AudioTrack* atrack = getAutomationTrack();
         if (atrack)
             atrack->setAutomationType(t);
+    }
+    else
+    {
+        MidiPort* port = &midiPorts[outPort()];
+        port->setAutomationType(outChannel(), t);
     }
 }
 
@@ -1123,7 +1125,27 @@ void MidiTrack::write(int level, Xml& xml) const/*{{{*/
 	xml.intTag(level, "delay", delay);
 	xml.intTag(level, "len", len);
 	xml.intTag(level, "compression", compression);
-	xml.intTag(level, "automation", int(automationType()));
+    
+    if (_wantsAutomation)
+    {
+        int atype = 0;
+
+        // FIXME - cannot use 'getAutomationTrack()' here
+        if (_outPort >= 0 && _outPort < MIDI_PORTS)
+        {
+            if (midiPorts[_outPort].device() && midiPorts[_outPort].device()->deviceType() == MidiDevice::SYNTH_MIDI)
+            {
+                SynthPluginDevice* dev = (SynthPluginDevice*)midiPorts[_outPort].device();
+                AudioTrack* atrack = dev->audioTrack();
+                if (atrack)
+                    atype = atrack->automationType();
+            }
+        }
+
+        xml.intTag(level, "automation", atype);
+    }
+    else
+        xml.intTag(level, "automation", int(automationType()));
 
 	const PartList* pl = cparts();
 	for (ciPart p = pl->begin(); p != pl->end(); ++p)
