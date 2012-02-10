@@ -69,6 +69,7 @@
 #include "toolbars/edittools.h"
 #include "toolbars/looptools.h"
 #include "toolbars/feedbacktools.h"
+#include "TrackManager.h"
 
 #include "ccinfo.h"
 #ifdef DSSI_SUPPORT
@@ -486,6 +487,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	setIconSize(ICON_SIZE);
 	setFocusPolicy(Qt::WheelFocus);
 	oom = this; // hack
+	
+	//Initialize the trackManager
+	trackManager = new TrackManager;
 	clipListEdit = 0;
 	midiSyncConfig = 0;
 	midiRemoteConfig = 0;
@@ -4657,7 +4661,7 @@ TrackView* OOMidi::addInstrumentTemplate()
 	TrackView* tv = new TrackView(true);
 	tv->setDefaultName();
 	m_instrumentTemplates.insert(tv->id(), tv);
-	emit instrumentTemplateAdded(tv->id());
+	//emit instrumentTemplateAdded(tv->id());
 
 	return tv;
 }

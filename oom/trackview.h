@@ -68,13 +68,11 @@ private:
 	QString _comment;
 	QList<qint64> m_tracksIndex;
 	QMap<qint64, TrackViewTrack*> m_tracks;
-	QMap<qint64, VirtualTrack*> m_vtracks;
 	bool _recState;
-	qint64 m_id;
 	bool m_template;
 
-protected:
 	QString _name;
+	qint64 m_id;
 	
 	bool _selected;
 	bool readProperties(Xml& xml, const QString& tag);
@@ -83,10 +81,12 @@ protected:
 public:
 
 	TrackView(bool istemplate = false);
+	TrackView(const TrackView&);
+	TrackView& operator=(const TrackView& g);
+	//TrackView* clone();
 	~TrackView();
 	qint64 id() { return m_id; }
-	QString getValidName(QString);
-	TrackView& operator=(const TrackView& g);
+	static QString getValidName(QString, bool temp = false);
 	
 	static const char* _cname[];
 	
@@ -116,14 +116,26 @@ public:
 	bool record() { return _recState; }
 	void setRecord(bool f) { _recState = f; }
 
-	QMap<qint64, VirtualTrack*> *virtualTracks()
+	bool hasVirtualTracks()
 	{
-		return &m_vtracks;
+		foreach(TrackViewTrack* t, m_tracks)
+		{
+			if(t->is_virtual)
+				return true;
+		}
+		return false;
 	}
 
-	void addVirtualTrack(VirtualTrack*);
-	qint64 addVirtualTrackCopy(VirtualTrack*);
-	void removeVirtualTrack(qint64 id);
+	QList<qint64> virtualTracks()
+	{
+		QList<qint64> rv;
+		foreach(TrackViewTrack* t, m_tracks)
+		{
+			if(t->is_virtual)
+				rv.append(t->id);
+		}
+		return rv;
+	}
 
 	void clear();
 

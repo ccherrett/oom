@@ -75,6 +75,7 @@ class QDocWidget;
 class MidiAssignDialog;
 class MidiPlayEvent;
 class MixerDock;
+class VirtualTrack;
 
 #define MENU_ADD_SYNTH_ID_BASE 0x1000
 #define OOCMD_PORT 8415

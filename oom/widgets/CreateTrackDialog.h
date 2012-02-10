@@ -62,8 +62,6 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	
 	void updateVisibleElements();
 	
-	int getFreeMidiPort();
-	
 	void initDefaults();
 	void cleanup();
 

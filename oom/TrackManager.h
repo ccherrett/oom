@@ -10,27 +10,12 @@
 #include <QMap>
 #include <QString>
 #include <QPair>
-#include "utils.h"
 
 class Xml;
 
 struct VirtualTrack {
 
-	VirtualTrack()
-	{
-		id = create_id();
-		type = -1;
-		useOutput = false;
-		useInput = false;
-		useBuss = false;
-		useMonitor = false;
-		inputChannel = -1;
-		outputChannel = -1;
-		instrumentType = -1;
-		autoCreateInstrument = false;
-		createMidiInputDevice = false;
-		createMidiOutputDevice = false;
-	}
+	VirtualTrack();
 	qint64 id;
 	int type;
 	QString name;
@@ -68,8 +53,8 @@ class TrackManager : public QObject{
 	
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;
-	
-	int getFreeMidiPort();
+
+	QMap<qint64, VirtualTrack*> m_virtualTracks;
 	
 	void createMonitorInputTracks(VirtualTrack*);
 	void removeMonitorInputTracks(VirtualTrack*);
@@ -84,8 +69,25 @@ public:
 	TrackManager();
 	~TrackManager(){}
 	void setPosition(int);
-	qint64 addTrack(VirtualTrack*);
+	qint64 addTrack(VirtualTrack*, int index = -1);
 	bool removeTrack(VirtualTrack*);
+	
+	void addVirtualTrack(VirtualTrack* vt)
+	{
+		if(vt)
+			m_virtualTracks.insert(vt->id, vt);
+	}
+	void removeVirtualTrack(qint64 id)
+	{
+		m_virtualTracks.erase(m_virtualTracks.find(id));
+	}
+	QMap<qint64, VirtualTrack*> virtualTracks()
+	{
+		QMap<qint64, VirtualTrack*> rv;
+		return rv.unite(m_virtualTracks);
+	}
+	void write(int level, Xml&) const;
+	void read(Xml&);
 };
 
 #endif

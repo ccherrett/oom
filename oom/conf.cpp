@@ -41,6 +41,7 @@
 #include "wave.h"
 #include "midiseq.h"
 #include "AudioMixer.h"
+#include "TrackManager.h"
 
 extern void writeMidiTransforms(int level, Xml& xml);
 extern void readMidiTransform(Xml&);
@@ -1142,6 +1143,7 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 void OOMidi::writeInstrumentTemplates(int level, Xml& xml) const 
 {
 	xml.tag(level++, "instrumentTemplateList");
+	trackManager->write(level, xml);
 	foreach(TrackView* tv, m_instrumentTemplates)
 	{
 		tv->write(level, xml);
@@ -1217,6 +1219,10 @@ void OOMidi::readInstrumentTemplates(Xml& xml)
 					TrackView* tv = new TrackView();
 					tv->read(xml);
 					insertInstrumentTemplate(tv, -1);
+				}
+				else if(tag == "trackManager")
+				{
+					trackManager->read(xml);
 				}
 				else
 					xml.skip(tag);

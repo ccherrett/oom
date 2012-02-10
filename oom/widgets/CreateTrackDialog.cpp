@@ -23,6 +23,7 @@
 #include "icons.h"
 #include "midimonitor.h"
 #include "plugin.h"
+#include "utils.h"
 
 
 CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent)
@@ -301,10 +302,8 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		}
 		else
 		{
-			TrackManager* tman = new TrackManager();
-			tman->setPosition(m_insertPosition);
-			connect(tman, SIGNAL(trackAdded(qint64)), this, SIGNAL(trackAdded(qint64)));
-			if(tman->addTrack(m_vtrack))
+			connect(trackManager, SIGNAL(trackAdded(qint64)), this, SIGNAL(trackAdded(qint64)));
+			if(trackManager->addTrack(m_vtrack, m_insertPosition))
 			{
 				qDebug("Sucessfully added track");
 				done(1);
@@ -886,24 +885,6 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
         if (gm >= 0)
             cmbInstrument->setCurrentIndex(gm);
     }
-}/*}}}*/
-
-int CreateTrackDialog::getFreeMidiPort()/*{{{*/
-{
-	int rv = -1;
-	for (int i = 0; i < MIDI_PORTS; ++i)
-	{
-		MidiPort* mp = &midiPorts[i];
-		MidiDevice* md = mp->device();
-		
-		//Use the first unconfigured port
-		if (!md)
-		{
-			rv = i;
-			break;
-		}
-	}
-	return rv;
 }/*}}}*/
 
 void CreateTrackDialog::updateVisibleElements()/*{{{*/

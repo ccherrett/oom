@@ -360,8 +360,7 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)/*{{{*/
 						ctdialog->lockType(true);
 						if(ctdialog->exec() && vt)
 						{
-							TrackManager* tman = new TrackManager();
-							qint64 nid = tman->addTrack(vt);
+							qint64 nid = trackManager->addTrack(vt, -1);
 							track = song->findTrackById(nid);
 						}
 						if(track)

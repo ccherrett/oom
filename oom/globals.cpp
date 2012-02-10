@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "config.h"
 #include "network/lsclient.h"
+#include "TrackManager.h"
 
 int recFileNumber = 1;
 
@@ -104,15 +105,6 @@ bool loadDSSI = true;
 bool usePythonBridge = false;
 bool useLASH = true;
 
-/*
-const char* midi_file_pattern[] = {
-      QT_TRANSLATE_NOOP("@default", "Midi/Kar (*.mid *.MID *.kar *.KAR *.mid.gz *.mid.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "Midi (*.mid *.MID *.mid.gz *.mid.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "Karaoke (*.kar *.KAR *.kar.gz *.kar.bz2)"),
-      QT_TRANSLATE_NOOP("@default", "All Files (*)"),
-      0
-      };
-*/      
 const QStringList midi_file_pattern =  
       QT_TRANSLATE_NOOP("@default", 
       QString("Midi/Kar (*.mid *.MID *.kar *.KAR *.mid.gz *.mid.bz2);;") +
@@ -268,7 +260,9 @@ int vuColorStrip = 0; //default vuColor is gradient
 bool lsClientStarted = false;
 LSClient* lsClient = 0;
 bool gUpdateAuxes = false;
+TrackManager* trackManager;
 
+QList<QPair<int, QString> > gInputList;
 //---------------------------------------------------------
 //   doSetuid
 //    Restore the effective UID to its original value.

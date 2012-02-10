@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <QList>
 #include <QHash>
+#include <QPair>
 
 class QString;
 class QAction;
@@ -27,6 +28,7 @@ class QIcon;
 class QColor;
 class QPixmap;
 class LSClient;
+class TrackManager;
 
 extern const float denormalBias;
 
@@ -78,26 +80,11 @@ extern bool realTimeScheduling;
 extern int realTimePriority;
 extern int midiRTPrioOverride;
 
-/*
-extern const char* midi_file_pattern[];  //!< File name pattern for midi files
-extern const char* midi_file_save_pattern[];  //!< File name pattern for saving midi files
-extern const char* med_file_pattern[];   //!< File name pattern for oom project files
-extern const char* med_file_save_pattern[];   //!< File name pattern for saving oom project files
-extern const char* image_file_pattern[]; //!< File name pattern for image files (gfx)
-//extern const char* ctrl_file_pattern[];  //!< File name pattern for controller-files
-extern const char* part_file_pattern[];  //!< File name pattern for part files
-extern const char* part_file_save_pattern[];  //!< File name pattern for saving part files
-//extern const char* plug_file_pattern[];  //!< File name pattern for plugin files
-extern const char* preset_file_pattern[];  //!< File name pattern for plugin files
-extern const char* preset_file_save_pattern[];  //!< File name pattern for saving plugin files
- */
-
 extern const QStringList midi_file_pattern;
 extern const QStringList midi_file_save_pattern;
 extern const QStringList med_file_pattern;
 extern const QStringList med_file_save_pattern;
 extern const QStringList image_file_pattern;
-//extern const QStringList ctrl_file_pattern;
 extern const QStringList part_file_pattern;
 extern const QStringList part_file_save_pattern;
 extern const QStringList preset_file_pattern;
@@ -106,7 +93,6 @@ extern const QStringList drum_map_file_pattern;
 extern const QStringList drum_map_file_save_pattern;
 extern const QStringList audio_file_pattern;
 
-///extern Qt::ButtonState globalKeyState;
 extern Qt::KeyboardModifiers globalKeyState;
 
 extern int midiInputPorts; //!< receive from all devices
@@ -153,9 +139,7 @@ extern QAction* noteAlphaAction;
 extern QAction* multiPartSelectionAction;
 extern QAction* masterEnableAction;
 
-//class AudioMixer;
 class OOMidi;
-//extern AudioMixer* audioMixer;
 extern OOMidi* oom;
 
 extern int preMeasures;
@@ -213,5 +197,7 @@ extern int vuColorStrip;
 extern bool lsClientStarted;
 extern LSClient* lsClient;
 extern bool gUpdateAuxes;
+extern TrackManager* trackManager;
+extern QList<QPair<int, QString> > gInputList;
 #endif
 
