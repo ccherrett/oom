@@ -33,6 +33,7 @@
 #ifdef GTK2UI_SUPPORT
 #undef signals
 #include <gtk/gtk.h>
+#include "xpm/oom_icon.xpm"
 static void oom_lv2_gtk_window_destroyed(void*, void* data)
 {
     if (data) ((Lv2Plugin*)data)->closeNativeGui(true);
@@ -1432,9 +1433,11 @@ void Lv2Plugin::showNativeGui(bool yesno)
 #ifdef GTK2UI_SUPPORT
                 GtkWidget* hostWidget   = gtk_window_new(GTK_WINDOW_TOPLEVEL);
                 GtkWidget* pluginWidget = (GtkWidget*)ui.widget;
+                GdkPixbuf* pixmap = gdk_pixbuf_new_from_xpm_data(oom_icon_xpm);
 
                 //gtk_window_set_resizable(GTK_WINDOW(hostWidget), 1);
                 gtk_window_set_title(GTK_WINDOW(hostWidget), title.toUtf8().constData());
+                gtk_window_set_icon(GTK_WINDOW(hostWidget), pixmap);
                 gtk_container_add(GTK_CONTAINER(hostWidget), pluginWidget);
                 g_signal_connect(G_OBJECT(hostWidget), "destroy", G_CALLBACK(oom_lv2_gtk_window_destroyed), this);
 
