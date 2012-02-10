@@ -1050,16 +1050,11 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 	populateInstrumentList();
 	populateMonitorList();
 	populateBussList();
-	if(!gInputList.size())//TODO: popup a messagebox first telling them what is happening
+	/*if(!gInputList.size())//TODO: popup a messagebox first telling them what is happening
 	{
 		GlobalSettingsConfig* genSetConfig = new GlobalSettingsConfig(this);
 		genSetConfig->setCurrentTab(2);
 		genSetConfig->show();
-	}
+	}*/
 }
 
-/*QSize CreateTrackDialog::sizeHint()
-{
-	return QSize(m_width, m_height);
-	//return QSize(450, 100);
-}*/
