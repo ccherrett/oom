@@ -5162,7 +5162,11 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 		{ //go find the right item from the current track
 			Track * t = y2Track(event->pos().y());
 			if (t) {
-				CtrlListList* cll = ((AudioTrack*) t)->controller();
+				CtrlListList* cll;
+                if (t->isMidiTrack() && t->wantsAutomation())
+                    cll = ((MidiTrack*)t)->getAutomationTrack()->controller();
+                else
+                    cll = ((AudioTrack*) t)->controller();
 				for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 				{
 					CtrlList *cl = icll->second;
