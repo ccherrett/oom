@@ -35,5 +35,7 @@ public:
 class Xml;
 extern bool readConfiguration();
 extern void readConfiguration(Xml&, bool readOnlySequencer);
+extern void readGlobalInputList(Xml&);
+extern void readGlobalInput(Xml&);
 #endif
 

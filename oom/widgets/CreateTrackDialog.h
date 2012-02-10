@@ -75,6 +75,8 @@ private slots:
 	void trackTypeChanged(int);
 	void trackNameEdited();
 
+	void showInputSettings();
+
 protected:
 	virtual void showEvent(QShowEvent*);
 

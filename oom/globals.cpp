@@ -263,6 +263,7 @@ bool gUpdateAuxes = false;
 TrackManager* trackManager;
 
 QList<QPair<int, QString> > gInputList;
+QList<int> gInputListPorts;
 //---------------------------------------------------------
 //   doSetuid
 //    Restore the effective UID to its original value.

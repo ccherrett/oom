@@ -667,6 +667,9 @@ void MidiTrack::setOutPort(int i)
 {
     _outPort = i;
 
+	MidiPort* mp = &midiPorts[i];
+	if(mp)
+		_outPortId = mp->id();
     if (i >= 0 && i < MIDI_PORTS)
     {
         _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
@@ -715,6 +718,9 @@ void MidiTrack::setOutPortAndUpdate(int i)/*{{{*/
             ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
     }
 
+	MidiPort* mp = &midiPorts[i];
+	if(mp)
+		_outPortId = mp->id();
 	if (_outPort == i)
 		return;
 
@@ -1113,6 +1119,7 @@ void MidiTrack::write(int level, Xml& xml) const/*{{{*/
 	Track::writeProperties(level, xml);
 
 	xml.intTag(level, "device", outPort());
+	xml.intTag(level, "deviceId", outPortId());
 	xml.intTag(level, "channel", outChannel());
 	xml.intTag(level, "locked", _locked);
 	xml.intTag(level, "echo", _recEcho);
@@ -1171,6 +1178,8 @@ void MidiTrack::read(Xml& xml)/*{{{*/
 				}
 				else if (tag == "device")
 					setOutPort(xml.parseInt());
+				else if (tag == "deviceId")
+					setOutPortId(xml.parseLongLong());
 				else if (tag == "channel")
 					setOutChannel(xml.parseInt());
 				else if (tag == "inportMap")

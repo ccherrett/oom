@@ -50,6 +50,9 @@
 #include "master/masteredit.h"
 #include "metronome.h"
 #include "midiseq.h"
+#include "midiport.h"
+#include "mididev.h"
+#include "driver/jackmidi.h"
 #include "mixdowndialog.h"
 #include "Performer.h"
 #include "popupmenu.h"
@@ -70,6 +73,7 @@
 #include "toolbars/looptools.h"
 #include "toolbars/feedbacktools.h"
 #include "TrackManager.h"
+#include "utils.h"
 
 #include "ccinfo.h"
 #ifdef DSSI_SUPPORT
@@ -144,6 +148,64 @@ void microSleep(long msleep)
 	while (sleepOk == -1)
 		sleepOk = usleep(msleep);
 }
+
+void initGlobalInputPorts()/*{{{*/
+{
+	gInputListPorts.clear();
+	if(gInputList.size())
+	{
+		for(int i = 0; i < gInputList.size(); ++i)
+		{
+			QPair<int, QString> input = gInputList.at(i);
+
+			QString devname = input.second;
+			MidiPort* inport = 0;
+			MidiDevice* indev = 0;
+			QString inputDevName(QString("Input-").append(devname));
+			int midiInPort = getFreeMidiPort();
+			qDebug("createMidiInputDevice is set: %i", midiInPort);
+			inport = &midiPorts[midiInPort];
+			int devtype = input.first;
+			if(devtype == MidiDevice::ALSA_MIDI)
+			{
+				indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
+				if(indev)
+				{
+					qDebug("Found MIDI input device: ALSA_MIDI");
+					int openFlags = 0;
+					openFlags ^= 0x2;
+					indev->setOpenFlags(openFlags);
+					midiSeq->msgSetMidiDevice(inport, indev);
+					gInputListPorts.append(midiInPort);
+				}
+			}
+			else if(devtype == MidiDevice::JACK_MIDI)
+			{
+				indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
+				if(indev)
+				{
+					qDebug("Created MIDI input device: JACK_MIDI");
+					int openFlags = 0;
+					openFlags ^= 0x2;
+					indev->setOpenFlags(openFlags);
+					midiSeq->msgSetMidiDevice(inport, indev);
+					gInputListPorts.append(midiInPort);
+				}
+			}
+			if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
+			{
+				qDebug("MIDI input device configured, Adding input routes to MIDI port");
+				Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
+				Route dstRoute(indev, -1);
+
+				audio->msgAddRoute(srcRoute, dstRoute);
+
+				audio->msgUpdateSoloStates();
+				song->update(SC_ROUTE);
+			}
+		}
+	}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   seqStart
@@ -1435,6 +1497,13 @@ void OOMidi::loadProjectFile(const QString& name)
 
 void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAll)
 {
+	//FIXME: Check this the file exists before going further
+	QFileInfo info(name);
+	if(!info.exists())
+	{
+		QMessageBox::critical(this, tr("Song Open Error"), QString(tr("Failed to open song\nNo such file:")).append(info.filePath()));
+		return;
+	}
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	song->invalid = true;
 	//
@@ -1476,6 +1545,7 @@ void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAl
 
 void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadAll)
 {
+	//FIXME: Check this the file exists before going further
 	//if (audioMixer)
 	//      audioMixer->clear();
 	if (mixer1)
@@ -1488,6 +1558,8 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	{
 		return;
 	}
+
+	//Configure the my input list
 
 	QFileInfo fi(name);
 	if (songTemplate)
@@ -1568,6 +1640,8 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	   		 // using the internal xml parser for now.
 
 			//TODO: Flush all ports at this point so each song loads with a fresh LS state
+
+			initGlobalInputPorts();
 			Xml xml(f);
 			printf("OOMidi::loadProjectFile1 Before OOMidi::read()\n");
 			read(xml, !loadAll);

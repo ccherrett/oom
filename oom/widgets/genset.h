@@ -13,6 +13,10 @@
 
 #include <QShowEvent>
 
+class QStandardItemModel;
+
+enum {CONF_APP_TAB = 0, CONF_AUDIO_TAB, CONF_MIDI_TAB, CONF_GUI_TAB};
+
 //---------------------------------------------------------
 //   GlobalSettingsConfig
 //---------------------------------------------------------
@@ -20,6 +24,8 @@
 class GlobalSettingsConfig : public QDialog, public Ui::GlobalSettingsDialogBase
 {
     Q_OBJECT
+
+	QStandardItemModel* m_inputsModel;
 
 private slots:
     void updateSettings();
@@ -34,6 +40,10 @@ private slots:
 protected:
     void showEvent(QShowEvent*);
     QButtonGroup *startSongGroup;
+
+public slots:
+	void setCurrentTab(int);
+	void populateInputs();
 
 public:
     GlobalSettingsConfig(QWidget* parent = 0);
