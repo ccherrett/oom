@@ -468,7 +468,7 @@ Lv2Plugin::~Lv2Plugin()
     // close UI
     if (m_hints & PLUGIN_HAS_NATIVE_GUI)
     {
-        if (ui.handle && ui.descriptor->cleanup)
+        if (ui.handle && ui.descriptor && ui.descriptor->cleanup)
             ui.descriptor->cleanup(ui.handle);
         
         ui.handle = 0;
@@ -1614,7 +1614,7 @@ void Lv2Plugin::closeNativeGui(bool destroyed)
     }
 #endif
 
-    if (ui.descriptor->cleanup)
+    if (ui.handle && ui.descriptor && ui.descriptor->cleanup)
         ui.descriptor->cleanup(ui.handle);
 
     ui.handle = 0;
