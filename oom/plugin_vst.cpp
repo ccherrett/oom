@@ -24,6 +24,16 @@
 
 // FIXME - check return values
 
+#ifdef USE_OFFICIAL_VSTSDK
+typedef VstTimeInfo VstTimeInfo_R;
+#else
+struct VstTimeInfo_R
+{
+	double samplePos, sampleRate, nanoSeconds, ppqPos, tempo, barStartPos, cycleStartPos, cycleEndPos;
+	int32_t timeSigNumerator, timeSigDenominator, smpteOffset, smpteFrameRate, samplesToNextClock, flags;
+};
+#endif
+
 intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
 {
     VstPlugin* plugin = (effect && effect->user && ((VstPlugin*)effect->user)->sanityCheck == VST_SANITY_CHECK) ? (VstPlugin*)effect->user : 0;
@@ -49,7 +59,7 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
             jack_client_t* client = ((JackAudioDevice*)audioDevice)->getJackClient();
             if (client)
             {
-                static VstTimeInfo timeInfo;
+                static VstTimeInfo_R timeInfo;
                 memset(&timeInfo, 0, sizeof(VstTimeInfo));
 
                 static jack_transport_state_t jack_state;

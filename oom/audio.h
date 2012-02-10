@@ -258,7 +258,7 @@ public:
     void msgShowInstrumentGui(MidiInstrument*, bool);
     void msgShowInstrumentNativeGui(MidiInstrument*, bool);
     void msgPanic();
-    void sendMsg(AudioMsg*);
+    void sendMsg(AudioMsg*, bool waitRead = true);
     bool sendMessage(AudioMsg* m, bool doUndo, bool waitRead = true);
     void msgRemoveRoute(Route, Route);
     void msgRemoveRoute1(Route, Route);
@@ -286,7 +286,7 @@ public:
     void msgIdle(bool);
     void msgBounce();
     //void msgSetPluginCtrlVal(BasePlugin* /*plugin*/, int /*param*/, double /*val*/);
-    void msgSetPluginCtrlVal(AudioTrack*, int /*param*/, double /*val*/);
+    void msgSetPluginCtrlVal(AudioTrack*, int /*param*/, double /*val*/, bool waitRead = true);
     void msgSwapControllerIDX(AudioTrack*, int, int);
     void msgClearControllerEvents(AudioTrack*, int);
     void msgSeekPrevACEvent(AudioTrack*, int);

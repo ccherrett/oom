@@ -172,31 +172,18 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
     PluginI* plugi = PluginDialog::getPlugin(this);
     if (plugi)
     {
-        // TODO - verify if channels match using track->channels()
+        BasePlugin* nplug = 0;
+
         if (plugi->type() == PLUGIN_LADSPA)
-        {
-            LadspaPlugin* ladplug = new LadspaPlugin();
-            if (ladplug->init(plugi->filename(), plugi->label()))
-            {
-                int idx = row(it);
-                if (replace)
-                    audio->msgAddPlugin(track, idx, 0);
-                audio->msgAddPlugin(track, idx, ladplug);
-                ladplug->setChannels(track->channels());
-                ladplug->setActive(true);
-                song->dirty = true;
-            }
-            else
-            {
-                QMessageBox::warning(this, tr("Failed to load plugin"), tr("Plugin '%1'' failed to initialize properly, error was:\n%2").arg(plugi->name()).arg(get_last_error()));
-                delete ladplug;
-                return;
-            }
-        }
+            nplug = new LadspaPlugin();
         else if (plugi->type() == PLUGIN_LV2)
+            nplug = new Lv2Plugin();
+        else if (plugi->type() == PLUGIN_VST)
+            nplug = new VstPlugin();
+        
+        if (nplug)
         {
-            Lv2Plugin* lv2plug = new Lv2Plugin();
-            if (lv2plug->init(plugi->filename(), plugi->label()))
+            if (nplug->init(plugi->filename(), plugi->label()))
             {
                 int idx = row(it);
                 if (replace)
@@ -205,35 +192,15 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
                     //Do this part from the GUI context so user interfaces can be properly deleted
                     // track->efxPipe()->insert(0, idx); was set on lv2 only
                 }
-                audio->msgAddPlugin(track, idx, lv2plug);
-                lv2plug->setChannels(track->channels());
-                lv2plug->setActive(true);
+                audio->msgAddPlugin(track, idx, nplug);
+                nplug->setChannels(track->channels());
+                nplug->setActive(true);
                 song->dirty = true;
             }
             else
             {
                 QMessageBox::warning(this, tr("Failed to load plugin"), tr("Plugin '%1'' failed to initialize properly, error was:\n%2").arg(plugi->name()).arg(get_last_error()));
-                delete lv2plug;
-                return;
-            }
-        }
-        else if (plugi->type() == PLUGIN_VST)
-        {
-            VstPlugin* vstplug = new VstPlugin();
-            if (vstplug->init(plugi->filename(), plugi->label()))
-            {
-                int idx = row(it);
-                if (replace)
-                    audio->msgAddPlugin(track, idx, 0);
-                audio->msgAddPlugin(track, idx, vstplug);
-                vstplug->setChannels(track->channels());
-                vstplug->setActive(true);
-                song->dirty = true;
-            }
-            else
-            {
-                QMessageBox::warning(this, tr("Failed to load plugin"), tr("Plugin '%1'' failed to initialize properly, error was:\n%2").arg(plugi->name()).arg(get_last_error()));
-                delete vstplug;
+                nplug->deleteMe();
                 return;
             }
         }

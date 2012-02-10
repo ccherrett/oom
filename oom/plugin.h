@@ -47,8 +47,24 @@
 #endif
 
 // vst includes
+#ifdef USE_OFFICIAL_VSTSDK
 #define VST_FORCE_DEPRECATED 0
 #include "pluginterfaces/vst2.x/aeffectx.h"
+#else
+#include "vestige/aeffectx.h"
+// missing defines
+#define effFlagsProgramChunks (1 << 5)
+#define effGetParamLabel 6
+#define effGetChunk 23
+#define effSetChunk 24
+#define effCanBeAutomated 26
+#define effGetProgramNameIndexed 29
+#define effIdle 53
+#define effStartProcess 71
+#define effStopProcess 72
+#define effSetProcessPrecision 77
+#define kVstTransportChanged (1 << 0)
+#endif
 
 class AudioTrack;
 class PluginI;
@@ -442,6 +458,8 @@ public:
         }
     }
 
+    virtual void deleteMe() = 0;
+
     void makeGui();
     void deleteGui();
     void showGui(bool yesno);
@@ -514,6 +532,11 @@ public:
     ~LadspaPlugin();
 
     static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
+    
+    virtual void deleteMe()
+    {
+        delete this;
+    }
 
     bool init(QString filename, QString label);
     void reload();
@@ -588,6 +611,11 @@ public:
     ~Lv2Plugin();
 
     static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
+    
+    virtual void deleteMe()
+    {
+        delete this;
+    }
 
     bool init(QString filename, QString label);
     void reload();
@@ -675,6 +703,11 @@ public:
 
     static void initPluginI(PluginI* plugi, const QString& filename, const QString& label, const void* nativeHandle);
     
+    virtual void deleteMe()
+    {
+        delete this;
+    }
+
     intptr_t dispatcher(int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
     bool init(QString filename, QString label);
@@ -732,8 +765,8 @@ protected:
 //---------------------------------------------------------
 
 class SynthPluginDevice :
-        public MidiDevice,
-        public MidiInstrument
+        public MidiDevice
+        //public MidiInstrument
 {
 public:
     SynthPluginDevice(PluginType type, QString filename, QString name, QString label, bool duplicated = false);
