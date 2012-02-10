@@ -926,7 +926,7 @@ void OOMidi::read(Xml& xml, bool skipConfig)
 				else if (tag == "mplugin")
 					readStatusMidiInputTransformPlugin(xml);
 				else
-					xml.unknown("oom");
+					xml.skip(tag);
 				break;
 			case Xml::Attribut:
 				if (tag == "version")

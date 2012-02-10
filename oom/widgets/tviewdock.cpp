@@ -171,54 +171,48 @@ void TrackViewDock::trackviewChanged(QStandardItem *item)/*{{{*/
 		{
 			//qDebug("TrackViewDock::trackviewChanged: Found trackview %s", tv->viewName().toUtf8().constData());
 			bool selected = (item->checkState() == Qt::Checked);
-			if(selected && tv->virtualTracks()->size())
+			if(selected && tv->hasVirtualTracks())
 			{
 				QStringList list;
-				ciVirtualTrack iter = tv->virtualTracks()->constBegin();
-				while(iter != tv->virtualTracks()->constEnd())
+				QList<qint64> vlist = tv->virtualTracks();
+				QList<VirtualTrack*> vtList;
+				for(int i = 0; i < vlist.size(); ++i)
 				{
-					list.append(iter.value()->name);
-					++iter;
+					VirtualTrack* vt = trackManager->virtualTracks().value(vlist[i]);
+					if(vt)
+					{
+						list.append(vt->name);
+						vtList.append(vt);
+					}
 				}
-				QString msg(tr("The View you selected contains Virtual Tracks.\n%1 \nWould you like to create them as real tracks now?"));/*{{{*/
+				QString msg(tr("The View you selected contains Virtual Tracks.\n%1 \nWould you like to create them as real tracks now?"));
 				if(QMessageBox::question(this, 
 					tr("Create Virtual Tracks"),
 					msg.arg(list.join("\n")),
 					QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
 				{
-					QList<qint64> delList;
-					QList<qint64> *tidlist = tv->trackIndexList();
-					for(int i = 0; i < tidlist->size(); ++i)
+					foreach(VirtualTrack* vt, vtList)
 					{
-						qint64 tid = tidlist->at(i);
-						TrackView::TrackViewTrack *tvt = tv->tracks()->value(tid);
-						if(tvt && tvt->is_virtual)
-						{
-							VirtualTrack* vt = tv->virtualTracks()->value(tid);
-							if(vt)
-							{//Let create the real track and add a part to it
-								TrackManager *tman = new TrackManager();
-								qint64 id = tman->addTrack(vt);
-								if(id)
-								{//Copy any settings for that track, delete the virtual track and add the real track to the view
-									TrackView::TrackViewTrack *ntvl = new TrackView::TrackViewTrack(id);
+						if(vt)
+						{//Let create the real track and add a part to it
+							qint64 id = trackManager->addTrack(vt, -1);
+							if(id)
+							{//Copy any settings for that track, delete the virtual track and add the real track to the view
+								TrackView::TrackViewTrack *tvt = tv->tracks()->value(vt->id);
+								TrackView::TrackViewTrack *ntvl = new TrackView::TrackViewTrack(id);
+								if(tvt)
 									ntvl->setSettingsCopy(tvt->settings);
-									tv->addTrack(ntvl);
-									Track* track = song->findTrackByIdAndType(id, vt->type);
-									if(track)
-									{
-										delList.append(tid);
-									}
+								tv->addTrack(ntvl);
+								Track* track = song->findTrackByIdAndType(id, vt->type);
+								if(track)
+								{
+									if(tvt)
+										tv->removeTrack(tvt);
 								}
 							}
 						}
 					}
-					foreach(qint64 id, delList)
-					{
-						tv->removeVirtualTrack(id);
-						tv->removeTrack(id);
-					}
-				}/*}}}*/
+				}
 			}
 			tv->setSelected(selected);
 			song->updateTrackViews();
@@ -331,11 +325,10 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 				}
 				else
 				{//This must be a virtual track try and find it
-					VirtualTrack* vt = tv->virtualTracks()->value(tid);
+					VirtualTrack* vt = trackManager->virtualTracks().value(tid);
 					if(vt)
 					{//Let create the real track and add a part to it
-						TrackManager *tman = new TrackManager();
-						qint64 id = tman->addTrack(vt);
+						qint64 id = trackManager->addTrack(vt, -1);
 						if(id)
 						{//Copy any settings for that track, delete the virtual track and add the real track to the view
 							TrackView::TrackViewTrack *ntvl = new TrackView::TrackViewTrack(id);
@@ -350,7 +343,6 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 									oom->composer->addCanvasPart(track);
 								song->updateTrackViews();
 							}
-							tv->removeVirtualTrack(tid);
 							tv->removeTrack(tvt);
 						}
 					}
@@ -399,18 +391,7 @@ void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 							{
 								newtvt->setSettingsCopy(tvt->settings);
 								newtvt->is_virtual = tvt->is_virtual;
-								if(tvt->is_virtual)
-								{//Copy the associated virtual track and change the id
-									VirtualTrack* vt = tview->virtualTracks()->value(id);
-									if(vt)
-									{
-										newtvt->id = tv->addVirtualTrackCopy(vt);
-									}
-								}
-								else
-								{//Its just a track id
-									newtvt->id = tvt->id;
-								}
+								newtvt->id = tvt->id;
 								tv->addTrack(newtvt);
 							}
 						}
@@ -428,6 +409,8 @@ void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 					{
 						TrackView* tv = new TrackView(false);
 						QList<qint64> *list = tview->trackIndexList();
+						QStringList namelist;
+						QList<VirtualTrack*> vtList;
 						for(int i = 0; i < list->size(); ++i)
 						{
 							qint64 id = list->at(i);
@@ -435,20 +418,15 @@ void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 							TrackView::TrackViewTrack *newtvt = new TrackView::TrackViewTrack();
 							if(tvt)
 							{
+								VirtualTrack* vt = trackManager->virtualTracks().value(tvt->id);
+								if(vt)
+								{
+									namelist.append(vt->name);
+									vtList.append(vt);
+								}
 								newtvt->setSettingsCopy(tvt->settings);
 								newtvt->is_virtual = tvt->is_virtual;
-								if(tvt->is_virtual)
-								{//Copy the associated virtual track and change the id
-									VirtualTrack* vt = tview->virtualTracks()->value(id);
-									if(vt)
-									{
-										newtvt->id = tv->addVirtualTrackCopy(vt);
-									}
-								}
-								else
-								{//Its just a track id
-									newtvt->id = tvt->id;
-								}
+								newtvt->id = tvt->id;
 								tv->addTrack(newtvt);
 							}
 						}
@@ -456,51 +434,31 @@ void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 						tv->setComment(tview->comment());
 						tv->setViewName(tv->getValidName(tview->viewName()));
 						tv->setRecord(tview->record());
-						QStringList namelist;
-						ciVirtualTrack iter = tv->virtualTracks()->constBegin();
-						while(iter != tv->virtualTracks()->constEnd())
-						{
-							namelist.append(iter.value()->name);
-							++iter;
-						}
 						QString msg(tr("The View you selected contains Virtual Tracks.\n%1 \nWould you like to create them as real tracks now?"));/*{{{*/
 						if(QMessageBox::question(this, 
 							tr("Create Virtual Tracks"),
 							msg.arg(namelist.join("\n")),
 							QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
 						{
-							QList<qint64> delList;
-							QList<qint64> *tidlist = tv->trackIndexList();
-							for(int i = 0; i < tidlist->size(); ++i)
+							foreach(VirtualTrack* vt, vtList)
 							{
-								qint64 tid = tidlist->at(i);
-								TrackView::TrackViewTrack *tvt = tv->tracks()->value(tid);
-								if(tvt && tvt->is_virtual)
-								{
-									VirtualTrack* vt = tv->virtualTracks()->value(tid);
-									if(vt)
-									{//Let create the real track and add a part to it
-										TrackManager *tman = new TrackManager();
-										qint64 id = tman->addTrack(vt);
-										if(id)
-										{//Copy any settings for that track, delete the virtual track and add the real track to the view
-											TrackView::TrackViewTrack *ntvl = new TrackView::TrackViewTrack(id);
-											ntvl->setSettingsCopy(tvt->settings);
-											tv->addTrack(ntvl);
-											Track* track = song->findTrackByIdAndType(id, vt->type);
-											if(track)
-											{
-												song->updateTrackViews();
-												delList.append(tid);
-											}
+								if(vt)
+								{//Let create the real track and add a part to it
+									qint64 id = trackManager->addTrack(vt, -1);
+									if(id)
+									{//Copy any settings for that track, delete the virtual track and add the real track to the view
+										TrackView::TrackViewTrack *tvt = tview->tracks()->value(vt->id);
+										TrackView::TrackViewTrack *ntvl = new TrackView::TrackViewTrack(id);
+										ntvl->setSettingsCopy(tvt->settings);
+										tv->addTrack(ntvl);
+										Track* track = song->findTrackByIdAndType(id, vt->type);
+										if(track)
+										{
+											song->updateTrackViews();
+											tv->removeTrack(tvt);
 										}
 									}
 								}
-							}
-							foreach(qint64 id, delList)
-							{
-								tv->removeVirtualTrack(id);
-								tv->removeTrack(id);
 							}
 						}/*}}}*/
 						tv->setSelected(true);

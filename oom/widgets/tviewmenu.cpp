@@ -61,7 +61,7 @@ QWidget* TrackViewMenu::createWidget(QWidget* parent)
 		{
 			if(tvt->is_virtual)
 			{
-				VirtualTrack* vt = m_trackview->virtualTracks()->value(tid);
+				VirtualTrack* vt = trackManager->virtualTracks().value(tid);
 				if(vt)
 				{
 					if((vt->type == Track::MIDI || vt->type == Track::WAVE))

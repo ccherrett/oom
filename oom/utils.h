@@ -45,5 +45,6 @@ extern int midiControlSortIndex(int ctrl);
 extern int calcNRPN7(int, int);
 extern QString sanitize(const QString);
 
+extern  int getFreeMidiPort();
 #endif
 

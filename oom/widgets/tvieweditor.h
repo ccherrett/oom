@@ -24,6 +24,7 @@ class QPushButton;
 class QStandardItemModel;
 class QStandardItem;
 class QItemSelectionModel;
+class QSortFilterProxyModel;
 class VirtualTrack;
 
 
@@ -32,8 +33,7 @@ enum TrackSourceType { EXISTING = 0, VIRTUAL};
 class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase 
 {
 	Q_OBJECT
-	TrackViewList* _viewList;
-	TrackView* _selected;
+	qint64 _selected;
 	bool _editing;
 	bool _addmode;
 	bool m_templateMode;
@@ -41,6 +41,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	QItemSelectionModel *m_selmodel;
 	QStandardItemModel *m_allmodel;
 	QItemSelectionModel *m_allselmodel;
+	QSortFilterProxyModel* m_filterModel;
 
 	QStringList _trackTypes;
 	QPushButton* btnOk;
@@ -50,6 +51,7 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	QHash<qint64, VirtualTrack*> m_vtrackList;
 
 	void buildViewList();
+    QList<int> getSelectedRows();
 
 private slots:
 	void cmbViewSelected(int);
@@ -61,7 +63,7 @@ private slots:
 	void btnOkClicked(bool);
 	void btnApplyClicked(bool);
 	void btnCancelClicked(bool);
-	void btnCopyClicked(bool);
+	void btnCopyClicked();
 	void btnDeleteClicked(bool);
 	void btnDownClicked(bool);
 	void btnUpClicked(bool);
@@ -71,16 +73,12 @@ private slots:
 	void reset();
 	void updateTableHeader();
 	void settingsChanged(QStandardItem*);
-    QList<int> getSelectedRows();
+	void populateTrackList();
 
 public:
 	TrackViewEditor(QWidget*, bool temp = false);
-	void setSelected(TrackView*);
-	TrackView* selectedView( ) { return _selected; }
 	void setTypes(QStringList);
-	void setViews(TrackViewList*);
 	QStringList trackTypes(){return _trackTypes;}
-	TrackViewList* views(){return _viewList;}
 
 };
 

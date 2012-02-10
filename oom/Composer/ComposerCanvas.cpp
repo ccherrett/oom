@@ -544,8 +544,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 		ctdialog->lockType(true);
 		if(ctdialog->exec() && vt)
 		{
-			TrackManager* tman = new TrackManager();
-			qint64 nid = tman->addTrack(vt);
+			qint64 nid = trackManager->addTrack(vt, -1);
 			newTrack = song->findTrackById(nid);
 		}
 		if (type == Track::WAVE && newTrack)

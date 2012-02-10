@@ -16,6 +16,9 @@
 #include <QDateTime>
 
 #include "midictrl.h"
+#include "midiport.h"
+#include "mididev.h"
+#include "globals.h"
 #include "utils.h"
 #include "citem.h"
 
@@ -89,7 +92,7 @@ QFrame* vLine(QWidget* w)
 //
 //---------------------------------------------------------
 
-QString bitmap2String(int bm)
+QString bitmap2String(int bm)/*{{{*/
 {
 	QString s;
 	//printf("bitmap2string: bm %04x", bm);
@@ -134,14 +137,13 @@ QString bitmap2String(int bm)
 	}
 	//printf(" -> <%s>\n", s.toLatin1());
 	return s;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   u32bitmap2String
 //---------------------------------------------------------
-// Added by Tim. p3.3.8
 
-QString u32bitmap2String(unsigned int bm)
+QString u32bitmap2String(unsigned int bm)/*{{{*/
 {
 	QString s;
 	//printf("bitmap2string: bm %04x", bm);
@@ -190,13 +192,13 @@ QString u32bitmap2String(unsigned int bm)
 	}
 	//printf(" -> <%s>\n", s.toLatin1());
 	return s;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   string2bitmap
 //---------------------------------------------------------
 
-int string2bitmap(const QString& str)
+int string2bitmap(const QString& str)/*{{{*/
 {
 	int val = 0;
 	QString ss = str.simplified();
@@ -255,13 +257,13 @@ int string2bitmap(const QString& str)
 		val |= (1 << (tval - 1));
 	}
 	return val & 0xffff;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   string2u32bitmap
 //---------------------------------------------------------
 
-unsigned int string2u32bitmap(const QString& str)
+unsigned int string2u32bitmap(const QString& str)/*{{{*/
 {
 	unsigned int val = 0;
 	QString ss = str.simplified();
@@ -320,7 +322,7 @@ unsigned int string2u32bitmap(const QString& str)
 		val |= (1U << (tval - 1));
 	}
 	return val;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   autoAdjustFontSize
@@ -330,7 +332,7 @@ unsigned int string2u32bitmap(const QString& str)
 //   ignoreHeight: Set if dealing with a horizontally constrained widget - one which is free to resize vertically. 
 //---------------------------------------------------------
 
-bool autoAdjustFontSize(QFrame* w, const QString& s, bool ignoreWidth, bool ignoreHeight, int max, int min)
+bool autoAdjustFontSize(QFrame* w, const QString& s, bool ignoreWidth, bool ignoreHeight, int max, int min)/*{{{*/
 {
 	// In case the max or min was obtained from QFont::pointSize() which returns -1
 	//  if the font is a pixel font, or if min is greater than max...
@@ -373,7 +375,7 @@ bool autoAdjustFontSize(QFrame* w, const QString& s, bool ignoreWidth, bool igno
 	}
 
 	return true;
-}
+}/*}}}*/
 
 
 double dbToVal(double inDb)
@@ -445,11 +447,11 @@ qint64 create_id( )
 	uint r = qrand();
 	QDateTime time = QDateTime::currentDateTime();
 	uint timeValue = time.toTime_t();
-	qint64 id = timeValue;
-	id *= 1000000000;
-	id += r;
+	qint64 created_id = timeValue;
+	created_id *= 1000000000;
+	created_id += r;
 
-	return id;
+	return created_id;
 }
 
 //---------------------------------------------------------
@@ -467,7 +469,7 @@ QDateTime extract_date_time(qint64 id)
 //   string2qhex
 //---------------------------------------------------------
 
-QString string2hex(const unsigned char* data, int len)
+QString string2hex(const unsigned char* data, int len)/*{{{*/
 {
 	QString d;
 	QString s;
@@ -482,13 +484,13 @@ QString string2hex(const unsigned char* data, int len)
 		d += s.sprintf("%02x", data[i]);
 	}
 	return d;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   hex2string
 //---------------------------------------------------------
 
-char* hex2string(const char* src, int& len, int& status)
+char* hex2string(const char* src, int& len, int& status)/*{{{*/
 {
 	char buffer[2048];
 	char* dst = buffer;
@@ -523,7 +525,7 @@ char* hex2string(const char* src, int& len, int& status)
 	b[len] = 0;
 	status = 0;
 	return b;
-}
+}/*}}}*/
 
 QString midiControlToString(int ctrl)
 {
@@ -607,3 +609,18 @@ QString sanitize(const QString text)
 	return text.simplified().replace(QRegExp("[\\s|\\.|\\-|/]+"), "_");
 }
 
+int getFreeMidiPort()/*{{{*/
+{
+	int rv = -1;
+	for (int i = 0; i < MIDI_PORTS; ++i)
+	{
+		MidiPort* mp = &midiPorts[i];
+		//Use the first unconfigured port
+		if (!mp->device())
+		{
+			rv = i;
+			break;
+		}
+	}
+	return rv;
+}/*}}}*/

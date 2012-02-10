@@ -24,7 +24,175 @@
 #include "midimonitor.h"
 #include "plugin.h"
 #include "xml.h"
+#include "utils.h"
 
+VirtualTrack::VirtualTrack()
+{/*{{{*/
+	id = create_id();
+	type = -1;
+	useOutput = false;
+	useInput = false;
+	useBuss = false;
+	useMonitor = false;
+	inputChannel = -1;
+	outputChannel = -1;
+	instrumentType = -1;
+	autoCreateInstrument = false;
+	createMidiInputDevice = false;
+	createMidiOutputDevice = false;
+}/*}}}*/
+
+void VirtualTrack::write(int level, Xml& xml) const/*{{{*/
+{
+	QStringList tmplist;
+	std::string tag = "virtualTrack";
+	xml.nput(level, "<%s id=\"%lld\" ", tag.c_str(), id);
+	level++;
+	xml.nput("type=\"%d\" name=\"%s\" useInput=\"%d\" useOutput=\"%d\" ", type, name.toUtf8().constData(), useInput, useOutput);
+	if(!instrumentName.isEmpty() && type == Track::MIDI)
+	{
+		xml.nput("autoCreateInstrument=\"%d\" createMidiInputDevice=\"%d\" createMidiOutputDevice=\"%d\" ", 
+				autoCreateInstrument, createMidiInputDevice, createMidiOutputDevice);
+		xml.nput("instrumentName=\"%s\" instrumentType=\"%d\" useMonitor=\"%d\" useBuss=\"%d\" inputChannel=\"%d\" outputChannel=\"%d\" ", 
+				instrumentName.toUtf8().constData(), instrumentType, useMonitor, useBuss, inputChannel, outputChannel);
+		if(useMonitor)
+		{
+			tmplist.clear();
+			tmplist << QString::number(monitorConfig.first) << monitorConfig.second;
+			xml.nput("monitorConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
+		}
+		if(useBuss)
+		{ 
+			tmplist.clear();
+			tmplist << QString::number(bussConfig.first) << bussConfig.second;
+			xml.nput("bussConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
+		}
+	}
+	if(useInput)
+	{ 
+		tmplist.clear();
+		tmplist << QString::number(inputConfig.first) << inputConfig.second;
+		xml.nput("inputConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
+	}
+	if(useOutput)
+	{ 
+		tmplist.clear();
+		tmplist << QString::number(outputConfig.first) << outputConfig.second;
+		xml.nput("outputConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
+	}
+    xml.put("/>");
+	level--;
+}/*}}}*/
+
+void VirtualTrack::read(Xml &xml)/*{{{*/
+{
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+			case Xml::Error:
+			case Xml::End:
+				return;
+			case Xml::TagStart:
+				break;
+			case Xml::Attribut:
+				if(tag == "id")
+				{
+					id = xml.s2().toLongLong();
+				}
+				else if(tag == "name")
+				{
+					name = xml.s2();
+				}
+				else if(tag == "type")
+				{
+					type = xml.s2().toInt();
+				}
+				else if(tag == "instrumentName")
+				{
+					instrumentName = xml.s2();
+				}
+				else if(tag == "instrumentType")
+				{
+					instrumentType = xml.s2().toInt();
+				}
+				else if(tag == "autoCreateInstrument")
+				{
+					autoCreateInstrument = xml.s2().toInt();
+				}
+				else if(tag == "createMidiInputDevice")
+				{
+					createMidiInputDevice = xml.s2().toInt();
+				}
+				else if(tag == "createMidiOutputDevice")
+				{
+					createMidiOutputDevice = xml.s2().toInt();
+				}
+				else if (tag == "useMonitor")
+				{
+					useMonitor = xml.s2().toInt();
+				}
+				else if(tag == "useInput")
+				{
+					useInput = xml.s2().toInt();
+				}
+				else if(tag == "useOutput")
+				{
+					useOutput = xml.s2().toInt();
+				}
+				else if(tag == "useBuss")
+				{
+					useBuss = xml.s2().toInt();
+				}
+				else if(tag == "inputChannel")
+				{
+					inputChannel = xml.s2().toInt();
+				}
+				else if(tag == "outputChannel")
+				{
+					outputChannel = xml.s2().toInt();
+				}
+				else if(tag == "inputConfig")
+				{
+					QStringList list = xml.s2().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						inputConfig = qMakePair(list[0].toInt(), list[1]);
+				}
+				else if(tag == "outputConfig")
+				{
+					QStringList list = xml.s2().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						outputConfig = qMakePair(list[0].toInt(), list[1]);
+				}
+				else if(tag == "monitorConfig")
+				{
+					QStringList list = xml.s2().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						monitorConfig = qMakePair(list[0].toInt(), list[1]);
+				}
+				else if(tag == "monitorConfig2")
+				{
+					QStringList list = xml.s2().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						monitorConfig2 = qMakePair(list[0].toInt(), list[1]);
+				}
+				else if(tag == "bussConfig")
+				{
+					QStringList list = xml.s2().split("@-:-@");
+					if(list.size() && list.size() == 2)
+						bussConfig = qMakePair(list[0].toInt(), list[1]);
+				}
+				break;
+			case Xml::TagEnd:
+				if(tag == "virtualTrack")
+					return;
+			default:
+				break;
+		}
+	}
+}/*}}}*/
 
 TrackManager::TrackManager()
 {
@@ -41,8 +209,9 @@ void TrackManager::setPosition(int v)
 }
 
 //Add button slot
-qint64 TrackManager::addTrack(VirtualTrack* vtrack)/*{{{*/
+qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 {
+	m_insertPosition = index;
 	qint64 rv = 0;
 	if(!vtrack || vtrack->name.isEmpty())
 		return rv;
@@ -1294,89 +1463,19 @@ void TrackManager::removeMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 	*/
 }/*}}}*/
 
-int TrackManager::getFreeMidiPort()/*{{{*/
+void TrackManager::write(int level, Xml& xml) const/*{{{*/
 {
-	int rv = -1;
-	for (int i = 0; i < MIDI_PORTS; ++i)
+	std::string tag = "trackManager";
+	xml.put(level, "<%s tracks=\"%d\">",tag.c_str() , m_virtualTracks.size());
+	level++;
+	foreach(VirtualTrack* vt, m_virtualTracks)
 	{
-		MidiPort* mp = &midiPorts[i];
-		MidiDevice* md = mp->device();
-		
-		//Use the first unconfigured port
-		if (!md)
-		{
-			rv = i;
-			break;
-		}
+		vt->write(level, xml);
 	}
-	return rv;
+    xml.put(--level, "</%s>", tag.c_str());
 }/*}}}*/
 
-void VirtualTrack::write(int level, Xml& xml) const
-{
-	QStringList tmplist;
-	std::string tag = "virtualTrack";
-	xml.nput(level, "<%s id=\"%lld\" ", tag.c_str(), id);
-	level++;
-	xml.nput("type=\"%d\" name=\"%s\" useInput=\"%d\" useOutput=\"%d\" ", type, name.toUtf8().constData(), useInput, useOutput);
-	if(!instrumentName.isEmpty() && type == Track::MIDI)/*{{{*/
-	{
-		xml.nput("autoCreateInstrument=\"%d\" createMidiInputDevice=\"%d\" createMidiOutputDevice=\"%d\" ", 
-				autoCreateInstrument, createMidiInputDevice, createMidiOutputDevice);
-		xml.nput("instrumentName=\"%s\" instrumentType=\"%d\" useMonitor=\"%d\" useBuss=\"%d\" inputChannel=\"%d\" outputChannel=\"%d\" ", 
-				instrumentName.toUtf8().constData(), instrumentType, useMonitor, useBuss, inputChannel, outputChannel);
-		if(useMonitor)
-		{
-			tmplist.clear();
-			tmplist << QString::number(monitorConfig.first) << monitorConfig.second;
-			xml.nput("monitorConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
-		}
-		if(useBuss)
-		{ 
-			tmplist.clear();
-			tmplist << QString::number(bussConfig.first) << bussConfig.second;
-			xml.nput("bussConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
-		}
-	}/*}}}*/
-	if(useInput)
-	{ 
-		tmplist.clear();
-		tmplist << QString::number(inputConfig.first) << inputConfig.second;
-		xml.nput("inputConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
-	}
-	if(useOutput)
-	{ 
-		tmplist.clear();
-		tmplist << QString::number(outputConfig.first) << outputConfig.second;
-		xml.nput("outputConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
-	}
-    xml.put("/>");
-	level--;
-}
-
-/*{{{
-	qint64 id;
-	int type;
-	QString name;
-	QString instrumentName;
-	int instrumentType;
-	bool autoCreateInstrument;
-	bool createMidiInputDevice;
-	bool createMidiOutputDevice;
-	bool useInput;
-	bool useOutput;
-	bool useMonitor;
-	bool useBuss;
-	int inputChannel;
-	int outputChannel;
-	QPair<int, QString> inputConfig;
-	QPair<int, QString> outputConfig;
-	QPair<int, QString> instrumentConfig; //unused
-	QPair<int, QString> monitorConfig;
-    QPair<int, QString> monitorConfig2;
-	QPair<int, QString> bussConfig;
-}}}*/
-void VirtualTrack::read(Xml &xml)
+void TrackManager::read(Xml& xml)/*{{{*/
 {
 	for (;;)
 	{
@@ -1388,101 +1487,25 @@ void VirtualTrack::read(Xml &xml)
 			case Xml::End:
 				return;
 			case Xml::TagStart:
+				if(tag == "virtualTrack")
+				{
+					VirtualTrack* vt = new VirtualTrack;
+					vt->read(xml);
+					m_virtualTracks.insert(vt->id, vt);
+				}
 				break;
 			case Xml::Attribut:
-				if(tag == "id")
-				{
-					id = xml.s2().toLongLong();
-				}
-				else if(tag == "name")
-				{
-					name = xml.s2();
-				}
-				else if(tag == "type")
-				{
-					type = xml.s2().toInt();
-				}
-				else if(tag == "instrumentName")
-				{
-					instrumentName = xml.s2();
-				}
-				else if(tag == "instrumentType")
-				{
-					instrumentType = xml.s2().toInt();
-				}
-				else if(tag == "autoCreateInstrument")
-				{
-					autoCreateInstrument = xml.s2().toInt();
-				}
-				else if(tag == "createMidiInputDevice")
-				{
-					createMidiInputDevice = xml.s2().toInt();
-				}
-				else if(tag == "createMidiOutputDevice")
-				{
-					createMidiOutputDevice = xml.s2().toInt();
-				}
-				else if (tag == "useMonitor")
-				{
-					useMonitor = xml.s2().toInt();
-				}
-				else if(tag == "useInput")
-				{
-					useInput = xml.s2().toInt();
-				}
-				else if(tag == "useOutput")
-				{
-					useOutput = xml.s2().toInt();
-				}
-				else if(tag == "useBuss")
-				{
-					useBuss = xml.s2().toInt();
-				}
-				else if(tag == "inputChannel")
-				{
-					inputChannel = xml.s2().toInt();
-				}
-				else if(tag == "outputChannel")
-				{
-					outputChannel = xml.s2().toInt();
-				}
-				else if(tag == "inputConfig")
-				{
-					QStringList list = xml.s2().split("@-:-@");
-					if(list.size() && list.size() == 2)
-						inputConfig = qMakePair(list[0].toInt(), list[1]);
-				}
-				else if(tag == "outputConfig")
-				{
-					QStringList list = xml.s2().split("@-:-@");
-					if(list.size() && list.size() == 2)
-						outputConfig = qMakePair(list[0].toInt(), list[1]);
-				}
-				else if(tag == "monitorConfig")
-				{
-					QStringList list = xml.s2().split("@-:-@");
-					if(list.size() && list.size() == 2)
-						monitorConfig = qMakePair(list[0].toInt(), list[1]);
-				}
-				else if(tag == "monitorConfig2")
-				{
-					QStringList list = xml.s2().split("@-:-@");
-					if(list.size() && list.size() == 2)
-						monitorConfig2 = qMakePair(list[0].toInt(), list[1]);
-				}
-				else if(tag == "bussConfig")
-				{
-					QStringList list = xml.s2().split("@-:-@");
-					if(list.size() && list.size() == 2)
-						bussConfig = qMakePair(list[0].toInt(), list[1]);
+				if(tag == "tracks")
+				{//We'll do something with this later
+					xml.s2().toInt();
 				}
 				break;
 			case Xml::TagEnd:
-				if(tag == "virtualTrack")
+				if(tag == "trackManager")
 					return;
 			default:
 				break;
 		}
 	}
-}
+}/*}}}*/
 
