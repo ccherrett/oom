@@ -42,7 +42,7 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
     {
     case audioMasterAutomate:
         if (plugin)
-            plugin->setParameterValue(index, opt);
+            plugin->setAutomatedParameterValue(index, opt);
         return 1;
 
     case audioMasterVersion:
@@ -647,6 +647,34 @@ QString VstPlugin::getParameterUnit(uint32_t index)
 void VstPlugin::setNativeParameterValue(uint32_t index, double value)
 {
     effect->setParameter(effect, index, value);
+}
+
+void VstPlugin::setAutomatedParameterValue(uint32_t index, double value)
+{
+    if (index < m_paramCount)
+    {
+        if (m_params[index].hints & PARAMETER_IS_INTEGER)
+            value = rint(value);
+
+        m_params[index].value = m_params[index].tmpValue = value;
+        m_params[index].update = true;
+
+        effect->setParameter(effect, index, value);        
+
+        // Record automation from plugin's native UI
+        if (m_track && m_id != -1)
+        {
+            AutomationType at = m_track->automationType();
+
+            if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+                enableController(index, false);
+
+            int id = genACnum(m_id, index);
+
+            audio->msgSetPluginCtrlVal(m_track, id, value, false);
+            m_track->recordAutomation(id, value);
+        }
+    }
 }
 
 uint32_t VstPlugin::getProgramCount()
