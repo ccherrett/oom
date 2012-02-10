@@ -24,6 +24,7 @@
 #include "midimonitor.h"
 #include "plugin.h"
 #include "utils.h"
+#include "genset.h"
 
 
 CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent)
@@ -104,8 +105,6 @@ void CreateTrackDialog::initDefaults()
 	connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSelected()));
 	connect(btnMyInput, SIGNAL(clicked()), this, SLOT(showInputSettings()));
 	txtName->setFocus(Qt::OtherFocusReason);
-	if(!gInputList.size())//TODO: popup a messagebox first telling them what is happening
-		oom->configGlobalSettings(2);
 }
 
 //Add button slot
@@ -335,7 +334,9 @@ void CreateTrackDialog::cancelSelected()
 
 void CreateTrackDialog::showInputSettings()
 {
-	oom->configGlobalSettings(2);//Open to the Midi tab
+	GlobalSettingsConfig* genSetConfig = new GlobalSettingsConfig(this);
+	genSetConfig->setCurrentTab(2);
+	genSetConfig->show();
 }
 
 void CreateTrackDialog::cleanup()/*{{{*/
@@ -1049,6 +1050,12 @@ void CreateTrackDialog::showEvent(QShowEvent*)
 	populateInstrumentList();
 	populateMonitorList();
 	populateBussList();
+	if(!gInputList.size())//TODO: popup a messagebox first telling them what is happening
+	{
+		GlobalSettingsConfig* genSetConfig = new GlobalSettingsConfig(this);
+		genSetConfig->setCurrentTab(2);
+		genSetConfig->show();
+	}
 }
 
 /*QSize CreateTrackDialog::sizeHint()
