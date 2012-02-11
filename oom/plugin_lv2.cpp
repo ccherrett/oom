@@ -94,8 +94,8 @@ struct LV2World {
 
     LilvNode* stateInterface;
 
-    //LilvNode* unitSymbol;
-    //LilvNode* unitUnit;
+    LilvNode* unitSymbol;
+    LilvNode* unitUnit;
 
     LilvNode* uiGtk2;
     LilvNode* uiQt4;
@@ -132,8 +132,8 @@ void initLV2()
 
     lv2world->stateInterface = lilv_new_uri(lv2world->world, LV2_STATE_INTERFACE_URI);
 
-    //lv2world->unitSymbol = lilv_new_uri(lv2world->world, LV2_NS_UNITS "symbol");
-    //lv2world->unitUnit = lilv_new_uri(lv2world->world, LV2_NS_UNITS "unit");
+    lv2world->unitSymbol = lilv_new_uri(lv2world->world, LV2_NS_UNITS "symbol");
+    lv2world->unitUnit = lilv_new_uri(lv2world->world, LV2_NS_UNITS "unit");
 
     lv2world->uiGtk2 = lilv_new_uri(lv2world->world, LV2_NS_UI "GtkUI");
     lv2world->uiQt4  = lilv_new_uri(lv2world->world, LV2_NS_UI "Qt4UI");
@@ -1315,15 +1315,33 @@ QString Lv2Plugin::getParameterName(uint32_t index)
 
 QString Lv2Plugin::getParameterUnit(uint32_t index)
 {
+    QString paramUnit;
+
     if (lplug && index < m_paramCount)
     {
-        //const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
-        return QString("");
-        // TODO
-        //return QString(lilv_node_as_string(lilv_port_get_classes(lplug, port)));
+        const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
+
+        // Try to find unit symbol
+        LilvNodes* symbols = lilv_port_get_value(lplug, port, lv2world->unitSymbol);
+        if (lilv_nodes_size(symbols) > 0)
+        {
+            paramUnit = QString(lilv_node_as_string(lilv_nodes_get(symbols, lilv_nodes_begin(symbols))));
+        }
+        lilv_nodes_free(symbols);
+
+        if (paramUnit.isEmpty())
+        {
+            // Unit symbol not found, try to find unit [unit]
+            LilvNodes* units = lilv_port_get_value(lplug, port, lv2world->unitUnit);
+            if (lilv_nodes_size(units) > 0)
+            {
+                paramUnit = QString(lilv_node_as_string(lilv_nodes_get(units, lilv_nodes_begin(units)))).replace(LV2_NS_UNITS, "");
+            }
+            lilv_nodes_free(units);
+        }
     }
-    else
-        return QString("");
+
+    return paramUnit;
 }
 
 void Lv2Plugin::setNativeParameterValue(uint32_t index, double value)
