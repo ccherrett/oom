@@ -629,6 +629,18 @@ int SynthPluginDevice::eventsPending() const
 //   putMidiEvent
 //---------------------------------------------------------
 
+void SynthPluginDevice::segmentSizeChanged(unsigned newSegmentSize)
+{
+    if (m_plugin && m_plugin->active())
+    {
+        m_plugin->bufferSizeChanged(newSegmentSize);
+    }
+}
+
+//---------------------------------------------------------
+//   putMidiEvent
+//---------------------------------------------------------
+
 bool SynthPluginDevice::putMidiEvent(const MidiPlayEvent& ev)
 {
     if (_writeEnable)
