@@ -543,6 +543,7 @@ void MidiSeq::processTimerTick()
 			continue;
         if (md->isSynthPlugin()) // synths are handled by audio thread
         {
+            // TODO - move this to the GUI thread
             ((SynthPluginDevice*)md)->updateNativeGui();
 			continue;
         }

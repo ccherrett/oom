@@ -631,7 +631,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		int oPort = ((MidiTrack*) m_track)->outPort();
 		MidiPort* port = &midiPorts[oPort];
 
-        if (port->device() && port->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        if (port->device() && port->device()->isSynthPlugin())
         {
             SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
             
@@ -912,7 +912,7 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
     if (m_track->isMidiTrack() && m_track->wantsAutomation())
     {
         MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
-        if (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        if (mp->device() && mp->device()->isSynthPlugin())
         {
             SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
             if (synth->audioTrack())
@@ -952,7 +952,7 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
     	if (m_track->isMidiTrack())
     	{
     	    MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
-    	    if (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+    	    if (mp->device() && mp->device()->isSynthPlugin())
     	    {
     	        SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
     	        if (synth->audioTrack())

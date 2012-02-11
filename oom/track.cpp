@@ -672,7 +672,7 @@ void MidiTrack::setOutPort(int i)
 		_outPortId = mp->id();
     if (i >= 0 && i < MIDI_PORTS)
     {
-        _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
+        _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->isSynthPlugin());
         if (_wantsAutomation)
             ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
     }
@@ -685,7 +685,7 @@ void MidiTrack::setOutPortId(qint64 i)
     if (oomMidiPorts.contains(i))
 	{
 		MidiPort* mp = oomMidiPorts.value(i);
-		_wantsAutomation = (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI);
+		_wantsAutomation = (mp->device() && mp->device()->isSynthPlugin());
         if (_wantsAutomation)
             ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
 	}
@@ -713,7 +713,7 @@ void MidiTrack::setOutPortAndUpdate(int i)/*{{{*/
 {
     if (i >= 0 && i < MIDI_PORTS)
     {
-        _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->deviceType() == MidiDevice::SYNTH_MIDI);
+        _wantsAutomation = (midiPorts[i].device() && midiPorts[i].device()->isSynthPlugin());
         if (_wantsAutomation)
             ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
     }
@@ -734,7 +734,7 @@ void MidiTrack::setOutPortIdAndUpdate(qint64 i)/*{{{*/
     if (oomMidiPorts.contains(i))
 	{
 		MidiPort* mp = oomMidiPorts.value(i);
-		_wantsAutomation = (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI);
+		_wantsAutomation = (mp->device() && mp->device()->isSynthPlugin());
 	}
 
 	if (_outPortId == i)
@@ -792,7 +792,7 @@ AudioTrack* MidiTrack::getAutomationTrack()
 {
     if (_outPort >= 0 && _outPort < MIDI_PORTS)
     {
-        if (midiPorts[_outPort].device() && midiPorts[_outPort].device()->deviceType() == MidiDevice::SYNTH_MIDI)
+        if (midiPorts[_outPort].device() && midiPorts[_outPort].device()->isSynthPlugin())
         {
             SynthPluginDevice* dev = (SynthPluginDevice*)midiPorts[_outPort].device();
             return dev->audioTrack();
@@ -1140,7 +1140,7 @@ void MidiTrack::write(int level, Xml& xml) const/*{{{*/
         // FIXME - cannot use 'getAutomationTrack()' here
         if (_outPort >= 0 && _outPort < MIDI_PORTS)
         {
-            if (midiPorts[_outPort].device() && midiPorts[_outPort].device()->deviceType() == MidiDevice::SYNTH_MIDI)
+            if (midiPorts[_outPort].device() && midiPorts[_outPort].device()->isSynthPlugin())
             {
                 SynthPluginDevice* dev = (SynthPluginDevice*)midiPorts[_outPort].device();
                 AudioTrack* atrack = dev->audioTrack();

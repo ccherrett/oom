@@ -354,8 +354,6 @@ QString SynthPluginDevice::open()
 
 void SynthPluginDevice::close()
 {
-    qWarning("SynthPluginDevice::close()");
-
     _readEnable = false;
     _writeEnable = false;
 

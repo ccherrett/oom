@@ -137,7 +137,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
             {
                 for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
                 {
-                    if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                    if ((*i)->isSynthPlugin() && (*i)->name() == instrumentName)
                     {
 						m_vtrack->instrumentType = instrumentType;
 						m_vtrack->instrumentName = instrumentName;
@@ -471,7 +471,7 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 			{
                 for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
                 {
-                    if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                    if ((*i)->isSynthPlugin() && (*i)->name() == instrumentName)
                     {
                         if(m_instrumentLoaded)
 						{   //unload the last one
@@ -885,7 +885,7 @@ void CreateTrackDialog::populateInstrumentList()/*{{{*/
 
         for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
         {
-            if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI)
+            if ((*i)->isSynthPlugin())
 			{
                 if (((SynthPluginDevice*)(*i))->duplicated() == false)
                 {

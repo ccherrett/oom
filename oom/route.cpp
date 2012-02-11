@@ -1275,7 +1275,7 @@ void Route::dump() const
 				if (device->deviceType() == MidiDevice::ALSA_MIDI)
 				printf("alsa midi device <%s> ", device->name().toLatin1().constData());
 			else
-				if (device->deviceType() == MidiDevice::SYNTH_MIDI)
+				if (device->isSynthPlugin())
 				printf("synth midi device <%s> ", device->name().toLatin1().constData());
 			else
 				printf("is midi but unknown device type:%d, ", device->deviceType());

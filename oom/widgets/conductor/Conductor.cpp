@@ -1631,7 +1631,7 @@ void Conductor::updateConductor(int flags)
 		iProgram->blockSignals(false);
 	}
     
-    if (mp->device() && mp->device()->deviceType() == MidiDevice::SYNTH_MIDI)
+    if (mp->device() && mp->device()->isSynthPlugin())
         return;
 
 	MidiController* mc = mp->midiController(CTRL_VOLUME);

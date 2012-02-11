@@ -1195,7 +1195,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
                 {
                     for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
                     {
-                        if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI && (*i)->name() == instrumentName)
+                        if ((*i)->isSynthPlugin() && (*i)->name() == instrumentName)
                         {
 							QString devName(QString("O-").append(vtrack->name));
                             SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
