@@ -851,10 +851,23 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                 iMPEvent ev = eventList->begin();
                 for (; ev != eventList->end(); ++ev)
                 {
-                    if (ev->type() == ME_CONTROLLER && ev->dataA() == 0x40001) // FIXME, what is 0x40001
+                    switch (ev->type())
                     {
-                        setProgram(ev->dataB());
-                        continue;
+                    case ME_NOTEOFF:
+                        if (ev->dataA() >= 0 && ev->dataA() <= 127)
+                            continue;
+                        break;
+                    case ME_NOTEON:
+                        if (ev->dataA() >= 0 && ev->dataA() <= 127)
+                            continue;
+                        break;
+                    case ME_CONTROLLER:
+                        if (ev->dataA() == 0x40001) // FIXME, what is 0x40001
+                        {
+                            setProgram(ev->dataB());
+                            continue;
+                        }
+                        break;
                     }
 
                     VstMidiEvent* midiEvent = &midiEvents[midiEventCount];
