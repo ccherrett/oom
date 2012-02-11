@@ -125,6 +125,7 @@ private:
     void del(CtrlVal);
     QString _name;
 	QString _pname;
+    QString _unit;
     double _min, _max;
     CtrlValueType _valueType;
     QColor _displayColor;
@@ -200,6 +201,16 @@ public:
     void setPluginName(const QString& s)
     {
         _pname = s;
+    }
+    
+    QString unit() const
+    {
+        return _unit;
+    }
+    
+    void setUnit(const QString& s)
+    {
+        _unit = s;
     }
 
     void setRange(double min, double max)

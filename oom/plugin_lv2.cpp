@@ -1336,6 +1336,12 @@ QString Lv2Plugin::getParameterUnit(uint32_t index)
             if (lilv_nodes_size(units) > 0)
             {
                 paramUnit = QString(lilv_node_as_string(lilv_nodes_get(units, lilv_nodes_begin(units)))).replace(LV2_NS_UNITS, "");
+                
+                // properly set some units
+                if (paramUnit == "db")
+                    paramUnit = QString("dB");
+                else if (paramUnit == "hz")
+                    paramUnit = QString("Hz");
             }
             lilv_nodes_free(units);
         }

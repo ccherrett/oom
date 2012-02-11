@@ -1660,12 +1660,12 @@ void ComposerCanvas::mouseMove(QMouseEvent* event)
 		if (show_tip && _tool == AutomationTool && automation.currentCtrlList && !automation.moveController) 
 		{
 			Track* t = y2Track(y);
-			if(t && !t->isMidiTrack() && !t->wantsAutomation())
+			if(t)
 			{
 				CtrlListList *cll;
                 if (t->isMidiTrack())
                 {
-                    AudioTrack* atrack = ((MidiTrack*)t)->getAutomationTrack();
+                    AudioTrack* atrack = t->wantsAutomation() ? ((MidiTrack*)t)->getAutomationTrack() : 0;
                     if (!atrack)
                         return;
                     cll = atrack->controller();
@@ -1703,6 +1703,8 @@ void ComposerCanvas::mouseMove(QMouseEvent* event)
 							newValue = max - (relativeY * range);
 							dbString += QString::number(newValue, 'f', 2);
 						}
+                        if(cl->unit().isEmpty() == false)
+                            dbString.append(" "+cl->unit());
 						if(cl->pluginName().isEmpty())
 							dbString.append("  "+cl->name());
 						else
@@ -4858,6 +4860,8 @@ void ComposerCanvas::drawTooltipText(QPainter& p, /*{{{*/
 	{
 		dbString += QString::number(vol, 'f', 2);
 	}
+    if(cl->unit().isEmpty() == false)
+        dbString.append(" "+cl->unit());
 	if(cl->pluginName().isEmpty())
 		dbString.append("  "+cl->name());
 	else
