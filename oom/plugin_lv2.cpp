@@ -1769,15 +1769,21 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                             switch (ev->type())
                             {
                             case ME_NOTEOFF:
-                                midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 2);
-                                midi_event[0] = ME_NOTEOFF + ev->channel();
-                                midi_event[1] = ev->dataA();
+                                if (ev->dataA() >= 0 && ev->dataA() <= 127)
+                                {
+                                    midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 2);
+                                    midi_event[0] = ME_NOTEOFF + ev->channel();
+                                    midi_event[1] = ev->dataA();
+                                }
                                 break;
                             case ME_NOTEON:
-                                midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
-                                midi_event[0] = ME_NOTEON + ev->channel();
-                                midi_event[1] = ev->dataA();
-                                midi_event[2] = ev->dataB();
+                                if (ev->dataA() >= 0 && ev->dataA() <= 127)
+                                {
+                                    midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
+                                    midi_event[0] = ME_NOTEON + ev->channel();
+                                    midi_event[1] = ev->dataA();
+                                    midi_event[2] = ev->dataB();
+                                }
                                 break;
                             case ME_CONTROLLER:
                                 if (ev->dataA() == 0x40001) // FIXME, what is 0x40001
