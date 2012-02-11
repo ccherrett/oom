@@ -15,26 +15,12 @@
     <useJackTransport>1</useJackTransport>
     <jackTransportMaster>1</jackTransportMaster>
     <extSync>0</extSync>
-    <bigtimeVisible>0</bigtimeVisible>
-    <transportVisible>0</transportVisible>
-    <markerVisible>0</markerVisible>
-    <geometryMain x="0" y="0" w="640" h="480"></geometryMain>
-    <geometryTransport x="0" y="0" w="598" h="88"></geometryTransport>
-    <partCanvasBg r="90" g="90" b="90"></partCanvasBg>
-    <transportHandleColor r="16" g="24" b="25"></transportHandleColor>
-    <bigtimeForegroundcolor r="66" g="202" b="230"></bigtimeForegroundcolor>
-    <bigtimeBackgroundcolor r="16" g="24" b="25"></bigtimeBackgroundcolor>
-    <mixer1Visible>0</mixer1Visible>
-    <arranger>
-      <info>1</info>
+    <composer>
       <arsplit>418 751 </arsplit>
-      <list>
-        <header> 8 7 6 5 4 3 2 1 0 </header>
-        </list>
       <xpos>0</xpos>
       <xmag>266</xmag>
       <ypos>0</ypos>
-      </arranger>
+    </composer>
     <sequencer>
       <metronom>
         <premeasures>2</premeasures>
@@ -53,30 +39,12 @@
         <midiClickEnable>1</midiClickEnable>
         <audioClickEnable>1</audioClickEnable>
         <audioClickVolume>0.5</audioClickVolume>
-        </metronom>
-      <rcEnable>0</rcEnable>
-      <rcStop>28</rcStop>
-      <rcRecord>31</rcRecord>
-      <rcGotoLeft>33</rcGotoLeft>
-      <rcPlay>29</rcPlay>
-      </sequencer>
-    <pianoroll>
-      <quant>96</quant>
-      <raster>96</raster>
-      <quantStrength>80</quantStrength>
-      <quantLimit>50</quantLimit>
-      <quantLen>0</quantLen>
-      <to>0</to>
-      <width>600</width>
-      <height>400</height>
-      <colormode>2</colormode>
-      </pianoroll>
-    <masteredit>
-      <raster>0</raster>
-      </masteredit>
-    </configuration>
+      </metronom>
+    </sequencer>
+  </configuration>
   <song>
     <info></info>
+    <masterTrackId>1328921206007395620</masterTrackId>
     <automation>1</automation>
     <cpos>0</cpos>
     <rpos>0</rpos>
@@ -95,8 +63,37 @@
     <len>405504</len>
     <follow>1</follow>
 	<associatedRoute></associatedRoute>
+    <AudioAux>
+      <name>OOMidi-Reverb</name>
+      <trackId>1328922385699435425</trackId>
+      <record>0</record>
+      <mute>0</mute>
+      <solo>0</solo>
+      <off>0</off>
+      <channels>2</channels>
+      <height>78</height>
+      <locked>0</locked>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
+      <prefader>0</prefader>
+      <sendMetronome>0</sendMetronome>
+      <automation>0</automation>
+      <controller id="0" cur="1" color="#ff5a00" visible="0">
+        0 1,         
+      </controller>
+      <controller id="1" cur="0" color="#00db05" visible="0">
+      </controller>
+      <controller id="2" cur="0" color="#db0000" visible="0">
+      </controller>
+    </AudioAux>
     <AudioOutput>
       <name>Master</name>
+      <trackId>1328921206007395620</trackId>
       <record>0</record>
       <mute>0</mute>
       <solo>0</solo>
@@ -105,19 +102,26 @@
       <height>78</height>
       <locked>0</locked>
       <selected>1</selected>
+      <reminder1>0</reminder1>
+      <reminder2>0</reminder2>
+      <reminder3>0</reminder3>
+      <collapsed>1</collapsed>
+      <mixertab>0</mixertab>
+      <partcolor>1</partcolor>
+      <MidiAssign port="0" channel="0" enabled="0" preset="0" midimap="0:0:262147:-1:0:0 0:0:7:-1:0:0 0:0:262148:-1:0:0 0:0:262149:-1:0:0 0:0:10:-1:0:0 " />
       <prefader>0</prefader>
       <sendMetronome>1</sendMetronome>
       <automation>0</automation>
       <controller id="0" cur="1">
         0 1,         
-        </controller>
+      </controller>
       <controller id="1" cur="0">
         0 0,         
-        </controller>
+      </controller>
       <controller id="2" cur="0">
         0 0,         
-        </controller>
-      </AudioOutput>
+      </controller>
+    </AudioOutput>
     <Route channel="0">
       <source name="Master"/>
       <dest type="1" name="system:playback_1"/>

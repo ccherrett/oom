@@ -1070,6 +1070,9 @@ Shorter periods are desirable.</string>
                 <height>25</height>
                </size>
               </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -1373,16 +1376,64 @@ Shorter periods are desirable.</string>
            <widget class="QLineEdit" name="userInstrumentsPath"/>
           </item>
           <item row="3" column="2">
-           <widget class="QPushButton" name="selectInstrumentsDirButton">
+           <widget class="QToolButton" name="selectInstrumentsDirButton">
+            <property name="minimumSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Browse</string>
+            </property>
             <property name="text">
              <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item row="3" column="3">
-           <widget class="QPushButton" name="defaultInstrumentsDirButton">
+           <widget class="QToolButton" name="defaultInstrumentsDirButton">
+            <property name="minimumSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Restore default Instrument Directory</string>
+            </property>
             <property name="text">
              <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
