@@ -58,9 +58,6 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 		case SEQM_PRELOAD_PROGRAM:
 			audio->preloadControllers();
 			break;
-		//case MS_PROCESS:
-		//	audio->processMidi();
-		//	break;
 		case SEQM_SEEK:
 			processSeek();
 			break;
@@ -94,7 +91,6 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 			song->cmdRemovePart((Part*) msg->p1);
 			break;
 		case SEQM_CHANGE_PART:
-			//song->cmdChangePart((Part*)msg->p1, (Part*)msg->p2);
 			song->cmdChangePart((Part*) msg->p1, (Part*) msg->p2, msg->a, msg->b);
 			break;
 		case SEQM_SET_TRACK_OUT_CHAN:
@@ -134,7 +130,6 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 
 void MidiSeq::processStop()
 {
-	// p3.3.28
 	playStateExt = false; // not playing
 
 	//
@@ -155,7 +150,6 @@ void MidiSeq::processStop()
 			pel->add(ev);
 		}
 		sel->clear();
-		//md->setNextPlayEvent(pel->begin());
 	}
 }
 
@@ -290,22 +284,6 @@ signed int MidiSeq::selectTimer()
 
 void MidiSeq::threadStart(void*)
 {
-	// Removed by Tim. p3.3.17
-	/*
-	struct sched_param rt_param;
-	memset(&rt_param, 0, sizeof(rt_param));
-	int prio_min = sched_get_priority_min(SCHED_FIFO);
-	int prio_max = sched_get_priority_max(SCHED_FIFO);
-
-	if (prio < prio_min) prio = prio_min;
-	else if (prio > prio_max) prio = prio_max;
-
-	rt_param.sched_priority = prio;
-	int rv = pthread_setschedparam(pthread_self(), SCHED_FIFO, &rt_param);
-	if (rv != 0)
-		  perror("set realtime scheduler");
-	 */
-
 	int policy;
 	if ((policy = sched_getscheduler(0)) < 0)
 	{
@@ -335,19 +313,6 @@ static void midiRead(void*, void* d)
 	MidiDevice* dev = (MidiDevice*) d;
 	dev->processInput();
 }
-
-//---------------------------------------------------------
-//   synthIRead
-//---------------------------------------------------------
-
-#if 0
-
-static void synthIRead(void*, void* d)
-{
-	SynthI* syn = (SynthI*) d;
-	syn->processInput();
-}
-#endif
 
 //---------------------------------------------------------
 //   midiWrite
@@ -393,10 +358,7 @@ void MidiSeq::updatePollFd()
 		const QString name = dev->name();
 		if (port == -1)
 			continue;
-		if ((dev->rwFlags() & 0x2) || (extSyncFlag.value()
-				//&& (rxSyncPort == port || rxSyncPort == -1))) {
-				//&& (dev->syncInfo().MCIn()))) {
-				&& (midiPorts[port].syncInfo().MCIn())))
+		if ((dev->rwFlags() & 0x2) || (extSyncFlag.value() && (midiPorts[port].syncInfo().MCIn())))
 		{
 			if (dev->selectRfd() < 0)
 			{
@@ -428,7 +390,6 @@ void MidiSeq::updatePollFd()
 void MidiSeq::threadStop()
 {
 	timer->stopTimer();
-	//timer.stopTimer();
 }
 
 //---------------------------------------------------------
@@ -438,9 +399,6 @@ void MidiSeq::threadStop()
 
 bool MidiSeq::setRtcTicks()
 {
-
-	//timer.setTimerFreq(config.rtcTicks);
-	//timer.startTimer();
 	timer->setTimerFreq(config.rtcTicks);
 	timer->startTimer();
 	realRtcTicks = config.rtcTicks;
@@ -452,25 +410,14 @@ bool MidiSeq::setRtcTicks()
 //    return true on error
 //---------------------------------------------------------
 
-//bool MidiSeq::start()
-
 void MidiSeq::start(int priority)
 {
-	// Changed by Tim. p3.3.17
-
 	prio = priority;
 
-	//timerFd = -1;
-
 	doSetuid();
-	//timerFd = selectTimer();
-	//timerFd = timer.initTimer();
-	//printf("timerFd=%d\n",timerFd);
 	setRtcTicks();
 	undoSetuid();
-	//Thread::start();
 	Thread::start(priority);
-	//return false;
 }
 
 //---------------------------------------------------------
@@ -479,34 +426,6 @@ void MidiSeq::start(int priority)
 
 void MidiSeq::processMidiClock()
 {
-	//      if (genMCSync) {
-	//            midiPorts[txSyncPort].sendClock();
-	//      }
-
-	/*      if (state == START_PLAY) {
-				// start play on sync
-				state      = PLAY;
-				_midiTick  = playTickPos;
-				midiClock  = playTickPos;
-
-				int bar, beat, tick;
-				sigmap.tickValues(_midiTick, &bar, &beat, &tick);
-				midiClick      = sigmap.bar2tick(bar, beat+1, 0);
-
-				double cpos    = tempomap.tick2time(playTickPos);
-				samplePosStart = samplePos - lrint(cpos * sampleRate);
-				rtcTickStart   = rtcTick - lrint(cpos * realRtcTicks);
-
-				endSlice       = playTickPos;
-				recTick        = playTickPos;
-				lastTickPos    = playTickPos;
-
-				tempoSN = tempomap.tempoSN();
-
-				startRecordPos.setPosTick(playTickPos);
-				}
-	 */
-	//      midiClock += config.division/24;
 }
 
 //---------------------------------------------------------
@@ -533,10 +452,6 @@ void MidiSeq::midiTick(void* p, void*)
 
 void MidiSeq::processTimerTick()
 {
-	// Disabled by Tim. p3.3.22
-	//      extern int watchMidi;
-	//      ++watchMidi;      // make a simple watchdog happy
-
 	//---------------------------------------------------
 	//    read elapsed rtc timer ticks
 	//---------------------------------------------------
@@ -546,13 +461,11 @@ void MidiSeq::processTimerTick()
 	if (timerFd != -1)
 	{
 		nn = timer->getTimerTicks();
-		//nn = timer.getTimerTicks();
 		nn >>= 8;
 	}
 
 	if (idle)
 	{
-		//        printf("IDLE\n");
 		return;
 	}
 	if (midiBusy)
@@ -564,35 +477,9 @@ void MidiSeq::processTimerTick()
 
 	unsigned curFrame = audio->curFrame();
 
-	// Keep the sync detectors running...
-	// No, done in Song::beat(), (at the much slower heartbeat rate).
-	//
-	//for(int port = 0; port < MIDI_PORTS; ++port)
-	//{
-	// Must keep them running even if there's no device...
-	//if(midiPorts[port].device())
-	//    midiPorts[port].syncInfo().setCurFrame(curFrame);
-	//}
-	//for(iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
-	//  (*imd)->syncInfo().setCurFrame(curFrame);
-
 	if (!extSyncFlag.value())
 	{
-		//int curTick = tempomap.frame2tick(curFrame);
-		// Copied from Tempomap.
-		//int curTick = lrint((double(curFrame)/double(sampleRate)) * tempomap.globalTempo() * config.division * 10000.0 / double(tempomap.tempo(song->cpos())));
-		//int curTick = lrint((double(curFrame)/double(sampleRate)) * tempomap.globalTempo() * 240000.0 / double(tempomap.tempo(song->cpos())));
 		int curTick = lrint((double(curFrame) / double(sampleRate)) * double(tempomap.globalTempo()) * double(config.division) * 10000.0 / double(tempomap.tempo(song->cpos())));
-		//int curTick = int((double(curFrame)/double(sampleRate)) * double(tempomap.globalTempo()) * double(config.division * 10000.0) / double(tempomap.tempo(song->cpos())));
-
-		/*            if ( midiClock > curTick + 100) // reinitialize
-						{
-					  midiClock = curTick;
-						}
-					else if( curTick > midiClock + 100) // reinitialize
-						{
-					  midiClock = curTick;
-						}*/
 
 		if (midiClock > curTick)
 			midiClock = curTick;
@@ -600,71 +487,25 @@ void MidiSeq::processTimerTick()
 		int div = config.division / 24;
 		if (curTick >= midiClock + div)
 		{
-			//if(curTick >= midiClock)  {
-			//processMidiClock();
 			int perr = (curTick - midiClock) / div;
-			//int perr = curTick - midiClock;
 
 			bool used = false;
 
-			//if(genMCSync)
-			//{
-			//midiPorts[txSyncPort].sendClock();
 			for (int port = 0; port < MIDI_PORTS; ++port)
 			{
 				MidiPort* mp = &midiPorts[port];
 
 				// No device? Clock out not turned on?
-				//MidiDevice* dev = mp->device();
-				//if(!dev || !mp->syncInfo().MCOut())
 				if (!mp->device() || !mp->syncInfo().MCOut())
 					continue;
-
-				// Shall we check open flags?
-				//if(!(dev->rwFlags() & 0x1) || !(dev->openFlags() & 1))
-				//if(!(dev->openFlags() & 1))
-				//  continue;
 
 				used = true;
 
 				mp->sendClock();
 			}
 
-			/*
-			for(iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
-			{
-			  MidiDevice* dev = *imd;
-                      
-			  if(!dev->syncInfo().MCOut())
-				continue;
-                        
-			  // Shall we check open flags?
-			  //if(!(dev->rwFlags() & 0x1) || !(dev->openFlags() & 1))
-			  //if(!(dev->openFlags() & 1))
-			  //  continue;
-        
-			  int port = dev->midiPort();
-			  // Without this -1 check, interesting sync things can be done by the user without ever
-			  //  assigning any devices to ports !
-			  //if(port < 0 || port > MIDI_PORTS)
-			  if(port < -1 || port > MIDI_PORTS)
-				continue;
-                        
-			  if(port == -1)
-			  // Send straight to the device... Copied from MidiPort.
-			  {
-				MidiPlayEvent event(0, 0, 0, ME_CLOCK, 0, 0);
-				dev->putEvent(event);
-			  }
-			  else
-				// Go through the port...
-				midiPorts[port].sendClock();
-			}
-			 */
-
 			if (debugMsg && used && perr > 1)
 				printf("Dropped %d midi out clock(s). curTick:%d midiClock:%d div:%d\n", perr, curTick, midiClock, div);
-			//}
 
 			// Keeping in mind how (receiving end) Phase Locked Loops (usually) operate...
 			// Increment as if we had caught the timer exactly on the mark, even if the timer
@@ -687,18 +528,9 @@ void MidiSeq::processTimerTick()
 			//
 			// Using equalization periods...
 			midiClock += (perr * div);
-			//midiClock += perr;
-			//
-			// No equalization periods... TODO:
-			//midiClock += (perr * div);
 		}
 	}
 
-	//      if (genMTCSync) {
-	// printf("Midi Time Code Sync generation not impl.\n");
-	//            }
-
-	// p3.3.25
 	int tickpos = audio->tickPos();
 	bool extsync = extSyncFlag.value();
 	//
@@ -707,9 +539,6 @@ void MidiSeq::processTimerTick()
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
 	{
 		MidiDevice* md = *id;
-		// Is it a Jack midi device? p3.3.36
-		//MidiJackDevice* mjd = dynamic_cast<MidiJackDevice*>(md);
-		//if(mjd)
 		if (md->deviceType() == MidiDevice::JACK_MIDI)
 			continue;
         if (md->isSynthPlugin()) // synths are handled by audio thread
@@ -722,16 +551,13 @@ void MidiSeq::processTimerTick()
 		MPEventList* el = md->playEvents();
 		if (el->empty())
 			continue;
-		iMPEvent i = el->begin(); //md->nextPlayEvent();
+		iMPEvent i = el->begin(); 
 		for (; i != el->end(); ++i)
 		{
-			// p3.3.25
 			// If syncing to external midi sync, we cannot use the tempo map.
 			// Therefore we cannot get sub-tick resolution. Just use ticks instead of frames.
-			//if (i->time() > curFrame) {
 			if (i->time() > (extsync ? tickpos : curFrame))
 			{
-				//printf("  curT %d  frame %d\n", i->time(), curFrame);
 				break; // skip this event
 			}
 
@@ -747,7 +573,6 @@ void MidiSeq::processTimerTick()
 			}
 		}
 		el->erase(el->begin(), i);
-		//md->setNextPlayEvent(i);
 	}
 }
 
@@ -787,11 +612,6 @@ void MidiSeq::msgPreloadCtrl()
 {
 	msgMsg(SEQM_PRELOAD_PROGRAM);
 }
-
-/*void MidiSeq::msgProcess()
-{
-	msgMsg(MS_PROCESS);
-}*/
 
 void MidiSeq::msgSeek()
 {
