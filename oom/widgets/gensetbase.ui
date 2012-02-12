@@ -159,7 +159,16 @@
             <item>
              <widget class="QPushButton" name="btnStartLSClient">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Start/Stop LinuxSampler client</string>
               </property>
               <property name="text">
                <string>Start Now</string>
@@ -197,6 +206,9 @@
              <widget class="QPushButton" name="btnResetLSNow">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Reset LinuxSampler (This will flush ALL MIDI maps and othe configurations)</string>
               </property>
               <property name="text">
                <string>Reset Now</string>

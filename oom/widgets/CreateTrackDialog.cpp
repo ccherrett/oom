@@ -24,6 +24,8 @@
 #include "plugin.h"
 #include "utils.h"
 #include "genset.h"
+#include "knob.h"
+#include "doublelabel.h"
 
 
 CreateTrackDialog::CreateTrackDialog(int type, int pos, QWidget* parent)
@@ -93,6 +95,63 @@ void CreateTrackDialog::initDefaults()
 	int row = cmbType->findData(m_insertType);
 	cmbType->setCurrentIndex(row);
 
+	m_panKnob = new Knob(this);/*{{{*/
+	m_panKnob->setRange(double(-64), double(63), 1.0);
+	m_panKnob->setId(9);
+	m_panKnob->setKnobImage(QString(":images/knob_buss_new.png"));
+
+	m_panKnob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	m_panKnob->setBackgroundRole(QPalette::Mid);
+	m_panKnob->setToolTip("Panorama");
+	m_panKnob->setEnabled(true);
+	m_panKnob->setIgnoreWheel(true);
+	
+	DoubleLabel* panLabel = new DoubleLabel(0.0, double(-64), double(60), this);
+	panLabel->setSlider(m_panKnob);
+	panLabel->setFont(config.fonts[1]);
+	panLabel->setBackgroundRole(QPalette::Mid);
+	panLabel->setFrame(true);
+	panLabel->setAlignment(Qt::AlignCenter);
+	panLabel->setPrecision(2);
+	panLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+	connect(m_panKnob, SIGNAL(valueChanged(double, int)), panLabel, SLOT(setValue(double)));
+	connect(panLabel, SIGNAL(valueChanged(double, int)), m_panKnob, SLOT(setValue(double)));
+	QLabel *pl = new QLabel(tr("Pan"));
+	pl->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+
+	panBox->addWidget(m_panKnob);
+	panBox->addWidget(panLabel);
+	panBox->addWidget(pl);
+
+
+	m_auxKnob = new Knob(this);
+	m_auxKnob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+	m_auxKnob->setRange(config.minSlider - 0.1, 10.0);
+	m_auxKnob->setKnobImage(":images/knob_aux_new.png");
+	m_auxKnob->setToolTip(tr("Reverb Sends level"));
+	m_auxKnob->setBackgroundRole(QPalette::Mid);
+
+	DoubleLabel* auxLabel = new DoubleLabel(0.0, config.minSlider, 10.1, this);
+
+	auxLabel->setSlider(m_auxKnob);
+	auxLabel->setFont(config.fonts[1]);
+	auxLabel->setBackgroundRole(QPalette::Mid);
+	auxLabel->setFrame(true);
+	auxLabel->setAlignment(Qt::AlignCenter);
+	auxLabel->setPrecision(0);
+	auxLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+	connect(m_auxKnob, SIGNAL(valueChanged(double, int)), auxLabel, SLOT(setValue(double)));
+	connect(auxLabel, SIGNAL(valueChanged(double, int)), m_auxKnob, SLOT(setValue(double)));
+	QLabel *al = new QLabel(tr("Verb"));
+	al->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+
+	auxBox->addWidget(m_auxKnob);
+	auxBox->addWidget(auxLabel);
+	auxBox->addWidget(al);/*}}}*/
+
 	connect(chkInput, SIGNAL(toggled(bool)), this, SLOT(updateInputSelected(bool)));
 	connect(chkOutput, SIGNAL(toggled(bool)), this, SLOT(updateOutputSelected(bool)));
 	connect(chkBuss, SIGNAL(toggled(bool)), this, SLOT(updateBussSelected(bool)));
@@ -128,7 +187,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
 	{
 		case Track::MIDI:
 		case Track::DRUM:
-		{/*{{{*/
+		{
             int instrumentType = cmbInstrument->itemData(instrumentIndex, CTDInstrumentTypeRole).toInt();
             QString instrumentName = cmbInstrument->itemData(instrumentIndex, CTDInstrumentNameRole).toString();
             QString selectedInput, selectedInput2;
@@ -215,13 +274,15 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				m_vtrack->useMonitor = true;
 				m_vtrack->monitorConfig  = qMakePair(0, selectedInput);
                 m_vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
+				m_vtrack->instrumentPan = m_panKnob->value();
+				m_vtrack->instrumentVerb = m_auxKnob->value();
 				if(chkBuss->isChecked())
 				{
 					m_vtrack->useBuss = true;
 					m_vtrack->bussConfig = qMakePair(iBuss, selectedBuss);
 				}
 			}
-		}/*}}}*/
+		}
 		break;
 		case Track::WAVE:
 		{
@@ -413,6 +474,12 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 				{
 					if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
 					{
+						m_panKnob->blockSignals(true);
+						m_panKnob->setValue((*i)->defaultPan());
+						m_panKnob->blockSignals(false);
+						m_auxKnob->blockSignals(true);
+						m_auxKnob->setValue((*i)->defaultVerb());
+						m_auxKnob->blockSignals(false);
 						if(m_instrumentLoaded)
 						{//unload the last one
 							cleanup();
@@ -516,6 +583,10 @@ void CreateTrackDialog::updateOutputSelected(bool raw)/*{{{*/
 void CreateTrackDialog::updateBussSelected(bool raw)/*{{{*/
 {
 	cmbBuss->setEnabled(raw);
+	if(raw)
+		m_panKnob->setKnobImage(QString(":images/knob_buss_new.png"));
+	else
+		m_panKnob->setKnobImage(QString(":images/knob_midi_new.png"));
 }/*}}}*/
 
 //Track type combo slot
@@ -929,11 +1000,13 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			chkInput->setVisible(true);
 			cmbOutput->setVisible(true);
 			chkOutput->setVisible(true);
-			midiBox->setVisible(true);
+			midiBoxFrame->setVisible(true);
+			midiBoxLabelFrame->setVisible(true);
 			chkAutoCreate->setVisible(true);
 			trackNameEdited();
 
-            m_height = 290;
+            //m_height = 290;
+            m_height = 400;
 			m_width = width();
 		}
 		break;
@@ -944,7 +1017,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
-			midiBox->setVisible(false);
+			midiBoxFrame->setVisible(false);
+			midiBoxLabelFrame->setVisible(false);
 			chkAutoCreate->setVisible(false);
 
 			cmbInput->setVisible(true);
@@ -952,7 +1026,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			
-			m_height = 160;
+			//m_height = 160;
+			m_height = 260;
 			m_width = width();
 		}
 		break;
@@ -963,7 +1038,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
-			midiBox->setVisible(false);
+			midiBoxFrame->setVisible(false);
+			midiBoxLabelFrame->setVisible(false);
 			chkAutoCreate->setVisible(false);
 
 			cmbInput->setVisible(true);
@@ -971,7 +1047,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			
-			m_height = 160;
+			//m_height = 160;
+			m_height = 260;
 			m_width = width();
 		}
 		break;
@@ -982,7 +1059,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
-			midiBox->setVisible(false);
+			midiBoxFrame->setVisible(false);
+			midiBoxLabelFrame->setVisible(false);
 			chkAutoCreate->setVisible(false);
 
 			cmbInput->setVisible(true);
@@ -990,7 +1068,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			
-			m_height = 160;
+			//m_height = 160;
+			m_height = 260;
 			m_width = width();
 		}
 		break;
@@ -1001,7 +1080,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			lblInstrument->setVisible(false);
 			cmbInstrument->setVisible(false);
 			cmbMonitor->setVisible(false);
-			midiBox->setVisible(false);
+			midiBoxFrame->setVisible(false);
+			midiBoxLabelFrame->setVisible(false);
 			chkAutoCreate->setVisible(false);
 
 			cmbInput->setVisible(true);
@@ -1009,7 +1089,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbOutput->setVisible(true);
 			chkOutput->setVisible(true);
 			
-			m_height = 160;
+			//m_height = 160;
+			m_height = 260;
 			m_width = width();
 		}
 		break;
@@ -1022,7 +1103,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbMonitor->setVisible(false);
 			chkAutoCreate->setVisible(false);
 			
-			midiBox->setVisible(false);
+			midiBoxFrame->setVisible(false);
+			midiBoxLabelFrame->setVisible(false);
 			
 			cmbInput->setVisible(false);
 			chkInput->setVisible(false);
@@ -1030,7 +1112,8 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbOutput->setVisible(false);
 			chkOutput->setVisible(false);
 			
-			m_height = 100;
+			//m_height = 100;
+			m_height = 200;
 			m_width = width();
 		}
 		default:

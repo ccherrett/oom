@@ -1077,21 +1077,21 @@ void Audio::processMidi()
 			RouteList* irl = track->inRoutes();
 			for (ciRoute r = irl->begin(); r != irl->end(); ++r)
 			{
-				if (!r->isValid() || (r->type != Route::MIDI_PORT_ROUTE)) // p3.3.49
+				if (!r->isValid() || (r->type != Route::MIDI_PORT_ROUTE)) 
 					continue;
 
-				int devport = r->midiPort; // p3.3.49
+				int devport = r->midiPort;
 				if (devport == -1)
 					continue;
 
-				MidiDevice* dev = midiPorts[devport].device(); // p3.3.49
+				MidiDevice* dev = midiPorts[devport].device();
 				if (!dev)
 					continue;
 
-				int channelMask = r->channel; // p3.3.50
+				int channelMask = r->channel;
 				if (channelMask == -1 || channelMask == 0)
 					continue;
-				for (int channel = 0; channel < MIDI_CHANNELS; ++channel) // p3.3.50
+				for (int channel = 0; channel < MIDI_CHANNELS; ++channel)
 				{
 					if (!(channelMask & (1 << channel)))
 						continue;
@@ -1190,7 +1190,6 @@ void Audio::processMidi()
 									event.setB(velo);
 								}
 							}
-								// Added by T356.
 							else if (event.type() == ME_CONTROLLER)
 							{
 								//printf("11111111111111111111111111111111111111111111111111111\n");

@@ -21,6 +21,8 @@ struct VirtualTrack {
 	QString name;
 	QString instrumentName;
 	int instrumentType;
+	double instrumentPan;
+	double instrumentVerb;
 	bool autoCreateInstrument;
 	bool createMidiInputDevice;
 	bool createMidiOutputDevice;
@@ -56,6 +58,7 @@ class TrackManager : public QObject{
 	QMap<int, QString> m_currentMidiOutputList;
 
 	QMap<qint64, VirtualTrack*> m_virtualTracks;
+	QList<QPair<int, QString> > m_synthConfigs;
 	
 	void createMonitorInputTracks(VirtualTrack*);
 	void removeMonitorInputTracks(VirtualTrack*);

@@ -37,6 +37,8 @@ VirtualTrack::VirtualTrack()
 	inputChannel = -1;
 	outputChannel = -1;
 	instrumentType = -1;
+	instrumentPan = 0.0;
+	instrumentVerb = 0.0;
 	autoCreateInstrument = false;
 	createMidiInputDevice = false;
 	createMidiOutputDevice = false;
@@ -53,13 +55,19 @@ void VirtualTrack::write(int level, Xml& xml) const/*{{{*/
 	{
 		xml.nput("autoCreateInstrument=\"%d\" createMidiInputDevice=\"%d\" createMidiOutputDevice=\"%d\" ", 
 				autoCreateInstrument, createMidiInputDevice, createMidiOutputDevice);
-		xml.nput("instrumentName=\"%s\" instrumentType=\"%d\" useMonitor=\"%d\" useBuss=\"%d\" inputChannel=\"%d\" outputChannel=\"%d\" ", 
-				instrumentName.toUtf8().constData(), instrumentType, useMonitor, useBuss, inputChannel, outputChannel);
-		if(useMonitor)
+		xml.nput("instrumentName=\"%s\" instrumentType=\"%d\" instrumentPan=\"%d\" instrumentVerb=\"%d\"",
+				instrumentName.toUtf8().constData(), instrumentType, instrumentPan, instrumentVerb);
+		
+		xml.put("useMonitor=\"%d\" useBuss=\"%d\" inputChannel=\"%d\" outputChannel=\"%d\" ", 
+				useMonitor, useBuss, inputChannel, outputChannel);
+		if(useMonitor && instrumentType != TrackManager::SYNTH_INSTRUMENT)
 		{
 			tmplist.clear();
 			tmplist << QString::number(monitorConfig.first) << monitorConfig.second;
 			xml.nput("monitorConfig=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
+			tmplist.clear();
+			tmplist << QString::number(monitorConfig2.first) << monitorConfig2.second;
+			xml.nput("monitorConfig2=\"%s\" ", tmplist.join("@-:-@").toUtf8().constData());
 		}
 		if(useBuss)
 		{ 
@@ -117,6 +125,14 @@ void VirtualTrack::read(Xml &xml)/*{{{*/
 				else if(tag == "instrumentType")
 				{
 					instrumentType = xml.s2().toInt();
+				}
+				else if(tag == "instrumentPan")
+				{
+					instrumentPan = xml.s2().toDouble();
+				}
+				else if(tag == "instrumentVerb")
+				{
+					instrumentVerb = xml.s2().toDouble();
 				}
 				else if(tag == "autoCreateInstrument")
 				{
@@ -388,7 +404,14 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					}
 					else
 					{
-						m_midiOutPort = vtrack->outputConfig.first;
+						if(vtrack->instrumentType == SYNTH_INSTRUMENT)
+						{//Get the config from our internal list
+							m_midiOutPort = m_synthConfigs.at(0).first;
+						}
+						else
+						{
+							m_midiOutPort = vtrack->outputConfig.first;
+						}
 						qDebug("Using existing MIDI output port: %i", m_midiOutPort);
 						outport = &midiPorts[m_midiOutPort];
 						if(outport)
@@ -402,7 +425,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						int outChan = vtrack->outputChannel;
 						mtrack->setOutChanAndUpdate(outChan);
 						audio->msgIdle(false);
-						if(vtrack->createMidiOutputDevice)
+						if(vtrack->createMidiOutputDevice || vtrack->instrumentType == SYNTH_INSTRUMENT)
 						{
 							QString instrumentName = vtrack->instrumentName;
 							if(vtrack->instrumentType == SYNTH_INSTRUMENT)
@@ -1209,9 +1232,13 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 
 							m_midiOutPort = portIdx;
 							qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
-							vtrack->outputConfig = qMakePair(portIdx, devName);
-                            vtrack->monitorConfig  = qMakePair(0, selectedInput);
-                            vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
+							m_synthConfigs.clear();
+							m_synthConfigs.append(qMakePair(portIdx, devName));
+                            m_synthConfigs.append(qMakePair(0, selectedInput));
+                            m_synthConfigs.append(qMakePair(0, selectedInput2));
+							//vtrack->outputConfig = qMakePair(portIdx, devName);
+                            //vtrack->monitorConfig  = qMakePair(0, selectedInput);
+                            //vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
 
                             break;
                         }
@@ -1307,17 +1334,31 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		else
 			buss = song->findTrack(vtrack->bussConfig.second);
 	}
-	//Track* audiot = song->addTrackByName(audioName, Track::WAVE, -1, false);
-	if(input/* && audiot*/)
+	if(input)
 	{
 		input->setMute(false);
-		QString selectedInput = vtrack->monitorConfig.second;
+		QString selectedInput;
+		if(vtrack->instrumentType == SYNTH_INSTRUMENT)
+			m_synthConfigs.at(1).second;
+		else
+			selectedInput = vtrack->monitorConfig.second;
         QString selectedInput2;
 
-        if (vtrack->monitorConfig2.second.isEmpty())
-            selectedInput2 = selectedInput;
-        else
-            selectedInput2 = vtrack->monitorConfig2.second;
+		if(vtrack->instrumentType == SYNTH_INSTRUMENT)
+		{
+			if(m_synthConfigs.at(2).second.isEmpty())
+        	    selectedInput2 = selectedInput;
+			else
+				selectedInput2 = m_synthConfigs.at(2).second;
+			
+		}
+		else
+		{
+			if (vtrack->monitorConfig2.second.isEmpty())
+        	    selectedInput2 = selectedInput;
+			else
+        	    selectedInput2 = vtrack->monitorConfig2.second;
+		}
 		qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
 
 		//Route world to input
@@ -1363,14 +1404,8 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 			audio->msgAddRoute(srcRoute, dstRoute);
 		}
 
-		//Route input to audio
-		/*Route srcRoute2(input, 0, input->channels());
-		Route dstRoute2(audiot->name(), true, -1);
-		
-		audio->msgAddRoute(srcRoute2, dstRoute2);*/
-
 		//Route audio to master
-		Track* master = song->findTrack("Master");
+		Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);
 		if(master)
 		{
 			//Route buss track to master
@@ -1388,12 +1423,21 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		
 				audio->msgAddRoute(srcRoute3, dstRoute3);
 			}
-
-			//Route audio track to master
-			/*Route srcRoute4(audiot, 0, audiot->channels());
-			Route dstRoute4(master->name(), true, -1);
-		
-			audio->msgAddRoute(srcRoute4, dstRoute4);*/
+		}
+		//Set the predefined pan and reverb level on buss or input
+		qint64 verb = song->oomVerbId();
+		if(verb)
+		{
+			if(vtrack->useBuss && buss)
+			{
+				((AudioTrack*)buss)->setPan(vtrack->instrumentPan);
+				((AudioTrack*)buss)->setAuxSend(verb, vtrack->instrumentVerb);
+			}
+			else if(!vtrack->useBuss && input)
+			{
+				((AudioTrack*)input)->setPan(vtrack->instrumentPan);
+				((AudioTrack*)input)->setAuxSend(verb, vtrack->instrumentVerb);
+			}
 		}
 
 		audio->msgUpdateSoloStates();

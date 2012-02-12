@@ -712,6 +712,10 @@ void Song::read(Xml& xml)
 				{
 					m_masterId = xml.parseLongLong();
 				}
+				else if(tag == "oomVerbAuxId")
+				{
+					m_oomVerbId = xml.parseLongLong();
+				}
 				else if (tag == "info")
 					songInfoStr = xml.parse1();
 				else if (tag == "associatedRoute")
@@ -868,6 +872,14 @@ void Song::read(Xml& xml)
 					{
 						updateAuxIndex();
 					}
+					if(!m_oomVerbId)
+					{//Create the default oom verb aux track if it dont exist
+						Track* t = addTrackByName("OOMidi Verb", Track::AUDIO_AUX, -1, true);
+						if(t)
+						{
+							m_oomVerbId = t->id();
+						}
+					}
 					//Call to update the track view menu
 					update(SC_VIEW_CHANGED);
 					return;
@@ -954,6 +966,7 @@ void Song::write(int level, Xml& xml) const
 	xml.tag(level++, "song");
 	xml.strTag(level, "info", songInfoStr);
 	xml.qint64Tag(level, "masterTrackId", m_masterId);
+	xml.qint64Tag(level, "oomVerbAuxId", m_oomVerbId);
 	xml.strTag(level, "associatedRoute", associatedRoute);
 	xml.intTag(level, "automation", automation);
 	xml.intTag(level, "cpos", song->cpos());

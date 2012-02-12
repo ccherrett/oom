@@ -308,6 +308,8 @@ void MidiInstrument::init()
 	_midiState = new EventList();
 	_controller = new MidiControllerList;
 	m_oomInstrument = false;
+	m_panValue = 0.0;
+	m_verbValue = 0.0;
 
 	// add some default controller to controller list
 	// this controllers are always available for all instruments
@@ -397,8 +399,6 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 	}
 	pg.clear();
 
-	// Assignment
-	//  pg = ins.pg;
 	for (ciPatchGroup g = ins.pg.begin(); g != ins.pg.end(); ++g)
 	{
 		PatchGroup* pgp = *g;
@@ -432,11 +432,8 @@ MidiInstrument& MidiInstrument::assign(const MidiInstrument& ins)
 	_filePath = ins._filePath;
 	m_keymaps = ins.m_keymaps;
 	m_oomInstrument = ins.m_oomInstrument;
-
-	// Hmm, dirty, yes? But init sets it to false...
-	//_dirty = ins._dirty;
-	//_dirty = false;
-	//_dirty = true;
+	m_panValue = ins.m_panValue;
+	m_verbValue = ins.m_verbValue;
 
 	return *this;
 }
@@ -475,8 +472,6 @@ void MidiInstrument::reset(int portNo, MType)
 	MidiPort* port = &midiPorts[portNo];
 	MidiPlayEvent ev;
 	ev.setType(0x90);
-	//if (port == 0)
-	//	return;
 	ev.setPort(portNo);
 	ev.setTime(0);
 	for (int chan = 0; chan < MIDI_CHANNELS; ++chan)
@@ -860,6 +855,10 @@ void MidiInstrument::read(Xml& xml)
 				}
 				else if(tag == "oomInstrument")
 					m_oomInstrument = xml.s2().toInt();
+				else if(tag == "panValue")
+					m_panValue = xml.s2().toDouble();
+				else if(tag == "verbValue")
+					m_verbValue = xml.s2().toDouble();
 				break;
 			case Xml::TagEnd:
 				if (tag == "MidiInstrument")
@@ -879,7 +878,8 @@ void MidiInstrument::write(int level, Xml& xml)
 	xml.header();
 	xml.tag(level, "oom version=\"1.0\"");
 	level++;
-	xml.nput(level, "<MidiInstrument name=\"%s\" oomInstrument=\"%d\"", Xml::xmlString(iname()).toLatin1().constData(), m_oomInstrument);
+	xml.nput(level, "<MidiInstrument name=\"%s\" oomInstrument=\"%d\" panValue=\"%d\" verbValue=\"%d\"", 
+			Xml::xmlString(iname()).toLatin1().constData(), m_oomInstrument, m_panValue, m_verbValue);
 
 	if (_nullvalue != -1)
 	{

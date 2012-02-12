@@ -20,6 +20,8 @@
 class QDialog;
 class QMenu;
 class QCloseEvent;
+class Knob;
+class DoubleLabel;
 
 //---------------------------------------------------------
 //   EditInstrument
@@ -32,8 +34,14 @@ class EditInstrument : public QMainWindow, public Ui::EditInstrumentBase
     MidiInstrument workingInstrument;
     QListWidgetItem* oldMidiInstrument;
     QTreeWidgetItem* oldPatchItem;
-    void closeEvent(QCloseEvent*);
-    int checkDirty(MidiInstrument*, bool isClose = false);
+    
+	Knob* m_panKnob;
+	DoubleLabel* m_panLabel;
+	Knob* m_auxKnob;
+	DoubleLabel* m_auxLabel;
+
+	void closeEvent(QCloseEvent*);
+	int checkDirty(MidiInstrument*, bool isClose = false);
     bool fileSave(MidiInstrument*, const QString&);
     void saveAs();
     void updateInstrument(MidiInstrument*);
@@ -98,6 +106,8 @@ private slots:
 	void loadmodeChanged(int);
 	void patchFilenameChanged();
 	void browseFilenameClicked();
+	void panChanged(double);
+	void auxChanged(double);
 #ifdef LSCP_SUPPORT
 	void btnImportClicked(bool);
 #endif

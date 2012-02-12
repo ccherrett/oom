@@ -40,9 +40,112 @@ QHeaderView#trackHeaders
 }
 
 
+/*{{{*/
+QTreeWidget#patchView
+{
+	margin-right: 6px;
+}
+QTabWidget#tabWidget3::pane
+{ /* The tab widget frame */
+    border-top: 0px solid #C2C7CB;
+	color: #d0d4d0;
+	background-color: #313131;
+	border-radius: 0px;
+}
 
+QTabWidget#tabWidget3::tab-bar
+{
+    left: 5px; /* move to the right by 5px */
+}
+
+/* Style the tab using the tab sub-control. Note that
+    it reads QTabBar _not_ QTabWidget */
+QTabWidget#tabWidget3 QTabBar::tab
+{
+	/*background-color: #47474d;*/							
+	background-color: #47474d;							
+	/*background-color: #FF0000;*/							
+    border: 1px solid #a5a6a5;
+    border-bottom-color: #525252; /* same as the pane color */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 0px;
+    min-width: 6ex;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+	color: #d6dfd6; 
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+}
+
+QTabWidget#tabWidget3 QTabBar::tab:selected 
+{
+    background-color: #0b0b0b;
+	color: #cdd1cd; 
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 10px;
+}
+
+QTabWidget#tabWidget3 QTabBar::tab:selected 
+{
+    border-color: #9B9B9B;
+    border-bottom: 0px;
+    margin-top: 0px;
+    margin-left: 0px;
+}
+
+QTabWidget#tabWidget3 QTabBar::tab:!selected 
+{
+    margin-top: 2px; /* make non-selected tabs look smaller */
+    margin-left: 0px;
+    border-bottom: 0px;
+}
+
+/* make use of negative margins for overlapping tabs */
+QTabWidget#tabWidget3 QTabBar::tab:selected
+{
+    /* expand/overlap to the left and right by 4px */
+    margin-top: 0px;
+    margin-left: 0px;
+}
+
+QTabWidget#tabWidget3 QTabBar::tab:first:selected 
+{
+    /*margin-top: 0px;*/ /* the first selected tab has nothing to overlap with on the left */
+}
+
+QTabWidget#tabWidget3 QTabBar::tab:last:selected 
+{
+    /*margin-bottom: 0px;*/ /* the last selected tab has nothing to overlap with on the right */
+}
+
+QTabWidget#tabWidget3 QTabBar::tab:only-one 
+{
+    /*margin: 0px;*/ /* if there is only one tab, we don't want overlapping margins */
+}
+
+QTabWidget#tabWidget3 QTabBar::tab::disabled 
+{
+    color: #8f9198;; /* if there is only one tab, we don't want overlapping margins */
+	border-color: #47474d;							
+	background-color: #525252;
+}
+/*}}}*/
+
+QTabWidget#tabWidget3,  QWidget#patchesTab, QWidget#controllerTab, QWidget#sysExTab,
+QFrame#propertiesFrame, QFrame#frame2, QSplitter#splitter5, QSplitter#splitter6, QSplitter#splitter2
+{ /* The tab widget frame */
+    border-top: 0px solid #C2C7CB;
+	color: #d0d4d0;
+	background-color: #313131;
+	border-radius: 0px;
+}
 QLabel#lblType, QLabel#lblTrack, QLabel#lblProp, QLabel#lblComments, QLabel#lblName, QLabel#lblGroup,
-GlobalSettingsConfig QLabel
+GlobalSettingsConfig QLabel, CreateTrackDialog QLabel, EditInstrument QLabel, LSCPImport QLabel
 {
 	background-color:none;
 	border:none;
@@ -50,27 +153,38 @@ GlobalSettingsConfig QLabel
 
 QFrame#propertyFrame, QFrame#trackListFrame, QFrame#commentFrame, QFrame#viewsFrame,
 QFrame#guiSettingsFrame, QFrame#myInputsFrame, QFrame#tickFrame, QFrame#mixerSettingsFrame,
-QFrame#crossfadeSettingsFrame, QFrame#dummyAudioBussBox, QFrame#startUpBox, QFrame#startSongBox
+QFrame#crossfadeSettingsFrame, QFrame#dummyAudioBussBox, QFrame#startUpBox, QFrame#startSongBox,
+QFrame#trackOptionsFrame, QFrame#midiBoxFrame, QFrame#instrumentListFrame, QFrame#importerFrame
 {
 	color: #d0d4d0;
-	/*background-color: #1e1e1e;*/
 	background-color: #313131;
 	border-radius: 12px;
     border: 0px;/* solid #4b4b4b;*/
 }
 
-QFrame#launchLabelFrame, QFrame#mixerLabelFrame, QFrame#myInputLabelFrame, QFrame#behaviorLabelFrame,
-QFrame#songStartLabelFrame, QFrame#crossfadeLabelFrame, QFrame#dummyLabelFrame, QFrame#tickLabelFrame
+QFrame#tabFrame
 {
 	color: #d0d4d0;
-	/*background-color: #1e1e1e;*/
+	background-color: #313131;
+	border-bottom-right-radius: 12px;
+	border-bottom-left-radius: 12px;
+    border: 0px;/* solid #4b4b4b;*/
+}
+
+QFrame#launchLabelFrame, QFrame#mixerLabelFrame, QFrame#myInputLabelFrame, QFrame#behaviorLabelFrame,
+QFrame#songStartLabelFrame, QFrame#crossfadeLabelFrame, QFrame#dummyLabelFrame, QFrame#tickLabelFrame,
+QFrame#insPropLabelFrame, QFrame#topLabelFrame, QFrame#instrumentLabelFrame, QFrame#instrumentPropFrame,
+QFrame#importerLabelFrame
+{
+	color: #d0d4d0;
 	background-color: #313131;
 	border-top-left-radius: 12px;
 	border-top-right-radius: 12px;
     border: 0px;/* solid #4b4b4b;*/
 }
 
-QFrame#addButtonFrame, QFrame#propLabelFrame, QFrame#trackLabelFrame
+QFrame#addButtonFrame, QFrame#propLabelFrame, QFrame#trackLabelFrame, QFrame#midiBoxLabelFrame,
+QFrame#propLabelFrame, QFrame#separatorFrame
 {
 	color: #d0d4d0;
 	/*background-color: #1e1e1e;*/
@@ -200,7 +314,7 @@ Conductor QTableView, QTableView#mapTable
 	padding: 0px;
 	font-size: 14px;
 }
-Conductor QTableView::focus, QTableView#mapTable::focus
+Conductor QTableView::focus
 {
 	border: 2px solid #f3ce69;
 }
@@ -217,7 +331,7 @@ Conductor QTableView::item:selected, QTableView#mapTable::item:selected
 	border-bottom: 1px solid #343434;
 }
 
-Conductor QTableView::item:selected:active
+Conductor QTableView::item:selected:active, QTableView#mapTable::item:selected:active
 {
 	border: none;
 }
@@ -1083,17 +1197,20 @@ QMainWindow::separator {
 QMainWindow#PluginGui, QWidget#PluginGuiBase { background-color: #525252 }
 
 /*{{{*/
-QTabWidget#tabControlCenter::pane { /* The tab widget frame */
+QTabWidget#tabControlCenter::pane
+{ /* The tab widget frame */
     border-top: 0px solid #C2C7CB;
 }
 
-QTabWidget#tabControlCenter::tab-bar {
+QTabWidget#tabControlCenter::tab-bar
+{
     /*left: 5px;*/ /* move to the right by 5px */
 }
 
 /* Style the tab using the tab sub-control. Note that
     it reads QTabBar _not_ QTabWidget */
-QTabWidget#tabControlCenter QTabBar::tab {
+QTabWidget#tabControlCenter QTabBar::tab
+{
 	background-color: #47474d;							
     border: 1px solid #a5a6a5;
     border-right-color: #5a5963; /* same as the pane color */
@@ -1111,7 +1228,8 @@ QTabWidget#tabControlCenter QTabBar::tab {
 	font-size: 11px;
 }
 
-QTabWidget#tabControlCenter QTabBar::tab:selected {
+QTabWidget#tabControlCenter QTabBar::tab:selected 
+{
     /*background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);*/
@@ -1122,34 +1240,41 @@ QTabWidget#tabControlCenter QTabBar::tab:selected {
 	font-size: 11px;
 }
 
-QTabWidget#tabControlCenter QTabBar::tab:selected {
+QTabWidget#tabControlCenter QTabBar::tab:selected 
+{
     border-color: #9B9B9B;
     border-bottom-color: #C2C7CB; /* same as pane color */
 }
 
-QTabWidget#tabControlCenter QTabBar::tab:!selected {
+QTabWidget#tabControlCenter QTabBar::tab:!selected 
+{
     margin-left: 4px; /* make non-selected tabs look smaller */
 }
 
 /* make use of negative margins for overlapping tabs */
-QTabWidget#tabControlCenter QTabBar::tab:selected {
+QTabWidget#tabControlCenter QTabBar::tab:selected
+{
     /* expand/overlap to the left and right by 4px */
     margin-left: 2px;
     /*margin-right: -4px;*/
 }
 
-QTabWidget#tabControlCenter QTabBar::tab:first:selected {
+QTabWidget#tabControlCenter QTabBar::tab:first:selected 
+{
     margin-top: 0; /* the first selected tab has nothing to overlap with on the left */
 }
 
-QTabWidget#tabControlCenter QTabBar::tab:last:selected {
+QTabWidget#tabControlCenter QTabBar::tab:last:selected 
+{
     margin-bottom: 0; /* the last selected tab has nothing to overlap with on the right */
 }
 
-QTabWidget#tabControlCenter QTabBar::tab:only-one {
+QTabWidget#tabControlCenter QTabBar::tab:only-one
+{
     margin: 0; /* if there is only one tab, we don't want overlapping margins */
 }
-QTabWidget#tabControlCenter QTabBar::tab::disabled {
+QTabWidget#tabControlCenter QTabBar::tab::disabled 
+{
     color: #8f9198;; /* if there is only one tab, we don't want overlapping margins */
 	border-color: #47474d;							
 	background-color: #525252;
@@ -2067,3 +2192,4 @@ QFrame#trackHeaderList {/*{{{*/
 	padding-right: -18px;
 	
 }/*}}}*/
+

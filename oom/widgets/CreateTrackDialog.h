@@ -18,6 +18,7 @@
 
 class QShowEvent;
 class QSize;
+class Knob;
 //class SynthPluginDevice;
 
 class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
@@ -47,7 +48,11 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	QMap<int, QString> m_currentMidiOutputList;
 
 	VirtualTrack *m_vtrack;
-    //SynthPluginDevice *m_lastSynth;
+
+	Knob* m_panKnob;
+	Knob* m_auxKnob;
+    
+	//SynthPluginDevice *m_lastSynth;
 
 	void importInputs();
 	void importOutputs();

@@ -36,7 +36,7 @@
         <signatureN>4</signatureN>
         <prerecord>0</prerecord>
         <preroll>0</preroll>
-        <midiClickEnable>1</midiClickEnable>
+        <midiClickEnable>0</midiClickEnable>
         <audioClickEnable>1</audioClickEnable>
         <audioClickVolume>0.5</audioClickVolume>
       </metronom>
@@ -45,6 +45,7 @@
   <song>
     <info></info>
     <masterTrackId>1328921206007395620</masterTrackId>
+    <oomVerbAuxId>1328922385699435425</oomVerbAuxId>
     <automation>1</automation>
     <cpos>0</cpos>
     <rpos>0</rpos>
@@ -64,7 +65,7 @@
     <follow>1</follow>
 	<associatedRoute></associatedRoute>
     <AudioAux>
-      <name>OOMidi-Reverb</name>
+      <name>OOMidi Verb</name>
       <trackId>1328922385699435425</trackId>
       <record>0</record>
       <mute>0</mute>

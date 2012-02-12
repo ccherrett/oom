@@ -143,6 +143,7 @@ private:
 	qint64 m_auxViewId;
 	qint64 m_commentViewId;
 	qint64 m_masterId;
+	qint64 m_oomVerbId;
 	
 	//For maintaining the track order and track view order
 	QList<qint64> m_trackIndex;
@@ -579,6 +580,10 @@ public:
 	qint64 masterId()
 	{
 		return m_masterId;
+	}
+	qint64 oomVerbId()
+	{
+		return m_oomVerbId;
 	}
 
     TrackView* addNewTrackView();

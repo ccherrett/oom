@@ -26,6 +26,8 @@
 #include "midictrl.h"
 #include "gconfig.h"
 #include "icons.h"
+#include "knob.h"
+#include "doublelabel.h"
 
 enum
 {
@@ -47,7 +49,7 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	fileSaveAsAction->setIcon(QIcon(*saveasIcon));
 	fileExitAction->setIcon(QIcon(*exitIcon));
 	viewController->setSelectionMode(QAbstractItemView::SingleSelection);
-	toolBar->addAction(QWhatsThis::createAction(this));
+	//toolBar->addAction(QWhatsThis::createAction(this));
 	Help->addAction(QWhatsThis::createAction(this));
 	
 	cmbEngine->addItem("GIG");
@@ -58,6 +60,59 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	cmbLoadMode->addItem("ON_DEMAND");
 	cmbLoadMode->addItem("ON_DEMAND_HOLD");
 	cmbLoadMode->addItem("PERSISTENT");
+
+
+	m_panKnob = new Knob(this);
+	m_panKnob->setRange(double(-64), double(63), 1.0);
+	m_panKnob->setId(9);
+	m_panKnob->setKnobImage(QString(":images/knob_buss_new.png"));
+
+	m_panKnob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	m_panKnob->setBackgroundRole(QPalette::Mid);
+	m_panKnob->setToolTip("Panorama");
+	m_panKnob->setEnabled(true);
+	m_panKnob->setIgnoreWheel(true);
+	
+	m_panLabel = new DoubleLabel(0.0, double(-64), double(60), this);
+	m_panLabel->setSlider(m_panKnob);
+	m_panLabel->setFont(config.fonts[1]);
+	m_panLabel->setBackgroundRole(QPalette::Mid);
+	m_panLabel->setFrame(true);
+	m_panLabel->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+	m_panLabel->setPrecision(2);
+	m_panLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+	connect(m_panKnob, SIGNAL(valueChanged(double, int)), m_panLabel, SLOT(setValue(double)));
+	connect(m_panLabel, SIGNAL(valueChanged(double, int)), m_panKnob, SLOT(setValue(double)));
+	connect(m_panKnob, SIGNAL(valueChanged(double, int)), this, SLOT(panChanged(double)));
+
+	panBox->addWidget(m_panKnob);
+	panBox->addWidget(m_panLabel);
+
+
+	m_auxKnob = new Knob(this);
+	m_auxKnob->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+	m_auxKnob->setRange(config.minSlider - 0.1, 10.0);
+	m_auxKnob->setKnobImage(":images/knob_aux_new.png");
+	m_auxKnob->setToolTip(tr("Reverb Sends level"));
+	m_auxKnob->setBackgroundRole(QPalette::Mid);
+
+	m_auxLabel = new DoubleLabel(0.0, config.minSlider, 10.1, this);
+	m_auxLabel->setSlider(m_auxKnob);
+	m_auxLabel->setFont(config.fonts[1]);
+	m_auxLabel->setBackgroundRole(QPalette::Mid);
+	m_auxLabel->setFrame(true);
+	m_auxLabel->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+	m_auxLabel->setPrecision(0);
+	m_auxLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+	connect(m_auxKnob, SIGNAL(valueChanged(double, int)), m_auxLabel, SLOT(setValue(double)));
+	connect(m_auxLabel, SIGNAL(valueChanged(double, int)), m_auxKnob, SLOT(setValue(double)));
+	connect(m_auxKnob, SIGNAL(valueChanged(double, int)), this, SLOT(auxChanged(double)));
+
+	auxBox->addWidget(m_auxKnob);
+	auxBox->addWidget(m_auxLabel);
 
 	populateInstruments();
 	connect(instrumentList, SIGNAL(itemSelectionChanged()), SLOT(instrumentChanged()));
@@ -165,6 +220,26 @@ void EditInstrument::autoLoadChecked(bool)
 	if(item)
 	{
 		workingInstrument.setOOMInstrument(chkAutoload->isChecked());
+		workingInstrument.setDirty(true);
+	}
+}
+
+void EditInstrument::panChanged(double val)
+{
+	QListWidgetItem* item = instrumentList->currentItem();
+	if(item)
+	{
+		workingInstrument.setDefaultPan(val);
+		workingInstrument.setDirty(true);
+	}
+}
+
+void EditInstrument::auxChanged(double val)
+{
+	QListWidgetItem* item = instrumentList->currentItem();
+	if(item)
+	{
+		workingInstrument.setDefaultVerb(val);
 		workingInstrument.setDirty(true);
 	}
 }
@@ -790,6 +865,16 @@ void EditInstrument::changeInstrument()/*{{{*/
 	chkAutoload->blockSignals(true);
 	chkAutoload->setChecked(workingInstrument.isOOMInstrument());
 	chkAutoload->blockSignals(false);
+
+	m_panKnob->blockSignals(true);
+	m_panKnob->setValue(workingInstrument.defaultPan());
+	m_panLabel->setValue(workingInstrument.defaultPan());
+	m_panKnob->blockSignals(false);
+
+	m_auxKnob->blockSignals(true);
+	m_auxKnob->setValue(workingInstrument.defaultVerb());
+	m_auxLabel->setValue(workingInstrument.defaultVerb());
+	m_auxKnob->blockSignals(false);
 
 	// populate patch list
 	patchView->blockSignals(true);

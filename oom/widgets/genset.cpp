@@ -114,7 +114,7 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	
 	m_chkAutofade->setChecked(config.useAutoCrossFades);
 	chkStartLSClient->setChecked(config.lsClientAutoStart);
-	btnStartLSClient->setEnabled(!lsClientStarted);
+	btnStartLSClient->setText(lsClientStarted ? tr("Stop Now") : tr("Start Now"));
 	btnResetLSNow->setEnabled(lsClientStarted);
 	chkResetLSOnStartup->setChecked(config.lsClientResetOnStart);
 	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
@@ -132,7 +132,7 @@ void GlobalSettingsConfig::populateInputs()/*{{{*/
 	m_inputsModel->clear();
 	QStringList alsaList;
 	QStringList jackList;
-	if(gInputList.size())/*{{{*/
+	if(gInputList.size())
 	{
 		//Select the rows
 		for(int i = 0; i < gInputList.size(); ++i)
@@ -143,7 +143,7 @@ void GlobalSettingsConfig::populateInputs()/*{{{*/
 			else
 				alsaList.append(input.second);
 		}
-	}/*}}}*/
+	}
 	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
 	{
 		if ((*i)->deviceType() == MidiDevice::ALSA_MIDI)
@@ -230,7 +230,7 @@ void GlobalSettingsConfig::updateSettings()
 	moveArmedCheckBox->setChecked(config.moveArmedCheckBox);
 	projectSaveCheckBox->setChecked(config.useProjectSaveDialog);
 	chkStartLSClient->setChecked(config.lsClientAutoStart);
-	btnStartLSClient->setEnabled(!lsClientStarted);
+	btnStartLSClient->setText(lsClientStarted ? tr("Stop Now") : tr("Start Now"));
 	btnResetLSNow->setEnabled(lsClientStarted);
 	chkResetLSOnStartup->setChecked(config.lsClientResetOnStart);
 	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
@@ -248,6 +248,10 @@ void GlobalSettingsConfig::showEvent(QShowEvent* e)
 	//updateSettings();     // TESTING
 }
 
+//---------------------------------------------------------
+//   startLSClientNow Start and restart the LS Client
+//---------------------------------------------------------
+
 void GlobalSettingsConfig::startLSClientNow()
 {
 	if(!lsClient)
@@ -258,18 +262,25 @@ void GlobalSettingsConfig::startLSClientNow()
 		{
 			lsClient->resetSampler();
 		}
+
+		if(!lsClientStarted)
+		{
+			lsClient = 0;
+		}
 	}
 	else
 	{
-		lsClientStarted = lsClient->startClient();
-		if(config.lsClientResetOnStart && lsClientStarted)
-		{
-			lsClient->resetSampler();
-		}
+		lsClientStarted = false;
+		lsClient->stopClient();
+		lsClient = 0;
 	}
-	btnStartLSClient->setEnabled(!lsClientStarted);
+	btnStartLSClient->setText(lsClientStarted ? tr("Stop Now") : tr("Start Now"));
 	btnResetLSNow->setEnabled(lsClientStarted);
 }
+
+//---------------------------------------------------------
+//   resetLSNow Resets LinuxSampler configuration
+//---------------------------------------------------------
 
 void GlobalSettingsConfig::resetLSNow()
 {
@@ -281,18 +292,7 @@ void GlobalSettingsConfig::resetLSNow()
 			QMessageBox::Ok|QMessageBox::Cancel,
 			QMessageBox::Cancel) == QMessageBox::Ok)
 	{
-		if(!lsClient)
-		{
-			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
-			lsClientStarted = lsClient->startClient();
-			if(config.lsClientResetOnStart && lsClientStarted)
-			{
-				lsClient->resetSampler();
-			}
-			//Update the start button
-			btnStartLSClient->setEnabled(!lsClientStarted);
-		}
-		if(lsClientStarted)
+		if(lsClient && lsClientStarted)
 		{
 			lsClient->resetSampler();
 			btnResetLSNow->setEnabled(lsClientStarted);

@@ -102,6 +102,7 @@ Song::Song(QUndoStack* stack, const char* name)
 	_replayPos = 0;
 	//Master track ID
 	m_masterId = 0;
+	m_oomVerbId = 0;
 	//Create the AutoView
 	TrackView* wv = new TrackView();
 	wv->setViewName(tr("Working View"));
