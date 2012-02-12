@@ -239,6 +239,7 @@ void initShortCuts()
 	defShrt(SHRT_OCTAVE_QWERTY_5, Qt::CTRL + Qt::Key_5, "Edit: Set Qwerty Range To C5", PROLL_SHRT, "qwerty_range_C5");
 	defShrt(SHRT_OCTAVE_QWERTY_6, Qt::CTRL + Qt::Key_6, "Edit: Set Qwerty Range To C6", PROLL_SHRT, "qwerty_range_C6");
 	defShrt(SHRT_PART_TOGGLE_MUTE, Qt::Key_M, "State: Mute", PROLL_SHRT, "toggle_mute");
+	defShrt(SHRT_SHOW_NATIVE_GUI, Qt::ALT + Qt::Key_G, "View: Show Native Synth GUI", PROLL_SHRT, "show_native_gui");
 
 	// Shortcuts for tools
 	// global

@@ -75,8 +75,7 @@ bool DoubleLabel::setString(double v)
 		setText(_specialText);
 		return true;
 	}
-	else
-		if (v < min)
+	else if (v <= min)
 	{
 		setText(QString("---"));
 		return true;

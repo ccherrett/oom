@@ -32,10 +32,8 @@
 //---------------------------------------------------------
 
 AudioTrack::AudioTrack(TrackType t)
-//AudioTrack::AudioTrack(TrackType t, int num_out_bufs)
 : Track(t)
 {
-	//_totalOutChannels = num_out_bufs; // Is either parameter-default MAX_CHANNELS, or custom value passed (used by syntis).
 	_processed = false;
 	_haveData = false;
 	_sendMetronome = false;
@@ -44,16 +42,11 @@ AudioTrack::AudioTrack(TrackType t)
 	_recFile = 0;
 	_channels = 0;
 	_automationType = AUTO_OFF;
-	//setChannels(1);
 	setChannels(2);
 	addController(new CtrlList(AC_VOLUME,"Volume", 0.001, 3.16 /* roughly 10 db */));
 	addController(new CtrlList(AC_PAN, "Pan", -1.0, 1.0));
 	addController(new CtrlList(AC_MUTE, "Mute", 0.0, 1.0, true /*dont show in Composer */));
 
-	// p3.3.38
-	// Easy way, less desirable... Start out with enough for MAX_CHANNELS. Then multi-channel syntis can re-allocate,
-	//  via a call to (a modified!) setChannels().
-	// Hard way, more desirable... Creating a synti instance passes the total channels to this constructor, overriding MAX_CHANNELS.
 	_totalOutChannels = MAX_CHANNELS;
 	outBuffers = new float*[_totalOutChannels];
 	for (int i = 0; i < _totalOutChannels; ++i)
@@ -66,9 +59,6 @@ AudioTrack::AudioTrack(TrackType t)
 
 	setVolume(1.0, true);
 }
-
-//AudioTrack::AudioTrack(const AudioTrack& t)
-//  : Track(t)
 
 AudioTrack::AudioTrack(const AudioTrack& t, bool cloneParts)
 : Track(t, cloneParts)
@@ -85,14 +75,7 @@ AudioTrack::AudioTrack(const AudioTrack& t, bool cloneParts)
 	//FIXME:Update this to create new input/output tracks and connect them to the same routes
 	_inRoutes = t._inRoutes;
 	_outRoutes = t._outRoutes;
-	// Changed by Tim. p3.3.15
-	//outBuffers = new float*[MAX_CHANNELS];
-	//for (int i = 0; i < MAX_CHANNELS; ++i)
-	//      outBuffers[i] = new float[segmentSize];
-	//for (int i = 0; i < MAX_CHANNELS; ++i)
-	//      posix_memalign((void**)(outBuffers + i), 16, sizeof(float) * segmentSize);
 
-	// p3.3.38
 	int chans = _totalOutChannels;
 	// Number of allocated buffers is always MAX_CHANNELS or more, even if _totalOutChannels is less.
 	if (chans < MAX_CHANNELS)
@@ -1225,7 +1208,6 @@ void AudioTrack::mapRackPluginsToControllers()
 			// If there's no plugin at that rack position, or the param is out of range of
 			//  the number of controls in the plugin, then it's a stray controller. Delete it.
 			// Future: Leave room for possible bypass controller at AC_PLUGIN_CTL_ID_MASK -1.
-			//if(!p || (param >= p->parameters() && (param != AC_PLUGIN_CTL_ID_MASK -1)))
 			if (!p || (param >= (int)p->getParameterCount()))
 			{
 				_controller.erase(id);
@@ -1235,37 +1217,6 @@ void AudioTrack::mapRackPluginsToControllers()
 			}
 		}
 	} while (loop);
-
-
-	// Although this tested OK, and is the 'official' way to erase while iterating,
-	//  I don't trust it. I'm weary of this method. The technique didn't work
-	//  in Audio::msgRemoveTracks(), see comments there.
-	/*
-    
-	// Now delete any stray controllers which don't belong to anything.
-	for(iCtrlList icl = _controller.begin(); icl != _controller.end(); )
-	{
-	  CtrlList* l = icl->second;
-	  int id = l->id();
-	  // Ignore volume, pan, mute etc.
-	  if(id < AC_PLUGIN_CTL_BASE)
-	  {
-		++icl;
-		continue;
-	  }
-	  int param = id & AC_PLUGIN_CTL_ID_MASK;
-	  int idx = (id >> AC_PLUGIN_CTL_BASE_POW) - 1;
-	  PluginI* p = (*_efxPipe)[idx];
-	  // If there's no plugin at that rack position, or the param is out of range of
-	  //  the number of controls in the plugin, then it's a stray controller. Delete it.
-	  // Future: Leave room for possible bypass controller at AC_PLUGIN_CTL_ID_MASK -1.
-	  //if(!p || (param >= p->parameters() && (param != AC_PLUGIN_CTL_ID_MASK -1)))
-	  if(!p || (param >= p->parameters()))
-		_controller.erase(icl++);
-	  else
-		++icl;
-	}
-	 */
 }
 
 //---------------------------------------------------------

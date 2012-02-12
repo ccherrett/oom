@@ -37,6 +37,8 @@
 #include "route.h"
 #include "popupmenu.h"
 #include "pctable.h"
+#include "plugin.h"
+#include "shortcuts.h"
 
 #include "gcombo.h"
 #include "traverso_shared/TConfig.h"
@@ -256,6 +258,7 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	//btnDown->setIconSize(downPCIcon->size());
 	//btnDelete->setIconSize(garbagePCIcon->size());
 	btnCopy->setIcon(*duplicateIconSet3);
+	btnShowGui->setIcon(*loadIconSet3);
 	//btnCopy->setIconSize(duplicatePCIcon->size());
 
 	//start tb1 merge
@@ -375,6 +378,10 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	connect(iRButton, SIGNAL(pressed()), SLOT(inRoutesPressed()));
 	connect(btnTranspose, SIGNAL(toggled(bool)), SIGNAL(globalTransposeClicked(bool)));
 	connect(btnComments, SIGNAL(toggled(bool)), SIGNAL(toggleComments(bool)));
+
+	btnShowGui->setShortcut(shortcuts[SHRT_SHOW_NATIVE_GUI].key);
+	connect(btnShowGui, SIGNAL(toggled(bool)), this, SLOT(toggleSynthNativeGui(bool)));
+
 	btnComments->setIcon(QIcon(*commentIconSet3));
 	btnTranspose->setIcon(QIcon(*transposeIconSet3));
 
@@ -603,6 +610,28 @@ void Conductor::heartBeat()
 				populateMatrix();
 				rebuildMatrix();
 			}
+
+			if(selected->isMidiTrack())/*{{{*/
+			{
+				int oPort = ((MidiTrack*) selected)->outPort();
+				MidiPort* port = &midiPorts[oPort];
+
+    		    if (port->device() && port->device()->isSynthPlugin())
+    		    {
+					SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
+					btnShowGui->setEnabled(synth->hasNativeGui());
+    		        if((btnShowGui->isChecked() != synth->nativeGuiVisible()) && synth->hasNativeGui())
+					{//Update the state as it was set elsewhere or the track was changed
+						btnShowGui->blockSignals(true);
+						btnShowGui->setChecked(synth->nativeGuiVisible());
+    		        	btnShowGui->blockSignals(false);
+					}
+    		    }
+				else
+				{
+					btnShowGui->setEnabled(false);
+				}
+			}/*}}}*/
 		}
 			break;
 
@@ -614,6 +643,24 @@ void Conductor::heartBeat()
 		case Track::AUDIO_SOFTSYNTH:
 			break;
 	}
+}
+
+void Conductor::toggleSynthNativeGui(bool on)
+{
+	if(!selected)
+		return;
+	if(selected->isMidiTrack())/*{{{*/
+	{
+		int oPort = ((MidiTrack*) selected)->outPort();
+		MidiPort* port = &midiPorts[oPort];
+
+        if (port->device() && port->device()->isSynthPlugin())
+        {
+			SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
+            if(synth->hasNativeGui())
+				audio->msgShowInstrumentNativeGui(port->instrument(), on);
+        }
+	}/*}}}*/
 }
 
 //---------------------------------------------------------
@@ -1447,7 +1494,6 @@ void Conductor::iPanDoubleClicked()
 
 void Conductor::updateConductor(int flags)
 {
-	//printf("Conductor::updateConductor(%d) called\n", flags);
 	// Is it simply a midi controller value adjustment? Forget it.
 	if (flags == SC_MIDI_CONTROLLER)
 		return;
@@ -1458,15 +1504,9 @@ void Conductor::updateConductor(int flags)
 		return;
 	MidiTrack* track = (MidiTrack*) selected;
 
-	// p3.3.47 Update the routing popup menu if anything relevant changes.
-	//if(gRoutingPopupMenuMaster == midiConductor && selected && (flags & (SC_ROUTE | SC_CHANNELS | SC_CONFIG)))
-	if (flags & (SC_ROUTE | SC_CHANNELS | SC_CONFIG)) // p3.3.50
-		// Use this handy shared routine.
-		//oom->updateRouteMenus(selected);
-		///oom->updateRouteMenus(selected, midiConductor);   // p3.3.50
+	if (flags & (SC_ROUTE | SC_CHANNELS | SC_CONFIG))
 		oom->updateRouteMenus(selected, this);
 
-	// Added by Tim. p3.3.9
 	setLabelText();
 	setLabelFont();
 
@@ -1498,13 +1538,11 @@ void Conductor::updateConductor(int flags)
 		iKompr->blockSignals(false);
 
 		int outChannel = track->outChannel();
-		///int inChannel  = track->inChannelMask();
+	
 		int outPort = track->outPort();
-		//int inPort     = track->inPortMask();
-		///unsigned int inPort     = track->inPortMask();
 
 		iOutput->blockSignals(true);
-		//iInput->clear();
+
 		iOutput->clear();
 
 		for (int i = 0; i < MIDI_PORTS; ++i)
@@ -1517,21 +1555,9 @@ void Conductor::updateConductor(int flags)
 		}
 		iOutput->blockSignals(false);
 
-		//iInput->setText(bitmap2String(inPort));
-		///iInput->setText(u32bitmap2String(inPort));
-
-		//iInputChannel->setText(bitmap2String(inChannel));
-
-		// Removed by Tim. p3.3.9
-		//if (iName->text() != selected->name()) {
-		//      iName->setText(selected->name());
-		//      iName->home(false);
-		//      }
-
 		iOutputChannel->blockSignals(true);
 		iOutputChannel->setValue(outChannel + 1);
 		iOutputChannel->blockSignals(false);
-		///iInputChannel->setText(bitmap2String(inChannel));
 
 		// Set record echo.
 		if (recEchoButton->isChecked() != track->recEcho())
@@ -1562,8 +1588,6 @@ void Conductor::updateConductor(int flags)
 		nprogram = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
 		if (nprogram == CTRL_VAL_UNKNOWN)
 		{
-			//iPatch->setText(QString("<unknown>"));
-			//iPatch->setText(tr("Select Patch"));
 			emit patchChanged(new Patch);
 			emit updateCurrentPatch(tr("Select Patch"));
 		}
@@ -1571,7 +1595,6 @@ void Conductor::updateConductor(int flags)
 		{
 			MidiInstrument* instr = mp->instrument();
 			emit updateCurrentPatch(instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM));
-			//iPatch->setText(instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM));
 			Patch *patch = instr->getPatch(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
 			if(patch)
 			{
@@ -1584,20 +1607,11 @@ void Conductor::updateConductor(int flags)
 		}
 	}
 	else
-		//if (program != nprogram)
 	{
 		program = nprogram;
 
-		//int hb, lb, pr;
-		//if (program == CTRL_VAL_UNKNOWN) {
-		//      hb = lb = pr = 0;
-		//      iPatch->setText("---");
-		//      }
-		//else
-		//{
 		MidiInstrument* instr = mp->instrument();
 		emit updateCurrentPatch(instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM));
-		//iPatch->setText(instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM));
 		Patch *patch = instr->getPatch(outChannel, program, song->mtype(), track->type() == Track::DRUM);
 		if(patch)
 		{
@@ -1617,7 +1631,6 @@ void Conductor::updateConductor(int flags)
 		int pr = (program & 0xff) + 1;
 		if (pr == 0x100)
 			pr = 0;
-		//}
 		iHBank->blockSignals(true);
 		iLBank->blockSignals(true);
 		iProgram->blockSignals(true);
@@ -1639,14 +1652,8 @@ void Conductor::updateConductor(int flags)
 	int v = mp->hwCtrlState(outChannel, CTRL_VOLUME);
 	volume = v;
 	if (v == CTRL_VAL_UNKNOWN)
-		//{
-		//v = mc->initVal();
-		//if(v == CTRL_VAL_UNKNOWN)
-		//  v = 0;
 		v = mn - 1;
-		//}
-	else
-		// Auto bias...
+	else	// Auto bias...
 		v -= mc->bias();
 	iLautst->blockSignals(true);
 	iLautst->setRange(mn - 1, mc->maxVal());
@@ -1658,23 +1665,34 @@ void Conductor::updateConductor(int flags)
 	v = mp->hwCtrlState(outChannel, CTRL_PANPOT);
 	pan = v;
 	if (v == CTRL_VAL_UNKNOWN)
-		//{
-		//v = mc->initVal();
-		//if(v == CTRL_VAL_UNKNOWN)
-		//  v = 0;
 		v = mn - 1;
-		//}
-	else
-		// Auto bias...
+	else // Auto bias...
 		v -= mc->bias();
 	iPan->blockSignals(true);
 	iPan->setRange(mn - 1, mc->maxVal());
 	iPan->setValue(v);
 	iPan->blockSignals(false);
-	//}
-	//printf("Before populateMatrix()\n");
-	//populateMatrix();
-	//rebuildMatrix();
+	if(selected->isMidiTrack())/*{{{*/
+	{
+		int oPort = ((MidiTrack*) selected)->outPort();
+		MidiPort* port = &midiPorts[oPort];
+
+        if (port->device() && port->device()->isSynthPlugin())
+        {
+			SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
+			btnShowGui->setEnabled(synth->hasNativeGui());
+            if((btnShowGui->isChecked() != synth->nativeGuiVisible()) && synth->hasNativeGui())
+			{//Update the state as it was set elsewhere or the track was changed
+				btnShowGui->blockSignals(true);
+				btnShowGui->setChecked(synth->nativeGuiVisible());
+            	btnShowGui->blockSignals(false);
+			}
+        }
+		else
+		{
+			btnShowGui->setEnabled(false);
+		}
+	}/*}}}*/
 }
 
 void Conductor::editorPartChanged(Part* p)

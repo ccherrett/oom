@@ -123,28 +123,32 @@
         0 0,         
       </controller>
     </AudioOutput>
+    <Route>
+      <source name="OOMidi Verb"/>
+      <dest name="Master"/>
+    </Route>
     <Route channel="0">
       <source name="Master"/>
       <dest type="1" name="system:playback_1"/>
-      </Route>
+    </Route>
     <Route channel="1">
       <source name="Master"/>
       <dest type="1" name="system:playback_2"/>
-      </Route>
+    </Route>
     <tempolist fix="500000">
       <tempo at="21474837">
         <tick>0</tick>
         <val>500000</val>
-        </tempo>
-      </tempolist>
+      </tempo>
+    </tempolist>
     <siglist>
       <sig at="21474836">
         <tick>0</tick>
         <nom>4</nom>
         <denom>4</denom>
-        </sig>
-      </siglist>
+      </sig>
+    </siglist>
     <drummap>
-      </drummap>
-    </song>
-  </oom>
+    </drummap>
+  </song>
+</oom>

@@ -104,7 +104,7 @@ void CreateTrackDialog::initDefaults()
 	m_panKnob->setBackgroundRole(QPalette::Mid);
 	m_panKnob->setToolTip("Panorama");
 	m_panKnob->setEnabled(true);
-	m_panKnob->setIgnoreWheel(true);
+	m_panKnob->setIgnoreWheel(false);
 	
 	m_panLabel = new DoubleLabel(0, -1.0, +1.0, this);
 	m_panLabel->setSlider(m_panKnob);
@@ -132,8 +132,9 @@ void CreateTrackDialog::initDefaults()
 	m_auxKnob->setKnobImage(":images/knob_aux_new.png");
 	m_auxKnob->setToolTip(tr("Reverb Sends level"));
 	m_auxKnob->setBackgroundRole(QPalette::Mid);
+	m_auxKnob->setValue(config.minSlider);
 
-	m_auxLabel = new DoubleLabel(0.0, config.minSlider, 10.1, this);
+	m_auxLabel = new DoubleLabel(config.minSlider, config.minSlider, 10.1, this);
 	m_auxLabel->setSlider(m_auxKnob);
 	m_auxLabel->setFont(config.fonts[1]);
 	m_auxLabel->setBackgroundRole(QPalette::Mid);
@@ -473,14 +474,14 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 				{
 					if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
 					{
-						m_panKnob->blockSignals(true);
+						//m_panKnob->blockSignals(true);
 						m_panKnob->setValue((*i)->defaultPan());
-						m_panLabel->setValue((*i)->defaultPan());
-						m_panKnob->blockSignals(false);
-						m_auxKnob->blockSignals(true);
+						//m_panLabel->setValue((*i)->defaultPan());
+						//m_panKnob->blockSignals(false);
+						//m_auxKnob->blockSignals(true);
 						m_auxKnob->setValue((*i)->defaultVerb());
-						m_auxLabel->setValue((*i)->defaultVerb());
-						m_auxKnob->blockSignals(false);
+						//m_auxLabel->setValue((*i)->defaultVerb());
+						//m_auxKnob->blockSignals(false);
 						if(m_instrumentLoaded)
 						{//unload the last one
 							cleanup();
@@ -585,9 +586,14 @@ void CreateTrackDialog::updateBussSelected(bool raw)/*{{{*/
 {
 	cmbBuss->setEnabled(raw);
 	if(raw)
+	{
 		m_panKnob->setKnobImage(QString(":images/knob_buss_new.png"));
+	}
 	else
+	{
 		m_panKnob->setKnobImage(QString(":images/knob_midi_new.png"));
+	}
+	m_panKnob->update();
 }/*}}}*/
 
 //Track type combo slot

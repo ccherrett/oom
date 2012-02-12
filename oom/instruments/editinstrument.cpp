@@ -71,7 +71,7 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	m_panKnob->setBackgroundRole(QPalette::Mid);
 	m_panKnob->setToolTip("Panorama");
 	m_panKnob->setEnabled(true);
-	m_panKnob->setIgnoreWheel(true);
+	m_panKnob->setIgnoreWheel(false);
 	
 	m_panLabel = new DoubleLabel(0, -1.0, +1.0, this);
 	m_panLabel->setSlider(m_panKnob);
@@ -2883,12 +2883,12 @@ int EditInstrument::checkDirty(MidiInstrument* i, bool isClose)
 		n = QMessageBox::warning(this, tr("OOMidi"),
 			tr("The current Instrument contains unsaved data\n"
 			"Save Current Instrument?"),
-			tr("&Save"), tr("&Nosave"), tr("&Abort"), 0, 2);
+			tr("&Save"), tr("&Don't Save"), tr("&Cancel"), 0, 2);
 	else
 		n = QMessageBox::warning(this, tr("OOMidi"),
 			tr("The current Instrument contains unsaved data\n"
 			"Save Current Instrument?"),
-			tr("&Save"), tr("&Nosave"), 0, 1);
+			tr("&Save"), tr("&Don't Save"), 0, 1);
 	if (n == 0)
 	{
 		if (i->filePath().isEmpty())

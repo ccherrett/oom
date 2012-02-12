@@ -1447,7 +1447,7 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 				if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
 					buss->enablePanController(false);
 
-				qDebug("TrackManager::createMonitorInputTracks: pan: %ld, verb: %ld", aux, panval);
+				qDebug("TrackManager::createMonitorInputTracks: pan: %f, verb: %f", aux, panval);
 				audio->msgSetPan(((AudioTrack*) buss), panval);
 				((AudioTrack*) buss)->recordAutomation(AC_PAN, panval);
 			}

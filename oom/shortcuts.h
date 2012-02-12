@@ -21,7 +21,7 @@
 #define PROLL_SHRT       1  // Performer shortcut
 //#define DEDIT_SHRT       2  // Drumedit shortcut
 #define LEDIT_SHRT       4  // Listedit shortcut
-#define SCORE_SHRT       8  // Score shortcut
+//#define SCORE_SHRT       8  // Score shortcut
 #define ARRANG_SHRT     16  // Composer shortcut
 #define TRANSP_SHRT     32  // Transport shortcut
 //#define WAVE_SHRT       64  // Waveedit shortcut
@@ -32,7 +32,7 @@
 #define INVIS_SHRT    1024  // Shortcuts not shown in the config-dialog. Hard-coded. To avoid conflicts
 #define MIXER_SHRT    1025  // Shortcuts directly related to mixer.
 
-#define SHRT_NUM_OF_CATEGORIES   7 //Number of shortcut categories
+#define SHRT_NUM_OF_CATEGORIES   6 //Number of shortcut categories
 
 struct shortcut
 {
@@ -321,6 +321,7 @@ enum
     SHRT_SEL_INSTRUMENT,
     SHRT_PREVIEW_INSTRUMENT,
     SHRT_PART_TOGGLE_MUTE,
+	SHRT_SHOW_NATIVE_GUI,
 
     // Shortcuts for tools
     // global

@@ -101,6 +101,9 @@ private slots:
     void patchSelectionChanged(QItemSelection, QItemSelection);
     void editorPartChanged(Part*);
     void transposeStateChanged(bool);
+	
+	void toggleSynthNativeGui(bool);
+
     //tb1
     void _rasterChanged(int);
     void _quantChanged(int);
