@@ -355,7 +355,9 @@ void writeShortCuts(int level, Xml& xml)
 		if (shortcuts[i].xml != NULL && shortcuts[i].type != INVIS_SHRT) //Avoid nullptr & hardcoded shortcuts
 			xml.intTag(level, shortcuts[i].xml, shortcuts[i].key);
 	}
+	level--;
 	xml.etag(level, "shortcuts");
+	level++;
 }
 
 void readShortCuts(Xml& xml)
