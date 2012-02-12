@@ -239,6 +239,7 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
             cl->setRange(paramPort->ranges.min, paramPort->ranges.max);
             cl->setName(plugin->getParameterName(i));
             cl->setPluginName(plugin->name());
+            cl->setUnit(plugin->getParameterUnit(i));
             cl->setValueType(t);
 
             if (paramPort->hints & PARAMETER_IS_TOGGLED)
@@ -1193,6 +1194,7 @@ void AudioTrack::mapRackPluginsToControllers()
 			l->setRange(paramPort->ranges.min, paramPort->ranges.max);
 			l->setName(p->getParameterName(i));
 			l->setPluginName(p->name());
+            l->setUnit(p->getParameterUnit(i));
 			l->setValueType(t);
 
 			if (paramPort->hints & PARAMETER_IS_TOGGLED)

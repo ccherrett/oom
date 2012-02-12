@@ -187,6 +187,10 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
         {
             if (nplug->init(plugi->filename(), plugi->label()))
             {
+                // just in case is needed later
+                //if (!audioDevice || audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
+                //    nplug->aboutToRemove();
+
                 int idx = row(it);
                 if (replace)
                 {

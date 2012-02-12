@@ -726,7 +726,14 @@ void Audio::processMsg(AudioMsg* msg)
 		case AUDIO_SET_SEG_SIZE:
 			segmentSize = msg->ival;
 			sampleRate = msg->iival;
-            song->updateSegmentSize();
+            
+            for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+            {
+                if ((*i)->deviceType() == MidiDevice::SYNTH_MIDI)
+                {
+                    ((SynthPluginDevice*)(*i))->segmentSizeChanged(segmentSize);
+                }
+            }
 
 #if 0 //TODO
 			audioOutput.segmentSizeChanged();

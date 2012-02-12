@@ -754,7 +754,7 @@ Route name2route(const QString& rn, bool /*dst*/, int rtype)
 	//int channel = 0;
 	QString s(rn);
 	// Support old route style in oom files. Obsolete.
-	if (rn[0].isNumber() && rn[1] == ':')
+	if (rn.size() >= 2 && rn[0].isNumber() && rn[1] == ':')
 	{
 		channel = rn[0].toAscii() - int('1');
 		s = rn.mid(2);
@@ -1275,7 +1275,7 @@ void Route::dump() const
 				if (device->deviceType() == MidiDevice::ALSA_MIDI)
 				printf("alsa midi device <%s> ", device->name().toLatin1().constData());
 			else
-				if (device->deviceType() == MidiDevice::SYNTH_MIDI)
+				if (device->isSynthPlugin())
 				printf("synth midi device <%s> ", device->name().toLatin1().constData());
 			else
 				printf("is midi but unknown device type:%d, ", device->deviceType());

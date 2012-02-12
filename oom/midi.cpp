@@ -756,7 +756,7 @@ void Audio::initDevices()
 		MidiInstrument* instr = port->instrument();
 		MidiDevice* md = port->device();
 
-		if (instr && md && md->isSynthPlugin() == false)
+		if (instr && md)
 		{
 			EventList* events = instr->midiInit();
 			if (events->empty())
@@ -1026,18 +1026,6 @@ void Audio::processMidi()
 	for (iMidiDevice id = midiDevices.begin(); id != midiDevices.end(); ++id)
 	{
 		MidiDevice* md = *id;
-
-		// klumsy hack for synti devices:
-        if (md->isSynthPlugin())
-		{
-            SynthPluginDevice* s = (SynthPluginDevice*) md;
-            while (s->eventsPending())
-            {
-                MidiRecordEvent ev = s->receiveEvent();
-                md->recordEvent(ev);
-            }
-		}
-
 		md->collectMidiEvents();
 
 		// Take snapshots of the current sizes of the recording fifos,
@@ -1111,7 +1099,7 @@ void Audio::processMidi()
 
 							// dont't echo controller changes back to software
 							// synthesizer:
-                            if (!dev->isSynthPlugin() && md && track->recEcho())
+                            if (md && track->recEcho())
 								playEvents->add(event);
 
 							// If syncing externally the event time is already in units of ticks, set above.
@@ -1221,8 +1209,8 @@ void Audio::processMidi()
 							// dont't echo controller changes back to software
 							// synthesizer:
 
-                            if (!dev->isSynthPlugin())
-							{
+                            //if (!dev->isSynthPlugin())
+							//{
 								//printf("444444444444444444444444444444444444444444444444444444\n");
 								//Check if we're outputting to another port than default:
 								if (devport == defaultPort)
@@ -1244,7 +1232,7 @@ void Audio::processMidi()
 								// Shall we activate meters even while rec echo is off? Sure, why not...
 								if (event.isNote() && event.dataB() > track->activity())
 									track->setActivity(event.dataB());
-							}
+							//}
 
 							// p3.3.25
 							// If syncing externally the event time is already in units of ticks, set above.

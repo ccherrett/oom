@@ -1062,7 +1062,7 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)/*{{{*
 				xml.intTag(level, "openFlags", dev->openFlags());
 
                 // save state of synth plugin
-                if (dev->deviceType() == MidiDevice::SYNTH_MIDI)
+                if (dev->isSynthPlugin())
                 {
                     SynthPluginDevice* synth = (SynthPluginDevice*)dev;
                     xml.tag(level++, "plugin");

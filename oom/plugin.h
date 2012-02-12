@@ -862,6 +862,8 @@ public:
 
     MidiPlayEvent receiveEvent();
     int eventsPending() const;
+    
+    void segmentSizeChanged(unsigned newSegmentSize);
 
 protected:
     virtual bool putMidiEvent(const MidiPlayEvent&);

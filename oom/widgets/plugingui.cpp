@@ -146,7 +146,15 @@ PluginGui::PluginGui(BasePlugin* p)
         }
         else
         {
-            label = new QLabel(QString(plugin->getParameterName(i)), 0);
+            QString labelName = plugin->getParameterName(i);
+            QString labelUnit = plugin->getParameterUnit(i);
+            if (labelUnit.isEmpty() == false && labelUnit != "coef")
+            {
+                labelName += " (";
+                labelName += labelUnit;
+                labelName += ")";
+            }
+            label = new QLabel(labelName, 0);
             params[i].type  = GuiParam::GUI_SLIDER;
             params[i].label = new DoubleLabel(paramPort->value, paramPort->ranges.min, paramPort->ranges.max, this); // NOTE - parent was 0
             params[i].label->setFrame(true);

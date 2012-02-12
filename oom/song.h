@@ -720,7 +720,6 @@ public slots:
 	void closeJackBox();
 	void toggleFeedback(bool);
 	void newTrackAdded(QString);
-    void updateSegmentSize();
 
 signals:
 	void replayChanged(bool, unsigned);

@@ -139,7 +139,7 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
 
     case audioMasterGetBlockSize:
         return segmentSize;
-        
+
     case audioMasterWillReplaceOrAccumulate:
         // Deprecated in VST SDK 2.4
         return 1; // replace, FIXME

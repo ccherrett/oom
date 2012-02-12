@@ -354,8 +354,6 @@ QString SynthPluginDevice::open()
 
 void SynthPluginDevice::close()
 {
-    qWarning("SynthPluginDevice::close()");
-
     _readEnable = false;
     _writeEnable = false;
 
@@ -623,6 +621,18 @@ int SynthPluginDevice::eventsPending() const
 {
     //qWarning("SynthPluginDevice::eventsPending()");
     return 0; //_sif->eventsPending();
+}
+
+//---------------------------------------------------------
+//   putMidiEvent
+//---------------------------------------------------------
+
+void SynthPluginDevice::segmentSizeChanged(unsigned newSegmentSize)
+{
+    if (m_plugin && m_plugin->active())
+    {
+        m_plugin->bufferSizeChanged(newSegmentSize);
+    }
 }
 
 //---------------------------------------------------------

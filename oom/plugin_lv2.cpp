@@ -28,6 +28,8 @@
 #include "lv2_urid.h"
 
 #include <math.h>
+#include <QCloseEvent>
+#include <QHBoxLayout>
 #include <QWidget>
 
 #ifdef GTK2UI_SUPPORT
@@ -94,8 +96,8 @@ struct LV2World {
 
     LilvNode* stateInterface;
 
-    //LilvNode* unitSymbol;
-    //LilvNode* unitUnit;
+    LilvNode* unitSymbol;
+    LilvNode* unitUnit;
 
     LilvNode* uiGtk2;
     LilvNode* uiQt4;
@@ -132,8 +134,8 @@ void initLV2()
 
     lv2world->stateInterface = lilv_new_uri(lv2world->world, LV2_STATE_INTERFACE_URI);
 
-    //lv2world->unitSymbol = lilv_new_uri(lv2world->world, LV2_NS_UNITS "symbol");
-    //lv2world->unitUnit = lilv_new_uri(lv2world->world, LV2_NS_UNITS "unit");
+    lv2world->unitSymbol = lilv_new_uri(lv2world->world, LV2_NS_UNITS "symbol");
+    lv2world->unitUnit = lilv_new_uri(lv2world->world, LV2_NS_UNITS "unit");
 
     lv2world->uiGtk2 = lilv_new_uri(lv2world->world, LV2_NS_UI "GtkUI");
     lv2world->uiQt4  = lilv_new_uri(lv2world->world, LV2_NS_UI "Qt4UI");
@@ -433,6 +435,34 @@ static void oom_lv2_ui_write_function(LV2UI_Controller controller, uint32_t port
 
 // ---------------------------------------------------------------------
 
+class Lv2QWidget : public QWidget
+{
+public:
+    Lv2QWidget(Lv2Plugin* plugin) :
+        QWidget(),
+        m_plugin(plugin)
+    {
+        setAttribute(Qt::WA_DeleteOnClose, false);
+        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+        setWindowIcon(*oomIcon);
+    }
+
+protected:
+    virtual void closeEvent(QCloseEvent* event)
+    {
+        if (m_plugin)
+            m_plugin->showNativeGui(false);
+        //    m_plugin->closeNativeGui(true);
+        //QWidget::closeEvent(event);
+        event->ignore();
+    }
+
+private:
+    Lv2Plugin* m_plugin;
+};
+
+// ---------------------------------------------------------------------
+
 Lv2Plugin::Lv2Plugin()
     : BasePlugin()
 {
@@ -469,9 +499,12 @@ Lv2Plugin::~Lv2Plugin()
     // close UI
     if (m_hints & PLUGIN_HAS_NATIVE_GUI)
     {
+        if (ui.type == UI_EXTERNAL && ui.widget)
+            LV2_EXTERNAL_UI_HIDE((lv2_external_ui*)ui.widget);
+
         if (ui.handle && ui.descriptor && ui.descriptor->cleanup)
             ui.descriptor->cleanup(ui.handle);
-        
+
         ui.handle = 0;
         ui.descriptor = 0;
 
@@ -483,9 +516,10 @@ Lv2Plugin::~Lv2Plugin()
                 gtk_widget_destroy((GtkWidget*)ui.nativeWidget);
             break;
 #endif
+        case UI_QT4:
         case UI_X11:
             if (ui.nativeWidget)
-                delete (QWidget*)ui.nativeWidget;
+                delete (Lv2QWidget*)ui.nativeWidget;
             break;
         case UI_EXTERNAL:
             // nothing to do
@@ -493,7 +527,7 @@ Lv2Plugin::~Lv2Plugin()
         default:
             break;
         }
-        
+
         ui.type = UI_NONE;
         ui.visible = false;
         ui.width = 0;
@@ -873,10 +907,10 @@ bool Lv2Plugin::init(QString filename, QString label)
 
                                         if (ui.descriptor)
                                         {
-                                            // Create base widget for X11 UI parent
-                                            if (ui.type == UI_X11)
-                                                ui.nativeWidget = new QWidget();
-                                            
+                                            // Create base widget for UI parent
+                                            if (ui.type == UI_QT4 || ui.type == UI_X11)
+                                                ui.nativeWidget = new Lv2QWidget(this);
+
                                             QString title;
                                             title += "OOMidi: ";
                                             title += m_name;
@@ -1315,15 +1349,39 @@ QString Lv2Plugin::getParameterName(uint32_t index)
 
 QString Lv2Plugin::getParameterUnit(uint32_t index)
 {
+    QString paramUnit;
+
     if (lplug && index < m_paramCount)
     {
-        //const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
-        return QString("");
-        // TODO
-        //return QString(lilv_node_as_string(lilv_port_get_classes(lplug, port)));
+        const LilvPort* port = lilv_plugin_get_port_by_index(lplug, m_params[index].rindex);
+
+        // Try to find unit symbol
+        LilvNodes* symbols = lilv_port_get_value(lplug, port, lv2world->unitSymbol);
+        if (lilv_nodes_size(symbols) > 0)
+        {
+            paramUnit = QString(lilv_node_as_string(lilv_nodes_get(symbols, lilv_nodes_begin(symbols))));
+        }
+        lilv_nodes_free(symbols);
+
+        if (paramUnit.isEmpty())
+        {
+            // Unit symbol not found, try to find unit [unit]
+            LilvNodes* units = lilv_port_get_value(lplug, port, lv2world->unitUnit);
+            if (lilv_nodes_size(units) > 0)
+            {
+                paramUnit = QString(lilv_node_as_string(lilv_nodes_get(units, lilv_nodes_begin(units)))).replace(LV2_NS_UNITS, "");
+                
+                // properly set some units
+                if (paramUnit == "db")
+                    paramUnit = QString("dB");
+                else if (paramUnit == "hz")
+                    paramUnit = QString("Hz");
+            }
+            lilv_nodes_free(units);
+        }
     }
-    else
-        return QString("");
+
+    return paramUnit;
 }
 
 void Lv2Plugin::setNativeParameterValue(uint32_t index, double value)
@@ -1416,7 +1474,7 @@ void Lv2Plugin::showNativeGui(bool yesno)
     {
         ui.handle = ui.descriptor->instantiate(ui.descriptor, m_filename.toUtf8().constData(), ui.bundlePath.toUtf8().constData(), oom_lv2_ui_write_function, this, &ui.widget, features);
 
-        if (ui.handle)
+        if (ui.handle && ui.widget)
         {
             QString title;
             title += "OOMidi: ";
@@ -1436,8 +1494,10 @@ void Lv2Plugin::showNativeGui(bool yesno)
                 GdkPixbuf* pixmap = gdk_pixbuf_new_from_xpm_data(oom_icon_xpm);
 
                 //gtk_window_set_resizable(GTK_WINDOW(hostWidget), 1);
-                gtk_window_set_title(GTK_WINDOW(hostWidget), title.toUtf8().constData());
                 gtk_window_set_icon(GTK_WINDOW(hostWidget), pixmap);
+                gtk_window_set_title(GTK_WINDOW(hostWidget), title.toUtf8().constData());
+                //gtk_window_set_keep_above();
+                
                 gtk_container_add(GTK_CONTAINER(hostWidget), pluginWidget);
                 g_signal_connect(G_OBJECT(hostWidget), "destroy", G_CALLBACK(oom_lv2_gtk_window_destroyed), this);
 
@@ -1449,20 +1509,21 @@ void Lv2Plugin::showNativeGui(bool yesno)
             }
             else if (ui.type == UI_QT4)
             {
+                QWidget* hostWidget   = (Lv2QWidget*)ui.nativeWidget;
                 QWidget* pluginWidget = (QWidget*)ui.widget;
                 pluginWidget->adjustSize();
-                pluginWidget->setAttribute(Qt::WA_DeleteOnClose);
-                pluginWidget->setWindowTitle(title);
-                pluginWidget->setWindowIcon(*oomIcon);
+                hostWidget->setLayout(new QHBoxLayout());
+                hostWidget->layout()->addWidget(pluginWidget);
+                hostWidget->layout()->setMargin(0);
+                hostWidget->setWindowTitle(title);
 
                 if (ui.width > 0 && ui.height > 0)
-                    pluginWidget->resize(ui.width, ui.height);
+                    hostWidget->resize(ui.width, ui.height);
             }
             else if (ui.type == UI_X11)
             {
-                QWidget* hostWidget = (QWidget*)ui.nativeWidget;
+                QWidget* hostWidget = (Lv2QWidget*)ui.nativeWidget;
                 hostWidget->setWindowTitle(title);
-                hostWidget->setWindowIcon(*oomIcon);
 
                 if (ui.width > 0 && ui.height > 0)
                     hostWidget->setFixedSize(ui.width, ui.height);
@@ -1473,6 +1534,10 @@ void Lv2Plugin::showNativeGui(bool yesno)
             // UI failed to initialize
             // fixme - is this enough?
             m_hints -= PLUGIN_HAS_NATIVE_GUI;
+            //if (ui.handle)
+            //    ui.descriptor->cleanup(ui.handle);  
+            ui.handle = 0;
+            ui.widget = 0;
             return;
         }
     }
@@ -1492,11 +1557,6 @@ void Lv2Plugin::showNativeGui(bool yesno)
         break;
 #endif
     case UI_QT4:
-        if (yesno)
-            ((QWidget*)ui.widget)->show();
-        else
-            ((QWidget*)ui.widget)->close();
-        break;
     case UI_X11:
         ((QWidget*)ui.nativeWidget)->setVisible(yesno);
         break;
@@ -1507,7 +1567,10 @@ void Lv2Plugin::showNativeGui(bool yesno)
             LV2_EXTERNAL_UI_RUN((lv2_external_ui*)ui.widget);
         }
         else
+        {
+            LV2_EXTERNAL_UI_HIDE((lv2_external_ui*)ui.widget);
             closeNativeGui();
+        }
         break;
     default:
         break;
@@ -1527,7 +1590,6 @@ bool Lv2Plugin::nativeGuiVisible()
             return ui.visible;
 #endif
         case UI_QT4:
-            return ((QWidget*)ui.widget)->isVisible();
         case UI_X11:
             if (ui.nativeWidget)
                 return ((QWidget*)ui.nativeWidget)->isVisible();
@@ -1557,12 +1619,6 @@ void Lv2Plugin::updateNativeGui()
             }
             break;
         case UI_QT4:
-            if (ui.widget)
-            {
-                if (ui.width > 0 && ui.height > 0)
-                    ((QWidget*)ui.widget)->resize(ui.width, ui.height);
-            }
-            break;
         case UI_X11:
             if (ui.nativeWidget)
             {
@@ -1607,20 +1663,28 @@ void Lv2Plugin::updateGuiPorts(bool onlyOutput)
 
 void Lv2Plugin::closeNativeGui(bool destroyed)
 {
-#ifdef GTK2UI_SUPPORT
-    if (ui.type == UI_GTK2 && destroyed == false)
+    // With Gtk, this may be called twice
+    if (ui.visible == false)
+        return;
+
+    if (ui.handle && ui.descriptor && ui.descriptor->cleanup)
     {
-        GtkWidget* hostWidget   = (GtkWidget*)ui.nativeWidget;
-        GtkWidget* pluginWidget = (GtkWidget*)ui.widget;
-        gtk_container_remove(GTK_CONTAINER(hostWidget), pluginWidget);
-        gtk_widget_destroy(hostWidget);
+        ui.visible = false;
+        ui.descriptor->cleanup(ui.handle);
+    }
+
+#ifdef GTK2UI_SUPPORT
+    if (ui.type == UI_GTK2 && ui.nativeWidget && destroyed == false)
+    {
+        //GtkWidget* hostWidget   = (GtkWidget*)ui.nativeWidget;
+        //GtkWidget* pluginWidget = (GtkWidget*)ui.widget;
+        //gtk_container_remove(GTK_CONTAINER(hostWidget), pluginWidget);
+        gtk_widget_destroy((GtkWidget*)ui.nativeWidget);
+        ui.nativeWidget = 0;
     }
 #endif
 
-    if (ui.handle && ui.descriptor && ui.descriptor->cleanup)
-        ui.descriptor->cleanup(ui.handle);
-
-    ui.handle = 0;
+    ui.handle  = 0;
     ui.visible = false;
 }
 

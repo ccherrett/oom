@@ -339,7 +339,7 @@ void OOMidi::seqStop()
     for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
     {
         MidiDevice* md = *i;
-        if (md && md->deviceType() == MidiDevice::SYNTH_MIDI)
+        if (md && md->isSynthPlugin())
             // can be safely closed even if not active
             md->close();
     }
