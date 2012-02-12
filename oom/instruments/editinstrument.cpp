@@ -63,7 +63,7 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 
 
 	m_panKnob = new Knob(this);
-	m_panKnob->setRange(double(-64), double(63), 1.0);
+	m_panKnob->setRange(-1.0, +1.0);
 	m_panKnob->setId(9);
 	m_panKnob->setKnobImage(QString(":images/knob_buss_new.png"));
 
@@ -73,7 +73,7 @@ EditInstrument::EditInstrument(QWidget* parent, Qt::WFlags fl)
 	m_panKnob->setEnabled(true);
 	m_panKnob->setIgnoreWheel(true);
 	
-	m_panLabel = new DoubleLabel(0.0, double(-64), double(60), this);
+	m_panLabel = new DoubleLabel(0, -1.0, +1.0, this);
 	m_panLabel->setSlider(m_panKnob);
 	m_panLabel->setFont(config.fonts[1]);
 	m_panLabel->setBackgroundRole(QPalette::Mid);

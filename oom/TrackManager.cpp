@@ -1428,15 +1428,42 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		qint64 verb = song->oomVerbId();
 		if(verb)
 		{
+			double auxval = vtrack->instrumentVerb, panval = vtrack->instrumentPan, aux;
+			if (auxval <= config.minSlider)
+			{
+				aux = 0.0;
+			}
+			else
+				aux = pow(10.0, auxval / 20.0);
+
 			if(vtrack->useBuss && buss)
 			{
-				((AudioTrack*)buss)->setPan(vtrack->instrumentPan);
-				((AudioTrack*)buss)->setAuxSend(verb, vtrack->instrumentVerb);
+				//Setup reverb value
+				audio->msgSetAux((AudioTrack*) buss, verb, aux);
+				song->update(SC_AUX);
+
+				//Setup Pan value
+				AutomationType at = ((AudioTrack*) buss)->automationType();
+				if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+					buss->enablePanController(false);
+
+				qDebug("TrackManager::createMonitorInputTracks: pan: %ld, verb: %ld", aux, panval);
+				audio->msgSetPan(((AudioTrack*) buss), panval);
+				((AudioTrack*) buss)->recordAutomation(AC_PAN, panval);
 			}
 			else if(!vtrack->useBuss && input)
 			{
-				((AudioTrack*)input)->setPan(vtrack->instrumentPan);
-				((AudioTrack*)input)->setAuxSend(verb, vtrack->instrumentVerb);
+				//Setup reverb value
+				audio->msgSetAux((AudioTrack*) input, verb, aux);
+				song->update(SC_AUX);
+
+				//Setup Pan value
+				AutomationType at = ((AudioTrack*) input)->automationType();
+				if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+					input->enablePanController(false);
+
+				audio->msgSetPan(((AudioTrack*) input), panval);
+				((AudioTrack*) input)->recordAutomation(AC_PAN, panval);
 			}
 		}
 

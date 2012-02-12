@@ -19,7 +19,7 @@
 class QShowEvent;
 class QSize;
 class Knob;
-//class SynthPluginDevice;
+class DoubleLabel;
 
 class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	Q_OBJECT
@@ -50,7 +50,9 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	VirtualTrack *m_vtrack;
 
 	Knob* m_panKnob;
+	DoubleLabel* m_panLabel;
 	Knob* m_auxKnob;
+	DoubleLabel* m_auxLabel;
     
 	//SynthPluginDevice *m_lastSynth;
 

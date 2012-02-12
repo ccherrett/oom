@@ -96,7 +96,7 @@ void CreateTrackDialog::initDefaults()
 	cmbType->setCurrentIndex(row);
 
 	m_panKnob = new Knob(this);/*{{{*/
-	m_panKnob->setRange(double(-64), double(63), 1.0);
+	m_panKnob->setRange(-1.0, +1.0);
 	m_panKnob->setId(9);
 	m_panKnob->setKnobImage(QString(":images/knob_buss_new.png"));
 
@@ -106,22 +106,22 @@ void CreateTrackDialog::initDefaults()
 	m_panKnob->setEnabled(true);
 	m_panKnob->setIgnoreWheel(true);
 	
-	DoubleLabel* panLabel = new DoubleLabel(0.0, double(-64), double(60), this);
-	panLabel->setSlider(m_panKnob);
-	panLabel->setFont(config.fonts[1]);
-	panLabel->setBackgroundRole(QPalette::Mid);
-	panLabel->setFrame(true);
-	panLabel->setAlignment(Qt::AlignCenter);
-	panLabel->setPrecision(2);
-	panLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+	m_panLabel = new DoubleLabel(0, -1.0, +1.0, this);
+	m_panLabel->setSlider(m_panKnob);
+	m_panLabel->setFont(config.fonts[1]);
+	m_panLabel->setBackgroundRole(QPalette::Mid);
+	m_panLabel->setFrame(true);
+	m_panLabel->setAlignment(Qt::AlignCenter);
+	m_panLabel->setPrecision(2);
+	m_panLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
-	connect(m_panKnob, SIGNAL(valueChanged(double, int)), panLabel, SLOT(setValue(double)));
-	connect(panLabel, SIGNAL(valueChanged(double, int)), m_panKnob, SLOT(setValue(double)));
+	connect(m_panKnob, SIGNAL(valueChanged(double, int)), m_panLabel, SLOT(setValue(double)));
+	connect(m_panLabel, SIGNAL(valueChanged(double, int)), m_panKnob, SLOT(setValue(double)));
 	QLabel *pl = new QLabel(tr("Pan"));
 	pl->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
 
 	panBox->addWidget(m_panKnob);
-	panBox->addWidget(panLabel);
+	panBox->addWidget(m_panLabel);
 	panBox->addWidget(pl);
 
 
@@ -133,23 +133,22 @@ void CreateTrackDialog::initDefaults()
 	m_auxKnob->setToolTip(tr("Reverb Sends level"));
 	m_auxKnob->setBackgroundRole(QPalette::Mid);
 
-	DoubleLabel* auxLabel = new DoubleLabel(0.0, config.minSlider, 10.1, this);
+	m_auxLabel = new DoubleLabel(0.0, config.minSlider, 10.1, this);
+	m_auxLabel->setSlider(m_auxKnob);
+	m_auxLabel->setFont(config.fonts[1]);
+	m_auxLabel->setBackgroundRole(QPalette::Mid);
+	m_auxLabel->setFrame(true);
+	m_auxLabel->setAlignment(Qt::AlignCenter);
+	m_auxLabel->setPrecision(0);
+	m_auxLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
-	auxLabel->setSlider(m_auxKnob);
-	auxLabel->setFont(config.fonts[1]);
-	auxLabel->setBackgroundRole(QPalette::Mid);
-	auxLabel->setFrame(true);
-	auxLabel->setAlignment(Qt::AlignCenter);
-	auxLabel->setPrecision(0);
-	auxLabel->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-
-	connect(m_auxKnob, SIGNAL(valueChanged(double, int)), auxLabel, SLOT(setValue(double)));
-	connect(auxLabel, SIGNAL(valueChanged(double, int)), m_auxKnob, SLOT(setValue(double)));
+	connect(m_auxKnob, SIGNAL(valueChanged(double, int)), m_auxLabel, SLOT(setValue(double)));
+	connect(m_auxLabel, SIGNAL(valueChanged(double, int)), m_auxKnob, SLOT(setValue(double)));
 	QLabel *al = new QLabel(tr("Verb"));
 	al->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
 
 	auxBox->addWidget(m_auxKnob);
-	auxBox->addWidget(auxLabel);
+	auxBox->addWidget(m_auxLabel);
 	auxBox->addWidget(al);/*}}}*/
 
 	connect(chkInput, SIGNAL(toggled(bool)), this, SLOT(updateInputSelected(bool)));
@@ -476,9 +475,11 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 					{
 						m_panKnob->blockSignals(true);
 						m_panKnob->setValue((*i)->defaultPan());
+						m_panLabel->setValue((*i)->defaultPan());
 						m_panKnob->blockSignals(false);
 						m_auxKnob->blockSignals(true);
 						m_auxKnob->setValue((*i)->defaultVerb());
+						m_auxLabel->setValue((*i)->defaultVerb());
 						m_auxKnob->blockSignals(false);
 						if(m_instrumentLoaded)
 						{//unload the last one
