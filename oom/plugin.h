@@ -18,7 +18,7 @@
 #include "mididev.h"
 #include "instruments/minstrument.h"
 
-#ifndef __WINDOWS__
+#ifdef __linux__
 #undef __cdecl
 #define __cdecl
 #endif

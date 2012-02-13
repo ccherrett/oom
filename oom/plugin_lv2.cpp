@@ -499,7 +499,8 @@ Lv2Plugin::~Lv2Plugin()
     // close UI
     if (m_hints & PLUGIN_HAS_NATIVE_GUI)
     {
-        if (ui.type == UI_EXTERNAL && ui.widget)
+        // Some UIs don't close on cleanup, fix it
+        if (ui.type == UI_EXTERNAL && ui.handle && ui.widget && ui.visible)
             LV2_EXTERNAL_UI_HIDE((lv2_external_ui*)ui.widget);
 
         if (ui.handle && ui.descriptor && ui.descriptor->cleanup)
