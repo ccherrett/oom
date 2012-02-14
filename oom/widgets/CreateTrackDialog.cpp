@@ -201,8 +201,9 @@ void CreateTrackDialog::addTrack()/*{{{*/
 						m_vtrack->instrumentType = instrumentType;
 						m_vtrack->instrumentName = instrumentName;
 
-                        m_vtrack->useOutput = true;
                         m_vtrack->createMidiOutputDevice = false;
+                        m_vtrack->outputChannel = 0;
+                        m_vtrack->useOutput = true;
                         m_vtrack->useMonitor = true;
                         break;
                     }
