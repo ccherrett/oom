@@ -1192,10 +1192,6 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 										if(lsClient->createInstrumentChannel(vtrack->name.toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
 										{
 											qDebug("Created Channel for track");
-											/*QString prefix("LinuxSampler:");
-											QString postfix("-audio");
-											QString audio(QString(prefix).append(trackName).append(postfix));
-											QString midi(QString(prefix).append(trackName));*/
 										}
 										else
 										{

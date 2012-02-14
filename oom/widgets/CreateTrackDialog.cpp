@@ -214,15 +214,16 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			if(inputIndex >= 0 && chkInput->isChecked())
 			{
 				m_vtrack->useInput = true;
+				int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
 				if(inputIndex == 0)
 				{
 					m_vtrack->useGlobalInputs = true;
+					m_vtrack->inputChannel = chanbit;
 				}
 				else
 				{
 					QString devname = cmbInput->itemText(inputIndex);
 					int inDevType = cmbInput->itemData(inputIndex).toInt();
-					int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
 					if(m_currentMidiInputList.isEmpty())
 					{
 						m_createMidiInputDevice = true;

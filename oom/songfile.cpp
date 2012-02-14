@@ -13,9 +13,9 @@
 #include "song.h"
 #include "Composer.h"
 #include "cobject.h"
-//#include "drumedit.h"
 #include "Performer.h"
 #include "globals.h"
+#include "gconfig.h"
 #include "xml.h"
 #include "drummap.h"
 #include "event.h"
@@ -29,6 +29,7 @@
 #include "conf.h"
 #include "driver/jackmidi.h"
 #include "trackview.h"
+#include "instruments/minstrument.h"
 
 //---------------------------------------------------------
 //   ClonePart
@@ -117,7 +118,7 @@ void Scale::read(Xml& xml)
 //   readXmlPart
 //---------------------------------------------------------
 
-Part* readXmlPart(Xml& xml, Track* track, bool doClone, bool toTrack)
+Part* readXmlPart(Xml& xml, Track* track, bool doClone, bool toTrack)/*{{{*/
 {
 	int id = -1;
 	Part* npart = 0;
@@ -374,7 +375,7 @@ Part* readXmlPart(Xml& xml, Track* track, bool doClone, bool toTrack)
 		}
 	}
 	return npart;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   Part::write
@@ -574,109 +575,6 @@ Part* OOMidi::readPart(Xml& xml)
 }
 
 //---------------------------------------------------------
-//   readCtrl
-//---------------------------------------------------------
-
-void OOMidi::readCtrl(Xml&, int /*prt*/, int /*channel*/)
-{
-}
-
-//---------------------------------------------------------
-//   readMidichannel
-//---------------------------------------------------------
-
-void OOMidi::readMidichannel(Xml& xml, int prt)
-{
-	int channel = 0;
-	//      MidiPort* port = &midiPorts[prt];
-
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return;
-			case Xml::TagStart:
-				if (tag == "pitch")
-				{
-					//TODO                              port->setCtrl(channel, 0, CTRL_PITCH, xml.parseInt());
-				}
-				else if (tag == "program")
-				{
-					//TODO                              port->setCtrl(channel, 0, CTRL_PROGRAM, xml.parseInt());
-				}
-				else if (tag == "ctrl")
-					readCtrl(xml, prt, channel);
-				else
-				{
-					xml.unknown("readMidichannel");
-				}
-				break;
-			case Xml::Attribut:
-				if (tag == "ch")
-				{
-					channel = xml.s2().toInt();
-				}
-				break;
-			case Xml::TagEnd:
-				if (tag == "midichannel")
-					return;
-			default:
-				break;
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   readMidiport
-//---------------------------------------------------------
-
-void OOMidi::readMidiport(Xml& xml)
-{
-	int port = 0;
-	qint64 portId = -1;
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-			case Xml::Error:
-			case Xml::End:
-				return;
-			case Xml::TagStart:
-				if (tag == "midichannel")
-					readMidichannel(xml, port);
-				else
-				{
-					xml.unknown("readMidiport");
-				}
-				break;
-			case Xml::Attribut:
-				if (tag == "port")
-				{
-					port = xml.s2().toInt();
-				}
-				else if(tag == "portId")
-				{
-					portId = xml.s2().toLongLong();
-				}
-				break;
-			case Xml::TagEnd:
-				if (tag == "midiport")
-				{
-					return;
-				}
-			default:
-				break;
-		}
-	}
-}
-
-//---------------------------------------------------------
 //   readMarker
 //---------------------------------------------------------
 
@@ -691,7 +589,7 @@ void Song::readMarker(Xml& xml)
 //   read
 //---------------------------------------------------------
 
-void Song::read(Xml& xml)
+void Song::read(Xml& xml)/*{{{*/
 {
 	cloneList.clear();
 	associatedRoute = "";
@@ -756,6 +654,49 @@ void Song::read(Xml& xml)
 					MidiTrack* track = new MidiTrack();
 					track->read(xml);
 					insertTrack(track, -1);
+					//Get the MidiPort that the track is connected to and restore the LS instruments
+					MidiPort* mp = oomMidiPorts[track->outPortId()];
+					if(mp)
+					{
+						MidiInstrument *ins = mp->instrument();
+						if(ins && ins->isOOMInstrument())
+						{//Load her up
+							if(!lsClient)
+							{
+								lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+								lsClientStarted = lsClient->startClient();
+								if(config.lsClientResetOnStart && lsClientStarted)
+								{
+									lsClient->resetSampler();
+								}
+							}
+							else if(!lsClientStarted)
+							{
+								lsClientStarted = lsClient->startClient();
+								if(config.lsClientResetOnStart && lsClientStarted)
+								{
+									lsClient->resetSampler();
+								}
+							}
+							if(lsClientStarted)
+							{
+								qDebug("Loading Instrument to LinuxSampler");
+								if(lsClient->loadInstrument(ins))
+								{
+									qDebug("Instrument Map Loaded");
+									int map = lsClient->findMidiMap(ins->iname().toUtf8().constData());
+									Patch* p = ins->getDefaultPatch();
+									if(p && map >= 0)
+									{
+										if(lsClient->createInstrumentChannel(track->name().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+										{
+											qDebug("Created Channel for track");
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 				else if (tag == "drumtrack")
 				{
@@ -874,7 +815,7 @@ void Song::read(Xml& xml)
 					}
 					if(!m_oomVerbId)
 					{//Create the default oom verb aux track if it dont exist
-						Track* t = addTrackByName("OOMidi Verb", Track::AUDIO_AUX, -1, true);
+						Track* t = addTrackByName("OOStudio Verb", Track::AUDIO_AUX, -1, true);
 						if(t)
 						{
 							m_oomVerbId = t->id();
@@ -893,7 +834,7 @@ void Song::read(Xml& xml)
 	// Since cloneList is also used for copy/paste operations,
 	//  clear the copy clone list again.
 	cloneList.clear();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   read
@@ -913,7 +854,7 @@ void OOMidi::read(Xml& xml, bool skipConfig)
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				if (skipmode && (tag == "oom" || tag == "muse"))
+				if (skipmode && tag == "oom")
 					skipmode = false;
 				else if (skipmode)
 					break;
@@ -926,14 +867,6 @@ void OOMidi::read(Xml& xml, bool skipConfig)
 				{
 					song->read(xml);
 					audio->msgUpdateSoloStates();
-				}
-				else if (tag == "midiport")
-					readMidiport(xml);
-				else if (tag == "Controller")
-				{ // obsolete
-					MidiController* ctrl = new MidiController;
-					ctrl->read(xml);
-					delete ctrl;
 				}
 				else if (tag == "mplugin")
 					readStatusMidiInputTransformPlugin(xml);
@@ -949,7 +882,7 @@ void OOMidi::read(Xml& xml, bool skipConfig)
 				}
 				break;
 			case Xml::TagEnd:
-				if (!skipmode && (tag == "oom" || tag == "muse"))
+				if (!skipmode && tag == "oom")
 					return;
 			default:
 				break;
@@ -995,41 +928,29 @@ void Song::write(int level, Xml& xml) const
 
 	//Write the aux tracks first so they can be loaded first, We need them for available configuring
 	//audio tracks later
-	QList<QString> added;
+	QList<qint64> added;
 	for (ciTrack i = _auxs.begin(); i != _auxs.end(); ++i)
 	{
 		(*i)->write(level, xml);
-		added.append((*i)->name());
+		added.append((*i)->id());
 	}
+	
 	// then write Composer visible tracks since the track view will maintain order for itself
 	for (ciTrack i = _artracks.begin(); i != _artracks.end(); ++i)
 	{
-		if(!added.contains((*i)->name()))
+		if(!added.contains((*i)->id()))
 		{
 			(*i)->write(level, xml);
-			added.append((*i)->name());
+			added.append((*i)->id());
 		}
 	}
 
+	//Write out any remaining tracks that are not view members
 	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
 	{
-		if(!added.contains((*i)->name()))
+		if(!added.contains((*i)->id()))
 			(*i)->write(level, xml);
 	}
-
-
-	// write the buss type tracks
-	/*for (ciTrack i = _inputs.begin(); i != _inputs.end(); ++i)
-		(*i)->write(level, xml);
-
-	for (ciTrack i = _outputs.begin(); i != _outputs.end(); ++i)
-		(*i)->write(level, xml);
-
-	for (ciTrack i = _groups.begin(); i != _groups.end(); ++i)
-		(*i)->write(level, xml);
-
-	for (ciTrack i = _auxs.begin(); i != _auxs.end(); ++i)
-		(*i)->write(level, xml);*/
 
 	// write track views
 	for (ciTrackView i = _tviews.begin(); i != _tviews.end(); ++i)
@@ -1037,7 +958,7 @@ void Song::write(int level, Xml& xml) const
 		(*i)->write(level, xml);
 	}
 
-	// write routing
+	// write track routing
 	for (ciTrack i = _tracks.begin(); i != _tracks.end(); ++i)
 	{
 		(*i)->writeRouting(level, xml);
@@ -1049,7 +970,7 @@ void Song::write(int level, Xml& xml) const
 		(*i)->writeRouting(level, xml);
 	}
 
-	// p3.3.49 Write midi port routing.
+	//Write midi port routing.
 	for (int i = 0; i < MIDI_PORTS; ++i)
 	{
 		midiPorts[i].writeRouting(level, xml);

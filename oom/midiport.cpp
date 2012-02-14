@@ -920,7 +920,7 @@ void MidiPort::writeRouting(int level, Xml& xml) const
 				s += QString(QT_TRANSLATE_NOOP("@default", " channelMask=\"%1\"")).arg(r->channel); // Use new channel mask.
 			xml.tag(level++, s.toLatin1().constData());
 
-			xml.tag(level, "source mport=\"%d\" mportId=\"%s\"/", portno(), QString::number(m_portId).toUtf8().constData());
+			xml.tag(level, "source mport=\"%d\" mportId=\"%lld\"/", portno(), m_portId);
 
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));

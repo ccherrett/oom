@@ -1106,13 +1106,7 @@ void Song::readRoute(Xml& xml)
 			case Xml::End:
 				return;
 			case Xml::TagStart:
-				// p3.3.38 2010/02/03 Support old routes in oom files. Now obsolete!
-				if (tag == "srcNode")
-					src = xml.parse1();
-				else if (tag == "dstNode")
-					dst = xml.parse1();
-					// Support new routes.
-				else if (tag == "source")
+				if (tag == "source")
 				{
 					sroute.read(xml);
 					sroute.channel = ch;
@@ -1150,14 +1144,7 @@ void Song::readRoute(Xml& xml)
 			case Xml::TagEnd:
 				if (xml.s1() == "Route")
 				{
-					// Support old routes in oom files. Now obsolete!
-					if (!src.isEmpty() && !dst.isEmpty())
-					{
-						Route s = name2route(src, false);
-						Route d = name2route(dst, true);
-						addRoute(s, d);
-					}
-					else if (sroute.isValid() && droute.isValid())// Support new routes.
+					if (sroute.isValid() && droute.isValid())// Support new routes.
 					{
 						// p3.3.49 Support pre- 1.1-RC2 midi-device-to-track routes. Obsolete. Replaced with midi port routes.
 						if (sroute.type == Route::MIDI_DEVICE_ROUTE && droute.type == Route::TRACK_ROUTE)

@@ -41,6 +41,7 @@
 #include "midiseq.h"
 #include "AudioMixer.h"
 #include "TrackManager.h"
+#include "utils.h"
 
 extern void writeMidiTransforms(int level, Xml& xml);
 extern void readMidiTransform(Xml&);
@@ -286,6 +287,7 @@ static void readConfigMidiPort(Xml& xml)/*{{{*/
 	int idx = 0;
 	qint64 id = -1;
 	QString device;
+	bool isGlobal = false;
 
 	QString instrument("GM");
 
@@ -313,7 +315,7 @@ static void readConfigMidiPort(Xml& xml)/*{{{*/
 				if (tag == "name")
                 {
 					device = xml.parse1();
-                    if (!dev)
+                    if (!dev)//Look for it as an alsa or already created device
                         dev = midiDevices.find(device);
 				}
 				else if (tag == "type")
@@ -382,18 +384,47 @@ static void readConfigMidiPort(Xml& xml)/*{{{*/
 				break;
 			case Xml::Attribut:
 				if (tag == "idx")
-				{
+				{//Check to see if this port is already used, and bump if so
 					idx = xml.s2().toInt();
+					int freePort = getFreeMidiPort();
+					if(freePort != idx)
+					{//Set a flag here so we know when loading tracks later that we are dealing with an old file or global inputs changed
+						idx = freePort;
+					}
 				}
 				else if(tag == "portId")
 				{//New style
 					id = xml.s2().toLongLong();
+					idx = getFreeMidiPort();
+				}
+				else if(tag == "isGlobalInput")
+				{//Find the matching input if posible and set our index to it
+					isGlobal = xml.s2().toInt();
 				}
 				break;
 			case Xml::TagEnd:
 				if (tag == "midiport")
 				{
-					//if (idx > MIDI_PORTS) {
+					if(isGlobal)
+					{//Find the global input that matches
+						//
+						if(gInputListPorts.size())
+						{
+							int myport = -1;
+							for(int i = 0; i < gInputListPorts.size(); ++i)
+							{
+								myport =  gInputListPorts.at(i);
+
+								MidiPort* inport = &midiPorts[i];
+								if(inport && inport->device() && inport->device()->name() == device)
+								{
+									idx = myport;
+									break;
+								}
+							}
+						}
+					}
+
 					if (idx < 0 || idx >= MIDI_PORTS)
 					{
 						fprintf(stderr, "bad midi port %d (>%d)\n",
@@ -418,7 +449,6 @@ static void readConfigMidiPort(Xml& xml)/*{{{*/
 						fprintf(stderr, "readConfigMidiPort: device not found %s\n", device.toLatin1().constData());
 
 					MidiPort* mp = &midiPorts[idx];
-					//FIXME: This is very bad to do but I have no choice for now until we make MidiPort read its own stuff
 					if(id)
 						mp->setPortId(id);
 
@@ -452,6 +482,7 @@ static void readConfigMidiPort(Xml& xml)/*{{{*/
 						midiSeq->msgSetMidiDevice(mp, dev);
 						dev->setCacheNRPN(cachenrpn);
 					}
+					oomMidiPorts.insert(mp->id(), mp);
 					return;
 				}
 			default:
@@ -525,6 +556,7 @@ static void loadConfigMetronom(Xml& xml)/*{{{*/
 
 static void readSeqConfiguration(Xml& xml)
 {
+	bool updatePorts = false;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -537,7 +569,10 @@ static void readSeqConfiguration(Xml& xml)
 				if (tag == "metronom")
 					loadConfigMetronom(xml);
 				else if (tag == "midiport")
+				{
+					updatePorts = true;
 					readConfigMidiPort(xml);
+				}
 				else if (tag == "rcStop")
 					rcStopNote = xml.parseInt();
 				else if (tag == "rcEnable")
@@ -554,6 +589,16 @@ static void readSeqConfiguration(Xml& xml)
 			case Xml::TagEnd:
 				if (tag == "sequencer")
 				{
+					//All Midiports have been read so put all the unconfigured ports in the id list
+					if(updatePorts)
+					{
+						for(int i = 0; i < MIDI_PORTS; ++i)
+						{
+							MidiPort *mp = &midiPorts[i];
+							if(!oomMidiPorts.contains(mp->id()))
+								oomMidiPorts.insert(mp->id(), mp);
+						}
+					}
 					return;
 				}
 			default:
@@ -1014,14 +1059,14 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)/*{{{*
 
 			// Route check by Tim. Port can now be used for routing even if no device.
 			// Also, check for other non-defaults and save port, to preserve settings even if no device.
+			// Dont write the config for the global inputs list they will be auto created with each startup
             if (mport->defaultInChannels() || mport->defaultOutChannels() ||
-                    (mport->instrument() && !mport->instrument()->iname().isEmpty() && mport->instrument()->iname() != "GM") ||
-                    !mport->syncInfo().isDefault())
+                    (mport->instrument() && !mport->instrument()->iname().isEmpty() && mport->instrument()->iname() != "GM") || !mport->syncInfo().isDefault() )
             {
 				used = true;
             }
 			else
-			{
+			{//Put the ID of this track into a list 
 				MidiTrackList* tl = song->midis();
 				for (iMidiTrack it = tl->begin(); it != tl->end(); ++it)
 				{
@@ -1037,15 +1082,15 @@ static void writeSeqConfiguration(int level, Xml& xml, bool writePortInfo)/*{{{*
 			MidiDevice* dev = mport->device();
 			if (!used && !dev)
 				continue;
-			xml.tag(level++, "midiport idx=\"%d\" portId=\"%s\"", i, QString::number(mport->id()).toUtf8().constData());
+			bool isGlobal = gInputListPorts.contains(mport->portno());
+			xml.tag(level++, "midiport portId=\"%lld\" isGlobalInput=\"%d\"", mport->id(), isGlobal);
 
 			if (mport->defaultInChannels())
 				xml.intTag(level, "defaultInChans", mport->defaultInChannels());
 			if (mport->defaultOutChannels())
 				xml.intTag(level, "defaultOutChans", mport->defaultOutChannels());
 
-			if (/*isSynth == false &&*/
-                    mport->instrument() && !mport->instrument()->iname().isEmpty() && // Tim.
+			if (mport->instrument() && !mport->instrument()->iname().isEmpty() &&
 					(mport->instrument()->iname() != "GM")) // FIXME: TODO: Make this user configurable.
             {
 				xml.strTag(level, "instrument", mport->instrument()->iname());

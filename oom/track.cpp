@@ -685,6 +685,7 @@ void MidiTrack::setOutPortId(qint64 i)
     if (oomMidiPorts.contains(i))
 	{
 		MidiPort* mp = oomMidiPorts.value(i);
+		_outPort = mp->portno();
 		_wantsAutomation = (mp->device() && mp->device()->isSynthPlugin());
         if (_wantsAutomation)
             ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
@@ -734,6 +735,7 @@ void MidiTrack::setOutPortIdAndUpdate(qint64 i)/*{{{*/
     if (oomMidiPorts.contains(i))
 	{
 		MidiPort* mp = oomMidiPorts.value(i);
+		_outPort = mp->portno();
 		_wantsAutomation = (mp->device() && mp->device()->isSynthPlugin());
 	}
 
@@ -1120,8 +1122,21 @@ void MidiTrack::write(int level, Xml& xml) const/*{{{*/
 	xml.tag(level++, tag);
 	Track::writeProperties(level, xml);
 
-	xml.intTag(level, "device", outPort());
-	xml.intTag(level, "deviceId", outPortId());
+	//Make sure we have the proper id but using the id of the port currently set
+	MidiPort* mp = &midiPorts[outPort()];
+	if(mp)
+	{ 	
+		if(mp->id() == outPortId())
+			xml.qint64Tag(level, "deviceId", outPortId());
+		else
+		{
+			xml.qint64Tag(level, "deviceId", mp->id());
+		}
+	}
+	/*else
+	{//Its probably unconfgured just use the index
+		xml.intTag(level, "device", outPort());
+	}*/
 	xml.intTag(level, "channel", outChannel());
 	xml.intTag(level, "locked", _locked);
 	xml.intTag(level, "echo", _recEcho);
@@ -1199,7 +1214,9 @@ void MidiTrack::read(Xml& xml)/*{{{*/
 						parts()->add(p);
 				}
 				else if (tag == "device")
+				{//Check if global inputs has bumped the port order and increment
 					setOutPort(xml.parseInt());
+				}
 				else if (tag == "deviceId")
 					setOutPortId(xml.parseLongLong());
 				else if (tag == "channel")
