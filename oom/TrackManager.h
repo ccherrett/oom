@@ -12,6 +12,7 @@
 #include <QPair>
 
 class Xml;
+class Track;
 
 struct VirtualTrack {
 
@@ -53,6 +54,8 @@ class TrackManager : public QObject{
 
 	int m_midiInPort;
 	int m_midiOutPort;
+
+	Track* m_track;
 	
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;

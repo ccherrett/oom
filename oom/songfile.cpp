@@ -814,8 +814,8 @@ void Song::read(Xml& xml)/*{{{*/
 						updateAuxIndex();
 					}
 					if(!m_oomVerbId)
-					{//Create the default oom verb aux track if it dont exist
-						Track* t = addTrackByName("OOStudio Verb", Track::AUDIO_AUX, -1, true);
+					{//Create the default oom verb aux track if it dont exist, no undo
+						Track* t = addTrackByName("OOStudio Verb", Track::AUDIO_AUX, -1, false, true);
 						if(t)
 						{
 							m_oomVerbId = t->id();

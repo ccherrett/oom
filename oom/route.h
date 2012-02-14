@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include <Qt>
+#include <QList>
 
 #include "globaldefs.h"
 
@@ -41,6 +42,7 @@ struct Route
 
     int midiPort; // p3.3.49 Midi port number. Best not to put this in the union to avoid problems?
 	qint64 midiPortId;
+	qint64 trackId;
 
     // Starting source channel (of the owner of this route). Normally zero for mono or stereo tracks, higher for multi-channel tracks.
     // NOTICE: channel is now a bit-wise channel mask, for MidiPort <-> MidiTrack routes.
@@ -59,6 +61,7 @@ struct Route
 
     Route(void* t, int ch = -1);
     Route(Track* t, int ch = -1, int chans = -1);
+	Route(qint64 tid, int ch = -1, int chans = -1);
     Route(MidiDevice* d, int ch);
     Route(int port, int ch);
     Route(qint64 port, int ch);
@@ -70,9 +73,9 @@ struct Route
 
     bool isValid() const
     {
-        return ((type == TRACK_ROUTE) && (track != 0)) || ((type == JACK_ROUTE) && (jackPort != 0)) ||
+        return ((type == TRACK_ROUTE) && (trackId > 0)) || ((type == JACK_ROUTE) && (jackPort != 0)) ||
                 ((type == MIDI_DEVICE_ROUTE) && (device != 0)) ||
-                ((type == MIDI_PORT_ROUTE) && (midiPort >= 0) && (midiPort < MIDI_PORTS)); // p3.3.49
+                ((type == MIDI_PORT_ROUTE) && (midiPortId > 0)/* && (midiPort < MIDI_PORTS)*/); // p3.3.49
     }
     void read(Xml & xml);
     void dump() const;
@@ -83,7 +86,8 @@ struct Route
 //   RouteList
 //---------------------------------------------------------
 
-struct RouteList : public std::vector<Route>
+//struct RouteList : public std::vector<Route>
+struct RouteList : public QList<Route>
 {
     void removeRoute(const Route & r);
 };

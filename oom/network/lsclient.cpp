@@ -704,7 +704,8 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 	bool rv = false;
 	if(_client != NULL)
 	{
-		qDebug("LSClient::createInstrumentChannel: name: %s, engine: %s,  filename: %s, map: %d", name, engine, filename, map);
+		qDebug("LSClient::createInstrumentChannel: name: %s, engine: %s,  filename: %s, map: %d", 
+				name, engine, QString(filename).replace(QString(SOUND_PATH), SOUNDS_DIR).toUtf8().constData(), map);
 		//configure audio device port for instrument
 		//Find the first unconfigure channels and use them
 		char midiPortName[strlen(name)+1];

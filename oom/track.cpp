@@ -1055,10 +1055,14 @@ void Track::writeRouting(int level, Xml& xml) const/*{{{*/
 				s = QT_TRANSLATE_NOOP("@default", "source");
 				if (r->type != Route::TRACK_ROUTE)
 					s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
+				else
+				{
+					s += QString(QT_TRANSLATE_NOOP("@default", " trackId=\"%1\"")).arg(r->track->id());
+				}
 				s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 				xml.tag(level, s.toAscii().constData());
 
-				xml.tag(level, "dest name=\"%s\"/", Xml::xmlString(name()).toLatin1().constData());
+				xml.tag(level, "dest name=\"%s\" trackId=\"%lld\"/", Xml::xmlString(name()).toLatin1().constData(), m_id);
 
                 xml.etag(--level, "Route");
 			}
@@ -1088,14 +1092,16 @@ void Track::writeRouting(int level, Xml& xml) const/*{{{*/
 
 			xml.tag(level++, s.toAscii().constData());
 
-			xml.tag(level, "source name=\"%s\"/", Xml::xmlString(name()).toLatin1().constData());
+			xml.tag(level, "source name=\"%s\" trackId=\"%lld\"/", Xml::xmlString(name()).toLatin1().constData(), m_id);
 
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 
 			if (r->type != Route::TRACK_ROUTE && r->type != Route::MIDI_PORT_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
+			else if(r->type == Route::TRACK_ROUTE)
+				s += QString(QT_TRANSLATE_NOOP("@default", " trackId=\"%1\"")).arg(r->track->id());
 
-			if (r->type == Route::MIDI_PORT_ROUTE) // p3.3.49
+			if (r->type == Route::MIDI_PORT_ROUTE) 
 				s += QString(QT_TRANSLATE_NOOP("@default", " mport=\"%1\"/")).arg(r->midiPort);
 			else
 				s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));

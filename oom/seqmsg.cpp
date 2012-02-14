@@ -692,7 +692,7 @@ void Song::msgInsertTrack(Track* track, int idx, bool doUndoFlag)
 
 void Audio::msgRemoveTrack(Track* track, bool doUndoFlag)
 {
-	if(track && track->name() == "Master")
+	if(track->id() == song->masterId() || track->id() == song->oomVerbId())
 		return;
 	AudioMsg msg;
 	msg.id = SEQM_REMOVE_TRACK;
@@ -715,7 +715,7 @@ void Audio::msgRemoveTracks()
 		for (iTrack t = tl->begin(); t != tl->end(); ++t)
 		{
 			Track* tr = *t;
-			if (tr->selected() && tr->name() != "Master")
+			if(tr->selected() && (tr->id() != song->masterId() || tr->id() == song->oomVerbId()))
 			{
 				song->removeTrack1(tr);
 				msgRemoveTrack(tr, false);

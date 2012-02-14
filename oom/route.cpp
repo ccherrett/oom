@@ -36,6 +36,7 @@ Route::Route(void* t, int ch)
 	midiPort = -1;
 	channel = ch;
 	channels = -1;
+	trackId = -1;
 	remoteChannel = -1;
 	type = JACK_ROUTE;
 }
@@ -44,6 +45,19 @@ Route::Route(void* t, int ch)
 Route::Route(Track* t, int ch, int chans)
 {
 	track = t;
+	if(t)
+		trackId = t->id();
+	midiPort = -1;
+	channel = ch;
+	channels = chans;
+	remoteChannel = -1;
+	type = TRACK_ROUTE;
+}
+
+Route::Route(qint64 t, int ch, int chans)
+{
+	track = song->findTrackById(t);
+	trackId = t;
 	midiPort = -1;
 	channel = ch;
 	channels = chans;
@@ -56,6 +70,7 @@ Route::Route(MidiDevice* d, int ch)
 {
 	device = d;
 	midiPort = -1;
+	trackId = -1;
 	channel = ch;
 	channels = -1;
 	remoteChannel = -1;
@@ -71,13 +86,21 @@ Route::Route(int port, int ch)
 	channels = -1;
 	remoteChannel = -1;
 	type = MIDI_PORT_ROUTE;
+	trackId = -1;
+	if(midiPort >= 0 && midiPort < MIDI_PORTS)
+	{
+		MidiPort* mp = &midiPorts[midiPort];
+		midiPortId = mp->id();
+	}
 }
 
 Route::Route(qint64 port, int ch)
 {
 	track = 0;
+	trackId = -1;
 	midiPortId = port;
-	midiPort = -1;
+	if(oomMidiPorts.contains(port))
+		midiPort = oomMidiPorts.value(port)->portno();
 	channel = ch;
 	channels = -1;
 	remoteChannel = -1;
@@ -88,6 +111,9 @@ Route::Route(qint64 port, int ch)
 //Used mostly for restoring routes from the xml file
 Route::Route(const QString& s, bool dst, int ch, int rtype)
 {
+	trackId = -1;
+	midiPort = -1;
+	midiPortId = -1;
 	Route node(name2route(s, dst, rtype));
 	channel = node.channel;
 	if (channel == -1)
@@ -98,22 +124,26 @@ Route::Route(const QString& s, bool dst, int ch, int rtype)
 	if (type == TRACK_ROUTE)
 	{
 		track = node.track;
-		midiPort = -1;
+		if(track)
+			trackId = track->id();
 	}
 	else if (type == JACK_ROUTE)
 	{
 		jackPort = node.jackPort;
-		midiPort = -1;
 	}
 	else if (type == MIDI_DEVICE_ROUTE)
 	{
 		device = node.device;
-		midiPort = -1;
 	}
 	else if (type == MIDI_PORT_ROUTE)
 	{
 		track = 0;
 		midiPort = node.midiPort;
+		if(midiPort >= 0 && midiPort < MIDI_PORTS)
+		{
+			MidiPort* mp = &midiPorts[midiPort];
+			midiPortId = mp->id();
+		}
 	}
 }
 
@@ -122,6 +152,7 @@ Route::Route(const QString& s, bool dst, int ch, int rtype)
 Route::Route()
 {
 	track = 0;
+	trackId = -1;
 	midiPort = -1;
 	channel = -1;
 	channels = -1;
@@ -133,7 +164,7 @@ Route::Route()
 //   addRoute
 //---------------------------------------------------------
 
-void addRoute(Route src, Route dst)
+void addRoute(Route src, Route dst)/*{{{*/
 {
 //TODO: Add hooks to update the patchcanvas on success
 //This should be conditionally checked so we dont update if the canvas is what made the connection
@@ -433,13 +464,13 @@ void addRoute(Route src, Route dst)
 				inRoutes->insert(inRoutes->begin(), src);
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   removeRoute
 //---------------------------------------------------------
 
-void removeRoute(Route src, Route dst)
+void removeRoute(Route src, Route dst)/*{{{*/
 {
 //TODO: Add hooks to update the patchcanvas on success
 //This should be conditionally checked so we dont update if the canvas is what made the connection
@@ -668,7 +699,7 @@ void removeRoute(Route src, Route dst)
 		else
 			printf("removeRoute: source is track but destination invalid\n");
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   removeAllRoutes
@@ -680,9 +711,7 @@ void removeRoute(Route src, Route dst)
 //   So far it only works with MidiDevice <-> Jack.
 //---------------------------------------------------------
 
-// p3.3.55
-
-void removeAllRoutes(Route src, Route dst)
+void removeAllRoutes(Route src, Route dst)/*{{{*/
 {
 	if (src.isValid())
 	{
@@ -699,7 +728,7 @@ void removeAllRoutes(Route src, Route dst)
 		else
 			printf("removeAllRoutes: dest is not midi device\n");
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   track2name
@@ -718,7 +747,7 @@ static QString track2name(const Track* n)
 //    create string name representation for audio node
 //---------------------------------------------------------
 
-QString Route::name() const
+QString Route::name() const/*{{{*/
 {
 	if (type == MIDI_DEVICE_ROUTE)
 	{
@@ -733,25 +762,22 @@ QString Route::name() const
 		if (!checkAudioDevice()) return "";
 		return audioDevice->portName(jackPort);
 	}
-	else if (type == MIDI_PORT_ROUTE) // p3.3.49
+	else if (type == MIDI_PORT_ROUTE)
 	{
 		return ROUTE_MIDIPORT_NAME_PREFIX + QString().setNum(midiPort);
 	}
 	else
 		return track2name(track);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   name2route
 //---------------------------------------------------------
 
-//Route name2route(const QString& rn, bool dst)
-
-Route name2route(const QString& rn, bool /*dst*/, int rtype)
+Route name2route(const QString& rn, bool /*dst*/, int rtype)/*{{{*/
 {
 	// printf("name2route %s\n", rn.toLatin1().constData());
 	int channel = -1;
-	//int channel = 0;
 	QString s(rn);
 	// Support old route style in oom files. Obsolete.
 	if (rn.size() >= 2 && rn[0].isNumber() && rn[1] == ':')
@@ -853,14 +879,14 @@ Route name2route(const QString& rn, bool /*dst*/, int rtype)
 
 	printf("  name2route: <%s> not found\n", rn.toLatin1().constData());
 	return Route((Track*) 0, channel);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   checkRoute
 //    return true if route is valid
 //---------------------------------------------------------
 
-bool checkRoute(const QString& s, const QString& d)
+bool checkRoute(const QString& s, const QString& d)/*{{{*/
 {
 	Route src(s, false, -1);
 	Route dst(d, true, -1);
@@ -957,13 +983,13 @@ bool checkRoute(const QString& s, const QString& d)
 		}
 	}
 	return true;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   read
 //---------------------------------------------------------
 
-void Route::read(Xml& xml)
+void Route::read(Xml& xml)/*{{{*/
 {
 	QString s;
 	int dtype = MidiDevice::ALSA_MIDI;
@@ -992,6 +1018,11 @@ void Route::read(Xml& xml)
 				}
 				else if (tag == "name")
 					s = xml.s2();
+				else if(tag == "trackId")
+				{
+					trackId = xml.s2().toLongLong();
+					rtype = Route::TRACK_ROUTE;
+				}
 				else if (tag == "mport") // p3.3.49
 				{
 					port = xml.s2().toInt();
@@ -1000,6 +1031,7 @@ void Route::read(Xml& xml)
 				else if(tag == "mportId")
 				{
 					midiPortId  = xml.s2().toLongLong();
+					rtype = Route::MIDI_PORT_ROUTE;
 				}
 				else
 					printf("Route::read(): unknown attribute:%s\n", tag.toLatin1().constData());
@@ -1008,12 +1040,25 @@ void Route::read(Xml& xml)
 #ifdef ROUTE_DEBUG
 				printf("Route::read(): tag end type:%d channel:%d name:%s\n", rtype, channel, s.toLatin1().constData());
 #endif
-				if (rtype == MIDI_PORT_ROUTE) // p3.3.49
+				if (rtype == MIDI_PORT_ROUTE)
 				{
-					if (port >= 0 && port < MIDI_PORTS)
+					if(midiPortId > 0)
+					{
+						qDebug("Route::read(): MIDI_PORT_ROUTE Finding midiport from id");
+						type = rtype;
+						MidiPort *mp = oomMidiPorts.value(midiPortId);
+						if(mp)
+						{
+							midiPort = mp->portno();
+							qDebug("Route::read(): Found midiport from id: %d", midiPort);
+						}
+					}
+					else if (port >= 0 && port < MIDI_PORTS)
 					{
 						type = rtype;
 						midiPort = port;
+						MidiPort *mp = &midiPorts[midiPort];
+						midiPortId = mp->id();
 					}
 					else
 						printf("Route::read(): midi port <%d> out of range\n", port);
@@ -1022,20 +1067,29 @@ void Route::read(Xml& xml)
 				{
 					if (rtype == TRACK_ROUTE)
 					{
-						TrackList* tl = song->tracks();
-						iTrack i = tl->begin();
-						for (; i != tl->end(); ++i)
+						if(trackId > 0)
 						{
-							Track* t = *i;
-							if (t->name() == s)
-							{
-								track = t;
-								type = rtype;
-								break;
-							}
+							track = song->findTrackById(trackId);
+							type = rtype;
 						}
-						if (i == tl->end())
-							printf("Route::read(): track <%s> not found\n", s.toLatin1().constData());
+						else
+						{
+							TrackList* tl = song->tracks();
+							iTrack i = tl->begin();
+							for (; i != tl->end(); ++i)
+							{
+								Track* t = *i;
+								if (t->name() == s)
+								{
+									track = t;
+									type = rtype;
+									trackId = t->id();
+									break;
+								}
+							}
+							if (i == tl->end())
+								printf("Route::read(): track <%s> not found\n", s.toLatin1().constData());
+						}
 					}
 					else if (rtype == JACK_ROUTE)
 					{
@@ -1059,7 +1113,6 @@ void Route::read(Xml& xml)
 							MidiDevice* md = *imd;
 							if (md->name() == s && md->deviceType() == dtype)
 							{
-								// p3.3.45
 								// We found a device, but if it is not in use by the song (port is -1), ignore it.
 								// This prevents loading and propagation of bogus routes in the oom file.
 								if (md->midiPort() == -1)
@@ -1079,14 +1132,14 @@ void Route::read(Xml& xml)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 
 //---------------------------------------------------------
 //   read
 //---------------------------------------------------------
 
-void Song::readRoute(Xml& xml)
+void Song::readRoute(Xml& xml)/*{{{*/
 {
 	QString src;
 	QString dst;
@@ -1190,7 +1243,8 @@ void Song::readRoute(Xml& xml)
 						}
 					}
 					else
-						printf("  Warning - route invalid. Ignoring route!\n");
+						printf("  Warning - route invalid. Ignoring route! srcValid: %d, destValid: %d\n", 
+								sroute.isValid(), droute.isValid());
 
 					return;
 				}
@@ -1198,7 +1252,7 @@ void Song::readRoute(Xml& xml)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   removeRoute
@@ -1206,22 +1260,17 @@ void Song::readRoute(Xml& xml)
 
 void RouteList::removeRoute(const Route& r)
 {
-	for (iRoute i = begin(); i != end(); ++i)
-	{
-		if (r == *i)
-		{
-			erase(i);
-			return;
-		}
-	}
-	printf("internal error: cannot remove Route\n");
+	int rem = removeAll(r);
+	if(!rem)
+		printf("RouteList::removeRoute: Removed  %d routes\n", rem);
+	//printf("RouteList::removeRoute: internal error: cannot remove Route\n");
 }
 
 //---------------------------------------------------------
 //   dump
 //---------------------------------------------------------
 
-void Route::dump() const
+void Route::dump() const/*{{{*/
 {
 	if (type == TRACK_ROUTE)
 	{
@@ -1274,7 +1323,7 @@ void Route::dump() const
 	}
 	else
 		printf("Route dump: unknown route type:%d\n", type);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   operator==
@@ -1282,17 +1331,13 @@ void Route::dump() const
 
 bool Route::operator==(const Route& a) const
 {
-	// Use new channel mask. True if all the bits in a.channel are contained in this route's channel.
-	// Hmm, not commutative... Two such routes are equal if _____ what? ...   Code-specific for now.
-	//  return midiPort == a.midiPort && (channel & a.channel) == a.channel;
-	//}
-	//else
-
-	if ((type == a.type) && (channel == a.channel))
+	// Track routes channel dont matter.
+	if ((type == a.type)/* && (channel == a.channel)*/)
 	{
 		if (type == TRACK_ROUTE)
 		{
-			return track == a.track && channels == a.channels && remoteChannel == a.remoteChannel;
+			//qDebug("Route::operator== ~~~~~~~TRACK_ROUTE srcId:%lld name:%s, dstId:%lld name:%s", a.trackId, a.track->name().toUtf8().constData(), trackId, track->name().toUtf8().constData());
+			return trackId == a.trackId && /*channels == a.channels &&*/ remoteChannel == a.remoteChannel;
 		}
 		else if (channel == a.channel)
 		{
@@ -1302,7 +1347,7 @@ bool Route::operator==(const Route& a) const
 			}
 			else if (type == MIDI_PORT_ROUTE)
 			{
-				return midiPort == a.midiPort;
+				return midiPortId == a.midiPortId;
 			}
 			else if (type == MIDI_DEVICE_ROUTE)
 			{

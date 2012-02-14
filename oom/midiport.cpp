@@ -913,17 +913,15 @@ void MidiPort::writeRouting(int level, Xml& xml) const
 	{
 		if (r->type == Route::TRACK_ROUTE && !r->name().isEmpty())
 		{
-			//xml.tag(level++, "Route");
-
 			s = QT_TRANSLATE_NOOP("@default", "Route");
 			if (r->channel != -1 && r->channel != 0)
 				s += QString(QT_TRANSLATE_NOOP("@default", " channelMask=\"%1\"")).arg(r->channel); // Use new channel mask.
 			xml.tag(level++, s.toLatin1().constData());
 
-			xml.tag(level, "source mport=\"%d\" mportId=\"%lld\"/", portno(), m_portId);
+			xml.tag(level, "source mportId=\"%lld\"/", m_portId);
 
 			s = QT_TRANSLATE_NOOP("@default", "dest");
-			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
+			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\" trackId=\"%2\"/")).arg(Xml::xmlString(r->name())).arg(r->track->id());
 			xml.tag(level, s.toLatin1().constData());
 
             xml.etag(--level, "Route");

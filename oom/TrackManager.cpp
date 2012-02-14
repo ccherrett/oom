@@ -219,6 +219,7 @@ TrackManager::TrackManager()
 	m_insertPosition = -1;
 	m_midiInPort = -1;
 	m_midiOutPort = -1;
+	m_track = 0;
 
 	m_allChannelBit = (1 << MIDI_CHANNELS) - 1;
 }
@@ -243,12 +244,14 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 		case Track::DRUM:
 		{
 			//Load up the instrument first
+			song->startUndo();
+			m_track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false, false);
 			if(vtrack->autoCreateInstrument)
 				loadInstrument(vtrack);
-			Track* track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false);
-			if(track)
+			if(m_track)
 			{
-				MidiTrack* mtrack = (MidiTrack*)track;
+				song->undoOp(UndoOp::AddTrack, m_insertPosition, m_track);
+				MidiTrack* mtrack = (MidiTrack*)m_track;
 				//Process Input connections
 				if(vtrack->useInput)
 				{
@@ -269,7 +272,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 								qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
 								int chanbit = vtrack->inputChannel;
 								Route srcRoute(m_midiInPort, chanbit);
-								Route dstRoute(track, chanbit);
+								Route dstRoute(m_track, chanbit);
 
 								audio->msgAddRoute(srcRoute, dstRoute);
 
@@ -283,7 +286,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						QString devname = vtrack->inputConfig.second;
 						MidiPort* inport = 0;
 						MidiDevice* indev = 0;
-						QString inputDevName(QString("I-").append(track->name()));
+						QString inputDevName(QString("I-").append(m_track->name()));
 						if(vtrack->createMidiInputDevice)
 						{
 							m_midiInPort = getFreeMidiPort();
@@ -339,7 +342,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 							qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
 							int chanbit = vtrack->inputChannel;
 							Route srcRoute(m_midiInPort, chanbit);
-							Route dstRoute(track, chanbit);
+							Route dstRoute(m_track, chanbit);
 
 							audio->msgAddRoute(srcRoute, dstRoute);
 
@@ -355,7 +358,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					MidiPort* outport= 0;
 					MidiDevice* outdev = 0;
 					QString devname = vtrack->outputConfig.second;
-					QString outputDevName(QString("O-").append(track->name()));
+					QString outputDevName(QString("O-").append(m_track->name()));
 					if(vtrack->createMidiOutputDevice)
 					{
 						m_midiOutPort = getFreeMidiPort();
@@ -453,31 +456,34 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					createMonitorInputTracks(vtrack);
 				}
 
-				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->id());
-				rv = track->id();
+				m_track->setSelected(true);
+				emit trackAdded(m_track->id());
+				rv = m_track->id();
 			}
+			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 		}
 		break;
 		case Track::WAVE:
 		{
-			Track* track =  song->addTrackByName(vtrack->name, Track::WAVE, m_insertPosition, !vtrack->useOutput);
-			if(track)
+			song->startUndo();
+			m_track =  song->addTrackByName(vtrack->name, Track::WAVE, m_insertPosition, false, !vtrack->useOutput);
+			if(m_track)
 			{
+				song->undoOp(UndoOp::AddTrack, m_insertPosition, m_track);
 				if(vtrack->useInput)
 				{
-					QString inputName = QString("i").append(track->name());
+					QString inputName = QString("i").append(m_track->name());
 					QString selectedInput = vtrack->inputConfig.second;
 					bool addNewRoute = vtrack->inputConfig.first;
 					Track* input = 0;
 					if(addNewRoute)
-						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
+						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
 					else
 						input = song->findTrack(selectedInput);
 					if(input)
 					{
+						song->undoOp(UndoOp::AddTrack, -1, input);
 						if(addNewRoute)
 						{
 							input->setMute(false);
@@ -499,7 +505,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						
 						//Connect input track to audio track
 						Route srcRoute(input->name(), true, -1);
-						Route dstRoute(track, 0, track->channels());
+						Route dstRoute(m_track, 0, m_track->channels());
 
 						audio->msgAddRoute(srcRoute, dstRoute);
 
@@ -511,30 +517,33 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				{
 					//Route to the Output or Buss
 					QString selectedOutput = vtrack->outputConfig.second;
-					Route srcRoute(track, 0, track->channels());
+					Route srcRoute(m_track, 0, m_track->channels());
 					Route dstRoute(selectedOutput, true, -1);
 
 					audio->msgAddRoute(srcRoute, dstRoute);
 					audio->msgUpdateSoloStates();
 					song->update(SC_ROUTE);
 				}
-				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->id());
-				rv = track->id();
+				m_track->setSelected(true);
+				emit trackAdded(m_track->id());
+				rv = m_track->id();
+				
 			}
+			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 		}
 		break;
 		case Track::AUDIO_OUTPUT:
 		{
-			Track* track = song->addTrackByName(vtrack->name, Track::AUDIO_OUTPUT, -1, false);
-			if(track)
+			song->startUndo();
+			m_track = song->addTrackByName(vtrack->name, Track::AUDIO_OUTPUT, -1, false, false);
+			if(m_track)
 			{
+				song->undoOp(UndoOp::AddTrack, -1, m_track);
 				if(vtrack->useInput)
 				{
 					QString selectedInput = vtrack->inputConfig.second;
-					Route dstRoute(track, 0, track->channels());
+					Route dstRoute(m_track, 0, m_track->channels());
 					Route srcRoute(selectedInput, true, -1);
 
 					audio->msgAddRoute(srcRoute, dstRoute);
@@ -553,14 +562,14 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						systemOutput = true;
 					
 						//Route channel 1
-						Route srcRoute(track, 0);
+						Route srcRoute(m_track, 0);
 						Route dstRoute(QString(jackPlayback).append("_1"), true, -1, Route::JACK_ROUTE);
 						dstRoute.channel = 0;
 
 						audio->msgAddRoute(srcRoute, dstRoute);
 
 						//Route channel 2
-						Route srcRoute2(track, 1);
+						Route srcRoute2(m_track, 1);
 						Route dstRoute2(QString(jackPlayback).append("_2"), true, -1, Route::JACK_ROUTE);
 						dstRoute2.channel = 1;
 						
@@ -569,14 +578,14 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					else
 					{
 						//Route channel 1
-						Route srcRoute(track, 0);
+						Route srcRoute(m_track, 0);
 						Route dstRoute(selectedOutput, true, -1, Route::JACK_ROUTE);
 						dstRoute.channel = 0;
 
 						audio->msgAddRoute(srcRoute, dstRoute);
 
 						//Route channel 2
-						Route srcRoute2(track, 1);
+						Route srcRoute2(m_track, 1);
 						Route dstRoute2(selectedOutput, true, -1, Route::JACK_ROUTE);
 						dstRoute2.channel = 1;
 
@@ -586,20 +595,22 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					audio->msgUpdateSoloStates();
 					song->update(SC_ROUTE);
 				}
-				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->id());
-				rv = track->id();
+				m_track->setSelected(true);
+				emit trackAdded(m_track->id());
+				rv = m_track->id();
 			}
+			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 		}
 		break;
 		case Track::AUDIO_INPUT:
 		{
-			Track* track = song->addTrackByName(vtrack->name, Track::AUDIO_INPUT, -1, false);
-			if(track)
+			song->startUndo();
+			m_track = song->addTrackByName(vtrack->name, Track::AUDIO_INPUT, -1, false, false);
+			if(m_track)
 			{
-				track->setMute(false);
+				song->undoOp(UndoOp::AddTrack, -1, m_track);
+				m_track->setMute(false);
 				if(vtrack->useInput)
 				{
 					QString selectedInput = vtrack->inputConfig.second;
@@ -608,24 +619,24 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					if(selectedInput.startsWith(jackCapture))
 					{
 						Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
-						Route dstRoute(track, 0);
+						Route dstRoute(m_track, 0);
 						srcRoute.channel = 0;
 						audio->msgAddRoute(srcRoute, dstRoute);
 
 						Route srcRoute2(QString(jackCapture).append("_2"), false, -1, Route::JACK_ROUTE);
-						Route dstRoute2(track, 1);
+						Route dstRoute2(m_track, 1);
 						srcRoute2.channel = 1;
 						audio->msgAddRoute(srcRoute2, dstRoute2);
 					}
 					else
 					{
 						Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
-						Route dstRoute(track, 0);
+						Route dstRoute(m_track, 0);
 						srcRoute.channel = 0;
 						audio->msgAddRoute(srcRoute, dstRoute);
 
 						Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
-						Route dstRoute2(track, 1);
+						Route dstRoute2(m_track, 1);
 						srcRoute2.channel = 1;
 						audio->msgAddRoute(srcRoute2, dstRoute2);
 					}
@@ -637,31 +648,33 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				{
 					QString selectedOutput = vtrack->outputConfig.second;
 
-					Route srcRoute(track, 0, track->channels());
+					Route srcRoute(m_track, 0, m_track->channels());
 					Route dstRoute(selectedOutput, true, -1);
 
 					audio->msgAddRoute(srcRoute, dstRoute);
 					audio->msgUpdateSoloStates();
 					song->update(SC_ROUTE);
 				}
-				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->id());
-				rv = track->id();
+				m_track->setSelected(true);
+				emit trackAdded(m_track->id());
+				rv = m_track->id();
 			}
+			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 		}
 		break;
 		case Track::AUDIO_BUSS:
 		{
-			Track* track = song->addTrackByName(vtrack->name, Track::AUDIO_BUSS, -1, false);
-			if(track)
+			song->startUndo();
+			m_track = song->addTrackByName(vtrack->name, Track::AUDIO_BUSS, -1, false, false);
+			if(m_track)
 			{
+				song->undoOp(UndoOp::AddTrack, -1, m_track);
 				if(vtrack->useInput)
 				{
 					QString selectedInput = vtrack->inputConfig.second;
 					Route srcRoute(selectedInput, true, -1);
-					Route dstRoute(track, 0, track->channels());
+					Route dstRoute(m_track, 0, m_track->channels());
 
 					audio->msgAddRoute(srcRoute, dstRoute);
 
@@ -671,40 +684,41 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				if(vtrack->useOutput)
 				{
 					QString selectedOutput = vtrack->outputConfig.second;
-					Route srcRoute(track, 0, track->channels());
+					Route srcRoute(m_track, 0, m_track->channels());
 					Route dstRoute(selectedOutput, true, -1);
 
 					audio->msgAddRoute(srcRoute, dstRoute);
 					audio->msgUpdateSoloStates();
 					song->update(SC_ROUTE);
 				}
-				midiMonitor->msgAddMonitoredTrack(track);
 				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->id());
-				rv = track->id();
+				m_track->setSelected(true);
+				emit trackAdded(m_track->id());
+				rv = m_track->id();
 			}
+			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 		}
 		break;
 		case Track::AUDIO_AUX:
 		{
-			Track* track = song->addTrackByName(vtrack->name, Track::AUDIO_AUX, -1, false);
-			if(track)
+			song->startUndo();
+			m_track = song->addTrackByName(vtrack->name, Track::AUDIO_AUX, -1, false, false);
+			if(m_track)
 			{
-				midiMonitor->msgAddMonitoredTrack(track);
+				song->undoOp(UndoOp::AddTrack, -1, m_track);
 				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->id());
-				rv = track->id();
+				m_track->setSelected(true);
+				emit trackAdded(m_track->id());
+				rv = m_track->id();
 			}
+			song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 		}
 		break;
-		case Track::AUDIO_SOFTSYNTH:
-        {
-			//Just add the track type and rename it
-        }
+		default:
         break;
 	}
+	m_track = 0;
+	m_synthConfigs.clear();
 	return rv;
 }/*}}}*/
 
@@ -712,434 +726,6 @@ bool TrackManager::removeTrack(VirtualTrack* vtrack)/*{{{*/
 {
 	bool rv = false;
 	Q_UNUSED(vtrack);
-	/*if(!vtrack || vtrack->name.isEmpty())
-		return rv;
-	
-	Track::TrackType type = (Track::TrackType)vtrack->type;
-	switch(type)
-	{
-		case Track::MIDI:
-		case Track::DRUM:
-		{
-			//Load up the instrument first
-			//loadInstrument(vtrack);
-			Track* track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false);
-			if(track)
-			{
-				MidiTrack* mtrack = (MidiTrack*)track;
-				//Process Input connections
-				if(vtrack->useInput)
-				{
-					QString devname = vtrack->inputConfig.second;
-					MidiPort* inport = 0;
-					MidiDevice* indev = 0;
-					QString inputDevName(QString("I-").append(track->name()));
-					if(vtrack->createMidiInputDevice)
-					{
-						m_midiInPort = getFreeMidiPort();
-						qDebug("createMidiInputDevice is set: %i", m_midiInPort);
-						inport = &midiPorts[m_midiInPort];
-						int devtype = vtrack->inputConfig.first;
-						if(devtype == MidiDevice::ALSA_MIDI)
-						{
-							indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
-							if(indev)
-							{
-								qDebug("Found MIDI input device: ALSA_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x2;
-								indev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(inport, indev);
-							}
-						}
-						else if(devtype == MidiDevice::JACK_MIDI)
-						{
-							indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
-							if(indev)
-							{
-								qDebug("Created MIDI input device: JACK_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x2;
-								indev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(inport, indev);
-							}
-						}
-						if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
-						{
-							qDebug("MIDI input device configured, Adding input routes to MIDI port");
-							Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
-							Route dstRoute(indev, -1);
-
-							audio->msgAddRoute(srcRoute, dstRoute);
-
-							audio->msgUpdateSoloStates();
-							song->update(SC_ROUTE);
-						}
-					}
-					else
-					{
-						m_midiInPort = vtrack->inputConfig.first;
-						qDebug("Using existing MIDI port: %i", m_midiInPort);
-						inport = &midiPorts[m_midiInPort];
-						if(inport)
-							indev = inport->device();
-					}
-					if(inport && indev)
-					{
-						qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
-						int chanbit = vtrack->inputChannel;
-						Route srcRoute(m_midiInPort, chanbit);
-						Route dstRoute(track, chanbit);
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						audio->msgUpdateSoloStates();
-						song->update(SC_ROUTE);
-					}
-				}
-				
-				//Process Output connections
-				if(vtrack->useOutput)
-				{
-					MidiPort* outport= 0;
-					MidiDevice* outdev = 0;
-					QString devname = vtrack->outputConfig.second;
-					QString outputDevName(QString("O-").append(track->name()));
-					if(vtrack->createMidiOutputDevice)
-					{
-						m_midiOutPort = getFreeMidiPort();
-						qDebug("m_createMidiOutputDevice is set: %i", m_midiOutPort);
-						outport = &midiPorts[m_midiOutPort];
-						int devtype = vtrack->outputConfig.first;
-						if(devtype == MidiDevice::ALSA_MIDI)
-						{
-							outdev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
-							if(outdev)
-							{
-								qDebug("Found MIDI output device: ALSA_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x1;
-								outdev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(outport, outdev);
-							}
-						}
-						else if(devtype == MidiDevice::JACK_MIDI)
-						{
-							outdev = MidiJackDevice::createJackMidiDevice(outputDevName, 3);
-							if(outdev)
-							{
-								qDebug("Created MIDI output device: JACK_MIDI");
-								int openFlags = 0;
-								openFlags ^= 0x1;
-								outdev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(outport, outdev);
-								oom->changeConfig(true);
-								song->update();
-							}
-						}
-						if(outdev && outdev->deviceType() == MidiDevice::JACK_MIDI)
-						{
-							qDebug("MIDI output device configured, Adding output routes to MIDI port");
-							Route srcRoute(outdev, -1);
-							Route dstRoute(devname, true, -1, Route::JACK_ROUTE);
-
-							qDebug("Device name from combo: %s, from dev: %s", devname.toUtf8().constData(), outdev->name().toUtf8().constData());
-
-							audio->msgAddRoute(srcRoute, dstRoute);
-
-							audio->msgUpdateSoloStates();
-							song->update(SC_ROUTE);
-						}
-					}
-					else
-					{
-						m_midiOutPort = vtrack->outputConfig.first;
-						qDebug("Using existing MIDI output port: %i", m_midiOutPort);
-						outport = &midiPorts[m_midiOutPort];
-						if(outport)
-							outdev = outport->device();
-					}
-					if(outport && outdev)
-					{
-						qDebug("MIDI output port and MIDI devices found, Adding final output routing");
-						audio->msgIdle(true);
-						mtrack->setOutPortAndUpdate(m_midiOutPort);
-						int outChan = vtrack->outputChannel;
-						mtrack->setOutChanAndUpdate(outChan);
-						audio->msgIdle(false);
-						if(vtrack->createMidiOutputDevice)
-						{
-							QString instrumentName = vtrack->instrumentName;
-							for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
-							{
-								if ((*i)->iname() == instrumentName)
-								{
-									outport->setInstrument(*i);
-									break;
-								}
-							}
-						}
-						song->update(SC_MIDI_TRACK_PROP);
-					}
-				}
-
-				if(vtrack->useMonitor)
-				{
-					createMonitorInputTracks(vtrack);
-				}
-
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
-			}
-		}
-		break;
-		case Track::WAVE:
-		{
-			Track* track =  song->addTrackByName(vtrack->name, Track::WAVE, m_insertPosition, !vtrack->useOutput);
-			if(track)
-			{
-				if(vtrack->useInput)
-				{
-					QString inputName = QString("i").append(track->name());
-					QString selectedInput = vtrack->inputConfig.second;
-					bool addNewRoute = vtrack->inputConfig.first;
-					Track* input = 0;
-					if(addNewRoute)
-						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
-					else
-						input = song->findTrack(selectedInput);
-					if(input)
-					{
-						if(addNewRoute)
-						{
-							input->setMute(false);
-							//Connect jack port to Input track
-							Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
-							Route dstRoute(input, 0);
-							srcRoute.channel = 0;
-							
-							Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
-							srcRoute2.channel = 1;
-							Route dstRoute2(input, 1);
-
-							audio->msgAddRoute(srcRoute, dstRoute);
-							audio->msgAddRoute(srcRoute2, dstRoute2);
-
-							audio->msgUpdateSoloStates();
-							song->update(SC_ROUTE);
-						}
-						
-						//Connect input track to audio track
-						Route srcRoute(input->name(), true, -1);
-						Route dstRoute(track, 0, track->channels());
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						audio->msgUpdateSoloStates();
-						song->update(SC_ROUTE);
-					}
-				}
-				if(vtrack->useOutput)
-				{
-					//Route to the Output or Buss
-					QString selectedOutput = vtrack->outputConfig.second;
-					Route srcRoute(track, 0, track->channels());
-					Route dstRoute(selectedOutput, true, -1);
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
-			}
-		}
-		break;
-		case Track::AUDIO_OUTPUT:
-		{
-			Track* track = song->addTrackByName(vtrack->name, Track::AUDIO_OUTPUT, -1, false);
-			if(track)
-			{
-				if(vtrack->useInput)
-				{
-					QString selectedInput = vtrack->inputConfig.second;
-					Route dstRoute(track, 0, track->channels());
-					Route srcRoute(selectedInput, true, -1);
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-
-				if(vtrack->useOutput)
-				{
-					QString jackPlayback("system:playback");
-					QString selectedOutput = vtrack->outputConfig.second;
-					bool systemOutput = false;
-					if(selectedOutput.startsWith(jackPlayback))
-					{
-						systemOutput = true;
-					
-						//Route channel 1
-						Route srcRoute(track, 0);
-						Route dstRoute(QString(jackPlayback).append("_1"), true, -1, Route::JACK_ROUTE);
-						dstRoute.channel = 0;
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						//Route channel 2
-						Route srcRoute2(track, 1);
-						Route dstRoute2(QString(jackPlayback).append("_2"), true, -1, Route::JACK_ROUTE);
-						dstRoute2.channel = 1;
-						
-						audio->msgAddRoute(srcRoute2, dstRoute2);
-					}
-					else
-					{
-						//Route channel 1
-						Route srcRoute(track, 0);
-						Route dstRoute(selectedOutput, true, -1, Route::JACK_ROUTE);
-						dstRoute.channel = 0;
-
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						//Route channel 2
-						Route srcRoute2(track, 1);
-						Route dstRoute2(selectedOutput, true, -1, Route::JACK_ROUTE);
-						dstRoute2.channel = 1;
-
-						audio->msgAddRoute(srcRoute2, dstRoute2);
-					}
-
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
-			}
-		}
-		break;
-		case Track::AUDIO_INPUT:
-		{
-			Track* track = song->addTrackByName(vtrack->name, Track::AUDIO_INPUT, -1, false);
-			if(track)
-			{
-				track->setMute(false);
-				if(vtrack->useInput)
-				{
-					QString selectedInput = vtrack->inputConfig.second;
-
-					QString jackCapture("system:capture");
-					if(selectedInput.startsWith(jackCapture))
-					{
-						Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
-						Route dstRoute(track, 0);
-						srcRoute.channel = 0;
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						Route srcRoute2(QString(jackCapture).append("_2"), false, -1, Route::JACK_ROUTE);
-						Route dstRoute2(track, 1);
-						srcRoute2.channel = 1;
-						audio->msgAddRoute(srcRoute2, dstRoute2);
-					}
-					else
-					{
-						Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
-						Route dstRoute(track, 0);
-						srcRoute.channel = 0;
-						audio->msgAddRoute(srcRoute, dstRoute);
-
-						Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
-						Route dstRoute2(track, 1);
-						srcRoute2.channel = 1;
-						audio->msgAddRoute(srcRoute2, dstRoute2);
-					}
-
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				if(vtrack->useOutput)
-				{
-					QString selectedOutput = vtrack->outputConfig.second;
-
-					Route srcRoute(track, 0, track->channels());
-					Route dstRoute(selectedOutput, true, -1);
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
-			}
-		}
-		break;
-		case Track::AUDIO_BUSS:
-		{
-			Track* track = song->addTrackByName(vtrack->name, Track::AUDIO_BUSS, -1, false);
-			if(track)
-			{
-				if(vtrack->useInput)
-				{
-					QString selectedInput = vtrack->inputConfig.second;
-					Route srcRoute(selectedInput, true, -1);
-					Route dstRoute(track, 0, track->channels());
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				if(vtrack->useOutput)
-				{
-					QString selectedOutput = vtrack->outputConfig.second;
-					Route srcRoute(track, 0, track->channels());
-					Route dstRoute(selectedOutput, true, -1);
-
-					audio->msgAddRoute(srcRoute, dstRoute);
-					audio->msgUpdateSoloStates();
-					song->update(SC_ROUTE);
-				}
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
-			}
-		}
-		break;
-		case Track::AUDIO_AUX:
-		{
-			Track* track = song->addTrackByName(vtrack->name, Track::AUDIO_AUX, -1, false);
-			if(track)
-			{
-				midiMonitor->msgAddMonitoredTrack(track);
-				song->deselectTracks();
-				track->setSelected(true);
-				emit trackAdded(track->name());
-				rv = true;
-			}
-		}
-		break;
-		case Track::AUDIO_SOFTSYNTH:
-        {
-			//Just add the track type and rename it
-        }
-        break;
-	}*/
 	return rv;
 }/*}}}*/
 
@@ -1150,7 +736,13 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 	if(type == Track::MIDI)
 	{
 		QString instrumentName = vtrack->instrumentName;
-		QString trackName = vtrack->name;
+		QString trackName;
+		if(m_track)
+		{qDebug("TrackManager::loadInstrument: Found temp track using name~~~~~~~~~~~~~~~~");
+			trackName = m_track->name();
+		}
+		else
+			trackName = vtrack->name;
 		switch(vtrack->instrumentType)
 		{
 			case LS_INSTRUMENT:
@@ -1189,7 +781,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 									Patch* p = (*i)->getDefaultPatch();
 									if(p && map >= 0)
 									{
-										if(lsClient->createInstrumentChannel(vtrack->name.toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+										if(lsClient->createInstrumentChannel(trackName.toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
 										{
 											qDebug("Created Channel for track");
 										}
@@ -1216,7 +808,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
                     {
                         if ((*i)->isSynthPlugin() && (*i)->name() == instrumentName)
                         {
-							QString devName(QString("O-").append(vtrack->name));
+							QString devName(QString("O-").append(m_track->name()));
                             SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
                             SynthPluginDevice* synth = oldSynth->clone(devName);
                             synth->open();
@@ -1316,22 +908,23 @@ bool TrackManager::unloadInstrument(VirtualTrack *vtrack)/*{{{*/
 void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 {
 	bool newBuss = vtrack->bussConfig.first;
-	QString name(vtrack->name);
+	QString name(m_track->name());
 
 	QString inputName = QString("i").append(name);
 	QString bussName = QString("B").append(name);
 	//QString audioName = QString("A-").append(name);
-	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
+	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
 	Track* buss = 0;
 	if(vtrack->useBuss)
 	{
 		if(newBuss)
-			buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
+			buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, false, true);
 		else
 			buss = song->findTrack(vtrack->bussConfig.second);
 	}
 	if(input)
 	{
+		song->undoOp(UndoOp::AddTrack, -1, input);
 		input->setMute(false);
 		QString selectedInput;
 		if(vtrack->instrumentType == SYNTH_INSTRUMENT)
@@ -1394,6 +987,7 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		
 		if(vtrack->useBuss && buss)
 		{
+			song->undoOp(UndoOp::AddTrack, -1, buss);
 			Route srcRoute(input, 0, input->channels());
 			Route dstRoute(buss->name(), true, -1);
 
@@ -1471,96 +1065,6 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 void TrackManager::removeMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 {
 	Q_UNUSED(vtrack);
-/*
-	bool newBuss = vtrack->bussConfig.first;
-	QString name(vtrack->name);
-
-	QString inputName = QString("i").append(name);
-	QString bussName = QString("B").append(name);
-	//QString audioName = QString("A-").append(name);
-	Track* input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false);
-	Track* buss = 0;
-	if(vtrack->useBuss)
-	{
-		if(newBuss)
-			buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, true);
-		else
-			buss = song->findTrack(vtrack->bussConfig.second);
-	}
-	//Track* audiot = song->addTrackByName(audioName, Track::WAVE, -1, false);
-	if(input)
-	{
-		input->setMute(false);
-		QString selectedInput = vtrack->monitorConfig.second;
-		
-		//Route world to input
-		QString jackCapture("system:capture");
-		if(selectedInput.startsWith(jackCapture))
-		{
-			//Route channel 1
-			Route srcRoute(QString(jackCapture).append("_1"), false, -1, Route::JACK_ROUTE);
-			Route dstRoute(input, 0);
-			srcRoute.channel = 0;
-			audio->msgAddRoute(srcRoute, dstRoute);
-
-			//Route channel 2
-			Route srcRoute2(QString(jackCapture).append("_2"), false, -1, Route::JACK_ROUTE);
-			Route dstRoute2(input, 1);
-			srcRoute2.channel = 1;
-			audio->msgAddRoute(srcRoute2, dstRoute2);
-		}
-		else
-		{
-			//Route channel 1
-			Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
-			Route dstRoute(input, 0);
-			srcRoute.channel = 0;
-			audio->msgAddRoute(srcRoute, dstRoute);
-
-			//Route channel 2
-			Route srcRoute2(selectedInput, false, -1, Route::JACK_ROUTE);
-			Route dstRoute2(input, 1);
-			srcRoute2.channel = 1;
-			audio->msgAddRoute(srcRoute2, dstRoute2);
-		}
-
-		//Route input to buss
-		audio->msgUpdateSoloStates();
-		song->update(SC_ROUTE);
-		
-		if(vtrack->useBuss && buss)
-		{
-			Route srcRoute(input, 0, input->channels());
-			Route dstRoute(buss->name(), true, -1);
-
-			audio->msgAddRoute(srcRoute, dstRoute);
-		}
-
-		//Route audio to master
-		Track* master = song->findTrack("Master");
-		if(master)
-		{
-			//Route buss track to master
-			if(vtrack->useBuss && buss)
-			{
-				Route srcRoute3(buss, 0, buss->channels());
-				Route dstRoute3(master->name(), true, -1);
-		
-				audio->msgAddRoute(srcRoute3, dstRoute3);
-			}
-			else
-			{//Route input directly to Master
-				Route srcRoute3(input, 0, input->channels());
-				Route dstRoute3(master->name(), true, -1);
-		
-				audio->msgAddRoute(srcRoute3, dstRoute3);
-			}
-		}
-
-		audio->msgUpdateSoloStates();
-		song->update(SC_ROUTE);
-	}
-	*/
 }/*}}}*/
 
 void TrackManager::write(int level, Xml& xml) const/*{{{*/
