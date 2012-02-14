@@ -248,6 +248,9 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			Track* track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false);
 			if(track)
 			{
+                // MIDI Tracks always default to channel 0
+                outputChannel = 0;
+
 				MidiTrack* mtrack = (MidiTrack*)track;
 				//Process Input connections
 				if(vtrack->useInput)

@@ -103,6 +103,36 @@ void set_last_error(const char* error)
 }
 
 //---------------------------------------------------------
+//   process_synth
+//---------------------------------------------------------
+
+void BasePlugin::process_synth(MPEventList* eventList)
+{
+    if (m_enabled && m_aoutsCount > 0)
+    {
+        jack_default_audio_sample_t* ains_buffer[m_ainsCount];
+        jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
+
+        for (uint32_t i=0; i < m_ainsCount; i++)
+            ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_portsIn[i], segmentSize);
+
+        for (uint32_t i=0; i < m_aoutsCount; i++)
+            aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_portsOut[i], segmentSize);
+
+        process(segmentSize, ains_buffer, aouts_buffer, eventList);
+    }
+    else
+    {
+        if (eventList)
+        {
+            //iMPEvent ev = eventList->begin();
+            //eventList->erase(eventList->begin(), ev);
+            eventList->clear();
+        }
+    }
+}
+
+//---------------------------------------------------------
 //   makeGui
 //---------------------------------------------------------
 
@@ -447,7 +477,6 @@ void SynthPluginDevice::processMidi()
         MPEventList* eventList = playEvents();
         if (m_plugin)
             m_plugin->process_synth(eventList);
-        //qWarning("SynthPluginDevice::processMidi()");
     }
 }
 
