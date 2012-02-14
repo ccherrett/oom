@@ -249,7 +249,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			if(track)
 			{
                 // MIDI Tracks always default to channel 0
-                outputChannel = 0;
+                vtrack->outputChannel = 0;
 
 				MidiTrack* mtrack = (MidiTrack*)track;
 				//Process Input connections
