@@ -102,7 +102,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	toolbar2->setMovable(false);
 	toolbar2->setFloatable(false);
 	toolbar2->setFixedHeight(24);
-
+    ((OOMidi*)parent)->setComposerAndSnapToolbars(toolbar, toolbar2);
 
 	_rtabs = new QTabWidget(oom->resourceDock());
 	_rtabs->setObjectName("tabControlCenter");

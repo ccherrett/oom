@@ -631,6 +631,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	m_undoStack = new QUndoStack(this);
 	m_undoView = 0;
 
+    toolbarComposerSettings = 0;
+    toolbarSnap = 0;
+
 	song = new Song(m_undoStack, "song");
 	song->blockSignals(true);
 	heartBeatTimer = new QTimer(this);
@@ -839,7 +842,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	//editSongInfoAction = new QAction(QIcon(*songInfoIcon), tr("Song Info"), this);
 
-
 	//-------- View Actions
 	viewTransportAction = new QAction(QIcon(*view_transport_windowIcon), tr("Transport Panel"), this);
 	viewTransportAction->setCheckable(true);
@@ -851,6 +853,18 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	viewCliplistAction->setCheckable(true);
 	viewMarkerAction = new QAction(QIcon(*view_markerIcon), tr("Marker View"), this);
 	viewMarkerAction->setCheckable(true);
+
+    viewToolbars = new QMenu(tr("Toolbars"), this);
+    viewToolbarOrchestra = new QAction(tr("The Orchestra Pit"), this);
+    viewToolbarOrchestra->setCheckable(true);
+    viewToolbarMixer = new QAction(tr("The Mixer Dock"), this);
+    viewToolbarMixer->setCheckable(true);
+    viewToolbarComposerSettings = new QAction(tr("The Composer Settings"), this);
+    viewToolbarComposerSettings->setCheckable(true);
+    viewToolbarSnap = new QAction(tr("Snap"), this);
+    viewToolbarSnap->setCheckable(true);
+    viewToolbarTransport = new QAction(tr("Transport Tools"), this);
+    viewToolbarTransport->setCheckable(true);
 
 	//-------- Structure Actions
 	strGlobalCutAction = new QAction(tr("Global Cut"), this);
@@ -983,6 +997,13 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(viewMixerAAction, SIGNAL(toggled(bool)), SLOT(toggleMixer1(bool)));
 	connect(viewCliplistAction, SIGNAL(toggled(bool)), SLOT(startClipList(bool)));
 	connect(viewMarkerAction, SIGNAL(toggled(bool)), SLOT(toggleMarker(bool)));
+
+    connect(viewToolbarOrchestra, SIGNAL(toggled(bool)), SLOT(showToolbarOrchestra(bool)));
+    connect(viewToolbarMixer, SIGNAL(toggled(bool)), SLOT(showToolbarMixer(bool)));
+    connect(viewToolbarComposerSettings, SIGNAL(toggled(bool)), SLOT(showToolbarComposerSettings(bool)));
+    connect(viewToolbarSnap, SIGNAL(toggled(bool)), SLOT(showToolbarSnap(bool)));
+    connect(viewToolbarTransport, SIGNAL(toggled(bool)), SLOT(showToolbarTransport(bool)));
+    connect(viewToolbars, SIGNAL(aboutToShow()), SLOT(updateViewToolbarMenu()));
 
 	//-------- Structure connections
 	connect(strGlobalCutAction, SIGNAL(triggered()), SLOT(globalCut()));
@@ -1153,6 +1174,14 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menuView->addAction(viewCliplistAction);
 	menuView->addAction(viewMarkerAction);
 
+    menuView->addSeparator();
+    menuView->addMenu(viewToolbars);
+    viewToolbars->addAction(viewToolbarOrchestra);
+    viewToolbars->addAction(viewToolbarMixer);
+    //viewToolbars->addSeparator();
+    viewToolbars->addAction(viewToolbarComposerSettings);
+    viewToolbars->addAction(viewToolbarSnap);
+    viewToolbars->addAction(viewToolbarTransport);
 
 	//-------------------------------------------------------------
 	//    popup Midi
@@ -1436,6 +1465,16 @@ void OOMidi::addTransportToolbar()
 	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer3->setMaximumWidth(5);
 	tools->addWidget(spacer3);
+}
+
+//---------------------------------------------------------
+//   setComposerAndSnapToolbars
+//---------------------------------------------------------
+
+void OOMidi::setComposerAndSnapToolbars(QToolBar* comp, QToolBar* snap)
+{
+    toolbarComposerSettings = comp;
+    toolbarSnap = snap;
 }
 
 //---------------------------------------------------------
@@ -4724,3 +4763,79 @@ TrackView* OOMidi::findInstrumentTemplateById(qint64 id) const
 	return 0;
 }
 
+//---------------------------------------------------------
+// View Toolbars code
+//---------------------------------------------------------
+
+void OOMidi::showToolbarOrchestra(bool yesno)
+{
+    if (_resourceDock)
+        _resourceDock->setVisible(yesno);
+}
+
+void OOMidi::showToolbarMixer(bool yesno)
+{
+    if (m_mixerDock)
+        m_mixerDock->setVisible(yesno);
+}
+
+void OOMidi::showToolbarComposerSettings(bool yesno)
+{
+    if (toolbarComposerSettings)
+        toolbarComposerSettings->setVisible(yesno);
+}
+
+void OOMidi::showToolbarSnap(bool yesno)
+{
+    if (toolbarSnap)
+        toolbarSnap->setVisible(yesno);
+}
+
+void OOMidi::showToolbarTransport(bool yesno)
+{
+    if (tools)
+        tools->setVisible(yesno);
+}
+
+void OOMidi::updateViewToolbarMenu()
+{
+    if (_resourceDock)
+    {
+        viewToolbarOrchestra->setEnabled(true);
+        viewToolbarOrchestra->setChecked(_resourceDock->isVisible());
+    }
+    else
+        viewToolbarOrchestra->setEnabled(false);
+    
+    if (m_mixerDock)
+    {
+        viewToolbarMixer->setEnabled(true);
+        viewToolbarMixer->setChecked(m_mixerDock->isVisible());
+    }
+    else
+        viewToolbarMixer->setEnabled(false);
+
+    if (toolbarComposerSettings)
+    {
+        viewToolbarComposerSettings->setEnabled(true);
+        viewToolbarComposerSettings->setChecked(toolbarComposerSettings->isVisible());
+    }
+    else
+        viewToolbarComposerSettings->setEnabled(false);
+
+    if (toolbarSnap)
+    {
+        viewToolbarSnap->setEnabled(true);
+        viewToolbarSnap->setChecked(toolbarSnap->isVisible());
+    }
+    else
+        viewToolbarSnap->setEnabled(false);
+
+    if (tools)
+    {
+        viewToolbarTransport->setEnabled(true);
+        viewToolbarTransport->setChecked(tools->isVisible());
+    }
+    else
+        viewToolbarTransport->setEnabled(false);
+}
