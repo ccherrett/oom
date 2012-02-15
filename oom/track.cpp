@@ -688,7 +688,7 @@ void MidiTrack::setOutPortId(qint64 i)
 		_outPort = mp->portno();
 		_wantsAutomation = (mp->device() && mp->device()->isSynthPlugin());
         if (_wantsAutomation)
-            ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
+            ((SynthPluginDevice*)mp->device())->setTrackId(m_id);
 	}
 }
 

@@ -879,6 +879,10 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                     midiEvent->midiData[1] = ev->dataA();
                     midiEvent->midiData[2] = ev->dataB();
 
+                    // Fix note-off
+                    if (ev->type() == ME_NOTEON && ev->dataB() == 0)
+                        midiEvent->midiData[0] = ME_NOTEOFF + ev->channel();
+
                     midiEventCount += 1;
                 }
                 eventList->erase(eventList->begin(), ev);
