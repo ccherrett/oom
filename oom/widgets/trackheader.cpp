@@ -570,7 +570,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	QAction* afterTrack = p->addAction(tr("Add Track After"));
 	afterTrack->setData(12000);
 
-	if(m_track->id() != song->masterId() || m_track->id() != song->oomVerbId())
+	if(m_track->id() != song->masterId() && m_track->id() != song->oomVerbId())
 	{
 		p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
 		p->addSeparator();

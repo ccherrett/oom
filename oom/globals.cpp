@@ -229,7 +229,7 @@ int precountSigZ = 4;
 int precountSigN = 4;
 bool precountPrerecord = false;
 bool precountPreroll = false;
-bool midiClickFlag   = true;
+bool midiClickFlag   = false;
 bool audioClickFlag  = true;
 float audioClickVolume = 0.5f;
 

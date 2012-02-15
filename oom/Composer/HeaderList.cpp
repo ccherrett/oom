@@ -466,10 +466,10 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 	if(tl.size() == 1)
 	{
 		Track* src = (Track*)tl.front();
-		if(src && src->name() == "Master")
-			return;
 		if(src)
 		{
+			if(src->id() == song->masterId())
+				return;
 			int i = song->visibletracks()->index(src);
 			ciTrack it = song->visibletracks()->index2iterator(i);
 			Track* t = 0;
@@ -479,16 +479,18 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 				{
 					ciTrack d = --it;
 					t = *(d);
-					if (t && t->name() == "Master")
-						return;
 				}
 				if (t)
 				{
+					if(t->id() == song->masterId())
+						return;
 					int dTrack = song->visibletracks()->index(t);
 					audio->msgMoveTrack(i, dTrack);
 					//The selection event should be harmless enough to call here to update 
 					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(src));
 				}
+				else
+					return;
 			}
 			else
 			{
@@ -496,16 +498,18 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 				{
 					ciTrack d = ++it;
 					t = *(d);
-					if (t && t->name() == "Master")
-						return;
 				}
 				if (t)
 				{
+					if(t->id() == song->masterId())
+						return;
 					int dTrack = song->visibletracks()->index(t);
 					audio->msgMoveTrack(i, dTrack);
 					//The selection event should be harmless enough to call here to update 
 					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(t));
 				}
+				else
+					return;
 			}
 			updateTrackList(true);
 		}
