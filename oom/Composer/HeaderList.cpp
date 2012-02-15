@@ -497,6 +497,8 @@ void HeaderList::moveSelectedTrack(int dir)/*{{{*/
 				if(it != song->visibletracks()->end())//already at bottom
 				{
 					ciTrack d = ++it;
+					if(d == song->visibletracks()->end())//already at bottom
+						return;
 					t = *(d);
 				}
 				if (t)
