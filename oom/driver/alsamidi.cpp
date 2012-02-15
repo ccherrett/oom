@@ -16,9 +16,9 @@
 #include "../midictrl.h"
 #include "../audio.h"
 #include "mpevent.h"
-//#include "sync.h"
 #include "utils.h"
 #include "audiodev.h"
+#include "track.h"
 #include "xml.h"
 
 static int alsaSeqFdi = -1;
@@ -70,11 +70,8 @@ QString MidiAlsaDevice::open()
 		// Not already subscribed (or error)? Then try subscribing.
 		if (snd_seq_get_port_subscription(alsaSeq, subs) < 0)
 		{
-			//int error = snd_seq_subscribe_port(alsaSeq, subs);
 			wer = snd_seq_subscribe_port(alsaSeq, subs);
-			//if (error < 0)
 			if (wer < 0)
-				//return QString("Play: ")+QString(snd_strerror(error));
 				estr += (QString("Play: ") + QString(snd_strerror(wer)) + QString(" "));
 		}
 		if (!wer)
@@ -91,9 +88,7 @@ QString MidiAlsaDevice::open()
 		{
 			//int error = snd_seq_subscribe_port(alsaSeq, subs);
 			rer = snd_seq_subscribe_port(alsaSeq, subs);
-			//if (error < 0)
 			if (rer < 0)
-				//return QString("Rec: ") + QString(snd_strerror(error));
 				estr += (QString("Rec: ") + QString(snd_strerror(rer)));
 		}
 		if (!rer)
@@ -176,7 +171,6 @@ void MidiAlsaDevice::close()
 
 void MidiAlsaDevice::writeRouting(int level, Xml& xml) const
 {
-	// p3.3.45
 	// If this device is not actually in use by the song, do not write any routes.
 	// This prevents bogus routes from being saved and propagated in the oom file.
 	if (midiPort() == -1)
@@ -195,13 +189,13 @@ void MidiAlsaDevice::writeRouting(int level, Xml& xml) const
 
 			xml.tag(level, "source devtype=\"%d\" name=\"%s\"/", MidiDevice::ALSA_MIDI, Xml::xmlString(name()).toLatin1().constData());
 
-
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 			if (r->type == Route::MIDI_DEVICE_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " devtype=\"%1\"")).arg(r->device->deviceType());
-			else
-				if (r->type != Route::TRACK_ROUTE)
+			else if (r->type != Route::TRACK_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
+			else if(r->type == Route::TRACK_ROUTE)
+				s += QString(QT_TRANSLATE_NOOP("@default", " trackId=\"%1\"")).arg(r->track->id());
 			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 			xml.tag(level, s.toLatin1().constData());
 
@@ -250,13 +244,10 @@ bool MidiAlsaDevice::putMidiEvent(const MidiPlayEvent& e)
 			int a = e.dataA();
 			int b = e.dataB();
 			int chn = e.channel();
-			// p3.3.37
-			//if (a < 0x1000) {          // 7 Bit Controller
 			if (a < CTRL_14_OFFSET)
 			{ // 7 Bit Controller
 				snd_seq_ev_set_controller(&event, chn, a, b);
 			}
-				//else if (a < 0x20000) {     // 14 bit high resolution controller
 			else if (a < CTRL_RPN_OFFSET)
 			{ // 14 bit high resolution controller
 				int ctrlH = (a >> 8) & 0x7f;
@@ -265,7 +256,6 @@ bool MidiAlsaDevice::putMidiEvent(const MidiPlayEvent& e)
 				snd_seq_ev_set_controller(&event, chn, a, b);
 				event.type = SND_SEQ_EVENT_CONTROL14;
 			}
-				//else if (a < 0x30000) {     // RPN 7-Bit Controller
 			else if (a < CTRL_NRPN_OFFSET)
 			{ // RPN 7-Bit Controller
 				int ctrlH = (a >> 8) & 0x7f;
@@ -275,7 +265,6 @@ bool MidiAlsaDevice::putMidiEvent(const MidiPlayEvent& e)
 				snd_seq_ev_set_controller(&event, chn, a, b);
 				event.type = SND_SEQ_EVENT_REGPARAM;
 			}
-				//else if (a < 0x40000) {     // NRPN 7-Bit Controller
 			else if (a < CTRL_INTERNAL_OFFSET)
 			{ // NRPN 7-Bit Controller
 				int ctrlH = (a >> 8) & 0x7f;
@@ -285,7 +274,6 @@ bool MidiAlsaDevice::putMidiEvent(const MidiPlayEvent& e)
 				snd_seq_ev_set_controller(&event, chn, a, b);
 				event.type = SND_SEQ_EVENT_NONREGPARAM;
 			}
-				//else if (a < 0x60000) {     // RPN14 Controller
 			else if (a < CTRL_NRPN14_OFFSET)
 			{ // RPN14 Controller
 				int ctrlH = (a >> 8) & 0x7f;
@@ -294,7 +282,6 @@ bool MidiAlsaDevice::putMidiEvent(const MidiPlayEvent& e)
 				snd_seq_ev_set_controller(&event, chn, a, b);
 				event.type = SND_SEQ_EVENT_REGPARAM;
 			}
-				//else if (a < 0x70000) {     // NRPN14 Controller
 			else if (a < CTRL_NONE_OFFSET)
 			{ // NRPN14 Controller
 				int ctrlH = (a >> 8) & 0x7f;
@@ -457,31 +444,9 @@ bool initMidiAlsa()
 					adr.client, adr.port,
 					flags, capability);
 			midiDevices.add(dev);
-
-			/*
-			// Experimental... Need to list 'sensible' devices first and ignore unwanted ones...
-			// Add instance last in midi device list.
-			for(int i = 0; i < MIDI_PORTS; ++i)
-			{
-			  MidiPort* mp  = &midiPorts[i];
-			  if(mp->device() == 0)
-			  {
-				// midiSeq might not be initialzed yet!
-				//midiSeq->msgSetMidiDevice(mp, dev);
-				mp->setMidiDevice(dev);
-                      
-				//oom->changeConfig(true);     // save configuration file
-				//update();
-				break;
-			  }
-			}
-			 */
-
 		}
 	}
 
-	// p3.3.38
-	//snd_seq_set_client_name(alsaSeq, "OOMidi Sequencer");
 	snd_seq_set_client_name(alsaSeq, audioDevice->clientName());
 
 	int ci = snd_seq_poll_descriptors_count(alsaSeq, POLLIN);
@@ -647,8 +612,7 @@ void alsaScanMidiPorts()
 		if (i == midiDevices.end())
 		{
 			// add device
-			MidiAlsaDevice* dev = new MidiAlsaDevice(k->adr,
-					QString(k->name));
+			MidiAlsaDevice* dev = new MidiAlsaDevice(k->adr, QString(k->name));
 			dev->setrwFlags(k->flags);
 			midiDevices.add(dev);
 			// printf("add device\n");

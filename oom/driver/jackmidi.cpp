@@ -235,6 +235,8 @@ void MidiJackDevice::writeRouting(int level, Xml& xml) const
 				s = QT_TRANSLATE_NOOP("@default", "source");
 				if (r->type != Route::TRACK_ROUTE)
 					s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
+				else
+					s += QString(QT_TRANSLATE_NOOP("@default", " trackId=\"%1\"")).arg(r->track->id());
 
 				s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 				xml.tag(level, s.toLatin1().constData());
@@ -261,9 +263,10 @@ void MidiJackDevice::writeRouting(int level, Xml& xml) const
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 			if (r->type == Route::MIDI_DEVICE_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " devtype=\"%1\"")).arg(r->device->deviceType());
-			else
-				if (r->type != Route::TRACK_ROUTE)
+			else if (r->type != Route::TRACK_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
+			else if(r->type == Route::TRACK_ROUTE)
+				s += QString(QT_TRANSLATE_NOOP("@default", " trackId=\"%1\"")).arg(r->track->id());
 
 			s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 			xml.tag(level, s.toLatin1().constData());
@@ -381,10 +384,6 @@ void MidiJackDevice::recordEvent(MidiRecordEvent& event)/*{{{*/
 		song->putEvent(pv);
 	}
 
-	//if(_recordFifo.put(MidiPlayEvent(event)))
-	//  printf("MidiJackDevice::recordEvent: fifo overflow\n");
-
-	// p3.3.38
 	// Do not bother recording if it is NOT actually being used by a port.
 	// Because from this point on, process handles things, by selected port.
 	if (_port == -1)

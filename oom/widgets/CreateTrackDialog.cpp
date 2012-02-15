@@ -189,6 +189,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		case Track::DRUM:
 		{
             int instrumentType = cmbInstrument->itemData(instrumentIndex, CTDInstrumentTypeRole).toInt();
+			int outChan = cmbOutChannel->itemData(outChanIndex).toInt();
             QString instrumentName = cmbInstrument->itemData(instrumentIndex, CTDInstrumentNameRole).toString();
             QString selectedInput, selectedInput2;
             
@@ -203,6 +204,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
 
                         m_vtrack->createMidiOutputDevice = false;
                         m_vtrack->outputChannel = 0;
+						outChan = 0;
                         m_vtrack->useOutput = true;
                         m_vtrack->useMonitor = true;
                         break;
@@ -245,7 +247,6 @@ void CreateTrackDialog::addTrack()/*{{{*/
 				m_vtrack->useOutput = true;
 				QString devname = cmbOutput->itemText(outputIndex);
 				int devtype = cmbOutput->itemData(outputIndex).toInt();
-				int outChan = cmbOutChannel->itemData(outChanIndex).toInt();
 				if(m_currentMidiOutputList.isEmpty())
 				{
 					m_createMidiOutputDevice = true;
