@@ -1834,11 +1834,11 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                             switch (ev->type())
                             {
                             case ME_NOTEOFF:
-                                if (ev->dataA() >= 0 && ev->dataA() <= 127)
+                                if (ev->dataA() < 0 || ev->dataA() > 127)
                                     continue;
                                 break;
                             case ME_NOTEON:
-                                if (ev->dataA() >= 0 && ev->dataA() <= 127)
+                                if (ev->dataA() < 0 || ev->dataA() > 127)
                                     continue;
                                 break;
                             case ME_CONTROLLER:
