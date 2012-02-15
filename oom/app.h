@@ -247,9 +247,6 @@ class OOMidi : public QMainWindow
 
     void setFollow();
     void readConfigParts(Xml& xml);
-    void readMidiport(Xml& xml);
-    void readMidichannel(Xml& xml, int port);
-    void readCtrl(Xml& xml, int port, int channel);
     void readToplevels(Xml& xml);
     PartList* getMidiPartsToEdit();
     Part* readPart(Xml& xml);

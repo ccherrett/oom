@@ -570,7 +570,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 	QAction* afterTrack = p->addAction(tr("Add Track After"));
 	afterTrack->setData(12000);
 
-	if(m_track->name() != "Master")
+	if(m_track->id() != song->masterId() || m_track->id() != song->oomVerbId())
 	{
 		p->addAction(QIcon(*midi_edit_instrumentIcon), tr("Rename Track"))->setData(15);
 		p->addSeparator();
@@ -645,6 +645,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
             mactn->setEnabled(synth->hasNativeGui());
             mactn->setChecked(synth->nativeGuiVisible());
             mactn->setData(16);
+			mactn->setShortcut(shortcuts[SHRT_SHOW_NATIVE_GUI].key);
         }
 	}
 
@@ -671,7 +672,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					}
 					else
 					{
-						if(m_track->name() == "Master")
+						if(m_track->id() == song->masterId() || m_track->id() == song->oomVerbId())
 							break;
 						song->removeTrack(m_track);
 						audio->msgUpdateSoloStates();

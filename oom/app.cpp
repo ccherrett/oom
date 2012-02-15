@@ -166,6 +166,7 @@ void initGlobalInputPorts()/*{{{*/
 			qDebug("createMidiInputDevice is set: %i", midiInPort);
 			inport = &midiPorts[midiInPort];
 			int devtype = input.first;
+			oomMidiPorts.insert(inport->id(), inport);
 			if(devtype == MidiDevice::ALSA_MIDI)
 			{
 				indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
@@ -1584,15 +1585,31 @@ void OOMidi::loadProjectFile(const QString& name, bool songTemplate, bool loadAl
 
 void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadAll)
 {
-	//FIXME: Check this the file exists before going further
-	//if (audioMixer)
-	//      audioMixer->clear();
 	if (mixer1)
 		mixer1->clear();
 	m_mixerWidget->clear();
-	//if (mixer2)
-	//	mixer2->clear();
 	composer->clear(); // clear track info
+	//Clear the ID based oomMidiPorts hash, it will be repopulated when the song loads
+	oomMidiPorts.clear();
+	//Reset Linuxsampler if user selected reset on song load
+	if(config.lsClientResetOnSongStart)
+	{
+		if(!lsClient)
+		{
+			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+			lsClientStarted = lsClient->startClient();
+			if(lsClientStarted)
+				lsClient->resetSampler();
+		}
+		else if(!lsClientStarted)
+		{
+			lsClientStarted = lsClient->startClient();
+			if(lsClientStarted)
+				lsClient->resetSampler();
+		}
+		else
+			lsClient->resetSampler();
+	}
 	if (clearSong())
 	{
 		return;
@@ -1723,32 +1740,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	if (loadAll)
 	{
 		showBigtime(config.bigTimeVisible);
-		//showMixer(config.mixerVisible);
 		showMixer1(config.mixer1Visible);
-		//showMixer2(config.mixer2Visible);
-
-		// Added p3.3.43 Make sure the geometry is correct because showMixerX() will NOT
-		//  set the geometry if the mixer has already been created.
-		if (mixer1)
-		{
-			//if(mixer1->geometry().size() != config.mixer1.geometry.size())   // p3.3.53 Moved below
-			//  mixer1->resize(config.mixer1.geometry.size());
-
-			if (mixer1->geometry().topLeft() != config.mixer1.geometry.topLeft())
-				mixer1->move(config.mixer1.geometry.topLeft());
-		}
-		/*if (mixer2)
-		{
-			//if(mixer2->geometry().size() != config.mixer2.geometry.size())   // p3.3.53 Moved below
-			//  mixer2->resize(config.mixer2.geometry.size());
-
-			if (mixer2->geometry().topLeft() != config.mixer2.geometry.topLeft())
-				mixer2->move(config.mixer2.geometry.topLeft());
-		}*/
-
-		//showMarker(config.markerVisible);  // Moved below. Tim.
-		//resize(config.geometryMain.size());
-		//move(config.geometryMain.topLeft());
 
 		if (config.transportVisible)
 			transport->show();
@@ -1765,24 +1757,9 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	clipboardChanged(); // enable/disable "Paste"
 	selectionChanged(); // enable/disable "Copy" & "Paste"
 
-	// p3.3.53 Try this AFTER the song update above which does a mixer update... Tested OK - mixers resize properly now.
+	// Try this AFTER the song update above which does a mixer update... Tested OK - mixers resize properly now.
 	if (loadAll)
 	{
-		if (mixer1)
-		{
-			if (mixer1->geometry().size() != config.mixer1.geometry.size())
-			{
-				mixer1->resize(config.mixer1.geometry.size());
-			}
-		}
-		/*if (mixer2)
-		{
-			if (mixer2->geometry().size() != config.mixer2.geometry.size())
-			{
-				mixer2->resize(config.mixer2.geometry.size());
-			}
-		}*/
-
 		// Moved here from above due to crash with a song loaded and then File->New.
 		// Marker view list was not updated, had non-existent items from marker list (cleared in ::clear()).
 		showMarker(config.markerVisible);

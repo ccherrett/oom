@@ -685,6 +685,7 @@ void MidiTrack::setOutPortId(qint64 i)
     if (oomMidiPorts.contains(i))
 	{
 		MidiPort* mp = oomMidiPorts.value(i);
+		_outPort = mp->portno();
 		_wantsAutomation = (mp->device() && mp->device()->isSynthPlugin());
         if (_wantsAutomation)
             ((SynthPluginDevice*)midiPorts[i].device())->setTrackId(m_id);
@@ -734,6 +735,7 @@ void MidiTrack::setOutPortIdAndUpdate(qint64 i)/*{{{*/
     if (oomMidiPorts.contains(i))
 	{
 		MidiPort* mp = oomMidiPorts.value(i);
+		_outPort = mp->portno();
 		_wantsAutomation = (mp->device() && mp->device()->isSynthPlugin());
 	}
 
@@ -1053,10 +1055,14 @@ void Track::writeRouting(int level, Xml& xml) const/*{{{*/
 				s = QT_TRANSLATE_NOOP("@default", "source");
 				if (r->type != Route::TRACK_ROUTE)
 					s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
+				else
+				{
+					s += QString(QT_TRANSLATE_NOOP("@default", " trackId=\"%1\"")).arg(r->track->id());
+				}
 				s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
 				xml.tag(level, s.toAscii().constData());
 
-				xml.tag(level, "dest name=\"%s\"/", Xml::xmlString(name()).toLatin1().constData());
+				xml.tag(level, "dest name=\"%s\" trackId=\"%lld\"/", Xml::xmlString(name()).toLatin1().constData(), m_id);
 
                 xml.etag(--level, "Route");
 			}
@@ -1086,14 +1092,16 @@ void Track::writeRouting(int level, Xml& xml) const/*{{{*/
 
 			xml.tag(level++, s.toAscii().constData());
 
-			xml.tag(level, "source name=\"%s\"/", Xml::xmlString(name()).toLatin1().constData());
+			xml.tag(level, "source name=\"%s\" trackId=\"%lld\"/", Xml::xmlString(name()).toLatin1().constData(), m_id);
 
 			s = QT_TRANSLATE_NOOP("@default", "dest");
 
 			if (r->type != Route::TRACK_ROUTE && r->type != Route::MIDI_PORT_ROUTE)
 				s += QString(QT_TRANSLATE_NOOP("@default", " type=\"%1\"")).arg(r->type);
+			else if(r->type == Route::TRACK_ROUTE)
+				s += QString(QT_TRANSLATE_NOOP("@default", " trackId=\"%1\"")).arg(r->track->id());
 
-			if (r->type == Route::MIDI_PORT_ROUTE) // p3.3.49
+			if (r->type == Route::MIDI_PORT_ROUTE) 
 				s += QString(QT_TRANSLATE_NOOP("@default", " mport=\"%1\"/")).arg(r->midiPort);
 			else
 				s += QString(QT_TRANSLATE_NOOP("@default", " name=\"%1\"/")).arg(Xml::xmlString(r->name()));
@@ -1120,8 +1128,21 @@ void MidiTrack::write(int level, Xml& xml) const/*{{{*/
 	xml.tag(level++, tag);
 	Track::writeProperties(level, xml);
 
-	xml.intTag(level, "device", outPort());
-	xml.intTag(level, "deviceId", outPortId());
+	//Make sure we have the proper id but using the id of the port currently set
+	MidiPort* mp = &midiPorts[outPort()];
+	if(mp)
+	{ 	
+		if(mp->id() == outPortId())
+			xml.qint64Tag(level, "deviceId", outPortId());
+		else
+		{
+			xml.qint64Tag(level, "deviceId", mp->id());
+		}
+	}
+	/*else
+	{//Its probably unconfgured just use the index
+		xml.intTag(level, "device", outPort());
+	}*/
 	xml.intTag(level, "channel", outChannel());
 	xml.intTag(level, "locked", _locked);
 	xml.intTag(level, "echo", _recEcho);
@@ -1199,7 +1220,9 @@ void MidiTrack::read(Xml& xml)/*{{{*/
 						parts()->add(p);
 				}
 				else if (tag == "device")
+				{//Check if global inputs has bumped the port order and increment
 					setOutPort(xml.parseInt());
+				}
 				else if (tag == "deviceId")
 					setOutPortId(xml.parseLongLong());
 				else if (tag == "channel")
