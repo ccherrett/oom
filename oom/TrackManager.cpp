@@ -34,8 +34,8 @@ VirtualTrack::VirtualTrack()
 	useGlobalInputs = false;
 	useBuss = false;
 	useMonitor = false;
-	inputChannel = -1;
-	outputChannel = -1;
+	inputChannel = 0;
+	outputChannel = 0;
 	instrumentType = -1;
 	instrumentPan = 0.0;
 	instrumentVerb = 0.0;
