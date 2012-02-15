@@ -135,6 +135,7 @@ class OOMidi : public QMainWindow
 
     // View Menu actions
     QAction *viewTransportAction, *viewBigtimeAction, *viewMixerAAction, *viewCliplistAction, *viewMarkerAction;
+    QAction *viewToolbarOrchestra, *viewToolbarMixer, *viewToolbarComposerSettings, *viewToolbarSnap, *viewToolbarTransport;
 
     // Structure Menu actions
     QAction *strGlobalCutAction, *strGlobalInsertAction, *strGlobalSplitAction, *strCopyRangeAction, *strCutEventsAction;
@@ -170,11 +171,14 @@ class OOMidi : public QMainWindow
     BigTime* bigtime;
     EditInstrument* editInstrument;
 
+    QToolBar* toolbarComposerSettings;
+    QToolBar* toolbarSnap;
+
     QMenu *menu_file, *menuView, *menuSettings, *menu_help;
     QMenu *menuEdit, *menuStructure;
     QMenu* menu_audio, *menuAutomation;
     QMenu* menu_functions, *menuScriptPlugins;
-    QMenu* select, *master, *midiEdit, *addTrack;
+    QMenu* select, *master, *viewToolbars, *midiEdit, *addTrack;
 
     // Special 'stay-open' menu for routes.
     PopupMenu* routingPopupMenu;
@@ -299,6 +303,13 @@ private slots:
     void toggleBigTime(bool);
     void toggleMixer1(bool);
     void toggleMixer2(bool);
+
+    void showToolbarOrchestra(bool);
+    void showToolbarMixer(bool);
+    void showToolbarComposerSettings(bool);
+    void showToolbarSnap(bool);
+    void showToolbarTransport(bool);
+    void updateViewToolbarMenu();
 
     void configMidiFile();
     void configShortCuts();
@@ -441,6 +452,7 @@ public:
 
 	QDockWidget* resourceDock() { return _resourceDock; }
 	void addTransportToolbar();
+    void setComposerAndSnapToolbars(QToolBar*, QToolBar*);
 	bool saveRouteMapping(QString, QString note = "Untitled");
 	bool loadRouteMapping(QString);
 	bool updateRouteMapping(QString, QString);
