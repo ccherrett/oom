@@ -51,7 +51,7 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 	m_layout->setSpacing(0);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setAlignment(Qt::AlignTop|Qt::AlignLeft);
-	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
+	QSpacerItem* vSpacer = new QSpacerItem(20, 240, QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
 	m_layout->addItem(vSpacer);
 
 	ypos = 0;
@@ -633,14 +633,21 @@ void HeaderList::dropEvent(QDropEvent *event)/*{{{*/
 				{//Create the track
 					Track::TrackType t = Track::MIDI;
 					if(text.endsWith(".wav", Qt::CaseInsensitive) || text.endsWith(".ogg", Qt::CaseInsensitive))
-						t = Track::WAVE;
-					VirtualTrack* vt;
-					CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
-					ctdialog->lockType(true);
-					if(ctdialog->exec() && vt)
 					{
-						qint64 nid = trackManager->addTrack(vt, -1);
-						track = song->findTrackById(nid);
+						t = Track::WAVE;
+						QFileInfo f(text);
+						track = song->addTrackByName(f.baseName(), Track::WAVE, -1, true, true);
+					}
+					else
+					{
+						VirtualTrack* vt;
+						CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
+						ctdialog->lockType(true);
+						if(ctdialog->exec() && vt)
+						{
+							qint64 nid = trackManager->addTrack(vt, -1);
+							track = song->findTrackById(nid);
+						}
 					}
 				}
 				
