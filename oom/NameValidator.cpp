@@ -9,16 +9,20 @@ NameValidator::NameValidator(QObject *parent)
 {
 }
 
-QValidator::State NameValidator::validate(QString& input, int& pos) const
+QValidator::State NameValidator::validate(QString& name, int& pos) const
 {
 	Q_UNUSED(pos);
-	if(input == Track::getValidName(input) && QRegExp("[a-zA-Z0-9_ ]{0,255}").exactMatch(input))
+	if(name == Track::getValidName(name) && QRegExp("[a-zA-Z0-9_- ]{0,255}").exactMatch(name))
 	{
 		return QValidator::Acceptable;
 	}
 	else
 	{
-		return QValidator::Invalid;
+		fixup(name);
+		if(QRegExp("[a-zA-Z0-9_- ]{0,255}").exactMatch(name))
+			return QValidator::Intermediate;
+		else
+			return QValidator::Invalid;
 	}
 }
 
