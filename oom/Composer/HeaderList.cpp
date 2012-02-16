@@ -51,7 +51,7 @@ HeaderList::HeaderList(QWidget* parent, const char* name)
 	m_layout->setSpacing(0);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setAlignment(Qt::AlignTop|Qt::AlignLeft);
-	QSpacerItem* vSpacer = new QSpacerItem(20, 240, QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
+	QSpacerItem* vSpacer = new QSpacerItem(20, 440, QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
 	m_layout->addItem(vSpacer);
 
 	ypos = 0;
