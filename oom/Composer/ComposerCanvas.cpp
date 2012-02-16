@@ -1465,7 +1465,7 @@ void ComposerCanvas::mouseRelease(const QPoint& pos)
 				endY = tempY;
 			}
 
-			if(startY < automation.currentTrack->y())
+			if(startY > automation.currentTrack->y())
 				startY = automation.currentTrack->y();
 			if(endY > (automation.currentTrack->y() + automation.currentTrack->height()))
 				endY = (automation.currentTrack->y() + automation.currentTrack->height());
