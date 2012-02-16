@@ -552,7 +552,8 @@ void PerformerCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType
 	std::vector< CItem* > doneList;
 	typedef std::vector< CItem* >::iterator iDoneList;
 
-	for (iCItem ici = items.begin(); ici != items.end(); ++ici)
+    int i = 0, count = items.size();
+	for (iCItem ici = items.begin(); ici != items.end(); ++ici, ++i)
 	{
 		CItem* ci = ici->second;
 
@@ -595,7 +596,7 @@ void PerformerCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType
 			}
 		}
 
-		if (_moving.size() == 1)
+		if (_moving.size() == 1 || i == count-1)
 			itemReleased(_curItem, newpos);
 		if (dtype == MOVE_COPY || dtype == MOVE_CLONE)
 			selectItem(ci, false);
@@ -2319,7 +2320,9 @@ void PerformerCanvas::itemReleased(const CItem*, const QPoint&)
 
 void PerformerCanvas::itemMoved(const CItem* item, const QPoint& pos)
 {
-	int npitch = y2pitch(pos.y());
+    if (!_playEvents)
+		return;
+    int npitch = y2pitch(pos.y());
 	if ((playedPitch != -1) && (playedPitch != npitch))
 	{
 		int port = track()->outPort();

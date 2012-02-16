@@ -1829,7 +1829,7 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                         iMPEvent ev = eventList->begin();
                         for (; ev != eventList->end(); ++ev)
                         {
-                            //qWarning("Event: %02X %02i %02i %0i", ev->type(), ev->dataA(), ev->dataB(), ev->channel());
+                            //qWarning("Event: 0x%02X %02i %02i", ev->type()+ev->channel(), ev->dataA(), ev->dataB());
 #if 1
                             switch (ev->type())
                             {
