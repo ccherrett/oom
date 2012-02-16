@@ -4246,15 +4246,21 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 		    	event->acceptProposedAction();
 				Track::TrackType t = Track::MIDI;
 				if(text.endsWith(".wav", Qt::CaseInsensitive) || text.endsWith(".ogg", Qt::CaseInsensitive))
-					t = Track::WAVE;
-				VirtualTrack* vt;
-				CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
-				ctdialog->lockType(true);
-				if(ctdialog->exec() && vt)
 				{
-					TrackManager* tman = new TrackManager();
-					qint64 nid = tman->addTrack(vt);
-					track = song->findTrackById(nid);
+					QFileInfo f(text);
+					track = song->addTrackByName(f.baseName(), Track::WAVE, -1, true, true);
+				}
+				else
+				{
+					VirtualTrack* vt;
+					CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
+					ctdialog->lockType(true);
+					if(ctdialog->exec() && vt)
+					{
+						TrackManager* tman = new TrackManager();
+						qint64 nid = tman->addTrack(vt);
+						track = song->findTrackById(nid);
+					}
 				}
 			}
 			

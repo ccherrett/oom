@@ -354,14 +354,17 @@ void AudioClipList::fileItemContextMenu(const QPoint& pos)/*{{{*/
 
 						Track::TrackType t = Track::MIDI;
 						if(f.suffix().endsWith("wav", Qt::CaseInsensitive) || f.suffix().endsWith("ogg", Qt::CaseInsensitive))
-							t = Track::WAVE;
-						VirtualTrack* vt;
-						CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
-						ctdialog->lockType(true);
-						if(ctdialog->exec() && vt)
+							track = song->addTrackByName(f.baseName(), Track::WAVE, -1, true, true);
+						else
 						{
-							qint64 nid = trackManager->addTrack(vt, -1);
-							track = song->findTrackById(nid);
+							VirtualTrack* vt;
+							CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, t, -1, this);
+							ctdialog->lockType(true);
+							if(ctdialog->exec() && vt)
+							{
+								qint64 nid = trackManager->addTrack(vt, -1);
+								track = song->findTrackById(nid);
+							}
 						}
 						if(track)
 						{
