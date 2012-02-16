@@ -592,10 +592,10 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 			{
 				line2x = xpos;
 				line2y = ypos;
-				//if (shift)
+				if (type != MidiController::Velo)
 					newValRamp(line1x, line1y, line2x, line2y);
-				//else
-				//	changeValRamp(line1x, line1y, line2x, line2y);
+				else
+					changeValRamp(line1x, line1y, line2x, line2y);
 				drawLineMode = false;
 			}
 			else

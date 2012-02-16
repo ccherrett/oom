@@ -454,7 +454,7 @@ void SynthPluginDevice::writeRouting(int, Xml&) const
 {
     if (m_plugin)
     {
-        qWarning("SynthPluginDevice::writeRouting()");
+        //qWarning("SynthPluginDevice::writeRouting()");
     }
 }
 
@@ -610,7 +610,6 @@ void SynthPluginDevice::read(Xml& xml)
 {
     if (m_plugin)
     {
-        qWarning("SynthPluginDevice::read(XML)");
         m_plugin->readConfiguration(xml, false);
         if (m_audioTrack)
             ((SynthPluginTrack*)m_audioTrack)->read(xml);
@@ -621,13 +620,9 @@ void SynthPluginDevice::write(int level, Xml& xml)
 {
     if (m_plugin)
     {
-        qWarning("SynthPluginDevice::write(XML)");
         m_plugin->writeConfiguration(level, xml);
         if (m_audioTrack)
-        {
-            qWarning("SynthPluginDevice::write(XML) - write automation track data");
             m_audioTrack->write(level, xml);
-        }
     }
 }
 
