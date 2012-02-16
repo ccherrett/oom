@@ -406,6 +406,7 @@ void Composer::currentTabChanged(int tab)
 			{
 				m_clipList->setActive(true);
 				m_clipList->refresh();
+				m_clipList->loadBookmarks();
 			}
 		}
 		break;

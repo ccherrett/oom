@@ -49,7 +49,6 @@ class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 	bool m_active;
 
 	bool isSupported(const QString&);
-	void loadBookmarks();
 	void addBookmark(const QString&);
 	void updateLabels();
 
@@ -82,6 +81,7 @@ private slots:
 
 public slots:
 	void refresh();
+	void loadBookmarks();
 	void setActive(bool v)
 	{
 		m_active = v;

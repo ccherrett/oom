@@ -278,7 +278,6 @@ void AudioClipList::refresh()/*{{{*/
 		else
 			setDir(oomProject);
 	}
-	loadBookmarks();
 }/*}}}*/
 
 bool AudioClipList::isSupported(const QString& suffix)
