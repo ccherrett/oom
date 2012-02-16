@@ -645,7 +645,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
             mactn->setEnabled(synth->hasNativeGui());
             mactn->setChecked(synth->nativeGuiVisible());
             mactn->setData(16);
-			mactn->setShortcut(shortcuts[SHRT_SHOW_NATIVE_GUI].key);
+			mactn->setShortcut(shortcuts[SHRT_SHOW_PLUGIN_GUI].key);
         }
 	}
 

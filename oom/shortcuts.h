@@ -321,7 +321,7 @@ enum
     SHRT_SEL_INSTRUMENT,
     SHRT_PREVIEW_INSTRUMENT,
     SHRT_PART_TOGGLE_MUTE,
-	SHRT_SHOW_NATIVE_GUI,
+	SHRT_SHOW_PLUGIN_GUI,
 
     // Shortcuts for tools
     // global

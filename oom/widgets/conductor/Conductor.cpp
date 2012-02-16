@@ -379,8 +379,8 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	connect(btnTranspose, SIGNAL(toggled(bool)), SIGNAL(globalTransposeClicked(bool)));
 	connect(btnComments, SIGNAL(toggled(bool)), SIGNAL(toggleComments(bool)));
 
-	btnShowGui->setShortcut(shortcuts[SHRT_SHOW_NATIVE_GUI].key);
-	connect(btnShowGui, SIGNAL(toggled(bool)), this, SLOT(toggleSynthNativeGui(bool)));
+	btnShowGui->setShortcut(shortcuts[SHRT_SHOW_PLUGIN_GUI].key);
+	connect(btnShowGui, SIGNAL(toggled(bool)), this, SLOT(toggleSynthGui(bool)));
 
 	btnComments->setIcon(QIcon(*commentIconSet3));
 	btnTranspose->setIcon(QIcon(*transposeIconSet3));
@@ -618,14 +618,27 @@ void Conductor::heartBeat()
 
     		    if (port->device() && port->device()->isSynthPlugin())
     		    {
+                    btnShowGui->setEnabled(true);
 					SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
-					btnShowGui->setEnabled(synth->hasNativeGui());
-    		        if((btnShowGui->isChecked() != synth->nativeGuiVisible()) && synth->hasNativeGui())
-					{//Update the state as it was set elsewhere or the track was changed
-						btnShowGui->blockSignals(true);
-						btnShowGui->setChecked(synth->nativeGuiVisible());
-    		        	btnShowGui->blockSignals(false);
-					}
+                    //Update the state as it was set elsewhere or the track was changed
+                    if (synth->hasNativeGui())
+                    {
+                        if (btnShowGui->isChecked() != synth->nativeGuiVisible())
+                        {
+                            btnShowGui->blockSignals(true);
+                            btnShowGui->setChecked(synth->nativeGuiVisible());
+                            btnShowGui->blockSignals(false);
+                        }
+                    }
+                    else
+                    {
+                        if (btnShowGui->isChecked() != synth->guiVisible())
+                        {
+                            btnShowGui->blockSignals(true);
+                            btnShowGui->setChecked(synth->guiVisible());
+                            btnShowGui->blockSignals(false);
+                        }
+                    }
     		    }
 				else
 				{
@@ -645,7 +658,7 @@ void Conductor::heartBeat()
 	}
 }
 
-void Conductor::toggleSynthNativeGui(bool on)
+void Conductor::toggleSynthGui(bool on)
 {
 	if(!selected)
 		return;
@@ -659,6 +672,8 @@ void Conductor::toggleSynthNativeGui(bool on)
 			SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
             if(synth->hasNativeGui())
 				audio->msgShowInstrumentNativeGui(port->instrument(), on);
+            else
+                audio->msgShowInstrumentGui(port->instrument(), on);
         }
 	}/*}}}*/
 }
@@ -1680,13 +1695,25 @@ void Conductor::updateConductor(int flags)
         if (port->device() && port->device()->isSynthPlugin())
         {
 			SynthPluginDevice* synth = (SynthPluginDevice*)port->device();
-			btnShowGui->setEnabled(synth->hasNativeGui());
-            if((btnShowGui->isChecked() != synth->nativeGuiVisible()) && synth->hasNativeGui())
-			{//Update the state as it was set elsewhere or the track was changed
-				btnShowGui->blockSignals(true);
-				btnShowGui->setChecked(synth->nativeGuiVisible());
-            	btnShowGui->blockSignals(false);
-			}
+            //Update the state as it was set elsewhere or the track was changed
+            if (synth->hasNativeGui())
+            {
+                if (btnShowGui->isChecked() != synth->nativeGuiVisible())
+                {
+                    btnShowGui->blockSignals(true);
+                    btnShowGui->setChecked(synth->nativeGuiVisible());
+                    btnShowGui->blockSignals(false);
+                }
+            }
+            else
+            {
+                if (btnShowGui->isChecked() != synth->guiVisible())
+                {
+                    btnShowGui->blockSignals(true);
+                    btnShowGui->setChecked(synth->guiVisible());
+                    btnShowGui->blockSignals(false);
+                }
+            }
         }
 		else
 		{

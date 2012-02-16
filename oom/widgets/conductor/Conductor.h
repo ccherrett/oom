@@ -102,7 +102,7 @@ private slots:
     void editorPartChanged(Part*);
     void transposeStateChanged(bool);
 	
-	void toggleSynthNativeGui(bool);
+	void toggleSynthGui(bool);
 
     //tb1
     void _rasterChanged(int);
