@@ -489,6 +489,20 @@ void MixerDock::composerViewChanged()
 	updateMixer(UPDATE_ALL);
 }
 
+void MixerDock::scrollSelectedToView(qint64 id)
+{
+	StripList::iterator si = stripList.begin();
+	for (; si != stripList.end(); ++si)
+	{
+		Track* t = (*si)->getTrack();
+		if(t->id() == id)
+		{
+			view->ensureWidgetVisible(*si);
+			break;
+		}
+	}
+}
+
 //---------------------------------------------------------
 //   songChanged
 //---------------------------------------------------------
@@ -536,24 +550,6 @@ void MixerDock::songChanged(int flags)/*{{{*/
 		if((m_mode == DOCKED || m_mode == MASTER )&& masterStrip)
 		{
 			masterStrip->songChanged(flags);
-		}
-	}
-	if((flags & SC_SELECTION))
-	{
-		QList<qint64> selected = song->selectedTracks();
-		if(selected.size())
-		{
-			qint64 id = selected.at(0);
-			StripList::iterator si = stripList.begin();
-			for (; si != stripList.end(); ++si)
-			{
-				Track* t = (*si)->getTrack();
-				if(t->id() == id)
-				{
-					view->ensureWidgetVisible(*si);
-					break;
-				}
-			}
 		}
 	}
 }/*}}}*/

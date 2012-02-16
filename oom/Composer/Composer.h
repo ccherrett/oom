@@ -115,6 +115,7 @@ signals:
     void updateFooterTool(int);
     //void addMarker(int);
     void setUsedTool(int);
+	void trackSelectionChanged(qint64);
 
 
 protected:

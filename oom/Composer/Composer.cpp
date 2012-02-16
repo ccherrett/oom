@@ -141,6 +141,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	song->setComposerRaster(0);
 	toolbar2->addWidget(raster);
 	connect(raster, SIGNAL(activated(int)), SLOT(_setRaster(int)));
+	connect(raster, SIGNAL(currentIndexChanged(int)), SLOT(_setRaster(int)));
 	///raster->setFocusPolicy(Qt::NoFocus);
 	raster->setFocusPolicy(Qt::TabFocus);
 
@@ -606,6 +607,7 @@ void Composer::trackSelectionChanged()
 			raster->setCurrentIndex(config.audioRaster);
 			//printf("Setting audio raster in trackSelectionChanged(%d)\n", config.audioRaster);
 		}
+		emit trackSelectionChanged(selected->id());
 	}
 }
 

@@ -1261,6 +1261,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(composer, SIGNAL(startEditor(PartList*, int)), SLOT(startEditor(PartList*, int)));
 	connect(this, SIGNAL(configChanged()), composer, SLOT(configChanged()));
 	connect(pcloaderAction, SIGNAL(triggered()), composer, SLOT(preloadControllers()));
+	connect(composer, SIGNAL(trackSelectionChanged(qint64)), m_mixerWidget, SLOT(scrollSelectedToView(qint64)));
 
 	connect(composer, SIGNAL(setUsedTool(int)), SLOT(setUsedTool(int)));
 

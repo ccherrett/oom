@@ -78,6 +78,7 @@ public slots:
 	void generateVUColorMenu();
 	void updateConnections(bool);
 	void composerViewChanged();
+	void scrollSelectedToView(qint64);
 	
 protected:
     void addStrip(Track*, int);
