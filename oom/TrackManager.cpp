@@ -55,7 +55,7 @@ void VirtualTrack::write(int level, Xml& xml) const/*{{{*/
 	{
 		xml.nput("autoCreateInstrument=\"%d\" createMidiInputDevice=\"%d\" createMidiOutputDevice=\"%d\" ", 
 				autoCreateInstrument, createMidiInputDevice, createMidiOutputDevice);
-		xml.nput("instrumentName=\"%s\" instrumentType=\"%d\" instrumentPan=\"%d\" instrumentVerb=\"%d\" ",
+		xml.nput("instrumentName=\"%s\" instrumentType=\"%d\" instrumentPan=\"%f\" instrumentVerb=\"%f\" ",
 				instrumentName.toUtf8().constData(), instrumentType, instrumentPan, instrumentVerb);
 		
 		xml.nput("useMonitor=\"%d\" useBuss=\"%d\" inputChannel=\"%d\" outputChannel=\"%d\" ", 

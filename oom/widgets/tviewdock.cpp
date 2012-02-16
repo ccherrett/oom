@@ -170,7 +170,7 @@ void TrackViewDock::trackviewChanged(QStandardItem *item)/*{{{*/
 		if(tv)
 		{
 			//qDebug("TrackViewDock::trackviewChanged: Found trackview %s", tv->viewName().toUtf8().constData());
-			bool selected = (item->checkState() == Qt::Checked);
+			bool selected = (item->checkState() == Qt::Checked);/*{{{*/
 			if(selected && tv->hasVirtualTracks())
 			{
 				QStringList list;
@@ -213,7 +213,7 @@ void TrackViewDock::trackviewChanged(QStandardItem *item)/*{{{*/
 						}
 					}
 				}
-			}
+			}/*}}}*/
 			tv->setSelected(selected);
 			song->updateTrackViews();
 		}
@@ -454,12 +454,12 @@ void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 										Track* track = song->findTrackByIdAndType(id, vt->type);
 										if(track)
 										{
-											song->updateTrackViews();
 											tv->removeTrack(tvt);
 										}
 									}
 								}
 							}
+							song->updateTrackViews();
 						}/*}}}*/
 						tv->setSelected(true);
 						song->insertTrackView(tv, -1);
