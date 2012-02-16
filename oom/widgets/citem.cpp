@@ -85,7 +85,7 @@ void CItem::setSelected(bool f)
 //   CItemList
 //---------------------------------------------------------
 
-CItem* CItemList::find(const QPoint& pos) const
+CItem* CItemList::find(const QPoint& pos) const/*{{{*/
 {
 	rciCItem ius;
 	bool usfound = false;
@@ -110,7 +110,7 @@ CItem* CItemList::find(const QPoint& pos) const
 		return ius->second;
 	else
 		return 0;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   CItemList
@@ -121,3 +121,14 @@ void CItemList::add(CItem* item)
 	std::multimap<int, CItem*, std::less<int> >::insert(std::pair<const int, CItem*> (item->bbox().x(), item));
 }
 
+int CItemList::selectionCount()/*{{{*/
+{
+	rciCItem ius;
+	int rv = 0;
+	for (rciCItem i = rbegin(); i != rend(); ++i)
+	{
+		if (i->second->isSelected())
+			++rv;
+	}
+	return rv;
+}/*}}}*/

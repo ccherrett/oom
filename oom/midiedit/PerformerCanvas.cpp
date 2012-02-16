@@ -554,10 +554,11 @@ void PerformerCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType
 	typedef std::vector< CItem* >::iterator iDoneList;
 
     int i = 0, count = items.size();
+	_playMoveEvent = (items.selectionCount() == 1);
 	for (iCItem ici = items.begin(); ici != items.end(); ++ici, ++i)
 	{
 		CItem* ci = ici->second;
-        _playMoveEvent = (i == 0);
+        //_playMoveEvent = (i == 0);
 
 		// If this item's part is in the parts2change list, change the item's part to the new part.
 		Part* pt = ci->part();
@@ -2454,10 +2455,10 @@ void PerformerCanvas::modifySelected(NoteInfo::ValType type, int delta, bool str
 	song->startUndo();
 	//i use this to make sure I only sound a note once if you are
 	//moving multiple notes at once
-	int count = 1;
 	CItemList list = _items;
 	if(strict)
 		list = getSelectedItemsForCurrentPart();
+	int count = list.selectionCount();
     for (iCItem i = list.begin(); i != list.end(); ++i)
 	{
 		if (!(i->second->isSelected()))
@@ -2475,7 +2476,6 @@ void PerformerCanvas::modifySelected(NoteInfo::ValType type, int delta, bool str
 				doModify(type, delta, citem, false);
 			}
 		}
-		++count;
 	}
 	song->endUndo(SC_EVENT_MODIFIED);
 	audio->msgIdle(false);

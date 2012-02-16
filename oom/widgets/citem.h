@@ -148,6 +148,7 @@ class CItemList : public std::multimap<int, CItem*, std::less<int> > {
 public:
     void add(CItem*);
     CItem* find(const QPoint& pos) const;
+	int selectionCount();
 };
 
 #endif

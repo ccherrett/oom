@@ -563,7 +563,7 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			if (_curItem)
 			{
 				selectItem(_curItem, true);
-				//TODO: Play the note
+				// Play the note
 				itemPressed(_curItem);
 			}
 			updateSelection();
@@ -579,7 +579,6 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 
 void EventCanvas::mouseRelease(const QPoint& pos)
 {
-	qDebug("EventCanvas::mouseRelease");
 	if(_tool == PencilTool && _curItem)
 	{
 		itemReleased(_curItem, pos);
