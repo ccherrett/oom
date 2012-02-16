@@ -63,8 +63,8 @@ void initShortCuts()
 	//      defShrt(SHRT_CONFIG_PRINTER,        Qt::CTRL + Qt::Key_P, "Configure printer", ARRANG_SHRT, "config_printer");
 	defShrt(SHRT_IMPORT_MIDI, 0, "File: Import midi file", ARRANG_SHRT, "import_midi");
 	defShrt(SHRT_EXPORT_MIDI, 0, "File: Export midi file", ARRANG_SHRT, "export_midi");
-	defShrt(SHRT_IMPORT_PART, 0, "File: Import midi part", ARRANG_SHRT, "import_part");
-	defShrt(SHRT_IMPORT_AUDIO, 0, "File: Import audio file", ARRANG_SHRT, "import_audio");
+	//defShrt(SHRT_IMPORT_PART, 0, "File: Import midi part", ARRANG_SHRT, "import_part");
+	//defShrt(SHRT_IMPORT_AUDIO, 0, "File: Import audio file", ARRANG_SHRT, "import_audio");
 	defShrt(SHRT_QUIT, Qt::CTRL + Qt::Key_Q, "File: Quit OOMidi", ARRANG_SHRT, "quit");
 	//      defShrt(SHRT_DESEL_PARTS,           Qt::CTRL + Qt::Key_B, "Deselect all parts", ARRANG_SHRT, "deselect_parts");
 	defShrt(SHRT_SELECT_PRTSTRACK, Qt::CTRL + Qt::ALT + Qt::Key_P, "Edit: Select parts on track", ARRANG_SHRT, "select_parts_on_track");
@@ -376,14 +376,14 @@ void readShortCuts(Xml& xml)
 				if (tag.length())
 				{
 					int index = getShrtByTag(tag.toAscii().constData());
-					if (index == -1) //No such tag found
-						printf("Config file might be corrupted. Unknown shortcut: %s\n", tag.toLatin1().constData());
-					else
+					if (index != -1)
 					{
 						//printf("Index: %d\n",index);
 						shortcuts[index].key = xml.parseInt();
 						//printf("shortcuts[%d].key = %d, %s\n",index, shortcuts[index].key, shortcuts[index].descr);
 					}
+					else
+						xml.skip(tag);
 				}
 			}
 			case Xml::TagEnd:

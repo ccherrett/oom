@@ -91,8 +91,8 @@ enum
     SHRT_CONFIG_PRINTER, //Ctrl+P
     SHRT_IMPORT_MIDI, //Default: undefined
     SHRT_EXPORT_MIDI, //Default: undefined
-    SHRT_IMPORT_PART, //!< Import midi part to current track & location, Default: undefined
-    SHRT_IMPORT_AUDIO, //Default: undefined
+    //SHRT_IMPORT_PART, //!< Import midi part to current track & location, Default: undefined
+    //SHRT_IMPORT_AUDIO, //Default: undefined
     SHRT_QUIT, //Default: Ctrl+Q
 
     SHRT_DESEL_PARTS, //Ctrl+B

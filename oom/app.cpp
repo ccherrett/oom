@@ -790,9 +790,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	fileImportMidiAction = new QAction(tr("Import Midifile"), this);
 	fileExportMidiAction = new QAction(tr("Export Midifile"), this);
-	fileImportPartAction = new QAction(tr("Import Part"), this);
+	//fileImportPartAction = new QAction(tr("Import Part"), this);
 
-	fileImportWaveAction = new QAction(tr("Import Audio File"), this);
+	//fileImportWaveAction = new QAction(tr("Import Audio File"), this);
 
 	quitAction = new QAction(tr("&Quit"), this);
 
@@ -939,9 +939,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	connect(fileImportMidiAction, SIGNAL(triggered()), SLOT(importMidi()));
 	connect(fileExportMidiAction, SIGNAL(triggered()), SLOT(exportMidi()));
-	connect(fileImportPartAction, SIGNAL(triggered()), SLOT(importPart()));
+	//connect(fileImportPartAction, SIGNAL(triggered()), SLOT(importPart()));
 
-	connect(fileImportWaveAction, SIGNAL(triggered()), SLOT(importWave()));
+	//connect(fileImportWaveAction, SIGNAL(triggered()), SLOT(importWave()));
 	connect(quitAction, SIGNAL(triggered()), SLOT(quitDoc()));
 
 	//-------- Edit connections
@@ -1115,9 +1115,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	menu_file->addSeparator();
 	menu_file->addAction(fileImportMidiAction);
 	menu_file->addAction(fileExportMidiAction);
-	menu_file->addAction(fileImportPartAction);
-	menu_file->addSeparator();
-	menu_file->addAction(fileImportWaveAction);
+	//menu_file->addAction(fileImportPartAction);
+	//menu_file->addSeparator();
+	//menu_file->addAction(fileImportWaveAction);
 	menu_file->addSeparator();
 	menu_file->addAction(quitAction);
 	menu_file->addSeparator();
@@ -4423,8 +4423,8 @@ void OOMidi::updateConfiguration()
 	//menu_file->setShortcut(shortcuts[SHRT_OPEN_RECENT].key, menu_ids[CMD_OPEN_RECENT]);    // Not used.
 	fileImportMidiAction->setShortcut(shortcuts[SHRT_IMPORT_MIDI].key);
 	fileExportMidiAction->setShortcut(shortcuts[SHRT_EXPORT_MIDI].key);
-	fileImportPartAction->setShortcut(shortcuts[SHRT_IMPORT_PART].key);
-	fileImportWaveAction->setShortcut(shortcuts[SHRT_IMPORT_AUDIO].key);
+	//fileImportPartAction->setShortcut(shortcuts[SHRT_IMPORT_PART].key);
+	//fileImportWaveAction->setShortcut(shortcuts[SHRT_IMPORT_AUDIO].key);
 	quitAction->setShortcut(shortcuts[SHRT_QUIT].key);
 
 	//menu_file->setShortcut(shortcuts[SHRT_LOAD_TEMPLATE].key, menu_ids[CMD_LOAD_TEMPLATE]);  // Not used.
