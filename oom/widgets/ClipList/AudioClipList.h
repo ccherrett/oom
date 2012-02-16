@@ -50,7 +50,6 @@ class AudioClipList : public QFrame, public Ui::AudioClipListBase {
 
 	bool isSupported(const QString&);
 	void loadBookmarks();
-	void saveBookmarks();
 	void addBookmark(const QString&);
 	void updateLabels();
 
@@ -66,6 +65,7 @@ private slots:
 	void homeClicked();
 	void forwardClicked();
 	void rewindClicked();
+	void saveBookmarks();
 
 	void fileItemSelected(const QModelIndex&);
 	void fileItemContextMenu(const QPoint&);

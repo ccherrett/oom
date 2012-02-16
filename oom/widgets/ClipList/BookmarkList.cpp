@@ -49,6 +49,7 @@ bool BookmarkListModel::dropMimeData(const QMimeData *data, Qt::DropAction actio
 			insertRow(irow, it);
 		else
 			appendRow(it);
+		emit bookmarkAdded();
 	}/*}}}*/
 	return true;
 }

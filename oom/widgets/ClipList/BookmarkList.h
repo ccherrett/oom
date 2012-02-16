@@ -22,10 +22,14 @@ class QMimeData;
 //Model for the bookmark list
 class BookmarkListModel : public QStandardItemModel
 {
+	Q_OBJECT
+
+signals:
+	void bookmarkAdded();
+
 public:
 	BookmarkListModel(QObject* parent = 0);
 	virtual bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int col, const QModelIndex &parent);
-//	virtual Qt::ItemFlags flags(const QModelIndex&) const;
 };
 
 //Subclass for the bookmark list

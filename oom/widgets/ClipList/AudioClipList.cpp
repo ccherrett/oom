@@ -139,6 +139,7 @@ AudioClipList::AudioClipList(QWidget *parent)
 
 	connect(m_bookmarkList, SIGNAL(clicked(const QModelIndex&)), this, SLOT(bookmarkItemSelected(const QModelIndex&)));
 	connect(m_bookmarkList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(bookmarkContextMenu(const QPoint&)));
+	connect(m_bookmarkModel, SIGNAL(bookmarkAdded()), this, SLOT(saveBookmarks()));
 
 	connect(m_watcher, SIGNAL(directoryChanged(const QString)), this, SLOT(refresh()));
 
