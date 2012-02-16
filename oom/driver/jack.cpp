@@ -1290,7 +1290,9 @@ void JackAudioDevice::unregisterPort(void* p)
 	if (JACK_DEBUG)
 		printf("JackAudioDevice::unregisterPort(\n");
 	if (!checkJackClient(_client)) return;
-	jack_port_unregister(_client, (jack_port_t*) p);
+	jack_port_t* port = (jack_port_t*)p;
+	if(port)
+		jack_port_unregister(_client, port);
 }
 
 //---------------------------------------------------------
