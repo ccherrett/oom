@@ -384,9 +384,6 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 	CItemList list = _items;
 	if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
 		list = getItemlistForCurrentPart();
-	//CItemList list = getItemlistForCurrentPart();
-	//if(editor->isGlobalEdit())
-	//	list = _items;
 	if (virt())
 	{
 		_curItem = list.find(_start);//_items.find(_start);
@@ -564,7 +561,11 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			}
 			deselectAll();
 			if (_curItem)
+			{
 				selectItem(_curItem, true);
+				//TODO: Play the note
+				itemPressed(_curItem);
+			}
 			updateSelection();
 			redraw();
 			break;
@@ -575,6 +576,15 @@ void EventCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 	}
 	mousePress(event);
 }/*}}}*/
+
+void EventCanvas::mouseRelease(const QPoint& pos)
+{
+	qDebug("EventCanvas::mouseRelease");
+	if(_tool == PencilTool && _curItem)
+	{
+		itemReleased(_curItem, pos);
+	}
+}
 
 QMenu* EventCanvas::genItemPopup(CItem* item)/*{{{*/
 {

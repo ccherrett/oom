@@ -402,6 +402,7 @@ void AudioTrack::copyData(unsigned pos, int dstChannels, int srcStartChan, int s
 		// p3.3.29 1/27/10 Don't do any processing at all if off. Whereas, mute needs to be ready for action at all times,
 		//  so still call getData before it. Off is NOT meant to be toggled rapidly, but mute is !
 		if (off() || !getData(pos, srcTotalOutChans, nframes, buffer) || (isMute() && !_prefader))
+		//if (off() || !getData(pos, srcTotalOutChans, nframes, buffer) || isMute())
 		{
 #ifdef NODE_DEBUG
 			printf("OOMidi: AudioTrack::copyData name:%s dstChannels:%d zeroing buffers\n", name().toLatin1().constData(), dstChannels);

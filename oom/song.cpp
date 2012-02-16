@@ -235,16 +235,16 @@ Track* Song::addNewTrack(QAction* action)
 		return 0;
 
 	CreateTrackDialog *ctdialog = new CreateTrackDialog(n, -1, oom);
-	connect(ctdialog, SIGNAL(trackAdded(QString)), this, SLOT(newTrackAdded(QString)));
+	connect(ctdialog, SIGNAL(trackAdded(qint64)), this, SLOT(newTrackAdded(qint64)));
 	ctdialog->exec();
 
 	return 0;
 }
 
 
-void Song::newTrackAdded(QString name)
+void Song::newTrackAdded(qint64 id)
 {
-	Track* t = findTrack(name);
+	Track* t = findTrackById(id);
 	if(t)
 	{
 		updateTrackViews();

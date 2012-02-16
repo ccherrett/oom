@@ -67,6 +67,7 @@ protected:
 	virtual void populateMultiSelect(CItem*);
     virtual QMenu* genItemPopup(CItem*);
     virtual void itemPopup(CItem*, int, const QPoint&);
+    virtual void mouseRelease(const QPoint&);
 
 public slots:
 
