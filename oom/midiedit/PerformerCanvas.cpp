@@ -55,6 +55,7 @@ PerformerCanvas::PerformerCanvas(AbstractMidiEditor* pr, QWidget* parent, int sx
 	playedPitch = -1;
 	_octaveQwerty = 3;
 	m_globalKey = false;
+    _playMoveEvent = false;
 
 	songChanged(SC_TRACK_INSERTED);
 	connect(song, SIGNAL(midiNote(int, int)), SLOT(midiNote(int, int)));
@@ -556,6 +557,7 @@ void PerformerCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType
 	for (iCItem ici = items.begin(); ici != items.end(); ++ici, ++i)
 	{
 		CItem* ci = ici->second;
+        _playMoveEvent = (i == 0);
 
 		// If this item's part is in the parts2change list, change the item's part to the new part.
 		Part* pt = ci->part();
@@ -601,6 +603,7 @@ void PerformerCanvas::moveCanvasItems(CItemList& items, int dp, int dx, DragType
 		if (dtype == MOVE_COPY || dtype == MOVE_CLONE)
 			selectItem(ci, false);
 	}
+    _playMoveEvent = false;
 
 	if (pflags)
 		*pflags = modified;
@@ -625,15 +628,18 @@ bool PerformerCanvas::moveItem(CItem* item, const QPoint& pos, DragType dtype)/*
 	int x = pos.x();
 	if (x < 0)
 		x = 0;
-	if (event.pitch() != npitch && _playEvents)
+
+    // replace note if needed
+	if (playedPitch != npitch && _playEvents && _playMoveEvent)
 	{
 		int port = track()->outPort();
 		int channel = track()->outChannel();
 		// release note:
-		MidiPlayEvent ev1(0, port, channel, 0x90, event.pitch() + track()->getTransposition(), 0, (Track*)track());
+		MidiPlayEvent ev1(0, port, channel, 0x90, playedPitch, 0, (Track*)track());
 		audio->msgPlayMidiEvent(&ev1);
 		MidiPlayEvent ev2(0, port, channel, 0x90, npitch + track()->getTransposition(), event.velo(), (Track*)track());
 		audio->msgPlayMidiEvent(&ev2);
+        playedPitch = npitch + track()->getTransposition();
 	}
 
 	Part* part = nevent->part(); 
@@ -2320,7 +2326,7 @@ void PerformerCanvas::itemReleased(const CItem*, const QPoint&)
 
 void PerformerCanvas::itemMoved(const CItem* item, const QPoint& pos)
 {
-    if (!_playEvents)
+    if (!_playEvents || (_moving.size() > 0 && _moving.begin()->second != item))
 		return;
     int npitch = y2pitch(pos.y());
 	if ((playedPitch != -1) && (playedPitch != npitch))

@@ -1829,8 +1829,8 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                         iMPEvent ev = eventList->begin();
                         for (; ev != eventList->end(); ++ev)
                         {
-                            //qWarning("Event: 0x%02X %02i %02i", ev->type()+ev->channel(), ev->dataA(), ev->dataB());
-#if 1
+                            //qWarning("LV2 Event: 0x%02X %02i %02i", ev->type()+ev->channel(), ev->dataA(), ev->dataB());
+
                             switch (ev->type())
                             {
                             case ME_NOTEOFF:
@@ -1858,42 +1858,6 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                             // Fix note-off
                             if (ev->type() == ME_NOTEON && ev->dataB() == 0)
                                 midi_event[0] = ME_NOTEOFF + ev->channel();
-
-#else
-                            uint8_t* midi_event;
-
-                            switch (ev->type())
-                            {
-                            case ME_NOTEOFF:
-                                if (ev->dataA() >= 0 && ev->dataA() <= 127)
-                                {
-                                    midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 2);
-                                    midi_event[0] = ME_NOTEOFF + ev->channel();
-                                    midi_event[1] = ev->dataA();
-                                }
-                                break;
-                            case ME_NOTEON:
-                                if (ev->dataA() >= 0 && ev->dataA() <= 127)
-                                {
-                                    midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
-                                    midi_event[0] = ME_NOTEON + ev->channel();
-                                    midi_event[1] = ev->dataA();
-                                    midi_event[2] = ev->dataB();
-                                }
-                                break;
-                            case ME_CONTROLLER:
-                                if (ev->dataA() == 0x40001) // FIXME, what is 0x40001
-                                    setProgram(ev->dataB());
-                                else
-                                {
-                                    midi_event = lv2_event_reserve(&ev_iters[i], 0, 0, OOM_URI_MAP_ID_EVENT_MIDI, 3);
-                                    midi_event[0] = ME_CONTROLLER + ev->channel();
-                                    midi_event[1] = ev->dataA();
-                                    midi_event[2] = ev->dataB();
-                                }
-                                break;
-                            }
-#endif
                         }
                         eventList->erase(eventList->begin(), ev);
 

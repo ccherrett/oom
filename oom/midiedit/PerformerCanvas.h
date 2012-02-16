@@ -44,6 +44,7 @@ class PerformerCanvas : public EventCanvas
     int playedPitch;
     int _octaveQwerty;
 	bool m_globalKey;
+    bool _playMoveEvent;
 
     QMap<QString, int> _qwertyToMidiMap;
     void bindQwertyKeyToMidiValue(const char* key, int note);

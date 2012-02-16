@@ -704,6 +704,36 @@ void Audio::sendLocalOff()
 
 void Audio::panic()
 {
+#if 0
+    for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+    {
+        MidiDevice* dev = *i;
+        if (dev && dev->isSynthPlugin())
+        {
+            SynthPluginDevice* synth = (SynthPluginDevice*)dev;
+            if (!synth->plugin())
+                continue;
+            MPEventList* el  = synth->playEvents();
+            MPEventList* sel = synth->stuckNotes();
+
+            qWarning("IS SYNTH %s -> %i %i", synth->name().toUtf8().constData(), el->size(), sel->size());
+
+            // stop all notes
+			el->clear();
+			//MPEventList* sel = dev->stuckNotes();
+			for (iMPEvent i = sel->begin(); i != sel->end(); ++i)
+			{
+				MidiPlayEvent ev = *i;
+                qWarning("XXX Event: 0x%02X %02i %02i", ev.type()+ev.channel(), ev.dataA(), ev.dataB());
+				ev.setTime(0);
+                ev.setType(ME_NOTEOFF);
+				el->add(ev);
+			}
+			sel->clear();
+        }
+    }
+#endif
+
 	for (int i = 0; i < MIDI_PORTS; ++i)
 	{
 		MidiPort* port = &midiPorts[i];

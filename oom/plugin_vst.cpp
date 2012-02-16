@@ -851,6 +851,8 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                 iMPEvent ev = eventList->begin();
                 for (; ev != eventList->end(); ++ev)
                 {
+                    //qWarning("VST Event: 0x%02X %02i %02i", ev->type()+ev->channel(), ev->dataA(), ev->dataB());
+
                     switch (ev->type())
                     {
                     case ME_NOTEOFF:
