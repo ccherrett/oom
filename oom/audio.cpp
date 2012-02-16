@@ -377,12 +377,12 @@ void Audio::process(unsigned frames)
 		// p3.3.43 Make sure to stop bounce and freewheel mode, for example if user presses stop
 		//  in QJackCtl before right-hand marker is reached (which is handled below).
 		//printf("Audio::process isPlaying() && jackState == STOP\n");
-		//if (_bounce)
-		//{
+		if (freewheel())
+		{
 		//printf("  stopping bounce...\n");
-		//  _bounce = false;
-		//  write(sigFd, "F", 1);
-		//}
+		  _bounce = false;
+		  write(sigFd, "F", 1);
+		}
 
 		stopRolling();
 	}
