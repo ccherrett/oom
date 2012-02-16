@@ -1033,7 +1033,7 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)/*{{{*/
 
 //Used by the add track mechanism to flush stuff created with the 
 //Instrument combo box
-void LSClient::removeLastChannel()
+void LSClient::removeLastChannel()/*{{{*/
 {
 	if(_client != NULL)
 	{
@@ -1083,9 +1083,9 @@ void LSClient::removeLastChannel()
 			}
 		}
 	}
-}
+}/*}}}*/
 
-bool LSClient::renameMidiPort(QString oldName, QString newName, int mdev)
+bool LSClient::renameMidiPort(QString oldName, QString newName, int mdev)/*{{{*/
 {
 	bool rv = false;
 	if(_client != NULL)
@@ -1144,14 +1144,14 @@ bool LSClient::renameMidiPort(QString oldName, QString newName, int mdev)
 		}
 	}
 	return rv;
-}
+}/*}}}*/
 
-bool LSClient::renameAudioChannel(QString oldName, QString newName, int adev)
+bool LSClient::renameAudioChannel(QString oldName, QString newName, int adev)/*{{{*/
 {
 	bool rv = false;
 	if(_client != NULL)
 	{
-		lscp_device_info_t* aDevInfo = ::lscp_get_audio_device_info(_client, adev);/*{{{*/
+		lscp_device_info_t* aDevInfo = ::lscp_get_audio_device_info(_client, adev);
 		if(aDevInfo)
 		{
 			int channelCount = -1;
@@ -1202,10 +1202,10 @@ bool LSClient::renameAudioChannel(QString oldName, QString newName, int adev)
 					}
 				}
 			}
-		}/*}}}*/
+		}
 	}
 	return rv;
-}
+}/*}}}*/
 
 bool LSClient::isFreePort(const char* val)
 {
@@ -1224,6 +1224,16 @@ bool LSClient::unloadInstrument(MidiInstrument*)
 	}
 	return false;
 }
+
+bool LSClient::removeMidiMap(int map)
+{
+	if(_client != NULL)
+	{
+		return (lscp_remove_midi_instrument_map(_client, map) == LSCP_OK);
+	}
+	return false;
+}
+
 
 QMap<int, QString> LSClient::listInstruments()/*{{{*/
 {
@@ -1261,11 +1271,6 @@ QString LSClient::getMapName(int mid)/*{{{*/
 	}
 	return mapName;
 }/*}}}*/
-
-void LSClient::startThread()
-{
-	lsp().queueClient(this);
-}
 
 bool LSClient::resetSampler()
 {
@@ -1381,82 +1386,4 @@ QString LSClient::_stripAscii(QString str)/*{{{*/
 }/*}}}*/
 //EnD qSampler
 
-LSProcessor& lsp()
-{
-	static LSProcessor lsp;
-	return lsp;
-}
-
-LSProcessor::LSProcessor()
-{
-	m_lsthread = new LSThread(this);
-	m_taskRunning = false;
-	m_runningClient = 0;
-	
-	moveToThread(m_lsthread);
-	
-	m_lsthread->start();
-
-	connect(this, SIGNAL(newClientTask()), this, SLOT(startClientTask()), Qt::QueuedConnection);
-}
-
-LSProcessor::~LSProcessor()
-{
-	m_lsthread->exit(0);
-	if(!m_lsthread->wait(1000))
-	{
-		m_lsthread->terminate();
-	}
-	delete m_lsthread;
-}
-
-void LSProcessor::startClientTask()
-{
-//TODO: Implement a task based system that we can later use to send channel resets on demand
-}
-
-void LSProcessor::queueClient(LSClient* c)
-{
-	QMutexLocker locker(&m_mutex);
-	m_queue.enqueue(c);
-
-	if(!m_taskRunning)
-	{
-		dequeueClient();
-	}
-}
-
-void LSProcessor::dequeueClient()
-{
-	if(!m_queue.isEmpty())
-	{
-		m_taskRunning = true;
-		m_runningClient = m_queue.dequeue();
-		emit newClientTask();
-	}
-}
-
-void LSProcessor::freeClient(LSClient* c)
-{
-	m_mutex.lock();
-	m_queue.removeAll(c);
-	if(c == m_runningClient)
-	{
-		m_wait.wait(&m_mutex);
-		dequeueClient();
-		return;
-	}
-	m_mutex.unlock();
-	delete c;
-}
-
-LSThread::LSThread(LSProcessor* lsp)
-{
-	m_lsp = lsp;
-}
-
-void LSThread::run()
-{
-	exec();
-}
 #endif

@@ -73,6 +73,7 @@ QT4_WRAP_CPP ( oom_moc_headers
       ccinfo.h
       FadeCurve.h
 	  TrackManager.h
+	  NameValidator.h
       )
 
 ##
@@ -154,6 +155,7 @@ file (GLOB core_source_files
       ccinfo.cpp
       FadeCurve.cpp
 	  TrackManager.cpp
+	  NameValidator.cpp
       lib_functions.cpp
       )
 file (GLOB main_source_files

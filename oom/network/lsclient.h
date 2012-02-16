@@ -45,48 +45,7 @@ class MidiInstrument;
 class MidiInstrumentList;
 class Patch;
 class PatchGroup;
-class LSThread;
 class LSClient;
-
-class LSProcessor : public QObject
-{
-	Q_OBJECT
-public:
-	void queueClient(LSClient* client);
-	void freeClient(LSClient* client);
-
-private:
-	LSThread* m_lsthread;
-	QMutex m_mutex;
-	QWaitCondition m_wait;
-	bool m_taskRunning;
-	LSClient* m_runningClient;
-
-	QQueue<LSClient*> m_queue;
-	void dequeueClient();
-	LSProcessor();
-	LSProcessor(const LSProcessor&);
-	~LSProcessor();
-	friend LSProcessor& lsp();
-
-private slots:
-	void startClientTask();
-
-signals:
-	void newClientTask();
-};
-
-class LSThread : public QThread
-{
-public:
-	LSThread(LSProcessor* p);
-protected:
-	void run();
-private:
-	LSProcessor* m_lsp;
-};
-
-LSProcessor& lsp();
 
 class LSClient : public QObject
 {
@@ -101,7 +60,6 @@ public:
 	~LSClient();
 	void stopClient();
 	bool startClient();
-	void startThread();
 	void setTimeout(int t){ _timeout = t; }
 	void setRetry(int r){ _retries = r; }
 	void setBankAsNumber(bool v) { _useBankNumber = v; }
@@ -126,6 +84,7 @@ public:
 	bool resetSampler();
 	bool loadSamplerCommand(QString);
 	void removeLastChannel();
+	bool removeMidiMap(int m);
 	
 private:
 	const LSCPChannelInfo getKeyBindings(lscp_channel_info_t*);

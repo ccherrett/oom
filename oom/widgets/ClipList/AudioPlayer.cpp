@@ -372,6 +372,7 @@ void AudioPlayer::play(const QString &file)/*{{{*/
 		usleep (50000) ;
 	}
 	printTime();
+	//memset (ringbuf->buf, 0, ringbuf->size);
 
 	m_isPlaying = false;
 

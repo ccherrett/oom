@@ -43,6 +43,8 @@ class CreateTrackDialog : public QDialog, public Ui::CreateTrackBase {
 	bool m_createTrackOnly;
 	int m_showJackAliases;
 	bool m_instrumentLoaded;
+	int m_instrumentMap;
+	bool m_existingMap;
 	
 	QMap<int, QString> m_currentMidiInputList;
 	QMap<int, QString> m_currentMidiOutputList;

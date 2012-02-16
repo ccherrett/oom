@@ -5,6 +5,7 @@
 //===========================================================
 
 #include "CreateTrackDialog.h"
+#include "NameValidator.h"
 #include "globals.h"
 #include "gconfig.h"
 #include "track.h"
@@ -65,11 +66,14 @@ void CreateTrackDialog::initDefaults()
 	
 	m_midiInPort = -1;
 	m_midiOutPort = -1;
+	m_instrumentMap = -1;
+	m_existingMap = false;
 
     m_height = 290;
 	m_width = 450;
 
 	m_allChannelBit = (1 << MIDI_CHANNELS) - 1;
+	txtName->setValidator(new NameValidator(this));
 
 	cmbType->addItem(*addMidiIcon, tr("Midi"), Track::MIDI);
 	cmbType->addItem(*addAudioIcon, tr("Audio"), Track::WAVE);
@@ -159,7 +163,7 @@ void CreateTrackDialog::initDefaults()
 	//connect(cmbInstrument, SIGNAL(currentIndexChanged(int)), this, SLOT(updateInstrument(int)));
 	connect(cmbInstrument, SIGNAL(activated(int)), this, SLOT(updateInstrument(int)));
 	connect(btnAdd, SIGNAL(clicked()), this, SLOT(addTrack()));
-	connect(txtName, SIGNAL(editingFinished()/*textEdited(QString)*/), this, SLOT(trackNameEdited()));
+	connect(txtName, SIGNAL(textEdited(QString)), this, SLOT(trackNameEdited()));
 	connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSelected()));
 	connect(btnMyInput, SIGNAL(clicked()), this, SLOT(showInputSettings()));
 	txtName->setFocus(Qt::OtherFocusReason);
@@ -193,7 +197,7 @@ void CreateTrackDialog::addTrack()/*{{{*/
             QString instrumentName = cmbInstrument->itemData(instrumentIndex, CTDInstrumentNameRole).toString();
             QString selectedInput, selectedInput2;
             
-            if (instrumentType == TrackManager::SYNTH_INSTRUMENT)
+            if (instrumentType == TrackManager::SYNTH_INSTRUMENT)/*{{{*/
             {
                 for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
                 {
@@ -210,11 +214,11 @@ void CreateTrackDialog::addTrack()/*{{{*/
                         break;
                     }
                 }
-            }
+            }/*}}}*/
 
 			m_vtrack->autoCreateInstrument = chkAutoCreate->isChecked();
 			//Process Input connections
-			if(inputIndex >= 0 && chkInput->isChecked())
+			if(inputIndex >= 0 && chkInput->isChecked())/*{{{*/
 			{
 				m_vtrack->useInput = true;
 				int chanbit = cmbInChannel->itemData(inChanIndex).toInt();
@@ -239,50 +243,90 @@ void CreateTrackDialog::addTrack()/*{{{*/
 					m_vtrack->inputConfig = qMakePair(inDevType, devname);
 					m_vtrack->inputChannel = chanbit;
 				}
-			}
+			}/*}}}*/
 			
 			//Process Output connections
-			if(outputIndex >= 0 && chkOutput->isChecked())
-			{
-				m_vtrack->useOutput = true;
-				QString devname = cmbOutput->itemText(outputIndex);
-				int devtype = cmbOutput->itemData(outputIndex).toInt();
-				if(m_currentMidiOutputList.isEmpty())
-				{
-					m_createMidiOutputDevice = true;
-				}
-				else
-				{
-					m_createMidiOutputDevice = !(m_currentMidiOutputList.contains(outputIndex) && m_currentMidiOutputList.value(outputIndex) == devname);
-				}
-				m_vtrack->createMidiOutputDevice = m_createMidiOutputDevice;
-				m_vtrack->outputConfig = qMakePair(devtype, devname);
-				m_vtrack->outputChannel = outChan;
-				if(m_createMidiOutputDevice)
-				{
-					//QString instrumentName = cmbInstrument->itemData(instrumentIndex, CTDInstrumentNameRole).toString();
-					m_vtrack->instrumentType = instrumentType; //cmbInstrument->itemData(instrumentIndex, CTDInstrumentTypeRole).toInt();
-					m_vtrack->instrumentName = instrumentName;
-				}
-			}
+            if (instrumentType == TrackManager::LS_INSTRUMENT)/*{{{*/
+            {
+				m_vtrack->instrumentType = instrumentType;
+				m_vtrack->instrumentName = instrumentName;
 
-			if(monitorIndex >= 0 && midiBox->isChecked())
-			{
-				int iBuss = cmbBuss->itemData(bussIndex).toInt();
-				QString selectedBuss = cmbBuss->itemText(bussIndex);
-                if (selectedInput.isEmpty())
-                    selectedInput = cmbMonitor->itemText(monitorIndex);
-                if (selectedInput2.isEmpty())
-                    selectedInput2 = selectedInput;
-				m_vtrack->useMonitor = true;
-				m_vtrack->monitorConfig  = qMakePair(0, selectedInput);
-                m_vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
-				m_vtrack->instrumentPan = m_panKnob->value();
-				m_vtrack->instrumentVerb = m_auxKnob->value();
-				if(chkBuss->isChecked())
+                m_vtrack->createMidiOutputDevice = true;
+                m_vtrack->outputChannel = 0;
+				outChan = 0;
+                m_vtrack->useOutput = true;
+                m_vtrack->useMonitor = true;
+				QString prefix("LinuxSampler:");
+				QString postfix("-audio");
+				QString audio(QString(prefix).append(m_vtrack->name).append(postfix));
+				QString midi(QString(prefix).append(m_vtrack->name));
+				int devtype = MidiDevice::JACK_MIDI;
+				m_vtrack->outputConfig = qMakePair(devtype, midi);
+				if(midiBox->isChecked())
 				{
-					m_vtrack->useBuss = true;
-					m_vtrack->bussConfig = qMakePair(iBuss, selectedBuss);
+            	    if (selectedInput.isEmpty())
+            	        selectedInput = audio;
+            	    if (selectedInput2.isEmpty())
+            	        selectedInput2 = selectedInput;
+					m_vtrack->useMonitor = true;
+					m_vtrack->monitorConfig  = qMakePair(0, selectedInput);
+            	    m_vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
+					m_vtrack->instrumentPan = m_panKnob->value();
+					m_vtrack->instrumentVerb = m_auxKnob->value();
+					if(chkBuss->isChecked())
+					{
+						int iBuss = cmbBuss->itemData(bussIndex).toInt();
+						QString selectedBuss = cmbBuss->itemText(bussIndex);
+						m_vtrack->useBuss = true;
+						m_vtrack->bussConfig = qMakePair(iBuss, selectedBuss);
+					}
+				}
+                break;
+            }/*}}}*/
+			else
+			{
+				if(outputIndex >= 0 && chkOutput->isChecked())
+				{
+					m_vtrack->useOutput = true;
+					QString devname = cmbOutput->itemText(outputIndex);
+					int devtype = cmbOutput->itemData(outputIndex).toInt();
+					if(m_currentMidiOutputList.isEmpty())
+					{
+						m_createMidiOutputDevice = true;
+					}
+					else
+					{
+						m_createMidiOutputDevice = !(m_currentMidiOutputList.contains(outputIndex) && m_currentMidiOutputList.value(outputIndex) == devname);
+					}
+					m_vtrack->createMidiOutputDevice = m_createMidiOutputDevice;
+					m_vtrack->outputConfig = qMakePair(devtype, devname);
+					m_vtrack->outputChannel = outChan;
+					if(m_createMidiOutputDevice)
+					{
+						//QString instrumentName = cmbInstrument->itemData(instrumentIndex, CTDInstrumentNameRole).toString();
+						m_vtrack->instrumentType = instrumentType; //cmbInstrument->itemData(instrumentIndex, CTDInstrumentTypeRole).toInt();
+						m_vtrack->instrumentName = instrumentName;
+					}
+				}
+
+				if(monitorIndex >= 0 && midiBox->isChecked())
+				{
+            	    if (selectedInput.isEmpty())
+            	        selectedInput = cmbMonitor->itemText(monitorIndex);
+            	    if (selectedInput2.isEmpty())
+            	        selectedInput2 = selectedInput;
+					m_vtrack->useMonitor = true;
+					m_vtrack->monitorConfig  = qMakePair(0, selectedInput);
+            	    m_vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
+					m_vtrack->instrumentPan = m_panKnob->value();
+					m_vtrack->instrumentVerb = m_auxKnob->value();
+					if(chkBuss->isChecked())
+					{
+						int iBuss = cmbBuss->itemData(bussIndex).toInt();
+						QString selectedBuss = cmbBuss->itemText(bussIndex);
+						m_vtrack->useBuss = true;
+						m_vtrack->bussConfig = qMakePair(iBuss, selectedBuss);
+					}
 				}
 			}
 		}
@@ -420,11 +464,12 @@ void CreateTrackDialog::cleanup()/*{{{*/
 				{
 					lsClientStarted = lsClient->startClient();
 				}
-				if(lsClientStarted)
+				if(lsClientStarted && m_instrumentLoaded && !m_existingMap)
 				{
-					lsClient->removeLastChannel();
-					m_instrumentLoaded = false;
+					//lsClient->removeMidiMap(m_instrumentMap);
+					//lsClient->removeLastChannel();
 				}
+				m_instrumentLoaded = false;
 			}
 			break;
 			case TrackManager::SYNTH_INSTRUMENT:
@@ -477,14 +522,8 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 				{
 					if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
 					{
-						//m_panKnob->blockSignals(true);
 						m_panKnob->setValue((*i)->defaultPan());
-						//m_panLabel->setValue((*i)->defaultPan());
-						//m_panKnob->blockSignals(false);
-						//m_auxKnob->blockSignals(true);
 						m_auxKnob->setValue((*i)->defaultVerb());
-						//m_auxLabel->setValue((*i)->defaultVerb());
-						//m_auxKnob->blockSignals(false);
 						if(m_instrumentLoaded)
 						{//unload the last one
 							cleanup();
@@ -504,35 +543,38 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 						}
 						if(lsClientStarted)
 						{
-							qDebug("Loading Instrument to LinuxSampler");
-							if(lsClient->loadInstrument(*i))
+							m_instrumentMap = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+							if(m_instrumentMap >= 0)
+								m_existingMap = true;
+							else
+								m_existingMap = false;
+							qDebug("CreateTrackDialog::updateInstrument: Searching for Instrument loaded found: %d", m_instrumentMap);
+							if(!m_existingMap)
 							{
-								qDebug("Instrument Map Loaded");
-								if(chkAutoCreate->isChecked())
+								qDebug("CreateTrackDialog::updateInstrument: Loading Instrument to LinuxSampler");
+								if(lsClient->loadInstrument(*i))
 								{
-									int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
-									Patch* p = (*i)->getDefaultPatch();
-									if(p && map >= 0)
-									{
-										if(lsClient->createInstrumentChannel(txtName->text().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
-										{
-											qDebug("Create Channel for track");
-											QString prefix("LinuxSampler:");
-											QString postfix("-audio");
-											QString audio(QString(prefix).append(trackName).append(postfix));
-											QString midi(QString(prefix).append(trackName));
-											//reload input/output list and select the coresponding ports respectively
-											updateVisibleElements();
-											//populateInputList();
-											populateOutputList();
-											populateMonitorList();
-											cmbOutput->setCurrentIndex(cmbOutput->findText(midi));
-											cmbMonitor->setCurrentIndex(cmbMonitor->findText(audio));
-											m_instrumentLoaded = true;
-										}
-									}
+									m_instrumentMap = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+									m_instrumentLoaded = true;
+									qDebug("CreateTrackDialog::updateInstrument: Instrument Map Loaded");
+									//reload input/output list and select the coresponding ports respectively
+									updateVisibleElements();
+                        			chkInput->setChecked(true);
+                        			chkInput->setEnabled(true);
+                        			chkOutput->setChecked(false);
+                        			chkOutput->setEnabled(false);
+                        			midiBox->setChecked(true);
+                        			midiBox->setEnabled(true);
+									cmbMonitor->setEnabled(false);
+								}
+								else
+								{//TODO: BIG ERROR Here cant connect to LinuxSampler for whatever reason this is show stopper error
+									qDebug("CreateTrackDialog::updateInstrument: ERROR: Faild to load instrument into LinuxSampler");
 								}
 							}
+						}
+						else
+						{//TODO: BIG ERROR Here cant connect to LinuxSampler for whatever reason this is show stopper error
 						}
 						break;
 					}
@@ -566,6 +608,13 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 			}
 			break;
 			default:
+			{
+                if(m_instrumentLoaded)
+				{   //unload the last one
+					cleanup();
+				}
+                updateVisibleElements();
+			}
 			break;
 		}
 	}
@@ -602,6 +651,11 @@ void CreateTrackDialog::updateBussSelected(bool raw)/*{{{*/
 //Track type combo slot
 void CreateTrackDialog::trackTypeChanged(int type)
 {
+	Track::TrackType curtype = (Track::TrackType)m_insertType;
+	if(curtype == Track::MIDI && m_instrumentLoaded)
+	{
+		cleanup();
+	}
 	m_insertType = cmbType->itemData(type).toInt();
 	updateVisibleElements();
 	populateInputList();
@@ -613,20 +667,14 @@ void CreateTrackDialog::trackTypeChanged(int type)
 
 void CreateTrackDialog::trackNameEdited()
 {
-	bool enabled = false;
-	if(!txtName->text().isEmpty())
-	{
-		Track* t = song->findTrack(txtName->text());
-		if(!t)
-			enabled = true;
-	}
+	bool enabled = !txtName->text().isEmpty();
 	btnAdd->setEnabled(enabled);
-	Track::TrackType type = (Track::TrackType)m_insertType;
+	/*Track::TrackType type = (Track::TrackType)m_insertType;
 	if(type == Track::MIDI && m_instrumentLoaded && enabled)
 	{
 		cleanup();
 		updateInstrument(cmbInstrument->currentIndex());
-	}
+	}*/
 }
 
 //Populate input combo based on type
@@ -992,6 +1040,7 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 	chkOutput->setChecked(true);
 	chkBuss->setChecked(true);
 	chkAutoCreate->setChecked(true);
+	cmbMonitor->setEnabled(true);
 	trackNameEdited();
 
 	Track::TrackType type = (Track::TrackType)m_insertType;
