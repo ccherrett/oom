@@ -536,8 +536,6 @@ void SynthPluginDevice::reset(int, MType)
 
 QString SynthPluginDevice::getPatchName(int, int prog, MType, bool)
 {
-    qWarning("SynthPluginDevice::getPatchName()");
-
     if (m_plugin)
     {
         if (prog < (int32_t)m_plugin->getProgramCount())
@@ -567,8 +565,12 @@ Patch* SynthPluginDevice::getPatch(int, int prog, MType, bool)
     //void write(int level, Xml&);
     return &patch;
 #endif
+    if (m_plugin)
+    {
+        if (prog < (int32_t)m_plugin->getProgramCount())
+            m_plugin->setProgram(prog);
+    }
 
-    qWarning("SynthPluginDevice::getPatch(%i)", prog);
     return 0;
 }
 
