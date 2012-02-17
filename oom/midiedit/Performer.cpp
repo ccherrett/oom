@@ -149,6 +149,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(m_prDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(dockAreaChanged(Qt::DockWidgetArea)));
 
 	QSignalMapper* mapper = new QSignalMapper(this);
+	QSignalMapper* functionMapper = new QSignalMapper(this);
 	QSignalMapper* colorMapper = new QSignalMapper(this);
 
 	//---------Menu----------------------------------
@@ -342,6 +343,51 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	song->populateScriptMenu(menuPlugins, this);
 
 	connect(mapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
+
+	menuFunctions->addSeparator();
+
+    funcLocateSelectionAction = menuFunctions->addAction(tr("Set locators to selection"), functionMapper, SLOT(map()), shortcuts[SHRT_LOCATORS_TO_SELECTION].key);
+	functionMapper->setMapping(funcLocateSelectionAction, LOCATORS_TO_SELECTION);
+    
+	funcSelectRightAction = menuFunctions->addAction(tr("Select nearest event right"), functionMapper, SLOT(map()), shortcuts[SHRT_SEL_RIGHT].key);
+	functionMapper->setMapping(funcSelectRightAction, SEL_RIGHT);
+
+    funcSelectRightAddAction = menuFunctions->addAction(tr("Add nearest event right to selection"), functionMapper, SLOT(map()), shortcuts[SHRT_SEL_RIGHT_ADD].key);
+	functionMapper->setMapping(funcSelectRightAddAction, SEL_RIGHT_ADD);
+    
+	funcSelectLeftAction = menuFunctions->addAction(tr("Select nearest event left"), functionMapper, SLOT(map()), shortcuts[SHRT_SEL_LEFT].key);
+	functionMapper->setMapping(funcSelectLeftAction, SEL_LEFT);
+    
+	funcSelectLeftAddAction = menuFunctions->addAction(tr("Add nearest event left to selection"), functionMapper, SLOT(map()), shortcuts[SHRT_SEL_LEFT_ADD].key);
+	functionMapper->setMapping(funcSelectLeftAddAction, SEL_LEFT_ADD);
+    
+	funcIncreaseOctaveAction = menuFunctions->addAction(tr("Increase pitch by octave"), functionMapper, SLOT(map()), shortcuts[SHRT_INC_PITCH_OCTAVE].key);
+	functionMapper->setMapping(funcIncreaseOctaveAction, INC_PITCH_OCTAVE);
+    
+	funcDecreaseOctaveAction = menuFunctions->addAction(tr("Decrease pitch by octave"), functionMapper, SLOT(map()), shortcuts[SHRT_DEC_PITCH_OCTAVE].key);
+	functionMapper->setMapping(funcDecreaseOctaveAction, DEC_PITCH_OCTAVE);
+    
+	funcIncreasePitchAction = menuFunctions->addAction(tr("Increase pitch"), functionMapper, SLOT(map()), shortcuts[SHRT_INC_PITCH].key);
+	functionMapper->setMapping(funcIncreasePitchAction, INC_PITCH);
+    
+	funcDecreasePitchAction = menuFunctions->addAction(tr("Decrease pitch"), functionMapper, SLOT(map()), shortcuts[SHRT_DEC_PITCH].key);
+	functionMapper->setMapping(funcDecreasePitchAction, DEC_PITCH);
+    
+	funcIncreasePosAction = menuFunctions->addAction(tr("Increase event position"), functionMapper, SLOT(map()), shortcuts[SHRT_INC_POS].key);
+	functionMapper->setMapping(funcIncreasePosAction, INC_POS);
+    
+	funcDecreasePosAction = menuFunctions->addAction(tr("Decrease event position"), functionMapper, SLOT(map()), shortcuts[SHRT_DEC_POS].key);
+	functionMapper->setMapping(funcDecreasePosAction, DEC_POS);
+    
+	funcIncreaseLenAction = menuFunctions->addAction(tr("Increase length"), functionMapper, SLOT(map()), shortcuts[SHRT_INCREASE_LEN].key);
+	functionMapper->setMapping(funcIncreaseLenAction, INCREASE_LEN);
+    
+	funcDecreaseLenAction = menuFunctions->addAction(tr("Decrease length"), functionMapper, SLOT(map()), shortcuts[SHRT_DECREASE_LEN].key);
+	functionMapper->setMapping(funcDecreaseLenAction, DECREASE_LEN);
+    
+	funcGotoSelNoteAction = menuFunctions->addAction(tr("Move PB to active note"), functionMapper, SLOT(map()), shortcuts[SHRT_GOTO_SEL_NOTE].key);
+	functionMapper->setMapping(funcGotoSelNoteAction, GOTO_SEL_NOTE);
+
 
 	//---------ToolBar----------------------------------
 	//tools = addToolBar(tr("Performer tools"));
@@ -616,6 +662,10 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     canvas->setCanvasTools(performerTools);
     canvas->setFocus();
     connect(canvas, SIGNAL(toolChanged(int)), tools22, SLOT(set(int)));
+
+	//Connect the functions to canvas
+	connect(functionMapper, SIGNAL(mapped(int)), canvas, SLOT(actionCommand(int)));
+
     time->setOrigin(offset, 0);
     pcbar->setOrigin(offset, 0);
 

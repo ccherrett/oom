@@ -658,9 +658,10 @@ void EventCanvas::itemPopup(CItem* item, int n, const QPoint&)/*{{{*/
 //   keyPress
 //---------------------------------------------------------
 
-void EventCanvas::keyPress(QKeyEvent* event)
+void EventCanvas::keyPress(QKeyEvent* event)/*{{{*/
 {
-	int key = event->key();
+	event->ignore();
+	/*int key = event->key();
 	///if (event->state() & Qt::ShiftButton)
 	if (((QInputEvent*) event)->modifiers() & Qt::ShiftModifier)
 		key += Qt::SHIFT;
@@ -871,7 +872,221 @@ void EventCanvas::keyPress(QKeyEvent* event)
 
 	else
 		event->ignore();
-}
+	*/
+}/*}}}*/
+
+//---------------------------------------------------------
+// actionCommands
+//---------------------------------------------------------
+
+void EventCanvas::actionCommand(int action)/*{{{*/
+{
+	switch(action)
+	{
+		case LOCATORS_TO_SELECTION:
+		{
+			int tick_max = 0;
+			int tick_min = INT_MAX;
+			bool found = false;
+
+			for (iCItem i = _items.begin(); i != _items.end(); i++)
+			{
+				if (!i->second->isSelected())
+					continue;
+
+				int tick = i->second->x();
+				int len = i->second->event().lenTick();
+				found = true;
+				if (tick + len > tick_max)
+					tick_max = tick + len;
+				if (tick < tick_min)
+					tick_min = tick;
+			}
+			if (found)
+			{
+				Pos p1(tick_min, true);
+				Pos p2(tick_max, true);
+				song->setPos(1, p1);
+				song->setPos(2, p2);
+			}
+		}
+		break;
+		case  SEL_RIGHT ... SEL_RIGHT_ADD:
+		{
+			if (action == SEL_RIGHT && allItemsAreSelected())
+			{
+				deselectAll();
+				selectAtTick(song->cpos());
+				return;
+			}
+
+			iCItem i, iRightmost;
+			CItem* rightmost = NULL;
+
+			// get a list of items that belong to the current part
+			// since multiple parts have populated the _items list
+			// we need to filter on the actual current Part!
+			CItemList list = _items;
+			if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+				list = getItemlistForCurrentPart();
+
+			//Get the rightmost selected note (if any)
+			i = list.begin();
+			while (i != list.end())
+			{
+				if (i->second->isSelected())
+				{
+					iRightmost = i;
+					rightmost = i->second;
+				}
+
+				++i;
+			}
+			if (rightmost)
+			{
+				iCItem temp = iRightmost;
+				temp++;
+				//If so, deselect current note and select the one to the right
+				if (temp != list.end())
+				{
+					if (action != SEL_RIGHT_ADD)
+						deselectAll();
+
+					iRightmost++;
+					iRightmost->second->setSelected(true);
+					if(editor->isGlobalEdit())
+						populateMultiSelect(iRightmost->second);
+					updateSelection();
+				}
+			}
+			else // there was no item selected at all? Then select nearest to tick if there is any
+			{
+				selectAtTick(song->cpos());
+				updateSelection();
+			}
+		}
+		break;
+		case SEL_LEFT ... SEL_LEFT_ADD:
+		{
+			if (action == SEL_LEFT && allItemsAreSelected())
+			{
+				deselectAll();
+				selectAtTick(song->cpos());
+				return;
+			}
+
+			iCItem i, iLeftmost;
+			CItem* leftmost = NULL;
+
+			// get a list of items that belong to the current part
+			// since multiple parts have populated the _items list
+			// we need to filter on the actual current Part!
+			CItemList list = _items;
+			if(multiPartSelectionAction && !multiPartSelectionAction->isChecked())
+				list = getItemlistForCurrentPart();
+
+			if (list.size() > 0)
+			{
+				i = list.end();
+				while (i != list.begin())
+				{
+					--i;
+
+					if (i->second->isSelected())
+					{
+						iLeftmost = i;
+						leftmost = i->second;
+					}
+				}
+				if (leftmost)
+				{
+					if (iLeftmost != list.begin())
+					{
+						//Add item
+						if (action != SEL_LEFT_ADD)
+							deselectAll();
+
+						iLeftmost--;
+						iLeftmost->second->setSelected(true);
+						if(editor->isGlobalEdit())
+							populateMultiSelect(iLeftmost->second);
+						updateSelection();
+					} else {
+						leftmost->setSelected(true);
+						if(editor->isGlobalEdit())
+							populateMultiSelect(leftmost);
+						updateSelection();
+					}
+				} else // there was no item selected at all? Then select nearest to tick if there is any
+				{
+					selectAtTick(song->cpos());
+					updateSelection();
+				}
+			}
+		}
+		break;
+		case INC_PITCH_OCTAVE:
+		{
+			modifySelected(NoteInfo::VAL_PITCH, 12);
+		}
+		break;
+		case DEC_PITCH_OCTAVE:
+		{
+			modifySelected(NoteInfo::VAL_PITCH, -12);
+		}
+		break;
+		case INC_PITCH:
+		{
+			modifySelected(NoteInfo::VAL_PITCH, 1);
+		}
+		break;
+		case DEC_PITCH:
+		{
+			modifySelected(NoteInfo::VAL_PITCH, -1);
+		}
+		break;
+		case INC_POS:
+		{
+			// TODO: Check boundaries
+			modifySelected(NoteInfo::VAL_TIME, editor->raster());
+		}
+		break;
+		case DEC_POS:
+		{
+			// TODO: Check boundaries
+			modifySelected(NoteInfo::VAL_TIME, 0 - editor->raster());
+		}
+		break;
+		case INCREASE_LEN:
+		{
+			// TODO: Check boundaries
+			modifySelected(NoteInfo::VAL_LEN, editor->raster());
+		}
+		break;
+		case DECREASE_LEN:
+		{
+			// TODO: Check boundaries
+			modifySelected(NoteInfo::VAL_LEN, 0 - editor->raster());
+		}
+		break;
+		case GOTO_SEL_NOTE:
+		{
+			CItem* leftmost = getLeftMostSelected();
+			if (leftmost)
+			{
+				unsigned newtick = leftmost->event().tick() + leftmost->part()->tick();
+				Pos p1(newtick, true);
+				song->setPos(0, p1, true, true, false);
+			}
+		}
+		break;
+		case MIDI_PANIC:
+		{
+			song->panic();
+		}
+		break;
+	}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   getTextDrag

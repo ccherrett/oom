@@ -31,6 +31,10 @@ struct PartToChange
 typedef std::map<Part*, PartToChange> PartsToChangeMap;
 typedef std::map<Part*, PartToChange>::iterator iPartToChange;
 
+enum { LOCATORS_TO_SELECTION, SEL_RIGHT, SEL_RIGHT_ADD, SEL_LEFT, SEL_LEFT_ADD, 
+						INC_PITCH_OCTAVE, DEC_PITCH_OCTAVE, INC_PITCH, DEC_PITCH, INC_POS, DEC_POS,
+						INCREASE_LEN, DECREASE_LEN, GOTO_SEL_NOTE, MIDI_PANIC };
+
 //---------------------------------------------------------
 //   EventCanvas
 //---------------------------------------------------------
@@ -86,6 +90,7 @@ public slots:
         _midiin = f;
     }
 	void toggleComments(bool){}
+	void actionCommand(int);
 
 signals:
     void pitchChanged(int); // current cursor position

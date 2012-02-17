@@ -116,6 +116,20 @@ class Performer : public AbstractMidiEditor
     QAction* funcSetFixedLenAction;
     QAction* funcDelOverlapsAction;
 
+    QAction* funcLocateSelectionAction;
+    QAction* funcSelectRightAction;
+    QAction* funcSelectRightAddAction;
+    QAction* funcSelectLeftAction;
+    QAction* funcSelectLeftAddAction;
+    QAction* funcIncreaseOctaveAction;
+    QAction* funcDecreaseOctaveAction;
+    QAction* funcIncreasePitchAction;
+    QAction* funcDecreasePitchAction;
+    QAction* funcIncreasePosAction;
+    QAction* funcDecreasePosAction;
+    QAction* funcIncreaseLenAction;
+    QAction* funcDecreaseLenAction;
+    QAction* funcGotoSelNoteAction;
 
     int tickOffset;
     int lenOffset;

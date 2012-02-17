@@ -753,6 +753,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	connect(punchoutAction, SIGNAL(toggled(bool)), song, SLOT(setPunchout(bool)));/*}}}*/
 
 	panicAction = new QAction(QIcon(*panicIconSet3), tr("Panic"), this);
+	panicAction->setShortcut(shortcuts[SHRT_MIDI_PANIC].key);
 
 	panicAction->setWhatsThis(tr(infoPanicButton));
 	connect(panicAction, SIGNAL(triggered()), song, SLOT(panic()));

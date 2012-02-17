@@ -39,6 +39,8 @@ class QRect;
 
 class PerformerCanvas : public EventCanvas
 {
+    Q_OBJECT
+
     int cmdRange;
     int colorMode;
     int playedPitch;
@@ -49,7 +51,6 @@ class PerformerCanvas : public EventCanvas
     QMap<QString, int> _qwertyToMidiMap;
     void bindQwertyKeyToMidiValue(const char* key, int note);
 
-    Q_OBJECT
     virtual void viewMouseDoubleClickEvent(QMouseEvent*);
     virtual void drawItem(QPainter&, const CItem*, const QRect&);
     void drawTopItem(QPainter &p, const QRect &rect);
