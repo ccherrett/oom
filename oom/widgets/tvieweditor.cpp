@@ -76,7 +76,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, bool templateMode) : QDialog(p
 	btnUp->setIcon(*up_arrowIconSet3);
 	btnDown->setIcon(*down_arrowIconSet3);
 	btnRemove->setIcon(*garbageIconSet3);
-	btnAdd->setIcon(*plusIconSet3);
+	btnAdd->setIcon(*nextIconSet3);
 	btnAddVirtual->setIcon(*plusIconSet3);
 
 	populateTrackList();
