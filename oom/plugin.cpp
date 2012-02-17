@@ -353,6 +353,7 @@ QString SynthPluginDevice::open()
         m_plugin->setName(m_name);
         if (m_plugin->init(m_filename, m_label))
         {
+            qWarning("Synth Open Test %i | %i", bool(audioDevice), audioDevice->deviceType());
             // disable plugin if jack is not running
             if (!audioDevice || audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
                 m_plugin->aboutToRemove();
