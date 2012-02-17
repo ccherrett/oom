@@ -928,7 +928,7 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		input->setMute(false);
 		QString selectedInput;
 		if(vtrack->instrumentType == SYNTH_INSTRUMENT)
-			m_synthConfigs.at(1).second;
+			selectedInput = m_synthConfigs.at(1).second;
 		else
 			selectedInput = vtrack->monitorConfig.second;
         QString selectedInput2;
@@ -939,7 +939,6 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
         	    selectedInput2 = selectedInput;
 			else
 				selectedInput2 = m_synthConfigs.at(2).second;
-			
 		}
 		else
 		{
