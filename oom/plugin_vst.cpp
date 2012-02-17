@@ -12,6 +12,7 @@
 #include "plugingui.h"
 #include "icons.h"
 #include "midi.h"
+#include "midictrl.h"
 #include "jackaudio.h"
 #include "track.h"
 #include "xml.h"

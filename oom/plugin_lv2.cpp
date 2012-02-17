@@ -15,6 +15,7 @@
 
 #include "icons.h"
 #include "midi.h"
+#include "midictrl.h"
 #include "jackaudio.h"
 
 #include "lv2_data_access.h"
