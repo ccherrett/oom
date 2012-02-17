@@ -615,7 +615,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	g_trackDragImageList.insert(Track::AUDIO_AUX, *dragAuxIcon);
 	g_trackDragImageList.insert(Track::AUDIO_SOFTSYNTH, *dragAudioIcon);
 
-	appName = QString("The Composer - OOMidi-").append(VERSION).append("     ");
+	appName = QString("The Composer - OOStudio-").append(VERSION).append("     ");
 	setWindowTitle(appName);
 
 	qRegisterMetaType<CCInfo>("CCInfo");
@@ -922,9 +922,9 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 
 	//-------- Help Actions
 	helpManualAction = new QAction(tr("&Manual"), this);
-	helpHomepageAction = new QAction(tr("&OOMidi Homepage"), this);
+	helpHomepageAction = new QAction(tr("&OOStudio Homepage"), this);
 	helpReportAction = new QAction(tr("&Report Bug..."), this);
-	helpAboutAction = new QAction(tr("&About OOMidi"), this);
+	helpAboutAction = new QAction(tr("&About OOStudio"), this);
 
 
 	//---- Connections
@@ -1624,7 +1624,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	{
 		if (!fi.isReadable())
 		{
-			QMessageBox::critical(this, QString("OOMidi"),
+			QMessageBox::critical(this, QString("OOStudio"),
 					tr("Cannot read template"));
 			return;
 		}
@@ -1655,7 +1655,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		{
 			if (errno != ENOENT)
 			{
-				QMessageBox::critical(this, QString("OOMidi"),
+				QMessageBox::critical(this, QString("OOStudio"),
 						tr("File open error"));
 				setUntitledProject();
 			}
@@ -1681,7 +1681,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	   		 	printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
 
 	   		 	if (QMessageBox::critical(this,
-	   		 			      QString("OOMidi Load Project"),
+	   		 			      QString("OOStudio Load Project"),
 	   		 			      tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n\n"
 	   		 				 "Suggestion: \n\nmove the %1 file to another location, and rename the %1.backup to %1"
 	   		 				 " and reload the project\n")
@@ -1708,7 +1708,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 			popenFlag ? pclose(f) : fclose(f);
 			if (fileError)
 			{
-				QMessageBox::critical(this, QString("OOMidi"),
+				QMessageBox::critical(this, QString("OOStudio"),
 						tr("File read error"));
 				setUntitledProject();
 			}
@@ -1722,14 +1722,14 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	}
 	else
 	{
-		QMessageBox::critical(this, QString("OOMidi"),
+		QMessageBox::critical(this, QString("OOStudio"),
 				tr("Unknown File Format: ") + ex);
 		setUntitledProject();
 	}
 	if (!songTemplate)
 	{
 		addProject(project.absoluteFilePath());
-		setWindowTitle(QString("The Composer - OOMidi-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
+		setWindowTitle(QString("The Composer - OOStudio-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
 	}
 	song->dirty = false;
 
@@ -1781,7 +1781,7 @@ void OOMidi::setUntitledProject()
 	project.setFile(name);
 	oomProjectFile = project.filePath();
 	//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
-	setWindowTitle(QString("The Composer - OOMidi-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
+	setWindowTitle(QString("The Composer - OOStudio-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
 }
 
 //---------------------------------------------------------
@@ -1849,7 +1849,7 @@ void OOMidi::loadProject()
 {
 	bool loadAll;
 	QString fn = getOpenFileName(QString(""), med_file_pattern, this,
-			tr("OOMidi: load project"), &loadAll);
+			tr("OOStudio: load project"), &loadAll);
 	if (!fn.isEmpty())
 	{
 		oomProject = QFileInfo(fn).absolutePath();
@@ -1865,7 +1865,7 @@ void OOMidi::loadProject()
 void OOMidi::loadTemplate()
 {
 	QString fn = getOpenFileName(QString("templates"), med_file_pattern, this,
-			tr("OOMidi: load template"), 0, MFileDialog::GLOBAL_VIEW);
+			tr("OOStudio: load template"), 0, MFileDialog::GLOBAL_VIEW);
 	if (!fn.isEmpty())
 	{
 		// oomProject = QFileInfo(fn).absolutePath();
@@ -1926,7 +1926,7 @@ bool OOMidi::save(const QString& name, bool overwriteWarn)
 				//+ strerror(errno);
 				+ QString(strerror(errno)); // p4.0.0
 		QMessageBox::critical(this,
-				tr("OOMidi: Write File failed"), s);
+				tr("OOStudio: Write File failed"), s);
 		popenFlag ? pclose(f) : fclose(f);
 		unlink(name.toLatin1().constData());
 		//FIXME: We should probably restore the backup file at this point as the saved file 
@@ -1975,7 +1975,7 @@ bool OOMidi::saveRouteMapping(QString name, QString notes)
 	if (ferror(f))
 	{
 		QString s = "Write File\n" + name + "\nfailed: " + QString(strerror(errno));
-		QMessageBox::critical(this, tr("OOMidi: Write File failed"), s);
+		QMessageBox::critical(this, tr("OOStudio: Write File failed"), s);
 		popenFlag ? pclose(f) : fclose(f);
 		unlink(name.toLatin1().constData());
 		return false;
@@ -2005,7 +2005,7 @@ bool OOMidi::updateRouteMapping(QString name, QString note)/*{{{*/
 	    printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
 
 	    if (QMessageBox::critical(this,
-				  QString("OOMidi Load Routing Map"),
+				  QString("OOStudio Load Routing Map"),
 				  tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
 				  .arg(file.fileName())
 				  .arg(errorMsg),
@@ -2057,7 +2057,7 @@ QString OOMidi::noteForRouteMapping(QString name)/*{{{*/
 	    printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
 
 	    if (QMessageBox::critical(this,
-				  QString("OOMidi Load Routing Map"),
+				  QString("OOStudio Load Routing Map"),
 				  tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
 				  .arg(file.fileName())
 				  .arg(errorMsg),
@@ -2096,7 +2096,7 @@ bool OOMidi::loadRouteMapping(QString name)
 	QFileInfo fi(name);/*{{{*/
 	if (!fi.isReadable())
 	{
-		QMessageBox::critical(this, QString("OOMidi"), tr("Cannot read routing map"));
+		QMessageBox::critical(this, QString("OOStudio"), tr("Cannot read routing map"));
 		return false;
 	}
 	QString ex = fi.completeSuffix().toLower();
@@ -2110,7 +2110,7 @@ bool OOMidi::loadRouteMapping(QString name)
 		{
 			if (errno != ENOENT)
 			{
-				QMessageBox::critical(this, QString("OOMidi"), tr("File open error: Could not open Route Map"));
+				QMessageBox::critical(this, QString("OOStudio"), tr("File open error: Could not open Route Map"));
 				return false;
 			}
 		}
@@ -2129,7 +2129,7 @@ bool OOMidi::loadRouteMapping(QString name)
 		printf("Failed to set xml content (Error: %s)\n", errorMsg.toLatin1().data());
 
 		if (QMessageBox::critical(this,
-				      QString("OOMidi Load Routing Map"),
+				      QString("OOStudio Load Routing Map"),
 				      tr("Failed to parse file:\n\n %1 \n\n\n Error Message:\n\n %2 \n")
 				      .arg(file.fileName())
 				      .arg(errorMsg),
@@ -2197,7 +2197,7 @@ bool OOMidi::loadRouteMapping(QString name)
 			popenFlag ? pclose(f) : fclose(f);
 			if (fileError)
 			{
-				QMessageBox::critical(this, QString("OOMidi"), tr("File read error"));
+				QMessageBox::critical(this, QString("OOStudio"), tr("File read error"));
 				return false;
 			}
 		}
@@ -2308,13 +2308,13 @@ void OOMidi::closeEvent(QCloseEvent* event)
 		fclose(f);
 	}
 	if (debugMsg)
-		printf("OOMidi: Exiting JackAudio\n");
+		printf("OOStudio: Exiting JackAudio\n");
 	exitJackAudio();
 	if (debugMsg)
-		printf("OOMidi: Exiting DummyAudio\n");
+		printf("OOStudio: Exiting DummyAudio\n");
 	exitDummyAudio();
 	if (debugMsg)
-		printf("OOMidi: Exiting Metronome\n");
+		printf("OOStudio: Exiting Metronome\n");
 	exitMetronome();
 
 	// p3.3.47
@@ -2751,7 +2751,7 @@ bool OOMidi::saveAs()
 		}
 		else
 		{
-			name = getSaveFileName(QString(""), med_file_save_pattern, this, tr("OOMidi: Save As"));
+			name = getSaveFileName(QString(""), med_file_save_pattern, this, tr("OOStudio: Save As"));
 			if (name.isEmpty())
 				return false;
 		}
@@ -2766,7 +2766,7 @@ bool OOMidi::saveAs()
 	}
 	else
 	{
-		name = getSaveFileName(QString(""), med_file_save_pattern, this, tr("OOMidi: Save As"));
+		name = getSaveFileName(QString(""), med_file_save_pattern, this, tr("OOStudio: Save As"));
 	}
 	bool ok = false;
 	if (!name.isEmpty())
@@ -2779,7 +2779,7 @@ bool OOMidi::saveAs()
 			project.setFile(name);
 			oomProjectFile = project.filePath();
 			//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
-			setWindowTitle(QString("The Composer - OOMidi-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
+			setWindowTitle(QString("The Composer - OOStudio-").append(VERSION).append(":     ") + project.completeBaseName() + QString("     "));
 			addProject(name);
 		}
 		else
@@ -2831,7 +2831,7 @@ PartList* OOMidi::getMidiPartsToEdit()
 	PartList* pl = song->getSelectedMidiParts();
 	if (pl->empty())
 	{
-		QMessageBox::critical(this, QString("OOMidi"), tr("Nothing to edit"));
+		QMessageBox::critical(this, QString("OOStudio"), tr("Nothing to edit"));
 		return 0;
 	}
 	return pl;
@@ -2994,7 +2994,7 @@ void OOMidi::showDidYouKnowDialog()
 	{
 		printf("show did you know dialog!!!!\n");
 		DidYouKnowWidget dyk;
-		dyk.tipText->setText("To get started with OOMidi why don't you try some demo songs available at http://www.openoctave.org/");
+		dyk.tipText->setText("To get started with OOStudio why don't you try some demo songs available at http://www.openoctave.org/");
 		dyk.show();
 		if (dyk.exec())
 		{
@@ -3986,7 +3986,7 @@ void OOMidi::globalSplit()
 void OOMidi::copyRange()
 {
 	QMessageBox::critical(this,
-			tr("OOMidi: Copy Range"),
+			tr("OOStudio: Copy Range"),
 			tr("not implemented")
 			);
 }
@@ -4001,7 +4001,7 @@ void OOMidi::copyRange()
 void OOMidi::cutEvents()
 {
 	QMessageBox::critical(this,
-			tr("OOMidi: Cut Events"),
+			tr("OOStudio: Cut Events"),
 			tr("not implemented")
 			);
 }
@@ -4018,7 +4018,7 @@ bool OOMidi::checkRegionNotNull()
 	if (end - start <= 0)
 	{
 		QMessageBox::critical(this,
-				tr("OOMidi: Bounce"),
+				tr("OOStudio: Bounce"),
 				tr("set left/right marker for bounce range")
 				);
 		return true;
@@ -4040,7 +4040,7 @@ void OOMidi::bounceToTrack()
 	if (song->waves()->empty())
 	{
 		QMessageBox::critical(this,
-				tr("OOMidi: Bounce to Track"),
+				tr("OOStudio: Bounce to Track"),
 				tr("No wave tracks found")
 				);
 		return;
@@ -4050,7 +4050,7 @@ void OOMidi::bounceToTrack()
 	if (ol->empty())
 	{
 		QMessageBox::critical(this,
-				tr("OOMidi: Bounce to Track"),
+				tr("OOStudio: Bounce to Track"),
 				tr("No audio output tracks found")
 				);
 		return;
@@ -4081,7 +4081,7 @@ void OOMidi::bounceToTrack()
 		if (!out)
 		{
 			QMessageBox::critical(this,
-					tr("OOMidi: Bounce to Track"),
+					tr("OOStudio: Bounce to Track"),
 					tr("Select one audio output track,\nand one target wave track")
 					);
 			return;
@@ -4120,7 +4120,7 @@ void OOMidi::bounceToTrack()
 		if (ol->size() == 1)
 		{
 			QMessageBox::critical(this,
-					tr("OOMidi: Bounce to Track"),
+					tr("OOStudio: Bounce to Track"),
 					tr("Select one target wave track")
 					);
 			return;
@@ -4128,7 +4128,7 @@ void OOMidi::bounceToTrack()
 		else
 		{
 			QMessageBox::critical(this,
-					tr("OOMidi: Bounce to Track"),
+					tr("OOStudio: Bounce to Track"),
 					tr("Select one target wave track,\nand one audio output track")
 					);
 			return;
@@ -4159,7 +4159,7 @@ void OOMidi::bounceToFile(AudioOutput* ao)
 		if (ol->empty())
 		{
 			QMessageBox::critical(this,
-					tr("OOMidi: Bounce to File"),
+					tr("OOStudio: Bounce to File"),
 					tr("No audio output tracks found")
 					);
 			return;
@@ -4185,7 +4185,7 @@ void OOMidi::bounceToFile(AudioOutput* ao)
 			if (ao == 0)
 			{
 				QMessageBox::critical(this,
-						tr("OOMidi: Bounce to File"),
+						tr("OOStudio: Bounce to File"),
 						tr("Select one audio output track")
 						);
 				return;
@@ -4236,7 +4236,7 @@ OOMidi::lash_idle_cb()
 				{
 					project.setFile(ss.toAscii());
 					//setWindowTitle(tr("OOMidi: Song: ") + project.completeBaseName());
-					setWindowTitle(QString("The Composer - OOMidi-").append(VERSION).append(":     ") + project.completeBaseName()  + QString("     "));
+					setWindowTitle(QString("The Composer - OOStudio-").append(VERSION).append(":     ") + project.completeBaseName()  + QString("     "));
 					addProject(ss.toAscii());
 					oomProject = QFileInfo(ss.toAscii()).absolutePath();
 					oomProjectFile = QFileInfo(ss.toAscii()).filePath();
