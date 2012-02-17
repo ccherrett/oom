@@ -529,6 +529,11 @@ extern QPixmap* load_OffIcon;
 extern QPixmap* load_OverIcon;
 extern QIcon*   loadIconSet3;
 
+extern QPixmap* pluginGUI_OnIcon;
+extern QPixmap* pluginGUI_OffIcon;
+extern QPixmap* pluginGUI_OverIcon;
+extern QIcon*   pluginGUIIconSet3;
+
 extern QPixmap* route_edit_OnIcon;
 extern QPixmap* route_edit_OffIcon;
 extern QPixmap* route_edit_OverIcon;

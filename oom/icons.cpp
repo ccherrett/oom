@@ -615,6 +615,11 @@ QPixmap* load_OffIcon;
 QPixmap* load_OverIcon;
 QIcon*   loadIconSet3;
 
+QPixmap* pluginGUI_OnIcon;
+QPixmap* pluginGUI_OffIcon;
+QPixmap* pluginGUI_OverIcon;
+QIcon*   pluginGUIIconSet3;
+
 QPixmap* route_edit_OnIcon;
 QPixmap* route_edit_OffIcon;
 QPixmap* route_edit_OverIcon;
@@ -1473,6 +1478,14 @@ void initIcons()
       loadIconSet3->addPixmap(*load_OnIcon, QIcon::Normal, QIcon::On);
       loadIconSet3->addPixmap(*load_OffIcon, QIcon::Normal, QIcon::Off);
       loadIconSet3->addPixmap(*load_OverIcon, QIcon::Active);
+	  
+      pluginGUI_OnIcon= new MPIXMAP(":/images/pluginGUI_new_on.png", NULL);
+      pluginGUI_OffIcon= new MPIXMAP(":/images/pluginGUI_new_off.png", NULL);
+      pluginGUI_OverIcon= new MPIXMAP(":/images/pluginGUI_new_over.png", NULL);
+	  pluginGUIIconSet3         = new QIcon();
+      pluginGUIIconSet3->addPixmap(*pluginGUI_OnIcon, QIcon::Normal, QIcon::On);
+      pluginGUIIconSet3->addPixmap(*pluginGUI_OffIcon, QIcon::Normal, QIcon::Off);
+      pluginGUIIconSet3->addPixmap(*pluginGUI_OverIcon, QIcon::Active);
 	  
       route_edit_OnIcon= new MPIXMAP(":/images/route_edit_new_on.png", NULL);
       route_edit_OffIcon= new MPIXMAP(":/images/route_edit_new_off.png", NULL);

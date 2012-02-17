@@ -457,6 +457,9 @@
 		<file>images/icons/clip-folder-up.png</file>
 		<file>images/icons/clip-folder-refresh.png</file>
 		<file>images/icons/clip-new-folder.png</file>
+		<file>images/pluginGUI_new_on.png</file>
+		<file>images/pluginGUI_new_over.png</file>
+		<file>images/pluginGUI_new_off.png</file>
 	</qresource>
 </RCC>
 

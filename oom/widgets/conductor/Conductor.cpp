@@ -258,7 +258,7 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	//btnDown->setIconSize(downPCIcon->size());
 	//btnDelete->setIconSize(garbagePCIcon->size());
 	btnCopy->setIcon(*duplicateIconSet3);
-	btnShowGui->setIcon(*loadIconSet3);
+	btnShowGui->setIcon(*pluginGUIIconSet3);
 	//btnCopy->setIconSize(duplicatePCIcon->size());
 
 	//start tb1 merge
