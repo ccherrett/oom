@@ -464,8 +464,10 @@ void Conductor::heartBeat()
 				}
 			}
 
+            bool isSynth = (mp->device() && mp->device()->isSynthPlugin());
 			int nprogram = mp->hwCtrlState(outChannel, CTRL_PROGRAM);
-			if (nprogram == CTRL_VAL_UNKNOWN)
+
+			if (nprogram == CTRL_VAL_UNKNOWN || isSynth)
 			{
 				if (program != CTRL_VAL_UNKNOWN)
 				{
@@ -492,7 +494,7 @@ void Conductor::heartBeat()
 					}
 				}
 
-                if (mp->device() && mp->device()->isSynthPlugin())
+                if (isSynth)
                 {
                     SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
                     nprogram = synth->getCurrentProgram();
@@ -527,8 +529,7 @@ void Conductor::heartBeat()
 					emit updateCurrentPatch(name);
 				}
 			}
-			else
-				if (program != nprogram)
+			else if (program != nprogram)
 			{
 				program = nprogram;
 
