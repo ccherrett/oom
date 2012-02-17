@@ -914,7 +914,7 @@ bool Lv2Plugin::init(QString filename, QString label)
                                                 ui.nativeWidget = new Lv2QWidget(this);
 
                                             QString title;
-                                            title += "OOMidi: ";
+                                            title += "OOStudio: ";
                                             title += m_name;
                                             title += " (GUI)";
                                             if (m_track && m_track->name().isEmpty() == false)
@@ -1479,7 +1479,7 @@ void Lv2Plugin::showNativeGui(bool yesno)
         if (ui.handle && ui.widget)
         {
             QString title;
-            title += "OOMidi: ";
+            title += "OOStudio: ";
             title += m_name;
             title += " (GUI)";
             if (m_track && m_track->name().isEmpty() == false)

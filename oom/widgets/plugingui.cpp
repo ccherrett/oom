@@ -39,7 +39,7 @@ PluginGui::PluginGui(BasePlugin* p)
   plugin(p)
 {
     QString title;
-    title += "OOMidi: ";
+    title += "OOStudio: ";
     title += plugin->name();
     if (plugin->track() && plugin->track()->name().isEmpty() == false)
     {
@@ -375,7 +375,7 @@ void PluginGui::load()
     s += "/";
 
     QString fn = getOpenFileName(s, preset_file_pattern,
-                                 this, tr("OOMidi: load preset"), 0);
+                                 this, tr("OOStudio: load preset"), 0);
     if (fn.isEmpty())
         return;
     bool popenFlag;
@@ -402,7 +402,7 @@ void PluginGui::load()
 
                 if (plugin->readConfiguration(xml, true))
                 {
-                    QMessageBox::critical(this, QString("OOMidi"),
+                    QMessageBox::critical(this, QString("OOStudio"),
                                           tr("Error reading preset. Might not be right type for this plugin"));
                     goto ende;
                 }
@@ -443,7 +443,7 @@ void PluginGui::save()
 
     //QString fn = getSaveFileName(s, preset_file_pattern, this,
     QString fn = getSaveFileName(s, preset_file_save_pattern, this,
-                                 tr("OOMidi: save preset"));
+                                 tr("OOStudio: save preset"));
     if (fn.isEmpty())
         return;
     bool popenFlag;

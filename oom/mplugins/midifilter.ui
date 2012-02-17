@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>OOMidi:  Midi Input Filter</string>
+   <string>OOStudio:  Midi Input Filter</string>
   </property>
   <layout class="QGridLayout">
    <property name="margin">

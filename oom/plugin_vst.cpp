@@ -759,7 +759,7 @@ void VstPlugin::showNativeGui(bool yesno)
         }
 
         QString title;
-        title += "OOMidi: ";
+        title += "OOStudio: ";
         title += m_name;
         title += " (GUI)";
         if (m_track && m_track->name().isEmpty() == false)
