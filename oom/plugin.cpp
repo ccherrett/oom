@@ -573,7 +573,10 @@ Patch* SynthPluginDevice::getPatch(int, int prog, MType, bool)
         patch.index = prog;
         patch.volume = 1.0f; // ?
         patch.drum = false;
-        //m_plugin->setProgram(prog);
+        
+        if (prog != m_plugin->getCurrentProgram())
+            m_plugin->setProgram(prog);
+
         return &patch;
     }
 #endif
