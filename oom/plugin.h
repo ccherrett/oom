@@ -174,6 +174,7 @@ public:
 
         m_paramCount = 0;
         m_params = 0;
+        m_currentProgram = -1;
 
         m_id = -1;
         m_channels = 0;
@@ -336,6 +337,11 @@ public:
             return 0.0;
     }
 
+    int32_t getCurrentProgram()
+    {
+        return m_currentProgram;
+    }
+
     bool controllerEnabled(uint32_t index)
     {
         if (index < m_paramCount)
@@ -482,6 +488,7 @@ protected:
 
     uint32_t m_paramCount;
     ParameterPort* m_params;
+    int32_t m_currentProgram;
 
     int m_id;
     int m_channels;
@@ -729,7 +736,6 @@ protected:
     } events;
     VstMidiEvent midiEvents[MAX_VST_EVENTS];
 
-    int32_t m_currentProgram;
     QStringList m_programNames;
 
     struct {
@@ -811,6 +817,7 @@ public:
     virtual void setName(const QString& s);
     void setPluginName(const QString& s);
     QString getAudioOutputPortName(uint32_t index);
+    int32_t getCurrentProgram();
 
     virtual void writeRouting(int, Xml&) const;
 

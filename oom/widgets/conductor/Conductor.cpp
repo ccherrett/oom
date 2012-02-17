@@ -492,7 +492,16 @@ void Conductor::heartBeat()
 					}
 				}
 
-				nprogram = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
+                if (mp->device() && mp->device()->isSynthPlugin())
+                {
+                    SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
+                    nprogram = synth->getCurrentProgram();
+                    if (nprogram == -1)
+                        nprogram = CTRL_VAL_UNKNOWN;
+                }
+                else
+                    nprogram = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
+
 				if (nprogram == CTRL_VAL_UNKNOWN)
 				{
 					const QString n(tr("Select Patch"));

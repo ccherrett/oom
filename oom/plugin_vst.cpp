@@ -196,7 +196,6 @@ VstPlugin::VstPlugin()
 {
     m_type = PLUGIN_VST;
     isOldSdk = false;
-    m_currentProgram = -1;
 
     ui.width = 0;
     ui.height = 0;

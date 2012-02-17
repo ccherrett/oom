@@ -448,6 +448,17 @@ QString SynthPluginDevice::getAudioOutputPortName(uint32_t index)
 }
 
 //---------------------------------------------------------
+//   getCurrentProgram
+//---------------------------------------------------------
+
+int32_t SynthPluginDevice::getCurrentProgram()
+{
+    if (m_plugin)
+        return m_plugin->getCurrentProgram();
+    return -1;
+}
+
+//---------------------------------------------------------
 //   writeRouting
 //---------------------------------------------------------
 
@@ -546,31 +557,26 @@ QString SynthPluginDevice::getPatchName(int, int prog, MType, bool)
 
 Patch* SynthPluginDevice::getPatch(int, int prog, MType, bool)
 {
-#if 0
-    static Patch patch;
-    patch.typ   = 1; // 1 - GM  2 - GS  4 - XG
-    patch.hbank = 0;
-    patch.lbank = 0;
-    patch.prog  = prog;
-    patch.name  = m_plugin ? m_plugin->getProgramName(prog) : "";
-    patch.loadmode = 0; // ?
-    //QString engine;
-    //QString filename;
-    patch.index = prog;
-    patch.volume = 1.0f; // ?
-    patch.drum = false;
-    //patch.read = 0;
-    //patch.write = 0;
-    //void read(Xml&);
-    //void write(int level, Xml&);
-    return &patch;
-#endif
-    if (m_plugin)
+    //qWarning("SynthPluginDevice::getPatch(%i)", prog);
+#if 1
+    if (m_plugin && prog < (int32_t)m_plugin->getProgramCount())
     {
-        if (prog < (int32_t)m_plugin->getProgramCount())
-            m_plugin->setProgram(prog);
+        static Patch patch;
+        patch.typ   = 1; // 1 - GM  2 - GS  4 - XG
+        patch.hbank = 0;
+        patch.lbank = 0;
+        patch.prog  = prog;
+        patch.name = m_plugin->getProgramName(prog);
+        patch.loadmode = 0; // ?
+        //patch.engine;
+        //patch.filename;
+        patch.index = prog;
+        patch.volume = 1.0f; // ?
+        patch.drum = false;
+        //m_plugin->setProgram(prog);
+        return &patch;
     }
-
+#endif
     return 0;
 }
 
