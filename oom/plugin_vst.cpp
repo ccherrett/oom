@@ -863,7 +863,7 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                             continue;
                         break;
                     case ME_CONTROLLER:
-                        if (ev->dataA() == 0x40001) // FIXME, what is 0x40001
+                        if (ev->dataA() == CTRL_PROGRAM)
                         {
                             setProgram(ev->dataB());
                             continue;
