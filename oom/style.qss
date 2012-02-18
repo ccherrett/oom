@@ -146,7 +146,7 @@ QFrame#propertiesFrame, QFrame#frame2, QSplitter#splitter5, QSplitter#splitter6,
 }
 QLabel#lblType, QLabel#lblTrack, QLabel#lblProp, QLabel#lblComments, QLabel#lblName, QLabel#lblGroup,
 GlobalSettingsConfig QLabel, CreateTrackDialog QLabel, EditInstrument QLabel, LSCPImport QLabel,
-TrackViewEditor QLabel
+TrackViewEditor QLabel, MixdownFileDialog QLabel
 {
 	background-color:none;
 	border:none;
@@ -155,7 +155,8 @@ TrackViewEditor QLabel
 QFrame#propertyFrame, QFrame#trackListFrame, QFrame#commentFrame, QFrame#viewsFrame,
 QFrame#guiSettingsFrame, QFrame#myInputsFrame, QFrame#tickFrame, QFrame#mixerSettingsFrame,
 QFrame#crossfadeSettingsFrame, QFrame#dummyAudioBussBox, QFrame#startUpBox, QFrame#startSongBox,
-QFrame#trackOptionsFrame, QFrame#midiBoxFrame, QFrame#instrumentListFrame, QFrame#importerFrame
+QFrame#trackOptionsFrame, QFrame#midiBoxFrame, QFrame#instrumentListFrame, QFrame#importerFrame,
+QFrame#audioExportFrame
 {
 	color: #d0d4d0;
 	background-color: #313131;
@@ -175,7 +176,7 @@ QFrame#tabFrame
 QFrame#launchLabelFrame, QFrame#mixerLabelFrame, QFrame#myInputLabelFrame, QFrame#behaviorLabelFrame,
 QFrame#songStartLabelFrame, QFrame#crossfadeLabelFrame, QFrame#dummyLabelFrame, QFrame#tickLabelFrame,
 QFrame#insPropLabelFrame, QFrame#topLabelFrame, QFrame#instrumentLabelFrame, QFrame#instrumentPropFrame,
-QFrame#importerLabelFrame
+QFrame#importerLabelFrame, QFrame#audioExportLabelFrame
 {
 	color: #d0d4d0;
 	background-color: #313131;
