@@ -379,6 +379,9 @@
 		<file>images/plus_new_on.png</file>
 		<file>images/plus_new_over.png</file>
 		<file>images/plus_new_off.png</file>
+		<file>images/browse_new_on.png</file>
+		<file>images/browse_new_over.png</file>
+		<file>images/browse_new_off.png</file>
 		<file>images/garbage_new_on.png</file>
 		<file>images/garbage_new_over.png</file>
 		<file>images/garbage_new_off.png</file>

@@ -36,9 +36,7 @@ MixdownFileDialog::MixdownFileDialog(const SndFile* _sf,
 {
 	setupUi(this);
 	sf = 0;
-	buttonPath->setFixedSize(QSize(25,25));
-	buttonPath->setIconSize(QSize(25,25));
-	buttonPath->setIcon(QIcon(*browseIconSet3));
+	buttonPath->setIcon(*browseIconSet3);
 	connect(buttonPath, SIGNAL(clicked()), SLOT(fdialog()));
 	if (_sf)
 	{
