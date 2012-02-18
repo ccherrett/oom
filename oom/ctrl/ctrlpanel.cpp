@@ -91,7 +91,7 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	_track = 0;
 	_ctrl = 0;
 	_val = CTRL_VAL_UNKNOWN;
-    _dnum = -1;
+    _dnum = CTRL_VELOCITY;
 
 	_knob = new Knob;
 	//_knob->setFixedWidth(25);
@@ -116,19 +116,11 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	_dl->setEnabled(false);
 	_dl->hide();
 
-    _cmbMode = new QComboBox(this);
-    _cmbMode->setObjectName("cmbModeSelect");
-    _cmbMode->addItem("READ", FEEDBACK_MODE_READ);
-    _cmbMode->addItem("WRITE", FEEDBACK_MODE_WRITE);
-    _cmbMode->addItem("TOUCH", FEEDBACK_MODE_TOUCH);
-    _cmbMode->addItem("AUDITION", FEEDBACK_MODE_AUDITION);
-
 	connect(_knob, SIGNAL(sliderMoved(double, int)), SLOT(ctrlChanged(double)));
 	connect(_knob, SIGNAL(sliderRightClicked(const QPoint&, int)), SLOT(ctrlRightClicked(const QPoint&, int)));
 	//connect(_knob, SIGNAL(sliderReleased(int)), SLOT(ctrlReleased(int)));
 	connect(_dl, SIGNAL(valueChanged(double, int)), SLOT(ctrlChanged(double)));
 	connect(_dl, SIGNAL(doubleClicked(int)), SLOT(labelDoubleClicked()));
-    connect(_cmbMode, SIGNAL(currentIndexChanged(int)), SLOT(feedbackModeChanged(int)));
     connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 
 	bbox->addStretch();
@@ -141,8 +133,6 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	dbox->addStretch();
 	dbox->addWidget(_dl);
 	dbox->addStretch();
-    vbox->addStretch();
-	vbox->addWidget(_cmbMode);
 	vbox->addStretch();
     setLayout(vbox);
 
@@ -241,7 +231,6 @@ void CtrlPanel::toggleCollapsed(bool val)
 		_knob->setVisible(!val);
 		_dl->setVisible(!val);
 	}
-	_cmbMode->setVisible(!val);
 	emit collapsed(val);
 }
 
@@ -318,21 +307,18 @@ void CtrlPanel::labelDoubleClicked()/*{{{*/
 			//  (or the controller's initial value?) to 'turn on' the controller.
 			if (lastv == CTRL_VAL_UNKNOWN)
 			{
-				//int kiv = _ctrl->initVal());
 				int kiv = lrint(_knob->value());
 				if (kiv < _ctrl->minVal())
 					kiv = _ctrl->minVal();
 				if (kiv > _ctrl->maxVal())
 					kiv = _ctrl->maxVal();
 				kiv += _ctrl->bias();
-				//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, kiv);
 				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, kiv, (Track*)_track);
 				audio->msgPlayMidiEvent(&ev);
 				midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, kiv);
 			}
 			else
 			{
-				//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, lastv);
 				MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, lastv, (Track*)_track);
 				audio->msgPlayMidiEvent(&ev);
 				midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, lastv);
@@ -340,7 +326,6 @@ void CtrlPanel::labelDoubleClicked()/*{{{*/
 		}
 		else
 		{
-			//if(mp->hwCtrlState(chan, _dnum) != CTRL_VAL_UNKNOWN)
 			audio->msgSetHwCtrlState(mp, chan, _dnum, CTRL_VAL_UNKNOWN);
 		}
 	}
@@ -385,7 +370,6 @@ void CtrlPanel::ctrlChanged(double val)/*{{{*/
 			ival |= 0xffff00;
 		else
 			ival |= (curval & 0xffff00);
-		//MidiPlayEvent ev(song->cpos(), outport, chan, ME_CONTROLLER, _dnum, ival);
 		MidiPlayEvent ev(0, outport, chan, ME_CONTROLLER, _dnum, ival, (Track*)_track);
 		audio->msgPlayMidiEvent(&ev);
 	}
@@ -393,7 +377,6 @@ void CtrlPanel::ctrlChanged(double val)/*{{{*/
 		// Shouldn't happen, but...
 		if ((ival < _ctrl->minVal()) || (ival > _ctrl->maxVal()))
 	{
-		//if(mp->hwCtrlState(chan, _dnum) != CTRL_VAL_UNKNOWN)
 		if (curval != CTRL_VAL_UNKNOWN)
 			audio->msgSetHwCtrlState(mp, chan, _dnum, CTRL_VAL_UNKNOWN);
 	}
@@ -602,10 +585,6 @@ bool CtrlPanel::ctrlSetTypeByName(QString s)/*{{{*/
 
 void CtrlPanel::ctrlRightClicked(const QPoint& p, int /*id*/)
 {
-	//if(!_knob->selectedFaceColor())
-	//  _knob->selectFaceColor(true);
-	//if(_dnum == -1)
-	//  return;
 	if (!editor->curCanvasPart())
 		return;
 

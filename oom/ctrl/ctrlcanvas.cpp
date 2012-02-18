@@ -25,6 +25,7 @@
 #include "ctrlpanel.h"
 #include "midiedit/drummap.h"
 #include "traverso_shared/TConfig.h"
+#include "midimonitor.h"
 
 extern void drawTickRaster(QPainter& p, int x, int y, int w, int h, int quant, bool ctrl);
 
@@ -121,6 +122,7 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 	pos[2] = 0;
 	noEvents = false;
 	m_collapsed = false;
+	m_feedbackMode = midiMonitor->feedbackMode();
 
 	ctrl = &veloList;
 	_controller = &veloCtrl;
@@ -146,7 +148,18 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 	//printf("CtrlCanvas::CtrlCanvas curDrumInstrument:%d\n", curDrumInstrument);
 
 	connect(editor, SIGNAL(curDrumInstrumentChanged(int)), SLOT(setCurDrumInstrument(int)));
+    connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
     updateItems();
+}
+
+void CtrlCanvas::heartBeat()
+{
+	int mode = midiMonitor->feedbackMode();
+	if(mode != m_feedbackMode)
+	{
+		m_feedbackMode = mode;
+		update();
+	}
 }
 
 //---------------------------------------------------------
@@ -156,7 +169,7 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 //    flag  - emit followEvent()
 //---------------------------------------------------------
 
-void CtrlCanvas::setPos(int idx, unsigned val, bool adjustScrollbar)
+void CtrlCanvas::setPos(int idx, unsigned val, bool adjustScrollbar)/*{{{*/
 {
 	if (pos[idx] == val)
 		return;
@@ -232,7 +245,7 @@ void CtrlCanvas::setPos(int idx, unsigned val, bool adjustScrollbar)
         // Redrawing the whole view fixes that for now, but it could be a cpu hog ?
 //	redraw(QRect(x, 0, w, height()));
         update();
-}
+}/*}}}*/
 
 void CtrlCanvas::toggleCollapsed(bool val)
 {
@@ -397,7 +410,7 @@ void CtrlCanvas::songChanged(int type)
 //   partControllers
 //---------------------------------------------------------
 
-void CtrlCanvas::partControllers(const MidiPart* part, int num, int* dnum, int* didx, MidiController** mc, MidiCtrlValList** mcvl)
+void CtrlCanvas::partControllers(const MidiPart* part, int num, int* dnum, int* didx, MidiController** mc, MidiCtrlValList** mcvl)/*{{{*/
 {
 	if (num == CTRL_VELOCITY) // special case
 	{
@@ -458,13 +471,13 @@ void CtrlCanvas::partControllers(const MidiPart* part, int num, int* dnum, int* 
 			*mcvl = tmcvl;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   updateItems
 //---------------------------------------------------------
 
-void CtrlCanvas::updateItems()
+void CtrlCanvas::updateItems()/*{{{*/
 {
 	items.clearDelete();
 
@@ -528,19 +541,189 @@ void CtrlCanvas::updateItems()
 
 
     redraw();
-}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   newValRamp
+//---------------------------------------------------------
+
+void CtrlCanvas::newValRamp(int x1, int y1, int x2, int y2)/*{{{*/
+{
+	int xx1 = editor->rasterVal1(x1);
+	int xx2 = editor->rasterVal2(x2);
+	int type = _controller->num();
+
+	int raster = editor->raster();
+	if (raster == 1) // set reasonable raster
+		raster = config.division / 4;
+
+	song->startUndo();
+
+	// delete existing events
+
+	int lastpv = CTRL_VAL_UNKNOWN;
+	for (ciCEvent i = items.begin(); i != items.end(); ++i)
+	{
+		CEvent* ev = *i;
+		if (ev->part() != curPart)
+			continue;
+		Event event = ev->event();
+		if (event.empty())
+			continue;
+		int x = event.tick() + curPart->tick();
+
+		if (x < xx1)
+		{
+			continue;
+		}
+		if (x >= xx2)
+			break;
+
+		// Indicate no undo, and do port controller values and clone parts.
+        audio->msgDeleteEvent(event, curPart, false, true, true, false);
+	}
+
+	if (ctrl)
+		lastpv = ctrl->hwVal();
+
+	// insert new events
+	for (int x = xx1; x < xx2; x += raster)
+	{
+		int y = (x2 == x1) ? y1 : (((y2 - y1)*(x - x1)) / (x2 - x1)) + y1;
+		int nval = computeVal(_controller, y, height());
+		int tick = x - curPart->tick();
+		// Do not add events which are past the end of the part.
+		if ((unsigned) tick >= curPart->lenTick())
+			break;
+		Event event(Controller);
+		event.setTick(tick);
+		event.setA(_didx);
+		if (type == CTRL_PROGRAM)
+		{
+			if (lastpv == CTRL_VAL_UNKNOWN)
+			{
+				if (song->mtype() == MT_GM)
+					event.setB(0xffff00 | (nval - 1));
+				else
+					event.setB(nval - 1);
+			}
+			else
+				event.setB((lastpv & 0xffff00) | (nval - 1));
+		}
+		else
+			event.setB(nval);
+
+		// Indicate no undo, and do port controller values and clone parts.
+        audio->msgAddEvent(event, curPart, false, true, true, false);
+	}
+
+	song->update(0);
+	redraw();
+	song->endUndo(SC_EVENT_MODIFIED | SC_EVENT_INSERTED | SC_EVENT_REMOVED);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   changeValRamp
+//---------------------------------------------------------
+
+void CtrlCanvas::changeValRamp(int x1, int y1, int x2, int y2)/*{{{*/
+{
+	int h = height();
+	bool changed = false;
+	int type = _controller->num();
+
+	song->startUndo();
+	for (ciCEvent i = items.begin(); i != items.end(); ++i)
+	{
+		if ((*i)->contains(x1, x2))
+		{
+			CEvent* ev = *i;
+			if (ev->part() != curPart)
+				continue;
+			Event event = ev->event();
+			if (event.empty())
+				continue;
+
+			int x = event.tick() + curPart->tick();
+			int y = (x2 == x1) ? y1 : (((y2 - y1)*(x - x1)) / (x2 - x1)) + y1;
+			int nval = computeVal(_controller, y, h);
+			if (type == CTRL_PROGRAM)
+			{
+				if (event.dataB() == CTRL_VAL_UNKNOWN)
+				{
+					--nval;
+					if (song->mtype() == MT_GM)
+						nval |= 0xffff00;
+				}
+				else
+					nval = (event.dataB() & 0xffff00) | (nval - 1);
+			}
+
+			ev->setVal(nval);
+
+			if (type == CTRL_VELOCITY)
+			{
+				if ((event.velo() != nval))
+				{
+					Event newEvent = event.clone();
+					newEvent.setVelo(nval);
+					// Indicate no undo, and do not do port controller values and clone parts.
+                    audio->msgChangeEvent(event, newEvent, curPart, false, false, false, false);
+					ev->setEvent(newEvent);
+					changed = true;
+				}
+			}
+			else
+			{
+				if (!event.empty())
+				{
+					if ((event.dataB() != nval))
+					{
+						Event newEvent = event.clone();
+						newEvent.setB(nval);
+						// Indicate no undo, and do port controller values and clone parts.
+                        audio->msgChangeEvent(event, newEvent, curPart, false, true, true, false);
+						ev->setEvent(newEvent);
+						changed = true;
+					}
+				}
+			}
+		}
+	}
+	if (changed)
+		redraw();
+	song->endUndo(SC_EVENT_MODIFIED);
+}/*}}}*/
 
 //---------------------------------------------------------
 //   viewMousePressEvent
 //---------------------------------------------------------
 
-void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
+void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 {
 	if(m_collapsed)
 		return; //No mouse action in collapsed mode
 	start = event->pos();
 	Tool activeTool = tool;
 	//bool shift = event->modifiers() & Qt::ShiftModifier;
+	if (event->buttons() & Qt::RightButton)
+	{
+		QMenu *p = new QMenu(this);
+    	p->addAction(tr("READ"))->setData(FEEDBACK_MODE_READ);
+    	p->addAction(tr("WRITE"))->setData(FEEDBACK_MODE_WRITE);
+    	p->addAction(tr("TOUCH"))->setData(FEEDBACK_MODE_TOUCH);
+    	p->addAction(tr("AUDITION"))->setData(FEEDBACK_MODE_AUDITION);
+
+		QAction* act = p->exec(QCursor::pos());
+		if(act)
+		{
+			int val = act->data().toInt();
+    		midiMonitor->setFeedbackMode(static_cast<FeedbackMode>(val));
+			m_feedbackMode = val;
+			update();
+		}
+		return;
+	}
 
 	int xpos = start.x();
 	int ypos = start.y();
@@ -554,7 +737,6 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 			break;
 
 		case PencilTool:
-			//if (shift)
 			{
 				if (type != MidiController::Velo)
 				{
@@ -569,12 +751,6 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 					changeVal(xpos, xpos, ypos);
 				}
 			}
-			/*else
-			{
-				drag = DRAG_RESIZE;
-				song->startUndo();
-				changeVal(xpos, xpos, ypos);
-			}*/
 			break;
 
 		case RubberTool:
@@ -609,187 +785,13 @@ void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 		default:
 			break;
 	}
-}
-
-//---------------------------------------------------------
-//   newValRamp
-//---------------------------------------------------------
-
-void CtrlCanvas::newValRamp(int x1, int y1, int x2, int y2)
-{
-	int xx1 = editor->rasterVal1(x1);
-	int xx2 = editor->rasterVal2(x2);
-	int type = _controller->num();
-
-	int raster = editor->raster();
-	if (raster == 1) // set reasonable raster
-		raster = config.division / 4;
-
-	song->startUndo();
-
-	// delete existing events
-
-	int lastpv = CTRL_VAL_UNKNOWN;
-	for (ciCEvent i = items.begin(); i != items.end(); ++i)
-	{
-		CEvent* ev = *i;
-		if (ev->part() != curPart)
-			continue;
-		Event event = ev->event();
-		if (event.empty())
-			continue;
-		int x = event.tick() + curPart->tick();
-		// Added by Tim. p3.3.6
-		//printf("CtrlCanvas::newValRamp x:%d xx1:%d xx2:%d len:%d\n", x, xx1, xx2, curPart->lenTick());
-
-		if (x < xx1)
-		{
-			//      if(event.dataB() != CTRL_VAL_UNKNOWN)
-			//        lastpv = event.dataB();
-			continue;
-		}
-		//if (x <= xx1)
-		//{
-		//      if(type == CTRL_PROGRAM && event.dataB() != CTRL_VAL_UNKNOWN && ((event.dataB() & 0xffffff) != 0xffffff))
-		//        lastpv = event.dataB();
-		//      if (x < xx1)
-		//        continue;
-		//}
-		if (x >= xx2)
-			break;
-
-		// Indicate no undo, and do port controller values and clone parts.
-		//audio->msgDeleteEvent(event, ev->part(), false);
-        audio->msgDeleteEvent(event, curPart, false, true, true, false);
-	}
-
-	//if(type == CTRL_PROGRAM && lastpv == CTRL_VAL_UNKNOWN)
-	if (ctrl)
-		lastpv = ctrl->hwVal();
-
-	// insert new events
-	for (int x = xx1; x < xx2; x += raster)
-	{
-		int y = (x2 == x1) ? y1 : (((y2 - y1)*(x - x1)) / (x2 - x1)) + y1;
-		int nval = computeVal(_controller, y, height());
-		int tick = x - curPart->tick();
-		// Do not add events which are past the end of the part.
-		if ((unsigned) tick >= curPart->lenTick())
-			break;
-		Event event(Controller);
-		event.setTick(tick);
-		event.setA(_didx);
-		if (type == CTRL_PROGRAM)
-		{
-			if (lastpv == CTRL_VAL_UNKNOWN)
-			{
-				if (song->mtype() == MT_GM)
-					event.setB(0xffff00 | (nval - 1));
-				else
-					event.setB(nval - 1);
-			}
-			else
-				event.setB((lastpv & 0xffff00) | (nval - 1));
-		}
-		else
-			event.setB(nval);
-
-		// Indicate no undo, and do port controller values and clone parts.
-		//audio->msgAddEvent(event, curPart, false);
-        audio->msgAddEvent(event, curPart, false, true, true, false);
-	}
-
-	song->update(0);
-	redraw();
-	song->endUndo(SC_EVENT_MODIFIED | SC_EVENT_INSERTED | SC_EVENT_REMOVED);
-}
-
-//---------------------------------------------------------
-//   changeValRamp
-//---------------------------------------------------------
-
-void CtrlCanvas::changeValRamp(int x1, int y1, int x2, int y2)
-{
-	int h = height();
-	bool changed = false;
-	int type = _controller->num();
-	//int xx1 = editor->rasterVal1(x1);
-
-	song->startUndo();
-	for (ciCEvent i = items.begin(); i != items.end(); ++i)
-	{
-		if ((*i)->contains(x1, x2))
-		{
-			//if ((*i)->contains(xx1, x2)) {
-			CEvent* ev = *i;
-			if (ev->part() != curPart)
-				continue;
-			Event event = ev->event();
-			if (event.empty())
-				continue;
-
-			//MidiPart* part   = ev->part();
-			//int x    = event.tick() + ev->part()->tick();
-			int x = event.tick() + curPart->tick();
-			int y = (x2 == x1) ? y1 : (((y2 - y1)*(x - x1)) / (x2 - x1)) + y1;
-			int nval = computeVal(_controller, y, h);
-			if (type == CTRL_PROGRAM)
-			{
-				if (event.dataB() == CTRL_VAL_UNKNOWN)
-				{
-					--nval;
-					if (song->mtype() == MT_GM)
-						nval |= 0xffff00;
-				}
-				else
-					nval = (event.dataB() & 0xffff00) | (nval - 1);
-			}
-
-			ev->setVal(nval);
-
-			//MidiController::ControllerType type = midiControllerType(_controller->num());
-			//if (type == MidiController::Velo) {
-			if (type == CTRL_VELOCITY)
-			{
-				if ((event.velo() != nval))
-				{
-					Event newEvent = event.clone();
-					newEvent.setVelo(nval);
-					// Indicate no undo, and do not do port controller values and clone parts.
-					//audio->msgChangeEvent(event, newEvent, part, false);
-                    audio->msgChangeEvent(event, newEvent, curPart, false, false, false, false);
-					ev->setEvent(newEvent);
-					changed = true;
-				}
-			}
-			else
-			{
-				if (!event.empty())
-				{
-					if ((event.dataB() != nval))
-					{
-						Event newEvent = event.clone();
-						newEvent.setB(nval);
-						// Indicate no undo, and do port controller values and clone parts.
-						//audio->msgChangeEvent(event, newEvent, part, false);
-                        audio->msgChangeEvent(event, newEvent, curPart, false, true, true, false);
-						ev->setEvent(newEvent);
-						changed = true;
-					}
-				}
-			}
-		}
-	}
-	if (changed)
-		redraw();
-	song->endUndo(SC_EVENT_MODIFIED);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   viewMouseMoveEvent
 //---------------------------------------------------------
 
-void CtrlCanvas::viewMouseMoveEvent(QMouseEvent* event)
+void CtrlCanvas::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 {
 	if(m_collapsed)
 		return; //No mouse action in collapsed mode
@@ -836,13 +838,13 @@ void CtrlCanvas::viewMouseMoveEvent(QMouseEvent* event)
 
 	int val = computeVal(_controller, pos.y(), height());
 	emit yposChanged(val);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   viewMouseReleaseEvent
 //---------------------------------------------------------
 
-void CtrlCanvas::viewMouseReleaseEvent(QMouseEvent* event)
+void CtrlCanvas::viewMouseReleaseEvent(QMouseEvent* event)/*{{{*/
 {
 	if(m_collapsed)
 		return; //No mouse action in collapsed mode
@@ -883,13 +885,13 @@ void CtrlCanvas::viewMouseReleaseEvent(QMouseEvent* event)
 			break;
 	}
 	drag = DRAG_OFF;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   changeVal
 //---------------------------------------------------------
 
-void CtrlCanvas::changeVal(int x1, int x2, int y)
+void CtrlCanvas::changeVal(int x1, int x2, int y)/*{{{*/
 {
 	bool changed = false;
 	int newval = computeVal(_controller, y, height());
@@ -940,7 +942,6 @@ void CtrlCanvas::changeVal(int x1, int x2, int y)
 					Event newEvent = event.clone();
 					newEvent.setB(nval);
 					// Indicate no undo, and do port controller values and clone parts.
-					//audio->msgChangeEvent(event, newEvent, part, false);
                     audio->msgChangeEvent(event, newEvent, curPart, false, true, true, false);
 					ev->setEvent(newEvent);
 					changed = true;
@@ -953,13 +954,13 @@ void CtrlCanvas::changeVal(int x1, int x2, int y)
 	}
 	if (changed)
 		redraw();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   newVal
 //---------------------------------------------------------
 
-void CtrlCanvas::newVal(int x1, int x2, int y)
+void CtrlCanvas::newVal(int x1, int x2, int y)/*{{{*/
 {
 	int xx1 = editor->rasterVal1(x1);
 	int xx2 = editor->rasterVal2(x2);
@@ -990,10 +991,6 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
         if (ax >= xx2)
             break;
 
-		// Added by T356. Do not add events which are past the end of the part.
-		//if(event.tick() >= curPart->lenTick())
-		//  break;
-
         int nval = newval;
         if (type == CTRL_PROGRAM)
         {
@@ -1021,11 +1018,8 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 			{
                 Event newEvent = event.clone();
                 newEvent.setB(nval);
-				// Added by Tim. p3.3.6
-				//printf("CtrlCanvas::newVal change xx1:%d xx2:%d len:%d\n", xx1, xx2, curPart->lenTick());
 
 				// Indicate no undo, and do port controller values and clone parts.
-				//audio->msgChangeEvent(event, newEvent, ev->part(), false);
                 audio->msgChangeEvent(event, newEvent, curPart, false, true, true, false);
 
                 ev->setEvent(newEvent);
@@ -1034,12 +1028,7 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 		}
         else if (ax < xx2)
 		{
-			// delete event
-			// Added by Tim. p3.3.6
-			//printf("CtrlCanvas::newVal delete xx1:%d xx2:%d len:%d\n", xx1, xx2, curPart->lenTick());
-
 			// Indicate no undo, and do port controller values and clone parts.
-            //audio->msgDeleteEvent(event, ev->part(), false);
             audio->msgDeleteEvent(event, curPart, false, true, true, false);
 
 			song_changed = true;
@@ -1071,7 +1060,6 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 				event.setB(newval);
 
 			// Indicate no undo, and do port controller values and clone parts.
-			//audio->msgAddEvent(event, curPart, false);
             audio->msgAddEvent(event, curPart, false, true, true, false);
 
 			song_changed = true;
@@ -1083,13 +1071,13 @@ void CtrlCanvas::newVal(int x1, int x2, int y)
 		return;
 	}
 	redraw();
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   deleteVal
 //---------------------------------------------------------
 
-void CtrlCanvas::deleteVal(int x1, int x2, int)
+void CtrlCanvas::deleteVal(int x1, int x2, int)/*{{{*/
 {
 	int xx1 = editor->rasterVal1(x1);
 	int xx2 = editor->rasterVal2(x2);
@@ -1125,13 +1113,13 @@ void CtrlCanvas::deleteVal(int x1, int x2, int)
 		songChanged(0);
 		return;
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setTool
 //---------------------------------------------------------
 
-void CtrlCanvas::setTool(int t)
+void CtrlCanvas::setTool(int t)/*{{{*/
 {
 	if (tool == Tool(t))
 		return;
@@ -1148,13 +1136,13 @@ void CtrlCanvas::setTool(int t)
 			setCursor(QCursor(Qt::ArrowCursor));
 			break;
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   pdrawItems
 //---------------------------------------------------------
 
-void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part, bool velo, bool fg)
+void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part, bool velo, bool fg)/*{{{*/
 {
         // Remon: Do we really have to do that ???? Seems unnesecary to me.
     int x = 0;//rect.x() - 1; // compensate for 3 pixel line width
@@ -1372,13 +1360,13 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			}
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   pdraw
 //---------------------------------------------------------
 
-void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)
+void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)/*{{{*/
 {
 
 	int x = rect.x() - 1; // compensate for 3 pixel line width
@@ -1457,7 +1445,7 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)
 		p.setBrush(QBrush(fillColor));
 		p.drawRect(lasso);
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   drawOverlay
@@ -1473,6 +1461,21 @@ void CtrlCanvas::drawOverlay(QPainter& p, const QRect&)
 		textColor = QColor(config.partColors[curPart->colorIndex()]);
 	textColor.setAlpha(180);
 	p.setPen(textColor);
+	switch(m_feedbackMode)
+	{
+		case 0:
+			s.append(tr(" (READ)"));
+		break;
+		case 1:
+			s.append(tr(" (WRITE)"));
+		break;
+		case 2:
+			s.append(tr(" (TOUCH)"));
+		break;
+		case 3:
+			s.append(tr(" (AUDITION)"));
+		break;
+	}
 
 	QFontMetrics fm(config.fonts[3]);
 	int y = fm.lineSpacing() + 2;

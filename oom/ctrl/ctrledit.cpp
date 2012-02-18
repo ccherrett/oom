@@ -33,7 +33,7 @@ void CtrlEdit::setTool(int t)
 //---------------------------------------------------------
 
 CtrlEdit::CtrlEdit(QWidget* parent, AbstractMidiEditor* e, int xmag, bool expand, const char* name)
-: QWidget(parent)
+: QFrame(parent)
 {
 	setObjectName(name);
 	setAttribute(Qt::WA_DeleteOnClose);
@@ -97,6 +97,11 @@ bool CtrlEdit::setType(QString n)
 QString CtrlEdit::type()
 {
 	return canvas->controller()->name();
+}
+
+QSize CtrlEdit::sizeHint()
+{
+	return QSize(400, 50);
 }
 
 //---------------------------------------------------------

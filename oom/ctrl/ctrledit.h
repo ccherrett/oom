@@ -8,7 +8,8 @@
 #ifndef __CTRL_EDIT_H__
 #define __CTRL_EDIT_H__
 
-#include <QWidget>
+#include <QFrame>
+#include <QSize>
 
 #include "ctrlcanvas.h"
 #include "song.h"
@@ -24,7 +25,7 @@ class Xml;
 //   CtrlEdit
 //---------------------------------------------------------
 
-class CtrlEdit : public QWidget
+class CtrlEdit : public QFrame
 {
     Q_OBJECT
 
@@ -33,6 +34,9 @@ class CtrlEdit : public QWidget
 	QWidget *vscale;
 
 	bool m_collapsed;
+
+protected:
+	virtual QSize sizeHint();
 
 private slots:
     void destroyCalled();

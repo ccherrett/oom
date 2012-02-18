@@ -135,6 +135,7 @@ class CtrlCanvas : public View
     bool drawLineMode;
     bool noEvents;
 	bool m_collapsed;
+	int m_feedbackMode;
 
     void viewMousePressEvent(QMouseEvent* event);
     void viewMouseMoveEvent(QMouseEvent*);
@@ -202,6 +203,9 @@ public slots:
     void setController(int ctrl);
 	void toggleCollapsed(bool);
 
+protected slots:
+    virtual void heartBeat();
+
 signals:
     void followEvent(int);
     void xposChanged(unsigned);
@@ -231,6 +235,11 @@ public:
     {
         return curTrack;
     }
+	void setFeedbackMode(int mode)
+	{
+		m_feedbackMode = mode;
+		update();
+	}
 };
 #endif
 

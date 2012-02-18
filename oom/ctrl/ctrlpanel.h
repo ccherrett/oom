@@ -21,7 +21,6 @@ class Knob;
 class DoubleLabel;
 class MidiPort;
 class MidiTrack;
-class QComboBox;
 
 //---------------------------------------------------------
 //   CtrlPanel
@@ -41,7 +40,6 @@ class CtrlPanel : public QWidget
     Knob* _knob;
     DoubleLabel* _dl;
     int _val;
-    QComboBox* _cmbMode;
 
 
 signals:
@@ -53,7 +51,6 @@ private slots:
     void ctrlChanged(double val);
     void labelDoubleClicked();
     void ctrlRightClicked(const QPoint& p, int id);
-    void feedbackModeChanged(int value);
 
 protected slots:
     virtual void heartBeat();
@@ -61,6 +58,7 @@ protected slots:
 public slots:
     void setHeight(int);
 	void toggleCollapsed(bool);
+    void feedbackModeChanged(int value);
 
 public:
     CtrlPanel(QWidget*, AbstractMidiEditor*, const char* name = 0);

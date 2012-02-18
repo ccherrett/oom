@@ -137,6 +137,7 @@ public:
 	virtual void start(int);
 
     void setFeedbackMode(FeedbackMode mode);
+	FeedbackMode feedbackMode(){return m_feedbackMode;}
 
 	void msgSendMidiInputEvent(MEvent&);
 	void msgSendMidiOutputEvent(Track*,  int ctl, int val);
