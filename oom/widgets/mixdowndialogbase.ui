@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>OOMidi: Set Mixdown Wavefile</string>
+   <string>OOStudio: Export Audio</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -105,6 +105,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="buttonPath">
+       <property name="toolTip">
+        <string>Browse</string>
+       </property>
        <property name="text">
         <string/>
        </property>
