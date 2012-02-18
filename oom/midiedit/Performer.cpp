@@ -296,10 +296,18 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	ctrl->setIcon(*plusIconSet3);
 	ctrl->setAutoRaise(true);
 
+	QToolButton* collapseAll = new QToolButton(mainw);
+	collapseAll->setToolTip(tr("Toggle Callapse Lanes"));
+	collapseAll->setIcon(*collapseIconSet3);
+	collapseAll->setAutoRaise(true);
+	collapseAll->setCheckable(true);
+
 	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
 	//ctrl->setIconSize(QSize(25,25));
-	ctrl->setFixedSize(QSize(pianoWidth, hscroll->sizeHint().height()));
-	ctrl->setIconSize(QSize(pianoWidth, hscroll->sizeHint().height()));
+	ctrl->setFixedSize(QSize(pianoWidth/2, hscroll->sizeHint().height()));
+	ctrl->setIconSize(QSize(pianoWidth/2, hscroll->sizeHint().height()));
+	collapseAll->setFixedSize(QSize(pianoWidth/2, hscroll->sizeHint().height()));
+	collapseAll->setIconSize(QSize(pianoWidth/2, hscroll->sizeHint().height()));
 
 	midiConductor = new Conductor(this, 0, _rasterInit, _quantInit);
 	midiConductor->setObjectName("prTrackInfo");
@@ -384,7 +392,12 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     gridS2->setSpacing(0);
     gridS2->setRowStretch(0, 100);
     gridS2->setColumnStretch(1, 100);
-    gridS2->addWidget(ctrl, 0, 0);
+
+	QHBoxLayout *buttonBox = new QHBoxLayout();
+	buttonBox->addWidget(collapseAll);
+	buttonBox->addWidget(ctrl);
+    
+	gridS2->addLayout(buttonBox, 0, 0);
     gridS2->addWidget(hscroll, 0, 1);
 
     splitter->setCollapsible(2, false);
@@ -402,10 +415,14 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 
 	connect(noteAlphaAction, SIGNAL(toggled(bool)), canvas, SLOT(update()));
 	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
-    connect(ctrl, SIGNAL(clicked()), SLOT(ctrlPopup()));
-    connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
+    
+	connect(ctrl, SIGNAL(clicked()), SLOT(ctrlPopup()));
+	connect(collapseAll, SIGNAL(toggled(bool)), SLOT(toggleCollapseAllControllers(bool)));
+    
+	connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
     connect(info, SIGNAL(enablePartLines(bool)), canvas, SLOT(setDrawPartEndLine(bool)));
-    connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
+    
+	connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
     connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
     connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
     connect(vscroll, SIGNAL(scaleChanged(float)), piano, SLOT(setYMag(float)));
@@ -641,6 +658,16 @@ Performer::~Performer()/*{{{*/
 	}
     tconfig().save();
 }/*}}}*/
+
+void Performer::toggleCollapseAllControllers(bool val)
+{
+	for(QList<CtrlEdit*>::iterator i = ctrlEditList.begin(); i != ctrlEditList.end(); ++i)
+	{
+		CtrlEdit* edit = (CtrlEdit*)*i;
+		if(edit)
+			edit->setCollapsed(val);
+	}
+}
 
 //---------------------------------------------------------
 // initFunctions

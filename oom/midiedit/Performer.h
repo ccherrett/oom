@@ -260,6 +260,7 @@ private slots:
 #ifdef LSCP_SUPPORT
 	void setKeyBindings(LSCPChannelInfo);
 #endif
+	void toggleCollapseAllControllers(bool);
 
 signals:
     void deleted();
