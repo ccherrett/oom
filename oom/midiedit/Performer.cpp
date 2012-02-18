@@ -87,31 +87,23 @@ static const int yscale = 1;
 static const int pianoWidth = 40;
 static int performerTools = PointerTool | PencilTool | RubberTool | DrawTool;
 
+static int rasterTable[] = {
+	//-9----8-  7    6     5     4    3(1/4)     2   1
+	4, 8, 16, 32, 64, 128, 256, 512, 1024, // triple
+	6, 12, 24, 48, 96, 192, 384, 768, 1536,
+	9, 18, 36, 72, 144, 288, 576, 1152, 2304 // dot
+};
+
 
 //---------------------------------------------------------
 //   Performer
 //---------------------------------------------------------
 
 Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned initPos)
-	: AbstractMidiEditor(_quantInit, _rasterInit, pl, parent, name)
+: AbstractMidiEditor(_quantInit, _rasterInit, pl, parent, name)
 {
+	setAttribute(Qt::WA_DeleteOnClose);
 	deltaMode = false;
-	// Set size stored in global config, or use defaults.
-	/*int w = tconfig().get_property("PerformerEdit", "widgetwidth", 800).toInt();
-	int h = tconfig().get_property("PerformerEdit", "widgetheigth", 650).toInt();
-	int dw = qApp->desktop()->width();
-	int dh = qApp->desktop()->height();
-		resize(w, h);*/
-	/*if(h <= dh && w <= dw)
-	{
-		printf("Restoring window state\n");
-		resize(w, h);
-	}
-	else
-	{
-		printf("Desktop size too large for saved state\n");
-		showMaximized();
-	}*/
 
 	selPart = 0;
 	quantConfig = 0;
@@ -148,9 +140,518 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	m_prDock->setWidget(dockWidget);
 	connect(m_prDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(dockAreaChanged(Qt::DockWidgetArea)));
 
-	QSignalMapper* mapper = new QSignalMapper(this);
-	QSignalMapper* functionMapper = new QSignalMapper(this);
-	QSignalMapper* colorMapper = new QSignalMapper(this);
+	//--------------------------------------------------
+	// Initialize menu functions
+	//-------------------------------------------------
+	initFunctions();
+
+	//---------ToolBar----------------------------------
+	
+	m_stepAction = new QAction(this);
+	m_stepAction->setToolTip(tr("Step Record"));
+	m_stepAction->setIcon(*stepIconSet3);
+	m_stepAction->setCheckable(true);
+
+    midiin = new QToolButton();
+	midiin->setToolTip(tr("Midi Input"));
+	midiin->setIcon(*midiinIcon);
+	midiin->setCheckable(true);
+
+	m_speakerAction = new QAction(this);
+	m_speakerAction->setToolTip(tr("Play Events"));
+	m_speakerAction->setIcon(*speakerIconSet3);
+	m_speakerAction->setCheckable(true);
+
+	solo = new QToolButton();
+	m_soloAction = new QAction(this);
+	m_soloAction->setIcon(*soloIconSet3);
+	m_soloAction->setToolTip(tr("Solo"));
+	m_soloAction->setCheckable(true);
+	solo->setDefaultAction(m_soloAction);
+
+
+	m_globalKeyAction = new QAction(this);
+	m_globalKeyAction->setToolTip(tr("EPIC: Enable editing across all parts"));
+	m_globalKeyAction->setIcon(*globalKeysIconSet3);
+	m_globalKeyAction->setCheckable(true);
+
+	m_globalArmAction = new QAction(this);
+	m_globalArmAction->setToolTip(tr("EPIC: Globally record arm all parts"));
+	m_globalArmAction->setIcon(*globalArmIconSet3);
+
+    m_mutePart = new QToolButton();
+	m_muteAction = new QAction(this);
+	m_muteAction->setShortcut(shortcuts[SHRT_PART_TOGGLE_MUTE].key);
+	m_muteAction->setToolTip(tr("Mute current part"));
+	m_muteAction->setIcon(*muteIconSet3);
+	m_muteAction->setCheckable(true);
+	m_mutePart->setDefaultAction(m_muteAction);
+
+	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
+	posLabel = new PosLabel(0, "pos");
+	posLabel->setFixedHeight(25);
+	posLabel->setObjectName("Cursor");
+	cursorBar->setObjectName("CursorBar");
+	cursorBar->addWidget(posLabel);
+
+	pitchLabel = new PitchLabel(0);
+	pitchLabel->setFixedHeight(25);
+	pitchLabel->setObjectName("pitchLabel");
+	cursorBar->addWidget(pitchLabel);
+
+	patchLabel = new QLabel();
+	patchLabel->setObjectName("patchLabel");
+	patchLabel->setMaximumSize(QSize(180, 22));
+	patchLabel->setFixedWidth(280);
+	patchLabel->setFixedHeight(22);
+	menuBar()->setCornerWidget(patchLabel, Qt::TopRightCorner);
+	patchLabel->show();
+
+	addToolBar(Qt::BottomToolBarArea, cursorBar);
+	cursorBar->setFloatable(false);
+	cursorBar->setMovable(false);
+	cursorBar->setAllowedAreas(Qt::BottomToolBarArea);
+	
+	tools22 = new EditToolBar(this, performerTools);
+    tools2 = new QToolBar(tr("Edit Tools"));
+	tools2->setObjectName("PREditToolBar");
+	tools2->setIconSize(QSize(29, 25));
+	addToolBar(Qt::BottomToolBarArea, tools2);
+	tools2->setFloatable(false);
+	tools2->setMovable(false);
+	tools2->setAllowedAreas(Qt::BottomToolBarArea);
+	QWidget* tspacer = new QWidget();
+	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tspacer->setMaximumWidth(170);
+	tools2->addWidget(tspacer);
+
+	bool showPanic = false;
+	bool showMuteSolo = true;
+	TransportToolbar *transportbar = new TransportToolbar(this,showPanic,showMuteSolo);
+	transportbar->setMuteAction(m_muteAction);
+	transportbar->setSoloAction(m_soloAction);
+	tools2->addWidget(transportbar);
+	connect(transportbar, SIGNAL(recordTriggered(bool)), this, SLOT(checkPartLengthForRecord(bool)));
+	QWidget* spacer55 = new QWidget();
+	spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer55->setMaximumWidth(15);
+	tools2->addWidget(spacer55);
+	tools2->addWidget(tools22);
+	QWidget* spacer555 = new QWidget();
+	spacer555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer555->setMaximumWidth(15);
+	tools2->addWidget(spacer555);
+	QList<QAction*> epicList;
+	epicList.append(m_globalKeyAction);
+	epicList.append(m_globalArmAction);
+
+	EpicToolbar* epicBar = new EpicToolbar(epicList, this);
+	tools2->addWidget(epicBar);
+	noteAlphaAction->setChecked(true);
+	QWidget* spacer5555 = new QWidget();
+	spacer5555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer5555->setMaximumWidth(15);
+	tools2->addWidget(spacer5555);
+	LoopToolbar* loopBar = new LoopToolbar(Qt::Horizontal, this);
+	tools2->addWidget(loopBar);
+	QWidget* spacer55555 = new QWidget();
+	spacer55555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer55555->setMaximumWidth(15);
+	tools2->addWidget(spacer55555);
+	
+	QList<QAction*> miscList;
+	miscList.append(m_stepAction);
+	miscList.append(m_speakerAction);
+
+	MiscToolbar* miscBar = new MiscToolbar(miscList, this);
+	tools2->addWidget(miscBar);
+	QWidget* spacer5 = new QWidget();
+	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	spacer5->setMaximumWidth(15);
+	tools2->addWidget(spacer5);
+
+    QSizeGrip* corner = new QSizeGrip(mainw);
+	QWidget* spacer3 = new QWidget();
+	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tools2->addWidget(spacer3);
+	tools2->addWidget(corner);
+
+	info = new NoteInfo(this);
+
+	//---------------------------------------------------
+	//    split
+	//---------------------------------------------------
+
+	splitter = new Splitter(Qt::Vertical, this, "splitter");
+	splitter->setHandleWidth(2);
+	splitter->setChildrenCollapsible(false);//TODO: Make this user configurable
+
+	hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
+	hsplitter->setChildrenCollapsible(true);
+	hsplitter->setHandleWidth(2);
+
+	QToolButton* ctrl = new QToolButton(mainw);
+	ctrl->setObjectName("Ctrl");
+	ctrl->setToolTip(tr("Add Controller Lane"));
+	ctrl->setIcon(*plusIconSet3);
+	ctrl->setAutoRaise(true);
+
+	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
+	//ctrl->setIconSize(QSize(25,25));
+	ctrl->setFixedSize(QSize(pianoWidth, hscroll->sizeHint().height()));
+	ctrl->setIconSize(QSize(pianoWidth, hscroll->sizeHint().height()));
+
+	midiConductor = new Conductor(this, 0, _rasterInit, _quantInit);
+	midiConductor->setObjectName("prTrackInfo");
+	midiConductor->btnPrev->setIcon(*previousIconSet3);
+	midiConductor->btnPrev->setIconSize(QSize(25, 25));
+	midiConductor->btnPrev->setFixedSize(QSize(25, 25));
+	midiConductor->btnPrev->setToolTip(tr("Select Previous Part"));
+	midiConductor->btnNext->setIcon(*nextIconSet3);
+	midiConductor->btnNext->setIconSize(QSize(25, 25));
+	midiConductor->btnNext->setFixedSize(QSize(25, 25));
+	midiConductor->btnNext->setToolTip(tr("Select Next Part"));
+	midiConductor->btnPrev->setVisible(true);
+	midiConductor->btnNext->setVisible(true);
+	connect(midiConductor->btnPrev, SIGNAL(clicked()), this, SLOT(selectPrevPart()));
+	connect(midiConductor->btnNext, SIGNAL(clicked()), this, SLOT(selectNextPart()));
+	int mtiw = 280; //midiConductor->width(); // Save this.
+	midiConductor->setMinimumSize(QSize(190,100));
+	// Catch left/right arrow key events for this widget so we
+	// can easily move the focus back from this widget to the canvas.
+	// TODO: Remove this in favour of parent level actions
+	installEventFilter(this);
+	midiConductor->installEventFilter(this);
+	midiConductor->getView()->installEventFilter(this);
+	midiConductor->getPatchListview()->installEventFilter(this);
+
+	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiConductor, SLOT(updateSize()));
+	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
+
+	m_trackListView = new TrackListView(this ,this);
+
+	m_tabs->addTab(midiConductor, tr("   Conductor   "));
+	m_tabs->addTab(m_trackListView, tr("   Track List   "));
+	m_tabs->addTab(info, tr("   Note Info   "));
+	hsplitter->addWidget(splitter);
+
+	mainGrid->setRowStretch(0, 100);
+	mainGrid->setColumnStretch(1, 100);
+	mainGrid->addWidget(hsplitter, 0, 1, 1, 3);
+
+	QWidget* split1 = new QWidget(splitter);
+	split1->setObjectName("split1");
+	QGridLayout* gridS1 = new QGridLayout(split1);
+	gridS1->setContentsMargins(0, 0, 0, 0);
+	gridS1->setSpacing(0);
+	//Defined and configure your program change bar here.
+	//This may well be a copy of MTScale extended for our needs
+	pcbar = new PCScale(&_raster, split1, this, xscale);
+	time = new MTScale(&_raster, split1, xscale);
+	piano = new Piano(split1, yscale, this);
+    canvas = new PerformerCanvas(this, split1, xscale, yscale);
+    vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
+
+    int offset = -(config.division / 4);
+    canvas->setOrigin(offset, 0);
+    canvas->setCanvasTools(performerTools);
+    canvas->setFocus();
+    connect(canvas, SIGNAL(toolChanged(int)), tools22, SLOT(set(int)));
+
+	//Connect the functions to canvas
+	connect(functionMapper, SIGNAL(mapped(int)), canvas, SLOT(actionCommand(int)));
+
+    time->setOrigin(offset, 0);
+    pcbar->setOrigin(offset, 0);
+
+    gridS1->setRowStretch(2, 100);
+    gridS1->setColumnStretch(1, 100);
+
+    gridS1->addWidget(pcbar, 0, 1, 1, 2);
+    gridS1->addWidget(time, 1, 1, 1, 2);
+    gridS1->addWidget(hLine(split1), 2, 0, 1, 3);
+    gridS1->addWidget(piano, 3, 0);
+    gridS1->addWidget(canvas, 3, 1);
+    gridS1->addWidget(vscroll, 3, 2);
+
+    ctrlLane = new Splitter(Qt::Vertical, splitter, "ctrllane");
+	ctrlLane->setChildrenCollapsible(false);//TODO: Make this user configurable
+    QWidget* split2 = new QWidget(splitter);
+    split2->setMaximumHeight(hscroll->sizeHint().height());
+    split2->setMinimumHeight(hscroll->sizeHint().height());
+    QGridLayout* gridS2 = new QGridLayout(split2);
+    gridS2->setContentsMargins(0, 0, 0, 0);
+    gridS2->setSpacing(0);
+    gridS2->setRowStretch(0, 100);
+    gridS2->setColumnStretch(1, 100);
+    gridS2->addWidget(ctrl, 0, 0);
+    gridS2->addWidget(hscroll, 0, 1);
+
+    splitter->setCollapsible(2, false);
+
+    piano->setFixedWidth(pianoWidth);
+
+    QList<int> mops;
+    mops.append(mtiw); // 30 for possible scrollbar
+    mops.append(width() - mtiw);
+    hsplitter->setSizes(mops);
+    hsplitter->setStretchFactor(0, 0);
+    hsplitter->setStretchFactor(1, 15);
+
+    connect(tools22, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
+
+	connect(noteAlphaAction, SIGNAL(toggled(bool)), canvas, SLOT(update()));
+	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
+    connect(ctrl, SIGNAL(clicked()), SLOT(ctrlPopup()));
+    connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
+    connect(info, SIGNAL(enablePartLines(bool)), canvas, SLOT(setDrawPartEndLine(bool)));
+    connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
+    connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
+    connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
+    connect(vscroll, SIGNAL(scaleChanged(float)), piano, SLOT(setYMag(float)));
+
+    connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
+    connect(hscroll, SIGNAL(scrollChanged(int)), pcbar, SLOT(setXPos(int)));
+
+    connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
+    connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
+
+    connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
+    connect(canvas, SIGNAL(pitchChanged(int)), piano, SLOT(setPitch(int)));
+    connect(canvas, SIGNAL(verticalScroll(unsigned)), vscroll, SLOT(setPos(unsigned)));
+    connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));
+    connect(canvas, SIGNAL(horizontalScrollNoLimit(unsigned)), hscroll, SLOT(setPosNoLimit(unsigned)));
+    connect(canvas, SIGNAL(selectionChanged(int, Event&, Part*)), this, SLOT(setSelection(int, Event&, Part*)));
+    connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
+
+    connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
+    connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
+	connect(piano, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
+
+    connect(m_stepAction, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
+    connect(m_speakerAction, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
+	
+	connect(m_globalArmAction, SIGNAL(triggered()), canvas, SLOT(recordArmAll()));
+	connect(m_globalKeyAction, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
+	connect(m_globalKeyAction, SIGNAL(toggled(bool)), midiConductor, SLOT(setGlobalState(bool)));
+	connect(m_globalKeyAction, SIGNAL(toggled(bool)), this, SLOT(toggleEpicEdit(bool)));
+	
+	connect(multiPartSelectionAction, SIGNAL(toggled(bool)), this, SLOT(toggleMultiPartSelection(bool)));
+	
+	connect(midiConductor, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
+	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
+	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
+    connect(midiConductor, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
+    connect(midiConductor, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
+    connect(midiConductor, SIGNAL(toChanged(int)), SLOT(setTo(int)));
+    connect(midiConductor, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
+	connect(midiConductor, SIGNAL(patchChanged(Patch*)), this ,SLOT(setKeyBindings(Patch*)));
+	
+	connect(m_muteAction, SIGNAL(triggered(bool)), this, SLOT(toggleMuteCurrentPart(bool)));
+
+    piano->setYPos(KH * 30);
+    canvas->setYPos(KH * 30);
+    vscroll->setPos(KH * 30);
+    info->enableTools(false);
+	connect(info, SIGNAL(alphaChanged()), canvas, SLOT(update()));
+
+    connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
+    connect(song, SIGNAL(punchinChanged(bool)), canvas, SLOT(update()));
+    connect(song, SIGNAL(punchoutChanged(bool)), canvas, SLOT(update()));
+    connect(song, SIGNAL(loopChanged(bool)), canvas, SLOT(update()));
+
+    setWindowTitle("The Performer:     " + canvas->getCaption());
+
+    updateHScrollRange();
+    // connect to toolbar
+    connect(canvas, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
+    connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+    connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
+    connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+    connect(pcbar, SIGNAL(addProgramChange(Part*, unsigned)), midiConductor, SLOT(insertMatrixEvent(Part*, unsigned)));
+    connect(canvas, SIGNAL(partChanged(Part*)), midiConductor, SLOT(editorPartChanged(Part*)));
+    connect(m_soloAction, SIGNAL(triggered(bool)), SLOT(soloChanged(bool)));
+
+    setFocusPolicy(Qt::StrongFocus);
+    setEventColorMode(colorMode);
+    canvas->setMidiin(true);
+    midiin->setChecked(true);
+    canvas->playEvents(true);
+    m_speakerAction->setChecked(true);
+
+    QClipboard* cb = QApplication::clipboard();
+    connect(cb, SIGNAL(dataChanged()), SLOT(clipboardChanged()));
+
+    clipboardChanged(); // enable/disable "Paste"
+    selectionChanged(); // enable/disable "Copy" & "Paste"
+    initShortcuts(); // initialize shortcuts
+
+    const Pos cpos = song->cPos();
+    canvas->setPos(0, cpos.tick(), true);
+    if (canvas->track())
+    {
+		song->setRecordFlag(canvas->track(), true);
+		song->deselectTracks();
+		canvas->track()->setSelected(true);
+		song->update(SC_SELECTION);
+
+	 	updateConductor();
+	 	m_soloAction->blockSignals(true);
+	 	m_soloAction->setChecked(canvas->track()->solo());
+	 	m_soloAction->blockSignals(false);
+		Part* part = curCanvasPart();
+		if(part)
+		{
+			m_muteAction->blockSignals(true);
+			m_muteAction->setChecked(part->mute());
+			m_muteAction->blockSignals(false);
+		}
+    }
+
+    unsigned pos;
+    if (initPos >= MAXINT)
+	  pos = song->cpos();
+    else
+	  pos = initPos;
+    if (pos > MAXINT)
+	  pos = MAXINT;
+
+	bool showcomment = tconfig().get_property("PerformerEdit", "showcomments", false).toBool();
+	//printf("Canvas show comments: %d\n", showcomment);
+	midiConductor->updateCommentState(showcomment, false);
+	
+	QString defaultControllers("MainVolume:Velocity:Modulation");
+	QString controllers = tconfig().get_property("PerformerEdit", "controllers", defaultControllers).toString();
+	QStringList lctrl = controllers.split(":", QString::SkipEmptyParts);
+	foreach(QString ctl, lctrl)
+	{
+		CtrlEdit* userctrl = addCtrl();
+		userctrl->setType(ctl);
+	}
+	restoreState(tconfig().get_property("PerformerEdit", "windowstate", "").toByteArray());
+}
+
+//---------------------------------------------------------
+//   showEvent
+//   Now that every gui element is created, including
+//   the scroll bars, what about updating the scrollbars
+//   so that the play cursor is in the center of the viewport?
+//---------------------------------------------------------
+
+void Performer::showEvent(QShowEvent *)/*{{{*/
+{
+
+	int w = tconfig().get_property("PerformerEdit", "widgetwidth", 924).toInt();
+	int h = tconfig().get_property("PerformerEdit", "widgetheigth", 650).toInt();
+	int dw = qApp->desktop()->width();
+	int dh = qApp->desktop()->height();
+	if(h <= dh && w <= dw)
+	{
+		//printf("Restoring window state\n");
+		resize(w, h);
+	}
+	else
+	{
+		//printf("Desktop size too large for saved state\n");
+		showMaximized();
+	}
+		
+	// maybe add a bool flag to follow: centered ?
+	// couldn't find a function that does that directly.
+	follow(song->cpos());
+	// now that the cursor is in the view, move the view
+	// half the canvas width so the cursor is centered.
+
+	hscroll->setPos(hscroll->pos() - (canvas->width() / 2));
+	int hScale = tconfig().get_property("PerformerEdit", "hscale", 346).toInt();
+	int vScale = tconfig().get_property("PerformerEdit", "yscale", 286).toInt();
+	int yPos = tconfig().get_property("PerformerEdit", "ypos", 0).toInt();
+	hscroll->setMag(hScale);
+	vscroll->setMag(vScale);
+	vscroll->setPos(yPos);
+	QList<int> vl2;
+	QString str2 = tconfig().get_property("splitter", "sizes", "347 218 33").toString();
+	QStringList sl2 = str2.split(QString(" "), QString::SkipEmptyParts);
+	for (QStringList::Iterator it2 = sl2.begin(); it2 != sl2.end(); ++it2)
+	{
+		int val = (*it2).toInt();
+		vl2.append(val);
+	}
+	splitter->setSizes(vl2);
+	QList<int> vl;
+	QString str = tconfig().get_property("hsplitter", "sizes", "200").toString();
+	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
+	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+	{
+		int val = (*it).toInt();
+		vl.append(val);
+	}
+	hsplitter->setSizes(vl);
+	
+	QList<int> vl3;/*{{{*/
+	//str = "78 50 78 ";//tconfig().get_property("ctrllane", "sizes", "78 50 78 ").toString();
+	str = tconfig().get_property("ctrllane", "sizes", "78 50 78 ").toString();
+	//printf("Control Lane Sizes: %s\n", str.toUtf8().constData());
+	sl = str.split(QString(" "), QString::SkipEmptyParts);
+	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+	{
+		int val = (*it).toInt();
+		vl3.append(val);
+	}
+	ctrlLane->setSizes(vl3);/*}}}*/
+	//ctrlLane
+}/*}}}*/
+
+//---------------------------------------------------------
+//   ~Performer
+//---------------------------------------------------------
+
+Performer::~Performer()/*{{{*/
+{
+	// undoRedo->removeFrom(tools);  // p4.0.6 Removed
+	// store widget size to global config
+	tconfig().set_property("PerformerEdit", "widgetwidth", width());
+	tconfig().set_property("PerformerEdit", "widgetheigth", height());
+	tconfig().set_property("PerformerEdit", "hscale", hscroll->mag());
+	tconfig().set_property("PerformerEdit", "yscale", vscroll->mag());
+	tconfig().set_property("PerformerEdit", "ypos", vscroll->pos());
+	tconfig().set_property("PerformerEdit", "colormode", colorMode);
+	tconfig().set_property("PerformerEdit", "showcomments", canvas->showComments());
+	tconfig().set_property("PerformerEdit", "windowstate", saveState());
+	//tconfig().set_property("PerformerEdit", "showghostpart", noteAlphaAction->isChecked());
+	//printf("Canvas show comments: %d\n", canvas->showComments());
+	
+	//Delete all the controll lists
+	QStringList controllers;
+	while(ctrlEditList.size())
+	{
+		CtrlEdit* ctrl = ctrlEditList.takeFirst();
+		if(ctrl)
+		{
+			controllers.append(ctrl->type());
+			delete ctrl;
+		}
+	}
+	if(controllers.size())
+	{
+		tconfig().set_property("PerformerEdit", "controllers", controllers.join(":"));
+	}
+    tconfig().save();
+}/*}}}*/
+
+//---------------------------------------------------------
+// initFunctions
+// Create and populate all menu finctions
+//---------------------------------------------------------
+
+void Performer::initFunctions()/*{{{*/
+{
+	mapper = new QSignalMapper(this);
+	functionMapper = new QSignalMapper(this);
+	colorMapper = new QSignalMapper(this);
 
 	//---------Menu----------------------------------
 
@@ -281,7 +782,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	mapper->setMapping(funcModVelAction, PerformerCanvas::CMD_MODIFY_VELOCITY);
 	connect(funcModVelAction, SIGNAL(triggered()), mapper, SLOT(map()));
 /*
-	funcCrescendoAction = menuFunctions->addAction(tr("Crescendo"));
+	funcCrescendoAction = menuFunctions->addAction(tr("Crescendo"));//{{{
 	mapper->setMapping(funcCrescendoAction, PerformerCanvas::CMD_CRESCENDO);
 	funcCrescendoAction->setEnabled(false);
 	connect(funcCrescendoAction, SIGNAL(triggered()), mapper, SLOT(map()));
@@ -329,7 +830,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	funcCreateMeasureAction = menuFunctions->addAction(tr("Create Measure"));
 	mapper->setMapping(funcCreateMeasureAction, PerformerCanvas::CMD_CREATE_MEASURE);
 	funcCreateMeasureAction->setEnabled(false);
-	connect(funcCreateMeasureAction, SIGNAL(triggered()), mapper, SLOT(map()));
+	connect(funcCreateMeasureAction, SIGNAL(triggered()), mapper, SLOT(map()));//}}}
 */
 	funcSetFixedLenAction = menuFunctions->addAction(tr("Set Fixed Length"));
 	mapper->setMapping(funcSetFixedLenAction, PerformerCanvas::CMD_FIXED_LEN);
@@ -339,7 +840,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	mapper->setMapping(funcDelOverlapsAction, PerformerCanvas::CMD_DELETE_OVERLAPS);
 	connect(funcDelOverlapsAction, SIGNAL(triggered()), mapper, SLOT(map()));
 
-	menuPlugins = menuBar()->addMenu(tr("&Plugins"));
+	menuPlugins = menuBar()->addMenu(tr("Plugins"));
 	song->populateScriptMenu(menuPlugins, this);
 
 	connect(mapper, SIGNAL(mapped(int)), this, SLOT(cmd(int)));
@@ -388,1233 +889,67 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	funcGotoSelNoteAction = menuFunctions->addAction(tr("Move PB to active note"), functionMapper, SLOT(map()), shortcuts[SHRT_GOTO_SEL_NOTE].key);
 	functionMapper->setMapping(funcGotoSelNoteAction, GOTO_SEL_NOTE);
 
+	/*shortcuts[SHRT_OCTAVE_QWERTY_0].key
+	shortcuts[SHRT_OCTAVE_QWERTY_1].key
+	shortcuts[SHRT_OCTAVE_QWERTY_2].key
+	shortcuts[SHRT_OCTAVE_QWERTY_3].key
+	shortcuts[SHRT_OCTAVE_QWERTY_4].key
+	shortcuts[SHRT_OCTAVE_QWERTY_5].key
+	shortcuts[SHRT_OCTAVE_QWERTY_6].key
 
-	//---------ToolBar----------------------------------
-	//tools = addToolBar(tr("Performer tools"));
-	//tools->setObjectName("tbPRtools");
-	//tools->addActions(undoRedo->actions());
-	//tools->addSeparator();
-	//tools->setIconSize(QSize(22, 22));
-	
-	m_stepAction = new QAction(this);
-	m_stepAction->setToolTip(tr("Step Record"));
-	m_stepAction->setIcon(*stepIconSet3);
-	m_stepAction->setCheckable(true);
-
-    /*srec = new QToolButton();
-	srec->setToolTip(tr("Step Record"));
-	srec->setIcon(*stepIconSet3);
-    srec->setCheckable(true);*/
-	//srec->setObjectName("StepRecord");
-	//tools->addWidget(srec);
-
-    midiin = new QToolButton();
-	midiin->setToolTip(tr("Midi Input"));
-	midiin->setIcon(*midiinIcon);
-	midiin->setCheckable(true);
-	//tools->addWidget(midiin);
-
-    /*speaker = new QToolButton();
-	speaker->setToolTip(tr("Play Events"));
-	speaker->setIcon(*speakerIconSet3);
-	speaker->setCheckable(true);*/
-	//tools->addWidget(speaker);
-	
-	m_speakerAction = new QAction(this);
-	m_speakerAction->setToolTip(tr("Play Events"));
-	m_speakerAction->setIcon(*speakerIconSet3);
-	m_speakerAction->setCheckable(true);
-
-	solo = new QToolButton();
-	///solo->setIcon(*soloIconSet3);
-	//solo->setIconSize(soloIconOn->size());
-	//solo->setToolTip(tr("Solo"));
-	//solo->setCheckable(true);
-	m_soloAction = new QAction(this);
-	m_soloAction->setIcon(*soloIconSet3);
-	m_soloAction->setToolTip(tr("Solo"));
-	m_soloAction->setCheckable(true);
-	solo->setDefaultAction(m_soloAction);
-
-
-    //m_globalKey = new QToolButton();
-	m_globalKeyAction = new QAction(this);
-	m_globalKeyAction->setToolTip(tr("EPIC: Enable editing across all parts"));
-	m_globalKeyAction->setIcon(*globalKeysIconSet3);
-	m_globalKeyAction->setCheckable(true);
-	//m_globalKey->setDefaultAction(globalKeyAction);
-
-    //m_globalArm = new QToolButton();
-	m_globalArmAction = new QAction(this);
-	m_globalArmAction->setToolTip(tr("EPIC: Globally record arm all parts"));
-	m_globalArmAction->setIcon(*globalArmIconSet3);
-	//m_globalArm->setDefaultAction(globalArmAction);
-
-    m_mutePart = new QToolButton();
-	m_muteAction = new QAction(this);
-	m_muteAction->setShortcut(shortcuts[SHRT_PART_TOGGLE_MUTE].key);
-	m_muteAction->setToolTip(tr("Mute current part"));
-	//m_muteAction->setIconSize(soloIconOn->size());
-	m_muteAction->setIcon(*muteIconSet3);
-	m_muteAction->setCheckable(true);
-	m_mutePart->setDefaultAction(m_muteAction);
-
-	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
-	posLabel = new PosLabel(0, "pos");
-	posLabel->setFixedHeight(25);
-	posLabel->setObjectName("Cursor");
-	cursorBar->setObjectName("CursorBar");
-	cursorBar->addWidget(posLabel);
-
-	pitchLabel = new PitchLabel(0);
-	pitchLabel->setFixedHeight(25);
-	pitchLabel->setObjectName("pitchLabel");
-	cursorBar->addWidget(pitchLabel);
-
-	patchLabel = new QLabel();
-	patchLabel->setObjectName("patchLabel");
-	patchLabel->setMaximumSize(QSize(180, 22));
-	patchLabel->setFixedWidth(280);
-	//patchLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-	patchLabel->setFixedHeight(22);
-	menuBar()->setCornerWidget(patchLabel, Qt::TopRightCorner);
-	patchLabel->show();
-	//cursorBar->addWidget(patchLabel);
-
-	addToolBar(Qt::BottomToolBarArea, cursorBar);
-	cursorBar->setFloatable(false);
-	cursorBar->setMovable(false);
-	cursorBar->setAllowedAreas(Qt::BottomToolBarArea);
-	
-	tools22 = new EditToolBar(this, performerTools);
-	//tools22->setVisible(false);
-    tools2 = new QToolBar(tr("Edit Tools"));
-	tools2->setObjectName("PREditToolBar");
-	tools2->setIconSize(QSize(29, 25));
-	addToolBar(Qt::BottomToolBarArea, tools2);
-	tools2->setFloatable(false);
-	tools2->setMovable(false);
-	tools2->setAllowedAreas(Qt::BottomToolBarArea);
-	QWidget* tspacer = new QWidget();
-	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	tspacer->setMaximumWidth(170);
-	tools2->addWidget(tspacer);
-
-	bool showPanic = false;
-	bool showMuteSolo = true;
-	TransportToolbar *transportbar = new TransportToolbar(this,showPanic,showMuteSolo);
-	transportbar->setMuteAction(m_muteAction);
-	transportbar->setSoloAction(m_soloAction);
-	tools2->addWidget(transportbar);
-	connect(transportbar, SIGNAL(recordTriggered(bool)), this, SLOT(checkPartLengthForRecord(bool)));
-	QWidget* spacer55 = new QWidget();
-	spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer55->setMaximumWidth(15);
-	tools2->addWidget(spacer55);
-	//EditTools *edittools = new EditTools(tools22->getActions(), this);
-	tools2->addWidget(tools22);
-	QWidget* spacer555 = new QWidget();
-	spacer555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer555->setMaximumWidth(15);
-	tools2->addWidget(spacer555);
-	QList<QAction*> epicList;
-	epicList.append(m_globalKeyAction);
-	epicList.append(m_globalArmAction);
-
-	EpicToolbar* epicBar = new EpicToolbar(epicList, this);
-	tools2->addWidget(epicBar);
-	noteAlphaAction->setChecked(true);
-	QWidget* spacer5555 = new QWidget();
-	spacer5555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer5555->setMaximumWidth(15);
-	tools2->addWidget(spacer5555);
-	LoopToolbar* loopBar = new LoopToolbar(Qt::Horizontal, this);
-	tools2->addWidget(loopBar);
-	QWidget* spacer55555 = new QWidget();
-	spacer55555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer55555->setMaximumWidth(15);
-	tools2->addWidget(spacer55555);
-	
-	QList<QAction*> miscList;
-	miscList.append(m_stepAction);
-	miscList.append(m_speakerAction);
-
-	MiscToolbar* miscBar = new MiscToolbar(miscList, this);
-	tools2->addWidget(miscBar);
-	QWidget* spacer5 = new QWidget();
-	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	spacer5->setMaximumWidth(15);
-	tools2->addWidget(spacer5);
-	//tools2->addWidget(srec);
-	//tools2->addWidget(speaker);
-	//tools2->addAction(panicAction);
-	/*#ifdef LSCP_SUPPORT
-	QToolButton *btnLSCP = new QToolButton();
-	btnLSCP->setText(tr("L"));
-	btnLSCP->setToolTip(tr("Click the refresh the LSCP Event subscription"));
-	tools2->addWidget(btnLSCP);
-	connect(btnLSCP, SIGNAL(clicked()), oom, SLOT(restartLSCPSubscribe()));
-#endif*/
-    QSizeGrip* corner = new QSizeGrip(mainw);
-	QWidget* spacer3 = new QWidget();
-	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//spacer3->setMaximumWidth(5);
-	tools2->addWidget(spacer3);
-	tools2->addWidget(corner);
-
-
-	//transport->setAllowedAreas(Qt::BottomToolBarArea);
-	//transport->setFloatable(false);
-	//transport->setMovable(false);
-	//transport->setIconSize(QSize(22, 22));
-
-	//addToolBarBreak();
-	//toolbar = new Toolbar1(this, _rasterInit, _quantInit);
-	//addToolBar(toolbar);
-
-	//addToolBarBreak();
-	info = new NoteInfo(this);
-	//addToolBar(Qt::TopToolBarArea, info);
-	//info->setAllowedAreas(Qt::TopToolBarArea);
-	//info->setFloatable(false);
-	//info->setMovable(false);
-	//info->hide();
-
-	//---------------------------------------------------
-	//    split
-	//---------------------------------------------------
-
-	splitter = new Splitter(Qt::Vertical, this, "splitter");
-	splitter->setHandleWidth(2);
-
-	hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
-	hsplitter->setChildrenCollapsible(true);
-	hsplitter->setHandleWidth(2);
-
-	QPushButton* ctrl = new QPushButton(tr(""), mainw);
-	ctrl->setObjectName("Ctrl");
-	ctrl->setFont(config.fonts[3]);
-	ctrl->setToolTip(tr("Add Controller Lane"));
-	ctrl->setIcon(*plus_OffIcon);
-	ctrl->setIconSize(QSize(25,25));
-	ctrl->setFixedSize(QSize(25,25));
-	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
-	ctrl->setFixedSize(pianoWidth, hscroll->sizeHint().height());
-	//ctrl->setFixedSize(pianoWidth / 2, hscroll->sizeHint().height());  // Tim.
-
-	midiConductor = new Conductor(this, 0, _rasterInit, _quantInit);
-	midiConductor->setObjectName("prTrackInfo");
-	midiConductor->btnPrev->setIcon(*previousIconSet3);
-	midiConductor->btnPrev->setIconSize(QSize(25, 25));
-	midiConductor->btnPrev->setFixedSize(QSize(25, 25));
-	midiConductor->btnPrev->setToolTip(tr("Select Previous Part"));
-	midiConductor->btnNext->setIcon(*nextIconSet3);
-	midiConductor->btnNext->setIconSize(QSize(25, 25));
-	midiConductor->btnNext->setFixedSize(QSize(25, 25));
-	midiConductor->btnNext->setToolTip(tr("Select Next Part"));
-	midiConductor->btnPrev->setVisible(true);
-	midiConductor->btnNext->setVisible(true);
-	connect(midiConductor->btnPrev, SIGNAL(clicked()), this, SLOT(selectPrevPart()));
-	connect(midiConductor->btnNext, SIGNAL(clicked()), this, SLOT(selectNextPart()));
-	int mtiw = 280; //midiConductor->width(); // Save this.
-	//midiConductor->setMinimumWidth(100);
-	midiConductor->setMinimumSize(QSize(190,100));
-	//midiConductor->setMaximumWidth(300);
-	// Catch left/right arrow key events for this widget so we
-	// can easily move the focus back from this widget to the canvas.
-	installEventFilter(this);
-	midiConductor->installEventFilter(this);
-	midiConductor->getView()->installEventFilter(this);
-	midiConductor->getPatchListview()->installEventFilter(this);
-
-	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiConductor, SLOT(updateSize()));
-	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
-
-	m_trackListView = new TrackListView(this ,this);
-
-	m_tabs->addTab(midiConductor, tr("   Conductor   "));
-	m_tabs->addTab(m_trackListView, tr("   Track List   "));
-	m_tabs->addTab(info, tr("   Note Info   "));
-	//hsplitter->addWidget(midiConductor);
-	hsplitter->addWidget(splitter);
-
-	mainGrid->setRowStretch(0, 100);
-	mainGrid->setColumnStretch(1, 100);
-	mainGrid->addWidget(hsplitter, 0, 1, 1, 3);
-
-	QWidget* split1 = new QWidget(splitter);
-	split1->setObjectName("split1");
-	QGridLayout* gridS1 = new QGridLayout(split1);
-	gridS1->setContentsMargins(0, 0, 0, 0);
-	gridS1->setSpacing(0);
-	//Defined and configure your program change bar here.
-	//This may well be a copy of MTScale extended for our needs
-	pcbar = new PCScale(&_raster, split1, this, xscale);
-	//pcbar->setAudio(audio);
-	//pcbar->setEditor(this);
-	time = new MTScale(&_raster, split1, xscale);
-	/*Piano*/ piano = new Piano(split1, yscale, this);
-    canvas = new PerformerCanvas(this, split1, xscale, yscale);
-    vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
-
-    int offset = -(config.division / 4);
-    canvas->setOrigin(offset, 0);
-    canvas->setCanvasTools(performerTools);
-    canvas->setFocus();
-    connect(canvas, SIGNAL(toolChanged(int)), tools22, SLOT(set(int)));
-
-	//Connect the functions to canvas
-	connect(functionMapper, SIGNAL(mapped(int)), canvas, SLOT(actionCommand(int)));
-
-    time->setOrigin(offset, 0);
-    pcbar->setOrigin(offset, 0);
-
-    gridS1->setRowStretch(2, 100);
-    gridS1->setColumnStretch(1, 100);
-
-    gridS1->addWidget(pcbar, 0, 1, 1, 2);
-    gridS1->addWidget(time, 1, 1, 1, 2);
-    gridS1->addWidget(hLine(split1), 2, 0, 1, 3);
-    gridS1->addWidget(piano, 3, 0);
-    gridS1->addWidget(canvas, 3, 1);
-    gridS1->addWidget(vscroll, 3, 2);
-
-    ctrlLane = new Splitter(Qt::Vertical, splitter, "ctrllane");
-    QWidget* split2 = new QWidget(splitter);
-    split2->setMaximumHeight(hscroll->sizeHint().height());
-    split2->setMinimumHeight(hscroll->sizeHint().height());
-    QGridLayout* gridS2 = new QGridLayout(split2);
-    gridS2->setContentsMargins(0, 0, 0, 0);
-    gridS2->setSpacing(0);
-    gridS2->setRowStretch(0, 100);
-    gridS2->setColumnStretch(1, 100);
-    gridS2->addWidget(ctrl, 0, 0);
-    gridS2->addWidget(hscroll, 0, 1);
-
-    //gridS2->addWidget(corner, 0, 2, Qt::AlignBottom | Qt::AlignRight);
-    //splitter->setChildrenCollapsible(false);
-    splitter->setCollapsible(2, false);
-
-    piano->setFixedWidth(pianoWidth);
-
-    // Tim.
-    QList<int> mops;
-    mops.append(mtiw); // 30 for possible scrollbar
-    mops.append(width() - mtiw);
-    hsplitter->setSizes(mops);
-    hsplitter->setStretchFactor(0, 0);
-    hsplitter->setStretchFactor(1, 15);
-
-    connect(tools22, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
-
-	connect(noteAlphaAction, SIGNAL(toggled(bool)), canvas, SLOT(update()));
-    //connect(midiConductor, SIGNAL(outputPortChanged(int)), list, SLOT(redraw()));
-	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
-    connect(ctrl, SIGNAL(clicked()), SLOT(addCtrl()));
-    connect(info, SIGNAL(valueChanged(NoteInfo::ValType, int)), SLOT(noteinfoChanged(NoteInfo::ValType, int)));
-    connect(info, SIGNAL(enablePartLines(bool)), canvas, SLOT(setDrawPartEndLine(bool)));
-    connect(vscroll, SIGNAL(scrollChanged(int)), piano, SLOT(setYPos(int)));
-    connect(vscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setYPos(int)));
-    connect(vscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setYMag(float)));
-    connect(vscroll, SIGNAL(scaleChanged(float)), piano, SLOT(setYMag(float)));
-
-    connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));
-    connect(hscroll, SIGNAL(scrollChanged(int)), time, SLOT(setXPos(int)));
-    connect(hscroll, SIGNAL(scrollChanged(int)), pcbar, SLOT(setXPos(int)));
-
-    connect(hscroll, SIGNAL(scaleChanged(float)), canvas, SLOT(setXMag(float)));
-    connect(hscroll, SIGNAL(scaleChanged(float)), time, SLOT(setXMag(float)));
-    connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
-
-    connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
-    connect(canvas, SIGNAL(pitchChanged(int)), piano, SLOT(setPitch(int)));
-    connect(canvas, SIGNAL(verticalScroll(unsigned)), vscroll, SLOT(setPos(unsigned)));
-    connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));
-    connect(canvas, SIGNAL(horizontalScrollNoLimit(unsigned)), hscroll, SLOT(setPosNoLimit(unsigned)));
-    connect(canvas, SIGNAL(selectionChanged(int, Event&, Part*)), this,
-		  SLOT(setSelection(int, Event&, Part*)));
-
-    connect(piano, SIGNAL(keyPressed(int, int, bool)), canvas, SLOT(pianoPressed(int, int, bool)));
-    connect(piano, SIGNAL(keyReleased(int, bool)), canvas, SLOT(pianoReleased(int, bool)));
-	connect(piano, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
-    connect(m_stepAction, SIGNAL(toggled(bool)), SLOT(setSteprec(bool)));
-    //connect(midiin, SIGNAL(toggled(bool)), canvas, SLOT(setMidiin(bool)));
-    connect(m_speakerAction, SIGNAL(toggled(bool)), SLOT(setSpeaker(bool)));
-    connect(canvas, SIGNAL(followEvent(int)), SLOT(follow(int)));
-	connect(m_globalArmAction, SIGNAL(triggered()), canvas, SLOT(recordArmAll()));
-	connect(m_globalKeyAction, SIGNAL(toggled(bool)), canvas, SLOT(setGlobalKey(bool)));
-	connect(m_globalKeyAction, SIGNAL(toggled(bool)), midiConductor, SLOT(setGlobalState(bool)));
-	connect(m_globalKeyAction, SIGNAL(toggled(bool)), this, SLOT(toggleEpicEdit(bool)));
-	connect(multiPartSelectionAction, SIGNAL(toggled(bool)), this, SLOT(toggleMultiPartSelection(bool)));
-	connect(midiConductor, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
-	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
-	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
-	connect(m_muteAction, SIGNAL(triggered(bool)), this, SLOT(toggleMuteCurrentPart(bool)));
-
-    connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
-    piano->setYPos(KH * 30);
-    canvas->setYPos(KH * 30);
-    vscroll->setPos(KH * 30);
-    //setSelection(0, 0, 0); //Really necessary? Causes segfault when only 1 item selected, replaced by the following:
-    info->enableTools(false);
-	connect(info, SIGNAL(alphaChanged()), canvas, SLOT(update()));
-
-    connect(song, SIGNAL(songChanged(int)), SLOT(songChanged1(int)));
-    connect(song, SIGNAL(punchinChanged(bool)), canvas, SLOT(update()));
-    connect(song, SIGNAL(punchoutChanged(bool)), canvas, SLOT(update()));
-    connect(song, SIGNAL(loopChanged(bool)), canvas, SLOT(update()));
-    //connect(song, SIGNAL(playbackStateChanged(bool)), SLOT(playStateChanged(bool)));
-
-    setWindowTitle("The Performer:     " + canvas->getCaption());
-
-    updateHScrollRange();
-    // connect to toolbar
-    connect(canvas, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
-    connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-    connect(piano, SIGNAL(pitchChanged(int)), pitchLabel, SLOT(setPitch(int)));
-    connect(time, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-    //connect(pcbar, SIGNAL(selectInstrument()), midiConductor, SLOT(instrPopup()));
-    connect(pcbar, SIGNAL(addProgramChange(Part*, unsigned)), midiConductor, SLOT(insertMatrixEvent(Part*, unsigned)));
-    connect(midiConductor, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
-    connect(midiConductor, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
-    connect(midiConductor, SIGNAL(toChanged(int)), SLOT(setTo(int)));
-    connect(midiConductor, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
-    connect(canvas, SIGNAL(partChanged(Part*)), midiConductor, SLOT(editorPartChanged(Part*)));
-    connect(m_soloAction, SIGNAL(triggered(bool)), SLOT(soloChanged(bool)));
-	connect(midiConductor, SIGNAL(patchChanged(Patch*)), this ,SLOT(setKeyBindings(Patch*)));
-    //connect(oom, SIGNAL(channelInfoChanged(const LSCPChannelInfo&)), this, SLOT(setKeyBindings(const LSCPChannelInfo&)));
-
-    setFocusPolicy(Qt::StrongFocus);
-    setEventColorMode(colorMode);
-    canvas->setMidiin(true);
-    midiin->setChecked(true);
-    canvas->playEvents(true);
-    m_speakerAction->setChecked(true);
-
-    QClipboard* cb = QApplication::clipboard();
-    connect(cb, SIGNAL(dataChanged()), SLOT(clipboardChanged()));
-
-    clipboardChanged(); // enable/disable "Paste"
-    selectionChanged(); // enable/disable "Copy" & "Paste"
-    initShortcuts(); // initialize shortcuts
-
-    const Pos cpos = song->cPos();
-    canvas->setPos(0, cpos.tick(), true);
-    //	canvas->selectAtTick(cpos.tick());
-    //canvas->selectFirst();
-    //
-    if (canvas->track())
-    {
-		song->setRecordFlag(canvas->track(), true);
-		song->deselectTracks();
-		canvas->track()->setSelected(true);
-		song->update(SC_SELECTION);
-
-	 	updateConductor();
-	 	m_soloAction->blockSignals(true);
-	 	m_soloAction->setChecked(canvas->track()->solo());
-	 	m_soloAction->blockSignals(false);
-		Part* part = curCanvasPart();
-		if(part)
-		{
-			m_muteAction->blockSignals(true);
-			m_muteAction->setChecked(part->mute());
-			m_muteAction->blockSignals(false);
-		}
-    }
-
-    unsigned pos;
-    if (initPos >= MAXINT)
-	  pos = song->cpos();
-    else
-	  pos = initPos;
-    if (pos > MAXINT)
-	  pos = MAXINT;
-
-	bool showcomment = tconfig().get_property("PerformerEdit", "showcomments", false).toBool();
-	//printf("Canvas show comments: %d\n", showcomment);
-	midiConductor->updateCommentState(showcomment, false);
-	CtrlEdit* mainVol = addCtrl();
-	if (!mainVol->setType(QString("MainVolume")))
-		removeCtrl(mainVol);
-	addCtrl(); //Velocity
-	CtrlEdit* modctrl = addCtrl();
-	modctrl->setType(QString("Modulation"));
-	restoreState(tconfig().get_property("PerformerEdit", "windowstate", "").toByteArray());
-	/*if (!modctrl->setType(QString("Modulation")))
-	{
-		modctrl->hide();
-		performer->removeCtrl(modctrl);
-	}*/
-
-    // At this point in time the range of the canvas hasn't
-    // been calculated right ?
-    // Also, why wanting to restore some initPos, what is initPos?
-    // To me, it seems to make a lot more sense to use the actual
-    // current song cpos.
-    // This is now done via the showEvent();
-
-    //      hscroll->setOffset((int)pos); // changed that to:
-}
-void Performer::toggleMuteCurrentPart(bool mute)
-{
-	if(canvas)
-	{
-		Part* part = curCanvasPart();
-		if(part)
-		{
-			part->setMute(mute);
-			song->update(SC_SELECTION);
-		}
-	}
-}
-
-void Performer::checkPartLengthForRecord(bool rec)/*{{{*/
-{
-	if(!rec)
-		return;
-	PartList* pl = parts();
-	for(iPart p = pl->begin(); p != pl->end(); ++p)
-	{
-		Part* part = p->second; //curCanvasPart();
-		if(part && part->track()->recordFlag())
-		{
-			unsigned spos = song->cpos();
-			unsigned ptick = part->tick();
-			unsigned pend = ptick + part->lenTick();
-			int diff = spos - pend;
-			if(diff > 0)
-			{//resize part
-				Part* newPart = part->clone();
-				unsigned ntick = newPart->lenTick() + diff;
-				newPart->setLenTick(ntick + (rasterStep(ntick)*2));
-				// Indicate no undo, and do port controller values but not clone parts.
-				audio->msgChangePart(part, newPart, true, true, false);
-				setCurCanvasPart(newPart);
-				song->update(SC_PART_MODIFIED);
-			}
-		}
-	}
+	Qt::Key_Escape
+	shortcuts[SHRT_LE_INS_POLY_AFTERTOUCH].key
+	shortcuts[SHRT_TOOL_POINTER].key
+	shortcuts[SHRT_TOOL_PENCIL].key
+	shortcuts[SHRT_TOOL_RUBBER].key
+	shortcuts[SHRT_TOOL_LINEDRAW].key
+	shortcuts[SHRT_POS_INC].key
+	shortcuts[SHRT_POS_DEC].key
+	shortcuts[SHRT_POS_INC_NOSNAP].key
+	shortcuts[SHRT_POS_DEC_NOSNAP].key
+	shortcuts[SHRT_INSERT_AT_LOCATION].key
+	Qt::Key_Delete
+	shortcuts[SHRT_ZOOM_IN].key
+	shortcuts[SHRT_ZOOM_OUT].key
+	shortcuts[SHRT_VZOOM_IN].key
+	shortcuts[SHRT_VZOOM_OUT].key
+	shortcuts[SHRT_GOTO_CPOS].key
+	shortcuts[SHRT_SCROLL_LEFT].key
+	shortcuts[SHRT_SCROLL_RIGHT].key
+	shortcuts[SHRT_SCROLL_UP].key
+	shortcuts[SHRT_SCROLL_DOWN].key
+	shortcuts[SHRT_SEL_INSTRUMENT].key
+	shortcuts[SHRT_ADD_PROGRAM].key
+	shortcuts[SHRT_COPY_PROGRAM].key
+	shortcuts[SHRT_SEL_PROGRAM].key
+	shortcuts[SHRT_LMOVE_PROGRAM].key
+	shortcuts[SHRT_RMOVE_PROGRAM].key
+	shortcuts[SHRT_DEL_PROGRAM].key
+	shortcuts[SHRT_SET_QUANT_1].key
+	shortcuts[SHRT_SET_QUANT_2].key
+	shortcuts[SHRT_SET_QUANT_3].key
+	shortcuts[SHRT_SET_QUANT_4].key
+	shortcuts[SHRT_SET_QUANT_5].key
+	shortcuts[SHRT_SET_QUANT_6].key
+	shortcuts[SHRT_SET_QUANT_7].key
+	shortcuts[SHRT_TOGGLE_TRIOL].key
+	shortcuts[SHRT_EVENT_COLOR].key
+	shortcuts[SHRT_TOGGLE_PUNCT].key
+	shortcuts[SHRT_TOGGLE_PUNCT2].key
+	shortcuts[SHRT_TOGGLE_STEPRECORD].key
+	shortcuts[SHRT_TOGGLE_STEPQWERTY].key
+	shortcuts[SHRT_NOTE_VELOCITY_UP].key
+	shortcuts[SHRT_NOTE_VELOCITY_DOWN].key
+	shortcuts[SHRT_TRACK_TOGGLE_SOLO].key
+	shortcuts[SHRT_TOGGLE_SOUND].key
+	shortcuts[SHRT_START_REC].key*/
 }/*}}}*/
-
-void Performer::setCurCanvasPart(Part* part)
-{
-	if (canvas)
-	{
-		//printf("Performer::setCurCanvasPart\n");
-		canvas->setCurrentPart(part);
-		m_muteAction->blockSignals(true);
-		m_muteAction->setChecked(part->mute());
-		m_muteAction->blockSignals(false);
-	}
-	updateConductor();
-	song->update(SC_SELECTION);
-}
-
-//---------------------------------------------------------
-//   songChanged1
-//---------------------------------------------------------
-
-void Performer::songChanged1(int bits)
-{
-
-	//if (bits & SC_SOLO)
-	//{
-		m_soloAction->blockSignals(true);
-		m_soloAction->setChecked(canvas->track()->solo());
-		m_soloAction->blockSignals(false);
-	//	return;
-	//}
-	songChanged(bits);
-	//midiConductor->songChanged(bits);
-	// We'll receive SC_SELECTION if a different part is selected.
-	if (bits & SC_SELECTION)
-		updateConductor();
-	if (bits & SC_MUTE)
-	{
-		Part* part = curCanvasPart();
-		if(part)
-		{
-			m_muteAction->blockSignals(true);
-			m_muteAction->setChecked(part->mute());
-			m_muteAction->blockSignals(false);
-		}
-	}	
-}
-
-void Performer::selectPrevPart()
-{
-	cmd(PerformerCanvas::CMD_SELECT_PREV_PART);
-}
-
-void Performer::selectNextPart()
-{
-	cmd(PerformerCanvas::CMD_SELECT_NEXT_PART);
-}
-
-void Performer::dockAreaChanged(Qt::DockWidgetArea area)
-{
-	switch(area)
-	{
-		case Qt::LeftDockWidgetArea:
-			m_tabs->setTabPosition(QTabWidget::West);
-		break;
-		case Qt::RightDockWidgetArea:
-			m_tabs->setTabPosition(QTabWidget::East);
-		break;
-		default:
-		break;
-	}
-}
-
-//---------------------------------------------------------
-//   configChanged
-//---------------------------------------------------------
-
-void Performer::configChanged()
-{
-	initShortcuts();
-	//midiConductor->updateConductor();
-}
-
-//---------------------------------------------------------
-//   updateHScrollRange
-//---------------------------------------------------------
-
-void Performer::updateHScrollRange()
-{
-	int s, e;
-	canvas->range(&s, &e);
-	// Show one more measure.
-	e += AL::sigmap.ticksMeasure(e);
-	// Show another quarter measure due to imprecise drawing at canvas end point.
-	e += AL::sigmap.ticksMeasure(e) / 4;
-	// Compensate for the fixed piano and vscroll widths.
-	e += canvas->rmapxDev(pianoWidth - vscroll->width());
-	int s1, e1;
-	hscroll->range(&s1, &e1);
-	if (s != s1 || e != e1)
-		hscroll->setRange(s, e);
-}
-
-void Performer::updateConductor()
-{
-	if(selected != curCanvasPart()->track())
-	{
-		selected = curCanvasPart()->track();
-		if (selected->isMidiTrack())
-		{
-			midiConductor->setTrack(selected);
-			///midiConductor->updateConductor(-1);
-		}
-	}
-	midiConductor->updateCommentState(canvas->showComments(), false);
-}
-
-//---------------------------------------------------------
-//   follow
-//---------------------------------------------------------
-
-void Performer::follow(int pos)
-{
-	int s, e;
-	canvas->range(&s, &e);
-
-	if (pos < e && pos >= s)
-		hscroll->setOffset(pos);
-	if (pos < s)
-		hscroll->setOffset(s);
-}
-
-//---------------------------------------------------------
-//   setTime
-//---------------------------------------------------------
-
-void Performer::setTime(unsigned tick)
-{
-	if (tick != MAXINT)
-		posLabel->setValue(tick);
-	time->setPos(3, tick, false);
-    pcbar->setPos(3, tick, false);
-}
-
-//---------------------------------------------------------
-//   ~Performer
-//---------------------------------------------------------
-
-Performer::~Performer()
-{
-	// undoRedo->removeFrom(tools);  // p4.0.6 Removed
-	// store widget size to global config
-	tconfig().set_property("PerformerEdit", "widgetwidth", width());
-	tconfig().set_property("PerformerEdit", "widgetheigth", height());
-	tconfig().set_property("PerformerEdit", "hscale", hscroll->mag());
-	tconfig().set_property("PerformerEdit", "yscale", vscroll->mag());
-	tconfig().set_property("PerformerEdit", "ypos", vscroll->pos());
-	tconfig().set_property("PerformerEdit", "colormode", colorMode);
-	tconfig().set_property("PerformerEdit", "showcomments", canvas->showComments());
-	tconfig().set_property("PerformerEdit", "windowstate", saveState());
-	//tconfig().set_property("PerformerEdit", "showghostpart", noteAlphaAction->isChecked());
-	//printf("Canvas show comments: %d\n", canvas->showComments());
-    tconfig().save();
-	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();i != ctrlEditList.end(); ++i)
-	{
-		ctrlEditList.erase(i);
-		break;
-	}
-}
-
-//---------------------------------------------------------
-//   cmd
-//    pulldown menu commands
-//---------------------------------------------------------
-
-void Performer::cmd(int cmd)
-{
-	((PerformerCanvas*) canvas)->cmd(cmd, _quantStrength, _quantLimit, _quantLen, _to);
-}
-
-void Performer::toggleMultiPartSelection(bool toggle)
-{
-	if(toggle)
-	{
-		m_globalKeyAction->setChecked(!toggle);
-		tools22->set(PointerTool);
-	}	
-}
-
-void Performer::toggleEpicEdit(bool toggle)
-{
-	if(toggle)
-		multiPartSelectionAction->setChecked(!toggle);
-}
-
-//---------------------------------------------------------
-//   setSelection
-//    update Info Line
-//---------------------------------------------------------
-
-void Performer::setSelection(int tick, Event& e, Part* p)
-{
-	int selections = canvas->selectionSize();
-
-	selEvent = e;
-	selPart = (MidiPart*) p;
-	selTick = tick;
-
-	if (selections > 1)
-	{
-		info->enableTools(true);
-		info->setDeltaMode(true);
-		if (!deltaMode)
-		{
-			deltaMode = true;
-			info->setValues(0, 0, 0, 0, 0);
-			tickOffset = 0;
-			lenOffset = 0;
-			pitchOffset = 0;
-			veloOnOffset = 0;
-			veloOffOffset = 0;
-		}
-	}
-	else if (selections == 1)
-	{
-		deltaMode = false;
-		info->enableTools(true);
-		info->setDeltaMode(false);
-		info->setValues(tick,
-						selEvent.lenTick(),
-						selEvent.pitch(),
-						selEvent.velo(),
-						selEvent.veloOff());
-	}
-	else
-	{
-		deltaMode = false;
-		info->enableTools(false);
-	}
-	selectionChanged();
-}
-
-//---------------------------------------------------------
-//    edit currently selected Event
-//---------------------------------------------------------
-
-void Performer::noteinfoChanged(NoteInfo::ValType type, int val)
-{
-	int selections = canvas->selectionSize();
-
-	if (selections == 0)
-	{
-		printf("noteinfoChanged while nothing selected\n");
-	}
-	else if (selections == 1)
-	{
-		Event event = selEvent.clone();
-		switch (type)
-		{
-		case NoteInfo::VAL_TIME:
-			event.setTick(val - selPart->tick());
-			break;
-		case NoteInfo::VAL_LEN:
-			event.setLenTick(val);
-			break;
-		case NoteInfo::VAL_VELON:
-			event.setVelo(val);
-			break;
-		case NoteInfo::VAL_VELOFF:
-			event.setVeloOff(val);
-			break;
-		case NoteInfo::VAL_PITCH:
-			event.setPitch(val);
-			break;
-		}
-		// Indicate do undo, and do not do port controller values and clone parts.
-		//audio->msgChangeEvent(selEvent, event, selPart);
-		audio->msgChangeEvent(selEvent, event, selPart, true, false, false);
-	}
-	else
-	{
-		// multiple events are selected; treat noteinfo values
-		// as offsets to event values
-
-		int delta = 0;
-		switch (type)
-		{
-		case NoteInfo::VAL_TIME:
-			delta = val - tickOffset;
-			tickOffset = val;
-			break;
-		case NoteInfo::VAL_LEN:
-			delta = val - lenOffset;
-			lenOffset = val;
-			break;
-		case NoteInfo::VAL_VELON:
-			delta = val - veloOnOffset;
-			veloOnOffset = val;
-			break;
-		case NoteInfo::VAL_VELOFF:
-			delta = val - veloOffOffset;
-			veloOffOffset = val;
-			break;
-		case NoteInfo::VAL_PITCH:
-			delta = val - pitchOffset;
-			pitchOffset = val;
-			break;
-		}
-		if (delta)
-			canvas->modifySelected(type, delta);
-	}
-}
-
-void Performer::updateCanvas()
-{
-	for(std::list<CtrlEdit*>::iterator i = ctrlEditList.begin(); i != ctrlEditList.end(); ++i)
-	{
-		CtrlEdit* edit = (CtrlEdit*)*i;
-		if(edit)
-			edit->updateCanvas();
-	}
-	canvas->update();
-}
-
-//---------------------------------------------------------
-//   addCtrl
-//---------------------------------------------------------
-
-CtrlEdit* Performer::addCtrl()
-{
-	///CtrlEdit* ctrlEdit = new CtrlEdit(splitter, this, xscale, false, "pianoCtrlEdit");
-	CtrlEdit* ctrlEdit = new CtrlEdit(ctrlLane/*splitter*/, this, xscale, false, "pianoCtrlEdit"); // ccharrett
-	connect(tools22, SIGNAL(toolChanged(int)), ctrlEdit, SLOT(setTool(int)));
-	connect(hscroll, SIGNAL(scrollChanged(int)), ctrlEdit, SLOT(setXPos(int)));
-	connect(hscroll, SIGNAL(scaleChanged(float)), ctrlEdit, SLOT(setXMag(float)));
-	connect(ctrlEdit, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
-	connect(ctrlEdit, SIGNAL(destroyedCtrl(CtrlEdit*)), SLOT(removeCtrl(CtrlEdit*)));
-	connect(ctrlEdit, SIGNAL(yposChanged(int)), pitchLabel, SLOT(setInt(int)));
-	connect(info, SIGNAL(alphaChanged()), ctrlEdit, SLOT(updateCanvas()));
-	connect(noteAlphaAction, SIGNAL(toggled(bool)), ctrlEdit, SLOT(updateCanvas()));
-
-	ctrlEdit->setTool(tools22->curTool());
-	ctrlEdit->setXPos(hscroll->pos());
-	ctrlEdit->setXMag(hscroll->getScaleValue());
-
-	ctrlEdit->show();
-	ctrlEditList.push_back(ctrlEdit);
-	return ctrlEdit;
-}
-
-//---------------------------------------------------------
-//   removeCtrl
-//---------------------------------------------------------
-
-void Performer::removeCtrl(CtrlEdit* ctrl)
-{
-	for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();
-	i != ctrlEditList.end(); ++i)
-	{
-		if (*i == ctrl)
-		{
-			ctrlEditList.erase(i);
-			break;
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   closeEvent
-//---------------------------------------------------------
-
-void Performer::closeEvent(QCloseEvent* e)
-{
-	tconfig().set_property("PerformerEdit", "widgetwidth", width());
-	tconfig().set_property("PerformerEdit", "widgetheigth", height());
-	tconfig().set_property("PerformerEdit", "hscale", hscroll->mag());
-	tconfig().set_property("PerformerEdit", "yscale", vscroll->mag());
-	tconfig().set_property("PerformerEdit", "ypos", vscroll->pos());
-	tconfig().set_property("PerformerEdit", "colormode", colorMode);
-	tconfig().set_property("PerformerEdit", "showcomments", canvas->showComments());
-	//tconfig().set_property("PerformerEdit", "showghostpart", noteAlphaAction->isChecked());
-	//printf("Canvas show comments: %d\n", canvas->showComments());
-    tconfig().save();
-	emit deleted((unsigned long) this);
-	e->accept();
-}
-
-//---------------------------------------------------------
-//   readConfiguration
-//---------------------------------------------------------
-
-void Performer::readConfiguration(Xml& xml)
-{
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		if (token == Xml::Error || token == Xml::End)
-			break;
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-		case Xml::TagStart:
-			if (tag == "quant")
-				_quantInit = xml.parseInt();
-			else if (tag == "raster")
-				_rasterInit = xml.parseInt();
-			else if (tag == "quantStrength")
-				_quantStrengthInit = xml.parseInt();
-			else if (tag == "quantLimit")
-				_quantLimitInit = xml.parseInt();
-			else if (tag == "quantLen")
-				_quantLenInit = xml.parseInt();
-			else if (tag == "to")
-				_toInit = xml.parseInt();
-			else if (tag == "colormode")
-				colorModeInit = xml.parseInt();
-			else if (tag == "width")
-				_widthInit = xml.parseInt();
-			else if (tag == "height")
-				_heightInit = xml.parseInt();
-			else
-				xml.unknown("Performer");
-			break;
-		case Xml::TagEnd:
-			if (tag == "performer")
-				return;
-		default:
-			break;
-		}
-	}
-}
-
-//---------------------------------------------------------
-//   writeConfiguration
-//---------------------------------------------------------
-
-void Performer::writeConfiguration(int level, Xml& xml)
-{
-	xml.tag(level++, "performer");
-	xml.intTag(level, "quant", _quantInit);
-	xml.intTag(level, "raster", _rasterInit);
-	xml.intTag(level, "quantStrength", _quantStrengthInit);
-	xml.intTag(level, "quantLimit", _quantLimitInit);
-	xml.intTag(level, "quantLen", _quantLenInit);
-	xml.intTag(level, "to", _toInit);
-	xml.intTag(level, "width", _widthInit);
-	xml.intTag(level, "height", _heightInit);
-	xml.intTag(level, "colormode", colorModeInit);
-    xml.etag(--level, "performer");
-}
-
-//---------------------------------------------------------
-//   soloChanged
-//    signal from solo button
-//---------------------------------------------------------
-
-void Performer::soloChanged(bool flag)
-{
-	audio->msgSetSolo(canvas->track(), flag);
-	song->update(SC_SOLO);
-}
-
-//---------------------------------------------------------
-//   setRaster
-//---------------------------------------------------------
-
-void Performer::setRaster(int val)
-{
-	_rasterInit = val;
-	AbstractMidiEditor::setRaster(val);
-	canvas->redrawGrid();
-	canvas->setFocus(); // give back focus after kb input
-
-    // falkTX. force update of control canvas
-    // FIXME - there should be a better way to do this..
-    song->update(0);
-}
-
-//---------------------------------------------------------
-//   setQuant
-//---------------------------------------------------------
-
-void Performer::setQuant(int val)
-{
-	_quantInit = val;
-	AbstractMidiEditor::setQuant(val);
-	canvas->setFocus();
-}
-
-//---------------------------------------------------------
-//   writeStatus
-//---------------------------------------------------------
-
-void Performer::writeStatus(int level, Xml& xml) const
-{
-	writePartList(level, xml);
-	xml.tag(level++, "performer");
-	AbstractMidiEditor::writeStatus(level, xml);
-	splitter->writeStatus(level, xml);
-	hsplitter->writeStatus(level, xml);
-
-	for (std::list<CtrlEdit*>::const_iterator i = ctrlEditList.begin();
-	i != ctrlEditList.end(); ++i)
-	{
-		(*i)->writeStatus(level, xml);
-	}
-
-	xml.intTag(level, "steprec", canvas->steprec());
-	xml.intTag(level, "midiin", canvas->midiin());
-	xml.intTag(level, "tool", int(canvas->tool()));
-	xml.intTag(level, "quantStrength", _quantStrength);
-	xml.intTag(level, "quantLimit", _quantLimit);
-	xml.intTag(level, "quantLen", _quantLen);
-	xml.intTag(level, "playEvents", _playEvents);
-	xml.intTag(level, "xpos", hscroll->pos());
-	xml.intTag(level, "xmag", hscroll->mag());
-	xml.intTag(level, "ypos", vscroll->pos());
-	xml.intTag(level, "ymag", vscroll->mag());
-    xml.tag(--level, "/performer");
-}
-
-//---------------------------------------------------------
-//   readStatus
-//---------------------------------------------------------
-
-void Performer::readStatus(Xml& xml)
-{
-	printf("readstatus\n");
-	for (;;)
-	{
-		Xml::Token token = xml.parse();
-		if (token == Xml::Error || token == Xml::End)
-			break;
-		const QString& tag = xml.s1();
-		switch (token)
-		{
-		case Xml::TagStart:
-			if (tag == "steprec")
-			{
-				int val = xml.parseInt();
-				canvas->setSteprec(val);
-				m_stepAction->setChecked(val);
-			}
-			else if (tag == "midiin")
-			{
-				int val = xml.parseInt();
-				canvas->setMidiin(val);
-				midiin->setChecked(val);
-			}
-			else if (tag == "tool")
-			{
-				int tool = xml.parseInt();
-				canvas->setTool(tool);
-				tools22->set(tool);
-			}
-			else if (tag == "midieditor")
-				AbstractMidiEditor::readStatus(xml);
-			else if (tag == "ctrledit")
-			{
-				CtrlEdit* ctrl = addCtrl();
-				ctrl->readStatus(xml);
-			}
-			else if (tag == splitter->objectName())
-				splitter->readStatus(xml);
-			else if (tag == hsplitter->objectName())
-				hsplitter->readStatus(xml);
-			else if (tag == "quantStrength")
-				_quantStrength = xml.parseInt();
-			else if (tag == "quantLimit")
-				_quantLimit = xml.parseInt();
-			else if (tag == "quantLen")
-				_quantLen = xml.parseInt();
-			else if (tag == "playEvents")
-			{
-				_playEvents = xml.parseInt();
-				canvas->playEvents(_playEvents);
-				m_speakerAction->setChecked(_playEvents);
-			}
-			else if (tag == "xmag")
-				hscroll->setMag(xml.parseInt());
-			else if (tag == "xpos")
-				hscroll->setPos(xml.parseInt());
-			else if (tag == "ymag")
-				vscroll->setMag(xml.parseInt());
-			else if (tag == "ypos")
-				vscroll->setPos(xml.parseInt());
-			else
-				xml.unknown("Performer");
-			break;
-			case Xml::TagEnd:
-			if (tag == "pianoroll" || tag == "performer")
-			{
-				_quantInit = _quant;
-				_rasterInit = _raster;
-				midiConductor->setRaster(_raster);
-				midiConductor->setQuant(_quant);
-				canvas->redrawGrid();
-				return;
-			}
-			default:
-			break;
-		}
-	}
-}
-
-static int rasterTable[] = {
-	//-9----8-  7    6     5     4    3(1/4)     2   1
-	4, 8, 16, 32, 64, 128, 256, 512, 1024, // triple
-	6, 12, 24, 48, 96, 192, 384, 768, 1536,
-	9, 18, 36, 72, 144, 288, 576, 1152, 2304 // dot
-};
-
-bool Performer::isGlobalEdit()
-{
-	return m_globalKeyAction->isChecked();
-}
-
-bool Performer::eventFilter(QObject *obj, QEvent *event)
-{
-	// Force left/right arrow key events to move the focus
-	// back on the canvas if it doesn't have the focus.
-	// Currently the object that we're filtering is the
-	// midiConductor.
-	if (event->type() == QEvent::KeyPress) {
-		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-		int key = keyEvent->key();
-		//if (event->state() & Qt::ShiftButton)
-		if (((QInputEvent*) event)->modifiers() & Qt::ShiftModifier)
-			key += Qt::SHIFT;
-		//if (event->state() & Qt::AltButton)
-		if (((QInputEvent*) event)->modifiers() & Qt::AltModifier)
-			key += Qt::ALT;
-		//if (event->state() & Qt::ControlButton)
-		if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
-			key += Qt::CTRL;
-		///if (event->state() & Qt::MetaButton)
-		if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
-			key += Qt::META;
-
-		if (key == shortcuts[SHRT_NAVIGATE_TO_CANVAS].key)
-		{
-			if (canvas->hasFocus())
-			{
-				midiConductor->getPatchListview()->setFocus();
-			}
-			else if (midiConductor->getPatchListview()->hasFocus())
-			{
-				midiConductor->getView()->setFocus();
-			}
-			else
-			{
-				canvas->setFocus(Qt::MouseFocusReason);
-			}
-			return true;
-		}
-		if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
-		{
-			m_stepAction->toggle();
-			return true;
-		}
-		if (key == shortcuts[SHRT_MIDI_PANIC].key)
-		{
-			song->panic();
-			return true;
-		}
-		if(key == shortcuts[SHRT_SEL_INSTRUMENT].key)
-		{
-			midiConductor->addSelectedPatch();
-			return true;
-		}
-		if(key == shortcuts[SHRT_PREVIEW_INSTRUMENT].key)
-		{
-			midiConductor->previewSelectedPatch();
-			return true;
-		}
-		else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
-		{
-			unsigned utick = song->cpos() + rasterStep(song->cpos());
-			if(m_globalKeyAction->isChecked())
-			{
-				for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
-				{
-					Part* part = ip->second;
-					midiConductor->insertMatrixEvent(part, utick);
-				}
-			}
-			else
-			{
-				midiConductor->insertMatrixEvent(curCanvasPart(), utick);
-			}
-			return true;
-		}
-		else if (key == shortcuts[SHRT_POS_INC].key)
-		{
-			PerformerCanvas* pc = (PerformerCanvas*) canvas;
-			pc->pianoCmd(CMD_RIGHT);
-			return true;
-		}
-		else if (key == shortcuts[SHRT_POS_DEC].key)
-		{
-			PerformerCanvas* pc = (PerformerCanvas*) canvas;
-			pc->pianoCmd(CMD_LEFT);
-			return true;
-		}
-		else if (key == shortcuts[SHRT_ADD_REST].key)
-		{
-			PerformerCanvas* pc = (PerformerCanvas*) canvas;
-			pc->pianoCmd(CMD_RIGHT);
-			return true;
-		}
-	}
-
-	// standard event processing
-	return QObject::eventFilter(obj, event);
-}
 
 //---------------------------------------------------------
 //   viewKeyPressEvent
 //---------------------------------------------------------
 
-void Performer::keyPressEvent(QKeyEvent* event)
+void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 {
 
 	// Force left/right arrow key events to move the focus
@@ -2009,66 +1344,12 @@ void Performer::keyPressEvent(QKeyEvent* event)
 	else if (key == shortcuts[SHRT_NOTE_VELOCITY_UP].key)
 	{
 		canvas->modifySelected(NoteInfo::VAL_VELON, 5, true);
-		/*CItemList list = canvas->getSelectedItemsForCurrentPart();
-
-		song->startUndo();
-		for (iCItem k = list.begin(); k != list.end(); ++k)
-		{
-			NEvent* nevent = (NEvent*) (k->second);
-			Event event = nevent->event();
-			if (event.type() != Note)
-				continue;
-
-			int velo = event.velo();
-			velo += 5;
-
-			if (velo <= 0)
-				velo = 1;
-			if (velo > 127)
-				velo = 127;
-			if (event.velo() != velo)
-			{
-				Event newEvent = event.clone();
-				newEvent.setVelo(velo);
-				// Indicate no undo, and do not do port controller values and clone parts.
-				//audio->msgChangeEvent(event, newEvent, nevent->part(), false);
-				audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
-			}
-		}
-		song->endUndo(SC_EVENT_MODIFIED);*/
 		return;
 
 	}
 	else if (key == shortcuts[SHRT_NOTE_VELOCITY_DOWN].key)
 	{
 		canvas->modifySelected(NoteInfo::VAL_VELON, -5, true);
-		/*CItemList list = canvas->getSelectedItemsForCurrentPart();
-
-		song->startUndo();
-		for (iCItem k = list.begin(); k != list.end(); ++k)
-		{
-			NEvent* nevent = (NEvent*) (k->second);
-			Event event = nevent->event();
-			if (event.type() != Note)
-				continue;
-
-			int velo = event.velo();
-			velo -= 5;
-
-			if (velo <= 0)
-				velo = 1;
-			if (velo > 127)
-				velo = 127;
-			if (event.velo() != velo)
-			{
-				Event newEvent = event.clone();
-				newEvent.setVelo(velo);
-				// Indicate no undo, and do not do port controller values and clone parts.
-				//audio->msgChangeEvent(event, newEvent, nevent->part(), false);
-				audio->msgChangeEvent(event, newEvent, nevent->part(), false, false, false);
-			}
-		}
-		song->endUndo(SC_EVENT_MODIFIED);*/
 		return;
 	}
 	else if (key == shortcuts[SHRT_TRACK_TOGGLE_SOLO].key)
@@ -2122,7 +1403,931 @@ void Performer::keyPressEvent(QKeyEvent* event)
 	setRaster(val);
 	midiConductor->setQuant(_quant);
 	midiConductor->setRaster(_raster);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   initShortcuts
+//---------------------------------------------------------
+
+void Performer::initShortcuts()/*{{{*/
+{
+	editCutAction->setShortcut(shortcuts[SHRT_CUT].key);
+	editCopyAction->setShortcut(shortcuts[SHRT_COPY].key);
+	editPasteAction->setShortcut(shortcuts[SHRT_PASTE].key);
+	editDelEventsAction->setShortcut(shortcuts[SHRT_DELETE].key);
+
+	selectAllAction->setShortcut(shortcuts[SHRT_SELECT_ALL].key);
+	selectNoneAction->setShortcut(shortcuts[SHRT_SELECT_NONE].key);
+	selectInvertAction->setShortcut(shortcuts[SHRT_SELECT_INVERT].key);
+	selectInsideLoopAction->setShortcut(shortcuts[SHRT_SELECT_ILOOP].key);
+	selectOutsideLoopAction->setShortcut(shortcuts[SHRT_SELECT_OLOOP].key);
+	selectPrevPartAction->setShortcut(shortcuts[SHRT_SELECT_PREV_PART].key);
+	selectNextPartAction->setShortcut(shortcuts[SHRT_SELECT_NEXT_PART].key);
+
+	eventColor->menuAction()->setShortcut(shortcuts[SHRT_EVENT_COLOR].key);
+	//evColorBlueAction->setShortcut(shortcuts[  ].key);
+	//evColorPitchAction->setShortcut(shortcuts[  ].key);
+	//evColorVelAction->setShortcut(shortcuts[  ].key);
+
+	funcOverQuantAction->setShortcut(shortcuts[SHRT_OVER_QUANTIZE].key);
+	funcNoteOnQuantAction->setShortcut(shortcuts[SHRT_ON_QUANTIZE].key);
+	funcNoteOnOffQuantAction->setShortcut(shortcuts[SHRT_ONOFF_QUANTIZE].key);
+	funcIterQuantAction->setShortcut(shortcuts[SHRT_ITERATIVE_QUANTIZE].key);
+
+	funcConfigQuantAction->setShortcut(shortcuts[SHRT_CONFIG_QUANT].key);
+
+	funcGateTimeAction->setShortcut(shortcuts[SHRT_MODIFY_GATE_TIME].key);
+	funcModVelAction->setShortcut(shortcuts[SHRT_MODIFY_VELOCITY].key);
+	/*
+	funcCrescendoAction->setShortcut(shortcuts[SHRT_CRESCENDO].key);
+	funcTransposeAction->setShortcut(shortcuts[SHRT_TRANSPOSE].key);
+	funcThinOutAction->setShortcut(shortcuts[SHRT_THIN_OUT].key);
+	funcEraseEventAction->setShortcut(shortcuts[SHRT_ERASE_EVENT].key);
+	funcNoteShiftAction->setShortcut(shortcuts[SHRT_NOTE_SHIFT].key);
+	funcMoveClockAction->setShortcut(shortcuts[SHRT_MOVE_CLOCK].key);
+	funcCopyMeasureAction->setShortcut(shortcuts[SHRT_COPY_MEASURE].key);
+	funcEraseMeasureAction->setShortcut(shortcuts[SHRT_ERASE_MEASURE].key);
+	funcDelMeasureAction->setShortcut(shortcuts[SHRT_DELETE_MEASURE].key);
+	funcCreateMeasureAction->setShortcut(shortcuts[SHRT_CREATE_MEASURE].key);
+	*/
+	funcSetFixedLenAction->setShortcut(shortcuts[SHRT_FIXED_LEN].key);
+	funcDelOverlapsAction->setShortcut(shortcuts[SHRT_DELETE_OVERLAPS].key);
+
+    funcLocateSelectionAction->setShortcut(shortcuts[SHRT_LOCATORS_TO_SELECTION].key);
+	funcSelectRightAction->setShortcut(shortcuts[SHRT_SEL_RIGHT].key);
+    funcSelectRightAddAction->setShortcut(shortcuts[SHRT_SEL_RIGHT_ADD].key);
+	funcSelectLeftAction->setShortcut(shortcuts[SHRT_SEL_LEFT].key);
+	funcSelectLeftAddAction->setShortcut(shortcuts[SHRT_SEL_LEFT_ADD].key);
+	funcIncreaseOctaveAction->setShortcut(shortcuts[SHRT_INC_PITCH_OCTAVE].key);
+	funcDecreaseOctaveAction->setShortcut(shortcuts[SHRT_DEC_PITCH_OCTAVE].key);
+	funcIncreasePitchAction->setShortcut(shortcuts[SHRT_INC_PITCH].key);
+	funcDecreasePitchAction->setShortcut(shortcuts[SHRT_DEC_PITCH].key);
+	funcIncreasePosAction->setShortcut(shortcuts[SHRT_INC_POS].key);
+	funcDecreasePosAction->setShortcut(shortcuts[SHRT_DEC_POS].key);
+	funcIncreaseLenAction->setShortcut(shortcuts[SHRT_INCREASE_LEN].key);
+	funcDecreaseLenAction->setShortcut(shortcuts[SHRT_DECREASE_LEN].key);
+	funcGotoSelNoteAction->setShortcut(shortcuts[SHRT_GOTO_SEL_NOTE].key);
+
+}/*}}}*/
+
+void Performer::toggleMuteCurrentPart(bool mute)
+{
+	if(canvas)
+	{
+		Part* part = curCanvasPart();
+		if(part)
+		{
+			part->setMute(mute);
+			song->update(SC_SELECTION);
+		}
+	}
 }
+
+void Performer::checkPartLengthForRecord(bool rec)/*{{{*/
+{
+	if(!rec)
+		return;
+	PartList* pl = parts();
+	for(iPart p = pl->begin(); p != pl->end(); ++p)
+	{
+		Part* part = p->second; //curCanvasPart();
+		if(part && part->track()->recordFlag())
+		{
+			unsigned spos = song->cpos();
+			unsigned ptick = part->tick();
+			unsigned pend = ptick + part->lenTick();
+			int diff = spos - pend;
+			if(diff > 0)
+			{//resize part
+				Part* newPart = part->clone();
+				unsigned ntick = newPart->lenTick() + diff;
+				newPart->setLenTick(ntick + (rasterStep(ntick)*2));
+				// Indicate no undo, and do port controller values but not clone parts.
+				audio->msgChangePart(part, newPart, true, true, false);
+				setCurCanvasPart(newPart);
+				song->update(SC_PART_MODIFIED);
+			}
+		}
+	}
+}/*}}}*/
+
+void Performer::setCurCanvasPart(Part* part)
+{
+	if (canvas)
+	{
+		//printf("Performer::setCurCanvasPart\n");
+		canvas->setCurrentPart(part);
+		m_muteAction->blockSignals(true);
+		m_muteAction->setChecked(part->mute());
+		m_muteAction->blockSignals(false);
+	}
+	updateConductor();
+	song->update(SC_SELECTION);
+}
+
+//---------------------------------------------------------
+//   songChanged1
+//---------------------------------------------------------
+
+void Performer::songChanged1(int bits)/*{{{*/
+{
+
+	//if (bits & SC_SOLO)
+	//{
+		m_soloAction->blockSignals(true);
+		m_soloAction->setChecked(canvas->track()->solo());
+		m_soloAction->blockSignals(false);
+	//	return;
+	//}
+	songChanged(bits);
+	//midiConductor->songChanged(bits);
+	// We'll receive SC_SELECTION if a different part is selected.
+	if (bits & SC_SELECTION)
+		updateConductor();
+	if (bits & SC_MUTE)
+	{
+		Part* part = curCanvasPart();
+		if(part)
+		{
+			m_muteAction->blockSignals(true);
+			m_muteAction->setChecked(part->mute());
+			m_muteAction->blockSignals(false);
+		}
+	}	
+}/*}}}*/
+
+void Performer::selectPrevPart()
+{
+	cmd(PerformerCanvas::CMD_SELECT_PREV_PART);
+}
+
+void Performer::selectNextPart()
+{
+	cmd(PerformerCanvas::CMD_SELECT_NEXT_PART);
+}
+
+void Performer::dockAreaChanged(Qt::DockWidgetArea area)/*{{{*/
+{
+	switch(area)
+	{
+		case Qt::LeftDockWidgetArea:
+			m_tabs->setTabPosition(QTabWidget::West);
+		break;
+		case Qt::RightDockWidgetArea:
+			m_tabs->setTabPosition(QTabWidget::East);
+		break;
+		default:
+		break;
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   configChanged
+//---------------------------------------------------------
+
+void Performer::configChanged()
+{
+	initShortcuts();
+	//midiConductor->updateConductor();
+}
+
+//---------------------------------------------------------
+//   updateHScrollRange
+//---------------------------------------------------------
+
+void Performer::updateHScrollRange()/*{{{*/
+{
+	int s, e;
+	canvas->range(&s, &e);
+	// Show one more measure.
+	e += AL::sigmap.ticksMeasure(e);
+	// Show another quarter measure due to imprecise drawing at canvas end point.
+	e += AL::sigmap.ticksMeasure(e) / 4;
+	// Compensate for the fixed piano and vscroll widths.
+	e += canvas->rmapxDev(pianoWidth - vscroll->width());
+	int s1, e1;
+	hscroll->range(&s1, &e1);
+	if (s != s1 || e != e1)
+		hscroll->setRange(s, e);
+}/*}}}*/
+
+void Performer::updateConductor()/*{{{*/
+{
+	if(selected != curCanvasPart()->track())
+	{
+		selected = curCanvasPart()->track();
+		if (selected->isMidiTrack())
+		{
+			midiConductor->setTrack(selected);
+			///midiConductor->updateConductor(-1);
+		}
+	}
+	midiConductor->updateCommentState(canvas->showComments(), false);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   follow
+//---------------------------------------------------------
+
+void Performer::follow(int pos)/*{{{*/
+{
+	int s, e;
+	canvas->range(&s, &e);
+
+	if (pos < e && pos >= s)
+		hscroll->setOffset(pos);
+	if (pos < s)
+		hscroll->setOffset(s);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   setTime
+//---------------------------------------------------------
+
+void Performer::setTime(unsigned tick)/*{{{*/
+{
+	if (tick != MAXINT)
+		posLabel->setValue(tick);
+	time->setPos(3, tick, false);
+    pcbar->setPos(3, tick, false);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   cmd
+//    pulldown menu commands
+//---------------------------------------------------------
+
+void Performer::cmd(int cmd)
+{
+	((PerformerCanvas*) canvas)->cmd(cmd, _quantStrength, _quantLimit, _quantLen, _to);
+}
+
+void Performer::toggleMultiPartSelection(bool toggle)
+{
+	if(toggle)
+	{
+		m_globalKeyAction->setChecked(!toggle);
+		tools22->set(PointerTool);
+	}	
+}
+
+void Performer::toggleEpicEdit(bool toggle)
+{
+	if(toggle)
+		multiPartSelectionAction->setChecked(!toggle);
+}
+
+//---------------------------------------------------------
+//   setSelection
+//    update Info Line
+//---------------------------------------------------------
+
+void Performer::setSelection(int tick, Event& e, Part* p)/*{{{*/
+{
+	int selections = canvas->selectionSize();
+
+	selEvent = e;
+	selPart = (MidiPart*) p;
+	selTick = tick;
+
+	if (selections > 1)
+	{
+		info->enableTools(true);
+		info->setDeltaMode(true);
+		if (!deltaMode)
+		{
+			deltaMode = true;
+			info->setValues(0, 0, 0, 0, 0);
+			tickOffset = 0;
+			lenOffset = 0;
+			pitchOffset = 0;
+			veloOnOffset = 0;
+			veloOffOffset = 0;
+		}
+	}
+	else if (selections == 1)
+	{
+		deltaMode = false;
+		info->enableTools(true);
+		info->setDeltaMode(false);
+		info->setValues(tick,
+						selEvent.lenTick(),
+						selEvent.pitch(),
+						selEvent.velo(),
+						selEvent.veloOff());
+	}
+	else
+	{
+		deltaMode = false;
+		info->enableTools(false);
+	}
+	selectionChanged();
+}/*}}}*/
+
+//---------------------------------------------------------
+//    edit currently selected Event
+//---------------------------------------------------------
+
+void Performer::noteinfoChanged(NoteInfo::ValType type, int val)/*{{{*/
+{
+	int selections = canvas->selectionSize();
+
+	if (selections == 0)
+	{
+		printf("noteinfoChanged while nothing selected\n");
+	}
+	else if (selections == 1)
+	{
+		Event event = selEvent.clone();
+		switch (type)
+		{
+		case NoteInfo::VAL_TIME:
+			event.setTick(val - selPart->tick());
+			break;
+		case NoteInfo::VAL_LEN:
+			event.setLenTick(val);
+			break;
+		case NoteInfo::VAL_VELON:
+			event.setVelo(val);
+			break;
+		case NoteInfo::VAL_VELOFF:
+			event.setVeloOff(val);
+			break;
+		case NoteInfo::VAL_PITCH:
+			event.setPitch(val);
+			break;
+		}
+		// Indicate do undo, and do not do port controller values and clone parts.
+		//audio->msgChangeEvent(selEvent, event, selPart);
+		audio->msgChangeEvent(selEvent, event, selPart, true, false, false);
+	}
+	else
+	{
+		// multiple events are selected; treat noteinfo values
+		// as offsets to event values
+
+		int delta = 0;
+		switch (type)
+		{
+		case NoteInfo::VAL_TIME:
+			delta = val - tickOffset;
+			tickOffset = val;
+			break;
+		case NoteInfo::VAL_LEN:
+			delta = val - lenOffset;
+			lenOffset = val;
+			break;
+		case NoteInfo::VAL_VELON:
+			delta = val - veloOnOffset;
+			veloOnOffset = val;
+			break;
+		case NoteInfo::VAL_VELOFF:
+			delta = val - veloOffOffset;
+			veloOffOffset = val;
+			break;
+		case NoteInfo::VAL_PITCH:
+			delta = val - pitchOffset;
+			pitchOffset = val;
+			break;
+		}
+		if (delta)
+			canvas->modifySelected(type, delta);
+	}
+}/*}}}*/
+
+void Performer::updateCanvas()/*{{{*/
+{
+	for(QList<CtrlEdit*>::iterator i = ctrlEditList.begin(); i != ctrlEditList.end(); ++i)
+	{
+		CtrlEdit* edit = (CtrlEdit*)*i;
+		if(edit)
+			edit->updateCanvas();
+	}
+	canvas->update();
+}/*}}}*/
+
+//---------------------------------------------------------
+//   ctrlPopup
+//---------------------------------------------------------
+
+void Performer::ctrlPopup()/*{{{*/
+{
+	//---------------------------------------------------
+	// build list of midi controllers for current
+	// MidiPort/channel
+	//---------------------------------------------------
+
+	PartList* partList = parts();
+	Part* part = curCanvasPart();
+	MidiTrack* track = (MidiTrack*) (part->track());
+	int channel = track->outChannel();
+	MidiPort* port = &midiPorts[track->outPort()];
+
+	QMenu* pop = new QMenu;
+	//pop->clear();
+	pop->addAction(tr("Velocity"))->setData(1);
+
+	MidiCtrlValListList* cll = port->controller();
+	int min = channel << 24;
+	int max = min + 0x1000000;
+
+	QStringList usedList;
+	for (iMidiCtrlValList i = cll->lower_bound(min); i != cll->lower_bound(max); ++i)
+	{
+		MidiCtrlValList* cl = i->second;
+		MidiController* c = port->midiController(cl->num());
+		// dont show drum specific controller at all, we no longer have a drum track
+		if (((c->num() & 0xff) == 0xffi) )
+		{
+			continue;
+		}
+		if(c->name() == "Program")
+			continue;
+		QAction *act = pop->addAction(c->name());
+		act->setData(c->num());
+
+		bool found = false;
+		for (iPart ip = partList->begin(); ip != partList->end(); ++ip)
+		{
+			EventList* el = ip->second->events();
+			for (iEvent ie = el->begin(); ie != el->end(); ++ie)
+			{
+				Event e = ie->second;
+				if ((e.type() == Controller) && (e.dataA() == cl->num()))
+				{
+					act->setIcon(QIcon(*greendotIcon));
+					found = true;
+					break;
+				}
+			}
+			if(found)
+				break;
+		}
+	}
+
+	//pop->addAction(QIcon(*plusIconSet3), tr("add new ..."))->setData(2);
+	
+	QMenu* subMenu = pop->addMenu(QIcon(*plusIconSet3), tr("Instrument"));/*{{{*/
+	// populate popup with all controllers available for
+	// current instrument
+	//
+	MidiInstrument* instr = port->instrument();
+	MidiControllerList* mcl = instr->controller();
+	for (iMidiController ci = mcl->begin(); ci != mcl->end(); ++ci)
+	{
+		int num = ci->second->num();
+		if ((num & 0xff) == 0xff)
+			continue; //no drum specific
+
+		if (cll->find(channel, num) == cll->end())
+			subMenu->addAction(ci->second->name())->setData(2);
+	}/*}}}*/
+
+	QAction *act = pop->exec(QCursor::pos());
+
+	if (!act)
+	{
+		delete pop;
+		return;
+	}
+
+	int rv = act->data().toInt();
+	QString s = act->text();
+	delete pop;
+
+	if (rv == 1)
+	{ // special case velocity
+		addCtrl();
+	}
+	else if (rv == 2)
+	{
+		//
+		// add new controller
+		//
+		MidiController* c;
+		for (iMidiController ci = mcl->begin(); ci != mcl->end(); ++ci)
+		{
+			c = ci->second;
+			if (c->name() == s)
+			{
+				int num = c->num();
+				if ((num & 0xff) == 0xff)
+					continue;
+
+				if (cll->find(channel, num) == cll->end())
+				{
+					MidiCtrlValList* vl = new MidiCtrlValList(num);
+
+					cll->add(channel, vl);
+					CtrlEdit* ctrl = addCtrl();
+					if(ctrl)
+						ctrl->setType(c->name());
+				}
+				else
+				{
+					CtrlEdit* ctrl = addCtrl();
+					if(ctrl)
+						ctrl->setType(c->name());
+				}
+				break;
+			}
+		}
+	}
+	else
+	{
+		iMidiCtrlValList i = cll->begin();
+		for (; i != cll->end(); ++i)
+		{
+			MidiCtrlValList* cl = i->second;
+			MidiController* c = port->midiController(cl->num());
+			if (c->name() == s)
+			{
+				CtrlEdit* ctrl = addCtrl();
+				if(ctrl)
+					ctrl->setType(c->name());
+				break;
+			}
+		}
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   addCtrl
+//---------------------------------------------------------
+
+CtrlEdit* Performer::addCtrl()/*{{{*/
+{
+	///CtrlEdit* ctrlEdit = new CtrlEdit(splitter, this, xscale, false, "pianoCtrlEdit");
+	CtrlEdit* ctrlEdit = new CtrlEdit(ctrlLane/*splitter*/, this, xscale, false, "pianoCtrlEdit"); // ccharrett
+	connect(tools22, SIGNAL(toolChanged(int)), ctrlEdit, SLOT(setTool(int)));
+	connect(hscroll, SIGNAL(scrollChanged(int)), ctrlEdit, SLOT(setXPos(int)));
+	connect(hscroll, SIGNAL(scaleChanged(float)), ctrlEdit, SLOT(setXMag(float)));
+	connect(ctrlEdit, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+	connect(ctrlEdit, SIGNAL(destroyedCtrl(CtrlEdit*)), SLOT(removeCtrl(CtrlEdit*)));
+	connect(ctrlEdit, SIGNAL(yposChanged(int)), pitchLabel, SLOT(setInt(int)));
+	connect(info, SIGNAL(alphaChanged()), ctrlEdit, SLOT(updateCanvas()));
+	connect(noteAlphaAction, SIGNAL(toggled(bool)), ctrlEdit, SLOT(updateCanvas()));
+
+	ctrlEdit->setTool(tools22->curTool());
+	ctrlEdit->setXPos(hscroll->pos());
+	ctrlEdit->setXMag(hscroll->getScaleValue());
+
+	ctrlEdit->show();
+	ctrlEditList.append(ctrlEdit);
+	return ctrlEdit;
+}/*}}}*/
+
+//---------------------------------------------------------
+//   removeCtrl
+//---------------------------------------------------------
+
+void Performer::removeCtrl(CtrlEdit* ctrl)/*{{{*/
+{
+	if(ctrlEditList.isEmpty())
+		return;
+	int index = ctrlEditList.indexOf(ctrl);
+	if(index >= 0)
+		delete ctrlEditList.takeAt(index);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   closeEvent
+//---------------------------------------------------------
+
+void Performer::closeEvent(QCloseEvent* e)/*{{{*/
+{
+	tconfig().set_property("PerformerEdit", "widgetwidth", width());
+	tconfig().set_property("PerformerEdit", "widgetheigth", height());
+	tconfig().set_property("PerformerEdit", "hscale", hscroll->mag());
+	tconfig().set_property("PerformerEdit", "yscale", vscroll->mag());
+	tconfig().set_property("PerformerEdit", "ypos", vscroll->pos());
+	tconfig().set_property("PerformerEdit", "colormode", colorMode);
+	tconfig().set_property("PerformerEdit", "showcomments", canvas->showComments());
+	//tconfig().set_property("PerformerEdit", "showghostpart", noteAlphaAction->isChecked());
+	//printf("Canvas show comments: %d\n", canvas->showComments());
+    tconfig().save();
+	e->accept();
+	emit deleted();
+}/*}}}*/
+
+//---------------------------------------------------------
+//   readConfiguration
+//---------------------------------------------------------
+
+void Performer::readConfiguration(Xml& xml)/*{{{*/
+{
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		if (token == Xml::Error || token == Xml::End)
+			break;
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+		case Xml::TagStart:
+			if (tag == "quant")
+				_quantInit = xml.parseInt();
+			else if (tag == "raster")
+				_rasterInit = xml.parseInt();
+			else if (tag == "quantStrength")
+				_quantStrengthInit = xml.parseInt();
+			else if (tag == "quantLimit")
+				_quantLimitInit = xml.parseInt();
+			else if (tag == "quantLen")
+				_quantLenInit = xml.parseInt();
+			else if (tag == "to")
+				_toInit = xml.parseInt();
+			else if (tag == "colormode")
+				colorModeInit = xml.parseInt();
+			else if (tag == "width")
+				_widthInit = xml.parseInt();
+			else if (tag == "height")
+				_heightInit = xml.parseInt();
+			else
+				xml.unknown("Performer");
+			break;
+		case Xml::TagEnd:
+			if (tag == "performer")
+				return;
+		default:
+			break;
+		}
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
+//   writeConfiguration
+//---------------------------------------------------------
+
+void Performer::writeConfiguration(int level, Xml& xml)/*{{{*/
+{
+	xml.tag(level++, "performer");
+	xml.intTag(level, "quant", _quantInit);
+	xml.intTag(level, "raster", _rasterInit);
+	xml.intTag(level, "quantStrength", _quantStrengthInit);
+	xml.intTag(level, "quantLimit", _quantLimitInit);
+	xml.intTag(level, "quantLen", _quantLenInit);
+	xml.intTag(level, "to", _toInit);
+	xml.intTag(level, "width", _widthInit);
+	xml.intTag(level, "height", _heightInit);
+	xml.intTag(level, "colormode", colorModeInit);
+    xml.etag(--level, "performer");
+}/*}}}*/
+
+//---------------------------------------------------------
+//   soloChanged
+//    signal from solo button
+//---------------------------------------------------------
+
+void Performer::soloChanged(bool flag)/*{{{*/
+{
+	audio->msgSetSolo(canvas->track(), flag);
+	song->update(SC_SOLO);
+}/*}}}*/
+
+//---------------------------------------------------------
+//   setRaster
+//---------------------------------------------------------
+
+void Performer::setRaster(int val)/*{{{*/
+{
+	_rasterInit = val;
+	AbstractMidiEditor::setRaster(val);
+	canvas->redrawGrid();
+	canvas->setFocus(); // give back focus after kb input
+
+	updateCanvas();
+}/*}}}*/
+
+//---------------------------------------------------------
+//   setQuant
+//---------------------------------------------------------
+
+void Performer::setQuant(int val)
+{
+	_quantInit = val;
+	AbstractMidiEditor::setQuant(val);
+	canvas->setFocus();
+}
+
+//---------------------------------------------------------
+//   writeStatus
+//---------------------------------------------------------
+
+void Performer::writeStatus(int level, Xml& xml) const/*{{{*/
+{
+	writePartList(level, xml);
+	xml.tag(level++, "performer");
+	AbstractMidiEditor::writeStatus(level, xml);
+	splitter->writeStatus(level, xml);
+	hsplitter->writeStatus(level, xml);
+
+	for (QList<CtrlEdit*>::const_iterator i = ctrlEditList.begin();	i != ctrlEditList.end(); ++i)
+	{
+		(*i)->writeStatus(level, xml);
+	}
+
+	xml.intTag(level, "steprec", canvas->steprec());
+	xml.intTag(level, "midiin", canvas->midiin());
+	xml.intTag(level, "tool", int(canvas->tool()));
+	xml.intTag(level, "quantStrength", _quantStrength);
+	xml.intTag(level, "quantLimit", _quantLimit);
+	xml.intTag(level, "quantLen", _quantLen);
+	xml.intTag(level, "playEvents", _playEvents);
+	xml.intTag(level, "xpos", hscroll->pos());
+	xml.intTag(level, "xmag", hscroll->mag());
+	xml.intTag(level, "ypos", vscroll->pos());
+	xml.intTag(level, "ymag", vscroll->mag());
+    xml.tag(--level, "/performer");
+}/*}}}*/
+
+//---------------------------------------------------------
+//   readStatus
+//---------------------------------------------------------
+
+void Performer::readStatus(Xml& xml)/*{{{*/
+{
+	printf("readstatus\n");
+	for (;;)
+	{
+		Xml::Token token = xml.parse();
+		if (token == Xml::Error || token == Xml::End)
+			break;
+		const QString& tag = xml.s1();
+		switch (token)
+		{
+		case Xml::TagStart:
+			if (tag == "steprec")
+			{
+				int val = xml.parseInt();
+				canvas->setSteprec(val);
+				m_stepAction->setChecked(val);
+			}
+			else if (tag == "midiin")
+			{
+				int val = xml.parseInt();
+				canvas->setMidiin(val);
+				midiin->setChecked(val);
+			}
+			else if (tag == "tool")
+			{
+				int tool = xml.parseInt();
+				canvas->setTool(tool);
+				tools22->set(tool);
+			}
+			else if (tag == "midieditor")
+				AbstractMidiEditor::readStatus(xml);
+			else if (tag == "ctrledit")
+			{
+				CtrlEdit* ctrl = addCtrl();
+				ctrl->readStatus(xml);
+			}
+			else if (tag == splitter->objectName())
+				splitter->readStatus(xml);
+			else if (tag == hsplitter->objectName())
+				hsplitter->readStatus(xml);
+			else if (tag == "quantStrength")
+				_quantStrength = xml.parseInt();
+			else if (tag == "quantLimit")
+				_quantLimit = xml.parseInt();
+			else if (tag == "quantLen")
+				_quantLen = xml.parseInt();
+			else if (tag == "playEvents")
+			{
+				_playEvents = xml.parseInt();
+				canvas->playEvents(_playEvents);
+				m_speakerAction->setChecked(_playEvents);
+			}
+			else if (tag == "xmag")
+				hscroll->setMag(xml.parseInt());
+			else if (tag == "xpos")
+				hscroll->setPos(xml.parseInt());
+			else if (tag == "ymag")
+				vscroll->setMag(xml.parseInt());
+			else if (tag == "ypos")
+				vscroll->setPos(xml.parseInt());
+			else
+				xml.unknown("Performer");
+			break;
+			case Xml::TagEnd:
+			if (tag == "pianoroll" || tag == "performer")
+			{
+				_quantInit = _quant;
+				_rasterInit = _raster;
+				midiConductor->setRaster(_raster);
+				midiConductor->setQuant(_quant);
+				canvas->redrawGrid();
+				return;
+			}
+			default:
+			break;
+		}
+	}
+}/*}}}*/
+
+bool Performer::isGlobalEdit()
+{
+	return m_globalKeyAction->isChecked();
+}
+
+bool Performer::eventFilter(QObject *obj, QEvent *event)/*{{{*/
+{
+	// Force left/right arrow key events to move the focus
+	// back on the canvas if it doesn't have the focus.
+	// Currently the object that we're filtering is the
+	// midiConductor.
+	if (event->type() == QEvent::KeyPress) {
+		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+		int key = keyEvent->key();
+		//if (event->state() & Qt::ShiftButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::ShiftModifier)
+			key += Qt::SHIFT;
+		//if (event->state() & Qt::AltButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::AltModifier)
+			key += Qt::ALT;
+		//if (event->state() & Qt::ControlButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::ControlModifier)
+			key += Qt::CTRL;
+		///if (event->state() & Qt::MetaButton)
+		if (((QInputEvent*) event)->modifiers() & Qt::MetaModifier)
+			key += Qt::META;
+
+		if (key == shortcuts[SHRT_NAVIGATE_TO_CANVAS].key)
+		{
+			if (canvas->hasFocus())
+			{
+				midiConductor->getPatchListview()->setFocus();
+			}
+			else if (midiConductor->getPatchListview()->hasFocus())
+			{
+				midiConductor->getView()->setFocus();
+			}
+			else
+			{
+				canvas->setFocus(Qt::MouseFocusReason);
+			}
+			return true;
+		}
+		if (key == shortcuts[SHRT_TOGGLE_STEPRECORD].key)
+		{
+			m_stepAction->toggle();
+			return true;
+		}
+		if (key == shortcuts[SHRT_MIDI_PANIC].key)
+		{
+			song->panic();
+			return true;
+		}
+		if(key == shortcuts[SHRT_SEL_INSTRUMENT].key)
+		{
+			midiConductor->addSelectedPatch();
+			return true;
+		}
+		if(key == shortcuts[SHRT_PREVIEW_INSTRUMENT].key)
+		{
+			midiConductor->previewSelectedPatch();
+			return true;
+		}
+		else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
+		{
+			unsigned utick = song->cpos() + rasterStep(song->cpos());
+			if(m_globalKeyAction->isChecked())
+			{
+				for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+				{
+					Part* part = ip->second;
+					midiConductor->insertMatrixEvent(part, utick);
+				}
+			}
+			else
+			{
+				midiConductor->insertMatrixEvent(curCanvasPart(), utick);
+			}
+			return true;
+		}
+		/*else if (key == shortcuts[SHRT_POS_INC].key)
+		{
+			PerformerCanvas* pc = (PerformerCanvas*) canvas;
+			pc->pianoCmd(CMD_RIGHT);
+			return true;
+		}
+		else if (key == shortcuts[SHRT_POS_DEC].key)
+		{
+			PerformerCanvas* pc = (PerformerCanvas*) canvas;
+			pc->pianoCmd(CMD_LEFT);
+			return true;
+		}
+		else if (key == shortcuts[SHRT_ADD_REST].key)
+		{
+			PerformerCanvas* pc = (PerformerCanvas*) canvas;
+			pc->pianoCmd(CMD_RIGHT);
+			return true;
+		}*/
+	}
+
+	// standard event processing
+	return QObject::eventFilter(obj, event);
+}/*}}}*/
 
 //---------------------------------------------------------
 //   configQuant
@@ -2214,7 +2419,7 @@ void Performer::setSpeaker(bool val)
 }
 
 
-void Performer::setKeyBindings(Patch* p)
+void Performer::setKeyBindings(Patch* p)/*{{{*/
 {
 	//if(!audio->isPlaying())
 	//{
@@ -2223,7 +2428,7 @@ void Performer::setKeyBindings(Patch* p)
 		piano->setMIDIKeyBindings(p->keys, p->keyswitches);
 		canvas->update();
 	//}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setKeyBindings
@@ -2343,127 +2548,6 @@ void Performer::resizeEvent(QResizeEvent* ev)
 }
 
 //---------------------------------------------------------
-//   showEvent
-//   Now that every gui element is created, including
-//   the scroll bars, what about updating the scrollbars
-//   so that the play cursor is in the center of the viewport?
-//---------------------------------------------------------
-
-void Performer::showEvent(QShowEvent *)
-{
-
-	int w = tconfig().get_property("PerformerEdit", "widgetwidth", 924).toInt();
-	int h = tconfig().get_property("PerformerEdit", "widgetheigth", 650).toInt();
-	int dw = qApp->desktop()->width();
-	int dh = qApp->desktop()->height();
-	if(h <= dh && w <= dw)
-	{
-		//printf("Restoring window state\n");
-		resize(w, h);
-	}
-	else
-	{
-		//printf("Desktop size too large for saved state\n");
-		showMaximized();
-	}
-		
-	// maybe add a bool flag to follow: centered ?
-	// couldn't find a function that does that directly.
-	follow(song->cpos());
-	// now that the cursor is in the view, move the view
-	// half the canvas width so the cursor is centered.
-
-	hscroll->setPos(hscroll->pos() - (canvas->width() / 2));
-	int hScale = tconfig().get_property("PerformerEdit", "hscale", 346).toInt();
-	int vScale = tconfig().get_property("PerformerEdit", "yscale", 286).toInt();
-	int yPos = tconfig().get_property("PerformerEdit", "ypos", 0).toInt();
-	hscroll->setMag(hScale);
-	vscroll->setMag(vScale);
-	vscroll->setPos(yPos);
-	QList<int> vl2;
-	QString str2 = tconfig().get_property("splitter", "sizes", "347 218 33").toString();
-	QStringList sl2 = str2.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it2 = sl2.begin(); it2 != sl2.end(); ++it2)
-	{
-		int val = (*it2).toInt();
-		vl2.append(val);
-	}
-	splitter->setSizes(vl2);
-	QList<int> vl;
-	QString str = tconfig().get_property("hsplitter", "sizes", "200").toString();
-	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
-	{
-		int val = (*it).toInt();
-		vl.append(val);
-	}
-	hsplitter->setSizes(vl);
-	
-	QList<int> vl3;/*{{{*/
-	//str = "78 50 78 ";//tconfig().get_property("ctrllane", "sizes", "78 50 78 ").toString();
-	str = tconfig().get_property("ctrllane", "sizes", "78 50 78 ").toString();
-	//printf("Control Lane Sizes: %s\n", str.toUtf8().constData());
-	sl = str.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
-	{
-		int val = (*it).toInt();
-		vl3.append(val);
-	}
-	ctrlLane->setSizes(vl3);/*}}}*/
-	//ctrlLane
-}
-
-//---------------------------------------------------------
-//   initShortcuts
-//---------------------------------------------------------
-
-void Performer::initShortcuts()
-{
-	editCutAction->setShortcut(shortcuts[SHRT_CUT].key);
-	editCopyAction->setShortcut(shortcuts[SHRT_COPY].key);
-	editPasteAction->setShortcut(shortcuts[SHRT_PASTE].key);
-	editDelEventsAction->setShortcut(shortcuts[SHRT_DELETE].key);
-
-	selectAllAction->setShortcut(shortcuts[SHRT_SELECT_ALL].key);
-	selectNoneAction->setShortcut(shortcuts[SHRT_SELECT_NONE].key);
-	selectInvertAction->setShortcut(shortcuts[SHRT_SELECT_INVERT].key);
-	selectInsideLoopAction->setShortcut(shortcuts[SHRT_SELECT_ILOOP].key);
-	selectOutsideLoopAction->setShortcut(shortcuts[SHRT_SELECT_OLOOP].key);
-	selectPrevPartAction->setShortcut(shortcuts[SHRT_SELECT_PREV_PART].key);
-	selectNextPartAction->setShortcut(shortcuts[SHRT_SELECT_NEXT_PART].key);
-
-	eventColor->menuAction()->setShortcut(shortcuts[SHRT_EVENT_COLOR].key);
-	//evColorBlueAction->setShortcut(shortcuts[  ].key);
-	//evColorPitchAction->setShortcut(shortcuts[  ].key);
-	//evColorVelAction->setShortcut(shortcuts[  ].key);
-
-	funcOverQuantAction->setShortcut(shortcuts[SHRT_OVER_QUANTIZE].key);
-	funcNoteOnQuantAction->setShortcut(shortcuts[SHRT_ON_QUANTIZE].key);
-	funcNoteOnOffQuantAction->setShortcut(shortcuts[SHRT_ONOFF_QUANTIZE].key);
-	funcIterQuantAction->setShortcut(shortcuts[SHRT_ITERATIVE_QUANTIZE].key);
-
-	funcConfigQuantAction->setShortcut(shortcuts[SHRT_CONFIG_QUANT].key);
-
-	funcGateTimeAction->setShortcut(shortcuts[SHRT_MODIFY_GATE_TIME].key);
-	funcModVelAction->setShortcut(shortcuts[SHRT_MODIFY_VELOCITY].key);
-	/*
-	funcCrescendoAction->setShortcut(shortcuts[SHRT_CRESCENDO].key);
-	funcTransposeAction->setShortcut(shortcuts[SHRT_TRANSPOSE].key);
-	funcThinOutAction->setShortcut(shortcuts[SHRT_THIN_OUT].key);
-	funcEraseEventAction->setShortcut(shortcuts[SHRT_ERASE_EVENT].key);
-	funcNoteShiftAction->setShortcut(shortcuts[SHRT_NOTE_SHIFT].key);
-	funcMoveClockAction->setShortcut(shortcuts[SHRT_MOVE_CLOCK].key);
-	funcCopyMeasureAction->setShortcut(shortcuts[SHRT_COPY_MEASURE].key);
-	funcEraseMeasureAction->setShortcut(shortcuts[SHRT_ERASE_MEASURE].key);
-	funcDelMeasureAction->setShortcut(shortcuts[SHRT_DELETE_MEASURE].key);
-	funcCreateMeasureAction->setShortcut(shortcuts[SHRT_CREATE_MEASURE].key);
-	*/
-	funcSetFixedLenAction->setShortcut(shortcuts[SHRT_FIXED_LEN].key);
-	funcDelOverlapsAction->setShortcut(shortcuts[SHRT_DELETE_OVERLAPS].key);
-
-}
-
-//---------------------------------------------------------
 //   execDeliveredScript
 //---------------------------------------------------------
 
@@ -2490,20 +2574,6 @@ void Performer::execUserScript(int id)
 
 void Performer::newCanvasWidth(int /*w*/)
 {
-	/*
-		  int nw = w + (vscroll->width() - 18); // 18 is the fixed width of the CtlEdit VScale widget.
-		  if(nw < 1)
-			nw = 1;
-
-		  for (std::list<CtrlEdit*>::iterator i = ctrlEditList.begin();
-			 i != ctrlEditList.end(); ++i) {
-				// Changed by Tim. p3.3.7
-				//(*i)->setCanvasWidth(w);
-				(*i)->setCanvasWidth(nw);
-				}
-
-		  updateHScrollRange();
-	 */
 }
 
 void Performer::splitterMoved(int pos, int)

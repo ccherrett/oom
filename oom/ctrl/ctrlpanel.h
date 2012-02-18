@@ -13,7 +13,7 @@
 class MidiController;
 
 class QMenu;
-class QPushButton;
+class QToolButton;
 class QString;
 
 class AbstractMidiEditor;
@@ -31,8 +31,7 @@ class CtrlPanel : public QWidget
 {
     Q_OBJECT
 
-    ///QMenu* pop;
-    QPushButton* selCtrl;
+    QToolButton* btnCollapse;
     AbstractMidiEditor* editor;
 
     MidiTrack* _track;
@@ -48,12 +47,12 @@ class CtrlPanel : public QWidget
 signals:
     void destroyPanel();
     void controllerChanged(int);
+	void collapsed(bool);
 
 private slots:
     void ctrlChanged(double val);
     void labelDoubleClicked();
     void ctrlRightClicked(const QPoint& p, int id);
-    //void ctrlReleased(int id);
     void feedbackModeChanged(int value);
 
 protected slots:
@@ -61,7 +60,7 @@ protected slots:
 
 public slots:
     void setHeight(int);
-    void ctrlPopup();
+	void toggleCollapsed(bool);
 
 public:
     CtrlPanel(QWidget*, AbstractMidiEditor*, const char* name = 0);

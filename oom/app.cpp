@@ -63,7 +63,6 @@
 #include "transport.h"
 #include "transpose.h"
 #include "widgets/projectcreateimpl.h"
-#include "ctrl/ctrledit.h"
 #include "midiassign.h"
 #include "midimonitor.h"
 #include "confmport.h"
@@ -578,6 +577,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	routingDialog = 0;
 	firstrun = true;
 	m_externalCall = false;
+	performer = 0;
 
 	g_trackColorListLine.insert(Track::AUDIO_INPUT, QColor(189,122,214));
 	g_trackColorListLine.insert(Track::MIDI, QColor(1,230,238));
@@ -2237,6 +2237,11 @@ void OOMidi::quitDoc(bool external)
 
 void OOMidi::closeEvent(QCloseEvent* event)
 {
+	if(performer)
+	{
+		performer->hide();
+		delete performer;
+	}
 	song->setStop(true);
 	//
 	// wait for sequencer
@@ -2317,22 +2322,10 @@ void OOMidi::closeEvent(QCloseEvent* event)
 		printf("OOStudio: Exiting Metronome\n");
 	exitMetronome();
 
-	// p3.3.47
 	// Make sure to clear the menu, which deletes any sub menus.
 	if (routingPopupMenu)
 		routingPopupMenu->clear();
-#if 0
-	if (routingPopupView)
-	{
-		routingPopupView->clear();
-		delete routingPopupView;
-	}
-#endif
 
-	// Changed by Tim. p3.3.14
-	//SynthIList* sl = song->syntis();
-	//for (iSynthI i = sl->begin(); i != sl->end(); ++i)
-	//      delete *i;
 	song->cleanupForQuit();
 
 	if (debugMsg)
@@ -2854,21 +2847,41 @@ void OOMidi::startPerformer()
 	startPerformer(pl, true);
 }
 
+void OOMidi::performerClosed()
+{
+	if(performer)
+		delete performer;
+	performer = 0;
+}
+
 void OOMidi::startPerformer(PartList* pl, bool /*showDefaultCtrls*/)
 {
-	Performer* performer = new Performer(pl, this, 0, composer->cursorValue());
-	performer->setWindowRole("performer");
-	performer->show();
+	if(!performer)
+	{
+		performer = new Performer(pl, this, 0, composer->cursorValue());
+		performer->setWindowRole("performer");
+    	// Be able to open the List Editor from the Piano Roll
+    	// with the application global shortcut to open the L.E.
+    	performer->addAction(startListEditAction);
+    	// same for save shortcut
+    	performer->addAction(fileSaveAction);
 
-    // Be able to open the List Editor from the Piano Roll
-    // with the application global shortcut to open the L.E.
-    performer->addAction(startListEditAction);
-    // same for save shortcut
-    performer->addAction(fileSaveAction);
+		performer->show();
 
-	toplevels.push_back(Toplevel(Toplevel::PIANO_ROLL, (unsigned long) (performer), performer));
-	connect(performer, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
-	connect(oom, SIGNAL(configChanged()), performer, SLOT(configChanged()));
+		connect(performer, SIGNAL(deleted()), SLOT(performerClosed()));
+		connect(oom, SIGNAL(configChanged()), performer, SLOT(configChanged()));
+	}
+	else
+	{
+		//Add part list to performer, Should the list already there be cleared?
+		if(performer->isMinimized())
+			performer->showNormal();
+		performer->addParts(pl);
+		performer->setCurCanvasPart(pl->begin()->second);
+		performer->activateWindow();
+		performer->raise();
+	}
+
 }
 
 //---------------------------------------------------------
@@ -2927,27 +2940,11 @@ void OOMidi::startLMasterEditor()
 void OOMidi::startDrumEditor()
 {
 	return;
-	/*PartList* pl = getMidiPartsToEdit();
-	if (pl == 0)
-		return;
-	startDrumEditor(pl, true);*/
 }
 
 void OOMidi::startDrumEditor(PartList*, bool)
 {
 	return;
-	/*DrumEdit* drumEditor = new DrumEdit(pl, this, 0, composer->cursorValue());
-	drumEditor->show();
-	if (showDefaultCtrls) // p4.0.12
-	{
-		CtrlEdit* mainVol = drumEditor->addCtrl();
-		if (!mainVol->setType(QString("MainVolume")))
-			drumEditor->removeCtrl(mainVol);
-		drumEditor->addCtrl();
-	}
-	toplevels.push_back(Toplevel(Toplevel::DRUM, (unsigned long) (drumEditor), drumEditor));
-	connect(drumEditor, SIGNAL(deleted(unsigned long)), SLOT(toplevelDeleted(unsigned long)));
-	connect(oom, SIGNAL(configChanged()), drumEditor, SLOT(configChanged()));*/
 }
 
 //---------------------------------------------------------
@@ -4512,18 +4509,18 @@ void OOMidi::updateConfiguration()
 
 	helpManualAction->setShortcut(shortcuts[SHRT_OPEN_HELP].key);
 
-	/*
-	loopAction->setShortcut(shortcuts[].key);
-	punchinAction->setShortcut(shortcuts[].key);
-	punchoutAction->setShortcut(shortcuts[].key);
-	startAction->setShortcut(shortcuts[].key);
-	rewindAction->setShortcut(shortcuts[].key);
-	forwardAction->setShortcut(shortcuts[].key);
-	stopAction->setShortcut(shortcuts[].key);
-	playAction->setShortcut(shortcuts[].key);
-	recordAction->setShortcut(shortcuts[].key);
-	panicAction->setShortcut(shortcuts[].key);
-	 */
+	
+	loopAction->setShortcut(shortcuts[SHRT_TOGGLE_LOOP].key);
+	//punchinAction->setShortcut(shortcuts[].key);
+	//punchoutAction->setShortcut(shortcuts[].key);
+	startAction->setShortcut(shortcuts[SHRT_GOTO_START].key);
+	//rewindAction->setShortcut(shortcuts[].key);
+	//forwardAction->setShortcut(shortcuts[].key);
+	stopAction->setShortcut(shortcuts[SHRT_STOP].key);
+	playAction->setShortcut(shortcuts[SHRT_PLAY_SONG].key);
+	//recordAction->setShortcut(shortcuts[].key);
+	panicAction->setShortcut(shortcuts[SHRT_MIDI_PANIC].key);
+	
 }
 
 //---------------------------------------------------------

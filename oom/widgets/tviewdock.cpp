@@ -403,6 +403,7 @@ void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 						song->insertTrackView(tv, -1);
 						song->updateTrackViews();
 						populateTable(-1);
+						m_tabWidget->setCurrentIndex(0);
 					}
 					break;
 					case 1:
@@ -464,6 +465,7 @@ void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 						tv->setSelected(true);
 						song->insertTrackView(tv, -1);
 						populateTable(-1);
+						m_tabWidget->setCurrentIndex(0);
 					}
 					break;
 				}

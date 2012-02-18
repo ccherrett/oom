@@ -44,7 +44,7 @@ protected:
     MTScale* time;
     EventCanvas* canvas;
 
-    std::list<CtrlEdit*> ctrlEditList;
+    QList<CtrlEdit*> ctrlEditList;
     int _quant, _raster;
     QGridLayout* mainGrid;
     QWidget* mainw;

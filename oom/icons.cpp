@@ -575,6 +575,8 @@ QPixmap* down_arrow_OffIcon;
 QPixmap* down_arrow_OverIcon;
 QIcon* down_arrowIconSet3;
 
+QIcon* collapseIconSet3;
+
 QPixmap* plus_OnIcon;
 QPixmap* plus_OffIcon;
 QPixmap* plus_OverIcon;
@@ -1399,6 +1401,12 @@ void initIcons()
       down_arrowIconSet3->addPixmap(*down_arrow_OnIcon, QIcon::Normal, QIcon::On);
       down_arrowIconSet3->addPixmap(*down_arrow_OffIcon, QIcon::Normal, QIcon::Off);
       down_arrowIconSet3->addPixmap(*down_arrow_OverIcon, QIcon::Active);
+	  
+	  collapseIconSet3         = new QIcon();
+      collapseIconSet3->addPixmap(*up_arrow_OnIcon, QIcon::Normal, QIcon::On);
+      collapseIconSet3->addPixmap(*down_arrow_OffIcon, QIcon::Normal, QIcon::Off);
+      collapseIconSet3->addPixmap(*up_arrow_OverIcon, QIcon::Active, QIcon::On);
+      collapseIconSet3->addPixmap(*down_arrow_OverIcon, QIcon::Active, QIcon::Off);
 	  
       plus_OnIcon= new MPIXMAP(":/images/plus_new_on.png", NULL);
       plus_OffIcon= new MPIXMAP(":/images/plus_new_off.png", NULL);

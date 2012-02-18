@@ -145,7 +145,8 @@ QFrame#propertiesFrame, QFrame#frame2, QSplitter#splitter5, QSplitter#splitter6,
 	border-radius: 0px;
 }
 QLabel#lblType, QLabel#lblTrack, QLabel#lblProp, QLabel#lblComments, QLabel#lblName, QLabel#lblGroup,
-GlobalSettingsConfig QLabel, CreateTrackDialog QLabel, EditInstrument QLabel, LSCPImport QLabel
+GlobalSettingsConfig QLabel, CreateTrackDialog QLabel, EditInstrument QLabel, LSCPImport QLabel,
+TrackViewEditor QLabel
 {
 	background-color:none;
 	border:none;

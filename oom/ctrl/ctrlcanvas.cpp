@@ -120,6 +120,7 @@ CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 	pos[1] = 0;
 	pos[2] = 0;
 	noEvents = false;
+	m_collapsed = false;
 
 	ctrl = &veloList;
 	_controller = &veloCtrl;
@@ -231,6 +232,12 @@ void CtrlCanvas::setPos(int idx, unsigned val, bool adjustScrollbar)
         // Redrawing the whole view fixes that for now, but it could be a cpu hog ?
 //	redraw(QRect(x, 0, w, height()));
         update();
+}
+
+void CtrlCanvas::toggleCollapsed(bool val)
+{
+	m_collapsed = val;
+	update();
 }
 
 //---------------------------------------------------------
@@ -449,15 +456,6 @@ void CtrlCanvas::partControllers(const MidiPart* part, int num, int* dnum, int* 
 				}
 			}
 			*mcvl = tmcvl;
-
-			// Removed by T356.
-			// MidiCtrlValList not found is now an acceptable state (for multiple part editing).
-			//if (i == cvll->end()) {
-			//      printf("CtrlCanvas::setController(0x%x): not found\n", num);
-			//      for (i = cvll->begin(); i != cvll->end(); ++i)
-			//            printf("  0x%x\n", i->second->num());
-			//      return;
-			//      }
 		}
 	}
 }
@@ -525,7 +523,6 @@ void CtrlCanvas::updateItems()
 					last = e;
 				}
 			}
-			//qApp->processEvents();
 		}
 	}
 
@@ -539,6 +536,8 @@ void CtrlCanvas::updateItems()
 
 void CtrlCanvas::viewMousePressEvent(QMouseEvent* event)
 {
+	if(m_collapsed)
+		return; //No mouse action in collapsed mode
 	start = event->pos();
 	Tool activeTool = tool;
 	//bool shift = event->modifiers() & Qt::ShiftModifier;
@@ -778,23 +777,6 @@ void CtrlCanvas::changeValRamp(int x1, int y1, int x2, int y2)
 						changed = true;
 					}
 				}
-				else
-				{
-					//if(!ctrl)
-					//{
-					//  ctrl =
-					//}
-
-					// Removed by T356. Never gets here? A good thing, don't wan't auto-create values.
-					//int oval = ctrl->value(0);
-					//if (oval != nval) {
-					// Changed by T356.
-					//ctrl->add(0, nval);
-					//      ctrl->add(0, nval, part);
-					//      changed = true;
-					//      }
-
-				}
 			}
 		}
 	}
@@ -809,6 +791,8 @@ void CtrlCanvas::changeValRamp(int x1, int y1, int x2, int y2)
 
 void CtrlCanvas::viewMouseMoveEvent(QMouseEvent* event)
 {
+	if(m_collapsed)
+		return; //No mouse action in collapsed mode
 	QPoint pos = event->pos();
 	QPoint dist = pos - start;
 	bool moving = dist.y() >= 3 || dist.y() <= 3 || dist.x() >= 3 || dist.x() <= 3;
@@ -860,6 +844,8 @@ void CtrlCanvas::viewMouseMoveEvent(QMouseEvent* event)
 
 void CtrlCanvas::viewMouseReleaseEvent(QMouseEvent* event)
 {
+	if(m_collapsed)
+		return; //No mouse action in collapsed mode
 	bool shift = event->modifiers() & Qt::ShiftModifier;
 
 	switch (drag)
@@ -1181,7 +1167,6 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 		{
 			CEvent* e = *i;
 			// Draw selected part velocity events on top of unselected part events.
-			//if((fg && e->part() != part) || (!fg && e->part() == part))
 			if (e->part() != part || e->event().empty())
 				continue;
 			int tick = mapx(e->event().tick() + e->part()->tick());
@@ -1190,7 +1175,6 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			if (tick > x + w)
 				break;
 			int y1 = wh - (e->val() * wh / 128);
-			// fg means 'draw selected parts'.
 			QColor fillColor = QColor(config.partColors[part->colorIndex()]);
 			QColor bgfillColor = QColor(config.partColors[part->colorIndex()]);
 			int bgalpha = 180;
@@ -1241,7 +1225,6 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			else
 			{
 				p.drawRect(tick+1, y1-3, 5, wh);
-				//p.drawLine(tick + 4, wh, tick + 4, y1);
 			}
 		}
 	}/*}}}*/
@@ -1283,18 +1266,13 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 		red.setAlpha(140);
 		QLinearGradient vuGrad(QPointF(0, 0), QPointF(0, height()));
 		vuGrad.setColorAt(1, green);
-		//vuGrad.setColorAt(0.45, yellow);
-		//vuGrad.setColorAt(0.3, yellow);
 		vuGrad.setColorAt(0, red);
 		QPen myPen = QPen();
-		//myPen.setCapStyle(Qt::RoundCap);
-		//myPen.setStyle(Qt::DashLine);
 		myPen.setBrush(QBrush(vuGrad));
 		for (iCEvent i = items.begin(); i != items.end(); ++i)
 		{
 			CEvent* e = *i;
 			// Draw unselected part controller events (lines) on top of selected part events (bars).
-			//if((fg && (e->part() == part)) || (!fg && (e->part() != part)))
 			if (e->part() != part)
 			{
 				continue;
@@ -1326,7 +1304,6 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 			}
 			if (tick > x + w)
 				break;
-			//int velo2 = e->val();
 
 			if (lval != CTRL_VAL_UNKNOWN)
 			{
@@ -1335,7 +1312,6 @@ void CtrlCanvas::pdrawItems(QPainter& p, const QRect& rect, const MidiPart* part
 				{
 					p.setPen(myPen);
 					p.fillRect(x1, lval, tick - x1, wh - lval, QBrush(vuGrad)); //, config.ctrlGraphFg);
-					//tickColor.setAlpha(127);
 					p.setPen(tickColor);
 					p.drawLine(x1, lval, tick, lval);
 				}
@@ -1421,23 +1397,25 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)
 	//---------------------------------------------------
 	// draw Canvas Items
 	//---------------------------------------------------
-
-	bool velo = (midiControllerType(_controller->num()) == MidiController::Velo);
-	if (!velo)
+	
+	if(!m_collapsed)
 	{
-		pdrawItems(p, rect, curPart, false, false);
-	}
-	for (iPart ip = editor->parts()->begin(); ip != editor->parts()->end(); ++ip)
-	{
-		MidiPart* part = (MidiPart*) (ip->second);
-		//if((velo && part == curPart) || (!velo && part != curPart))
-		if (part == curPart)
-			continue;
-		pdrawItems(p, rect, part, velo, !velo);
-	}
-	if (velo)
-	{
-		pdrawItems(p, rect, curPart, true, true);
+		bool velo = (midiControllerType(_controller->num()) == MidiController::Velo);
+		if (!velo)
+		{
+			pdrawItems(p, rect, curPart, false, false);
+		}
+		for (iPart ip = editor->parts()->begin(); ip != editor->parts()->end(); ++ip)
+		{
+			MidiPart* part = (MidiPart*) (ip->second);
+			if (part == curPart)
+				continue;
+			pdrawItems(p, rect, part, velo, !velo);
+		}
+		if (velo)
+		{
+			pdrawItems(p, rect, curPart, true, true);
+		}
 	}
 
 	//---------------------------------------------------
@@ -1447,23 +1425,19 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)
 	int xp = mapx(pos[0]);
 	if (xp >= x && xp < x + w)
 	{
-		//p.setPen(Qt::red);
 		p.setPen(QColor(0, 186, 255));
-		//p.setPen(QColor(139,225,69));
 		p.drawLine(xp, y, xp, y + h);
 	}
 	xp = mapx(pos[1]);
 	if ((song->loop() || song->punchin()) && xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
-		//p.setPen(Qt::blue);
 		p.drawLine(xp, y, xp, y + h);
 	}
 	xp = mapx(pos[2]);
 	if ((song->loop() || song->punchout()) && xp >= x && xp < x + w)
 	{
 		p.setPen(QColor(139, 225, 69));
-		//p.setPen(Qt::blue);
 		p.drawLine(xp, y, xp, y + h);
 	}
 
@@ -1471,20 +1445,15 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)
 	//    draw lasso
 	//---------------------------------------------------
 
-	if (drag == DRAG_LASSO)
+	if (!m_collapsed && drag == DRAG_LASSO)
 	{
 		QColor outlineColor = QColor(config.partColors[curPart->colorIndex()]);
 		QColor fillColor = QColor(config.partWaveColors[curPart->colorIndex()]);
-		//QColor outlineColor = QColor(55,80,45);
-		//QColor fillColor = QColor(148, 177, 106,127);
 		fillColor.setAlpha(127);
-		//QColor outlineColor = QColor(55,80,45);
 		setPainter(p);
 		QPen mypen2 = QPen(outlineColor, 2, Qt::SolidLine);
 		mypen2.setCosmetic(true);
 		p.setPen(mypen2);
-		//p.setPen(Qt::blue);
-		//p.setBrush(Qt::NoBrush);
 		p.setBrush(QBrush(fillColor));
 		p.drawRect(lasso);
 	}
@@ -1508,14 +1477,10 @@ void CtrlCanvas::drawOverlay(QPainter& p, const QRect&)
 	QFontMetrics fm(config.fonts[3]);
 	int y = fm.lineSpacing() + 2;
 	p.drawText(2, y, s);
-	if (noEvents)
+	if (noEvents && !m_collapsed)
 	{
 		p.setFont(config.fonts[3]);
-		//p.setPen(Qt::black);
-		//p.setPen(Qt::black);
         p.drawText(width() / 2 - 100, height() / 2 - 10, "Use pencil or line tool to draw new events");
-        //p.drawText(width() / 2 - 100, height() / 2 - 10, "Use shift + pencil or line tool to draw new events");
-		//p.drawText(2 , y * 2, "Use shift + pencil or line tool to draw new events");
 	}
 }
 
@@ -1561,20 +1526,4 @@ void CtrlCanvas::draw(QPainter& p, const QRect& rect)
 void CtrlCanvas::setCurDrumInstrument(int di)
 {
 	curDrumInstrument = di;
-	//printf("CtrlCanvas::setCurDrumInstrument curDrumInstrument:%d\n", curDrumInstrument);
-
-	//
-	//  check if current controller is only valid for
-	//  a specific drum instrument
-	//
-	// Removed by T356.
-	//if(curTrack && (curTrack->type() == Track::DRUM) && ((_controller->num() & 0xff) == 0xff)) {
-	//if(curTrack && (curTrack->type() == Track::DRUM) && ((_cnum & 0xff) == 0xff)) {
-	// reset to default
-	// TODO: check, if new drum instrument has a similar controller
-	//    configured
-	//      _cnum = CTRL_VELOCITY;
-	//      }
-	// Removed by T356
-	//songChanged(-1);
 }

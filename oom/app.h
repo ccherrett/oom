@@ -76,6 +76,7 @@ class MidiAssignDialog;
 class MidiPlayEvent;
 class MixerDock;
 class VirtualTrack;
+class Performer;
 
 #define MENU_ADD_SYNTH_ID_BASE 0x1000
 #define OOCMD_PORT 8415
@@ -170,6 +171,7 @@ class OOMidi : public QMainWindow
     Transport* transport;
     BigTime* bigtime;
     EditInstrument* editInstrument;
+	Performer* performer;
 
     QToolBar* toolbarComposerSettings;
     QToolBar* toolbarSnap;
@@ -375,6 +377,8 @@ private slots:
 
     void execDeliveredScript(int);
     void execUserScript(int);
+
+	void performerClosed();
 
 
 public slots:

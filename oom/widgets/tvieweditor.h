@@ -43,7 +43,6 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	QItemSelectionModel *m_allselmodel;
 	QSortFilterProxyModel* m_filterModel;
 
-	QStringList _trackTypes;
 	QPushButton* btnOk;
 	QPushButton* btnCancel;
 	QPushButton* btnApply;
@@ -51,6 +50,8 @@ class TrackViewEditor : public QDialog, public Ui::TrackViewEditorBase
 	QHash<qint64, VirtualTrack*> m_vtrackList;
 
 	void buildViewList();
+	void populateTypes();
+	void setType(int);
     QList<int> getSelectedRows();
 
 private slots:
@@ -75,11 +76,11 @@ private slots:
 	void settingsChanged(QStandardItem*);
 	void populateTrackList();
 
+public slots:
+	void setMode(int moded); //0 == song local mode (old trackview mode), 1 == global template mode
+
 public:
 	TrackViewEditor(QWidget*, bool temp = false);
-	void setTypes(QStringList);
-	QStringList trackTypes(){return _trackTypes;}
-
 };
 
 #endif

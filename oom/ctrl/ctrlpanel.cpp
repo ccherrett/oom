@@ -12,7 +12,7 @@
 #include "ctrlcanvas.h"
 
 #include <QMenu>
-#include <QPushButton>
+#include <QToolButton>
 #include <QSizePolicy>
 #include <QHBoxLayout>
 #include <QTimer>
@@ -67,31 +67,26 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	kbox->setContentsMargins(0, 0, 0, 0);
 	dbox->setContentsMargins(0, 0, 0, 0);
 
-	selCtrl = new QPushButton(tr(""));
-	//selCtrl->setFont(config.fonts[3]);
-	//selCtrl->setFixedHeight(20);
-	selCtrl->setFont(QFont("fixed-width", 8, QFont::Bold));
-	selCtrl->setFixedHeight(20);
-	selCtrl->setSizePolicy(
-			QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-	selCtrl->setToolTip(tr("Select Controller Type"));
-	selCtrl->setIcon(*plus_OffIcon);
-	selCtrl->setIconSize(QSize(22,22));
-
-	///pop = new QMenu;
+	btnCollapse = new QToolButton();
+	btnCollapse->setCheckable(true);
+	btnCollapse->setFixedHeight(20);
+	btnCollapse->setAutoRaise(true);
+	btnCollapse->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	btnCollapse->setToolTip(tr("Toggle Collapsed"));
+	btnCollapse->setIcon(QIcon(*collapseIconSet3));
+	btnCollapse->setIconSize(QSize(22,22));
+	connect(btnCollapse, SIGNAL(toggled(bool)), SLOT(toggleCollapsed(bool)));
 
 	// destroy button
-	QPushButton* destroy = new QPushButton(tr(""));
-	destroy->setFont(QFont("fixed-width", 8, QFont::Bold));
-	destroy->setFixedHeight(20);
-	destroy->setSizePolicy(
-			QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-	destroy->setToolTip(tr("Remove Controller Lane"));
-	destroy->setIcon(*garbage_OffIcon);
-	destroy->setIconSize(QSize(22,22));
+	QToolButton* btnClose = new QToolButton();
+	btnClose->setAutoRaise(true);
+	btnClose->setFixedHeight(20);
+	btnClose->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	btnClose->setToolTip(tr("Remove Controller Lane"));
+	btnClose->setIcon(QIcon(*garbageIconSet3));
+	btnClose->setIconSize(QSize(22,22));
 	// Cursor Position
-	connect(selCtrl, SIGNAL(clicked()), SLOT(ctrlPopup()));
-	connect(destroy, SIGNAL(clicked()), SIGNAL(destroyPanel()));
+	connect(btnClose, SIGNAL(clicked()), SIGNAL(destroyPanel()));
 
 	_track = 0;
 	_ctrl = 0;
@@ -137,8 +132,8 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
     connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 
 	bbox->addStretch();
-	bbox->addWidget(selCtrl);
-	bbox->addWidget(destroy);
+	bbox->addWidget(btnCollapse);
+	bbox->addWidget(btnClose);
 	bbox->addStretch();
 	kbox->addStretch();
 	kbox->addWidget(_knob);
@@ -158,7 +153,7 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 //   heartBeat
 //---------------------------------------------------------
 
-void CtrlPanel::heartBeat()
+void CtrlPanel::heartBeat()/*{{{*/
 {
 	inHeartBeat = true;
 
@@ -234,13 +229,27 @@ void CtrlPanel::heartBeat()
 	}
 
 	inHeartBeat = false;
+}/*}}}*/
+
+void CtrlPanel::toggleCollapsed(bool val)
+{
+	btnCollapse->blockSignals(true);
+	btnCollapse->setChecked(val);
+	btnCollapse->blockSignals(false);
+	if (_dnum != CTRL_VELOCITY)
+	{
+		_knob->setVisible(!val);
+		_dl->setVisible(!val);
+	}
+	_cmbMode->setVisible(!val);
+	emit collapsed(val);
 }
 
 //---------------------------------------------------------
 //   labelDoubleClicked
 //---------------------------------------------------------
 
-void CtrlPanel::labelDoubleClicked()
+void CtrlPanel::labelDoubleClicked()/*{{{*/
 {
 	if (!_track || !_ctrl || _dnum == -1)
 		return;
@@ -336,13 +345,13 @@ void CtrlPanel::labelDoubleClicked()
 		}
 	}
 	song->update(SC_MIDI_CONTROLLER);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   ctrlChanged
 //---------------------------------------------------------
 
-void CtrlPanel::ctrlChanged(double val)
+void CtrlPanel::ctrlChanged(double val)/*{{{*/
 {
 	if (inHeartBeat)
 		return;
@@ -399,13 +408,13 @@ void CtrlPanel::ctrlChanged(double val)
 		midiMonitor->msgSendMidiOutputEvent((Track*)_track, _dnum, ival);
 	}
 	song->update(SC_MIDI_CONTROLLER);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setHWController
 //---------------------------------------------------------
 
-void CtrlPanel::setHWController(MidiTrack* t, MidiController* ctrl)
+void CtrlPanel::setHWController(MidiTrack* t, MidiController* ctrl)/*{{{*/
 {
 	inHeartBeat = true;
 
@@ -532,7 +541,7 @@ void CtrlPanel::setHWController(MidiTrack* t, MidiController* ctrl)
 	}
 
 	inHeartBeat = false;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setHeight
@@ -543,190 +552,12 @@ void CtrlPanel::setHeight(int h)
 	setFixedHeight(h);
 }
 
-struct CI
-{
-	QString s;
-	bool used;
-
-	CI(const QString& ss, bool u) : s(ss), used(u)
-	{
-	}
-};
-
-//---------------------------------------------------------
-//   ctrlPopup
-//---------------------------------------------------------
-
-void CtrlPanel::ctrlPopup()
-{
-	//---------------------------------------------------
-	// build list of midi controllers for current
-	// MidiPort/channel
-	//---------------------------------------------------
-
-	PartList* parts = editor->parts();
-	Part* part = editor->curCanvasPart();
-	MidiTrack* track = (MidiTrack*) (part->track());
-	int channel = track->outChannel();
-	MidiPort* port = &midiPorts[track->outPort()];
-	int curDrumInstrument = editor->curDrumInstrument();
-	bool isDrum = track->type() == Track::DRUM;
-
-	QMenu* pop = new QMenu;
-	//pop->clear();
-	pop->addAction(tr("Velocity"))->setData(1);
-
-	MidiCtrlValListList* cll = port->controller();
-	int min = channel << 24;
-	int max = min + 0x1000000;
-
-	std::list<CI> sList;
-	typedef std::list<CI>::iterator isList;
-
-	for (iMidiCtrlValList i = cll->lower_bound(min); i != cll->lower_bound(max); ++i)
-	{
-		MidiCtrlValList* cl = i->second;
-		MidiController* c = port->midiController(cl->num());
-		// dont show drum specific controller if not a drum track
-		if ((c->num() & 0xff) == 0xff)
-		{
-			if (!isDrum)
-				continue;
-			// only show controller for curDrumInstrument:
-			if ((cl->num() & 0xff) != drumMap[curDrumInstrument].anote)
-			{
-				continue;
-			}
-		}
-		isList i = sList.begin();
-		for (; i != sList.end(); ++i)
-		{
-			if (i->s == c->name())
-				break;
-		}
-		if (i == sList.end())
-		{
-			bool used = false;
-			for (iPart ip = parts->begin(); ip != parts->end(); ++ip)
-			{
-				EventList* el = ip->second->events();
-				for (iEvent ie = el->begin(); ie != el->end(); ++ie)
-				{
-					Event e = ie->second;
-					if ((e.type() == Controller) && (e.dataA() == cl->num()))
-					{
-						used = true;
-						break;
-					}
-				}
-				if (used)
-					break;
-			}
-			sList.push_back(CI(c->name(), used));
-		}
-	}
-	for (isList i = sList.begin(); i != sList.end(); ++i)
-	{
-		if (i->used && i->s != "Program")
-			pop->addAction(QIcon(*greendotIcon), i->s);
-		else if (!i->used && i->s != "Program")
-			pop->addAction(i->s);
-	}
-
-	pop->addAction(QIcon(*plusIconSet3), tr("add new ..."))->setData(2);
-	QAction *act = pop->exec(selCtrl->mapToGlobal(QPoint(0, 0)));
-	selCtrl->setDown(false);
-
-	if (!act)
-	{
-		delete pop;
-		return;
-	}
-
-	int rv = act->data().toInt();
-	QString s = act->text();
-	delete pop;
-
-	if (rv == 1)
-	{ // special case velocity
-		emit controllerChanged(CTRL_VELOCITY);
-	}
-	else if (rv == 2)
-	{
-		//
-		// add new controller
-		//
-		QMenu* pop1 = new QMenu(this);
-		//pop1->setCheckable(false); // Qt4 doc says not needed.
-		//
-		// populate popup with all controllers available for
-		// current instrument
-		//
-		MidiInstrument* instr = port->instrument();
-		MidiControllerList* mcl = instr->controller();
-		for (iMidiController ci = mcl->begin(); ci != mcl->end(); ++ci)
-		{
-			int num = ci->second->num();
-			if (isDrum && ((num & 0xff) == 0xff))
-				num = (num & ~0xff) + drumMap[curDrumInstrument].anote;
-
-			if (cll->find(channel, num) == cll->end())
-				pop1->addAction(ci->second->name());
-		}
-		QAction *act2 = pop1->exec(selCtrl->mapToGlobal(QPoint(0, 0)));
-		if (act2)
-		{
-			QString s = act2->text();
-			MidiController* c;
-			for (iMidiController ci = mcl->begin(); ci != mcl->end(); ++ci)
-			{
-				c = ci->second;
-				if (c->name() == s)
-				{
-					int num = c->num();
-					if (isDrum && ((num & 0xff) == 0xff))
-						num = (num & ~0xff) + drumMap[curDrumInstrument].anote;
-
-					if (cll->find(channel, num) == cll->end())
-					{
-						MidiCtrlValList* vl = new MidiCtrlValList(num);
-
-						cll->add(channel, vl);
-						emit controllerChanged(c->num());
-						//song->update(SC_MIDI_CONTROLLER_ADD);
-					}
-					else
-						emit controllerChanged(c->num());
-					break;
-				}
-			}
-		}
-		delete pop1;
-	}
-	else
-	{
-		///QString s = act->text();
-		iMidiCtrlValList i = cll->begin();
-		for (; i != cll->end(); ++i)
-		{
-			MidiCtrlValList* cl = i->second;
-			MidiController* c = port->midiController(cl->num());
-			if (c->name() == s)
-			{
-				emit controllerChanged(c->num());
-				break;
-			}
-		}
-		if (i == cll->end())
-		{
-			printf("CtrlPanel: controller %s not found!\n", s.toLatin1().constData());
-		}
-	}
-}
-
 bool CtrlPanel::ctrlSetTypeByName(QString s)/*{{{*/
 {
 	bool rv = false;
+	if(s.isEmpty())
+		return rv;
+
 	if (s == "Velocity")
 	{
 		rv = true;
@@ -787,18 +618,6 @@ void CtrlPanel::ctrlRightClicked(const QPoint& p, int /*id*/)
 	MidiPart* part = dynamic_cast<MidiPart*> (editor->curCanvasPart());
 	song->execMidiAutomationCtlPopup(0, part, p, ctlnum);
 }
-
-/*
-//---------------------------------------------------------
-//   ctrlReleased
-//---------------------------------------------------------
-
-void CtrlPanel::ctrlReleased(int id)
-{
-  //if(_knob->selectedFaceColor())
-  //  _knob->selectFaceColor(false);
-}
- */
 
 //---------------------------------------------------------
 //   feedbackModeChanged

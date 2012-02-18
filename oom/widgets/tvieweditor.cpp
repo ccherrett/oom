@@ -43,11 +43,14 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, bool templateMode) : QDialog(p
 {
 	setupUi(this);
 	_selected = 0;
-//MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_BUSS,AUDIO_AUX
-	_trackTypes = (QStringList() << "All Types" << "Outputs" << "Inputs" << "Auxs" << "Busses" << "Midi Tracks" << "Audio Tracks"); //new QStringList();
 	_editing = false;
 	_addmode = false;
 	m_templateMode = templateMode;
+
+	cmbMode->addItem(tr("Song"));
+	cmbMode->addItem(tr("Global"));
+	cmbMode->setCurrentIndex((int)m_templateMode);
+
 	InstrumentDelegate* pdelegate = new InstrumentDelegate(this);
 	TableSpinnerDelegate* tdelegate = new TableSpinnerDelegate(this);
 	m_model = new QStandardItemModel(0, 3, this);
@@ -58,9 +61,9 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, bool templateMode) : QDialog(p
 	m_allmodel = new QStandardItemModel(this);
 	m_allselmodel = new QItemSelectionModel(m_allmodel);
 	updateTableHeader();
-	//Populate trackTypes and pass it to cmbTypes 
-	cmbType->addItems(_trackTypes);
+	
 	buildViewList();
+	populateTypes();
 	m_filterModel = new QSortFilterProxyModel(this);
 	m_filterModel->setSourceModel(m_allmodel);
 	m_filterModel->setFilterRole(TrackTypeRole);
@@ -75,7 +78,7 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, bool templateMode) : QDialog(p
 
 	btnUp->setIcon(*up_arrowIconSet3);
 	btnDown->setIcon(*down_arrowIconSet3);
-	btnRemove->setIcon(*garbageIconSet3);
+	btnRemove->setIcon(*previousIconSet3);
 	btnAdd->setIcon(*nextIconSet3);
 	btnAddVirtual->setIcon(*plusIconSet3);
 
@@ -88,6 +91,8 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, bool templateMode) : QDialog(p
 	txtName->setReadOnly(true);
 	connect(btnRemove, SIGNAL(clicked()), SLOT(btnRemoveTrack()));
 	connect(btnNew, SIGNAL(clicked(bool)), SLOT(btnNewClicked(bool)));
+
+	connect(cmbMode, SIGNAL(currentIndexChanged(int)), SLOT(setMode(int)));
 
 	connect(cmbViews, SIGNAL(currentIndexChanged(int)), SLOT(cmbViewSelected(int)));
 	
@@ -119,6 +124,9 @@ TrackViewEditor::TrackViewEditor(QWidget* parent, bool templateMode) : QDialog(p
 
 void TrackViewEditor::buildViewList()
 {
+	while(cmbViews->count())
+		cmbViews->removeItem(0);
+
 	TrackViewList *tvl = 0;
 	if(m_templateMode)
 	{
@@ -141,30 +149,55 @@ void TrackViewEditor::buildViewList()
 	}
 }
 
+void TrackViewEditor::populateTypes()
+{
+	while(cmbType->count())
+		cmbType->removeItem(0);
+	
+//MIDI=0, DRUM, WAVE, AUDIO_OUTPUT, AUDIO_INPUT, AUDIO_BUSS,AUDIO_AUX
+	//Populate trackTypes and pass it to cmbTypes 
+	cmbType->addItem(tr("All Types"), -1);
+	cmbType->addItem(tr("Midi Tracks"), Track::MIDI);
+	cmbType->addItem(tr("Audio Tracks"), Track::WAVE);
+	cmbType->addItem(tr("Inputs"), Track::AUDIO_INPUT);
+	cmbType->addItem(tr("Outputs"), Track::AUDIO_OUTPUT);
+	cmbType->addItem(tr("Busses"), Track::AUDIO_BUSS);
+	cmbType->addItem(tr("Auxs"), Track::AUDIO_AUX);
+}
+
+void TrackViewEditor::setType(int val)
+{//Translate tracktype to combo index
+	Track::TrackType type = (Track::TrackType)val;
+	switch(type)
+	{
+		case Track::MIDI:
+			cmbType->setCurrentIndex(1);
+		break;
+		case Track::WAVE:
+			cmbType->setCurrentIndex(2);
+		break;
+		case Track::AUDIO_INPUT:
+			cmbType->setCurrentIndex(3);
+		break;
+		case Track::AUDIO_OUTPUT:
+			cmbType->setCurrentIndex(4);
+		break;
+		case Track::AUDIO_BUSS:
+			cmbType->setCurrentIndex(5);
+		break;
+		case Track::AUDIO_AUX:
+			cmbType->setCurrentIndex(6);
+		break;
+		default:
+			cmbType->setCurrentIndex(0);
+		break;
+	}
+}
+
 void TrackViewEditor::populateTrackList()/*{{{*/
 {
 	m_allmodel->clear();
-	if(m_templateMode)
-	{
-		QMap<qint64, VirtualTrack*> vthash = trackManager->virtualTracks();
-		QMap<qint64, VirtualTrack*>::const_iterator iter = vthash.constBegin();
-		QList<qint64> keys;
-		while(iter != vthash.constEnd())
-		{
-			if(!keys.contains(iter.value()->id))
-			{
-				QStandardItem *item = new QStandardItem(iter.value()->name);
-				item->setData(iter.value()->id, TrackIdRole);
-				item->setData(iter.value()->type, TrackTypeRole);
-				item->setData(1, TrackSourceRole);
-				item->setEditable(false);
-				m_allmodel->appendRow(item);
-				keys.append(iter.value()->id);
-			}
-			iter++;
-		}
-	}
-	else
+	if(!m_templateMode)
 	{
 		for (ciTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
 		{
@@ -176,11 +209,46 @@ void TrackViewEditor::populateTrackList()/*{{{*/
 			m_allmodel->appendRow(item);
 		}
 	}
+	{/*{{{*/
+		QMap<qint64, VirtualTrack*> vthash = trackManager->virtualTracks();
+		QMap<qint64, VirtualTrack*>::const_iterator iter = vthash.constBegin();
+		QList<qint64> keys;
+		while(iter != vthash.constEnd())
+		{
+			if(!keys.contains(iter.value()->id))
+			{
+				QString s(iter.value()->name);
+				QStandardItem *item = new QStandardItem(s.append(tr(" (Virtual)")));
+				item->setData(iter.value()->id, TrackIdRole);
+				item->setData(iter.value()->type, TrackTypeRole);
+				item->setData(1, TrackSourceRole);
+				item->setEditable(false);
+				m_allmodel->appendRow(item);
+				keys.append(iter.value()->id);
+			}
+			iter++;
+		}
+	}/*}}}*/
 }/*}}}*/
 
 //----------------------------------------------
 // Slots
 //----------------------------------------------
+
+void TrackViewEditor::setMode(int mode)
+{
+	//Just in case it was called externally
+	cmbMode->blockSignals(true);
+	cmbMode->setCurrentIndex(mode);
+	cmbMode->blockSignals(false);
+
+	m_templateMode = mode;
+
+	reset();
+	populateTrackList();
+	buildViewList();
+	cmbTypeSelected(0);
+}
 
 void TrackViewEditor::txtNameEdited(QString text)
 {
@@ -391,33 +459,40 @@ void TrackViewEditor::cmbViewSelected(int ind)/*{{{*/
 	_editing = false;
 }/*}}}*/
 
-void TrackViewEditor::cmbTypeSelected(int type)/*{{{*/
+void TrackViewEditor::cmbTypeSelected(int index)/*{{{*/
 {
 	//Perform actions to filter the list below based on selected type
 	//"All" "Audio_Out" "Audio_In" "Audio_Aux" "Audio_Group" "Midi" "Wave"
-	switch (type)
+	int type = cmbType->itemData(index).toInt();
+	if(type == -1)
 	{
-		case 0:
-			m_filterModel->setFilterRegExp(QRegExp("[0-9]", Qt::CaseInsensitive, QRegExp::Wildcard));
-			break;
-		case 1:
+		m_filterModel->setFilterRegExp(QRegExp("[0-9]", Qt::CaseInsensitive, QRegExp::Wildcard));
+		return;
+	}
+
+	Track::TrackType t = (Track::TrackType)type;
+	switch (t)
+	{
+		case Track::AUDIO_OUTPUT:
 			m_filterModel->setFilterRegExp(QRegExp(QString::number(Track::AUDIO_OUTPUT), Qt::CaseInsensitive, QRegExp::FixedString));
 			break;
-		case 2:
+		case Track::AUDIO_INPUT:
 			m_filterModel->setFilterRegExp(QRegExp(QString::number(Track::AUDIO_INPUT), Qt::CaseInsensitive, QRegExp::FixedString));
 			break;
-		case 3:
+		case Track::AUDIO_AUX:
 			m_filterModel->setFilterRegExp(QRegExp(QString::number(Track::AUDIO_AUX), Qt::CaseInsensitive, QRegExp::FixedString));
 			break;
-		case 4:
+		case Track::AUDIO_BUSS:
 			m_filterModel->setFilterRegExp(QRegExp(QString::number(Track::AUDIO_BUSS), Qt::CaseInsensitive, QRegExp::FixedString));
 			break;
-		case 5:
+		case Track::MIDI...Track::DRUM:
 			m_filterModel->setFilterRegExp(QRegExp(QString::number(Track::MIDI), Qt::CaseInsensitive, QRegExp::FixedString));
 			break;
-		case 6:
+		case Track::WAVE:
 			m_filterModel->setFilterRegExp(QRegExp(QString::number(Track::WAVE), Qt::CaseInsensitive, QRegExp::FixedString));
 			break;
+		default:
+		break;
 	}
 }/*}}}*/
 
@@ -551,8 +626,8 @@ void TrackViewEditor::reset()/*{{{*/
 	populateTrackList();
 	if(m_vtrackList.size())
 	{
-		foreach(qint64 id, m_vtrackList.keys())
-			trackManager->removeVirtualTrack(id);
+		//foreach(qint64 id, m_vtrackList.keys())
+		//	trackManager->removeVirtualTrack(id);
 		m_vtrackList.clear();
 	}
 	cmbViews->blockSignals(false);
@@ -594,8 +669,8 @@ void TrackViewEditor::btnCancelClicked(bool/* state*/)/*{{{*/
 		}
 		if(m_vtrackList.size())
 		{
-			foreach(qint64 id, m_vtrackList.keys())
-				trackManager->removeVirtualTrack(id);
+			//foreach(qint64 id, m_vtrackList.keys())
+			//	trackManager->removeVirtualTrack(id);
 			m_vtrackList.clear();
 		}
 	}
@@ -693,7 +768,8 @@ void TrackViewEditor::btnAddTrack()/*{{{*/
 				{
 					qDebug("TrackViewEditor::btnAddTrack: found item~~~~~~~~~~~~~~~~");
 					qint64 tid = item->data(TrackIdRole).toLongLong();
-					if(m_templateMode)
+					int trackSource = item->data(TrackSourceRole).toInt();
+					if(trackSource)
 					{
 						VirtualTrack* trk = trackManager->virtualTracks().value(tid);
 						if (trk)
@@ -736,37 +812,40 @@ void TrackViewEditor::btnAddTrack()/*{{{*/
 					}
 					else
 					{
-						Track* trk = song->findTrackById(tid);
-						if (trk)
+						if(!m_templateMode)
 						{
-						//	printf("Adding Track from row: %d\n", row);
-							QList<QStandardItem *> items = m_model->findItems(item->text());
-							if(items.isEmpty())
+							Track* trk = song->findTrackById(tid);
+							if (trk)
 							{
-								QStandardItem* tname = new QStandardItem(trk->name());
-								tname->setData(trk->id(), TrackIdRole);
-								tname->setData(0, TrackSourceRole);
-								tname->setEditable(false);
-								QStandardItem* transp = new QStandardItem(QString::number(0));
-								transp->setEditable(false);
-								if(trk->isMidiTrack())
-									transp->setEditable(true);
-								QStandardItem* patch = new QStandardItem(trk->isMidiTrack() ? tr("Select Patch") : "-");
-								patch->setData(0, ProgramRole);
-								patch->setEditable(false);
-								if(trk->isMidiTrack())
+							//	printf("Adding Track from row: %d\n", row);
+								QList<QStandardItem *> items = m_model->findItems(item->text());
+								if(items.isEmpty())
 								{
-									int outPort = ((MidiTrack*)trk)->outPort();
-									MidiInstrument* instr = midiPorts[outPort].instrument();
-									patch->setData(instr->iname(), InstrumentNameRole);
-									patch->setEditable(true);
+									QStandardItem* tname = new QStandardItem(trk->name());
+									tname->setData(trk->id(), TrackIdRole);
+									tname->setData(0, TrackSourceRole);
+									tname->setEditable(false);
+									QStandardItem* transp = new QStandardItem(QString::number(0));
+									transp->setEditable(false);
+									if(trk->isMidiTrack())
+										transp->setEditable(true);
+									QStandardItem* patch = new QStandardItem(trk->isMidiTrack() ? tr("Select Patch") : "-");
+									patch->setData(0, ProgramRole);
+									patch->setEditable(false);
+									if(trk->isMidiTrack())
+									{
+										int outPort = ((MidiTrack*)trk)->outPort();
+										MidiInstrument* instr = midiPorts[outPort].instrument();
+										patch->setData(instr->iname(), InstrumentNameRole);
+										patch->setEditable(true);
+									}
+									QList<QStandardItem*> rowData;
+									rowData.append(tname);
+									rowData.append(transp);
+									rowData.append(patch);
+									m_model->appendRow(rowData);
+									optionsTable->selectRow((m_model->rowCount()-1));
 								}
-								QList<QStandardItem*> rowData;
-								rowData.append(tname);
-								rowData.append(transp);
-								rowData.append(patch);
-								m_model->appendRow(rowData);
-								optionsTable->selectRow((m_model->rowCount()-1));
 							}
 						}
 					}
@@ -803,7 +882,7 @@ void TrackViewEditor::btnRemoveTrack()/*{{{*/
 					if(m_vtrackList.contains(tid))
 					{
 						m_vtrackList.erase(m_vtrackList.find(tid));
-						trackManager->removeVirtualTrack(tid);
+						//trackManager->removeVirtualTrack(tid);
 					}
 				}
 				del.append(row);
@@ -834,31 +913,47 @@ void TrackViewEditor::btnAddVirtualTrack()
 	CreateTrackDialog *ctdialog = new CreateTrackDialog(&vt, 0, -1, this);
 	if(ctdialog->exec() && vt)
 	{
-		m_vtrackList[vt->id] = vt;
 		trackManager->addVirtualTrack(vt);
-		QStandardItem* tname = new QStandardItem(vt->name);
-		tname->setData(vt->id, TrackIdRole);
-		tname->setData(1, TrackSourceRole);
-		tname->setEditable(false);
-		QStandardItem* transp = new QStandardItem(QString::number(0));
-		transp->setEditable(false);
-		if(vt->type == Track::MIDI)
-			transp->setEditable(true);
-		QStandardItem* patch = new QStandardItem(vt->type == Track::MIDI ? tr("Select Patch") : "-");
-		patch->setData(0, ProgramRole);
-		patch->setEditable(false);
-		if(vt->type == Track::MIDI)
+
+		//Add to the full list of tracks and select the type
+		QString s(vt->name);
+		QStandardItem *item = new QStandardItem(s.append(tr(" (Virtual)")));
+		item->setData(vt->id, TrackIdRole);
+		item->setData(vt->type, TrackTypeRole);
+		item->setData(1, TrackSourceRole);
+		item->setEditable(false);
+		m_allmodel->appendRow(item);
+		
+		//display types of created virtual
+		setType(vt->type);
+		
+		if(QMessageBox::question(this, tr("Add track"), tr("Add new track to current view?"), QMessageBox::Ok|QMessageBox::No, QMessageBox::Ok) == QMessageBox::Ok)
 		{
-			patch->setData(vt->instrumentName, InstrumentNameRole);
-			patch->setData(vt->instrumentType,  InstrumentTypeRole);
-			patch->setEditable(true);
+			m_vtrackList[vt->id] = vt;
+			QStandardItem* tname = new QStandardItem(vt->name);
+			tname->setData(vt->id, TrackIdRole);
+			tname->setData(1, TrackSourceRole);
+			tname->setEditable(false);
+			QStandardItem* transp = new QStandardItem(QString::number(0));
+			transp->setEditable(false);
+			if(vt->type == Track::MIDI)
+				transp->setEditable(true);
+			QStandardItem* patch = new QStandardItem(vt->type == Track::MIDI ? tr("Select Patch") : "-");
+			patch->setData(0, ProgramRole);
+			patch->setEditable(false);
+			if(vt->type == Track::MIDI)
+			{
+				patch->setData(vt->instrumentName, InstrumentNameRole);
+				patch->setData(vt->instrumentType,  InstrumentTypeRole);
+				patch->setEditable(true);
+			}
+			QList<QStandardItem*> rowData;
+			rowData.append(tname);
+			rowData.append(transp);
+			rowData.append(patch);
+			m_model->appendRow(rowData);
+			optionsTable->selectRow((m_model->rowCount()-1));
 		}
-		QList<QStandardItem*> rowData;
-		rowData.append(tname);
-		rowData.append(transp);
-		rowData.append(patch);
-		m_model->appendRow(rowData);
-		optionsTable->selectRow((m_model->rowCount()-1));
 	}
 }
 
@@ -905,12 +1000,6 @@ void TrackViewEditor::btnDownClicked(bool)/*{{{*/
 		}
 	}
 }/*}}}*/
-
-void TrackViewEditor::setTypes(QStringList t)
-{
-	_trackTypes = t;
-	//Call methods to update the display
-}
 
 QList<int> TrackViewEditor::getSelectedRows()/*{{{*/
 {

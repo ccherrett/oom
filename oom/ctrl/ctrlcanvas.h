@@ -134,6 +134,7 @@ class CtrlCanvas : public View
     int line2y;
     bool drawLineMode;
     bool noEvents;
+	bool m_collapsed;
 
     void viewMousePressEvent(QMouseEvent* event);
     void viewMouseMoveEvent(QMouseEvent*);
@@ -199,6 +200,7 @@ public slots:
     void setTool(int t);
     void setPos(int, unsigned, bool adjustScrollbar);
     void setController(int ctrl);
+	void toggleCollapsed(bool);
 
 signals:
     void followEvent(int);

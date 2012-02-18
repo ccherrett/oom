@@ -489,6 +489,8 @@ extern QPixmap* down_arrow_OffIcon;
 extern QPixmap* down_arrow_OverIcon;
 extern QIcon* down_arrowIconSet3;
 
+extern QIcon* collapseIconSet3;
+
 extern QPixmap* plus_OnIcon;
 extern QPixmap* plus_OffIcon;
 extern QPixmap* plus_OverIcon;

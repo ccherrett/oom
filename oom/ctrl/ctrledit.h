@@ -14,6 +14,7 @@
 #include "song.h"
 
 class AbstractMidiEditor;
+class QLabel;
 class CtrlView;
 class CtrlPanel;
 class Xml;
@@ -29,9 +30,13 @@ class CtrlEdit : public QWidget
 
     CtrlCanvas* canvas;
     CtrlPanel* panel;
+	QWidget *vscale;
+
+	bool m_collapsed;
 
 private slots:
-    void destroy();
+    void destroyCalled();
+	void collapsedCalled(bool);
 
 public slots:
     void setTool(int tool);
@@ -57,12 +62,14 @@ signals:
     void yposChanged(int);
 
 public:
-    CtrlEdit(QWidget*, AbstractMidiEditor* e, int xmag,
-            bool expand = false, const char* name = 0);
+    CtrlEdit(QWidget*, AbstractMidiEditor* e, int xmag, bool expand = false, const char* name = 0);
 	virtual ~CtrlEdit(){}
     void readStatus(Xml&);
     void writeStatus(int, Xml&);
     bool setType(QString);
+	QString type();
+	void setCollapsed(bool);
+	bool collapsed() {return m_collapsed;}
 };
 
 #endif

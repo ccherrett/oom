@@ -55,6 +55,7 @@ class Patch;
 class QDockWidget;
 class QTabWidget;
 class TrackListView;
+class QSignalMapper;
 
 //---------------------------------------------------------
 //   Performer
@@ -78,6 +79,10 @@ class Performer : public AbstractMidiEditor
     Track* selected;
     PCScale* pcbar;
 	Piano* piano;
+
+	QSignalMapper* mapper;
+	QSignalMapper* functionMapper;
+	QSignalMapper* colorMapper;
 
     QAction* editCutAction;
     QAction* editCopyAction;
@@ -130,6 +135,11 @@ class Performer : public AbstractMidiEditor
     QAction* funcIncreaseLenAction;
     QAction* funcDecreaseLenAction;
     QAction* funcGotoSelNoteAction;
+
+    QAction* funcAddProgramChangeAction;
+    QAction* funcDelProgramChangeAction;
+    QAction* funcCopyProgramChangeAction;
+    QAction* funcPasteProgramChangeAction;
 
     int tickOffset;
     int lenOffset;
@@ -190,6 +200,7 @@ class Performer : public AbstractMidiEditor
 	TrackListView* m_trackListView;
 
     void initShortcuts();
+	void initFunctions();
     void setEventColorMode(int);
     QWidget* genToolbar(QWidget* parent);
     virtual void closeEvent(QCloseEvent*);
@@ -208,6 +219,7 @@ private slots:
     void setRaster(int);
     void setQuant(int);
     void configQuant();
+    void ctrlPopup();
 
     void setQuantStrength(int val)
     {
@@ -250,7 +262,7 @@ private slots:
 #endif
 
 signals:
-    void deleted(unsigned long);
+    void deleted();
 	void showComments(bool);
 
 public slots:
