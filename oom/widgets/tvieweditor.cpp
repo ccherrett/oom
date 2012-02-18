@@ -916,6 +916,8 @@ void TrackViewEditor::btnAddVirtualTrack()
 	if(ctdialog->exec() && vt)
 	{
 		trackManager->addVirtualTrack(vt);
+		//Make song save the virtual track
+		song->update(SC_CONFIG);
 
 		//Add to the full list of tracks and select the type
 		QString s(vt->name);
