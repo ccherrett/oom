@@ -572,9 +572,21 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 									qDebug("CreateTrackDialog::updateInstrument: ERROR: Faild to load instrument into LinuxSampler");
 								}
 							}
+							else
+							{
+								updateVisibleElements();
+                        		chkInput->setChecked(true);
+                        		chkInput->setEnabled(true);
+                        		chkOutput->setChecked(false);
+                        		chkOutput->setEnabled(false);
+                        		midiBox->setChecked(true);
+                        		midiBox->setEnabled(true);
+								cmbMonitor->setEnabled(false);
+							}
 						}
 						else
 						{//TODO: BIG ERROR Here cant connect to LinuxSampler for whatever reason this is show stopper error
+							qDebug("CreateTrackDialog::updateInstrument: FATAL ERROR: Faild to connect to LinuxSampler~~~~~~~~~~~~~~~~~~~~~");
 						}
 						break;
 					}

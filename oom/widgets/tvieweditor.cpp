@@ -209,7 +209,7 @@ void TrackViewEditor::populateTrackList()/*{{{*/
 			m_allmodel->appendRow(item);
 		}
 	}
-	{/*{{{*/
+	{
 		QMap<qint64, VirtualTrack*> vthash = trackManager->virtualTracks();
 		QMap<qint64, VirtualTrack*>::const_iterator iter = vthash.constBegin();
 		QList<qint64> keys;
@@ -228,7 +228,7 @@ void TrackViewEditor::populateTrackList()/*{{{*/
 			}
 			iter++;
 		}
-	}/*}}}*/
+	}
 }/*}}}*/
 
 //----------------------------------------------
@@ -763,12 +763,14 @@ void TrackViewEditor::btnAddTrack()/*{{{*/
 			for (id = sel.constBegin(); id != sel.constEnd(); ++id)
 			{
 				//We have to index we will get the row.
-				QStandardItem *item = m_allmodel->item((*id).row());//FromIndex((*id));
-				if(item)
+				QModelIndex idx = *id;
+				//QStandardItem *item = m_allmodel->item((*id).row());//FromIndex((*id));
+				if(idx.isValid())
 				{
 					qDebug("TrackViewEditor::btnAddTrack: found item~~~~~~~~~~~~~~~~");
-					qint64 tid = item->data(TrackIdRole).toLongLong();
-					int trackSource = item->data(TrackSourceRole).toInt();
+					qint64 tid = idx.data(TrackIdRole).toLongLong();
+					int trackSource = idx.data(TrackSourceRole).toInt();
+					QString text(idx.data().toString());
 					if(trackSource)
 					{
 						VirtualTrack* trk = trackManager->virtualTracks().value(tid);
@@ -776,7 +778,7 @@ void TrackViewEditor::btnAddTrack()/*{{{*/
 						{
 							qDebug("TrackViewEditor::btnAddTrack:~~~~~~~~~~~~~~Found Virtual Track");
 						//	printf("Adding Track from row: %d\n", row);
-							QList<QStandardItem *> items = m_model->findItems(item->text());
+							QList<QStandardItem *> items = m_model->findItems(trk->name);
 							if(items.isEmpty())
 							{
 								QString trackname = trk->name;
@@ -818,7 +820,7 @@ void TrackViewEditor::btnAddTrack()/*{{{*/
 							if (trk)
 							{
 							//	printf("Adding Track from row: %d\n", row);
-								QList<QStandardItem *> items = m_model->findItems(item->text());
+								QList<QStandardItem *> items = m_model->findItems(trk->name());
 								if(items.isEmpty())
 								{
 									QStandardItem* tname = new QStandardItem(trk->name());
