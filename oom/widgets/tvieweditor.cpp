@@ -247,7 +247,7 @@ void TrackViewEditor::setMode(int mode)
 	reset();
 	populateTrackList();
 	buildViewList();
-	cmbTypeSelected(0);
+	setType(-1);
 }
 
 void TrackViewEditor::txtNameEdited(QString text)

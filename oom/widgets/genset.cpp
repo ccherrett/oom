@@ -86,7 +86,7 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	inputView->setModel(m_inputsModel);
 	populateInputs();
 	btnRefreshInput->setIcon(QIcon(*refreshIconSet3));
-	selectInstrumentsDirButton->setIcon(QIcon(*route_editIconSet3));
+	selectInstrumentsDirButton->setIcon(QIcon(*browseIconSet3));
 	defaultInstrumentsDirButton->setIcon(QIcon(*refreshIconSet3));
 
 	userInstrumentsPath->setText(config.userInstrumentsDir);
