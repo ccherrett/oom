@@ -582,6 +582,11 @@ QPixmap* plus_OffIcon;
 QPixmap* plus_OverIcon;
 QIcon* plusIconSet3;
 
+QPixmap* browse_OnIcon;
+QPixmap* browse_OffIcon;
+QPixmap* browse_OverIcon;
+QIcon* browseIconSet3;
+
 QPixmap* garbage_OnIcon;
 QPixmap* garbage_OffIcon;
 QPixmap* garbage_OverIcon;
@@ -1415,6 +1420,14 @@ void initIcons()
       plusIconSet3->addPixmap(*plus_OnIcon, QIcon::Normal, QIcon::On);
       plusIconSet3->addPixmap(*plus_OffIcon, QIcon::Normal, QIcon::Off);
       plusIconSet3->addPixmap(*plus_OverIcon, QIcon::Active);
+	  
+      browse_OnIcon= new MPIXMAP(":/images/browse_new_on.png", NULL);
+      browse_OffIcon= new MPIXMAP(":/images/browse_new_off.png", NULL);
+      browse_OverIcon= new MPIXMAP(":/images/browse_new_over.png", NULL);
+	  browseIconSet3         = new QIcon();
+      browseIconSet3->addPixmap(*browse_OnIcon, QIcon::Normal, QIcon::On);
+      browseIconSet3->addPixmap(*browse_OffIcon, QIcon::Normal, QIcon::Off);
+      browseIconSet3->addPixmap(*browse_OverIcon, QIcon::Active);
 	  
       garbage_OnIcon= new MPIXMAP(":/images/garbage_new_on.png", NULL);
       garbage_OffIcon= new MPIXMAP(":/images/garbage_new_off.png", NULL);

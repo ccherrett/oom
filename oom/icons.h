@@ -491,6 +491,11 @@ extern QIcon* down_arrowIconSet3;
 
 extern QIcon* collapseIconSet3;
 
+extern QPixmap* browse_OnIcon;
+extern QPixmap* browse_OffIcon;
+extern QPixmap* browse_OverIcon;
+extern QIcon* browseIconSet3;
+
 extern QPixmap* plus_OnIcon;
 extern QPixmap* plus_OffIcon;
 extern QPixmap* plus_OverIcon;
