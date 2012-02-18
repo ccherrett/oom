@@ -1270,31 +1270,30 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//  read list of "Recent Projects"
 	//---------------------------------------------------
 
-	QString prjPath(configPath);
-	prjPath += QString("/projects");
-	FILE* f = fopen(prjPath.toLatin1().constData(), "r");
-	if (f == 0)
+	QString prjPath(QString(configPath).append(QDir::separator()).append("projects"));
+	QFile projFile(prjPath);
+	if (!projFile.open(QIODevice::ReadOnly|QIODevice::Text))
 	{
-		perror("open projectfile");
 		for (int i = 0; i < PROJECT_LIST_LEN; ++i)
 			projectList[i] = 0;
 	}
 	else
 	{
-		for (int i = 0; i < PROJECT_LIST_LEN; ++i)
+		QTextStream in(&projFile);
+		QString path = in.readLine();
+		int i = 0;
+		while(!path.isNull() && i < PROJECT_LIST_LEN)
 		{
-			char buffer[256];
-			if (fgets(buffer, 256, f))
+			QFileInfo f(path);
+			if(f.exists())
 			{
-				int n = strlen(buffer);
-				if (n && buffer[n - 1] == '\n')
-					buffer[n - 1] = 0;
-				projectList[i] = *buffer ? new QString(buffer) : 0;
+				projectList[i] = new QString(path);
+				++i;
 			}
-			else
-				break;
+			path = in.readLine();
 		}
-		fclose(f);
+		for(;i < PROJECT_LIST_LEN; ++i)
+			projectList[i] = 0;
 	}
 
 	initMidiSynth();
@@ -2299,8 +2298,7 @@ void OOMidi::closeEvent(QCloseEvent* event)
 	}
 
 	// save "Open Recent" list
-	QString prjPath(configPath);
-	prjPath += "/projects";
+	QString prjPath(QString(configPath).append(QDir::separator()).append("projects"));
 	FILE* f = fopen(prjPath.toLatin1().constData(), "w");
 	if (f)
 	{
