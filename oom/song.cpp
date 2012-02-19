@@ -50,6 +50,7 @@
 #include "midimonitor.h"
 #include "plugin.h"
 #include "traverso_shared/OOMCommand.h"
+#include "traverso_shared/TConfig.h"
 #include "CreateTrackDialog.h"
 //#include <omp.h>
 
@@ -4283,3 +4284,34 @@ void Song::toggleFeedback(bool f)
 {	
 	midiMonitor->msgToggleFeedback(f);
 }
+
+void Song::movePlaybackToPart(Part* part)/*{{{*/
+{
+	bool snap = tconfig().get_property("PerformerEdit", "snaptopart", true).toBool();
+	if(audio->isPlaying() || !snap)
+		return;
+	if(part)
+	{
+		unsigned tick = part->tick();
+		EventList* el = part->events();
+		if(el->empty())
+		{//move pb to part start
+			Pos p(tick, true);
+			song->setPos(0, p, true, true, true);
+		}
+		else
+		{
+			for(iEvent i = el->begin(); i != el->end(); ++i)
+			{
+				Event ev = i->second;
+				if(ev.isNote())
+				{
+					Pos p(tick+ev.tick(), true);
+					song->setPos(0, p, true, true, true);
+					break;
+				}
+			}
+		}
+	}
+}/*}}}*/
+

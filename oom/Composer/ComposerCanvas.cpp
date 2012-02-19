@@ -4203,7 +4203,7 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 	{
 		if (debugMsg && event->mimeData()->formats().size() != 0)
 			printf("Drop with unknown format. First format:<%s>\n", event->mimeData()->formats()[0].toLatin1().constData());
-		//event->ignore();                     // TODO CHECK Tim.
+		//event->ignore();
 		return;
 	}
 

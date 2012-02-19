@@ -101,7 +101,7 @@ QString CtrlEdit::type()
 
 QSize CtrlEdit::sizeHint()
 {
-	return QSize(400, 50);
+	return QSize(400, 1);
 }
 
 //---------------------------------------------------------

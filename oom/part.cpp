@@ -6,6 +6,8 @@
 //  (C) Copyright 1999/2000 Werner Schweer (ws@seh.de)
 //=========================================================
 
+//FIXME: Find all files with assert(foo) in them and add the following above the include for assert.h
+#define NDEBUG
 #include <stdio.h>
 #include <assert.h>
 #include <cmath>
@@ -990,7 +992,7 @@ void PartList::remove(Part* part)
 			break;
 		}
 	}
-	assert(i != end());
+	//assert(i != end());
 }
 
 //---------------------------------------------------------

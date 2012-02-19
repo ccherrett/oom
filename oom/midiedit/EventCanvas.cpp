@@ -20,6 +20,7 @@
 #include <QDrag>
 #include <QMenu>
 #include <QAction>
+#include <QTimer>
 
 #include "xml.h"
 #include "AbstractMidiEditor.h"
@@ -34,6 +35,7 @@
 #include "globals.h"
 #include "traverso_shared/TConfig.h"
 
+static int NOTE_PLAY_TIME = 90;
 //---------------------------------------------------------
 //   EventCanvas
 //---------------------------------------------------------
@@ -283,8 +285,17 @@ void EventCanvas::selectAtTick(unsigned int tick)/*{{{*/
 				populateMultiSelect(nearest);
 			songChanged(SC_SELECTION);
 		}
+		itemPressed(nearest);
+		m_tempPlayItems.append(nearest);
+		QTimer::singleShot(NOTE_PLAY_TIME, this, SLOT(playReleaseForItem()));
 	}
 }/*}}}*/
+
+void EventCanvas::playReleaseForItem()
+{
+	while(!m_tempPlayItems.isEmpty())
+		itemReleased(m_tempPlayItems.takeFirst(), QPoint(1,1));
+}
 
 //---------------------------------------------------------
 //   track
@@ -742,6 +753,9 @@ void EventCanvas::actionCommand(int action)/*{{{*/
 
 					iRightmost++;
 					iRightmost->second->setSelected(true);
+					itemPressed(iRightmost->second);
+					m_tempPlayItems.append(iRightmost->second);
+					QTimer::singleShot(NOTE_PLAY_TIME, this, SLOT(playReleaseForItem()));
 					if(editor->isGlobalEdit())
 						populateMultiSelect(iRightmost->second);
 					updateSelection();
@@ -796,11 +810,17 @@ void EventCanvas::actionCommand(int action)/*{{{*/
 
 						iLeftmost--;
 						iLeftmost->second->setSelected(true);
+						itemPressed(iLeftmost->second);
+						m_tempPlayItems.append(iLeftmost->second);
+						QTimer::singleShot(NOTE_PLAY_TIME, this, SLOT(playReleaseForItem()));
 						if(editor->isGlobalEdit())
 							populateMultiSelect(iLeftmost->second);
 						updateSelection();
 					} else {
 						leftmost->setSelected(true);
+						itemPressed(leftmost);
+						m_tempPlayItems.append(leftmost);
+						QTimer::singleShot(NOTE_PLAY_TIME, this, SLOT(playReleaseForItem()));
 						if(editor->isGlobalEdit())
 							populateMultiSelect(leftmost);
 						updateSelection();

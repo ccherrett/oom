@@ -13,6 +13,7 @@
 #include "noteinfo.h"
 #include <QEvent>
 #include <QKeyEvent>
+#include <QList>
 
 class MidiPart;
 class MidiTrack;
@@ -42,10 +43,10 @@ enum { LOCATORS_TO_SELECTION, SEL_RIGHT, SEL_RIGHT_ADD, SEL_LEFT, SEL_LEFT_ADD,
 class EventCanvas : public Canvas
 {
     Q_OBJECT
+
+	QList<CItem*> m_tempPlayItems;
     virtual void leaveEvent(QEvent*e);
     virtual void enterEvent(QEvent*e);
-    // Removed by T356.
-    //virtual QPoint raster(const QPoint&) const;
 
     virtual void startUndo(DragType);
 
@@ -72,6 +73,10 @@ protected:
     virtual QMenu* genItemPopup(CItem*);
     virtual void itemPopup(CItem*, int, const QPoint&);
     virtual void mouseRelease(const QPoint&);
+
+private slots:
+
+	void playReleaseForItem();
 
 public slots:
 

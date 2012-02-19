@@ -41,7 +41,6 @@ class CtrlPanel : public QWidget
     DoubleLabel* _dl;
     int _val;
 
-
 signals:
     void destroyPanel();
     void controllerChanged(int);

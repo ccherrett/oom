@@ -45,7 +45,7 @@ Splitter::~Splitter()
 	//For whatever reason OOMidi destructor is called before this so call tconfig().save() again
     tconfig().save();
 	*/
-	saveStateInfo();
+	//saveStateInfo();
 }
 
 void Splitter::saveStateInfo()
@@ -148,4 +148,18 @@ void Splitter::readStatus(Xml& /*xml*/)
 				break;
 		}
 	}*/
+}
+
+QSize Splitter::sizeHint() const
+{
+	QSize rv(1,1);
+	/*switch(orientaton())
+	{
+		case Qt::Horizontal:
+			rv = QSize(1,);
+		break;
+		case Qt::Vertical:
+		break;
+	}*/
+	return rv;
 }

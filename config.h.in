@@ -4,6 +4,7 @@
 //  $Id:$
 //
 //  Copyright (C) 2002-2006 by Werner Schweer and others
+//  Copyright (C) 2011-2012 by The OpenOctave Project
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License version 2.
@@ -43,3 +44,7 @@
 #define OOM_EXT_DEFAULT_TEMPLATE "${OOMidi_SHARE_DIR}/templates/oomidi-extended-template.oos"
 #define MIDI_FIFO_SIZE	${OOM_MIDI_FIFO_SIZE}
 #define MIDI_REC_FIFO_SIZE ${OOM_MIDI_REC_FIFO_SIZE}
+
+//Prevent all assertions in the code from crashing us
+//Please include config.h before assert.h, then we can unset this to do debuging
+#define NDEBUG

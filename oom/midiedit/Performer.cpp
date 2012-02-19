@@ -337,6 +337,8 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
 
 	m_trackListView = new TrackListView(this ,this);
+	m_trackListView->installEventFilter(this);
+	m_trackListView->getView()->installEventFilter(this);
 
 	m_tabs->addTab(midiConductor, tr("   Conductor   "));
 	m_tabs->addTab(m_trackListView, tr("   Track List   "));
@@ -348,6 +350,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	mainGrid->addWidget(hsplitter, 0, 1, 1, 3);
 
 	QWidget* split1 = new QWidget(splitter);
+	split1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	split1->setObjectName("split1");
 	QGridLayout* gridS1 = new QGridLayout(split1);
 	gridS1->setContentsMargins(0, 0, 0, 0);
@@ -384,6 +387,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 
     ctrlLane = new Splitter(Qt::Vertical, splitter, "ctrllane");
 	ctrlLane->setChildrenCollapsible(false);//TODO: Make this user configurable
+	ctrlLane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     QWidget* split2 = new QWidget(splitter);
     split2->setMaximumHeight(hscroll->sizeHint().height());
     split2->setMinimumHeight(hscroll->sizeHint().height());
@@ -1984,8 +1988,7 @@ void Performer::ctrlPopup()/*{{{*/
 
 CtrlEdit* Performer::addCtrl()/*{{{*/
 {
-	///CtrlEdit* ctrlEdit = new CtrlEdit(splitter, this, xscale, false, "pianoCtrlEdit");
-	CtrlEdit* ctrlEdit = new CtrlEdit(ctrlLane/*splitter*/, this, xscale, false, "pianoCtrlEdit"); // ccharrett
+	CtrlEdit* ctrlEdit = new CtrlEdit(ctrlLane, this, xscale, false, "pianoCtrlEdit"); 
 	connect(tools22, SIGNAL(toolChanged(int)), ctrlEdit, SLOT(setTool(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), ctrlEdit, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scaleChanged(float)), ctrlEdit, SLOT(setXMag(float)));
@@ -2332,6 +2335,23 @@ bool Performer::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 			}
 			return true;
 		}
+		else if (key == shortcuts[SHRT_PLAY_TOGGLE].key)/*{{{*/
+		{
+			checkPartLengthForRecord(song->record());
+			if (audio->isPlaying())
+				//song->setStopPlay(false);
+				song->setStop(true);
+			else if (!config.useOldStyleStopShortCut)
+				song->setPlay(true);
+			else if (song->cpos() != song->lpos())
+				song->setPos(0, song->lPos());
+			else
+			{
+				Pos p(0, true);
+				song->setPos(0, p);
+			}
+			return true;
+		}/*}}}*/
 		/*else if (key == shortcuts[SHRT_POS_INC].key)
 		{
 			PerformerCanvas* pc = (PerformerCanvas*) canvas;

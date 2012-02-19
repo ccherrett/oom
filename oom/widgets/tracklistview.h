@@ -6,13 +6,18 @@
 
 #ifndef _OOM_TRACKLISTVIEW_H_
 #define _OOM_TRACKLISTVIEW_H_
+
 #include <QFrame>
 #include <QList>
 #include <QModelIndex>
+#include <QBrush>
+
 #define PartRole Qt::UserRole+2
 #define TrackRole Qt::UserRole+3
 #define TrackNameRole Qt::UserRole+4
 #define TickRole Qt::UserRole+5
+#define PartNameRole Qt::UserRole+6
+#define TrackIdRole Qt::UserRole+7
 
 class QTableView;
 class QStandardItem;
@@ -42,14 +47,17 @@ class TrackListView : public QFrame
 	QVBoxLayout* m_layout;
 	QHBoxLayout* m_buttonBox;
 	AbstractMidiEditor* m_editor;
-	QList<QString> m_selected;
+	QList<qint64> m_selectedTracks;
 	QToolButton* m_btnRefresh;;
 	QCheckBox* m_chkWorkingView;
 	QCheckBox* m_chkSnapToPart;
 	int m_displayRole;
 	int m_selectedIndex;
+	bool m_editing;
 	QStringList m_headers;
 	QPoint scrollPos;
+	QBrush m_tempColor;
+	QList<int> m_colorRows;
 	
 	void updatePartSelection(Part*);
 
@@ -62,6 +70,7 @@ private slots:
 	void updateCheck(PartList*, bool);
 	void updateCheck();
 	void snapToPartChanged(int);
+	void updateColor();
 
 protected:
 	virtual void showEvent(QShowEvent*);
@@ -72,8 +81,8 @@ public slots:
 
 public:
 	TrackListView(AbstractMidiEditor* e, QWidget* parent = 0);
-	static void movePlaybackToPart(Part*);
 	virtual ~TrackListView();
+	QTableView* getView(){return m_table;}
 };
 
 #endif

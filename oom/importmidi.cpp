@@ -557,8 +557,6 @@ void OOMidi::importPartToTrack(QString& filename, unsigned tick, Track* track)
 				case Xml::TagStart:
 					if (tag == "part")
 					{
-						//MidiPart* p = new MidiPart((MidiTrack*)track);
-						//p->read(xml);
 
 						// Read the part.
 						Part* p = 0;
@@ -580,8 +578,7 @@ void OOMidi::importPartToTrack(QString& filename, unsigned tick, Track* track)
 							posOffset = tick - p->tick();
 						}
 						p->setTick(p->tick() + posOffset);
-						//finalPos=p->tick() + p->lenTick();
-						////pos += p->lenTick();
+						p->setColorIndex(track->getDefaultPartColor());
 						audio->msgAddPart(p, false);
 					}
 					else

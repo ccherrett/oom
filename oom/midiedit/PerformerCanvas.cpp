@@ -1450,7 +1450,7 @@ void PerformerCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quant
 				track()->setSelected(true);
 				newpt->setSelected(true);
 				song->update(SC_SELECTION);
-				TrackListView::movePlaybackToPart(newpt);
+				Song::movePlaybackToPart(newpt);
 			}
 		}
 			break;
@@ -1518,7 +1518,7 @@ void PerformerCanvas::cmd(int cmd, int quantStrength, int quantLimit, bool quant
 				track()->setSelected(true);
 				newpt->setSelected(true);
 				song->update(SC_SELECTION);
-				TrackListView::movePlaybackToPart(newpt);
+				Song::movePlaybackToPart(newpt);
 			}
 		}
 			break;

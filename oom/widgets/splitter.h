@@ -29,6 +29,7 @@ public:
     void readStatus(Xml&);
 protected:
 	virtual void showEvent(QShowEvent*);
+	virtual QSize sizeHint() const;
 private slots:
 	void saveStateInfo();
 };

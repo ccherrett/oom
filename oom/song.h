@@ -119,6 +119,7 @@ public:
         MARKER_CUR, MARKER_ADD, MARKER_REMOVE, MARKER_NAME,
         MARKER_TICK, MARKER_LOCK
     };
+	static void movePlaybackToPart(Part*);
 
 private:
     // fifo for note-on events

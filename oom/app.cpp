@@ -1423,14 +1423,6 @@ void OOMidi::addTransportToolbar()
 	TransportToolbar *transportbar = new TransportToolbar(this, showPanic, showMuteSolo);
 	tools->addWidget(transportbar);
 	
-	/*tools22 = new EditToolBar(this, performerTools);
-	tools22->setVisible(false);
-    tools1 = new QToolBar(tr("Edit Tools"));
-	tools1->setIconSize(QSize(29, 25));
-	addToolBar(Qt::BottomToolBarArea, tools1);
-	tools1->setFloatable(false);
-	tools1->setMovable(false);
-	tools1->setAllowedAreas(Qt::BottomToolBarArea);*/
 	QWidget* tspacer = new QWidget();
 	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tspacer->setMaximumWidth(15);
@@ -2865,6 +2857,7 @@ void OOMidi::startPerformer(PartList* pl, bool /*showDefaultCtrls*/)
     	performer->addAction(fileSaveAction);
 
 		performer->show();
+		Song::movePlaybackToPart(pl->begin()->second);
 
 		connect(performer, SIGNAL(deleted()), SLOT(performerClosed()));
 		connect(oom, SIGNAL(configChanged()), performer, SLOT(configChanged()));
@@ -2876,6 +2869,7 @@ void OOMidi::startPerformer(PartList* pl, bool /*showDefaultCtrls*/)
 			performer->showNormal();
 		performer->addParts(pl);
 		performer->setCurCanvasPart(pl->begin()->second);
+		Song::movePlaybackToPart(pl->begin()->second);
 		performer->activateWindow();
 		performer->raise();
 	}

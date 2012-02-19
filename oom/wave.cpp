@@ -1011,6 +1011,7 @@ bool OOMidi::importWaveToTrack(QString& name, unsigned tick, Track* track)
 	part->addEvent(event);
 
 	part->setName(QFileInfo(name).completeBaseName());
+	part->setColorIndex(track->getDefaultPartColor());
 	audio->msgAddPart(part);
 	unsigned endTick = part->tick() + part->lenTick();
 	if (song->len() < endTick)

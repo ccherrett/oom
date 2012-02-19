@@ -51,7 +51,6 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	setObjectName(name);
 	inHeartBeat = true;
 	editor = e;
-	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	QVBoxLayout* vbox = new QVBoxLayout;
 	QHBoxLayout* bbox = new QHBoxLayout;
 	bbox->setSpacing(0);
