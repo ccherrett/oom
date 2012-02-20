@@ -52,7 +52,7 @@
 #include "checkbox.h"
 
 #include "audio.h"
-#include "jackaudio.h"
+#include "audiodev.h"
 #include "track.h"
 #include "al/dsp.h"
 
@@ -103,21 +103,32 @@ void set_last_error(const char* error)
 }
 
 //---------------------------------------------------------
+//   getAudioOutputPortName
+//---------------------------------------------------------
+
+QString BasePlugin::getAudioOutputPortName(uint32_t index)
+{
+    if (index < m_aoutsCount)
+        return audioDevice->portName(m_portsOut[index]);
+    return QString("");
+}
+
+//---------------------------------------------------------
 //   process_synth
 //---------------------------------------------------------
 
-void BasePlugin::process_synth(MPEventList* eventList)
+void BasePlugin::processSynth(MPEventList* eventList)
 {
     if (m_enabled && m_aoutsCount > 0)
     {
-        jack_default_audio_sample_t* ains_buffer[m_ainsCount];
-        jack_default_audio_sample_t* aouts_buffer[m_aoutsCount];
+        float* ains_buffer[m_ainsCount];
+        float* aouts_buffer[m_aoutsCount];
 
         for (uint32_t i=0; i < m_ainsCount; i++)
-            ains_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_portsIn[i], segmentSize);
+            ains_buffer[i] = audioDevice->getBuffer(m_portsIn[i], segmentSize);
 
         for (uint32_t i=0; i < m_aoutsCount; i++)
-            aouts_buffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(m_portsOut[i], segmentSize);
+            aouts_buffer[i] = audioDevice->getBuffer(m_portsOut[i], segmentSize);
 
         process(segmentSize, ains_buffer, aouts_buffer, eventList);
     }
@@ -488,7 +499,7 @@ void SynthPluginDevice::processMidi()
     {
         MPEventList* eventList = playEvents();
         if (m_plugin)
-            m_plugin->process_synth(eventList);
+            m_plugin->processSynth(eventList);
     }
 }
 

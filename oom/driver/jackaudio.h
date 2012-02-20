@@ -46,6 +46,11 @@ public:
     {
         return JACK_AUDIO;
     } // p3.3.52
+    
+    virtual bool isJackAudio()
+    {
+        return true;
+    }
 
     void scanMidiPorts();
 

@@ -509,7 +509,7 @@ void LadspaPlugin::process(uint32_t frames, float** src, float** dst, MPEventLis
             }
 
             // Process automation
-            if (m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
+            if (automation && m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
             {
                 for (uint32_t i = 0; i < m_paramCount; i++)
                 {

@@ -30,9 +30,6 @@
 #include <QFileInfo>
 #include <QMutex>
 
-// needed for synths
-#include <jack/jack.h>
-
 // ladspa includes
 #include "ladspa.h"
 
@@ -300,14 +297,6 @@ public:
         return m_enabled;
     }
 
-    // needed for synth monitors
-    QString getAudioOutputPortName(uint32_t index)
-    {
-        if (index < m_aoutsCount)
-            return QString(jack_port_name(m_portsOut[index]));
-        return QString("");
-    }
-
     uint32_t getParameterCount()
     {
         return m_paramCount;
@@ -441,8 +430,11 @@ public:
         m_enabled = false;
         if (blocked) m_proc_lock.unlock();
     }
+    
+    // needed for synths
+    QString getAudioOutputPortName(uint32_t index);
+    void processSynth(MPEventList* eventList);
 
-    void process_synth(MPEventList* eventList);
     void makeGui();
     void deleteGui();
     void showGui(bool yesno);
@@ -502,8 +494,8 @@ protected:
     // synths only
     uint32_t m_ainsCount;
     uint32_t m_aoutsCount;
-    jack_port_t** m_portsIn;
-    jack_port_t** m_portsOut;
+    void** m_portsIn;
+    void** m_portsOut;
 };
 
 //---------------------------------------------------------

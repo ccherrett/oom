@@ -38,6 +38,11 @@ public:
     }
 
     virtual int deviceType() = 0; // p3.3.52
+    
+    virtual bool isJackAudio()
+    {
+        return false;
+    }
 
     //virtual void start() = 0;
     virtual void start(int priority) = 0;
