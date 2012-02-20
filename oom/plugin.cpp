@@ -1169,8 +1169,11 @@ static void loadPluginDir(const QString& s, const PluginType t)
             blacklist.append("libwormhole2_64bit.so");
             blacklist.append("vexvst.so");
 
-            if (blacklist.contains( ((QFileInfo*)&*it)->baseName()) )
+            if (blacklist.contains( ((QFileInfo*)&*it)->fileName()) )
+            {
+                ++it;
                 continue;
+            }
 
             loadPluginLib(&*it, t);
             ++it;
