@@ -1086,8 +1086,8 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
 
 void VstPlugin::writeConfiguration(int level, Xml& xml)
 {
-    xml.tag(level++, "VstPlugin filename=\"%s\" label=\"%s\" channels=\"%d\"",
-            Xml::xmlString(m_filename).toLatin1().constData(), Xml::xmlString(m_label).toLatin1().constData(), m_channels);
+    xml.tag(level++, "VstPlugin filename=\"%s\" label=\"%s\" uniqueId=\"%i\" channels=\"%d\"",
+            Xml::xmlString(m_filename).toLatin1().constData(), Xml::xmlString(m_label).toLatin1().constData(), effect->uniqueID, m_channels);
 
     for (uint32_t i = 0; i < m_paramCount; i++)
     {
