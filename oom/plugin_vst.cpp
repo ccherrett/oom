@@ -561,10 +561,13 @@ void VstPlugin::reload()
 
     reloadPrograms(true);
 
-    // enable it again
-    m_proc_lock.lock();
-    m_enabled = true;
-    m_proc_lock.unlock();
+    // enable it again (only if jack is active, otherwise non-needed)
+    if (jclient)
+    {
+        m_proc_lock.lock();
+        m_enabled = true;
+        m_proc_lock.unlock();
+    }
 }
 
 void VstPlugin::reloadPrograms(bool)

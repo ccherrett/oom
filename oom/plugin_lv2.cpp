@@ -1327,10 +1327,13 @@ void Lv2Plugin::reload()
 
     reloadPrograms(true);
 
-    // enable it again
-    m_proc_lock.lock();
-    m_enabled = true;
-    m_proc_lock.unlock();
+    // enable it again (only if jack is active, otherwise non-needed)
+    if (jclient)
+    {
+        m_proc_lock.lock();
+        m_enabled = true;
+        m_proc_lock.unlock();
+    }
 }
 
 void Lv2Plugin::reloadPrograms(bool /*init*/)
