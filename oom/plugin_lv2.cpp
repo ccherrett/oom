@@ -568,6 +568,7 @@ Lv2Plugin::~Lv2Plugin()
 
     handle = 0;
     descriptor = 0;
+    lplug = 0;
 
     // delete plugin features
     if (features[lv2_feature_id_uri_map] && features[lv2_feature_id_uri_map]->data)
@@ -700,7 +701,7 @@ bool Lv2Plugin::init(QString filename, QString label)
 {
     if (!lplug)
     {
-        LilvNode* pluginURI = lilv_new_uri(lv2world->world, filename.toAscii().constData());
+        LilvNode* pluginURI = lilv_new_uri(lv2world->world, filename.toUtf8().constData());
         lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
         lilv_node_free(pluginURI);
     }
@@ -716,7 +717,7 @@ bool Lv2Plugin::init(QString filename, QString label)
             if (descfn)
             {
                 uint32_t i = 0;
-                const char* c_uri = strdup(filename.toAscii().constData());
+                const char* c_uri = strdup(filename.toUtf8().constData());
 
                 while ((descriptor = descfn(i++)))
                 {
@@ -809,7 +810,7 @@ bool Lv2Plugin::init(QString filename, QString label)
                         features[lv2_feature_id_event]->URI       = LV2_EVENT_URI;
                         features[lv2_feature_id_event]->data      = Event_Feature;
 
-                        handle = descriptor->instantiate(descriptor, sampleRate, lilv_node_as_string(lilv_plugin_get_bundle_uri(lplug)), features);
+                        handle = descriptor->instantiate(descriptor, sampleRate, lilv_uri_to_path(lilv_node_as_string(lilv_plugin_get_bundle_uri(lplug))), features);
 
                         if (handle)
                         {

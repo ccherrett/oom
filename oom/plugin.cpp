@@ -343,8 +343,6 @@ void SynthPluginDevice::setTrackId(qint64 /*id*/)
 
 QString SynthPluginDevice::open()
 {
-    qWarning("SynthPluginDevice::open() -> %s", name().toUtf8().constData());
-
     if (m_plugin)
         return QString("OK");
 
@@ -396,14 +394,15 @@ void SynthPluginDevice::close()
     _readEnable = false;
     _writeEnable = false;
 
+    if (m_audioTrack)
+    {
+        audio->msgAddPlugin(m_audioTrack, 0, 0);
+        delete (SynthPluginTrack*)m_audioTrack;
+        m_audioTrack = 0;
+    }
+
     if (m_plugin)
     {
-        if (m_audioTrack)
-        {
-            audio->msgAddPlugin(m_audioTrack, 0, 0);
-            delete (SynthPluginTrack*)m_audioTrack;
-        }
-
         m_plugin->setTrack(0);
         m_plugin->aboutToRemove();
 
