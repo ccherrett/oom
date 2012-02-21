@@ -458,6 +458,9 @@ QString EventListItem::text(int col) const
 ListEdit::ListEdit(PartList* pl)
 : AbstractMidiEditor(0, 0, pl)
 {
+    setWindowTitle("OOStudio: List Edit");
+    setWindowIcon(*oomIcon);
+
 	insertItems = new QActionGroup(this);
 	insertItems->setExclusive(false);
 	insertNote = new QAction(QIcon(*note1Icon), tr("insert Note"), insertItems);
@@ -565,6 +568,7 @@ ListEdit::ListEdit(PartList* pl)
 
 	connect(liste, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
 	connect(liste, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(doubleClicked(QTreeWidgetItem*)));
+
 	//---------------------------------------------------
 	//    Rest
 	//---------------------------------------------------
@@ -572,6 +576,7 @@ ListEdit::ListEdit(PartList* pl)
 	mainGrid->setRowStretch(1, 100);
 	mainGrid->setColumnStretch(0, 100);
 	mainGrid->addWidget(liste, 1, 0, 2, 1);
+    //setLayout(mainGrid);
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	songChanged(-1);
 
@@ -1028,4 +1033,15 @@ void ListEdit::keyPressEvent(QKeyEvent* event)
 		close();
 		return;
 	}
+}
+
+//---------------------------------------------------------
+//   resizeEvent
+//---------------------------------------------------------
+
+void ListEdit::resizeEvent(QResizeEvent* e)
+{
+    QSize newSize = e->size();
+    liste->resize(newSize.width(), newSize.height()-listTools->height()-6); // 6 = default Qt widget padding
+    AbstractMidiEditor::resizeEvent(e);
 }

@@ -76,6 +76,9 @@ public slots:
 signals:
     void deleted(unsigned long);
 
+protected:
+    void resizeEvent(QResizeEvent *);
+
 public:
     ListEdit(PartList*);
     ~ListEdit();
