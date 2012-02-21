@@ -502,134 +502,140 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 {
 	QString instrumentName = cmbInstrument->itemData(index, CTDInstrumentNameRole).toString();
 	QString trackName = txtName->text();
-	if(btnAdd->isEnabled())
+	if(trackName.isEmpty())
 	{
-        chkInput->setEnabled(true);
-        cmbInput->setEnabled(true);
-        cmbInChannel->setEnabled(true);
-        chkOutput->setEnabled(true);
-        cmbOutput->setEnabled(true);
-        cmbOutChannel->setEnabled(true);
-        midiBox->setChecked(true);
-        midiBox->setEnabled(true);
+		trackName = Track::getValidName(instrumentName);
+		txtName->setText(trackName);
+		trackNameEdited();
+	}
+	//if(btnAdd->isEnabled())
+	//{
+    chkInput->setEnabled(true);
+    cmbInput->setEnabled(true);
+    cmbInChannel->setEnabled(true);
+    chkOutput->setEnabled(true);
+    cmbOutput->setEnabled(true);
+    cmbOutChannel->setEnabled(true);
+    midiBox->setChecked(true);
+    midiBox->setEnabled(true);
 
-		int insType = cmbInstrument->itemData(index, CTDInstrumentTypeRole).toInt();
-		switch(insType)
+	int insType = cmbInstrument->itemData(index, CTDInstrumentTypeRole).toInt();
+	switch(insType)
+	{
+		case TrackManager::LS_INSTRUMENT:
 		{
-			case TrackManager::LS_INSTRUMENT:
+			for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
 			{
-				for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+				if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
 				{
-					if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
+					m_panKnob->setValue((*i)->defaultPan());
+					m_auxKnob->setValue((*i)->defaultVerb());
+					if(m_instrumentLoaded)
+					{//unload the last one
+						cleanup();
+					}
+					if(!lsClient)
 					{
-						m_panKnob->setValue((*i)->defaultPan());
-						m_auxKnob->setValue((*i)->defaultVerb());
-						if(m_instrumentLoaded)
-						{//unload the last one
-							cleanup();
-						}
-						if(!lsClient)
+						lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+						lsClientStarted = lsClient->startClient();
+						if(config.lsClientResetOnStart && lsClientStarted)
 						{
-							lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
-							lsClientStarted = lsClient->startClient();
-							if(config.lsClientResetOnStart && lsClientStarted)
-							{
-								lsClient->resetSampler();
-							}
+							lsClient->resetSampler();
 						}
-						else if(!lsClientStarted)
+					}
+					else if(!lsClientStarted)
+					{
+						lsClientStarted = lsClient->startClient();
+					}
+					if(lsClientStarted)
+					{
+						m_instrumentMap = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+						if(m_instrumentMap >= 0)
+							m_existingMap = true;
+						else
+							m_existingMap = false;
+						qDebug("CreateTrackDialog::updateInstrument: Searching for Instrument loaded found: %d", m_instrumentMap);
+						if(!m_existingMap)
 						{
-							lsClientStarted = lsClient->startClient();
-						}
-						if(lsClientStarted)
-						{
-							m_instrumentMap = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
-							if(m_instrumentMap >= 0)
-								m_existingMap = true;
-							else
-								m_existingMap = false;
-							qDebug("CreateTrackDialog::updateInstrument: Searching for Instrument loaded found: %d", m_instrumentMap);
-							if(!m_existingMap)
+							qDebug("CreateTrackDialog::updateInstrument: Loading Instrument to LinuxSampler");
+							if(lsClient->loadInstrument(*i))
 							{
-								qDebug("CreateTrackDialog::updateInstrument: Loading Instrument to LinuxSampler");
-								if(lsClient->loadInstrument(*i))
-								{
-									m_instrumentMap = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
-									m_instrumentLoaded = true;
-									qDebug("CreateTrackDialog::updateInstrument: Instrument Map Loaded");
-									//reload input/output list and select the coresponding ports respectively
-									updateVisibleElements();
-                        			chkInput->setChecked(true);
-                        			chkInput->setEnabled(true);
-                        			chkOutput->setChecked(false);
-                        			chkOutput->setEnabled(false);
-                        			midiBox->setChecked(true);
-                        			midiBox->setEnabled(true);
-									cmbMonitor->setEnabled(false);
-								}
-								else
-								{//TODO: BIG ERROR Here cant connect to LinuxSampler for whatever reason this is show stopper error
-									qDebug("CreateTrackDialog::updateInstrument: ERROR: Faild to load instrument into LinuxSampler");
-								}
-							}
-							else
-							{
+								m_instrumentMap = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
+								m_instrumentLoaded = true;
+								qDebug("CreateTrackDialog::updateInstrument: Instrument Map Loaded");
+								//reload input/output list and select the coresponding ports respectively
 								updateVisibleElements();
-                        		chkInput->setChecked(true);
-                        		chkInput->setEnabled(true);
-                        		chkOutput->setChecked(false);
-                        		chkOutput->setEnabled(false);
-                        		midiBox->setChecked(true);
-                        		midiBox->setEnabled(true);
+                    			chkInput->setChecked(true);
+                    			chkInput->setEnabled(true);
+                    			chkOutput->setChecked(false);
+                    			chkOutput->setEnabled(false);
+                    			midiBox->setChecked(true);
+                    			midiBox->setEnabled(true);
 								cmbMonitor->setEnabled(false);
+							}
+							else
+							{//TODO: BIG ERROR Here cant connect to LinuxSampler for whatever reason this is show stopper error
+								qDebug("CreateTrackDialog::updateInstrument: ERROR: Faild to load instrument into LinuxSampler");
 							}
 						}
 						else
-						{//TODO: BIG ERROR Here cant connect to LinuxSampler for whatever reason this is show stopper error
-							qDebug("CreateTrackDialog::updateInstrument: FATAL ERROR: Faild to connect to LinuxSampler~~~~~~~~~~~~~~~~~~~~~");
+						{
+							updateVisibleElements();
+                    		chkInput->setChecked(true);
+                    		chkInput->setEnabled(true);
+                    		chkOutput->setChecked(false);
+                    		chkOutput->setEnabled(false);
+                    		midiBox->setChecked(true);
+                    		midiBox->setEnabled(true);
+							cmbMonitor->setEnabled(false);
 						}
-						break;
 					}
+					else
+					{//TODO: BIG ERROR Here cant connect to LinuxSampler for whatever reason this is show stopper error
+						qDebug("CreateTrackDialog::updateInstrument: FATAL ERROR: Faild to connect to LinuxSampler~~~~~~~~~~~~~~~~~~~~~");
+					}
+					break;
 				}
 			}
-			break;
-			case TrackManager::SYNTH_INSTRUMENT:
-			{
-                for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
-                {
-                    if ((*i)->isSynthPlugin() && (*i)->name() == instrumentName)
-                    {
-                        if(m_instrumentLoaded)
-						{   //unload the last one
-							cleanup();
-						}
-
-                        updateVisibleElements();
-                        populateMonitorList();
-                        chkInput->setChecked(true);
-                        chkInput->setEnabled(true);
-                        chkOutput->setChecked(false);
-                        chkOutput->setEnabled(false);
-                        midiBox->setChecked(false);
-                        midiBox->setEnabled(false);
-
-                        m_instrumentLoaded = true;
-                        break;
-                    }
-                }
-			}
-			break;
-			default:
-			{
-                if(m_instrumentLoaded)
-				{   //unload the last one
-					cleanup();
-				}
-                updateVisibleElements();
-			}
-			break;
 		}
+		break;
+		case TrackManager::SYNTH_INSTRUMENT:
+		{
+            for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
+            {
+                if ((*i)->isSynthPlugin() && (*i)->name() == instrumentName)
+                {
+                    if(m_instrumentLoaded)
+					{   //unload the last one
+						cleanup();
+					}
+
+                    updateVisibleElements();
+                    populateMonitorList();
+                    chkInput->setChecked(true);
+                    chkInput->setEnabled(true);
+                    chkOutput->setChecked(false);
+                    chkOutput->setEnabled(false);
+                    midiBox->setChecked(false);
+                    midiBox->setEnabled(false);
+
+                    m_instrumentLoaded = true;
+                    break;
+                }
+            }
+		}
+		break;
+		default:
+		{
+            if(m_instrumentLoaded)
+			{   //unload the last one
+				cleanup();
+			}
+            updateVisibleElements();
+		}
+		break;
 	}
+	//}
 }/*}}}*/
 
 //Input raw slot
