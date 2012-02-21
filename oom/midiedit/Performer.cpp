@@ -2197,6 +2197,8 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 
 void Performer::saveInstrumentControllerState()/*{{{*/
 {
+	if(m_currentInstrument.isEmpty())
+		return;
 	QStringList controllers;
 	foreach(CtrlEdit* edit, ctrlEditList)
 	{
