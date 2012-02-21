@@ -250,7 +250,6 @@ ScrollScale::ScrollScale(int s1, int s2, int cs, int max_, Qt::Orientation o,
 	scale->setValue(cur);
 
 	scroll = new QScrollBar(o);
-	//scroll->setFocusPolicy(Qt::NoFocus);  // Tim.
 	setScale(cur);
 
 	if (o == Qt::Horizontal)
@@ -258,12 +257,14 @@ ScrollScale::ScrollScale(int s1, int s2, int cs, int max_, Qt::Orientation o,
 		box = new QBoxLayout(QBoxLayout::LeftToRight);
 		scale->setMaximumWidth(70);
 		scroll->setMinimumWidth(50);
+		setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	}
 	else
 	{
 		box = new QBoxLayout(QBoxLayout::TopToBottom);
 		scroll->setMinimumHeight(50);
 		scale->setMaximumHeight(70);
+		setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 	}
 	box->addWidget(scroll, 10);
 	box->addWidget(scale, 5);

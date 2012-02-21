@@ -679,7 +679,7 @@ void PCScale::moveSelected(int dir)/*{{{*/
  */
 void PCScale::copySelected(bool checked)/*{{{*/
 {
-	if(!checked)
+	if(!checked || _pc.event.empty())
 		return;
 	int x = m_clickpos;
 	Event nevent = _pc.event.clone();

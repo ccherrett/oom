@@ -51,20 +51,21 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	setObjectName(name);
 	inHeartBeat = true;
 	editor = e;
-	QVBoxLayout* vbox = new QVBoxLayout;
-	QHBoxLayout* bbox = new QHBoxLayout;
-	bbox->setSpacing(0);
-	vbox->addLayout(bbox);
-	//vbox->addStretch();
-	QHBoxLayout* kbox = new QHBoxLayout;
-	QHBoxLayout* dbox = new QHBoxLayout;
-	vbox->addLayout(kbox);
-	vbox->addLayout(dbox);
-	//vbox->addStretch();
-	vbox->setContentsMargins(0, 0, 0, 0);
-	bbox->setContentsMargins(0, 0, 0, 0);
-	kbox->setContentsMargins(0, 0, 0, 0);
-	dbox->setContentsMargins(0, 0, 0, 0);
+	m_collapsed = false;
+	QVBoxLayout* mainLayout = new QVBoxLayout;
+	QHBoxLayout* buttonBox = new QHBoxLayout;
+	buttonBox->setSpacing(0);
+	mainLayout->addLayout(buttonBox);
+	//mainLayout->addStretch();
+	//QHBoxLayout* knobBox = new QHBoxLayout;
+	//QHBoxLayout* labelBox = new QHBoxLayout;
+	//mainLayout->addLayout(knobBox);
+	//mainLayout->addLayout(labelBox);
+	//mainLayout->addStretch();
+	mainLayout->setContentsMargins(0, 0, 0, 0);
+	buttonBox->setContentsMargins(0, 0, 0, 0);
+	//knobBox->setContentsMargins(0, 0, 0, 0);
+	//labelBox->setContentsMargins(0, 0, 0, 0);
 
 	btnCollapse = new QToolButton();
 	btnCollapse->setCheckable(true);
@@ -122,18 +123,21 @@ CtrlPanel::CtrlPanel(QWidget* parent, AbstractMidiEditor* e, const char* name)
 	connect(_dl, SIGNAL(doubleClicked(int)), SLOT(labelDoubleClicked()));
     connect(heartBeatTimer, SIGNAL(timeout()), SLOT(heartBeat()));
 
-	bbox->addStretch();
-	bbox->addWidget(btnCollapse);
-	bbox->addWidget(btnClose);
-	bbox->addStretch();
-	kbox->addStretch();
-	kbox->addWidget(_knob);
-	kbox->addStretch();
-	dbox->addStretch();
-	dbox->addWidget(_dl);
-	dbox->addStretch();
-	vbox->addStretch();
-    setLayout(vbox);
+	buttonBox->addStretch();
+	buttonBox->addWidget(btnCollapse);
+	buttonBox->addWidget(btnClose);
+	buttonBox->addStretch();
+
+	//knobBox->addStretch();
+	mainLayout->addWidget(_knob, 0, Qt::AlignHCenter);
+	//knobBox->addStretch();
+	
+	//labelBox->addStretch();
+	mainLayout->addWidget(_dl, 0, Qt::AlignHCenter);
+	//labelBox->addStretch();
+	
+	mainLayout->addStretch();
+    setLayout(mainLayout);
 
     inHeartBeat = false;
 }
@@ -225,12 +229,23 @@ void CtrlPanel::toggleCollapsed(bool val)
 	btnCollapse->blockSignals(true);
 	btnCollapse->setChecked(val);
 	btnCollapse->blockSignals(false);
-	if (_dnum != CTRL_VELOCITY)
+
+	emit collapsed(val);
+	
+	m_collapsed = val;
+	if(val)
 	{
 		_knob->setVisible(!val);
 		_dl->setVisible(!val);
 	}
-	emit collapsed(val);
+	else
+	{
+		if (_dnum != CTRL_VELOCITY)
+		{
+			_knob->setVisible(!val);
+			_dl->setVisible(!val);
+		}
+	}
 }
 
 //---------------------------------------------------------
@@ -515,11 +530,14 @@ void CtrlPanel::setHWController(MidiTrack* t, MidiController* ctrl)/*{{{*/
 		_knob->setValue(double(v));
 		_dl->setValue(dlv);
 
-		_knob->show();
-		_dl->show();
-		// Incomplete drawing sometimes. Update fixes it.
-		_knob->update();
-		_dl->update();
+		if(!m_collapsed)
+		{
+			_knob->show();
+			_dl->show();
+			// Incomplete drawing sometimes. Update fixes it.
+			_knob->update();
+			_dl->update();
+		}
 	}
 
 	inHeartBeat = false;

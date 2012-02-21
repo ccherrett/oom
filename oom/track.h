@@ -866,7 +866,7 @@ public:
 
     virtual bool isMute() const
     {
-        return _mute;
+        return false;
     }
 
 };

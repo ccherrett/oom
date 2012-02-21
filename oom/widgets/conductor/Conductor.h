@@ -165,8 +165,6 @@ public:
     {
 	    return patchList;
     }
-    void setLabelText();
-    void setLabelFont();
     void updateConductor(int);
     void setSolo(bool val);
 };

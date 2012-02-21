@@ -10,29 +10,7 @@
 // if fails to compile, why ?
 #include "app.h"
 
-#include <QLayout>
-#include <QSizeGrip>
-#include <QLabel>
-#include <QPushButton>
-#include <QToolButton>
-#include <QToolTip>
-#include <QMenu>
-#include <QSignalMapper>
-#include <QMenuBar>
 #include <QApplication>
-#include <QClipboard>
-#include <QDir>
-#include <QAction>
-#include <QKeySequence>
-#include <QKeyEvent>
-#include <QGridLayout>
-#include <QResizeEvent>
-#include <QCloseEvent>
-#include <QMimeData>
-#include <QScrollArea>
-#include <QWidgetAction>
-#include <QDockWidget>
-#include <QTabWidget>
 #include <QtGui>
 
 #include <stdio.h>
@@ -46,10 +24,9 @@
 #include "pitchlabel.h"
 #include "scrollscale.h"
 #include "Piano.h"
-#include "../ctrl/ctrledit.h"
+#include "ctrl/ctrledit.h"
 #include "splitter.h"
 #include "ttoolbar.h"
-//#include "tb1.h"
 #include "utils.h"
 #include "globals.h"
 #include "gconfig.h"
@@ -94,6 +71,7 @@ static int rasterTable[] = {
 	9, 18, 36, 72, 144, 288, 576, 1152, 2304 // dot
 };
 
+static const QString DEFAULT_CONTROLLERS("MainVolume:0:80::Velocity:0:60::Modulation:0:80");
 
 //---------------------------------------------------------
 //   Performer
@@ -104,6 +82,11 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	deltaMode = false;
+	
+	m_layout = new QVBoxLayout;
+	m_layout->setContentsMargins(0,0,0,0);
+	m_layout->setSpacing(0);
+	mainw->setLayout(m_layout);
 
 	selPart = 0;
 	quantConfig = 0;
@@ -115,10 +98,14 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	colorMode = tconfig().get_property("PerformerEdit", "colormode", colorModeInit).toInt();
 	_stepQwerty = false;
 
+	//-------------------------------------------------------
+	// Configure Dock widget
+	//-------------------------------------------------------
+	
 	m_prDock = new QDockWidget(tr("The Orchestra Pit"), this);
 	m_prDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	m_prDock->setObjectName("dockResourceCenter");
-	m_prDock->setMinimumWidth(190);
+	m_prDock->setMinimumWidth(275);
 	addDockWidget(Qt::LeftDockWidgetArea, m_prDock);
 
 	m_tabs = new QTabWidget(m_prDock);
@@ -139,6 +126,29 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	dockLayout->addWidget(m_tabs);
 	m_prDock->setWidget(dockWidget);
 	connect(m_prDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(dockAreaChanged(Qt::DockWidgetArea)));
+
+	midiConductor = new Conductor(this, 0, _rasterInit, _quantInit);
+	midiConductor->setObjectName("prTrackInfo");
+	midiConductor->setMinimumSize(QSize(190,100));
+
+	
+	// Catch left/right arrow key events for this widget so we
+	// can easily move the focus back from this widget to the canvas.
+	// TODO: Remove this in favour of parent level actions
+	installEventFilter(this);
+	midiConductor->installEventFilter(this);
+	midiConductor->getView()->installEventFilter(this);
+	midiConductor->getPatchListview()->installEventFilter(this);
+
+	m_trackListView = new TrackListView(this ,this);
+	m_trackListView->installEventFilter(this);
+	m_trackListView->getView()->installEventFilter(this);
+
+	info = new NoteInfo(this);
+
+	m_tabs->addTab(midiConductor, tr("   Conductor   "));
+	m_tabs->addTab(m_trackListView, tr("   Track List   "));
+	m_tabs->addTab(info, tr("   Note Info   "));
 
 	//--------------------------------------------------
 	// Initialize menu functions
@@ -187,7 +197,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	m_muteAction->setCheckable(true);
 	m_mutePart->setDefaultAction(m_muteAction);
 
-	QToolBar *cursorBar = new QToolBar(tr("Cursor"));
+	cursorBar = new QToolBar(tr("Cursor"));
 	posLabel = new PosLabel(0, "pos");
 	posLabel->setFixedHeight(25);
 	posLabel->setObjectName("Cursor");
@@ -212,162 +222,119 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	cursorBar->setMovable(false);
 	cursorBar->setAllowedAreas(Qt::BottomToolBarArea);
 	
-	tools22 = new EditToolBar(this, performerTools);
-    tools2 = new QToolBar(tr("Edit Tools"));
-	tools2->setObjectName("PREditToolBar");
-	tools2->setIconSize(QSize(29, 25));
-	addToolBar(Qt::BottomToolBarArea, tools2);
-	tools2->setFloatable(false);
-	tools2->setMovable(false);
-	tools2->setAllowedAreas(Qt::BottomToolBarArea);
+	editTools = new EditToolBar(this, performerTools);
+    
+	editToolbar = new QToolBar(tr("Edit Tools"));
+	editToolbar->setObjectName("PREditToolBar");
+	editToolbar->setIconSize(QSize(29, 25));
+	editToolbar->setFloatable(false);
+	editToolbar->setMovable(false);
+	editToolbar->setAllowedAreas(Qt::BottomToolBarArea);
+	addToolBar(Qt::BottomToolBarArea, editToolbar);
+	
 	QWidget* tspacer = new QWidget();
 	tspacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tspacer->setMaximumWidth(170);
-	tools2->addWidget(tspacer);
+	editToolbar->addWidget(tspacer);
 
 	bool showPanic = false;
 	bool showMuteSolo = true;
 	TransportToolbar *transportbar = new TransportToolbar(this,showPanic,showMuteSolo);
 	transportbar->setMuteAction(m_muteAction);
 	transportbar->setSoloAction(m_soloAction);
-	tools2->addWidget(transportbar);
+	editToolbar->addWidget(transportbar);
 	connect(transportbar, SIGNAL(recordTriggered(bool)), this, SLOT(checkPartLengthForRecord(bool)));
+
 	QWidget* spacer55 = new QWidget();
 	spacer55->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer55->setMaximumWidth(15);
-	tools2->addWidget(spacer55);
-	tools2->addWidget(tools22);
+	editToolbar->addWidget(spacer55);
+	editToolbar->addWidget(editTools);
 	QWidget* spacer555 = new QWidget();
 	spacer555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer555->setMaximumWidth(15);
-	tools2->addWidget(spacer555);
+	editToolbar->addWidget(spacer555);
 	QList<QAction*> epicList;
 	epicList.append(m_globalKeyAction);
 	epicList.append(m_globalArmAction);
 
 	EpicToolbar* epicBar = new EpicToolbar(epicList, this);
-	tools2->addWidget(epicBar);
+	editToolbar->addWidget(epicBar);
 	noteAlphaAction->setChecked(true);
 	QWidget* spacer5555 = new QWidget();
 	spacer5555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer5555->setMaximumWidth(15);
-	tools2->addWidget(spacer5555);
+	editToolbar->addWidget(spacer5555);
 	LoopToolbar* loopBar = new LoopToolbar(Qt::Horizontal, this);
-	tools2->addWidget(loopBar);
+	editToolbar->addWidget(loopBar);
 	QWidget* spacer55555 = new QWidget();
 	spacer55555->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer55555->setMaximumWidth(15);
-	tools2->addWidget(spacer55555);
+	editToolbar->addWidget(spacer55555);
 	
 	QList<QAction*> miscList;
 	miscList.append(m_stepAction);
 	miscList.append(m_speakerAction);
 
 	MiscToolbar* miscBar = new MiscToolbar(miscList, this);
-	tools2->addWidget(miscBar);
+	editToolbar->addWidget(miscBar);
 	QWidget* spacer5 = new QWidget();
 	spacer5->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	spacer5->setMaximumWidth(15);
-	tools2->addWidget(spacer5);
+	editToolbar->addWidget(spacer5);
 
-    QSizeGrip* corner = new QSizeGrip(mainw);
+    QSizeGrip* corner = new QSizeGrip(this);
 	QWidget* spacer3 = new QWidget();
 	spacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	tools2->addWidget(spacer3);
-	tools2->addWidget(corner);
-
-	info = new NoteInfo(this);
+	editToolbar->addWidget(spacer3);
+	editToolbar->addWidget(corner);
 
 	//---------------------------------------------------
 	//    split
 	//---------------------------------------------------
 
-	splitter = new Splitter(Qt::Vertical, this, "splitter");
-	splitter->setHandleWidth(2);
-	splitter->setChildrenCollapsible(false);//TODO: Make this user configurable
+	canvasFrame = new QFrame(this);
+	//canvasFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	QHBoxLayout *canvasFrameBox = new QHBoxLayout();
+	canvasFrameBox->setContentsMargins(0,0,0,0);
+	canvasFrameBox->setSpacing(0);
+	canvasFrame->setLayout(canvasFrameBox);
 
-	hsplitter = new Splitter(Qt::Horizontal, mainw, "hsplitter");
-	hsplitter->setChildrenCollapsible(true);
-	hsplitter->setHandleWidth(2);
-
-	QToolButton* ctrl = new QToolButton(mainw);
+	QToolButton* ctrl = new QToolButton(this);
 	ctrl->setObjectName("Ctrl");
 	ctrl->setToolTip(tr("Add Controller Lane"));
 	ctrl->setIcon(*plusIconSet3);
 	ctrl->setAutoRaise(true);
 
-	QToolButton* collapseAll = new QToolButton(mainw);
+	QToolButton* collapseAll = new QToolButton(this);
 	collapseAll->setToolTip(tr("Toggle Callapse Lanes"));
 	collapseAll->setIcon(*collapseIconSet3);
 	collapseAll->setAutoRaise(true);
 	collapseAll->setCheckable(true);
 
-	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, mainw);
+	hscroll = new ScrollScale(-25, -2, xscale, 20000, Qt::Horizontal, this);
 	//ctrl->setIconSize(QSize(25,25));
 	ctrl->setFixedSize(QSize(pianoWidth/2, hscroll->sizeHint().height()));
 	ctrl->setIconSize(QSize(pianoWidth/2, hscroll->sizeHint().height()));
 	collapseAll->setFixedSize(QSize(pianoWidth/2, hscroll->sizeHint().height()));
 	collapseAll->setIconSize(QSize(pianoWidth/2, hscroll->sizeHint().height()));
 
-	midiConductor = new Conductor(this, 0, _rasterInit, _quantInit);
-	midiConductor->setObjectName("prTrackInfo");
-	midiConductor->btnPrev->setIcon(*previousIconSet3);
-	midiConductor->btnPrev->setIconSize(QSize(25, 25));
-	midiConductor->btnPrev->setFixedSize(QSize(25, 25));
-	midiConductor->btnPrev->setToolTip(tr("Select Previous Part"));
-	midiConductor->btnNext->setIcon(*nextIconSet3);
-	midiConductor->btnNext->setIconSize(QSize(25, 25));
-	midiConductor->btnNext->setFixedSize(QSize(25, 25));
-	midiConductor->btnNext->setToolTip(tr("Select Next Part"));
-	midiConductor->btnPrev->setVisible(true);
-	midiConductor->btnNext->setVisible(true);
-	connect(midiConductor->btnPrev, SIGNAL(clicked()), this, SLOT(selectPrevPart()));
-	connect(midiConductor->btnNext, SIGNAL(clicked()), this, SLOT(selectNextPart()));
-	int mtiw = 280; //midiConductor->width(); // Save this.
-	midiConductor->setMinimumSize(QSize(190,100));
-	// Catch left/right arrow key events for this widget so we
-	// can easily move the focus back from this widget to the canvas.
-	// TODO: Remove this in favour of parent level actions
-	installEventFilter(this);
-	midiConductor->installEventFilter(this);
-	midiConductor->getView()->installEventFilter(this);
-	midiConductor->getPatchListview()->installEventFilter(this);
-
-	connect(hsplitter, SIGNAL(splitterMoved(int, int)), midiConductor, SLOT(updateSize()));
-	connect(hsplitter, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
-
-	m_trackListView = new TrackListView(this ,this);
-	m_trackListView->installEventFilter(this);
-	m_trackListView->getView()->installEventFilter(this);
-
-	m_tabs->addTab(midiConductor, tr("   Conductor   "));
-	m_tabs->addTab(m_trackListView, tr("   Track List   "));
-	m_tabs->addTab(info, tr("   Note Info   "));
-	hsplitter->addWidget(splitter);
-
-	mainGrid->setRowStretch(0, 100);
-	mainGrid->setColumnStretch(1, 100);
-	mainGrid->addWidget(hsplitter, 0, 1, 1, 3);
-
-	QWidget* split1 = new QWidget(splitter);
-	split1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	split1->setObjectName("split1");
-	QGridLayout* gridS1 = new QGridLayout(split1);
-	gridS1->setContentsMargins(0, 0, 0, 0);
-	gridS1->setSpacing(0);
 	//Defined and configure your program change bar here.
 	//This may well be a copy of MTScale extended for our needs
-	pcbar = new PCScale(&_raster, split1, this, xscale);
-	time = new MTScale(&_raster, split1, xscale);
-	piano = new Piano(split1, yscale, this);
-    canvas = new PerformerCanvas(this, split1, xscale, yscale);
-    vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, split1);
+	pcbar = new PCScale(&_raster, this, this, xscale);
+	time = new MTScale(&_raster, this, xscale);
+	piano = new Piano(this, yscale, this);
+    piano->setFixedWidth(pianoWidth);
+    canvas = new PerformerCanvas(this, this, xscale, yscale);
+	//canvas->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    vscroll = new ScrollScale(-1, 7, yscale, KH * 75, Qt::Vertical, this);
 
-    int offset = -(config.division / 4);
+    
+	int offset = -(config.division / 4);
     canvas->setOrigin(offset, 0);
     canvas->setCanvasTools(performerTools);
     canvas->setFocus();
-    connect(canvas, SIGNAL(toolChanged(int)), tools22, SLOT(set(int)));
+    connect(canvas, SIGNAL(toolChanged(int)), editTools, SLOT(set(int)));
 
 	//Connect the functions to canvas
 	connect(functionMapper, SIGNAL(mapped(int)), canvas, SLOT(actionCommand(int)));
@@ -375,47 +342,100 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     time->setOrigin(offset, 0);
     pcbar->setOrigin(offset, 0);
 
-    gridS1->setRowStretch(2, 100);
-    gridS1->setColumnStretch(1, 100);
+	canvasFrameBox->addWidget(piano, 0);
+	canvasFrameBox->addWidget(canvas, 1);
+	canvasFrameBox->addWidget(vscroll, 0);
 
-    gridS1->addWidget(pcbar, 0, 1, 1, 2);
-    gridS1->addWidget(time, 1, 1, 1, 2);
-    gridS1->addWidget(hLine(split1), 2, 0, 1, 3);
-    gridS1->addWidget(piano, 3, 0);
-    gridS1->addWidget(canvas, 3, 1);
-    gridS1->addWidget(vscroll, 3, 2);
-
-    ctrlLane = new Splitter(Qt::Vertical, splitter, "ctrllane");
-	ctrlLane->setChildrenCollapsible(false);//TODO: Make this user configurable
-	ctrlLane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-    QWidget* split2 = new QWidget(splitter);
-    split2->setMaximumHeight(hscroll->sizeHint().height());
-    split2->setMinimumHeight(hscroll->sizeHint().height());
-    QGridLayout* gridS2 = new QGridLayout(split2);
-    gridS2->setContentsMargins(0, 0, 0, 0);
-    gridS2->setSpacing(0);
-    gridS2->setRowStretch(0, 100);
-    gridS2->setColumnStretch(1, 100);
+    QWidget* hscrollLane = new QWidget(this);
+    hscrollLane->setFixedHeight(hscroll->sizeHint().height());
+    QGridLayout* hscrollGrid = new QGridLayout(hscrollLane);
+    hscrollGrid->setContentsMargins(0, 0, 0, 0);
+    hscrollGrid->setSpacing(0);
+    hscrollGrid->setRowStretch(0, 100);
+    hscrollGrid->setColumnStretch(1, 100);
 
 	QHBoxLayout *buttonBox = new QHBoxLayout();
 	buttonBox->addWidget(collapseAll);
 	buttonBox->addWidget(ctrl);
     
-	gridS2->addLayout(buttonBox, 0, 0);
-    gridS2->addWidget(hscroll, 0, 1);
+	hscrollGrid->addLayout(buttonBox, 0, 0);
+    hscrollGrid->addWidget(hscroll, 0, 1);
 
-    splitter->setCollapsible(2, false);
+	QVBoxLayout *rulerLane = new QVBoxLayout;
+	rulerLane->setContentsMargins(0,0,0,0);
+	rulerLane->setSpacing(0);
 
-    piano->setFixedWidth(pianoWidth);
+	QHBoxLayout* topBox = new QHBoxLayout;
+	topBox->setContentsMargins(0,0,0,0);
+	topBox->setSpacing(0);
 
-    QList<int> mops;
-    mops.append(mtiw); // 30 for possible scrollbar
-    mops.append(width() - mtiw);
-    hsplitter->setSizes(mops);
-    hsplitter->setStretchFactor(0, 0);
-    hsplitter->setStretchFactor(1, 15);
+	QWidget* topFiller = new QWidget(this);
+	topFiller->setFixedWidth(pianoWidth);
+	QVBoxLayout *fillerBox = new QVBoxLayout(topFiller);
+	fillerBox->setContentsMargins(0,0,0,0);
+	fillerBox->setSpacing(0);
 
-    connect(tools22, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
+	QString key = QKeySequence(shortcuts[SHRT_ADD_PROGRAM].key).toString(); 
+	m_btnAddProgram = new QToolButton();
+	m_btnAddProgram->setDefaultAction(funcAddProgramChangeAction);
+	m_btnAddProgram->setAutoRaise(true);
+	m_btnAddProgram->setToolTip(QString(tr("Add Program Change at Cursor position \t")).append(key));
+	m_btnAddProgram->setFixedSize(QSize(20, 20));
+	m_btnAddProgram->setIconSize(QSize(20, 20));
+	
+	key = QKeySequence(shortcuts[SHRT_DEL_PROGRAM].key).toString();
+	m_btnDeleteProgram = new QToolButton();
+	m_btnDeleteProgram->setDefaultAction(funcDelProgramChangeAction);
+	m_btnDeleteProgram->setAutoRaise(true);
+	m_btnDeleteProgram->setToolTip(QString(tr("Delete Program Change at Cursor position \t")).append(key));
+	m_btnDeleteProgram->setFixedSize(QSize(20, 20));
+	m_btnDeleteProgram->setIconSize(QSize(20, 20));
+	
+	key = QKeySequence(shortcuts[SHRT_SELECT_NEXT_PART].key).toString();
+	m_btnNext = new QToolButton();
+	m_btnNext->setDefaultAction(selectNextPartAction);
+	m_btnNext->setAutoRaise(true);
+	m_btnNext->setToolTip(QString(tr("Select Next Part \t")).append(key));
+	m_btnNext->setFixedSize(QSize(20, 20));
+	m_btnNext->setIconSize(QSize(20,20));
+
+	key = QKeySequence(shortcuts[SHRT_SELECT_PREV_PART].key).toString();
+	m_btnPrev = new QToolButton();
+	m_btnPrev->setDefaultAction(selectPrevPartAction);
+	m_btnPrev->setAutoRaise(true);
+	m_btnPrev->setToolTip(QString(tr("Select Previous Part \t")).append(key));
+	m_btnPrev->setFixedSize(QSize(20, 20));
+	m_btnPrev->setIconSize(QSize(20,20));
+	
+	QHBoxLayout *programBox = new QHBoxLayout;
+	programBox->setContentsMargins(0,0,0,0);
+	programBox->setSpacing(0);
+	programBox->addWidget(m_btnAddProgram);
+	programBox->addWidget(m_btnDeleteProgram);
+	fillerBox->addLayout(programBox);
+
+	QHBoxLayout *navBox = new QHBoxLayout;
+	navBox->setContentsMargins(0,0,0,0);
+	navBox->setSpacing(0);
+	navBox->addWidget(m_btnPrev);
+	navBox->addWidget(m_btnNext);
+	fillerBox->addLayout(navBox);
+
+	//connect(m_btnPrev, SIGNAL(clicked()), this, SLOT(selectPrevPart()));
+	//connect(m_btnNext, SIGNAL(clicked()), this, SLOT(selectNextPart()));
+
+	topBox->addWidget(topFiller);
+	topBox->addLayout(rulerLane);
+
+	rulerLane->addWidget(pcbar, 0);
+	rulerLane->addWidget(time, 0);
+	rulerLane->addWidget(hLine(this), 0);
+	
+	m_layout->addLayout(topBox, 0);
+	m_layout->addWidget(canvasFrame, 1000);
+	m_layout->addWidget(hscrollLane, 0);
+
+    connect(editTools, SIGNAL(toolChanged(int)), canvas, SLOT(setTool(int)));
 
 	connect(noteAlphaAction, SIGNAL(toggled(bool)), canvas, SLOT(update()));
 	connect(pcbar, SIGNAL(drawSelectedProgram(int, bool)), canvas, SLOT(drawSelectedProgram(int, bool)));
@@ -440,7 +460,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
     connect(hscroll, SIGNAL(scaleChanged(float)), pcbar, SLOT(setXMag(float)));
     connect(hscroll, SIGNAL(scaleChanged(float)), SLOT(updateHScrollRange()));
 
-    connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
+    //connect(canvas, SIGNAL(newWidth(int)), SLOT(newCanvasWidth(int)));
     connect(canvas, SIGNAL(pitchChanged(int)), piano, SLOT(setPitch(int)));
     connect(canvas, SIGNAL(verticalScroll(unsigned)), vscroll, SLOT(setPos(unsigned)));
     connect(canvas, SIGNAL(horizontalScroll(unsigned)), hscroll, SLOT(setPos(unsigned)));
@@ -544,15 +564,12 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	//printf("Canvas show comments: %d\n", showcomment);
 	midiConductor->updateCommentState(showcomment, false);
 	
-	QString defaultControllers("MainVolume:Velocity:Modulation");
-	QString controllers = tconfig().get_property("PerformerEdit", "controllers", defaultControllers).toString();
-	QStringList lctrl = controllers.split(":", QString::SkipEmptyParts);
-	foreach(QString ctl, lctrl)
-	{
-		CtrlEdit* userctrl = addCtrl();
-		userctrl->setType(ctl);
+
+	Part* p = curCanvasPart();
+	if(p)
+	{//Update controllers for its track
+		updateControllerForInstrument(p->track()->id());
 	}
-	restoreState(tconfig().get_property("PerformerEdit", "windowstate", "").toByteArray());
 }
 
 //---------------------------------------------------------
@@ -565,7 +582,13 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 void Performer::showEvent(QShowEvent *)/*{{{*/
 {
 
-	int w = tconfig().get_property("PerformerEdit", "widgetwidth", 924).toInt();
+	//int dockwidth = tconfig().get_property("PerformerEdit", "dockwidth", 300).toInt();
+	restoreState(tconfig().get_property("PerformerEdit", "windowstate", "").toByteArray());
+	restoreGeometry(tconfig().get_property("PerformerEdit", "geometry", "").toByteArray());
+
+	//lets try to size the 
+	restoreDockWidget(m_prDock);
+	/*int w = tconfig().get_property("PerformerEdit", "widgetwidth", 924).toInt();
 	int h = tconfig().get_property("PerformerEdit", "widgetheigth", 650).toInt();
 	int dw = qApp->desktop()->width();
 	int dh = qApp->desktop()->height();
@@ -578,8 +601,10 @@ void Performer::showEvent(QShowEvent *)/*{{{*/
 	{
 		//printf("Desktop size too large for saved state\n");
 		showMaximized();
-	}
-		
+	}*/
+	
+	//m_prDock->resize(dockwidth, m_prDock->height());
+
 	// maybe add a bool flag to follow: centered ?
 	// couldn't find a function that does that directly.
 	follow(song->cpos());
@@ -593,83 +618,38 @@ void Performer::showEvent(QShowEvent *)/*{{{*/
 	hscroll->setMag(hScale);
 	vscroll->setMag(vScale);
 	vscroll->setPos(yPos);
-	QList<int> vl2;
-	QString str2 = tconfig().get_property("splitter", "sizes", "347 218 33").toString();
-	QStringList sl2 = str2.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it2 = sl2.begin(); it2 != sl2.end(); ++it2)
-	{
-		int val = (*it2).toInt();
-		vl2.append(val);
-	}
-	splitter->setSizes(vl2);
-	QList<int> vl;
-	QString str = tconfig().get_property("hsplitter", "sizes", "200").toString();
-	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
-	{
-		int val = (*it).toInt();
-		vl.append(val);
-	}
-	hsplitter->setSizes(vl);
-	
-	QList<int> vl3;/*{{{*/
-	//str = "78 50 78 ";//tconfig().get_property("ctrllane", "sizes", "78 50 78 ").toString();
-	str = tconfig().get_property("ctrllane", "sizes", "78 50 78 ").toString();
-	//printf("Control Lane Sizes: %s\n", str.toUtf8().constData());
-	sl = str.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
-	{
-		int val = (*it).toInt();
-		vl3.append(val);
-	}
-	ctrlLane->setSizes(vl3);/*}}}*/
-	//ctrlLane
+
+	updateControllerSizes();
 }/*}}}*/
 
 //---------------------------------------------------------
 //   ~Performer
 //---------------------------------------------------------
 
-Performer::~Performer()/*{{{*/
+Performer::~Performer()
 {
-	// undoRedo->removeFrom(tools);  // p4.0.6 Removed
 	// store widget size to global config
 	tconfig().set_property("PerformerEdit", "widgetwidth", width());
 	tconfig().set_property("PerformerEdit", "widgetheigth", height());
+	tconfig().set_property("PerformerEdit", "geometry", saveGeometry());
 	tconfig().set_property("PerformerEdit", "hscale", hscroll->mag());
 	tconfig().set_property("PerformerEdit", "yscale", vscroll->mag());
 	tconfig().set_property("PerformerEdit", "ypos", vscroll->pos());
 	tconfig().set_property("PerformerEdit", "colormode", colorMode);
 	tconfig().set_property("PerformerEdit", "showcomments", canvas->showComments());
 	tconfig().set_property("PerformerEdit", "windowstate", saveState());
-	//tconfig().set_property("PerformerEdit", "showghostpart", noteAlphaAction->isChecked());
-	//printf("Canvas show comments: %d\n", canvas->showComments());
+	tconfig().set_property("PerformerEdit", "dockwidth", m_prDock->width());
+    tconfig().save();
 	
 	//Delete all the controll lists
-	QStringList controllers;
+	saveInstrumentControllerState();
 	while(ctrlEditList.size())
 	{
 		CtrlEdit* ctrl = ctrlEditList.takeFirst();
 		if(ctrl)
 		{
-			controllers.append(ctrl->type());
 			delete ctrl;
 		}
-	}
-	if(controllers.size())
-	{
-		tconfig().set_property("PerformerEdit", "controllers", controllers.join(":"));
-	}
-    tconfig().save();
-}/*}}}*/
-
-void Performer::toggleCollapseAllControllers(bool val)
-{
-	for(QList<CtrlEdit*>::iterator i = ctrlEditList.begin(); i != ctrlEditList.end(); ++i)
-	{
-		CtrlEdit* edit = (CtrlEdit*)*i;
-		if(edit)
-			edit->setCollapsed(val);
 	}
 }
 
@@ -738,15 +718,11 @@ void Performer::initFunctions()/*{{{*/
 
 	menuSelect->addSeparator();
 
-	//selectPrevPartAction = select->addAction(tr("&Previous Part"));
-	selectPrevPartAction = menuSelect->addAction(QIcon(*select_all_parts_on_trackIcon), tr("&Previous Part"));
+	selectPrevPartAction = menuSelect->addAction(QIcon(*previousIconSet3), tr("&Previous Part"), mapper, SLOT(map()), shortcuts[SHRT_SELECT_PREV_PART].key);
 	mapper->setMapping(selectPrevPartAction, PerformerCanvas::CMD_SELECT_PREV_PART);
-	connect(selectPrevPartAction, SIGNAL(triggered()), mapper, SLOT(map()));
 
-	//selNextPartAction = select->addAction(tr("&Next Part"));
-	selectNextPartAction = menuSelect->addAction(QIcon(*select_all_parts_on_trackIcon), tr("&Next Part"));
+	selectNextPartAction = menuSelect->addAction(QIcon(*nextIconSet3), tr("&Next Part"), mapper, SLOT(map()), shortcuts[SHRT_SELECT_NEXT_PART].key);
 	mapper->setMapping(selectNextPartAction, PerformerCanvas::CMD_SELECT_NEXT_PART);
-	connect(selectNextPartAction, SIGNAL(triggered()), mapper, SLOT(map()));
 
 	menuConfig = menuBar()->addMenu(tr("&Config"));
 
@@ -920,6 +896,16 @@ void Performer::initFunctions()/*{{{*/
 	funcGotoSelNoteAction = menuFunctions->addAction(tr("Move PB to active note"), functionMapper, SLOT(map()), shortcuts[SHRT_GOTO_SEL_NOTE].key);
 	functionMapper->setMapping(funcGotoSelNoteAction, GOTO_SEL_NOTE);
 
+	funcAddProgramChangeAction = menuFunctions->addAction(QIcon(*plusIconSet3), tr("Add Program Change at Cursor"), mapper, SLOT(map()), shortcuts[SHRT_ADD_PROGRAM].key);
+	mapper->setMapping(funcAddProgramChangeAction, PerformerCanvas::CMD_ADD_PROGRAM);
+    
+	funcDelProgramChangeAction = menuFunctions->addAction(QIcon(*garbageIconSet3), tr("Delele Program Change at Cursor"), mapper, SLOT(map()), shortcuts[SHRT_DEL_PROGRAM].key);
+	mapper->setMapping(funcDelProgramChangeAction, PerformerCanvas::CMD_DELETE_PROGRAM);
+
+    funcCopyProgramChangeAction = menuFunctions->addAction(QIcon(*duplicateIconSet3), tr("Copy Selected Program Change"), mapper, SLOT(map()), shortcuts[SHRT_COPY_PROGRAM].key);
+	mapper->setMapping(funcCopyProgramChangeAction, PerformerCanvas::CMD_COPY_PROGRAM);
+    //funcPasteProgramChangeAction = menuFunctions->addAction(tr("Paste Program Change at Cursor"), functionMapper, SLOT(map()), shortcuts[SHRT_GOTO_SEL_NOTE].key);
+
 	/*shortcuts[SHRT_OCTAVE_QWERTY_0].key
 	shortcuts[SHRT_OCTAVE_QWERTY_1].key
 	shortcuts[SHRT_OCTAVE_QWERTY_2].key
@@ -1072,22 +1058,22 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 	}
 	else if (key == shortcuts[SHRT_TOOL_POINTER].key)
 	{
-		tools22->set(PointerTool);
+		editTools->set(PointerTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_PENCIL].key)
 	{
-		tools22->set(PencilTool);
+		editTools->set(PencilTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_RUBBER].key)
 	{
-		tools22->set(RubberTool);
+		editTools->set(RubberTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_TOOL_LINEDRAW].key)
 	{
-		tools22->set(DrawTool);
+		editTools->set(DrawTool);
 		return;
 	}
 	else if (key == shortcuts[SHRT_POS_INC].key)
@@ -1208,7 +1194,7 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 		midiConductor->addSelectedPatch();
 		return;
 	}
-	else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
+	/*else if (key == shortcuts[SHRT_ADD_PROGRAM].key)
 	{
 		unsigned utick = song->cpos() + rasterStep(song->cpos());
 		if(m_globalKeyAction->isChecked())
@@ -1230,7 +1216,7 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 	{
 		pcbar->copySelected(true);
 		return;
-	}
+	}*/
 	if(key == shortcuts[SHRT_SEL_PROGRAM].key)
 	{
 		pcbar->selectProgramChange(song->cpos());
@@ -1246,7 +1232,7 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 		pcbar->moveSelected(1);
 		return;
 	}
-	else if (key == shortcuts[SHRT_DEL_PROGRAM].key)
+	/*else if (key == shortcuts[SHRT_DEL_PROGRAM].key)
 	{
 		//printf("Delete KeyStroke recieved\n");
 		int x = song->cpos();
@@ -1271,7 +1257,7 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 								{
 									pcbar->deleteProgramChange(pcevt);
 									song->startUndo();
-									audio->msgDeleteEvent(evt->second, mprt/*p->second*/, true, true, false);
+									audio->msgDeleteEvent(evt->second, mprt, true, true, false);
 									song->endUndo(SC_EVENT_MODIFIED);
 									break;
 								}
@@ -1283,7 +1269,7 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 		}
 		else
 		{
-			Part* mprt = curCanvasPart();/*{{{*/
+			Part* mprt = curCanvasPart();
 			EventList* eventList = mprt->events();
 			if(eventList && !eventList->empty())
 			{
@@ -1300,18 +1286,18 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 							{
 								pcbar->deleteProgramChange(pcevt);
 								song->startUndo();
-								audio->msgDeleteEvent(evt->second, mprt/*p->second*/, true, true, false);
+								audio->msgDeleteEvent(evt->second, mprt, true, true, false);
 								song->endUndo(SC_EVENT_MODIFIED);
 								break;
 							}
 						}
 					}
 				}
-			}/*}}}*/
+			}
 		}
 		pcbar->update();
 		return;
-	}
+	}*/
 	else if (key == shortcuts[SHRT_SET_QUANT_1].key)
 		val = rasterTable[8 + off];
 	else if (key == shortcuts[SHRT_SET_QUANT_2].key)
@@ -1408,7 +1394,7 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 		//printf("Record key pressed from PR\n");
 		return;
 	}
-	else if (key == shortcuts[SHRT_PLAY_TOGGLE].key)/*{{{*/
+	else if (key == shortcuts[SHRT_PLAY_TOGGLE].key)
 	{
 		checkPartLengthForRecord(song->record());
 		if (audio->isPlaying())
@@ -1424,7 +1410,7 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 			song->setPos(0, p);
 		}
 		return;
-	}/*}}}*/
+	}
 	else
 	{ //Default:
 		event->ignore();
@@ -1498,6 +1484,9 @@ void Performer::initShortcuts()/*{{{*/
 	funcIncreaseLenAction->setShortcut(shortcuts[SHRT_INCREASE_LEN].key);
 	funcDecreaseLenAction->setShortcut(shortcuts[SHRT_DECREASE_LEN].key);
 	funcGotoSelNoteAction->setShortcut(shortcuts[SHRT_GOTO_SEL_NOTE].key);
+	funcAddProgramChangeAction->setShortcut(shortcuts[SHRT_ADD_PROGRAM].key);
+	funcDelProgramChangeAction->setShortcut(shortcuts[SHRT_DEL_PROGRAM].key);
+    funcCopyProgramChangeAction->setShortcut(shortcuts[SHRT_COPY_PROGRAM].key);
 
 }/*}}}*/
 
@@ -1551,6 +1540,10 @@ void Performer::setCurCanvasPart(Part* part)
 		m_muteAction->blockSignals(true);
 		m_muteAction->setChecked(part->mute());
 		m_muteAction->blockSignals(false);
+	}
+	if(part)
+	{
+		updateControllerForInstrument(part->track()->id());
 	}
 	updateConductor();
 	song->update(SC_SELECTION);
@@ -1688,17 +1681,109 @@ void Performer::setTime(unsigned tick)/*{{{*/
 //    pulldown menu commands
 //---------------------------------------------------------
 
-void Performer::cmd(int cmd)
+void Performer::cmd(int cmd)/*{{{*/
 {
-	((PerformerCanvas*) canvas)->cmd(cmd, _quantStrength, _quantLimit, _quantLen, _to);
-}
+	switch(cmd)
+	{
+		case PerformerCanvas::CMD_ADD_PROGRAM:
+		{
+			unsigned utick = song->cpos() + rasterStep(song->cpos());
+			if(m_globalKeyAction->isChecked())
+			{
+				for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+				{
+					Part* part = ip->second;
+					midiConductor->insertMatrixEvent(part, utick);
+				}
+			}
+			else
+			{
+				midiConductor->insertMatrixEvent(curCanvasPart(), utick);
+			}
+		}
+		break;
+		case PerformerCanvas::CMD_DELETE_PROGRAM:
+		{
+			int x = song->cpos();
+			if(m_globalKeyAction->isChecked())
+			{
+				for (iPart ip = parts()->begin(); ip != parts()->end(); ++ip)
+				{
+					Part* mprt = ip->second;
+					EventList* eventList = mprt->events();
+					if(eventList && !eventList->empty())
+					{
+						for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+						{
+							//Get event type.
+							Event pcevt = evt->second;
+							if (!pcevt.isNote())
+							{
+								if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+								{
+									int xp = pcevt.tick() + mprt->tick();
+									if (xp >= x && xp <= (x + 50))
+									{
+										pcbar->deleteProgramChange(pcevt);
+										song->startUndo();
+										audio->msgDeleteEvent(evt->second, mprt/*p->second*/, true, true, false);
+										song->endUndo(SC_EVENT_MODIFIED);
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				Part* mprt = curCanvasPart();
+				EventList* eventList = mprt->events();
+				if(eventList && !eventList->empty())
+				{
+					for (iEvent evt = eventList->begin(); evt != eventList->end(); ++evt)
+					{
+						//Get event type.
+						Event pcevt = evt->second;
+						if (!pcevt.isNote())
+						{
+							if (pcevt.type() == Controller && pcevt.dataA() == CTRL_PROGRAM)
+							{
+								int xp = pcevt.tick() + mprt->tick();
+								if (xp >= x && xp <= (x + 50))
+								{
+									pcbar->deleteProgramChange(pcevt);
+									song->startUndo();
+									audio->msgDeleteEvent(evt->second, mprt/*p->second*/, true, true, false);
+									song->endUndo(SC_EVENT_MODIFIED);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			pcbar->update();
+		}
+		break;
+		case PerformerCanvas::CMD_COPY_PROGRAM:
+		{
+			pcbar->copySelected(true);
+		}
+		break;
+		default:
+			((PerformerCanvas*) canvas)->cmd(cmd, _quantStrength, _quantLimit, _quantLen, _to);
+		break;
+	}
+}/*}}}*/
 
 void Performer::toggleMultiPartSelection(bool toggle)
 {
 	if(toggle)
 	{
 		m_globalKeyAction->setChecked(!toggle);
-		tools22->set(PointerTool);
+		editTools->set(PointerTool);
 	}	
 }
 
@@ -1828,9 +1913,8 @@ void Performer::noteinfoChanged(NoteInfo::ValType type, int val)/*{{{*/
 
 void Performer::updateCanvas()/*{{{*/
 {
-	for(QList<CtrlEdit*>::iterator i = ctrlEditList.begin(); i != ctrlEditList.end(); ++i)
+	foreach(CtrlEdit* edit, ctrlEditList)
 	{
-		CtrlEdit* edit = (CtrlEdit*)*i;
 		if(edit)
 			edit->updateCanvas();
 	}
@@ -1898,7 +1982,7 @@ void Performer::ctrlPopup()/*{{{*/
 
 	//pop->addAction(QIcon(*plusIconSet3), tr("add new ..."))->setData(2);
 	
-	QMenu* subMenu = pop->addMenu(QIcon(*plusIconSet3), tr("Instrument"));/*{{{*/
+	QMenu* subMenu = pop->addMenu(QIcon(*plusIconSet3), tr("Instrument"));
 	// populate popup with all controllers available for
 	// current instrument
 	//
@@ -1912,7 +1996,7 @@ void Performer::ctrlPopup()/*{{{*/
 
 		if (cll->find(channel, num) == cll->end())
 			subMenu->addAction(ci->second->name())->setData(2);
-	}/*}}}*/
+	}
 
 	QAction *act = pop->exec(QCursor::pos());
 
@@ -1950,15 +2034,11 @@ void Performer::ctrlPopup()/*{{{*/
 					MidiCtrlValList* vl = new MidiCtrlValList(num);
 
 					cll->add(channel, vl);
-					CtrlEdit* ctrl = addCtrl();
-					if(ctrl)
-						ctrl->setType(c->name());
+					addCtrl(c->name());
 				}
 				else
 				{
-					CtrlEdit* ctrl = addCtrl();
-					if(ctrl)
-						ctrl->setType(c->name());
+					addCtrl(c->name());
 				}
 				break;
 			}
@@ -1973,35 +2053,49 @@ void Performer::ctrlPopup()/*{{{*/
 			MidiController* c = port->midiController(cl->num());
 			if (c->name() == s)
 			{
-				CtrlEdit* ctrl = addCtrl();
-				if(ctrl)
-					ctrl->setType(c->name());
+				addCtrl(c->name());
 				break;
 			}
 		}
 	}
+	saveInstrumentControllerState();
+	updateControllerSizes();
 }/*}}}*/
 
 //---------------------------------------------------------
 //   addCtrl
 //---------------------------------------------------------
 
-CtrlEdit* Performer::addCtrl()/*{{{*/
+CtrlEdit* Performer::addCtrl(QString name, bool collapse, int height)/*{{{*/
 {
-	CtrlEdit* ctrlEdit = new CtrlEdit(ctrlLane, this, xscale, false, "pianoCtrlEdit"); 
-	connect(tools22, SIGNAL(toolChanged(int)), ctrlEdit, SLOT(setTool(int)));
+	CtrlEdit* ctrlEdit = new CtrlEdit(this, this, xscale, height);
+	ctrlEdit->setType(name);
+	if(name == "Velocity")
+		ctrlEdit->setMinHeight(60);
+	m_layout->insertWidget(m_layout->count()-1, ctrlEdit, 0);
+
+	connect(editTools, SIGNAL(toolChanged(int)), ctrlEdit, SLOT(setTool(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), ctrlEdit, SLOT(setXPos(int)));
 	connect(hscroll, SIGNAL(scaleChanged(float)), ctrlEdit, SLOT(setXMag(float)));
+	
 	connect(ctrlEdit, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
 	connect(ctrlEdit, SIGNAL(destroyedCtrl(CtrlEdit*)), SLOT(removeCtrl(CtrlEdit*)));
 	connect(ctrlEdit, SIGNAL(yposChanged(int)), pitchLabel, SLOT(setInt(int)));
+	connect(ctrlEdit, SIGNAL(resizeEnded()), this, SLOT(updateControllerSizes()));
+	connect(ctrlEdit, SIGNAL(resizeStarted()), this, SLOT(updateControllerSizes()));
+	connect(this, SIGNAL(controllerMaxHeightChanged(int)), ctrlEdit, SLOT(setMaxHeight(int)));
+
 	connect(info, SIGNAL(alphaChanged()), ctrlEdit, SLOT(updateCanvas()));
 	connect(noteAlphaAction, SIGNAL(toggled(bool)), ctrlEdit, SLOT(updateCanvas()));
 
-	ctrlEdit->setTool(tools22->curTool());
+	ctrlEdit->setTool(editTools->curTool());
 	ctrlEdit->setXPos(hscroll->pos());
 	ctrlEdit->setXMag(hscroll->getScaleValue());
 
+	//Collapse before show
+	//ctrlEdit->setExpandedHeight(height);
+	//ctrlEdit->updateHeight(height);
+	ctrlEdit->setCollapsed(collapse);
 	ctrlEdit->show();
 	ctrlEditList.append(ctrlEdit);
 	return ctrlEdit;
@@ -2021,21 +2115,129 @@ void Performer::removeCtrl(CtrlEdit* ctrl)/*{{{*/
 }/*}}}*/
 
 //---------------------------------------------------------
+//   updateControllerSizes
+//---------------------------------------------------------
+
+void Performer::updateControllerSizes()/*{{{*/
+{
+	QRect crect = mainw->contentsRect();
+	int h = crect.height();
+	//qDebug("Performer::updateControllerSizes: contentHeight: %d", h);
+	h -= 200;
+
+	foreach(CtrlEdit* edit, ctrlEditList)
+	{
+		if(edit)
+		{
+			if(edit->collapsed())
+				h -= edit->minHeight();
+			else
+				h -= edit->expandedHeight();
+		}
+	}
+	//qDebug("Performer::updateControllerSizes: new Max Height: %d", h);
+	//Just emit a signal and let them update themselves
+	emit controllerMaxHeightChanged(h);
+}/*}}}*/
+
+void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
+{
+	bool setDefaults = true;
+	Track* track = song->findTrackById(trackId);
+	if(track)
+	{
+		qint64 portid = ((MidiTrack*)track)->outPortId();
+		MidiPort* port = oomMidiPorts.value(portid);
+		if(port)
+		{
+			QString instrument = port->instrument()->iname();
+			if(m_currentInstrument.isEmpty() || m_currentInstrument != instrument)
+			{
+				//save the current controller state and remove them
+				saveInstrumentControllerState();
+				while(ctrlEditList.size())
+					delete ctrlEditList.takeFirst();
+
+				QString controllers = tconfig().get_property("InstrumentControllers", instrument, DEFAULT_CONTROLLERS).toString();
+				QStringList lctrl = controllers.split("::", QString::SkipEmptyParts);
+				foreach(QString ctl, lctrl)
+				{
+					QStringList list = ctl.split(":", QString::SkipEmptyParts);
+					if(list.size() == 3)
+					{
+						bool collapsed = list.at(1).toInt();
+						int height = list.at(2).toInt();
+						addCtrl(list.at(0), collapsed, height);
+					}
+				}
+				m_currentInstrument = instrument;
+			}
+			setDefaults = false;
+		}
+	}
+	if(setDefaults)
+	{
+		QStringList lctrl = DEFAULT_CONTROLLERS.split("::", QString::SkipEmptyParts);
+		foreach(QString ctl, lctrl)
+		{
+			QStringList list = ctl.split(":", QString::SkipEmptyParts);
+			if(list.size() == 3)
+			{
+				bool collapsed = list.at(1).toInt();
+				int height = list.at(2).toInt();
+				addCtrl(list.at(0), collapsed, height);
+			}
+		}
+	}
+	updateControllerSizes();
+}/*}}}*/
+
+void Performer::saveInstrumentControllerState()/*{{{*/
+{
+	QStringList controllers;
+	foreach(CtrlEdit* edit, ctrlEditList)
+	{
+		if(edit)
+		{
+			int collapsed = edit->collapsed();
+			QStringList s;
+			s << edit->type() << QString::number(collapsed) << QString::number(edit->expandedHeight());
+			controllers.append(s.join(":"));
+		}
+	}
+	if(controllers.size())
+	{
+		tconfig().set_property("InstrumentControllers", m_currentInstrument, controllers.join("::"));
+	}
+    tconfig().save();
+}/*}}}*/
+
+void Performer::toggleCollapseAllControllers(bool val)/*{{{*/
+{
+	foreach(CtrlEdit* edit, ctrlEditList)
+	{
+		if(edit)
+			edit->setCollapsed(val);
+	}
+}/*}}}*/
+
+//---------------------------------------------------------
 //   closeEvent
 //---------------------------------------------------------
 
 void Performer::closeEvent(QCloseEvent* e)/*{{{*/
 {
-	tconfig().set_property("PerformerEdit", "widgetwidth", width());
+	/*tconfig().set_property("PerformerEdit", "widgetwidth", width());
 	tconfig().set_property("PerformerEdit", "widgetheigth", height());
 	tconfig().set_property("PerformerEdit", "hscale", hscroll->mag());
 	tconfig().set_property("PerformerEdit", "yscale", vscroll->mag());
 	tconfig().set_property("PerformerEdit", "ypos", vscroll->pos());
 	tconfig().set_property("PerformerEdit", "colormode", colorMode);
 	tconfig().set_property("PerformerEdit", "showcomments", canvas->showComments());
+	tconfig().set_property("PerformerEdit", "dockwidth", m_prDock->width());
 	//tconfig().set_property("PerformerEdit", "showghostpart", noteAlphaAction->isChecked());
 	//printf("Canvas show comments: %d\n", canvas->showComments());
-    tconfig().save();
+    tconfig().save();*/
 	e->accept();
 	emit deleted();
 }/*}}}*/
@@ -2149,13 +2351,7 @@ void Performer::writeStatus(int level, Xml& xml) const/*{{{*/
 	writePartList(level, xml);
 	xml.tag(level++, "performer");
 	AbstractMidiEditor::writeStatus(level, xml);
-	splitter->writeStatus(level, xml);
-	hsplitter->writeStatus(level, xml);
-
-	for (QList<CtrlEdit*>::const_iterator i = ctrlEditList.begin();	i != ctrlEditList.end(); ++i)
-	{
-		(*i)->writeStatus(level, xml);
-	}
+	//splitter->writeStatus(level, xml);
 
 	xml.intTag(level, "steprec", canvas->steprec());
 	xml.intTag(level, "midiin", canvas->midiin());
@@ -2203,19 +2399,10 @@ void Performer::readStatus(Xml& xml)/*{{{*/
 			{
 				int tool = xml.parseInt();
 				canvas->setTool(tool);
-				tools22->set(tool);
+				editTools->set(tool);
 			}
 			else if (tag == "midieditor")
 				AbstractMidiEditor::readStatus(xml);
-			else if (tag == "ctrledit")
-			{
-				CtrlEdit* ctrl = addCtrl();
-				ctrl->readStatus(xml);
-			}
-			else if (tag == splitter->objectName())
-				splitter->readStatus(xml);
-			else if (tag == hsplitter->objectName())
-				hsplitter->readStatus(xml);
 			else if (tag == "quantStrength")
 				_quantStrength = xml.parseInt();
 			else if (tag == "quantLimit")
@@ -2352,7 +2539,7 @@ bool Performer::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 			}
 			return true;
 		}/*}}}*/
-		/*else if (key == shortcuts[SHRT_POS_INC].key)
+		else if (key == shortcuts[SHRT_POS_INC].key)
 		{
 			PerformerCanvas* pc = (PerformerCanvas*) canvas;
 			pc->pianoCmd(CMD_RIGHT);
@@ -2369,7 +2556,7 @@ bool Performer::eventFilter(QObject *obj, QEvent *event)/*{{{*/
 			PerformerCanvas* pc = (PerformerCanvas*) canvas;
 			pc->pianoCmd(CMD_RIGHT);
 			return true;
-		}*/
+		}
 	}
 
 	// standard event processing
@@ -2592,6 +2779,7 @@ void Performer::resizeEvent(QResizeEvent* ev)
 	QWidget::resizeEvent(ev);
 	_widthInit = ev->size().width();
 	_heightInit = ev->size().height();
+	//updateControllerSizes();
 }
 
 //---------------------------------------------------------
@@ -2615,21 +2803,4 @@ void Performer::execUserScript(int id)
 	song->executeScript(scriptfile.toAscii().data(), parts(), quant(), true);
 }
 
-//---------------------------------------------------------
-//   newCanvasWidth
-//---------------------------------------------------------
 
-void Performer::newCanvasWidth(int /*w*/)
-{
-}
-
-void Performer::splitterMoved(int pos, int)
-{
-	if(pos < midiConductor->minimumSize().width())
-	{
-		QList<int> def;
-		def.append(midiConductor->minimumSize().width());
-		def.append(50);
-		hsplitter->setSizes(def);
-	}
-}

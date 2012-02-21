@@ -78,8 +78,9 @@ void MasterEdit::songChanged(int type)
 MasterEdit::MasterEdit()
 : AbstractMidiEditor(0, _rasterInit, 0)
 {
-	setWindowTitle(tr("OOMidi: Tempo Editor"));
+	setWindowTitle(tr("OOStudio: Tempo Editor"));
 	setWindowIcon(*oomIcon);
+	mainw->setLayout(mainGrid);
 	_raster = 0; // measure
 	//setMinimumSize(400, 300);
 	//resize(500, 350);

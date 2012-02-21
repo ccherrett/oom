@@ -2024,6 +2024,11 @@ CtrlEdit QWidget#ctrlLabelBox
 	 color: #b8b8b8;
 }
 
+ResizeHandle
+{
+	background-color: #2f2f2f;
+}
+
 QLabel#Cursor {
      /*padding-right: 15px;  make room for the arrows */
      border-image: url(:/images/frame.png) 4;

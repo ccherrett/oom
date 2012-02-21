@@ -1356,19 +1356,20 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	{
 		if(defaultScreenSize.height() <= dh && defaultScreenSize.width() <= dw)
 		{
-			resize(defaultScreenSize);
-			move(tconfig().get_property("Interface", "pos", QPoint(200, 200)).toPoint());
+			restoreGeometry(tconfig().get_property("Interface", "geometry", "").toByteArray());
 		}
 		else
 		{
 			showMaximized();
 		}
-		restoreState(tconfig().get_property("Interface", "windowstate", "").toByteArray());
 	}
 	else
 	{ //maximize the window
 		showMaximized();
 	}
+	restoreState(tconfig().get_property("Interface", "windowstate", "").toByteArray());
+	//restoreDockWidget(_resourceDock);
+	//restoreDockWidget(m_mixerDock);
 
 	readInstrumentTemplates();
 	song->update();
@@ -1383,6 +1384,7 @@ OOMidi::~OOMidi()
 	tconfig().set_property("Interface", "fullScreen", isFullScreen());
 	tconfig().set_property("Interface", "pos", pos());
 	tconfig().set_property("Interface", "windowstate", saveState());
+	tconfig().set_property("Interface", "geometry", saveGeometry());
     // Save the new global settings to the configuration file
     tconfig().save();
 }
@@ -2855,7 +2857,9 @@ void OOMidi::startPerformer(PartList* pl, bool /*showDefaultCtrls*/)
     	performer->addAction(startListEditAction);
     	// same for save shortcut
     	performer->addAction(fileSaveAction);
+		//performer->addAction(playAction);
 
+		//performer->restoreState(tconfig().get_property("PerformerEdit", "windowstate", "").toByteArray());
 		performer->show();
 		Song::movePlaybackToPart(pl->begin()->second);
 

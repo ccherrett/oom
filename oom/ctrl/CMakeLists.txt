@@ -22,12 +22,10 @@
 ## Expand Qt macros in source files
 ##
 QT4_WRAP_CPP (ctrl_mocs
-      # configmidictrl.h
-      # ctrldialog.h
-      # definemidictrl.h
       ctrlcanvas.h 
       ctrledit.h 
       ctrlpanel.h
+	  ResizeHandle.h
       )
 
 ##
@@ -37,16 +35,13 @@ file (GLOB ctrl_source_files
       ctrlcanvas.cpp
       ctrledit.cpp 
       ctrlpanel.cpp
+	  ResizeHandle.cpp
       )
 
 ##
 ## Define target
 ##
 add_library ( ctrl STATIC
-      # configmidictrl.cpp
-      # definemidictrl.cpp
-      # ctrldialog.cpp
-      # ctrleditor.cpp
       ${ctrl_source_files}
       ${ctrl_mocs}
       )

@@ -111,7 +111,6 @@ void CEventList::clearDelete()
 CtrlCanvas::CtrlCanvas(AbstractMidiEditor* e, QWidget* parent, int xmag,
 		const char* name, CtrlPanel* pnl) : View(parent, xmag, 1, name)
 {
-	//setBg(QColor(195, 198, 196));
 	setBg(QColor(63,63,63));
 
 	editor = e;
@@ -1453,14 +1452,20 @@ void CtrlCanvas::pdraw(QPainter& p, const QRect& rect)/*{{{*/
 
 void CtrlCanvas::drawOverlay(QPainter& p, const QRect&)
 {
-	QString s(_controller->name());
+	QString s;
+	
 	p.setFont(config.fonts[3]);
 	
 	QColor textColor = QColor(0,0,0,180);
 	if(curPart)
+	{
+		s.append(curPart->track()->name()).append(" : ");
 		textColor = QColor(config.partColors[curPart->colorIndex()]);
+	}
+	s.append(_controller->name());
 	textColor.setAlpha(180);
 	p.setPen(textColor);
+	
 	switch(m_feedbackMode)
 	{
 		case 0:
@@ -1479,7 +1484,9 @@ void CtrlCanvas::drawOverlay(QPainter& p, const QRect&)
 
 	QFontMetrics fm(config.fonts[3]);
 	int y = fm.lineSpacing() + 2;
+	
 	p.drawText(2, y, s);
+
 	if (noEvents && !m_collapsed)
 	{
 		p.setFont(config.fonts[3]);

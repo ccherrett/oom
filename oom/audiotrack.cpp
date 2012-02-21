@@ -1227,7 +1227,7 @@ AudioInput::AudioInput()
 : AudioTrack(AUDIO_INPUT)
 {
 	// set Default for Input Ports:
-	_mute = true;
+	_mute = false;
 	//setVolume(1.0);
 	for (int i = 0; i < MAX_CHANNELS; ++i)
 		jackPorts[i] = 0;

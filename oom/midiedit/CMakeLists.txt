@@ -22,12 +22,6 @@
 ## Expand Qt macros in source files
 ##
 QT4_WRAP_CPP ( midiedit_mocs
-      # gatetime.h
-      # midicmd.h
-      # AbstractMidiEditor.h
-      # miditracker.h
-      # trackpattern.h
-      # velocity.h
       EventCanvas.h
       Piano.h 
       Performer.h 
@@ -39,13 +33,6 @@ QT4_WRAP_CPP ( midiedit_mocs
 ## List of source files to compile
 ##
 file (GLOB midiedit_source_files
-      # citem.cpp
-      # gatetime.cpp
-      # midicmd.cpp
-      # AbstractMidiEditor.cpp
-      # miditracker.cpp
-      # trackpattern.cpp
-      # velocity.cpp
 	  drummap.cpp
       EventCanvas.cpp
       Piano.cpp

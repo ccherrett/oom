@@ -40,11 +40,15 @@ class CtrlPanel : public QWidget
     Knob* _knob;
     DoubleLabel* _dl;
     int _val;
+	bool m_collapsed;
 
 signals:
     void destroyPanel();
     void controllerChanged(int);
 	void collapsed(bool);
+
+protected:
+	//virtual QSize minimumSizeHint(){return QSize(35, 50);}
 
 private slots:
     void ctrlChanged(double val);

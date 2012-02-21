@@ -35,7 +35,7 @@
 #include "globals.h"
 #include "traverso_shared/TConfig.h"
 
-static int NOTE_PLAY_TIME = 90;
+static int NOTE_PLAY_TIME = 20;
 //---------------------------------------------------------
 //   EventCanvas
 //---------------------------------------------------------
@@ -293,7 +293,7 @@ void EventCanvas::selectAtTick(unsigned int tick)/*{{{*/
 
 void EventCanvas::playReleaseForItem()
 {
-	while(!m_tempPlayItems.isEmpty())
+	if(!m_tempPlayItems.isEmpty())
 		itemReleased(m_tempPlayItems.takeFirst(), QPoint(1,1));
 }
 

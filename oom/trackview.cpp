@@ -24,7 +24,7 @@
 TrackView::TrackView(bool istemplate)
 {
 	m_id = create_id();
-	qDebug("TrackView::TrackView: My ID: %lld", m_id);
+	//qDebug("TrackView::TrackView: My ID: %lld", m_id);
 	_selected = false;
 	_recState = false;
 	m_template = istemplate;
@@ -36,7 +36,7 @@ TrackView::~TrackView()
 
 TrackView::TrackView(const TrackView& t)
 {
-	qDebug("TrackView::TrackView copy~~~~~~~~~~~~~~~~~");
+	//qDebug("TrackView::TrackView copy~~~~~~~~~~~~~~~~~");
 	_comment = t.comment();
 	m_tracksIndex = t.m_tracksIndex;
 	m_tracks = t.m_tracks;
@@ -49,7 +49,7 @@ TrackView::TrackView(const TrackView& t)
 
 TrackView& TrackView::operator=(const TrackView& t)
 {
-	qDebug("TrackView::operator= ~~~~~~~~~~~~~~~~~~~~~");
+	//qDebug("TrackView::operator= ~~~~~~~~~~~~~~~~~~~~~");
 	_comment = t.comment();
 	m_tracksIndex = t.m_tracksIndex;
 	m_tracks = t.m_tracks;

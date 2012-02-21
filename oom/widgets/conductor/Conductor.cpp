@@ -84,13 +84,6 @@ void Conductor::setTrack(Track* t)
 		return;
 	selected = t;
 
-	QPalette pal;
-	if (selected->type() == Track::DRUM)
-		pal.setColor(trackNameLabel->backgroundRole(), config.drumTrackLabelBg);
-	else
-		pal.setColor(trackNameLabel->backgroundRole(), config.midiTrackLabelBg);
-	trackNameLabel->setPalette(pal);
-
 	populatePatches();
 	updateConductor(-1);
 	//printf("Conductor::setTrack()\n");
@@ -182,11 +175,6 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	_patchSelModel = new QItemSelectionModel(_patchModel);
 	patchList->installEventFilter(oom);
 
-	//These buttons are only valid in PR so we hide them by default and PR init will 
-	//show and config them with propper actions.
-	btnNext->setVisible(false);
-	btnPrev->setVisible(false);
-
 	selected = sel_track;
 
 	// Since program covers 3 controls at once, it is in 'midi controller' units rather than 'gui control' units.
@@ -206,38 +194,6 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	recEchoButton->setIcon(*midiInIconSet3);
 	recEchoButton->setIconSize(QSize(25,25));
 
-	// OOMidi-2: AlignCenter and WordBreak are set in the ui(3) file, but not supported by QLabel. Turn them on here.
-	trackNameLabel->setAlignment(Qt::AlignCenter);
-
-	if (selected)
-	{
-		trackNameLabel->setObjectName(selected->cname());
-		QPalette pal;
-		//pal.setColor(trackNameLabel->backgroundRole(), QColor(0, 160, 255)); // Med blue
-		if (selected->type() == Track::DRUM)
-			pal.setColor(trackNameLabel->backgroundRole(), config.drumTrackLabelBg);
-		else
-			pal.setColor(trackNameLabel->backgroundRole(), config.midiTrackLabelBg);
-		trackNameLabel->setPalette(pal);
-	}
-	//else
-	//{
-	//  pal.setColor(trackNameLabel->backgroundRole(), config.midiTrackLabelBg);
-	//  trackNameLabel->setPalette(pal);
-	//}
-
-	//trackNameLabel->setStyleSheet(QString("background-color: ") + QColor(0, 160, 255).name()); // Med blue
-	trackNameLabel->setWordWrap(true);
-	trackNameLabel->setAutoFillBackground(true);
-	trackNameLabel->setTextFormat(Qt::PlainText);
-	trackNameLabel->setLineWidth(2);
-	trackNameLabel->setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
-	trackNameLabel->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Minimum));
-
-	setLabelText();
-	setLabelFont();
-
-
 	tableView->setModel(_tableModel);
 	tableView->setShowGrid(true);
 	tableView->setSelectionModel(_selModel);
@@ -245,18 +201,11 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	updateTableHeader();
 
 	patchList->setModel(_patchModel);
-	//patchList->setShowGrid(true);
 	patchList->setSelectionModel(_patchSelModel);
-
-	//HTMLDelegate *delegate = new HTMLDelegate;
-	//tableView->setItemDelegateForColumn(1, delegate);
 
 	btnUp->setIcon(*up_arrowIconSet3);
 	btnDown->setIcon(*down_arrowIconSet3);
 	btnDelete->setIcon(*garbageIconSet3);
-	//btnUp->setIconSize(upPCIcon->size());
-	//btnDown->setIconSize(downPCIcon->size());
-	//btnDelete->setIconSize(garbagePCIcon->size());
 	btnCopy->setIcon(*duplicateIconSet3);
 	btnShowGui->setIcon(*pluginGUIIconSet3);
 	//btnCopy->setIconSize(duplicatePCIcon->size());
@@ -730,36 +679,6 @@ void Conductor::songChanged(int type)
 		return;
 	}
 	updateConductor(type);
-}
-
-//---------------------------------------------------------
-//   setLabelText
-//---------------------------------------------------------
-
-void Conductor::setLabelText()
-{
-	MidiTrack* track = (MidiTrack*) selected;
-	if (track)
-		trackNameLabel->setText(track->name());
-	else
-		trackNameLabel->setText(QString());
-}
-
-//---------------------------------------------------------
-//   setLabelFont
-//---------------------------------------------------------
-
-void Conductor::setLabelFont()
-{
-	//if(!selected)
-	//  return;
-	//MidiTrack* track = (MidiTrack*)selected;
-
-	// Use the new font #6 I created just for these labels (so far).
-	// Set the label's font.
-	trackNameLabel->setFont(config.fonts[6]);
-	// Dealing with a horizontally constrained label. Ignore vertical. Use a minimum readable point size.
-	autoAdjustFontSize(trackNameLabel, trackNameLabel->text(), false, true, config.fonts[6].pointSize(), 5);
 }
 
 //---------------------------------------------------------
@@ -1531,9 +1450,6 @@ void Conductor::updateConductor(int flags)
 
 	if (flags & (SC_ROUTE | SC_CHANNELS | SC_CONFIG))
 		oom->updateRouteMenus(selected, this);
-
-	setLabelText();
-	setLabelFont();
 
 	if (flags & (SC_MIDI_TRACK_PROP))
 	{

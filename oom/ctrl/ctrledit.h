@@ -9,15 +9,18 @@
 #define __CTRL_EDIT_H__
 
 #include <QFrame>
-#include <QSize>
+#include <QPoint>
 
 #include "ctrlcanvas.h"
 #include "song.h"
 
 class AbstractMidiEditor;
 class QLabel;
+class QMouseEvent;
+class QResizeEvent;
 class CtrlView;
 class CtrlPanel;
+class ResizeHandle;
 class Xml;
 
 #define CTRL_PANEL_FIXED_WIDTH 40
@@ -32,11 +35,18 @@ class CtrlEdit : public QFrame
     CtrlCanvas* canvas;
     CtrlPanel* panel;
 	QWidget *vscale;
+	ResizeHandle* handle; 
 
 	bool m_collapsed;
+	int m_collapsedHeight;
+	int m_maxheight;
+	int m_minheight;
 
 protected:
-	virtual QSize sizeHint();
+
+	//virtual QSize sizeHint();
+	//virtual QSize minimumSizeHint(){return QSize(400, 50);}
+
 
 private slots:
     void destroyCalled();
@@ -59,21 +69,30 @@ public slots:
 	{
 		canvas->update();
 	}
+	void setMinHeight(int);
+	void setMaxHeight(int);
+	void updateHeight(int);
+
 signals:
     void timeChanged(unsigned);
     void destroyedCtrl(CtrlEdit*);
     void enterCanvas();
     void yposChanged(int);
+	void resizeEnded();
+	void resizeStarted();
+	void minHeightChanged(int);
+	void maxHeightChanged(int);
 
 public:
-    CtrlEdit(QWidget*, AbstractMidiEditor* e, int xmag, bool expand = false, const char* name = 0);
+    CtrlEdit(QWidget*, AbstractMidiEditor* e, int xmag, int height = 80);
 	virtual ~CtrlEdit(){}
-    void readStatus(Xml&);
-    void writeStatus(int, Xml&);
     bool setType(QString);
 	QString type();
 	void setCollapsed(bool);
 	bool collapsed() {return m_collapsed;}
+	int expandedHeight() {return m_collapsedHeight;}
+	void setExpandedHeight(int h) {m_collapsedHeight = h;}
+	int minHeight(){return m_minheight;}
 };
 
 #endif

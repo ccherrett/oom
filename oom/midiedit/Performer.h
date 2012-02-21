@@ -56,6 +56,8 @@ class QDockWidget;
 class QTabWidget;
 class TrackListView;
 class QSignalMapper;
+class QHBoxLayout;
+class QVBoxLayout;
 
 //---------------------------------------------------------
 //   Performer
@@ -69,10 +71,7 @@ class Performer : public AbstractMidiEditor
     MidiPart* selPart;
     int selTick;
 
-    //enum { CMD_EVENT_COLOR, CMD_CONFIG_QUANT, CMD_LAST };
-    //int menu_ids[CMD_LAST];
-    //Q3PopupMenu *menuEdit, *menuFunctions, *menuSelect, *menuConfig, *menuPlugins;
-
+	QString m_currentInstrument;
 
     QMenu *menuEdit, *menuFunctions, *menuSelect, *menuConfig, *eventColor, *menuPlugins;
     Conductor *midiConductor;
@@ -158,23 +157,27 @@ class Performer : public AbstractMidiEditor
     PitchLabel* pitchLabel;
 	QLabel *patchLabel;
 
-    Splitter* splitter;
-    Splitter* hsplitter;
-    Splitter* ctrlLane;
+    QFrame* canvasFrame;
+	QVBoxLayout *m_layout;
 
     QToolButton* speaker;
     QToolButton* m_globalKey;
     QToolButton* m_globalArm;
     QToolButton* m_mutePart;
+	QToolButton* m_btnNext;
+	QToolButton* m_btnPrev;
+	QToolButton* m_btnAddProgram;
+	QToolButton* m_btnDeleteProgram;
+
 	QAction* m_muteAction;
 	QAction* m_soloAction;
 	QAction* m_globalKeyAction;
 	QAction* m_globalArmAction;
 	QAction* m_stepAction;
 	QAction* m_speakerAction;
-    QToolBar* tools;
-    QToolBar* tools2;
-    EditToolBar* tools22;
+    QToolBar* cursorBar;
+    QToolBar* editToolbar;
+    EditToolBar* editTools;
 
     int colorMode;
 
@@ -250,9 +253,7 @@ private slots:
     void follow(int pos);
     void songChanged1(int);
     void configChanged();
-    void newCanvasWidth(int);
     void updateConductor();
-	void splitterMoved(int, int);
 	void dockAreaChanged(Qt::DockWidgetArea);
 	void selectPrevPart();
 	void selectNextPart();
@@ -261,18 +262,22 @@ private slots:
 	void setKeyBindings(LSCPChannelInfo);
 #endif
 	void toggleCollapseAllControllers(bool);
+	void updateControllerForInstrument(qint64);
+	void saveInstrumentControllerState();
 
 signals:
     void deleted();
 	void showComments(bool);
+	void controllerMaxHeightChanged(int);
 
 public slots:
     virtual void updateHScrollRange();
     void execDeliveredScript(int id);
     void execUserScript(int id);
-    CtrlEdit* addCtrl();
+    CtrlEdit* addCtrl(QString name = "Velocity", bool collapsed = false, int height = 80);
     void removeCtrl(CtrlEdit* ctrl);
 	void setKeyBindings(Patch*);
+	void updateControllerSizes();
 
 public:
     Performer(PartList*, QWidget* parent = 0, const char* name = 0, unsigned initPos = MAXINT);

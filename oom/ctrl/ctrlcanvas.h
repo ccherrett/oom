@@ -205,6 +205,8 @@ public slots:
 
 protected slots:
     virtual void heartBeat();
+	//virtual QSize sizeHint() {return QSize(1024, 80);}
+//	virtual QSize minimumSizeHint(){return QSize(400, 50);}
 
 signals:
     void followEvent(int);

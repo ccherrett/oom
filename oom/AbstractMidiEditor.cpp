@@ -40,7 +40,7 @@ AbstractMidiEditor::AbstractMidiEditor(int q, int r, PartList* pl, QWidget* pare
 
 	///mainGrid = new QGridLayout(mainw);
 	mainGrid = new QGridLayout();
-	mainw->setLayout(mainGrid);
+	//mainw->setLayout(mainGrid);
 
 	mainGrid->setContentsMargins(0, 0, 0, 0);
 	mainGrid->setSpacing(0);
@@ -51,7 +51,7 @@ AbstractMidiEditor::AbstractMidiEditor(int q, int r, PartList* pl, QWidget* pare
 //   genPartlist
 //---------------------------------------------------------
 
-void AbstractMidiEditor::genPartlist()
+void AbstractMidiEditor::genPartlist()/*{{{*/
 {
 	_pl->clear();
 	for (std::list<int>::iterator i = _parts.begin(); i != _parts.end(); ++i)
@@ -73,9 +73,9 @@ void AbstractMidiEditor::genPartlist()
 				break;
 		}
 	}
-}
+}/*}}}*/
 
-bool AbstractMidiEditor::hasPart(int sn)
+bool AbstractMidiEditor::hasPart(int sn)/*{{{*/
 {
 	bool rv = false;
 	for (std::list<int>::iterator i = _parts.begin(); i != _parts.end(); ++i)
@@ -87,7 +87,7 @@ bool AbstractMidiEditor::hasPart(int sn)
 		}
 	}
 	return rv;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   AbstractMidiEditor
@@ -103,19 +103,19 @@ AbstractMidiEditor::~AbstractMidiEditor()
 //   quantVal
 //---------------------------------------------------------
 
-int AbstractMidiEditor::quantVal(int v) const
+int AbstractMidiEditor::quantVal(int v) const/*{{{*/
 {
 	int val = ((v + _quant / 2) / _quant) * _quant;
 	if (val == 0)
 		val = _quant;
 	return val;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   readStatus
 //---------------------------------------------------------
 
-void AbstractMidiEditor::readStatus(Xml& xml)
+void AbstractMidiEditor::readStatus(Xml& xml)/*{{{*/
 {
 	if (_pl == 0)
 		_pl = new PartList;
@@ -146,13 +146,13 @@ void AbstractMidiEditor::readStatus(Xml& xml)
 				break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   writePartList
 //---------------------------------------------------------
 
-void AbstractMidiEditor::writePartList(int level, Xml& xml) const
+void AbstractMidiEditor::writePartList(int level, Xml& xml) const/*{{{*/
 {
 	for (ciPart p = _pl->begin(); p != _pl->end(); ++p)
 	{
@@ -166,22 +166,22 @@ void AbstractMidiEditor::writePartList(int level, Xml& xml) const
 
 		xml.put(level, "<part>%d:%d</part>", trkIdx, partIdx);
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   writeStatus
 //---------------------------------------------------------
 
-void AbstractMidiEditor::writeStatus(int level, Xml& xml) const
+void AbstractMidiEditor::writeStatus(int level, Xml& xml) const/*{{{*/
 {
 	xml.tag(level++, "midieditor");
 	TopWin::writeStatus(level, xml);
 	xml.intTag(level, "quant", _quant);
 	xml.intTag(level, "raster", _raster);
 	xml.tag(level, "/midieditor");
-}
+}/*}}}*/
 
-void AbstractMidiEditor::addParts(PartList* pl)
+void AbstractMidiEditor::addParts(PartList* pl)/*{{{*/
 {
 	if(pl)
 	{
@@ -193,9 +193,9 @@ void AbstractMidiEditor::addParts(PartList* pl)
 		songChanged(SC_PART_INSERTED);
 		//setCurCanvasPart(p);
 	}
-}
+}/*}}}*/
 
-void AbstractMidiEditor::addPart(Part* p)
+void AbstractMidiEditor::addPart(Part* p)/*{{{*/
 {
 	if(p)
 	{
@@ -203,9 +203,9 @@ void AbstractMidiEditor::addPart(Part* p)
 		songChanged(SC_PART_INSERTED);
 		//setCurCanvasPart(p);
 	}
-}
+}/*}}}*/
 
-void AbstractMidiEditor::removeParts(PartList* pl)
+void AbstractMidiEditor::removeParts(PartList* pl)/*{{{*/
 {
 	if(pl)
 	{
@@ -216,24 +216,23 @@ void AbstractMidiEditor::removeParts(PartList* pl)
 		}
 		songChanged(SC_PART_REMOVED);
 	}
-}
+}/*}}}*/
 
-void AbstractMidiEditor::removePart(int sn)
+void AbstractMidiEditor::removePart(int sn)/*{{{*/
 {
 	if(_parts.size() >= 2)
 	{
 		_parts.remove(sn);
 	}
 	songChanged(SC_PART_REMOVED);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   songChanged
 //---------------------------------------------------------
 
-void AbstractMidiEditor::songChanged(int type)
+void AbstractMidiEditor::songChanged(int type)/*{{{*/
 {
-
 	if (type)
 	{
 		if (type & (SC_PART_REMOVED | SC_PART_MODIFIED
@@ -262,64 +261,64 @@ void AbstractMidiEditor::songChanged(int type)
 
 		}
 
-                if (type & SC_SELECTION)
+        if (type & SC_SELECTION)
+        {
+                CItemList list = canvas->getSelectedItemsForCurrentPart();
+
+                //Get the rightmost selected note (if any)
+                iCItem i, iRightmost;
+                CItem* rightmost = NULL;
+
+                i = list.begin();
+                while (i != list.end())
                 {
-                        CItemList list = canvas->getSelectedItemsForCurrentPart();
-
-                        //Get the rightmost selected note (if any)
-                        iCItem i, iRightmost;
-                        CItem* rightmost = NULL;
-
-                        i = list.begin();
-                        while (i != list.end())
+                        if (i->second->isSelected())
                         {
-                                if (i->second->isSelected())
-                                {
-                                        iRightmost = i;
-                                        rightmost = i->second;
-                                }
-
-                                ++i;
+                                iRightmost = i;
+                                rightmost = i->second;
                         }
 
-                        if (rightmost)
-                        {
-                                int pos = rightmost->pos().x();
-                                pos = canvas->mapx(pos) + hscroll->offset();
-                                int s = hscroll->offset();
-                                int e = s + canvas->width();
-
-                                if (pos > e)
-                                        hscroll->setOffset(rightmost->pos().x());
-                                if (pos < s)
-                                        hscroll->setOffset(rightmost->pos().x());
-                        }
+                        ++i;
                 }
 
+                if (rightmost)
+                {
+                        int pos = rightmost->pos().x();
+                        pos = canvas->mapx(pos) + hscroll->offset();
+                        int s = hscroll->offset();
+                        int e = s + canvas->width();
+
+                        if (pos > e)
+                                hscroll->setOffset(rightmost->pos().x());
+                        if (pos < s)
+                                hscroll->setOffset(rightmost->pos().x());
+                }
+        }
+
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setCurDrumInstrument
 //---------------------------------------------------------
 
-void AbstractMidiEditor::setCurDrumInstrument(int instr)
+void AbstractMidiEditor::setCurDrumInstrument(int instr)/*{{{*/
 {
 	_curDrumInstrument = instr;
 	emit curDrumInstrumentChanged(_curDrumInstrument);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   curCanvasPart
 //---------------------------------------------------------
 
-Part* AbstractMidiEditor::curCanvasPart()
+Part* AbstractMidiEditor::curCanvasPart()/*{{{*/
 {
 	if (canvas)
 		return canvas->part();
 	else
 		return 0;
-}
+}/*}}}*/
 
 QList<Event> AbstractMidiEditor::getSelectedEvents()/*{{{*/
 {
@@ -341,7 +340,7 @@ QList<Event> AbstractMidiEditor::getSelectedEvents()/*{{{*/
 	return rv;
 }/*}}}*/
 
-bool AbstractMidiEditor::isEventSelected(Event e)
+bool AbstractMidiEditor::isEventSelected(Event e)/*{{{*/
 {
 	bool rv = false;
 	if(canvas)
@@ -349,27 +348,27 @@ bool AbstractMidiEditor::isEventSelected(Event e)
 		rv = canvas->isEventSelected(e);
 	}
 	return rv;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   curWavePart
 //---------------------------------------------------------
 
-WavePart* AbstractMidiEditor::curWavePart()
+WavePart* AbstractMidiEditor::curWavePart()/*{{{*/
 {
 	return 0;
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   setCurCanvasPart
 //---------------------------------------------------------
 
-void AbstractMidiEditor::setCurCanvasPart(Part* part)
+void AbstractMidiEditor::setCurCanvasPart(Part* part)/*{{{*/
 {
 	if (canvas)
 	{
 		//printf("AbstractMidiEditor::setCurCanvasPart\n");
 		canvas->setCurrentPart(part);
 	}
-}
+}/*}}}*/
 
