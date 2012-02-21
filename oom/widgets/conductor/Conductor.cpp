@@ -1913,7 +1913,7 @@ void Conductor::matrixItemChanged(QStandardItem* item)
 	{
 		QList<PatchSequence*> *list = mp->patchSequences();
 		int row = item->row();
-		if (list && !list->isEmpty() && row < list->size() && item->column() == 1)
+		if (list && !list->isEmpty() && row < list->size())
 		{
 			PatchSequence *ps = list->at(row);
 			if (ps)
