@@ -10,12 +10,14 @@
 
 #include "plugin.h"
 #include "plugingui.h"
-#include "icons.h"
-#include "midi.h"
-#include "midictrl.h"
+#include "audiodev.h"
 #include "jackaudio.h"
 #include "track.h"
 #include "xml.h"
+
+#include "icons.h"
+#include "midi.h"
+#include "midictrl.h"
 
 #include <math.h>
 
@@ -55,51 +57,48 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
         return 1;
 
     case audioMasterGetTime:
-        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+        static VstTimeInfo_R timeInfo;
+        memset(&timeInfo, 0, sizeof(VstTimeInfo_R));
+        timeInfo.sampleRate = sampleRate;
+
+        if (audioDevice->isJackAudio())
         {
-            jack_client_t* client = ((JackAudioDevice*)audioDevice)->getJackClient();
-            if (client)
+            JackAudioDevice* jackAudioDevice = (JackAudioDevice*)audioDevice;
+            
+            jack_position_t jack_pos;
+            jack_transport_state_t jack_state = jackAudioDevice->transportQuery(&jack_pos);
+            
+            if (jack_state == JackTransportRolling)
+                timeInfo.flags |= kVstTransportChanged|kVstTransportPlaying;
+            else
+                timeInfo.flags |= kVstTransportChanged;
+            
+            if (jack_pos.unique_1 == jack_pos.unique_2)
             {
-                static VstTimeInfo_R timeInfo;
-                memset(&timeInfo, 0, sizeof(VstTimeInfo));
-
-                static jack_transport_state_t jack_state;
-                static jack_position_t jack_pos;
-                jack_state = jack_transport_query(client, &jack_pos);
-
-                if (jack_state == JackTransportRolling)
-                    timeInfo.flags |= kVstTransportChanged|kVstTransportPlaying;
-                else
-                    timeInfo.flags |= kVstTransportChanged;
-
-                if (jack_pos.unique_1 == jack_pos.unique_2)
+                timeInfo.samplePos  = jack_pos.frame;
+                
+                if (jack_pos.valid & JackPositionBBT)
                 {
-                    timeInfo.samplePos  = jack_pos.frame;
-                    timeInfo.sampleRate = jack_pos.frame_rate;
-
-                    if (jack_pos.valid & JackPositionBBT)
-                    {
-                        // Tempo
-                        timeInfo.tempo = jack_pos.beats_per_minute;
-                        timeInfo.timeSigNumerator = jack_pos.beats_per_bar;
-                        timeInfo.timeSigDenominator = jack_pos.beat_type;
-                        timeInfo.flags |= kVstTempoValid|kVstTimeSigValid;
-
-                        // Position
-                        double dPos = timeInfo.samplePos / timeInfo.sampleRate;
-                        timeInfo.nanoSeconds = dPos * 1000.0;
-                        timeInfo.flags |= kVstNanosValid;
-
-                        // Position
-                        timeInfo.barStartPos = 0;
-                        timeInfo.ppqPos = dPos * timeInfo.tempo / 60.0;
-                        timeInfo.flags |= kVstBarsValid|kVstPpqPosValid;
-                    }
+                    // Tempo
+                    timeInfo.tempo = jack_pos.beats_per_minute;
+                    timeInfo.timeSigNumerator = jack_pos.beats_per_bar;
+                    timeInfo.timeSigDenominator = jack_pos.beat_type;
+                    timeInfo.flags |= kVstTempoValid|kVstTimeSigValid;
+                    
+                    // Position
+                    double dPos = timeInfo.samplePos / timeInfo.sampleRate;
+                    timeInfo.nanoSeconds = dPos * 1000.0;
+                    timeInfo.flags |= kVstNanosValid;
+                    
+                    // Position
+                    timeInfo.barStartPos = 0;
+                    timeInfo.ppqPos = dPos * timeInfo.tempo / 60.0;
+                    timeInfo.flags |= kVstBarsValid|kVstPpqPosValid;
                 }
-                return (intptr_t)&timeInfo;
             }
         }
-        return 0;
+
+        return (intptr_t)&timeInfo;
 
     case audioMasterTempoAt:
         // Deprecated in VST SDK 2.4
@@ -243,26 +242,19 @@ VstPlugin::~VstPlugin()
         effect = 0;
     }
 
-    // use global client to delete synth audio ports
+    // delete synth audio ports
     if (m_hints & PLUGIN_IS_SYNTH)
     {
-        jack_client_t* jclient = 0;
-        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
-            jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
-
-        if (jclient)
+        if (m_ainsCount > 0)
         {
-            if (m_ainsCount > 0)
-            {
-                for (uint32_t i=0; i < m_ainsCount; i++)
-                    jack_port_unregister(jclient, m_portsIn[i]);
-            }
-
-            if (m_aoutsCount > 0)
-            {
-                for (uint32_t i=0; i < m_aoutsCount; i++)
-                    jack_port_unregister(jclient, m_portsOut[i]);
-            }
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                audioDevice->unregisterPort(m_portsIn[i]);
+        }
+        
+        if (m_aoutsCount > 0)
+        {
+            for (uint32_t i=0; i < m_aoutsCount; i++)
+                audioDevice->unregisterPort(m_portsOut[i]);
         }
     }
 }
@@ -380,16 +372,11 @@ bool VstPlugin::init(QString filename, QString label)
 }
 
 void VstPlugin::reload()
-{
+{    
     // safely disable plugin during reload
     m_proc_lock.lock();
     m_enabled = false;
     m_proc_lock.unlock();
-
-    // use global client to create/delete synth audio ports
-    jack_client_t* jclient = 0;
-    if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
-        jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
 
     // delete old data
     if (m_paramCount > 0)
@@ -397,22 +384,16 @@ void VstPlugin::reload()
 
     if (m_ainsCount > 0)
     {
-        if (jclient)
-        {
-            for (uint32_t i=0; i < m_ainsCount; i++)
-                jack_port_unregister(jclient, m_portsIn[i]);
-        }
+        for (uint32_t i=0; i < m_ainsCount; i++)
+            audioDevice->unregisterPort(m_portsIn[i]);
 
         delete[] m_portsIn;
     }
 
     if (m_aoutsCount > 0)
     {
-        if (jclient)
-        {
-            for (uint32_t i=0; i < m_aoutsCount; i++)
-                jack_port_unregister(jclient, m_portsOut[i]);
-        }
+        for (uint32_t i=0; i < m_aoutsCount; i++)
+            audioDevice->unregisterPort(m_portsOut[i]);
 
         delete[] m_portsOut;
     }
@@ -440,29 +421,23 @@ void VstPlugin::reload()
         // synths output directly to jack
         if (m_ainsCount > 0)
         {
-            m_portsIn = new jack_port_t* [m_ainsCount];
+            m_portsIn = new void* [m_ainsCount];
 
             for (uint32_t j=0; j<m_ainsCount; j++)
             {
                 QString port_name = m_name + ":input_" + QString::number(j+1);
-                if (jclient)
-                    m_portsIn[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
-                else
-                    m_portsIn[j] = 0;
+                m_portsIn[j] = audioDevice->registerInPort(port_name.toUtf8().constData(), false);
             }
         }
 
         if (m_aoutsCount > 0)
         {
-            m_portsOut = new jack_port_t* [m_aoutsCount];
+            m_portsOut = new void* [m_aoutsCount];
 
             for (uint32_t j=0; j<m_aoutsCount; j++)
             {
                 QString port_name = m_name + ":output_" + QString::number(j+1);
-                if (jclient)
-                    m_portsOut[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-                else
-                    m_portsOut[j] = 0;
+                m_portsOut[j] = audioDevice->registerOutPort(port_name.toUtf8().constData(), false);
             }
         }
     }
@@ -561,10 +536,13 @@ void VstPlugin::reload()
 
     reloadPrograms(true);
 
-    // enable it again
-    m_proc_lock.lock();
-    m_enabled = true;
-    m_proc_lock.unlock();
+    // enable it again (only if jack is active, otherwise non-needed)
+    if (audioDevice->isJackAudio())
+    {
+        m_proc_lock.lock();
+        m_enabled = true;
+        m_proc_lock.unlock();
+    }
 }
 
 void VstPlugin::reloadPrograms(bool)
@@ -899,7 +877,7 @@ void VstPlugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
             }
 
             // Process automation
-            if (m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
+            if (automation && m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
             {
                 for (uint32_t i = 0; i < m_paramCount; i++)
                 {
@@ -1086,8 +1064,8 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
 
 void VstPlugin::writeConfiguration(int level, Xml& xml)
 {
-    xml.tag(level++, "VstPlugin filename=\"%s\" label=\"%s\" channels=\"%d\"",
-            Xml::xmlString(m_filename).toLatin1().constData(), Xml::xmlString(m_label).toLatin1().constData(), m_channels);
+    xml.tag(level++, "VstPlugin filename=\"%s\" label=\"%s\" uniqueId=\"%i\" channels=\"%d\"",
+            Xml::xmlString(m_filename).toLatin1().constData(), Xml::xmlString(m_label).toLatin1().constData(), effect->uniqueID, m_channels);
 
     for (uint32_t i = 0; i < m_paramCount; i++)
     {

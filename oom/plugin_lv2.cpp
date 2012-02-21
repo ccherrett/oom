@@ -10,13 +10,14 @@
 
 #include "plugin.h"
 #include "plugingui.h"
+#include "audiodev.h"
+#include "jackaudio.h"
 #include "track.h"
 #include "xml.h"
 
 #include "icons.h"
 #include "midi.h"
 #include "midictrl.h"
-#include "jackaudio.h"
 
 #include "lv2_data_access.h"
 #include "lv2_event_helpers.h"
@@ -567,6 +568,7 @@ Lv2Plugin::~Lv2Plugin()
 
     handle = 0;
     descriptor = 0;
+    lplug = 0;
 
     // delete plugin features
     if (features[lv2_feature_id_uri_map] && features[lv2_feature_id_uri_map]->data)
@@ -605,26 +607,19 @@ Lv2Plugin::~Lv2Plugin()
 
     m_lv2States.clear();    
 
-    // use global client to delete synth audio ports
+    // delete synth audio ports
     if (m_hints & PLUGIN_IS_SYNTH)
     {
-        jack_client_t* jclient = 0;
-        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
-            jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
-
-        if (jclient)
+        if (m_ainsCount > 0)
         {
-            if (m_ainsCount > 0)
-            {
-                for (uint32_t i=0; i < m_ainsCount; i++)
-                    jack_port_unregister(jclient, m_portsIn[i]);
-            }
-
-            if (m_aoutsCount > 0)
-            {
-                for (uint32_t i=0; i < m_aoutsCount; i++)
-                    jack_port_unregister(jclient, m_portsOut[i]);
-            }
+            for (uint32_t i=0; i < m_ainsCount; i++)
+                audioDevice->unregisterPort(m_portsIn[i]);
+        }
+        
+        if (m_aoutsCount > 0)
+        {
+            for (uint32_t i=0; i < m_aoutsCount; i++)
+                audioDevice->unregisterPort(m_portsOut[i]);
         }
     }
 
@@ -706,7 +701,7 @@ bool Lv2Plugin::init(QString filename, QString label)
 {
     if (!lplug)
     {
-        LilvNode* pluginURI = lilv_new_uri(lv2world->world, filename.toAscii().constData());
+        LilvNode* pluginURI = lilv_new_uri(lv2world->world, filename.toUtf8().constData());
         lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
         lilv_node_free(pluginURI);
     }
@@ -722,7 +717,7 @@ bool Lv2Plugin::init(QString filename, QString label)
             if (descfn)
             {
                 uint32_t i = 0;
-                const char* c_uri = strdup(filename.toAscii().constData());
+                const char* c_uri = strdup(filename.toUtf8().constData());
 
                 while ((descriptor = descfn(i++)))
                 {
@@ -815,7 +810,7 @@ bool Lv2Plugin::init(QString filename, QString label)
                         features[lv2_feature_id_event]->URI       = LV2_EVENT_URI;
                         features[lv2_feature_id_event]->data      = Event_Feature;
 
-                        handle = descriptor->instantiate(descriptor, sampleRate, lilv_node_as_string(lilv_plugin_get_bundle_uri(lplug)), features);
+                        handle = descriptor->instantiate(descriptor, sampleRate, lilv_uri_to_path(lilv_node_as_string(lilv_plugin_get_bundle_uri(lplug))), features);
 
                         if (handle)
                         {
@@ -1011,11 +1006,6 @@ void Lv2Plugin::reload()
     m_enabled = false;
     m_proc_lock.unlock();
 
-    // use global client to create/delete synth audio ports
-    jack_client_t* jclient = 0;
-    if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
-        jclient = ((JackAudioDevice*)audioDevice)->getJackClient();
-
     // delete old data
     if (m_paramCount > 0)
     {
@@ -1025,22 +1015,16 @@ void Lv2Plugin::reload()
 
     if (m_ainsCount > 0)
     {
-        if (jclient)
-        {
-            for (uint32_t i=0; i < m_ainsCount; i++)
-                jack_port_unregister(jclient, m_portsIn[i]);
-        }
+        for (uint32_t i=0; i < m_ainsCount; i++)
+            audioDevice->unregisterPort(m_portsIn[i]);
 
         delete[] m_portsIn;
     }
 
     if (m_aoutsCount > 0)
     {
-        if (jclient)
-        {
-            for (uint32_t i=0; i < m_aoutsCount; i++)
-                jack_port_unregister(jclient, m_portsOut[i]);
-        }
+        for (uint32_t i=0; i < m_aoutsCount; i++)
+            audioDevice->unregisterPort(m_portsOut[i]);
 
         delete[] m_portsOut;
     }
@@ -1112,10 +1096,10 @@ void Lv2Plugin::reload()
     {
         // synths output directly to jack
         if (ains > 0)
-            m_portsIn = new jack_port_t* [ains];
+            m_portsIn = new void* [ains];
 
         if (aouts > 0)
-            m_portsOut = new jack_port_t* [aouts];
+            m_portsOut = new void* [aouts];
     }
 
     // fill in all the data
@@ -1136,11 +1120,7 @@ void Lv2Plugin::reload()
                     {
                         j = m_ainsCount++;
                         QString port_name = m_name + ":" + lilv_node_as_string(lilv_port_get_name(lplug, port));
-                        //m_portsIn[j] = audioDevice->registerInPort(port_name.toUtf8().constData(), false);
-                        if (jclient)
-                            m_portsIn[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
-                        else
-                            m_portsIn[j] = 0;
+                        m_portsIn[j] = audioDevice->registerInPort(port_name.toUtf8().constData(), false);
                     }
                 }
                 else if(lilv_port_is_a(lplug, port, lv2world->portOutput))
@@ -1151,11 +1131,7 @@ void Lv2Plugin::reload()
                     {
                         j = m_aoutsCount++;
                         QString port_name = m_name + ":" + lilv_node_as_string(lilv_port_get_name(lplug, port));
-                        //m_portsOut[j] = audioDevice->registerOutPort(port_name.toUtf8().constData(), false);
-                        if (jclient)
-                            m_portsOut[j] = jack_port_register(jclient, port_name.toUtf8().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-                        else
-                            m_portsOut[j] = 0;
+                        m_portsOut[j] = audioDevice->registerOutPort(port_name.toUtf8().constData(), false);
                     }
                 }
                 else
@@ -1327,10 +1303,13 @@ void Lv2Plugin::reload()
 
     reloadPrograms(true);
 
-    // enable it again
-    m_proc_lock.lock();
-    m_enabled = true;
-    m_proc_lock.unlock();
+    // enable it again (only if jack is active, otherwise non-needed)
+    if (audioDevice->isJackAudio())
+    {
+        m_proc_lock.lock();
+        m_enabled = true;
+        m_proc_lock.unlock();
+    }
 }
 
 void Lv2Plugin::reloadPrograms(bool /*init*/)
@@ -1887,35 +1866,31 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
                         oom_lv2_time_pos.ticks_per_beat   = 0;
                         oom_lv2_time_pos.beats_per_minute = 120.0;
 
-                        if (audioDevice && audioDevice->deviceType() == AudioDevice::JACK_AUDIO)
+                        if (audioDevice->isJackAudio())
                         {
-                            jack_client_t* client = ((JackAudioDevice*)audioDevice)->getJackClient();
-                            if (client)
+                            JackAudioDevice* jackAudioDevice = (JackAudioDevice*)audioDevice;
+                            
+                            jack_position_t jack_pos;
+                            jack_transport_state_t jack_state = jackAudioDevice->transportQuery(&jack_pos);
+
+                            if (jack_state != JackTransportStopped)
+                                oom_lv2_time_pos.state = LV2_TIME_ROLLING;
+                            
+                            if (jack_pos.unique_1 == jack_pos.unique_2)
                             {
-                                jack_position_t pos;
-                                jack_transport_state_t state = jack_transport_query(client, &pos);
-
-                                if (state == JackTransportRolling)
-                                    oom_lv2_time_pos.state = LV2_TIME_ROLLING;
-                                else
-                                    oom_lv2_time_pos.state = LV2_TIME_STOPPED;
-
-                                if (pos.unique_1 == pos.unique_2)
+                                oom_lv2_time_pos.frame = jack_pos.frame;
+                                
+                                if (jack_pos.valid & JackPositionBBT)
                                 {
-                                    oom_lv2_time_pos.frame = pos.frame;
-
-                                    if (pos.valid & JackPositionBBT)
-                                    {
-                                        oom_lv2_time_pos.bar  = pos.bar;
-                                        oom_lv2_time_pos.beat = pos.beat;
-                                        oom_lv2_time_pos.tick = pos.tick;
-                                        oom_lv2_time_pos.beats_per_bar    = pos.beats_per_bar;
-                                        oom_lv2_time_pos.beat_type        = pos.beat_type;
-                                        oom_lv2_time_pos.ticks_per_beat   = pos.ticks_per_beat;
-                                        oom_lv2_time_pos.beats_per_minute = pos.beats_per_minute;
-
-                                        oom_lv2_time_pos.flags |= LV2_TIME_HAS_BBT;
-                                    }
+                                    oom_lv2_time_pos.bar  = jack_pos.bar;
+                                    oom_lv2_time_pos.beat = jack_pos.beat;
+                                    oom_lv2_time_pos.tick = jack_pos.tick;
+                                    oom_lv2_time_pos.beats_per_bar    = jack_pos.beats_per_bar;
+                                    oom_lv2_time_pos.beat_type        = jack_pos.beat_type;
+                                    oom_lv2_time_pos.ticks_per_beat   = jack_pos.ticks_per_beat;
+                                    oom_lv2_time_pos.beats_per_minute = jack_pos.beats_per_minute;
+                                    
+                                    oom_lv2_time_pos.flags |= LV2_TIME_HAS_BBT;
                                 }
                             }
                         }
@@ -1927,7 +1902,7 @@ void Lv2Plugin::process(uint32_t frames, float** src, float** dst, MPEventList* 
             }
 
             // Process automation
-            if (m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
+            if (automation && m_track && m_track->automationType() != AUTO_OFF && m_id != -1)
             {
                 for (uint32_t i = 0; i < m_paramCount; i++)
                 {

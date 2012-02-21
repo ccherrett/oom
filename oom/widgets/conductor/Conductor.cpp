@@ -412,120 +412,157 @@ void Conductor::heartBeat()
 					iChanDetectLabel->setPixmap(*darkRedLedIcon);
 				}
 			}
-
-            bool isSynth = (mp->device() && mp->device()->isSynthPlugin());
-			int nprogram = mp->hwCtrlState(outChannel, CTRL_PROGRAM);
-
-			if (nprogram == CTRL_VAL_UNKNOWN || isSynth)
-			{
-				if (program != CTRL_VAL_UNKNOWN)
-				{
-					//printf("Composer::midiConductorHeartBeat setting program to unknown\n");
-
-					program = CTRL_VAL_UNKNOWN;
-					if (iHBank->value() != 0)
-					{
-						iHBank->blockSignals(true);
-						iHBank->setValue(0);
-						iHBank->blockSignals(false);
-					}
-					if (iLBank->value() != 0)
-					{
-						iLBank->blockSignals(true);
-						iLBank->setValue(0);
-						iLBank->blockSignals(false);
-					}
-					if (iProgram->value() != 0)
-					{
-						iProgram->blockSignals(true);
-						iProgram->setValue(0);
-						iProgram->blockSignals(false);
-					}
-				}
-
-                if (isSynth)
+            
+            if (mp->device() && mp->device()->isSynthPlugin())
+            {
+                SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
+                
+                int nprogram = mp->hwCtrlState(outChannel, CTRL_PROGRAM);
+                
+                if (nprogram == program)
                 {
-                    SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
                     nprogram = synth->getCurrentProgram();
                     if (nprogram == -1)
                         nprogram = CTRL_VAL_UNKNOWN;
+                    if (nprogram != program)
+                        mp->setHwCtrlState(outChannel, CTRL_PROGRAM, nprogram);
                 }
-                else
+                
+                if (nprogram != program)
+                {
+                    if (nprogram == CTRL_VAL_UNKNOWN)
+                    {
+                        const QString n(tr("Select Patch"));
+                        emit updateCurrentPatch(n);
+                    }
+                    else
+                    {
+                        MidiInstrument* instr = mp->instrument();
+                        QString name = instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
+                        if (name.isEmpty())
+                        {
+                            name = "???";
+                        }
+                        Patch *patch = instr->getPatch(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
+                        if(patch)
+                        {
+                            emit patchChanged(patch);
+                        }
+                        else
+                        {
+                            emit patchChanged(new Patch);
+                        }
+                        emit updateCurrentPatch(name);
+                    }
+                    program = nprogram;
+                }
+            }
+            else
+            {
+                int nprogram = mp->hwCtrlState(outChannel, CTRL_PROGRAM);
+                
+                if (nprogram == CTRL_VAL_UNKNOWN)
+                {
+                    if (program != CTRL_VAL_UNKNOWN)
+                    {
+                        //printf("Composer::midiConductorHeartBeat setting program to unknown\n");
+                        
+                        program = CTRL_VAL_UNKNOWN;
+                        if (iHBank->value() != 0)
+                        {
+                            iHBank->blockSignals(true);
+                            iHBank->setValue(0);
+                            iHBank->blockSignals(false);
+                        }
+                        if (iLBank->value() != 0)
+                        {
+                            iLBank->blockSignals(true);
+                            iLBank->setValue(0);
+                            iLBank->blockSignals(false);
+                        }
+                        if (iProgram->value() != 0)
+                        {
+                            iProgram->blockSignals(true);
+                            iProgram->setValue(0);
+                            iProgram->blockSignals(false);
+                        }
+                    }
+                    
                     nprogram = mp->lastValidHWCtrlState(outChannel, CTRL_PROGRAM);
-
-				if (nprogram == CTRL_VAL_UNKNOWN)
-				{
-					const QString n(tr("Select Patch"));
-					emit updateCurrentPatch(n);
-				}
-				else
-				{
-					MidiInstrument* instr = mp->instrument();
-					QString name = instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
-					if (name.isEmpty())
-					{
-						name = "???";
-					}
-					Patch *patch = instr->getPatch(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
-					if(patch)
-					{
-						emit patchChanged(patch);
-					}
-					else
-					{
-						emit patchChanged(new Patch);
-					}
-					emit updateCurrentPatch(name);
-				}
-			}
-			else if (program != nprogram)
-			{
-				program = nprogram;
-
-				MidiInstrument* instr = mp->instrument();
-				QString name = instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM);
-				Patch *patch = instr->getPatch(outChannel, program, song->mtype(), track->type() == Track::DRUM);
-				if(patch)
-				{
-					emit patchChanged(patch);
-				}
-				else
-				{
-					emit patchChanged(new Patch);
-				}
-				emit updateCurrentPatch(name);
-
-				int hb = ((program >> 16) & 0xff) + 1;
-				if (hb == 0x100)
-					hb = 0;
-				int lb = ((program >> 8) & 0xff) + 1;
-				if (lb == 0x100)
-					lb = 0;
-				int pr = (program & 0xff) + 1;
-				if (pr == 0x100)
-					pr = 0;
-
-				if (iHBank->value() != hb)
-				{
-					iHBank->blockSignals(true);
-					iHBank->setValue(hb);
-					iHBank->blockSignals(false);
-				}
-				if (iLBank->value() != lb)
-				{
-					iLBank->blockSignals(true);
-					iLBank->setValue(lb);
-					iLBank->blockSignals(false);
-				}
-				if (iProgram->value() != pr)
-				{
-					iProgram->blockSignals(true);
-					iProgram->setValue(pr);
-					iProgram->blockSignals(false);
-				}
-
-			}
-
+                    
+                    if (nprogram == CTRL_VAL_UNKNOWN)
+                    {
+                        const QString n(tr("Select Patch"));
+                        emit updateCurrentPatch(n);
+                    }
+                    else
+                    {
+                        MidiInstrument* instr = mp->instrument();
+                        QString name = instr->getPatchName(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
+                        if (name.isEmpty())
+                        {
+                            name = "???";
+                        }
+                        Patch *patch = instr->getPatch(outChannel, nprogram, song->mtype(), track->type() == Track::DRUM);
+                        if(patch)
+                        {
+                            emit patchChanged(patch);
+                        }
+                        else
+                        {
+                            emit patchChanged(new Patch);
+                        }
+                        emit updateCurrentPatch(name);
+                    }
+                }
+                else if (program != nprogram)
+                {
+                    program = nprogram;
+                    
+                    MidiInstrument* instr = mp->instrument();
+                    QString name = instr->getPatchName(outChannel, program, song->mtype(), track->type() == Track::DRUM);
+                    Patch *patch = instr->getPatch(outChannel, program, song->mtype(), track->type() == Track::DRUM);
+                    if(patch)
+                    {
+                        emit patchChanged(patch);
+                    }
+                    else
+                    {
+                        emit patchChanged(new Patch);
+                    }
+                    emit updateCurrentPatch(name);
+                    
+                    int hb = ((program >> 16) & 0xff) + 1;
+                    if (hb == 0x100)
+                        hb = 0;
+                    int lb = ((program >> 8) & 0xff) + 1;
+                    if (lb == 0x100)
+                        lb = 0;
+                    int pr = (program & 0xff) + 1;
+                    if (pr == 0x100)
+                        pr = 0;
+                    
+                    if (iHBank->value() != hb)
+                    {
+                        iHBank->blockSignals(true);
+                        iHBank->setValue(hb);
+                        iHBank->blockSignals(false);
+                    }
+                    if (iLBank->value() != lb)
+                    {
+                        iLBank->blockSignals(true);
+                        iLBank->setValue(lb);
+                        iLBank->blockSignals(false);
+                    }
+                    if (iProgram->value() != pr)
+                    {
+                        iProgram->blockSignals(true);
+                        iProgram->setValue(pr);
+                        iProgram->blockSignals(false);
+                    }
+                }
+            }
+                
 			MidiController* mc = mp->midiController(CTRL_VOLUME);
 			int mn = mc->minVal();
 			int v = mp->hwCtrlState(outChannel, CTRL_VOLUME);

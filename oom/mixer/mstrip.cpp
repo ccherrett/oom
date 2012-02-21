@@ -458,7 +458,6 @@ void MidiStrip::addKnob(int idx, const QString& tt, const QString& label,
 
 void MidiStrip::updateOffState()
 {
-    qWarning("MidiStrip::updateOffState()");
 	bool val = !track->off();
 	slider->setEnabled(val);
 	sl->setEnabled(val);
