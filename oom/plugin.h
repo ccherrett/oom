@@ -61,6 +61,7 @@
 #define effStartProcess 71
 #define effStopProcess 72
 #define effSetProcessPrecision 77
+#define kVstVersion 2400
 #define kVstTransportChanged (1 << 0)
 #endif
 
@@ -670,6 +671,7 @@ private:
 
 typedef AEffect* (*VST_Function)(audioMasterCallback);
 
+bool VstPluginCanDo(AEffect* effect, const char* feature);
 intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt);
 
 class VstPlugin : public BasePlugin
