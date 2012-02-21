@@ -2193,7 +2193,7 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 				addCtrl(list.at(0), collapsed, height);
 			}
 		}
-		m_currentInstrument = "GM"
+		m_currentInstrument = "GM";
 	}
 	updateControllerSizes();
 }/*}}}*/
