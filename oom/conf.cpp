@@ -556,7 +556,7 @@ static void loadConfigMetronom(Xml& xml)/*{{{*/
 
 static void readSeqConfiguration(Xml& xml)
 {
-	bool updatePorts = false;
+	//bool updatePorts = false;
 	for (;;)
 	{
 		Xml::Token token = xml.parse();
@@ -570,7 +570,7 @@ static void readSeqConfiguration(Xml& xml)
 					loadConfigMetronom(xml);
 				else if (tag == "midiport")
 				{
-					updatePorts = true;
+					//updatePorts = true;
 					readConfigMidiPort(xml);
 				}
 				else if (tag == "rcStop")
@@ -590,15 +590,15 @@ static void readSeqConfiguration(Xml& xml)
 				if (tag == "sequencer")
 				{
 					//All Midiports have been read so put all the unconfigured ports in the id list
-					if(updatePorts)
-					{
+					//if(updatePorts)
+					//{
 						for(int i = 0; i < MIDI_PORTS; ++i)
 						{
 							MidiPort *mp = &midiPorts[i];
 							if(!oomMidiPorts.contains(mp->id()))
 								oomMidiPorts.insert(mp->id(), mp);
 						}
-					}
+					//}
 					return;
 				}
 			default:
