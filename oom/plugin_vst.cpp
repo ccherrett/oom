@@ -21,10 +21,6 @@
 
 #include <math.h>
 
-#ifndef kVstVersion
-#define kVstVersion 2400
-#endif
-
 // FIXME - check return values
 
 #ifdef USE_OFFICIAL_VSTSDK
@@ -37,24 +33,37 @@ struct VstTimeInfo_R
 };
 #endif
 
+VstPlugin* VstHostUserCheck(AEffect* effect)
+{
+    if (effect && effect->user)
+    {
+        VstPlugin* plugin = (VstPlugin*)effect->user;
+         if (plugin->sanityCheck == VST_SANITY_CHECK)
+             return plugin;
+    }
+    return 0;
+}
+
 intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
 {
-    VstPlugin* plugin = (effect && effect->user && ((VstPlugin*)effect->user)->sanityCheck == VST_SANITY_CHECK) ? (VstPlugin*)effect->user : 0;
+    VstPlugin* plugin = VstHostUserCheck(effect);
 
     switch (opcode)
     {
     case audioMasterAutomate:
         if (plugin)
             plugin->setAutomatedParameterValue(index, opt);
-        return 1;
+        else if (effect)
+            effect->setParameter(effect, index, opt);
+        break;
 
     case audioMasterVersion:
         return kVstVersion;
-
+        
     case audioMasterIdle:
         if (effect)
             effect->dispatcher(effect, effEditIdle, 0, 0, 0, 0.0f);
-        return 1;
+        break;
 
     case audioMasterGetTime:
         static VstTimeInfo_R timeInfo;
@@ -145,12 +154,14 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
         return 1; // replace, FIXME
 
     case audioMasterGetVendorString:
-        if (ptr) strcpy((char*)ptr, "OpenOctave");
-        return 1;
+        if (ptr)
+            strcpy((char*)ptr, "OpenOctave");
+        break;
 
     case audioMasterGetProductString:
-        if (ptr) strcpy((char*)ptr, "OpenOctave MIDI");
-        return 1;
+        if (ptr)
+            strcpy((char*)ptr, "OpenOctave MIDI");
+        break;
 
     case audioMasterGetVendorVersion:
         return 2012;
@@ -166,12 +177,28 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
             return 1;
         else if (strcmp((char*)ptr, "receiveVstMidiEvent") == 0)
             return 1;
+#if !VST_FORCE_DEPRECATED
         else if (strcmp((char*)ptr, "receiveVstTimeInfo") == 0)
             return -1;
-        else if (strcmp((char*)ptr, "sizeWindow") == 0)
+#endif
+        else if (strcmp((char*)ptr, "reportConnectionChanges") == 0)
             return 1;
         else if (strcmp((char*)ptr, "acceptIOChanges") == 0)
             return 1;
+        else if (strcmp((char*)ptr, "sizeWindow") == 0)
+            return 1;
+        else if (strcmp((char*)ptr, "offline") == 0)
+            return -1;
+        else if (strcmp((char*)ptr, "openFileSelector") == 0)
+            return -1;
+        else if (strcmp((char*)ptr, "closeFileSelector") == 0)
+            return -1;
+        else if (strcmp((char*)ptr, "startStopProcess") == 0)
+            return 1;
+        else if (strcmp((char*)ptr, "shellCategory") == 0)
+            return -1;
+        else if (strcmp((char*)ptr, "sendVstMidiEventFlagIsRealtime") == 0)
+            return -1;
         else
             return 0;
 
@@ -185,10 +212,8 @@ intptr_t VstHostCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_
             plugin->updateCurrentProgram();
         }
         return 1;
-
-    default:
-        return 0;
     }
+    return 0;
 }
 
 VstPlugin::VstPlugin()
