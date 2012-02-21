@@ -986,12 +986,8 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
                             new_filename = plugi->filename();
                     }
 
-                    if (init(new_filename, new_label))
-                    {
-                        xml.parse1();
-                        break;
-                    }
-                    else
+                    if (init(new_filename, new_label) == false)
+                        // plugin failed to initialize
                         return true;
                 }
 
