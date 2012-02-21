@@ -2151,6 +2151,7 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 		if(port)
 		{
 			QString instrument = port->instrument()->iname();
+			qDebug("Performer::updateControllerForInstrument: Found MIDI port, Checking instrument: %s", instrument.toUtf8().constData());
 			if(m_currentInstrument.isEmpty() || m_currentInstrument != instrument)
 			{
 				qDebug("Performer::updateControllerForInstrument: Instrument changed: \"%s\", Updating controllers", instrument.toUtf8().constData());
