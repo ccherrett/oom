@@ -39,12 +39,13 @@ CommentDock::CommentDock(QWidget* parent, Track* t)
 
 CommentDock::~CommentDock()
 {
-	QList<int> sizes = commentDockSplitter->sizes();
+	//QList<int> sizes = commentDockSplitter->sizes();
 	QStringList out;
-	foreach(int s, sizes)
+	/*foreach(int s, sizes)
 	{
 		out << QString::number(s);
-	}
+	}*/
+	out << QString::number(songComment->height()) << QString::number(textentry->height());
 	tconfig().set_property("CommentDock", "sizes", out.join(" "));
 	tconfig().save();
 }

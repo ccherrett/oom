@@ -2152,10 +2152,10 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 		if(port)
 		{
 			QString instrument = port->instrument()->iname();
-			qDebug("Performer::updateControllerForInstrument: Found MIDI port, Checking instrument: %s", instrument.toUtf8().constData());
+			//qDebug("Performer::updateControllerForInstrument: Found MIDI port, Checking instrument: %s", instrument.toUtf8().constData());
 			if(m_currentInstrument.isEmpty() || m_currentInstrument != instrument)
 			{
-				qDebug("Performer::updateControllerForInstrument: Instrument changed: \"%s\", Updating controllers", instrument.toUtf8().constData());
+				//qDebug("Performer::updateControllerForInstrument: Instrument changed: \"%s\", Updating controllers", instrument.toUtf8().constData());
 				//save the current controller state and remove them
 				saveInstrumentControllerState();
 				while(ctrlEditList.size())
@@ -2180,7 +2180,7 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 	}
 	if(setDefaults)
 	{
-		qDebug("Performer::updateControllerForInstrument: No Instrument or MIDI port found, Using default");
+		//qDebug("Performer::updateControllerForInstrument: No Instrument or MIDI port found, Using default");
 		saveInstrumentControllerState();
 		while(ctrlEditList.size())
 			delete ctrlEditList.takeFirst();
@@ -2195,7 +2195,6 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 				addCtrl(list.at(0), collapsed, height);
 			}
 		}
-		m_currentInstrument = "GM";
 	}
 	updateControllerSizes();
 }/*}}}*/
