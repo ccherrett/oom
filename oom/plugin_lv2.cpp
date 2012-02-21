@@ -1999,12 +1999,8 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
 
                 new_label = QString(lilv_node_as_string(lilv_plugin_get_name(lplug)));
 
-                if (init(new_uri, new_label))
-                {
-                    xml.parse1();
-                    break;
-                }
-                else
+                if (init(new_uri, new_label) == false)
+                    // plugin failed to initialize
                     return true;
             }
 
@@ -2169,7 +2165,7 @@ bool Lv2Plugin::loadControl(Xml& xml)
             break;
 
         case Xml::TagEnd:
-            if (tag == "control" && symbol.isEmpty() == false && lplug)
+            if (tag == "control" && lplug)
                 return setControl(symbol, oldName, val);
             return true;
 

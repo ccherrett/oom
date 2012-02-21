@@ -610,12 +610,8 @@ bool LadspaPlugin::readConfiguration(Xml& xml, bool readPreset)
                         new_filename = plugi->filename();
                 }
 
-                if (init(new_filename, new_label))
-                {
-                    xml.parse1();
-                    break;
-                }
-                else
+                if (init(new_filename, new_label) == false)
+                    // plugin failed to initialize
                     return true;
             }
 
@@ -752,7 +748,7 @@ bool LadspaPlugin::loadControl(Xml& xml)
             break;
 
         case Xml::TagEnd:
-            if (tag == "control" && idx >= 0)
+            if (tag == "control")
                 return setControl(idx, oldName, val);
             return true;
 
