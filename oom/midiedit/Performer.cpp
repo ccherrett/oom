@@ -2146,8 +2146,9 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 	Track* track = song->findTrackById(trackId);
 	if(track)
 	{
-		qint64 portid = ((MidiTrack*)track)->outPortId();
-		MidiPort* port = oomMidiPorts.value(portid);
+		//qint64 portid = ((MidiTrack*)track)->outPortId();
+		int outport = ((MidiTrack*)track)->outPort();
+		MidiPort* port = &midiPorts[outport];//oomMidiPorts.value(portid);
 		if(port)
 		{
 			QString instrument = port->instrument()->iname();
