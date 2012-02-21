@@ -1,5 +1,5 @@
 //=========================================================
-//  OOMidi
+//  OOStudio
 //  OpenOctave Midi and Audio Editor
 
 //  (C) Copyright 2011 Andrew Williams
@@ -587,7 +587,7 @@ bool ComposerCanvas::moveItem(CItem* item, const QPoint& newpos, DragType t)
 
 	if (dtrack->type() != type)
 	{
-		QMessageBox::critical(this, QString("OOMidi"),
+		QMessageBox::critical(this, QString("OOStudio"),
 				tr("Cannot copy/move/clone to different Track-Type"));
 		return false;
 	}
@@ -1122,8 +1122,8 @@ void ComposerCanvas::itemPopup(CItem* item, int n, const QPoint& pt)/*{{{*/
 		{
 			const Part* part = item->part();
 			bool popenFlag = false;
-			//QString fn = getSaveFileName(QString(""), part_file_pattern, this, tr("OOMidi: save part"));
-			QString fn = getSaveFileName(QString(""), part_file_save_pattern, this, tr("OOMidi: save part"));
+			//QString fn = getSaveFileName(QString(""), part_file_pattern, this, tr("OOStudio: save part"));
+			QString fn = getSaveFileName(QString(""), part_file_save_pattern, this, tr("OOStudio: save part"));
 			if (!fn.isEmpty())
 			{
 				FILE* fp = fileOpen(this, fn, ".mpt", "w", popenFlag, false, false);
@@ -3922,7 +3922,7 @@ int ComposerCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, b
 	if (notDone)
 	{
 		int tot = notDone + done;
-		QMessageBox::critical(this, QString("OOMidi"),
+		QMessageBox::critical(this, QString("OOStudio"),
 				QString().setNum(notDone) + (tot > 1 ? (tr(" out of ") + QString().setNum(tot)) : QString("")) +
 				(tot > 1 ? tr(" parts") : tr(" part")) +
 				tr(" could not be pasted.\nLikely the selected track is the wrong type."));
@@ -3955,7 +3955,7 @@ void ComposerCanvas::paste(bool clone, bool toTrack, bool doInsert)
 			{
 				if (track)
 				{
-					QMessageBox::critical(this, QString("OOMidi"),
+					QMessageBox::critical(this, QString("OOStudio"),
 							tr("Cannot paste: multiple tracks selected"));
 					return;
 				}
@@ -3965,7 +3965,7 @@ void ComposerCanvas::paste(bool clone, bool toTrack, bool doInsert)
 		}
 		if (track == 0)
 		{
-			QMessageBox::critical(this, QString("OOMidi"),
+			QMessageBox::critical(this, QString("OOStudio"),
 					tr("Cannot paste: no track selected"));
 			return;
 		}
@@ -3985,31 +3985,29 @@ void ComposerCanvas::paste(bool clone, bool toTrack, bool doInsert)
 		// If we want to paste to a selected track...
 		if (toTrack && !track->isMidiTrack())
 		{
-			QMessageBox::critical(this, QString("OOMidi"),
-					tr("Can only paste to midi/drum track"));
+			QMessageBox::critical(this, QString("OOStudio"),
+					tr("Can only paste to midi track"));
 			return;
 		}
 		txt = cb->text(mdpl, QClipboard::Clipboard);
 	}
-	else
-		if (md->hasFormat(pfx + wvpl))
+	else if (md->hasFormat(pfx + wvpl))
 	{
 		// If we want to paste to a selected track...
 		if (toTrack && track->type() != Track::WAVE)
 		{
-			QMessageBox::critical(this, QString("OOMidi"),
+			QMessageBox::critical(this, QString("OOStudio"),
 					tr("Can only paste to wave track"));
 			return;
 		}
 		txt = cb->text(wvpl, QClipboard::Clipboard);
 	}
-	else
-		if (md->hasFormat(pfx + mxpl))
+	else if (md->hasFormat(pfx + mxpl))
 	{
 		// If we want to paste to a selected track...
 		if (toTrack && !track->isMidiTrack() && track->type() != Track::WAVE)
 		{
-			QMessageBox::critical(this, QString("OOMidi"),
+			QMessageBox::critical(this, QString("OOStudio"),
 					tr("Can only paste to midi or wave track"));
 			return;
 		}
@@ -4017,7 +4015,7 @@ void ComposerCanvas::paste(bool clone, bool toTrack, bool doInsert)
 	}
 	else
 	{
-		QMessageBox::critical(this, QString("OOMidi"),
+		QMessageBox::critical(this, QString("OOStudio"),
 				tr("Cannot paste: wrong data type"));
 		return;
 	}

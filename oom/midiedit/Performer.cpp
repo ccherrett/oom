@@ -2177,6 +2177,9 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 	}
 	if(setDefaults)
 	{
+		saveInstrumentControllerState();
+		while(ctrlEditList.size())
+			delete ctrlEditList.takeFirst();
 		QStringList lctrl = DEFAULT_CONTROLLERS.split("::", QString::SkipEmptyParts);
 		foreach(QString ctl, lctrl)
 		{
@@ -2194,6 +2197,8 @@ void Performer::updateControllerForInstrument(qint64 trackId)/*{{{*/
 
 void Performer::saveInstrumentControllerState()/*{{{*/
 {
+	if(m_currentInstrument.isEmpty())
+		return;
 	QStringList controllers;
 	foreach(CtrlEdit* edit, ctrlEditList)
 	{
