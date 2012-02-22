@@ -1179,9 +1179,9 @@ void initIcons()
       stretchIconOff= new MPIXMAP(":/images/icons/stretchtool_new_off.png", NULL);
       stretchIconOver= new MPIXMAP(":/images/icons/stretchtool_new_over.png", NULL);
 	  stretchIconSet3         = new QIcon();
-      stretchIconSet3->addPixmap(*drawIconOn, QIcon::Normal, QIcon::On);
-      stretchIconSet3->addPixmap(*drawIconOff, QIcon::Normal, QIcon::Off);
-      stretchIconSet3->addPixmap(*drawIconOver, QIcon::Active);
+      stretchIconSet3->addPixmap(*stretchIconOn, QIcon::Normal, QIcon::On);
+      stretchIconSet3->addPixmap(*stretchIconOff, QIcon::Normal, QIcon::Off);
+      stretchIconSet3->addPixmap(*stretchIconOver, QIcon::Active);
 	  
 	  multiDisplayIconOn = new MPIXMAP(":/images/icons/epicParts_new_on.png", NULL);
       multiDisplayIconOff= new MPIXMAP(":/images/icons/epicParts_new_off.png", NULL);
