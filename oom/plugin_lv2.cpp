@@ -1997,11 +1997,19 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
                 lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
                 lilv_node_free(pluginURI);
 
-                new_label = QString(lilv_node_as_string(lilv_plugin_get_name(lplug)));
-
-                if (init(new_uri, new_label) == false)
-                    // plugin failed to initialize
+                if (lplug)
+                {
+                    new_label = QString(lilv_node_as_string(lilv_plugin_get_name(lplug)));
+                    
+                    if (init(new_uri, new_label) == false)
+                        // plugin failed to initialize
+                        return true;
+                }
+                else
+                {
+                    qWarning("Failed to find LV2 plugin with uri '%s'", new_uri.toUtf8().constData());
                     return true;
+                }
             }
 
             if (tag == "control")
