@@ -613,13 +613,19 @@ Lv2Plugin::~Lv2Plugin()
         if (m_ainsCount > 0)
         {
             for (uint32_t i=0; i < m_ainsCount; i++)
-                audioDevice->unregisterPort(m_portsIn[i]);
+            {
+                if (m_portsIn[i])
+                    audioDevice->unregisterPort(m_portsIn[i]);
+            }
         }
         
         if (m_aoutsCount > 0)
         {
             for (uint32_t i=0; i < m_aoutsCount; i++)
-                audioDevice->unregisterPort(m_portsOut[i]);
+            {
+                if (m_portsOut[i])
+                    audioDevice->unregisterPort(m_portsOut[i]);
+            }
         }
     }
 
@@ -1999,11 +2005,19 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
 					return true;
                 lilv_node_free(pluginURI);
 
-                new_label = QString(lilv_node_as_string(lilv_plugin_get_name(lplug)));
-
-                if (init(new_uri, new_label) == false)
-                    // plugin failed to initialize
+                if (lplug)
+                {
+                    new_label = QString(lilv_node_as_string(lilv_plugin_get_name(lplug)));
+                    
+                    if (init(new_uri, new_label) == false)
+                        // plugin failed to initialize
+                        return true;
+                }
+                else
+                {
+                    qWarning("Failed to find LV2 plugin with uri '%s'", new_uri.toUtf8().constData());
                     return true;
+                }
             }
 
             if (tag == "control")

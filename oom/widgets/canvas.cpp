@@ -1812,7 +1812,7 @@ void Canvas::canvasPopup(int n)
 {
 	switch(n)
 	{
-		case 20 ... NUM_PARTCOLORS + 20:
+		case 33 ... NUM_PARTCOLORS + 20:
 		{
 			int curColorIndex = n - 20;
 			if (_curPart)
