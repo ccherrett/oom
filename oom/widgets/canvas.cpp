@@ -1691,6 +1691,9 @@ void Canvas::setCursor()
 		case MuteTool:
 			QWidget::setCursor(QCursor(*editmuteIcon, 4, 15));
 			break;
+		case StretchTool:
+			QWidget::setCursor(Qt::SplitHCursor);
+			break;
 		case AutomationTool:
 			//QWidget::setCursor(QCursor(Qt::PointingHandCursor));
 			QWidget::setCursor(QCursor(*crosshairIcon));
