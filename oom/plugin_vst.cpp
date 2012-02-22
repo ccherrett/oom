@@ -274,7 +274,7 @@ VstPlugin::~VstPlugin()
         {
             for (uint32_t i=0; i < m_ainsCount; i++)
 			{
-				if(m_portsIn[i])
+				if (m_portsIn[i])
                 	audioDevice->unregisterPort(m_portsIn[i]);
 			}
         }
@@ -283,7 +283,7 @@ VstPlugin::~VstPlugin()
         {
             for (uint32_t i=0; i < m_aoutsCount; i++)
 			{
-				if(m_portsOut[i])
+				if (m_portsOut[i])
                 	audioDevice->unregisterPort(m_portsOut[i]);
 			}
         }
