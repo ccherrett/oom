@@ -43,6 +43,8 @@ const char* infoMute = QT_TRANSLATE_NOOP("@default", "select Muting Tool:\n"
 		"click on part to mute/unmute");
 const char* infoAutomation = QT_TRANSLATE_NOOP("@default", "Manipulate automation");
 const char* infoMaster = QT_TRANSLATE_NOOP("@default", "Enable Tempo Editor to affect song");
+const char* infoStretch = QT_TRANSLATE_NOOP("@default", "select Time Stretch Tool:\n"
+		"insert time stretch");
 
 ToolB toolList[] = {
 	{&pointerIconSet3, QT_TRANSLATE_NOOP("@default", "Pointer"), infoPointer},
@@ -53,6 +55,7 @@ ToolB toolList[] = {
 	{&glueIconSet3, QT_TRANSLATE_NOOP("@default", "Glue"), infoGlue},
 	{&quantIconSet3, QT_TRANSLATE_NOOP("@default", "Quantize"), infoQuant},
 	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "Draw"), infoDraw},
+	{&stretchIconSet3, QT_TRANSLATE_NOOP("@default", "Insert Time Stretch"), infoStretch},
 	{&muteIconSet3, QT_TRANSLATE_NOOP("@default", "Mute parts"), infoMute},
 	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "Edit automation"),    infoAutomation},
 	{&drawIconSet3, QT_TRANSLATE_NOOP("@default", "Enable Tempo Editor"),    infoMaster},

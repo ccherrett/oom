@@ -474,6 +474,11 @@ QPixmap* drawIconOff;
 QPixmap* drawIconOver;
 QIcon* drawIconSet3;
 
+QPixmap* stretchIconOn;
+QPixmap* stretchIconOff;
+QPixmap* stretchIconOver;
+QIcon* stretchIconSet3;
+
 QPixmap* multiDisplayIconOn;
 QPixmap* multiDisplayIconOff;
 QPixmap* multiDisplayIconOver;
@@ -1169,6 +1174,14 @@ void initIcons()
       drawIconSet3->addPixmap(*drawIconOn, QIcon::Normal, QIcon::On);
       drawIconSet3->addPixmap(*drawIconOff, QIcon::Normal, QIcon::Off);
       drawIconSet3->addPixmap(*drawIconOver, QIcon::Active);
+	  
+	  stretchIconOn = new MPIXMAP(":/images/icons/stretchtool_new_on.png", NULL);
+      stretchIconOff= new MPIXMAP(":/images/icons/stretchtool_new_off.png", NULL);
+      stretchIconOver= new MPIXMAP(":/images/icons/stretchtool_new_over.png", NULL);
+	  stretchIconSet3         = new QIcon();
+      stretchIconSet3->addPixmap(*drawIconOn, QIcon::Normal, QIcon::On);
+      stretchIconSet3->addPixmap(*drawIconOff, QIcon::Normal, QIcon::Off);
+      stretchIconSet3->addPixmap(*drawIconOver, QIcon::Active);
 	  
 	  multiDisplayIconOn = new MPIXMAP(":/images/icons/epicParts_new_on.png", NULL);
       multiDisplayIconOff= new MPIXMAP(":/images/icons/epicParts_new_off.png", NULL);

@@ -218,9 +218,15 @@
 		<file>images/icons/line-tool.png</file>
 		<file>images/icons/line-tool_off.png</file>
 		<file>images/icons/line-tool_over.png</file>
+
 		<file>images/icons/linetool_new_on.png</file>
 		<file>images/icons/linetool_new_off.png</file>
 		<file>images/icons/linetool_new_over.png</file>
+		
+		<file>images/icons/stretchtool_new_on.png</file>
+		<file>images/icons/stretchtool_new_off.png</file>
+		<file>images/icons/stretchtool_new_over.png</file>
+		
 		<file>images/icons/join_tracks.png</file>
 		<file>images/icons/join_tracks_off.png</file>
 		<file>images/icons/join_tracks_over.png</file>

@@ -256,6 +256,11 @@ extern QIcon* drawIconOff;
 extern QIcon* drawIconOver;
 extern QIcon* drawIconSet3;
 
+extern QIcon* stretchIconOn;
+extern QIcon* stretchIconOff;
+extern QIcon* stretchIconOver;
+extern QIcon* stretchIconSet3;
+
 extern QIcon* multiDisplayIconOn;
 extern QIcon* multiDisplayIconOff;
 extern QIcon* multiDisplayIconOver;
