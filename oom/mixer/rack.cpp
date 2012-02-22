@@ -171,7 +171,7 @@ QSize EffectRack::sizeHint() const
 
 void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 {
-    PluginI* plugi = PluginDialog::getPlugin(this);
+    PluginI* plugi = PluginDialog::getPlugin(track->type(), this);
     if (plugi)
     {
         BasePlugin* nplug = 0;

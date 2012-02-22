@@ -568,7 +568,7 @@ void VstPlugin::reload()
     reloadPrograms(true);
 
     // enable it again (only if jack is active, otherwise non-needed)
-    if (audioDevice->isJackAudio())
+    if (audioDevice && audioDevice->isJackAudio())
     {
         m_proc_lock.lock();
         m_enabled = true;

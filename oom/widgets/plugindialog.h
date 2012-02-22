@@ -48,10 +48,11 @@ class PluginDialog : public QDialog
     QPushButton *okB;
     QComboBox* m_cmbType;
     PluginType m_display_type;
+	int m_trackType;
 
 public:
-    PluginDialog(QWidget* parent = 0);
-    static PluginI* getPlugin(QWidget* parent);
+    PluginDialog(int type, QWidget* parent = 0);
+    static PluginI* getPlugin(int type, QWidget* parent);
     PluginI* value();
     void accept();
 

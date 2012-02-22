@@ -1304,7 +1304,7 @@ void Lv2Plugin::reload()
     reloadPrograms(true);
 
     // enable it again (only if jack is active, otherwise non-needed)
-    if (audioDevice->isJackAudio())
+    if (audioDevice && audioDevice->isJackAudio())
     {
         m_proc_lock.lock();
         m_enabled = true;
@@ -1995,6 +1995,8 @@ bool Lv2Plugin::readConfiguration(Xml& xml, bool readPreset)
             {
                 LilvNode* pluginURI = lilv_new_uri(lv2world->world, new_uri.toAscii().constData());
                 lplug = lilv_plugins_get_by_uri(lv2world->plugins, pluginURI);
+				if(!lplug)
+					return true;
                 lilv_node_free(pluginURI);
 
                 new_label = QString(lilv_node_as_string(lilv_plugin_get_name(lplug)));

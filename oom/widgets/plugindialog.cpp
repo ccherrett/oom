@@ -1,5 +1,5 @@
 //=========================================================
-//  OOMidi
+//  OOStudio
 //  OpenOctave Midi and Audio Editor
 //  $Id: plugin.h,v 1.9.2.13 2009/12/06 01:25:21 terminator356 Exp $
 //
@@ -10,6 +10,7 @@
 #include <QtGui>
 #include "config.h"
 #include "plugindialog.h"
+#include "track.h"
 #include "traverso_shared/TConfig.h"
 
 int PluginDialog::selectedPlugType = 0;
@@ -20,12 +21,13 @@ QStringList PluginDialog::sortItems = QStringList();
 //    select Plugin dialog
 //---------------------------------------------------------
 
-PluginDialog::PluginDialog(QWidget* parent)
+PluginDialog::PluginDialog(int type, QWidget* parent)
 : QDialog(parent)
 {
 	m_display_type = PLUGIN_LV2;
+	m_trackType = type;
 
-	setWindowTitle(tr("OOMidi: select plugin"));
+	setWindowTitle(tr("OOStudio: select plugin"));
 	QVBoxLayout* vbox = new QVBoxLayout(this);
 
 	QHBoxLayout* layout = new QHBoxLayout();
@@ -132,7 +134,7 @@ PluginDialog::PluginDialog(QWidget* parent)
 
 	//plugSelGroup->setToolTip(tr("Select which types of plugins should be visible in the list.<br>"
 	//		"Note that using mono plugins on stereo tracks is not a problem, two will be used in parallell.<br>"
-	//		"Also beware that the 'all' alternative includes plugins that probably not are usable by OOMidi."));
+	//		"Also beware that the 'all' alternative includes plugins that probably not are usable by OOStudio."));
 
 	//w5->addSpacing(12);
 	//w5->addWidget(plugSelGroup);
@@ -300,14 +302,14 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 		//int ci = i->controlInPorts();
 		//int co = i->controlOutPorts();
 
-        if (ai != ao)
+        //if (ai != ao)
             // we can only safely process if inputs match outputs (of fx, not synth plugins)
-            continue;
+            //continue;
 
 		bool addFlag = false;
         bool addFlagString = false;
 		bool stereo = false;
-		if ((ai == 1 || ai == 2) && ao == 2)
+		if ((ai == 1 || ai == 2 || (m_trackType == Track::AUDIO_BUSS && ai == 3)) && ao == 2)
 			stereo = true;
         else if (ai == 1 && ao == 1)
 			stereo = false;
@@ -320,13 +322,13 @@ void PluginDialog::fillPlugs(int nbr)/*{{{*/
 		switch (nbr)
 		{
 			case SEL_SM: // stereo & mono
-				if ((ai == 1 || ai == 2) && (ao == 1 || ao == 2))
+				if ((ai == 1 || ai == 2 || (m_trackType == Track::AUDIO_BUSS && ai == 3)) && (ao == 1 || ao == 2))
 				{
 					addFlag = true;
 				}
 				break;
 			case SEL_S: // stereo
-				if ((ai == 1 || ai == 2) && ao == 2)
+				if ((ai == 1 || ai == 2 || (m_trackType == Track::AUDIO_BUSS && ai == 3)) && ao == 2)
 				{
 					addFlag = true;
 				}
@@ -378,13 +380,13 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 		//int ci = i->controlInPorts();
 		//int co = i->controlOutPorts();
 
-        if (ai != ao)
+        //if (ai != ao)
             // we can only safely process if inputs match outputs (of fx, not synth plugins)
-            continue;
+        //    continue;
 
 		bool addFlag = false;
 		bool stereo = false;
-		if ((ai == 1 || ai == 2) && ao == 2)
+		if ((ai == 1 || ai == 2 || (m_trackType == Track::AUDIO_BUSS && ai == 3)) && ao == 2)
 			stereo = true;
 		else if(ai == 1 && ao == 1)
 			stereo = false;
@@ -422,9 +424,9 @@ void PluginDialog::fillPlugs(const QString &sortValue)/*{{{*/
 //   getPlugin
 //---------------------------------------------------------
 
-PluginI* PluginDialog::getPlugin(QWidget* parent)/*{{{*/
+PluginI* PluginDialog::getPlugin(int type, QWidget* parent)/*{{{*/
 {
-	PluginDialog* dialog = new PluginDialog(parent);
+	PluginDialog* dialog = new PluginDialog(type, parent);
 	if (dialog->exec())
 		return dialog->value();
 	return 0;
