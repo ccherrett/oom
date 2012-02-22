@@ -492,7 +492,7 @@ void EffectRack::startDrag(int idx)
 	Pipeline* pipe = track->efxPipe();
 	if (pipe)
 	{
-		if ((*pipe)[idx] != NULL)
+		if (idx >= 0 && (*pipe)[idx] != NULL)
 		{
 			xml.header();
 			xml.tag(0, "oom version=\"1.0\"");
