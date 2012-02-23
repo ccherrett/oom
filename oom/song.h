@@ -743,6 +743,34 @@ signals:
 	void trackViewDeleted();
 	void composerViewChanged();
     void segmentSizeChanged(int);
+	void trackOrderChanged();
+	void trackModified(qint64);
+	void trackRemoved(qint64);
+	void trackAdded(qint64);
+	void partInserted(qint64 trackId, unsigned int pos);
+	void partRemoved(qint64);
+	void partModified(qint64, unsigned);
+	void eventInserted();
+	void eventRemoved();
+	void eventModified();
+	void sigmapChanged();
+	void tempoModified();
+	void masterFlagChanged();
+	void selectionChanged(int type);
+	void midiControllerChanged();
+	void muteChanged(qint64);
+	void soloChanged(qint64);
+	void recordFlagChanged(qint64);
+	void routeChanged();
+	void channelsModified();
+	void configModified();
+//#define SC_AUX                0x1000000   // mixer aux changed
+//#define SC_RACK               0x2000000   // mixer rack changed
+//#define SC_CLIP_MODIFIED      0x4000000
+//#define SC_MIDI_CONTROLLER_ADD 0x8000000   // a hardware midi controller was added or deleted
+//#define SC_MIDI_TRACK_PROP    0x10000000   // a midi track's properties changed (channel, compression etc)
+//#define SC_SONG_TYPE          0x20000000   // the midi song type (mtype) changed
+//#define SC_PATCH_UPDATED      0X60000000
 };
 
 extern Song* song;
