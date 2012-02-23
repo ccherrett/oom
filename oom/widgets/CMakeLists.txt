@@ -117,6 +117,7 @@ QT4_WRAP_CPP (widget_mocs
 	  ClipList/AudioClipList.h
 	  ClipList/AudioPlayer.h
 	  AutomationMenu.h
+	  StretchDialog.h
       )
 
 ##
@@ -159,6 +160,7 @@ file (GLOB widgets_ui_files
 	  cceditbase.ui
 	  createtrackbase.ui
 	  ClipList/AudioClipListBase.ui
+	  stretchdialog.ui
       )
 QT4_WRAP_UI (widget_ui_headers ${widgets_ui_files})
 
@@ -265,6 +267,7 @@ file (GLOB widgets_source_files
 	  ClipList/AudioClipList.cpp
 	  ClipList/AudioPlayer.cpp
 	  AutomationMenu.cpp
+	  StretchDialog.cpp
       )
 
 ##

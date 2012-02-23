@@ -22,6 +22,7 @@
 #include "drummap.h"
 #include "song.h"
 #include "app.h"
+#include "StretchDialog.h"
 
 int Part::snGen;
 
@@ -1102,7 +1103,13 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 				// Indicate no undo, and do not do port controller values and clone parts.
                 if (oom->getCurrentTool() == StretchTool)
                 {
-                    qWarning("Dialog here");
+                    StretchDialog sdialog;
+                    if (sdialog.exec())
+                    {
+                        qWarning("Stretch processing here");
+                    }
+                    else
+                        qWarning("Stretch cancelled");
                 }
                 else
                     audio->msgChangePart(oPart, nPart, false, false, false);
