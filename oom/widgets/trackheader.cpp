@@ -41,6 +41,7 @@
 #include "slider.h"
 #include "mixer/meter.h"
 #include "CreateTrackDialog.h"
+#include "AutomationMenu.h"
 
 static QString styletemplate = "QLineEdit { border-width:1px; border-radius: 0px; border-image: url(:/images/frame.png) 4; border-top-color: #1f1f22; border-bottom-color: #505050; color: #%1; background-color: #%2; font-family: fixed-width; font-weight: bold; font-size: 15px; padding-left: 15px; }";
 static QString trackHeaderStyle = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #2e2e2e; }";
@@ -176,9 +177,15 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 		setFixedHeight(m_track->height());
 	}
     if(m_track->isMidiTrack() && m_track->wantsAutomation() == false)
+	{
 		m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
+		m_btnAutomation->setToolTip("");
+	}
 	else
+	{
 		m_btnAutomation->setIcon(*automation_trackIconSet3);
+		m_btnAutomation->setToolTip(tr("Toggle Automation"));
+	}
 	
 	if(type == Track::AUDIO_BUSS || type == Track::AUDIO_INPUT || type == Track::AUDIO_AUX)
 	{
@@ -907,9 +914,12 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
 	QMenu* p = new QMenu(this);
 	p->disconnect();
 	p->clear();
-	p->setTitle(tr("Viewable automation"));
+	AutomationMenu *amenu = new AutomationMenu(p, m_track);
 
-    CtrlListList* cll;
+	p->addAction(amenu);
+	p->exec(QCursor::pos());
+
+    /*CtrlListList* cll;
     if (m_track->isMidiTrack() && m_track->wantsAutomation())
     {
         MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
@@ -947,7 +957,7 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
 
 	if(act1)
 	{
-		int id = act1->data().toInt();/*{{{*/
+		int id = act1->data().toInt();{{{
 
 		AudioTrack* atrack = 0;
     	if (m_track->isMidiTrack())
@@ -994,9 +1004,9 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
 					}
 				}
 			}
-			song->update(SC_TRACK_MODIFIED);/*}}}*/
+			song->update(SC_TRACK_MODIFIED);//}}}
 		}
-	}
+	}*/
 
 	delete p;
 }/*}}}*/

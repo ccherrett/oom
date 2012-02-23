@@ -116,6 +116,7 @@ QT4_WRAP_CPP (widget_mocs
 	  ClipList/BookmarkList.h
 	  ClipList/AudioClipList.h
 	  ClipList/AudioPlayer.h
+	  AutomationMenu.h
       )
 
 ##
@@ -263,6 +264,7 @@ file (GLOB widgets_source_files
 	  ClipList/BookmarkList.cpp
 	  ClipList/AudioClipList.cpp
 	  ClipList/AudioPlayer.cpp
+	  AutomationMenu.cpp
       )
 
 ##

@@ -1,5 +1,5 @@
 //=========================================================
-//  OOMidi
+//  OOStudio
 //  OpenOctave Midi and Audio Editor
 //  $Id: rack.cpp,v 1.7.2.7 2007/01/27 14:52:43 spamatica Exp $
 //
@@ -140,6 +140,7 @@ void EffectRack::songChanged(int typ)
 
 void EffectRack::segmentSizeChanged(int size)
 {
+	Q_UNUSED(size);
     Pipeline* pipe = track->efxPipe();
     for (int i = 0; i < PipelineDepth; ++i)
     {
@@ -151,25 +152,7 @@ void EffectRack::segmentSizeChanged(int size)
     }
 }
 
-//---------------------------------------------------------
-//   minimumSizeHint
-//---------------------------------------------------------
-
-/*QSize EffectRack::minimumSizeHint() const
-{
-	return QSize(10, 19 * PipelineDepth);
-}
-
-//---------------------------------------------------------
-//   SizeHint
-//---------------------------------------------------------
-
-QSize EffectRack::sizeHint() const
-{
-	return minimumSizeHint();
-}*/
-
-void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
+void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)/*{{{*/
 {
     PluginI* plugi = PluginDialog::getPlugin(track->type(), this);
     if (plugi)
@@ -213,13 +196,13 @@ void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)
 
         updateContents();
     }
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   menuRequested
 //---------------------------------------------------------
 
-void EffectRack::menuRequested(QListWidgetItem* it)
+void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
 {
 	if (it == 0 || track == 0)
 		return;
@@ -385,7 +368,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)
 	}
 	updateContents();
 	song->update(SC_RACK);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   doubleClicked
@@ -422,11 +405,11 @@ void EffectRack::doubleClicked(QListWidgetItem* it)
         }
 }
 
-void EffectRack::savePreset(int idx)
+void EffectRack::savePreset(int idx)/*{{{*/
 {
 	//QString name = getSaveFileName(QString(""), plug_file_pattern, this,
 	QString name = getSaveFileName(QString(""), preset_file_save_pattern, this,
-			tr("OOMidi: Save Preset"));
+			tr("OOStudio: Save Preset"));
 
 	if (name.isEmpty())
 		return;
@@ -447,7 +430,7 @@ void EffectRack::savePreset(int idx)
 		if ((*pipe)[idx] != NULL)
 		{
 			xml.header();
-			xml.tag(0, "oom version=\"1.0\"");
+			xml.tag(0, "oom version=\"2.0\"");
 			(*pipe)[idx]->writeConfiguration(1, xml);
 			xml.tag(0, "/oom");
 		}
@@ -477,7 +460,7 @@ void EffectRack::savePreset(int idx)
 		pclose(presetFp);
 	else
 		fclose(presetFp);
-}
+}/*}}}*/
 
 void EffectRack::startDrag(int idx)
 {
@@ -495,7 +478,7 @@ void EffectRack::startDrag(int idx)
 		if (idx >= 0 && (*pipe)[idx] != NULL)
 		{
 			xml.header();
-			xml.tag(0, "oom version=\"1.0\"");
+			xml.tag(0, "oom version=\"2.0\"");
 			(*pipe)[idx]->writeConfiguration(1, xml);
 			xml.tag(0, "/oom");
 		}
@@ -515,6 +498,8 @@ void EffectRack::startDrag(int idx)
 	xml.dump(xmlconf);
 
 	QByteArray data(xmlconf.toLatin1().constData());
+	QString strData(data);
+	//qDebug("EffectRack::startDrag: Generated Drag Copy data:\n%s",strData.toUtf8().constData());
 	QMimeData* md = new QMimeData();
 
 	md->setData("text/x-oom-plugin", data);
@@ -535,18 +520,19 @@ QStringList EffectRack::mimeTypes() const
 	return QStringList("text/x-oom-plugin");
 }
 
-void EffectRack::dropEvent(QDropEvent *event)
+void EffectRack::dropEvent(QDropEvent *event)/*{{{*/
 {
 	QString text;
 	QListWidgetItem *i = itemAt(event->pos());
 	if (!i)
 		return;
 	int idx = row(i);
+	//qDebug("EffectRack::dropEvent: idx: %d", idx);
 
 	Pipeline* pipe = track->efxPipe();
 	if (pipe)
 	{
-		if ((*pipe)[idx] != NULL)
+		if (idx >= 0 && (*pipe)[idx] != NULL)
 		{
 			QWidget *sw = event->source();
 			if (sw)
@@ -579,12 +565,14 @@ void EffectRack::dropEvent(QDropEvent *event)
 
 		if (event->mimeData()->hasFormat("text/x-oom-plugin"))
 		{
-			QString outxml;
-			Xml xml(event->mimeData()->data("text/x-oom-plugin").data());
+			const QMimeData *md = event->mimeData();
+			QString outxml(md->data("text/x-oom-plugin"));
+			//qDebug("EffectRack::dropEvent Event data:\n%s", outxml.toUtf8().constData());
+			//Xml xml(event->mimeData()->data("text/x-oom-plugin").data());
+			Xml xml(outxml.toUtf8().constData());
 			initPlugin(xml, idx);
 		}
-		else
-			if (event->mimeData()->hasUrls())
+		else if (event->mimeData()->hasUrls())
 		{
 			// Multiple urls not supported here. Grab the first one.
 			text = event->mimeData()->urls()[0].path();
@@ -601,7 +589,6 @@ void EffectRack::dropEvent(QDropEvent *event)
 					Xml xml(fp);
 					initPlugin(xml, idx);
 
-					// Added by T356.
 					if (popenFlag)
 						pclose(fp);
 					else
@@ -610,7 +597,7 @@ void EffectRack::dropEvent(QDropEvent *event)
 			}
 		}
 	}
-}
+}/*}}}*/
 
 void EffectRack::dragEnterEvent(QDragEnterEvent *event)
 {
@@ -656,15 +643,15 @@ void EffectRack::mouseMoveEvent(QMouseEvent *event)
 		int distance = (dragPos - event->pos()).manhattanLength();
 		if (distance > QApplication::startDragDistance())
 		{
-			QListWidgetItem *i = itemAt(event->pos());
-			int idx = row(i);
-			startDrag(idx);
+			//QListWidgetItem *i = itemAt(event->pos());
+			//int idx = row(i);
+			startDrag(idx0);
 		}
 	}
 	QListWidget::mouseMoveEvent(event);
 }
 
-void EffectRack::initPlugin(Xml xml, int idx)
+void EffectRack::initPlugin(Xml xml, int idx)/*{{{*/
 {
     for (;;)
     {
@@ -721,7 +708,7 @@ void EffectRack::initPlugin(Xml xml, int idx)
                         return;
                     }
                 }
-                else if (tag == "oom" || tag == "muse")
+                else if (tag == "oom")
                     break;
                 else
                     xml.unknown("EffectRack");
@@ -729,11 +716,11 @@ void EffectRack::initPlugin(Xml xml, int idx)
             case Xml::Attribut:
                 break;
             case Xml::TagEnd:
-                if (tag == "oom" || tag == "muse")
+                if (tag == "oom")
                     return;
             default:
                 break;
         }
     }
-}
+}/*}}}*/
 
