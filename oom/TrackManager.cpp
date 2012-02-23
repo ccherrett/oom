@@ -246,10 +246,13 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			//Load up the instrument first
 			song->startUndo();
 			m_track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false, false);
-			if(vtrack->autoCreateInstrument)
-				loadInstrument(vtrack);
 			if(m_track)
 			{
+				if(vtrack->instrumentType == LS_INSTRUMENT)
+					m_track->setHeight(MIN_TRACKHEIGHT);
+				if(vtrack->autoCreateInstrument)
+					loadInstrument(vtrack);
+
 				song->undoOp(UndoOp::AddTrack, m_insertPosition, m_track);
 				MidiTrack* mtrack = (MidiTrack*)m_track;
 				//Process Input connections
