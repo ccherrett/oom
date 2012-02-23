@@ -1393,6 +1393,14 @@ void OOMidi::showUndoView()
 {
 }
 
+Tool OOMidi::getCurrentTool()
+{
+    if (composer && composer->getCanvas())
+        return composer->getCanvas()->tool();
+    // return an invalid tool
+    return (Tool)0;
+}
+
 /**
  * Called from within the after Composer Constructor
  */

@@ -21,6 +21,7 @@
 #include "midiport.h"
 #include "drummap.h"
 #include "song.h"
+#include "app.h"
 
 int Part::snGen;
 
@@ -1092,12 +1093,19 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 						nPart->setRightClip(rclip);
 						//printf("newEvent.setLenFrame(new_partlength:%d - event_startframe:%d) = %d right clip=%d\n",new_partlength, event_startframe, (new_partlength - event_startframe), rclip);
 						// Indicate no undo, and do not do port controller values and clone parts.
-						audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
+                        if (oom->getCurrentTool() != StretchTool)
+                            // ignore this if we're using stretch tool
+                            audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
 					}
 				}
 				nPart->setLenFrame(new_partlength);
 				// Indicate no undo, and do not do port controller values and clone parts.
-				audio->msgChangePart(oPart, nPart, false, false, false);
+                if (oom->getCurrentTool() == StretchTool)
+                {
+                    qWarning("Dialog here");
+                }
+                else
+                    audio->msgChangePart(oPart, nPart, false, false, false);
 
 				endUndo(SC_PART_MODIFIED);
 			}

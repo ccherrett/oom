@@ -417,6 +417,8 @@ public slots:
 	void pipelineStateChanged(int);
 	void connectDefaultSongPorts();
 	void showUndoView();
+    
+    Tool getCurrentTool();
 
 public:
     OOMidi(int argc, char** argv);

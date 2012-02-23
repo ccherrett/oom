@@ -849,6 +849,25 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 			redraw();
 			break;
 
+            case StretchTool: // copied from pencil tool
+            if (_curItem)
+            {
+                Track* ctrack = _curItem->part()->track();
+                if (ctrack && ctrack->type() == Track::WAVE)
+                {
+                    _drag = DRAG_RESIZE;
+                    //Christopher
+                    //Set up you flag here to draw the right border
+                    //Unset both flags in viewMouseRelease() function below
+                    m_myRightFlag = true;
+                    setCursor();
+                    int dx = _start.x() - _curItem->x();
+                    _curItem->setWidth(dx);
+                    _start.setX(_curItem->x());
+                }
+            }
+            break;
+            
 			default:
 			break;
 		}
