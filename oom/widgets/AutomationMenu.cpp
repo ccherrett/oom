@@ -70,9 +70,10 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
         cll = ((AudioTrack*) m_track)->controller();
     }
 	int size = cll->size();
-	baseHeight += 24*size;
-	if(baseHeight > 600)
-		baseHeight = 600;
+	baseHeight += 20*size;
+	int desktopHeight = qApp->desktop()->height();
+	if(baseHeight > desktopHeight)
+		baseHeight = (desktopHeight-50);
 	w->setFixedHeight(baseHeight);
     for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
     {

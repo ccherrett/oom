@@ -912,8 +912,7 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
 		return;
 
 	QMenu* p = new QMenu(this);
-	p->disconnect();
-	p->clear();
+	//p->setTearOffEnabled(true);
 	AutomationMenu *amenu = new AutomationMenu(p, m_track);
 
 	p->addAction(amenu);
