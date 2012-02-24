@@ -1052,6 +1052,9 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 			if (new_partlength < oPart->lenFrame())
 			{
 				startUndo();
+                
+                // decide if we should change the current part or not. if not stretching, then always true
+                bool changePart = (oom->getCurrentTool() != StretchTool);
 
 				//for (iEvent i = el->begin(); i != el->end(); i++)
 				if (!el->empty())
@@ -1094,25 +1097,39 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
 						nPart->setRightClip(rclip);
 						//printf("newEvent.setLenFrame(new_partlength:%d - event_startframe:%d) = %d right clip=%d\n",new_partlength, event_startframe, (new_partlength - event_startframe), rclip);
 						// Indicate no undo, and do not do port controller values and clone parts.
-                        if (oom->getCurrentTool() != StretchTool)
-                            // ignore this if we're using stretch tool
+                        if (oom->getCurrentTool() == StretchTool)
+                        {
+                            StretchDialog sdialog;
+                            if (sdialog.exec())
+                            {
+                                qWarning("Stretch processing here:\n"
+                                         "Start Pos:  %i\n"
+                                         "Current Size: %i\n"
+                                         "New Size:     %i\n"
+                                         "Multiplicator: x%f"
+                                         "",
+                                         part_start, oPart->lenFrame(), new_partlength, float(new_partlength)/oPart->lenFrame());
+                                
+                                //nPart->addEvent()
+                                //WaveEvent newEvent = new WaveEvent(Wave);
+                                //newEvent.setLenFrame(new_partlength - event_startframe);
+                                nPart->setLenFrame(new_partlength);
+                                audio->msgChangePart(oPart, nPart, false, false, false);
+                            }
+                            else
+                                qWarning("Stretch cancelled");
+                        }
+                        else
                             audio->msgChangeEvent(e, newEvent, nPart, false, false, false);
 					}
 				}
-				nPart->setLenFrame(new_partlength);
-				// Indicate no undo, and do not do port controller values and clone parts.
-                if (oom->getCurrentTool() == StretchTool)
+				
+                if (changePart)
                 {
-                    StretchDialog sdialog;
-                    if (sdialog.exec())
-                    {
-                        qWarning("Stretch processing here");
-                    }
-                    else
-                        qWarning("Stretch cancelled");
-                }
-                else
+                    nPart->setLenFrame(new_partlength);
+                    // Indicate no undo, and do not do port controller values and clone parts.
                     audio->msgChangePart(oPart, nPart, false, false, false);
+                }
 
 				endUndo(SC_PART_MODIFIED);
 			}
