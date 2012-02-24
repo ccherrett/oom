@@ -33,9 +33,10 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
 	if(!m_track || (m_track->isMidiTrack() && !m_track->wantsAutomation()))
 		return 0;
 
-	int baseHeight = 40;
+	int baseHeight = 70;
 	QVBoxLayout* layout = new QVBoxLayout();
 	QWidget* w = new QWidget(parent);
+	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QLabel* tvname = new QLabel(m_track->name());
 	tvname->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 	tvname->setObjectName("AutomationMenuLabel");
@@ -47,6 +48,9 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
 	list->setAlternatingRowColors(true);
 	list->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	list->setModel(m_listModel);
+	list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	list->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+	list->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	layout->addWidget(list);
 	w->setLayout(layout);
 
@@ -69,26 +73,49 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
     {
         cll = ((AudioTrack*) m_track)->controller();
     }
-	int size = cll->size();
-	baseHeight += 20*size;
 	int desktopHeight = qApp->desktop()->height();
-	if(baseHeight > desktopHeight)
-		baseHeight = (desktopHeight-50);
-	w->setFixedHeight(baseHeight);
+	int lstr = 0;
+	QString longest;
     for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
     {
         CtrlList *cl = icll->second;
         if (cl->dontShow())
             continue;
+		baseHeight += 18;
         QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
+		if(name.length() > lstr)
+		{
+			lstr = name.length();
+			longest = name;
+		}
 		QStandardItem* item = new QStandardItem(name);
         item->setCheckable(true);
         item->setCheckState(cl->isVisible() ? Qt::Checked : Qt::Unchecked);
         item->setData(cl->id());
 		m_listModel->appendRow(item);
     }
+	if(baseHeight > desktopHeight)
+		baseHeight = (desktopHeight-50);
+	w->setFixedHeight(baseHeight);
+	QFontMetrics fm(list->font());
+	QRect rect = fm.boundingRect(longest);
+	//if(size > 3)
+	w->setFixedWidth(rect.width()+100);
 	connect(m_listModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(updateData(QStandardItem*)));
+	connect(list, SIGNAL(clicked(const QModelIndex&)), this, SLOT(itemClicked(const QModelIndex&)));
 	return w;
+}
+
+void AutomationMenu::itemClicked(const QModelIndex& index)
+{
+	if(index.isValid())
+	{
+		QStandardItem *item = m_listModel->itemFromIndex(index);
+		if(item)
+		{
+			item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+		}
+	}
 }
 
 void AutomationMenu::updateData(QStandardItem *item)

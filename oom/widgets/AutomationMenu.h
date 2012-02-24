@@ -15,6 +15,7 @@ class QListView;
 class QStandardItem;
 class QStandardItemModel;
 class Track;
+class QModelIndex;
 
 class AutomationMenu : public QWidgetAction
 {
@@ -29,6 +30,7 @@ class AutomationMenu : public QWidgetAction
 
 	private slots:
 		void updateData(QStandardItem*);
+		void itemClicked(const QModelIndex&);
 	
 	signals:
 		void triggered();

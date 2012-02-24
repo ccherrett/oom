@@ -41,6 +41,7 @@ class CommentDock;
 class CItem;
 class HeaderList;
 class EditToolBar;
+class TimeHeader;
 
 static const int MIN_HEADER_WIDTH = 240;
 static const int MAX_HEADER_WIDTH = 400;
@@ -62,7 +63,8 @@ class Composer : public QWidget
     SpinBox* lenEntry;
     Conductor* midiConductor;
 	QScrollArea *listScroll;
-	EditToolBar *edittools;
+	//EditToolBar *edittools;
+	TimeHeader* m_timeHeader;
 
     Track* selected;
 

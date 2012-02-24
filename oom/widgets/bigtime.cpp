@@ -81,15 +81,11 @@ BigTime::BigTime(QWidget* parent)
 	oldAbsTick = oldAbsFrame = -1;
 	setString(MAXINT);
 
-	dwin->setStyleSheet("font-size:10px; font-family:'fixed-width'; "); // Tim p4.0.8
+	dwin->setStyleSheet("font-size:10px; font-family:'fixed-width'; ");
 
 	configChanged();
 
-	//QFont f(QString("Courier"));
-	//f.setPixelSize(10);
-	//dwin->setFont(f);
-
-	setWindowTitle(tr("OOMidi: Bigtime"));
+	setWindowTitle(tr("OOStudio: Bigtime"));
 }
 
 

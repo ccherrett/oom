@@ -118,6 +118,7 @@ QT4_WRAP_CPP (widget_mocs
 	  ClipList/AudioPlayer.h
 	  AutomationMenu.h
 	  StretchDialog.h
+	  TimeHeader.h
       )
 
 ##
@@ -268,6 +269,7 @@ file (GLOB widgets_source_files
 	  ClipList/AudioPlayer.cpp
 	  AutomationMenu.cpp
 	  StretchDialog.cpp
+	  TimeHeader.cpp
       )
 
 ##

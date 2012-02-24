@@ -10,25 +10,8 @@
 #include <stdio.h>
 #include <values.h>
 
-#include <QComboBox>
-#include <QGridLayout>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QList>
+#include <QtGui>
 #include <QMainWindow>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QToolBar>
-#include <QToolButton>
-#include <QVBoxLayout>
-#include <QWheelEvent>
-#include <QPainter>
-#include <QDockWidget>
-#include <QTabWidget>
-#include <QStackedWidget>
-#include <QVBoxLayout>
-#include <QLayoutItem>
-#include <QGroupBox>
 
 #include "Composer.h"
 #include "song.h"
@@ -64,6 +47,7 @@
 #include "mixerdock.h"
 #include "toolbars/tools.h"
 #include "ClipList/AudioClipList.h"
+#include "TimeHeader.h"
 
 static int rasterTable[] = {
 	1, 0, 768, 384, 192, 96
@@ -248,14 +232,18 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	listScroll->setMinimumWidth(MIN_HEADER_WIDTH);
 	listScroll->setMaximumWidth(MAX_HEADER_WIDTH);
 
-	edittools = new EditToolBar(this, composerTools, true);
+	/*edittools = new EditToolBar(this, composerTools, true);
 	edittools->setFixedHeight(32);
 	connect(edittools, SIGNAL(toolChanged(int)), this, SLOT(setTool(int)));
 	connect(edittools, SIGNAL(toolChanged(int)), SIGNAL(updateFooterTool(int)));
 	connect(this, SIGNAL(toolChanged(int)), edittools, SLOT(set(int)));
 	connect(this, SIGNAL(updateHeaderTool(int)), edittools, SLOT(setNoUpdate(int)));
-	trackLayout->addWidget(edittools);
+	trackLayout->addWidget(edittools);*/
 	
+	m_timeHeader = new TimeHeader(this);
+	connect(song, SIGNAL(posChanged(int, unsigned, bool)), m_timeHeader, SLOT(setPos(int, unsigned, bool)));
+	trackLayout->addWidget(m_timeHeader);
+
 	//trackLayout->addItem(new QSpacerItem(0, 32, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	trackLayout->addWidget(listScroll);
 
@@ -284,10 +272,10 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	//---------------------------------------------------
 
 	int offset = AL::sigmap.ticksMeasure(0);
-	hscroll = new ScrollScale(-1000, -10, xscale, song->len(), Qt::Horizontal, editor, -offset);
+	hscroll = new ScrollScale(-1000, -10, xscale, song->len(), Qt::Horizontal, this, -offset);
 	hscroll->setFocusPolicy(Qt::NoFocus);
 
-	vscroll = new QScrollBar(Qt::Vertical, editor);
+	vscroll = new QScrollBar(Qt::Vertical, this);
 	listScroll->setVerticalScrollBar(vscroll);
 	vscroll->setMinimum(0);
 	vscroll->setMaximum(20 * 20);
@@ -295,19 +283,34 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	vscroll->setPageStep(25);
 	vscroll->setValue(0);
 
-	QGridLayout* egrid = new QGridLayout(editor);
-	egrid->setColumnStretch(0, 50);
-	egrid->setRowStretch(2, 50);
-	egrid->setContentsMargins(0, 0, 0, 0);
-	egrid->setSpacing(0);
+	QVBoxLayout *editorBox = new QVBoxLayout(editor);
+	editorBox->setContentsMargins(0,0,0,0);
+	editorBox->setSpacing(0);
 
-	time = new MTScale(&_raster, editor, xscale);
+	QHBoxLayout *canvasBox = new QHBoxLayout;
+	canvasBox->setContentsMargins(0,0,0,0);
+	canvasBox->setSpacing(0);
+
+	QFrame *virtualScroll = new QFrame(this);
+	virtualScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	virtualScroll->setFixedHeight(18);
+	
+	time = new MTScale(&_raster, this, xscale);
 	time->setOrigin(-offset, 0);
-	canvas = new ComposerCanvas(&_raster, editor, xscale, yscale);
+
+	canvas = new ComposerCanvas(&_raster, this, xscale, yscale);
 	canvas->setBg(config.partCanvasBg);
 	canvas->setCanvasTools(composerTools);
 	canvas->setOrigin(-offset, 0);
 	canvas->setFocus();
+
+	editorBox->addWidget(virtualScroll); //TODO: Placeholder for the scroll widget
+	editorBox->addWidget(time);
+	editorBox->addWidget(hLine(this));
+	canvasBox->addWidget(canvas, 100);
+	canvasBox->addWidget(vscroll);
+	editorBox->addLayout(canvasBox, 100);
+	editorBox->addWidget(hscroll);
 
 	connect(canvas, SIGNAL(setUsedTool(int)), this, SIGNAL(setUsedTool(int)));
 	connect(canvas, SIGNAL(trackChanged(Track*)), m_trackheader, SLOT(selectTrack(Track*)));
@@ -319,13 +322,6 @@ Composer::Composer(QMainWindow* parent, const char* name)
 
 	connect(this, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
 	connect(m_trackheader, SIGNAL(redirectWheelEvent(QWheelEvent*)), canvas, SLOT(redirectedWheelEvent(QWheelEvent*)));
-
-	egrid->addWidget(time, 0, 0, 1, 2);
-	egrid->addWidget(hLine(editor), 1, 0, 1, 2);
-
-	egrid->addWidget(canvas, 2, 0);
-	egrid->addWidget(vscroll, 2, 1);
-	egrid->addWidget(hscroll, 3, 0, Qt::AlignBottom);
 
 	connect(vscroll, SIGNAL(valueChanged(int)), canvas, SLOT(setYPos(int)));
 	connect(hscroll, SIGNAL(scrollChanged(int)), canvas, SLOT(setXPos(int)));

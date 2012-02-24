@@ -14,9 +14,10 @@ class OOMidi;
 
 class BigTime : public QWidget
 {
+    Q_OBJECT
+
     bool tickmode;
     OOMidi* seq;
-    Q_OBJECT
 
     bool setString(unsigned);
 
