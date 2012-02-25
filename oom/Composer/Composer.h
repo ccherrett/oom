@@ -32,7 +32,7 @@ class Track;
 class Xml;
 class Splitter;
 class LabelCombo;
-class PosLabel;
+//class PosLabel;
 class Conductor;
 class SpinBox;
 class TrackViewDock;
@@ -72,7 +72,7 @@ class Composer : public QWidget
     QToolButton* ib;
     Splitter* split;
     int songType;
-    PosLabel* cursorPos;
+    //PosLabel* cursorPos;
     SpinBox* globalTempoSpinBox;
     SpinBox* globalPitchSpinBox;
 	QTabWidget* _rtabs;

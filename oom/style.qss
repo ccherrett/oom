@@ -213,7 +213,76 @@ QFrame#timeHeader
 	background-color: #171717;
 }
 
-QLabel#songLabel
+
+TimeHeader QLabel#thBigTimeLabel/*{{{*/
+{
+	 border-radius: 0px;
+	border-top: 18px;
+	border-bottom: 18px;
+	border-left: 1px;
+	border-right: 0px;
+	border-image: url(:/images/frame_top_left.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #080808;
+	 color: #d6dfd6;
+	 color: #848884;
+	font-family: "fixed-width";
+	font-weight: bold;
+	font-size: 32px;
+}/*}}}*/
+
+TimeHeader QLabel#thSubFrameLabel/*{{{*/
+{
+	/*background-color:none;
+	border:none;*/
+	 border-radius: 0px;
+	border-top: 18px;
+	border-bottom: 18px;
+	border-left: 1px;/*2px solid #1e1e1e;*/
+	border-right: 0px;
+	border-image: url(:/images/frame_top_right.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #080808;
+	 color: #d6dfd6;
+	 color: #848884;
+}/*}}}*/
+
+TimeHeader QLabel#thTimeLabel/*{{{*/
+{
+	/*background-color:none;
+	border:none;*/
+	 border-radius: 0px;
+	border-top: 18px;
+	border-bottom: 18px;
+	border-left: 1px;/*2px solid #1e1e1e;*/
+	border-right: 0px;
+	border-image: url(:/images/frame_bottom_left.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #080808;
+	 color: #d6dfd6;
+	 color: #848884;
+}/*}}}*/
+
+TimeHeader QLabel#thLengthLabel/*{{{*/
+{
+	/*background-color:none;
+	border:none;*/
+	 border-radius: 0px;
+	border-top: 18px;
+	border-bottom: 18px;
+	border-left: 1px;/*2px solid #1e1e1e;*/
+	border-right: 0px;
+	border-image: url(:/images/frame_bottom_right.png) 4;
+     border-width: 3;
+	 border-color: #484848;
+	 background-color: #080808;
+	 color: #848884;
+}/*}}}*/
+
+AudioClipList QLabel#songLabel
 {
 	/*background-color:none;
 	border:none;*/
@@ -229,8 +298,7 @@ QLabel#songLabel
 	 color: #d6dfd6;
 	 color: #848884;
 }
-
-QLabel#timeLabel
+AudioClipList QLabel#timeLabel
 {
 	/*background-color:none;
 	border:none;*/
@@ -247,7 +315,7 @@ QLabel#timeLabel
 	 color: #848884;
 }
 
-QLabel#lengthLabel
+AudioClipList QLabel#lengthLabel
 {
 	/*background-color:none;
 	border:none;*/

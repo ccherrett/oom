@@ -19,7 +19,7 @@
 #include "mtscale.h"
 #include "scrollscale.h"
 #include "ComposerCanvas.h"
-#include "poslabel.h"
+//#include "poslabel.h"
 #include "xml.h"
 #include "splitter.h"
 #include "lcombo.h"
@@ -107,11 +107,11 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	connect(oom->resourceDock(), SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(resourceDockAreaChanged(Qt::DockWidgetArea)));
 
 
-	cursorPos = new PosLabel(0);
+	/*cursorPos = new PosLabel(0);
 	cursorPos->setEnabled(false);
 	cursorPos->setFixedHeight(22);
 	cursorPos->setObjectName("composerCursor");
-	toolbar2->addWidget(cursorPos);
+	toolbar2->addWidget(cursorPos);*/
 
 	const char* rastval[] = {
 		QT_TRANSLATE_NOOP("@default", "Off"), QT_TRANSLATE_NOOP("@default", "Bar"), "1/2", "1/4", "1/8", "1/16"
@@ -293,7 +293,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 
 	QFrame *virtualScroll = new QFrame(this);
 	virtualScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	virtualScroll->setFixedHeight(38);
+	virtualScroll->setFixedHeight(48);
 	
 	time = new MTScale(&_raster, this, xscale);
 	time->setOrigin(-offset, 0);
@@ -429,8 +429,8 @@ void Composer::setTime(unsigned tick)
 	else
 	{
 		cursVal = tick;
-		cursorPos->setEnabled(true);
-		cursorPos->setValue(tick);
+		//cursorPos->setEnabled(true);
+		//cursorPos->setValue(tick);
 		m_timeHeader->setTime(tick);
 		time->setPos(3, tick, false);
 	}

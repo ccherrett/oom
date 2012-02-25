@@ -22,7 +22,7 @@ class TimeHeader : public QFrame
     bool setString(unsigned);
 
     PosLabel* cursorPos;
-    QLabel *timeLabel, *posLabel;
+    QLabel *timeLabel, *posLabel, *frameLabel;
 
 public slots:
     void setPos(int, unsigned, bool);
