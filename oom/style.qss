@@ -230,6 +230,7 @@ TimeHeader QLabel#thBigTimeLabel/*{{{*/
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 42px;
+	padding-top: 5px;
 }/*}}}*/
 
 TimeHeader QLabel#thSubFrameLabel/*{{{*/
