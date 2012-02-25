@@ -27,7 +27,7 @@ TimeHeader::TimeHeader(QWidget* parent)
 	setObjectName("timeHeader");
 	tickmode = true;
 	m_layout = new QVBoxLayout(this);
-	m_layout->setContentsMargins(8,8,8,8);
+	m_layout->setContentsMargins(0,0,0,0);
 	m_layout->setSpacing(0);
 	setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	setFixedHeight(80);
@@ -55,13 +55,13 @@ TimeHeader::TimeHeader(QWidget* parent)
 	posLabel->setObjectName("thBigTimeLabel");
 	posLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	frameLabel = new QLabel(this);
+	/*frameLabel = new QLabel(this);
 	frameLabel->setAlignment(Qt::AlignLeft|Qt::AlignBottom);
 	frameLabel->setObjectName("thSubFrameLabel");
-	frameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	frameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);*/
 
 	infoBox->addWidget(posLabel, 1);
-	infoBox->addWidget(frameLabel);
+	/*infoBox->addWidget(frameLabel);*/
 	
 	m_layout->addLayout(infoBox, 1);
 	m_layout->addLayout(timeBox);
@@ -79,7 +79,7 @@ bool TimeHeader::setString(unsigned v)
 	{
 		timeLabel->setText(QString("----.--.---"));
 		posLabel->setText(QString("---:--"));
-		frameLabel->setText(QString("--:--"));
+		//frameLabel->setText(QString("--:--"));
 		return true;
 	}
 
@@ -117,8 +117,8 @@ bool TimeHeader::setString(unsigned v)
 	s.sprintf("%03d:%02d", min, sec);
 	posLabel->setText(s);
 
-	s.sprintf("%02d:%02u", frame, subframe);
-	frameLabel->setText(s);
+	//s.sprintf("%02d:%02u", frame, subframe);
+	//frameLabel->setText(s);
 
 
 	return false;

@@ -217,19 +217,19 @@ QFrame#timeHeader
 TimeHeader QLabel#thBigTimeLabel/*{{{*/
 {
 	 border-radius: 0px;
-	border-top: 18px;
-	border-bottom: 18px;
+	border-top: 0px;
+	border-bottom: 0px;
 	border-left: 1px;
 	border-right: 0px;
-	border-image: url(:/images/frame_top_left.png) 4;
-     border-width: 3;
+	/*border-image: url(:/images/frame_top_left.png) 4;*/
+     border-width: 0;
 	 border-color: #484848;
-	 background-color: #080808;
+	 background-color: #171717;
 	 color: #d6dfd6;
 	 color: #848884;
 	font-family: "fixed-width";
 	font-weight: bold;
-	font-size: 32px;
+	font-size: 42px;
 }/*}}}*/
 
 TimeHeader QLabel#thSubFrameLabel/*{{{*/
@@ -241,10 +241,10 @@ TimeHeader QLabel#thSubFrameLabel/*{{{*/
 	border-bottom: 18px;
 	border-left: 1px;/*2px solid #1e1e1e;*/
 	border-right: 0px;
-	border-image: url(:/images/frame_top_right.png) 4;
+	/*border-image: url(:/images/frame_top_right.png) 4;*/
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #080808;
+	 background-color: #171717;
 	 color: #d6dfd6;
 	 color: #848884;
 }/*}}}*/
@@ -258,10 +258,10 @@ TimeHeader QLabel#thTimeLabel/*{{{*/
 	border-bottom: 18px;
 	border-left: 1px;/*2px solid #1e1e1e;*/
 	border-right: 0px;
-	border-image: url(:/images/frame_bottom_left.png) 4;
+	/*border-image: url(:/images/frame_bottom_left.png) 4;*/
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #080808;
+	 background-color: #171717;
 	 color: #d6dfd6;
 	 color: #848884;
 }/*}}}*/
@@ -275,10 +275,10 @@ TimeHeader QLabel#thLengthLabel/*{{{*/
 	border-bottom: 18px;
 	border-left: 1px;/*2px solid #1e1e1e;*/
 	border-right: 0px;
-	border-image: url(:/images/frame_bottom_right.png) 4;
+	/*border-image: url(:/images/frame_bottom_right.png) 4;*/
      border-width: 3;
 	 border-color: #484848;
-	 background-color: #080808;
+	 background-color: #171717;
 	 color: #848884;
 }/*}}}*/
 
