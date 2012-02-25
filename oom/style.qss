@@ -222,11 +222,11 @@ TimeHeader QLabel#thBigTimeLabel/*{{{*/
 	border-left: 1px;
 	border-right: 0px;
 	/*border-image: url(:/images/frame_top_left.png) 4;*/
+    border-image: url(:/images/frame_time_top.png) 4;
      border-width: 0;
 	 border-color: #484848;
 	 background-color: #171717;
-	 color: #d6dfd6;
-	 color: #848884;
+	 color: #bbbfbb;
 	font-family: "fixed-width";
 	font-weight: bold;
 	font-size: 42px;
@@ -245,8 +245,7 @@ TimeHeader QLabel#thSubFrameLabel/*{{{*/
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #171717;
-	 color: #d6dfd6;
-	 color: #848884;
+	 color: #bbbfbb;
 }/*}}}*/
 
 TimeHeader QLabel#thTimeLabel/*{{{*/
@@ -254,32 +253,33 @@ TimeHeader QLabel#thTimeLabel/*{{{*/
 	/*background-color:none;
 	border:none;*/
 	 border-radius: 0px;
-	border-top: 18px;
-	border-bottom: 18px;
+	border-top: 0px;
+	border-bottom: 28px;
 	border-left: 1px;/*2px solid #1e1e1e;*/
 	border-right: 0px;
-	/*border-image: url(:/images/frame_bottom_left.png) 4;*/
+    border-image: url(:/images/frame_time_bottom.png) 4;
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #171717;
-	 color: #d6dfd6;
-	 color: #848884;
+	 color: #bbbfbb;
+	 padding-bottom: 5px;
 }/*}}}*/
 
 TimeHeader QLabel#thLengthLabel/*{{{*/
 {
 	/*background-color:none;
 	border:none;*/
-	 border-radius: 0px;
+	border-radius: 0px;
 	border-top: 18px;
 	border-bottom: 18px;
 	border-left: 1px;/*2px solid #1e1e1e;*/
 	border-right: 0px;
-	/*border-image: url(:/images/frame_bottom_right.png) 4;*/
+    border-image: url(:/images/frame_time_bottom.png) 4;
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #171717;
-	 color: #848884;
+	 color: #bbbfbb;
+	 padding-bottom: 5px;
 }/*}}}*/
 
 AudioClipList QLabel#songLabel
