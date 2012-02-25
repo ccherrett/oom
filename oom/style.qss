@@ -205,6 +205,14 @@ QFrame#m_playerFrame
     border: 1px solid #1e1e1e;
 }
 
+QFrame#timeHeader
+{
+	border-bottom: 1px solid #888888;
+	border-right: 1px solid #888888;
+	border-left: 1px solid #888888;
+	background-color: #171717;
+}
+
 QLabel#songLabel
 {
 	/*background-color:none;

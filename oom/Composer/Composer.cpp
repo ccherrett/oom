@@ -293,7 +293,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 
 	QFrame *virtualScroll = new QFrame(this);
 	virtualScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	virtualScroll->setFixedHeight(18);
+	virtualScroll->setFixedHeight(38);
 	
 	time = new MTScale(&_raster, this, xscale);
 	time->setOrigin(-offset, 0);
@@ -431,6 +431,7 @@ void Composer::setTime(unsigned tick)
 		cursVal = tick;
 		cursorPos->setEnabled(true);
 		cursorPos->setValue(tick);
+		m_timeHeader->setTime(tick);
 		time->setPos(3, tick, false);
 	}
 }

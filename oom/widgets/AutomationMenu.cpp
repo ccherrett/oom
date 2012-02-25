@@ -83,6 +83,8 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
             continue;
 		baseHeight += 18;
         QString name(cl->pluginName().isEmpty() ? cl->name() : cl->pluginName() + " : " + cl->name()); 
+		if(name.isEmpty())
+			continue; //I am seeing ports with no names show up, lets avoid these as they may cause us problems later
 		if(name.length() > lstr)
 		{
 			lstr = name.length();

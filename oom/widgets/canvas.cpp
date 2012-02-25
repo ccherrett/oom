@@ -1300,6 +1300,8 @@ void Canvas::viewMouseMoveEvent(QMouseEvent* event)/*{{{*/
 
 		case DRAG_OFF:
 		break;
+		default:
+		break;
 	}
 
 	mouseMove(event);
@@ -1408,6 +1410,8 @@ void Canvas::viewMouseReleaseEvent(QMouseEvent* event)/*{{{*/
 
 	case DRAG_DELETE:
 		break;
+	default:
+	break;
 	}
 	//printf("Canvas::viewMouseReleaseEvent setting drag to DRAG_OFF\n");
 
@@ -1721,6 +1725,8 @@ void Canvas::setCursor()
 			QWidget::setCursor(QCursor(Qt::ArrowCursor));
 			break;
 		}
+		break;
+		default:
 		break;
 	}
 }

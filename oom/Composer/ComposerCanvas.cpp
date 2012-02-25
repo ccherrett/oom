@@ -1253,7 +1253,7 @@ CItemList ComposerCanvas::getSelectedItems()
 //   viewMousePressEvent
 //---------------------------------------------------------
 
-void ComposerCanvas::mousePress(QMouseEvent* event)
+void ComposerCanvas::mousePress(QMouseEvent* event)/*{{{*/
 {
 	if (event->modifiers() & Qt::ShiftModifier && _tool != AutomationTool)
 	{
@@ -1426,13 +1426,13 @@ void ComposerCanvas::mousePress(QMouseEvent* event)
 			break;
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   viewMouseReleaseEvent
 //---------------------------------------------------------
 
-void ComposerCanvas::mouseRelease(const QPoint& pos)
+void ComposerCanvas::mouseRelease(const QPoint& pos)/*{{{*/
 {
 	if(_drag == DRAG_LASSO && _tool == AutomationTool)
 	{
@@ -1599,18 +1599,20 @@ void ComposerCanvas::mouseRelease(const QPoint& pos)
 		m_selectedCurve = 0;
 		_drag = DRAG_OFF;
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   viewMouseMoveEvent
 //---------------------------------------------------------
 
-void ComposerCanvas::mouseMove(QMouseEvent* event)
+void ComposerCanvas::mouseMove(QMouseEvent* event)/*{{{*/
 {
 	int x = event->pos().x();
 	int y = event->pos().y();
 	if (x < 0)
 		x = 0;
+
+	emit timeChanged(AL::sigmap.raster(x, *_raster));
 
 	if(_tool == PointerTool && m_selectedCurve)
 	{
@@ -1724,8 +1726,7 @@ void ComposerCanvas::mouseMove(QMouseEvent* event)
 			}
 		}//
 	}
-	emit timeChanged(AL::sigmap.raster(x, *_raster));
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   y2Track
@@ -1773,7 +1774,7 @@ int ComposerCanvas::track2Y(Track * track) const
 //   keyPress
 //---------------------------------------------------------
 
-void ComposerCanvas::keyPress(QKeyEvent* event)
+void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 {
 	int key = event->key();
 	if (editMode)
@@ -2523,14 +2524,14 @@ void ComposerCanvas::keyPress(QKeyEvent* event)
 		}
 		redraw();
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   drawPart
 //    draws a part
 //---------------------------------------------------------
 
-void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
+void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)/*{{{*/
 {
 	int from = rect.x();
 	int to = from + rect.width();
@@ -2582,7 +2583,6 @@ void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	//  r.x(), r.y(), r.width(), r.height());
 
 	p.setPen(Qt::black);
-	//p.setPen(Qt::NoPen);
 	if(item->isMoving())
 	{
 		QColor c(Qt::gray);
@@ -2594,7 +2594,6 @@ void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		partWaveColor.setAlpha(150);
 		partWaveColorAutomation.setAlpha(150);
 		
-		//bool clone = part->events()->arefCount() > 1;
 		p.setBrush(partWaveColor);
 		if (wp)
 		{
@@ -2610,8 +2609,6 @@ void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	}
 	else
 	{
-		//bool clone = part->events()->arefCount() > 1;
-		
 		partColor.setAlpha(150);
 		partColorAutomation.setAlpha(150);
 	
@@ -2630,13 +2627,6 @@ void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 	p.drawRect(QRect(r.x(), r.y(), r.width(), mp ? r.height()-2 : r.height()-1));
 	if (part->mute() || part->track()->mute())
 	{
-		//QColor c(Qt::white);
-		//c.setAlpha(config.globalAlphaBlend);
-		//p.setBrush(c);
-		//QPen mutePen;// = QPen(partColorAutomation, 2, Qt::BDiagPattern);
-		//mutePen.setColor(partWaveColor);
-		//mutePen.setCosmetic(true);
-		//p.setPen(mutePen);
 		QBrush muteBrush;
 		muteBrush.setStyle(Qt::HorPattern);
 		if(part->selected())
@@ -2653,9 +2643,6 @@ void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 
 		// NOTE: For one-pixel border use first line For two-pixel border use second.
 		p.drawRect(QRect(r.x(), r.y(), r.width(), r.height()-1));
-		//p.drawRect(r);
-
-		//return;
 	}
 
 	trackOffset += part->track()->height();
@@ -2700,42 +2687,35 @@ void ComposerCanvas::drawItem(QPainter& p, const CItem* item, const QRect& rect)
 		p.drawText(rr, Qt::AlignBottom | Qt::AlignLeft, part->name());
 		p.restore();
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   drawMoving
 //    draws moving items
 //---------------------------------------------------------
 
-void ComposerCanvas::drawMoving(QPainter& p, const CItem* item, const QRect&)
+void ComposerCanvas::drawMoving(QPainter& p, const CItem* item, const QRect&)/*{{{*/
 {
-	//if(!item->isMoving())
-	//  return;
 	p.setPen(Qt::black);
 
-	//p.setBrush( Qt::NoBrush);
-	//QColor c(Qt::gray);
 	Part* part = ((NPart*) item)->part();
 	QColor c(config.partColors[part->colorIndex()]);
 
-	///c.setAlpha(config.globalAlphaBlend);
 	c.setAlpha(128); // Fix this regardless of global setting. Should be OK.
 
 	p.setBrush(c);
 
 	// NOTE: For one-pixel border use second line. For two-pixel border use first.
-	//p.drawRect(item->mp().x(), item->mp().y()+1, item->width(), item->height());
 	p.drawRect(item->mp().x(), item->mp().y(), item->width(), item->height());
-}
+}/*}}}*/
 
-void ComposerCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to, QColor c)
+void ComposerCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, MidiTrack *mt, const QRect& r, int pTick, int from, int to, QColor c)/*{{{*/
 {
 	if (config.canvasShowPartType & 2) {      // show events
 		// Do not allow this, causes segfault.
 		if(from <= to)
 		{
 			p.setPen(c);
-			//EventList* events = mp->events();
 			iEvent ito(events->lower_bound(to));
 
 			for (iEvent i = events->lower_bound(from); i != ito; ++i) {
@@ -2785,7 +2765,7 @@ void ComposerCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, 
             }
 		}
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   drawWavePart
@@ -2793,7 +2773,7 @@ void ComposerCanvas::drawMidiPart(QPainter& p, const QRect&, EventList* events, 
 //    pr - part rectangle
 //---------------------------------------------------------
 
-void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const QRect& _pr)
+void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, const QRect& _pr)/*{{{*/
 {
 	int i = wp->colorIndex();
 	QColor waveFill(config.partWaveColors[i]);
@@ -2848,23 +2828,13 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 	if (x2 > width())
 		x2 = width();
 	int hh = pr.height();
-	//if((hh / 2) != 0)
-	//	hh = hh +1;
 	int h = hh / 2;
 	int y = pr.y() + h;
 	int drawLines = 1;
-	//int modulusVar = 10;
-	//int remainderVar = 5;
 	EventList* el = wp->events();
 	for (iEvent e = el->begin(); e != el->end(); ++e)/*{{{*/
 	{
 		
-		/*if( eventcounter % 2==0 )
-		{ 
-			printf(" continue \n");
-			eventcounter ++;
-	  		continue;
-	 	}*/
 		int cc = hh % 2 ? 0 : 1;
 		Event event = e->second;
 		SndFileR f = event.sndFile();
@@ -2877,7 +2847,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			continue;
 		}
 
-		//unsigned clipframes = (f.samples() - event.spos());
 		//printf("SndFileR samples=%d channels=%d event samplepos=%d clipframes=%d event lenframe=%d, event.frame=%d part_start=%d part_length=%d\n", 
 		//		f.samples(), f.channels(), event.spos(), clipframes, event.lenFrame(), event.frame(), wp->frame(), wp->lenFrame());
 
@@ -2902,7 +2871,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 		int ex = mapx(tempomap.frame2tick(wp->frame() + event.frame() + event.lenFrame()));
 		if (ex > x2)
 			ex = x2;
-		//if (h < 41)
 		if (h < 41)
 		{
 			//
@@ -2914,11 +2882,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 				for (; i < ex; i++)//{{{
 				{
 					int hm = hh / 2;
-					//if(channels == 1)
-					//{
-						//printf("one channel found: %d\n", channels);
-					//	hm = h;
-					//}	
 					SampleV sa[channels];
 					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
 					f.read(sa, xScale, pos);
@@ -2936,20 +2899,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 					peak = (peak * (hh - 2)) >> 9;
 					rms = (rms * (hh - 2)) >> 9;
 					
-					/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-					vuGrad.setColorAt(1, red);
-					vuGrad.setColorAt(0.6, green);
-					vuGrad.setColorAt(0.5, green);
-					vuGrad.setColorAt(0.4, green);
-					vuGrad.setColorAt(0, red);*/
-					/*vuGrad.setColorAt(1, red);
-					vuGrad.setColorAt(0.90, yellow);
-					vuGrad.setColorAt(0.5, green);
-					vuGrad.setColorAt(0.10, yellow);
-					vuGrad.setColorAt(0, red);*/
-					//QPen myPen = QPen();
-					//myPen.setBrush(QBrush(vuGrad));
-					//p.setPen(myPen);
 					p.setPen(green);
 					
 					p.drawLine(i, y - peak - cc, i, y + peak);
@@ -2978,8 +2927,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 					hm = hh / 2;
 					SampleV sa[channels];
 					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
-					//if( !i % modulusVar==remainderVar )
-					//printf("xmag == %f\n",xmag);
 					
 					if(xmag <= -301)/*{{{*/
 					{
@@ -3026,11 +2973,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 					m_monoPolygonTop.append(QPointF(i, y-peak));
 					m_monoPolygonBottom.append(QPointF(i, y+peak));
 					
-					//p.drawLine(i, y - peak - cc, i, y + peak);
-					
-					//p.drawLine(i, y - rms - cc, i, y + rms);
-				
-					
 					if(peak >= (hm - 2))
 					{
 						p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
@@ -3038,27 +2980,13 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 					}
 					
 				}//}}}
-				/*
-				QLinearGradient vuGrad(QPointF(0, y), QPointF(0, y+hm));
-				vuGrad.setColorAt(0, green);
-				vuGrad.setColorAt(0.5, green);
-				vuGrad.setColorAt(1, red);
-				
-				QLinearGradient vuGradTop(QPointF(0, y), QPointF(0, y-hm));
-				vuGradTop.setColorAt(0, green);
-				vuGradTop.setColorAt(0.5, green);
-				vuGradTop.setColorAt(1, red);
-				*/
 				m_monoPolygonTop.append(QPointF(i, y));
 				m_monoPolygonBottom.append(QPointF(i, y));
 				
-				//p.setPen(waveEdge);//this is the outline of the wave
 				p.setPen(Qt::NoPen);//this is the outline of the wave
 				p.setBrush(waveFill);//waveFill);//this is the fill color of the wave
 				
-				//p.setBrush(QBrush(vuGradTop));//waveFill);//this is the fill color of the wave
 				p.drawPolygon(m_monoPolygonTop);
-				//p.setBrush(QBrush(vuGrad));//waveFill);//this is the fill color of the wave
 				p.drawPolygon(m_monoPolygonBottom);
 				firstIn = 1;
 				
@@ -3100,41 +3028,11 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 						int rms = (sa[k].rms * (hm - 1)) >> 8;
 						if(k == 0)
 						{
-							/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-							vuGrad.setColorAt(1, red);
-							vuGrad.setColorAt(0.6, green);
-							vuGrad.setColorAt(0.5, green);
-							vuGrad.setColorAt(0.4, green);
-							vuGrad.setColorAt(0, red);*/
-							/*vuGrad.setColorAt(1, red);
-							vuGrad.setColorAt(0.90, yellow);
-							vuGrad.setColorAt(0.5, green);
-							vuGrad.setColorAt(0.10, yellow);
-							vuGrad.setColorAt(0, red);*/
-							//QPen myPen = QPen();
-							//myPen.setBrush(QBrush(vuGrad));
-							///p.setPen(myPen);
 							p.setPen(green);
 							p.drawLine(i, y - peak - cc, i, y + peak);
-							//p.drawLine(0, pr.height(), 3000, pr.height());
 						}
 						else
 						{
-							//QLinearGradient vuGrad(QPointF(i, y-peak-cc), QPointF(i, y+peak));
-							/*QLinearGradient vuGrad(QPointF(0, y-hm), QPointF(0, y+hm));
-							vuGrad.setColorAt(1, red);
-							vuGrad.setColorAt(0.6, green);
-							vuGrad.setColorAt(0.5, green);
-							vuGrad.setColorAt(0.4, green);
-							vuGrad.setColorAt(0, red);*/
-							/*vuGrad.setColorAt(1, red);
-							vuGrad.setColorAt(0.90, yellow);
-							vuGrad.setColorAt(0.5, green);
-							vuGrad.setColorAt(0.10, yellow);
-							vuGrad.setColorAt(0, red);*/
-							//QPen myPen = QPen();
-							//myPen.setBrush(QBrush(vuGrad));
-							//p.setPen(myPen);
 							p.setPen(green);
 							p.drawLine(i, y - peak - cc, i, y + peak);
 							
@@ -3146,17 +3044,17 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 							p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
 							p.drawLine(i, y + peak - 1, i, y + peak);
 						}	
-						p.setPen(rms_color);//QColor(0,19,23));
+						p.setPen(rms_color);
 						p.drawLine(i, y - rms - cc, i, y + rms);
 						
 						if(k == 0)
 						{
-							p.setPen(QColor(102,177,205));//QColor(0,19,23));
+							p.setPen(QColor(102,177,205));
 							p.drawLine(0, y, width(), y);
 						}
 						else
 						{
-							p.setPen(QColor(213,93,93));//QColor(0,19,23));
+							p.setPen(QColor(213,93,93));
 							p.drawLine(0, y, width(), y);
 						}
 
@@ -3173,8 +3071,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 					y = pr.y() + hm;
 					SampleV sa[channels];
 					xScale = tempomap.deltaTick2frame(postick, postick + tickstep);
-					//if( !i % modulusVar==remainderVar )
-					//printf("xmag == %f\n",xmag);
 					if(xmag <= -301)/*{{{*/
 					{
 						if( i % 10==1 || i % 10==2 || i % 10==3 || i % 10==4 || i % 10==5 || i % 10 == 7 || i % 10==8 || i % 10==9)
@@ -3208,7 +3104,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 					for (unsigned k = 0; k < channels; ++k)
 					{
 						int peak = (sa[k].peak * (hm - 1)) >> 8;
-						//int rms = (sa[k].rms * (hm - 1)) >> 8;
 						if(k == 0)
 						{
 							stereoOneY = y;
@@ -3218,8 +3113,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 								m_stereoOnePolygonBottom.append(QPointF(i, stereoOneY));
 								stereoOneFirstIn = 0;
 							}
-							//p.setPen(green);
-							//p.drawLine(i, y - peak - cc, i, y + peak);
 							m_stereoOnePolygonTop.append(QPointF(i, y-peak));
 							m_stereoOnePolygonBottom.append(QPointF(i, y+peak));
 						}
@@ -3241,19 +3134,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 							p.drawLine(i, y - peak - cc, i, y - peak - cc + 1);
 							p.drawLine(i, y + peak - 1, i, y + peak);
 						}	
-						//p.setPen(rms_color);//QColor(0,19,23));
-						//p.drawLine(i, y - rms - cc, i, y + rms);
-						
-						/*if(k == 0)
-						{
-							p.setPen(QColor(102,177,205));//QColor(0,19,23));
-							p.drawLine(0, y, width(), y);
-						}
-						else
-						{
-							p.setPen(QColor(213,93,93));//QColor(0,19,23));
-							p.drawLine(0, y, width(), y);
-						}*/
 
 						y += 2 * hm;
 					}
@@ -3263,7 +3143,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 				m_stereoTwoPolygonTop.append(QPointF(i, stereoTwoY));
 				m_stereoTwoPolygonBottom.append(QPointF(i, stereoTwoY));
 				
-				//p.setPen(waveEdge);//this is the outline of the wave
 				p.setPen(Qt::NoPen);//this is the outline of the wave
 				p.setBrush(waveFill);//this is the fill color of the wave
 				
@@ -3299,23 +3178,11 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			int fix = partx;
 			int fiw = int(fadex);
 			int fih = pr.bottom();
-			//QPolygon fadeInCurve;
 			QPolygon fadeInCurve(5);
-			//const int w2 = (fiw >> 1);
-			//const int w4 = (fiw >> 2);
 			fadeInCurve.setPoint(0, fix, fiy);
 			fadeInCurve.setPoint(1, fix, fih);
-			//switch(fadeIn->mode())
-			//{
-				//case FadeCurve::Linear:
-				//{
-					fadeInCurve.setPoint(2, fix, fih);
-					fadeInCurve.setPoint(3, fix, fih);
-					//fadeInCurve.setPoint(2, fix + w2, fih);
-					//fadeInCurve.setPoint(3, fix + fiw, fiy);
-				//}
-				//break;
-			//}
+			fadeInCurve.setPoint(2, fix, fih);
+			fadeInCurve.setPoint(3, fix, fih);
 			fadeInCurve.setPoint(4, fiw, fiy);
 			p.setBrush(fadeColor);
 			p.drawPolygon(fadeInCurve);
@@ -3328,7 +3195,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 	}
 	if(fadeOut)
 	{
-		//long pstart = tempomap.frame2tick(wp->frame());
 		long pend = tempomap.frame2tick(wp->frame() + wp->lenFrame());
 		long fpos = (wp->frame() + wp->lenFrame())-fadeOut->width();
 		fpos = tempomap.frame2tick(fpos);
@@ -3342,8 +3208,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			int fiw = int(fadex);
 			int fih = pr.bottom();
 			QPolygon fadeOutCurve(5);
-			//const int w2 = (fiw >> 1);
-			//const int w4 = (fiw >> 2);
 
 			fadeOutCurve.setPoint(0, fix, fiy);
 			fadeOutCurve.setPoint(1, fix, fih);
@@ -3351,8 +3215,6 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 			fadeOutCurve.setPoint(3, fix, fih);
 			fadeOutCurve.setPoint(4, fiw, fiy);
 
-			//QPolygon fadeOutCurve;
-			//fadeOutCurve << QPoint(endx, pr.bottom()) << QPoint(fadex, pr.top());
 			p.setBrush(fadeColor);
 			p.drawPolygon(fadeOutCurve);
 		}
@@ -3366,12 +3228,13 @@ void ComposerCanvas::drawWavePart(QPainter& p, const QRect& bb, WavePart* wp, co
 	}
 	p.setRenderHint(QPainter::Antialiasing, false);
 	p.restore();
-}
+}/*}}}*/
+
 //---------------------------------------------------------
 //   cmd
 //---------------------------------------------------------
 
-void ComposerCanvas::cmd(int cmd)
+void ComposerCanvas::cmd(int cmd)/*{{{*/
 {
 	PartList pl;
         for (iCItem i = _items.begin(); i != _items.end(); ++i)
@@ -3517,7 +3380,7 @@ void ComposerCanvas::cmd(int cmd)
 			break;
 		}
 	}
-}
+}/*}}}*/
 
 /**
  * Copy portion of the copy paste of automation curves
@@ -3739,8 +3602,6 @@ void ComposerCanvas::copy(PartList* pl)/*{{{*/
 	//printf("void ComposerCanvas::copy(PartList* pl)\n");
 	if (pl->empty())
 		return;
-	// Changed by T356. Support mixed .mpt files.
-	//bool isWave = pl->begin()->second->track()->type() == Track::WAVE;
 	bool wave = false;
 	bool midi = false;
 	for (ciPart p = pl->begin(); p != pl->end(); ++p)
@@ -3771,14 +3632,12 @@ void ComposerCanvas::copy(PartList* pl)/*{{{*/
 
 	// Clear the copy clone list.
 	cloneList.clear();
-	//copyCloneList.clear();
 
 	int level = 0;
 	int tick = 0;
 	for (ciPart p = pl->begin(); p != pl->end(); ++p)
 	{
 		// Indicate this is a copy operation. Also force full wave paths.
-		//p->second->write(level, xml);
 		p->second->write(level, xml, true, true);
 
 		int endTick = p->second->endTick();
@@ -3936,7 +3795,7 @@ int ComposerCanvas::pasteAt(const QString& pt, Track* track, unsigned int pos, b
 //    paste part to current selected track at cpos
 //---------------------------------------------------------
 
-void ComposerCanvas::paste(bool clone, bool toTrack, bool doInsert)
+void ComposerCanvas::paste(bool clone, bool toTrack, bool doInsert)/*{{{*/
 {
 	Track* track = 0;
 
@@ -4038,13 +3897,13 @@ void ComposerCanvas::paste(bool clone, bool toTrack, bool doInsert)
 		movePartsTotheRight(startPos, offset);
 		song->endUndo(SC_PART_INSERTED);
 	}
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   movePartsToTheRight
 //---------------------------------------------------------
 
-void ComposerCanvas::movePartsTotheRight(unsigned int startTicks, int length)
+void ComposerCanvas::movePartsTotheRight(unsigned int startTicks, int length)/*{{{*/
 {
 	// all parts that start after the pasted parts will be moved the entire length of the pasted parts
         for (iCItem i = _items.begin(); i != _items.end(); ++i)
@@ -4082,12 +3941,12 @@ void ComposerCanvas::movePartsTotheRight(unsigned int startTicks, int length)
 			song->undoOp(UndoOp::ModifyMarker, oldMarker, m);
 		}
 	}
-}
+}/*}}}*/
 //---------------------------------------------------------
 //   startDrag
 //---------------------------------------------------------
 
-void ComposerCanvas::startDrag(CItem* item, DragType t)
+void ComposerCanvas::startDrag(CItem* item, DragType t)/*{{{*/
 {
 	//printf("ComposerCanvas::startDrag(CItem* item, DragType t)\n");
 	NPart* p = (NPart*) (item);
@@ -4144,7 +4003,7 @@ void ComposerCanvas::startDrag(CItem* item, DragType t)
 
 	munmap(fbuf, n);
 	fclose(tmp);
-}
+}/*}}}*/
 
 //---------------------------------------------------------
 //   dragEnterEvent
@@ -4152,8 +4011,28 @@ void ComposerCanvas::startDrag(CItem* item, DragType t)
 
 void ComposerCanvas::dragEnterEvent(QDragEnterEvent* event)
 {
-	///event->accept(Q3TextDrag::canDecode(event));
-	event->acceptProposedAction(); // TODO CHECK Tim.
+	QString text;
+	if (event->mimeData()->hasFormat("text/partlist"))
+	{
+		qDebug("ComposerCanvas::dragEnterEvent: Found partList");
+		event->acceptProposedAction();
+	}
+	else if (event->mimeData()->hasUrls())
+	{
+		text = event->mimeData()->urls()[0].path();
+
+		if (text.endsWith(".wav", Qt::CaseInsensitive) ||
+				text.endsWith(".ogg", Qt::CaseInsensitive) ||
+				text.endsWith(".mpt", Qt::CaseInsensitive))
+		{
+			qDebug("ComposerCanvas::dragEnterEvent: Found Audio file");
+			event->acceptProposedAction();
+		}
+		else
+			event->ignore();
+	}
+	else
+		event->ignore();
 }
 
 //---------------------------------------------------------
@@ -4163,6 +4042,13 @@ void ComposerCanvas::dragEnterEvent(QDragEnterEvent* event)
 void ComposerCanvas::dragMoveEvent(QDragMoveEvent*)
 {
 	//      printf("drag move %x\n", this);
+	/*QPoint p = mapFromGlobal(QCursor::pos());
+	qDebug("ComposerCanvas::dragMoveEvent: x: %d", p.x());
+	int x = AL::sigmap.raster(p.x(), *_raster);
+	if(x < 0)
+		x = 0;
+	qDebug("ComposerCanvas::dragMoveEvent: raster x: %d", x);
+	emit timeChanged(x);*/
 	//event->acceptProposedAction();
 }
 
@@ -4187,7 +4073,7 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 	if (event->source() == this)
 	{
 		printf("local DROP\n");
-		//event->ignore();                     // TODO CHECK Tim.
+		//event->ignore();
 		return;
 	}
 	int type = 0; // 0 = unknown, 1 = partlist, 2 = uri-list
@@ -4201,7 +4087,7 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 	{
 		if (debugMsg && event->mimeData()->formats().size() != 0)
 			printf("Drop with unknown format. First format:<%s>\n", event->mimeData()->formats()[0].toLatin1().constData());
-		//event->ignore();
+		event->ignore();
 		return;
 	}
 
@@ -4232,7 +4118,7 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 	}
 	else if (type == 2)
 	{
-		// Multiple urls not supported here. Grab the first one.
+		// TODO:Multiple support. Grab the first one for now.
 		text = event->mimeData()->urls()[0].path();
 
 		if (text.endsWith(".wav", Qt::CaseInsensitive) ||
@@ -4242,6 +4128,7 @@ void ComposerCanvas::viewDropEvent(QDropEvent* event)
 			int x = AL::sigmap.raster(event->pos().x(), *_raster);
 			if (x < 0)
 				x = 0;
+			//qDebug("ComposerCanvas::dropEvent: x: %d cursor x: %d", x, AL::sigmap.raster(QCursor::pos().x(), *_raster));
 			unsigned trackNo = y2pitch(event->pos().y());
 			Track* track = 0;
 			if (trackNo < tracks->size())
