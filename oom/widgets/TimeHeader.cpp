@@ -90,8 +90,10 @@ bool TimeHeader::setString(unsigned v)
 	double time = double(absFrame) / double(sampleRate);
 	int min = int(time) / 60;
 	int sec = int(time) % 60;
-	//int mil = sec * 1000;
-	int mil = (time / 60) * 1000;
+	/*int mil = (int)(time % 1000);
+	int sec = (int)((time/1000) % 60);
+	int min = (int)((time/60000) % 60);
+	int hours = (int)((time/3600000) % 24);*/
 	double rest = time - (min * 60 + sec);
 	switch (mtcType)
 	{
@@ -116,14 +118,14 @@ bool TimeHeader::setString(unsigned v)
 	s.sprintf("%04d.%02d.%03d", bar + 1, beat + 1, tick);
 	timeLabel->setText(s);
 
-	s.sprintf("%d:%02d:%03d", min, sec, mil);
+	s.sprintf("%d:%02d:%02d", min, sec, frame);
 	posLabel->setText(s);
 
 	//s.sprintf("%02d:%02u", frame, subframe);
 	//frameLabel->setText(s);
 
 
-	Q_UNUSED(frame);
+	//Q_UNUSED(frame);
 	Q_UNUSED(subframe);
 	return false;
 }
