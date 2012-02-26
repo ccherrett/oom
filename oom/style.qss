@@ -262,7 +262,8 @@ TimeHeader QLabel#thTimeLabel/*{{{*/
      border-width: 3;
 	 border-color: #484848;
 	 background-color: #171717;
-	 color: #bbbfbb;
+	 color: #565a56;
+	 color: #828782;
 	 padding-bottom: 5px;
 }/*}}}*/
 
@@ -280,6 +281,7 @@ TimeHeader QLabel#thLengthLabel/*{{{*/
 	 border-color: #484848;
 	 background-color: #171717;
 	 color: #bbbfbb;
+	 color: #828782;
 	 padding-bottom: 5px;
 }/*}}}*/
 

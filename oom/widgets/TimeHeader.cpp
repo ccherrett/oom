@@ -118,7 +118,7 @@ bool TimeHeader::setString(unsigned v)
 	s.sprintf("%04d.%02d.%03d", bar + 1, beat + 1, tick);
 	timeLabel->setText(s);
 
-	s.sprintf("%d:%02d:%02d", min, sec, frame);
+	s.sprintf("%d:%02d <font color='#565a56' size='12px'>%02d</font>", min, sec, frame);
 	posLabel->setText(s);
 
 	//s.sprintf("%02d:%02u", frame, subframe);
