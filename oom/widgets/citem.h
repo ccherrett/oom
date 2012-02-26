@@ -36,9 +36,8 @@ protected:
 
 public:
     CItem(const QPoint& p, const QRect& r);
+    CItem(const QPoint& p, const QRect& r, bool moving);
     CItem();
-    // Changed by Tim. p3.3.20
-    //CItem(Event e, Part* p);
     CItem(const Event& e, Part* p);
 
     bool isMoving() const {

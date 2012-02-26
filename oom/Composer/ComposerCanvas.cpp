@@ -4014,7 +4014,7 @@ void ComposerCanvas::dragEnterEvent(QDragEnterEvent* event)
 	QString text;
 	if (event->mimeData()->hasFormat("text/partlist"))
 	{
-		qDebug("ComposerCanvas::dragEnterEvent: Found partList");
+		//qDebug("ComposerCanvas::dragEnterEvent: Found partList");
 		event->acceptProposedAction();
 	}
 	else if (event->mimeData()->hasUrls())
@@ -4023,9 +4023,23 @@ void ComposerCanvas::dragEnterEvent(QDragEnterEvent* event)
 
 		if (text.endsWith(".wav", Qt::CaseInsensitive) ||
 				text.endsWith(".ogg", Qt::CaseInsensitive) ||
-				text.endsWith(".mpt", Qt::CaseInsensitive))
+				text.endsWith(".mpt", Qt::CaseInsensitive) ||
+				text.endsWith(".oom", Qt::CaseInsensitive) ||
+				text.endsWith(".mid", Qt::CaseInsensitive))
 		{
-			qDebug("ComposerCanvas::dragEnterEvent: Found Audio file");
+			/*if(text.endsWith(".mpt", Qt::CaseInsensitive))
+			{
+			}
+			else
+			{
+				SndFile* f = getWave(text, true);
+				if(f)
+				{
+					int samples = f->samples();
+					//
+				}
+			}*/
+			//qDebug("ComposerCanvas::dragEnterEvent: Found Audio file");
 			event->acceptProposedAction();
 		}
 		else
@@ -4039,16 +4053,14 @@ void ComposerCanvas::dragEnterEvent(QDragEnterEvent* event)
 //   dragMoveEvent
 //---------------------------------------------------------
 
-void ComposerCanvas::dragMoveEvent(QDragMoveEvent*)
+void ComposerCanvas::dragMoveEvent(QDragMoveEvent* ev)
 {
 	//      printf("drag move %x\n", this);
-	/*QPoint p = mapFromGlobal(QCursor::pos());
-	qDebug("ComposerCanvas::dragMoveEvent: x: %d", p.x());
+	QPoint p = mapDev(ev->pos());
 	int x = AL::sigmap.raster(p.x(), *_raster);
 	if(x < 0)
 		x = 0;
-	qDebug("ComposerCanvas::dragMoveEvent: raster x: %d", x);
-	emit timeChanged(x);*/
+	emit timeChanged(x);
 	//event->acceptProposedAction();
 }
 
