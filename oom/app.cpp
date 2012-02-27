@@ -1768,6 +1768,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		showMarker(config.markerVisible);
 	}
 	firstrun = false;
+	emit viewReady();
 }
 
 //---------------------------------------------------------
@@ -4841,4 +4842,9 @@ void OOMidi::updateViewToolbarMenu()
     }
     else
         viewToolbarTransport->setEnabled(false);
+}
+
+void OOMidi::showEvent(QShowEvent*)
+{
+	emit viewReady();
 }

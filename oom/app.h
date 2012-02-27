@@ -35,6 +35,7 @@ class QDockWidget;
 class QMessageBox;
 class QUndoStack;
 class QUndoView;
+class QShowEvent;
 
 class Part;
 class PartList;
@@ -283,6 +284,11 @@ signals:
 
 	void instrumentTemplateAdded(qint64 id);
 	void instrumentTemplateRemoved(qint64 id);
+
+	void viewReady();
+
+protected:
+	virtual void showEvent(QShowEvent*);
 
 private slots:
     //void runPythonScript();

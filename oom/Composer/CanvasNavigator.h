@@ -19,11 +19,14 @@ class CanvasNavigator : public QWidget
 
 	QList<qint64> m_tracks;
 
+	double calcSize(int);
+
 protected:
 	virtual void resizeEvent(QResizeEvent*);
 
 public slots:
 	void updateParts();
+	void updateSpacing();
 
 public:
 	CanvasNavigator(QWidget* parent = 0);

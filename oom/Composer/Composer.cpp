@@ -305,6 +305,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	canvas->setFocus();
 
 	virtualScroll.setCanvas(canvas);
+	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
 
 	editorBox->addWidget(&virtualScroll); //TODO: Placeholder for the scroll widget
 	editorBox->addWidget(time);

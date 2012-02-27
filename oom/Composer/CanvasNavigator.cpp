@@ -9,7 +9,7 @@
 #include "part.h"
 
 static const int MIN_PART_HEIGHT = 1;
-static const int PIXEL_PER_BAR = 4;
+static const double TICK_PER_PIXEL = 81.37;
 
 CanvasNavigator::CanvasNavigator(QWidget* parent)
 : QWidget(parent)
@@ -21,7 +21,7 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	setFixedHeight(48);
 
 	m_scene = new QGraphicsScene(0, 0, 400, 48);
-	m_scene->setBackgroundBrush(QColor(23,23,23));
+	m_scene->setBackgroundBrush(QColor(65, 65, 65));
 	//QGraphicsRectItem *item = new QGraphicsRectItem(0, m_scene);
 	//item->setRect(20, 20, 40, 20);
 	QGraphicsRectItem* item = m_scene->addRect(24, 24, 150, 1);
@@ -76,28 +76,35 @@ void CanvasNavigator::updateParts()
 							tick = tempomap.frame2tick(part->frame());
 							len = tempomap.frame2tick(part->lenFrame());
 						}
-						/*int tenp = (len * 8)/100;
-						int startpos = m_canvas->mapx(tick);
-						int pos = (startpos * 8)/100;*/
-						int w = m_canvas->mapx(len)+m_canvas->xOffsetDev();
-						int pos = m_canvas->mapx(tick)+m_canvas->xOffsetDev();
-						w = (w * 8)/100;
-						pos = (pos * 8)/100;
-						//QGraphicsRectItem* item = m_scene->addRect(pos, index*partHeight, w, partHeight);
+						double w = calcSize(len);//m_canvas->mapx(len)+m_canvas->xOffsetDev();
+						double pos = calcSize(tick);//m_canvas->mapx(tick)+m_canvas->xOffsetDev();
+					//	qDebug("CanvasNavigator::updateParts: tick: %d, len: %d , pos: %d, w: %d", tick, len, pos, w);
 						QGraphicsRectItem* item = m_scene->addRect(pos, index*partHeight, w, partHeight);
 						item->setBrush(config.partColors[part->colorIndex()]);
 						item->setPen(Qt::NoPen);
-						//qDebug("CanvasNavigator::updateParts: tick: %d, len: %d , pos: %d, w: %d", tick, len, pos, w);
 					}
 				}
 				++index;
 			}
 		}
 	}
-	QRectF bounds = m_scene->itemsBoundingRect();
-	m_view->fitInView(bounds, Qt::KeepAspectRatio);
+	updateSpacing();
+}
+
+double CanvasNavigator::calcSize(int val)
+{
+	double rv = 0.0;
+	rv = ((val / TICK_PER_PIXEL) * 8)/100;
+	return rv;
 }
 
 void CanvasNavigator::resizeEvent(QResizeEvent*)
 {
+	updateSpacing();
+}
+
+void CanvasNavigator::updateSpacing()
+{
+	QRectF bounds = m_scene->itemsBoundingRect();
+	m_view->fitInView(bounds, Qt::KeepAspectRatio);
 }
