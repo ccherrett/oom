@@ -103,6 +103,6 @@ void CanvasNavigator::resizeEvent(QResizeEvent*)
 void CanvasNavigator::updateSpacing()
 {
 	QRectF bounds = m_scene->itemsBoundingRect();
-	m_view->fitInView(bounds, Qt::KeepAspectRatio);
-	//m_view->fitInView(bounds, Qt::KeepAspectRatioByExpanding);
+	//m_view->fitInView(bounds, Qt::KeepAspectRatio);
+	m_view->fitInView(bounds, Qt::KeepAspectRatioByExpanding);
 }
