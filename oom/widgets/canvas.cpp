@@ -724,12 +724,12 @@ void Canvas::viewMousePressEvent(QMouseEvent* event)/*{{{*/
 				if(ctrack && ctrack->isMidiTrack())
 				{
 					oom->composer->_setRaster(config.midiRaster, false);
-					oom->composer->raster->setCurrentIndex(config.midiRaster);
+					//oom->composer->raster->setCurrentIndex(config.midiRaster);
 				}
 				else
 				{
 					oom->composer->_setRaster(config.audioRaster, false);
-					oom->composer->raster->setCurrentIndex(config.audioRaster);
+					//oom->composer->raster->setCurrentIndex(config.audioRaster);
 				}
 				if (_curItem->part() != _curPart)
 				{

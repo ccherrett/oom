@@ -291,9 +291,9 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	canvasBox->setContentsMargins(0,0,0,0);
 	canvasBox->setSpacing(0);
 
-	QFrame *virtualScroll = new QFrame(this);
-	virtualScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	virtualScroll->setFixedHeight(48);
+	
+	//virtualScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	//virtualScroll->setFixedHeight(48);
 	
 	time = new MTScale(&_raster, this, xscale);
 	time->setOrigin(-offset, 0);
@@ -304,7 +304,9 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	canvas->setOrigin(-offset, 0);
 	canvas->setFocus();
 
-	editorBox->addWidget(virtualScroll); //TODO: Placeholder for the scroll widget
+	virtualScroll.setCanvas(canvas);
+
+	editorBox->addWidget(&virtualScroll); //TODO: Placeholder for the scroll widget
 	editorBox->addWidget(time);
 	editorBox->addWidget(hLine(this));
 	canvasBox->addWidget(canvas, 100);
@@ -545,6 +547,10 @@ void Composer::songChanged(int type)
 		{//Scroll to top
 			//canvas->setYPos(0);
 			//vscroll->setValue(0);
+		}
+		if(type & (SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_MODIFIED | SC_VIEW_CHANGED | SC_TRACK_REMOVED))
+		{//Scroll to top
+			virtualScroll.updateParts();
 		}
 	}
 

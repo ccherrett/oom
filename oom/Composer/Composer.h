@@ -10,6 +10,7 @@
 
 #include <vector>
 
+#include "CanvasNavigator.h"
 #include "AbstractMidiEditor.h"
 #include "ComposerCanvas.h"
 
@@ -42,6 +43,7 @@ class CItem;
 class HeaderList;
 class EditToolBar;
 class TimeHeader;
+class CanvasNavigator;
 
 static const int MIN_HEADER_WIDTH = 240;
 static const int MAX_HEADER_WIDTH = 400;
@@ -65,6 +67,7 @@ class Composer : public QWidget
 	QScrollArea *listScroll;
 	//EditToolBar *edittools;
 	TimeHeader* m_timeHeader;
+	CanvasNavigator virtualScroll;
 
     Track* selected;
 

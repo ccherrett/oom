@@ -25,6 +25,7 @@ QT4_WRAP_CPP (composer_mocs
       Composer.h 
       ComposerCanvas.h 
 	  HeaderList.h
+	  CanvasNavigator.h
       )
 
 #
@@ -34,6 +35,7 @@ file (GLOB composer_source_files
       Composer.cpp
       ComposerCanvas.cpp
 	  HeaderList.cpp
+	  CanvasNavigator.cpp
       )
 
 #

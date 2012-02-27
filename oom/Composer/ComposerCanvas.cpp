@@ -1255,6 +1255,8 @@ CItemList ComposerCanvas::getSelectedItems()
 
 void ComposerCanvas::mousePress(QMouseEvent* event)/*{{{*/
 {
+//	qDebug("ComposerCanvas::mousePress: One pixel = %d ticks", AL::sigmap.raster(1, *_raster));
+//	qDebug("ComposerCanvas::mousePress: width = %d ticks, length: %d", AL::sigmap.raster(width(), *_raster), song->len());
 	if (event->modifiers() & Qt::ShiftModifier && _tool != AutomationTool)
 	{
 		return;
