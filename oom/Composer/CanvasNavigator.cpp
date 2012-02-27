@@ -21,16 +21,13 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	setFixedHeight(48);
 
 	m_scene = new QGraphicsScene(0, 0, 400, 48);
-	m_scene->setBackgroundBrush(QColor(65, 65, 65));
-	//QGraphicsRectItem *item = new QGraphicsRectItem(0, m_scene);
-	//item->setRect(20, 20, 40, 20);
-	QGraphicsRectItem* item = m_scene->addRect(24, 24, 150, 1);
-	item->setBrush(config.partColors[1]);
-	item->setPen(Qt::NoPen);
+	m_scene->setBackgroundBrush(QColor(63, 63, 63));
+	
 	m_view = new QGraphicsView(m_scene);
 	m_view->setRenderHints(QPainter::Antialiasing);
 	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	layout->addWidget(m_view);
 }
 
@@ -107,4 +104,5 @@ void CanvasNavigator::updateSpacing()
 {
 	QRectF bounds = m_scene->itemsBoundingRect();
 	m_view->fitInView(bounds, Qt::KeepAspectRatio);
+	//m_view->fitInView(bounds, Qt::KeepAspectRatioByExpanding);
 }
