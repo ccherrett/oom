@@ -202,7 +202,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	QVBoxLayout* box = new QVBoxLayout(this);
 	box->setContentsMargins(0, 0, 0, 0);
 	box->setSpacing(0);
-	box->addWidget(hLine(this), Qt::AlignTop);
+	//box->addWidget(hLine(this), Qt::AlignTop);
 
 	//---------------------------------------------------
 	//  Tracklist
@@ -211,10 +211,18 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	int xscale = -100;
 	int yscale = 1;
 
-	split = new Splitter(Qt::Horizontal, this, "arsplit");
+	//m_splitter = new QSplitter(Qt::Vertical, this);
+	m_splitter = 0;
+	split = new QSplitter(Qt::Horizontal, this);
 	split->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	split->setHandleWidth(2);
-	box->addWidget(split, 1000);
+	QFrame *headerFrame = new QFrame(this);
+	headerFrame->setFixedHeight(80);
+	headerFrame->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+	QHBoxLayout *headerBox = new QHBoxLayout(headerFrame);
+	headerBox->setContentsMargins(0, 0, 0, 0);
+	headerBox->setSpacing(0);
+	//box->addWidget(m_splitter, 1000);
 
 	m_trackheader = new HeaderList(this, "trackHeaderList");
 	m_trackheader->setMinimumWidth(MIN_HEADER_WIDTH);
@@ -232,18 +240,14 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	listScroll->setMinimumWidth(MIN_HEADER_WIDTH);
 	listScroll->setMaximumWidth(MAX_HEADER_WIDTH);
 
-	/*edittools = new EditToolBar(this, composerTools, true);
+	edittools = new EditToolBar(this, composerTools, true);
 	edittools->setFixedHeight(32);
 	connect(edittools, SIGNAL(toolChanged(int)), this, SLOT(setTool(int)));
 	connect(edittools, SIGNAL(toolChanged(int)), SIGNAL(updateFooterTool(int)));
 	connect(this, SIGNAL(toolChanged(int)), edittools, SLOT(set(int)));
 	connect(this, SIGNAL(updateHeaderTool(int)), edittools, SLOT(setNoUpdate(int)));
-	trackLayout->addWidget(edittools);*/
+	trackLayout->addWidget(edittools);
 	
-	m_timeHeader = new TimeHeader(this);
-	connect(song, SIGNAL(posChanged(int, unsigned, bool)), m_timeHeader, SLOT(setPos(int, unsigned, bool)));
-	trackLayout->addWidget(m_timeHeader);
-
 	//trackLayout->addItem(new QSpacerItem(0, 32, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	trackLayout->addWidget(listScroll);
 
@@ -283,6 +287,16 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	vscroll->setPageStep(25);
 	vscroll->setValue(0);
 
+	m_timeHeader = new TimeHeader(this);
+	m_timeHeader->setFixedWidth(MIN_HEADER_WIDTH);
+	headerBox->addWidget(m_timeHeader);
+
+	virtualScroll.setCanvas(canvas);
+	headerBox->addWidget(&virtualScroll);
+	
+	connect(song, SIGNAL(posChanged(int, unsigned, bool)), m_timeHeader, SLOT(setPos(int, unsigned, bool)));
+	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
+
 	QVBoxLayout *editorBox = new QVBoxLayout(editor);
 	editorBox->setContentsMargins(0,0,0,0);
 	editorBox->setSpacing(0);
@@ -291,10 +305,6 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	canvasBox->setContentsMargins(0,0,0,0);
 	canvasBox->setSpacing(0);
 
-	
-	//virtualScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	//virtualScroll->setFixedHeight(48);
-	
 	time = new MTScale(&_raster, this, xscale);
 	time->setOrigin(-offset, 0);
 
@@ -304,16 +314,15 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	canvas->setOrigin(-offset, 0);
 	canvas->setFocus();
 
-	virtualScroll.setCanvas(canvas);
-	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
-
-	editorBox->addWidget(&virtualScroll); //TODO: Placeholder for the scroll widget
 	editorBox->addWidget(time);
 	editorBox->addWidget(hLine(this));
 	canvasBox->addWidget(canvas, 100);
 	canvasBox->addWidget(vscroll);
 	editorBox->addLayout(canvasBox, 100);
 	editorBox->addWidget(hscroll);
+
+	box->addWidget(headerFrame);
+	box->addWidget(split);
 
 	connect(canvas, SIGNAL(setUsedTool(int)), this, SIGNAL(setUsedTool(int)));
 	connect(canvas, SIGNAL(trackChanged(Track*)), m_trackheader, SLOT(selectTrack(Track*)));
@@ -354,6 +363,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	connect(canvas, SIGNAL(toolChanged(int)), SIGNAL(toolChanged(int)));
 	//connect(canvas, SIGNAL(toolChanged(int)), edittools, SLOT(setTool(int)));
 	connect(split, SIGNAL(splitterMoved(int, int)),  SLOT(splitterMoved(int, int)));
+	//connect(m_splitter, SIGNAL(splitterMoved(int, int)),  SLOT(resizeHeader(int, int)));
 
 	configChanged(); // set configuration values
 	if (canvas->part())
@@ -368,19 +378,44 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	QList<int> vl;
 	QString str = tconfig().get_property("arsplit", "sizes", def+" 200").toString();
 	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
-	for (QStringList::Iterator it = sl.begin(); it != sl.end(); ++it)
+	foreach(QString it, sl)
 	{
-		int val = (*it).toInt();
-		vl.append(val);
+		vl.append(it.toInt());
 	}
 	split->setSizes(vl);
-
+	/*vl.clear();
+	sl.clear();
+	str = tconfig().get_property("composerVSplit", "sizes", "80 400").toString();
+	sl = str.split(QString(" "), QString::SkipEmptyParts);
+	foreach(QString s, sl)
+	{
+		vl.append(s.toInt());
+	}
+	m_splitter->setSizes(vl);
+	m_timeHeader->setFixedHeight(vl[0]);
+	virtualScroll.setFixedHeight(vl[0]);*/
 }
 
 Composer::~Composer()
 {
-	//tconfig().set_property(split->objectName(), "listwidth", split->sizes().at(0));
-	//tconfig().set_property(split->objectName(), "canvaswidth", split->sizes().at(1));
+	QList<int> isl = split->sizes();
+	QStringList sl;
+	foreach(int i, isl)
+		sl.append(QString::number(i));
+	tconfig().set_property("arsplit", "sizes", sl.join(" "));
+
+	/*QList<int> isl2 = m_splitter->sizes();
+	QStringList sl2;
+	foreach(int i2, isl2)
+		sl2.append(QString::number(i2));
+	tconfig().set_property("composerVSplit", "sizes", sl2.join(" "));
+	tconfig().save();*/
+}
+
+void Composer::resizeHeader(int pos, int)
+{
+	m_timeHeader->setFixedHeight(pos);
+	virtualScroll.setFixedHeight(pos);
 }
 
 void Composer::currentTabChanged(int tab)
@@ -673,7 +708,7 @@ void Composer::resourceDockAreaChanged(Qt::DockWidgetArea area)
 void Composer::writeStatus(int level, Xml& xml)
 {
 	xml.tag(level++, "composer");
-	split->writeStatus(level, xml);
+	//split->writeStatus(level, xml);
 	xml.intTag(level, "xpos", hscroll->pos());
 	xml.intTag(level, "xmag", hscroll->mag());
 	xml.intTag(level, "ypos", vscroll->value());

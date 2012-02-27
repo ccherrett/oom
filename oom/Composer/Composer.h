@@ -26,6 +26,7 @@ class QKeyEvent;
 class QComboBox;
 class QStackedWidget;
 class QVBoxLayout;
+class QSplitter;
 
 class ScrollScale;
 class MTScale;
@@ -65,7 +66,7 @@ class Composer : public QWidget
     SpinBox* lenEntry;
     Conductor* midiConductor;
 	QScrollArea *listScroll;
-	//EditToolBar *edittools;
+	EditToolBar *edittools;
 	TimeHeader* m_timeHeader;
 	CanvasNavigator virtualScroll;
 
@@ -73,7 +74,8 @@ class Composer : public QWidget
 
     LabelCombo* typeBox;
     QToolButton* ib;
-    Splitter* split;
+    QSplitter* split;
+	QSplitter* m_splitter;
     int songType;
     //PosLabel* cursorPos;
     SpinBox* globalTempoSpinBox;
@@ -107,6 +109,7 @@ private slots:
 	void currentTabChanged(int);
 	void composerViewChanged();
 	void updateAll();
+	void resizeHeader(int, int);
 
 signals:
     void redirectWheelEvent(QWheelEvent*);

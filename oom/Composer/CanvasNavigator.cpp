@@ -18,7 +18,7 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	setFixedHeight(48);
+	setFixedHeight(80);
 
 	m_scene = new QGraphicsScene(0, 0, 400, 48);
 	m_scene->setBackgroundBrush(QColor(63, 63, 63));
@@ -26,7 +26,7 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view = new QGraphicsView(m_scene);
 	m_view->setRenderHints(QPainter::Antialiasing);
 	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	layout->addWidget(m_view);
 }
@@ -41,7 +41,7 @@ void CanvasNavigator::updateParts()
 {
 	m_tracks.clear();
 	m_scene->clear();
-	int partHeight = 4;
+	int partHeight = 2;
 	//if(partHeight < MIN_PART_HEIGHT)
 	//	partHeight = MIN_PART_HEIGHT;
 	int index = 0;
@@ -103,6 +103,17 @@ void CanvasNavigator::resizeEvent(QResizeEvent*)
 void CanvasNavigator::updateSpacing()
 {
 	QRectF bounds = m_scene->itemsBoundingRect();
-	//m_view->fitInView(bounds, Qt::KeepAspectRatio);
-	m_view->fitInView(bounds, Qt::KeepAspectRatioByExpanding);
+	//m_view->fitInView(bounds, Qt::IgnoreAspectRatio);
+	m_view->fitInView(bounds, Qt::KeepAspectRatio);
+	//m_view->fitInView(bounds, Qt::KeepAspectRatioByExpanding);
 }
+
+/*QSize CanvasNavigator::sizeHint() const
+{
+	return QSize(400, 80);
+}
+
+QSize CanvasNavigator::minimumSizeHint() const
+{
+	return sizeHint();
+}*/

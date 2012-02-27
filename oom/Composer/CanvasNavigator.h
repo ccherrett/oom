@@ -23,6 +23,8 @@ class CanvasNavigator : public QWidget
 
 protected:
 	virtual void resizeEvent(QResizeEvent*);
+	//virtual QSize minimumSizeHint() const;
+	//virtual QSize sizeHint() const;
 
 public slots:
 	void updateParts();
