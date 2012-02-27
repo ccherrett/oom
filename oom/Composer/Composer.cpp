@@ -216,12 +216,12 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	split = new QSplitter(Qt::Horizontal, this);
 	split->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 	split->setHandleWidth(2);
-	QFrame *headerFrame = new QFrame(this);
+	/*QFrame *headerFrame = new QFrame(this);
 	headerFrame->setFixedHeight(80);
 	headerFrame->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 	QHBoxLayout *headerBox = new QHBoxLayout(headerFrame);
 	headerBox->setContentsMargins(0, 0, 0, 0);
-	headerBox->setSpacing(0);
+	headerBox->setSpacing(0);*/
 	//box->addWidget(m_splitter, 1000);
 
 	m_trackheader = new HeaderList(this, "trackHeaderList");
@@ -239,6 +239,12 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	listScroll->setMouseTracking(true);
 	listScroll->setMinimumWidth(MIN_HEADER_WIDTH);
 	listScroll->setMaximumWidth(MAX_HEADER_WIDTH);
+
+	m_timeHeader = new TimeHeader(this);
+	//m_timeHeader->setFixedWidth(MIN_HEADER_WIDTH);
+	trackLayout->addWidget(m_timeHeader);
+
+	connect(song, SIGNAL(posChanged(int, unsigned, bool)), m_timeHeader, SLOT(setPos(int, unsigned, bool)));
 
 	edittools = new EditToolBar(this, composerTools, true);
 	edittools->setFixedHeight(32);
@@ -287,16 +293,6 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	vscroll->setPageStep(25);
 	vscroll->setValue(0);
 
-	m_timeHeader = new TimeHeader(this);
-	m_timeHeader->setFixedWidth(MIN_HEADER_WIDTH);
-	headerBox->addWidget(m_timeHeader);
-
-	virtualScroll.setCanvas(canvas);
-	headerBox->addWidget(&virtualScroll);
-	
-	connect(song, SIGNAL(posChanged(int, unsigned, bool)), m_timeHeader, SLOT(setPos(int, unsigned, bool)));
-	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
-
 	QVBoxLayout *editorBox = new QVBoxLayout(editor);
 	editorBox->setContentsMargins(0,0,0,0);
 	editorBox->setSpacing(0);
@@ -314,6 +310,11 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	canvas->setOrigin(-offset, 0);
 	canvas->setFocus();
 
+	virtualScroll.setCanvas(canvas);
+	editorBox->addWidget(&virtualScroll);
+	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
+	
+
 	editorBox->addWidget(time);
 	editorBox->addWidget(hLine(this));
 	canvasBox->addWidget(canvas, 100);
@@ -321,7 +322,6 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	editorBox->addLayout(canvasBox, 100);
 	editorBox->addWidget(hscroll);
 
-	box->addWidget(headerFrame);
 	box->addWidget(split);
 
 	connect(canvas, SIGNAL(setUsedTool(int)), this, SIGNAL(setUsedTool(int)));
