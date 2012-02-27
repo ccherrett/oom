@@ -87,7 +87,7 @@ void CanvasNavigator::updateParts()
 						QGraphicsRectItem* item = m_scene->addRect(pos, index*partHeight, w, partHeight);
 						item->setBrush(config.partColors[part->colorIndex()]);
 						item->setPen(Qt::NoPen);
-						qDebug("CanvasNavigator::updateParts: tick: %d, len: %d , pos: %d, w: %d", tick, len, pos, w);
+						//qDebug("CanvasNavigator::updateParts: tick: %d, len: %d , pos: %d, w: %d", tick, len, pos, w);
 					}
 				}
 				++index;

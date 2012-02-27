@@ -496,6 +496,7 @@ void Composer::composerViewChanged()
 	updateAll();
 	canvas->trackViewChanged();
 	updateConductor(SC_VIEW_CHANGED);
+	virtualScroll.updateParts();
 }
 
 void Composer::updateAll()
