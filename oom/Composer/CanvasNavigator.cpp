@@ -96,7 +96,7 @@ void CanvasNavigator::updateParts()
 						partWaveColor.setAlpha(150);
 						partColor.setAlpha(150);
 						item->setBrush(part->selected() ? partWaveColor : partColor);
-						item->setPen(part->selected() ? partColor : Qt::NoPen);
+						item->setPen(part->selected() ? partColor : partWaveColor);
 					}
 				}
 				++index;
@@ -128,7 +128,7 @@ void CanvasNavigator::updateSelections(int)
 			partWaveColor.setAlpha(150);
 			partColor.setAlpha(150);
 			p->setBrush(part->selected() ? partWaveColor : partColor);
-			p->setPen(part->selected() ? partColor : Qt::NoPen);
+			p->setPen(part->selected() ? partColor : partWaveColor);
 		}
 	}
 	updateSpacing();
