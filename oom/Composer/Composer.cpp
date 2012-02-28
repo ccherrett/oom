@@ -313,6 +313,8 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	virtualScroll.setCanvas(canvas);
 	editorBox->addWidget(&virtualScroll);
 	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
+	connect(canvas, SIGNAL(selectionChanged()), &virtualScroll, SLOT(updateSelections()));
+//	connect(song, SIGNAL(songChanged()), &virtualScroll, SLOT(updateSelections(int)));
 	
 
 	editorBox->addWidget(time);
@@ -589,6 +591,8 @@ void Composer::songChanged(int type)
 		{//Scroll to top
 			virtualScroll.updateParts();
 		}
+		//if (type & SC_SELECTION)
+		//	virtualScroll.updateSelections();
 	}
 
 	updateConductor(type);

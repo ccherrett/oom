@@ -3,11 +3,24 @@
 
 #include <QWidget>
 #include <QList>
+#include <QGraphicsRectItem>
 
 class QGraphicsView;
+class QGraphicsItem;
 class QGraphicsScene;
 class QResizeEvent;
 class ComposerCanvas;
+class Part;
+
+class PartItem : public QGraphicsRectItem
+{
+	Part* m_part;
+public:
+	PartItem(qreal x, qreal y, qreal w, qreal h, QGraphicsItem* parent = 0);
+	PartItem(QRectF r, QGraphicsItem* parent = 0);
+	void setPart(Part* p) {m_part = p;}
+	Part* part(){return  m_part;}
+};
 
 class CanvasNavigator : public QWidget
 {
@@ -17,7 +30,8 @@ class CanvasNavigator : public QWidget
 	QGraphicsView* m_view;
 	QGraphicsScene* m_scene;
 
-	QList<qint64> m_tracks;
+	QList<PartItem*> m_parts;
+	bool m_editing;
 
 	double calcSize(int);
 
@@ -29,6 +43,7 @@ protected:
 public slots:
 	void updateParts();
 	void updateSpacing();
+	void updateSelections(int = -1);
 
 public:
 	CanvasNavigator(QWidget* parent = 0);

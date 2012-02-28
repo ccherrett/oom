@@ -7,13 +7,25 @@
 #include "song.h"
 #include "track.h"
 #include "part.h"
+#include "app.h"
 
 static const int MIN_PART_HEIGHT = 1;
 static const double TICK_PER_PIXEL = 81.37;
 
+PartItem::PartItem(qreal x, qreal y, qreal w, qreal h, QGraphicsItem* parent)
+: QGraphicsRectItem(x, y, w, h, parent)
+{
+}
+
+PartItem::PartItem(QRectF r, QGraphicsItem* parent)
+: QGraphicsRectItem(r, parent)
+{
+}
+
 CanvasNavigator::CanvasNavigator(QWidget* parent)
 : QWidget(parent)
 {
+	m_editing = false;
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
@@ -39,7 +51,8 @@ void CanvasNavigator::setCanvas(ComposerCanvas* c)
 
 void CanvasNavigator::updateParts()
 {
-	m_tracks.clear();
+	m_editing = true;
+	m_parts.clear();
 	m_scene->clear();
 	int partHeight = 2;
 	//if(partHeight < MIN_PART_HEIGHT)
@@ -50,8 +63,6 @@ void CanvasNavigator::updateParts()
 	{
 		if((*ci)->type() == Track::WAVE || (*ci)->type() == Track::MIDI)
 		{
-			m_tracks.append((*ci)->id());
-
 			Track* track = *ci;
 			if(track)
 			{
@@ -76,9 +87,16 @@ void CanvasNavigator::updateParts()
 						double w = calcSize(len);//m_canvas->mapx(len)+m_canvas->xOffsetDev();
 						double pos = calcSize(tick);//m_canvas->mapx(tick)+m_canvas->xOffsetDev();
 					//	qDebug("CanvasNavigator::updateParts: tick: %d, len: %d , pos: %d, w: %d", tick, len, pos, w);
-						QGraphicsRectItem* item = m_scene->addRect(pos, index*partHeight, w, partHeight);
-						item->setBrush(config.partColors[part->colorIndex()]);
-						item->setPen(Qt::NoPen);
+						PartItem* item = (PartItem*)m_scene->addRect(pos, index*partHeight, w, partHeight);
+						item->setPart(part);
+						m_parts.append(item);
+						int i = part->colorIndex();
+						QColor partWaveColor(config.partWaveColors[i]);
+						QColor partColor(config.partColors[i]);
+						partWaveColor.setAlpha(150);
+						partColor.setAlpha(150);
+						item->setBrush(part->selected() ? partWaveColor : partColor);
+						item->setPen(part->selected() ? partColor : Qt::NoPen);
 					}
 				}
 				++index;
@@ -86,6 +104,7 @@ void CanvasNavigator::updateParts()
 		}
 	}
 	updateSpacing();
+	m_editing = false;
 }
 
 double CanvasNavigator::calcSize(int val)
@@ -93,6 +112,26 @@ double CanvasNavigator::calcSize(int val)
 	double rv = 0.0;
 	rv = ((val / TICK_PER_PIXEL) * 8)/100;
 	return rv;
+}
+
+void CanvasNavigator::updateSelections(int)
+{
+//	qDebug("CanvasNavigator::updateSelections");
+	foreach(PartItem* p, m_parts)
+	{
+		Part* part = p->part();
+		if(part)
+		{
+			int i = part->colorIndex();
+			QColor partWaveColor(config.partWaveColors[i]);
+			QColor partColor(config.partColors[i]);
+			partWaveColor.setAlpha(150);
+			partColor.setAlpha(150);
+			p->setBrush(part->selected() ? partWaveColor : partColor);
+			p->setPen(part->selected() ? partColor : Qt::NoPen);
+		}
+	}
+	updateSpacing();
 }
 
 void CanvasNavigator::resizeEvent(QResizeEvent*)
