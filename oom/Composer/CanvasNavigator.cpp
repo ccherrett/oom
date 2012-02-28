@@ -42,7 +42,7 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	layout->addWidget(m_view);
 	QColor colTimeLine = QColor(0, 186, 255);
-	m_playhead = m_scene->addRect(calcSize(song->cpos()), 0, 2, 80);
+	m_playhead = m_scene->addRect(calcSize(song->cpos()), 0, 2, 40);
 	m_playhead->setBrush(colTimeLine);
 }
 
@@ -55,7 +55,7 @@ void CanvasNavigator::setCanvas(ComposerCanvas* c)
 void CanvasNavigator::advancePlayhead()
 {
 	if(m_playhead)
-		m_playhead->setPos(calcSize(song->cpos()));
+		m_playhead->setPos(calcSize(song->cpos()), 0);
 }
 
 void CanvasNavigator::updateParts()
@@ -64,7 +64,7 @@ void CanvasNavigator::updateParts()
 	foreach(PartItem* i, m_parts)
 		m_scene->removeItem(i);
 	while(m_parts.size())
-		delete m_part.takeFirst();
+		delete m_parts.takeFirst();
 	//m_parts.clear();
 	//m_scene->clear();
 	int partHeight = 2;
@@ -116,6 +116,7 @@ void CanvasNavigator::updateParts()
 			}
 		}
 	}
+	m_playhead->setRect(calcSize(song->cpos()), 0, 2, 2*index);
 	updateSpacing();
 	m_editing = false;
 }
