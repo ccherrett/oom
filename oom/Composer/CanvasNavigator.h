@@ -29,6 +29,7 @@ class CanvasNavigator : public QWidget
 	ComposerCanvas* m_canvas;
 	QGraphicsView* m_view;
 	QGraphicsScene* m_scene;
+	QGraphicsRectItem* m_playhead;
 
 	QList<PartItem*> m_parts;
 	bool m_editing;
@@ -44,6 +45,7 @@ public slots:
 	void updateParts();
 	void updateSpacing();
 	void updateSelections(int = -1);
+	void advancePlayhead();
 
 public:
 	CanvasNavigator(QWidget* parent = 0);

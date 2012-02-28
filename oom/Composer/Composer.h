@@ -139,6 +139,7 @@ public slots:
     void _setRaster(int, bool setDefault = true);
     void verticalScrollSetYpos(unsigned);
 	void preloadControllers();
+	void heartBeat();
 
 public:
 

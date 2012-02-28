@@ -41,6 +41,9 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	layout->addWidget(m_view);
+	QColor colTimeLine = QColor(0, 186, 255);
+	m_playhead = m_scene->addRect(calcSize(song->cpos()), 0, 2, 80);
+	m_playhead->setBrush(colTimeLine);
 }
 
 void CanvasNavigator::setCanvas(ComposerCanvas* c)
@@ -49,11 +52,21 @@ void CanvasNavigator::setCanvas(ComposerCanvas* c)
 	//TODO: Update all parts
 }
 
+void CanvasNavigator::advancePlayhead()
+{
+	if(m_playhead)
+		m_playhead->setPos(calcSize(song->cpos()));
+}
+
 void CanvasNavigator::updateParts()
 {
 	m_editing = true;
-	m_parts.clear();
-	m_scene->clear();
+	foreach(PartItem* i, m_parts)
+		m_scene->removeItem(i);
+	while(m_parts.size())
+		delete m_part.takeFirst();
+	//m_parts.clear();
+	//m_scene->clear();
 	int partHeight = 2;
 	//if(partHeight < MIN_PART_HEIGHT)
 	//	partHeight = MIN_PART_HEIGHT;

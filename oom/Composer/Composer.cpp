@@ -420,6 +420,11 @@ void Composer::resizeHeader(int pos, int)
 	virtualScroll.setFixedHeight(pos);
 }
 
+void Composer::heartBeat()
+{
+	virtualScroll.advancePlayhead();
+}
+
 void Composer::currentTabChanged(int tab)
 {
 	switch(tab)

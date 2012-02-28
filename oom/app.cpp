@@ -1256,6 +1256,7 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	setCentralWidget(composer);
 	addTransportToolbar();
 
+	connect(heartBeatTimer, SIGNAL(timeout()), composer, SLOT(heartBeat()));
 	connect(composer, SIGNAL(editPart(Track*)), SLOT(startEditor(Track*)));
 	connect(composer, SIGNAL(dropSongFile(const QString&)), SLOT(loadProjectFile(const QString&)));
 	connect(composer, SIGNAL(dropMidiFile(const QString&)), SLOT(importMidi(const QString&)));
