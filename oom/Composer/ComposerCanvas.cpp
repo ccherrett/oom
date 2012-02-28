@@ -2525,6 +2525,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 			setPos(0, curpos, false); //Dummy to put the current position back once we've scrolled
 		}
 		redraw();
+		emit selectionChanged();
 	}
 }/*}}}*/
 
