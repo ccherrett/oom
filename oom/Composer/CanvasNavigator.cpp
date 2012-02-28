@@ -116,7 +116,7 @@ void CanvasNavigator::updateParts()
 			}
 		}
 	}
-	m_playhead->setRect(calcSize(song->cpos()), 0, 2, 2*index);
+	m_playhead->setRect(calcSize(song->cpos()), 0, 2, 40);
 	updateSpacing();
 	m_editing = false;
 }
