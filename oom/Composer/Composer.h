@@ -110,6 +110,7 @@ private slots:
 	void composerViewChanged();
 	void updateAll();
 	void resizeHeader(int, int);
+	void updateScroll(int, int);
 
 signals:
     void redirectWheelEvent(QWheelEvent*);

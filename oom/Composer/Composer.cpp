@@ -314,7 +314,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	editorBox->addWidget(&virtualScroll);
 	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
 	connect(canvas, SIGNAL(selectionChanged()), &virtualScroll, SLOT(updateSelections()));
-//	connect(song, SIGNAL(songChanged()), &virtualScroll, SLOT(updateSelections(int)));
+	connect(&virtualScroll, SIGNAL(updateScroll(int, int)), this, SLOT(updateScroll(int, int)));
 	
 
 	editorBox->addWidget(time);
@@ -805,6 +805,12 @@ void Composer::reset()
 	vscroll->setValue(0);
 	time->setXPos(0);
 	time->setYPos(0);
+}
+
+void Composer::updateScroll(int x, int y)
+{
+	hscroll->setPos(x);
+	vscroll->setValue(y);
 }
 
 //---------------------------------------------------------

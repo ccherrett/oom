@@ -35,7 +35,8 @@ protected:
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent*);
 	virtual void wheelEvent(QGraphicsSceneWheelEvent*);
 signals:
-	void centerCanvas(int);
+	void centerCanvas(int, int);
+	void updatePlayhead(int);
 public:
 	NavigatorScene(QObject* parent = 0);
 	NavigatorScene(const QRectF&, QObject* parent = 0);
@@ -63,8 +64,10 @@ class CanvasNavigator : public QWidget
 
 protected:
 	virtual void resizeEvent(QResizeEvent*);
-	//virtual QSize minimumSizeHint() const;
-	//virtual QSize sizeHint() const;
+
+private slots:
+	void updatePlayheadPosition(int);
+	void updateCanvasPosition(int, int);
 
 public slots:
 	void updateParts();
@@ -72,13 +75,15 @@ public slots:
 	void updateSelections(int = -1);
 	void updateCanvasBox();
 	void advancePlayhead();
-	void updateCanvasPosition(int);
 
+signals:
+	void updateScroll(int, int);
 public:
 	CanvasNavigator(QWidget* parent = 0);
 	void setCanvas(ComposerCanvas* c);
 	static double calcSize(int);
-	static int getSizeForCanvas(int);
+	static int sceneToTick(int);
+	static int sceneToCanvas(int);
 };
 
 #endif

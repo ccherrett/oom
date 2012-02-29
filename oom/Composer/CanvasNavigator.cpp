@@ -45,7 +45,10 @@ NavigatorScene::NavigatorScene(qreal x, qreal y, qreal w, qreal h, QObject* pare
 
 void NavigatorScene::mousePressEvent(QGraphicsSceneMouseEvent* ev)
 {
-	emit centerCanvas(CanvasNavigator::getSizeForCanvas(ev->scenePos().x()));
+	if(ev->modifiers() & Qt::ShiftModifier)
+		emit updatePlayhead(ev->scenePos().x());
+	else
+		emit centerCanvas(ev->scenePos().x(), ev->scenePos().y());
 }
 
 void NavigatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* )
@@ -82,11 +85,12 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view = new QGraphicsView(m_scene);
 	m_view->setRenderHints(QPainter::Antialiasing);
 	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	m_view->setFixedHeight(80);
 	layout->addWidget(m_view);
-	connect(m_scene, SIGNAL(centerCanvas(int)), this, SLOT(updateCanvasPosition(int)));
+	connect(m_scene, SIGNAL(centerCanvas(int, int)), this, SLOT(updateCanvasPosition(int, int)));
+	connect(m_scene, SIGNAL(updatePlayhead(int)), this, SLOT(updatePlayheadPosition(int)));
 }
 
 void CanvasNavigator::setCanvas(ComposerCanvas* c)
@@ -95,12 +99,22 @@ void CanvasNavigator::setCanvas(ComposerCanvas* c)
 	createCanvasBox();
 }
 
-void CanvasNavigator::updateCanvasPosition(int pos)
+void CanvasNavigator::updatePlayheadPosition(int pos)
+{
+	Pos p(sceneToTick(pos), true);
+	song->setPos(0, p);
+}
+
+void CanvasNavigator::updateCanvasPosition(int x, int y)
 {
 	if(m_canvas)
 	{
-		Pos p(pos, true);
-		song->setPos(0, p);
+		//Pos p(sceneToTick(x), true);
+		//song->setPos(0, p);
+		int pos = ((m_canvas->mapx(sceneToTick(x))+m_canvas->xOffsetDev())-(m_canvas->width()/2));
+		//m_canvas->setXPos(sceneToCanvas(x) - m_canvas->width());
+		int ypos = sceneToCanvas(y)-200;
+		emit updateScroll(pos, ypos);
 	}
 }
 
@@ -118,7 +132,7 @@ void CanvasNavigator::createCanvasBox()
 	m_canvasBox->setPen(pen);
 }
 
-void CanvasNavigator::updateCanvasBox()
+void CanvasNavigator::updateCanvasBox()/*{{{*/
 {
 	if(m_canvasBox && m_canvas)
 	{
@@ -132,9 +146,9 @@ void CanvasNavigator::updateCanvasBox()
 		m_canvasBox->setRect(real);
 		//m_view->ensureVisible(m_canvasBox, 0, 0);
 	}
-}
+}/*}}}*/
 
-void CanvasNavigator::advancePlayhead()
+void CanvasNavigator::advancePlayhead()/*{{{*/
 {
 	if(m_editing)
 		return;
@@ -157,7 +171,7 @@ void CanvasNavigator::advancePlayhead()
 		m_start->setRect(rect);
 	}
 	updateCanvasBox();
-}
+}/*}}}*/
 
 void CanvasNavigator::updateParts()/*{{{*/
 {
@@ -207,7 +221,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 				int ih = m_heightList.at(index);
 				double partHeight = (ih * 8)/100;
 					
-				qDebug("CanvasNavigator::updateParts: partHeight: %2f, ypos: %d", partHeight, ypos);
+				//qDebug("CanvasNavigator::updateParts: partHeight: %2f, ypos: %d", partHeight, ypos);
 				PartList* parts = track->parts();
 				if(parts && !parts->empty())
 				{
@@ -279,14 +293,21 @@ double CanvasNavigator::calcSize(int val)
 	return rv;
 }
 
-int CanvasNavigator::getSizeForCanvas(int size)
+int CanvasNavigator::sceneToTick(int size)
 {
 	int rv = 0;
 	rv = ((size * TICK_PER_PIXEL) * 100)/8;
 	return rv;
 }
 
-void CanvasNavigator::updateSelections(int)
+int CanvasNavigator::sceneToCanvas(int size)
+{
+	int rv = 0;
+	rv = (size * 100)/8;
+	return rv;
+}
+
+void CanvasNavigator::updateSelections(int)/*{{{*/
 {
 //	qDebug("CanvasNavigator::updateSelections");
 	foreach(PartItem* p, m_parts)
@@ -304,7 +325,7 @@ void CanvasNavigator::updateSelections(int)
 		}
 	}
 	//updateSpacing();
-}
+}/*}}}*/
 
 void CanvasNavigator::resizeEvent(QResizeEvent*)
 {
