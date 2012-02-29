@@ -176,6 +176,7 @@ void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 					connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
 					connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
 					connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
+					connect(header, SIGNAL(trackHeightChanged()), SIGNAL(trackHeightChanged()));
 					m_layout->insertWidget(m_headers.size(), header);
 					m_headers.append(header);
 				}
@@ -208,6 +209,7 @@ void HeaderList::updateTrackList(bool viewupdate)/*{{{*/
 			connect(this, SIGNAL(updateHeader(int)), header, SLOT(songChanged(int)));
 			connect(header, SIGNAL(selectionChanged(Track*)), SIGNAL(selectionChanged(Track*)));
 			connect(header, SIGNAL(trackInserted(int)), SIGNAL(trackInserted(int)));
+			connect(header, SIGNAL(trackHeightChanged()), SIGNAL(trackHeightChanged()));
 			m_headers.append(header);
 			m_layout->insertWidget(index, header);
 		}

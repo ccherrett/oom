@@ -110,6 +110,7 @@ protected:
 signals:
     void selectionChanged(Track*);
 	void trackInserted(int);
+	void trackHeightChanged();
 
 public:
 	TrackHeader(Track* track, QWidget* parent = 0);

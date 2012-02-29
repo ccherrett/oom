@@ -736,6 +736,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					m_track->setHeight(DEFAULT_TRACKHEIGHT);
 					song->update(SC_TRACK_MODIFIED);
 				}
+				emit trackHeightChanged();
 				break;
 			}
 			case 7:
@@ -749,6 +750,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					m_track->setHeight(MIN_TRACKHEIGHT);
 					song->update(SC_TRACK_MODIFIED);
 				}
+				emit trackHeightChanged();
 				break;
 			}
 			case 8:
@@ -762,6 +764,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					m_track->setHeight(TRACK_HEIGHT_3);
 					song->update(SC_TRACK_MODIFIED);
 				}
+				emit trackHeightChanged();
 				break;
 			}
 			case 9:
@@ -775,6 +778,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					m_track->setHeight(TRACK_HEIGHT_4);
 					song->update(SC_TRACK_MODIFIED);
 				}
+				emit trackHeightChanged();
 				break;
 			}
 			case 10:
@@ -788,6 +792,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					m_track->setHeight(TRACK_HEIGHT_5);
 					song->update(SC_TRACK_MODIFIED);
 				}
+				emit trackHeightChanged();
 				break;
 			}
 			case 11:
@@ -801,6 +806,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					m_track->setHeight(TRACK_HEIGHT_6);
 					song->update(SC_TRACK_MODIFIED);
 				}
+				emit trackHeightChanged();
 				break;
 			}
 			case 12:
@@ -820,6 +826,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					song->update(SC_TRACK_MODIFIED);
 					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(m_track));
 				}
+				emit trackHeightChanged();
 				break;
 			}
 			case 13:
@@ -838,6 +845,7 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 					song->update(SC_TRACK_MODIFIED);
 					oom->composer->verticalScrollSetYpos(oom->composer->getCanvas()->track2Y(m_track));
 				}
+				emit trackHeightChanged();
 				break;
 			}
 			case 15:
@@ -1919,6 +1927,8 @@ void TrackHeader::mouseMoveEvent(QMouseEvent* ev)/*{{{*/
 
 void TrackHeader::mouseReleaseEvent(QMouseEvent*)/*{{{*/
 {
+	if(mode == RESIZE)
+		emit trackHeightChanged();
 	mode = NORMAL;
 	setCursor(QCursor(Qt::ArrowCursor));
 	m_editing = false;

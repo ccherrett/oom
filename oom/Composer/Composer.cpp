@@ -314,6 +314,8 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	editorBox->addWidget(&virtualScroll);
 	connect(oom, SIGNAL(viewReady()), &virtualScroll, SLOT(updateSpacing()));
 	connect(canvas, SIGNAL(selectionChanged()), &virtualScroll, SLOT(updateSelections()));
+	connect(canvas, SIGNAL(trackHeightChanged()), &virtualScroll, SLOT(updateParts()));
+	connect(m_trackheader, SIGNAL(trackHeightChanged()), &virtualScroll, SLOT(updateParts()));
 	connect(&virtualScroll, SIGNAL(updateScroll(int, int)), this, SLOT(updateScroll(int, int)));
 	
 

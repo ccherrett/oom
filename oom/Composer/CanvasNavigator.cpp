@@ -47,8 +47,7 @@ void NavigatorScene::mousePressEvent(QGraphicsSceneMouseEvent* ev)
 {
 	if(ev->modifiers() & Qt::ShiftModifier)
 		emit updatePlayhead(ev->scenePos().x());
-	else
-		emit centerCanvas(ev->scenePos().x(), ev->scenePos().y());
+	emit centerCanvas(ev->scenePos().x(), ev->scenePos().y());
 }
 
 void NavigatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* )
@@ -89,6 +88,9 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	m_view->setFixedHeight(80);
 	layout->addWidget(m_view);
+	setFocusPolicy(Qt::NoFocus);
+	m_view->setFocusPolicy(Qt::NoFocus);
+	//m_scene->setFocusPolicy(Qt::NoFocus);
 	connect(m_scene, SIGNAL(centerCanvas(int, int)), this, SLOT(updateCanvasPosition(int, int)));
 	connect(m_scene, SIGNAL(updatePlayhead(int)), this, SLOT(updatePlayheadPosition(int)));
 }

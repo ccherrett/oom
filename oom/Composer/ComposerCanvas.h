@@ -177,6 +177,7 @@ signals:
     void selectTrackBelow();
 	void renameTrack(Track*);
 	void moveSelectedTracks(int);
+	void trackHeightChanged();
 
     void startEditor(PartList*, int);
 

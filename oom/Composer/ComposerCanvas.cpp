@@ -2050,6 +2050,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 				tr->setHeight(DEFAULT_TRACKHEIGHT);
 			}
 		}
+		emit trackHeightChanged();
 		song->update(SC_TRACK_MODIFIED);
 		return;
 	}
@@ -2066,6 +2067,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 			Track* tr = *tl.begin();
 			oom->composer->verticalScrollSetYpos(track2Y(tr));
 		}
+		emit trackHeightChanged();
 		song->update(SC_TRACK_MODIFIED);
 		return;
 	}
@@ -2082,6 +2084,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 			Track* tr = *tl.begin();
 			oom->composer->verticalScrollSetYpos(track2Y(tr));
 		}
+		emit trackHeightChanged();
 		song->update(SC_TRACK_MODIFIED);
 		return;
 	}
@@ -2097,6 +2100,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 				tr->setHeight(MIN_TRACKHEIGHT);
 			}
 		}
+		emit trackHeightChanged();
 		song->update(SC_TRACK_MODIFIED);
 		return;
 	}
@@ -2111,6 +2115,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 				tr->setHeight(100);
 			}
 		}
+		emit trackHeightChanged();
 		song->update(SC_TRACK_MODIFIED);
 		return;
 	}
@@ -2125,6 +2130,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 				tr->setHeight(180);
 			}
 		}
+		emit trackHeightChanged();
 		song->update(SC_TRACK_MODIFIED);
 		return;
 	}
@@ -2139,6 +2145,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 				tr->setHeight(320);
 			}
 		}
+		emit trackHeightChanged();
 		song->update(SC_TRACK_MODIFIED);
 		return;
 	}
@@ -2153,6 +2160,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 				tr->setHeight(640);
 			}
 		}
+		emit trackHeightChanged();
 		song->update(SC_TRACK_MODIFIED);
 		return;
 	}

@@ -64,6 +64,7 @@ signals:
     void redirectWheelEvent(QWheelEvent*);
 	void trackInserted(int);
 	void updateHeader(int);
+	void trackHeightChanged();
 
 public slots:
     void tracklistChanged();
