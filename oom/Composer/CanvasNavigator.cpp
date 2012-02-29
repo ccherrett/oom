@@ -50,8 +50,14 @@ void NavigatorScene::mousePressEvent(QGraphicsSceneMouseEvent* ev)
 	emit centerCanvas(ev->scenePos().x(), ev->scenePos().y());
 }
 
-void NavigatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* )
+void NavigatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* ev)
 {
+	if(ev->buttons() & (Qt::LeftButton | Qt::RightButton))
+	{
+		if(ev->modifiers() & Qt::ShiftModifier)
+			emit updatePlayhead(ev->scenePos().x());
+		emit centerCanvas(ev->scenePos().x(), ev->scenePos().y());
+	}
 }
 
 
