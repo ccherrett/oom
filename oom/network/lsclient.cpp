@@ -124,6 +124,11 @@ bool LSClient::startClient()/*{{{*/
 	}
 }/*}}}*/
 
+bool LSClient::isClientStarted()
+{
+	return _client != NULL;
+}
+
 void LSClient::stopClient()/*{{{*/
 {
 	if(_client != NULL)

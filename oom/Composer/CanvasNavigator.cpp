@@ -26,13 +26,14 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 : QWidget(parent)
 {
 	m_editing = false;
+	m_partGroup = 0;
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setFixedHeight(80);
 
-	m_scene = new QGraphicsScene(0, 0, 400, 48);
+	m_scene = new QGraphicsScene(QRectF());
 	m_scene->setBackgroundBrush(QColor(63, 63, 63));
 	
 	m_view = new QGraphicsView(m_scene);
@@ -40,22 +41,55 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+	m_view->setFixedHeight(80);
 	layout->addWidget(m_view);
 	QColor colTimeLine = QColor(0, 186, 255);
-	m_playhead = m_scene->addRect(calcSize(song->cpos()), 0, 2, 40);
-	m_playhead->setBrush(colTimeLine);
+	double val = calcSize(song->cpos());
+	m_playhead = new QGraphicsLineItem(val, 0, val, 80);
+	m_playhead->setPen(colTimeLine);
+	m_playhead->setZValue(124000.0f);
+	m_scene->addItem(m_playhead);
+	m_start = m_scene->addLine(0.0, 0.0, calcSize(song->len()), 0.0, QColor(63, 63, 63));
+	//m_playhead->setBrush(colTimeLine);
 }
 
 void CanvasNavigator::setCanvas(ComposerCanvas* c)
 {
 	m_canvas = c;
 	//TODO: Update all parts
+	QRect crect = m_canvas->contentsRect();
+	QRect mapped = m_canvas->mapDev(crect);
+	QRectF real(calcSize(mapped.x()), 0, calcSize(mapped.width()), 80);
+	m_canvasBox = m_scene->addRect(real);
+	m_canvasBox->setPen(QPen(Qt::red));
+}
+
+void CanvasNavigator::updateCanvasBox()
+{
+	if(m_canvasBox && m_canvas)
+	{
+		QRect crect = m_canvas->contentsRect();
+		QRect mapped = m_canvas->mapDev(crect);
+		QRectF real(calcSize(mapped.x()), 0, calcSize(mapped.width()), 80);
+		m_canvasBox->setRect(real);
+	}
 }
 
 void CanvasNavigator::advancePlayhead()
 {
 	if(m_playhead)
-		m_playhead->setPos(calcSize(song->cpos()), 0);
+	{
+		QPointF point(calcSize(song->cpos()), 0);
+		m_playhead->setPos(point);
+		//m_playhead->setScale(1.0);
+		//updateSpacing();
+	}
+	if(m_start)
+	{
+		QLineF line(0.0, 0.0, calcSize(song->len()), 0.0);
+		m_start->setLine(line);
+	}
+	updateCanvasBox();
 }
 
 void CanvasNavigator::updateParts()
@@ -70,7 +104,9 @@ void CanvasNavigator::updateParts()
 	int partHeight = 2;
 	//if(partHeight < MIN_PART_HEIGHT)
 	//	partHeight = MIN_PART_HEIGHT;
-	int index = 0;
+	m_scene->setSceneRect(QRectF());
+	int index = 1;
+	QList<QGraphicsItem*> group;
 	TrackList* tl = song->visibletracks();
 	for(ciTrack ci = tl->begin(); ci != tl->end(); ci++)
 	{
@@ -100,13 +136,14 @@ void CanvasNavigator::updateParts()
 						double w = calcSize(len);//m_canvas->mapx(len)+m_canvas->xOffsetDev();
 						double pos = calcSize(tick);//m_canvas->mapx(tick)+m_canvas->xOffsetDev();
 					//	qDebug("CanvasNavigator::updateParts: tick: %d, len: %d , pos: %d, w: %d", tick, len, pos, w);
-						PartItem* item = (PartItem*)m_scene->addRect(pos, index*partHeight, w, partHeight);
+						PartItem* item = new PartItem(pos, index*partHeight, w, partHeight);
 						item->setPart(part);
 						m_parts.append(item);
+						group.append((QGraphicsItem*)item);
 						int i = part->colorIndex();
 						QColor partWaveColor(config.partWaveColors[i]);
 						QColor partColor(config.partColors[i]);
-						partWaveColor.setAlpha(150);
+						//partWaveColor.setAlpha(150);
 						partColor.setAlpha(150);
 						item->setBrush(part->selected() ? partWaveColor : partColor);
 						item->setPen(part->selected() ? partColor : partWaveColor);
@@ -116,7 +153,19 @@ void CanvasNavigator::updateParts()
 			}
 		}
 	}
-	m_playhead->setRect(calcSize(song->cpos()), 0, 2, 40);
+	QPointF point(calcSize(song->cpos()), 0);
+	//m_playhead->setPos(m_playhead->mapFromItem((QGraphicsItem*)m_start, point));
+	//m_playhead->setLine(point.x(), point.y(), point.x(), m_scene->height());
+	group.append((QGraphicsItem*)m_start);
+	//group.append((QGraphicsItem*)m_playhead);
+	if(group.size())
+	{
+		m_partGroup = m_scene->createItemGroup(group);
+	}
+	else
+		m_partGroup = 0;
+	//m_playhead->setScale(1.0);
+	//m_start->setScale(1.0);
 	updateSpacing();
 	m_editing = false;
 }
@@ -139,13 +188,13 @@ void CanvasNavigator::updateSelections(int)
 			int i = part->colorIndex();
 			QColor partWaveColor(config.partWaveColors[i]);
 			QColor partColor(config.partColors[i]);
-			partWaveColor.setAlpha(150);
+			//partWaveColor.setAlpha(150);
 			partColor.setAlpha(150);
 			p->setBrush(part->selected() ? partWaveColor : partColor);
 			p->setPen(part->selected() ? partColor : partWaveColor);
 		}
 	}
-	updateSpacing();
+	//updateSpacing();
 }
 
 void CanvasNavigator::resizeEvent(QResizeEvent*)
@@ -155,10 +204,19 @@ void CanvasNavigator::resizeEvent(QResizeEvent*)
 
 void CanvasNavigator::updateSpacing()
 {
-	QRectF bounds = m_scene->itemsBoundingRect();
+	QRectF bounds;
+	if(m_partGroup)
+	{
+		bounds = m_partGroup->childrenBoundingRect();
+	}
+	else
+	{
+		bounds = m_scene->itemsBoundingRect();
+	}
 	//m_view->fitInView(bounds, Qt::IgnoreAspectRatio);
 	m_view->fitInView(bounds, Qt::KeepAspectRatio);
 	//m_view->fitInView(bounds, Qt::KeepAspectRatioByExpanding);
+	//m_start->setScale(1.0);
 }
 
 /*QSize CanvasNavigator::sizeHint() const

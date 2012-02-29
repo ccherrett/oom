@@ -7,6 +7,8 @@
 
 class QGraphicsView;
 class QGraphicsItem;
+class QGraphicsLineItem;
+class QGraphicsItemGroup;
 class QGraphicsScene;
 class QResizeEvent;
 class ComposerCanvas;
@@ -29,7 +31,10 @@ class CanvasNavigator : public QWidget
 	ComposerCanvas* m_canvas;
 	QGraphicsView* m_view;
 	QGraphicsScene* m_scene;
-	QGraphicsRectItem* m_playhead;
+	QGraphicsLineItem* m_playhead;
+	QGraphicsLineItem* m_start;
+	QGraphicsRectItem* m_canvasBox;
+	QGraphicsItemGroup* m_partGroup;
 
 	QList<PartItem*> m_parts;
 	bool m_editing;
@@ -45,6 +50,7 @@ public slots:
 	void updateParts();
 	void updateSpacing();
 	void updateSelections(int = -1);
+	void updateCanvasBox();
 	void advancePlayhead();
 
 public:

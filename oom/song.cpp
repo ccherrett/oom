@@ -1993,6 +1993,14 @@ void Song::beat()
 		emit song->midiNote(pitch, velo);
 		--noteFifoSize;
 	}
+	if(lsClient)
+	{
+		lsClientStarted = lsClient->isClientStarted();
+	}
+	else
+	{
+		lsClientStarted = false;
+	}
 }
 
 //---------------------------------------------------------

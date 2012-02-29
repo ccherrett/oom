@@ -85,6 +85,7 @@ public:
 	bool loadSamplerCommand(QString);
 	void removeLastChannel();
 	bool removeMidiMap(int m);
+	bool isClientStarted();
 	
 private:
 	const LSCPChannelInfo getKeyBindings(lscp_channel_info_t*);

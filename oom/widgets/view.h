@@ -89,11 +89,6 @@ protected:
     {
     }
 
-    QRect map(const QRect&) const;
-    QPoint map(const QPoint&) const;
-    QRect mapDev(const QRect&) const;
-    QPoint mapDev(const QPoint&) const;
-
     int mapy(int y) const;
     int mapyDev(int y) const;
     int mapxDev(int x) const;
@@ -119,6 +114,11 @@ public:
         brush.setColor(color);
         redraw();
     }
+
+    QRect map(const QRect&) const;
+    QPoint map(const QPoint&) const;
+    QRect mapDev(const QRect&) const;
+    QPoint mapDev(const QPoint&) const;
 
     void setXOffset(int v)
     {
