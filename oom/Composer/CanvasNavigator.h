@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QList>
 #include <QGraphicsRectItem>
+#include <QGraphicsScene>
 
 class QGraphicsView;
 class QGraphicsItem;
@@ -11,6 +12,8 @@ class QGraphicsLineItem;
 class QGraphicsItemGroup;
 class QGraphicsScene;
 class QResizeEvent;
+class QGraphicsSceneMouseEvent;
+class QGraphicsSceneWheelEvent;
 class ComposerCanvas;
 class Part;
 
@@ -24,13 +27,28 @@ public:
 	Part* part(){return  m_part;}
 };
 
+class NavigatorScene : public QGraphicsScene
+{
+	Q_OBJECT
+protected:
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent*);
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent*);
+	virtual void wheelEvent(QGraphicsSceneWheelEvent*);
+signals:
+	void centerCanvas(int);
+public:
+	NavigatorScene(QObject* parent = 0);
+	NavigatorScene(const QRectF&, QObject* parent = 0);
+	NavigatorScene(qreal x, qreal y, qreal w, qreal h, QObject* parent = 0);
+};
+
 class CanvasNavigator : public QWidget
 {
 	Q_OBJECT
 
 	ComposerCanvas* m_canvas;
 	QGraphicsView* m_view;
-	QGraphicsScene* m_scene;
+	NavigatorScene* m_scene;
 	//QGraphicsLineItem* m_playhead;
 	QGraphicsRectItem* m_playhead;
 	QGraphicsRectItem* m_start;
@@ -41,7 +59,6 @@ class CanvasNavigator : public QWidget
 	QList<int> m_heightList;
 	bool m_editing;
 
-	double calcSize(int);
 	void createCanvasBox();
 
 protected:
@@ -55,10 +72,13 @@ public slots:
 	void updateSelections(int = -1);
 	void updateCanvasBox();
 	void advancePlayhead();
+	void updateCanvasPosition(int);
 
 public:
 	CanvasNavigator(QWidget* parent = 0);
 	void setCanvas(ComposerCanvas* c);
+	static double calcSize(int);
+	static int getSizeForCanvas(int);
 };
 
 #endif

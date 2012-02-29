@@ -12,6 +12,9 @@
 static const double MIN_PART_HEIGHT = 1.0;
 static const double TICK_PER_PIXEL = 81.37;
 
+//---------------------------------------------------------------
+// PartItem
+//---------------------------------------------------------------
 PartItem::PartItem(qreal x, qreal y, qreal w, qreal h, QGraphicsItem* parent)
 : QGraphicsRectItem(x, y, w, h, parent)
 {
@@ -21,6 +24,43 @@ PartItem::PartItem(QRectF r, QGraphicsItem* parent)
 : QGraphicsRectItem(r, parent)
 {
 }
+
+//-----------------------------------------------------------------
+// NavigatorScene
+//----------------------------------------------------------------
+NavigatorScene::NavigatorScene(QObject* parent)
+: QGraphicsScene(parent)
+{
+}
+
+NavigatorScene::NavigatorScene(const QRectF &r, QObject* parent)
+: QGraphicsScene(r, parent)
+{
+}
+
+NavigatorScene::NavigatorScene(qreal x, qreal y, qreal w, qreal h, QObject* parent)
+: QGraphicsScene(x, y, w, h, parent)
+{
+}
+
+void NavigatorScene::mousePressEvent(QGraphicsSceneMouseEvent* ev)
+{
+	emit centerCanvas(CanvasNavigator::getSizeForCanvas(ev->scenePos().x()));
+}
+
+void NavigatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* )
+{
+}
+
+
+void NavigatorScene::wheelEvent(QGraphicsSceneWheelEvent* ev)
+{
+	ev->ignore();
+}
+
+//-------------------------------------------------------------
+// Main navigator widget
+//------------------------------------------------------------
 
 CanvasNavigator::CanvasNavigator(QWidget* parent)
 : QWidget(parent)
@@ -36,7 +76,7 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setFixedHeight(80);
 
-	m_scene = new QGraphicsScene(QRectF());
+	m_scene = new NavigatorScene(QRectF());
 	m_scene->setBackgroundBrush(QColor(63, 63, 63));
 	
 	m_view = new QGraphicsView(m_scene);
@@ -46,12 +86,22 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	m_view->setFixedHeight(80);
 	layout->addWidget(m_view);
+	connect(m_scene, SIGNAL(centerCanvas(int)), this, SLOT(updateCanvasPosition(int)));
 }
 
 void CanvasNavigator::setCanvas(ComposerCanvas* c)
 {
 	m_canvas = c;
 	createCanvasBox();
+}
+
+void CanvasNavigator::updateCanvasPosition(int pos)
+{
+	if(m_canvas)
+	{
+		Pos p(pos, true);
+		song->setPos(0, p);
+	}
 }
 
 void CanvasNavigator::createCanvasBox()
@@ -201,7 +251,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 	foreach(int i, m_heightList)
 		kpos += i;
 	kpos = ((kpos + 400) * 8)/100;
-	double val = calcSize(song->cpos());
+	//double val = calcSize(song->cpos());
 	//m_playhead = new QGraphicsLineItem(val, 0, val, kpos);
 	m_playhead = new QGraphicsRectItem(0, 0, 1, kpos);
 	m_playhead->setBrush(colTimeLine);
@@ -226,6 +276,13 @@ double CanvasNavigator::calcSize(int val)
 {
 	double rv = 0.0;
 	rv = ((val / TICK_PER_PIXEL) * 8)/100;
+	return rv;
+}
+
+int CanvasNavigator::getSizeForCanvas(int size)
+{
+	int rv = 0;
+	rv = ((size * TICK_PER_PIXEL) * 100)/8;
 	return rv;
 }
 
