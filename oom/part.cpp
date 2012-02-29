@@ -1100,16 +1100,9 @@ void Song::cmdResizePart(Track* track, Part* oPart, unsigned int len)/*{{{*/
                         if (oom->getCurrentTool() == StretchTool)
                         {
                             StretchDialog sdialog;
+                            sdialog.setFile(file.path(), file.dirPath());
                             if (sdialog.exec())
                             {
-                                qWarning("Stretch processing here:\n"
-                                         "Start Pos:  %i\n"
-                                         "Current Size: %i\n"
-                                         "New Size:     %i\n"
-                                         "Multiplicator: x%f"
-                                         "",
-                                         part_start, oPart->lenFrame(), new_partlength, float(new_partlength)/oPart->lenFrame());
-                                
                                 //nPart->addEvent()
                                 //WaveEvent newEvent = new WaveEvent(Wave);
                                 //newEvent.setLenFrame(new_partlength - event_startframe);
