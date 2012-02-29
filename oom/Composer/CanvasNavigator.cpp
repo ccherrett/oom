@@ -63,7 +63,7 @@ void CanvasNavigator::setCanvas(ComposerCanvas* c)
 	m_canvasBox->setFlag(QGraphicsItem::ItemIsMovable, true);
 	m_canvasBox->setZValue(124000.0f);
 	QPen pen(QColor(229, 233, 234));
-	pen.setWidth(3);
+	pen.setWidth(2);
 	pen.setCosmetic(true);
 	m_canvasBox->setPen(pen);
 }
