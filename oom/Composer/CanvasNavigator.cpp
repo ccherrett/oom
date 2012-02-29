@@ -155,8 +155,8 @@ void CanvasNavigator::updateCanvasBoxColor()
 				fillColor = QColor(config.partWaveColors[_curPart->colorIndex()]);
 			}
 		}
-		fillColor.setAlpha(127);
-		outlineColor.setAlpha(150);
+		fillColor.setAlpha(80);
+		outlineColor.setAlpha(100);
 		QPen pen(outlineColor, 2, Qt::SolidLine);
 		pen.setCosmetic(true);
 		m_canvasBox->setPen(pen);
