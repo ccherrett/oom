@@ -45,7 +45,7 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	layout->addWidget(m_view);
 	QColor colTimeLine = QColor(0, 186, 255);
 	double val = calcSize(song->cpos());
-	m_playhead = new QGraphicsLineItem(val, 0, val, 80);
+	m_playhead = new QGraphicsLineItem(val, 0, val, 48);
 	m_playhead->setPen(colTimeLine);
 	m_playhead->setZValue(124001.0f);
 	m_scene->addItem(m_playhead);
@@ -88,7 +88,12 @@ void CanvasNavigator::advancePlayhead()
 	if(m_playhead)
 	{
 		QPointF point(calcSize(song->cpos()), 0);
-		m_playhead->setLine(point.x(), point.y(), point.x(), m_scene->height());
+		/*TrackList* tl = song->visibletracks();
+		int tracks = tl->size();
+		double partHeight = (MIN_TRACKHEIGHT * 8)/100;
+		if(partHeight < MIN_PART_HEIGHT)
+			partHeight = MIN_PART_HEIGHT;
+		m_playhead->setLine(point.x(), point.y(), point.x(), tracks*partHeight);*/
 		m_playhead->setPos(point);
 		//m_playhead->setScale(1.0);
 		//updateSpacing();
