@@ -31,15 +31,18 @@ class CanvasNavigator : public QWidget
 	ComposerCanvas* m_canvas;
 	QGraphicsView* m_view;
 	QGraphicsScene* m_scene;
-	QGraphicsLineItem* m_playhead;
-	QGraphicsLineItem* m_start;
+	//QGraphicsLineItem* m_playhead;
+	QGraphicsRectItem* m_playhead;
+	QGraphicsRectItem* m_start;
 	QGraphicsRectItem* m_canvasBox;
 	QGraphicsItemGroup* m_partGroup;
 
 	QList<PartItem*> m_parts;
+	QList<int> m_heightList;
 	bool m_editing;
 
 	double calcSize(int);
+	void createCanvasBox();
 
 protected:
 	virtual void resizeEvent(QResizeEvent*);

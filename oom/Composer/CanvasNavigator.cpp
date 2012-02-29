@@ -27,6 +27,9 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 {
 	m_editing = false;
 	m_partGroup = 0;
+	m_start = 0;
+	m_playhead = 0;
+	m_canvasBox =  0;
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
@@ -43,24 +46,21 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 	m_view->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	m_view->setFixedHeight(80);
 	layout->addWidget(m_view);
-	QColor colTimeLine = QColor(0, 186, 255);
-	double val = calcSize(song->cpos());
-	m_playhead = new QGraphicsLineItem(val, 0, val, 48);
-	m_playhead->setPen(colTimeLine);
-	m_playhead->setZValue(124001.0f);
-	m_scene->addItem(m_playhead);
-	m_start = m_scene->addLine(0.0, 0.0, calcSize(song->len()), 0.0, QColor(63, 63, 63));
-	//m_playhead->setBrush(colTimeLine);
 }
 
 void CanvasNavigator::setCanvas(ComposerCanvas* c)
 {
 	m_canvas = c;
+	createCanvasBox();
+}
+
+void CanvasNavigator::createCanvasBox()
+{
 	QRect crect = m_canvas->contentsRect();
 	QRect mapped = m_canvas->mapDev(crect);
 	QRectF real(calcSize(mapped.x()), 0, calcSize(mapped.width()), 80);
 	m_canvasBox = m_scene->addRect(real);
-	m_canvasBox->setFlag(QGraphicsItem::ItemIsMovable, true);
+	//m_canvasBox->setFlag(QGraphicsItem::ItemIsMovable, true);
 	m_canvasBox->setZValue(124000.0f);
 	QPen pen(QColor(229, 233, 234));
 	pen.setWidth(2);
@@ -80,55 +80,84 @@ void CanvasNavigator::updateCanvasBox()
 		y = (y * 8)/100;
 		QRectF real(calcSize(mapped.x()), y, calcSize(mapped.width()), h);
 		m_canvasBox->setRect(real);
+		//m_view->ensureVisible(m_canvasBox, 0, 0);
 	}
 }
 
 void CanvasNavigator::advancePlayhead()
 {
+	if(m_editing)
+		return;
 	if(m_playhead)
 	{
-		QPointF point(calcSize(song->cpos()), 0);
-		/*TrackList* tl = song->visibletracks();
-		int tracks = tl->size();
-		double partHeight = (MIN_TRACKHEIGHT * 8)/100;
-		if(partHeight < MIN_PART_HEIGHT)
-			partHeight = MIN_PART_HEIGHT;
-		m_playhead->setLine(point.x(), point.y(), point.x(), tracks*partHeight);*/
+		QPoint point(calcSize(song->cpos()), 0);
 		m_playhead->setPos(point);
-		//m_playhead->setScale(1.0);
-		//updateSpacing();
 	}
 	if(m_start)
 	{
-		QLineF line(0.0, 0.0, calcSize(song->len()), 0.0);
-		m_start->setLine(line);
+		Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);
+		int mh = MIN_TRACKHEIGHT;
+		if(master)
+		{
+			mh = master->height();
+		}
+		double partHeight = (mh * 8)/100;
+		QRectF rect(0.0, 0.0, calcSize(song->len()), partHeight);
+		//QLineF line(0.0, 0.0, calcSize(song->len()), 0.0);
+		m_start->setRect(rect);
 	}
 	updateCanvasBox();
 }
 
-void CanvasNavigator::updateParts()
+void CanvasNavigator::updateParts()/*{{{*/
 {
 	m_editing = true;
-	foreach(PartItem* i, m_parts)
+	m_playhead = 0;
+	m_start = 0;
+	m_canvasBox =  0;
+	m_parts.clear();
+	m_scene->clear();
+	/*foreach(PartItem* i, m_parts)
 		m_scene->removeItem(i);
 	while(m_parts.size())
-		delete m_parts.takeFirst();
-	//m_parts.clear();
-	//m_scene->clear();
-	double partHeight = (MIN_TRACKHEIGHT * 8)/100;
-	if(partHeight < MIN_PART_HEIGHT)
-		partHeight = MIN_PART_HEIGHT;
+		delete m_parts.takeFirst();*/
+	m_heightList.clear();
 	m_scene->setSceneRect(QRectF());
 	int index = 1;
 	QList<QGraphicsItem*> group;
 	TrackList* tl = song->visibletracks();
-	for(ciTrack ci = tl->begin(); ci != tl->end(); ci++)
+	ciTrack ci = tl->begin();
+	for(; ci != tl->end(); ci++)
 	{
-		if((*ci)->type() == Track::WAVE || (*ci)->type() == Track::MIDI)
-		{
+		m_heightList.append((*ci)->height());
+	}
+	ci = tl->begin();
+	if(ci != tl->end())
+	{
+		int mh = (*ci)->height();
+		double partHeight = (mh * 8)/100;
+		m_start = m_scene->addRect(0.0, 0.0, calcSize(song->len()), partHeight);
+		m_start->setBrush(QColor(63, 63, 63));
+		m_start->setPen(QPen(QColor(63, 63, 63)));
+		m_start->setZValue(-50);
+		ci++;//Special case for master
+	}
+	for(; ci != tl->end(); ci++)
+	{
+		//if((*ci)->type() == Track::WAVE || (*ci)->type() == Track::MIDI)
+		//{
 			Track* track = *ci;
 			if(track)
 			{
+				QList<int> list = m_heightList.mid(0, index);
+				int ypos = 0;
+				foreach(int i, list)
+					ypos += i;
+				ypos = (ypos * 8)/100;
+				int ih = m_heightList.at(index);
+				double partHeight = (ih * 8)/100;
+					
+				qDebug("CanvasNavigator::updateParts: partHeight: %2f, ypos: %d", partHeight, ypos);
 				PartList* parts = track->parts();
 				if(parts && !parts->empty())
 				{
@@ -150,7 +179,7 @@ void CanvasNavigator::updateParts()
 						double w = calcSize(len);//m_canvas->mapx(len)+m_canvas->xOffsetDev();
 						double pos = calcSize(tick);//m_canvas->mapx(tick)+m_canvas->xOffsetDev();
 					//	qDebug("CanvasNavigator::updateParts: tick: %d, len: %d , pos: %d, w: %d", tick, len, pos, w);
-						PartItem* item = new PartItem(pos, index*partHeight, w, partHeight);
+						PartItem* item = new PartItem(pos, ypos, w, partHeight);
 						item->setPart(part);
 						m_parts.append(item);
 						group.append((QGraphicsItem*)item);
@@ -165,12 +194,22 @@ void CanvasNavigator::updateParts()
 				}
 				++index;
 			}
-		}
+		//}
 	}
-	qDebug("CanvasNavigator::updateParts: partHeight: %2f", partHeight);
-	QPointF point(calcSize(song->cpos()), 0);
-	//m_playhead->setPos(m_playhead->mapFromItem((QGraphicsItem*)m_start, point));
-	//m_playhead->setLine(point.x(), point.y(), point.x(), m_scene->height());
+	QColor colTimeLine = QColor(0, 186, 255);
+	int kpos = 0;
+	foreach(int i, m_heightList)
+		kpos += i;
+	kpos = ((kpos + 400) * 8)/100;
+	double val = calcSize(song->cpos());
+	//m_playhead = new QGraphicsLineItem(val, 0, val, kpos);
+	m_playhead = new QGraphicsRectItem(0, 0, 1, kpos);
+	m_playhead->setBrush(colTimeLine);
+	m_playhead->setPen(Qt::NoPen);
+	m_playhead->setZValue(124001.0f);
+	m_scene->addItem(m_playhead);
+	createCanvasBox();
+	//m_playhead->setBrush(colTimeLine);
 	group.append((QGraphicsItem*)m_start);
 	//group.append((QGraphicsItem*)m_playhead);
 	if(group.size())
@@ -179,11 +218,9 @@ void CanvasNavigator::updateParts()
 	}
 	else
 		m_partGroup = 0;
-	//m_playhead->setScale(1.0);
-	//m_start->setScale(1.0);
 	updateSpacing();
 	m_editing = false;
-}
+}/*}}}*/
 
 double CanvasNavigator::calcSize(int val)
 {
@@ -214,22 +251,22 @@ void CanvasNavigator::updateSelections(int)
 
 void CanvasNavigator::resizeEvent(QResizeEvent*)
 {
-	updateSpacing();
+	updateParts();
 }
 
 void CanvasNavigator::updateSpacing()
 {
 	QRectF bounds;
-	if(m_partGroup)
+/*	if(m_partGroup)
 	{
 		bounds = m_partGroup->childrenBoundingRect();
 	}
 	else
-	{
+	{*/
 		bounds = m_scene->itemsBoundingRect();
-	}
-	//m_view->fitInView(bounds, Qt::IgnoreAspectRatio);
-	m_view->fitInView(bounds, Qt::KeepAspectRatio);
+	//}
+	m_view->fitInView(bounds, Qt::IgnoreAspectRatio);
+	//m_view->fitInView(bounds, Qt::KeepAspectRatio);
 	//m_view->fitInView(bounds, Qt::KeepAspectRatioByExpanding);
 	//m_start->setScale(1.0);
 }
