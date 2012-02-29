@@ -5212,3 +5212,10 @@ void ComposerCanvas::trackViewChanged()
 	emit selectionChanged();
 	redraw();
 }
+
+Part* ComposerCanvas::currentCanvasPart()
+{
+	if(_curPart)
+		return _curPart;
+	return 0;
+}

@@ -75,6 +75,7 @@ public slots:
 	void updateSelections(int = -1);
 	void updateCanvasBox();
 	void advancePlayhead();
+	void updateCanvasBoxColor();
 
 signals:
 	void updateScroll(int, int);

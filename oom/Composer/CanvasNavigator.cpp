@@ -132,12 +132,36 @@ void CanvasNavigator::createCanvasBox()
 	QRect mapped = m_canvas->mapDev(crect);
 	QRectF real(calcSize(mapped.x()), 0, calcSize(mapped.width()), 80);
 	m_canvasBox = m_scene->addRect(real);
-	//m_canvasBox->setFlag(QGraphicsItem::ItemIsMovable, true);
 	m_canvasBox->setZValue(124000.0f);
-	QPen pen(QColor(229, 233, 234));
+	updateCanvasBoxColor();
+	/*QPen pen(QColor(229, 233, 234));
 	pen.setWidth(2);
 	pen.setCosmetic(true);
-	m_canvasBox->setPen(pen);
+	m_canvasBox->setPen(pen);*/
+}
+
+void CanvasNavigator::updateCanvasBoxColor()
+{
+	QColor outlineColor = QColor(config.partColors[1]);
+	QColor fillColor = QColor(config.partWaveColors[1]);
+	if(m_canvasBox)
+	{
+		if(m_canvas)
+		{
+			Part* _curPart = m_canvas->currentCanvasPart();
+			if(_curPart)
+			{
+				outlineColor = QColor(config.partColors[_curPart->colorIndex()]);
+				fillColor = QColor(config.partWaveColors[_curPart->colorIndex()]);
+			}
+		}
+		fillColor.setAlpha(127);
+		outlineColor.setAlpha(150);
+		QPen pen(outlineColor, 2, Qt::SolidLine);
+		pen.setCosmetic(true);
+		m_canvasBox->setPen(pen);
+		m_canvasBox->setBrush(QBrush(fillColor));
+	}
 }
 
 void CanvasNavigator::updateCanvasBox()/*{{{*/
@@ -332,6 +356,7 @@ void CanvasNavigator::updateSelections(int)/*{{{*/
 			p->setPen(part->selected() ? partColor : partWaveColor);
 		}
 	}
+	updateCanvasBoxColor();
 	//updateSpacing();
 }/*}}}*/
 

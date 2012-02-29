@@ -200,6 +200,7 @@ public:
 	bool isEditing() { return editMode; }
 	CItem* addPartAtCursor(Track*);
     virtual void newItem(CItem*, bool);
+	Part* currentCanvasPart();
 
 public slots:
 
