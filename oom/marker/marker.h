@@ -11,6 +11,7 @@
 #include <map>
 
 #include "xml.h"
+#include "utils.h"
 #include "pos.h"
 
 class QString;
@@ -20,19 +21,24 @@ class QString;
 //---------------------------------------------------------
 
 class Marker : public Pos {
+	  qint64 m_id;
       QString _name;
       bool _current;
 
    public:
-      Marker() : _current(false) {}
+      Marker() 
+	  : m_id(create_id())
+	  , _current(false)
+	  {}
       Marker(const QString& s, bool cur = false)
-         : _name(s), _current(cur) {}
+      : m_id(create_id()), _name(s), _current(cur) {}
       void read(Xml&);
       const QString name() const     { return _name; }
       void setName(const QString& s) { _name = s;    }
       bool current() const           { return _current; }
       void setCurrent(bool f)        { _current = f; }
-      };
+	  qint64 id() const  {return m_id;}
+};
 
 //---------------------------------------------------------
 //   MarkerList

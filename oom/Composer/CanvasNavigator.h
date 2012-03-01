@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QList>
+#include <QHash>
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
 
@@ -54,11 +55,15 @@ class CanvasNavigator : public QWidget
 	QGraphicsRectItem* m_playhead;
 	QGraphicsRectItem* m_start;
 	QGraphicsRectItem* m_canvasBox;
+	QGraphicsRectItem* m_punchIn;
+	QGraphicsRectItem* m_punchOut;
 	QGraphicsItemGroup* m_partGroup;
 
 	QList<PartItem*> m_parts;
 	QList<int> m_heightList;
+	QHash<qint64, QGraphicsRectItem*> m_markers;
 	bool m_editing;
+	bool m_updateMarkers;
 
 	void createCanvasBox();
 
@@ -76,6 +81,8 @@ public slots:
 	void updateCanvasBox();
 	void advancePlayhead();
 	void updateCanvasBoxColor();
+	void updateMarkers();
+	void updateLoopRange();
 
 signals:
 	void updateScroll(int, int);

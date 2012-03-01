@@ -8,6 +8,7 @@
 #include "track.h"
 #include "part.h"
 #include "app.h"
+#include "marker/marker.h"
 
 static const double MIN_PART_HEIGHT = 1.0;
 static const double TICK_PER_PIXEL = 81.37;
@@ -74,10 +75,13 @@ CanvasNavigator::CanvasNavigator(QWidget* parent)
 : QWidget(parent)
 {
 	m_editing = false;
+	m_updateMarkers = false;
 	m_partGroup = 0;
 	m_start = 0;
 	m_playhead = 0;
 	m_canvasBox =  0;
+	m_punchIn = 0;
+	m_punchOut = 0;
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
@@ -117,10 +121,7 @@ void CanvasNavigator::updateCanvasPosition(int x, int y)
 {
 	if(m_canvas)
 	{
-		//Pos p(sceneToTick(x), true);
-		//song->setPos(0, p);
 		int pos = ((m_canvas->mapx(sceneToTick(x))+m_canvas->xOffsetDev())-(m_canvas->width()/2));
-		//m_canvas->setXPos(sceneToCanvas(x) - m_canvas->width());
 		int ypos = sceneToCanvas(y)-200;
 		emit updateScroll(pos, ypos);
 	}
@@ -134,10 +135,6 @@ void CanvasNavigator::createCanvasBox()
 	m_canvasBox = m_scene->addRect(real);
 	m_canvasBox->setZValue(124000.0f);
 	updateCanvasBoxColor();
-	/*QPen pen(QColor(229, 233, 234));
-	pen.setWidth(2);
-	pen.setCosmetic(true);
-	m_canvasBox->setPen(pen);*/
 }
 
 void CanvasNavigator::updateCanvasBoxColor()
@@ -161,6 +158,38 @@ void CanvasNavigator::updateCanvasBoxColor()
 		pen.setCosmetic(true);
 		m_canvasBox->setPen(pen);
 		m_canvasBox->setBrush(QBrush(fillColor));
+	}
+}
+
+void CanvasNavigator::updateMarkers()
+{
+	MarkerList* markers = song->marker();
+	for (iMarker m = markers->begin(); m != markers->end(); ++m)
+	{
+		QPointF point(calcSize(m->second.tick()), 0.0);
+		QGraphicsRectItem* marker = m_markers.value(m->second.id());
+		if(marker)
+			marker->setPos(point);
+	}
+}
+
+void CanvasNavigator::updateLoopRange()
+{
+	double lpos = calcSize(song->lpos());
+	double rpos = calcSize(song->rpos());
+	/*int mapped = m_canvas->mapx(song->lpos());
+	int rmapped = m_canvas->mapx(song->rpos());
+	double lpos = calcSize(mapped);
+	double rpos = calcSize(rmapped);*/
+	if(m_punchIn)
+	{
+		m_punchIn->setPos(QPointF(lpos, 0.0));
+		m_punchIn->setVisible(song->loop() || song->punchin());
+	}
+	if(m_punchOut)
+	{
+		m_punchOut->setPos(QPointF(rpos, 0.0));
+		m_punchOut->setVisible(song->loop() || song->punchout());
 	}
 }
 
@@ -203,6 +232,10 @@ void CanvasNavigator::advancePlayhead()/*{{{*/
 		m_start->setRect(rect);
 	}
 	updateCanvasBox();
+	updateLoopRange();
+	if(m_updateMarkers)
+		updateMarkers();
+	m_updateMarkers = true;
 }/*}}}*/
 
 void CanvasNavigator::updateParts()/*{{{*/
@@ -211,7 +244,10 @@ void CanvasNavigator::updateParts()/*{{{*/
 	m_playhead = 0;
 	m_start = 0;
 	m_canvasBox =  0;
+	m_punchIn = 0;
+	m_punchOut = 0;
 	m_parts.clear();
+	m_markers.clear();
 	m_scene->clear();
 	/*foreach(PartItem* i, m_parts)
 		m_scene->removeItem(i);
@@ -240,57 +276,54 @@ void CanvasNavigator::updateParts()/*{{{*/
 	}
 	for(; ci != tl->end(); ci++)
 	{
-		//if((*ci)->type() == Track::WAVE || (*ci)->type() == Track::MIDI)
-		//{
-			Track* track = *ci;
-			if(track)
+		Track* track = *ci;
+		if(track)
+		{
+			QList<int> list = m_heightList.mid(0, index);
+			int ypos = 0;
+			foreach(int i, list)
+				ypos += i;
+			ypos = (ypos * 8)/100;
+			int ih = m_heightList.at(index);
+			double partHeight = (ih * 8)/100;
+				
+			//qDebug("CanvasNavigator::updateParts: partHeight: %2f, ypos: %d", partHeight, ypos);
+			PartList* parts = track->parts();
+			if(parts && !parts->empty())
 			{
-				QList<int> list = m_heightList.mid(0, index);
-				int ypos = 0;
-				foreach(int i, list)
-					ypos += i;
-				ypos = (ypos * 8)/100;
-				int ih = m_heightList.at(index);
-				double partHeight = (ih * 8)/100;
-					
-				//qDebug("CanvasNavigator::updateParts: partHeight: %2f, ypos: %d", partHeight, ypos);
-				PartList* parts = track->parts();
-				if(parts && !parts->empty())
+				for(iPart p = parts->begin(); p != parts->end(); p++)
 				{
-					for(iPart p = parts->begin(); p != parts->end(); p++)
-					{
-						Part *part =  p->second;
+					Part *part =  p->second;
 
-						int tick, len;
-						if(part && track->isMidiTrack())
-						{
-							tick = part->tick();
-							len = part->lenTick();
-						}
-						else
-						{
-							tick = tempomap.frame2tick(part->frame());
-							len = tempomap.frame2tick(part->lenFrame());
-						}
-						double w = calcSize(len);//m_canvas->mapx(len)+m_canvas->xOffsetDev();
-						double pos = calcSize(tick);//m_canvas->mapx(tick)+m_canvas->xOffsetDev();
-					//	qDebug("CanvasNavigator::updateParts: tick: %d, len: %d , pos: %d, w: %d", tick, len, pos, w);
-						PartItem* item = new PartItem(pos, ypos, w, partHeight);
-						item->setPart(part);
-						m_parts.append(item);
-						group.append((QGraphicsItem*)item);
-						int i = part->colorIndex();
-						QColor partWaveColor(config.partWaveColors[i]);
-						QColor partColor(config.partColors[i]);
-						//partWaveColor.setAlpha(150);
-						partColor.setAlpha(150);
-						item->setBrush(part->selected() ? partWaveColor : partColor);
-						item->setPen(part->selected() ? partColor : partWaveColor);
+					int tick, len;
+					if(part && track->isMidiTrack())
+					{
+						tick = part->tick();
+						len = part->lenTick();
 					}
+					else
+					{
+						tick = tempomap.frame2tick(part->frame());
+						len = tempomap.frame2tick(part->lenFrame());
+					}
+					double w = calcSize(len);
+					double pos = calcSize(tick);
+				
+					PartItem* item = new PartItem(pos, ypos, w, partHeight);
+					item->setPart(part);
+					m_parts.append(item);
+					group.append((QGraphicsItem*)item);
+					int i = part->colorIndex();
+					QColor partWaveColor(config.partWaveColors[i]);
+					QColor partColor(config.partColors[i]);
+					//partWaveColor.setAlpha(150);
+					partColor.setAlpha(150);
+					item->setBrush(part->selected() ? partWaveColor : partColor);
+					item->setPen(part->selected() ? partColor : partWaveColor);
 				}
-				++index;
 			}
-		//}
+			++index;
+		}
 	}
 	QColor colTimeLine = QColor(0, 186, 255);
 	int kpos = 0;
@@ -304,8 +337,39 @@ void CanvasNavigator::updateParts()/*{{{*/
 	m_playhead->setPen(Qt::NoPen);
 	m_playhead->setZValue(124001.0f);
 	m_scene->addItem(m_playhead);
+	QColor loopColor(139, 225, 69);
+	QColor markerColor(243,191,124);
+	MarkerList* markers = song->marker();
+	for (iMarker m = markers->begin(); m != markers->end(); ++m)
+	{
+		//double xp = calcSize(m->second.tick());
+		QGraphicsRectItem *marker = m_scene->addRect(0, 0, 1, kpos);
+		marker->setData(Qt::UserRole, m->second.id());
+		m_markers[m->second.id()] = marker;
+		marker->setPen(Qt::NoPen);
+		marker->setBrush(markerColor);
+		marker->setZValue(124002.0f);
+		m_updateMarkers = true;
+	}
+
+	//double lpos = calcSize(song->lpos());
+	//double rpos = calcSize(song->rpos());
+	m_punchIn = new QGraphicsRectItem(0, 0, 1, kpos);
+	m_punchIn->setBrush(loopColor);
+	m_punchIn->setPen(Qt::NoPen);
+	m_punchIn->setZValue(124003.0f);
+	m_scene->addItem(m_punchIn);
+	m_punchIn->setVisible(song->loop() || song->punchin());
+
+	m_punchOut = new QGraphicsRectItem(0, 0, 1, kpos);
+	m_punchOut->setBrush(loopColor);
+	m_punchOut->setPen(Qt::NoPen);
+	m_punchOut->setZValue(124003.0f);
+	m_scene->addItem(m_punchOut);
+	m_punchOut->setVisible(song->loop() || song->punchout());
+
 	createCanvasBox();
-	//m_playhead->setBrush(colTimeLine);
+	
 	group.append((QGraphicsItem*)m_start);
 	//group.append((QGraphicsItem*)m_playhead);
 	if(group.size())

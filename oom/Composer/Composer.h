@@ -96,6 +96,7 @@ private slots:
     void songlenChanged(int);
     void trackSelectionChanged();
     void songChanged(int);
+    void markerChanged(int);
     void modeChange(int);
     void setTime(unsigned);
     void globalPitchChanged(int);

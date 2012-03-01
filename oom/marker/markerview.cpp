@@ -158,7 +158,7 @@ MarkerView::MarkerView(QWidget* parent)
 {
 	//setAttribute(Qt::WA_DeleteOnClose);
 
-	setWindowTitle(tr("OOMidi: Marker"));
+	setWindowTitle(tr("OOStudio: Marker"));
 
 	QAction* markerAdd = new QAction(QIcon(*plusIconSet3), tr("add marker"), this);
 	connect(markerAdd, SIGNAL(triggered()), SLOT(addMarker()));

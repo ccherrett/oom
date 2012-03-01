@@ -354,6 +354,7 @@ Composer::Composer(QMainWindow* parent, const char* name)
 	connect(canvas, SIGNAL(dclickPart(Track*)), SIGNAL(editPart(Track*)));
 	connect(canvas, SIGNAL(startEditor(PartList*, int)), SIGNAL(startEditor(PartList*, int)));
 
+	connect(song, SIGNAL(markerChanged(int)), SLOT(markerChanged(int)));
 	connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	connect(song, SIGNAL(composerViewChanged()), SLOT(composerViewChanged()));
     connect(song, SIGNAL(punchinChanged(bool)), canvas, SLOT(update()));
@@ -594,7 +595,7 @@ void Composer::songChanged(int type)
 			//canvas->setYPos(0);
 			//vscroll->setValue(0);
 		}
-		if(type & (SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_MODIFIED | SC_VIEW_CHANGED | SC_TRACK_REMOVED))
+		if(type & (SC_PART_INSERTED | SC_PART_REMOVED | SC_PART_MODIFIED | SC_VIEW_CHANGED | SC_TRACK_REMOVED | SC_TRACK_INSERTED))
 		{//Scroll to top
 			virtualScroll.updateParts();
 		}
@@ -603,6 +604,25 @@ void Composer::songChanged(int type)
 	}
 
 	updateConductor(type);
+}
+
+void Composer::markerChanged(int flag)
+{
+	switch(flag)
+	{
+		case Song::MARKER_ADD:
+		case Song::MARKER_REMOVE:
+			virtualScroll.updateParts();
+		break;
+		case Song::MARKER_TICK:
+			virtualScroll.updateMarkers();
+		break;
+		//case Song::MARKER_CUR:
+		//case Song::MARKER_NAME:
+		//case Song::MARKER_LOCK
+		default:
+		break;
+	}
 }
 
 void Composer::splitterMoved(int pos, int)
