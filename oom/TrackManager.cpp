@@ -248,10 +248,19 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			m_track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false, false);
 			if(m_track)
 			{
-				if(vtrack->instrumentType == SYNTH_INSTRUMENT)
-					m_track->setHeight(MIN_TRACKHEIGHT);
+				//if(vtrack->instrumentType == SYNTH_INSTRUMENT)
+				m_track->setHeight(MIN_TRACKHEIGHT);
 				if(vtrack->autoCreateInstrument)
-					loadInstrument(vtrack);
+				{
+					if(!loadInstrument(vtrack))
+					{
+						song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
+						song->startUndo();
+						song->removeTrack(track);
+						song->endUndo(SC_TRACK_REMOVED);
+						return 0;
+					}
+				}
 
 				song->undoOp(UndoOp::AddTrack, m_insertPosition, m_track);
 				MidiTrack* mtrack = (MidiTrack*)m_track;
