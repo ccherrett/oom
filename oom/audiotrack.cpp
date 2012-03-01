@@ -151,7 +151,7 @@ void AudioTrack::idlePlugin(BasePlugin* plugin)
 
 void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
 {
-    printf("AudioTrack::addPlugin(%p, %d) \n", plugin, idx);
+    qDebug("AudioTrack::addPlugin(%p, %d) \n", plugin, idx);
     if (plugin == 0)
     {
         BasePlugin* oldPlugin = (*_efxPipe)[idx];

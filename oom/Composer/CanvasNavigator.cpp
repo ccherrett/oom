@@ -175,19 +175,15 @@ void CanvasNavigator::updateMarkers()
 
 void CanvasNavigator::updateLoopRange()
 {
-	double lpos = calcSize(song->lpos());
-	double rpos = calcSize(song->rpos());
-	/*int mapped = m_canvas->mapx(song->lpos());
-	int rmapped = m_canvas->mapx(song->rpos());
-	double lpos = calcSize(mapped);
-	double rpos = calcSize(rmapped);*/
 	if(m_punchIn)
 	{
+		double lpos = calcSize(song->lpos());
 		m_punchIn->setPos(QPointF(lpos, 0.0));
 		m_punchIn->setVisible(song->loop() || song->punchin());
 	}
 	if(m_punchOut)
 	{
+		double rpos = calcSize(song->rpos());
 		m_punchOut->setPos(QPointF(rpos, 0.0));
 		m_punchOut->setVisible(song->loop() || song->punchout());
 	}
@@ -330,8 +326,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 	foreach(int i, m_heightList)
 		kpos += i;
 	kpos = ((kpos + 400) * 8)/100;
-	//double val = calcSize(song->cpos());
-	//m_playhead = new QGraphicsLineItem(val, 0, val, kpos);
+	
 	m_playhead = new QGraphicsRectItem(0, 0, 1, kpos);
 	m_playhead->setBrush(colTimeLine);
 	m_playhead->setPen(Qt::NoPen);
@@ -352,8 +347,6 @@ void CanvasNavigator::updateParts()/*{{{*/
 		m_updateMarkers = true;
 	}
 
-	//double lpos = calcSize(song->lpos());
-	//double rpos = calcSize(song->rpos());
 	m_punchIn = new QGraphicsRectItem(0, 0, 1, kpos);
 	m_punchIn->setBrush(loopColor);
 	m_punchIn->setPen(Qt::NoPen);

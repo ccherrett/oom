@@ -614,6 +614,22 @@ MidiTrack::~MidiTrack()
 {
 	delete _events;
 	delete _mpevents;
+	if(_wantsAutomation)
+	{
+    	if (_outPort >= 0 && _outPort < MIDI_PORTS)
+    	{
+    	    if (midiPorts[_outPort].device() && midiPorts[_outPort].device()->isSynthPlugin())
+    	    {
+    	        SynthPluginDevice* dev = (SynthPluginDevice*)midiPorts[_outPort].device();
+				dev->close();
+    	    }
+			midiPorts[_outPort].inRoutes()->clear();
+			midiPorts[_outPort].outRoutes()->clear();
+			midiPorts[_outPort].patchSequences()->clear();
+			midiPorts[_outPort].setFoundInSongFile(false);
+			midiPorts[_outPort].setMidiDevice(0);
+    	}
+	}
 }
 
 //---------------------------------------------------------
