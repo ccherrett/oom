@@ -123,6 +123,7 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
 	chkStartLS->setChecked(config.lsClientStartLS);
 	txtLSPath->setText(config.lsClientLSPath);
+	btnStartStopLS->hide();
 
 	connect(applyButton, SIGNAL(clicked()), SLOT(apply()));
 	connect(okButton, SIGNAL(clicked()), SLOT(ok()));

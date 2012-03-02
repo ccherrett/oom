@@ -1044,13 +1044,13 @@ void Route::read(Xml& xml)/*{{{*/
 				{
 					if(midiPortId > 0)
 					{
-						qDebug("Route::read(): MIDI_PORT_ROUTE Finding midiport from id");
+						//qDebug("Route::read(): MIDI_PORT_ROUTE Finding midiport from id");
 						type = rtype;
 						MidiPort *mp = oomMidiPorts.value(midiPortId);
 						if(mp)
 						{
 							midiPort = mp->portno();
-							qDebug("Route::read(): Found midiport from id: %d", midiPort);
+							//qDebug("Route::read(): Found midiport from id: %d", midiPort);
 						}
 					}
 					else if (port >= 0 && port < MIDI_PORTS)
@@ -1098,7 +1098,7 @@ void Route::read(Xml& xml)/*{{{*/
 							jport = audioDevice->findPort(s.toLatin1().constData());
 
 						if (jport == 0)
-							printf("Route::read(): jack port <%s> not found\n", s.toLatin1().constData());
+							printf("Route::read(): jack port <%s> not found audioDevice(%p)\n", s.toLatin1().constData(), audioDevice);
 						else
 						{
 							jackPort = jport;

@@ -309,7 +309,7 @@ bool initJackAudio()
 	doSetuid();
 
 	jack_status_t status;
-	jack_client_t* client = jack_client_open("OOMidi", JackUseExactName, &status);
+	jack_client_t* client = jack_client_open("OOMidi", JackNoStartServer, &status);
 	if (!client)
 	{
 		if (status & JackServerStarted)

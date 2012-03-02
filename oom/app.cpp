@@ -1661,7 +1661,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	}
 
 	//Reset Linuxsampler if user selected reset on song load
-	if(config.lsClientResetOnSongStart)
+	if(config.lsClientResetOnSongStart && !firstrun)
 	{
 		//Start Linuxsampler
 		if(config.lsClientStartLS)
@@ -1696,22 +1696,6 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		{
 			QMessageBox::critical(this, tr("LinuxSampler Client Failed!!"), tr("You have configured OOStudio to start a LinuxSampler\n however the LinuxSampler client failed to start"));
 		}
-		/*if(!lsClient)
-		{
-			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
-			lsClientStarted = lsClient->startClient();
-			if(lsClientStarted)
-				lsClient->resetSampler();
-		}
-		else if(!lsClientStarted)
-		{
-			lsClientStarted = lsClient->startClient();
-			if(lsClientStarted)
-				lsClient->resetSampler();
-		}
-		else
-			lsClient->resetSampler();
-		*/
 	}
 	//Configure the my input list
 
