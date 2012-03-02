@@ -29,6 +29,7 @@ class QColor;
 class QPixmap;
 class LSClient;
 class TrackManager;
+class LSThread;
 
 extern const float denormalBias;
 
@@ -200,5 +201,7 @@ extern bool gUpdateAuxes;
 extern TrackManager* trackManager;
 extern QList<QPair<int, QString> > gInputList;
 extern QList<int> gInputListPorts;
+extern LSThread* gLSThread;
+extern bool gSamplerStarted;
 #endif
 

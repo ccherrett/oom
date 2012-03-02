@@ -84,6 +84,7 @@
 #endif
 
 #include "traverso_shared/TConfig.h"
+#include "network/LSThread.h"
 
 //extern void cacheJackRouteNames();
 
@@ -1324,32 +1325,47 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//               2  - load configured start song
 	//---------------------------------------------------
 
-	QString name;
-	bool useTemplate = false;
-	if (argc >= 2)
-		name = argv[0];
+	m_useTemplate = false;
+	if (argc >= 2)/*{{{*/
+		m_initProjectName = argv[0];
 	else if (config.startMode == 0)
 	{
 		if (argc < 2)
-			name = projectList[0] ? *projectList[0] : QString("untitled");
+			m_initProjectName = projectList[0] ? *projectList[0] : QString("untitled");
 		else
-			name = argv[0];
+			m_initProjectName = argv[0];
 		printf("starting with selected song %s\n", config.startSong.toLatin1().constData());
 	}
 	else if (config.startMode == 1)
 	{
 		printf("starting with default template\n");
-		name = oomGlobalShare + QString("/templates/default.oom");
-		useTemplate = true;
+		m_initProjectName = oomGlobalShare + QString("/templates/default.oom");
+		m_useTemplate = true;
 	}
 	else if (config.startMode == 2)
 	{
 		printf("starting with pre configured song %s\n", config.startSong.toLatin1().constData());
-		name = config.startSong;
+		m_initProjectName = config.startSong;
+	}/*}}}*/
+
+	/**
+	 * Load linuxsampler 
+	 */
+	if(config.lsClientStartLS)
+	{
+		if(gSamplerStarted)
+			loadInitialProject();
+		else
+			lsStartupFailed();
+		//connect(&gLSThread, SIGNAL(startupSuccess()), this, SLOT(loadInitialProject()));
+		//connect(&gLSThread, SIGNAL(startupFailed()), this, SLOT(lsStartupFailed()));
+		//gLSThread.start();
 	}
-	song->blockSignals(false);
-	loadProjectFile(name, useTemplate, true);
-	changeConfig(false);
+	else
+	{
+		loadInitialProject();
+	}
+
 	QSize defaultScreenSize = tconfig().get_property("Interface", "size", QSize(0, 0)).toSize();
 	int dw = qApp->desktop()->width();
 	int dh = qApp->desktop()->height();
@@ -1372,8 +1388,6 @@ OOMidi::OOMidi(int argc, char** argv) : QMainWindow()
 	//restoreDockWidget(_resourceDock);
 	//restoreDockWidget(m_mixerDock);
 
-	readInstrumentTemplates();
-	song->update();
 
 	setCorner(Qt::BottomLeftCorner, Qt:: LeftDockWidgetArea);
 }
@@ -1388,6 +1402,46 @@ OOMidi::~OOMidi()
 	tconfig().set_property("Interface", "geometry", saveGeometry());
     // Save the new global settings to the configuration file
     tconfig().save();
+}
+
+void OOMidi::loadInitialProject()
+{
+	qDebug("Entering OOMidi::loadInitialProject~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	if(config.lsClientAutoStart)
+	{
+		bool started = false;
+		while(!started)
+		{
+			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+			lsClientStarted = lsClient->startClient();
+			if(config.lsClientResetOnStart && lsClientStarted)
+			{
+				lsClient->resetSampler();
+			}
+			started = lsClient && lsClient->isClientStarted();
+			sleep(1);
+		}
+	}
+
+	song->blockSignals(false);
+	loadProjectFile(m_initProjectName, m_useTemplate, true);
+	changeConfig(false);
+	readInstrumentTemplates();
+	song->update();
+	qDebug("Leaving OOMidi::loadInitialProject~~~~~~~~~~~~~~~~~~~~~~~~~~");
+}
+
+void OOMidi::lsStartupFailed()
+{
+	qDebug("Entering OOMidi::lsStartupFailed~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	m_initProjectName = oomGlobalShare + QString("/templates/default.oom");
+	m_useTemplate = true;
+	song->blockSignals(false);
+	loadProjectFile(m_initProjectName, m_useTemplate, true);
+	changeConfig(false);
+	readInstrumentTemplates();
+	song->update();
+	qDebug("Leaving OOMidi::lsStartupFailed~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
 
 void OOMidi::showUndoView()
@@ -2291,6 +2345,11 @@ void OOMidi::closeEvent(QCloseEvent* event)
 	}
 	seqStop();
 
+	if(config.lsClientStartLS)
+	{
+		if(gLSThread)
+			gLSThread->quit();
+	}
 	WaveTrackList* wt = song->waves();
 	for (iWaveTrack iwt = wt->begin(); iwt != wt->end(); ++iwt)
 	{

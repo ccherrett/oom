@@ -711,6 +711,8 @@ GlobalConfigValues config = {
 	true, //LSCP client auto start
 	false, //Reset LS on client start
 	false, //Reset LS on song start
+	true, //Start LinuxSampler on startup
+	QString("linuxsampler"), //LinuxSampler Path
 	0, //Default audio raster index
 	1, //Default midi raster index
 	true //Use auto crossfades

@@ -34,6 +34,8 @@ private slots:
     void cancel();
 	void startLSClientNow();
 	void resetLSNow();
+	void startStopSampler();
+	void selectedSamplerPath();
     void selectInstrumentsPath();
     void defaultInstrumentsPath();
 

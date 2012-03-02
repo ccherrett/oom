@@ -156,6 +156,8 @@ struct GlobalConfigValues
 	bool lsClientAutoStart;
 	bool lsClientResetOnStart;
 	bool lsClientResetOnSongStart;
+	bool lsClientStartLS;
+	QString lsClientLSPath;
 	int audioRaster;
 	int midiRaster;
 	bool useAutoCrossFades;

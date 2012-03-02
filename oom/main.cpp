@@ -27,6 +27,7 @@
 #include "globals.h"
 #include "icons.h"
 #include "sync.h"
+#include "network/LSThread.h"
 
 extern bool initDummyAudio();
 extern void initIcons();
@@ -338,14 +339,12 @@ int main(int argc, char* argv[])
 			stimer->start(6000);
 		}
 	}
-	if(config.lsClientAutoStart)
+	
+	//Start Linuxsampler
+	if(config.lsClientStartLS)
 	{
-		lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
-		lsClientStarted = lsClient->startClient();
-		if(config.lsClientResetOnStart && lsClientStarted)
-		{
-			lsClient->resetSampler();
-		}
+		gLSThread = new LSThread();
+		gLSThread->start();
 	}
 
 	int i;

@@ -19,6 +19,7 @@
 #include "app.h"
 #include "gconfig.h"
 #include "midiseq.h"
+#include "network/LSThread.h"
 
 #include "mididev.h"
 #include "audio.h"
@@ -85,6 +86,7 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	m_inputsModel = new QStandardItemModel(this);
 	inputView->setModel(m_inputsModel);
 	populateInputs();
+	btnBrowseLS->setIcon(QIcon(*browseIconSet3));
 	btnRefreshInput->setIcon(QIcon(*refreshIconSet3));
 	selectInstrumentsDirButton->setIcon(QIcon(*browseIconSet3));
 	defaultInstrumentsDirButton->setIcon(QIcon(*refreshIconSet3));
@@ -115,9 +117,12 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	m_chkAutofade->setChecked(config.useAutoCrossFades);
 	chkStartLSClient->setChecked(config.lsClientAutoStart);
 	btnStartLSClient->setText(lsClientStarted ? tr("Stop Now") : tr("Start Now"));
+	btnStartStopLS->setText(gSamplerStarted ? tr("Stop Now") : tr("Start Now"));
 	btnResetLSNow->setEnabled(lsClientStarted);
 	chkResetLSOnStartup->setChecked(config.lsClientResetOnStart);
 	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
+	chkStartLS->setChecked(config.lsClientStartLS);
+	txtLSPath->setText(config.lsClientLSPath);
 
 	connect(applyButton, SIGNAL(clicked()), SLOT(apply()));
 	connect(okButton, SIGNAL(clicked()), SLOT(ok()));
@@ -125,6 +130,21 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	connect(btnStartLSClient, SIGNAL(clicked()), SLOT(startLSClientNow()));
 	connect(btnResetLSNow, SIGNAL(clicked()), SLOT(resetLSNow()));
 	connect(btnRefreshInput, SIGNAL(clicked()), this, SLOT(populateInputs()));
+	connect(btnStartStopLS, SIGNAL(clicked()), SLOT(startStopSampler()));
+	connect(btnBrowseLS, SIGNAL(clicked()), SLOT(selectSamplerPath()));
+}
+
+void GlobalSettingsConfig::startStopSampler()
+{
+}
+
+void GlobalSettingsConfig::selectedSamplerPath()
+{
+	QString ls = QFileDialog::getOpenFileName(this, tr("Locate LinuxSampler binary"));
+	if(!ls.isNull())
+	{
+		txtLSPath->setText(ls);
+	}
 }
 
 void GlobalSettingsConfig::populateInputs()/*{{{*/
@@ -231,9 +251,12 @@ void GlobalSettingsConfig::updateSettings()
 	projectSaveCheckBox->setChecked(config.useProjectSaveDialog);
 	chkStartLSClient->setChecked(config.lsClientAutoStart);
 	btnStartLSClient->setText(lsClientStarted ? tr("Stop Now") : tr("Start Now"));
+	btnStartStopLS->setText(gSamplerStarted ? tr("Stop Now") : tr("Start Now"));
 	btnResetLSNow->setEnabled(lsClientStarted);
 	chkResetLSOnStartup->setChecked(config.lsClientResetOnStart);
 	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
+	chkStartLS->setChecked(config.lsClientStartLS);
+	txtLSPath->setText(config.lsClientLSPath);
 	populateInputs();
 	//TODO: Set icon for status of lsClient
 }
@@ -335,6 +358,8 @@ void GlobalSettingsConfig::apply()
 	oomUserInstruments = config.userInstrumentsDir;
 	config.lsClientResetOnStart = chkResetLSOnStartup->isChecked();
 	config.lsClientResetOnSongStart = chkResetLSOnSongLoad->isChecked();
+	config.lsClientStartLS = chkStartLS->isChecked();
+	config.lsClientLSPath = txtLSPath->text();
 
 	gInputList.clear();
 	for(int i = 0; i < m_inputsModel->rowCount(); ++i)
@@ -345,6 +370,7 @@ void GlobalSettingsConfig::apply()
 			gInputList.append(qMakePair(item->data(Qt::UserRole+2).toInt(), item->data(Qt::UserRole+1).toString()));
 		}
 	}
+//FIXME: Initialize the ports right now that were added and unconfigurethe ones that were removed
 
 	oom->setHeartBeat(); // set guiRefresh
 	midiSeq->msgSetRtc(); // set midi tick rate

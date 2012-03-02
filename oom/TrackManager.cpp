@@ -256,8 +256,9 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					{
 						song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 						song->startUndo();
-						song->removeTrack(track);
+						song->removeTrack(m_track);
 						song->endUndo(SC_TRACK_REMOVED);
+						m_track = 0;
 						return 0;
 					}
 				}

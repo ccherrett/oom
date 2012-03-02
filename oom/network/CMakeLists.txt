@@ -27,6 +27,7 @@ QT4_WRAP_CPP ( network_mocs
 if(LSCP_SUPPORT)
 QT4_WRAP_CPP ( network_mocs
 	lsclient.h
+	LSThread.h
 	${network_mocs}
       )
 endif(LSCP_SUPPORT)
@@ -40,6 +41,7 @@ file (GLOB network_source_files
 if(LSCP_SUPPORT)
 file (GLOB network_source_files
 	lsclient.cpp
+	LSThread.cpp
 	${network_source_files}
 )
 endif(LSCP_SUPPORT)

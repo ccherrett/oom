@@ -252,7 +252,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 	m_heightList.clear();
 	m_scene->setSceneRect(QRectF());
 	int index = 1;
-	QList<QGraphicsItem*> group;
+	//QList<QGraphicsItem*> group;
 	TrackList* tl = song->visibletracks();
 	ciTrack ci = tl->begin();
 	for(; ci != tl->end(); ci++)
@@ -308,7 +308,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 					PartItem* item = new PartItem(pos, ypos, w, partHeight);
 					item->setPart(part);
 					m_parts.append(item);
-					group.append((QGraphicsItem*)item);
+					//group.append((QGraphicsItem*)item);
 					int i = part->colorIndex();
 					QColor partWaveColor(config.partWaveColors[i]);
 					QColor partColor(config.partColors[i]);
@@ -316,6 +316,7 @@ void CanvasNavigator::updateParts()/*{{{*/
 					partColor.setAlpha(150);
 					item->setBrush(part->selected() ? partWaveColor : partColor);
 					item->setPen(part->selected() ? partColor : partWaveColor);
+					m_scene->addItem(item);
 				}
 			}
 			++index;
@@ -363,13 +364,13 @@ void CanvasNavigator::updateParts()/*{{{*/
 
 	createCanvasBox();
 	
-	group.append((QGraphicsItem*)m_start);
+	//group.append((QGraphicsItem*)m_start);
 	//group.append((QGraphicsItem*)m_playhead);
-	if(group.size())
-	{
-		m_partGroup = m_scene->createItemGroup(group);
-	}
-	else
+	//if(group.size())
+	//{
+	//	m_partGroup = m_scene->createItemGroup(group);
+	//}
+	//else
 		m_partGroup = 0;
 	updateSpacing();
 	m_editing = false;

@@ -270,7 +270,7 @@ VstPlugin::~VstPlugin()
     // delete synth audio ports
     if (m_hints & PLUGIN_IS_SYNTH)
     {
-        if (m_ainsCount > 0)
+        if (m_ainsCount > 0 &&  audioDevice)
         {
             for (uint32_t i=0; i < m_ainsCount; i++)
 			{
@@ -279,7 +279,7 @@ VstPlugin::~VstPlugin()
 			}
         }
         
-        if (m_aoutsCount > 0)
+        if (m_aoutsCount > 0 &&  audioDevice)
         {
             for (uint32_t i=0; i < m_aoutsCount; i++)
 			{

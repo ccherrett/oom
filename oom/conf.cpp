@@ -925,6 +925,14 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)/*{{{*/
 				{
 					config.lsClientResetOnSongStart = xml.parseInt();
 				}
+				else if(tag == "lsClientStartLS")
+				{
+					config.lsClientStartLS = xml.parseInt();
+				}
+				else if(tag == "lsClientLSPath")
+				{
+					config.lsClientLSPath = xml.parse1();
+				}
 				else if(tag == "globalInputList")
 				{
 					readGlobalInputList(xml);
@@ -1238,6 +1246,8 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.intTag(level, "lsClientAutoStart", config.lsClientAutoStart);
 	xml.intTag(level, "lsClientResetOnStart", config.lsClientResetOnStart);
 	xml.intTag(level, "lsClientResetOnSongStart", config.lsClientResetOnSongStart);
+	xml.strTag(level, "lsClientLSPath", config.lsClientLSPath);
+	xml.intTag(level, "lsClientStartLS", config.lsClientStartLS);
 	
 	xml.intTag(level, "vuColorStrip", vuColorStrip);
 	if(gInputList.size())

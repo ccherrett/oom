@@ -232,6 +232,9 @@ class OOMidi : public QMainWindow
 	bool lscpRestart;
 #endif
 	
+	QString m_initProjectName;
+	bool m_useTemplate;
+	
 	//-------------------------------------------------------------
 	// Instrument Templates
 	//-------------------------------------------------------------
@@ -385,6 +388,8 @@ private slots:
     void execUserScript(int);
 
 	void performerClosed();
+	void loadInitialProject();
+	void lsStartupFailed();
 
 
 public slots:

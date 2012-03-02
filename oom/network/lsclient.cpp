@@ -113,6 +113,7 @@ bool LSClient::startClient()/*{{{*/
 	}
 	else
 	{
+		//Check if linuxsampler is running at all
 		qDebug("Failed to Initialize LSCP client connection, retrying");
 		_client = ::lscp_client_create(_hostname.toUtf8().constData(), _port, client_callback, this);
 		_lastInfo.valid = false;
@@ -126,7 +127,16 @@ bool LSClient::startClient()/*{{{*/
 
 bool LSClient::isClientStarted()
 {
-	return _client != NULL;
+	bool rv = false;
+	if(_client != NULL)
+	{//Run a test to see if the sampler is really there
+		lscp_server_info_t* info = ::lscp_get_server_info(_client);
+		if(info != NULL)
+		{
+			rv = true;
+		}
+	}
+	return rv;
 }
 
 void LSClient::stopClient()/*{{{*/
