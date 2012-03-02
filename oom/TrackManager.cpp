@@ -254,6 +254,8 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				{
 					if(!loadInstrument(vtrack))
 					{
+						qDebug("Failed to load instrument");
+						//QMessageBox::critical(this, tr("Instrument Load Failed"), tr("An error has occurred.\nFailed to load instrument"));
 						song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 						song->startUndo();
 						song->removeTrack(m_track);
@@ -744,7 +746,7 @@ bool TrackManager::removeTrack(VirtualTrack* vtrack)/*{{{*/
 
 bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 {
-	bool rv = false;
+	bool rv = true;
 	Track::TrackType type = (Track::TrackType)vtrack->type;
 	if(type == Track::MIDI)
 	{
@@ -814,7 +816,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 			case SYNTH_INSTRUMENT://SYNTH instrument, falkTx do your synth on the fly creation hooks here
 			{
                 int portIdx = getFreeMidiPort();
-                
+                rv = false;
                 if (portIdx >= 0)
                 {
                     for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
@@ -837,9 +839,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 							m_synthConfigs.append(qMakePair(portIdx, devName));
                             m_synthConfigs.append(qMakePair(0, selectedInput));
                             m_synthConfigs.append(qMakePair(0, selectedInput2));
-							//vtrack->outputConfig = qMakePair(portIdx, devName);
-                            //vtrack->monitorConfig  = qMakePair(0, selectedInput);
-                            //vtrack->monitorConfig2 = qMakePair(0, selectedInput2);
+							rv = true;
 
                             break;
                         }
@@ -849,6 +849,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 			break;
 			case GM_INSTRUMENT:  //Regular idf no linuxsampler
 			{
+				rv = true;
 			}
 			break;
 		}

@@ -4,6 +4,7 @@
 //  (C) Copyright 2011 Andrew Williams & Christopher Cherrett
 //===========================================================
 
+#include <QMessageBox>
 #include "CreateTrackDialog.h"
 #include "NameValidator.h"
 #include "globals.h"
@@ -423,6 +424,11 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			{
 				qDebug("Sucessfully added track");
 				done(1);
+			}
+			else
+			{
+				QMessageBox::critical(this, tr("Create Track Failed"), tr("Unknown error occurred.\nFailed to add new track."));
+				done(0);
 			}
 		}
 	}

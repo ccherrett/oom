@@ -1021,16 +1021,22 @@ void Lv2Plugin::reload()
 
     if (m_ainsCount > 0)
     {
-        for (uint32_t i=0; i < m_ainsCount; i++)
-            audioDevice->unregisterPort(m_portsIn[i]);
+		if(audioDevice)
+		{
+        	for (uint32_t i=0; i < m_ainsCount; i++)
+            	audioDevice->unregisterPort(m_portsIn[i]);
+		}	
 
         delete[] m_portsIn;
     }
 
     if (m_aoutsCount > 0)
     {
-        for (uint32_t i=0; i < m_aoutsCount; i++)
-            audioDevice->unregisterPort(m_portsOut[i]);
+		if(audioDevice)
+		{
+        	for (uint32_t i=0; i < m_aoutsCount; i++)
+            	audioDevice->unregisterPort(m_portsOut[i]);
+		}
 
         delete[] m_portsOut;
     }
