@@ -167,20 +167,10 @@ bool Audio::start()
 	state = STOP;
 	_loopCount = 0;
 	oom->setHeartBeat();
-	if (audioDevice)
+	if (!audioDevice)
 	{
-		// Added by Tim. p3.3.6
-		//_running = true;
-
-		//audioDevice->start();
-	}
-	else
-	{
-		if (false == initJackAudio())
+		if (!initJackAudio())
 		{
-			// Added by Tim. p3.3.6
-			//_running = true;
-
 			InputList* itl = song->inputs();
 			for (iAudioInput i = itl->begin(); i != itl->end(); ++i)
 			{
@@ -199,7 +189,6 @@ bool Audio::start()
 				//printf("name=%s\n",(*i)->name().toLatin1());
 				(*i)->setName((*i)->name()); // restore jack connection
 			}
-			//audioDevice->start();
 		}
 		else
 		{
@@ -208,17 +197,19 @@ bool Audio::start()
 		}
 	}
 
-	audioDevice->start(realTimePriority);
+	if(audioDevice)
+	{
+		audioDevice->start(realTimePriority);
 
-	_running = true;
+		_running = true;
 
-	// shall we really stop JACK transport and locate to
-	// saved position?
-
-	audioDevice->stopTransport();
-	//audioDevice->seekTransport(song->cPos().frame());
-	audioDevice->seekTransport(song->cPos());
-	return true;
+		// shall we really stop JACK transport and locate to
+		// saved position?
+		audioDevice->stopTransport();
+		audioDevice->seekTransport(song->cPos());
+		return true;
+	}
+	return false;
 }
 
 //---------------------------------------------------------

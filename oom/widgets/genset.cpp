@@ -131,7 +131,7 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	connect(btnResetLSNow, SIGNAL(clicked()), SLOT(resetLSNow()));
 	connect(btnRefreshInput, SIGNAL(clicked()), this, SLOT(populateInputs()));
 	connect(btnStartStopLS, SIGNAL(clicked()), SLOT(startStopSampler()));
-	connect(btnBrowseLS, SIGNAL(clicked()), SLOT(selectSamplerPath()));
+	connect(btnBrowseLS, SIGNAL(clicked()), SLOT(selectedSamplerPath()));
 }
 
 void GlobalSettingsConfig::startStopSampler()

@@ -1410,7 +1410,8 @@ void OOMidi::loadInitialProject()
 	if(config.lsClientAutoStart)
 	{
 		bool started = false;
-		while(!started)
+		int retry = 0;
+		while(!started && retry <= 10)
 		{
 			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
 			lsClientStarted = lsClient->startClient();
@@ -1420,6 +1421,11 @@ void OOMidi::loadInitialProject()
 			}
 			started = lsClient && lsClient->isClientStarted();
 			sleep(1);
+			retry++;
+		}
+		if(retry >= 10 && !started)
+		{
+			QMessageBox::critical(this, tr("LinuxSampler Client Failed!!"), tr("You have configured OOStudio to start a LinuxSampler\n however the LinuxSampler client failed to start"));
 		}
 	}
 
@@ -1649,10 +1655,48 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	composer->clear(); // clear track info
 	//Clear the ID based oomMidiPorts hash, it will be repopulated when the song loads
 	oomMidiPorts.clear();
+	if (clearSong())
+	{
+		return;
+	}
+
 	//Reset Linuxsampler if user selected reset on song load
 	if(config.lsClientResetOnSongStart)
 	{
-		if(!lsClient)
+		//Start Linuxsampler
+		if(config.lsClientStartLS)
+		{
+			if(gLSThread)
+			{
+				if(lsClient)
+					lsClient->stopClient();
+				lsClient = 0;
+				gLSThread->quit();
+				gLSThread = 0;
+				gSamplerStarted = false;
+			}
+			gLSThread = new LSThread();
+			gLSThread->start();
+		}
+		bool started = false;
+		int retry = 0;
+		while(!started && retry <= 10)
+		{
+			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+			lsClientStarted = lsClient->startClient();
+			if(config.lsClientResetOnStart && lsClientStarted)
+			{
+				lsClient->resetSampler();
+			}
+			started = lsClient && lsClient->isClientStarted();
+			sleep(1);
+			retry++;
+		}
+		if(retry >= 10 && !started)
+		{
+			QMessageBox::critical(this, tr("LinuxSampler Client Failed!!"), tr("You have configured OOStudio to start a LinuxSampler\n however the LinuxSampler client failed to start"));
+		}
+		/*if(!lsClient)
 		{
 			lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
 			lsClientStarted = lsClient->startClient();
@@ -1667,12 +1711,8 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		}
 		else
 			lsClient->resetSampler();
+		*/
 	}
-	if (clearSong())
-	{
-		return;
-	}
-
 	//Configure the my input list
 
 	QFileInfo fi(name);
