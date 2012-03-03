@@ -324,14 +324,8 @@ std::list<QString> DummyAudioDevice::inputPorts(bool midi, int /*aliases*/)
 
 static void* dummyLoop(void* ptr)
 {
-	//unsigned int tickRate = 25;
-
-	// p3.3.30
-	//sampleRate = 25600;
 	sampleRate = config.dummyAudioSampleRate;
-	//segmentSize = dummyFrames;
 	segmentSize = config.dummyAudioBufSize;
-	//unsigned int tickRate = sampleRate / dummyFrames;
 	unsigned int tickRate = sampleRate / segmentSize;
 
 	AlsaTimer timer;
@@ -340,9 +334,6 @@ static void* dummyLoop(void* ptr)
 	int fd = timer.initTimer();
 	if (fd == -1)
 	{
-		//  QMessageBox::critical( 0, /*tr*/(QString("Failed to start timer for dummy audio driver!")),
-		//        /*tr*/(QString("No functional timer was available.\n"
-		//                   "Alsa timer not available, check if module snd_timer is available and /dev/snd/timer is available")));
 		fprintf(stderr, "Failed to start timer for dummy audio driver! No functional timer was available.\n"
 				"Alsa timer not available, check if module snd_timer is available and /dev/snd/timer is available\n");
 		pthread_exit(0);
@@ -355,7 +346,6 @@ static void* dummyLoop(void* ptr)
 	 */
 	tickRate = timer.setTimerFreq(/*250*/ tickRate);
 
-	// p3.3.31
 	// If it didn't work, get the actual rate.
 	if (tickRate == 0)
 		tickRate = timer.getTimerFreq();
@@ -370,42 +360,8 @@ static void* dummyLoop(void* ptr)
 	myPollFd.fd = fd;
 	myPollFd.events = POLLIN;
 
-	/*
-	doSetuid();
-	struct sched_param rt_param;
-	int rv;
-	memset(&rt_param, 0, sizeof(sched_param));
-	int type;
-	rv = pthread_getschedparam(pthread_self(), &type, &rt_param);
-	if (rv != 0)
-		  perror("get scheduler parameter");
-	if (type != SCHED_FIFO) {
-		  fprintf(stderr, "Driver thread not running SCHED_FIFO, trying to set...\n");
-
-		  memset(&rt_param, 0, sizeof(sched_param));
-		  //rt_param.sched_priority = 1;
-		  rt_param.sched_priority = realtimePriority();
-		  rv = pthread_setschedparam(pthread_self(), SCHED_FIFO, &rt_param);
-		  if (rv != 0)
-				perror("set realtime scheduler");
-		  memset(&rt_param, 0, sizeof(sched_param));
-		  rv = pthread_getschedparam(pthread_self(), &type, &rt_param);
-		  if (rv != 0)
-				perror("get scheduler parameter");
-		  if (type == SCHED_FIFO) {
-				drvPtr->setRealTime();
-				fprintf(stderr, "Thread succesfully set to SCHED_FIFO\n");
-				}
-				else {
-				fprintf(stderr, "Unable to set thread to SCHED_FIFO\n");
-				}
-		  }
-	undoSetuid();
-	 */
-
 #ifndef __APPLE__
 	doSetuid();
-	//if (realTimePriority) {
 	if (realTimeScheduling)
 	{
 		//
@@ -436,7 +392,6 @@ static void* dummyLoop(void* ptr)
 	undoSetuid();
 #endif
 
-	/* unsigned long tick = 0;*/ // prevent compiler warning: unused variable
 	for (;;)
 	{
 		int _pollWait = 10; // ms
@@ -488,15 +443,11 @@ static void* dummyLoop(void* ptr)
 	pthread_exit(0);
 }
 
-//void DummyAudioDevice::start()
-
 void DummyAudioDevice::start(int priority)
 {
-	//realTimePriority = priority;
 	_realTimePriority = priority;
 	pthread_attr_t* attributes = 0;
 
-	//if (priority) {
 	if (realTimeScheduling && priority > 0)
 	{
 		attributes = (pthread_attr_t*) malloc(sizeof (pthread_attr_t));
@@ -520,8 +471,6 @@ void DummyAudioDevice::start(int priority)
 		}
 	}
 
-	//pthread_attr_t* attributes = (pthread_attr_t*) malloc(sizeof(pthread_attr_t));
-	//pthread_attr_init(attributes);
 	if (pthread_create(&dummyThread, attributes, ::dummyLoop, this))
 		perror("creating thread failed:");
 	if (priority)

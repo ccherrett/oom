@@ -2474,38 +2474,69 @@ void Song::clear(bool signal)
 	}
 
 	// Make sure to delete Jack midi devices, and remove all ALSA midi device routes...
-	// Otherwise really nasty things happen when loading another song when one is already loaded.
-	// The loop is a safe way to delete while iterating.
-	bool loop;
-	do
+	QList<MidiDevice*> deleteList;
+	for (iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
 	{
-		loop = false;
-		for (iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
+		MidiDevice* md = (MidiDevice*)*imd;
+		if(md)
 		{
-			//if((*imd)->deviceType() == MidiDevice::JACK_MIDI)
-			if (dynamic_cast<MidiJackDevice*> (*imd))
+			int type = md->deviceType();
+			switch(type)
+			{
+				case MidiDevice::SYNTH_MIDI:
+				{//Properly handle synths
+					deleteList.append(md);
+				}
+				break;
+				case MidiDevice::JACK_MIDI:
+				{
+					deleteList.append(md);
+				}
+				break;
+				case MidiDevice::ALSA_MIDI:
+				{
+					// With alsa devices, we must not delete them (they're always in the list). But we must
+					//  clear all routes. They point to non-existant midi tracks, which were all deleted above.
+					(*imd)->inRoutes()->clear();
+					(*imd)->outRoutes()->clear();
+				}
+				break;
+			}
+		}
+	}
+
+	//Now safely delete them from the device list
+	foreach(MidiDevice* md, deleteList)
+	{
+		int type = md->deviceType();
+		switch(type)
+		{
+			case MidiDevice::SYNTH_MIDI:
+			{//Properly handle synths
+				SynthPluginDevice* synth = (SynthPluginDevice*)md;
+				if (synth && synth->duplicated())
+				{
+				    midiDevices.remove(md);
+				    synth->close();
+				    //delete synth;
+				}
+			}
+			break;
+			case MidiDevice::JACK_MIDI:
 			{
 				// Remove the device from the list.
-				midiDevices.erase(imd);
+				midiDevices.remove(md);
 				// Since Jack midi devices are created dynamically, we must delete them.
 				// The destructor unregisters the device from Jack, which also disconnects all device-to-jack routes.
 				// This will also delete all midi-track-to-device routes, they point to non-existant midi tracks
 				//  which were all deleted above
-				delete (*imd);
-				loop = true;
-				break;
+				delete md;
 			}
-			else
-				//if((*imd)->deviceType() == MidiDevice::ALSA_MIDI)
-				if (dynamic_cast<MidiAlsaDevice*> (*imd))
-			{
-				// With alsa devices, we must not delete them (they're always in the list). But we must
-				//  clear all routes. They point to non-existant midi tracks, which were all deleted above.
-				(*imd)->inRoutes()->clear();
-				(*imd)->outRoutes()->clear();
-			}
+			break;
+			default://ALSA already handled
+			break;
 		}
-	} while (loop);
+	}
 
 	tempomap.clear();
 	AL::sigmap.clear();
@@ -2810,7 +2841,6 @@ void Song::seqSignal(int fd)/*{{{*/
 					audioDevice->graphChanged();
 				break;
 
-				// p3.3.37
 			case 'R': // Registration changed
 				if (audioDevice)
 					audioDevice->registrationChanged();

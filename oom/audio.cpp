@@ -553,7 +553,6 @@ void Audio::process1(unsigned samplePos, unsigned offset, unsigned frames)
 			continue;
 		track = (AudioTrack*) (*it);
 
-		// Added by T356.
 		// For audio track types, synths etc. which need some kind of non-audio
 		//  (but possibly audio-affecting) processing always, even if their output path
 		//  is ultimately unconnected.
@@ -832,7 +831,6 @@ void Audio::seek(const Pos& p)
 		return;
 	}
 
-	// p3.3.23
 	//printf("Audio::seek frame:%d\n", p.frame());
 	_pos = p;
 	if (!checkAudioDevice()) return;
@@ -843,7 +841,6 @@ void Audio::seek(const Pos& p)
 	midiSeq->msgSeek(); // handle stuck notes and set
 	// controller for new position
 
-	// p3.3.31
 	// Don't send if external sync is on. The master, and our sync routing system will take care of that.
 	if (!extSyncFlag.value())
 	{
@@ -852,26 +849,8 @@ void Audio::seek(const Pos& p)
 		{
 			MidiPort* mp = &midiPorts[port];
 			MidiDevice* dev = mp->device();
-			//if(!dev || !mp->syncInfo().MCOut())
 			if (!dev || !mp->syncInfo().MRTOut())
 				continue;
-
-			// Added by T356: Shall we check for device write open flag to see if it's ok to send?...
-			// This means obey what the user has chosen for read/write in the midi port config dialog,
-			//  which already takes into account whether the device is writable or not.
-			//if(!(dev->rwFlags() & 0x1) || !(dev->openFlags() & 1))
-			//if(!(dev->openFlags() & 1))
-			//  continue;
-
-			//int port = dev->midiPort();
-
-			// By checking for no port here (-1), (and out of bounds), it means
-			//  the device must be assigned to a port for these MMC commands to be sent.
-			// Without this check, interesting sync things can be done by the user without ever
-			//  assigning any devices to ports !
-			//if(port < 0 || port > MIDI_PORTS)
-			//if(port < -1 || port > MIDI_PORTS)
-			//  continue;
 
 			int beat = (curTickPos * 4) / config.division;
 
@@ -886,77 +865,12 @@ void Audio::seek(const Pos& p)
 		}
 	}
 
-	/*
-	if(genMCSync)
-	{
-	  for(iMidiDevice imd = midiDevices.begin(); imd != midiDevices.end(); ++imd)
-	  {
-		MidiDevice* dev = (*imd);
-		if(!dev->syncInfo().MCOut())
-		  continue;
-            
-		// Added by T356: Shall we check for device write open flag to see if it's ok to send?...
-		// This means obey what the user has chosen for read/write in the midi port config dialog,
-		//  which already takes into account whether the device is writable or not.
-		//if(!(dev->rwFlags() & 0x1) || !(dev->openFlags() & 1))
-		//if(!(dev->openFlags() & 1))
-		//  continue;
-          
-		int port = dev->midiPort();
-          
-		// By checking for no port here (-1), (and out of bounds), it means
-		//  the device must be assigned to a port for these MMC commands to be sent.
-		// Without this check, interesting sync things can be done by the user without ever
-		//  assigning any devices to ports !
-		//if(port < 0 || port > MIDI_PORTS)
-		if(port < -1 || port > MIDI_PORTS)
-		  continue;
-          
-		int beat = (curTickPos * 4) / config.division;
-            
-		bool isPlaying=false;
-		if(state == PLAY)
-		  isPlaying = true;
-            
-		if(port == -1)
-		// Send straight to the device... Copied from MidiPort.
-		{
-		  MidiPlayEvent event(0, 0, 0, ME_STOP, 0, 0);
-		  dev->putEvent(event);
-            
-		  event.setType(ME_SONGPOS);
-		  event.setA(beat);
-		  dev->putEvent(event);
-            
-		  if(isPlaying)
-		  {
-			event.setType(ME_CONTINUE);
-			event.setA(0);
-			dev->putEvent(event);
-		  }
-		}
-		else
-		// Go through the port...
-		{
-		  MidiPort* mp = &midiPorts[port];
-            
-		  mp->sendStop();
-		  mp->sendSongpos(beat);
-		  if(isPlaying)
-			mp->sendContinue();
-		}
-	  }
-	}
-	 */
-
-	//loopPassed = true;   // for record loop mode
 	if (state != LOOP2 && !freewheel())
 	{
-		// Changed by T356 08/17/08. We need to force prefetch to update,
+		// We need to force prefetch to update,
 		//  to ensure the most recent data. Things can happen to a part
 		//  before play is pressed - such as part muting, part moving etc.
 		// Without a force, the wrong data was being played.
-		//audioPrefetch->msgSeek(_pos.frame());
 		audioPrefetch->msgSeek(_pos.frame(), true);
 	}
 
@@ -992,8 +906,6 @@ void Audio::writeTick()
 
 void Audio::startRolling()
 {
-	// Changed by Tim. p3.3.8
-	//startRecordPos = _pos;
 	if (debugMsg)
 		printf("startRolling - loopCount=%d, _pos=%d\n", _loopCount, _pos.tick());
 
@@ -1017,7 +929,6 @@ void Audio::startRolling()
 	state = PLAY;
 	write(sigFd, "1", 1); // Play
 
-	// p3.3.31
 	// Don't send if external sync is on. The master, and our sync routing system will take care of that.
 	if (!extSyncFlag.value())
 	{
@@ -1096,8 +1007,6 @@ void Audio::startRolling()
 			}
 		}
 	}
-
-	//tempomap.clearExtTempoList();
 }
 
 //---------------------------------------------------------
@@ -1106,10 +1015,6 @@ void Audio::startRolling()
 
 void Audio::stopRolling()
 {
-	// Added by Tim. p3.3.20
-	//if(debugMsg)
-	//  printf("Audio::stopRolling state %s\n", audioStates[state]);
-
 	state = STOP;
 	midiSeq->msgStop();
 
@@ -1140,7 +1045,6 @@ void Audio::stopRolling()
 
 #endif
 
-	// p3.3.31
 	// Don't send if external sync is on. The master, and our sync routing system will take care of that.
 	if (!extSyncFlag.value())
 	{
@@ -1207,9 +1111,6 @@ void Audio::recordStop()
 
 			track->setRecFile(0); // flush out the old file
 			song->setRecordFlag(track, false); //
-
-			//track->setRecordFlag1(true);       // and re-arm the track here
-			//song->setRecordFlag(track, true);  // here
 		}
 	}
 	MidiTrackList* ml = song->midis();

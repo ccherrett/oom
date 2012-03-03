@@ -4422,8 +4422,14 @@ bool OOMidi::clearSong()
 				//goto again;
 		}
 	}
-	printf("OOMidi::clearSong() TopLevel.size(%d) \n", (int)toplevels.size());
 	toplevels.clear();
+	if(performer)
+	{
+		performer->hide();
+		delete performer;
+		performer = 0;
+	}
+	//printf("OOMidi::clearSong() TopLevel.size(%d) \n", (int)toplevels.size());
 	microSleep(100000);
 	song->clear(false);
 	microSleep(200000);

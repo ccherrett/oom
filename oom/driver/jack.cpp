@@ -323,7 +323,7 @@ bool initJackAudio()
 		if (status & JackVersionError)
 			printf("jack server has wrong version\n");
 		printf("cannot create jack client\n");
-		undoSetuid(); // p3.3.51
+		undoSetuid();
 		return true;
 	}
 
@@ -511,10 +511,10 @@ void JackAudioDevice::graphChanged()
 			// check for disconnects
 			//---------------------------------------
 
-			bool erased;
+			bool erased = true;
 			// limit set to 20 iterations for disconnects, don't know how to make it go
 			// the "right" amount
-			for (int i = 0; i < 20; i++)
+			while(erased)//for (int i = 0; i < 20; i++)
 			{
 				erased = false;
 				for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
@@ -540,7 +540,6 @@ void JackAudioDevice::graphChanged()
 					if (!found)
 					{
 						audio->msgRemoveRoute1(
-								//Route(portName, false, channel),
 								Route(portName, false, channel, Route::JACK_ROUTE),
 								Route(it, channel)
 								);
@@ -548,8 +547,8 @@ void JackAudioDevice::graphChanged()
 						break;
 					}
 				}
-				if (!erased)
-					break;
+				//if (!erased)
+				//	break;
 			}
 
 			//---------------------------------------
@@ -578,7 +577,6 @@ void JackAudioDevice::graphChanged()
 					if (!found)
 					{
 						audio->msgAddRoute1(
-								//Route(*pn, false, channel),
 								Route(*pn, false, channel, Route::JACK_ROUTE),
 								Route(it, channel)
 								);
@@ -611,10 +609,10 @@ void JackAudioDevice::graphChanged()
 			// check for disconnects
 			//---------------------------------------
 
-			bool erased;
+			bool erased = true;
 			// limit set to 20 iterations for disconnects, don't know how to make it go
 			// the "right" amount
-			for (int i = 0; i < 20; i++)
+			while (erased)//int i = 0; i < 20; i++)
 			{
 				erased = false;
 				for (iRoute irl = rl->begin(); irl != rl->end(); ++irl)
@@ -639,15 +637,14 @@ void JackAudioDevice::graphChanged()
 					{
 						audio->msgRemoveRoute1(
 								Route(it, channel),
-								//Route(portName, false, channel)
 								Route(portName, false, channel, Route::JACK_ROUTE)
 								);
 						erased = true;
 						break;
 					}
 				}
-				if (!erased)
-					break;
+				//if (!erased)
+				//	break;
 			}
 
 			//---------------------------------------
@@ -1016,7 +1013,7 @@ void JackAudioDevice::start(int /*priority*/)
 
 	if (jack_activate(_client))
 	{
-		undoSetuid(); // p3.3.51
+		undoSetuid();
 		fprintf(stderr, "JACK: cannot activate client\n");
 		exit(-1);
 	}
@@ -1061,7 +1058,6 @@ void JackAudioDevice::start(int /*priority*/)
 		}
 	}
 
-	// p3.3.37
 	// Connect the Jack midi client ports to device ports.
 	connectJackMidiPorts();
 
