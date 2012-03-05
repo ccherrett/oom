@@ -94,6 +94,8 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
         item->setCheckable(true);
         item->setCheckState(cl->isVisible() ? Qt::Checked : Qt::Unchecked);
         item->setData(cl->id());
+		if(cl->size() > 1)
+			item->setForeground(cl->color());
 		m_listModel->appendRow(item);
     }
 	if(baseHeight > desktopHeight)
