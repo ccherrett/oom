@@ -289,6 +289,7 @@ signals:
 	void instrumentTemplateRemoved(qint64 id);
 
 	void viewReady();
+	void songClearCalled();
 
 protected:
 	virtual void showEvent(QShowEvent*);

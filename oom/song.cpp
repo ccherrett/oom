@@ -2435,6 +2435,8 @@ void Song::clear(bool signal)
 		printf("Song::clear\n");
 
 	bounceTrack = 0;
+	m_masterId = 0;
+	m_oomVerbId = 0;
 
 	m_tracks.clear();
 	m_trackIndex.clear();
@@ -2688,6 +2690,51 @@ void Song::cleanupForQuit()
 	invalid = true;
 	if (debugMsg)
 		printf("...finished cleaning up.\n");
+}
+
+void Song::addMasterTrack()
+{
+	if(!m_masterId)
+	{//Create the default oom verb aux track if it dont exist, no undo
+		Track* t = addTrackByName("Master", Track::AUDIO_OUTPUT, -1, false, false);
+		if(t)
+		{
+			m_masterId = t->id();
+			//Route master to system playback
+			if(audioDevice && audioDevice->deviceType() == MidiDevice::JACK_MIDI)
+			{//TODO: Fix this when we support more than Jack and ALSA
+				void* p = audioDevice->findPort("system:playback_1");
+				if(p)
+				{
+					Route src((AudioTrack*)t, 0);
+					Route dst(p, 0);
+					audio->msgAddRoute(src, dst);
+				}
+				void* p2 = audioDevice->findPort("system:playback_2");
+				if(p2)
+				{
+					Route src((AudioTrack*)t, 1);
+					Route dst(p2, 1);
+					audio->msgAddRoute(src, dst);
+				}
+			}
+			else
+			{//Do the ALSA stuff
+			}
+		}
+	}
+}
+
+void Song::addOOMVerb()
+{
+	if(!m_oomVerbId)
+	{//Create the default oom verb aux track if it dont exist, no undo
+		Track* t = addTrackByName("OOStudio Verb", Track::AUDIO_AUX, -1, false, true);
+		if(t)
+		{
+			m_oomVerbId = t->id();
+		}
+	}
 }
 
 void Song::playMonitorEvent(int fd)

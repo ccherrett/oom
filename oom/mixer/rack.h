@@ -25,11 +25,9 @@ class Xml;
 
 class EffectRack : public QListWidget
 {
-    AudioTrack* track;
     Q_OBJECT
 
-    //virtual QSize minimumSizeHint() const;
-    //virtual QSize sizeHint() const;
+    AudioTrack* track;
 
     void startDrag(int idx);
     void initPlugin(Xml xml, int idx);
@@ -55,7 +53,7 @@ protected:
 
 public:
     EffectRack(QWidget*, AudioTrack* t);
-    ~EffectRack();
+    virtual ~EffectRack();
 
     AudioTrack* getTrack()
     {

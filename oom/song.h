@@ -587,6 +587,9 @@ public:
 		return m_oomVerbId;
 	}
 
+	void addMasterTrack();
+	void addOOMVerb();
+
     TrackView* addNewTrackView();
     TrackView* addTrackView();
     

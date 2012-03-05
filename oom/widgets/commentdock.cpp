@@ -21,6 +21,7 @@ CommentDock::CommentDock(QWidget* parent, Track* t)
 {
 	setupUi(this);
 	m_track = t;
+	setObjectName("commentDockSplitter");
 	//connect(song, SIGNAL(songChanged(int)), SLOT(songChanged(int)));
 	connect(textentry, SIGNAL(textChanged()), this, SLOT(textChanged()));
 	connect(songComment, SIGNAL(textChanged()), this, SLOT(songCommentChanged()));

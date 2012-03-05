@@ -306,7 +306,6 @@ int main(int argc, char* argv[])
 #endif
 
 	srand(time(0)); // initialize random number generator
-	//      signal(SIGCHLD, catchSignal);  // interferes with initVST()
 	initMidiController();
 	QApplication::setColorSpec(QApplication::ManyColor);
 	OOMidiApplication app(argc, argv);
@@ -359,12 +358,6 @@ int main(int argc, char* argv[])
 #ifdef HAVE_LASH
 	optstr += QString("L");
 #endif
-
-	//#ifdef VST_SUPPORT
-	//      while ((i = getopt(argc, argv, "ahvdDmMsVP:py")) != EOF) {
-	//#else
-	//      while ((i = getopt(argc, argv, "ahvdDmMsP:py")) != EOF) {
-	//#endif
 
 	while ((i = getopt(argc, argv, optstr.toLatin1().constData())) != EOF)
 	{
@@ -430,8 +423,8 @@ int main(int argc, char* argv[])
 	{
 		if (!debugMode)
 		{
-			QMessageBox::critical(NULL, "OOMidi fatal error", "OOMidi <b>failed</b> to find a <b>Jack audio server</b>.<br><br>"
-					"<i>OOMidi will continue without audio support (-a switch)!</i><br><br>"
+			QMessageBox::critical(NULL, "OOStudio fatal error", "OOStudio <b>failed</b> to find a <b>Jack audio server</b>.<br><br>"
+					"<i>OOStudio will continue without audio support (-a switch)!</i><br><br>"
 					"If this was not intended check that Jack was started. "
 					"If Jack <i>was</i> started check that it was\n"
 					"started as the same user as OOMidi.\n");
@@ -464,7 +457,7 @@ int main(int argc, char* argv[])
 	++argc;
 
 	if (debugMsg)
-	{
+	{//TODO: Change all these debugMsg/debugMode stuff to just use qDebug
 		printf("global lib:       <%s>\n", oomGlobalLib.toLatin1().constData());
 		printf("global share:     <%s>\n", oomGlobalShare.toLatin1().constData());
 		printf("oom home:        <%s>\n", oomUser.toLatin1().constData());

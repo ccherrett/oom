@@ -14,11 +14,20 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
-    <widget class="Splitter" name="commentDockSplitter">
+    <widget class="QSplitter" name="commentDockSplitter">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -109,14 +118,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>Splitter</class>
-   <extends>QSplitter</extends>
-   <header location="global">splitter.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

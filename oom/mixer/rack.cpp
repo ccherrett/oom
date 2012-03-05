@@ -43,7 +43,7 @@ class RackSlot : public QListWidgetItem
 
 public:
 	RackSlot(QListWidget* lb, AudioTrack* t, int i);
-	~RackSlot();
+	virtual ~RackSlot();
 
 	void setBackgroundColor(const QBrush& brush)
 	{
@@ -83,7 +83,6 @@ EffectRack::EffectRack(QWidget* parent, AudioTrack* t)
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	//setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setSelectionMode(QAbstractItemView::SingleSelection);
-	//setMaximumHeight(19 * PipelineDepth);
 	for (int i = 0; i < PipelineDepth; ++i)
 		new RackSlot(this, track, i);
 	updateContents();
@@ -94,24 +93,8 @@ EffectRack::EffectRack(QWidget* parent, AudioTrack* t)
     connect(song, SIGNAL(segmentSizeChanged(int)), SLOT(segmentSizeChanged(int)));
 
 	setSpacing(0);
-	//QPalette qpal;
-	//qpal.setColor(QPalette::Base, QColor(palette().midlight().color()));
-	//setPalette(qpal);
 
 	setAcceptDrops(true);
-}
-
-void EffectRack::updateContents()
-{
-    if (!track)
-        return;
-	for (int i = 0; i < PipelineDepth; ++i)
-	{
-		QString name = track->efxPipe()->name(i);
-		item(i)->setText(name);
-		//item(i)->setBackground(track->efxPipe()->isOn(i) ? palette().mid() : palette().dark());
-		item(i)->setToolTip(name == QString("empty") ? tr("effect rack") : name);
-	}
 }
 
 //---------------------------------------------------------
@@ -120,6 +103,40 @@ void EffectRack::updateContents()
 
 EffectRack::~EffectRack()
 {
+	qDebug("Deleting Effect Rack");
+}
+
+void EffectRack::updateContents()
+{
+    if (!track)
+        return;
+	Pipeline* pipeline = track->efxPipe();
+	int pdepth = 0;
+	if(pipeline)
+		pdepth = pipeline->size();
+	if(pdepth == 0)
+	{
+		for (int i = 0; i < PipelineDepth; ++i)
+		{
+			QString name("empty");
+			item(i)->setText(name);
+			item(i)->setToolTip(tr("effect rack"));
+		}
+	}
+	else
+	{
+		for (int i = 0; i < PipelineDepth; ++i)
+		{
+			QString name("empty");
+			item(i)->setToolTip(tr("effect rack"));
+			if(i < pdepth)
+			{
+				name = pipeline->name(i);
+				item(i)->setToolTip(name);
+			}
+			item(i)->setText(name);
+		}
+	}
 }
 
 //---------------------------------------------------------
@@ -141,15 +158,16 @@ void EffectRack::songChanged(int typ)
 void EffectRack::segmentSizeChanged(int size)
 {
 	Q_UNUSED(size);
-    Pipeline* pipe = track->efxPipe();
-    for (int i = 0; i < PipelineDepth; ++i)
+    /*Pipeline* pipe = track->efxPipe();
+	int pdepth = pipe->size();
+    for (int i = 0; i < pdepth; ++i)
     {
         if ((*pipe)[i])
         {
             // FIXME - this needs to happen on the same call as jack-buffer-size change callback
             //(*pipe)[i]->bufferSizeChanged(size);
         }
-    }
+    }*/
 }
 
 void EffectRack::choosePlugin(QListWidgetItem* it, bool replace)/*{{{*/
@@ -208,16 +226,18 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
 		return;
 	RackSlot* curitem = (RackSlot*) it;
 
+	Pipeline* epipe = track->efxPipe();
+	
 	int idx = row(curitem);
 	QString name;
 	bool mute = false;
-        bool nativeGui = false;
+    bool nativeGui = false;
 	Pipeline* pipe = track->efxPipe();
 	if (pipe)
 	{
 		name = pipe->name(idx);
 		mute = (pipe->isActive(idx) == false);
-                nativeGui = pipe->hasNativeGui(idx);
+        nativeGui = pipe->hasNativeGui(idx);
 	}
 
 	//enum { NEW, CHANGE, UP, DOWN, REMOVE, BYPASS, SHOW, SAVE };
@@ -253,9 +273,9 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
 
 	bypassAction->setChecked(mute);
 	showGuiAction->setChecked(pipe->guiVisible(idx));
-        showNativeGuiAction->setEnabled(nativeGui);
-        if (nativeGui)
-            showNativeGuiAction->setChecked(pipe->nativeGuiVisible(idx));
+    showNativeGuiAction->setEnabled(nativeGui);
+    if (nativeGui)
+        showNativeGuiAction->setChecked(pipe->nativeGuiVisible(idx));
 
 	if (pipe->empty(idx))
 	{
@@ -273,7 +293,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
 		menu->removeAction(newAction);
 		if (idx == 0)
 			upAction->setEnabled(true);
-		if (idx == (PipelineDepth - 1))
+		if (idx == ((int)epipe->size() - 1))
 			downAction->setEnabled(false);
 	}
 
@@ -290,6 +310,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
 	int sel = act->data().toInt();
 	delete menu;
 
+	int pdepth = epipe->size();
 	switch (sel)
 	{
 		case NEW:
@@ -304,28 +325,14 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
 		}
 		case REMOVE:
 		{
-			Pipeline* epipe = track->efxPipe();
             BasePlugin* oldPlugin = (*epipe)[idx];
             oldPlugin->setActive(false);
             oldPlugin->aboutToRemove();
 
             qCritical("Plugin to remove now and here");
-			/*PluginI* oldPlugin = (*epipe)[idx];
-			if(oldPlugin)
-			{
-		#ifdef LV2_SUPPORT
-				if(oldPlugin->type() == 1)
-				{
-					LV2PluginI* lp = (LV2PluginI*)oldPlugin;
-					delete lp;
-				}
-				else
-		#endif
-					delete oldPlugin;
-			}*/
 
             audio->msgAddPlugin(track, idx, 0);
-			epipe->insert(0, idx);
+			//epipe->insert(0, idx);
 			song->dirty = true;
 			break;
 		}
@@ -356,7 +363,7 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
 			}
 			break;
 		case DOWN:
-			if (idx < (PipelineDepth - 1))
+			if (idx < pdepth)
 			{
 				setCurrentItem(item(idx + 1));
 				pipe->move(idx, false);
@@ -601,8 +608,7 @@ void EffectRack::dropEvent(QDropEvent *event)/*{{{*/
 
 void EffectRack::dragEnterEvent(QDragEnterEvent *event)
 {
-	///event->accept(Q3TextDrag::canDecode(event));
-	event->acceptProposedAction(); // TODO CHECK Tim.
+	event->acceptProposedAction();
 }
 
 void EffectRack::mousePressEvent(QMouseEvent *event)

@@ -48,7 +48,7 @@ void OOMidi::importMidi(const QString &file)
 	if (file.isEmpty())
 	{
 		fn = getOpenFileName(lastMidiPath, midi_file_pattern, this,
-				tr("OOMidi: Import Midi"), 0);
+				tr("OOStudio: Import Midi"), 0);
 		if (fn.isEmpty())
 			return;
 		lastMidiPath = fn;
@@ -96,7 +96,7 @@ bool OOMidi::importMidi(const QString name, bool merge)
 		s += name;
 		s += tr("\nfailed: ");
 		s += mf.error();
-		QMessageBox::critical(this, QString("OOMidi"), s);
+		QMessageBox::critical(this, QString("OOStudio"), s);
 		return rv;
 	}
 	//
@@ -124,7 +124,8 @@ bool OOMidi::importMidi(const QString name, bool merge)
 	{
 		// the standard instrument files (GM, GS, XG) must be present
 		printf("no instrument, type %d\n", t);
-		abort();
+		return true;
+		//abort();
 	}
 
 	MidiFileTrackList* etl = mf.trackList();
@@ -182,16 +183,6 @@ bool OOMidi::importMidi(const QString name, bool merge)
 				buildMidiEventList(mel, el, track, division, first, false);
 				first = false;
 
-				// Removed by T356. Handled by addPortCtrlEvents() below.
-				//for (iEvent i = mel->begin(); i != mel->end(); ++i) {
-				//      Event event = i->second;
-				//      if (event.type() == Controller) {
-				//            importController(channel, mport, event.dataA());
-				//            midiPorts[track->outPort()].setCtrl(channel, event.tick(), event.dataA(), event.dataB());
-				//            }
-				//      }
-
-				// Comment Added by T356.
 				// Hmm. buildMidiEventList already takes care of this.
 				// But it seems to work. How? Must test.
 				if (channel == 9 && song->mtype() != MT_UNKNOWN)
@@ -290,11 +281,10 @@ void OOMidi::processTrack(MidiTrack* track)
 		return;
 
 	//---------------------------------------------------
-	//    Parts ermitteln
-	//    die Midi-Spuren werden in Parts aufgebrochen;
-	//    ein neuer Part wird bei einer LÃ¯Â¿Â½cke von einem
-	//    Takt gebildet; die LÃ¯Â¿Â½nge wird jeweils auf
-	//    Takte aufgerundet und aligned
+	// Identify Parts
+	// The MIDI tracks are broken up into parts
+	// A new Part will be located based on track.
+	// Events will be aligned on new track
 	//---------------------------------------------------
 
 	PartList* pl = track->parts();
@@ -492,7 +482,7 @@ void OOMidi::importPart()
 			else
 			{
 				//QMessageBox::warning(this, QString("OOMidi"), tr("Import part is only valid for midi tracks!"));
-				QMessageBox::warning(this, QString("OOMidi"), tr("Import part is only valid for midi and wave tracks!"));
+				QMessageBox::warning(this, QString("OOStudio"), tr("Import part is only valid for midi and wave tracks!"));
 				return;
 			}
 		}
@@ -501,7 +491,7 @@ void OOMidi::importPart()
 	if (track)
 	{
 		bool loadAll;
-		QString filename = getOpenFileName(QString(""), part_file_pattern, this, tr("OOMidi: load part"), &loadAll);
+		QString filename = getOpenFileName(QString(""), part_file_pattern, this, tr("OOStudio: load part"), &loadAll);
 		if (!filename.isEmpty())
 		{
 			// Make a backup of the current clone list, to retain any 'copy' items,
@@ -521,7 +511,7 @@ void OOMidi::importPart()
 	}
 	else
 	{
-		QMessageBox::warning(this, QString("OOMidi"), tr("No track selected for import"));
+		QMessageBox::warning(this, QString("OOStudio"), tr("No track selected for import"));
 	}
 }
 
@@ -599,7 +589,7 @@ void OOMidi::importPartToTrack(QString& filename, unsigned tick, Track* track)
 		if (notDone)
 		{
 			int tot = notDone + done;
-			QMessageBox::critical(this, QString("OOMidi"),
+			QMessageBox::critical(this, QString("OOStudio"),
 					QString().setNum(notDone) + (tot > 1 ? (tr(" out of ") + QString().setNum(tot)) : QString("")) +
 					(tot > 1 ? tr(" parts") : tr(" part")) +
 					tr(" could not be imported.\nLikely the track is the wrong type."));

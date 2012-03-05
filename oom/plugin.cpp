@@ -696,12 +696,8 @@ bool SynthPluginDevice::putMidiEvent(const MidiPlayEvent& ev)
 Pipeline::Pipeline()
 : std::vector<BasePlugin*>()
 {
-    // Added by Tim. p3.3.15
     for (int i = 0; i < MAX_CHANNELS; ++i)
         posix_memalign((void**) (buffer + i), 16, sizeof (float) * segmentSize);
-
-    for (int i = 0; i < PipelineDepth; ++i)
-        push_back(0);
 }
 
 //---------------------------------------------------------
@@ -722,8 +718,14 @@ Pipeline::~Pipeline()
 
 void Pipeline::insert(BasePlugin* plugin, int index)
 {
-    remove(index);
-    (*this)[index] = plugin;
+	int s = size();
+	if(index >= s || index == -1)
+		push_back(plugin);
+	else
+	{
+    	remove(index);
+    	(*this)[index] = plugin;
+	}
 }
 
 //---------------------------------------------------------
@@ -732,6 +734,9 @@ void Pipeline::insert(BasePlugin* plugin, int index)
 
 void Pipeline::remove(int index)
 {
+	int s = size();
+	if(index >= s)
+		return;
     BasePlugin* plugin = (*this)[index];
 
     if (plugin)
@@ -764,7 +769,8 @@ void Pipeline::remove(int index)
 
 void Pipeline::removeAll()
 {
-    for (int i = 0; i < PipelineDepth; ++i)
+	int s = size();
+    for (int i = 0; i < s; ++i)
         remove(i);
 }
 
@@ -774,6 +780,10 @@ void Pipeline::removeAll()
 
 bool Pipeline::isActive(int idx) const
 {
+	int s = size();
+	if(idx >= s)
+		return false;
+
     BasePlugin* p = (*this)[idx];
     if (p)
         return p->active();
@@ -786,6 +796,9 @@ bool Pipeline::isActive(int idx) const
 
 void Pipeline::setActive(int idx, bool flag)
 {
+	int s = size();
+	if(idx >= s)
+		return;
     BasePlugin* p = (*this)[idx];
     if (p)
     {
@@ -802,7 +815,8 @@ void Pipeline::setActive(int idx, bool flag)
 
 void Pipeline::setChannels(int n)
 {
-    for (int i = 0; i < PipelineDepth; ++i)
+	int s = size();
+    for (int i = 0; i < s; ++i)
         if ((*this)[i])
             (*this)[i]->setChannels(n);
 }
@@ -813,6 +827,10 @@ void Pipeline::setChannels(int n)
 
 QString Pipeline::label(int idx) const
 {
+	int s = size();
+	if(idx >= s)
+    	return QString("");
+		
     BasePlugin* p = (*this)[idx];
     if (p)
         return p->label();
@@ -825,6 +843,10 @@ QString Pipeline::label(int idx) const
 
 QString Pipeline::name(int idx) const
 {
+qDebug("Pipeline::name: idx: %d", idx);
+	int s = (*this).size();
+	if(idx >= s)
+		return QString("empty");
     BasePlugin* p = (*this)[idx];
     if (p)
         return p->name();
@@ -837,8 +859,10 @@ QString Pipeline::name(int idx) const
 
 bool Pipeline::empty(int idx) const
 {
-    BasePlugin* p = (*this)[idx];
-    return p == 0;
+	int s = size();
+	return idx >= s;
+    //BasePlugin* p = (*this)[idx];
+    //return p == 0;
 }
 
 //---------------------------------------------------------
@@ -933,6 +957,10 @@ void Pipeline::apply(int ports, uint32_t nframes, float** buffer1)
 
 void Pipeline::showGui(int idx, bool flag)
 {
+	int s = size();
+	if(idx >= s)
+		return;
+
     BasePlugin* p = (*this)[idx];
 
     if (p)
@@ -945,7 +973,8 @@ void Pipeline::showGui(int idx, bool flag)
 
 void Pipeline::deleteGui(int idx)
 {
-    if (idx >= PipelineDepth)
+	int s = size();
+    if (idx >= s)
         return;
 
     BasePlugin* p = (*this)[idx];
@@ -960,7 +989,8 @@ void Pipeline::deleteGui(int idx)
 
 void Pipeline::deleteAllGuis()
 {
-    for (int i = 0; i < PipelineDepth; i++)
+	int s = size();
+    for (int i = 0; i < s; i++)
         deleteGui(i);
 }
 
@@ -970,6 +1000,9 @@ void Pipeline::deleteAllGuis()
 
 bool Pipeline::guiVisible(int idx)
 {
+	int s = size();
+	if(idx >= s)
+		return false;
     BasePlugin* p = (*this)[idx];
 
     if (p)
@@ -984,6 +1017,9 @@ bool Pipeline::guiVisible(int idx)
 
 bool Pipeline::hasNativeGui(int idx)
 {
+	int s = size();
+	if(idx >= s)
+		return false;
     BasePlugin* p = (*this)[idx];
     if (p)
         return p->hasNativeGui();
@@ -996,6 +1032,9 @@ bool Pipeline::hasNativeGui(int idx)
 
 void Pipeline::showNativeGui(int idx, bool flag)
 {
+	int s = size();
+	if(idx >= s)
+		return;
     BasePlugin* p = (*this)[idx];
     if(p)
         p->showNativeGui(flag);
@@ -1007,6 +1046,9 @@ void Pipeline::showNativeGui(int idx, bool flag)
 
 bool Pipeline::nativeGuiVisible(int idx)
 {
+	int s = size();
+	if(idx >= s)
+		return false;
     BasePlugin* p = (*this)[idx];
     if (p)
         return p->nativeGuiVisible();

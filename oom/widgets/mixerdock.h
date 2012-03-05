@@ -69,7 +69,6 @@ public:
 	~MixerDock();
 	void setTracklist(TrackList* list);
 	TrackList* tracklist();
-    void clear();
 	
 public slots:
 	void songChanged(int);
@@ -79,6 +78,7 @@ public slots:
 	void updateConnections(bool);
 	void composerViewChanged();
 	void scrollSelectedToView(qint64);
+    void clear();
 	
 protected:
     void addStrip(Track*, int);

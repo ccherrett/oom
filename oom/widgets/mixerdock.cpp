@@ -150,13 +150,14 @@ void MixerDock::layoutUi()/*{{{*/
 		m_masterBox = new QHBoxLayout();
 		m_masterBox->setContentsMargins(4, 0, 0, 0);
 		m_masterBox->setSpacing(0);
-		Track* master = song->findTrack("Master");
+		Track* master = song->findTrackById(song->masterId());
 		if(master)
 		{
 			masterStrip = new AudioStrip(this, (AudioTrack*)master);
 			masterStrip->setObjectName("MixerAudioOutStrip");
 			m_masterBox->addWidget(masterStrip);
 		}
+		//stripList.insert(stripList.begin(), strip);
 		m_mixerBox->addLayout(m_masterBox);
 	}
 
@@ -169,6 +170,7 @@ void MixerDock::layoutUi()/*{{{*/
 	if(m_mode == DOCKED)
 		connect(oom, SIGNAL(configChanged()), SLOT(configChanged()));
 	//	connect(this, SIGNAL(visibilityChanged(bool)), this, SLOT(updateConnections(bool)));
+	connect(oom, SIGNAL(songClearCalled()), SLOT(clear()));
 	songChanged(-1);
 }/*}}}*/
 
@@ -358,6 +360,7 @@ void MixerDock::addStrip(Track* t, int idx)/*{{{*/
 
 void MixerDock::clear()/*{{{*/
 {
+	qDebug("Entering MixerDock::clear");
 	StripList::iterator si = stripList.begin();
 	for (; si != stripList.end(); ++si)
 	{
@@ -366,6 +369,7 @@ void MixerDock::clear()/*{{{*/
 	}
 	stripList.clear();
 	oldAuxsSize = -1;
+	qDebug("Leaving MixerDock::clear");
 }/*}}}*/
 
 void MixerDock::updateMixer(UpdateAction action)/*{{{*/
@@ -458,7 +462,7 @@ void MixerDock::updateMixer(UpdateAction action)/*{{{*/
 		if(mt->name() != "Master")
 			addStrip(mt, idx++);
 	}
-	Track* master = song->findTrack("Master");
+	Track* master = song->findTrackById(song->masterId());
 	if(master)
 	{
 		if((m_mode == DOCKED || m_mode == MASTER) && !masterStrip)

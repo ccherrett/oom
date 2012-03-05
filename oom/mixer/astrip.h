@@ -127,7 +127,7 @@ public slots:
 
 public:
     AudioStrip(QWidget* parent, AudioTrack*);
-    ~AudioStrip();
+    virtual ~AudioStrip();
 
     void toggleShowEffectsRack(bool);
 };

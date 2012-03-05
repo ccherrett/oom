@@ -133,6 +133,7 @@ public:
 
 	bool setTrack(Track* t);
     void setLabelFont();
+	int type(){return m_type;};
 };
 
 #endif

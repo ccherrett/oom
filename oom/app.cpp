@@ -1829,7 +1829,8 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 		transport->move(config.geometryTransport.topLeft());
 		showTransport(config.transportVisible);
 	}
-
+	song->addMasterTrack();
+	song->addOOMVerb();
 	transport->setMasterFlag(song->masterFlag());
 	punchinAction->setChecked(song->punchin());
 	punchoutAction->setChecked(song->punchout());
@@ -4400,7 +4401,6 @@ bool OOMidi::clearSong()
 	}
 	microSleep(100000);
 
-//again:
 	for (iToplevel i = toplevels.begin(); i != toplevels.end(); ++i)
 	{
 		Toplevel tl = *i;
@@ -4431,6 +4431,7 @@ bool OOMidi::clearSong()
 	}
 	//printf("OOMidi::clearSong() TopLevel.size(%d) \n", (int)toplevels.size());
 	microSleep(100000);
+	emit songClearCalled();
 	song->clear(false);
 	microSleep(200000);
 	return false;

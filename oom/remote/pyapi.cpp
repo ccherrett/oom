@@ -817,13 +817,17 @@ PyObject* getTrackEffects(PyObject*, PyObject* args)
 	AudioTrack* track = (AudioTrack*) t;
 	PyObject* pyfxnames = Py_BuildValue("[]");
 	const Pipeline* pipeline = track->efxPipe();
-	for (int i = 0; i < PipelineDepth; i++)
+	if(pipeline)
 	{
-		QString name = pipeline->name(i);
-		printf("fx %d name: %s\n", i, name.toLatin1());
-		PyObject* pyname = Py_BuildValue("s", name.toLatin1());
-		PyList_Append(pyfxnames, pyname);
-		Py_DECREF(pyname);
+		int pdepth = pipeline->size();
+		for (int i = 0; i < pdepth; i++)
+		{
+			QString name = pipeline->name(i);
+			printf("fx %d name: %s\n", i, name.toLatin1());
+			PyObject* pyname = Py_BuildValue("s", name.toLatin1());
+			PyList_Append(pyfxnames, pyname);
+			Py_DECREF(pyname);
+		}
 	}
 
 	return pyfxnames;
@@ -1191,14 +1195,19 @@ bool Song::event(QEvent* _e)
 
 			int fxid = e->getP1();
 
-			if (fxid > PipelineDepth)
-				return false;
 
 			int onoff = (e->getP2() == 1);
 
 			AudioTrack* track = (AudioTrack*) t;
 			Pipeline* pipeline = track->efxPipe();
-			pipeline->setOn(fxid, onoff);
+			const Pipeline* pipeline = track->efxPipe();
+			if(pipeline)
+			{
+				int pdepth = pipeline->size();
+				if (fxid > pdepth)
+					return false;
+				pipeline->setOn(fxid, onoff);
+			}
 			break;
 		}
 		case QPybridgeEvent::SONG_ADD_TRACK:

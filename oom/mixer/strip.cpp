@@ -502,6 +502,7 @@ bool Strip::setTrack(Track* t)
 	if(t && t->type() == type)
 	{
 		track = t;
+		m_type = t->type();
 		trackChanged();
 		//songChanged(-1);
 		return true;

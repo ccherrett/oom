@@ -121,8 +121,7 @@ void AudioTrack::deleteAllEfxGuis()
 void AudioTrack::clearEfxList()
 {
 	if (_efxPipe)
-		for (int i = 0; i < PipelineDepth; i++)
-			(*_efxPipe)[i] = 0;
+		_efxPipe->removeAll();
 }
 
 //---------------------------------------------------------
@@ -286,11 +285,12 @@ void AudioTrack::swapControllerIDX(int idx1, int idx2)
 	// FIXME This code is ugly.
 	// At best we would like to modify the keys (IDXs) in-place and
 	//  do some kind of deferred re-sort, but it can't be done...
+	int pdepth = _efxPipe->size();
 
 	if (idx1 == idx2)
 		return;
 
-	if (idx1 < 0 || idx2 < 0 || idx1 >= PipelineDepth || idx2 >= PipelineDepth)
+	if (idx1 < 0 || idx2 < 0 || idx1 >= pdepth || idx2 >= pdepth)
 		return;
 
 	CtrlList *cl;
@@ -946,66 +946,33 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 {
     if (tag == "LadspaPlugin" || tag == "plugin")
     {
-        int rackpos;
-        for (rackpos = 0; rackpos < PipelineDepth; ++rackpos)
-        {
-                if (!(*_efxPipe)[rackpos])
-                        break;
-        }
-        if (rackpos < PipelineDepth)
-        {
-                BasePlugin* pi = new LadspaPlugin();
-                pi->setTrack(this);
-                pi->setId(rackpos);
-                if (pi->readConfiguration(xml, false))
-                   delete pi;
-                else
-                   (*_efxPipe)[rackpos] = pi;
-        }
-        else
-           printf("can't load ladspa plugin - plugin rack is already full\n");
+         BasePlugin* pi = new LadspaPlugin();
+         pi->setTrack(this);
+         pi->setId((int)_efxPipe->size());
+         if (pi->readConfiguration(xml, false))
+            delete pi;
+         else
+            _efxPipe->insert(pi, -1);
     }
     else if (tag == "Lv2Plugin")
     {
-        int rackpos;
-        for (rackpos = 0; rackpos < PipelineDepth; ++rackpos)
-        {
-                if (!(*_efxPipe)[rackpos])
-                        break;
-        }
-        if (rackpos < PipelineDepth)
-        {
-                Lv2Plugin* pi = new Lv2Plugin();
-                pi->setTrack(this);
-                pi->setId(rackpos);
-                if (pi->readConfiguration(xml, false))
-                        delete pi;
-                else
-                        (*_efxPipe)[rackpos] = pi;
-        }
-        else
-                printf("can't load plugin - plugin rack is already full\n");
+         Lv2Plugin* pi = new Lv2Plugin();
+         pi->setTrack(this);
+         pi->setId((int)_efxPipe->size());
+         if (pi->readConfiguration(xml, false))
+            delete pi;
+         else
+            _efxPipe->insert(pi, -1);
     }
     else if (tag == "VstPlugin")
     {
-        int rackpos;
-        for (rackpos = 0; rackpos < PipelineDepth; ++rackpos)
-        {
-                if (!(*_efxPipe)[rackpos])
-                        break;
-        }
-        if (rackpos < PipelineDepth)
-        {
-                VstPlugin* pi = new VstPlugin();
-                pi->setTrack(this);
-                pi->setId(rackpos);
-                if (pi->readConfiguration(xml, false))
-                        delete pi;
-                else
-                        (*_efxPipe)[rackpos] = pi;
-        }
-        else
-                printf("can't load plugin - plugin rack is already full\n");
+         VstPlugin* pi = new VstPlugin();
+         pi->setTrack(this);
+         pi->setId((int)_efxPipe->size());
+         if (pi->readConfiguration(xml, false))
+            delete pi;
+         else
+            _efxPipe->insert(pi, -1);
     }
     else if (tag == "auxSend")
         readAuxSend(xml);
@@ -1031,7 +998,8 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
         bool ctlfound = false;
         int m = l->id() & AC_PLUGIN_CTL_ID_MASK;
         int n = (l->id() >> AC_PLUGIN_CTL_BASE_POW) - 1;
-        if (n >= 0 && n < PipelineDepth)
+		int pdepth = _efxPipe->size();
+        if (n >= 0 && n < pdepth)
         {
             p = (*_efxPipe)[n];
             if (p)
@@ -1087,19 +1055,6 @@ bool AudioTrack::readProperties(Xml& xml, const QString& tag)
 
 void AudioTrack::showPendingPluginNativeGuis()
 {
-#if 0
-	for (int idx = 0; idx < PipelineDepth; ++idx)
-	{
-		BasePlugin* p = (*_efxPipe)[idx];
-		if (!p)
-			continue;
-
-		if (p->isShowNativeGuiPending())
-		{
-			p->showNativeGui(true);
-		}
-	}
-#endif
 }
 
 //---------------------------------------------------------
@@ -1109,7 +1064,8 @@ void AudioTrack::showPendingPluginNativeGuis()
 void AudioTrack::mapRackPluginsToControllers()
 {
 	// Iterate all possible plugin controller indexes...
-	for (int idx = PipelineDepth - 1; idx >= 0; idx--)
+	int pdepth = _efxPipe->size();
+	for (int idx = pdepth - 1; idx >= 0; idx--)
 	{
 		iCtrlList icl = _controller.lower_bound((idx + 1) * AC_PLUGIN_CTL_BASE);
 		if (icl == _controller.end() || ((icl->second->id() >> AC_PLUGIN_CTL_BASE_POW) - 1) != idx)
@@ -1142,7 +1098,8 @@ void AudioTrack::mapRackPluginsToControllers()
 	//  are stuck at zero can't be adjusted.
 	// OOMidi oom files created before the automation patches (before 0.9pre1) may have broken
 	//  controller sections, so this will allow more tolerance of them.
-	for (int idx = 0; idx < PipelineDepth; idx++)
+	pdepth = _efxPipe->size();
+	for (int idx = 0; idx < pdepth; idx++)
 	{
 		BasePlugin* p = (*_efxPipe)[idx];
 		if (!p)
@@ -1154,9 +1111,9 @@ void AudioTrack::mapRackPluginsToControllers()
 		uint32_t portCount = p->getParameterCount();
 		for (uint32_t i = 0; i < portCount; i++)
 		{
-                        ParameterPort* paramPort = p->getParameterPort(i);
-                        if (! paramPort || paramPort->type != PARAMETER_INPUT || (paramPort->hints & PARAMETER_IS_AUTOMABLE) == 0)
-                            continue;
+            ParameterPort* paramPort = p->getParameterPort(i);
+            if (! paramPort || paramPort->type != PARAMETER_INPUT || (paramPort->hints & PARAMETER_IS_AUTOMABLE) == 0)
+                continue;
 
 			int id = genACnum(idx, i);
 			CtrlList* l = 0;
@@ -1191,32 +1148,37 @@ void AudioTrack::mapRackPluginsToControllers()
 	}
 
 	// The loop is a safe way to delete while iterating 'non-linear' lists.
-	bool loop;
-	do
+	QList<int> delList;
+	for (ciCtrlList icl = _controller.begin(); icl != _controller.end(); ++icl)
 	{
-		loop = false;
-		for (ciCtrlList icl = _controller.begin(); icl != _controller.end(); ++icl)
+		CtrlList* l = icl->second;
+		int id = l->id();
+		// Ignore volume, pan, mute etc.
+		if (id < AC_PLUGIN_CTL_BASE)
+			continue;
+		int param = id & AC_PLUGIN_CTL_ID_MASK;
+		int idx = (id >> AC_PLUGIN_CTL_BASE_POW) - 1;
+		if(idx >= pdepth)
 		{
-			CtrlList* l = icl->second;
-			int id = l->id();
-			// Ignore volume, pan, mute etc.
-			if (id < AC_PLUGIN_CTL_BASE)
-				continue;
-			int param = id & AC_PLUGIN_CTL_ID_MASK;
-			int idx = (id >> AC_PLUGIN_CTL_BASE_POW) - 1;
+			delList.append(id);
+		}
+		else
+		{
 			BasePlugin* p = (*_efxPipe)[idx];
 			// If there's no plugin at that rack position, or the param is out of range of
 			//  the number of controls in the plugin, then it's a stray controller. Delete it.
 			// Future: Leave room for possible bypass controller at AC_PLUGIN_CTL_ID_MASK -1.
-			if (!p || (param >= (int)p->getParameterCount()))
+			if (param >= (int)p->getParameterCount())
 			{
-				_controller.erase(id);
-
-				loop = true;
-				break;
+				delList.append(id);
 			}
 		}
-	} while (loop);
+	}
+
+	foreach(int id, delList)
+	{
+		_controller.erase(id);
+	}
 }
 
 //---------------------------------------------------------

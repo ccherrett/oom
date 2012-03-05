@@ -565,20 +565,6 @@ void Audio::process1(unsigned samplePos, unsigned offset, unsigned frames)
 		//  audio processing, because THAT is done at the very end of this routine.
 		// This will also reset the track's processed flag.
 		track->preProcessAlways();
-
-		// Removed by T356
-		/*
-		if (track->noOutRoute() && !track->noInRoute() &&
-			track->type() != Track::AUDIO_AUX && track->type() != Track::AUDIO_OUTPUT) {
-			  channels = track->channels();
-			  float* buffer[channels];
-			  float data[frames * channels];
-			  for (int i = 0; i < channels; ++i)
-					buffer[i] = data + i * frames;
-			  track->copyData(samplePos, channels, frames, buffer);
-			  }
-		 */
-
 	}
 	// Pre-process the metronome.
 	((AudioTrack*) metronome)->preProcessAlways();
@@ -587,23 +573,6 @@ void Audio::process1(unsigned samplePos, unsigned offset, unsigned frames)
 	for (ciAudioOutput i = ol->begin(); i != ol->end(); ++i)
 		(*i)->process(samplePos, offset, frames);
 
-	// Removed by T356
-	/*
-	AuxList* auxl = song->auxs();
-	for (ciAudioAux ia = auxl->begin(); ia != auxl->end(); ++ia) {
-		  track = (AudioTrack*)(*ia);
-		  if (track->noOutRoute()) {
-				channels = track->channels();
-				float* buffer[channels];
-				float data[frames * channels];
-				for (int i = 0; i < channels; ++i)
-					  buffer[i] = data + i * frames;
-				track->copyData(samplePos, channels, frames, buffer);
-				}
-		  }
-	 */
-
-	// Added by T356.
 	// Were ANY tracks unprocessed as a result of processing all the AudioOutputs, above?
 	// Not just unconnected ones, as previously done, but ones whose output path ultimately leads nowhere.
 	// Those tracks were missed, until this fix.
@@ -627,8 +596,6 @@ void Audio::process1(unsigned samplePos, unsigned offset, unsigned frames)
 				buffer[i] = data + i * frames;
 			//printf("Audio::process1 calling track->copyData for track:%s\n", track->name().toLatin1());
 
-			// p3.3.38
-			//track->copyData(samplePos, channels, frames, buffer);
 			track->copyData(samplePos, channels, -1, -1, frames, buffer);
 		}
 	}
