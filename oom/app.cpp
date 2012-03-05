@@ -149,7 +149,7 @@ void microSleep(long msleep)
 		sleepOk = usleep(msleep);
 }
 
-void initGlobalInputPorts()/*{{{*/
+void OOMidi::initGlobalInputPorts()/*{{{*/
 {
 	gInputListPorts.clear();
 	if(gInputList.size())
@@ -157,56 +157,61 @@ void initGlobalInputPorts()/*{{{*/
 		for(int i = 0; i < gInputList.size(); ++i)
 		{
 			QPair<int, QString> input = gInputList.at(i);
-
-			QString devname = input.second;
-			MidiPort* inport = 0;
-			MidiDevice* indev = 0;
-			QString inputDevName(QString("Input-").append(devname));
-			int midiInPort = getFreeMidiPort();
-			qDebug("createMidiInputDevice is set: %i", midiInPort);
-			inport = &midiPorts[midiInPort];
-			int devtype = input.first;
-			oomMidiPorts.insert(inport->id(), inport);
-			if(devtype == MidiDevice::ALSA_MIDI)
-			{
-				indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
-				if(indev)
-				{
-					qDebug("Found MIDI input device: ALSA_MIDI");
-					int openFlags = 0;
-					openFlags ^= 0x2;
-					indev->setOpenFlags(openFlags);
-					midiSeq->msgSetMidiDevice(inport, indev);
-					gInputListPorts.append(midiInPort);
-				}
-			}
-			else if(devtype == MidiDevice::JACK_MIDI)
-			{
-				indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
-				if(indev)
-				{
-					qDebug("Created MIDI input device: JACK_MIDI");
-					int openFlags = 0;
-					openFlags ^= 0x2;
-					indev->setOpenFlags(openFlags);
-					midiSeq->msgSetMidiDevice(inport, indev);
-					gInputListPorts.append(midiInPort);
-				}
-			}
-			if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
-			{
-				qDebug("MIDI input device configured, Adding input routes to MIDI port");
-				Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
-				Route dstRoute(indev, -1);
-
-				audio->msgAddRoute(srcRoute, dstRoute);
-
-				audio->msgUpdateSoloStates();
-				song->update(SC_ROUTE);
-			}
+			addGlobalInput(input);
 		}
 	}
 }/*}}}*/
+
+void OOMidi::addGlobalInput(QPair<int, QString> input)
+{
+
+	QString devname = input.second;
+	MidiPort* inport = 0;
+	MidiDevice* indev = 0;
+	QString inputDevName(QString("Input-").append(devname));
+	int midiInPort = getFreeMidiPort();
+	qDebug("createMidiInputDevice is set: %i", midiInPort);
+	inport = &midiPorts[midiInPort];
+	int devtype = input.first;
+	oomMidiPorts.insert(inport->id(), inport);
+	if(devtype == MidiDevice::ALSA_MIDI)
+	{
+		indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
+		if(indev)
+		{
+			qDebug("Found MIDI input device: ALSA_MIDI");
+			int openFlags = 0;
+			openFlags ^= 0x2;
+			indev->setOpenFlags(openFlags);
+			midiSeq->msgSetMidiDevice(inport, indev);
+			gInputListPorts.append(midiInPort);
+		}
+	}
+	else if(devtype == MidiDevice::JACK_MIDI)
+	{
+		indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
+		if(indev)
+		{
+			qDebug("Created MIDI input device: JACK_MIDI");
+			int openFlags = 0;
+			openFlags ^= 0x2;
+			indev->setOpenFlags(openFlags);
+			midiSeq->msgSetMidiDevice(inport, indev);
+			gInputListPorts.append(midiInPort);
+		}
+	}
+	if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
+	{
+		qDebug("MIDI input device configured, Adding input routes to MIDI port");
+		Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
+		Route dstRoute(indev, -1);
+
+		audio->msgAddRoute(srcRoute, dstRoute);
+
+		audio->msgUpdateSoloStates();
+		song->update(SC_ROUTE);
+	}
+}
 
 //---------------------------------------------------------
 //   seqStart

@@ -379,7 +379,7 @@ AudioStrip::AudioStrip(QWidget* parent, AudioTrack* at)/*{{{*/
 
 AudioStrip::~AudioStrip()
 {
-	qDebug("Deleting AudioStrip");
+//	qDebug("Deleting AudioStrip");
 	//delete rack;
 }
 

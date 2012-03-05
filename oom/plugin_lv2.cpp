@@ -614,7 +614,7 @@ Lv2Plugin::~Lv2Plugin()
         {
             for (uint32_t i=0; i < m_ainsCount; i++)
             {
-                if (m_portsIn[i])
+                if (audioDevice && m_portsIn[i])
                     audioDevice->unregisterPort(m_portsIn[i]);
             }
         }
@@ -623,7 +623,7 @@ Lv2Plugin::~Lv2Plugin()
         {
             for (uint32_t i=0; i < m_aoutsCount; i++)
             {
-                if (m_portsOut[i])
+                if (audioDevice && m_portsOut[i])
                     audioDevice->unregisterPort(m_portsOut[i]);
             }
         }

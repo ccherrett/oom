@@ -103,7 +103,7 @@ EffectRack::EffectRack(QWidget* parent, AudioTrack* t)
 
 EffectRack::~EffectRack()
 {
-	qDebug("Deleting Effect Rack");
+	//qDebug("Deleting Effect Rack");
 }
 
 void EffectRack::updateContents()

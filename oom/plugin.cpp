@@ -843,7 +843,6 @@ QString Pipeline::label(int idx) const
 
 QString Pipeline::name(int idx) const
 {
-qDebug("Pipeline::name: idx: %d", idx);
 	int s = (*this).size();
 	if(idx >= s)
 		return QString("empty");

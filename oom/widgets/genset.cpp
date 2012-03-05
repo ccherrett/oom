@@ -20,7 +20,7 @@
 #include "gconfig.h"
 #include "midiseq.h"
 #include "network/LSThread.h"
-
+#include "midiport.h"
 #include "mididev.h"
 #include "audio.h"
 #include "driver/jackaudio.h"
@@ -169,14 +169,17 @@ void GlobalSettingsConfig::populateInputs()/*{{{*/
 	{
 		if ((*i)->deviceType() == MidiDevice::ALSA_MIDI)
 		{
-			QStandardItem* item = new QStandardItem(QString((*i)->name()).append(" (ALSA)"));
-			item->setData((*i)->name(), Qt::UserRole+1);
-			item->setData(MidiDevice::ALSA_MIDI, Qt::UserRole+2);
-			item->setEditable(false);
-			item->setCheckable(true);
-			if(alsaList.contains((*i)->name()))
-				item->setCheckState(Qt::Checked);
-			m_inputsModel->appendRow(item);
+			if ((*i)->rwFlags() & 0x2)
+			{
+				QStandardItem* item = new QStandardItem(QString((*i)->name()).append(" (ALSA)"));
+				item->setData((*i)->name(), Qt::UserRole+1);
+				item->setData(MidiDevice::ALSA_MIDI, Qt::UserRole+2);
+				item->setEditable(false);
+				item->setCheckable(true);
+				if(alsaList.contains((*i)->name()))
+					item->setCheckState(Qt::Checked);
+				m_inputsModel->appendRow(item);
+			}
 		}
 	}
 	if(audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
@@ -363,12 +366,32 @@ void GlobalSettingsConfig::apply()
 	config.lsClientLSPath = txtLSPath->text();
 
 	gInputList.clear();
+	bool hasPorts = !gInputListPorts.isEmpty();
 	for(int i = 0; i < m_inputsModel->rowCount(); ++i)
 	{
 		QStandardItem* item = m_inputsModel->item(i);
 		if(item && item->checkState() == Qt::Checked)
 		{
-			gInputList.append(qMakePair(item->data(Qt::UserRole+2).toInt(), item->data(Qt::UserRole+1).toString()));
+			QPair<int, QString> pinfo = qMakePair(item->data(Qt::UserRole+2).toInt(), item->data(Qt::UserRole+1).toString());
+			if(hasPorts)
+			{
+				bool found = false;
+				for(int p = 0; p < gInputListPorts.size(); p++)
+				{
+					MidiPort* mp = &midiPorts[gInputListPorts.at(p)];
+					if(mp && mp->device()->name() == pinfo.second)
+					{
+						found = true;
+						break;
+					}
+				}
+				if(!found)
+				{
+					oom->addGlobalInput(pinfo);
+				}
+			}
+
+			gInputList.append(pinfo);
 		}
 	}
 //FIXME: Initialize the ports right now that were added and unconfigurethe ones that were removed

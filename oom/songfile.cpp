@@ -809,20 +809,12 @@ void Song::read(Xml& xml)/*{{{*/
 				{
 					//Call song->updateTrackViews() to update the canvas and headers
 					addMasterTrack();
+					addOOMVerb();
 					updateTrackViews();
 					if(gUpdateAuxes)
 					{
 						updateAuxIndex();
 					}
-					addOOMVerb();
-					/*if(!m_oomVerbId)
-					{//Create the default oom verb aux track if it dont exist, no undo
-						Track* t = addTrackByName("OOStudio Verb", Track::AUDIO_AUX, -1, false, true);
-						if(t)
-						{
-							m_oomVerbId = t->id();
-						}
-					}*/
 					//Call to update the track view menu
 					update(SC_VIEW_CHANGED);
 					return;

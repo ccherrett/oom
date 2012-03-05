@@ -18,6 +18,7 @@
 #endif
 #include "trackview.h"
 #include <QFileInfo>
+#include <QPair>
 
 class QCloseEvent;
 class QFocusEvent;
@@ -494,6 +495,8 @@ public:
 	TrackView* findInstrumentTemplateById(qint64 id) const;
     void insertInstrumentTemplate(TrackView*, int idx);
     void removeInstrumentTemplate(qint64);
+	void addGlobalInput(QPair<int, QString> pinfo);
+	void initGlobalInputPorts();
 
 #ifdef HAVE_LASH
     void lash_idle_cb();
@@ -501,6 +504,5 @@ public:
 };
 
 extern void addProject(const QString& name);
-extern void initGlobalInputPorts();
 #endif
 

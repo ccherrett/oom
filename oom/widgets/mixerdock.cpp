@@ -360,7 +360,7 @@ void MixerDock::addStrip(Track* t, int idx)/*{{{*/
 
 void MixerDock::clear()/*{{{*/
 {
-	qDebug("Entering MixerDock::clear");
+	//qDebug("Entering MixerDock::clear");
 	StripList::iterator si = stripList.begin();
 	for (; si != stripList.end(); ++si)
 	{
@@ -369,7 +369,7 @@ void MixerDock::clear()/*{{{*/
 	}
 	stripList.clear();
 	oldAuxsSize = -1;
-	qDebug("Leaving MixerDock::clear");
+	//qDebug("Leaving MixerDock::clear");
 }/*}}}*/
 
 void MixerDock::updateMixer(UpdateAction action)/*{{{*/
