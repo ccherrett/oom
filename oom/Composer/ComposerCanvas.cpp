@@ -5095,7 +5095,7 @@ void ComposerCanvas::processAutomationMovements(QMouseEvent *event)
 				for(CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
 				{
 					CtrlList *cl = icll->second;
-					if(cl->selected() && cl != automation.currentCtrlList)
+					if(cl && cl->selected() && cl != automation.currentCtrlList)
 					{
 						automation.currentCtrlList = cl;
 						break;
