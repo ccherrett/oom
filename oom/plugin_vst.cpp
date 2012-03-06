@@ -1004,7 +1004,7 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
                 else if (tag == "chunk")
                 {
                     QByteArray chunk = QByteArray::fromBase64(xml.parse1().toUtf8().constData());
-                    effect->dispatcher(effect, effSetChunk, 1 /* Preset */, chunk.size(), chunk.data(), 0.0f);
+                    effect->dispatcher(effect, effSetChunk, 0 /* Bank */, chunk.size(), chunk.data(), 0.0f);
                 }
                 else if (tag == "active")
                 {
@@ -1107,7 +1107,7 @@ void VstPlugin::writeConfiguration(int level, Xml& xml)
     if (effect->flags & effFlagsProgramChunks)
     {
         void* data = 0;
-        intptr_t data_size = effect->dispatcher(effect, effGetChunk, 1 /* Preset */, 0, &data, 0.0f);
+        intptr_t data_size = effect->dispatcher(effect, effGetChunk, 0 /* Bank */, 0, &data, 0.0f);
 
         if (data && data_size >= 4)
         {
