@@ -245,18 +245,11 @@ static void usage(const char* prog, const char* txt)
 	fprintf(stderr, "   -M       debug mode: trace midi Output\n");
 	fprintf(stderr, "   -s       debug mode: trace sync\n");
 	fprintf(stderr, "   -a       no audio\n");
-	//fprintf(stderr, "   -P  n    set real time priority to n (default: 50)\n");
 	fprintf(stderr, "   -P  n    set audio driver real time priority to n (Dummy only, default 40. Else fixed by Jack.)\n");
 	fprintf(stderr, "   -Y  n    force midi real time priority to n (default: audio driver prio +2)\n");
 	fprintf(stderr, "   -p       don't load LADSPA plugins\n");
 #ifdef ENABLE_PYTHON
 	fprintf(stderr, "   -y       enable Python control support\n");
-#endif
-#ifdef VST_SUPPORT
-	fprintf(stderr, "   -V       don't load VST plugins\n");
-#endif
-#ifdef DSSI_SUPPORT
-	fprintf(stderr, "   -I       don't load DSSI plugins\n");
 #endif
 #ifdef HAVE_LASH
 	fprintf(stderr, "   -L       don't use LASH\n");
@@ -349,12 +342,6 @@ int main(int argc, char* argv[])
 	int i;
 
 	QString optstr("ahvdDmMsP:Y:l:py");
-#ifdef VST_SUPPORT
-	optstr += QString("V");
-#endif
-#ifdef DSSI_SUPPORT
-	optstr += QString("I");
-#endif
 #ifdef HAVE_LASH
 	optstr += QString("L");
 #endif
@@ -386,10 +373,6 @@ int main(int argc, char* argv[])
 			case 'Y': midiRTPrioOverride = atoi(optarg);
 				break;
 			case 'p': loadPlugins = false;
-				break;
-			case 'V': loadVST = false;
-				break;
-			case 'I': loadDSSI = false;
 				break;
 			case 'L': useLASH = false;
 				break;
@@ -491,12 +474,8 @@ int main(int argc, char* argv[])
 		hIsB = false;
 	}
 
-        // TODO, parse from command-line
-        bool ladspa, lv2, vst;
-        ladspa = lv2 = vst = true;
-
-        if (loadPlugins)
-            initPlugins(ladspa, lv2, vst);
+	if (loadPlugins)
+		initPlugins(config.loadLADSPA, config.loadLV2, config.loadVST);
 
 	initIcons();
 

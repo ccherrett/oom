@@ -156,7 +156,7 @@ QFrame#propertyFrame, QFrame#trackListFrame, QFrame#commentFrame, QFrame#viewsFr
 QFrame#guiSettingsFrame, QFrame#myInputsFrame, QFrame#tickFrame, QFrame#mixerSettingsFrame,
 QFrame#crossfadeSettingsFrame, QFrame#dummyAudioBussBox, QFrame#startUpBox, QFrame#startSongBox,
 QFrame#trackOptionsFrame, QFrame#midiBoxFrame, QFrame#instrumentListFrame, QFrame#importerFrame,
-QFrame#audioExportFrame
+QFrame#audioExportFrame, QFrame#pluginFrame
 {
 	color: #d0d4d0;
 	background-color: #313131;
@@ -176,7 +176,7 @@ QFrame#tabFrame
 QFrame#launchLabelFrame, QFrame#mixerLabelFrame, QFrame#myInputLabelFrame, QFrame#behaviorLabelFrame,
 QFrame#songStartLabelFrame, QFrame#crossfadeLabelFrame, QFrame#dummyLabelFrame, QFrame#tickLabelFrame,
 QFrame#insPropLabelFrame, QFrame#topLabelFrame, QFrame#instrumentLabelFrame, QFrame#instrumentPropFrame,
-QFrame#importerLabelFrame, QFrame#audioExportLabelFrame
+QFrame#importerLabelFrame, QFrame#audioExportLabelFrame, QFrame#pluginLabelFrame
 {
 	color: #d0d4d0;
 	background-color: #313131;

@@ -1237,17 +1237,21 @@ void initPlugins(bool ladspa, bool lv2, bool vst)
     {
         fprintf(stderr, "Looking up LADSPA plugins...\n");
 
+		QStringList ladspaPathList;
 #ifdef __WINDOWS__
         // TODO - look for ladspa in known locations
 #else
         const char* ladspaPath = getenv("LADSPA_PATH");
         if (ladspaPath == 0)
-            ladspaPath = "/usr/local/lib64/ladspa:/usr/lib64/ladspa:/usr/local/lib/ladspa:/usr/lib/ladspa";
-        QStringList ladspaPathList = QString(ladspaPath).split(":");
+		{
+			ladspaPathList = config.ladspaPaths.split(":");//"/usr/local/lib64/ladspa:/usr/lib64/ladspa:/usr/local/lib/ladspa:/usr/lib/ladspa";
+        }
+		else
+			ladspaPathList = QString(ladspaPath).split(":");
 #endif
 
-        for (int i=0; i < ladspaPathList.count(); i++)
-            loadPluginDir(ladspaPathList[i], PLUGIN_LADSPA);
+        foreach(QString s, ladspaPathList)
+            loadPluginDir(s, PLUGIN_LADSPA);
     }
 
     if (lv2)
@@ -1261,17 +1265,22 @@ void initPlugins(bool ladspa, bool lv2, bool vst)
         // TODO
         fprintf(stderr, "Looking up VST plugins...\n");
 
+        QStringList vstPathList;
 #ifdef __WINDOWS__
         // TODO - look for vst in known locations
 #else
         const char* vstPath = getenv("VST_PATH");
         if (vstPath == 0)
-            vstPath = "/usr/local/lib64/vst:/usr/lib64/vst:/usr/local/lib/vst:/usr/lib/vst";
-        QStringList vstPathList = QString(vstPath).split(":");
+		{
+			vstPathList = config.vstPaths.split(":");
+		}
+		else
+			 vstPathList = QString(vstPath).split(":");
+			//"/usr/local/lib64/vst:/usr/lib64/vst:/usr/local/lib/vst:/usr/lib/vst";
 #endif
 
-        for (int i=0; i < vstPathList.count(); i++)
-            loadPluginDir(vstPathList[i], PLUGIN_VST);
+        foreach (QString s, vstPathList)
+            loadPluginDir(s, PLUGIN_VST);
     }
 
     // Add the synth plugins to the midi-device list

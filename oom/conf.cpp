@@ -937,6 +937,26 @@ void readConfiguration(Xml& xml, bool readOnlySequencer)/*{{{*/
 				{
 					readGlobalInputList(xml);
 				}
+				else if(tag == "loadLV2")
+				{
+					config.loadLV2 = xml.parseInt();
+				}
+				else if(tag == "loadLADSPA")
+				{
+					config.loadLADSPA = xml.parseInt();
+				}
+				else if(tag == "loadVST")
+				{
+					config.loadVST = xml.parseInt();
+				}
+				else if(tag == "vstPaths")
+				{
+					config.vstPaths = xml.parse1();
+				}
+				else if(tag == "ladspaPaths")
+				{
+					config.ladspaPaths = xml.parse1();
+				}
 				else
 					xml.skip(tag);
 				break;
@@ -1249,6 +1269,12 @@ void OOMidi::writeGlobalConfiguration(int level, Xml& xml) const
 	xml.strTag(level, "lsClientLSPath", config.lsClientLSPath);
 	xml.intTag(level, "lsClientStartLS", config.lsClientStartLS);
 	
+	xml.intTag(level, "loadLV2", config.loadLV2);
+	xml.intTag(level, "loadLADSPA", config.loadLADSPA);
+	xml.intTag(level, "loadVST", config.loadVST);
+	xml.strTag(level, "ladspaPaths", config.ladspaPaths);
+	xml.strTag(level, "vstPaths", config.vstPaths);
+
 	xml.intTag(level, "vuColorStrip", vuColorStrip);
 	if(gInputList.size())
 	{

@@ -125,6 +125,12 @@ GlobalSettingsConfig::GlobalSettingsConfig(QWidget* parent)
 	txtLSPath->setText(config.lsClientLSPath);
 	btnStartStopLS->hide();
 
+	chkLoadLV2->setChecked(config.loadLV2);
+	chkLoadLADSPA->setChecked(config.loadLADSPA);
+	chkLoadVST->setChecked(config.loadVST);
+	txtVSTPaths->setText(config.vstPaths);
+	txtLADSPAPaths->setText(config.ladspaPaths);
+
 	connect(applyButton, SIGNAL(clicked()), SLOT(apply()));
 	connect(okButton, SIGNAL(clicked()), SLOT(ok()));
 	connect(cancelButton, SIGNAL(clicked()), SLOT(cancel()));
@@ -261,6 +267,13 @@ void GlobalSettingsConfig::updateSettings()
 	chkResetLSOnSongLoad->setChecked(config.lsClientResetOnSongStart);
 	chkStartLS->setChecked(config.lsClientStartLS);
 	txtLSPath->setText(config.lsClientLSPath);
+
+	chkLoadLV2->setChecked(config.loadLV2);
+	chkLoadLADSPA->setChecked(config.loadLADSPA);
+	chkLoadVST->setChecked(config.loadVST);
+	txtVSTPaths->setText(config.vstPaths);
+	txtLADSPAPaths->setText(config.ladspaPaths);
+
 	populateInputs();
 	//TODO: Set icon for status of lsClient
 }
@@ -365,6 +378,12 @@ void GlobalSettingsConfig::apply()
 	config.lsClientStartLS = chkStartLS->isChecked();
 	config.lsClientLSPath = txtLSPath->text();
 
+	config.loadLV2 = chkLoadLV2->isChecked();
+	config.loadLADSPA = chkLoadLADSPA->isChecked();
+	config.ladspaPaths = txtLADSPAPaths->text();
+	config.loadVST = chkLoadVST->isChecked();
+	config.vstPaths = txtVSTPaths->text();
+
 	gInputList.clear();
 	bool hasPorts = !gInputListPorts.isEmpty();
 	for(int i = 0; i < m_inputsModel->rowCount(); ++i)
@@ -394,7 +413,6 @@ void GlobalSettingsConfig::apply()
 			gInputList.append(pinfo);
 		}
 	}
-//FIXME: Initialize the ports right now that were added and unconfigurethe ones that were removed
 
 	oom->setHeartBeat(); // set guiRefresh
 	midiSeq->msgSetRtc(); // set midi tick rate

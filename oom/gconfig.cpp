@@ -6,6 +6,7 @@
 //  (C) Copyright 1999-2003 Werner Schweer (ws@seh.de)
 //=========================================================
 
+#include <QDir>
 #include "gconfig.h"
 
 GlobalConfigValues config = {
@@ -713,6 +714,12 @@ GlobalConfigValues config = {
 	false, //Reset LS on song start
 	true, //Start LinuxSampler on startup
 	QString("linuxsampler"), //LinuxSampler Path
+	true, //Load LV2 plugins
+	true, //Load LADSPA plugins with search path below
+	//TODO: Update this when windows and mac support comes into play
+	QString(QString("/usr/local/lib64/ladspa:/usr/lib64/ladspa:/usr/local/lib/ladspa:/usr/lib/ladspa:").append(QDir::homePath()).append(QDir::separator()).append(".ladspa")),
+	true, //Load VST plugins with search path below
+	QString(QString("/usr/local/lib64/vst:/usr/lib64/vst:/usr/local/lib/vst:/usr/lib/vst:").append(QDir::homePath()).append(QDir::separator()).append(".vst")),
 	0, //Default audio raster index
 	1, //Default midi raster index
 	true //Use auto crossfades

@@ -158,6 +158,11 @@ struct GlobalConfigValues
 	bool lsClientResetOnSongStart;
 	bool lsClientStartLS;
 	QString lsClientLSPath;
+	bool loadLV2;
+	bool loadLADSPA;
+	QString ladspaPaths;
+	bool loadVST;
+	QString vstPaths;
 	int audioRaster;
 	int midiRaster;
 	bool useAutoCrossFades;
