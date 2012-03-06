@@ -215,6 +215,7 @@ MasterEdit::MasterEdit()
 
 	connect(canvas, SIGNAL(followEvent(int)), hscroll, SLOT(setOffset(int)));
 	connect(canvas, SIGNAL(timeChanged(unsigned)), SLOT(setTime(unsigned)));
+	posChanged(0, song->cpos(), false);
 }
 
 //---------------------------------------------------------
