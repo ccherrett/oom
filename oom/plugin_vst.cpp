@@ -1004,6 +1004,11 @@ bool VstPlugin::readConfiguration(Xml& xml, bool readPreset)
                 else if (tag == "chunk")
                 {
                     QByteArray chunk = QByteArray::fromBase64(xml.parse1().toUtf8().constData());
+                    effect->dispatcher(effect, effSetChunk, 1 /* Preset */, chunk.size(), chunk.data(), 0.0f);
+                }
+                else if (tag == "chunkFull")
+                {
+                    QByteArray chunk = QByteArray::fromBase64(xml.parse1().toUtf8().constData());
                     effect->dispatcher(effect, effSetChunk, 0 /* Bank */, chunk.size(), chunk.data(), 0.0f);
                 }
                 else if (tag == "active")
@@ -1113,7 +1118,7 @@ void VstPlugin::writeConfiguration(int level, Xml& xml)
         {
             QByteArray qchunk((const char*)data, data_size);
             const char* chunk = strdup(qchunk.toBase64().data());
-            xml.strTag(level, "chunk", chunk);
+            xml.strTag(level, "chunkFull", chunk);
             free((void*)chunk);
         }
     }
