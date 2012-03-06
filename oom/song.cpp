@@ -1397,7 +1397,7 @@ void Song::setClick(bool val)
 {
 	if(val)/*{{{*/
 	{
-		AudioOutput* master = (AudioOutput*)findTrack("Master");
+		AudioOutput* master = (AudioOutput*)findTrackByIdAndType(m_masterId, Track::AUDIO_OUTPUT);
 		bool hasoutput = (master && master->sendMetronome());
 		if(!hasoutput)
 		{

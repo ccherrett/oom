@@ -401,7 +401,15 @@ void CreateTrackDialog::addTrack()/*{{{*/
 		}
 		break;
 		case Track::AUDIO_AUX:
+		{
+			if(outputIndex >= 0 && chkOutput->isChecked())
+			{
+				QString selectedOutput = cmbOutput->itemText(outputIndex);
+				m_vtrack->useOutput = true;
+				m_vtrack->outputConfig = qMakePair(0, selectedOutput);
+			}
 			//Just add the track type and rename it
+		}
 		break;
 		case Track::AUDIO_SOFTSYNTH:
 			valid = false;
@@ -920,6 +928,28 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 		}
 		break;
 		case Track::AUDIO_AUX:
+		{
+			for(iTrack t = song->tracks()->begin(); t != song->tracks()->end(); ++t)
+			{
+				if((*t)->isMidiTrack())
+					continue;
+				AudioTrack* track = (AudioTrack*) (*t);
+				switch(track->type())
+				{
+					case Track::AUDIO_OUTPUT:
+					case Track::AUDIO_BUSS:
+						cmbOutput->addItem(Route(track, -1).name());
+					break;
+					default:
+					break;
+				}
+			}
+			if (!cmbOutput->count())
+			{
+				chkOutput->setChecked(false);
+				chkOutput->setEnabled(false);
+			}
+		}
         break;
 		case Track::AUDIO_SOFTSYNTH:
             chkOutput->setChecked(false);
@@ -976,9 +1006,6 @@ void CreateTrackDialog::populateBussList()/*{{{*/
 
 void CreateTrackDialog::populateNewInputList()/*{{{*/
 {
-	//while(cmbInput->count())
-	//	cmbInput->removeItem(cmbInput->count()-1);
-	//m_createMidiInputDevice = true;
 	for (iMidiDevice i = midiDevices.begin(); i != midiDevices.end(); ++i)
 	{
 		if ((*i)->deviceType() == MidiDevice::ALSA_MIDI)
@@ -997,9 +1024,6 @@ void CreateTrackDialog::populateNewInputList()/*{{{*/
 
 void CreateTrackDialog::populateNewOutputList()/*{{{*/
 {
-	//while(cmbOutput->count())
-	//	cmbOutput->removeItem(cmbOutput->count()-1);
-	//m_createMidiOutputDevice = true;
 	if(audioDevice->deviceType() != AudioDevice::JACK_AUDIO)
 		return;
 	std::list<QString> sl = audioDevice->inputPorts(true, m_showJackAliases);
@@ -1192,11 +1216,11 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 			cmbInput->setVisible(false);
 			chkInput->setVisible(false);
 
-			cmbOutput->setVisible(false);
-			chkOutput->setVisible(false);
+			cmbOutput->setVisible(true);
+			chkOutput->setVisible(true);
 			
 			//m_height = 100;
-			m_height = 200;
+			m_height = 230;
 			m_width = width();
 		}
 		default:

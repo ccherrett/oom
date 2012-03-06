@@ -593,6 +593,7 @@ void Song::read(Xml& xml)/*{{{*/
 {
 	cloneList.clear();
 	associatedRoute = "";
+	bool click = false;
 	for (;;)
 	{
 		Xml::Token token;
@@ -635,7 +636,7 @@ void Song::read(Xml& xml)/*{{{*/
 				else if (tag == "cycle")
 					_cycleMode = xml.parseInt();
 				else if (tag == "click")
-					setClick(xml.parseInt());
+					click = xml.parseInt();
 				else if (tag == "quantize")
 					_quantize = xml.parseInt();
 				else if (tag == "len")
@@ -815,6 +816,7 @@ void Song::read(Xml& xml)/*{{{*/
 					{
 						updateAuxIndex();
 					}
+					setClick(click);
 					//Call to update the track view menu
 					update(SC_VIEW_CHANGED);
 					return;

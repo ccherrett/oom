@@ -721,6 +721,17 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			if(m_track)
 			{
 				song->undoOp(UndoOp::AddTrack, -1, m_track);
+				if(vtrack->useOutput)
+				{
+					QString selectedOutput = vtrack->outputConfig.second;
+					Route srcRoute((AudioTrack*)m_track, -1);
+					Route dstRoute(selectedOutput, true, -1);
+
+					//audio->msgAddRoute(Route((AudioTrack*) m_track, -1), Route(ao, -1));
+					audio->msgAddRoute(srcRoute, dstRoute);
+					audio->msgUpdateSoloStates();
+					song->update(SC_ROUTE);
+				}
 				song->deselectTracks();
 				m_track->setSelected(true);
 				emit trackAdded(m_track->id());
