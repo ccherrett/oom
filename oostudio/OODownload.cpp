@@ -49,8 +49,10 @@ void OODownload::startDownload(DownloadPackage* pkg)
 			qDebug() << "OODownload::startDownload Unknown progress";
 		break;
 	}
+	emit displayMessage(QString("Fetching library from url: ").append(pkg->path.toString()));
 	m_currentDownloads[pkg->type] = reply;
 	m_currentPackages[pkg->type] = pkg;
+	m_redirectUrl[pkg->type] = pkg->path;
 	emit downloadStarted(pkg->type);
 }
 
@@ -58,6 +60,16 @@ void OODownload::trackProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
 	Q_UNUSED(bytesReceived);
 	Q_UNUSED(bytesTotal);
+}
+
+QUrl OODownload::detectRedirect(const QUrl& possibleRedir, const QUrl& oldUrl) const
+{
+	QUrl redirUrl;
+	if(!possibleRedir.isEmpty() && possibleRedir != oldUrl)
+	{
+		redirUrl = possibleRedir;
+	}
+	return redirUrl;
 }
 
 QString OODownload::getFilename(const QString &name)
@@ -113,45 +125,81 @@ bool OODownload::processDownload(DownloadPackage* pkg, QIODevice* data)
 
 void OODownload::downloadFinished(QNetworkReply* reply)
 {
-	QUrl url = reply->url();
 	int index = m_currentDownloads.key(reply);
 	DownloadPackage* pkg = m_currentPackages.value(index);
 	int id = pkg->type;
-	if(reply->error())
-	{
-		qDebug() << "OODownload::downloadFinished Download finished with error: " << pkg->name;
-		if(reply->error() == QNetworkReply::OperationCanceledError)
+	QVariant possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+	QUrl redirUrl = detectRedirect(possibleRedirectUrl.toUrl(), m_redirectUrl.value(id));
+	if(!redirUrl.isEmpty())
+	{//Try again to follow the redirect
+		QNetworkRequest request(redirUrl);
+		request.setRawHeader("User-Agent", "OOStudio "VERSION);
+		QNetworkReply *reply = m_manager.get(request);/*{{{*/
+		switch(pkg->type)
 		{
-			emit downloadCanceled(id);
-			cleanup(id);
-			if(m_currentDownloads.isEmpty())
+			case Sonatina:
+				connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackSonatinaProgress(qint64, qint64)));
+			break;
+			case Maestro:
+				connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackMaestroProgress(qint64, qint64)));
+			break;
+			case ClassicGuitar:
+				connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackClassicProgress(qint64, qint64)));
+			break;
+			case AcousticGuitar:
+				connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackAcousticProgress(qint64, qint64)));
+			break;
+			case M7IR44:
+			case M7IR48:
+				connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(trackM7Progress(qint64, qint64)));
+			break;
+			default:
+				qDebug() << "OODownload::startDownload Unknown progress";
+			break;
+		}/*}}}*/
+		m_currentDownloads[pkg->type] = reply;
+		m_redirectUrl[pkg->type] = redirUrl;
+		emit displayMessage(QString("Following redirect url: ").append(redirUrl.toString()));
+	}
+	else
+	{//Complete the process
+		QUrl url = reply->url();
+		if(reply->error())
+		{
+			qDebug() << "OODownload::downloadFinished Download finished with error: " << pkg->name;
+			if(reply->error() == QNetworkReply::OperationCanceledError)
 			{
-				emit downloadsComplete();
+				emit downloadCanceled(id);
+				cleanup(id);
+				if(m_currentDownloads.isEmpty())
+				{
+					emit downloadsComplete();
+				}
+			}
+			else
+			{
+				emit downloadError(id, QString(reply->errorString()));
+				cleanup(id);
+				if(m_currentDownloads.isEmpty())
+				{
+					emit downloadsComplete();
+				}
 			}
 		}
 		else
 		{
-			emit downloadError(id, QString(reply->errorString()));
-			cleanup(id);
-			if(m_currentDownloads.isEmpty())
+			if(pkg)
 			{
-				emit downloadsComplete();
-			}
-		}
-	}
-	else
-	{
-		if(pkg)
-		{
-			//QString filename = pkg->filename; //getFilename(url);
-			if(!processDownload(pkg, reply))
-			{
-				cleanup(pkg->type);
-				emit downloadError(pkg->type, QString(reply->errorString()));
-				qDebug() << "OODownload::downloadFinished Download finished: " << pkg->name;
-				//Add message to log
-				//TODO: fire extract thread
-				//emit downloadEnded(pkg->type);
+				//QString filename = pkg->filename; //getFilename(url);
+				if(!processDownload(pkg, reply))
+				{
+					cleanup(pkg->type);
+					emit downloadError(pkg->type, QString(reply->errorString()));
+					qDebug() << "OODownload::downloadFinished Download finished: " << pkg->name;
+					//Add message to log
+					//TODO: fire extract thread
+					//emit downloadEnded(pkg->type);
+				}
 			}
 		}
 	}

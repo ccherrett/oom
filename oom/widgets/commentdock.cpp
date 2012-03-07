@@ -27,8 +27,11 @@ CommentDock::CommentDock(QWidget* parent, Track* t)
 	connect(songComment, SIGNAL(textChanged()), this, SLOT(songCommentChanged()));
 	updateComments();
     commentDockSplitter->setChildrenCollapsible(false);
-	QList<int> sizes;
+	QByteArray str = tconfig().get_property("CommentDock", "settings", "").toByteArray();
+	commentDockSplitter->restoreState(str);
+	/*
 	QString str = tconfig().get_property("CommentDock", "sizes", "30 250").toString();
+	QList<int> sizes;
 	QStringList sl = str.split(QString(" "), QString::SkipEmptyParts);
 	foreach (QString s, sl)
 	{
@@ -36,18 +39,20 @@ CommentDock::CommentDock(QWidget* parent, Track* t)
 		sizes.append(val);
 	}
 	commentDockSplitter->setSizes(sizes);
+	*/
 }
 
 CommentDock::~CommentDock()
 {
 	//QList<int> sizes = commentDockSplitter->sizes();
-	QStringList out;
+	//QStringList out;
 	/*foreach(int s, sizes)
 	{
 		out << QString::number(s);
 	}*/
-	out << QString::number(songComment->height()) << QString::number(textentry->height());
-	tconfig().set_property("CommentDock", "sizes", out.join(" "));
+	//out << QString::number(songComment->height()) << QString::number(textentry->height());
+	//tconfig().set_property("CommentDock", "sizes", out.join(" "));
+	tconfig().set_property("CommentDock", "settings", commentDockSplitter->saveState());
 	tconfig().save();
 }
 

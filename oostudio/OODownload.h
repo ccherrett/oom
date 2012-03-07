@@ -29,7 +29,9 @@ class OODownload : public QObject
 	QMap<int, ExtractJob*> m_currentJobs;
 	QMap<int, QNetworkReply*> m_currentDownloads;
 	QMap<int, DownloadPackage*> m_currentPackages;
+	QMap<int, QUrl> m_redirectUrl;
 	void cleanup(int);
+	QUrl detectRedirect(const QUrl&, const QUrl&) const;
 
 public:
 	OODownload(QObject* parent = 0);
@@ -58,6 +60,7 @@ signals:
 	void trackClassicProgress(qint64 bytesReceived, qint64 bytesTotal);
 	void trackAcousticProgress(qint64 bytesReceived, qint64 bytesTotal);
 	void trackM7Progress(qint64 bytesReceived, qint64 bytesTotal);
+	void displayMessage(QString);
 };
 
 #endif

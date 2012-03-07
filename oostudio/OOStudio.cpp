@@ -378,6 +378,7 @@ void OOStudio::createConnections()/*{{{*/
 	connect(m_downloader, SIGNAL(downloadCanceled(int)), this, SLOT(downloadCanceled(int)));
 	connect(m_downloader, SIGNAL(downloadError(int, QString)), this, SLOT(downloadError(int, QString)));
 	connect(m_downloader, SIGNAL(downloadsComplete()), this, SLOT(downloadsComplete()));
+	connect(m_downloader, SIGNAL(displayMessage(QString)), this, SLOT(showMessage(QString)));
 
 	connect(m_downloader, SIGNAL(trackSonatinaProgress(qint64, qint64)), this, SLOT(trackSonatinaProgress(qint64, qint64)));
 	connect(m_downloader, SIGNAL(trackMaestroProgress(qint64, qint64)), this, SLOT(trackMaestroProgress(qint64, qint64)));

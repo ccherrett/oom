@@ -106,7 +106,6 @@ private:
 	QString getValidName(QString);
 	QString convertPath(QString);
 	void doSessionDelete(OOSession*);
-	void showMessage(QString);
 	bool checkPackageInstall(int);
 
 protected:
@@ -114,6 +113,7 @@ protected:
 	void resizeEvent(QResizeEvent*);
 
 private slots:
+	void showMessage(QString);
 	void linuxSamplerStarted();
 	void oomStarted();
 	void jackStarted();
