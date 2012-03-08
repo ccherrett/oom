@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>354</width>
-    <height>185</height>
+    <height>297</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,7 +59,7 @@
     <widget class="QLabel" name="textLabel1">
      <property name="text">
       <string>
-(C) Copyright 2011 openoctave.org
+(C) Copyright 2011-2012 openoctave.org
   
 Original code from Muse Sequencer 
 (forked on: Jan 9, 2011):

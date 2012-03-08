@@ -34,7 +34,6 @@
 #cmakedefine GTK2UI_SUPPORT
 
 #define VERSION          "${OOMidi_VERSION_FULL}"
-#define SVNVERSION       "${OOMidi_SVNVER}"
 #define PACKAGE_NAME     "OOMidi"
 #define DOCDIR           "${OOMidi_DOC_DIR}"
 #define SHAREDIR         "${OOMidi_SHARE_DIR}"

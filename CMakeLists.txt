@@ -73,9 +73,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 # The OOMidi version number.
-SET(OOMidi_VERSION_MAJOR 2011)
-SET(OOMidi_VERSION_MINOR 3)
-SET(OOMidi_VERSION_PATCH 2)
+SET(OOMidi_VERSION_MAJOR 2012)
+SET(OOMidi_VERSION_MINOR 1)
+SET(OOMidi_VERSION_PATCH beta1)
 SET(OOMidi_VERSION "${OOMidi_VERSION_MAJOR}.${OOMidi_VERSION_MINOR}.${OOMidi_VERSION_PATCH}")
 SET(OOMidi_VERSION_FULL  "${OOMidi_VERSION}")
 SET(OOMidi_INSTALL_NAME  "oom-${OOMidi_VERSION}")
@@ -104,18 +104,6 @@ SET(OOMidi_SHARE_DIR ${SHARE_INSTALL_PREFIX}/${OOMidi_INSTALL_NAME})
 
 ## Lib directory
 SET(OOMidi_LIB_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME})
-
-FIND_PROGRAM(SVNVER svnversion)
-if (${SVNVER} STREQUAL "SVNVER-NOTFOUND")
-      SET (OOMidi_SVNVER 0)
-else (${SVNVER} STREQUAL "SVNVER-NOTFOUND")
-      EXEC_PROGRAM( svnversion
-            ARGS ${PROJECT_SOURCE_DIR}
-            OUTPUT_VARIABLE OOMidi_SVNVER )
-endif (${SVNVER} STREQUAL "SVNVER-NOTFOUND")
-
-# Do we need this? - Orcan:
-# include ( ${PROJECT_SOURCE_DIR}/cmake/WrapMacros.cmake)
 
 #option ( ENABLE_LASH        "enable LASH Audio Session Handler"                              OFF)
 #option ( ENABLE_OSC         "enable Open Sound Control (DSSI also recommended)"              OFF)   
@@ -161,7 +149,7 @@ endif (APPLE)
 set(QT_MIN_VERSION "4.3.0")
 set(QT_USE_QTXML TRUE)
 set(QT_USE_QTDESIGNER TRUE)
-set(QT_USE_QTNSPLUGIN TRUE)
+#set(QT_USE_QTNSPLUGIN TRUE)
 SET (QT_USE_QTWEBKIT TRUE)
 set(QT_USE_QTSVG TRUE)
 
@@ -187,6 +175,7 @@ include(${QT_USE_FILE})
 ## find doxygen
 ##    TODO
 
+PKG_CHECK_MODULES(LINUXSAMPLER REQUIRED linuxsampler>=1.0.0.svn)
 ##
 ## alsa >= 0.9.0
 ##
