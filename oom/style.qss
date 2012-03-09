@@ -355,7 +355,7 @@ AudioClipList QLabel#lengthLabel
  	background-color: #2f2f2f;
  }
 /*Trackview editor styles*/
-TrackViewEditor QListView, TrackViewEditor QTextField, QTableView, AudioClipList QListView, GlobalSettingsConfig QListView, QListView#AutomationMenuList
+TrackViewEditor QListView, TrackViewEditor QTextField, QTableView, AudioClipList QListView, GlobalSettingsConfig QListView, QListView#AutomationMenuList, QListView#TrackInstrumentMenuList
 {
 	border: 1px solid #29292a;
 	border-radius: 6px;
@@ -367,17 +367,17 @@ TrackViewEditor QListView, TrackViewEditor QTextField, QTableView, AudioClipList
 	color: #bbbfbb;
 }
 
-TrackViewEditor QListView::item, AudioClipList QListView::item, GlobalSettingsConfig QListView::item, QListView#AutomationMenuList::item
+TrackViewEditor QListView::item, AudioClipList QListView::item, GlobalSettingsConfig QListView::item, QListView#AutomationMenuList::item, QListView#TrackInstrumentMenuList::item
 {
 	border-bottom: 1px solid #343434;
 }
-TrackViewEditor QListView::item::selected, AudioClipList QListView::item::selected, GlobalSettingsConfig QListView::item::selected, QListView#AutomationMenuList::item::selected
+TrackViewEditor QListView::item::selected, AudioClipList QListView::item::selected, GlobalSettingsConfig QListView::item::selected, QListView#AutomationMenuList::item::selected, QListView#TrackInstrumentMenuList::selected
 {
 	background-color: #0a0a0a;
 }
 /*Conductor styles*/
 
-QLabel#patchLabel, QLabel#AutomationMenuLabel
+QLabel#patchLabel, QLabel#AutomationMenuLabel, QLabel#TrackInstrumentMenuLabel
 {
 	 border-radius: 8px;
      border-image: url(:/images/frame.png) 4;

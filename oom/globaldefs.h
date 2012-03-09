@@ -34,5 +34,20 @@ const int MIDI_PORTS = 1024; // max Number of Midi Ports
 #define MIDI_CHANNELS 16       // Channels per Port
 #endif
 
+struct SamplerData {
+	int samplerChannel;
+	int audioDevice;
+	int audioChannel;
+	int midiDevice;
+	int midiPort;
+	SamplerData()
+	{
+		samplerChannel = -1;
+		audioDevice = -1;
+		audioChannel = -1;
+		midiDevice = -1;
+		midiPort = -1;
+	}
+};
 #endif
 

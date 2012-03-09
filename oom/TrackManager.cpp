@@ -5,6 +5,7 @@
 //===========================================================
 
 #include "TrackManager.h"
+#include "globaldefs.h"
 #include "globals.h"
 #include "gconfig.h"
 #include "track.h"
@@ -248,6 +249,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			m_track =  song->addTrackByName(vtrack->name, Track::MIDI, m_insertPosition, false, false);
 			if(m_track)
 			{
+				m_track->setMasterFlag(true);
 				//if(vtrack->instrumentType == SYNTH_INSTRUMENT)
 				m_track->setHeight(MIN_TRACKHEIGHT);
 				if(vtrack->autoCreateInstrument)
@@ -320,7 +322,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 									midiSeq->msgSetMidiDevice(inport, indev);
 								}
 							}
-							else if(devtype == MidiDevice::JACK_MIDI)
+							else if(devtype == MidiDevice::JACK_MIDI)/*{{{*/
 							{
 								indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
 								if(indev)
@@ -342,7 +344,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 
 								audio->msgUpdateSoloStates();
 								song->update(SC_ROUTE);
-							}
+							}/*}}}*/
 						}
 						else
 						{
@@ -485,6 +487,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			m_track =  song->addTrackByName(vtrack->name, Track::WAVE, m_insertPosition, false, !vtrack->useOutput);
 			if(m_track)
 			{
+				m_track->setMasterFlag(true);
 				song->undoOp(UndoOp::AddTrack, m_insertPosition, m_track);
 				if(vtrack->useInput)
 				{
@@ -493,7 +496,15 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					bool addNewRoute = vtrack->inputConfig.first;
 					Track* input = 0;
 					if(addNewRoute)
+					{
 						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
+						if(input)
+						{
+							input->setMasterFlag(false);
+							input->setChainMaster(m_track->id());
+							m_track->addManagedTrack(input->id());
+						}
+					}
 					else
 						input = song->findTrack(selectedInput);
 					if(input)
@@ -554,6 +565,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			m_track = song->addTrackByName(vtrack->name, Track::AUDIO_OUTPUT, -1, false, false);
 			if(m_track)
 			{
+				m_track->setMasterFlag(true);
 				song->undoOp(UndoOp::AddTrack, -1, m_track);
 				if(vtrack->useInput)
 				{
@@ -624,6 +636,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			m_track = song->addTrackByName(vtrack->name, Track::AUDIO_INPUT, -1, false, false);
 			if(m_track)
 			{
+				m_track->setMasterFlag(true);
 				song->undoOp(UndoOp::AddTrack, -1, m_track);
 				m_track->setMute(false);
 				if(vtrack->useInput)
@@ -684,6 +697,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			m_track = song->addTrackByName(vtrack->name, Track::AUDIO_BUSS, -1, false, false);
 			if(m_track)
 			{
+				m_track->setMasterFlag(true);
 				song->undoOp(UndoOp::AddTrack, -1, m_track);
 				if(vtrack->useInput)
 				{
@@ -720,6 +734,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 			m_track = song->addTrackByName(vtrack->name, Track::AUDIO_AUX, -1, false, false);
 			if(m_track)
 			{
+				m_track->setMasterFlag(true);
 				song->undoOp(UndoOp::AddTrack, -1, m_track);
 				if(vtrack->useOutput)
 				{
@@ -748,6 +763,390 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 	return rv;
 }/*}}}*/
 
+void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int type)/*{{{*/
+{
+	if(!t || instrument.isEmpty())
+		return;
+	m_track = t;
+	MidiTrack* track = (MidiTrack*) m_track;
+	MidiPort *mp = oomMidiPorts.value(track->outPortId());
+	if(mp)
+	{
+		MidiInstrument* oldins = mp->instrument();
+		if(!oldins || oldins->iname() == instrument)
+			return;//No change
+		MidiDevice* md = mp->device();
+		bool isSynth = (md && md->isSynthPlugin());
+		switch(type)
+		{
+			case LS_INSTRUMENT:
+			{
+				if(!lsClient)
+				{
+					lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+					lsClientStarted = lsClient->startClient();
+				}
+				else if(!lsClientStarted)
+				{
+					lsClientStarted = lsClient->startClient();
+					if(config.lsClientResetOnStart && lsClientStarted)
+					{
+						lsClient->resetSampler();
+					}
+				}
+				if(!lsClientStarted)
+				{
+					return;//TODO: announce error condition
+				}
+				MidiInstrument* ins = 0;
+				for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+				{
+					if ((*i)->iname() == instrument)
+					{
+						ins = *i;
+						break;
+					}
+				}
+				if(!ins)
+				{//Reset GUI widgets that made this call and return
+					return;
+				}
+				if(isSynth || !track->samplerData())
+				{//We need to deal with closing the synth devices first
+					if(isSynth)
+					{
+						SynthPluginDevice* synth = (SynthPluginDevice*)md;
+						if (synth->duplicated())
+						{
+							midiDevices.remove(md);
+							synth->close();
+						}
+					}
+					mp->setInstrument(ins);
+					song->update();
+					int map = lsClient->findMidiMap(ins->iname().toUtf8().constData());
+					Patch* p = ins->getDefaultPatch();
+					if(p && map >= 0)
+					{
+						SamplerData* data;
+						if(lsClient->createInstrumentChannel(m_track->name().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map, &data))
+						{
+							if(data)
+							{
+								((MidiTrack*)m_track)->setSamplerData(data);
+							}
+							QString prefix("LinuxSampler:");
+							QString postfix("-audio");
+							QString devname(QString(prefix).append(m_track->name()));
+							QString audioName(QString(prefix).append(m_track->name()).append(postfix));
+							QString midi(QString("O").append(m_track->name()));
+
+							MidiDevice* outdev = MidiJackDevice::createJackMidiDevice(midi, 3);
+							if(outdev)
+							{
+								qDebug("Created MIDI input device: JACK_MIDI");
+								int openFlags = 0;
+								openFlags ^= 0x1;
+								outdev->setOpenFlags(openFlags);
+								midiSeq->msgSetMidiDevice(mp, outdev);
+
+								Route dstRoute(devname, false, -1, Route::JACK_ROUTE);
+								Route srcRoute(outdev, -1);
+
+								audio->msgAddRoute(srcRoute, dstRoute);
+
+								audio->msgUpdateSoloStates();
+								song->update(SC_ROUTE);
+							}
+							
+							Track *input = 0;
+							Track *buss = 0;
+							QList<qint64> *chain = track->audioChain();
+							if(chain && !chain->isEmpty())
+							{
+								for(int c = 0; c < chain->size(); c++)
+								{
+									input = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_INPUT);
+									buss = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_BUSS);
+									if(input && buss)
+										break;
+								}
+							}
+
+							QString inputName = QString("i").append(m_track->name());
+							QString bussName = QString("B").append(m_track->name());
+							
+							if(!input)
+							{
+								input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
+								input->setMasterFlag(false);
+								input->setChainMaster(m_track->id());
+								m_track->addManagedTrack(input->id());
+								input->setMute(false);
+							}
+							if(!buss)
+							{//Create a new one
+								buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, false, true);
+								buss->setMasterFlag(false);
+								buss->setChainMaster(m_track->id());
+								m_track->addManagedTrack(input->id());
+
+								Route srcRoute(input, 0, input->channels());
+								Route dstRoute(buss->name(), true, -1);
+
+								audio->msgAddRoute(srcRoute, dstRoute);
+
+								Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);
+								if(master)
+								{
+									//Route buss track to master
+									//if(vtrack->useBuss && buss)
+									//{
+										Route srcRoute3(buss, 0, buss->channels());
+										Route dstRoute3(master->name(), true, -1);
+								
+										audio->msgAddRoute(srcRoute3, dstRoute3);
+									/*}
+									else
+									{//Route input directly to Master
+										Route srcRoute3(input, 0, input->channels());
+										Route dstRoute3(master->name(), true, -1);
+								
+										audio->msgAddRoute(srcRoute3, dstRoute3);
+									}*/
+								}
+							}
+								
+							if(input)
+							{//Do we have to remove that old route to the synth port, evaluate later
+								//Route channel 1
+								Route srcRoute(audioName, false, -1, Route::JACK_ROUTE);
+								Route dstRoute(input, 0);
+								srcRoute.channel = 0;
+								audio->msgAddRoute(srcRoute, dstRoute);
+
+								//Route channel 2
+								Route srcRoute2(audioName, false, -1, Route::JACK_ROUTE);
+								Route dstRoute2(input, 1);
+								srcRoute2.channel = 1;
+								audio->msgAddRoute(srcRoute2, dstRoute2);
+							}
+						}
+						else
+						{
+							//TODO Show Error dialog
+							return;
+						}
+					}
+				}
+				else
+				{
+					//Now set the instrument and let it load itself into LS
+					mp->setInstrument(ins);
+					int map = lsClient->findMidiMap(ins->iname().toUtf8().constData());
+					Patch* p = ins->getDefaultPatch();
+					if(p && map >= 0)
+					{
+						if(!lsClient->updateInstrumentChannel(track->samplerData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+						{
+							qDebug("Failed to update Sampler Channel");
+						}
+					}
+				}
+				//Find input track related to us and route it
+			}
+			break;
+			case SYNTH_INSTRUMENT:
+			{
+				MidiDevice *ndev = midiDevices.find(instrument, MidiDevice::SYNTH_MIDI);
+				if(!ndev)
+				{
+					return;
+				}
+				if(isSynth)
+				{
+					SynthPluginDevice* synth = (SynthPluginDevice*)md;
+					if (synth->duplicated())
+					{
+						midiDevices.remove(md);
+						synth->close();
+					}
+				}
+				else
+				{//Maybe remove the channel in LS if it was an LS instrument
+					if(oldins->isOOMInstrument() && track->samplerData())
+					{//Delete sampler channel and null the track sampler data
+						if(!lsClient)
+						{
+							lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+							lsClientStarted = lsClient->startClient();
+						}
+						else if(!lsClientStarted)
+						{
+							lsClientStarted = lsClient->startClient();
+							if(config.lsClientResetOnStart && lsClientStarted)
+							{
+								lsClient->resetSampler();
+							}
+						}
+						if(lsClientStarted)
+						{
+							lsClient->removeInstrumentChannel(track->samplerData());
+						}
+						Route srcRoute(md, -1);
+						Route dstRoute(QString("LinuxSampler:").append(m_track->name()), true, -1, Route::JACK_ROUTE);
+						audio->msgRemoveRoute(srcRoute, dstRoute);
+						track->setSamplerData(0);
+						if (audioDevice)
+						{
+							if (md->outClientPort())
+								audioDevice->unregisterPort(md->outClientPort());
+						}
+						midiDevices.remove(md);
+					}
+				}
+				if(ndev)
+				{
+					QString devName(QString("O-").append(m_track->name()));
+                    SynthPluginDevice* oldSynth = (SynthPluginDevice*)ndev;
+                    SynthPluginDevice* synth = oldSynth->clone(devName);
+                    synth->open();
+
+                    midiSeq->msgSetMidiDevice(mp, synth);
+
+                    QString selectedInput  = synth->getAudioOutputPortName(0);
+                    QString selectedInput2 = synth->getAudioOutputPortName(1);
+
+					qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
+					Track* input = 0;
+					Track* buss = 0;
+					QList<qint64> *chain = track->audioChain();
+					if(chain && !chain->isEmpty())
+					{
+						for(int c = 0; c < chain->size(); c++)
+						{
+							input = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_INPUT);
+							buss = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_BUSS);
+						}
+					}
+					QString inputName = QString("i").append(m_track->name());
+					QString bussName = QString("B").append(m_track->name());
+					
+					if(!input)
+					{
+						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
+						input->setMasterFlag(false);
+						input->setChainMaster(m_track->id());
+						m_track->addManagedTrack(input->id());
+						input->setMute(false);
+					}
+					if(!buss)
+					{//Create a new one
+						buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, false, true);
+						buss->setMasterFlag(false);
+						buss->setChainMaster(m_track->id());
+						m_track->addManagedTrack(input->id());
+
+						Route srcRoute(input, 0, input->channels());
+						Route dstRoute(buss->name(), true, -1);
+
+						audio->msgAddRoute(srcRoute, dstRoute);
+
+						Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);
+						if(master)
+						{
+							//Route buss track to master
+							//if(vtrack->useBuss && buss)
+							//{
+								Route srcRoute3(buss, 0, buss->channels());
+								Route dstRoute3(master->name(), true, -1);
+						
+								audio->msgAddRoute(srcRoute3, dstRoute3);
+							/*}
+							else
+							{//Route input directly to Master
+								Route srcRoute3(input, 0, input->channels());
+								Route dstRoute3(master->name(), true, -1);
+						
+								audio->msgAddRoute(srcRoute3, dstRoute3);
+							}*/
+						}
+					}
+					if(input)
+					{//Do we have to remove that old route to the synth port, evaluate later
+						//Route channel 1
+						Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
+						Route dstRoute(input, 0);
+						srcRoute.channel = 0;
+						audio->msgAddRoute(srcRoute, dstRoute);
+
+						//Route channel 2
+						Route srcRoute2(selectedInput2, false, -1, Route::JACK_ROUTE);
+						Route dstRoute2(input, 1);
+						srcRoute2.channel = 1;
+						audio->msgAddRoute(srcRoute2, dstRoute2);
+						break;
+					}
+				}
+				oom->changeConfig(true); // save configuration file
+				song->update(SC_MIDI_TRACK_PROP);
+			}
+			break;
+			default:
+			{//External manual cannections required
+				MidiInstrument* ins = 0;
+				for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
+				{
+					if ((*i)->iname() == instrument)
+					{
+						ins = *i;
+						break;
+					}
+				}
+				if(!ins)
+				{//Reset GUI widgets that made this call and return
+					return;
+				}
+				if(isSynth)
+				{
+					SynthPluginDevice* synth = (SynthPluginDevice*)md;
+					if (synth->duplicated())
+					{
+						midiDevices.remove(md);
+						synth->close();
+					}
+				}
+				else
+				{//Maybe remove the channel in LS if it was an LS instrument
+					if(oldins->isOOMInstrument() || track->samplerData())
+					{//Delete sampler channel and null the track sampler data
+						if(!lsClient)
+						{
+							lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
+							lsClientStarted = lsClient->startClient();
+						}
+						else if(!lsClientStarted)
+						{
+							lsClientStarted = lsClient->startClient();
+						}
+						if(lsClientStarted)
+						{
+							lsClient->removeInstrumentChannel(track->samplerData());
+						}
+						midiDevices.remove(md);
+						track->setSamplerData(0);
+					}
+				}
+				midiSeq->msgSetMidiDevice(mp, 0);
+				mp->setInstrument(ins);
+				song->update(SC_MIDI_TRACK_PROP);
+			}
+			break;
+		}
+		song->update(SC_MIDI_TRACK_PROP);
+	}
+}/*}}}*/
+
 bool TrackManager::removeTrack(VirtualTrack* vtrack)/*{{{*/
 {
 	bool rv = false;
@@ -764,7 +1163,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 		QString instrumentName = vtrack->instrumentName;
 		QString trackName;
 		if(m_track)
-		{qDebug("TrackManager::loadInstrument: Found temp track using name~~~~~~~~~~~~~~~~");
+		{
 			trackName = m_track->name();
 		}
 		else
@@ -807,8 +1206,13 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 									Patch* p = (*i)->getDefaultPatch();
 									if(p && map >= 0)
 									{
-										if(lsClient->createInstrumentChannel(trackName.toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+										SamplerData* data;
+										if(lsClient->createInstrumentChannel(trackName.toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map, &data))
 										{
+											if(data)
+											{
+												((MidiTrack*)m_track)->setSamplerData(data);
+											}
 											qDebug("Created Channel for track");
 										}
 										else
@@ -834,7 +1238,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
                     {
                         if ((*i)->isSynthPlugin() && (*i)->name() == instrumentName)
                         {
-							QString devName(QString("O-").append(m_track->name()));
+							QString devName(QString("O-").append(m_track->name()));/*{{{*/
                             SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
                             SynthPluginDevice* synth = oldSynth->clone(devName);
                             synth->open();
@@ -849,7 +1253,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 							m_synthConfigs.clear();
 							m_synthConfigs.append(qMakePair(portIdx, devName));
                             m_synthConfigs.append(qMakePair(0, selectedInput));
-                            m_synthConfigs.append(qMakePair(0, selectedInput2));
+                            m_synthConfigs.append(qMakePair(0, selectedInput2));/*}}}*/
 							rv = true;
 
                             break;
@@ -872,64 +1276,10 @@ bool TrackManager::unloadInstrument(VirtualTrack *vtrack)/*{{{*/
 {
 	bool rv = false;
 	Q_UNUSED(vtrack);
-	/*Track::TrackType type = (Track::TrackType)vtrack->type;
-	if(type == Track::MIDI)
-	{
-		QString instrumentName = vtrack->instrumentName;
-		QString trackName = vtrack->name;
-		for (iMidiInstrument i = midiInstruments.begin(); i != midiInstruments.end(); ++i)
-		{
-			if ((*i)->iname() == instrumentName && (*i)->isOOMInstrument())
-			{
-				if(!lsClient)
-				{
-					lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
-					lsClientStarted = lsClient->startClient();
-					if(config.lsClientResetOnStart && lsClientStarted)
-					{
-						lsClient->resetSampler();
-					}
-				}
-				else if(!lsClientStarted)
-				{
-					lsClientStarted = lsClient->startClient();
-					if(config.lsClientResetOnStart && lsClientStarted)
-					{
-						lsClient->resetSampler();
-					}
-				}
-				if(lsClientStarted)
-				{
-					qDebug("Loading Instrument to LinuxSampler");
-					if(lsClient->loadInstrument(*i))
-					{
-						rv = true;
-						qDebug("Instrument Map Loaded");
-						if(vtrack->autoCreateInstrument)
-						{
-							int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
-							Patch* p = (*i)->getDefaultPatch();
-							if(p && map >= 0)
-							{
-								if(lsClient->createInstrumentChannel(vtrack->name.toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
-								{
-									qDebug("Created Channel for track");
-								}
-								else
-								{
-									rv = false;
-								}
-							}
-						}
-					}
-				}
-				break;
-			}
-		}
-	}*/
 	return rv;
 }/*}}}*/
 
+//newBuss, useBuss, 
 void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 {
 	bool newBuss = vtrack->bussConfig.first;
@@ -943,13 +1293,24 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 	if(vtrack->useBuss)
 	{
 		if(newBuss)
+		{
 			buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, false, true);
+			if(buss)
+			{
+				buss->setMasterFlag(false);
+				buss->setChainMaster(m_track->id());
+				m_track->addManagedTrack(buss->id());
+			}
+		}
 		else
 			buss = song->findTrack(vtrack->bussConfig.second);
 	}
 	if(input)
 	{
 		song->undoOp(UndoOp::AddTrack, -1, input);
+		input->setMasterFlag(false);
+		input->setChainMaster(m_track->id());
+		m_track->addManagedTrack(input->id());
 		input->setMute(false);
 		QString selectedInput;
 		if(vtrack->instrumentType == SYNTH_INSTRUMENT)
@@ -1019,7 +1380,7 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		}
 
 		//Route audio to master
-		Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);
+		Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);/*{{{*/
 		if(master)
 		{
 			//Route buss track to master
@@ -1037,9 +1398,9 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		
 				audio->msgAddRoute(srcRoute3, dstRoute3);
 			}
-		}
+		}/*}}}*/
 		//Set the predefined pan and reverb level on buss or input
-		qint64 verb = song->oomVerbId();
+		qint64 verb = song->oomVerbId();/*{{{*/
 		if(verb)
 		{
 			double auxval = vtrack->instrumentVerb, panval = vtrack->instrumentPan, aux;
@@ -1079,7 +1440,7 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 				audio->msgSetPan(((AudioTrack*) input), panval);
 				((AudioTrack*) input)->recordAutomation(AC_PAN, panval);
 			}
-		}
+		}/*}}}*/
 
 		audio->msgUpdateSoloStates();
 		song->update(SC_ROUTE);

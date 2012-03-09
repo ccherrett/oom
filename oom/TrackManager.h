@@ -93,6 +93,7 @@ public:
 		QMap<qint64, VirtualTrack*> rv;
 		return rv.unite(m_virtualTracks);
 	}
+	void setTrackInstrument(Track*, const QString&, int);
 	void write(int level, Xml&) const;
 	void read(Xml&);
 };

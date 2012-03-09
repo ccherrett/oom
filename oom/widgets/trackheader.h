@@ -88,6 +88,7 @@ private slots:
 	{
 		m_editing = edit;
 	}
+	void generateInstrumentMenu();
 
 public slots:
 	void songChanged(int);

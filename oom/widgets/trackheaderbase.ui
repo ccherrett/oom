@@ -138,7 +138,7 @@
             <number>0</number>
            </property>
            <item>
-            <layout class="QHBoxLayout" name="m_buttonHBox" stretch="0,0,0,0,0,0,0,0">
+            <layout class="QHBoxLayout" name="m_buttonHBox" stretch="0,0,0,0,0,0,0,0,0">
              <property name="spacing">
               <number>0</number>
              </property>
@@ -262,6 +262,37 @@
                </property>
                <property name="checkable">
                 <bool>true</bool>
+               </property>
+               <property name="autoRaise">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="m_btnInstrument">
+               <property name="minimumSize">
+                <size>
+                 <width>21</width>
+                 <height>18</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>21</width>
+                 <height>18</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>21</width>
+                 <height>18</height>
+                </size>
+               </property>
+               <property name="popupMode">
+                <enum>QToolButton::DelayedPopup</enum>
                </property>
                <property name="autoRaise">
                 <bool>true</bool>

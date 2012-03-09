@@ -46,7 +46,7 @@ class Conductor : public QFrame/*QWidget*/, public Ui::ConductorBase {
 
     Track* selected;
     bool _midiDetect;
-    int program, pan, volume;
+    int program, pan, volume, hbank, lbank;
     int _progRowNum, _selectedIndex;
     ProgramChangeTable* tableView;
     QList<int>* _matrix;
@@ -101,7 +101,6 @@ private slots:
     void patchSelectionChanged(QItemSelection, QItemSelection);
     void editorPartChanged(Part*);
     void transposeStateChanged(bool);
-	
 	void toggleSynthGui(bool);
 
     //tb1

@@ -114,7 +114,7 @@ void AutomationMenu::itemClicked(const QModelIndex& index)
 {
 	if(index.isValid())
 	{
-		QStandardItem *item = m_listModel->itemFromIndex(index);
+		QStandardItem *item = m_listModel->item(index.row());
 		if(item)
 		{
 			item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);

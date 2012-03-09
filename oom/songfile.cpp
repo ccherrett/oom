@@ -689,8 +689,11 @@ void Song::read(Xml& xml)/*{{{*/
 									Patch* p = ins->getDefaultPatch();
 									if(p && map >= 0)
 									{
-										if(lsClient->createInstrumentChannel(track->name().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
+										SamplerData* data;
+										if(lsClient->createInstrumentChannel(track->name().toUtf8().constData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map, &data))
 										{
+											if(data)
+												track->setSamplerData(data);
 											qDebug("Created Channel for track");
 										}
 									}

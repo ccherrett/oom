@@ -119,6 +119,7 @@ QT4_WRAP_CPP (widget_mocs
 	  AutomationMenu.h
 	  StretchDialog.h
 	  TimeHeader.h
+	  TrackInstrumentMenu.h
       )
 
 ##
@@ -270,6 +271,7 @@ file (GLOB widgets_source_files
 	  AutomationMenu.cpp
 	  StretchDialog.cpp
 	  TimeHeader.cpp
+	  TrackInstrumentMenu.cpp
       )
 
 ##

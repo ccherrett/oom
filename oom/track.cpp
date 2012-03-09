@@ -173,7 +173,8 @@ void Track::init()
 	_volumeEn2Ctrl = true;
 	_panEnCtrl = true;
 	_panEn2Ctrl = true;
-	m_chainMaster = false;
+	m_chainMaster = 0;
+	m_masterFlag = false;
     _wantsAutomation = false;
 
 	_selected = false;
@@ -232,6 +233,7 @@ Track::Track(const Track& t, bool cloneParts)
 {
 	m_id = t.m_id;
 	m_chainMaster = t.m_chainMaster;
+	m_masterFlag = t.m_masterFlag;
 	m_audioChain = t.m_audioChain;
 	_partDefaultColor = t._partDefaultColor;
 	_activity = t._activity;
@@ -306,6 +308,7 @@ Track& Track::operator=(const Track& t)
 {
 	m_id = t.m_id;
 	m_chainMaster = t.m_chainMaster;
+	m_masterFlag = t.m_masterFlag;
 	m_audioChain = t.m_audioChain;
 	_partDefaultColor = t._partDefaultColor;
 	_activity = t._activity;
@@ -599,6 +602,7 @@ MidiTrack::MidiTrack(const MidiTrack& mt, bool cloneParts)
 	_outChannel = mt.outChannel();
 	///_inPortMask    = mt.inPortMask();
 	///_inChannelMask = mt.inChannelMask();
+	m_samplerData = mt.m_samplerData;
 	_events = new EventList;
 	_mpevents = new MPEventList;
 	transposition = mt.transposition;
@@ -648,6 +652,7 @@ void MidiTrack::init()
 	compression = 100; // percent
 	_recEcho = true;
 	transpose = false;
+	m_samplerData = 0;
 
 	m_midiassign.enabled = false;
 	m_midiassign.port = 0;
@@ -962,7 +967,8 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 	xml.put(" />");
 	if(m_chainMaster)
 	{
-		xml.intTag(level, "chainMaster", m_chainMaster);
+		xml.qint64Tag(level, "chainMaster", m_chainMaster);
+		xml.intTag(level, "masterFlag", m_masterFlag);
 		QString chaintracks;
 		QStringList ac;
 		if(m_audioChain.size())
@@ -1029,7 +1035,9 @@ bool Track::readProperties(Xml& xml, const QString& tag)/*{{{*/
 	else if(tag == "MidiAssign")
 		m_midiassign.read(xml, (Track*)this);
 	else if(tag == "chainMaster")
-		m_chainMaster = xml.parseInt();
+		m_chainMaster = xml.parseLongLong();
+	else if(tag == "masterFlag")
+		m_masterFlag = xml.parseInt();
 	else if(tag == "audioChain")
 	{
 		QString ids = xml.parse1();

@@ -39,6 +39,7 @@
 #include "pctable.h"
 #include "plugin.h"
 #include "shortcuts.h"
+#include "TrackManager.h"
 
 #include "gcombo.h"
 #include "traverso_shared/TConfig.h"
@@ -318,7 +319,6 @@ Conductor::Conductor(QWidget* parent, Track* sel_track, int rast, int quant) : Q
 	connect(iPan, SIGNAL(valueChanged(int)), SLOT(iPanChanged(int)));
 	connect(iPan, SIGNAL(doubleClicked()), SLOT(iPanDoubleClicked()));
 	connect(iOutput, SIGNAL(activated(int)), SLOT(iOutputPortChanged(int)));
-	///connect(iInput, SIGNAL(textChanged(const QString&)), SLOT(iInputPortChanged(const QString&)));
 	connect(recordButton, SIGNAL(clicked()), SLOT(recordClicked()));
 	connect(progRecButton, SIGNAL(clicked()), SLOT(progRecClicked()));
 	connect(volRecButton, SIGNAL(clicked()), SLOT(volRecClicked()));
@@ -727,7 +727,7 @@ void Conductor::iOutputChannelChanged(int channel)
 	--channel;
 	if (!selected)
 		return;
-	MidiTrack* track = (MidiTrack*) selected;
+	MidiTrack* track = (MidiTrack*) selected;/*{{{*/
 	if (channel != track->outChannel())
 	{
 		// Changed by T356.
@@ -740,7 +740,7 @@ void Conductor::iOutputChannelChanged(int channel)
 		// may result in adding/removing mixer strip:
 		//song->update(-1);
 		song->update(SC_MIDI_TRACK_PROP);
-	}
+	}/*}}}*/
 }
 
 //---------------------------------------------------------
@@ -1517,8 +1517,8 @@ void Conductor::updateConductor(int flags)
 
 		int outChannel = track->outChannel();
 	
+		
 		int outPort = track->outPort();
-
 		iOutput->blockSignals(true);
 
 		iOutput->clear();
@@ -1532,7 +1532,7 @@ void Conductor::updateConductor(int flags)
 				iOutput->setCurrentIndex(i);
 		}
 		iOutput->blockSignals(false);
-
+		
 		iOutputChannel->blockSignals(true);
 		iOutputChannel->setValue(outChannel + 1);
 		iOutputChannel->blockSignals(false);

@@ -125,7 +125,9 @@ protected:
 
     bool _locked;
     bool _selected;
-	bool m_chainMaster;
+	qint64 m_chainMaster;
+	bool m_masterFlag;
+
     
     bool _wantsAutomation;
 
@@ -190,6 +192,21 @@ public:
     {
         _comment = s;
     }
+
+	void setChainMaster(qint64 val){m_chainMaster = val;}
+	qint64 chainMaster(){return m_chainMaster;}
+	void setMasterFlag(bool val){m_masterFlag = val;}
+	bool masterFlag() {return m_masterFlag;}
+	void addManagedTrack(qint64 id)
+	{
+		if(!chainContains(id))
+			m_audioChain.append(id);
+	}
+	QList<qint64>* audioChain() {return &m_audioChain;}
+	bool chainContains(qint64 id) 
+	{
+		return (!m_audioChain.isEmpty() && m_audioChain.contains(id));
+	}
 
 	MidiAssignData* midiAssign() { return &m_midiassign; }
 
@@ -484,6 +501,7 @@ class MidiTrack : public Track
     EventList* _events; // tmp Events during midi import
     MPEventList* _mpevents; // tmp Events druring recording
 	QHash<int, QList<MonitorLog> > m_monitorBuffer;
+	SamplerData* m_samplerData;
 
 public:
     MidiTrack();
@@ -579,6 +597,8 @@ public:
     {
         return _recEcho;
     }
+	SamplerData* samplerData() {return m_samplerData;}
+	void setSamplerData(SamplerData* data){ m_samplerData = data;}
 
     virtual bool isMute() const;
     virtual void setSolo(bool val, bool monitor = false);

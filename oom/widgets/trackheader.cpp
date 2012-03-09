@@ -42,6 +42,7 @@
 #include "mixer/meter.h"
 #include "CreateTrackDialog.h"
 #include "AutomationMenu.h"
+#include "TrackInstrumentMenu.h"
 
 static QString styletemplate = "QLineEdit { border-width:1px; border-radius: 0px; border-image: url(:/images/frame.png) 4; border-top-color: #1f1f22; border-bottom-color: #505050; color: #%1; background-color: #%2; font-family: fixed-width; font-weight: bold; font-size: 15px; padding-left: 15px; }";
 static QString trackHeaderStyle = "QFrame#TrackHeader { border-bottom: 1px solid #888888; border-right: 1px solid #888888; border-left: 1px solid #888888; background-color: #2e2e2e; }";
@@ -111,6 +112,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	connect(m_btnReminder2, SIGNAL(toggled(bool)), this, SLOT(toggleReminder2(bool)));
 	connect(m_btnReminder3, SIGNAL(toggled(bool)), this, SLOT(toggleReminder3(bool)));
 	connect(m_btnAutomation, SIGNAL(clicked()), this, SLOT(generateAutomationMenu()));
+	connect(m_btnInstrument, SIGNAL(clicked()), this, SLOT(generateInstrumentMenu()));
 	//Let header list control this for now
 	//connect(song, SIGNAL(songChanged(int)), this, SLOT(songChanged(int)));
 	connect(song, SIGNAL(playChanged(bool)), this, SLOT(resetPeaksOnPlay(bool)));
@@ -927,6 +929,22 @@ void TrackHeader::generateAutomationMenu()/*{{{*/
 	p->exec(QCursor::pos());
 
 	delete p;
+}/*}}}*/
+
+void TrackHeader::generateInstrumentMenu()/*{{{*/
+{
+	if(!m_track || !m_track->isMidiTrack())
+		return;
+
+	QMenu* p = new QMenu(this);
+	//p->setTearOffEnabled(true);
+	TrackInstrumentMenu *imenu = new TrackInstrumentMenu(p, m_track);
+
+	p->addAction(imenu);
+	p->exec(QCursor::pos());
+
+	//p->deleteLater();
+	song->update();
 }/*}}}*/
 
 void TrackHeader::toggleRecord(bool state)/*{{{*/
