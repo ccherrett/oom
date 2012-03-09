@@ -866,8 +866,10 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 							{
 								for(int c = 0; c < chain->size(); c++)
 								{
-									input = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_INPUT);
-									buss = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_BUSS);
+									if(!input)
+										input = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_INPUT);
+									if(!buss)
+										buss = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_BUSS);
 									if(input && buss)
 										break;
 								}
@@ -882,6 +884,7 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 								input->setMasterFlag(false);
 								input->setChainMaster(m_track->id());
 								m_track->addManagedTrack(input->id());
+								m_track->setMasterFlag(true);
 								input->setMute(false);
 							}
 							if(!buss)
@@ -889,7 +892,7 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 								buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, false, true);
 								buss->setMasterFlag(false);
 								buss->setChainMaster(m_track->id());
-								m_track->addManagedTrack(input->id());
+								m_track->addManagedTrack(buss->id());
 
 								Route srcRoute(input, 0, input->channels());
 								Route dstRoute(buss->name(), true, -1);
@@ -943,6 +946,7 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 				{
 					//Now set the instrument and let it load itself into LS
 					mp->setInstrument(ins);
+					song->update();
 					int map = lsClient->findMidiMap(ins->iname().toUtf8().constData());
 					Patch* p = ins->getDefaultPatch();
 					if(p && map >= 0)
@@ -953,6 +957,8 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 						}
 					}
 				}
+				mp->setInstrument(ins);
+				track->setWantsAutomation(false);
 				//Find input track related to us and route it
 			}
 			break;
@@ -989,20 +995,70 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 								lsClient->resetSampler();
 							}
 						}
-						if(lsClientStarted)
-						{
-							lsClient->removeInstrumentChannel(track->samplerData());
-						}
 						Route srcRoute(md, -1);
-						Route dstRoute(QString("LinuxSampler:").append(m_track->name()), true, -1, Route::JACK_ROUTE);
+						RouteList *rl = md->outRoutes();
+						QString outRoute;
+						std::list<QString> sl = audioDevice->inputPorts(true, false);
+						for (std::list<QString>::iterator ip = sl.begin(); ip != sl.end(); ++ip)/*{{{*/
+						{
+							bool found = false;
+							Route rt(*ip, true, -1, Route::JACK_ROUTE);
+							for (iRoute ir = rl->begin(); ir != rl->end(); ++ir)
+							{
+								if (*ir == rt)
+								{
+									outRoute = (*ir).name();
+									found = true;
+									break;
+								}
+							}
+							if(found)
+								break;
+						}/*}}}*/
+						Route dstRoute(outRoute, true, -1, Route::JACK_ROUTE);
 						audio->msgRemoveRoute(srcRoute, dstRoute);
-						track->setSamplerData(0);
 						if (audioDevice)
 						{
 							if (md->outClientPort())
 								audioDevice->unregisterPort(md->outClientPort());
 						}
 						midiDevices.remove(md);
+						//Remove Audio Routes
+						Track* input = 0;
+						QList<qint64> *chain = track->audioChain();
+						if(chain && !chain->isEmpty())
+						{
+							for(int c = 0; c < chain->size(); c++)
+							{
+								input = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_INPUT);
+								if(input)
+									break;
+							}
+						}
+						if(input)
+						{//Remove route
+							for(int i = 0; i < input->channels(); i++)
+							{
+								QString src(QString("LinuxSampler:").append(m_track->name()).append("-audio"));
+                				Route srcRoute(src, true, Route::JACK_ROUTE);
+                				Route dstRoute(input->name(), true, i);
+								qDebug("srcRoute: %s, %d, %d\n", src.toUtf8().constData(), true, Route::JACK_ROUTE);
+								qDebug("dstRoute: %s, %d, %d\n", input->name().toUtf8().constData(), true, i);
+								audio->msgRemoveRoute(srcRoute, dstRoute);
+								/*if (audioDevice)
+								{
+									if (((AudioInput*)input)->jackPort(i))
+										audioDevice->unregisterPort(((AudioInput*)input)->jackPort(i));
+								}*/
+							}
+						}
+						//Remove the LinuxSampler channel
+						if(lsClientStarted)
+						{
+							lsClient->removeInstrumentChannel(track->samplerData());
+						}
+						track->setSamplerData(0);
+						track->setWantsAutomation(true);
 					}
 				}
 				if(ndev)
@@ -1025,8 +1081,12 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 					{
 						for(int c = 0; c < chain->size(); c++)
 						{
-							input = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_INPUT);
-							buss = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_BUSS);
+							if(!input)
+								input = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_INPUT);
+							if(!buss)
+								buss = song->findTrackByIdAndType(chain->at(c), Track::AUDIO_BUSS);
+							if(input && buss)
+								break;
 						}
 					}
 					QString inputName = QString("i").append(m_track->name());
@@ -1039,13 +1099,14 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 						input->setChainMaster(m_track->id());
 						m_track->addManagedTrack(input->id());
 						input->setMute(false);
+						m_track->setMasterFlag(true);
 					}
 					if(!buss)
 					{//Create a new one
 						buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, false, true);
 						buss->setMasterFlag(false);
 						buss->setChainMaster(m_track->id());
-						m_track->addManagedTrack(input->id());
+						m_track->addManagedTrack(buss->id());
 
 						Route srcRoute(input, 0, input->channels());
 						Route dstRoute(buss->name(), true, -1);

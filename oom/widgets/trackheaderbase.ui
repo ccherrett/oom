@@ -146,7 +146,7 @@
               <enum>QLayout::SetDefaultConstraint</enum>
              </property>
              <property name="leftMargin">
-              <number>10</number>
+              <number>0</number>
              </property>
              <property name="topMargin">
               <number>2</number>
@@ -466,7 +466,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>50</width>
+                 <width>27</width>
                  <height>20</height>
                 </size>
                </property>

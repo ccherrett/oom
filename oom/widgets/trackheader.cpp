@@ -92,6 +92,7 @@ TrackHeader::TrackHeader(Track* t, QWidget* parent)
 	m_btnRecord->setIcon(*record_trackIconSet3);
 	m_btnMute->setAcceptDrops(false);
 	m_btnMute->setIcon(*mute_trackIconSet3);
+	m_btnInstrument->setAcceptDrops(false);
 	m_btnAutomation->setAcceptDrops(false);
 	m_btnReminder1->setAcceptDrops(false);
 	m_btnReminder2->setAcceptDrops(false);
@@ -178,13 +179,30 @@ void TrackHeader::setTrack(Track* track)/*{{{*/
 	{
 		setFixedHeight(m_track->height());
 	}
-    if(m_track->isMidiTrack() && m_track->wantsAutomation() == false)
+    if(m_track->isMidiTrack())
 	{
-		m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
-		m_btnAutomation->setToolTip("");
+		MidiPort *mp = oomMidiPorts.value(((MidiTrack*)m_track)->outPortId());
+		m_btnInstrument->setIcon(*instrument_trackIconSet3);
+		if(mp)
+			m_btnInstrument->setToolTip(QString(tr("Change Instrument: ")).append(mp->instrument()->iname()));
+		else
+			m_btnInstrument->setToolTip(tr("Change Instrument"));
+		if(m_track->wantsAutomation())
+		{
+			m_btnAutomation->setIcon(*automation_trackIconSet3);
+			m_btnAutomation->setToolTip(tr("Toggle Automation"));
+		}
+		else
+		{
+			m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
+			m_btnAutomation->setToolTip("");
+		}
 	}
 	else
 	{
+		m_btnInstrument->setIcon(*input_indicator_OffIcon);
+		m_btnInstrument->setToolTip("");
+
 		m_btnAutomation->setIcon(*automation_trackIconSet3);
 		m_btnAutomation->setToolTip(tr("Toggle Automation"));
 	}
@@ -451,9 +469,9 @@ void TrackHeader::heartBeat()/*{{{*/
 			track->setActivity((int) ((double) act * 0.8));
 		
 		//int outChannel = track->outChannel();
-		//int outPort = track->outPort();
+		int outPort = track->outPort();
 
-		//MidiPort* mp = &midiPorts[outPort];
+		MidiPort* mp = &midiPorts[outPort];
 
 		// Check for detection of midi general activity on chosen channels...
 		if(m_track->recordFlag())
@@ -507,6 +525,10 @@ void TrackHeader::heartBeat()/*{{{*/
             else
                 m_btnAutomation->setIcon(QIcon(*input_indicator_OffIcon));
 		}
+		if(mp)
+			m_btnInstrument->setToolTip(QString(tr("Change Instrument: ")).append(mp->instrument()->iname()));
+		else
+			m_btnInstrument->setToolTip(tr("Change Instrument"));
 	}
 	else
 	{
@@ -943,8 +965,9 @@ void TrackHeader::generateInstrumentMenu()/*{{{*/
 	p->addAction(imenu);
 	p->exec(QCursor::pos());
 
-	//p->deleteLater();
-	song->update();
+	p->deleteLater();
+	updateSelection(false);
+	emit selectionChanged(m_track);
 }/*}}}*/
 
 void TrackHeader::toggleRecord(bool state)/*{{{*/

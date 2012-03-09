@@ -845,6 +845,8 @@ QPixmap* input_indicator_OffIcon;
 QPixmap* input_indicator_OverIcon;
 QPixmap* automation_track_OffIcon;
 QPixmap* automation_track_OverIcon;
+QPixmap* instrument_track_OffIcon;
+QPixmap* instrument_track_OverIcon;
 
 QIcon* reminder1IconSet3;
 QIcon* reminder2IconSet3;
@@ -854,6 +856,7 @@ QIcon* record_trackIconSet3;
 QIcon* mute_trackIconSet3;
 QIcon* solo_trackIconSet3;
 QIcon* automation_trackIconSet3;
+QIcon* instrument_trackIconSet3;
 QIcon* input_indicatorIconSet3;
 
 QPixmap* armAllIcon;
@@ -1683,6 +1686,9 @@ void initIcons()
       automation_track_OffIcon                      = new MPIXMAP(":/images/icons/automation_track_new_off.png", NULL);
       automation_track_OverIcon                     = new MPIXMAP(":/images/icons/automation_track_new_over.png", NULL);
 	  
+      instrument_track_OffIcon                      = new MPIXMAP(":/images/icons/instrument_track_new_off.png", NULL);
+      instrument_track_OverIcon                     = new MPIXMAP(":/images/icons/instrument_track_new_over.png", NULL);
+	  
 	  reminder1IconSet3         = new QIcon();
 	  reminder1IconSet3->addPixmap(*reminder1_OnIcon, QIcon::Normal, QIcon::On);
       reminder1IconSet3->addPixmap(*reminder1_OffIcon, QIcon::Normal, QIcon::Off);
@@ -1721,6 +1727,10 @@ void initIcons()
 	  automation_trackIconSet3         = new QIcon();
       automation_trackIconSet3->addPixmap(*automation_track_OffIcon, QIcon::Normal, QIcon::Off);
       automation_trackIconSet3->addPixmap(*automation_track_OverIcon, QIcon::Active);
+
+	  instrument_trackIconSet3         = new QIcon();
+      instrument_trackIconSet3->addPixmap(*instrument_track_OffIcon, QIcon::Normal, QIcon::Off);
+      instrument_trackIconSet3->addPixmap(*instrument_track_OverIcon, QIcon::Active);
 
       oomIcon                                      = new MPIXMAP(oom_icon_xpm, NULL);
       aboutOOMidiImage                             = new MPIXMAP(":/images/oom-about.png", NULL);

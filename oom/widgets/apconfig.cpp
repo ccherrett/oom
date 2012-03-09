@@ -118,8 +118,10 @@ void AudioPortConfig::removeRoute()
 
         if (item->type() == Track::AUDIO_INPUT)
         {
+			qDebug("srcRoute: %s, %d, %d\n", item->text(0).toUtf8().constData(), true, item->text(1).toInt());
+			qDebug("dstRoute: %s, %d, %d\n", item->text(2).toUtf8().constData(), true, item->text(4).toInt());
                 Route srcRoute(item->text(0), true, item->text(1).toInt());
-                Route dstRoute(item->text(2), true, item->text(4).toInt());
+                Route dstRoute(item->text(2), true, item->text(1).toInt());
                 audio->msgRemoveRoute(srcRoute, dstRoute);
         }
         if (item->type() == Track::AUDIO_OUTPUT)

@@ -965,21 +965,16 @@ void Track::writeProperties(int level, Xml& xml) const/*{{{*/
 	}
 	xml.nput(" midimap=\"%s\"", assign.toUtf8().constData());
 	xml.put(" />");
-	if(m_chainMaster)
+	xml.qint64Tag(level, "chainMaster", m_chainMaster);
+	xml.intTag(level, "masterFlag", m_masterFlag);
+	QStringList ac;
+	if(m_audioChain.size())
 	{
-		xml.qint64Tag(level, "chainMaster", m_chainMaster);
-		xml.intTag(level, "masterFlag", m_masterFlag);
-		QString chaintracks;
-		QStringList ac;
-		if(m_audioChain.size())
+		foreach(qint64 id, m_audioChain)
 		{
-			foreach(qint64 id, m_audioChain)
-			{
-				ac.append(QString::number(id));
-			}
-			chaintracks = ac.join(",");
-			xml.strTag(level, "audioChain", chaintracks);
+			ac.append(QString::number(id));
 		}
+		xml.strTag(level, "audioChain", ac.join(","));
 	}
 }/*}}}*/
 

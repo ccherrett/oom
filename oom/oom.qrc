@@ -345,6 +345,9 @@
 		<file>images/icons/automation_track_new_over.png</file>
 		<file>images/icons/automation_track_new_off.png</file>
 
+		<file>images/icons/instrument_track_new_over.png</file>
+		<file>images/icons/instrument_track_new_off.png</file>
+
 		<file>images/icons/mixer_record_new_on.png</file>
 		<file>images/icons/mixer_record_new_over.png</file>
 		<file>images/icons/mixer_record_new_off.png</file>
