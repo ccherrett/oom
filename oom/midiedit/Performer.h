@@ -268,6 +268,7 @@ private slots:
 signals:
     void deleted();
 	void showComments(bool);
+	void showComments(bool, bool);
 	void controllerMaxHeightChanged(int);
 
 public slots:

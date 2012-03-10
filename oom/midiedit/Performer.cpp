@@ -489,6 +489,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
     connect(midiConductor, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
 	connect(midiConductor, SIGNAL(patchChanged(Patch*)), this ,SLOT(setKeyBindings(Patch*)));
+	connect(this, SIGNAL(showComments(bool, bool)), midiConductor, SLOT(updateComments(bool, bool)));
     connect(info, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
     connect(info, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
     connect(info, SIGNAL(toChanged(int)), SLOT(setTo(int)));
@@ -1648,7 +1649,9 @@ void Performer::updateConductor()/*{{{*/
 			///midiConductor->updateConductor(-1);
 		}
 	}
-	midiConductor->updateCommentState(canvas->showComments(), false);
+	//if(canvas)
+	//	emit showComments(canvas->showComments(), false);
+	//midiConductor->updateCommentState(canvas->showComments(), false);
 }/*}}}*/
 
 //---------------------------------------------------------
