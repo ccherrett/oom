@@ -14,8 +14,8 @@
 #include <QKeyEvent>
 
 #include <values.h>
-#include "noteinfo.h"
 #include "cobject.h"
+#include "noteinfo.h"
 #include "AbstractMidiEditor.h"
 #include "mididev.h"
 #include "toolbars/tools.h"

@@ -967,7 +967,7 @@ void TrackHeader::generateInstrumentMenu()/*{{{*/
 
 	p->deleteLater();
 	updateSelection(false);
-	emit selectionChanged(m_track);
+	//emit selectionChanged(m_track);
 }/*}}}*/
 
 void TrackHeader::toggleRecord(bool state)/*{{{*/

@@ -15,6 +15,8 @@ namespace Awl
     //class PitchEdit;
 };
 
+class QTableWidget;
+class GridCombo;
 class QSpinBox;
 class QCheckBox;
 ///class PosEdit;
@@ -29,6 +31,13 @@ class QVBoxLayout;
 class NoteInfo : public QWidget
 {
     Q_OBJECT
+
+	//ToolBar1 merge
+    GridCombo* quantLabel;
+    QTableWidget* qlist;
+    GridCombo* rasterLabel;
+    QTableWidget* rlist;
+	//end merge
 
     Awl::PosEdit* selTime;
 	QVBoxLayout* m_layout;
@@ -60,14 +69,28 @@ private slots:
     void timeChanged(const Pos&);
 	void alphaChanged(int);
 	void partLinesChanged(bool);
+    //tb1
+    void _rasterChanged(int);
+    void _quantChanged(int);
+	//end
 
 public slots:
     void setValue(ValType, int);
+    //tb1
+    void setRaster(int);
+    void setQuant(int);
+    //end
 
 signals:
     void valueChanged(NoteInfo::ValType, int);
 	void alphaChanged();
 	void enablePartLines(bool);
+	//tb1
+    void rasterChanged(int);
+    void quantChanged(int);
+    void soloChanged(bool);
+    void toChanged(int);
+	//end
 };
 #endif
 

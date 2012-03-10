@@ -127,7 +127,7 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	m_prDock->setWidget(dockWidget);
 	connect(m_prDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), SLOT(dockAreaChanged(Qt::DockWidgetArea)));
 
-	midiConductor = new Conductor(this, 0, _rasterInit, _quantInit);
+	midiConductor = new Conductor(this, 0);
 	midiConductor->setObjectName("prTrackInfo");
 	midiConductor->setMinimumSize(QSize(190,100));
 
@@ -145,6 +145,8 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	m_trackListView->getView()->installEventFilter(this);
 
 	info = new NoteInfo(this);
+	info->setRaster(_rasterInit);
+	info->setQuant(_quantInit);
 
 	m_tabs->addTab(midiConductor, tr("   Conductor   "));
 	m_tabs->addTab(m_trackListView, tr("   Track List   "));
@@ -485,11 +487,11 @@ Performer::Performer(PartList* pl, QWidget* parent, const char* name, unsigned i
 	connect(midiConductor, SIGNAL(globalTransposeClicked(bool)), canvas, SLOT(globalTransposeClicked(bool)));
 	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
 	connect(midiConductor, SIGNAL(toggleComments(bool)), canvas, SLOT(toggleComments(bool)));
-    connect(midiConductor, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
-    connect(midiConductor, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
-    connect(midiConductor, SIGNAL(toChanged(int)), SLOT(setTo(int)));
     connect(midiConductor, SIGNAL(updateCurrentPatch(QString)), patchLabel, SLOT(setText(QString)));
 	connect(midiConductor, SIGNAL(patchChanged(Patch*)), this ,SLOT(setKeyBindings(Patch*)));
+    connect(info, SIGNAL(quantChanged(int)), SLOT(setQuant(int)));
+    connect(info, SIGNAL(rasterChanged(int)), SLOT(setRaster(int)));
+    connect(info, SIGNAL(toChanged(int)), SLOT(setTo(int)));
 	
 	connect(m_muteAction, SIGNAL(triggered(bool)), this, SLOT(toggleMuteCurrentPart(bool)));
 
@@ -1418,8 +1420,8 @@ void Performer::keyPressEvent(QKeyEvent* event)/*{{{*/
 	}
 	setQuant(val);
 	setRaster(val);
-	midiConductor->setQuant(_quant);
-	midiConductor->setRaster(_raster);
+	info->setQuant(_quant);
+	info->setRaster(_raster);
 }/*}}}*/
 
 //---------------------------------------------------------
@@ -2440,8 +2442,8 @@ void Performer::readStatus(Xml& xml)/*{{{*/
 			{
 				_quantInit = _quant;
 				_rasterInit = _raster;
-				midiConductor->setRaster(_raster);
-				midiConductor->setQuant(_quant);
+				info->setRaster(_raster);
+				info->setQuant(_quant);
 				canvas->redrawGrid();
 				return;
 			}

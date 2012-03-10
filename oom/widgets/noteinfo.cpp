@@ -7,16 +7,41 @@
 //=========================================================
 
 #include <QtGui>
+#include <QTableWidget>
 
 #include "config.h"
 #include "noteinfo.h"
 #include "awl/posedit.h"
-//#include "awl/pitchedit.h"
 #include "song.h"
 #include "globals.h"
-///#include "posedit.h"
 #include "pitchedit.h"
+#include "gcombo.h"
 #include "traverso_shared/TConfig.h"
+
+static int rasterTable[] = {
+	//------                8    4     2
+	1, 4, 8, 16, 32, 64, 128, 256, 512, 1024,
+	1, 6, 12, 24, 48, 96, 192, 384, 768, 1536,
+	1, 9, 18, 36, 72, 144, 288, 576, 1152, 2304
+};
+
+static const char* rasterStrings[] ={
+	QT_TRANSLATE_NOOP("@default", "Off"), "2pp", "5pp", "64T", "32T", "16T", "8T", "4T", "2T", "1T",
+	QT_TRANSLATE_NOOP("@default", "Off"), "3pp", "6pp", "64", "32", "16", "8", "4", "2", "1",
+	QT_TRANSLATE_NOOP("@default", "Off"), "4pp", "7pp", "64.", "32.", "16.", "8.", "4.", "2.", "1."
+};
+
+static int quantTable[] = {
+	1, 16, 32, 64, 128, 256, 512, 1024,
+	1, 24, 48, 96, 192, 384, 768, 1536,
+	1, 36, 72, 144, 288, 576, 1152, 2304
+};
+
+static const char* quantStrings[] = {
+	QT_TRANSLATE_NOOP("@default", "Off"), "64T", "32T", "16T", "8T", "4T", "2T", "1T",
+	QT_TRANSLATE_NOOP("@default", "Off"), "64", "32", "16", "8", "4", "2", "1",
+	QT_TRANSLATE_NOOP("@default", "Off"), "64.", "32.", "16.", "8.", "4.", "2.", "1."
+};
 
 //---------------------------------------------------
 //    NoteInfo
@@ -64,6 +89,75 @@ NoteInfo::NoteInfo(QWidget* parent)
 	m_partLines->setChecked(pl);
 	addTool(tr("Part End Marker"), m_partLines);
 
+	//start tb1 merge/*{{{*/
+	//---------------------------------------------------
+	//  Raster, Quant.
+	//---------------------------------------------------
+
+    rasterLabel = new GridCombo(this);
+    quantLabel = new GridCombo(this);
+
+	rlist = new QTableWidget(10, 3);
+	rlist->setObjectName("listSnap");
+	qlist = new QTableWidget(8, 3);
+	qlist->setObjectName("listQuant");
+	rlist->verticalHeader()->setDefaultSectionSize(22);
+	rlist->horizontalHeader()->setDefaultSectionSize(32);
+	rlist->setSelectionMode(QAbstractItemView::SingleSelection);
+	rlist->verticalHeader()->hide();
+	rlist->horizontalHeader()->hide();
+	qlist->verticalHeader()->setDefaultSectionSize(22);
+	qlist->horizontalHeader()->setDefaultSectionSize(32);
+	qlist->setSelectionMode(QAbstractItemView::SingleSelection);
+	qlist->verticalHeader()->hide();
+	qlist->horizontalHeader()->hide();
+
+	rlist->setMinimumWidth(96);
+	qlist->setMinimumWidth(96);
+
+	rasterLabel->setView(rlist);
+	quantLabel->setView(qlist);
+
+	for (int j = 0; j < 3; j++)
+		for (int i = 0; i < 10; i++)
+			rlist->setItem(i, j, new QTableWidgetItem(tr(rasterStrings[i + j * 10])));
+	for (int j = 0; j < 3; j++)
+		for (int i = 0; i < 8; i++)
+			qlist->setItem(i, j, new QTableWidgetItem(tr(quantStrings[i + j * 8])));
+
+	setRaster(96);
+	setQuant(96);
+
+    rasterLabel->setMinimumSize(QSize(80, 22));
+    quantLabel->setMinimumSize(QSize(80, 22));
+
+	QHBoxLayout *hbox1 = new QHBoxLayout();
+	hbox1->addWidget(new QLabel(tr("Snap")));
+	hbox1->addWidget(rasterLabel);
+	QHBoxLayout *hbox2 = new QHBoxLayout();
+	hbox2->addWidget(new QLabel(tr("Quant.")));
+	hbox2->addWidget(quantLabel);
+	m_layout->addLayout(hbox1);
+	m_layout->addLayout(hbox2);
+
+	//---------------------------------------------------
+	//  To Menu
+	//---------------------------------------------------
+	QComboBox* toList = new QComboBox;
+	toList->insertItem(0, tr("All Events"));
+	toList->insertItem(CMD_RANGE_LOOP, tr("Looped Ev."));
+	toList->insertItem(CMD_RANGE_SELECTED, tr("Selected Ev."));
+	toList->insertItem(CMD_RANGE_LOOP | CMD_RANGE_SELECTED, tr("Looped+Sel."));
+    toList->setMinimumSize(QSize(80, 22));
+	QHBoxLayout *hbox3 = new QHBoxLayout();
+	hbox3->addWidget(new QLabel(tr("To")));
+	hbox3->addWidget(toList);
+	m_layout->addLayout(hbox3);
+
+    connect(rasterLabel, SIGNAL(activated(int)), SLOT(_rasterChanged(int)));
+    connect(quantLabel, SIGNAL(activated(int)), SLOT(_quantChanged(int)));
+    connect(toList, SIGNAL(activated(int)), SIGNAL(toChanged(int)));
+	//end tb1/*}}}*/
 	QSpacerItem* vSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	m_layout->addItem(vSpacer);
 
@@ -230,3 +324,56 @@ void NoteInfo::timeChanged(const Pos& pos)
 		emit valueChanged(VAL_TIME, pos.tick());
 }
 
+//---------------------------------------------------------/*{{{*/
+//   rasterChanged
+//---------------------------------------------------------
+
+void NoteInfo::_rasterChanged(int /*i*/)
+{
+	emit rasterChanged(rasterTable[rlist->currentRow() + rlist->currentColumn() * 10]);
+}
+
+//---------------------------------------------------------
+//   quantChanged
+//---------------------------------------------------------
+
+void NoteInfo::_quantChanged(int /*i*/)
+{
+	emit quantChanged(quantTable[qlist->currentRow() + qlist->currentColumn() * 8]);
+}
+
+//---------------------------------------------------------
+//   setRaster
+//---------------------------------------------------------
+
+void NoteInfo::setRaster(int val)
+{
+	for (unsigned i = 0; i < sizeof (rasterTable) / sizeof (*rasterTable); i++)
+	{
+		if (val == rasterTable[i])
+		{
+			rasterLabel->setCurrentIndex(i);
+			return;
+		}
+	}
+	printf("setRaster(%d) not defined\n", val);
+	rasterLabel->setCurrentIndex(0);
+}
+
+//---------------------------------------------------------
+//   setQuant
+//---------------------------------------------------------
+
+void NoteInfo::setQuant(int val)
+{
+	for (unsigned i = 0; i < sizeof (quantTable) / sizeof (*quantTable); i++)
+	{
+		if (val == quantTable[i])
+		{
+			quantLabel->setCurrentIndex(i);
+			return;
+		}
+	}
+	printf("setQuant(%d) not defined\n", val);
+	quantLabel->setCurrentIndex(0);
+}/*}}}*/

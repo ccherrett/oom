@@ -15,12 +15,10 @@
 #define ConductorPatchIdRole Qt::UserRole+2
 
 class QToolButton;
-class QTableWidget;
 class QComboBox;
 
 class Track;
 class Part;
-class GridCombo;
 
 class QTableView;
 class QStandardItem;
@@ -36,13 +34,6 @@ class Patch;
 
 class Conductor : public QFrame/*QWidget*/, public Ui::ConductorBase {
     Q_OBJECT
-
-	//ToolBar1 merge
-    GridCombo* quantLabel;
-    QTableWidget* qlist;
-    GridCombo* rasterLabel;
-    QTableWidget* rlist;
-	//end merge
 
     Track* selected;
     bool _midiDetect;
@@ -103,11 +94,6 @@ private slots:
     void transposeStateChanged(bool);
 	void toggleSynthGui(bool);
 
-    //tb1
-    void _rasterChanged(int);
-    void _quantChanged(int);
-	//end
-
 protected slots:
     virtual void heartBeat();
 
@@ -131,10 +117,6 @@ public slots:
     void setGlobalState(bool state) {
         m_globalState = state;
     }
-    //tb1
-    void setRaster(int);
-    void setQuant(int);
-    //end
 
 signals:
     void outputPortChanged(int);
@@ -142,15 +124,9 @@ signals:
     void patchChanged(Patch*);
     void globalTransposeClicked(bool);
     void toggleComments(bool);
-	//tb1
-    void rasterChanged(int);
-    void quantChanged(int);
-    void soloChanged(bool);
-    void toChanged(int);
-	//end
 
 public:
-    Conductor(QWidget*, Track* = 0, int rast = 96, int quant = 96);
+    Conductor(QWidget*, Track* = 0);
     ~Conductor();
 
     Track* track() const {

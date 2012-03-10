@@ -992,7 +992,7 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 						RouteList *rl = md->outRoutes();
 						QString outRoute;
 						std::list<QString> sl = audioDevice->inputPorts(true, false);
-						for (std::list<QString>::iterator ip = sl.begin(); ip != sl.end(); ++ip)/*{{{*/
+						for (std::list<QString>::iterator ip = sl.begin(); ip != sl.end(); ++ip)
 						{
 							bool found = false;
 							Route rt(*ip, true, -1, Route::JACK_ROUTE);
@@ -1007,7 +1007,7 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 							}
 							if(found)
 								break;
-						}/*}}}*/
+						}
 						Route dstRoute(outRoute, true, -1, Route::JACK_ROUTE);
 						audio->msgRemoveRoute(srcRoute, dstRoute);
 						if (audioDevice)
@@ -1030,7 +1030,8 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 						}
 						if(input)
 						{//Remove route
-							for(int i = 0; i < input->channels(); i++)
+							int channels = input->channels();
+							for(int i = 0; i < channels; i++)
 							{
 								QString src(QString("LinuxSampler:").append(m_track->name()).append("-audio"));
                 				Route srcRoute(src, true, Route::JACK_ROUTE);
@@ -1192,6 +1193,8 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 			break;
 		}
 		song->update(SC_MIDI_TRACK_PROP);
+		song->update(SC_TRACK_INSTRUMENT);
+		song->dirty = true;
 	}
 }/*}}}*/
 
@@ -1327,9 +1330,9 @@ bool TrackManager::unloadInstrument(VirtualTrack *vtrack)/*{{{*/
 	return rv;
 }/*}}}*/
 
-void TrackManager::configureVerb(Track* track, double auxval, double panval)
+void TrackManager::configureVerb(Track* track, double auxval, double panval)/*{{{*/
 {
-	qint64 verb = song->oomVerbId();/*{{{*/
+	qint64 verb = song->oomVerbId();
 	if(verb)
 	{
 		double aux;
@@ -1357,8 +1360,8 @@ void TrackManager::configureVerb(Track* track, double auxval, double panval)
 			
 			audio->msgUpdateSoloStates();
 		}
-	}/*}}}*/
-}
+	}
+}/*}}}*/
 
 //newBuss, useBuss, 
 void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/

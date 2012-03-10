@@ -987,7 +987,7 @@ void Composer::createDockMembers()
 	{
 		obj->installEventFilter(this);
 	}
-	midiConductor->groupBox->hide();
+	midiConductor->performerToolsFrame->hide();
 
 	_tvdock = new TrackViewDock(this);
 	m_clipList = new AudioClipList(this);

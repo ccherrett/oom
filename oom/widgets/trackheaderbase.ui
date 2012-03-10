@@ -132,7 +132,7 @@
             <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>37</number>
+            <number>30</number>
            </property>
            <property name="bottomMargin">
             <number>0</number>
@@ -466,7 +466,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>27</width>
+                 <width>5</width>
                  <height>20</height>
                 </size>
                </property>
