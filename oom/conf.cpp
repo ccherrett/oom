@@ -666,7 +666,8 @@ void readGlobalInput(Xml& xml)/*{{{*/
 			case Xml::TagEnd:
 				if(tag == "globalInput")
 				{
-					qDebug("Adding My Input to list: Type: %d, Name: %s", type,  name.toUtf8().constData());
+					if(debugMsg)
+						qDebug("readGlobalInput: Adding My Input to list: Type: %d, Name: %s", type,  name.toUtf8().constData());
 					gInputList.append(qMakePair(type, name));
 					return;
 				}

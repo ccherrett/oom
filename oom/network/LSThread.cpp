@@ -35,9 +35,9 @@ void LSThread::run()/*{{{*/
 
 	if(config.lsClientStartLS)
 	{
-		//showMessage("Launching linuxsampler... ");
 		bool rv = pingLinuxsampler();
-		printf("Launching linuxsampler ");
+		if(debugMsg)
+			qDebug("LSThread::run: Launching linuxsampler ");
 		if(!rv && !m_versionError)
 		{
 			QString lscmd("linuxsampler");
@@ -55,8 +55,7 @@ void LSThread::run()/*{{{*/
 			}
 			if(!m_process->waitForStarted())
 			{
-				//showMessage("LinuxSampler startup FAILED");
-				printf("FAILED\n");
+				qDebug("LSThread::run: FATAL: LinuxSampler startup FAILED");
 				m_state = ProcessError;
 				gSamplerStarted = false;
 				emit startupFailed();
@@ -74,13 +73,16 @@ void LSThread::run()/*{{{*/
 		}
 		else if(m_versionError)
 		{//We have a 
-			printf("FATAL: Found running linuxsampler but version is unsupported");
+			qDebug("LSThread::run: FATAL: Found running linuxsampler but version is unsupported");
 			gSamplerStarted = false;
 			emit startupFailed();
 			return;
 		}
 		m_versionError = false;
-		printf("%s\n", rv ? "Complete" : "FAILED");
+		if(rv && debugMsg)
+			qDebug("LSThread::run: LinuxSampler startup complete");
+		else if(!rv)
+			qDebug("LSThread::run: FATAL: LinuxSampler startup FAILED");
 		if(rv)
 		{
 			m_state = ProcessRunning;
@@ -116,23 +118,20 @@ bool LSThread::pingLinuxsampler()/*{{{*/
 	lscp_client_t* client = ::lscp_client_create(config.lsClientHost.toUtf8().constData(), config.lsClientPort, lscp_client_callback, NULL);
 	if(client == NULL)
 		return false;
-	//printf("Query LS info: ");
 	lscp_server_info_t* info = lscp_get_server_info(client);
 	if(info == NULL)
 	{
-		//printf("FAILED!!\n");
 		return false;
 	}
 	else
 	{
 		QString version(info->version);
-		//qDebug("LSThread::pingLinuxsampler(): Version: %s", info->version);
-		printf("Description: %s, Version: %s, Protocol Version: %s\n", info->description, info->version, info->protocol_version);
+		qDebug("LSThread::pingLinuxsampler: Description: %s, Version: %s, Protocol Version: %s\n", info->description, info->version, info->protocol_version);
 		if(version.startsWith("1.0.0.svn"))
 			return true;
 		else
 		{
-			qDebug("LinuxSampler started but incorrect Version tag: %s", info->version);
+			qDebug("LSThread::pingLinuxsampler: LinuxSampler started but incorrect Version tag: %s", info->version);
 			return false;
 		}
 	}
@@ -161,7 +160,8 @@ void LSThread::processMessagesByType(int type)/*{{{*/
 				messages = messages.trimmed().simplified();
 				if(messages.isEmpty())
 					continue;
-				qDebug("LinuxSampler::INFO: %s", messages.toUtf8().constData());
+				if(debugMsg)
+					qDebug("LinuxSampler::INFO: %s", messages.toUtf8().constData());
 			}
 		}
 		break;

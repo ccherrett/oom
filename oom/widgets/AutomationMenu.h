@@ -16,6 +16,7 @@ class QStandardItem;
 class QStandardItemModel;
 class Track;
 class QModelIndex;
+class CtrlListList;
 
 class AutomationMenu : public QWidgetAction
 {
@@ -23,13 +24,13 @@ class AutomationMenu : public QWidgetAction
 	QListView *list;
 	QStandardItemModel *m_listModel;
 	Track* m_track;
+	CtrlListList* m_controllers;
 
 	public:
 		AutomationMenu(QMenu* parent, Track* t);
 		virtual QWidget* createWidget(QWidget* parent = 0);
 
 	private slots:
-		void updateData(QStandardItem*);
 		void itemClicked(const QModelIndex&);
 	
 	signals:

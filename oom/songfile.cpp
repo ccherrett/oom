@@ -681,10 +681,10 @@ void Song::read(Xml& xml)/*{{{*/
 							}
 							if(lsClientStarted)
 							{
-								qDebug("Loading Instrument to LinuxSampler");
+								//qDebug("Loading Instrument to LinuxSampler");
 								if(lsClient->loadInstrument(ins))
 								{
-									qDebug("Instrument Map Loaded");
+									//qDebug("Instrument Map Loaded");
 									int map = lsClient->findMidiMap(ins->iname().toUtf8().constData());
 									Patch* p = ins->getDefaultPatch();
 									if(p && map >= 0)
@@ -694,7 +694,7 @@ void Song::read(Xml& xml)/*{{{*/
 										{
 											if(data)
 												track->setSamplerData(data);
-											qDebug("Created Channel for track");
+											//qDebug("Created Channel for track");
 										}
 									}
 								}

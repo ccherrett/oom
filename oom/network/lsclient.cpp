@@ -401,13 +401,6 @@ LSCPKeymap LSClient::_getKeyMapping(QString fname, int nr, int chan)/*{{{*/
 			_retries = 5; //default to sane state
 		//Load instruments into your created channel
 		bool loaded = false;
-		/*while(lscp_load_instrument(_client, fname.toUtf8().constData(), nr, chan) != LSCP_OK && tries < _retries)
-		{
-			printf("Failed to preload instrument:\n %s into ram...retrying\n", fname.toUtf8().constData());
-			if(_timeout)
-				sleep(_timeout);
-			++tries;
-		}*/
 		while(tries < _retries)
 		{
 			if(!loaded)
@@ -482,7 +475,6 @@ MidiInstrumentList* LSClient::getInstruments(QList<int> pMaps)/*{{{*/
 {
 	if(_client != NULL)
 	{
-		//int* maps = ::lscp_list_midi_instrument_maps(_client);
 		if(!pMaps.isEmpty())
 		{
 			MidiInstrumentList* instruments = new MidiInstrumentList;
@@ -509,12 +501,11 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 {
 	if(_client != NULL)
 	{
-		//int* maps = ::lscp_list_midi_instrument_maps(_client);
 		if(pMaps >= 0)
 		{
 			//Create a channel
 			int chan = ::lscp_add_channel(_client);
-			if(chan >= 0/* && lscp_load_engine(_client, "GIG", chan) == LSCP_OK*/)
+			if(chan >= 0)
 			{
 				::lscp_load_engine(_client, "GIG", chan);
 				//Get audio channels
@@ -620,6 +611,7 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 				}//end load audio dev
 				else
 				{
+					return 0;
 					//TODO: emit errorOccurrect(QString type);
 				}
 				//Flush the disk streams used by the channel created
@@ -629,6 +621,7 @@ MidiInstrument* LSClient::getInstrument(int pMaps)/*{{{*/
 			}//end create channel
 			else
 			{
+				return 0;
 				//TODO: emit errorOccurrect(QString type);
 			}
 		}//end maps
@@ -722,8 +715,9 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 		SamplerData *sd = new SamplerData;
 		sd->midiDevice = 0; //TODO: Implement round robin
 		sd->audioDevice = 0; //TODO: Implement round robin
-		//qDebug("LSClient::createInstrumentChannel: name: %s, engine: %s,  filename: %s, map: %d", 
-		//		name, engine, QString(filename).replace(QString(SOUND_PATH), SOUNDS_DIR).toUtf8().constData(), map);
+		if(debugMsg)
+			qDebug("LSClient::createInstrumentChannel: name: %s, engine: %s,  filename: %s, map: %d", 
+					name, engine, QString(filename).replace(QString(SOUND_PATH), SOUNDS_DIR).toUtf8().constData(), map);
 		//configure audio device port for instrument
 		//Find the first unconfigure channels and use them
 		char midiPortName[strlen(name)+1];
@@ -740,10 +734,8 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 			lscp_param_t* mDevParams = mDevInfo->params;
 			for(int i = 0; mDevParams && mDevParams[i].key && mDevParams[i].value; ++i)
 			{
-				//qDebug("Midi Device Param: key: %s, value: %s", mDevParams[i].key, mDevParams[i].value);
 				if(strcmp(mDevParams[i].key, sPorts) == 0)
 				{
-					//qDebug("Found MIDI port count");
 					midiPortCount = atoi(mDevParams[i].value);
 					break;
 				}
@@ -752,57 +744,29 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 
 		if(midiPort == -1)
 		{
-			/*bool firstrun = false;
-			if(midiPort == 1)
-			{//Check if its configured
-				lscp_device_port_info_t* portInfo = ::lscp_get_midi_port_info(_client, 0, 0);
-				if(portInfo)
-				{
-					lscp_param_t* mPortParams = portInfo->params;
-					for(int i = 0; mPortParams && mPortParams[i].key && mPortParams[i].value; ++i)
-					{
-						if(strcmp(mPortParams[i].key, sName) == 0)
-						{
-							if(strcmp(mPortParams[i].value, "midi_in_0") == 0)
-							{
-								midiPort  = 0;
-								firstrun = true;
-							}
-							break;
-						}
-					}
-				}
-			}*/
-			//if(!firstrun)
-			//{
-				//qDebug("Increasing MIDI Device Port count");
-				char pCount[QString::number(midiPortCount+1).size()+1];
-				strcpy(pCount, QString::number(midiPortCount+1).toLocal8Bit().constData());
-				lscp_param_t p;
-				p.key = sPorts;
-				p.value = pCount;
-				if(lscp_set_midi_device_param(_client, 0, &p) == LSCP_OK)
-				{
-					qDebug("Sucessfullt increased port count");
-				}
-				else
-				{//find a free channel
-					qDebug("Failed");
-				}
-				midiPort = midiPortCount;
-			//}
+			if(debugMsg)
+				qDebug("Increasing MIDI Device Port count");
+			char pCount[QString::number(midiPortCount+1).size()+1];
+			strcpy(pCount, QString::number(midiPortCount+1).toLocal8Bit().constData());
+			lscp_param_t p;
+			p.key = sPorts;
+			p.value = pCount;
+			if(lscp_set_midi_device_param(_client, 0, &p) == LSCP_OK)
+			{
+				if(debugMsg)
+					qDebug("LSClient::createInstrumentChannel: Sucessfullt increased port count");
+			}
+			else
+			{//find a free channel
+				qDebug("LSClient::createInstrumentChannel: Failed to increase channel count");
+			}
+			midiPort = midiPortCount;
 		}
 		//set port name
 		if(midiPort != -1)
 		{
-			renameMidiPort(midiPort, QString(midiPortName), 0);
-			/*lscp_param_t portName;
-			portName.key = sName;
-			portName.value = midiPortName;
-			if(lscp_set_midi_port_param(_client, 0, midiPort, &portName) != LSCP_OK)
-			{
-				qDebug("Failed to renamed midi port");
-			}*/
+			if(!renameMidiPort(midiPort, QString(midiPortName), 0))
+				qDebug("LSClient::createInstrumentChannel: Failed to renamed midi port");
 		}
 
 		//Prepare audio device chanell
@@ -813,10 +777,8 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 			lscp_param_t* aDevParams = aDevInfo->params;
 			for(int i = 0; aDevParams && aDevParams[i].key && aDevParams[i].value; ++i)
 			{
-				//qDebug("Audio Device Param: key: %s, value: %s", aDevParams[i].key, aDevParams[i].value);
 				if(strcmp(aDevParams[i].key, sChannels) == 0)
 				{
-					//qDebug("Found Audio channel count");
 					audioChannelCount = atoi(aDevParams[i].value);
 					break;
 				}
@@ -824,64 +786,38 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 		}
 		if(audioChannel == -1)
 		{
-		/*	bool firstrun = false;
-			if(audioChannel == 1)
-			{//Check if its configured
-				lscp_device_port_info_t* portInfo = ::lscp_get_audio_channel_info(_client, 0, 0);
-				if(portInfo)
-				{
-					lscp_param_t* aPortParams = portInfo->params;
-					for(int i = 0; aPortParams && aPortParams[i].key && aPortParams[i].value; ++i)
-					{
-						if(strcmp(aPortParams[i].key, sName) == 0)
-						{
-							if(strcmp(aPortParams[i].value, "0") == 0)
-							{
-								audioChannel  = 0;
-								firstrun = true;
-							}
-							break;
-						}
-					}
-				}
+			if(debugMsg)
+				qDebug("LSClient::createInstrumentChannel: Increasing Audio device channel count");
+			char pCount[QString::number(audioChannelCount+1).size()+1];
+			strcpy(pCount, QString::number(audioChannelCount+1).toLocal8Bit().constData());
+			lscp_param_t c;
+			c.key = sChannels;
+			c.value = pCount;
+			if(lscp_set_audio_device_param(_client, 0, &c) == LSCP_OK)
+			{
+				if(debugMsg)
+					qDebug("LSClient::createInstrumentChannel: Sucessfully increased channel count");
 			}
-			if(!firstrun)
-			{*/
-				qDebug("Increasing Audio device channel count");
-				char pCount[QString::number(audioChannelCount+1).size()+1];
-				strcpy(pCount, QString::number(audioChannelCount+1).toLocal8Bit().constData());
-				lscp_param_t c;
-				c.key = sChannels;
-				c.value = pCount;
-				if(lscp_set_audio_device_param(_client, 0, &c) == LSCP_OK)
-				{
-					qDebug("Sucessfully increased count");
-				}
-				else
-				{
-					qDebug("Failed");
-				}
-				audioChannel = audioChannelCount;
-			//}
+			else
+			{
+				qDebug("LSClient::createInstrumentChannel: Failed to instrease channel count");
+			}
+			audioChannel = audioChannelCount;
 		}
 		if(audioChannel != -1)
 		{
-			renameAudioChannel(audioChannel, QString(audioChannelName), 0);
-			/*lscp_param_t chanName;
-			chanName.key = sName;
-			chanName.value = audioChannelName;
-			if(lscp_set_audio_channel_param(_client, 0, audioChannel, &chanName) != LSCP_OK)
-			{
-				qDebug("Failed to set Audio channel name");
-			}*/
+			if(!renameAudioChannel(audioChannel, QString(audioChannelName), 0))
+				qDebug("LSClient::createInstrumentChannel: Failed to set Audio channel name");
 		}
-		qDebug("LSClient::createInstrumentChannel: midiPort: %d, audioChanel: %d", midiPort, audioChannel);
+		if(debugMsg)
+			qDebug("LSClient::createInstrumentChannel: midiPort: %d, audioChanel: %d", midiPort, audioChannel);
 		
 		if(midiPort != -1 && audioChannel != -1)
 		{
 			sd->midiPort = midiPort;
 			sd->audioChannel = audioChannel;
-			//qDebug("Creating LinuxSampler Channel");
+			if(debugMsg)
+				qDebug("LSClient::createInstrumentChannel: Creating LinuxSampler Channel");
 			//Create Channels and load default map
 			//ADD CHANNEL
 			//LOAD ENGINE SFZ 0
@@ -892,8 +828,11 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 			{
 				sd->samplerChannel = chan;
 				*data = sd;
-				//qDebug("Created LinuxSampler Channel: %d", chan);
-				//qDebug("Loading Channel engine: %s", cEngine);
+				if(debugMsg)
+				{
+					qDebug("LSClient::createInstrumentChannel: Created LinuxSampler Channel: %d", chan);
+					qDebug("LSClient::createInstrumentChannel: Loading Channel engine: %s", cEngine);
+				}
 				if(lscp_load_engine(_client, cEngine, chan) == LSCP_OK)
 				{
 					//Setup midi side of channel
@@ -903,40 +842,40 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 					//SET CHANNEL MIDI_INSTRUMENT_MAP 0 0
 					if(lscp_set_channel_midi_device(_client, chan, 0) != LSCP_OK)
 					{
-						qDebug("Failed to set channel MIDI input device");
+						qDebug("LSClient::createInstrumentChannel: Failed to set channel MIDI input device");
 					}
 					if(lscp_set_channel_midi_port(_client, chan, midiPort) != LSCP_OK)
 					{
-						qDebug("Failed to set channel MIDI port");
+						qDebug("LSClient::createInstrumentChannel: Failed to set channel MIDI port");
 					}
 					if(lscp_set_channel_midi_channel(_client, chan, LSCP_MIDI_CHANNEL_ALL) != LSCP_OK)
 					{
-						qDebug("Failed to set channel MIDI channels");
+						qDebug("LSClient::createInstrumentChannel: Failed to set channel MIDI channels");
 					}
 					if(lscp_set_channel_midi_map(_client, chan, map) != LSCP_OK)
 					{
-						qDebug("Failed to set channel MIDI instrument map");
+						qDebug("LSClient::createInstrumentChannel: Failed to set channel MIDI instrument map");
 					}
 					//Set channel default volume
 					//SET CHANNEL VOLUME 0 1.0
 					if(lscp_set_channel_volume(_client, chan, 1.0) != LSCP_OK)
 					{
-						qDebug("Failed to set channel volume");
+						qDebug("LSClient::createInstrumentChannel: Failed to set channel volume");
 					}
 					//SET CHANNEL AUDIO_OUTPUT_DEVICE 0 0
 					//SET CHANNEL AUDIO_OUTPUT_CHANNEL 0 1 0
 					//Setup audio side of channel
 					if(lscp_set_channel_audio_device(_client, chan, 0) != LSCP_OK)
 					{
-						qDebug("Failed to set channel AUDIO output device");
+						qDebug("LSClient::createInstrumentChannel: Failed to set channel AUDIO output device");
 					}
 					if(lscp_set_channel_audio_channel(_client, chan, 0, audioChannel) != LSCP_OK)
 					{
-						qDebug("Failed to set channel AUDIO output channel 1");
+						qDebug("LSClient::createInstrumentChannel: Failed to set channel AUDIO output channel 1");
 					}
 					if(lscp_set_channel_audio_channel(_client, chan, 1, audioChannel) != LSCP_OK)
 					{
-						qDebug("Failed to set channel AUDIO output channel 2");
+						qDebug("LSClient::createInstrumentChannel: Failed to set channel AUDIO output channel 2");
 					}
 					QString file(filename);
 					if(file.contains(QString(SOUND_PATH)))
@@ -947,7 +886,7 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 					strcpy(cFile, file.toUtf8().constData());
 					if(lscp_load_instrument_non_modal(_client, cFile, index, chan) != LSCP_OK)
 					{
-						qDebug("Failed to load default sample into channel");
+						qDebug("LSClient::createInstrumentChannel: Failed to load default sample into channel");
 					}
 					rv = true;
 				}
@@ -974,7 +913,8 @@ bool LSClient::updateInstrumentChannel(SamplerData* data, const char* engine, co
 	bool rv = false;
 	if(_client != NULL && data)
 	{
-		qDebug("LSClient::updateInstrumentChannel: engine: %s,  filename: %s, map: %d", 
+		if(debugMsg)
+			qDebug("LSClient::updateInstrumentChannel: engine: %s,  filename: %s, map: %d", 
 				engine, QString(filename).replace(QString(SOUND_PATH), SOUNDS_DIR).toUtf8().constData(), map);
 		//configure audio device port for instrument
 		//Find the first unconfigure channels and use them
@@ -995,14 +935,17 @@ bool LSClient::updateInstrumentChannel(SamplerData* data, const char* engine, co
 			strcpy(cEngine, engine);
 			if(chan >= 0)
 			{
-				qDebug("Updating LinuxSampler Channel: %d", chan);
-				qDebug("Loading Channel engine: %s", cEngine);
+				if(debugMsg)
+				{
+					qDebug("LSClient::updateInstrumentChannel: Updating LinuxSampler Channel: %d", chan);
+					qDebug("LSClient::updateInstrumentChannel: Loading Channel engine: %s", cEngine);
+				}
 				if(lscp_load_engine(_client, cEngine, chan) == LSCP_OK)
 				{
 					//Setup midi side of channel
 					if(lscp_set_channel_midi_map(_client, chan, map) != LSCP_OK)
 					{
-						qDebug("Failed to set channel MIDI instrument map");
+						qDebug("LSClient::updateInstrumentChannel: Failed to set channel MIDI instrument map");
 					}
 					QString file(filename);
 					if(file.contains(QString(SOUND_PATH)))
@@ -1013,7 +956,7 @@ bool LSClient::updateInstrumentChannel(SamplerData* data, const char* engine, co
 					strcpy(cFile, file.toUtf8().constData());
 					if(lscp_load_instrument_non_modal(_client, cFile, index, chan) != LSCP_OK)
 					{
-						qDebug("Failed to load default sample into channel");
+						qDebug("LSClient::updateInstrumentChannel: Failed to load default sample into channel");
 					}
 					rv = true;
 				}
@@ -1040,7 +983,8 @@ bool LSClient::removeInstrumentChannel(SamplerData* data)/*{{{*/
 	bool rv = false;
 	if(_client != NULL && data)
 	{
-		qDebug("LSClient::removeInstrumentChannel: Channel: %d", data->samplerChannel);
+		if(debugMsg)
+			qDebug("LSClient::removeInstrumentChannel: Channel: %d", data->samplerChannel);
 		//configure audio device port for instrument
 		//Find the first unconfigure channels and use them
 		int midiPort = data->midiPort;
@@ -1074,9 +1018,9 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)/*{{{*/
 	if(_client != NULL && instrument && instrument->isOOMInstrument())
 	{
 		int mapCount = ::lscp_get_midi_instrument_maps(_client);
-		int mdev = ::lscp_get_midi_devices(_client);
+		//int mdev = ::lscp_get_midi_devices(_client);
 		int mdevId = 0;
-		int adev = ::lscp_get_audio_devices(_client);
+		//int adev = ::lscp_get_audio_devices(_client);
 		int adevId = 0;
 		//qDebug("Client connected ready to load instrument, mdev: %d, adev: %d", mdev, adev);
 		if(!mapCount)
@@ -1085,30 +1029,23 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)/*{{{*/
 			//qDebug("No MIDI device found creating one");
 			mdevId = createMidiInputDevice(sDevName, "JACK", 1);	
 			//SET MIDI_INPUT_DEVICE_PARAMETER 0 PORTS=21
-			/*if(mdevId >= 0)
-			{
-				qDebug("Created MIDI device with id: %d", mdevId);
-			}*/
 		
 			//Create an audio output device
 			//CREATE AUDIO_OUTPUT_DEVICE JACK ACTIVE=true CHANNELS=35 SAMPLERATE=48000 NAME='LinuxSampler'
-			//qDebug("No Audio device found creating one");
 			adevId = createAudioOutputDevice(sDevName, "JACK", 1, 48000);
-			/*if(adevId >= 0)
-			{
-				qDebug("Created audio channel with id: %d", adevId);
-			}*/
 		}
 		if(mdevId != -1 && adevId != -1)
 		{
-			qDebug("Found MIDI and audio devices");
+			if(debugMsg)
+				qDebug("LSClient::loadInstrument: Found MIDI and audio devices");
 			QString channelFile;
 			QString channelEngine;
 			
 			int map = findMidiMap(instrument->iname().toUtf8().constData());;
 			if(map == -1)
 			{
-				qDebug("MIDI Map not found for %s, Creating MIDI Map ", instrument->iname().toUtf8().constData());
+				if(debugMsg)
+					qDebug("LSClient::loadInstrument: MIDI Map not found for %s, Creating MIDI Map ", instrument->iname().toUtf8().constData());
 				//Create midiMap with the patchgroup name
 				map = ::lscp_add_midi_instrument_map(_client, instrument->iname().toUtf8().constData());
 				if(map >= 0)
@@ -1130,10 +1067,12 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)/*{{{*/
 							{
 								filename = filename.replace(QString(SOUND_PATH), SOUNDS_DIR);
 							}
-							qDebug("Loading patch: %s, engine: %s, filename: %s", p->name.toUtf8().constData(), p->engine.toUtf8().constData(), filename.toUtf8().constData());
+							if(debugMsg)
+								qDebug("LSClient::loadInstrument: Loading patch: %s, engine: %s, filename: %s", p->name.toUtf8().constData(), p->engine.toUtf8().constData(), filename.toUtf8().constData());
 							if(::lscp_map_midi_instrument(_client, ins, p->engine.toUtf8().constData(), filename.toUtf8().constData(), p->index, p->volume, (lscp_load_mode_t)p->loadmode, p->name.toUtf8().constData()) == LSCP_OK)
 							{//
-								qDebug("Loaded");
+								if(debugMsg)
+									qDebug("LSClient::loadInstrument: Patch Loaded");
 								//Select the first instrument to load into the channel
 								if(ipg == pgl->begin() || channelFile.isEmpty() || channelEngine.isEmpty())
 								{
@@ -1145,7 +1084,8 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)/*{{{*/
 							}
 							else
 							{
-								qDebug("Failed");
+								if(debugMsg)
+									qDebug("LSClient::loadInstrument: Patch Load Failed");
 							}
 							++index;
 						}
@@ -1162,6 +1102,8 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)/*{{{*/
 //Instrument combo box
 void LSClient::removeLastChannel()/*{{{*/
 {
+	//This function is dangerous and is deprecated
+	return;
 	if(_client != NULL)
 	{
 		int channelCount = ::lscp_get_channels(_client);
@@ -1230,7 +1172,8 @@ bool LSClient::renameMidiPort(int port, QString newName, int mdev)/*{{{*/
 				portName.value = pName;
 				if(lscp_set_midi_port_param(_client, mdev, port, &portName) == LSCP_OK)
 				{
-					qDebug("LSClient::renameMidiPort: Sucessfully renamed midi port");
+					if(debugMsg)
+						qDebug("LSClient::renameMidiPort: Sucessfully renamed midi port");
 					rv = true;
 				}
 			}
@@ -1258,7 +1201,8 @@ bool LSClient::renameAudioChannel(int chan, QString newName, int adev)/*{{{*/
 				if(lscp_set_audio_channel_param(_client, adev, chan, &chanName) == LSCP_OK)
 				{
 					rv = true;
-					qDebug("Sucessfullt renamed audio channel");
+					if(debugMsg)
+						qDebug("Sucessfullt renamed audio channel");
 				}
 			}
 		}
@@ -1311,7 +1255,8 @@ int LSClient::getFreeMidiInputPort(int mdev)/*{{{*/
 			}
 		}
 	}
-	qDebug("LSClient::getFreeMidiInputPort: midiPort: %d", rv);
+	if(debugMsg)
+		qDebug("LSClient::getFreeMidiInputPort: midiPort: %d", rv);
 	return rv;
 }/*}}}*/
 
@@ -1366,7 +1311,8 @@ int LSClient::getFreeAudioOutputChannel(int adev)/*{{{*/
 			}
 		}
 	}
-	qDebug("LSClient::getFreeAudioOutputChannel: channel: %d ", rv);
+	if(debugMsg)
+		qDebug("LSClient::getFreeAudioOutputChannel: channel: %d ", rv);
 	return rv;
 }/*}}}*/
 

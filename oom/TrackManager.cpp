@@ -256,7 +256,7 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 				{
 					if(!loadInstrument(vtrack))
 					{
-						qDebug("Failed to load instrument");
+						qDebug("TrackManager::addTrack: Failed to load instrument");
 						//QMessageBox::critical(this, tr("Instrument Load Failed"), tr("An error has occurred.\nFailed to load instrument"));
 						song->endUndo(SC_TRACK_INSERTED | SC_TRACK_MODIFIED);
 						song->startUndo();
@@ -279,14 +279,16 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						{
 							MidiDevice* indev = 0;
 							m_midiInPort = gInputListPorts.at(i);
-							qDebug("Using global MIDI Input port: %i", m_midiInPort);
+							if(debugMsg)
+								qDebug("TrackManager::addTrack: Using global MIDI Input port: %i", m_midiInPort);
 
 							MidiPort* inport = &midiPorts[m_midiInPort];
 							if(inport)
 								indev = inport->device();
 							if(inport && indev)
 							{
-								qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
+								if(debugMsg)
+									qDebug("TrackManager::addTrack: MIDI Input port and MIDI devices found, Adding final input routing");
 								int chanbit = vtrack->inputChannel;
 								Route srcRoute(m_midiInPort, chanbit);
 								Route dstRoute(m_track, chanbit);
@@ -307,7 +309,8 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						if(vtrack->createMidiInputDevice)
 						{
 							m_midiInPort = getFreeMidiPort();
-							qDebug("createMidiInputDevice is set: %i", m_midiInPort);
+							if(debugMsg)
+								qDebug("TrackManager::addTrack: createMidiInputDevice is set: %i", m_midiInPort);
 							inport = &midiPorts[m_midiInPort];
 							int devtype = vtrack->inputConfig.first;
 							if(devtype == MidiDevice::ALSA_MIDI)
@@ -315,19 +318,21 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 								indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
 								if(indev)
 								{
-									qDebug("Found MIDI input device: ALSA_MIDI");
+									if(debugMsg)
+										qDebug("TrackManager::addTrack: Found MIDI input device: ALSA_MIDI");
 									int openFlags = 0;
 									openFlags ^= 0x2;
 									indev->setOpenFlags(openFlags);
 									midiSeq->msgSetMidiDevice(inport, indev);
 								}
 							}
-							else if(devtype == MidiDevice::JACK_MIDI)/*{{{*/
+							else if(devtype == MidiDevice::JACK_MIDI)
 							{
 								indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
 								if(indev)
 								{
-									qDebug("Created MIDI input device: JACK_MIDI");
+									if(debugMsg)
+										qDebug("TrackManager::addTrack: Created MIDI input device: JACK_MIDI");
 									int openFlags = 0;
 									openFlags ^= 0x2;
 									indev->setOpenFlags(openFlags);
@@ -336,7 +341,8 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 							}
 							if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
 							{
-								qDebug("MIDI input device configured, Adding input routes to MIDI port");
+								if(debugMsg)
+									qDebug("TrackManager::addTrack: MIDI input device configured, Adding input routes to MIDI port");
 								Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
 								Route dstRoute(indev, -1);
 
@@ -344,19 +350,21 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 
 								audio->msgUpdateSoloStates();
 								song->update(SC_ROUTE);
-							}/*}}}*/
+							}
 						}
 						else
 						{
 							m_midiInPort = vtrack->inputConfig.first;
-							qDebug("Using existing MIDI port: %i", m_midiInPort);
+							if(debugMsg)
+								qDebug("TrackManager::addTrack: Using existing MIDI port: %i", m_midiInPort);
 							inport = &midiPorts[m_midiInPort];
 							if(inport)
 								indev = inport->device();
 						}
 						if(inport && indev)
 						{
-							qDebug("MIDI Input port and MIDI devices found, Adding final input routing");
+							if(debugMsg)
+								qDebug("TrackManager::addTrack: MIDI Input port and MIDI devices found, Adding final input routing");
 							int chanbit = vtrack->inputChannel;
 							Route srcRoute(m_midiInPort, chanbit);
 							Route dstRoute(m_track, chanbit);
@@ -379,7 +387,8 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 					if(vtrack->createMidiOutputDevice)
 					{
 						m_midiOutPort = getFreeMidiPort();
-						qDebug("m_createMidiOutputDevice is set: %i", m_midiOutPort);
+						if(debugMsg)
+							qDebug("TrackManager::addTrack: m_createMidiOutputDevice is set: %i", m_midiOutPort);
 						outport = &midiPorts[m_midiOutPort];
 						int devtype = vtrack->outputConfig.first;
 						if(devtype == MidiDevice::ALSA_MIDI)
@@ -387,7 +396,8 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 							outdev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
 							if(outdev)
 							{
-								qDebug("Found MIDI output device: ALSA_MIDI");
+								if(debugMsg)
+									qDebug("TrackManager::addTrack: Found MIDI output device: ALSA_MIDI");
 								int openFlags = 0;
 								openFlags ^= 0x1;
 								outdev->setOpenFlags(openFlags);
@@ -399,7 +409,8 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 							outdev = MidiJackDevice::createJackMidiDevice(outputDevName, 3);
 							if(outdev)
 							{
-								qDebug("Created MIDI output device: JACK_MIDI");
+								if(debugMsg)
+									qDebug("TrackManager::addTrack: Created MIDI output device: JACK_MIDI");
 								int openFlags = 0;
 								openFlags ^= 0x1;
 								outdev->setOpenFlags(openFlags);
@@ -410,11 +421,13 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						}
 						if(outdev && outdev->deviceType() == MidiDevice::JACK_MIDI)
 						{
-							qDebug("MIDI output device configured, Adding output routes to MIDI port");
+							if(debugMsg)
+								qDebug("TrackManager::addTrack: MIDI output device configured, Adding output routes to MIDI port");
 							Route srcRoute(outdev, -1);
 							Route dstRoute(devname, true, -1, Route::JACK_ROUTE);
 
-							qDebug("Device name from combo: %s, from dev: %s", devname.toUtf8().constData(), outdev->name().toUtf8().constData());
+							if(debugMsg)
+								qDebug("TrackManager::addTrack: Device name from combo: %s, from dev: %s", devname.toUtf8().constData(), outdev->name().toUtf8().constData());
 
 							audio->msgAddRoute(srcRoute, dstRoute);
 
@@ -432,14 +445,16 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 						{
 							m_midiOutPort = vtrack->outputConfig.first;
 						}
-						qDebug("Using existing MIDI output port: %i", m_midiOutPort);
+						if(debugMsg)
+							qDebug("TrackManager::addTrack: Using existing MIDI output port: %i", m_midiOutPort);
 						outport = &midiPorts[m_midiOutPort];
 						if(outport)
 							outdev = outport->device();
 					}
 					if(outport && outdev)
 					{
-						qDebug("MIDI output port and MIDI devices found, Adding final output routing");
+						if(debugMsg)
+							qDebug("TrackManager::addTrack: MIDI output port and MIDI devices found, Adding final output routing");
 						audio->msgIdle(true);
 						mtrack->setOutPortAndUpdate(m_midiOutPort);
 						int outChan = vtrack->outputChannel;
@@ -844,7 +859,8 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 							MidiDevice* outdev = MidiJackDevice::createJackMidiDevice(midi, 3);
 							if(outdev)
 							{
-								qDebug("Created MIDI input device: JACK_MIDI");
+								if(debugMsg)
+									qDebug("TrackManager::setTrackInstrument: Created MIDI input device: JACK_MIDI");
 								int openFlags = 0;
 								openFlags ^= 0x1;
 								outdev->setOpenFlags(openFlags);
@@ -947,7 +963,8 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 					{
 						if(!lsClient->updateInstrumentChannel(track->samplerData(), p->engine.toUtf8().constData(), p->filename.toUtf8().constData(), p->index, map))
 						{
-							qDebug("Failed to update Sampler Channel");
+							if(debugMsg)
+								qDebug("TrackManager::setTrackInstrument: Failed to update Sampler Channel");
 						}
 					}
 				}
@@ -1033,11 +1050,16 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 							int channels = input->channels();
 							for(int i = 0; i < channels; i++)
 							{
+								//if(debugMsg)
+									qDebug("TrackManager::setTrackInstrument: Removing route for channel: %d", i);
 								QString src(QString("LinuxSampler:").append(m_track->name()).append("-audio"));
                 				Route srcRoute(src, true, Route::JACK_ROUTE);
                 				Route dstRoute(input->name(), true, i);
-								//qDebug("srcRoute: %s, %d, %d\n", src.toUtf8().constData(), true, Route::JACK_ROUTE);
-								//qDebug("dstRoute: %s, %d, %d\n", input->name().toUtf8().constData(), true, i);
+								//if(debugMsg)
+								//{
+									qDebug("TrackManager::setTrackInstrument: srcRoute: %s, %d, %d\n", src.toUtf8().constData(), true, Route::JACK_ROUTE);
+									qDebug("TrackManager::setTrackInstrument: dstRoute: %s, %d, %d\n", input->name().toUtf8().constData(), true, i);
+								//}
 								audio->msgRemoveRoute(srcRoute, dstRoute);
 								/*if (audioDevice)
 								{
@@ -1067,7 +1089,8 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
                     QString selectedInput  = synth->getAudioOutputPortName(0);
                     QString selectedInput2 = synth->getAudioOutputPortName(1);
 
-					//qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
+					if(debugMsg)
+						qDebug("TrackManager::setTrackInstrument: Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
 					Track* input = 0;
 					Track* buss = 0;
 					QList<qint64> *chain = track->audioChain();
@@ -1246,11 +1269,13 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 						}
 						if(lsClientStarted)
 						{
-							qDebug("Loading Instrument to LinuxSampler");
+							if(debugMsg)
+								qDebug("TrackManager::loadInstrument: Loading Instrument to LinuxSampler");
 							if(lsClient->loadInstrument(*i))
 							{
 								rv = true;
-								qDebug("Instrument Map Loaded");
+								if(debugMsg)
+									qDebug("TrackManager::loadInstrument: Instrument Map Loaded");
 								if(vtrack->autoCreateInstrument)
 								{
 									int map = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
@@ -1264,7 +1289,8 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
 											{
 												((MidiTrack*)m_track)->setSamplerData(data);
 											}
-											qDebug("Created Channel for track");
+											if(debugMsg)
+												qDebug("TrackManager::loadInstrument: Created Channel for track");
 										}
 										else
 										{
@@ -1289,7 +1315,7 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
                     {
                         if ((*i)->isSynthPlugin() && (*i)->name() == instrumentName)
                         {
-							QString devName(QString("O-").append(m_track->name()));/*{{{*/
+							QString devName(QString("O-").append(m_track->name()));
                             SynthPluginDevice* oldSynth = (SynthPluginDevice*)(*i);
                             SynthPluginDevice* synth = oldSynth->clone(devName);
                             synth->open();
@@ -1300,11 +1326,12 @@ bool TrackManager::loadInstrument(VirtualTrack *vtrack)/*{{{*/
                             QString selectedInput2 = synth->getAudioOutputPortName(1);
 
 							m_midiOutPort = portIdx;
-							qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
+							if(debugMsg)
+								qDebug("TrackManager::loadInstrument: Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
 							m_synthConfigs.clear();
 							m_synthConfigs.append(qMakePair(portIdx, devName));
                             m_synthConfigs.append(qMakePair(0, selectedInput));
-                            m_synthConfigs.append(qMakePair(0, selectedInput2));/*}}}*/
+                            m_synthConfigs.append(qMakePair(0, selectedInput2));
 							rv = true;
 
                             break;
@@ -1354,7 +1381,8 @@ void TrackManager::configureVerb(Track* track, double auxval, double panval)/*{{
 			if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
 				track->enablePanController(false);
 
-			qDebug("TrackManager::configureVerb: pan: %f, verb: %f", aux, panval);
+			if(debugMsg)
+				qDebug("TrackManager::configureVerb: pan: %f, verb: %f", aux, panval);
 			audio->msgSetPan(((AudioTrack*) track), panval);
 			((AudioTrack*) track)->recordAutomation(AC_PAN, panval);
 			
@@ -1417,7 +1445,8 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 			else
         	    selectedInput2 = vtrack->monitorConfig2.second;
 		}
-		qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
+		if(debugMsg)
+			qDebug("TrackManager::createMonitorInputTracks: Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
 
 		//Route world to input
 		QString jackCapture("system:capture");
@@ -1464,7 +1493,7 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		}
 
 		//Route audio to master
-		Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);/*{{{*/
+		Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);
 		if(master)
 		{
 			//Route buss track to master
@@ -1482,52 +1511,25 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		
 				audio->msgAddRoute(srcRoute3, dstRoute3);
 			}
-		}/*}}}*/
+		}
 		//Set the predefined pan and reverb level on buss or input
-		qint64 verb = song->oomVerbId();/*{{{*/
+		qint64 verb = song->oomVerbId();
 		if(verb)
 		{
 			double auxval = vtrack->instrumentVerb, panval = vtrack->instrumentPan;
-			/*if (auxval <= config.minSlider)
-			{
-				aux = 0.0;
-			}
-			else
-				aux = pow(10.0, auxval / 20.0);*/
 
 			if(vtrack->useBuss && buss)
 			{
+				//Setup reverb value
 				configureVerb(buss, auxval, panval);
 				configureVerb(input, config.minSlider, 0.0);
-				//Setup reverb value
-				/*audio->msgSetAux((AudioTrack*) buss, verb, aux);
-				song->update(SC_AUX);
-
-				//Setup Pan value
-				AutomationType at = ((AudioTrack*) buss)->automationType();
-				if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-					buss->enablePanController(false);
-
-				qDebug("TrackManager::createMonitorInputTracks: pan: %f, verb: %f", aux, panval);
-				audio->msgSetPan(((AudioTrack*) buss), panval);
-				((AudioTrack*) buss)->recordAutomation(AC_PAN, panval);*/
 			}
 			else if(!vtrack->useBuss && input)
 			{
-				configureVerb(input, auxval, panval);
 				//Setup reverb value
-				/*audio->msgSetAux((AudioTrack*) input, verb, aux);
-				song->update(SC_AUX);
-
-				//Setup Pan value
-				AutomationType at = ((AudioTrack*) input)->automationType();
-				if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
-					input->enablePanController(false);
-
-				audio->msgSetPan(((AudioTrack*) input), panval);
-				((AudioTrack*) input)->recordAutomation(AC_PAN, panval);*/
+				configureVerb(input, auxval, panval);
 			}
-		}/*}}}*/
+		}
 
 		audio->msgUpdateSoloStates();
 		song->update(SC_ROUTE);

@@ -138,7 +138,7 @@ void TrackViewDock::populateTable(int flag, bool)/*{{{*/
 
 void TrackViewDock::populateInstrumentTemplates()
 {
-	qDebug("TrackViewDock::populateInstrumentTemplates------------");
+	//qDebug("TrackViewDock::populateInstrumentTemplates------------");
 	_templateModel->clear();/*{{{*/
 	ciTrackView iter = oom->instrumentTemplates()->constBegin();
 	while(iter != oom->instrumentTemplates()->constEnd())
@@ -355,7 +355,7 @@ void TrackViewDock::contextPopupMenu(QPoint pos)/*{{{*/
 
 void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 {
-	qDebug("TrackViewDock::templateContextPopupMenu");
+	//qDebug("TrackViewDock::templateContextPopupMenu");
 	QModelIndex index = templateView->indexAt(pos);
 	if(!index.isValid())
 		return;
@@ -379,7 +379,7 @@ void TrackViewDock::templateContextPopupMenu(QPoint pos)/*{{{*/
 				{
 					case 0:
 					{
-						qDebug("TrackViewDock::templateContextPopupMenu~~~~~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						//qDebug("TrackViewDock::templateContextPopupMenu~~~~~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 						TrackView* tv = new TrackView(false);
 						QList<qint64> *list = tview->trackIndexList();
 						for(int i = 0; i < list->size(); ++i)

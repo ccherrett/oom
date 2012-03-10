@@ -150,6 +150,7 @@ void initLV2()
     // Disable known plugins that we don't support yet
     QStringList blacklist;
     blacklist.append("http://home.gna.org/zyn/zynadd/1");
+	blacklist.append("http://linuxsampler.org/plugins/linuxsampler");
 
     LILV_FOREACH(plugins, i, lv2world->plugins)
     {
@@ -215,7 +216,8 @@ bool isLV2FeatureSupported(const char* uri)
 // ----------------- URI-Map Feature -------------------------------------------------
 static uint32_t oom_lv2_uri_to_id(LV2_URI_Map_Callback_Data data, const char* map, const char* uri)
 {
-    qDebug("oom_lv2_uri_to_id(%p, %s, %s)", data, map, uri);
+	if(debugMsg)
+    	qDebug("oom_lv2_uri_to_id(%p, %s, %s)", data, map, uri);
 
     if (map && strcmp(map, LV2_EVENT_URI) == 0)
     {
@@ -243,7 +245,8 @@ static uint32_t oom_lv2_uri_to_id(LV2_URI_Map_Callback_Data data, const char* ma
 // ----------------- URID Feature ----------------------------------------------------
 static LV2_URID oom_lv2_urid_map(LV2_URID_Map_Handle handle, const char* uri)
 {
-    qDebug("oom_lv2_urid_map(%p, %s)", handle, uri);
+	if(debugMsg)
+    	qDebug("oom_lv2_urid_map(%p, %s)", handle, uri);
 
     if (strcmp(uri, LILV_URI_MIDI_EVENT) == 0)
         return OOM_URI_MAP_ID_EVENT_MIDI;
@@ -264,7 +267,8 @@ static LV2_URID oom_lv2_urid_map(LV2_URID_Map_Handle handle, const char* uri)
 
 static const char* oom_lv2_urid_unmap(LV2_URID_Map_Handle handle, LV2_URID urid)
 {
-    qDebug("oom_lv2_urid_unmap(%p, %i)", handle, urid);
+	if(debugMsg)
+    	qDebug("oom_lv2_urid_unmap(%p, %i)", handle, urid);
 
     if (urid == OOM_URI_MAP_ID_EVENT_MIDI)
         return LILV_URI_MIDI_EVENT;
@@ -286,7 +290,8 @@ static const char* oom_lv2_urid_unmap(LV2_URID_Map_Handle handle, LV2_URID urid)
 // ----------------- Event Feature ---------------------------------------------------
 static uint32_t oom_lv2_event_ref(LV2_Event_Callback_Data data, LV2_Event* event)
 {
-    qDebug("oom_lv2_event_ref(%p, %p)", data, event);
+	if(debugMsg)
+    	qDebug("oom_lv2_event_ref(%p, %p)", data, event);
 
     // TODO
     return 0;
@@ -294,7 +299,8 @@ static uint32_t oom_lv2_event_ref(LV2_Event_Callback_Data data, LV2_Event* event
 
 static uint32_t oom_lv2_event_unref(LV2_Event_Callback_Data data, LV2_Event* event)
 {
-    qDebug("oom_lv2_event_unref(%p, %p)", data, event);
+	if(debugMsg)
+	    qDebug("oom_lv2_event_unref(%p, %p)", data, event);
 
     // TODO
     return 0;
@@ -303,7 +309,8 @@ static uint32_t oom_lv2_event_unref(LV2_Event_Callback_Data data, LV2_Event* eve
 // ----------------- State Feature ---------------------------------------------------
 static int oom_lv2_state_store(LV2_State_Handle handle, uint32_t key, const void* value, size_t size, uint32_t type, uint32_t flags)
 {
-    qDebug("oom_lv2_state_store(%p, %i, %p, %lu, %i, %i)", handle, key, value, size, type, flags);
+	if(debugMsg)
+    	qDebug("oom_lv2_state_store(%p, %i, %p, %lu, %i, %i)", handle, key, value, size, type, flags);
 
     if (handle)
     {
@@ -349,7 +356,8 @@ static int oom_lv2_state_store(LV2_State_Handle handle, uint32_t key, const void
 
 static const void* oom_lv2_state_retrieve(LV2_State_Handle handle, uint32_t key, size_t* size, uint32_t* type, uint32_t* flags)
 {
-    qDebug("oom_lv2_state_retrieve(%p, %i, %p, %p, %p)", handle, key, size, type, flags);
+	if(debugMsg)
+	    qDebug("oom_lv2_state_retrieve(%p, %i, %p, %p, %p)", handle, key, size, type, flags);
 
     if (handle)
     {
@@ -399,7 +407,8 @@ static const void* oom_lv2_state_retrieve(LV2_State_Handle handle, uint32_t key,
 // ----------------- External UI Feature ---------------------------------------------
 static void oom_lv2_external_ui_closed(LV2UI_Controller controller)
 {
-    qDebug("oom_lv2_external_ui_closed(%p)", controller);
+	if(debugMsg)
+	    qDebug("oom_lv2_external_ui_closed(%p)", controller);
 
     if (controller)
     {
@@ -411,7 +420,8 @@ static void oom_lv2_external_ui_closed(LV2UI_Controller controller)
 // ----------------- UI Resize Feature -----------------------------------------------
 static int oom_lv2_ui_resize(LV2_UI_Resize_Feature_Data data, int width, int height)
 {
-    qDebug("oom_lv2_ui_resized(%p, %i, %i)", data, width, height);
+	if(debugMsg)
+    	qDebug("oom_lv2_ui_resized(%p, %i, %i)", data, width, height);
 
     if (data)
     {
@@ -426,7 +436,8 @@ static int oom_lv2_ui_resize(LV2_UI_Resize_Feature_Data data, int width, int hei
 // ----------------- UI Extension ----------------------------------------------------
 static void oom_lv2_ui_write_function(LV2UI_Controller controller, uint32_t port_index, uint32_t buffer_size, uint32_t format, const void* buffer)
 {
-    qDebug("oom_lv2_ui_write_function(%p, %i, %i, %i, %p)", controller, port_index, buffer_size, format, buffer);
+	if(debugMsg)
+    	qDebug("oom_lv2_ui_write_function(%p, %i, %i, %i, %p)", controller, port_index, buffer_size, format, buffer);
 
     if (controller)
     {
@@ -1401,7 +1412,8 @@ void Lv2Plugin::setProgram(uint32_t /*index*/)
 
 uint32_t Lv2Plugin::getCustomURIId(const char *uri)
 {
-    qDebug("Lv2Plugin::getCustomURIId(%s)", uri);
+	if(debugMsg)
+    	qDebug("Lv2Plugin::getCustomURIId(%s)", uri);
 
     for (int i=0; i < m_customURIs.count(); i++)
     {
@@ -1415,7 +1427,8 @@ uint32_t Lv2Plugin::getCustomURIId(const char *uri)
 
 const char* Lv2Plugin::getCustomURIString(int uri_id)
 {
-    qDebug("Lv2Plugin::getCustomURIString(%i)", uri_id);
+	if(debugMsg)
+    	qDebug("Lv2Plugin::getCustomURIString(%i)", uri_id);
 
     if (uri_id < m_customURIs.count())
         return m_customURIs.at(uri_id);

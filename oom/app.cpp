@@ -170,7 +170,8 @@ void OOMidi::addGlobalInput(QPair<int, QString> input)
 	MidiDevice* indev = 0;
 	QString inputDevName(QString("Input-").append(devname));
 	int midiInPort = getFreeMidiPort();
-	qDebug("createMidiInputDevice is set: %i", midiInPort);
+	if(debugMsg)
+		qDebug("OOMidi::addGlobalInput: createMidiInputDevice is set: %i", midiInPort);
 	inport = &midiPorts[midiInPort];
 	int devtype = input.first;
 	oomMidiPorts.insert(inport->id(), inport);
@@ -179,7 +180,8 @@ void OOMidi::addGlobalInput(QPair<int, QString> input)
 		indev = midiDevices.find(devname, MidiDevice::ALSA_MIDI);
 		if(indev)
 		{
-			qDebug("Found MIDI input device: ALSA_MIDI");
+			if(debugMsg)
+				qDebug("OOMidi::addGlobalInput: Found MIDI input device: ALSA_MIDI");
 			int openFlags = 0;
 			openFlags ^= 0x2;
 			indev->setOpenFlags(openFlags);
@@ -192,7 +194,8 @@ void OOMidi::addGlobalInput(QPair<int, QString> input)
 		indev = MidiJackDevice::createJackMidiDevice(inputDevName, 3);
 		if(indev)
 		{
-			qDebug("Created MIDI input device: JACK_MIDI");
+			if(debugMsg)
+				qDebug("OOMidi::addGlobalInput: Created MIDI input device: JACK_MIDI");
 			int openFlags = 0;
 			openFlags ^= 0x2;
 			indev->setOpenFlags(openFlags);
@@ -202,7 +205,8 @@ void OOMidi::addGlobalInput(QPair<int, QString> input)
 	}
 	if(indev && indev->deviceType() == MidiDevice::JACK_MIDI)
 	{
-		qDebug("MIDI input device configured, Adding input routes to MIDI port");
+		if(debugMsg)
+			qDebug("OOMidi::addGlobalInput: MIDI input device configured, Adding input routes to MIDI port");
 		Route srcRoute(devname, false, -1, Route::JACK_ROUTE);
 		Route dstRoute(indev, -1);
 
@@ -1411,7 +1415,7 @@ OOMidi::~OOMidi()
 
 void OOMidi::loadInitialProject()
 {
-	qDebug("Entering OOMidi::loadInitialProject~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	//qDebug("Entering OOMidi::loadInitialProject~~~~~~~~~~~~~~~~~~~~~~~~~~");
 	if(config.lsClientAutoStart)
 	{
 		bool started = false;
@@ -1439,12 +1443,12 @@ void OOMidi::loadInitialProject()
 	changeConfig(false);
 	readInstrumentTemplates();
 	song->update();
-	qDebug("Leaving OOMidi::loadInitialProject~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	//qDebug("Leaving OOMidi::loadInitialProject~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
 
 void OOMidi::lsStartupFailed()
 {
-	qDebug("Entering OOMidi::lsStartupFailed~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	//qDebug("Entering OOMidi::lsStartupFailed~~~~~~~~~~~~~~~~~~~~~~~~~~");
 	m_initProjectName = oomGlobalShare + QString("/templates/default.oom");
 	m_useTemplate = true;
 	song->blockSignals(false);
@@ -1452,7 +1456,7 @@ void OOMidi::lsStartupFailed()
 	changeConfig(false);
 	readInstrumentTemplates();
 	song->update();
-	qDebug("Leaving OOMidi::lsStartupFailed~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	//qDebug("Leaving OOMidi::lsStartupFailed~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
 
 void OOMidi::showUndoView()
@@ -1786,15 +1790,16 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 
 			initGlobalInputPorts();
 			Xml xml(f);
-			printf("OOMidi::loadProjectFile1 Before OOMidi::read()\n");
+			if(debugMsg)
+				qDebug("OOMidi::loadProjectFile1 Before OOMidi::read()\n");
 			read(xml, !loadAll);
-			printf("OOMidi::loadProjectFile1 After OOMidi::read()\n");
+			if(debugMsg)
+				qDebug("OOMidi::loadProjectFile1 After OOMidi::read()\n");
 			bool fileError = ferror(f);
 			popenFlag ? pclose(f) : fclose(f);
 			if (fileError)
 			{
-				QMessageBox::critical(this, QString("OOStudio"),
-						tr("File read error"));
+				QMessageBox::critical(this, QString("OOStudio"), tr("File read error"));
 				setUntitledProject();
 			}
 		}
@@ -1807,8 +1812,7 @@ void OOMidi::loadProjectFile1(const QString& name, bool songTemplate, bool loadA
 	}
 	else
 	{
-		QMessageBox::critical(this, QString("OOStudio"),
-				tr("Unknown File Format: ") + ex);
+		QMessageBox::critical(this, QString("OOStudio"), tr("Unknown File Format: ") + ex);
 		setUntitledProject();
 	}
 	if (!songTemplate)

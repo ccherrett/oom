@@ -32,6 +32,7 @@
 TrackInstrumentMenu::TrackInstrumentMenu(QMenu* parent, Track *t) : QWidgetAction(parent)
 {
 	m_track = t;
+	m_edit = false;
 }
 
 QWidget* TrackInstrumentMenu::createWidget(QWidget* parent)/*{{{*/
@@ -155,7 +156,6 @@ QWidget* TrackInstrumentMenu::createWidget(QWidget* parent)/*{{{*/
 		if(width < 170)
 			width = 170;
 		w->setFixedWidth(width);
-		connect(m_listModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(updateData(QStandardItem*)));
 		connect(list, SIGNAL(clicked(const QModelIndex&)), this, SLOT(itemClicked(const QModelIndex&)));
 		return w;
     }
@@ -165,29 +165,28 @@ QWidget* TrackInstrumentMenu::createWidget(QWidget* parent)/*{{{*/
 
 void TrackInstrumentMenu::itemClicked(const QModelIndex& index)/*{{{*/
 {
+	if(m_edit || !m_track)
+		return;
+	m_edit = true;
 	if(index.isValid())
 	{
 		QStandardItem *item = m_listModel->item(index.row());
 		if(item)
 		{
-			item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+			//item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+			QString instrument = item->data().toString();
+			int insType = item->data(Qt::UserRole+2).toInt();
+			trackManager->setTrackInstrument(m_track, instrument, insType);
+			
+			trigger();
+			//FIXME: This is a seriously brutal HACK but its the only way it can get it done
+			QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+			QCoreApplication::postEvent(this->parent(), e);
+
+			QKeyEvent *e2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+			QCoreApplication::postEvent(this->parent(), e2);
 		}
 	}
+	m_edit = false;
+
 }/*}}}*/
-
-void TrackInstrumentMenu::updateData(QStandardItem *item)
-{
-	//printf("TrackInstrumentMenu::updateData() classed\n");
-	QString instrument = item->data().toString();
-	int insType = item->data(Qt::UserRole+2).toInt();
-	trackManager->setTrackInstrument(m_track, instrument, insType);
-	
-	trigger();
-	//FIXME: This is a seriously brutal HACK but its the only way it can get it done
-	QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
-	QCoreApplication::postEvent(this->parent(), e);
-
-	QKeyEvent *e2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
-	QCoreApplication::postEvent(this->parent(), e2);
-}
-

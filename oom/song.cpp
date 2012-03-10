@@ -1996,6 +1996,16 @@ void Song::beat()
 	if(lsClient)
 	{
 		lsClientStarted = lsClient->isClientStarted();
+		if(!lsClientStarted)
+		{
+			if(lsClient->startClient())
+				lsClientStarted = true;
+			else
+			{
+				lsClientStarted = false;
+				lsClient = 0;
+			}
+		}
 	}
 	else
 	{

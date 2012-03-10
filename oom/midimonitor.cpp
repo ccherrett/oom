@@ -77,7 +77,7 @@ MidiMonitor::~MidiMonitor()
 
 void MidiMonitor::setFeedbackMode(FeedbackMode mode)
 {
-    qWarning("Feedback mode changed %i", mode);
+    //qWarning("Feedback mode changed %i", mode);
 
     m_feedbackMode = mode;
 }
@@ -137,14 +137,14 @@ void MidiMonitor::updateSongNow()
                 // if message > 384 ticks and audition is on, stop playback
                 if (m_feedback && m_feedbackMode == FEEDBACK_MODE_AUDITION)
                 {
-                    qWarning("Audition stop!");
+                    //qWarning("Audition stop!");
                     song->stopRolling();
                     song->setPos(Song::CPOS, Pos(lastMsg->lastTick, true), true, true, true);
                     break;
                 }
             }
 
-            qWarning("Audition continue");
+            //qWarning("Audition continue");
 
             MidiPlayEvent ev(0, msg->port, msg->channel, ME_CONTROLLER, msg->controller, msg->value);
             ev.setEventSource(MonitorSource);
@@ -161,7 +161,7 @@ void MidiMonitor::updateSongNow()
 
 void MidiMonitor::songPlayChanged()
 {
-    qWarning("songPlayChanged()");
+    //qWarning("songPlayChanged()");
     m_lastMidiInMessages.clear();
     m_lastFeedbackMessages.clear();
     m_feedbackTimeout = 0;
@@ -274,7 +274,7 @@ LastFeedbackMessage* MidiMonitor::getLastFeedbackMessage(int port, int channel, 
 
 void MidiMonitor::setLastFeedbackMessage(int port, int channel, int controller, int value)
 {
-    qWarning("setLastFeedbackMessage();");
+    //qWarning("setLastFeedbackMessage();");
 
     for (int i=0; i < m_lastFeedbackMessages.count(); i++)
     {

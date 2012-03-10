@@ -430,7 +430,8 @@ void CreateTrackDialog::addTrack()/*{{{*/
 			connect(trackManager, SIGNAL(trackAdded(qint64)), this, SIGNAL(trackAdded(qint64)));
 			if(trackManager->addTrack(m_vtrack, m_insertPosition))
 			{
-				qDebug("Sucessfully added track");
+				if(debugMsg)
+					qDebug("CreateTrackDialog::addTrack: Sucessfully added track");
 				done(1);
 			}
 			else
@@ -568,15 +569,18 @@ void CreateTrackDialog::updateInstrument(int index)/*{{{*/
 							m_existingMap = true;
 						else
 							m_existingMap = false;
-						qDebug("CreateTrackDialog::updateInstrument: Searching for Instrument loaded found: %d", m_instrumentMap);
+						if(debugMsg)
+							qDebug("CreateTrackDialog::updateInstrument: Searching for Instrument loaded found: %d", m_instrumentMap);
 						if(!m_existingMap)
 						{
-							qDebug("CreateTrackDialog::updateInstrument: Loading Instrument to LinuxSampler");
+							if(debugMsg)
+								qDebug("CreateTrackDialog::updateInstrument: Loading Instrument to LinuxSampler");
 							if(lsClient->loadInstrument(*i))
 							{
 								m_instrumentMap = lsClient->findMidiMap((*i)->iname().toUtf8().constData());
 								m_instrumentLoaded = true;
-								qDebug("CreateTrackDialog::updateInstrument: Instrument Map Loaded");
+								if(debugMsg)
+									qDebug("CreateTrackDialog::updateInstrument: Instrument Map Loaded");
 								//reload input/output list and select the coresponding ports respectively
 								updateVisibleElements();
                     			chkInput->setChecked(true);
@@ -701,12 +705,6 @@ void CreateTrackDialog::trackNameEdited()
 {
 	bool enabled = !txtName->text().isEmpty();
 	btnAdd->setEnabled(enabled);
-	/*Track::TrackType type = (Track::TrackType)m_insertType;
-	if(type == Track::MIDI && m_instrumentLoaded && enabled)
-	{
-		cleanup();
-		updateInstrument(cmbInstrument->currentIndex());
-	}*/
 }
 
 //Populate input combo based on type
@@ -844,7 +842,7 @@ void CreateTrackDialog::populateOutputList()/*{{{*/
 					QString mdname(md->name());
 					if(md->deviceType() == MidiDevice::ALSA_MIDI)
 					{
-						mdname = QString("(OOMidi) ").append(mdname);
+						mdname = QString("(OOStudio) ").append(mdname);
 					}
 					cmbOutput->addItem(mdname, i);
 					m_currentMidiOutputList.insert(cmbOutput->count()-1, mdname);
@@ -1232,18 +1230,13 @@ void CreateTrackDialog::updateVisibleElements()/*{{{*/
 
 void CreateTrackDialog::showEvent(QShowEvent*)
 {
-	qDebug("Inside CreateTrackDialog::showEvent trackType: %i, position: %i", m_insertType, m_insertPosition);
+	if(debugMsg)
+		qDebug("CreateTrackDialog::showEvent: trackType: %i, position: %i", m_insertType, m_insertPosition);
 	updateVisibleElements();
 	populateInputList();
 	populateOutputList();
 	populateInstrumentList();
 	populateMonitorList();
 	populateBussList();
-	/*if(!gInputList.size())//TODO: popup a messagebox first telling them what is happening
-	{
-		GlobalSettingsConfig* genSetConfig = new GlobalSettingsConfig(this);
-		genSetConfig->setCurrentTab(2);
-		genSetConfig->show();
-	}*/
 }
 

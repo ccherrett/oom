@@ -26,6 +26,7 @@ AutomationMenu::AutomationMenu(QMenu* parent, Track *t)
 : QWidgetAction(parent)
 {
 	m_track= t;
+	m_controllers = 0;
 }
 
 QWidget* AutomationMenu::createWidget(QWidget* parent)
@@ -59,7 +60,6 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
 	layout->addWidget(list);
 	w->setLayout(layout);
 
-    CtrlListList* cll;
     if (m_track->isMidiTrack() && m_track->wantsAutomation())
     {
         MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
@@ -67,7 +67,10 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
         {
             SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
             if (synth->audioTrack())
-                cll = synth->audioTrack()->controller();
+			{
+                m_controllers = synth->audioTrack()->controller();
+				m_track = synth->audioTrack();
+			}
             else
                 return 0;
         }
@@ -76,12 +79,12 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
     }
     else
     {
-        cll = ((AudioTrack*) m_track)->controller();
+        m_controllers = ((AudioTrack*) m_track)->controller();
     }
 	int desktopHeight = qApp->desktop()->height();
 	int lstr = 0;
 	QString longest;
-    for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+    for (CtrlListList::iterator icll = m_controllers->begin(); icll != m_controllers->end(); ++icll)
     {
         CtrlList *cl = icll->second;
         if (cl->dontShow())
@@ -112,84 +115,61 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
 	if(width < 170)
 		width = 170;
 	w->setFixedWidth(width);
-	connect(m_listModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(updateData(QStandardItem*)));
+	//connect(m_listModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(updateData(QStandardItem*)));
 	connect(list, SIGNAL(clicked(const QModelIndex&)), this, SLOT(itemClicked(const QModelIndex&)));
 	return w;
 }
 
 void AutomationMenu::itemClicked(const QModelIndex& index)
 {
+	if(!list || !m_controllers || !m_track)
+		return;
+	qDebug("TrackInstrumentMenu::itemClicked");
 	if(index.isValid())
 	{
+		qDebug("TrackInstrumentMenu::itemClicked: index valid");
 		QStandardItem *item = m_listModel->item(index.row());
 		if(item)
 		{
-			item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
-		}
-	}
-}
-
-void AutomationMenu::updateData(QStandardItem *item)
-{
-	if(list && item)
-	{
-		int id = item->data().toInt();
-		AudioTrack* atrack = 0;
-    	if (m_track->isMidiTrack())
-    	{
-    	    MidiPort* mp = &midiPorts[((MidiTrack*) m_track)->outPort()];
-    	    if (mp->device() && mp->device()->isSynthPlugin())
-    	    {
-    	        SynthPluginDevice* synth = (SynthPluginDevice*)mp->device();
-    	        if (synth->audioTrack())
-    	            atrack = (AudioTrack*)synth->audioTrack();
-    	        else
-    	            return;
-    	    }
-    	    else
-    	        return;
-    	}
-		else
-		{
-			atrack = (AudioTrack*)m_track;
-		}
-
-		if(atrack)
-		{
-			CtrlListList* cll = atrack->controller();
-			for (CtrlListList::iterator icll = cll->begin(); icll != cll->end(); ++icll)
+			int id = item->data().toInt();
+			iCtrlList it = m_controllers->find(id);
+			if(it != m_controllers->end())
 			{
-				CtrlList *cl = icll->second;
-				if (id == cl->id()) 
+				CtrlList* cl = it->second;
+				bool checked = (item->checkState() == Qt::Checked);
+				if(checked == cl->isVisible())
 				{
-					cl->setVisible(!cl->isVisible());
-					if(cl->id() == AC_PAN)
-					{
-						AutomationType at = atrack->automationType();
-						if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
-							atrack->enablePanController(false);
-					
-						double panVal = atrack->pan();
-						audio->msgSetPan(atrack, panVal);
-						atrack->startAutoRecord(AC_PAN, panVal);
-
-						if (atrack->automationType() != AUTO_WRITE)
-							atrack->enablePanController(true);
-						atrack->stopAutoRecord(AC_PAN, panVal);
-					}
-					song->update(SC_TRACK_MODIFIED);
-					break;
+					item->setCheckState( checked ? Qt::Unchecked : Qt::Checked);
+					qDebug("TrackInstrumentMenu::itemClicked: Got click off checkbox");
 				}
+				cl->setVisible(!cl->isVisible());
+				if(cl->id() == AC_PAN)
+				{
+					AutomationType at = ((AudioTrack*)m_track)->automationType();
+					if (at == AUTO_WRITE || (at == AUTO_READ || at == AUTO_TOUCH))
+						((AudioTrack*)m_track)->enablePanController(false);
+				
+					double panVal = ((AudioTrack*)m_track)->pan();
+					audio->msgSetPan(((AudioTrack*)m_track), panVal);
+					((AudioTrack*)m_track)->startAutoRecord(AC_PAN, panVal);
+
+					if (((AudioTrack*)m_track)->automationType() != AUTO_WRITE)
+						((AudioTrack*)m_track)->enablePanController(true);
+					((AudioTrack*)m_track)->stopAutoRecord(AC_PAN, panVal);
+				}
+				song->update(SC_TRACK_MODIFIED);
+				//updateData(item);
 			}
 		}
-		//printf("Triggering Menu Action\n");
-		//setData(item->data(Qt::UserRole+3));
-		
-		//FIXME: This is a seriously brutal HACK but its the only way I can get it to dismiss the menu
-		/*QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
-		QCoreApplication::postEvent(this->parent(), e);
-
-		QKeyEvent *e2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
-		QCoreApplication::postEvent(this->parent(), e2);*/
 	}
+
+	//printf("Triggering Menu Action\n");
+	//setData(item->data(Qt::UserRole+3));
+	
+	//FIXME: This is a seriously brutal HACK but its the only way I can get it to dismiss the menu
+	/*QKeyEvent *e = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+	QCoreApplication::postEvent(this->parent(), e);
+
+	QKeyEvent *e2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+	QCoreApplication::postEvent(this->parent(), e2);*/
 }

@@ -26,13 +26,13 @@ class TrackInstrumentMenu : public QWidgetAction
 	QListView *list;
 	QStandardItemModel *m_listModel;
 	Track *m_track;
+	bool m_edit;
 
 public:
 	TrackInstrumentMenu(QMenu* parent, Track*);
 	virtual QWidget* createWidget(QWidget* parent = 0);
 
 private slots:
-	void updateData(QStandardItem*);
 	void itemClicked(const QModelIndex&);
 	
 signals:

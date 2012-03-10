@@ -965,7 +965,7 @@ void TrackHeader::generateInstrumentMenu()/*{{{*/
 	p->addAction(imenu);
 	p->exec(QCursor::pos());
 
-	p->deleteLater();
+	delete p;
 	updateSelection(false);
 	//emit selectionChanged(m_track);
 }/*}}}*/
