@@ -33,13 +33,18 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
 	if(!m_track || (m_track->isMidiTrack() && !m_track->wantsAutomation()))
 		return 0;
 
-	int baseHeight = 70;
+	int baseHeight = 109;
 	QVBoxLayout* layout = new QVBoxLayout();
 	QWidget* w = new QWidget(parent);
 	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QLabel* header = new QLabel();
+	header->setPixmap(QPixmap(":/images/automation_menu_title.png"));
+	header->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+	header->setObjectName("AutomationMenuHeader");
 	QLabel* tvname = new QLabel(m_track->name());
 	tvname->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 	tvname->setObjectName("AutomationMenuLabel");
+	layout->addWidget(header);
 	layout->addWidget(tvname);
 	m_listModel = new QStandardItemModel();
 	list = new QListView();
@@ -103,8 +108,10 @@ QWidget* AutomationMenu::createWidget(QWidget* parent)
 	w->setFixedHeight(baseHeight);
 	QFontMetrics fm(list->font());
 	QRect rect = fm.boundingRect(longest);
-	//if(size > 3)
-	w->setFixedWidth(rect.width()+100);
+	int width = rect.width()+100;
+	if(width < 170)
+		width = 170;
+	w->setFixedWidth(width);
 	connect(m_listModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(updateData(QStandardItem*)));
 	connect(list, SIGNAL(clicked(const QModelIndex&)), this, SLOT(itemClicked(const QModelIndex&)));
 	return w;

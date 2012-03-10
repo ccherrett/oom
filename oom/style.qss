@@ -146,7 +146,8 @@ QFrame#propertiesFrame, QFrame#frame2, QSplitter#splitter5, QSplitter#splitter6,
 }
 QLabel#lblType, QLabel#lblTrack, QLabel#lblProp, QLabel#lblComments, QLabel#lblName, QLabel#lblGroup,
 GlobalSettingsConfig QLabel, CreateTrackDialog QLabel, EditInstrument QLabel, LSCPImport QLabel,
-TrackViewEditor QLabel, MixdownFileDialog QLabel
+TrackViewEditor QLabel, MixdownFileDialog QLabel, QLabel#TrackInstrumentMenuHeader,
+QLabel#AutomationMenuHeader
 {
 	background-color:none;
 	border:none;
