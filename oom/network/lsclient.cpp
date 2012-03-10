@@ -722,36 +722,37 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 		SamplerData *sd = new SamplerData;
 		sd->midiDevice = 0; //TODO: Implement round robin
 		sd->audioDevice = 0; //TODO: Implement round robin
-		qDebug("LSClient::createInstrumentChannel: name: %s, engine: %s,  filename: %s, map: %d", 
-				name, engine, QString(filename).replace(QString(SOUND_PATH), SOUNDS_DIR).toUtf8().constData(), map);
+		//qDebug("LSClient::createInstrumentChannel: name: %s, engine: %s,  filename: %s, map: %d", 
+		//		name, engine, QString(filename).replace(QString(SOUND_PATH), SOUNDS_DIR).toUtf8().constData(), map);
 		//configure audio device port for instrument
 		//Find the first unconfigure channels and use them
 		char midiPortName[strlen(name)+1];
 		strcpy(midiPortName, name);
 		char audioChannelName[QString(name).append("-audio").size()+1];
 		strcpy(audioChannelName, QString(name).append("-audio").toLocal8Bit().constData());
-		int midiPort = -1;
-		int audioChannel = -1;
+		int midiPort = getFreeMidiInputPort(0);
+		int audioChannel = getFreeAudioOutputChannel(0);
 
+		int midiPortCount = -1;
 		lscp_device_info_t* mDevInfo = ::lscp_get_midi_device_info(_client, 0);
 		if(mDevInfo)
 		{
 			lscp_param_t* mDevParams = mDevInfo->params;
 			for(int i = 0; mDevParams && mDevParams[i].key && mDevParams[i].value; ++i)
 			{
-				qDebug("Midi Device Param: key: %s, value: %s", mDevParams[i].key, mDevParams[i].value);
+				//qDebug("Midi Device Param: key: %s, value: %s", mDevParams[i].key, mDevParams[i].value);
 				if(strcmp(mDevParams[i].key, sPorts) == 0)
 				{
-					qDebug("Found MIDI port count");
-					midiPort = atoi(mDevParams[i].value);
+					//qDebug("Found MIDI port count");
+					midiPortCount = atoi(mDevParams[i].value);
 					break;
 				}
 			}
 		}
 
-		if(midiPort)
+		if(midiPort == -1)
 		{
-			bool firstrun = false;
+			/*bool firstrun = false;
 			if(midiPort == 1)
 			{//Check if its configured
 				lscp_device_port_info_t* portInfo = ::lscp_get_midi_port_info(_client, 0, 0);
@@ -771,12 +772,12 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 						}
 					}
 				}
-			}
-			if(!firstrun)
-			{
-				qDebug("Increasing MIDI Device Port count");
-				char pCount[QString::number(midiPort+1).size()+1];
-				strcpy(pCount, QString::number(midiPort+1).toLocal8Bit().constData());
+			}*/
+			//if(!firstrun)
+			//{
+				//qDebug("Increasing MIDI Device Port count");
+				char pCount[QString::number(midiPortCount+1).size()+1];
+				strcpy(pCount, QString::number(midiPortCount+1).toLocal8Bit().constData());
 				lscp_param_t p;
 				p.key = sPorts;
 				p.value = pCount;
@@ -788,39 +789,42 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 				{//find a free channel
 					qDebug("Failed");
 				}
-			}
+				midiPort = midiPortCount;
+			//}
 		}
 		//set port name
 		if(midiPort != -1)
 		{
-			lscp_param_t portName;
+			renameMidiPort(midiPort, QString(midiPortName), 0);
+			/*lscp_param_t portName;
 			portName.key = sName;
 			portName.value = midiPortName;
 			if(lscp_set_midi_port_param(_client, 0, midiPort, &portName) != LSCP_OK)
 			{
 				qDebug("Failed to renamed midi port");
-			}
+			}*/
 		}
 
 		//Prepare audio device chanell
+		int audioChannelCount = -1;
 		lscp_device_info_t* aDevInfo = ::lscp_get_audio_device_info(_client, 0);
 		if(aDevInfo)
 		{
 			lscp_param_t* aDevParams = aDevInfo->params;
 			for(int i = 0; aDevParams && aDevParams[i].key && aDevParams[i].value; ++i)
 			{
-				qDebug("Audio Device Param: key: %s, value: %s", aDevParams[i].key, aDevParams[i].value);
+				//qDebug("Audio Device Param: key: %s, value: %s", aDevParams[i].key, aDevParams[i].value);
 				if(strcmp(aDevParams[i].key, sChannels) == 0)
 				{
-					qDebug("Found Audio channel count");
-					audioChannel = atoi(aDevParams[i].value);
+					//qDebug("Found Audio channel count");
+					audioChannelCount = atoi(aDevParams[i].value);
 					break;
 				}
 			}
 		}
-		if(audioChannel)
+		if(audioChannel == -1)
 		{
-			bool firstrun = false;
+		/*	bool firstrun = false;
 			if(audioChannel == 1)
 			{//Check if its configured
 				lscp_device_port_info_t* portInfo = ::lscp_get_audio_channel_info(_client, 0, 0);
@@ -842,10 +846,10 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 				}
 			}
 			if(!firstrun)
-			{
+			{*/
 				qDebug("Increasing Audio device channel count");
-				char pCount[QString::number(audioChannel+1).size()+1];
-				strcpy(pCount, QString::number(audioChannel+1).toLocal8Bit().constData());
+				char pCount[QString::number(audioChannelCount+1).size()+1];
+				strcpy(pCount, QString::number(audioChannelCount+1).toLocal8Bit().constData());
 				lscp_param_t c;
 				c.key = sChannels;
 				c.value = pCount;
@@ -857,17 +861,19 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 				{
 					qDebug("Failed");
 				}
-			}
+				audioChannel = audioChannelCount;
+			//}
 		}
 		if(audioChannel != -1)
 		{
-			lscp_param_t chanName;
+			renameAudioChannel(audioChannel, QString(audioChannelName), 0);
+			/*lscp_param_t chanName;
 			chanName.key = sName;
 			chanName.value = audioChannelName;
 			if(lscp_set_audio_channel_param(_client, 0, audioChannel, &chanName) != LSCP_OK)
 			{
 				qDebug("Failed to set Audio channel name");
-			}
+			}*/
 		}
 		qDebug("LSClient::createInstrumentChannel: midiPort: %d, audioChanel: %d", midiPort, audioChannel);
 		
@@ -875,7 +881,7 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 		{
 			sd->midiPort = midiPort;
 			sd->audioChannel = audioChannel;
-			qDebug("Creating LinuxSampler Channel");
+			//qDebug("Creating LinuxSampler Channel");
 			//Create Channels and load default map
 			//ADD CHANNEL
 			//LOAD ENGINE SFZ 0
@@ -886,8 +892,8 @@ bool LSClient::createInstrumentChannel(const char* name, const char* engine, con
 			{
 				sd->samplerChannel = chan;
 				*data = sd;
-				qDebug("Created LinuxSampler Channel: %d", chan);
-				qDebug("Loading Channel engine: %s", cEngine);
+				//qDebug("Created LinuxSampler Channel: %d", chan);
+				//qDebug("Loading Channel engine: %s", cEngine);
 				if(lscp_load_engine(_client, cEngine, chan) == LSCP_OK)
 				{
 					//Setup midi side of channel
@@ -1072,26 +1078,26 @@ bool LSClient::loadInstrument(MidiInstrument* instrument)/*{{{*/
 		int mdevId = 0;
 		int adev = ::lscp_get_audio_devices(_client);
 		int adevId = 0;
-		qDebug("Client connected ready to load instrument, mdev: %d, adev: %d", mdev, adev);
+		//qDebug("Client connected ready to load instrument, mdev: %d, adev: %d", mdev, adev);
 		if(!mapCount)
 		{// Create a midi input device
 			//CREATE MIDI_INPUT_DEVICE JACK NAME='LinuxSampler'
-			qDebug("No MIDI device found creating one");
+			//qDebug("No MIDI device found creating one");
 			mdevId = createMidiInputDevice(sDevName, "JACK", 1);	
 			//SET MIDI_INPUT_DEVICE_PARAMETER 0 PORTS=21
-			if(mdevId >= 0)
+			/*if(mdevId >= 0)
 			{
 				qDebug("Created MIDI device with id: %d", mdevId);
-			}
+			}*/
 		
 			//Create an audio output device
 			//CREATE AUDIO_OUTPUT_DEVICE JACK ACTIVE=true CHANNELS=35 SAMPLERATE=48000 NAME='LinuxSampler'
-			qDebug("No Audio device found creating one");
+			//qDebug("No Audio device found creating one");
 			adevId = createAudioOutputDevice(sDevName, "JACK", 1, 48000);
-			if(adevId >= 0)
+			/*if(adevId >= 0)
 			{
 				qDebug("Created audio channel with id: %d", adevId);
-			}
+			}*/
 		}
 		if(mdevId != -1 && adevId != -1)
 		{
@@ -1257,6 +1263,110 @@ bool LSClient::renameAudioChannel(int chan, QString newName, int adev)/*{{{*/
 			}
 		}
 	}
+	return rv;
+}/*}}}*/
+
+int LSClient::getFreeMidiInputPort(int mdev)/*{{{*/
+{
+	int rv = -1;
+	if(_client)
+	{
+		lscp_device_info_t* mDevInfo = ::lscp_get_midi_device_info(_client, mdev);
+		int midiPortCount = 0;
+		if(mDevInfo)
+		{
+			lscp_param_t* mDevParams = mDevInfo->params;
+			for(int i = 0; mDevParams && mDevParams[i].key && mDevParams[i].value; ++i)
+			{
+				if(strcmp(mDevParams[i].key, sPorts) == 0)
+				{
+					midiPortCount = atoi(mDevParams[i].value);
+					break;
+				}
+			}
+			bool found = false;
+			for(int c = 0; c < midiPortCount; c++)
+			{
+				lscp_device_port_info_t* portInfo = ::lscp_get_midi_port_info(_client, mdev, c);
+				if(portInfo)
+				{
+					lscp_param_t* mPortParams = portInfo->params;
+					for(int i = 0; mPortParams && mPortParams[i].key && mPortParams[i].value; ++i)
+					{
+						if(strcmp(mPortParams[i].key, sName) == 0)
+						{
+							//if(strcmp(mPortParams[i].value, "midi_in_0") == 0)
+							QString value(mPortParams[i].value);
+							if(value.startsWith("midi_in_"))
+							{
+								rv = c;
+								found = true;
+							}
+							break;
+						}
+					}
+				}
+				if(found)
+					break;
+			}
+		}
+	}
+	qDebug("LSClient::getFreeMidiInputPort: midiPort: %d", rv);
+	return rv;
+}/*}}}*/
+
+int LSClient::getFreeAudioOutputChannel(int adev)/*{{{*/
+{
+	int rv = -1;
+	if(_client)
+	{
+		int channelCount = 0;
+		lscp_device_info_t* aDevInfo = ::lscp_get_audio_device_info(_client, adev);
+		if(aDevInfo)
+		{
+			lscp_param_t* aDevParams = aDevInfo->params;
+			for(int i = 0; aDevParams && aDevParams[i].key && aDevParams[i].value; ++i)
+			{
+				if(strcmp(aDevParams[i].key, sChannels) == 0)
+				{
+					channelCount = atoi(aDevParams[i].value);
+					break;
+				}
+			}
+			bool found = false;
+			for(int c = 0; c < channelCount; ++c)
+			{
+				lscp_device_port_info_t* portInfo = ::lscp_get_audio_channel_info(_client, adev, c);
+				if(portInfo)
+				{
+					lscp_param_t* aPortParams = portInfo->params;
+					for(int i = 0; aPortParams && aPortParams[i].key && aPortParams[i].value; ++i)
+					{
+						if(strcmp(aPortParams[i].key, sName) == 0)
+						{
+							QString value(aPortParams[i].value);
+							bool ok;
+							value.toInt(&ok);
+							if(ok)
+							{
+								rv = c;
+								found = true;
+							}
+							else if(strcmp(aPortParams[i].value, "0") == 0)
+							{
+								rv = c;
+								found = true;
+							}
+							break;
+						}
+					}
+				}
+				if(found)
+					break;
+			}
+		}
+	}
+	qDebug("LSClient::getFreeAudioOutputChannel: channel: %d ", rv);
 	return rv;
 }/*}}}*/
 

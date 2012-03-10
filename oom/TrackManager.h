@@ -94,6 +94,7 @@ public:
 		return rv.unite(m_virtualTracks);
 	}
 	void setTrackInstrument(Track*, const QString&, int);
+	void configureVerb(Track*, double, double);
 	void write(int level, Xml&) const;
 	void read(Xml&);
 };

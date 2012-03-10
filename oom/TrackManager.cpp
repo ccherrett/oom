@@ -878,6 +878,7 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 							QString inputName = QString("i").append(m_track->name());
 							QString bussName = QString("B").append(m_track->name());
 							
+							bool useBuss = (input && !buss);
 							if(!input)
 							{
 								input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
@@ -886,8 +887,9 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 								m_track->addManagedTrack(input->id());
 								m_track->setMasterFlag(true);
 								input->setMute(false);
+								useBuss = true;//Default to using a buss
 							}
-							if(!buss)
+							if(!buss && useBuss)
 							{//Create a new one
 								buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, false, true);
 								buss->setMasterFlag(false);
@@ -902,26 +904,18 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 								Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);
 								if(master)
 								{
-									//Route buss track to master
-									//if(vtrack->useBuss && buss)
-									//{
-										Route srcRoute3(buss, 0, buss->channels());
-										Route dstRoute3(master->name(), true, -1);
+									Route srcRoute3(buss, 0, buss->channels());
+									Route dstRoute3(master->name(), true, -1);
 								
-										audio->msgAddRoute(srcRoute3, dstRoute3);
-									/*}
-									else
-									{//Route input directly to Master
-										Route srcRoute3(input, 0, input->channels());
-										Route dstRoute3(master->name(), true, -1);
-								
-										audio->msgAddRoute(srcRoute3, dstRoute3);
-									}*/
+									audio->msgAddRoute(srcRoute3, dstRoute3);
 								}
 							}
 								
+							if(buss)
+								configureVerb(buss, config.minSlider, 0.0);
 							if(input)
 							{//Do we have to remove that old route to the synth port, evaluate later
+								configureVerb(input, ins->defaultVerb(), ins->defaultPan());
 								//Route channel 1
 								Route srcRoute(audioName, false, -1, Route::JACK_ROUTE);
 								Route dstRoute(input, 0);
@@ -959,7 +953,6 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 				}
 				mp->setInstrument(ins);
 				track->setWantsAutomation(false);
-				//Find input track related to us and route it
 			}
 			break;
 			case SYNTH_INSTRUMENT:
@@ -1042,8 +1035,8 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 								QString src(QString("LinuxSampler:").append(m_track->name()).append("-audio"));
                 				Route srcRoute(src, true, Route::JACK_ROUTE);
                 				Route dstRoute(input->name(), true, i);
-								qDebug("srcRoute: %s, %d, %d\n", src.toUtf8().constData(), true, Route::JACK_ROUTE);
-								qDebug("dstRoute: %s, %d, %d\n", input->name().toUtf8().constData(), true, i);
+								//qDebug("srcRoute: %s, %d, %d\n", src.toUtf8().constData(), true, Route::JACK_ROUTE);
+								//qDebug("dstRoute: %s, %d, %d\n", input->name().toUtf8().constData(), true, i);
 								audio->msgRemoveRoute(srcRoute, dstRoute);
 								/*if (audioDevice)
 								{
@@ -1073,7 +1066,7 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
                     QString selectedInput  = synth->getAudioOutputPortName(0);
                     QString selectedInput2 = synth->getAudioOutputPortName(1);
 
-					qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
+					//qDebug("Port Names: left: %s, right: %s", selectedInput.toUtf8().constData(), selectedInput2.toUtf8().constData());
 					Track* input = 0;
 					Track* buss = 0;
 					QList<qint64> *chain = track->audioChain();
@@ -1092,6 +1085,7 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 					QString inputName = QString("i").append(m_track->name());
 					QString bussName = QString("B").append(m_track->name());
 					
+					bool useBuss = (input && !buss);
 					if(!input)
 					{
 						input = song->addTrackByName(inputName, Track::AUDIO_INPUT, -1, false, false);
@@ -1100,8 +1094,9 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 						m_track->addManagedTrack(input->id());
 						input->setMute(false);
 						m_track->setMasterFlag(true);
+						useBuss = true;
 					}
-					if(!buss)
+					if(!buss && useBuss)
 					{//Create a new one
 						buss = song->addTrackByName(bussName, Track::AUDIO_BUSS, -1, false, true);
 						buss->setMasterFlag(false);
@@ -1116,25 +1111,17 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 						Track* master = song->findTrackByIdAndType(song->masterId(), Track::AUDIO_OUTPUT);
 						if(master)
 						{
-							//Route buss track to master
-							//if(vtrack->useBuss && buss)
-							//{
-								Route srcRoute3(buss, 0, buss->channels());
-								Route dstRoute3(master->name(), true, -1);
+							Route srcRoute3(buss, 0, buss->channels());
+							Route dstRoute3(master->name(), true, -1);
 						
-								audio->msgAddRoute(srcRoute3, dstRoute3);
-							/*}
-							else
-							{//Route input directly to Master
-								Route srcRoute3(input, 0, input->channels());
-								Route dstRoute3(master->name(), true, -1);
-						
-								audio->msgAddRoute(srcRoute3, dstRoute3);
-							}*/
+							audio->msgAddRoute(srcRoute3, dstRoute3);
 						}
 					}
+					if(buss)
+						configureVerb(buss, config.minSlider, 0.0);
 					if(input)
 					{//Do we have to remove that old route to the synth port, evaluate later
+						configureVerb(input, config.minSlider, 0.0);
 						//Route channel 1
 						Route srcRoute(selectedInput, false, -1, Route::JACK_ROUTE);
 						Route dstRoute(input, 0);
@@ -1340,6 +1327,39 @@ bool TrackManager::unloadInstrument(VirtualTrack *vtrack)/*{{{*/
 	return rv;
 }/*}}}*/
 
+void TrackManager::configureVerb(Track* track, double auxval, double panval)
+{
+	qint64 verb = song->oomVerbId();/*{{{*/
+	if(verb)
+	{
+		double aux;
+		if (auxval <= config.minSlider)
+		{
+			aux = 0.0;
+		}
+		else
+			aux = pow(10.0, auxval / 20.0);
+
+		if(track)
+		{
+			//Setup reverb value
+			audio->msgSetAux((AudioTrack*) track, verb, aux);
+			song->update(SC_AUX);
+
+			//Setup Pan value
+			AutomationType at = ((AudioTrack*) track)->automationType();
+			if (at == AUTO_WRITE || (audio->isPlaying() && at == AUTO_TOUCH))
+				track->enablePanController(false);
+
+			qDebug("TrackManager::configureVerb: pan: %f, verb: %f", aux, panval);
+			audio->msgSetPan(((AudioTrack*) track), panval);
+			((AudioTrack*) track)->recordAutomation(AC_PAN, panval);
+			
+			audio->msgUpdateSoloStates();
+		}
+	}/*}}}*/
+}
+
 //newBuss, useBuss, 
 void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 {
@@ -1464,18 +1484,20 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 		qint64 verb = song->oomVerbId();/*{{{*/
 		if(verb)
 		{
-			double auxval = vtrack->instrumentVerb, panval = vtrack->instrumentPan, aux;
-			if (auxval <= config.minSlider)
+			double auxval = vtrack->instrumentVerb, panval = vtrack->instrumentPan;
+			/*if (auxval <= config.minSlider)
 			{
 				aux = 0.0;
 			}
 			else
-				aux = pow(10.0, auxval / 20.0);
+				aux = pow(10.0, auxval / 20.0);*/
 
 			if(vtrack->useBuss && buss)
 			{
+				configureVerb(buss, auxval, panval);
+				configureVerb(input, config.minSlider, 0.0);
 				//Setup reverb value
-				audio->msgSetAux((AudioTrack*) buss, verb, aux);
+				/*audio->msgSetAux((AudioTrack*) buss, verb, aux);
 				song->update(SC_AUX);
 
 				//Setup Pan value
@@ -1485,12 +1507,13 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 
 				qDebug("TrackManager::createMonitorInputTracks: pan: %f, verb: %f", aux, panval);
 				audio->msgSetPan(((AudioTrack*) buss), panval);
-				((AudioTrack*) buss)->recordAutomation(AC_PAN, panval);
+				((AudioTrack*) buss)->recordAutomation(AC_PAN, panval);*/
 			}
 			else if(!vtrack->useBuss && input)
 			{
+				configureVerb(input, auxval, panval);
 				//Setup reverb value
-				audio->msgSetAux((AudioTrack*) input, verb, aux);
+				/*audio->msgSetAux((AudioTrack*) input, verb, aux);
 				song->update(SC_AUX);
 
 				//Setup Pan value
@@ -1499,7 +1522,7 @@ void TrackManager::createMonitorInputTracks(VirtualTrack* vtrack)/*{{{*/
 					input->enablePanController(false);
 
 				audio->msgSetPan(((AudioTrack*) input), panval);
-				((AudioTrack*) input)->recordAutomation(AC_PAN, panval);
+				((AudioTrack*) input)->recordAutomation(AC_PAN, panval);*/
 			}
 		}/*}}}*/
 
