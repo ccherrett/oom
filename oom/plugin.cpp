@@ -1074,7 +1074,7 @@ void Pipeline::updateGuis()
 
 static void loadPluginLib(QFileInfo* fi, const PluginType t)
 {
-    if (debugMsg)
+    //if (debugMsg)
         qWarning("looking up %s", fi->filePath().toAscii().constData());
 
     void* handle = lib_open(fi->filePath().toAscii().constData());
@@ -1183,7 +1183,7 @@ static void loadPluginLib(QFileInfo* fi, const PluginType t)
 
 static void loadPluginDir(const QString& s, const PluginType t)
 {
-    if (debugMsg)
+    //if (debugMsg)
         qWarning("scan plugin dir <%s>\n", s.toLatin1().constData());
 
 #ifdef __WINDOWS__
@@ -1272,10 +1272,14 @@ void initPlugins(bool ladspa, bool lv2, bool vst)
         const char* vstPath = getenv("VST_PATH");
         if (vstPath == 0)
 		{
+			qDebug("from config VST_PATH: %s", config.vstPaths.toUtf8().constData());
 			vstPathList = config.vstPaths.split(":");
 		}
 		else
+		{
 			 vstPathList = QString(vstPath).split(":");
+			qDebug("from env VST_PATH: %s", vstPath);
+		}
 			//"/usr/local/lib64/vst:/usr/lib64/vst:/usr/local/lib/vst:/usr/lib/vst";
 #endif
 

@@ -1187,10 +1187,11 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 						midiDevices.remove(md);
 						synth->close();
 					}
+					mp->setInstrument(ins);
 				}
 				else
 				{//Maybe remove the channel in LS if it was an LS instrument
-					if(oldins->isOOMInstrument() || track->samplerData())
+					if(oldins->isOOMInstrument() && track->samplerData())
 					{//Delete sampler channel and null the track sampler data
 						if(!lsClient)
 						{
@@ -1208,9 +1209,10 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 						midiDevices.remove(md);
 						track->setSamplerData(0);
 					}
+					mp->setInstrument(ins);
 				}
+				track->setWantsAutomation(false);
 				midiSeq->msgSetMidiDevice(mp, 0);
-				mp->setInstrument(ins);
 				song->update(SC_MIDI_TRACK_PROP);
 			}
 			break;

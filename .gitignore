@@ -6,3 +6,8 @@ oom/plugin_includes/pluginterfaces/
 CMakeLists.txt.user
 .svn/
 .directory
+debug_build.sh
+oostudio/html/m7ir48.html
+oom/Composer/AutomationMove.cpp
+oom/Composer/AutomationMove.h
+oom/Composer/AutomationMoveBase.ui
