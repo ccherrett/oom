@@ -89,6 +89,7 @@ private slots:
 		m_editing = edit;
 	}
 	void generateInstrumentMenu();
+	void instrumentChangeRequested(qint64, const QString&, int);
 
 public slots:
 	void songChanged(int);

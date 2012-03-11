@@ -963,6 +963,7 @@ void TrackHeader::generateInstrumentMenu()/*{{{*/
 	QMenu* p = new QMenu(this);
 	//p->setTearOffEnabled(true);
 	TrackInstrumentMenu *imenu = new TrackInstrumentMenu(p, m_track);
+	connect(imenu, SIGNAL(instrumentSelected(qint64, const QString&, int)), this, SLOT(instrumentChangeRequested(qint64, const QString&, int)));
 
 	p->addAction(imenu);
 	p->exec(QCursor::pos());
@@ -971,6 +972,11 @@ void TrackHeader::generateInstrumentMenu()/*{{{*/
 	updateSelection(false);
 	//emit selectionChanged(m_track);
 }/*}}}*/
+
+void TrackHeader::instrumentChangeRequested(qint64 id, const QString& instrument, int type)
+{
+	trackManager->setTrackInstrument(id, instrument, type);
+}
 
 void TrackHeader::toggleRecord(bool state)/*{{{*/
 {

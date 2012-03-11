@@ -780,8 +780,10 @@ qint64 TrackManager::addTrack(VirtualTrack* vtrack, int index)/*{{{*/
 	return rv;
 }/*}}}*/
 
-void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int type)/*{{{*/
+void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int type)/*{{{*/
 {
+	Track *t = song->findTrackById(tid);
+
 	if(!t || instrument.isEmpty())
 		return;
 	m_track = t;

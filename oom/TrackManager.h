@@ -93,7 +93,7 @@ public:
 		QMap<qint64, VirtualTrack*> rv;
 		return rv.unite(m_virtualTracks);
 	}
-	void setTrackInstrument(Track*, const QString&, int);
+	void setTrackInstrument(qint64, const QString&, int);
 	void configureVerb(Track*, double, double);
 	void removeTrack(qint64 id);
 	void removeSelectedTracks();

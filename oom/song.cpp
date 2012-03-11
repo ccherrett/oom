@@ -1993,23 +1993,26 @@ void Song::beat()
 		emit song->midiNote(pitch, velo);
 		--noteFifoSize;
 	}
-	if(lsClient)
+	if(!invalid)
 	{
-		lsClientStarted = lsClient->isClientStarted();
-		if(!lsClientStarted)
+		if(lsClient)
 		{
-			if(lsClient->startClient())
-				lsClientStarted = true;
-			else
+			lsClientStarted = lsClient->isClientStarted();
+			if(!lsClientStarted)
 			{
-				lsClientStarted = false;
-				lsClient = 0;
+				if(lsClient->startClient())
+					lsClientStarted = true;
+				else
+				{
+					lsClientStarted = false;
+					lsClient = 0;
+				}
 			}
 		}
-	}
-	else
-	{
-		lsClientStarted = false;
+		else
+		{
+			lsClientStarted = false;
+		}
 	}
 }
 

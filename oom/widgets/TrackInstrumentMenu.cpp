@@ -176,7 +176,8 @@ void TrackInstrumentMenu::itemClicked(const QModelIndex& index)/*{{{*/
 			//item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
 			QString instrument = item->data().toString();
 			int insType = item->data(Qt::UserRole+2).toInt();
-			trackManager->setTrackInstrument(m_track, instrument, insType);
+			emit instrumentSelected(m_track->id(), instrument, insType);
+			//trackManager->setTrackInstrument(m_track, instrument, insType);
 			
 			trigger();
 			//FIXME: This is a seriously brutal HACK but its the only way it can get it done

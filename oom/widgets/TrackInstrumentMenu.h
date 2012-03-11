@@ -37,6 +37,7 @@ private slots:
 	
 signals:
 	void triggered();
+	void instrumentSelected(qint64, const QString&, int);
 };
 
 #endif
