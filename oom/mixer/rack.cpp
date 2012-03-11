@@ -332,7 +332,6 @@ void EffectRack::menuRequested(QListWidgetItem* it)/*{{{*/
             qCritical("Plugin to remove now and here");
 
             audio->msgAddPlugin(track, idx, 0);
-			//epipe->insert(0, idx);
 			song->dirty = true;
 			break;
 		}

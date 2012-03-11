@@ -152,7 +152,7 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
 {
 	if(debugMsg)
     	qDebug("AudioTrack::addPlugin(%p, %d) \n", plugin, idx);
-    if (plugin == 0)
+    if (!plugin)
     {
         BasePlugin* oldPlugin = (*_efxPipe)[idx];
         if (oldPlugin)
@@ -170,35 +170,7 @@ void AudioTrack::addPlugin(BasePlugin* plugin, int idx)/*{{{*/
                 int id = genACnum(idx, i);
                 removeController(id);
             }
-
-#if 0 //def LV2_SUPPORT
-            if(oldPlugin->type() == LV2)
-            {
-                    LV2PluginI* plug = (LV2PluginI*)oldPlugin;
-                    if(plug)
-                            plug->setStop(true);
-                    //if(plug)
-                    //      delete plug;
-            }
-            //else
-#endif
-            // Delete the appropriate class
-//            qWarning("delete oldPlgin commented here before");
-
-//            switch (oldPlugin->type())
-//            {
-//            case PLUGIN_LADSPA:
-//                delete (LadspaPlugin*)oldPlugin;
-//                break;
-//            case PLUGIN_LV2:
-//                delete (Lv2Plugin*)oldPlugin;
-//                break;
-//            case PLUGIN_VST:
-//                delete (VstPlugin*)oldPlugin;
-//                break;
-//            default:
-//                break;
-//            }
+			_efxPipe->remove(idx);
         }
     }
 
