@@ -1820,7 +1820,7 @@ void ComposerCanvas::keyPress(QKeyEvent* event)/*{{{*/
 		}
 
 		song->startUndo();
-		song->msgRemoveParts();
+		audio->msgRemoveParts(song->selectedParts());
 		song->endUndo(SC_PART_REMOVED);
 
 		return;

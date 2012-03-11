@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "utils.h"
 #include "citem.h"
+#include "track.h"
 
 //---------------------------------------------------------
 //   curTime
@@ -624,3 +625,27 @@ int getFreeMidiPort()/*{{{*/
 	}
 	return rv;
 }/*}}}*/
+
+QString trackTypeString(int id)
+{
+	Track::TrackType type = (Track::TrackType)id;
+	switch(type)
+	{
+		case Track::MIDI:
+		case Track::DRUM:
+			return QString("MIDI");
+		case Track::WAVE:
+			return QString("Audio Wave");
+		case Track::AUDIO_OUTPUT:
+			QString("Audio Output");
+		case Track::AUDIO_INPUT:
+			return QString("Audio Input");
+		case Track::AUDIO_BUSS:
+			return QString("Audio Buss");
+		case Track::AUDIO_AUX:
+			return QString("Aux Send");
+		default:
+		break;
+	}
+	return QString("<Unknown Type>");
+}

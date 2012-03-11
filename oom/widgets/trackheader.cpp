@@ -688,27 +688,29 @@ void TrackHeader::generatePopupMenu()/*{{{*/
 		{
 			case 0: // delete track
 			{
-				QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
+				/*QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
 				if(QMessageBox::question(this, 
 					tr("Delete Track"),
 					msg.arg(multipleSelectedTracks ? "all selected tracks" : m_track->name()),
 					QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
-				{
+				{*/
 					if (multipleSelectedTracks)
 					{
-						song->startUndo();
+						trackManager->removeSelectedTracks();
+					/*	song->startUndo();
 						audio->msgRemoveTracks();
 						song->endUndo(SC_TRACK_REMOVED);
-						song->updateSoloStates();
+						song->updateSoloStates();*/
 					}
 					else
 					{
 						if(m_track->id() == song->masterId() || m_track->id() == song->oomVerbId())
 							break;
-						song->removeTrack(m_track);
-						audio->msgUpdateSoloStates();
+						trackManager->removeTrack(m_track->id());
+						//song->removeTrack(m_track);
+						//audio->msgUpdateSoloStates();
 					}
-				}
+				//}
 			}
 			break;
 

@@ -4410,3 +4410,19 @@ void Song::movePlaybackToPart(Part* part)/*{{{*/
 	}
 }/*}}}*/
 
+QList<Part*> Song::selectedParts()
+{
+	QList<Part*> selected;
+	for (iTrack it = _viewtracks.begin(); it != _viewtracks.end(); ++it)
+	{
+		PartList* pl = (*it)->parts();
+		for (iPart ip = pl->begin(); ip != pl->end(); ++ip)
+		{
+			if (ip->second->selected())
+			{
+				selected.append(ip->second);
+			}
+		}
+	}
+	return selected;
+}

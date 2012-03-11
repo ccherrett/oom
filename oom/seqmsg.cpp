@@ -74,7 +74,7 @@ bool Audio::sendMessage(AudioMsg* m, bool doUndo, bool waitRead)
         processMsg(m);
 
 	if (doUndo)
-		song->endUndo(0); // song->endMsgCmd();
+		song->endUndo(0);
 
 	return false;
 }
@@ -701,6 +701,18 @@ void Audio::msgRemoveTrack(Track* track, bool doUndoFlag)
 }
 
 //---------------------------------------------------------
+//   msgRemoveTrackGroup
+//---------------------------------------------------------
+
+void Audio::msgRemoveTrackGroup(QList<qint64> list, bool doUndoFlag)
+{
+	AudioMsg msg;
+	msg.id = SEQM_REMOVE_TRACK_GROUP;
+	msg.list = list;
+	sendMessage(&msg, doUndoFlag);
+}
+
+//---------------------------------------------------------
 //   msgRemoveTracks
 //    remove all selected tracks
 //---------------------------------------------------------
@@ -785,6 +797,14 @@ void Audio::msgRemovePart(Part* part, bool doUndoFlag)
 	sendMessage(&msg, doUndoFlag);
 }
 
+void Audio::msgRemoveParts(QList<Part*> parts, bool doUndoFlag)
+{
+	AudioMsg msg;
+	msg.id = SEQM_REMOVE_PART_LIST;
+	msg.plist = parts;
+	sendMessage(&msg, doUndoFlag);
+}
+
 //---------------------------------------------------------
 //   msgRemoveParts
 //    remove selected parts; return true if any part was
@@ -801,7 +821,7 @@ bool Song::msgRemoveParts()
 		//TrackList* tl = song->tracks();
 		//TODO: Check if this is used outside of the canvas part delete and fix them
 		//since we should not be deleting parts we cant see.
-		TrackList* tl = visibletracks();
+		TrackList* tl = visibletracks();/*{{{*/
 
 		for (iTrack it = tl->begin(); it != tl->end(); ++it)
 		{
@@ -825,7 +845,7 @@ bool Song::msgRemoveParts()
 			}
 			if (loop)
 				break;
-		}
+		}/*}}}*/
 	} while (loop);
 	if(partSelected)
 	{

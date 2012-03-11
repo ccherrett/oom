@@ -79,6 +79,17 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 		case SEQM_REMOVE_TRACK:
 			song->cmdRemoveTrack(msg->track);
 			updatePollFd();
+		case SEQM_REMOVE_TRACK_GROUP:
+		{	
+			for(int i = 0; i < msg->list.size(); i++)
+			{
+				Track* track  = song->findTrackById(msg->list.at(i));
+				if(track && track->id() != song->masterId() && track->id() != song->oomVerbId())
+					song->cmdRemoveTrack(track);
+			}
+			updatePollFd();
+		}
+		break;
 			break;
 		case SEQM_CHANGE_TRACK:
 			song->changeTrack((Track*) (msg->p1), (Track*) (msg->p2));
@@ -90,6 +101,14 @@ void MidiSeq::processMsg(const ThreadMsg* m)
 		case SEQM_REMOVE_PART:
 			song->cmdRemovePart((Part*) msg->p1);
 			break;
+		case SEQM_REMOVE_PART_LIST:
+		{
+			for(int i = 0; i < msg->plist.size(); i++)
+			{
+				song->cmdRemovePart((Part*) msg->plist.at(i));
+			}
+		}
+		break;
 		case SEQM_CHANGE_PART:
 			song->cmdChangePart((Part*) msg->p1, (Part*) msg->p2, msg->a, msg->b);
 			break;

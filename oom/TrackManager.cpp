@@ -26,6 +26,8 @@
 #include "xml.h"
 #include "utils.h"
 
+#include "QMessageBox"
+
 VirtualTrack::VirtualTrack()
 {/*{{{*/
 	id = create_id();
@@ -1222,6 +1224,157 @@ void TrackManager::setTrackInstrument(Track* t, const QString& instrument, int t
 		song->dirty = true;
 	}
 }/*}}}*/
+
+void TrackManager::removeTrack(qint64 id)/*{{{*/
+{
+	Track* track = song->findTrackById(id);
+	if(track)
+	{
+		QList<qint64> idList;
+		QStringList names;
+		if(track->masterFlag())
+		{//Find children
+			idList.append(track->id());
+			names.append(track->name());
+			if(track->hasChildren())
+			{
+				QList<qint64> *chain = track->audioChain();
+				for(int i = 0; i < chain->size(); i++)
+				{
+					Track* child = song->findTrackById(chain->at(i));
+					if(child && child->chainMaster() == id)
+					{
+						names.append(child->name());
+						idList.append(child->id());
+					}
+				}
+			}
+		}
+		else
+		{//Find parent and siblings
+			Track *ptrack = song->findTrackById(track->chainMaster());
+			if(ptrack && ptrack->chainContains(id))
+			{//We're good
+				idList.append(ptrack->id());
+				names.append(ptrack->name());
+				if(ptrack->hasChildren())
+				{
+					QList<qint64> *chain = ptrack->audioChain();
+					for(int i = 0; i < chain->size(); i++)
+					{
+						Track* child = song->findTrackById(chain->at(i));
+						if(child)
+						{
+							names.append(child->name());
+							idList.append(child->id());
+						}
+					}
+				}
+			}
+			else
+			{//Unparented track, maybe old file, just delete it
+				idList.append(track->id());
+				names.append(track->name());
+			}
+		}
+		//Process list
+		if(idList.size())
+		{
+			QString msg(tr("You are about to delete the following track(s) \n%1 \nAre you sure this is what you want?"));
+			if(QMessageBox::question(oom, 
+				tr("Delete Track(s)"),
+				msg.arg(names.join("\n")),
+				QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+			{
+				audio->msgRemoveTrackGroup(idList, true);
+			}
+		}
+	}
+}/*}}}*/
+
+void TrackManager::removeSelectedTracks()
+{
+	QList<qint64> selected = song->selectedTracks();
+	if(selected.isEmpty())
+		return;
+	QList<qint64> idList;
+	QStringList names;
+	for(int t = 0; t < selected.size(); t++)
+	{
+		qint64 id =  selected.at(t);
+		Track* track = song->findTrackById(id);
+		if(track)
+		{
+			if(track->masterFlag())
+			{//Find children
+				if(!idList.contains(track->id()))
+					idList.append(track->id());
+				if(!names.contains(track->name()))
+					names.append(track->name());
+				if(track->hasChildren())
+				{
+					QList<qint64> *chain = track->audioChain();
+					for(int i = 0; i < chain->size(); i++)
+					{
+						Track* child = song->findTrackById(chain->at(i));
+						if(child && child->chainMaster() == id)
+						{
+							if(!names.contains(child->name()))
+								names.append(child->name());
+							if(!idList.contains(child->id()))
+								idList.append(child->id());
+						}
+					}
+				}
+			}
+			else
+			{//Find parent and siblings
+				Track *ptrack = song->findTrackById(track->chainMaster());
+				if(ptrack && ptrack->chainContains(id))
+				{//We're good
+					if(!idList.contains(ptrack->id()))
+						idList.append(ptrack->id());
+					if(!names.contains(ptrack->name()))
+						names.append(ptrack->name());
+					if(ptrack->hasChildren())
+					{
+						QList<qint64> *chain = ptrack->audioChain();
+						for(int i = 0; i < chain->size(); i++)
+						{
+							Track* child = song->findTrackById(chain->at(i));
+							if(child)
+							{
+								if(!names.contains(child->name()))
+									names.append(child->name());
+								if(!idList.contains(child->id()))
+									idList.append(child->id());
+							}
+						}
+					}
+				}
+				else
+				{//Unparented track, maybe old file, just delete it
+					if(!idList.contains(track->id()))
+						idList.append(track->id());
+					if(!names.contains(track->name()))
+						names.append(track->name());
+				}
+			}
+		}
+	}
+	//Process list
+	if(idList.size())
+	{
+		QString msg(tr("You are about to delete the following track(s) \n%1 \nAre you sure this is what you want?"));
+		if(QMessageBox::question(oom, 
+			tr("Delete Track(s)"),
+			msg.arg(names.join("\n")),
+			QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+		{
+			audio->msgRemoveTrackGroup(idList, true);
+		}
+	}
+}
 
 bool TrackManager::removeTrack(VirtualTrack* vtrack)/*{{{*/
 {

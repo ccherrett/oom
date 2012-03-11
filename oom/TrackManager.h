@@ -95,6 +95,8 @@ public:
 	}
 	void setTrackInstrument(Track*, const QString&, int);
 	void configureVerb(Track*, double, double);
+	void removeTrack(qint64 id);
+	void removeSelectedTracks();
 	void write(int level, Xml&) const;
 	void read(Xml&);
 };

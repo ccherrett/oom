@@ -48,10 +48,11 @@ class MidiPort;
 class MidiDevice;
 class AudioPort;
 class AudioDevice;
-/*
+
 #define SC_TRACK_INSERTED     1
 #define SC_TRACK_REMOVED      2
 #define SC_TRACK_MODIFIED     4
+#define SC_TRACK_INSTRUMENT   5
 #define SC_PART_INSERTED      8
 #define SC_PART_REMOVED       0x10
 #define SC_PART_MODIFIED      0x20
@@ -87,8 +88,8 @@ class AudioDevice;
 #define SC_VIEW_CHANGED		   0X70000000
 #define SC_VIEW_ADDED		   0X80000000
 #define SC_VIEW_DELETED		   0X90000000
-*/
 
+/*
 enum 
 {
 	SC_TRACK_INSERTED = 1, SC_TRACK_REMOVED, SC_TRACK_MODIFIED,
@@ -102,6 +103,7 @@ enum
 	SC_TRACKVIEW_MODIFIED, SC_PATCH_UPDATED, SC_VIEW_CHANGED, SC_VIEW_ADDED,
 	SC_VIEW_DELETED, SC_TRACK_INSTRUMENT
 };
+*/
 
 #define REC_NOTE_FIFO_SIZE    16
 
@@ -473,6 +475,7 @@ public:
 		}
 		return list;
 	}
+	QList<Part*> selectedParts();
 
     TrackList getSelectedTracks();
     void setTrackHeights(TrackList& list, int height);

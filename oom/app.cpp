@@ -3497,31 +3497,35 @@ void OOMidi::cmd(int cmd)
 			}
 			else
 			{
-				song->startUndo();
-				if (song->msgRemoveParts())
+				QList<Part*> parts = song->selectedParts();
+				if (parts.size())
 				{
+					song->startUndo();
+					audio->msgRemoveParts(parts);
 					song->endUndo(SC_PART_REMOVED);
 					break;
 				}
 				else
 				{
-					QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
+					trackManager->removeSelectedTracks();
+					/*QString msg(tr("You are about to delete \n%1 \nAre you sure this is what you want?"));
 					if(QMessageBox::question(this, 
 						tr("Delete Track"),
 						msg.arg("all selected tracks"),
 						QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
 					{
 						audio->msgRemoveTracks();
-					}
+					}*/
 				}
-				song->endUndo(SC_TRACK_REMOVED);
+				//song->endUndo(SC_TRACK_REMOVED);
 
 			}
 			break;
 		case CMD_DELETE_TRACK:
-			song->startUndo();
-			audio->msgRemoveTracks();
-			song->endUndo(SC_TRACK_REMOVED);
+			trackManager->removeSelectedTracks();
+			//song->startUndo();
+			//audio->msgRemoveTracks();
+			//song->endUndo(SC_TRACK_REMOVED);
 			audio->msgUpdateSoloStates();
 			break;
 

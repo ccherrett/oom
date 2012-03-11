@@ -207,6 +207,10 @@ public:
 	{
 		return (!m_audioChain.isEmpty() && m_audioChain.contains(id));
 	}
+	bool hasChildren()
+	{
+		return !m_audioChain.isEmpty();
+	}
 
 	MidiAssignData* midiAssign() { return &m_midiassign; }
 

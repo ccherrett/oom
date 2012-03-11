@@ -14,6 +14,7 @@
 #include "mpevent.h"
 #include "route.h"
 #include "event.h"
+#include <QList>
 
 class SndFile;
 class BasePlugin;
@@ -40,7 +41,7 @@ class MidiTrack;
 enum
 {
     SEQM_ADD_TRACK, SEQM_REMOVE_TRACK, SEQM_CHANGE_TRACK, SEQM_MOVE_TRACK,
-    SEQM_ADD_PART, SEQM_REMOVE_PART, SEQM_CHANGE_PART,
+    SEQM_ADD_PART, SEQM_REMOVE_PART, SEQM_REMOVE_PART_LIST, SEQM_CHANGE_PART,
     SEQM_ADD_EVENT, SEQM_ADD_EVENT_CHECK, SEQM_REMOVE_EVENT, SEQM_CHANGE_EVENT,
     SEQM_ADD_TEMPO, SEQM_SET_TEMPO, SEQM_REMOVE_TEMPO, SEQM_ADD_SIG, SEQM_REMOVE_SIG,
     SEQM_SET_GLOBAL_TEMPO,
@@ -77,7 +78,7 @@ enum
     AUDIO_ADD_AC_EVENT,
     AUDIO_SET_SOLO, AUDIO_SET_SEND_METRONOME,
     MS_PROCESS, MS_STOP, MS_SET_RTC, MS_UPDATE_POLL_FD,
-    SEQM_IDLE, SEQM_SEEK, SEQM_PRELOAD_PROGRAM
+    SEQM_IDLE, SEQM_SEEK, SEQM_PRELOAD_PROGRAM, SEQM_REMOVE_TRACK_GROUP
 };
 
 extern const char* seqMsgList[]; // for debug
@@ -109,6 +110,8 @@ struct AudioMsg : public ThreadMsg
     char port, channel, ctrl;
     int a, b, c;
     Pos pos;
+	QList<qint64> list;
+	QList<Part*> plist;
 };
 
 //---------------------------------------------------------
@@ -233,11 +236,12 @@ public:
 
     void msgRemoveTrack(Track*, bool u = true);
     void msgRemoveTracks();
+	void msgRemoveTrackGroup(QList<qint64>, bool undo = true);
     void msgChangeTrack(Track* oldTrack, Track* newTrack, bool u = true);
     void msgMoveTrack(int idx1, int dx2, bool u = true);
     void msgAddPart(Part*, bool u = true);
     void msgRemovePart(Part*, bool u = true);
-    //void msgChangePart(Part* oldPart, Part* newPart, bool u = true);
+    void msgRemoveParts(QList<Part*>, bool u = true);
     void msgChangePart(Part* oldPart, Part* newPart, bool u = true, bool doCtrls = true, bool doClones = false);
     //void msgAddEvent(Event&, Part*, bool u = true);
     void msgAddEvent(Event&, Part*, bool u = true, bool doCtrls = true, bool doClones = false, bool waitRead = true);
