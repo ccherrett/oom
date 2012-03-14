@@ -841,6 +841,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 						{
 							midiDevices.remove(md);
 							synth->close();
+							delete synth;
 						}
 						//if(debugMsg)
 							qDebug("TrackManager::setTrackInstrument: Synth cleanup complete");
@@ -864,18 +865,18 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 							QString audioName(QString(prefix).append(m_track->name()).append(postfix));
 							QString midi(QString("O-").append(m_track->name()));
 
-							md = MidiJackDevice::createJackMidiDevice(midi, 3);
-							if(md)
+							MidiDevice *ndev = MidiJackDevice::createJackMidiDevice(midi, 3);
+							if(ndev)
 							{
 								if(debugMsg)
 									qDebug("TrackManager::setTrackInstrument: Created MIDI input device: JACK_MIDI");
 								int openFlags = 0;
 								openFlags ^= 0x1;
-								md->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(mp, md);
+								ndev->setOpenFlags(openFlags);
+								midiSeq->msgSetMidiDevice(mp, ndev);
 
 								Route dstRoute(devname, false, -1, Route::JACK_ROUTE);
-								Route srcRoute(md, -1);
+								Route srcRoute(ndev, -1);
 
 								audio->msgAddRoute(srcRoute, dstRoute);
 
@@ -993,7 +994,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 					if (synth->duplicated())
 					{
 						midiDevices.remove(md);
-						synth->close();
+						//synth->close();
 					}
 				}
 				else
