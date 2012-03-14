@@ -241,7 +241,8 @@ VstPlugin::VstPlugin()
 
 VstPlugin::~VstPlugin()
 {
-	qDebug("VstPlugin::~VstPlugin");
+	if(debugMsg)
+		qDebug("VstPlugin::~VstPlugin");
     sanityCheck = 0;
     aboutToRemove();
 

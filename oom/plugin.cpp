@@ -391,22 +391,26 @@ QString SynthPluginDevice::open()
 
 void SynthPluginDevice::close()
 {
-	qDebug("SynthPluginDevice::close");
+	if(debugMsg)
+		qDebug("SynthPluginDevice::close");
     _readEnable = false;
     _writeEnable = false;
 
     if (m_audioTrack)
     {
-		qDebug("SynthPluginDevice::close Deleting internal SynthAudioTrack");
+		if(debugMsg)
+			qDebug("SynthPluginDevice::close Deleting internal SynthAudioTrack");
         audio->msgAddPlugin(m_audioTrack, 0, 0);
         delete (SynthPluginTrack*)m_audioTrack;
         m_audioTrack = 0;
-		qDebug("SynthPluginDevice::close Done");
+		if(debugMsg)
+			qDebug("SynthPluginDevice::close Done");
     }
 
     if (m_plugin)
     {
-		qDebug("SynthPluginDevice::close calling delete on plugin");
+		if(debugMsg)
+			qDebug("SynthPluginDevice::close calling delete on plugin");
         m_plugin->setTrack(0);
         m_plugin->aboutToRemove();
 
@@ -550,7 +554,8 @@ void SynthPluginDevice::updateNativeGui()
 
 void SynthPluginDevice::reset(int, MType)
 {
-    qWarning("SynthPluginDevice::reset");
+	if(debugMsg)
+    	qWarning("SynthPluginDevice::reset");
 }
 
 QString SynthPluginDevice::getPatchName(int, int prog, MType, bool)
@@ -593,7 +598,8 @@ Patch* SynthPluginDevice::getPatch(int, int prog, MType, bool)
 
 void SynthPluginDevice::populatePatchPopup(QMenu*, int, MType, bool)
 {
-    qWarning("SynthPluginDevice::populatePatchPopup();");
+	if(debugMsg)
+    	qWarning("SynthPluginDevice::populatePatchPopup();");
 }
 
 void SynthPluginDevice::populatePatchModel(QStandardItemModel* model, int, MType, bool)
@@ -654,7 +660,8 @@ void SynthPluginDevice::write(int level, Xml& xml)
 
 MidiPlayEvent SynthPluginDevice::receiveEvent()
 {
-    qWarning("SynthPluginDevice::receiveEvent()");
+	if(debugMsg)
+    	qWarning("SynthPluginDevice::receiveEvent()");
     return MidiPlayEvent() ;//_sif->receiveEvent();
 }
 
@@ -742,7 +749,8 @@ void Pipeline::remove(int index)
 	int s = size();
 	if(index >= s)
 		return;
-	qDebug(" Pipeline::remove(%d)", index);
+	if(debugMsg)
+		qDebug(" Pipeline::remove(%d)", index);
     BasePlugin* plugin = (*this)[index];
 
     if (plugin && !(plugin->hints() & PLUGIN_IS_SYNTH))
