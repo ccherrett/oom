@@ -31,6 +31,7 @@
 #cmakedefine LSCP_SUPPORT
 #cmakedefine USE_SSE
 #cmakedefine JACK2_SUPPORT
+#cmakedefine JACK_SESSION_SUPPORT
 #cmakedefine GTK2UI_SUPPORT
 
 #define VERSION          "${OOMidi_VERSION_FULL}"

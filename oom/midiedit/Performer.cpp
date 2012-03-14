@@ -1581,6 +1581,15 @@ void Performer::songChanged1(int bits)/*{{{*/
 			m_muteAction->blockSignals(false);
 		}
 	}	
+
+	if(bits & SC_TRACK_INSTRUMENT)
+	{
+		Part* part = curCanvasPart();
+		if(part)
+		{
+			updateControllerForInstrument(part->track()->id());
+		}
+	}
 }/*}}}*/
 
 void Performer::selectPrevPart()

@@ -594,7 +594,8 @@ void SynthPluginDevice::populatePatchPopup(QMenu*, int, MType, bool)
 
 void SynthPluginDevice::populatePatchModel(QStandardItemModel* model, int, MType, bool)
 {
-    qWarning("SynthPluginDevice::populatePatchModel();");
+	if(debugMsg)
+    	qWarning("SynthPluginDevice::populatePatchModel();");
     model->clear();
 
     if (m_plugin)
@@ -739,8 +740,8 @@ void Pipeline::remove(int index)
 		return;
     BasePlugin* plugin = (*this)[index];
 
-    if (plugin)
-    {
+    if (plugin && !(plugin->hints() & PLUGIN_IS_SYNTH))
+    {//Synth type plugins are deleted elsewhere in SynthPluginDevice::close(), DO NOT delete here
         plugin->aboutToRemove();
 
         // Delete the appropriate class
@@ -760,7 +761,8 @@ void Pipeline::remove(int index)
         }
     }
 
-    (*this)[index] = 0;
+	erase(begin()+index);
+    //(*this)[index] = 0;
 }
 
 //---------------------------------------------------------

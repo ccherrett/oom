@@ -700,7 +700,6 @@ void Audio::processMsg(AudioMsg* msg)
 				(*ii)->segmentSizeChanged();
 #endif
 			break;
-
 		case SEQM_RESET_DEVICES:
 			for (int i = 0; i < MIDI_PORTS; ++i)
 			{

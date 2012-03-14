@@ -834,12 +834,16 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 				{//We need to deal with closing the synth devices first
 					if(isSynth)
 					{
+						if(debugMsg)
+							qDebug("TrackManager::setTrackInstrument: Found Synth Instrument, Removing midi Device: %s", md->name().toUtf8().constData());
 						SynthPluginDevice* synth = (SynthPluginDevice*)md;
 						if (synth->duplicated())
 						{
 							midiDevices.remove(md);
 							synth->close();
 						}
+						if(debugMsg)
+							qDebug("TrackManager::setTrackInstrument: Synth cleanup complete");
 					}
 					mp->setInstrument(ins);
 					song->update();
@@ -860,18 +864,18 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 							QString audioName(QString(prefix).append(m_track->name()).append(postfix));
 							QString midi(QString("O").append(m_track->name()));
 
-							MidiDevice* outdev = MidiJackDevice::createJackMidiDevice(midi, 3);
-							if(outdev)
+							md = MidiJackDevice::createJackMidiDevice(midi, 3);
+							if(md)
 							{
 								if(debugMsg)
 									qDebug("TrackManager::setTrackInstrument: Created MIDI input device: JACK_MIDI");
 								int openFlags = 0;
 								openFlags ^= 0x1;
-								outdev->setOpenFlags(openFlags);
-								midiSeq->msgSetMidiDevice(mp, outdev);
+								md->setOpenFlags(openFlags);
+								midiSeq->msgSetMidiDevice(mp, md);
 
 								Route dstRoute(devname, false, -1, Route::JACK_ROUTE);
-								Route srcRoute(outdev, -1);
+								Route srcRoute(md, -1);
 
 								audio->msgAddRoute(srcRoute, dstRoute);
 
@@ -996,6 +1000,8 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 				{//Maybe remove the channel in LS if it was an LS instrument
 					if(oldins->isOOMInstrument() && track->samplerData())
 					{//Delete sampler channel and null the track sampler data
+						if(debugMsg)
+							qDebug("TrackManager::setTrackInstrument Found old LS Instrument, Removing...");
 						if(!lsClient)
 						{
 							lsClient = new LSClient(config.lsClientHost, config.lsClientPort);
@@ -1036,6 +1042,8 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 							if (md->outClientPort())
 								audioDevice->unregisterPort(md->outClientPort());
 						}
+						if(debugMsg)
+							qDebug("TrackManager::setTrackInstrument: Removing midi Device: %s", md->name().toUtf8().constData());
 						midiDevices.remove(md);
 						//Remove Audio Routes
 						Track* input = 0;
@@ -1054,16 +1062,16 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 							int channels = input->channels();
 							for(int i = 0; i < channels; i++)
 							{
-								//if(debugMsg)
+								if(debugMsg)
 									qDebug("TrackManager::setTrackInstrument: Removing route for channel: %d", i);
 								QString src(QString("LinuxSampler:").append(m_track->name()).append("-audio"));
                 				Route srcRoute(src, true, Route::JACK_ROUTE);
                 				Route dstRoute(input->name(), true, i);
-								//if(debugMsg)
-								//{
+								if(debugMsg)
+								{
 									qDebug("TrackManager::setTrackInstrument: srcRoute: %s, %d, %d\n", src.toUtf8().constData(), true, Route::JACK_ROUTE);
 									qDebug("TrackManager::setTrackInstrument: dstRoute: %s, %d, %d\n", input->name().toUtf8().constData(), true, i);
-								//}
+								}
 								audio->msgRemoveRoute(srcRoute, dstRoute);
 								/*if (audioDevice)
 								{
@@ -1077,7 +1085,6 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 						{
 							lsClient->removeInstrumentChannel(track->samplerData());
 						}
-						track->setSamplerData(0);
 						track->setWantsAutomation(true);
 					}
 				}
@@ -1164,6 +1171,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 						break;
 					}
 				}
+				track->setSamplerData(0);
 				oom->changeConfig(true); // save configuration file
 				song->update(SC_MIDI_TRACK_PROP);
 			}
@@ -1211,10 +1219,10 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 							lsClient->removeInstrumentChannel(track->samplerData());
 						}
 						midiDevices.remove(md);
-						track->setSamplerData(0);
 					}
 					mp->setInstrument(ins);
 				}
+				track->setSamplerData(0);
 				track->setWantsAutomation(false);
 				midiSeq->msgSetMidiDevice(mp, 0);
 				song->update(SC_MIDI_TRACK_PROP);

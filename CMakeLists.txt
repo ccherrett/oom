@@ -114,9 +114,10 @@ SET(OOMidi_LIB_DIR ${CMAKE_INSTALL_LIBDIR}/${OOMidi_INSTALL_NAME})
 option ( UPDATE_TRANSLATIONS "Update source translation share/locale/*.ts files 
          (WARNING: This will modify the .ts files in the source tree!!)"                     OFF)
 option ( ENABLE_LSCP         "enable lscp client"                                            ON)
-option ( ENABLE_LV2         "enable LV2 plugin support"                                      ON)
-option ( ENABLE_LILV_STATIC "enable static LILV linking"									 ON)
-option ( ENABLE_LV2UI       "enable LV2 plugin UI support"                                   ON)
+option ( ENABLE_LV2          "enable LV2 plugin support"                                      ON)
+option ( ENABLE_LILV_STATIC  "enable static LILV linking"   								 ON)
+option ( ENABLE_LV2UI        "enable LV2 plugin UI support"                                   ON)
+#option ( ENABLE_JACK_SESSION "enable Jack Session support"                                   ON)
 
 ##
 ## Just print a notice if this is OS X
@@ -227,6 +228,16 @@ else (JACK2_FOUND)
 endif (JACK2_FOUND)
 
 ##
+## jack_session
+##
+
+#if(ENABLE_JACK_SESSION)
+#	set(JACK_SESSION_SUPPORT ON)
+#else(ENABLE_JACK_SESSION)
+#	set(JACK_SESSION_SUPPORT OFF)
+#endif(ENABLE_JACK_SESSION)
+
+##
 ## Set the plugin headers path
 ##
 include_directories(${OOMIDI_PLUGIN_INCLUDES})
@@ -283,17 +294,12 @@ CHECK_INCLUDE_FILES (wordexp.h HAVE_WORDEXP)
 #      set (VST_SUPPORT FALSE)
 #endif (ENABLE_VST)
 
-#if (ENABLE_LSCP)
-      PKG_CHECK_MODULES(LSCP REQUIRED lscp)
-      if (LSCP_FOUND)
-          message("LSCP support enabled")
-          include_directories(${LSCP_INCLUDE_DIRS})
-          set (LSCP_SUPPORT TRUE)
-      endif (LSCP_FOUND)
-	  #else (ENABLE_LSCP)
-	  #      message("LSCP support disabled")
-	  #      set (LSCP_SUPPORT FALSE)
-	  #endif (ENABLE_LSCP)
+PKG_CHECK_MODULES(LSCP REQUIRED lscp)
+if (LSCP_FOUND)
+    message("LSCP support enabled")
+    include_directories(${LSCP_INCLUDE_DIRS})
+    set (LSCP_SUPPORT TRUE)
+endif (LSCP_FOUND)
 
 if (ENABLE_LILV_STATIC)
 	if (ENABLE_LV2)
@@ -455,16 +461,6 @@ file (GLOB doc_files
       AUTHORS
       COPYING
       README
-	  #ChangeLog
-	  #NEWS
-	  #README.de
-	  #README.effects-rack
-	  #README.instruments
-	  #README.ladspaguis
-	  #README.shortcuts
-	  #README.softsynth
-	  #README.translate
-	  #SECURITY
       )
 INSTALL( FILES ${doc_files} DESTINATION ${OOMidi_DOC_DIR})
 
@@ -487,6 +483,7 @@ summary_add("LILV support" LILV_SUPPORT)
 summary_add("LILV static" ENABLE_LILV_STATIC)
 summary_add("GTK2 GUI support" GTK2UI_SUPPORT)
 summary_add("LSCP support" LSCP_SUPPORT)
+#summary_add("JACK_SESSION support" JACK_SESSION_SUPPORT)
 #summary_add("Fluidsynth support" HAVE_FLUIDSYNTH)
 #summary_add("Experimental features" ENABLE_EXPERIMENTAL)
 summary_show()

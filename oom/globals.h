@@ -62,6 +62,7 @@ extern QString configPath;
 extern QString routePath;
 extern QString oomInstruments;
 extern QString oomUserInstruments;
+extern QString gJackSessionUUID;
 
 extern QString lastWavePath;
 extern QString lastMidiPath;

@@ -89,6 +89,7 @@ QString configName = configPath + QString("/OOMidi-").append(VERSION).append(".c
 QString routePath = configPath + QString("/routes");
 QString oomInstruments;
 QString oomUserInstruments;
+QString gJackSessionUUID;
 
 QString lastWavePath(".");
 QString lastMidiPath(".");

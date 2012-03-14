@@ -248,6 +248,9 @@ static void usage(const char* prog, const char* txt)
 	fprintf(stderr, "   -P  n    set audio driver real time priority to n (Dummy only, default 40. Else fixed by Jack.)\n");
 	fprintf(stderr, "   -Y  n    force midi real time priority to n (default: audio driver prio +2)\n");
 	fprintf(stderr, "   -p       don't load LADSPA plugins\n");
+#ifdef JACK_SESSION_SUPPORT
+	fprintf(stderr, "   -U       Jack session UUID\n");
+#endif
 #ifdef ENABLE_PYTHON
 	fprintf(stderr, "   -y       enable Python control support\n");
 #endif
@@ -345,6 +348,9 @@ int main(int argc, char* argv[])
 #ifdef HAVE_LASH
 	optstr += QString("L");
 #endif
+#ifdef JACK_SESSION_SUPPORT
+	optstr += QString("U");
+#endif
 
 	while ((i = getopt(argc, argv, optstr.toLatin1().constData())) != EOF)
 	{
@@ -379,6 +385,8 @@ int main(int argc, char* argv[])
 			case 'y': usePythonBridge = true;
 				break;
 			case 'l': locale_override = QString(optarg);
+				break;
+			case 'U': gJackSessionUUID = QString(optarg);
 				break;
 			case 'h': usage(argv[0], argv[1]);
 				return -1;

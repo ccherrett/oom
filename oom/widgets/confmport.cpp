@@ -667,8 +667,8 @@ _redisplay:
                             SynthPluginDevice* synth = (SynthPluginDevice*)sdev;
                             if (synth->duplicated())
                             {
-                                midiDevices.remove(sdev);
                                 synth->close();
+                                midiDevices.remove(sdev);
                                 //delete synth;
                             }
                         }
