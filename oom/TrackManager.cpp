@@ -840,7 +840,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 						if (synth->duplicated())
 						{
 							midiDevices.remove(md);
-							//synth->close();
+							synth->close();
 						}
 						//if(debugMsg)
 							qDebug("TrackManager::setTrackInstrument: Synth cleanup complete");
@@ -862,7 +862,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 							QString postfix("-audio");
 							QString devname(QString(prefix).append(m_track->name()));
 							QString audioName(QString(prefix).append(m_track->name()).append(postfix));
-							QString midi(QString("O").append(m_track->name()));
+							QString midi(QString("O-").append(m_track->name()));
 
 							MidiDevice *ndev = MidiJackDevice::createJackMidiDevice(midi, 3);
 							if(ndev)
@@ -993,7 +993,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 					if (synth->duplicated())
 					{
 						midiDevices.remove(md);
-						//synth->close();
+						synth->close();
 					}
 				}
 				else

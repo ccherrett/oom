@@ -115,9 +115,15 @@ void MidiPort::setMidiDevice(MidiDevice* dev)
 	if (_device)
 	{
         if (_device->isSynthPlugin())
+		{
 			_instrument = genericMidiInstrument;
-		_device->setPort(-1);
-		_device->close();
+			_device->setPort(-1);
+		}
+		else
+		{
+			_device->setPort(-1);
+			_device->close();
+		}
 	}
     // set-up new device
 	if (dev)
