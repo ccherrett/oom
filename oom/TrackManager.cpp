@@ -834,7 +834,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 				{//We need to deal with closing the synth devices first
 					if(isSynth)
 					{
-						if(debugMsg)
+						//if(debugMsg)
 							qDebug("TrackManager::setTrackInstrument: Found Synth Instrument, Removing midi Device: %s", md->name().toUtf8().constData());
 						SynthPluginDevice* synth = (SynthPluginDevice*)md;
 						if (synth->duplicated())
@@ -842,7 +842,7 @@ void TrackManager::setTrackInstrument(qint64 tid, const QString& instrument, int
 							midiDevices.remove(md);
 							synth->close();
 						}
-						if(debugMsg)
+						//if(debugMsg)
 							qDebug("TrackManager::setTrackInstrument: Synth cleanup complete");
 					}
 					mp->setInstrument(ins);

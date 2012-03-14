@@ -391,18 +391,22 @@ QString SynthPluginDevice::open()
 
 void SynthPluginDevice::close()
 {
+	qDebug("SynthPluginDevice::close");
     _readEnable = false;
     _writeEnable = false;
 
     if (m_audioTrack)
     {
+		qDebug("SynthPluginDevice::close Deleting internal SynthAudioTrack");
         audio->msgAddPlugin(m_audioTrack, 0, 0);
         delete (SynthPluginTrack*)m_audioTrack;
         m_audioTrack = 0;
+		qDebug("SynthPluginDevice::close Done");
     }
 
     if (m_plugin)
     {
+		qDebug("SynthPluginDevice::close calling delete on plugin");
         m_plugin->setTrack(0);
         m_plugin->aboutToRemove();
 
@@ -738,6 +742,7 @@ void Pipeline::remove(int index)
 	int s = size();
 	if(index >= s)
 		return;
+	qDebug(" Pipeline::remove(%d)", index);
     BasePlugin* plugin = (*this)[index];
 
     if (plugin && !(plugin->hints() & PLUGIN_IS_SYNTH))
